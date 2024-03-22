@@ -1,51 +1,6 @@
-- cluster-network-operator embedded-component e84a82d82c1fbab237fbaf6efaa3fbc40bb948e8 to 5c074c930fc58368fd68d576505261ed158d4059
-  - b15f935 2024-03-08T16:41:01+01:00 getMultusAdmissionControllerReplicas for non-hypershift externalTopology clusters
-  - 5cd95ee 2024-02-28T09:04:12+01:00 Disable network-node-identity on ROKS
+- ovn-kubernetes image-amd64 b565506145a33f4869e9cdd457a305d5cf2659c4 to 21ab2315a1b04831a59395171c65e661eede8794
+  - 1004496 2024-02-19T16:10:02-05:00 APB: return error if the target pod is in Pending phase when adding the external gateway IPs so that it can be retried when the pod obtains an IP
 
-- etcd embedded-component 77303c479ae9cb45b5a1b481f54ec5b62d89246f to 070ba48ac446fa25ecd993e04494448a88eaeff2
-  - 740bfccd 2024-01-31T15:09:50+01:00 DOWNSTREAM <carry>: resolve merge conflicts
-  - 0404154d 2024-01-31T14:51:52+01:00 DOWNSTREAM <carry>: resolve merge conflicts
-  - e7b3bb6c 2024-01-31T11:32:22+01:00 version: bump up to 3.5.12
-  - 8599d48f 2024-01-30T12:02:49+01:00 Bump golang.org/x/crypto to v0.17+ to address CVE-2023-48795
-  - 0f494e02 2024-01-25T13:32:03+00:00 test: fix TestHashKVWhenCompacting: ensure all goroutine finished
-  - 926d0227 2024-01-24T13:50:38+00:00 print error log when creating peer listener failed
-  - 2c3b6140 2024-01-22T19:10:20+05:30 mvcc: Printing etcd backend database related metrics inside scheduleCompaction function
-  - 02d55998 2024-01-18T14:38:08-08:00 dependency: update go version to 1.20.13
-  - 2d531a30 2024-01-11T13:34:14-08:00 commit bbolt transaction if there is any pending deleting operations
-  - f219ab44 2024-01-11T13:29:54-08:00 add tests to test tx delete consistency.
-  - f3a27b37 2024-01-08T15:06:12+01:00 Don't flock snapshot files
-  - 5f571ba2 2024-01-08T14:55:42+13:00 Backport adding digest for etcd base image.
-  - 0ac8e50a 2024-01-05T14:46:42+05:30 Add a unit tests and missing flags in etcd help.
-  - f87048a9 2024-01-02T18:08:20+05:30 Add missing flag in etcd help.
-  - b075426e 2024-01-01T16:48:59+05:30 Backport testutils.ExecuteUntil to 3.5 branch
-  - bd587c08 2023-12-29T09:46:58+08:00 member replace e2e test
-  - d6d263ac 2023-12-20T11:41:54+01:00 Check if be is nil to avoid panic when be is overriden with nil by recoverSnapshotBackend on line 517
-  - a2e9dc8c 2023-12-20T11:31:47+01:00 Don't redeclare err and snapshot variable, fixing validation of consistent index and closing database on defer
-  - cb65c1f0 2023-12-11T09:15:56-08:00 test: enable gofail in release e2e test.
-  - b8d5e79f 2023-12-07T09:51:39-08:00 [3.5] backport health check e2e tests.
-  - 795dcedd 2023-12-06T09:13:36-08:00 tests: Extract e2e cluster setup to separate package
-
-- kubernetes embedded-component d8e449a2a95f1f99e19c09d1ee57d8b5362632df to 749fe1d06dbe007762ae224f25386d0f278276f3
-  - 61ca2c762 2024-03-15T15:02:30+00:00 UPSTREAM: <carry>: Update IP/CIDR CEL for 1.28 compatibility
-  - 13cc2dbfa 2024-03-15T15:01:22+00:00 UPSTREAM: 121912: Add IP address CEL extension
-
-- machine-config-operator embedded-component 1c8361d152c92d2ce4f9eaa524610b10849d4f31 to 22c9320b6daa6100873261694c381f5061780257
-  - 33cb7433 2024-03-18T10:14:29+00:00 add preferredduringscheduling annotation to kube-rbac-proxy-crio
-  - ee49927b 2024-03-13T13:16:40+00:00 OCPNODE-2098: add static pods for rbacproxy
-
-- ovn-kubernetes image-amd64 f7b6551eff3f5f234b895a4fd643b017a3079d7e to b565506145a33f4869e9cdd457a305d5cf2659c4
-  - f07950d 2024-03-06T23:43:12+05:30 Handle hybrid overlay nodes while syncing HostNetworkNamespece specific address_set
-  - a98ae35 2024-03-05T20:47:11+05:30 Update HostNetworkNamespace address_set for remote zone nodes
-
-- kubernetes image-amd64 d8e449a2a95f1f99e19c09d1ee57d8b5362632df to 749fe1d06dbe007762ae224f25386d0f278276f3
-  - 61ca2c762 2024-03-15T15:02:30+00:00 UPSTREAM: <carry>: Update IP/CIDR CEL for 1.28 compatibility
-  - 13cc2dbfa 2024-03-15T15:01:22+00:00 UPSTREAM: 121912: Add IP address CEL extension
-
-- ovn-kubernetes image-arm64 f7b6551eff3f5f234b895a4fd643b017a3079d7e to b565506145a33f4869e9cdd457a305d5cf2659c4
-  - f07950d 2024-03-06T23:43:12+05:30 Handle hybrid overlay nodes while syncing HostNetworkNamespece specific address_set
-  - a98ae35 2024-03-05T20:47:11+05:30 Update HostNetworkNamespace address_set for remote zone nodes
-
-- kubernetes image-arm64 d8e449a2a95f1f99e19c09d1ee57d8b5362632df to 749fe1d06dbe007762ae224f25386d0f278276f3
-  - 61ca2c762 2024-03-15T15:02:30+00:00 UPSTREAM: <carry>: Update IP/CIDR CEL for 1.28 compatibility
-  - 13cc2dbfa 2024-03-15T15:01:22+00:00 UPSTREAM: 121912: Add IP address CEL extension
+- ovn-kubernetes image-arm64 b565506145a33f4869e9cdd457a305d5cf2659c4 to 21ab2315a1b04831a59395171c65e661eede8794
+  - 1004496 2024-02-19T16:10:02-05:00 APB: return error if the target pod is in Pending phase when adding the external gateway IPs so that it can be retried when the pod obtains an IP
 
