@@ -1,6 +1,7 @@
 package templatingdata
 
 import (
+	"fmt"
 	"strings"
 	"text/template"
 
@@ -76,14 +77,14 @@ func (td *TemplatingData) Template(name, data string) (string, error) {
 	tpl, err := template.New(name).Funcs(funcs).Parse(data)
 	if err != nil {
 		klog.ErrorS(err, "Failed to parse template file", "template", name)
-		return "", err
+		return "", fmt.Errorf("failed to parse template %q: %w", name, err)
 	}
 
 	b := &strings.Builder{}
 	err = tpl.Execute(b, td)
 	if err != nil {
 		klog.ErrorS(err, "Executing template failed", "template", name)
-		return "", err
+		return "", fmt.Errorf("failed to execute template %q: %w", name, err)
 	}
 
 	result := b.String()
