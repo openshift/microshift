@@ -10,12 +10,12 @@ apiServer:
       # profile may be one of the "Default", "WriteRequestBodies", "AllRequestBodies", "None". If unset or an empty-string
       # "Default" is assumed.
       profile: "Default"
-      # maxSize specifies the file size at which the active log is rotated.
-      maxSize: 200
+      # maxFileSize specifies the file size at which the active log is rotated.
+      maxFileSize: 200
       # maxFiles sets the maximum number of rotated log files to retain. A 0 value removes the limit. Defaults to 10 if unset.
       maxFiles: 10
-      # maxAge sets the time in days to retain log files. A 0 value removes the limit. Defaults to 0 if unset.
-      maxAge: 0
+      # maxFileAge sets the time in days to retain log files. A 0 value removes the limit. Defaults to 0 if unset.
+      maxFileAge: 0
 debugging:
     # Valid values are: "Normal", "Debug", "Trace", "TraceAll". Defaults to "Normal".
     logLevel: Normal

@@ -22,11 +22,11 @@ type ApiServer struct {
 
 type AuditLog struct {
 	// maxFileAge is the maximum number of days to retain old audit log files
-	MaxFileAge  int    `json:"maxAge"`
+	MaxFileAge  int    `json:"maxFileAge"`
 	// maxFiles is the maximum number of audit log files to retain
-	MaxFiles    int    `json:"maxBackup"`
+	MaxFiles    int    `json:"maxFiles"`
 	// maxFileSize is the maximum size in megabytes of the audit log file before it gets rotated
-	MaxFileSize int    `json:"maxSize"`
+	MaxFileSize int    `json:"maxFileSize"`
 	// profile is the OpenShift profile specifying a specific logging policy
 	Profile     string `json:"profile"`
 }
