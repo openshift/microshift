@@ -71,21 +71,9 @@ func NewComposeCmd() *cobra.Command {
 			klog.InfoS("No argument provided - running default set of layers", "layers", args)
 		}
 
-		var composer helpers.Composer
-		var ostree helpers.Ostree
-		var err error
-		if dryRun {
-			ostree = helpers.NewDryRunOstree()
-			composer = helpers.NewDryRunComposer()
-		} else {
-			ostree, err = helpers.NewOstree(filepath.Join(artifactsMainDir, "repo"))
-			if err != nil {
-				return err
-			}
-			composer, err = helpers.NewComposer(testDirPath, fmt.Sprintf("http://%s:8080/repo", hostIP))
-			if err != nil {
-				return err
-			}
+		composer, ostree, err := getHelpers()
+		if err != nil {
+			return err
 		}
 
 		td, err := (&templatingdata.TemplatingDataOpts{
@@ -262,6 +250,22 @@ func buildPlanSubCmd() *cobra.Command {
 	}
 
 	return cmd
+}
+
+func getHelpers() (helpers.Composer, helpers.Ostree, error) {
+	if dryRun {
+		return helpers.NewDryRunComposer(), helpers.NewDryRunOstree(), nil
+	}
+	ostree, err := helpers.NewOstree(filepath.Join(artifactsMainDir, "repo"))
+	if err != nil {
+		return nil, nil, err
+	}
+	composer, err := helpers.NewComposer(testDirPath, fmt.Sprintf("http://%s:8080/repo", hostIP))
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return composer, ostree, nil
 }
 
 func persistImages(td *templatingdata.TemplatingData) error {
