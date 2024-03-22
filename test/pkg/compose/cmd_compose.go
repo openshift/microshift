@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strings"
 
 	"github.com/openshift/microshift/pkg/util"
 	"github.com/openshift/microshift/test/pkg/compose/build"
@@ -110,25 +109,21 @@ func NewComposeCmd() *cobra.Command {
 			return err
 		}
 
-		blueprintsPath := filepath.Join(testDirPath, "image-blueprints")
 		buildPlanner := build.Planner{
 			Opts: &build.PlannerOpts{
-				Filesys:          os.DirFS(blueprintsPath),
 				TplData:          td,
 				SourceOnly:       sourceOnly,
 				BuildInstallers:  buildInstallers,
 				ArtifactsMainDir: artifactsMainDir,
+				TestDir:          testDirPath,
 			},
 		}
 
 		buildPaths := []string{}
 		for _, arg := range args {
-			// As a result of using os.DirFS starting at ./test/image-blueprints these paths need to be carefully crafted
-			buildPath := filepath.Join(testDirPath, arg)
-			buildPath = strings.TrimLeft(strings.ReplaceAll(buildPath, blueprintsPath, ""), "/")
-			buildPaths = append(buildPaths, buildPath)
+			buildPaths = append(buildPaths, filepath.Join(testDirPath, arg))
 		}
-		toBuild, err := buildPlanner.CreateBuildPlan(buildPaths)
+		buildPlan, err := buildPlanner.CreateBuildPlan(buildPaths)
 		if err != nil {
 			return err
 		}
@@ -142,7 +137,7 @@ func NewComposeCmd() *cobra.Command {
 				ArtifactsMainDir: artifactsMainDir,
 			},
 		}
-		err = builder.Build(toBuild)
+		err = builder.Build(buildPlan)
 		if err != nil {
 			return err
 		}
@@ -236,10 +231,8 @@ func buildPlanSubCmd() *cobra.Command {
 				return err
 			}
 
-			blueprintsPath := filepath.Join(testDirPath, "image-blueprints")
 			buildPlanner := build.Planner{
 				Opts: &build.PlannerOpts{
-					Filesys:          os.DirFS(blueprintsPath),
 					TplData:          td,
 					SourceOnly:       sourceOnly,
 					BuildInstallers:  buildInstallers,
@@ -248,16 +241,13 @@ func buildPlanSubCmd() *cobra.Command {
 			}
 			buildPaths := []string{}
 			for _, arg := range args {
-				// As a result of using os.DirFS starting at ./test/image-blueprints these paths need to be carefully crafted
-				buildPath := filepath.Join(testDirPath, arg)
-				buildPath = strings.TrimLeft(strings.ReplaceAll(buildPath, blueprintsPath, ""), "/")
-				buildPaths = append(buildPaths, buildPath)
+				buildPaths = append(buildPaths, filepath.Join(testDirPath, arg))
 			}
-			toBuild, err := buildPlanner.CreateBuildPlan(buildPaths)
+			buildPlan, err := buildPlanner.CreateBuildPlan(buildPaths)
 			if err != nil {
 				return err
 			}
-			b, err := json.MarshalIndent(toBuild, "", "    ")
+			b, err := json.MarshalIndent(buildPlan, "", "    ")
 			if err != nil {
 				return fmt.Errorf("failed to marshal build plan to json: %w", err)
 			}

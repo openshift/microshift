@@ -39,7 +39,7 @@ func NewBlueprintBuild(path string, opts *PlannerOpts) (*BlueprintBuild, error) 
 	withoutExt := strings.TrimSuffix(filename, filepath.Ext(filename))
 	dir := filepath.Dir(path)
 
-	dataBytes, err := fs.ReadFile(opts.Filesys, path)
+	dataBytes, err := os.ReadFile(path)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read %s: %w", path, err)
 	}
@@ -76,10 +76,10 @@ func NewBlueprintBuild(path string, opts *PlannerOpts) (*BlueprintBuild, error) 
 
 	// blueprint.alias file contains aliases for commit defined in blueprint.toml
 	potentialAliasFile := fmt.Sprintf("%s.alias", withoutExt)
-	if exists, err := fileExistsInDir(opts.Filesys, dir, potentialAliasFile); err != nil {
+	if exists, err := fileExistsInDir(dir, potentialAliasFile); err != nil {
 		return nil, err
 	} else if exists {
-		data, err := fs.ReadFile(opts.Filesys, filepath.Join(dir, potentialAliasFile))
+		data, err := os.ReadFile(filepath.Join(dir, potentialAliasFile))
 		if err != nil {
 			return nil, err
 		}
@@ -88,7 +88,7 @@ func NewBlueprintBuild(path string, opts *PlannerOpts) (*BlueprintBuild, error) 
 
 	if opts.BuildInstallers {
 		// If blueprint.image-installer exists, then ISO installer can be built.
-		if exists, err := fileExistsInDir(opts.Filesys, dir, fmt.Sprintf("%s.image-installer", withoutExt)); err != nil {
+		if exists, err := fileExistsInDir(dir, fmt.Sprintf("%s.image-installer", withoutExt)); err != nil {
 			return nil, err
 		} else if exists {
 			bb.Installer = true
@@ -102,7 +102,7 @@ func NewBlueprintBuild(path string, opts *PlannerOpts) (*BlueprintBuild, error) 
 		expectedParentFilename := parts[0] + ".toml"
 
 		parentPath := ""
-		err = fs.WalkDir(opts.Filesys, ".", func(p string, d fs.DirEntry, err error) error {
+		err = filepath.WalkDir(filepath.Join(opts.TestDir, "image-blueprints"), func(p string, d fs.DirEntry, err error) error {
 			if parentPath != "" {
 				return nil
 			}
@@ -116,7 +116,7 @@ func NewBlueprintBuild(path string, opts *PlannerOpts) (*BlueprintBuild, error) 
 		}
 
 		if parentPath != "" {
-			parentData, err := fs.ReadFile(opts.Filesys, parentPath)
+			parentData, err := os.ReadFile(parentPath)
 			if err != nil {
 				return nil, fmt.Errorf("failed to read parent of %q which is %q: %w", path, parentPath, err)
 			}
