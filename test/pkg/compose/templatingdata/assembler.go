@@ -27,12 +27,13 @@ var (
 type TemplatingDataOpts struct {
 	ArtifactsMainDir               string
 	TemplatingDataFragmentFilepath string
+	SkipContainerImagesExtraction  bool
 }
 
-func New(opts *TemplatingDataOpts) (*TemplatingData, error) {
+func (o *TemplatingDataOpts) Construct() (*TemplatingData, error) {
 	klog.InfoS("Constructing TemplatingData")
 
-	rpmRepos := path.Join(opts.ArtifactsMainDir, "rpm-repos")
+	rpmRepos := path.Join(o.ArtifactsMainDir, "rpm-repos")
 	localRepo := path.Join(rpmRepos, "microshift-local")
 	fakeNextRepo := path.Join(rpmRepos, "microshift-fake-next-minor")
 	baseRepo := path.Join(rpmRepos, "microshift-base")
@@ -47,8 +48,8 @@ func New(opts *TemplatingDataOpts) (*TemplatingData, error) {
 	var td *TemplatingData
 	var err error
 
-	if opts.TemplatingDataFragmentFilepath != "" {
-		td, err = unmarshalTemplatingData(opts.TemplatingDataFragmentFilepath)
+	if o.TemplatingDataFragmentFilepath != "" {
+		td, err = unmarshalTemplatingData(o.TemplatingDataFragmentFilepath)
 		if err != nil {
 			return nil, err
 		}
@@ -60,21 +61,21 @@ func New(opts *TemplatingDataOpts) (*TemplatingData, error) {
 	td.Arch = getArch()
 
 	if td.Source.Repository == "" {
-		td.Source, err = getReleaseFromLocalFs(localRepo)
+		td.Source, err = o.getReleaseFromLocalFs(localRepo)
 		if err != nil {
 			return nil, err
 		}
 	}
 
 	if td.Base.Repository == "" {
-		td.Base, err = getReleaseFromLocalFs(baseRepo)
+		td.Base, err = o.getReleaseFromLocalFs(baseRepo)
 		if err != nil {
 			return nil, err
 		}
 	}
 
 	if td.FakeNext.Repository == "" {
-		td.FakeNext, err = getReleaseFromLocalFs(fakeNextRepo)
+		td.FakeNext, err = o.getReleaseFromLocalFs(fakeNextRepo)
 		if err != nil {
 			return nil, err
 		}
@@ -86,7 +87,7 @@ func New(opts *TemplatingDataOpts) (*TemplatingData, error) {
 			return nil, err
 		}
 		if exists {
-			td.External, err = getReleaseFromLocalFs(externalRepo)
+			td.External, err = o.getReleaseFromLocalFs(externalRepo)
 			if err != nil {
 				return nil, err
 			}
@@ -94,21 +95,21 @@ func New(opts *TemplatingDataOpts) (*TemplatingData, error) {
 	}
 
 	if td.Current.Repository == "" {
-		td.Current, err = getReleaseFromRemoteRepo(td.Source.Minor)
+		td.Current, err = o.getReleaseFromRemoteRepo(td.Source.Minor)
 		if err != nil {
 			return nil, err
 		}
 	}
 
 	if td.Previous.Repository == "" {
-		td.Previous, err = getReleaseFromRemoteRepo(td.Source.Minor - 1)
+		td.Previous, err = o.getReleaseFromRemoteRepo(td.Source.Minor - 1)
 		if err != nil {
 			return nil, err
 		}
 	}
 
 	if td.YMinus2.Repository == "" {
-		td.YMinus2, err = getReleaseFromRemoteRepo(td.Source.Minor - 2)
+		td.YMinus2, err = o.getReleaseFromRemoteRepo(td.Source.Minor - 2)
 		if err != nil {
 			return nil, err
 		}
@@ -116,7 +117,7 @@ func New(opts *TemplatingDataOpts) (*TemplatingData, error) {
 
 	// If templatingDataInputPath was provided, assume the 0 is
 	// already "calculated" value and repo is not available yet.
-	if td.RHOCPMinorY == 0 && opts.TemplatingDataFragmentFilepath == "" {
+	if td.RHOCPMinorY == 0 && o.TemplatingDataFragmentFilepath == "" {
 		if isRHOCPAvailable(td.Source.Minor) {
 			td.RHOCPMinorY = td.Source.Minor
 		}
@@ -162,7 +163,7 @@ func getArch() string {
 }
 
 // getReleaseFromLocalFs creates `Release` from local filesystem repository
-func getReleaseFromLocalFs(repo string) (Release, error) {
+func (o *TemplatingDataOpts) getReleaseFromLocalFs(repo string) (Release, error) {
 	releaseInfoFile := ""
 	err := filepath.WalkDir(repo, func(path string, d fs.DirEntry, err error) error {
 		if releaseInfoFile != "" {
@@ -199,9 +200,14 @@ func getReleaseFromLocalFs(repo string) (Release, error) {
 		return Release{}, fmt.Errorf("failed to convert %q to int: %w", minorStr, err)
 	}
 
-	images, err := getContainerImages(releaseInfoFile)
-	if err != nil {
-		return Release{}, err
+	var images []string
+	if o.SkipContainerImagesExtraction {
+		klog.InfoS("Skipping container image extraction", "version", rpmVersion)
+	} else {
+		images, err = getContainerImages(releaseInfoFile)
+		if err != nil {
+			return Release{}, err
+		}
 	}
 
 	return Release{
@@ -215,10 +221,10 @@ func getReleaseFromLocalFs(repo string) (Release, error) {
 // getReleaseFromRemoteRepo creates `Release` from remote repository.
 // It looks for MicroShift RPM in following order:
 // RHOCP, Release Candidates on OpenShift mirror, Engineering Candidates on OpenShift mirror.
-func getReleaseFromRemoteRepo(minor int) (Release, error) {
+func (o *TemplatingDataOpts) getReleaseFromRemoteRepo(minor int) (Release, error) {
 	klog.InfoS("Looking for a Release for minor version", "minor", minor)
 
-	r, err := getReleaseFromRHOCP(minor)
+	r, err := o.getReleaseFromRHOCP(minor)
 	if err != nil && !errors.Is(err, errNoRemoteRelease) {
 		return Release{}, err
 	}
@@ -227,7 +233,7 @@ func getReleaseFromRemoteRepo(minor int) (Release, error) {
 		return r, nil
 	}
 
-	r, err = getReleaseFromTheMirror(minor, false)
+	r, err = o.getReleaseFromTheMirror(minor, false)
 	if err != nil && !errors.Is(err, errNoRemoteRelease) {
 		return Release{}, err
 	}
@@ -236,7 +242,7 @@ func getReleaseFromRemoteRepo(minor int) (Release, error) {
 		return r, nil
 	}
 
-	r, err = getReleaseFromTheMirror(minor, true)
+	r, err = o.getReleaseFromTheMirror(minor, true)
 	if err != nil && !errors.Is(err, errNoRemoteRelease) {
 		return Release{}, err
 	}
@@ -251,7 +257,7 @@ func getReleaseFromRemoteRepo(minor int) (Release, error) {
 }
 
 // getReleaseFromTheMirror looks for MicroShift RPM in OpenShift mirror
-func getReleaseFromTheMirror(minor int, devPreview bool) (Release, error) {
+func (o *TemplatingDataOpts) getReleaseFromTheMirror(minor int, devPreview bool) (Release, error) {
 	dp := ""
 	if devPreview {
 		dp = "-dev-preview"
@@ -279,21 +285,27 @@ func getReleaseFromTheMirror(minor int, devPreview bool) (Release, error) {
 	if err != nil {
 		return Release{}, err
 	}
-	imgs, err := getContainerImages(relInfo)
-	if err != nil {
-		return Release{}, err
+
+	var images []string
+	if o.SkipContainerImagesExtraction {
+		klog.InfoS("Skipping container image extraction", "version", version)
+	} else {
+		images, err = getContainerImages(relInfo)
+		if err != nil {
+			return Release{}, err
+		}
 	}
 
 	return Release{
 		Repository: repo,
 		Version:    version,
 		Minor:      minor,
-		Images:     imgs,
+		Images:     images,
 	}, nil
 }
 
 // getReleaseFromRHOCP looks for MicroShift RPM in RHOCP
-func getReleaseFromRHOCP(minor int) (Release, error) {
+func (o *TemplatingDataOpts) getReleaseFromRHOCP(minor int) (Release, error) {
 	rhocp := fmt.Sprintf("rhocp-4.%d-for-rhel-9-%s-rpms", minor, getArch())
 	version, serr, err := testutil.RunCommand("sudo", "dnf", "repoquery", "microshift",
 		"--quiet",
@@ -306,15 +318,20 @@ func getReleaseFromRHOCP(minor int) (Release, error) {
 		if err != nil {
 			return Release{}, err
 		}
-		imgs, err := getContainerImages(relInfo)
-		if err != nil {
-			return Release{}, err
+		var images []string
+		if o.SkipContainerImagesExtraction {
+			klog.InfoS("Skipping container image extraction", "version", version)
+		} else {
+			images, err = getContainerImages(relInfo)
+			if err != nil {
+				return Release{}, err
+			}
 		}
 		return Release{
 			Repository: rhocp,
 			Version:    version,
 			Minor:      minor,
-			Images:     imgs,
+			Images:     images,
 		}, nil
 	}
 	if strings.Contains(serr, "Cannot download repomd.xml: Cannot download repodata/repomd.xml: All mirrors were tried") {
