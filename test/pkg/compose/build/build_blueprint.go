@@ -265,12 +265,14 @@ func (b *BlueprintBuild) composeInstaller(opts *Opts) error {
 	}
 
 	dest := filepath.Join(opts.ArtifactsMainDir, "vm-storage", b.Name+".iso")
-	err = os.Rename(installerPath, dest)
-	if err != nil {
-		return fmt.Errorf("failed to move installer from %q to %q: %w", installerPath, dest, err)
-	}
+	if installerPath != "/dummy/dry/run/path" {
+		err = os.Rename(installerPath, dest)
+		if err != nil {
+			return fmt.Errorf("failed to move installer from %q to %q: %w", installerPath, dest, err)
+		}
 
-	klog.InfoS("Moved installer file", "destination", dest)
+		klog.InfoS("Moved installer file", "destination", dest)
+	}
 
 	klog.InfoS("Installer procedure done", "blueprint", b.Name, "elapsed", time.Since(start))
 
