@@ -70,7 +70,7 @@ func (c *dryrunComposer) StartCompose(blueprint string, composeType string) (str
 
 func (c *dryrunComposer) WaitForCompose(id, friendlyName string, timeout time.Duration) error {
 	klog.InfoS("DRYRUN: Waiting for compose", "id", id, "timeout", timeout)
-	time.Sleep(1 * time.Second)
+	time.Sleep(5 * time.Second)
 	klog.InfoS("DRYRUN: Waited for compose", "id", id, "timeout", timeout)
 	return nil
 }
