@@ -59,7 +59,7 @@ func (b *Planner) CreateBuildPlan(paths []string) (Plan, error) {
 		} else if strings.Contains(base, ".image-installer") || strings.Contains(base, ".alias") {
 			return nil, fmt.Errorf("passing .image-installer or .alias files directly is not supported - only .toml and .image-fetcher file are supported")
 		} else {
-			return nil, fmt.Errorf("unknown artifact to build")
+			return nil, fmt.Errorf("unknown artifact to build: %q", path)
 		}
 	}
 
