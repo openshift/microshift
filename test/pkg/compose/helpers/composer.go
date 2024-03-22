@@ -1,9 +1,11 @@
 package helpers
 
 import (
+	"archive/tar"
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"strings"
@@ -296,4 +298,46 @@ func (c *composer) SaveComposeImage(id, friendlyName, ext string) (string, error
 
 	klog.InfoS("Got compose image", "id", id, "filename", filename)
 	return filename, nil
+}
+
+// extractSingleFileFromTar extracts exactly one file from tar archive.
+// Intended to be used with compose metadata or logs as the archives contain only single file.
+func extractSingleFileFromTar(archivePath, filePath string) error {
+	archiveFile, err := os.Open(archivePath)
+	if err != nil {
+		return fmt.Errorf("failed to open tar file %q: %w", archivePath, err)
+	}
+	tarFile := tar.NewReader(archiveFile)
+	header, err := tarFile.Next()
+	if err == io.EOF {
+		return fmt.Errorf("tar file %q is empty, expected single file", archivePath)
+	}
+	if err != nil {
+		return fmt.Errorf("error when reading tar file %q: %w", archivePath, err)
+	}
+	if header.Typeflag != tar.TypeReg {
+		return fmt.Errorf("unexpected header type in tar file %q - type: %v", archivePath, header.Typeflag)
+	}
+
+	extractedFile, err := os.OpenFile(filePath, os.O_CREATE|os.O_RDWR, os.FileMode(header.Mode))
+	if err != nil {
+		return fmt.Errorf("failed to open file %q: %w", filePath, err)
+	}
+	defer extractedFile.Close()
+
+	written, err := io.Copy(extractedFile, tarFile)
+	if err != nil {
+		return fmt.Errorf("failed to copy file to %q: %w", filePath, err)
+	}
+
+	if header.Size != written {
+		return fmt.Errorf("incomplete file copy from the tar archive, size:%d, copied:%d", header.Size, written)
+	}
+
+	err = os.Remove(archivePath)
+	if err != nil {
+		return fmt.Errorf("failed to remove old tar file %q: %w", archivePath, err)
+	}
+
+	return nil
 }
