@@ -159,6 +159,7 @@ func NewComposeCmd() *cobra.Command {
 	// TODO: trap 'osbuild_logs' EXIT + SKIP_LOG_COLLECTION
 
 	cmd.AddCommand(templatingDataSubCmd())
+	cmd.AddCommand(buildPlanSubCmd())
 
 	return cmd
 }
@@ -208,6 +209,63 @@ func templatingDataSubCmd() *cobra.Command {
 	}
 
 	cmd.Flags().BoolVar(&full, "full", false, "Obtain full templating data, including local RPM information (source, base, fake)")
+
+	return cmd
+}
+
+func buildPlanSubCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "build-plan",
+		Short: "",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if len(args) == 0 {
+				args = []string{
+					"./image-blueprints/layer1-base",
+					"./image-blueprints/layer2-presubmit",
+					"./image-blueprints/layer3-periodic",
+				}
+
+				klog.InfoS("No argument provided - running default set of layers", "layers", args)
+			}
+
+			td, err := templatingdata.New(&templatingdata.TemplatingDataOpts{
+				ArtifactsMainDir:               artifactsMainDir,
+				TemplatingDataFragmentFilepath: templatingDataFragmentFilepath,
+			})
+			if err != nil {
+				return err
+			}
+
+			blueprintsPath := filepath.Join(testDirPath, "image-blueprints")
+			buildPlanner := build.Planner{
+				Opts: &build.PlannerOpts{
+					Filesys:          os.DirFS(blueprintsPath),
+					TplData:          td,
+					SourceOnly:       sourceOnly,
+					BuildInstallers:  buildInstallers,
+					ArtifactsMainDir: artifactsMainDir,
+				},
+			}
+			buildPaths := []string{}
+			for _, arg := range args {
+				// As a result of using os.DirFS starting at ./test/image-blueprints these paths need to be carefully crafted
+				buildPath := filepath.Join(testDirPath, arg)
+				buildPath = strings.TrimLeft(strings.ReplaceAll(buildPath, blueprintsPath, ""), "/")
+				buildPaths = append(buildPaths, buildPath)
+			}
+			toBuild, err := buildPlanner.CreateBuildPlan(buildPaths)
+			if err != nil {
+				return err
+			}
+			b, err := json.MarshalIndent(toBuild, "", "    ")
+			if err != nil {
+				return fmt.Errorf("failed to marshal build plan to json: %w", err)
+			}
+			fmt.Printf("%s", string(b))
+
+			return nil
+		},
+	}
 
 	return cmd
 }
