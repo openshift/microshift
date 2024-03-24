@@ -24,6 +24,6 @@ def get_env_var(var_name: str):
 def run_command(command: List[str], dry_run: bool):
     """Run the command or print the command line depending on the dry run argument"""
     if dry_run:
-        print(f"[Dry Run] {" ".join(command)}")
+        print(f"[Dry Run] {' '.join(command)}")
     else:
         subprocess.run(command, check=True)

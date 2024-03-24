@@ -93,6 +93,11 @@ run_image_build() {
     fi
 }
 
+# Run bootc image build
+run_bootc_image_build() {
+    $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints/layer5-bootc
+}
+
 cat /etc/os-release
 
 # Show what other dnf commands have been run to try to debug why we
@@ -153,7 +158,14 @@ else
     if ! ${GOT_CACHED_DATA} ; then
         echo "WARNING: Build cache is not available, rebuilding all the artifacts"
     fi
-    run_image_build
+
+    # TODO: Remove this line before merge
+    CI_JOB_NAME=microshift-bootc-periodic
+    if [ -v CI_JOB_NAME ] && [[ "${CI_JOB_NAME}" =~ .*bootc.* ]]; then
+        run_bootc_image_build
+    else
+        run_image_build
+    fi
 fi
 
 echo "Build phase complete"

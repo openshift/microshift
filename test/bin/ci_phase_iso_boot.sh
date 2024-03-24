@@ -69,6 +69,9 @@ fi
 # Tell scenario.sh to merge stderr into stdout
 export SCENARIO_MERGE_OUTPUT_STREAMS=true
 
+# TODO: Remove this before merge
+SCENARIO_SOURCES="${TESTDIR}/scenarios-bootc"
+
 # Prepare all the scenarios that need to run into a special directory
 prepare_scenario_sources
 
