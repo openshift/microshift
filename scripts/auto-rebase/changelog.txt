@@ -1,3 +1,8 @@
-- cluster-network-operator embedded-component f41dbd3ab6c426157b4d58e103f4148913edc531 to 6480348212445eb74ca2dafc61503f4942a87bed
-  - 7f69e3c 2024-03-14T14:07:42+00:00 OCPBUGS-30103: ensure local networking deployments within hypershift use the client side load balancer to be resilient to control plane node failures
+- oc image-amd64 d6175ebd387c07d8fd6354b476f6b1092f15ee1d to 62c4d45a976deb18194a7b9eb853a8c40b10f4b8
+  - 4d308b9c 2024-03-06T01:30:18+00:00 oc adm catalog mirror: reconstruct the original digest with ':' for sha256 and sha512 algorithms on Windows
+  - 05f0a7b8 2024-03-06T01:30:18+00:00 oc adm catalog mirror: use ToSlash and FromSlash to unify the path separators
+
+- oc image-arm64 d6175ebd387c07d8fd6354b476f6b1092f15ee1d to 62c4d45a976deb18194a7b9eb853a8c40b10f4b8
+  - 4d308b9c 2024-03-06T01:30:18+00:00 oc adm catalog mirror: reconstruct the original digest with ':' for sha256 and sha512 algorithms on Windows
+  - 05f0a7b8 2024-03-06T01:30:18+00:00 oc adm catalog mirror: use ToSlash and FromSlash to unify the path separators
 
