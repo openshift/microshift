@@ -281,15 +281,14 @@ func (o *TemplatingDataOpts) getReleaseFromTheMirror(minor int, devPreview bool)
 	if err != nil {
 		return Release{}, fmt.Errorf("failed to repoquery %q for microshift RPM: %w", repo, err)
 	}
-	relInfo, err := downloadReleaseInfoRPM(version, "--repofrompath", fmt.Sprintf("this,%s", repo))
-	if err != nil {
-		return Release{}, err
-	}
-
 	var images []string
 	if o.SkipContainerImagesExtraction {
 		klog.InfoS("Skipping container image extraction", "version", version)
 	} else {
+		relInfo, err := downloadReleaseInfoRPM(version, "--repofrompath", fmt.Sprintf("this,%s", repo))
+		if err != nil {
+			return Release{}, err
+		}
 		images, err = getContainerImages(relInfo)
 		if err != nil {
 			return Release{}, err
@@ -314,14 +313,14 @@ func (o *TemplatingDataOpts) getReleaseFromRHOCP(minor int) (Release, error) {
 		"--latest-limit", "1",
 	)
 	if err == nil {
-		relInfo, err := downloadReleaseInfoRPM(version, "--repo", rhocp)
-		if err != nil {
-			return Release{}, err
-		}
 		var images []string
 		if o.SkipContainerImagesExtraction {
 			klog.InfoS("Skipping container image extraction", "version", version)
 		} else {
+			relInfo, err := downloadReleaseInfoRPM(version, "--repo", rhocp)
+			if err != nil {
+				return Release{}, err
+			}
 			images, err = getContainerImages(relInfo)
 			if err != nil {
 				return Release{}, err
