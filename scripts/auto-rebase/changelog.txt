@@ -1,6 +1,0 @@
-- ovn-kubernetes image-amd64 b565506145a33f4869e9cdd457a305d5cf2659c4 to 21ab2315a1b04831a59395171c65e661eede8794
-  - 1004496 2024-02-19T16:10:02-05:00 APB: return error if the target pod is in Pending phase when adding the external gateway IPs so that it can be retried when the pod obtains an IP
-
-- ovn-kubernetes image-arm64 b565506145a33f4869e9cdd457a305d5cf2659c4 to 21ab2315a1b04831a59395171c65e661eede8794
-  - 1004496 2024-02-19T16:10:02-05:00 APB: return error if the target pod is in Pending phase when adding the external gateway IPs so that it can be retried when the pod obtains an IP
-
