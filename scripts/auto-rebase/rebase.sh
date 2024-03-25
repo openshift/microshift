@@ -1118,7 +1118,7 @@ rebase_to() {
             git commit -m "update ${dirname}/go.mod"
 
             title "## Updating ${dirname}/vendor directory"
-            (cd "${dirpath}" && make vendor)
+            pushd "${dirpath}" && make vendor && popd || exit 1
             if [[ -n "$(git status -s "${dirpath}/vendor")" ]]; then
                 title "## Commiting changes to ${dirname}/vendor directory"
                 git add "${dirpath}/vendor"
