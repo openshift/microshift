@@ -18,6 +18,7 @@ type SourceConfigurerOpts struct {
 	Composer    helpers.Composer
 	TplData     *templatingdata.TemplatingData
 	TestDirPath string
+	Junit       *testutil.JUnit
 }
 
 type SourceConfigurer struct {
@@ -63,6 +64,11 @@ func (sc *SourceConfigurer) ConfigureSources() error {
 				}
 			} else {
 				klog.InfoS("Template is empty - not adding", "name", name)
+				sc.Opts.Junit.AddTest("sources", testutil.JUnitTestCase{
+					Name:      name,
+					ClassName: "source",
+					Skipped:   &testutil.JUnitSkipped{Message: "Empty result of templating"},
+				})
 			}
 			return nil
 		}
@@ -70,8 +76,20 @@ func (sc *SourceConfigurer) ConfigureSources() error {
 		klog.InfoS("Adding source to the composer", "name", name)
 		if err := sc.Opts.Composer.AddSource(result); err != nil {
 			klog.ErrorS(err, "Adding composer source failed")
+			sc.Opts.Junit.AddTest("sources", testutil.JUnitTestCase{
+				Name:      name,
+				ClassName: "source",
+				SystemOut: result,
+				Failure:   &testutil.JUnitFailure{Message: "Adding composer source failed", Content: err.Error()},
+			})
 			return err
 		}
+
+		sc.Opts.Junit.AddTest("sources", testutil.JUnitTestCase{
+			Name:      name,
+			ClassName: "source",
+			SystemOut: result,
+		})
 
 		return nil
 	})

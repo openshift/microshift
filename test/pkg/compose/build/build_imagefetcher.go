@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/openshift/microshift/pkg/util"
+	"github.com/openshift/microshift/test/pkg/testutil"
 	"k8s.io/klog/v2"
 )
 
@@ -52,6 +53,27 @@ func (i *ImageFetcher) Prepare(opts *Opts) error {
 }
 
 func (i *ImageFetcher) Execute(opts *Opts) error {
+	s := time.Now()
+	err := i.execute(opts)
+	if err != nil {
+		opts.Junit.AddTest("download", testutil.JUnitTestCase{
+			Name:      i.Name,
+			ClassName: "iso-download",
+			Time:      int(time.Since(s).Seconds()),
+			Failure:   &testutil.JUnitFailure{Message: "Downloading image failed", Content: err.Error()},
+		})
+		return err
+	}
+
+	opts.Junit.AddTest("download", testutil.JUnitTestCase{
+		Name:      i.Name,
+		ClassName: "iso-download",
+		Time:      int(time.Since(s).Seconds()),
+	})
+	return nil
+}
+
+func (i *ImageFetcher) execute(opts *Opts) error {
 	if opts.DryRun {
 		klog.InfoS("DRY RUN: Downloaded image", "name", i.Name)
 		return nil
@@ -65,6 +87,13 @@ func (i *ImageFetcher) Execute(opts *Opts) error {
 	} else if exists {
 		klog.InfoS("Image for download already exists", "path", i.Destination)
 		if !opts.Force {
+			opts.Junit.AddTest("download", testutil.JUnitTestCase{
+				Name:      i.Name,
+				ClassName: "iso-download",
+				Skipped: &testutil.JUnitSkipped{
+					Message: fmt.Sprintf("Image already exists in %s", i.Destination),
+				},
+			})
 			return nil
 		}
 		klog.InfoS("Force mode: removing and re-downloading file", "path", i.Destination)

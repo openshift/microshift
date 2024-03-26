@@ -63,8 +63,18 @@ func NewBlueprintBuild(path string, opts *PlannerOpts) (*BlueprintBuild, error) 
 
 	templatedData, err := opts.TplData.Template(name, data)
 	if err != nil {
+		opts.Junit.AddTest("render", testutil.JUnitTestCase{
+			Name:      name,
+			ClassName: "render",
+			Failure:   &testutil.JUnitFailure{Message: "Failed to render template", Content: err.Error()},
+		})
 		return nil, err
 	}
+	opts.Junit.AddTest("render", testutil.JUnitTestCase{
+		Name:      name,
+		ClassName: "render",
+		SystemOut: templatedData,
+	})
 
 	bb := &BlueprintBuild{
 		build: build{
@@ -139,8 +149,17 @@ func (b *BlueprintBuild) Prepare(opts *Opts) error {
 	}
 	err = opts.Composer.DepsolveBlueprint(b.Name)
 	if err != nil {
+		opts.Junit.AddTest("depsolve", testutil.JUnitTestCase{
+			Name:      b.Name,
+			ClassName: "depsolve",
+			Failure: &testutil.JUnitFailure{
+				Message: "Depsolve failed",
+				Content: err.Error(),
+			},
+		})
 		return err
 	}
+	opts.Junit.AddTest("depsolve", testutil.JUnitTestCase{Name: b.Name, ClassName: "depsolve"})
 	return nil
 }
 
@@ -156,13 +175,36 @@ func (b *BlueprintBuild) Execute(opts *Opts) error {
 
 	if skipCommit {
 		klog.InfoS("Commit already present in the ostree repository and --force wasn't present - skipping", "blueprint", b.Name)
+		opts.Junit.AddTest("compose", testutil.JUnitTestCase{
+			Name:      b.Name,
+			ClassName: "commit",
+			Skipped: &testutil.JUnitSkipped{
+				Message: "Commit already present in the ostree repository and --force wasn't present - skipping",
+			},
+		})
 	} else {
 		eg.Go(func() error {
 			// TODO: Retry
+			n := time.Now()
 			if err := b.composeCommit(opts); err != nil {
 				klog.ErrorS(err, "Composing commit failed", "blueprint", b.Name)
+				opts.Junit.AddTest("compose", testutil.JUnitTestCase{
+					Name:      b.Name,
+					ClassName: "commit",
+					Time:      int(time.Since(n).Seconds()),
+					Failure: &testutil.JUnitFailure{
+						Message: "Composing commit failed",
+						Content: err.Error(),
+					},
+				})
 				return err
 			}
+			opts.Junit.AddTest("compose", testutil.JUnitTestCase{
+				Name:      b.Name,
+				ClassName: "commit",
+				Time:      int(time.Since(n).Seconds()),
+			})
+
 			return nil
 		})
 	}
@@ -172,13 +214,35 @@ func (b *BlueprintBuild) Execute(opts *Opts) error {
 			return err
 		} else if isoExists && !opts.Force {
 			klog.InfoS("ISO installer already present in vm-storage and --force wasn't present - skipping", "blueprint", b.Name)
+			opts.Junit.AddTest("compose", testutil.JUnitTestCase{
+				Name:      b.Name,
+				ClassName: "installer",
+				Skipped: &testutil.JUnitSkipped{
+					Message: "ISO installer already present in vm-storage and --force wasn't present - skipping",
+				},
+			})
 		} else {
 			eg.Go(func() error {
 				// TODO: Retry
+				n := time.Now()
 				if err := b.composeInstaller(opts); err != nil {
 					klog.ErrorS(err, "Composing installer failed", "blueprint", b.Name)
+					opts.Junit.AddTest("compose", testutil.JUnitTestCase{
+						Name:      b.Name,
+						ClassName: "installer",
+						Time:      int(time.Since(n).Seconds()),
+						Failure: &testutil.JUnitFailure{
+							Message: "Composing installer failed",
+							Content: err.Error(),
+						},
+					})
 					return err
 				}
+				opts.Junit.AddTest("compose", testutil.JUnitTestCase{
+					Name:      b.Name,
+					ClassName: "installer",
+					Time:      int(time.Since(n).Seconds()),
+				})
 				return nil
 			})
 		}
@@ -193,8 +257,21 @@ func (b *BlueprintBuild) Execute(opts *Opts) error {
 		klog.InfoS("Adding aliases", "name", b.Name)
 		err = opts.Ostree.CreateAlias(b.Name, b.Aliases...)
 		if err != nil {
+			opts.Junit.AddTest("compose", testutil.JUnitTestCase{
+				Name:      b.Name,
+				ClassName: "alias",
+				Failure: &testutil.JUnitFailure{
+					Message: "Adding aliases failed",
+					Content: err.Error(),
+				},
+			})
 			return err
 		}
+		opts.Junit.AddTest("compose", testutil.JUnitTestCase{
+			Name:      b.Name,
+			ClassName: "alias",
+			SystemOut: strings.Join(b.Aliases, " "),
+		})
 	}
 
 	return nil

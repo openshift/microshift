@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/openshift/microshift/test/pkg/compose/helpers"
+	"github.com/openshift/microshift/test/pkg/testutil"
 	"golang.org/x/sync/errgroup"
 	"k8s.io/klog/v2"
 )
@@ -15,6 +16,8 @@ type Opts struct {
 	Force            bool
 	DryRun           bool
 	ArtifactsMainDir string
+
+	Junit *testutil.JUnit
 }
 
 type Runner struct {

@@ -11,6 +11,7 @@ import (
 	"github.com/openshift/microshift/test/pkg/compose/helpers"
 	"github.com/openshift/microshift/test/pkg/compose/sources"
 	"github.com/openshift/microshift/test/pkg/compose/templatingdata"
+	"github.com/openshift/microshift/test/pkg/testutil"
 	"github.com/spf13/cobra"
 	"k8s.io/klog/v2"
 )
@@ -91,10 +92,20 @@ func NewComposeCmd() *cobra.Command {
 			}
 		}
 
+		junit := testutil.NewJUnit("compose")
+		defer func() {
+			junitFile := filepath.Join(artifactsMainDir, "build-logs", "junit_compose.xml")
+			err = junit.WriteToFile(junitFile)
+			if err != nil {
+				klog.ErrorS(err, "Failed to write junit to a file", "file", junitFile)
+			}
+		}()
+
 		sourceConfigurer := sources.SourceConfigurer{Opts: &sources.SourceConfigurerOpts{
 			Composer:    composer,
 			TplData:     td,
 			TestDirPath: testDirPath,
+			Junit:       junit,
 		}}
 		if err := sourceConfigurer.ConfigureSources(); err != nil {
 			return err
@@ -107,6 +118,7 @@ func NewComposeCmd() *cobra.Command {
 				BuildInstallers:  buildInstallers,
 				ArtifactsMainDir: artifactsMainDir,
 				TestDir:          testDirPath,
+				Junit:            junit,
 			},
 		}
 
@@ -126,6 +138,7 @@ func NewComposeCmd() *cobra.Command {
 				Force:            force,
 				DryRun:           dryRun,
 				ArtifactsMainDir: artifactsMainDir,
+				Junit:            junit,
 			},
 		}
 		err = builder.Build(buildPlan)
