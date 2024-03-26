@@ -191,8 +191,8 @@ assets:
   - dir: crd/
     src: release-manifests/
     files:
-      - file: 0000_03_security-openshift_01_scc.crd.yaml
-      - file: 0000_03_securityinternal-openshift_02_rangeallocation.crd.yaml
+      - file: 0000_03_config-operator_01_securitycontextconstraints.crd.yaml
+      - file: 0000_03_config-operator_02_rangeallocations.crd.yaml
       - file: storage_version_migration.crd.yaml
         src:  0000_50_cluster-kube-storage-version-migrator-operator_01_storage_migration_crd.yaml
       - file: route.crd.yaml
