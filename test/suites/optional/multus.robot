@@ -110,10 +110,7 @@ Curl Pod Over Local Interface
 Interface Should Not Exist
     [Documentation]    Verifies that network interface does not exist.
     [Arguments]    ${if}
-    ${stdout}    ${rc}=    Execute Command
-    ...    ip link show ${if}
-    ...    sudo=True    return_rc=True
-    Should Be Equal As Integers    ${rc}    1
+    Command Should Fail    ip link show ${if}
 
 Create Interface
     [Documentation]    Creates network interface.

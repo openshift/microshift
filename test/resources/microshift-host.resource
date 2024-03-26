@@ -122,3 +122,14 @@ Command Should Work
     Log    ${stderr}
     Should Be Equal As Integers    0    ${rc}
     RETURN    ${stdout}
+
+Command Should Fail
+    [Documentation]    Run a command remotely, expect command to fail
+    [Arguments]    ${command}
+    ${stdout}    ${stderr}    ${rc}=    SSHLibrary.Execute Command
+    ...    ${command}
+    ...    sudo=True
+    ...    return_rc=True
+    ...    return_stderr=True
+    ...    return_stdout=True
+    Should Not Be Equal As Integers    0    ${rc}
