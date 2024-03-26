@@ -1,5 +1,6 @@
 kind: DaemonSet
 apiVersion: apps/v1
+# name, namespace and labels are set at runtime
 spec:
   # minReadySeconds should be 3x the readiness probe's polling interval (i.e. periodSeconds).
   minReadySeconds: 9
@@ -7,91 +8,83 @@ spec:
     metadata:
       annotations:
         target.workload.openshift.io/management: '{"effect": "PreferredDuringScheduling"}'
-      labels:
-        dns.operator.openshift.io/daemonset-dns: default
     spec:
       serviceAccountName: dns
       priorityClassName: system-node-critical
       containers:
-        - name: dns
-          imagePullPolicy: IfNotPresent
-          terminationMessagePolicy: FallbackToLogsOnError
-          command: ["coredns"]
-          args: ["-conf", "/etc/coredns/Corefile"]
-          volumeMounts:
-            - name: config-volume
-              mountPath: /etc/coredns
-              readOnly: true
-          ports:
-            - containerPort: 5353
-              name: dns
-              protocol: UDP
-            - containerPort: 5353
-              name: dns-tcp
-              protocol: TCP
-          readinessProbe:
-            httpGet:
-              path: /ready
-              port: 8181
-              scheme: HTTP
-            initialDelaySeconds: 10
-            periodSeconds: 3 # Update the daemonset's spec.minReadySeconds above if you change this value!
-            successThreshold: 1
-            failureThreshold: 3
-            timeoutSeconds: 3
-          livenessProbe:
-            httpGet:
-              path: /health
-              port: 8080
-              scheme: HTTP
-            initialDelaySeconds: 60
-            timeoutSeconds: 5
-            successThreshold: 1
-            failureThreshold: 5
-          resources:
-            requests:
-              cpu: 50m
-              memory: 70Mi
-          image: '{{ .ReleaseImage.coredns }}'
-        - name: kube-rbac-proxy
-          args:
-            - --logtostderr
-            - --secure-listen-address=:9154
-            - --tls-cipher-suites=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_RSA_WITH_AES_128_CBC_SHA256,TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256,TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256
-            - --upstream=http://127.0.0.1:9153/
-            - --tls-cert-file=/etc/tls/private/tls.crt
-            - --tls-private-key-file=/etc/tls/private/tls.key
-          ports:
-            - containerPort: 9154
-              name: metrics
-          resources:
-            requests:
-              cpu: 10m
-              memory: 40Mi
-          terminationMessagePolicy: FallbackToLogsOnError
-          volumeMounts:
-            - mountPath: /etc/tls/private
-              name: metrics-tls
-              readOnly: true
-          image: '{{ .ReleaseImage.kube_rbac_proxy }}'
-          imagePullPolicy: IfNotPresent
-      dnsPolicy: Default
-      volumes:
+      - name: dns
+        # image is set at runtime
+        imagePullPolicy: IfNotPresent
+        terminationMessagePolicy: FallbackToLogsOnError
+        command: [ "coredns" ]
+        args: [ "-conf", "/etc/coredns/Corefile" ]
+        volumeMounts:
         - name: config-volume
-          configMap:
-            items:
-              - key: Corefile
-                path: Corefile
-            name: dns-default
-        - name: metrics-tls
-          secret:
-            defaultMode: 420
-            secretName: dns-default-metrics-tls
-      nodeSelector:
-        kubernetes.io/os: linux
-      tolerations:
-        - key: node-role.kubernetes.io/master
-          operator: Exists
+          mountPath: /etc/coredns
+          readOnly: true
+        ports:
+        - containerPort: 5353
+          name: dns
+          protocol: UDP
+        - containerPort: 5353
+          name: dns-tcp
+          protocol: TCP
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8181
+            scheme: HTTP
+          initialDelaySeconds: 10
+          periodSeconds: 3 # Update the daemonset's spec.minReadySeconds above if you change this value!
+          successThreshold: 1
+          failureThreshold: 3
+          timeoutSeconds: 3
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: 60
+          timeoutSeconds: 5
+          successThreshold: 1
+          failureThreshold: 5
+        resources:
+          requests:
+            cpu: 50m
+            memory: 70Mi
+      - name: kube-rbac-proxy
+        # image is set at runtime
+        args:
+        - --logtostderr
+        - --secure-listen-address=:9154
+        - --tls-cipher-suites=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_RSA_WITH_AES_128_CBC_SHA256,TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256,TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256
+        - --upstream=http://127.0.0.1:9153/
+        - --tls-cert-file=/etc/tls/private/tls.crt
+        - --tls-private-key-file=/etc/tls/private/tls.key
+        ports:
+        - containerPort: 9154
+          name: metrics
+        resources:
+          requests:
+            cpu: 10m
+            memory: 40Mi
+        terminationMessagePolicy: FallbackToLogsOnError
+        volumeMounts:
+        - mountPath: /etc/tls/private
+          name: metrics-tls
+          readOnly: true
+      dnsPolicy: Default
+      # nodeSelector is set at runtime.
+      volumes:
+      - name: config-volume
+        configMap:
+        # Name is set at runtime
+          items:
+          - key: Corefile
+            path: Corefile
+      - name: metrics-tls
+        # secretName is set at runtime
+      # tolerations is set at runtime.
   updateStrategy:
     type: RollingUpdate
     rollingUpdate:
@@ -103,11 +96,3 @@ spec:
       maxSurge: 10%
       # maxUnavailable must be zero when maxSurge is nonzero.
       maxUnavailable: 0
-  selector:
-    matchLabels:
-      dns.operator.openshift.io/daemonset-dns: default
-metadata:
-  name: dns-default
-  namespace: openshift-dns
-  labels:
-    dns.operator.openshift.io/owning-dns: default

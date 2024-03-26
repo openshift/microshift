@@ -1,6 +1,6 @@
 {
   "release": {
-    "base": "4.16.0-0.nightly-2024-03-13-061822"
+    "base": "4.16.0-0.nightly-2024-03-25-100907"
   },
   "images": {
     "cli": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:3907faea2062c2199b4294bb1ad0471e12cfd02760067f92a4c333f0c521b53d",
@@ -8,9 +8,9 @@
     "haproxy-router": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:1f333bf53a7a7a4429911c6fff2fd7bbc382f84cc3a7b5c401065ec281d20acf",
     "kube-rbac-proxy": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:97423459da8caa516c541a605ffc9aa89658b690ed8eb7c768bf3ad56cb6e4ed",
     "openssl": "registry.access.redhat.com/ubi8/openssl@sha256:9e743d947be073808f7f1750a791a3dbd81e694e37161e8c6c6057c2c342d671",
-    "ovn-kubernetes-microshift": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:2ea11d5cbb889385592663b00e4ec41744a51ef66ab33e8029656e475c34ba59",
-    "pod": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:4cdc8bef6c6b00bc502517c375c960e2c4d3a65e11ac7a04119be719319a7bf6",
-    "service-ca-operator": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:7babc0f44ce46e61e257fc730978e071f54c1c487047f4c9a954b50b4002d3b6",
+    "ovn-kubernetes-microshift": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:d72fee03c6c2b221bec414dee119d77ff5f767fe4881a20a7add7a509e5dff75",
+    "pod": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:cbe1dfc3f12ec1f7ba9cbbd4000e6e523f190771ce1143366da0d4af3e143a7e",
+    "service-ca-operator": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:3f5e47da2ab19562c512dc99f1b47f5a44f12a54830bbe20be94ac57e214c9a2",
     "topolvm_csi": "registry.redhat.io/lvms4/topolvm-rhel9@sha256:ce0c78c2867fb0b73c4911ae6afd5aaf9a413480cfcf4f31f46f2387c3df97e0",
     "topolvm_csi_registrar": "registry.redhat.io/openshift4/ose-csi-node-driver-registrar@sha256:95691c21198e20d11777d592806fa00c018c17443d9b3aee853891dac6090470",
     "topolvm_csi_livenessprobe": "registry.redhat.io/openshift4/ose-csi-livenessprobe@sha256:98ad03919da81c910aaa8a4f12fcae3048f2119735aeb7ca5271f7c16cf5e4e6",
