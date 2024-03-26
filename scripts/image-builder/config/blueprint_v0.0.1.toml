@@ -32,6 +32,10 @@ name = "microshift-release-info"
 version = "REPLACE_MICROSHIFT_VERSION"
 
 [[packages]]
+name = "microshift-multus"
+version = "REPLACE_MICROSHIFT_VERSION"
+
+[[packages]]
 name = "openshift-clients"
 version = "*"
 
