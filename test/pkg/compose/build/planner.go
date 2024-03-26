@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/openshift/microshift/test/pkg/compose/templatingdata"
+	"github.com/openshift/microshift/test/pkg/testutil"
 	"k8s.io/klog/v2"
 )
 
@@ -25,6 +26,8 @@ type PlannerOpts struct {
 
 	ArtifactsMainDir string
 	TestDir          string
+
+	Junit *testutil.JUnit
 }
 
 type Planner struct {
