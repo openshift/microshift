@@ -40,7 +40,7 @@ Pre-Existing Bridge Interface
     ...    AND
     ...    Set IP For Host Interface    ${PREEXISTING_BRIDGE_INTERFACE}    ${PREEXISTING_BRIDGE_IP}
 
-    Curl Pod Over Local Interface    ${PREEXISTING_BRIDGE_POD_NAME}    ${NS}    ${PREEXISTING_BRIDGE_INTERFACE}
+    Connect To Pod Over Local Interface    ${PREEXISTING_BRIDGE_POD_NAME}    ${NS}    ${PREEXISTING_BRIDGE_INTERFACE}
 
     [Teardown]    Cleanup Bridge Test
     ...    ${PREEXISTING_BRIDGE_NAD_YAML}
@@ -62,7 +62,7 @@ No Pre-Existing Bridge Interface
     ...    AND
     ...    Set IP For Host Interface    ${BRIDGE_INTERFACE}    ${BRIDGE_IP}
 
-    Curl Pod Over Local Interface    ${BRIDGE_POD_NAME}    ${NS}    ${BRIDGE_INTERFACE}
+    Connect To Pod Over Local Interface    ${BRIDGE_POD_NAME}    ${NS}    ${BRIDGE_INTERFACE}
 
     [Teardown]    Cleanup Bridge Test
     ...    ${BRIDGE_NAD_YAML}
@@ -97,7 +97,7 @@ Cleanup Bridge Test
     ...    Oc Delete    -f ${nad}
     Command Should Work    ip link delete ${if}
 
-Curl Pod Over Local Interface
+Connect To Pod Over Local Interface
     [Documentation]    Makes a HTTP request to 8080 for a given Pod over given interface.
     [Arguments]    ${pod}    ${ns}    ${if}
 
