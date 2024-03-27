@@ -22,6 +22,7 @@ type ApiServer struct {
 
 type AuditLog struct {
 	// maxFileAge is the maximum number of days to retain old audit log files
+    // +kubebuilder:example=10
 	MaxFileAge  int    `json:"maxFileAge"`
 	// maxFiles is the maximum number of rotated audit log files to retain
 	MaxFiles    int    `json:"maxFiles"`
