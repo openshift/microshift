@@ -159,7 +159,7 @@ func getArch() string {
 	if runtime.GOARCH == "amd64" {
 		return "x86_64"
 	}
-	return "arm64"
+	return "aarch64"
 }
 
 // getReleaseFromLocalFs creates `Release` from local filesystem repository
@@ -360,7 +360,7 @@ func downloadReleaseInfoRPM(version string, repoOpts ...string) (string, error) 
 // isRHOCPAvailable checks if RHOCP of a given `minor` is available for usage by attempting
 // to query the repository for cri-o package
 func isRHOCPAvailable(minor int) bool {
-	repo := fmt.Sprintf("rhocp-4.%d-for-rhel-9-%s-rpms", minor, "x86_64")
+	repo := fmt.Sprintf("rhocp-4.%d-for-rhel-9-%s-rpms", minor, getArch())
 	_, _, err := testutil.RunCommand("sudo", "dnf", "repository-packages", repo, "info", "cri-o")
 	return err == nil
 }
