@@ -1,11 +1,14 @@
 package compose
 
 import (
+	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
 
+	"github.com/coreos/go-systemd/v22/dbus"
 	"github.com/openshift/microshift/pkg/util"
 	"github.com/openshift/microshift/test/pkg/compose/build"
 	"github.com/openshift/microshift/test/pkg/compose/helpers"
@@ -30,6 +33,7 @@ var (
 	buildInstallers               bool
 	sourceOnly                    bool
 	skipContainerImagesExtraction bool
+	skipOSBuildLogCollection      bool
 )
 
 func NewComposeCmd() *cobra.Command {
@@ -70,6 +74,14 @@ func NewComposeCmd() *cobra.Command {
 			}
 
 			klog.InfoS("No argument provided - running default set of layers", "layers", args)
+		}
+
+		if !skipOSBuildLogCollection {
+			defer func() {
+				if err := saveOSBuildLogs(filepath.Join(artifactsMainDir, "build-logs")); err != nil {
+					klog.ErrorS(err, "Failed to save logs of osbuild service(s)")
+				}
+			}()
 		}
 
 		composer, ostree, err := getHelpers()
@@ -155,7 +167,7 @@ func NewComposeCmd() *cobra.Command {
 	cmd.PersistentFlags().BoolVarP(&dryRun, "dry-run", "d", false, "Dry run - no real interaction with the Composer")
 	cmd.PersistentFlags().BoolVarP(&force, "force", "f", false, "Rebuild existing artifacts (ostree commits, ISO images)")
 	cmd.PersistentFlags().BoolVarP(&skipContainerImagesExtraction, "skip-container-images-extraction", "E", false, "Skip extraction of images from microshift-release-info RPMs")
-	// TODO: trap 'osbuild_logs' EXIT + SKIP_LOG_COLLECTION
+	cmd.PersistentFlags().BoolVarP(&skipOSBuildLogCollection, "skip-osbuild-log-collection", "L", false, "Skip collection of osbuild logs (journals)")
 
 	cmd.AddCommand(templatingDataSubCmd())
 	cmd.AddCommand(buildPlanSubCmd())
@@ -312,4 +324,30 @@ func persistImages(td *templatingdata.TemplatingData) error {
 	}
 
 	return nil
+}
+
+func saveOSBuildLogs(dir string) error {
+	conn, err := dbus.NewWithContext(context.Background())
+	if err != nil {
+		return err
+	}
+	defer conn.Close()
+
+	units, err := conn.ListUnitsByPatternsContext(context.Background(), []string{}, []string{"osbuild-worker*.service", "osbuild-composer*.service"})
+	if err != nil {
+		return err
+	}
+
+	errs := []error{}
+
+	for _, unit := range units {
+		logFile := filepath.Join(dir, unit.Name+".log")
+		_, _, err := testutil.RunCommand("bash", "-c", fmt.Sprintf("sudo journalctl -u %s &> %s", unit.Name, logFile))
+		if err != nil {
+			klog.ErrorS(err, "Failed to write journal of osbuild service", "service", unit, "filepath", logFile)
+			errs = append(errs, err)
+		}
+	}
+
+	return errors.Join(errs...)
 }

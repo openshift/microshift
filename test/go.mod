@@ -10,11 +10,14 @@ replace (
 )
 
 require (
+	github.com/coreos/go-systemd/v22 v22.5.0
 	github.com/osbuild/weldr-client/v2 v2.0.0-20240312082831-2b01b2b0a13b
 	github.com/spf13/cobra v1.8.0
 	golang.org/x/sync v0.6.0
 	k8s.io/klog/v2 v2.120.1
 )
+
+require github.com/godbus/dbus/v5 v5.1.0 // indirect
 
 require (
 	github.com/BurntSushi/toml v1.3.2 // indirect
