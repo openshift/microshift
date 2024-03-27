@@ -110,6 +110,35 @@ def main():
     """
     global GITHUB_TOKEN
 
+    # The script runs as
+    # .../microshift/scripts/release-notes/gen_ec_release_notes.py
+    # and we want the path to
+    # .../microshift
+    root_dir = pathlib.Path(__file__).parent.parent.parent
+    version_makefile = root_dir / 'Makefile.version.aarch64.var'
+    # Makefile contains something like
+    #   OCP_VERSION := 4.16.0-0.nightly-arm64-2024-03-13-041907
+    # and we want
+    #   4.16
+    version = version_makefile.read_text('utf8').split('=')[-1].strip().split('.')[:2]
+
+    # We build a default list of versions to scan using the current
+    # version and the previous version. This assumes the script is run
+    # out of the main branch where we can find the most current
+    # version under development. During the period where 4.n is being
+    # developed, 4.n-1 may still be producing only release candidates,
+    # so that scanning those 2 versions give us the 2 most recent
+    # candidates for having no releases. During the period where the
+    # main branch has not landed a rebase to update the version and
+    # both main and the pre-release branch have the same version, we
+    # will end up scanning for EC or RC releases of 4.n-2, but that's
+    # OK because the should all have been tagged already.
+    previous_version = [version[0], str(int(version[1])-1)]
+    versions_to_scan = [
+        '.'.join(version),
+        '.'.join(previous_version),
+    ]
+
     parser = argparse.ArgumentParser(
         description=__doc__,
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -146,6 +175,15 @@ def main():
         default=False,
         help='Report but take no action',
     )
+    parser.add_argument(
+        '--version-to-scan',
+        action='append',
+        dest='versions_to_scan',
+        default=[],
+        help=('A version to scan. May be repeated. ' +
+              f'Defaults to {versions_to_scan} but if any version ' +
+              'is given on the command line the default is overridden.'),
+    )
     args = parser.parse_args()
 
     if not GITHUB_TOKEN:
@@ -154,13 +192,16 @@ def main():
     if not GITHUB_TOKEN:
         raise RuntimeError('GITHUB_TOKEN does not appear to be set')
 
+    if not args.versions_to_scan:
+        args.versions_to_scan = versions_to_scan
+
     new_releases = []
     if args.ec:
-        new_releases.extend(find_new_releases(URL_BASE, 'ocp-dev-preview'))
-        new_releases.extend(find_new_releases(URL_BASE_X86, 'ocp-dev-preview'))
+        new_releases.extend(find_new_releases(versions_to_scan, URL_BASE, 'ocp-dev-preview'))
+        new_releases.extend(find_new_releases(versions_to_scan, URL_BASE_X86, 'ocp-dev-preview'))
     if args.rc:
-        new_releases.extend(find_new_releases(URL_BASE, 'ocp'))
-        new_releases.extend(find_new_releases(URL_BASE_X86, 'ocp'))
+        new_releases.extend(find_new_releases(versions_to_scan, URL_BASE, 'ocp'))
+        new_releases.extend(find_new_releases(versions_to_scan, URL_BASE_X86, 'ocp'))
 
     if not new_releases:
         print("No new releases found.")
@@ -251,7 +292,7 @@ class VersionListParser(html.parser.HTMLParser):
         print(f"WARNING: error processing HTML: {message}")
 
 
-def find_new_releases(url_base, release_type):
+def find_new_releases(versions_to_scan, url_base, release_type):
     """Returns a list of Release instances for missing releases.
     """
     new_releases = []
@@ -265,7 +306,7 @@ def find_new_releases(url_base, release_type):
         # Skip very old RCs, indicated by the first 2 parts of the
         # version string major.minor.
         version_prefix = '.'.join(version.split('.')[:2])
-        if version_prefix in OLD_VERSIONS:
+        if version_prefix not in versions_to_scan:
             continue
         try:
             nr = check_for_new_releases(url_base, release_type, version)
