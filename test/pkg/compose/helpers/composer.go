@@ -73,7 +73,7 @@ func (c *composer) ListSources() ([]string, error) {
 		return nil, fmt.Errorf("listing composer sources failed: %w", err)
 	}
 	if apiResponse != nil && !apiResponse.Status {
-		return nil, fmt.Errorf("listing composer sources returned wrong response: %v", apiResponse)
+		return nil, fmt.Errorf("ListSources() - wrong api response: %+v", apiResponse)
 	}
 	klog.InfoS("Listed Composer Sources", "sources", sources)
 	return sources, nil
@@ -86,7 +86,7 @@ func (c *composer) DeleteSource(id string) error {
 		return fmt.Errorf("deleting composer source failed: %w", err)
 	}
 	if apiResponse != nil && !apiResponse.Status {
-		return fmt.Errorf("deleting composer source returned wrong response: %v", apiResponse)
+		return fmt.Errorf("DeleteSource(%q) - wrong api response: %+v", id, apiResponse)
 	}
 	klog.InfoS("Deleted Composer Source", "id", id)
 	return nil
@@ -100,7 +100,7 @@ func (c *composer) AddSource(toml string) error {
 		return fmt.Errorf("adding composer source failed: %w", err)
 	}
 	if apiResponse != nil && !apiResponse.Status {
-		return fmt.Errorf("adding composer source returned wrong response: %v", apiResponse)
+		return fmt.Errorf("NewSourceTOML(...) - wrong api response: %+v", apiResponse)
 	}
 	klog.InfoS("Added Composer Source", "toml", short)
 	return nil
@@ -114,7 +114,7 @@ func (c *composer) AddBlueprint(toml string) error {
 		return fmt.Errorf("adding composer blueprint failed: %w", err)
 	}
 	if apiResponse != nil && !apiResponse.Status {
-		return fmt.Errorf("adding composer blueprint returned wrong response: %v", apiResponse)
+		return fmt.Errorf("PushBlueprintTOML(...) - wrong api response: %+v", apiResponse)
 	}
 	klog.InfoS("Added Composer Blueprint", "toml", short)
 	return nil
@@ -131,7 +131,7 @@ func (c *composer) DepsolveBlueprint(name string) error {
 		return fmt.Errorf("error depsolving blueprint %q: %w", name, err)
 	}
 	if len(apiErrors) != 0 {
-		return fmt.Errorf("unsuccessful blueprint depsolve: %+v", apiErrors)
+		return fmt.Errorf("DepsolveBlueprints(%v) errors: %+v", []string{name}, apiErrors)
 	}
 
 	klog.InfoS("Depsolved blueprint", "name", name)
@@ -150,7 +150,7 @@ func (c *composer) StartOSTreeCompose(blueprint, composeType, ref, parent string
 		return "", fmt.Errorf("error starting ostree compose: %w", err)
 	}
 	if apiResponse != nil && !apiResponse.Status {
-		return "", fmt.Errorf("unsuccessful compose start: %+v", apiResponse)
+		return "", fmt.Errorf("StartOSTreeCompose(%q, %q, %q, %q, %q, 0) - wrong api response: %+v", blueprint, composeType, ref, parent, url, apiResponse)
 	}
 	klog.InfoS("Started ostree compose", "blueprint", blueprint, "id", id)
 
@@ -164,7 +164,7 @@ func (c *composer) StartCompose(blueprint, composeType string) (string, error) {
 		return "", fmt.Errorf("error starting ostree compose: %w", err)
 	}
 	if apiResponse != nil && !apiResponse.Status {
-		return "", fmt.Errorf("unsuccessful compose start: %+v", apiResponse)
+		return "", fmt.Errorf("StartCompose(%q, %v, 0) - wrong api response: %+v", blueprint, composeType, apiResponse)
 	}
 	klog.InfoS("Started compose", "blueprint", blueprint, "id", id)
 	return id, nil
@@ -213,7 +213,7 @@ outer:
 		return fmt.Errorf("failed to wait for the compose %q: %w", id, err)
 	}
 	if apiResponse != nil && !apiResponse.Status {
-		return fmt.Errorf("unsuccessful compose wait: %+v", apiResponse)
+		return fmt.Errorf("ComposeWait(%q, %v, %v) - wrong api response: %+v", id, timeout, 30*time.Second, apiResponse)
 	}
 	if aborted {
 		return fmt.Errorf("wait for compose %q timed out", id)
@@ -237,7 +237,7 @@ func (c *composer) SaveComposeLogs(id, friendlyName string) error {
 		return fmt.Errorf("failed to get compose's %q logs: %w", id, err)
 	}
 	if apiResponse != nil && !apiResponse.Status {
-		return fmt.Errorf("unsuccessful get compose's %q logs: %w", id, err)
+		return fmt.Errorf("ComposeLogsPath(%q, %q) - wrong api response: %+v", id, archiveFilepath, apiResponse)
 	}
 
 	klog.InfoS("Saved compose logs archive", "id", id, "path", filename)
@@ -266,7 +266,7 @@ func (c *composer) SaveComposeMetadata(id, friendlyName string) error {
 		return fmt.Errorf("failed to get compose's %q metadata: %w", id, err)
 	}
 	if apiResponse != nil && !apiResponse.Status {
-		return fmt.Errorf("unsuccessful get compose's %q metadata: %w", id, err)
+		return fmt.Errorf("ComposeMetadataPath(%q, %q) - wrong api response: %+v", id, archiveFilepath, apiResponse)
 	}
 
 	klog.InfoS("Got compose metadata", "id", id, "filename", filename)
@@ -293,7 +293,7 @@ func (c *composer) SaveComposeImage(id, friendlyName, ext string) (string, error
 		return "", fmt.Errorf("failed to get compose's %q image: %w", id, err)
 	}
 	if apiResponse != nil && !apiResponse.Status {
-		return "", fmt.Errorf("unsuccessful get compose's %q image: %w", id, err)
+		return "", fmt.Errorf("ComposeImagePath(%q, %q) - wrong api response: %+v", id, path, apiResponse)
 	}
 
 	klog.InfoS("Got compose image", "id", id, "filename", filename)
