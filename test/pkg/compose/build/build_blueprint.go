@@ -1,7 +1,6 @@
 package build
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"io/fs"
@@ -14,7 +13,6 @@ import (
 	"github.com/openshift/microshift/pkg/util"
 	"github.com/openshift/microshift/test/pkg/testutil"
 
-	"golang.org/x/sync/errgroup"
 	"k8s.io/klog/v2"
 )
 
@@ -169,7 +167,7 @@ func (b *BlueprintBuild) Execute(opts *Opts) error {
 		return err
 	}
 
-	eg, _ := errgroup.WithContext(context.TODO())
+	aeg := testutil.NewAllErrGroup()
 
 	skipCommit := refExists && !opts.Force
 
@@ -183,7 +181,7 @@ func (b *BlueprintBuild) Execute(opts *Opts) error {
 			},
 		})
 	} else {
-		eg.Go(func() error {
+		aeg.Go(func() error {
 			// TODO: Retry
 			n := time.Now()
 			if err := testutil.Retry(3, func() error { return b.composeCommit(opts) }); err != nil {
@@ -222,7 +220,7 @@ func (b *BlueprintBuild) Execute(opts *Opts) error {
 				},
 			})
 		} else {
-			eg.Go(func() error {
+			aeg.Go(func() error {
 				n := time.Now()
 				if err := testutil.Retry(3, func() error { return b.composeInstaller(opts) }); err != nil {
 					klog.ErrorS(err, "Composing installer failed", "blueprint", b.Name)
@@ -247,8 +245,9 @@ func (b *BlueprintBuild) Execute(opts *Opts) error {
 		}
 	}
 
-	err = eg.Wait()
+	err = aeg.Wait()
 	if err != nil {
+		klog.ErrorS(err, "Building blueprint failed")
 		return err
 	}
 

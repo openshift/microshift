@@ -1,11 +1,8 @@
 package build
 
 import (
-	"context"
-
 	"github.com/openshift/microshift/test/pkg/compose/helpers"
 	"github.com/openshift/microshift/test/pkg/testutil"
-	"golang.org/x/sync/errgroup"
 	"k8s.io/klog/v2"
 )
 
@@ -44,11 +41,11 @@ func (ib *Runner) Build(toBuild Plan) error {
 }
 
 func (ib *Runner) prepareGroup(group Group) error {
-	eg, _ := errgroup.WithContext(context.TODO())
+	aeg := testutil.NewAllErrGroup()
 
 	for _, build := range group {
 		build := build
-		eg.Go(func() error {
+		aeg.Go(func() error {
 			err := build.Prepare(ib.Opts)
 			if err != nil {
 				klog.ErrorS(err, "Build preparation error")
@@ -57,15 +54,15 @@ func (ib *Runner) prepareGroup(group Group) error {
 		})
 	}
 
-	return eg.Wait()
+	return aeg.Wait()
 }
 
 func (ib *Runner) executeGroup(group Group) error {
-	eg, _ := errgroup.WithContext(context.TODO())
+	aeg := testutil.NewAllErrGroup()
 
 	for _, build := range group {
 		build := build
-		eg.Go(func() error {
+		aeg.Go(func() error {
 			err := build.Execute(ib.Opts)
 			if err != nil {
 				klog.ErrorS(err, "Build execution error")
@@ -74,5 +71,5 @@ func (ib *Runner) executeGroup(group Group) error {
 		})
 	}
 
-	return eg.Wait()
+	return aeg.Wait()
 }
