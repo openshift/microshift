@@ -186,7 +186,7 @@ func (b *BlueprintBuild) Execute(opts *Opts) error {
 		eg.Go(func() error {
 			// TODO: Retry
 			n := time.Now()
-			if err := b.composeCommit(opts); err != nil {
+			if err := testutil.Retry(3, func() error { return b.composeCommit(opts) }); err != nil {
 				klog.ErrorS(err, "Composing commit failed", "blueprint", b.Name)
 				opts.Junit.AddTest("compose", testutil.JUnitTestCase{
 					Name:      b.Name,
@@ -223,9 +223,8 @@ func (b *BlueprintBuild) Execute(opts *Opts) error {
 			})
 		} else {
 			eg.Go(func() error {
-				// TODO: Retry
 				n := time.Now()
-				if err := b.composeInstaller(opts); err != nil {
+				if err := testutil.Retry(3, func() error { return b.composeInstaller(opts) }); err != nil {
 					klog.ErrorS(err, "Composing installer failed", "blueprint", b.Name)
 					opts.Junit.AddTest("compose", testutil.JUnitTestCase{
 						Name:      b.Name,

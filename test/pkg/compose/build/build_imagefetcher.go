@@ -78,7 +78,6 @@ func (i *ImageFetcher) execute(opts *Opts) error {
 		klog.InfoS("DRY RUN: Downloaded image", "name", i.Name)
 		return nil
 	}
-	// TODO: Retry
 
 	tmpDest := i.Destination + ".download"
 
@@ -102,6 +101,22 @@ func (i *ImageFetcher) execute(opts *Opts) error {
 		}
 	}
 
+	err := testutil.Retry(3, func() error { return i.download(tmpDest) })
+	if err != nil {
+		klog.ErrorS(err, "Failed to download image", "destination", tmpDest, "url", i.Url)
+		return err
+	}
+
+	err = os.Rename(tmpDest, i.Destination)
+	if err != nil {
+		return fmt.Errorf("failed to rename %q to %q: %w", tmpDest, i.Destination, err)
+	}
+	klog.InfoS("Renamed image", "destination", i.Destination, "source", tmpDest)
+
+	return nil
+}
+
+func (i *ImageFetcher) download(dest string) error {
 	timeout := 20 * time.Minute
 	klog.InfoS("Downloading image", "name", i.Name, "destination", i.Destination, "timeout", timeout)
 	start := time.Now()
@@ -113,7 +128,7 @@ func (i *ImageFetcher) execute(opts *Opts) error {
 	}
 	defer resp.Body.Close()
 
-	f, err := os.Create(tmpDest)
+	f, err := os.Create(dest)
 	if err != nil {
 		return fmt.Errorf("failed to create file %q for downloading: %w", i.Destination, err)
 	}
@@ -137,12 +152,11 @@ outer:
 	}
 	ticker.Stop()
 
-	err = os.Rename(tmpDest, i.Destination)
 	if err != nil {
-		return fmt.Errorf("failed to rename %q to %q: %w", tmpDest, i.Destination, err)
+		return err
 	}
 
-	klog.InfoS("Downloaded image", "destination", i.Destination, "url", i.Url, "sizeMB", n/1_048_576, "duration", time.Since(start))
+	klog.InfoS("Downloaded image", "destination", dest, "url", i.Url, "sizeMB", n/1_048_576, "duration", time.Since(start))
 
 	return nil
 }
