@@ -26,6 +26,7 @@ type AuditLog struct {
 	// maxFiles is the maximum number of rotated audit log files to retain
 	MaxFiles    int    `json:"maxFiles"`
 	// maxFileSize is the maximum size in megabytes of the audit log file before it gets rotated
+    // +kubebuilder:example=200
 	MaxFileSize int    `json:"maxFileSize"`
 	// profile is the OpenShift profile specifying a specific logging policy
 	// +kubebuilder:example=Default
