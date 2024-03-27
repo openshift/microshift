@@ -23,7 +23,7 @@ type ApiServer struct {
 type AuditLog struct {
 	// maxFileAge is the maximum number of days to retain old audit log files
 	MaxFileAge  int    `json:"maxFileAge"`
-	// maxFiles is the maximum number of audit log files to retain
+	// maxFiles is the maximum number of rotated audit log files to retain
 	MaxFiles    int    `json:"maxFiles"`
 	// maxFileSize is the maximum size in megabytes of the audit log file before it gets rotated
 	MaxFileSize int    `json:"maxFileSize"`
