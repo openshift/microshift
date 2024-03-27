@@ -21,6 +21,10 @@ ${PE_BRIDGE_POD_YAML}       ./assets/multus/bridge-preexisting-pod.yaml
 ${PE_BRIDGE_POD_NAME}       test-bridge-preexisting
 ${PE_BRIDGE_IP}             10.10.1.10/24
 
+${MACVLAN_NAD_YAML}         ./assets/multus/macvlan-nad.yaml
+${MACVLAN_POD_YAML}         ./assets/multus/macvlan-pod.yaml
+${MACVLAN_POD_NAME}         test-macvlan
+
 
 *** Test Cases ***
 Pre-Existing Bridge Interface
@@ -67,6 +71,18 @@ No Pre-Existing Bridge Interface
     ...    ${BRIDGE_POD_YAML}
     ...    ${BRIDGE_INTERFACE}
 
+Macvlan
+    [Documentation]    Tests if Pod with macvlan plugin interface is accessible
+    ...    from outside the MicroShift host.
+    [Setup]    Run Keywords
+    ...    Create NAD And Pod    ${MACVLAN_NAD_YAML}    ${MACVLAN_POD_YAML}
+    ...    AND
+    ...    Named Pod Should Be Ready    ${MACVLAN_POD_NAME}    ${NAMESPACE}
+
+    Connect To Pod From The Hypervisor    ${MACVLAN_POD_NAME}    ${NAMESPACE}    ${NAMESPACE}/macvlan-conf
+
+    [Teardown]    Remove NAD And Pod    ${MACVLAN_NAD_YAML}    ${MACVLAN_POD_YAML}
+
 
 *** Keywords ***
 Create NAD And Pod
@@ -75,24 +91,41 @@ Create NAD And Pod
     Oc Create    -n ${NAMESPACE} -f ${nad}
     Oc Create    -n ${NAMESPACE} -f ${pod}
 
-Cleanup Bridge Test
-    [Documentation]    Removes provided NetworkAttachmentDefinition, Pod and network interface to allow for test rerun.
-    [Arguments]    ${nad}    ${pod}    ${if}
+Remove NAD And Pod
+    [Documentation]    Removes provided NetworkAttachmentDefinition and Pod.
+    [Arguments]    ${nad}    ${pod}
     Run Keyword And Continue On Failure
     ...    Oc Delete    -n ${NAMESPACE} -f ${pod}
     Run Keyword And Continue On Failure
     ...    Oc Delete    -n ${NAMESPACE} -f ${nad}
+
+Cleanup Bridge Test
+    [Documentation]    Removes provided NetworkAttachmentDefinition, Pod and network interface to allow for test rerun.
+    [Arguments]    ${nad}    ${pod}    ${if}
+    Remove NAD And Pod    ${nad}    ${pod}
     Command Should Work    ip link delete ${if}
 
 Connect To Pod Over Local Interface
     [Documentation]    Makes a HTTP request to 8080 for a given Pod over given interface.
     [Arguments]    ${pod}    ${ns}    ${if}
 
-    ${networks}=    Get And Verify Pod Networks    ${pod}    ${ns}
+    ${networks}=    Get And Verify Pod Networks    ${pod}    ${ns}    ${NAMESPACE}/bridge*-conf
     ${extra_ip}=    Set Variable    ${networks}[1][ips][0]
 
     ${stdout}=    Command Should Work    curl -v --interface ${if} ${extra_ip}:8080
     Should Contain    ${stdout}    Hello MicroShift
+
+Connect To Pod From The Hypervisor
+    [Documentation]    Makes a HTTP request to port 8080 of a given Pod from the hypervisor machine.
+    ...    This is a limitation of macvlan devices - virtual devices cannot communicate with the master interface.
+    [Arguments]    ${pod}    ${ns}    ${extra_cni_name}
+
+    ${networks}=    Get And Verify Pod Networks    ${pod}    ${ns}    ${extra_cni_name}
+    ${extra_ip}=    Set Variable    ${networks}[1][ips][0]
+    Should Contain    ${extra_ip}    192.168.122
+
+    ${result}=    Process.Run Process    curl    -v    ${extra_ip}:8080
+    Should Contain    ${result.stdout}    Hello MicroShift
 
 Interface Should Not Exist
     [Documentation]    Verifies that network interface does not exist.
@@ -117,7 +150,7 @@ Set IP For Host Interface
 Get And Verify Pod Networks
     [Documentation]    Obtains interfaces of the Pod from its annotation.
     ...    The annotation is managed by Multus.
-    [Arguments]    ${pod}    ${ns}
+    [Arguments]    ${pod}    ${ns}    ${extra_cni_name}
 
     ${networks_str}=    Oc Get JsonPath
     ...    pod
@@ -131,5 +164,6 @@ Get And Verify Pod Networks
     Should Be Equal As Integers    ${n}    2
     Should Be Equal As Strings    ${networks}[0][name]    ovn-kubernetes
     Should Match    ${networks}[1][name]    ${NAMESPACE}/bridge*-conf
+    Should Match    ${networks}[1][name]    ${extra_cni_name}
 
     RETURN    ${networks}
