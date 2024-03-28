@@ -197,7 +197,7 @@ func UpdateStatus(ctx context.Context, client OperatorClient, updateFuncs ...Upd
 			updatedOperatorStatus = newStatus
 			return nil
 		}
-		if klog.V(2).Enabled() {
+		if klog.V(4).Enabled() {
 			klog.Infof("Operator status changed: %v", operatorStatusJSONPatchNoError(oldStatus, newStatus))
 		}
 
@@ -273,7 +273,7 @@ func UpdateStaticPodStatus(ctx context.Context, client StaticPodOperatorClient, 
 			updatedOperatorStatus = newStatus
 			return nil
 		}
-		if klog.V(2).Enabled() {
+		if klog.V(4).Enabled() {
 			klog.Infof("Operator status changed: %v", staticPodOperatorStatusJSONPatchNoError(oldStatus, newStatus))
 		}
 

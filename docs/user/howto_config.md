@@ -11,6 +11,11 @@ apiServer:
     advertiseAddress: ""
     subjectAltNames:
         - ""
+    auditLog:
+      profile: ""
+      maxSize: 0
+      maxFiles: 0
+      maxAge: 0
 debugging:
     logLevel: ""
 dns:

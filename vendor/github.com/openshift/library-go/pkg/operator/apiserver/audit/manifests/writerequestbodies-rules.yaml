@@ -1,0 +1,24 @@
+# exclude resources where the body is security-sensitive
+- level: Metadata
+  resources:
+  - group: "route.openshift.io"
+    resources: ["routes", "routes/status"]
+  - resources: ["secrets", "serviceaccounts/token"]
+  - group: "authentication.k8s.io"
+    resources: ["tokenreviews", "tokenrequests"]
+  - group: "oauth.openshift.io"
+    resources: ["oauthclients", "tokenreviews"]
+# log request and response payloads for all write requests
+- level: RequestResponse
+  verbs:
+  - update
+  - patch
+  - create
+  - delete
+  - deletecollection
+# catch-all rule to log all other requests at the Metadata level.
+- level: Metadata
+  # Long-running requests like watches that fall under this rule will not
+  # generate an audit event in RequestReceived.
+  omitStages:
+  - RequestReceived
