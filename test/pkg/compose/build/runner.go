@@ -14,7 +14,7 @@ type Opts struct {
 	DryRun           bool
 	ArtifactsMainDir string
 
-	Junit *testutil.JUnit
+	Events *testutil.EventManager
 }
 
 type Runner struct {

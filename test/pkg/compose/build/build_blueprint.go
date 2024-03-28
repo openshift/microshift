@@ -33,6 +33,8 @@ type BlueprintBuild struct {
 func NewBlueprintBuild(path string, opts *PlannerOpts) (*BlueprintBuild, error) {
 	klog.InfoS("Constructing BlueprintBuild", "path", path)
 
+	start := time.Now()
+
 	filename := filepath.Base(path)
 	withoutExt := strings.TrimSuffix(filename, filepath.Ext(filename))
 	dir := filepath.Dir(path)
@@ -61,16 +63,25 @@ func NewBlueprintBuild(path string, opts *PlannerOpts) (*BlueprintBuild, error) 
 
 	templatedData, err := opts.TplData.Template(name, data)
 	if err != nil {
-		opts.Junit.AddTest("render", testutil.JUnitTestCase{
-			Name:      name,
-			ClassName: "render",
-			Failure:   &testutil.JUnitFailure{Message: "Failed to render template", Content: err.Error()},
+		opts.Events.AddEvent(&testutil.FailedEvent{
+			Event: testutil.Event{
+				Name:      name,
+				Suite:     "render",
+				ClassName: "blueprint",
+				Start:     start,
+				End:       time.Now(),
+			},
+			Message: "Failed to render template",
+			Content: err.Error(),
 		})
 		return nil, err
 	}
-	opts.Junit.AddTest("render", testutil.JUnitTestCase{
+	opts.Events.AddEvent(&testutil.Event{
 		Name:      name,
-		ClassName: "render",
+		Suite:     "render",
+		ClassName: "blueprint",
+		Start:     start,
+		End:       time.Now(),
 		SystemOut: templatedData,
 	})
 
@@ -141,23 +152,34 @@ func NewBlueprintBuild(path string, opts *PlannerOpts) (*BlueprintBuild, error) 
 
 func (b *BlueprintBuild) Prepare(opts *Opts) error {
 	// TODO: Do we need to remove Blueprint before to adding? It's not required and it only bumps blueprint's version
+	start := time.Now()
+
 	err := opts.Composer.AddBlueprint(b.Contents)
 	if err != nil {
 		return err
 	}
 	err = opts.Composer.DepsolveBlueprint(b.Name)
 	if err != nil {
-		opts.Junit.AddTest("depsolve", testutil.JUnitTestCase{
-			Name:      b.Name,
-			ClassName: "depsolve",
-			Failure: &testutil.JUnitFailure{
-				Message: "Depsolve failed",
-				Content: err.Error(),
+		opts.Events.AddEvent(&testutil.FailedEvent{
+			Event: testutil.Event{
+				Name:      b.Name,
+				Suite:     "depsolve",
+				ClassName: "depsolve",
+				Start:     start,
+				End:       time.Now(),
 			},
+			Message: "Depsolve failed",
+			Content: err.Error(),
 		})
 		return err
 	}
-	opts.Junit.AddTest("depsolve", testutil.JUnitTestCase{Name: b.Name, ClassName: "depsolve"})
+	opts.Events.AddEvent(&testutil.Event{
+		Name:      b.Name,
+		Suite:     "depsolve",
+		ClassName: "depsolve",
+		Start:     start,
+		End:       time.Now(),
+	})
 	return nil
 }
 
@@ -166,6 +188,7 @@ func (b *BlueprintBuild) Execute(opts *Opts) error {
 	if err != nil {
 		return err
 	}
+	start := time.Now()
 
 	aeg := testutil.NewAllErrGroup()
 
@@ -173,34 +196,44 @@ func (b *BlueprintBuild) Execute(opts *Opts) error {
 
 	if skipCommit {
 		klog.InfoS("Commit already present in the ostree repository and --force wasn't present - skipping", "blueprint", b.Name)
-		opts.Junit.AddTest("compose", testutil.JUnitTestCase{
-			Name:      b.Name,
-			ClassName: "commit",
-			Skipped: &testutil.JUnitSkipped{
-				Message: "Commit already present in the ostree repository and --force wasn't present - skipping",
+		opts.Events.AddEvent(&testutil.SkippedEvent{
+			Event: testutil.Event{
+				Name:      b.Name,
+				Suite:     "compose",
+				ClassName: "commit",
+				Start:     start,
+				End:       time.Now(),
 			},
+			Message: "Commit already present in the ostree repository and --force wasn't present - skipping",
 		})
+
 	} else {
 		aeg.Go(func() error {
 			// TODO: Retry
-			n := time.Now()
 			if err := testutil.Retry(3, func() error { return b.composeCommit(opts) }); err != nil {
 				klog.ErrorS(err, "Composing commit failed", "blueprint", b.Name)
-				opts.Junit.AddTest("compose", testutil.JUnitTestCase{
-					Name:      b.Name,
-					ClassName: "commit",
-					Time:      int(time.Since(n).Seconds()),
-					Failure: &testutil.JUnitFailure{
-						Message: "Composing commit failed",
-						Content: err.Error(),
+
+				opts.Events.AddEvent(&testutil.FailedEvent{
+					Event: testutil.Event{
+						Name:      b.Name,
+						Suite:     "compose",
+						ClassName: "commit",
+						Start:     start,
+						End:       time.Now(),
 					},
+					Message: "Composing commit failed",
+					Content: err.Error(),
 				})
+
 				return err
 			}
-			opts.Junit.AddTest("compose", testutil.JUnitTestCase{
+
+			opts.Events.AddEvent(&testutil.Event{
 				Name:      b.Name,
+				Suite:     "compose",
 				ClassName: "commit",
-				Time:      int(time.Since(n).Seconds()),
+				Start:     start,
+				End:       time.Now(),
 			})
 
 			return nil
@@ -212,33 +245,42 @@ func (b *BlueprintBuild) Execute(opts *Opts) error {
 			return err
 		} else if isoExists && !opts.Force {
 			klog.InfoS("ISO installer already present in vm-storage and --force wasn't present - skipping", "blueprint", b.Name)
-			opts.Junit.AddTest("compose", testutil.JUnitTestCase{
-				Name:      b.Name,
-				ClassName: "installer",
-				Skipped: &testutil.JUnitSkipped{
-					Message: "ISO installer already present in vm-storage and --force wasn't present - skipping",
+
+			opts.Events.AddEvent(&testutil.SkippedEvent{
+				Event: testutil.Event{
+					Name:      b.Name,
+					Suite:     "compose",
+					ClassName: "installer",
+					Start:     start,
+					End:       time.Now(),
 				},
+				Message: "ISO installer already present in vm-storage and --force wasn't present - skipping",
 			})
+
 		} else {
 			aeg.Go(func() error {
-				n := time.Now()
 				if err := testutil.Retry(3, func() error { return b.composeInstaller(opts) }); err != nil {
 					klog.ErrorS(err, "Composing installer failed", "blueprint", b.Name)
-					opts.Junit.AddTest("compose", testutil.JUnitTestCase{
-						Name:      b.Name,
-						ClassName: "installer",
-						Time:      int(time.Since(n).Seconds()),
-						Failure: &testutil.JUnitFailure{
-							Message: "Composing installer failed",
-							Content: err.Error(),
+					opts.Events.AddEvent(&testutil.FailedEvent{
+						Event: testutil.Event{
+							Name:      b.Name,
+							Suite:     "compose",
+							ClassName: "installer",
+							Start:     start,
+							End:       time.Now(),
 						},
+						Message: "Composing installer failed",
+						Content: err.Error(),
 					})
 					return err
 				}
-				opts.Junit.AddTest("compose", testutil.JUnitTestCase{
+
+				opts.Events.AddEvent(&testutil.Event{
 					Name:      b.Name,
+					Suite:     "compose",
 					ClassName: "installer",
-					Time:      int(time.Since(n).Seconds()),
+					Start:     start,
+					End:       time.Now(),
 				})
 				return nil
 			})
@@ -255,19 +297,26 @@ func (b *BlueprintBuild) Execute(opts *Opts) error {
 		klog.InfoS("Adding aliases", "name", b.Name)
 		err = opts.Ostree.CreateAlias(b.Name, b.Aliases...)
 		if err != nil {
-			opts.Junit.AddTest("compose", testutil.JUnitTestCase{
-				Name:      b.Name,
-				ClassName: "alias",
-				Failure: &testutil.JUnitFailure{
-					Message: "Adding aliases failed",
-					Content: err.Error(),
+			opts.Events.AddEvent(&testutil.FailedEvent{
+				Event: testutil.Event{
+					Name:      b.Name,
+					Suite:     "compose",
+					ClassName: "alias",
+					Start:     start,
+					End:       time.Now(),
 				},
+				Message: "Adding aliases failed",
+				Content: err.Error(),
 			})
 			return err
 		}
-		opts.Junit.AddTest("compose", testutil.JUnitTestCase{
+
+		opts.Events.AddEvent(&testutil.Event{
 			Name:      b.Name,
+			Suite:     "compose",
 			ClassName: "alias",
+			Start:     start,
+			End:       time.Now(),
 			SystemOut: strings.Join(b.Aliases, " "),
 		})
 	}

@@ -27,7 +27,7 @@ type PlannerOpts struct {
 	ArtifactsMainDir string
 	TestDir          string
 
-	Junit *testutil.JUnit
+	Events *testutil.EventManager
 }
 
 type Planner struct {

@@ -74,6 +74,18 @@ type JUnitTestSuites struct {
 	TestSuites []JUnitTestSuite
 }
 
+func (j *JUnitTestSuites) WriteToFile(path string) error {
+	contents, err := j.Marshal()
+	if err != nil {
+		return fmt.Errorf("failed to marshal junit: %w", err)
+	}
+	err = os.WriteFile(path, contents, 0644)
+	if err != nil {
+		return fmt.Errorf("failed to write junit to file %q: %w", path, err)
+	}
+	return nil
+}
+
 // Prow's junit lens does not support nested TestSuites
 // https://github.com/k8s-ci-robot/test-infra/blob/d7867ec05b41/prow/spyglass/lenses/junit/lens.go#L107
 
