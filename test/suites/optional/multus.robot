@@ -163,7 +163,6 @@ Get And Verify Pod Networks
     ${n}=    Get Length    ${networks}
     Should Be Equal As Integers    ${n}    2
     Should Be Equal As Strings    ${networks}[0][name]    ovn-kubernetes
-    Should Match    ${networks}[1][name]    ${NAMESPACE}/bridge*-conf
     Should Match    ${networks}[1][name]    ${extra_cni_name}
 
     RETURN    ${networks}
