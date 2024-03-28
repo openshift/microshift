@@ -1,8 +1,8 @@
-{{- if env.Getenv "RHOCP_MINOR_Y" "" -}}
+{{- if .RHOCPMinorY -}}
 id = "rhocp-y"
-name = "Red Hat OpenShift Container Platform 4.{{ .Env.RHOCP_MINOR_Y }} for RHEL 9"
+name = "Red Hat OpenShift Container Platform 4.{{ .RHOCPMinorY }} for RHEL 9"
 type = "yum-baseurl"
-url = "https://cdn.redhat.com/content/dist/layered/rhel9/{{ .Env.UNAME_M }}/rhocp/4.{{ .Env.RHOCP_MINOR_Y }}/os"
+url = "https://cdn.redhat.com/content/dist/layered/rhel9/{{ .Arch }}/rhocp/4.{{ .RHOCPMinorY }}/os"
 check_gpg = true
 check_ssl = true
 system = false

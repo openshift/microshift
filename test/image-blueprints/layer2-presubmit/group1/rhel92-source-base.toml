@@ -7,19 +7,19 @@ distro = "rhel-92"
 
 [[packages]]
 name = "microshift"
-version = "{{ .Env.SOURCE_VERSION_BASE }}"
+version = "{{ .Base.Version }}"
 
 [[packages]]
 name = "microshift-greenboot"
-version = "{{ .Env.SOURCE_VERSION_BASE }}"
+version = "{{ .Base.Version }}"
 
 [[packages]]
 name = "microshift-networking"
-version = "{{ .Env.SOURCE_VERSION_BASE }}"
+version = "{{ .Base.Version }}"
 
 [[packages]]
 name = "microshift-selinux"
-version = "{{ .Env.SOURCE_VERSION_BASE }}"
+version = "{{ .Base.Version }}"
 
 [[packages]]
 name = "microshift-test-agent"

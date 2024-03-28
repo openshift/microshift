@@ -1,0 +1,9 @@
+{{- if .External.Repository -}}
+id = "microshift-external"
+name = "Repository with externally supplied RPMs"
+type = "yum-baseurl"
+url = "{{ .External.Repository }}"
+check_gpg = false
+check_ssl = true
+system = false
+{{- end -}}

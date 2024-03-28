@@ -7,27 +7,27 @@ distro = "rhel-92"
 
 [[packages]]
 name = "microshift"
-version = "{{ .Env.SOURCE_VERSION }}"
+version = "{{ .Source.Version }}"
 
 [[packages]]
 name = "microshift-greenboot"
-version = "{{ .Env.SOURCE_VERSION }}"
+version = "{{ .Source.Version }}"
 
 [[packages]]
 name = "microshift-networking"
-version = "{{ .Env.SOURCE_VERSION }}"
+version = "{{ .Source.Version }}"
 
 [[packages]]
 name = "microshift-selinux"
-version = "{{ .Env.SOURCE_VERSION }}"
+version = "{{ .Source.Version }}"
 
 [[packages]]
 name = "microshift-olm"
-version = "{{ .Env.SOURCE_VERSION }}"
+version = "{{ .Source.Version }}"
 
 [[packages]]
 name = "microshift-multus"
-version = "{{ .Env.SOURCE_VERSION }}"
+version = "{{ .Source.Version }}"
 
 [[packages]]
 name = "microshift-test-agent"
