@@ -202,3 +202,17 @@ func selectV4IPFromHostInterface(nodeIP string) (string, error) {
 	}
 	return "", fmt.Errorf("no interface with valid address found on host")
 }
+
+// ContainIPANetwork - will check if given IP address contained within list of networks
+func ContainIPANetwork(ip tcpnet.IP, networks []string) bool {
+	for _, netStr := range networks {
+		_, netA, err := tcpnet.ParseCIDR(netStr)
+		if err != nil {
+			return false
+		}
+		if netA.Contains(ip) {
+			return true
+		}
+	}
+	return false
+}
