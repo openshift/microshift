@@ -54,66 +54,81 @@ func (i *ImageFetcher) Prepare(opts *Opts) error {
 
 func (i *ImageFetcher) Execute(opts *Opts) error {
 	s := time.Now()
-	err := i.execute(opts)
+	skipped, err := i.execute(opts)
+
+	if skipped && err == nil {
+		opts.Events.AddEvent(&testutil.SkippedEvent{
+			Event: testutil.Event{
+				Name:      i.Name,
+				Suite:     "download",
+				ClassName: "iso-download",
+				Start:     s,
+				End:       time.Now(),
+			},
+			Message: fmt.Sprintf("Image already exists in %s", i.Destination),
+		})
+		return nil
+	}
+
 	if err != nil {
-		opts.Junit.AddTest("download", testutil.JUnitTestCase{
-			Name:      i.Name,
-			ClassName: "iso-download",
-			Time:      int(time.Since(s).Seconds()),
-			Failure:   &testutil.JUnitFailure{Message: "Downloading image failed", Content: err.Error()},
+		opts.Events.AddEvent(&testutil.FailedEvent{
+			Event: testutil.Event{
+				Name:      i.Name,
+				Suite:     "download",
+				ClassName: "iso-download",
+				Start:     s,
+				End:       time.Now(),
+			},
+			Message: "Downloading image failed",
+			Content: err.Error(),
 		})
 		return err
 	}
 
-	opts.Junit.AddTest("download", testutil.JUnitTestCase{
+	opts.Events.AddEvent(&testutil.Event{
 		Name:      i.Name,
+		Suite:     "download",
 		ClassName: "iso-download",
-		Time:      int(time.Since(s).Seconds()),
+		Start:     s,
+		End:       time.Now(),
 	})
 	return nil
 }
 
-func (i *ImageFetcher) execute(opts *Opts) error {
+func (i *ImageFetcher) execute(opts *Opts) (bool, error) {
 	if opts.DryRun {
 		klog.InfoS("DRY RUN: Downloaded image", "name", i.Name)
-		return nil
+		return false, nil
 	}
 
 	tmpDest := i.Destination + ".download"
 
 	if exists, err := util.PathExistsAndIsNotEmpty(i.Destination); err != nil {
-		return err
+		return false, err
 	} else if exists {
 		klog.InfoS("Image for download already exists", "path", i.Destination)
 		if !opts.Force {
-			opts.Junit.AddTest("download", testutil.JUnitTestCase{
-				Name:      i.Name,
-				ClassName: "iso-download",
-				Skipped: &testutil.JUnitSkipped{
-					Message: fmt.Sprintf("Image already exists in %s", i.Destination),
-				},
-			})
-			return nil
+			return true, nil
 		}
 		klog.InfoS("Force mode: removing and re-downloading file", "path", i.Destination)
 		if err := os.RemoveAll(i.Destination); err != nil {
-			return fmt.Errorf("failed to remove %q: %w", i.Destination, err)
+			return false, fmt.Errorf("failed to remove %q: %w", i.Destination, err)
 		}
 	}
 
 	err := testutil.Retry(3, func() error { return i.download(tmpDest) })
 	if err != nil {
 		klog.ErrorS(err, "Failed to download image", "destination", tmpDest, "url", i.Url)
-		return err
+		return false, err
 	}
 
 	err = os.Rename(tmpDest, i.Destination)
 	if err != nil {
-		return fmt.Errorf("failed to rename %q to %q: %w", tmpDest, i.Destination, err)
+		return false, fmt.Errorf("failed to rename %q to %q: %w", tmpDest, i.Destination, err)
 	}
 	klog.InfoS("Renamed image", "destination", i.Destination, "source", tmpDest)
 
-	return nil
+	return false, nil
 }
 
 func (i *ImageFetcher) download(dest string) error {

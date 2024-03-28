@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"slices"
+	"time"
 
 	"github.com/openshift/microshift/test/pkg/compose/helpers"
 	"github.com/openshift/microshift/test/pkg/compose/templatingdata"
@@ -18,7 +19,7 @@ type SourceConfigurerOpts struct {
 	Composer    helpers.Composer
 	TplData     *templatingdata.TemplatingData
 	TestDirPath string
-	Junit       *testutil.JUnit
+	Events      *testutil.EventManager
 }
 
 type SourceConfigurer struct {
@@ -36,6 +37,7 @@ func (sc *SourceConfigurer) ConfigureSources() error {
 		if fileInfo.IsDir() {
 			return nil
 		}
+		start := time.Now()
 
 		dataBytes, err := os.ReadFile(path)
 		if err != nil {
@@ -64,10 +66,15 @@ func (sc *SourceConfigurer) ConfigureSources() error {
 				}
 			} else {
 				klog.InfoS("Template is empty - not adding", "name", name)
-				sc.Opts.Junit.AddTest("sources", testutil.JUnitTestCase{
-					Name:      name,
-					ClassName: "source",
-					Skipped:   &testutil.JUnitSkipped{Message: "Empty result of templating"},
+				sc.Opts.Events.AddEvent(&testutil.SkippedEvent{
+					Event: testutil.Event{
+						Name:      name,
+						Suite:     "sources",
+						ClassName: "source",
+						Start:     start,
+						End:       time.Now(),
+					},
+					Message: "Empty result of templating",
 				})
 			}
 			return nil
@@ -76,19 +83,26 @@ func (sc *SourceConfigurer) ConfigureSources() error {
 		klog.InfoS("Adding source to the composer", "name", name)
 		if err := sc.Opts.Composer.AddSource(result); err != nil {
 			klog.ErrorS(err, "Adding composer source failed")
-			sc.Opts.Junit.AddTest("sources", testutil.JUnitTestCase{
-				Name:      name,
-				ClassName: "source",
-				SystemOut: result,
-				Failure:   &testutil.JUnitFailure{Message: "Adding composer source failed", Content: err.Error()},
+			sc.Opts.Events.AddEvent(&testutil.FailedEvent{
+				Event: testutil.Event{
+					Name:      name,
+					Suite:     "sources",
+					ClassName: "source",
+					Start:     start,
+					End:       time.Now(),
+				},
+				Message: "Adding composer source failed",
+				Content: err.Error(),
 			})
 			return err
 		}
 
-		sc.Opts.Junit.AddTest("sources", testutil.JUnitTestCase{
+		sc.Opts.Events.AddEvent(&testutil.Event{
 			Name:      name,
+			Suite:     "sources",
 			ClassName: "source",
-			SystemOut: result,
+			Start:     start,
+			End:       time.Now(),
 		})
 
 		return nil

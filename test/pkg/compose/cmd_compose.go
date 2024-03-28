@@ -104,12 +104,20 @@ func NewComposeCmd() *cobra.Command {
 			}
 		}
 
-		junit := testutil.NewJUnit("compose")
+		events := testutil.NewEventManager("compose")
 		defer func() {
 			junitFile := filepath.Join(artifactsMainDir, "build-logs", "junit_compose.xml")
+			junit := events.GetJUnit()
 			err = junit.WriteToFile(junitFile)
 			if err != nil {
 				klog.ErrorS(err, "Failed to write junit to a file", "file", junitFile)
+			}
+
+			intervalsFile := filepath.Join(artifactsMainDir, "build-logs", "intervals_compose.json")
+			timelinesFile := filepath.Join(artifactsMainDir, "build-logs", "e2e-timelines_spyglass_compose.html")
+			err = events.WriteToFiles(intervalsFile, timelinesFile)
+			if err != nil {
+				klog.ErrorS(err, "Failed to write events to a files", "file", timelinesFile)
 			}
 		}()
 
@@ -117,7 +125,7 @@ func NewComposeCmd() *cobra.Command {
 			Composer:    composer,
 			TplData:     td,
 			TestDirPath: testDirPath,
-			Junit:       junit,
+			Events:      events,
 		}}
 		if err := sourceConfigurer.ConfigureSources(); err != nil {
 			return err
@@ -130,7 +138,7 @@ func NewComposeCmd() *cobra.Command {
 				BuildInstallers:  buildInstallers,
 				ArtifactsMainDir: artifactsMainDir,
 				TestDir:          testDirPath,
-				Junit:            junit,
+				Events:           events,
 			},
 		}
 
@@ -150,7 +158,7 @@ func NewComposeCmd() *cobra.Command {
 				Force:            force,
 				DryRun:           dryRun,
 				ArtifactsMainDir: artifactsMainDir,
-				Junit:            junit,
+				Events:           events,
 			},
 		}
 		err = builder.Build(buildPlan)
