@@ -40,12 +40,14 @@ PREVIOUS_RELEASE_REPO = ""
 YMINUS2_RELEASE_VERSION = ""
 YMINUS2_RELEASE_REPO = ""
 
+
 def find_latest_rpm(repo_path, version=""):
     rpms = glob.glob(f"{repo_path}/**/microshift-release-info-{version}*.rpm", recursive=True)
     if not rpms:
         raise Exception(f"Failed to find 'microshift-release-info-{version}*' RPM in {repo_path}")
     rpms.sort()
     return rpms[-1]
+
 
 def is_rhocp_available(ver):
     # Equivalent to `uname -m`
@@ -59,6 +61,7 @@ def is_rhocp_available(ver):
         return True
     except Exception:
         return False
+
 
 def set_rpm_version_info_vars():
     global SOURCE_VERSION
@@ -106,6 +109,7 @@ def set_rpm_version_info_vars():
     YMINUS2_RELEASE_REPO = common.run_command_in_shell(f"source {SCRIPTDIR}/get_rel_version_repo.sh; get_ocp_repo_name_for_version {YMINUS2_MINOR_VERSION}")
     RHOCP_MINOR_Y2 = YMINUS2_MINOR_VERSION
 
+
 def get_container_images(path, version):
     # Find the last microshift-release-info RPM with the specified version
     release_info_rpm = find_latest_rpm(path, version)
@@ -113,6 +117,7 @@ def get_container_images(path, version):
     cpio_cmd = f"rpm2cpio '{release_info_rpm}' | cpio -i --to-stdout '*release-{UNAME_M}.json' 2> /dev/null"
     jq_cmd = "jq -r '[.images[]] | join(\",\")'"
     return common.run_command_in_shell(f"{cpio_cmd} | {jq_cmd}")
+
 
 def extract_container_images(version, repo_spec, outfile, dry_run=False):
     print(f"Extracting images from {version}")
@@ -138,7 +143,7 @@ def extract_container_images(version, repo_spec, outfile, dry_run=False):
 
     # Construct and execute the dnf download command
     dnf_command = ["sudo", "dnf", "download"] + dnf_options + [f"microshift-release-info-{version}"]
-    if common.run_command(dnf_command, dry_run) != None:
+    if common.run_command(dnf_command, dry_run) is not None:
         images_output = get_container_images(str(image_path), version)
         with open(outfile, "a") as f:
             f.write(images_output.replace(',', '\n'))
@@ -147,6 +152,7 @@ def extract_container_images(version, repo_spec, outfile, dry_run=False):
         # Cleanup RPM files
         rpm_list = list(map(str, image_path.glob("microshift-release-info-*.rpm")))
         common.run_command(["sudo", "rm", "-f"] + rpm_list, dry_run)
+
 
 def process_containerfiles(groupdir, dry_run=False):
     for containerfile in os.listdir(groupdir):
@@ -168,10 +174,11 @@ def process_containerfiles(groupdir, dry_run=False):
         print(f"Processing {cf_path}")
         common.run_command(
             ["podman", "build", "-t", cf_outname, "-f", cf_path,
-            os.path.join(IMAGEDIR, "rpm-repos")], dry_run)
+                os.path.join(IMAGEDIR, "rpm-repos")], dry_run)
         if os.path.exists(cf_outdir):
             shutil.rmtree(cf_outdir)
         common.run_command(["podman", "save", "--format", "oci-dir", "-o", cf_outdir, cf_outname], dry_run)
+
 
 def main():
     # Parse command line arguments
@@ -217,6 +224,7 @@ def main():
         print(f"An error occurred: {e}")
         traceback.print_exc()
         sys.exit(1)
+
 
 if __name__ == "__main__":
     main()

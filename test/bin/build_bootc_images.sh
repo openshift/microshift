@@ -4,7 +4,8 @@
 # same as the hypervisor).
 set -euo pipefail
 
-export SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+export SCRIPTDIR
 # shellcheck source=test/bin/common.sh
 source "${SCRIPTDIR}/common.sh"
 
