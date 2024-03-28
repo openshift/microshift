@@ -159,8 +159,7 @@ else
         echo "WARNING: Build cache is not available, rebuilding all the artifacts"
     fi
 
-    # TODO: Remove this line before merge
-    CI_JOB_NAME=microshift-bootc-periodic
+    # Optionally run bootc image build depending on the job name
     if [ -v CI_JOB_NAME ] && [[ "${CI_JOB_NAME}" =~ .*bootc.* ]]; then
         run_bootc_image_build
     else
