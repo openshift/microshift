@@ -159,7 +159,11 @@ func startIngressController(ctx context.Context, cfg *config.Config, kubeconfigP
 		klog.Warningf("Failed to apply configMap %v: %v", cm, err)
 		return err
 	}
-	if err := assets.ApplyServices(ctx, svc, nil, nil, kubeconfigPath); err != nil {
+	extraParams := assets.RenderParams{
+		"RouterHttpPort":  cfg.Ingress.Ports.Http,
+		"RouterHttpsPort": cfg.Ingress.Ports.Https,
+	}
+	if err := assets.ApplyServices(ctx, svc, renderTemplate, renderParamsFromConfig(cfg, extraParams), kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply service %v %v", svc, err)
 		return err
 	}
@@ -176,8 +180,10 @@ func startIngressController(ctx context.Context, cfg *config.Config, kubeconfigP
 		return err
 	}
 
-	extraParams := assets.RenderParams{
+	extraParams = assets.RenderParams{
 		"RouterNamespaceOwnership": cfg.Ingress.AdmissionPolicy.NamespaceOwnership == config.NamespaceOwnershipAllowed,
+		"RouterHttpPort":           cfg.Ingress.Ports.Http,
+		"RouterHttpsPort":          cfg.Ingress.Ports.Https,
 	}
 	if err := assets.ApplyDeployments(ctx, apps, renderTemplate, renderParamsFromConfig(cfg, extraParams), kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply apps %v: %v", apps, err)

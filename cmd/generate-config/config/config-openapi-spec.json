@@ -73,9 +73,29 @@
     "ingress": {
       "type": "object",
       "required": [
+        "ports",
         "routeAdmissionPolicy"
       ],
       "properties": {
+        "ports": {
+          "type": "object",
+          "required": [
+            "http",
+            "https"
+          ],
+          "properties": {
+            "http": {
+              "description": "Default router http port.",
+              "type": "integer",
+              "default": 80
+            },
+            "https": {
+              "description": "Default router https port.",
+              "type": "integer",
+              "default": 443
+            }
+          }
+        },
         "routeAdmissionPolicy": {
           "type": "object",
           "required": [
