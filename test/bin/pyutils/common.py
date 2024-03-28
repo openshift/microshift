@@ -25,5 +25,21 @@ def run_command(command: List[str], dry_run: bool):
     """Run the command or print the command line depending on the dry run argument"""
     if dry_run:
         print(f"[Dry Run] {' '.join(command)}")
-    else:
-        subprocess.run(command, check=True)
+        return None
+    return subprocess.run(command, check=True)
+
+def run_command_in_shell(command: str):
+    """Run the command through shell and return its output"""
+    print(f"SHELL={command}")
+    result = subprocess.run(
+        command,
+        check=True, shell=True, text=True,
+        env=os.environ.copy(), stdout=subprocess.PIPE)
+    return result.stdout.strip()
+
+def delete_file(file_path: str):
+    """Attempt file deletion ignoring errors when a file does not exist"""
+    try:
+        os.remove(file_path)
+    except FileNotFoundError:
+        pass

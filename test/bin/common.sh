@@ -50,19 +50,19 @@ BASE_RPM_SOURCE="${OUTPUTDIR}/rpmbuild-base"
 
 # Location of local repository used by composer
 # shellcheck disable=SC2034  # used elsewhere
-LOCAL_REPO="${IMAGEDIR}/rpm-repos/microshift-local"
+export LOCAL_REPO="${IMAGEDIR}/rpm-repos/microshift-local"
 
 # Location of local repository used by composer
 # shellcheck disable=SC2034  # used elsewhere
-NEXT_REPO="${IMAGEDIR}/rpm-repos/microshift-fake-next-minor"
+export NEXT_REPO="${IMAGEDIR}/rpm-repos/microshift-fake-next-minor"
 
 # Location of local repository used by composer
 # shellcheck disable=SC2034  # used elsewhere
-BASE_REPO="${IMAGEDIR}/rpm-repos/microshift-base"
+export BASE_REPO="${IMAGEDIR}/rpm-repos/microshift-base"
 
 # Location of container images list for all the built images
 # shellcheck disable=SC2034  # used elsewhere
-CONTAINER_LIST="${IMAGEDIR}/container-images-list"
+export CONTAINER_LIST="${IMAGEDIR}/container-images-list"
 
 # Location of container images in oci-dir formar for all the bootc images
 # shellcheck disable=SC2034  # used elsewhere
