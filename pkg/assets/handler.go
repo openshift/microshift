@@ -17,7 +17,7 @@ type RenderParams map[string]interface{}
 
 type RenderFunc func([]byte, RenderParams) ([]byte, error)
 
-type readerApplier interface {
-	Reader([]byte, RenderFunc, RenderParams)
-	Applier(ctx context.Context) error
+type resourceHandler interface {
+	Read([]byte, RenderFunc, RenderParams)
+	Handle(ctx context.Context) error
 }

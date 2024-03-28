@@ -45,7 +45,7 @@ type scApplier struct {
 	sc     *scv1.StorageClass
 }
 
-func (s *scApplier) Reader(objBytes []byte, render RenderFunc, params RenderParams) {
+func (s *scApplier) Read(objBytes []byte, render RenderFunc, params RenderParams) {
 	var err error
 	if render != nil {
 		objBytes, err = render(objBytes, params)
@@ -59,12 +59,12 @@ func (s *scApplier) Reader(objBytes []byte, render RenderFunc, params RenderPara
 	}
 	s.sc = obj.(*scv1.StorageClass)
 }
-func (s *scApplier) Applier(ctx context.Context) error {
+func (s *scApplier) Handle(ctx context.Context) error {
 	_, _, err := resourceapply.ApplyStorageClass(ctx, s.Client, assetsEventRecorder, s.sc)
 	return err
 }
 
-func applySCs(ctx context.Context, scs []string, applier readerApplier, render RenderFunc, params RenderParams) error {
+func applySCs(ctx context.Context, scs []string, handler resourceHandler, render RenderFunc, params RenderParams) error {
 	lock.Lock()
 	defer lock.Unlock()
 
@@ -74,8 +74,8 @@ func applySCs(ctx context.Context, scs []string, applier readerApplier, render R
 		if err != nil {
 			return fmt.Errorf("error getting asset %s: %v", sc, err)
 		}
-		applier.Reader(objBytes, render, params)
-		if err := applier.Applier(ctx); err != nil {
+		handler.Read(objBytes, render, params)
+		if err := handler.Handle(ctx); err != nil {
 			klog.Warningf("Failed to apply sc api %s: %v", sc, err)
 			return err
 		}
@@ -95,7 +95,7 @@ type cdApplier struct {
 	cd     *scv1.CSIDriver
 }
 
-func (c *cdApplier) Reader(objBytes []byte, render RenderFunc, params RenderParams) {
+func (c *cdApplier) Read(objBytes []byte, render RenderFunc, params RenderParams) {
 	var err error
 	if render != nil {
 		objBytes, err = render(objBytes, params)
@@ -110,7 +110,7 @@ func (c *cdApplier) Reader(objBytes []byte, render RenderFunc, params RenderPara
 	c.cd = obj.(*scv1.CSIDriver)
 }
 
-func (c *cdApplier) Applier(ctx context.Context) error {
+func (c *cdApplier) Handle(ctx context.Context) error {
 	_, _, err := resourceapply.ApplyCSIDriver(ctx, c.Client, assetsEventRecorder, c.cd)
 	return err
 }
@@ -121,7 +121,7 @@ func ApplyCSIDrivers(ctx context.Context, drivers []string, render RenderFunc, p
 	return applyCDs(ctx, drivers, applier, render, params)
 }
 
-func applyCDs(ctx context.Context, cds []string, applier readerApplier, render RenderFunc, params RenderParams) error {
+func applyCDs(ctx context.Context, cds []string, handler resourceHandler, render RenderFunc, params RenderParams) error {
 	lock.Lock()
 	defer lock.Unlock()
 
@@ -131,8 +131,8 @@ func applyCDs(ctx context.Context, cds []string, applier readerApplier, render R
 		if err != nil {
 			return fmt.Errorf("error getting asset %s: %v", cd, err)
 		}
-		applier.Reader(objBytes, render, params)
-		if err := applier.Applier(ctx); err != nil {
+		handler.Read(objBytes, render, params)
+		if err := handler.Handle(ctx); err != nil {
 			klog.Warningf("Failed to apply CSIDriver api %s: %v", cd, err)
 			return err
 		}
@@ -145,7 +145,7 @@ type volumeSnapshotClassApplier struct {
 	vc     *unstructured.Unstructured
 }
 
-func (v *volumeSnapshotClassApplier) Reader(objBytes []byte, render RenderFunc, params RenderParams) {
+func (v *volumeSnapshotClassApplier) Read(objBytes []byte, render RenderFunc, params RenderParams) {
 	var err error
 	if render != nil {
 		objBytes, err = render(objBytes, params)
@@ -162,7 +162,7 @@ func (v *volumeSnapshotClassApplier) Reader(objBytes []byte, render RenderFunc, 
 	v.vc = obj
 }
 
-func (v *volumeSnapshotClassApplier) Applier(ctx context.Context) error {
+func (v *volumeSnapshotClassApplier) Handle(ctx context.Context) error {
 	_, _, err := resourceapply.ApplyVolumeSnapshotClass(ctx, v.Client, assetsEventRecorder, v.vc)
 	return err
 }
@@ -173,7 +173,7 @@ func ApplyVolumeSnapshotClass(ctx context.Context, kubeconfigPath string, vcs []
 	return applyVolumeSnapshotClass(ctx, applier, vcs, render, params)
 }
 
-func applyVolumeSnapshotClass(ctx context.Context, applier readerApplier, vcs []string, render RenderFunc, params RenderParams) error {
+func applyVolumeSnapshotClass(ctx context.Context, handler resourceHandler, vcs []string, render RenderFunc, params RenderParams) error {
 	lock.Lock()
 	defer lock.Unlock()
 
@@ -183,8 +183,8 @@ func applyVolumeSnapshotClass(ctx context.Context, applier readerApplier, vcs []
 		if err != nil {
 			return fmt.Errorf("error getting asset %s: %v", vc, err)
 		}
-		applier.Reader(objBytes, render, params)
-		if err := applier.Applier(ctx); err != nil {
+		handler.Read(objBytes, render, params)
+		if err := handler.Handle(ctx); err != nil {
 			klog.Warningf("Failed to apply volumeSnapshotClass api %s: %v", vc, err)
 			return err
 		}

@@ -28,11 +28,6 @@ func init() {
 	}
 }
 
-type nsApplier struct {
-	Client *coreclientv1.CoreV1Client
-	ns     *corev1.Namespace
-}
-
 func coreClient(kubeconfigPath string) *coreclientv1.CoreV1Client {
 	restConfig, err := clientcmd.BuildConfigFromFlags("", kubeconfigPath)
 	if err != nil {
@@ -42,7 +37,7 @@ func coreClient(kubeconfigPath string) *coreclientv1.CoreV1Client {
 	return coreclientv1.NewForConfigOrDie(rest.AddUserAgent(restConfig, "core-agent"))
 }
 
-func (ns *nsApplier) Reader(objBytes []byte, render RenderFunc, params RenderParams) {
+func readCore[T any](objBytes []byte, render RenderFunc, params RenderParams) T {
 	var err error
 	if render != nil {
 		objBytes, err = render(objBytes, params)
@@ -54,11 +49,34 @@ func (ns *nsApplier) Reader(objBytes []byte, render RenderFunc, params RenderPar
 	if err != nil {
 		panic(err)
 	}
-	ns.ns = obj.(*corev1.Namespace)
+	return obj.(T)
 }
 
-func (ns *nsApplier) Applier(ctx context.Context) error {
+type nsApplier struct {
+	Client *coreclientv1.CoreV1Client
+	ns     *corev1.Namespace
+}
+
+func (ns *nsApplier) Read(objBytes []byte, render RenderFunc, params RenderParams) {
+	ns.ns = readCore[*corev1.Namespace](objBytes, render, params)
+}
+
+func (ns *nsApplier) Handle(ctx context.Context) error {
 	_, _, err := resourceapply.ApplyNamespace(ctx, ns.Client, assetsEventRecorder, ns.ns)
+	return err
+}
+
+type nsDeleter struct {
+	Client *coreclientv1.CoreV1Client
+	ns     *corev1.Namespace
+}
+
+func (ns *nsDeleter) Read(objBytes []byte, render RenderFunc, params RenderParams) {
+	ns.ns = readCore[*corev1.Namespace](objBytes, render, params)
+}
+
+func (ns *nsDeleter) Handle(ctx context.Context) error {
+	_, _, err := resourceapply.DeleteNamespace(ctx, ns.Client, assetsEventRecorder, ns.ns)
 	return err
 }
 
@@ -67,22 +85,11 @@ type secretApplier struct {
 	secret *corev1.Secret
 }
 
-func (secret *secretApplier) Reader(objBytes []byte, render RenderFunc, params RenderParams) {
-	var err error
-	if render != nil {
-		objBytes, err = render(objBytes, params)
-		if err != nil {
-			panic(err)
-		}
-	}
-	obj, err := runtime.Decode(coreCodecs.UniversalDecoder(corev1.SchemeGroupVersion), objBytes)
-	if err != nil {
-		panic(err)
-	}
-	secret.secret = obj.(*corev1.Secret)
+func (secret *secretApplier) Read(objBytes []byte, render RenderFunc, params RenderParams) {
+	secret.secret = readCore[*corev1.Secret](objBytes, render, params)
 }
 
-func (secret *secretApplier) Applier(ctx context.Context) error {
+func (secret *secretApplier) Handle(ctx context.Context) error {
 	_, _, err := resourceapply.ApplySecret(ctx, secret.Client, assetsEventRecorder, secret.secret)
 	return err
 }
@@ -92,22 +99,11 @@ type svcApplier struct {
 	svc    *corev1.Service
 }
 
-func (svc *svcApplier) Reader(objBytes []byte, render RenderFunc, params RenderParams) {
-	var err error
-	if render != nil {
-		objBytes, err = render(objBytes, params)
-		if err != nil {
-			panic(err)
-		}
-	}
-	obj, err := runtime.Decode(coreCodecs.UniversalDecoder(corev1.SchemeGroupVersion), objBytes)
-	if err != nil {
-		panic(err)
-	}
-	svc.svc = obj.(*corev1.Service)
+func (svc *svcApplier) Read(objBytes []byte, render RenderFunc, params RenderParams) {
+	svc.svc = readCore[*corev1.Service](objBytes, render, params)
 }
 
-func (svc *svcApplier) Applier(ctx context.Context) error {
+func (svc *svcApplier) Handle(ctx context.Context) error {
 	_, _, err := resourceapply.ApplyService(ctx, svc.Client, assetsEventRecorder, svc.svc)
 	return err
 }
@@ -117,22 +113,11 @@ type saApplier struct {
 	sa     *corev1.ServiceAccount
 }
 
-func (sa *saApplier) Reader(objBytes []byte, render RenderFunc, params RenderParams) {
-	var err error
-	if render != nil {
-		objBytes, err = render(objBytes, params)
-		if err != nil {
-			panic(err)
-		}
-	}
-	obj, err := runtime.Decode(coreCodecs.UniversalDecoder(corev1.SchemeGroupVersion), objBytes)
-	if err != nil {
-		panic(err)
-	}
-	sa.sa = obj.(*corev1.ServiceAccount)
+func (sa *saApplier) Read(objBytes []byte, render RenderFunc, params RenderParams) {
+	sa.sa = readCore[*corev1.ServiceAccount](objBytes, render, params)
 }
 
-func (sa *saApplier) Applier(ctx context.Context) error {
+func (sa *saApplier) Handle(ctx context.Context) error {
 	_, _, err := resourceapply.ApplyServiceAccount(ctx, sa.Client, assetsEventRecorder, sa.sa)
 	return err
 }
@@ -142,27 +127,16 @@ type cmApplier struct {
 	cm     *corev1.ConfigMap
 }
 
-func (cm *cmApplier) Reader(objBytes []byte, render RenderFunc, params RenderParams) {
-	var err error
-	if render != nil {
-		objBytes, err = render(objBytes, params)
-		if err != nil {
-			panic(err)
-		}
-	}
-	obj, err := runtime.Decode(coreCodecs.UniversalDecoder(corev1.SchemeGroupVersion), objBytes)
-	if err != nil {
-		panic(err)
-	}
-	cm.cm = obj.(*corev1.ConfigMap)
+func (cm *cmApplier) Read(objBytes []byte, render RenderFunc, params RenderParams) {
+	cm.cm = readCore[*corev1.ConfigMap](objBytes, render, params)
 }
 
-func (cm *cmApplier) Applier(ctx context.Context) error {
+func (cm *cmApplier) Handle(ctx context.Context) error {
 	_, _, err := resourceapply.ApplyConfigMap(ctx, cm.Client, assetsEventRecorder, cm.cm)
 	return err
 }
 
-func applyCore(ctx context.Context, cores []string, applier readerApplier, render RenderFunc, params RenderParams) error {
+func handleCore(ctx context.Context, cores []string, handler resourceHandler, render RenderFunc, params RenderParams) error {
 	lock.Lock()
 	defer lock.Unlock()
 
@@ -172,8 +146,8 @@ func applyCore(ctx context.Context, cores []string, applier readerApplier, rende
 		if err != nil {
 			return fmt.Errorf("error getting asset %s: %v", core, err)
 		}
-		applier.Reader(objBytes, render, params)
-		if err := applier.Applier(ctx); err != nil {
+		handler.Read(objBytes, render, params)
+		if err := handler.Handle(ctx); err != nil {
 			klog.Warningf("Failed to apply corev1 api %s: %v", core, err)
 			return err
 		}
@@ -185,25 +159,31 @@ func applyCore(ctx context.Context, cores []string, applier readerApplier, rende
 func ApplyNamespaces(ctx context.Context, cores []string, kubeconfigPath string) error {
 	ns := &nsApplier{}
 	ns.Client = coreClient(kubeconfigPath)
-	return applyCore(ctx, cores, ns, nil, nil)
+	return handleCore(ctx, cores, ns, nil, nil)
+}
+
+func DeleteNamespaces(ctx context.Context, cores []string, kubeconfigPath string) error {
+	ns := &nsDeleter{}
+	ns.Client = coreClient(kubeconfigPath)
+	return handleCore(ctx, cores, ns, nil, nil)
 }
 
 func ApplyServices(ctx context.Context, cores []string, render RenderFunc, params RenderParams, kubeconfigPath string) error {
 	svc := &svcApplier{}
 	svc.Client = coreClient(kubeconfigPath)
-	return applyCore(ctx, cores, svc, render, params)
+	return handleCore(ctx, cores, svc, render, params)
 }
 
 func ApplyServiceAccounts(ctx context.Context, cores []string, kubeconfigPath string) error {
 	sa := &saApplier{}
 	sa.Client = coreClient(kubeconfigPath)
-	return applyCore(ctx, cores, sa, nil, nil)
+	return handleCore(ctx, cores, sa, nil, nil)
 }
 
 func ApplyConfigMaps(ctx context.Context, cores []string, render RenderFunc, params RenderParams, kubeconfigPath string) error {
 	cm := &cmApplier{}
 	cm.Client = coreClient(kubeconfigPath)
-	return applyCore(ctx, cores, cm, render, params)
+	return handleCore(ctx, cores, cm, render, params)
 }
 
 func ApplyConfigMapWithData(ctx context.Context, cmPath string, data map[string]string, kubeconfigPath string) error {
@@ -213,7 +193,7 @@ func ApplyConfigMapWithData(ctx context.Context, cmPath string, data map[string]
 	if err != nil {
 		return err
 	}
-	cm.Reader(cmBytes, nil, nil)
+	cm.Read(cmBytes, nil, nil)
 	cm.cm.Data = data
 	_, _, err = resourceapply.ApplyConfigMap(ctx, cm.Client, assetsEventRecorder, cm.cm)
 	return err
@@ -226,7 +206,7 @@ func ApplySecretWithData(ctx context.Context, secretPath string, data map[string
 	if err != nil {
 		return err
 	}
-	secret.Reader(secretBytes, nil, nil)
+	secret.Read(secretBytes, nil, nil)
 	secret.secret.Data = data
 	_, _, err = resourceapply.ApplySecret(ctx, secret.Client, assetsEventRecorder, secret.secret)
 	return err
