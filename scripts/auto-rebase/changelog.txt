@@ -1,8 +1,3 @@
-- oc image-amd64 286cfa5f978c4a89c776347c82fa09a232eef144 to f7b14a92857ad1f28be2e2eaec3ae8229d4c2761
-  - 8daa19bb 2024-03-06T01:30:58+00:00 oc adm catalog mirror: reconstruct the original digest with ':' for sha256 and sha512 algorithms on Windows
-  - 09413aa7 2024-03-06T01:30:58+00:00 oc adm catalog mirror: use ToSlash and FromSlash to unify the path separators
-
-- oc image-arm64 286cfa5f978c4a89c776347c82fa09a232eef144 to f7b14a92857ad1f28be2e2eaec3ae8229d4c2761
-  - 8daa19bb 2024-03-06T01:30:58+00:00 oc adm catalog mirror: reconstruct the original digest with ':' for sha256 and sha512 algorithms on Windows
-  - 09413aa7 2024-03-06T01:30:58+00:00 oc adm catalog mirror: use ToSlash and FromSlash to unify the path separators
+- cluster-network-operator embedded-component 5c074c930fc58368fd68d576505261ed158d4059 to bdcd97c60b9593e40c71a290f05d181612581e94
+  - b282389 2024-03-25T14:06:38+01:00 Remove egressip write permissions from ovn-kubernetes-node
 
