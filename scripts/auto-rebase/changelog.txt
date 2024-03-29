@@ -1,27 +1,21 @@
-- oc image-arm64 c92b50721e5b12fc1edb6cd4cb2390d8622d1f1e to 508e3d0e0aa2fe06e7b31552e29f43fb528fa599
-  - f0f00067 2024-03-25T12:53:20-07:00 pkg/cli/admin/release/info: add back disk space note
-  - ce1595d7 2024-03-22T15:16:32+03:00 Bump coreos/go-oidc to 3.10.0
-  - a1dfc344 2024-03-14T15:44:02-07:00 pkg/cli/admin/release: fix git extract
-  - 4c766f99 2024-03-14T11:01:05-07:00 pkg/cli/admin/release/git: fetch with blob:none
-  - 0d093afb 2024-03-13T16:07:13-07:00 cli/admin/release/git: use optimized git flags
-  - b9779796 2024-02-27T09:26:35+03:00 oc idle: Remove redundant endpoint resource modification
+- oc image-arm64 508e3d0e0aa2fe06e7b31552e29f43fb528fa599 to ec6e928ec80cdbdd67c9dc2327ae17d9b2feebbf
+  - 52661743 2024-03-28T08:01:42+03:00 Remove some of newapp unit tests relying on external deprecated images
 
-- csi-external-snapshotter image-arm64 196496e722fba017252b66e76d5dc05595d32ae2 to af6b06ec142d95d84c318776c1214427f55a3e1d
-  - f00d415 2024-03-12T13:16:52-06:00 UPSTREAM: 1033: CVE-2024-24786: bump google.golang.org/protobuf to v1.33.0
+- csi-external-snapshotter image-arm64 af6b06ec142d95d84c318776c1214427f55a3e1d to 39164d4fd75a049a4eb772095c19cda2f99a59e0
+  - deebac0 2024-03-19T18:54:33-07:00 UPSTREAM: <carry>: Add OpenShift files
+  - 553899b 2024-02-12T11:07:33-05:00 Add changelog 7.0.1
+  - be543ce 2024-02-09T16:50:09-05:00 Add nil check for SourceVolumeMode in the ValidationWebHook
 
-- csi-external-snapshotter image-arm64 196496e722fba017252b66e76d5dc05595d32ae2 to af6b06ec142d95d84c318776c1214427f55a3e1d
-  - f00d415 2024-03-12T13:16:52-06:00 UPSTREAM: 1033: CVE-2024-24786: bump google.golang.org/protobuf to v1.33.0
+- csi-external-snapshotter image-arm64 af6b06ec142d95d84c318776c1214427f55a3e1d to 39164d4fd75a049a4eb772095c19cda2f99a59e0
+  - deebac0 2024-03-19T18:54:33-07:00 UPSTREAM: <carry>: Add OpenShift files
+  - 553899b 2024-02-12T11:07:33-05:00 Add changelog 7.0.1
+  - be543ce 2024-02-09T16:50:09-05:00 Add nil check for SourceVolumeMode in the ValidationWebHook
 
-- csi-external-snapshotter image-arm64 196496e722fba017252b66e76d5dc05595d32ae2 to af6b06ec142d95d84c318776c1214427f55a3e1d
-  - f00d415 2024-03-12T13:16:52-06:00 UPSTREAM: 1033: CVE-2024-24786: bump google.golang.org/protobuf to v1.33.0
+- csi-external-snapshotter image-arm64 af6b06ec142d95d84c318776c1214427f55a3e1d to 39164d4fd75a049a4eb772095c19cda2f99a59e0
+  - deebac0 2024-03-19T18:54:33-07:00 UPSTREAM: <carry>: Add OpenShift files
+  - 553899b 2024-02-12T11:07:33-05:00 Add changelog 7.0.1
+  - be543ce 2024-02-09T16:50:09-05:00 Add nil check for SourceVolumeMode in the ValidationWebHook
 
-- router image-arm64 19e6365d90d0540c138267091235005ad32c238b to 526f832abbd2c2926d6545b4a6f5c41579bc6a76
-  - e298bb0 2024-03-13T15:05:24-04:00 OCPBUGS-22739: Properly handle rewrite-target annotation
-
-- kubernetes image-arm64 5a51bd8afbb871ff9952c94788d368d6254cd500 to 258f1d5fb6491ba65fd8201c827e179432430627
-  - 7921d3dbd 2024-03-18T10:57:49-04:00 UPSTREAM: 123603: fix UT failure TestPrintIPAddressList
-  - 1022a26a7 2024-03-18T10:13:05-04:00 UPSTREAM: <carry>: fix [sig-auth] ServiceAccounts no secret-based service account token should be auto-generated
-  - f7330497c 2024-03-15T18:41:09+05:30 UPSTREAM: <carry>: Add openshift feature gates to kube-apiserver - inject openshift feature gates into pkg/features
-  - 23a972978 2024-03-15T18:40:45+05:30 UPSTREAM: <drop>: Bump deps for api and library-go - hack/pin-dependecy.sh github.com/openshift/api ae973131190ee375747ac8efad4d4bc077d6c4fd - hack/pin-dependency.sh github.com/openshift/library-go 126b47137408f93a2fc9f2e8cbeedda61f9ebbfb - hack/update-vendor.sh
-  - fe98fc78d 2024-02-12T16:59:32+05:30 UPSTREAM: <carry>: Add context to ObjectValidator TODO: add router validation logic to implement ctx add in ObjectValidator
+- ovn-kubernetes image-arm64 06e52e971aa8640c02be16dcb867e2c9af71fc3c to 531eba5fe164c79afd97e24ecd1a7c8aa112a2e3
+  - 2f51c18 2024-03-25T14:13:32-04:00 Remove unnecessary rhel8 build layer
 
