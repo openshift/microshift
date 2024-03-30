@@ -22,7 +22,7 @@ skip_if_unavailable=0\n" > "/etc/yum.repos.d/microshift-local.repo"
 RUN printf "\
 [openshift-mirror-beta]\n\
 name=OpenShift Mirror Beta Repository\n\
-baseurl=https://mirror.openshift.com/pub/openshift-v4/x86_64/dependencies/rpms/4.${PREVIOUS_MINOR_VERSION}-el9-beta/\n\
+baseurl=https://mirror.openshift.com/pub/openshift-v4/$(uname -m)/dependencies/rpms/4.${PREVIOUS_MINOR_VERSION}-el9-beta/\n\
 enabled=1\n\
 gpgcheck=0\n\
 skip_if_unavailable=0\n" > "/etc/yum.repos.d/openshift-mirror-beta.repo"
