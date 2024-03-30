@@ -57,7 +57,7 @@ def is_rhocp_available(ver):
     try:
         # Run the dnf command to check for cri-o in the specified repository
         repo_info = common.run_command_in_shell(f"sudo dnf -v repository-packages {repository} info cri-o")
-        print(repo_info)
+        common.print_msg(repo_info)
         return True
     except Exception:
         return False
@@ -120,7 +120,7 @@ def get_container_images(path, version):
 
 
 def extract_container_images(version, repo_spec, outfile, dry_run=False):
-    print(f"Extracting images from {version}")
+    common.print_msg(f"Extracting images from {version}")
 
     image_path = pathlib.Path(f"{IMAGEDIR}/release-info-rpms")
     image_path.mkdir(parents=True, exist_ok=True)
@@ -166,12 +166,12 @@ def process_containerfiles(groupdir, dry_run=False):
         os.makedirs(BOOTC_IMAGE_DIR, exist_ok=True)
 
         if os.path.exists(cf_outdir):
-            print(f"{cf_outdir} already exists")
+            common.print_msg(f"{cf_outdir} already exists")
             if common.should_skip(cf_outname):
                 common.record_junit(groupdir, cf_path, "containerfile", "SKIPPED")
                 continue
 
-        print(f"Processing {cf_path}")
+        common.print_msg(f"Processing {cf_path}")
         common.run_command(
             ["podman", "build", "-t", cf_outname, "-f", cf_path,
                 os.path.join(IMAGEDIR, "rpm-repos")], dry_run)
@@ -220,8 +220,9 @@ def main():
             # Check if this item is a directory
             if os.path.isdir(item_path):
                 process_containerfiles(item_path, args.dry_run)
+        common.print_msg("Build complete")
     except Exception as e:
-        print(f"An error occurred: {e}")
+        common.print_msg(f"An error occurred: {e}")
         traceback.print_exc()
         sys.exit(1)
 
