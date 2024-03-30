@@ -12,6 +12,9 @@ import platform
 import common
 
 # Global environment variables
+#
+# Note: Global variables for RPM versions and repos are
+# initialized in set_rpm_version_info_vars function
 SCRIPTDIR = common.get_env_var('SCRIPTDIR')
 BOOTC_IMAGE_DIR = common.get_env_var('BOOTC_IMAGE_DIR')
 IMAGEDIR = common.get_env_var('IMAGEDIR')
@@ -20,24 +23,6 @@ CONTAINER_LIST = common.get_env_var('CONTAINER_LIST')
 LOCAL_REPO = common.get_env_var('LOCAL_REPO')
 BASE_REPO = common.get_env_var('BASE_REPO')
 NEXT_REPO = common.get_env_var('NEXT_REPO')
-
-# RPM versions and repos
-SOURCE_VERSION = ""
-MINOR_VERSION = ""
-PREVIOUS_MINOR_VERSION = ""
-YMINUS2_MINOR_VERSION = ""
-FAKE_NEXT_MINOR_VERSION = ""
-SOURCE_VERSION_BASE = ""
-RHOCP_MINOR_Y = ""
-RHOCP_MINOR_Y1 = ""
-RHOCP_MINOR_Y2 = ""
-
-CURRENT_RELEASE_VERSION = ""
-CURRENT_RELEASE_REPO = ""
-PREVIOUS_RELEASE_VERSION = ""
-PREVIOUS_RELEASE_REPO = ""
-YMINUS2_RELEASE_VERSION = ""
-YMINUS2_RELEASE_REPO = ""
 
 
 def find_latest_rpm(repo_path, version=""):
