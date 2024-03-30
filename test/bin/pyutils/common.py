@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import os
+import pathlib
 import sys
 import subprocess
 from typing import List
@@ -49,9 +50,23 @@ def run_command_in_shell(command: str):
     return result.stdout.strip()
 
 
+def create_dir(dir: str, chdir: bool):
+    """Attempt recursive directory creation and optionally change current directory"""
+    path = pathlib.Path(dir)
+    path.mkdir(parents=True, exist_ok=True)
+    if chdir:
+        os.chdir(path)
+    return path
+
+
 def delete_file(file_path: str):
     """Attempt file deletion ignoring errors when a file does not exist"""
     try:
         os.remove(file_path)
     except FileNotFoundError:
         pass
+
+
+def basename(path: str):
+    """Return a base name of the path"""
+    return pathlib.Path(path).name

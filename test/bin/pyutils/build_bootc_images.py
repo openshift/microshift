@@ -7,7 +7,6 @@ import shutil
 import sys
 import traceback
 import re
-import pathlib
 import platform
 
 import common
@@ -122,11 +121,8 @@ def get_container_images(path, version):
 def extract_container_images(version, repo_spec, outfile, dry_run=False):
     common.print_msg(f"Extracting images from {version}")
 
-    image_path = pathlib.Path(f"{IMAGEDIR}/release-info-rpms")
-    image_path.mkdir(parents=True, exist_ok=True)
-    os.chdir(image_path)
-
-    repo_name = pathlib.Path(repo_spec).name
+    image_path = common.create_dir(f"{IMAGEDIR}/release-info-rpms", True)
+    repo_name = common.basename(repo_spec)
     dnf_options = []
 
     if re.match(r'^https://.*', repo_spec):
