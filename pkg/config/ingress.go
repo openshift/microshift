@@ -36,10 +36,10 @@ type RouteAdmissionPolicy struct {
 }
 
 type IngressPortsConfig struct {
-	// Default router http port.
+	// Default router http port. Must be in range 1-65535.
 	// +kubebuilder:default=80
-	Http uint16 `json:"http"`
-	// Default router https port.
+	Http int `json:"http"`
+	// Default router https port. Must be in range 1-65535.
 	// +kubebuilder:default=443
-	Https uint16 `json:"https"`
+	Https int `json:"https"`
 }
