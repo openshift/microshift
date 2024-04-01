@@ -278,8 +278,10 @@ func TestGetActiveConfigFromYAML(t *testing.T) {
 			`),
 			expected: func() *Config {
 				c := mkDefaultConfig()
-				c.Ingress.Ports.Http = 1234
-				c.Ingress.Ports.Https = 9876
+				c.Ingress.Ports.Http = new(int)
+				c.Ingress.Ports.Https = new(int)
+				*c.Ingress.Ports.Http = 1234
+				*c.Ingress.Ports.Https = 9876
 				return c
 			}(),
 		},

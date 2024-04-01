@@ -123,8 +123,8 @@ func (c *Config) fillDefaults() error {
 			NamespaceOwnership: NamespaceOwnershipAllowed,
 		},
 		Ports: IngressPortsConfig{
-			Http:  80,
-			Https: 443,
+			Http:  &(&struct{ x int }{80}).x,
+			Https: &(&struct{ x int }{443}).x,
 		},
 	}
 
@@ -204,12 +204,14 @@ func (c *Config) incorporateUserSettings(u *Config) {
 		c.Ingress.AdmissionPolicy.NamespaceOwnership = u.Ingress.AdmissionPolicy.NamespaceOwnership
 	}
 
-	if u.Ingress.Ports.Http != c.Ingress.Ports.Http {
-		c.Ingress.Ports.Http = u.Ingress.Ports.Http
+	if u.Ingress.Ports.Http != nil {
+		c.Ingress.Ports.Http = new(int)
+		*c.Ingress.Ports.Http = *u.Ingress.Ports.Http
 	}
 
-	if u.Ingress.Ports.Https != c.Ingress.Ports.Https {
-		c.Ingress.Ports.Https = u.Ingress.Ports.Https
+	if u.Ingress.Ports.Https != nil {
+		c.Ingress.Ports.Https = new(int)
+		*c.Ingress.Ports.Https = *u.Ingress.Ports.Https
 	}
 }
 
@@ -325,11 +327,11 @@ func (c *Config) validate() error {
 		return fmt.Errorf("unsupported namespaceOwnership value %v", c.Ingress.AdmissionPolicy.NamespaceOwnership)
 	}
 
-	if c.Ingress.Ports.Http < 1 || c.Ingress.Ports.Http > math.MaxUint16 {
-		return fmt.Errorf("unsupported value %v for ingress.ports.http", c.Ingress.Ports.Http)
+	if c.Ingress.Ports.Http != nil && (*c.Ingress.Ports.Http < 1 || *c.Ingress.Ports.Http > math.MaxUint16) {
+		return fmt.Errorf("unsupported value %v for ingress.ports.http", *c.Ingress.Ports.Http)
 	}
-	if c.Ingress.Ports.Https < 1 || c.Ingress.Ports.Https > math.MaxUint16 {
-		return fmt.Errorf("unsupported value %v for ingress.ports.https", c.Ingress.Ports.Https)
+	if c.Ingress.Ports.Https != nil && (*c.Ingress.Ports.Https < 1 || *c.Ingress.Ports.Https > math.MaxUint16) {
+		return fmt.Errorf("unsupported value %v for ingress.ports.https", *c.Ingress.Ports.Https)
 	}
 
 	return nil
