@@ -9,7 +9,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ghodss/yaml"
 	"github.com/google/go-cmp/cmp"
 	configv1 "github.com/openshift/api/config/v1"
 	operatorv1 "github.com/openshift/api/operator/v1"
@@ -21,6 +20,7 @@ import (
 	utilerrors "k8s.io/apimachinery/pkg/util/errors"
 	"k8s.io/client-go/util/retry"
 	"k8s.io/klog/v2"
+	"sigs.k8s.io/yaml"
 )
 
 // SetOperandVersion sets the new version and returns the previous value.
@@ -197,7 +197,7 @@ func UpdateStatus(ctx context.Context, client OperatorClient, updateFuncs ...Upd
 			updatedOperatorStatus = newStatus
 			return nil
 		}
-		if klog.V(2).Enabled() {
+		if klog.V(4).Enabled() {
 			klog.Infof("Operator status changed: %v", operatorStatusJSONPatchNoError(oldStatus, newStatus))
 		}
 
@@ -273,7 +273,7 @@ func UpdateStaticPodStatus(ctx context.Context, client StaticPodOperatorClient, 
 			updatedOperatorStatus = newStatus
 			return nil
 		}
-		if klog.V(2).Enabled() {
+		if klog.V(4).Enabled() {
 			klog.Infof("Operator status changed: %v", staticPodOperatorStatusJSONPatchNoError(oldStatus, newStatus))
 		}
 
