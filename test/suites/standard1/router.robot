@@ -14,36 +14,38 @@ Test Tags           restart    slow
 
 
 *** Variables ***
-${NS_OWNERSHIP_1}       ${EMPTY}
-${NS_OWNERSHIP_2}       ${EMPTY}
-${ALTERNATIVE_HTTP_PORT}    8000
-${HOSTNAME}             hello-microshift.cluster.local
-${ROUTER_MANAGED}       SEPARATOR=\n
-...                     ---
-...                     ingress:
-...                     \ \ status: Managed
-${ROUTER_REMOVED}       SEPARATOR=\n
-...                     ---
-...                     ingress:
-...                     \ \ status: Removed
-${OWNERSHIP_ALLOW}      SEPARATOR=\n
-...                     ---
-...                     ingress:
-...                     \ \ status: Managed
-...                     \ \ routeAdmissionPolicy:
-...                     \ \ \ \ namespaceOwnership: InterNamespaceAllowed
-${OWNERSHIP_STRICT}     SEPARATOR=\n
-...                     ---
-...                     ingress:
-...                     \ \ status: Managed
-...                     \ \ routeAdmissionPolicy:
-...                     \ \ \ \ namespaceOwnership: Strict
-${ROUTER_CUSTOM_PORT}       SEPARATOR=\n
-...                         ---
-...                         ingress:
-...                         \ \ status: Enabled
-...                         \ \ ports:
-...                         \ \ \ \ http: ${ALTERNATIVE_HTTP_PORT}
+${NS_OWNERSHIP_1}               ${EMPTY}
+${NS_OWNERSHIP_2}               ${EMPTY}
+${ALTERNATIVE_HTTP_PORT}        8000
+${ALTERNATIVE_HTTPS_PORT}       8001
+${HOSTNAME}                     hello-microshift.cluster.local
+${ROUTER_MANAGED}               SEPARATOR=\n
+...                             ---
+...                             ingress:
+...                             \ \ status: Managed
+${ROUTER_REMOVED}               SEPARATOR=\n
+...                             ---
+...                             ingress:
+...                             \ \ status: Removed
+${OWNERSHIP_ALLOW}              SEPARATOR=\n
+...                             ---
+...                             ingress:
+...                             \ \ status: Managed
+...                             \ \ routeAdmissionPolicy:
+...                             \ \ \ \ namespaceOwnership: InterNamespaceAllowed
+${OWNERSHIP_STRICT}             SEPARATOR=\n
+...                             ---
+...                             ingress:
+...                             \ \ status: Managed
+...                             \ \ routeAdmissionPolicy:
+...                             \ \ \ \ namespaceOwnership: Strict
+${ROUTER_CUSTOM_PORTS}          SEPARATOR=\n
+...                             ---
+...                             ingress:
+...                             \ \ status: Enabled
+...                             \ \ ports:
+...                             \ \ \ \ http: ${ALTERNATIVE_HTTP_PORT}
+...                             \ \ \ \ https: ${ALTERNATIVE_HTTPS_PORT}
 
 
 *** Test Cases ***
@@ -123,21 +125,21 @@ Router Disabled
     ...    Restore Default MicroShift Config
     ...    Restart MicroShift
 
-Router Listen Custom Port
-    [Documentation]    Change default listening ports in the router and check they work.
+Router Listen Custom Ports
+    [Documentation]    Change default listening ports in the router and check the router is listening. This test
+    ...    only checks connectivity, it does not go into router internals such as where traffic lands inside the
+    ...    cluster.
     [Setup]    Run Keywords
     ...    Save Default MicroShift Config
-    ...    Configure Listening Ports
-    ...    Create Hello MicroShift Pod
-    ...    Expose Hello MicroShift Service Via Route
-    ...    Restart Router
 
-    Access Hello Microshift Success    ${ALTERNATIVE_HTTP_PORT}
+    Check Port Closed    ${ALTERNATIVE_HTTP_PORT}
+    Check Port Closed    ${ALTERNATIVE_HTTPS_PORT}
+    Configure Listening Ports
+    Restart Router
+    Check Http Port Open    ${ALTERNATIVE_HTTP_PORT}
+    Check Https Port Open    ${ALTERNATIVE_HTTPS_PORT}
 
     [Teardown]    Run Keywords
-    ...    Delete Hello MicroShift Route
-    ...    Delete Hello MicroShift Pod And Service
-    ...    Wait For Service Deletion With Timeout
     ...    Restore Default MicroShift Config
     ...    Restart MicroShift
 
@@ -191,7 +193,7 @@ Enable Router
 
 Configure Listening Ports
     [Documentation]    Enable router and change the default listening ports
-    Setup With Custom Config    ${ROUTER_CUSTOM_PORT}
+    Setup With Custom Config    ${ROUTER_CUSTOM_PORTS}
 
 Setup With Custom Config
     [Documentation]    Install a custom config and restart MicroShift
@@ -251,3 +253,21 @@ Network APIs With Test Label Are Gone
     ${match_string}=    Remove String    ${match_string}    "
     ${response}=    Run With Kubeconfig    oc get svc,ep -l app\=hello-microshift -n ${NAMESPACE}
     Should Be Equal As Strings    ${match_string}    ${response}    strip_spaces=True
+
+Check Http Port Open
+    [Documentation]    Try to curl the router, disregard the response because we only care about connectivity.
+    [Arguments]    ${port}
+    ${result}=    Access Hello MicroShift    ${port}
+    Should Match Regexp    ${result}    HTTP.*503
+
+Check Https Port Open
+    [Documentation]    Try to curl the router, disregard the response because we only care about connectivity.
+    [Arguments]    ${port}
+    ${result}=    Access Hello MicroShift    ${port}    protocol=https
+    Should Match Regexp    ${result}    HTTP.*503
+
+Check Port Closed
+    [Documentation]    Try to curl the router and expect a failure when connecting.
+    [Arguments]    ${port}
+    Run Keyword And Expect Error    *
+    ...    Access Hello MicroShift    ${port}

@@ -37,15 +37,20 @@ Expose Hello MicroShift Pod Via NodePort
 
 Access Hello Microshift
     [Documentation]    Try to retrieve data from the "hello microshift" service end point
-    [Arguments]    ${ushift_port}    ${ushift_ip}=${USHIFT_HOST}    ${path}=${EMPTY}    ${ns}=${NAMESPACE}
+    [Arguments]
+    ...    ${ushift_port}
+    ...    ${ushift_ip}=${USHIFT_HOST}
+    ...    ${path}=${EMPTY}
+    ...    ${ns}=${NAMESPACE}
+    ...    ${protocol}=http
 
     Run With Kubeconfig    oc get all -n ${ns}
 
     ${connect_to}=    Set Variable    "hello-microshift.cluster.local::${ushift_ip}:"
-    ${url_path}=    Set Variable    "http://hello-microshift.cluster.local:${ushift_port}${path}"
+    ${url_path}=    Set Variable    "${protocol}://hello-microshift.cluster.local:${ushift_port}${path}"
 
     ${result}=    Run Process
-    ...    curl -i ${url_path} --connect-to ${connect_to}
+    ...    curl -k -i ${url_path} --connect-to ${connect_to}
     ...    shell=True
     ...    timeout=15s
     Log Many    ${result.rc}    ${result.stdout}    ${result.stderr}
