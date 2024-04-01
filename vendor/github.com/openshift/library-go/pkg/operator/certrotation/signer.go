@@ -44,11 +44,9 @@ type RotatedSigningCASecret struct {
 	// is used, early deletion will be catastrophic.
 	Owner *metav1.OwnerReference
 
-	// JiraComponent annotates tls artifacts so that owner could be easily found
-	JiraComponent string
+	// AdditionalAnnotations is a collection of annotations set for the secret
+	AdditionalAnnotations AdditionalAnnotations
 
-	// Description is a human-readable one sentence description of certificate purpose
-	Description string
 	// Plumbing:
 	Informer      corev1informers.SecretInformer
 	Lister        corev1listers.SecretLister
@@ -67,8 +65,7 @@ func (c RotatedSigningCASecret) EnsureSigningCertKeyPair(ctx context.Context) (*
 		signingCertKeyPairSecret = &corev1.Secret{ObjectMeta: NewTLSArtifactObjectMeta(
 			c.Name,
 			c.Namespace,
-			c.JiraComponent,
-			c.Description,
+			c.AdditionalAnnotations,
 		)}
 	}
 	signingCertKeyPairSecret.Type = corev1.SecretTypeTLS
@@ -77,9 +74,7 @@ func (c RotatedSigningCASecret) EnsureSigningCertKeyPair(ctx context.Context) (*
 	if c.Owner != nil {
 		needsMetadataUpdate = ensureOwnerReference(&signingCertKeyPairSecret.ObjectMeta, c.Owner)
 	}
-	if len(c.JiraComponent) > 0 || len(c.Description) > 0 {
-		needsMetadataUpdate = EnsureTLSMetadataUpdate(&signingCertKeyPairSecret.ObjectMeta, c.JiraComponent, c.Description) || needsMetadataUpdate
-	}
+	needsMetadataUpdate = c.AdditionalAnnotations.EnsureTLSMetadataUpdate(&signingCertKeyPairSecret.ObjectMeta) || needsMetadataUpdate
 	if needsMetadataUpdate && len(signingCertKeyPairSecret.ResourceVersion) > 0 {
 		_, _, err := resourceapply.ApplySecret(ctx, c.Client, c.EventRecorder, signingCertKeyPairSecret)
 		if err != nil {

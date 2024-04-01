@@ -64,10 +64,8 @@ type ClientCertOption struct {
 	SecretName string
 	// AdditonalSecretData contains data that will be added into client certificate secret besides tls.key/tls.crt
 	AdditonalSecretData map[string][]byte
-	// JiraComponent annotates tls artifacts so that owner could be easily found
-	JiraComponent string
-	// Description is a human-readable one sentence description of certificate purpose
-	Description string
+	// AdditionalAnnotations is a collection of annotations set for the secret
+	AdditionalAnnotations certrotation.AdditionalAnnotations
 }
 
 // clientCertificateController implements the common logic of hub client certification creation/rotation. It
@@ -154,18 +152,14 @@ func (c *clientCertificateController) sync(ctx context.Context, syncCtx factory.
 			ObjectMeta: certrotation.NewTLSArtifactObjectMeta(
 				c.SecretName,
 				c.SecretNamespace,
-				c.JiraComponent,
-				c.Description,
+				c.AdditionalAnnotations,
 			),
 		}
 	case err != nil:
 		return fmt.Errorf("unable to get secret %q: %w", c.SecretNamespace+"/"+c.SecretName, err)
 	}
 
-	needsMetadataUpdate := false
-	if len(c.JiraComponent) > 0 || len(c.Description) > 0 {
-		needsMetadataUpdate = certrotation.EnsureTLSMetadataUpdate(&secret.ObjectMeta, c.JiraComponent, c.Description)
-	}
+	needsMetadataUpdate := c.AdditionalAnnotations.EnsureTLSMetadataUpdate(&secret.ObjectMeta)
 
 	// reconcile pending csr if exists
 	if len(c.csrName) > 0 {

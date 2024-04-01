@@ -451,4 +451,14 @@ var (
 		ResponsiblePerson:   "akashem",
 		OwningProduct:       kubernetes,
 	}
+
+	FeatureGateVolumeGroupSnapshot = FeatureGateName("VolumeGroupSnapshot")
+	volumeGroupSnapshot            = FeatureGateDescription{
+		FeatureGateAttributes: FeatureGateAttributes{
+			Name: FeatureGateVolumeGroupSnapshot,
+		},
+		OwningJiraComponent: "Storage / Kubernetes External Components",
+		ResponsiblePerson:   "fbertina",
+		OwningProduct:       kubernetes,
+	}
 )
