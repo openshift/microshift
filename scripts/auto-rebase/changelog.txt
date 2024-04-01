@@ -1,3 +1,0 @@
-- cluster-network-operator embedded-component 5c074c930fc58368fd68d576505261ed158d4059 to bdcd97c60b9593e40c71a290f05d181612581e94
-  - b282389 2024-03-25T14:06:38+01:00 Remove egressip write permissions from ovn-kubernetes-node
-
