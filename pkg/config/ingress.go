@@ -13,11 +13,14 @@ type IngressStatusEnum string
 type IngressConfig struct {
 	// Default router status, can be Managed or Removed.
 	// +kubebuilder:default=Managed
-	Status             IngressStatusEnum    `json:"status"`
-	AdmissionPolicy    RouteAdmissionPolicy `json:"routeAdmissionPolicy"`
-	Ports              IngressPortsConfig   `json:"ports"`
-	ServingCertificate []byte               `json:"-"`
-	ServingKey         []byte               `json:"-"`
+	Status          IngressStatusEnum    `json:"status"`
+	AdmissionPolicy RouteAdmissionPolicy `json:"routeAdmissionPolicy"`
+	Ports           IngressPortsConfig   `json:"ports"`
+	// List of NIC names and IP addresses where the router will be listening.
+	// Defaults to the IPs in the host.
+	Expose             []string `json:"expose"`
+	ServingCertificate []byte   `json:"-"`
+	ServingKey         []byte   `json:"-"`
 }
 
 type RouteAdmissionPolicy struct {

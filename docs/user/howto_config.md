@@ -23,6 +23,8 @@ dns:
 etcd:
     memoryLimitMB: 0
 ingress:
+    expose:
+        - ""
     ports:
         http: 0
         https: 0
@@ -71,6 +73,8 @@ dns:
 etcd:
     memoryLimitMB: 0
 ingress:
+    expose:
+        - ""
     ports:
         http: 80
         https: 443

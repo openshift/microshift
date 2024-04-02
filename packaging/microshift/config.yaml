@@ -24,6 +24,9 @@ etcd:
     # Set a memory limit on the etcd process; etcd will begin paging memory when it gets to this value. 0 means no limit.
     memoryLimitMB: 0
 ingress:
+    # List of NIC names and IP addresses where the router will be listening. Defaults to the IPs in the host.
+    expose:
+        - ""
     ports:
         # Default router http port. Must be in range 1-65535.
         http: 80

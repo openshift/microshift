@@ -101,11 +101,19 @@
     "ingress": {
       "type": "object",
       "required": [
+        "expose",
         "ports",
         "routeAdmissionPolicy",
         "status"
       ],
       "properties": {
+        "expose": {
+          "description": "List of NIC names and IP addresses where the router will be listening. Defaults to the IPs in the host.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
         "ports": {
           "type": "object",
           "required": [
