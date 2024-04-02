@@ -129,7 +129,7 @@ func startIngressController(ctx context.Context, cfg *config.Config, kubeconfigP
 		servingKeypairSecret = "components/openshift-router/serving-certificate.yaml"
 	)
 
-	if cfg.Ingress.Status == config.StatusDisabled {
+	if cfg.Ingress.Status == config.StatusRemoved {
 		if err := assets.DeleteClusterRoleBindings(ctx, clusterRoleBinding, kubeconfigPath); err != nil {
 			klog.Warningf("Failed to delete cluster role bindings %v: %v", clusterRoleBinding, err)
 			return err

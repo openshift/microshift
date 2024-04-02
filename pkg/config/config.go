@@ -117,7 +117,7 @@ func (c *Config) fillDefaults() error {
 		},
 	}
 	c.Ingress = IngressConfig{
-		Status: StatusEnabled,
+		Status: StatusManaged,
 		AdmissionPolicy: RouteAdmissionPolicy{
 			NamespaceOwnership: NamespaceOwnershipAllowed,
 		},
@@ -301,7 +301,7 @@ func (c *Config) validate() error {
 	}
 
 	switch c.Ingress.Status {
-	case StatusEnabled, StatusDisabled:
+	case StatusManaged, StatusRemoved:
 	default:
 		return fmt.Errorf("unsupported ingress.status value %v", c.Ingress.Status)
 	}

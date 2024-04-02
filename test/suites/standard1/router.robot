@@ -17,24 +17,24 @@ Test Tags           restart    slow
 ${NS_OWNERSHIP_1}       ${EMPTY}
 ${NS_OWNERSHIP_2}       ${EMPTY}
 ${HOSTNAME}             hello-microshift.cluster.local
-${ROUTER_ENABLED}       SEPARATOR=\n
+${ROUTER_MANAGED}       SEPARATOR=\n
 ...                     ---
 ...                     ingress:
-...                     \ \ status: Enabled
-${ROUTER_DISABLED}      SEPARATOR=\n
+...                     \ \ status: Managed
+${ROUTER_REMOVED}       SEPARATOR=\n
 ...                     ---
 ...                     ingress:
-...                     \ \ status: Disabled
+...                     \ \ status: Removed
 ${OWNERSHIP_ALLOW}      SEPARATOR=\n
 ...                     ---
 ...                     ingress:
-...                     \ \ status: Enabled
+...                     \ \ status: Managed
 ...                     \ \ routeAdmissionPolicy:
 ...                     \ \ \ \ namespaceOwnership: InterNamespaceAllowed
 ${OWNERSHIP_STRICT}     SEPARATOR=\n
 ...                     ---
 ...                     ingress:
-...                     \ \ status: Enabled
+...                     \ \ status: Managed
 ...                     \ \ routeAdmissionPolicy:
 ...                     \ \ \ \ namespaceOwnership: Strict
 
@@ -159,11 +159,11 @@ Network APIs With Test Label Are Gone
 
 Disable Router
     [Documentation]    Disable router
-    Setup With Custom Config    ${ROUTER_DISABLED}
+    Setup With Custom Config    ${ROUTER_REMOVED}
 
 Enable Router
     [Documentation]    Disable router
-    Setup With Custom Config    ${ROUTER_ENABLED}
+    Setup With Custom Config    ${ROUTER_MANAGED}
 
 Setup With Custom Config
     [Documentation]    Install a custom config and restart MicroShift

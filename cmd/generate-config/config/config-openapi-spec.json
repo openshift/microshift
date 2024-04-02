@@ -91,9 +91,9 @@
           }
         },
         "status": {
-          "description": "Default router status, can be Enabled or Disabled.",
+          "description": "Default router status, can be Managed or Removed.",
           "type": "string",
-          "default": "Enabled"
+          "default": "Managed"
         }
       }
     },

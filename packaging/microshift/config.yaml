@@ -25,8 +25,8 @@ ingress:
         #  - InterNamespaceAllowed: Allow routes to claim different paths of the same host name across namespaces. 
         #  If empty, the default is InterNamespaceAllowed.
         namespaceOwnership: InterNamespaceAllowed
-    # Default router status, can be Enabled or Disabled.
-    status: Enabled
+    # Default router status, can be Managed or Removed.
+    status: Managed
 manifests:
     # The locations on the filesystem to scan for kustomization files to use to load manifests. Set to a list of paths to scan only those paths. Set to an empty list to disable loading manifests. The entries in the list can be glob patterns to match multiple subdirectories.
     kustomizePaths:

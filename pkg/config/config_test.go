@@ -245,26 +245,26 @@ func TestGetActiveConfigFromYAML(t *testing.T) {
 			}(),
 		},
 		{
-			name: "router-enable",
+			name: "router-managed",
 			config: dedent(`
             ingress:
-              status: Enabled
+              status: Managed
             `),
 			expected: func() *Config {
 				c := mkDefaultConfig()
-				c.Ingress.Status = StatusEnabled
+				c.Ingress.Status = StatusManaged
 				return c
 			}(),
 		},
 		{
-			name: "router-disable",
+			name: "router-removed",
 			config: dedent(`
             ingress:
-              status: Disabled
+              status: Removed
             `),
 			expected: func() *Config {
 				c := mkDefaultConfig()
-				c.Ingress.Status = StatusDisabled
+				c.Ingress.Status = StatusRemoved
 				return c
 			}(),
 		},
@@ -370,6 +370,15 @@ func TestValidate(t *testing.T) {
 				c := mkDefaultConfig()
 				c.ApiServer.AdvertiseAddress = "8.8.8.8"
 				c.ApiServer.SkipInterface = true
+				return c
+			}(),
+			expectErr: true,
+		},
+		{
+			name: "router-status-invalid",
+			config: func() *Config {
+				c := mkDefaultConfig()
+				c.Ingress.Status = "invalid"
 				return c
 			}(),
 			expectErr: true,
