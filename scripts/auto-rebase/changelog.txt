@@ -1,4 +1,0 @@
-- machine-config-operator embedded-component 8437f354d88926efbf447472c640f27cc3764741 to 36049f9a1cc1b2f9b8c5edee9165fb4307313ec0
-  - 02ec6bb0 2024-03-25T19:32:21+00:00 Makefile: hardcode version of setup-envtest
-  - 389e8390 2024-03-13T15:06:29+00:00 Prevent OVS-configuration to run before kdump
-
