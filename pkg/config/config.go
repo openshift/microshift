@@ -19,11 +19,19 @@ import (
 
 	"github.com/apparentlymart/go-cidr/cidr"
 	"github.com/openshift/microshift/pkg/util"
+	"github.com/vishvananda/netlink"
 )
 
 const (
 	// default DNS resolve file when systemd-resolved is used
 	DefaultSystemdResolvedFile = "/run/systemd/resolve/resolv.conf"
+)
+
+var (
+	forbiddenCIDRs = []string{
+		"127.0.0.0/8",
+		"169.254.0.0/16",
+	}
 )
 
 type Config struct {
@@ -118,6 +126,7 @@ func (c *Config) fillDefaults() error {
 			defaultManifestDirEtcGlob,
 		},
 	}
+
 	c.Ingress = IngressConfig{
 		Status: StatusManaged,
 		AdmissionPolicy: RouteAdmissionPolicy{
@@ -213,6 +222,10 @@ func (c *Config) incorporateUserSettings(u *Config) {
 		c.Ingress.Ports.Https = ptr.To[int](*u.Ingress.Ports.Https)
 	}
 
+	if len(u.Ingress.Expose) != 0 {
+		c.Ingress.Expose = u.Ingress.Expose
+	}
+
 	if len(u.ApiServer.NamedCertificates) != 0 {
 		c.ApiServer.NamedCertificates = u.ApiServer.NamedCertificates
 	}
@@ -251,6 +264,21 @@ func (c *Config) updateComputedValues() error {
 		// First and last are the same because of the /32 netmask.
 		firstValidIP, _ := cidr.AddressRange(nextSubnet)
 		c.ApiServer.AdvertiseAddress = firstValidIP.String()
+	}
+
+	if len(c.Ingress.Expose) == 0 {
+		// If the expose is not configured we need to include all of the host addresses
+		// to preserve previous behavior. However, if the apiserver advertise address has
+		// not been configured, it will do so in a later stage and we also need to
+		// include it here.
+		addresses, err := GetConfiguredAddresses()
+		if err != nil {
+			return fmt.Errorf("unable to compute configured addresses: %v", err)
+		}
+		if !c.ApiServer.SkipInterface {
+			addresses = append(addresses, c.ApiServer.AdvertiseAddress)
+		}
+		c.Ingress.Expose = addresses
 	}
 
 	c.computeLoggingSetting()
@@ -391,4 +419,65 @@ func checkAdvertiseAddressConfigured(advertiseAddress string) error {
 		}
 	}
 	return fmt.Errorf("Advertise address: %s not present in any interface", advertiseAddress)
+}
+
+func getBannedIPs() ([]*net.IPNet, error) {
+	banned := make([]*net.IPNet, 0)
+	for _, entry := range forbiddenCIDRs {
+		_, netIP, err := net.ParseCIDR(entry)
+		if err != nil {
+			return nil, err
+		}
+		banned = append(banned, netIP)
+	}
+	return banned, nil
+}
+func getHostAddresses() ([]net.IP, error) {
+	handle, err := netlink.NewHandle()
+	if err != nil {
+		return nil, err
+	}
+	links, err := handle.LinkList()
+	if err != nil {
+		return nil, err
+	}
+	addresses := make([]net.IP, 0)
+	for _, link := range links {
+		if link.Attrs().ParentIndex != 0 || link.Attrs().MasterIndex != 0 {
+			continue
+		}
+		addressList, err := handle.AddrList(link, netlink.FAMILY_V4)
+		if err != nil {
+			return nil, err
+		}
+		for _, addr := range addressList {
+			addresses = append(addresses, addr.IP)
+		}
+	}
+	return addresses, nil
+}
+
+func GetConfiguredAddresses() ([]string, error) {
+	bannedAddresses, err := getBannedIPs()
+	if err != nil {
+		return nil, err
+	}
+	hostAddresses, err := getHostAddresses()
+	if err != nil {
+		return nil, err
+	}
+	addressList := make([]string, 0)
+	for _, addr := range hostAddresses {
+		skip := false
+		for _, banned := range bannedAddresses {
+			if banned.Contains(addr) {
+				skip = true
+			}
+		}
+		if skip {
+			continue
+		}
+		addressList = append(addressList, addr.String())
+	}
+	return addressList, nil
 }
