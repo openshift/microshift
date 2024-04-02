@@ -398,6 +398,42 @@ func TestValidate(t *testing.T) {
 			}(),
 			expectErr: true,
 		},
+		{
+			name: "ingress-ports-http-invalid-value-1",
+			config: func() *Config {
+				c := mkDefaultConfig()
+				c.Ingress.Ports.Http = ptr.To[int](0)
+				return c
+			}(),
+			expectErr: true,
+		},
+		{
+			name: "ingress-ports-http-invalid-value-2",
+			config: func() *Config {
+				c := mkDefaultConfig()
+				c.Ingress.Ports.Http = ptr.To[int](65536)
+				return c
+			}(),
+			expectErr: true,
+		},
+		{
+			name: "ingress-ports-https-invalid-value-1",
+			config: func() *Config {
+				c := mkDefaultConfig()
+				c.Ingress.Ports.Https = ptr.To[int](0)
+				return c
+			}(),
+			expectErr: true,
+		},
+		{
+			name: "ingress-ports-https-invalid-value-2",
+			config: func() *Config {
+				c := mkDefaultConfig()
+				c.Ingress.Ports.Https = ptr.To[int](65536)
+				return c
+			}(),
+			expectErr: true,
+		},
 	}
 	for _, tt := range ttests {
 		t.Run(tt.name, func(t *testing.T) {
