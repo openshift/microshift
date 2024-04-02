@@ -15,6 +15,7 @@ import (
 
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/klog/v2"
+	"k8s.io/utils/ptr"
 
 	"github.com/apparentlymart/go-cidr/cidr"
 	"github.com/openshift/microshift/pkg/util"
@@ -123,8 +124,8 @@ func (c *Config) fillDefaults() error {
 			NamespaceOwnership: NamespaceOwnershipAllowed,
 		},
 		Ports: IngressPortsConfig{
-			Http:  &(&struct{ x int }{80}).x,
-			Https: &(&struct{ x int }{443}).x,
+			Http:  ptr.To[int](80),
+			Https: ptr.To[int](443),
 		},
 	}
 
@@ -205,13 +206,11 @@ func (c *Config) incorporateUserSettings(u *Config) {
 	}
 
 	if u.Ingress.Ports.Http != nil {
-		c.Ingress.Ports.Http = new(int)
-		*c.Ingress.Ports.Http = *u.Ingress.Ports.Http
+		c.Ingress.Ports.Http = ptr.To[int](*u.Ingress.Ports.Http)
 	}
 
 	if u.Ingress.Ports.Https != nil {
-		c.Ingress.Ports.Https = new(int)
-		*c.Ingress.Ports.Https = *u.Ingress.Ports.Https
+		c.Ingress.Ports.Https = ptr.To[int](*u.Ingress.Ports.Https)
 	}
 }
 
