@@ -132,12 +132,12 @@ Router Listen Custom Ports
     [Setup]    Run Keywords
     ...    Save Default MicroShift Config
 
-    Check Port Closed    ${ALTERNATIVE_HTTP_PORT}
-    Check Port Closed    ${ALTERNATIVE_HTTPS_PORT}
+    Port Should Be Closed    ${ALTERNATIVE_HTTP_PORT}
+    Port Should Be Closed    ${ALTERNATIVE_HTTPS_PORT}
     Configure Listening Ports
     Restart Router
-    Check Http Port Open    ${ALTERNATIVE_HTTP_PORT}
-    Check Https Port Open    ${ALTERNATIVE_HTTPS_PORT}
+    Http Port Should Be Open    ${ALTERNATIVE_HTTP_PORT}
+    Https Port Should Be Open    ${ALTERNATIVE_HTTPS_PORT}
 
     [Teardown]    Run Keywords
     ...    Restore Default MicroShift Config
@@ -254,19 +254,19 @@ Network APIs With Test Label Are Gone
     ${response}=    Run With Kubeconfig    oc get svc,ep -l app\=hello-microshift -n ${NAMESPACE}
     Should Be Equal As Strings    ${match_string}    ${response}    strip_spaces=True
 
-Check Http Port Open
+Http Port Should Be Open
     [Documentation]    Try to curl the router, disregard the response because we only care about connectivity.
     [Arguments]    ${port}
     ${result}=    Access Hello MicroShift    ${port}
     Should Match Regexp    ${result}    HTTP.*503
 
-Check Https Port Open
+Https Port Should Be Open
     [Documentation]    Try to curl the router, disregard the response because we only care about connectivity.
     [Arguments]    ${port}
     ${result}=    Access Hello MicroShift    ${port}    protocol=https
     Should Match Regexp    ${result}    HTTP.*503
 
-Check Port Closed
+Port Should Be Closed
     [Documentation]    Try to curl the router and expect a failure when connecting.
     [Arguments]    ${port}
     Run Keyword And Expect Error    *
