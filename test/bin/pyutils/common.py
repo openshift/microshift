@@ -64,7 +64,7 @@ def pushd(dir: str):
     """Change directory saving the current directory in the stack"""
     global PUSHD_DIR_STACK
     PUSHD_DIR_STACK.append(os.getcwd())
-    os.chdir(str)
+    os.chdir(dir)
 
 
 def popd():
