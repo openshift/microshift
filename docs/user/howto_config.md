@@ -23,7 +23,7 @@ dns:
 etcd:
     memoryLimitMB: 0
 ingress:
-    expose:
+    listenAddress:
         - ""
     ports:
         http: 0
@@ -73,7 +73,7 @@ dns:
 etcd:
     memoryLimitMB: 0
 ingress:
-    expose:
+    listenAddress:
         - ""
     ports:
         http: 80

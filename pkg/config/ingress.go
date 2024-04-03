@@ -16,9 +16,10 @@ type IngressConfig struct {
 	Status          IngressStatusEnum    `json:"status"`
 	AdmissionPolicy RouteAdmissionPolicy `json:"routeAdmissionPolicy"`
 	Ports           IngressPortsConfig   `json:"ports"`
-	// List of NIC names and IP addresses where the router will be listening.
-	// Defaults to the IPs in the host.
-	Expose             []string `json:"expose"`
+	// List of IP addresses and NIC names where the router will be listening. The NIC
+	// names get translated to all their configured IPs dynamically. Defaults to the
+	// configured IPs in the host at MicroShift start.
+	ListenAddress      []string `json:"listenAddress"`
 	ServingCertificate []byte   `json:"-"`
 	ServingKey         []byte   `json:"-"`
 }

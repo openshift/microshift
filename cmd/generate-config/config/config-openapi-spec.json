@@ -101,14 +101,14 @@
     "ingress": {
       "type": "object",
       "required": [
-        "expose",
+        "listenAddress",
         "ports",
         "routeAdmissionPolicy",
         "status"
       ],
       "properties": {
-        "expose": {
-          "description": "List of NIC names and IP addresses where the router will be listening. Defaults to the IPs in the host.",
+        "listenAddress": {
+          "description": "List of IP addresses and NIC names where the router will be listening. The NIC names get translated to all their configured IPs dynamically. Defaults to the configured IPs in the host at MicroShift start.",
           "type": "array",
           "items": {
             "type": "string"

@@ -222,8 +222,8 @@ func (c *Config) incorporateUserSettings(u *Config) {
 		c.Ingress.Ports.Https = ptr.To[int](*u.Ingress.Ports.Https)
 	}
 
-	if len(u.Ingress.Expose) != 0 {
-		c.Ingress.Expose = u.Ingress.Expose
+	if len(u.Ingress.ListenAddress) != 0 {
+		c.Ingress.ListenAddress = u.Ingress.ListenAddress
 	}
 
 	if len(u.ApiServer.NamedCertificates) != 0 {
@@ -266,8 +266,8 @@ func (c *Config) updateComputedValues() error {
 		c.ApiServer.AdvertiseAddress = firstValidIP.String()
 	}
 
-	if len(c.Ingress.Expose) == 0 {
-		// If the expose is not configured we need to include all of the host addresses
+	if len(c.Ingress.ListenAddress) == 0 {
+		// If the listenAddress is not configured we need to include all of the host addresses
 		// to preserve previous behavior. However, if the apiserver advertise address has
 		// not been configured, it will do so in a later stage and we also need to
 		// include it here.
@@ -278,7 +278,7 @@ func (c *Config) updateComputedValues() error {
 		if !c.ApiServer.SkipInterface {
 			addresses = append(addresses, c.ApiServer.AdvertiseAddress)
 		}
-		c.Ingress.Expose = addresses
+		c.Ingress.ListenAddress = addresses
 	}
 
 	c.computeLoggingSetting()
@@ -365,9 +365,9 @@ func (c *Config) validate() error {
 		return fmt.Errorf("unsupported value %v for ingress.ports.https", *c.Ingress.Ports.Https)
 	}
 
-	if len(c.Ingress.Expose) != 0 {
-		if err := validateRouterExpose(c.Ingress.Expose, c.ApiServer.AdvertiseAddress, c.ApiServer.SkipInterface); err != nil {
-			return fmt.Errorf("error validating ingress.expose: %v", err)
+	if len(c.Ingress.ListenAddress) != 0 {
+		if err := validateRouterListenAddress(c.Ingress.ListenAddress, c.ApiServer.AdvertiseAddress, c.ApiServer.SkipInterface); err != nil {
+			return fmt.Errorf("error validating ingress.listenAddress: %v", err)
 		}
 	}
 
@@ -427,7 +427,7 @@ func checkAdvertiseAddressConfigured(advertiseAddress string) error {
 	return fmt.Errorf("Advertise address: %s not present in any interface", advertiseAddress)
 }
 
-func validateRouterExpose(entries []string, advertiseAddress string, skipInterface bool) error {
+func validateRouterListenAddress(entries []string, advertiseAddress string, skipInterface bool) error {
 	addresses, err := GetConfiguredAddresses()
 	if err != nil {
 		return err

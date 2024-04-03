@@ -41,7 +41,7 @@ var _ servicemanager.Service = &LoadbalancerServiceController{}
 func NewLoadbalancerServiceController(cfg *config.Config) *LoadbalancerServiceController {
 	ipAddresses := make([]string, 0)
 	nicNames := make([]string, 0)
-	for _, entry := range cfg.Ingress.Expose {
+	for _, entry := range cfg.Ingress.ListenAddress {
 		if net.ParseIP(entry) != nil {
 			ipAddresses = append(ipAddresses, entry)
 		} else {
