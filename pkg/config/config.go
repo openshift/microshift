@@ -29,7 +29,7 @@ const (
 )
 
 var (
-	forbiddenCIDRs = []string{
+	defaultRouterForbiddenCIDRs = []string{
 		"127.0.0.0/8",
 		"169.254.0.0/16",
 	}
@@ -271,7 +271,7 @@ func (c *Config) updateComputedValues() error {
 		// to preserve previous behavior. However, if the apiserver advertise address has
 		// not been configured, it will do so in a later stage and we also need to
 		// include it here.
-		addresses, err := GetConfiguredAddresses()
+		addresses, err := AllowedListeningIPAddresses()
 		if err != nil {
 			return fmt.Errorf("unable to compute configured addresses: %v", err)
 		}
@@ -428,11 +428,11 @@ func checkAdvertiseAddressConfigured(advertiseAddress string) error {
 }
 
 func validateRouterListenAddress(entries []string, advertiseAddress string, skipInterface bool) error {
-	addresses, err := GetConfiguredAddresses()
+	addresses, err := AllowedListeningIPAddresses()
 	if err != nil {
 		return err
 	}
-	names, err := GetHostNICNames()
+	names, err := AllowedNICNames()
 	if err != nil {
 		return err
 	}
@@ -455,7 +455,7 @@ func validateRouterListenAddress(entries []string, advertiseAddress string, skip
 
 func getBannedIPs() ([]*net.IPNet, error) {
 	banned := make([]*net.IPNet, 0)
-	for _, entry := range forbiddenCIDRs {
+	for _, entry := range defaultRouterForbiddenCIDRs {
 		_, netIP, err := net.ParseCIDR(entry)
 		if err != nil {
 			return nil, err
@@ -489,7 +489,7 @@ func getHostAddresses() ([]net.IP, error) {
 	return addresses, nil
 }
 
-func GetConfiguredAddresses() ([]string, error) {
+func AllowedListeningIPAddresses() ([]string, error) {
 	bannedAddresses, err := getBannedIPs()
 	if err != nil {
 		return nil, err
@@ -514,7 +514,7 @@ func GetConfiguredAddresses() ([]string, error) {
 	return addressList, nil
 }
 
-func GetHostNICNames() ([]string, error) {
+func AllowedNICNames() ([]string, error) {
 	handle, err := netlink.NewHandle()
 	if err != nil {
 		return nil, err

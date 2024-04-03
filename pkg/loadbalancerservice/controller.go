@@ -240,12 +240,12 @@ func (c *LoadbalancerServiceController) patchStatus(svc *corev1.Service, newStat
 }
 
 func (c *LoadbalancerServiceController) getRouterIPAddressList() ([]string, error) {
-	configuredAddresses, err := config.GetConfiguredAddresses()
+	allowedAddresses, err := config.AllowedListeningIPAddresses()
 	if err != nil {
 		return nil, err
 	}
 
-	configuredNicNames, err := config.GetHostNICNames()
+	allowedNicNames, err := config.AllowedNICNames()
 	if err != nil {
 		return nil, err
 	}
@@ -253,29 +253,35 @@ func (c *LoadbalancerServiceController) getRouterIPAddressList() ([]string, erro
 	ipList := make([]string, 0)
 
 	for _, ip := range c.IPAddresses {
-		if !slices.Contains(configuredAddresses, ip) {
-			klog.Infof("IP address %v not found in the host. Removing it", ip)
+		if !slices.Contains(allowedAddresses, ip) {
+			klog.Warningf("IP address %v not found in the host. Skipping", ip)
 			continue
 		}
 		ipList = append(ipList, ip)
 	}
 
-	for _, name := range c.NICNames {
-		if !slices.Contains(configuredNicNames, name) {
-			klog.Infof("NIC %v not found in the host. Removing its IP addresses", name)
+	for _, nicName := range c.NICNames {
+		if !slices.Contains(allowedNicNames, nicName) {
+			klog.Warningf("NIC %v not found in the host. Skipping", nicName)
 			continue
 		}
-		nicAddresses, err := getIPsFromNIC(name)
+		nicAddresses, err := ipAddressesFromNIC(nicName)
 		if err != nil {
 			return nil, err
 		}
-		ipList = append(ipList, nicAddresses...)
+		for _, nicAddress := range nicAddresses {
+			if !slices.Contains(allowedAddresses, nicAddress) {
+				klog.Warningf("IP address %v from NIC %v is not allowed. Skipping", nicAddress, nicName)
+				continue
+			}
+			ipList = append(ipList, nicAddress)
+		}
 	}
 
 	return ipList, nil
 }
 
-func getIPsFromNIC(name string) ([]string, error) {
+func ipAddressesFromNIC(name string) ([]string, error) {
 	link, err := netlink.LinkByName(name)
 	if err != nil {
 		return nil, err
