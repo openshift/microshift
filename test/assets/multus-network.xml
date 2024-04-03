@@ -1,0 +1,9 @@
+<network>
+  <name>${VM_MULTUS_NETWORK}</name>
+  <forward mode='nat'/>
+  <ip address='192.168.112.1' netmask='255.255.255.0' localPtr='yes'>
+    <dhcp>
+      <range start='192.168.112.100' end='192.168.112.254'/>
+    </dhcp>
+  </ip>
+</network>

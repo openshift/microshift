@@ -1,0 +1,20 @@
+apiVersion: "k8s.cni.cncf.io/v1"
+kind: NetworkAttachmentDefinition
+metadata:
+  name: ipvlan-conf
+spec:
+  config: '{
+      "cniVersion": "0.4.0",
+      "name": "test",
+      "type": "ipvlan",
+      "master": "enp2s0",
+      "mode": "l2",
+      "ipam": {
+        "type": "static",
+        "addresses": [
+          {
+            "address": "192.168.112.2/24"
+          }
+        ]
+      }
+    }'

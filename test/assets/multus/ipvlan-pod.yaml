@@ -1,0 +1,28 @@
+kind: Pod
+apiVersion: v1
+metadata:
+  name: test-ipvlan
+  annotations:
+    k8s.v1.cni.cncf.io/networks: ipvlan-conf
+  labels:
+    app: test-ipvlan
+spec:
+  terminationGracePeriodSeconds: 0
+  containers:
+  - name: hello-microshift
+    image: quay.io/microshift/busybox:1.36
+    command: ["/bin/sh"]
+    args: ["-c", "while true; do echo -ne \"HTTP/1.0 200 OK\r\nContent-Length: 16\r\n\r\nHello MicroShift\" | nc -l -p 8080 ; done"]
+    ports:
+    - containerPort: 8080
+      protocol: TCP
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+      runAsNonRoot: true
+      runAsUser: 1001
+      runAsGroup: 1001
+      seccompProfile:
+        type: RuntimeDefault
