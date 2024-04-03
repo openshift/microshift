@@ -105,8 +105,10 @@ def get_container_images(path, version):
 
 def extract_container_images(version, repo_spec, outfile, dry_run=False):
     common.print_msg(f"Extracting images from {version}")
+    # Create and change the directory for extracting RPMs
+    image_path = common.create_dir(f"{IMAGEDIR}/release-info-rpms")
+    common.pushd(str(image_path))
 
-    image_path = common.create_dir(f"{IMAGEDIR}/release-info-rpms", True)
     repo_name = common.basename(repo_spec)
     dnf_options = []
 
@@ -133,6 +135,8 @@ def extract_container_images(version, repo_spec, outfile, dry_run=False):
         # Cleanup RPM files
         rpm_list = list(map(str, image_path.glob("microshift-release-info-*.rpm")))
         common.run_command(["sudo", "rm", "-f"] + rpm_list, dry_run)
+    # Restore the current directory
+    common.popd()
 
 
 def process_containerfiles(groupdir, dry_run=False):

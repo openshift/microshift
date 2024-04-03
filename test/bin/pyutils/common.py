@@ -7,6 +7,9 @@ import subprocess
 from typing import List
 
 
+PUSHD_DIR_STACK = []
+
+
 def should_skip(file):
     # Implement your skipping logic here
     return False
@@ -50,13 +53,26 @@ def run_command_in_shell(command: str):
     return result.stdout.strip()
 
 
-def create_dir(dir: str, chdir: bool):
-    """Attempt recursive directory creation and optionally change current directory"""
+def create_dir(dir: str):
+    """Attempt recursive directory creation ignoring errors if it already exists"""
     path = pathlib.Path(dir)
     path.mkdir(parents=True, exist_ok=True)
-    if chdir:
-        os.chdir(path)
     return path
+
+
+def pushd(dir: str):
+    """Change directory saving the current directory in the stack"""
+    global PUSHD_DIR_STACK
+    PUSHD_DIR_STACK.append(os.getcwd())
+    os.chdir(str)
+
+
+def popd():
+    """Restore the current directory from the stack"""
+    if not PUSHD_DIR_STACK:
+        raise Exception("Directory stack is empty")
+    dir = PUSHD_DIR_STACK.pop()
+    os.chdir(dir)
 
 
 def delete_file(file_path: str):
