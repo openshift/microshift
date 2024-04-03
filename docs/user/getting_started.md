@@ -16,7 +16,9 @@ Run the following command to install the necessary components for the [libvirt](
 sudo dnf install -y libvirt virt-manager virt-install virt-viewer libvirt-client qemu-kvm qemu-img
 ```
 
-Download the Red Hat Enterprise Linux 9.2 DVD ISO image for the `x86_64` or `aarch64` architectures from [Red Hat Developer](https://developers.redhat.com/products/rhel/download) site and copy the file to the `/var/lib/libvirt/images` directory.
+Download the Red Hat Enterprise Linux 9.2 DVD ISO image for the `x86_64` or `aarch64` architectures from [Red Hat Developer](https://developers.redhat.com/products/rhel/download) site, scroll down to see the 9.2 option.
+
+Copy the ISO file to the `/var/lib/libvirt/images` directory.
 > Other architectures, versions or flavors of operating systems are not supported in this opinionated environment.
 > For this setup, only use the RHEL 9.2 DVD image for the `x86_64` or `aarch64` architectures.
 

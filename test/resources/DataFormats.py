@@ -14,6 +14,8 @@ def json_parse(data):
     if not data:
         return DotDict()
     parsed = json.loads(data)
+    if type(parsed) == list:
+        return DotDict({"list": parsed})["list"]
     return DotDict(parsed)
 
 

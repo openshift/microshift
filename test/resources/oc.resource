@@ -46,8 +46,8 @@ Oc Delete
 Oc Exec
     [Documentation]    Run 'oc exec' on a specific pod in the curret test namespace
     ...    Returns the command's combined STDOUT/STDER
-    [Arguments]    ${pod}    ${cmd}
-    ${output}=    Run With Kubeconfig    oc exec -n ${NAMESPACE} pod/${pod} -- /bin/bash -c '${cmd}'
+    [Arguments]    ${pod}    ${cmd}    ${ns}=${NAMESPACE}
+    ${output}=    Run With Kubeconfig    oc exec -n ${ns} pod/${pod} -- /bin/bash -c '${cmd}'
     RETURN    ${output}
 
 Named Pod Should Be Ready
@@ -57,7 +57,7 @@ Named Pod Should Be Ready
     ...    ${timeout}    Period of time to wait for pod to reach ready status.    Default 30s.
     [Arguments]    ${name}    ${ns}=${NAMESPACE}    ${timeout}=30s
 
-    Run With Kubeconfig    oc wait -n ${NAMESPACE} pod/${name} --for="condition=Ready" --timeout=${timeout}
+    Run With Kubeconfig    oc wait -n ${ns} pod/${name} --for="condition=Ready" --timeout=${timeout}
 
 Named Pod Should Be Deleted
     [Documentation]    Wait for pod with ${name} to be deleted
@@ -65,7 +65,7 @@ Named Pod Should Be Deleted
     ...    ${ns}    Namespace of named pod. Defaults to NAMESPACE suite variable
     ...    ${timeout}    Period of time to wait for pod to reach ready status.    Default 30s.
     [Arguments]    ${name}    ${ns}=${NAMESPACE}    ${timeout}=30s
-    Run With Kubeconfig    oc wait -n ${NAMESPACE} pod/${name} --for=delete --timeout=${timeout}
+    Run With Kubeconfig    oc wait -n ${ns} pod/${name} --for=delete --timeout=${timeout}
 
 Labeled Pod Should Be Ready
     [Documentation]    Wait for pod(s) ready by ${label} to become "Ready"

@@ -33,8 +33,8 @@ var (
 	apiExtensionsScheme = apiruntime.NewScheme()
 	apiExtensionsCodecs = serializer.NewCodecFactory(apiExtensionsScheme)
 	crds                = []string{
-		"crd/0000_03_securityinternal-openshift_02_rangeallocation.crd.yaml",
-		"crd/0000_03_security-openshift_01_scc.crd.yaml",
+		"crd/0000_03_config-operator_02_rangeallocations.crd.yaml",
+		"crd/0000_03_config-operator_01_securitycontextconstraints.crd.yaml",
 		"crd/route.crd.yaml",
 		"crd/storage_version_migration.crd.yaml",
 		"components/lvms/topolvm.io_logicalvolumes.yaml",
