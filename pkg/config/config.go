@@ -10,6 +10,7 @@ import (
 	"net/url"
 	"os"
 	"os/exec"
+	"slices"
 	"strings"
 	"time"
 
@@ -126,7 +127,6 @@ func (c *Config) fillDefaults() error {
 			defaultManifestDirEtcGlob,
 		},
 	}
-
 	c.Ingress = IngressConfig{
 		Status: StatusManaged,
 		AdmissionPolicy: RouteAdmissionPolicy{
@@ -365,6 +365,12 @@ func (c *Config) validate() error {
 		return fmt.Errorf("unsupported value %v for ingress.ports.https", *c.Ingress.Ports.Https)
 	}
 
+	if len(c.Ingress.Expose) != 0 {
+		if err := validateRouterExpose(c.Ingress.Expose, c.ApiServer.AdvertiseAddress, c.ApiServer.SkipInterface); err != nil {
+			return fmt.Errorf("error validating ingress.expose: %v", err)
+		}
+	}
+
 	return nil
 }
 
@@ -419,6 +425,32 @@ func checkAdvertiseAddressConfigured(advertiseAddress string) error {
 		}
 	}
 	return fmt.Errorf("Advertise address: %s not present in any interface", advertiseAddress)
+}
+
+func validateRouterExpose(entries []string, advertiseAddress string, skipInterface bool) error {
+	addresses, err := GetConfiguredAddresses()
+	if err != nil {
+		return err
+	}
+	names, err := GetHostNICNames()
+	if err != nil {
+		return err
+	}
+	for _, entry := range entries {
+		if net.ParseIP(entry) != nil {
+			if entry == advertiseAddress && !skipInterface {
+				continue
+			}
+			if !slices.Contains(addresses, entry) {
+				return fmt.Errorf("IP %v not present in the host", entry)
+			}
+		} else if slices.Contains(names, entry) {
+			continue
+		} else {
+			return fmt.Errorf("entry %v not present in the host", entry)
+		}
+	}
+	return nil
 }
 
 func getBannedIPs() ([]*net.IPNet, error) {
@@ -480,4 +512,20 @@ func GetConfiguredAddresses() ([]string, error) {
 		addressList = append(addressList, addr.String())
 	}
 	return addressList, nil
+}
+
+func GetHostNICNames() ([]string, error) {
+	handle, err := netlink.NewHandle()
+	if err != nil {
+		return nil, err
+	}
+	links, err := handle.LinkList()
+	if err != nil {
+		return nil, err
+	}
+	names := make([]string, 0, len(links))
+	for _, link := range links {
+		names = append(names, link.Attrs().Name)
+	}
+	return names, nil
 }
