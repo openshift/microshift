@@ -3,6 +3,8 @@ package loadbalancerservice
 import (
 	"context"
 	"fmt"
+	"net"
+	"slices"
 	"time"
 
 	corev1 "k8s.io/api/core/v1"
@@ -18,25 +20,39 @@ import (
 
 	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/servicemanager"
+	"github.com/vishvananda/netlink"
 )
 
 const defaultInformerResyncPeriod = 10 * time.Minute
 
 type LoadbalancerServiceController struct {
-	NodeIP     string
-	KubeConfig string
-	client     *kubernetes.Clientset
-	indexer    cache.Indexer
-	queue      workqueue.RateLimitingInterface
-	informer   cache.SharedIndexInformer
+	IPAddresses []string
+	NICNames    []string
+	NodeIP      string
+	KubeConfig  string
+	client      *kubernetes.Clientset
+	indexer     cache.Indexer
+	queue       workqueue.RateLimitingInterface
+	informer    cache.SharedIndexInformer
 }
 
 var _ servicemanager.Service = &LoadbalancerServiceController{}
 
 func NewLoadbalancerServiceController(cfg *config.Config) *LoadbalancerServiceController {
+	ipAddresses := make([]string, 0)
+	nicNames := make([]string, 0)
+	for _, entry := range cfg.Ingress.Expose {
+		if net.ParseIP(entry) != nil {
+			ipAddresses = append(ipAddresses, entry)
+		} else {
+			nicNames = append(nicNames, entry)
+		}
+	}
 	return &LoadbalancerServiceController{
-		NodeIP:     cfg.Node.NodeIP,
-		KubeConfig: cfg.KubeConfigPath(config.KubeAdmin),
+		IPAddresses: ipAddresses,
+		NICNames:    nicNames,
+		NodeIP:      cfg.Node.NodeIP,
+		KubeConfig:  cfg.KubeConfigPath(config.KubeAdmin),
 	}
 }
 
@@ -193,9 +209,22 @@ func (c *LoadbalancerServiceController) getNewStatus(svc *corev1.Service) (*core
 		}
 	}
 
-	newStatus.Ingress = append(newStatus.Ingress, corev1.LoadBalancerIngress{
-		IP: c.NodeIP,
-	})
+	//TODO use annotations instead.
+	if svc.Name == "router-default" {
+		ips, err := c.getRouterIPAddressList()
+		if err != nil {
+			return newStatus, fmt.Errorf("unable to update router IP list: %v", err)
+		}
+		for _, ip := range ips {
+			newStatus.Ingress = append(newStatus.Ingress, corev1.LoadBalancerIngress{
+				IP: ip,
+			})
+		}
+	} else {
+		newStatus.Ingress = append(newStatus.Ingress, corev1.LoadBalancerIngress{
+			IP: c.NodeIP,
+		})
+	}
 	return newStatus, nil
 }
 
@@ -208,4 +237,60 @@ func (c *LoadbalancerServiceController) patchStatus(svc *corev1.Service, newStat
 	_, err := helpers.PatchService(c.client.CoreV1(), svc, updated)
 
 	return err
+}
+
+func (c *LoadbalancerServiceController) getRouterIPAddressList() ([]string, error) {
+	configuredAddresses, err := config.GetConfiguredAddresses()
+	if err != nil {
+		return nil, err
+	}
+
+	configuredNicNames, err := config.GetHostNICNames()
+	if err != nil {
+		return nil, err
+	}
+
+	ipList := make([]string, 0)
+
+	for _, ip := range c.IPAddresses {
+		if !slices.Contains(configuredAddresses, ip) {
+			klog.Infof("IP address %v not found in the host. Removing it", ip)
+			continue
+		}
+		ipList = append(ipList, ip)
+	}
+
+	for _, name := range c.NICNames {
+		if !slices.Contains(configuredNicNames, name) {
+			klog.Infof("NIC %v not found in the host. Removing its IP addresses", name)
+			continue
+		}
+		nicAddresses, err := getIPsFromNIC(name)
+		if err != nil {
+			return nil, err
+		}
+		ipList = append(ipList, nicAddresses...)
+	}
+
+	return ipList, nil
+}
+
+func getIPsFromNIC(name string) ([]string, error) {
+	link, err := netlink.LinkByName(name)
+	if err != nil {
+		return nil, err
+	}
+
+	addrList, err := netlink.AddrList(link, netlink.FAMILY_ALL)
+	if err != nil {
+		return nil, err
+	}
+
+	ipList := make([]string, 0)
+
+	for _, addr := range addrList {
+		ipList = append(ipList, addr.IP.String())
+	}
+
+	return ipList, nil
 }
