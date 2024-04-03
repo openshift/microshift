@@ -2,17 +2,17 @@ FROM quay.io/centos-bootc/centos-bootc:stream9
 
 # Build arguments
 ARG PREVIOUS_MINOR_VERSION=15
-ARG MICROSHIFT_REPO_NAME=microshift-local
-ARG MICROSHIFT_REPO_PATH=/tmp/$MICROSHIFT_REPO_NAME
+ARG USHIFT_RPM_REPO_NAME=microshift-local
+ARG USHIFT_RPM_REPO_PATH=/tmp/$USHIFT_RPM_REPO_NAME
 
 # Copy the MicroShift repository contents
-ADD $MICROSHIFT_REPO_NAME $MICROSHIFT_REPO_PATH
+ADD $USHIFT_RPM_REPO_NAME $USHIFT_RPM_REPO_PATH
 
 # MicroShift local RPM repository
 RUN printf "\
 [microshift-local]\n\
 name=MicroShift Local Repository\n\
-baseurl=$MICROSHIFT_REPO_PATH\n\
+baseurl=$USHIFT_RPM_REPO_PATH\n\
 enabled=1\n\
 gpgcheck=0\n\
 skip_if_unavailable=0\n" > "/etc/yum.repos.d/microshift-local.repo"
@@ -41,7 +41,7 @@ RUN mkdir -p /opt/cni && mkdir -p /var/opt/cni/bin && ln -s /var/opt/cni/bin /op
 # Install MicroShift, few helper utilities and cleanup
 RUN dnf install -y vi firewalld microshift && \
     systemctl enable microshift && \
-    rm -rf $MICROSHIFT_REPO_PATH && \
+    rm -rf $USHIFT_RPM_REPO_PATH && \
     rm -f /etc/yum.repos.d/{microshift,openshift}*.repo && \
     dnf clean all
 
