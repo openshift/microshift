@@ -229,31 +229,6 @@ Restart Router
     Run With Kubeconfig    oc rollout restart deployment router-default -n openshift-ingress
     Named Deployment Should Be Available    router-default    openshift-ingress    5m
 
-Expose Hello MicroShift Service Via Route
-    [Documentation]    Expose the "hello microshift" application through the Route
-    Oc Expose    pod hello-microshift -n ${NAMESPACE}
-    Oc Expose    svc hello-microshift --hostname hello-microshift.cluster.local -n ${NAMESPACE}
-
-Delete Hello MicroShift Route
-    [Documentation]    Delete route for cleanup.
-    Oc Delete    route/hello-microshift -n ${NAMESPACE}
-
-Wait For Service Deletion With Timeout
-    [Documentation]    Polls for service and endpoint by "app=hello-microshift" label. Fails if timeout
-    ...    expires. This check is unique to this test suite because each test here reuses the same namespace. Since
-    ...    the tests reuse the service name, a small race window exists between the teardown of one test and the setup
-    ...    of the next. This produces flakey failures when the service or endpoint names collide.
-    Wait Until Keyword Succeeds    30s    1s
-    ...    Network APIs With Test Label Are Gone
-
-Network APIs With Test Label Are Gone
-    [Documentation]    Check for service and endpoint by "app=hello-microshift" label. Succeeds if response matches
-    ...    "No resources found in <namespace> namespace." Fail if not.
-    ${match_string}=    Catenate    No resources found in    ${NAMESPACE}    namespace.
-    ${match_string}=    Remove String    ${match_string}    "
-    ${response}=    Run With Kubeconfig    oc get svc,ep -l app\=hello-microshift -n ${NAMESPACE}
-    Should Be Equal As Strings    ${match_string}    ${response}    strip_spaces=True
-
 Http Port Should Be Open
     [Documentation]    Try to curl the router, disregard the response because we only care about connectivity.
     [Arguments]    ${port}
