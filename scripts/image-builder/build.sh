@@ -139,10 +139,10 @@ build_image() {
         sudo podman run -d --name="${parent_blueprint}-server" -p 8085:8080 "localhost/${parent_blueprint}:${parent_version}"
 
         title "Building ${image_type} for ${blueprint} v${version}, parent ${parent_blueprint} v${parent_version}"
-        buildid=$(sudo composer-cli compose start-ostree --ref "rhel/${OSVERSION}/${BUILD_ARCH}/edge" --url http://localhost:8085/repo/ "${blueprint}" "${image_type}" | awk '{print $2}')
+        buildid=$(sudo composer-cli compose start-ostree --ref "rhel/${OSVERSION}/${BUILD_ARCH}/edge" --url http://localhost:8085/repo/ "${blueprint}" "${image_type}" | awk '/Compose/{print $2}')
     else
         title "Building ${image_type} for ${blueprint} v${version}"
-        buildid=$(sudo composer-cli compose start-ostree --ref "rhel/${OSVERSION}/${BUILD_ARCH}/edge" "${blueprint}" "${image_type}" | awk '{print $2}')
+        buildid=$(sudo composer-cli compose start-ostree --ref "rhel/${OSVERSION}/${BUILD_ARCH}/edge" "${blueprint}" "${image_type}" | awk '/Compose/{print $2}')
     fi
 
     waitfor_image "${buildid}"
