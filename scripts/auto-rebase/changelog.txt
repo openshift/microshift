@@ -1,3 +1,0 @@
-- cluster-kube-apiserver-operator embedded-component 052be42a385155ed8bbb77151c9d7fe1f943f2e9 to d5fb16a69adc72e78da8cd326aae5f88b6cc6b8f
-  - 96f2322 2024-03-22T14:06:57+00:00 OBSDA-553: add provider name to cluster_infrastructure_provider when platform external
-
