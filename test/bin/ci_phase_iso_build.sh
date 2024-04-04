@@ -22,6 +22,12 @@ exec &> >(tee >(awk '{ print strftime("%Y-%m-%d %H:%M:%S"), $0; fflush() }' >"${
 
 PULL_SECRET=${PULL_SECRET:-${HOME}/.pull-secret.json}
 
+# Detect a bootc build mode based on the job name
+COMPOSER_CLI_BUILDS=true
+if [ -v CI_JOB_NAME ] && [[ "${CI_JOB_NAME}" =~ .*bootc.* ]]; then
+    COMPOSER_CLI_BUILDS=false
+fi
+
 # Allow for a dry-run option to save on testing time
 BUILD_DRY_RUN=${BUILD_DRY_RUN:-false}
 dry_run() {
@@ -93,6 +99,11 @@ run_image_build() {
     fi
 }
 
+# Run bootc image build
+run_bootc_image_build() {
+    $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints/layer5-bootc
+}
+
 cat /etc/os-release
 
 # Show what other dnf commands have been run to try to debug why we
@@ -121,12 +132,14 @@ $(dry_run) bash -x ./bin/create_local_repo.sh
 # Start the web server to host the ostree commit repository for parent images
 $(dry_run) bash -x ./bin/start_webserver.sh
 
-# Figure out an optimal number of osbuild workers
-CPU_CORES="$(grep -c ^processor /proc/cpuinfo)"
-MAX_WORKERS=$(find "${ROOTDIR}/test/image-blueprints" -name \*.toml | wc -l)
-CUR_WORKERS="$( [ "${CPU_CORES}" -lt  $(( MAX_WORKERS * 2 )) ] && echo $(( CPU_CORES / 2 )) || echo "${MAX_WORKERS}" )"
+if ${COMPOSER_CLI_BUILDS} ; then
+    # Figure out an optimal number of osbuild workers
+    CPU_CORES="$(grep -c ^processor /proc/cpuinfo)"
+    MAX_WORKERS=$(find "${ROOTDIR}/test/image-blueprints" -name \*.toml | wc -l)
+    CUR_WORKERS="$( [ "${CPU_CORES}" -lt  $(( MAX_WORKERS * 2 )) ] && echo $(( CPU_CORES / 2 )) || echo "${MAX_WORKERS}" )"
 
-$(dry_run) bash -x ./bin/start_osbuild_workers.sh "${CUR_WORKERS}"
+    $(dry_run) bash -x ./bin/start_osbuild_workers.sh "${CUR_WORKERS}"
+fi
 
 # Check if cache can be used for builds
 # This may fail when AWS S3 connection is not configured, or there is no cache bucket
@@ -153,7 +166,13 @@ else
     if ! ${GOT_CACHED_DATA} ; then
         echo "WARNING: Build cache is not available, rebuilding all the artifacts"
     fi
-    run_image_build
+
+    # Optionally run bootc image builds
+    if ${COMPOSER_CLI_BUILDS} ; then
+        run_image_build
+    else
+        run_bootc_image_build
+    fi
 fi
 
 echo "Build phase complete"
