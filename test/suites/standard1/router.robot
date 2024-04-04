@@ -99,7 +99,7 @@ Router Enabled
     [Setup]    Run Keywords
     ...    Save Default MicroShift Config
     ...    Enable Router
-    ...        ...    Create Hello MicroShift Pod
+    ...    Create Hello MicroShift Pod
     ...    Expose Hello MicroShift Service Via Route
     ...    Restart Router
 
@@ -142,6 +142,7 @@ Router Listen Custom Ports
     [Teardown]    Run Keywords
     ...    Restore Default MicroShift Config
     ...    Restart MicroShift
+
 
 *** Keywords ***
 Configure Namespace Ownership Allowed
@@ -222,12 +223,6 @@ Setup Hello MicroShift Pods In Multiple Namespaces
     Expose Hello MicroShift    ${NS_OWNERSHIP_2}
     Oc Expose    svc hello-microshift --hostname ${HOSTNAME} --path /${NS_OWNERSHIP_1} -n ${NS_OWNERSHIP_1}
     Oc Expose    svc hello-microshift --hostname ${HOSTNAME} --path /${NS_OWNERSHIP_2} -n ${NS_OWNERSHIP_2}
-
-Restart Router
-    [Documentation]    Restart the router and wait for readiness again. The router is sensitive to apiserver
-    ...    downtime and might need a restart (after the apiserver is ready) to resync all the routes.
-    Run With Kubeconfig    oc rollout restart deployment router-default -n openshift-ingress
-    Named Deployment Should Be Available    router-default    openshift-ingress    5m
 
 Http Port Should Be Open
     [Documentation]    Try to curl the router, disregard the response because we only care about connectivity.
