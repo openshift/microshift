@@ -117,6 +117,7 @@ func (c *Config) fillDefaults() error {
 		},
 	}
 	c.Ingress = IngressConfig{
+		Status: StatusManaged,
 		AdmissionPolicy: RouteAdmissionPolicy{
 			NamespaceOwnership: NamespaceOwnershipAllowed,
 		},
@@ -188,6 +189,10 @@ func (c *Config) incorporateUserSettings(u *Config) {
 	// disabling the manifest loader.
 	if u.Manifests.KustomizePaths != nil {
 		c.Manifests.KustomizePaths = u.Manifests.KustomizePaths
+	}
+
+	if len(u.Ingress.Status) != 0 {
+		c.Ingress.Status = u.Ingress.Status
 	}
 
 	if len(u.Ingress.AdmissionPolicy.NamespaceOwnership) != 0 {
@@ -293,6 +298,12 @@ func (c *Config) validate() error {
 		if err != nil {
 			return err
 		}
+	}
+
+	switch c.Ingress.Status {
+	case StatusManaged, StatusRemoved:
+	default:
+		return fmt.Errorf("unsupported ingress.status value %v", c.Ingress.Status)
 	}
 
 	switch c.Ingress.AdmissionPolicy.NamespaceOwnership {

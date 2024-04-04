@@ -116,7 +116,6 @@ spec:
             optional: false
           defaultMode: 420
       restartPolicy: Always
-      terminationGracePeriodSeconds: 3600
       dnsPolicy: ClusterFirst
       nodeSelector:
         kubernetes.io/os: linux

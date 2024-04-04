@@ -73,7 +73,8 @@
     "ingress": {
       "type": "object",
       "required": [
-        "routeAdmissionPolicy"
+        "routeAdmissionPolicy",
+        "status"
       ],
       "properties": {
         "routeAdmissionPolicy": {
@@ -88,6 +89,11 @@
               "default": "InterNamespaceAllowed"
             }
           }
+        },
+        "status": {
+          "description": "Default router status, can be Managed or Removed.",
+          "type": "string",
+          "default": "Managed"
         }
       }
     },

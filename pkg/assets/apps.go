@@ -42,7 +42,7 @@ type dpApplier struct {
 	dp     *appsv1.Deployment
 }
 
-func (d *dpApplier) Reader(objBytes []byte, render RenderFunc, params RenderParams) {
+func (d *dpApplier) Read(objBytes []byte, render RenderFunc, params RenderParams) {
 	var err error
 	if render != nil {
 		objBytes, err = render(objBytes, params)
@@ -57,7 +57,7 @@ func (d *dpApplier) Reader(objBytes []byte, render RenderFunc, params RenderPara
 	d.dp = obj.(*appsv1.Deployment)
 }
 
-func (d *dpApplier) Applier(ctx context.Context) error {
+func (d *dpApplier) Handle(ctx context.Context) error {
 	_, _, err := resourceapply.ApplyDeployment(ctx, d.Client, assetsEventRecorder, d.dp, 0)
 	return err
 }
@@ -67,7 +67,7 @@ type dsApplier struct {
 	ds     *appsv1.DaemonSet
 }
 
-func (d *dsApplier) Reader(objBytes []byte, render RenderFunc, params RenderParams) {
+func (d *dsApplier) Read(objBytes []byte, render RenderFunc, params RenderParams) {
 	var err error
 	if render != nil {
 		objBytes, err = render(objBytes, params)
@@ -81,12 +81,12 @@ func (d *dsApplier) Reader(objBytes []byte, render RenderFunc, params RenderPara
 	}
 	d.ds = obj.(*appsv1.DaemonSet)
 }
-func (d *dsApplier) Applier(ctx context.Context) error {
+func (d *dsApplier) Handle(ctx context.Context) error {
 	_, _, err := resourceapply.ApplyDaemonSet(ctx, d.Client, assetsEventRecorder, d.ds, 0)
 	return err
 }
 
-func applyApps(ctx context.Context, apps []string, applier readerApplier, render RenderFunc, params RenderParams) error {
+func applyApps(ctx context.Context, apps []string, handler resourceHandler, render RenderFunc, params RenderParams) error {
 	lock.Lock()
 	defer lock.Unlock()
 
@@ -96,8 +96,8 @@ func applyApps(ctx context.Context, apps []string, applier readerApplier, render
 		if err != nil {
 			return fmt.Errorf("error getting asset %s: %v", app, err)
 		}
-		applier.Reader(objBytes, render, params)
-		if err := applier.Applier(ctx); err != nil {
+		handler.Read(objBytes, render, params)
+		if err := handler.Handle(ctx); err != nil {
 			klog.Warningf("Failed to apply apps api %s: %v", app, err)
 			return err
 		}

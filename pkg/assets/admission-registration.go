@@ -22,7 +22,7 @@ type validationWebhookCfg struct {
 	codec                   serializer.CodecFactory
 }
 
-func (v *validationWebhookCfg) Reader(objBytes []byte, renderFunc RenderFunc, params RenderParams) {
+func (v *validationWebhookCfg) Read(objBytes []byte, renderFunc RenderFunc, params RenderParams) {
 	var err error
 	if renderFunc != nil {
 		objBytes, err = renderFunc(objBytes, RenderParams{})
@@ -37,7 +37,7 @@ func (v *validationWebhookCfg) Reader(objBytes []byte, renderFunc RenderFunc, pa
 	v.validationWebhookConfig = obj.(*arV1.ValidatingWebhookConfiguration)
 }
 
-func (v *validationWebhookCfg) Applier(ctx context.Context) error {
+func (v *validationWebhookCfg) Handle(ctx context.Context) error {
 	_, _, err := resourceapply.ApplyValidatingWebhookConfigurationImproved(ctx, v.Client, assetsEventRecorder, v.validationWebhookConfig, resourceapply.NewResourceCache())
 	return err
 }
@@ -50,7 +50,7 @@ func admissionRegistrationClient(kubeconfigPath string) *arClientV1.Admissionreg
 	return arClientV1.NewForConfigOrDie(rest.AddUserAgent(restConfig, "admission-registration"))
 }
 
-func applyAdmissionRegistration(ctx context.Context, admissionRegistrations []string, applier readerApplier, render RenderFunc, params RenderParams) error {
+func applyAdmissionRegistration(ctx context.Context, admissionRegistrations []string, handler resourceHandler, render RenderFunc, params RenderParams) error {
 	lock.Lock()
 	defer lock.Unlock()
 
@@ -60,8 +60,8 @@ func applyAdmissionRegistration(ctx context.Context, admissionRegistrations []st
 		if err != nil {
 			return fmt.Errorf("error getting embedded asset %s: %w", ar, err)
 		}
-		applier.Reader(objBytes, render, params)
-		if err := applier.Applier(ctx); err != nil {
+		handler.Read(objBytes, render, params)
+		if err := handler.Handle(ctx); err != nil {
 			klog.Warningf("failed to apply admissionRegistration object: %s, %v", ar, err)
 			return err
 		}
