@@ -95,6 +95,7 @@ func TestGetActiveConfigFromYAML(t *testing.T) {
 				c.Network.ServiceNetwork = []string{"40.30.20.10/16"}
 				c.Network.ServiceNodePortRange = "1024-32767"
 				c.ApiServer.AdvertiseAddress = ""           // force value to be recomputed
+				c.Ingress.ListenAddress = nil               // force value to be recomputed
 				assert.NoError(t, c.updateComputedValues()) // recomputes DNS field
 				return c
 			}(),
@@ -169,6 +170,8 @@ func TestGetActiveConfigFromYAML(t *testing.T) {
 				c := mkDefaultConfig()
 				c.ApiServer.AdvertiseAddress = "127.0.0.1"
 				c.ApiServer.SkipInterface = true
+				c.Ingress.ListenAddress = nil
+				assert.NoError(t, c.updateComputedValues()) // recomputes ingress listenAddress field
 				return c
 			}(),
 		},
@@ -314,6 +317,19 @@ func TestGetActiveConfigFromYAML(t *testing.T) {
 				return c
 			}(),
 		},
+		{
+			name: "ingress-listen-address-nic",
+			config: dedent(`
+            ingress:
+              listenAddress:
+                - lo
+            `),
+			expected: func() *Config {
+				c := mkDefaultConfig()
+				c.Ingress.ListenAddress = []string{"lo"}
+				return c
+			}(),
+		},
 	}
 
 	for _, tt := range ttests {
@@ -438,10 +454,28 @@ func TestValidate(t *testing.T) {
 			expectErr: true,
 		},
 		{
+			name: "ingress-listen-address-ip-forbidden",
+			config: func() *Config {
+				c := mkDefaultConfig()
+				c.Ingress.ListenAddress = []string{"127.0.0.1", "169.255.169.254"}
+				return c
+			}(),
+			expectErr: true,
+		},
+		{
 			name: "ingress-ports-http-invalid-value-2",
 			config: func() *Config {
 				c := mkDefaultConfig()
 				c.Ingress.Ports.Http = ptr.To[int](65536)
+				return c
+			}(),
+			expectErr: true,
+		},
+		{
+			name: "ingress-listen-address-ip-not-present",
+			config: func() *Config {
+				c := mkDefaultConfig()
+				c.Ingress.ListenAddress = []string{"1.2.3.4"}
 				return c
 			}(),
 			expectErr: true,
@@ -460,6 +494,15 @@ func TestValidate(t *testing.T) {
 			config: func() *Config {
 				c := mkDefaultConfig()
 				c.Ingress.Ports.Https = ptr.To[int](65536)
+				return c
+			}(),
+			expectErr: true,
+		},
+		{
+			name: "ingress-listen-address-nic-not-present",
+			config: func() *Config {
+				c := mkDefaultConfig()
+				c.Ingress.ListenAddress = []string{"dummyinterface"}
 				return c
 			}(),
 			expectErr: true,
