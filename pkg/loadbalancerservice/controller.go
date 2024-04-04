@@ -23,7 +23,13 @@ import (
 	"github.com/vishvananda/netlink"
 )
 
-const defaultInformerResyncPeriod = 10 * time.Minute
+const (
+	defaultInformerResyncPeriod         = 10 * time.Minute
+	defaultRouterServiceName            = "router-default"
+	defaultRouterServiceNamespace       = "openshift-ingress"
+	defaultRouterServiceAnnotationKey   = "ingresscontroller.operator.openshift.io/owning-ingresscontroller"
+	defaultRouterServiceAnnotationValue = "default"
+)
 
 type LoadbalancerServiceController struct {
 	IPAddresses []string
@@ -209,9 +215,14 @@ func (c *LoadbalancerServiceController) getNewStatus(svc *corev1.Service) (*core
 		}
 	}
 
-	//TODO use annotations instead.
-	if svc.Name == "router-default" {
-		ips, err := c.getRouterIPAddressList()
+	// The default router gets special treatment, as it takes some of the values configured in MicroShift
+	// to determine in which IPs the LoadBalancer service will be listening. In order to to a fine grained
+	// filtering of the service, look for the name, namespace and specific annotation of that service.
+	if value, ok := svc.Labels[defaultRouterServiceAnnotationKey]; ok &&
+		value == defaultRouterServiceAnnotationValue &&
+		svc.Name == defaultRouterServiceName &&
+		svc.Namespace == defaultRouterServiceNamespace {
+		ips, err := c.defaultRouterListenAddresses()
 		if err != nil {
 			return newStatus, fmt.Errorf("unable to update router IP list: %v", err)
 		}
@@ -239,7 +250,7 @@ func (c *LoadbalancerServiceController) patchStatus(svc *corev1.Service, newStat
 	return err
 }
 
-func (c *LoadbalancerServiceController) getRouterIPAddressList() ([]string, error) {
+func (c *LoadbalancerServiceController) defaultRouterListenAddresses() ([]string, error) {
 	allowedAddresses, err := config.AllowedListeningIPAddresses()
 	if err != nil {
 		return nil, err
@@ -277,6 +288,9 @@ func (c *LoadbalancerServiceController) getRouterIPAddressList() ([]string, erro
 			ipList = append(ipList, nicAddress)
 		}
 	}
+
+	slices.Sort(ipList)
+	ipList = slices.Compact(ipList)
 
 	return ipList, nil
 }
