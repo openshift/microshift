@@ -1,0 +1,3 @@
+- machine-config-operator embedded-component 22c9320b6daa6100873261694c381f5061780257 to ffd28d32b7658d7655cb6822eebb81c412e0c566
+  - 7987eef4 2024-04-03T08:52:17+00:00 Makefile: hardcode version of setup-envtest
+
