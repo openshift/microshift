@@ -137,6 +137,16 @@ func (i *ImageFetcher) execute(ctx context.Context, opts *Opts) (bool, error) {
 	return false, nil
 }
 
+type downloadProgressCounter struct {
+	Copied int64
+}
+
+func (d *downloadProgressCounter) Write(p []byte) (int, error) {
+	n := len(p)
+	d.Copied += int64(n)
+	return n, nil
+}
+
 func (i *ImageFetcher) download(ctx context.Context, dest string) error {
 	timeout := 20 * time.Minute
 	klog.InfoS("Downloading image", "name", i.Name, "destination", i.Destination, "timeout", timeout)
@@ -154,10 +164,13 @@ func (i *ImageFetcher) download(ctx context.Context, dest string) error {
 		return fmt.Errorf("failed to create file %q for downloading: %w", i.Destination, err)
 	}
 
+	counter := &downloadProgressCounter{}
+	body := io.TeeReader(resp.Body, counter)
+
 	var n int64
 	done := make(chan struct{})
 	go func() {
-		n, err = io.Copy(f, resp.Body)
+		n, err = io.Copy(f, body)
 		done <- struct{}{}
 	}()
 
@@ -168,7 +181,13 @@ outer:
 		case <-done:
 			break outer
 		case <-ticker.C:
-			klog.InfoS("Waiting for image download", "name", i.Name, "timeout", timeout, "elapsed", time.Since(start))
+			klog.InfoS("Waiting for image download",
+				"name", i.Name,
+				"progress", fmt.Sprintf("%.1f%%", float64(counter.Copied)/float64(resp.ContentLength)*100),
+				"timeout", timeout,
+				"elapsed", time.Since(start),
+				"size", resp.ContentLength/1_048_576,
+				"downloaded", counter.Copied/1_048_576)
 		case <-ctx.Done():
 			klog.InfoS("Context canceled - stopping image download")
 			resp.Body.Close()
