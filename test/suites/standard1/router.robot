@@ -42,7 +42,7 @@ ${OWNERSHIP_STRICT}             SEPARATOR=\n
 ${ROUTER_CUSTOM_PORTS}          SEPARATOR=\n
 ...                             ---
 ...                             ingress:
-...                             \ \ status: Enabled
+...                             \ \ status: Managed
 ...                             \ \ ports:
 ...                             \ \ \ \ http: ${ALTERNATIVE_HTTP_PORT}
 ...                             \ \ \ \ https: ${ALTERNATIVE_HTTPS_PORT}
@@ -60,10 +60,10 @@ Router Namespace Ownership Allowed
     ...    Restart Router
 
     Wait Until Keyword Succeeds    10x    6s
-    ...    Access Hello Microshift Success    ${HTTP_PORT}    path=/${NS_OWNERSHIP_1}    ns=${NS_OWNERSHIP_1}
+    ...    Access Hello Microshift Success    ${HTTP_PORT}    path=/${NS_OWNERSHIP_1}
 
     Wait Until Keyword Succeeds    10x    6s
-    ...    Access Hello Microshift Success    ${HTTP_PORT}    path=/${NS_OWNERSHIP_2}    ns=${NS_OWNERSHIP_2}
+    ...    Access Hello Microshift Success    ${HTTP_PORT}    path=/${NS_OWNERSHIP_2}
 
     [Teardown]    Run Keywords
     ...    Delete Namespaces
@@ -81,9 +81,9 @@ Router Namespace Ownership Strict
     ...    Restart Router
 
     ${result_1}=    Run Keyword And Return Status
-    ...    Access Hello Microshift Success    ${HTTP_PORT}    path=/${NS_OWNERSHIP_1}    ns=${NS_OWNERSHIP_1}
+    ...    Access Hello Microshift Success    ${HTTP_PORT}    path=/${NS_OWNERSHIP_1}
     ${result_2}=    Run Keyword And Return Status
-    ...    Access Hello Microshift Success    ${HTTP_PORT}    path=/${NS_OWNERSHIP_2}    ns=${NS_OWNERSHIP_2}
+    ...    Access Hello Microshift Success    ${HTTP_PORT}    path=/${NS_OWNERSHIP_2}
 
     IF    (${result_1}==True and ${result_2}==True) or (${result_1}==False and ${result_2}==False)
         Fail
@@ -99,17 +99,12 @@ Router Enabled
     [Setup]    Run Keywords
     ...    Save Default MicroShift Config
     ...    Enable Router
-    ...    Create Hello MicroShift Pod
-    ...    Expose Hello MicroShift Service Via Route
     ...    Restart Router
 
     Wait Until Keyword Succeeds    10x    6s
-    ...    Access Hello Microshift    ${HTTP_PORT}
+    ...    Access Hello MicroShift No Route    ${HTTP_PORT}
 
     [Teardown]    Run Keywords
-    ...    Delete Hello MicroShift Route
-    ...    Delete Hello MicroShift Pod And Service
-    ...    Wait For Service Deletion With Timeout
     ...    Restore Default MicroShift Config
     ...    Restart MicroShift
 
@@ -159,31 +154,6 @@ Restart Router
     Run With Kubeconfig    oc rollout restart deployment router-default -n openshift-ingress
     Named Deployment Should Be Available    router-default    openshift-ingress    5m
 
-Expose Hello MicroShift Service Via Route
-    [Documentation]    Expose the "hello microshift" application through the Route
-    Oc Expose    pod hello-microshift -n ${NAMESPACE}
-    Oc Expose    svc hello-microshift --hostname hello-microshift.cluster.local -n ${NAMESPACE}
-
-Delete Hello MicroShift Route
-    [Documentation]    Delete route for cleanup.
-    Oc Delete    route/hello-microshift -n ${NAMESPACE}
-
-Wait For Service Deletion With Timeout
-    [Documentation]    Polls for service and endpoint by "app=hello-microshift" label. Fails if timeout
-    ...    expires. This check is unique to this test suite because each test here reuses the same namespace. Since
-    ...    the tests reuse the service name, a small race window exists between the teardown of one test and the setup
-    ...    of the next. This produces flakey failures when the service or endpoint names collide.
-    Wait Until Keyword Succeeds    30s    1s
-    ...    Network APIs With Test Label Are Gone
-
-Network APIs With Test Label Are Gone
-    [Documentation]    Check for service and endpoint by "app=hello-microshift" label. Succeeds if response matches
-    ...    "No resources found in <namespace> namespace." Fail if not.
-    ${match_string}=    Catenate    No resources found in    ${NAMESPACE}    namespace.
-    ${match_string}=    Remove String    ${match_string}    "
-    ${response}=    Run With Kubeconfig    oc get svc,ep -l app\=hello-microshift -n ${NAMESPACE}
-    Should Be Equal As Strings    ${match_string}    ${response}    strip_spaces=True
-
 Disable Router
     [Documentation]    Disable router
     Setup With Custom Config    ${ROUTER_REMOVED}
@@ -225,19 +195,20 @@ Setup Hello MicroShift Pods In Multiple Namespaces
     Oc Expose    svc hello-microshift --hostname ${HOSTNAME} --path /${NS_OWNERSHIP_2} -n ${NS_OWNERSHIP_2}
 
 Http Port Should Be Open
-    [Documentation]    Try to curl the router, disregard the response because we only care about connectivity.
+    [Documentation]    Connect to the router and expect a response using http. A 503 response means the router
+    ...    is up but no routes are configured for the requested path.
     [Arguments]    ${port}
-    ${result}=    Access Hello MicroShift    ${port}
-    Should Match Regexp    ${result}    HTTP.*503
+    Access Hello MicroShift No Route    ${port}
 
 Https Port Should Be Open
-    [Documentation]    Try to curl the router, disregard the response because we only care about connectivity.
+    [Documentation]    Connect to the router and expect a response using https. A 503 response means the router
+    ...    is up but no routes are configured for the requested path.
     [Arguments]    ${port}
-    ${result}=    Access Hello MicroShift    ${port}    protocol=https
-    Should Match Regexp    ${result}    HTTP.*503
+    Access Hello MicroShift No Route    ${port}    scheme=https
 
 Port Should Be Closed
-    [Documentation]    Try to curl the router and expect a failure when connecting.
+    [Documentation]    Try to connect to the router and expect a failure when connecting.
     [Arguments]    ${port}
-    Run Keyword And Expect Error    *
-    ...    Access Hello MicroShift    ${port}
+    ${rc}    ${ignore_out}    ${ignore_err}=    Access Hello MicroShift    ${port}
+    # 7 is the error code for connection refused when using curl.
+    Should Be Equal As Integers    ${rc}    7

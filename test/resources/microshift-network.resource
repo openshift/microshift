@@ -36,49 +36,49 @@ Expose Hello MicroShift Pod Via NodePort
     ...    oc create service nodeport hello-microshift --node-port=${NP_PORT} --tcp=8080 -n ${NAMESPACE}
 
 Access Hello Microshift
-    [Documentation]    Try to retrieve data from the "hello microshift" service end point
+    [Documentation]    Use curl to make a GET request to the specified scheme, host, port and path.
+    ...    Use hello-microshift as authority and swap it with --connect-to option.
+    ...    Returns all output and return code.
+    ...    Times out after 15s.
     [Arguments]
     ...    ${ushift_port}
     ...    ${ushift_ip}=${USHIFT_HOST}
     ...    ${path}=${EMPTY}
-    ...    ${ns}=${NAMESPACE}
-    ...    ${protocol}=http
-
-    Run With Kubeconfig    oc get all -n ${ns}
+    ...    ${scheme}=http
 
     ${connect_to}=    Set Variable    "hello-microshift.cluster.local::${ushift_ip}:"
-    ${url_path}=    Set Variable    "${protocol}://hello-microshift.cluster.local:${ushift_port}${path}"
+    ${url_path}=    Set Variable    "${scheme}://hello-microshift.cluster.local:${ushift_port}${path}"
 
     ${result}=    Run Process
     ...    curl -k -i ${url_path} --connect-to ${connect_to}
     ...    shell=True
     ...    timeout=15s
-    Log Many    ${result.rc}    ${result.stdout}    ${result.stderr}
-    Should Be Equal As Integers    ${result.rc}    0
-    RETURN    ${result.stdout}
+    RETURN    ${result.rc}    ${result.stdout}    ${result.stderr}
 
 Access Hello MicroShift Success
     [Documentation]    Expect 200 OK when accessing "hello microshift" through the router.
-    [Arguments]    ${ushift_port}    ${ushift_ip}=${USHIFT_HOST}    ${path}=${EMPTY}    ${ns}=${NAMESPACE}
+    [Arguments]    ${ushift_port}    ${ushift_ip}=${USHIFT_HOST}    ${path}=${EMPTY}    ${scheme}=http
 
-    ${result}=    Access Hello MicroShift
+    ${rc}    ${stdout}    ${stderr}=    Access Hello MicroShift
     ...    ushift_port=${ushift_port}
     ...    ushift_ip=${ushift_ip}
     ...    path=${path}
-    ...    ns=${ns}
-    Should Match Regexp    ${result}    HTTP.*200
-    Should Match    ${result}    *Hello MicroShift*
+    ...    scheme=${scheme}
+    Should Be Equal As Integers    ${rc}    0
+    Should Match Regexp    ${stdout}    HTTP.*200
+    Should Match    ${stdout}    *Hello MicroShift*
 
-Access Hello MicroShift Unavailable
+Access Hello MicroShift No Route
     [Documentation]    Expect 503 Service Unavailable when accessing "hello microshift" through the router.
-    [Arguments]    ${ushift_port}    ${ushift_ip}=${USHIFT_HOST}    ${path}=${EMPTY}    ${ns}=${NAMESPACE}
+    [Arguments]    ${ushift_port}    ${ushift_ip}=${USHIFT_HOST}    ${path}=${EMPTY}    ${scheme}=http
 
-    ${result}=    Access Hello MicroShift
+    ${rc}    ${stdout}    ${stderr}=    Access Hello MicroShift
     ...    ushift_port=${ushift_port}
     ...    ushift_ip=${ushift_ip}
     ...    path=${path}
-    ...    ns=${ns}
-    Should Match Regexp    ${result}    HTTP.*503
+    ...    scheme=${scheme}
+    Should Be Equal As Integers    ${rc}    0
+    Should Match Regexp    ${stdout}    HTTP.*503
 
 Verify Hello MicroShift LB
     [Documentation]    Run Hello MicroShift Load Balancer verification
