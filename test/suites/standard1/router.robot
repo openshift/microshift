@@ -46,6 +46,12 @@ ${ROUTER_CUSTOM_PORTS}          SEPARATOR=\n
 ...                             \ \ ports:
 ...                             \ \ \ \ http: ${ALTERNATIVE_HTTP_PORT}
 ...                             \ \ \ \ https: ${ALTERNATIVE_HTTPS_PORT}
+${ROUTER_LISTEN_INTERNAL}       SEPARATOR=\n
+...                             ---
+...                             ingress:
+...                             \ \ status: Managed
+...                             \ \ listenAddress:
+...                             \ \ - 10.44.0.0
 
 
 *** Test Cases ***
@@ -138,6 +144,24 @@ Router Listen Custom Ports
     ...    Restore Default MicroShift Config
     ...    Restart MicroShift
 
+Router Listen In Internal Addresses Only
+    [Documentation]    Configure the default router to respond only to an internal IP. The node IP
+    ...    must reject connections (which means external router connection attempts), while the
+    ...    internal IP will accept them and serve content.
+    [Setup]    Run Keywords
+    ...    Save Default MicroShift Config
+    ...    Expose Router Internally
+    ...    Restart Router
+
+    # Following two keywords try to connect using the node IP.
+    Port Should Be Closed    80
+    Port Should Be Closed    443
+    Internal Router Access Success    10.44.0.0
+
+    [Teardown]    Run Keywords
+    ...    Restore Default MicroShift Config
+    ...    Restart MicroShift
+
 
 *** Keywords ***
 Configure Namespace Ownership Allowed
@@ -165,6 +189,11 @@ Enable Router
 Configure Listening Ports
     [Documentation]    Enable router and change the default listening ports
     Setup With Custom Config    ${ROUTER_CUSTOM_PORTS}
+
+Expose Router Internally
+    [Documentation]    Configure the router to get exposed internally and block
+    ...    all external connections.
+    Setup With Custom Config    ${ROUTER_LISTEN_INTERNAL}
 
 Setup With Custom Config
     [Documentation]    Install a custom config and restart MicroShift
@@ -212,3 +241,15 @@ Port Should Be Closed
     ${rc}    ${ignore_out}    ${ignore_err}=    Access Hello MicroShift    ${port}
     # 7 is the error code for connection refused when using curl.
     Should Be Equal As Integers    ${rc}    7
+
+Internal Router Access Success
+    [Documentation]    Connect and send a request to the given IP (where router should
+    ...    be listening) from within the MicroShift host. Expects a 503 assuming there
+    ...    are no routes configured.
+    [Arguments]    ${router_ip}
+    ${stdout}    ${stderr}    ${rc}=    SSHLibrary.Execute Command
+    ...    curl -I http://${router_ip}
+    ...    sudo=False    return_rc=True    return_stderr=True    return_stdout=True
+    Should Match Regexp    ${stdout}    HTTP.*503
+    Log Many    ${stdout}    ${stderr}
+    Should Be Equal As Integers    0    ${rc}
