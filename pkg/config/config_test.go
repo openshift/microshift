@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"k8s.io/utils/ptr"
 )
 
 const (
@@ -268,12 +269,26 @@ func TestGetActiveConfigFromYAML(t *testing.T) {
 				return c
 			}(),
 		},
+		{
+			name: "router-ports",
+			config: dedent(`
+			ingress:
+			  ports:
+			    http: 1234
+			    https: 9876
+			`),
+			expected: func() *Config {
+				c := mkDefaultConfig()
+				c.Ingress.Ports.Http = ptr.To[int](1234)
+				c.Ingress.Ports.Https = ptr.To[int](9876)
+				return c
+			}(),
+		},
 	}
 
 	for _, tt := range ttests {
 		t.Run(tt.name, func(t *testing.T) {
 			config, err := getActiveConfigFromYAML([]byte(tt.config))
-
 			// If we have any warnings, drop them. Use an empty array
 			// instead of nil so that we can differentiate between
 			// unexpected warnings (where we get an array instead of
@@ -379,6 +394,42 @@ func TestValidate(t *testing.T) {
 			config: func() *Config {
 				c := mkDefaultConfig()
 				c.Ingress.Status = "invalid"
+				return c
+			}(),
+			expectErr: true,
+		},
+		{
+			name: "ingress-ports-http-invalid-value-1",
+			config: func() *Config {
+				c := mkDefaultConfig()
+				c.Ingress.Ports.Http = ptr.To[int](0)
+				return c
+			}(),
+			expectErr: true,
+		},
+		{
+			name: "ingress-ports-http-invalid-value-2",
+			config: func() *Config {
+				c := mkDefaultConfig()
+				c.Ingress.Ports.Http = ptr.To[int](65536)
+				return c
+			}(),
+			expectErr: true,
+		},
+		{
+			name: "ingress-ports-https-invalid-value-1",
+			config: func() *Config {
+				c := mkDefaultConfig()
+				c.Ingress.Ports.Https = ptr.To[int](0)
+				return c
+			}(),
+			expectErr: true,
+		},
+		{
+			name: "ingress-ports-https-invalid-value-2",
+			config: func() *Config {
+				c := mkDefaultConfig()
+				c.Ingress.Ports.Https = ptr.To[int](65536)
 				return c
 			}(),
 			expectErr: true,
