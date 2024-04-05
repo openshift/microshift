@@ -2,6 +2,7 @@ package helpers
 
 import (
 	"archive/tar"
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -122,13 +123,24 @@ func (c *composer) AddBlueprint(toml string) error {
 
 func (c *composer) DepsolveBlueprint(name string) error {
 	klog.InfoS("Depsolving blueprint", "name", name)
-	blueprints, apiErrors, err := c.client.DepsolveBlueprints([]string{name})
+	blueprints, apiErrors, depsolveErr := c.client.DepsolveBlueprints([]string{name})
 
-	// TODO: Write to file
-	_ = blueprints
+	depsolveData := new(bytes.Buffer)
+	enc := json.NewEncoder(depsolveData)
+	enc.SetIndent("", "    ")
+	if err := enc.Encode(blueprints[0]); err != nil {
+		klog.ErrorS(err, "Failed to encode depsolve info")
+		return err
+	}
 
-	if err != nil {
-		return fmt.Errorf("error depsolving blueprint %q: %w", name, err)
+	depsolveFilepath := filepath.Join(c.logsDir, name+"_depsolve.log")
+	if err := os.WriteFile(depsolveFilepath, depsolveData.Bytes(), 0644); err != nil {
+		klog.ErrorS(err, "Failed to write file with depsolve info")
+		return err
+	}
+
+	if depsolveErr != nil {
+		return fmt.Errorf("error depsolving blueprint %q: %w", name, depsolveErr)
 	}
 	if len(apiErrors) != 0 {
 		return fmt.Errorf("DepsolveBlueprints(%v) errors: %+v", []string{name}, apiErrors)
