@@ -105,7 +105,7 @@ run_image_build() {
 
 # Run bootc image build
 run_bootc_image_build() {
-    $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints/layer5-bootc
+    $(dry_run) exec sg "weldr" "./bin/microshift-tests compose ./image-blueprints/layer1-base/group1/centos9.image-fetcher ./image-blueprints/layer5-bootc"
 }
 
 cat /etc/os-release

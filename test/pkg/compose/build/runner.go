@@ -9,6 +9,7 @@ import (
 type Opts struct {
 	Composer helpers.Composer
 	Ostree   helpers.Ostree
+	Podman   helpers.Podman
 
 	Force            bool
 	DryRun           bool

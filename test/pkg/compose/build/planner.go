@@ -52,7 +52,7 @@ func (b *Planner) CreateBuildPlan(paths []string) (Plan, error) {
 			} else {
 				toBuild = append(toBuild, grp)
 			}
-		} else if strings.Contains(base, ".toml") || strings.Contains(base, ".image-fetcher") {
+		} else if strings.Contains(base, ".toml") || strings.Contains(base, ".image-fetcher") || strings.Contains(base, ".containerfile") {
 			if build, err := b.file(path); err != nil {
 				return nil, err
 			} else if build != nil {
@@ -133,6 +133,8 @@ func (b *Planner) file(path string) (Build, error) {
 		return nil, nil
 	case ".image-fetcher":
 		return NewImageFetcher(path, b.Opts)
+	case ".containerfile":
+		return NewContainerfileBuild(path, b.Opts)
 	}
 
 	return NewBlueprintBuild(path, b.Opts)

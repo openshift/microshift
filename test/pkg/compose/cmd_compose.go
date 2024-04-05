@@ -84,7 +84,7 @@ func NewComposeCmd() *cobra.Command {
 			}()
 		}
 
-		composer, ostree, err := getHelpers()
+		composer, ostree, podman, err := getHelpers()
 		if err != nil {
 			return err
 		}
@@ -155,6 +155,7 @@ func NewComposeCmd() *cobra.Command {
 			Opts: &build.Opts{
 				Composer:         composer,
 				Ostree:           ostree,
+				Podman:           podman,
 				Force:            force,
 				DryRun:           dryRun,
 				ArtifactsMainDir: artifactsMainDir,
@@ -285,20 +286,21 @@ func buildPlanSubCmd() *cobra.Command {
 	return cmd
 }
 
-func getHelpers() (helpers.Composer, helpers.Ostree, error) {
+func getHelpers() (helpers.Composer, helpers.Ostree, helpers.Podman, error) {
 	if dryRun {
-		return helpers.NewDryRunComposer(), helpers.NewDryRunOstree(), nil
+		return helpers.NewDryRunComposer(), helpers.NewDryRunOstree(), helpers.NewDryRunPodman(), nil
 	}
+
 	ostree, err := helpers.NewOstree(filepath.Join(artifactsMainDir, "repo"))
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 	composer, err := helpers.NewComposer(testDirPath, fmt.Sprintf("http://%s:8080/repo", hostIP))
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 
-	return composer, ostree, nil
+	return composer, ostree, helpers.NewPodman(), nil
 }
 
 func persistImages(td *templatingdata.TemplatingData) error {

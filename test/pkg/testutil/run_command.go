@@ -5,6 +5,7 @@ import (
 	"os/exec"
 	"regexp"
 	"strings"
+	"time"
 
 	"k8s.io/klog/v2"
 )
@@ -15,11 +16,16 @@ func RunCommand(c ...string) (string, string, error) {
 	var outb, errb bytes.Buffer
 	cmd.Stdout = &outb
 	cmd.Stderr = &errb
+
 	klog.InfoS("Running command", "cmd", cmd)
+	start := time.Now()
 	err := cmd.Run()
+	dur := time.Since(start)
+
 	out := strings.Trim(outb.String(), "\n")
 	serr := errb.String()
-	klog.InfoS("Command complete", "cmd", cmd, "stdout", redactOutput(out), "stderr", redactOutput(serr), "err", err)
+	klog.InfoS("Command complete", "duration", dur, "cmd", cmd, "stdout", redactOutput(out), "stderr", redactOutput(serr), "err", err)
+
 	return out, serr, err
 }
 
