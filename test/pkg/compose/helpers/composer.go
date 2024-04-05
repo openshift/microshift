@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
@@ -56,7 +57,12 @@ func NewComposer(testDirPath string, ostreeRepoURL string) (Composer, error) {
 		return nil, err
 	}
 
-	// TODO: Check if ostree http repo is up
+	client := http.Client{Timeout: 5 * time.Second}
+	resp, err := client.Get(ostreeRepoURL)
+	if err != nil {
+		return nil, fmt.Errorf("failed to connect to %q - is webserver up?", ostreeRepoURL)
+	}
+	resp.Body.Close()
 
 	return &composer{
 		client:        weldr.InitClientUnixSocket(context.Background(), 1, "/run/weldr/api.socket"),
