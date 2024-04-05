@@ -25,7 +25,7 @@ var (
 )
 
 type TemplatingDataOpts struct {
-	ArtifactsMainDir               string
+	Paths                          *testutil.Paths
 	TemplatingDataFragmentFilepath string
 	SkipContainerImagesExtraction  bool
 }
@@ -33,11 +33,10 @@ type TemplatingDataOpts struct {
 func (o *TemplatingDataOpts) Construct() (*TemplatingData, error) {
 	klog.InfoS("Constructing TemplatingData")
 
-	rpmRepos := path.Join(o.ArtifactsMainDir, "rpm-repos")
-	localRepo := path.Join(rpmRepos, "microshift-local")
-	fakeNextRepo := path.Join(rpmRepos, "microshift-fake-next-minor")
-	baseRepo := path.Join(rpmRepos, "microshift-base")
-	externalRepo := path.Join(rpmRepos, "microshift-external")
+	localRepo := path.Join(o.Paths.RPMRepos, "microshift-local")
+	fakeNextRepo := path.Join(o.Paths.RPMRepos, "microshift-fake-next-minor")
+	baseRepo := path.Join(o.Paths.RPMRepos, "microshift-base")
+	externalRepo := path.Join(o.Paths.RPMRepos, "microshift-external")
 
 	if exists, err := util.PathExists(localRepo); err != nil {
 		return nil, fmt.Errorf("failed to check if %s exists: %w", localRepo, err)

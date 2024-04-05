@@ -112,7 +112,7 @@ func NewBlueprintBuild(path string, opts *PlannerOpts) (*BlueprintBuild, error) 
 			return nil, err
 		} else if exists {
 			bb.Installer = true
-			bb.InstallerDestination = filepath.Join(opts.ArtifactsMainDir, "vm-storage", name+".iso")
+			bb.InstallerDestination = filepath.Join(opts.Paths.VMStorageDir, name+".iso")
 		}
 	}
 
@@ -122,7 +122,7 @@ func NewBlueprintBuild(path string, opts *PlannerOpts) (*BlueprintBuild, error) 
 		expectedParentFilename := parts[0] + ".toml"
 
 		parentPath := ""
-		err = filepath.WalkDir(filepath.Join(opts.TestDir, "image-blueprints"), func(p string, d fs.DirEntry, err error) error {
+		err = filepath.WalkDir(filepath.Join(opts.Paths.TestDirPath, "image-blueprints"), func(p string, d fs.DirEntry, err error) error {
 			if parentPath != "" {
 				return nil
 			}
@@ -396,7 +396,7 @@ func (b *BlueprintBuild) composeInstaller(ctx context.Context, opts *Opts) error
 		return err
 	}
 
-	dest := filepath.Join(opts.ArtifactsMainDir, "vm-storage", b.Name+".iso")
+	dest := filepath.Join(opts.Paths.VMStorageDir, b.Name+".iso")
 	if installerPath != "/dummy/dry/run/path" {
 		err = os.Rename(installerPath, dest)
 		if err != nil {

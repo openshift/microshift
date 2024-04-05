@@ -13,10 +13,10 @@ type Opts struct {
 	Ostree   helpers.Ostree
 	Podman   helpers.Podman
 
-	Force            bool
-	DryRun           bool
-	ArtifactsMainDir string
+	Force  bool
+	DryRun bool
 
+	Paths  *testutil.Paths
 	Events *testutil.EventManager
 }
 

@@ -24,9 +24,7 @@ type PlannerOpts struct {
 	SourceOnly      bool
 	BuildInstallers bool
 
-	ArtifactsMainDir string
-	TestDir          string
-
+	Paths  *testutil.Paths
 	Events *testutil.EventManager
 }
 

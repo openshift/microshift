@@ -13,6 +13,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/openshift/microshift/test/pkg/testutil"
 	"github.com/osbuild/weldr-client/v2/weldr"
 	"k8s.io/klog/v2"
 )
@@ -45,18 +46,7 @@ type composer struct {
 	buildsDir string
 }
 
-func NewComposer(testDirPath string, ostreeRepoURL string) (Composer, error) {
-	artifactsDir := filepath.Join(testDirPath, "..", "_output", "test-images")
-	logsDir := filepath.Join(artifactsDir, "build-logs")
-	buildsDir := filepath.Join(artifactsDir, "builds")
-
-	if err := os.MkdirAll(logsDir, 0755); err != nil {
-		return nil, err
-	}
-	if err := os.MkdirAll(buildsDir, 0755); err != nil {
-		return nil, err
-	}
-
+func NewComposer(paths *testutil.Paths, ostreeRepoURL string) (Composer, error) {
 	client := http.Client{Timeout: 5 * time.Second}
 	resp, err := client.Get(ostreeRepoURL)
 	if err != nil {
@@ -68,8 +58,8 @@ func NewComposer(testDirPath string, ostreeRepoURL string) (Composer, error) {
 		client:        weldr.InitClientUnixSocket(context.Background(), 1, "/run/weldr/api.socket"),
 		ostreeRepoURL: ostreeRepoURL,
 
-		logsDir:   logsDir,
-		buildsDir: buildsDir,
+		logsDir:   paths.BuildLogsDir,
+		buildsDir: paths.BuildsDir,
 	}, nil
 }
 

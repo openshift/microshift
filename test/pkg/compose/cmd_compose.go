@@ -22,9 +22,7 @@ import (
 )
 
 var (
-	microShiftRepoRootPath string
-	testDirPath            string
-	artifactsMainDir       string
+	paths *testutil.Paths
 
 	templatingDataFragmentFilepath string
 
@@ -53,10 +51,11 @@ func NewComposeCmd() *cobra.Command {
 				buildInstallers = true
 				force = true
 			}
-
-			testDirPath = testDirAbs
-			microShiftRepoRootPath = filepath.Join(testDirAbs, "..")
-			artifactsMainDir = filepath.Join(microShiftRepoRootPath, "_output", "test-images")
+			paths, err = testutil.NewPaths(testDirAbs)
+			if err != nil {
+				return err
+			}
+			klog.InfoS("Constructed Paths struct", "path", paths)
 
 			hostIP, err = util.GetHostIP("")
 			if err != nil {
@@ -80,7 +79,7 @@ func NewComposeCmd() *cobra.Command {
 
 		if !skipOSBuildLogCollection {
 			defer func() {
-				if err := saveOSBuildLogs(filepath.Join(artifactsMainDir, "build-logs")); err != nil {
+				if err := saveOSBuildLogs(paths.BuildLogsDir); err != nil {
 					klog.ErrorS(err, "Failed to save logs of osbuild service(s)")
 				}
 			}()
@@ -92,7 +91,7 @@ func NewComposeCmd() *cobra.Command {
 		}
 
 		td, err := (&templatingdata.TemplatingDataOpts{
-			ArtifactsMainDir:               artifactsMainDir,
+			Paths:                          paths,
 			TemplatingDataFragmentFilepath: templatingDataFragmentFilepath,
 			SkipContainerImagesExtraction:  skipContainerImagesExtraction,
 		}).Construct()
@@ -108,15 +107,15 @@ func NewComposeCmd() *cobra.Command {
 
 		events := testutil.NewEventManager("compose")
 		defer func() {
-			junitFile := filepath.Join(artifactsMainDir, "build-logs", "junit_compose.xml")
+			junitFile := filepath.Join(paths.BuildLogsDir, "junit_compose.xml")
 			junit := events.GetJUnit()
 			err = junit.WriteToFile(junitFile)
 			if err != nil {
 				klog.ErrorS(err, "Failed to write junit to a file", "file", junitFile)
 			}
 
-			intervalsFile := filepath.Join(artifactsMainDir, "build-logs", "intervals_compose.json")
-			timelinesFile := filepath.Join(artifactsMainDir, "build-logs", "e2e-timelines_spyglass_compose.html")
+			intervalsFile := filepath.Join(paths.BuildLogsDir, "intervals_compose.json")
+			timelinesFile := filepath.Join(paths.BuildLogsDir, "e2e-timelines_spyglass_compose.html")
 			err = events.WriteToFiles(intervalsFile, timelinesFile)
 			if err != nil {
 				klog.ErrorS(err, "Failed to write events to a files", "file", timelinesFile)
@@ -126,7 +125,7 @@ func NewComposeCmd() *cobra.Command {
 		sourceConfigurer := sources.SourceConfigurer{Opts: &sources.SourceConfigurerOpts{
 			Composer:    composer,
 			TplData:     td,
-			TestDirPath: testDirPath,
+			TestDirPath: paths.TestDirPath,
 			Events:      events,
 		}}
 		if err := sourceConfigurer.ConfigureSources(); err != nil {
@@ -135,18 +134,17 @@ func NewComposeCmd() *cobra.Command {
 
 		buildPlanner := build.Planner{
 			Opts: &build.PlannerOpts{
-				TplData:          td,
-				SourceOnly:       sourceOnly,
-				BuildInstallers:  buildInstallers,
-				ArtifactsMainDir: artifactsMainDir,
-				TestDir:          testDirPath,
-				Events:           events,
+				TplData:         td,
+				SourceOnly:      sourceOnly,
+				BuildInstallers: buildInstallers,
+				Paths:           paths,
+				Events:          events,
 			},
 		}
 
 		buildPaths := []string{}
 		for _, arg := range args {
-			buildPaths = append(buildPaths, filepath.Join(testDirPath, arg))
+			buildPaths = append(buildPaths, filepath.Join(paths.TestDirPath, arg))
 		}
 		buildPlan, err := buildPlanner.CreateBuildPlan(buildPaths)
 		if err != nil {
@@ -164,13 +162,13 @@ func NewComposeCmd() *cobra.Command {
 
 		builder := build.Runner{
 			Opts: &build.Opts{
-				Composer:         composer,
-				Ostree:           ostree,
-				Podman:           podman,
-				Force:            force,
-				DryRun:           dryRun,
-				ArtifactsMainDir: artifactsMainDir,
-				Events:           events,
+				Composer: composer,
+				Ostree:   ostree,
+				Podman:   podman,
+				Force:    force,
+				DryRun:   dryRun,
+				Paths:    paths,
+				Events:   events,
 			},
 		}
 		err = builder.Build(ctx, buildPlan)
@@ -203,7 +201,7 @@ func templatingDataSubCmd() *cobra.Command {
 		Short: "",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			td, err := (&templatingdata.TemplatingDataOpts{
-				ArtifactsMainDir:               artifactsMainDir,
+				Paths:                          paths,
 				TemplatingDataFragmentFilepath: templatingDataFragmentFilepath,
 				SkipContainerImagesExtraction:  skipContainerImagesExtraction,
 			}).Construct()
@@ -261,7 +259,7 @@ func buildPlanSubCmd() *cobra.Command {
 			}
 
 			td, err := (&templatingdata.TemplatingDataOpts{
-				ArtifactsMainDir:               artifactsMainDir,
+				Paths:                          paths,
 				TemplatingDataFragmentFilepath: templatingDataFragmentFilepath,
 			}).Construct()
 			if err != nil {
@@ -270,15 +268,15 @@ func buildPlanSubCmd() *cobra.Command {
 
 			buildPlanner := build.Planner{
 				Opts: &build.PlannerOpts{
-					TplData:          td,
-					SourceOnly:       sourceOnly,
-					BuildInstallers:  buildInstallers,
-					ArtifactsMainDir: artifactsMainDir,
+					TplData:         td,
+					SourceOnly:      sourceOnly,
+					BuildInstallers: buildInstallers,
+					Paths:           paths,
 				},
 			}
 			buildPaths := []string{}
 			for _, arg := range args {
-				buildPaths = append(buildPaths, filepath.Join(testDirPath, arg))
+				buildPaths = append(buildPaths, filepath.Join(paths.TestDirPath, arg))
 			}
 			buildPlan, err := buildPlanner.CreateBuildPlan(buildPaths)
 			if err != nil {
@@ -302,11 +300,11 @@ func getHelpers() (helpers.Composer, helpers.Ostree, helpers.Podman, error) {
 		return helpers.NewDryRunComposer(), helpers.NewDryRunOstree(), helpers.NewDryRunPodman(), nil
 	}
 
-	ostree, err := helpers.NewOstree(filepath.Join(artifactsMainDir, "repo"))
+	ostree, err := helpers.NewOstree(paths.OSTreeRepoDir)
 	if err != nil {
 		return nil, nil, nil, err
 	}
-	composer, err := helpers.NewComposer(testDirPath, fmt.Sprintf("http://%s:8080/repo", hostIP))
+	composer, err := helpers.NewComposer(paths, fmt.Sprintf("http://%s:8080/repo", hostIP))
 	if err != nil {
 		return nil, nil, nil, err
 	}
@@ -315,7 +313,7 @@ func getHelpers() (helpers.Composer, helpers.Ostree, helpers.Podman, error) {
 }
 
 func persistImages(td *templatingdata.TemplatingData) error {
-	dest := filepath.Join(artifactsMainDir, "container-images-list")
+	dest := filepath.Join(paths.ArtifactsMainDir, "container-images-list")
 	klog.InfoS("Writing all image references from TemplatingData to a file", "path", dest)
 
 	images := []string{}

@@ -39,18 +39,13 @@ func NewImageFetcher(path string, opts *PlannerOpts) (*ImageFetcher, error) {
 		return nil, err
 	}
 
-	destDir := filepath.Join(opts.ArtifactsMainDir, "vm-storage")
-	if err := os.MkdirAll(destDir, 0755); err != nil {
-		return nil, err
-	}
-
 	return &ImageFetcher{
 		build: build{
 			Name: withoutExt,
 			Path: path,
 		},
 		Url:         templatedData,
-		Destination: filepath.Join(destDir, withoutExt+".iso"),
+		Destination: filepath.Join(opts.Paths.VMStorageDir, withoutExt+".iso"),
 	}, nil
 }
 

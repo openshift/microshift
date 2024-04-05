@@ -55,11 +55,7 @@ func (c *ContainerfileBuild) Execute(ctx context.Context, opts *Opts) error {
 
 	start := time.Now()
 
-	outputDir := filepath.Join(opts.ArtifactsMainDir, "bootc-images")
-	if err := os.MkdirAll(outputDir, 0755); err != nil {
-		return err
-	}
-	output := filepath.Join(outputDir, c.Name)
+	output := filepath.Join(opts.Paths.BootCImages, c.Name)
 	if exists, err := util.PathExists(output); err != nil {
 		return err
 	} else if exists {
@@ -84,7 +80,7 @@ func (c *ContainerfileBuild) Execute(ctx context.Context, opts *Opts) error {
 		}
 	}
 
-	err := opts.Podman.BuildAndSave(ctx, c.Name, c.Path, filepath.Join(opts.ArtifactsMainDir, "rpm-repos"), output)
+	err := opts.Podman.BuildAndSave(ctx, c.Name, c.Path, opts.Paths.RPMRepos, output)
 	if err != nil {
 		klog.ErrorS(err, "Failed to build Containerfile", "name", c.Name)
 		opts.Events.AddEvent(&testutil.FailedEvent{
