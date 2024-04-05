@@ -1,3 +1,80 @@
-- machine-config-operator embedded-component 1d5df20e0c3a50de5372a8dcd64769a13f773174 to a4fbf4d0991878d0f98efdc1d2bf22b877acc9ad
-  - 69187002 2024-04-02T09:44:46-04:00 fix: resources were in the wrong indentation level
+- oc image-arm64 bd8ced04018d9976cd94db2b3bed88d0892e5929 to 425af75f33def2d4dfedbc6ca8a0465be84e343f
+  - 34e4a0a6 2024-04-03T09:11:30+03:00 Add help text the behavior of filter-by-os against single image
+
+- csi-external-snapshotter image-arm64 39164d4fd75a049a4eb772095c19cda2f99a59e0 to 795fa18b0522d2bcddc2cab6751d23255a2b936d
+  - 10e3e62 2024-03-28T17:33:38-07:00 UPSTREAM: 1034: Add snapshot secret reference to group snapshot controller.
+  - c363d15 2024-03-28T17:31:43-07:00 UPSTREAM: 1015: Fix detecting default annotation on VolumeGroupSnapshotClass
+  - ffd5143 2024-03-28T17:29:11-07:00 UPSTREAM: 1014: use GroupSnapshotDeleteError type for event
+  - 115c4ef 2024-03-28T17:27:47-07:00 UPSTREAM: 1014: fix method name in logging
+  - 895a295 2024-03-28T17:25:00-07:00 UPSTREAM: 1011: Add snapshot size to VSC created for VGS
+
+- csi-external-snapshotter image-arm64 39164d4fd75a049a4eb772095c19cda2f99a59e0 to 795fa18b0522d2bcddc2cab6751d23255a2b936d
+  - 10e3e62 2024-03-28T17:33:38-07:00 UPSTREAM: 1034: Add snapshot secret reference to group snapshot controller.
+  - c363d15 2024-03-28T17:31:43-07:00 UPSTREAM: 1015: Fix detecting default annotation on VolumeGroupSnapshotClass
+  - ffd5143 2024-03-28T17:29:11-07:00 UPSTREAM: 1014: use GroupSnapshotDeleteError type for event
+  - 115c4ef 2024-03-28T17:27:47-07:00 UPSTREAM: 1014: fix method name in logging
+  - 895a295 2024-03-28T17:25:00-07:00 UPSTREAM: 1011: Add snapshot size to VSC created for VGS
+
+- csi-external-snapshotter image-arm64 39164d4fd75a049a4eb772095c19cda2f99a59e0 to 795fa18b0522d2bcddc2cab6751d23255a2b936d
+  - 10e3e62 2024-03-28T17:33:38-07:00 UPSTREAM: 1034: Add snapshot secret reference to group snapshot controller.
+  - c363d15 2024-03-28T17:31:43-07:00 UPSTREAM: 1015: Fix detecting default annotation on VolumeGroupSnapshotClass
+  - ffd5143 2024-03-28T17:29:11-07:00 UPSTREAM: 1014: use GroupSnapshotDeleteError type for event
+  - 115c4ef 2024-03-28T17:27:47-07:00 UPSTREAM: 1014: fix method name in logging
+  - 895a295 2024-03-28T17:25:00-07:00 UPSTREAM: 1011: Add snapshot size to VSC created for VGS
+
+- ovn-kubernetes image-arm64 b63057c336156dc2b48f2d5124d58391e3ca6221 to 5136ff9727c6b11db3ddc64de7d31798faf0076d
+  - 667c94d 2024-03-20T09:58:52+01:00 TEMP: Skip pass action validation
+  - e3d81ab 2024-03-20T09:58:52+01:00 Add e2e for ANP/BANP ACL logging
+  - 051cce1 2024-03-20T09:58:50+01:00 BANP: Add UT for ACL logging
+  - 81d7e5d 2024-03-20T09:58:07+01:00 ANP: Add UT for ACL logging
+  - 66492f1 2024-03-20T09:45:35+01:00 ANPUpdate: Honor ACLlog annotation updates
+  - ecabf77 2024-03-20T09:40:00+01:00 ANPCreate: Add logic to honor ACLlog annotation
+  - 7d12e68 2024-03-20T09:40:00+01:00 NIT: Fix log message
+  - e3304d0 2024-03-20T09:40:00+01:00 Add getACLLoggingLevelsForANP util
+  - 1e673ea 2024-03-20T09:40:00+01:00 Add Pass to ACLLoggingLevels
+  - 5359e7d 2024-03-19T10:20:49+01:00 kubevirt, e2e: Fill in the http server pods slice
+  - f310170 2024-03-15T17:52:27+01:00 Fix PortRange computation
+  - 87bf468 2024-03-15T15:26:27+00:00 Bump google.golang.org/protobuf from 1.30.0 to 1.33.0 in /go-controller
+  - f6270d0 2024-03-15T16:23:21+01:00 Update network-policy-api to pickup latest API
+  - 017a1bb 2024-03-15T15:17:59+01:00 Update status for EgressQoS
+  - 05cd39e 2024-03-15T15:17:59+01:00 Add status field for EgressQoS
+  - 00cf7c5 2024-03-15T14:32:32+01:00 Fix EgressIP initialization on IPv6 clusters
+  - b257782 2024-03-15T11:40:59+01:00 e2e: Fix loca, ipv4 skip expression
+  - f118187 2024-03-14T14:52:07-07:00 remove test_periodic workflow
+  - 860f0f7 2024-03-14T14:44:39-07:00 update golangci-lint-action v3->v4
+  - 6f5ab29 2024-03-14T13:01:51+01:00 kubevirt, e2e: Reconnect after del deny all policy
+  - df18d49 2024-03-14T11:54:57+01:00 Fix and enable MetalLB service tests for Shared mode with IPv6
+  - fa36b2c 2024-03-13T22:39:45+00:00 Bump google.golang.org/protobuf in /test/conformance
+  - 06f67e2 2024-03-13T10:21:01+01:00 TokenFile also has to be "" to fail new RestConfig
+  - 08a0516 2024-03-12T10:49:52+01:00 docs, multi-homing: correct layer2 parameter list
+  - 3150ea4 2024-03-12T10:45:29+01:00 docs, multi-homing: remove IC limitation
+  - c7f2af2 2024-03-12T09:55:38+01:00 Fix and enable MetalLB service tests for LGW mode with IPv6
+
+- kubernetes image-arm64 258f1d5fb6491ba65fd8201c827e179432430627 to 8628c3c4da6746b1dc967cc520b189a04ebd78d1
+  - 522095e22 2024-04-03T12:22:19+02:00 UPSTREAM: <carry>: allow type mutation for specific secrets
+  - b9c1d7ebe 2024-04-02T18:57:37+02:00 UPSTREAM: <carry>: allow type mutation for specific secrets
+  - 90ec42f20 2024-04-01T22:46:23+05:30 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - 062a0e4a3 2024-04-01T21:24:15+05:30 UPSTREAM: <drop>: manually resolve conflicts
+  - 0ee3df1d4 2024-03-29T11:03:08-04:00 UPSTREAM: 124110: retry policy creation for CRD type checking E2E test
+  - 6813625b7 2024-03-14T23:58:34+00:00 Release commit for Kubernetes v1.29.3
+  - 6db05c2d6 2024-03-06T13:06:57-08:00 remove --v arg from kubetest2-tester-ginkgo test args
+  - 6322daeb7 2024-03-06T13:06:56-08:00 ci: bump kind to latest for kms jobs
+  - c53a24db8 2024-03-06T13:14:32-05:00 [go] Bump images, dependencies and versions to go 1.21.8 / distroless-iptables to v0.4.6
+  - 3ceb275cb 2024-03-06T10:38:40-05:00 [CVE-2024-24786] Bump github.com/golang/protobuf v1.5.4, google.golang.org/protobuf v1.33.0
+  - 24f1cbe2c 2024-03-06T14:48:44+01:00 keep existing PDB conditions when updating status
+  - bbe8ca8b2 2024-03-05T19:58:13+09:00 Validate restartable init container state transition
+  - b1e1d68cf 2024-03-05T07:23:39+00:00 Test that separation of streams work by using progress notifies
+  - 4009acb0c 2024-03-05T07:22:13+00:00 Prevent watch cache starvation, by moving its watch to separate RPC and add a SeparateCacheWatchRPC feature flag to disable this behavior
+  - 769b9c0b8 2024-03-01T11:17:09+08:00 fix UT failure TestPrintIPAddressList
+  - a99148c88 2024-02-28T14:08:08+08:00 etcd: Update to version 3.5.12
+  - 5cfecf2ba 2024-02-28T14:07:42+08:00 build etcd image v3.5.12
+  - 8f8bcf2c2 2024-02-26T13:59:04-05:00 Fix race condition between external-resizer and kubelet
+  - 4e0e37818 2024-02-19T10:49:33+01:00 codegen: don't nuke files if only verifying
+  - 01a5b82a0 2024-02-15T09:40:12+01:00 dra: increase timeout in setupFakeDRADriverGRPCServer to prevent tests to flake.
+  - 82ac80a7e 2024-02-15T11:14:51+09:00 e2e_node: replace `registry.k8s.io/stress:v1` with agnhost
+  - 24b6185f7 2024-02-15T11:14:46+09:00 promote agnhost to v2.47
+  - 994f70c15 2024-02-14T11:03:38+00:00 Update CHANGELOG/CHANGELOG-1.29.md for v1.29.2
+  - 550ae323b 2024-02-12T09:51:22-08:00 fixing issue with GetCPUUsageNanoCores on Windows
+  - c16c91827 2024-02-12T17:22:52+01:00 Fix cleanup of file subpaths
+  - 61726ab12 2024-01-18T11:22:17+01:00 Fix SELinux e2e tests: add label to observed metrics
 
