@@ -1,10 +1,10 @@
 package build
 
-// TODO: Signal handling: INT -> cancel build/download
+import "context"
 
 type Build interface {
 	Prepare(*Opts) error
-	Execute(*Opts) error
+	Execute(context.Context, *Opts) error
 }
 
 type build struct {

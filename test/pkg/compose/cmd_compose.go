@@ -6,7 +6,9 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"os/signal"
 	"path/filepath"
+	"syscall"
 
 	"github.com/coreos/go-systemd/v22/dbus"
 	"github.com/openshift/microshift/pkg/util"
@@ -151,6 +153,15 @@ func NewComposeCmd() *cobra.Command {
 			return err
 		}
 
+		ctx, cancel := context.WithCancel(context.Background())
+		sigs := make(chan os.Signal, 1)
+		signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
+		go func() {
+			sig := <-sigs
+			klog.InfoS("Received signal - canceling context", "signal", sig)
+			cancel()
+		}()
+
 		builder := build.Runner{
 			Opts: &build.Opts{
 				Composer:         composer,
@@ -162,7 +173,7 @@ func NewComposeCmd() *cobra.Command {
 				Events:           events,
 			},
 		}
-		err = builder.Build(buildPlan)
+		err = builder.Build(ctx, buildPlan)
 		if err != nil {
 			return err
 		}

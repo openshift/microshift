@@ -27,7 +27,7 @@ type Composer interface {
 	StartOSTreeCompose(blueprint, composeType, ref, parent string) (string, error)
 	StartCompose(blueprint, composeType string) (string, error)
 
-	WaitForCompose(id, friendlyName string, timeout time.Duration) error
+	WaitForCompose(ctx context.Context, id, friendlyName string, timeout time.Duration) error
 
 	SaveComposeLogs(id, friendlyName string) error
 	SaveComposeMetadata(id, friendlyName string) error
@@ -182,7 +182,7 @@ func (c *composer) StartCompose(blueprint, composeType string) (string, error) {
 	return id, nil
 }
 
-func (c *composer) WaitForCompose(id, friendlyName string, timeout time.Duration) error {
+func (c *composer) WaitForCompose(ctx context.Context, id, friendlyName string, timeout time.Duration) error {
 	start := time.Now()
 
 	var aborted bool
@@ -204,6 +204,17 @@ outer:
 			break outer
 		case <-ticker.C:
 			klog.InfoS("Waiting for compose", "id", id, "timeout", timeout, "friendlyName", friendlyName, "elapsed", time.Since(start))
+		case <-ctx.Done():
+			klog.InfoS("Context canceled - canceling compose", "id", id, "friendlyName", friendlyName)
+			w, cancelApiResp, err := c.client.CancelCompose(id)
+			if err != nil {
+				klog.ErrorS(err, "Failed to cancel compose")
+			}
+			if len(cancelApiResp) > 0 {
+				klog.InfoS("Failed to cancel compose", "api errors", cancelApiResp)
+			}
+			klog.InfoS("Compose cancelled", "id", id, "friendlyName", friendlyName, "status", w.Status)
+			return ctx.Err()
 		}
 	}
 	ticker.Stop()

@@ -1,6 +1,7 @@
 package build
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"net/http"
@@ -38,13 +39,18 @@ func NewImageFetcher(path string, opts *PlannerOpts) (*ImageFetcher, error) {
 		return nil, err
 	}
 
+	destDir := filepath.Join(opts.ArtifactsMainDir, "vm-storage")
+	if err := os.MkdirAll(destDir, 0755); err != nil {
+		return nil, err
+	}
+
 	return &ImageFetcher{
 		build: build{
 			Name: withoutExt,
 			Path: path,
 		},
 		Url:         templatedData,
-		Destination: filepath.Join(opts.ArtifactsMainDir, "vm-storage", withoutExt+".iso"),
+		Destination: filepath.Join(destDir, withoutExt+".iso"),
 	}, nil
 }
 
@@ -52,9 +58,9 @@ func (i *ImageFetcher) Prepare(opts *Opts) error {
 	return nil
 }
 
-func (i *ImageFetcher) Execute(opts *Opts) error {
+func (i *ImageFetcher) Execute(ctx context.Context, opts *Opts) error {
 	s := time.Now()
-	skipped, err := i.execute(opts)
+	skipped, err := i.execute(ctx, opts)
 
 	if skipped && err == nil {
 		opts.Events.AddEvent(&testutil.SkippedEvent{
@@ -95,7 +101,7 @@ func (i *ImageFetcher) Execute(opts *Opts) error {
 	return nil
 }
 
-func (i *ImageFetcher) execute(opts *Opts) (bool, error) {
+func (i *ImageFetcher) execute(ctx context.Context, opts *Opts) (bool, error) {
 	if opts.DryRun {
 		klog.InfoS("DRY RUN: Downloaded image", "name", i.Name)
 		return false, nil
@@ -116,7 +122,7 @@ func (i *ImageFetcher) execute(opts *Opts) (bool, error) {
 		}
 	}
 
-	err := testutil.Retry(3, func() error { return i.download(tmpDest) })
+	err := testutil.Retry(ctx, 3, func() error { return i.download(ctx, tmpDest) })
 	if err != nil {
 		klog.ErrorS(err, "Failed to download image", "destination", tmpDest, "url", i.Url)
 		return false, err
@@ -131,7 +137,7 @@ func (i *ImageFetcher) execute(opts *Opts) (bool, error) {
 	return false, nil
 }
 
-func (i *ImageFetcher) download(dest string) error {
+func (i *ImageFetcher) download(ctx context.Context, dest string) error {
 	timeout := 20 * time.Minute
 	klog.InfoS("Downloading image", "name", i.Name, "destination", i.Destination, "timeout", timeout)
 	start := time.Now()
@@ -163,6 +169,13 @@ outer:
 			break outer
 		case <-ticker.C:
 			klog.InfoS("Waiting for image download", "name", i.Name, "timeout", timeout, "elapsed", time.Since(start))
+		case <-ctx.Done():
+			klog.InfoS("Context canceled - stopping image download")
+			resp.Body.Close()
+			if err := os.RemoveAll(dest); err != nil {
+				klog.ErrorS(err, "Failed to remove filepath", "filepath", dest)
+			}
+			return ctx.Err()
 		}
 	}
 	ticker.Stop()

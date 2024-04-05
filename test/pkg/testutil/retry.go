@@ -1,6 +1,7 @@
 package testutil
 
 import (
+	"context"
 	"errors"
 	"time"
 
@@ -11,12 +12,17 @@ const (
 	interval = time.Second * 10
 )
 
-func Retry(attempts int, f func() error) error {
+func Retry(ctx context.Context, attempts int, f func() error) error {
 	errs := []error{}
 	for i := 0; i < attempts; i++ {
 		err := f()
 		if err == nil {
 			return nil
+		}
+
+		if ctx.Err() != nil {
+			errs = append(errs, ctx.Err())
+			break
 		}
 
 		klog.ErrorS(err, "Retrying soon", "interval", interval, "attempt", i+1, "attempts", attempts)

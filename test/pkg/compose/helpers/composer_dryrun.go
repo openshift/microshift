@@ -1,6 +1,7 @@
 package helpers
 
 import (
+	"context"
 	"strings"
 	"time"
 
@@ -68,7 +69,7 @@ func (c *dryrunComposer) StartCompose(blueprint string, composeType string) (str
 	return "dummy-dry-run-id", nil
 }
 
-func (c *dryrunComposer) WaitForCompose(id, friendlyName string, timeout time.Duration) error {
+func (c *dryrunComposer) WaitForCompose(ctx context.Context, id, friendlyName string, timeout time.Duration) error {
 	klog.InfoS("DRYRUN: Waiting for compose", "id", id, "timeout", timeout)
 	time.Sleep(5 * time.Second)
 	klog.InfoS("DRYRUN: Waited for compose", "id", id, "timeout", timeout)

@@ -1,6 +1,7 @@
 package build
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -47,7 +48,7 @@ func (c *ContainerfileBuild) Prepare(opts *Opts) error {
 	return nil
 }
 
-func (c *ContainerfileBuild) Execute(opts *Opts) error {
+func (c *ContainerfileBuild) Execute(ctx context.Context, opts *Opts) error {
 	// podman's libpod doesn't give enough value but brings a lot of dependencies
 	// https://pkg.go.dev/github.com/containers/podman/libpod#Runtime.Build
 	// https://github.com/containers/buildah/tree/main/imagebuildah is an overkill - gives too much manual control.
@@ -83,7 +84,7 @@ func (c *ContainerfileBuild) Execute(opts *Opts) error {
 		}
 	}
 
-	err := opts.Podman.BuildAndSave(c.Name, c.Path, filepath.Join(opts.ArtifactsMainDir, "rpm-repos"), output)
+	err := opts.Podman.BuildAndSave(ctx, c.Name, c.Path, filepath.Join(opts.ArtifactsMainDir, "rpm-repos"), output)
 	if err != nil {
 		klog.ErrorS(err, "Failed to build Containerfile", "name", c.Name)
 		opts.Events.AddEvent(&testutil.FailedEvent{

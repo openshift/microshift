@@ -2,6 +2,7 @@ package testutil
 
 import (
 	"bytes"
+	"context"
 	"os/exec"
 	"regexp"
 	"strings"
@@ -11,7 +12,11 @@ import (
 )
 
 func RunCommand(c ...string) (string, string, error) {
-	cmd := exec.Command(c[0], c[1:]...)
+	return RunCommandWithContext(context.Background(), c...)
+}
+
+func RunCommandWithContext(ctx context.Context, c ...string) (string, string, error) {
+	cmd := exec.CommandContext(ctx, c[0], c[1:]...)
 
 	var outb, errb bytes.Buffer
 	cmd.Stdout = &outb

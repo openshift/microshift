@@ -1,6 +1,7 @@
 package build
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"io/fs"
@@ -183,7 +184,7 @@ func (b *BlueprintBuild) Prepare(opts *Opts) error {
 	return nil
 }
 
-func (b *BlueprintBuild) Execute(opts *Opts) error {
+func (b *BlueprintBuild) Execute(ctx context.Context, opts *Opts) error {
 	refExists, err := opts.Ostree.DoesRefExists(b.Name)
 	if err != nil {
 		return err
@@ -209,8 +210,7 @@ func (b *BlueprintBuild) Execute(opts *Opts) error {
 
 	} else {
 		aeg.Go(func() error {
-			// TODO: Retry
-			if err := testutil.Retry(3, func() error { return b.composeCommit(opts) }); err != nil {
+			if err := testutil.Retry(ctx, 3, func() error { return b.composeCommit(ctx, opts) }); err != nil {
 				klog.ErrorS(err, "Composing commit failed", "blueprint", b.Name)
 
 				opts.Events.AddEvent(&testutil.FailedEvent{
@@ -259,7 +259,7 @@ func (b *BlueprintBuild) Execute(opts *Opts) error {
 
 		} else {
 			aeg.Go(func() error {
-				if err := testutil.Retry(3, func() error { return b.composeInstaller(opts) }); err != nil {
+				if err := testutil.Retry(ctx, 3, func() error { return b.composeInstaller(ctx, opts) }); err != nil {
 					klog.ErrorS(err, "Composing installer failed", "blueprint", b.Name)
 					opts.Events.AddEvent(&testutil.FailedEvent{
 						Event: testutil.Event{
@@ -324,7 +324,7 @@ func (b *BlueprintBuild) Execute(opts *Opts) error {
 	return nil
 }
 
-func (b *BlueprintBuild) composeCommit(opts *Opts) error {
+func (b *BlueprintBuild) composeCommit(ctx context.Context, opts *Opts) error {
 	var commitID string
 	var err error
 
@@ -338,9 +338,13 @@ func (b *BlueprintBuild) composeCommit(opts *Opts) error {
 
 	friendlyName := fmt.Sprintf("%s_edge-commit_%s", b.Name, commitID)
 
-	waitErr := opts.Composer.WaitForCompose(commitID, friendlyName, 15*time.Minute)
+	waitErr := opts.Composer.WaitForCompose(ctx, commitID, friendlyName, 15*time.Minute)
 
-	// Get metadata and logs even if composing failed
+	// Get metadata and logs even if composing failed, unless context was cancelled
+	if errors.Is(waitErr, context.Canceled) {
+		return waitErr
+	}
+
 	metadataErr := opts.Composer.SaveComposeMetadata(commitID, friendlyName)
 	logsErr := opts.Composer.SaveComposeLogs(commitID, friendlyName)
 
@@ -362,7 +366,7 @@ func (b *BlueprintBuild) composeCommit(opts *Opts) error {
 	return nil
 }
 
-func (b *BlueprintBuild) composeInstaller(opts *Opts) error {
+func (b *BlueprintBuild) composeInstaller(ctx context.Context, opts *Opts) error {
 	start := time.Now()
 	klog.InfoS("Starting installer compose procedure", "blueprint", b.Name)
 
@@ -373,9 +377,13 @@ func (b *BlueprintBuild) composeInstaller(opts *Opts) error {
 
 	friendlyName := fmt.Sprintf("%s_image-installer_%s", b.Name, installerID)
 
-	waitErr := opts.Composer.WaitForCompose(installerID, friendlyName, 25*time.Minute)
+	waitErr := opts.Composer.WaitForCompose(ctx, installerID, friendlyName, 25*time.Minute)
 
-	// Get metadata and logs even if composing failed
+	// Get metadata and logs even if composing failed, unless context was cancelled
+	if errors.Is(waitErr, context.Canceled) {
+		return waitErr
+	}
+
 	metadataErr := opts.Composer.SaveComposeMetadata(installerID, friendlyName)
 	logsErr := opts.Composer.SaveComposeLogs(installerID, friendlyName)
 
