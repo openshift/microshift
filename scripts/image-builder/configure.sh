@@ -23,11 +23,9 @@ fi
      createrepo yum-utils selinux-policy-devel jq wget lorax rpm-build \
      containernetworking-plugins expect"
 
-VID=$(source /etc/os-release && echo "${VERSION_ID}")
-if { [[ "${VID}" == "9.4" ]] && grep -qE 'Red Hat Enterprise Linux.*Beta' /etc/redhat-release; }; then
-    # If the system 9.4 beta: switch 9.4 repos to use beta packages
-    # Otherwise (like non-beta 9.4): keep original contents of the file
-    sudo sed -i "s,dist/rhel9/9.4,beta/rhel9/9,g" /usr/share/osbuild-composer/repositories/rhel-9.4.json
+if grep -qE 'Red Hat Enterprise Linux.*Beta' /etc/redhat-release; then
+   VID=$(source /etc/os-release && echo "${VERSION_ID}")
+   sudo sed -i "s,dist/rhel9/${VID},beta/rhel9/9,g" /usr/share/osbuild-composer/repositories/rhel-${VID}.json
 fi
 
 sudo systemctl enable osbuild-composer.socket --now
