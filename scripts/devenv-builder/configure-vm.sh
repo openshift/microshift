@@ -123,11 +123,11 @@ if ${RHEL_SUBSCRIPTION}; then
 
     # Enable RHEL CDN repos to avoid problems with incomplete RHUI mirrors
     if ! ${RHEL_BETA_VERSION} ; then
-    OSVERSION=$(awk -F: '{print $5}' /etc/system-release-cpe)
-    sudo subscription-manager config --rhsm.manage_repos=1
-    sudo subscription-manager repos \
-        --enable "rhel-${OSVERSION}-for-$(uname -m)-baseos-rpms" \
-        --enable "rhel-${OSVERSION}-for-$(uname -m)-appstream-rpms"
+        OSVERSION=$(awk -F: '{print $5}' /etc/system-release-cpe)
+        sudo subscription-manager config --rhsm.manage_repos=1
+        sudo subscription-manager repos \
+            --enable "rhel-${OSVERSION}-for-$(uname -m)-baseos-rpms" \
+            --enable "rhel-${OSVERSION}-for-$(uname -m)-appstream-rpms"
     fi
 fi
 
