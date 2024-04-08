@@ -19,6 +19,7 @@ ${NS_OWNERSHIP_2}               ${EMPTY}
 ${ALTERNATIVE_HTTP_PORT}        8000
 ${ALTERNATIVE_HTTPS_PORT}       8001
 ${HOSTNAME}                     hello-microshift.cluster.local
+${FAKE_LISTEN_IP}               99.99.99.99
 ${ROUTER_MANAGED}               SEPARATOR=\n
 ...                             ---
 ...                             ingress:
@@ -51,7 +52,7 @@ ${ROUTER_LISTEN_INTERNAL}       SEPARATOR=\n
 ...                             ingress:
 ...                             \ \ status: Managed
 ...                             \ \ listenAddress:
-...                             \ \ - 10.44.0.0
+...                             \ \ - br-ex
 
 
 *** Test Cases ***
@@ -162,6 +163,23 @@ Router Listen In Internal Addresses Only
     ...    Restore Default MicroShift Config
     ...    Restart MicroShift
 
+Router Listen React To Dynamic IP Changes
+    [Documentation]    After configuring MicroShift to expose the router in br-ex NIC and starting, add
+    ...    another IP to the interface and verify the router is responding on it.
+    [Setup]    Run Keywords
+    ...    Save Default MicroShift Config
+    ...    Expose Router Internally
+    ...    Restart Router
+    ...    Add Fake IP To NIC
+
+    Wait Until Keyword Succeeds    10x    6s
+    ...    Internal Router Access Success    ${FAKE_LISTEN_IP}
+
+    [Teardown]    Run Keywords
+    ...    Remove Fake IP From NIC
+    ...    Restore Default MicroShift Config
+    ...    Restart MicroShift
+
 
 *** Keywords ***
 Configure Namespace Ownership Allowed
@@ -250,6 +268,24 @@ Internal Router Access Success
     ${stdout}    ${stderr}    ${rc}=    SSHLibrary.Execute Command
     ...    curl -I http://${router_ip}
     ...    sudo=False    return_rc=True    return_stderr=True    return_stdout=True
+    Log Many    ${stdout}    ${stderr}
+    Should Be Equal As Integers    0    ${rc}
     Should Match Regexp    ${stdout}    HTTP.*503
+
+Add Fake IP To NIC
+    [Documentation]    Add the given IP to the given NIC temporarily.
+    [Arguments]    ${ip_address}=${FAKE_LISTEN_IP}    ${nic_name}=br-ex
+    ${stdout}    ${stderr}    ${rc}=    SSHLibrary.Execute Command
+    ...    ip address add ${ip_address}/32 dev ${nic_name}
+    ...    sudo=True    return_rc=True    return_stderr=True    return_stdout=True
+    Log Many    ${stdout}    ${stderr}
+    Should Be Equal As Integers    0    ${rc}
+
+Remove Fake IP From NIC
+    [Documentation]    Remove the given IP from the given NIC.
+    [Arguments]    ${ip_address}=${FAKE_LISTEN_IP}    ${nic_name}=br-ex
+    ${stdout}    ${stderr}    ${rc}=    SSHLibrary.Execute Command
+    ...    ip address delete ${ip_address}/32 dev ${nic_name}
+    ...    sudo=True    return_rc=True    return_stderr=True    return_stdout=True
     Log Many    ${stdout}    ${stderr}
     Should Be Equal As Integers    0    ${rc}
