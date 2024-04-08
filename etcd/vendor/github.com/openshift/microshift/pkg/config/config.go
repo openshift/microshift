@@ -5,6 +5,7 @@ package config
 import (
 	"bytes"
 	"fmt"
+	"math"
 	"net"
 	"net/url"
 	"os"
@@ -14,6 +15,7 @@ import (
 
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/klog/v2"
+	"k8s.io/utils/ptr"
 
 	"github.com/apparentlymart/go-cidr/cidr"
 	"github.com/openshift/microshift/pkg/util"
@@ -117,8 +119,13 @@ func (c *Config) fillDefaults() error {
 		},
 	}
 	c.Ingress = IngressConfig{
+		Status: StatusManaged,
 		AdmissionPolicy: RouteAdmissionPolicy{
 			NamespaceOwnership: NamespaceOwnershipAllowed,
+		},
+		Ports: IngressPortsConfig{
+			Http:  ptr.To[int](80),
+			Https: ptr.To[int](443),
 		},
 	}
 
@@ -190,8 +197,20 @@ func (c *Config) incorporateUserSettings(u *Config) {
 		c.Manifests.KustomizePaths = u.Manifests.KustomizePaths
 	}
 
+	if len(u.Ingress.Status) != 0 {
+		c.Ingress.Status = u.Ingress.Status
+	}
+
 	if len(u.Ingress.AdmissionPolicy.NamespaceOwnership) != 0 {
 		c.Ingress.AdmissionPolicy.NamespaceOwnership = u.Ingress.AdmissionPolicy.NamespaceOwnership
+	}
+
+	if u.Ingress.Ports.Http != nil {
+		c.Ingress.Ports.Http = ptr.To[int](*u.Ingress.Ports.Http)
+	}
+
+	if u.Ingress.Ports.Https != nil {
+		c.Ingress.Ports.Https = ptr.To[int](*u.Ingress.Ports.Https)
 	}
 }
 
@@ -295,10 +314,23 @@ func (c *Config) validate() error {
 		}
 	}
 
+	switch c.Ingress.Status {
+	case StatusManaged, StatusRemoved:
+	default:
+		return fmt.Errorf("unsupported ingress.status value %v", c.Ingress.Status)
+	}
+
 	switch c.Ingress.AdmissionPolicy.NamespaceOwnership {
 	case NamespaceOwnershipAllowed, NamespaceOwnershipStrict:
 	default:
 		return fmt.Errorf("unsupported namespaceOwnership value %v", c.Ingress.AdmissionPolicy.NamespaceOwnership)
+	}
+
+	if c.Ingress.Ports.Http != nil && (*c.Ingress.Ports.Http < 1 || *c.Ingress.Ports.Http > math.MaxUint16) {
+		return fmt.Errorf("unsupported value %v for ingress.ports.http", *c.Ingress.Ports.Http)
+	}
+	if c.Ingress.Ports.Https != nil && (*c.Ingress.Ports.Https < 1 || *c.Ingress.Ports.Https > math.MaxUint16) {
+		return fmt.Errorf("unsupported value %v for ingress.ports.https", *c.Ingress.Ports.Https)
 	}
 
 	return nil
