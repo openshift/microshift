@@ -259,7 +259,7 @@ spec:
           path: "/etc/cni/net.d"
       - name: host-cni-bin
         hostPath:
-          path: "/opt/cni/bin"
+          path: "/run/cni/bin"
       - name: host-var-lib-cni-networks-ovn-kubernetes
         hostPath:
           path: /var/lib/cni/networks/ovn-k8s-cni-overlay
