@@ -23,7 +23,7 @@ fi
      createrepo yum-utils selinux-policy-devel jq wget lorax rpm-build \
      containernetworking-plugins expect"
 
-if grep -qE 'Red Hat Enterprise Linux.*Beta' /etc/redhat-release; then
+if grep -qE "Red Hat Enterprise Linux.*Beta" /etc/redhat-release; then
    VID=$(source /etc/os-release && echo "${VERSION_ID}")
    sudo sed -i "s,dist/rhel9/${VID},beta/rhel9/9,g" /usr/share/osbuild-composer/repositories/rhel-${VID}.json
 fi
