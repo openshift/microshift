@@ -25,7 +25,7 @@ fi
 
 if grep -qE "Red Hat Enterprise Linux.*Beta" /etc/redhat-release; then
    VID=$(source /etc/os-release && echo "${VERSION_ID}")
-   sudo sed -i "s,dist/rhel9/${VID},beta/rhel9/9,g" /usr/share/osbuild-composer/repositories/rhel-${VID}.json
+   sudo sed -i "s,dist/rhel9/${VID},beta/rhel9/9,g" /usr/share/osbuild-composer/repositories/rhel-"${VID}".json
 fi
 
 sudo systemctl enable osbuild-composer.socket --now
