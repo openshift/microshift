@@ -25,3 +25,18 @@ webhooks:
       - v1beta1
     sideEffects: None
     failurePolicy: Ignore
+  - name: volumegroupsnapshotclasses.groupsnapshot.storage.k8s.io
+    clientConfig:
+      service:
+        name: csi-snapshot-webhook
+        namespace: openshift-cluster-storage-operator
+        path: /volumegroupsnapshot
+    rules:
+      - operations: ["CREATE", "UPDATE"]
+        apiGroups: ["groupsnapshot.storage.k8s.io"]
+        apiVersions: ["v1alpha1"]
+        resources: ["volumegroupsnapshots", "volumegroupsnapshotcontents", "volumegroupsnapshotclasses"]
+    admissionReviewVersions:
+      - v1
+    sideEffects: None
+    failurePolicy: Ignore

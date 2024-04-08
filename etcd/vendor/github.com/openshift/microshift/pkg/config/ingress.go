@@ -1,14 +1,21 @@
 package config
 
 const (
-	NamespaceOwnershipStrict  = "Strict"
-	NamespaceOwnershipAllowed = "InterNamespaceAllowed"
+	NamespaceOwnershipStrict  NamespaceOwnershipEnum = "Strict"
+	NamespaceOwnershipAllowed NamespaceOwnershipEnum = "InterNamespaceAllowed"
+	StatusManaged             IngressStatusEnum      = "Managed"
+	StatusRemoved             IngressStatusEnum      = "Removed"
 )
 
 type NamespaceOwnershipEnum string
+type IngressStatusEnum string
 
 type IngressConfig struct {
+	// Default router status, can be Managed or Removed.
+	// +kubebuilder:default=Managed
+	Status             IngressStatusEnum    `json:"status"`
 	AdmissionPolicy    RouteAdmissionPolicy `json:"routeAdmissionPolicy"`
+	Ports              IngressPortsConfig   `json:"ports"`
 	ServingCertificate []byte               `json:"-"`
 	ServingKey         []byte               `json:"-"`
 }
@@ -26,4 +33,13 @@ type RouteAdmissionPolicy struct {
 	// If empty, the default is InterNamespaceAllowed.
 	// +kubebuilder:default="InterNamespaceAllowed"
 	NamespaceOwnership NamespaceOwnershipEnum `json:"namespaceOwnership"`
+}
+
+type IngressPortsConfig struct {
+	// Default router http port. Must be in range 1-65535.
+	// +kubebuilder:default=80
+	Http *int `json:"http"`
+	// Default router https port. Must be in range 1-65535.
+	// +kubebuilder:default=443
+	Https *int `json:"https"`
 }
