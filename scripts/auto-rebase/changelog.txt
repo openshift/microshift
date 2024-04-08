@@ -1,0 +1,93 @@
+- cluster-network-operator embedded-component 6480348212445eb74ca2dafc61503f4942a87bed to a62442bbb2ee777e3715f57af6dd87f333e0e20a
+  - 7d1cadf 2024-03-15T17:48:54+01:00 Fully disable network-node-identity on ROKS
+
+- csi-external-snapshotter embedded-component 50fa049ccaa48d7f7dcb165fb6e20c185a0cbd13 to 4f2955c7c90cd150f9dfae782148d0fa8eba7342
+  - c8162b6 2024-04-02T14:31:10-06:00 UPSTREAM: 922: add cmdline args to enable group snapshot webhooks
+
+- kubernetes embedded-component f1b5f6c8166add33d0d5b0964e7e4482d11b1a17 to 6b4a380c8104d3b8f48443544548193cccb32b72
+  - f82e7dbb4 2024-04-01T15:05:04-03:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - b0a30c246 2024-04-01T14:34:49-03:00 UPSTREAM: <drop>: manually resolve conflicts
+  - de36ba911 2024-03-28T14:55:37+01:00 UPSTREAM: <drop>: Pin x/net to the private fork
+  - fc11ff34c 2024-03-15T00:00:00+00:00 Release commit for Kubernetes v1.28.8
+  - e55ff77df 2024-03-06T13:07:31-08:00 remove --v arg from kubetest2-tester-ginkgo test args
+  - 1107f1b80 2024-03-06T13:07:31-08:00 ci: bump kind to latest for kms jobs
+  - 023168e25 2024-03-06T13:12:09-05:00 [go] Bump images, dependencies and versions to go 1.21.8 / distroless-iptables to v0.4.6
+  - 7889bca8b 2024-03-06T10:47:48-05:00 [CVE-2024-24786] Bump github.com/golang/protobuf v1.5.4, google.golang.org/protobuf v1.33.0
+  - 39bb9e94e 2024-03-06T14:49:24+01:00 keep existing PDB conditions when updating status
+  - d75625a52 2024-03-05T19:58:35+09:00 Validate restartable init container state transition
+  - 4fbf9a22a 2024-03-05T07:27:12+00:00 Test that separation of streams work by using progress notifies
+  - 1792c73a2 2024-03-05T07:24:58+00:00 Prevent watch cache starvation, by moving its watch to separate RPC and add a SeparateCacheWatchRPC feature flag to disable this behavior
+  - d216da45c 2024-03-01T11:17:54+08:00 fix UT failure TestPrintIPAddressList
+  - bb365b8e6 2024-02-26T13:59:31-05:00 Fix race condition between external-resizer and kubelet
+  - 728325849 2024-02-19T10:51:44+01:00 codegen: don't nuke files if only verifying
+  - 3be54edf8 2024-02-15T09:38:32+01:00 dra: increase timeout in setupFakeDRADriverGRPCServer to prevent tests to flake.
+  - d077f4a7e 2024-02-15T11:20:00+09:00 e2e_node: replace `registry.k8s.io/stress:v1` with agnhost
+  - 6e552d8d2 2024-02-15T11:19:55+09:00 promote agnhost to v2.47
+  - 00f140f6e 2024-02-14T11:03:40+00:00 Update CHANGELOG/CHANGELOG-1.28.md for v1.28.7
+  - a3e89669b 2024-02-12T09:50:04-08:00 fixing issue with GetCPUUsageNanoCores on Windows
+  - f483e4106 2024-02-12T17:23:11+01:00 Fix cleanup of file subpaths
+  - e51a3130d 2024-02-12T17:43:38+05:30 etcd: Update to version 3.5.12
+  - 04a499fd1 2024-02-12T17:43:12+05:30 build etcd image v3.5.12
+
+- machine-config-operator embedded-component 36049f9a1cc1b2f9b8c5edee9165fb4307313ec0 to 3b90c34b13f52ca89e9a3fecc9ac827eff9886d1
+  - a1d14210 2024-04-01T09:34:26-05:00 kubelet: restorecon necessary files on kubelet's prestart
+
+- operator-framework-olm embedded-component 59aa935ebbe6948921ea3292603cbdce898e0091 to 0a14440d662de108769cd3f3cf9cb5a47559b5cd
+  - 44a81b0f 2024-04-03T07:39:44-04:00 OCPBUGS-31438: Correctly detect catalog image ID for extractContent catalog pods (#3194)
+
+- csi-external-snapshotter image-amd64 50fa049ccaa48d7f7dcb165fb6e20c185a0cbd13 to 4f2955c7c90cd150f9dfae782148d0fa8eba7342
+  - c8162b6 2024-04-02T14:31:10-06:00 UPSTREAM: 922: add cmdline args to enable group snapshot webhooks
+
+- csi-external-snapshotter image-amd64 50fa049ccaa48d7f7dcb165fb6e20c185a0cbd13 to 4f2955c7c90cd150f9dfae782148d0fa8eba7342
+  - c8162b6 2024-04-02T14:31:10-06:00 UPSTREAM: 922: add cmdline args to enable group snapshot webhooks
+
+- csi-external-snapshotter image-amd64 50fa049ccaa48d7f7dcb165fb6e20c185a0cbd13 to 4f2955c7c90cd150f9dfae782148d0fa8eba7342
+  - c8162b6 2024-04-02T14:31:10-06:00 UPSTREAM: 922: add cmdline args to enable group snapshot webhooks
+
+- ovn-kubernetes image-amd64 42b1cc427538a736f8c056171b4de7e6c6a366fb to 3bdcbd4e7cf57237c8c59b277fc2d8de6a932f68
+  - 8ad99d7 2024-03-28T07:50:16+00:00 Node IP handler: do not exclude keepalived vips
+  - 6699b80 2024-03-28T07:50:16+00:00 EIP multi NIC: in LGW mode, skip IP rules when dst is node IP
+  - 831040d 2024-03-28T07:50:16+00:00 Rename non-OVN eips to secondary host eips
+  - f5bf7c5 2024-03-28T07:50:16+00:00 EIP multi NIC: do not remove node IP SNAT
+  - 8d0a2b3 2024-03-28T07:50:16+00:00 EIP E2E: add multi NIC test where EIP IPs hosted on same inf
+  - a8ffbc5 2024-03-28T07:50:15+00:00 Refactor egress IP controller update 'config' to match current 'state'
+  - e618cf3 2024-03-28T07:50:15+00:00 EIP E2Es: add multi NIC test cases for enable/disable egress
+  - ced7a1c 2024-03-28T07:50:15+00:00 EIP multi NIC: copy routes from main routing table
+  - 672f0a6 2024-03-28T07:50:15+00:00 EIP multi NIC: start dependent controllers before repair
+  - 747ba49 2024-03-28T07:50:15+00:00 EIP multi NIC: filter only global unicast addresses from host-cidrs
+  - bb62683 2024-03-28T07:50:14+00:00 EIP multi NIC: Add IPV6 support
+  - b93a23b 2024-03-28T07:48:30+00:00 EIP multi NIC: continue repairing even if an egress IP is not on link
+  - 092ec82 2024-03-28T07:48:30+00:00 EIP multi NIC: rename struct field
+  - efe7649 2024-03-28T07:48:30+00:00 Refactor net util to allow passing a netlink.Link obj instead of name
+  - d58f743 2024-03-28T07:48:30+00:00 improve iptables manager code quality and add IPv6 tests
+  - 669dde9 2024-03-28T07:48:30+00:00 Fix how detect any network following lib change
+  - dc57be9 2024-03-28T07:48:30+00:00 Refactor route manager and fix panic
+  - eda6ec5 2024-03-28T07:48:30+00:00 Upgrade netlink lib to consume default route fix
+  - d1ce354 2024-03-28T07:48:14+00:00 Add netlink subscriber for link manager
+  - f1b13a7 2024-03-28T07:17:42+00:00 Exposes link manager to track MAC address changes
+
+- kubernetes image-amd64 f1b5f6c8166add33d0d5b0964e7e4482d11b1a17 to 6b4a380c8104d3b8f48443544548193cccb32b72
+  - f82e7dbb4 2024-04-01T15:05:04-03:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - b0a30c246 2024-04-01T14:34:49-03:00 UPSTREAM: <drop>: manually resolve conflicts
+  - de36ba911 2024-03-28T14:55:37+01:00 UPSTREAM: <drop>: Pin x/net to the private fork
+  - fc11ff34c 2024-03-15T00:00:00+00:00 Release commit for Kubernetes v1.28.8
+  - e55ff77df 2024-03-06T13:07:31-08:00 remove --v arg from kubetest2-tester-ginkgo test args
+  - 1107f1b80 2024-03-06T13:07:31-08:00 ci: bump kind to latest for kms jobs
+  - 023168e25 2024-03-06T13:12:09-05:00 [go] Bump images, dependencies and versions to go 1.21.8 / distroless-iptables to v0.4.6
+  - 7889bca8b 2024-03-06T10:47:48-05:00 [CVE-2024-24786] Bump github.com/golang/protobuf v1.5.4, google.golang.org/protobuf v1.33.0
+  - 39bb9e94e 2024-03-06T14:49:24+01:00 keep existing PDB conditions when updating status
+  - d75625a52 2024-03-05T19:58:35+09:00 Validate restartable init container state transition
+  - 4fbf9a22a 2024-03-05T07:27:12+00:00 Test that separation of streams work by using progress notifies
+  - 1792c73a2 2024-03-05T07:24:58+00:00 Prevent watch cache starvation, by moving its watch to separate RPC and add a SeparateCacheWatchRPC feature flag to disable this behavior
+  - d216da45c 2024-03-01T11:17:54+08:00 fix UT failure TestPrintIPAddressList
+  - bb365b8e6 2024-02-26T13:59:31-05:00 Fix race condition between external-resizer and kubelet
+  - 728325849 2024-02-19T10:51:44+01:00 codegen: don't nuke files if only verifying
+  - 3be54edf8 2024-02-15T09:38:32+01:00 dra: increase timeout in setupFakeDRADriverGRPCServer to prevent tests to flake.
+  - d077f4a7e 2024-02-15T11:20:00+09:00 e2e_node: replace `registry.k8s.io/stress:v1` with agnhost
+  - 6e552d8d2 2024-02-15T11:19:55+09:00 promote agnhost to v2.47
+  - 00f140f6e 2024-02-14T11:03:40+00:00 Update CHANGELOG/CHANGELOG-1.28.md for v1.28.7
+  - a3e89669b 2024-02-12T09:50:04-08:00 fixing issue with GetCPUUsageNanoCores on Windows
+  - f483e4106 2024-02-12T17:23:11+01:00 Fix cleanup of file subpaths
+  - e51a3130d 2024-02-12T17:43:38+05:30 etcd: Update to version 3.5.12
+  - 04a499fd1 2024-02-12T17:43:12+05:30 build etcd image v3.5.12
+
