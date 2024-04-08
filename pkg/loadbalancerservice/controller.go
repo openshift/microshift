@@ -4,10 +4,10 @@ import (
 	"context"
 	"fmt"
 	"net"
-	"slices"
 	"time"
 
 	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/informers"
 	"k8s.io/client-go/kubernetes"
@@ -20,15 +20,10 @@ import (
 
 	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/servicemanager"
-	"github.com/vishvananda/netlink"
 )
 
 const (
-	defaultInformerResyncPeriod         = 10 * time.Minute
-	defaultRouterServiceName            = "router-default"
-	defaultRouterServiceNamespace       = "openshift-ingress"
-	defaultRouterServiceAnnotationKey   = "ingresscontroller.operator.openshift.io/owning-ingresscontroller"
-	defaultRouterServiceAnnotationValue = "default"
+	defaultInformerResyncPeriod = 10 * time.Minute
 )
 
 type LoadbalancerServiceController struct {
@@ -127,6 +122,8 @@ func (c *LoadbalancerServiceController) Run(ctx context.Context, ready chan<- st
 
 	go wait.Until(c.runWorker, time.Second, stopCh)
 
+	go defaultRouterWatch(c.IPAddresses, c.NICNames, c.updateDefaultRouterServiceStatus, stopCh)
+
 	close(ready)
 
 	<-ctx.Done()
@@ -176,7 +173,7 @@ func (c *LoadbalancerServiceController) updateServiceStatus(key string) error {
 		klog.Infof("Service %s does not exist anymore", key)
 	} else {
 		svc := obj.(*corev1.Service)
-		if svc.Spec.Type != corev1.ServiceTypeLoadBalancer || svc.Spec.LoadBalancerClass != nil {
+		if svc.Spec.Type != corev1.ServiceTypeLoadBalancer || svc.Spec.LoadBalancerClass != nil || isDefaultRouterService(svc) {
 			return nil
 		}
 		klog.Infof("Process service %s/%s", svc.Namespace, svc.Name)
@@ -215,27 +212,9 @@ func (c *LoadbalancerServiceController) getNewStatus(svc *corev1.Service) (*core
 		}
 	}
 
-	// The default router gets special treatment, as it takes some of the values configured in MicroShift
-	// to determine in which IPs the LoadBalancer service will be listening. In order to to a fine grained
-	// filtering of the service, look for the name, namespace and specific annotation of that service.
-	if value, ok := svc.Labels[defaultRouterServiceAnnotationKey]; ok &&
-		value == defaultRouterServiceAnnotationValue &&
-		svc.Name == defaultRouterServiceName &&
-		svc.Namespace == defaultRouterServiceNamespace {
-		ips, err := c.defaultRouterListenAddresses()
-		if err != nil {
-			return newStatus, fmt.Errorf("unable to update router IP list: %v", err)
-		}
-		for _, ip := range ips {
-			newStatus.Ingress = append(newStatus.Ingress, corev1.LoadBalancerIngress{
-				IP: ip,
-			})
-		}
-	} else {
-		newStatus.Ingress = append(newStatus.Ingress, corev1.LoadBalancerIngress{
-			IP: c.NodeIP,
-		})
-	}
+	newStatus.Ingress = append(newStatus.Ingress, corev1.LoadBalancerIngress{
+		IP: c.NodeIP,
+	})
 	return newStatus, nil
 }
 
@@ -250,67 +229,24 @@ func (c *LoadbalancerServiceController) patchStatus(svc *corev1.Service, newStat
 	return err
 }
 
-func (c *LoadbalancerServiceController) defaultRouterListenAddresses() ([]string, error) {
-	allowedAddresses, err := config.AllowedListeningIPAddresses()
-	if err != nil {
-		return nil, err
-	}
-
-	allowedNicNames, err := config.AllowedNICNames()
-	if err != nil {
-		return nil, err
-	}
-
-	ipList := make([]string, 0)
-
-	for _, ip := range c.IPAddresses {
-		if !slices.Contains(allowedAddresses, ip) {
-			klog.Warningf("IP address %v not found in the host. Skipping", ip)
-			continue
-		}
-		ipList = append(ipList, ip)
-	}
-
-	for _, nicName := range c.NICNames {
-		if !slices.Contains(allowedNicNames, nicName) {
-			klog.Warningf("NIC %v not found in the host. Skipping", nicName)
-			continue
-		}
-		nicAddresses, err := ipAddressesFromNIC(nicName)
+func (c *LoadbalancerServiceController) updateDefaultRouterServiceStatus(ips []string) error {
+	return wait.PollUntilContextTimeout(context.Background(), time.Second, time.Minute, true, func(ctx context.Context) (bool, error) {
+		svc, err := c.client.CoreV1().Services(defaultRouterServiceNamespace).Get(ctx, defaultRouterServiceName, metav1.GetOptions{})
 		if err != nil {
-			return nil, err
+			return false, err
 		}
-		for _, nicAddress := range nicAddresses {
-			if !slices.Contains(allowedAddresses, nicAddress) {
-				klog.Warningf("IP address %v from NIC %v is not allowed. Skipping", nicAddress, nicName)
-				continue
-			}
-			ipList = append(ipList, nicAddress)
+		klog.Infof("updating default router service status: %v", ips)
+		newStatus := &corev1.LoadBalancerStatus{}
+		for _, ip := range ips {
+			newStatus.Ingress = append(newStatus.Ingress, corev1.LoadBalancerIngress{
+				IP: ip,
+			})
 		}
-	}
-
-	slices.Sort(ipList)
-	ipList = slices.Compact(ipList)
-
-	return ipList, nil
-}
-
-func ipAddressesFromNIC(name string) ([]string, error) {
-	link, err := netlink.LinkByName(name)
-	if err != nil {
-		return nil, err
-	}
-
-	addrList, err := netlink.AddrList(link, netlink.FAMILY_ALL)
-	if err != nil {
-		return nil, err
-	}
-
-	ipList := make([]string, 0)
-
-	for _, addr := range addrList {
-		ipList = append(ipList, addr.IP.String())
-	}
-
-	return ipList, nil
+		err = c.patchStatus(svc, newStatus)
+		if err != nil {
+			klog.Warningf("unable to patch default router service: %v", err)
+			return false, nil
+		}
+		return true, nil
+	})
 }
