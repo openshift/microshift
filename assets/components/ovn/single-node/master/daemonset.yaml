@@ -470,7 +470,7 @@ spec:
           path: "/etc/cni/net.d"
       - name: host-cni-bin
         hostPath:
-          path: "/opt/cni/bin"
+          path: "/run/cni/bin"
 
       - name: kubeconfig
         hostPath:

@@ -40,7 +40,7 @@ spec:
             /entrypoint/cnibincopy.sh;
         volumeMounts:
         - name: cnibin
-          mountPath: /host/opt/cni/bin
+          mountPath: /host/run/cni/bin
         - mountPath: /entrypoint
           name: cni-binary-copy
         env:
@@ -70,6 +70,7 @@ spec:
             echo "$(date --iso-8601=seconds) /etc/cni/net.d/10-ovn-kubernetes.conf exists - proceeding";
             exec /usr/src/multus-cni/bin/thin_entrypoint
             --multus-conf-file=auto
+            --cni-bin-dir=/host/run/cni/bin
             --multus-autoconfig-dir=/host/etc/cni/net.d
             --readiness-indicator-file=/etc/cni/net.d/10-ovn-kubernetes.conf
             --cleanup-config-on-exit=true
@@ -93,16 +94,14 @@ spec:
               - "-c"
               - >
                 rm -vf /host/etc/cni/net.d/00-multus.conf* > /proc/1/fd/1 2>&1;
-                rm -vf /host/opt/cni/bin/multus > /proc/1/fd/1 2>&1;
                 rm -vfr /host/etc/cni/net.d/multus.d > /proc/1/fd/1 2>&1;
-                rm -vf /host/opt/cni/bin/{bridge,ipvlan,macvlan,static,dhcp,host-local} > /proc/1/fd/1 2>&1;
         volumeMounts:
         - mountPath: /entrypoint
           name: cni-binary-copy
         - name: system-cni-dir
           mountPath: /host/etc/cni/net.d
         - name: cnibin
-          mountPath: /host/opt/cni/bin
+          mountPath: /host/run/cni/bin
         env:
         - name: DEFAULT_SOURCE_DIRECTORY
           # TODO: Change when microshift-specific multus image is ready
@@ -117,7 +116,12 @@ spec:
             type: Directory
         - name: cnibin
           hostPath:
-            path: "/opt/cni/bin"
+            path: "/run/cni/bin"
+            type: DirectoryOrCreate
+            defaultMode: 0766
+        - name: run
+          hostPath:
+            path: "/run"
             type: Directory
         - name: cni-binary-copy
           configMap:

@@ -235,7 +235,7 @@ OVN Data Should Not Exist
     Verify Remote Directory Does Not Exist With Sudo    /var/run/ovn
     Verify Remote Directory Does Not Exist With Sudo    /var/run/ovn-kubernetes
     Verify Remote File Does Not Exist With Sudo    /etc/cni/net.d/10-ovn-kubernetes.conf
-    Verify Remote File Does Not Exist With Sudo    /opt/cni/bin/ovn-k8s-cni-overlay
+    Verify Remote File Does Not Exist With Sudo    /run/cni/bin/ovn-k8s-cni-overlay
 
 OVN Data Should Exist
     [Documentation]    Make sure that OVN data files and directories exist
@@ -244,7 +244,7 @@ OVN Data Should Exist
     Verify Remote Directory Exists With Sudo    /var/run/ovn
     Verify Remote Directory Exists With Sudo    /var/run/ovn-kubernetes
     Verify Remote File Exists With Sudo    /etc/cni/net.d/10-ovn-kubernetes.conf
-    Verify Remote File Exists With Sudo    /opt/cni/bin/ovn-k8s-cni-overlay
+    Verify Remote File Exists With Sudo    /run/cni/bin/ovn-k8s-cni-overlay
 
 OVN Internal Bridge Should Not Exist
     [Documentation]    Make sure that OVN internal bridge devices do not exist

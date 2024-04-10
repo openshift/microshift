@@ -124,7 +124,7 @@ function clean_data() {
         rm -rf /var/run/ovn
         rm -rf /var/run/ovn-kubernetes
         rm -f /etc/cni/net.d/10-ovn-kubernetes.conf
-        rm -f /opt/cni/bin/ovn-k8s-cni-overlay
+        rm -f /run/cni/bin/ovn-k8s-cni-overlay
     fi
 }
 

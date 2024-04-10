@@ -28,15 +28,11 @@ gpgcheck=0\n\
 skip_if_unavailable=0\n" > "/etc/yum.repos.d/openshift-mirror-beta.repo"
 
 # Implement workarounds necessary for the successful MicroShift operation
-# - OVN-k copies an executable to /opt/cni/bin directory on the host, which is
-#   read-only on bootc images. Create the /opt/cni/bin -> /var/opt/cni/bin
-#   symbolic link as a workaround.
 # - The /var/run directory must be a symbolic link to /run, which is not
 #   the case in bootc images. This cases problems with services like DBus
 #   and NetworkManager. DBus creates its socket in /run/dbus directory, which
 #   is accessed by NetworkManager at /var/run/dbus.
-RUN mkdir -p /opt/cni && mkdir -p /var/opt/cni/bin && ln -s /var/opt/cni/bin /opt/cni/ ; \
-    [ ! -L /var/run ] && rm -rf /var/run && ln -s /run /var/
+RUN [ ! -L /var/run ] && rm -rf /var/run && ln -s /run /var/
 
 # Install MicroShift, few helper utilities and cleanup
 RUN dnf install -y vi firewalld microshift && \

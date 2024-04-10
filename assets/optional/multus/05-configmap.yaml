@@ -14,7 +14,7 @@ data:
     {
         echo "$(date --iso-8601=seconds) [cnibincopy] ${1}"
     }
-    DESTINATION_DIRECTORY=/host/opt/cni/bin/
+    DESTINATION_DIRECTORY=/host/run/cni/bin/
     # Perform validation of usage
     if [ -z "$DEFAULT_SOURCE_DIRECTORY" ]; then
       log "FATAL ERROR: You must set env variables: DEFAULT_SOURCE_DIRECTORY"
