@@ -411,9 +411,9 @@ def tag_release(tag, sha, buildtime):
     env.update(os.environ)
     timestamp = buildtime.strftime('%Y-%m-%d %H:%M')
     env['GIT_COMMITTER_DATE'] = timestamp
-    print(f'GIT_COMMITTER_DATE={timestamp} git tag -s {tag} {sha}')
+    print(f'GIT_COMMITTER_DATE={timestamp} git tag {tag} {sha}')
     subprocess.run(
-        ['git', 'tag', '-s', '-m', tag, tag, sha],
+        ['git', 'tag', '-m', tag, tag, sha],
         env=env,
         check=True,
     )
