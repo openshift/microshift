@@ -212,6 +212,10 @@ func (c *Config) incorporateUserSettings(u *Config) {
 	if u.Ingress.Ports.Https != nil {
 		c.Ingress.Ports.Https = ptr.To[int](*u.Ingress.Ports.Https)
 	}
+
+	if len(u.ApiServer.NamedCertificates) != 0 {
+		c.ApiServer.NamedCertificates = u.ApiServer.NamedCertificates
+	}
 }
 
 // updateComputedValues examins the existing settings and converts any

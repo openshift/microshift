@@ -14,12 +14,40 @@
     "apiServer": {
       "type": "object",
       "required": [
+        "namedCertificates",
         "subjectAltNames"
       ],
       "properties": {
         "advertiseAddress": {
           "description": "Kube apiserver advertise address to work around the certificates issue when requiring external access using the node IP. This will turn into the IP configured in the endpoint slice for kubernetes service. Must be a reachable IP from pods. Defaults to service network CIDR first address.",
           "type": "string"
+        },
+        "namedCertificates": {
+          "description": "List of custom certificates used to secure requests to specific host names",
+          "type": "array",
+          "items": {
+            "description": "NamedCertificateEntry provides certificate details",
+            "type": "object",
+            "required": [
+              "certPath",
+              "keyPath",
+              "names"
+            ],
+            "properties": {
+              "certPath": {
+                "type": "string"
+              },
+              "keyPath": {
+                "type": "string"
+              },
+              "names": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
         },
         "subjectAltNames": {
           "description": "SubjectAltNames added to API server certs",

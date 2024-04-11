@@ -105,3 +105,11 @@ Verify Remote File Does Not Exist With Sudo
     ...    test -f ${remote_file}
     ...    sudo=True    return_rc=True    return_stdout=True    return_stderr=True
     Should Not Be Equal As Integers    0    ${rc}
+
+Create Random Temp Directory
+    [Documentation]    Create a random temp file
+    [Arguments]    ${root_path}=/tmp/certs
+    ${rand}=    Generate Random String
+    ${path}=    Join Path    ${root_path}    ${rand}
+    Create Directory    ${path}
+    RETURN    ${path}

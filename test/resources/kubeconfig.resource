@@ -38,6 +38,14 @@ Setup Kubeconfig
     ${path}=    Create Random Temp File    ${kubeconfig}
     Set Suite Variable    \${KUBECONFIG}    ${path}
 
+Setup Custom Kubeconfig
+    [Documentation]    Get the kubeconfig file from the path,
+    ...    and export it as $KUBECONFIG variable.
+    [Arguments]    ${custom_path}
+    ${kubeconfig}=    Get Kubeconfig    ${custom_path}
+    ${path}=    Create Random Temp File    ${kubeconfig}
+    Set Suite Variable    \${KUBECONFIG}    ${path}
+
 Remove Kubeconfig
     [Documentation]    Remove kubeconfig ${KUBECONFIG} file.
     Remove File    ${KUBECONFIG}

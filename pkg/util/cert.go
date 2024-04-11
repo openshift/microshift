@@ -21,9 +21,12 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
+	tcpnet "net"
 	"os"
+	"strings"
 
 	"k8s.io/client-go/util/keyutil"
+	"k8s.io/klog/v2"
 )
 
 const keySize = 2048
@@ -103,4 +106,85 @@ func getKeyPair(pubKeyPath, privKeyPath string) (*rsa.PrivateKey, error) {
 	}
 
 	return rsaPrivKey, nil
+}
+
+func IsCertAllowed(advertiseAddress string, clusterNetwork []string, serviceNetwork []string, certPath string, extraNames []string) (bool, error) {
+	certsSNIs, err := GetSNIsFromCert(certPath, extraNames)
+	if err != nil {
+		return false, err
+	}
+
+	// iterate over the Cert SNIs and make sure that all are allowed
+	for _, dns := range certsSNIs {
+		// check if SNI is allowed (non local or wildcard)
+		if !VerifyAllowedSNI(advertiseAddress, clusterNetwork, serviceNetwork, dns) {
+			klog.Infof("Certificate SNI is not allowed for %s", dns)
+			return false, nil
+		}
+	}
+
+	return true, nil
+}
+
+// GetSNIsFromCert - get list of unique SNIs from certificate
+func GetSNIsFromCert(certPath string, extraNames []string) ([]string, error) {
+	pemByte, err := os.ReadFile(certPath)
+	if err != nil {
+		return nil, err
+	}
+	block, _ := pem.Decode(pemByte)
+	if block == nil {
+		return nil, fmt.Errorf("failed to decode the certificate %s", certPath)
+	}
+
+	cert, err := x509.ParseCertificate(block.Bytes)
+	if err != nil {
+		return nil, err
+	}
+
+	// create one list to hold all the SNIs
+	certsSNIs := append(cert.DNSNames, cert.Subject.CommonName)
+
+	// add  Certificate SAN ipaddress
+	for _, ipaddress := range cert.IPAddresses {
+		certsSNIs = append(certsSNIs, ipaddress.String())
+	}
+	// add Configuration names
+	if len(extraNames) > 0 {
+		certsSNIs = append(certsSNIs, extraNames...)
+	}
+	return certsSNIs, nil
+}
+
+// IsWildcardDNS - check if DNS is a wildcard
+func IsWildcardDNS(val string) bool {
+	return strings.HasPrefix(val, "*.")
+}
+
+// verifyAllowedSNI checks if sni is allowed
+// return bool: true, false
+func VerifyAllowedSNI(advertiseAddress string, clusterNetwork []string, serviceNetwork []string, sni string) bool {
+	forbiddenSuffixValues := []string{"svc.cluster.local", "openshift", "openshift.default", "openshift.default.svc", "kubernetes", "kubernetes.default", "kubernetes.default.svc"}
+
+	ipAddress := tcpnet.ParseIP(sni)
+	//check if IPAddress or DNS record
+	if ipAddress == nil {
+		if sni == "localhost" {
+			return false
+		}
+
+		for _, val := range forbiddenSuffixValues {
+			if strings.HasSuffix(sni, val) {
+				return false
+			}
+		}
+	} else {
+		if ContainIPANetwork(ipAddress, clusterNetwork) ||
+			ContainIPANetwork(ipAddress, serviceNetwork) ||
+			ContainIPANetwork(ipAddress, []string{"127.0.0.1/8", "169.254.169.2/29"}) ||
+			advertiseAddress == ipAddress.String() {
+			return false
+		}
+	}
+	return true
 }
