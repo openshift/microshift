@@ -12,6 +12,7 @@ ${HELLO_USHIFT}     ./assets/hello-microshift.yaml
 ${LB_PORT}          5678
 ${NP_PORT}          32222
 ${HTTP_PORT}        80
+${HTTPS_PORT}       443
 
 
 *** Keywords ***
