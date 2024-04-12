@@ -23,6 +23,8 @@ CONTAINER_LIST = common.get_env_var('CONTAINER_LIST')
 LOCAL_REPO = common.get_env_var('LOCAL_REPO')
 BASE_REPO = common.get_env_var('BASE_REPO')
 NEXT_REPO = common.get_env_var('NEXT_REPO')
+HOME_DIR = common.get_env_var("HOME")
+PULL_SECRET = common.get_env_var('PULL_SECRET', f"{HOME_DIR}/.pull-secret.json")
 
 
 def find_latest_rpm(repo_path, version=""):
@@ -40,7 +42,7 @@ def is_rhocp_available(ver):
 
     try:
         # Run the dnf command to check for cri-o in the specified repository
-        repo_info = common.run_command_in_shell(f"sudo dnf -v repository-packages {repository} info cri-o")
+        repo_info = common.run_command_in_shell(f"sudo dnf repository-packages {repository} info cri-o")
         common.print_msg(repo_info)
         return True
     except Exception:
@@ -157,9 +159,24 @@ def process_containerfiles(groupdir, dry_run=False):
                 continue
 
         common.print_msg(f"Processing {cf_path}")
-        common.run_command(
-            ["podman", "build", "-t", cf_outname, "-f", cf_path,
-                os.path.join(IMAGEDIR, "rpm-repos")], dry_run)
+        # Compose the container build arguments
+        build_args = [
+            "podman", "build",
+            "--authfile", PULL_SECRET,
+            "-t", cf_outname, "-f", cf_path
+        ]
+        # Share the registration info with the container when running on RHEL
+        if os.path.exists("/etc/rhsm"):
+            build_args += [
+                "-v", "/etc/rhsm:/etc/rhsm:ro",
+                "-v", "/etc/pki/entitlement:/etc/pki/entitlement:ro",
+                "-v", "/etc/pki/ca-trust/extracted:/etc/pki/ca-trust/extracted:ro",
+            ]
+        build_args += [os.path.join(IMAGEDIR, "rpm-repos")]
+        # Run the container build command
+        common.run_command(build_args, dry_run)
+
+        # Run the container export command
         if os.path.exists(cf_outdir):
             shutil.rmtree(cf_outdir)
         common.run_command(["podman", "save", "--format", "oci-dir", "-o", cf_outdir, cf_outname], dry_run)
