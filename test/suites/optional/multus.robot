@@ -5,7 +5,7 @@ Resource            ../../resources/common.resource
 Resource            ../../resources/multus.resource
 Resource            ../../resources/microshift-process.resource
 
-Suite Setup         Setup Suite With Namespace
+Suite Setup         Setup
 Suite Teardown      Teardown Suite With Namespace
 
 
@@ -25,10 +25,12 @@ ${PE_BRIDGE_IP}             10.10.1.10/24
 ${MACVLAN_NAD_YAML}         ./assets/multus/macvlan-nad.yaml
 ${MACVLAN_POD_YAML}         ./assets/multus/macvlan-pod.yaml
 ${MACVLAN_POD_NAME}         test-macvlan
+${MACVLAN_MASTER}           ${EMPTY}
 
 ${IPVLAN_NAD_YAML}          ./assets/multus/ipvlan-nad.yaml
 ${IPVLAN_POD_YAML}          ./assets/multus/ipvlan-pod.yaml
 ${IPVLAN_POD_NAME}          test-ipvlan
+${IPVLAN_MASTER}            ${EMPTY}
 
 
 *** Test Cases ***
@@ -80,7 +82,7 @@ Macvlan
     [Documentation]    Tests if Pod with macvlan plugin interface is accessible
     ...    from outside the MicroShift host.
     [Setup]    Run Keywords
-    ...    Create NAD And Pod    ${MACVLAN_NAD_YAML}    ${MACVLAN_POD_YAML}
+    ...    Template And Create NAD And Pod    ${MACVLAN_NAD_YAML}    ${MACVLAN_POD_YAML}
     ...    AND
     ...    Named Pod Should Be Ready    ${MACVLAN_POD_NAME}    ${NAMESPACE}
 
@@ -92,7 +94,7 @@ Ipvlan
     [Documentation]    Tests if Pod with ipvlan plugin interface is accessible
     ...    from outside the MicroShift host.
     [Setup]    Run Keywords
-    ...    Create NAD And Pod    ${IPVLAN_NAD_YAML}    ${IPVLAN_POD_YAML}
+    ...    Template And Create NAD And Pod    ${IPVLAN_NAD_YAML}    ${IPVLAN_POD_YAML}
     ...    AND
     ...    Named Pod Should Be Ready    ${IPVLAN_POD_NAME}    ${NAMESPACE}
 
@@ -102,6 +104,28 @@ Ipvlan
 
 
 *** Keywords ***
+Setup
+    [Documentation]    Setup test suite
+    Setup Suite With Namespace
+
+    ${out}=    Command Should Work    ls /sys/class/net | grep enp
+    @{enps}=    String.Split To Lines    ${out}
+    ${len}=    Get Length    ${enps}
+    Should Be True    ${len}>=2
+    Set Suite Variable    ${MACVLAN_MASTER}    ${enps[0]}
+    Set Suite Variable    ${IPVLAN_MASTER}    ${enps[1]}
+
+Template And Create NAD And Pod
+    [Documentation]    Template NAD and create it along with Pod
+    [Arguments]    ${nad_tpl}    ${pod}
+    ${rand}=    Generate Random String
+    ${nad_tpl_output}=    Join Path    /tmp    multus-templates-${rand}.yaml
+    ${template}=    OperatingSystem.Get File    ${nad_tpl}
+    ${contents}=    Replace Variables    ${template}
+    OperatingSystem.Append To File    ${nad_tpl_output}    ${contents}
+    Create NAD And Pod    ${nad_tpl_output}    ${pod}
+    OperatingSystem.Remove File    ${nad_tpl_output}
+
 Cleanup Bridge Test
     [Documentation]    Removes provided NetworkAttachmentDefinition, Pod and network interface to allow for test rerun.
     [Arguments]    ${nad}    ${pod}    ${if}

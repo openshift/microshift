@@ -7,7 +7,7 @@ spec:
       "cniVersion": "0.4.0",
       "name": "test",
       "type": "ipvlan",
-      "master": "enp2s0",
+      "master": "${IPVLAN_MASTER}",
       "mode": "l2",
       "ipam": {
         "type": "static",
