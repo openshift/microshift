@@ -40,8 +40,8 @@ type LoadbalancerServiceController struct {
 var _ servicemanager.Service = &LoadbalancerServiceController{}
 
 func NewLoadbalancerServiceController(cfg *config.Config) *LoadbalancerServiceController {
-	ipAddresses := make([]string, 0)
-	nicNames := make([]string, 0)
+	ipAddresses := make([]string, 0, len(cfg.Ingress.ListenAddress))
+	nicNames := make([]string, 0, len(cfg.Ingress.ListenAddress))
 	for _, entry := range cfg.Ingress.ListenAddress {
 		if net.ParseIP(entry) != nil {
 			ipAddresses = append(ipAddresses, entry)
@@ -235,7 +235,7 @@ func (c *LoadbalancerServiceController) updateDefaultRouterServiceStatus(ips []s
 		if err != nil {
 			return false, err
 		}
-		klog.Infof("updating default router service status: %v", ips)
+		klog.Infof("Updating default router service status: %v", ips)
 		newStatus := &corev1.LoadBalancerStatus{}
 		for _, ip := range ips {
 			newStatus.Ingress = append(newStatus.Ingress, corev1.LoadBalancerIngress{
@@ -244,7 +244,7 @@ func (c *LoadbalancerServiceController) updateDefaultRouterServiceStatus(ips []s
 		}
 		err = c.patchStatus(svc, newStatus)
 		if err != nil {
-			klog.Warningf("unable to patch default router service: %v", err)
+			klog.ErrorS(err, "Unable to patch default router service")
 			return false, nil
 		}
 		return true, nil

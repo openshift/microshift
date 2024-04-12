@@ -273,7 +273,7 @@ func (c *Config) updateComputedValues() error {
 		// include it here.
 		addresses, err := AllowedListeningIPAddresses()
 		if err != nil {
-			return fmt.Errorf("unable to compute configured addresses: %v", err)
+			return fmt.Errorf("unable to compute default listening addresses: %v", err)
 		}
 		if !c.ApiServer.SkipInterface {
 			addresses = append(addresses, c.ApiServer.AdvertiseAddress)
@@ -367,7 +367,7 @@ func (c *Config) validate() error {
 
 	if len(c.Ingress.ListenAddress) != 0 {
 		if err := validateRouterListenAddress(c.Ingress.ListenAddress, c.ApiServer.AdvertiseAddress, c.ApiServer.SkipInterface); err != nil {
-			return fmt.Errorf("error validating ingress.listenAddress: %v", err)
+			return fmt.Errorf("error validating ingress.listenAddress: %w", err)
 		}
 	}
 
@@ -427,33 +427,33 @@ func checkAdvertiseAddressConfigured(advertiseAddress string) error {
 	return fmt.Errorf("Advertise address: %s not present in any interface", advertiseAddress)
 }
 
-func validateRouterListenAddress(entries []string, advertiseAddress string, skipInterface bool) error {
+func validateRouterListenAddress(ingressListenAddresses []string, advertiseAddress string, skipInterface bool) error {
 	addresses, err := AllowedListeningIPAddresses()
 	if err != nil {
 		return err
 	}
-	names, err := AllowedNICNames()
+	nicNames, err := AllowedNICNames()
 	if err != nil {
 		return err
 	}
-	for _, entry := range entries {
+	for _, entry := range ingressListenAddresses {
 		if net.ParseIP(entry) != nil {
 			if entry == advertiseAddress && !skipInterface {
 				continue
 			}
 			if !slices.Contains(addresses, entry) {
-				return fmt.Errorf("IP %v not present in the host", entry)
+				return fmt.Errorf("IP %v not present in any of the host's interfaces", entry)
 			}
-		} else if slices.Contains(names, entry) {
+		} else if slices.Contains(nicNames, entry) {
 			continue
 		} else {
-			return fmt.Errorf("entry %v not present in the host", entry)
+			return fmt.Errorf("interface %v not present in the host", entry)
 		}
 	}
 	return nil
 }
 
-func getBannedIPs() ([]*net.IPNet, error) {
+func getForbiddenIPs() ([]*net.IPNet, error) {
 	banned := make([]*net.IPNet, 0)
 	for _, entry := range defaultRouterForbiddenCIDRs {
 		_, netIP, err := net.ParseCIDR(entry)
@@ -464,6 +464,7 @@ func getBannedIPs() ([]*net.IPNet, error) {
 	}
 	return banned, nil
 }
+
 func getHostAddresses() ([]net.IP, error) {
 	handle, err := netlink.NewHandle()
 	if err != nil {
@@ -473,8 +474,9 @@ func getHostAddresses() ([]net.IP, error) {
 	if err != nil {
 		return nil, err
 	}
-	addresses := make([]net.IP, 0)
+	addresses := make([]net.IP, 0, len(links)*2)
 	for _, link := range links {
+		// Filter out slave NICs. These include ovs/ovn created interfaces, in case of a restart.
 		if link.Attrs().ParentIndex != 0 || link.Attrs().MasterIndex != 0 {
 			continue
 		}
@@ -490,7 +492,7 @@ func getHostAddresses() ([]net.IP, error) {
 }
 
 func AllowedListeningIPAddresses() ([]string, error) {
-	bannedAddresses, err := getBannedIPs()
+	bannedAddresses, err := getForbiddenIPs()
 	if err != nil {
 		return nil, err
 	}
@@ -498,7 +500,7 @@ func AllowedListeningIPAddresses() ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	addressList := make([]string, 0)
+	addressList := make([]string, 0, len(hostAddresses))
 	for _, addr := range hostAddresses {
 		skip := false
 		for _, banned := range bannedAddresses {

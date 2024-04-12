@@ -49,13 +49,13 @@ func defaultRouterWatch(ipAddresses, nicNames []string, updateFunc serviceUpdate
 				break
 			}
 			err = updateFunc(ips)
-			klog.Infof("P333. This is something I am waiting for: %v", err)
 			if err != nil {
 				klog.Errorf("unable to update default router service status: %v", err)
 				break
 			}
 		case <-stopCh:
 			klog.Info("default router watcher stopping")
+			close(doneChan)
 			return
 		}
 	}
@@ -80,7 +80,7 @@ func defaultRouterListenAddresses(ipAddresses, nicNames []string) ([]string, err
 		return nil, err
 	}
 
-	ipList := make([]string, 0)
+	ipList := make([]string, 0, len(ipAddresses)+len(nicNames)*2)
 
 	for _, ip := range ipAddresses {
 		if !slices.Contains(allowedAddresses, ip) {
@@ -125,7 +125,7 @@ func ipAddressesFromNIC(name string) ([]string, error) {
 		return nil, err
 	}
 
-	ipList := make([]string, 0)
+	ipList := make([]string, 0, len(addrList))
 
 	for _, addr := range addrList {
 		ipList = append(ipList, addr.IP.String())
