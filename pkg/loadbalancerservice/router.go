@@ -19,27 +19,25 @@ const (
 type serviceUpdateFunction func([]string) error
 
 func defaultRouterWatch(ipAddresses, nicNames []string, updateFunc serviceUpdateFunction, stopCh <-chan struct{}) {
+	updateChan := make(chan netlink.AddrUpdate)
+	doneChan := make(chan struct{})
 	for {
 		ips, err := defaultRouterListenAddresses(ipAddresses, nicNames)
 		if err != nil {
-			klog.Errorf("unable to determine default router listening addresses: %v", err)
+			klog.ErrorS(err, "unable to determine default router listening addresses")
 			continue
 		}
 		if err := updateFunc(ips); err != nil {
-			klog.Errorf("unable to update default router service status: %v", err)
+			klog.ErrorS(err, "unable to update default router service status")
+			continue
+		}
+		if err := netlink.AddrSubscribe(updateChan, doneChan); err != nil {
+			klog.ErrorS(err, "unable to subscribe to IP address changes")
 			continue
 		}
 		break
 	}
-
-	updateChan := make(chan netlink.AddrUpdate)
-	doneChan := make(chan struct{})
-	err := netlink.AddrSubscribe(updateChan, doneChan)
-	if err != nil {
-		klog.Errorf("unable to subscribe to IP address changes: %v", err)
-		return
-	}
-
+	klog.Info("Default router watcher configured, waiting on IP address changes ")
 	for {
 		select {
 		case <-updateChan:
