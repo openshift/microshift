@@ -159,21 +159,13 @@ def process_containerfiles(groupdir, dry_run=False):
                 continue
 
         common.print_msg(f"Processing {cf_path}")
-        # Compose the container build arguments
+        # Run the container build command
         build_args = [
             "podman", "build",
             "--authfile", PULL_SECRET,
-            "-t", cf_outname, "-f", cf_path
+            "-t", cf_outname, "-f", cf_path,
+            os.path.join(IMAGEDIR, "rpm-repos")
         ]
-        # Share the registration info with the container when running on RHEL
-        if os.path.exists("/etc/rhsm"):
-            build_args += [
-                "-v", "/etc/rhsm:/etc/rhsm:ro",
-                "-v", "/etc/pki/entitlement:/etc/pki/entitlement:ro",
-                "-v", "/etc/pki/ca-trust/extracted:/etc/pki/ca-trust/extracted:ro",
-            ]
-        build_args += [os.path.join(IMAGEDIR, "rpm-repos")]
-        # Run the container build command
         common.run_command(build_args, dry_run)
 
         # Run the container export command
