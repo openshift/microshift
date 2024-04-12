@@ -140,7 +140,8 @@ def extract_container_images(version, repo_spec, outfile, dry_run=False):
 
 
 def process_containerfiles(groupdir, dry_run=False):
-    for containerfile in os.listdir(groupdir):
+    # Process group directory contents sorted by length and then alphabetically
+    for containerfile in sorted(os.listdir(groupdir), key=lambda i: (len(i), i)):
         if not containerfile.endswith(".containerfile"):
             continue
 
@@ -199,8 +200,8 @@ def main():
         if args.group_dir:
             process_containerfiles(args.group_dir, args.dry_run)
             return
-        # Process a layer with group directories
-        for item in os.listdir(args.layer_dir):
+        # Process layer directory contents sorted by length and then alphabetically
+        for item in sorted(os.listdir(args.layer_dir), key=lambda i: (len(i), i)):
             item_path = os.path.join(args.layer_dir, item)
             # Check if this item is a directory
             if os.path.isdir(item_path):
