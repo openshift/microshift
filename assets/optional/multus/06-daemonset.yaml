@@ -118,7 +118,6 @@ spec:
           hostPath:
             path: "/run/cni/bin"
             type: DirectoryOrCreate
-            defaultMode: 0766
         - name: run
           hostPath:
             path: "/run"
