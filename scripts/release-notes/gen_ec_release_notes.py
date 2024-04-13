@@ -418,11 +418,16 @@ def tag_release(tag, sha, buildtime):
         check=True,
     )
     print(f'git push origin {tag}')
-    subprocess.run(
-        ['git', 'push', 'origin', tag],
+    cmd = ['git', 'push', 'origin', tag]
+    completed = subprocess.run(
+        cmd,
         env=env,
-        check=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
     )
+    output = completed.stdout.decode('utf-8') if completed.stdout else ''
+    if completed.returncode != 0:
+        raise subprocess.CalledProcessError(completed.returncode, cmd, output)
 
 
 def publish_release(new_release, take_action):
