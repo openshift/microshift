@@ -66,6 +66,7 @@ URL_BASE = "https://mirror.openshift.com/pub/openshift-v4/aarch64/microshift"
 URL_BASE_X86 = "https://mirror.openshift.com/pub/openshift-v4/x86_64/microshift"
 GITHUB_ORG = 'openshift'
 GITHUB_REPO = 'microshift'
+REMOTE = "token-remote"
 
 # An EC RPM filename looks like
 # microshift-4.13.0~ec.4-202303070857.p0.gcf0bce2.assembly.ec.4.el9.aarch64.rpm
@@ -207,6 +208,7 @@ def main():
         return
 
     print()
+    add_token_remote()
 
     unique_releases = {
         r.commit_sha: r
@@ -404,6 +406,32 @@ def tag_exists(release_name):
         return False
 
 
+def add_token_remote():
+    """
+    Adds the Git remote to the given repository using
+    the provided installation (or personal) access token.
+    """
+    env = {}
+    env.update(os.environ)
+
+    print(f'git remote remove {REMOTE}')
+    subprocess.run(
+       ["git", "remote", "remove", REMOTE],
+       env=env,
+    )
+    print(f'git remote add {REMOTE} ~~REDACTED~~')
+    remote_url = f"https://x-access-token:{GITHUB_TOKEN}@github.com/{GITHUB_ORG}/{GITHUB_REPO}"
+    result = subprocess.run(
+       ["git", "remote", "add", REMOTE, remote_url],
+       env=env,
+       capture_output=True,
+       text=True,
+    )
+    if result.returncode != 0:
+        err = result.stderr.replace(GITHUB_TOKEN, "") if result.stderr else "stderr is empty"
+        raise Exception(f"Command `git remote add` failed: {err}")
+
+
 def tag_release(tag, sha, buildtime):
     env = {}
     # Include our existing environment settings to ensure values like
@@ -417,8 +445,8 @@ def tag_release(tag, sha, buildtime):
         env=env,
         check=True,
     )
-    print(f'git push origin {tag}')
-    cmd = ['git', 'push', 'origin', tag]
+    print(f'git push {REMOTE} {tag}')
+    cmd = ['git', 'push', REMOTE, tag]
     completed = subprocess.run(
         cmd,
         env=env,
