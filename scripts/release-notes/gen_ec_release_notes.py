@@ -521,7 +521,7 @@ def publish_release(new_release, take_action):
 
 def github_release_create(tag, notes_header):
     results = github_api(
-        '/repos/openshift/microshift/releases',
+        f'/repos/{GITHUB_ORG}/{GITHUB_REPO}/releases',
         tag_name=tag,
         name=tag,
         body=notes_header,
@@ -538,7 +538,7 @@ def github_release_create(tag, notes_header):
 
 def github_release_exists(tag):
     try:
-        github_api(f'/repos/openshift/microshift/releases/tags/{tag}')
+        github_api(f'/repos/{GITHUB_ORG}/{GITHUB_REPO}releases/tags/{tag}')
         return True
     except Exception:
         return False
