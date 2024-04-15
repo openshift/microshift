@@ -13,11 +13,15 @@ type IngressStatusEnum string
 type IngressConfig struct {
 	// Default router status, can be Managed or Removed.
 	// +kubebuilder:default=Managed
-	Status             IngressStatusEnum    `json:"status"`
-	AdmissionPolicy    RouteAdmissionPolicy `json:"routeAdmissionPolicy"`
-	Ports              IngressPortsConfig   `json:"ports"`
-	ServingCertificate []byte               `json:"-"`
-	ServingKey         []byte               `json:"-"`
+	Status          IngressStatusEnum    `json:"status"`
+	AdmissionPolicy RouteAdmissionPolicy `json:"routeAdmissionPolicy"`
+	Ports           IngressPortsConfig   `json:"ports"`
+	// List of IP addresses and NIC names where the router will be listening. The NIC
+	// names get translated to all their configured IPs dynamically. Defaults to the
+	// configured IPs in the host at MicroShift start.
+	ListenAddress      []string `json:"listenAddress"`
+	ServingCertificate []byte   `json:"-"`
+	ServingKey         []byte   `json:"-"`
 }
 
 type RouteAdmissionPolicy struct {
