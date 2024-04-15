@@ -1,6 +1,119 @@
-- kubernetes embedded-component e994e5dbd69833088514616351b0aa997e4ed79d to 0345d5c423d17870618685f0b39fa90db8614e4c
-  - eabeab950 2024-03-25T16:50:29-03:00 UPSTREAM: 124048: Use the right feature gate when updating uncertain volumes
+- cluster-csi-snapshot-controller-operator embedded-component ecf88167052407b4180a58424e93efac83352fcc to a9b0c1c1b0bc031572e6f5029f672e58347c0648
+  - 540dddb 2024-03-21T15:52:00-07:00 STOR-1573: Update manifests to v7.0.0
 
-- kubernetes image-amd64 e994e5dbd69833088514616351b0aa997e4ed79d to 0345d5c423d17870618685f0b39fa90db8614e4c
+- cluster-dns-operator embedded-component b2013e95ded2c316867c57441063da9d535e1d48 to 2d77b099cd229949067d7de843b9d1538aab7403
+  - d32ca6b 2024-04-09T19:52:15+05:30 Enable ocp_dnsnameresolver CoreDNS plugin
+
+- cluster-ingress-operator embedded-component bf974a96704fb0e98dad586ab81b86cb65123145 to 81fffa0a15f82deafd97b84e1f5cb2efe1bd9d62
+  - 5c019ea 2024-04-08T17:33:25-04:00 OCPBUGS-30834: Update to go 1.21
+  - abc9ab7 2024-03-26T12:46:34-07:00 Add additional azure subnet permissions for private clusters
+
+- cluster-kube-controller-manager-operator embedded-component 05f385d85b3ecd55c063cef7dab5a537d29e12a8 to f5ea706c4378d74d1a46ed0eec624bc6cc207dbc
+  - 5495c6e 2024-04-10T11:30:03-03:00 WRKLDS-1169: tolerate node-role.kubernetes.io/control-plane:NoExecute
+
+- cluster-network-operator embedded-component a5b5de5098592867f39ac513dc62024b5b076044 to d98d330298330a9f181965e9bc5a821b349084bf
+  - 67fb1ab 2024-04-03T04:56:16-04:00 Remove managed cluster checking for live migration
+
+- csi-external-snapshotter embedded-component 795fa18b0522d2bcddc2cab6751d23255a2b936d to 5315d37a1e5415e8b6870f23e50238681979cc28
+  - 08effea 2024-04-05T12:38:11-07:00 UPSTREAM: 1051: use group secret for GetGroupSnapshotStatus
+  - 26c8ecd 2024-04-05T12:17:02-07:00 UPSTREAM: 1048: fix: use groupsnapshot secret for group operation
+
+- etcd embedded-component c205b668c1fbe3db52a5227bb3fa7d8ceefc6bcc to aa0c441f97e070fed62cc3e1423537eb42c661a3
+  - 4c990476 2024-04-02T18:10:59+02:00 DOWNSTREAM <carry>: update Dockerfile golang 1.20 ocp 4.16
+  - efff773c 2024-04-02T18:07:14+02:00 DOWNSTREAM: <carry>: Add Dockerfile to build etcd for openshift-installer
+  - 73455a06 2024-04-02T18:06:35+02:00 Merge pull request #236 from openshift-bot/art-consistency-openshift-4.16-ose-etcd
+  - 76bfcfd6 2024-04-02T18:00:39+02:00 DOWNSTREAM <carry>: update Dockerfile golang 1.20 ocp 4.16
+  - 3516df25 2024-04-02T17:50:56+02:00 DOWNSTREAM <carry>: resolve merge conflicts
+  - c9063a0d 2024-03-30T07:27:31+13:00 version: bump up to 3.5.13
+  - 59e3f7df 2024-03-21T07:28:20+00:00 build(deps): bump distroless/static-debian11 from `9be3fcc` to `7e5c6a2`
+  - 46d2caae 2024-03-18T18:41:17-07:00 [release-3.5] backport fix watch event loss after compaction
+  - 579b22cf 2024-03-11T20:18:26+01:00 Fix progress notification for watch that doesn't get any events
+  - 67afad6e 2024-03-08T08:30:03-08:00 Add govuln GitHub workflow
+  - e6d95c84 2024-03-07T16:03:12-08:00 dependency: bump google.golang.org/protobuf to v1.33.0
+  - 722e5cbb 2024-03-06T09:33:17+00:00 Update go version to 1.21.8
+  - d76d8479 2024-02-24T15:38:49+00:00 Bump bbolt to 1.3.9 for 3.5
+  - f1d1029c 2024-02-23T16:24:13-08:00 dependency: bump github.com/sirupsen/logrus to v1.9.3
+  - a1aaa51c 2024-02-19T13:26:15+00:00 add uds test cases into e2e TestAuthority
+  - 80e2064b 2024-02-19T12:21:31+00:00 Add unix socket test to TestNewURLsValue
+  - 1a9062ec 2024-02-19T12:21:16+00:00 pkg/types: Support Unix sockets in NewURLS
+  - 31f097ee 2024-02-18T20:44:25+08:00 added dial-keepalive-time、dial-keepalive-timeout、permit-without-stream arguments to the grpc-proxy
+  - 4a90575a 2024-02-17T22:16:53-08:00 Backport ignore old leader's leases revoking request
+  - c486b589 2024-02-17T22:16:29-08:00 tests/e2e: backport e2e cluster setup
+  - 9635525b 2024-02-17T03:02:19-08:00 *: add test-smoke to the pipeline and update test-smoke
+  - 7ebbc0f6 2024-02-16T13:52:09-08:00 tools/mod: go mod tidy
+  - f4633c84 2024-02-15T19:55:22-08:00 *: fix failing shellchecks
+  - b9b4f1bd 2024-02-15T19:46:22-08:00 server: fix comment to match function name
+  - 1115eb15 2024-02-13T15:21:07-08:00 tests/e2e: implement EtcdProcess GoFailClientTimeout
+  - e179686f 2024-02-13T16:01:10+05:30 Make CGO_ENABLED configurable for etcd 3.5
+  - 07c4dcb9 2024-02-07T17:00:09-08:00 tests/e2e: use WaitLeader in corrupt test
+  - 8b249325 2024-02-06T14:29:51-08:00 tests/e2e: implement EtcdProcessCluster WaitLeader
+  - c37d33c5 2024-02-06T14:29:40-08:00 tests/e2e: implement EtcdProcess Etcdctl
+  - 62a4bb3b 2024-02-06T19:39:09+01:00 etcd: Add OpenBSD-specific files for SetKeepAlivePeriod handling
+  - a965801b 2024-02-06T12:11:33+08:00 etcdserver: drain leaky goroutines before test completed
+  - 26bae5ef 2024-02-05T15:13:42-08:00 tests/e2e: move etcdctl to framework/e2e
+  - a13f676e 2024-02-02T14:40:15-05:00 [3.5] backport: add backoff to client config
+  - 3d64877d 2024-02-02T14:25:53-05:00 [3.5] Update to go1.21
+
+- kubernetes embedded-component 0345d5c423d17870618685f0b39fa90db8614e4c to 6b4d6cb58038fc1bd4da50fde0164a8872e60703
+  - 4b29bf4ce 2024-04-05T18:24:04-04:00 UPSTREAM: <carry>: add management workload check for guaranteed qos
+  - d55caa84e 2024-03-27T14:57:56+01:00 UPSTREAM: <drop>: bump apiserver-library-go
+
+- machine-config-operator embedded-component 82011335dbdd3d4c869b959d6048a3fba7742e47 to 509a97df24be851ee8c11247dbd840c927f02137
+  - b05842b2 2024-04-12T15:19:09-04:00 update hack/crd-sync.h to pull in new CRDs
+  - ff2e4eba 2024-04-12T15:01:04-04:00 OCPBUGS-28230: enforce termination message policy on all platform pods
+  - 9942c406 2024-04-12T10:27:36-04:00 Revert "TRT-1587: Revert #4275 "MCO-1092: Adapt the MCO's featuregate usage to new API""
+  - cf48c605 2024-04-10T10:07:55-04:00  Support Cluster ImagePolicy CRD
+  - 1456b062 2024-04-02T15:43:02-05:00 OCPBUGS-30192: Move StartLimitIntervalSec to Unit section
+  - 743fd42d 2024-03-13T09:19:20+01:00 OCPBUGS-29919: Decrease logs of haproxy
+
+- operator-framework-olm embedded-component 215fb45834220f2b0e6410c029507d5f6d276beb to 0d40488558ed03b817755c2f95567fcf68dc9cba
+  - 8b77b367 2024-04-13T00:02:53+00:00 OCPBUGS-28230: fallback to logs for termination message (#3203)
+  - f2a9101b 2024-04-12T00:08:53+00:00 chore: pkg import only once (#3120)
+  - f2689682 2024-04-09T00:02:55+00:00 build(deps): bump helm.sh/helm/v3 from 3.12.2 to 3.14.3 (#3198)
+
+- oc image-amd64 1f5e247c98cb3c4b4e014536d09115fa21e71935 to 46db7c2bce5a57e3c3d9347e7e1e107e61dbd306
+  - 09ed8360 2024-04-09T15:00:10+02:00 adm update status: Refactor node status
+  - bce03529 2024-04-08T18:26:33+02:00 adm update status: Add status of control plane nodes
+  - 7ce55aee 2024-04-01T08:54:51+03:00 Add OIDC specific certificate authority bundle flag
+
+- csi-external-snapshotter image-amd64 795fa18b0522d2bcddc2cab6751d23255a2b936d to 5315d37a1e5415e8b6870f23e50238681979cc28
+  - 08effea 2024-04-05T12:38:11-07:00 UPSTREAM: 1051: use group secret for GetGroupSnapshotStatus
+  - 26c8ecd 2024-04-05T12:17:02-07:00 UPSTREAM: 1048: fix: use groupsnapshot secret for group operation
+
+- csi-external-snapshotter image-amd64 795fa18b0522d2bcddc2cab6751d23255a2b936d to 5315d37a1e5415e8b6870f23e50238681979cc28
+  - 08effea 2024-04-05T12:38:11-07:00 UPSTREAM: 1051: use group secret for GetGroupSnapshotStatus
+  - 26c8ecd 2024-04-05T12:17:02-07:00 UPSTREAM: 1048: fix: use groupsnapshot secret for group operation
+
+- csi-external-snapshotter image-amd64 795fa18b0522d2bcddc2cab6751d23255a2b936d to 5315d37a1e5415e8b6870f23e50238681979cc28
+  - 08effea 2024-04-05T12:38:11-07:00 UPSTREAM: 1051: use group secret for GetGroupSnapshotStatus
+  - 26c8ecd 2024-04-05T12:17:02-07:00 UPSTREAM: 1048: fix: use groupsnapshot secret for group operation
+
+- kubernetes image-amd64 0345d5c423d17870618685f0b39fa90db8614e4c to 6b4d6cb58038fc1bd4da50fde0164a8872e60703
+  - 4b29bf4ce 2024-04-05T18:24:04-04:00 UPSTREAM: <carry>: add management workload check for guaranteed qos
+  - d55caa84e 2024-03-27T14:57:56+01:00 UPSTREAM: <drop>: bump apiserver-library-go
+
+- oc image-arm64 1f5e247c98cb3c4b4e014536d09115fa21e71935 to 46db7c2bce5a57e3c3d9347e7e1e107e61dbd306
+  - 09ed8360 2024-04-09T15:00:10+02:00 adm update status: Refactor node status
+  - bce03529 2024-04-08T18:26:33+02:00 adm update status: Add status of control plane nodes
+  - 7ce55aee 2024-04-01T08:54:51+03:00 Add OIDC specific certificate authority bundle flag
+
+- coredns image-arm64 022a0530038602605b8f3e8866c2a6ded97708cc to f937ebfb6b8a31fc194597a1ade0e93e73e474b5
+  - 7a9d9ea 2024-03-26T14:13:34+05:30 UPSTREAM: <carry>: openshift: Add ocp_dnsnameresolver external plugin
+
+- csi-external-snapshotter image-arm64 795fa18b0522d2bcddc2cab6751d23255a2b936d to 5315d37a1e5415e8b6870f23e50238681979cc28
+  - 08effea 2024-04-05T12:38:11-07:00 UPSTREAM: 1051: use group secret for GetGroupSnapshotStatus
+  - 26c8ecd 2024-04-05T12:17:02-07:00 UPSTREAM: 1048: fix: use groupsnapshot secret for group operation
+
+- csi-external-snapshotter image-arm64 795fa18b0522d2bcddc2cab6751d23255a2b936d to 5315d37a1e5415e8b6870f23e50238681979cc28
+  - 08effea 2024-04-05T12:38:11-07:00 UPSTREAM: 1051: use group secret for GetGroupSnapshotStatus
+  - 26c8ecd 2024-04-05T12:17:02-07:00 UPSTREAM: 1048: fix: use groupsnapshot secret for group operation
+
+- csi-external-snapshotter image-arm64 795fa18b0522d2bcddc2cab6751d23255a2b936d to 5315d37a1e5415e8b6870f23e50238681979cc28
+  - 08effea 2024-04-05T12:38:11-07:00 UPSTREAM: 1051: use group secret for GetGroupSnapshotStatus
+  - 26c8ecd 2024-04-05T12:17:02-07:00 UPSTREAM: 1048: fix: use groupsnapshot secret for group operation
+
+- kubernetes image-arm64 e994e5dbd69833088514616351b0aa997e4ed79d to 6b4d6cb58038fc1bd4da50fde0164a8872e60703
+  - 4b29bf4ce 2024-04-05T18:24:04-04:00 UPSTREAM: <carry>: add management workload check for guaranteed qos
+  - d55caa84e 2024-03-27T14:57:56+01:00 UPSTREAM: <drop>: bump apiserver-library-go
   - eabeab950 2024-03-25T16:50:29-03:00 UPSTREAM: 124048: Use the right feature gate when updating uncertain volumes
 
