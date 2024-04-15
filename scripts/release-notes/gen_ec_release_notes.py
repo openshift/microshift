@@ -58,6 +58,7 @@ import pathlib
 import re
 import subprocess
 import textwrap
+import urllib
 from urllib import request
 
 import github
@@ -514,6 +515,10 @@ def publish_release(new_release, take_action):
     # Create draft release with message that includes download URLs and history
     try:
         github_release_create(release_name, notes)
+    except urllib.error.URLError as e:
+        print(f"Failed to create the release {release_name}: {e}")
+        print(f"Response: {str(e.fp.readlines())}")
+        raise
     except Exception as err:
         print(f"Failed to create the release {release_name}: {err}")
         raise
