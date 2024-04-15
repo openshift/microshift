@@ -92,14 +92,14 @@ Router Exposure Configuration
     ...    Configure Router Exposure
     ...    Add Fake IP To NIC
 
-    Wait Until Keyword Succeeds    60x    1s
-    ...    Port Should Be Closed    ${HTTP_PORT}
-    Wait Until Keyword Succeeds    60x    1s
-    ...    Port Should Be Closed    ${HTTPS_PORT}
     Wait Until Keyword Succeeds    60x    2s
     ...    Internal Router Port Should Be Open    10.44.0.0    ${ALTERNATIVE_HTTP_PORT}    http
     Wait Until Keyword Succeeds    60x    2s
     ...    Internal Router Port Should Be Open    10.44.0.0    ${ALTERNATIVE_HTTPS_PORT}    https
+    Wait Until Keyword Succeeds    60x    1s
+    ...    Port Should Be Closed    ${HTTP_PORT}
+    Wait Until Keyword Succeeds    60x    1s
+    ...    Port Should Be Closed    ${HTTPS_PORT}
 
     # The link in which this IP was added was configured in MicroShift. Note the IP was
     # added after MicroShift started, therefore it must pick it up dynamically.
