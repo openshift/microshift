@@ -83,6 +83,13 @@ def delete_file(file_path: str):
         pass
 
 
+def read_file(file_path: str):
+    """Read the file contents and return them to the caller"""
+    with open(file_path, 'r') as file:
+        content = file.read()
+    return content
+
+
 def basename(path: str):
     """Return a base name of the path"""
     return pathlib.Path(path).name

@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 
 import argparse
+import getpass
 import glob
 import os
+import platform
+import re
 import shutil
 import sys
 import traceback
-import re
-import platform
 
 import common
 
@@ -17,7 +18,9 @@ import common
 # initialized in set_rpm_version_info_vars function
 SCRIPTDIR = common.get_env_var('SCRIPTDIR')
 BOOTC_IMAGE_DIR = common.get_env_var('BOOTC_IMAGE_DIR')
+BOOTC_ISO_DIR = common.get_env_var('BOOTC_ISO_DIR')
 IMAGEDIR = common.get_env_var('IMAGEDIR')
+VM_DISK_BASEDIR = common.get_env_var('VM_DISK_BASEDIR')
 UNAME_M = common.get_env_var('UNAME_M')
 CONTAINER_LIST = common.get_env_var('CONTAINER_LIST')
 LOCAL_REPO = common.get_env_var('LOCAL_REPO')
@@ -139,31 +142,74 @@ def extract_container_images(version, repo_spec, outfile, dry_run=False):
     common.popd()
 
 
-def process_containerfiles(groupdir, dry_run=False):
+def process_containerfile(groupdir, containerfile, dry_run):
+    cf_path = os.path.join(groupdir, containerfile)
+    cf_outname = os.path.splitext(containerfile)[0]
+    cf_outdir = os.path.join(BOOTC_IMAGE_DIR, cf_outname)
+
+    os.makedirs(BOOTC_IMAGE_DIR, exist_ok=True)
+
+    if os.path.exists(cf_outdir):
+        common.print_msg(f"{cf_outdir} already exists")
+        if common.should_skip(cf_outname):
+            common.record_junit(groupdir, cf_path, "containerfile", "SKIPPED")
+            return
+
+    common.print_msg(f"Processing {cf_path}")
+    common.run_command(
+        ["podman", "build", "-t", cf_outname, "-f", cf_path,
+            os.path.join(IMAGEDIR, "rpm-repos")], dry_run)
+    if os.path.exists(cf_outdir):
+        shutil.rmtree(cf_outdir)
+    common.run_command(["podman", "save", "--format", "oci-dir", "-o", cf_outdir, cf_outname], dry_run)
+
+
+def process_image_bootc(groupdir, bootcfile, dry_run):
+    bf_path = os.path.join(groupdir, bootcfile)
+    bf_outname = os.path.splitext(bootcfile)[0]
+    bf_outdir = os.path.join(BOOTC_ISO_DIR, bf_outname)
+
+    os.makedirs(BOOTC_ISO_DIR, exist_ok=True)
+
+    if os.path.exists(bf_outdir):
+        common.print_msg(f"{bf_outdir} already exists")
+        if common.should_skip(bf_outname):
+            common.record_junit(groupdir, bf_path, "image-bootc", "SKIPPED")
+            return
+    # Image builder expects the output directory to exist
+    os.makedirs(bf_outdir, exist_ok=True)
+
+    common.print_msg(f"Processing {bf_path}")
+    bf_imgref = common.read_file(bf_path).strip()
+    build_cmd = [
+        "sudo", "podman", "run",
+        "--rm", "-i", "--privileged",
+        "--security-opt", "label=type:unconfined_t",
+        "-v", f"{bf_outdir}:/output",
+        "quay.io/centos-bootc/bootc-image-builder:latest",
+        "--type", "anaconda-iso",
+        bf_imgref
+    ]
+    common.run_command(build_cmd, dry_run)
+
+    # Fix the directory ownership and move the artifact
+    common.run_command(
+        ["sudo", "chown", "-R", f"{getpass.getuser()}.", bf_outdir],
+        dry_run)
+    os.rename(
+        f"{bf_outdir}/bootiso/install.iso",
+        f"{VM_DISK_BASEDIR}/{bf_outname}.iso")
+
+
+def process_group(groupdir, dry_run=False):
     # Process group directory contents sorted by length and then alphabetically
-    for containerfile in sorted(os.listdir(groupdir), key=lambda i: (len(i), i)):
-        if not containerfile.endswith(".containerfile"):
-            continue
-
-        cf_path = os.path.join(groupdir, containerfile)
-        cf_outname = os.path.splitext(os.path.basename(containerfile))[0]
-        cf_outdir = os.path.join(BOOTC_IMAGE_DIR, cf_outname)
-
-        os.makedirs(BOOTC_IMAGE_DIR, exist_ok=True)
-
-        if os.path.exists(cf_outdir):
-            common.print_msg(f"{cf_outdir} already exists")
-            if common.should_skip(cf_outname):
-                common.record_junit(groupdir, cf_path, "containerfile", "SKIPPED")
-                continue
-
-        common.print_msg(f"Processing {cf_path}")
-        common.run_command(
-            ["podman", "build", "-t", cf_outname, "-f", cf_path,
-                os.path.join(IMAGEDIR, "rpm-repos")], dry_run)
-        if os.path.exists(cf_outdir):
-            shutil.rmtree(cf_outdir)
-        common.run_command(["podman", "save", "--format", "oci-dir", "-o", cf_outdir, cf_outname], dry_run)
+    for file in sorted(os.listdir(groupdir), key=lambda i: (len(i), i)):
+        if file.endswith(".containerfile"):
+            process_containerfile(groupdir, file, dry_run)
+        elif file.endswith(".image-bootc"):
+            process_image_bootc(groupdir, file, dry_run)
+        else:
+            common.print_msg(f"Skipping unknown file {file}")
 
 
 def main():
@@ -198,14 +244,14 @@ def main():
 
         # Process individual group directory
         if args.group_dir:
-            process_containerfiles(args.group_dir, args.dry_run)
+            process_group(args.group_dir, args.dry_run)
             return
         # Process layer directory contents sorted by length and then alphabetically
         for item in sorted(os.listdir(args.layer_dir), key=lambda i: (len(i), i)):
             item_path = os.path.join(args.layer_dir, item)
             # Check if this item is a directory
             if os.path.isdir(item_path):
-                process_containerfiles(item_path, args.dry_run)
+                process_group(item_path, args.dry_run)
         common.print_msg("Build complete")
     except Exception as e:
         common.print_msg(f"An error occurred: {e}")
