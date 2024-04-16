@@ -24,13 +24,15 @@ def print_msg(msg: str, file=sys.stderr):
     print(msg, file=file)
 
 
-def get_env_var(var_name: str):
+def get_env_var(var_name: str, def_val: str = None):
     """Get an environment variable or exit if not set."""
     value = os.environ.get(var_name)
-    if value is None:
-        print_msg(f"Error: {var_name} environment variable not set.")
-        sys.exit(1)
-    return value
+    if value:
+        return value
+    if def_val:
+        return def_val
+    print_msg(f"Error: {var_name} environment variable not set.")
+    sys.exit(1)
 
 
 def run_command(command: List[str], dry_run: bool):
