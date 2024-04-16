@@ -1,4 +1,4 @@
-%include /main-prologue.cfg
+%include /main-prologue-bootc.cfg
 %include /main-network.cfg
 %include /main-ostreecontainer.cfg
 

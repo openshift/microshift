@@ -430,10 +430,12 @@ launch_vm() {
 
     # Prepare file system, network and extra arguments for the VM creation
     # depending on the number of requested NICs and other parameters
+    local vm_loc_args
     local vm_fs_args
     local vm_network_args
     local vm_extra_args
     local vm_initrd_inject
+    vm_loc_args="--location ${VM_DISK_BASEDIR}/${boot_blueprint}.iso"
     vm_fs_args=""
     vm_network_args=""
     vm_extra_args="fips=${fips_mode}"
@@ -443,6 +445,9 @@ launch_vm() {
     if [ "${bootc_mode}" -ne 0 ] ; then
         vm_fs_args+=" --filesystem=${BOOTC_IMAGE_DIR},bootc-images,driver.type=virtiofs"
         vm_fs_args+=" --memorybacking=source.type=memfd,access.mode=shared"
+
+        vm_loc_args+=",kernel=images/pxeboot/vmlinuz,initrd=images/pxeboot/initrd.img"
+        vm_loc_args+=" --osinfo detect=on"
     fi
 
     # Specify the right console device per each platform. The baud rate
@@ -516,7 +521,7 @@ launch_vm() {
             ${vm_network_args} \
             --events on_reboot=restart \
             --noreboot \
-            --location "${VM_DISK_BASEDIR}/${boot_blueprint}.iso" \
+            ${vm_loc_args} \
             ${vm_fs_args} \
             --extra-args "${vm_extra_args}" \
             ${vm_initrd_inject} \
