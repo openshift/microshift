@@ -157,20 +157,20 @@ def process_containerfile(groupdir, containerfile, dry_run):
             common.record_junit(groupdir, cf_path, "containerfile", "SKIPPED")
             return
 
-        common.print_msg(f"Processing {cf_path}")
-        # Run the container build command
-        build_args = [
-            "podman", "build",
-            "--authfile", PULL_SECRET,
-            "-t", cf_outname, "-f", cf_path,
-            os.path.join(IMAGEDIR, "rpm-repos")
-        ]
-        common.run_command(build_args, dry_run)
+    common.print_msg(f"Processing {cf_path}")
+    # Run the container build command
+    build_args = [
+        "podman", "build",
+        "--authfile", PULL_SECRET,
+        "-t", cf_outname, "-f", cf_path,
+        os.path.join(IMAGEDIR, "rpm-repos")
+    ]
+    common.run_command(build_args, dry_run)
 
-        # Run the container export command
-        if os.path.exists(cf_outdir):
-            shutil.rmtree(cf_outdir)
-        common.run_command(["podman", "save", "--format", "oci-dir", "-o", cf_outdir, cf_outname], dry_run)
+    # Run the container export command
+    if os.path.exists(cf_outdir):
+        shutil.rmtree(cf_outdir)
+    common.run_command(["podman", "save", "--format", "oci-dir", "-o", cf_outdir, cf_outname], dry_run)
 
 
 def process_image_bootc(groupdir, bootcfile, dry_run):
