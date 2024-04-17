@@ -193,8 +193,8 @@ assets:
       - file: 0000_03_securityinternal-openshift_02_rangeallocation.crd.yaml
       - file: storage_version_migration.crd.yaml
         src:  0000_50_cluster-kube-storage-version-migrator-operator_01_storage_migration_crd.yaml
-      - file: route.crd.yaml
-        src:  /kubernetes/vendor/github.com/openshift/api/route/v1/
+      - file: routes-Default.crd.yaml
+        src:  /kubernetes/vendor/github.com/openshift/api/route/v1/zz_generated.crd-manifests/
 
   - dir: release/
     ignore: "it contains files generated during rebase procedure"
