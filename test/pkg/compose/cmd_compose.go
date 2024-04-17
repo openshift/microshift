@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io/fs"
 	"os"
 	"os/signal"
 	"path/filepath"
@@ -122,11 +123,22 @@ func NewComposeCmd() *cobra.Command {
 			}
 		}()
 
+		fileSystem := os.DirFS(paths.MicroShiftRepoRootPath)
+		testFS, err := fs.Sub(fileSystem, "test")
+		if err != nil {
+			klog.ErrorS(err, "Failed to get subFS")
+			return err
+		}
+		sourcesFS, err := fs.Sub(testFS, "package-sources")
+		if err != nil {
+			klog.ErrorS(err, "Failed to get subFS")
+			return err
+		}
 		sourceConfigurer := sources.SourceConfigurer{Opts: &sources.SourceConfigurerOpts{
-			Composer:    composer,
-			TplData:     td,
-			TestDirPath: paths.TestDirPath,
-			Events:      events,
+			Composer:  composer,
+			TplData:   td,
+			Events:    events,
+			SourcesFS: sourcesFS,
 		}}
 		if err := sourceConfigurer.ConfigureSources(); err != nil {
 			return err

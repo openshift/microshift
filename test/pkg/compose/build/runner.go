@@ -17,7 +17,7 @@ type Opts struct {
 	DryRun bool
 
 	Paths  *testutil.Paths
-	Events *testutil.EventManager
+	Events testutil.EventManager
 }
 
 type Runner struct {

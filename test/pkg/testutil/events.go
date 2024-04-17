@@ -9,7 +9,13 @@ import (
 	"time"
 )
 
-type EventManager struct {
+type EventManager interface {
+	AddEvent(e IEvent)
+	WriteToFiles(intervalsFile, timelinesFile string) error
+	GetJUnit() *JUnitTestSuites
+}
+
+type eventManager struct {
 	name   string
 	events []IEvent
 	suites map[string]suite
@@ -23,15 +29,15 @@ type suite struct {
 	events []IEvent
 }
 
-func NewEventManager(name string) *EventManager {
-	return &EventManager{
+func NewEventManager(name string) EventManager {
+	return &eventManager{
 		name:   name,
 		suites: make(map[string]suite),
 		start:  time.Now(),
 	}
 }
 
-func (em *EventManager) AddEvent(e IEvent) {
+func (em *eventManager) AddEvent(e IEvent) {
 	em.mu.Lock()
 	defer em.mu.Unlock()
 
@@ -49,7 +55,7 @@ func (em *EventManager) AddEvent(e IEvent) {
 	}
 }
 
-func (em *EventManager) WriteToFiles(intervalsFile, timelinesFile string) error {
+func (em *eventManager) WriteToFiles(intervalsFile, timelinesFile string) error {
 	ivs := em.GetIntervals()
 
 	contents, err := json.MarshalIndent(ivs, "", "    ")
@@ -80,7 +86,7 @@ func (em *EventManager) WriteToFiles(intervalsFile, timelinesFile string) error 
 	return tpl.Execute(f, data)
 }
 
-func (em *EventManager) GetIntervals() []Interval {
+func (em *eventManager) GetIntervals() []Interval {
 	intervals := []Interval{}
 
 	for _, suite := range em.suites {
@@ -96,7 +102,7 @@ func (em *EventManager) GetIntervals() []Interval {
 	return intervals
 }
 
-func (em *EventManager) GetJUnit() *JUnitTestSuites {
+func (em *eventManager) GetJUnit() *JUnitTestSuites {
 	jsuites := &JUnitTestSuites{
 		Name:      em.name,
 		Time:      int(time.Since(em.start).Seconds()),
@@ -131,6 +137,7 @@ type IEvent interface {
 	GetJUnitTestCase() JUnitTestCase
 	GetSuite() string
 	GetInterval() Interval
+	GetName() string
 }
 
 var _ IEvent = (*Event)(nil)
@@ -142,6 +149,10 @@ type Event struct {
 	Start     time.Time
 	End       time.Time
 	SystemOut string
+}
+
+func (e *Event) GetName() string {
+	return e.Name
 }
 
 func (e *Event) GetInterval() Interval {

@@ -25,7 +25,7 @@ type PlannerOpts struct {
 	BuildInstallers bool
 
 	Paths  *testutil.Paths
-	Events *testutil.EventManager
+	Events testutil.EventManager
 }
 
 type Planner struct {
