@@ -163,6 +163,12 @@ EOF
     scp "redhat@${ip}:/tmp/sosreport-*" "${vmdir}/sos/" || {
         echo "WARNING: Ignoring an error when copying sos report files"
     }
+
+    run_command_on_vm "${vmname}" "sudo journalctl > /tmp/journal_$(date +'%Y-%m-%d_%H:%M:%S').log"
+    scp "redhat@${ip}:/tmp/journal*.log" "${vmdir}/sos/" || {
+        echo "WARNING: Ignoring an error when copying journal"
+    }
+
     # Also copy the logs from the /var/log/anaconda directory to
     # collect information about potentially failed installations.
     # Note: we cannot use `anaconda` sos report plugin because

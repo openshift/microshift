@@ -37,14 +37,15 @@ Test Expired Cert
     [Setup]    Setup Test
     # Generate CSR Config
     Create Keys
-    Create Cert    TestCN    test-expired.api.com    5.5.5.5    0
+    ${hostname}=    Generate Random HostName
+    Create Cert    TestCN    ${hostname}    5.5.5.5    0
     Upload Certificates
     Configure Named Certificates    ${TMPDIR}/server.crt    ${TMPDIR}/server.key
     Restart MicroShift
-    Add Entry To Hosts    ${USHIFT_HOST}    test-expired.api.com
-    Setup Custom Kubeconfig    test-expired.api.com
+    Add Entry To Hosts    ${USHIFT_HOST}    ${hostname}
+    Setup Custom Kubeconfig    ${hostname}
     OC Should Fail To Connect With Expired Cert
-    [Teardown]    RemoveRootCAFromRhel
+    [Teardown]    Remove Entry From Hosts    ${hostname}
 
 Test Local Cert
     [Documentation]    localhost certs should be ignored with a warning
@@ -59,53 +60,52 @@ Test Local Cert
     Pattern Should Appear In Log Output    ${CURSOR}    is not allowed - ignoring
     Setup Kubeconfig
     MicroShift Is Live
-    [Teardown]    RemoveRootCAFromRhel
 
 Test SAN Cert
     [Documentation]    Create regular SNI certificate
     [Setup]    Setup Test
     Create Keys
-    Create Cert    TestCN    test.api.com
+    ${hostname}=    Generate Random HostName
+    Create Cert    TestCN    ${hostname}
     Upload Certificates
     Configure Named Certificates    ${TMPDIR}/server.crt    ${TMPDIR}/server.key    test
     Restart MicroShift
-    Add Entry To Hosts    ${USHIFT_HOST}    test.api.com
-    Setup Custom Kubeconfig    test.api.com
+    Add Entry To Hosts    ${USHIFT_HOST}    ${hostname}
+    Setup Custom Kubeconfig    ${hostname}
     OC Should Fail To Connect With Unknown CA
-    AddRootCAToRHEL
-    MicroShift Is Live
-    [Teardown]    RemoveRootCAFromRhel
+    MicroShift Is Live With Custom CA    ${TMPDIR}/ca.crt
+    [Teardown]    Remove Entry From Hosts    ${hostname}
 
 Test Wildcard Only Cert
     [Documentation]    Create WildCard only certificate
     [Setup]    Setup Test
     Create Keys
+    ${hostname}=    Generate Random HostName
     Create Cert    TestCN    *.api.com
     Upload Certificates
     Configure Named Certificates    ${TMPDIR}/server.crt    ${TMPDIR}/server.key
     Restart MicroShift
-    Add Entry To Hosts    ${USHIFT_HOST}    test.api.com
+    Add Entry To Hosts    ${USHIFT_HOST}    ${hostname}
     Setup Custom Kubeconfig    TestCN
-    Replace Server In Kubeconfig    test.api.com
+    Replace Server In Kubeconfig    ${hostname}
     OC Should Fail To Connect With Unknown CA
-    AddRootCAToRHEL
-    MicroShift Is Live
-    [Teardown]    RemoveRootCAFromRhel
+    MicroShift Is Live With Custom CA    ${TMPDIR}/ca.crt
+    [Teardown]    Remove Entry From Hosts    ${hostname}
 
 Test Wildcard With Names Cert
     [Documentation]    Create WildCard certificate with additional config name
     [Setup]    Setup Test
     Create Keys
+    ${hostname}=    Generate Random HostName
     Create Cert    TestCN    *.api.com
     Upload Certificates
-    Configure Named Certificates    ${TMPDIR}/server.crt    ${TMPDIR}/server.key    test.api.com
+    Configure Named Certificates    ${TMPDIR}/server.crt    ${TMPDIR}/server.key    ${hostname}
     Restart MicroShift
-    Add Entry To Hosts    ${USHIFT_HOST}    test.api.com
-    Setup Custom Kubeconfig    test.api.com
+    Add Entry To Hosts    ${USHIFT_HOST}    ${hostname}
+    Setup Custom Kubeconfig    ${hostname}
     OC Should Fail To Connect With Unknown CA
-    AddRootCAToRHEL
-    MicroShift Is Live
-    [Teardown]    RemoveRootCAFromRhel
+    MicroShift Is Live With Custom CA    ${TMPDIR}/ca.crt
+    [Teardown]    Remove Entry From Hosts    ${hostname}
 
 
 *** Keywords ***
@@ -123,7 +123,6 @@ Setup Test
 
 Teardown
     [Documentation]    Test suite teardown
-    Cleanup Hosts
     Remove Kubeconfig
     Logout MicroShift Host
 
@@ -186,16 +185,23 @@ Configure Named Certificates
     END
     Upload MicroShift Config    ${subject_alt_names}
 
+Generate Random HostName
+    [Documentation]    Generate Random Hostname
+    ${rand}=    Generate Random String
+    ${rand}=    Convert To Lower Case    ${rand}
+    RETURN    ${rand}.api.com
+
 Add Entry To Hosts
     [Documentation]    Add new entry to local /etc/hosts
     [Arguments]    ${ip}    ${host}
-    ${ttt}=    Set Variable    ${ip}\t${host} # RF test marker
-    ${result}=    Run Process    echo -e "${ttt}" | sudo tee -a /etc/hosts    shell=True
+    ${ttt}=    Set Variable    ${ip}\t${host} # RF test marker\n
+    ${result}=    Run Process    sudo tee -a /etc/hosts    shell=True    stdin=${ttt}
     Should Be Equal As Integers    ${result.rc}    0
 
-Cleanup Hosts
-    [Documentation]    remove entries from    local /etc/hosts
-    ${result}=    Run Process    sudo sed -i "/# RF test marker/d" /etc/hosts    shell=True
+Remove Entry From Hosts
+    [Documentation]    Removes entry from local /etc/hosts
+    [Arguments]    ${host}
+    ${result}=    Run Process    sudo sed -i "/${host} # RF test marker/d" /etc/hosts    shell=True
     Should Be Equal As Integers    ${result.rc}    0
 
 Replace Server In Kubeconfig
@@ -214,15 +220,7 @@ OC Should Fail To Connect With Expired Cert
     ${stdout}=    Run With Kubeconfig    oc get --raw='/livez'    allow_fail=True
     Should Contain    ${stdout}    certificate has expired or is not yet valid    strip_spaces=True
 
-AddRootCAToRHEL
-    [Documentation]    add certificate to the rhel trust store
-    [Arguments]    ${src_crt}=ca.crt    ${dst_crt}=oc_ca.pem
-    Set Global Variable    ${RHL_CA_PATH}    /etc/pki/ca-trust/source/anchors/${dst_crt}
-    ${result}=    Run Process    sudo cp ${TMPDIR}/${src_crt} ${RHL_CA_PATH} && sudo update-ca-trust    shell=True
-    Should Be Equal As Integers    ${result.rc}    0
-
-RemoveRootCAFromRhel
-    [Documentation]    remove certificate from the rhel trust store
-    [Arguments]    ${dst_crt}=oc_ca.pem
-    ${result}=    Run Process    sudo rm -f ${RHL_CA_PATH} && sudo update-ca-trust    shell=True
-    Should Be Equal As Integers    ${result.rc}    0
+MicroShift Is Live With Custom CA
+    [Documentation]    Check the /livez endpoint with Custom CA
+    [Arguments]    ${ca_path}
+    MicroShift Is Live    --certificate-authority ${ca_path}

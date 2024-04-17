@@ -30,7 +30,8 @@ MicroShift Is Ready
 
 MicroShift Is Live
     [Documentation]    Check the /livez endpoint
-    ${stdout}=    Run With Kubeconfig    oc get --raw='/livez'
+    [Arguments]    ${extra_args}=${EMPTY}
+    ${stdout}=    Run With Kubeconfig    oc get --raw='/livez' ${extra_args}
     Should Be Equal As Strings    ${stdout}    ok    strip_spaces=True
 
 Wait For MicroShift
