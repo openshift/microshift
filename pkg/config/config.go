@@ -386,7 +386,7 @@ func (c *Config) validate() error {
 		}
 	}
 	if err := validateAuditLogConfig(c.ApiServer.AuditLog); err != nil {
-		return fmt.Errorf("invalid auditlog config: %v", err)
+		return fmt.Errorf("error validating apiserver.auditLog:\n%w", err)
 	}
 
 	return nil
