@@ -396,6 +396,7 @@ do_group() {
             record_junit "${groupdir}" "${alias_name}" "alias" "OK"
         else
             record_junit "${groupdir}" "${alias_name}" "alias" "FAILED"
+            return 1
         fi
     done
 
