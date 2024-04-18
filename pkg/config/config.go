@@ -4,7 +4,9 @@ package config
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
+	"github.com/openshift/microshift/pkg/config/apiserver"
 	"math"
 	"net"
 	"net/url"
@@ -383,6 +385,9 @@ func (c *Config) validate() error {
 			return fmt.Errorf("error validating ingress.listenAddress: %w", err)
 		}
 	}
+	if err := validateAuditLogConfig(c.ApiServer.AuditLog); err != nil {
+		return fmt.Errorf("invalid auditlog config: %v", err)
+	}
 
 	return nil
 }
@@ -543,4 +548,24 @@ func AllowedNICNames() ([]string, error) {
 		names = append(names, link.Attrs().Name)
 	}
 	return names, nil
+}
+
+func validateAuditLogConfig(cfg AuditLog) error {
+	// compose a list of errors so that multiple executions are not required to detect each invalid value individually
+	errs := make([]error, 0)
+	if cfg.Profile != "" {
+		if _, err := apiserver.GetPolicy(cfg.Profile); err != nil {
+			errs = append(errs, fmt.Errorf("invalid value for apiserver.auditlog.profile: %v", err))
+		}
+	}
+	if cfg.MaxFiles < 0 {
+		errs = append(errs, fmt.Errorf("invalid value for apiserver.auditlog.maxFiles, expected value >=0"))
+	}
+	if cfg.MaxFileAge < 0 {
+		errs = append(errs, fmt.Errorf("invalid value for apiserver.auditlog.maxFileAge, expected value >=0"))
+	}
+	if cfg.MaxFileSize < 0 {
+		errs = append(errs, fmt.Errorf("invalid value for apiserver.auditlog.maxFileSize, expected value >=0"))
+	}
+	return errors.Join(errs...) // Join returns nil if len(errs) == 0
 }
