@@ -354,7 +354,7 @@ do_group() {
             rc=$?
             set -e
             if [[ "${rc}" -eq 0 ]]; then
-                buildid=$(echo "${build_cmd_output}" | awk '{print $2}')
+                buildid=$(echo "${build_cmd_output}" | awk '/^Compose/ {print $2}')
                 break
             fi
             sleep 15
