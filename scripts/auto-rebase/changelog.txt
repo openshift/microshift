@@ -1,4 +1,11 @@
-- machine-config-operator embedded-component 42218f968a9e3f28da33bfe3d66de0f912ba1bb5 to 4ea40c5c81c9624146a24d57aeaaa0616972bb4d
-  - bbcfa14d 2024-03-28T07:42:21+00:00 Prevent OVS-configuration to run before kdump
-  - 09d3dd61 2024-01-12T19:58:51+00:00 Add \n in cert_writer for old cert methods and skip cloudCA validation
+- ovn-kubernetes image-arm64 21ab2315a1b04831a59395171c65e661eede8794 to 2fdbd1bb9fa7b298c8883010958267474c93c955
+  - 439f5ea 2024-04-08T16:24:45+00:00 CARRY: fix 4.14 specific unit tests
+  - 2110452 2024-04-08T15:55:12+00:00 Set mac binding age threshold in gateway routers
+  - 1fd3804 2024-04-08T15:53:58+00:00 Delete HO static mac bindings
+  - fe76441 2024-04-08T15:53:58+00:00 Delete static mac bindings on gateway cleanup
+  - 0c52bfd 2024-04-08T15:53:57+00:00 Add static mac bindings to the Static_Mac_Binding table
+  - 2227800 2024-04-08T15:53:56+00:00 Delete legacy DGP mac binding using client native API
+
+- kubernetes image-arm64 613e4d8fcdca10207adfa2e18533d9cf29e91df4 to 7bee54d0aa64d001faf2a3c8c72849e4be692ec1
+  - c48bf1840 2024-02-26T13:41:57+01:00 UPSTREAM: <carry>: openshift-kube-apiserver: add kube-apiserver patches
 
