@@ -20,6 +20,7 @@ spec:
       labels:
         app: csi-snapshot-webhook
     spec:
+      serviceAccount: csi-snapshot-webhook
       containers:
         - name: webhook
           image: '{{ .ReleaseImage.csi_snapshot_validation_webhook }}'
