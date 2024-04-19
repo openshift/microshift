@@ -82,7 +82,16 @@ restart_osbuilder_services() {
     if ! systemctl is-active -q osbuild-composer.socket &>/dev/null ; then
         title "Starting osbuild services"
         sudo systemctl start osbuild-composer.socket
-        sudo systemctl start osbuild-worker@1.service
+        for try in $(seq 3); do
+            sleep 1 # Give composer some time to be ready for workers
+            if sudo systemctl start osbuild-worker@1.service; then
+                break
+            else
+                if [ "${try}" -eq 2 ]; then
+                    return 1
+                fi
+            fi
+        done
     fi
 }
 
