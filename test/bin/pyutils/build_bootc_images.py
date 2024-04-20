@@ -189,14 +189,28 @@ def process_image_bootc(groupdir, bootcfile, dry_run):
     os.makedirs(bf_outdir, exist_ok=True)
 
     common.print_msg(f"Processing {bf_path}")
+
     bf_imgref = common.read_file(bf_path).strip()
+    # Download the image locally to be used by bootc image builder
+    common.run_command(
+        ["sudo", "podman", "pull", "--authfile", PULL_SECRET, bf_imgref ],
+        dry_run)
+
+    # The podman command with security elevation and
+    # mount of output / container storage
     build_cmd = [
         "sudo", "podman", "run",
         "--rm", "-i", "--privileged",
+        "--pull=newer",
         "--security-opt", "label=type:unconfined_t",
         "-v", f"{bf_outdir}:/output",
+        "-v", "/var/lib/containers/storage:/var/lib/containers/storage"
+    ]
+    # Add the bootc image builder command line using local images
+    build_cmd += [
         "quay.io/centos-bootc/bootc-image-builder:latest",
         "--type", "anaconda-iso",
+        "--local",
         bf_imgref
     ]
     common.run_command(build_cmd, dry_run)
