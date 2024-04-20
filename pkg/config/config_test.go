@@ -507,6 +507,28 @@ func TestValidate(t *testing.T) {
 			}(),
 			expectErr: true,
 		},
+		{
+			name: "audit-log-flag-values-unexpected-values",
+			config: func() *Config {
+				c := mkDefaultConfig()
+				c.ApiServer.AuditLog.MaxFiles = -1
+				c.ApiServer.AuditLog.MaxFileAge = -1
+				c.ApiServer.AuditLog.MaxFileSize = -1
+				return c
+			}(),
+			expectErr: true,
+		},
+		{
+			name: "audit-log-flag-expected-values",
+			config: func() *Config {
+				c := mkDefaultConfig()
+				c.ApiServer.AuditLog.MaxFiles = 0
+				c.ApiServer.AuditLog.MaxFileAge = 0
+				c.ApiServer.AuditLog.MaxFileSize = 0
+				return c
+			}(),
+			expectErr: false,
+		},
 	}
 	for _, tt := range ttests {
 		t.Run(tt.name, func(t *testing.T) {
