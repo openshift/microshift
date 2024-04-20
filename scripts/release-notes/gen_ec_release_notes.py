@@ -68,6 +68,8 @@ URL_BASE_X86 = "https://mirror.openshift.com/pub/openshift-v4/x86_64/microshift"
 GITHUB_ORG = 'openshift'
 GITHUB_REPO = 'microshift'
 REMOTE = "token-remote"
+MAX_RELEASE_NOTE_BODY_SIZE = 125000
+TRUNCATED_MESSAGE = '\n\n(release notes were truncated)\n\n'
 
 # An EC RPM filename looks like
 # microshift-4.13.0~ec.4-202303070857.p0.gcf0bce2.assembly.ec.4.el9.aarch64.rpm
@@ -433,6 +435,12 @@ def add_token_remote():
         raise Exception(f"Command `git remote add` failed: {err}")
 
 
+def get_previous_tag(release_name):
+    "Returns the name of the tag _before_ release_name on the branch."
+    output = subprocess.check_output(["git", "describe", f'{release_name}~1', '--abbrev=0'])
+    return output.decode('utf-8').strip()
+
+
 def tag_release(tag, sha, buildtime):
     env = {}
     # Include our existing environment settings to ensure values like
@@ -471,7 +479,7 @@ def publish_release(new_release, take_action):
     release_date = new_release.release_date
 
     # Set up the release notes preamble with download links
-    notes = textwrap.dedent(f"""
+    preamble = textwrap.dedent(f"""
     This is a candidate release for {product_version}.
 
     See the mirror for build artifacts:
@@ -502,6 +510,28 @@ def publish_release(new_release, take_action):
 
     """)
 
+    # Get the previous tag on the branch as the starting point for the
+    # release notes.
+    previous_tag = get_previous_tag(release_name)
+
+    # Auto-generate the release notes ourselves, add the preamble,
+    # then make sure the results fit within the size limits imposed by
+    # the API.
+    generated_notes = github_release_notes(previous_tag, release_name, commit_sha)
+    notes = f'{preamble}\n{generated_notes["body"]}'
+    if len(notes) > MAX_RELEASE_NOTE_BODY_SIZE:
+        lines = notes.splitlines()
+        last_line = lines[-1]
+        notes_content_we_can_truncate = notes[:-len(last_line)]
+        amount_we_can_keep = MAX_RELEASE_NOTE_BODY_SIZE - len(last_line) - len(TRUNCATED_MESSAGE)
+        truncated = notes_content_we_can_truncate[:amount_we_can_keep]
+        if truncated[-1] == '\n':
+            notes_to_keep = truncated
+        else:
+            # don't leave a partial line
+            notes_to_keep = truncated.rpartition('\n')[0].rstrip()
+        notes = f'{notes_to_keep}{TRUNCATED_MESSAGE}{last_line}'
+
     if not take_action:
         print(f'Dry run for new release {new_release} on commit {commit_sha} from {release_date}')
         print(notes)
@@ -524,15 +554,14 @@ def publish_release(new_release, take_action):
         raise
 
 
-def github_release_create(tag, notes_header):
+def github_release_create(tag, notes):
     results = github_api(
         f'/repos/{GITHUB_ORG}/{GITHUB_REPO}/releases',
         tag_name=tag,
         name=tag,
-        body=notes_header,
+        body=notes,
         draft=False,
         prerelease=True,
-        generate_release_notes=True,
     )
     print(f'Created new release {tag}')
     print()
@@ -541,9 +570,19 @@ def github_release_create(tag, notes_header):
     print(results['body'])
 
 
+def github_release_notes(previous_tag, tag_name, target_commitish):
+    results = github_api(
+        f'/repos/{GITHUB_ORG}/{GITHUB_REPO}/releases/generate-notes',
+        tag_name=tag_name,
+        target_commitish=target_commitish,
+        previous_tag_name=previous_tag,
+    )
+    return results
+
+
 def github_release_exists(tag):
     try:
-        github_api(f'/repos/{GITHUB_ORG}/{GITHUB_REPO}releases/tags/{tag}')
+        github_api(f'/repos/{GITHUB_ORG}/{GITHUB_REPO}/releases/tags/{tag}')
         return True
     except Exception:
         return False
