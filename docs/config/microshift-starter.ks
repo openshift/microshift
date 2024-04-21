@@ -53,10 +53,11 @@ RuntimeMaxUse=1G
 EOF
 
 # Make sure all the Ethernet network interfaces are connected automatically
-for uuid in $(nmcli -f uuid,type,autoconnect connection | awk '$2 == "ethernet" && $3 == "no" {print $1}') ; do
-    # Remove autoconnect option from the configuration file to keep it enabled after reboot
-    file=$(nmcli -f uuid,filename connection | awk -v uuid=${uuid} '$1 == uuid' | sed "s/${uuid}//g" | xargs)
-    sed -i '/autoconnect=.*/d' "${file}"
+# by removing autoconnect option from the configuration files
+find /etc/NetworkManager -name '*.nmconnection' -print0 | while IFS= read -r -d $'\0' file ; do
+    if grep -qE '^type=ethernet' "${file}" ; then
+        sed -i '/autoconnect=.*/d' "${file}"
+    fi
 done
 
 %end
