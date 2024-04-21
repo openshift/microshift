@@ -40,3 +40,6 @@ RUN dnf install -y vi firewalld microshift && \
     rm -rf $USHIFT_RPM_REPO_PATH && \
     rm -f /etc/yum.repos.d/{microshift,openshift}*.repo && \
     dnf clean all
+
+# Extend Greenboot wait timeout to 10m for MicroShift to be ready
+RUN printf '\nMICROSHIFT_WAIT_TIMEOUT_SEC=600\n' >> /etc/greenboot/greenboot.conf
