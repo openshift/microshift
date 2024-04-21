@@ -13,13 +13,6 @@ scenario_create_vms() {
     # It is a temporary workaround until rhel-9.4.iso build is available.
     # Two nics - one for macvlan, another for ipvlan (they cannot enslave the same interface)
     launch_vm host1 centos9 "${VM_MULTUS_NETWORK}" "" "" "" "2" "" "1"
-
-    # Open the firewall ports. Other scenarios get this behavior by
-    # embedding settings in the blueprint, but there is no blueprint
-    # for this scenario. We need do this step before running the RF
-    # suite so that suite can assume it can reach all of the same
-    # ports as for any other test.
-    configure_vm_firewall host1
 }
 
 scenario_remove_vms() {
