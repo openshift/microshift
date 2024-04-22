@@ -354,7 +354,7 @@ do_group() {
             rc=$?
             set -e
             if [[ "${rc}" -eq 0 ]]; then
-                buildid=$(echo "${build_cmd_output}" | awk '{print $2}')
+                buildid=$(echo "${build_cmd_output}" | awk '/^Compose/ {print $2}')
                 break
             fi
             sleep 15
@@ -473,6 +473,12 @@ do_group() {
         builds_to_get=$(time "${SCRIPTDIR}/wait_images.py" "${buildid_list[@]}")
     fi
 
+    builds_to_get_num="$(echo "${builds_to_get}" | awk -F' ' '{print NF}')"
+    if [ "${#buildid_list[@]}" -ne "${builds_to_get_num}" ]; then
+        echo "wait_images.py returned unexpected amount of build IDs"
+        return 1
+    fi
+
     echo "Downloading build logs, metadata, and image"
     cd "${IMAGEDIR}/builds"
 
@@ -546,6 +552,7 @@ do_group() {
             record_junit "${groupdir}" "${alias_name}" "alias" "OK"
         else
             record_junit "${groupdir}" "${alias_name}" "alias" "FAILED"
+            return 1
         fi
     done
 

@@ -181,9 +181,11 @@ if ${RHEL_SUBSCRIPTION}; then
     OSVERSION=$(awk -F: '{print $5}' /etc/system-release-cpe)
     sudo subscription-manager config --rhsm.manage_repos=1
 
+    sudo subscription-manager repos \
+        --enable "rhocp-${OCPVERSION}-for-rhel-${OSVERSION}-$(uname -m)-rpms"
+
     if ! ${RHEL_BETA_VERSION} ; then
         sudo subscription-manager repos \
-            --enable "rhocp-${OCPVERSION}-for-rhel-${OSVERSION}-$(uname -m)-rpms" \
             --enable "fast-datapath-for-rhel-${OSVERSION}-$(uname -m)-rpms"
     else
         OCP_REPO_NAME="rhocp-${OCPVERSION}-for-rhel-${OSVERSION}-mirrorbeta-$(uname -i)-rpms"
