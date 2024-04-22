@@ -1,0 +1,21 @@
+rangeallocations.security.internal.openshift.io:
+  Annotations: {}
+  ApprovedPRNumber: https://github.com/openshift/api/pull/751
+  CRDName: rangeallocations.security.internal.openshift.io
+  Capability: ""
+  Category: ""
+  FeatureGates: []
+  FilenameOperatorName: config-operator
+  FilenameOperatorOrdering: "02"
+  FilenameRunLevel: "0000_03"
+  GroupName: security.internal.openshift.io
+  HasStatus: false
+  KindName: RangeAllocation
+  Labels: {}
+  PluralName: rangeallocations
+  PrinterColumns: []
+  Scope: Cluster
+  ShortNames: null
+  TopLevelFeatureGates: []
+  Version: v1
+

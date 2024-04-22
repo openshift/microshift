@@ -3,7 +3,6 @@ package controllercmd
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
 	"math/rand"
 	"os"
 	"path/filepath"
@@ -150,7 +149,7 @@ func (c *ControllerCommandConfig) NewCommandWithContext(ctx context.Context) *co
 				}
 				files := map[string][]byte{}
 				for _, fn := range c.basicFlags.TerminateOnFiles {
-					fileBytes, err := ioutil.ReadFile(fn)
+					fileBytes, err := os.ReadFile(fn)
 					if err != nil {
 						klog.Warningf("Unable to read initial content of %q: %v", fn, err)
 						continue // intentionally ignore errors
@@ -248,7 +247,7 @@ func (c *ControllerCommandConfig) AddDefaultRotationToConfig(config *operatorv1a
 			startingFileContent[filepath.Join(certDir, "tls.crt")] = []byte{}
 			startingFileContent[filepath.Join(certDir, "tls.key")] = []byte{}
 
-			temporaryCertDir, err := ioutil.TempDir("", "serving-cert-")
+			temporaryCertDir, err := os.MkdirTemp("", "serving-cert-")
 			if err != nil {
 				return nil, nil, err
 			}
@@ -268,7 +267,7 @@ func (c *ControllerCommandConfig) AddDefaultRotationToConfig(config *operatorv1a
 			config.ServingInfo.CertFile = filepath.Join(temporaryCertDir, "tls.crt")
 			config.ServingInfo.KeyFile = filepath.Join(temporaryCertDir, "tls.key")
 			// nothing can trust this, so we don't really care about hostnames
-			servingCert, err := ca.MakeServerCert(sets.NewString("localhost"), 30)
+			servingCert, err := ca.MakeServerCert(sets.New("localhost"), 30)
 			if err != nil {
 				return nil, nil, err
 			}

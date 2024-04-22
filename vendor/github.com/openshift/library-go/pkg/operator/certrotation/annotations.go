@@ -33,7 +33,7 @@ func (a AdditionalAnnotations) EnsureTLSMetadataUpdate(meta *metav1.ObjectMeta) 
 		modified = true
 	}
 	if len(a.AutoRegenerateAfterOfflineExpiry) > 0 && meta.Annotations[AutoRegenerateAfterOfflineExpiryAnnotation] != a.AutoRegenerateAfterOfflineExpiry {
-		meta.Annotations[AutoRegenerateAfterOfflineExpiryAnnotation] = a.Description
+		meta.Annotations[AutoRegenerateAfterOfflineExpiryAnnotation] = a.AutoRegenerateAfterOfflineExpiry
 		modified = true
 	}
 	return modified
