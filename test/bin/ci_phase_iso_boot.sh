@@ -24,6 +24,16 @@ exec &> >(tee >(awk '{ print strftime("%Y-%m-%d %H:%M:%S"), $0; fflush() }' >"${
 
 LAUNCH_VMS_JOB_LOG="${IMAGEDIR}/launch_vm_jobs.txt"
 
+# shellcheck disable=SC2317  # used in trap below
+osbuild_logs() {
+    workers_services=$(sudo systemctl list-units --output json | jq -r '.[] | select(.unit | contains("osbuild-worker@") or contains("osbuild-composer.service")) | .unit')
+    for service in ${workers_services}; do
+        # shellcheck disable=SC2024  # redirect and sudo
+        sudo journalctl -u "${service}" &> "${LOGDIR}/${service}.boot.log"
+    done
+}
+trap 'osbuild_logs' EXIT
+
 # Copy the scenario definition files to a temporary location from
 # which they will be read. This allows filtering the tests from a
 # specific $SCENARIO_SOURCES directory.

@@ -23,7 +23,7 @@ osbuild_logs() {
     if ${SKIP_LOG_COLLECTION}; then
         return
     fi
-    workers_services=$(sudo systemctl list-units | awk '/osbuild-worker@/ {print $1} /osbuild-composer\.service/ {print $1}')
+    workers_services=$(sudo systemctl list-units --output json | jq -r '.[] | select(.unit | contains("osbuild-worker@") or contains("osbuild-composer.service")) | .unit')
     for service in ${workers_services}; do
         # shellcheck disable=SC2024  # redirect and sudo
         sudo journalctl -u "${service}" &> "${LOGDIR}/${service}.log"
