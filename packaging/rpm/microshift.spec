@@ -359,7 +359,7 @@ usermod -a -G hugetlbfs openvswitch
 
 # only for install, not on upgrades
 if [ $1 -eq 1 ]; then
-	# if crio was already started, restart it so it will catch /etc/crio/crio.conf.d/microshift.conf
+	# if crio was already started, restart it so it will catch /etc/crio/crio.conf.d/10-microshift.conf
 	systemctl is-active --quiet crio && systemctl restart --quiet crio || true
 fi
 
@@ -395,6 +395,12 @@ systemctl enable --now --quiet openvswitch || true
 
 %systemd_preun microshift.service
 
+%post multus
+# only for install, not on upgrades
+if [ $1 -eq 1 ]; then
+	# if crio was already started, restart it so it will catch /etc/crio/crio.conf.d/12-microshift-multus.conf
+	systemctl is-active --quiet crio && systemctl restart --quiet crio || true
+fi
 
 %files
 %license LICENSE
@@ -472,6 +478,9 @@ systemctl enable --now --quiet openvswitch || true
 # Use Git command to generate the log and replace the VERSION string
 # LANG=C git log --date="format:%a %b %d %Y" --pretty="tformat:* %cd %an <%ae> VERSION%n- %s%n" packaging/rpm/microshift.spec
 %changelog
+* Tue Apr 23 2024 Patryk Matuszak <pmatusza@redhat.com> 4.16.0
+- Restart CRI-O on microshift-multus RPM install
+
 * Mon Feb 26 2024 Patryk Matuszak <pmatusza@redhat.com> 4.16.0
 - RPM packages for Multus CNI
 
