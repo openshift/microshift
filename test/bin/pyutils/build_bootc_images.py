@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 
 import argparse
+import concurrent.futures
 import glob
 import os
+import platform
+import re
 import shutil
 import sys
 import traceback
-import re
-import platform
 
 import common
 
@@ -141,25 +142,23 @@ def extract_container_images(version, repo_spec, outfile, dry_run=False):
     common.popd()
 
 
-def process_containerfiles(groupdir, dry_run=False):
-    # Process group directory contents sorted by length and then alphabetically
-    for containerfile in sorted(os.listdir(groupdir), key=lambda i: (len(i), i)):
-        if not containerfile.endswith(".containerfile"):
-            continue
+def process_containerfile(groupdir, containerfile, dry_run):
+    cf_path = os.path.join(groupdir, containerfile)
+    cf_outname = os.path.splitext(containerfile)[0]
+    cf_outdir = os.path.join(BOOTC_IMAGE_DIR, cf_outname)
+    cf_logfile = os.path.join(BOOTC_IMAGE_DIR, f"{cf_outname}.log")
 
-        cf_path = os.path.join(groupdir, containerfile)
-        cf_outname = os.path.splitext(os.path.basename(containerfile))[0]
-        cf_outdir = os.path.join(BOOTC_IMAGE_DIR, cf_outname)
+    os.makedirs(BOOTC_IMAGE_DIR, exist_ok=True)
 
-        os.makedirs(BOOTC_IMAGE_DIR, exist_ok=True)
+    if os.path.exists(cf_outdir):
+        common.print_msg(f"{cf_outdir} already exists")
+        if common.should_skip(cf_outname):
+            common.record_junit(groupdir, cf_path, "containerfile", "SKIPPED")
+            return
 
-        if os.path.exists(cf_outdir):
-            common.print_msg(f"{cf_outdir} already exists")
-            if common.should_skip(cf_outname):
-                common.record_junit(groupdir, cf_path, "containerfile", "SKIPPED")
-                continue
-
-        common.print_msg(f"Processing {cf_path}")
+    common.print_msg(f"Processing {containerfile} with logs in {cf_logfile}")
+    # Redirect the output to the log file
+    with open(cf_logfile, 'w') as logfile:
         # Run the container build command
         build_args = [
             "podman", "build",
@@ -167,12 +166,49 @@ def process_containerfiles(groupdir, dry_run=False):
             "-t", cf_outname, "-f", cf_path,
             os.path.join(IMAGEDIR, "rpm-repos")
         ]
-        common.run_command(build_args, dry_run)
+        common.run_command_in_shell(build_args, dry_run, logfile, logfile)
 
         # Run the container export command
         if os.path.exists(cf_outdir):
             shutil.rmtree(cf_outdir)
-        common.run_command(["podman", "save", "--format", "oci-dir", "-o", cf_outdir, cf_outname], dry_run)
+        save_args = [
+            "podman", "save",
+            "--format", "oci-dir",
+            "-o", cf_outdir, cf_outname
+        ]
+        common.run_command_in_shell(save_args, dry_run, logfile, logfile)
+
+
+def process_image_bootc(groupdir, bootcfile, dry_run):
+    None
+
+
+def process_group(groupdir, dry_run=False):
+    futures = []
+    # Parallel processing loop
+    with concurrent.futures.ProcessPoolExecutor() as executor:
+        # Scan group directory contents sorted by length and then alphabetically
+        for file in sorted(os.listdir(groupdir), key=lambda i: (len(i), i)):
+            if file.endswith(".containerfile"):
+                futures += [executor.submit(process_containerfile, groupdir, file, dry_run)]
+            elif file.endswith(".image-bootc"):
+                futures += [executor.submit(process_image_bootc, groupdir, file, dry_run)]
+            else:
+                common.print_msg(f"Skipping unknown file {file}")
+
+    try:
+        # Wait for the parallel tasks to complete
+        for f in concurrent.futures.as_completed(futures):
+            common.print_msg(f"Task {f} completed")
+            # Result function generates an exception depending on the task state
+            f.result()
+    except Exception:
+        # Cancel all pending tasks and propagate the exception
+        for f in futures:
+            if not f.done():
+                f.cancel()
+                common.print_msg(f"Task {f} cancelled")
+        raise
 
 
 def main():
@@ -207,14 +243,15 @@ def main():
 
         # Process individual group directory
         if args.group_dir:
-            process_containerfiles(args.group_dir, args.dry_run)
-            return
-        # Process layer directory contents sorted by length and then alphabetically
-        for item in sorted(os.listdir(args.layer_dir), key=lambda i: (len(i), i)):
-            item_path = os.path.join(args.layer_dir, item)
-            # Check if this item is a directory
-            if os.path.isdir(item_path):
-                process_containerfiles(item_path, args.dry_run)
+            process_group(args.group_dir, args.dry_run)
+        else:
+            # Process layer directory contents sorted by length and then alphabetically
+            for item in sorted(os.listdir(args.layer_dir), key=lambda i: (len(i), i)):
+                item_path = os.path.join(args.layer_dir, item)
+                # Check if this item is a directory
+                if os.path.isdir(item_path):
+                    process_group(item_path, args.dry_run)
+        # Success message
         common.print_msg("Build complete")
     except Exception as e:
         common.print_msg(f"An error occurred: {e}")

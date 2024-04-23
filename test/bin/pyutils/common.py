@@ -45,14 +45,25 @@ def run_command(command: List[str], dry_run: bool):
     return subprocess.run(command, check=True)
 
 
-def run_command_in_shell(command: str):
-    """Run the command through shell and return its output"""
+def run_command_in_shell(command: List[str], dry_run: bool = False,
+                         stdout=subprocess.PIPE, stderr=sys.stderr):
+    """Run the command through shell and return its standard output"""
+    """If output file descriptors are specified, the appropriate output is redirected"""
+    # Convert command to a string if necessary
+    if isinstance(command, list):
+        command = ' '.join(command)
+    if dry_run:
+        print_msg(f"[DRY RUN] {command}")
+        return ""
+
     print_msg(f"[SHELL] {command}")
+    # Run the command and return its output
     result = subprocess.run(
         command,
         check=True, shell=True, text=True,
-        env=os.environ.copy(), stdout=subprocess.PIPE)
-    return result.stdout.strip()
+        env=os.environ.copy(),
+        stdout=stdout, stderr=stderr)
+    return result.stdout.strip() if result.stdout else ""
 
 
 def create_dir(dir: str):
