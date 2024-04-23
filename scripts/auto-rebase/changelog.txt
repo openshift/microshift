@@ -1,0 +1,275 @@
+- cluster-csi-snapshot-controller-operator embedded-component a9b0c1c1b0bc031572e6f5029f672e58347c0648 to 661409f25dd18cdfc508568a30740b173538049c
+  - 0aa1e91 2024-02-06T10:06:17-05:00 OCPBUGS-28230: add FallbackToLogsOnError for easier debugging
+
+- cluster-ingress-operator embedded-component 81fffa0a15f82deafd97b84e1f5cb2efe1bd9d62 to bca2dff6a401500f1eae2847289c1e8ca2e993a2
+  - 9bf38aa 2024-04-19T20:58:04+02:00 NE-1317: manifests - adding ingress capability annotations
+  - 65dcb3f 2024-04-17T13:08:54-04:00 Bump openshift/api, and update CRD generation
+
+- cluster-kube-controller-manager-operator embedded-component f5ea706c4378d74d1a46ed0eec624bc6cc207dbc to f0f485f3c1d70416c242e3159820331a36fb2d2a
+  - 6eb697a 2024-04-15T16:38:00+02:00 bindata: convert SecretTypeTLS secrets
+
+- cluster-network-operator embedded-component d98d330298330a9f181965e9bc5a821b349084bf to a5909c5af10683639fbbdbc822bc0b13c98520d5
+  - b4980a4 2024-04-18T18:29:27+02:00 Fix shellcheck warnings on ipsec bash scripts
+  - 3e813ca 2024-04-18T18:29:27+02:00 Fix wait logic for ipsec certificate signing request
+  - f0ccd42 2024-04-18T15:01:15+02:00 Improve IPsec MachineConfig readiness check
+  - ac7ba19 2024-04-17T02:48:51+09:00 OCPBUGS-28230: enforce termination message policy on all platform pods
+  - 424182b 2024-04-16T09:51:32+02:00 ANP: Add RBAC for cluster-manager
+  - 07fd8f1 2024-04-16T10:30:30+03:00 Add ipsec state metric
+  - aab035e 2024-04-15T18:29:12+05:30 Avoid updating networkDiagnostics field to cluster config
+  - d95ab1c 2024-04-15T18:29:12+05:30 Add ability to configure transit and join switch subnet
+  - d5032b8 2024-04-15T18:29:12+05:30 Configure CNO as per new API changes for join and transit switch subnet
+  - 6b0e01e 2024-04-12T14:24:59-04:00 OCPBUGS-28230: enforce termination message policy on all platform pods
+  - bcb1282 2024-04-11T12:14:26+05:30 API bump in CNO
+  - 4de77fc 2024-02-05T09:49:21-05:00 use v1 for flowcontrol API
+
+- kubernetes embedded-component 6b4d6cb58038fc1bd4da50fde0164a8872e60703 to d9d45306df052aa5824fd8b2dab4e61f5ecc481c
+  - 93a2209cd 2024-04-18T07:43:24+05:30 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - e40b9c41b 2024-04-18T07:22:22+05:30 UPSTREAM: <drop>: manually resolve conflicts
+  - facd3b186 2024-04-16T11:41:03-04:00 UPSTREAM: <carry>: featureset validation moved to CEL
+  - 55019c83b 2024-04-16T15:00:24+00:00 Release commit for Kubernetes v1.29.4
+  - 406ffc35f 2024-04-16T10:45:38-04:00 UPSTREAM: <carry>: create readyz event for kubeapi server
+  - 410ba701b 2024-04-16T00:37:27+05:30 UPSTREAM: <carry>: Fix incorrect type casting in admission validate_apiserver
+  - 1448e1c3f 2024-04-16T00:37:08+05:30 UPSTREAM: <carry>: Add RouteExternalCertificate validation in Route ObjectValidator
+  - 34546f472 2024-04-15T09:15:06-07:00 Add envFrom to serviceaccount admission plugin
+  - 34ab3fd19 2024-04-11T16:36:40-04:00 UPSTREAM: <carry>: react to library-go changes
+  - 8240a5ec8 2024-04-11T16:36:40-04:00 UPSTREAM: <drop>: bump library-go
+  - c652a1dae 2024-04-09T18:20:48-04:00 UPSTREAM: <carry>: add support for cpu limits into management workloads
+  - b635fd628 2024-04-05T15:56:44+02:00 update debian-base to bookworm-v1.0.2
+  - 1fded9c76 2024-04-05T15:56:34+02:00 [go] Bump images, dependencies and versions to go 1.21.9 and distroless iptables / set-cap
+  - f10341af5 2024-04-04T14:20:20+05:30 [CVE-2023-45288] .*: bump x/net to v0.23.0
+  - efd8578ac 2024-04-03T14:54:16-04:00 Keep streams from being set up after closeAllStreamReaders is called
+  - 4499c3fad 2024-04-03T14:54:08-04:00 Make websocket heartbeat test timing less flaky
+  - d7258c313 2024-04-03T14:54:02-04:00 Avoid logging binary junk for frame write failure
+  - 2b621fe7b 2024-04-01T15:29:59-03:00 Use the right feature gate when updating uncertain volumes
+  - aa6c13575 2024-04-01T16:49:17+08:00 fix panic with SIGSEGV in kubeadm certs check-expiration
+  - cd9f65388 2024-03-29T10:01:39-04:00 retry policy creation for CRD type checking E2E test
+  - cf2a33715 2024-03-19T23:16:57+01:00 Undo double run of the TestWatchSemantics test to avoid hitting timeout
+  - d9ca30059 2024-03-19T09:06:53+01:00 apiserver/storage/cacher: decrease the running time of tests in the cacher package.
+  - f8f08542c 2024-03-19T09:06:33+01:00 Serve watch without resourceVersion from cache and introduce a WatchFromStorageWithoutResourceVersion feature gate to allow serving watch from storage.
+  - ff2189b7c 2024-03-19T08:52:31+01:00 Ensure that initial events are sorted for WatchList
+  - dee895d7f 2024-03-15T00:33:33+00:00 Update CHANGELOG/CHANGELOG-1.29.md for v1.29.3
+  - 93cafce2f 2024-03-08T12:57:08-05:00 fix aggregator path filtering to include /
+  - a3ac0b48c 2024-03-01T17:17:23-05:00 Filter aggregated apiservice gv
+  - beb7bf347 2024-01-10T12:19:46+01:00 Use DBG=1 for conformance verification
+  - 437f2cfce 2024-01-10T12:19:46+01:00 build: use -trimpath in non-DBG mode
+  - 0af609a29 2023-11-24T18:30:50+01:00 UPSTREAM: <carry>: kube-controller-manager: allow running bare kube-controller-manager
+
+- machine-config-operator embedded-component 509a97df24be851ee8c11247dbd840c927f02137 to 52e618e80e1ac6cd00ac7a41b19d354b6b254488
+  - fb604458 2024-04-18T10:39:09+02:00 cleanup: update references in docs from machine-os-contenet to rhel-coreos
+  - 335da0ad 2024-04-17T15:47:10-04:00 use caching to speed up incremental builds
+  - 2be5e47f 2024-04-17T10:50:42-04:00 msbic: nit cleanups
+  - 6923d564 2024-04-16T18:54:20-04:00 msbic: update e2e to use API
+  - 2b9c00f0 2024-04-16T18:54:20-04:00 msbic: inject managed stub into machineset
+  - 537d958f 2024-04-16T18:54:20-04:00 msbic: error on machineset with an owner reference
+  - 4fce32f6 2024-04-16T18:54:20-04:00 msbic: add support for boot image opt-in API
+  - 9f8844d2 2024-04-16T18:54:20-04:00 operator: add syncMachineConfiguration
+  - cea6d50d 2024-04-16T05:50:10-04:00 update crd-sync script to include missing CRDs
+  - bdf34886 2024-04-16T15:07:36+05:30 bug: Fix configure-ip-forwarding.sh
+  - 0862f41c 2024-04-15T16:08:18-04:00 operator: sync validatingadmissionpolicy manifests
+  - ef3d914e 2024-04-13T07:57:17-04:00 make go-deps for library-go
+  - 6969efaa 2024-04-12T14:17:37-04:00 OCPBUGS-28230: enforce termination message policy on all platform pods
+
+- operator-framework-olm embedded-component 0d40488558ed03b817755c2f95567fcf68dc9cba to 773439e5842d3b7ba480c6e097c7aa6da3c92df5
+  - 8aafc6c0 2024-04-18T00:02:51+00:00 Fix unpack job cache issue (#3204)
+  - 7c5825f4 2024-04-16T00:03:54+00:00 Update if AlreadyExists (#3202)
+  - 98991290 2024-04-16T00:02:18+00:00 catalog-operator: delete catalog pods stuck in Terminating state due to unreachable node (#3201)
+  - 1658453a 2024-04-12T16:59:48-04:00 OCPBUGS-28230: update manifest generation to enforce termination message policy on all platform pods
+  - 3b110b7f 2024-04-12T15:41:54-04:00 OCPBUGS-28230: enforce termination message policy on all platform pods
+
+- oc image-amd64 46db7c2bce5a57e3c3d9347e7e1e107e61dbd306 to 0cef8cba93cca6eb9c0b31f9c03f829ecc5b02a2
+  - 24897fe4 2024-04-19T18:14:05-04:00 Changing the conditional risk to known issues
+  - 31b1c919 2024-04-19T01:05:08+02:00 `upgrade status`: always tabulate 'All is well'
+  - cff394b6 2024-04-19T01:05:08+02:00 `upgrade status`: ignore incomplete insights
+  - 3fd53d64 2024-04-19T01:05:08+02:00 `upgrade status`: pad linebreaks in descriptions
+  - e24767c4 2024-04-19T01:05:08+02:00 `upgrade status`: populate descriptions and refs for insights
+  - aada20af 2024-04-19T01:05:08+02:00 `upgrade status`: `--details=health` shows reference and description
+  - 38cd6c9e 2024-04-17T15:52:40+02:00 `upgrade status`: test `--detailed=all` in examples integration test
+  - 17c3c1fc 2024-04-17T15:44:25+02:00 `upgrade status`: add `--detailed=nodes` that shows all nodes
+  - cf8d1026 2024-04-16T10:02:17-06:00 add prune renderedmachineconfigs
+  - e4657909 2024-04-15T11:28:24-04:00 indicate how many tests each feature has
+  - eeaf9631 2024-04-15T11:09:11-04:00 update library-go for new api
+  - b0ce1a6b 2024-04-11T09:25:38-04:00 update API for test reporting types
+
+- router image-amd64 526f832abbd2c2926d6545b4a6f5c41579bc6a76 to a14aea7c439463e684fc921254d6f85234563bee
+  - 7df65af 2024-04-18T13:38:20+02:00 OCPBUGS-32044: Introduce 'idle-close-on-response' option for frontends
+
+- ovn-kubernetes image-amd64 904635520714590ee15a1b70c09303266c4910fb to 83a598a201cd5d94e921b4790a86e7bdca1ae0a9
+  - cae032e 2024-04-17T23:25:53+02:00 Fix helm installation for ANP CRDs
+  - 1109289 2024-04-17T21:35:39+02:00 ANP Status: Fix bug around zone delete
+  - f95ea49 2024-04-17T21:35:39+02:00 Update version of e2e's to the latest: v0.1.3
+  - 7a69306 2024-04-17T21:35:39+02:00 Do server-side-apply for ANP/BANP
+  - 648d83d 2024-04-17T21:35:39+02:00 Update the new namespace peer styling
+  - f20ee5d 2024-04-17T21:35:39+02:00 Update the vendoring of ANP yamls
+  - 977b256 2024-04-17T21:35:39+02:00 Bump network-policy-api to latest
+  - d0dbf01 2024-04-16T09:40:46+02:00 Add (B)ANP ACL/AddressSet count metrics
+  - 26eb4ae 2024-04-15T22:03:49-07:00 helm: Add GitHub Test Lane
+  - a4303fc 2024-04-15T22:03:49-07:00 symlink CRDs from helm chart to dist/templates
+  - 3bb4861 2024-04-15T22:03:49-07:00 helm: enable controllers and egress ip grpc by default
+  - 4ad0e39 2024-04-15T22:03:49-07:00 helm: add missing crds
+  - 88d582a 2024-04-15T22:03:49-07:00 helm: Move pod affinity to values.yaml
+  - e295a9d 2024-04-15T22:03:49-07:00 add Helm chart to deploy ovn-kubernetes
+  - 485b659 2024-04-15T13:54:40-07:00 Various fixes and improvements to iptables stuff
+  - e806cda 2024-04-15T13:54:40-07:00 Fixes iptables issue where SNAT rules were being added multiple times
+  - a2ee9d4 2024-04-15T13:54:40-07:00 Adds iptables-restore capability for service sync
+  - b77ea07 2024-04-15T13:54:40-07:00 Vendor trozet/go-iptables
+  - d8f7288 2024-04-15T13:54:40-07:00 Fixes inefficient service parsing
+  - 6ff1378 2024-04-15T13:54:40-07:00 Improves service iptables efficiency on start up
+  - d7f155d 2024-04-15T08:13:45-04:00 skip ipv6 'should listen on each host address test'
+  - a3c8570 2024-04-15T12:28:03+02:00 Fix endpoint selection for externalTrafficPolicy=local
+  - 156c329 2024-04-14T13:26:10+00:00 Bump golang.org/x/crypto from 0.16.0 to 0.17.0 in /test/e2e
+  - 91f38ec 2024-04-13T07:37:22+00:00 Bump google.golang.org/protobuf from 1.31.0 to 1.33.0 in /test/e2e
+  - a336a90 2024-04-12T11:23:41-04:00 Update e2e to k8s 1.29
+  - f9e9090 2024-04-12T11:23:41-04:00 Skip serviceCidr tests
+  - 26cff8d 2024-04-12T11:23:41-04:00 Kind changes
+  - 6b8ff6e 2024-04-12T15:57:16+01:00 Dockerfile.base: Bump OVN to ovn-23.09.0-139.el9fdp
+  - 9f43c6c 2024-04-11T20:13:56-07:00 Dockerfile.ubuntu : fix build issue
+  - b3fe49b 2024-04-11T08:15:07-07:00 control file is not same as sock file
+  - 34b1a4b 2024-04-11T15:57:55+01:00 Service E2Es: ensure pods can communicate using src port equal to node port
+  - 26bd3a7 2024-04-11T11:26:33+01:00 Dockerfile.fedora:bump OVN to 23.09.0-139
+  - c4dc672 2024-04-10T12:01:43+02:00 incorrect OVS DB version is being scrapped
+  - ec50da8 2024-04-10T12:01:43+02:00 incorrect OVN DB version is being scrapped
+  - 87927a2 2024-04-09T18:12:01-07:00 remove ovn-{nb|sb}ctl CLI latency metrics and alerts
+  - c11bb83 2024-04-09T11:18:03-04:00 unskip ipv6 testing in local gateway mode
+  - ca614e2 2024-04-09T10:47:59-04:00 fix for ipv6 control plane test for nodePorts
+  - 67f3338 2024-04-09T10:47:59-04:00 fixes ipv6 control plane testing
+  - 54a40ac 2024-04-05T18:38:38+01:00 Bump K8s Z version to consume test fix
+  - 2579da6 2024-04-05T18:16:46+02:00 Add function for secondary controller name generation based on network name.
+  - 759b4bd 2024-04-05T18:16:46+02:00 Update sync functions for network policy to directly get port groups, and not ACLs. It wasn't possible before to get network policy related port groups for cleanup, and we had to find then via referencing ACLs. But now we can just filter them directly using new IDs.
+  - 5aa56d3 2024-04-05T18:16:46+02:00 Use owner-based ExternalIDs for port groups. Add port groups syncer. It is different from the previous syncers, since it updates port groups owned by different controllers. Leave only 1 buildPortGroup function that uses DbObjectIDs Wrap all Cluster[Rtr]PortGroup usage with getClusterPortGroupName. Add hashPrimaryID function to set portGroup name in libovsdbops. Introduce shared functionality to build and parse ObjectNameKey for namespaced objects.
+  - acdaa4a 2024-04-05T18:16:46+02:00 Update address set external_ids_sync to use batching package.
+  - 3171adb 2024-04-05T18:16:46+02:00 Make syncer types exported
+  - 8903abd 2024-04-05T10:44:18+01:00 Remove extra || in SKIP formatting
+  - 46333e0 2024-04-05T10:07:54+01:00 EIP docs: Add description for skipping IP rules when dst is a node IP in LGW mode
+  - a56feca 2024-02-02T11:56:30+00:00 EIP docs: replace confusing use of mark 1008 as routing table int
+
+- kubernetes image-amd64 6b4d6cb58038fc1bd4da50fde0164a8872e60703 to d9d45306df052aa5824fd8b2dab4e61f5ecc481c
+  - 93a2209cd 2024-04-18T07:43:24+05:30 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - e40b9c41b 2024-04-18T07:22:22+05:30 UPSTREAM: <drop>: manually resolve conflicts
+  - facd3b186 2024-04-16T11:41:03-04:00 UPSTREAM: <carry>: featureset validation moved to CEL
+  - 55019c83b 2024-04-16T15:00:24+00:00 Release commit for Kubernetes v1.29.4
+  - 406ffc35f 2024-04-16T10:45:38-04:00 UPSTREAM: <carry>: create readyz event for kubeapi server
+  - 410ba701b 2024-04-16T00:37:27+05:30 UPSTREAM: <carry>: Fix incorrect type casting in admission validate_apiserver
+  - 1448e1c3f 2024-04-16T00:37:08+05:30 UPSTREAM: <carry>: Add RouteExternalCertificate validation in Route ObjectValidator
+  - 34546f472 2024-04-15T09:15:06-07:00 Add envFrom to serviceaccount admission plugin
+  - 34ab3fd19 2024-04-11T16:36:40-04:00 UPSTREAM: <carry>: react to library-go changes
+  - 8240a5ec8 2024-04-11T16:36:40-04:00 UPSTREAM: <drop>: bump library-go
+  - c652a1dae 2024-04-09T18:20:48-04:00 UPSTREAM: <carry>: add support for cpu limits into management workloads
+  - b635fd628 2024-04-05T15:56:44+02:00 update debian-base to bookworm-v1.0.2
+  - 1fded9c76 2024-04-05T15:56:34+02:00 [go] Bump images, dependencies and versions to go 1.21.9 and distroless iptables / set-cap
+  - f10341af5 2024-04-04T14:20:20+05:30 [CVE-2023-45288] .*: bump x/net to v0.23.0
+  - efd8578ac 2024-04-03T14:54:16-04:00 Keep streams from being set up after closeAllStreamReaders is called
+  - 4499c3fad 2024-04-03T14:54:08-04:00 Make websocket heartbeat test timing less flaky
+  - d7258c313 2024-04-03T14:54:02-04:00 Avoid logging binary junk for frame write failure
+  - 2b621fe7b 2024-04-01T15:29:59-03:00 Use the right feature gate when updating uncertain volumes
+  - aa6c13575 2024-04-01T16:49:17+08:00 fix panic with SIGSEGV in kubeadm certs check-expiration
+  - cd9f65388 2024-03-29T10:01:39-04:00 retry policy creation for CRD type checking E2E test
+  - cf2a33715 2024-03-19T23:16:57+01:00 Undo double run of the TestWatchSemantics test to avoid hitting timeout
+  - d9ca30059 2024-03-19T09:06:53+01:00 apiserver/storage/cacher: decrease the running time of tests in the cacher package.
+  - f8f08542c 2024-03-19T09:06:33+01:00 Serve watch without resourceVersion from cache and introduce a WatchFromStorageWithoutResourceVersion feature gate to allow serving watch from storage.
+  - ff2189b7c 2024-03-19T08:52:31+01:00 Ensure that initial events are sorted for WatchList
+  - dee895d7f 2024-03-15T00:33:33+00:00 Update CHANGELOG/CHANGELOG-1.29.md for v1.29.3
+  - 93cafce2f 2024-03-08T12:57:08-05:00 fix aggregator path filtering to include /
+  - a3ac0b48c 2024-03-01T17:17:23-05:00 Filter aggregated apiservice gv
+  - beb7bf347 2024-01-10T12:19:46+01:00 Use DBG=1 for conformance verification
+  - 437f2cfce 2024-01-10T12:19:46+01:00 build: use -trimpath in non-DBG mode
+  - 0af609a29 2023-11-24T18:30:50+01:00 UPSTREAM: <carry>: kube-controller-manager: allow running bare kube-controller-manager
+
+- oc image-arm64 46db7c2bce5a57e3c3d9347e7e1e107e61dbd306 to 744645ba53d55f82c5907e57eb90fbc66f8c1127
+  - 0df0f756 2024-04-20T11:37:50+02:00 oc adm must-gather: print timestamp when logging
+  - 24897fe4 2024-04-19T18:14:05-04:00 Changing the conditional risk to known issues
+  - 31b1c919 2024-04-19T01:05:08+02:00 `upgrade status`: always tabulate 'All is well'
+  - cff394b6 2024-04-19T01:05:08+02:00 `upgrade status`: ignore incomplete insights
+  - 3fd53d64 2024-04-19T01:05:08+02:00 `upgrade status`: pad linebreaks in descriptions
+  - e24767c4 2024-04-19T01:05:08+02:00 `upgrade status`: populate descriptions and refs for insights
+  - aada20af 2024-04-19T01:05:08+02:00 `upgrade status`: `--details=health` shows reference and description
+  - 38cd6c9e 2024-04-17T15:52:40+02:00 `upgrade status`: test `--detailed=all` in examples integration test
+  - 17c3c1fc 2024-04-17T15:44:25+02:00 `upgrade status`: add `--detailed=nodes` that shows all nodes
+  - cf8d1026 2024-04-16T10:02:17-06:00 add prune renderedmachineconfigs
+  - e4657909 2024-04-15T11:28:24-04:00 indicate how many tests each feature has
+  - eeaf9631 2024-04-15T11:09:11-04:00 update library-go for new api
+  - b0ce1a6b 2024-04-11T09:25:38-04:00 update API for test reporting types
+
+- router image-arm64 526f832abbd2c2926d6545b4a6f5c41579bc6a76 to a14aea7c439463e684fc921254d6f85234563bee
+  - 7df65af 2024-04-18T13:38:20+02:00 OCPBUGS-32044: Introduce 'idle-close-on-response' option for frontends
+
+- ovn-kubernetes image-arm64 904635520714590ee15a1b70c09303266c4910fb to 83a598a201cd5d94e921b4790a86e7bdca1ae0a9
+  - cae032e 2024-04-17T23:25:53+02:00 Fix helm installation for ANP CRDs
+  - 1109289 2024-04-17T21:35:39+02:00 ANP Status: Fix bug around zone delete
+  - f95ea49 2024-04-17T21:35:39+02:00 Update version of e2e's to the latest: v0.1.3
+  - 7a69306 2024-04-17T21:35:39+02:00 Do server-side-apply for ANP/BANP
+  - 648d83d 2024-04-17T21:35:39+02:00 Update the new namespace peer styling
+  - f20ee5d 2024-04-17T21:35:39+02:00 Update the vendoring of ANP yamls
+  - 977b256 2024-04-17T21:35:39+02:00 Bump network-policy-api to latest
+  - d0dbf01 2024-04-16T09:40:46+02:00 Add (B)ANP ACL/AddressSet count metrics
+  - 26eb4ae 2024-04-15T22:03:49-07:00 helm: Add GitHub Test Lane
+  - a4303fc 2024-04-15T22:03:49-07:00 symlink CRDs from helm chart to dist/templates
+  - 3bb4861 2024-04-15T22:03:49-07:00 helm: enable controllers and egress ip grpc by default
+  - 4ad0e39 2024-04-15T22:03:49-07:00 helm: add missing crds
+  - 88d582a 2024-04-15T22:03:49-07:00 helm: Move pod affinity to values.yaml
+  - e295a9d 2024-04-15T22:03:49-07:00 add Helm chart to deploy ovn-kubernetes
+  - 485b659 2024-04-15T13:54:40-07:00 Various fixes and improvements to iptables stuff
+  - e806cda 2024-04-15T13:54:40-07:00 Fixes iptables issue where SNAT rules were being added multiple times
+  - a2ee9d4 2024-04-15T13:54:40-07:00 Adds iptables-restore capability for service sync
+  - b77ea07 2024-04-15T13:54:40-07:00 Vendor trozet/go-iptables
+  - d8f7288 2024-04-15T13:54:40-07:00 Fixes inefficient service parsing
+  - 6ff1378 2024-04-15T13:54:40-07:00 Improves service iptables efficiency on start up
+  - d7f155d 2024-04-15T08:13:45-04:00 skip ipv6 'should listen on each host address test'
+  - a3c8570 2024-04-15T12:28:03+02:00 Fix endpoint selection for externalTrafficPolicy=local
+  - 156c329 2024-04-14T13:26:10+00:00 Bump golang.org/x/crypto from 0.16.0 to 0.17.0 in /test/e2e
+  - 91f38ec 2024-04-13T07:37:22+00:00 Bump google.golang.org/protobuf from 1.31.0 to 1.33.0 in /test/e2e
+  - a336a90 2024-04-12T11:23:41-04:00 Update e2e to k8s 1.29
+  - f9e9090 2024-04-12T11:23:41-04:00 Skip serviceCidr tests
+  - 26cff8d 2024-04-12T11:23:41-04:00 Kind changes
+  - 6b8ff6e 2024-04-12T15:57:16+01:00 Dockerfile.base: Bump OVN to ovn-23.09.0-139.el9fdp
+  - 9f43c6c 2024-04-11T20:13:56-07:00 Dockerfile.ubuntu : fix build issue
+  - b3fe49b 2024-04-11T08:15:07-07:00 control file is not same as sock file
+  - 34b1a4b 2024-04-11T15:57:55+01:00 Service E2Es: ensure pods can communicate using src port equal to node port
+  - 26bd3a7 2024-04-11T11:26:33+01:00 Dockerfile.fedora:bump OVN to 23.09.0-139
+  - c4dc672 2024-04-10T12:01:43+02:00 incorrect OVS DB version is being scrapped
+  - ec50da8 2024-04-10T12:01:43+02:00 incorrect OVN DB version is being scrapped
+  - 87927a2 2024-04-09T18:12:01-07:00 remove ovn-{nb|sb}ctl CLI latency metrics and alerts
+  - c11bb83 2024-04-09T11:18:03-04:00 unskip ipv6 testing in local gateway mode
+  - ca614e2 2024-04-09T10:47:59-04:00 fix for ipv6 control plane test for nodePorts
+  - 67f3338 2024-04-09T10:47:59-04:00 fixes ipv6 control plane testing
+  - 54a40ac 2024-04-05T18:38:38+01:00 Bump K8s Z version to consume test fix
+  - 2579da6 2024-04-05T18:16:46+02:00 Add function for secondary controller name generation based on network name.
+  - 759b4bd 2024-04-05T18:16:46+02:00 Update sync functions for network policy to directly get port groups, and not ACLs. It wasn't possible before to get network policy related port groups for cleanup, and we had to find then via referencing ACLs. But now we can just filter them directly using new IDs.
+  - 5aa56d3 2024-04-05T18:16:46+02:00 Use owner-based ExternalIDs for port groups. Add port groups syncer. It is different from the previous syncers, since it updates port groups owned by different controllers. Leave only 1 buildPortGroup function that uses DbObjectIDs Wrap all Cluster[Rtr]PortGroup usage with getClusterPortGroupName. Add hashPrimaryID function to set portGroup name in libovsdbops. Introduce shared functionality to build and parse ObjectNameKey for namespaced objects.
+  - acdaa4a 2024-04-05T18:16:46+02:00 Update address set external_ids_sync to use batching package.
+  - 3171adb 2024-04-05T18:16:46+02:00 Make syncer types exported
+  - 8903abd 2024-04-05T10:44:18+01:00 Remove extra || in SKIP formatting
+  - 46333e0 2024-04-05T10:07:54+01:00 EIP docs: Add description for skipping IP rules when dst is a node IP in LGW mode
+  - a56feca 2024-02-02T11:56:30+00:00 EIP docs: replace confusing use of mark 1008 as routing table int
+
+- kubernetes image-arm64 6b4d6cb58038fc1bd4da50fde0164a8872e60703 to d9d45306df052aa5824fd8b2dab4e61f5ecc481c
+  - 93a2209cd 2024-04-18T07:43:24+05:30 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - e40b9c41b 2024-04-18T07:22:22+05:30 UPSTREAM: <drop>: manually resolve conflicts
+  - facd3b186 2024-04-16T11:41:03-04:00 UPSTREAM: <carry>: featureset validation moved to CEL
+  - 55019c83b 2024-04-16T15:00:24+00:00 Release commit for Kubernetes v1.29.4
+  - 406ffc35f 2024-04-16T10:45:38-04:00 UPSTREAM: <carry>: create readyz event for kubeapi server
+  - 410ba701b 2024-04-16T00:37:27+05:30 UPSTREAM: <carry>: Fix incorrect type casting in admission validate_apiserver
+  - 1448e1c3f 2024-04-16T00:37:08+05:30 UPSTREAM: <carry>: Add RouteExternalCertificate validation in Route ObjectValidator
+  - 34546f472 2024-04-15T09:15:06-07:00 Add envFrom to serviceaccount admission plugin
+  - 34ab3fd19 2024-04-11T16:36:40-04:00 UPSTREAM: <carry>: react to library-go changes
+  - 8240a5ec8 2024-04-11T16:36:40-04:00 UPSTREAM: <drop>: bump library-go
+  - c652a1dae 2024-04-09T18:20:48-04:00 UPSTREAM: <carry>: add support for cpu limits into management workloads
+  - b635fd628 2024-04-05T15:56:44+02:00 update debian-base to bookworm-v1.0.2
+  - 1fded9c76 2024-04-05T15:56:34+02:00 [go] Bump images, dependencies and versions to go 1.21.9 and distroless iptables / set-cap
+  - f10341af5 2024-04-04T14:20:20+05:30 [CVE-2023-45288] .*: bump x/net to v0.23.0
+  - efd8578ac 2024-04-03T14:54:16-04:00 Keep streams from being set up after closeAllStreamReaders is called
+  - 4499c3fad 2024-04-03T14:54:08-04:00 Make websocket heartbeat test timing less flaky
+  - d7258c313 2024-04-03T14:54:02-04:00 Avoid logging binary junk for frame write failure
+  - 2b621fe7b 2024-04-01T15:29:59-03:00 Use the right feature gate when updating uncertain volumes
+  - aa6c13575 2024-04-01T16:49:17+08:00 fix panic with SIGSEGV in kubeadm certs check-expiration
+  - cd9f65388 2024-03-29T10:01:39-04:00 retry policy creation for CRD type checking E2E test
+  - cf2a33715 2024-03-19T23:16:57+01:00 Undo double run of the TestWatchSemantics test to avoid hitting timeout
+  - d9ca30059 2024-03-19T09:06:53+01:00 apiserver/storage/cacher: decrease the running time of tests in the cacher package.
+  - f8f08542c 2024-03-19T09:06:33+01:00 Serve watch without resourceVersion from cache and introduce a WatchFromStorageWithoutResourceVersion feature gate to allow serving watch from storage.
+  - ff2189b7c 2024-03-19T08:52:31+01:00 Ensure that initial events are sorted for WatchList
+  - dee895d7f 2024-03-15T00:33:33+00:00 Update CHANGELOG/CHANGELOG-1.29.md for v1.29.3
+  - 93cafce2f 2024-03-08T12:57:08-05:00 fix aggregator path filtering to include /
+  - a3ac0b48c 2024-03-01T17:17:23-05:00 Filter aggregated apiservice gv
+  - beb7bf347 2024-01-10T12:19:46+01:00 Use DBG=1 for conformance verification
+  - 437f2cfce 2024-01-10T12:19:46+01:00 build: use -trimpath in non-DBG mode
+  - 0af609a29 2023-11-24T18:30:50+01:00 UPSTREAM: <carry>: kube-controller-manager: allow running bare kube-controller-manager
+
