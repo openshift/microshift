@@ -2,6 +2,7 @@
 
 import argparse
 import concurrent.futures
+import getpass
 import glob
 import os
 import platform
@@ -18,7 +19,9 @@ import common
 # initialized in set_rpm_version_info_vars function
 SCRIPTDIR = common.get_env_var('SCRIPTDIR')
 BOOTC_IMAGE_DIR = common.get_env_var('BOOTC_IMAGE_DIR')
+BOOTC_ISO_DIR = common.get_env_var('BOOTC_ISO_DIR')
 IMAGEDIR = common.get_env_var('IMAGEDIR')
+VM_DISK_BASEDIR = common.get_env_var('VM_DISK_BASEDIR')
 UNAME_M = common.get_env_var('UNAME_M')
 CONTAINER_LIST = common.get_env_var('CONTAINER_LIST')
 LOCAL_REPO = common.get_env_var('LOCAL_REPO')
@@ -26,6 +29,12 @@ BASE_REPO = common.get_env_var('BASE_REPO')
 NEXT_REPO = common.get_env_var('NEXT_REPO')
 HOME_DIR = common.get_env_var("HOME")
 PULL_SECRET = common.get_env_var('PULL_SECRET', f"{HOME_DIR}/.pull-secret.json")
+
+
+def should_skip(file):
+    if os.path.exists(file):
+        return True
+    return False
 
 
 def find_latest_rpm(repo_path, version=""):
@@ -147,14 +156,15 @@ def process_containerfile(groupdir, containerfile, dry_run):
     cf_outname = os.path.splitext(containerfile)[0]
     cf_outdir = os.path.join(BOOTC_IMAGE_DIR, cf_outname)
     cf_logfile = os.path.join(BOOTC_IMAGE_DIR, f"{cf_outname}.log")
+    cf_targetimg = os.path.join(cf_outdir, "index.json")
 
-    os.makedirs(BOOTC_IMAGE_DIR, exist_ok=True)
+    # Check if the target artifact exists
+    if should_skip(cf_targetimg):
+        common.record_junit(groupdir, cf_path, "containerfile", "SKIPPED")
+        return
 
-    if os.path.exists(cf_outdir):
-        common.print_msg(f"{cf_outdir} already exists")
-        if common.should_skip(cf_outname):
-            common.record_junit(groupdir, cf_path, "containerfile", "SKIPPED")
-            return
+    # Create the output directories
+    os.makedirs(cf_outdir, exist_ok=True)
 
     common.print_msg(f"Processing {containerfile} with logs in {cf_logfile}")
     try:
@@ -187,7 +197,64 @@ def process_containerfile(groupdir, containerfile, dry_run):
 
 
 def process_image_bootc(groupdir, bootcfile, dry_run):
-    None
+    bf_path = os.path.join(groupdir, bootcfile)
+    bf_outname = os.path.splitext(bootcfile)[0]
+    bf_outdir = os.path.join(BOOTC_ISO_DIR, bf_outname)
+    bf_logfile = os.path.join(BOOTC_ISO_DIR, f"{bf_outname}.log")
+    bf_targetiso = os.path.join(VM_DISK_BASEDIR, f"{bf_outname}.iso")
+
+    # Check if the target artifact exists
+    if should_skip(bf_targetiso):
+        common.record_junit(groupdir, bf_path, "image-bootc", "SKIPPED")
+        return
+
+    # Create the output directories
+    os.makedirs(bf_outdir, exist_ok=True)
+    os.makedirs(VM_DISK_BASEDIR, exist_ok=True)
+
+    common.print_msg(f"Processing {bootcfile} with logs in {bf_logfile}")
+    try:
+        # Redirect the output to the log file
+        with open(bf_logfile, 'w') as logfile:
+            bf_imgref = common.read_file(bf_path).strip()
+            # Download the image locally to be used by bootc image builder
+            pull_args = [
+                "sudo", "podman", "pull",
+                "--authfile", PULL_SECRET, bf_imgref
+            ]
+            common.run_command_in_shell(pull_args, dry_run, logfile, logfile)
+
+            # The podman command with security elevation and
+            # mount of output / container storage
+            build_args = [
+                "sudo", "podman", "run",
+                "--rm", "-i", "--privileged",
+                "--pull=newer",
+                "--security-opt", "label=type:unconfined_t",
+                "-v", f"{bf_outdir}:/output",
+                "-v", "/var/lib/containers/storage:/var/lib/containers/storage"
+            ]
+            # Add the bootc image builder command line using local images
+            build_args += [
+                "quay.io/centos-bootc/bootc-image-builder:latest",
+                "--type", "anaconda-iso",
+                "--local",
+                bf_imgref
+            ]
+            common.run_command_in_shell(build_args, dry_run, logfile, logfile)
+    except Exception:
+        # Propagate the exception to the caller
+        raise
+    finally:
+        # Always display the command logs with the prefix on each line
+        common.run_command(["sed", f"s/^/{bf_outname}: /", bf_logfile], dry_run)
+
+    # Fix the directory ownership and move the artifact
+    if not dry_run:
+        common.run_command(
+            ["sudo", "chown", "-R", f"{getpass.getuser()}.", bf_outdir],
+            dry_run)
+        os.rename(f"{bf_outdir}/bootiso/install.iso", bf_targetiso)
 
 
 def process_group(groupdir, dry_run=False):

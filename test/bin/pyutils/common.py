@@ -10,11 +10,6 @@ from typing import List
 PUSHD_DIR_STACK = []
 
 
-def should_skip(file):
-    # Implement your skipping logic here
-    return False
-
-
 def record_junit(groupdir, containerfile, filetype, status):
     # Implement your recording logic here
     pass
@@ -86,6 +81,13 @@ def popd():
         raise Exception("Directory stack is empty")
     dir = PUSHD_DIR_STACK.pop()
     os.chdir(dir)
+
+
+def read_file(file_path: str):
+    """Read the file contents and return them to the caller"""
+    with open(file_path, 'r') as file:
+        content = file.read()
+    return content
 
 
 def delete_file(file_path: str):
