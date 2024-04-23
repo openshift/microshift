@@ -81,14 +81,15 @@ assets:
       - file: signing-secret.yaml
 
   - dir: components/csi-snapshot-controller/
-    no_clean: True
+    no_clean: false
     src: cluster-csi-snapshot-controller-operator/assets
     files:
     - file: csi_controller_deployment.yaml
-    - file: serviceaccount.yaml
+    - file: webhook_serviceaccount.yaml
     - file: webhook_config.yaml
     - file: webhook_deployment.yaml
     - file: webhook_service.yaml
+    - file: serviceaccount.yaml
     - file: volumesnapshotclasses.yaml
     - file: volumesnapshotcontents.yaml
     - file: volumesnapshots.yaml
