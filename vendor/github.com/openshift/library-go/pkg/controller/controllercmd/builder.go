@@ -3,7 +3,6 @@ package controllercmd
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"strings"
 	"sync"
@@ -413,7 +412,7 @@ func (b *ControllerBuilder) getComponentNamespace() (string, error) {
 	if len(b.componentNamespace) > 0 {
 		return b.componentNamespace, nil
 	}
-	nsBytes, err := ioutil.ReadFile("/var/run/secrets/kubernetes.io/serviceaccount/namespace")
+	nsBytes, err := os.ReadFile("/var/run/secrets/kubernetes.io/serviceaccount/namespace")
 	if err != nil {
 		return "openshift-config-managed", err
 	}
