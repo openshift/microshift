@@ -157,26 +157,33 @@ def process_containerfile(groupdir, containerfile, dry_run):
             return
 
     common.print_msg(f"Processing {containerfile} with logs in {cf_logfile}")
-    # Redirect the output to the log file
-    with open(cf_logfile, 'w') as logfile:
-        # Run the container build command
-        build_args = [
-            "podman", "build",
-            "--authfile", PULL_SECRET,
-            "-t", cf_outname, "-f", cf_path,
-            os.path.join(IMAGEDIR, "rpm-repos")
-        ]
-        common.run_command_in_shell(build_args, dry_run, logfile, logfile)
+    try:
+        # Redirect the output to the log file
+        with open(cf_logfile, 'w') as logfile:
+            # Run the container build command
+            build_args = [
+                "podman", "build",
+                "--authfile", PULL_SECRET,
+                "-t", cf_outname, "-f", cf_path,
+                os.path.join(IMAGEDIR, "rpm-repos")
+            ]
+            common.run_command_in_shell(build_args, dry_run, logfile, logfile)
 
-        # Run the container export command
-        if os.path.exists(cf_outdir):
-            shutil.rmtree(cf_outdir)
-        save_args = [
-            "podman", "save",
-            "--format", "oci-dir",
-            "-o", cf_outdir, cf_outname
-        ]
-        common.run_command_in_shell(save_args, dry_run, logfile, logfile)
+            # Run the container export command
+            if os.path.exists(cf_outdir):
+                shutil.rmtree(cf_outdir)
+            save_args = [
+                "podman", "save",
+                "--format", "oci-dir",
+                "-o", cf_outdir, cf_outname
+            ]
+            common.run_command_in_shell(save_args, dry_run, logfile, logfile)
+    except Exception:
+        # Propagate the exception to the caller
+        raise
+    finally:
+        # Always display the command logs with the prefix on each line
+        common.run_command(["sed", f"s/^/{cf_outname}: /", cf_logfile], dry_run)
 
 
 def process_image_bootc(groupdir, bootcfile, dry_run):
@@ -203,11 +210,12 @@ def process_group(groupdir, dry_run=False):
             # Result function generates an exception depending on the task state
             f.result()
     except Exception:
-        # Cancel all pending tasks and propagate the exception
+        # Cancel all pending tasks
         for f in futures:
             if not f.done():
                 f.cancel()
                 common.print_msg(f"Task {f} cancelled")
+        # Propagate the exception to the caller
         raise
 
 
