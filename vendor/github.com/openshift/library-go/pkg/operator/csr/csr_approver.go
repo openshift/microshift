@@ -175,7 +175,7 @@ func getCertApprovalCondition(status *certapiv1.CertificateSigningRequestStatus)
 }
 
 type ServiceAccountApprover struct {
-	saGroups        sets.String // saGroups is the set of groups for the SA expected to have created the CSR
+	saGroups        sets.Set[string] // saGroups is the set of groups for the SA expected to have created the CSR
 	saName          string
 	expectedSubject string
 }
@@ -186,7 +186,7 @@ func NewServiceAccountApprover(saNamespace, saName, expectedSubject string, addi
 
 	return &ServiceAccountApprover{
 		saName:          serviceaccount.MakeUsername(saNamespace, saName),
-		saGroups:        sets.NewString(append(saGroups, additionalGroups...)...),
+		saGroups:        sets.New(append(saGroups, additionalGroups...)...),
 		expectedSubject: expectedSubject,
 	}
 }
@@ -200,8 +200,8 @@ func (a *ServiceAccountApprover) Approve(csrObj *certapiv1.CertificateSigningReq
 		return CSRDenied, fmt.Sprintf("CSR %q was created by an unexpected user: %q", csrObj.Name, csrObj.Spec.Username), nil
 	}
 
-	if csrGroups := sets.NewString(csrObj.Spec.Groups...); !csrGroups.Equal(a.saGroups) {
-		return CSRDenied, fmt.Sprintf("CSR %q was created by a user with unexpected groups: %v", csrObj.Name, csrGroups.List()), nil
+	if csrGroups := sets.New(csrObj.Spec.Groups...); !csrGroups.Equal(a.saGroups) {
+		return CSRDenied, fmt.Sprintf("CSR %q was created by a user with unexpected groups: %v", csrObj.Name, sets.List(csrGroups)), nil
 	}
 
 	if expectedSubject := a.expectedSubject; x509CSR.Subject.String() != expectedSubject {
@@ -253,11 +253,11 @@ func (f *LabelFilter) Matches(csr *certapiv1.CertificateSigningRequest) bool {
 }
 
 type NamesFilter struct {
-	names sets.String
+	names sets.Set[string]
 }
 
 func NewNamesFilter(names ...string) *NamesFilter {
-	return &NamesFilter{sets.NewString(names...)}
+	return &NamesFilter{sets.New(names...)}
 }
 
 func (f *NamesFilter) Matches(csr *certapiv1.CertificateSigningRequest) bool {
@@ -265,11 +265,11 @@ func (f *NamesFilter) Matches(csr *certapiv1.CertificateSigningRequest) bool {
 }
 
 type RequestCommonNameFilter struct {
-	commonNames sets.String
+	commonNames sets.Set[string]
 }
 
 func NewRequestCommonNameFilter(commonNames ...string) *RequestCommonNameFilter {
-	return &RequestCommonNameFilter{sets.NewString(commonNames...)}
+	return &RequestCommonNameFilter{sets.New(commonNames...)}
 }
 
 func (f *RequestCommonNameFilter) Match(csr *certapiv1.CertificateSigningRequest) bool {
