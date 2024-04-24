@@ -1,6 +1,6 @@
 module github.com/openshift/microshift/etcd
 
-go 1.20
+go 1.21
 
 require github.com/openshift/microshift v0.0.0
 
@@ -82,6 +82,7 @@ require (
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/monochromegane/go-gitignore v0.0.0-20200626010858-205db1a8cc00 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
+	github.com/openshift/cluster-policy-controller cc48f3152213bfe6e42fdd82f760246e862d208f
 	github.com/peterbourgon/diskv v2.0.1+incompatible // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/prometheus/client_golang v1.16.0 // indirect
