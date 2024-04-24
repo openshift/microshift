@@ -86,7 +86,8 @@ Macvlan
     ...    AND
     ...    Named Pod Should Be Ready    ${MACVLAN_POD_NAME}    ${NAMESPACE}
 
-    Connect To Pod From The Hypervisor    ${MACVLAN_POD_NAME}    ${NAMESPACE}    ${NAMESPACE}/macvlan-conf
+    Wait Until Keyword Succeeds    5x    5s
+    ...    Connect To Pod From The Hypervisor    ${MACVLAN_POD_NAME}    ${NAMESPACE}    ${NAMESPACE}/macvlan-conf
 
     [Teardown]    Remove NAD And Pod    ${MACVLAN_NAD_YAML}    ${MACVLAN_POD_YAML}
 
@@ -98,7 +99,8 @@ Ipvlan
     ...    AND
     ...    Named Pod Should Be Ready    ${IPVLAN_POD_NAME}    ${NAMESPACE}
 
-    Connect To Pod From The Hypervisor    ${IPVLAN_POD_NAME}    ${NAMESPACE}    ${NAMESPACE}/ipvlan-conf
+    Wait Until Keyword Succeeds    5x    5s
+    ...    Connect To Pod From The Hypervisor    ${IPVLAN_POD_NAME}    ${NAMESPACE}    ${NAMESPACE}/ipvlan-conf
 
     [Teardown]    Remove NAD And Pod    ${IPVLAN_NAD_YAML}    ${IPVLAN_POD_YAML}
 
