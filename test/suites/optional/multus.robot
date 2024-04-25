@@ -110,7 +110,7 @@ Setup
     [Documentation]    Setup test suite
     Setup Suite With Namespace
 
-    ${out}=    Command Should Work    ls /sys/class/net | grep enp
+    ${out}=    Command Should Work    ip route list default | cut -d' ' -f5
     @{enps}=    String.Split To Lines    ${out}
     ${len}=    Get Length    ${enps}
     Should Be True    ${len}>=2
