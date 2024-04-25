@@ -78,6 +78,11 @@ func defaultRouterListenAddresses(ipAddresses, nicNames []string) ([]string, err
 		return nil, err
 	}
 
+	if len(ipAddresses) == 0 && len(nicNames) == 0 {
+		ipAddresses = allowedAddresses
+		nicNames = allowedNicNames
+	}
+
 	ipList := make([]string, 0, len(ipAddresses)+len(nicNames)*2)
 
 	for _, ip := range ipAddresses {
