@@ -4,7 +4,9 @@ package config
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
+	"github.com/openshift/microshift/pkg/config/apiserver"
 	"math"
 	"net"
 	"net/url"
@@ -95,6 +97,7 @@ func (c *Config) fillDefaults() error {
 		URL:             "https://localhost:6443",
 		Port:            6443,
 	}
+	c.ApiServer.AuditLog.Profile = "Default"
 	c.Node = Node{
 		HostnameOverride: hostname,
 		NodeIP:           nodeIP,
@@ -193,6 +196,18 @@ func (c *Config) incorporateUserSettings(u *Config) {
 	}
 	if u.ApiServer.URL != "" {
 		c.ApiServer.URL = u.ApiServer.URL
+	}
+	if u.ApiServer.AuditLog.Profile != "" {
+		c.ApiServer.AuditLog.Profile = u.ApiServer.AuditLog.Profile
+	}
+	if u.ApiServer.AuditLog.MaxFiles != 0 {
+		c.ApiServer.AuditLog.MaxFiles = u.ApiServer.AuditLog.MaxFiles
+	}
+	if u.ApiServer.AuditLog.MaxFileAge != 0 {
+		c.ApiServer.AuditLog.MaxFileAge = u.ApiServer.AuditLog.MaxFileAge
+	}
+	if u.ApiServer.AuditLog.MaxFileSize != 0 {
+		c.ApiServer.AuditLog.MaxFileSize = u.ApiServer.AuditLog.MaxFileSize
 	}
 
 	if u.Debugging.LogLevel != "" {
@@ -370,6 +385,9 @@ func (c *Config) validate() error {
 			return fmt.Errorf("error validating ingress.listenAddress: %w", err)
 		}
 	}
+	if err := validateAuditLogConfig(c.ApiServer.AuditLog); err != nil {
+		return fmt.Errorf("error validating apiserver.auditLog:\n%w", err)
+	}
 
 	return nil
 }
@@ -530,4 +548,24 @@ func AllowedNICNames() ([]string, error) {
 		names = append(names, link.Attrs().Name)
 	}
 	return names, nil
+}
+
+func validateAuditLogConfig(cfg AuditLog) error {
+	// compose a list of errors so that multiple executions are not required to detect each invalid value individually
+	errs := make([]error, 0)
+	if cfg.Profile != "" {
+		if _, err := apiserver.GetPolicy(cfg.Profile); err != nil {
+			errs = append(errs, fmt.Errorf("invalid value for apiserver.auditlog.profile: %v", err))
+		}
+	}
+	if cfg.MaxFiles < 0 {
+		errs = append(errs, fmt.Errorf("invalid value for apiserver.auditlog.maxFiles, expected value >=0"))
+	}
+	if cfg.MaxFileAge < 0 {
+		errs = append(errs, fmt.Errorf("invalid value for apiserver.auditlog.maxFileAge, expected value >=0"))
+	}
+	if cfg.MaxFileSize < 0 {
+		errs = append(errs, fmt.Errorf("invalid value for apiserver.auditlog.maxFileSize, expected value >=0"))
+	}
+	return errors.Join(errs...) // Join returns nil if len(errs) == 0
 }
