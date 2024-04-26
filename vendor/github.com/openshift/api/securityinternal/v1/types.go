@@ -12,6 +12,10 @@ import (
 // This is an internal API, not intended for external consumption.
 //
 // Compatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).
+// +kubebuilder:object:root=true
+// +kubebuilder:resource:path=rangeallocations,scope=Cluster
+// +openshift:api-approved.openshift.io=https://github.com/openshift/api/pull/751
+// +openshift:file-pattern=cvoRunLevel=0000_03,operatorName=config-operator,operatorOrdering=02
 // +openshift:compatibility-gen:level=1
 type RangeAllocation struct {
 	metav1.TypeMeta `json:",inline"`
