@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/openshift/microshift/test/pkg/testutil"
 	"k8s.io/klog/v2"
@@ -23,7 +24,13 @@ func NewPodman() *podman {
 
 func (p *podman) BuildAndSave(ctx context.Context, tag, containerfilePath, contextDir, output string) error {
 	klog.InfoS("Building Containerfile", "tag", tag, "containerfile", containerfilePath, "destination", output, "contextDir", contextDir)
-	_, _, err := testutil.RunCommandWithContext(ctx, "podman", "build", "--tag", tag, "--file", containerfilePath, contextDir)
+
+	homedir, err := os.UserHomeDir()
+	if err != nil {
+		return fmt.Errorf("failed to get user's home dir: %w", err)
+	}
+
+	_, _, err = testutil.RunCommandWithContext(ctx, "podman", "build", "--authfile", filepath.Join(homedir, ".pull-secret.json"), "--tag", tag, "--file", containerfilePath, contextDir)
 	if err != nil {
 		return fmt.Errorf("failed to build: %v", err)
 	}
