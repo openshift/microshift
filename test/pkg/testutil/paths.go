@@ -9,6 +9,7 @@ import (
 type Paths struct {
 	MicroShiftRepoRootPath string
 	TestDirPath            string
+	ImageBlueprintsPath    string
 	ArtifactsMainDir       string
 	BuildLogsDir           string
 	BuildsDir              string
@@ -25,6 +26,7 @@ func NewPaths(microshiftTestDirAbs string) (*Paths, error) {
 	paths := &Paths{
 		MicroShiftRepoRootPath: microShiftRepoRootPath,
 		TestDirPath:            microshiftTestDirAbs,
+		ImageBlueprintsPath:    filepath.Join(microshiftTestDirAbs, "image-blueprints"),
 		ArtifactsMainDir:       artifactsMainDir,
 		BuildLogsDir:           filepath.Join(artifactsMainDir, "build-logs"),
 		BuildsDir:              filepath.Join(artifactsMainDir, "builds"),

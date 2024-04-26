@@ -1,8 +1,9 @@
 package build
 
 import (
+	"encoding/json"
 	"fmt"
-	"os"
+	"io/fs"
 	"path/filepath"
 	"strings"
 
@@ -24,8 +25,9 @@ type PlannerOpts struct {
 	SourceOnly      bool
 	BuildInstallers bool
 
-	Paths  *testutil.Paths
-	Events testutil.EventManager
+	BlueprintsFS fs.FS
+	Paths        *testutil.Paths
+	Events       testutil.EventManager
 }
 
 type Planner struct {
@@ -75,7 +77,7 @@ func (b *Planner) CreateBuildPlan(paths []string) (Plan, error) {
 func (b *Planner) layer(path string) (Plan, error) {
 	klog.InfoS("Constructing build plan from provided blueprint layer", "path", path)
 
-	entries, err := os.ReadDir(path)
+	entries, err := fs.ReadDir(b.Opts.BlueprintsFS, path)
 	if err != nil {
 		return nil, err
 	}
@@ -98,7 +100,7 @@ func (b *Planner) layer(path string) (Plan, error) {
 func (b *Planner) group(path string) (Group, error) {
 	klog.InfoS("Constructing build group from provided blueprint group", "path", path)
 
-	entries, err := os.ReadDir(path)
+	entries, err := fs.ReadDir(b.Opts.BlueprintsFS, path)
 	if err != nil {
 		return nil, err
 	}

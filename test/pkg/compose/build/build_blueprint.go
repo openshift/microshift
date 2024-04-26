@@ -40,7 +40,7 @@ func NewBlueprintBuild(path string, opts *PlannerOpts) (*BlueprintBuild, error) 
 	withoutExt := strings.TrimSuffix(filename, filepath.Ext(filename))
 	dir := filepath.Dir(path)
 
-	dataBytes, err := os.ReadFile(path)
+	dataBytes, err := fs.ReadFile(opts.BlueprintsFS, path)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read %s: %w", path, err)
 	}
@@ -96,10 +96,10 @@ func NewBlueprintBuild(path string, opts *PlannerOpts) (*BlueprintBuild, error) 
 
 	// blueprint.alias file contains aliases for commit defined in blueprint.toml
 	potentialAliasFile := fmt.Sprintf("%s.alias", withoutExt)
-	if exists, err := fileExistsInDir(dir, potentialAliasFile); err != nil {
+	if exists, err := fileExistsInDir(opts.BlueprintsFS, dir, potentialAliasFile); err != nil {
 		return nil, err
 	} else if exists {
-		data, err := os.ReadFile(filepath.Join(dir, potentialAliasFile))
+		data, err := fs.ReadFile(opts.BlueprintsFS, filepath.Join(dir, potentialAliasFile))
 		if err != nil {
 			return nil, err
 		}
@@ -108,7 +108,7 @@ func NewBlueprintBuild(path string, opts *PlannerOpts) (*BlueprintBuild, error) 
 
 	if opts.BuildInstallers {
 		// If blueprint.image-installer exists, then ISO installer can be built.
-		if exists, err := fileExistsInDir(dir, fmt.Sprintf("%s.image-installer", withoutExt)); err != nil {
+		if exists, err := fileExistsInDir(opts.BlueprintsFS, dir, fmt.Sprintf("%s.image-installer", withoutExt)); err != nil {
 			return nil, err
 		} else if exists {
 			bb.Installer = true
@@ -122,7 +122,7 @@ func NewBlueprintBuild(path string, opts *PlannerOpts) (*BlueprintBuild, error) 
 		expectedParentFilename := parts[0] + ".toml"
 
 		parentPath := ""
-		err = filepath.WalkDir(filepath.Join(opts.Paths.TestDirPath, "image-blueprints"), func(p string, d fs.DirEntry, err error) error {
+		err = fs.WalkDir(opts.BlueprintsFS, ".", func(p string, d fs.DirEntry, err error) error {
 			if parentPath != "" {
 				return nil
 			}
@@ -136,7 +136,7 @@ func NewBlueprintBuild(path string, opts *PlannerOpts) (*BlueprintBuild, error) 
 		}
 
 		if parentPath != "" {
-			parentData, err := os.ReadFile(parentPath)
+			parentData, err := fs.ReadFile(opts.BlueprintsFS, parentPath)
 			if err != nil {
 				return nil, fmt.Errorf("failed to read parent of %q which is %q: %w", path, parentPath, err)
 			}
@@ -409,4 +409,17 @@ func (b *BlueprintBuild) composeInstaller(ctx context.Context, opts *Opts) error
 	klog.InfoS("Installer procedure done", "blueprint", b.Name, "elapsed", time.Since(start))
 
 	return nil
+}
+
+func fileExistsInDir(filesys fs.FS, dir, filename string) (bool, error) {
+	entries, err := fs.ReadDir(filesys, dir)
+	if err != nil {
+		return false, err
+	}
+	for _, entry := range entries {
+		if entry.Name() == filename {
+			return true, nil
+		}
+	}
+	return false, nil
 }

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"io/fs"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -29,7 +30,7 @@ func NewImageFetcher(path string, opts *PlannerOpts) (*ImageFetcher, error) {
 	filename := filepath.Base(path)
 	withoutExt := strings.TrimSuffix(filename, filepath.Ext(filename))
 
-	dataBytes, err := os.ReadFile(path)
+	dataBytes, err := fs.ReadFile(opts.BlueprintsFS, path)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read %s: %w", path, err)
 	}
@@ -201,17 +202,4 @@ outer:
 	klog.InfoS("Downloaded image", "destination", dest, "url", i.Url, "sizeMB", n/1_048_576, "duration", time.Since(start))
 
 	return nil
-}
-
-func fileExistsInDir(dir, filename string) (bool, error) {
-	entries, err := os.ReadDir(dir)
-	if err != nil {
-		return false, err
-	}
-	for _, entry := range entries {
-		if entry.Name() == filename {
-			return true, nil
-		}
-	}
-	return false, nil
 }

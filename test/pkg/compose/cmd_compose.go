@@ -70,6 +70,7 @@ func NewComposeCmd() *cobra.Command {
 	cmd.RunE = func(cmd *cobra.Command, args []string) error {
 		if len(args) == 0 {
 			args = []string{
+				// Assumption: CWD is test/
 				"./image-blueprints/layer1-base",
 				"./image-blueprints/layer2-presubmit",
 				"./image-blueprints/layer3-periodic",
@@ -126,12 +127,12 @@ func NewComposeCmd() *cobra.Command {
 		fileSystem := os.DirFS(paths.MicroShiftRepoRootPath)
 		testFS, err := fs.Sub(fileSystem, "test")
 		if err != nil {
-			klog.ErrorS(err, "Failed to get subFS")
+			klog.ErrorS(err, "Failed to get 'test' subFS")
 			return err
 		}
 		sourcesFS, err := fs.Sub(testFS, "package-sources")
 		if err != nil {
-			klog.ErrorS(err, "Failed to get subFS")
+			klog.ErrorS(err, "Failed to get 'package-sources' subFS")
 			return err
 		}
 		sourceConfigurer := sources.SourceConfigurer{Opts: &sources.SourceConfigurerOpts{
@@ -144,19 +145,25 @@ func NewComposeCmd() *cobra.Command {
 			return err
 		}
 
+		blueprintsFS, err := fs.Sub(testFS, "image-blueprints")
+		if err != nil {
+			klog.ErrorS(err, "Failed to get 'image-blueprints' subFS")
+			return err
+		}
 		buildPlanner := build.Planner{
 			Opts: &build.PlannerOpts{
 				TplData:         td,
 				SourceOnly:      sourceOnly,
 				BuildInstallers: buildInstallers,
+				BlueprintsFS:    blueprintsFS,
 				Paths:           paths,
 				Events:          events,
 			},
 		}
 
-		buildPaths := []string{}
-		for _, arg := range args {
-			buildPaths = append(buildPaths, filepath.Join(paths.TestDirPath, arg))
+		buildPaths, err := argsToBuildPaths(args)
+		if err != nil {
+			return err
 		}
 		buildPlan, err := buildPlanner.CreateBuildPlan(buildPaths)
 		if err != nil {
@@ -286,9 +293,9 @@ func buildPlanSubCmd() *cobra.Command {
 					Paths:           paths,
 				},
 			}
-			buildPaths := []string{}
-			for _, arg := range args {
-				buildPaths = append(buildPaths, filepath.Join(paths.TestDirPath, arg))
+			buildPaths, err := argsToBuildPaths(args)
+			if err != nil {
+				return err
 			}
 			buildPlan, err := buildPlanner.CreateBuildPlan(buildPaths)
 			if err != nil {
@@ -381,4 +388,22 @@ func saveOSBuildLogs(dir string) error {
 	}
 
 	return errors.Join(errs...)
+}
+
+func argsToBuildPaths(args []string) ([]string, error) {
+	buildPaths := []string{}
+	for _, arg := range args {
+		abs_arg, err := filepath.Abs(arg)
+		if err != nil {
+			klog.ErrorS(err, "failed to convert arg to absolute path", "arg", arg)
+			return nil, err
+		}
+		rel_arg, err := filepath.Rel(paths.ImageBlueprintsPath, abs_arg)
+		if err != nil {
+			klog.ErrorS(err, "failed to convert absolute path to relative path", "arg", arg, "abs_arg", abs_arg)
+			return nil, err
+		}
+		buildPaths = append(buildPaths, rel_arg)
+	}
+	return buildPaths, nil
 }

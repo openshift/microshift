@@ -80,7 +80,7 @@ func (c *ContainerfileBuild) Execute(ctx context.Context, opts *Opts) error {
 		}
 	}
 
-	err := opts.Podman.BuildAndSave(ctx, c.Name, c.Path, opts.Paths.RPMRepos, output)
+	err := opts.Podman.BuildAndSave(ctx, c.Name, filepath.Join(opts.Paths.ImageBlueprintsPath, c.Path), opts.Paths.RPMRepos, output)
 	if err != nil {
 		klog.ErrorS(err, "Failed to build Containerfile", "name", c.Name)
 		opts.Events.AddEvent(&testutil.FailedEvent{
