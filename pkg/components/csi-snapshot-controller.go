@@ -10,9 +10,18 @@ import (
 
 func startCSISnapshotController(ctx context.Context, cfg *config.Config, kubeconfigPath string) error {
 	var (
-		cr         = []string{"components/csi-snapshot-controller/clusterrole.yaml"}
-		crb        = []string{"components/csi-snapshot-controller/clusterrolebinding.yaml"}
-		sa         = []string{"components/csi-snapshot-controller/serviceaccount.yaml"}
+		cr = []string{
+			"components/csi-snapshot-controller/clusterrole.yaml",
+			"components/csi-snapshot-controller/webhook_clusterrole.yaml",
+		}
+		crb = []string{
+			"components/csi-snapshot-controller/clusterrolebinding.yaml",
+			"components/csi-snapshot-controller/webhook_clusterrolebinding.yaml",
+		}
+		sa = []string{
+			"components/csi-snapshot-controller/serviceaccount.yaml",
+			"components/csi-snapshot-controller/webhook_serviceaccount.yaml",
+		}
 		svc        = []string{"components/csi-snapshot-controller/webhook_service.yaml"}
 		webhookCfg = []string{"components/csi-snapshot-controller/webhook_config.yaml"}
 		deploy     = []string{
