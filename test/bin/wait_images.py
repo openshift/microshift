@@ -92,7 +92,7 @@ def restart_job(cmd):
     # >
     # > Compose 2c6a1ba2-4a18-49b8-a0f1-d103de1bd93a added to the queue
     # Split output with \n and select line starting with "Compose", then split that line with space and select 2nd word.
-    line_with_id = [line for line in result.stdout.split("\n") if line.startswith("Compose")][0]
+    line_with_id = next(line for line in result.stdout.split("\n") if line.startswith("Compose"))
     return line_with_id.split(" ")[1]
 
 
