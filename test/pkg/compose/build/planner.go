@@ -25,6 +25,7 @@ type PlannerOpts struct {
 	SourceOnly      bool
 	BuildInstallers bool
 
+	Proxy        Proxy
 	BlueprintsFS fs.FS
 	Paths        *testutil.Paths
 	Events       testutil.EventManager
@@ -123,8 +124,7 @@ func (b *Planner) group(path string) (Group, error) {
 }
 
 func (b *Planner) file(path string) (Build, error) {
-	klog.InfoS("Constructing build", "path", path)
-
+	klog.InfoS("Creating Build", "path", path)
 	filename := filepath.Base(path)
 
 	if b.Opts.SourceOnly && !strings.Contains(filename, "source") {
@@ -134,12 +134,13 @@ func (b *Planner) file(path string) (Build, error) {
 
 	switch filepath.Ext(filename) {
 	case ".image-installer", ".alias":
+		// Handled by BlueprintBuild
 		return nil, nil
 	case ".image-fetcher":
-		return NewImageFetcher(path, b.Opts)
+		return b.Opts.Proxy.NewImageFetcher(path, b.Opts)
 	case ".containerfile":
-		return NewContainerfileBuild(path, b.Opts)
+		return b.Opts.Proxy.NewContainerfileBuild(path, b.Opts)
 	}
 
-	return NewBlueprintBuild(path, b.Opts)
+	return b.Opts.Proxy.NewBlueprintBuild(path, b.Opts)
 }

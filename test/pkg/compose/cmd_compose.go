@@ -155,6 +155,7 @@ func NewComposeCmd() *cobra.Command {
 				TplData:         td,
 				SourceOnly:      sourceOnly,
 				BuildInstallers: buildInstallers,
+				Proxy:           build.NewProxy(),
 				BlueprintsFS:    blueprintsFS,
 				Paths:           paths,
 				Events:          events,
