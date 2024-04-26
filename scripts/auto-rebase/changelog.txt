@@ -1,50 +1,146 @@
-- cluster-network-operator embedded-component 6480348212445eb74ca2dafc61503f4942a87bed to a62442bbb2ee777e3715f57af6dd87f333e0e20a
-  - 7d1cadf 2024-03-15T17:48:54+01:00 Fully disable network-node-identity on ROKS
+- cluster-csi-snapshot-controller-operator embedded-component 1afe553a46159bd5b65061c98e15138bf48327cc to 87d7080a91e9247c9fde6c3e2d9e222c23df541e
+  - 42d42f9 2024-04-01T15:39:39-06:00 create suitable role and roleBinding for csi-snapshot-webhook
 
-- csi-external-snapshotter embedded-component 50fa049ccaa48d7f7dcb165fb6e20c185a0cbd13 to 4f2955c7c90cd150f9dfae782148d0fa8eba7342
+- cluster-dns-operator embedded-component 9eb983497cd90c4115d7dc476e4bcf0dfb5ee002 to 49290d7db2194df73dfaeb1e719580dabf166690
+  - 5a1285a 2024-04-19T16:14:44+05:30 Add RBAC for reading featuregates
+
+- cluster-kube-apiserver-operator embedded-component 9fe0ab100bc6241030bf6ad1fc3f554ad0b0faf1 to f5c5a609fa5e318379ceb86d346122814dc81762
+  - 2809abd 2024-04-09T10:04:59-04:00 use RotatedSigningCASecret in update only mode
+  - 3602f48 2024-04-09T10:03:57-04:00 bump(library-go)
+
+- cluster-kube-controller-manager-operator embedded-component 642fb08461913d9352b781693311727da42ffc0a to ee8cf52558df0862f9927dbc7275fbe6cc1a1e5f
+  - 6f89332 2024-04-09T11:51:56+02:00 operator/certrotationcontroller/certrotationcontroller: make use of UseSecretUpdateOnly
+  - ae7842a 2024-04-09T11:50:11+02:00 go mod tidy && go mod vendor
+  - fd4959c 2024-04-09T11:49:56+02:00 pin library-go to v0.0.0-20240409080036-0ebfe3e52a95
+  - d070507 2024-04-04T13:16:49+02:00 bump(library-go)=release-4.15
+
+- cluster-kube-scheduler-operator embedded-component e1a1e3a845fd27d2dc8cbd7eb40975505ff294ab to f054dfaf189b43b262c11ef7f97038c79592c796
+  - b7deb92 2024-04-04T13:16:03+02:00 Bump(library-go)=release-4.15
+
+- cluster-network-operator embedded-component a62442bbb2ee777e3715f57af6dd87f333e0e20a to 529ce52e7c159addf8a6ebfe9ad5470454d93651
+  - 9bb883b 2024-02-06T14:52:57+00:00 OCPBUGS-24436: Add probes to node-network-identity
+
+- cluster-openshift-controller-manager-operator embedded-component f189a00839491e166cd0220afe11d35cdb844754 to e9845aab67730c8b6b9225d0a27f082b8640b139
+  - 6175d69 2024-01-03T08:43:19+00:00 fix unit tests
+  - 7c5df4e 2024-01-03T08:43:19+00:00 Disable deployer-controller when deploymentconfig is disabled
+
+- etcd embedded-component 8aecb841e30bb4ce38de1d270ef5138301de828a to a7005ef1eae85eec6c59411860538169cea182fd
+  - 4c0498bd 2024-04-23T21:59:27+02:00 Revert "OCPBUGS-31644: Rebase etcd 3.5.13 openshift 4.15"
+  - f28dbd98 2024-04-02T18:36:36+02:00 Merge pull request #215 from openshift-bot/art-consistency-openshift-4.15-ose-etcd
+  - ae99d351 2024-04-02T18:35:52+02:00 DOWNSTREAM <carry>: resolve merge conflicts
+  - c9063a0d 2024-03-30T07:27:31+13:00 version: bump up to 3.5.13
+  - 59e3f7df 2024-03-21T07:28:20+00:00 build(deps): bump distroless/static-debian11 from `9be3fcc` to `7e5c6a2`
+  - 46d2caae 2024-03-18T18:41:17-07:00 [release-3.5] backport fix watch event loss after compaction
+  - 579b22cf 2024-03-11T20:18:26+01:00 Fix progress notification for watch that doesn't get any events
+  - 67afad6e 2024-03-08T08:30:03-08:00 Add govuln GitHub workflow
+  - e6d95c84 2024-03-07T16:03:12-08:00 dependency: bump google.golang.org/protobuf to v1.33.0
+  - 722e5cbb 2024-03-06T09:33:17+00:00 Update go version to 1.21.8
+  - d76d8479 2024-02-24T15:38:49+00:00 Bump bbolt to 1.3.9 for 3.5
+  - f1d1029c 2024-02-23T16:24:13-08:00 dependency: bump github.com/sirupsen/logrus to v1.9.3
+  - a1aaa51c 2024-02-19T13:26:15+00:00 add uds test cases into e2e TestAuthority
+  - 80e2064b 2024-02-19T12:21:31+00:00 Add unix socket test to TestNewURLsValue
+  - 1a9062ec 2024-02-19T12:21:16+00:00 pkg/types: Support Unix sockets in NewURLS
+  - 31f097ee 2024-02-18T20:44:25+08:00 added dial-keepalive-time、dial-keepalive-timeout、permit-without-stream arguments to the grpc-proxy
+  - 4a90575a 2024-02-17T22:16:53-08:00 Backport ignore old leader's leases revoking request
+  - c486b589 2024-02-17T22:16:29-08:00 tests/e2e: backport e2e cluster setup
+  - 9635525b 2024-02-17T03:02:19-08:00 *: add test-smoke to the pipeline and update test-smoke
+  - 7ebbc0f6 2024-02-16T13:52:09-08:00 tools/mod: go mod tidy
+  - f4633c84 2024-02-15T19:55:22-08:00 *: fix failing shellchecks
+  - b9b4f1bd 2024-02-15T19:46:22-08:00 server: fix comment to match function name
+  - 1115eb15 2024-02-13T15:21:07-08:00 tests/e2e: implement EtcdProcess GoFailClientTimeout
+  - e179686f 2024-02-13T16:01:10+05:30 Make CGO_ENABLED configurable for etcd 3.5
+  - 07c4dcb9 2024-02-07T17:00:09-08:00 tests/e2e: use WaitLeader in corrupt test
+  - 8b249325 2024-02-06T14:29:51-08:00 tests/e2e: implement EtcdProcessCluster WaitLeader
+  - c37d33c5 2024-02-06T14:29:40-08:00 tests/e2e: implement EtcdProcess Etcdctl
+  - 62a4bb3b 2024-02-06T19:39:09+01:00 etcd: Add OpenBSD-specific files for SetKeepAlivePeriod handling
+  - a965801b 2024-02-06T12:11:33+08:00 etcdserver: drain leaky goroutines before test completed
+  - 26bae5ef 2024-02-05T15:13:42-08:00 tests/e2e: move etcdctl to framework/e2e
+  - a13f676e 2024-02-02T14:40:15-05:00 [3.5] backport: add backoff to client config
+  - 3d64877d 2024-02-02T14:25:53-05:00 [3.5] Update to go1.21
+
+- kubernetes embedded-component 6b4a380c8104d3b8f48443544548193cccb32b72 to 2f7b99248d49c18da5c29f11da989ce3f1d9edfc
+  - 83c5b4246 2024-04-17T14:21:37-03:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - fe1198c41 2024-04-17T14:00:43-03:00 UPSTREAM: <drop>: manually resolve conflicts
+  - 587f5fe8a 2024-04-16T14:59:05+00:00 Release commit for Kubernetes v1.28.9
+  - 2c8d5059e 2024-04-15T09:12:25-07:00 Add envFrom to serviceaccount admission plugin
+  - 02bd4d5c6 2024-04-05T16:01:55+02:00 update debian-base to bookworm-v1.0.2
+  - 36afdd8f1 2024-04-05T16:01:48+02:00 [go] Bump images, dependencies and versions to go 1.22.1 and distroless iptables / set-cap
+  - a307a04fa 2024-04-05T13:20:15+02:00 UPSTREAM: <carry>: allow type mutation for specific secrets
+  - 069162827 2024-04-04T14:25:40+02:00 UPSTREAM: 124048: Use the right feature gate when updating uncertain volumes
+  - af92f0441 2024-04-04T14:13:20+05:30 [CVE-2023-45288] .*: bump x/net to v0.23.0
+  - cd2bf99dc 2024-04-01T15:32:48-03:00 Use the right feature gate when updating uncertain volumes
+  - c5ef46951 2024-04-01T17:27:01+08:00 fix panic with SIGSEGV in kubeadm certs check-expiration
+  - 050bb467c 2024-03-28T10:32:47+01:00 hack/tools: bump honnef.co/go/tools to v0.4.6
+  - 7bfb5d228 2024-03-25T09:28:40+00:00 UPSTREAM: <carry>: OCPBUGS-29520: fix cpu manager default cpuset check in workload partitioned env
+  - b0d358b89 2024-03-25T09:28:40+00:00 UPSTREAM: 123603: fix UT failure TestPrintIPAddressList
+  - d32c7d007 2024-03-20T17:29:10+01:00 Serve watch without resourceVersion from cache and introduce a WatchFromStorageWithoutResourceVersion feature gate to allow serving watch from storage.
+  - ba41767e1 2024-03-15T00:25:45+00:00 Update CHANGELOG/CHANGELOG-1.28.md for v1.28.8
+  - e5a20fc3a 2024-03-08T12:51:53-05:00 fix aggregator path filtering to include /
+  - edf0c62ab 2024-03-01T17:19:56-05:00 Filter aggregated apiservice gv
+  - 20972fe8e 2024-02-26T12:11:12+00:00 UPSTREAM: <carry>: openshift-kube-apiserver: add kube-apiserver patches
+  - 295c0a127 2024-01-10T11:50:27+01:00 Use DBG=1 for conformance verification
+  - 259409664 2024-01-10T11:50:27+01:00 build: use -trimpath in non-DBG mode
+
+- machine-config-operator embedded-component 3b90c34b13f52ca89e9a3fecc9ac827eff9886d1 to 6e28938baecfe677ff6b69f46e2c889c1a7a0bb5
+  - 62fa2987 2024-04-09T15:09:06+02:00 OCPBUGS-24366: Delete state files on reboot only
+  - 9c809af9 2024-04-05T14:57:34+00:00 OCPBUGS-22910: Modify rm_nm_conn_files to remove temporary files
+  - dedf98bb 2024-04-02T17:01:20+00:00 fix: resources were in the wrong indentation level
+  - e1188cfa 2024-01-11T16:33:20+00:00 OCPBUGS-18541: Log network service output to console
+
+- operator-framework-olm embedded-component 0a14440d662de108769cd3f3cf9cb5a47559b5cd to f6374fbc52a33f72763e7dda2b0bf04773a359dd
+  - c077b3db 2024-04-16T11:45:12-04:00 Update if AlreadyExists (#3202)
+  - 1dcc7cfb 2024-04-16T11:41:50-04:00 RoleBinding SSA (#3190)
+  - c7c5a73a 2024-04-06T21:59:14-04:00 copy-content: delete destination dirs before copying (#3197)
+
+- router image-amd64 b7001137f832d02d4ed68cba27fe3001ff523fa6 to 397ff2fdb0a65bca3c960c364239bd1c0697ce21
+  - ee6382a 2024-04-18T15:00:27+00:00 OCPBUGS-32044: Introduce 'idle-close-on-response' option for frontends
+  - f3ad52d 2024-03-29T14:06:16+00:00 OCPBUGS-22739: Properly handle rewrite-target annotation
+
+- ovn-kubernetes image-amd64 3bdcbd4e7cf57237c8c59b277fc2d8de6a932f68 to feca446a2e3848f79e533bb28763b2d61074de6e
+  - 057abeb 2024-04-08T10:21:05+02:00 Remove OVN topology version reporting/detection from OVN db
+  - 0f743ab 2024-04-08T10:21:03+02:00 Remove the configmap based OVN topology version reporting/detection
+  - bab2028 2024-03-20T09:14:34+01:00 Periodically check the ovnkube-node certificate is not expired
+  - 2016e89 2024-03-12T21:08:51+05:30 Custom v4 and v6 transit switch subnets while creating kind cluster
+
+- kubernetes image-amd64 6b4a380c8104d3b8f48443544548193cccb32b72 to 2f7b99248d49c18da5c29f11da989ce3f1d9edfc
+  - 83c5b4246 2024-04-17T14:21:37-03:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - fe1198c41 2024-04-17T14:00:43-03:00 UPSTREAM: <drop>: manually resolve conflicts
+  - 587f5fe8a 2024-04-16T14:59:05+00:00 Release commit for Kubernetes v1.28.9
+  - 2c8d5059e 2024-04-15T09:12:25-07:00 Add envFrom to serviceaccount admission plugin
+  - 02bd4d5c6 2024-04-05T16:01:55+02:00 update debian-base to bookworm-v1.0.2
+  - 36afdd8f1 2024-04-05T16:01:48+02:00 [go] Bump images, dependencies and versions to go 1.22.1 and distroless iptables / set-cap
+  - a307a04fa 2024-04-05T13:20:15+02:00 UPSTREAM: <carry>: allow type mutation for specific secrets
+  - 069162827 2024-04-04T14:25:40+02:00 UPSTREAM: 124048: Use the right feature gate when updating uncertain volumes
+  - af92f0441 2024-04-04T14:13:20+05:30 [CVE-2023-45288] .*: bump x/net to v0.23.0
+  - cd2bf99dc 2024-04-01T15:32:48-03:00 Use the right feature gate when updating uncertain volumes
+  - c5ef46951 2024-04-01T17:27:01+08:00 fix panic with SIGSEGV in kubeadm certs check-expiration
+  - 050bb467c 2024-03-28T10:32:47+01:00 hack/tools: bump honnef.co/go/tools to v0.4.6
+  - 7bfb5d228 2024-03-25T09:28:40+00:00 UPSTREAM: <carry>: OCPBUGS-29520: fix cpu manager default cpuset check in workload partitioned env
+  - b0d358b89 2024-03-25T09:28:40+00:00 UPSTREAM: 123603: fix UT failure TestPrintIPAddressList
+  - d32c7d007 2024-03-20T17:29:10+01:00 Serve watch without resourceVersion from cache and introduce a WatchFromStorageWithoutResourceVersion feature gate to allow serving watch from storage.
+  - ba41767e1 2024-03-15T00:25:45+00:00 Update CHANGELOG/CHANGELOG-1.28.md for v1.28.8
+  - e5a20fc3a 2024-03-08T12:51:53-05:00 fix aggregator path filtering to include /
+  - edf0c62ab 2024-03-01T17:19:56-05:00 Filter aggregated apiservice gv
+  - 20972fe8e 2024-02-26T12:11:12+00:00 UPSTREAM: <carry>: openshift-kube-apiserver: add kube-apiserver patches
+  - 295c0a127 2024-01-10T11:50:27+01:00 Use DBG=1 for conformance verification
+  - 259409664 2024-01-10T11:50:27+01:00 build: use -trimpath in non-DBG mode
+
+- csi-external-snapshotter image-arm64 50fa049ccaa48d7f7dcb165fb6e20c185a0cbd13 to 4f2955c7c90cd150f9dfae782148d0fa8eba7342
   - c8162b6 2024-04-02T14:31:10-06:00 UPSTREAM: 922: add cmdline args to enable group snapshot webhooks
 
-- kubernetes embedded-component f1b5f6c8166add33d0d5b0964e7e4482d11b1a17 to 6b4a380c8104d3b8f48443544548193cccb32b72
-  - f82e7dbb4 2024-04-01T15:05:04-03:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
-  - b0a30c246 2024-04-01T14:34:49-03:00 UPSTREAM: <drop>: manually resolve conflicts
-  - de36ba911 2024-03-28T14:55:37+01:00 UPSTREAM: <drop>: Pin x/net to the private fork
-  - fc11ff34c 2024-03-15T00:00:00+00:00 Release commit for Kubernetes v1.28.8
-  - e55ff77df 2024-03-06T13:07:31-08:00 remove --v arg from kubetest2-tester-ginkgo test args
-  - 1107f1b80 2024-03-06T13:07:31-08:00 ci: bump kind to latest for kms jobs
-  - 023168e25 2024-03-06T13:12:09-05:00 [go] Bump images, dependencies and versions to go 1.21.8 / distroless-iptables to v0.4.6
-  - 7889bca8b 2024-03-06T10:47:48-05:00 [CVE-2024-24786] Bump github.com/golang/protobuf v1.5.4, google.golang.org/protobuf v1.33.0
-  - 39bb9e94e 2024-03-06T14:49:24+01:00 keep existing PDB conditions when updating status
-  - d75625a52 2024-03-05T19:58:35+09:00 Validate restartable init container state transition
-  - 4fbf9a22a 2024-03-05T07:27:12+00:00 Test that separation of streams work by using progress notifies
-  - 1792c73a2 2024-03-05T07:24:58+00:00 Prevent watch cache starvation, by moving its watch to separate RPC and add a SeparateCacheWatchRPC feature flag to disable this behavior
-  - d216da45c 2024-03-01T11:17:54+08:00 fix UT failure TestPrintIPAddressList
-  - bb365b8e6 2024-02-26T13:59:31-05:00 Fix race condition between external-resizer and kubelet
-  - 728325849 2024-02-19T10:51:44+01:00 codegen: don't nuke files if only verifying
-  - 3be54edf8 2024-02-15T09:38:32+01:00 dra: increase timeout in setupFakeDRADriverGRPCServer to prevent tests to flake.
-  - d077f4a7e 2024-02-15T11:20:00+09:00 e2e_node: replace `registry.k8s.io/stress:v1` with agnhost
-  - 6e552d8d2 2024-02-15T11:19:55+09:00 promote agnhost to v2.47
-  - 00f140f6e 2024-02-14T11:03:40+00:00 Update CHANGELOG/CHANGELOG-1.28.md for v1.28.7
-  - a3e89669b 2024-02-12T09:50:04-08:00 fixing issue with GetCPUUsageNanoCores on Windows
-  - f483e4106 2024-02-12T17:23:11+01:00 Fix cleanup of file subpaths
-  - e51a3130d 2024-02-12T17:43:38+05:30 etcd: Update to version 3.5.12
-  - 04a499fd1 2024-02-12T17:43:12+05:30 build etcd image v3.5.12
-
-- machine-config-operator embedded-component 36049f9a1cc1b2f9b8c5edee9165fb4307313ec0 to 3b90c34b13f52ca89e9a3fecc9ac827eff9886d1
-  - a1d14210 2024-04-01T09:34:26-05:00 kubelet: restorecon necessary files on kubelet's prestart
-
-- operator-framework-olm embedded-component 59aa935ebbe6948921ea3292603cbdce898e0091 to 0a14440d662de108769cd3f3cf9cb5a47559b5cd
-  - 44a81b0f 2024-04-03T07:39:44-04:00 OCPBUGS-31438: Correctly detect catalog image ID for extractContent catalog pods (#3194)
-
-- csi-external-snapshotter image-amd64 50fa049ccaa48d7f7dcb165fb6e20c185a0cbd13 to 4f2955c7c90cd150f9dfae782148d0fa8eba7342
+- csi-external-snapshotter image-arm64 50fa049ccaa48d7f7dcb165fb6e20c185a0cbd13 to 4f2955c7c90cd150f9dfae782148d0fa8eba7342
   - c8162b6 2024-04-02T14:31:10-06:00 UPSTREAM: 922: add cmdline args to enable group snapshot webhooks
 
-- csi-external-snapshotter image-amd64 50fa049ccaa48d7f7dcb165fb6e20c185a0cbd13 to 4f2955c7c90cd150f9dfae782148d0fa8eba7342
+- csi-external-snapshotter image-arm64 50fa049ccaa48d7f7dcb165fb6e20c185a0cbd13 to 4f2955c7c90cd150f9dfae782148d0fa8eba7342
   - c8162b6 2024-04-02T14:31:10-06:00 UPSTREAM: 922: add cmdline args to enable group snapshot webhooks
 
-- csi-external-snapshotter image-amd64 50fa049ccaa48d7f7dcb165fb6e20c185a0cbd13 to 4f2955c7c90cd150f9dfae782148d0fa8eba7342
-  - c8162b6 2024-04-02T14:31:10-06:00 UPSTREAM: 922: add cmdline args to enable group snapshot webhooks
+- router image-arm64 b7001137f832d02d4ed68cba27fe3001ff523fa6 to 397ff2fdb0a65bca3c960c364239bd1c0697ce21
+  - ee6382a 2024-04-18T15:00:27+00:00 OCPBUGS-32044: Introduce 'idle-close-on-response' option for frontends
+  - f3ad52d 2024-03-29T14:06:16+00:00 OCPBUGS-22739: Properly handle rewrite-target annotation
 
-- ovn-kubernetes image-amd64 42b1cc427538a736f8c056171b4de7e6c6a366fb to 3bdcbd4e7cf57237c8c59b277fc2d8de6a932f68
+- ovn-kubernetes image-arm64 42b1cc427538a736f8c056171b4de7e6c6a366fb to feca446a2e3848f79e533bb28763b2d61074de6e
+  - 057abeb 2024-04-08T10:21:05+02:00 Remove OVN topology version reporting/detection from OVN db
+  - 0f743ab 2024-04-08T10:21:03+02:00 Remove the configmap based OVN topology version reporting/detection
   - 8ad99d7 2024-03-28T07:50:16+00:00 Node IP handler: do not exclude keepalived vips
   - 6699b80 2024-03-28T07:50:16+00:00 EIP multi NIC: in LGW mode, skip IP rules when dst is node IP
   - 831040d 2024-03-28T07:50:16+00:00 Rename non-OVN eips to secondary host eips
@@ -65,12 +161,31 @@
   - eda6ec5 2024-03-28T07:48:30+00:00 Upgrade netlink lib to consume default route fix
   - d1ce354 2024-03-28T07:48:14+00:00 Add netlink subscriber for link manager
   - f1b13a7 2024-03-28T07:17:42+00:00 Exposes link manager to track MAC address changes
+  - bab2028 2024-03-20T09:14:34+01:00 Periodically check the ovnkube-node certificate is not expired
+  - 2016e89 2024-03-12T21:08:51+05:30 Custom v4 and v6 transit switch subnets while creating kind cluster
 
-- kubernetes image-amd64 f1b5f6c8166add33d0d5b0964e7e4482d11b1a17 to 6b4a380c8104d3b8f48443544548193cccb32b72
+- kubernetes image-arm64 f1b5f6c8166add33d0d5b0964e7e4482d11b1a17 to 2f7b99248d49c18da5c29f11da989ce3f1d9edfc
+  - 83c5b4246 2024-04-17T14:21:37-03:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - fe1198c41 2024-04-17T14:00:43-03:00 UPSTREAM: <drop>: manually resolve conflicts
+  - 587f5fe8a 2024-04-16T14:59:05+00:00 Release commit for Kubernetes v1.28.9
+  - 2c8d5059e 2024-04-15T09:12:25-07:00 Add envFrom to serviceaccount admission plugin
+  - 02bd4d5c6 2024-04-05T16:01:55+02:00 update debian-base to bookworm-v1.0.2
+  - 36afdd8f1 2024-04-05T16:01:48+02:00 [go] Bump images, dependencies and versions to go 1.22.1 and distroless iptables / set-cap
+  - a307a04fa 2024-04-05T13:20:15+02:00 UPSTREAM: <carry>: allow type mutation for specific secrets
+  - 069162827 2024-04-04T14:25:40+02:00 UPSTREAM: 124048: Use the right feature gate when updating uncertain volumes
+  - af92f0441 2024-04-04T14:13:20+05:30 [CVE-2023-45288] .*: bump x/net to v0.23.0
+  - cd2bf99dc 2024-04-01T15:32:48-03:00 Use the right feature gate when updating uncertain volumes
   - f82e7dbb4 2024-04-01T15:05:04-03:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
   - b0a30c246 2024-04-01T14:34:49-03:00 UPSTREAM: <drop>: manually resolve conflicts
+  - c5ef46951 2024-04-01T17:27:01+08:00 fix panic with SIGSEGV in kubeadm certs check-expiration
   - de36ba911 2024-03-28T14:55:37+01:00 UPSTREAM: <drop>: Pin x/net to the private fork
+  - 050bb467c 2024-03-28T10:32:47+01:00 hack/tools: bump honnef.co/go/tools to v0.4.6
+  - 7bfb5d228 2024-03-25T09:28:40+00:00 UPSTREAM: <carry>: OCPBUGS-29520: fix cpu manager default cpuset check in workload partitioned env
+  - b0d358b89 2024-03-25T09:28:40+00:00 UPSTREAM: 123603: fix UT failure TestPrintIPAddressList
+  - d32c7d007 2024-03-20T17:29:10+01:00 Serve watch without resourceVersion from cache and introduce a WatchFromStorageWithoutResourceVersion feature gate to allow serving watch from storage.
+  - ba41767e1 2024-03-15T00:25:45+00:00 Update CHANGELOG/CHANGELOG-1.28.md for v1.28.8
   - fc11ff34c 2024-03-15T00:00:00+00:00 Release commit for Kubernetes v1.28.8
+  - e5a20fc3a 2024-03-08T12:51:53-05:00 fix aggregator path filtering to include /
   - e55ff77df 2024-03-06T13:07:31-08:00 remove --v arg from kubetest2-tester-ginkgo test args
   - 1107f1b80 2024-03-06T13:07:31-08:00 ci: bump kind to latest for kms jobs
   - 023168e25 2024-03-06T13:12:09-05:00 [go] Bump images, dependencies and versions to go 1.21.8 / distroless-iptables to v0.4.6
@@ -79,8 +194,10 @@
   - d75625a52 2024-03-05T19:58:35+09:00 Validate restartable init container state transition
   - 4fbf9a22a 2024-03-05T07:27:12+00:00 Test that separation of streams work by using progress notifies
   - 1792c73a2 2024-03-05T07:24:58+00:00 Prevent watch cache starvation, by moving its watch to separate RPC and add a SeparateCacheWatchRPC feature flag to disable this behavior
+  - edf0c62ab 2024-03-01T17:19:56-05:00 Filter aggregated apiservice gv
   - d216da45c 2024-03-01T11:17:54+08:00 fix UT failure TestPrintIPAddressList
   - bb365b8e6 2024-02-26T13:59:31-05:00 Fix race condition between external-resizer and kubelet
+  - 20972fe8e 2024-02-26T12:11:12+00:00 UPSTREAM: <carry>: openshift-kube-apiserver: add kube-apiserver patches
   - 728325849 2024-02-19T10:51:44+01:00 codegen: don't nuke files if only verifying
   - 3be54edf8 2024-02-15T09:38:32+01:00 dra: increase timeout in setupFakeDRADriverGRPCServer to prevent tests to flake.
   - d077f4a7e 2024-02-15T11:20:00+09:00 e2e_node: replace `registry.k8s.io/stress:v1` with agnhost
@@ -90,4 +207,6 @@
   - f483e4106 2024-02-12T17:23:11+01:00 Fix cleanup of file subpaths
   - e51a3130d 2024-02-12T17:43:38+05:30 etcd: Update to version 3.5.12
   - 04a499fd1 2024-02-12T17:43:12+05:30 build etcd image v3.5.12
+  - 295c0a127 2024-01-10T11:50:27+01:00 Use DBG=1 for conformance verification
+  - 259409664 2024-01-10T11:50:27+01:00 build: use -trimpath in non-DBG mode
 
