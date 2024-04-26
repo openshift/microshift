@@ -30,7 +30,7 @@ VM_POOL_BASENAME="vm-storage"
 
 # The location for storage for the VMs.
 # shellcheck disable=SC2034  # used elsewhere
-VM_DISK_BASEDIR="${IMAGEDIR}/${VM_POOL_BASENAME}"
+export VM_DISK_BASEDIR="${IMAGEDIR}/${VM_POOL_BASENAME}"
 
 # The isolated network name used by some VMs.
 # shellcheck disable=SC2034  # used elsewhere
@@ -71,6 +71,10 @@ export CONTAINER_LIST="${IMAGEDIR}/container-images-list"
 # Location of container images in oci-dir format for all the bootc images
 # shellcheck disable=SC2034  # used elsewhere
 export BOOTC_IMAGE_DIR="${IMAGEDIR}/bootc-images"
+
+# Location of images produced by bootc ISO build procedure
+# shellcheck disable=SC2034  # used elsewhere
+export BOOTC_ISO_DIR="${IMAGEDIR}/bootc-iso-images"
 
 # Location of data files created by the tools for managing scenarios
 # as they are run.

@@ -4,15 +4,11 @@ import os
 import pathlib
 import sys
 import subprocess
+import time
 from typing import List
 
 
 PUSHD_DIR_STACK = []
-
-
-def should_skip(file):
-    # Implement your skipping logic here
-    return False
 
 
 def record_junit(groupdir, containerfile, filetype, status):
@@ -20,8 +16,22 @@ def record_junit(groupdir, containerfile, filetype, status):
     pass
 
 
+def get_timestamp(format: str = "%H:%M:%S"):
+    """Return a timestamp in the specified format with nanoseconds"""
+    # Get current time in secs
+    cts = time.time()
+    # Extract seconds and nanoseconds
+    secs = int(cts)
+    nsecs = int((cts - secs) * 1_000_000_000)
+    # Use time.strftime to format the time part
+    time_str = time.strftime(format, time.localtime(secs))
+
+    # Construct the final timestamp string with nanoseconds
+    return f"{time_str}.{nsecs:09d}"
+
+
 def print_msg(msg: str, file=sys.stderr):
-    print(msg, file=file)
+    print(get_timestamp(), msg, file=file)
 
 
 def get_env_var(var_name: str, def_val: str = None):
@@ -86,6 +96,13 @@ def popd():
         raise Exception("Directory stack is empty")
     dir = PUSHD_DIR_STACK.pop()
     os.chdir(dir)
+
+
+def read_file(file_path: str):
+    """Read the file contents and return them to the caller"""
+    with open(file_path, 'r') as file:
+        content = file.read()
+    return content
 
 
 def delete_file(file_path: str):
