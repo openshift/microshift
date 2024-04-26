@@ -6,7 +6,6 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"github.com/openshift/microshift/pkg/config/apiserver"
 	"math"
 	"net"
 	"net/url"
@@ -15,6 +14,8 @@ import (
 	"slices"
 	"strings"
 	"time"
+
+	"github.com/openshift/microshift/pkg/config/apiserver"
 
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/klog/v2"
@@ -279,21 +280,6 @@ func (c *Config) updateComputedValues() error {
 		// First and last are the same because of the /32 netmask.
 		firstValidIP, _ := cidr.AddressRange(nextSubnet)
 		c.ApiServer.AdvertiseAddress = firstValidIP.String()
-	}
-
-	if len(c.Ingress.ListenAddress) == 0 {
-		// If the listenAddress is not configured we need to include all of the host addresses
-		// to preserve previous behavior. However, if the apiserver advertise address has
-		// not been configured, it will do so in a later stage and we also need to
-		// include it here.
-		addresses, err := AllowedListeningIPAddresses()
-		if err != nil {
-			return fmt.Errorf("unable to compute default listening addresses: %v", err)
-		}
-		if !c.ApiServer.SkipInterface {
-			addresses = append(addresses, c.ApiServer.AdvertiseAddress)
-		}
-		c.Ingress.ListenAddress = addresses
 	}
 
 	c.computeLoggingSetting()
