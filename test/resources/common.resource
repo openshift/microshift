@@ -126,8 +126,8 @@ QE Team Skip Test If Bug Is Open
     IF    '${JIRA_API_TOKEN}' == '${EMPTY}'
         Log    Variable 'JIRA_API_TOKEN' does not exist. Test is NOT skipped
     ELSE
-        ${result}=    Run Process    ./scripts/jira/manage_ticket.sh get_status --ticket-id ${ticket_id} | tail -n1
-        ...    shell=True    env:JIRA_API_TOKEN=${JIRA_API_TOKEN}    cwd=/Users/agullon/workspace/microshift/
+        ${result}=    Run Process    ../scripts/jira/manage_ticket.sh get_status --ticket-id ${ticket_id} | tail -n1
+        ...    shell=True    env:JIRA_API_TOKEN=${JIRA_API_TOKEN}
         Should Be Equal As Integers    0    ${result.rc}
         Skip If    "${result.stdout} != Closed and ${result.stdout} != Done"
     END
