@@ -309,6 +309,16 @@ def command_close(args):
             )
 
 
+def command_get_status(args):
+    """Implement 'get_status' command."""
+    server = jira.JIRA(
+        server=SERVER_URL,
+        token_auth=os.environ.get("JIRA_API_TOKEN"),
+    )
+    ticket = server.issue(args.ticket_id)
+    print(f"{ticket.fields.status}")
+
+
 def main():
     """The main program."""
     parser = argparse.ArgumentParser(
@@ -378,12 +388,22 @@ def main():
         help='report but make no changes',
     )
 
+    get_status_parser = subparsers.add_parser(
+        "get_status",
+        help="Find tickets status from ticket id",
+    )
+    get_status_parser.add_argument(
+        "--ticket-id", dest="ticket_id", default=None, help="the ticket id", type=str
+    )
+
     args = parser.parse_args()
 
     if args.command == 'start':
         command_start(args)
     elif args.command == 'close':
         command_close(args)
+    elif args.command == "get_status":
+        command_get_status(args)
     else:
         parser.print_help()
 
