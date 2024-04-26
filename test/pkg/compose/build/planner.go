@@ -63,7 +63,11 @@ func (b *Planner) CreateBuildPlan(paths []string) (Plan, error) {
 		}
 	}
 
-	klog.InfoS("Constructed build plan", "groups", len(toBuild), "build-request", toBuild)
+	out, err := json.MarshalIndent(toBuild, "", "    ")
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal build plan to json: %w", err)
+	}
+	klog.InfoS("Constructed build plan", "groups", len(toBuild), "plan", string(out))
 
 	return toBuild, nil
 }
