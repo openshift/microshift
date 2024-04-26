@@ -25,7 +25,7 @@ Router Smoke Test
     ...    Expose Hello MicroShift Service Via Route
     ...    Restart Router
 
-    QE Team Skip Test If Bug Is Open    USHIFT-2349
+    Skip Test If Bug Is Open    USHIFT-2349
 
     Wait Until Keyword Succeeds    10x    6s
     ...    Access Hello Microshift Success    ${HTTP_PORT}

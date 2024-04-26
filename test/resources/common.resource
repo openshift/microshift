@@ -119,7 +119,7 @@ Create Random Temp Directory
     Create Directory    ${path}
     RETURN    ${path}
 
-QE Team Skip Test If Bug Is Open
+Skip Test If Bug Is Open
     [Documentation]    Skip jira bug is not in Closed or Done state
     [Arguments]    ${ticket_id}
 
