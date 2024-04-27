@@ -2,6 +2,7 @@
 
 import os
 import pathlib
+import psutil
 import sys
 import subprocess
 import time
@@ -116,3 +117,34 @@ def delete_file(file_path: str):
 def basename(path: str):
     """Return a base name of the path"""
     return pathlib.Path(path).name
+
+
+def find_subprocesses(ppid=None):
+    """Find and return a list of all the sub-processes of a parent PID"""
+    # Get current process if not specified
+    if not ppid:
+        ppid = psutil.Process().pid
+    # Get all child process objects recursively
+    children = psutil.Process(ppid).children(recursive=True)
+    # Collect the child process IDs
+    pids = []
+    for child in children:
+        pids += [child.pid]
+    return pids
+
+
+def terminate_process(pid, wait=True):
+    """Terminate a process, waiting until it exited"""
+    try:
+        proc = psutil.Process(pid)
+        # Check if the process runs elevated
+        if proc.uids().effective == 0:
+            run_command(["sudo", "kill", "-TERM", pid], False)
+        else:
+            proc.terminate()
+        # Wait for process to terminate
+        if wait:
+            proc.wait()
+    except psutil.NoSuchProcess:
+        # Ignore non-existent processes
+        None

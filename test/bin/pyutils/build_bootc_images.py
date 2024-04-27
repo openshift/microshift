@@ -29,10 +29,31 @@ BASE_REPO = common.get_env_var('BASE_REPO')
 NEXT_REPO = common.get_env_var('NEXT_REPO')
 HOME_DIR = common.get_env_var("HOME")
 PULL_SECRET = common.get_env_var('PULL_SECRET', f"{HOME_DIR}/.pull-secret.json")
+BIB_IMAGE = "quay.io/centos-bootc/bootc-image-builder:latest"
+
+
+def cleanup_atexit(dry_run):
+    common.print_msg(f"Running atexit cleanup")
+    # Terminating any running subprocesses
+    for pid in common.find_subprocesses():
+        common.print_msg(f"Terminating {pid} PID")
+        common.terminate_process(pid)
+
+    # Terminate running bootc image builder containers
+    podman_args = [
+        "sudo", "podman", "ps",
+        "--filter", f"ancestor={BIB_IMAGE}",
+        "--format", "{{.ID}}"
+    ]
+    cids = common.run_command_in_shell(podman_args, dry_run)
+    if cids:
+        common.print_msg(f"Terminating '{cids}' container(s)")
+        common.run_command_in_shell(["sudo", "podman", "stop", cids], dry_run)
 
 
 def should_skip(file):
     if os.path.exists(file):
+        common.print_msg(f"{file} already exists, skipping")
         return True
     return False
 
@@ -236,7 +257,7 @@ def process_image_bootc(groupdir, bootcfile, dry_run):
             ]
             # Add the bootc image builder command line using local images
             build_args += [
-                "quay.io/centos-bootc/bootc-image-builder:latest",
+                BIB_IMAGE,
                 "--type", "anaconda-iso",
                 "--local",
                 bf_imgref
@@ -295,13 +316,18 @@ def main():
     dirgroup.add_argument("-g", "--group-dir", type=str, help="Path to the group directory to process.")
 
     args = parser.parse_args()
-    # Convert input directories to absolute paths
-    if args.group_dir:
-        args.group_dir = os.path.abspath(args.group_dir)
-    if args.layer_dir:
-        args.layer_dir = os.path.abspath(args.layer_dir)
 
     try:
+        # Convert input directories to absolute paths
+        if args.group_dir:
+            args.group_dir = os.path.abspath(args.group_dir)
+            dir2process = args.group_dir
+        if args.layer_dir:
+            args.layer_dir = os.path.abspath(args.layer_dir)
+            dir2process = args.layer_dir
+        # Make sure the input directory exists
+        if not os.path.isdir(dir2process):
+            raise Exception(f"The input directory '{dir2process}' does not exist")
         # Make sure the local RPM repository exists
         if not os.path.isdir(LOCAL_REPO):
             raise Exception("Run create_local_repo.sh before building images")
@@ -332,6 +358,8 @@ def main():
         common.print_msg(f"An error occurred: {e}")
         traceback.print_exc()
         sys.exit(1)
+    finally:
+        cleanup_atexit(args.dry_run)
 
 
 if __name__ == "__main__":
