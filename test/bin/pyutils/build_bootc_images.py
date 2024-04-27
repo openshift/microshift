@@ -324,6 +324,7 @@ def main():
     parser = argparse.ArgumentParser(description="Build image layers using Bootc Image Builder and Podman.")
     parser.add_argument("-d", "--dry-run", action="store_true", help="Dry run: skip executing build commands.")
     parser.add_argument("-f", "--force-rebuild", action="store_true", help="Force rebuilding images that already exist.")
+    parser.add_argument("-E", "--no-extract-images", action="store_true", help="Skip container image extraction.")
     parser.add_argument("-b", "--build-type", choices=["image-bootc", "containerfile"], help="Only build images of the specified type.")
     dirgroup = parser.add_mutually_exclusive_group(required=True)
     dirgroup.add_argument("-l", "--layer-dir", type=str, help="Path to the layer directory to process.")
@@ -352,13 +353,16 @@ def main():
 
         # Determine versions of RPM packages
         set_rpm_version_info_vars()
-        # Prepare container lists for mirroring registries
-        common.delete_file(CONTAINER_LIST)
-        extract_container_images(SOURCE_VERSION, LOCAL_REPO, CONTAINER_LIST, args.dry_run)
-        # The following images are specific to layers that use fake rpms built from source
-        extract_container_images(f"4.{FAKE_NEXT_MINOR_VERSION}.*", NEXT_REPO, CONTAINER_LIST, args.dry_run)
-        extract_container_images(PREVIOUS_RELEASE_VERSION, PREVIOUS_RELEASE_REPO, CONTAINER_LIST, args.dry_run)
-        extract_container_images(YMINUS2_RELEASE_VERSION, YMINUS2_RELEASE_REPO, CONTAINER_LIST, args.dry_run)
+        # Prepare container image lists for mirroring registries
+        if args.no_extract_images:
+            common.print_msg("Skipping container image extraction")
+        else:
+            common.delete_file(CONTAINER_LIST)
+            extract_container_images(SOURCE_VERSION, LOCAL_REPO, CONTAINER_LIST, args.dry_run)
+            # The following images are specific to layers that use fake rpms built from source
+            extract_container_images(f"4.{FAKE_NEXT_MINOR_VERSION}.*", NEXT_REPO, CONTAINER_LIST, args.dry_run)
+            extract_container_images(PREVIOUS_RELEASE_VERSION, PREVIOUS_RELEASE_REPO, CONTAINER_LIST, args.dry_run)
+            extract_container_images(YMINUS2_RELEASE_VERSION, YMINUS2_RELEASE_REPO, CONTAINER_LIST, args.dry_run)
 
         # Process individual group directory
         if args.group_dir:
