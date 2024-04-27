@@ -330,7 +330,7 @@ def main():
     dirgroup.add_argument("-g", "--group-dir", type=str, help="Path to the group directory to process.")
 
     args = parser.parse_args()
-
+    success_message = False
     try:
         # Convert input directories to absolute paths
         if args.group_dir:
@@ -370,14 +370,16 @@ def main():
                 # Check if this item is a directory
                 if os.path.isdir(item_path):
                     process_group(item_path, args.build_type, args.dry_run)
-        # Success message
-        common.print_msg("Build complete")
+        # Toggle the success flag
+        success_message = True
     except Exception as e:
         common.print_msg(f"An error occurred: {e}")
         traceback.print_exc()
         sys.exit(1)
     finally:
         cleanup_atexit(args.dry_run)
+        # Exit status message
+        common.print_msg("Build " + ("OK" if success_message else "FAILED"))
 
 
 if __name__ == "__main__":
