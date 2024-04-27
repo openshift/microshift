@@ -30,10 +30,11 @@ NEXT_REPO = common.get_env_var('NEXT_REPO')
 HOME_DIR = common.get_env_var("HOME")
 PULL_SECRET = common.get_env_var('PULL_SECRET', f"{HOME_DIR}/.pull-secret.json")
 BIB_IMAGE = "quay.io/centos-bootc/bootc-image-builder:latest"
+FORCE_REBUILD = False
 
 
 def cleanup_atexit(dry_run):
-    common.print_msg(f"Running atexit cleanup")
+    common.print_msg("Running atexit cleanup")
     # Terminating any running subprocesses
     for pid in common.find_subprocesses():
         common.print_msg(f"Terminating {pid} PID")
@@ -52,10 +53,15 @@ def cleanup_atexit(dry_run):
 
 
 def should_skip(file):
-    if os.path.exists(file):
-        common.print_msg(f"{file} already exists, skipping")
-        return True
-    return False
+    if not os.path.exists(file):
+        return False
+    # Forcing the rebuild if needed
+    if FORCE_REBUILD is True:
+        common.print_msg(f"Forcing rebuild of '{file}'")
+        return False
+
+    common.print_msg(f"The '{file}' already exists, skipping")
+    return True
 
 
 def find_latest_rpm(repo_path, version=""):
@@ -317,6 +323,7 @@ def main():
     # Parse command line arguments
     parser = argparse.ArgumentParser(description="Build image layers using Bootc Image Builder and Podman.")
     parser.add_argument("-d", "--dry-run", action="store_true", help="Dry run: skip executing build commands.")
+    parser.add_argument("-f", "--force-rebuild", action="store_true", help="Force rebuilding images that already exist.")
     parser.add_argument("-b", "--build-type", choices=["image-bootc", "containerfile"], help="Only build images of the specified type.")
     dirgroup = parser.add_mutually_exclusive_group(required=True)
     dirgroup.add_argument("-l", "--layer-dir", type=str, help="Path to the layer directory to process.")
@@ -338,6 +345,10 @@ def main():
         # Make sure the local RPM repository exists
         if not os.path.isdir(LOCAL_REPO):
             raise Exception("Run create_local_repo.sh before building images")
+        # Initialize force rebuild option
+        global FORCE_REBUILD
+        if args.force_rebuild and args.force_rebuild is True:
+            FORCE_REBUILD = True
 
         # Determine versions of RPM packages
         set_rpm_version_info_vars()
