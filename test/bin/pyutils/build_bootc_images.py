@@ -56,7 +56,7 @@ def should_skip(file):
     if not os.path.exists(file):
         return False
     # Forcing the rebuild if needed
-    if FORCE_REBUILD is True:
+    if FORCE_REBUILD:
         common.print_msg(f"Forcing rebuild of '{file}'")
         return False
 
@@ -348,7 +348,7 @@ def main():
             raise Exception("Run create_local_repo.sh before building images")
         # Initialize force rebuild option
         global FORCE_REBUILD
-        if args.force_rebuild and args.force_rebuild is True:
+        if args.force_rebuild:
             FORCE_REBUILD = True
 
         # Determine versions of RPM packages
