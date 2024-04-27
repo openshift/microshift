@@ -278,15 +278,21 @@ def process_image_bootc(groupdir, bootcfile, dry_run):
         os.rename(f"{bf_outdir}/bootiso/install.iso", bf_targetiso)
 
 
-def process_group(groupdir, dry_run=False):
+def process_group(groupdir, build_type, dry_run=False):
     futures = []
     # Parallel processing loop
     with concurrent.futures.ProcessPoolExecutor() as executor:
         # Scan group directory contents sorted by length and then alphabetically
         for file in sorted(os.listdir(groupdir), key=lambda i: (len(i), i)):
             if file.endswith(".containerfile"):
+                if build_type and build_type != "containerfile":
+                    common.print_msg(f"Skipping '{file}' due to '{build_type}' filter")
+                    continue
                 futures += [executor.submit(process_containerfile, groupdir, file, dry_run)]
             elif file.endswith(".image-bootc"):
+                if build_type and build_type != "image-bootc":
+                    common.print_msg(f"Skipping '{file}' due to '{build_type}' filter")
+                    continue
                 futures += [executor.submit(process_image_bootc, groupdir, file, dry_run)]
             else:
                 common.print_msg(f"Skipping unknown file {file}")
@@ -309,8 +315,9 @@ def process_group(groupdir, dry_run=False):
 
 def main():
     # Parse command line arguments
-    parser = argparse.ArgumentParser(description="Process container files with Podman.")
-    parser.add_argument("-d", "--dry-run", action="store_true", help="Dry run: skip executing Podman commands.")
+    parser = argparse.ArgumentParser(description="Build image layers using Bootc Image Builder and Podman.")
+    parser.add_argument("-d", "--dry-run", action="store_true", help="Dry run: skip executing build commands.")
+    parser.add_argument("-b", "--build-type", choices=["image-bootc", "containerfile"], help="Only build images of the specified type.")
     dirgroup = parser.add_mutually_exclusive_group(required=True)
     dirgroup.add_argument("-l", "--layer-dir", type=str, help="Path to the layer directory to process.")
     dirgroup.add_argument("-g", "--group-dir", type=str, help="Path to the group directory to process.")
@@ -344,14 +351,14 @@ def main():
 
         # Process individual group directory
         if args.group_dir:
-            process_group(args.group_dir, args.dry_run)
+            process_group(args.group_dir, args.build_type, args.dry_run)
         else:
             # Process layer directory contents sorted by length and then alphabetically
             for item in sorted(os.listdir(args.layer_dir), key=lambda i: (len(i), i)):
                 item_path = os.path.join(args.layer_dir, item)
                 # Check if this item is a directory
                 if os.path.isdir(item_path):
-                    process_group(item_path, args.dry_run)
+                    process_group(item_path, args.build_type, args.dry_run)
         # Success message
         common.print_msg("Build complete")
     except Exception as e:
