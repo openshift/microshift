@@ -758,6 +758,8 @@ EOF
     yq -i 'with(.spec.template.spec.containers[0].securityContext; .runAsUser = 65534)' $target
 
     yq -i '.metadata.namespace = "kube-system"' "${REPOROOT}/assets/components/csi-snapshot-controller/webhook_service.yaml"
+    yq -i '.metadata.subjects[0].namespace = "kube-system"' "${REPOROOT}/assets/components/csi-snapshot-controller/webhook_clusterrolebinding.yaml"
+    yq -i '.metadata.namespace = "kube-system"' "${REPOROOT}/assets/components/csi-snapshot-controller/webhook_serviceaccount.yaml"
 
     yq -i '.webhooks[0].clientConfig.service.namespace="kube-system"' "${REPOROOT}/assets/components/csi-snapshot-controller/webhook_config.yaml"
 
