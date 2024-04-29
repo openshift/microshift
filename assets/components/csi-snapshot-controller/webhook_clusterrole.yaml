@@ -1,0 +1,8 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: csi-snapshot-webhook-clusterrole
+rules:
+- apiGroups: ["snapshot.storage.k8s.io"]
+  resources: ["volumesnapshotclasses"]
+  verbs: ["get", "list", "watch"]
