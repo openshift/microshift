@@ -305,12 +305,12 @@ def process_group(groupdir, build_type, dry_run=False):
                     if build_type and build_type != "containerfile":
                         common.print_msg(f"Skipping '{file}' due to '{build_type}' filter")
                         continue
-                    futures += [executor.submit(process_containerfile, groupdir, file, dry_run)]
+                    futures.append(executor.submit(process_containerfile, groupdir, file, dry_run))
                 elif file.endswith(".image-bootc"):
                     if build_type and build_type != "image-bootc":
                         common.print_msg(f"Skipping '{file}' due to '{build_type}' filter")
                         continue
-                    futures += [executor.submit(process_image_bootc, groupdir, file, dry_run)]
+                    futures.append(executor.submit(process_image_bootc, groupdir, file, dry_run))
                 else:
                     common.print_msg(f"Skipping unknown file {file}")
 

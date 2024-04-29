@@ -189,7 +189,7 @@ def find_subprocesses(ppid=None):
     # Collect the child process IDs
     pids = []
     for child in children:
-        pids += [child.pid]
+        pids.append(child.pid)
     return pids
 
 
