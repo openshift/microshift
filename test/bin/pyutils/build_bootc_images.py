@@ -48,6 +48,8 @@ def cleanup_atexit(dry_run):
     ]
     cids = common.run_command_in_shell(podman_args, dry_run)
     if cids:
+        # Make sure the ids are normalized in a single line
+        cids = re.sub(r'\s+', ' ', cids)
         common.print_msg(f"Terminating '{cids}' container(s)")
         common.run_command_in_shell(["sudo", "podman", "stop", cids], dry_run)
 
@@ -187,7 +189,7 @@ def process_containerfile(groupdir, containerfile, dry_run):
 
     # Check if the target artifact exists
     if should_skip(cf_targetimg):
-        common.record_junit(groupdir, cf_path, "containerfile", "SKIPPED")
+        common.record_junit(cf_path, "process-container", "SKIPPED")
         return
 
     # Create the output directories
@@ -205,6 +207,7 @@ def process_containerfile(groupdir, containerfile, dry_run):
                 os.path.join(IMAGEDIR, "rpm-repos")
             ]
             common.run_command_in_shell(build_args, dry_run, logfile, logfile)
+            common.record_junit(cf_path, "build-container", "OK")
 
             # Run the container export command
             if os.path.exists(cf_outdir):
@@ -215,7 +218,9 @@ def process_containerfile(groupdir, containerfile, dry_run):
                 "-o", cf_outdir, cf_outname
             ]
             common.run_command_in_shell(save_args, dry_run, logfile, logfile)
+            common.record_junit(cf_path, "save-container", "OK")
     except Exception:
+        common.record_junit(cf_path, "process-container", "FAILED")
         # Propagate the exception to the caller
         raise
     finally:
@@ -232,7 +237,7 @@ def process_image_bootc(groupdir, bootcfile, dry_run):
 
     # Check if the target artifact exists
     if should_skip(bf_targetiso):
-        common.record_junit(groupdir, bf_path, "image-bootc", "SKIPPED")
+        common.record_junit(bf_path, "process-bootc-image", "SKIPPED")
         return
 
     # Create the output directories
@@ -250,6 +255,7 @@ def process_image_bootc(groupdir, bootcfile, dry_run):
                 "--authfile", PULL_SECRET, bf_imgref
             ]
             common.run_command_in_shell(pull_args, dry_run, logfile, logfile)
+            common.record_junit(bf_path, "pull-bootc-image", "OK")
 
             # The podman command with security elevation and
             # mount of output / container storage
@@ -269,7 +275,9 @@ def process_image_bootc(groupdir, bootcfile, dry_run):
                 bf_imgref
             ]
             common.run_command_in_shell(build_args, dry_run, logfile, logfile)
+            common.record_junit(bf_path, "build-bootc-image", "OK")
     except Exception:
+        common.record_junit(bf_path, "process-bootc-image", "FAILED")
         # Propagate the exception to the caller
         raise
     finally:
@@ -286,24 +294,26 @@ def process_image_bootc(groupdir, bootcfile, dry_run):
 
 def process_group(groupdir, build_type, dry_run=False):
     futures = []
-    # Parallel processing loop
-    with concurrent.futures.ProcessPoolExecutor() as executor:
-        # Scan group directory contents sorted by length and then alphabetically
-        for file in sorted(os.listdir(groupdir), key=lambda i: (len(i), i)):
-            if file.endswith(".containerfile"):
-                if build_type and build_type != "containerfile":
-                    common.print_msg(f"Skipping '{file}' due to '{build_type}' filter")
-                    continue
-                futures += [executor.submit(process_containerfile, groupdir, file, dry_run)]
-            elif file.endswith(".image-bootc"):
-                if build_type and build_type != "image-bootc":
-                    common.print_msg(f"Skipping '{file}' due to '{build_type}' filter")
-                    continue
-                futures += [executor.submit(process_image_bootc, groupdir, file, dry_run)]
-            else:
-                common.print_msg(f"Skipping unknown file {file}")
-
     try:
+        # Open the junit file
+        common.start_junit(groupdir)
+        # Parallel processing loop
+        with concurrent.futures.ProcessPoolExecutor() as executor:
+            # Scan group directory contents sorted by length and then alphabetically
+            for file in sorted(os.listdir(groupdir), key=lambda i: (len(i), i)):
+                if file.endswith(".containerfile"):
+                    if build_type and build_type != "containerfile":
+                        common.print_msg(f"Skipping '{file}' due to '{build_type}' filter")
+                        continue
+                    futures += [executor.submit(process_containerfile, groupdir, file, dry_run)]
+                elif file.endswith(".image-bootc"):
+                    if build_type and build_type != "image-bootc":
+                        common.print_msg(f"Skipping '{file}' due to '{build_type}' filter")
+                        continue
+                    futures += [executor.submit(process_image_bootc, groupdir, file, dry_run)]
+                else:
+                    common.print_msg(f"Skipping unknown file {file}")
+
         # Wait for the parallel tasks to complete
         for f in concurrent.futures.as_completed(futures):
             common.print_msg(f"Task {f} completed")
@@ -317,6 +327,9 @@ def process_group(groupdir, build_type, dry_run=False):
                 common.print_msg(f"Task {f} cancelled")
         # Propagate the exception to the caller
         raise
+    finally:
+        # Close junit file
+        common.close_junit()
 
 
 def main():
@@ -354,10 +367,10 @@ def main():
         # Determine versions of RPM packages
         set_rpm_version_info_vars()
         # Prepare container image lists for mirroring registries
+        common.delete_file(CONTAINER_LIST)
         if args.no_extract_images:
             common.print_msg("Skipping container image extraction")
         else:
-            common.delete_file(CONTAINER_LIST)
             extract_container_images(SOURCE_VERSION, LOCAL_REPO, CONTAINER_LIST, args.dry_run)
             # The following images are specific to layers that use fake rpms built from source
             extract_container_images(f"4.{FAKE_NEXT_MINOR_VERSION}.*", NEXT_REPO, CONTAINER_LIST, args.dry_run)

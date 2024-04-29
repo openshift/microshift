@@ -6,15 +6,69 @@ import psutil
 import sys
 import subprocess
 import time
+import threading
 from typing import List
 
 
 PUSHD_DIR_STACK = []
+JUNIT_LOGFILE = None
+JUNIT_LOCK = threading.Lock()
 
 
-def record_junit(groupdir, containerfile, filetype, status):
-    # Implement your recording logic here
-    pass
+def start_junit(groupdir):
+    """Create a new junit file with the group name and timestampt header"""
+    # Initialize the junit log file path
+    global JUNIT_LOGFILE
+    group = basename(groupdir)
+    JUNIT_LOGFILE = os.path.join(get_env_var('IMAGEDIR'), "build-logs", group, "junit.xml")
+
+    print_msg(f"Creating '{JUNIT_LOGFILE}'")
+    # Create the output directory
+    create_dir(os.path.dirname(JUNIT_LOGFILE))
+    # Create a new junit file with a header
+    delete_file(JUNIT_LOGFILE)
+    timestamp = get_timestamp("%Y-%m-%dT%H:%M:%S")
+    append_file(JUNIT_LOGFILE, f'''<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="microshift-test-framework:{group}" timestamp="{timestamp}">''')
+
+
+def close_junit():
+    """Close the junit file"""
+    global JUNIT_LOGFILE
+    if not JUNIT_LOGFILE:
+        raise Exception("Attempt to close junit without starting it first")
+    # Close the unit
+    append_file(JUNIT_LOGFILE, '</testsuite>')
+    # Reset the junit log directory
+    JUNIT_LOGFILE = None
+
+
+def record_junit(object, step, status):
+    """Add a message for the specified object and step with OK, SKIP or FAIL status.
+    Recording messages is synchronized and it can be called from different threads.
+    """
+    try:
+        # BEGIN CRITICAL SECTION
+        JUNIT_LOCK.acquire()
+
+        append_file(JUNIT_LOGFILE, f'<testcase classname="{object}" name="{step}">')
+        # Add a message according to the status
+        if status == "OK":
+            pass
+        elif status.startswith("SKIP"):
+            append_file(JUNIT_LOGFILE, f'<skipped message="{status}" type="{step}-skipped" />')
+        elif status.startswith("FAIL"):
+            append_file(JUNIT_LOGFILE, f'<failure message="{status}" type="${step}-failure" />')
+        else:
+            raise Exception(f"Invalid junit status '{status}'")
+        # Close the test case block
+        append_file(JUNIT_LOGFILE, '</testcase>')
+    except Exception:
+        # Propagate the exception to the caller
+        raise
+    finally:
+        # END CRITICAL SECTION
+        JUNIT_LOCK.release()
 
 
 def get_timestamp(format: str = "%H:%M:%S"):
@@ -106,6 +160,12 @@ def read_file(file_path: str):
     return content
 
 
+def append_file(file_path: str, content: str):
+    """Append the specified content to a file"""
+    with open(file_path, 'a') as file:
+        file.write(content)
+
+
 def delete_file(file_path: str):
     """Attempt file deletion ignoring errors when a file does not exist"""
     try:
@@ -134,17 +194,20 @@ def find_subprocesses(ppid=None):
 
 
 def terminate_process(pid, wait=True):
-    """Terminate a process, waiting until it exited"""
+    """Terminate a process, waiting for 10s until it exits"""
     try:
         proc = psutil.Process(pid)
         # Check if the process runs elevated
         if proc.uids().effective == 0:
-            run_command(["sudo", "kill", "-TERM", pid], False)
+            run_command(["sudo", "kill", "-TERM", f"{pid}"], False)
         else:
             proc.terminate()
         # Wait for process to terminate
         if wait:
-            proc.wait()
-    except psutil.NoSuchProcess:
+            try:
+                proc.wait(timeout=10)
+            except psutil.TimeoutExpired:
+                print_msg(f"The {pid} PID did not exit after 10s")
+    except Exception:
         # Ignore non-existent processes
-        None
+        pass
