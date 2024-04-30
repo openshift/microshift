@@ -202,12 +202,17 @@ def terminate_process(pid, wait=True):
             run_command(["sudo", "kill", "-TERM", f"{pid}"], False)
         else:
             proc.terminate()
+        if not wait:
+            return
+
         # Wait for process to terminate
-        if wait:
-            try:
-                proc.wait(timeout=10)
-            except psutil.TimeoutExpired:
-                print_msg(f"The {pid} PID did not exit after 10s")
-    except Exception:
+        try:
+            proc.wait(timeout=10)
+        except psutil.TimeoutExpired:
+            print_msg(f"The {pid} PID did not exit after 10s")
+    except psutil.NoSuchProcess:
         # Ignore non-existent processes
         pass
+    except Exception:
+        # Propagate the exception to the caller
+        raise
