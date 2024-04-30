@@ -47,6 +47,7 @@ spec:
               drop:
                 - ALL
             runAsUser: 65534
+          terminationMessagePolicy: FallbackToLogsOnError
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:

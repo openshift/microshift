@@ -2840,6 +2840,13 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         scalar: string
       default: ""
+- name: com.github.openshift.api.config.v1.ProfileCustomizations
+  map:
+    fields:
+    - name: dynamicResourceAllocation
+      type:
+        scalar: string
+      default: ""
 - name: com.github.openshift.api.config.v1.Project
   map:
     fields:
@@ -3124,6 +3131,10 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: profile
       type:
         scalar: string
+    - name: profileCustomizations
+      type:
+        namedType: com.github.openshift.api.config.v1.ProfileCustomizations
+      default: {}
 - name: com.github.openshift.api.config.v1.SchedulerStatus
   map:
     elementType:
@@ -3619,7 +3630,6 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: fulcioCAData
       type:
         scalar: string
-      default: ""
     - name: fulcioSubject
       type:
         namedType: com.github.openshift.api.config.v1alpha1.PolicyFulcioSubject
@@ -3627,7 +3637,6 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: rekorKeyData
       type:
         scalar: string
-      default: ""
 - name: com.github.openshift.api.config.v1alpha1.GatherConfig
   map:
     fields:
@@ -3811,7 +3820,6 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: keyData
       type:
         scalar: string
-      default: ""
     - name: rekorKeyData
       type:
         scalar: string

@@ -46,7 +46,8 @@ spec:
               # TODO: measure on a real cluster
               cpu: 10m
               memory: 50Mi
-              # volumeMount with guest Kubeconfig will be added by the operator
+          terminationMessagePolicy: FallbackToLogsOnError
+          # volumeMount with guest Kubeconfig will be added by the operator
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:

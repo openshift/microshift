@@ -93,6 +93,10 @@ assets:
     - file: webhook_deployment.yaml
     - file: webhook_service.yaml
     - file: webhook_serviceaccount.yaml
+    - file: webhook_clusterrole.yaml
+      src: ./rbac/
+    - file: webhook_clusterrolebinding.yaml
+      src: ./rbac/
     - file: volumesnapshotclasses.yaml
     - file: volumesnapshotcontents.yaml
     - file: volumesnapshots.yaml
@@ -196,7 +200,7 @@ assets:
       - file: storage_version_migration.crd.yaml
         src:  0000_50_cluster-kube-storage-version-migrator-operator_01_storage_migration_crd.yaml
       - file: route.crd.yaml
-        src:  /kubernetes/vendor/github.com/openshift/api/route/v1/
+        src:  /route-controller-manager/vendor/github.com/openshift/api/route/v1/route.crd.yaml
 
   - dir: release/
     ignore: "it contains files generated during rebase procedure"
