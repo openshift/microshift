@@ -86,7 +86,14 @@ def restart_job(cmd):
     result = subprocess.run(cmd, shell=True, text=True, stdout=subprocess.PIPE)
     if result.returncode != 0:
         return ""
-    return result.stdout.split(" ")[1]
+    # Osbuild emits a warning on stdout about functionality we don't use in our blueprints,
+    # so we need to skip the lines we don't find interesting. Example output:
+    # > Warning: Please note that user customizations on "edge-commit" image type are deprecated and will be removed in the near future
+    # >
+    # > Compose 2c6a1ba2-4a18-49b8-a0f1-d103de1bd93a added to the queue
+    # Split output with \n and select line starting with "Compose", then split that line with space and select 2nd word.
+    line_with_id = next(line for line in result.stdout.split("\n") if line.startswith("Compose"))
+    return line_with_id.split(" ")[1]
 
 
 def copy_build_metadata(old_id, new_id):
