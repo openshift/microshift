@@ -4,6 +4,7 @@ package config
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"math"
 	"net"
@@ -13,6 +14,8 @@ import (
 	"slices"
 	"strings"
 	"time"
+
+	"github.com/openshift/microshift/pkg/config/apiserver"
 
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/klog/v2"
@@ -95,6 +98,7 @@ func (c *Config) fillDefaults() error {
 		URL:             "https://localhost:6443",
 		Port:            6443,
 	}
+	c.ApiServer.AuditLog.Profile = "Default"
 	c.Node = Node{
 		HostnameOverride: hostname,
 		NodeIP:           nodeIP,
@@ -194,6 +198,18 @@ func (c *Config) incorporateUserSettings(u *Config) {
 	if u.ApiServer.URL != "" {
 		c.ApiServer.URL = u.ApiServer.URL
 	}
+	if u.ApiServer.AuditLog.Profile != "" {
+		c.ApiServer.AuditLog.Profile = u.ApiServer.AuditLog.Profile
+	}
+	if u.ApiServer.AuditLog.MaxFiles != 0 {
+		c.ApiServer.AuditLog.MaxFiles = u.ApiServer.AuditLog.MaxFiles
+	}
+	if u.ApiServer.AuditLog.MaxFileAge != 0 {
+		c.ApiServer.AuditLog.MaxFileAge = u.ApiServer.AuditLog.MaxFileAge
+	}
+	if u.ApiServer.AuditLog.MaxFileSize != 0 {
+		c.ApiServer.AuditLog.MaxFileSize = u.ApiServer.AuditLog.MaxFileSize
+	}
 
 	if u.Debugging.LogLevel != "" {
 		c.Debugging.LogLevel = u.Debugging.LogLevel
@@ -264,21 +280,6 @@ func (c *Config) updateComputedValues() error {
 		// First and last are the same because of the /32 netmask.
 		firstValidIP, _ := cidr.AddressRange(nextSubnet)
 		c.ApiServer.AdvertiseAddress = firstValidIP.String()
-	}
-
-	if len(c.Ingress.ListenAddress) == 0 {
-		// If the listenAddress is not configured we need to include all of the host addresses
-		// to preserve previous behavior. However, if the apiserver advertise address has
-		// not been configured, it will do so in a later stage and we also need to
-		// include it here.
-		addresses, err := AllowedListeningIPAddresses()
-		if err != nil {
-			return fmt.Errorf("unable to compute default listening addresses: %v", err)
-		}
-		if !c.ApiServer.SkipInterface {
-			addresses = append(addresses, c.ApiServer.AdvertiseAddress)
-		}
-		c.Ingress.ListenAddress = addresses
 	}
 
 	c.computeLoggingSetting()
@@ -369,6 +370,9 @@ func (c *Config) validate() error {
 		if err := validateRouterListenAddress(c.Ingress.ListenAddress, c.ApiServer.AdvertiseAddress, c.ApiServer.SkipInterface); err != nil {
 			return fmt.Errorf("error validating ingress.listenAddress: %w", err)
 		}
+	}
+	if err := validateAuditLogConfig(c.ApiServer.AuditLog); err != nil {
+		return fmt.Errorf("error validating apiserver.auditLog:\n%w", err)
 	}
 
 	return nil
@@ -530,4 +534,24 @@ func AllowedNICNames() ([]string, error) {
 		names = append(names, link.Attrs().Name)
 	}
 	return names, nil
+}
+
+func validateAuditLogConfig(cfg AuditLog) error {
+	// compose a list of errors so that multiple executions are not required to detect each invalid value individually
+	errs := make([]error, 0)
+	if cfg.Profile != "" {
+		if _, err := apiserver.GetPolicy(cfg.Profile); err != nil {
+			errs = append(errs, fmt.Errorf("invalid value for apiserver.auditlog.profile: %v", err))
+		}
+	}
+	if cfg.MaxFiles < 0 {
+		errs = append(errs, fmt.Errorf("invalid value for apiserver.auditlog.maxFiles, expected value >=0"))
+	}
+	if cfg.MaxFileAge < 0 {
+		errs = append(errs, fmt.Errorf("invalid value for apiserver.auditlog.maxFileAge, expected value >=0"))
+	}
+	if cfg.MaxFileSize < 0 {
+		errs = append(errs, fmt.Errorf("invalid value for apiserver.auditlog.maxFileSize, expected value >=0"))
+	}
+	return errors.Join(errs...) // Join returns nil if len(errs) == 0
 }
