@@ -9,7 +9,7 @@
 export TEST_RANDOMIZATION=none
 
 scenario_create_vms() {
-    prepare_kickstart host1 kickstart.ks.template rhel-9.2-microshift-source
+    prepare_kickstart host1 kickstart.ks.template rhel-9.4-microshift-source
     launch_vm host1
 }
 

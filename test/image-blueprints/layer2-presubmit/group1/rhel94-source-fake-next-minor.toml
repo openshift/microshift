@@ -1,25 +1,25 @@
-name = "rhel-9.2-microshift-source-base"
-description = "A RHEL 9.4 image with the RPMs built from source from the base release branch"
+name = "rhel-9.4-microshift-source-fake-next-minor"
+description = "A RHEL 9.4 image with the RPMs built from source from the current PR but with the _version_ set to the next y-stream."
 version = "0.0.1"
 modules = []
 groups = []
-distro = "rhel-92"
+distro = "rhel-94"
 
 [[packages]]
 name = "microshift"
-version = "{{ .Env.SOURCE_VERSION_BASE }}"
+version = "4.{{ .Env.FAKE_NEXT_MINOR_VERSION }}.*"
 
 [[packages]]
 name = "microshift-greenboot"
-version = "{{ .Env.SOURCE_VERSION_BASE }}"
+version = "4.{{ .Env.FAKE_NEXT_MINOR_VERSION }}.*"
 
 [[packages]]
 name = "microshift-networking"
-version = "{{ .Env.SOURCE_VERSION_BASE }}"
+version = "4.{{ .Env.FAKE_NEXT_MINOR_VERSION }}.*"
 
 [[packages]]
 name = "microshift-selinux"
-version = "{{ .Env.SOURCE_VERSION_BASE }}"
+version = "4.{{ .Env.FAKE_NEXT_MINOR_VERSION }}.*"
 
 [[packages]]
 name = "microshift-test-agent"
