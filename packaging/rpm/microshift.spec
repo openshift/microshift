@@ -20,15 +20,11 @@
 %global selinuxtype targeted
 %define selinux_policyver 3.14.3-67
 %define microshift_relabel_files() \
-   mkdir -p /var/run/kubelet; \
    mkdir -p /var/lib/kubelet/pods; \
    mkdir -p /etc/microshift; \
    mkdir -p /usr/lib/microshift; \
-   mkdir -p /var/run/secrets/kubernetes.io/serviceaccount; \
    mkdir -p /var/lib/microshift-backups; # Creating folder to avoid GreenBoot race condition so that correct label is applied \
-   restorecon -R /var/run/kubelet; \
    restorecon -R /var/lib/kubelet/pods; \
-   restorecon -R /var/run/secrets/kubernetes.io/serviceaccount; \
    restorecon -R /var/lib/microshift-backups; \
    restorecon -R /etc/microshift; \
    restorecon -R /usr/lib/microshift
@@ -289,9 +285,7 @@ install -p -m755 packaging/systemd/configure-ovs-microshift.sh %{buildroot}%{_bi
 mkdir -p -m755 %{buildroot}%{_sysconfdir}/systemd/system/firewalld.service.d
 install -p -m644 packaging/systemd/firewalld-no-iptables.conf %{buildroot}%{_sysconfdir}/systemd/system/firewalld.service.d/firewalld-no-iptables.conf
 
-mkdir -p -m755 %{buildroot}/var/run/kubelet
 mkdir -p -m755 %{buildroot}/var/lib/kubelet/pods
-mkdir -p -m755 %{buildroot}/var/run/secrets/kubernetes.io/serviceaccount
 
 install -d %{buildroot}%{_datadir}/selinux/packages/%{selinuxtype}
 install -m644 packaging/selinux/microshift.pp.bz2 %{buildroot}%{_datadir}/selinux/packages/%{selinuxtype}
@@ -433,11 +427,9 @@ fi
 %{_datadir}/microshift/blueprint/blueprint*.toml
 
 %files selinux
-/var/run/kubelet
 /var/lib/kubelet/pods
-/var/run/secrets/kubernetes.io/serviceaccount
 %{_datadir}/selinux/packages/%{selinuxtype}/microshift.pp.bz2
-%ghost %{_sharedstatedir}/selinux/%{selinuxtype}/active/modules/200/microshift
+
 
 %files networking
 %{_sysconfdir}/crio/crio.conf.d/11-microshift-ovn.conf
@@ -478,6 +470,9 @@ fi
 # Use Git command to generate the log and replace the VERSION string
 # LANG=C git log --date="format:%a %b %d %Y" --pretty="tformat:* %cd %an <%ae> VERSION%n- %s%n" packaging/rpm/microshift.spec
 %changelog
+* Mon Apr 29 2024 Gregory Giguashvili <ggiguash@redhat.com> 4.16.0
+- Remove references to redundant files in selinux packaging
+
 * Tue Apr 23 2024 Patryk Matuszak <pmatusza@redhat.com> 4.16.0
 - Restart CRI-O on microshift-multus RPM install
 
