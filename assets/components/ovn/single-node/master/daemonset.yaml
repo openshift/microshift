@@ -193,16 +193,6 @@ spec:
                 /usr/share/ovn/scripts/ovn-ctl stop_nb_ovsdb
                 echo "$(date -Iseconds) - nbdb stopped"
                 rm -f /var/run/ovn/ovnnb_db.pid
-        readinessProbe:
-          timeoutSeconds: 5
-          exec:
-            command:
-            - /bin/bash
-            - -c
-            - |
-              set -xeo pipefail
-              /usr/bin/ovn-appctl -t /var/run/ovn/ovnnb_db.ctl --timeout=5 ovsdb-server/memory-trim-on-compaction on 2>/dev/null
-
         env:
         - name: OVN_LOG_LEVEL
           value: info
@@ -288,15 +278,6 @@ spec:
                 /usr/share/ovn/scripts/ovn-ctl stop_sb_ovsdb
                 echo "$(date -Iseconds) - sbdb stopped"
                 rm -f /var/run/ovn/ovnsb_db.pid
-        readinessProbe:
-          timeoutSeconds: 5
-          exec:
-            command:
-            - /bin/bash
-            - -c
-            - |
-              set -xeo pipefail
-              /usr/bin/ovn-appctl -t /var/run/ovn/ovnsb_db.ctl --timeout=5 ovsdb-server/memory-trim-on-compaction on 2>/dev/null
         env:
         - name: OVN_LOG_LEVEL
           value: info
