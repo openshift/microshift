@@ -4,6 +4,7 @@ Documentation       Tests for Multus and Bridge plugin on MicroShift
 Resource            ../../resources/common.resource
 Resource            ../../resources/multus.resource
 Resource            ../../resources/microshift-process.resource
+Resource            ../../resources/microshift-rpm.resource
 
 Suite Setup         Setup
 Suite Teardown      Teardown Suite With Namespace
@@ -116,6 +117,7 @@ Setup
     Should Be True    ${len}>=2
     Set Suite Variable    ${MACVLAN_MASTER}    ${enps[0]}
     Set Suite Variable    ${IPVLAN_MASTER}    ${enps[1]}
+    Verify MicroShift RPM Install
 
 Template And Create NAD And Pod
     [Documentation]    Template NAD and create it along with Pod

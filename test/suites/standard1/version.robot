@@ -68,6 +68,7 @@ Setup
     Login MicroShift Host
     Setup Kubeconfig
     Read Expected Versions
+    Verify MicroShift RPM Install
 
 Teardown
     [Documentation]    Test suite teardown

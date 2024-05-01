@@ -3,6 +3,7 @@ Documentation       Operator Lifecycle Manager on MicroShift
 
 Resource            ../../resources/common.resource
 Resource            ../../resources/microshift-process.resource
+Resource            ../../resources/microshift-rpm.resource
 
 Suite Setup         Setup
 Suite Teardown      Teardown
@@ -44,6 +45,7 @@ Setup
     Check Required Env Variables
     Login MicroShift Host
     Setup Kubeconfig
+    Verify MicroShift RPM Install
 
 Teardown
     [Documentation]    Test suite teardown
