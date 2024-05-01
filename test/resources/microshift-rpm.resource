@@ -84,3 +84,22 @@ Get Version Of MicroShift RPM
     # 4.15.0_0.nightly_2023_11_01_080931_20231103152813_3f5593fca_dirty-1.el9.x86_64
     ${version_string}=    Strip String    ${version_string_raw}
     RETURN    ${version_string}
+
+Verify MicroShift RPM Install
+    [Documentation]    Run 'rpm -V' package verification command
+    ...    on all the installed MicroShift RPM packages.
+    # The ostree-based file system does not preserve modification
+    # times of the installed files
+    ${is_ostree}=    Is System OSTree
+    IF    ${is_ostree}
+        ${nomtime}=    Set Variable    --nomtime
+    ELSE
+        ${nomtime}=    Set Variable    ${EMPTY}
+    END
+
+    ${stdout}    ${stderr}    ${rc}=    SSHLibrary.Execute Command
+    ...    rpm -qa microshift\* | xargs -I {} bash -c 'echo {}; sudo rpm -V ${nomtime} {}'
+    ...    sudo=True    return_rc=True    return_stdout=True    return_stderr=True
+    Log    ${stdout}
+    Log    ${stderr}
+    Should Be Equal As Integers    0    ${rc}
