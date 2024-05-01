@@ -88,8 +88,17 @@ Get Version Of MicroShift RPM
 Verify MicroShift RPM Install
     [Documentation]    Run 'rpm -V' package verification command
     ...    on all the installed MicroShift RPM packages.
+    # The ostree-based file system does not preserve modification
+    # times of the installed files
+    ${is_ostree}=    Is System OSTree
+    IF    ${is_ostree}
+        ${nomtime}=    Set Variable    --nomtime
+    ELSE
+        ${nomtime}=    Set Variable    ${EMPTY}
+    END
+
     ${stdout}    ${stderr}    ${rc}=    SSHLibrary.Execute Command
-    ...    rpm -qa microshift\* | xargs -I {} bash -c 'echo {}; sudo rpm -V {}'
+    ...    rpm -qa microshift\* | xargs -I {} bash -c 'echo {}; sudo rpm -V ${nomtime} {}'
     ...    sudo=True    return_rc=True    return_stdout=True    return_stderr=True
     Log    ${stdout}
     Log    ${stderr}
