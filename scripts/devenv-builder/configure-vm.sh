@@ -86,7 +86,7 @@ if [ ! -x "${RHOCP_REPO}" ] ; then
     chmod 755 "${RHOCP_REPO}"
 fi
 if [ ! -f "${MAKE_VERSION}" ] ; then
-    MAKE_VERSION=$(mktemp /tmp/Makefile.version.XXXXXXXX.var)
+    MAKE_VERSION=$(mktemp "/tmp/Makefile.version.$(uname -m).XXXXXXXX.var")
     curl -s "https://raw.githubusercontent.com/openshift/microshift/main/Makefile.version.$(uname -m).var" -o "${MAKE_VERSION}"
     chmod 644 "${MAKE_VERSION}"
 fi
