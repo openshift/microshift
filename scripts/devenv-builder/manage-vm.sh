@@ -43,19 +43,19 @@ function get_base_isofile {
 
     case ${rhel_version} in
         8)
-            echo "rhel-8.7-$(uname -m)-dvd.iso"
+            echo "rhel-8.10-$(uname -m)-dvd.iso"
             ;;
         8.*)
             echo "rhel-${rhel_version}-$(uname -m)-dvd.iso"
             ;;
         9)
-            echo "rhel-9.2-$(uname -m)-dvd.iso"
+            echo "rhel-9.4-$(uname -m)-dvd.iso"
             ;;
         9.*)
             echo "rhel-${rhel_version}-$(uname -m)-dvd.iso"
             ;;
         *)
-            echo "unknown RHEL version ${rhel_version}" 1>&2
+            echo "Unknown RHEL version ${rhel_version}" 1>&2
             exit 1
     esac
 }
@@ -80,7 +80,7 @@ function action_create {
     export VMDISKDIR="${MICROSHIFT_VMDISKDIR}"
     export NCPUS="${NCPUS:-4}"
     export RAMSIZE="${RAMSIZE:-8}"
-    export DISKSIZE="${DISKSIZE:-70}"
+    export DISKSIZE="${DISKSIZE:-100}"
     export SWAPSIZE="${SWAPSIZE:-8}"
     export DATAVOLSIZE="${DATAVOLSIZE:-2}"
     if [ -z "${ISOFILE}" ]; then

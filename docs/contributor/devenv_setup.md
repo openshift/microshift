@@ -3,18 +3,18 @@ This document describes how to setup the MicroShift development environment runn
 in a virtual machine.
 
 ## Create Development Virtual Machine
-Start by downloading one of the boot DVD images for the `x86_64` or `aarch64` architecture:
-* RHEL 9.3 from https://developers.redhat.com/products/rhel/download
+Start by downloading one of the DVD ISO images for the `x86_64` or `aarch64` architecture:
+* RHEL 9.4 from https://developers.redhat.com/products/rhel/download
 * CentOS 9 Stream from https://www.centos.org/download
 
 ### Creating VM
 Log into the hypervisor host and run the following commands to create a RHEL virtual
-machine with 4 cores, 8GB of RAM and 70GB of storage.
+machine with 4 cores, 8GB of RAM and 100GB of storage.
 
 > See [Increase Virtual Machine Disk Size](#increase-virtual-machine-disk-size) section
 > for increasing the storage size if necessary.
 
-Move the boot DVD image to `/var/lib/libvirt/images` directory and run the following
+Move the DVD ISO image to `/var/lib/libvirt/images` directory and run the following
 commands to install the `libvirt` packages and create a virtual machine.
 ```
 VMNAME="microshift-dev"
