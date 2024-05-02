@@ -1,6 +1,13 @@
-- ovn-kubernetes image-amd64 feca446a2e3848f79e533bb28763b2d61074de6e to cfd52d889978bfa13d1674f73bea8bb5fc2c7a81
-  - e071df4 2024-04-24T20:04:21+05:30 drop-forwarding: Add ClusterSubnets to allowed forwarding CIDRs
+- machine-config-operator embedded-component b72184f8517a9bd73759b66839ae869b6371d51c to 1b35c4e05377a34e8403108837bb6773e2c3566d
+  - 8fe1f696 2024-04-24T14:52:39-05:00 add cluster fleet evaluation support to mco
 
-- ovn-kubernetes image-arm64 feca446a2e3848f79e533bb28763b2d61074de6e to cfd52d889978bfa13d1674f73bea8bb5fc2c7a81
-  - e071df4 2024-04-24T20:04:21+05:30 drop-forwarding: Add ClusterSubnets to allowed forwarding CIDRs
+- ovn-kubernetes image-amd64 cfd52d889978bfa13d1674f73bea8bb5fc2c7a81 to a2cac64f0ce21e324c0d243cb3d12dd3ef3cf3b4
+  - 593c26c 2024-04-14T08:54:51+01:00 Dockerfile.base: Bump OVN to ovn-23.09.0-139.el9fdp
+  - 0cd5b90 2024-04-14T08:53:55+01:00 Service E2Es: ensure pods can communicate using src port equal to node port
+  - f021a3b 2024-04-14T08:53:45+01:00 Dockerfile.fedora:bump OVN to 23.09.0-139
+
+- ovn-kubernetes image-arm64 cfd52d889978bfa13d1674f73bea8bb5fc2c7a81 to a2cac64f0ce21e324c0d243cb3d12dd3ef3cf3b4
+  - 593c26c 2024-04-14T08:54:51+01:00 Dockerfile.base: Bump OVN to ovn-23.09.0-139.el9fdp
+  - 0cd5b90 2024-04-14T08:53:55+01:00 Service E2Es: ensure pods can communicate using src port equal to node port
+  - f021a3b 2024-04-14T08:53:45+01:00 Dockerfile.fedora:bump OVN to 23.09.0-139
 
