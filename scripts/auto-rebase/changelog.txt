@@ -1,17 +1,21 @@
-- cluster-network-operator embedded-component bd27db3628d5d30f01f334cb937999b188c26df8 to 874b16f376c8664da9c4a6eb079f2cf4ddb2bd15
-  - 245ef82 2024-04-26T09:51:29-04:00 Reapply "Merge pull request #2330 from pperiyasamy/block-sdn-upgrade"
+- cluster-network-operator embedded-component 874b16f376c8664da9c4a6eb079f2cf4ddb2bd15 to 7604c189b47723fd932cf959c8c15d694262b1f5
+  - b66fe1d 2024-04-30T13:17:47+02:00 Update EQoS CRD to latest
 
-- machine-config-operator embedded-component 41cfb04fb84e52eb4940f2e8c3f4bb02c3fe23f5 to 4ea63f5a4cfe8ac8b5a31f48b7d8828c5244c7e8
-  - 212846ea 2024-04-29T08:43:24-04:00 daemon: minor nit fixes
-  - 7c781f04 2024-04-29T07:46:56-04:00 docs: add NodeDisruptionPolicy
+- machine-config-operator embedded-component 4ea63f5a4cfe8ac8b5a31f48b7d8828c5244c7e8 to 69944ada37af73f874bc436cbd79e5b9af4c16de
+  - e04c6b04 2024-04-26T16:33:09-04:00 update feature gate refs: config/v1 -> features
+  - cc9e1705 2024-04-26T16:33:09-04:00 make go-deps & make update
+  - 3bc24f6f 2024-02-13T12:21:51+00:00 OCPBUGS-11936: Wait for OpenStack Metadata service
 
-- openshift-controller-manager embedded-component 6296cd3d8629de9a8835108b7144e23a82a0f793 to 8f6f90a1e8b7057588006508cc2be22949d3b0e2
-  - b5e9d22 2024-04-29T09:10:49-03:00 Revert "Merge pull request #298 from sanchezl/rollback-controllers"
-
-- oc image-amd64 8d46ebc7585c283cb6609e381e327912ce4318f4 to 5ffe8230ec8aa94dc37dfa589c108402d12f8615
-  - 1685a16f 2024-04-25T16:18:40+03:00 Bump go-jose indirect reference to 2.6.3
-
-- oc image-arm64 8d46ebc7585c283cb6609e381e327912ce4318f4 to ba1f00b782ff8dc385b5b55f437e0557133a48c2
+- oc image-amd64 5ffe8230ec8aa94dc37dfa589c108402d12f8615 to 51e5705eaace0d3a8b359913cb82e69a8bf0eaf1
+  - 197eb62a 2024-04-29T15:24:02-07:00 pkg/cli/admin/upgrade/status: Drop free-form Progressing output line
   - 7977ec94 2024-04-29T11:34:03-07:00 pkg/cli/admin/upgrade/status: Move Failing from free-form to updateInsight
-  - 1685a16f 2024-04-25T16:18:40+03:00 Bump go-jose indirect reference to 2.6.3
+
+- router image-amd64 8762aa4c58f0407c235d284d0cf6a8dba7176243 to b6f7c63c52e6b20fde2549a3c3e69a052ab453cc
+  - 44f217f 2024-04-30T09:39:07-04:00 Make ingressConditionsEqual more efficient
+  - 3f17190 2024-04-29T18:50:28-04:00 Add log for attempting to update route status
+  - 66eb223 2024-04-29T18:50:11-04:00 Add verbose logging for plugin chain execution
+  - efcba1b 2024-04-25T12:36:36-04:00 Log election results in writerlease
+
+- ovn-kubernetes image-amd64 8a08bc0ef1d8cdefe8d6ad7be3d5abb367efac15 to 7682c449ded3889b111f8aefe43134e30bd89118
+  - 27c4ed7d 2024-04-28T15:15:48+02:00 Dockerfile: Bump OVS to 3.3.0-2.
 
