@@ -9,10 +9,8 @@ WEB_SERVER_URL="http://${VM_BRIDGE_IP}:${WEB_SERVER_PORT}"
 
 scenario_create_vms() {
     prepare_kickstart host1 kickstart-bootc.ks.template rhel94-bootc-source-optionals
-    # Using centos9 is necessary for getting the latest anaconda.
-    # It is a temporary workaround until rhel-9.4.iso build is available.
     # Two nics - one for macvlan, another for ipvlan (they cannot enslave the same interface)
-    launch_vm host1 centos9 "${VM_MULTUS_NETWORK}" "" "" "" "2" "" "1"
+    launch_vm host1 rhel94-bootc "${VM_MULTUS_NETWORK}" "" "" "" "2" "" "1"
 }
 
 scenario_remove_vms() {
