@@ -1,6 +1,6 @@
-- kubernetes embedded-component 401bb488d6f5e704de86bbc28fcdd907a130be70 to fd36fb9acf9a99270f4fca3f5817fd52c8bc58b4
-  - b152eb3ed 2024-04-24T14:38:17-06:00 UPSTREAM: <carry>: OCPBUGS-32580: allow override of NewVolumeManagerReconstruction
-
-- kubernetes image-amd64 401bb488d6f5e704de86bbc28fcdd907a130be70 to fd36fb9acf9a99270f4fca3f5817fd52c8bc58b4
-  - b152eb3ed 2024-04-24T14:38:17-06:00 UPSTREAM: <carry>: OCPBUGS-32580: allow override of NewVolumeManagerReconstruction
+- ovn-kubernetes image-arm64 ae7f5360d05b928ad10247f58ca9b8dd54242678 to cc219ebfdcdef860ef576eb6e4f5b72c379dd70e
+  - b8d9ebe 2024-04-26T19:09:52-04:00 APB: Fix formatting issues
+  - 00bfba3 2024-04-24T16:07:20-04:00 Check for length of message slice instead of lastTransactionTime being initialized to avoid the risk of time being initialized and slice not having any element
+  - b9eeed6 2024-04-12T18:49:41+03:00 APB: Replace logic to update status to check first if there's a change in status to avoid hitting the KAPI server for any pod status change
+  - 6e6225d 2024-04-10T13:43:47-04:00 Disable APB status updates
 
