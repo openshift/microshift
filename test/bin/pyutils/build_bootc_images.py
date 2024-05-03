@@ -201,7 +201,7 @@ def process_containerfile(groupdir, containerfile, dry_run):
         with open(cf_logfile, 'w') as logfile:
             # Run the container build command
             build_args = [
-                "podman", "build",
+                "sudo", "podman", "build",
                 "--authfile", PULL_SECRET,
                 "-t", cf_outname, "-f", cf_path,
                 os.path.join(IMAGEDIR, "rpm-repos")
@@ -213,12 +213,19 @@ def process_containerfile(groupdir, containerfile, dry_run):
             if os.path.exists(cf_outdir):
                 shutil.rmtree(cf_outdir)
             save_args = [
-                "podman", "save",
+                "sudo", "podman", "save",
                 "--format", "oci-dir",
                 "-o", cf_outdir, cf_outname
             ]
             common.run_command_in_shell(save_args, dry_run, logfile, logfile)
             common.record_junit(cf_path, "save-container", "OK")
+
+            # Fix the directory ownership and move the artifact
+            if not dry_run:
+                common.run_command(
+                    ["sudo", "chown", "-R", f"{getpass.getuser()}.", cf_outdir],
+                    dry_run)
+                common.record_junit(cf_path, "chown-container", "OK")
     except Exception:
         common.record_junit(cf_path, "process-container", "FAILED")
         # Propagate the exception to the caller
@@ -249,13 +256,14 @@ def process_image_bootc(groupdir, bootcfile, dry_run):
         # Redirect the output to the log file
         with open(bf_logfile, 'w') as logfile:
             bf_imgref = common.read_file(bf_path).strip()
-            # Download the image locally to be used by bootc image builder
-            pull_args = [
-                "sudo", "podman", "pull",
-                "--authfile", PULL_SECRET, bf_imgref
-            ]
-            common.run_command_in_shell(pull_args, dry_run, logfile, logfile)
-            common.record_junit(bf_path, "pull-bootc-image", "OK")
+            if not bf_imgref.startswith('localhost/'):
+                # If not already local, download the image to be used by bootc image builder
+                pull_args = [
+                    "sudo", "podman", "pull",
+                    "--authfile", PULL_SECRET, bf_imgref
+                ]
+                common.run_command_in_shell(pull_args, dry_run, logfile, logfile)
+                common.record_junit(bf_path, "pull-bootc-image", "OK")
 
             # The podman command with security elevation and
             # mount of output / container storage
