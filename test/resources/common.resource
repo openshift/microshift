@@ -128,6 +128,5 @@ Skip Test If Bug Is Open
     ELSE
         ${result}=    Run Process    ../scripts/jira/manage_ticket.sh get_status --ticket-id ${ticket_id} | tail -n1
         ...    shell=True    env:JIRA_API_TOKEN=${JIRA_API_TOKEN}
-        Should Be Equal As Integers    0    ${result.rc}
-        Skip If    '${result.stdout}' != 'Closed'
+        Skip If    '${result.stdout}' == 'To Do' or '${result.stdout}' == 'In Progress' or '${result.stdout}' == 'Code Review' or '${result.stdout}' == 'Review'
     END
