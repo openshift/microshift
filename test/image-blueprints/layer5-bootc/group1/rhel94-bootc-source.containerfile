@@ -1,4 +1,4 @@
-FROM registry.redhat.io/rhel9-beta/rhel-bootc:9.4
+FROM registry.redhat.io/rhel9/rhel-bootc:9.4
 
 # Build arguments
 ARG PREVIOUS_MINOR_VERSION=15
