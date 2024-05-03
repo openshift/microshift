@@ -8,9 +8,7 @@ TEST_EXECUTION_TIMEOUT="1.5h"
 
 scenario_create_vms() {
     prepare_kickstart host1 kickstart-bootc.ks.template rhel94-bootc-source
-    # Using centos9 is necessary for getting the latest anaconda.
-    # It is a temporary workaround until rhel-9.4.iso build is available.
-    launch_vm host1 centos9 "" "" "" "" "" "" "1"
+    launch_vm host1 rhel94-bootc "" "" "" "" "" "" "1"
 }
 
 scenario_remove_vms() {
