@@ -1,7 +1,6 @@
 FROM localhost/rhel94-bootc-source:latest
 
 # Build arguments
-ARG PREVIOUS_MINOR_VERSION=15
 ARG USHIFT_RPM_REPO_NAME=microshift-local
 ARG USHIFT_RPM_REPO_PATH=/tmp/$USHIFT_RPM_REPO_NAME
 
@@ -22,10 +21,10 @@ skip_if_unavailable=0\n" "${USHIFT_RPM_REPO_PATH}" > "/etc/yum.repos.d/microshif
 RUN printf "\
 [openshift-mirror-beta]\n\
 name=OpenShift Mirror Beta Repository\n\
-baseurl=https://mirror.openshift.com/pub/openshift-v4/%s/dependencies/rpms/4.%s-el9-beta/\n\
+baseurl=https://mirror.openshift.com/pub/openshift-v4/{{ .Env.UNAME_M }}/dependencies/rpms/4.{{ .Env.PREVIOUS_MINOR_VERSION }}-el9-beta/\n\
 enabled=1\n\
 gpgcheck=0\n\
-skip_if_unavailable=0\n" "$(uname -m)" "${PREVIOUS_MINOR_VERSION}" > "/etc/yum.repos.d/openshift-mirror-beta.repo"
+skip_if_unavailable=0\n" > "/etc/yum.repos.d/openshift-mirror-beta.repo"
 
 # Install MicroShift optional RPMs
 RUN dnf install -y microshift-olm microshift-multus && \

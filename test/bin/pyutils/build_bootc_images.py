@@ -29,7 +29,10 @@ BASE_REPO = common.get_env_var('BASE_REPO')
 NEXT_REPO = common.get_env_var('NEXT_REPO')
 HOME_DIR = common.get_env_var("HOME")
 PULL_SECRET = common.get_env_var('PULL_SECRET', f"{HOME_DIR}/.pull-secret.json")
+# Switch to registry.redhat.io/rhel9/bootc-image-builder:9.4 when all the
+# required features are supported
 BIB_IMAGE = "quay.io/centos-bootc/bootc-image-builder:latest"
+GOMPLATE = common.get_env_var('GOMPLATE')
 FORCE_REBUILD = False
 
 
@@ -121,6 +124,8 @@ def set_rpm_version_info_vars():
     previous_version_repo = common.run_command_in_shell(f"source {SCRIPTDIR}/get_rel_version_repo.sh; get_rel_version_repo {PREVIOUS_MINOR_VERSION}")
     PREVIOUS_RELEASE_VERSION, PREVIOUS_RELEASE_REPO = previous_version_repo.split(',')
 
+    RHOCP_MINOR_Y = ""
+    RHOCP_MINOR_Y1 = ""
     if is_rhocp_available(MINOR_VERSION):
         RHOCP_MINOR_Y = MINOR_VERSION
     if is_rhocp_available(PREVIOUS_MINOR_VERSION):
@@ -133,6 +138,21 @@ def set_rpm_version_info_vars():
     YMINUS2_RELEASE_VERSION, _ = yminus2_version_repo.split(',')
     YMINUS2_RELEASE_REPO = common.run_command_in_shell(f"source {SCRIPTDIR}/get_rel_version_repo.sh; get_ocp_repo_name_for_version {YMINUS2_MINOR_VERSION}")
     RHOCP_MINOR_Y2 = YMINUS2_MINOR_VERSION
+
+    # Update environment variables based on the RPM version global variables.
+    # These are used for templating container files and images.
+    rpmver_globals_vars = [
+        'SOURCE_VERSION', 'MINOR_VERSION', 'PREVIOUS_MINOR_VERSION',
+        'YMINUS2_MINOR_VERSION', 'FAKE_NEXT_MINOR_VERSION', 'SOURCE_VERSION_BASE',
+        'CURRENT_RELEASE_VERSION', 'CURRENT_RELEASE_REPO', 'PREVIOUS_RELEASE_VERSION',
+        'PREVIOUS_RELEASE_REPO', 'RHOCP_MINOR_Y', 'RHOCP_MINOR_Y1',
+        'RHOCP_MINOR_Y2', 'YMINUS2_RELEASE_VERSION', 'YMINUS2_RELEASE_REPO'
+    ]
+    for var in rpmver_globals_vars:
+        value = globals().get(var)
+        if value is None:
+            raise Exception(f"The '{var}' global variable does not exist")
+        os.environ[var] = str(value)
 
 
 def get_container_images(path, version):
@@ -180,10 +200,20 @@ def extract_container_images(version, repo_spec, outfile, dry_run=False):
     common.popd()
 
 
+def run_gomplate(ifile, ofile, dry_run, logfile):
+    gomplate_args = [
+        GOMPLATE,
+        "--file", ifile,
+        "--out", ofile
+    ]
+    common.run_command_in_shell(gomplate_args, dry_run, logfile, logfile)
+
+
 def process_containerfile(groupdir, containerfile, dry_run):
     cf_path = os.path.join(groupdir, containerfile)
     cf_outname = os.path.splitext(containerfile)[0]
     cf_outdir = os.path.join(BOOTC_IMAGE_DIR, cf_outname)
+    cf_gomplate = os.path.join(BOOTC_IMAGE_DIR, f"{containerfile}.gomplate")
     cf_logfile = os.path.join(BOOTC_IMAGE_DIR, f"{cf_outname}.log")
     cf_targetimg = os.path.join(cf_outdir, "index.json")
 
@@ -199,11 +229,14 @@ def process_containerfile(groupdir, containerfile, dry_run):
     try:
         # Redirect the output to the log file
         with open(cf_logfile, 'w') as logfile:
-            # Run the container build command
+            # Run gomplate on the input container file
+            run_gomplate(cf_path, cf_gomplate, dry_run, logfile)
+
+            # Run the container build command, using the templated file as an input
             build_args = [
                 "sudo", "podman", "build",
                 "--authfile", PULL_SECRET,
-                "-t", cf_outname, "-f", cf_path,
+                "-t", cf_outname, "-f", cf_gomplate,
                 os.path.join(IMAGEDIR, "rpm-repos")
             ]
             common.run_command_in_shell(build_args, dry_run, logfile, logfile)
@@ -239,6 +272,7 @@ def process_image_bootc(groupdir, bootcfile, dry_run):
     bf_path = os.path.join(groupdir, bootcfile)
     bf_outname = os.path.splitext(bootcfile)[0]
     bf_outdir = os.path.join(BOOTC_ISO_DIR, bf_outname)
+    bf_gomplate = os.path.join(BOOTC_IMAGE_DIR, f"{bootcfile}.gomplate")
     bf_logfile = os.path.join(BOOTC_ISO_DIR, f"{bf_outname}.log")
     bf_targetiso = os.path.join(VM_DISK_BASEDIR, f"{bf_outname}.iso")
 
@@ -255,9 +289,22 @@ def process_image_bootc(groupdir, bootcfile, dry_run):
     try:
         # Redirect the output to the log file
         with open(bf_logfile, 'w') as logfile:
-            bf_imgref = common.read_file(bf_path).strip()
+            # Download the bootc image builder itself in case
+            # it requires authorization for accessing the image
+            pull_args = [
+                "sudo", "podman", "pull",
+                "--authfile", PULL_SECRET, BIB_IMAGE
+            ]
+            common.run_command_in_shell(pull_args, dry_run, logfile, logfile)
+            common.record_junit(bf_path, "pull-bootc-bib", "OK")
+
+            # Run gomplate on the input image file
+            run_gomplate(bf_path, bf_gomplate, dry_run, logfile)
+            # Read the image reference using the templated file as an input
+            bf_imgref = common.read_file(bf_gomplate).strip()
+
+            # If not already local, download the image to be used by bootc image builder
             if not bf_imgref.startswith('localhost/'):
-                # If not already local, download the image to be used by bootc image builder
                 pull_args = [
                     "sudo", "podman", "pull",
                     "--authfile", PULL_SECRET, bf_imgref
@@ -371,6 +418,13 @@ def main():
         global FORCE_REBUILD
         if args.force_rebuild:
             FORCE_REBUILD = True
+        # Fetch gomplate if necessary
+        if not os.path.exists(GOMPLATE):
+            gomplate_args = [
+                f"{SCRIPTDIR}/../../scripts/fetch_tools.sh",
+                "gomplate"
+            ]
+            common.run_command(gomplate_args, args.dry_run)
 
         # Determine versions of RPM packages
         set_rpm_version_info_vars()

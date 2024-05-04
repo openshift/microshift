@@ -80,7 +80,7 @@ export BOOTC_ISO_DIR="${IMAGEDIR}/bootc-iso-images"
 # as they are run.
 #
 # The CI system will override this, but we need a default for local
-# use. Use the image directoy, since that is already served by a web
+# use. Use the image directory, since that is already served by a web
 # server.
 #
 # shellcheck disable=SC2034  # used elsewhere
@@ -109,7 +109,7 @@ RF_VENV=${RF_VENV:-${OUTPUTDIR}/robotenv}
 
 # The location of the gomplate binary.
 # shellcheck disable=SC2034  # used elsewhere
-GOMPLATE=${OUTPUTDIR}/bin/gomplate
+export GOMPLATE=${OUTPUTDIR}/bin/gomplate
 
 # Which port the web server should run on.
 WEB_SERVER_PORT=${WEB_SERVER_PORT:-8080}
