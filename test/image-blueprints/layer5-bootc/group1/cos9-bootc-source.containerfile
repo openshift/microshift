@@ -7,18 +7,17 @@ ARG USHIFT_RPM_REPO_PATH=/tmp/$USHIFT_RPM_REPO_NAME
 # Copy the MicroShift repository contents
 COPY $USHIFT_RPM_REPO_NAME $USHIFT_RPM_REPO_PATH
 
-# MicroShift local RPM repository
+# Add the following repositories:
+# - MicroShift local RPM repository
+# - OpenShift Mirror Beta previous minor version repository for MicroShift dependencies
 RUN printf "\
 [microshift-local]\n\
 name=MicroShift Local Repository\n\
 baseurl=%s\n\
 enabled=1\n\
 gpgcheck=0\n\
-skip_if_unavailable=0\n" "${USHIFT_RPM_REPO_PATH}" > "/etc/yum.repos.d/microshift-local.repo"
-
-# OpenShift Mirror beta RPM repository for MicroShift dependencies
-# Only the released previous minor version is guaranteed to be available
-RUN printf "\
+skip_if_unavailable=0\n" "${USHIFT_RPM_REPO_PATH}" > "/etc/yum.repos.d/microshift-local.repo" && \
+    printf "\
 [openshift-mirror-beta]\n\
 name=OpenShift Mirror Beta Repository\n\
 baseurl=https://mirror.openshift.com/pub/openshift-v4/{{ .Env.UNAME_M }}/dependencies/rpms/4.{{ .Env.PREVIOUS_MINOR_VERSION }}-el9-beta/\n\
