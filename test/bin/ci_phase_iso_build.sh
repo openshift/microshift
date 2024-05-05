@@ -51,7 +51,7 @@ download_build_cache() {
     return 1
 }
 
-# Run image build for the 'base' layer and update the cache:
+# Run image build for the 'base' layers and update the cache:
 # - Upload build artifacts
 # - Update 'last' to point to the current build tag
 # - Clean up older images, preserving the 'last' and the previous build tag
@@ -63,8 +63,11 @@ update_build_cache() {
         return
     fi
 
-    # Build the base layer to be cached
+    # Build the composer-cli base layer to be cached
     $(dry_run) bash -x ./bin/build_images.sh -l ./image-blueprints/layer1-base
+    # Build the bootc base groups to be cached
+    $(dry_run) bash -x ./bin/build_bootc_images.sh -g ./image-blueprints/layer5-bootc/group0
+    $(dry_run) bash -x ./bin/build_bootc_images.sh -g ./image-blueprints/layer5-bootc/group1
 
     # Upload the images and update the 'last' setting
     ./bin/manage_build_cache.sh upload  -b "${SCENARIO_BUILD_BRANCH}" -t "${SCENARIO_BUILD_TAG}"
@@ -75,18 +78,16 @@ update_build_cache() {
     ./bin/manage_build_cache.sh keep -b "${SCENARIO_BUILD_BRANCH}" -t "${SCENARIO_BUILD_TAG_PREV}"
 }
 
-# Run image build, potentially skipping the 'base' and 'periodic' layers in CI builds.
+# Run image build, potentially skipping the 'periodic' layer in CI builds.
 # Full builds are run if the 'CI_JOB_NAME' environment variable is not set.
 #
 # When the 'CI_JOB_NAME' environment variable is set:
-# - If the 'with_cached_data' argument is 'true', only dry run the 'base' layer.
-# - Always build the 'presubmit' layer.
+# - Always build the 'base' and 'presubmit' layers.
 # - Only build the 'periodic' layer when 'CI_JOB_NAME' contains 'periodic' token.
 run_image_build() {
     if [ -v CI_JOB_NAME ] ; then
-        # Conditional per-layer builds when running in
-        # CI. build_images.sh skips any images that have been
-        # downloaded from the cache.
+        # Conditional per-layer builds when running in CI.
+        # The build_images.sh script skips any images that have been downloaded from the cache.
         $(dry_run) bash -x ./bin/build_images.sh -l ./image-blueprints/layer1-base
         $(dry_run) bash -x ./bin/build_images.sh -l ./image-blueprints/layer2-presubmit
 
