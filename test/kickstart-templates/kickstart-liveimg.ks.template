@@ -8,8 +8,6 @@
 %include /post-containers.cfg
 %include /post-system.cfg
 %include /post-network.cfg
-
-# Configure FIPS
-REPLACE_FIPS_COMMAND
+%include /post-fips.cfg
 
 %end
