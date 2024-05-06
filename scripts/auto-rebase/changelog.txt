@@ -1,21 +1,95 @@
-- cluster-network-operator embedded-component 874b16f376c8664da9c4a6eb079f2cf4ddb2bd15 to 7604c189b47723fd932cf959c8c15d694262b1f5
-  - b66fe1d 2024-04-30T13:17:47+02:00 Update EQoS CRD to latest
+- cluster-ingress-operator embedded-component b7d42a2535904aab104e1f3d709832b1c104204c to 5b42422d0f5f488fc1deb3db08a7b97367cfd2a6
+  - f7f09bb 2024-04-25T00:06:21-04:00 Bump controller-runtime to v0.17.3
 
-- machine-config-operator embedded-component 4ea63f5a4cfe8ac8b5a31f48b7d8828c5244c7e8 to 69944ada37af73f874bc436cbd79e5b9af4c16de
-  - e04c6b04 2024-04-26T16:33:09-04:00 update feature gate refs: config/v1 -> features
-  - cc9e1705 2024-04-26T16:33:09-04:00 make go-deps & make update
-  - 3bc24f6f 2024-02-13T12:21:51+00:00 OCPBUGS-11936: Wait for OpenStack Metadata service
+- cluster-kube-apiserver-operator embedded-component 1d9a2d0d604601640d318ea0cf973d23d711e970 to 8fae6b51944c1f90e6875f55072a3d85db40e743
+  - 7b66bf3 2024-05-03T11:04:06-07:00 Fix incorrect name for SCC ClusterRole
 
-- oc image-amd64 5ffe8230ec8aa94dc37dfa589c108402d12f8615 to 51e5705eaace0d3a8b359913cb82e69a8bf0eaf1
+- cluster-network-operator embedded-component 7604c189b47723fd932cf959c8c15d694262b1f5 to 4ce35caa8b689db45d65aae76881fd01ad5b46f1
+  - 582092d 2024-05-01T13:23:45-04:00 OCPBUGS-28230: enforce termination message policy on all platform pods
+
+- etcd embedded-component aa0c441f97e070fed62cc3e1423537eb42c661a3 to f6dd3fb9c8b351dce11af0161e58e2edc644ee3a
+  - a861c997 2024-05-02T16:29:14+02:00 CORS-3249: DOWNSTREAM <carry>: installer: make etcd binaries static
+  - c145bd16 2024-05-02T16:10:10+02:00 DOWNSTREAM <carry>: add installer Dockerfile for ART builds
+
+- machine-config-operator embedded-component 69944ada37af73f874bc436cbd79e5b9af4c16de to 203afde4a93e2c6c7672d6669dd6fe7644ccd388
+  - 7df3a46a 2024-05-01T15:57:18-07:00 pkg/daemon: logSystem the Kube API errors that trigger a re-bootstrap
+  - dc4f6a36 2024-03-18T17:23:47-04:00 Fix volumeMounts within cloud platform bootstrap coredns.yaml
+
+- oc image-amd64 51e5705eaace0d3a8b359913cb82e69a8bf0eaf1 to 941fe49866979576189f764217deae6029e15e9b
+  - 65c2c3d7 2024-05-03T10:36:23+03:00 Switch cli-artifacts default oc to RHEL9
+  - 9e11d643 2024-04-30T09:32:35+03:00 Switch cli image to RHEL9 base image
+
+- router image-amd64 b6f7c63c52e6b20fde2549a3c3e69a052ab453cc to 56ab14f257e123317c00ce7ba5b4ecae7b2e0102
+  - 0bc6f5e 2024-05-03T10:26:03-04:00 generateHAProxyCertConfigMap: No H2 with dup certs
+  - 13ab1dd 2024-05-01T19:11:45-04:00 Optimize Upgrade Validation plugin by skipping unnecessary changes
+
+- ovn-kubernetes image-amd64 7682c449ded3889b111f8aefe43134e30bd89118 to e7517c1c125d482c01e53baf0670ba777ca2c9d2
+  - 12c5f08d 2024-05-01T12:40:01-04:00 Delete site directory
+  - cd072da0 2024-05-01T12:38:07-04:00 Update static.yml
+  - 4cbcd0db 2024-04-30T16:14:50-04:00 Create static.yml
+  - 5803c727 2024-04-30T20:48:02+02:00 docs: Add site to our repo
+  - d119bae8 2024-04-30T13:34:35-04:00 Update CODEOWNERS
+  - c059c9f4 2024-04-30T13:21:19-04:00 Update CODEOWNERS -testing
+  - d929d5d7 2024-04-30T09:53:41-04:00 Fix codeowners location
+  - 71efbfdb 2024-04-30T15:44:58+02:00 docs: setup github pages with mkdocs
+  - df235d19 2024-04-30T09:23:33+02:00 Revert "Cleanup docs and Add Integration to Github Pages"
+  - 6454f344 2024-04-30T08:39:08+02:00 docs: setup github pages with mkdocs
+  - c54dc7b0 2024-04-29T15:24:42-04:00 Create index.html
+  - 27617a28 2024-04-29T13:05:44-04:00 Update _config.yml
+  - 0af2abd0 2024-04-29T13:02:06-04:00 Update _config.yml
+  - be863ab8 2024-04-29T12:55:17-04:00 Create index.md
+  - 4c3a4e4b 2024-04-29T12:39:07-04:00 Add github pages conf
+  - 2acb20d2 2024-04-29T12:26:23-04:00 Delete CNAME
+  - d99ea735 2024-04-29T12:08:23-04:00 Create CNAME
+  - dff5dc7f 2024-04-29T15:56:01+02:00 EQoS: Set force:true for server-side-apply
+  - afe0b649 2024-04-29T18:36:56+05:30 Reuse node-subnet from cache if exists
+  - cb10a72d 2024-04-25T14:54:11-04:00 Add back CODEOWNERS
+  - b7d827a2 2024-04-25T17:59:20+02:00 Remove skip for ETP=local+terminating endpoints
+  - c5906c8c 2024-04-24T13:47:15-04:00 Remove CODEOWNERS
+  - 3dd254d0 2024-04-22T12:47:58-07:00 Follow up fix how detect any network following lib change
+  - 235e81e8 2024-03-31T10:57:45+03:00 e2e, multi-net policies: Add ingress deny all test
+  - 6fd4e31a 2024-03-31T10:57:45+03:00 e2e, multi-net policies: Add ingress allow all tests
+  - afb364f3 2024-03-31T10:57:45+03:00 e2e, multi-net policies: Add missing MultiPolicyType
+
+- oc image-arm64 ba1f00b782ff8dc385b5b55f437e0557133a48c2 to 941fe49866979576189f764217deae6029e15e9b
+  - 65c2c3d7 2024-05-03T10:36:23+03:00 Switch cli-artifacts default oc to RHEL9
+  - 9e11d643 2024-04-30T09:32:35+03:00 Switch cli image to RHEL9 base image
   - 197eb62a 2024-04-29T15:24:02-07:00 pkg/cli/admin/upgrade/status: Drop free-form Progressing output line
-  - 7977ec94 2024-04-29T11:34:03-07:00 pkg/cli/admin/upgrade/status: Move Failing from free-form to updateInsight
 
-- router image-amd64 8762aa4c58f0407c235d284d0cf6a8dba7176243 to b6f7c63c52e6b20fde2549a3c3e69a052ab453cc
+- router image-arm64 8762aa4c58f0407c235d284d0cf6a8dba7176243 to 56ab14f257e123317c00ce7ba5b4ecae7b2e0102
+  - 0bc6f5e 2024-05-03T10:26:03-04:00 generateHAProxyCertConfigMap: No H2 with dup certs
+  - 13ab1dd 2024-05-01T19:11:45-04:00 Optimize Upgrade Validation plugin by skipping unnecessary changes
   - 44f217f 2024-04-30T09:39:07-04:00 Make ingressConditionsEqual more efficient
   - 3f17190 2024-04-29T18:50:28-04:00 Add log for attempting to update route status
   - 66eb223 2024-04-29T18:50:11-04:00 Add verbose logging for plugin chain execution
   - efcba1b 2024-04-25T12:36:36-04:00 Log election results in writerlease
 
-- ovn-kubernetes image-amd64 8a08bc0ef1d8cdefe8d6ad7be3d5abb367efac15 to 7682c449ded3889b111f8aefe43134e30bd89118
+- ovn-kubernetes image-arm64 8a08bc0ef1d8cdefe8d6ad7be3d5abb367efac15 to e7517c1c125d482c01e53baf0670ba777ca2c9d2
+  - 12c5f08d 2024-05-01T12:40:01-04:00 Delete site directory
+  - cd072da0 2024-05-01T12:38:07-04:00 Update static.yml
+  - 4cbcd0db 2024-04-30T16:14:50-04:00 Create static.yml
+  - 5803c727 2024-04-30T20:48:02+02:00 docs: Add site to our repo
+  - d119bae8 2024-04-30T13:34:35-04:00 Update CODEOWNERS
+  - c059c9f4 2024-04-30T13:21:19-04:00 Update CODEOWNERS -testing
+  - d929d5d7 2024-04-30T09:53:41-04:00 Fix codeowners location
+  - 71efbfdb 2024-04-30T15:44:58+02:00 docs: setup github pages with mkdocs
+  - df235d19 2024-04-30T09:23:33+02:00 Revert "Cleanup docs and Add Integration to Github Pages"
+  - 6454f344 2024-04-30T08:39:08+02:00 docs: setup github pages with mkdocs
+  - c54dc7b0 2024-04-29T15:24:42-04:00 Create index.html
+  - 27617a28 2024-04-29T13:05:44-04:00 Update _config.yml
+  - 0af2abd0 2024-04-29T13:02:06-04:00 Update _config.yml
+  - be863ab8 2024-04-29T12:55:17-04:00 Create index.md
+  - 4c3a4e4b 2024-04-29T12:39:07-04:00 Add github pages conf
+  - 2acb20d2 2024-04-29T12:26:23-04:00 Delete CNAME
+  - d99ea735 2024-04-29T12:08:23-04:00 Create CNAME
+  - dff5dc7f 2024-04-29T15:56:01+02:00 EQoS: Set force:true for server-side-apply
+  - afe0b649 2024-04-29T18:36:56+05:30 Reuse node-subnet from cache if exists
   - 27c4ed7d 2024-04-28T15:15:48+02:00 Dockerfile: Bump OVS to 3.3.0-2.
+  - cb10a72d 2024-04-25T14:54:11-04:00 Add back CODEOWNERS
+  - b7d827a2 2024-04-25T17:59:20+02:00 Remove skip for ETP=local+terminating endpoints
+  - c5906c8c 2024-04-24T13:47:15-04:00 Remove CODEOWNERS
+  - 3dd254d0 2024-04-22T12:47:58-07:00 Follow up fix how detect any network following lib change
+  - 235e81e8 2024-03-31T10:57:45+03:00 e2e, multi-net policies: Add ingress deny all test
+  - 6fd4e31a 2024-03-31T10:57:45+03:00 e2e, multi-net policies: Add ingress allow all tests
+  - afb364f3 2024-03-31T10:57:45+03:00 e2e, multi-net policies: Add missing MultiPolicyType
 
