@@ -5,8 +5,8 @@
 scenario_create_vms() {
     [[ "${UNAME_M}" =~ aarch64 ]] && { record_junit "setup" "scenario_create_vms" "SKIPPED"; exit 0; }
 
-    prepare_kickstart host1 kickstart-liveimg.ks.template rhel-9.2-microshift-source-isolated true
-    launch_vm host1 "rhel-9.2-microshift-source-isolated" "" "" "" "" "" "1"
+    prepare_kickstart host1 kickstart-liveimg.ks.template "" true
+    launch_vm host1 rhel-9.4-microshift-source-isolated "" "" "" "" "" "1"
 }
 
 scenario_remove_vms() {
