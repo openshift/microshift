@@ -384,7 +384,7 @@ def check_for_new_releases(url_base, release_type, version):
     if github_release_exists(release_name):
         print("Found an existing release, no work to do")
         return None
-    print("Not found")
+    print(f"Release tag {release_name} not found on remote repository")
 
     return Release(
         release_name,
@@ -572,11 +572,7 @@ def github_release_create(tag, notes):
         draft=False,
         prerelease=True,
     )
-    print(f'Created new release {tag}')
-    print()
-    print(results['html_url'])
-    print()
-    print(results['body'])
+    print(f'Created new release {tag}:{ {"url":results["html_url"], "body": results["body"]} }')
 
 
 def github_release_notes(previous_tag, tag_name, target_commitish):
@@ -606,7 +602,7 @@ def github_api(path, **data):
         )
     else:
         r = request.Request(url=url)
-    print(r.get_method(), url, data)
+    print(f"GitHub API Request: { {'method':r.get_method(), 'url': url, 'data': data} }")
     r.add_header('Accept', 'application/vnd.github+json')
     r.add_header('User-agent', 'microshift-release-notes')
     r.add_header('Authorization', f'Bearer {GITHUB_TOKEN}')
