@@ -206,16 +206,11 @@ prepare_kickstart() {
     local -r vm_hostname="${full_vmname/./-}"
     local -r hostname=$(hostname)
 
-    local fips_command=""
-
     echo "Preparing kickstart file ${template} at ${output_dir}"
     if [ ! -f "${KICKSTART_TEMPLATE_DIR}/${template}" ]; then
         error "No ${template} in ${KICKSTART_TEMPLATE_DIR}"
         record_junit "${vmname}" "prepare_kickstart" "no-template"
         exit 1
-    fi
-    if "${fips_enabled}"; then
-        fips_command="fips-mode-setup --enable"
     fi
 
     mkdir -p "${output_dir}"
@@ -237,7 +232,7 @@ prepare_kickstart() {
             -e "s|REPLACE_HOST_NAME|${vm_hostname}|g" \
             -e "s|REPLACE_REDHAT_AUTHORIZED_KEYS|${REDHAT_AUTHORIZED_KEYS}|g" \
             -e "s|REPLACE_PUBLIC_IP|${PUBLIC_IP}|g" \
-            -e "s|REPLACE_FIPS_COMMAND|${fips_command}|g" \
+            -e "s|REPLACE_FIPS_ENABLED|${fips_enabled}|g" \
             -e "s|REPLACE_ENABLE_MIRROR|${ENABLE_REGISTRY_MIRROR}|g" \
             -e "s|REPLACE_MIRROR_HOSTNAME|${hostname}|g" \
             "${ifile}" > "${output_file}"
