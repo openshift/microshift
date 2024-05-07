@@ -1,12 +1,3 @@
-- router image-amd64 3f833257249c8070da8f3fedd3ab6b3e8ef17cde to e1e59b3337700e2b94c8d5c5e5414519f9785614
-  - 65ee9cf 2024-03-11T14:17:31-04:00 OCPBUGS-6958: Fix clipHAProxyTimeoutValue (#483)
-
-- ovn-kubernetes image-amd64 ae7f5360d05b928ad10247f58ca9b8dd54242678 to cc219ebfdcdef860ef576eb6e4f5b72c379dd70e
-  - b8d9ebe 2024-04-26T19:09:52-04:00 APB: Fix formatting issues
-  - 00bfba3 2024-04-24T16:07:20-04:00 Check for length of message slice instead of lastTransactionTime being initialized to avoid the risk of time being initialized and slice not having any element
-  - b9eeed6 2024-04-12T18:49:41+03:00 APB: Replace logic to update status to check first if there's a change in status to avoid hitting the KAPI server for any pod status change
-  - 6e6225d 2024-04-10T13:43:47-04:00 Disable APB status updates
-
-- router image-arm64 3f833257249c8070da8f3fedd3ab6b3e8ef17cde to e1e59b3337700e2b94c8d5c5e5414519f9785614
-  - 65ee9cf 2024-03-11T14:17:31-04:00 OCPBUGS-6958: Fix clipHAProxyTimeoutValue (#483)
+- machine-config-operator embedded-component c29fe458496f7351a1e5c60e3af04d400a3d95c1 to 83d66a9228fef00885826e00ad3d392c5525bfab
+  - 64b871b5 2024-04-17T06:20:28+00:00 OCPBUGS-22910: Modify rm_nm_conn_files to remove temporary files
 
