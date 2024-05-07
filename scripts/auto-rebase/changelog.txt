@@ -1,24 +1,6 @@
-- cluster-openshift-controller-manager-operator embedded-component e9845aab67730c8b6b9225d0a27f082b8640b139 to 9c4fb818258a579901343fec3c2c47ec20ad2555
-  - 83242b1 2024-04-03T15:25:59+05:30 updates opentelemetry packages
+- router image-amd64 397ff2fdb0a65bca3c960c364239bd1c0697ce21 to 1cac6b72281a3e69141f3a14206d420ab23471d6
+  - 9fdfb8b 2024-04-23T01:24:31+00:00 OCPBUGS-26539: Reject routes with MD5 certs
 
-- kubernetes embedded-component 2f7b99248d49c18da5c29f11da989ce3f1d9edfc to 8ca71f701a70cb3eed8603478e5f6c1676319fc4
-  - cf7d9fa86 2024-02-21T11:34:33-07:00 UPSTREAM: <carry>: fix intergration test
-  - a475cc48e 2024-02-21T07:34:08-07:00 UPSTREAM: <carry>: bump structured-merge-diff
-
-- openshift-controller-manager embedded-component edbf7353e21a286cac85867ec13d6cf937dd9c33 to cdba57f4d73d86ec73394081bbeef487af5ec08c
-  - 875a120 2024-03-28T15:41:19+05:30 updates opentelemetry packages
-
-- oc image-amd64 fa6afba5e2a9bc669df246c8f04da4535017bee0 to 7693229513083646fe3a83a0fec6e651e4866d8d
-  - 3d5a707c 2024-04-26T12:23:02+03:00 Bump go-jose indirect reference to 2.6.3
-
-- kubernetes image-amd64 2f7b99248d49c18da5c29f11da989ce3f1d9edfc to 8ca71f701a70cb3eed8603478e5f6c1676319fc4
-  - cf7d9fa86 2024-02-21T11:34:33-07:00 UPSTREAM: <carry>: fix intergration test
-  - a475cc48e 2024-02-21T07:34:08-07:00 UPSTREAM: <carry>: bump structured-merge-diff
-
-- oc image-arm64 fa6afba5e2a9bc669df246c8f04da4535017bee0 to 7693229513083646fe3a83a0fec6e651e4866d8d
-  - 3d5a707c 2024-04-26T12:23:02+03:00 Bump go-jose indirect reference to 2.6.3
-
-- kubernetes image-arm64 2f7b99248d49c18da5c29f11da989ce3f1d9edfc to 8ca71f701a70cb3eed8603478e5f6c1676319fc4
-  - cf7d9fa86 2024-02-21T11:34:33-07:00 UPSTREAM: <carry>: fix intergration test
-  - a475cc48e 2024-02-21T07:34:08-07:00 UPSTREAM: <carry>: bump structured-merge-diff
+- router image-arm64 397ff2fdb0a65bca3c960c364239bd1c0697ce21 to 1cac6b72281a3e69141f3a14206d420ab23471d6
+  - 9fdfb8b 2024-04-23T01:24:31+00:00 OCPBUGS-26539: Reject routes with MD5 certs
 
