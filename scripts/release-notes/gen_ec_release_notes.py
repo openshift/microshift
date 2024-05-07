@@ -454,6 +454,13 @@ def tag_release(tag, sha, buildtime):
         env=env,
         check=True,
     )
+
+
+def push_tag(tag):
+    env = {}
+    # Include our existing environment settings to ensure values like
+    # HOME and other git settings are propagated.
+    env.update(os.environ)
     print(f'git push {REMOTE} {tag}')
     cmd = ['git', 'push', REMOTE, tag]
     completed = subprocess.run(
@@ -510,6 +517,11 @@ def publish_release(new_release, take_action):
 
     """)
 
+    if not tag_exists(release_name):
+        # release_date looks like 202402022103
+        buildtime = datetime.datetime.strptime(release_date, '%Y%m%d%H%M')
+        tag_release(release_name, commit_sha, buildtime)
+
     # Get the previous tag on the branch as the starting point for the
     # release notes.
     previous_tag = get_previous_tag(release_name)
@@ -537,10 +549,7 @@ def publish_release(new_release, take_action):
         print(notes)
         return
 
-    if not tag_exists(release_name):
-        # release_date looks like 202402022103
-        buildtime = datetime.datetime.strptime(release_date, '%Y%m%d%H%M')
-        tag_release(release_name, commit_sha, buildtime)
+    push_tag(release_name)
 
     # Create draft release with message that includes download URLs and history
     try:
