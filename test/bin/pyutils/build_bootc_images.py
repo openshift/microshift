@@ -213,7 +213,7 @@ def process_containerfile(groupdir, containerfile, dry_run):
     cf_path = os.path.join(groupdir, containerfile)
     cf_outname = os.path.splitext(containerfile)[0]
     cf_outdir = os.path.join(BOOTC_IMAGE_DIR, cf_outname)
-    cf_gomplate = os.path.join(BOOTC_IMAGE_DIR, f"{containerfile}.gomplate")
+    cf_processed = os.path.join(BOOTC_IMAGE_DIR, containerfile)
     cf_logfile = os.path.join(BOOTC_IMAGE_DIR, f"{cf_outname}.log")
     cf_targetimg = os.path.join(cf_outdir, "index.json")
 
@@ -230,13 +230,13 @@ def process_containerfile(groupdir, containerfile, dry_run):
         # Redirect the output to the log file
         with open(cf_logfile, 'w') as logfile:
             # Run gomplate on the input container file
-            run_gomplate(cf_path, cf_gomplate, dry_run, logfile)
+            run_gomplate(cf_path, cf_processed, dry_run, logfile)
 
             # Run the container build command, using the templated file as an input
             build_args = [
                 "sudo", "podman", "build",
                 "--authfile", PULL_SECRET,
-                "-t", cf_outname, "-f", cf_gomplate,
+                "-t", cf_outname, "-f", cf_processed,
                 os.path.join(IMAGEDIR, "rpm-repos")
             ]
             common.run_command_in_shell(build_args, dry_run, logfile, logfile)
@@ -272,7 +272,7 @@ def process_image_bootc(groupdir, bootcfile, dry_run):
     bf_path = os.path.join(groupdir, bootcfile)
     bf_outname = os.path.splitext(bootcfile)[0]
     bf_outdir = os.path.join(BOOTC_ISO_DIR, bf_outname)
-    bf_gomplate = os.path.join(BOOTC_IMAGE_DIR, f"{bootcfile}.gomplate")
+    bf_processed = os.path.join(BOOTC_ISO_DIR, bootcfile)
     bf_logfile = os.path.join(BOOTC_ISO_DIR, f"{bf_outname}.log")
     bf_targetiso = os.path.join(VM_DISK_BASEDIR, f"{bf_outname}.iso")
 
@@ -299,9 +299,9 @@ def process_image_bootc(groupdir, bootcfile, dry_run):
             common.record_junit(bf_path, "pull-bootc-bib", "OK")
 
             # Run gomplate on the input image file
-            run_gomplate(bf_path, bf_gomplate, dry_run, logfile)
+            run_gomplate(bf_path, bf_processed, dry_run, logfile)
             # Read the image reference using the templated file as an input
-            bf_imgref = common.read_file(bf_gomplate).strip()
+            bf_imgref = common.read_file(bf_processed).strip()
 
             # If not already local, download the image to be used by bootc image builder
             if not bf_imgref.startswith('localhost/'):
