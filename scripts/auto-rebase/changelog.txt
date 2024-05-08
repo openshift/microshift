@@ -1,0 +1,17 @@
+- cluster-network-operator embedded-component 4ce35caa8b689db45d65aae76881fd01ad5b46f1 to 21291740019b0ef308fdd090c229d12efce33c80
+  - 6aa2f0f 2024-05-06T09:34:02+02:00 Check every MachineConfigPool for IPsec plugin existence
+
+- kubernetes embedded-component d1ec84aa4c0ca46e90b22b364a62d38c78487c12 to 681e46bbc98c439e0915762fec0e98bb9cf1cc5c
+  - 8fc74eee3 2024-05-03T17:09:26-07:00 UPSTREAM: <carry>: Provide SCC access via RBAC
+
+- kubernetes image-amd64 d1ec84aa4c0ca46e90b22b364a62d38c78487c12 to 681e46bbc98c439e0915762fec0e98bb9cf1cc5c
+  - 8fc74eee3 2024-05-03T17:09:26-07:00 UPSTREAM: <carry>: Provide SCC access via RBAC
+
+- kubernetes image-arm64 d1ec84aa4c0ca46e90b22b364a62d38c78487c12 to 6c10b2df178d8497ea61ca6749a73b31fee740a7
+  - ebe33c3c4 2024-05-07T10:49:06+02:00 UPSTREAM: <carry>: add native build to installer image
+  - 8fc74eee3 2024-05-03T17:09:26-07:00 UPSTREAM: <carry>: Provide SCC access via RBAC
+
+- service-ca-operator image-arm64 cb3093f23618be6898e540b97855450cc198db2d to 0e9c5426da942853a94e5f9242bd66d3f2b7fff8
+  - da2d8c6 2024-04-18T15:10:17-04:00 fix replace
+  - a1de422 2024-02-21T15:23:10-05:00 apply hypershift cluster-profile
+
