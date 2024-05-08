@@ -1,6 +1,9 @@
-- router image-amd64 397ff2fdb0a65bca3c960c364239bd1c0697ce21 to 1cac6b72281a3e69141f3a14206d420ab23471d6
-  - 9fdfb8b 2024-04-23T01:24:31+00:00 OCPBUGS-26539: Reject routes with MD5 certs
+- operator-framework-olm embedded-component f6374fbc52a33f72763e7dda2b0bf04773a359dd to 50f148e2b1ed9eed9625d03f0d754bca53da1414
+  - a6cd494d 2024-04-25T08:43:51-04:00 UPSTREAM: <carry>: bump go-jose
 
-- router image-arm64 397ff2fdb0a65bca3c960c364239bd1c0697ce21 to 1cac6b72281a3e69141f3a14206d420ab23471d6
-  - 9fdfb8b 2024-04-23T01:24:31+00:00 OCPBUGS-26539: Reject routes with MD5 certs
+- ovn-kubernetes image-amd64 a2cac64f0ce21e324c0d243cb3d12dd3ef3cf3b4 to c108b9f7bb51ad5462f410e54eb2177103c86ee5
+  - 1e2f5d2 2024-02-09T16:53:30+00:00 Ignore missing live migratable pod annotation on AddNode
+
+- ovn-kubernetes image-arm64 a2cac64f0ce21e324c0d243cb3d12dd3ef3cf3b4 to c108b9f7bb51ad5462f410e54eb2177103c86ee5
+  - 1e2f5d2 2024-02-09T16:53:30+00:00 Ignore missing live migratable pod annotation on AddNode
 
