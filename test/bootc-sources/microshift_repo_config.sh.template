@@ -1,0 +1,112 @@
+#!/bin/bash
+set -euo pipefail
+
+USHIFT_LOCAL_REPO_FILE=/etc/yum.repos.d/microshift-local.repo
+OCP_MIRROR_REPO_FILE=/etc/yum.repos.d/openshift-mirror-beta.repo
+OCP_DTPATH_REPO_FILE=/etc/yum.repos.d/openshift-fast-datapath.repo
+OCP_RHOCP_REPO_FILE=/etc/yum.repos.d/openshift-rhocp.repo
+
+usage() {
+    echo "Usage: $(basename $0) <-create microshift_local_repo_path | -delete>"
+    [ -n "$1" ] && echo "ERROR: $1"
+    exit 1
+}
+
+del_repo_files() {
+    rm -f "${USHIFT_LOCAL_REPO_FILE}"
+    rm -f "${OCP_MIRROR_REPO_FILE}"
+    rm -f "${OCP_DTPATH_REPO_FILE}"
+    rm -f "${OCP_RHOCP_REPO_FILE}"
+}
+
+config_local_repos() {
+    local -r repo_path=$1
+    cat > "${USHIFT_LOCAL_REPO_FILE}" <<EOF
+[microshift-local]
+name=MicroShift Local Repository
+baseurl=${repo_path}
+enabled=1
+gpgcheck=0
+skip_if_unavailable=0
+EOF
+}
+
+config_centos9_repos() {
+    cat > "${OCP_MIRROR_REPO_FILE}" <<EOF
+[openshift-mirror-beta]
+name=OpenShift Mirror Beta Repository
+baseurl=https://mirror.openshift.com/pub/openshift-v4/{{ .Env.UNAME_M }}/dependencies/rpms/4.{{ .Env.PREVIOUS_MINOR_VERSION }}-el9-beta/
+enabled=1
+gpgcheck=0
+skip_if_unavailable=0
+EOF
+}
+
+config_rhel9_repos() {
+    local -r sslkey=$(find /etc/pki/entitlement-host/ -type f -name "*-key.pem" -print -quit)
+    local -r sslcrt=$(find /etc/pki/entitlement-host/ -type f -name "*.pem" ! -name "*-key.pem" -print -quit)
+
+    cat > "${OCP_DTPATH_REPO_FILE}" <<EOF
+[openshift-fast-datapath]
+name=Fast Datapath for RHEL 9
+baseurl=https://cdn.redhat.com/content/dist/layered/rhel9/{{ .Env.UNAME_M }}/fast-datapath/os
+enabled=1
+gpgcheck=1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+sslverify=1
+sslcacert = /etc/rhsm/ca/redhat-uep.pem
+sslclientkey = ${sslkey}
+sslclientcert = ${sslcrt}
+skip_if_unavailable=0
+EOF
+
+    cat > "${OCP_RHOCP_REPO_FILE}" <<EOF
+[openshift-rhocp]
+name=OpenShift Dependencies RHEL 9
+baseurl=https://cdn.redhat.com/content/dist/layered/rhel9/{{ .Env.UNAME_M }}/rhocp/4.{{ .Env.PREVIOUS_MINOR_VERSION }}/os
+enabled=1
+gpgcheck=1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+sslverify=1
+sslcacert = /etc/rhsm/ca/redhat-uep.pem
+sslclientkey = ${sslkey}
+sslclientcert = ${sslcrt}
+skip_if_unavailable=0
+EOF
+}
+
+# Parse command line
+if [ $# -ne 1 ] && [ $# -ne 2 ] ; then
+    usage "Wrong number of arguments"
+fi
+RUN_MODE=$1
+
+# Exit if the current user is not 'root'
+if [ "$(id -u)" -ne 0 ] ; then
+    echo "The '$(basename $0)' script must be run with the 'root' user privileges"
+    exit 1
+fi
+
+# Install the repository files
+case "${RUN_MODE}" in
+    -create)
+        LOCAL_REPO_PATH=$2
+        [ -z "${LOCAL_REPO_PATH}" ] && usage "MicroShift local repository path argument is missing"
+
+        config_local_repos "${LOCAL_REPO_PATH}"
+        os_id=$(awk -F= '$1=="ID" { print $2 }' /etc/os-release | xargs)
+        if [ "${os_id}" == "centos" ] ; then 
+            config_centos9_repos
+        elif [ "${os_id}" == "rhel" ] ; then 
+            config_rhel9_repos
+        else
+            usage "Only RHEL or CentOS operating systems are supported"
+        fi
+        ;;
+    -delete)
+        del_repo_files
+        ;;
+    *)
+        usage "Wrong arguments"
+        ;;
+esac

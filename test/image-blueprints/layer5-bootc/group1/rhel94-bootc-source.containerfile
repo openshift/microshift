@@ -1,49 +1,15 @@
 FROM registry.redhat.io/rhel9/rhel-bootc:9.4
 
 # Build arguments
+ARG REPO_CONFIG_SCRIPT=/tmp/microshift_repo_config.sh
 ARG USHIFT_RPM_REPO_NAME=microshift-local
 ARG USHIFT_RPM_REPO_PATH=/tmp/$USHIFT_RPM_REPO_NAME
 
-# Copy the MicroShift repository contents
-COPY $USHIFT_RPM_REPO_NAME $USHIFT_RPM_REPO_PATH
+# Copy the repository configuration script
+COPY --chmod=755 ./bootc-sources/microshift_repo_config.sh ${REPO_CONFIG_SCRIPT}
 
-# Add the following repositories, using host entitlements for SSL keys:
-# - MicroShift local RPM repository
-# - Fast Datapath repository for MicroShift dependencies
-# - OpenShift previous minor version repository for MicroShift dependencies
-RUN sslkey=$(find /etc/pki/entitlement-host/ -type f -name "*-key.pem" -print -quit) && \
-    sslcrt=$(find /etc/pki/entitlement-host/ -type f -name "*.pem" ! -name "*-key.pem" -print -quit) && \
-    printf "\
-[microshift-local]\n\
-name=MicroShift Local Repository\n\
-baseurl=%s\n\
-enabled=1\n\
-gpgcheck=0\n\
-skip_if_unavailable=0\n" "${USHIFT_RPM_REPO_PATH}" > "/etc/yum.repos.d/microshift-local.repo" && \
-    printf "\
-[openshift-fast-datapath]\n\
-name=Fast Datapath for RHEL 9\n\
-baseurl=https://cdn.redhat.com/content/dist/layered/rhel9/{{ .Env.UNAME_M }}/fast-datapath/os\n\
-enabled=1\n\
-gpgcheck=1\n\
-gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release\n\
-sslverify=1\n\
-sslcacert = /etc/rhsm/ca/redhat-uep.pem\n\
-sslclientkey = %s\n\
-sslclientcert = %s\n\
-skip_if_unavailable=0\n" "${sslkey}" "${sslcrt}" > "/etc/yum.repos.d/openshift-fast-datapath.repo" && \
-    printf "\
-[openshift-rhocp]\n\
-name=OpenShift Dependencies RHEL 9\n\
-baseurl=https://cdn.redhat.com/content/dist/layered/rhel9/{{ .Env.UNAME_M }}/rhocp/4.{{ .Env.PREVIOUS_MINOR_VERSION }}/os\n\
-enabled=1\n\
-gpgcheck=1\n\
-gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release\n\
-sslverify=1\n\
-sslcacert = /etc/rhsm/ca/redhat-uep.pem\n\
-sslclientkey = %s\n\
-sslclientcert = %s\n\
-skip_if_unavailable=0\n" "${sslkey}" "${sslcrt}" > "/etc/yum.repos.d/openshift-rhocp.repo"
+# Copy the MicroShift repository contents
+COPY ./rpm-repos/$USHIFT_RPM_REPO_NAME $USHIFT_RPM_REPO_PATH
 
 # Implement workarounds necessary for the successful MicroShift operation
 # - The /var/run directory must be a symbolic link to /run, which is not
@@ -52,12 +18,16 @@ skip_if_unavailable=0\n" "${sslkey}" "${sslcrt}" > "/etc/yum.repos.d/openshift-r
 #   is accessed by NetworkManager at /var/run/dbus.
 RUN [ ! -L /var/run ] && rm -rf /var/run && ln -s /run /var/
 
+# Add the following repositories:
+# - MicroShift local RPM repository
+# - OpenShift previous minor version RHEL repositories for MicroShift dependencies
 # Install MicroShift, few helper utilities and cleanup
-RUN dnf install -y vi firewalld microshift && \
+RUN ${REPO_CONFIG_SCRIPT} -create ${USHIFT_RPM_REPO_PATH} && \
+    dnf install -y vi firewalld microshift && \
     systemctl enable microshift && \
+    ${REPO_CONFIG_SCRIPT} -delete && \
+    rm -f ${REPO_CONFIG_SCRIPT} && \
     rm -rf $USHIFT_RPM_REPO_PATH && \
-    rm -f /etc/yum.repos.d/microshift*.repo && \
-    rm -f /etc/yum.repos.d/openshift*.repo && \
     dnf clean all
 
 # Configure firewall

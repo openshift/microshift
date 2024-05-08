@@ -200,20 +200,33 @@ def extract_container_images(version, repo_spec, outfile, dry_run=False):
     common.popd()
 
 
-def run_gomplate(ifile, ofile, dry_run, logfile):
+def run_template_cmd(ifile, ofile, dry_run):
+    # Remove the .template suffix from the output file
+    ofile = ofile.removesuffix(".template")
+    # Run the templating command
     gomplate_args = [
         GOMPLATE,
         "--file", ifile,
         "--out", ofile
     ]
-    common.run_command_in_shell(gomplate_args, dry_run, logfile, logfile)
+    common.run_command_in_shell(gomplate_args, dry_run)
+
+
+def process_template_dir(idir, odir, dry_run):
+    # Create the output directory
+    os.makedirs(odir, exist_ok=True)
+    # Process the input directory running templating on the files
+    # and copying them to the output directory
+    for file in os.listdir(idir):
+        ifile = os.path.join(idir, file)
+        ofile = os.path.join(odir, common.basename(ifile))
+        run_template_cmd(ifile, ofile, dry_run)
 
 
 def process_containerfile(groupdir, containerfile, dry_run):
     cf_path = os.path.join(groupdir, containerfile)
     cf_outname = os.path.splitext(containerfile)[0]
     cf_outdir = os.path.join(BOOTC_IMAGE_DIR, cf_outname)
-    cf_processed = os.path.join(BOOTC_IMAGE_DIR, containerfile)
     cf_logfile = os.path.join(BOOTC_IMAGE_DIR, f"{cf_outname}.log")
     cf_targetimg = os.path.join(cf_outdir, "index.json")
 
@@ -229,15 +242,12 @@ def process_containerfile(groupdir, containerfile, dry_run):
     try:
         # Redirect the output to the log file
         with open(cf_logfile, 'w') as logfile:
-            # Run gomplate on the input container file
-            run_gomplate(cf_path, cf_processed, dry_run, logfile)
-
-            # Run the container build command, using the templated file as an input
+            # Run the container build command
             build_args = [
                 "sudo", "podman", "build",
                 "--authfile", PULL_SECRET,
-                "-t", cf_outname, "-f", cf_processed,
-                os.path.join(IMAGEDIR, "rpm-repos")
+                "-t", cf_outname, "-f", cf_path,
+                IMAGEDIR
             ]
             common.run_command_in_shell(build_args, dry_run, logfile, logfile)
             common.record_junit(cf_path, "build-container", "OK")
@@ -272,7 +282,6 @@ def process_image_bootc(groupdir, bootcfile, dry_run):
     bf_path = os.path.join(groupdir, bootcfile)
     bf_outname = os.path.splitext(bootcfile)[0]
     bf_outdir = os.path.join(BOOTC_ISO_DIR, bf_outname)
-    bf_processed = os.path.join(BOOTC_ISO_DIR, bootcfile)
     bf_logfile = os.path.join(BOOTC_ISO_DIR, f"{bf_outname}.log")
     bf_targetiso = os.path.join(VM_DISK_BASEDIR, f"{bf_outname}.iso")
 
@@ -298,10 +307,8 @@ def process_image_bootc(groupdir, bootcfile, dry_run):
             common.run_command_in_shell(pull_args, dry_run, logfile, logfile)
             common.record_junit(bf_path, "pull-bootc-bib", "OK")
 
-            # Run gomplate on the input image file
-            run_gomplate(bf_path, bf_processed, dry_run, logfile)
-            # Read the image reference using the templated file as an input
-            bf_imgref = common.read_file(bf_processed).strip()
+            # Read the image reference
+            bf_imgref = common.read_file(bf_path).strip()
 
             # If not already local, download the image to be used by bootc image builder
             if not bf_imgref.startswith('localhost/'):
@@ -439,6 +446,11 @@ def main():
             extract_container_images(PREVIOUS_RELEASE_VERSION, PREVIOUS_RELEASE_REPO, CONTAINER_LIST, args.dry_run)
             extract_container_images(YMINUS2_RELEASE_VERSION, YMINUS2_RELEASE_REPO, CONTAINER_LIST, args.dry_run)
 
+        # Process template files
+        process_template_dir(
+            os.path.join(SCRIPTDIR, "../bootc-sources"),
+            os.path.join(IMAGEDIR, "bootc-sources"),
+            args.dry_run)
         # Process individual group directory
         if args.group_dir:
             process_group(args.group_dir, args.build_type, args.dry_run)
