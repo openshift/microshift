@@ -1,23 +1,30 @@
 FROM localhost/rhel94-bootc-source:latest
 
 # Build arguments
-ARG REPO_CONFIG_SCRIPT=/tmp/microshift_repo_config.sh
 ARG USHIFT_RPM_REPO_NAME=microshift-local
 ARG USHIFT_RPM_REPO_PATH=/tmp/$USHIFT_RPM_REPO_NAME
 
-# Copy the repository configuration script
-COPY --chmod=755 ./bootc-sources/microshift_repo_config.sh ${REPO_CONFIG_SCRIPT}
+# Copy the repository configuration files
+COPY ./bootc-sources/microshift-local.repo /etc/yum.repos.d/
+COPY ./bootc-sources/openshift-fast-datapath.repo /etc/yum.repos.d/
+COPY ./bootc-sources/openshift-rhocp.repo /etc/yum.repos.d/
 
 # Copy the MicroShift repository contents
 COPY ./rpm-repos/$USHIFT_RPM_REPO_NAME $USHIFT_RPM_REPO_PATH
 
-# Add the following repositories:
-# - MicroShift local RPM repository
-# - OpenShift previous minor version RHEL repositories for MicroShift dependencies
+# Fix the local repositories to point to the right path
+# Fix the remote repositories to use local SSL client key and certificate
+# Print the resulting repository files for troubleshooting purposes
+RUN sslkey=$(find /etc/pki/entitlement-host/ -type f -name "*-key.pem" -print -quit) && \
+    sslcrt=$(find /etc/pki/entitlement-host/ -type f -name "*.pem" ! -name "*-key.pem" -print -quit) && \
+    sed -i "s;REPLACE_USHIFT_RPM_REPO_PATH;$USHIFT_RPM_REPO_PATH;g" /etc/yum.repos.d/microshift*.repo && \
+    sed -i "s;REPLACE_SSL_CLIENT_KEY;${sslkey};g" /etc/yum.repos.d/openshift*.repo && \
+    sed -i "s;REPLACE_SSL_CLIENT_CRT;${sslcrt};g" /etc/yum.repos.d/openshift*.repo && \
+    awk 'FNR==1 {print "=== " FILENAME " ==="} {print}' /etc/yum.repos.d/*.repo 
+
 # Install MicroShift optional packages and cleanup
-RUN ${REPO_CONFIG_SCRIPT} -create ${USHIFT_RPM_REPO_PATH} && \
-    dnf install -y microshift-olm microshift-multus && \
-    ${REPO_CONFIG_SCRIPT} -delete && \
-    rm -f ${REPO_CONFIG_SCRIPT} && \
+RUN dnf install -y microshift-olm microshift-multus && \
+    rm -f /etc/yum.repos.d/microshift*.repo && \
+    rm -f /etc/yum.repos.d/openshift*.repo && \
     rm -rf $USHIFT_RPM_REPO_PATH && \
     dnf clean all

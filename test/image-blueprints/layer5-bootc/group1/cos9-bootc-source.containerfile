@@ -1,15 +1,20 @@
 FROM quay.io/centos-bootc/centos-bootc:stream9
 
 # Build arguments
-ARG REPO_CONFIG_SCRIPT=/tmp/microshift_repo_config.sh
 ARG USHIFT_RPM_REPO_NAME=microshift-local
 ARG USHIFT_RPM_REPO_PATH=/tmp/$USHIFT_RPM_REPO_NAME
 
-# Copy the repository configuration script
-COPY --chmod=755 ./bootc-sources/microshift_repo_config.sh ${REPO_CONFIG_SCRIPT}
+# Copy the repository configuration files
+COPY ./bootc-sources/microshift-local.repo /etc/yum.repos.d/
+COPY ./bootc-sources/openshift-mirror-beta.repo /etc/yum.repos.d/
 
 # Copy the MicroShift repository contents
 COPY ./rpm-repos/$USHIFT_RPM_REPO_NAME $USHIFT_RPM_REPO_PATH
+
+# Fix the local repositories to point to the right path
+# Print the resulting repository files for troubleshooting purposes
+RUN sed -i "s;REPLACE_USHIFT_RPM_REPO_PATH;$USHIFT_RPM_REPO_PATH;g" /etc/yum.repos.d/microshift*.repo && \
+    awk 'FNR==1 {print "=== " FILENAME " ==="} {print}' /etc/yum.repos.d/*.repo 
 
 # Implement workarounds necessary for the successful MicroShift operation
 # - The /var/run directory must be a symbolic link to /run, which is not
@@ -18,15 +23,11 @@ COPY ./rpm-repos/$USHIFT_RPM_REPO_NAME $USHIFT_RPM_REPO_PATH
 #   is accessed by NetworkManager at /var/run/dbus.
 RUN [ ! -L /var/run ] && rm -rf /var/run && ln -s /run /var/
 
-# Add the following repositories:
-# - MicroShift local RPM repository
-# - OpenShift Mirror Beta previous minor version repository for MicroShift dependencies
 # Install MicroShift, few helper utilities and cleanup
-RUN ${REPO_CONFIG_SCRIPT} -create ${USHIFT_RPM_REPO_PATH} && \
-    dnf install -y vi firewalld microshift && \
+RUN dnf install -y vi firewalld microshift && \
     systemctl enable microshift && \
-    ${REPO_CONFIG_SCRIPT} -delete && \
-    rm -f ${REPO_CONFIG_SCRIPT} && \
+    rm -f /etc/yum.repos.d/microshift*.repo && \
+    rm -f /etc/yum.repos.d/openshift*.repo && \
     rm -rf $USHIFT_RPM_REPO_PATH && \
     dnf clean all
 

@@ -1,0 +1,11 @@
+[openshift-rhocp]
+name=OpenShift Dependencies RHEL 9
+baseurl=https://cdn.redhat.com/content/dist/layered/rhel9/{{ .Env.UNAME_M }}/rhocp/4.{{ .Env.PREVIOUS_MINOR_VERSION }}/os
+enabled=1
+gpgcheck=1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+sslverify=1
+sslcacert = /etc/rhsm/ca/redhat-uep.pem
+sslclientkey = REPLACE_SSL_CLIENT_KEY
+sslclientcert = REPLACE_SSL_CLIENT_CRT
+skip_if_unavailable=0
