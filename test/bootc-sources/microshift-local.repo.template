@@ -1,6 +1,0 @@
-[microshift-local]
-name=MicroShift Local Repository
-baseurl=REPLACE_USHIFT_RPM_REPO_PATH
-enabled=1
-gpgcheck=0
-skip_if_unavailable=0
