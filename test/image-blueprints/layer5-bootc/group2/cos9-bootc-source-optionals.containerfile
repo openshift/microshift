@@ -11,7 +11,7 @@ COPY --chmod=755 ./bootc-sources/microshift_repo_config.sh ${REPO_CONFIG_SCRIPT}
 # Copy the MicroShift repository contents
 COPY ./rpm-repos/$USHIFT_RPM_REPO_NAME $USHIFT_RPM_REPO_PATH
 
-# Add the following repositories:
+# Add the following repositories and print their contents:
 # - MicroShift local RPM repository
 # - OpenShift Mirror Beta previous minor version repository for MicroShift dependencies
 # Install MicroShift optional packages and cleanup

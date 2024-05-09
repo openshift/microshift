@@ -18,11 +18,12 @@ COPY ./rpm-repos/$USHIFT_RPM_REPO_NAME $USHIFT_RPM_REPO_PATH
 #   is accessed by NetworkManager at /var/run/dbus.
 RUN [ ! -L /var/run ] && rm -rf /var/run && ln -s /run /var/
 
-# Add the following repositories:
+# Add the following repositories and print their contents:
 # - MicroShift local RPM repository
 # - OpenShift previous minor version RHEL repositories for MicroShift dependencies
 # Install MicroShift, few helper utilities and cleanup
 RUN ${REPO_CONFIG_SCRIPT} -create ${USHIFT_RPM_REPO_PATH} && \
+    awk 'FNR==1 {print "=== " FILENAME " ==="} {print}' /etc/yum.repos.d/*.repo && \
     dnf install -y vi firewalld microshift && \
     systemctl enable microshift && \
     ${REPO_CONFIG_SCRIPT} -delete && \

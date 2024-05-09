@@ -92,16 +92,19 @@ case "${RUN_MODE}" in
     -create)
         LOCAL_REPO_PATH=$2
         [ -z "${LOCAL_REPO_PATH}" ] && usage "MicroShift local repository path argument is missing"
-
+        # Configure the local repositories
         config_local_repos "${LOCAL_REPO_PATH}"
+        # Configure the OS-specific remote repositories
         os_id=$(awk -F= '$1=="ID" { print $2 }' /etc/os-release | xargs)
-        if [ "${os_id}" == "centos" ] ; then 
+        if [ "${os_id}" == "centos" ] ; then
             config_centos9_repos
-        elif [ "${os_id}" == "rhel" ] ; then 
+        elif [ "${os_id}" == "rhel" ] ; then
             config_rhel9_repos
         else
             usage "Only RHEL or CentOS operating systems are supported"
         fi
+        # Print the repository contents
+        awk 'FNR==1 {print "=== " FILENAME " ==="} {print}' /etc/yum.repos.d/*.repo
         ;;
     -delete)
         del_repo_files

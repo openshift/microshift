@@ -18,7 +18,7 @@ COPY ./rpm-repos/$USHIFT_RPM_REPO_NAME $USHIFT_RPM_REPO_PATH
 #   is accessed by NetworkManager at /var/run/dbus.
 RUN [ ! -L /var/run ] && rm -rf /var/run && ln -s /run /var/
 
-# Add the following repositories:
+# Add the following repositories and print their contents:
 # - MicroShift local RPM repository
 # - OpenShift Mirror Beta previous minor version repository for MicroShift dependencies
 # Install MicroShift, few helper utilities and cleanup
