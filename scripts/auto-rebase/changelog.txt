@@ -1,17 +1,7 @@
-- cluster-network-operator embedded-component 4ce35caa8b689db45d65aae76881fd01ad5b46f1 to 21291740019b0ef308fdd090c229d12efce33c80
-  - 6aa2f0f 2024-05-06T09:34:02+02:00 Check every MachineConfigPool for IPsec plugin existence
+- oc image-arm64 941fe49866979576189f764217deae6029e15e9b to 1e4757fd86487950dc14b59a3379bb70fdcd9b4c
+  - 7f3ee03b 2024-04-30T16:33:41-07:00 OTA-1275: cli/admin/release/git: use optimized git flags
 
-- kubernetes embedded-component d1ec84aa4c0ca46e90b22b364a62d38c78487c12 to 681e46bbc98c439e0915762fec0e98bb9cf1cc5c
-  - 8fc74eee3 2024-05-03T17:09:26-07:00 UPSTREAM: <carry>: Provide SCC access via RBAC
-
-- kubernetes image-amd64 d1ec84aa4c0ca46e90b22b364a62d38c78487c12 to 681e46bbc98c439e0915762fec0e98bb9cf1cc5c
-  - 8fc74eee3 2024-05-03T17:09:26-07:00 UPSTREAM: <carry>: Provide SCC access via RBAC
-
-- kubernetes image-arm64 d1ec84aa4c0ca46e90b22b364a62d38c78487c12 to 6c10b2df178d8497ea61ca6749a73b31fee740a7
-  - ebe33c3c4 2024-05-07T10:49:06+02:00 UPSTREAM: <carry>: add native build to installer image
-  - 8fc74eee3 2024-05-03T17:09:26-07:00 UPSTREAM: <carry>: Provide SCC access via RBAC
-
-- service-ca-operator image-arm64 cb3093f23618be6898e540b97855450cc198db2d to 0e9c5426da942853a94e5f9242bd66d3f2b7fff8
-  - da2d8c6 2024-04-18T15:10:17-04:00 fix replace
-  - a1de422 2024-02-21T15:23:10-05:00 apply hypershift cluster-profile
+- service-ca-operator image-arm64 0e9c5426da942853a94e5f9242bd66d3f2b7fff8 to 538c7b98a689e573b61e1abb1cb649da470c5fac
+  - f406c2e 2024-05-08T09:18:21+02:00 go mod tidy && go mod vendor
+  - 73317e8 2024-03-12T18:25:23+00:00 Updating ose-service-ca-operator-container image to be consistent with ART for 4.16 Reconciling with https://github.com/openshift/ocp-build-data/tree/688f7221d1f0f47c4a31c596c974186c1a1c61c5/images/ose-service-ca-operator.yml
 
