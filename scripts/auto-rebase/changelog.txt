@@ -1,9 +1,13 @@
-- operator-framework-olm embedded-component f6374fbc52a33f72763e7dda2b0bf04773a359dd to 50f148e2b1ed9eed9625d03f0d754bca53da1414
-  - a6cd494d 2024-04-25T08:43:51-04:00 UPSTREAM: <carry>: bump go-jose
+- cluster-kube-apiserver-operator embedded-component f5c5a609fa5e318379ceb86d346122814dc81762 to cb537c7a834b1e67210ee4d3620d9e94d402e960
+  - 56c1900 2024-05-03T22:27:39+00:00 Fix incorrect name for SCC ClusterRole
 
-- ovn-kubernetes image-amd64 a2cac64f0ce21e324c0d243cb3d12dd3ef3cf3b4 to c108b9f7bb51ad5462f410e54eb2177103c86ee5
-  - 1e2f5d2 2024-02-09T16:53:30+00:00 Ignore missing live migratable pod annotation on AddNode
+- cluster-network-operator embedded-component 529ce52e7c159addf8a6ebfe9ad5470454d93651 to 071f46acbf9043f9ae9106c56639888e078977a9
+  - f7692c4 2024-04-22T07:48:55+00:00 Fix shellcheck warnings on ipsec bash scripts
+  - 4d5e664 2024-04-22T07:48:55+00:00 Fix wait logic for ipsec certificate signing request
 
-- ovn-kubernetes image-arm64 a2cac64f0ce21e324c0d243cb3d12dd3ef3cf3b4 to c108b9f7bb51ad5462f410e54eb2177103c86ee5
-  - 1e2f5d2 2024-02-09T16:53:30+00:00 Ignore missing live migratable pod annotation on AddNode
+- router image-amd64 1cac6b72281a3e69141f3a14206d420ab23471d6 to 4b6be4ddcbe7dae2b08f305fc823d1718f2563f7
+  - a2a0a50 2024-04-25T13:49:46+00:00 OCPBUGS-29690: Count active services before setting weight to 1
+
+- router image-arm64 1cac6b72281a3e69141f3a14206d420ab23471d6 to 4b6be4ddcbe7dae2b08f305fc823d1718f2563f7
+  - a2a0a50 2024-04-25T13:49:46+00:00 OCPBUGS-29690: Count active services before setting weight to 1
 
