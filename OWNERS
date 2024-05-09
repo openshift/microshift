@@ -1,6 +1,5 @@
 approvers:
 - copejon
-- dhellmann
 - ggiguash
 - zshi-redhat
 - pmtk
@@ -12,7 +11,6 @@ approvers:
 - eslutsky
 reviewers:
 - copejon
-- dhellmann
 - ggiguash
 - pmtk
 - pacevedom
@@ -29,3 +27,4 @@ emeritus_approvers:
 - mangelajo
 - oglok
 - fzdarsky
+- dhellmann
