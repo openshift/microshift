@@ -61,7 +61,7 @@ Teardown
 Verify No Internet Access
     [Documentation]    Verifies that Internet is not accessible
     ${rc}=    Execute Command
-    ...    curl -I redhat.com quay.io registry.access.redhat.com
+    ...    curl -I redhat.com quay.io registry.redhat.io
     ...    return_stdout=False    return_stderr=False    return_rc=True
     Should Not Be Equal As Integers    ${rc}    0
 

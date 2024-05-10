@@ -19,11 +19,3 @@
 [[registry.mirror]]
     location = "REPLACE_MIRROR_REGISTRY_HOST"
     insecure = REPLACE_MIRROR_REGISTRY_INSECURE
-
-[[registry]]
-    prefix = ""
-    location = "registry.access.redhat.com"
-    mirror-by-digest-only = true
-[[registry.mirror]]
-    location = "REPLACE_MIRROR_REGISTRY_HOST"
-    insecure = REPLACE_MIRROR_REGISTRY_INSECURE

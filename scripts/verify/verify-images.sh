@@ -29,11 +29,9 @@ while read -r source_file image; do
             debug "${image} OK";;
         registry.redhat.io/openshift4/*)
             debug "${image} OK";;
-        registry.access.redhat.com/*)
-            debug "${image} OK";;
-        registry.redhat.io/odf4/*)
-            debug "${image} OK";;
         registry.redhat.io/lvms4/*)
+            debug "${image} OK";;
+        registry.redhat.io/ubi9*)
             debug "${image} OK";;
         *)
             echo "${image} used in ${source_file} is not from an approved location" 1>&2
