@@ -3,6 +3,7 @@
 Tests to skip are specified by Test Name
 """
 
+import os
 from robot.api import SuiteVisitor
 
 
@@ -13,7 +14,7 @@ class SkipTests(SuiteVisitor):
 
         if self.list_skip_test:
             print("List of tests to be skipped:")
-            print(f" - {self.list_skip_test.replace(',', '\n - ')}")
+            print(f" - {self.list_skip_test.replace(',', f'{os.linesep} - ')}")
         else:
             print("No tests to be skipped")
 
