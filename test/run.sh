@@ -14,7 +14,7 @@ OUTDIR="${ROOTDIR}/_output/e2e-$(date +%Y%m%d-%H%M%S)"
 function usage {
     local -r script_name=$(basename "$0")
     cat - <<EOF
-${script_name} [-h] [-n] [-o output_dir] [-v venv_dir] [-i var_file] [-s name=value] [test suite files]
+${script_name} [-h] [-n] [-o output_dir] [-v venv_dir] [-i var_file] [-s name=value] [-k test_names] [test suite files]
 
 Options:
 
@@ -23,11 +23,12 @@ Options:
   -o DIR             The output directory. (${OUTDIR})
   -v DIR             The venv directory. (${RF_VENV})
   -i PATH            The variables file. (${RF_VARIABLES})
-  -s NAME=VALUE      To enable an stress condition.
+  -s NAME=VALUE      To enable a stress condition.
+  -k SKIP_TESTS      Comma separated list of tests to skip.
 EOF
 }
 
-while getopts "hno:v:i:s:" opt; do
+while getopts "hno:v:i:s:k:" opt; do
     case ${opt} in
         h)
             usage
@@ -47,6 +48,9 @@ while getopts "hno:v:i:s:" opt; do
             ;;
         s)
             STRESS_TESTING=${OPTARG}
+            ;;
+        k)
+            SKIP_TESTS=${OPTARG}
             ;;
         *)
             usage
@@ -101,6 +105,7 @@ else
     # shellcheck disable=SC2086
     "${RF_BINARY}" \
         --randomize all \
+        --prerunmodifier "${SCRIPTDIR}/resources/SkipTests.py:${SKIP_TESTS:-}" \
         --loglevel TRACE \
         -V "${RF_VARIABLES}" \
         -x junit.xml \
