@@ -2,8 +2,10 @@ package build
 
 import (
 	"context"
+	"os"
 	"time"
 
+	"github.com/openshift/microshift/pkg/util"
 	"github.com/openshift/microshift/test/pkg/compose/helpers"
 	"github.com/openshift/microshift/test/pkg/testutil"
 	"k8s.io/klog/v2"
@@ -13,6 +15,7 @@ type Opts struct {
 	Composer helpers.Composer
 	Ostree   helpers.Ostree
 	Podman   helpers.Podman
+	Utils    UtilProxy
 
 	Force  bool
 	DryRun bool
@@ -79,4 +82,39 @@ func (ib *Runner) executeGroup(ctx context.Context, group Group) error {
 	}
 
 	return aeg.Wait()
+}
+
+type UtilProxy interface {
+	PathExistsAndIsNotEmpty(path string) (bool, error)
+	Rename(oldpath, newpath string) error
+}
+
+var _ UtilProxy = (*utilProxy)(nil)
+
+func NewUtilProxy() UtilProxy {
+	return &utilProxy{}
+}
+
+type utilProxy struct{}
+
+func (u *utilProxy) Rename(oldpath string, newpath string) error {
+	return os.Rename(oldpath, newpath)
+}
+
+func (*utilProxy) PathExistsAndIsNotEmpty(path string) (bool, error) {
+	return util.PathExistsAndIsNotEmpty(path)
+}
+
+func NewDryRunUtilProxy() UtilProxy {
+	return &dryRunUtilProxy{}
+}
+
+type dryRunUtilProxy struct{}
+
+func (u *dryRunUtilProxy) Rename(oldpath string, newpath string) error {
+	return nil
+}
+
+func (*dryRunUtilProxy) PathExistsAndIsNotEmpty(path string) (bool, error) {
+	return true, nil
 }

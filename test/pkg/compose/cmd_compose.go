@@ -181,11 +181,18 @@ func NewComposeCmd() *cobra.Command {
 			cancel()
 		}()
 
+		utilProxy := func() build.UtilProxy {
+			if dryRun {
+				return build.NewDryRunUtilProxy()
+			}
+			return build.NewUtilProxy()
+		}()
 		builder := build.Runner{
 			Opts: &build.Opts{
 				Composer:      composer,
 				Ostree:        ostree,
 				Podman:        podman,
+				Utils:         utilProxy,
 				Force:         force,
 				DryRun:        dryRun,
 				Retries:       3,

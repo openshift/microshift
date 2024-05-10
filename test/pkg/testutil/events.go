@@ -136,6 +136,7 @@ func (em *eventManager) GetJUnit() *JUnitTestSuites {
 type IEvent interface {
 	GetJUnitTestCase() JUnitTestCase
 	GetSuite() string
+	GetClass() string
 	GetInterval() Interval
 	GetName() string
 }
@@ -168,6 +169,10 @@ func (e *Event) GetInterval() Interval {
 
 func (e *Event) GetSuite() string {
 	return e.Suite
+}
+
+func (e *Event) GetClass() string {
+	return e.ClassName
 }
 
 func (e *Event) GetJUnitTestCase() JUnitTestCase {

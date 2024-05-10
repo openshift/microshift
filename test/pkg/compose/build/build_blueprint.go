@@ -101,7 +101,10 @@ func NewBlueprintBuild(path string, opts *PlannerOpts) (*BlueprintBuild, error) 
 		if err != nil {
 			return nil, err
 		}
-		bb.Aliases = slices.DeleteFunc(strings.Split(string(data), "\n"), func(line string) bool { return line == "" })
+		bb.Aliases = slices.DeleteFunc(strings.Split(string(data), "\n"), func(line string) bool {
+			// Remove empty lines and lines with whitespace only.
+			return strings.TrimSpace(line) == ""
+		})
 	}
 
 	if opts.BuildInstallers {
@@ -155,6 +158,17 @@ func (b *BlueprintBuild) Prepare(opts *Opts) error {
 
 	err := opts.Composer.AddBlueprint(b.Contents)
 	if err != nil {
+		opts.Events.AddEvent(&testutil.FailedEvent{
+			Event: testutil.Event{
+				Name:      b.Name,
+				Suite:     "add",
+				ClassName: "add",
+				Start:     start,
+				End:       time.Now(),
+			},
+			Message: "Adding blueprint failed",
+			Content: err.Error(),
+		})
 		return err
 	}
 	err = opts.Composer.DepsolveBlueprint(b.Name)
