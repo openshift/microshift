@@ -105,7 +105,7 @@ else
     # shellcheck disable=SC2086
     "${RF_BINARY}" \
         --randomize all \
-        --prerunmodifier resources/SkipTests.py:${SKIP_TESTS:-} \
+        --prerunmodifier "${SCRIPTDIR}/resources/SkipTests.py:${SKIP_TESTS:-}" \
         --loglevel TRACE \
         -V "${RF_VARIABLES}" \
         -x junit.xml \
