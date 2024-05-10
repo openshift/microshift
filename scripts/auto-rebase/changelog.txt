@@ -1,0 +1,3 @@
+- router image-arm64 e1e59b3337700e2b94c8d5c5e5414519f9785614 to e17abdff0095edee65e3be926f98b758aa3c87bb
+  - f0ad69e 2024-05-08T07:45:09+00:00 OCPBUGS-29690: Count active services before setting weight to 1
+
