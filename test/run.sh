@@ -23,8 +23,8 @@ Options:
   -o DIR             The output directory. (${OUTDIR})
   -v DIR             The venv directory. (${RF_VENV})
   -i PATH            The variables file. (${RF_VARIABLES})
-  -s NAME=VALUE      To enable an stress condition.
-  -k SKIP_TESTS      List of Tests to skip.
+  -s NAME=VALUE      To enable a stress condition.
+  -k SKIP_TESTS      Comma separated list of tests to skip.
 EOF
 }
 
