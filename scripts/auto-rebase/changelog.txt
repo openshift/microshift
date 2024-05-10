@@ -1,7 +1,49 @@
-- oc image-arm64 941fe49866979576189f764217deae6029e15e9b to 1e4757fd86487950dc14b59a3379bb70fdcd9b4c
+- cluster-dns-operator embedded-component 2d77b099cd229949067d7de843b9d1538aab7403 to a2c4492a942ec51f900a1784bc239d16aa39e4e6
+  - f5eb1d1 2024-05-06T14:03:18-04:00 Updating ose-cluster-dns-operator-container image to be consistent with ART for 4.16 Reconciling with https://github.com/openshift/ocp-build-data/tree/16fcb965e08aba14bb4ea6caaeeaa99fe31141bd/images/ose-cluster-dns-operator.yml
+
+- cluster-openshift-controller-manager-operator embedded-component d291c51f0becf065fbe740cf7b113b81378ee34a to e620f4af51023ef35bc8176fa19e79341dcf5d40
+  - b68b048 2024-03-01T15:28:10+01:00 manifests: set required-scc for openshift workloads
+
+- etcd embedded-component f6dd3fb9c8b351dce11af0161e58e2edc644ee3a to bc2fec27ff5b086436d438157c24396f280e0305
+  - f04df1e8 2024-05-07T10:55:13+02:00 DOWNSTREAM <carry>: add native binary to installer images
+
+- kubernetes embedded-component 681e46bbc98c439e0915762fec0e98bb9cf1cc5c to 6c10b2df178d8497ea61ca6749a73b31fee740a7
+  - ebe33c3c4 2024-05-07T10:49:06+02:00 UPSTREAM: <carry>: add native build to installer image
+
+- machine-config-operator embedded-component 203afde4a93e2c6c7672d6669dd6fe7644ccd388 to aa28d1b034bcfaff79537d2fc979de018a77e4a0
+  - 8cbdc2ad 2024-05-06T21:23:16-04:00 *: improve status reporting for pinned image sets
+  - e5e16191 2024-05-06T10:11:03-07:00 pkg/daemon: Only re-bootstrap kubelet on X.509 errors
+  - c02974ba 2024-05-06T11:43:18-05:00 Enable nmstate-configuration only on baremetal
+  - addcb11b 2024-05-06T11:43:18-05:00 Add logging and fix logic in nmstate-configuration
+  - 397b18ed 2024-05-06T11:43:18-05:00 Add exception to NodeDisruptionPolicy
+  - 16d796aa 2024-05-06T11:43:18-05:00 Use InSlice to check if file is in directory
+  - 16b8327a 2024-05-06T11:43:17-05:00 Avoid overwriting existing files and cleanup mtu migration
+  - 7a94ef88 2024-05-06T11:43:17-05:00 Change reboot-less path to /etc/nmstate/openshift
+  - 171223f0 2024-05-06T11:43:17-05:00 Add wait-for-primary-ip service
+  - cad8c273 2024-05-06T11:43:17-05:00 Tweak dependencies to reflect kubelet-dependencies
+  - 07989071 2024-05-06T11:43:17-05:00 Add nmstate-configuration service
+  - ee16cded 2024-05-03T15:26:34-04:00 daemon/pinned-image-set: refactor mirrored registry auth
+
+- openshift-controller-manager embedded-component 8f6f90a1e8b7057588006508cc2be22949d3b0e2 to 6d49ea351dbc89e6ea51062b40a7d408780f75dc
+  - bf4285a 2024-05-07T13:12:12+05:30 Adds roleBinding controllers to controllerInitializers
+  - 7078b70 2024-05-07T13:09:49+05:30 bumps openshift/api: builder-rolebindings, deployer-rolebindings, image-puller-rolebindings controllers
+  - eb840ab 2024-04-29T10:53:38-04:00 rollback controllers
+
+- service-ca-operator embedded-component cb3093f23618be6898e540b97855450cc198db2d to 538c7b98a689e573b61e1abb1cb649da470c5fac
+  - f406c2e 2024-05-08T09:18:21+02:00 go mod tidy && go mod vendor
+  - da2d8c6 2024-04-18T15:10:17-04:00 fix replace
+  - 73317e8 2024-03-12T18:25:23+00:00 Updating ose-service-ca-operator-container image to be consistent with ART for 4.16 Reconciling with https://github.com/openshift/ocp-build-data/tree/688f7221d1f0f47c4a31c596c974186c1a1c61c5/images/ose-service-ca-operator.yml
+  - a1de422 2024-02-21T15:23:10-05:00 apply hypershift cluster-profile
+
+- oc image-amd64 941fe49866979576189f764217deae6029e15e9b to 1e4757fd86487950dc14b59a3379bb70fdcd9b4c
   - 7f3ee03b 2024-04-30T16:33:41-07:00 OTA-1275: cli/admin/release/git: use optimized git flags
 
-- service-ca-operator image-arm64 0e9c5426da942853a94e5f9242bd66d3f2b7fff8 to 538c7b98a689e573b61e1abb1cb649da470c5fac
+- kubernetes image-amd64 681e46bbc98c439e0915762fec0e98bb9cf1cc5c to 6c10b2df178d8497ea61ca6749a73b31fee740a7
+  - ebe33c3c4 2024-05-07T10:49:06+02:00 UPSTREAM: <carry>: add native build to installer image
+
+- service-ca-operator image-amd64 cb3093f23618be6898e540b97855450cc198db2d to 538c7b98a689e573b61e1abb1cb649da470c5fac
   - f406c2e 2024-05-08T09:18:21+02:00 go mod tidy && go mod vendor
+  - da2d8c6 2024-04-18T15:10:17-04:00 fix replace
   - 73317e8 2024-03-12T18:25:23+00:00 Updating ose-service-ca-operator-container image to be consistent with ART for 4.16 Reconciling with https://github.com/openshift/ocp-build-data/tree/688f7221d1f0f47c4a31c596c974186c1a1c61c5/images/ose-service-ca-operator.yml
+  - a1de422 2024-02-21T15:23:10-05:00 apply hypershift cluster-profile
 
