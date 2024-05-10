@@ -118,7 +118,7 @@ func (i *ImageFetcher) execute(ctx context.Context, opts *Opts) (bool, error) {
 		}
 	}
 
-	err := testutil.Retry(ctx, 3, func() error { return i.download(ctx, tmpDest) })
+	err := testutil.Retry(ctx, opts.Retries, opts.RetryInterval, func() error { return i.download(ctx, tmpDest) })
 	if err != nil {
 		klog.ErrorS(err, "Failed to download image", "destination", tmpDest, "url", i.Url)
 		return false, err

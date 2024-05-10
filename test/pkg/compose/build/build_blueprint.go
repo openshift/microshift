@@ -5,13 +5,11 @@ import (
 	"errors"
 	"fmt"
 	"io/fs"
-	"os"
 	"path/filepath"
 	"slices"
 	"strings"
 	"time"
 
-	"github.com/openshift/microshift/pkg/util"
 	"github.com/openshift/microshift/test/pkg/testutil"
 
 	"k8s.io/klog/v2"
@@ -210,7 +208,7 @@ func (b *BlueprintBuild) Execute(ctx context.Context, opts *Opts) error {
 
 	} else {
 		aeg.Go(func() error {
-			if err := testutil.Retry(ctx, 3, func() error { return b.composeCommit(ctx, opts) }); err != nil {
+			if err := testutil.Retry(ctx, opts.Retries, opts.RetryInterval, func() error { return b.composeCommit(ctx, opts) }); err != nil {
 				klog.ErrorS(err, "Composing commit failed", "blueprint", b.Name)
 
 				opts.Events.AddEvent(&testutil.FailedEvent{
@@ -241,7 +239,7 @@ func (b *BlueprintBuild) Execute(ctx context.Context, opts *Opts) error {
 	}
 
 	if b.Installer {
-		if isoExists, err := util.PathExistsAndIsNotEmpty(b.InstallerDestination); err != nil {
+		if isoExists, err := opts.Utils.PathExistsAndIsNotEmpty(b.InstallerDestination); err != nil {
 			return err
 		} else if isoExists && !opts.Force {
 			klog.InfoS("ISO installer already present in vm-storage and --force wasn't present - skipping", "blueprint", b.Name)
@@ -259,7 +257,7 @@ func (b *BlueprintBuild) Execute(ctx context.Context, opts *Opts) error {
 
 		} else {
 			aeg.Go(func() error {
-				if err := testutil.Retry(ctx, 3, func() error { return b.composeInstaller(ctx, opts) }); err != nil {
+				if err := testutil.Retry(ctx, opts.Retries, opts.RetryInterval, func() error { return b.composeInstaller(ctx, opts) }); err != nil {
 					klog.ErrorS(err, "Composing installer failed", "blueprint", b.Name)
 					opts.Events.AddEvent(&testutil.FailedEvent{
 						Event: testutil.Event{
@@ -397,14 +395,12 @@ func (b *BlueprintBuild) composeInstaller(ctx context.Context, opts *Opts) error
 	}
 
 	dest := filepath.Join(opts.Paths.VMStorageDir, b.Name+".iso")
-	if installerPath != "/dummy/dry/run/path" {
-		err = os.Rename(installerPath, dest)
-		if err != nil {
-			return fmt.Errorf("failed to move installer from %q to %q: %w", installerPath, dest, err)
-		}
-
-		klog.InfoS("Moved installer file", "destination", dest)
+	err = opts.Utils.Rename(installerPath, dest)
+	if err != nil {
+		return fmt.Errorf("failed to move installer from %q to %q: %w", installerPath, dest, err)
 	}
+
+	klog.InfoS("Moved installer file", "destination", dest)
 
 	klog.InfoS("Installer procedure done", "blueprint", b.Name, "elapsed", time.Since(start))
 

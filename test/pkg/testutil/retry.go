@@ -8,11 +8,7 @@ import (
 	"k8s.io/klog/v2"
 )
 
-const (
-	interval = time.Second * 10
-)
-
-func Retry(ctx context.Context, attempts int, f func() error) error {
+func Retry(ctx context.Context, attempts int, interval time.Duration, f func() error) error {
 	errs := []error{}
 	for i := 0; i < attempts; i++ {
 		err := f()

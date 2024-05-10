@@ -10,6 +10,7 @@ import (
 	"os/signal"
 	"path/filepath"
 	"syscall"
+	"time"
 
 	"github.com/coreos/go-systemd/v22/dbus"
 	"github.com/openshift/microshift/pkg/util"
@@ -182,13 +183,15 @@ func NewComposeCmd() *cobra.Command {
 
 		builder := build.Runner{
 			Opts: &build.Opts{
-				Composer: composer,
-				Ostree:   ostree,
-				Podman:   podman,
-				Force:    force,
-				DryRun:   dryRun,
-				Paths:    paths,
-				Events:   events,
+				Composer:      composer,
+				Ostree:        ostree,
+				Podman:        podman,
+				Force:         force,
+				DryRun:        dryRun,
+				Retries:       3,
+				RetryInterval: time.Second * 10,
+				Paths:         paths,
+				Events:        events,
 			},
 		}
 		err = builder.Build(ctx, buildPlan)

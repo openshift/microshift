@@ -2,6 +2,7 @@ package build
 
 import (
 	"context"
+	"time"
 
 	"github.com/openshift/microshift/test/pkg/compose/helpers"
 	"github.com/openshift/microshift/test/pkg/testutil"
@@ -15,6 +16,9 @@ type Opts struct {
 
 	Force  bool
 	DryRun bool
+
+	Retries       int
+	RetryInterval time.Duration
 
 	Paths  *testutil.Paths
 	Events testutil.EventManager
