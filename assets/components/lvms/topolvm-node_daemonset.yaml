@@ -93,6 +93,7 @@ spec:
           requests:
             cpu: 1m
             memory: 2Mi
+        terminationMessagePolicy: FallbackToLogsOnError
         volumeMounts:
         - mountPath: /run/topolvm
           name: node-plugin-dir
@@ -106,6 +107,7 @@ spec:
           requests:
             cpu: 1m
             memory: 7Mi
+        terminationMessagePolicy: FallbackToLogsOnError
         volumeMounts:
         - mountPath: /run/topolvm
           name: node-plugin-dir

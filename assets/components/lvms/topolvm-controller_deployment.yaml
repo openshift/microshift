@@ -52,6 +52,7 @@ spec:
           requests:
             cpu: 2m
             memory: 31Mi
+        terminationMessagePolicy: FallbackToLogsOnError
         volumeMounts:
         - mountPath: /run/topolvm
           name: socket-dir
@@ -78,6 +79,7 @@ spec:
           requests:
             cpu: 2m
             memory: 35Mi
+        terminationMessagePolicy: FallbackToLogsOnError
         volumeMounts:
         - mountPath: /run/topolvm
           name: socket-dir
@@ -89,6 +91,7 @@ spec:
           requests:
             cpu: 1m
             memory: 23Mi
+        terminationMessagePolicy: FallbackToLogsOnError
         volumeMounts:
         - mountPath: /run/topolvm
           name: socket-dir
@@ -100,6 +103,7 @@ spec:
           requests:
             cpu: 1m
             memory: 9Mi
+        terminationMessagePolicy: FallbackToLogsOnError
         volumeMounts:
         - mountPath: /run/topolvm
           name: socket-dir
@@ -113,6 +117,7 @@ spec:
         - name: ADDRESS
           value: /csi/csi-topolvm.sock
         imagePullPolicy: IfNotPresent
+        terminationMessagePolicy: FallbackToLogsOnError
         volumeMounts:
         - name: socket-dir
           mountPath: /csi
@@ -125,6 +130,7 @@ spec:
         image: '{{ .ReleaseImage.openssl }}'
         name: self-signed-cert-generator
         resources: {}
+        terminationMessagePolicy: FallbackToLogsOnError
         volumeMounts:
         - mountPath: /certs
           name: certs
