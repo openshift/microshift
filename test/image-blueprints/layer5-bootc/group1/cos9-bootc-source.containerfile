@@ -53,6 +53,3 @@ monitor_path = ""\n\
 monitor_cgroup = "system.slice"\n\
 monitor_exec_cgroup = ""\n\
 privileged_without_host_devices = false\n' > "/etc/crio/crio.conf.d/microshift-crun.conf"
-
-# Extend Greenboot wait timeout to 10m for MicroShift to be ready
-RUN printf '\nMICROSHIFT_WAIT_TIMEOUT_SEC=600\n' >> /etc/greenboot/greenboot.conf
