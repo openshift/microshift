@@ -65,6 +65,7 @@ spec:
         securityContext:
           privileged: true
           runAsUser: 0
+        terminationMessagePolicy: FallbackToLogsOnError
         volumeMounts:
         - mountPath: /etc/topolvm
           name: lvmd-config-dir
@@ -118,6 +119,7 @@ spec:
         image: '{{ .ReleaseImage.openssl }}'
         name: file-checker
         resources: {}
+        terminationMessagePolicy: FallbackToLogsOnError
         volumeMounts:
         - mountPath: /etc/topolvm
           name: lvmd-config-dir
