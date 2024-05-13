@@ -5,6 +5,7 @@ USHIFT_LOCAL_REPO_FILE=/etc/yum.repos.d/microshift-local.repo
 OCP_MIRROR_REPO_FILE=/etc/yum.repos.d/openshift-mirror-beta.repo
 OCP_DTPATH_REPO_FILE=/etc/yum.repos.d/openshift-fast-datapath.repo
 OCP_RHOCP_REPO_FILE=/etc/yum.repos.d/openshift-rhocp.repo
+CENTOS_NFV_SIG_REPO_FILE=/etc/yum.repos.d/microshift-sig-nfv.repo
 
 usage() {
     echo "Usage: $(basename $0) <-create microshift_local_repo_path | -delete>"
@@ -36,6 +37,15 @@ config_centos9_repos() {
 [openshift-mirror-beta]
 name=OpenShift Mirror Beta Repository
 baseurl=https://mirror.openshift.com/pub/openshift-v4/{{ .Env.UNAME_M }}/dependencies/rpms/4.{{ .Env.PREVIOUS_MINOR_VERSION }}-el9-beta/
+enabled=1
+gpgcheck=0
+skip_if_unavailable=0
+EOF
+
+    cat > "${CENTOS_NFV_SIG_REPO_FILE}" <<EOF
+[nfv-sig]
+name=CentOS Stream 9 - SIG NFV
+baseurl=http://mirror.stream.centos.org/SIGs/9-stream/nfv/{{ .Env.UNAME_M }}/openvswitch-2/
 enabled=1
 gpgcheck=0
 skip_if_unavailable=0
