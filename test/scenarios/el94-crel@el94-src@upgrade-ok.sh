@@ -27,6 +27,6 @@ scenario_run_tests() {
         return 0
     fi
     run_tests host1 \
-              suites/upgrade/upgrade-successful.robot \
-              --variable "TARGET_REF:rhel-9.4-microshift-source"
+              --variable "TARGET_REF:rhel-9.4-microshift-source" \
+              suites/upgrade/upgrade-successful.robot
 }
