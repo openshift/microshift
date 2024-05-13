@@ -59,6 +59,11 @@ if ${ENABLE_REGISTRY_MIRROR}; then
     bash -x ./bin/mirror_registry.sh
 fi
 
+# Enable edk2 debugging
+if [ -f /usr/share/qemu/firmware/52-edk2-aarch64-verbose-qcow2.json ] ; then
+    sudo cp -f /usr/share/qemu/firmware/52-edk2-aarch64-verbose-qcow2.json /usr/share/qemu/firmware/10-DEBUG-edk2-aarch64-verbose-qcow2.json
+fi
+
 # Show the summary of the output of the parallel jobs.
 if [ -t 0 ]; then
     progress="--progress"

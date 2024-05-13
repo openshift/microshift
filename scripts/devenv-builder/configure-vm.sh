@@ -136,7 +136,7 @@ if ${INSTALL_BUILD_DEPS} || ${BUILD_AND_RUN}; then
     if ${DNF_UPDATE}; then
         "${DNF_RETRY}" "update"
     fi
-    "${DNF_RETRY}" "install" "gcc git golang cockpit make jq selinux-policy-devel rpm-build jq bash-completion avahi-tools createrepo"
+    "${DNF_RETRY}" "install" "gcc gdb git golang cockpit make jq selinux-policy-devel rpm-build jq bash-completion avahi-tools createrepo"
     sudo systemctl enable --now cockpit.socket
 fi
 

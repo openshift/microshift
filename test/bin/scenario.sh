@@ -510,13 +510,13 @@ launch_vm() {
         # exit after 1m, it sends the KILL signal to terminate the process.
         # Note: Using the '--wait <time>' virt-install options may not work for
         # failed installations when 'unbuffer' command is used.
-        local timeout_install="timeout -v --kill-after=1m ${VM_BOOT_TIMEOUT}s"
+        local timeout_install="timeout -v -s SIGUSR1 ${VM_BOOT_TIMEOUT}s"
         # When bash creates a background job (using `&`),
         # the bg job does not get its own TTY.
         # If the TTY is not provided, virt-install refuses
         # to attach to the console. `unbuffer` provides the TTY.
         # shellcheck disable=SC2086
-        if ! ${timeout_install} unbuffer sudo virt-install \
+        if ! unbuffer sudo virt-install \
             --autoconsole text \
             --graphics "${graphics_args}" \
             --name "${full_vmname}" \
@@ -530,7 +530,7 @@ launch_vm() {
             ${vm_fs_args} \
             --extra-args "${vm_extra_args}" \
             ${vm_initrd_inject} \
-            --wait ; then
+            --wait 20 ; then
 
             # Check if the command exited within 15s due to a failure
             local vm_create_end
@@ -557,6 +557,10 @@ launch_vm() {
         # the caller considers the script fully complete.
         # Note: this option is disabled automatically in interactive sessions
         # for easier troubleshooting of failed installations.
+        pid=$(sudo pgrep qemu -a | grep "${full_vmname}" | awk '{print $1}')
+        sudo pstack "${pid}"
+        sleep 15
+
         if [ ! -t 0 ] ; then
             sudo virsh destroy "${full_vmname}" || true
         fi

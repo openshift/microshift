@@ -63,7 +63,8 @@ function get_base_isofile {
 function action_config() {
     local -r deps="libvirt virt-manager virt-install virt-viewer libvirt-client qemu-kvm qemu-img sshpass"
     
-    "${SCRIPTDIR}/../dnf_retry.sh" "install" "${deps}"
+    "${SCRIPTDIR}/../dnf_retry.sh" "install"           "${deps}"
+    "${SCRIPTDIR}/../dnf_retry.sh" "debuginfo-install" "${deps}"
 
     if [ "$(systemctl is-active libvirtd.socket)" != "active" ] ; then
         echo "Enabling libvirtd"
