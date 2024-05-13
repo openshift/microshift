@@ -18,7 +18,7 @@ export TEST_RANDOMIZATION=none
 
 scenario_create_vms() {
     prepare_kickstart host1 kickstart-liveimg.ks.template ""
-    launch_vm host1 "rhel-9.2"
+    launch_vm host1 "rhel-9.4"
 
     # Open the firewall ports. Other scenarios get this behavior by
     # embedding settings in the blueprint, but there is no blueprint
