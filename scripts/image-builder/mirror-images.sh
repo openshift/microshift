@@ -32,16 +32,17 @@ function skopeo_retry() {
 }
 
 function mirror_registry() {
-    local img_pull_file=$1
-    local img_file_list=$2
-    local dest_registry=$3
+    local -r img_pull_file=$1
+    local -r img_file_list=$2
+    local -r dest_registry=$3
 
-    # Use timestamp and counter as a tag on the target images to avoid
-    # their overwrite by the 'latest' automatic tagging
-    local -r image_tag=mirror-$(date +%y%m%d%H%M%S)
-    local image_cnt=1
+    process_image_copy() {
+        local -r img_pull_file=$1
+        local -r dest_registry=$2
+        local -r image_tag=$3
+        local -r image_cnt=$(cut -d' ' -f1 <<< "$4")
+        local -r src_img=$(cut -d' ' -f2 <<< "$4")
 
-    while read -r src_img ; do
         # Remove the source registry prefix and SHA
         local dst_img
         dst_img=$(echo "${src_img}" | cut -d '/' -f 2-)
@@ -55,10 +56,19 @@ function mirror_registry() {
             --preserve-digests \
             --authfile "${img_pull_file}" \
             docker://"${src_img}" docker://"${dst_img}:${image_tag}-${image_cnt}"
-        # Increment the counter
-        (( image_cnt += 1 ))
+    }
 
-    done < "${img_file_list}"
+    # Use timestamp as a tag on the target images to avoid
+    # their overwrite by the 'latest' automatic tagging
+    local -r image_tag=mirror-$(date +%y%m%d%H%M%S)
+    # Export functions for xargs to use
+    export -f process_image_copy
+    export -f skopeo_retry
+    # Generate a list with an incremental counter for each image and run copy in parallel.
+    # Note that the counter and image pairs are passed as one argument by replacing "{}" in xarg input.
+    awk '{print NR, $0}' "${img_file_list}" | \
+        xargs -P 8 -I {} \
+        bash -c 'process_image_copy "$@"' _ "${img_pull_file}" "${dest_registry}" "${image_tag}" "{}"
 }
 
 function registry_to_dir() {
