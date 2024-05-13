@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Sourced from cleanup_scenario.sh and uses functions defined there.
+# Sourced from scenario.sh and uses functions defined there.
 
 start_commit=rhel-9.4-microshift-crel
 
@@ -27,6 +27,7 @@ scenario_run_tests() {
         return 0
     fi
     run_tests host1 \
-              --variable "TARGET_REF:rhel-9.4-microshift-source" \
-              suites/upgrade/upgrade-successful.robot
+        --variable "FAILING_REF:rhel-9.4-microshift-source" \
+        --variable "REASON:fail_greenboot" \
+        suites/upgrade/upgrade-fails-and-rolls-back.robot
 }
