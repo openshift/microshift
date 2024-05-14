@@ -65,6 +65,7 @@ spec:
         securityContext:
           privileged: true
           runAsUser: 0
+        terminationMessagePolicy: FallbackToLogsOnError
         volumeMounts:
         - mountPath: /etc/topolvm
           name: lvmd-config-dir
@@ -92,6 +93,7 @@ spec:
           requests:
             cpu: 1m
             memory: 2Mi
+        terminationMessagePolicy: FallbackToLogsOnError
         volumeMounts:
         - mountPath: /run/topolvm
           name: node-plugin-dir
@@ -105,6 +107,7 @@ spec:
           requests:
             cpu: 1m
             memory: 7Mi
+        terminationMessagePolicy: FallbackToLogsOnError
         volumeMounts:
         - mountPath: /run/topolvm
           name: node-plugin-dir
@@ -118,6 +121,7 @@ spec:
         image: '{{ .ReleaseImage.openssl }}'
         name: file-checker
         resources: {}
+        terminationMessagePolicy: FallbackToLogsOnError
         volumeMounts:
         - mountPath: /etc/topolvm
           name: lvmd-config-dir
