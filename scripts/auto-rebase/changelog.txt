@@ -1,8 +1,18 @@
-- router image-amd64 e1e59b3337700e2b94c8d5c5e5414519f9785614 to e17abdff0095edee65e3be926f98b758aa3c87bb
-  - f0ad69e 2024-05-08T07:45:09+00:00 OCPBUGS-29690: Count active services before setting weight to 1
+- kubernetes embedded-component fd36fb9acf9a99270f4fca3f5817fd52c8bc58b4 to e709aa5eb1daae19266b1154fbaba3ee547908c1
+  - a4b3ae2ed 2024-04-30T14:54:12-05:00 UPSTREAM: 117669: Fix flaky HPA e2e tests by not failing on context cancelled (#117669)
 
-- ovn-kubernetes image-arm64 255b35826c736426a2f39ea1bbc72adeb19cf1e6 to 9e8b26ff12e0bd2b22a0e0d8262c561b7d828e17
+- ovn-kubernetes image-amd64 255b35826c736426a2f39ea1bbc72adeb19cf1e6 to 3ca943a29cd745587594ff47e3343807b6203021
   - 07b0774 2024-05-08T14:17:27-04:00 bump OVS version
   - 21431f2 2024-05-07T16:33:20+02:00 Fix endpoint selection for externalTrafficPolicy=local
+  - 815daa2 2024-04-11T09:03:41+00:00 Periodically check the ovnkube-node certificate is not expired
   - f918596 2024-04-10T15:33:57+02:00 Full implementation of KEP-1669 ProxyTerminatingEndpoints
+
+- kubernetes image-amd64 fd36fb9acf9a99270f4fca3f5817fd52c8bc58b4 to e709aa5eb1daae19266b1154fbaba3ee547908c1
+  - a4b3ae2ed 2024-04-30T14:54:12-05:00 UPSTREAM: 117669: Fix flaky HPA e2e tests by not failing on context cancelled (#117669)
+
+- ovn-kubernetes image-arm64 9e8b26ff12e0bd2b22a0e0d8262c561b7d828e17 to 3ca943a29cd745587594ff47e3343807b6203021
+  - 815daa2 2024-04-11T09:03:41+00:00 Periodically check the ovnkube-node certificate is not expired
+
+- kubernetes image-arm64 fd36fb9acf9a99270f4fca3f5817fd52c8bc58b4 to e709aa5eb1daae19266b1154fbaba3ee547908c1
+  - a4b3ae2ed 2024-04-30T14:54:12-05:00 UPSTREAM: 117669: Fix flaky HPA e2e tests by not failing on context cancelled (#117669)
 
