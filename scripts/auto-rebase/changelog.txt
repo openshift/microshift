@@ -1,0 +1,22 @@
+- kubernetes embedded-component 8ca71f701a70cb3eed8603478e5f6c1676319fc4 to 416ecaf479d8fa342937068dede6481f5c7a1441
+  - da3c5db4b 2024-05-07T10:43:04+00:00 UPSTREAM: <carry>: Provide SCC access via RBAC
+
+- machine-config-operator embedded-component 1b35c4e05377a34e8403108837bb6773e2c3566d to 10694c7cc870f32bc7bf1888d1b8199f13119ff4
+  - 0b190004 2024-05-07T15:54:22-04:00 Don't error if the certs.d dir doesn't exist yet
+
+- ovn-kubernetes image-amd64 c108b9f7bb51ad5462f410e54eb2177103c86ee5 to 7fab1ff7a30e89dc2c65ecb86784a84ef4026dbb
+  - 51441bb 2024-05-07T16:19:20+02:00 Fix endpoint selection for externalTrafficPolicy=local
+  - 77f6635 2024-05-06T22:32:48-04:00 CARRY: fix ordering of MCS blocking iptables rules
+  - fd072ed 2024-05-06T21:57:20-04:00 Fixes regression to service openflow rules
+  - b20d82c 2024-05-06T21:56:54-04:00 Various fixes and improvements to iptables stuff
+  - 8e4fcf9 2024-05-06T21:56:45-04:00 Fixes iptables issue where SNAT rules were being added multiple times
+  - fd5762c 2024-05-06T21:56:32-04:00 Adds iptables-restore capability for service sync
+  - 45c2ee4 2024-05-06T21:56:19-04:00 Vendor trozet/go-iptables
+  - 37d4a80 2024-05-06T21:54:05-04:00 Fixes inefficient service parsing
+  - 0343a8e 2024-05-06T11:50:38-04:00 Improves service iptables efficiency on start up
+  - 133eedb 2024-05-01T01:54:52-04:00 bump OVS version
+  - 32d2ce1 2024-04-10T15:30:47+02:00 Full implementation of KEP-1669 ProxyTerminatingEndpoints
+
+- kubernetes image-amd64 8ca71f701a70cb3eed8603478e5f6c1676319fc4 to 416ecaf479d8fa342937068dede6481f5c7a1441
+  - da3c5db4b 2024-05-07T10:43:04+00:00 UPSTREAM: <carry>: Provide SCC access via RBAC
+
