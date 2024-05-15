@@ -8,9 +8,6 @@ source "${SCRIPTDIR}/common.sh"
 DISTRIBUTION_VERSION=2.8.3
 REGISTRY_IMAGE="quay.io/microshift/distribution:${DISTRIBUTION_VERSION}"
 REGISTRY_HOST=${REGISTRY_HOST:-$(hostname):5000}
-REGISTRY_ROOT=${REGISTRY_ROOT:-${OUTPUTDIR}/mirror-registry}
-REGISTRY_CONTAINER_DIR=${REGISTRY_CONTAINER_DIR:-${REGISTRY_ROOT}/containers}
-REGISTRY_CONTAINER_LIST=${REGISTRY_CONTAINER_LIST:-${REGISTRY_ROOT}/mirror-list.txt}
 PULL_SECRET=${PULL_SECRET:-${HOME}/.pull-secret.json}
 LOCAL_REGISTRY_NAME="microshift-local-registry"
 
@@ -28,14 +25,7 @@ retry_pull_image() {
     return 1
 }
 
-get_container_images() {
-    local -r container_file=$1
-    sort -u "${container_file}" > "${REGISTRY_CONTAINER_LIST}"
-}
-
 prereqs() {
-    mkdir -p "${REGISTRY_ROOT}"
-    mkdir -p "${REGISTRY_CONTAINER_DIR}"
     "${SCRIPTDIR}/../../scripts/dnf_retry.sh" "install" "podman skopeo jq"
     podman stop "${LOCAL_REGISTRY_NAME}" || true
     podman rm "${LOCAL_REGISTRY_NAME}" || true
@@ -55,11 +45,12 @@ EOF
 }
 
 mirror_images() {
-    local -r list_file=$1
-    get_container_images "${list_file}"
-    "${ROOTDIR}/scripts/image-builder/mirror-images.sh" --reg-to-dir "${PULL_SECRET}" "${REGISTRY_CONTAINER_LIST}" "${REGISTRY_CONTAINER_DIR}"
-    "${ROOTDIR}/scripts/image-builder/mirror-images.sh" --dir-to-reg "${REGISTRY_ROOT}/local-auth.json" "${REGISTRY_CONTAINER_DIR}" "${REGISTRY_HOST}"
-    rm -rf "${REGISTRY_CONTAINER_DIR}"
+    local -r ifile=$1
+    local -r ofile=$(mktemp /tmp/container-list.XXXXXXXX)
+
+    sort -u "${ifile}" > "${ofile}"
+    "${ROOTDIR}/scripts/image-builder/mirror-images.sh" --mirror "${PULL_SECRET}" "${ofile}" "${REGISTRY_HOST}"
+    rm -f "${ofile}"
 }
 
 usage() {
