@@ -65,7 +65,7 @@ In case `config.yaml` is not provided, the following default settings will be us
 apiServer:
     advertiseAddress: ""
     auditLog:
-        maxFileAge: 10
+        maxFileAge: 0
         maxFileSize: 200
         maxFiles: 10
         profile: Default
