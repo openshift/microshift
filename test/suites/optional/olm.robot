@@ -21,7 +21,7 @@ Deploy CertManager From OperatorHubIO
     [Documentation]    Deploy CertManager from OperatorHub Catalog.
     [Setup]    Run Keywords
     ...    OLM Should Be Ready
-    ...    Create OperatorHub CatalogSource
+    ...    Create CatalogSource
     ...    Create CertManager Subscription
 
     ${csv}=    Get CSV Name From Subscription    ${OPERATORS_NAMESPACE}    my-cert-manager
@@ -30,7 +30,7 @@ Deploy CertManager From OperatorHubIO
     Wait For Deployments    ${OPERATORS_NAMESPACE}    @{deployments}
 
     [Teardown]    Run Keywords
-    ...    Delete OperatorHub CatalogSource
+    ...    Delete CatalogSource
     ...    AND
     ...    Delete CertManager Subscription
     ...    AND
@@ -57,11 +57,11 @@ OLM Should Be Ready
     Named Deployment Should Be Available    catalog-operator    openshift-operator-lifecycle-manager
     Named Deployment Should Be Available    olm-operator    openshift-operator-lifecycle-manager
 
-Create OperatorHub CatalogSource
-    [Documentation]    Create CatalogSource resource pointing to OperatorHub.io catalog.
+Create CatalogSource
+    [Documentation]    Create CatalogSource resource with Red Hat Community Catalog Index.
     Oc Create    -f ${CATALOG_SOURCE}
     Wait Until Keyword Succeeds    120s    5s
-    ...    CatalogSource Should Be Ready    ${MARKETPLACE_NAMESPACE}    operatorhubio-catalog
+    ...    CatalogSource Should Be Ready    ${MARKETPLACE_NAMESPACE}    redhat-community-catalog
 
 CatalogSource Should Be Ready
     [Documentation]    Checks if CatalogSource is ready.
@@ -118,8 +118,8 @@ Wait For Deployments
         Named Deployment Should Be Available    ${deploy}    ${namespace}    120s
     END
 
-Delete OperatorHub CatalogSource
-    [Documentation]    Delete OperatorHub's CatalogSource.
+Delete CatalogSource
+    [Documentation]    Delete CatalogSource.
     Oc Delete    -f ${CATALOG_SOURCE}
 
 Delete CertManager Subscription
