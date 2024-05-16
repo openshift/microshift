@@ -99,7 +99,7 @@ func (c *Config) fillDefaults() error {
 		Port:            6443,
 	}
 	c.ApiServer.AuditLog = AuditLog{
-		MaxFileAge:  10,
+		MaxFileAge:  0,
 		MaxFiles:    10,
 		MaxFileSize: 200,
 		Profile:     "Default",
