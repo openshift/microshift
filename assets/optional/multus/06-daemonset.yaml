@@ -32,7 +32,7 @@ spec:
       - operator: Exists
       initContainers:
       - name: install-container-network-plugins
-        image: container-networking-plugins
+        image: containernetworking-plugins-microshift
         imagePullPolicy: IfNotPresent
         command: [ "/bin/bash", "-ec", "--" ]
         args:
@@ -45,13 +45,12 @@ spec:
           name: cni-binary-copy
         env:
         - name: DEFAULT_SOURCE_DIRECTORY
-          # TODO: Change when microshift-specific multus image is ready
-          value: "/usr/src/plugins/rhel9/bin/"
+          value: "/usr/src/plugins/bin/"
         - name: BINARIES_TO_COPY
           value: "{bridge,ipvlan,macvlan,static,dhcp,host-local}"
       containers:
       - name: kube-multus
-        image: multus-cni
+        image: multus-cni-microshift
         imagePullPolicy: IfNotPresent
         command: [ "/bin/bash", "-ec", "--" ]
         args:
@@ -104,8 +103,7 @@ spec:
           mountPath: /host/run/cni/bin
         env:
         - name: DEFAULT_SOURCE_DIRECTORY
-          # TODO: Change when microshift-specific multus image is ready
-          value: "/usr/src/multus-cni/rhel9/bin/"
+          value: "/usr/src/multus-cni/bin/"
         - name: BINARIES_TO_COPY
           value: "multus"
       terminationGracePeriodSeconds: 10

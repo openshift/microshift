@@ -951,7 +951,7 @@ update_multus_images() {
 images:
 EOF
 
-        for container in multus-cni container-networking-plugins; do
+        for container in multus-cni-microshift containernetworking-plugins-microshift; do
             local new_image
             new_image=$(jq -r ".references.spec.tags[] | select(.name == \"${container}\") | .from.name" "${release_file}")
             local new_image_name="${new_image%@*}"

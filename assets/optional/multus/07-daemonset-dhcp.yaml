@@ -31,7 +31,7 @@ spec:
       - operator: Exists
       initContainers:
       - name: dhcp-daemon-initialization
-        image: container-networking-plugins
+        image: containernetworking-plugins-microshift
         command: ["/bin/sh"]
         args: ["-c", "rm -f /host/run/cni/dhcp.sock"]
         volumeMounts:
@@ -39,7 +39,7 @@ spec:
           mountPath: /host/run/cni
       containers:
       - name: dhcp-daemon
-        image: container-networking-plugins
+        image: containernetworking-plugins-microshift
         imagePullPolicy: Always
         command: ["/usr/src/plugins/bin/dhcp"]
         args:
