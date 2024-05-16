@@ -6,5 +6,5 @@ metadata:
 spec:
   channel: stable
   name: cert-manager
-  source: operatorhubio-catalog
+  source: redhat-community-catalog
   sourceNamespace: openshift-marketplace
