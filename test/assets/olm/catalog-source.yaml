@@ -1,12 +1,12 @@
 apiVersion: operators.coreos.com/v1alpha1
 kind: CatalogSource
 metadata:
-  name: redhat-community-catalog
+  name: redhat-operators
   namespace: openshift-marketplace
 spec:
   sourceType: grpc
-  image: registry.redhat.io/redhat/community-operator-index:v4.16
-  displayName: Red Hat Community Operators
+  image: registry.redhat.io/redhat/redhat-operator-index:v4.16
+  displayName: Red Hat Operators
   publisher: Red Hat
   grpcPodConfig:
     securityContextConfig: restricted
