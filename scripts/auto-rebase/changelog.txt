@@ -1,20 +1,3 @@
-- ovn-kubernetes image-amd64 3ca943a29cd745587594ff47e3343807b6203021 to 4f1ff16966404db73da7a64c5e0e535847c5dbbe
-  - 011ab4a 2024-05-10T15:53:57+00:00 CARRY: fix ordering of MCS blocking iptables rules
-  - 1b525a8 2024-05-10T15:53:57+00:00 Fixes regression to service openflow rules
-  - 424fb37 2024-05-10T15:53:57+00:00 Various fixes and improvements to iptables stuff
-  - 550ad71 2024-05-10T15:53:57+00:00 Fixes iptables issue where SNAT rules were being added multiple times
-  - 28437de 2024-05-10T15:53:57+00:00 Adds iptables-restore capability for service sync
-  - 5949ca4 2024-05-10T15:53:57+00:00 Vendor trozet/go-iptables
-  - 332072c 2024-05-10T15:53:57+00:00 Fixes inefficient service parsing
-  - 68c780c 2024-05-10T15:53:57+00:00 Improves service iptables efficiency on start up
-
-- ovn-kubernetes image-arm64 3ca943a29cd745587594ff47e3343807b6203021 to 4f1ff16966404db73da7a64c5e0e535847c5dbbe
-  - 011ab4a 2024-05-10T15:53:57+00:00 CARRY: fix ordering of MCS blocking iptables rules
-  - 1b525a8 2024-05-10T15:53:57+00:00 Fixes regression to service openflow rules
-  - 424fb37 2024-05-10T15:53:57+00:00 Various fixes and improvements to iptables stuff
-  - 550ad71 2024-05-10T15:53:57+00:00 Fixes iptables issue where SNAT rules were being added multiple times
-  - 28437de 2024-05-10T15:53:57+00:00 Adds iptables-restore capability for service sync
-  - 5949ca4 2024-05-10T15:53:57+00:00 Vendor trozet/go-iptables
-  - 332072c 2024-05-10T15:53:57+00:00 Fixes inefficient service parsing
-  - 68c780c 2024-05-10T15:53:57+00:00 Improves service iptables efficiency on start up
+- kubernetes image-arm64 e709aa5eb1daae19266b1154fbaba3ee547908c1 to 048520e2550f287e0b8013cd53b2bf74e6af1529
+  - 945a68be9 2024-05-08T14:11:00+00:00 UPSTREAM: <carry>: Provide SCC access via RBAC
 
