@@ -975,13 +975,15 @@ action_run() {
 
 usage() {
     cat - <<EOF
-scenario.sh (create|boot|run|cleanup|rerun|login) scenario-script [args]
+scenario.sh (create|boot|run|cleanup|rerun|recreate|login) scenario-script [args]
 
   create|boot -- Set up the infrastructure for the test, such as VMs.
 
   run -- Run the scenario.
 
   rerun -- cleanup, create, run for the same scenario.
+
+  recreate -- cleanup and create for the same scenario.
 
   cleanup -- Remove the VMs created for the scenario.
 
@@ -1017,6 +1019,10 @@ case "${action}" in
         "action_${action}" "$@"
         ;;
     boot)
+        action_create "$@"
+        ;;
+    recreate)
+        action_cleanup "$@"
         action_create "$@"
         ;;
     rerun)
