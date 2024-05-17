@@ -1,150 +1,23 @@
-- cluster-csi-snapshot-controller-operator embedded-component 66048040bb40915f0903a0e7de0bbc6f4b4faef5 to 439826e1a723c094717877db0f2ca1848d0fb10a
-  - 8835601 2024-02-28T14:14:04+01:00 set required-scc for openshift workloads
+- cluster-dns-operator embedded-component a975508a6bf7ba15e71409118b784ec030a48efc to a14431f277364605ede8e95530453c5fb7267e33
+  - 2b219fd 2024-05-14T19:40:59+05:30 Add DNSNameResolver CRD and add DNSNameResolver controller
+  - 7ea761d 2024-05-10T20:44:36+05:30 Bump openshift/api version
 
-- cluster-dns-operator embedded-component a2c4492a942ec51f900a1784bc239d16aa39e4e6 to a975508a6bf7ba15e71409118b784ec030a48efc
-  - 7bd4edd 2024-05-09T12:40:32-04:00 OCPBUGS-32941: Bump golang 1.21, openshift/api, controller-runtime, Kubernetes, and make     corresponding file and CRD generation changes.
+- openshift-controller-manager embedded-component 0adb6e13297e736ca99ec92133ec9713ebcc9838 to 7637f1a4335bbfac3ed1a0cc07b26c0079e26125
+  - 5bcef36 2024-05-14T14:31:35-04:00 fallback to alternate method of obtaining token signing key hash
+  - d27cf1e 2024-05-13T14:32:20-04:00 add image pull secret to mountable secrets
+  - 8bfd46a 2024-05-13T14:32:20-04:00 internal registry mage pull secret controllers
 
-- cluster-ingress-operator embedded-component 5b42422d0f5f488fc1deb3db08a7b97367cfd2a6 to 5b4f6283f48046b85f60bf9d75fa5c9222329cd1
-  - 77c61ba 2024-04-24T12:50:46-04:00 Allow operator to update Route spec.subdomain
+- oc image-amd64 e63d210d5d25af4a8733f19bdca5f3523696bfd6 to 1073b293db8e3310a51d03294113b660cdde61f0
+  - 1073b293 2024-05-14T21:48:57+00:00 OCPBUGS-32682: Fix the retrieval of API objects with an empty name (#1765)
 
-- cluster-kube-apiserver-operator embedded-component 8fae6b51944c1f90e6875f55072a3d85db40e743 to 313bc06912503443d3422da07b4ea4ea57b9fc84
-  - 4ea21e0 2024-05-10T18:49:51+02:00 go mod tidy && go mod vendor
-  - 46ef601 2024-05-10T18:49:51+02:00 add a controller that reconciles SCCs' volumes
-  - fdc7ec6 2024-05-09T16:30:44+02:00 Revert "add SNO control plane high cpu usage alert"
+- router image-amd64 56ab14f257e123317c00ce7ba5b4ecae7b2e0102 to 4d9b8c4afa6cd89b41f4bd5e7c09ccddd8679bc6
+  - 2f06f7c 2024-05-14T16:15:04+05:30 CFE-1020: feature:route external certificate reference
+  - c1d3e84 2024-05-14T16:13:30+05:30 CFE-1020: Bump library-go and update deps
 
-- cluster-network-operator embedded-component 21291740019b0ef308fdd090c229d12efce33c80 to 9c3a57e03e67a4f582a405a47dd0300e235e6f97
-  - b8f25d7 2024-05-08T13:06:33+02:00 Add ref to MicroShift's Multus and CNI Plugins
-  - a6fbafe 2024-02-13T15:39:57+02:00 sysctl: add more safe sysctls to safelist
+- oc image-arm64 e63d210d5d25af4a8733f19bdca5f3523696bfd6 to 1073b293db8e3310a51d03294113b660cdde61f0
+  - 1073b293 2024-05-14T21:48:57+00:00 OCPBUGS-32682: Fix the retrieval of API objects with an empty name (#1765)
 
-- kubernetes embedded-component 6c10b2df178d8497ea61ca6749a73b31fee740a7 to 4a87b5377b72baed624e7afa315bb8622117ebf9
-  - 39d3a4ca7 2024-05-13T20:49:13+05:30 UPSTREAM: <carry>: Update RouteExternalCertificate validation in Route ObjectValidator
-  - 7ad807898 2024-05-13T20:46:29+05:30 UPSTREAM: <drop>: bump openshift/library-go and update deps
-  - 43f02d10e 2024-05-13T10:47:06+02:00 UPSTREAM: 124795: e2e: DaemonSet maxSurge test should account for terminated pods
-
-- machine-config-operator embedded-component aa28d1b034bcfaff79537d2fc979de018a77e4a0 to 4b809a4214f5c426411b51686dbf3b4326948e7c
-  - e8e945c6 2024-05-08T07:58:06-04:00 Final cleanup
-  - 17e78c73 2024-05-08T07:58:06-04:00 adds Red Hat entitlement functionality for on-cluster layering
-  - 1da14cc3 2024-05-08T07:58:05-04:00 Build controller test fixes for the new OCB API
-  - 084a4e39 2024-05-08T07:57:09-04:00 Test fixes for the new OCB API
-  - c8949996 2024-05-08T07:57:09-04:00 further cleanup
-  - f58b5939 2024-05-08T07:57:07-04:00 ocb-api
-  - 4c04643d 2024-05-07T10:09:39-05:00 OCPBUGS-33357: Check both ready and health ingress endpoints
-  - bab7ffe1 2024-05-06T17:36:24+02:00 Reference `stream-coreos` instead of `centos-stream-coreos-9`
-  - f0b8084b 2024-05-03T16:43:45-04:00 cert_writer: skip kube-apiserver-lb-signer
-  - 255f028e 2024-05-03T12:34:08-04:00 certificate_writer: clean up disk-write logic
-
-- openshift-controller-manager embedded-component 6d49ea351dbc89e6ea51062b40a7d408780f75dc to 0adb6e13297e736ca99ec92133ec9713ebcc9838
-  - 71a085e 2024-05-12T19:44:36-04:00 Revert "Merge pull request #288 from sanchezl/pull-secret-controller-v2"
-  - ef265c1 2024-05-03T11:18:18-04:00 handle tombstone
-  - 893fef2 2024-04-17T16:57:13+05:30 OCPBUGS-30688: bump go-jose to fix CVE-2024-28176
-  - 6c8f6cf 2024-04-09T07:29:54-04:00 add image pull secret to mountable secrets
-  - 0ca8aa3 2024-04-09T07:29:54-04:00 internal registry mage pull secret controllers
-  - 88e965f 2024-04-09T07:29:54-04:00 go shim shh!
-
-- oc image-amd64 1e4757fd86487950dc14b59a3379bb70fdcd9b4c to e63d210d5d25af4a8733f19bdca5f3523696bfd6
-  - 7dfe72fe 2024-05-10T15:08:09-04:00 Support multiple icsps in migrate icsp
-  - 4aa7d25f 2024-05-04T03:07:42-04:00 [OCPNODE-2282]Support multiple ImageDigestMirrorSet objects in the the single file
-
-- coredns image-amd64 f937ebfb6b8a31fc194597a1ade0e93e73e474b5 to 5afff2a989779a52e00ef9579cfbc03f36b5334a
-  - 5839299 2024-05-09T15:23:37-04:00 UPSTREAM: <carry>: Address CVE-2023-49295 and CVE-2024-22189
-  - 6b897ee 2024-05-07T20:38:15+05:30 UPSTREAM: <carry>: openshift: Move ocp_dnsnameresolver before cache in plugin chaining order
-
-- kube-rbac-proxy image-amd64 04d0a78154b45ce300e176836bd47c6004603e88 to 8ea2c994df4296ec161023d8ff85f9ea0e383216
-  - f027071 2024-05-07T18:54:13+02:00 bump go version down
-  - 550fd3e 2024-05-07T18:51:17+02:00 go mod vendor
-  - 123627f 2024-05-07T17:08:02+02:00 scripts: force pull tags
-  - c84b2e8 2024-05-07T15:58:52+02:00 cut release v0.17.1
-  - 9f2d51d 2024-05-07T15:58:52+02:00 go*: bump deps
-  - b2e9035 2024-05-07T14:06:09+02:00 c/k/app: add non-empty listen address check
-  - c88a0b1 2024-05-07T14:03:41+02:00 c/k/a/opts: fix bool,deprecated flags regression
-  - 8c9e583 2024-04-18T18:50:07+02:00 *: cut v0.17.0 release
-  - 37bc5b7 2024-04-16T14:07:08+02:00 bump golang/x/net to v0.24.0
-  - eaebcdc 2024-03-18T17:13:21+01:00 add changed README.md
-  - d4bd26a 2024-03-18T14:37:12+01:00 add command line args --kube-api-qps/--kube-api-burst
-  - f49629e 2024-03-13T23:23:15+00:00 build(deps): bump google.golang.org/protobuf from 1.31.0 to 1.33.0
-  - 9309b67 2024-02-08T13:59:37+01:00 v0.16.0: bump krp version
-  - f4347a6 2024-02-08T13:58:51+01:00 go*: bump deps
-  - 0566550 2024-02-08T10:17:58+01:00 pkg/tls,cmd/krp/app/options: fix breaking changes
-  - c6e521e 2024-02-07T15:31:24+01:00 go.*: bump deps and k8s.io to v1.28.6
-  - 4e6f735 2023-11-13T14:27:47-08:00 Allow BASEIMAGE to be overriden at build time
-
-- ovn-kubernetes image-amd64 e7517c1c125d482c01e53baf0670ba777ca2c9d2 to 0dce1201b8cc2f9ce1d64091538584b4a1f783ec
-  - b0f28185 2024-05-10T08:10:49-07:00 allow multiple interface of different NADs of the same network in a Pod
-  - 24cf0166 2024-05-10T08:07:50-07:00 kind: Add parameter to configure overlay MTU
-  - fb6df3d0 2024-05-10T08:05:06-07:00 e2e util: do not assume /etc/origin/openvswitch exists
-  - 57e5e17e 2024-05-10T16:30:47+02:00 Node delete should not retry when no node-subnets exist
-  - b2b8feb1 2024-05-10T10:59:55+02:00 Fix EIP GARP config overwritten by gateway update
-  - 6609780e 2024-05-09T17:26:20-04:00 check disk usage before and after test steps (#4305)
-  - 6e392342 2024-05-09T16:59:01+02:00 EgressIP: Reload certificates for the grpc heatlhcheck server
-  - b23e34f7 2024-05-09T16:59:01+02:00 grpc vendoring
-  - eb2ecb37 2024-05-08T11:23:13-07:00 Add OVNKubeAllocatedSubnetsDoNotMatch alert.
-  - 05d4bea7 2024-05-08T11:23:13-07:00 Update ovnkube_clustermanager_allocated_v4_host_subnets metric during add/delete node event
-  - 0f7ff0fa 2024-05-08T20:51:54+05:30 Add doc for DNSNameResolver
-  - bac9a79a 2024-05-08T16:31:58+05:30 Add support for DNSNameResolver in ovnkube-controller
-  - b1c70fad 2024-05-08T16:31:58+05:30 Add support for DNSNameResolver in clustermanager
-  - 37d4acea 2024-05-08T16:31:58+05:30 Update kubebuilder validation of DNSName field of EgressFirewall to support wildcard DNS name
-  - ff439837 2024-05-08T16:31:58+05:30 Bump openshift/api and openshift/client-go versions
-  - b54a2300 2024-05-07T11:35:16-07:00 document on how we do web designing for ovn-kubernetes project
-  - d3d9a44f 2024-05-07T08:30:03-07:00 add egressqos API spec documentation
-  - 9d56d803 2024-05-07T08:30:03-07:00 add egressqos API spec documentation
-  - e5a407e6 2024-05-07T08:30:03-07:00 add egressservice API spec documentation
-  - 399f8294 2024-05-07T08:30:03-07:00 add egressqos API spec documentation
-  - 4378caf5 2024-05-07T08:30:03-07:00 add egressfirewall API spec documentation
-  - d2dc3cbf 2024-05-06T16:29:02+05:30 Add logic to unfurl Aggregate type error in IsSuppressedError function
-  - 60d6d9c9 2024-05-04T23:55:08-07:00 unprivileged ovnkube-node cannot collect OVS process metrics
-  - 9bf6a484 2024-05-04T23:27:35-07:00 fix references to images once for all
-  - 7ca3128a 2024-05-04T23:27:35-07:00 fix reference to broken anchors in various pages
-  - 3374c88f 2024-05-04T15:39:25-07:00 [index.md] correct the links and typos in this file
-  - 20d89526 2024-05-04T15:39:25-07:00 fix incorrect paths to images in <img> tag
-  - c66d1f44 2024-05-04T14:36:31-07:00 add all the missing files to avoid 404 page not found error
-  - 04451e0c 2024-05-04T14:36:31-07:00 fix typo in the file name, it is missing a hyphen
-  - 0a2bef2e 2024-05-04T13:43:09-07:00 add getting-started/overview.md file to fix page not found error
-
-- kubernetes image-amd64 6c10b2df178d8497ea61ca6749a73b31fee740a7 to 4a87b5377b72baed624e7afa315bb8622117ebf9
-  - 39d3a4ca7 2024-05-13T20:49:13+05:30 UPSTREAM: <carry>: Update RouteExternalCertificate validation in Route ObjectValidator
-  - 7ad807898 2024-05-13T20:46:29+05:30 UPSTREAM: <drop>: bump openshift/library-go and update deps
-  - 43f02d10e 2024-05-13T10:47:06+02:00 UPSTREAM: 124795: e2e: DaemonSet maxSurge test should account for terminated pods
-
-- oc image-arm64 4e02e9f74d070093e47ecf7d4d0afc29cff6f77f to e63d210d5d25af4a8733f19bdca5f3523696bfd6
-  - 7dfe72fe 2024-05-10T15:08:09-04:00 Support multiple icsps in migrate icsp
-
-- coredns image-arm64 32bf22529f7c0db11f3b9f57b9d35e074505a689 to 5afff2a989779a52e00ef9579cfbc03f36b5334a
-  - 6b897ee 2024-05-07T20:38:15+05:30 UPSTREAM: <carry>: openshift: Move ocp_dnsnameresolver before cache in plugin chaining order
-
-- ovn-kubernetes image-arm64 e7517c1c125d482c01e53baf0670ba777ca2c9d2 to 0dce1201b8cc2f9ce1d64091538584b4a1f783ec
-  - b0f28185 2024-05-10T08:10:49-07:00 allow multiple interface of different NADs of the same network in a Pod
-  - 24cf0166 2024-05-10T08:07:50-07:00 kind: Add parameter to configure overlay MTU
-  - fb6df3d0 2024-05-10T08:05:06-07:00 e2e util: do not assume /etc/origin/openvswitch exists
-  - 57e5e17e 2024-05-10T16:30:47+02:00 Node delete should not retry when no node-subnets exist
-  - b2b8feb1 2024-05-10T10:59:55+02:00 Fix EIP GARP config overwritten by gateway update
-  - 6609780e 2024-05-09T17:26:20-04:00 check disk usage before and after test steps (#4305)
-  - 6e392342 2024-05-09T16:59:01+02:00 EgressIP: Reload certificates for the grpc heatlhcheck server
-  - b23e34f7 2024-05-09T16:59:01+02:00 grpc vendoring
-  - eb2ecb37 2024-05-08T11:23:13-07:00 Add OVNKubeAllocatedSubnetsDoNotMatch alert.
-  - 05d4bea7 2024-05-08T11:23:13-07:00 Update ovnkube_clustermanager_allocated_v4_host_subnets metric during add/delete node event
-  - 0f7ff0fa 2024-05-08T20:51:54+05:30 Add doc for DNSNameResolver
-  - bac9a79a 2024-05-08T16:31:58+05:30 Add support for DNSNameResolver in ovnkube-controller
-  - b1c70fad 2024-05-08T16:31:58+05:30 Add support for DNSNameResolver in clustermanager
-  - 37d4acea 2024-05-08T16:31:58+05:30 Update kubebuilder validation of DNSName field of EgressFirewall to support wildcard DNS name
-  - ff439837 2024-05-08T16:31:58+05:30 Bump openshift/api and openshift/client-go versions
-  - b54a2300 2024-05-07T11:35:16-07:00 document on how we do web designing for ovn-kubernetes project
-  - d3d9a44f 2024-05-07T08:30:03-07:00 add egressqos API spec documentation
-  - 9d56d803 2024-05-07T08:30:03-07:00 add egressqos API spec documentation
-  - e5a407e6 2024-05-07T08:30:03-07:00 add egressservice API spec documentation
-  - 399f8294 2024-05-07T08:30:03-07:00 add egressqos API spec documentation
-  - 4378caf5 2024-05-07T08:30:03-07:00 add egressfirewall API spec documentation
-  - d2dc3cbf 2024-05-06T16:29:02+05:30 Add logic to unfurl Aggregate type error in IsSuppressedError function
-  - 60d6d9c9 2024-05-04T23:55:08-07:00 unprivileged ovnkube-node cannot collect OVS process metrics
-  - 9bf6a484 2024-05-04T23:27:35-07:00 fix references to images once for all
-  - 7ca3128a 2024-05-04T23:27:35-07:00 fix reference to broken anchors in various pages
-  - 3374c88f 2024-05-04T15:39:25-07:00 [index.md] correct the links and typos in this file
-  - 20d89526 2024-05-04T15:39:25-07:00 fix incorrect paths to images in <img> tag
-  - c66d1f44 2024-05-04T14:36:31-07:00 add all the missing files to avoid 404 page not found error
-  - 04451e0c 2024-05-04T14:36:31-07:00 fix typo in the file name, it is missing a hyphen
-  - 0a2bef2e 2024-05-04T13:43:09-07:00 add getting-started/overview.md file to fix page not found error
-
-- kubernetes image-arm64 6c10b2df178d8497ea61ca6749a73b31fee740a7 to 4a87b5377b72baed624e7afa315bb8622117ebf9
-  - 39d3a4ca7 2024-05-13T20:49:13+05:30 UPSTREAM: <carry>: Update RouteExternalCertificate validation in Route ObjectValidator
-  - 7ad807898 2024-05-13T20:46:29+05:30 UPSTREAM: <drop>: bump openshift/library-go and update deps
-  - 43f02d10e 2024-05-13T10:47:06+02:00 UPSTREAM: 124795: e2e: DaemonSet maxSurge test should account for terminated pods
+- router image-arm64 56ab14f257e123317c00ce7ba5b4ecae7b2e0102 to 4d9b8c4afa6cd89b41f4bd5e7c09ccddd8679bc6
+  - 2f06f7c 2024-05-14T16:15:04+05:30 CFE-1020: feature:route external certificate reference
+  - c1d3e84 2024-05-14T16:13:30+05:30 CFE-1020: Bump library-go and update deps
 
