@@ -1,23 +1,75 @@
-- cluster-dns-operator embedded-component a975508a6bf7ba15e71409118b784ec030a48efc to a14431f277364605ede8e95530453c5fb7267e33
-  - 2b219fd 2024-05-14T19:40:59+05:30 Add DNSNameResolver CRD and add DNSNameResolver controller
-  - 7ea761d 2024-05-10T20:44:36+05:30 Bump openshift/api version
+- cluster-network-operator embedded-component 9c3a57e03e67a4f582a405a47dd0300e235e6f97 to 019fa77b2afb6186320ebe15604f7d26d76bcfab
+  - 763c565 2024-05-13T13:39:49+02:00 Update network operator status for IPsec
+  - 71ddff7 2024-05-07T14:33:21+05:30 CFE-888: ovnkube:add enable-dns-name-resolver flag
 
-- openshift-controller-manager embedded-component 0adb6e13297e736ca99ec92133ec9713ebcc9838 to 7637f1a4335bbfac3ed1a0cc07b26c0079e26125
-  - 5bcef36 2024-05-14T14:31:35-04:00 fallback to alternate method of obtaining token signing key hash
-  - d27cf1e 2024-05-13T14:32:20-04:00 add image pull secret to mountable secrets
-  - 8bfd46a 2024-05-13T14:32:20-04:00 internal registry mage pull secret controllers
+- machine-config-operator embedded-component 4b809a4214f5c426411b51686dbf3b4326948e7c to 90660896de993b904e1d5e7612b5c8652cbb4390
+  - 6a912328 2024-05-15T09:52:25+01:00 If multiple hostnames are returned, use the first one for the Node name
 
-- oc image-amd64 e63d210d5d25af4a8733f19bdca5f3523696bfd6 to 1073b293db8e3310a51d03294113b660cdde61f0
-  - 1073b293 2024-05-14T21:48:57+00:00 OCPBUGS-32682: Fix the retrieval of API objects with an empty name (#1765)
+- openshift-controller-manager embedded-component 7637f1a4335bbfac3ed1a0cc07b26c0079e26125 to c736111041fca03f933739e7c55f223e72705623
+  - 3488d3a 2024-05-17T16:15:10+00:00 assume co-ownership of the imagepullsecrets field
+  - 0caa857 2024-05-17T13:12:45+00:00 handle tombstones in filter handler
 
-- router image-amd64 56ab14f257e123317c00ce7ba5b4ecae7b2e0102 to 4d9b8c4afa6cd89b41f4bd5e7c09ccddd8679bc6
-  - 2f06f7c 2024-05-14T16:15:04+05:30 CFE-1020: feature:route external certificate reference
-  - c1d3e84 2024-05-14T16:13:30+05:30 CFE-1020: Bump library-go and update deps
+- ovn-kubernetes image-amd64 0dce1201b8cc2f9ce1d64091538584b4a1f783ec to e93cd5b3c805949b2c97366f6f75855deec74432
+  - 315362aa 2024-05-16T21:21:24+02:00 Update centos to 9?
+  - b6fbf553 2024-05-16T08:14:35-07:00 docs: multi-homing cleanup
+  - 7527fcff 2024-05-16T16:33:48+02:00 Add e2e for multi-nic EIP & ETP=local; same node
+  - 05433c77 2024-05-16T16:33:48+02:00 E2E: Add e2e for EIP && ETP=local; diff node
+  - fe3f3f0d 2024-05-16T16:33:40+02:00 EIP: Add QoS rule at prio 103 to mark reply packet
+  - f5f7d10e 2024-05-16T14:34:23+02:00 (B)ANP: Add rule count metrics
+  - fbb42906 2024-05-16T13:55:26+02:00 Vendor golang.org/x/exp/constraints
+  - eacb4679 2024-05-16T13:55:19+02:00 GetL3L4MatchesFromNamedPorts: Iterate over sorted namedPorts map
+  - 3a2690fe 2024-05-16T13:40:24+02:00 Keep gressRule.namedPorts as slice of ports(!ptr)
+  - 8bf08b9a 2024-05-15T11:32:31+02:00 fix README.md
+  - 9d101931 2024-05-15T09:00:17+02:00 E2E: Enable NamedPortConformance Test
+  - e9aedf6f 2024-05-15T09:00:17+02:00 BANP: Add UT for NamedPorts
+  - 6dc2d55d 2024-05-15T09:00:17+02:00 ANP: Add UT for NamedPorts
+  - 09b2f0a7 2024-05-15T09:00:17+02:00 Add Support for NamedPorts
+  - bf6aae7e 2024-05-15T09:00:17+02:00 Introduce NamedNetworkPolicyPort Representation
+  - 07fa4d1f 2024-05-14T15:21:27+02:00 Add QoSTable DBIndexing
+  - 71fa6739 2024-05-14T15:17:05+02:00 EIP: Add new no-reroute LRP for reply traffic
+  - 3b8371ea 2024-05-14T15:17:05+02:00 Rename AddressSetIPFamilyKey to IPFamilyKey
+  - 5c244e2e 2024-05-14T15:17:04+02:00 EIP: Don't hard code 1008 mark
+  - c37f1c3c 2024-05-14T15:17:04+02:00 Update OVN Schema to 24.03.1
+  - 42e28121 2024-05-14T15:17:04+02:00 Bump OVN to 24.03
+  - 4edc508c 2024-05-13T13:01:11+02:00 Fix id to not have spaces
+  - b080781d 2024-05-10T15:52:22-04:00 Enables scaling worker nodes in KIND cluster
+  - ef0c4551 2024-05-10T08:56:41-07:00 deploy, helm: add enable service template config flag
+  - 30735e7f 2024-05-10T08:56:41-07:00 make svc_template_support configurable, default is enabled
+  - 8bfce09b 2024-05-10T10:44:34+02:00 update-codegen: set controller-gen version
+  - 62d85ecd 2024-05-10T10:44:25+02:00 Update codegen to explicitly set output-base for predictable output folder that doesn't depend on GOPATH. Clean up generated folder after copying apis. Specify code-generator version, as release-1.30 changes scripts parameters.
+  - 18129dcc 2024-05-02T13:52:31+02:00 Fix templates for issues/prs in OVN Kubernetes
+  - a5627f4a 2024-04-30T17:34:23+02:00 Remove ginkgo deprecated APIs from e2e test
+  - 16a059d2 2023-11-09T15:32:20+08:00 Update gateway_init.go
 
-- oc image-arm64 e63d210d5d25af4a8733f19bdca5f3523696bfd6 to 1073b293db8e3310a51d03294113b660cdde61f0
-  - 1073b293 2024-05-14T21:48:57+00:00 OCPBUGS-32682: Fix the retrieval of API objects with an empty name (#1765)
-
-- router image-arm64 56ab14f257e123317c00ce7ba5b4ecae7b2e0102 to 4d9b8c4afa6cd89b41f4bd5e7c09ccddd8679bc6
-  - 2f06f7c 2024-05-14T16:15:04+05:30 CFE-1020: feature:route external certificate reference
-  - c1d3e84 2024-05-14T16:13:30+05:30 CFE-1020: Bump library-go and update deps
+- ovn-kubernetes image-arm64 0dce1201b8cc2f9ce1d64091538584b4a1f783ec to e93cd5b3c805949b2c97366f6f75855deec74432
+  - 315362aa 2024-05-16T21:21:24+02:00 Update centos to 9?
+  - b6fbf553 2024-05-16T08:14:35-07:00 docs: multi-homing cleanup
+  - 7527fcff 2024-05-16T16:33:48+02:00 Add e2e for multi-nic EIP & ETP=local; same node
+  - 05433c77 2024-05-16T16:33:48+02:00 E2E: Add e2e for EIP && ETP=local; diff node
+  - fe3f3f0d 2024-05-16T16:33:40+02:00 EIP: Add QoS rule at prio 103 to mark reply packet
+  - f5f7d10e 2024-05-16T14:34:23+02:00 (B)ANP: Add rule count metrics
+  - fbb42906 2024-05-16T13:55:26+02:00 Vendor golang.org/x/exp/constraints
+  - eacb4679 2024-05-16T13:55:19+02:00 GetL3L4MatchesFromNamedPorts: Iterate over sorted namedPorts map
+  - 3a2690fe 2024-05-16T13:40:24+02:00 Keep gressRule.namedPorts as slice of ports(!ptr)
+  - 8bf08b9a 2024-05-15T11:32:31+02:00 fix README.md
+  - 9d101931 2024-05-15T09:00:17+02:00 E2E: Enable NamedPortConformance Test
+  - e9aedf6f 2024-05-15T09:00:17+02:00 BANP: Add UT for NamedPorts
+  - 6dc2d55d 2024-05-15T09:00:17+02:00 ANP: Add UT for NamedPorts
+  - 09b2f0a7 2024-05-15T09:00:17+02:00 Add Support for NamedPorts
+  - bf6aae7e 2024-05-15T09:00:17+02:00 Introduce NamedNetworkPolicyPort Representation
+  - 07fa4d1f 2024-05-14T15:21:27+02:00 Add QoSTable DBIndexing
+  - 71fa6739 2024-05-14T15:17:05+02:00 EIP: Add new no-reroute LRP for reply traffic
+  - 3b8371ea 2024-05-14T15:17:05+02:00 Rename AddressSetIPFamilyKey to IPFamilyKey
+  - 5c244e2e 2024-05-14T15:17:04+02:00 EIP: Don't hard code 1008 mark
+  - c37f1c3c 2024-05-14T15:17:04+02:00 Update OVN Schema to 24.03.1
+  - 42e28121 2024-05-14T15:17:04+02:00 Bump OVN to 24.03
+  - 4edc508c 2024-05-13T13:01:11+02:00 Fix id to not have spaces
+  - b080781d 2024-05-10T15:52:22-04:00 Enables scaling worker nodes in KIND cluster
+  - ef0c4551 2024-05-10T08:56:41-07:00 deploy, helm: add enable service template config flag
+  - 30735e7f 2024-05-10T08:56:41-07:00 make svc_template_support configurable, default is enabled
+  - 8bfce09b 2024-05-10T10:44:34+02:00 update-codegen: set controller-gen version
+  - 62d85ecd 2024-05-10T10:44:25+02:00 Update codegen to explicitly set output-base for predictable output folder that doesn't depend on GOPATH. Clean up generated folder after copying apis. Specify code-generator version, as release-1.30 changes scripts parameters.
+  - 18129dcc 2024-05-02T13:52:31+02:00 Fix templates for issues/prs in OVN Kubernetes
+  - a5627f4a 2024-04-30T17:34:23+02:00 Remove ginkgo deprecated APIs from e2e test
+  - 16a059d2 2023-11-09T15:32:20+08:00 Update gateway_init.go
 
