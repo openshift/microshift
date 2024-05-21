@@ -7,19 +7,19 @@ distro = "rhel-94"
 
 [[packages]]
 name = "microshift"
-version = "4.{{ .Env.FAKE_NEXT_MINOR_VERSION }}.*"
+version = "{{ .FakeNext.Version }}"
 
 [[packages]]
 name = "microshift-greenboot"
-version = "4.{{ .Env.FAKE_NEXT_MINOR_VERSION }}.*"
+version = "{{ .FakeNext.Version }}"
 
 [[packages]]
 name = "microshift-networking"
-version = "4.{{ .Env.FAKE_NEXT_MINOR_VERSION }}.*"
+version = "{{ .FakeNext.Version }}"
 
 [[packages]]
 name = "microshift-selinux"
-version = "4.{{ .Env.FAKE_NEXT_MINOR_VERSION }}.*"
+version = "{{ .FakeNext.Version }}"
 
 [[packages]]
 name = "microshift-test-agent"
