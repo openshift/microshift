@@ -95,17 +95,15 @@ run_image_build() {
         fi
 
         $(dry_run) exec sg "weldr" "./bin/microshift-tests compose ${targets}"
-        #$(dry_run) ./bin/microshift-tests ${targets}
     else
         # Fall back to full build when not running in CI
-        #$(dry_run) ./bin/microshift-tests
         $(dry_run) exec sg "weldr" "./bin/microshift-tests compose"
     fi
 }
 
 # Run bootc image build
 run_bootc_image_build() {
-    $(dry_run) exec sg "weldr" "./bin/microshift-tests compose ./image-blueprints/layer1-base/group1/centos9.image-fetcher ./image-blueprints/layer5-bootc"
+    $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints/layer5-bootc
 }
 
 cat /etc/os-release
