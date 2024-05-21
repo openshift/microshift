@@ -613,3 +613,8 @@ func (u *utilProxyMock) PathExistsAndIsNotEmpty(path string) (bool, error) {
 	args := u.Called(path)
 	return args.Bool(0), args.Error(1)
 }
+
+func (u *utilProxyMock) RemoveAll(path string) error {
+	args := u.Called(path)
+	return args.Error(0)
+}

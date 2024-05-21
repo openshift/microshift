@@ -87,6 +87,7 @@ func (ib *Runner) executeGroup(ctx context.Context, group Group) error {
 type UtilProxy interface {
 	PathExistsAndIsNotEmpty(path string) (bool, error)
 	Rename(oldpath, newpath string) error
+	RemoveAll(path string) error
 }
 
 var _ UtilProxy = (*utilProxy)(nil)
@@ -105,6 +106,10 @@ func (*utilProxy) PathExistsAndIsNotEmpty(path string) (bool, error) {
 	return util.PathExistsAndIsNotEmpty(path)
 }
 
+func (*utilProxy) RemoveAll(path string) error {
+	return os.RemoveAll(path)
+}
+
 func NewDryRunUtilProxy() UtilProxy {
 	return &dryRunUtilProxy{}
 }
@@ -117,4 +122,8 @@ func (u *dryRunUtilProxy) Rename(oldpath string, newpath string) error {
 
 func (*dryRunUtilProxy) PathExistsAndIsNotEmpty(path string) (bool, error) {
 	return true, nil
+}
+
+func (*dryRunUtilProxy) RemoveAll(path string) error {
+	return nil
 }

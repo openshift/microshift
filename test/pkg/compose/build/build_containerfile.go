@@ -3,12 +3,10 @@ package build
 import (
 	"context"
 	"fmt"
-	"os"
 	"path/filepath"
 	"strings"
 	"time"
 
-	"github.com/openshift/microshift/pkg/util"
 	"github.com/openshift/microshift/test/pkg/testutil"
 	"k8s.io/klog/v2"
 )
@@ -56,7 +54,7 @@ func (c *ContainerfileBuild) Execute(ctx context.Context, opts *Opts) error {
 	start := time.Now()
 
 	output := filepath.Join(opts.Paths.BootCImages, c.Name)
-	if exists, err := util.PathExists(output); err != nil {
+	if exists, err := opts.Utils.PathExistsAndIsNotEmpty(output); err != nil {
 		return err
 	} else if exists {
 		if !opts.Force {
@@ -75,7 +73,7 @@ func (c *ContainerfileBuild) Execute(ctx context.Context, opts *Opts) error {
 			return nil
 		}
 
-		if err := os.RemoveAll(output); err != nil {
+		if err := opts.Utils.RemoveAll(output); err != nil {
 			return err
 		}
 	}
