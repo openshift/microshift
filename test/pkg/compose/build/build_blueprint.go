@@ -350,7 +350,7 @@ func (b *BlueprintBuild) composeCommit(ctx context.Context, opts *Opts) error {
 
 	friendlyName := fmt.Sprintf("%s_edge-commit_%s", b.Name, commitID)
 
-	waitErr := opts.Composer.WaitForCompose(ctx, commitID, friendlyName, 15*time.Minute)
+	waitErr := opts.Composer.WaitForCompose(ctx, commitID, friendlyName, 25*time.Minute)
 
 	// Get metadata and logs even if composing failed, unless context was cancelled
 	if errors.Is(waitErr, context.Canceled) {
@@ -389,7 +389,7 @@ func (b *BlueprintBuild) composeInstaller(ctx context.Context, opts *Opts) error
 
 	friendlyName := fmt.Sprintf("%s_image-installer_%s", b.Name, installerID)
 
-	waitErr := opts.Composer.WaitForCompose(ctx, installerID, friendlyName, 25*time.Minute)
+	waitErr := opts.Composer.WaitForCompose(ctx, installerID, friendlyName, 35*time.Minute)
 
 	// Get metadata and logs even if composing failed, unless context was cancelled
 	if errors.Is(waitErr, context.Canceled) {
