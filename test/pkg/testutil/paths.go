@@ -20,6 +20,10 @@ type Paths struct {
 }
 
 func NewPaths(microshiftTestDirAbs string) (*Paths, error) {
+	return newPaths(microshiftTestDirAbs, os.MkdirAll)
+}
+
+func newPaths(microshiftTestDirAbs string, mkdirAll func(string, os.FileMode) error) (*Paths, error) {
 	microShiftRepoRootPath := filepath.Join(microshiftTestDirAbs, "..")
 	artifactsMainDir := filepath.Join(microShiftRepoRootPath, "_output", "test-images")
 
@@ -47,7 +51,7 @@ func NewPaths(microshiftTestDirAbs string) (*Paths, error) {
 	}
 	errs := []error{}
 	for _, p := range toCreate {
-		if err := os.MkdirAll(p, 0755); err != nil {
+		if err := mkdirAll(p, 0755); err != nil {
 			errs = append(errs, err)
 		}
 	}
