@@ -1,3 +1,12 @@
-- kubernetes image-arm64 e709aa5eb1daae19266b1154fbaba3ee547908c1 to 048520e2550f287e0b8013cd53b2bf74e6af1529
+- kubernetes embedded-component e709aa5eb1daae19266b1154fbaba3ee547908c1 to 048520e2550f287e0b8013cd53b2bf74e6af1529
   - 945a68be9 2024-05-08T14:11:00+00:00 UPSTREAM: <carry>: Provide SCC access via RBAC
+
+- router image-amd64 e17abdff0095edee65e3be926f98b758aa3c87bb to 99b0c3119a0e2c7db4775cd58dcdb3e33dda9d3e
+  - d711d8c 2024-05-16T17:14:29+00:00 OCPBUGS-26539: Reject routes with MD5 certs
+
+- kubernetes image-amd64 e709aa5eb1daae19266b1154fbaba3ee547908c1 to 048520e2550f287e0b8013cd53b2bf74e6af1529
+  - 945a68be9 2024-05-08T14:11:00+00:00 UPSTREAM: <carry>: Provide SCC access via RBAC
+
+- router image-arm64 e17abdff0095edee65e3be926f98b758aa3c87bb to 99b0c3119a0e2c7db4775cd58dcdb3e33dda9d3e
+  - d711d8c 2024-05-16T17:14:29+00:00 OCPBUGS-26539: Reject routes with MD5 certs
 
