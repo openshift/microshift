@@ -19,10 +19,11 @@ package controllers
 import (
 	"context"
 	"fmt"
-	"github.com/openshift/library-go/pkg/crypto"
 	"reflect"
 	"strings"
 	"testing"
+
+	"github.com/openshift/library-go/pkg/crypto"
 
 	"github.com/google/go-cmp/cmp"
 	embedded "github.com/openshift/microshift/assets"
@@ -54,7 +55,6 @@ func TestConfigure(t *testing.T) {
 		fmt.Sprintf("--cluster-signing-cert-file=%s", clusterSigningCert),
 		"--cluster-signing-duration=720h",
 		fmt.Sprintf("--cluster-signing-key-file=%s", clusterSigningKey),
-		"--configure-cloud-routes=false",
 		"--controllers=*",
 		"--controllers=-bootstrapsigner",
 		"--controllers=-tokencleaner",
