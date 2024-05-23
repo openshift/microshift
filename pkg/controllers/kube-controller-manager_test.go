@@ -54,7 +54,6 @@ func TestConfigure(t *testing.T) {
 		fmt.Sprintf("--cluster-signing-cert-file=%s", clusterSigningCert),
 		"--cluster-signing-duration=720h",
 		fmt.Sprintf("--cluster-signing-key-file=%s", clusterSigningKey),
-		"--configure-cloud-routes=false",
 		"--controllers=*",
 		"--controllers=-bootstrapsigner",
 		"--controllers=-tokencleaner",
