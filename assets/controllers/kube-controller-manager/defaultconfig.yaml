@@ -5,8 +5,6 @@ extendedArguments:
     - "true"
   allocate-node-cidrs:
     - "false"
-  configure-cloud-routes:
-    - "false"
   use-service-account-credentials:
     - "true"
   leader-elect:
