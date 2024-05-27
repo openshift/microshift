@@ -1,3 +1,0 @@
-- cluster-ingress-operator embedded-component 0106cb99b340a2f266a88700b4250f11457ffb05 to 9fc0b5c93e5da4ce37ee5e191992e44218311549
-  - e5d4c1b 2024-05-22T19:15:33+00:00 Use centos7 tag for quay.io/centos7/httpd-24-centos7 image
-
