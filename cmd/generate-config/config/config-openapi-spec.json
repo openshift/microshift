@@ -20,7 +20,7 @@
       ],
       "properties": {
         "advertiseAddress": {
-          "description": "Kube apiserver advertise address to work around the certificates issue when requiring external access using the node IP. This will turn into the IP configured in the endpoint slice for kubernetes service. Must be a reachable IP from pods. Defaults to service network CIDR first address.",
+          "description": "Kube apiserver advertise address to work around the certificates issue\nwhen requiring external access using the node IP. This will turn into\nthe IP configured in the endpoint slice for kubernetes service. Must be\na reachable IP from pods. Defaults to service network CIDR first\naddress.",
           "type": "string"
         },
         "auditLog": {
@@ -97,7 +97,7 @@
       ],
       "properties": {
         "logLevel": {
-          "description": "Valid values are: \"Normal\", \"Debug\", \"Trace\", \"TraceAll\". Defaults to \"Normal\".",
+          "description": "Valid values are: \"Normal\", \"Debug\", \"Trace\", \"TraceAll\".\nDefaults to \"Normal\".",
           "type": "string",
           "default": "Normal"
         }
@@ -110,7 +110,7 @@
       ],
       "properties": {
         "baseDomain": {
-          "description": "baseDomain is the base domain of the cluster. All managed DNS records will be sub-domains of this base. \n For example, given the base domain `example.com`, router exposed domains will be formed as `*.apps.example.com` by default, and API service will have a DNS entry for `api.example.com`, as well as \"api-int.example.com\" for internal k8s API access. \n Once set, this field cannot be changed.",
+          "description": "baseDomain is the base domain of the cluster. All managed DNS records will\nbe sub-domains of this base.\n\n\nFor example, given the base domain `example.com`, router exposed\ndomains will be formed as `*.apps.example.com` by default,\nand API service will have a DNS entry for `api.example.com`,\nas well as \"api-int.example.com\" for internal k8s API access.\n\n\nOnce set, this field cannot be changed.",
           "type": "string",
           "default": "example.com",
           "example": "microshift.example.com"
@@ -124,7 +124,7 @@
       ],
       "properties": {
         "memoryLimitMB": {
-          "description": "Set a memory limit on the etcd process; etcd will begin paging memory when it gets to this value. 0 means no limit.",
+          "description": "Set a memory limit on the etcd process; etcd will begin paging\nmemory when it gets to this value. 0 means no limit.",
           "type": "integer",
           "format": "int64"
         }
@@ -140,7 +140,7 @@
       ],
       "properties": {
         "listenAddress": {
-          "description": "List of IP addresses and NIC names where the router will be listening. The NIC names get translated to all their configured IPs dynamically. Defaults to the configured IPs in the host at MicroShift start.",
+          "description": "List of IP addresses and NIC names where the router will be listening. The NIC\nnames get translated to all their configured IPs dynamically. Defaults to the\nconfigured IPs in the host at MicroShift start.",
           "type": "array",
           "items": {
             "type": "string"
@@ -172,7 +172,7 @@
           ],
           "properties": {
             "namespaceOwnership": {
-              "description": "Describes how host name claims across namespaces should be handled. \n Value must be one of: \n - Strict: Do not allow routes in different namespaces to claim the same host. \n - InterNamespaceAllowed: Allow routes to claim different paths of the same host name across namespaces. \n If empty, the default is InterNamespaceAllowed.",
+              "description": "Describes how host name claims across namespaces should be handled.\n\n\nValue must be one of:\n\n\n- Strict: Do not allow routes in different namespaces to claim the same host.\n\n\n- InterNamespaceAllowed: Allow routes to claim different paths of the same\n  host name across namespaces.\n\n\nIf empty, the default is InterNamespaceAllowed.",
               "type": "string",
               "default": "InterNamespaceAllowed"
             }
@@ -192,7 +192,7 @@
       ],
       "properties": {
         "kustomizePaths": {
-          "description": "The locations on the filesystem to scan for kustomization files to use to load manifests. Set to a list of paths to scan only those paths. Set to an empty list to disable loading manifests. The entries in the list can be glob patterns to match multiple subdirectories.",
+          "description": "The locations on the filesystem to scan for kustomization\nfiles to use to load manifests. Set to a list of paths to scan\nonly those paths. Set to an empty list to disable loading\nmanifests. The entries in the list can be glob patterns to\nmatch multiple subdirectories.",
           "type": "array",
           "default": [
             "/usr/lib/microshift/manifests",
@@ -215,7 +215,7 @@
       ],
       "properties": {
         "clusterNetwork": {
-          "description": "IP address pool to use for pod IPs. This field is immutable after installation.",
+          "description": "IP address pool to use for pod IPs.\nThis field is immutable after installation.",
           "type": "array",
           "default": [
             "10.42.0.0/16"
@@ -225,7 +225,7 @@
           }
         },
         "serviceNetwork": {
-          "description": "IP address pool for services. Currently, we only support a single entry here. This field is immutable after installation.",
+          "description": "IP address pool for services.\nCurrently, we only support a single entry here.\nThis field is immutable after installation.",
           "type": "array",
           "default": [
             "10.43.0.0/16"
@@ -235,7 +235,7 @@
           }
         },
         "serviceNodePortRange": {
-          "description": "The port range allowed for Services of type NodePort. If not specified, the default of 30000-32767 will be used. Such Services without a NodePort specified will have one automatically allocated from this range. This parameter can be updated after the cluster is installed.",
+          "description": "The port range allowed for Services of type NodePort.\nIf not specified, the default of 30000-32767 will be used.\nSuch Services without a NodePort specified will have one\nautomatically allocated from this range.\nThis parameter can be updated after the cluster is\ninstalled.",
           "type": "string",
           "default": "30000-32767",
           "pattern": "^([0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])-([0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$"
@@ -254,7 +254,7 @@
           "type": "string"
         },
         "nodeIP": {
-          "description": "IP address of the node, passed to the kubelet. If not specified, kubelet will use the node's default IP address.",
+          "description": "IP address of the node, passed to the kubelet.\nIf not specified, kubelet will use the node's default IP address.",
           "type": "string"
         }
       }

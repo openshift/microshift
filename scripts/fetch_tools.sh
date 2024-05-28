@@ -164,7 +164,7 @@ gettool_govulncheck() {
 }
 
 gettool_controller-gen() {
-    local ver="v0.11.3"
+    local ver="v0.15.0"
     GOBIN=${DEST_DIR} GOFLAGS="" go install sigs.k8s.io/controller-tools/cmd/controller-gen@${ver}
 }
 
