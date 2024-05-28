@@ -492,8 +492,8 @@ github.com/openshift/build-machinery-go v0.0.0-20231128094528-1e9b1b0595c8 h1:cu
 github.com/openshift/build-machinery-go v0.0.0-20231128094528-1e9b1b0595c8/go.mod h1:b1BuldmJlbA/xYtdZvKi+7j5YGB44qJUJDZ9zwiNCfE=
 github.com/openshift/client-go v0.0.0-20240405120947-c67c8325cdd8 h1:HGfbllzRcrJBSiwzNjBCs7sExLUxC5/1evnvlNGB0Cg=
 github.com/openshift/client-go v0.0.0-20240405120947-c67c8325cdd8/go.mod h1:+VvvaMSTUhOt+rBq7NwRLSNxq06hTeRCBqm0j0PQEq8=
-github.com/openshift/cluster-policy-controller v0.0.0-20240311102810-eaea543f4c84 h1:aGtVz0VmcWvTx7cUIN8+38RdttDQJy2pqnVSX96DaXY=
-github.com/openshift/cluster-policy-controller v0.0.0-20240311102810-eaea543f4c84/go.mod h1:xGUXh6jWYgH/ihR5MIBZ/FgTEdftTlUaiPYg7a8SduY=
+github.com/openshift/cluster-policy-controller v0.0.0-20240523091323-c744b9b88807 h1:IQdauLl+KKozv1Nis2SELPLq6sjeamsjr5I41nd9dMo=
+github.com/openshift/cluster-policy-controller v0.0.0-20240523091323-c744b9b88807/go.mod h1:xGUXh6jWYgH/ihR5MIBZ/FgTEdftTlUaiPYg7a8SduY=
 github.com/openshift/etcd/api/v3 v3.5.1-0.20240507115420-bc2fec27ff5b h1:CPC1D3nY1m2aIL2LUzyWIkAfIdBiAqyvGICkucNxV0Q=
 github.com/openshift/etcd/api/v3 v3.5.1-0.20240507115420-bc2fec27ff5b/go.mod h1:gBqlqkcMMZMVTMm4NDZloEVJzxQOQIls8splbqBDa0c=
 github.com/openshift/etcd/client/pkg/v3 v3.5.1-0.20240507115420-bc2fec27ff5b h1:sPFgi7snRPA+JPe9S1b2d1p9ivY0JcwdsMeNVv5BoMU=
@@ -558,8 +558,8 @@ github.com/openshift/kubernetes/staging/src/k8s.io/pod-security-admission v0.0.0
 github.com/openshift/kubernetes/staging/src/k8s.io/pod-security-admission v0.0.0-20240514134208-4a87b5377b72/go.mod h1:nEqWuQNrBxCIeYnc9zWoV3/SW5Lhtrn7vvugEFVk88o=
 github.com/openshift/library-go v0.0.0-20240513090140-e22d25af5587 h1:eZ79/F6bhtqoY78KRRxp5G5yITTgVatMnj5J/cYDumI=
 github.com/openshift/library-go v0.0.0-20240513090140-e22d25af5587/go.mod h1:lFwyRj0XjUf25Da3Q00y+KuaxCWTJ6YzYPDX1+96nco=
-github.com/openshift/route-controller-manager v0.0.0-20240306200724-3112b458983c h1:Y+CdtMBqLmL5RQAYzugn3O5xsKC6y0oYpqY9Ds/PMr8=
-github.com/openshift/route-controller-manager v0.0.0-20240306200724-3112b458983c/go.mod h1:bKMzHzOveoSMWypzUHrHxf62Oq8BOnNhwjTeDp/lgDg=
+github.com/openshift/route-controller-manager v0.0.0-20240522184345-2d872eb0d871 h1:3k8pKka03yIXinTicm6PjR01JfnROD8GVDcqmB0tUP0=
+github.com/openshift/route-controller-manager v0.0.0-20240522184345-2d872eb0d871/go.mod h1:bKMzHzOveoSMWypzUHrHxf62Oq8BOnNhwjTeDp/lgDg=
 github.com/pelletier/go-toml v1.2.0/go.mod h1:5z9KED0ma1S8pY6P1sdut58dfprrGBbd/94hg7ilaic=
 github.com/peterbourgon/diskv v2.0.1+incompatible h1:UBdAOUP5p4RWqPBg048CAvpKN+vxiaj6gdUUzhl4XmI=
 github.com/peterbourgon/diskv v2.0.1+incompatible/go.mod h1:uqqh8zWWbv1HBMNONnaR/tNboyR3/BZd58JJSHlUSCU=
