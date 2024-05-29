@@ -118,11 +118,17 @@ def set_rpm_version_info_vars():
     FAKE_NEXT_MINOR_VERSION = str(int(MINOR_VERSION) + 1)
     SOURCE_VERSION_BASE = common.run_command_in_shell(f"rpm -q --queryformat '%{{version}}' {release_info_rpm_base}")
 
+    CURRENT_RELEASE_VERSION = ""
+    CURRENT_RELEASE_REPO = ""
     current_version_repo = common.run_command_in_shell(f"source {SCRIPTDIR}/get_rel_version_repo.sh; get_rel_version_repo {MINOR_VERSION}")
-    CURRENT_RELEASE_VERSION, CURRENT_RELEASE_REPO = current_version_repo.split(',')
+    if len(current_version_repo):
+        CURRENT_RELEASE_VERSION, CURRENT_RELEASE_REPO = current_version_repo.split(',')
 
+    PREVIOUS_RELEASE_VERSION = ""
+    PREVIOUS_RELEASE_REPO = ""
     previous_version_repo = common.run_command_in_shell(f"source {SCRIPTDIR}/get_rel_version_repo.sh; get_rel_version_repo {PREVIOUS_MINOR_VERSION}")
-    PREVIOUS_RELEASE_VERSION, PREVIOUS_RELEASE_REPO = previous_version_repo.split(',')
+    if len(previous_version_repo):
+        PREVIOUS_RELEASE_VERSION, PREVIOUS_RELEASE_REPO = previous_version_repo.split(',')
 
     RHOCP_MINOR_Y = ""
     RHOCP_MINOR_Y1 = ""
