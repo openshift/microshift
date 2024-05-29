@@ -1,0 +1,9 @@
+- oc image-arm64 2574bc791f17f3ca33d055e7645775e5db79159d to 12a2e98239d503af3e8e30a6fa9d0186c9524b77
+  - 4292caa9 2024-05-23T21:11:34+00:00 `upgrade status`: upgrade -> update
+  - 0614888c 2024-05-23T21:11:34+00:00 OCPBUGS-33903: Simplify output when not updating
+  - bdd75eef 2024-05-18T21:23:01+00:00 adm update status: Fix target version field for install.
+  - 12f58d05 2024-05-18T21:23:01+00:00 adm update status: Show information about upgrade target version
+
+- ovn-kubernetes image-arm64 9e6ce7fd4528f49b60cdbf280a247ff71f3a198e to d90fa545e17a27bdf253fa820a1d7552e3079465
+  - 377a0dfc 2024-05-23T22:57:09+02:00 dns: fix deadlock in case of error
+
