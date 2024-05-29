@@ -1,19 +1,15 @@
-- cluster-ingress-operator embedded-component d876f5ab48e3748057ec196d90b6f7aae633b081 to fc4cab0d129151b919ac09b495c33d627ef55915
-  - 157b281 2024-05-23T21:26:40+00:00 Use centos7 tag for quay.io/centos7/httpd-24-centos7 image
-
-- cluster-kube-apiserver-operator embedded-component 2eab0f9e27db4399bf8885d62ca338c3d02fdd35 to 4302637f4d521bd9880de93df6bc41d44a4b0756
-  - 6956952 2024-05-20T09:36:32+02:00 go mod tidy && go mod vendor
-  - 268e65e 2024-05-20T09:32:38+02:00 add a controller that reconciles SCCs' volumes
-
-- etcd embedded-component b0c0321e61acdf93649ff4b753b2a399ffff411b to 5ed5044c5661c55d297ab0348056b50969af9627
-  - 51a70ffb 2024-04-24T09:31:04-04:00 Revert "Merge pull request #261 from Elbehery/rebase-etcd-3.5.13-openshift-4.14"
-
-- machine-config-operator embedded-component 83d66a9228fef00885826e00ad3d392c5525bfab to 0eac83ac1e841b60677c1ae3f7f3ce07abff8d3a
-  - 7b4adcdb 2024-05-14T13:21:56+00:00 Don't error if the certs.d dir doesn't exist yet
-
-- ovn-kubernetes image-amd64 4f1ff16966404db73da7a64c5e0e535847c5dbbe to d52ee0f64093a606b3b79ed66221720a58d25433
-  - 21402bf 2024-05-09T18:56:07+05:30 drop-forwarding: Add ClusterSubnets to allowed forwarding CIDRs
-
-- ovn-kubernetes image-arm64 4f1ff16966404db73da7a64c5e0e535847c5dbbe to d52ee0f64093a606b3b79ed66221720a58d25433
-  - 21402bf 2024-05-09T18:56:07+05:30 drop-forwarding: Add ClusterSubnets to allowed forwarding CIDRs
+- kubernetes image-arm64 048520e2550f287e0b8013cd53b2bf74e6af1529 to 95b99eeaeda05f23b12c0f50276b84a3f4d7176f
+  - 8164c4477 2024-05-27T17:35:50+00:00 git commit -m "UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image"
+  - f678fbc2f 2024-05-14T10:44:34+00:00 Release commit for Kubernetes v1.27.14
+  - cd50a0aef 2024-05-10T11:12:37+08:00 scheduler: preallocation for NodeToStatusMap
+  - 0d353e049 2024-05-10T11:12:37+08:00 add e2e test when a plugin (in-tree or out-of-tree) return non-existent/illegal nodes, the pod should be scheduled normally if suitable nodes exists
+  - e3cd8eba9 2024-05-10T11:12:37+08:00 test to catch illegal nodeNames returned by PreFilterResult
+  - 1acda7e74 2024-05-10T10:17:32+08:00 add integration test for pod with pvc has node-affinity to non-existent/existent nodes
+  - d446d44f1 2024-05-09T10:30:09+08:00 hotfix when a plugin (in-tree or out-of-tree) return non-existent/illegal nodes, the pod scheduling flow will abort immediately.
+  - 099988d0f 2024-04-30T15:04:35+02:00 Fix PersistentVolumeLabel admission plugin on Azure
+  - 22bc89142 2024-04-23T11:30:55-04:00 cluster/gce: upgrade cos-97-lts -> cos-109-lts
+  - f50d4af9d 2024-04-22T11:22:25+08:00 storage e2e: update hostpath and mock images
+  - bd2cb7205 2024-04-16T15:20:22+00:00 Update CHANGELOG/CHANGELOG-1.27.md for v1.27.13
+  - da55d879b 2023-12-05T14:26:46+01:00 gce: fix test for non-existing instance in cloud
+  - 0e937add0 2023-12-05T14:26:45+01:00 cloud-node-lifecycle controller: add fallback for empty providerID in shutdown
 
