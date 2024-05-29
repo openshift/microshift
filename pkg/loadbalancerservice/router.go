@@ -123,7 +123,7 @@ func ipAddressesFromNIC(name string) ([]string, error) {
 		return nil, err
 	}
 
-	addrList, err := netlink.AddrList(link, netlink.FAMILY_ALL)
+	addrList, err := netlink.AddrList(link, netlink.FAMILY_V4)
 	if err != nil {
 		return nil, err
 	}
