@@ -1,0 +1,51 @@
+- kubernetes embedded-component 416ecaf479d8fa342937068dede6481f5c7a1441 to a2c84a5418d02fbb0230fa10ade3e3c3d093f891
+  - 1e8df4da3 2024-05-15T14:51:23-03:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - 21be1d76a 2024-05-14T10:44:00+00:00 Release commit for Kubernetes v1.28.10
+  - 02c796cff 2024-05-10T10:07:03+08:00 scheduler: preallocation for NodeToStatusMap
+  - e3e35d5b2 2024-05-10T10:01:52+08:00 add e2e test when a plugin (in-tree or out-of-tree) return non-existent/illegal nodes, the pod should be scheduled normally if suitable nodes exists
+  - 9dd2bea07 2024-05-10T10:01:52+08:00 test to catch illegal nodeNames returned by PreFilterResult
+  - 0a2278b5c 2024-05-10T10:01:52+08:00 add integration test for pod with pvc has node-affinity to non-existent/existent nodes
+  - e376efcdc 2024-05-09T10:00:03+08:00 hotfix when a plugin (in-tree or out-of-tree) return non-existent/illegal nodes, the pod scheduling flow will abort immediately.
+  - 829fddd51 2024-04-30T15:03:31+02:00 Fix PersistentVolumeLabel admission plugin on Azure
+  - 80c178deb 2024-04-23T11:19:47-04:00 cluster/gce: upgrade cos-97-lts -> cos-109-lts
+  - 1d9992856 2024-04-22T11:21:26+08:00 storage e2e: update hostpath and mock images
+  - b1a3f0a77 2024-04-18T01:55:01+00:00 add log verbosity to endpoint topology hint loop.
+  - 2113633b4 2024-04-16T15:25:11+00:00 Update CHANGELOG/CHANGELOG-1.28.md for v1.28.9
+  - ef5b2c7a8 2024-04-12T09:31:21-04:00 Rename `cluster` to `storage_cluster_id` for apiserver_storage_size_bytes metric
+  - 1fe2536dc 2023-12-05T14:25:47+01:00 gce: fix test for non-existing instance in cloud
+  - 88536aafc 2023-12-05T14:25:46+01:00 cloud-node-lifecycle controller: add fallback for empty providerID in shutdown
+
+- kubernetes image-amd64 416ecaf479d8fa342937068dede6481f5c7a1441 to a2c84a5418d02fbb0230fa10ade3e3c3d093f891
+  - 1e8df4da3 2024-05-15T14:51:23-03:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - 21be1d76a 2024-05-14T10:44:00+00:00 Release commit for Kubernetes v1.28.10
+  - 02c796cff 2024-05-10T10:07:03+08:00 scheduler: preallocation for NodeToStatusMap
+  - e3e35d5b2 2024-05-10T10:01:52+08:00 add e2e test when a plugin (in-tree or out-of-tree) return non-existent/illegal nodes, the pod should be scheduled normally if suitable nodes exists
+  - 9dd2bea07 2024-05-10T10:01:52+08:00 test to catch illegal nodeNames returned by PreFilterResult
+  - 0a2278b5c 2024-05-10T10:01:52+08:00 add integration test for pod with pvc has node-affinity to non-existent/existent nodes
+  - e376efcdc 2024-05-09T10:00:03+08:00 hotfix when a plugin (in-tree or out-of-tree) return non-existent/illegal nodes, the pod scheduling flow will abort immediately.
+  - 829fddd51 2024-04-30T15:03:31+02:00 Fix PersistentVolumeLabel admission plugin on Azure
+  - 80c178deb 2024-04-23T11:19:47-04:00 cluster/gce: upgrade cos-97-lts -> cos-109-lts
+  - 1d9992856 2024-04-22T11:21:26+08:00 storage e2e: update hostpath and mock images
+  - b1a3f0a77 2024-04-18T01:55:01+00:00 add log verbosity to endpoint topology hint loop.
+  - 2113633b4 2024-04-16T15:25:11+00:00 Update CHANGELOG/CHANGELOG-1.28.md for v1.28.9
+  - ef5b2c7a8 2024-04-12T09:31:21-04:00 Rename `cluster` to `storage_cluster_id` for apiserver_storage_size_bytes metric
+  - 1fe2536dc 2023-12-05T14:25:47+01:00 gce: fix test for non-existing instance in cloud
+  - 88536aafc 2023-12-05T14:25:46+01:00 cloud-node-lifecycle controller: add fallback for empty providerID in shutdown
+
+- kubernetes image-arm64 416ecaf479d8fa342937068dede6481f5c7a1441 to a2c84a5418d02fbb0230fa10ade3e3c3d093f891
+  - 1e8df4da3 2024-05-15T14:51:23-03:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - 21be1d76a 2024-05-14T10:44:00+00:00 Release commit for Kubernetes v1.28.10
+  - 02c796cff 2024-05-10T10:07:03+08:00 scheduler: preallocation for NodeToStatusMap
+  - e3e35d5b2 2024-05-10T10:01:52+08:00 add e2e test when a plugin (in-tree or out-of-tree) return non-existent/illegal nodes, the pod should be scheduled normally if suitable nodes exists
+  - 9dd2bea07 2024-05-10T10:01:52+08:00 test to catch illegal nodeNames returned by PreFilterResult
+  - 0a2278b5c 2024-05-10T10:01:52+08:00 add integration test for pod with pvc has node-affinity to non-existent/existent nodes
+  - e376efcdc 2024-05-09T10:00:03+08:00 hotfix when a plugin (in-tree or out-of-tree) return non-existent/illegal nodes, the pod scheduling flow will abort immediately.
+  - 829fddd51 2024-04-30T15:03:31+02:00 Fix PersistentVolumeLabel admission plugin on Azure
+  - 80c178deb 2024-04-23T11:19:47-04:00 cluster/gce: upgrade cos-97-lts -> cos-109-lts
+  - 1d9992856 2024-04-22T11:21:26+08:00 storage e2e: update hostpath and mock images
+  - b1a3f0a77 2024-04-18T01:55:01+00:00 add log verbosity to endpoint topology hint loop.
+  - 2113633b4 2024-04-16T15:25:11+00:00 Update CHANGELOG/CHANGELOG-1.28.md for v1.28.9
+  - ef5b2c7a8 2024-04-12T09:31:21-04:00 Rename `cluster` to `storage_cluster_id` for apiserver_storage_size_bytes metric
+  - 1fe2536dc 2023-12-05T14:25:47+01:00 gce: fix test for non-existing instance in cloud
+  - 88536aafc 2023-12-05T14:25:46+01:00 cloud-node-lifecycle controller: add fallback for empty providerID in shutdown
+
