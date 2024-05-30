@@ -255,7 +255,7 @@ def process_containerfile(groupdir, containerfile, dry_run):
                 "-t", cf_outname, "-f", cf_path,
                 IMAGEDIR
             ]
-            common.run_command_in_shell(build_args, dry_run, logfile, logfile)
+            common.retry_on_exception(3, common.run_command_in_shell, build_args, dry_run, logfile, logfile)
             common.record_junit(cf_path, "build-container", "OK")
 
             # Run the container export command
@@ -310,7 +310,7 @@ def process_image_bootc(groupdir, bootcfile, dry_run):
                 "sudo", "podman", "pull",
                 "--authfile", PULL_SECRET, BIB_IMAGE
             ]
-            common.run_command_in_shell(pull_args, dry_run, logfile, logfile)
+            common.retry_on_exception(3, common.run_command_in_shell, pull_args, dry_run, logfile, logfile)
             common.record_junit(bf_path, "pull-bootc-bib", "OK")
 
             # Read the image reference
@@ -322,7 +322,7 @@ def process_image_bootc(groupdir, bootcfile, dry_run):
                     "sudo", "podman", "pull",
                     "--authfile", PULL_SECRET, bf_imgref
                 ]
-                common.run_command_in_shell(pull_args, dry_run, logfile, logfile)
+                common.retry_on_exception(3, common.run_command_in_shell, pull_args, dry_run, logfile, logfile)
                 common.record_junit(bf_path, "pull-bootc-image", "OK")
 
             # The podman command with security elevation and
@@ -342,7 +342,7 @@ def process_image_bootc(groupdir, bootcfile, dry_run):
                 "--local",
                 bf_imgref
             ]
-            common.run_command_in_shell(build_args, dry_run, logfile, logfile)
+            common.retry_on_exception(3, common.run_command_in_shell, build_args, dry_run, logfile, logfile)
             common.record_junit(bf_path, "build-bootc-image", "OK")
     except Exception:
         common.record_junit(bf_path, "process-bootc-image", "FAILED")
