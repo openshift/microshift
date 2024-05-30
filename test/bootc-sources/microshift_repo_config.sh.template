@@ -33,6 +33,7 @@ EOF
 }
 
 config_centos9_repos() {
+    # The y-1 version repository is guaranteed to be available on the mirror
     cat > "${OCP_MIRROR_REPO_FILE}" <<EOF
 [openshift-mirror-beta]
 name=OpenShift Mirror Beta Repository
@@ -70,10 +71,11 @@ sslclientcert = ${sslcrt}
 skip_if_unavailable=0
 EOF
 
+    # Only the y-2 version is guaranteed to be available for released repositories
     cat > "${OCP_RHOCP_REPO_FILE}" <<EOF
 [openshift-rhocp]
 name=OpenShift Dependencies RHEL 9
-baseurl=https://cdn.redhat.com/content/dist/layered/rhel9/{{ .Env.UNAME_M }}/rhocp/4.{{ .Env.PREVIOUS_MINOR_VERSION }}/os
+baseurl=https://cdn.redhat.com/content/dist/layered/rhel9/{{ .Env.UNAME_M }}/rhocp/4.{{ .Env.YMINUS2_MINOR_VERSION }}/os
 enabled=1
 gpgcheck=1
 gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
