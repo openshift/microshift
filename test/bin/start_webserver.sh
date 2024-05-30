@@ -14,8 +14,10 @@ mkdir -p "${IMAGEDIR}"
 cd "${IMAGEDIR}"
 
 NGINX_CONFIG="${IMAGEDIR}/nginx.conf"
+# See the https://nginx.org/en/docs/http/ngx_http_core_module.html page for
+# a full list of HTTP configuration directives
 cat > "${NGINX_CONFIG}" <<EOF
-worker_processes 8;
+worker_processes 32;
 events {
 }
 http {
@@ -26,6 +28,18 @@ http {
         root   ${IMAGEDIR};
         autoindex on;
     }
+
+    # Timeout during which a keep-alive client connection will stay open on the server
+    # Default: 75s
+    keepalive_timeout 300s;
+
+    # Timeout for transmitting a response to the client
+    # Default: 60s
+    send_timeout 300s;
+
+    # Buffers used for reading response from a disk
+    # Default: 2 32k
+    output_buffers 2 1m;
 }
 pid ${IMAGEDIR}/nginx.pid;
 daemon on;
