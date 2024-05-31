@@ -1,39 +1,15 @@
-- kubernetes embedded-component 048520e2550f287e0b8013cd53b2bf74e6af1529 to 95b99eeaeda05f23b12c0f50276b84a3f4d7176f
-  - 8164c4477 2024-05-27T17:35:50+00:00 git commit -m "UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image"
-  - f678fbc2f 2024-05-14T10:44:34+00:00 Release commit for Kubernetes v1.27.14
-  - cd50a0aef 2024-05-10T11:12:37+08:00 scheduler: preallocation for NodeToStatusMap
-  - 0d353e049 2024-05-10T11:12:37+08:00 add e2e test when a plugin (in-tree or out-of-tree) return non-existent/illegal nodes, the pod should be scheduled normally if suitable nodes exists
-  - e3cd8eba9 2024-05-10T11:12:37+08:00 test to catch illegal nodeNames returned by PreFilterResult
-  - 1acda7e74 2024-05-10T10:17:32+08:00 add integration test for pod with pvc has node-affinity to non-existent/existent nodes
-  - d446d44f1 2024-05-09T10:30:09+08:00 hotfix when a plugin (in-tree or out-of-tree) return non-existent/illegal nodes, the pod scheduling flow will abort immediately.
-  - 099988d0f 2024-04-30T15:04:35+02:00 Fix PersistentVolumeLabel admission plugin on Azure
-  - 22bc89142 2024-04-23T11:30:55-04:00 cluster/gce: upgrade cos-97-lts -> cos-109-lts
-  - f50d4af9d 2024-04-22T11:22:25+08:00 storage e2e: update hostpath and mock images
-  - bd2cb7205 2024-04-16T15:20:22+00:00 Update CHANGELOG/CHANGELOG-1.27.md for v1.27.13
-  - da55d879b 2023-12-05T14:26:46+01:00 gce: fix test for non-existing instance in cloud
-  - 0e937add0 2023-12-05T14:26:45+01:00 cloud-node-lifecycle controller: add fallback for empty providerID in shutdown
+- cluster-network-operator embedded-component d429c8bc14a64bd56fb9160b218bfa75a891219f to 796bf8f5d5268e1123f033a644b7c7abf3bec823
+  - fe1e91b 2024-04-16T10:09:19+02:00 Replace "migration" with "upgrade phase" for upgrades to IC
+  - 17c86ae 2024-03-07T16:00:45+01:00 Tighten conditions on shouldUpdateOVNKonInterConnectZoneModeChange
+  - 2248c50 2024-03-07T16:00:45+01:00 Use constants for YAML folders
+  - a29d891 2024-03-07T16:00:42+01:00 Tighten the progression phase 2 to the presence of the configmap
+  - 6ca9f83 2024-03-05T14:57:00+01:00 Relax conditions on ovnkube-node progressing status
+  - 33c31f2 2024-03-05T14:57:00+01:00 Fix log message about generation and observed generation
 
-- router image-amd64 99b0c3119a0e2c7db4775cd58dcdb3e33dda9d3e to c3a2430c09ccea623bb8a599ce56a6e267009620
-  - a71e1a3 2024-05-16T13:31:35-04:00 OCPBUGS-22739: Properly handle rewrite-target annotation
-
-- kubernetes image-amd64 048520e2550f287e0b8013cd53b2bf74e6af1529 to 95b99eeaeda05f23b12c0f50276b84a3f4d7176f
-  - 8164c4477 2024-05-27T17:35:50+00:00 git commit -m "UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image"
-  - f678fbc2f 2024-05-14T10:44:34+00:00 Release commit for Kubernetes v1.27.14
-  - cd50a0aef 2024-05-10T11:12:37+08:00 scheduler: preallocation for NodeToStatusMap
-  - 0d353e049 2024-05-10T11:12:37+08:00 add e2e test when a plugin (in-tree or out-of-tree) return non-existent/illegal nodes, the pod should be scheduled normally if suitable nodes exists
-  - e3cd8eba9 2024-05-10T11:12:37+08:00 test to catch illegal nodeNames returned by PreFilterResult
-  - 1acda7e74 2024-05-10T10:17:32+08:00 add integration test for pod with pvc has node-affinity to non-existent/existent nodes
-  - d446d44f1 2024-05-09T10:30:09+08:00 hotfix when a plugin (in-tree or out-of-tree) return non-existent/illegal nodes, the pod scheduling flow will abort immediately.
-  - 099988d0f 2024-04-30T15:04:35+02:00 Fix PersistentVolumeLabel admission plugin on Azure
-  - 22bc89142 2024-04-23T11:30:55-04:00 cluster/gce: upgrade cos-97-lts -> cos-109-lts
-  - f50d4af9d 2024-04-22T11:22:25+08:00 storage e2e: update hostpath and mock images
-  - bd2cb7205 2024-04-16T15:20:22+00:00 Update CHANGELOG/CHANGELOG-1.27.md for v1.27.13
-  - da55d879b 2023-12-05T14:26:46+01:00 gce: fix test for non-existing instance in cloud
-  - 0e937add0 2023-12-05T14:26:45+01:00 cloud-node-lifecycle controller: add fallback for empty providerID in shutdown
-
-- router image-arm64 99b0c3119a0e2c7db4775cd58dcdb3e33dda9d3e to c3a2430c09ccea623bb8a599ce56a6e267009620
-  - a71e1a3 2024-05-16T13:31:35-04:00 OCPBUGS-22739: Properly handle rewrite-target annotation
-
-- ovn-kubernetes image-arm64 d52ee0f64093a606b3b79ed66221720a58d25433 to 92b3ec3c3851580e50509d23723510df556dd2cb
+- ovn-kubernetes image-amd64 d52ee0f64093a606b3b79ed66221720a58d25433 to fcb4f2505821b0eddf003a226606045d79b37f21
   - 6d47a4e 2024-05-23T23:10:06+02:00 dns: fix deadlock in case of error
+  - aefc700 2024-05-22T09:46:10+00:00 Reuse node-subnet from cache if exists
+
+- ovn-kubernetes image-arm64 92b3ec3c3851580e50509d23723510df556dd2cb to fcb4f2505821b0eddf003a226606045d79b37f21
+  - aefc700 2024-05-22T09:46:10+00:00 Reuse node-subnet from cache if exists
 
