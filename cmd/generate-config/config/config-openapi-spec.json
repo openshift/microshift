@@ -35,7 +35,7 @@
             "maxFileAge": {
               "description": "maxFileAge is the maximum number of days to retain old audit log files",
               "type": "integer",
-              "default": 10
+              "default": 0
             },
             "maxFileSize": {
               "description": "maxFileSize is the maximum size in megabytes of the audit log file before it gets rotated",

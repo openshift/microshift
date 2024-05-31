@@ -7,7 +7,7 @@ apiServer:
     advertiseAddress: ""
     auditLog:
         # maxFileAge is the maximum number of days to retain old audit log files
-        maxFileAge: 10
+        maxFileAge: 0
         # maxFileSize is the maximum size in megabytes of the audit log file before it gets rotated
         maxFileSize: 200
         # maxFiles is the maximum number of rotated audit log files to retain

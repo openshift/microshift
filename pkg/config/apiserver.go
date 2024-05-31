@@ -31,7 +31,7 @@ type NamedCertificateEntry struct {
 
 type AuditLog struct {
 	// maxFileAge is the maximum number of days to retain old audit log files
-	// +kubebuilder:default=10
+	// +kubebuilder:default=0
 	MaxFileAge int `json:"maxFileAge"`
 	// maxFiles is the maximum number of rotated audit log files to retain
 	// +kubebuilder:default=10
