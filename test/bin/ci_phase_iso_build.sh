@@ -120,6 +120,8 @@ $(dry_run) bash -x ./scripts/image-builder/configure.sh
 
 cd "${ROOTDIR}/test/"
 
+go build -o ./bin/microshift-tests ./cmd
+
 # Source common.sh only after all dependencies are installed.
 # shellcheck source=test/bin/common.sh
 source "${SCRIPTDIR}/common.sh"

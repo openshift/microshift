@@ -36,6 +36,7 @@ sudo firewall-cmd --add-service=cockpit --permanent
 "${DNF_RETRY}" "install" "https://dl.fedoraproject.org/pub/epel/epel-release-latest-${OSVERSION}.noarch.rpm"
 "${DNF_RETRY}" "install" "mock nginx tomcli parallel"
 sudo usermod -a -G mock "$(whoami)"
+sudo usermod -a -G weldr "$(whoami)"
 
 # Verify umask and home directory permissions
 TEST_FILE=$(mktemp /tmp/configure-perm-test.XXXXX)

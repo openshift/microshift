@@ -61,55 +61,9 @@ extract_container_images() {
 }
 
 configure_package_sources() {
-    ## TEMPLATE VARIABLES
-    export UNAME_M                 # defined in common.sh
-    export LOCAL_REPO              # defined in common.sh
-    export NEXT_REPO               # defined in common.sh
-    export BASE_REPO               # defined in common.sh
-    export CURRENT_RELEASE_REPO
-    export PREVIOUS_RELEASE_REPO
-
-    export SOURCE_VERSION
-    export FAKE_NEXT_MINOR_VERSION
-    export MINOR_VERSION
-    export PREVIOUS_MINOR_VERSION
-    export YMINUS2_MINOR_VERSION
-    export SOURCE_VERSION_BASE
-    export CURRENT_RELEASE_VERSION
-    export PREVIOUS_RELEASE_VERSION
-    export YMINUS2_RELEASE_VERSION
-    export RHOCP_MINOR_Y
-    export RHOCP_MINOR_Y1
-    export RHOCP_MINOR_Y2
-
-    # Add our sources. It is OK to run these steps repeatedly, if the
-    # details change they are updated in the service.
-    title "Expanding package source templates to ${IMAGEDIR}/package-sources"
-    mkdir -p "${IMAGEDIR}/package-sources"
-    for template in "${TESTDIR}"/package-sources/*.toml; do
-        name=$(basename "${template}" .toml)
-        outfile="${IMAGEDIR}/package-sources/${name}.toml"
-
-        echo "Rendering ${template} to ${outfile}"
-        ${GOMPLATE} --file "${template}" >"${outfile}"
-        if [[ "$(wc -l "${outfile}" | cut -d ' ' -f1)" -eq 0 ]]; then
-            echo "WARNING: Templating '${template}' resulted in empty file! - SKIPPING"
-            continue
-        fi
-
-        echo "Adding package source from ${outfile}"
-        if sudo composer-cli sources list | grep "^${name}\$"; then
-            sudo composer-cli sources delete "${name}"
-        fi
-        sudo composer-cli sources add "${outfile}"
-    done
-
-    # Show details about the available sources to make debugging easier.
-    for name in $(sudo composer-cli sources list); do
-        echo
-        echo "Package source: ${name}"
-        sudo composer-cli sources info "${name}" | sed -e 's/gpgkeys.*/gpgkeys = .../g'
-    done
+    # `sg weldr` causes command to be run as `weldr` group
+    # TODO: Add re-log in CI.
+    sg "weldr" "./bin/microshift-tests compose build"
 }
 
 # Reads release-info RPM for provided version to obtain images

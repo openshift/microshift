@@ -10,3 +10,4 @@ test/variables.yaml
 test/scenario_settings.sh
 __pycache__
 test/dev_overrides.sh
+test/bin/microshift-tests
