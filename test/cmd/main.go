@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 
 	"github.com/openshift/microshift/pkg/util"
+	compose "github.com/openshift/microshift/test/pkg/compose/cmd"
 
 	"github.com/spf13/cobra"
 )
@@ -38,6 +39,8 @@ func main() {
 			os.Exit(1)
 		},
 	}
+
+	cmd.AddCommand(compose.NewComposeCmd())
 
 	if err := cmd.Execute(); err != nil {
 		os.Exit(1)
