@@ -3,8 +3,6 @@ package compose
 import (
 	"fmt"
 
-	"github.com/openshift/microshift/test/pkg/compose/templatingdata"
-
 	"github.com/spf13/cobra"
 )
 
@@ -22,18 +20,9 @@ For example:
   $ microshift-tests compose --templating-data ~/tplData.json TARGET`,
 
 		RunE: func(cmd *cobra.Command, args []string) error {
-			tplDataOpts := &templatingdata.TemplatingDataOpts{
-				Paths:                          paths,
-				TemplatingDataFragmentFilepath: templatingDataFragmentFilepath,
-				SkipContainerImagesExtraction:  skipContainerImagesExtraction,
-			}
-
-			tplData, err := tplDataOpts.Construct()
-			if err != nil {
-				return err
-			}
-
 			var output string
+			var err error
+
 			if full {
 				// Serialize whole templating data only on demand.
 				// Primarily for debug: if templating-data-fragment is supplied,
