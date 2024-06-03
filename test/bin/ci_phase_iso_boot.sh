@@ -75,6 +75,7 @@ prepare_scenario_sources
 LAUNCH_OK=true
 if ! parallel \
     ${progress} \
+    --jobs 10 \
     --results "${SCENARIO_INFO_DIR}/{/.}/boot.log" \
     --joblog "${LAUNCH_VMS_JOB_LOG}" \
     --delay 5 \
