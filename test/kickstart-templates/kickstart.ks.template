@@ -1,5 +1,12 @@
 %include /main-prologue.cfg
 %include /main-network.cfg
+
+%pre-install --log=/dev/console --erroronfail
+
+export OSTREE_CURL_TIMEOUT=600
+
+%end
+
 %include /main-ostree.cfg
 
 %post --log=/dev/console --erroronfail
