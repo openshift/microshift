@@ -4,6 +4,7 @@
 %pre-install --log=/dev/console --erroronfail
 
 export OSTREE_CURL_TIMEOUT=600
+export OSTREE_DEBUG_HTTP=true
 
 %end
 
