@@ -1,14 +1,6 @@
-- oc image-arm64 a5a43b9e6407f8ddf4a73fe995c5eca75a9ac5ab to d5b5b3a62fa4743a9e7a9cd4779b08d7f3e58c31
-  - 51487f9a 2024-05-29T16:22:12+02:00 inspectalerts: refactor `getWithBearer` to try all urls in route
-  - 2715cc4f 2024-05-29T15:42:11+02:00 inspectalerts: use client-go wrappers for thanos call debugging
-  - 518c0e77 2024-05-29T15:38:59+02:00 OCPBUGS-33896: `status/inspect-alerts`: handle non-200 by Thanos
-
-- coredns image-arm64 4989dc716d946d61642989412fe3f4f92bc28bad to 4a14f3481105adf4b4086ba9727bee3dec0847fd
-  - 2637e65 2024-05-25T03:47:02+00:00 Updating coredns-container image to be consistent with ART for 4.17 Reconciling with https://github.com/openshift/ocp-build-data/tree/4c1326094222f9209876f06833179a1b9178faf7/images/coredns.yml
-
-- kubernetes image-arm64 f1cd924886037a20bc23538a5d146b5cb43245e1 to 9798e1912b073aadb7551210381cb2c1e7020bd1
-  - 26f5de0b5 2024-05-29T16:16:20+02:00 UPSTREAM: 124933: [Scheduler] Use allNodes when calculating nextStartNodeIndex
-  - c54d78f1d 2024-05-29T15:31:16+02:00 UPSTREAM: <carry>: skip PodLifecycleSleepAction test
-  - 07f0c6196 2024-05-29T11:01:42+02:00 UPSTREAM: <carry>: skip storage tests
-  - 518f920b9 2024-04-16T10:47:53-04:00 UPSTREAM: <carry>: extend termination events
+- oc image-arm64 d5b5b3a62fa4743a9e7a9cd4779b08d7f3e58c31 to 0bea0594b2cdb44de33be3a96f8ac2cf68e10ee2
+  - 75151619 2024-05-31T16:59:04+02:00 `upgrade status`: polish alert insights
+  - 4b531b2d 2024-05-30T17:10:08+02:00 pkg/cli/expose: override print flags for cmd
+  - 18405673 2024-05-30T17:10:08+02:00 pkg/cli/create,pkg/cli/expose: use custom scheme
+  - 109236a1 2024-05-30T17:10:03+02:00 pkg/helpers/scheme: stop loading legacy schemes on global scheme
 
