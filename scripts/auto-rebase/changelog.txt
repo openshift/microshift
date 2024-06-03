@@ -1,0 +1,3 @@
+- machine-config-operator embedded-component 10694c7cc870f32bc7bf1888d1b8199f13119ff4 to ab25ae4a1fcf41ecfdba7a72d361a71e2604a9c1
+  - 1c73152e 2024-05-17T09:17:21+00:00 If multiple hostnames are returned, use the first one for the Node name
+
