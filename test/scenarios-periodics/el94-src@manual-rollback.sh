@@ -3,8 +3,8 @@
 # Sourced from scenario.sh and uses functions defined there.
 
 scenario_create_vms() {
-    prepare_kickstart host1 kickstart.ks.template rhel-9.2-microshift-source
-    launch_vm host1
+    prepare_kickstart host1 kickstart.ks.template rhel-9.4-microshift-source
+    launch_vm host1 rhel-9.4
 }
 
 scenario_remove_vms() {
@@ -13,6 +13,6 @@ scenario_remove_vms() {
 
 scenario_run_tests() {
     run_tests host1 \
-        --variable "UPGRADE_REF:rhel-9.2-microshift-source-aux" \
+        --variable "UPGRADE_REF:rhel-9.4-microshift-source-aux" \
         suites/upgrade/rollback-manual.robot
 }
