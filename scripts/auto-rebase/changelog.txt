@@ -1,6 +1,0 @@
-- oc image-arm64 d5b5b3a62fa4743a9e7a9cd4779b08d7f3e58c31 to 0bea0594b2cdb44de33be3a96f8ac2cf68e10ee2
-  - 75151619 2024-05-31T16:59:04+02:00 `upgrade status`: polish alert insights
-  - 4b531b2d 2024-05-30T17:10:08+02:00 pkg/cli/expose: override print flags for cmd
-  - 18405673 2024-05-30T17:10:08+02:00 pkg/cli/create,pkg/cli/expose: use custom scheme
-  - 109236a1 2024-05-30T17:10:03+02:00 pkg/helpers/scheme: stop loading legacy schemes on global scheme
-
