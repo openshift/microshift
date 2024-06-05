@@ -1,3 +1,0 @@
-- oc image-arm64 12a2e98239d503af3e8e30a6fa9d0186c9524b77 to f9d6c50fee8b143733f9a0d210d1095b5e5ff77d
-  - eacf0666 2024-05-20T14:43:41+00:00 pkg/cli/admin/upgrade/rollback: Gate on OC_ENABLE_CMD_UPGRADE_ROLLBACK
-
