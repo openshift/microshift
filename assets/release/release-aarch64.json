@@ -1,16 +1,16 @@
 {
   "release": {
-    "base": "4.15.0-0.nightly-arm64-2024-05-31-195139"
+    "base": "4.15.0-0.nightly-arm64-2024-06-04-224356"
   },
   "images": {
     "cli": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:48f70304396743800e104d711d66f87f6ebad20ce16f2e51ba4678a76e986fa5",
     "coredns": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:757a08a59327c03818c70f20aa908687779dcdcbb0452b382fb6de15b2128b45",
-    "haproxy-router": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:844c20c2ff496b22dc992e948cca0b0ffa328be863795e76b5a65b5b156c53ad",
+    "haproxy-router": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:d0b70de6ef3fa69196f8339df6ab139ca67deae411d7b9edf2860a6a7a250e25",
     "kube-rbac-proxy": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:3e537e2bc43473025cca81650212a03fde7662a25dcd938614df0ac277936fe4",
     "openssl": "registry.access.redhat.com/ubi8/openssl@sha256:9e743d947be073808f7f1750a791a3dbd81e694e37161e8c6c6057c2c342d671",
     "ovn-kubernetes-microshift": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:112af3fe019b3074d2af732a1d09530c523e44b796df4131da3390c8b067d026",
     "pod": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:c1803fd4765e0b97f7d8eebc1e20c524b07119316a11fc8050dffdfa76155e24",
-    "service-ca-operator": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:5962cf8d95ca475feb06134db18d0b8ac62e4ac9a60e4eb6ea6dea0c384b8dff",
+    "service-ca-operator": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:d7e19d8fd7c147e277db5b1fc65ce8f067f9728784da81acddee5209fab191a8",
     "topolvm_csi": "registry.redhat.io/lvms4/topolvm-rhel9@sha256:ce0c78c2867fb0b73c4911ae6afd5aaf9a413480cfcf4f31f46f2387c3df97e0",
     "topolvm_csi_registrar": "registry.redhat.io/openshift4/ose-csi-node-driver-registrar@sha256:95691c21198e20d11777d592806fa00c018c17443d9b3aee853891dac6090470",
     "topolvm_csi_livenessprobe": "registry.redhat.io/openshift4/ose-csi-livenessprobe@sha256:98ad03919da81c910aaa8a4f12fcae3048f2119735aeb7ca5271f7c16cf5e4e6",
