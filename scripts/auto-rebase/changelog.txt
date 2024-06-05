@@ -1,15 +1,5 @@
-- cluster-network-operator embedded-component d429c8bc14a64bd56fb9160b218bfa75a891219f to 796bf8f5d5268e1123f033a644b7c7abf3bec823
-  - fe1e91b 2024-04-16T10:09:19+02:00 Replace "migration" with "upgrade phase" for upgrades to IC
-  - 17c86ae 2024-03-07T16:00:45+01:00 Tighten conditions on shouldUpdateOVNKonInterConnectZoneModeChange
-  - 2248c50 2024-03-07T16:00:45+01:00 Use constants for YAML folders
-  - a29d891 2024-03-07T16:00:42+01:00 Tighten the progression phase 2 to the presence of the configmap
-  - 6ca9f83 2024-03-05T14:57:00+01:00 Relax conditions on ovnkube-node progressing status
-  - 33c31f2 2024-03-05T14:57:00+01:00 Fix log message about generation and observed generation
-
-- ovn-kubernetes image-amd64 d52ee0f64093a606b3b79ed66221720a58d25433 to fcb4f2505821b0eddf003a226606045d79b37f21
-  - 6d47a4e 2024-05-23T23:10:06+02:00 dns: fix deadlock in case of error
-  - aefc700 2024-05-22T09:46:10+00:00 Reuse node-subnet from cache if exists
-
-- ovn-kubernetes image-arm64 92b3ec3c3851580e50509d23723510df556dd2cb to fcb4f2505821b0eddf003a226606045d79b37f21
-  - aefc700 2024-05-22T09:46:10+00:00 Reuse node-subnet from cache if exists
+- ovn-kubernetes image-arm64 fcb4f2505821b0eddf003a226606045d79b37f21 to 3ff0577114073ec43a1259d7f582d58c3553cc2c
+  - 36c8981 2024-05-29T08:09:49+00:00 CARRY: fix EIP GARP config for 4.15 specific tests
+  - 27f61d5 2024-05-29T08:09:49+00:00 Fix EIP GARP config overwritten by gateway update
+  - 338c3c2 2024-05-15T10:26:25-04:00 use a forked version of j-keck/arping that fixes a threading issue
 
