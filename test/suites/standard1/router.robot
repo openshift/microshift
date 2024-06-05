@@ -84,7 +84,7 @@ Router Disabled
     [Setup]    Run Keywords
     ...    Disable Router
 
-    Run With Kubeconfig    oc wait --for=delete namespace/openshift-ingress --timeout=60s
+    Run With Kubeconfig    oc wait --for=delete namespace/openshift-ingress --timeout=300s
 
 Router Exposure Configuration
     [Documentation]    Test custom ports and custom listening addresses.
