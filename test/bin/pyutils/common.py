@@ -216,3 +216,18 @@ def terminate_process(pid, wait=True):
     except Exception:
         # Propagate the exception to the caller
         raise
+
+
+def retry_on_exception(max_attempts, func, *args, **kwargs):
+    """Wrapper allowing to retry a function call on any exception"""
+    attempts = 0
+    while attempts < max_attempts:
+        try:
+            return func(*args, **kwargs)
+        except Exception as e:
+            print_msg(f"Error: Attempt {attempts + 1} failed, retrying: {e}")
+            attempts += 1
+            if attempts >= max_attempts:
+                print_msg(f"Error: Reached maximum of {max_attempts} attempts, fatal error")
+                # Propagate the exception to the caller
+                raise
