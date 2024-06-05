@@ -1,0 +1,16 @@
+- oc image-arm64 0bea0594b2cdb44de33be3a96f8ac2cf68e10ee2 to b9859d53cacf7496eadcd18d46c63f55519dc6cc
+  - 93364191 2024-05-31T12:46:08-05:00 Update comment about using OpenFileSequential
+  - cc9777cf 2024-05-31T13:44:43+02:00 pkg/helpers: remove legacy pkg
+  - 75239059 2024-05-30T12:47:13+03:00 go 1.22 lint fix
+  - ac9f66b2 2024-05-30T11:43:35+03:00 Run make update
+  - c79a4243 2024-05-30T09:30:11+03:00 Update tools images kube version to 1.30.1
+  - a5b489a4 2024-05-30T09:14:52+03:00 Manually bump indirect dependency runc to v1.1.12 to pull some fixes
+  - a36a0ce8 2024-05-30T09:13:07+03:00 Bump aws-sdk-go version to v1.53.12
+  - e3d06e49 2024-05-30T09:06:29+03:00 React to type changes in containers/image/v5 v5.30.1 version
+  - 2b5c5e85 2024-05-30T09:06:07+03:00 Bump containers/image/v5 to v5.30.1
+  - 5e4e38dc 2024-05-30T08:59:59+03:00 Go 1.22 changes the escape output of some special characters
+  - 891c2a1d 2024-05-30T08:51:18+03:00 Bump go based imports
+  - 184a6699 2024-05-30T07:48:00+03:00 Bump k8s dependencies to 1.30
+  - 79f5fddb 2024-05-30T07:41:10+03:00 Remove already deprecated versions
+  - bf68f8e5 2024-05-30T07:37:06+03:00 Bump go version to 1.22
+
