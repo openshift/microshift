@@ -20,7 +20,8 @@ WEB_SERVER_URL="http://${VM_BRIDGE_IP}:${WEB_SERVER_PORT}"
 PULL_SECRET="${PULL_SECRET:-${HOME}/.pull-secret.json}"
 PULL_SECRET_CONTENT="$(jq -c . "${PULL_SECRET}")"
 PUBLIC_IP=${PUBLIC_IP:-""}  # may be overridden in global settings file
-VM_BOOT_TIMEOUT=1800
+VM_BOOT_TIMEOUT=1200 # Overall total boot times are around 15m
+VM_GREENBOOT_TIMEOUT=1800 # Greenboot readiness may take up to 15-30m depending on the load
 ENABLE_REGISTRY_MIRROR=${ENABLE_REGISTRY_MIRROR:-false}
 SKIP_SOS=${SKIP_SOS:-false}  # may be overridden in global settings file
 SKIP_GREENBOOT=${SKIP_GREENBOOT:-false}  # may be overridden in scenario file
@@ -298,11 +299,11 @@ wait_for_greenboot() {
         return 0
     fi
 
-    echo "Waiting ${VM_BOOT_TIMEOUT} for greenboot on ${vmname} to complete"
+    echo "Waiting ${VM_GREENBOOT_TIMEOUT} for greenboot on ${vmname} to complete"
 
     local -r start_time=$(date +%s)
     local -r ssh_cmd="ssh -oConnectTimeout=10 -oBatchMode=yes -oStrictHostKeyChecking=accept-new redhat@${ip}"
-    while [ $(( $(date +%s) - start_time )) -lt "${VM_BOOT_TIMEOUT}" ] ; do
+    while [ $(( $(date +%s) - start_time )) -lt "${VM_GREENBOOT_TIMEOUT}" ] ; do
         local svc_state
         svc_state="$(${ssh_cmd} systemctl show --property=SubState --value greenboot-healthcheck || true)"
         if [ "${svc_state}" = "exited" ] ; then
@@ -492,13 +493,12 @@ launch_vm() {
         vm_initrd_inject+=" --initrd-inject ${cfg_file}"
     done
 
-    # Implement retries on VM creation until the problem is fixed
-    # See https://github.com/virt-manager/virt-manager/issues/498
+    # Implement retries on VM creation that can time out when pulling
+    # ostree commits or any other installation error
     local vm_created=false
-    for attempt in $(seq 5) ; do
-        local vm_create_start
-        vm_create_start=$(date +%s)
-
+    local attempt=1
+    local max_attempts=2
+    while true ; do
         local graphics_args
         graphics_args="none"
         if "${VNC_CONSOLE}"; then
@@ -516,7 +516,7 @@ launch_vm() {
         # If the TTY is not provided, virt-install refuses
         # to attach to the console. `unbuffer` provides the TTY.
         # shellcheck disable=SC2086
-        if ! ${timeout_install} unbuffer sudo virt-install \
+        if ${timeout_install} unbuffer sudo virt-install \
             --autoconsole text \
             --graphics "${graphics_args}" \
             --name "${full_vmname}" \
@@ -532,21 +532,25 @@ launch_vm() {
             ${vm_initrd_inject} \
             --wait ; then
 
-            # Check if the command exited within 15s due to a failure
-            local vm_create_end
-            vm_create_end=$(date +%s)
-            if [ $(( vm_create_end -  vm_create_start )) -lt 15 ] ; then
-                local backoff=$(( attempt * 5 ))
-                echo "Error running virt-install on attempt ${attempt}: retrying in ${backoff}s"
-                sleep "${backoff}"
-                continue
-            fi
-            # Stop retrying on timeout error
+            # Stop retrying when VM is created successfully
+            vm_created=true
             break
         fi
-        # Stop retrying when VM is created successfully
-        vm_created=true
-        break
+
+        # Check if VM creation should be retried
+        ((attempt++))
+        if [ ${attempt} -gt ${max_attempts} ] ; then
+            echo "Error running virt-install: giving up on attempt ${attempt}"
+            break
+        fi
+
+        # Retry the operation on error
+        local backoff=$(( attempt * 5 ))
+        echo "Error running virt-install: retrying in ${backoff}s on attempt ${attempt}"
+        sleep "${backoff}"
+
+        # Cleanup the failed VM before trying to recreate it
+        remove_vm "${vmname}"
     done
 
     if ${vm_created} ; then
