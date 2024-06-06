@@ -1,5 +1,0 @@
-- ovn-kubernetes image-arm64 fcb4f2505821b0eddf003a226606045d79b37f21 to 3ff0577114073ec43a1259d7f582d58c3553cc2c
-  - 36c8981 2024-05-29T08:09:49+00:00 CARRY: fix EIP GARP config for 4.15 specific tests
-  - 27f61d5 2024-05-29T08:09:49+00:00 Fix EIP GARP config overwritten by gateway update
-  - 338c3c2 2024-05-15T10:26:25-04:00 use a forked version of j-keck/arping that fixes a threading issue
-
