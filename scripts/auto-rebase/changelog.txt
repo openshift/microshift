@@ -1,0 +1,15 @@
+- cluster-ingress-operator embedded-component fc4cab0d129151b919ac09b495c33d627ef55915 to 4c398c77770f0e567fe986db0a5e86b2608a6cc5
+  - a6fa2b8 2024-05-23T21:56:02+00:00 clientca-configmap: Remove OperatorNamespace field
+  - 30fd701 2024-05-23T21:56:02+00:00 Don't add clientca-configmap finalizer if deleting
+
+- machine-config-operator embedded-component 0eac83ac1e841b60677c1ae3f7f3ce07abff8d3a to a50e9b05e3dbe0e2a0370ca83a7bcf4ac72d4e67
+  - 585599f8 2024-05-30T10:25:16-05:00 added platform field to spec field in controller config manifests
+
+- ovn-kubernetes image-amd64 fcb4f2505821b0eddf003a226606045d79b37f21 to 3ff0577114073ec43a1259d7f582d58c3553cc2c
+  - 36c8981 2024-05-29T08:09:49+00:00 CARRY: fix EIP GARP config for 4.15 specific tests
+  - 27f61d5 2024-05-29T08:09:49+00:00 Fix EIP GARP config overwritten by gateway update
+  - 338c3c2 2024-05-15T10:26:25-04:00 use a forked version of j-keck/arping that fixes a threading issue
+
+- kubernetes image-arm64 95b99eeaeda05f23b12c0f50276b84a3f4d7176f to 78524260502e5d93191acb29397a01db5df6136b
+  - 0c72b20f8 2024-04-19T08:06:34+00:00 UPSTREAM: <carry>: OCPBUGS-29520: fix cpu manager default cpuset check in workload partitioned env
+
