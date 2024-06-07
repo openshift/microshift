@@ -16,6 +16,7 @@ import (
 // +kubebuilder:resource:path=rangeallocations,scope=Cluster
 // +openshift:api-approved.openshift.io=https://github.com/openshift/api/pull/751
 // +openshift:file-pattern=cvoRunLevel=0000_03,operatorName=config-operator,operatorOrdering=02
+// +kubebuilder:metadata:annotations=release.openshift.io/bootstrap-required=true
 // +openshift:compatibility-gen:level=1
 type RangeAllocation struct {
 	metav1.TypeMeta `json:",inline"`
