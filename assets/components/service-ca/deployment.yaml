@@ -18,6 +18,7 @@ spec:
       name: service-ca
       annotations:
         target.workload.openshift.io/management: '{"effect": "PreferredDuringScheduling"}'
+        openshift.io/required-scc: restricted-v2
       labels:
         app: service-ca
         service-ca: "true"
