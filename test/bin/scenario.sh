@@ -550,7 +550,8 @@ launch_vm() {
         sleep "${backoff}"
 
         # Cleanup the failed VM before trying to recreate it
-        remove_vm "${vmname}"
+        # Keep the storage pool for the subsequent VM creation
+        remove_vm "${vmname}" true
     done
 
     if ${vm_created} ; then
@@ -621,9 +622,10 @@ launch_vm() {
     echo "${full_vmname} is up and ready"
 }
 
-# Clean up the resources for one VM.
+# Clean up the resources for one VM, optionally skipping storage pool removal
 remove_vm() {
     local -r vmname="${1}"
+    local -r keep_pool="${2:-false}"
     local -r full_vmname="$(full_vm_name "${vmname}")"
 
     # Remove the actual VM
@@ -635,15 +637,20 @@ remove_vm() {
     fi
 
     # Remove the VM storage pool
-    local -r vm_pool_name="${VM_POOL_BASENAME}-${SCENARIO}"
-    if sudo virsh pool-info "${vm_pool_name}" &>/dev/null; then
-        sudo virsh pool-destroy "${vm_pool_name}"
-        sudo virsh pool-undefine "${vm_pool_name}"
-    fi
+    if ! ${keep_pool} ; then
+        local -r vm_pool_name="${VM_POOL_BASENAME}-${SCENARIO}"
+        if sudo virsh pool-info "${vm_pool_name}" &>/dev/null; then
+            sudo virsh pool-destroy "${vm_pool_name}"
+            sudo virsh pool-undefine "${vm_pool_name}"
+        fi
 
-    # Remove the pool directory
-    # ShellCheck: Using "${var:?}" to ensure this never expands to '/*'
-    rm -rf "${VM_DISK_BASEDIR:?}/${vm_pool_name}"
+        # Remove the pool directory
+        # ShellCheck: Using "${var:?}" to ensure this never expands to '/*'
+        rm -rf "${VM_DISK_BASEDIR:?}/${vm_pool_name}"
+    else
+        # Remove VM disk files
+        rm -f "${VM_DISK_BASEDIR}/${vm_pool_name}/*"
+    fi
 
     # Remove the info file so something processing the VMs does not
     # assume the file exists. This is most useful in a local setting.
