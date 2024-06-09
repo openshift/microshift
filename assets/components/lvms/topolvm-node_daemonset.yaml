@@ -39,17 +39,16 @@ spec:
               fieldPath: spec.nodeName
         image: '{{ .ReleaseImage.topolvm_csi }}'
         livenessProbe:
-          failureThreshold: 3
           httpGet:
-            path: /healthz
             port: healthz
-          initialDelaySeconds: 10
-          periodSeconds: 60
+            path: /healthz
           timeoutSeconds: 3
+          failureThreshold: 3
+          periodSeconds: 60
         startupProbe:
           failureThreshold: 60
-          successThreshold: 1
           periodSeconds: 2
+          timeoutSeconds: 3
           httpGet:
             port: healthz
             path: /healthz
