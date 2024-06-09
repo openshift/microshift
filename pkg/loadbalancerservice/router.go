@@ -104,7 +104,12 @@ func defaultRouterListenAddresses(ipAddresses, nicNames []string) ([]string, err
 		}
 		for _, nicAddress := range nicAddresses {
 			if !slices.Contains(allowedAddresses, nicAddress) {
-				klog.Warningf("IP address %v from NIC %v is not allowed. Skipping", nicAddress, nicName)
+				// NICs may get their addresses changed while MicroShift is running.
+				// None of the forbidden IPs (from config pkg) can be configured because
+				// MicroShift will refuse to start. If any of those IPs is configured in
+				// a NIC after starting MicroShift it should be ignored. As for non
+				// forbidden addresses, they are already included in the allowed list, so
+				// any new IP will always be there.
 				continue
 			}
 			ipList = append(ipList, nicAddress)
