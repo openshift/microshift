@@ -429,14 +429,14 @@ func (b *ControllerBuilder) getClientConfig() (*rest.Config, error) {
 }
 
 func topologyLeaderElection(topology configv1.TopologyMode, original configv1.LeaderElection) configv1.LeaderElection {
-	// if we can't determine the infra toplogy, return original
+	// if we can't determine the infra topology, return original
 	if topology == "" {
 		return original
 	}
 
-	// If we are running in a SingleReplicaTopologyMode and leader election is not disabled, configure leader election for SNO Toplogy
+	// If we are running in a SingleReplicaTopologyMode and leader election is not disabled, configure leader election for SNO Topology
 	if topology == configv1.SingleReplicaTopologyMode && !original.Disable {
-		klog.Info("detected SingleReplicaTopologyMode, the original leader election has been altered for the default SingleReplicaToplogy")
+		klog.Info("detected SingleReplicaTopologyMode, the original leader election has been altered for the default SingleReplicaTopology")
 		return leaderelectionconverter.LeaderElectionSNOConfig(original)
 	}
 	return original
