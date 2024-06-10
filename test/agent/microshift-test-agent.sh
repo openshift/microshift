@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/bash
 
 set -xeuo pipefail
 
@@ -95,7 +95,7 @@ prevent_backup() {
 fail_greenboot() {
     local -r path="/etc/greenboot/check/required.d/99_microshift_test_failure.sh"
     cat >"${path}" <<EOF
-#!/bin/bash
+#!/usr/bin/bash
 echo 'Forced greenboot failure by MicroShift Failure Agent'
 sleep 5
 exit 1
