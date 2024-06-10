@@ -4,6 +4,8 @@ Before=microshift.service sshd.service
 
 [Service]
 ExecStart=/usr/bin/microshift-test-agent.sh
+# Allow agent to finish cleanup instead of (sometimes) getting two consecutive SIGTERMs.
+TimeoutStopSec=5s
 
 [Install]
 WantedBy=multi-user.target
