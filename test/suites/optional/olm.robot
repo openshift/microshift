@@ -11,20 +11,21 @@ Suite Teardown      Teardown
 
 *** Variables ***
 ${CATALOG_SOURCE}           ./assets/olm/catalog-source.yaml
-${SUB_CERT_MANAGER}         ./assets/olm/subscription-cert-manager.yaml
+${SUBSCRIPTION}             ./assets/olm/subscription.yaml
+${SUBSCRIPTION_NAME}        amq-broker
 ${MARKETPLACE_NAMESPACE}    openshift-marketplace
 ${OPERATORS_NAMESPACE}      openshift-operators
 
 
 *** Test Cases ***
-Deploy CertManager From OperatorHubIO
-    [Documentation]    Deploy CertManager from OperatorHub Catalog.
+Deploy AmqBroker From Red Hat Operators catalog
+    [Documentation]    Deploy AMQ Broker from Red Hat Operators catalog.
     [Setup]    Run Keywords
     ...    OLM Should Be Ready
     ...    Create CatalogSource
-    ...    Create CertManager Subscription
+    ...    Create Subscription
 
-    ${csv}=    Get CSV Name From Subscription    ${OPERATORS_NAMESPACE}    my-cert-manager
+    ${csv}=    Get CSV Name From Subscription    ${OPERATORS_NAMESPACE}    ${SUBSCRIPTION_NAME}
     Wait For CSV    ${OPERATORS_NAMESPACE}    ${csv}
     @{deployments}=    Get Deployments From CSV    ${OPERATORS_NAMESPACE}    ${csv}
     Wait For Deployments    ${OPERATORS_NAMESPACE}    @{deployments}
@@ -32,7 +33,7 @@ Deploy CertManager From OperatorHubIO
     [Teardown]    Run Keywords
     ...    Delete CatalogSource
     ...    AND
-    ...    Delete CertManager Subscription
+    ...    Delete Subscription
     ...    AND
     ...    Delete CSV    ${OPERATORS_NAMESPACE}    ${csv}
     ...    AND
@@ -61,7 +62,7 @@ Create CatalogSource
     [Documentation]    Create CatalogSource resource with Red Hat Community Catalog Index.
     Oc Create    -f ${CATALOG_SOURCE}
     Wait Until Keyword Succeeds    120s    5s
-    ...    CatalogSource Should Be Ready    ${MARKETPLACE_NAMESPACE}    redhat-community-catalog
+    ...    CatalogSource Should Be Ready    ${MARKETPLACE_NAMESPACE}    redhat-operators
 
 CatalogSource Should Be Ready
     [Documentation]    Checks if CatalogSource is ready.
@@ -69,11 +70,11 @@ CatalogSource Should Be Ready
     ${catalog}=    Oc Get    catalogsources    ${namespace}    ${name}
     Should Be Equal As Strings    READY    ${catalog.status.connectionState.lastObservedState}
 
-Create CertManager Subscription
-    [Documentation]    Creates cert-manager subscription.
-    Oc Create    -f ${SUB_CERT_MANAGER}
+Create Subscription
+    [Documentation]    Creates subscription.
+    Oc Create    -f ${SUBSCRIPTION}
     Wait Until Keyword Succeeds    120s    5s
-    ...    Subscription Should Be AtLatestKnown    ${OPERATORS_NAMESPACE}    my-cert-manager
+    ...    Subscription Should Be AtLatestKnown    ${OPERATORS_NAMESPACE}    ${SUBSCRIPTION_NAME}
 
 Subscription Should Be AtLatestKnown
     [Documentation]    Checks if subscription has state "AtLeastKnown"
@@ -84,7 +85,7 @@ Subscription Should Be AtLatestKnown
 Get CSV Name From Subscription
     [Documentation]    Obtains Subscription's CSV name.
     [Arguments]    ${namespace}    ${name}
-    ${sub}=    Oc Get    subscriptions.operators.coreos.com    ${OPERATORS_NAMESPACE}    my-cert-manager
+    ${sub}=    Oc Get    subscriptions.operators.coreos.com    ${OPERATORS_NAMESPACE}    ${SUBSCRIPTION_NAME}
     RETURN    ${sub.status.currentCSV}
 
 Wait For CSV
@@ -122,9 +123,9 @@ Delete CatalogSource
     [Documentation]    Delete CatalogSource.
     Oc Delete    -f ${CATALOG_SOURCE}
 
-Delete CertManager Subscription
-    [Documentation]    Delete CertManager Subscription.
-    Oc Delete    -f ${SUB_CERT_MANAGER}
+Delete Subscription
+    [Documentation]    Delete Subscription.
+    Oc Delete    -f ${SUBSCRIPTION}
 
 Delete CSV
     [Documentation]    Delete CSV.
