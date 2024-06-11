@@ -407,6 +407,7 @@ def check_for_new_releases(url_base, release_type, version):
     release_date = rpm_version_details["release_date"]
     patch_number = rpm_version_details["patch_num"]
     commit_sha = rpm_version_details["commit_sha"]
+    full_commit_sha = str.strip(run_process(["git", "rev-parse", "--verify", f"{commit_sha}^{{commit}}"]))
 
     # Older release names # look like "4.13.0-ec-2" but we had a few
     # sprints where we published multiple builds, so use more of the
@@ -424,7 +425,7 @@ def check_for_new_releases(url_base, release_type, version):
 
     return Release(
         release_name,
-        commit_sha,
+        full_commit_sha,
         product_version,
         candidate_type,
         candidate_number,
