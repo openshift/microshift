@@ -6,6 +6,7 @@ metadata:
     api.openshift.io/merged-by-featuregates: "true"
     include.release.openshift.io/ibm-cloud-managed: "true"
     include.release.openshift.io/self-managed-high-availability: "true"
+    release.openshift.io/bootstrap-required: "true"
   name: rangeallocations.security.internal.openshift.io
 spec:
   group: security.internal.openshift.io

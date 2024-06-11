@@ -26,3 +26,4 @@ spec:
       protocol: TCP
       port: {{ .RouterHttpsPort }}
       targetPort: https
+  sessionAffinity: None

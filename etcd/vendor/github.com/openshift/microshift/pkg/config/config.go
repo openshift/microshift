@@ -98,7 +98,12 @@ func (c *Config) fillDefaults() error {
 		URL:             "https://localhost:6443",
 		Port:            6443,
 	}
-	c.ApiServer.AuditLog.Profile = "Default"
+	c.ApiServer.AuditLog = AuditLog{
+		MaxFileAge:  0,
+		MaxFiles:    10,
+		MaxFileSize: 200,
+		Profile:     "Default",
+	}
 	c.Node = Node{
 		HostnameOverride: hostname,
 		NodeIP:           nodeIP,
