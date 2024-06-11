@@ -1,9 +1,8 @@
-- cluster-ingress-operator embedded-component 4c398c77770f0e567fe986db0a5e86b2608a6cc5 to c6fc4df40f69091e864054bc79a88733e7af00fe
-  - f91b095 2024-06-05T19:44:24+00:00 TestHostNetworkPortBinding: Delete t.Parallel()
+- ovn-kubernetes image-amd64 3ff0577114073ec43a1259d7f582d58c3553cc2c to bdc67edd064afc3519c4780f43c1c3837cd4143f
+  - 52ffe95 2024-06-06T18:10:43+02:00 Put conntrack flushing for external gateway in a single function, add ipv6 MAC resolution support, cleanup conntrack for all protocols. Update e2es to expect the same behaviour for both protocols, now should also work in an ipv6-only cluster.
+  - d82e980 2024-06-06T18:10:29+02:00 Fix external gateway tests for IPv6
 
-- kubernetes embedded-component 95b99eeaeda05f23b12c0f50276b84a3f4d7176f to 78524260502e5d93191acb29397a01db5df6136b
-  - 0c72b20f8 2024-04-19T08:06:34+00:00 UPSTREAM: <carry>: OCPBUGS-29520: fix cpu manager default cpuset check in workload partitioned env
-
-- kubernetes image-amd64 95b99eeaeda05f23b12c0f50276b84a3f4d7176f to 78524260502e5d93191acb29397a01db5df6136b
-  - 0c72b20f8 2024-04-19T08:06:34+00:00 UPSTREAM: <carry>: OCPBUGS-29520: fix cpu manager default cpuset check in workload partitioned env
+- ovn-kubernetes image-arm64 3ff0577114073ec43a1259d7f582d58c3553cc2c to bdc67edd064afc3519c4780f43c1c3837cd4143f
+  - 52ffe95 2024-06-06T18:10:43+02:00 Put conntrack flushing for external gateway in a single function, add ipv6 MAC resolution support, cleanup conntrack for all protocols. Update e2es to expect the same behaviour for both protocols, now should also work in an ipv6-only cluster.
+  - d82e980 2024-06-06T18:10:29+02:00 Fix external gateway tests for IPv6
 
