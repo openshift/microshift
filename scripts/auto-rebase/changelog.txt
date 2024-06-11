@@ -1,12 +1,20 @@
-- cluster-network-operator embedded-component 5a90c99b4142a496ad63d0d76878afb25d73ea46 to dfb3ff7a1642906f523911882c72d0cf00fd086f
-  - a262000 2024-06-05T17:11:50+00:00 Put feature-gate flag to the control-plane pod spec to make sure control-plane pods are restarted on feature gate enablement. ovnkube-node is fine, as this flag is enabled via script-lib.
+- cluster-network-operator embedded-component dfb3ff7a1642906f523911882c72d0cf00fd086f to 84f9a080d03777c95a1c5a0d13ca16e5aa342d98
+  - 807aa75 2024-06-08T00:20:09+00:00 Limit iptables-alerter's cpu
+  - 628db82 2024-06-05T10:44:16+01:00 Validate live migration before setting the progressing condition
+  - 13fac42 2024-06-04T09:13:41+00:00 ANP: Add telemetry rule expressions
+  - f7d9fb1 2024-06-04T09:13:41+00:00 Bump to v0.1.5
+  - 08cbef7 2024-06-04T09:13:41+00:00 Add ANP enable flag to HCP control-plane
+  - da50516 2024-05-31T13:25:15+00:00 Handle pod exiting race conditions in iptables-alerter
+  - 44e60e1 2024-05-30T13:55:42+01:00 Align new node subnet allocation between OVN-K and SDN during live migration
+  - 0225c3c 2024-05-30T09:50:42+01:00 Live migration: add metrics to observe CNI live migration
+  - 5eab508 2024-05-30T09:48:41+01:00 Add validation for live migration from OpenShiftSDN to OVNKubernetes
 
-- kubernetes embedded-component 87992f48b0ead9af80145861d1bffff0810e70d9 to f6419fba786afe73e14412e43ee5645184addd92
-  - f53fd9c05 2024-06-03T09:44:26+02:00 UPSTREAM: <carry>: Disable e2e tests that need PersistentVolumeLabel
+- kubernetes embedded-component f6419fba786afe73e14412e43ee5645184addd92 to b2f5b1171deb4bbf754961c8b72ac31d2548c896
+  - 8b8df1a82 2024-05-29T08:13:01+00:00 UPSTREAM: <carry>: extend termination events
 
-- kubernetes image-amd64 87992f48b0ead9af80145861d1bffff0810e70d9 to f6419fba786afe73e14412e43ee5645184addd92
-  - f53fd9c05 2024-06-03T09:44:26+02:00 UPSTREAM: <carry>: Disable e2e tests that need PersistentVolumeLabel
+- openshift-controller-manager embedded-component c736111041fca03f933739e7c55f223e72705623 to 1432fe0aa630ce83c0c3fd18c86e1fb9a47ae4cc
+  - 4f3cde4 2024-06-03T20:10:05+00:00 Add lower-case proxy envs to pod proxydefaults
 
-- kubernetes image-arm64 87992f48b0ead9af80145861d1bffff0810e70d9 to f6419fba786afe73e14412e43ee5645184addd92
-  - f53fd9c05 2024-06-03T09:44:26+02:00 UPSTREAM: <carry>: Disable e2e tests that need PersistentVolumeLabel
+- kubernetes image-amd64 f6419fba786afe73e14412e43ee5645184addd92 to b2f5b1171deb4bbf754961c8b72ac31d2548c896
+  - 8b8df1a82 2024-05-29T08:13:01+00:00 UPSTREAM: <carry>: extend termination events
 
