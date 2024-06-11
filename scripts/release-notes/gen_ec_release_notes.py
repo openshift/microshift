@@ -553,15 +553,7 @@ def publish_release(new_release, take_action):
     push_tag(release_name)
 
     # Create draft release with message that includes download URLs and history
-    try:
-        github_release_create(release_name, notes)
-    except urllib.error.URLError as e:
-        logging.error(f"Failed to create the release {release_name}: {e}")
-        logging.error(f"Response: {str(e.fp.readlines())}")
-        raise
-    except Exception as err:
-        logging.error(f"Failed to create the release {release_name}: {err}")
-        raise
+    github_release_create(release_name, notes)
 
 
 def github_release_create(tag, notes):
@@ -603,12 +595,24 @@ def github_api(path, **data):
         )
     else:
         r = request.Request(url=url)
+
     logging.info(f"GitHub API Request: { {'method':r.get_method(), 'url': url, 'data': data} }")
     r.add_header('Accept', 'application/vnd.github+json')
     r.add_header('User-agent', 'microshift-release-notes')
     r.add_header('Authorization', f'Bearer {GITHUB_TOKEN}')
     r.add_header('X-GitHub-Api-Version', '2022-11-28')
-    response = request.urlopen(r)
+
+    try:
+        response = request.urlopen(r)
+    except urllib.error.URLError as e:
+        logging.error(f"GitHub API Request Failed: '{str(e.fp.readlines())}'")
+        # e.fp.readlines() sinks the response body but it's not read in any other place,
+        # so just re-raise for the exception type.
+        raise
+    except Exception as err:
+        logging.error(f"GitHub API Request Failed: '{err}'")
+        raise
+
     return json.loads(response.read().decode('utf-8'))
 
 
