@@ -1,4 +1,9 @@
-- ovn-kubernetes image-arm64 0f17c7b6e5d1c0139d05123d310c6aaff30a3e49 to 29f1b8aff950b2cb670aa14edb0a181530f2ba53
+- machine-config-operator embedded-component ab25ae4a1fcf41ecfdba7a72d361a71e2604a9c1 to aaf1a8d2265fe934977300a229fde6d49166646f
+  - 88d7393a 2024-03-27T16:16:52+00:00 OPNET-303: Remove weights from ingress check script
+
+- ovn-kubernetes image-amd64 ab921c76ce6df598c47ba659fa2725382c9a5958 to 29f1b8aff950b2cb670aa14edb0a181530f2ba53
   - 41ab865 2024-05-21T14:09:38+01:00 Add logic to unfurl Aggregate type error in IsSuppressedError function
   - 7b93ecd 2024-05-21T14:07:34+01:00 Node delete should not retry when no node-subnets exist
+  - dac7382 2024-05-02T10:14:18+02:00 Put conntrack flushing for external gateway in a single function, add ipv6 MAC resolution support, cleanup conntrack for all protocols. Update e2es to expect the same behaviour for both protocols, now should also work in an ipv6-only cluster.
+  - ab2840d 2024-05-02T10:14:18+02:00 Fix external gateway tests for IPv6
 
