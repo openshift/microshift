@@ -1,9 +1,9 @@
-- machine-config-operator embedded-component ab25ae4a1fcf41ecfdba7a72d361a71e2604a9c1 to aaf1a8d2265fe934977300a229fde6d49166646f
-  - 88d7393a 2024-03-27T16:16:52+00:00 OPNET-303: Remove weights from ingress check script
+- machine-config-operator embedded-component aaf1a8d2265fe934977300a229fde6d49166646f to 4a4385ccb8c61013b04e5699d4a8d148e6e2a535
+  - a80a795e 2024-06-06T12:55:17+00:00 manifests: set required-scc for openshift workloads
 
-- ovn-kubernetes image-amd64 ab921c76ce6df598c47ba659fa2725382c9a5958 to 29f1b8aff950b2cb670aa14edb0a181530f2ba53
-  - 41ab865 2024-05-21T14:09:38+01:00 Add logic to unfurl Aggregate type error in IsSuppressedError function
-  - 7b93ecd 2024-05-21T14:07:34+01:00 Node delete should not retry when no node-subnets exist
-  - dac7382 2024-05-02T10:14:18+02:00 Put conntrack flushing for external gateway in a single function, add ipv6 MAC resolution support, cleanup conntrack for all protocols. Update e2es to expect the same behaviour for both protocols, now should also work in an ipv6-only cluster.
-  - ab2840d 2024-05-02T10:14:18+02:00 Fix external gateway tests for IPv6
+- oc image-amd64 7693229513083646fe3a83a0fec6e651e4866d8d to 44edfb50c55756395abc844fc4f7edb19dfefa50
+  - b9c28eea 2024-06-10T13:14:20+03:00 Bump joelanford/ignore to bump go-git to 5.11.0
+
+- oc image-arm64 7693229513083646fe3a83a0fec6e651e4866d8d to 44edfb50c55756395abc844fc4f7edb19dfefa50
+  - b9c28eea 2024-06-10T13:14:20+03:00 Bump joelanford/ignore to bump go-git to 5.11.0
 
