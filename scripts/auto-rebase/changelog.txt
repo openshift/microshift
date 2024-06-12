@@ -1,8 +1,0 @@
-- ovn-kubernetes image-amd64 3ff0577114073ec43a1259d7f582d58c3553cc2c to bdc67edd064afc3519c4780f43c1c3837cd4143f
-  - 52ffe95 2024-06-06T18:10:43+02:00 Put conntrack flushing for external gateway in a single function, add ipv6 MAC resolution support, cleanup conntrack for all protocols. Update e2es to expect the same behaviour for both protocols, now should also work in an ipv6-only cluster.
-  - d82e980 2024-06-06T18:10:29+02:00 Fix external gateway tests for IPv6
-
-- ovn-kubernetes image-arm64 3ff0577114073ec43a1259d7f582d58c3553cc2c to bdc67edd064afc3519c4780f43c1c3837cd4143f
-  - 52ffe95 2024-06-06T18:10:43+02:00 Put conntrack flushing for external gateway in a single function, add ipv6 MAC resolution support, cleanup conntrack for all protocols. Update e2es to expect the same behaviour for both protocols, now should also work in an ipv6-only cluster.
-  - d82e980 2024-06-06T18:10:29+02:00 Fix external gateway tests for IPv6
-
