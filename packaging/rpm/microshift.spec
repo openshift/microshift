@@ -230,6 +230,8 @@ install -d -m755 %{buildroot}%{_sharedstatedir}/microshift-backups
 
 install -d -m755 %{buildroot}%{_sysconfdir}/crio/crio.conf.d
 
+install -p -m644 packaging/crio.conf.d/00-crio-crun.conf %{buildroot}%{_sysconfdir}/crio/crio.conf.d/00-crio-crun.conf
+
 %ifarch %{arm} aarch64
 install -p -m644 packaging/crio.conf.d/10-microshift_arm64.conf %{buildroot}%{_sysconfdir}/crio/crio.conf.d/10-microshift.conf
 %endif
