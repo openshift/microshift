@@ -52,6 +52,7 @@ import argparse
 import collections
 import datetime
 import html.parser
+import logging
 import json
 import os
 import pathlib
@@ -62,6 +63,8 @@ import urllib
 from urllib import request
 
 import github
+
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(levelname)-8s [%(filename)s:%(lineno)d] %(message)s')
 
 URL_BASE = "https://mirror.openshift.com/pub/openshift-v4/aarch64/microshift"
 URL_BASE_X86 = "https://mirror.openshift.com/pub/openshift-v4/x86_64/microshift"
@@ -188,7 +191,7 @@ def main():
     args = parser.parse_args()
 
     if not GITHUB_TOKEN:
-        print('GITHUB_TOKEN is not set, trying to authenticate using application credentials')
+        logging.warning('GITHUB_TOKEN is not set, trying to authenticate using application credentials')
         GITHUB_TOKEN = get_access_token_for_app()
     if not GITHUB_TOKEN:
         raise RuntimeError('GITHUB_TOKEN does not appear to be set')
@@ -207,7 +210,7 @@ def main():
         new_releases.extend(find_new_releases(versions_to_scan, URL_BASE_X86, 'ocp'))
 
     if not new_releases:
-        print("No new releases found.")
+        logging.info("No new releases found.")
         return
 
     print()
@@ -220,6 +223,38 @@ def main():
 
     for new_release in unique_releases.values():
         publish_release(new_release, not args.dry_run)
+
+
+def redact(input):
+    return str.replace(input, GITHUB_TOKEN, '~~REDACTED~~')
+
+
+def run_process(cmd: list[str], env={}):
+    """
+    Helper function to run external commands and log (redacted) output.
+    Stdout is returned as a str.
+    If command fails, exception is raised.
+    """
+    cmd_to_log = redact(' '.join(cmd))
+    logging.debug(f"Running command: {cmd_to_log}")
+
+    # Include our existing environment settings to ensure values like
+    # HOME and other git settings are propagated.
+    env.update(os.environ)
+
+    completed = subprocess.run(
+        cmd,
+        env=env,
+        capture_output=True
+    )
+    sout = completed.stdout.decode('utf-8') if completed.stdout else ''
+    serr = str.strip(redact(completed.stderr.decode('utf-8'))) if completed.stderr else ''
+    logging.debug(f"Command '{cmd_to_log}' finished: rc='{completed.returncode}' stdout='{str.strip(redact(sout))}' stderr='{serr}'")
+
+    if completed.returncode != 0:
+        raise subprocess.CalledProcessError(completed.returncode, cmd_to_log, redact(sout), serr)
+
+    return sout
 
 
 def get_access_token_for_app():
@@ -292,8 +327,8 @@ class VersionListParser(html.parser.HTMLParser):
         self.versions.append(data)
 
     def error(self, message):
-        "Handle an error processing the HTML"
-        print(f"WARNING: error processing HTML: {message}")
+        """Handle an error processing the HTML"""
+        logging.warning(f"WARNING: error processing HTML: {message}")
 
 
 def find_new_releases(versions_to_scan, url_base, release_type):
@@ -317,7 +352,7 @@ def find_new_releases(versions_to_scan, url_base, release_type):
             if nr:
                 new_releases.append(nr)
         except Exception as err:  # pylint: disable=broad-except
-            print(f"WARNING: could not process {release_type} {version}: {err}")
+            logging.warning(f"Could not process {release_type} {version}: {err}")
     return new_releases
 
 
@@ -331,12 +366,13 @@ def check_for_new_releases(url_base, release_type, version):
     # in the path.
     for os_name in ['el9', 'elrhel-9']:
         rpm_list_url = f"{url_base}/{release_type}/{version}/{os_name}/os/rpm_list"
-        print(f"\nFetching {rpm_list_url} ...")
+        print()
+        logging.info(f"Fetching {rpm_list_url} ...")
         try:
             with request.urlopen(rpm_list_url) as rpm_list_response:
                 rpm_list = rpm_list_response.read().decode("utf-8").splitlines()
         except Exception as err:
-            print(err)
+            logging.error(err)
         else:
             break
 
@@ -356,10 +392,10 @@ def check_for_new_releases(url_base, release_type, version):
             break
     else:
         rpm_names = ',\n'.join(rpm_list)
-        print(f"WARNING: Did not find {microshift_rpm_name_prefix} in {rpm_names}")
+        logging.warning(f"Did not find {microshift_rpm_name_prefix} in {rpm_names}")
         return None
 
-    print(f"Examining RPM {microshift_rpm_filename}")
+    logging.info(f"Examining RPM {microshift_rpm_filename}")
 
     match = VERSION_RE.search(microshift_rpm_filename)
     if match is None:
@@ -371,6 +407,7 @@ def check_for_new_releases(url_base, release_type, version):
     release_date = rpm_version_details["release_date"]
     patch_number = rpm_version_details["patch_num"]
     commit_sha = rpm_version_details["commit_sha"]
+    full_commit_sha = str.strip(run_process(["git", "rev-parse", "--verify", f"{commit_sha}^{{commit}}"]))
 
     # Older release names # look like "4.13.0-ec-2" but we had a few
     # sprints where we published multiple builds, so use more of the
@@ -380,15 +417,15 @@ def check_for_new_releases(url_base, release_type, version):
     release_name = f"{product_version}-{candidate_type}.{candidate_number}-{release_date}.p{patch_number}"
 
     # Check if the release already exists
-    print(f"Checking for release {release_name}...")
+    logging.info(f"Checking for release {release_name}...")
     if github_release_exists(release_name):
-        print("Found an existing release, no work to do")
+        logging.info(f"Found an existing release {release_name}, no work to do")
         return None
-    print(f"Release tag {release_name} not found on remote repository")
+    logging.info(f"Release tag {release_name} not found on remote repository")
 
     return Release(
         release_name,
-        commit_sha,
+        full_commit_sha,
         product_version,
         candidate_type,
         candidate_number,
@@ -400,10 +437,7 @@ def check_for_new_releases(url_base, release_type, version):
 def tag_exists(release_name):
     "Checks if a given tag exists in the local repository."
     try:
-        subprocess.run(["git", "show", release_name],
-                       stdout=subprocess.DEVNULL,
-                       stderr=subprocess.DEVNULL,
-                       check=True)
+        run_process(["git", "show", release_name])
         return True
     except subprocess.CalledProcessError:
         return False
@@ -414,64 +448,32 @@ def add_token_remote():
     Adds the Git remote to the given repository using
     the provided installation (or personal) access token.
     """
-    env = {}
-    env.update(os.environ)
+    try:
+        run_process(["git", "remote", "remove", REMOTE])
+    except subprocess.CalledProcessError:
+        pass
 
-    print(f'git remote remove {REMOTE}')
-    subprocess.run(
-       ["git", "remote", "remove", REMOTE],
-       env=env,
-    )
-    print(f'git remote add {REMOTE} ~~REDACTED~~')
     remote_url = f"https://x-access-token:{GITHUB_TOKEN}@github.com/{GITHUB_ORG}/{GITHUB_REPO}"
-    result = subprocess.run(
-       ["git", "remote", "add", REMOTE, remote_url],
-       env=env,
-       capture_output=True,
-       text=True,
-    )
-    if result.returncode != 0:
-        err = result.stderr.replace(GITHUB_TOKEN, "") if result.stderr else "stderr is empty"
-        raise Exception(f"Command `git remote add` failed: {err}")
+    run_process(["git", "remote", "add", REMOTE, remote_url])
 
 
 def get_previous_tag(release_name):
     "Returns the name of the tag _before_ release_name on the branch."
-    output = subprocess.check_output(["git", "describe", f'{release_name}~1', '--abbrev=0'])
-    return output.decode('utf-8').strip()
+    output = run_process(["git", "describe", f'{release_name}~1', '--abbrev=0'])
+    return output.strip()
 
 
 def tag_release(tag, sha, buildtime):
     env = {}
-    # Include our existing environment settings to ensure values like
-    # HOME and other git settings are propagated.
-    env.update(os.environ)
     timestamp = buildtime.strftime('%Y-%m-%d %H:%M')
     env['GIT_COMMITTER_DATE'] = timestamp
-    print(f'GIT_COMMITTER_DATE={timestamp} git tag {tag} {sha}')
-    subprocess.run(
-        ['git', 'tag', '-m', tag, tag, sha],
-        env=env,
-        check=True,
-    )
+
+    logging.info(f"Using 'GIT_COMMITTER_DATE={timestamp}' for 'git tag {tag} {sha}'")
+    run_process(['git', 'tag', '-m', tag, tag, sha], env)
 
 
 def push_tag(tag):
-    env = {}
-    # Include our existing environment settings to ensure values like
-    # HOME and other git settings are propagated.
-    env.update(os.environ)
-    print(f'git push {REMOTE} {tag}')
-    cmd = ['git', 'push', REMOTE, tag]
-    completed = subprocess.run(
-        cmd,
-        env=env,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,
-    )
-    output = completed.stdout.decode('utf-8') if completed.stdout else ''
-    if completed.returncode != 0:
-        raise subprocess.CalledProcessError(completed.returncode, cmd, output)
+    run_process(['git', 'push', REMOTE, tag])
 
 
 def publish_release(new_release, take_action):
@@ -545,22 +547,14 @@ def publish_release(new_release, take_action):
         notes = f'{notes_to_keep}{TRUNCATED_MESSAGE}{last_line}'
 
     if not take_action:
-        print(f'Dry run for new release {new_release} on commit {commit_sha} from {release_date}')
-        print(notes)
+        logging.info(f'Dry run for new release {new_release} on commit {commit_sha} from {release_date}')
+        logging.info(notes)
         return
 
     push_tag(release_name)
 
     # Create draft release with message that includes download URLs and history
-    try:
-        github_release_create(release_name, notes)
-    except urllib.error.URLError as e:
-        print(f"Failed to create the release {release_name}: {e}")
-        print(f"Response: {str(e.fp.readlines())}")
-        raise
-    except Exception as err:
-        print(f"Failed to create the release {release_name}: {err}")
-        raise
+    github_release_create(release_name, notes)
 
 
 def github_release_create(tag, notes):
@@ -572,7 +566,7 @@ def github_release_create(tag, notes):
         draft=False,
         prerelease=True,
     )
-    print(f'Created new release {tag}:{ {"url":results["html_url"], "body": results["body"]} }')
+    logging.info(f'Created new release {tag}:{ {"url":results["html_url"], "body": results["body"]} }')
 
 
 def github_release_notes(previous_tag, tag_name, target_commitish):
@@ -602,12 +596,24 @@ def github_api(path, **data):
         )
     else:
         r = request.Request(url=url)
-    print(f"GitHub API Request: { {'method':r.get_method(), 'url': url, 'data': data} }")
+
+    logging.info(f"GitHub API Request: { {'method':r.get_method(), 'url': url, 'data': data} }")
     r.add_header('Accept', 'application/vnd.github+json')
     r.add_header('User-agent', 'microshift-release-notes')
     r.add_header('Authorization', f'Bearer {GITHUB_TOKEN}')
     r.add_header('X-GitHub-Api-Version', '2022-11-28')
-    response = request.urlopen(r)
+
+    try:
+        response = request.urlopen(r)
+    except urllib.error.URLError as e:
+        logging.error(f"GitHub API Request Failed: '{str(e.fp.readlines())}'")
+        # e.fp.readlines() sinks the response body but it's not read in any other place,
+        # so just re-raise for the exception type.
+        raise
+    except Exception as err:
+        logging.error(f"GitHub API Request Failed: '{err}'")
+        raise
+
     return json.loads(response.read().decode('utf-8'))
 
 
