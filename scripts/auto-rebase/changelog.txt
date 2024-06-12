@@ -1,20 +1,6 @@
-- cluster-network-operator embedded-component dfb3ff7a1642906f523911882c72d0cf00fd086f to 84f9a080d03777c95a1c5a0d13ca16e5aa342d98
-  - 807aa75 2024-06-08T00:20:09+00:00 Limit iptables-alerter's cpu
-  - 628db82 2024-06-05T10:44:16+01:00 Validate live migration before setting the progressing condition
-  - 13fac42 2024-06-04T09:13:41+00:00 ANP: Add telemetry rule expressions
-  - f7d9fb1 2024-06-04T09:13:41+00:00 Bump to v0.1.5
-  - 08cbef7 2024-06-04T09:13:41+00:00 Add ANP enable flag to HCP control-plane
-  - da50516 2024-05-31T13:25:15+00:00 Handle pod exiting race conditions in iptables-alerter
-  - 44e60e1 2024-05-30T13:55:42+01:00 Align new node subnet allocation between OVN-K and SDN during live migration
-  - 0225c3c 2024-05-30T09:50:42+01:00 Live migration: add metrics to observe CNI live migration
-  - 5eab508 2024-05-30T09:48:41+01:00 Add validation for live migration from OpenShiftSDN to OVNKubernetes
+- machine-config-operator embedded-component 53f3e1eef97a3e1c2cae0b3cbcae3e10f9228d8d to 03b4015daebb7b41004cd581bb9cbe7faacf120a
+  - d3b71f88 2024-06-06T23:12:11+00:00 *: ensure event handlers are registered after queue is configured
 
-- kubernetes embedded-component f6419fba786afe73e14412e43ee5645184addd92 to b2f5b1171deb4bbf754961c8b72ac31d2548c896
-  - 8b8df1a82 2024-05-29T08:13:01+00:00 UPSTREAM: <carry>: extend termination events
-
-- openshift-controller-manager embedded-component c736111041fca03f933739e7c55f223e72705623 to 1432fe0aa630ce83c0c3fd18c86e1fb9a47ae4cc
-  - 4f3cde4 2024-06-03T20:10:05+00:00 Add lower-case proxy envs to pod proxydefaults
-
-- kubernetes image-amd64 f6419fba786afe73e14412e43ee5645184addd92 to b2f5b1171deb4bbf754961c8b72ac31d2548c896
+- kubernetes image-arm64 f6419fba786afe73e14412e43ee5645184addd92 to b2f5b1171deb4bbf754961c8b72ac31d2548c896
   - 8b8df1a82 2024-05-29T08:13:01+00:00 UPSTREAM: <carry>: extend termination events
 
