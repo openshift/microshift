@@ -230,6 +230,8 @@ install -d -m755 %{buildroot}%{_sharedstatedir}/microshift-backups
 
 install -d -m755 %{buildroot}%{_sysconfdir}/crio/crio.conf.d
 
+install -p -m644 packaging/crio.conf.d/00-crio-crun.conf %{buildroot}%{_sysconfdir}/crio/crio.conf.d/00-crio-crun.conf
+
 %ifarch %{arm} aarch64
 install -p -m644 packaging/crio.conf.d/10-microshift_arm64.conf %{buildroot}%{_sysconfdir}/crio/crio.conf.d/10-microshift.conf
 %endif
@@ -404,6 +406,7 @@ fi
 %{_bindir}/microshift-cleanup-data
 %{_bindir}/microshift-sos-report
 %{_unitdir}/microshift.service
+%{_sysconfdir}/crio/crio.conf.d/00-crio-crun.conf
 %{_sysconfdir}/crio/crio.conf.d/10-microshift.conf
 %{_datadir}/microshift/spec/config-openapi-spec.json
 %dir %{_sysconfdir}/microshift
@@ -471,6 +474,9 @@ fi
 # Use Git command to generate the log and replace the VERSION string
 # LANG=C git log --date="format:%a %b %d %Y" --pretty="tformat:* %cd %an <%ae> VERSION%n- %s%n" packaging/rpm/microshift.spec
 %changelog
+* Wed Jun 12 2024 Pablo Acevedo Montserrat <pacevedo@redhat.com> 4.16.0
+- Explicitly configure crun as default crio runtime
+
 * Wed Jun 05 2024 Gregory Giguashvili <ggiguash@redhat.com> 4.16.0
 - Declare openvswitch3.1 package as obsolete to allow seemless upgrade to openvswitch3.3
 
