@@ -1,0 +1,3 @@
+- cluster-dns-operator embedded-component 5553a22698ac7fce2cc401ed5884eb1bdb36a02d to 9964f0b6fce1ba7a26995762602685cd07416928
+  - 801d06b 2024-01-03T20:17:54+00:00 OCPBUGS-20024: Remove modifiability of maxUnavailable
+
