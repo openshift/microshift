@@ -1,9 +1,0 @@
-- machine-config-operator embedded-component aaf1a8d2265fe934977300a229fde6d49166646f to 4a4385ccb8c61013b04e5699d4a8d148e6e2a535
-  - a80a795e 2024-06-06T12:55:17+00:00 manifests: set required-scc for openshift workloads
-
-- oc image-amd64 7693229513083646fe3a83a0fec6e651e4866d8d to 44edfb50c55756395abc844fc4f7edb19dfefa50
-  - b9c28eea 2024-06-10T13:14:20+03:00 Bump joelanford/ignore to bump go-git to 5.11.0
-
-- oc image-arm64 7693229513083646fe3a83a0fec6e651e4866d8d to 44edfb50c55756395abc844fc4f7edb19dfefa50
-  - b9c28eea 2024-06-10T13:14:20+03:00 Bump joelanford/ignore to bump go-git to 5.11.0
-
