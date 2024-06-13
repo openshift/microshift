@@ -1,15 +1,31 @@
-- api embedded-component cefcda60d93878aef123d2bc79a80935751af6be to a837bee24500e12cf6b5608620a36983d96b1e36
-  - 5caa603 2024-06-07T09:01:11-05:00 OCPBUGS-34974: IBMCloud: Add IBM Cloud Services
+- api embedded-component a837bee24500e12cf6b5608620a36983d96b1e36 to 5c2b46e4709a950e98cda1f3733f9a46cd9737cd
+  - ebe447c 2024-06-11T14:02:04+01:00 Update published Kubebuilder tools
 
-- cluster-kube-controller-manager-operator embedded-component 69c2adfce27e91a94dcd4c3e8dcae198bc0becbf to a1afb4c381b817e9465105f9860560607e338fb9
-  - 8523f34 2024-06-10T10:37:37+01:00 Updating ose-cluster-kube-controller-manager-operator-container image to be consistent with ART for 4.17 Reconciling with https://github.com/openshift/ocp-build-data/tree/4c1326094222f9209876f06833179a1b9178faf7/images/ose-cluster-kube-controller-manager-operator.yml
-  - 59c1bf1 2024-06-10T09:42:19+01:00 Bump golang 1.22.1
+- cluster-kube-apiserver-operator embedded-component 94ca049d55ee0f070f7fcad9b12a1f1c45ce47cb to 58d79ab9d65972bbd706e0787d149e7c0aef1774
+  - 98aca49 2024-05-30T12:57:33+02:00 manifests: add ownership annotation for kubelet-bootstrap-kubeconfig
 
-- cluster-kube-scheduler-operator embedded-component 2dd16868b165e58f949fc6db815f086aeaa28554 to 42cd901d6af5d0a1deaab55cf377082b9f76b4d6
-  - 3131522 2024-06-10T10:50:40+01:00 Updating ose-cluster-kube-scheduler-operator-container image to be consistent with ART for 4.17 Reconciling with https://github.com/openshift/ocp-build-data/tree/4c1326094222f9209876f06833179a1b9178faf7/images/ose-cluster-kube-scheduler-operator.yml
-  - 4c19250 2024-06-10T09:29:00+01:00 Bump golang 1.22.1
+- cluster-network-operator embedded-component ef3e1a0e1002a4ef5eaa95a1484d172e5df53b91 to 07bc4e2cb3e0b5cee72dd843229193c220b9e08c
+  - fc9a55d 2024-06-10T16:11:52+01:00 Adds cluster-autoscaler annotation to prevent eviction
 
-- cluster-network-operator embedded-component 529c8fb2f44f0b60a84095eedaae27ed308e2fee to ef3e1a0e1002a4ef5eaa95a1484d172e5df53b91
-  - a1c3d8c 2024-06-05T09:38:35-04:00 Limit iptables-alerter's cpu
-  - 0b9c0b2 2024-06-05T08:54:56-04:00 Reject openshift-sdn as a plugin, drop references to image.
+- machine-config-operator embedded-component 3506e3e84307cd9fa0f420f2931b460b7cb0296a to eafd0ba4b92d65ea4f93134e9e87ad30f75932aa
+  - 1f53051a 2024-06-11T06:35:11-04:00 fix panic due to missing MOSC deference by erroring it out
+  - 829684eb 2024-06-10T17:16:21-04:00 OCPNODE-2336: Drop ClusterImagePolicy validation on scope conflicts with release-image repo
+  - 23a8c8d2 2024-06-04T16:42:17-04:00 add NodeDisruption e2e tests
+  - b65c6331 2024-06-04T16:42:17-04:00 degrade daemon on NodeDisruptionPolicy errors
+  - b90b11e8 2024-05-22T14:03:56-04:00 add check for MachineConfiguration generation
+  - e7d82d53 2024-05-22T11:09:22-04:00 fixes canonicalized secret creation and updates
+
+- oc image-amd64 0b082c6c3f40807e6e6482ac34417f7ee8a97712 to 7b485f76af31da5be136158d070db8130465216a
+  - 8c6fe516 2024-05-31T15:12:18+02:00 pkg/cli/admin/mustgather: don't manually delete cluster role binding
+  - 1c6c3169 2024-05-30T15:14:07+02:00 pkg/cli/admin/mustgather: gofumpt file
+
+- coredns image-amd64 4a14f3481105adf4b4086ba9727bee3dec0847fd to f80a0b3882f36832a33f07b720007956717e324d
+  - c87f74b 2024-05-29T16:19:23-04:00 UPSTREAM: 6692: openshift: Fix OCPBUGS-34619
+
+- oc image-arm64 0b082c6c3f40807e6e6482ac34417f7ee8a97712 to 7b485f76af31da5be136158d070db8130465216a
+  - 8c6fe516 2024-05-31T15:12:18+02:00 pkg/cli/admin/mustgather: don't manually delete cluster role binding
+  - 1c6c3169 2024-05-30T15:14:07+02:00 pkg/cli/admin/mustgather: gofumpt file
+
+- coredns image-arm64 4a14f3481105adf4b4086ba9727bee3dec0847fd to f80a0b3882f36832a33f07b720007956717e324d
+  - c87f74b 2024-05-29T16:19:23-04:00 UPSTREAM: 6692: openshift: Fix OCPBUGS-34619
 
