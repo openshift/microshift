@@ -1,6 +1,10 @@
-- machine-config-operator embedded-component 53f3e1eef97a3e1c2cae0b3cbcae3e10f9228d8d to 03b4015daebb7b41004cd581bb9cbe7faacf120a
-  - d3b71f88 2024-06-06T23:12:11+00:00 *: ensure event handlers are registered after queue is configured
-
-- kubernetes image-arm64 f6419fba786afe73e14412e43ee5645184addd92 to b2f5b1171deb4bbf754961c8b72ac31d2548c896
-  - 8b8df1a82 2024-05-29T08:13:01+00:00 UPSTREAM: <carry>: extend termination events
+- operator-framework-olm embedded-component 56b7b9d5a6a063dad50e5f5a31b6dca7012c8345 to 1aacee6a78ceac7acd5aa03647933e550d66a12c
+  - ae0494a0 2024-06-09T10:10:06+02:00 pin test catalog
+  - f355a8f9 2024-06-08T19:59:11+02:00 patch subscription e2e flake (#3302)
+  - f8cf872e 2024-06-08T19:59:07+02:00 patch installplan e2e (#3301)
+  - 8d67f6da 2024-06-06T12:59:49+02:00 :seedling: update skopeo openshift test (#3298)
+  - 8f9e3dd5 2024-06-06T12:59:48+02:00 re-enable seed and skip options for e2e (#3296)
+  - 5c0959e4 2024-06-06T12:59:25+02:00 :seedling: parameterizes the e2e target and pins opm images (#3275)
+  - d22e45e7 2024-06-05T15:28:44+02:00 :seedling: patch flakes (#3281)
+  - d0196440 2024-06-05T15:26:08+02:00 bugfix: refactor test package names 'packageA' and 'packageB' because they break naming conventions (#3260)
 
