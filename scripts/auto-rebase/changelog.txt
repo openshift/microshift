@@ -1,31 +1,16 @@
-- api embedded-component a837bee24500e12cf6b5608620a36983d96b1e36 to 5c2b46e4709a950e98cda1f3733f9a46cd9737cd
-  - ebe447c 2024-06-11T14:02:04+01:00 Update published Kubebuilder tools
+- cluster-network-operator embedded-component 07bc4e2cb3e0b5cee72dd843229193c220b9e08c to 6addd5e12150973804abf26991dcc6cfb8e9ff36
+  - 73cb30b 2024-06-11T10:31:15+02:00 linter: removed deprecated linters
 
-- cluster-kube-apiserver-operator embedded-component 94ca049d55ee0f070f7fcad9b12a1f1c45ce47cb to 58d79ab9d65972bbd706e0787d149e7c0aef1774
-  - 98aca49 2024-05-30T12:57:33+02:00 manifests: add ownership annotation for kubelet-bootstrap-kubeconfig
+- machine-config-operator embedded-component eafd0ba4b92d65ea4f93134e9e87ad30f75932aa to fc878b8614b1aed5e2e44e4a1a89e6673674880d
+  - a5dcc6fe 2024-06-11T20:25:52-04:00 Azure: add Azure specific dnsmasq ordering
+  - 51662639 2024-06-10T12:40:58-05:00 crio: migrate metrics port to localhost only
 
-- cluster-network-operator embedded-component ef3e1a0e1002a4ef5eaa95a1484d172e5df53b91 to 07bc4e2cb3e0b5cee72dd843229193c220b9e08c
-  - fc9a55d 2024-06-10T16:11:52+01:00 Adds cluster-autoscaler annotation to prevent eviction
+- openshift-controller-manager embedded-component 51b6dbac5caca0db97423b81197629e59be090f0 to dc54a288f78e85e880ee37da2877629efd65c8c6
+  - 6bbfd9a 2024-06-11T15:18:45+05:30 OCPBUGS-32873: Replace deprecated gopkg.in/square/go-jose.v2
 
-- machine-config-operator embedded-component 3506e3e84307cd9fa0f420f2931b460b7cb0296a to eafd0ba4b92d65ea4f93134e9e87ad30f75932aa
-  - 1f53051a 2024-06-11T06:35:11-04:00 fix panic due to missing MOSC deference by erroring it out
-  - 829684eb 2024-06-10T17:16:21-04:00 OCPNODE-2336: Drop ClusterImagePolicy validation on scope conflicts with release-image repo
-  - 23a8c8d2 2024-06-04T16:42:17-04:00 add NodeDisruption e2e tests
-  - b65c6331 2024-06-04T16:42:17-04:00 degrade daemon on NodeDisruptionPolicy errors
-  - b90b11e8 2024-05-22T14:03:56-04:00 add check for MachineConfiguration generation
-  - e7d82d53 2024-05-22T11:09:22-04:00 fixes canonicalized secret creation and updates
-
-- oc image-amd64 0b082c6c3f40807e6e6482ac34417f7ee8a97712 to 7b485f76af31da5be136158d070db8130465216a
-  - 8c6fe516 2024-05-31T15:12:18+02:00 pkg/cli/admin/mustgather: don't manually delete cluster role binding
-  - 1c6c3169 2024-05-30T15:14:07+02:00 pkg/cli/admin/mustgather: gofumpt file
-
-- coredns image-amd64 4a14f3481105adf4b4086ba9727bee3dec0847fd to f80a0b3882f36832a33f07b720007956717e324d
-  - c87f74b 2024-05-29T16:19:23-04:00 UPSTREAM: 6692: openshift: Fix OCPBUGS-34619
-
-- oc image-arm64 0b082c6c3f40807e6e6482ac34417f7ee8a97712 to 7b485f76af31da5be136158d070db8130465216a
-  - 8c6fe516 2024-05-31T15:12:18+02:00 pkg/cli/admin/mustgather: don't manually delete cluster role binding
-  - 1c6c3169 2024-05-30T15:14:07+02:00 pkg/cli/admin/mustgather: gofumpt file
-
-- coredns image-arm64 4a14f3481105adf4b4086ba9727bee3dec0847fd to f80a0b3882f36832a33f07b720007956717e324d
-  - c87f74b 2024-05-29T16:19:23-04:00 UPSTREAM: 6692: openshift: Fix OCPBUGS-34619
+- operator-framework-olm embedded-component e45e646787c45749617a91aaa93f4b062beec131 to c921a18b08a10e8d4366b70103a7de0ec6c50747
+  - 8210c1a5 2024-06-12T00:05:01+00:00 build(deps): bump github.com/go-logr/logr from 1.4.1 to 1.4.2 (#3311)
+  - 15a681cd 2024-06-12T00:03:24+00:00 build(deps): bump goreleaser/goreleaser-action from 5 to 6 (#3314)
+  - bb9f8629 2024-06-12T00:03:09+00:00 build(deps): bump sigs.k8s.io/controller-runtime from 0.18.3 to 0.18.4 (#3313)
+  - 0222def6 2024-06-12T00:02:50+00:00 build(deps): bump golang.org/x/net from 0.25.0 to 0.26.0 (#3312)
 
