@@ -1,0 +1,33 @@
+- cluster-ingress-operator embedded-component 37f7c42f4fea6f4668e5447f420d3a55b8e9f287 to a0ac804cae89b91763ec8d0e16ed918c49eb3411
+  - 6778ce1 2024-06-11T16:29:21-04:00 Add route upgradeable control loop for SHA-1 certs
+  - 3797141 2024-06-11T16:20:34-04:00 Add SignatureAlgorithm argument to generateCertificate
+  - 6c4576b 2024-06-11T16:20:34-04:00 Rename certificate generation E2E helper functions
+  - 09ceb00 2024-06-11T16:20:34-04:00 Bump openshift/api
+  - 26b6b7a 2024-06-11T16:19:14-04:00 Set Upgradeable=False if default cert uses SHA-1
+  - 553e182 2024-06-11T14:52:24-04:00 copyProbe: Refactor to group copying of defaults
+  - 8024aa1 2024-06-11T14:52:24-04:00 Specify parameter values for router probes
+  - 616eff5 2024-06-11T14:51:05-04:00 Modified-by: candita
+  - c111705 2024-06-11T14:30:30-04:00 Set "service-ca-bundle" volume's default mode
+  - 5a88ab0 2024-06-11T14:30:30-04:00 Test_deploymentConfigChanged: Use k8s.io/utils/ptr
+  - 21a7572 2024-06-11T14:30:30-04:00 TestHostNetworkPortBinding: Check service ports
+  - 65fda2b 2024-06-11T14:30:30-04:00 TestHostNetworkPortBinding: Use t.Log, t.Cleanup
+  - e9607ed 2024-06-11T14:30:30-04:00 Test_desiredInternalIngressControllerService: godoc
+  - 56f7cd7 2024-06-11T14:30:30-04:00 Test_desiredLoadBalancerService: Add assertions
+  - c2bc837 2024-06-11T14:30:30-04:00 Set SessionAffinity to avoid confusing diffs
+  - d2117eb 2024-06-11T14:30:30-04:00 crdChanged, nodePortServiceChanged: Fix preserves
+  - 6f41cf1 2024-06-11T14:30:30-04:00 Test_*Changed: Verify that some update was made
+  - c8a8b1d 2024-06-11T14:30:30-04:00 internalServiceChanged: Fix target port logic
+
+- machine-config-operator embedded-component 4a4385ccb8c61013b04e5699d4a8d148e6e2a535 to eac63b92593461d31042085ab5d156bb680006ed
+  - e776b946 2024-04-11T00:44:55+00:00 OCPBUGS-29919: Decrease logs of haproxy
+
+- operator-framework-olm embedded-component 50f148e2b1ed9eed9625d03f0d754bca53da1414 to d863e7cd095d747c6e9e43c6371470f78a064c65
+  - 726e49bc 2024-06-09T14:00:59+02:00 pin test catalog
+  - 2f247250 2024-06-09T14:00:59+02:00 bump to go1.20
+  - eb1a88ea 2024-06-09T14:00:59+02:00 patch subscription e2e flake (#3302)
+  - 25d18450 2024-06-09T14:00:56+02:00 patch installplan e2e (#3301)
+  - 996682cb 2024-06-09T13:57:39+02:00 re-enable seed and skip options for e2e (#3296)
+  - edb54359 2024-06-09T13:57:39+02:00 :seedling: parameterizes the e2e target and pins opm images (#3275)
+  - dbb7d144 2024-06-09T13:57:39+02:00 :seedling: patch flakes (#3281)
+  - 7fa69878 2024-06-09T13:57:39+02:00 bugfix: refactor test package names 'packageA' and 'packageB' because they break naming conventions (#3260)
+
