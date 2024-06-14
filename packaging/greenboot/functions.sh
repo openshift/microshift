@@ -57,10 +57,10 @@ function print_boot_status() {
 # The returned timeout is a product of a base value and a boot attempt counter, so
 # that the timeout increases after every boot attempt.
 #
-# The base value for the timeout and the maximum boot attempts can be defined in
-# the /etc/greenboot/greenboot.conf file using the MICROSHIFT_WAIT_TIMEOUT_SEC
-# and GREENBOOT_MAX_BOOTS settings. These values can be in the [60..9999] range
-# for MICROSHIFT_WAIT_TIMEOUT_SEC and the [1..9] range for GREENBOOT_MAX_BOOTS.
+# The base value for the timeout and the maximum boot attempts can be defined in the
+# /etc/greenboot/greenboot.conf file using the MICROSHIFT_WAIT_TIMEOUT_SEC and
+# GREENBOOT_MAX_BOOT_ATTEMPTS settings. These values can be in the [60..9999] range
+# for MICROSHIFT_WAIT_TIMEOUT_SEC and the [1..9] range for GREENBOOT_MAX_BOOT_ATTEMPTS.
 #
 # args: None
 # return: Print the recommended timeout value to stdout. If the values are not
@@ -84,11 +84,11 @@ function get_wait_timeout() {
     fi
 
     # Read and verify the max boots value, allowing for the [1..9] range
-    local max_boots=${GREENBOOT_MAX_BOOTS:-3}
+    local max_boots=${GREENBOOT_MAX_BOOT_ATTEMPTS:-3}
     local reBoots='^[1-9]{1}$'
     if [[ ! ${max_boots} =~ ${reBoots} ]] ; then
         max_boots=3
-        >&2 echo "GREENBOOT_MAX_BOOTS value '${GREENBOOT_MAX_BOOTS}' is not in the [1..9] range: using '${max_boots}' instead"
+        >&2 echo "GREENBOOT_MAX_BOOT_ATTEMPTS value '${GREENBOOT_MAX_BOOT_ATTEMPTS}' is not in the [1..9] range: using '${max_boots}' instead"
     fi
 
     # Update the wait timeout according to the boot counter.
