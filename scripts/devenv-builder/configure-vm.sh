@@ -168,35 +168,29 @@ if ${BUILD_AND_RUN}; then
 fi
 
 if ${RHEL_SUBSCRIPTION}; then
-    # This version might not match the version under development because we need
-    # to pull in dependencies that are already released
-    LATEST_RHOCP_MINOR=$("${RHOCP_REPO}")
-else
-    # Assume the current development version on non-RHEL OS
-    LATEST_RHOCP_MINOR=$(cut -d'.' -f2 "${MAKE_VERSION}")
-fi
-OCPVERSION="4.${LATEST_RHOCP_MINOR}"
-
-if ${RHEL_SUBSCRIPTION}; then
     OSVERSION=$(awk -F: '{print $5}' /etc/system-release-cpe)
     sudo subscription-manager config --rhsm.manage_repos=1
 
-    sudo subscription-manager repos \
-        --enable "rhocp-${OCPVERSION}-for-rhel-${OSVERSION}-$(uname -m)-rpms"
-
-    if ! ${RHEL_BETA_VERSION} ; then
-        sudo subscription-manager repos \
-            --enable "fast-datapath-for-rhel-${OSVERSION}-$(uname -m)-rpms"
-    else
-        OCP_REPO_NAME="rhocp-${OCPVERSION}-for-rhel-${OSVERSION}-mirrorbeta-$(uname -i)-rpms"
+    RHOCP=$("${RHOCP_REPO}")
+    if [[ "${RHOCP}" =~ ^[0-9]{2} ]]; then
+        sudo subscription-manager repos --enable "rhocp-4.${RHOCP}-for-rhel-9-$(uname -m)-rpms"
+    elif [[ "${RHOCP}" =~ ^http ]]; then
+        url=$(echo "${RHOCP}" | cut -d, -f1)
+        ver=$(echo "${RHOCP}" | cut -d, -f2)
+        OCP_REPO_NAME="rhocp-4.${ver}-for-rhel-9-mirrorbeta-$(uname -i)-rpms"
         sudo tee "/etc/yum.repos.d/${OCP_REPO_NAME}.repo" >/dev/null <<EOF
 [${OCP_REPO_NAME}]
-name=Beta rhocp-${OCPVERSION} RPMs for RHEL ${OSVERSION}
-baseurl=https://mirror.openshift.com/pub/openshift-v4/\$basearch/dependencies/rpms/${OCPVERSION}-el${OSVERSION}-beta/
+name=Beta rhocp-4.${ver} RPMs for RHEL 9
+baseurl=${url}
 enabled=1
 gpgcheck=0
 skip_if_unavailable=0
 EOF
+    fi
+
+    # Enable fast-datapath (ovn) only for non-beta. Beta RHEL will use openvswitch from RHOCP beta mirror.
+    if ! ${RHEL_BETA_VERSION}; then
+        sudo subscription-manager repos --enable "fast-datapath-for-rhel-${OSVERSION}-$(uname -m)-rpms"
     fi
 else
     "${DNF_RETRY}" "install" "centos-release-nfv-common"
@@ -215,6 +209,8 @@ fi
 if ${RHEL_SUBSCRIPTION}; then
     "${DNF_RETRY}" "install" "openshift-clients"
 else
+    # Assume the current development version on non-RHEL OS
+    OCPVERSION="4.$(cut -d'.' -f2 "${MAKE_VERSION}")"
     OCC_SRC="https://mirror.openshift.com/pub/openshift-v4/$(uname -m)/dependencies/rpms/${OCPVERSION}-el9-beta"
     OCC_RPM="$(curl -s "${OCC_SRC}/" | grep -o "openshift-clients-4[^\"']*.rpm" | sort | uniq)"
     OCC_LOC="$(mktemp /tmp/openshift-client-XXXXX.rpm)"

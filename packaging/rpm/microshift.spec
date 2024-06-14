@@ -61,8 +61,8 @@ BuildRequires: systemd
 BuildRequires: golang
 # DO NOT REMOVE
 
-Requires: cri-o >= 1.25
-Requires: cri-tools >= 1.25
+Requires: cri-o >= 1.29.0, cri-o < 1.30.0
+Requires: cri-tools >= 1.29.0, cri-tools < 1.30.0
 Requires: iptables
 Requires: microshift-selinux = %{version}
 Requires: microshift-networking = %{version}
@@ -474,6 +474,9 @@ fi
 # Use Git command to generate the log and replace the VERSION string
 # LANG=C git log --date="format:%a %b %d %Y" --pretty="tformat:* %cd %an <%ae> VERSION%n- %s%n" packaging/rpm/microshift.spec
 %changelog
+* Mon Jul 1 2024 Patryk Matuszak <pmatusza@redhat.com> 4.16.2
+- Fix CRI-O version to match Kubernetes version
+
 * Wed Jun 12 2024 Pablo Acevedo Montserrat <pacevedo@redhat.com> 4.16.0
 - Explicitly configure crun as default crio runtime
 

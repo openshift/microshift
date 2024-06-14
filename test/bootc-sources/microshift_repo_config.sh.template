@@ -36,7 +36,7 @@ config_centos9_repos() {
     cat > "${OCP_MIRROR_REPO_FILE}" <<EOF
 [openshift-mirror-beta]
 name=OpenShift Mirror Beta Repository
-baseurl=https://mirror.openshift.com/pub/openshift-v4/{{ .Env.UNAME_M }}/dependencies/rpms/4.{{ .Env.PREVIOUS_MINOR_VERSION }}-el9-beta/
+baseurl={{ .Env.RHOCP_MINOR_Y_BETA }}
 enabled=1
 gpgcheck=0
 skip_if_unavailable=0
@@ -73,7 +73,8 @@ EOF
     cat > "${OCP_RHOCP_REPO_FILE}" <<EOF
 [openshift-rhocp]
 name=OpenShift Dependencies RHEL 9
-baseurl=https://cdn.redhat.com/content/dist/layered/rhel9/{{ .Env.UNAME_M }}/rhocp/4.{{ .Env.PREVIOUS_MINOR_VERSION }}/os
+{{- if env.Getenv "RHOCP_MINOR_Y" "" }}
+baseurl=https://cdn.redhat.com/content/dist/layered/rhel9/{{ .Env.UNAME_M }}/rhocp/4.{{ .Env.RHOCP_MINOR_Y }}/os
 enabled=1
 gpgcheck=1
 gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
@@ -81,6 +82,13 @@ sslverify=1
 sslcacert = /etc/rhsm/ca/redhat-uep.pem
 sslclientkey = ${sslkey}
 sslclientcert = ${sslcrt}
+{{- else }}
+{{- /* Just use .Env.RHOCP_MINOR_Y_BETA without checking if it exists, so missing repo is an explicit error */}}
+baseurl={{ .Env.RHOCP_MINOR_Y_BETA }}
+enabled=1
+gpgcheck=0
+sslverify=1
+{{- end }}
 skip_if_unavailable=0
 EOF
 }
