@@ -4,31 +4,40 @@ assets:
     src: lvms/amd64/
     no_clean: True
     files:
+      # Version Config Map
       - file: topolvm-configmap_lvms-version.yaml
-      - file: topolvm-controller_rbac.authorization.k8s.io_v1_clusterrole.yaml
-      - file: topolvm-controller_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml
-      - file: topolvm-controller_rbac.authorization.k8s.io_v1_role.yaml
-      - file: topolvm-controller_rbac.authorization.k8s.io_v1_rolebinding.yaml
-      - file: topolvm-controller_v1_serviceaccount.yaml
-      - file: topolvm-node_rbac.authorization.k8s.io_v1_clusterrole.yaml
-      - file: topolvm-node_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml
-      - file: topolvm-node_v1_serviceaccount.yaml
+      # CRDs
       - file: topolvm.io_logicalvolumes.yaml
-      - file: topolvm-node-scc_rbac.authorization.k8s.io_v1_clusterrole.yaml
-        ignore: "provided by MicroShift"
-      - file: topolvm-node-scc_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml
-        ignore: "provided by MicroShift"
-      - file: csi-driver.yaml
-        ignore: "provided by MicroShift"
-      - file: topolvm-controller_deployment.yaml
-        ignore: "provided by MicroShift"
-      - file: topolvm-lvmd-config_configmap_v1.yaml
-        ignore: "provided by MicroShift"
-      - file: topolvm-node_daemonset.yaml
-        ignore: "provided by MicroShift"
-      - file: topolvm-node-securitycontextconstraint.yaml
-        ignore: "provided by MicroShift"
+      - file: lvm.topolvm.io_lvmclusters.yaml
+      - file: lvm.topolvm.io_lvmvolumegroupnodestatuses.yaml
+      - file: lvm.topolvm.io_lvmvolumegroups.yaml
+      # Extracted CSV RBAC Information
+      - file: lvms-operator_rbac.authorization.k8s.io_v1_clusterrole.yaml
+      - file: lvms-operator_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml
+      - file: lvms-operator_rbac.authorization.k8s.io_v1_role.yaml
+      - file: lvms-operator_rbac.authorization.k8s.io_v1_rolebinding.yaml
+      - file: lvms-metrics_rbac.authorization.k8s.io_v1_role.yaml
+      - file: lvms-metrics_rbac.authorization.k8s.io_v1_rolebinding.yaml
+      - file: vg-manager_rbac.authorization.k8s.io_v1_clusterrole.yaml
+      - file: vg-manager_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml
+      - file: vg-manager_rbac.authorization.k8s.io_v1_role.yaml
+      - file: vg-manager_rbac.authorization.k8s.io_v1_rolebinding.yaml
+      # Services
+      - file: lvms-operator_v1_serviceaccount.yaml
+      - file: vg-manager_v1_serviceaccount.yaml
+      - file: lvms-webhook-service_v1_service.yaml
+      - file: lvms-operator-metrics-service_v1_service.yaml
+      - file: vg-manager-metrics-service_v1_service.yaml
+      # Deployment
+      - file: lvms-operator_apps_v1_deployment.yaml
+      # Webhook
+      - file: lvms-operator_admissionregistration.k8s.io_v1_webhook.yaml
+      # Manual Namespace instead of OLM one
       - file: topolvm-openshift-storage_namespace.yaml
         ignore: "provided by MicroShift"
+      # Manual Storage Class instead of automatic LVMCluster creation
       - file: topolvm_default-storage-class.yaml
+        ignore: "provided by MicroShift"
+      # LVMCluster instead of User-created LVMCluster
+      - file: lvms_default-lvmcluster.yaml
         ignore: "provided by MicroShift"

@@ -90,56 +90,6 @@ func ApplyStorageClasses(ctx context.Context, scs []string, render RenderFunc, p
 	return applySCs(ctx, scs, sc, render, params)
 }
 
-type cdApplier struct {
-	Client *scclientv1.StorageV1Client
-	cd     *scv1.CSIDriver
-}
-
-func (c *cdApplier) Read(objBytes []byte, render RenderFunc, params RenderParams) {
-	var err error
-	if render != nil {
-		objBytes, err = render(objBytes, params)
-		if err != nil {
-			panic(err)
-		}
-	}
-	obj, err := runtime.Decode(scCodecs.UniversalDecoder(scv1.SchemeGroupVersion), objBytes)
-	if err != nil {
-		panic(err)
-	}
-	c.cd = obj.(*scv1.CSIDriver)
-}
-
-func (c *cdApplier) Handle(ctx context.Context) error {
-	_, _, err := resourceapply.ApplyCSIDriver(ctx, c.Client, assetsEventRecorder, c.cd)
-	return err
-}
-
-func ApplyCSIDrivers(ctx context.Context, drivers []string, render RenderFunc, params RenderParams, kubeconfigPath string) error {
-	applier := &cdApplier{}
-	applier.Client = scClient(kubeconfigPath)
-	return applyCDs(ctx, drivers, applier, render, params)
-}
-
-func applyCDs(ctx context.Context, cds []string, handler resourceHandler, render RenderFunc, params RenderParams) error {
-	lock.Lock()
-	defer lock.Unlock()
-
-	for _, cd := range cds {
-		klog.Infof("Applying csiDriver %s", cd)
-		objBytes, err := embedded.Asset(cd)
-		if err != nil {
-			return fmt.Errorf("error getting asset %s: %v", cd, err)
-		}
-		handler.Read(objBytes, render, params)
-		if err := handler.Handle(ctx); err != nil {
-			klog.Warningf("Failed to apply CSIDriver api %s: %v", cd, err)
-			return err
-		}
-	}
-	return nil
-}
-
 type volumeSnapshotClassApplier struct {
 	Client dynamic.Interface
 	vc     *unstructured.Unstructured
@@ -192,12 +142,12 @@ func applyVolumeSnapshotClass(ctx context.Context, handler resourceHandler, vcs 
 	return nil
 }
 
-// storageDynamicClient returns a generic kubernetes client which can handle arbitrary API schemas.  We use this instead of th
-// volumeSnapshot client to avoid vendoring
+// storageDynamicClient returns a generic kubernetes Client which can handle arbitrary API schemas.  We use this instead of th
+// volumeSnapshot Client to avoid vendoring
 func storageDynamicClient(kubeconfigPath string) *dynamic.DynamicClient {
 	restCfg, err := clientcmd.BuildConfigFromFlags("", kubeconfigPath)
 	if err != nil {
 		panic(err)
 	}
-	return dynamic.NewForConfigOrDie(rest.AddUserAgent(restCfg, "storage-dynamic-client"))
+	return dynamic.NewForConfigOrDie(rest.AddUserAgent(restCfg, "storage-dynamic-Client"))
 }

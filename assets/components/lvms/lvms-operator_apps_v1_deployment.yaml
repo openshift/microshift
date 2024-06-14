@@ -1,0 +1,88 @@
+label:
+  app.kubernetes.io/name: lvms-operator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: lvms-operator
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        target.workload.openshift.io/management: '{"effect": "PreferredDuringScheduling"}'
+      labels:
+        app.kubernetes.io/component: lvms-operator
+        app.kubernetes.io/name: lvms-operator
+        app.kubernetes.io/part-of: lvms-provisioner
+    spec:
+      containers:
+        - args:
+            - --health-probe-bind-address=:8081
+            - --leader-elect=false
+          command:
+            - /lvms
+            - operator
+          env:
+            - name: GOGC
+              value: "120"
+            - name: GOMEMLIMIT
+              value: 50MiB
+            - name: GOMAXPROCS
+              value: "2"
+            - name: NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+          image: quay.io/jmoller/lvms-operator:microshift
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8081
+            initialDelaySeconds: 10
+            periodSeconds: 20
+          name: manager
+          ports:
+            - containerPort: 9443
+              name: webhook-server
+              protocol: TCP
+          resources:
+            requests:
+              cpu: 5m
+              memory: 50Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+          volumeMounts:
+            - mountPath: /tmp/k8s-webhook-server/serving-certs
+              name: cert
+              readOnly: true
+            - mountPath: /tmp/k8s-metrics-server/serving-certs
+              name: metrics-cert
+              readOnly: true
+            - mountPath: /run/topolvm
+              name: socket-dir
+      priorityClassName: openshift-user-critical
+      securityContext:
+        runAsNonRoot: true
+      serviceAccountName: lvms-operator
+      terminationGracePeriodSeconds: 10
+      volumes:
+        - name: cert
+          secret:
+            defaultMode: 420
+            secretName: lvms-operator-webhook-server-cert
+        - name: metrics-cert
+          secret:
+            defaultMode: 420
+            secretName: lvms-operator-metrics-cert
+        - emptyDir: {}
+          name: socket-dir
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: openshift-storage
+  name: lvms-operator

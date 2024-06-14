@@ -1,0 +1,114 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.14.0
+  creationTimestamp: null
+  name: lvmvolumegroupnodestatuses.lvm.topolvm.io
+spec:
+  group: lvm.topolvm.io
+  names:
+    kind: LVMVolumeGroupNodeStatus
+    listKind: LVMVolumeGroupNodeStatusList
+    plural: lvmvolumegroupnodestatuses
+    singular: lvmvolumegroupnodestatus
+  scope: Namespaced
+  versions:
+  - name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: LVMVolumeGroupNodeStatus is the Schema for the lvmvolumegroupnodestatuses
+          API
+        properties:
+          apiVersion:
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+            type: string
+          kind:
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: LVMVolumeGroupNodeStatusSpec defines the desired state of
+              LVMVolumeGroupNodeStatus
+            properties:
+              nodeStatus:
+                description: NodeStatus contains the per node status of the VG
+                items:
+                  properties:
+                    deviceDiscoveryPolicy:
+                      default: RuntimeDynamic
+                      description: |-
+                        DeviceDiscoveryPolicy is a field to indicate whether the devices are discovered
+                        at runtime or preconfigured through a DeviceSelector
+                        Setting this to DeviceDiscoveryPolicyPreconfigured indicates the devices are preconfigured through a DeviceSelector.
+                        Setting this to DeviceDiscoveryPolicyRuntimeDynamic indicates the devices are added to the VG dynamically if they are present at runtime.
+                        By default, the value is set to RuntimeDynamic.
+                      enum:
+                      - Preconfigured
+                      - RuntimeDynamic
+                      type: string
+                    devices:
+                      description: Devices is the list of devices used by the volume
+                        group
+                      items:
+                        type: string
+                      type: array
+                    excluded:
+                      description: |-
+                        Excluded contains the per node status of applied device exclusions that were picked up via selector,
+                        but were not used for other reasons.
+                      items:
+                        properties:
+                          name:
+                            description: Name is the device that was filtered
+                            type: string
+                          reasons:
+                            description: Reasons are the human-readable reasons why
+                              the device was excluded from the volume group
+                            items:
+                              type: string
+                            type: array
+                        required:
+                        - name
+                        - reasons
+                        type: object
+                      type: array
+                    name:
+                      description: Name is the name of the volume group
+                      type: string
+                    reason:
+                      description: Reason provides more detail on the volume group
+                        creation status
+                      type: string
+                    status:
+                      description: Status tells if the volume group was created on
+                        the node
+                      type: string
+                  type: object
+                type: array
+            type: object
+          status:
+            description: LVMVolumeGroupNodeStatusStatus defines the observed state
+              of LVMVolumeGroupNodeStatus
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: null
+  storedVersions: null

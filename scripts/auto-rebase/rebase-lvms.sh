@@ -153,14 +153,41 @@ download_lvms_operator_bundle_manifest(){
         local csv="lvms-operator.clusterserviceversion.yaml"
         local namespace="openshift-storage"
         extract_lvms_rbac_from_cluster_service_version "${PWD}" "${csv}" "${namespace}"
+        extract_lvms_deploy_from_cluster_service_version "${PWD}" "${csv}" "${namespace}"
 
         # Push the configMap to the kube-public namespace so that it is available to all users/apps
         generate_version_config_map "${version}" "lvms-version" "kube-public"\
             > "${PWD}/topolvm-configmap_lvms-version.yaml"
 
+        # Loop over all services and roles since they need to be patched with a namespace if they were not
+        # part of the CSV role definitions
+        for file in ${PWD}/*; do
+          if [[ $file == *.yaml || $file == *.yml ]]; then
+              patch_namespace "Service" "$file" "$namespace"
+              patch_namespace "Role" "$file" "$namespace"
+              patch_namespace "RoleBinding" "$file" "$namespace"
+          fi
+        done
+
         popd || return 1
     done
 }
+
+patch_namespace() {
+  local kind=$1
+  local file=$2
+  local namespace=$3
+
+  if [[ $(yq e ".kind == \"${kind}\"" "$file") == "true" ]]; then
+    # Check if the .metadata.namespace is not set or empty
+    if [[ $(yq e ".metadata.namespace == \"${namespace}\"" "$file") == "false" ]]; then
+      echo "patching .metadata.namespace to \"${namespace}\" in $file"
+      # Set the .metadata.namespace to the specified value
+      yq e '.metadata.namespace = "'${namespace}'"' -i "$file"
+    fi
+  fi
+}
+
 
 write_lvms_images_for_arch(){
     local arch="$1"
@@ -171,11 +198,7 @@ write_lvms_images_for_arch(){
     }
 
     declare -a include_images=(
-        "topolvm-csi"
-        "topolvm-csi-provisioner"
-        "topolvm-csi-resizer"
-        "topolvm-csi-registrar"
-        "topolvm-csi-livenessprobe"
+        "lvms-operator"
     )
 
     local csv_manifest="${arch_dir}/lvms-operator.clusterserviceversion.yaml"
@@ -291,6 +314,87 @@ extract_lvms_rbac_from_cluster_service_version() {
     local service_account="${dest}/${service_account_name}_v1_serviceaccount.yaml"
     echo "generating ${service_account}"
     extract_lvms_service_account_from_csv_by_service_account_name "${service_account_name}" "${namespace}" "${service_account}"
+  done
+}
+
+extract_lvms_deploy_from_cluster_service_version() {
+  local dest="$1"
+  local csv="$2"
+  local namespace="$3"
+
+  title "extracting lvms clusterserviceversion.yaml into separate Deployments"
+
+  local deployments=($(yq eval '.spec.install.spec.deployments[].name' < "${csv}"))
+
+  for deployment in "${deployments[@]}"; do
+    echo "extracting bundle .spec.install.spec.deployments by name ${deployment}"
+
+    local deployment_file="${dest}/${deployment}_apps_v1_deployment.yaml"
+    echo "generating ${deployment_file}"
+    yq eval ".spec.install.spec.deployments[] | select(.name == \"${deployment}\") |
+        .apiVersion = \"apps/v1\" |
+        .kind = \"Deployment\" |
+        .metadata.namespace = \"${namespace}\" |
+        .metadata.name = .name |
+        del(.name)
+        " "${csv}" > "${deployment_file}"
+
+
+    echo "extracting webhook .spec.install.spec.webhookdefinitions by deployment ${deployment}"
+
+    # This assumes that we have only one webhook per deployment, if we get more this needs to be adjusted!
+    # The assumptions this rebase script makes are
+    # - One webhook defined per deployment
+    # - The webhook name can be uniquely defined by .generateName + .deploymentName (derived from above)
+    # - One object per webhook type
+    # - webhook available under service "lvms-webhook-service" (hardcoded in bundle, could also be generated)
+    local webhook_file="${dest}/${deployment}_admissionregistration.k8s.io_v1_webhook.yaml"
+    deployment=${deployment} namespace=${namespace} yq eval '
+      .spec.webhookdefinitions[]
+        | select(.deploymentName == env(deployment))
+        | .apiVersion = "admissionregistration.k8s.io/v1"
+        | with(select(.type == "ValidatingAdmissionWebhook"); .kind = "ValidatingWebhookConfiguration" )
+        | with(select(.type == "MutatingAdmissionWebhook"); .kind = "MutatingWebhookConfiguration" ) | del(.type)
+        | .metadata.namespace = env(namespace)
+        | .metadata.name = .generateName + "-" + .deploymentName
+        | .metadata.annotations."service.beta.openshift.io/inject-cabundle" = "true"
+        | del(.targetPort)
+        | .webhooks[0] = {
+            "name": .generateName,
+            "clientConfig": {"service": {
+              "name": "lvms-webhook-service",
+              "namespace": env(namespace),
+              "path": .webhookPath,
+              "port": .containerPort
+            }},
+            "rules": .rules | map(. + {"scope": "*"}),
+            "failurePolicy": .failurePolicy,
+            "matchPolicy": "Equivalent",
+            "sideEffects": .sideEffects,
+            "timeoutSeconds": 10,
+            "admissionReviewVersions": .admissionReviewVersions,
+            "namespaceSelector": {
+              "matchExpressions": [
+                {
+                  "key": "namespace",
+                  "operator": "In",
+                  "values": [env(namespace)]
+                }
+              ]
+            }
+          } | del(
+          .name,
+          .deploymentName,
+          .generateName,
+          .webhookPath,
+          .containerPort,
+          .rules,
+          .failurePolicy,
+          .sideEffects,
+          .admissionReviewVersions,
+          .targetPort
+          )
+    ' "${csv}" > "${webhook_file}"
   done
 }
 
