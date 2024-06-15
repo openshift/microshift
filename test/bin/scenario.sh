@@ -647,14 +647,14 @@ remove_vm() {
         # Remove the pool directory
         # ShellCheck: Using "${var:?}" to ensure this never expands to '/*'
         rm -rf "${VM_DISK_BASEDIR:?}/${vm_pool_name}"
+
+        # Remove the info file so something processing the VMs does not
+        # assume the file exists. This is most useful in a local setting.
+        rm -rf "${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}"
     else
         # Remove VM disk files
         rm -f "${VM_DISK_BASEDIR}/${vm_pool_name}/*"
     fi
-
-    # Remove the info file so something processing the VMs does not
-    # assume the file exists. This is most useful in a local setting.
-    rm -rf "${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}"
 }
 
 # Configure the firewall in the VM based on the instructions in the documentation.
