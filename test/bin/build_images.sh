@@ -283,6 +283,8 @@ do_group() {
             template_list=$(echo "${groupdir}"/*source*.toml)
         fi
     fi
+
+    local failed_depsolve=()
     for template in ${template_list}; do
         echo
         echo "Blueprint ${template}"
@@ -333,6 +335,11 @@ do_group() {
             record_junit "${groupdir}" "${blueprint}" "depsolve" "OK"
         else
             record_junit "${groupdir}" "${blueprint}" "depsolve" "FAILED"
+            # Log an error and proceed with the build by skipping the failed blueprint.
+            # The error will be reported in the end of the procedure.
+            echo "ERROR: Failed to solve dependences for '${blueprint}' blueprint - skipping"
+            failed_depsolve+=("${blueprint}")
+            continue
         fi
 
         if ${COMPOSER_DRY_RUN} ; then
@@ -482,7 +489,7 @@ do_group() {
     echo "Downloading build logs, metadata, and image"
     cd "${IMAGEDIR}/builds"
 
-    failed_builds=()
+    local failed_builds=()
     # shellcheck disable=SC2231  # allow glob expansion without quotes in for loop
     for buildid in ${builds_to_get}; do
         # shellcheck disable=SC2086  # pass glob args without quotes
@@ -530,10 +537,16 @@ do_group() {
         record_junit "${groupdir}" "${build_name}" "compose" "OK"
     done
 
-    # Exit the function on build errors
-    if [ ${#failed_builds[@]} -ne 0 ] ; then
-        echo "Error: check the failed build jobs"
-        echo "${failed_builds[@]}"
+    # Exit the function on dependency or build errors
+    if [ ${#failed_builds[@]} -ne 0 ] || [ ${#failed_depsolve[@]} -ne 0 ] ; then
+        if [ ${#failed_depsolve[@]} -ne 0 ] ; then
+            echo "Error: check the failed blueprints dependency"
+            echo "${failed_depsolve[@]}"
+        fi
+        if [ ${#failed_builds[@]} -ne 0 ] ; then
+            echo "Error: check the failed build jobs"
+            echo "${failed_builds[@]}"
+        fi
         return 1
     fi
 
