@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net"
+	"slices"
 	"time"
 
 	corev1 "k8s.io/api/core/v1"
@@ -235,13 +236,20 @@ func (c *LoadbalancerServiceController) updateDefaultRouterServiceStatus(ips []s
 		if err != nil {
 			return false, err
 		}
-		klog.Infof("Updating default router service status: %v", ips)
 		newStatus := &corev1.LoadBalancerStatus{}
 		for _, ip := range ips {
 			newStatus.Ingress = append(newStatus.Ingress, corev1.LoadBalancerIngress{
 				IP: ip,
 			})
 		}
+
+		equal := slices.EqualFunc(svc.Status.LoadBalancer.Ingress, newStatus.Ingress, func(oldIP, newIP corev1.LoadBalancerIngress) bool {
+			return oldIP.IP == newIP.IP
+		})
+		if equal {
+			return true, nil
+		}
+		klog.Infof("Updating default router service status: %v", ips)
 		err = c.patchStatus(svc, newStatus)
 		if err != nil {
 			klog.ErrorS(err, "Unable to patch default router service")
