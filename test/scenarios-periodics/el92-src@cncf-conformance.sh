@@ -4,8 +4,8 @@
 
 KUBECONFIG="${SCENARIO_INFO_DIR}/${SCENARIO}/kubeconfig"
 # Timeout in seconds
-TIMEOUT_TEST=5400
-TIMEOUT_RESULTS=300
+TIMEOUT_TEST=7400
+TIMEOUT_RESULTS=600
 
 prepare_hosts() {
     local -r primary_host_ip=$(cat "${SCENARIO_INFO_DIR}/${SCENARIO}/vms/host1/public_ip")
@@ -38,11 +38,10 @@ run_sonobuoy() {
     oc adm policy add-scc-to-group anyuid     system:authenticated system:serviceaccounts
 
     go install github.com/vmware-tanzu/sonobuoy@v0.56.16
-    ~/go/bin/sonobuoy gen \
+    ~/go/bin/sonobuoy run \
         --mode=certified-conformance \
         --dns-namespace=openshift-dns \
-        --dns-pod-labels=dns.operator.openshift.io/daemonset-dns=default \
-        --e2e-parallel=y | oc apply -f -
+        --dns-pod-labels=dns.operator.openshift.io/daemonset-dns=default 
 
     # Wait for up to 5m until tests start
     WAIT_FAILURE=true
@@ -58,12 +57,12 @@ run_sonobuoy() {
         exit 1
     fi
 
-    # Use 1h timeout. A normal run on 2 CPUs takes 40-45min.
+    # Note that a normal run on 2 CPUs takes 40-45min.
     start=$(date +%s)
     while [ "$(~/go/bin/sonobuoy status --json | jq -r '.status')" = "running" ] ; do
         now=$(date +%s)
         if [ $(( now - start )) -ge ${TIMEOUT_TEST} ]; then
-            echo "Tests running for 1h. Timing out"
+            echo "Tests running for ${TIMEOUT_TEST}s. Timing out"
             break
         fi
         ~/go/bin/sonobuoy status --json | jq '.plugins[] | select(.plugin=="e2e") | .progress'
@@ -75,7 +74,7 @@ run_sonobuoy() {
     while [ -z $(~/go/bin/sonobuoy status --json | jq -r '."tar-info".name') ] ; do
         now=$(date +%s)
         if [ $(( now - start )) -ge ${TIMEOUT_RESULTS} ]; then
-            echo "Waited for results for 5m. Timing out"
+            echo "Waited for results for ${TIMEOUT_RESULTS}s. Timing out"
             break
         fi
         echo "Waiting for results availability"
