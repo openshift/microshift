@@ -48,6 +48,10 @@ type Config struct {
 	Manifests Manifests     `json:"manifests"`
 	Ingress   IngressConfig `json:"ingress"`
 
+	// Settings specified in this section are transferred as-is into the Kubelet config.
+	// +kubebuilder:validation:Schemaless
+	Kubelet map[string]any `json:"kubelet"`
+
 	// Internal-only fields
 	userSettings *Config `json:"-"` // the values read from the config file
 
@@ -148,6 +152,7 @@ func (c *Config) fillDefaults() error {
 	}
 
 	c.MultiNode.Enabled = false
+	c.Kubelet = nil
 
 	return nil
 }
@@ -249,6 +254,10 @@ func (c *Config) incorporateUserSettings(u *Config) {
 
 	if len(u.ApiServer.NamedCertificates) != 0 {
 		c.ApiServer.NamedCertificates = u.ApiServer.NamedCertificates
+	}
+
+	if u.Kubelet != nil {
+		c.Kubelet = u.Kubelet
 	}
 }
 
