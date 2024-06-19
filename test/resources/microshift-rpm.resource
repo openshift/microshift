@@ -15,7 +15,12 @@ ${REPO_FILE_NAME}       "/etc/yum.repos.d/microshift-local.repo"
 Install MicroShift RPM Packages From System Repo
     [Documentation]    Installs MicroShift RPM packages from a system repository
     [Arguments]    ${version}    ${check_warnings}=True
-    ${stdout}=    Command Should Work    dnf install -y 'microshift-${version}'
+    # Allow erasing because update may require a new version of openvswitch
+    # and major versions of openvswitch are separate packages that obsolete
+    # each other. Override default timeout to 2 min (-R 2) because the transmission rate sometimes dips below the
+    # minrate threshold. This is not a fatal error and should not fail the test, so raising the timeout only helps to
+    # keep logs clean of flakey error messages.
+    ${stdout}=    Command Should Work    dnf install -q -R 2 -y --allowerasing 'microshift-${version}'
     IF    ${check_warnings}
         # Look for all warnings and errors before testing so that the log
         # shows the output for both.
