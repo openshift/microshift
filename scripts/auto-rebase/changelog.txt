@@ -1,0 +1,19 @@
+- ovn-kubernetes image-arm64 55341b3c02f1cf622b145d6aed3c818e8cf96cfe to 6681cfb01a3d083a8e281c26e1be5292749c350d
+  - 6b7e03be 2024-06-14T22:01:15+02:00 nit-fix: log statement had extra %s
+  - 966db159 2024-06-14T19:11:45+02:00 docs-nit-fix
+  - fabb87bb 2024-06-14T17:49:14+02:00 Rename packages
+  - bb9b9f38 2024-06-14T16:51:53+02:00 Add release documentation
+  - d8a27117 2024-06-14T16:51:51+02:00 docs: Fix configuration docs
+  - 1dba29d4 2024-06-14T16:48:00+02:00 Update Helm Chart version to 1.0.0
+  - 61d5c593 2024-06-14T16:48:00+02:00 Update OVN_DAEMONSET_VERSION to be 1.0.0
+  - c4e61703 2024-06-14T16:48:00+02:00 OVN Kubernetes v1.0.0 release
+  - c92e512f 2024-06-14T12:37:42+02:00 Update hardware offloads to hardware acceleration
+  - de5cbaa1 2024-06-08T21:49:15-04:00 Update README.md
+  - 71336e65 2024-06-07T20:48:04-04:00 Starting to refactor developer documentation
+  - b1bb8edf 2024-06-05T10:07:28+00:00 Fix race condition when creating/deleting namespace address set
+  - ef45f218 2024-06-04T10:43:51-07:00 CGO_ENABLED=0 for cross-platform windows build
+  - 54bc5a19 2024-05-25T15:52:25+00:00 Updating ose-ovn-kubernetes-container image to be consistent with ART for 4.17 Reconciling with https://github.com/openshift/ocp-build-data/tree/4c1326094222f9209876f06833179a1b9178faf7/images/ose-ovn-kubernetes.yml
+
+- kubernetes image-arm64 fb0e036e8a1032d2ec69711c32d1fcee257ed018 to 7d2df9acbc57af584985832795709e23fbdf7fb2
+  - 2d9336513 2024-06-18T14:45:21+02:00 UPSTREAM: <carry>: Disable PersistentVolumeLabel by default
+
