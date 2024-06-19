@@ -18,11 +18,17 @@ Setup Suite With Namespace
     Check Required Env Variables
     Login MicroShift Host
     Setup Kubeconfig
+    ${ns}=    Create Unique Namespace
+    Set Suite Variable    \${NAMESPACE}    ${ns}
+
+Create Unique Namespace
+    [Documentation]    Creates a namespace with a unique suffix
     ${rand}=    Generate Random String
     ${rand}=    Convert To Lower Case    ${rand}
     ${ns}=    Catenate    SEPARATOR=-    test    ${rand}
-    Set Suite Variable    \${NAMESPACE}    ${ns}
+
     Create Namespace    ${ns}
+    RETURN    ${ns}
 
 Teardown Suite
     [Documentation]    Teardown the namespace-less test suite by removing the Kubeconfig.

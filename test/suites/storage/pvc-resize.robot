@@ -5,8 +5,8 @@ Resource            ../../resources/common.resource
 Resource            ../../resources/oc.resource
 Resource            ../../resources/ostree-health.resource
 
-Suite Setup         Setup Suite With Namespace
-Suite Teardown      Teardown Suite With Namespace
+Suite Setup         Setup Suite
+Suite Teardown      Teardown Suite
 
 
 *** Variables ***
@@ -23,14 +23,18 @@ Increase Running Pod PV Size
     Oc Patch    pvc/${PVC_CLAIM_NAME}    '{"spec":{"resources":{"requests":{"storage":"${RESIZE_TO}"}}}}'
     Named PVC Should Be Resized    ${PVC_CLAIM_NAME}    ${RESIZE_TO}
     [Teardown]    Test Case Teardown
-
+1
 
 *** Keywords ***
 Test Case Setup
     [Documentation]    Prepare the cluster env and test pod workload.
+    Login MicroShift Host
+    ${ns}=    Create Unique Namespace
+    Set Test Variable    \${NAMESPACE}    ${ns}
     Oc Create    -f ${SOURCE_POD} -n ${NAMESPACE}
     Named Pod Should Be Ready    ${POD_NAME_STATIC}
 
 Test Case Teardown
     [Documentation]    Clean up test suite resources
     Oc Delete    -f ${SOURCE_POD} -n ${NAMESPACE}
+    Oc Delete    ns ${NAMESPACE}

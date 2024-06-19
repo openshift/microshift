@@ -42,7 +42,7 @@ Snapshotter Smoke Test
 Test Suite Setup
     [Documentation]    Setup test namespace, patch the lvmd for thin-volume support, and restart microshift for
     ...    it to take effect
-    Setup Suite With Namespace
+    Setup Suite
     Create Thin Storage Pool
     Save Lvmd Config
     ${config}=    Extend Lvmd Config
@@ -58,10 +58,13 @@ Test Suite Teardown
     Delete Thin Storage Pool
     Restart Microshift
     Restart Greenboot And Wait For Success
-    Teardown Suite With Namespace
+    Teardown Suite
 
 Test Case Setup
     [Documentation]    Prepare the cluster-level APIs and a data-volume with some simple text
+    Login MicroShift Host
+    ${ns}=    Create Unique Namespace
+    Set Test Variable    \${NAMESPACE}    ${ns}
     Oc Apply    -k ${SOURCE_KUSTOMIZE} -n ${NAMESPACE}
     Named Pod Should Be Ready    ${POD_NAME_STATIC}
     Write To Volume    ${POD_NAME_STATIC}    ${TEST_DATA}
@@ -78,6 +81,7 @@ Test Case Teardown
     Oc Delete    pvc snapshot-restore -n ${NAMESPACE}
     Named PVC Should Be Deleted    test-claim-thin
     Named PVC Should Be Deleted    snapshot-restore
+    Oc Delete    ns ${NAMESPACE}
 
 Write To Volume
     [Documentation]    Write some simple text to the data volume
