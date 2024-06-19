@@ -6,6 +6,7 @@
     "dns",
     "etcd",
     "ingress",
+    "kubelet",
     "manifests",
     "network",
     "node"
@@ -184,6 +185,9 @@
           "default": "Managed"
         }
       }
+    },
+    "kubelet": {
+      "description": "Settings specified in this section are transferred as-is into the Kubelet config."
     },
     "manifests": {
       "type": "object",
