@@ -62,7 +62,6 @@ Test Suite Teardown
 
 Test Case Setup
     [Documentation]    Prepare the cluster-level APIs and a data-volume with some simple text
-    Login MicroShift Host
     ${ns}=    Create Unique Namespace
     Set Test Variable    \${NAMESPACE}    ${ns}
     Oc Apply    -k ${SOURCE_KUSTOMIZE} -n ${NAMESPACE}

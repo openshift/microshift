@@ -28,7 +28,6 @@ Rebooting Healthy System Should Keep Functional PVC
 *** Keywords ***
 Test Case Setup
     [Documentation]    Prepare the cluster env and test pod workload.
-    Login MicroShift Host
     ${ns}=    Create Unique Namespace
     Set Test Variable    \${NAMESPACE}    ${ns}
     Oc Create    -f ${SOURCE_POD} -n ${NAMESPACE}
@@ -38,4 +37,3 @@ Test Case Teardown
     [Documentation]    Clean up test suite resources
     Oc Delete    -f ${SOURCE_POD} -n ${NAMESPACE}
     Oc Delete    ns ${NAMESPACE}
-    

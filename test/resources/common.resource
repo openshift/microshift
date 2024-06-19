@@ -11,6 +11,7 @@ Resource            ../resources/kubeconfig.resource
 Setup Suite
     [Documentation]    Setup a namespace-less test suite by configuring Kubeconfig
     Check Required Env Variables
+    Login MicroShift Host
     Setup Kubeconfig
 
 Setup Suite With Namespace
