@@ -1,6 +1,22 @@
-- coredns image-amd64 5afff2a989779a52e00ef9579cfbc03f36b5334a to 04d84f7f2e17ff464fad3f2841e7b29a43c8382f
-  - 399a67a 2024-06-11T17:51:05+00:00 UPSTREAM: 6692: openshift: Fix OCPBUGS-34619
+- kubernetes embedded-component b2f5b1171deb4bbf754961c8b72ac31d2548c896 to 29c95f359e591fae386ce64516812d8b65d285be
+  - 055f0886e 2024-06-14T14:40:53+01:00 UPSTREAM: 125337: add more testing for node.status.addresses
+  - 514975173 2024-06-14T14:40:52+01:00 UPSTREAM: 125337: document kubelet node-ip with cloud provider external
+  - 2aa044a34 2024-06-14T14:39:06+01:00 UPSTREAM: 124516: Fix behavior with external cloud provider and --hostname-override
 
-- coredns image-arm64 5afff2a989779a52e00ef9579cfbc03f36b5334a to 04d84f7f2e17ff464fad3f2841e7b29a43c8382f
-  - 399a67a 2024-06-11T17:51:05+00:00 UPSTREAM: 6692: openshift: Fix OCPBUGS-34619
+- machine-config-operator embedded-component b118fb4e80373d2ea0c1158bc5abbcdf2e8e674c to e03a9a494ef840b3c8d6cc827577552525bf993f
+  - 95bfa455 2024-06-14T14:05:30+00:00 Default ipv4 NODE_IP to 0.0.0.0
+  - 378b355a 2024-06-12T15:39:04+00:00 Azure: add Azure specific dnsmasq ordering
+
+- operator-framework-olm embedded-component 1aacee6a78ceac7acd5aa03647933e550d66a12c to 66ef61a4f0a37003564f06514e695a9b68123a6c
+  - f158dee0 2024-06-12T16:17:19-04:00 OCPBUGS-31522: Warn and allow CRD upgrade if validation fails but new CRD specifies a conversion strategy (#3209)
+
+- kubernetes image-amd64 b2f5b1171deb4bbf754961c8b72ac31d2548c896 to 29c95f359e591fae386ce64516812d8b65d285be
+  - 055f0886e 2024-06-14T14:40:53+01:00 UPSTREAM: 125337: add more testing for node.status.addresses
+  - 514975173 2024-06-14T14:40:52+01:00 UPSTREAM: 125337: document kubelet node-ip with cloud provider external
+  - 2aa044a34 2024-06-14T14:39:06+01:00 UPSTREAM: 124516: Fix behavior with external cloud provider and --hostname-override
+
+- kubernetes image-arm64 b2f5b1171deb4bbf754961c8b72ac31d2548c896 to 29c95f359e591fae386ce64516812d8b65d285be
+  - 055f0886e 2024-06-14T14:40:53+01:00 UPSTREAM: 125337: add more testing for node.status.addresses
+  - 514975173 2024-06-14T14:40:52+01:00 UPSTREAM: 125337: document kubelet node-ip with cloud provider external
+  - 2aa044a34 2024-06-14T14:39:06+01:00 UPSTREAM: 124516: Fix behavior with external cloud provider and --hostname-override
 
