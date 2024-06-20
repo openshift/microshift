@@ -11,3 +11,5 @@
 %include /post-fips.cfg
 
 %end
+
+%include /onerror-logs.cfg

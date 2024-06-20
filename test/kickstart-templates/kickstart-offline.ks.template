@@ -12,3 +12,5 @@ network --no-activate --nodefroute --hostname=REPLACE_HOST_NAME
 sudo semanage permissive -a virt_qemu_ga_t
 
 %end
+
+%include /onerror-logs.cfg

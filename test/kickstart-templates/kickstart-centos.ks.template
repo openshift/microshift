@@ -12,3 +12,5 @@
 %include /post-cos9rpm.cfg
 
 %end
+
+%include /onerror-logs.cfg
