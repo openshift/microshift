@@ -23,7 +23,6 @@ import (
 	"net/http"
 	"os"
 	"sort"
-	"strconv"
 	"strings"
 	"time"
 
@@ -115,15 +114,6 @@ func RetryTCPConnection(ctx context.Context, host string, port string) bool {
 		klog.Warningf("Endpoint is not returning any status code")
 	}
 	return status
-}
-
-func CreateLocalhostListenerOnPort(port int) (tcpnet.Listener, error) {
-	ln, err := tcpnet.Listen("tcp", "0.0.0.0:"+strconv.Itoa(port))
-	if err != nil {
-		return nil, err
-	}
-
-	return ln, nil
 }
 
 func AddToNoProxyEnv(additionalEntries ...string) error {
