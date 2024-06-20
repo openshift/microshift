@@ -15,7 +15,7 @@ OUTDIR="${ROOTDIR}/_output/e2e-$(date +%Y%m%d-%H%M%S)"
 function usage {
     local -r script_name=$(basename "$0")
     cat - <<EOF
-${script_name} [-h] [-n] [-o output_dir] [-v venv_dir] [-i var_file] [test suite files]
+${script_name} [-h] [-n] [-o output_dir] [-v venv_dir] [-i var_file] [-k test_names] [test suite files]
 
 Options:
 
@@ -24,10 +24,11 @@ Options:
   -o DIR   The output directory. (${OUTDIR})
   -v DIR   The venv directory. (${RF_VENV})
   -i PATH  The variables file. (${RF_VARIABLES})
+  -k SKIP_TESTS      Comma separated list of tests to skip.
 EOF
 }
 
-while getopts "hno:v:i:" opt; do
+while getopts "hno:v:i:k:" opt; do
     case ${opt} in
         h)
             usage
@@ -44,6 +45,9 @@ while getopts "hno:v:i:" opt; do
             ;;
         i)
             RF_VARIABLES=${OPTARG}
+            ;;
+        k)
+            SKIP_TESTS=${OPTARG}
             ;;
         *)
             usage
@@ -82,6 +86,7 @@ else
     # shellcheck disable=SC2086
     "${RF_BINARY}" \
         --randomize all \
+        --prerunmodifier "${SCRIPTDIR}/resources/SkipTests.py:${SKIP_TESTS:-}" \
         --loglevel TRACE \
         -V "${RF_VARIABLES}" \
         -x junit.xml \
