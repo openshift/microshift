@@ -1,8 +1,8 @@
 id = "rhocp-4.REPLACE_OCP_MINOR"
 name = "Red Hat OpenShift Container Platform 4.REPLACE_OCP_MINOR for RHEL 9"
 type = "yum-baseurl"
-url = "https://cdn.redhat.com/content/dist/layered/rhel9/REPLACE_BUILD_ARCH/rhocp/4.REPLACE_OCP_MINOR/os"
-check_gpg = true
+url = "REPLACE_RHOCP_URL"
+check_gpg = REPLACE_RHOCP_GPG_RHSM
 check_ssl = true
 system = false
-rhsm = true
+rhsm = REPLACE_RHOCP_GPG_RHSM

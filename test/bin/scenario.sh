@@ -227,7 +227,7 @@ prepare_kickstart() {
         sed -e "s|REPLACE_LVM_SYSROOT_SIZE|${LVM_SYSROOT_SIZE}|g" \
             -e "s|REPLACE_OSTREE_SERVER_URL|${WEB_SERVER_URL}/repo|g" \
             -e "s|REPLACE_RPM_SERVER_URL|${WEB_SERVER_URL}/rpm-repos|g" \
-            -e "s|REPLACE_PREVIOUS_MINOR_VERSION|$(previous_minor_version)|g" \
+            -e "s|REPLACE_MINOR_VERSION|$(current_minor_version)|g" \
             -e "s|REPLACE_BOOT_COMMIT_REF|${boot_commit_ref}|g" \
             -e "s|REPLACE_PULL_SECRET|${PULL_SECRET_CONTENT}|g" \
             -e "s|REPLACE_HOST_NAME|${vm_hostname}|g" \

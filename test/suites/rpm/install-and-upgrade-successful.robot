@@ -34,8 +34,6 @@ Test Tags           restart    rpm-based-system    slow
 ${SOURCE_REPO_URL}              ${EMPTY}
 # The version of microshift we expect to find in that repo
 ${TARGET_VERSION}               ${EMPTY}
-# The version we should use when enabling the extra repos with dependencies like oc
-${DEPENDENCY_VERSION}           ${EMPTY}
 # Optional URL for repo for previous minor version
 ${PREVIOUS_VERSION_REPO_URL}    ${EMPTY}
 
@@ -83,25 +81,15 @@ Setup
     [Documentation]    Test suite setup
     Check Required Env Variables
     Should Not Be Empty    ${SOURCE_REPO_URL}    SOURCE_REPO_URL variable is required
-    Should Not Be Empty    ${DEPENDENCY_VERSION}    DEPENDENCY_VERSION variable is required
     Should Not Be Empty    ${TARGET_VERSION}    TARGET_VERSION variable is required
     Login MicroShift Host
     System Should Not Be Ostree
-    Enable MicroShift Dependency Repositories
     Pull Secret Should Be Installed
 
 System Should Not Be Ostree
     [Documentation]    Make sure we run on a non-ostree system
     ${is_ostree}=    Is System OSTree
     Should Not Be True    ${is_ostree}
-
-Enable MicroShift Dependency Repositories
-    [Documentation]    Add the repositories with dependencies like oc, crio, etc.
-    ...    The scenario script is responsible for creating the VM with a
-    ...    subscription enabled.
-    ${uname}=    Command Should Work    uname -m
-    Command Should Work
-    ...    subscription-manager repos --enable rhocp-${DEPENDENCY_VERSION}-for-rhel-9-${uname}-rpms --enable fast-datapath-for-rhel-9-${uname}-rpms
 
 Pull Secret Should Be Installed
     [Documentation]    Check that the kickstart file installed a pull secret for us
