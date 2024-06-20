@@ -58,3 +58,8 @@ func getClusterDNS(serviceCIDR string) (string, error) {
 
 	return dnsClusterIP.String(), nil
 }
+
+func isValidIPAddress(ipAddress string) bool {
+	ip := net.ParseIP(ipAddress)
+	return ip != nil
+}
