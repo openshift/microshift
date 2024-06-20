@@ -11,3 +11,5 @@
 %include /post-bootc-wa.cfg
 
 %end
+
+%include /onerror-logs.cfg
