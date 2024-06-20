@@ -42,8 +42,6 @@ scenario_run_tests() {
     local -r target_version=$(current_version)
     local -r current_minor_version=$(current_minor_version)
     local -r previous_minor_version=$(previous_minor_version)
-    local -r previous_version_repo=$(get_rel_version_repo "${previous_minor_version}")
-    local -r previous_version_repo_url=$(echo "${previous_version_repo}" | cut -d, -f2)
 
     # Enable the repositories with the dependencies.
 
@@ -84,6 +82,5 @@ EOF
         --variable "SOURCE_REPO_URL:${source_repo_url}" \
         --variable "TARGET_VERSION:${target_version}" \
         --variable "PREVIOUS_MINOR_VERSION:${previous_minor_version}" \
-        --variable "PREVIOUS_VERSION_REPO_URL:${previous_version_repo_url}" \
         suites/rpm/install-and-upgrade-successful.robot
 }
