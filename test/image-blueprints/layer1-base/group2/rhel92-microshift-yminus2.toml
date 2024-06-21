@@ -37,3 +37,14 @@ enabled = ["mdns", "ssh", "http", "https"]
 [[customizations.firewall.zones]]
 name = "trusted"
 sources = ["10.42.0.0/16", "169.254.169.1"]
+
+[[customizations.files]]
+path = "/etc/crio/crio.conf.d/00-crio-crun.yaml"
+data = """
+[crio.runtime.runtimes.crun]
+runtime_path = ""
+runtime_type = "oci"
+runtime_root = "/run/crun"
+runtime_config_path = ""
+monitor_path = ""
+"""
