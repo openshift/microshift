@@ -70,7 +70,7 @@ func (s *OCPRouteControllerManager) configure(cfg *config.Config) error {
 		ServingInfo: &configv1.HTTPServingInfo{
 			ServingInfo: configv1.ServingInfo{
 				BindAddress: "0.0.0.0:8445",
-				BindNetwork: "tcp4",
+				BindNetwork: "tcp",
 				CertInfo: configv1.CertInfo{
 					CertFile: cryptomaterial.ServingCertPath(servingCertDir),
 					KeyFile:  cryptomaterial.ServingKeyPath(servingCertDir),
