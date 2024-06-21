@@ -49,7 +49,6 @@ func TestConfigure(t *testing.T) {
 		"--allocate-node-cidrs=true",
 		fmt.Sprintf("--authentication-kubeconfig=%s", cfg.KubeConfigPath(config.KubeControllerManager)),
 		fmt.Sprintf("--authorization-kubeconfig=%s", cfg.KubeConfigPath(config.KubeControllerManager)),
-		"--bind-address=127.0.0.1",
 		"--cert-dir=/var/run/kubernetes",
 		"--cluster-cidr=10.42.0.0/16",
 		fmt.Sprintf("--cluster-signing-cert-file=%s", clusterSigningCert),
