@@ -46,7 +46,7 @@ func GetHostIP(nodeIP string) (string, error) {
 			foundHardCodedNodeIP = true
 			klog.Infof("trying to find configured nodeIP %q on host", nodeIP)
 		}
-		hostIP, err = selectV4IPFromHostInterface(nodeIP)
+		hostIP, err = selectIPFromHostInterface(nodeIP)
 		if err != nil {
 			foundHardCodedNodeIP = false
 			return "", fmt.Errorf("failed to find the configured nodeIP %q on host: %v", nodeIP, err)
@@ -58,7 +58,7 @@ func GetHostIP(nodeIP string) (string, error) {
 		hostIP = ip.String()
 	} else {
 		klog.Infof("failed to get host IP by default route: %v", err)
-		if hostIP, err = selectV4IPFromHostInterface(""); err != nil {
+		if hostIP, err = selectIPFromHostInterface(""); err != nil {
 			return "", err
 		}
 	}
@@ -158,7 +158,7 @@ func addNoProxyEnvVarEntries(entries map[string]struct{}, envVar string) {
 	}
 }
 
-func selectV4IPFromHostInterface(nodeIP string) (string, error) {
+func selectIPFromHostInterface(nodeIP string) (string, error) {
 	ifaces, err := tcpnet.Interfaces()
 	if err != nil {
 		return "", err
@@ -180,8 +180,7 @@ func selectV4IPFromHostInterface(nodeIP string) (string, error) {
 			if err != nil {
 				return "", fmt.Errorf("unable to parse CIDR for interface %q: %s", i.Name, err)
 			}
-			if ip.To4() == nil || ip.IsLoopback() {
-				// ignore IPv6 and loopback addresses
+			if ip.IsLoopback() {
 				continue
 			}
 			if nodeIP != "" && nodeIP != ip.String() {
