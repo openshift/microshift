@@ -35,6 +35,8 @@ var (
 	defaultRouterForbiddenCIDRs = []string{
 		"127.0.0.0/8",
 		"169.254.0.0/16",
+		"::1/128",
+		"fe80::/10",
 	}
 )
 
@@ -489,7 +491,7 @@ func getHostAddresses() ([]net.IP, error) {
 		if link.Attrs().ParentIndex != 0 || link.Attrs().MasterIndex != 0 {
 			continue
 		}
-		addressList, err := handle.AddrList(link, netlink.FAMILY_V4)
+		addressList, err := handle.AddrList(link, netlink.FAMILY_ALL)
 		if err != nil {
 			return nil, err
 		}
