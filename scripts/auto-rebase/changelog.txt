@@ -1,3 +1,3 @@
-- operator-framework-olm embedded-component c760189484d42a31b5dcb349d7d950821d844826 to 95839e128d9aadb30d51314a840017840730e0c6
-  - dc9ee114 2024-06-18T05:11:09+00:00 OCPBUGS-31522: Warn and allow CRD upgrade if validation fails but new CRD specifies a conversion strategy (#3209)
+- operator-framework-olm embedded-component 95839e128d9aadb30d51314a840017840730e0c6 to 89cf3705e28c59cc9228f606de8b555771eb474a
+  - d8a76e9b 2024-06-20T11:59:16+02:00 OCPBUGS-35305: [release-4.15] catalog-operator: delete catalog pods stuck in Terminating state due to unreachable node
 
