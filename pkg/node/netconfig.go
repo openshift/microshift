@@ -18,6 +18,7 @@ package node
 import (
 	"context"
 	"fmt"
+	"net"
 
 	"k8s.io/klog/v2"
 
@@ -87,7 +88,11 @@ func (n *NetworkConfiguration) addServiceIPLoopback() error {
 			return err
 		}
 	}
-	address, err := netlink.ParseAddr(fmt.Sprintf("%s/32", n.kasAdvertiseAddress))
+	prefix := 32
+	if net.ParseIP(n.kasAdvertiseAddress).To4() == nil {
+		prefix = 128
+	}
+	address, err := netlink.ParseAddr(fmt.Sprintf("%s/%d", n.kasAdvertiseAddress, prefix))
 	if err != nil {
 		return err
 	}
@@ -114,7 +119,11 @@ func (n *NetworkConfiguration) removeServiceIPLoopback() error {
 			return err
 		}
 	}
-	address, err := netlink.ParseAddr(fmt.Sprintf("%s/32", n.kasAdvertiseAddress))
+	prefix := 32
+	if net.ParseIP(n.kasAdvertiseAddress).To4() == nil {
+		prefix = 128
+	}
+	address, err := netlink.ParseAddr(fmt.Sprintf("%s/%d", n.kasAdvertiseAddress, prefix))
 	if err != nil {
 		return err
 	}
