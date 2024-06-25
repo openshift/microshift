@@ -1,3 +1,0 @@
-- operator-framework-olm embedded-component 95839e128d9aadb30d51314a840017840730e0c6 to 89cf3705e28c59cc9228f606de8b555771eb474a
-  - d8a76e9b 2024-06-20T11:59:16+02:00 OCPBUGS-35305: [release-4.15] catalog-operator: delete catalog pods stuck in Terminating state due to unreachable node
-
