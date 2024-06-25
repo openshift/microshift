@@ -1,6 +1,0 @@
-- cluster-network-operator embedded-component 796bf8f5d5268e1123f033a644b7c7abf3bec823 to 9a032c35c32e05f7e88c4e8eacaed9bf3cce4037
-  - 611288e 2024-06-10T11:04:22+02:00 Add unit test for ipsec rendering during 4.13->4.14 upgrade
-  - 3491df0 2024-06-07T17:10:25+02:00 Use same kubeclient subtype in upgrade code
-  - c74b612 2024-06-07T17:08:02+02:00 Fix ipsec status for 4.13->4.14 upgrades and use constants for ipsec
-  - e3d8fc0 2024-06-04T20:13:06+02:00 Make ipsec available all throughout 4.13->4.14 upgrade
-
