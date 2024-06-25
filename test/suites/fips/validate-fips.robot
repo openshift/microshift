@@ -65,13 +65,19 @@ Check Payload Tool Must Pass
     ${podman_args}=    Set Variable    --authfile /etc/crio/openshift-pull-secret --privileged -i -v /:/myroot
     ${scan_command}=    Set Variable    scan node --root /myroot
     ${path}=    Create Random Temp File
+    ${version}=    MicroShift Version
+    ${ocp_version}=    Set Variable    -V ${version.major}.${version.minor}
+
     Set Global Variable    ${CHECK_PAYLOAD_OUTPUT_FILE}    ${path}
     ${rc}=    Execute Command    rpm -qi microshift >${CHECK_PAYLOAD_OUTPUT_FILE} 2>&1
     ...    sudo=True    return_rc=True    return_stdout=False    return_stderr=False
     Should Be Equal As Integers    0    ${rc}
     ${rc}=    Execute Command
-    ...    podman run ${podman_args} ${CHECK_PAYLOAD_IMAGE} ${scan_command} >>${CHECK_PAYLOAD_OUTPUT_FILE} 2>&1
-    ...    sudo=True    return_rc=True    return_stdout=False    return_stderr=False
+    ...    podman run ${podman_args} ${CHECK_PAYLOAD_IMAGE} ${ocp_version} ${scan_command} >>${CHECK_PAYLOAD_OUTPUT_FILE} 2>&1
+    ...    sudo=True
+    ...    return_rc=True
+    ...    return_stdout=False
+    ...    return_stderr=False
     Should Be Equal As Integers    0    ${rc}
 
 Check Container Images In Release Must Pass
