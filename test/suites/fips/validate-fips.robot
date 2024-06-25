@@ -46,6 +46,8 @@ Setup
     Setup Kubeconfig
     Start MicroShift
     Wait Until Greenboot Health Check Exited
+    ${version}=    MicroShift Version
+    Set Global Variable    ${OCP_VERSION}    ${version.major}.${version.minor}
 
 Teardown
     [Documentation]    Test suite teardown
@@ -63,15 +65,21 @@ Teardown
 Check Payload Tool Must Pass
     [Documentation]    Run check-paylod Tool
     ${podman_args}=    Set Variable    --authfile /etc/crio/openshift-pull-secret --privileged -i -v /:/myroot
-    ${scan_command}=    Set Variable    scan node --root /myroot
+    ${scan_command}=    Set Variable    -V ${OCP_VERSION} scan node --root /myroot
     ${path}=    Create Random Temp File
+    ${version}=    MicroShift Version
+    ${ocp_version}=    Set Variable    -V ${version.major}.${version.minor}
+
     Set Global Variable    ${CHECK_PAYLOAD_OUTPUT_FILE}    ${path}
     ${rc}=    Execute Command    rpm -qi microshift >${CHECK_PAYLOAD_OUTPUT_FILE} 2>&1
     ...    sudo=True    return_rc=True    return_stdout=False    return_stderr=False
     Should Be Equal As Integers    0    ${rc}
     ${rc}=    Execute Command
-    ...    podman run ${podman_args} ${CHECK_PAYLOAD_IMAGE} ${scan_command} >>${CHECK_PAYLOAD_OUTPUT_FILE} 2>&1
-    ...    sudo=True    return_rc=True    return_stdout=False    return_stderr=False
+    ...    podman run ${podman_args} ${CHECK_PAYLOAD_IMAGE} >>${CHECK_PAYLOAD_OUTPUT_FILE} 2>&1
+    ...    sudo=True
+    ...    return_rc=True
+    ...    return_stdout=False
+    ...    return_stderr=False
     Should Be Equal As Integers    0    ${rc}
 
 Check Container Images In Release Must Pass
@@ -83,7 +91,7 @@ Check Container Images In Release Must Pass
     Set Global Variable    ${CHECK_PAYLOAD_REL_OUTPUT_FILE}    ${path}
     @{images}=    Get Images From Release File
     FOR    ${image}    IN    @{images}
-        ${scan_command}=    Set Variable    scan operator --spec ${image}
+        ${scan_command}=    Set Variable    -V ${OCP_VERSION} scan operator --spec ${image}
         ${rc}=    Execute Command
         ...    podman run ${podman_args} ${CHECK_PAYLOAD_IMAGE} ${scan_command} >>${CHECK_PAYLOAD_REL_OUTPUT_FILE} 2>&1
         ...    sudo=True    return_rc=True    return_stdout=False    return_stderr=False
