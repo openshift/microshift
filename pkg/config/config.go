@@ -246,7 +246,9 @@ func (c *Config) incorporateUserSettings(u *Config) {
 	}
 
 	if len(u.Ingress.ListenAddress) != 0 {
-		c.Ingress.ListenAddress = u.Ingress.ListenAddress
+		c.Ingress.ListenAddress = slices.DeleteFunc(u.Ingress.ListenAddress, func(s string) bool {
+			return len(s) == 0
+		})
 	}
 
 	if len(u.ApiServer.NamedCertificates) != 0 {
