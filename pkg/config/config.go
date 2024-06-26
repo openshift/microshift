@@ -297,7 +297,7 @@ func (c *Config) updateComputedValues() error {
 
 func (c *Config) validate() error {
 	if !isValidIPAddress(c.ApiServer.AdvertiseAddress) {
-		return fmt.Errorf("error validating apiServer.advertiseAddress")
+		return fmt.Errorf("error validating apiServer.advertiseAddress (%q)", c.ApiServer.AdvertiseAddress)
 	}
 	if c.ApiServer.SkipInterface {
 		err := checkAdvertiseAddressConfigured(c.ApiServer.AdvertiseAddress)
@@ -307,7 +307,7 @@ func (c *Config) validate() error {
 	}
 
 	if !isValidIPAddress(c.Node.NodeIP) {
-		return fmt.Errorf("error validating node.nodeIP")
+		return fmt.Errorf("error validating node.nodeIP (%q)", c.Node.NodeIP)
 	}
 
 	if err := validateNetworkStack(c); err != nil {
@@ -581,9 +581,6 @@ func validateNetworkStack(cfg *Config) error {
 	}
 	if len(cfg.Network.ServiceNetwork) > 2 {
 		return fmt.Errorf("network.serviceNetwork can not have more than 2 entries")
-	}
-	if len(cfg.Network.ClusterNetwork) > 2 {
-		return fmt.Errorf("network.clusterNetwork can not have more than 2 entries")
 	}
 	ipv4Entries := 0
 	ipv6Entries := 0
