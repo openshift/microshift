@@ -55,12 +55,16 @@ Created Pod Is Guaranteed And Has Correct CPU Set
     ${cpus}=    Oc Exec    oslat    cat /proc/self/status | grep Cpus_allowed_list: | cut -f 2
     Should Be Equal    ${cpus}    2,4
 
+    Wait Until Oslat Completed Testing
+
 Make Sure Everything Works After Reboot
     [Documentation]    Verify that after reboot MicroShift is starting and our low latency Pod is running.
 
     Reboot MicroShift Host
     Wait Until Greenboot Health Check Exited
     Named Pod Should Be Ready    oslat
+
+    Wait Until Oslat Completed Testing
 
     [Teardown]    Remove Namespace    ${NAMESPACE}
 
@@ -106,3 +110,14 @@ CPUs Should Be
         ${state}=    Command Should Work    cat /sys/devices/system/cpu/cpu${cpu}/online
         Should Be Equal    ${state}    ${expected}
     END
+
+Wait Until Oslat Completed Testing
+    [Documentation]    Wait until oslat container finished testing.
+    Wait Until Keyword Succeeds    30s    5s
+    ...    Oslat Completed Testing
+
+Oslat Completed Testing
+    [Documentation]    Check logs of oslat container looking for "Test completed." message.
+    ...    We run oslat just to make sure it successfully runs, not for the results.
+    ${logs}=    Oc Logs    oslat    ${NAMESPACE}
+    Should Contain    ${logs}    Test completed.
