@@ -19,6 +19,7 @@ import (
 
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/klog/v2"
+	netutils "k8s.io/utils/net"
 	"k8s.io/utils/ptr"
 
 	"github.com/apparentlymart/go-cidr/cidr"
@@ -295,6 +296,24 @@ func (c *Config) updateComputedValues() error {
 }
 
 func (c *Config) validate() error {
+	if !isValidIPAddress(c.ApiServer.AdvertiseAddress) {
+		return fmt.Errorf("error validating apiServer.advertiseAddress (%q)", c.ApiServer.AdvertiseAddress)
+	}
+	if c.ApiServer.SkipInterface {
+		err := checkAdvertiseAddressConfigured(c.ApiServer.AdvertiseAddress)
+		if err != nil {
+			return err
+		}
+	}
+
+	if !isValidIPAddress(c.Node.NodeIP) {
+		return fmt.Errorf("error validating node.nodeIP (%q)", c.Node.NodeIP)
+	}
+
+	if err := validateNetworkStack(c); err != nil {
+		return fmt.Errorf("error validating networks: %w", err)
+	}
+
 	//nolint:nestif // extracting the nested ifs will just increase the complexity of the if expressions as validation expands
 	if len(c.ApiServer.SubjectAltNames) > 0 {
 		// Any entry in SubjectAltNames will be included in the external access certificates.
@@ -345,13 +364,6 @@ func (c *Config) validate() error {
 		return fmt.Errorf("etcd.memoryLimitMB value %d is below the minimum allowed %d",
 			c.Etcd.MemoryLimitMB, EtcdMinimumMemoryLimit,
 		)
-	}
-
-	if c.ApiServer.SkipInterface {
-		err := checkAdvertiseAddressConfigured(c.ApiServer.AdvertiseAddress)
-		if err != nil {
-			return err
-		}
 	}
 
 	switch c.Ingress.Status {
@@ -561,4 +573,40 @@ func validateAuditLogConfig(cfg AuditLog) error {
 		errs = append(errs, fmt.Errorf("invalid value for apiserver.auditlog.maxFileSize, expected value >=0"))
 	}
 	return errors.Join(errs...) // Join returns nil if len(errs) == 0
+}
+
+func validateNetworkStack(cfg *Config) error {
+	if len(cfg.Network.ClusterNetwork) != len(cfg.Network.ServiceNetwork) {
+		return fmt.Errorf("network.serviceNetwork and network.clusterNetwork have different cardinality")
+	}
+	if len(cfg.Network.ServiceNetwork) > 2 {
+		return fmt.Errorf("network.serviceNetwork can not have more than 2 entries")
+	}
+	ipv4Entries := 0
+	ipv6Entries := 0
+	for i := 0; i < len(cfg.Network.ClusterNetwork); i++ {
+		_, _, err := net.ParseCIDR(cfg.Network.ServiceNetwork[i])
+		if err != nil {
+			return fmt.Errorf("invalid format in network.ServiceNetwork[%d]: %w", i, err)
+		}
+		_, _, err = net.ParseCIDR(cfg.Network.ClusterNetwork[i])
+		if err != nil {
+			return fmt.Errorf("invalid format in network.ClusterNetwork[%d]: %w", i, err)
+		}
+		if netutils.IPFamilyOfCIDRString(cfg.Network.ServiceNetwork[i]) != netutils.IPFamilyOfCIDRString(cfg.Network.ClusterNetwork[i]) {
+			return fmt.Errorf("mismatched IP families in network.ServiceNetwork[%d] and network.ClusterNetwork[%d]", i, i)
+		}
+		if netutils.IPFamilyOfCIDRString(cfg.Network.ServiceNetwork[i]) == netutils.IPv4 {
+			ipv4Entries++
+		} else {
+			ipv6Entries++
+		}
+	}
+	if ipv4Entries > 1 || ipv6Entries > 1 {
+		return fmt.Errorf("invalid number of entries of the same IP family in network.serviceNetwork and network.clusterNetwork")
+	}
+	if netutils.IPFamilyOfString(cfg.ApiServer.AdvertiseAddress) != netutils.IPFamilyOfCIDRString(cfg.Network.ServiceNetwork[0]) {
+		return fmt.Errorf("invalid IP family in apiServer.AdvertiseAddress: does not match first network.ServiceNetwork IP family")
+	}
+	return nil
 }
