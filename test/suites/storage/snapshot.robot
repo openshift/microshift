@@ -80,7 +80,7 @@ Test Case Teardown
     Oc Delete    pvc snapshot-restore -n ${NAMESPACE}
     Named PVC Should Be Deleted    test-claim-thin
     Named PVC Should Be Deleted    snapshot-restore
-    Oc Delete    ns ${NAMESPACE}
+    Remove Namespace    ${NAMESPACE}
 
 Write To Volume
     [Documentation]    Write some simple text to the data volume

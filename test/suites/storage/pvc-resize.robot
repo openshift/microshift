@@ -36,4 +36,4 @@ Test Case Setup
 Test Case Teardown
     [Documentation]    Clean up test suite resources
     Oc Delete    -f ${SOURCE_POD} -n ${NAMESPACE}
-    Oc Delete    ns ${NAMESPACE}
+    Remove Namespace    ${NAMESPACE}
