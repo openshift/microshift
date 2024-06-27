@@ -282,7 +282,11 @@ func (c *Config) updateComputedValues() error {
 		// host network pods trying to reach apiserver, as the VIP 10.43.0.1:443 is
 		// not translated to 10.43.0.1:6443. It remains unchanged and therefore
 		// connects to the ingress router instead, triggering all sorts of errors.
-		nextSubnet, exceed := cidr.NextSubnet(svcNet, 32)
+		prefix := 32
+		if svcNet.IP.To4() == nil {
+			prefix = 128
+		}
+		nextSubnet, exceed := cidr.NextSubnet(svcNet, prefix)
 		if exceed {
 			return fmt.Errorf("unable to compute next subnet from service CIDR")
 		}
