@@ -49,6 +49,9 @@ scenario_run_tests() {
     # name, so should include the major and minor version number.
     local -r dependency_version="4.$("${ROOTDIR}/scripts/get-latest-rhocp-repo.sh")"
 
+    # Force enable the previous minor version repo to pull microshift-*-4.15
+    run_command_on_vm host1 "sudo subscription-manager repos --enable rhocp-4.${previous_minor_version}-for-rhel-9-\$(uname -m)-rpms"
+
     run_tests host1 \
         --exitonfailure \
         --variable "SOURCE_REPO_URL:${source_repo_url}" \
