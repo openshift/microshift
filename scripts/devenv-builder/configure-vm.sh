@@ -186,6 +186,10 @@ enabled=1
 gpgcheck=0
 skip_if_unavailable=0
 EOF
+        PREVIOUS_RHOCP=$("${RHOCP_REPO}" $((ver-1)))
+        if [[ "${PREVIOUS_RHOCP}" =~ ^[0-9]{2} ]]; then
+            sudo subscription-manager repos --enable "rhocp-4.${PREVIOUS_RHOCP}-for-rhel-9-$(uname -m)-rpms"
+        fi
     fi
 
     # Enable fast-datapath (ovn) only for non-beta. Beta RHEL will use openvswitch from RHOCP beta mirror.
