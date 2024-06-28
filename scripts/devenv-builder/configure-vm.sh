@@ -178,11 +178,14 @@ fi
 OCPVERSION="4.${LATEST_RHOCP_MINOR}"
 
 if ${RHEL_SUBSCRIPTION}; then
+    OCPPREVVERSION="4.$((LATEST_RHOCP_MINOR-1))"
     OSVERSION=$(awk -F: '{print $5}' /etc/system-release-cpe)
     sudo subscription-manager config --rhsm.manage_repos=1
 
     sudo subscription-manager repos \
         --enable "rhocp-${OCPVERSION}-for-rhel-${OSVERSION}-$(uname -m)-rpms"
+    sudo subscription-manager repos \
+        --enable "rhocp-${OCPPREVVERSION}-for-rhel-${OSVERSION}-$(uname -m)-rpms"
 
     if ! ${RHEL_BETA_VERSION} ; then
         sudo subscription-manager repos \
