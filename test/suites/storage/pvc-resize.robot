@@ -5,8 +5,8 @@ Resource            ../../resources/common.resource
 Resource            ../../resources/oc.resource
 Resource            ../../resources/ostree-health.resource
 
-Suite Setup         Setup Suite With Namespace
-Suite Teardown      Teardown Suite With Namespace
+Suite Setup         Setup Suite
+Suite Teardown      Teardown Suite
 
 
 *** Variables ***
@@ -28,9 +28,12 @@ Increase Running Pod PV Size
 *** Keywords ***
 Test Case Setup
     [Documentation]    Prepare the cluster env and test pod workload.
+    ${ns}=    Create Unique Namespace
+    Set Test Variable    \${NAMESPACE}    ${ns}
     Oc Create    -f ${SOURCE_POD} -n ${NAMESPACE}
     Named Pod Should Be Ready    ${POD_NAME_STATIC}
 
 Test Case Teardown
     [Documentation]    Clean up test suite resources
     Oc Delete    -f ${SOURCE_POD} -n ${NAMESPACE}
+    Remove Namespace    ${NAMESPACE}

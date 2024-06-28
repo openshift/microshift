@@ -5,7 +5,7 @@ Resource            ../../resources/common.resource
 Resource            ../../resources/oc.resource
 Resource            ../../resources/ostree-health.resource
 
-Suite Setup         Setup Suite With Namespace
+Suite Setup         Setup Suite
 
 Test Tags           restart    slow
 
@@ -28,10 +28,12 @@ Rebooting Healthy System Should Keep Functional PVC
 *** Keywords ***
 Test Case Setup
     [Documentation]    Prepare the cluster env and test pod workload.
+    ${ns}=    Create Unique Namespace
+    Set Test Variable    \${NAMESPACE}    ${ns}
     Oc Create    -f ${SOURCE_POD} -n ${NAMESPACE}
     Named Pod Should Be Ready    ${POD_NAME_STATIC}
 
 Test Case Teardown
     [Documentation]    Clean up test suite resources
     Oc Delete    -f ${SOURCE_POD} -n ${NAMESPACE}
-    Named Pod Should Be Deleted    ${POD_NAME_STATIC}    timeout=120s
+    Remove Namespace    ${NAMESPACE}
