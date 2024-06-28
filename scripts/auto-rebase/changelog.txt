@@ -1,6 +1,42 @@
-- coredns image-amd64 5afff2a989779a52e00ef9579cfbc03f36b5334a to 04d84f7f2e17ff464fad3f2841e7b29a43c8382f
-  - 399a67a 2024-06-11T17:51:05+00:00 UPSTREAM: 6692: openshift: Fix OCPBUGS-34619
+- cluster-network-operator embedded-component 84f9a080d03777c95a1c5a0d13ca16e5aa342d98 to ac935d0133ee1b1c17abff94968b1e64bffda637
+  - 6d69bad 2024-06-21T16:52:24+02:00 Update whereabouts crd
 
-- coredns image-arm64 5afff2a989779a52e00ef9579cfbc03f36b5334a to 04d84f7f2e17ff464fad3f2841e7b29a43c8382f
-  - 399a67a 2024-06-11T17:51:05+00:00 UPSTREAM: 6692: openshift: Fix OCPBUGS-34619
+- cluster-openshift-controller-manager-operator embedded-component 899699681f8bb984d0f249dec171e630440c461b to bcc371ccbc9cab9bcb80b3f1a281a40c28011f59
+  - 3a6ad51 2024-06-19T12:33:10+00:00 fix nil pointer reference
+  - 9dabf00 2024-05-22T13:47:20+00:00 delay deleting recently created image pull secrets
+
+- kubernetes embedded-component b2f5b1171deb4bbf754961c8b72ac31d2548c896 to 58452d8d4db25d4afb8e53ed5901103590766b7e
+  - 7bf0b7a16 2024-06-18T16:40:22+00:00 UPSTREAM: <carry>: Disable PersistentVolumeLabel by default
+  - 055f0886e 2024-06-14T14:40:53+01:00 UPSTREAM: 125337: add more testing for node.status.addresses
+  - 514975173 2024-06-14T14:40:52+01:00 UPSTREAM: 125337: document kubelet node-ip with cloud provider external
+  - 2aa044a34 2024-06-14T14:39:06+01:00 UPSTREAM: 124516: Fix behavior with external cloud provider and --hostname-override
+
+- machine-config-operator embedded-component b118fb4e80373d2ea0c1158bc5abbcdf2e8e674c to 031dda584ed9d12a86ce7ff885c260afb6cf6316
+  - cf9847e0 2024-06-26T06:36:31+00:00 daemon/update: add workaround for OCPBUGS-33694
+  - 5c3cf9b2 2024-06-26T06:36:31+00:00 daemon/update: disable systemd unit before overwriting
+  - 91f42cc1 2024-06-24T12:41:10-04:00 disable mglru service
+  - 36aec890 2024-06-19T00:46:36+00:00 Revert "Azure: add Azure specific dnsmasq ordering"
+  - 95bfa455 2024-06-14T14:05:30+00:00 Default ipv4 NODE_IP to 0.0.0.0
+  - 378b355a 2024-06-12T15:39:04+00:00 Azure: add Azure specific dnsmasq ordering
+
+- operator-framework-olm embedded-component 1aacee6a78ceac7acd5aa03647933e550d66a12c to 66ef61a4f0a37003564f06514e695a9b68123a6c
+  - f158dee0 2024-06-12T16:17:19-04:00 OCPBUGS-31522: Warn and allow CRD upgrade if validation fails but new CRD specifies a conversion strategy (#3209)
+
+- ovn-kubernetes image-amd64 d90fa545e17a27bdf253fa820a1d7552e3079465 to 8a9743708ae117595226a52b4856f8c032fed2ab
+  - b3dde60f 2024-06-20T15:05:08+02:00 Bump OVN to 24.03.2-19 in Dockerfile.base to fix multicast bug
+
+- kubernetes image-amd64 b2f5b1171deb4bbf754961c8b72ac31d2548c896 to 58452d8d4db25d4afb8e53ed5901103590766b7e
+  - 7bf0b7a16 2024-06-18T16:40:22+00:00 UPSTREAM: <carry>: Disable PersistentVolumeLabel by default
+  - 055f0886e 2024-06-14T14:40:53+01:00 UPSTREAM: 125337: add more testing for node.status.addresses
+  - 514975173 2024-06-14T14:40:52+01:00 UPSTREAM: 125337: document kubelet node-ip with cloud provider external
+  - 2aa044a34 2024-06-14T14:39:06+01:00 UPSTREAM: 124516: Fix behavior with external cloud provider and --hostname-override
+
+- ovn-kubernetes image-arm64 d90fa545e17a27bdf253fa820a1d7552e3079465 to 8a9743708ae117595226a52b4856f8c032fed2ab
+  - b3dde60f 2024-06-20T15:05:08+02:00 Bump OVN to 24.03.2-19 in Dockerfile.base to fix multicast bug
+
+- kubernetes image-arm64 b2f5b1171deb4bbf754961c8b72ac31d2548c896 to 58452d8d4db25d4afb8e53ed5901103590766b7e
+  - 7bf0b7a16 2024-06-18T16:40:22+00:00 UPSTREAM: <carry>: Disable PersistentVolumeLabel by default
+  - 055f0886e 2024-06-14T14:40:53+01:00 UPSTREAM: 125337: add more testing for node.status.addresses
+  - 514975173 2024-06-14T14:40:52+01:00 UPSTREAM: 125337: document kubelet node-ip with cloud provider external
+  - 2aa044a34 2024-06-14T14:39:06+01:00 UPSTREAM: 124516: Fix behavior with external cloud provider and --hostname-override
 
