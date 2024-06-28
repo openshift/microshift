@@ -1,0 +1,8 @@
+- ovn-kubernetes image-amd64 29f1b8aff950b2cb670aa14edb0a181530f2ba53 to 7e8054a8ddb596087186c8c4b68dbf82767026b5
+  - 8fcb310 2024-05-14T10:04:22+02:00 vendoring changes
+  - 3c29dd0 2024-05-14T09:32:29+02:00 EgressIP: Reload certificates for the grpc heatlhcheck server
+
+- ovn-kubernetes image-arm64 29f1b8aff950b2cb670aa14edb0a181530f2ba53 to 7e8054a8ddb596087186c8c4b68dbf82767026b5
+  - 8fcb310 2024-05-14T10:04:22+02:00 vendoring changes
+  - 3c29dd0 2024-05-14T09:32:29+02:00 EgressIP: Reload certificates for the grpc heatlhcheck server
+
