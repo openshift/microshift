@@ -1,18 +1,26 @@
-- machine-config-operator embedded-component 612b9cd6a642a560bb48b9e8f1fa9cb4b54622ab to 58aca6909f9d1c319816dc12beedc35150418e40
-  - 5236644a 2024-06-24T09:51:06-05:00 disable mglru service
-  - 521d36a9 2024-06-21T17:45:36-04:00 make logging less verbose and make OCL featuregate more explicit in operator
-  - 17e99bfd 2024-06-13T14:56:05-04:00 MCD should emit events whenever SIGTERM protection is added, removed, or bumped into
-  - 023c85cd 2024-06-13T13:10:06-04:00 update events in nodecontroller should include MachineConfig / image
-  - 47a8befb 2024-06-13T13:03:02-04:00 run validations on all MachineOSConfigs before rendering new MCD DaemonSet
-  - 97cefda5 2024-06-12T14:21:41-04:00 start MachineOSConfig informers only if the featuregate is enabled
-  - 82b19302 2024-06-12T14:21:41-04:00 initial commit of MCD-side implementation
-  - 6dc50086 2024-06-12T14:21:41-04:00 move canonicalizePullSecretBytes and add tests for all DockerConfig helpers
-  - d8ebdfc7 2024-06-12T14:21:41-04:00 wires up operator-side for currentimagepullsecret syncing
-  - 2d77dcf4 2024-06-12T14:21:40-04:00 certificatewriter should handle the internal registry pull secret
+- ovn-kubernetes image-arm64 56c123fe65143eb4005558d9845c89d243c8573c to 1356c9b67dc0f07b71537117f1fce09a34b9b5cf
+  - 84b72abb 2024-05-25T16:06:38+00:00 Updating ovn-kubernetes-microshift-container image to be consistent with ART for 4.17 Reconciling with https://github.com/openshift/ocp-build-data/tree/4c1326094222f9209876f06833179a1b9178faf7/images/ovn-kubernetes-microshift.yml
 
-- operator-framework-olm embedded-component 06c943a5bd529b7fb6fa278f637747889f4fab73 to 02e3f41f9a9e88fb3852c6c49e9cd6421fe9db61
-  - 88c8eca4 2024-06-25T00:03:28+00:00 [OCPBUGS-25341]: perform operator apiService certificate validity checks directly (#3217)
-  - b682d7ee 2024-06-24T18:44:15+02:00 [CARRY] bump e2e timeout by 15 mins
-  - 56226d58 2024-06-24T18:42:56+02:00 [OCPBUGS-25341]: perform operator apiService certificate validity checks directly (#3217)
-  - 9c4ea260 2024-06-24T18:37:18+02:00 [OCPBUGS-34173]: fix sorting unpack jobs (#3299)
+- kubernetes image-arm64 d0324787c86dcd13d4f16745da43b216a6787040 to 733cc9d44d7c449f231313a8f158e265afa4b8c6
+  - 69330adbe 2024-06-21T13:51:03-04:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - efe876d19 2024-06-21T13:50:32-04:00 UPSTREAM: <drop>: manually resolve conflicts
+  - 39683505b 2024-06-11T20:20:59+00:00 Release commit for Kubernetes v1.30.2
+  - 47c36d4bb 2024-06-06T18:18:54+02:00 Bump images, dependencies and versions to go 1.22.4 and distroless iptables/setcap/debian-base
+  - cd73ad187 2024-06-04T23:23:18+00:00 update driver installer
+  - 654c085cb 2024-06-04T09:04:10+00:00 Don't fill in NodeToStatusMap with UnschedulableAndUnresolvable
+  - 1ddcf3486 2024-06-04T09:02:07+00:00 Revert "scheduler: preallocation for NodeToStatusMap"
+  - 0df726772 2024-06-03T08:12:16+03:00 kubeadm: use the actual configured kubelet healthz address:port
+  - 398ab938e 2024-05-23T12:07:42+03:00 kubectl create cronjobs: Manually set OwnerReferences
+  - 42b93b35b 2024-05-22T10:41:21+08:00 add an integration test when nodeAffinity specifies a non-existent node.
+  - f73bb17ef 2024-05-22T10:41:21+08:00 base on allNodes when calculating nextStartNodeIndex
+  - a26f2c59e 2024-05-16T11:59:44-04:00 Fix printPod panic with spurious container statuses
+  - 85fc47582 2024-05-14T11:10:45+00:00 Update CHANGELOG/CHANGELOG-1.30.md for v1.30.1
+  - 3d8967247 2024-05-13T17:34:08+00:00 Adding the feature gates to fix cost for VAP and webhook matchConditions.
+  - b762a187f 2024-05-13T11:04:47+00:00 cherry pick #124618 to 1.30
+  - 1c8b0f697 2024-05-13T11:11:59+02:00 fix requests tracker concurrency
+  - 2956e294c 2024-05-13T11:11:59+02:00 fix conflict race in statefulset rest update
+  - 7d9b913d1 2024-05-13T11:11:58+02:00 fix stateful set pod recreation and event spam
+  - a58d4f54c 2024-05-13T11:11:58+02:00 fix pods tracking and internal error checking in statefulset tests
+  - f20b6672b 2024-05-12T15:30:58+02:00 [go] Bump images, dependencies and versions to go 1.22.3 and distroless iptables
+  - d8c37e815 2024-05-11T01:18:51+00:00 Updated & added visibility to apiserver x509 test certificates expiring this year
 
