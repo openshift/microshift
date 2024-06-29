@@ -38,6 +38,14 @@ ${TARGET_VERSION}               ${EMPTY}
 ${DEPENDENCY_VERSION}           ${EMPTY}
 # Optional URL for repo for previous minor version
 ${PREVIOUS_VERSION_REPO_URL}    ${EMPTY}
+# Crun configuration
+${CRIO_CONFIG}                  SEPARATOR=\n
+...                             [crio.runtime.runtimes.crun]
+...                             runtime_path = ""
+...                             runtime_type = "oci"
+...                             runtime_root = "/run/crun"
+...                             runtime_config_path = ""
+...                             monitor_path = ""
 
 
 *** Test Cases ***
@@ -68,6 +76,13 @@ Upgrade From Previous Version
     END
     ${version}=    MicroShift Version
     Should Be Equal As Integers    ${version.minor}    ${PREVIOUS_MINOR_VERSION}
+    # Since 4.15 RPMs do not restrict the crio max version, and crio 1.29 (which is the
+    # version in 4.16 repo) includes a breaking change in the default config(that was fixed
+    # in 4.16 for microshift), we need to manually configure it here. A proper fix would be
+    # to have microshift 4.15 install crio<=1.28, but here we can work around it by copying
+    # the file.
+    # This is a temporary fix until 4.15 RPMs set their dependencies with min and max versions.
+    Upload String To File    ${CRIO_CONFIG}    /etc/crio/crio.conf.d/00-crio-crun.conf
     Start MicroShift
     Wait For MicroShift
     Install MicroShift RPM Packages From Repo    ${SOURCE_REPO_URL}    ${TARGET_VERSION}
