@@ -45,7 +45,7 @@ func (v *validationWebhookCfg) Handle(ctx context.Context) error {
 func admissionRegistrationClient(kubeconfigPath string) *arClientV1.AdmissionregistrationV1Client {
 	restConfig, err := clientcmd.BuildConfigFromFlags("", kubeconfigPath)
 	if err != nil {
-		klog.Fatalf("failed to create admission-registration client: %v", err)
+		klog.Fatalf("failed to create admission-registration Client: %v", err)
 	}
 	return arClientV1.NewForConfigOrDie(rest.AddUserAgent(restConfig, "admission-registration"))
 }

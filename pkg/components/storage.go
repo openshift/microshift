@@ -3,9 +3,9 @@ package components
 import (
 	"context"
 	"errors"
-	"fmt"
 	"os"
 	"path/filepath"
+	"sync"
 
 	"k8s.io/klog/v2"
 
@@ -14,69 +14,51 @@ import (
 	"github.com/openshift/microshift/pkg/config/lvmd"
 )
 
-// getCSIPluginConfig searches for a user-defined lvmd configuration file in /etc/microshift.  If found, returns
-// the lvmd config.  If not found, returns a default-value lvmd config.  If an unmarshalling errors, returns nil
-// and the error.
-func getCSIPluginConfig() (*lvmd.Lvmd, error) {
-	lvmdConfig := filepath.Join(filepath.Dir(config.ConfigFile), lvmd.LvmdConfigFileName)
-	if _, err := os.Stat(lvmdConfig); !errors.Is(err, os.ErrNotExist) {
-		return lvmd.NewLvmdConfigFromFile(lvmdConfig)
+var lvmdConfigPathInMicroShift string
+var lvmdConfigPathInMicroShiftSync sync.Once
+
+func lvmdConfigForMicroShift() string {
+	lvmdConfigPathInMicroShiftSync.Do(func() {
+		lvmdConfigPathInMicroShift = filepath.Join(filepath.Dir(config.ConfigFile), lvmd.LvmdConfigFileName)
+	})
+	return lvmdConfigPathInMicroShift
+}
+
+// loadCSIPluginConfig searches for a user-defined lvmd configuration file in /etc/microshift. If found, returns
+// the lvmd config.  If not found, returns a default-value lvmd config which is saved in /etc/microshift.
+func loadCSIPluginConfig() (*lvmd.Lvmd, error) {
+	microshiftPath := lvmdConfigForMicroShift()
+	_, err := os.Stat(microshiftPath)
+
+	var config *lvmd.Lvmd
+	if errors.Is(err, os.ErrNotExist) {
+		if config, err = lvmd.DefaultLvmdConfig(); err != nil {
+			return nil, err
+		}
+		if err := lvmd.SaveLvmdConfigToFile(config, microshiftPath); err != nil {
+			return nil, err
+		}
+	} else if err != nil {
+		return nil, err
+	} else {
+		config, err = lvmd.NewLvmdConfigFromFile(microshiftPath)
+		if err != nil {
+			return nil, err
+		}
 	}
-	return lvmd.DefaultLvmdConfig()
+
+	return config, nil
 }
 
 func startCSIPlugin(ctx context.Context, cfg *config.Config, kubeconfigPath string) error {
-	var (
-		ns = []string{
-			"components/lvms/topolvm-openshift-storage_namespace.yaml",
-		}
-		sa = []string{
-			"components/lvms/topolvm-node_v1_serviceaccount.yaml",
-			"components/lvms/topolvm-controller_v1_serviceaccount.yaml",
-		}
-		role = []string{
-			"components/lvms/topolvm-controller_rbac.authorization.k8s.io_v1_role.yaml",
-		}
-		rb = []string{
-			"components/lvms/topolvm-controller_rbac.authorization.k8s.io_v1_rolebinding.yaml",
-		}
-		cr = []string{
-			"components/lvms/topolvm-controller_rbac.authorization.k8s.io_v1_clusterrole.yaml",
-			"components/lvms/topolvm-node-scc_rbac.authorization.k8s.io_v1_clusterrole.yaml",
-			"components/lvms/topolvm-node_rbac.authorization.k8s.io_v1_clusterrole.yaml",
-		}
-		crb = []string{
-			"components/lvms/topolvm-controller_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml",
-			"components/lvms/topolvm-node-scc_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml",
-			"components/lvms/topolvm-node_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml",
-		}
-		cd = []string{
-			"components/lvms/csi-driver.yaml",
-		}
-		cm     = "components/lvms/topolvm-lvmd-config_configmap_v1.yaml"
-		cm_ver = "components/lvms/topolvm-configmap_lvms-version.yaml"
-		ds     = []string{
-			"components/lvms/topolvm-node_daemonset.yaml",
-		}
-		deploy = []string{
-			"components/lvms/topolvm-controller_deployment.yaml",
-		}
-		sc = []string{
-			"components/lvms/topolvm_default-storage-class.yaml",
-		}
-		scc = []string{
-			"components/lvms/topolvm-node-securitycontextconstraint.yaml",
-		}
-	)
-
-	if err := lvmd.LvmSupported(); err != nil {
+	if err := lvmd.LvmPresentOnMachine(); err != nil {
 		klog.Warningf("skipping CSI deployment: %v", err)
 		return nil
 	}
 
 	// the lvmd file should be located in the same directory as the microshift config to minimize coupling with the
 	// csi plugin.
-	lvmdCfg, err := getCSIPluginConfig()
+	lvmdCfg, err := loadCSIPluginConfig()
 	if err != nil {
 		return err
 	}
@@ -84,17 +66,56 @@ func startCSIPlugin(ctx context.Context, cfg *config.Config, kubeconfigPath stri
 		klog.V(2).Infof("CSI is disabled. %s", lvmdCfg.Message)
 		return nil
 	}
-	lvmdRenderParams, err := renderLvmdParams(lvmdCfg)
-	if err != nil {
-		return fmt.Errorf("rendering lvmd params: %v", err)
-	}
+
+	var (
+		// CRDS are handled in
+		ns = []string{
+			"components/lvms/topolvm-openshift-storage_namespace.yaml",
+		}
+		sa = []string{
+			"components/lvms/lvms-operator_v1_serviceaccount.yaml",
+			"components/lvms/vg-manager_v1_serviceaccount.yaml",
+		}
+		role = []string{
+			"components/lvms/lvms-operator_rbac.authorization.k8s.io_v1_role.yaml",
+			"components/lvms/vg-manager_rbac.authorization.k8s.io_v1_role.yaml",
+			"components/lvms/lvms-metrics_rbac.authorization.k8s.io_v1_role.yaml",
+		}
+		rb = []string{
+			"components/lvms/lvms-operator_rbac.authorization.k8s.io_v1_rolebinding.yaml",
+			"components/lvms/vg-manager_rbac.authorization.k8s.io_v1_rolebinding.yaml",
+			"components/lvms/lvms-metrics_rbac.authorization.k8s.io_v1_rolebinding.yaml",
+		}
+		cr = []string{
+			"components/lvms/lvms-operator_rbac.authorization.k8s.io_v1_clusterrole.yaml",
+			"components/lvms/vg-manager_rbac.authorization.k8s.io_v1_clusterrole.yaml",
+		}
+		crb = []string{
+			"components/lvms/lvms-operator_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml",
+			"components/lvms/vg-manager_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml",
+		}
+		cm_ver = "components/lvms/topolvm-configmap_lvms-version.yaml"
+		deploy = []string{
+			"components/lvms/lvms-operator_apps_v1_deployment.yaml",
+		}
+		lvmClusters = []string{
+			"components/lvms/lvms_default-lvmcluster.yaml",
+		}
+		sc = []string{
+			"components/lvms/topolvm_default-storage-class.yaml",
+		}
+		svc = []string{
+			"components/lvms/lvms-webhook-service_v1_service.yaml",
+			"components/lvms/lvms-operator-metrics-service_v1_service.yaml",
+			"components/lvms/vg-manager-metrics-service_v1_service.yaml",
+		}
+		vwc = []string{
+			"components/lvms/lvms-operator_admissionregistration.k8s.io_v1_webhook.yaml",
+		}
+	)
 
 	if err := assets.ApplyStorageClasses(ctx, sc, nil, nil, kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply storage cass %v: %v", sc, err)
-		return err
-	}
-	if err := assets.ApplyCSIDrivers(ctx, cd, nil, nil, kubeconfigPath); err != nil {
-		klog.Warningf("Failed to apply csiDriver %v: %v", sc, err)
 		return err
 	}
 	if err := assets.ApplyNamespaces(ctx, ns, kubeconfigPath); err != nil {
@@ -121,25 +142,26 @@ func startCSIPlugin(ctx context.Context, cfg *config.Config, kubeconfigPath stri
 		klog.Warningf("Failed to apply clusterrolebinding %v: %v", crb, err)
 		return err
 	}
-	if err := assets.ApplyConfigMapWithData(ctx, cm, map[string]string{"lvmd.yaml": lvmdRenderParams["lvmd"].(string)}, kubeconfigPath); err != nil {
+	if err := assets.ApplyConfigMaps(ctx, []string{cm_ver}, nil, nil, kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply configMap %v: %v", crb, err)
 		return err
 	}
-	if err := assets.ApplyConfigMaps(ctx, []string{cm_ver}, nil, nil, kubeconfigPath); err != nil {
-		klog.Warningf("Failed to apply configMap %v: %v", crb, err)
+	if err := assets.ApplyServices(ctx, svc, nil, map[string]interface{}{}, kubeconfigPath); err != nil {
+		klog.Warningf("Failed to apply service %v: %v", svc, err)
 		return err
 	}
 	if err := assets.ApplyDeployments(ctx, deploy, renderTemplate, renderParamsFromConfig(cfg, nil), kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply deployment %v: %v", deploy, err)
 		return err
 	}
-	if err := assets.ApplyDaemonSets(ctx, ds, renderTemplate, renderParamsFromConfig(cfg, lvmdRenderParams), kubeconfigPath); err != nil {
-		klog.Warningf("Failed to apply daemonsets %v: %v", ds, err)
+	if err := assets.ApplyValidatingWebhookConfiguration(ctx, vwc, kubeconfigPath); err != nil {
+		klog.Warningf("Failed to apply validating webhook configuration %v: %v", vwc, err)
 		return err
 	}
-	if err := assets.ApplySCCs(ctx, scc, nil, nil, kubeconfigPath); err != nil {
-		klog.Warningf("Failed to apply sccs %v: %v", scc, err)
+	if err := assets.ApplyGeneric(ctx, lvmClusters, nil, map[string]interface{}{}, nil, kubeconfigPath); err != nil {
+		klog.Warningf("Failed to apply lvmcluster: %v", err)
 		return err
 	}
+
 	return nil
 }

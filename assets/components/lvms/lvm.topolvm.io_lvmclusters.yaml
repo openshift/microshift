@@ -1,0 +1,397 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.14.0
+  creationTimestamp: null
+  name: lvmclusters.lvm.topolvm.io
+spec:
+  group: lvm.topolvm.io
+  names:
+    kind: LVMCluster
+    listKind: LVMClusterList
+    plural: lvmclusters
+    singular: lvmcluster
+  scope: Namespaced
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: .status.state
+      name: Status
+      type: string
+    name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: LVMCluster is the Schema for the lvmclusters API
+        properties:
+          apiVersion:
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+            type: string
+          kind:
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: LVMClusterSpec defines the desired state of LVMCluster
+            properties:
+              storage:
+                description: Storage contains the device class configuration for local
+                  storage devices.
+                properties:
+                  deviceClasses:
+                    description: DeviceClasses contains the configuration to assign
+                      the local storage devices to the LVM volume groups that you
+                      can use to provision persistent volume claims (PVCs).
+                    items:
+                      properties:
+                        default:
+                          description: Default is a flag to indicate that a device
+                            class is the default. You can configure only a single
+                            default device class.
+                          type: boolean
+                        deviceSelector:
+                          description: DeviceSelector contains the configuration to
+                            specify paths to the devices that you want to add to the
+                            LVM volume group, and force wipe the selected devices.
+                          properties:
+                            forceWipeDevicesAndDestroyAllData:
+                              description: |-
+                                ForceWipeDevicesAndDestroyAllData is a flag to force wipe the selected devices.
+                                This wipes the file signatures on the devices. Use this feature with caution.
+                                Force wipe the devices only when you know that they do not contain any important data.
+                              type: boolean
+                            optionalPaths:
+                              description: OptionalPaths specify the optional device
+                                paths.
+                              items:
+                                type: string
+                              type: array
+                            paths:
+                              description: Paths specify the device paths.
+                              items:
+                                type: string
+                              type: array
+                          type: object
+                        fstype:
+                          default: xfs
+                          description: FilesystemType sets the filesystem the device
+                            should use. Select either `ext4` or `xfs`.
+                          enum:
+                          - xfs
+                          - ext4
+                          - ""
+                          type: string
+                        name:
+                          description: Name specifies a name for the device class
+                          maxLength: 245
+                          minLength: 1
+                          pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
+                          type: string
+                        nodeSelector:
+                          description: NodeSelector contains the configuration to
+                            choose the nodes on which you want to create the LVM volume
+                            group. If this field is not configured, all nodes without
+                            no-schedule taints are considered.
+                          properties:
+                            nodeSelectorTerms:
+                              description: Required. A list of node selector terms.
+                                The terms are ORed.
+                              items:
+                                description: |-
+                                  A null or empty node selector term matches no objects. The requirements of
+                                  them are ANDed.
+                                  The TopologySelectorTerm type implements a subset of the NodeSelectorTerm.
+                                properties:
+                                  matchExpressions:
+                                    description: A list of node selector requirements
+                                      by node's labels.
+                                    items:
+                                      description: |-
+                                        A node selector requirement is a selector that contains values, a key, and an operator
+                                        that relates the key and values.
+                                      properties:
+                                        key:
+                                          description: The label key that the selector
+                                            applies to.
+                                          type: string
+                                        operator:
+                                          description: |-
+                                            Represents a key's relationship to a set of values.
+                                            Valid operators are In, NotIn, Exists, DoesNotExist. Gt, and Lt.
+                                          type: string
+                                        values:
+                                          description: |-
+                                            An array of string values. If the operator is In or NotIn,
+                                            the values array must be non-empty. If the operator is Exists or DoesNotExist,
+                                            the values array must be empty. If the operator is Gt or Lt, the values
+                                            array must have a single element, which will be interpreted as an integer.
+                                            This array is replaced during a strategic merge patch.
+                                          items:
+                                            type: string
+                                          type: array
+                                      required:
+                                      - key
+                                      - operator
+                                      type: object
+                                    type: array
+                                  matchFields:
+                                    description: A list of node selector requirements
+                                      by node's fields.
+                                    items:
+                                      description: |-
+                                        A node selector requirement is a selector that contains values, a key, and an operator
+                                        that relates the key and values.
+                                      properties:
+                                        key:
+                                          description: The label key that the selector
+                                            applies to.
+                                          type: string
+                                        operator:
+                                          description: |-
+                                            Represents a key's relationship to a set of values.
+                                            Valid operators are In, NotIn, Exists, DoesNotExist. Gt, and Lt.
+                                          type: string
+                                        values:
+                                          description: |-
+                                            An array of string values. If the operator is In or NotIn,
+                                            the values array must be non-empty. If the operator is Exists or DoesNotExist,
+                                            the values array must be empty. If the operator is Gt or Lt, the values
+                                            array must have a single element, which will be interpreted as an integer.
+                                            This array is replaced during a strategic merge patch.
+                                          items:
+                                            type: string
+                                          type: array
+                                      required:
+                                      - key
+                                      - operator
+                                      type: object
+                                    type: array
+                                type: object
+                                x-kubernetes-map-type: atomic
+                              type: array
+                          required:
+                          - nodeSelectorTerms
+                          type: object
+                          x-kubernetes-map-type: atomic
+                        thinPoolConfig:
+                          description: ThinPoolConfig contains the configuration to
+                            create a thin pool in the LVM volume group. If you exclude
+                            this field, logical volumes are thick provisioned.
+                          properties:
+                            chunkSize:
+                              anyOf:
+                              - type: integer
+                              - type: string
+                              description: |-
+                                ChunkSize specifies the statically calculated chunk size for the thin pool.
+                                Thus, It is only used when the ChunkSizeCalculationPolicy is set to Static.
+                                No ChunkSize with a ChunkSizeCalculationPolicy set to Static will result in a default chunk size of 128Ki.
+                                It can be between 64Ki and 1Gi due to the underlying limitations of lvm2.
+                              pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                              x-kubernetes-int-or-string: true
+                            chunkSizeCalculationPolicy:
+                              default: Static
+                              description: |-
+                                ChunkSizeCalculationPolicy specifies the policy to calculate the chunk size for the underlying volume.
+                                When set to Host, the chunk size is calculated based on the lvm2 host setting on the node.
+                                When set to Static, the chunk size is calculated based on the static size attribute provided within ChunkSize.
+                              enum:
+                              - Host
+                              - Static
+                              type: string
+                            name:
+                              description: Name specifies a name for the thin pool.
+                              type: string
+                            overprovisionRatio:
+                              description: OverProvisionRatio specifies a factor by
+                                which you can provision additional storage based on
+                                the available storage in the thin pool. To prevent
+                                over-provisioning through validation, set this field
+                                to 1.
+                              minimum: 1
+                              type: integer
+                            sizePercent:
+                              default: 90
+                              description: SizePercent specifies the percentage of
+                                space in the LVM volume group for creating the thin
+                                pool.
+                              maximum: 90
+                              minimum: 10
+                              type: integer
+                          required:
+                          - name
+                          - overprovisionRatio
+                          type: object
+                      type: object
+                    type: array
+                type: object
+              tolerations:
+                description: Tolerations to apply to nodes to act on
+                items:
+                  description: |-
+                    The pod this Toleration is attached to tolerates any taint that matches
+                    the triple <key,value,effect> using the matching operator <operator>.
+                  properties:
+                    effect:
+                      description: |-
+                        Effect indicates the taint effect to match. Empty means match all taint effects.
+                        When specified, allowed values are NoSchedule, PreferNoSchedule and NoExecute.
+                      type: string
+                    key:
+                      description: |-
+                        Key is the taint key that the toleration applies to. Empty means match all taint keys.
+                        If the key is empty, operator must be Exists; this combination means to match all values and all keys.
+                      type: string
+                    operator:
+                      description: |-
+                        Operator represents a key's relationship to the value.
+                        Valid operators are Exists and Equal. Defaults to Equal.
+                        Exists is equivalent to wildcard for value, so that a pod can
+                        tolerate all taints of a particular category.
+                      type: string
+                    tolerationSeconds:
+                      description: |-
+                        TolerationSeconds represents the period of time the toleration (which must be
+                        of effect NoExecute, otherwise this field is ignored) tolerates the taint. By default,
+                        it is not set, which means tolerate the taint forever (do not evict). Zero and
+                        negative values will be treated as 0 (evict immediately) by the system.
+                      format: int64
+                      type: integer
+                    value:
+                      description: |-
+                        Value is the taint value the toleration matches to.
+                        If the operator is Exists, the value should be empty, otherwise just a regular string.
+                      type: string
+                  type: object
+                type: array
+            type: object
+          status:
+            description: LVMClusterStatus defines the observed state of LVMCluster
+            properties:
+              conditions:
+                description: Conditions describes the state of the resource.
+                items:
+                  description: |-
+                    Condition represents the state of the operator's
+                    reconciliation functionality.
+                  properties:
+                    lastHeartbeatTime:
+                      format: date-time
+                      type: string
+                    lastTransitionTime:
+                      format: date-time
+                      type: string
+                    message:
+                      type: string
+                    reason:
+                      type: string
+                    status:
+                      type: string
+                    type:
+                      description: ConditionType is the state of the operator's reconciliation
+                        functionality.
+                      type: string
+                  required:
+                  - status
+                  - type
+                  type: object
+                type: array
+              deviceClassStatuses:
+                description: DeviceClassStatuses describes the status of all deviceClasses
+                items:
+                  description: DeviceClassStatus defines the observed status of the
+                    deviceclass across all nodes
+                  properties:
+                    name:
+                      description: Name is the name of the deviceclass
+                      type: string
+                    nodeStatus:
+                      description: NodeStatus tells if the deviceclass was created
+                        on the node
+                      items:
+                        description: NodeStatus defines the observed state of the
+                          deviceclass on the node
+                        properties:
+                          deviceDiscoveryPolicy:
+                            default: RuntimeDynamic
+                            description: |-
+                              DeviceDiscoveryPolicy is a field to indicate whether the devices are discovered
+                              at runtime or preconfigured through a DeviceSelector
+                              Setting this to DeviceDiscoveryPolicyPreconfigured indicates the devices are preconfigured through a DeviceSelector.
+                              Setting this to DeviceDiscoveryPolicyRuntimeDynamic indicates the devices are added to the VG dynamically if they are present at runtime.
+                              By default, the value is set to RuntimeDynamic.
+                            enum:
+                            - Preconfigured
+                            - RuntimeDynamic
+                            type: string
+                          devices:
+                            description: Devices is the list of devices used by the
+                              volume group
+                            items:
+                              type: string
+                            type: array
+                          excluded:
+                            description: |-
+                              Excluded contains the per node status of applied device exclusions that were picked up via selector,
+                              but were not used for other reasons.
+                            items:
+                              properties:
+                                name:
+                                  description: Name is the device that was filtered
+                                  type: string
+                                reasons:
+                                  description: Reasons are the human-readable reasons
+                                    why the device was excluded from the volume group
+                                  items:
+                                    type: string
+                                  type: array
+                              required:
+                              - name
+                              - reasons
+                              type: object
+                            type: array
+                          name:
+                            description: Name is the name of the volume group
+                            type: string
+                          node:
+                            description: Node is the name of the node
+                            type: string
+                          reason:
+                            description: Reason provides more detail on the volume
+                              group creation status
+                            type: string
+                          status:
+                            description: Status tells if the volume group was created
+                              on the node
+                            type: string
+                        type: object
+                      type: array
+                  type: object
+                type: array
+              ready:
+                description: Ready describes if the LVMCluster is ready.
+                type: boolean
+              state:
+                description: State describes the LVMCluster state.
+                type: string
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: null
+  storedVersions: null

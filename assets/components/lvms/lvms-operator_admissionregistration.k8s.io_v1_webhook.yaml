@@ -1,0 +1,38 @@
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingWebhookConfiguration
+metadata:
+  namespace: openshift-storage
+  name: vlvmcluster.kb.io-lvms-operator
+  annotations:
+    service.beta.openshift.io/inject-cabundle: "true"
+webhooks:
+  - name: vlvmcluster.kb.io
+    clientConfig:
+      service:
+        name: lvms-webhook-service
+        namespace: openshift-storage
+        path: /validate-lvm-topolvm-io-v1alpha1-lvmcluster
+        port: 443
+    rules:
+      - apiGroups:
+          - lvm.topolvm.io
+        apiVersions:
+          - v1alpha1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - lvmclusters
+        scope: '*'
+    failurePolicy: Fail
+    matchPolicy: Equivalent
+    sideEffects: None
+    timeoutSeconds: 10
+    admissionReviewVersions:
+      - v1
+    namespaceSelector:
+      matchExpressions:
+        - key: namespace
+          operator: In
+          values:
+            - openshift-storage

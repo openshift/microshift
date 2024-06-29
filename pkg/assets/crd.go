@@ -15,7 +15,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
-	klog "k8s.io/klog/v2"
+	"k8s.io/klog/v2"
 
 	"github.com/openshift/library-go/pkg/operator/resource/resourceapply"
 	"github.com/openshift/microshift/pkg/config"
@@ -38,6 +38,9 @@ var (
 		"crd/route.crd.yaml",
 		"crd/storage_version_migration.crd.yaml",
 		"components/lvms/topolvm.io_logicalvolumes.yaml",
+		"components/lvms/lvm.topolvm.io_lvmclusters.yaml",
+		"components/lvms/lvm.topolvm.io_lvmvolumegroupnodestatuses.yaml",
+		"components/lvms/lvm.topolvm.io_lvmvolumegroups.yaml",
 		"components/csi-snapshot-controller/volumesnapshotclasses.yaml",
 		"components/csi-snapshot-controller/volumesnapshotcontents.yaml",
 		"components/csi-snapshot-controller/volumesnapshots.yaml",

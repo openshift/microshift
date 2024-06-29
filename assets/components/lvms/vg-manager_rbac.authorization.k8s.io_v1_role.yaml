@@ -1,0 +1,68 @@
+rules:
+  - apiGroups:
+      - lvm.topolvm.io
+      - apps
+    resources:
+      - lvmvolumegroups
+      - daemonsets
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  - apiGroups:
+      - lvm.topolvm.io
+    resources:
+      - lvmvolumegroups/finalizers
+    verbs:
+      - update
+  - apiGroups:
+      - lvm.topolvm.io
+    resources:
+      - lvmvolumegroups/status
+    verbs:
+      - get
+      - patch
+      - update
+  - apiGroups:
+      - lvm.topolvm.io
+    resources:
+      - lvmvolumegroupnodestatuses
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  - apiGroups:
+      - lvm.topolvm.io
+    resources:
+      - lvmvolumegroupnodestatuses/finalizers
+    verbs:
+      - update
+  - apiGroups:
+      - lvm.topolvm.io
+    resources:
+      - lvmvolumegroupnodestatuses/status
+    verbs:
+      - get
+      - patch
+      - update
+  - apiGroups:
+      - ""
+    resources:
+      - events
+    verbs:
+      - create
+      - patch
+      - update
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: vg-manager
+  namespace: openshift-storage

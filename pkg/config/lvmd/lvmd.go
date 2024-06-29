@@ -133,8 +133,20 @@ func NewLvmdConfigFromFile(p string) (*Lvmd, error) {
 	return l, nil
 }
 
-func LvmSupported() error {
-	if _, err := exec.LookPath("vgs"); err != nil {
+func SaveLvmdConfigToFile(l *Lvmd, p string) error {
+	buf, err := yaml.Marshal(l)
+	if err != nil {
+		return fmt.Errorf("marshalling lvmd config: %v", err)
+	}
+	err = os.WriteFile(p, buf, 0644)
+	if err != nil {
+		return fmt.Errorf("writing lvmd config: %v", err)
+	}
+	return nil
+}
+
+func LvmPresentOnMachine() error {
+	if _, err := exec.LookPath("lvm"); err != nil {
 		return fmt.Errorf("failed to find 'vgs' command line tool: %v", err)
 	}
 	return nil
