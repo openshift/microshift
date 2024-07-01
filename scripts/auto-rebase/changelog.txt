@@ -1,8 +1,4 @@
-- ovn-kubernetes image-amd64 29f1b8aff950b2cb670aa14edb0a181530f2ba53 to 7e8054a8ddb596087186c8c4b68dbf82767026b5
-  - 8fcb310 2024-05-14T10:04:22+02:00 vendoring changes
-  - 3c29dd0 2024-05-14T09:32:29+02:00 EgressIP: Reload certificates for the grpc heatlhcheck server
-
-- ovn-kubernetes image-arm64 29f1b8aff950b2cb670aa14edb0a181530f2ba53 to 7e8054a8ddb596087186c8c4b68dbf82767026b5
-  - 8fcb310 2024-05-14T10:04:22+02:00 vendoring changes
-  - 3c29dd0 2024-05-14T09:32:29+02:00 EgressIP: Reload certificates for the grpc heatlhcheck server
+- machine-config-operator embedded-component eac63b92593461d31042085ab5d156bb680006ed to 98cf6fbede4d0ba3746bcaa5c13211e2e88faa86
+  - 55c0ad08 2024-06-27T09:38:36+00:00 daemon/update: add workaround for OCPBUGS-33694
+  - 16652746 2024-06-27T09:38:36+00:00 daemon/update: disable systemd unit before overwriting
 
