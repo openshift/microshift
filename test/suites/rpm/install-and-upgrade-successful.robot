@@ -31,13 +31,9 @@ Test Tags           restart    rpm-based-system    slow
 
 *** Variables ***
 # The URL to the repo with the version of microshift build from source
-${SOURCE_REPO_URL}              ${EMPTY}
+${SOURCE_REPO_URL}      ${EMPTY}
 # The version of microshift we expect to find in that repo
-${TARGET_VERSION}               ${EMPTY}
-# The version we should use when enabling the extra repos with dependencies like oc
-${DEPENDENCY_VERSION}           ${EMPTY}
-# Optional URL for repo for previous minor version
-${PREVIOUS_VERSION_REPO_URL}    ${EMPTY}
+${TARGET_VERSION}       ${EMPTY}
 
 
 *** Test Cases ***
@@ -51,21 +47,21 @@ Install Source Version
 
 Upgrade From Previous Version
     [Documentation]    Install the previous version, then upgrade
-    # Depending on where we are in the current release cycle, we might
-    # need to install from an unofficial repository if the previous
-    # release only has EC and RC builds.
-    IF    '${PREVIOUS_VERSION_REPO_URL}' != '${EMPTY}'
-        Install MicroShift RPM Packages From Repo
-        ...    ${PREVIOUS_VERSION_REPO_URL}
-        ...    4.${PREVIOUS_MINOR_VERSION}.*
-    ELSE
-        # Ignore warnings when installing the previous version because we
-        # know some of our older RPMs generate warnings. We care more
-        # about warnings on the new RPM.
-        Install MicroShift RPM Packages From System Repo
-        ...    4.${PREVIOUS_MINOR_VERSION}.*
-        ...    check_warnings=False
-    END
+    # Always install from system repo, because the scenario script
+    # is enabling all the repositories needed.
+    #
+    # Ignore warnings when installing the previous version because we
+    # know some of our older RPMs generate warnings. We care more
+    # about warnings on the new RPM.
+    Install MicroShift RPM Packages From System Repo
+    ...    4.${PREVIOUS_MINOR_VERSION}.*
+    ...    check_warnings=False
+
+    # This is release-4.16 branch, so previous MicroShift is 4.15.
+    # microshift-4.15 doesn't specify exact crio version it needs, so dnf will install crio for 4.16,
+    # which is missing the `crun` runtime configuration and result in failure to start.
+    Command Should Work    dnf install -y --allowerasing 'cri-o-1.28.*'
+
     ${version}=    MicroShift Version
     Should Be Equal As Integers    ${version.minor}    ${PREVIOUS_MINOR_VERSION}
     Start MicroShift
@@ -83,25 +79,15 @@ Setup
     [Documentation]    Test suite setup
     Check Required Env Variables
     Should Not Be Empty    ${SOURCE_REPO_URL}    SOURCE_REPO_URL variable is required
-    Should Not Be Empty    ${DEPENDENCY_VERSION}    DEPENDENCY_VERSION variable is required
     Should Not Be Empty    ${TARGET_VERSION}    TARGET_VERSION variable is required
     Login MicroShift Host
     System Should Not Be Ostree
-    Enable MicroShift Dependency Repositories
     Pull Secret Should Be Installed
 
 System Should Not Be Ostree
     [Documentation]    Make sure we run on a non-ostree system
     ${is_ostree}=    Is System OSTree
     Should Not Be True    ${is_ostree}
-
-Enable MicroShift Dependency Repositories
-    [Documentation]    Add the repositories with dependencies like oc, crio, etc.
-    ...    The scenario script is responsible for creating the VM with a
-    ...    subscription enabled.
-    ${uname}=    Command Should Work    uname -m
-    Command Should Work
-    ...    subscription-manager repos --enable rhocp-${DEPENDENCY_VERSION}-for-rhel-9-${uname}-rpms --enable fast-datapath-for-rhel-9-${uname}-rpms
 
 Pull Secret Should Be Installed
     [Documentation]    Check that the kickstart file installed a pull secret for us

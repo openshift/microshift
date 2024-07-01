@@ -348,7 +348,17 @@ fi
 
 title "Loading package sources"
 
-LATEST_RHOCP_MINOR=$("${ROOTDIR}/scripts/get-latest-rhocp-repo.sh")
+RHOCP=$("${ROOTDIR}/scripts/get-latest-rhocp-repo.sh")
+if [[ "${RHOCP}" =~ ^[0-9]{2} ]]; then
+    OCP_MINOR="${RHOCP}"
+    RHOCP_URL="https://cdn.redhat.com/content/dist/layered/rhel9/${BUILD_ARCH}/rhocp/4.${OCP_MINOR}/os"
+    RHOCP_GPG_RHSM="true"
+elif [[ "${RHOCP}" =~ ^http ]]; then
+    RHOCP_URL=$(echo "${RHOCP}" | cut -d, -f1)
+    OCP_MINOR=$(echo "${RHOCP}" | cut -d, -f2)
+    RHOCP_GPG_RHSM="false"
+fi
+
 PACKAGE_SOURCES="microshift-local rhocp fast-datapath"
 if [ -n "${CUSTOM_RPM_FILES}" ] ; then
     PACKAGE_SOURCES+=" custom-rpms"
@@ -357,7 +367,9 @@ fi
 for f in ${PACKAGE_SOURCES} ; do
     sed -e "s;REPLACE_IMAGE_BUILDER_DIR;${BUILDDIR};g" \
         -e "s;REPLACE_BUILD_ARCH;${BUILD_ARCH};g" \
-        -e "s;REPLACE_OCP_MINOR;${LATEST_RHOCP_MINOR};g" \
+        -e "s;REPLACE_OCP_MINOR;${OCP_MINOR};g" \
+        -e "s;REPLACE_RHOCP_URL;${RHOCP_URL};g" \
+        -e "s;REPLACE_RHOCP_GPG_RHSM;${RHOCP_GPG_RHSM};g" \
         "${SCRIPTDIR}/config/${f}.toml.template" \
         > ${f}.toml
     sudo composer-cli sources delete ${f} 2>/dev/null || true

@@ -1,4 +1,4 @@
-{{- if env.Getenv "PREVIOUS_RELEASE_REPO" "" -}}
+{{- if and (env.Getenv "PREVIOUS_RELEASE_REPO" "") (strings.HasPrefix "http" .Env.PREVIOUS_RELEASE_REPO) -}}
 id = "microshift-prel"
 name = "Repository with RPMs for previous release"
 type = "yum-baseurl"
