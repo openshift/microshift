@@ -1,26 +1,3 @@
-- ovn-kubernetes image-arm64 56c123fe65143eb4005558d9845c89d243c8573c to 1356c9b67dc0f07b71537117f1fce09a34b9b5cf
-  - 84b72abb 2024-05-25T16:06:38+00:00 Updating ovn-kubernetes-microshift-container image to be consistent with ART for 4.17 Reconciling with https://github.com/openshift/ocp-build-data/tree/4c1326094222f9209876f06833179a1b9178faf7/images/ovn-kubernetes-microshift.yml
-
-- kubernetes image-arm64 d0324787c86dcd13d4f16745da43b216a6787040 to 733cc9d44d7c449f231313a8f158e265afa4b8c6
-  - 69330adbe 2024-06-21T13:51:03-04:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
-  - efe876d19 2024-06-21T13:50:32-04:00 UPSTREAM: <drop>: manually resolve conflicts
-  - 39683505b 2024-06-11T20:20:59+00:00 Release commit for Kubernetes v1.30.2
-  - 47c36d4bb 2024-06-06T18:18:54+02:00 Bump images, dependencies and versions to go 1.22.4 and distroless iptables/setcap/debian-base
-  - cd73ad187 2024-06-04T23:23:18+00:00 update driver installer
-  - 654c085cb 2024-06-04T09:04:10+00:00 Don't fill in NodeToStatusMap with UnschedulableAndUnresolvable
-  - 1ddcf3486 2024-06-04T09:02:07+00:00 Revert "scheduler: preallocation for NodeToStatusMap"
-  - 0df726772 2024-06-03T08:12:16+03:00 kubeadm: use the actual configured kubelet healthz address:port
-  - 398ab938e 2024-05-23T12:07:42+03:00 kubectl create cronjobs: Manually set OwnerReferences
-  - 42b93b35b 2024-05-22T10:41:21+08:00 add an integration test when nodeAffinity specifies a non-existent node.
-  - f73bb17ef 2024-05-22T10:41:21+08:00 base on allNodes when calculating nextStartNodeIndex
-  - a26f2c59e 2024-05-16T11:59:44-04:00 Fix printPod panic with spurious container statuses
-  - 85fc47582 2024-05-14T11:10:45+00:00 Update CHANGELOG/CHANGELOG-1.30.md for v1.30.1
-  - 3d8967247 2024-05-13T17:34:08+00:00 Adding the feature gates to fix cost for VAP and webhook matchConditions.
-  - b762a187f 2024-05-13T11:04:47+00:00 cherry pick #124618 to 1.30
-  - 1c8b0f697 2024-05-13T11:11:59+02:00 fix requests tracker concurrency
-  - 2956e294c 2024-05-13T11:11:59+02:00 fix conflict race in statefulset rest update
-  - 7d9b913d1 2024-05-13T11:11:58+02:00 fix stateful set pod recreation and event spam
-  - a58d4f54c 2024-05-13T11:11:58+02:00 fix pods tracking and internal error checking in statefulset tests
-  - f20b6672b 2024-05-12T15:30:58+02:00 [go] Bump images, dependencies and versions to go 1.22.3 and distroless iptables
-  - d8c37e815 2024-05-11T01:18:51+00:00 Updated & added visibility to apiserver x509 test certificates expiring this year
+- oc image-arm64 34c69c72be5a0c71863965a5c6480c236b0f843e to 4b158b272fb3eb0d78e4cf87dd909af2e3f823f3
+  - 6210a4a5 2024-06-25T12:05:49-07:00 pkg/cli/admin/prune/renderedmachineconfigs: 'Error dry-run deleting'
 
