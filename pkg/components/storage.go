@@ -2,11 +2,12 @@ package components
 
 import (
 	"context"
-	"errors"
+	"fmt"
+	"io"
 	"os"
 	"path/filepath"
-	"sync"
 
+	"github.com/fsnotify/fsnotify"
 	"k8s.io/klog/v2"
 
 	"github.com/openshift/microshift/pkg/assets"
@@ -14,51 +15,20 @@ import (
 	"github.com/openshift/microshift/pkg/config/lvmd"
 )
 
-var lvmdConfigPathInMicroShift string
-var lvmdConfigPathInMicroShiftSync sync.Once
-
-func lvmdConfigForMicroShift() string {
-	lvmdConfigPathInMicroShiftSync.Do(func() {
-		lvmdConfigPathInMicroShift = filepath.Join(filepath.Dir(config.ConfigFile), lvmd.LvmdConfigFileName)
-	})
-	return lvmdConfigPathInMicroShift
-}
-
-// loadCSIPluginConfig searches for a user-defined lvmd configuration file in /etc/microshift. If found, returns
-// the lvmd config.  If not found, returns a default-value lvmd config which is saved in /etc/microshift.
-func loadCSIPluginConfig() (*lvmd.Lvmd, error) {
-	microshiftPath := lvmdConfigForMicroShift()
-	_, err := os.Stat(microshiftPath)
-
-	var config *lvmd.Lvmd
-	if errors.Is(err, os.ErrNotExist) {
-		if config, err = lvmd.DefaultLvmdConfig(); err != nil {
-			return nil, err
-		}
-		if err := lvmd.SaveLvmdConfigToFile(config, microshiftPath); err != nil {
-			return nil, err
-		}
-	} else if err != nil {
-		return nil, err
-	} else {
-		config, err = lvmd.NewLvmdConfigFromFile(microshiftPath)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	return config, nil
-}
-
 func startCSIPlugin(ctx context.Context, cfg *config.Config, kubeconfigPath string) error {
 	if err := lvmd.LvmPresentOnMachine(); err != nil {
 		klog.Warningf("skipping CSI deployment: %v", err)
 		return nil
 	}
 
-	// the lvmd file should be located in the same directory as the microshift config to minimize coupling with the
-	// csi plugin.
-	lvmdCfg, err := loadCSIPluginConfig()
+	usrCfg := filepath.Join(filepath.Dir(config.ConfigFile), lvmd.LvmdConfigFileName)
+	runtimeCfg := lvmd.RuntimeLvmdConfigFile
+
+	lvmdCfg, err := loadCSIPluginConfig(
+		ctx,
+		usrCfg,
+		runtimeCfg,
+	)
 	if err != nil {
 		return err
 	}
@@ -67,6 +37,18 @@ func startCSIPlugin(ctx context.Context, cfg *config.Config, kubeconfigPath stri
 		return nil
 	}
 
+	// This sets up the resources in the cluster
+	// Note that currently the lvmdCfg is only checked for being enabled at startup
+	// That means that the loading of the configuration file only respects enabled / disabled on restarts.
+	// That means that
+	// 1. If the configuration file is changed to disable the CSI plugin, the plugin will still be running until the next restart and until all resources are removed
+	// 2. If the configuration file is changed to enable the CSI plugin, the plugin will not be running until the next restart
+	// TODO: Implement a mechanism to reload the configuration file even when enabling or disabling, this requires a mechanism in k8s to delete resources that are no longer wanted
+	// 3. If the plugin is already enabled, the configuration file is changed and the plugin is restarted with hot-reloading.
+	return setupPluginResources(ctx, cfg, kubeconfigPath)
+}
+
+func setupPluginResources(ctx context.Context, cfg *config.Config, kubeconfigPath string) error {
 	var (
 		// CRDS are handled in
 		ns = []string{
@@ -164,4 +146,142 @@ func startCSIPlugin(ctx context.Context, cfg *config.Config, kubeconfigPath stri
 	}
 
 	return nil
+}
+
+// loadCSIPluginConfig sets up a file watcher on the configuration directory. It first creates a cancellable context
+// and determines the directory and file path of the configuration file. It then checks if the configuration directory
+// and file exist. If the configuration file exists, it copies the user's configuration, otherwise, it copies the default configuration.
+//
+// The function then creates a new file watcher and adds the configuration directory to the watcher's watch list.
+// It listens for file events in a separate goroutine. If the configuration file is modified, it copies the user's configuration again.
+// If the configuration file is removed, it copies the default configuration. If the file permissions are changed, it logs a warning.
+//
+// The function is designed to ensure that lvms always uses the most recent configuration through its hot-reload mechanism,
+// whether it's user-defined or the default, and reacts to changes in the configuration file in real-time.
+func loadCSIPluginConfig(ctx context.Context,
+	// usrCfg is the user's configuration file.
+	usrCfg string,
+	runtimeCfg string,
+) (*lvmd.Lvmd, error) {
+	usrCfgDir := filepath.Dir(usrCfg)
+	ctx, cancel := context.WithCancelCause(ctx)
+
+	// check if file exists, otherwise the watcher errors
+	fi, err := os.Stat(usrCfgDir)
+	if err != nil {
+		return nil, fmt.Errorf("config directory %s cannot be watched: %v", usrCfgDir, err)
+	} else if !fi.IsDir() {
+		return nil, fmt.Errorf("config directory %s is not a directory", usrCfgDir)
+	}
+
+	if _, err := os.Stat(usrCfg); err == nil {
+		copyUserCfg(usrCfg, runtimeCfg, cancel)
+	} else {
+		copyDefaultCfg(runtimeCfg, cancel)
+	}
+
+	// Create new watcher.
+	go func(ctx context.Context) {
+		watcher, err := fsnotify.NewWatcher()
+		defer func() {
+			if err := watcher.Close(); err != nil {
+				klog.Errorf("unable to close file watcher: %v", err)
+			}
+		}()
+		if err != nil {
+			klog.Errorf("unable to set up file watcher: %v", err)
+		}
+		if err = watcher.Add(usrCfgDir); err != nil {
+			klog.Errorf("unable to add file path to watcher: %v", err)
+		}
+
+		for {
+			select {
+			case event, ok := <-watcher.Events:
+				if !ok {
+					return
+				}
+				if event.Name != usrCfg {
+					continue
+				}
+				if event.Has(fsnotify.Write) {
+					klog.Infof("lvmd config file %q was modified, this may be due to changed user configuration or by mistake; "+
+						"now, the new config will be applied from %q", event.Name, usrCfg)
+					copyUserCfg(usrCfg, runtimeCfg, cancel)
+				}
+				if event.Has(fsnotify.Remove) {
+					klog.Warningf("lvmd config file %q was removed, this may be due to a reset user configuration or by mistake; "+
+						"now, the new config will be applied from inbuilt defaults", event.Name)
+					copyDefaultCfg(runtimeCfg, cancel)
+				}
+				if event.Has(fsnotify.Chmod) {
+					klog.Warningf("permissions were modified for %q, this may cause side-effects", event.Name)
+				}
+			case err, ok := <-watcher.Errors:
+				if !ok {
+					return
+				}
+				if err != nil {
+					klog.Errorf("file watcher error: %v", err)
+					cancel(err)
+				}
+			case <-ctx.Done():
+				klog.Errorf("stop watching for lvmd config changes: %v", ctx.Err())
+				return
+			}
+		}
+	}(ctx)
+
+	return lvmd.NewLvmdConfigFromFile(runtimeCfg)
+}
+
+func copyUserCfg(userCfg string, runtimeCfg string, onFail context.CancelCauseFunc) {
+	userCfgFile, err := os.OpenFile(userCfg, os.O_RDONLY, 0)
+	defer func() {
+		if err := userCfgFile.Close(); err != nil {
+			onFail(fmt.Errorf("unable to close lvmd config file %q: %v", userCfg, err))
+		}
+	}()
+	if err != nil {
+		onFail(fmt.Errorf("unable to open lvmd config file %q: %v", userCfg, err))
+		return
+	}
+
+	if err := os.MkdirAll(filepath.Dir(runtimeCfg), 0755); err != nil {
+		onFail(fmt.Errorf("unable to create lvmd runtime config directory: %v", err))
+		return
+	}
+
+	runtimeCfgFile, err := os.OpenFile(runtimeCfg, os.O_RDWR|os.O_CREATE, 0644)
+	defer func() {
+		if err := runtimeCfgFile.Close(); err != nil {
+			onFail(fmt.Errorf("unable to close lvmd runtime config file %q: %v", runtimeCfg, err))
+		}
+	}()
+	if err != nil {
+		onFail(fmt.Errorf("unable to open lvmd runtime config file %q: %v", runtimeCfg, err))
+		return
+	}
+
+	if _, err := io.Copy(runtimeCfgFile, userCfgFile); err != nil {
+		onFail(fmt.Errorf("unable to copy lvmd config file %q to runtime config file %q: %v", userCfg, runtimeCfg, err))
+		return
+	}
+}
+
+// defaultCfgLoader is a function that loads the default lvmd configuration.
+// Used for testing overrides as the default loader uses host lvm for volume group detection.
+var defaultCfgLoader = lvmd.DefaultLvmdConfig
+
+func copyDefaultCfg(runtimeCfg string, onFail context.CancelCauseFunc) {
+	if err := os.MkdirAll(filepath.Dir(runtimeCfg), 0755); err != nil {
+		onFail(fmt.Errorf("failed to ensure runtime lvmd config directory: %v", err))
+		return
+	}
+
+	if cfg, err := defaultCfgLoader(); err != nil {
+		onFail(fmt.Errorf("failed to load default lvmd config: %v", err))
+	} else if err := lvmd.SaveLvmdConfigToFile(cfg, runtimeCfg); err != nil {
+		onFail(fmt.Errorf("failed to save default lvmd config: %v", err))
+	}
 }

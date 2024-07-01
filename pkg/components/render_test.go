@@ -12,56 +12,8 @@ import (
 	embedded "github.com/openshift/microshift/assets"
 	"github.com/openshift/microshift/pkg/assets"
 	"github.com/openshift/microshift/pkg/config"
-	"github.com/openshift/microshift/pkg/config/lvmd"
 	"github.com/openshift/microshift/pkg/release"
 )
-
-func Test_renderLvmdParams(t *testing.T) {
-	iToP := func(i int) *uint64 { r := uint64(i); return &r }
-
-	type args struct {
-		l *lvmd.Lvmd
-	}
-	tests := []struct {
-		name    string
-		args    args
-		want    assets.RenderParams
-		wantErr bool
-	}{
-		{
-			name: "should pass",
-			args: args{
-				l: &lvmd.Lvmd{
-					SocketName: "/run/lvmd/lvmd.socket",
-					DeviceClasses: []*lvmd.DeviceClass{
-						{
-							Name:        "test",
-							VolumeGroup: "vg",
-							Default:     true,
-							SpareGB:     iToP(5),
-						},
-					}},
-			},
-			wantErr: false,
-			want: assets.RenderParams{
-				"SocketName": "/run/lvmd/lvmd.socket",
-				"lvmd":       "device-classes:\n- default: true\n  lvcreate-options: null\n  name: test\n  spare-gb: 5\n  stripe: null\n  stripe-size: \"\"\n  thin-pool: null\n  type: \"\"\n  volume-group: vg\nsocket-name: /run/lvmd/lvmd.socket\n",
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := renderLvmdParams(tt.args.l)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("renderLvmdParams() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("renderLvmdParams() got = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
 
 func Test_renderTopolvmDaemonsetTemplate(t *testing.T) {
 	tb := embedded.MustAsset("components/lvms/topolvm-node_daemonset.yaml")

@@ -11,6 +11,7 @@ import (
 )
 
 const (
+	RuntimeLvmdConfigFile       = "/var/lib/microshift/lvms/lvmd.yaml"
 	LvmdConfigFileName          = "lvmd.yaml"
 	defaultSockName             = "/run/lvmd/lvmd.socket"
 	defaultRHEL4EdgeVolumeGroup = "microshift"
