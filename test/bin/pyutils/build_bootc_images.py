@@ -84,7 +84,7 @@ def is_rhocp_available(ver):
 
     try:
         # Run the dnf command to check for cri-o in the specified repository
-        repo_info = common.run_command_in_shell(f"sudo dnf repository-packages {repository} info cri-o")
+        repo_info = common.run_command_in_shell(f"sudo dnf repository-packages --showduplicates {repository} info cri-o")
         common.print_msg(repo_info)
         return True
     except Exception:
@@ -97,10 +97,10 @@ def get_rhocp_beta_url_if_available(ver):
 
     try:
         # Run the dnf command to check for cri-o in the specified repository
-        repo_info = common.run_command_in_shell(f"sudo dnf repository-packages --disablerepo '*' --repofrompath 'this,{url_amd}' this info cri-o")
+        repo_info = common.run_command_in_shell(f"sudo dnf repository-packages --showduplicates --disablerepo '*' --repofrompath 'this,{url_amd}' this info cri-o")
         common.print_msg(repo_info)
 
-        repo_info = common.run_command_in_shell(f"sudo dnf repository-packages --disablerepo '*' --repofrompath 'this,{url_arm}' this info cri-o")
+        repo_info = common.run_command_in_shell(f"sudo dnf repository-packages --showduplicates --disablerepo '*' --repofrompath 'this,{url_arm}' this info cri-o")
         common.print_msg(repo_info)
 
         # Use specific minor version RHOCP mirror only if both arches are available.
