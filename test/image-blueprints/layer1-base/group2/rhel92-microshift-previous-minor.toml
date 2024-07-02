@@ -22,6 +22,10 @@ name = "microshift-selinux"
 version = "{{ .Env.PREVIOUS_RELEASE_VERSION }}*"
 
 [[packages]]
+name = "cri-o"
+version = "1.28.*"
+
+[[packages]]
 name = "microshift-test-agent"
 version = "*"
 
