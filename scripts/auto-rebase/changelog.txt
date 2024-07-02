@@ -1,0 +1,12 @@
+- kubernetes embedded-component 78524260502e5d93191acb29397a01db5df6136b to fedd72e71a4f21582b9ff43d929321f87dd24f7a
+  - 633f047d4 2024-05-20T14:55:27+02:00 UPSTREAM: 123055: Fix race condition between resizer and kubelet
+
+- machine-config-operator embedded-component 3aec7f32a44af5baf4f9af27edeb260ac7853776 to 5f5ce309c545f74888a748123dba0f8afbaccbd4
+  - 6e510099 2024-05-13T11:54:40+00:00 ovs-configure: fix `vlan_parent` calculation
+
+- kubernetes image-amd64 78524260502e5d93191acb29397a01db5df6136b to fedd72e71a4f21582b9ff43d929321f87dd24f7a
+  - 633f047d4 2024-05-20T14:55:27+02:00 UPSTREAM: 123055: Fix race condition between resizer and kubelet
+
+- kubernetes image-arm64 78524260502e5d93191acb29397a01db5df6136b to fedd72e71a4f21582b9ff43d929321f87dd24f7a
+  - 633f047d4 2024-05-20T14:55:27+02:00 UPSTREAM: 123055: Fix race condition between resizer and kubelet
+
