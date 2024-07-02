@@ -159,6 +159,7 @@ if [ $# -gt 0 ] && [ "$1" = "-update_cache" ] ; then
     fi
 else
     GOT_CACHED_DATA=false
+    HAS_CACHE_ACCESS=false  # Disable cache usage
     if ${HAS_CACHE_ACCESS} ; then
         if download_build_cache ; then
             GOT_CACHED_DATA=true
