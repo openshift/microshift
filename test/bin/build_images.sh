@@ -81,6 +81,8 @@ configure_package_sources() {
     export RHOCP_MINOR_Y
     export RHOCP_MINOR_Y1
     export RHOCP_MINOR_Y2
+    export RHOCP_MINOR_Y_BETA
+    export RHOCP_MINOR_Y1_BETA
 
     # Add our sources. It is OK to run these steps repeatedly, if the
     # details change they are updated in the service.
@@ -565,7 +567,19 @@ do_group() {
 is_rhocp_available() {
     local -r ver="${1}"
     repository="rhocp-4.${ver}-for-rhel-9-$(uname -m)-rpms"
-    if sudo dnf -v repository-packages "${repository}" info cri-o 1>&2; then
+    if sudo dnf repository-packages "${repository}" info cri-o 1>&2; then
+        return 0
+    fi
+    return 1
+}
+
+is_rhocp_beta_available() {
+    local -r ver="${1}"
+    url_amd="https://mirror.openshift.com/pub/openshift-v4/x86_64/dependencies/rpms/4.${ver}-el9-beta/"
+    url_arm="https://mirror.openshift.com/pub/openshift-v4/aarch64/dependencies/rpms/4.${ver}-el9-beta/"
+    # Use specific minor version RHOCP mirror only if both arches are available.
+    if sudo dnf repository-packages --disablerepo '*' --repofrompath "this,${url_arm}" this info cri-o 1>&2 && \
+        sudo dnf repository-packages --disablerepo '*' --repofrompath "this,${url_amd}" this info cri-o 1>&2; then
         return 0
     fi
     return 1
@@ -712,12 +726,19 @@ PREVIOUS_RELEASE_VERSION=$(echo "${previous_version_repo}" | cut -d, -f1)
 PREVIOUS_RELEASE_REPO=$(echo "${previous_version_repo}" | cut -d, -f2)
 
 RHOCP_MINOR_Y=""
-RHOCP_MINOR_Y1=""
+RHOCP_MINOR_Y_BETA=""
 if is_rhocp_available "${MINOR_VERSION}"; then
     RHOCP_MINOR_Y="${MINOR_VERSION}"
+elif is_rhocp_beta_available "${MINOR_VERSION}"; then
+    RHOCP_MINOR_Y_BETA="https://mirror.openshift.com/pub/openshift-v4/${UNAME_M}/dependencies/rpms/4.${MINOR_VERSION}-el9-beta/"
 fi
+
+RHOCP_MINOR_Y1=""
+RHOCP_MINOR_Y1_BETA=""
 if is_rhocp_available "${PREVIOUS_MINOR_VERSION}"; then
     RHOCP_MINOR_Y1="${PREVIOUS_MINOR_VERSION}"
+elif is_rhocp_beta_available "${PREVIOUS_MINOR_VERSION}"; then
+    RHOCP_MINOR_Y1_BETA="https://mirror.openshift.com/pub/openshift-v4/${UNAME_M}/dependencies/rpms/4.${PREVIOUS_MINOR_VERSION}-el9-beta/"
 fi
 
 # For Y-2, there will always be a real repository, so we can always

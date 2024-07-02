@@ -91,6 +91,25 @@ def is_rhocp_available(ver):
         return False
 
 
+def get_rhocp_beta_url_if_available(ver):
+    url_amd = f"https://mirror.openshift.com/pub/openshift-v4/x86_64/dependencies/rpms/4.{ver}-el9-beta/"
+    url_arm = f"https://mirror.openshift.com/pub/openshift-v4/aarch64/dependencies/rpms/4.{ver}-el9-beta/"
+
+    try:
+        # Run the dnf command to check for cri-o in the specified repository
+        repo_info = common.run_command_in_shell(f"sudo dnf repository-packages --disablerepo '*' --repofrompath 'this,{url_amd}' this info cri-o")
+        common.print_msg(repo_info)
+
+        repo_info = common.run_command_in_shell(f"sudo dnf repository-packages --disablerepo '*' --repofrompath 'this,{url_arm}' this info cri-o")
+        common.print_msg(repo_info)
+
+        # Use specific minor version RHOCP mirror only if both arches are available.
+        architecture = platform.machine()
+        return f"https://mirror.openshift.com/pub/openshift-v4/{architecture}/dependencies/rpms/4.{ver}-el9-beta/"
+    except Exception:
+        return ""
+
+
 def set_rpm_version_info_vars():
     global SOURCE_VERSION
     global MINOR_VERSION
@@ -107,6 +126,8 @@ def set_rpm_version_info_vars():
     global RHOCP_MINOR_Y2
     global YMINUS2_RELEASE_VERSION
     global YMINUS2_RELEASE_REPO
+    global RHOCP_MINOR_Y_BETA
+    global RHOCP_MINOR_Y1_BETA
 
     release_info_rpm = find_latest_rpm(LOCAL_REPO)
     release_info_rpm_base = find_latest_rpm(BASE_REPO)
@@ -126,10 +147,25 @@ def set_rpm_version_info_vars():
 
     RHOCP_MINOR_Y = ""
     RHOCP_MINOR_Y1 = ""
+
     if is_rhocp_available(MINOR_VERSION):
         RHOCP_MINOR_Y = MINOR_VERSION
+
     if is_rhocp_available(PREVIOUS_MINOR_VERSION):
         RHOCP_MINOR_Y1 = PREVIOUS_MINOR_VERSION
+
+    # Check RHOCP mirror anyway, because centos9 tests are using them.
+    RHOCP_MINOR_Y_BETA = get_rhocp_beta_url_if_available(MINOR_VERSION)
+    RHOCP_MINOR_Y1_BETA = get_rhocp_beta_url_if_available(PREVIOUS_MINOR_VERSION)
+
+    # Currently bootc tests only use current minor RHOCP. If they are unavailable, use previous minor RHOCP.
+    if RHOCP_MINOR_Y == "" and RHOCP_MINOR_Y1 != "":
+        RHOCP_MINOR_Y = RHOCP_MINOR_Y1
+    elif RHOCP_MINOR_Y_BETA == "" and RHOCP_MINOR_Y1_BETA != "":
+        RHOCP_MINOR_Y_BETA = RHOCP_MINOR_Y1_BETA
+
+    if RHOCP_MINOR_Y == "" and RHOCP_MINOR_Y_BETA == "":
+        raise Exception("Could not find a suitable RHOCP repository to enable")
 
     # For Y-2, there will always be a real repository, so we can always
     # set the template variable for enabling that package source and use
@@ -146,7 +182,8 @@ def set_rpm_version_info_vars():
         'YMINUS2_MINOR_VERSION', 'FAKE_NEXT_MINOR_VERSION', 'SOURCE_VERSION_BASE',
         'CURRENT_RELEASE_VERSION', 'CURRENT_RELEASE_REPO', 'PREVIOUS_RELEASE_VERSION',
         'PREVIOUS_RELEASE_REPO', 'RHOCP_MINOR_Y', 'RHOCP_MINOR_Y1',
-        'RHOCP_MINOR_Y2', 'YMINUS2_RELEASE_VERSION', 'YMINUS2_RELEASE_REPO'
+        'RHOCP_MINOR_Y2', 'YMINUS2_RELEASE_VERSION', 'YMINUS2_RELEASE_REPO',
+        'RHOCP_MINOR_Y_BETA', 'RHOCP_MINOR_Y1_BETA'
     ]
     for var in rpmver_globals_vars:
         value = globals().get(var)
