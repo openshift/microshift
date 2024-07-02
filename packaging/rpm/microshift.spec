@@ -65,8 +65,8 @@ BuildRequires: systemd
 BuildRequires: golang
 # DO NOT REMOVE
 
-Requires: cri-o >= 1.25
-Requires: cri-tools >= 1.25
+Requires: cri-o >= 1.28.0, cri-o < 1.29.0
+Requires: cri-tools >= 1.28.0, cri-tools < 1.29.0
 Requires: iptables
 Requires: microshift-selinux = %{version}
 Requires: microshift-networking = %{version}
@@ -425,6 +425,9 @@ systemctl enable --now --quiet openvswitch || true
 # Use Git command to generate the log and replace the VERSION string
 # LANG=C git log --date="format:%a %b %d %Y" --pretty="tformat:* %cd %an <%ae> VERSION%n- %s%n" packaging/rpm/microshift.spec
 %changelog
+* Tue Jul 02 2024 Patryk Matuszak <pmatusza@redhat.com> 4.15.21
+- Set CRI-O version to match Kubernetes' version
+
 * Thu Jan 25 2024 Patryk Matuszak <pmatusza@redhat.com> 4.15.0
 - Create microshift-olm-release-info RPM containing OLM release info files
 

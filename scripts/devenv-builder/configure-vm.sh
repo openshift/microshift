@@ -2,7 +2,6 @@
 set -eo pipefail
 
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-REPOROOT="$(cd "${SCRIPTDIR}/../.." && pwd)"
 
 BUILD_AND_RUN=true
 INSTALL_BUILD_DEPS=true
@@ -149,30 +148,13 @@ if ${BUILD_AND_RUN}; then
     make srpm
 fi
 
-# This version might not match the version under development because we need
-# to pull in dependencies that are already released
-LATEST_RHOCP_MINOR=$("${REPOROOT}/scripts/get-latest-rhocp-repo.sh")
-OCPVERSION="4.${LATEST_RHOCP_MINOR}"
-
+OCPVERSION="4.15"
 if ${RHEL_SUBSCRIPTION}; then
     OSVERSION=$(awk -F: '{print $5}' /etc/system-release-cpe)
     sudo subscription-manager config --rhsm.manage_repos=1
-
-    if ! ${RHEL_BETA_VERSION} ; then
-        sudo subscription-manager repos \
-            --enable "rhocp-${OCPVERSION}-for-rhel-${OSVERSION}-$(uname -m)-rpms" \
-            --enable "fast-datapath-for-rhel-${OSVERSION}-$(uname -m)-rpms"
-    else
-        OCP_REPO_NAME="rhocp-${OCPVERSION}-for-rhel-${OSVERSION}-mirrorbeta-$(uname -i)-rpms"
-        sudo tee "/etc/yum.repos.d/${OCP_REPO_NAME}.repo" >/dev/null <<EOF
-[${OCP_REPO_NAME}]
-name=Beta rhocp-${OCPVERSION} RPMs for RHEL ${OSVERSION}
-baseurl=https://mirror.openshift.com/pub/openshift-v4/\$basearch/dependencies/rpms/${OCPVERSION}-el${OSVERSION}-beta/
-enabled=1
-gpgcheck=0
-skip_if_unavailable=0
-EOF
-    fi
+    sudo subscription-manager repos \
+        --enable "rhocp-${OCPVERSION}-for-rhel-${OSVERSION}-$(uname -m)-rpms" \
+        --enable "fast-datapath-for-rhel-${OSVERSION}-$(uname -m)-rpms"
 else
     "${DNF_RETRY}" "install" "centos-release-nfv-common"
     sudo dnf copr enable -y @OKD/okd "centos-stream-9-$(uname -m)"
