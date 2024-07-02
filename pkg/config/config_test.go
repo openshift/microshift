@@ -529,6 +529,84 @@ func TestValidate(t *testing.T) {
 			}(),
 			expectErr: false,
 		},
+		{
+			name: "network-too-many-entries",
+			config: func() *Config {
+				c := mkDefaultConfig()
+				c.Network.ServiceNetwork = []string{"1.2.3.4/24", "::1/128", "5.6.7.8/24"}
+				c.Network.ClusterNetwork = []string{"9.10.11.12/24", "::2/128", "13.14.15.16/24"}
+				c.ApiServer.AdvertiseAddress = "17.18.19.20"
+				return c
+			}(),
+			expectErr: true,
+		},
+		{
+			name: "network-same-ip-family-ipv4",
+			config: func() *Config {
+				c := mkDefaultConfig()
+				c.Network.ServiceNetwork = []string{"21.22.23.24/24", "25.26.27.28/24"}
+				c.Network.ClusterNetwork = []string{"29.30.31.32/24", "33.34.35.36/24"}
+				c.ApiServer.AdvertiseAddress = "37.38.39.40"
+				return c
+			}(),
+			expectErr: true,
+		},
+		{
+			name: "network-same-ip-family-ipv6",
+			config: func() *Config {
+				c := mkDefaultConfig()
+				c.Network.ServiceNetwork = []string{"fd01::/64", "fd02::/64"}
+				c.Network.ClusterNetwork = []string{"fd03::/64", "fd04::/64"}
+				c.ApiServer.AdvertiseAddress = "fd01::1"
+				return c
+			}(),
+			expectErr: true,
+		},
+		{
+			name: "network-bad-format-ipv4",
+			config: func() *Config {
+				c := mkDefaultConfig()
+				c.Network.ServiceNetwork = []string{"1.2.3.300/24"}
+				c.Network.ClusterNetwork = []string{"300.1.2.3/24"}
+				c.ApiServer.AdvertiseAddress = "8.8.8.8"
+				return c
+			}(),
+			expectErr: true,
+		},
+		{
+			name: "network-bad-format-ipv6",
+			config: func() *Config {
+				c := mkDefaultConfig()
+				c.Network.ServiceNetwork = []string{"fd01:::/64"}
+				c.Network.ClusterNetwork = []string{"fd05::/64"}
+				c.ApiServer.AdvertiseAddress = "fd01::2"
+				return c
+			}(),
+			expectErr: true,
+		},
+		{
+			name: "network-different-ip-family",
+			config: func() *Config {
+				c := mkDefaultConfig()
+				c.Network.ServiceNetwork = []string{"fd05::/64"}
+				c.Network.ClusterNetwork = []string{"4.3.2.1/24"}
+				c.ApiServer.AdvertiseAddress = "fd01::3"
+				return c
+			}(),
+			expectErr: true,
+		},
+
+		{
+			name: "network-different-ip-family-advertise-address",
+			config: func() *Config {
+				c := mkDefaultConfig()
+				c.Network.ServiceNetwork = []string{"fd06::/64"}
+				c.Network.ClusterNetwork = []string{"fd07::/64"}
+				c.ApiServer.AdvertiseAddress = "10.20.30.40"
+				return c
+			}(),
+			expectErr: true,
+		},
 	}
 	for _, tt := range ttests {
 		t.Run(tt.name, func(t *testing.T) {
