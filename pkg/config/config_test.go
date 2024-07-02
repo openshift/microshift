@@ -330,6 +330,48 @@ func TestGetActiveConfigFromYAML(t *testing.T) {
 				return c
 			}(),
 		},
+		{
+			name: "kubelet",
+			config: dedent(`
+            kubelet:
+              cpuManagerPolicy: static
+              reservedMemory:
+              - limits:
+                  memory: 1100Mi
+                numaNode: 0
+              kubeReserved:
+                memory: 500Mi
+              evictionHard:
+                imagefs.available: 15%
+                memory.available: 100Mi
+                nodefs.available: 10%
+                nodefs.inodesFree: 5%
+            `),
+			expected: func() *Config {
+				c := mkDefaultConfig()
+				c.Kubelet = map[string]any{
+					"cpuManagerPolicy": "static",
+					"reservedMemory": []any{
+						map[string]any{
+							"limits": map[string]any{
+								"memory": "1100Mi",
+							},
+							"numaNode": float64(0),
+						},
+					},
+					"kubeReserved": map[string]any{
+						"memory": "500Mi",
+					},
+					"evictionHard": map[string]any{
+						"imagefs.available": "15%",
+						"memory.available":  "100Mi",
+						"nodefs.available":  "10%",
+						"nodefs.inodesFree": "5%",
+					},
+				}
+				return c
+			}(),
+		},
 	}
 
 	for _, tt := range ttests {

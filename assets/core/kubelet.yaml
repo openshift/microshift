@@ -32,3 +32,6 @@ volumePluginDir: "{{ .volumePluginDir }}"
 {{- if .resolvConf }}
 resolvConf: "{{ .resolvConf }}"
 {{- end }}
+{{ if .userProvidedConfig }}
+{{- .userProvidedConfig -}}
+{{ end }}

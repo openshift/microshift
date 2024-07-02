@@ -36,6 +36,7 @@ ingress:
     routeAdmissionPolicy:
         namespaceOwnership: ""
     status: ""
+kubelet:
 manifests:
     kustomizePaths:
         - ""
@@ -91,6 +92,7 @@ ingress:
     routeAdmissionPolicy:
         namespaceOwnership: InterNamespaceAllowed
     status: Managed
+kubelet:
 manifests:
     kustomizePaths:
         - /usr/lib/microshift/manifests

@@ -75,6 +75,8 @@ ingress:
         namespaceOwnership: InterNamespaceAllowed
     # Default router status, can be Managed or Removed.
     status: Managed
+# Settings specified in this section are transferred as-is into the Kubelet config.
+kubelet:
 manifests:
     # The locations on the filesystem to scan for kustomization
     # files to use to load manifests. Set to a list of paths to scan
