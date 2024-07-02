@@ -1,4 +1,0 @@
-- machine-config-operator embedded-component eac63b92593461d31042085ab5d156bb680006ed to 98cf6fbede4d0ba3746bcaa5c13211e2e88faa86
-  - 55c0ad08 2024-06-27T09:38:36+00:00 daemon/update: add workaround for OCPBUGS-33694
-  - 16652746 2024-06-27T09:38:36+00:00 daemon/update: disable systemd unit before overwriting
-
