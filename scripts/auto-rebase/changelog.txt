@@ -1,3 +1,77 @@
-- oc image-arm64 34c69c72be5a0c71863965a5c6480c236b0f843e to 4b158b272fb3eb0d78e4cf87dd909af2e3f823f3
+- api embedded-component 987b8890c273cdcc262028806fa85ae5ab3ed92f to 0689f006bcdeccf685c75438835beffa8bb14db7
+  - d6cbe3b 2024-06-16T13:16:17+03:00 METAL-1038 Remove baremetal dependency on MachineAPI capability
+
+- cluster-ingress-operator embedded-component 4e621359cea8ef2ae8497101ee3daf9f474b4b66 to b18a07c414696eb01170180d9dc8b5c221909d68
+  - dc4e7f9 2024-06-25T09:13:27+02:00 OCPBUGS-28673: Add e2e test for connect timeout
+
+- cluster-network-operator embedded-component 32e733b32f942ccd823f02ac0a77c52101eaf79e to 4b792c659385948e825d2ba17b8f6d2e5c3acfed
+  - 3955a9a 2024-06-24T15:54:40+05:30 Set global IP forwarding sysctl parameters while starting ovnkube-controller
+
+- kubernetes embedded-component d0324787c86dcd13d4f16745da43b216a6787040 to 733cc9d44d7c449f231313a8f158e265afa4b8c6
+  - 69330adbe 2024-06-21T13:51:03-04:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - efe876d19 2024-06-21T13:50:32-04:00 UPSTREAM: <drop>: manually resolve conflicts
+  - 39683505b 2024-06-11T20:20:59+00:00 Release commit for Kubernetes v1.30.2
+  - 47c36d4bb 2024-06-06T18:18:54+02:00 Bump images, dependencies and versions to go 1.22.4 and distroless iptables/setcap/debian-base
+  - cd73ad187 2024-06-04T23:23:18+00:00 update driver installer
+  - 654c085cb 2024-06-04T09:04:10+00:00 Don't fill in NodeToStatusMap with UnschedulableAndUnresolvable
+  - 1ddcf3486 2024-06-04T09:02:07+00:00 Revert "scheduler: preallocation for NodeToStatusMap"
+  - 0df726772 2024-06-03T08:12:16+03:00 kubeadm: use the actual configured kubelet healthz address:port
+  - 398ab938e 2024-05-23T12:07:42+03:00 kubectl create cronjobs: Manually set OwnerReferences
+  - 42b93b35b 2024-05-22T10:41:21+08:00 add an integration test when nodeAffinity specifies a non-existent node.
+  - f73bb17ef 2024-05-22T10:41:21+08:00 base on allNodes when calculating nextStartNodeIndex
+  - a26f2c59e 2024-05-16T11:59:44-04:00 Fix printPod panic with spurious container statuses
+  - 85fc47582 2024-05-14T11:10:45+00:00 Update CHANGELOG/CHANGELOG-1.30.md for v1.30.1
+  - 3d8967247 2024-05-13T17:34:08+00:00 Adding the feature gates to fix cost for VAP and webhook matchConditions.
+  - b762a187f 2024-05-13T11:04:47+00:00 cherry pick #124618 to 1.30
+  - 1c8b0f697 2024-05-13T11:11:59+02:00 fix requests tracker concurrency
+  - 2956e294c 2024-05-13T11:11:59+02:00 fix conflict race in statefulset rest update
+  - 7d9b913d1 2024-05-13T11:11:58+02:00 fix stateful set pod recreation and event spam
+  - a58d4f54c 2024-05-13T11:11:58+02:00 fix pods tracking and internal error checking in statefulset tests
+  - f20b6672b 2024-05-12T15:30:58+02:00 [go] Bump images, dependencies and versions to go 1.22.3 and distroless iptables
+  - d8c37e815 2024-05-11T01:18:51+00:00 Updated & added visibility to apiserver x509 test certificates expiring this year
+
+- machine-config-operator embedded-component 58aca6909f9d1c319816dc12beedc35150418e40 to 444decb1dfd1ebb3fb7c2e5a96ff3b3d53b6f492
+  - 51c2df2b 2024-06-25T16:58:38-04:00 daemon/update: add workaround for OCPBUGS-33694
+  - ff37e274 2024-06-25T16:58:38-04:00 daemon/update: disable systemd unit before overwriting
+  - 1092da0f 2024-06-25T12:17:50-04:00 remove this unnecessary test
+  - 52e76fec 2024-06-25T13:31:47+02:00 daemon: Handle correctly OS Version for 4.1 and 4.2 bootimages
+  - 4d0502c8 2024-05-29T21:42:57+05:30 Modify auto tuned system reserved cpu recommendation
+  - a5bbee36 2024-05-29T21:41:15+05:30 Introduce versioning for Auto Node Sizing feature
+
+- operator-framework-olm embedded-component 02e3f41f9a9e88fb3852c6c49e9cd6421fe9db61 to 0b14e86bcc2368a4d0201f8de7ea322f11e6f236
+  - 59c52546 2024-06-27T10:26:38-05:00 switch base image
+  - 5274dd9c 2024-06-27T00:03:56+00:00 build(deps): bump k8s.io/component-base from 0.30.1 to 0.30.2 (#3320) (#3293)
+  - 9d757815 2024-06-27T00:02:31+00:00 drop --show-node-events from e2e call (#3331)
+  - 50ccd407 2024-06-27T00:02:17+00:00 make flake attempts an optional parameter (#3330)
+  - bb9eff24 2024-06-27T00:02:02+00:00 Bump kubeapis to 0.30.2 (#3329)
+  - 20de5942 2024-06-27T00:01:46+00:00 [OCPBUGS-25341]: perform operator apiService certificate validity checks directly (#3217)
+
+- oc image-amd64 34c69c72be5a0c71863965a5c6480c236b0f843e to 4b158b272fb3eb0d78e4cf87dd909af2e3f823f3
   - 6210a4a5 2024-06-25T12:05:49-07:00 pkg/cli/admin/prune/renderedmachineconfigs: 'Error dry-run deleting'
+
+- ovn-kubernetes image-amd64 56c123fe65143eb4005558d9845c89d243c8573c to 1356c9b67dc0f07b71537117f1fce09a34b9b5cf
+  - 84b72abb 2024-05-25T16:06:38+00:00 Updating ovn-kubernetes-microshift-container image to be consistent with ART for 4.17 Reconciling with https://github.com/openshift/ocp-build-data/tree/4c1326094222f9209876f06833179a1b9178faf7/images/ovn-kubernetes-microshift.yml
+
+- kubernetes image-amd64 d0324787c86dcd13d4f16745da43b216a6787040 to 733cc9d44d7c449f231313a8f158e265afa4b8c6
+  - 69330adbe 2024-06-21T13:51:03-04:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - efe876d19 2024-06-21T13:50:32-04:00 UPSTREAM: <drop>: manually resolve conflicts
+  - 39683505b 2024-06-11T20:20:59+00:00 Release commit for Kubernetes v1.30.2
+  - 47c36d4bb 2024-06-06T18:18:54+02:00 Bump images, dependencies and versions to go 1.22.4 and distroless iptables/setcap/debian-base
+  - cd73ad187 2024-06-04T23:23:18+00:00 update driver installer
+  - 654c085cb 2024-06-04T09:04:10+00:00 Don't fill in NodeToStatusMap with UnschedulableAndUnresolvable
+  - 1ddcf3486 2024-06-04T09:02:07+00:00 Revert "scheduler: preallocation for NodeToStatusMap"
+  - 0df726772 2024-06-03T08:12:16+03:00 kubeadm: use the actual configured kubelet healthz address:port
+  - 398ab938e 2024-05-23T12:07:42+03:00 kubectl create cronjobs: Manually set OwnerReferences
+  - 42b93b35b 2024-05-22T10:41:21+08:00 add an integration test when nodeAffinity specifies a non-existent node.
+  - f73bb17ef 2024-05-22T10:41:21+08:00 base on allNodes when calculating nextStartNodeIndex
+  - a26f2c59e 2024-05-16T11:59:44-04:00 Fix printPod panic with spurious container statuses
+  - 85fc47582 2024-05-14T11:10:45+00:00 Update CHANGELOG/CHANGELOG-1.30.md for v1.30.1
+  - 3d8967247 2024-05-13T17:34:08+00:00 Adding the feature gates to fix cost for VAP and webhook matchConditions.
+  - b762a187f 2024-05-13T11:04:47+00:00 cherry pick #124618 to 1.30
+  - 1c8b0f697 2024-05-13T11:11:59+02:00 fix requests tracker concurrency
+  - 2956e294c 2024-05-13T11:11:59+02:00 fix conflict race in statefulset rest update
+  - 7d9b913d1 2024-05-13T11:11:58+02:00 fix stateful set pod recreation and event spam
+  - a58d4f54c 2024-05-13T11:11:58+02:00 fix pods tracking and internal error checking in statefulset tests
+  - f20b6672b 2024-05-12T15:30:58+02:00 [go] Bump images, dependencies and versions to go 1.22.3 and distroless iptables
+  - d8c37e815 2024-05-11T01:18:51+00:00 Updated & added visibility to apiserver x509 test certificates expiring this year
 
