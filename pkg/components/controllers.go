@@ -176,10 +176,20 @@ func startIngressController(ctx context.Context, cfg *config.Config, kubeconfigP
 		klog.Warningf("Failed to apply configMap %v: %v", cm, err)
 		return err
 	}
+
+	routerMode := "v4"
+	if cfg.IsIPv6() {
+		routerMode = "v4v6"
+		if !cfg.IsIPv4() {
+			routerMode = "v6"
+		}
+	}
+
 	extraParams := assets.RenderParams{
 		"RouterNamespaceOwnership": cfg.Ingress.AdmissionPolicy.NamespaceOwnership == config.NamespaceOwnershipAllowed,
 		"RouterHttpPort":           *cfg.Ingress.Ports.Http,
 		"RouterHttpsPort":          *cfg.Ingress.Ports.Https,
+		"RouterMode":               routerMode,
 	}
 	if err := assets.ApplyServices(ctx, svc, renderTemplate, renderParamsFromConfig(cfg, extraParams), kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply service %v %v", svc, err)
