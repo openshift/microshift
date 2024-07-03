@@ -64,8 +64,8 @@ BuildRequires: systemd
 BuildRequires: golang
 # DO NOT REMOVE
 
-Requires: cri-o >= 1.25
-Requires: cri-tools >= 1.25
+Requires: cri-o >= 1.27.0, cri-o < 1.28.0
+Requires: cri-tools >= 1.27.0, cri-tools < 1.28.0
 Requires: iptables
 Requires: microshift-selinux = %{version}
 Requires: microshift-networking = %{version}
@@ -348,6 +348,9 @@ systemctl enable --now --quiet openvswitch || true
 # Use Git command to generate the log and replace the VERSION string
 # LANG=C git log --date="format:%a %b %d %Y" --pretty="tformat:* %cd %an <%ae> VERSION%n- %s%n" packaging/rpm/microshift.spec
 %changelog
+* Wed Jul 03 2024 Patryk Matuszak <pmatusza@redhat.com> 4.14.32
+- Set CRI-O version to match Kubernetes' version
+
 * Wed Nov 01 2023 Gregory Giguashvili <ggiguash@redhat.com> 4.14.2
 - Fix selinux labeling for microshift executable files
 
