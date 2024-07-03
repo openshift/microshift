@@ -1,0 +1,3 @@
+- cluster-network-operator embedded-component 2d6a049ae8dae379e7a1583695f165f3bafac810 to f273783444ca6f251dfdaba3843322e09cb09488
+  - 531190d 2024-05-22T22:55:59+09:00 Add conditions for ignored-namespaces
+
