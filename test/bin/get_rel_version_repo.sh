@@ -79,7 +79,7 @@ get_rel_version_repo() {
 	local version
 	version=$(get_current_release_from_sub_repos "${minor}")
 	if [ -n "${version}" ]; then
-		echo "${version},"
+		echo "${version},$(get_ocp_repo_name_for_version "${minor}")"
 		return
 	fi
 
