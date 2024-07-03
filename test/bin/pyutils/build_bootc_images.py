@@ -84,7 +84,7 @@ def is_rhocp_available(ver):
 
     try:
         # Run the dnf command to check for cri-o in the specified repository
-        repo_info = common.run_command_in_shell(f"sudo dnf repository-packages {repository} info cri-o")
+        repo_info = common.run_command_in_shell(f"sudo dnf repository-packages --showduplicates {repository} info cri-o")
         common.print_msg(repo_info)
         return True
     except Exception:
@@ -97,10 +97,10 @@ def get_rhocp_beta_url_if_available(ver):
 
     try:
         # Run the dnf command to check for cri-o in the specified repository
-        repo_info = common.run_command_in_shell(f"sudo dnf repository-packages --disablerepo '*' --repofrompath 'this,{url_amd}' this info cri-o")
+        repo_info = common.run_command_in_shell(f"sudo dnf repository-packages --showduplicates --disablerepo '*' --repofrompath 'this,{url_amd}' this info cri-o")
         common.print_msg(repo_info)
 
-        repo_info = common.run_command_in_shell(f"sudo dnf repository-packages --disablerepo '*' --repofrompath 'this,{url_arm}' this info cri-o")
+        repo_info = common.run_command_in_shell(f"sudo dnf repository-packages --showduplicates --disablerepo '*' --repofrompath 'this,{url_arm}' this info cri-o")
         common.print_msg(repo_info)
 
         # Use specific minor version RHOCP mirror only if both arches are available.
@@ -152,23 +152,16 @@ def set_rpm_version_info_vars():
         PREVIOUS_RELEASE_VERSION, PREVIOUS_RELEASE_REPO = previous_version_repo.split(',')
 
     RHOCP_MINOR_Y = ""
-    RHOCP_MINOR_Y1 = ""
-
     if is_rhocp_available(MINOR_VERSION):
         RHOCP_MINOR_Y = MINOR_VERSION
+    # Check RHOCP mirror unconditionally, because CentOS9 tests are using them
+    RHOCP_MINOR_Y_BETA = get_rhocp_beta_url_if_available(MINOR_VERSION)
 
+    RHOCP_MINOR_Y1 = ""
     if is_rhocp_available(PREVIOUS_MINOR_VERSION):
         RHOCP_MINOR_Y1 = PREVIOUS_MINOR_VERSION
-
-    # Check RHOCP mirror anyway, because centos9 tests are using them.
-    RHOCP_MINOR_Y_BETA = get_rhocp_beta_url_if_available(MINOR_VERSION)
+    # Check RHOCP mirror unconditionally, because CentOS9 tests are using them
     RHOCP_MINOR_Y1_BETA = get_rhocp_beta_url_if_available(PREVIOUS_MINOR_VERSION)
-
-    # Currently bootc tests only use current minor RHOCP. If they are unavailable, use previous minor RHOCP.
-    if RHOCP_MINOR_Y == "" and RHOCP_MINOR_Y1 != "":
-        RHOCP_MINOR_Y = RHOCP_MINOR_Y1
-    elif RHOCP_MINOR_Y_BETA == "" and RHOCP_MINOR_Y1_BETA != "":
-        RHOCP_MINOR_Y_BETA = RHOCP_MINOR_Y1_BETA
 
     if RHOCP_MINOR_Y == "" and RHOCP_MINOR_Y_BETA == "":
         raise Exception("Could not find a suitable RHOCP repository to enable")
