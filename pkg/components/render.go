@@ -5,6 +5,7 @@ import (
 	"crypto/sha256"
 	"fmt"
 	"path/filepath"
+	"strings"
 	"text/template"
 
 	"sigs.k8s.io/yaml"
@@ -25,8 +26,8 @@ func renderParamsFromConfig(cfg *config.Config, extra assets.RenderParams) asset
 		"ReleaseImage": release.Image,
 		"NodeName":     cfg.CanonicalNodeName(),
 		"NodeIP":       cfg.Node.NodeIP,
-		"ClusterCIDR":  cfg.Network.ClusterNetwork[0],
-		"ServiceCIDR":  cfg.Network.ServiceNetwork[0],
+		"ClusterCIDR":  strings.Join(cfg.Network.ClusterNetwork, ","),
+		"ServiceCIDR":  strings.Join(cfg.Network.ServiceNetwork, ","),
 		"ClusterDNS":   cfg.Network.DNS,
 		"BaseDomain":   cfg.DNS.BaseDomain,
 	}
