@@ -168,6 +168,7 @@ Summary: Baseline configuration for running low latency workload on MicroShift
 BuildArch: noarch
 Requires: microshift = %{version}
 Requires: tuned-profiles-cpu-partitioning
+Requires: python3-pyyaml
 
 %description low-latency
 The microshift-low-latency package provides baseline configuration prepared for
@@ -359,6 +360,10 @@ install -p -m755 packaging/tuned/profile/script.sh %{buildroot}/%{_prefix}/lib/t
 install -d -m755 %{buildroot}%{_sysconfdir}/tuned
 install -p -m644 packaging/tuned/profile/variables.conf %{buildroot}%{_sysconfdir}/tuned/microshift-baseline-variables.conf
 
+install -p -m644 packaging/crio.conf.d/05-high-performance-runtime.conf %{buildroot}%{_sysconfdir}/crio/crio.conf.d/05-high-performance-runtime.conf
+install -p -m644 packaging/tuned/microshift-tuned.service %{buildroot}%{_unitdir}/microshift-tuned.service
+install -p -m755 packaging/tuned/microshift-tuned.py %{buildroot}%{_bindir}/microshift-tuned
+
 %pre networking
 
 getent group hugetlbfs >/dev/null || groupadd -r hugetlbfs
@@ -490,6 +495,9 @@ fi
 %files low-latency
 %{_prefix}/lib/tuned/microshift-baseline
 %config(noreplace) %{_sysconfdir}/tuned/microshift-baseline-variables.conf
+%{_sysconfdir}/crio/crio.conf.d/05-high-performance-runtime.conf
+%{_unitdir}/microshift-tuned.service
+%{_bindir}/microshift-tuned
 
 
 # Use Git command to generate the log and replace the VERSION string
