@@ -63,6 +63,8 @@ spec:
               value: 1s
             - name: ROUTER_DOMAIN
               value: apps.{{ .BaseDomain }}
+            - name: ROUTER_IP_V4_V6_MODE
+              value: '{{ .RouterMode }}'
           livenessProbe:
             failureThreshold: 3
             httpGet:
