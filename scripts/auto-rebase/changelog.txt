@@ -1,6 +1,93 @@
-- coredns image-amd64 5afff2a989779a52e00ef9579cfbc03f36b5334a to 04d84f7f2e17ff464fad3f2841e7b29a43c8382f
-  - 399a67a 2024-06-11T17:51:05+00:00 UPSTREAM: 6692: openshift: Fix OCPBUGS-34619
+- cluster-ingress-operator embedded-component 28c943937d7bc6718e10af50da82097ce8fc6877 to 9eae38dce9615897991a3b0b1f73e2cdb33b7f8e
+  - f552fec 2024-06-25T20:55:50+02:00 OCPBUGS-28673: Add e2e test for connect timeout
+  - 5850958 2024-06-20T15:48:31+00:00 OCPBUGS-35368: Add Regexp Anchor to TestAll
 
-- coredns image-arm64 5afff2a989779a52e00ef9579cfbc03f36b5334a to 04d84f7f2e17ff464fad3f2841e7b29a43c8382f
-  - 399a67a 2024-06-11T17:51:05+00:00 UPSTREAM: 6692: openshift: Fix OCPBUGS-34619
+- cluster-network-operator embedded-component 84f9a080d03777c95a1c5a0d13ca16e5aa342d98 to e2f42540a5cbde654ef1b2535b1a6afc1fc7ab29
+  - 6d69bad 2024-06-21T16:52:24+02:00 Update whereabouts crd
+  - 3bfdad8 2024-06-19T13:52:17+00:00 Create the configmap mtu if not found
+
+- cluster-openshift-controller-manager-operator embedded-component 899699681f8bb984d0f249dec171e630440c461b to bcc371ccbc9cab9bcb80b3f1a281a40c28011f59
+  - 3a6ad51 2024-06-19T12:33:10+00:00 fix nil pointer reference
+  - 9dabf00 2024-05-22T13:47:20+00:00 delay deleting recently created image pull secrets
+
+- kubernetes embedded-component b2f5b1171deb4bbf754961c8b72ac31d2548c896 to 58452d8d4db25d4afb8e53ed5901103590766b7e
+  - 7bf0b7a16 2024-06-18T16:40:22+00:00 UPSTREAM: <carry>: Disable PersistentVolumeLabel by default
+  - 055f0886e 2024-06-14T14:40:53+01:00 UPSTREAM: 125337: add more testing for node.status.addresses
+  - 514975173 2024-06-14T14:40:52+01:00 UPSTREAM: 125337: document kubelet node-ip with cloud provider external
+  - 2aa044a34 2024-06-14T14:39:06+01:00 UPSTREAM: 124516: Fix behavior with external cloud provider and --hostname-override
+
+- machine-config-operator embedded-component b118fb4e80373d2ea0c1158bc5abbcdf2e8e674c to 8c4afe087d64b028fdc16df24204fe4f7f7e6127
+  - a7b8ead9 2024-06-27T13:11:49-04:00 e2e test should wait for MCD pod to be running
+  - cf9847e0 2024-06-26T06:36:31+00:00 daemon/update: add workaround for OCPBUGS-33694
+  - 5c3cf9b2 2024-06-26T06:36:31+00:00 daemon/update: disable systemd unit before overwriting
+  - daeeb8cd 2024-06-25T13:15:08-04:00 update events in nodecontroller should include MachineConfig / image
+  - 45a04895 2024-06-25T13:15:03-04:00 start MachineOSConfig informers only if the featuregate is enabled
+  - 120ef82d 2024-06-25T10:13:43-04:00 initial commit of MCD-side implementation
+  - d0b31ae5 2024-06-25T10:13:23-04:00 move canonicalizePullSecretBytes and add tests for all DockerConfig helpers
+  - 86b00a33 2024-06-25T10:12:52-04:00 wires up operator-side for currentimagepullsecret syncing
+  - b8150198 2024-06-25T09:56:52-04:00 certificatewriter should handle the internal registry pull secret
+  - 91f42cc1 2024-06-24T12:41:10-04:00 disable mglru service
+  - 84ec414d 2024-06-21T16:58:47+00:00 daemon: add check for reload crio action
+  - 36aec890 2024-06-19T00:46:36+00:00 Revert "Azure: add Azure specific dnsmasq ordering"
+  - 8c132332 2024-06-18T15:46:44+00:00 OCPBUGS-33331: Fix reference to $host_file
+  - 95bfa455 2024-06-14T14:05:30+00:00 Default ipv4 NODE_IP to 0.0.0.0
+  - 378b355a 2024-06-12T15:39:04+00:00 Azure: add Azure specific dnsmasq ordering
+
+- operator-framework-olm embedded-component 1aacee6a78ceac7acd5aa03647933e550d66a12c to 555e529c944f9b8b93d2e4d9626e12de51f59854
+  - aaa3a02f 2024-06-24T22:49:02-04:00 [OCPBUGS-25341]: perform operator apiService certificate validity checks directly (#3217)
+  - f158dee0 2024-06-12T16:17:19-04:00 OCPBUGS-31522: Warn and allow CRD upgrade if validation fails but new CRD specifies a conversion strategy (#3209)
+
+- oc image-amd64 a2450418f7b12a71e8f3562a4e9aa8a976bbf85b to e4cacc0be012b75a230f07e3902a1ede9a2ecba9
+  - 9c93d7ec 2024-06-21T15:21:06+00:00 `upgrade status`: revert to overestimating remaining time
+  - 88d8c507 2024-06-21T15:21:06+00:00 `upgrade status`: lower estimated node actions to avoid inconsistency with estimation
+  - f9da51a8 2024-06-21T15:21:06+00:00 `upgrade status`: overestimate total duration, not remaining time
+  - f7bdc8ee 2024-06-21T15:21:06+00:00 `upgrade status`: change how last observed progress is computed
+  - 622c2331 2024-06-21T15:21:06+00:00 `upgrade status`: get baseline from history when possible
+  - 0774046c 2024-06-21T15:21:06+00:00 `upgrade status`: stalled or progressing-slow when over estimate
+  - 3f3efbc4 2024-06-21T15:21:06+00:00 `upgrade status`: show <10m when estimate is lower than 10m
+  - 32616e45 2024-06-21T15:21:06+00:00 `upgrade status`: overestimate remaining time by 20%
+  - 2a423347 2024-06-21T15:21:06+00:00 `update status`: Avoid projecting from small values
+  - f53d9122 2024-06-21T15:21:06+00:00 `upgrade status`: do not show estimate TTC when completed
+  - 98652794 2024-06-21T15:21:06+00:00 `upgrade status`: estimate better via last observed progress
+  - fc5e067f 2024-06-21T15:21:06+00:00 `update status`: use timewise completion estimate
+  - 435e3adc 2024-06-21T15:21:06+00:00 `update status`: project estimate duration from elapsed
+  - bc341a32 2024-06-21T15:21:06+00:00 `update status`: add baseline control plane estimate duration
+  - a78215a1 2024-06-21T15:21:06+00:00 `update status`: truncate subsecond durations
+  - e086a0d3 2024-06-21T15:21:06+00:00 `update status`: inject ns skew to eliminate input data rounding
+
+- ovn-kubernetes image-amd64 d90fa545e17a27bdf253fa820a1d7552e3079465 to 8a9743708ae117595226a52b4856f8c032fed2ab
+  - b3dde60f 2024-06-20T15:05:08+02:00 Bump OVN to 24.03.2-19 in Dockerfile.base to fix multicast bug
+
+- kubernetes image-amd64 b2f5b1171deb4bbf754961c8b72ac31d2548c896 to 58452d8d4db25d4afb8e53ed5901103590766b7e
+  - 7bf0b7a16 2024-06-18T16:40:22+00:00 UPSTREAM: <carry>: Disable PersistentVolumeLabel by default
+  - 055f0886e 2024-06-14T14:40:53+01:00 UPSTREAM: 125337: add more testing for node.status.addresses
+  - 514975173 2024-06-14T14:40:52+01:00 UPSTREAM: 125337: document kubelet node-ip with cloud provider external
+  - 2aa044a34 2024-06-14T14:39:06+01:00 UPSTREAM: 124516: Fix behavior with external cloud provider and --hostname-override
+
+- oc image-arm64 a2450418f7b12a71e8f3562a4e9aa8a976bbf85b to e4cacc0be012b75a230f07e3902a1ede9a2ecba9
+  - 9c93d7ec 2024-06-21T15:21:06+00:00 `upgrade status`: revert to overestimating remaining time
+  - 88d8c507 2024-06-21T15:21:06+00:00 `upgrade status`: lower estimated node actions to avoid inconsistency with estimation
+  - f9da51a8 2024-06-21T15:21:06+00:00 `upgrade status`: overestimate total duration, not remaining time
+  - f7bdc8ee 2024-06-21T15:21:06+00:00 `upgrade status`: change how last observed progress is computed
+  - 622c2331 2024-06-21T15:21:06+00:00 `upgrade status`: get baseline from history when possible
+  - 0774046c 2024-06-21T15:21:06+00:00 `upgrade status`: stalled or progressing-slow when over estimate
+  - 3f3efbc4 2024-06-21T15:21:06+00:00 `upgrade status`: show <10m when estimate is lower than 10m
+  - 32616e45 2024-06-21T15:21:06+00:00 `upgrade status`: overestimate remaining time by 20%
+  - 2a423347 2024-06-21T15:21:06+00:00 `update status`: Avoid projecting from small values
+  - f53d9122 2024-06-21T15:21:06+00:00 `upgrade status`: do not show estimate TTC when completed
+  - 98652794 2024-06-21T15:21:06+00:00 `upgrade status`: estimate better via last observed progress
+  - fc5e067f 2024-06-21T15:21:06+00:00 `update status`: use timewise completion estimate
+  - 435e3adc 2024-06-21T15:21:06+00:00 `update status`: project estimate duration from elapsed
+  - bc341a32 2024-06-21T15:21:06+00:00 `update status`: add baseline control plane estimate duration
+  - a78215a1 2024-06-21T15:21:06+00:00 `update status`: truncate subsecond durations
+  - e086a0d3 2024-06-21T15:21:06+00:00 `update status`: inject ns skew to eliminate input data rounding
+
+- ovn-kubernetes image-arm64 d90fa545e17a27bdf253fa820a1d7552e3079465 to 8a9743708ae117595226a52b4856f8c032fed2ab
+  - b3dde60f 2024-06-20T15:05:08+02:00 Bump OVN to 24.03.2-19 in Dockerfile.base to fix multicast bug
+
+- kubernetes image-arm64 b2f5b1171deb4bbf754961c8b72ac31d2548c896 to 58452d8d4db25d4afb8e53ed5901103590766b7e
+  - 7bf0b7a16 2024-06-18T16:40:22+00:00 UPSTREAM: <carry>: Disable PersistentVolumeLabel by default
+  - 055f0886e 2024-06-14T14:40:53+01:00 UPSTREAM: 125337: add more testing for node.status.addresses
+  - 514975173 2024-06-14T14:40:52+01:00 UPSTREAM: 125337: document kubelet node-ip with cloud provider external
+  - 2aa044a34 2024-06-14T14:39:06+01:00 UPSTREAM: 124516: Fix behavior with external cloud provider and --hostname-override
 
