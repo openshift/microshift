@@ -38,18 +38,28 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.name
-          image: quay.io/jmoller/lvms-operator:microshift
+          image: quay.io/lvms_dev/lvms4-lvms-rhel9-operator@sha256:1901bc1f4affaf9db870dd6eaea6eb5d0a33eb60aaca2ed12253b48ceafa2d90
           livenessProbe:
+            failureThreshold: 3
             httpGet:
               path: /healthz
               port: 8081
-            initialDelaySeconds: 10
-            periodSeconds: 20
+            initialDelaySeconds: 1
+            periodSeconds: 30
+            timeoutSeconds: 1
           name: manager
           ports:
             - containerPort: 9443
               name: webhook-server
               protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /readyz
+              port: 8081
+            initialDelaySeconds: 1
+            periodSeconds: 60
+            timeoutSeconds: 1
           resources:
             requests:
               cpu: 5m
