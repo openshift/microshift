@@ -6,13 +6,7 @@ import (
 
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/yaml"
-	"k8s.io/client-go/discovery"
-	"k8s.io/client-go/discovery/cached/memory"
-	"k8s.io/client-go/dynamic"
-	"k8s.io/client-go/rest"
-	"k8s.io/client-go/restmapper"
 )
 
 // ConvertYAMLOrJSONToUnstructured converts a YAML or JSON stream to an unstructured object.
@@ -32,34 +26,4 @@ func ConvertYAMLOrJSONToUnstructured(reader io.Reader) (*unstructured.Unstructur
 	}
 
 	return &unstruct, nil
-}
-
-func ClientForDynamicObjectKind(config *rest.Config, object schema.ObjectKind) (dynamic.NamespaceableResourceInterface, error) {
-	gvk := object.GroupVersionKind()
-
-	httpClient, err := rest.HTTPClientFor(config)
-	if err != nil {
-		return nil, err
-	}
-
-	clnt, err := dynamic.NewForConfigAndClient(config, httpClient)
-	if err != nil {
-		return nil, err
-	}
-
-	disco, err := discovery.NewDiscoveryClientForConfigAndClient(config, httpClient)
-	if err != nil {
-		return nil, err
-	}
-
-	mapper := restmapper.NewDeferredDiscoveryRESTMapper(memory.NewMemCacheClient(disco))
-
-	mapping, err := mapper.RESTMapping(gvk.GroupKind(), gvk.Version)
-	if err != nil {
-		return nil, err
-	}
-
-	object.SetGroupVersionKind(mapping.GroupVersionKind)
-
-	return clnt.Resource(mapping.Resource), nil
 }

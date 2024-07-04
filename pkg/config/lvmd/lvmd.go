@@ -139,7 +139,7 @@ func SaveLvmdConfigToFile(l *Lvmd, p string) error {
 	if err != nil {
 		return fmt.Errorf("marshalling lvmd config: %v", err)
 	}
-	err = os.WriteFile(p, buf, 0644)
+	err = os.WriteFile(p, buf, 0600)
 	if err != nil {
 		return fmt.Errorf("writing lvmd config: %v", err)
 	}
