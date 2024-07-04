@@ -14,13 +14,21 @@ clean_podman_images() {
         return
     fi
 
-    title "Cleaning up container images"
-    for id in $(sudo podman ps -a | grep microshift | awk '{print $1}') ; do
+    title "Cleaning up running containers"
+    for id in $(sudo podman ps -a | awk '{print $1}') ; do
         sudo podman rm -f "${id}"
+    done
+    for id in $(podman ps -a | awk '{print $1}') ; do
+        podman rm -f "${id}"
     done
 
     if [ "${FULL_CLEAN}" = 1 ] ; then
+        title "Cleaning up container images"
+
         sudo podman rmi -af
+        podman rmi -af
+        # Ensure the user-specific container storage is deleted
+        sudo rm -rf ~/.local/share/containers/
     fi
 }
 
