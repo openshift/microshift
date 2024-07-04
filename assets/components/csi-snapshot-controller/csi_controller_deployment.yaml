@@ -19,6 +19,7 @@ spec:
   template:
     metadata:
       annotations:
+        openshift.io/required-scc: restricted-v2
         target.workload.openshift.io/management: '{"effect": "PreferredDuringScheduling"}'
       labels:
         app: csi-snapshot-controller
