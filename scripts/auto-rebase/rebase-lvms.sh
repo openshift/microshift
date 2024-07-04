@@ -161,11 +161,11 @@ download_lvms_operator_bundle_manifest(){
 
         # Loop over all services and roles since they need to be patched with a namespace if they were not
         # part of the CSV role definitions
-        for file in ${PWD}/*; do
-          if [[ $file == *.yaml || $file == *.yml ]]; then
-              patch_namespace "Service" "$file" "$namespace"
-              patch_namespace "Role" "$file" "$namespace"
-              patch_namespace "RoleBinding" "$file" "$namespace"
+        for file in "${PWD}"/*; do
+          if [[ ${file} == *.yaml || ${file} == *.yml ]]; then
+              patch_namespace "Service" "${file}" "${namespace}"
+              patch_namespace "Role" "${file}" "${namespace}"
+              patch_namespace "RoleBinding" "${file}" "${namespace}"
           fi
         done
 
@@ -178,12 +178,12 @@ patch_namespace() {
   local file=$2
   local namespace=$3
 
-  if [[ $(yq e ".kind == \"${kind}\"" "$file") == "true" ]]; then
+  if [[ $(yq e ".kind == \"${kind}\"" "${file}") == "true" ]]; then
     # Check if the .metadata.namespace is not set or empty
-    if [[ $(yq e ".metadata.namespace == \"${namespace}\"" "$file") == "false" ]]; then
-      echo "patching .metadata.namespace to \"${namespace}\" in $file"
+    if [[ $(yq e ".metadata.namespace == \"${namespace}\"" "${file}") == "false" ]]; then
+      echo "patching .metadata.namespace to \"${namespace}\" in ${file}"
       # Set the .metadata.namespace to the specified value
-      yq e '.metadata.namespace = "'${namespace}'"' -i "$file"
+      yq e '.metadata.namespace = "'"${namespace}"'"' -i "${file}"
     fi
   fi
 }
@@ -324,7 +324,7 @@ extract_lvms_deploy_from_cluster_service_version() {
 
   title "extracting lvms clusterserviceversion.yaml into separate Deployments"
 
-  local deployments=($(yq eval '.spec.install.spec.deployments[].name' < "${csv}"))
+  mapfile -t deployments < <(yq eval '.spec.install.spec.deployments[].name' < "${csv}")
 
   for deployment in "${deployments[@]}"; do
     echo "extracting bundle .spec.install.spec.deployments by name ${deployment}"
