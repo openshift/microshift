@@ -226,11 +226,11 @@ func loadCSIPluginConfig(ctx context.Context,
 					return
 				}
 				if err != nil {
-					klog.Errorf("file watcher error: %w", err)
+					klog.Errorf("file watcher error: %v", err)
 					cancel(err)
 				}
 			case <-ctx.Done():
-				klog.Errorf("stop watching for lvmd config changes: %w", ctx.Err())
+				klog.Errorf("stop watching for lvmd config changes: %v", ctx.Err())
 				return
 			}
 		}
