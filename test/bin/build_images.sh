@@ -14,8 +14,8 @@ shopt -s nullglob
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # shellcheck source=test/bin/common.sh
 source "${SCRIPTDIR}/common.sh"
-# shellcheck source=test/bin/get_rel_version_repo.sh
-source "${SCRIPTDIR}/get_rel_version_repo.sh"
+# shellcheck source=test/bin/common_versions.sh
+source "${SCRIPTDIR}/common_versions.sh"
 
 SKIP_LOG_COLLECTION=${SKIP_LOG_COLLECTION:-false}
 
@@ -61,29 +61,6 @@ extract_container_images() {
 }
 
 configure_package_sources() {
-    ## TEMPLATE VARIABLES
-    export UNAME_M                 # defined in common.sh
-    export LOCAL_REPO              # defined in common.sh
-    export NEXT_REPO               # defined in common.sh
-    export BASE_REPO               # defined in common.sh
-    export CURRENT_RELEASE_REPO
-    export PREVIOUS_RELEASE_REPO
-
-    export SOURCE_VERSION
-    export FAKE_NEXT_MINOR_VERSION
-    export MINOR_VERSION
-    export PREVIOUS_MINOR_VERSION
-    export YMINUS2_MINOR_VERSION
-    export SOURCE_VERSION_BASE
-    export CURRENT_RELEASE_VERSION
-    export PREVIOUS_RELEASE_VERSION
-    export YMINUS2_RELEASE_VERSION
-    export RHOCP_MINOR_Y
-    export RHOCP_MINOR_Y1
-    export RHOCP_MINOR_Y2
-    export RHOCP_MINOR_Y_BETA
-    export RHOCP_MINOR_Y1_BETA
-
     # Add our sources. It is OK to run these steps repeatedly, if the
     # details change they are updated in the service.
     title "Expanding package source templates to ${IMAGEDIR}/package-sources"
@@ -577,27 +554,6 @@ do_group() {
     ostree summary --view --repo=repo
 }
 
-is_rhocp_available() {
-    local -r ver="${1}"
-    repository="rhocp-4.${ver}-for-rhel-9-$(uname -m)-rpms"
-    if sudo dnf repository-packages "${repository}" info cri-o 1>&2; then
-        return 0
-    fi
-    return 1
-}
-
-is_rhocp_beta_available() {
-    local -r ver="${1}"
-    url_amd="https://mirror.openshift.com/pub/openshift-v4/x86_64/dependencies/rpms/4.${ver}-el9-beta/"
-    url_arm="https://mirror.openshift.com/pub/openshift-v4/aarch64/dependencies/rpms/4.${ver}-el9-beta/"
-    # Use specific minor version RHOCP mirror only if both arches are available.
-    if sudo dnf repository-packages --disablerepo '*' --repofrompath "this,${url_arm}" this info cri-o 1>&2 && \
-        sudo dnf repository-packages --disablerepo '*' --repofrompath "this,${url_amd}" this info cri-o 1>&2; then
-        return 0
-    fi
-    return 1
-}
-
 usage() {
     if [ $# -gt 0 ] ; then
         echo "ERROR: $*"
@@ -723,44 +679,11 @@ if [ -z "${release_info_rpm_base}" ]; then
     error "Failed to find microshift-release-info RPM in ${BASE_REPO}"
     exit 1
 fi
+
 SOURCE_VERSION=$(rpm -q --queryformat '%{version}' "${release_info_rpm}")
-MINOR_VERSION=$(echo "${SOURCE_VERSION}" | cut -f2 -d.)
-PREVIOUS_MINOR_VERSION=$(( "${MINOR_VERSION}" - 1 ))
-YMINUS2_MINOR_VERSION=$(( "${MINOR_VERSION}" - 2 ))
-FAKE_NEXT_MINOR_VERSION=$(( "${MINOR_VERSION}" + 1 ))
 SOURCE_VERSION_BASE=$(rpm -q --queryformat '%{version}' "${release_info_rpm_base}")
-
-current_version_repo=$(get_rel_version_repo "${MINOR_VERSION}")
-CURRENT_RELEASE_VERSION=$(echo "${current_version_repo}" | cut -d, -f1)
-CURRENT_RELEASE_REPO=$(echo "${current_version_repo}" | cut -d, -f2)
-
-previous_version_repo=$(get_rel_version_repo "${PREVIOUS_MINOR_VERSION}")
-PREVIOUS_RELEASE_VERSION=$(echo "${previous_version_repo}" | cut -d, -f1)
-PREVIOUS_RELEASE_REPO=$(echo "${previous_version_repo}" | cut -d, -f2)
-
-RHOCP_MINOR_Y=""
-RHOCP_MINOR_Y_BETA=""
-if is_rhocp_available "${MINOR_VERSION}"; then
-    RHOCP_MINOR_Y="${MINOR_VERSION}"
-elif is_rhocp_beta_available "${MINOR_VERSION}"; then
-    RHOCP_MINOR_Y_BETA="https://mirror.openshift.com/pub/openshift-v4/${UNAME_M}/dependencies/rpms/4.${MINOR_VERSION}-el9-beta/"
-fi
-
-RHOCP_MINOR_Y1=""
-RHOCP_MINOR_Y1_BETA=""
-if is_rhocp_available "${PREVIOUS_MINOR_VERSION}"; then
-    RHOCP_MINOR_Y1="${PREVIOUS_MINOR_VERSION}"
-elif is_rhocp_beta_available "${PREVIOUS_MINOR_VERSION}"; then
-    RHOCP_MINOR_Y1_BETA="https://mirror.openshift.com/pub/openshift-v4/${UNAME_M}/dependencies/rpms/4.${PREVIOUS_MINOR_VERSION}-el9-beta/"
-fi
-
-# For Y-2, there will always be a real repository, so we can always
-# set the template variable for enabling that package source and use
-# the well-known name of that repo instead of figuring out the URL.
-yminus2_version_repo=$(get_rel_version_repo "${YMINUS2_MINOR_VERSION}")
-YMINUS2_RELEASE_VERSION=$(echo "${yminus2_version_repo}" | cut -d, -f1)
-YMINUS2_RELEASE_REPO="$(get_ocp_repo_name_for_version ${YMINUS2_MINOR_VERSION})"
-RHOCP_MINOR_Y2="${YMINUS2_MINOR_VERSION}"
+export SOURCE_VERSION
+export SOURCE_VERSION_BASE
 
 mkdir -p "${IMAGEDIR}"
 LOGDIR="${IMAGEDIR}/build-logs"

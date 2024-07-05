@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# shellcheck source=test/bin/get_rel_version_repo.sh
-source "${SCRIPTDIR}/get_rel_version_repo.sh"
-
 # Sourced from scenario.sh and uses functions defined there.
 
 # The RPM-based image used to create the VM for this test does not
@@ -15,6 +12,35 @@ export SKIP_GREENBOOT=true
 # could have separated them and run them as separate scenarios, but
 # did not want to spend the resources on a new VM.
 export TEST_RANDOMIZATION=none
+
+configure_rhocp_repo() {
+    local -r rhocp=$1
+    local -r version=$2
+
+    # The repository may be empty if the beta mirror is not up yet
+    if [[ -z "${rhocp}" ]] ; then
+        return
+    fi
+
+    if [[ "${rhocp}" =~ ^[0-9]{2} ]]; then
+        run_command_on_vm host1 "sudo subscription-manager repos --enable rhocp-4.${rhocp}-for-rhel-9-\$(uname -m)-rpms"
+    elif [[ "${rhocp}" =~ ^http ]]; then
+        local -r ocp_repo_name="rhocp-4.${version}-for-rhel-9-mirrorbeta-rpms"
+        local -r tmp_file=$(mktemp)
+
+        tee "${tmp_file}" >/dev/null <<EOF
+[${ocp_repo_name}]
+name=Beta rhocp RPMs for RHEL 9
+baseurl=${rhocp}
+enabled=1
+gpgcheck=0
+skip_if_unavailable=0
+EOF
+        copy_file_to_vm host1 "${tmp_file}" "${tmp_file}"
+        run_command_on_vm host1 "sudo cp ${tmp_file} /etc/yum.repos.d/${ocp_repo_name}.repo"
+        rm -f "${tmp_file}"
+    fi
+}
 
 scenario_create_vms() {
     prepare_kickstart host1 kickstart-liveimg.ks.template ""
@@ -39,51 +65,22 @@ scenario_remove_vms() {
 scenario_run_tests() {
     local -r source_reponame=$(basename "${LOCAL_REPO}")
     local -r source_repo_url="${WEB_SERVER_URL}/rpm-repos/${source_reponame}"
-    local -r target_version=$(current_version)
-    local -r current_minor_version=$(current_minor_version)
-    local -r previous_minor_version=$(previous_minor_version)
-    local -r previous_version_repo=$(get_rel_version_repo "${previous_minor_version}")
-    local -r previous_version_repo_url=$(echo "${previous_version_repo}" | cut -d, -f2)
+    local -r target_version=$(local_rpm_version)
 
-    # Enable the repositories with the dependencies.
-
-    # RHOCP for current version might not exist yet. Then, just use whatever we can get for previous minor.
-    local -r rhocp_current=$("${ROOTDIR}/scripts/get-latest-rhocp-repo.sh" "${current_minor_version}" || true)
-    local -r rhocp_previous=$("${ROOTDIR}/scripts/get-latest-rhocp-repo.sh" "${previous_minor_version}")
-    for rhocp in "${rhocp_current}" "${rhocp_previous}"; do
-        if [[ ! "${rhocp}" ]]; then
-            # rhocp_current might be empty if the beta mirror is not up yet
-            continue
-        fi
-
-        if [[ "${rhocp}" =~ ^[0-9]{2} ]]; then
-            run_command_on_vm host1 "sudo subscription-manager repos --enable rhocp-4.${rhocp}-for-rhel-9-\$(uname -m)-rpms"
-        elif [[ "${rhocp}" =~ ^http ]]; then
-            url=$(echo "${rhocp}" | cut -d, -f1)
-            ver=$(echo "${rhocp}" | cut -d, -f2)
-            OCP_REPO_NAME="rhocp-4.${ver}-for-rhel-9-mirrorbeta-$(uname -i)-rpms"
-            tmp_file=$(mktemp)
-            tee "${tmp_file}" >/dev/null <<EOF
-[${OCP_REPO_NAME}]
-name=Beta rhocp-4.${ver} RPMs for RHEL 9
-baseurl=${url}
-enabled=1
-gpgcheck=0
-skip_if_unavailable=0
-EOF
-            copy_file_to_vm host1 "${tmp_file}" "${tmp_file}"
-            run_command_on_vm host1 "sudo cp ${tmp_file} /etc/yum.repos.d/${OCP_REPO_NAME}.repo"
-            rm "${tmp_file}"
-        fi
-    done
-
+    # Enable the rhocp and dependency repositories.
+    #
+    # Note that rhocp or beta dependencies repository may not yet exist
+    # for the current version. Then, just use whatever we can get for
+    # the previous minor version.
+    configure_rhocp_repo "${RHOCP_MINOR_Y}"      "${MINOR_VERSION}"
+    configure_rhocp_repo "${RHOCP_MINOR_Y_BETA}" "${MINOR_VERSION}"
+    configure_rhocp_repo "${RHOCP_MINOR_Y1}"     "${PREVIOUS_MINOR_VERSION}"
     run_command_on_vm host1 "sudo subscription-manager repos --enable fast-datapath-for-rhel-9-\$(uname -m)-rpms"
 
     run_tests host1 \
         --exitonfailure \
         --variable "SOURCE_REPO_URL:${source_repo_url}" \
         --variable "TARGET_VERSION:${target_version}" \
-        --variable "PREVIOUS_MINOR_VERSION:${previous_minor_version}" \
-        --variable "PREVIOUS_VERSION_REPO_URL:${previous_version_repo_url}" \
+        --variable "PREVIOUS_MINOR_VERSION:${PREVIOUS_MINOR_VERSION}" \
         suites/rpm/install-and-upgrade-successful.robot
 }
