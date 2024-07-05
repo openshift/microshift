@@ -32,6 +32,8 @@ type LoadbalancerServiceController struct {
 	NICNames    []string
 	NodeIP      string
 	KubeConfig  string
+	Ipv4        bool
+	Ipv6        bool
 	client      *kubernetes.Clientset
 	indexer     cache.Indexer
 	queue       workqueue.RateLimitingInterface
@@ -55,6 +57,8 @@ func NewLoadbalancerServiceController(cfg *config.Config) *LoadbalancerServiceCo
 		NICNames:    nicNames,
 		NodeIP:      cfg.Node.NodeIP,
 		KubeConfig:  cfg.KubeConfigPath(config.KubeAdmin),
+		Ipv4:        cfg.IsIPv4(),
+		Ipv6:        cfg.IsIPv6(),
 	}
 }
 
@@ -123,7 +127,7 @@ func (c *LoadbalancerServiceController) Run(ctx context.Context, ready chan<- st
 
 	go wait.Until(c.runWorker, time.Second, stopCh)
 
-	go defaultRouterWatch(c.IPAddresses, c.NICNames, c.updateDefaultRouterServiceStatus, stopCh)
+	go defaultRouterWatch(c.IPAddresses, c.NICNames, c.Ipv4, c.Ipv6, c.updateDefaultRouterServiceStatus, stopCh)
 
 	close(ready)
 

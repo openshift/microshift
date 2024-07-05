@@ -18,11 +18,11 @@ const (
 
 type serviceUpdateFunction func([]string) error
 
-func defaultRouterWatch(ipAddresses, nicNames []string, updateFunc serviceUpdateFunction, stopCh <-chan struct{}) {
+func defaultRouterWatch(ipAddresses, nicNames []string, ipv4, ipv6 bool, updateFunc serviceUpdateFunction, stopCh <-chan struct{}) {
 	updateChan := make(chan netlink.AddrUpdate)
 	doneChan := make(chan struct{})
 	for {
-		ips, err := defaultRouterListenAddresses(ipAddresses, nicNames)
+		ips, err := defaultRouterListenAddresses(ipAddresses, nicNames, ipv4, ipv6)
 		if err != nil {
 			klog.ErrorS(err, "unable to determine default router listening addresses")
 			continue
@@ -41,7 +41,7 @@ func defaultRouterWatch(ipAddresses, nicNames []string, updateFunc serviceUpdate
 	for {
 		select {
 		case <-updateChan:
-			ips, err := defaultRouterListenAddresses(ipAddresses, nicNames)
+			ips, err := defaultRouterListenAddresses(ipAddresses, nicNames, ipv4, ipv6)
 			if err != nil {
 				klog.Errorf("unable to determine default router listening addresses: %v", err)
 				break
@@ -67,7 +67,7 @@ func isDefaultRouterService(svc *corev1.Service) bool {
 		svc.Namespace == defaultRouterServiceNamespace
 }
 
-func defaultRouterListenAddresses(ipAddresses, nicNames []string) ([]string, error) {
+func defaultRouterListenAddresses(ipAddresses, nicNames []string, ipv4, ipv6 bool) ([]string, error) {
 	allowedAddresses, err := config.AllowedListeningIPAddresses()
 	if err != nil {
 		return nil, err
@@ -98,7 +98,7 @@ func defaultRouterListenAddresses(ipAddresses, nicNames []string) ([]string, err
 			klog.Warningf("NIC %v not found in the host. Skipping", nicName)
 			continue
 		}
-		nicAddresses, err := ipAddressesFromNIC(nicName)
+		nicAddresses, err := ipAddressesFromNIC(nicName, ipv4, ipv6)
 		if err != nil {
 			return nil, err
 		}
@@ -122,13 +122,20 @@ func defaultRouterListenAddresses(ipAddresses, nicNames []string) ([]string, err
 	return ipList, nil
 }
 
-func ipAddressesFromNIC(name string) ([]string, error) {
+func ipAddressesFromNIC(name string, ipv4, ipv6 bool) ([]string, error) {
 	link, err := netlink.LinkByName(name)
 	if err != nil {
 		return nil, err
 	}
 
-	addrList, err := netlink.AddrList(link, netlink.FAMILY_ALL)
+	family := netlink.FAMILY_V4
+	if ipv6 {
+		family = netlink.FAMILY_ALL
+		if !ipv4 {
+			family = netlink.FAMILY_V6
+		}
+	}
+	addrList, err := netlink.AddrList(link, family)
 	if err != nil {
 		return nil, err
 	}
