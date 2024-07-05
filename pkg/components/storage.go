@@ -97,51 +97,51 @@ func setupPluginResources(ctx context.Context, cfg *config.Config, kubeconfigPat
 	)
 
 	if err := assets.ApplyStorageClasses(ctx, sc, nil, nil, kubeconfigPath); err != nil {
-		klog.Warningf("Failed to apply storage cass %v: %w", sc, err)
+		klog.Warningf("Failed to apply storage cass %v: %v", sc, err)
 		return err
 	}
 	if err := assets.ApplyNamespaces(ctx, ns, kubeconfigPath); err != nil {
-		klog.Warningf("Failed to apply ns %v: %w", ns, err)
+		klog.Warningf("Failed to apply ns %v: %v", ns, err)
 		return err
 	}
 	if err := assets.ApplyServiceAccounts(ctx, sa, kubeconfigPath); err != nil {
-		klog.Warningf("Failed to apply sa %v: %w", sa, err)
+		klog.Warningf("Failed to apply sa %v: %v", sa, err)
 		return err
 	}
 	if err := assets.ApplyRoles(ctx, role, kubeconfigPath); err != nil {
-		klog.Warningf("Failed to apply role %v: %w", cr, err)
+		klog.Warningf("Failed to apply role %v: %v", cr, err)
 		return err
 	}
 	if err := assets.ApplyRoleBindings(ctx, rb, kubeconfigPath); err != nil {
-		klog.Warningf("Failed to apply rolebinding %v: %w", cr, err)
+		klog.Warningf("Failed to apply rolebinding %v: %v", cr, err)
 		return err
 	}
 	if err := assets.ApplyClusterRoles(ctx, cr, kubeconfigPath); err != nil {
-		klog.Warningf("Failed to apply clusterrole %v: %w", cr, err)
+		klog.Warningf("Failed to apply clusterrole %v: %v", cr, err)
 		return err
 	}
 	if err := assets.ApplyClusterRoleBindings(ctx, crb, kubeconfigPath); err != nil {
-		klog.Warningf("Failed to apply clusterrolebinding %v: %w", crb, err)
+		klog.Warningf("Failed to apply clusterrolebinding %v: %v", crb, err)
 		return err
 	}
 	if err := assets.ApplyConfigMaps(ctx, []string{cm_ver}, nil, nil, kubeconfigPath); err != nil {
-		klog.Warningf("Failed to apply configMap %v: %w", crb, err)
+		klog.Warningf("Failed to apply configMap %v: %v", crb, err)
 		return err
 	}
 	if err := assets.ApplyServices(ctx, svc, nil, map[string]interface{}{}, kubeconfigPath); err != nil {
-		klog.Warningf("Failed to apply service %v: %w", svc, err)
+		klog.Warningf("Failed to apply service %v: %v", svc, err)
 		return err
 	}
 	if err := assets.ApplyDeployments(ctx, deploy, renderTemplate, renderParamsFromConfig(cfg, nil), kubeconfigPath); err != nil {
-		klog.Warningf("Failed to apply deployment %v: %w", deploy, err)
+		klog.Warningf("Failed to apply deployment %v: %v", deploy, err)
 		return err
 	}
 	if err := assets.ApplyValidatingWebhookConfiguration(ctx, vwc, kubeconfigPath); err != nil {
-		klog.Warningf("Failed to apply validating webhook configuration %v: %w", vwc, err)
+		klog.Warningf("Failed to apply validating webhook configuration %v: %v", vwc, err)
 		return err
 	}
 	if err := assets.ApplyGeneric(ctx, lvmClusters, nil, map[string]interface{}{}, nil, kubeconfigPath); err != nil {
-		klog.Warningf("Failed to apply lvmcluster: %w", err)
+		klog.Warningf("Failed to apply lvmcluster: %v", err)
 		return err
 	}
 

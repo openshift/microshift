@@ -178,12 +178,18 @@ func applyGeneric(ctx context.Context, resources []string, handler resourceHandl
 	for _, resource := range resources {
 		klog.Infof("Applying resource %s", resource)
 		asset, err := embedded.AssetStreamed(resource)
-		defer asset.Close()
 		if err != nil {
 			return fmt.Errorf("error getting asset %s: %v", resource, err)
 		}
-		if err := handler.Read(asset, render, params); err != nil {
-			return fmt.Errorf("failed to read resource %s: %w", resource, err)
+		// call within IIFE to ensure asset is closed without leak with defer
+		if err := func() error {
+			defer asset.Close()
+			if err := handler.Read(asset, render, params); err != nil {
+				return fmt.Errorf("failed to read resource %s: %w", resource, err)
+			}
+			return nil
+		}(); err != nil {
+			return err
 		}
 		if err := handler.Handle(ctx); err != nil {
 			klog.Warningf("failed to apply resource %s: %v", resource, err)
