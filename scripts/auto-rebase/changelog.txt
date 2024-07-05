@@ -1,0 +1,59 @@
+- cluster-dns-operator embedded-component 9964f0b6fce1ba7a26995762602685cd07416928 to 0ea96c98243f4f0afae3331fc3766200a4c038b5
+  - 0c14c9e 2024-06-14T01:21:07+00:00 Enable topology-aware hints iff nodes in >=2 zones
+
+- cluster-ingress-operator embedded-component fe438b86e3241ffdb13e7a4cbac43060949733cc to fe5bd7b02565becfb8ff80aaafbc2215a45ce4c9
+  - 5ac3463 2024-07-02T19:21:28+00:00 OCPBUGS-35368: Add Regexp Anchor to TestAll
+
+- kubernetes embedded-component fedd72e71a4f21582b9ff43d929321f87dd24f7a to 61474561fcb21a751f326887df2d943c00354b16
+  - b8dc9d064 2024-07-03T17:24:48+02:00 UPSTREAM: <drop>: disable hack/verify-govulncheck.sh in 4.15
+  - 65177b243 2024-06-18T16:06:35+00:00 git commit -m "UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image"
+  - fb63712e1 2024-06-11T19:56:00+00:00 Release commit for Kubernetes v1.27.15
+  - 7146caef2 2024-06-06T18:36:19+02:00 Bump images, dependencies and versions to go 1.21.11 and distroless iptables
+  - 3e34da6e2 2024-06-04T11:39:47+00:00 Don't fill in NodeToStatusMap with UnschedulableAndUnresolvable
+  - 33deeed90 2024-06-04T11:37:48+00:00 Revert "scheduler: preallocation for NodeToStatusMap"
+  - 12ee08792 2024-05-22T10:59:07+08:00 add an integration test when nodeAffinity specifies a non-existent node.
+  - 22f2ba023 2024-05-22T10:59:00+08:00 base on allNodes when calculating nextStartNodeIndex
+  - e1343e2ff 2024-05-22T00:57:05+05:30 backport verify-govulncheck.sh
+  - f37ce28c3 2024-05-14T11:17:10+00:00 Update CHANGELOG/CHANGELOG-1.27.md for v1.27.14
+  - 3ac2d9889 2024-05-14T10:34:43+00:00 Cherry pick #124618 to 1.27
+  - d5452392a 2024-05-13T21:37:06-04:00 Fix NFS related issues on GCP/Ubuntu
+  - 37fb64147 2024-05-12T15:44:11+02:00 [go] Bump images, dependencies and versions to go 1.21.10 and distroless iptables
+  - 4e06df413 2024-05-11T01:19:52+00:00 Updated & added visibility to apiserver x509 test certificates expiring this year
+
+- machine-config-operator embedded-component 5f5ce309c545f74888a748123dba0f8afbaccbd4 to 2af8f3ee00669286da10a87a6cabf7c32cb2f3bc
+  - e832fc05 2024-07-02T12:15:08-04:00 daemon/update: add workaround for OCPBUGS-33694
+  - d6df6128 2024-07-02T12:15:08-04:00 daemon/update: disable systemd unit before overwriting
+  - 5b8763ac 2024-04-19T08:05:49+00:00 OCPBUGS-24366: Delete state files on reboot only
+
+- kubernetes image-amd64 fedd72e71a4f21582b9ff43d929321f87dd24f7a to 61474561fcb21a751f326887df2d943c00354b16
+  - b8dc9d064 2024-07-03T17:24:48+02:00 UPSTREAM: <drop>: disable hack/verify-govulncheck.sh in 4.15
+  - 65177b243 2024-06-18T16:06:35+00:00 git commit -m "UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image"
+  - fb63712e1 2024-06-11T19:56:00+00:00 Release commit for Kubernetes v1.27.15
+  - 7146caef2 2024-06-06T18:36:19+02:00 Bump images, dependencies and versions to go 1.21.11 and distroless iptables
+  - 3e34da6e2 2024-06-04T11:39:47+00:00 Don't fill in NodeToStatusMap with UnschedulableAndUnresolvable
+  - 33deeed90 2024-06-04T11:37:48+00:00 Revert "scheduler: preallocation for NodeToStatusMap"
+  - 12ee08792 2024-05-22T10:59:07+08:00 add an integration test when nodeAffinity specifies a non-existent node.
+  - 22f2ba023 2024-05-22T10:59:00+08:00 base on allNodes when calculating nextStartNodeIndex
+  - e1343e2ff 2024-05-22T00:57:05+05:30 backport verify-govulncheck.sh
+  - f37ce28c3 2024-05-14T11:17:10+00:00 Update CHANGELOG/CHANGELOG-1.27.md for v1.27.14
+  - 3ac2d9889 2024-05-14T10:34:43+00:00 Cherry pick #124618 to 1.27
+  - d5452392a 2024-05-13T21:37:06-04:00 Fix NFS related issues on GCP/Ubuntu
+  - 37fb64147 2024-05-12T15:44:11+02:00 [go] Bump images, dependencies and versions to go 1.21.10 and distroless iptables
+  - 4e06df413 2024-05-11T01:19:52+00:00 Updated & added visibility to apiserver x509 test certificates expiring this year
+
+- kubernetes image-arm64 fedd72e71a4f21582b9ff43d929321f87dd24f7a to 61474561fcb21a751f326887df2d943c00354b16
+  - b8dc9d064 2024-07-03T17:24:48+02:00 UPSTREAM: <drop>: disable hack/verify-govulncheck.sh in 4.15
+  - 65177b243 2024-06-18T16:06:35+00:00 git commit -m "UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image"
+  - fb63712e1 2024-06-11T19:56:00+00:00 Release commit for Kubernetes v1.27.15
+  - 7146caef2 2024-06-06T18:36:19+02:00 Bump images, dependencies and versions to go 1.21.11 and distroless iptables
+  - 3e34da6e2 2024-06-04T11:39:47+00:00 Don't fill in NodeToStatusMap with UnschedulableAndUnresolvable
+  - 33deeed90 2024-06-04T11:37:48+00:00 Revert "scheduler: preallocation for NodeToStatusMap"
+  - 12ee08792 2024-05-22T10:59:07+08:00 add an integration test when nodeAffinity specifies a non-existent node.
+  - 22f2ba023 2024-05-22T10:59:00+08:00 base on allNodes when calculating nextStartNodeIndex
+  - e1343e2ff 2024-05-22T00:57:05+05:30 backport verify-govulncheck.sh
+  - f37ce28c3 2024-05-14T11:17:10+00:00 Update CHANGELOG/CHANGELOG-1.27.md for v1.27.14
+  - 3ac2d9889 2024-05-14T10:34:43+00:00 Cherry pick #124618 to 1.27
+  - d5452392a 2024-05-13T21:37:06-04:00 Fix NFS related issues on GCP/Ubuntu
+  - 37fb64147 2024-05-12T15:44:11+02:00 [go] Bump images, dependencies and versions to go 1.21.10 and distroless iptables
+  - 4e06df413 2024-05-11T01:19:52+00:00 Updated & added visibility to apiserver x509 test certificates expiring this year
+
