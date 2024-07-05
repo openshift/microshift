@@ -111,78 +111,34 @@ def get_rhocp_beta_url_if_available(ver):
 
 
 def set_rpm_version_info_vars():
-    global SOURCE_VERSION
-    global MINOR_VERSION
-    global PREVIOUS_MINOR_VERSION
-    global YMINUS2_MINOR_VERSION
+    # See the test/bin/common_versions.sh script for a full list
+    # of the variables used for templating
     global FAKE_NEXT_MINOR_VERSION
-    global SOURCE_VERSION_BASE
-    global CURRENT_RELEASE_VERSION
-    global CURRENT_RELEASE_REPO
-    global PREVIOUS_RELEASE_VERSION
     global PREVIOUS_RELEASE_REPO
-    global RHOCP_MINOR_Y
-    global RHOCP_MINOR_Y1
-    global RHOCP_MINOR_Y2
-    global YMINUS2_RELEASE_VERSION
+    global PREVIOUS_RELEASE_VERSION
     global YMINUS2_RELEASE_REPO
-    global RHOCP_MINOR_Y_BETA
-    global RHOCP_MINOR_Y1_BETA
+    global YMINUS2_RELEASE_VERSION
+
+    FAKE_NEXT_MINOR_VERSION = common.get_env_var('FAKE_NEXT_MINOR_VERSION')
+    PREVIOUS_RELEASE_REPO = common.get_env_var('PREVIOUS_RELEASE_REPO')
+    PREVIOUS_RELEASE_VERSION = common.get_env_var('PREVIOUS_RELEASE_VERSION')
+    YMINUS2_RELEASE_REPO = common.get_env_var('YMINUS2_RELEASE_REPO')
+    YMINUS2_RELEASE_VERSION = common.get_env_var('YMINUS2_RELEASE_VERSION')
+
+    # The source versions are deduced from the locally built RPMs
+    global SOURCE_VERSION
+    global SOURCE_VERSION_BASE
 
     release_info_rpm = find_latest_rpm(LOCAL_REPO)
     release_info_rpm_base = find_latest_rpm(BASE_REPO)
 
     SOURCE_VERSION = common.run_command_in_shell(f"rpm -q --queryformat '%{{version}}' {release_info_rpm}")
-    MINOR_VERSION = SOURCE_VERSION.split('.')[1]
-    PREVIOUS_MINOR_VERSION = str(int(MINOR_VERSION) - 1)
-    YMINUS2_MINOR_VERSION = str(int(MINOR_VERSION) - 2)
-    FAKE_NEXT_MINOR_VERSION = str(int(MINOR_VERSION) + 1)
     SOURCE_VERSION_BASE = common.run_command_in_shell(f"rpm -q --queryformat '%{{version}}' {release_info_rpm_base}")
 
-    CURRENT_RELEASE_VERSION = ""
-    CURRENT_RELEASE_REPO = ""
-    current_version_repo = common.run_command_in_shell(f"source {SCRIPTDIR}/get_rel_version_repo.sh; get_rel_version_repo {MINOR_VERSION}")
-    if len(current_version_repo):
-        CURRENT_RELEASE_VERSION, CURRENT_RELEASE_REPO = current_version_repo.split(',')
-
-    PREVIOUS_RELEASE_VERSION = ""
-    PREVIOUS_RELEASE_REPO = ""
-    previous_version_repo = common.run_command_in_shell(f"source {SCRIPTDIR}/get_rel_version_repo.sh; get_rel_version_repo {PREVIOUS_MINOR_VERSION}")
-    if len(previous_version_repo):
-        PREVIOUS_RELEASE_VERSION, PREVIOUS_RELEASE_REPO = previous_version_repo.split(',')
-
-    RHOCP_MINOR_Y = ""
-    if is_rhocp_available(MINOR_VERSION):
-        RHOCP_MINOR_Y = MINOR_VERSION
-    # Check RHOCP mirror unconditionally, because CentOS9 tests are using them
-    RHOCP_MINOR_Y_BETA = get_rhocp_beta_url_if_available(MINOR_VERSION)
-
-    RHOCP_MINOR_Y1 = ""
-    if is_rhocp_available(PREVIOUS_MINOR_VERSION):
-        RHOCP_MINOR_Y1 = PREVIOUS_MINOR_VERSION
-    # Check RHOCP mirror unconditionally, because CentOS9 tests are using them
-    RHOCP_MINOR_Y1_BETA = get_rhocp_beta_url_if_available(PREVIOUS_MINOR_VERSION)
-
-    if RHOCP_MINOR_Y == "" and RHOCP_MINOR_Y_BETA == "":
-        raise Exception("Could not find a suitable RHOCP repository to enable")
-
-    # For Y-2, there will always be a real repository, so we can always
-    # set the template variable for enabling that package source and use
-    # the well-known name of that repo instead of figuring out the URL.
-    yminus2_version_repo = common.run_command_in_shell(f"source {SCRIPTDIR}/get_rel_version_repo.sh; get_rel_version_repo {YMINUS2_MINOR_VERSION}")
-    YMINUS2_RELEASE_VERSION, _ = yminus2_version_repo.split(',')
-    YMINUS2_RELEASE_REPO = common.run_command_in_shell(f"source {SCRIPTDIR}/get_rel_version_repo.sh; get_ocp_repo_name_for_version {YMINUS2_MINOR_VERSION}")
-    RHOCP_MINOR_Y2 = YMINUS2_MINOR_VERSION
-
-    # Update environment variables based on the RPM version global variables.
+    # Update the source version environment variables based on the global variables.
     # These are used for templating container files and images.
     rpmver_globals_vars = [
-        'SOURCE_VERSION', 'MINOR_VERSION', 'PREVIOUS_MINOR_VERSION',
-        'YMINUS2_MINOR_VERSION', 'FAKE_NEXT_MINOR_VERSION', 'SOURCE_VERSION_BASE',
-        'CURRENT_RELEASE_VERSION', 'CURRENT_RELEASE_REPO', 'PREVIOUS_RELEASE_VERSION',
-        'PREVIOUS_RELEASE_REPO', 'RHOCP_MINOR_Y', 'RHOCP_MINOR_Y1',
-        'RHOCP_MINOR_Y2', 'YMINUS2_RELEASE_VERSION', 'YMINUS2_RELEASE_REPO',
-        'RHOCP_MINOR_Y_BETA', 'RHOCP_MINOR_Y1_BETA'
+        'SOURCE_VERSION', 'SOURCE_VERSION_BASE'
     ]
     for var in rpmver_globals_vars:
         value = globals().get(var)
