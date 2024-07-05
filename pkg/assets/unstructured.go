@@ -141,7 +141,7 @@ func (d *unstructuredApplier) Handle(ctx context.Context) error {
 		return nil
 	}
 	if err != nil {
-		return fmt.Errorf("failed to verify existance of %s: %w", d.unstructured.GroupVersionKind(), err)
+		return fmt.Errorf("failed to verify existence of %s: %w", d.unstructured.GroupVersionKind(), err)
 	}
 
 	var modified bool
