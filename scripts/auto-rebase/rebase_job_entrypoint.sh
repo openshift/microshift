@@ -73,7 +73,7 @@ pullspec_release_lvms_fallback="quay.io/lvms_dev/lvms4-lvms-operator-bundle:${re
 
 # You can also pass the version as a command-line argument
 lvms_is_candidate_build=$(check_semver_suffix "${release_lvms}")
-if [ "$lvms_is_candidate_build" == "true" ]; then
+if [ "$lvms_is_candidate_build" == "false" ]; then
     ./scripts/auto-rebase/rebase-lvms.sh to "${pullspec_release_lvms}"
 else
     ./scripts/auto-rebase/rebase-lvms.sh to "${pullspec_release_lvms_fallback}"
