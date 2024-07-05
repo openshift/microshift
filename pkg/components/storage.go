@@ -185,6 +185,8 @@ func loadCSIPluginConfig(ctx context.Context,
 		watcher, err := fsnotify.NewWatcher()
 		if err != nil {
 			klog.Errorf("unable to set up file watcher: %v", err)
+			cancel(err)
+			return
 		}
 		defer func() {
 			if err := watcher.Close(); err != nil {
@@ -193,6 +195,8 @@ func loadCSIPluginConfig(ctx context.Context,
 		}()
 		if err = watcher.Add(usrCfgDir); err != nil {
 			klog.Errorf("unable to add file path to watcher: %v", err)
+			cancel(err)
+			return
 		}
 
 		for {
