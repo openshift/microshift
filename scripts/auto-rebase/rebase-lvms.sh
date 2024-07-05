@@ -71,6 +71,7 @@ rebase_lvms_to() {
     git checkout -b "${rebase_branch}"
 
     update_last_lvms_rebase "${lvms_operator_bundle_manifest}"
+    update_rebase_job_entrypoint "${lvms_operator_bundle_manifest}"
 
     update_lvms_images
     if [[ -n "$(git status -s pkg/release)" ]]; then
@@ -268,6 +269,18 @@ EOF
              git add scripts/auto-rebase/last_lvms_rebase.sh && \
              git commit -m "update last_lvms_rebase.sh"; \
          fi)
+}
+
+update_rebase_job_entrypoint() {
+    local lvms_operator_bundle_manifest="$1"
+    local version=$(echo "${lvms_operator_bundle_manifest}" | awk -F':' '{print $2}')
+
+    title "## Updating rebase_job_entrypoint.sh with new lvms version ${version}"
+
+    local rebase_job_entrypoint="${REPOROOT}/scripts/auto-rebase/rebase_job_entrypoint.sh"
+
+    # Replace the line that sets the LVMS release version
+    sed -i "s/^release_lvms=.*$/release_lvms=\"${version}\"/" "${rebase_job_entrypoint}"
 }
 
 
