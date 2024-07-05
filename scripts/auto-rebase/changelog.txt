@@ -1,72 +1,16 @@
-- cluster-csi-snapshot-controller-operator embedded-component 87d7080a91e9247c9fde6c3e2d9e222c23df541e to 65dbb12b710b7126f662f5f7f2d8272f9f6868cc
-  - e5ad750 2024-07-02T14:40:21+01:00 manifests: set required-scc for openshift workloads
+- cluster-network-operator embedded-component f273783444ca6f251dfdaba3843322e09cb09488 to 6b2734f030911c065d25e1319444222956b2d1ac
+  - f1a512e 2024-07-01T10:52:04+02:00 Update whereabouts crd
 
-- cluster-ingress-operator embedded-component a0ac804cae89b91763ec8d0e16ed918c49eb3411 to 6d63904f882d23871e332e93dfb740b05aca7097
-  - 565502a 2024-06-27T14:53:20+00:00 OCPBUGS-35368: Add Regexp Anchor to TestAll
+- machine-config-operator embedded-component 98cf6fbede4d0ba3746bcaa5c13211e2e88faa86 to 42e07574113781d4fde76aa50a146ee72d637a2d
+  - 53018a02 2024-06-25T10:55:52-04:00 [release-4.15] OCPBUGS-27436: Fix mirrorSourcePolicy error prompt imagecontentsourcepolicies
 
-- kubernetes embedded-component a2c84a5418d02fbb0230fa10ade3e3c3d093f891 to add48d0c4f679a95d1c06d80a00be54644bbdeaf
-  - 4cd49b4a3 2024-06-19T09:53:51-03:00 UPSTREAM: <drop>: disable hack/verify-govulncheck.sh in 4.15
-  - a06b3c87f 2024-06-18T14:37:42-03:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
-  - f25b321b9 2024-06-11T20:11:26+00:00 Release commit for Kubernetes v1.28.11
-  - 6c91810b9 2024-06-06T18:32:11+02:00 Bump images, dependencies and versions to go 1.21.11 and distroless iptables/setcap/debian-base
-  - 1c8c008ca 2024-06-04T11:32:04+00:00 Don't fill in NodeToStatusMap with UnschedulableAndUnresolvable
-  - ab8a7dd52 2024-06-04T10:19:46+00:00 Revert "scheduler: preallocation for NodeToStatusMap"
-  - de4ba4e13 2024-05-22T10:51:59+08:00 add an integration test when nodeAffinity specifies a non-existent node.
-  - b5e0eea32 2024-05-22T10:51:59+08:00 base on allNodes when calculating nextStartNodeIndex
-  - a38640df0 2024-05-22T00:54:45+05:30 backport verify-govulncheck.sh to 1.28
-  - c92678f3c 2024-05-21T16:41:15+02:00 Don't sort under lock
-  - 8633c328f 2024-05-16T12:03:47-04:00 Fix printPod panic with spurious container statuses
-  - 7a77bfbae 2024-05-14T11:18:33+00:00 Update CHANGELOG/CHANGELOG-1.28.md for v1.28.10
-  - c4e9d548c 2024-05-14T09:23:09+00:00 Cherry pick #124618 to 1.28
-  - 5bff2f166 2024-05-13T19:45:04-04:00 Fix NFS related issues on GCP/Ubuntu
-  - 77a6152c3 2024-05-13T11:22:25+02:00 fix requests tracker concurrency
-  - d30a16a1e 2024-05-13T11:16:42+02:00 fix conflict race in statefulset rest update
-  - 36211c60e 2024-05-13T11:16:42+02:00 fix stateful set pod recreation and event spam
-  - 42a8afd5a 2024-05-13T11:16:42+02:00 fix pods tracking and internal error checking in statefulset tests
-  - 8d6f3fdde 2024-05-12T15:40:45+02:00 [go] Bump images, dependencies and versions to go 1.21.10 and distroless iptables
-  - d0167db0f 2024-05-11T01:19:29+00:00 Updated & added visibility to apiserver x509 test certificates expiring this year
+- ovn-kubernetes image-amd64 7e8054a8ddb596087186c8c4b68dbf82767026b5 to ad798f2aca6a471fbb6bcd8d2395e069f53ad7dc
+  - b7ba318 2024-07-01T10:58:10+00:00 Handle IP fragments in SGW mode
+  - 3fe4301 2024-07-01T10:58:09+00:00 Move custom conntrack zones to the config package
+  - e6f139e 2024-07-01T10:58:07+00:00 ovnkube-node: Make service conntrack zone configurable
 
-- kubernetes image-amd64 a2c84a5418d02fbb0230fa10ade3e3c3d093f891 to add48d0c4f679a95d1c06d80a00be54644bbdeaf
-  - 4cd49b4a3 2024-06-19T09:53:51-03:00 UPSTREAM: <drop>: disable hack/verify-govulncheck.sh in 4.15
-  - a06b3c87f 2024-06-18T14:37:42-03:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
-  - f25b321b9 2024-06-11T20:11:26+00:00 Release commit for Kubernetes v1.28.11
-  - 6c91810b9 2024-06-06T18:32:11+02:00 Bump images, dependencies and versions to go 1.21.11 and distroless iptables/setcap/debian-base
-  - 1c8c008ca 2024-06-04T11:32:04+00:00 Don't fill in NodeToStatusMap with UnschedulableAndUnresolvable
-  - ab8a7dd52 2024-06-04T10:19:46+00:00 Revert "scheduler: preallocation for NodeToStatusMap"
-  - de4ba4e13 2024-05-22T10:51:59+08:00 add an integration test when nodeAffinity specifies a non-existent node.
-  - b5e0eea32 2024-05-22T10:51:59+08:00 base on allNodes when calculating nextStartNodeIndex
-  - a38640df0 2024-05-22T00:54:45+05:30 backport verify-govulncheck.sh to 1.28
-  - c92678f3c 2024-05-21T16:41:15+02:00 Don't sort under lock
-  - 8633c328f 2024-05-16T12:03:47-04:00 Fix printPod panic with spurious container statuses
-  - 7a77bfbae 2024-05-14T11:18:33+00:00 Update CHANGELOG/CHANGELOG-1.28.md for v1.28.10
-  - c4e9d548c 2024-05-14T09:23:09+00:00 Cherry pick #124618 to 1.28
-  - 5bff2f166 2024-05-13T19:45:04-04:00 Fix NFS related issues on GCP/Ubuntu
-  - 77a6152c3 2024-05-13T11:22:25+02:00 fix requests tracker concurrency
-  - d30a16a1e 2024-05-13T11:16:42+02:00 fix conflict race in statefulset rest update
-  - 36211c60e 2024-05-13T11:16:42+02:00 fix stateful set pod recreation and event spam
-  - 42a8afd5a 2024-05-13T11:16:42+02:00 fix pods tracking and internal error checking in statefulset tests
-  - 8d6f3fdde 2024-05-12T15:40:45+02:00 [go] Bump images, dependencies and versions to go 1.21.10 and distroless iptables
-  - d0167db0f 2024-05-11T01:19:29+00:00 Updated & added visibility to apiserver x509 test certificates expiring this year
-
-- kubernetes image-arm64 a2c84a5418d02fbb0230fa10ade3e3c3d093f891 to add48d0c4f679a95d1c06d80a00be54644bbdeaf
-  - 4cd49b4a3 2024-06-19T09:53:51-03:00 UPSTREAM: <drop>: disable hack/verify-govulncheck.sh in 4.15
-  - a06b3c87f 2024-06-18T14:37:42-03:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
-  - f25b321b9 2024-06-11T20:11:26+00:00 Release commit for Kubernetes v1.28.11
-  - 6c91810b9 2024-06-06T18:32:11+02:00 Bump images, dependencies and versions to go 1.21.11 and distroless iptables/setcap/debian-base
-  - 1c8c008ca 2024-06-04T11:32:04+00:00 Don't fill in NodeToStatusMap with UnschedulableAndUnresolvable
-  - ab8a7dd52 2024-06-04T10:19:46+00:00 Revert "scheduler: preallocation for NodeToStatusMap"
-  - de4ba4e13 2024-05-22T10:51:59+08:00 add an integration test when nodeAffinity specifies a non-existent node.
-  - b5e0eea32 2024-05-22T10:51:59+08:00 base on allNodes when calculating nextStartNodeIndex
-  - a38640df0 2024-05-22T00:54:45+05:30 backport verify-govulncheck.sh to 1.28
-  - c92678f3c 2024-05-21T16:41:15+02:00 Don't sort under lock
-  - 8633c328f 2024-05-16T12:03:47-04:00 Fix printPod panic with spurious container statuses
-  - 7a77bfbae 2024-05-14T11:18:33+00:00 Update CHANGELOG/CHANGELOG-1.28.md for v1.28.10
-  - c4e9d548c 2024-05-14T09:23:09+00:00 Cherry pick #124618 to 1.28
-  - 5bff2f166 2024-05-13T19:45:04-04:00 Fix NFS related issues on GCP/Ubuntu
-  - 77a6152c3 2024-05-13T11:22:25+02:00 fix requests tracker concurrency
-  - d30a16a1e 2024-05-13T11:16:42+02:00 fix conflict race in statefulset rest update
-  - 36211c60e 2024-05-13T11:16:42+02:00 fix stateful set pod recreation and event spam
-  - 42a8afd5a 2024-05-13T11:16:42+02:00 fix pods tracking and internal error checking in statefulset tests
-  - 8d6f3fdde 2024-05-12T15:40:45+02:00 [go] Bump images, dependencies and versions to go 1.21.10 and distroless iptables
-  - d0167db0f 2024-05-11T01:19:29+00:00 Updated & added visibility to apiserver x509 test certificates expiring this year
+- ovn-kubernetes image-arm64 7e8054a8ddb596087186c8c4b68dbf82767026b5 to ad798f2aca6a471fbb6bcd8d2395e069f53ad7dc
+  - b7ba318 2024-07-01T10:58:10+00:00 Handle IP fragments in SGW mode
+  - 3fe4301 2024-07-01T10:58:09+00:00 Move custom conntrack zones to the config package
+  - e6f139e 2024-07-01T10:58:07+00:00 ovnkube-node: Make service conntrack zone configurable
 
