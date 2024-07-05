@@ -92,9 +92,9 @@ def print_msg(msg: str, file=sys.stderr):
 def get_env_var(var_name: str, def_val: str = None):
     """Get an environment variable or exit if not set."""
     value = os.environ.get(var_name)
-    if value:
+    if value is not None:
         return value
-    if def_val:
+    if def_val is not None:
         return def_val
     print_msg(f"Error: {var_name} environment variable not set.")
     sys.exit(1)
