@@ -39,7 +39,7 @@ func Test_loadCSIPluginConfig(t *testing.T) {
 		time.Sleep(runtimeCfgUpdateDelay)
 		runtimeLvmd, err := lvmd.NewLvmdConfigFromFile(testRuntimeCfg)
 		if err != nil {
-			t.Fatalf("Failed to load user config: %v", err)
+			t.Fatalf("Failed to load runtime config: %v", err)
 		}
 		runtimeLvmd.Message = "" // ignore message field
 		return runtimeLvmd
