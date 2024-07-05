@@ -1,9 +1,9 @@
 package assets
 
 import (
-	"bytes"
 	"context"
 	"fmt"
+	"io"
 	"sync"
 
 	"github.com/openshift/library-go/pkg/operator/resource/resourcemerge"
@@ -59,33 +59,33 @@ type unstructuredApplier struct {
 	ModifyOnExists
 }
 
-func unstructuredConfigAndClient(kubeconfigPath string) configClientCacheEntry {
+func unstructuredConfigAndClient(kubeconfigPath string) (configClientCacheEntry, error) {
 	configClientCacheLock.RLock()
 	entry, ok := configClientCache[kubeconfigPath]
 	configClientCacheLock.RUnlock()
 	if ok {
-		return entry
+		return entry, nil
 	}
 
 	restConfig, err := clientcmd.BuildConfigFromFlags("", kubeconfigPath)
 	if err != nil {
-		panic(err)
+		return configClientCacheEntry{}, fmt.Errorf("failed to build unstructured rest config: %w", err)
 	}
 	restConfig = rest.AddUserAgent(restConfig, "generic-microshift-agent")
 
 	httpClient, err := rest.HTTPClientFor(restConfig)
 	if err != nil {
-		panic(err)
+		return configClientCacheEntry{}, fmt.Errorf("failed to get HTTP client for unstructured rest config: %w", err)
 	}
 
 	base, err := dynamic.NewForConfigAndClient(restConfig, httpClient)
 	if err != nil {
-		panic(err)
+		return configClientCacheEntry{}, fmt.Errorf("failed to get dynamic client for unstructured rest config: %w", err)
 	}
 
 	disco, err := discovery.NewDiscoveryClientForConfigAndClient(restConfig, httpClient)
 	if err != nil {
-		panic(err)
+		return configClientCacheEntry{}, fmt.Errorf("failed to get discovery client for unstructured rest config: %w", err)
 	}
 
 	entry = configClientCacheEntry{
@@ -97,21 +97,20 @@ func unstructuredConfigAndClient(kubeconfigPath string) configClientCacheEntry {
 	configClientCache[kubeconfigPath] = entry
 	configClientCacheLock.Unlock()
 
-	return entry
+	return entry, nil
 }
 
-func (d *unstructuredApplier) Read(objBytes []byte, render RenderFunc, params RenderParams) {
+func (d *unstructuredApplier) Read(obj io.Reader, render RenderFuncV2, params RenderParams) error {
 	var err error
 	if render != nil {
-		objBytes, err = render(objBytes, params)
-		if err != nil {
-			panic(err)
+		if obj, err = render(obj, params); err != nil {
+			return fmt.Errorf("failed to render object: %w", err)
 		}
 	}
 
-	unstruct, err := util.ConvertYAMLOrJSONToUnstructured(bytes.NewReader(objBytes))
+	unstruct, err := util.ConvertYAMLOrJSONToUnstructured(obj)
 	if err != nil {
-		panic(fmt.Errorf("failed to parse LVMCluster: %w", err))
+		return err
 	}
 
 	d.unstructured = unstruct
@@ -119,7 +118,7 @@ func (d *unstructuredApplier) Read(objBytes []byte, render RenderFunc, params Re
 	gvk := d.unstructured.GroupVersionKind()
 	mapping, err := d.mapper.RESTMapping(gvk.GroupKind(), gvk.Version)
 	if err != nil {
-		panic(fmt.Errorf("failed to get RESTMapping for %s: %w", unstruct.GetObjectKind(), err))
+		return fmt.Errorf("failed to get RESTMapping for %s: %w", unstruct.GetObjectKind(), err)
 	}
 	d.unstructured.SetGroupVersionKind(mapping.GroupVersionKind)
 
@@ -128,6 +127,8 @@ func (d *unstructuredApplier) Read(objBytes []byte, render RenderFunc, params Re
 	} else {
 		d.Client = d.base.Resource(mapping.Resource)
 	}
+
+	return nil
 }
 
 func (d *unstructuredApplier) Handle(ctx context.Context) error {
@@ -140,7 +141,7 @@ func (d *unstructuredApplier) Handle(ctx context.Context) error {
 		return nil
 	}
 	if err != nil {
-		return fmt.Errorf("failed to verify existence of %s: %w", d.unstructured.GroupVersionKind(), err)
+		return fmt.Errorf("failed to verify existance of %s: %w", d.unstructured.GroupVersionKind(), err)
 	}
 
 	var modified bool
@@ -170,19 +171,22 @@ func (d *unstructuredApplier) Handle(ctx context.Context) error {
 	return nil
 }
 
-func applyGeneric(ctx context.Context, resources []string, handler resourceHandler, render RenderFunc, params RenderParams) error {
+func applyGeneric(ctx context.Context, resources []string, handler resourceHandlerV2, render RenderFuncV2, params RenderParams) error {
 	lock.Lock()
 	defer lock.Unlock()
 
 	for _, resource := range resources {
 		klog.Infof("Applying resource %s", resource)
-		objBytes, err := embedded.Asset(resource)
+		asset, err := embedded.AssetStreamed(resource)
+		defer asset.Close()
 		if err != nil {
 			return fmt.Errorf("error getting asset %s: %v", resource, err)
 		}
-		handler.Read(objBytes, render, params)
+		if err := handler.Read(asset, render, params); err != nil {
+			return fmt.Errorf("failed to read resource %s: %w", resource, err)
+		}
 		if err := handler.Handle(ctx); err != nil {
-			klog.Warningf("Failed to apply resource %s: %v", resource, err)
+			klog.Warningf("failed to apply resource %s: %v", resource, err)
 			return err
 		}
 	}
@@ -193,12 +197,15 @@ func applyGeneric(ctx context.Context, resources []string, handler resourceHandl
 func ApplyGeneric(
 	ctx context.Context,
 	resources []string,
-	render RenderFunc,
+	render RenderFuncV2,
 	params RenderParams,
 	modify ModifyOnExists,
 	kubeconfigPath string,
 ) error {
-	configAndClient := unstructuredConfigAndClient(kubeconfigPath)
+	configAndClient, err := unstructuredConfigAndClient(kubeconfigPath)
+	if err != nil {
+		return fmt.Errorf("failed to get config and client for generic apply: %w", err)
+	}
 	applier := &unstructuredApplier{
 		base:           configAndClient.base,
 		mapper:         configAndClient.mapper,

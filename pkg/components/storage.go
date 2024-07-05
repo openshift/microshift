@@ -97,51 +97,51 @@ func setupPluginResources(ctx context.Context, cfg *config.Config, kubeconfigPat
 	)
 
 	if err := assets.ApplyStorageClasses(ctx, sc, nil, nil, kubeconfigPath); err != nil {
-		klog.Warningf("Failed to apply storage cass %v: %v", sc, err)
+		klog.Warningf("Failed to apply storage cass %v: %w", sc, err)
 		return err
 	}
 	if err := assets.ApplyNamespaces(ctx, ns, kubeconfigPath); err != nil {
-		klog.Warningf("Failed to apply ns %v: %v", ns, err)
+		klog.Warningf("Failed to apply ns %v: %w", ns, err)
 		return err
 	}
 	if err := assets.ApplyServiceAccounts(ctx, sa, kubeconfigPath); err != nil {
-		klog.Warningf("Failed to apply sa %v: %v", sa, err)
+		klog.Warningf("Failed to apply sa %v: %w", sa, err)
 		return err
 	}
 	if err := assets.ApplyRoles(ctx, role, kubeconfigPath); err != nil {
-		klog.Warningf("Failed to apply role %v: %v", cr, err)
+		klog.Warningf("Failed to apply role %v: %w", cr, err)
 		return err
 	}
 	if err := assets.ApplyRoleBindings(ctx, rb, kubeconfigPath); err != nil {
-		klog.Warningf("Failed to apply rolebinding %v: %v", cr, err)
+		klog.Warningf("Failed to apply rolebinding %v: %w", cr, err)
 		return err
 	}
 	if err := assets.ApplyClusterRoles(ctx, cr, kubeconfigPath); err != nil {
-		klog.Warningf("Failed to apply clusterrole %v: %v", cr, err)
+		klog.Warningf("Failed to apply clusterrole %v: %w", cr, err)
 		return err
 	}
 	if err := assets.ApplyClusterRoleBindings(ctx, crb, kubeconfigPath); err != nil {
-		klog.Warningf("Failed to apply clusterrolebinding %v: %v", crb, err)
+		klog.Warningf("Failed to apply clusterrolebinding %v: %w", crb, err)
 		return err
 	}
 	if err := assets.ApplyConfigMaps(ctx, []string{cm_ver}, nil, nil, kubeconfigPath); err != nil {
-		klog.Warningf("Failed to apply configMap %v: %v", crb, err)
+		klog.Warningf("Failed to apply configMap %v: %w", crb, err)
 		return err
 	}
 	if err := assets.ApplyServices(ctx, svc, nil, map[string]interface{}{}, kubeconfigPath); err != nil {
-		klog.Warningf("Failed to apply service %v: %v", svc, err)
+		klog.Warningf("Failed to apply service %v: %w", svc, err)
 		return err
 	}
 	if err := assets.ApplyDeployments(ctx, deploy, renderTemplate, renderParamsFromConfig(cfg, nil), kubeconfigPath); err != nil {
-		klog.Warningf("Failed to apply deployment %v: %v", deploy, err)
+		klog.Warningf("Failed to apply deployment %v: %w", deploy, err)
 		return err
 	}
 	if err := assets.ApplyValidatingWebhookConfiguration(ctx, vwc, kubeconfigPath); err != nil {
-		klog.Warningf("Failed to apply validating webhook configuration %v: %v", vwc, err)
+		klog.Warningf("Failed to apply validating webhook configuration %v: %w", vwc, err)
 		return err
 	}
 	if err := assets.ApplyGeneric(ctx, lvmClusters, nil, map[string]interface{}{}, nil, kubeconfigPath); err != nil {
-		klog.Warningf("Failed to apply lvmcluster: %v", err)
+		klog.Warningf("Failed to apply lvmcluster: %w", err)
 		return err
 	}
 
@@ -166,12 +166,12 @@ func loadCSIPluginConfig(ctx context.Context,
 	usrCfgDir := filepath.Dir(usrCfg)
 	ctx, cancel := context.WithCancelCause(ctx)
 
-	// check if file exists, otherwise the watcher errors
+	// check if dir exists, otherwise the watcher errors
 	fi, err := os.Stat(usrCfgDir)
 	if err != nil {
-		return nil, fmt.Errorf("config directory %s cannot be watched: %v", usrCfgDir, err)
+		return nil, fmt.Errorf("config directory %q cannot be watched: %v", usrCfgDir, err)
 	} else if !fi.IsDir() {
-		return nil, fmt.Errorf("config directory %s is not a directory", usrCfgDir)
+		return nil, fmt.Errorf("config directory %q is not a directory", usrCfgDir)
 	}
 
 	if _, err := os.Stat(usrCfg); err == nil {
@@ -183,14 +183,14 @@ func loadCSIPluginConfig(ctx context.Context,
 	// Create new watcher.
 	go func(ctx context.Context) {
 		watcher, err := fsnotify.NewWatcher()
+		if err != nil {
+			klog.Errorf("unable to set up file watcher: %v", err)
+		}
 		defer func() {
 			if err := watcher.Close(); err != nil {
 				klog.Errorf("unable to close file watcher: %v", err)
 			}
 		}()
-		if err != nil {
-			klog.Errorf("unable to set up file watcher: %v", err)
-		}
 		if err = watcher.Add(usrCfgDir); err != nil {
 			klog.Errorf("unable to add file path to watcher: %v", err)
 		}
@@ -222,11 +222,11 @@ func loadCSIPluginConfig(ctx context.Context,
 					return
 				}
 				if err != nil {
-					klog.Errorf("file watcher error: %v", err)
+					klog.Errorf("file watcher error: %w", err)
 					cancel(err)
 				}
 			case <-ctx.Done():
-				klog.Errorf("stop watching for lvmd config changes: %v", ctx.Err())
+				klog.Errorf("stop watching for lvmd config changes: %w", ctx.Err())
 				return
 			}
 		}
@@ -237,34 +237,34 @@ func loadCSIPluginConfig(ctx context.Context,
 
 func copyUserCfg(userCfg string, runtimeCfg string, onFail context.CancelCauseFunc) {
 	userCfgFile, err := os.OpenFile(userCfg, os.O_RDONLY, 0)
-	defer func() {
-		if err := userCfgFile.Close(); err != nil {
-			onFail(fmt.Errorf("unable to close lvmd config file %q: %v", userCfg, err))
-		}
-	}()
 	if err != nil {
-		onFail(fmt.Errorf("unable to open lvmd config file %q: %v", userCfg, err))
+		onFail(fmt.Errorf("unable to open lvmd config file %q: %w", userCfg, err))
 		return
 	}
+	defer func() {
+		if err := userCfgFile.Close(); err != nil {
+			onFail(fmt.Errorf("unable to close lvmd config file %q: %w", userCfg, err))
+		}
+	}()
 
 	if err := os.MkdirAll(filepath.Dir(runtimeCfg), 0755); err != nil {
-		onFail(fmt.Errorf("unable to create lvmd runtime config directory: %v", err))
+		onFail(fmt.Errorf("unable to create lvmd runtime config directory: %w", err))
 		return
 	}
 
 	runtimeCfgFile, err := os.OpenFile(runtimeCfg, os.O_RDWR|os.O_CREATE, 0644)
-	defer func() {
-		if err := runtimeCfgFile.Close(); err != nil {
-			onFail(fmt.Errorf("unable to close lvmd runtime config file %q: %v", runtimeCfg, err))
-		}
-	}()
 	if err != nil {
-		onFail(fmt.Errorf("unable to open lvmd runtime config file %q: %v", runtimeCfg, err))
+		onFail(fmt.Errorf("unable to open lvmd runtime config file %q: %w", runtimeCfg, err))
 		return
 	}
+	defer func() {
+		if err := runtimeCfgFile.Close(); err != nil {
+			onFail(fmt.Errorf("unable to close lvmd runtime config file %q: %w", runtimeCfg, err))
+		}
+	}()
 
 	if _, err := io.Copy(runtimeCfgFile, userCfgFile); err != nil {
-		onFail(fmt.Errorf("unable to copy lvmd config file %q to runtime config file %q: %v", userCfg, runtimeCfg, err))
+		onFail(fmt.Errorf("unable to copy lvmd config file %q to runtime config file %q: %w", userCfg, runtimeCfg, err))
 		return
 	}
 }
@@ -275,13 +275,13 @@ var defaultCfgLoader = lvmd.DefaultLvmdConfig
 
 func copyDefaultCfg(runtimeCfg string, onFail context.CancelCauseFunc) {
 	if err := os.MkdirAll(filepath.Dir(runtimeCfg), 0755); err != nil {
-		onFail(fmt.Errorf("failed to ensure runtime lvmd config directory: %v", err))
+		onFail(fmt.Errorf("failed to ensure runtime lvmd config directory: %w", err))
 		return
 	}
 
 	if cfg, err := defaultCfgLoader(); err != nil {
 		onFail(fmt.Errorf("failed to load default lvmd config: %v", err))
 	} else if err := lvmd.SaveLvmdConfigToFile(cfg, runtimeCfg); err != nil {
-		onFail(fmt.Errorf("failed to save default lvmd config: %v", err))
+		onFail(fmt.Errorf("failed to save default lvmd config: %w", err))
 	}
 }

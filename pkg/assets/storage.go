@@ -149,5 +149,5 @@ func storageDynamicClient(kubeconfigPath string) *dynamic.DynamicClient {
 	if err != nil {
 		panic(err)
 	}
-	return dynamic.NewForConfigOrDie(rest.AddUserAgent(restCfg, "storage-dynamic-Client"))
+	return dynamic.NewForConfigOrDie(rest.AddUserAgent(restCfg, "storage-dynamic-client"))
 }
