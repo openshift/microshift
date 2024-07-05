@@ -3,12 +3,7 @@
 # Sourced from scenario.sh and uses functions defined there.
 
 scenario_create_vms() {
-    # Determine the starting image based on the source tree current
-    # version, minus one.
-    local start_image
-    start_image="rhel-9.3-microshift-4.$(yminus2_minor_version)"
-
-    prepare_kickstart host1 kickstart.ks.template "${start_image}"
+    prepare_kickstart host1 kickstart.ks.template "rhel-9.3-microshift-4.${YMINUS2_MINOR_VERSION}"
     launch_vm host1 rhel-9.3
 }
 
