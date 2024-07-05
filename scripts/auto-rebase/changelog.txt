@@ -1,6 +1,68 @@
-- api embedded-component 0689f006bcdeccf685c75438835beffa8bb14db7 to d3b3bb16a38282191881195f617fd494a9cb922b
-  - e3df50e 2024-06-07T11:10:23-04:00 OCPBUGS-34906: Fix IngressController missing listTypes
+- api embedded-component d3b3bb16a38282191881195f617fd494a9cb922b to 33ed71ab039fca2a3292968abddde1065bf61784
+  - 8a9df47 2024-07-03T10:11:15+02:00 features: add multi-arch feature gate per platform
+  - 99bfe92 2024-07-03T10:04:03+02:00 OCPBUGS-36213: Remove the conversion webhook reference from the ConsolePlugin CRD spec
+  - 3023dee 2024-07-02T13:10:49+02:00 Add ClusterMonitoring feature gate
+  - 2a454c7 2024-07-01T11:44:21+02:00 TP: Add NetworkSegmentation Feature Gate
+  - d7b7087 2024-06-25T14:19:58-04:00 Update (cluster)imagepolicy doc no restriction on release repo scopes
 
-- kubernetes image-arm64 733cc9d44d7c449f231313a8f158e265afa4b8c6 to 421e90ed9ef07c1a797386e662255dfb830a6b9f
+- cluster-network-operator embedded-component 4b792c659385948e825d2ba17b8f6d2e5c3acfed to 33070b57aac78118eea34060adef7f2fb7b7b4bf
+  - 1cc35b9 2024-07-01T19:33:06+02:00 Fix featuregates module change
+  - 7ec85b9 2024-07-01T19:33:06+02:00 Fix IsValidIP func change
+  - 997c2cf 2024-07-01T19:32:40+02:00 Bump ocp/api
+
+- kubernetes embedded-component 733cc9d44d7c449f231313a8f158e265afa4b8c6 to 421e90ed9ef07c1a797386e662255dfb830a6b9f
   - 40b3b0cd3 2024-06-26T14:00:52+02:00 UPSTREAM: <carry>: update base image
+
+- machine-config-operator embedded-component 444decb1dfd1ebb3fb7c2e5a96ff3b3d53b6f492 to 0f53196f6480481d3f5a04e217a143a56d4db79e
+  - 583ae9a2 2024-06-28T11:29:02-05:00 Bootstrap e2e test featuregate setup does not match the actual code
+  - 24183b4b 2024-06-24T11:00:02-05:00 Pick up openshift/kubernetes 1.30 rebase updates
+  - c7d6ec27 2024-06-21T14:53:23-04:00 MCD-pull: run after network-online.target in Azure
+
+- operator-framework-olm embedded-component 0b14e86bcc2368a4d0201f8de7ea322f11e6f236 to a6a66e275c51291a551ff7076f47128fad216094
+  - 94afedef 2024-07-04T09:40:50+02:00 add output-dir to E2E_GINKGO_OPTS
+  - adf348cb 2024-07-02T16:49:52+02:00 [CARRY] add junit report
+  - 369dfdbc 2024-07-02T16:33:09+02:00 provide required schema for basic template and fbc conversion (#1335)
+  - e64f24e2 2024-07-02T16:32:34+02:00 Bump github.com/docker/cli (#1366)
+  - abaac0a2 2024-07-02T16:32:29+02:00 Bump github.com/docker/cli (#1365)
+  - 23518bb4 2024-07-02T16:32:23+02:00 generate binary-less dockerfiles (#1338)
+  - 94f4bcbf 2024-07-02T16:32:18+02:00 Bump github.com/containers/image/v5 from 5.31.0 to 5.31.1 (#1363)
+  - a397f90d 2024-07-02T16:32:12+02:00 Fix codecov-action params (#1361)
+  - df7500ae 2024-07-02T16:32:07+02:00 Bump github.com/spf13/cobra from 1.8.0 to 1.8.1 (#1359)
+  - cb64f6e6 2024-07-02T16:32:02+02:00 Bump github.com/operator-framework/api from 0.25.0 to 0.26.0 (#1358)
+  - 6acf8fa9 2024-07-02T16:31:56+02:00 Bump k8s.io/apiextensions-apiserver from 0.30.1 to 0.30.2 (#1355)
+  - 0ef42c49 2024-07-02T16:31:50+02:00 Bump github.com/grpc-ecosystem/grpc-health-probe from 0.4.26 to 0.4.29 (#1352)
+  - 39dae176 2024-07-02T16:31:45+02:00 Bump google.golang.org/protobuf from 1.34.1 to 1.34.2 (#1353)
+  - 23bfaeeb 2024-07-02T16:31:39+02:00 deprecate composite template (#1339)
+  - fd159217 2024-07-02T16:31:34+02:00 Bump golang.org/x/mod from 0.17.0 to 0.18.0 (#1347)
+  - eb7b1373 2024-07-02T16:31:28+02:00 Bump github.com/docker/cli (#1348)
+  - e765ec29 2024-07-02T16:31:23+02:00 Bump sigs.k8s.io/controller-runtime from 0.18.3 to 0.18.4 (#1346)
+  - e43f8a49 2024-07-02T16:31:17+02:00 Bump golang.org/x/net from 0.25.0 to 0.26.0 (#1344)
+  - 132ac0b3 2024-07-02T16:31:12+02:00 Bump github.com/containers/common from 0.59.0 to 0.59.1 (#1342)
+  - 374b62eb 2024-07-02T16:31:06+02:00 Bump golang.org/x/text from 0.15.0 to 0.16.0 (#1341)
+  - 16b251d4 2024-07-02T16:31:01+02:00 Bump github.com/containerd/containerd from 1.7.17 to 1.7.18 (#1343)
+  - 812177d7 2024-07-02T16:30:55+02:00 Bump golang.org/x/sys from 0.20.0 to 0.21.0 (#1345)
+  - 3b437efb 2024-07-02T16:30:50+02:00 Bump google.golang.org/grpc/cmd/protoc-gen-go-grpc from 1.3.0 to 1.4.0 (#1340)
+  - 581538c2 2024-07-02T16:30:44+02:00 Makefile: avoid ?= shell executions (#1328)
+  - c2c0dfa0 2024-07-02T16:30:38+02:00 Bump github.com/onsi/ginkgo/v2 from 2.18.0 to 2.19.0 (#1327)
+  - 7f156e85 2024-07-02T16:30:33+02:00 Bump sigs.k8s.io/controller-runtime from 0.18.2 to 0.18.3 (#1326)
+  - 473ad6c9 2024-07-02T16:30:28+02:00 mark flaky tests (#3333)
+  - 71eb4544 2024-07-02T16:30:21+02:00 bump operator-registry to v1.44.0 (#3335)
+  - 6e434b6c 2024-07-02T16:30:14+02:00 update ginkgo opts (#3337)
+  - 4ce3d446 2024-07-02T16:30:09+02:00 [OCPBUGS-25341]: perform operator apiService certificate validity checks directly (#3217)
+  - 414c4a6d 2024-07-01T08:29:15-05:00 don't erase the filesystem from the base
+
+- oc image-amd64 4b158b272fb3eb0d78e4cf87dd909af2e3f823f3 to 71b0067b9e9c10266f0ba68d0f249455cc118c35
+  - 8fe64c57 2024-07-04T07:50:27+02:00 Remove invalid test cases: empty dockerfiles are no longer allowed
+  - 2591a370 2024-07-04T07:50:23+02:00 Lower case command value before comparision
+  - ebc21197 2024-07-04T07:50:17+02:00 bump(k8s.io)=1.30.2
+  - 17a3fe02 2024-07-02T15:37:46+02:00 pkg/cli/admin/mustgather: GA since and since-time flags
+
+- kubernetes image-amd64 733cc9d44d7c449f231313a8f158e265afa4b8c6 to 421e90ed9ef07c1a797386e662255dfb830a6b9f
+  - 40b3b0cd3 2024-06-26T14:00:52+02:00 UPSTREAM: <carry>: update base image
+
+- oc image-arm64 4b158b272fb3eb0d78e4cf87dd909af2e3f823f3 to 71b0067b9e9c10266f0ba68d0f249455cc118c35
+  - 8fe64c57 2024-07-04T07:50:27+02:00 Remove invalid test cases: empty dockerfiles are no longer allowed
+  - 2591a370 2024-07-04T07:50:23+02:00 Lower case command value before comparision
+  - ebc21197 2024-07-04T07:50:17+02:00 bump(k8s.io)=1.30.2
+  - 17a3fe02 2024-07-02T15:37:46+02:00 pkg/cli/admin/mustgather: GA since and since-time flags
 
