@@ -1,63 +1,17 @@
-- kubernetes embedded-component 58452d8d4db25d4afb8e53ed5901103590766b7e to aba1e8d781a8de14bd80a3e4ea0f9a29c5a8530d
-  - ae2033acf 2024-06-18T11:35:43+05:30 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
-  - 062798d53 2024-06-11T20:17:06+00:00 Release commit for Kubernetes v1.29.6
-  - 4a7948c2d 2024-06-06T18:24:04+02:00 Bump images, dependencies and versions to go 1.21.11 and distroless iptables/setcap/debian-base
-  - 81babdde1 2024-06-04T10:09:20+00:00 Don't fill in NodeToStatusMap with UnschedulableAndUnresolvable
-  - 808b67c6f 2024-06-04T08:38:25+00:00 Revert "scheduler: preallocation for NodeToStatusMap"
-  - 27839cb78 2024-05-22T10:47:33+08:00 add an integration test when nodeAffinity specifies a non-existent node.
-  - e126f6604 2024-05-22T10:47:33+08:00 base on allNodes when calculating nextStartNodeIndex
-  - f6072e0d7 2024-05-21T16:40:20+02:00 Don't sort under lock
-  - 8883844f6 2024-05-16T12:00:05-04:00 Fix printPod panic with spurious container statuses
-  - 3b0ef5bbd 2024-05-14T11:10:33+00:00 Update CHANGELOG/CHANGELOG-1.29.md for v1.29.5
-  - b50c6f4b8 2024-05-13T19:44:40-04:00 Fix NFS related issues on GCP/Ubuntu
-  - b66ebe13e 2024-05-13T15:16:13+00:00 cherry pick #124618 to 1.29
-  - 494242a6a 2024-05-13T11:16:15+02:00 fix requests tracker concurrency
-  - a20e74f70 2024-05-13T11:16:10+02:00 fix conflict race in statefulset rest update
-  - 88192fcab 2024-05-13T11:16:10+02:00 fix stateful set pod recreation and event spam
-  - 42a2f900b 2024-05-13T11:16:10+02:00 fix pods tracking and internal error checking in statefulset tests
-  - 029c4f2e0 2024-05-12T15:36:41+02:00 [go] Bump images, dependencies and versions to go 1.21.10 and distroless iptables
-  - 9776912fd 2024-05-11T01:19:08+00:00 Updated & added visibility to apiserver x509 test certificates expiring this year
-  - e5561a421 2024-04-25T15:18:38+02:00 Fix PersistentVolumeLabel admission plugin on Azure
+- cluster-kube-apiserver-operator embedded-component d790493cfc43fd33450ca27633cbe37aa17427d2 to b0eea1220af097c61241ebe221af4c220d72f0b7
+  - 185521f 2024-06-19T18:30:49+04:00 Revert "Add sno section to alert description"
+  - 39bf4ba 2024-06-19T18:30:42+04:00 add highcpuusagesnoalertcontroller tests
+  - 9dbc913 2024-06-19T18:30:00+04:00 add SNO control plane high cpu usage alert
 
-- kubernetes image-amd64 58452d8d4db25d4afb8e53ed5901103590766b7e to aba1e8d781a8de14bd80a3e4ea0f9a29c5a8530d
-  - ae2033acf 2024-06-18T11:35:43+05:30 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
-  - 062798d53 2024-06-11T20:17:06+00:00 Release commit for Kubernetes v1.29.6
-  - 4a7948c2d 2024-06-06T18:24:04+02:00 Bump images, dependencies and versions to go 1.21.11 and distroless iptables/setcap/debian-base
-  - 81babdde1 2024-06-04T10:09:20+00:00 Don't fill in NodeToStatusMap with UnschedulableAndUnresolvable
-  - 808b67c6f 2024-06-04T08:38:25+00:00 Revert "scheduler: preallocation for NodeToStatusMap"
-  - 27839cb78 2024-05-22T10:47:33+08:00 add an integration test when nodeAffinity specifies a non-existent node.
-  - e126f6604 2024-05-22T10:47:33+08:00 base on allNodes when calculating nextStartNodeIndex
-  - f6072e0d7 2024-05-21T16:40:20+02:00 Don't sort under lock
-  - 8883844f6 2024-05-16T12:00:05-04:00 Fix printPod panic with spurious container statuses
-  - 3b0ef5bbd 2024-05-14T11:10:33+00:00 Update CHANGELOG/CHANGELOG-1.29.md for v1.29.5
-  - b50c6f4b8 2024-05-13T19:44:40-04:00 Fix NFS related issues on GCP/Ubuntu
-  - b66ebe13e 2024-05-13T15:16:13+00:00 cherry pick #124618 to 1.29
-  - 494242a6a 2024-05-13T11:16:15+02:00 fix requests tracker concurrency
-  - a20e74f70 2024-05-13T11:16:10+02:00 fix conflict race in statefulset rest update
-  - 88192fcab 2024-05-13T11:16:10+02:00 fix stateful set pod recreation and event spam
-  - 42a2f900b 2024-05-13T11:16:10+02:00 fix pods tracking and internal error checking in statefulset tests
-  - 029c4f2e0 2024-05-12T15:36:41+02:00 [go] Bump images, dependencies and versions to go 1.21.10 and distroless iptables
-  - 9776912fd 2024-05-11T01:19:08+00:00 Updated & added visibility to apiserver x509 test certificates expiring this year
-  - e5561a421 2024-04-25T15:18:38+02:00 Fix PersistentVolumeLabel admission plugin on Azure
+- ovn-kubernetes image-amd64 8a9743708ae117595226a52b4856f8c032fed2ab to f80acd01c9a4106b0f9681181ed43f059986f4d9
+  - e53cba10 2024-06-17T19:36:37+02:00 nit-fix: log statement had extra %s
+  - c912892c 2024-06-14T16:27:09+02:00 Add events for >99 priority
+  - 8b4b2519 2024-06-14T16:26:27+02:00 ANP: Allow two ANPs at the same priority
+  - b3398edc 2024-06-14T16:23:46+02:00 e2e: Re-enable PASS action logging
 
-- kubernetes image-arm64 58452d8d4db25d4afb8e53ed5901103590766b7e to aba1e8d781a8de14bd80a3e4ea0f9a29c5a8530d
-  - ae2033acf 2024-06-18T11:35:43+05:30 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
-  - 062798d53 2024-06-11T20:17:06+00:00 Release commit for Kubernetes v1.29.6
-  - 4a7948c2d 2024-06-06T18:24:04+02:00 Bump images, dependencies and versions to go 1.21.11 and distroless iptables/setcap/debian-base
-  - 81babdde1 2024-06-04T10:09:20+00:00 Don't fill in NodeToStatusMap with UnschedulableAndUnresolvable
-  - 808b67c6f 2024-06-04T08:38:25+00:00 Revert "scheduler: preallocation for NodeToStatusMap"
-  - 27839cb78 2024-05-22T10:47:33+08:00 add an integration test when nodeAffinity specifies a non-existent node.
-  - e126f6604 2024-05-22T10:47:33+08:00 base on allNodes when calculating nextStartNodeIndex
-  - f6072e0d7 2024-05-21T16:40:20+02:00 Don't sort under lock
-  - 8883844f6 2024-05-16T12:00:05-04:00 Fix printPod panic with spurious container statuses
-  - 3b0ef5bbd 2024-05-14T11:10:33+00:00 Update CHANGELOG/CHANGELOG-1.29.md for v1.29.5
-  - b50c6f4b8 2024-05-13T19:44:40-04:00 Fix NFS related issues on GCP/Ubuntu
-  - b66ebe13e 2024-05-13T15:16:13+00:00 cherry pick #124618 to 1.29
-  - 494242a6a 2024-05-13T11:16:15+02:00 fix requests tracker concurrency
-  - a20e74f70 2024-05-13T11:16:10+02:00 fix conflict race in statefulset rest update
-  - 88192fcab 2024-05-13T11:16:10+02:00 fix stateful set pod recreation and event spam
-  - 42a2f900b 2024-05-13T11:16:10+02:00 fix pods tracking and internal error checking in statefulset tests
-  - 029c4f2e0 2024-05-12T15:36:41+02:00 [go] Bump images, dependencies and versions to go 1.21.10 and distroless iptables
-  - 9776912fd 2024-05-11T01:19:08+00:00 Updated & added visibility to apiserver x509 test certificates expiring this year
-  - e5561a421 2024-04-25T15:18:38+02:00 Fix PersistentVolumeLabel admission plugin on Azure
+- ovn-kubernetes image-arm64 8a9743708ae117595226a52b4856f8c032fed2ab to f80acd01c9a4106b0f9681181ed43f059986f4d9
+  - e53cba10 2024-06-17T19:36:37+02:00 nit-fix: log statement had extra %s
+  - c912892c 2024-06-14T16:27:09+02:00 Add events for >99 priority
+  - 8b4b2519 2024-06-14T16:26:27+02:00 ANP: Allow two ANPs at the same priority
+  - b3398edc 2024-06-14T16:23:46+02:00 e2e: Re-enable PASS action logging
 
