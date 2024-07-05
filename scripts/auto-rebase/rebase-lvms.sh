@@ -273,7 +273,7 @@ EOF
 
 update_rebase_job_entrypoint() {
     local lvms_operator_bundle_manifest="$1"
-    local version=$(echo "${lvms_operator_bundle_manifest}" | awk -F':' '{print $2}')
+    version=$(echo "${lvms_operator_bundle_manifest}" | awk -F':' '{print $2}')
 
     title "## Updating rebase_job_entrypoint.sh with new lvms version ${version}"
 
