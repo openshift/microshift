@@ -68,7 +68,7 @@ func isDefaultRouterService(svc *corev1.Service) bool {
 }
 
 func defaultRouterListenAddresses(ipAddresses, nicNames []string, ipv4, ipv6 bool) ([]string, error) {
-	allowedAddresses, err := config.AllowedListeningIPAddresses()
+	allowedAddresses, err := config.AllowedListeningIPAddresses(ipv4, ipv6)
 	if err != nil {
 		return nil, err
 	}
