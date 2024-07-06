@@ -57,6 +57,11 @@ Upgrade From Previous Version
     ...    4.${PREVIOUS_MINOR_VERSION}.*
     ...    check_warnings=False
 
+    # This is release-4.16 branch, so previous MicroShift is 4.15.
+    # microshift-4.15 doesn't specify exact crio version it needs, so dnf will install crio for 4.16,
+    # which is missing the `crun` runtime configuration and result in failure to start.
+    Command Should Work    dnf install -y --allowerasing 'cri-o-1.28.*'
+
     ${version}=    MicroShift Version
     Should Be Equal As Integers    ${version.minor}    ${PREVIOUS_MINOR_VERSION}
     Start MicroShift
