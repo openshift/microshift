@@ -4,7 +4,7 @@ UNAME_M=$(uname -m)
 export UNAME_M
 
 # The location of the test directory, relative to the script.
-TESTDIR="$(cd "${SCRIPTDIR}/.." && pwd)"
+TESTDIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 # The location of the root of the git repo, relative to the script.
 ROOTDIR="$(cd "${TESTDIR}/.." && pwd)"
@@ -15,10 +15,6 @@ OUTPUTDIR="${ROOTDIR}/_output"
 # The location of shared kickstart templates
 # shellcheck disable=SC2034  # used elsewhere
 KICKSTART_TEMPLATE_DIR="${TESTDIR}/kickstart-templates"
-
-# The blueprint we should use for building an installer image.
-# shellcheck disable=SC2034  # used elsewhere
-INSTALLER_IMAGE_BLUEPRINT="rhel-9.2"
 
 # The location for downloading all of the image-related output.
 # The location the web server should serve.
