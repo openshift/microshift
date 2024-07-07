@@ -1,12 +1,19 @@
 ARG TAG
 FROM registry.ci.openshift.org/ocp/builder:$TAG
 
-RUN rm -rfv /etc/yum.repos.d/ci-rpm-mirrors.repo /etc/yum.repos.d/localdev* && \
-    dnf install \
+# Allow for optional override of the dnf command. This is necessary when build
+# images are configured to use a dnf shim and dnf.real executable name.
+ARG DNF=dnf
+
+# Delete the builder repos to allow usage of the host repository entitlement.
+# This requires '--volume /etc/pki/entitlement/:/etc/pki/entitlement' option
+# during the build.
+RUN rm -fv /etc/yum.repos.d/ci-rpm-mirrors.repo /etc/yum.repos.d/localdev* && \
+    ${DNF} install \
         --setopt=tsflags=nodocs \
         --setopt=install_weak_deps=False \
         -y \
         selinux-policy-devel rpmdevtools jq gettext \
     && \
-    dnf clean all && \
+    ${DNF} clean all && \
     rm -rf /var/cache/dnf/*
