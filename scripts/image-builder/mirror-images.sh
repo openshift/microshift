@@ -50,12 +50,19 @@ function mirror_registry() {
         # Add the target registry prefix
         dst_img="${dest_registry}/${dst_img}"
 
-        # Run the image copy command
+        # Run the image mirror and tag command
         echo "Mirroring '${src_img}' to '${dst_img}'"
         skopeo_retry copy --all --quiet \
             --preserve-digests \
+            --additional-tag "${dst_img}:latest" \
             --authfile "${img_pull_file}" \
             docker://"${src_img}" docker://"${dst_img}:${image_tag}-${image_cnt}"
+
+        echo "Tagging '${dst_img}' as 'latest'"
+        skopeo_retry copy --all --quiet \
+            --preserve-digests \
+            --authfile "${img_pull_file}" \
+            docker://"${dst_img}:${image_tag}-${image_cnt}" docker://"${dst_img}:latest"
     }
 
     # Use timestamp as a tag on the target images to avoid
@@ -112,12 +119,18 @@ function dir_to_registry() {
         dst_img="${dest_registry}/${src_img}"
         dst_img=$(echo "${dst_img}" | awk -F'@' '{print $1}')
 
-        # Run the image upload command
+        # Run the image upload and tag commands
         echo "Uploading '${src_img}' to '${dst_img}'"
         skopeo_retry copy --all --quiet \
             --preserve-digests \
             --authfile "${img_pull_file}" \
             dir://"${local_dir}/${src_img}" docker://"${dst_img}:${image_tag}-${image_cnt}"
+
+        echo "Tagging '${dst_img}' as 'latest'"
+        skopeo_retry copy --all --quiet \
+            --preserve-digests \
+            --authfile "${img_pull_file}" \
+            docker://"${dst_img}:${image_tag}-${image_cnt}" docker://"${dst_img}:latest"
         # Increment the counter
         (( image_cnt += 1 ))
 
