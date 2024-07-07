@@ -310,14 +310,19 @@ rpm-podman:
 	podman build \
 		--volume /etc/pki/entitlement/:/etc/pki/entitlement \
 		--build-arg TAG=$(RPM_BUILDER_IMAGE_TAG) \
+		--build-arg DNF=dnf.real \
 		--authfile $(PULLSECRET) \
-		--tag microshift-builder:$(RPM_BUILDER_IMAGE_TAG) - < ./packaging/images/Containerfile.rpm-builder ; \
+		--tag microshift-builder:$(RPM_BUILDER_IMAGE_TAG) \
+		--file ./packaging/images/Containerfile.rpm-builder \
+	&& \
 	podman run \
 		--rm -i \
 		--volume $$(pwd):/opt/microshift:z \
 		--env TARGET_ARCH=$(TARGET_ARCH) \
 		microshift-builder:$(RPM_BUILDER_IMAGE_TAG) \
-		bash -ilc 'cd /opt/microshift && make rpm & pid=$$! ; trap "pkill $${pid}" INT ; wait $${pid}'
+		bash -ilc 'cd /opt/microshift && make rpm & pid=$$! ; \
+				   trap "echo Killing make PID $${pid}; kill $${pid}" INT ; \
+				   wait $${pid}'
 .PHONY: rpm-podman
 
 ###############################
