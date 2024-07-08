@@ -404,6 +404,26 @@ func (c Config) UserNodeIP() string {
 	return ""
 }
 
+func (c Config) IsIPv4() bool {
+	for _, network := range c.Network.ClusterNetwork {
+		ip, _, _ := net.ParseCIDR(network)
+		if ip.To4() != nil {
+			return true
+		}
+	}
+	return false
+}
+
+func (c Config) IsIPv6() bool {
+	for _, network := range c.Network.ClusterNetwork {
+		ip, _, _ := net.ParseCIDR(network)
+		if ip.To4() == nil {
+			return true
+		}
+	}
+	return false
+}
+
 var allHostnames []string
 
 func getAllHostnames() ([]string, error) {
