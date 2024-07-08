@@ -13,6 +13,8 @@ fi
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # shellcheck source=test/bin/common.sh
 source "${SCRIPTDIR}/common.sh"
+# shellcheck source=test/bin/common_versions.sh
+source "${SCRIPTDIR}/common_versions.sh"
 
 DEFAULT_BOOT_BLUEPRINT="rhel-9.2"
 LVM_SYSROOT_SIZE="10240"
@@ -227,7 +229,7 @@ prepare_kickstart() {
         sed -e "s|REPLACE_LVM_SYSROOT_SIZE|${LVM_SYSROOT_SIZE}|g" \
             -e "s|REPLACE_OSTREE_SERVER_URL|${WEB_SERVER_URL}/repo|g" \
             -e "s|REPLACE_RPM_SERVER_URL|${WEB_SERVER_URL}/rpm-repos|g" \
-            -e "s|REPLACE_MINOR_VERSION|$(current_minor_version)|g" \
+            -e "s|REPLACE_MINOR_VERSION|${MINOR_VERSION}|g" \
             -e "s|REPLACE_BOOT_COMMIT_REF|${boot_commit_ref}|g" \
             -e "s|REPLACE_PULL_SECRET|${PULL_SECRET_CONTENT}|g" \
             -e "s|REPLACE_HOST_NAME|${vm_hostname}|g" \
@@ -686,37 +688,19 @@ configure_vm_firewall() {
     run_command_on_vm "${vmname}" "sudo firewall-cmd --reload"
 }
 
-# Function to report the full current version, e.g. "4.13.5"
-current_version() {
+# Function to report the full version of locally built RPMs, e.g. "4.17.0"
+local_rpm_version() {
     if [ ! -d "${LOCAL_REPO}" ]; then
         error "Run ${SCRIPTDIR}/create_local_repo.sh before running this scenario."
         return 1
     fi
-    "${SCRIPTDIR}/get_latest_rpm_version.sh"
-}
 
-# Function to report only the minor portion of the current version,
-# e.g. from "4.13.5" reports "13"
-current_minor_version() {
-    current_version | cut -f2 -d.
-}
-
-# Function to report the *previous* minor version. If the current
-# version is "4.13.5", reports "12".
-previous_minor_version() {
-    echo $(( $(current_minor_version) - 1 ))
-}
-
-# Function to report the minor version for 2 releases back. If the current
-# version is "4.16.0", reports "14".
-yminus2_minor_version() {
-    echo $(( $(current_minor_version) - 2 ))
-}
-
-# Function to report the *next* minor version. If the current
-# version is "4.14.5", reports "15".
-next_minor_version() {
-    echo $(( $(current_minor_version) + 1 ))
+    local -r release_info_rpm=$(find "${LOCAL_REPO}" -name 'microshift-release-info-*.rpm' | sort | tail -n 1)
+    if [ -z "${release_info_rpm}" ]; then
+        error "Failed to find microshift-release-info RPM in ${LOCAL_REPO}"
+        exit 1
+    fi
+    rpm -q --queryformat '%{version}' "${release_info_rpm}" 2>/dev/null
 }
 
 # Public function to enable or disable a Stress Condition

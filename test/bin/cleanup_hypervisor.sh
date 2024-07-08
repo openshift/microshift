@@ -10,7 +10,7 @@ SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 source "${SCRIPTDIR}/common.sh"
 
 # Clean up all of the VMs
-for scenario in "${SCENARIO_SOURCES}"/*.sh; do
+for scenario in "${TESTDIR}"/scenarios*/*.sh; do
     echo "Deleting $(basename "${scenario}")"
     "${TESTDIR}/bin/scenario.sh" cleanup "${scenario}" &>/dev/null || true
 done

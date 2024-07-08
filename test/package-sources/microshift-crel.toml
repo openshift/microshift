@@ -1,6 +1,6 @@
 {{- if and (env.Getenv "CURRENT_RELEASE_REPO" "") (strings.HasPrefix "http" .Env.CURRENT_RELEASE_REPO) -}}
 id = "microshift-crel"
-name = "Repository with already existing RPMs for current release"
+name = "Repository with OpenShift mirror-only RPMs for current release"
 type = "yum-baseurl"
 url = "{{ .Env.CURRENT_RELEASE_REPO }}"
 check_gpg = false
