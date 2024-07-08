@@ -10,7 +10,10 @@ touch "${USHIFT_CFG}"
 cat << 'EOF' >> "${USHIFT_CFG}"
 kubelet:
   cpuManagerPolicy: static
-  memoryManagerPolicy: static
+  cpuManagerPolicyOptions:
+    full-pcpus-only: "true"
+  cpuManagerReconcilePeriod: 5s
+  memoryManagerPolicy: Static
   topologyManagerPolicy: single-numa-node
   reservedSystemCPUs: 0-5
   reservedMemory:
