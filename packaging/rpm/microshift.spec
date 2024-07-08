@@ -360,6 +360,10 @@ install -p -m755 packaging/tuned/profile/script.sh %{buildroot}/%{_prefix}/lib/t
 install -d -m755 %{buildroot}%{_sysconfdir}/tuned
 install -p -m644 packaging/tuned/profile/variables.conf %{buildroot}%{_sysconfdir}/tuned/microshift-baseline-variables.conf
 
+install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/002-microshift-low-latency
+install -p -m644 packaging/tuned/runtime-class/runtime-class.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/002-microshift-low-latency/runtime-class.yaml
+install -p -m644 packaging/tuned/runtime-class/kustomization.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/002-microshift-low-latency/kustomization.yaml
+
 install -p -m644 packaging/crio.conf.d/05-high-performance-runtime.conf %{buildroot}%{_sysconfdir}/crio/crio.conf.d/05-high-performance-runtime.conf
 install -p -m644 packaging/tuned/microshift-tuned.service %{buildroot}%{_unitdir}/microshift-tuned.service
 install -p -m755 packaging/tuned/microshift-tuned.py %{buildroot}%{_bindir}/microshift-tuned
@@ -498,6 +502,8 @@ fi
 %{_sysconfdir}/crio/crio.conf.d/05-high-performance-runtime.conf
 %{_unitdir}/microshift-tuned.service
 %{_bindir}/microshift-tuned
+%{_prefix}/lib/microshift/manifests.d/002-microshift-low-latency/runtime-class.yaml
+%{_prefix}/lib/microshift/manifests.d/002-microshift-low-latency/kustomization.yaml
 
 
 # Use Git command to generate the log and replace the VERSION string
