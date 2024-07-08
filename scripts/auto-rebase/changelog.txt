@@ -1,16 +1,18 @@
-- cluster-network-operator embedded-component f273783444ca6f251dfdaba3843322e09cb09488 to 6b2734f030911c065d25e1319444222956b2d1ac
-  - f1a512e 2024-07-01T10:52:04+02:00 Update whereabouts crd
+- cluster-kube-apiserver-operator embedded-component eae692607f7ef1cfc6ef95bcd57c67f04d2c165c to 62a9eff944bfbdc1b4e79332fe4d8ae2df053c8c
+  - 078c319 2024-06-20T12:17:55+04:00 Revert "Add sno section to alert description"
+  - 2ecf632 2024-06-20T12:15:24+04:00 add highcpuusagesnoalertcontroller tests
+  - de24ac1 2024-06-20T12:14:50+04:00 add SNO control plane high cpu usage alert
 
-- machine-config-operator embedded-component 98cf6fbede4d0ba3746bcaa5c13211e2e88faa86 to 42e07574113781d4fde76aa50a146ee72d637a2d
-  - 53018a02 2024-06-25T10:55:52-04:00 [release-4.15] OCPBUGS-27436: Fix mirrorSourcePolicy error prompt imagecontentsourcepolicies
+- cluster-network-operator embedded-component 6b2734f030911c065d25e1319444222956b2d1ac to 853b1bd8f59f22cdc020c6b916b80e64ee71dc6d
+  - 4e49207 2024-06-28T22:28:25+00:00 Create the configmap mtu if not found
+  - 848c7d4 2024-06-27T11:12:49-04:00 Add ability to configure transit and join switch subnet
+  - c3c500c 2024-06-27T11:12:49-04:00 Configure CNO as per new API changes for join and transit switch subnet
+  - 34a5219 2024-06-27T11:12:24-04:00 Bump openshift/api
+  - e874a03 2024-05-21T14:34:49-04:00 Add knobs in cno referencing api change
 
-- ovn-kubernetes image-amd64 7e8054a8ddb596087186c8c4b68dbf82767026b5 to ad798f2aca6a471fbb6bcd8d2395e069f53ad7dc
-  - b7ba318 2024-07-01T10:58:10+00:00 Handle IP fragments in SGW mode
-  - 3fe4301 2024-07-01T10:58:09+00:00 Move custom conntrack zones to the config package
-  - e6f139e 2024-07-01T10:58:07+00:00 ovnkube-node: Make service conntrack zone configurable
+- cluster-openshift-controller-manager-operator embedded-component 9c4fb818258a579901343fec3c2c47ec20ad2555 to 45d342cb8ecde4e2fe51ceb613827fb3d219b8a0
+  - a8f96f9 2024-06-27T10:23:07+01:00 set required-scc for openshift workloads
 
-- ovn-kubernetes image-arm64 7e8054a8ddb596087186c8c4b68dbf82767026b5 to ad798f2aca6a471fbb6bcd8d2395e069f53ad7dc
-  - b7ba318 2024-07-01T10:58:10+00:00 Handle IP fragments in SGW mode
-  - 3fe4301 2024-07-01T10:58:09+00:00 Move custom conntrack zones to the config package
-  - e6f139e 2024-07-01T10:58:07+00:00 ovnkube-node: Make service conntrack zone configurable
+- machine-config-operator embedded-component 42e07574113781d4fde76aa50a146ee72d637a2d to 0b30396ac09af31e99f99a75e8ad0ed26d4fff47
+  - 0261a611 2024-07-04T10:50:48+00:00 MCD-pull: run after network-online.target in Azure
 
