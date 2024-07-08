@@ -8,5 +8,7 @@ SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 export SCRIPTDIR
 # shellcheck source=test/bin/common.sh
 source "${SCRIPTDIR}/common.sh"
+# shellcheck source=test/bin/common_versions.sh
+source "${SCRIPTDIR}/common_versions.sh"
 
 python3 "${SCRIPTDIR}/pyutils/build_bootc_images.py" "$@"
