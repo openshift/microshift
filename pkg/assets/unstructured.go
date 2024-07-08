@@ -2,9 +2,12 @@ package assets
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io"
+	"strings"
 	"sync"
+	"time"
 
 	"github.com/openshift/library-go/pkg/operator/resource/resourcemerge"
 	embedded "github.com/openshift/microshift/assets"
@@ -14,6 +17,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/discovery"
 	"k8s.io/client-go/discovery/cached/memory"
 	"k8s.io/client-go/dynamic"
@@ -234,12 +238,20 @@ func DeleteGeneric(
 		base:   configAndClient.base,
 		mapper: configAndClient.mapper,
 	}
-	return clnt.deleteGeneric(ctx, objects)
+	return clnt.concurrentDeleteGeneric(ctx, objects)
 }
 
-func (clnt *unstructuredClient) deleteGeneric(ctx context.Context, objects []runtime.Object) error {
+func (clnt *unstructuredClient) concurrentDeleteGeneric(ctx context.Context, objects []runtime.Object) error {
 	lock.Lock()
 	defer lock.Unlock()
+
+	type verification struct {
+		client   dynamic.ResourceInterface
+		accessor metav1.Object
+	}
+
+	skipped := make([]string, 0, len(objects))
+	toVerify := make([]verification, 0, len(objects))
 
 	for i, obj := range objects {
 		accessor, err := meta.Accessor(obj)
@@ -265,18 +277,67 @@ func (clnt *unstructuredClient) deleteGeneric(ctx context.Context, objects []run
 			client = clnt.base.Resource(mapping.Resource)
 		}
 
-		// TODO move this to an asynchronous delete with a check for exists
 		err = client.Delete(ctx, accessor.GetName(), metav1.DeleteOptions{
-			PropagationPolicy: ptr.To(metav1.DeletePropagationForeground),
+			PropagationPolicy: ptr.To(metav1.DeletePropagationBackground),
 		})
 		if apierrors.IsNotFound(err) {
-			klog.Infof("Object %s not found, skipping deletion", accessor.GetName())
+			skipped = append(skipped, nameFromAccessorAndMapping(accessor, mapping))
 			continue
 		}
 		if err != nil {
 			return fmt.Errorf("failed to delete %s %s: %w", obj.GetObjectKind(), accessor.GetName(), err)
 		}
+
+		toVerify = append(toVerify, verification{
+			client:   client,
+			accessor: accessor,
+		})
+	}
+
+	errs := make(chan error, len(toVerify))
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
+	for _, v := range toVerify {
+		go func(ctx context.Context, v verification) {
+			err := wait.PollUntilContextCancel(ctx, 1*time.Second, true, func(ctx context.Context) (bool, error) {
+				_, err := v.client.Get(ctx, v.accessor.GetName(), metav1.GetOptions{})
+				if apierrors.IsNotFound(err) {
+					return true, nil
+				}
+				if err != nil {
+					return false, err
+				}
+				return false, nil
+			})
+			if err != nil {
+				errs <- fmt.Errorf("failed to wait for deletion of %s: %w", v.accessor.GetName(), err)
+			} else {
+				errs <- nil
+			}
+		}(ctx, v)
+	}
+
+	var err error
+	for range toVerify {
+		err = errors.Join(err, <-errs)
+	}
+	if err != nil {
+		return err
+	}
+
+	if len(skipped) > 0 {
+		klog.Infof("Skipped deleting %v resources: %s", len(skipped), strings.Join(skipped, ", "))
 	}
 
 	return nil
+}
+
+func nameFromAccessorAndMapping(accessor metav1.Object, mapping *meta.RESTMapping) string {
+	name := accessor.GetName()
+	if accessor.GetNamespace() != "" {
+		name = fmt.Sprintf("%s/%s", accessor.GetNamespace(), name)
+	}
+	gvr := fmt.Sprintf("%s/%s", mapping.Resource.GroupVersion().String(), mapping.Resource.Resource)
+	return fmt.Sprintf("%s/%s", gvr, name)
 }
