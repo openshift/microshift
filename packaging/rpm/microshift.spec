@@ -242,6 +242,9 @@ install -p -m644 packaging/crio.conf.d/10-microshift_amd64.conf %{buildroot}%{_s
 
 install -p -m644 packaging/crio.conf.d/11-microshift-ovn.conf %{buildroot}%{_sysconfdir}/crio/crio.conf.d/11-microshift-ovn.conf
 
+install -d -m755 %{buildroot}%{_sysconfdir}/NetworkManager/conf.d
+install -p -m644 packaging/NetworkManager.conf.d/10-microshift-ignore-devices.conf %{buildroot}%{_sysconfdir}/NetworkManager/conf.d/10-microshift-ignore-devices.conf
+
 install -d -m755 %{buildroot}/%{_unitdir}
 install -p -m644 packaging/systemd/microshift.service %{buildroot}%{_unitdir}/microshift.service
 
@@ -436,6 +439,7 @@ fi
 
 
 %files networking
+%{_sysconfdir}/NetworkManager/conf.d/10-microshift-ignore-devices.conf
 %{_sysconfdir}/crio/crio.conf.d/11-microshift-ovn.conf
 %{_sysconfdir}/systemd/system/ovs-vswitchd.service.d/microshift-cpuaffinity.conf
 %{_sysconfdir}/systemd/system/ovsdb-server.service.d/microshift-cpuaffinity.conf
@@ -474,6 +478,9 @@ fi
 # Use Git command to generate the log and replace the VERSION string
 # LANG=C git log --date="format:%a %b %d %Y" --pretty="tformat:* %cd %an <%ae> VERSION%n- %s%n" packaging/rpm/microshift.spec
 %changelog
+* Mon Jul 08 2024 Pablo Acevedo Montserrat <pacevedo@redhat.com> 4.17.0
+- Add NM configuration file
+
 * Wed Jun 19 2024 Patryk Matuszak <pmatusza@redhat.com> 4.17.0
 - Fix CRI-O version to match Kubernetes version
 
