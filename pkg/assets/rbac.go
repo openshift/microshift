@@ -18,15 +18,9 @@ import (
 )
 
 var (
-	rbacScheme = runtime.NewScheme()
+	rbacScheme = scheme
 	rbacCodecs = serializer.NewCodecFactory(rbacScheme)
 )
-
-func init() {
-	if err := rbacv1.AddToScheme(rbacScheme); err != nil {
-		panic(err)
-	}
-}
 
 type clusterRoleBindingApplier struct {
 	client *kubernetes.Clientset

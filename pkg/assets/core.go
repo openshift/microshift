@@ -18,15 +18,9 @@ import (
 )
 
 var (
-	coreScheme = runtime.NewScheme()
+	coreScheme = scheme
 	coreCodecs = serializer.NewCodecFactory(coreScheme)
 )
-
-func init() {
-	if err := corev1.AddToScheme(coreScheme); err != nil {
-		panic(err)
-	}
-}
 
 func coreClient(kubeconfigPath string) *coreclientv1.CoreV1Client {
 	restConfig, err := clientcmd.BuildConfigFromFlags("", kubeconfigPath)

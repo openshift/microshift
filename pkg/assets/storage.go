@@ -21,15 +21,9 @@ import (
 )
 
 var (
-	scScheme = runtime.NewScheme()
+	scScheme = scheme
 	scCodecs = serializer.NewCodecFactory(scScheme)
 )
-
-func init() {
-	if err := scv1.AddToScheme(scScheme); err != nil {
-		panic(err)
-	}
-}
 
 func scClient(kubeconfigPath string) *scclientv1.StorageV1Client {
 	restConfig, err := clientcmd.BuildConfigFromFlags("", kubeconfigPath)
