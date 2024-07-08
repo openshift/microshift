@@ -15,6 +15,7 @@ spec:
     metadata:
       annotations:
         lvms.microshift.io/lvmd_config_sha256sum: '{{ Sha256sum .lvmd }}'
+        target.workload.openshift.io/management: '{"effect": "PreferredDuringScheduling"}' 
       labels:
         app.kubernetes.io/component: topolvm-node
         app.kubernetes.io/name: topolvm-csi-driver

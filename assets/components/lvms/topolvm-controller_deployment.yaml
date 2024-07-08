@@ -18,6 +18,8 @@ spec:
         app.kubernetes.io/name: topolvm-csi-driver
       name: topolvm-controller
       namespace: openshift-storage
+      annotations:
+        target.workload.openshift.io/management: '{"effect": "PreferredDuringScheduling"}'        
     spec:
       containers:
       - command:
