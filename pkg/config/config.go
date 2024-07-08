@@ -474,20 +474,21 @@ func validateRouterListenAddress(ingressListenAddresses []string, advertiseAddre
 		return err
 	}
 	for _, entry := range ingressListenAddresses {
-		if ip := net.ParseIP(entry); ip != nil {
-			if entry == advertiseAddress && !skipInterface {
+		if entry == advertiseAddress && !skipInterface {
+			continue
+		}
+		ip := net.ParseIP(entry)
+		if ip == nil {
+			if slices.Contains(nicNames, entry) {
 				continue
 			}
-			if (ip.To4() != nil && !ipv4) || (ip.To4() == nil && !ipv6) {
-				return fmt.Errorf("IP %v does not match family of service/cluster network", entry)
-			}
-			if !slices.Contains(addresses, entry) {
-				return fmt.Errorf("IP %v not present in any of the host's interfaces", entry)
-			}
-		} else if slices.Contains(nicNames, entry) {
-			continue
-		} else {
 			return fmt.Errorf("interface %v not present in the host", entry)
+		}
+		if (ip.To4() != nil && !ipv4) || (ip.To4() == nil && !ipv6) {
+			return fmt.Errorf("IP %v does not match family of service/cluster network", entry)
+		}
+		if !slices.Contains(addresses, entry) {
+			return fmt.Errorf("IP %v not present in any of the host's interfaces", entry)
 		}
 	}
 	return nil
