@@ -8,6 +8,12 @@ import (
 	"path/filepath"
 
 	"github.com/fsnotify/fsnotify"
+	sccv1 "github.com/openshift/api/security/v1"
+	appsv1 "k8s.io/api/apps/v1"
+	corev1 "k8s.io/api/core/v1"
+	rbacv1 "k8s.io/api/rbac/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/klog/v2"
 
 	"github.com/openshift/microshift/pkg/assets"
@@ -37,6 +43,11 @@ func startCSIPlugin(ctx context.Context, cfg *config.Config, kubeconfigPath stri
 		return nil
 	}
 
+	if err := deleteLegacyResources(ctx, kubeconfigPath); err != nil {
+		klog.Warningf("Failed to delete legacy resources of CSI installation, possibly corrupt state: %v", err)
+		return err
+	}
+
 	// This sets up the resources in the cluster
 	// Note that currently the lvmdCfg is only checked for being enabled at startup
 	// That means that the loading of the configuration file only respects enabled / disabled on restarts.
@@ -46,6 +57,28 @@ func startCSIPlugin(ctx context.Context, cfg *config.Config, kubeconfigPath stri
 	// TODO: Implement a mechanism to reload the configuration file even when enabling or disabling, this requires a mechanism in k8s to delete resources that are no longer wanted
 	// 3. If the plugin is already enabled, the configuration file is changed and the plugin is restarted with hot-reloading.
 	return setupPluginResources(ctx, cfg, kubeconfigPath)
+}
+
+// deleteLegacyResources deletes the legacy resources of TopoLVM.
+// TODO: Remove this function in the next release.
+func deleteLegacyResources(ctx context.Context, kubeconfigPath string) error {
+	klog.Infof("Deleting legacy resources of TopoLVM (this is a migration operation and will disappear in the next release)")
+	return assets.DeleteGeneric(ctx, []runtime.Object{
+		&appsv1.Deployment{ObjectMeta: metav1.ObjectMeta{Name: "topolvm-controller", Namespace: "openshift-storage"}},
+		&appsv1.DaemonSet{ObjectMeta: metav1.ObjectMeta{Name: "topolvm-node", Namespace: "openshift-storage"}},
+		&rbacv1.ClusterRoleBinding{ObjectMeta: metav1.ObjectMeta{Name: "topolvm-node-scc"}},
+		&rbacv1.ClusterRoleBinding{ObjectMeta: metav1.ObjectMeta{Name: "topolvm-node"}},
+		&rbacv1.ClusterRoleBinding{ObjectMeta: metav1.ObjectMeta{Name: "topolvm-controller"}},
+		&rbacv1.RoleBinding{ObjectMeta: metav1.ObjectMeta{Name: "topolvm-controller", Namespace: "openshift-storage"}},
+		&rbacv1.ClusterRole{ObjectMeta: metav1.ObjectMeta{Name: "topolvm-controller"}},
+		&rbacv1.ClusterRole{ObjectMeta: metav1.ObjectMeta{Name: "topolvm-node-scc"}},
+		&rbacv1.ClusterRole{ObjectMeta: metav1.ObjectMeta{Name: "topolvm-node"}},
+		&rbacv1.Role{ObjectMeta: metav1.ObjectMeta{Name: "topolvm-controller", Namespace: "openshift-storage"}},
+		&corev1.ServiceAccount{ObjectMeta: metav1.ObjectMeta{Name: "topolvm-controller", Namespace: "openshift-storage"}},
+		&corev1.ServiceAccount{ObjectMeta: metav1.ObjectMeta{Name: "topolvm-node", Namespace: "openshift-storage"}},
+		&corev1.ConfigMap{ObjectMeta: metav1.ObjectMeta{Name: "lvmd", Namespace: "openshift-storage"}},
+		&sccv1.SecurityContextConstraints{ObjectMeta: metav1.ObjectMeta{Name: "topolvm-node"}},
+	}, kubeconfigPath)
 }
 
 func setupPluginResources(ctx context.Context, cfg *config.Config, kubeconfigPath string) error {

@@ -13,6 +13,7 @@ import (
 	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/discovery"
 	"k8s.io/client-go/discovery/cached/memory"
 	"k8s.io/client-go/dynamic"
@@ -42,7 +43,7 @@ type configClientCacheEntry struct {
 var configClientCache = make(map[string]configClientCacheEntry, 1)
 var configClientCacheLock sync.RWMutex
 
-type unstructuredApplier struct {
+type unstructuredClient struct {
 	base   dynamic.Interface
 	mapper meta.ResettableRESTMapper
 
@@ -100,7 +101,7 @@ func unstructuredConfigAndClient(kubeconfigPath string) (configClientCacheEntry,
 	return entry, nil
 }
 
-func (d *unstructuredApplier) Read(obj io.Reader, render RenderFuncV2, params RenderParams) error {
+func (d *unstructuredClient) Read(obj io.Reader, render RenderFuncV2, params RenderParams) error {
 	var err error
 	if render != nil {
 		if obj, err = render(obj, params); err != nil {
@@ -131,7 +132,7 @@ func (d *unstructuredApplier) Read(obj io.Reader, render RenderFuncV2, params Re
 	return nil
 }
 
-func (d *unstructuredApplier) Handle(ctx context.Context) error {
+func (d *unstructuredClient) Handle(ctx context.Context) error {
 	existing, err := d.Client.Get(ctx, d.unstructured.GetName(), metav1.GetOptions{})
 	if apierrors.IsNotFound(err) {
 		if _, err := d.Client.Create(ctx, d.unstructured, metav1.CreateOptions{}); err != nil {
@@ -212,10 +213,70 @@ func ApplyGeneric(
 	if err != nil {
 		return fmt.Errorf("failed to get config and client for generic apply: %w", err)
 	}
-	applier := &unstructuredApplier{
+	clnt := &unstructuredClient{
 		base:           configAndClient.base,
 		mapper:         configAndClient.mapper,
 		ModifyOnExists: modify,
 	}
-	return applyGeneric(ctx, resources, applier, render, params)
+	return applyGeneric(ctx, resources, clnt, render, params)
+}
+
+func DeleteGeneric(
+	ctx context.Context,
+	objects []runtime.Object,
+	kubeconfigPath string,
+) error {
+	configAndClient, err := unstructuredConfigAndClient(kubeconfigPath)
+	if err != nil {
+		return fmt.Errorf("failed to get config and client for generic delete: %w", err)
+	}
+	clnt := &unstructuredClient{
+		base:   configAndClient.base,
+		mapper: configAndClient.mapper,
+	}
+	return clnt.deleteGeneric(ctx, objects)
+}
+
+func (clnt *unstructuredClient) deleteGeneric(ctx context.Context, objects []runtime.Object) error {
+	lock.Lock()
+	defer lock.Unlock()
+
+	for i, obj := range objects {
+		accessor, err := meta.Accessor(obj)
+		if err != nil {
+			return fmt.Errorf("failed to get accessor for object at index %v: %w", i, err)
+		}
+
+		if accessor.GetName() == "" {
+			return fmt.Errorf("object at index %v has no name", i)
+		}
+
+		gvk := obj.GetObjectKind().GroupVersionKind()
+
+		mapping, err := clnt.mapper.RESTMapping(gvk.GroupKind(), gvk.Version)
+		if err != nil {
+			return fmt.Errorf("failed to get RESTMapping for %s: %w", obj.GetObjectKind(), err)
+		}
+
+		var client dynamic.ResourceInterface
+		if accessor.GetNamespace() != "" {
+			client = clnt.base.Resource(mapping.Resource).Namespace(accessor.GetNamespace())
+		} else {
+			client = clnt.base.Resource(mapping.Resource)
+		}
+
+		// TODO move this to an asynchronous delete with a check for exists
+		err = client.Delete(ctx, accessor.GetName(), metav1.DeleteOptions{
+			PropagationPolicy: ptr.To(metav1.DeletePropagationForeground),
+		})
+		if apierrors.IsNotFound(err) {
+			klog.Infof("Object %s not found, skipping deletion", accessor.GetName())
+			continue
+		}
+		if err != nil {
+			return fmt.Errorf("failed to delete %s %s: %w", obj.GetObjectKind(), accessor.GetName(), err)
+		}
+	}
+
+	return nil
 }
