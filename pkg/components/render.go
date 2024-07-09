@@ -8,6 +8,8 @@ import (
 	"strings"
 	"text/template"
 
+	"k8s.io/kubernetes/pkg/apis/core"
+
 	"github.com/openshift/microshift/pkg/assets"
 	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/release"
@@ -28,9 +30,16 @@ func renderParamsFromConfig(cfg *config.Config, extra assets.RenderParams) asset
 		"ClusterDNS":   cfg.Network.DNS,
 		"BaseDomain":   cfg.DNS.BaseDomain,
 	}
+	ipFamily := core.IPFamilyPolicySingleStack
+	if cfg.IsIPv4() && cfg.IsIPv6() {
+		ipFamily = core.IPFamilyPolicyPreferDualStack
+	}
+	params["IPFamily"] = ipFamily
+
 	for k, v := range extra {
 		params[k] = v
 	}
+
 	return params
 }
 
