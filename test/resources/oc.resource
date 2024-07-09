@@ -29,7 +29,13 @@ Oc Get JsonPath
     ...    with jsonpath provided. Returns output of the command without any parsing.
     [Arguments]    ${type}    ${namespace}    ${resource}    ${jsonpath}
 
-    ${text}=    Run With Kubeconfig    oc get -n ${namespace} -o=jsonpath='{ ${jsonpath} }' ${type} ${resource}
+    IF    "${namespace}"=="${EMPTY}"
+        ${namespace_arg}=    Set Variable    -A
+    ELSE
+        ${namespace_arg}=    Set Variable    -n ${namespace}
+    END
+
+    ${text}=    Run With Kubeconfig    oc get ${namespace_arg} -o=jsonpath='{ ${jsonpath} }' ${type} ${resource}
 
     RETURN    ${text}
 
