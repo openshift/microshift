@@ -1,17 +1,21 @@
-- cluster-kube-apiserver-operator embedded-component d790493cfc43fd33450ca27633cbe37aa17427d2 to b0eea1220af097c61241ebe221af4c220d72f0b7
-  - 185521f 2024-06-19T18:30:49+04:00 Revert "Add sno section to alert description"
-  - 39bf4ba 2024-06-19T18:30:42+04:00 add highcpuusagesnoalertcontroller tests
-  - 9dbc913 2024-06-19T18:30:00+04:00 add SNO control plane high cpu usage alert
+- machine-config-operator embedded-component 8c4afe087d64b028fdc16df24204fe4f7f7e6127 to 73d5f16fdc96f3d7a4bc87edc77d394e53a8bb9c
+  - 4b0db3fb 2024-07-04T03:32:50+00:00 MCD-pull: run after network-online.target in Azure
 
-- ovn-kubernetes image-amd64 8a9743708ae117595226a52b4856f8c032fed2ab to f80acd01c9a4106b0f9681181ed43f059986f4d9
-  - e53cba10 2024-06-17T19:36:37+02:00 nit-fix: log statement had extra %s
-  - c912892c 2024-06-14T16:27:09+02:00 Add events for >99 priority
-  - 8b4b2519 2024-06-14T16:26:27+02:00 ANP: Allow two ANPs at the same priority
-  - b3398edc 2024-06-14T16:23:46+02:00 e2e: Re-enable PASS action logging
+- oc image-amd64 e4cacc0be012b75a230f07e3902a1ede9a2ecba9 to 8c491baf99f880bd767cb325effbb35beeb47a6c
+  - 02ca8d32 2024-07-04T08:08:33+02:00 bump k8s version in the Makefile and Dockerfiles
+  - 2f3e536d 2024-07-03T14:37:55+02:00 Remove invalid test cases: empty dockerfiles are no longer allowed
+  - 4bcd2670 2024-07-03T14:37:14+02:00 Lower case command value before comparision
+  - 1f27c7ef 2024-07-02T15:08:41+02:00 bump(k8s)=1.29.6
 
-- ovn-kubernetes image-arm64 8a9743708ae117595226a52b4856f8c032fed2ab to f80acd01c9a4106b0f9681181ed43f059986f4d9
-  - e53cba10 2024-06-17T19:36:37+02:00 nit-fix: log statement had extra %s
-  - c912892c 2024-06-14T16:27:09+02:00 Add events for >99 priority
-  - 8b4b2519 2024-06-14T16:26:27+02:00 ANP: Allow two ANPs at the same priority
-  - b3398edc 2024-06-14T16:23:46+02:00 e2e: Re-enable PASS action logging
+- ovn-kubernetes image-amd64 f80acd01c9a4106b0f9681181ed43f059986f4d9 to 7f412836bd26c3d6e9735552a7fd615e7e7e9695
+  - 147d4eee 2024-07-03T10:02:05+00:00 Fix race condition when creating/deleting namespace address set
+
+- oc image-arm64 e4cacc0be012b75a230f07e3902a1ede9a2ecba9 to 8c491baf99f880bd767cb325effbb35beeb47a6c
+  - 02ca8d32 2024-07-04T08:08:33+02:00 bump k8s version in the Makefile and Dockerfiles
+  - 2f3e536d 2024-07-03T14:37:55+02:00 Remove invalid test cases: empty dockerfiles are no longer allowed
+  - 4bcd2670 2024-07-03T14:37:14+02:00 Lower case command value before comparision
+  - 1f27c7ef 2024-07-02T15:08:41+02:00 bump(k8s)=1.29.6
+
+- ovn-kubernetes image-arm64 f80acd01c9a4106b0f9681181ed43f059986f4d9 to 7f412836bd26c3d6e9735552a7fd615e7e7e9695
+  - 147d4eee 2024-07-03T10:02:05+00:00 Fix race condition when creating/deleting namespace address set
 
