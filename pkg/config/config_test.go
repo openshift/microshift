@@ -508,6 +508,28 @@ func TestValidate(t *testing.T) {
 			expectErr: true,
 		},
 		{
+			name: "ingress-listen-address-bad-ip-family-1",
+			config: func() *Config {
+				c := mkDefaultConfig()
+				c.Ingress.ListenAddress = []string{"1.2.3.4"}
+				c.Network.ClusterNetwork = []string{"fd01::/48"}
+				c.Network.ServiceNetwork = []string{"fd02::/112"}
+				return c
+			}(),
+			expectErr: true,
+		},
+		{
+			name: "ingress-listen-address-bad-ip-family-2",
+			config: func() *Config {
+				c := mkDefaultConfig()
+				c.Ingress.ListenAddress = []string{"fe80::1"}
+				c.Network.ClusterNetwork = []string{"10.42.0.0/16"}
+				c.Network.ServiceNetwork = []string{"10.43.0.0/16"}
+				return c
+			}(),
+			expectErr: true,
+		},
+		{
 			name: "audit-log-flag-values-unexpected-values",
 			config: func() *Config {
 				c := mkDefaultConfig()
