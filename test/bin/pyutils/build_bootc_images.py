@@ -249,7 +249,7 @@ def process_containerfile(groupdir, containerfile, dry_run):
                 shutil.rmtree(cf_outdir)
             save_args = [
                 "sudo", "podman", "save",
-                "--format", "oci-dir",
+                "--format", "docker-dir",
                 "-o", cf_outdir, cf_outname
             ]
             common.run_command_in_shell(save_args, dry_run, logfile, logfile)
