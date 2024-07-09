@@ -64,14 +64,6 @@ export BASE_REPO="${IMAGEDIR}/rpm-repos/microshift-base"
 # shellcheck disable=SC2034  # used elsewhere
 export CONTAINER_LIST="${IMAGEDIR}/container-images-list"
 
-# Location of container images in oci-dir format for all the bootc images
-# shellcheck disable=SC2034  # used elsewhere
-export BOOTC_IMAGE_DIR="${IMAGEDIR}/bootc-images"
-
-# Location of images produced by bootc ISO build procedure
-# shellcheck disable=SC2034  # used elsewhere
-export BOOTC_ISO_DIR="${IMAGEDIR}/bootc-iso-images"
-
 # Location of data files created by the tools for managing scenarios
 # as they are run.
 #
