@@ -36,7 +36,7 @@ const (
 )
 
 type NetworkConfiguration struct {
-	kasAdvertiseAddresses        []string
+	kasAdvertiseAddresses      []string
 	skipInterfaceConfiguration bool
 }
 
