@@ -69,6 +69,7 @@ func TestConfigure(t *testing.T) {
 		fmt.Sprintf("--root-ca-file=%s", kcmRootCAFile()),
 		"--secure-port=10257",
 		fmt.Sprintf("--service-account-private-key-file=%s", kcmServiceAccountPrivateKeyFile()),
+		fmt.Sprintf("--service-cluster-ip-range=%s", cfg.Network.ServiceNetwork[0]),
 		fmt.Sprintf("--tls-cipher-suites=%s", strings.Join(crypto.OpenSSLToIANACipherSuites(fixedTLSProfile.Ciphers), ",")),
 		fmt.Sprintf("--tls-min-version=%s", string(fixedTLSProfile.MinTLSVersion)),
 		"--use-service-account-credentials=true",
