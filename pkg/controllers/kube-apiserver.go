@@ -114,7 +114,7 @@ func (s *KubeAPIServer) configure(cfg *config.Config) error {
 
 	s.masterURL = cfg.ApiServer.URL
 	s.servingCAPath = cryptomaterial.ServiceAccountTokenCABundlePath(certsDir)
-	s.advertiseAddress = cfg.ApiServer.AdvertiseAddress
+	s.advertiseAddress = cfg.ApiServer.AdvertiseAddresses[0]
 
 	namedCerts := []configv1.NamedCertificate{
 		{
@@ -139,7 +139,7 @@ func (s *KubeAPIServer) configure(cfg *config.Config) error {
 	if len(cfg.ApiServer.NamedCertificates) > 0 {
 		for _, namedCertsCfg := range cfg.ApiServer.NamedCertificates {
 			//Validate the cert is non-destructive
-			certAllowed, err := util.IsCertAllowed(cfg.ApiServer.AdvertiseAddress, cfg.Network.ClusterNetwork, cfg.Network.ServiceNetwork, namedCertsCfg.CertPath, namedCertsCfg.Names)
+			certAllowed, err := util.IsCertAllowed(cfg.ApiServer.AdvertiseAddresses[0], cfg.Network.ClusterNetwork, cfg.Network.ServiceNetwork, namedCertsCfg.CertPath, namedCertsCfg.Names)
 			if err != nil {
 				klog.Warningf("Failed to read NamedCertificate from %s - ignoring: %v", namedCertsCfg.CertPath, err)
 				continue
