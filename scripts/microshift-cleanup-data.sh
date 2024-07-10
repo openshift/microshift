@@ -112,8 +112,9 @@ function clean_processes() {
 
 function clean_data() {
     if ${FULL_CLEAN} ; then
-        echo Removing MicroShift configuration
+        echo Removing MicroShift data
         rm -rf /var/lib/microshift
+        rm -rf /var/lib/kubelet
     elif ${CERT_CLEAN} ; then
         echo Removing MicroShift certificates
         rm -rf /var/lib/microshift/certs
