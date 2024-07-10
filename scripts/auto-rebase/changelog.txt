@@ -1,5 +1,0 @@
-- cluster-kube-apiserver-operator embedded-component 4302637f4d521bd9880de93df6bc41d44a4b0756 to 1fe5769f9c30c79140484b11340f40e5208b5d2c
-  - 2b4152a 2024-06-20T13:26:59+04:00 Revert "Add sno section to alert description"
-  - 0fefd5e 2024-06-20T13:26:55+04:00 add highcpuusagesnoalertcontroller tests
-  - 73c8f4f 2024-06-20T13:26:18+04:00 add SNO control plane high cpu usage alert
-
