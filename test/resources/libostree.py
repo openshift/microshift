@@ -178,7 +178,7 @@ def write_greenboot_microshift_wait_timeout(seconds: int) -> None:
 
 
 def remove_greenboot_microshift_wait_timeout() -> None:
-    remote_sudo("rm /etc/greenboot/greenboot.conf")
+    remote_sudo("sudo sed -i '/^MICROSHIFT_WAIT_TIMEOUT_SEC=/d' /etc/greenboot/greenboot.conf")
 
 
 def no_transaction_in_progress() -> None:
