@@ -1,21 +1,19 @@
-- machine-config-operator embedded-component 8c4afe087d64b028fdc16df24204fe4f7f7e6127 to 73d5f16fdc96f3d7a4bc87edc77d394e53a8bb9c
-  - 4b0db3fb 2024-07-04T03:32:50+00:00 MCD-pull: run after network-online.target in Azure
+- machine-config-operator embedded-component 73d5f16fdc96f3d7a4bc87edc77d394e53a8bb9c to 1ec936b6519a118ba05617efbe338e4961c71e7f
+  - 65a94db4 2024-06-28T14:00:13+00:00 daemon: Handle correctly OS Version for 4.1 and 4.2 bootimages
 
-- oc image-amd64 e4cacc0be012b75a230f07e3902a1ede9a2ecba9 to 8c491baf99f880bd767cb325effbb35beeb47a6c
-  - 02ca8d32 2024-07-04T08:08:33+02:00 bump k8s version in the Makefile and Dockerfiles
-  - 2f3e536d 2024-07-03T14:37:55+02:00 Remove invalid test cases: empty dockerfiles are no longer allowed
-  - 4bcd2670 2024-07-03T14:37:14+02:00 Lower case command value before comparision
-  - 1f27c7ef 2024-07-02T15:08:41+02:00 bump(k8s)=1.29.6
+- operator-framework-olm embedded-component 555e529c944f9b8b93d2e4d9626e12de51f59854 to ee44d6cb5c16633f9787fc1135d70bd8561da0b6
+  - 6e9c9e83 2024-07-08T11:46:29-05:00 Update operator-framework-tools.Dockerfile
+  - dfa5e458 2024-07-08T11:45:54-05:00 Update operator-framework-tools.Dockerfile
+  - 345509bb 2024-07-03T13:31:04-05:00 don't erase the filesystem from the base
+  - ea1b9438 2024-07-03T13:31:04-05:00 switch base image
+  - 782e7f82 2024-06-24T22:51:05-04:00 [OCPBUGS-34173]: fix sorting unpack jobs (#3299)
+  - b29ba37e 2024-06-24T07:33:39-05:00 UPSTREAM: <carry>: fix xplat compile for of-tools image; hide utest files from git; use rhel8 art builder image
+  - 096fed55 2024-06-17T12:53:57+02:00 remove default value of catsrc.spec.grpcPodConfig.securityContextConfig (#342)
+  - b2ba330c 2024-06-17T12:52:23+02:00 OCPBUGS-29729: Updates default security context behavior for catalog source pods (#3206)
 
-- ovn-kubernetes image-amd64 f80acd01c9a4106b0f9681181ed43f059986f4d9 to 7f412836bd26c3d6e9735552a7fd615e7e7e9695
-  - 147d4eee 2024-07-03T10:02:05+00:00 Fix race condition when creating/deleting namespace address set
+- oc image-amd64 8c491baf99f880bd767cb325effbb35beeb47a6c to 0127eb4d4f1131758ef39f445eba783eaf7b240f
+  - f3d5e4c2 2024-07-05T14:50:19+01:00 debug: set required-scc annotation to privileged for node debug pods
 
-- oc image-arm64 e4cacc0be012b75a230f07e3902a1ede9a2ecba9 to 8c491baf99f880bd767cb325effbb35beeb47a6c
-  - 02ca8d32 2024-07-04T08:08:33+02:00 bump k8s version in the Makefile and Dockerfiles
-  - 2f3e536d 2024-07-03T14:37:55+02:00 Remove invalid test cases: empty dockerfiles are no longer allowed
-  - 4bcd2670 2024-07-03T14:37:14+02:00 Lower case command value before comparision
-  - 1f27c7ef 2024-07-02T15:08:41+02:00 bump(k8s)=1.29.6
-
-- ovn-kubernetes image-arm64 f80acd01c9a4106b0f9681181ed43f059986f4d9 to 7f412836bd26c3d6e9735552a7fd615e7e7e9695
-  - 147d4eee 2024-07-03T10:02:05+00:00 Fix race condition when creating/deleting namespace address set
+- oc image-arm64 8c491baf99f880bd767cb325effbb35beeb47a6c to 0127eb4d4f1131758ef39f445eba783eaf7b240f
+  - f3d5e4c2 2024-07-05T14:50:19+01:00 debug: set required-scc annotation to privileged for node debug pods
 
