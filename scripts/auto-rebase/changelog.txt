@@ -1,5 +1,6 @@
-- cluster-kube-apiserver-operator embedded-component 4302637f4d521bd9880de93df6bc41d44a4b0756 to 1fe5769f9c30c79140484b11340f40e5208b5d2c
-  - 2b4152a 2024-06-20T13:26:59+04:00 Revert "Add sno section to alert description"
-  - 0fefd5e 2024-06-20T13:26:55+04:00 add highcpuusagesnoalertcontroller tests
-  - 73c8f4f 2024-06-20T13:26:18+04:00 add SNO control plane high cpu usage alert
+- cluster-network-operator embedded-component 9a032c35c32e05f7e88c4e8eacaed9bf3cce4037 to af36d54203155e32162bf3c5eb0b0ac3f75d32d7
+  - fb0c555 2024-07-09T10:46:28+02:00 [release-4.14] OCPBUGS-36722: update whereabouts crd
+
+- machine-config-operator embedded-component cee84af27d7c3684a1923094e713e317d27265f7 to ea6671e27ec6683aa986b7072b022f0393a0e15a
+  - b1ebe20c 2024-07-09T20:26:38+00:00 daemon: Handle correctly OS Version for 4.1 and 4.2 bootimages
 
