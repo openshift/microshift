@@ -16,7 +16,6 @@ cpu_online_offline() {
 
 start() {
     cpu_online_offline 0
-    # TODO /proc/sys/kernel/sched_rt_runtime_us=-1
 }
 
 stop() {
