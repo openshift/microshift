@@ -36,7 +36,7 @@ firewall_settings() {
         local vm_bridge
         local vm_bridge_cidr
         vm_bridge=$(sudo virsh net-info "${netname}" | grep '^Bridge:' | awk '{print $2}')
-        vm_bridge_cidr=$(ip -f inet addr show "${vm_bridge}" | grep inet | awk '{print $2}')
+        vm_bridge_cidr=$(ip addr show "${vm_bridge}" | grep inet | awk '{print $2}')
 
         sudo firewall-cmd --permanent --zone=trusted "--${action}-source"="${vm_bridge_cidr}"
         sudo firewall-cmd --permanent --zone=public  "--${action}-port"="${WEB_SERVER_PORT}/tcp"
