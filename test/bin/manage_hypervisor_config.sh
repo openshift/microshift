@@ -28,7 +28,7 @@ firewall_settings() {
 
     sudo firewall-cmd --permanent --zone=libvirt "--${action}-service=mdns"
 
-    for netname in default "${VM_ISOLATED_NETWORK}" "${VM_MULTUS_NETWORK}" ; do
+    for netname in default "${VM_ISOLATED_NETWORK}" "${VM_MULTUS_NETWORK}" "${VM_IPV6_NETWORK}"; do
         if ! sudo virsh net-info "${netname}" &>/dev/null ; then
             continue
         fi
@@ -79,6 +79,19 @@ action_create() {
         sudo virsh net-autostart "${VM_MULTUS_NETWORK}"
     fi
 
+    # IPv6 network
+    if ! sudo sudo virsh net-info "${VM_IPV6_NETWORK}" &>/dev/null ; then
+        local -r ipv6_netconfig_tmpl="${SCRIPTDIR}/../assets/ipv6-network.xml"
+        local -r ipv6_netconfig_file="${IMAGEDIR}/infra/ipv6-network.xml"
+
+        mkdir -p "$(dirname "${ipv6_netconfig_file}")"
+        envsubst <"${ipv6_netconfig_tmpl}" >"${ipv6_netconfig_file}"
+
+        sudo virsh net-define    "${ipv6_netconfig_file}"
+        sudo virsh net-start     "${VM_IPV6_NETWORK}"
+        sudo virsh net-autostart "${VM_IPV6_NETWORK}"
+    fi
+
     # Firewall
     firewall_settings "add"
 }
@@ -91,6 +104,11 @@ action_cleanup() {
     if sudo virsh net-info "${VM_ISOLATED_NETWORK}" &>/dev/null ; then
         sudo virsh net-destroy "${VM_ISOLATED_NETWORK}"
         sudo virsh net-undefine "${VM_ISOLATED_NETWORK}"
+    fi
+
+    if sudo virsh net-info "${VM_IPV6_NETWORK}" &>/dev/null ; then
+        sudo virsh net-destroy "${VM_IPV6_NETWORK}"
+        sudo virsh net-undefine "${VM_IPV6_NETWORK}"
     fi
 
     # Storage pool

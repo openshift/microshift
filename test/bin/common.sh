@@ -36,6 +36,10 @@ export VM_ISOLATED_NETWORK="isolated"
 # shellcheck disable=SC2034  # used elsewhere
 export VM_MULTUS_NETWORK="multus"
 
+# Libvirt network for IPv6 tests
+# shellcheck disable=SC2034  # used elsewhere
+export VM_IPV6_NETWORK="ipv6"
+
 # Location of RPMs built from source
 # shellcheck disable=SC2034  # used elsewhere
 RPM_SOURCE="${OUTPUTDIR}/rpmbuild"
