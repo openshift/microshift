@@ -1,19 +1,4 @@
-- machine-config-operator embedded-component 73d5f16fdc96f3d7a4bc87edc77d394e53a8bb9c to 1ec936b6519a118ba05617efbe338e4961c71e7f
-  - 65a94db4 2024-06-28T14:00:13+00:00 daemon: Handle correctly OS Version for 4.1 and 4.2 bootimages
-
-- operator-framework-olm embedded-component 555e529c944f9b8b93d2e4d9626e12de51f59854 to ee44d6cb5c16633f9787fc1135d70bd8561da0b6
-  - 6e9c9e83 2024-07-08T11:46:29-05:00 Update operator-framework-tools.Dockerfile
-  - dfa5e458 2024-07-08T11:45:54-05:00 Update operator-framework-tools.Dockerfile
-  - 345509bb 2024-07-03T13:31:04-05:00 don't erase the filesystem from the base
-  - ea1b9438 2024-07-03T13:31:04-05:00 switch base image
-  - 782e7f82 2024-06-24T22:51:05-04:00 [OCPBUGS-34173]: fix sorting unpack jobs (#3299)
-  - b29ba37e 2024-06-24T07:33:39-05:00 UPSTREAM: <carry>: fix xplat compile for of-tools image; hide utest files from git; use rhel8 art builder image
-  - 096fed55 2024-06-17T12:53:57+02:00 remove default value of catsrc.spec.grpcPodConfig.securityContextConfig (#342)
-  - b2ba330c 2024-06-17T12:52:23+02:00 OCPBUGS-29729: Updates default security context behavior for catalog source pods (#3206)
-
-- oc image-amd64 8c491baf99f880bd767cb325effbb35beeb47a6c to 0127eb4d4f1131758ef39f445eba783eaf7b240f
-  - f3d5e4c2 2024-07-05T14:50:19+01:00 debug: set required-scc annotation to privileged for node debug pods
-
-- oc image-arm64 8c491baf99f880bd767cb325effbb35beeb47a6c to 0127eb4d4f1131758ef39f445eba783eaf7b240f
-  - f3d5e4c2 2024-07-05T14:50:19+01:00 debug: set required-scc annotation to privileged for node debug pods
+- operator-framework-olm embedded-component ee44d6cb5c16633f9787fc1135d70bd8561da0b6 to f4eac4271317504fcdeaf45fcf30bb01b1cd8bb0
+  - ea03cd9a 2024-07-02T10:44:16-07:00 Unpack Job Creation Failure Test (#3297)
+  - 00690e8f 2024-07-02T10:44:02-07:00 Fix: Ensure jobs without unpack label are considered (#3262)
 
