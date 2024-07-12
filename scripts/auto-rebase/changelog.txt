@@ -1,6 +1,3 @@
-- cluster-network-operator embedded-component 9a032c35c32e05f7e88c4e8eacaed9bf3cce4037 to af36d54203155e32162bf3c5eb0b0ac3f75d32d7
-  - fb0c555 2024-07-09T10:46:28+02:00 [release-4.14] OCPBUGS-36722: update whereabouts crd
-
-- machine-config-operator embedded-component cee84af27d7c3684a1923094e713e317d27265f7 to ea6671e27ec6683aa986b7072b022f0393a0e15a
-  - b1ebe20c 2024-07-09T20:26:38+00:00 daemon: Handle correctly OS Version for 4.1 and 4.2 bootimages
+- ovn-kubernetes image-arm64 bdc67edd064afc3519c4780f43c1c3837cd4143f to 19a46c84a3c26ba43d227c972952226d53eca67c
+  - 6bc9b92 2024-07-09T11:31:25+00:00 Bump ovn to 23.09.4-16.
 
