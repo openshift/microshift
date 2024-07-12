@@ -164,11 +164,21 @@ get_vm_bridge_ip() {
         return
     fi
 
+    ip=$(ip -f inet addr show "${bridge}" | grep inet)
+    if [ -z $ip ]; then
+      ip=$(ip -f inet6 addr show "${bridge}" | grep global)
+    fi
     # $ ip -f inet addr show virbr0
     # 10: virbr0: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc noqueue state DOWN group default qlen 1000
     #     inet 192.168.122.1/24 brd 192.168.122.255 scope global virbr0
     #        valid_lft forever preferred_lft forever
-    ip -f inet addr show "${bridge}" | grep inet | awk '{print $2}' | cut -d/ -f1
+    # $ ip -f inet6 addr show virbr1
+    # 14: virbr1: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc noqueue state DOWN group default qlen 1000
+    #     inet6 2001:db8:dead:beef:fe::1/96 scope global
+    #        valid_lft forever preferred_lft forever
+    #     inet6 fe80::5054:ff:fe02:7e12/64 scope link proto kernel_ll
+    #        valid_lft forever preferred_lft forever
+    echo "${ip}" | awk '{print $2}' | cut -d/ -f1
 }
 
 # The IP address of the current host on the bridge used for the
