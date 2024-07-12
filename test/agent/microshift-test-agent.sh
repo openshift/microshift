@@ -109,10 +109,18 @@ EOF
 # problem with groups. Following line ensures that sshd's keys are owned by
 # ssh_keys group and not some other.
 # When removing, change Before= in microshift-test-agent.service
-chown -v root:ssh_keys /etc/ssh/ssh_host*key
+if [ -d /etc/ssh ] ; then
+    find /etc/ssh -name 'ssh_host*key' -exec chown -v root:ssh_keys {} \;
+else
+    echo "The /etc/ssh directory does not exist, skipping file ownership update"
+fi
 # WORKAROUND END
 
 _debug_info
+
+if [ ! -f "${AGENT_CFG}" ] ; then
+    exit 0
+fi
 
 current_boot="$(_get_current_boot_number)"
 current_deployment_id=$(rpm-ostree status --booted --json | jq -r ".deployments[0].id")

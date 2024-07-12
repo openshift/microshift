@@ -21,11 +21,11 @@ RUN [ ! -L /var/run ] && rm -rf /var/run && ln -s /run /var/
 # Add the following repositories and print their contents:
 # - MicroShift local RPM repository
 # - OpenShift previous minor version RHEL repositories for MicroShift dependencies
-# Install MicroShift, few helper utilities and cleanup
+# Install MicroShift, test agent, a few helper utilities and cleanup
 RUN ${REPO_CONFIG_SCRIPT} -create ${USHIFT_RPM_REPO_PATH} && \
     awk 'FNR==1 {print "=== " FILENAME " ==="} {print}' /etc/yum.repos.d/*.repo && \
-    dnf install -y vi firewalld microshift && \
-    systemctl enable microshift && \
+    dnf install -y vi firewalld microshift microshift-test-agent && \
+    systemctl enable microshift microshift-test-agent && \
     ${REPO_CONFIG_SCRIPT} -delete && \
     rm -f ${REPO_CONFIG_SCRIPT} && \
     rm -rf $USHIFT_RPM_REPO_PATH && \
