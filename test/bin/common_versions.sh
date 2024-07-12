@@ -9,7 +9,7 @@ get_vrel_from_beta() {
             --queryformat '%{version}-%{release}' \
             --disablerepo '*' \
             --repofrompath "this,${beta_repo}" \
-            --latest-limit 1 \
+            --latest-limit 1 2>/dev/null \
         )
     if [ -n "${beta_vrel}" ]; then
         echo "${beta_vrel}"
@@ -25,7 +25,7 @@ get_vrel_from_rhsm() {
             --quiet \
             --queryformat '%{version}-%{release}' \
             --repo "${rhsm_repo}" \
-            --latest-limit 1 \
+            --latest-limit 1 2>/dev/null \
         )
     if [ -n "${rhsm_vrel}" ]; then
         echo "${rhsm_vrel}"
