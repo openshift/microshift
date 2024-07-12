@@ -367,6 +367,7 @@ install -p -m644 packaging/tuned/runtime-class/kustomization.yaml %{buildroot}/%
 install -p -m644 packaging/crio.conf.d/05-high-performance-runtime.conf %{buildroot}%{_sysconfdir}/crio/crio.conf.d/05-high-performance-runtime.conf
 install -p -m644 packaging/tuned/microshift-tuned.service %{buildroot}%{_unitdir}/microshift-tuned.service
 install -p -m755 packaging/tuned/microshift-tuned.py %{buildroot}%{_bindir}/microshift-tuned
+install -p -m644 packaging/tuned/microshift-cleanup-kubelet.service %{buildroot}%{_unitdir}/microshift-cleanup-kubelet.service
 
 %pre networking
 
@@ -501,6 +502,7 @@ fi
 %config(noreplace) %{_sysconfdir}/tuned/microshift-baseline-variables.conf
 %{_sysconfdir}/crio/crio.conf.d/05-high-performance-runtime.conf
 %{_unitdir}/microshift-tuned.service
+%{_unitdir}/microshift-cleanup-kubelet.service
 %{_bindir}/microshift-tuned
 %{_prefix}/lib/microshift/manifests.d/002-microshift-low-latency/runtime-class.yaml
 %{_prefix}/lib/microshift/manifests.d/002-microshift-low-latency/kustomization.yaml
