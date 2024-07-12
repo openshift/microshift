@@ -25,6 +25,7 @@ import (
 	"strings"
 	"text/template"
 
+	"gopkg.in/yaml.v2"
 	"k8s.io/klog/v2"
 
 	embedded "github.com/openshift/microshift/assets"
@@ -92,17 +93,31 @@ func (s *KubeletServer) configure(cfg *config.Config) {
 }
 
 func (s *KubeletServer) writeConfig(cfg *config.Config) error {
+	data, err := s.generateConfig(cfg)
+	if err != nil {
+		return err
+	}
+
+	path := filepath.Join(config.DataDir, "resources", "kubelet", "config", "config.yaml")
+	if err := os.MkdirAll(filepath.Dir(path), os.FileMode(0700)); err != nil {
+		return fmt.Errorf("failed to create dir %q: %w", path, err)
+	}
+
+	return os.WriteFile(path, data, 0400)
+}
+
+func (s *KubeletServer) generateConfig(cfg *config.Config) ([]byte, error) {
 	certsDir := cryptomaterial.CertsDirectory(config.DataDir)
 	servingCertDir := cryptomaterial.KubeletServingCertDir(certsDir)
 
 	tplData, err := embedded.Asset("core/kubelet.yaml")
 	if err != nil {
-		return fmt.Errorf("loading kubelet.yaml asset failed: %w", err)
+		return nil, fmt.Errorf("loading kubelet.yaml asset failed: %w", err)
 	}
 
 	tpl, err := template.New("").Option("missingkey=error").Parse(string(tplData))
 	if err != nil {
-		return fmt.Errorf("creating a template for kubelet config failed: %w", err)
+		return nil, fmt.Errorf("creating a template for kubelet config failed: %w", err)
 	}
 
 	resolvConf := ""
@@ -112,25 +127,31 @@ func (s *KubeletServer) writeConfig(cfg *config.Config) error {
 		resolvConf = config.DefaultSystemdResolvedFile
 	}
 
+	userProvidedConfig := ""
+	if cfg.Kubelet != nil {
+		b, err := yaml.Marshal(cfg.Kubelet)
+		if err != nil {
+			return nil, fmt.Errorf("failed to re-marshal user provided kubelet config: %w", err)
+		}
+		userProvidedConfig = string(b)
+	}
+
 	tplParams := map[string]string{
-		"clientCAFile":      cryptomaterial.KubeletClientCAPath(cryptomaterial.CertsDirectory(config.DataDir)),
-		"tlsCertFile":       cryptomaterial.ServingCertPath(servingCertDir),
-		"tlsPrivateKeyFile": cryptomaterial.ServingKeyPath(servingCertDir),
-		"volumePluginDir":   config.DataDir + "/kubelet-plugins/volume/exec",
-		"clusterDNSIP":      cfg.Network.DNS,
-		"resolvConf":        resolvConf,
+		"clientCAFile":       cryptomaterial.KubeletClientCAPath(cryptomaterial.CertsDirectory(config.DataDir)),
+		"tlsCertFile":        cryptomaterial.ServingCertPath(servingCertDir),
+		"tlsPrivateKeyFile":  cryptomaterial.ServingKeyPath(servingCertDir),
+		"volumePluginDir":    config.DataDir + "/kubelet-plugins/volume/exec",
+		"clusterDNSIP":       cfg.Network.DNS,
+		"resolvConf":         resolvConf,
+		"userProvidedConfig": userProvidedConfig,
 	}
 
 	var data bytes.Buffer
 	if err := tpl.Execute(&data, tplParams); err != nil {
-		return fmt.Errorf("templating kubelet config failed: %w", err)
+		return nil, fmt.Errorf("templating kubelet config failed: %w", err)
 	}
 
-	path := filepath.Join(config.DataDir, "resources", "kubelet", "config", "config.yaml")
-	if err := os.MkdirAll(filepath.Dir(path), os.FileMode(0700)); err != nil {
-		return fmt.Errorf("failed to create dir %q: %w", path, err)
-	}
-	return os.WriteFile(path, data.Bytes(), 0400)
+	return data.Bytes(), nil
 }
 
 func (s *KubeletServer) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
