@@ -1,5 +1,5 @@
-name = "rhel-9.4-microshift-4.{{ .Env.PREVIOUS_MINOR_VERSION }}"
-description = "RHEL 9.4 with MicroShift from the previous minor version (y-stream) installed."
+name = "rhel-9.4-microshift-4.{{ .Env.YMINUS2_MINOR_VERSION }}"
+description = "RHEL 9.4 with MicroShift from two minor versions back installed."
 version = "0.0.1"
 modules = []
 groups = []
@@ -7,19 +7,19 @@ distro = "rhel-94"
 
 [[packages]]
 name = "microshift"
-version = "{{ .Env.PREVIOUS_RELEASE_VERSION }}*"
+version = "{{ .Env.YMINUS2_RELEASE_VERSION }}*"
 
 [[packages]]
 name = "microshift-greenboot"
-version = "{{ .Env.PREVIOUS_RELEASE_VERSION }}*"
+version = "{{ .Env.YMINUS2_RELEASE_VERSION }}*"
 
 [[packages]]
 name = "microshift-networking"
-version = "{{ .Env.PREVIOUS_RELEASE_VERSION }}*"
+version = "{{ .Env.YMINUS2_RELEASE_VERSION }}*"
 
 [[packages]]
 name = "microshift-selinux"
-version = "{{ .Env.PREVIOUS_RELEASE_VERSION }}*"
+version = "{{ .Env.YMINUS2_RELEASE_VERSION }}*"
 
 [[packages]]
 name = "microshift-test-agent"
