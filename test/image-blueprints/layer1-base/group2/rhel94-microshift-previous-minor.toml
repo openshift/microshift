@@ -25,6 +25,12 @@ version = "{{ .Env.PREVIOUS_RELEASE_VERSION }}*"
 name = "microshift-test-agent"
 version = "*"
 
+# The bootc package is required for testing upgrades
+# from ostree to bootc images
+[[packages]]
+name = "bootc"
+version = "*"
+
 [customizations.services]
 enabled = ["microshift", "microshift-test-agent"]
 

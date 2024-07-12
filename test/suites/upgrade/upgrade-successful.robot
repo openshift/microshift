@@ -13,9 +13,6 @@ Test Tags           ostree
 
 
 *** Variables ***
-${USHIFT_HOST}      ${EMPTY}
-${USHIFT_USER}      ${EMPTY}
-
 ${TARGET_REF}       ${EMPTY}
 
 
@@ -24,17 +21,13 @@ Upgrade
     [Documentation]    Performs an upgrade to given reference
     ...    and verifies if it was successful, with SELinux validation
 
-    MicroShift 413 Should Not Have Upgrade Artifacts
     Wait Until Greenboot Health Check Exited
 
     ${future_backup}=    Get Future Backup Name For Current Boot
     Deploy Commit Not Expecting A Rollback    ${TARGET_REF}
     Backup Should Exist    ${future_backup}
 
-    # Upgrade from 4.13 is not officially supported, skipping due to failure in relabeling
-    IF    "${future_backup}" != "4.13"
-        Validate SELinux With Backup    ${future_backup}
-    END
+    Validate SELinux With Backup    ${future_backup}
 
 
 *** Keywords ***
