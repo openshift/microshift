@@ -1,16 +1,3 @@
-- cluster-kube-apiserver-operator embedded-component b0eea1220af097c61241ebe221af4c220d72f0b7 to 0afad8a00186e1e7a2712e9addf026e17b8cd950
-  - 4a87330 2024-06-11T18:44:12+00:00 manifests: add ownership annotation for kubelet-bootstrap-kubeconfig
-
-- cluster-network-operator embedded-component e2f42540a5cbde654ef1b2535b1a6afc1fc7ab29 to dc0ef57c8512a150435226f5774a0f2263b0080b
-  - 225a3f0 2024-06-19T16:10:34+00:00 improve error handling of multus deployment not being found
-  - 7be191d 2024-06-19T16:10:34+00:00 Propogate hypershift priority class override to multus and preserve container requests
-
-- machine-config-operator embedded-component 1ec936b6519a118ba05617efbe338e4961c71e7f to d70a17fc8fee26d27c0624522f000504838f4b22
-  - f8d9102e 2024-07-09T20:05:49+00:00 templates: run disable-mglru conditionally
-
-- oc image-amd64 0127eb4d4f1131758ef39f445eba783eaf7b240f to fa846511dbeb7e08cf77265056397283c6c896f9
-  - c90b3546 2024-07-09T15:57:20+00:00 pkg/cli/admin/upgrade/rollback: Drop this command
-
-- oc image-arm64 0127eb4d4f1131758ef39f445eba783eaf7b240f to fa846511dbeb7e08cf77265056397283c6c896f9
-  - c90b3546 2024-07-09T15:57:20+00:00 pkg/cli/admin/upgrade/rollback: Drop this command
+- cluster-ingress-operator embedded-component 9eae38dce9615897991a3b0b1f73e2cdb33b7f8e to af5d3f6c171354c387e0cfc901110a7211715e9b
+  - 2929231 2024-07-02T20:22:22-04:00 Delete & recreate canary route to clear spec.host
 
