@@ -51,6 +51,10 @@ type Config struct {
 	Manifests Manifests     `json:"manifests"`
 	Ingress   IngressConfig `json:"ingress"`
 
+	// Settings specified in this section are transferred as-is into the Kubelet config.
+	// +kubebuilder:validation:Schemaless
+	Kubelet map[string]any `json:"kubelet"`
+
 	// Internal-only fields
 	userSettings *Config `json:"-"` // the values read from the config file
 
@@ -151,6 +155,7 @@ func (c *Config) fillDefaults() error {
 	}
 
 	c.MultiNode.Enabled = false
+	c.Kubelet = nil
 
 	return nil
 }
@@ -254,6 +259,10 @@ func (c *Config) incorporateUserSettings(u *Config) {
 
 	if len(u.ApiServer.NamedCertificates) != 0 {
 		c.ApiServer.NamedCertificates = u.ApiServer.NamedCertificates
+	}
+
+	if u.Kubelet != nil {
+		c.Kubelet = u.Kubelet
 	}
 }
 
@@ -392,7 +401,7 @@ func (c *Config) validate() error {
 	}
 
 	if len(c.Ingress.ListenAddress) != 0 {
-		if err := validateRouterListenAddress(c.Ingress.ListenAddress, c.ApiServer.AdvertiseAddress, c.ApiServer.SkipInterface); err != nil {
+		if err := validateRouterListenAddress(c.Ingress.ListenAddress, c.ApiServer.AdvertiseAddress, c.ApiServer.SkipInterface, c.IsIPv4(), c.IsIPv6()); err != nil {
 			return fmt.Errorf("error validating ingress.listenAddress: %w", err)
 		}
 	}
@@ -476,8 +485,8 @@ func checkAdvertiseAddressConfigured(advertiseAddress string) error {
 	return fmt.Errorf("Advertise address: %s not present in any interface", advertiseAddress)
 }
 
-func validateRouterListenAddress(ingressListenAddresses []string, advertiseAddress string, skipInterface bool) error {
-	addresses, err := AllowedListeningIPAddresses()
+func validateRouterListenAddress(ingressListenAddresses []string, advertiseAddress string, skipInterface, ipv4, ipv6 bool) error {
+	addresses, err := AllowedListeningIPAddresses(ipv4, ipv6)
 	if err != nil {
 		return err
 	}
@@ -486,17 +495,21 @@ func validateRouterListenAddress(ingressListenAddresses []string, advertiseAddre
 		return err
 	}
 	for _, entry := range ingressListenAddresses {
-		if net.ParseIP(entry) != nil {
-			if entry == advertiseAddress && !skipInterface {
+		if entry == advertiseAddress && !skipInterface {
+			continue
+		}
+		ip := net.ParseIP(entry)
+		if ip == nil {
+			if slices.Contains(nicNames, entry) {
 				continue
 			}
-			if !slices.Contains(addresses, entry) {
-				return fmt.Errorf("IP %v not present in any of the host's interfaces", entry)
-			}
-		} else if slices.Contains(nicNames, entry) {
-			continue
-		} else {
 			return fmt.Errorf("interface %v not present in the host", entry)
+		}
+		if (ip.To4() != nil && !ipv4) || (ip.To4() == nil && !ipv6) {
+			return fmt.Errorf("IP %v does not match family of service/cluster network", entry)
+		}
+		if !slices.Contains(addresses, entry) {
+			return fmt.Errorf("IP %v not present in any of the host's interfaces", entry)
 		}
 	}
 	return nil
@@ -514,7 +527,7 @@ func getForbiddenIPs() ([]*net.IPNet, error) {
 	return banned, nil
 }
 
-func getHostAddresses() ([]net.IP, error) {
+func getHostAddresses(ipv4, ipv6 bool) ([]net.IP, error) {
 	handle, err := netlink.NewHandle()
 	if err != nil {
 		return nil, err
@@ -523,13 +536,20 @@ func getHostAddresses() ([]net.IP, error) {
 	if err != nil {
 		return nil, err
 	}
+	family := netlink.FAMILY_V4
+	if ipv6 {
+		family = netlink.FAMILY_ALL
+		if !ipv4 {
+			family = netlink.FAMILY_V6
+		}
+	}
 	addresses := make([]net.IP, 0, len(links)*2)
 	for _, link := range links {
 		// Filter out slave NICs. These include ovs/ovn created interfaces, in case of a restart.
 		if link.Attrs().ParentIndex != 0 || link.Attrs().MasterIndex != 0 {
 			continue
 		}
-		addressList, err := handle.AddrList(link, netlink.FAMILY_ALL)
+		addressList, err := handle.AddrList(link, family)
 		if err != nil {
 			return nil, err
 		}
@@ -540,12 +560,12 @@ func getHostAddresses() ([]net.IP, error) {
 	return addresses, nil
 }
 
-func AllowedListeningIPAddresses() ([]string, error) {
+func AllowedListeningIPAddresses(ipv4, ipv6 bool) ([]string, error) {
 	bannedAddresses, err := getForbiddenIPs()
 	if err != nil {
 		return nil, err
 	}
-	hostAddresses, err := getHostAddresses()
+	hostAddresses, err := getHostAddresses(ipv4, ipv6)
 	if err != nil {
 		return nil, err
 	}
