@@ -165,7 +165,7 @@ get_vm_bridge_ip() {
     fi
 
     ip=$(ip -f inet addr show "${bridge}" | grep inet)
-    if [ -z $ip ]; then
+    if [ -z "${ip}" ]; then
       ip=$(ip -f inet6 addr show "${bridge}" | grep global)
     fi
     # $ ip -f inet addr show virbr0
