@@ -615,11 +615,14 @@ update_openshift_manifests() {
     # Sort the document, except for kind and apiVersion
     yq -i 'sort_keys(..) | pick((["kind","apiVersion"] + keys) | unique)' "${REPOROOT}/assets/core/kubelet.yaml"
 
-    # Add optional resolvConf
+    # Add optional resolvConf & userProvidedConfig
     cat << 'EOF' >> "${REPOROOT}/assets/core/kubelet.yaml"
 {{- if .resolvConf }}
 resolvConf: "{{ .resolvConf }}"
 {{- end }}
+{{ if .userProvidedConfig }}
+{{- .userProvidedConfig -}}
+{{ end }}
 EOF
 
     #-- OpenShift control plane ---------------------------
