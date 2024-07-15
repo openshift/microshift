@@ -1,29 +1,35 @@
-- api embedded-component 329ea37556495281bb92beae131a449e798a4380 to 465787efd0d69f12beaad9410a3812d823e78c2b
-  - 2cc2fb7 2024-07-08T14:42:19-04:00 NE-1530: IngressController LB Subnet Selection in AWS
+- api embedded-component 465787efd0d69f12beaad9410a3812d823e78c2b to 40c9497c12f4ce70515787dfc8db63f0d22e97b7
+  - 41fc031 2024-07-03T14:18:02-04:00 Rename Dockerfile
 
-- cluster-ingress-operator embedded-component a5b1a32aa89bf183341aae32b2134a36513ad358 to f0722916474a5ca78ba8e14fafc793988be14850
-  - 1ae7e8c 2024-07-02T19:47:50-04:00 Delete & recreate canary route to clear spec.host
+- cluster-ingress-operator embedded-component f0722916474a5ca78ba8e14fafc793988be14850 to defe53fbbdbaff8ecbbe562acef92e4b4a596f61
+  - a2f440d 2024-07-03T15:01:41+01:00 Fix status message for SyncLoadBalancerFailed condition
 
-- cluster-kube-apiserver-operator embedded-component a88d4ae8e0a9c8d3457e8488d9da7f04680240d3 to 890ef6e36bc331247d64c3d2a34619eb8e604e54
-  - d6e9553 2024-07-10T13:44:04+02:00 p/o/podsecurityreadinesscontroller: add disabled syncer
-  - acf9f46 2024-07-10T13:44:03+02:00 p/o/psreadinesscontroller: make ctrl owner aware
-  - 3e89c96 2024-07-04T16:46:51+02:00 p/o/psreadinesscontroller: minor refactoring
+- cluster-kube-apiserver-operator embedded-component 890ef6e36bc331247d64c3d2a34619eb8e604e54 to 0ecdda58434784dc1973a6f0d17a02cbbe2340d3
+  - e3a54c1 2024-07-11T15:26:41+02:00 nodekubeconfigcontroller: set ownership component for node kubeconfigs
 
-- machine-config-operator embedded-component 0f53196f6480481d3f5a04e217a143a56d4db79e to a1213dbb6b25f634494e17c7c30d9605558565be
-  - b16f1b50 2024-07-10T13:23:23-04:00 OCPBUGS-35436: Remove disable-mglru.service
-  - 42a2e797 2024-07-08T19:20:08-04:00 templates: run disable-mglru conditionally
-
-- operator-framework-olm embedded-component 6e34f41a6856ecc6b17129bd7d3370c0de1255d3 to 79f360bfe22a46a390f578a239f909f5faaf954c
-  - 79fd14fa 2024-07-11T00:03:16+00:00 mark flaky test as flaky (#3340)
-  - e84d34d6 2024-07-10T00:03:31+00:00 build(deps): bump golang.org/x/net from 0.26.0 to 0.27.0 (#3341)
-
-- router image-amd64 4d9b8c4afa6cd89b41f4bd5e7c09ccddd8679bc6 to a7313722c6e0541fcc00e92c459dd5d32a4a1534
-  - 4b3e265 2024-05-25T18:01:19+00:00 Updating openshift-enterprise-haproxy-router-container image to be consistent with ART for 4.17 Reconciling with https://github.com/openshift/ocp-build-data/tree/4c1326094222f9209876f06833179a1b9178faf7/images/openshift-enterprise-haproxy-router.yml
-  - 889bddf 2024-05-25T13:14:15+00:00 Updating ose-haproxy-router-base-container image to be consistent with ART for 4.17 Reconciling with https://github.com/openshift/ocp-build-data/tree/4c1326094222f9209876f06833179a1b9178faf7/images/ose-haproxy-router-base.yml
-
-- router image-arm64 467f906b561be9faa422b30339a7a3d939782a67 to a7313722c6e0541fcc00e92c459dd5d32a4a1534
-  - 889bddf 2024-05-25T13:14:15+00:00 Updating ose-haproxy-router-base-container image to be consistent with ART for 4.17 Reconciling with https://github.com/openshift/ocp-build-data/tree/4c1326094222f9209876f06833179a1b9178faf7/images/ose-haproxy-router-base.yml
-
-- kubernetes image-arm64 421e90ed9ef07c1a797386e662255dfb830a6b9f to 61de516d1eb19a8e392045f2e1dbcf3bf8e8580c
+- kubernetes embedded-component 421e90ed9ef07c1a797386e662255dfb830a6b9f to 61de516d1eb19a8e392045f2e1dbcf3bf8e8580c
   - 76b0e3eab 2024-07-09T18:12:04+02:00 UPSTREAM: <carry>: inject k8s version from hyperkube Dockerfile
+
+- machine-config-operator embedded-component a1213dbb6b25f634494e17c7c30d9605558565be to 6968535ff182ae863a5309558239df879359b8d6
+  - 1dccac4a 2024-07-11T10:53:04-05:00 msbic: add delete handlers for informers
+  - 0eef1e22 2024-07-11T09:58:27-05:00 e2e: add test for cluster operator degrade
+  - fb426474 2024-07-11T09:58:27-05:00 operator: degrade on msbic errors
+  - 84baed69 2024-07-11T09:58:27-05:00 msbic: add progress and error conditions
+  - 2a716897 2024-07-11T10:56:59+05:30 Revert "disable mglru service"
+  - 861d9aff 2024-07-10T17:19:18-04:00 OCPBUGS-36344: Add CIP relevant mirrors to sigstore attachement cfg
+  - 9e831db2 2024-07-01T11:41:54-05:00 msbic: remove workqueue and metrics, add helpers
+  - e33be1d6 2024-07-01T11:41:54-05:00 msbic: refactor fg detection
+
+- openshift-controller-manager embedded-component dc54a288f78e85e880ee37da2877629efd65c8c6 to 37f5f00b5afb1e5d28f2e62ff91d4977985ec603
+  - 19d9be4 2024-07-12T11:06:07+02:00 Revert "OCPBUGS-36833: 4.16 "Bad" reconciliation loops can cause unbounded dockercfg secret creation"
+  - a9519ba 2024-07-10T19:07:35-04:00 handle orphaned managed image pull secrets
+
+- oc image-amd64 a2e5b09d7d14b77c14f1b32550f8c5a0328e73b3 to 981134497d2996edf5097d3b58833bfe04cc86a7
+  - ae5cd8c9 2024-07-11T17:47:15-04:00 upgrade status: removes custom nodes from the worker pool
+
+- kubernetes image-amd64 421e90ed9ef07c1a797386e662255dfb830a6b9f to 61de516d1eb19a8e392045f2e1dbcf3bf8e8580c
+  - 76b0e3eab 2024-07-09T18:12:04+02:00 UPSTREAM: <carry>: inject k8s version from hyperkube Dockerfile
+
+- oc image-arm64 a2e5b09d7d14b77c14f1b32550f8c5a0328e73b3 to 981134497d2996edf5097d3b58833bfe04cc86a7
+  - ae5cd8c9 2024-07-11T17:47:15-04:00 upgrade status: removes custom nodes from the worker pool
 
