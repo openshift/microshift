@@ -5,9 +5,14 @@
 Instance type: c7i.metal-24xl
 
 ```sh
+export MANAGEMENT_CPUSET="0-5"
+export WORKLOAD_CPUSET="10-30"
+```
+
+```sh
 USHIFT_CFG="/etc/microshift/config.yaml"
 touch "${USHIFT_CFG}"
-cat << 'EOF' >> "${USHIFT_CFG}"
+cat << EOF >> "${USHIFT_CFG}"
 kubelet:
   cpuManagerPolicy: static
   cpuManagerPolicyOptions:
@@ -15,7 +20,7 @@ kubelet:
   cpuManagerReconcilePeriod: 5s
   memoryManagerPolicy: Static
   topologyManagerPolicy: single-numa-node
-  reservedSystemCPUs: 0-5
+  reservedSystemCPUs: $MANAGEMENT_CPUSET
   reservedMemory:
   - limits:
       memory: 1100Mi
@@ -43,8 +48,8 @@ EOF
 ```
 
 ```sh
-cat << 'EOF' > "/etc/tuned/microshift-baseline-variables.conf"
-isolated_cores=10-30
+cat << EOF > "/etc/tuned/microshift-baseline-variables.conf"
+isolated_cores = $WORKLOAD_CPUSET
 hugepages_size = 2M
 hugepages = 1000
 additional_args =
@@ -52,8 +57,25 @@ offline_cpu_set =
 EOF
 ```
 
-```
-echo -1 | sudo tee /proc/sys/kernel/sched_rt_runtime_us
+Below is part of Workload Partitioning setup which is necessary to achieve best results for low latency.
+```sh
+cat << EOF > /etc/crio/crio.conf.d/20-microshift-wp.conf
+[crio.runtime]
+infra_ctr_cpuset = "$MANAGEMENT_CPUSET"
+
+[crio.runtime.workloads.management]
+activation_annotation = "target.workload.openshift.io/management"
+annotation_prefix = "resources.workload.openshift.io"
+resources = { "cpushares" = 0, "cpuset" = "$MANAGEMENT_CPUSET" }
+EOF
+
+cat << EOF > /etc/kubernetes/openshift-workload-pinning
+{
+  "management": {
+    "cpuset": "$MANAGEMENT_CPUSET"
+  }
+}
+EOF
 ```
 
 ```sh
