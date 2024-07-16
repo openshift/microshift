@@ -72,7 +72,12 @@ function action_config() {
     # Necessary to allow remote connections in the virt-viewer application
     sudo usermod -a -G libvirt "$(whoami)"
 
-    sudo wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/bin/yq && sudo chmod +x /usr/bin/yq
+    binary="yq_linux_amd64"
+    if [ $(arch) == "aarch64" ]; then
+        binary="yq_linux_arm64"
+    fi
+
+    sudo wget https://github.com/mikefarah/yq/releases/latest/download/"${binary}" -O /usr/bin/yq && sudo chmod +x /usr/bin/yq
 }
 
 # Create the VM, if it does not exist
