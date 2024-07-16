@@ -251,6 +251,7 @@ install -p -m644 packaging/systemd/microshift.service %{buildroot}%{_unitdir}/mi
 install -d -m755 %{buildroot}/%{_sysconfdir}/microshift
 install -d -m755 %{buildroot}/%{_sysconfdir}/microshift/manifests
 install -d -m755 %{buildroot}/%{_sysconfdir}/microshift/manifests.d
+install -d -m755 %{buildroot}/%{_sysconfdir}/microshift/config.d
 install -p -m644 packaging/microshift/config.yaml %{buildroot}%{_sysconfdir}/microshift/config.yaml.default
 install -p -m644 packaging/microshift/lvmd.yaml %{buildroot}%{_sysconfdir}/microshift/lvmd.yaml.default
 install -p -m644 packaging/microshift/ovn.yaml %{buildroot}%{_sysconfdir}/microshift/ovn.yaml.default
@@ -413,6 +414,7 @@ fi
 %{_sysconfdir}/crio/crio.conf.d/10-microshift.conf
 %{_datadir}/microshift/spec/config-openapi-spec.json
 %dir %{_sysconfdir}/microshift
+%dir %{_sysconfdir}/microshift/config.d
 %dir %{_sysconfdir}/microshift/manifests
 %dir %{_sysconfdir}/microshift/manifests.d
 %config(noreplace) %{_sysconfdir}/microshift/config.yaml.default
@@ -478,6 +480,9 @@ fi
 # Use Git command to generate the log and replace the VERSION string
 # LANG=C git log --date="format:%a %b %d %Y" --pretty="tformat:* %cd %an <%ae> VERSION%n- %s%n" packaging/rpm/microshift.spec
 %changelog
+* Thu Jul 18 2024 Patryk Matuszak <pmatusza@redhat.com> 4.17.0
+- Support for config drop-in dir
+
 * Mon Jul 08 2024 Pablo Acevedo Montserrat <pacevedo@redhat.com> 4.17.0
 - Add NM configuration file
 
