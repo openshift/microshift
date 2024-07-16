@@ -73,10 +73,30 @@ Delete Thin Storage Pool
     Log    ${stderr}
     Should Be Equal As Integers    0    ${rc}
 
+Is System Bootc
+    [Documentation]    Returns true if system is bootc-based.
+
+    ${stdout}    ${stderr}    ${rc}=    SSHLibrary.Execute Command
+    ...    bootc status --booted --json
+    ...    sudo=True    return_stderr=True    return_stdout=True    return_rc=True
+    IF    ${rc} != 0    RETURN    ${FALSE}
+
+    ${json_status}=    Json Parse    ${stdout}
+    ${bootc_type}=    Set Variable    ${json_status}[status][type]
+    IF    '${bootc_type}' == 'bootcHost'
+        RETURN    ${TRUE}
+    ELSE
+        RETURN    ${FALSE}
+    END
+
 Is System OSTree
     [Documentation]    Returns true if system is ostree-based.
 
-    ${rc}=    Execute Command    stat /run/ostree-booted
+    # A bootc system should return False for the ostree check
+    ${is_bootc}=    Is System Bootc
+    IF    ${is_bootc} == ${TRUE}    RETURN    ${FALSE}
+
+    ${rc}=    SSHLibrary.Execute Command    stat /run/ostree-booted
     ...    sudo=True    return_stderr=False    return_stdout=False    return_rc=True
     IF    ${rc} == 0    RETURN    ${TRUE}    ELSE    RETURN    ${FALSE}
 
