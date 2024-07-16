@@ -392,7 +392,7 @@ func TestGetActiveConfigFromYAML(t *testing.T) {
 
 	for _, tt := range ttests {
 		t.Run(tt.name, func(t *testing.T) {
-			config, err := getActiveConfigFromYAML([]byte(tt.config))
+			config, err := getActiveConfigFromYAMLDropins([][]byte{[]byte(tt.config)})
 			// If we have any warnings, drop them. Use an empty array
 			// instead of nil so that we can differentiate between
 			// unexpected warnings (where we get an array instead of
@@ -418,6 +418,78 @@ func TestGetActiveConfigFromYAML(t *testing.T) {
 			}
 		})
 	}
+
+	t.Run("multiple-drop-ins", func(t *testing.T) {
+		dropins := [][]byte{
+			// Individual fields should be overwritten
+			[]byte(dedent(`
+            ingress:
+              ports:
+                http: 1234
+                https: 9876
+            `)),
+			[]byte(dedent(`
+            ingress:
+              ports:
+                http: 2345
+            `)),
+			[]byte(dedent(`
+            ingress:
+              ports:
+                https: 8765
+            `)),
+
+			// Arrays are overwritten completely (no addition)
+			[]byte(dedent(`
+            ingress:
+              listenAddress:
+                - eth1
+                - eth2
+            `)),
+			[]byte(dedent(`
+            ingress:
+              listenAddress:
+                - lo
+            `)),
+
+			// Even though kubelet is map[string]any, we want to merge individual settings
+			[]byte(dedent(`
+            kubelet:
+              cpuManagerPolicy: static
+              evictionHard:
+                imagefs.available: 15%
+                memory.available: 100Mi
+            `)),
+			[]byte(dedent(`
+            kubelet:
+              memoryManagerPolicy: Static
+              evictionHard:
+                nodefs.available: 10%
+                nodefs.inodesFree: 5%
+            `)),
+		}
+
+		expected := mkDefaultConfig()
+		expected.Ingress.Ports.Http = ptr.To[int](2345)
+		expected.Ingress.Ports.Https = ptr.To[int](8765)
+		expected.Ingress.ListenAddress = []string{"lo"}
+		expected.Kubelet = map[string]any{
+			"cpuManagerPolicy":    "static",
+			"memoryManagerPolicy": "Static",
+			"evictionHard": map[string]any{
+				"imagefs.available": "15%",
+				"memory.available":  "100Mi",
+				"nodefs.available":  "10%",
+				"nodefs.inodesFree": "5%",
+			},
+		}
+
+		config, err := getActiveConfigFromYAMLDropins(dropins)
+		assert.NoError(t, err)
+
+		config.userSettings = nil
+		assert.Equal(t, expected, config)
+	})
 }
 
 // Test the validation logic
