@@ -83,9 +83,10 @@ copy_file_to_vm() {
     local -r local_filename="$2"
     local -r remote_filename="$3"
 
-    local ip=$(get_vm_property "${vmname}" ip)
-    if [ "$ip" != "${ip#*:[0-9a-fA-F]}" ]; then
-      ip="[$ip]"
+    local ip
+    ip=$(get_vm_property "${vmname}" ip)
+    if [ "${ip}" != "${ip#*:[0-9a-fA-F]}" ]; then
+      ip="[${ip}]"
     fi
     local -r ssh_port=$(get_vm_property "${vmname}" ssh_port)
 
@@ -97,9 +98,10 @@ copy_file_from_vm() {
     local -r remote_filename="$2"
     local -r local_filename="$3"
 
-    local ip=$(get_vm_property "${vmname}" ip)
-    if [ "$ip" != "${ip#*:[0-9a-fA-F]}" ]; then
-      ip="[$ip]"
+    local ip
+    ip=$(get_vm_property "${vmname}" ip)
+    if [ "${ip}" != "${ip#*:[0-9a-fA-F]}" ]; then
+      ip="[${ip}]"
     fi
     local -r ssh_port=$(get_vm_property "${vmname}" ssh_port)
 

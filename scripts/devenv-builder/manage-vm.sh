@@ -73,7 +73,7 @@ function action_config() {
     sudo usermod -a -G libvirt "$(whoami)"
 
     binary="yq_linux_amd64"
-    if [ $(arch) == "aarch64" ]; then
+    if [ "$(arch)" == "aarch64" ]; then
         binary="yq_linux_arm64"
     fi
 
