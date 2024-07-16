@@ -1,35 +1,37 @@
-- api embedded-component 465787efd0d69f12beaad9410a3812d823e78c2b to 40c9497c12f4ce70515787dfc8db63f0d22e97b7
-  - 41fc031 2024-07-03T14:18:02-04:00 Rename Dockerfile
-
-- cluster-ingress-operator embedded-component f0722916474a5ca78ba8e14fafc793988be14850 to defe53fbbdbaff8ecbbe562acef92e4b4a596f61
-  - a2f440d 2024-07-03T15:01:41+01:00 Fix status message for SyncLoadBalancerFailed condition
-
-- cluster-kube-apiserver-operator embedded-component 890ef6e36bc331247d64c3d2a34619eb8e604e54 to 0ecdda58434784dc1973a6f0d17a02cbbe2340d3
-  - e3a54c1 2024-07-11T15:26:41+02:00 nodekubeconfigcontroller: set ownership component for node kubeconfigs
-
-- kubernetes embedded-component 421e90ed9ef07c1a797386e662255dfb830a6b9f to 61de516d1eb19a8e392045f2e1dbcf3bf8e8580c
-  - 76b0e3eab 2024-07-09T18:12:04+02:00 UPSTREAM: <carry>: inject k8s version from hyperkube Dockerfile
-
-- machine-config-operator embedded-component a1213dbb6b25f634494e17c7c30d9605558565be to 6968535ff182ae863a5309558239df879359b8d6
-  - 1dccac4a 2024-07-11T10:53:04-05:00 msbic: add delete handlers for informers
-  - 0eef1e22 2024-07-11T09:58:27-05:00 e2e: add test for cluster operator degrade
-  - fb426474 2024-07-11T09:58:27-05:00 operator: degrade on msbic errors
-  - 84baed69 2024-07-11T09:58:27-05:00 msbic: add progress and error conditions
-  - 2a716897 2024-07-11T10:56:59+05:30 Revert "disable mglru service"
-  - 861d9aff 2024-07-10T17:19:18-04:00 OCPBUGS-36344: Add CIP relevant mirrors to sigstore attachement cfg
-  - 9e831db2 2024-07-01T11:41:54-05:00 msbic: remove workqueue and metrics, add helpers
-  - e33be1d6 2024-07-01T11:41:54-05:00 msbic: refactor fg detection
-
-- openshift-controller-manager embedded-component dc54a288f78e85e880ee37da2877629efd65c8c6 to 37f5f00b5afb1e5d28f2e62ff91d4977985ec603
-  - 19d9be4 2024-07-12T11:06:07+02:00 Revert "OCPBUGS-36833: 4.16 "Bad" reconciliation loops can cause unbounded dockercfg secret creation"
-  - a9519ba 2024-07-10T19:07:35-04:00 handle orphaned managed image pull secrets
-
-- oc image-amd64 a2e5b09d7d14b77c14f1b32550f8c5a0328e73b3 to 981134497d2996edf5097d3b58833bfe04cc86a7
-  - ae5cd8c9 2024-07-11T17:47:15-04:00 upgrade status: removes custom nodes from the worker pool
-
-- kubernetes image-amd64 421e90ed9ef07c1a797386e662255dfb830a6b9f to 61de516d1eb19a8e392045f2e1dbcf3bf8e8580c
-  - 76b0e3eab 2024-07-09T18:12:04+02:00 UPSTREAM: <carry>: inject k8s version from hyperkube Dockerfile
-
-- oc image-arm64 a2e5b09d7d14b77c14f1b32550f8c5a0328e73b3 to 981134497d2996edf5097d3b58833bfe04cc86a7
-  - ae5cd8c9 2024-07-11T17:47:15-04:00 upgrade status: removes custom nodes from the worker pool
+- ovn-kubernetes image-arm64 1d4ea50a317fa4a1fd01122a6c2cab5e76b01e97 to 9168abf8a94cbd83a7fd53fc675fb42afea870ea
+  - 09af1c13 2024-07-11T20:20:51+02:00 udn: Skip non ovn nads
+  - 681f7cab 2024-07-11T11:18:32+02:00 Always enable global IPv6 forwarding
+  - 425a328c 2024-07-10T12:58:03-07:00 helm: Add conditional image pull secrets to Helm charts
+  - 5f1939cf 2024-07-10T18:11:06+02:00 e2e, udn: use different network name per test
+  - e3dfb5be 2024-07-10T18:11:06+02:00 udn, e2e: remove manual subnet exclusion from tests
+  - 062b6947 2024-07-10T18:11:06+02:00 Revert "Merge pull request #4509 from maiqueb/auto-exclude-ips-for-user-defined-primary-nets"
+  - 0337d03e 2024-07-10T18:11:05+02:00 multi-homing, tests: secondary L2 nets do not auto-reserve IPs
+  - 429b8918 2024-07-10T18:07:43+02:00 udn, layer2: auto-exclude GW and mgmt port ips on cluster manager
+  - 8a67b3e1 2024-07-10T12:43:00+02:00 test: Integrate mockery to Makefile
+  - d255e693 2024-07-09T16:27:13+02:00 udn, e2e: add comments explaining which ls manager to use
+  - acdd53f0 2024-07-09T16:08:20+02:00 udn, e2e: sort out imports
+  - 1df15c4b 2024-07-09T16:07:11+02:00 udn, e2e: remove manual exlusion from e2e tests
+  - 6697cbab 2024-07-09T15:58:12+02:00 udn, layer2: auto-exclude GW and mp0 IPs from the subnet
+  - 1ec48b5c 2024-07-09T15:01:57+02:00 Add a readinessProbe to the NetworkSegmentation isolation test
+  - 2584d304 2024-07-09T14:23:06+02:00 ovn: Add mgmt port to L2 segmented networks.
+  - 58270d70 2024-07-09T12:07:21+02:00 ovn: Add mgmt port to L3 segmented networks.
+  - 4460f9c3 2024-07-09T12:07:21+02:00 bnc: Move syncNodeManagementPort() to the base network controller.
+  - dab68a2d 2024-07-08T22:24:00+02:00 Add ANP docs
+  - ee284fb5 2024-07-08T12:50:35+02:00 NodeIdentity: Recover from corrupted certificate file
+  - 697e9994 2024-07-08T10:36:00+02:00 node: Use mdlayher/arp at link_network_manager
+  - 85b08ee5 2024-07-08T08:18:32+02:00 ovnkube-trace: Dummp empty tableid list on missing
+  - e743946b 2024-07-08T08:18:32+02:00 udn, util: Add mgmt host iface name generator
+  - aec6a971 2024-07-08T08:18:32+02:00 test, tools: Test dump-udn-vrf-table-ids
+  - 16169966 2024-07-08T08:18:32+02:00 ci: Add lane to test ovnkube-trace
+  - c8e2e279 2024-07-05T15:49:39+02:00 udn, allocator: Add masquerade IPs
+  - d3d5c9e9 2024-07-05T12:01:03+02:00 Move ipgenerator to its own pkg
+  - 3904d5e5 2024-07-05T09:38:44+02:00 Add e2e for default network pod isolation. Update e2e vendor deps.
+  - 2df3c20d 2024-07-05T09:38:40+02:00 Add ACLs for default network switch non-primary pods.
+  - 57f23408 2024-07-04T11:00:42+02:00 Rename PlaceHolderACLTier to PrimaryACLTier
+  - 3314aa1f 2024-07-01T11:54:30-07:00 kind-helm.sh: Add --config-file Flag
+  - 6ca8bbab 2024-07-01T11:54:30-07:00 kind-common: Add kind_get_nodes Function
+  - 8352867c 2024-07-01T11:54:30-07:00 kind-helm: Add Enable Multi-Network Support
+  - 39b53349 2024-07-01T14:55:40+02:00 Replace nc with curl in egressfirewall e2e.
+  - b550c8e0 2024-07-01T12:48:44+02:00 ef e2e: make sure external containers are running and ready to serve before starting the test.
+  - a5901db1 2024-06-26T20:17:23+00:00 Docs: add new branch as part of release process
 
