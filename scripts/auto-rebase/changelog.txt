@@ -1,3 +1,0 @@
-- cluster-ingress-operator embedded-component 9eae38dce9615897991a3b0b1f73e2cdb33b7f8e to af5d3f6c171354c387e0cfc901110a7211715e9b
-  - 2929231 2024-07-02T20:22:22-04:00 Delete & recreate canary route to clear spec.host
-
