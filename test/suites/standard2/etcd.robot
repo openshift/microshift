@@ -49,7 +49,6 @@ Setup
     Check Required Env Variables
     Login MicroShift Host
     Setup Kubeconfig    # for readiness checks
-    Save Default MicroShift Config
 
 Teardown
     [Documentation]    Test suite teardown
@@ -59,14 +58,13 @@ Teardown
 
 Restore Default Config
     [Documentation]    Remove any custom config and restart MicroShift
-    Restore Default MicroShift Config
+    Remove Drop In MicroShift Config    10-etcd
     Restart MicroShift
 
 Setup With Custom Config
     [Documentation]    Install a custom config and restart MicroShift
     [Arguments]    ${config_content}
-    ${merged}=    Extend MicroShift Config    ${config_content}
-    Upload MicroShift Config    ${merged}
+    Drop In MicroShift Config    ${config_content}    10-etcd
     Restart MicroShift
 
 Expect MemoryHigh

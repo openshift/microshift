@@ -111,12 +111,11 @@ Setup
     ...    different ways there is no need to restart before/after each one of them. Instead, store
     ...    the original configuration here to restore it at the end.
     Setup Suite With Namespace
-    Save Default MicroShift Config
 
 Teardown
     [Documentation]    Special teardown for the suite, will finish off by restoring the original
     ...    configuration and restarting MicroShift.
-    Restore Default MicroShift Config
+    Remove Drop In MicroShift Config    10-ingress
     Restart MicroShift
     Teardown Suite With Namespace
 
@@ -146,8 +145,7 @@ Wait For Router Ready
 Setup With Custom Config
     [Documentation]    Install a custom config and restart MicroShift.
     [Arguments]    ${config_content}
-    ${merged}=    Extend MicroShift Config    ${config_content}
-    Upload MicroShift Config    ${merged}
+    Drop In MicroShift Config    ${config_content}    10-ingress
     Restart MicroShift
 
 Setup Namespaces
