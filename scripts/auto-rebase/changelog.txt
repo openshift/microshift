@@ -1,3 +1,4 @@
-- cluster-ingress-operator embedded-component 9eae38dce9615897991a3b0b1f73e2cdb33b7f8e to af5d3f6c171354c387e0cfc901110a7211715e9b
-  - 2929231 2024-07-02T20:22:22-04:00 Delete & recreate canary route to clear spec.host
+- openshift-controller-manager embedded-component 1432fe0aa630ce83c0c3fd18c86e1fb9a47ae4cc to f0536caff57932e0b5fb88987477f4978463574a
+  - ea52ce6 2024-07-15T13:17:38+00:00 fix nil pointer dereference
+  - 890e85b 2024-07-15T13:17:38+00:00 handle orphaned managed image pull secrets
 
