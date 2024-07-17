@@ -1,0 +1,10 @@
+{
+    "version": 0,
+
+    "tools": {
+        "console": {
+            "label": "Microshift Console",
+            "path": "console.html"
+        }
+    }
+}

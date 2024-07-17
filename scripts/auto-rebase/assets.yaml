@@ -269,3 +269,11 @@ assets:
       - file: 07-daemonset-dhcp.yaml
       - file: release-multus-aarch64.json
       - file: release-multus-x86_64.json
+
+  - dir: optional/cockpit-console/
+    ignore: "they don't exist in upstream repository - only in microshift"
+    files:
+      - file: enable_console.sh
+      - file: manifest.json
+      - file: console.js
+      - file: console.html

@@ -150,6 +150,14 @@ Summary: Multus CNI for MicroShift
 ExclusiveArch: x86_64 aarch64
 Requires: microshift = %{version}
 
+%package cockpit-console
+Summary: cockpit console for MicroShift
+BuildArch: noarch
+Requires: microshift-cockpit-console
+
+%description cockpit-console
+MicroShift console plugin for cockpit 
+
 %description multus
 The microshift-multus package provides the required manifests for the Multus CNI to be installed on MicroShift.
 
@@ -325,6 +333,12 @@ cat assets/optional/operator-lifecycle-manager/kustomization.x86_64.yaml >> %{bu
 mkdir -p -m755 %{buildroot}%{_datadir}/microshift/release
 install -p -m644 assets/optional/operator-lifecycle-manager/release-olm-{x86_64,aarch64}.json %{buildroot}%{_datadir}/microshift/release/
 
+# cockpit-console
+install -d -m755 %{buildroot}/%{_prefix}/share/cockpit/cockpit-console
+install -p -m644 assets/optional/cockpit-console/* %{buildroot}/%{_prefix}/share/cockpit/cockpit-console
+install -p -m755 assets/optional/cockpit-console/*.sh %{buildroot}/%{_prefix}/share/cockpit/cockpit-console
+
+
 # multus
 install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/000-microshift-multus
 # Copy all the Multus manifests except the arch specific ones
@@ -464,6 +478,10 @@ fi
 
 %files olm-release-info
 %{_datadir}/microshift/release/release-olm-{x86_64,aarch64}.json
+
+%files cockpit-console
+%dir %{_prefix}/share/cockpit/cockpit-console
+%{_prefix}/share/cockpit/cockpit-console/*
 
 %files multus
 %dir %{_prefix}/lib/microshift/manifests.d/000-microshift-multus
