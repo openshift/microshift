@@ -119,14 +119,7 @@ func (c *Config) fillDefaults() error {
 		BaseDomain: "example.com",
 	}
 	c.Network = Network{
-		ClusterNetwork: []string{
-			"10.42.0.0/16",
-		},
-		ServiceNetwork: []string{
-			"10.43.0.0/16",
-		},
 		ServiceNodePortRange: "30000-32767",
-		DNS:                  "10.43.0.10",
 	}
 	c.Etcd = EtcdConfig{
 		MemoryLimitMB:           0,
@@ -270,6 +263,18 @@ func (c *Config) incorporateUserSettings(u *Config) {
 // inputs to more easily consumable units or fills in any defaults
 // computed based on the values of other settings.
 func (c *Config) updateComputedValues() error {
+	if len(c.Network.ClusterNetwork) == 0 && len(c.Network.ServiceNetwork) == 0 {
+		defaultClusterNetwork := "10.42.0.0/16"
+		defaultServiceNetwork := "10.43.0.0/16"
+		ip := net.ParseIP(c.Node.NodeIP)
+		if ip.To4() == nil {
+			defaultClusterNetwork = "fd01::/48"
+			defaultServiceNetwork = "fd02::/112"
+		}
+		c.Network.ClusterNetwork = []string{defaultClusterNetwork}
+		c.Network.ServiceNetwork = []string{defaultServiceNetwork}
+	}
+
 	clusterDNS, err := c.computeClusterDNS()
 	if err != nil {
 		return err
