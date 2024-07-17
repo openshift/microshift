@@ -1,4 +1,19 @@
-- ovn-kubernetes image-arm64 1d4ea50a317fa4a1fd01122a6c2cab5e76b01e97 to 9168abf8a94cbd83a7fd53fc675fb42afea870ea
+- api embedded-component 40c9497c12f4ce70515787dfc8db63f0d22e97b7 to e9f09d21bcb566954b1c28ba242887ae93979436
+  - 5a8b954 2024-07-15T11:13:06-04:00 Feature gate verification should use new variant registry
+  - 2d61624 2024-07-12T15:47:29-04:00 NE-1530: Fix empty subnet list CEL validation
+
+- kubernetes embedded-component 61de516d1eb19a8e392045f2e1dbcf3bf8e8580c to b9176556cda6da83643241a8eadbefd79fa50151
+  - 31e577152 2024-07-16T13:19:01+02:00 UPSTREAM: <drop>: bump(github.com/openshift/apiserver-library-go)
+  - 4ccf91a46 2024-07-11T07:58:53-04:00 UPSTREAM: <carry>: bump cadvisor for 3516 upstream patches
+
+- openshift-controller-manager embedded-component 37f5f00b5afb1e5d28f2e62ff91d4977985ec603 to 3d6b2b477b61eeca458e23a791ba95bc476caad1
+  - 00e32c7 2024-07-12T08:55:57-04:00 fix nil pointer dereference
+  - 7d8c68a 2024-07-12T08:55:26-04:00 handle orphaned managed image pull secrets
+
+- oc image-amd64 981134497d2996edf5097d3b58833bfe04cc86a7 to 1127650882a9e42d059dca74c21915155afaeb2e
+  - 11276508 2024-07-16T07:45:13+00:00 WRKLDS-1314: create image command (#1819)
+
+- ovn-kubernetes image-amd64 1d4ea50a317fa4a1fd01122a6c2cab5e76b01e97 to 9168abf8a94cbd83a7fd53fc675fb42afea870ea
   - 09af1c13 2024-07-11T20:20:51+02:00 udn: Skip non ovn nads
   - 681f7cab 2024-07-11T11:18:32+02:00 Always enable global IPv6 forwarding
   - 425a328c 2024-07-10T12:58:03-07:00 helm: Add conditional image pull secrets to Helm charts
@@ -34,4 +49,15 @@
   - 39b53349 2024-07-01T14:55:40+02:00 Replace nc with curl in egressfirewall e2e.
   - b550c8e0 2024-07-01T12:48:44+02:00 ef e2e: make sure external containers are running and ready to serve before starting the test.
   - a5901db1 2024-06-26T20:17:23+00:00 Docs: add new branch as part of release process
+
+- kubernetes image-amd64 61de516d1eb19a8e392045f2e1dbcf3bf8e8580c to b9176556cda6da83643241a8eadbefd79fa50151
+  - 31e577152 2024-07-16T13:19:01+02:00 UPSTREAM: <drop>: bump(github.com/openshift/apiserver-library-go)
+  - 4ccf91a46 2024-07-11T07:58:53-04:00 UPSTREAM: <carry>: bump cadvisor for 3516 upstream patches
+
+- oc image-arm64 981134497d2996edf5097d3b58833bfe04cc86a7 to 1127650882a9e42d059dca74c21915155afaeb2e
+  - 11276508 2024-07-16T07:45:13+00:00 WRKLDS-1314: create image command (#1819)
+
+- kubernetes image-arm64 61de516d1eb19a8e392045f2e1dbcf3bf8e8580c to b9176556cda6da83643241a8eadbefd79fa50151
+  - 31e577152 2024-07-16T13:19:01+02:00 UPSTREAM: <drop>: bump(github.com/openshift/apiserver-library-go)
+  - 4ccf91a46 2024-07-11T07:58:53-04:00 UPSTREAM: <carry>: bump cadvisor for 3516 upstream patches
 
