@@ -6,6 +6,7 @@ Library             String
 Library             ../../resources/qemu-guest-agent.py
 Library             ../../resources/DataFormats.py
 Resource            ../../resources/libvirt.resource
+Resource            ../../resources/microshift-config.resource
 
 Suite Setup         Setup
 Suite Teardown      Teardown
@@ -102,13 +103,11 @@ Pod Should Be Reachable Via Ingress
 
 Update MicroShift Config
     [Documentation]    Update the MicroShift config to use the offline-network endpoint
-    Save Default MicroShift Config
     ${patch}=    Catenate    SEPARATOR=\n
     ...    node:
     ...    \ \ hostnameOverride: ${GUEST_NAME}
     ...    \ \ nodeIP: ${NODE_IP}
-    ${patched_config}=    Yaml Replace    ${DEFAULT_MICROSHIFT_CONFIG}    ${patch}
-    Write To File    ${GUEST_NAME}    /etc/microshift/config.yaml    ${patched_config}
+    Write To File    ${GUEST_NAME}    /etc/microshift/config.d/10-hostname.yaml    ${patch}
 
 Update Guest Network Config
     [Documentation]    Setup the guest's loopback with IP address, hostname, and DNS
@@ -157,28 +156,15 @@ Restore Guest Network Config
     ...    nmcli    connection    modify    lo    connection.autoconnect    no
     Should Be Equal As Integers    ${result["rc"]}    0
 
-Save Default MicroShift Config
-    [Documentation]    Save the default MicroShift config for offline start. MicroShift fails on first boot when
-    ...    offline, so ignore the file not exist error.
-    ${data}=    Set Variable    ${EMPTY}
-    TRY
-        ${data}=    Run Keyword
-        ...    Read From File    ${GUEST_NAME}    /etc/microshift/config.yaml
-    EXCEPT    *No such file or directory*    type=glob
-        Log    Default MicroShift config not found, ignoring
-    END
-    Set Suite Variable    ${DEFAULT_MICROSHIFT_CONFIG}    ${data}
-
 Restore Default MicroShift Config
     [Documentation]    Restore the default MicroShift config for offline start.
-    ${len}=    Get Length    ${DEFAULT_MICROSHIFT_CONFIG}
-    IF    ${len} > 0
-        Write To File    ${GUEST_NAME}    /etc/microshift/config.yaml    ${DEFAULT_MICROSHIFT_CONFIG}
-    ELSE
-        ${result}    ${ignore}=    Run Guest Process    ${GUEST_NAME}    rm    /etc/microshift/config.yaml
-        Log Many    ${result["stdout"]}    ${result["stderr"]}
-        Should Be Equal As Integers    ${result["rc"]}    0
-    END
+    ${result}    ${ignore}=    Run Guest Process
+    ...    ${GUEST_NAME}
+    ...    rm
+    ...    -f
+    ...    /etc/microshift/config.d/10-hostname.yaml
+    Log Many    ${result["stdout"]}    ${result["stderr"]}
+    Should Be Equal As Integers    ${result["rc"]}    0
 
 Start MicroShift
     [Documentation]    Restart the MicroShift systemd service

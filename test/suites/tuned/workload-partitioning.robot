@@ -41,7 +41,6 @@ Workload Partitioning Should Work
 *** Keywords ***
 Setup For Workload Partitioning
     [Documentation]    Setup for Workload Partitioning
-    Save Default MicroShift Config
     Configure Kubelet For Workload Partitioning    ${MANAGEMENT_CPU}
     Configure CRIO For Workload Partitioning    ${MANAGEMENT_CPU}
     Configure CPUAffinity In Systemd    ${MANAGEMENT_CPU}    ${SYSTEMD_CRIO_DROPIN}
@@ -62,7 +61,7 @@ Teardown For Workload Partitioning
     ...    ${SYSTEMD_MICROSHIFT_DROPIN}
     ...    ${CRIO_CONFIG_DROPIN}
     Systemctl Daemon Reload
-    Restore Default MicroShift Config
+    Remove Drop In MicroShift Config    10-kubelet
     Systemctl    restart    crio.service
     Restart MicroShift
 
@@ -79,8 +78,7 @@ Configure Kubelet For Workload Partitioning
     ...    \ \ \ \ full-pcpus-only: "true"
     ...    \ \ cpuManagerReconcilePeriod: 5s
 
-    ${merged}=    Extend MicroShift Config    ${kubelet_config}
-    Upload MicroShift Config    ${merged}
+    Drop In MicroShift Config    ${kubelet_config}    10-kubelet
 
     ${kubelet_pinning_config}=    CATENATE    SEPARATOR=\n
     ...    {

@@ -110,7 +110,6 @@ Setup Suite    # robocop: disable=too-long-keyword
     Set Suite Variable    \${NOEXT_NAMESPACE}    ${ns}
 
     # Extend the configuration setting to add the unique path to the defaults
-    Save Default MicroShift Config
     ${config_content}=    Catenate    SEPARATOR=\n
     ...    manifests:
     ...    \ \ kustomizePaths:
@@ -121,8 +120,7 @@ Setup Suite    # robocop: disable=too-long-keyword
     ...    \ \ \ \ - ${NON_DEFAULT_DIR}
     ...    \ \ \ \ # Add a directory _without_ the glob for unconfigured test
     ...    \ \ \ \ - /home/${USHIFT_USER}/test-manifests.d
-    ${merged}=    Extend MicroShift Config    ${config_content}
-    Upload MicroShift Config    ${merged}
+    Drop In MicroShift Config    ${config_content}    10-kustomize
 
     Restart MicroShift
 
@@ -233,7 +231,7 @@ Remove Manifest Directory
 
 Restore Default Config
     [Documentation]    Remove any custom config and restart MicroShift
-    Restore Default MicroShift Config
+    Remove Drop In MicroShift Config    10-kustomize
 
     # When restoring, we check if ostree is active, if so we reboot
     # to convert everything back to normal, MicroShift restart should not

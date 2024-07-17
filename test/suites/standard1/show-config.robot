@@ -58,13 +58,11 @@ Setup
     [Documentation]    Test suite setup
     Check Required Env Variables
     Login MicroShift Host
-    Save Default MicroShift Config
-    ${newconfig}=    Extend MicroShift Config    ${MEMLIMIT128}
-    Upload MicroShift Config    ${newconfig}
+    Drop In MicroShift Config    ${MEMLIMIT128}    10-etcd
 
 Teardown
     [Documentation]    Test suite teardown
-    Restore Default MicroShift Config
+    Remove Drop In MicroShift Config    10-etcd
     Logout MicroShift Host
 
 Show Config
