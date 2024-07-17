@@ -1,8 +1,4 @@
-- cluster-ingress-operator embedded-component fe5bd7b02565becfb8ff80aaafbc2215a45ce4c9 to 992e81333480a66539dd9cd0d03155f71db2477b
-  - 0607312 2024-07-11T13:35:10+02:00 OCPBUGS-28673: Add e2e test for connect timeout
-  - c258ddc 2024-07-11T12:22:43+02:00 OCPBUGS-28673: Implement connect timeout tuning option
-  - 4b4b800 2024-07-11T12:22:30+02:00 OCPBUGS-36555: Bump API to get connect timeout tuning option
-
-- ovn-kubernetes image-amd64 bdc67edd064afc3519c4780f43c1c3837cd4143f to 19a46c84a3c26ba43d227c972952226d53eca67c
-  - 6bc9b92 2024-07-09T11:31:25+00:00 Bump ovn to 23.09.4-16.
+- cluster-ingress-operator embedded-component 992e81333480a66539dd9cd0d03155f71db2477b to e302d85665274cb299d873eb624867384e5c37b1
+  - ab150f3 2024-07-02T20:25:19-04:00 Delete & recreate canary route to clear spec.host
+  - d188567 2024-07-02T20:25:19-04:00 Allow operator to update Route spec.subdomain
 
