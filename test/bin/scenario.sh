@@ -83,10 +83,29 @@ copy_file_to_vm() {
     local -r local_filename="$2"
     local -r remote_filename="$3"
 
-    local -r ip=$(get_vm_property "${vmname}" ip)
+    local ip
+    ip=$(get_vm_property "${vmname}" ip)
+    if [ "${ip}" != "${ip#*:[0-9a-fA-F]}" ]; then
+      ip="[${ip}]"
+    fi
     local -r ssh_port=$(get_vm_property "${vmname}" ssh_port)
 
     scp -P "${ssh_port}" "${local_filename}" "redhat@${ip}:${remote_filename}"
+}
+
+copy_file_from_vm() {
+    local -r vmname="$1"
+    local -r remote_filename="$2"
+    local -r local_filename="$3"
+
+    local ip
+    ip=$(get_vm_property "${vmname}" ip)
+    if [ "${ip}" != "${ip#*:[0-9a-fA-F]}" ]; then
+      ip="[${ip}]"
+    fi
+    local -r ssh_port=$(get_vm_property "${vmname}" ssh_port)
+
+    scp -P "${ssh_port}" "redhat@${ip}:${remote_filename}" "${local_filename}"
 }
 
 sos_report() {
@@ -121,7 +140,7 @@ sos_report() {
             continue
         fi
 
-        if ! sos_report_for_vm "${vmdir}" "${vmname}" "${ip}"; then
+        if ! sos_report_for_vm "${vmdir}" "${vmname}"; then
             scenario_result=1
             if "${junit}"; then
                 record_junit "${vmname}" "sos-report" "FAILED"
@@ -138,8 +157,6 @@ sos_report() {
 sos_report_for_vm() {
     local -r vmdir="${1}"
     local -r vmname="${2}"
-    local -r ip="${3}"
-
     # Some scenarios do not start with MicroShift installed, so we
     # can't rely on the wrapper being there or working if it
     # is. Copy the script to the host, just in case, along with a
@@ -164,12 +181,12 @@ EOF
     copy_file_to_vm "${vmname}" "${ROOTDIR}/scripts/microshift-sos-report.sh" "/tmp/microshift-sos-report.sh"
     run_command_on_vm "${vmname}" "sudo bash -x /tmp/sos-wrapper.sh"
     mkdir -p "${vmdir}/sos"
-    scp "redhat@${ip}:/tmp/sosreport-*" "${vmdir}/sos/" || {
+    copy_file_from_vm "${vmname}" "/tmp/sosreport-*" "${vmdir}/sos/" || {
         echo "WARNING: Ignoring an error when copying sos report files"
     }
 
     run_command_on_vm "${vmname}" "sudo journalctl > /tmp/journal_$(date +'%Y-%m-%d_%H:%M:%S').log"
-    scp "redhat@${ip}:/tmp/journal*.log" "${vmdir}/sos/" || {
+    copy_file_from_vm "${vmname}" "/tmp/journal*.log" "${vmdir}/sos" || {
         echo "WARNING: Ignoring an error when copying journal"
     }
 
@@ -183,7 +200,7 @@ EOF
          sudo cp /var/log/anaconda/*.log /tmp/var-log-anaconda/ && \
          sudo chmod +r /tmp/var-log-anaconda/*.log"
     mkdir -p "${vmdir}/anaconda"
-    scp "redhat@${ip}:/tmp/var-log-anaconda/*.log" "${vmdir}/anaconda/" || {
+    copy_file_from_vm "${vmname}" "/tmp/var-log-anaconda/*.log" "${vmdir}/anaconda" || {
         echo "WARNING: Ignoring an error when copying anaconda logs"
     }
 }

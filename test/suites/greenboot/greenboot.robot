@@ -125,6 +125,8 @@ Disrupt Pod Network
     Save Default MicroShift Config
     ${configuration}=    Catenate    SEPARATOR=\n
     ...    network:
+    ...    \ clusterNetwork:
+    ...    \ - 10.42.0.0/16
     ...    \ serviceNetwork:
     ...    \ - 10.66.0.0/16
     ...
