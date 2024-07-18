@@ -7,15 +7,16 @@ Resource            ../../resources/ostree-health.resource
 Resource            ../../resources/microshift-network.resource
 Library             ../../resources/libipv6.py
 
-
 Suite Setup         Setup
 Suite Teardown      Teardown
 
-Test Tags           network    ipv6
+Test Tags           ipv6    network
+
 
 *** Variables ***
 ${USHIFT_HOST}      ${EMPTY}
 ${HOSTNAME}         hello-microshift.cluster.local
+
 
 *** Test Cases ***
 Verify Router Serves IPv6
@@ -38,7 +39,7 @@ Verify Router Serves IPv6
 
 Verify All Services Are Ipv6
     [Documentation]    Check all services are running IPv6 only
-    
+
     All Services Are Ipv6
 
 
