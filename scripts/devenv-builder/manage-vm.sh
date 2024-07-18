@@ -61,7 +61,7 @@ function get_base_isofile {
 }
 
 function action_config() {
-    local -r deps="libvirt virt-manager virt-install virt-viewer libvirt-client qemu-kvm qemu-img sshpass"
+    local -r deps="libvirt virt-manager virt-install virt-viewer libvirt-client qemu-kvm qemu-img sshpass wget"
     
     "${SCRIPTDIR}/../dnf_retry.sh" "install" "${deps}"
 
@@ -71,6 +71,13 @@ function action_config() {
     fi
     # Necessary to allow remote connections in the virt-viewer application
     sudo usermod -a -G libvirt "$(whoami)"
+
+    binary="yq_linux_amd64"
+    if [ "$(arch)" == "aarch64" ]; then
+        binary="yq_linux_arm64"
+    fi
+
+    sudo wget https://github.com/mikefarah/yq/releases/latest/download/"${binary}" -O /usr/bin/yq && sudo chmod +x /usr/bin/yq
 }
 
 # Create the VM, if it does not exist

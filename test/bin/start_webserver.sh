@@ -24,7 +24,8 @@ http {
     access_log /dev/null;
     error_log  ${IMAGEDIR}/nginx_error.log;
     server {
-        listen 0.0.0.0:${WEB_SERVER_PORT};
+        listen ${WEB_SERVER_PORT};
+        listen [::]:${WEB_SERVER_PORT};
         root   ${IMAGEDIR};
         autoindex on;
     }
