@@ -1,4 +1,3 @@
-- openshift-controller-manager embedded-component 1432fe0aa630ce83c0c3fd18c86e1fb9a47ae4cc to f0536caff57932e0b5fb88987477f4978463574a
-  - ea52ce6 2024-07-15T13:17:38+00:00 fix nil pointer dereference
-  - 890e85b 2024-07-15T13:17:38+00:00 handle orphaned managed image pull secrets
+- operator-framework-olm embedded-component f4eac4271317504fcdeaf45fcf30bb01b1cd8bb0 to 1551101943313e3546cba7d9bc78effc79b40a8e
+  - 382f9a8f 2024-07-16T17:47:16+02:00 [CARRY] Bump github.com/containers/image/v5
 
