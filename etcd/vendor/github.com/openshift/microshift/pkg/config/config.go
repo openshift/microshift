@@ -263,15 +263,20 @@ func (c *Config) incorporateUserSettings(u *Config) {
 // inputs to more easily consumable units or fills in any defaults
 // computed based on the values of other settings.
 func (c *Config) updateComputedValues() error {
-	if len(c.Network.ClusterNetwork) == 0 && len(c.Network.ServiceNetwork) == 0 {
+	if len(c.Network.ClusterNetwork) == 0 {
 		defaultClusterNetwork := "10.42.0.0/16"
-		defaultServiceNetwork := "10.43.0.0/16"
 		ip := net.ParseIP(c.Node.NodeIP)
 		if ip.To4() == nil {
 			defaultClusterNetwork = "fd01::/48"
-			defaultServiceNetwork = "fd02::/112"
 		}
 		c.Network.ClusterNetwork = []string{defaultClusterNetwork}
+	}
+	if len(c.Network.ServiceNetwork) == 0 {
+		defaultServiceNetwork := "10.43.0.0/16"
+		ip := net.ParseIP(c.Node.NodeIP)
+		if ip.To4() == nil {
+			defaultServiceNetwork = "fd02::/112"
+		}
 		c.Network.ServiceNetwork = []string{defaultServiceNetwork}
 	}
 
