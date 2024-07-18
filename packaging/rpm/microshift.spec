@@ -345,6 +345,9 @@ cat assets/optional/multus/kustomization.x86_64.yaml >> %{buildroot}/%{_prefix}/
 mkdir -p -m755 %{buildroot}%{_datadir}/microshift/release
 install -p -m644 assets/optional/multus/release-multus-{x86_64,aarch64}.json %{buildroot}%{_datadir}/microshift/release/
 
+# cleanup kubelet
+install -p -m644 packaging/tuned/microshift-cleanup-kubelet.service %{buildroot}%{_unitdir}/microshift-cleanup-kubelet.service
+
 %pre networking
 
 getent group hugetlbfs >/dev/null || groupadd -r hugetlbfs
@@ -409,6 +412,7 @@ fi
 %{_bindir}/microshift-cleanup-data
 %{_bindir}/microshift-sos-report
 %{_unitdir}/microshift.service
+%{_unitdir}/microshift-cleanup-kubelet.service
 %{_sysconfdir}/crio/crio.conf.d/00-crio-crun.conf
 %{_sysconfdir}/crio/crio.conf.d/10-microshift.conf
 %{_datadir}/microshift/spec/config-openapi-spec.json
@@ -478,6 +482,9 @@ fi
 # Use Git command to generate the log and replace the VERSION string
 # LANG=C git log --date="format:%a %b %d %Y" --pretty="tformat:* %cd %an <%ae> VERSION%n- %s%n" packaging/rpm/microshift.spec
 %changelog
+* Thu Jul 18 2024 Patryk Matuszak <pmatusza@redhat.com> 4.17.0
+- Add service to cleanup stale kubelet files on boot
+
 * Mon Jul 08 2024 Pablo Acevedo Montserrat <pacevedo@redhat.com> 4.17.0
 - Add NM configuration file
 
