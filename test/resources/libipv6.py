@@ -1,10 +1,9 @@
 import ipaddress
-import urllib
-import yaml
 import socket
 from robot.libraries.BuiltIn import BuiltIn
 
 _log = BuiltIn().log
+
 
 def is_ipv6(addr: str) -> bool:
     """
@@ -22,8 +21,10 @@ def is_ipv6(addr: str) -> bool:
         return False
     return True
 
+
 def must_be_ipv6(addr: str) -> None:
     BuiltIn().should_be_true(is_ipv6(addr))
+
 
 def add_brackets_if_ipv6(ip: str) -> str:
     """
