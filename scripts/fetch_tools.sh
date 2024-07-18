@@ -216,6 +216,17 @@ gettool_awscli() {
     popd &>/dev/null
 }
 
+gettool_oc() {
+    local ver="4.16.3"
+    pushd "${WORK_DIR}" &>/dev/null
+
+    curl -s "https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/${ver}/openshift-client-linux-${ver}.tar.gz" -o "oc-${ver}-linux.tar.gz"
+    tar xvzf oc-${ver}-linux.tar.gz
+    sudo cp oc /usr/bin/oc
+
+    popd &>/dev/null
+}
+
 tool_getters=$(declare -F | awk '$3 ~ /^gettool_/ {print $3}' | sed 's/^gettool_//g')
 
 usage() {
