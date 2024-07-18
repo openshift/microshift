@@ -3,6 +3,7 @@ Documentation       Keywords for testing the MicroShift network
 
 Library             Process
 Library             SSHLibrary
+Library             libipv6.py
 Resource            oc.resource
 Resource            common.resource
 
@@ -47,7 +48,9 @@ Access Hello Microshift
     ...    ${path}=${EMPTY}
     ...    ${scheme}=http
 
-    ${connect_to}=    Set Variable    "hello-microshift.cluster.local::${ushift_ip}:"
+    ${ip}=    Add Brackets If Ipv6    ${ushift_ip}
+
+    ${connect_to}=    Set Variable    "hello-microshift.cluster.local::${ip}:"
     ${url_path}=    Set Variable    "${scheme}://hello-microshift.cluster.local:${ushift_port}${path}"
 
     ${result}=    Run Process
