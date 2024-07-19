@@ -1,3 +1,0 @@
-- operator-framework-olm embedded-component f4eac4271317504fcdeaf45fcf30bb01b1cd8bb0 to 1551101943313e3546cba7d9bc78effc79b40a8e
-  - 382f9a8f 2024-07-16T17:47:16+02:00 [CARRY] Bump github.com/containers/image/v5
-
