@@ -54,7 +54,7 @@ clean_composer_jobs() {
         done
 
         title "Cleaning up composer sources"
-        for src in $(sudo composer-cli sources list | grep -Ev "appstream|baseos") ; do
+        for src in $(sudo composer-cli sources list | grep -Ev "appstream|baseos|kernel-rt") ; do
             echo "Removing source ${src}"
             sudo composer-cli sources delete "${src}"
         done

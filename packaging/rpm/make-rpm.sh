@@ -145,7 +145,7 @@ case $1 in
 esac
 
 if [ "${CHECK_RPMS}" = "y" ]; then
-  check_built_rpms "RPMS" "microshift microshift-networking microshift-greenboot microshift-selinux microshift-release-info"
+  check_built_rpms "RPMS" "microshift microshift-networking microshift-greenboot microshift-selinux microshift-release-info microshift-low-latency"
 fi
 
 if [ "${CHECK_SRPMS}" = "y" ]; then
