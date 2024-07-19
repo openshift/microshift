@@ -1,4 +1,18 @@
-- cluster-ingress-operator embedded-component 992e81333480a66539dd9cd0d03155f71db2477b to e302d85665274cb299d873eb624867384e5c37b1
-  - ab150f3 2024-07-02T20:25:19-04:00 Delete & recreate canary route to clear spec.host
-  - d188567 2024-07-02T20:25:19-04:00 Allow operator to update Route spec.subdomain
+- ovn-kubernetes image-amd64 19a46c84a3c26ba43d227c972952226d53eca67c to b292310a0e912af6dc4b8fde436d38115818d90f
+  - 4518c92 2024-07-04T10:59:12+00:00 Handle IP fragments in SGW mode
+  - 3a6c99e 2024-07-04T10:57:19+00:00 Move custom conntrack zones to the config package
+  - e98dd3e 2024-07-04T10:57:17+00:00 ovnkube-node: Make service conntrack zone configurable
+  - ea0b1b0 2024-07-04T10:56:53+00:00 Fix service.go NodePort cleanup
+  - 1d922e6 2024-07-04T10:52:30+00:00 CARRY: fix compilation errors in e2e service.go
+  - 0f1c592 2024-06-27T10:08:05+02:00 vendoring changes
+  - ee6b11d 2024-06-27T09:56:48+02:00 EgressIP: Reload certificates for the grpc heatlhcheck server
+
+- ovn-kubernetes image-arm64 19a46c84a3c26ba43d227c972952226d53eca67c to b292310a0e912af6dc4b8fde436d38115818d90f
+  - 4518c92 2024-07-04T10:59:12+00:00 Handle IP fragments in SGW mode
+  - 3a6c99e 2024-07-04T10:57:19+00:00 Move custom conntrack zones to the config package
+  - e98dd3e 2024-07-04T10:57:17+00:00 ovnkube-node: Make service conntrack zone configurable
+  - ea0b1b0 2024-07-04T10:56:53+00:00 Fix service.go NodePort cleanup
+  - 1d922e6 2024-07-04T10:52:30+00:00 CARRY: fix compilation errors in e2e service.go
+  - 0f1c592 2024-06-27T10:08:05+02:00 vendoring changes
+  - ee6b11d 2024-06-27T09:56:48+02:00 EgressIP: Reload certificates for the grpc heatlhcheck server
 
