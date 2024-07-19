@@ -1,33 +1,16 @@
-- cluster-network-operator embedded-component 1cd8678b38fb0b7ac51fae98fc512e7224bc5965 to 116a2c713beb4689b3a1df80e6e898cc2733b3fb
-  - 0be5bd9 2024-07-16T09:55:17+02:00 Enable TechPreview FeatureGate for NetworkSegmentation
+- csi-external-snapshotter image-arm64 a58f2cd35a2623d83179e9558a04a3094c694f4b to 6ae55b8749a2fd9011d2c75d5f428f36e93be512
+  - 5af999d 2024-07-12T19:32:34+00:00 UPSTREAM: <carry>: Updating ose-csi-snapshot-controller-container image to be consistent with ART for 4.17 Reconciling with https://github.com/openshift/ocp-build-data/tree/81a28f96d18bca14030c8f73664a9c230858fb03/images/ose-csi-snapshot-controller.yml
+  - 70b4688 2024-07-12T19:02:23+00:00 UPSTREAM: <carry>: Updating ose-csi-snapshot-validation-webhook-container image to be consistent with ART for 4.17 Reconciling with https://github.com/openshift/ocp-build-data/tree/81a28f96d18bca14030c8f73664a9c230858fb03/images/csi-snapshot-validation-webhook.yml
 
-- csi-external-snapshotter embedded-component 43de97b3868f0597a114df25531d866aa2cd1191 to a58f2cd35a2623d83179e9558a04a3094c694f4b
-  - d20ba4f 2024-07-12T16:42:23+00:00 UPSTREAM: <carry>: Updating ose-csi-external-snapshotter-container image to be consistent with ART for 4.17 Reconciling with https://github.com/openshift/ocp-build-data/tree/81a28f96d18bca14030c8f73664a9c230858fb03/images/ose-csi-external-snapshotter.yml
+- csi-external-snapshotter image-arm64 a58f2cd35a2623d83179e9558a04a3094c694f4b to 6ae55b8749a2fd9011d2c75d5f428f36e93be512
+  - 5af999d 2024-07-12T19:32:34+00:00 UPSTREAM: <carry>: Updating ose-csi-snapshot-controller-container image to be consistent with ART for 4.17 Reconciling with https://github.com/openshift/ocp-build-data/tree/81a28f96d18bca14030c8f73664a9c230858fb03/images/ose-csi-snapshot-controller.yml
+  - 70b4688 2024-07-12T19:02:23+00:00 UPSTREAM: <carry>: Updating ose-csi-snapshot-validation-webhook-container image to be consistent with ART for 4.17 Reconciling with https://github.com/openshift/ocp-build-data/tree/81a28f96d18bca14030c8f73664a9c230858fb03/images/csi-snapshot-validation-webhook.yml
 
-- kubernetes embedded-component b9176556cda6da83643241a8eadbefd79fa50151 to e34cf927edb7321aac8e69ac9b8849fb831a8cfe
-  - 2c16ab44d 2024-07-16T11:31:06-05:00 UPSTREAM: 125404: Fix that PodIP field is temporarily removed for a terminal pod
+- csi-external-snapshotter image-arm64 a58f2cd35a2623d83179e9558a04a3094c694f4b to 6ae55b8749a2fd9011d2c75d5f428f36e93be512
+  - 5af999d 2024-07-12T19:32:34+00:00 UPSTREAM: <carry>: Updating ose-csi-snapshot-controller-container image to be consistent with ART for 4.17 Reconciling with https://github.com/openshift/ocp-build-data/tree/81a28f96d18bca14030c8f73664a9c230858fb03/images/ose-csi-snapshot-controller.yml
+  - 70b4688 2024-07-12T19:02:23+00:00 UPSTREAM: <carry>: Updating ose-csi-snapshot-validation-webhook-container image to be consistent with ART for 4.17 Reconciling with https://github.com/openshift/ocp-build-data/tree/81a28f96d18bca14030c8f73664a9c230858fb03/images/csi-snapshot-validation-webhook.yml
 
-- csi-external-snapshotter image-amd64 43de97b3868f0597a114df25531d866aa2cd1191 to a58f2cd35a2623d83179e9558a04a3094c694f4b
-  - d20ba4f 2024-07-12T16:42:23+00:00 UPSTREAM: <carry>: Updating ose-csi-external-snapshotter-container image to be consistent with ART for 4.17 Reconciling with https://github.com/openshift/ocp-build-data/tree/81a28f96d18bca14030c8f73664a9c230858fb03/images/ose-csi-external-snapshotter.yml
-
-- csi-external-snapshotter image-amd64 43de97b3868f0597a114df25531d866aa2cd1191 to a58f2cd35a2623d83179e9558a04a3094c694f4b
-  - d20ba4f 2024-07-12T16:42:23+00:00 UPSTREAM: <carry>: Updating ose-csi-external-snapshotter-container image to be consistent with ART for 4.17 Reconciling with https://github.com/openshift/ocp-build-data/tree/81a28f96d18bca14030c8f73664a9c230858fb03/images/ose-csi-external-snapshotter.yml
-
-- csi-external-snapshotter image-amd64 43de97b3868f0597a114df25531d866aa2cd1191 to a58f2cd35a2623d83179e9558a04a3094c694f4b
-  - d20ba4f 2024-07-12T16:42:23+00:00 UPSTREAM: <carry>: Updating ose-csi-external-snapshotter-container image to be consistent with ART for 4.17 Reconciling with https://github.com/openshift/ocp-build-data/tree/81a28f96d18bca14030c8f73664a9c230858fb03/images/ose-csi-external-snapshotter.yml
-
-- kubernetes image-amd64 b9176556cda6da83643241a8eadbefd79fa50151 to e34cf927edb7321aac8e69ac9b8849fb831a8cfe
-  - 2c16ab44d 2024-07-16T11:31:06-05:00 UPSTREAM: 125404: Fix that PodIP field is temporarily removed for a terminal pod
-
-- csi-external-snapshotter image-arm64 43de97b3868f0597a114df25531d866aa2cd1191 to a58f2cd35a2623d83179e9558a04a3094c694f4b
-  - d20ba4f 2024-07-12T16:42:23+00:00 UPSTREAM: <carry>: Updating ose-csi-external-snapshotter-container image to be consistent with ART for 4.17 Reconciling with https://github.com/openshift/ocp-build-data/tree/81a28f96d18bca14030c8f73664a9c230858fb03/images/ose-csi-external-snapshotter.yml
-
-- csi-external-snapshotter image-arm64 43de97b3868f0597a114df25531d866aa2cd1191 to a58f2cd35a2623d83179e9558a04a3094c694f4b
-  - d20ba4f 2024-07-12T16:42:23+00:00 UPSTREAM: <carry>: Updating ose-csi-external-snapshotter-container image to be consistent with ART for 4.17 Reconciling with https://github.com/openshift/ocp-build-data/tree/81a28f96d18bca14030c8f73664a9c230858fb03/images/ose-csi-external-snapshotter.yml
-
-- csi-external-snapshotter image-arm64 43de97b3868f0597a114df25531d866aa2cd1191 to a58f2cd35a2623d83179e9558a04a3094c694f4b
-  - d20ba4f 2024-07-12T16:42:23+00:00 UPSTREAM: <carry>: Updating ose-csi-external-snapshotter-container image to be consistent with ART for 4.17 Reconciling with https://github.com/openshift/ocp-build-data/tree/81a28f96d18bca14030c8f73664a9c230858fb03/images/ose-csi-external-snapshotter.yml
-
-- kubernetes image-arm64 b9176556cda6da83643241a8eadbefd79fa50151 to e34cf927edb7321aac8e69ac9b8849fb831a8cfe
-  - 2c16ab44d 2024-07-16T11:31:06-05:00 UPSTREAM: 125404: Fix that PodIP field is temporarily removed for a terminal pod
+- kubernetes image-arm64 e34cf927edb7321aac8e69ac9b8849fb831a8cfe to 1bead22a2ef091d421bbe4e455799fac869c3c80
+  - a1eaa95fe 2024-07-15T16:39:34-03:00 UPSTREAM: <carry>: add tool to validate test packages imported
+  - 092eb800a 2024-07-11T12:53:19+02:00 UPSTREAM: <carry>: sync imports and update test rules
 
