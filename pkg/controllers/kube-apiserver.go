@@ -25,6 +25,7 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"time"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -113,7 +114,7 @@ func (s *KubeAPIServer) configure(cfg *config.Config) error {
 
 	s.masterURL = cfg.ApiServer.URL
 	s.servingCAPath = cryptomaterial.ServiceAccountTokenCABundlePath(certsDir)
-	s.advertiseAddress = cfg.ApiServer.AdvertiseAddress
+	s.advertiseAddress = cfg.ApiServer.AdvertiseAddresses[0]
 
 	namedCerts := []configv1.NamedCertificate{
 		{
@@ -138,7 +139,7 @@ func (s *KubeAPIServer) configure(cfg *config.Config) error {
 	if len(cfg.ApiServer.NamedCertificates) > 0 {
 		for _, namedCertsCfg := range cfg.ApiServer.NamedCertificates {
 			//Validate the cert is non-destructive
-			certAllowed, err := util.IsCertAllowed(cfg.ApiServer.AdvertiseAddress, cfg.Network.ClusterNetwork, cfg.Network.ServiceNetwork, namedCertsCfg.CertPath, namedCertsCfg.Names)
+			certAllowed, err := util.IsCertAllowed(cfg.ApiServer.AdvertiseAddresses[0], cfg.Network.ClusterNetwork, cfg.Network.ServiceNetwork, namedCertsCfg.CertPath, namedCertsCfg.Names)
 			if err != nil {
 				klog.Warningf("Failed to read NamedCertificate from %s - ignoring: %v", namedCertsCfg.CertPath, err)
 				continue
@@ -188,6 +189,7 @@ func (s *KubeAPIServer) configure(cfg *config.Config) error {
 			// limitations. For this, we prefer using names and IPs as a fallback, supporting both single
 			// and multi node.
 			"kubelet-preferred-address-types": {"Hostname", "InternalIP"},
+			"service-cluster-ip-range":        {strings.Join(cfg.Network.ServiceNetwork, ",")},
 
 			"proxy-client-cert-file":           {cryptomaterial.ClientCertPath(aggregatorClientCertDir)},
 			"proxy-client-key-file":            {cryptomaterial.ClientKeyPath(aggregatorClientCertDir)},
@@ -250,7 +252,6 @@ func (s *KubeAPIServer) configure(cfg *config.Config) error {
 		ServiceAccountPublicKeyFiles: []string{
 			filepath.Join(config.DataDir, "/resources/kube-apiserver/secrets/service-account-key/service-account.pub"),
 		},
-		ServicesSubnet:        cfg.Network.ServiceNetwork[0],
 		ServicesNodePortRange: cfg.Network.ServiceNodePortRange,
 	}
 
