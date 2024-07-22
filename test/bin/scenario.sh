@@ -16,7 +16,7 @@ source "${SCRIPTDIR}/common.sh"
 # shellcheck source=test/bin/common_versions.sh
 source "${SCRIPTDIR}/common_versions.sh"
 
-DEFAULT_BOOT_BLUEPRINT="rhel-9.2"
+DEFAULT_BOOT_BLUEPRINT="rhel-9.4"
 LVM_SYSROOT_SIZE="10240"
 WEB_SERVER_URL="http://${VM_BRIDGE_IP}:${WEB_SERVER_PORT}"
 BOOTC_REGISTRY_URL="${VM_BRIDGE_IP}:5000"
