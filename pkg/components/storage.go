@@ -62,7 +62,7 @@ func startCSIPlugin(ctx context.Context, cfg *config.Config, kubeconfigPath stri
 // deleteLegacyResources deletes the legacy resources of TopoLVM.
 // TODO: Remove this function in the next release.
 func deleteLegacyResources(ctx context.Context, kubeconfigPath string) error {
-	klog.Infof("Deleting legacy resources of TopoLVM (this is a migration operation and will disappear in the next release)")
+	klog.Infof("Deleting legacy resources of TopoLVM (this is a migration operation and will disappear in the future release)")
 	return assets.DeleteGeneric(ctx, []runtime.Object{
 		&appsv1.Deployment{ObjectMeta: metav1.ObjectMeta{Name: "topolvm-controller", Namespace: "openshift-storage"}},
 		&appsv1.DaemonSet{ObjectMeta: metav1.ObjectMeta{Name: "topolvm-node", Namespace: "openshift-storage"}},
