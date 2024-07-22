@@ -218,9 +218,17 @@ gettool_awscli() {
 
 gettool_oc() {
     local ver="4.16.3"
-    pushd "${WORK_DIR}" &>/dev/null
+    
+    declare -A arch_map=(
+    ["x86_64"]="x86_64"
+    ["aarch64"]="arm64")
 
-    curl -s "https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/${ver}/openshift-client-linux-${ver}.tar.gz" -o "oc-${ver}-linux.tar.gz"
+    local arch="${arch_map[${ARCH}]}"
+
+    pushd "${WORK_DIR}" &>/dev/null
+    echo "https://mirror.openshift.com/pub/openshift-v4/${arch}/clients/ocp/${ver}/openshift-client-linux-${ver}.tar.gz"
+
+    curl -s -f "https://mirror.openshift.com/pub/openshift-v4/${arch}/clients/ocp/${ver}/openshift-client-linux-${ver}.tar.gz" -L -o "oc-${ver}-linux.tar.gz"
     tar xvzf oc-${ver}-linux.tar.gz
     sudo cp oc /usr/bin/oc
 

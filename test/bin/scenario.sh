@@ -776,8 +776,10 @@ run_tests() {
     if ! command -v oc &> /dev/null
     then
         error "OpenShift Client package not installed, install it with ${ROOTDIR}/scripts/fetch_tools.sh oc"
+        record_junit "${vmname}" "oc_installed" "FAILED"
         exit 1
     fi
+    record_junit "${vmname}" "oc_installed" "OK"
 
     # The IP file is created empty during the launch VM phase if the VM is has no NICs. This is the queue to skip
     # the variable file creation and greenboot check.
