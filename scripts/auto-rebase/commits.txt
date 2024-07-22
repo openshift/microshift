@@ -16,7 +16,7 @@ https://github.com/openshift/openshift-controller-manager embedded-component f05
 https://github.com/openshift/operator-framework-olm embedded-component 1551101943313e3546cba7d9bc78effc79b40a8e
 https://github.com/openshift/route-controller-manager embedded-component 3112b458983c6fca6f77d5a945fb0026186dace6
 https://github.com/openshift/service-ca-operator embedded-component 538c7b98a689e573b61e1abb1cb649da470c5fac
-https://github.com/openshift/oc image-amd64 fa846511dbeb7e08cf77265056397283c6c896f9
+https://github.com/openshift/oc image-amd64 ada2fa874dc7dc175da036dae67e8d7a61a27291
 https://github.com/openshift/coredns image-amd64 04d84f7f2e17ff464fad3f2841e7b29a43c8382f
 https://github.com/openshift/csi-external-snapshotter image-amd64 5315d37a1e5415e8b6870f23e50238681979cc28
 https://github.com/openshift/csi-external-snapshotter image-amd64 5315d37a1e5415e8b6870f23e50238681979cc28
@@ -26,7 +26,7 @@ https://github.com/openshift/kube-rbac-proxy image-amd64 8ea2c994df4296ec161023d
 https://github.com/openshift/ovn-kubernetes image-amd64 7f412836bd26c3d6e9735552a7fd615e7e7e9695
 https://github.com/openshift/kubernetes image-amd64 aba1e8d781a8de14bd80a3e4ea0f9a29c5a8530d
 https://github.com/openshift/service-ca-operator image-amd64 538c7b98a689e573b61e1abb1cb649da470c5fac
-https://github.com/openshift/oc image-arm64 fa846511dbeb7e08cf77265056397283c6c896f9
+https://github.com/openshift/oc image-arm64 ada2fa874dc7dc175da036dae67e8d7a61a27291
 https://github.com/openshift/coredns image-arm64 04d84f7f2e17ff464fad3f2841e7b29a43c8382f
 https://github.com/openshift/csi-external-snapshotter image-arm64 5315d37a1e5415e8b6870f23e50238681979cc28
 https://github.com/openshift/csi-external-snapshotter image-arm64 5315d37a1e5415e8b6870f23e50238681979cc28
