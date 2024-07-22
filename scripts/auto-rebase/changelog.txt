@@ -1,16 +1,37 @@
-- csi-external-snapshotter image-arm64 a58f2cd35a2623d83179e9558a04a3094c694f4b to 6ae55b8749a2fd9011d2c75d5f428f36e93be512
+- api embedded-component e9f09d21bcb566954b1c28ba242887ae93979436 to 8da8de571496f968c1ce283e51718f218cc9eedc
+  - 34cb805 2024-07-16T15:33:44-04:00 Drop ImagePolicy featuregate
+  - d68bab0 2024-07-16T15:33:44-04:00 SigstoreImageVerification feature gatemarker for the ClusterImagePolicy and ImagePolicy
+
+- csi-external-snapshotter embedded-component a58f2cd35a2623d83179e9558a04a3094c694f4b to 6ae55b8749a2fd9011d2c75d5f428f36e93be512
   - 5af999d 2024-07-12T19:32:34+00:00 UPSTREAM: <carry>: Updating ose-csi-snapshot-controller-container image to be consistent with ART for 4.17 Reconciling with https://github.com/openshift/ocp-build-data/tree/81a28f96d18bca14030c8f73664a9c230858fb03/images/ose-csi-snapshot-controller.yml
   - 70b4688 2024-07-12T19:02:23+00:00 UPSTREAM: <carry>: Updating ose-csi-snapshot-validation-webhook-container image to be consistent with ART for 4.17 Reconciling with https://github.com/openshift/ocp-build-data/tree/81a28f96d18bca14030c8f73664a9c230858fb03/images/csi-snapshot-validation-webhook.yml
 
-- csi-external-snapshotter image-arm64 a58f2cd35a2623d83179e9558a04a3094c694f4b to 6ae55b8749a2fd9011d2c75d5f428f36e93be512
-  - 5af999d 2024-07-12T19:32:34+00:00 UPSTREAM: <carry>: Updating ose-csi-snapshot-controller-container image to be consistent with ART for 4.17 Reconciling with https://github.com/openshift/ocp-build-data/tree/81a28f96d18bca14030c8f73664a9c230858fb03/images/ose-csi-snapshot-controller.yml
-  - 70b4688 2024-07-12T19:02:23+00:00 UPSTREAM: <carry>: Updating ose-csi-snapshot-validation-webhook-container image to be consistent with ART for 4.17 Reconciling with https://github.com/openshift/ocp-build-data/tree/81a28f96d18bca14030c8f73664a9c230858fb03/images/csi-snapshot-validation-webhook.yml
-
-- csi-external-snapshotter image-arm64 a58f2cd35a2623d83179e9558a04a3094c694f4b to 6ae55b8749a2fd9011d2c75d5f428f36e93be512
-  - 5af999d 2024-07-12T19:32:34+00:00 UPSTREAM: <carry>: Updating ose-csi-snapshot-controller-container image to be consistent with ART for 4.17 Reconciling with https://github.com/openshift/ocp-build-data/tree/81a28f96d18bca14030c8f73664a9c230858fb03/images/ose-csi-snapshot-controller.yml
-  - 70b4688 2024-07-12T19:02:23+00:00 UPSTREAM: <carry>: Updating ose-csi-snapshot-validation-webhook-container image to be consistent with ART for 4.17 Reconciling with https://github.com/openshift/ocp-build-data/tree/81a28f96d18bca14030c8f73664a9c230858fb03/images/csi-snapshot-validation-webhook.yml
-
-- kubernetes image-arm64 e34cf927edb7321aac8e69ac9b8849fb831a8cfe to 1bead22a2ef091d421bbe4e455799fac869c3c80
+- kubernetes embedded-component e34cf927edb7321aac8e69ac9b8849fb831a8cfe to 1bead22a2ef091d421bbe4e455799fac869c3c80
   - a1eaa95fe 2024-07-15T16:39:34-03:00 UPSTREAM: <carry>: add tool to validate test packages imported
   - 092eb800a 2024-07-11T12:53:19+02:00 UPSTREAM: <carry>: sync imports and update test rules
+
+- machine-config-operator embedded-component 6968535ff182ae863a5309558239df879359b8d6 to 5fbf0e517a5bedfffe78247ce5ec65712521a3b4
+  - 43db0a10 2024-07-16T12:12:31-05:00 Restore setup-envtest used in the verify test
+
+- oc image-amd64 1127650882a9e42d059dca74c21915155afaeb2e to 4cd37cabf60e395d182361aef42ee0300c8233f6
+  - 4cd37cab 2024-07-18T21:43:33+00:00 upgarde status: use a table to represent node pools (#1821)
+
+- csi-external-snapshotter image-amd64 a58f2cd35a2623d83179e9558a04a3094c694f4b to 6ae55b8749a2fd9011d2c75d5f428f36e93be512
+  - 5af999d 2024-07-12T19:32:34+00:00 UPSTREAM: <carry>: Updating ose-csi-snapshot-controller-container image to be consistent with ART for 4.17 Reconciling with https://github.com/openshift/ocp-build-data/tree/81a28f96d18bca14030c8f73664a9c230858fb03/images/ose-csi-snapshot-controller.yml
+  - 70b4688 2024-07-12T19:02:23+00:00 UPSTREAM: <carry>: Updating ose-csi-snapshot-validation-webhook-container image to be consistent with ART for 4.17 Reconciling with https://github.com/openshift/ocp-build-data/tree/81a28f96d18bca14030c8f73664a9c230858fb03/images/csi-snapshot-validation-webhook.yml
+
+- csi-external-snapshotter image-amd64 a58f2cd35a2623d83179e9558a04a3094c694f4b to 6ae55b8749a2fd9011d2c75d5f428f36e93be512
+  - 5af999d 2024-07-12T19:32:34+00:00 UPSTREAM: <carry>: Updating ose-csi-snapshot-controller-container image to be consistent with ART for 4.17 Reconciling with https://github.com/openshift/ocp-build-data/tree/81a28f96d18bca14030c8f73664a9c230858fb03/images/ose-csi-snapshot-controller.yml
+  - 70b4688 2024-07-12T19:02:23+00:00 UPSTREAM: <carry>: Updating ose-csi-snapshot-validation-webhook-container image to be consistent with ART for 4.17 Reconciling with https://github.com/openshift/ocp-build-data/tree/81a28f96d18bca14030c8f73664a9c230858fb03/images/csi-snapshot-validation-webhook.yml
+
+- csi-external-snapshotter image-amd64 a58f2cd35a2623d83179e9558a04a3094c694f4b to 6ae55b8749a2fd9011d2c75d5f428f36e93be512
+  - 5af999d 2024-07-12T19:32:34+00:00 UPSTREAM: <carry>: Updating ose-csi-snapshot-controller-container image to be consistent with ART for 4.17 Reconciling with https://github.com/openshift/ocp-build-data/tree/81a28f96d18bca14030c8f73664a9c230858fb03/images/ose-csi-snapshot-controller.yml
+  - 70b4688 2024-07-12T19:02:23+00:00 UPSTREAM: <carry>: Updating ose-csi-snapshot-validation-webhook-container image to be consistent with ART for 4.17 Reconciling with https://github.com/openshift/ocp-build-data/tree/81a28f96d18bca14030c8f73664a9c230858fb03/images/csi-snapshot-validation-webhook.yml
+
+- kubernetes image-amd64 e34cf927edb7321aac8e69ac9b8849fb831a8cfe to 1bead22a2ef091d421bbe4e455799fac869c3c80
+  - a1eaa95fe 2024-07-15T16:39:34-03:00 UPSTREAM: <carry>: add tool to validate test packages imported
+  - 092eb800a 2024-07-11T12:53:19+02:00 UPSTREAM: <carry>: sync imports and update test rules
+
+- oc image-arm64 1127650882a9e42d059dca74c21915155afaeb2e to 4cd37cabf60e395d182361aef42ee0300c8233f6
+  - 4cd37cab 2024-07-18T21:43:33+00:00 upgarde status: use a table to represent node pools (#1821)
 
