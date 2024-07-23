@@ -60,6 +60,13 @@ Oc Exec
     ${output}=    Run With Kubeconfig    oc exec -n ${ns} pod/${pod} -- /bin/bash -c '${cmd}'
     RETURN    ${output}
 
+Oc Wait
+    [Documentation]    Run 'oc wait' on a specific resource in the current test namespace
+    ...    Returns the combined STDOUT/STDERR output of the command.
+    [Arguments]    ${opts}
+    ${output}=    Run With Kubeconfig    oc wait ${opts}
+    RETURN    ${output}
+
 Named Pod Should Be Ready
     [Documentation]    Wait for pod with name \${name} to become "Ready"
     ...    ${name}    Name of pod to wait for

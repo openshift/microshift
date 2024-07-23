@@ -20,15 +20,9 @@ import (
 )
 
 var (
-	sccScheme = runtime.NewScheme()
+	sccScheme = scheme
 	sccCodecs = serializer.NewCodecFactory(sccScheme)
 )
-
-func init() {
-	if err := sccv1.AddToScheme(sccScheme); err != nil {
-		panic(err)
-	}
-}
 
 type sccApplier struct {
 	Client *sccclientv1.SecurityV1Client

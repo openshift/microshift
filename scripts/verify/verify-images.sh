@@ -27,6 +27,8 @@ while read -r source_file image; do
             debug "${image} OK";;
         quay.io/openshift-release-dev/*)
             debug "${image} OK";;
+        quay.io/lvms_dev/*) # This is a registry for LVMS image clones from CPaaS candidates
+            debug "${image} OK";;
         registry.redhat.io/openshift4/*)
             debug "${image} OK";;
         registry.redhat.io/lvms4/*)

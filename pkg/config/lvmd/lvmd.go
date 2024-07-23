@@ -11,6 +11,7 @@ import (
 )
 
 const (
+	RuntimeLvmdConfigFile       = "/var/lib/microshift/lvms/lvmd.yaml"
 	LvmdConfigFileName          = "lvmd.yaml"
 	defaultSockName             = "/run/lvmd/lvmd.socket"
 	defaultRHEL4EdgeVolumeGroup = "microshift"
@@ -93,7 +94,7 @@ func getLvmdConfigForVGs(vgNames []string) (*Lvmd, error) {
 func DefaultLvmdConfig() (*Lvmd, error) {
 	vgNames, err := getVolumeGroups()
 	if err != nil {
-		return nil, fmt.Errorf("failed to discover local volume groups: %s", err)
+		return nil, fmt.Errorf("failed to discover local volume groups: %w", err)
 	}
 	return getLvmdConfigForVGs(vgNames)
 }
@@ -103,7 +104,7 @@ func getVolumeGroups() ([]string, error) {
 	cmd := exec.Command("vgs", "--readonly", "--options=name", "--noheadings")
 	output, err := cmd.Output()
 	if err != nil {
-		return nil, fmt.Errorf("error running vgs: %s", err)
+		return nil, fmt.Errorf("error running vgs: %w", err)
 	}
 	names := []string{}
 	for _, line := range strings.Split(string(output), "\n") {
@@ -119,12 +120,12 @@ func NewLvmdConfigFromFile(p string) (*Lvmd, error) {
 	l := new(Lvmd)
 	buf, err := os.ReadFile(p)
 	if err != nil {
-		return nil, fmt.Errorf("failed to read lvmd file: %v", err)
+		return nil, fmt.Errorf("failed to read lvmd file: %w", err)
 	}
 
 	err = yaml.Unmarshal(buf, &l)
 	if err != nil {
-		return nil, fmt.Errorf("unmarshalling lvmd file: %v", err)
+		return nil, fmt.Errorf("unmarshalling lvmd file: %w", err)
 	}
 	if l.SocketName == "" {
 		l.SocketName = defaultSockName
@@ -133,9 +134,21 @@ func NewLvmdConfigFromFile(p string) (*Lvmd, error) {
 	return l, nil
 }
 
-func LvmSupported() error {
-	if _, err := exec.LookPath("vgs"); err != nil {
-		return fmt.Errorf("failed to find 'vgs' command line tool: %v", err)
+func SaveLvmdConfigToFile(l *Lvmd, p string) error {
+	buf, err := yaml.Marshal(l)
+	if err != nil {
+		return fmt.Errorf("marshalling lvmd config: %w", err)
+	}
+	err = os.WriteFile(p, buf, 0600)
+	if err != nil {
+		return fmt.Errorf("writing lvmd config: %w", err)
+	}
+	return nil
+}
+
+func LvmPresentOnMachine() error {
+	if _, err := exec.LookPath("lvm"); err != nil {
+		return fmt.Errorf("failed to find 'vgs' command line tool: %w", err)
 	}
 	return nil
 }
