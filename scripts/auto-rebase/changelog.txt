@@ -1,3 +1,0 @@
-- machine-config-operator embedded-component ea6671e27ec6683aa986b7072b022f0393a0e15a to 83226c2cde5bfd61b8e289773edae3cd7fc3f5dd
-  - 7ce4627c 2024-07-17T23:05:33+00:00 OCPBUGS-36863: Copy RHEL9 binaries used in HCP
-
