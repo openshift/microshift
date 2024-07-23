@@ -1,6 +1,0 @@
-- cluster-network-operator embedded-component 853b1bd8f59f22cdc020c6b916b80e64ee71dc6d to 3a06784187564c89dffbc0dd9378fb4feaa03005
-  - f6ab5c5 2024-06-03T14:25:56+00:00 Ensure that the node-identity webhook address contains colons for IPv6
-
-- machine-config-operator embedded-component cee5dd7922f666583d92128b72fe7adac77c04ae to b730129374d90da5a32235fd104fba6385f4b3a9
-  - 10b4eab4 2024-07-17T15:55:44+02:00 OCPBUGS-36863: Copy RHEL9 binaries used in HCP
-
