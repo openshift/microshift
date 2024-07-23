@@ -184,7 +184,7 @@ patch_namespace() {
     if [[ $(yq e ".metadata.namespace == \"${namespace}\"" "${file}") == "false" ]]; then
       echo "patching .metadata.namespace to \"${namespace}\" in ${file}"
       # Set the .metadata.namespace to the specified value
-      yq e '.metadata.namespace = "'"${namespace}"'"' -i "${file}"
+      ns=${namespace} yq e '.metadata.namespace = strenv(ns)'  -i "${file}"
     fi
   fi
 }

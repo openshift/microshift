@@ -71,7 +71,6 @@ pullspec_release_lvms="registry.redhat.io/lvms4/lvms-operator-bundle:${release_l
 # the latest lvms release candidate replicated from CPaaS into quay
 pullspec_release_lvms_fallback="quay.io/lvms_dev/lvms4-lvms-operator-bundle:${release_lvms}"
 
-# You can also pass the version as a command-line argument
 lvms_is_candidate_build=$(check_semver_suffix "${release_lvms}")
 if [ "$lvms_is_candidate_build" == "false" ]; then
     ./scripts/auto-rebase/rebase-lvms.sh to "${pullspec_release_lvms}"
