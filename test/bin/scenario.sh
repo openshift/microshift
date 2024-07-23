@@ -257,6 +257,7 @@ prepare_kickstart() {
             -e "s|REPLACE_FIPS_ENABLED|${fips_enabled}|g" \
             -e "s|REPLACE_ENABLE_MIRROR|${ENABLE_REGISTRY_MIRROR}|g" \
             -e "s|REPLACE_MIRROR_HOSTNAME|${hostname}|g" \
+            -e "s|REPLACE_VM_BRIDGE_IP|${VM_BRIDGE_IP}|g" \
             "${ifile}" > "${output_file}"
     done
     record_junit "${vmname}" "prepare_kickstart" "OK"
