@@ -173,7 +173,7 @@ To workaround this issue, there is a dedicated script in `scripts/auto-rebase/re
 
 The script employs `yq` extensively for manipulating YAML files coming from the bundle, 
 such as extracting and updating image references in the LVMS operator bundle manifest. 
-It also uses oc image extract to download the operator bundle for different architectures.
+It also uses `oc image extract` to download the operator bundle for different architectures.
 
 Finally, the script includes utility functions for generating Kubernetes ConfigMaps, extracting RBAC (Role-Based Access Control) resources from the ClusterServiceVersion (CSV) file, and patching namespaces in YAML files.
 
