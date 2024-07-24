@@ -122,6 +122,7 @@ Summary: Greenboot components for MicroShift
 BuildArch: noarch
 Requires: microshift = %{version}
 Requires: greenboot
+Requires: python3-pyyaml
 
 %description greenboot
 The microshift-greenboot package provides the Greenboot scripts used for verifying that MicroShift is up and running.

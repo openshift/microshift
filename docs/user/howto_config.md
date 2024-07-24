@@ -50,6 +50,10 @@ node:
     hostnameOverride: ""
     nodeIP: ""
     nodeIPv6: ""
+storage:
+    driver: ""
+    optionalCsiComponents:
+        - ""
 
 ```
 <!---
@@ -110,6 +114,10 @@ node:
     hostnameOverride: ""
     nodeIP: ""
     nodeIPv6: ""
+storage:
+    driver: ""
+    optionalCsiComponents:
+        - ""
 
 ```
 <!---

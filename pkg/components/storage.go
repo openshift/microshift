@@ -22,6 +22,10 @@ import (
 )
 
 func startCSIPlugin(ctx context.Context, cfg *config.Config, kubeconfigPath string) error {
+	if !cfg.Storage.IsEnabled() {
+		klog.Warningf("CSI driver deployment disabled, persistent storage will not be available")
+		return nil
+	}
 	if err := lvmd.LvmPresentOnMachine(); err != nil {
 		klog.Warningf("skipping CSI deployment: %v", err)
 		return nil
