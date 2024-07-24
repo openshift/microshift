@@ -39,6 +39,7 @@ require (
 )
 
 require (
+	github.com/fsnotify/fsnotify v1.7.0
 	gopkg.in/yaml.v2 v2.4.0
 	k8s.io/utils v0.0.0-20240102154912-e7106e64919e
 	sigs.k8s.io/kube-storage-version-migrator v0.0.6-0.20230721195810-5c8923c5ff96
@@ -86,7 +87,6 @@ require (
 	github.com/exponent-io/jsonpath v0.0.0-20151013193312-d6023ce2651d // indirect
 	github.com/fatih/camelcase v1.0.0 // indirect
 	github.com/felixge/httpsnoop v1.0.3 // indirect
-	github.com/fsnotify/fsnotify v1.7.0 // indirect
 	github.com/fvbommel/sortorder v1.1.0 // indirect
 	github.com/go-asn1-ber/asn1-ber v1.5.4 // indirect
 	github.com/go-errors/errors v1.4.2 // indirect
