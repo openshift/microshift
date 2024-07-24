@@ -4,6 +4,7 @@ Documentation       Keywords for accessing a kubeconfig file for the MicroShift 
 Library             OperatingSystem
 Library             String
 Library             DataFormats.py
+Library             libipv6.py
 Resource            ../resources/microshift-host.resource
 Resource            ../resources/common.resource
 
@@ -31,9 +32,10 @@ Setup Kubeconfig
     # If we have been given an explicit API port to use, make sure that
     # port appears in the kubeconfig file.
     IF    "${API_PORT}"!="${EMPTY}"
+        ${ip}=    Add Brackets If Ipv6    ${USHIFT_HOST}
         ${kubeconfig}=    Update Kubeconfig Server Url
         ...    ${kubeconfig}
-        ...    https://${USHIFT_HOST}:${API_PORT}
+        ...    https://${ip}:${API_PORT}
     END
     ${path}=    Create Random Temp File    ${kubeconfig}
     Set Suite Variable    \${KUBECONFIG}    ${path}

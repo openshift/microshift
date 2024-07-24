@@ -1,6 +1,10 @@
 <network>
   <name>${VM_IPV6_NETWORK}</name>
-  <forward mode='none'/>
+  <forward mode="nat">
+    <nat ipv6='yes'>
+      <port start='1024' end='65535'/>
+    </nat>
+  </forward>
   <ip family="ipv6" address="2001:db8:ca7:ff::1" prefix="96">
     <dhcp>
       <range start="2001:db8:ca7:ff::1000" end="2001:db8:ca7:ff::2000" />
