@@ -89,6 +89,9 @@ DNS Entry For Route Should Resolve
     ...    timeout=15s
     Should Be Equal As Integers    0    ${result.rc}
     Log Many    ${result.stdout}    ${result.stderr}
+    @{words} =  Split String    ${result.stdout}
+    Must Be Ipv6    ${words}[1]
+
 
 Restart Router
     [Documentation]    Restart the router and wait for readiness again. The router is sensitive to apiserver
