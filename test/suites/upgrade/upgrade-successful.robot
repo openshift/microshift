@@ -32,8 +32,12 @@ Upgrade
 
     Validate SELinux With Backup    ${future_backup}
 
-    # verifies that old TopoLVM resources are cleaned up after migration
-    Oc Wait    -f ${LVMS_TOPOLVM_DIFF} --for=Delete --timeout=${DEFAULT_WAIT_TIMEOUT}
+    # Skip topolvm deletion check if upgrade is to "crel" because (at the time of writing)
+    # it doesn't yet contain the topolvm -> lvms changes.
+    IF    'microshift-crel' not in '${TARGET_REF}'
+        # verifies that old TopoLVM resources are cleaned up after migration
+        Oc Wait    -f ${LVMS_TOPOLVM_DIFF} --for=Delete --timeout=${DEFAULT_WAIT_TIMEOUT}
+    END
 
 
 *** Keywords ***
