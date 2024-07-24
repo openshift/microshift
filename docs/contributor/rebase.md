@@ -165,42 +165,71 @@ git add Makefile* packaging
 git commit -m "update buildfiles"
 ```
 
-### Fully Automated Update of LVMS
+### LVMS Rebase
+
+Since LVMS is part of the delivery of MicroShift default functionality, we cannot rely on OLM to use a ClusterServiceVersion to install LVMS as we would in a normal OpenShift cluster. 
+
+To workaround this issue, there is a dedicated script in `scripts/auto-rebase/rebase-lvms.sh` to update the LVMS component images and manifests based on (naive but straight-forward) reverse-engineering the Operator Bundle image of LVMS.
+
+The script employs `yq` extensively for manipulating YAML files coming from the bundle, 
+such as extracting and updating image references in the LVMS operator bundle manifest. 
+It also uses oc image extract to download the operator bundle for different architectures.
+
+Finally, the script includes utility functions for generating Kubernetes ConfigMaps, extracting RBAC (Role-Based Access Control) resources from the ClusterServiceVersion (CSV) file, and patching namespaces in YAML files.
+
+In summary the following steps are included:
+
+- Download LVMS Operator Bundle Manifest: Downloads the LVMS operator bundle for specified architectures and extracts relevant files, including RBAC and deployment manifests.
+- Update LVMS Images: Parses the downloaded LVMS operator bundle manifest to update image references in the project.
+- Update LVMS Manifests: Copies LVMS manifests from the staging directory to the project, ensuring the project uses the latest LVMS configurations.
+- Extract RBAC from ClusterServiceVersion: Extracts RBAC permissions and roles from the LVMS ClusterServiceVersion file and saves them as separate YAML files in the staging directory.
+- Extract Deployments, Webhooks, and Services: Extracts the core of the operator bundle from the LVMS ClusterServiceVersion file and saves them as separate YAML files in the staging directory.
+- Patch Namespace in Manifests: Adjusts the namespace in LVMS-related Kubernetes manifests to ensure they are deployed to the correct namespace, what otherwise would be done via OLM.
+
+#### Fully Automated Update of LVMS
 
 The following command attempts a fully automatic rebase to a given target LVMS release.  It creates a new branch named after the LVMS release, then runs the individual steps described in the following sections, including creating the respective commits.
 
+for a release candidate in CPaaS (Red Hat Internal Build System):
+
 ```shell
-./scripts/auto-rebase/rebase.sh lvms-to registry.redhat.io/lvms4/lvms-operator-bundle:[TAG || DIGEST]
+./scripts/auto-rebase/rebase-lvms.sh to "quay.io/lvms_dev/lvms4-lvms-operator-bundle:[TAG || DIGEST]"
 ```
 
-### Manual Update of LVMS
+for a public release:
 
-#### Downloading the target LVMS release
+```shell
+./scripts/auto-rebase/rebase-lvms.sh to "registry.redhat.io/lvms4/lvms-operator-bundle:[TAG || DIGEST]"
+```
+
+#### Manual Update of LVMS
+
+##### Downloading the target LVMS release
 
 Run the following to download the LVMS release to update to, specifying the multi-arch target release image, e.g.:
 
 ```shell
-./scripts/auto-rebase/rebase.sh lvms-download registry.redhat.io/lvms4/lvms-operator-bundle:v4.12
+./scripts/auto-rebase/rebase-lvms.sh download "registry.redhat.io/lvms4/lvms-operator-bundle:[TAG || DIGEST]"
 ```
 
 This will create a directory `_output/staging`, download the operator bundle for the specified LVMS release.
 
-#### Updating the LVMS component images
+##### Updating the LVMS component images
 
 To update the image references for LVMS, run:
 
 ```shell
-./scripts/auto-rebase/rebase.sh lvms-images
+./scripts/auto-rebase/rebase-lvms.sh images
 git add pkg/release
 git commit -m "update LVMS images"
 ```
 
-#### Updating the LVMS manifests
+##### Updating the LVMS manifests
 
 To update the manifests for LVMS, run:
 
 ```shell
-./scripts/auto-rebase/rebase.sh lvms-manifests
+./scripts/auto-rebase/rebase-lvms.sh manifests
 git add assets
 git commit -m "update LVMS manifests"
 ```
