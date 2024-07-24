@@ -1,0 +1,10 @@
+- operator-framework-olm embedded-component 28befe20a9f97db2a4a47c655b483de3197622da to f3f8de5d0caa7387630272260e9e4e0db1b8ef85
+  - f3c75774 2024-07-17T10:46:15+02:00 [CARRY] Bump github.com/containers/image/v5
+  - ea327068 2024-07-10T13:11:33+00:00 fix sorting unpack jobs (#3299)
+
+- coredns image-amd64 22f950eae53fcba187c2303ac4f1a8305b6c1c8a to 1326282c9e158078634be4261b75ded247d233d7
+  - f70cdab 2024-07-16T18:18:10+00:00 UPSTREAM: 6354: openshift: Fix OCPBUGS-15755
+
+- coredns image-arm64 22f950eae53fcba187c2303ac4f1a8305b6c1c8a to 1326282c9e158078634be4261b75ded247d233d7
+  - f70cdab 2024-07-16T18:18:10+00:00 UPSTREAM: 6354: openshift: Fix OCPBUGS-15755
+
