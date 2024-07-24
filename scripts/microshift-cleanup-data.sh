@@ -114,6 +114,8 @@ function clean_data() {
     if ${FULL_CLEAN} ; then
         echo Removing MicroShift configuration
         rm -rf /var/lib/microshift
+        # Best effort - it contains Pod volumes which sometimes cannot be removed (Device or resource busy)
+        rm -rf /var/lib/kubelet 2>/dev/null || true
     elif ${CERT_CLEAN} ; then
         echo Removing MicroShift certificates
         rm -rf /var/lib/microshift/certs
