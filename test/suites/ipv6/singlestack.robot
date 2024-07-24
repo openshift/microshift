@@ -15,7 +15,7 @@ Test Tags           ipv6    network
 
 *** Variables ***
 ${USHIFT_HOST}      ${EMPTY}
-${HOSTNAME}         hello-microshift.cluster.local
+${HOSTNAME}         hello-microshift.ipv6.cluster.local
 
 
 *** Test Cases ***
@@ -28,7 +28,7 @@ Verify Router Serves IPv6
 
     Must Be Ipv6    ${USHIFT_HOST}
     Wait Until Keyword Succeeds    10x    6s
-    ...    Access Hello Microshift Success    ${HTTP_PORT}
+    ...    Access Hello Microshift Success    ushift_port=${HTTP_PORT}    hostname=${HOSTNAME}
 
     DNS Entry For Route Should Resolve
 
@@ -69,7 +69,7 @@ Wait For Service Deletion With Timeout
 Expose Hello MicroShift Service Via Route
     [Documentation]    Expose the "hello microshift" application through the Route
     Oc Expose    pod hello-microshift -n ${NAMESPACE}
-    Oc Expose    svc hello-microshift --hostname hello-microshift.cluster.local -n ${NAMESPACE}
+    Oc Expose    svc hello-microshift --hostname ${HOSTNAME} -n ${NAMESPACE}
 
 Network APIs With Test Label Are Gone
     [Documentation]    Check for service and endpoint by "app=hello-microshift" label. Succeeds if response matches
