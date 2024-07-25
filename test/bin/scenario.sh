@@ -613,7 +613,10 @@ remove_vm() {
     # Remove the actual VM
     if sudo virsh dumpxml "${full_vmname}" >/dev/null; then
         if ! sudo virsh dominfo "${full_vmname}" | grep '^State' | grep -q 'shut off'; then
-            sudo virsh destroy "${full_vmname}"
+            sudo virsh destroy --graceful "${full_vmname}" || true
+        fi
+        if ! sudo virsh dominfo "${full_vmname}" | grep '^State' | grep -q 'shut off'; then
+            sudo virsh destroy "${full_vmname}" || true
         fi
         sudo virsh undefine --nvram "${full_vmname}"
     fi
