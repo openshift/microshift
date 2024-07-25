@@ -55,7 +55,7 @@ validate_vm_hostname() {
         exit 1
     fi
 
-    if [[ $vm_name =~ ^\. ]]; then
+    if [[ "${vm_name}" =~ ^\. ]]; then
         error "VM hostname cannot start with '.'" 
         record_junit "${vm_name}" "vm_hostname_validation" "FAILED"
         exit 1
