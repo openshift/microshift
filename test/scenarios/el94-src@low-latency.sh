@@ -1,0 +1,19 @@
+#!/bin/bash
+
+export SKIP_GREENBOOT=true
+export TEST_RANDOMIZATION=none
+
+# Sourced from scenario.sh and uses functions defined there.
+
+scenario_create_vms() {
+    prepare_kickstart host1 kickstart.ks.template rhel-9.4-microshift-source-tuned
+    launch_vm host1 rhel-9.4 "" 6
+}
+
+scenario_remove_vms() {
+    remove_vm host1
+}
+
+scenario_run_tests() {
+    run_tests host1 suites/tuned/
+}

@@ -25,3 +25,4 @@ TimeoutStartSec=4m
 
 [Install]
 WantedBy=multi-user.target
+Also=microshift-cleanup-kubelet.service

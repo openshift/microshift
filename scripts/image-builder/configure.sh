@@ -28,6 +28,16 @@ if grep -qE "Red Hat Enterprise Linux.*Beta" /etc/redhat-release; then
    sudo sed -i "s,dist/rhel9/${VID},beta/rhel9/9,g" /usr/share/osbuild-composer/repositories/rhel-"${VID}".json
 fi
 
+# Following edits composer's configuration to enable RT repository.
+# Duplicate first repository (baseos), change its name, and replace 'baseos' with 'rt'.
+# kernel-rt is only available for x86_64.
+"${SCRIPTDIR}/../fetch_tools.sh" yq
+sudo mkdir -p /etc/osbuild-composer/repositories/
+source /etc/os-release
+sudo "${SCRIPTDIR}/../../_output/bin/yq" \
+    '.["x86_64"] += (.["x86_64"][0] | .name = "kernel-rt" | .baseurl |= sub("baseos", "rt"))' \
+    "/usr/share/osbuild-composer/repositories/rhel-${VERSION_ID}.json" | jq | sudo tee "/etc/osbuild-composer/repositories/rhel-${VERSION_ID}.json" 2>/dev/null
+
 sudo systemctl enable osbuild-composer.socket --now
 sudo systemctl enable cockpit.socket --now
 sudo firewall-cmd --add-service=cockpit --permanent
