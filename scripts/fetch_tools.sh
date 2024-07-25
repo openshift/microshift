@@ -217,20 +217,18 @@ gettool_awscli() {
 }
 
 gettool_oc() {
-    local ver="4.16.3"
-    
     declare -A arch_map=(
-    ["x86_64"]="x86_64"
-    ["aarch64"]="arm64")
+        ["x86_64"]="x86_64"
+        ["aarch64"]="arm64")
 
     local arch="${arch_map[${ARCH}]}"
 
     pushd "${WORK_DIR}" &>/dev/null
-    echo "https://mirror.openshift.com/pub/openshift-v4/${arch}/clients/ocp/${ver}/openshift-client-linux-${ver}.tar.gz"
 
-    curl -s -f "https://mirror.openshift.com/pub/openshift-v4/${arch}/clients/ocp/${ver}/openshift-client-linux-${ver}.tar.gz" -L -o "oc-${ver}-linux.tar.gz"
-    tar xvzf oc-${ver}-linux.tar.gz
+    curl -s -f "https://mirror.openshift.com/pub/openshift-v4/${arch}/clients/ocp/latest/openshift-client-linux.tar.gz" -L -o "openshift-client-linux.tar.gz"
+    tar xvzf openshift-client-linux.tar.gz
     sudo cp oc /usr/bin/oc
+    sudo cp kubectl /usr/bin/kubectl
 
     popd &>/dev/null
 }
