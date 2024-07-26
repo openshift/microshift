@@ -295,3 +295,62 @@ provisioning/deprovisioning or mount/unmount operations. Workloads with attached
 those volumes must then be manually deleted by the user. Once the MicroShift config `storage` section is specified with
 supported values, the user may restart MicroShift. They should see that MicroShift does not redeploy the disabled
 components after restart.
+
+## Drop-in configuration directory
+
+In addition to the existing `/etc/microshift/config.yaml` configuration file there is a `/etc/microshift/config.d` configuration directory where you can place fragments of configuration.
+
+At runtime, `/etc/microshift/config.yaml` and `.yaml` files inside `/etc/microshift/config.d` are merged together to create one configuration file which overrides the defaults.
+
+Files in `/etc/microshift/config.d` are sorted lexicographilly. It is recommended to use numerical prefix for easy reasoning about the priority of the fragments.
+
+For example, given following files:
+- `/etc/microshift/config.yaml`
+- `/etc/microshift/config.d/10-subjectAltNames.yaml`
+- `/etc/microshift/config.d/20-kubelet.yaml`
+
+The final user config will be created by using `config.yaml` as a base, and then overwriting it with `10-subjectAltNames.yaml`, and then overwriting it with `20-kubelet.yaml`:
+```
+20-kubelet.yaml
+     ||
+     \/
+10-subjectAltNames.yaml
+     ||
+     \/
+config.yaml
+```
+
+Some additional rules:
+- Lists are not merged together, they are overwritten. For example:
+  ```yaml
+  # 10-san.yaml
+  apiServer:
+    subjectAltNames:
+      - host1
+      - host2
+
+  # 20-san.yaml
+  apiServer:
+    subjectAltNames:
+      - hostZ
+
+  # end result
+  apiServer:
+    subjectAltNames:
+      - hostZ
+  ```
+- Contents of `kubelet:` configuration are merged together (unless specific field is a list). For example:
+  ```yaml
+  # 10-kubelet.yaml
+  kubelet:
+    some_setting: True
+
+  # 20-kubelet.yaml
+  kubelet:
+    another_setting: True
+
+  # end result
+  kubelet:
+    some_setting: True
+    another_setting: True
+  ```
