@@ -5,6 +5,7 @@ apiVersion: v1
 spec:
   type: ClusterIP
   internalTrafficPolicy: Cluster
+  ipFamilyPolicy: '{{.IPFamily}}'
   ports:
     - name: http
       port: 80

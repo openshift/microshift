@@ -29,6 +29,7 @@ spec:
         type: infra
         openshift.io/component: network
         kubernetes.io/os: "linux"
+        microshift.io/ipfamilypolicy: '{{.IPFamily}}'
     spec:
       serviceAccountName: ovn-kubernetes-controller
       hostNetwork: true
