@@ -1,29 +1,6 @@
-- api embedded-component 329ea37556495281bb92beae131a449e798a4380 to 465787efd0d69f12beaad9410a3812d823e78c2b
-  - 2cc2fb7 2024-07-08T14:42:19-04:00 NE-1530: IngressController LB Subnet Selection in AWS
+- oc image-arm64 5fc681242a24e146ac67b7be2d2ba909f833b3b0 to 19e7c3998335e1b3f0153fec82a8a81e04c45634
+  - 278081ea 2024-07-17T14:27:05-04:00 Minor wording tweaks for CLI help
 
-- cluster-ingress-operator embedded-component a5b1a32aa89bf183341aae32b2134a36513ad358 to f0722916474a5ca78ba8e14fafc793988be14850
-  - 1ae7e8c 2024-07-02T19:47:50-04:00 Delete & recreate canary route to clear spec.host
-
-- cluster-kube-apiserver-operator embedded-component a88d4ae8e0a9c8d3457e8488d9da7f04680240d3 to 890ef6e36bc331247d64c3d2a34619eb8e604e54
-  - d6e9553 2024-07-10T13:44:04+02:00 p/o/podsecurityreadinesscontroller: add disabled syncer
-  - acf9f46 2024-07-10T13:44:03+02:00 p/o/psreadinesscontroller: make ctrl owner aware
-  - 3e89c96 2024-07-04T16:46:51+02:00 p/o/psreadinesscontroller: minor refactoring
-
-- machine-config-operator embedded-component 0f53196f6480481d3f5a04e217a143a56d4db79e to a1213dbb6b25f634494e17c7c30d9605558565be
-  - b16f1b50 2024-07-10T13:23:23-04:00 OCPBUGS-35436: Remove disable-mglru.service
-  - 42a2e797 2024-07-08T19:20:08-04:00 templates: run disable-mglru conditionally
-
-- operator-framework-olm embedded-component 6e34f41a6856ecc6b17129bd7d3370c0de1255d3 to 79f360bfe22a46a390f578a239f909f5faaf954c
-  - 79fd14fa 2024-07-11T00:03:16+00:00 mark flaky test as flaky (#3340)
-  - e84d34d6 2024-07-10T00:03:31+00:00 build(deps): bump golang.org/x/net from 0.26.0 to 0.27.0 (#3341)
-
-- router image-amd64 4d9b8c4afa6cd89b41f4bd5e7c09ccddd8679bc6 to a7313722c6e0541fcc00e92c459dd5d32a4a1534
-  - 4b3e265 2024-05-25T18:01:19+00:00 Updating openshift-enterprise-haproxy-router-container image to be consistent with ART for 4.17 Reconciling with https://github.com/openshift/ocp-build-data/tree/4c1326094222f9209876f06833179a1b9178faf7/images/openshift-enterprise-haproxy-router.yml
-  - 889bddf 2024-05-25T13:14:15+00:00 Updating ose-haproxy-router-base-container image to be consistent with ART for 4.17 Reconciling with https://github.com/openshift/ocp-build-data/tree/4c1326094222f9209876f06833179a1b9178faf7/images/ose-haproxy-router-base.yml
-
-- router image-arm64 467f906b561be9faa422b30339a7a3d939782a67 to a7313722c6e0541fcc00e92c459dd5d32a4a1534
-  - 889bddf 2024-05-25T13:14:15+00:00 Updating ose-haproxy-router-base-container image to be consistent with ART for 4.17 Reconciling with https://github.com/openshift/ocp-build-data/tree/4c1326094222f9209876f06833179a1b9178faf7/images/ose-haproxy-router-base.yml
-
-- kubernetes image-arm64 421e90ed9ef07c1a797386e662255dfb830a6b9f to 61de516d1eb19a8e392045f2e1dbcf3bf8e8580c
-  - 76b0e3eab 2024-07-09T18:12:04+02:00 UPSTREAM: <carry>: inject k8s version from hyperkube Dockerfile
+- kubernetes image-arm64 1bead22a2ef091d421bbe4e455799fac869c3c80 to 32f817d75efea03f9baf659eaf373569c4d85f56
+  - 3943dc137 2024-07-23T01:25:18-04:00 UPSTREAM: <carry>: update test annotations for sno
 

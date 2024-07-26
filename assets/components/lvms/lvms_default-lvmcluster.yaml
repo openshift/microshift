@@ -1,0 +1,5 @@
+apiVersion: lvm.topolvm.io/v1alpha1
+kind: LVMCluster
+metadata:
+  name: lvms
+  namespace: openshift-storage

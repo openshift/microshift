@@ -1,12 +1,19 @@
 package embedded
 
-import "embed"
+import (
+	"embed"
+	"io/fs"
+)
 
 //go:embed components controllers core crd version release
 var content embed.FS
 
 func Asset(name string) ([]byte, error) {
 	return content.ReadFile(name)
+}
+
+func AssetStreamed(name string) (fs.File, error) {
+	return content.Open(name)
 }
 
 func MustAsset(name string) []byte {

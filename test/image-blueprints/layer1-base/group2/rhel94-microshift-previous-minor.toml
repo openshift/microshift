@@ -25,10 +25,18 @@ version = "{{ .Env.PREVIOUS_RELEASE_VERSION }}*"
 name = "microshift-test-agent"
 version = "*"
 
-# The bootc package is required for testing upgrades
-# from ostree to bootc images
+# The bootc, dnf and subscription-manager packages are required for
+# testing upgrades from ostree to bootc images
 [[packages]]
 name = "bootc"
+version = "*"
+
+[[packages]]
+name = "dnf"
+version = "*"
+
+[[packages]]
+name = "subscription-manager"
 version = "*"
 
 [customizations.services]

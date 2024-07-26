@@ -1,0 +1,42 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: oslat
+  annotations:
+    cpu-load-balancing.crio.io: "disable"
+    irq-load-balancing.crio.io: "disable"
+    cpu-quota.crio.io: "disable"
+spec:
+  runtimeClassName: microshift-low-latency
+  containers:
+  - name: oslat
+    image: quay.io/container-perf-tools/oslat
+    imagePullPolicy: Always
+    resources:
+      requests:
+        memory: "200Mi"
+        cpu: "2"
+      limits:
+        memory: "200Mi"
+        cpu: "2"
+    env:
+    - name: tool
+      value: "oslat"
+    - name: manual
+      value: "n"
+    - name: PRIO
+      value: "1"
+    - name: delay
+      value: "0"
+    - name: RUNTIME_SECONDS
+      value: "10"
+    - name: TRACE_THRESHOLD
+      value: ""
+    - name: EXTRA_ARGS
+      value: ""
+    securityContext:
+      privileged: true
+      capabilities:
+        add:
+          - SYS_NICE
+          - IPC_LOCK

@@ -51,6 +51,10 @@ type Config struct {
 	Manifests Manifests     `json:"manifests"`
 	Ingress   IngressConfig `json:"ingress"`
 
+	// Settings specified in this section are transferred as-is into the Kubelet config.
+	// +kubebuilder:validation:Schemaless
+	Kubelet map[string]any `json:"kubelet"`
+
 	// Internal-only fields
 	userSettings *Config `json:"-"` // the values read from the config file
 
@@ -115,14 +119,7 @@ func (c *Config) fillDefaults() error {
 		BaseDomain: "example.com",
 	}
 	c.Network = Network{
-		ClusterNetwork: []string{
-			"10.42.0.0/16",
-		},
-		ServiceNetwork: []string{
-			"10.43.0.0/16",
-		},
 		ServiceNodePortRange: "30000-32767",
-		DNS:                  "10.43.0.10",
 	}
 	c.Etcd = EtcdConfig{
 		MemoryLimitMB:           0,
@@ -151,6 +148,7 @@ func (c *Config) fillDefaults() error {
 	}
 
 	c.MultiNode.Enabled = false
+	c.Kubelet = nil
 
 	return nil
 }
@@ -255,12 +253,33 @@ func (c *Config) incorporateUserSettings(u *Config) {
 	if len(u.ApiServer.NamedCertificates) != 0 {
 		c.ApiServer.NamedCertificates = u.ApiServer.NamedCertificates
 	}
+
+	if u.Kubelet != nil {
+		c.Kubelet = u.Kubelet
+	}
 }
 
 // updateComputedValues examins the existing settings and converts any
 // inputs to more easily consumable units or fills in any defaults
 // computed based on the values of other settings.
 func (c *Config) updateComputedValues() error {
+	if len(c.Network.ClusterNetwork) == 0 {
+		defaultClusterNetwork := "10.42.0.0/16"
+		ip := net.ParseIP(c.Node.NodeIP)
+		if ip.To4() == nil {
+			defaultClusterNetwork = "fd01::/48"
+		}
+		c.Network.ClusterNetwork = []string{defaultClusterNetwork}
+	}
+	if len(c.Network.ServiceNetwork) == 0 {
+		defaultServiceNetwork := "10.43.0.0/16"
+		ip := net.ParseIP(c.Node.NodeIP)
+		if ip.To4() == nil {
+			defaultServiceNetwork = "fd02::/112"
+		}
+		c.Network.ServiceNetwork = []string{defaultServiceNetwork}
+	}
+
 	clusterDNS, err := c.computeClusterDNS()
 	if err != nil {
 		return err
@@ -275,25 +294,30 @@ func (c *Config) updateComputedValues() error {
 
 	// If we have no advertise address, pick one.
 	if len(c.ApiServer.AdvertiseAddress) == 0 {
-		// unchecked error because this was done when getting cluster DNS
-		_, svcNet, _ := net.ParseCIDR(c.Network.ServiceNetwork[0])
 		// Since the KAS advertise address was not provided we will default to the
 		// next immediate subnet after the service CIDR. This is due to the fact
 		// that using the actual apiserver service IP as an endpoint slice breaks
 		// host network pods trying to reach apiserver, as the VIP 10.43.0.1:443 is
 		// not translated to 10.43.0.1:6443. It remains unchanged and therefore
 		// connects to the ingress router instead, triggering all sorts of errors.
-		prefix := 32
-		if svcNet.IP.To4() == nil {
-			prefix = 128
+		ip, err := firstIPFromNextSubnet(c.Network.ServiceNetwork[0])
+		if err != nil {
+			return fmt.Errorf("unable to compute AdvertiseAddress: %s", err)
 		}
-		nextSubnet, exceed := cidr.NextSubnet(svcNet, prefix)
-		if exceed {
-			return fmt.Errorf("unable to compute next subnet from service CIDR")
+		c.ApiServer.AdvertiseAddress = ip
+	}
+
+	// Use this variable instead, as we may be in dual stack ip an need to
+	// configure one extra IP address in the ovn gateway interface. Pick
+	// the IP family that was not used for the advertise address and add
+	// the first valid IP for the next subnet.
+	c.ApiServer.AdvertiseAddresses = []string{c.ApiServer.AdvertiseAddress}
+	if c.IsIPv4() && c.IsIPv6() {
+		ip, err := firstIPFromNextSubnet(c.Network.ServiceNetwork[1])
+		if err != nil {
+			return fmt.Errorf("unable to compute secondary address for br-ex: %s", err)
 		}
-		// First and last are the same because of the /32 netmask.
-		firstValidIP, _ := cidr.AddressRange(nextSubnet)
-		c.ApiServer.AdvertiseAddress = firstValidIP.String()
+		c.ApiServer.AdvertiseAddresses = append(c.ApiServer.AdvertiseAddresses, ip)
 	}
 
 	c.computeLoggingSetting()
@@ -360,9 +384,14 @@ func (c *Config) validate() error {
 			"openshift.default",
 			"openshift.default.svc",
 			"openshift.default.svc.cluster.local",
-			c.ApiServer.AdvertiseAddress,
 		) {
-			return fmt.Errorf("subjectAltNames must not contain apiserver kubernetes service names or IPs")
+			return fmt.Errorf("subjectAltNames must not contain kubernetes service names")
+		}
+		if stringSliceContains(
+			c.ApiServer.SubjectAltNames,
+			c.ApiServer.AdvertiseAddresses...,
+		) {
+			return fmt.Errorf("subjectAltNames must not contain apiserver advertise address IPs")
 		}
 	}
 
@@ -370,6 +399,13 @@ func (c *Config) validate() error {
 		return fmt.Errorf("etcd.memoryLimitMB value %d is below the minimum allowed %d",
 			c.Etcd.MemoryLimitMB, EtcdMinimumMemoryLimit,
 		)
+	}
+
+	if c.ApiServer.SkipInterface {
+		err := checkAdvertiseAddressConfigured(c.ApiServer.AdvertiseAddresses[0])
+		if err != nil {
+			return err
+		}
 	}
 
 	switch c.Ingress.Status {
@@ -392,7 +428,7 @@ func (c *Config) validate() error {
 	}
 
 	if len(c.Ingress.ListenAddress) != 0 {
-		if err := validateRouterListenAddress(c.Ingress.ListenAddress, c.ApiServer.AdvertiseAddress, c.ApiServer.SkipInterface); err != nil {
+		if err := validateRouterListenAddress(c.Ingress.ListenAddress, c.ApiServer.AdvertiseAddresses, c.ApiServer.SkipInterface, c.IsIPv4(), c.IsIPv6()); err != nil {
 			return fmt.Errorf("error validating ingress.listenAddress: %w", err)
 		}
 	}
@@ -476,8 +512,8 @@ func checkAdvertiseAddressConfigured(advertiseAddress string) error {
 	return fmt.Errorf("Advertise address: %s not present in any interface", advertiseAddress)
 }
 
-func validateRouterListenAddress(ingressListenAddresses []string, advertiseAddress string, skipInterface bool) error {
-	addresses, err := AllowedListeningIPAddresses()
+func validateRouterListenAddress(ingressListenAddresses []string, advertiseAddresses []string, skipInterface bool, ipv4, ipv6 bool) error {
+	addresses, err := AllowedListeningIPAddresses(ipv4, ipv6)
 	if err != nil {
 		return err
 	}
@@ -486,17 +522,21 @@ func validateRouterListenAddress(ingressListenAddresses []string, advertiseAddre
 		return err
 	}
 	for _, entry := range ingressListenAddresses {
-		if net.ParseIP(entry) != nil {
-			if entry == advertiseAddress && !skipInterface {
+		if slices.Contains(advertiseAddresses, entry) && !skipInterface {
+			continue
+		}
+		ip := net.ParseIP(entry)
+		if ip == nil {
+			if slices.Contains(nicNames, entry) {
 				continue
 			}
-			if !slices.Contains(addresses, entry) {
-				return fmt.Errorf("IP %v not present in any of the host's interfaces", entry)
-			}
-		} else if slices.Contains(nicNames, entry) {
-			continue
-		} else {
 			return fmt.Errorf("interface %v not present in the host", entry)
+		}
+		if (ip.To4() != nil && !ipv4) || (ip.To4() == nil && !ipv6) {
+			return fmt.Errorf("IP %v does not match family of service/cluster network", entry)
+		}
+		if !slices.Contains(addresses, entry) {
+			return fmt.Errorf("IP %v not present in any of the host's interfaces", entry)
 		}
 	}
 	return nil
@@ -514,7 +554,7 @@ func getForbiddenIPs() ([]*net.IPNet, error) {
 	return banned, nil
 }
 
-func getHostAddresses() ([]net.IP, error) {
+func getHostAddresses(ipv4, ipv6 bool) ([]net.IP, error) {
 	handle, err := netlink.NewHandle()
 	if err != nil {
 		return nil, err
@@ -523,13 +563,20 @@ func getHostAddresses() ([]net.IP, error) {
 	if err != nil {
 		return nil, err
 	}
+	family := netlink.FAMILY_V4
+	if ipv6 {
+		family = netlink.FAMILY_ALL
+		if !ipv4 {
+			family = netlink.FAMILY_V6
+		}
+	}
 	addresses := make([]net.IP, 0, len(links)*2)
 	for _, link := range links {
 		// Filter out slave NICs. These include ovs/ovn created interfaces, in case of a restart.
 		if link.Attrs().ParentIndex != 0 || link.Attrs().MasterIndex != 0 {
 			continue
 		}
-		addressList, err := handle.AddrList(link, netlink.FAMILY_ALL)
+		addressList, err := handle.AddrList(link, family)
 		if err != nil {
 			return nil, err
 		}
@@ -540,12 +587,12 @@ func getHostAddresses() ([]net.IP, error) {
 	return addresses, nil
 }
 
-func AllowedListeningIPAddresses() ([]string, error) {
+func AllowedListeningIPAddresses(ipv4, ipv6 bool) ([]string, error) {
 	bannedAddresses, err := getForbiddenIPs()
 	if err != nil {
 		return nil, err
 	}
-	hostAddresses, err := getHostAddresses()
+	hostAddresses, err := getHostAddresses(ipv4, ipv6)
 	if err != nil {
 		return nil, err
 	}
@@ -635,4 +682,21 @@ func validateNetworkStack(cfg *Config) error {
 		return fmt.Errorf("invalid IP family in apiServer.AdvertiseAddress: does not match first network.ServiceNetwork IP family")
 	}
 	return nil
+}
+
+func firstIPFromNextSubnet(subnet string) (string, error) {
+	_, svcNet, err := net.ParseCIDR(subnet)
+	if err != nil {
+		return "", err
+	}
+	prefix := 32
+	if svcNet.IP.To4() == nil {
+		prefix = 128
+	}
+	nextSubnet, exceed := cidr.NextSubnet(svcNet, prefix)
+	if exceed {
+		return "", fmt.Errorf("unable to compute next subnet from service CIDR")
+	}
+	firstValidIP, _ := cidr.AddressRange(nextSubnet)
+	return firstValidIP.String(), nil
 }

@@ -216,6 +216,23 @@ gettool_awscli() {
     popd &>/dev/null
 }
 
+gettool_oc() {
+    declare -A arch_map=(
+        ["x86_64"]="x86_64"
+        ["aarch64"]="arm64")
+
+    local arch="${arch_map[${ARCH}]}"
+
+    pushd "${WORK_DIR}" &>/dev/null
+
+    curl -s -f "https://mirror.openshift.com/pub/openshift-v4/${arch}/clients/ocp/latest/openshift-client-linux.tar.gz" -L -o "openshift-client-linux.tar.gz"
+    tar xvzf openshift-client-linux.tar.gz
+    sudo cp oc /usr/bin/oc
+    sudo cp kubectl /usr/bin/kubectl
+
+    popd &>/dev/null
+}
+
 tool_getters=$(declare -F | awk '$3 ~ /^gettool_/ {print $3}' | sed 's/^gettool_//g')
 
 usage() {

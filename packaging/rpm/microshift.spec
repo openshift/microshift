@@ -163,6 +163,16 @@ The microshift-multus-release-info package provides release information files fo
 release. These files contain the list of container image references used by
 the Multus CNI for MicroShift and can be used to embed those images into osbuilder blueprints.
 
+%package low-latency
+Summary: Baseline configuration for running low latency workload on MicroShift
+BuildArch: noarch
+Requires: microshift = %{version}
+Requires: tuned-profiles-cpu-partitioning
+
+%description low-latency
+The microshift-low-latency package provides a baseline configuration prepared for
+running low latency workloads on MicroShift.
+
 %prep
 # Dynamic detection of the available golang version also works for non-RPM golang packages
 golang_detected=$(go version | awk '{print $3}' | tr -d '[a-z]' | cut -f1-2 -d.)
@@ -345,6 +355,22 @@ cat assets/optional/multus/kustomization.x86_64.yaml >> %{buildroot}/%{_prefix}/
 mkdir -p -m755 %{buildroot}%{_datadir}/microshift/release
 install -p -m644 assets/optional/multus/release-multus-{x86_64,aarch64}.json %{buildroot}%{_datadir}/microshift/release/
 
+# cleanup kubelet
+install -p -m644 packaging/tuned/microshift-cleanup-kubelet.service %{buildroot}%{_unitdir}/microshift-cleanup-kubelet.service
+
+# low-latency
+install -d -m755 %{buildroot}/%{_prefix}/lib/tuned/microshift-baseline
+install -p -m644 packaging/tuned/profile/tuned.conf %{buildroot}/%{_prefix}/lib/tuned/microshift-baseline/tuned.conf
+install -p -m755 packaging/tuned/profile/script.sh %{buildroot}/%{_prefix}/lib/tuned/microshift-baseline/script.sh
+install -d -m755 %{buildroot}%{_sysconfdir}/tuned
+install -p -m644 packaging/tuned/profile/variables.conf %{buildroot}%{_sysconfdir}/tuned/microshift-baseline-variables.conf
+
+## low-latency: crio runtime & manifests to install runtime-class
+install -p -m644 packaging/crio.conf.d/05-high-performance-runtime.conf %{buildroot}%{_sysconfdir}/crio/crio.conf.d/05-high-performance-runtime.conf
+install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/002-microshift-low-latency
+install -p -m644 packaging/tuned/runtime-class/runtime-class.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/002-microshift-low-latency/runtime-class.yaml
+install -p -m644 packaging/tuned/runtime-class/kustomization.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/002-microshift-low-latency/kustomization.yaml
+
 %pre networking
 
 getent group hugetlbfs >/dev/null || groupadd -r hugetlbfs
@@ -409,6 +435,7 @@ fi
 %{_bindir}/microshift-cleanup-data
 %{_bindir}/microshift-sos-report
 %{_unitdir}/microshift.service
+%{_unitdir}/microshift-cleanup-kubelet.service
 %{_sysconfdir}/crio/crio.conf.d/00-crio-crun.conf
 %{_sysconfdir}/crio/crio.conf.d/10-microshift.conf
 %{_datadir}/microshift/spec/config-openapi-spec.json
@@ -474,10 +501,26 @@ fi
 %files multus-release-info
 %{_datadir}/microshift/release/release-multus-{x86_64,aarch64}.json
 
+%files low-latency
+%{_prefix}/lib/tuned/microshift-baseline
+%config(noreplace) %{_sysconfdir}/tuned/microshift-baseline-variables.conf
+%{_sysconfdir}/crio/crio.conf.d/05-high-performance-runtime.conf
+%{_prefix}/lib/microshift/manifests.d/002-microshift-low-latency/runtime-class.yaml
+%{_prefix}/lib/microshift/manifests.d/002-microshift-low-latency/kustomization.yaml
+
 
 # Use Git command to generate the log and replace the VERSION string
 # LANG=C git log --date="format:%a %b %d %Y" --pretty="tformat:* %cd %an <%ae> VERSION%n- %s%n" packaging/rpm/microshift.spec
 %changelog
+* Thu Jul 18 2024 Patryk Matuszak <pmatusza@redhat.com> 4.17.0
+- Add high-performance CRI-O runtime and RuntimeClass
+
+* Thu Jul 18 2024 Patryk Matuszak <pmatusza@redhat.com> 4.17.0
+- Add microshift-baseline TuneD profile
+
+* Thu Jul 18 2024 Patryk Matuszak <pmatusza@redhat.com> 4.17.0
+- Add service to cleanup stale kubelet files on boot
+
 * Mon Jul 08 2024 Pablo Acevedo Montserrat <pacevedo@redhat.com> 4.17.0
 - Add NM configuration file
 

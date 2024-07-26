@@ -3,6 +3,7 @@ Documentation       Keywords for testing the MicroShift network
 
 Library             Process
 Library             SSHLibrary
+Library             libipv6.py
 Resource            oc.resource
 Resource            common.resource
 
@@ -46,9 +47,12 @@ Access Hello Microshift
     ...    ${ushift_ip}=${USHIFT_HOST}
     ...    ${path}=${EMPTY}
     ...    ${scheme}=http
+    ...    ${hostname}=hello-microshift.cluster.local
 
-    ${connect_to}=    Set Variable    "hello-microshift.cluster.local::${ushift_ip}:"
-    ${url_path}=    Set Variable    "${scheme}://hello-microshift.cluster.local:${ushift_port}${path}"
+    ${ip}=    Add Brackets If Ipv6    ${ushift_ip}
+
+    ${connect_to}=    Set Variable    "${hostname}::${ip}:"
+    ${url_path}=    Set Variable    "${scheme}://${hostname}:${ushift_port}${path}"
 
     ${result}=    Run Process
     ...    curl -k -i ${url_path} --connect-to ${connect_to}
@@ -58,26 +62,38 @@ Access Hello Microshift
 
 Access Hello MicroShift Success
     [Documentation]    Expect 200 OK when accessing "hello microshift" through the router.
-    [Arguments]    ${ushift_port}    ${ushift_ip}=${USHIFT_HOST}    ${path}=${EMPTY}    ${scheme}=http
+    [Arguments]
+    ...    ${ushift_port}
+    ...    ${ushift_ip}=${USHIFT_HOST}
+    ...    ${path}=${EMPTY}
+    ...    ${scheme}=http
+    ...    ${hostname}=hello-microshift.cluster.local
 
     ${rc}    ${stdout}    ${stderr}=    Access Hello MicroShift
     ...    ushift_port=${ushift_port}
     ...    ushift_ip=${ushift_ip}
     ...    path=${path}
     ...    scheme=${scheme}
+    ...    hostname=${hostname}
     Should Be Equal As Integers    ${rc}    0
     Should Match Regexp    ${stdout}    HTTP.*200
     Should Match    ${stdout}    *Hello MicroShift*
 
 Access Hello MicroShift No Route
     [Documentation]    Expect 503 Service Unavailable when accessing "hello microshift" through the router.
-    [Arguments]    ${ushift_port}    ${ushift_ip}=${USHIFT_HOST}    ${path}=${EMPTY}    ${scheme}=http
+    [Arguments]
+    ...    ${ushift_port}
+    ...    ${ushift_ip}=${USHIFT_HOST}
+    ...    ${path}=${EMPTY}
+    ...    ${scheme}=http
+    ...    ${hostname}=hello-microshift.cluster.local
 
     ${rc}    ${stdout}    ${stderr}=    Access Hello MicroShift
     ...    ushift_port=${ushift_port}
     ...    ushift_ip=${ushift_ip}
     ...    path=${path}
     ...    scheme=${scheme}
+    ...    hostname=${hostname}
     Should Be Equal As Integers    ${rc}    0
     Should Match Regexp    ${stdout}    HTTP.*503
 

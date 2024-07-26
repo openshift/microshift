@@ -1,0 +1,15 @@
+# There are systems with multiple NUMA node that can change reported memory after rebooting
+# causing kubelet's Memory Manager to block startup.
+# To work around this, this unit will delete stale files on boot.
+# Borrowed from: https://github.com/openshift/machine-config-operator/pull/4124
+[Unit]
+Description=Delete Kubelet CPU and Memory managers state on boot
+Before=microshift.service
+
+[Service]
+Type=oneshot
+ExecStart=/bin/rm -f /var/lib/kubelet/cpu_manager_state
+ExecStart=/bin/rm -f /var/lib/kubelet/memory_manager_state
+
+[Install]
+WantedBy=multi-user.target

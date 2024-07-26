@@ -20,6 +20,18 @@ type ApiServer struct {
 	// The URL and Port of the API server cannot be changed by the user.
 	URL  string `json:"-"`
 	Port int    `json:"-"`
+
+	// In dual stack mode, ovnk requires ovn.OVNGatewayInterface to have one IP
+	// per family or else it wont start. When configuring advertiseAddress,
+	// whether that is manual or automatic, this IP is configured in that
+	// bridge afterwards in node package. Since there is only one IP, ovnk will
+	// return an error complaining about the other IP family for the secondary
+	// cluster/service network gateway. This variable holds all the different
+	// IP addresses that ovn.OVNGatewayInterface needs. Note that this IP is
+	// not configurable by users and it will not be used for apiserver
+	// advertising because of dual stack limitations there. This is only to
+	// make ovnk work properly.
+	AdvertiseAddresses []string `json:"-"`
 }
 
 // NamedCertificateEntry provides certificate details
