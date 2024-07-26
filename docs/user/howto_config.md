@@ -255,3 +255,62 @@ oc get pods -n busybox
 ## Storage Configuration
 
 MicroShift's included CSI plugin manages LVM LogicialVolumes to provide persistent workload storage. For specific storage configuration, refer to the dedicated [documentation](../contributor/storage/configuration.md).
+
+## Drop-in configuration directory
+
+In additional to existing `/etc/microshift/config.yaml` there is a `/etc/microshift/config.d` directory where you can place fragments of config.
+
+At runtime, `/etc/microshift/config.yaml` and `.yaml` files inside `/etc/microshift/config.d` are merged together to create one configuration file which overrides the defaults.
+
+Files in `/etc/microshift/config.d` are sorted lexicographilly. It is recommended to use numerical prefix for easy reasoning about the priority of the fragments.
+
+For example, given following files:
+- `/etc/microshift/config.yaml`
+- `/etc/microshift/config.d/10-subjectAltNames.yaml`
+- `/etc/microshift/config.d/20-kubelet.yaml`
+
+The final user config will be created by using `config.yaml` as a base, and then overwriting it with `10-subjectAltNames.yaml`, and then overwriting it with `20-kubelet.yaml`:
+```
+20-kubelet.yaml
+     ||
+     \/
+10-subjectAltNames.yaml
+     ||
+     \/
+config.yaml
+```
+
+Some additional rules:
+- Lists are not merged together, they are overwritten. For example:
+  ```yaml
+  # 10-san.yaml
+  apiServer:
+    subjectAltNames:
+      - host1
+      - host2
+
+  # 20-san.yaml
+  apiServer:
+    subjectAltNames:
+      - hostZ
+
+  # end result
+  apiServer:
+    subjectAltNames:
+      - hostZ
+  ```
+- Contents of `kubelet:` configuration are merged together (unless specific field is a list). For example:
+  ```yaml
+  # 10-kubelet.yaml
+  kubelet:
+    some_setting: True
+
+  # 20-kubelet.yaml
+  kubelet:
+    another_setting: True
+
+  # end result
+  kubelet:
+    some_setting: True
+    another_setting: True
+  ```
