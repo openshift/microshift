@@ -17,7 +17,8 @@ Test Tags           ipv6    network
 *** Variables ***
 ${USHIFT_HOST_IP1}      ${EMPTY}
 ${USHIFT_HOST_IP2}      ${EMPTY}
-${HOSTNAME}         hello-microshift.dualstack.cluster.local
+${HOSTNAME}             hello-microshift.dualstack.cluster.local
+
 
 *** Test Cases ***
 Verify New Pod Works With IPv6
@@ -29,18 +30,24 @@ Verify New Pod Works With IPv6
     ...    Expose Hello MicroShift Service Via Route IPv6
     ...    Restart Router
 
-    ${pod_ip}=    Run With Kubeconfig    oc get pod hello-microshift -n ${NAMESPACE} -o jsonpath='{.status.podIPs[0].ip}'
+    ${pod_ip}=    Run With Kubeconfig
+    ...    oc get pod hello-microshift -n ${NAMESPACE} -o jsonpath='{.status.podIPs[0].ip}'
     Must Not Be Ipv6    ${pod_ip}
-    ${pod_ip}=    Run With Kubeconfig    oc get pod hello-microshift -n ${NAMESPACE} -o jsonpath='{.status.podIPs[1].ip}'
+    ${pod_ip}=    Run With Kubeconfig
+    ...    oc get pod hello-microshift -n ${NAMESPACE} -o jsonpath='{.status.podIPs[1].ip}'
     Must Be Ipv6    ${pod_ip}
-    ${service_ip}=    Run With Kubeconfig    oc get svc hello-microshift -n ${NAMESPACE} -o jsonpath='{.spec.clusterIP}'
+    ${service_ip}=    Run With Kubeconfig
+    ...    oc get svc hello-microshift -n ${NAMESPACE} -o jsonpath='{.spec.clusterIP}'
     Must Be Ipv6    ${service_ip}
-    
 
     Wait Until Keyword Succeeds    10x    6s
-    ...    Access Hello Microshift Success    ushift_ip=${USHIFT_HOST_IP1}    ushift_port=${HTTP_PORT}    hostname=${HOSTNAME}
+    ...    Access Hello Microshift Success    ushift_ip=${USHIFT_HOST_IP1}
+    ...        ushift_port=${HTTP_PORT}
+    ...        hostname=${HOSTNAME}
     Wait Until Keyword Succeeds    10x    6s
-    ...    Access Hello Microshift Success    ushift_ip=${USHIFT_HOST_IP2}    ushift_port=${HTTP_PORT}    hostname=${HOSTNAME}
+    ...    Access Hello Microshift Success    ushift_ip=${USHIFT_HOST_IP2}
+    ...        ushift_port=${HTTP_PORT}
+    ...        hostname=${HOSTNAME}
 
     [Teardown]    Run Keywords
     ...    Delete Hello MicroShift Route
@@ -58,18 +65,24 @@ Verify New Pod Works With IPv4
     ...    Expose Hello MicroShift Service Via Route IPv4
     ...    Restart Router
 
-    ${pod_ip}=    Run With Kubeconfig    oc get pod hello-microshift -n ${NAMESPACE} -o jsonpath='{.status.podIPs[0].ip}'
+    ${pod_ip}=    Run With Kubeconfig
+    ...    oc get pod hello-microshift -n ${NAMESPACE} -o jsonpath='{.status.podIPs[0].ip}'
     Must Not Be Ipv6    ${pod_ip}
-    ${pod_ip}=    Run With Kubeconfig    oc get pod hello-microshift -n ${NAMESPACE} -o jsonpath='{.status.podIPs[1].ip}'
+    ${pod_ip}=    Run With Kubeconfig
+    ...    oc get pod hello-microshift -n ${NAMESPACE} -o jsonpath='{.status.podIPs[1].ip}'
     Must Be Ipv6    ${pod_ip}
-    ${service_ip}=    Run With Kubeconfig    oc get svc hello-microshift -n ${NAMESPACE} -o jsonpath='{.spec.clusterIP}'
+    ${service_ip}=    Run With Kubeconfig
+    ...    oc get svc hello-microshift -n ${NAMESPACE} -o jsonpath='{.spec.clusterIP}'
     Must Not Be Ipv6    ${service_ip}
-    
 
     Wait Until Keyword Succeeds    10x    6s
-    ...    Access Hello Microshift Success    ushift_ip=${USHIFT_HOST_IP1}    ushift_port=${HTTP_PORT}    hostname=${HOSTNAME}
+    ...    Access Hello Microshift Success    ushift_ip=${USHIFT_HOST_IP1}
+    ...        ushift_port=${HTTP_PORT}
+    ...        hostname=${HOSTNAME}
     Wait Until Keyword Succeeds    10x    6s
-    ...    Access Hello Microshift Success    ushift_ip=${USHIFT_HOST_IP2}    ushift_port=${HTTP_PORT}    hostname=${HOSTNAME}
+    ...    Access Hello Microshift Success    ushift_ip=${USHIFT_HOST_IP2}
+    ...        ushift_port=${HTTP_PORT}
+    ...        hostname=${HOSTNAME}
 
     [Teardown]    Run Keywords
     ...    Delete Hello MicroShift Route

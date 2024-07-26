@@ -25,8 +25,10 @@ def is_ipv6(addr: str) -> bool:
 def must_be_ipv6(addr: str) -> None:
     BuiltIn().should_be_true(is_ipv6(addr))
 
+
 def must_not_be_ipv6(addr: str) -> None:
     BuiltIn().should_not_be_true(is_ipv6(addr))
+
 
 def add_brackets_if_ipv6(ip: str) -> str:
     """
