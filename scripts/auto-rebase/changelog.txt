@@ -1,0 +1,3 @@
+- cluster-network-operator embedded-component 3a06784187564c89dffbc0dd9378fb4feaa03005 to 6d9f739ffab69717b0ffee2bfb97d99118cc88a4
+  - 0bed685 2024-07-17T14:35:55+00:00 Check every MachineConfigPool for IPsec plugin existence
+
