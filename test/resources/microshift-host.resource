@@ -92,11 +92,7 @@ Is System Bootc
 Is System OSTree
     [Documentation]    Returns true if system is ostree-based.
 
-    # A bootc system should return False for the ostree check
-    ${is_bootc}=    Is System Bootc
-    IF    ${is_bootc} == ${TRUE}    RETURN    ${FALSE}
-
-    ${rc}=    SSHLibrary.Execute Command    stat /run/ostree-booted
+    ${rc}=    Execute Command    stat /run/ostree-booted
     ...    sudo=True    return_stderr=False    return_stdout=False    return_rc=True
     IF    ${rc} == 0    RETURN    ${TRUE}    ELSE    RETURN    ${FALSE}
 
