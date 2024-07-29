@@ -54,12 +54,6 @@ validate_vm_hostname() {
         record_junit "${vm_name}" "vm_hostname_validation" "FAILED"
         exit 1
     fi
-
-    if [[ "${vm_name}" =~ ^\. ]]; then
-        error "VM hostname cannot start with '.'" 
-        record_junit "${vm_name}" "vm_hostname_validation" "FAILED"
-        exit 1
-    fi
     
     if ! echo "${vm_name}" | grep -E '^([a-zA-Z0-9]+-*[a-zA-Z0-9]+)+$|^[a-zA-Z0-9]+$' > /dev/null; then
         error "VM hostname is invalid"
