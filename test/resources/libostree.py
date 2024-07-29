@@ -178,7 +178,7 @@ def write_greenboot_microshift_wait_timeout(seconds: int) -> None:
 
 
 def remove_greenboot_microshift_wait_timeout() -> None:
-    remote_sudo("sudo sed -i '/^MICROSHIFT_WAIT_TIMEOUT_SEC=/d' /etc/greenboot/greenboot.conf")
+    remote_sudo("sed -i '/^MICROSHIFT_WAIT_TIMEOUT_SEC=/d' /etc/greenboot/greenboot.conf")
 
 
 def no_transaction_in_progress() -> None:
@@ -187,3 +187,22 @@ def no_transaction_in_progress() -> None:
     key = "transaction"
     transaction_in_progress = key in status and status[key] is not None
     BuiltIn().should_not_be_true(transaction_in_progress)
+
+
+def write_insecure_registry_url(url: str) -> None:
+    remote_sudo(
+        f"printf '[[registry]]\nlocation = \"{url}\"\ninsecure = true\n' |"
+        "sudo tee /etc/containers/registries.conf.d/999-microshift-insecure-registry.conf"
+    )
+
+
+def remove_insecure_registry_url() -> None:
+    remote_sudo('rm -f /etc/containers/registries.conf.d/999-microshift-insecure-registry.conf')
+
+
+def rebase_bootc_system(ref: str) -> str:
+    """
+    Rebase system to given bootc image ref and return its deployment ID
+    """
+    remote_sudo(f"bootc switch --quiet {ref}")
+    return get_staged_deployment_id()

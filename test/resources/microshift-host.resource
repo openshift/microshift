@@ -73,6 +73,22 @@ Delete Thin Storage Pool
     Log    ${stderr}
     Should Be Equal As Integers    0    ${rc}
 
+Is System Bootc
+    [Documentation]    Returns true if system is bootc-based.
+
+    ${stdout}    ${stderr}    ${rc}=    SSHLibrary.Execute Command
+    ...    bootc status --booted --json
+    ...    sudo=True    return_stderr=True    return_stdout=True    return_rc=True
+    IF    ${rc} != 0    RETURN    ${FALSE}
+
+    ${json_status}=    Json Parse    ${stdout}
+    ${bootc_type}=    Set Variable    ${json_status}[status][type]
+    IF    '${bootc_type}' == 'bootcHost'
+        RETURN    ${TRUE}
+    ELSE
+        RETURN    ${FALSE}
+    END
+
 Is System OSTree
     [Documentation]    Returns true if system is ostree-based.
 
