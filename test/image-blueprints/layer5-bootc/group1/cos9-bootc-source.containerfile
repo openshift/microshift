@@ -11,13 +11,6 @@ COPY --chmod=755 ./bootc-sources/microshift_repo_config.sh ${REPO_CONFIG_SCRIPT}
 # Copy the MicroShift repository contents
 COPY ./rpm-repos/$USHIFT_RPM_REPO_NAME $USHIFT_RPM_REPO_PATH
 
-# Implement workarounds necessary for the successful MicroShift operation
-# - The /var/run directory must be a symbolic link to /run, which is not
-#   the case in bootc images. This cases problems with services like DBus
-#   and NetworkManager. DBus creates its socket in /run/dbus directory, which
-#   is accessed by NetworkManager at /var/run/dbus.
-RUN [ ! -L /var/run ] && rm -rf /var/run && ln -s /run /var/
-
 # Add the following repositories and print their contents:
 # - MicroShift local RPM repository
 # - OpenShift Mirror Beta previous minor version repository for MicroShift dependencies
