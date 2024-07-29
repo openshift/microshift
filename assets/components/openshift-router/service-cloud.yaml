@@ -17,7 +17,6 @@ spec:
   # router pods are present on a node behind the service.
   externalTrafficPolicy: Local
   internalTrafficPolicy: Cluster
-  ipFamilyPolicy: '{{.IPFamily}}'
   ports:
     - name: http
       protocol: TCP
@@ -28,3 +27,4 @@ spec:
       port: {{ .RouterHttpsPort }}
       targetPort: https
   sessionAffinity: None
+  ipFamilyPolicy: '{{.IPFamily}}'
