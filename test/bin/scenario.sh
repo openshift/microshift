@@ -38,6 +38,32 @@ full_vm_name() {
     echo "${SCENARIO//@/-}-${base}"
 }
 
+# hostname validation
+# based on https://github.com/rhinstaller/anaconda/blob/c95142f76735a2e9ae6d845f8569d46632ddd619/pyanaconda/network.py#L96-L120
+validate_vm_hostname() {
+    local vm_name="$1"
+
+    if [ -z "${vm_name}" ]; then
+        error "VM hostname cannot be empty string" 
+        record_junit "${vm_name}" "vm_hostname_validation" "FAILED"
+        exit 1
+    fi
+
+    if [ ${#vm_name} -gt 64 ]; then
+        error "VM hostname is too long" 
+        record_junit "${vm_name}" "vm_hostname_validation" "FAILED"
+        exit 1
+    fi
+    
+    if ! echo "${vm_name}" | grep -E '^([a-zA-Z0-9]+-*[a-zA-Z0-9]+)+$|^[a-zA-Z0-9]+$' > /dev/null; then
+        error "VM hostname is invalid"
+        record_junit "${vm_name}" "vm_hostname_validation" "FAILED"
+        exit 1
+    fi
+
+    record_junit "${vm_name}" "vm_hostname_validation" "OK"   
+}
+
 vm_property_filename() {
     local -r vmname="$1"
     local -r property="$2"
@@ -226,6 +252,8 @@ prepare_kickstart() {
     local -r output_dir="${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}"
     local -r vm_hostname="${full_vmname/./-}"
     local -r hostname=$(hostname)
+
+    validate_vm_hostname "${vm_hostname}"
 
     echo "Preparing kickstart file ${template} at ${output_dir}"
     if [ ! -f "${KICKSTART_TEMPLATE_DIR}/${template}" ]; then
