@@ -29,9 +29,9 @@ BASE_REPO = common.get_env_var('BASE_REPO')
 NEXT_REPO = common.get_env_var('NEXT_REPO')
 HOME_DIR = common.get_env_var("HOME")
 PULL_SECRET = common.get_env_var('PULL_SECRET', f"{HOME_DIR}/.pull-secret.json")
-# Switch to registry.redhat.io/rhel9/bootc-image-builder:9.4 when all the
-# required features are supported
-BIB_IMAGE = "quay.io/centos-bootc/bootc-image-builder:latest"
+# Switch to quay.io/centos-bootc/bootc-image-builder:latest if any new upstream
+# features are required
+BIB_IMAGE = "registry.redhat.io/rhel9/bootc-image-builder:latest"
 GOMPLATE = common.get_env_var('GOMPLATE')
 FORCE_REBUILD = False
 
