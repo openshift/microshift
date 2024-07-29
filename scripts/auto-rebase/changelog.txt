@@ -1,3 +1,8 @@
-- cluster-network-operator embedded-component 3a06784187564c89dffbc0dd9378fb4feaa03005 to 6d9f739ffab69717b0ffee2bfb97d99118cc88a4
-  - 0bed685 2024-07-17T14:35:55+00:00 Check every MachineConfigPool for IPsec plugin existence
+- cluster-kube-apiserver-operator embedded-component 62a9eff944bfbdc1b4e79332fe4d8ae2df053c8c to aabc7863cdbd76f8909a10fbc1be53b032e4ec31
+  - 9f52a49 2024-07-25T13:12:48+00:00 p/o/podsecurityreadinesscontroller: add disabled syncer
+  - 2178bbd 2024-07-25T13:12:48+00:00 p/o/psreadinesscontroller: make ctrl owner aware
+  - 11d242e 2024-07-25T13:12:48+00:00 p/o/psreadinesscontroller: minor refactoring
+
+- operator-framework-olm embedded-component f3f8de5d0caa7387630272260e9e4e0db1b8ef85 to 80dee4eb4c5ec643131052292313191e600e5d0c
+  - d209907e 2024-07-25T12:01:36+01:00 set required-scc for openshift workloads
 
