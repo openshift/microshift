@@ -436,6 +436,10 @@ func (c *Config) validate() error {
 		return fmt.Errorf("error validating apiserver.auditLog:\n%w", err)
 	}
 
+	if err := validateNodeIPv6Address(c.Node.NodeIPV6, c.IsIPv4() && c.IsIPv6()); err != nil {
+		return fmt.Errorf("error validating node.nodeIPv6: %w", err)
+	}
+
 	return nil
 }
 
@@ -699,4 +703,23 @@ func firstIPFromNextSubnet(subnet string) (string, error) {
 	}
 	firstValidIP, _ := cidr.AddressRange(nextSubnet)
 	return firstValidIP.String(), nil
+}
+
+func validateNodeIPv6Address(addr string, dualStack bool) error {
+	if len(addr) == 0 {
+		if dualStack {
+			return fmt.Errorf("dual stack detected, address must be configured")
+		}
+		return nil
+	}
+	if !dualStack {
+		return fmt.Errorf("dual stack not deteced, address must not be configured")
+	}
+	if !isValidIPAddress(addr) {
+		return fmt.Errorf("address %v is not valid", addr)
+	}
+	if ip := net.ParseIP(addr); ip.To4() != nil {
+		return fmt.Errorf("address %v must be ipv6", addr)
+	}
+	return nil
 }

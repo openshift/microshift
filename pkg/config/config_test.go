@@ -659,7 +659,6 @@ func TestValidate(t *testing.T) {
 			}(),
 			expectErr: true,
 		},
-
 		{
 			name: "network-different-ip-family-advertise-address",
 			config: func() *Config {
@@ -667,6 +666,49 @@ func TestValidate(t *testing.T) {
 				c.Network.ServiceNetwork = []string{"fd06::/64"}
 				c.Network.ClusterNetwork = []string{"fd07::/64"}
 				c.ApiServer.AdvertiseAddress = "10.20.30.40"
+				return c
+			}(),
+			expectErr: true,
+		},
+		{
+			name: "node-ipv6-must-be-configured",
+			config: func() *Config {
+				c := mkDefaultConfig()
+				c.Network.ServiceNetwork = []string{"90.80.70.60/16", "fd08::/64"}
+				c.Network.ClusterNetwork = []string{"50.40.30.20/16", "fd09::/64"}
+				return c
+			}(),
+			expectErr: true,
+		},
+		{
+			name: "node-ipv6-must-not-be-configured",
+			config: func() *Config {
+				c := mkDefaultConfig()
+				c.Network.ServiceNetwork = []string{"91.81.71.61/16"}
+				c.Network.ClusterNetwork = []string{"51.41.31.21/16"}
+				c.Node.NodeIPV6 = "2001:db0:ff::1"
+				return c
+			}(),
+			expectErr: true,
+		},
+		{
+			name: "node-ipv6-bad-format",
+			config: func() *Config {
+				c := mkDefaultConfig()
+				c.Network.ServiceNetwork = []string{"92.82.72.62/16", "fd0a::/64"}
+				c.Network.ClusterNetwork = []string{"52.42.32.22/16", "fd0b::/64"}
+				c.Node.NodeIPV6 = "2001:db0::ff:::1"
+				return c
+			}(),
+			expectErr: true,
+		},
+		{
+			name: "node-ipv6-must-be-ipv6",
+			config: func() *Config {
+				c := mkDefaultConfig()
+				c.Network.ServiceNetwork = []string{"93.83.73.63/16", "fd0c::/64"}
+				c.Network.ClusterNetwork = []string{"53.43.33.23/16", "fd0d::/64"}
+				c.Node.NodeIPV6 = "11.22.33.44"
 				return c
 			}(),
 			expectErr: true,
