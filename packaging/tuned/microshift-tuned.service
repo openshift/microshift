@@ -1,0 +1,11 @@
+[Unit]
+Description=MicroShift TuneD helper
+Before=microshift.service
+After=tuned.service
+Requires=tuned.service
+
+[Service]
+ExecStart=/usr/bin/microshift-tuned
+
+[Install]
+WantedBy=multi-user.target

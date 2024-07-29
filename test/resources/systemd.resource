@@ -54,7 +54,7 @@ Systemctl
     [Arguments]    ${verb}    ${unit_name}
 
     # Verify the input
-    Should Be True    "${verb}" in {"restart", "start", "stop", "enable"}
+    Should Be True    "${verb}" in {"restart", "start", "stop", "enable", "disable"}
 
     IF    "${verb}" in {"restart", "start"}
         ${state}=    Set Variable    running
@@ -68,7 +68,7 @@ Systemctl
     IF    ${rc} != 0    Systemctl Print Service Status And Logs    ${unit_name}
     Should Be Equal As Integers    0    ${rc}
 
-    IF    "${verb}" == "enable"    RETURN
+    IF    "${verb}" in {"enable", "disable"}    RETURN
 
     # It takes a bit for systemd to respond, and if we check too soon
     # then it looks like microshift is up, even though it is about to

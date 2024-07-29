@@ -15,5 +15,14 @@ scenario_remove_vms() {
 }
 
 scenario_run_tests() {
-    run_tests host1 suites/tuned/
+    # Should not be ran immediately after creating VM because of
+    # microshift-tuned rebooting the node to activate the profile.
+    
+    # --exitonfailure because tests within suites are meant to be ordered,
+    # so don't advance to next test if current failed.
+
+    run_tests host1 \
+        --exitonfailure \
+        suites/tuned/profile.robot \
+        suites/tuned/microshift-tuned.robot
 }
