@@ -10,18 +10,54 @@ source "${SCRIPTDIR}/common.sh"
 
 usage() {
     cat - <<EOF
-${BASH_SOURCE[0]} (create|cleanup)
+${BASH_SOURCE[0]} (create|cleanup|cleanup-all)
 
   -h           Show this help.
 
-create: Set up firewall, storage pool and network.
+create: Set up firewall, storage pool and network. 
+        Start nginx file-server to serve images 
+        for test scenarios.
         Uses the VM_POOL_BASENAME, VM_DISK_BASEDIR and
         VM_ISOLATED_NETWORK variables.
 
 cleanup: Undo the settings made by 'create' command.
 
+cleanup-all: Clean up all scenario infrastructure, 
+             revert the hypervisor configuration and 
+             kill the web server process.
+
 EOF
 }
+
+nginx_conf="
+worker_processes 32;
+events {
+}
+http {
+    access_log /dev/null;
+    error_log  ${IMAGEDIR}/nginx_error.log;
+    server {
+        listen ${WEB_SERVER_PORT};
+        listen [::]:${WEB_SERVER_PORT};
+        root   ${IMAGEDIR};
+        autoindex on;
+    }
+
+    # Timeout during which a keep-alive client connection will stay open on the server
+    # Default: 75s
+    keepalive_timeout 300s;
+
+    # Timeout for transmitting a response to the client
+    # Default: 60s
+    send_timeout 300s;
+
+    # Buffers used for reading response from a disk
+    # Default: 2 32k
+    output_buffers 2 1m;
+}
+pid ${IMAGEDIR}/nginx.pid;
+daemon on;
+"
 
 firewall_settings() {
     local -r action=$1
@@ -99,6 +135,9 @@ action_create() {
 
     # Firewall
     firewall_settings "add"
+
+    # Start nginx web server
+    start_webserver
 }
 
 action_cleanup() {
@@ -125,6 +164,48 @@ action_cleanup() {
             sudo virsh pool-undefine "${pool_name}"
         fi
     done
+
+    # Stop nginx web server
+    stop_webserver
+}
+
+action_cleanup-all() {
+    # Clean up all of the VMs
+    for scenario in "${TESTDIR}"/scenarios*/*.sh; do
+        echo "Deleting $(basename "${scenario}")"
+        "${TESTDIR}/bin/scenario.sh" cleanup "${scenario}" &>/dev/null || true
+    done
+
+    action_cleanup
+}
+
+start_webserver() {
+    echo "Starting web server in ${IMAGEDIR}"
+    mkdir -p "${IMAGEDIR}"
+    cd "${IMAGEDIR}"
+
+    NGINX_CONFIG="${IMAGEDIR}/nginx.conf"
+    # See the https://nginx.org/en/docs/http/ngx_http_core_module.html page for
+    # a full list of HTTP configuration directives
+    echo "${nginx_conf}" > "${NGINX_CONFIG}"
+
+    # Allow the current user to write to nginx temporary directories
+    sudo chgrp -R "$(id -gn)" /var/lib/nginx
+
+    # Kill running nginx processes and wait until down
+    sudo pkill nginx || true
+    while pidof nginx &>/dev/null ; do
+        sleep 1
+    done
+
+    nginx \
+        -c "${NGINX_CONFIG}" \
+        -e "${IMAGEDIR}/nginx.log"
+}
+
+stop_webserver() {
+    echo "Stopping web server"
+    sudo pkill nginx || true
 }
 
 if [ $# -eq 0 ]; then
@@ -135,7 +216,7 @@ action="${1}"
 shift
 
 case "${action}" in
-    create|cleanup)
+    create|cleanup|cleanup-all)
         "action_${action}" "$@"
         ;;
     -h)
