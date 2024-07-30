@@ -20,44 +20,14 @@ create: Set up firewall, storage pool and network.
         Uses the VM_POOL_BASENAME, VM_DISK_BASEDIR and
         VM_ISOLATED_NETWORK variables.
 
-cleanup: Undo the settings made by 'create' command.
+cleanup: Undo the settings made by 'create' command, 
+         stop the nginx file-server.
 
 cleanup-all: Clean up all scenario infrastructure, 
              revert the hypervisor configuration and 
              kill the web server process.
-
 EOF
 }
-
-nginx_conf="
-worker_processes 32;
-events {
-}
-http {
-    access_log /dev/null;
-    error_log  ${IMAGEDIR}/nginx_error.log;
-    server {
-        listen ${WEB_SERVER_PORT};
-        listen [::]:${WEB_SERVER_PORT};
-        root   ${IMAGEDIR};
-        autoindex on;
-    }
-
-    # Timeout during which a keep-alive client connection will stay open on the server
-    # Default: 75s
-    keepalive_timeout 300s;
-
-    # Timeout for transmitting a response to the client
-    # Default: 60s
-    send_timeout 300s;
-
-    # Buffers used for reading response from a disk
-    # Default: 2 32k
-    output_buffers 2 1m;
-}
-pid ${IMAGEDIR}/nginx.pid;
-daemon on;
-"
 
 firewall_settings() {
     local -r action=$1
@@ -177,35 +147,6 @@ action_cleanup-all() {
     done
 
     action_cleanup
-}
-
-start_webserver() {
-    echo "Starting web server in ${IMAGEDIR}"
-    mkdir -p "${IMAGEDIR}"
-    cd "${IMAGEDIR}"
-
-    NGINX_CONFIG="${IMAGEDIR}/nginx.conf"
-    # See the https://nginx.org/en/docs/http/ngx_http_core_module.html page for
-    # a full list of HTTP configuration directives
-    echo "${nginx_conf}" > "${NGINX_CONFIG}"
-
-    # Allow the current user to write to nginx temporary directories
-    sudo chgrp -R "$(id -gn)" /var/lib/nginx
-
-    # Kill running nginx processes and wait until down
-    sudo pkill nginx || true
-    while pidof nginx &>/dev/null ; do
-        sleep 1
-    done
-
-    nginx \
-        -c "${NGINX_CONFIG}" \
-        -e "${IMAGEDIR}/nginx.log"
-}
-
-stop_webserver() {
-    echo "Stopping web server"
-    sudo pkill nginx || true
 }
 
 if [ $# -eq 0 ]; then

@@ -401,6 +401,7 @@ hypervisor settings:
 - Firewall
 - Storage pools used for VM images and disks
 - Isolated networks
+- Nginx webserver for serving images used in scenarios
 
 Create the necessary configuration using `create`.
 
@@ -420,9 +421,6 @@ $ ./test/bin/manage_hypervisor_config.sh cleanup
 > ```
 
 #### Creating Test Infrastructure
-
-Use `./test/bin/start_webserver.sh` to run an `nginx` web server to serve the
-images needed for the test scenarios.
 
 Use `./test/bin/scenario.sh` to create test infrastructure for a scenario
 with the `create` argument and a scenario directory name as input.

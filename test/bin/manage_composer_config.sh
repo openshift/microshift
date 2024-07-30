@@ -10,13 +10,13 @@ source "${SCRIPTDIR}/common.sh"
 
 usage() {
     cat - <<EOF
-${BASH_SOURCE[0]} (workers <number>|cleanup)
+${BASH_SOURCE[0]} (workers <num_workers>|cleanup)
 
   -h           Show this help.
 
 workers: Create multiple workers for building images
          in parallel.
-    <number>: Number of workers to create.
+    <num_workers>: Number of workers to create.
 
 cleanup: Cancel any running builds, delete failed
          and completed builds, and remove package 
@@ -33,7 +33,7 @@ action_workers() {
     workers="${1}"
 
     # Loop from 2 because we should already have at least 1 worker.
-    for i in $(seq 2 "${num_workers}"); do
+    for i in $(seq 2 "${workers}"); do
         sudo systemctl start "osbuild-worker@${i}.service"
     done
 }
