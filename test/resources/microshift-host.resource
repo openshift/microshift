@@ -57,7 +57,7 @@ Reboot MicroShift Host
     Sleep    30s
 
     Wait Until Keyword Succeeds    5m    15s
-    ...    Is System Rebooted    ${bootid}
+    ...    System Should Be Rebooted    ${bootid}
 
 Create Thin Storage Pool
     [Documentation]    Create a new thin storage pool
@@ -79,6 +79,12 @@ Is System OSTree
     ${rc}=    Execute Command    stat /run/ostree-booted
     ...    sudo=True    return_stderr=False    return_stdout=False    return_rc=True
     IF    ${rc} == 0    RETURN    ${TRUE}    ELSE    RETURN    ${FALSE}
+
+System Should Be Rebooted
+    [Documentation]    Assert if the system rebooted comparing the current and provided boot identifier
+    [Arguments]    ${old_bootid}
+    ${rebooted}=    Is System Rebooted    ${old_bootid}
+    Should Be True    ${rebooted}
 
 Is System Rebooted
     [Documentation]    Check if the system rebooted comparing the current and provided boot identifier

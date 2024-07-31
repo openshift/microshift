@@ -11,16 +11,21 @@ Suite Teardown      Teardown
 
 
 *** Test Cases ***
-Current Profile Should Be Hashed
-    [Documentation]    We expect that microshift-tuned keeps a hash of the profile and variables.
+Checksum Of Current Profile Should Be Persisted
+    [Documentation]    We expect that microshift-tuned keeps checksums of the profile and variables
+    ...    in a separate file.
 
     SSHLibrary.File Should Exist    /var/lib/microshift-tuned.yaml
+    ${checksums_contents}=    Command Should Work    cat /var/lib/microshift-tuned.yaml
+    ${checksums}=    DataFormats.Yaml Parse    ${checksums_contents}
+    Should Not Be Empty    ${checksums.profile_checksum}
+    Should Not Be Empty    ${checksums.variables_checksum}
 
 Profile Is Already Active But Cache File Is Missing
     [Documentation]    If profile is already active, but cache file is missing,
     ...    we expect microshift-tuned to reactivate it, reboot, and store the hashes.
 
-    Command Should Work    rm /var/lib/microshift-tuned.yaml
+    Command Should Work    rm -f /var/lib/microshift-tuned.yaml
     Restart MicroShift-Tuned Expecting Reboot
     SSHLibrary.File Should Exist    /var/lib/microshift-tuned.yaml
 
@@ -53,17 +58,17 @@ Can Activate Any Tuned Profile
 
 MicroShift-Tuned Requires Config To Function
     [Documentation]    Verify that missing configuration will be fatal.
-    Command Should Work    rm /etc/microshift/tuned.yaml
+    Command Should Work    rm -f /etc/microshift/tuned.yaml
     Command Should Work    systemctl restart microshift-tuned.service
-    Sleep    5s
-    Systemctl Check Service SubState    microshift-tuned.service    failed
+    Wait Until Keyword Succeeds    1m    10s
+    ...    Systemctl Check Service SubState    microshift-tuned.service    failed
 
 
 *** Keywords ***
 Setup
     [Documentation]    Setup test for the test suite
     Login MicroShift Host
-    # We don't care for MicroShift when testing microshift-tuned.service
+    # We don't need MicroShift service when testing microshift-tuned.service
     Stop MicroShift
     Disable MicroShift
     Command Should Work
@@ -83,15 +88,14 @@ Restart MicroShift-Tuned Expecting Reboot
     [Documentation]    TODO
     ${bootid}=    Get Current Boot Id
     Command Should Work    systemctl restart microshift-tuned.service
-    Sleep    30s
-
     Wait Until Keyword Succeeds    5m    15s
-    ...    Is System Rebooted    ${bootid}
+    ...    System Should Be Rebooted    ${bootid}
 
 Restart MicroShift-Tuned Not Expecting Reboot
     [Documentation]    TODO
     ${bootid}=    Get Current Boot Id
     Command Should Work    systemctl restart microshift-tuned.service
-    Sleep    60s
+    Wait Until Keyword Succeeds    1m    10s
+    ...    Systemctl Check Service SubState    microshift-tuned.service    dead
     ${rebooted}=    Is System Rebooted    ${bootid}
     Should Not Be True    ${rebooted}
