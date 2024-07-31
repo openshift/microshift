@@ -1,25 +1,142 @@
-- cluster-network-operator embedded-component 3ec170ef2a1f445b589fd74f4a5b2f4eab8ac370 to b454d8d06272bc4788c0b51bbf6970f6021b1dbb
-  - 4776726 2024-07-25T13:22:35-04:00 hcp tolerations integration
+- api embedded-component 84047ef4a2ce54dc7f879b1382690079081128f1 to 0d46442e8df17a87cfcf6666ab19b28e88620b59
+  - ae8eac7 2024-07-30T14:36:20+02:00 docs update
+  - 3ab071d 2024-07-29T15:07:27+02:00 CONSOLE-4163: Add support for lightspeed button integration
 
-- kubernetes embedded-component 32f817d75efea03f9baf659eaf373569c4d85f56 to 6892b57d65d25fb0588693bce3d338d8b8b1d2b4
-  - eb3806356 2024-07-23T12:04:31-04:00 UPSTREAM: 126104: Add funcs in pkg/filesystem/util that can actually set file permissiosn on Windows and update container log dir perms to 660 on Windows
+- cluster-csi-snapshot-controller-operator embedded-component 7bf48d561be0bd524febeaf5d0c3fde9b2936d16 to ffba005bf839897b173cb76d0bb561dcf9c7215c
+  - 5219530 2024-07-25T15:08:51+02:00 update api extensions to upstream
+  - 645ee3a 2024-07-23T13:04:41-04:00 Support hcp tolerations
 
-- machine-config-operator embedded-component 1ab8e9906e96533e65ccb991b0dfd018dcd6c686 to 40d03dc1376995a2d65e10af48287dc8d2b2012e
-  - 4eca63de 2024-07-26T13:55:00+02:00 OWNERS: keep up-to-date with active maintainers
-  - 963765e1 2024-07-24T08:48:17-04:00 server: consume bootstrap apiserver manifest
-  - cd056f37 2024-07-24T08:48:17-04:00 controller: consume bootstrap apiserver manifest
-  - ab9b8e47 2024-07-24T08:48:17-04:00 server: apply tlsSecurityProfile via args
-  - bebc99e8 2024-07-24T08:48:17-04:00 add tls profile expansion for kube rbac proxy
-  - eb8a44f8 2024-07-24T08:48:17-04:00 operator/controller: grab tlsSecurityProfile
-  - f84e5b59 2024-06-27T13:24:19-04:00 e2e test should wait for MCD pod to be running
+- cluster-ingress-operator embedded-component ccc4b97e8338ba488794d9f7a60a3e7e675ef26d to f2c9f0760e14a3fa8408db5e7a1e6847e11a51e3
+  - 3a16a2f 2024-07-29T11:00:23-04:00 OCPBUGS-37627: Fix getRouteHost error handling
 
-- oc image-amd64 19e7c3998335e1b3f0153fec82a8a81e04c45634 to 49bebdbdb90ccf837da19e22bbc9fc6396346f8c
-  - a5be06f9 2024-07-24T10:29:46-04:00 upgrade status: removes custom nodes from the worker pool (2)
-  - 40218f91 2024-07-24T10:13:24-04:00 Revert "upgrade status: removes custom nodes from the worker pool"
+- machine-config-operator embedded-component 40d03dc1376995a2d65e10af48287dc8d2b2012e to 9f305987c2f4546fbe5bcfe2658f3837c53e62eb
+  - a0c1d84f 2024-07-29T12:26:50-04:00 retry build and push operations multiple times
+  - 10fee6ef 2024-07-24T11:55:01-04:00 create interal bootc-client-go
+  - 462267cd 2024-07-24T11:55:01-04:00 Consolidate common rpm-ostree and bootc functions into image_manager_helper.go
+  - 4b429080 2024-07-24T11:55:01-04:00 Create a bootc.go to store bootc status reading and command line execution
+  - ccf73c9b 2024-07-24T13:04:26+02:00 OCPBUGS-30955: On-Prem resolv prepender to watch for NM changes
 
-- kubernetes image-amd64 32f817d75efea03f9baf659eaf373569c4d85f56 to 6892b57d65d25fb0588693bce3d338d8b8b1d2b4
-  - eb3806356 2024-07-23T12:04:31-04:00 UPSTREAM: 126104: Add funcs in pkg/filesystem/util that can actually set file permissiosn on Windows and update container log dir perms to 660 on Windows
+- oc image-amd64 49bebdbdb90ccf837da19e22bbc9fc6396346f8c to bd7e59668c050e59b14e81cf5be00fad17f2f669
+  - 29221107 2024-07-30T04:21:11-04:00 node-joiner: add the required role to support platform type validation
+  - dc9b83b1 2024-07-26T17:37:09-04:00 Separate api group for secrets
+  - bdee71a3 2024-07-24T15:07:21-04:00 Update command description
+  - 0601c2ef 2024-07-22T21:36:16-04:00 Remove common.go and incorporate review feedback
+  - b46b680a 2024-07-22T18:03:37-04:00 Create monitor run test and reuse common code
+  - 19bdd412 2024-07-16T17:56:46-04:00 Shared code placed in common.go
+  - c2bbdfb8 2024-07-16T16:36:06-04:00 WRKLDS-1316: oc adm node-image monitor command
+  - d38015a2 2024-07-16T16:35:23-04:00 renamed to node-image
+  - 3ffbacc1 2024-07-16T16:32:45-04:00 add-nodes: define empty commands structure
 
-- kubernetes image-arm64 32f817d75efea03f9baf659eaf373569c4d85f56 to 6892b57d65d25fb0588693bce3d338d8b8b1d2b4
-  - eb3806356 2024-07-23T12:04:31-04:00 UPSTREAM: 126104: Add funcs in pkg/filesystem/util that can actually set file permissiosn on Windows and update container log dir perms to 660 on Windows
+- ovn-kubernetes image-amd64 9168abf8a94cbd83a7fd53fc675fb42afea870ea to 7108849ad061051eb43117d398d0ba63f7788adf
+  - fdffd716 2024-07-30T08:18:19-04:00 Revert "Merge pull request #2233 from tssurya/ds-merge-24th-july"
+  - 122bd357 2024-07-23T16:22:46+02:00 L2/L3: Create UDN management-port on host
+  - 012e09a1 2024-07-22T07:55:19+02:00 udn, cni: Trait pod without role
+  - 0d941615 2024-07-22T07:55:19+02:00 udn, pods: Add default net 'role=primary'
+  - c33b3e89 2024-07-22T07:52:02+02:00 udn, cni: Add feature gate unit tests
+  - 58da278e 2024-07-22T07:52:02+02:00 udn, cni: Convert getCNIResult to free function
+  - e3334b71 2024-07-22T07:52:02+02:00 udn, cni: Gate primary role networks
+  - a439ebcd 2024-07-19T15:30:26+02:00 udn, controllers: Wire up networkID helper
+  - 424d22bf 2024-07-19T14:55:55+02:00 util: Add helper to discover networkID
+  - ff286af7 2024-07-18T09:16:24-07:00 workflows/test.yml: Run conformance in control-plane-helm matrix
+  - 4223a9cc 2024-07-18T09:15:52-07:00 helm: update README.md
+  - e3c2c88e 2024-07-18T09:15:52-07:00 helm: Add conditional image pull secrets to Helm charts
+  - aae7bdaa 2024-07-17T16:26:56+02:00 Fix stale network cleanup
+  - 9ebbc186 2024-07-17T14:14:26+02:00 nit: remove unused parameter
+  - 27653f18 2024-07-17T14:14:26+02:00 cm: Move nodeGWRouterLRPIPGenerators from zic to na
+  - 258c5cd1 2024-07-17T14:14:26+02:00 node-annotation: Deprecate node-gateway-router-lrp-ifaddr
+  - bf4c113d 2024-07-17T14:14:26+02:00 node-annotations: Add UpdateNodeGatewayRouterLRPAddrsAnnotation util
+  - f3eb8e0f 2024-07-17T14:14:26+02:00 node-annotations: Add ParseNodeGatewayRouterJoinAddrs util
+  - 35e77c27 2024-07-17T14:14:26+02:00 node-annotation: Add convertPrimaryIfAddrAnnotationToIPNet util
+  - 781b9ebf 2024-07-17T14:14:26+02:00 node-annotations: Add k8s.ovn.org/node-gateway-router-lrp-ifaddrs
+  - bd3713a5 2024-07-17T14:11:58+02:00 pod-routes: Add join subnet routes for each network
+  - 98d8f7ee 2024-07-17T14:11:33+02:00 controller: Move ovnClusterLRPToJoinIfAddrs from DNC to BNC
+  - 7f623269 2024-07-17T14:11:03+02:00 netInfo: Add joinSubnets config
+  - f3b64444 2024-07-17T12:20:42+02:00 LGW,DGP: Remove unused subnets
+  - 6e36658e 2024-07-17T08:25:56+02:00 Add joinSubnet to NAD config
+  - dd7290fa 2024-07-16T19:42:15+00:00 github workflow test: enable ENABLE_MULTI_NET for helm
+  - 28e6215c 2024-07-16T19:03:41+00:00 HELM: udn, non-IC: allow node to read NADs on non-IC
+  - 0197fe59 2024-07-16T15:12:07+02:00 Ignore mirrored EndpointSlices in current controllers
+  - d28b801b 2024-07-16T15:12:06+02:00 Make GetEndpointSlices network aware
+  - 932273e7 2024-07-16T15:12:06+02:00 Rename GetEndpointSlices to GetServiceEndpointSlices
+  - 2b660fa8 2024-07-16T15:12:05+02:00 Docs
+  - 4ac64520 2024-07-16T15:12:04+02:00 E2E tests
+  - 72661ca5 2024-07-16T15:12:03+02:00 Introduce EndpointSlice mirror controller for user defined networks
+  - 4a4ccb1a 2024-07-16T12:17:48+02:00 udn, isolation, e2e: skip tests on non-IC deployments
+  - 9e2aa33c 2024-07-16T12:17:48+02:00 udn, non-IC: allow node to read NADs on non-IC
+  - d1a01257 2024-07-16T12:17:47+02:00 udn, non-IC: start NAD listener
+  - 11c8637b 2024-07-16T10:03:56+02:00 udn, ci, e2e: add a non-IC lane
+  - 32774a47 2024-07-15T16:02:09-07:00 helm: fix appVersion to be 1.0.0
+  - ae1d7366 2024-07-15T11:45:48+02:00 multi-homing, tests: assert an UDN cannot be used as a secondary net
+  - 7993d344 2024-07-15T11:45:43+02:00 multi-homing, tests: add UT coverage to the GetPodNADToNetworkMapping fn
+  - 7b4a015f 2024-07-15T10:32:55+02:00 ci: Add network segmentation lgw lane
+  - 60d3c731 2024-07-15T09:02:21+02:00 udn, e2e, non-IC: add comments explaining which ls manager to use
+  - 6a99be25 2024-07-15T09:02:20+02:00 udn, e2e: sort out imports
+  - 89c9e1b9 2024-07-15T08:57:10+02:00 udn, layer2, non-IC: auto-exclude GW and mp0 IPs from the subnet
+  - 07317592 2024-07-12T17:08:29+02:00 user-def-nets, cni: configure the additional net iface
+  - 659f0d76 2024-07-12T17:08:01+02:00 cni: Add nadLister to clientset
+  - df165e65 2024-07-12T17:08:01+02:00 allocator, pod: Use active network nad name
+  - 5630db23 2024-07-12T17:07:59+02:00 util: Return NetInfo as active network
+  - 4cb7c1cf 2024-07-12T17:07:20+02:00 udn, e2e: Remove NSE annotation from pods
+
+- oc image-arm64 49bebdbdb90ccf837da19e22bbc9fc6396346f8c to bd7e59668c050e59b14e81cf5be00fad17f2f669
+  - 29221107 2024-07-30T04:21:11-04:00 node-joiner: add the required role to support platform type validation
+  - dc9b83b1 2024-07-26T17:37:09-04:00 Separate api group for secrets
+  - bdee71a3 2024-07-24T15:07:21-04:00 Update command description
+  - 0601c2ef 2024-07-22T21:36:16-04:00 Remove common.go and incorporate review feedback
+  - b46b680a 2024-07-22T18:03:37-04:00 Create monitor run test and reuse common code
+  - 19bdd412 2024-07-16T17:56:46-04:00 Shared code placed in common.go
+  - c2bbdfb8 2024-07-16T16:36:06-04:00 WRKLDS-1316: oc adm node-image monitor command
+  - d38015a2 2024-07-16T16:35:23-04:00 renamed to node-image
+  - 3ffbacc1 2024-07-16T16:32:45-04:00 add-nodes: define empty commands structure
+
+- ovn-kubernetes image-arm64 9168abf8a94cbd83a7fd53fc675fb42afea870ea to 7108849ad061051eb43117d398d0ba63f7788adf
+  - fdffd716 2024-07-30T08:18:19-04:00 Revert "Merge pull request #2233 from tssurya/ds-merge-24th-july"
+  - 122bd357 2024-07-23T16:22:46+02:00 L2/L3: Create UDN management-port on host
+  - 012e09a1 2024-07-22T07:55:19+02:00 udn, cni: Trait pod without role
+  - 0d941615 2024-07-22T07:55:19+02:00 udn, pods: Add default net 'role=primary'
+  - c33b3e89 2024-07-22T07:52:02+02:00 udn, cni: Add feature gate unit tests
+  - 58da278e 2024-07-22T07:52:02+02:00 udn, cni: Convert getCNIResult to free function
+  - e3334b71 2024-07-22T07:52:02+02:00 udn, cni: Gate primary role networks
+  - a439ebcd 2024-07-19T15:30:26+02:00 udn, controllers: Wire up networkID helper
+  - 424d22bf 2024-07-19T14:55:55+02:00 util: Add helper to discover networkID
+  - ff286af7 2024-07-18T09:16:24-07:00 workflows/test.yml: Run conformance in control-plane-helm matrix
+  - 4223a9cc 2024-07-18T09:15:52-07:00 helm: update README.md
+  - e3c2c88e 2024-07-18T09:15:52-07:00 helm: Add conditional image pull secrets to Helm charts
+  - aae7bdaa 2024-07-17T16:26:56+02:00 Fix stale network cleanup
+  - 9ebbc186 2024-07-17T14:14:26+02:00 nit: remove unused parameter
+  - 27653f18 2024-07-17T14:14:26+02:00 cm: Move nodeGWRouterLRPIPGenerators from zic to na
+  - 258c5cd1 2024-07-17T14:14:26+02:00 node-annotation: Deprecate node-gateway-router-lrp-ifaddr
+  - bf4c113d 2024-07-17T14:14:26+02:00 node-annotations: Add UpdateNodeGatewayRouterLRPAddrsAnnotation util
+  - f3eb8e0f 2024-07-17T14:14:26+02:00 node-annotations: Add ParseNodeGatewayRouterJoinAddrs util
+  - 35e77c27 2024-07-17T14:14:26+02:00 node-annotation: Add convertPrimaryIfAddrAnnotationToIPNet util
+  - 781b9ebf 2024-07-17T14:14:26+02:00 node-annotations: Add k8s.ovn.org/node-gateway-router-lrp-ifaddrs
+  - bd3713a5 2024-07-17T14:11:58+02:00 pod-routes: Add join subnet routes for each network
+  - 98d8f7ee 2024-07-17T14:11:33+02:00 controller: Move ovnClusterLRPToJoinIfAddrs from DNC to BNC
+  - 7f623269 2024-07-17T14:11:03+02:00 netInfo: Add joinSubnets config
+  - f3b64444 2024-07-17T12:20:42+02:00 LGW,DGP: Remove unused subnets
+  - 6e36658e 2024-07-17T08:25:56+02:00 Add joinSubnet to NAD config
+  - dd7290fa 2024-07-16T19:42:15+00:00 github workflow test: enable ENABLE_MULTI_NET for helm
+  - 28e6215c 2024-07-16T19:03:41+00:00 HELM: udn, non-IC: allow node to read NADs on non-IC
+  - 0197fe59 2024-07-16T15:12:07+02:00 Ignore mirrored EndpointSlices in current controllers
+  - d28b801b 2024-07-16T15:12:06+02:00 Make GetEndpointSlices network aware
+  - 932273e7 2024-07-16T15:12:06+02:00 Rename GetEndpointSlices to GetServiceEndpointSlices
+  - 2b660fa8 2024-07-16T15:12:05+02:00 Docs
+  - 4ac64520 2024-07-16T15:12:04+02:00 E2E tests
+  - 72661ca5 2024-07-16T15:12:03+02:00 Introduce EndpointSlice mirror controller for user defined networks
+  - 4a4ccb1a 2024-07-16T12:17:48+02:00 udn, isolation, e2e: skip tests on non-IC deployments
+  - 9e2aa33c 2024-07-16T12:17:48+02:00 udn, non-IC: allow node to read NADs on non-IC
+  - d1a01257 2024-07-16T12:17:47+02:00 udn, non-IC: start NAD listener
+  - 11c8637b 2024-07-16T10:03:56+02:00 udn, ci, e2e: add a non-IC lane
+  - 32774a47 2024-07-15T16:02:09-07:00 helm: fix appVersion to be 1.0.0
+  - ae1d7366 2024-07-15T11:45:48+02:00 multi-homing, tests: assert an UDN cannot be used as a secondary net
+  - 7993d344 2024-07-15T11:45:43+02:00 multi-homing, tests: add UT coverage to the GetPodNADToNetworkMapping fn
+  - 7b4a015f 2024-07-15T10:32:55+02:00 ci: Add network segmentation lgw lane
+  - 60d3c731 2024-07-15T09:02:21+02:00 udn, e2e, non-IC: add comments explaining which ls manager to use
+  - 6a99be25 2024-07-15T09:02:20+02:00 udn, e2e: sort out imports
+  - 89c9e1b9 2024-07-15T08:57:10+02:00 udn, layer2, non-IC: auto-exclude GW and mp0 IPs from the subnet
+  - 07317592 2024-07-12T17:08:29+02:00 user-def-nets, cni: configure the additional net iface
+  - 659f0d76 2024-07-12T17:08:01+02:00 cni: Add nadLister to clientset
+  - df165e65 2024-07-12T17:08:01+02:00 allocator, pod: Use active network nad name
+  - 5630db23 2024-07-12T17:07:59+02:00 util: Return NetInfo as active network
+  - 4cb7c1cf 2024-07-12T17:07:20+02:00 udn, e2e: Remove NSE annotation from pods
 
