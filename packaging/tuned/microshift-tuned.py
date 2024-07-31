@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import argparse
 import os.path
 import subprocess
 import configparser
@@ -173,6 +174,30 @@ def should_run_as_root():
 
 
 def main():
+    parser = argparse.ArgumentParser(
+        prog='MicroShift TuneD',
+        formatter_class=argparse.RawTextHelpFormatter,
+        description=f"""Daemon for unattended TuneD profile activation.
+
+When program starts, it compares configuration and system state.
+If the requested profile is not activate, it will be activated,
+and if reboot_after_apply is True, the node will be rebooted.
+When profile is being activated, checksums of the profile contents
+and its variables are stored in separate location.
+Later, when program starts again, it compares stored checksums with
+current state of the profile and only reactivate and (optionally)
+reboot the host if the profile has changed.
+
+Configuration file is at {Config.PATH} and it has following schema:
+    profile: <name of the tuned profile>
+    reboot_after_apply: {{True|False}}"""
+    )
+    parser.add_argument("--live-run",
+                        action='store_true',
+                        help="Allows program to reboot the node if it was requested in the configuration file (reboot_after_apply)")
+
+    args = parser.parse_args()
+
     should_run_as_root()
     tuned_daemon_should_be_running()
     cfg = Config.load()
@@ -191,9 +216,13 @@ def main():
 
     activate_profile(cfg.profile)
     checksums.write_to_cache()
+
     if cfg.reboot_after_apply:
-        logging.info("Rebooting the host")
-        reboot()
+        if args.live_run:
+            logging.info("Rebooting the host")
+            reboot()
+        else:
+            logging.info("Reboot is skipped because --live-run was not provided.")
 
 
 if __name__ == "__main__":

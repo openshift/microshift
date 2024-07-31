@@ -5,7 +5,7 @@ After=tuned.service
 Requires=tuned.service
 
 [Service]
-ExecStart=/usr/bin/microshift-tuned
+ExecStart=/usr/bin/microshift-tuned --live-run
 
 [Install]
 WantedBy=multi-user.target
