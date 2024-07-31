@@ -47,12 +47,8 @@ bash -x ./scripts/image-builder/cleanup.sh -full
 
 cd "${ROOTDIR}/test"
 
-# Set up the hypervisor configuration for the tests
+# Set up the hypervisor configuration for the tests and start webserver
 bash -x ./bin/manage_hypervisor_config.sh create
-
-# Start the web server to host the kickstart files and ostree commit
-# repository.
-bash -x ./bin/start_webserver.sh
 
 # Setup a container registry and mirror images.
 if ${ENABLE_REGISTRY_MIRROR}; then

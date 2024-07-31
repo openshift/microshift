@@ -240,35 +240,6 @@ get_build_branch() {
     echo "main"
 }
 
-start_webserver() {
-    echo "Starting web server in ${IMAGEDIR}"
-    mkdir -p "${IMAGEDIR}"
-    cd "${IMAGEDIR}"
-
-    NGINX_CONFIG="${IMAGEDIR}/nginx.conf"
-    # See the https://nginx.org/en/docs/http/ngx_http_core_module.html page for
-    # a full list of HTTP configuration directives
-    echo "${nginx_conf}" > "${NGINX_CONFIG}"
-
-    # Allow the current user to write to nginx temporary directories
-    sudo chgrp -R "$(id -gn)" /var/lib/nginx
-
-    # Kill running nginx processes and wait until down
-    sudo pkill nginx || true
-    while pidof nginx &>/dev/null ; do
-        sleep 1
-    done
-
-    nginx \
-        -c "${NGINX_CONFIG}" \
-        -e "${IMAGEDIR}/nginx.log"
-}
-
-stop_webserver() {
-    echo "Stopping web server"
-    sudo pkill nginx || true
-}
-
 # The branch identifier of the current scenario repository,
 # i.e. "main", "release-4.14", etc.
 # Used for top-level directory names when caching build artifacts,

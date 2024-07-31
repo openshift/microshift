@@ -9,6 +9,36 @@ SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # shellcheck source=test/bin/common.sh
 source "${SCRIPTDIR}/common.sh"
 
+usage() {
+    cat - <<EOF
+${BASH_SOURCE[0]} [stop]
+Run this script to start an nginx web server.
+
+  -h           Show this help.
+
+[stop]: Stop the nginx web server.
+
+EOF
+}
+
+if [ $# -ne 0 ]; then
+    case "${1}" in
+        stop)
+            echo "Stopping web server"
+            sudo pkill nginx || true
+            exit 0
+            ;;
+        -h)
+            usage
+            exit 0
+            ;;
+        *)
+            usage
+            exit 1
+            ;;
+    esac
+fi
+
 echo "Starting web server in ${IMAGEDIR}"
 mkdir -p "${IMAGEDIR}"
 cd "${IMAGEDIR}"

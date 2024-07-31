@@ -290,21 +290,25 @@ Image Builder.
 
 #### Creating Images
 
-Use `./test/bin/start_osbuild_workers.sh` to create multiple workers for
-building images in parallel. The image build process is mostly CPU and I/O
+Use `./test/bin/manage_composer_config.sh` to set up the system for building
+images. Create the configuration and start the webserver using `create`.
+
+```
+$ ./test/bin/manage_composer_config.sh create
+```
+
+Optionally, use `create [num_workers]` to create multiple workers for building 
+images in parallel. The image build process is mostly CPU and I/O
 intensive. For a development environment, setting the number of workers to
 half of the CPU number may be a good starting point.
 
 ```
-NCPUS=$(lscpu | grep '^CPU(s):' | awk '{print $2}')
-./test/bin/start_osbuild_workers.sh $((NCPUS / 2))
+$ NCPUS=$(lscpu | grep '^CPU(s):' | awk '{print $2}')
+$ ./test/bin/manage_composer_config.sh create $((NCPUS / 2))
 ```
 
 > This setting is optional and not necessarily recommended for configurations
 > with small number of CPUs and limited disk performance.
-
-Use `./test/bin/start_webserver.sh` to run an `nginx` web server to serve the
-images needed for the build.
 
 Use `./test/bin/build_images.sh` to build all of the images for all of the
 blueprints available.
