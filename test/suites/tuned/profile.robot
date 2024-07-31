@@ -5,12 +5,22 @@ Resource            ../../resources/microshift-host.resource
 Resource            ../../resources/microshift-config.resource
 Resource            ../../resources/microshift-process.resource
 Resource            ../../resources/ostree-health.resource
+Resource            ../../resources/ostree.resource
 
 Suite Setup         Setup
 Suite Teardown      Teardown
 
 
 *** Test Cases ***
+Host Should Have MicroShift-Baseline TuneD Profile Enabled
+    [Documentation]    Verifies that microshift-tuned.service was successful in activating the profile
+    ...    and rebooting the host.
+
+    Kernel Arguments Should Exist    nohz=on    nohz_full=2,4-5    cu_nocbs=2,4-5    tuned.non_isolcpus=0000000b
+    ...    hugepagesz=2M    hugepages=10    test1=on    test2=true    dummy
+    CPUs Should Be    0    3
+    CPUs Should Be    1    1    2    4    5    # 0 is implicitly online
+
 X86 64 Should Run RT Kernel
     [Documentation]    If system under test is x86_64, assert it's running RT kernel.
 
@@ -19,20 +29,6 @@ X86 64 Should Run RT Kernel
         ${kernel}=    Command Should Work    sudo grubby --default-kernel
         Should End With    ${kernel}    +rt
     END
-
-MicroShift-Baseline Profile Is Enabled Successfully
-    [Documentation]    Check if profile can be activated successfully
-    ...    and necessary bits are in place after rebooting, including
-    ...    working MicroShift with kubelet configuration.
-
-    Activate TuneD Profile
-    Enable MicroShift
-    Reboot MicroShift Host
-
-    Kernel Arguments Should Exist    nohz=on    nohz_full=2,4-5    cu_nocbs=2,4-5    tuned.non_isolcpus=0000000b
-    ...    hugepagesz=2M    hugepages=10    test1=on    test2=true    dummy
-    CPUs Should Be    0    3
-    CPUs Should Be    1    1    2    4    5    # 0 is implicitly online
 
 Kubelet Resources Are As Expected
     [Documentation]    Validates that kubelet detected right amount of online CPUs and hugepages.
@@ -68,6 +64,17 @@ Make Sure Everything Works After Reboot
 
     [Teardown]    Remove Namespace    ${NAMESPACE}
 
+Reactivate Offline CPU
+    [Documentation]    Verify if reactivating previously offlined CPU is successful.
+    [Setup]    Backup MicroShift Baseline Variables
+
+    Command Should Work
+    ...    sed -i 's/^offline_cpu_set=.*$/offline_cpu_set=/' /etc/tuned/microshift-baseline-variables.conf
+    Command Should Work    tuned-adm profile microshift-baseline
+    CPUs Should Be    1    1    2    3    4    5    # 0 is implicitly online
+
+    [Teardown]    Restore MicroShift Baseline Variables
+
 
 *** Keywords ***
 Setup
@@ -75,7 +82,7 @@ Setup
     Login MicroShift Host
 
 Teardown
-    [Documentation]    Teardown test after the tes suite
+    [Documentation]    Teardown test after the test suite
     Logout MicroShift Host
 
 Setup Namespace
@@ -85,10 +92,6 @@ Setup Namespace
     Run With Kubeconfig    oc label ns ${ns} --overwrite pod-security.kubernetes.io/audit=privileged
     Run With Kubeconfig    oc label ns ${ns} --overwrite pod-security.kubernetes.io/enforce=privileged
     Run With Kubeconfig    oc label ns ${ns} --overwrite pod-security.kubernetes.io/warn=privileged
-
-Activate TuneD Profile
-    [Documentation]    Setup and activate TuneD profile
-    Command Should Work    sudo tuned-adm profile microshift-baseline
 
 Verify Node Resources
     [Documentation]    Checks if node resources are as expected
@@ -121,3 +124,13 @@ Oslat Completed Testing
     ...    We run oslat just to make sure it successfully runs, not for the results.
     ${logs}=    Oc Logs    oslat    ${NAMESPACE}
     Should Contain    ${logs}    Test completed.
+
+Backup MicroShift Baseline Variables
+    [Documentation]    Backs up microshift-baseline-variables.conf
+    Command Should Work
+    ...    cp /etc/tuned/microshift-baseline-variables.conf /etc/tuned/microshift-baseline-variables.conf.bak
+
+Restore MicroShift Baseline Variables
+    [Documentation]    Restores up microshift-baseline-variables.conf
+    Command Should Work
+    ...    mv /etc/tuned/microshift-baseline-variables.conf.bak /etc/tuned/microshift-baseline-variables.conf

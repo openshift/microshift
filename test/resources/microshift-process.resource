@@ -102,6 +102,10 @@ Enable MicroShift
     [Documentation]    Enable the MicroShift service
     Systemctl    enable    microshift.service
 
+Disable MicroShift
+    [Documentation]    Disable the MicroShift service
+    Systemctl    disable    microshift.service
+
 Cleanup MicroShift
     [Documentation]    Cleanup MicroShift data
     [Arguments]    ${cmd}="--all"    ${opt}=${EMPTY}

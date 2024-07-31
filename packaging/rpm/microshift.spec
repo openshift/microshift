@@ -168,6 +168,7 @@ Summary: Baseline configuration for running low latency workload on MicroShift
 BuildArch: noarch
 Requires: microshift = %{version}
 Requires: tuned-profiles-cpu-partitioning
+Requires: python3-pyyaml
 
 %description low-latency
 The microshift-low-latency package provides a baseline configuration prepared for
@@ -371,6 +372,10 @@ install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/002-microshi
 install -p -m644 packaging/tuned/runtime-class/runtime-class.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/002-microshift-low-latency/runtime-class.yaml
 install -p -m644 packaging/tuned/runtime-class/kustomization.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/002-microshift-low-latency/kustomization.yaml
 
+## low-latency: microshift-tuned
+install -p -m644 packaging/tuned/microshift-tuned.service %{buildroot}%{_unitdir}/microshift-tuned.service
+install -p -m755 packaging/tuned/microshift-tuned.py %{buildroot}%{_bindir}/microshift-tuned
+
 %pre networking
 
 getent group hugetlbfs >/dev/null || groupadd -r hugetlbfs
@@ -505,13 +510,17 @@ fi
 %{_prefix}/lib/tuned/microshift-baseline
 %config(noreplace) %{_sysconfdir}/tuned/microshift-baseline-variables.conf
 %{_sysconfdir}/crio/crio.conf.d/05-high-performance-runtime.conf
-%{_prefix}/lib/microshift/manifests.d/002-microshift-low-latency/runtime-class.yaml
-%{_prefix}/lib/microshift/manifests.d/002-microshift-low-latency/kustomization.yaml
+%{_prefix}/lib/microshift/manifests.d/002-microshift-low-latency/
+%{_unitdir}/microshift-tuned.service
+%{_bindir}/microshift-tuned
 
 
 # Use Git command to generate the log and replace the VERSION string
 # LANG=C git log --date="format:%a %b %d %Y" --pretty="tformat:* %cd %an <%ae> VERSION%n- %s%n" packaging/rpm/microshift.spec
 %changelog
+* Mon Jul 29 2024 Patryk Matuszak <pmatusza@redhat.com> 4.17.0
+- Add microshift-tuned daemon for unattended TuneD profile activation
+
 * Thu Jul 18 2024 Patryk Matuszak <pmatusza@redhat.com> 4.17.0
 - Add high-performance CRI-O runtime and RuntimeClass
 
