@@ -30,14 +30,11 @@ Verify New Pod Works With IPv6
     ...    Expose Hello MicroShift Service Via Route IPv6
     ...    Restart Router
 
-    ${pod_ip}=    Run With Kubeconfig
-    ...    oc get pod hello-microshift -n ${NAMESPACE} -o jsonpath='{.status.podIPs[0].ip}'
+    ${pod_ip}=    Oc Get JsonPath    pod    ${NAMESPACE}    hello-microshift    .status.podIPs[0].ip
     Must Not Be Ipv6    ${pod_ip}
-    ${pod_ip}=    Run With Kubeconfig
-    ...    oc get pod hello-microshift -n ${NAMESPACE} -o jsonpath='{.status.podIPs[1].ip}'
+    ${pod_ip}=    Oc Get JsonPath    pod    ${NAMESPACE}    hello-microshift    .status.podIPs[1].ip
     Must Be Ipv6    ${pod_ip}
-    ${service_ip}=    Run With Kubeconfig
-    ...    oc get svc hello-microshift -n ${NAMESPACE} -o jsonpath='{.spec.clusterIP}'
+    ${service_ip}=    Oc Get JsonPath    svc    ${NAMESPACE}    hello-microshift    .spec.clusterIP
     Must Be Ipv6    ${service_ip}
 
     Wait Until Keyword Succeeds    10x    6s
@@ -65,14 +62,11 @@ Verify New Pod Works With IPv4
     ...    Expose Hello MicroShift Service Via Route IPv4
     ...    Restart Router
 
-    ${pod_ip}=    Run With Kubeconfig
-    ...    oc get pod hello-microshift -n ${NAMESPACE} -o jsonpath='{.status.podIPs[0].ip}'
+    ${pod_ip}=    Oc Get JsonPath    pod    ${NAMESPACE}    hello-microshift    .status.podIPs[0].ip
     Must Not Be Ipv6    ${pod_ip}
-    ${pod_ip}=    Run With Kubeconfig
-    ...    oc get pod hello-microshift -n ${NAMESPACE} -o jsonpath='{.status.podIPs[1].ip}'
+    ${pod_ip}=    Oc Get JsonPath    pod    ${NAMESPACE}    hello-microshift    .status.podIPs[1].ip
     Must Be Ipv6    ${pod_ip}
-    ${service_ip}=    Run With Kubeconfig
-    ...    oc get svc hello-microshift -n ${NAMESPACE} -o jsonpath='{.spec.clusterIP}'
+    ${service_ip}=    Oc Get JsonPath    svc    ${NAMESPACE}    hello-microshift    .spec.clusterIP
     Must Not Be Ipv6    ${service_ip}
 
     Wait Until Keyword Succeeds    10x    6s
@@ -153,26 +147,8 @@ Network APIs With Test Label Are Gone
     ${response}=    Run With Kubeconfig    oc get svc,ep -l app\=hello-microshift -n ${NAMESPACE}
     Should Be Equal As Strings    ${match_string}    ${response}    strip_spaces=True
 
-DNS Entry For Route Should Resolve
-    [Documentation]    Resolve hello-microshift route via mDNS from the hypervisor/RF runner.
-    ...    Expects RF runner host has opened port 5353 for libvirt zone.
-
-    ${result}=    Run Process
-    ...    avahi-resolve-host-name ${HOSTNAME}
-    ...    shell=True
-    ...    timeout=15s
-    Should Be Equal As Integers    0    ${result.rc}
-    Log Many    ${result.stdout}    ${result.stderr}
-    @{words}=    Split String    ${result.stdout}
-    Must Be Ipv6    ${words}[1]
-
 Restart Router
     [Documentation]    Restart the router and wait for readiness again. The router is sensitive to apiserver
     ...    downtime and might need a restart (after the apiserver is ready) to resync all the routes.
     Run With Kubeconfig    oc rollout restart deployment router-default -n openshift-ingress
     Named Deployment Should Be Available    router-default    openshift-ingress    5m
-
-All Services Are Ipv6
-    [Documentation]    Retrieve all services and check none of them have an IPv4 family
-    ${response}=    Run With Kubeconfig    oc get svc -A -o jsonpath='{.items[*].spec.ipFamilies[*]}'
-    Should Not Contain    ${response}    IPv4
