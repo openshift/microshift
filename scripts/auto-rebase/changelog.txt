@@ -1,23 +1,14 @@
-- cluster-kube-apiserver-operator embedded-component 0afad8a00186e1e7a2712e9addf026e17b8cd950 to de2f2ac2fc9a811bd2b1db4f912c5a0092bfc3d0
-  - 69ea72a 2024-07-22T12:43:20+00:00 p/o/podsecurityreadinesscontroller: add disabled syncer
-  - 3c9753a 2024-07-22T12:43:20+00:00 p/o/psreadinesscontroller: make ctrl owner aware
-  - 05cca26 2024-07-22T12:43:20+00:00 p/o/psreadinesscontroller: minor refactoring
+- cluster-network-operator embedded-component dc0ef57c8512a150435226f5774a0f2263b0080b to 739536971534310704707375a4903858d7331ad3
+  - 2e00bea 2024-07-22T09:05:31+00:00 Fix IC distributed control plane alerts
 
-- machine-config-operator embedded-component d70a17fc8fee26d27c0624522f000504838f4b22 to 6c5920917486dc9ff7fb7600e35211ace02f05cb
-  - a2da3240 2024-07-23T10:25:18-04:00 controller: add annotation filter for node drains
-  - 5d965f5e 2024-07-23T13:03:03+00:00 add node ready check in getAllCandidateMachines
-  - 842b2027 2024-07-22T15:37:38-04:00 manifests: add vap defaults
+- machine-config-operator embedded-component 6c5920917486dc9ff7fb7600e35211ace02f05cb to a4756652d07e380d7c6176af382f756d5c48281f
+  - affd8372 2024-06-20T20:21:29+00:00 Use Role instead of ClusterRole for on-prem services
+  - e392d392 2024-06-20T20:21:29+00:00 OCPBUGS-32348: Allow system:node read config maps in infra namespaces
+  - 30aeaf49 2024-06-20T20:21:29+00:00 OCPBUGS-32348: Mount pod namespace for on-prem components
 
-- operator-framework-olm embedded-component 1551101943313e3546cba7d9bc78effc79b40a8e to a897b786370bbb7d3f9cc2f523aa4c5e5c9fcd55
-  - 27ccca42 2024-07-16T09:09:29+02:00 mark flaky test as flaky (#3340)
-  - 9c5343ff 2024-07-16T09:09:29+02:00 [CARRY] add output-dir to E2E_GINKGO_OPTS
-  - aedde0e9 2024-07-16T09:09:29+02:00 [CARRY] add junit report
-  - a27fb655 2024-07-16T09:09:29+02:00 mark flaky tests (#3333)
-  - 22a76ede 2024-07-16T09:09:29+02:00 update ginkgo opts (#3337)
+- ovn-kubernetes image-amd64 2dbb7fa6ab109ebd440a35eda9d4a7c14ca027e9 to 494993b7702336ed9d527c2c9899b85cdd22c7bf
+  - f8eaec6f 2024-07-22T09:19:05+00:00 Fix registering northd metrics on appropriate nodes
 
-- ovn-kubernetes image-amd64 7f412836bd26c3d6e9735552a7fd615e7e7e9695 to 2dbb7fa6ab109ebd440a35eda9d4a7c14ca027e9
-  - aab07b8d 2024-07-05T09:52:26+02:00 ovspinning: Set affinity of each thread
-
-- ovn-kubernetes image-arm64 7f412836bd26c3d6e9735552a7fd615e7e7e9695 to 2dbb7fa6ab109ebd440a35eda9d4a7c14ca027e9
-  - aab07b8d 2024-07-05T09:52:26+02:00 ovspinning: Set affinity of each thread
+- ovn-kubernetes image-arm64 2dbb7fa6ab109ebd440a35eda9d4a7c14ca027e9 to 494993b7702336ed9d527c2c9899b85cdd22c7bf
+  - f8eaec6f 2024-07-22T09:19:05+00:00 Fix registering northd metrics on appropriate nodes
 
