@@ -1,15 +1,6 @@
-- machine-config-operator embedded-component 83226c2cde5bfd61b8e289773edae3cd7fc3f5dd to e3f6b6a0df1046063d4ae17e9696050691581731
-  - 03dfbc56 2024-07-12T09:01:20+00:00 OCPBUGS-22324: Fix wait-for-br-ex-up enablement logic
-  - d9558030 2024-07-12T09:01:20+00:00 Wait for br-ex up event before node-valid-hostname
-  - 6184bffb 2024-07-12T09:01:20+00:00 OCPBUGS-27162: Add dependency on crio-wipe to resolv-prepender
-  - 7babb96f 2024-07-12T09:01:20+00:00 OCPBUGS-29732: Always touch resolv-prepender file at end of script
-  - e3d70a37 2024-07-12T09:01:20+00:00 OPNET-469: Apply new DNS configuration only if changed
-  - b0a1d1a7 2024-07-12T09:01:20+00:00 OCPBUGS-29624: Restart resolv-prepender on failure
-  - 4c16bb1c 2024-07-12T09:01:20+00:00 OPNET-355: Use NM's dns-change event for resolv.conf
+- ovn-kubernetes image-amd64 b292310a0e912af6dc4b8fde436d38115818d90f to 6a57379ee0eb56c90a4fa9acc123001f61890167
+  - c8d908e 2024-07-26T10:16:26+02:00 ovspinning: Set affinity of each thread
 
-- oc image-amd64 aa6e2f22f0c7e46757d976b6eb003786196ff907 to 44b3ac26e654777e0283759d45a2b3351823fc5e
-  - 4a8e4d79 2024-06-20T05:16:22+00:00 Remove some of newapp unit tests relying on external deprecated images
-
-- oc image-arm64 aa6e2f22f0c7e46757d976b6eb003786196ff907 to 44b3ac26e654777e0283759d45a2b3351823fc5e
-  - 4a8e4d79 2024-06-20T05:16:22+00:00 Remove some of newapp unit tests relying on external deprecated images
+- ovn-kubernetes image-arm64 b292310a0e912af6dc4b8fde436d38115818d90f to 6a57379ee0eb56c90a4fa9acc123001f61890167
+  - c8d908e 2024-07-26T10:16:26+02:00 ovspinning: Set affinity of each thread
 
