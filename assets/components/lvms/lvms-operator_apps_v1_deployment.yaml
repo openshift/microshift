@@ -38,7 +38,7 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.name
-          image: quay.io/lvms_dev/lvms4-lvms-rhel9-operator@sha256:1901bc1f4affaf9db870dd6eaea6eb5d0a33eb60aaca2ed12253b48ceafa2d90
+          image: quay.io/lvms_dev/lvms4-lvms-rhel9-operator@sha256:d236a30c0793850c3453163cd0160227fb0beb81863d17ff1d9ee1439c8798b3
           livenessProbe:
             failureThreshold: 3
             httpGet:
@@ -66,6 +66,7 @@ spec:
               memory: 50Mi
           securityContext:
             allowPrivilegeEscalation: false
+          terminationMessagePolicy: FallbackToLogsOnError
           volumeMounts:
             - mountPath: /tmp/k8s-webhook-server/serving-certs
               name: cert
