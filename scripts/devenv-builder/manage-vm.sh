@@ -22,7 +22,7 @@ SSH_PASSWORD_OPTS="-o PubkeyAuthentication=no -o PreferredAuthentications=passwo
 # Show the IP address of the VM
 function get_ip {
     sudo virsh domifaddr "$1" \
-        | grep vnet \
+        | grep ipv \
         | awk '{print $4}' \
         | cut -f1 -d/
 }

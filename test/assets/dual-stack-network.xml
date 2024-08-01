@@ -1,0 +1,18 @@
+<network>
+  <name>${VM_DUAL_STACK_NETWORK}</name>
+  <forward mode="nat">
+    <nat ipv6='yes'>
+      <port start='1024' end='65535'/>
+    </nat>
+  </forward>
+  <ip address='192.168.113.1' netmask='255.255.255.0' localPtr='yes'>
+    <dhcp>
+      <range start='192.168.113.100' end='192.168.113.254'/>
+    </dhcp>
+  </ip>
+  <ip family="ipv6" address="2001:db9:ca7:ff::1" prefix="96">
+    <dhcp>
+      <range start="2001:db9:ca7:ff::1000" end="2001:db9:ca7:ff::2000" />
+    </dhcp>
+  </ip>
+</network>

@@ -26,6 +26,10 @@ def must_be_ipv6(addr: str) -> None:
     BuiltIn().should_be_true(is_ipv6(addr))
 
 
+def must_not_be_ipv6(addr: str) -> None:
+    BuiltIn().should_not_be_true(is_ipv6(addr))
+
+
 def add_brackets_if_ipv6(ip: str) -> str:
     """
     Add square brackets to the given IP if its ipv6 for later use in other tools (e.g. curl)
