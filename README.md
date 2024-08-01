@@ -74,6 +74,7 @@ To build MicroShift from source and contribute to its development, refer to the 
 - [Testing MicroShift Integration with Greenboot](./docs/contributor/greenboot.md)
 - [Quay Mirror Registry Setup for Testing](./docs/contributor/howto_quay_mirror.md)
 - [Multinode Testing Environment for MicroShift](./docs/contributor/multinode/setup.md)
+- [Image Mode for MicroShift](./docs/contributor/image_mode.md)
 
 ## Community
 Community documentation sources are managed at <https://github.com/redhat-et/microshift-documentation> and published on <https://microshift.io>.
