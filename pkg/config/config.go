@@ -195,6 +195,9 @@ func (c *Config) incorporateUserSettings(u *Config) {
 	if u.Node.NodeIP != "" {
 		c.Node.NodeIP = u.Node.NodeIP
 	}
+	if u.Node.NodeIPV6 != "" {
+		c.Node.NodeIPV6 = u.Node.NodeIPV6
+	}
 	if len(u.ApiServer.SubjectAltNames) != 0 {
 		c.ApiServer.SubjectAltNames = u.ApiServer.SubjectAltNames
 	}
@@ -278,6 +281,20 @@ func (c *Config) updateComputedValues() error {
 			defaultServiceNetwork = "fd02::/112"
 		}
 		c.Network.ServiceNetwork = []string{defaultServiceNetwork}
+	}
+
+	if c.IsIPv4() && c.IsIPv6() && len(c.Node.NodeIPV6) == 0 {
+		// NodeIPv6 is a dual-stack only parameter that needs to be configured.
+		// When the user does not provide a value, MicroShift needs to take
+		// one from the host. The function to take the default IP (like node.NodeIP)
+		// is not valid in this case, because it relies on net.ChooseHostInterface
+		// which gives preference to IPv4 addresses. Instead, a simple helper
+		// is used.
+		ip, err := util.GetHostIPv6()
+		if err != nil {
+			return fmt.Errorf("unable to determine ipv6 host address: %v", err)
+		}
+		c.Node.NodeIPV6 = ip
 	}
 
 	clusterDNS, err := c.computeClusterDNS()
@@ -713,7 +730,7 @@ func validateNodeIPv6Address(addr string, dualStack bool) error {
 		return nil
 	}
 	if !dualStack {
-		return fmt.Errorf("dual stack not deteced, address must not be configured")
+		return fmt.Errorf("dual stack not detected, address must not be configured")
 	}
 	if !isValidIPAddress(addr) {
 		return fmt.Errorf("address %v is not valid", addr)

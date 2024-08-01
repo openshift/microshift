@@ -26,6 +26,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/vishvananda/netlink"
 	"k8s.io/apimachinery/pkg/util/net"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/klog/v2"
@@ -205,4 +206,57 @@ func ContainIPANetwork(ip tcpnet.IP, networks []string) bool {
 		}
 	}
 	return false
+}
+
+func GetHostIPv6() (string, error) {
+	handle, err := netlink.NewHandle()
+	if err != nil {
+		return "", err
+	}
+	// Start by looking for the default route and using the dev
+	// address.
+	routeList, err := handle.RouteList(nil, netlink.FAMILY_V6)
+	if err != nil {
+		return "", err
+	}
+	defaultRouteLinkIndex := -1
+	for _, route := range routeList {
+		if route.Dst == nil {
+			defaultRouteLinkIndex = route.LinkIndex
+			break
+		}
+	}
+
+	if defaultRouteLinkIndex != -1 {
+		link, err := handle.LinkByIndex(defaultRouteLinkIndex)
+		if err != nil {
+			return "", err
+		}
+		addrList, err := handle.AddrList(link, netlink.FAMILY_V6)
+		if err != nil {
+			return "", err
+		}
+		for _, addr := range addrList {
+			return addr.IP.String(), nil
+		}
+	}
+
+	// If there is no default route then pick the first ipv6
+	// address that fits.
+	addrList, err := handle.AddrList(nil, netlink.FAMILY_V6)
+	if err != nil {
+		return "", err
+	}
+	for _, addr := range addrList {
+		ip, _, err := tcpnet.ParseCIDR(addr.String())
+		if err != nil {
+			return "", fmt.Errorf("unable to parse CIDR from address %q: %s", addr.String(), err)
+		}
+		if ip.IsLoopback() || ip.IsLinkLocalMulticast() {
+			continue
+		}
+		return ip.String(), nil
+	}
+
+	return "", fmt.Errorf("unable to find host IPv6 address")
 }
