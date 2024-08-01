@@ -281,6 +281,13 @@ update_rebase_job_entrypoint() {
 
     # Replace the line that sets the LVMS release version
     sed -i "s/^release_lvms=.*$/release_lvms=\"${version}\"/" "${rebase_job_entrypoint}"
+
+    (cd "${REPOROOT}" && \
+         if test -n "$(git status -s scripts/auto-rebase/rebase_job_entrypoint.sh)"; then \
+             title "## Committing changes to rebase_job_entrypoint.sh" && \
+             git add scripts/auto-rebase/rebase_job_entrypoint.sh && \
+             git commit -m "update rebase_job_entrypoint.sh"; \
+         fi)
 }
 
 
