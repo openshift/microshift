@@ -110,4 +110,4 @@
 "[sig-cli] Kubectl client Kubectl events should show event when pod is created [Suite:openshift/conformance/parallel] [Suite:k8s]"
 "[sig-network] Netpol NetworkPolicy between server and client should allow ingress access from updated pod [Feature:NetworkPolicy] [Skipped:Network/OpenShiftSDN/Multitenant] [Suite:openshift/conformance/parallel] [Suite:k8s]"
 "[sig-node] Managed cluster should verify that nodes have no unexpected reboots [Late] [Suite:openshift/conformance/parallel]"
-"[sig-architecture] Conformance Tests should have at least two untainted nodes [Conformance] [Suite:openshift/conformance/parallel/minimal] [Suite:k8s]"
+"[sig-architecture] Conformance Tests should have at least two untainted nodes [Conformance] [Skipped:SingleReplicaTopology] [Suite:openshift/conformance/parallel/minimal] [Suite:k8s]"
