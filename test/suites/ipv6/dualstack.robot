@@ -85,6 +85,24 @@ Verify New Pod Works With IPv4
     ...    Restore Default MicroShift Config
     ...    Restart MicroShift
 
+Verify Host Network Pods Get Dual Stack IP Addresses
+    [Documentation]    Verify host network pods get dual stack IP addresses
+    [Setup]    Run Keywords
+    ...    Save Default MicroShift Config
+    ...    Migrate To Dual Stack
+
+    ${pod_ips}=    Oc Get JsonPath
+    ...    pod
+    ...    openshift-dns
+    ...    -l dns.operator.openshift.io/daemonset-node-resolver
+    ...    .items[*].status.podIPs[*].ip
+    Should Contain    ${pod_ips}    ${USHIFT_HOST_IP1}
+    Should Contain    ${pod_ips}    ${USHIFT_HOST_IP2}
+
+    [Teardown]    Run Keywords
+    ...    Restore Default MicroShift Config
+    ...    Restart MicroShift
+
 
 *** Keywords ***
 Setup
