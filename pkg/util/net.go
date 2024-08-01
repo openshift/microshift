@@ -208,7 +208,7 @@ func ContainIPANetwork(ip tcpnet.IP, networks []string) bool {
 	return false
 }
 
-func GetHostIPv6() (string, error) {
+func GetHostIPv6(ipHint string) (string, error) {
 	handle, err := netlink.NewHandle()
 	if err != nil {
 		return "", err
@@ -237,6 +237,9 @@ func GetHostIPv6() (string, error) {
 			return "", err
 		}
 		for _, addr := range addrList {
+			if ipHint != "" && ipHint != addr.IP.String() {
+				continue
+			}
 			return addr.IP.String(), nil
 		}
 	}
@@ -253,6 +256,9 @@ func GetHostIPv6() (string, error) {
 			return "", fmt.Errorf("unable to parse CIDR from address %q: %s", addr.String(), err)
 		}
 		if ip.IsLoopback() || ip.IsLinkLocalMulticast() {
+			continue
+		}
+		if ipHint != "" && ipHint != ip.String() {
 			continue
 		}
 		return ip.String(), nil

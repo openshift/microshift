@@ -290,7 +290,7 @@ func (c *Config) updateComputedValues() error {
 		// is not valid in this case, because it relies on net.ChooseHostInterface
 		// which gives preference to IPv4 addresses. Instead, a simple helper
 		// is used.
-		ip, err := util.GetHostIPv6()
+		ip, err := util.GetHostIPv6("")
 		if err != nil {
 			return fmt.Errorf("unable to determine ipv6 host address: %v", err)
 		}
@@ -469,6 +469,14 @@ func (c *Config) AddWarning(message string) {
 func (c Config) UserNodeIP() string {
 	if c.userSettings != nil {
 		return c.userSettings.Node.NodeIP
+	}
+	return ""
+}
+
+// UserNodeIPv6 return the user configured NodeIPv6, or "" if it's unset.
+func (c Config) UserNodeIPv6() string {
+	if c.userSettings != nil {
+		return c.userSettings.Node.NodeIPV6
 	}
 	return ""
 }
