@@ -250,7 +250,8 @@
       "type": "object",
       "required": [
         "hostnameOverride",
-        "nodeIP"
+        "nodeIP",
+        "nodeIPv6"
       ],
       "properties": {
         "hostnameOverride": {
@@ -259,6 +260,10 @@
         },
         "nodeIP": {
           "description": "IP address of the node, passed to the kubelet.\nIf not specified, kubelet will use the node's default IP address.",
+          "type": "string"
+        },
+        "nodeIPv6": {
+          "description": "IPv6 address of the node, passed to the kubelet. This parameter\nis only allowed when dual stack deployment is configured.",
           "type": "string"
         }
       }

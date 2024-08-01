@@ -49,6 +49,7 @@ network:
 node:
     hostnameOverride: ""
     nodeIP: ""
+    nodeIPv6: ""
 
 ```
 <!---
@@ -108,6 +109,7 @@ network:
 node:
     hostnameOverride: ""
     nodeIP: ""
+    nodeIPv6: ""
 
 ```
 <!---

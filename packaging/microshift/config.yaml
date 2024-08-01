@@ -111,4 +111,7 @@ node:
     # IP address of the node, passed to the kubelet.
     # If not specified, kubelet will use the node's default IP address.
     nodeIP: ""
+    # IPv6 address of the node, passed to the kubelet. This parameter
+    # is only allowed when dual stack deployment is configured.
+    nodeIPv6: ""
 
