@@ -1,3 +1,45 @@
-- oc image-arm64 bd7e59668c050e59b14e81cf5be00fad17f2f669 to 110cba7f25fd1c53017f5c207614b8d88fb97dd1
+- api embedded-component 0d46442e8df17a87cfcf6666ab19b28e88620b59 to 1cd5e299324762879b66c5f5c1c279a98367ee60
+  - d2fb33c 2024-07-31T11:26:50-04:00 Nutanix mapi: gpus and dataDisks support
+  - 7e2935d 2024-07-26T13:59:32-04:00 make update
+  - c4c1bb8 2024-07-26T13:50:59-04:00 enable ManagedBootImages and NodeDisruptionPolicy
+  - 8106d39 2024-07-25T23:08:52+02:00 features: move MultiArchInstall[AWS|GCP] to TechPreview
+
+- cluster-ingress-operator embedded-component f2c9f0760e14a3fa8408db5e7a1e6847e11a51e3 to a9b7292ed9c9bb22642c28e806461379b9da682c
+  - b8b9a43 2024-07-31T20:27:55-04:00 NE-1531: Fix Initialization of NLB Status Parameters
+  - 3b54ec9 2024-07-31T20:27:51-04:00 NE-1531: Fix LB Subnet E2E Tests to Check for Progressing=False
+  - 97a9822 2024-07-31T18:43:31-04:00 NE-1531: Fix TestAWSLBSubnets Verify Subnet Status Logic
+  - 26dfe2c 2024-07-31T01:06:57-04:00 NE-1531: Add LB Subnet Selection for AWS
+  - e9c4200 2024-07-29T16:13:56+05:30 NE-1273: Add a watch to the ingress operator so it will recreate the gwapi crds and E2E tests
+  - ea6af9f 2024-07-26T21:53:51+05:30 E2E Fixes from NE-1208: Gateway API E2E Testing
+  - fdb6215 2024-07-24T16:38:22-04:00 Bump openshift/api, update CRD generation
+  - c9a3b88 2024-07-24T10:48:12-04:00 Update e2e function updateIngressControllerSpecWithRetryOnConflict
+
+- cluster-network-operator embedded-component b454d8d06272bc4788c0b51bbf6970f6021b1dbb to b6ff6df7cd04bd3cb97b04cb5b8c76164fd2c2dc
+  - b3c3a30 2024-07-30T09:23:21-04:00 Handle random crictl errors in iptables-alerter
+
+- kubernetes embedded-component 6892b57d65d25fb0588693bce3d338d8b8b1d2b4 to 1cc018a6608886d6702617a429c3e086f4195151
+  - d6c640bdf 2024-07-31T13:12:34-05:00 UPSTREAM: 126213: add test about container metrics from cadvisor
+
+- machine-config-operator embedded-component 9f305987c2f4546fbe5bcfe2658f3837c53e62eb to 76a8bb34c6a4e38ea2a57cd45a39240776c0d85a
+  - 93852dfd 2024-07-30T10:30:00-04:00 API bump for ManagedBootImages & NodeDisruption GA
+  - 28a4b230 2024-07-29T11:14:43-04:00 controller: guard OCL informer with feature gates
+
+- operator-framework-olm embedded-component 540bb290a11b9f0f13b709bcb8c19affdcf66531 to 5d3de4a6132880f8b8815a31d3e259dc0096810b
+  - c62a1661 2024-07-31T00:04:56+00:00 build(deps): bump github.com/onsi/gomega from 1.33.1 to 1.34.1 (#3354)
+  - 09c33251 2024-07-31T00:03:36+00:00 build(deps): bump k8s.io/apiextensions-apiserver from 0.30.2 to 0.30.3 (#3350)
+  - 411aa668 2024-07-31T00:03:18+00:00 build(deps): bump github.com/docker/docker (#3353)
+  - cbb5bbb2 2024-07-31T00:03:00+00:00 build(deps): bump github.com/onsi/ginkgo/v2 from 2.19.0 to 2.19.1 (#3352)
+
+- oc image-amd64 bd7e59668c050e59b14e81cf5be00fad17f2f669 to fb5b9869b919d7c05db692a68daef6eb3b9d71b1
   - 191d0403 2024-07-30T17:57:47-04:00 WRKLDS-1316: Remove clusterversions from certificates api group
+  - cc31e750 2024-07-26T09:38:36-04:00 upgrade-status: fix a typo in README
+
+- kubernetes image-amd64 6892b57d65d25fb0588693bce3d338d8b8b1d2b4 to 1cc018a6608886d6702617a429c3e086f4195151
+  - d6c640bdf 2024-07-31T13:12:34-05:00 UPSTREAM: 126213: add test about container metrics from cadvisor
+
+- oc image-arm64 110cba7f25fd1c53017f5c207614b8d88fb97dd1 to fb5b9869b919d7c05db692a68daef6eb3b9d71b1
+  - cc31e750 2024-07-26T09:38:36-04:00 upgrade-status: fix a typo in README
+
+- kubernetes image-arm64 6892b57d65d25fb0588693bce3d338d8b8b1d2b4 to 1cc018a6608886d6702617a429c3e086f4195151
+  - d6c640bdf 2024-07-31T13:12:34-05:00 UPSTREAM: 126213: add test about container metrics from cadvisor
 
