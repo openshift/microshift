@@ -159,10 +159,8 @@ the same one used for building the image. This means that the `openvswitch` modu
 cannot be loaded in the container due to the kernel version mismatch with the
 modules present in the `/lib/modules` directory.
 
-To work around this problem, it is necessary to share the host `/lib/modules`
-directory with the container when it is started. This is accomplished by providing
-the `-v /lib/modules:/lib/modules:ro` option to the `podman run` command as
-described in the [Run Container](#run-container) section.
+One way to work around this problem is to pre-load the `openvswitch` module before
+starting the container as described in the [Run Container](#run-container) section.
 
 ### Configure CSI
 
@@ -213,25 +211,30 @@ the next section.
 
 ### Run Container
 
-Run the following command to start the MicroShift `bootc` image in an interactive
+Run the following commands to start the MicroShift `bootc` image in an interactive
 terminal session.
 
-Note that the following paths are shared with the container:
-* Pull secret file for downloading the required OpenShift container images
-* Kernel modules path for loading the `openvswitch` module
-* Host container storage for reusing the available container images
+The host shares the following configuration with the container:
+* The `openvswitch` kernel module to be used by the Open vSwitch service
+* A pull secret file for downloading the required OpenShift container images
+* Host container storage for reusing available container images
 
 ```
 PULL_SECRET=~/.pull-secret.json
 IMAGE_NAME=microshift-4.16-bootc
 
+sudo modprobe openvswitch
 sudo podman run --rm -it --privileged \
     -v "${PULL_SECRET}":/etc/crio/openshift-pull-secret:ro \
-    -v /lib/modules:/lib/modules:ro \
     -v /var/lib/containers/storage:/var/lib/containers/storage \
     --name "${IMAGE_NAME}" \
     "${IMAGE_NAME}"
 ```
+
+> The `systemd-modules-load` service will fail to start in the container if the
+> host kernel version is different from the `bootc` image kernel version. This
+> failure can be safely ignored as all the necessary kernel modules have already
+> been loaded by the host.
 
 > If additional LVM volume group device was allocated as described in the
 > [Configure CSI](#configure-csi) section, the loop device should automatically
