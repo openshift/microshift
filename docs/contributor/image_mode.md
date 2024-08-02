@@ -147,7 +147,7 @@ modules present in the `/lib/modules` directory.
 To work around this problem, it is necessary to share the host `/lib/modules`
 directory with the container when it is started. This is accomplished by providing
 the `-v /lib/modules:/lib/modules:ro` option to the `podman run` command as
-described below.
+described in the [Run Container](#run-container) section.
 
 ### Configure CSI
 
@@ -155,18 +155,19 @@ If the host is already configured to have a `rhel` volume group with free space,
 this configuration is inherited by the container so that it can be used by the
 MicroShift CSI driver to allocate storage.
 
+Run the following command to determine if the volume group exists and it has the
+necessary free space.
 ```
 $ sudo vgs
   VG   #PV #LV #SN Attr   VSize   VFree
   rhel   1   1   0 wz--n- <91.02g <2.02g
 ```
 
-Additional configuration is required for using storage in `bootc` MicroShift
-images when the host does not have the volume group setup as required by the
-MicroShift CSI driver.
+Otherwise, a new volume group should be set up for MicroShift CSI driver to allocate
+storage in `bootc` MicroShift images.
 
 Run the following commands to create a file to be used for LVM partitioning and
-set it up as a loop device.
+configure it as a loop device.
 
 ```
 VGFILE=/var/lib/microshift-lvm-storage.img
@@ -177,7 +178,7 @@ sudo losetup -f "${VGFILE}"
 ```
 
 Query the loop device name and create a free volume group on the device according
-to the MicroShift CSI driver requirements.
+to the MicroShift CSI driver requirements described in [Storage Configuration](./storage/configuration.md).
 
 ```
 VGLOOP=$(losetup -j ${VGFILE} | cut -d: -f1)
@@ -189,6 +190,7 @@ the next section.
 
 > The following commands can be run to detach the loop device and delete the LVM
 > volume group file.
+>
 > ```
 > sudo losetup -d "${VGLOOP}"
 > sudo rm -f "${VGFILE}"
@@ -214,7 +216,10 @@ sudo podman run --rm -it --privileged \
 > [Configure CSI](#configure-csi) section, the loop device should automatically
 > be shared with the container and used by the MicroShift CSI driver.
 
-Log into the container host when prompted using the `redhat:redhat` credentials.
+After the MicroShift `bootc` image has been successfully started, a login prompt
+will be  presented in the terminal. Log into the running container using the
+`redhat:redhat` credentials.
+
 Run the following command to verify that all the MicroShift pods are up and running
 without errors.
 
@@ -223,7 +228,7 @@ sudo oc get pods -A -w \
     --kubeconfig /var/lib/microshift/resources/kubeadmin/kubeconfig
 ```
 
-> Run the `sudo shutdown now` command to stop the container host.
+> Run the `sudo shutdown now` command to stop the container.
 
 ## Run MicroShift Bootc Virtual Machine
 
@@ -260,12 +265,12 @@ rootpw --lock
 network --bootproto=dhcp --device=link --activate --onboot=on
 
 # Pull a `bootc` images from a remote registry
-ostreecontainer --url quay.io/myorg/mypath/microshift-4.16-bootc --no-signature-verification
+ostreecontainer --url quay.io/myorg/mypath/microshift-4.16-bootc
 ```
 
 The kickstart file uses a special [ostreecontainer](https://pykickstart.readthedocs.io/en/latest/kickstart-docs.html#ostreecontainer)
-directive to pull a `bootc` image from the remote registry and install it on top
-of the base RHEL operating system.
+directive to pull a `bootc` image from the remote registry and use it to install
+the RHEL operating system.
 
 > Replace `myorg/mypath` with your remote registry organization name and path.
 
@@ -276,8 +281,8 @@ Copy the downloaded file to the `/var/lib/libvirt/images` directory.
 
 Run the following commands to create a RHEL virtual machine with 2 cores, 2GB of
 RAM and 20GB of storage. The command uses the kickstart file prepared in the
-previous step to pull a `bootc` image from the remote registry and install it on
-top of the base RHEL operating system.
+previous step to pull a `bootc` image from the remote registry and use it to install
+the RHEL operating system.
 
 ```
 VMNAME=microshift-4.16-bootc
