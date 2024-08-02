@@ -53,11 +53,6 @@ RUN if [ -z "${USER_PASSWD}" ] ; then \
 RUN useradd -m -d /var/home/redhat -G wheel redhat && \
     echo "redhat:${USER_PASSWD}" | chpasswd
 
-# Configure OpenShift pull secret
-ARG PULL_SECRET
-RUN echo $PULL_SECRET > /etc/crio/openshift-pull-secret && \
-    chmod 600 /etc/crio/openshift-pull-secret
-
 # Mandatory firewall configuration
 RUN firewall-offline-cmd --zone=public --add-port=22/tcp && \
     firewall-offline-cmd --zone=trusted --add-source=10.42.0.0/16 && \
@@ -81,10 +76,10 @@ CMD ["/bin/sh", "-c", "mount --make-rshared / ; exec /sbin/init"]
 
 Run the following image build command to create a local `bootc` image.
 
-Note that a pull secret file is used for:
-* The podman `--authfile` argument to pull the base `rhel-bootc:9.4` image from the `registry.redhat.io` registry
-* The build `PULL_SECRET` argument to be saved as `/etc/crio/openshift-pull-secret` file on the image for pulling MicroShift container images
-* The build `USER_PASSWD` argument to set as a password for the `redhat` user
+Note how secrets are used during the image build:
+* The podman `--authfile` argument to is required pull the base `rhel-bootc:9.4`
+image from the `registry.redhat.io` registry
+* The build `USER_PASSWD` argument is used to set a password for the `redhat` user
 
 ```
 PULL_SECRET=~/.pull-secret.json
@@ -92,7 +87,6 @@ USER_PASSWD=<your_redhat_user_password>
 IMAGE_NAME=microshift-4.16-bootc
 
 sudo podman build --authfile "${PULL_SECRET}" -t "${IMAGE_NAME}" \
-    --build-arg PULL_SECRET="$(cat "${PULL_SECRET}")" \
     --build-arg USER_PASSWD="${USER_PASSWD}" \
     -f Containerfile
 ```
@@ -208,15 +202,21 @@ the next section.
 ### Run Container
 
 Run the following command to start the MicroShift `bootc` image in an interactive
-terminal session. Note that the host container storage and kernel modules paths
-are shared with the container.
+terminal session.
+
+Note that the following paths are shared with the container:
+* Pull secret file for downloading the required OpenShift container images
+* Kernel modules path for loading the `openvswitch` module
+* Host container storage for reusing the available container images
 
 ```
+PULL_SECRET=~/.pull-secret.json
 IMAGE_NAME=microshift-4.16-bootc
 
 sudo podman run --rm -it --privileged \
-    -v /var/lib/containers/storage:/var/lib/containers/storage \
+    -v "${PULL_SECRET}":/etc/crio/openshift-pull-secret:ro \
     -v /lib/modules:/lib/modules:ro \
+    -v /var/lib/containers/storage:/var/lib/containers/storage \
     --name "${IMAGE_NAME}" \
     "${IMAGE_NAME}"
 ```
@@ -233,7 +233,7 @@ Run the following command to verify that all the MicroShift pods are up and runn
 without errors.
 
 ```
-sudo oc get pods -A -w \
+watch sudo oc get pods -A \
     --kubeconfig /var/lib/microshift/resources/kubeadmin/kubeconfig
 ```
 
@@ -246,10 +246,16 @@ SUDO permissions configured.
 
 ### Prepare Kickstart File
 
-Create the `kickstart.ks` file with the following contents to be used during the
-virtual machine installation.
+Run the following commands to create the `kickstart.ks` file to be used during
+the virtual machine installation.
+
+> The pull secret file contents are embedded in `kickstart.ks` and they are used
+> to create the `/etc/crio/openshift-pull-secret` file at the post-install stage.
 
 ```
+PULL_SECRET=~/.pull-secret.json
+
+cat > kickstart.ks <<EOFKS
 lang en_US.UTF-8
 keyboard us
 timezone UTC
@@ -273,8 +279,19 @@ rootpw --lock
 # Configure network to use DHCP and activate on boot
 network --bootproto=dhcp --device=link --activate --onboot=on
 
-# Pull a `bootc` images from a remote registry
+# Pull a 'bootc' image from a remote registry
 ostreecontainer --url quay.io/myorg/mypath/microshift-4.16-bootc
+
+%post --log=/dev/console --erroronfail
+
+# Create an OpenShift pull secret file
+cat > /etc/crio/openshift-pull-secret <<'EOF'
+$(cat "${PULL_SECRET}")
+EOF
+chmod 600 /etc/crio/openshift-pull-secret
+
+%end
+EOFKS
 ```
 
 The kickstart file uses a special [ostreecontainer](https://pykickstart.readthedocs.io/en/latest/kickstart-docs.html#ostreecontainer)
@@ -305,7 +322,6 @@ sudo virt-install \
     --network network=${NETNAME},model=virtio \
     --events on_reboot=restart \
     --location /var/lib/libvirt/images/rhel-9.4-$(uname -m)-boot.iso \
-    --noautoconsole \
     --initrd-inject kickstart.ks \
     --extra-args "inst.ks=file://kickstart.ks" \
     --wait
@@ -317,6 +333,6 @@ Run the following command to verify that all the MicroShift pods are up and runn
 without errors.
 
 ```
-sudo oc get pods -A -w \
+watch sudo oc get pods -A \
     --kubeconfig /var/lib/microshift/resources/kubeadmin/kubeconfig
 ```
