@@ -69,6 +69,7 @@ RUN cat > /etc/systemd/system/microshift-make-rshared.service <<'EOF'
 [Unit]
 Description=Make root filesystem shared
 Before=microshift.service
+ConditionVirtualization=container
 [Service]
 Type=oneshot
 ExecStart=/usr/bin/mount --make-rshared /
