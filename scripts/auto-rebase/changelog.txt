@@ -1,6 +1,0 @@
-- ovn-kubernetes image-amd64 b292310a0e912af6dc4b8fde436d38115818d90f to 6a57379ee0eb56c90a4fa9acc123001f61890167
-  - c8d908e 2024-07-26T10:16:26+02:00 ovspinning: Set affinity of each thread
-
-- ovn-kubernetes image-arm64 b292310a0e912af6dc4b8fde436d38115818d90f to 6a57379ee0eb56c90a4fa9acc123001f61890167
-  - c8d908e 2024-07-26T10:16:26+02:00 ovspinning: Set affinity of each thread
-
