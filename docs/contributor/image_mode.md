@@ -63,8 +63,19 @@ RUN firewall-offline-cmd --zone=public --add-port=80/tcp && \
     firewall-offline-cmd --zone=public --add-port=30000-32767/tcp && \
     firewall-offline-cmd --zone=public --add-port=30000-32767/udp
 
-# Recursively make the root filesystem subtree shared as required by OVN images
-CMD ["/bin/sh", "-c", "mount --make-rshared / ; exec /sbin/init"]
+# Create a systemd unit to recursively make the root filesystem subtree
+# shared as required by OVN images
+RUN cat > /etc/systemd/system/microshift-make-rshared.service <<'EOF'
+[Unit]
+Description=Make root filesystem shared
+Before=microshift.service
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/mount --make-rshared /
+[Install]
+WantedBy=multi-user.target
+EOF
+RUN systemctl enable microshift-make-rshared.service
 ```
 
 > **Important:**<br>
@@ -77,7 +88,7 @@ CMD ["/bin/sh", "-c", "mount --make-rshared / ; exec /sbin/init"]
 Run the following image build command to create a local `bootc` image.
 
 Note how secrets are used during the image build:
-* The podman `--authfile` argument to is required pull the base `rhel-bootc:9.4`
+* The podman `--authfile` argument is required to pull the base `rhel-bootc:9.4`
 image from the `registry.redhat.io` registry
 * The build `USER_PASSWD` argument is used to set a password for the `redhat` user
 
@@ -226,7 +237,7 @@ sudo podman run --rm -it --privileged \
 > be shared with the container and used by the MicroShift CSI driver.
 
 After the MicroShift `bootc` image has been successfully started, a login prompt
-will be  presented in the terminal. Log into the running container using the
+will be presented in the terminal. Log into the running container using the
 `redhat:<password>` credentials.
 
 Run the following command to verify that all the MicroShift pods are up and running
@@ -325,7 +336,6 @@ sudo virt-install \
     --initrd-inject kickstart.ks \
     --extra-args "inst.ks=file://kickstart.ks" \
     --wait
-"
 ```
 
 Log into the virtual machine using the `redhat:<password>` credentials.
