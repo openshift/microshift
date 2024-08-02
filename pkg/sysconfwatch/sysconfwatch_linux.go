@@ -32,9 +32,11 @@ const sysConfigCheckInterval = time.Second * 5
 const sysConfigAllowedTimeDrift = time.Second * 10
 
 type SysConfWatchController struct {
-	NodeIP     string
-	userNodeIP string
-	timerFd    int
+	NodeIP       string
+	NodeIPv6     string
+	userNodeIP   string
+	userNodeIPv6 string
+	timerFd      int
 }
 
 func NewSysConfWatchController(cfg *config.Config) *SysConfWatchController {
@@ -55,9 +57,11 @@ func NewSysConfWatchController(cfg *config.Config) *SysConfWatchController {
 		klog.Fatalf("failed to start a realtime clock timer %v", err)
 	}
 	return &SysConfWatchController{
-		NodeIP:     cfg.Node.NodeIP,
-		userNodeIP: cfg.UserNodeIP(),
-		timerFd:    fd,
+		NodeIP:       cfg.Node.NodeIP,
+		NodeIPv6:     cfg.Node.NodeIPV6,
+		userNodeIP:   cfg.UserNodeIP(),
+		userNodeIPv6: cfg.UserNodeIPv6(),
+		timerFd:      fd,
 	}
 }
 
@@ -114,6 +118,20 @@ func (c *SysConfWatchController) Run(ctx context.Context, ready chan<- struct{},
 				klog.Warningf("IP address has changed from %q to %q, restarting MicroShift", c.NodeIP, currentIP)
 				os.Exit(1)
 				return nil
+			}
+			// Dual stack case
+			if c.NodeIPv6 != "" {
+				currentIP, err = util.GetHostIPv6(c.userNodeIPv6)
+				if err != nil {
+					klog.Warningf("cannot find an host IP: %v", err)
+					os.Exit(1)
+					return nil
+				}
+				if c.NodeIPv6 != currentIP {
+					klog.Warningf("IP address has changed from %q to %q, restarting MicroShift", c.NodeIPv6, currentIP)
+					os.Exit(1)
+					return nil
+				}
 			}
 
 			// Check the clock change by initiating an asynchronous read operation on the timer object

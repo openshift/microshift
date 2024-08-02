@@ -17,6 +17,10 @@ type Node struct {
 	// IP address of the node, passed to the kubelet.
 	// If not specified, kubelet will use the node's default IP address.
 	NodeIP string `json:"nodeIP"`
+
+	// IPv6 address of the node, passed to the kubelet. This parameter
+	// is only allowed when dual stack deployment is configured.
+	NodeIPV6 string `json:"nodeIPv6"`
 }
 
 // Determine if the config file specified a NodeName (by default it's assigned the hostname)

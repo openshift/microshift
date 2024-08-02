@@ -71,12 +71,16 @@ func (s *KubeletServer) configure(cfg *config.Config) {
 		klog.Fatalf("Failed to read OS ID %v", err)
 	}
 
+	nodeIP := cfg.Node.NodeIP
+	if len(cfg.Node.NodeIPV6) != 0 {
+		nodeIP = fmt.Sprintf("%s,%s", nodeIP, cfg.Node.NodeIPV6)
+	}
 	kubeletFlags := kubeletoptions.NewKubeletFlags()
 	kubeletFlags.BootstrapKubeconfig = cfg.KubeConfigPath(config.Kubelet)
 	kubeletFlags.KubeConfig = cfg.KubeConfigPath(config.Kubelet)
 	kubeletFlags.RuntimeCgroups = "/system.slice/crio.service"
 	kubeletFlags.HostnameOverride = cfg.Node.HostnameOverride
-	kubeletFlags.NodeIP = cfg.Node.NodeIP
+	kubeletFlags.NodeIP = nodeIP
 	kubeletFlags.NodeLabels["node-role.kubernetes.io/control-plane"] = ""
 	kubeletFlags.NodeLabels["node-role.kubernetes.io/master"] = ""
 	kubeletFlags.NodeLabels["node-role.kubernetes.io/worker"] = ""
