@@ -44,20 +44,26 @@ RUN dnf install -y firewalld microshift && \
     systemctl enable microshift && \
     dnf clean all
 
-# Create a default 'redhat' user, allowing it to run sudo commands
-ARG USER_PASSWD=\$5\$XDVQ6DxT8S5YWLV7\$8f2om5JfjK56v9ofUkUAwZXTxJl3Sqnc9yPnza4xoJ0
-RUN useradd -m -d /var/home/redhat -G wheel -p ${USER_PASSWD} redhat
+# Create a default 'redhat' user with the specified password.
+# Add it to the 'wheel' group to allow for running sudo commands.
+ARG USER_PASSWD
+RUN if [ -z "${USER_PASSWD}" ] ; then \
+        echo USER_PASSWD is a mandatory build argument && exit 1 ; \
+    fi
+RUN useradd -m -d /var/home/redhat -G wheel redhat && \
+    echo "redhat:${USER_PASSWD}" | chpasswd
 
 # Configure OpenShift pull secret
 ARG PULL_SECRET
 RUN echo $PULL_SECRET > /etc/crio/openshift-pull-secret && \
     chmod 600 /etc/crio/openshift-pull-secret
 
-# Configure firewall
+# Mandatory firewall configuration
 RUN firewall-offline-cmd --zone=public --add-port=22/tcp && \
     firewall-offline-cmd --zone=trusted --add-source=10.42.0.0/16 && \
-    firewall-offline-cmd --zone=trusted --add-source=169.254.169.1 && \
-    firewall-offline-cmd --zone=public --add-port=80/tcp && \
+    firewall-offline-cmd --zone=trusted --add-source=169.254.169.1
+# Application-specific firewall configuration
+RUN firewall-offline-cmd --zone=public --add-port=80/tcp && \
     firewall-offline-cmd --zone=public --add-port=443/tcp && \
     firewall-offline-cmd --zone=public --add-port=30000-32767/tcp && \
     firewall-offline-cmd --zone=public --add-port=30000-32767/udp
@@ -78,13 +84,16 @@ Run the following image build command to create a local `bootc` image.
 Note that a pull secret file is used for:
 * The podman `--authfile` argument to pull the base `rhel-bootc:9.4` image from the `registry.redhat.io` registry
 * The build `PULL_SECRET` argument to be saved as `/etc/crio/openshift-pull-secret` file on the image for pulling MicroShift container images
+* The build `USER_PASSWD` argument to set as a password for the `redhat` user
 
 ```
 PULL_SECRET=~/.pull-secret.json
+USER_PASSWD=<your_redhat_user_password>
 IMAGE_NAME=microshift-4.16-bootc
 
 sudo podman build --authfile "${PULL_SECRET}" -t "${IMAGE_NAME}" \
     --build-arg PULL_SECRET="$(cat "${PULL_SECRET}")" \
+    --build-arg USER_PASSWD="${USER_PASSWD}" \
     -f Containerfile
 ```
 
@@ -218,7 +227,7 @@ sudo podman run --rm -it --privileged \
 
 After the MicroShift `bootc` image has been successfully started, a login prompt
 will be  presented in the terminal. Log into the running container using the
-`redhat:redhat` credentials.
+`redhat:<password>` credentials.
 
 Run the following command to verify that all the MicroShift pods are up and running
 without errors.
@@ -303,7 +312,7 @@ sudo virt-install \
 "
 ```
 
-Log into the virtual machine using the `redhat:redhat` credentials.
+Log into the virtual machine using the `redhat:<password>` credentials.
 Run the following command to verify that all the MicroShift pods are up and running
 without errors.
 
