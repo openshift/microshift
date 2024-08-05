@@ -1,45 +1,34 @@
-- api embedded-component 0d46442e8df17a87cfcf6666ab19b28e88620b59 to 1cd5e299324762879b66c5f5c1c279a98367ee60
-  - d2fb33c 2024-07-31T11:26:50-04:00 Nutanix mapi: gpus and dataDisks support
-  - 7e2935d 2024-07-26T13:59:32-04:00 make update
-  - c4c1bb8 2024-07-26T13:50:59-04:00 enable ManagedBootImages and NodeDisruptionPolicy
-  - 8106d39 2024-07-25T23:08:52+02:00 features: move MultiArchInstall[AWS|GCP] to TechPreview
+- oc image-arm64 fb5b9869b919d7c05db692a68daef6eb3b9d71b1 to b0b64ea11f1b35c2abaaf2026d70921ce1c84930
+  - 0f0592f7 2024-08-01T11:40:07-04:00 WRKLDS-1316: Retry and do not fail when logs cannot be updated
 
-- cluster-ingress-operator embedded-component f2c9f0760e14a3fa8408db5e7a1e6847e11a51e3 to a9b7292ed9c9bb22642c28e806461379b9da682c
-  - b8b9a43 2024-07-31T20:27:55-04:00 NE-1531: Fix Initialization of NLB Status Parameters
-  - 3b54ec9 2024-07-31T20:27:51-04:00 NE-1531: Fix LB Subnet E2E Tests to Check for Progressing=False
-  - 97a9822 2024-07-31T18:43:31-04:00 NE-1531: Fix TestAWSLBSubnets Verify Subnet Status Logic
-  - 26dfe2c 2024-07-31T01:06:57-04:00 NE-1531: Add LB Subnet Selection for AWS
-  - e9c4200 2024-07-29T16:13:56+05:30 NE-1273: Add a watch to the ingress operator so it will recreate the gwapi crds and E2E tests
-  - ea6af9f 2024-07-26T21:53:51+05:30 E2E Fixes from NE-1208: Gateway API E2E Testing
-  - fdb6215 2024-07-24T16:38:22-04:00 Bump openshift/api, update CRD generation
-  - c9a3b88 2024-07-24T10:48:12-04:00 Update e2e function updateIngressControllerSpecWithRetryOnConflict
-
-- cluster-network-operator embedded-component b454d8d06272bc4788c0b51bbf6970f6021b1dbb to b6ff6df7cd04bd3cb97b04cb5b8c76164fd2c2dc
-  - b3c3a30 2024-07-30T09:23:21-04:00 Handle random crictl errors in iptables-alerter
-
-- kubernetes embedded-component 6892b57d65d25fb0588693bce3d338d8b8b1d2b4 to 1cc018a6608886d6702617a429c3e086f4195151
-  - d6c640bdf 2024-07-31T13:12:34-05:00 UPSTREAM: 126213: add test about container metrics from cadvisor
-
-- machine-config-operator embedded-component 9f305987c2f4546fbe5bcfe2658f3837c53e62eb to 76a8bb34c6a4e38ea2a57cd45a39240776c0d85a
-  - 93852dfd 2024-07-30T10:30:00-04:00 API bump for ManagedBootImages & NodeDisruption GA
-  - 28a4b230 2024-07-29T11:14:43-04:00 controller: guard OCL informer with feature gates
-
-- operator-framework-olm embedded-component 540bb290a11b9f0f13b709bcb8c19affdcf66531 to 5d3de4a6132880f8b8815a31d3e259dc0096810b
-  - c62a1661 2024-07-31T00:04:56+00:00 build(deps): bump github.com/onsi/gomega from 1.33.1 to 1.34.1 (#3354)
-  - 09c33251 2024-07-31T00:03:36+00:00 build(deps): bump k8s.io/apiextensions-apiserver from 0.30.2 to 0.30.3 (#3350)
-  - 411aa668 2024-07-31T00:03:18+00:00 build(deps): bump github.com/docker/docker (#3353)
-  - cbb5bbb2 2024-07-31T00:03:00+00:00 build(deps): bump github.com/onsi/ginkgo/v2 from 2.19.0 to 2.19.1 (#3352)
-
-- oc image-amd64 bd7e59668c050e59b14e81cf5be00fad17f2f669 to fb5b9869b919d7c05db692a68daef6eb3b9d71b1
-  - 191d0403 2024-07-30T17:57:47-04:00 WRKLDS-1316: Remove clusterversions from certificates api group
-  - cc31e750 2024-07-26T09:38:36-04:00 upgrade-status: fix a typo in README
-
-- kubernetes image-amd64 6892b57d65d25fb0588693bce3d338d8b8b1d2b4 to 1cc018a6608886d6702617a429c3e086f4195151
-  - d6c640bdf 2024-07-31T13:12:34-05:00 UPSTREAM: 126213: add test about container metrics from cadvisor
-
-- oc image-arm64 110cba7f25fd1c53017f5c207614b8d88fb97dd1 to fb5b9869b919d7c05db692a68daef6eb3b9d71b1
-  - cc31e750 2024-07-26T09:38:36-04:00 upgrade-status: fix a typo in README
-
-- kubernetes image-arm64 6892b57d65d25fb0588693bce3d338d8b8b1d2b4 to 1cc018a6608886d6702617a429c3e086f4195151
-  - d6c640bdf 2024-07-31T13:12:34-05:00 UPSTREAM: 126213: add test about container metrics from cadvisor
+- ovn-kubernetes image-arm64 7108849ad061051eb43117d398d0ba63f7788adf to 8f1dcb6a878fcd22b4cf2727abeba7f7c69ba64b
+  - 5e152710 2024-08-01T17:17:22+02:00 Reapply "Merge pull request #2233 from tssurya/ds-merge-24th-july"
+  - 9ddf807f 2024-08-01T05:27:23+02:00 UT flake: fix panic in node IP handler tests
+  - 6f357c07 2024-07-31T19:16:05+02:00 Add new packages to mockery yaml
+  - 19768309 2024-07-31T19:16:05+02:00 e2e: fix isolation test to send traffic via eth0
+  - 2e19c3a9 2024-07-31T19:16:05+02:00 Remove mac value from annotation when network is deleted
+  - 8b77754a 2024-07-31T19:16:05+02:00 Deprecate OvnNodeManagementPortMacAddress
+  - f2ff050e 2024-07-31T19:16:05+02:00 Remove ParseNodeManagementPortMACAddress
+  - 2696e52a 2024-07-31T19:16:03+02:00 Add ParseNodeManagementPortMACAddresses util
+  - 91055bc2 2024-07-31T15:39:00+02:00 Add OvnNodeManagementPortMacAddresses
+  - dc58eabf 2024-07-30T15:49:06+02:00 updating k8sreporter to a version that no longer uses glog
+  - 6159ca35 2024-07-30T15:49:06+02:00 required changes to e2e for the kube rebase to 1.30.2
+  - f452bb3a 2024-07-30T15:49:06+02:00 bump k8s version and supporting pkgs for e2e's
+  - da74bd86 2024-07-30T15:49:06+02:00 changes required in ovnkube.go for k8s bump
+  - 451ef747 2024-07-30T15:49:06+02:00 update sigs.k8s.io/controller-runtime
+  - 8fff5d7e 2024-07-30T15:49:06+02:00 Bump K8sVersion for KIND and CI to 1.30.2
+  - 9be60edf 2024-07-30T15:49:06+02:00 Update golang and k8s versions
+  - d3782131 2024-07-29T21:06:37-04:00 Fixes hybrid overlay from deprecated annotation
+  - 33e65e7e 2024-07-29T13:58:35-04:00 cm: Add event unit tests
+  - aa28a18c 2024-07-29T13:58:35-04:00 udn, l2: Send event on unexpected primary network
+  - c5f637a9 2024-07-29T13:58:35-04:00 cm: Write event on unknown active network
+  - 42bd9487 2024-07-29T13:58:35-04:00 udn,l3: Send event on unexpected primary network
+  - 75d2b9b0 2024-07-29T13:58:35-04:00 udn: Log as errors at CNI
+  - dc9642b2 2024-07-29T13:58:35-04:00 util: Propertly implement IsUnknownActiveNetworkError
+  - c53542d4 2024-07-24T11:58:01-04:00 Ensure config is reset before node ip handler tests
+  - 0038e5b9 2024-07-24T09:41:47-04:00 Make annotation in pod sync only happen for local pods
+  - f38eff61 2024-07-24T12:20:01+02:00 udn, config: a layer2 primary UDN requires subnets
+  - 46d35e6c 2024-07-16T21:05:42+05:30 Add subnet overlap check for transit switch subnet
+  - b07fbdee 2024-07-09T13:29:38+02:00 Use Transaction timeout for MonitorAll call. It allows to change this value via config.
+  - 8e3c8c2c 2024-07-09T13:28:52+02:00 Make OVSDBTimeout for transactions a part of config.Global instead of const. A reasonable value for this timeout depends on the size of the cluster and making it configurable may help solve crashloop problems. It also speeds up testing as timeout may be set to lower value for unit tests. Set default value to 100 second, to allow larger transactions, e.g. 50 address set batch updated on address set sync with dbIDs.
 
