@@ -69,7 +69,7 @@ action="${1}"
 shift
 
 case "${action}" in
-    create|cleanup|start-workers)
+    create|cleanup|create-workers)
         "action_${action}" "$@"
         ;;
     -h)
