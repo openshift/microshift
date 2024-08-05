@@ -13,7 +13,7 @@ RUN ln -sr /run/secrets/etc-pki-entitlement /etc/pki/entitlement-host && \
     mkdir -p /var/opt
 
 # Copy the repository configuration script
-COPY --chmod=755 ./bootc-sources/microshift_repo_config.sh ${REPO_CONFIG_SCRIPT}
+COPY --chmod=755 ./bootc-images/microshift_repo_config.sh ${REPO_CONFIG_SCRIPT}
 
 # Copy the MicroShift repository contents
 COPY ./rpm-repos/$USHIFT_RPM_REPO_NAME $USHIFT_RPM_REPO_PATH
