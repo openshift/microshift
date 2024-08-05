@@ -116,6 +116,7 @@ cd "${ROOTDIR}"
 # Get firewalld and repos in place. Use scripts to get the right repos
 # for each branch.
 $(dry_run) bash -x ./scripts/devenv-builder/configure-vm.sh --no-build --force-firewall "${PULL_SECRET}"
+$(dry_run) bash -x ./bin/manage_composer_config.sh create
 
 cd "${ROOTDIR}/test/"
 
@@ -135,7 +136,7 @@ if ${COMPOSER_CLI_BUILDS} ; then
     MAX_WORKERS=$(find "${ROOTDIR}/test/image-blueprints" -name \*.toml | wc -l)
     CUR_WORKERS="$( [ "${CPU_CORES}" -lt  $(( MAX_WORKERS * 2 )) ] && echo $(( CPU_CORES / 2 )) || echo "${MAX_WORKERS}" )"
 
-    $(dry_run) bash -x ./bin/manage_composer_config.sh create "${CUR_WORKERS}"
+    $(dry_run) bash -x ./bin/manage_composer_config.sh create-workers "${CUR_WORKERS}"
 fi
 
 # Check if cache can be used for builds

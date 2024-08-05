@@ -10,7 +10,7 @@ source "${SCRIPTDIR}/common.sh"
 
 usage() {
     cat - <<EOF
-${BASH_SOURCE[0]} (create [num_workers]|cleanup)
+${BASH_SOURCE[0]} (create [num_workers]|cleanup|create-workers <num_workers>)
 
   -h           Show this help.
 
@@ -22,6 +22,10 @@ cleanup: Cancel any running builds, delete failed
          and completed builds, and remove package 
          sources other than the defaults.
 
+create-workers: Create multiple osbuild workers for 
+                building in parallel.
+    <num_workers>: Number of workers.
+
 EOF
 }
 
@@ -30,13 +34,13 @@ action_create() {
 
     # Optionally create workers for building in parallel
     if [ $# -ne 0 ]; then
-        create_workers "${1}"
+        action_create-workers "${1}"
     fi
     
-    "${TEST_DIR}/bin/start_webserver.sh"
+    "${TESTDIR}/bin/start_webserver.sh"
 }
 
-create_workers() {
+action_create-workers() {
     if [ $# -eq 0 ]; then
         usage
         exit 1
@@ -54,7 +58,7 @@ action_cleanup() {
     # Clean up the composer cache
     "${ROOTDIR}/scripts/image-builder/cleanup.sh" -full
 
-    "${TEST_DIR}/bin/start_webserver.sh stop"
+    "${TESTDIR}/bin/start_webserver.sh stop"
 }
 
 if [ $# -eq 0 ]; then
@@ -65,7 +69,7 @@ action="${1}"
 shift
 
 case "${action}" in
-    create|cleanup)
+    create|cleanup|start-workers)
         "action_${action}" "$@"
         ;;
     -h)
