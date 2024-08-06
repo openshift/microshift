@@ -6,8 +6,9 @@ Resource            ../../resources/common.resource
 Resource            ../../resources/systemd.resource
 Resource            ../../resources/microshift-process.resource
 Resource            ../../resources/microshift-network.resource
+Resource            ../../resources/ostree-health.resource
 
-Suite Setup         Setup Suite With Namespace
+Suite Setup         Setup Suite With Greenboot Wait And Namespace
 Suite Teardown      Teardown Suite
 
 
@@ -38,6 +39,11 @@ Workload Partitioning Should Work
 
 
 *** Keywords ***
+Setup Suite With Greenboot Wait And Namespace
+    [Documentation]    wait for greenboot service and run setup suite with Namespace
+    Setup Suite
+    Restart Greenboot And Wait For Success
+
 Setup For Workload Partitioning
     [Documentation]    Setup for Workload Partitioning
     Save Default MicroShift Config
