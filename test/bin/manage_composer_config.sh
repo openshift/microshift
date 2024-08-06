@@ -38,7 +38,7 @@ action_create() {
 
     "${ROOTDIR}/scripts/image-builder/configure.sh"
     
-    "${TESTDIR}/bin/manage_webserver.sh start"
+    "${TESTDIR}/bin/manage_webserver.sh" "start"
 }
 
 action_create-workers() {
@@ -66,7 +66,7 @@ action_cleanup() {
     # Clean up the composer cache
     "${ROOTDIR}/scripts/image-builder/cleanup.sh" -full
 
-    "${TESTDIR}/bin/manage_webserver.sh stop"
+    "${TESTDIR}/bin/manage_webserver.sh" "stop"
 }
 
 if [ $# -eq 0 ]; then
