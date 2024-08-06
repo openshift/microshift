@@ -107,7 +107,7 @@ action_create() {
     firewall_settings "add"
 
     # Start nginx web server
-    "${TESTDIR}/bin/start_webserver.sh"
+    "${TESTDIR}/bin/manage_webserver.sh"
 }
 
 action_cleanup() {
@@ -136,7 +136,7 @@ action_cleanup() {
     done
 
     # Stop nginx web server
-    "${TESTDIR}/bin/start_webserver.sh stop"
+    "${TESTDIR}/bin/manage_webserver.sh stop"
 }
 
 action_cleanup-all() {
