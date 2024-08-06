@@ -132,8 +132,8 @@ def set_rpm_version_info_vars():
     release_info_rpm = find_latest_rpm(LOCAL_REPO)
     release_info_rpm_base = find_latest_rpm(BASE_REPO)
 
-    SOURCE_VERSION = common.run_command_in_shell(f"rpm -q --queryformat '%{{version}}' {release_info_rpm}")
-    SOURCE_VERSION_BASE = common.run_command_in_shell(f"rpm -q --queryformat '%{{version}}' {release_info_rpm_base}")
+    SOURCE_VERSION = common.run_command_in_shell(f"rpm -q --queryformat '%{{version}}-%{{release}}' {release_info_rpm}")
+    SOURCE_VERSION_BASE = common.run_command_in_shell(f"rpm -q --queryformat '%{{version}}-%{{release}}' {release_info_rpm_base}")
 
     # Update the source version environment variables based on the global variables.
     # These are used for templating container files and images.

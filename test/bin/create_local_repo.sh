@@ -39,3 +39,5 @@ cd "${IMAGEDIR}"
 make_repo "${LOCAL_REPO}" "${RPM_SOURCE}"
 make_repo "${NEXT_REPO}" "${NEXT_RPM_SOURCE}"
 make_repo "${BASE_REPO}" "${BASE_RPM_SOURCE}"
+# Force recreation of dnf cache after rebuilding the repositories
+sudo dnf clean all

@@ -745,7 +745,7 @@ local_rpm_version() {
         error "Failed to find microshift-release-info RPM in ${LOCAL_REPO}"
         exit 1
     fi
-    rpm -q --queryformat '%{version}' "${release_info_rpm}" 2>/dev/null
+    rpm -q --queryformat '%{version}-%{release}' "${release_info_rpm}" 2>/dev/null
 }
 
 # Public function to enable or disable a Stress Condition
