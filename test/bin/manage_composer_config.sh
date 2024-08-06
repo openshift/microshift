@@ -35,20 +35,21 @@ action_create() {
         usage
         exit 1
     fi
-
+    
     "${ROOTDIR}/scripts/image-builder/configure.sh"
     
     "${TESTDIR}/bin/manage_webserver.sh" "start"
 }
 
 action_create-workers() {
+    local workers
     # If no number is given, determine the optimal number of workers
     if [ $# -eq 0 ]; then
-        CPU_CORES="$(grep -c ^processor /proc/cpuinfo)"
-        MAX_WORKERS=$(find "${ROOTDIR}/test/image-blueprints" -name \*.toml | wc -l)
-        CUR_WORKERS="$( [ "${CPU_CORES}" -lt  $(( MAX_WORKERS * 2 )) ] && echo $(( CPU_CORES / 2 )) || echo "${MAX_WORKERS}" )"
+        local -r cpu_cores="$(grep -c ^processor /proc/cpuinfo)"
+        local -r max_workers=$(find "${ROOTDIR}/test/image-blueprints" -name \*.toml | wc -l)
+        local -r cur_workers="$( [ "${cpu_cores}" -lt  $(( max_workers * 2 )) ] && echo $(( cpu_cores / 2 )) || echo "${max_workers}" )"
 
-        workers="${CUR_WORKERS}"
+        workers="${cur_workers}"
     # If specified explicitly, create the given number of workers
     else
         workers="${1}"
