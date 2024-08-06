@@ -20,12 +20,10 @@ create: Set up firewall, storage pool and network.
         Uses the VM_POOL_BASENAME, VM_DISK_BASEDIR and
         VM_ISOLATED_NETWORK variables.
 
-cleanup: Undo the settings made by 'create' command, 
-         stop the nginx file-server.
+cleanup: Undo the settings made by 'create' command.
 
-cleanup-all: Clean up all scenario infrastructure, 
-             revert the hypervisor configuration and 
-             kill the web server process.
+cleanup-all: Clean up all scenario infrastructure
+             and undo the settings made by 'create' command
 EOF
 }
 

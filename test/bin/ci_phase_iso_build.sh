@@ -131,12 +131,8 @@ $(dry_run) bash -x ./bin/build_rpms.sh
 $(dry_run) bash -x ./bin/create_local_repo.sh
 
 if ${COMPOSER_CLI_BUILDS} ; then
-    # Figure out an optimal number of osbuild workers
-    CPU_CORES="$(grep -c ^processor /proc/cpuinfo)"
-    MAX_WORKERS=$(find "${ROOTDIR}/test/image-blueprints" -name \*.toml | wc -l)
-    CUR_WORKERS="$( [ "${CPU_CORES}" -lt  $(( MAX_WORKERS * 2 )) ] && echo $(( CPU_CORES / 2 )) || echo "${MAX_WORKERS}" )"
-
-    $(dry_run) bash -x ./bin/manage_composer_config.sh create-workers "${CUR_WORKERS}"
+    # Determine and create the ideal number of workers
+    $(dry_run) bash -x ./bin/manage_composer_config.sh create-workers
 fi
 
 # Check if cache can be used for builds

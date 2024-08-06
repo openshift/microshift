@@ -10,13 +10,11 @@ source "${SCRIPTDIR}/common.sh"
 
 usage() {
     cat - <<EOF
-${BASH_SOURCE[0]} (create [num_workers]|cleanup|create-workers <num_workers>)
+${BASH_SOURCE[0]} (create|cleanup|create-workers [num_workers])
 
   -h           Show this help.
 
 create: Set up system for building images, start webserver.
-    [num_workers]: Number of workers to create for
-                   building in parallel.
 
 cleanup: Cancel any running builds, delete failed
          and completed builds, and remove package 
@@ -24,29 +22,39 @@ cleanup: Cancel any running builds, delete failed
 
 create-workers: Create multiple osbuild workers for 
                 building in parallel.
-    <num_workers>: Number of workers.
+    [num_workers]: Number of workers. If unspecified,
+                   The optimal number of workers will
+                   be determined based on the number
+                   of CPU cores.
 
 EOF
 }
 
 action_create() {
-    "${ROOTDIR}/scripts/image-builder/configure.sh"
-
-    # Optionally create workers for building in parallel
     if [ $# -ne 0 ]; then
-        action_create-workers "${1}"
+        usage
+        exit 1
     fi
+
+    "${ROOTDIR}/scripts/image-builder/configure.sh"
     
     "${TESTDIR}/bin/manage_webserver.sh start"
 }
 
 action_create-workers() {
+    # If no number is given, determine the optimal number of workers
     if [ $# -eq 0 ]; then
-        usage
-        exit 1
+        CPU_CORES="$(grep -c ^processor /proc/cpuinfo)"
+        MAX_WORKERS=$(find "${ROOTDIR}/test/image-blueprints" -name \*.toml | wc -l)
+        CUR_WORKERS="$( [ "${CPU_CORES}" -lt  $(( MAX_WORKERS * 2 )) ] && echo $(( CPU_CORES / 2 )) || echo "${MAX_WORKERS}" )"
+
+        workers="${CUR_WORKERS}"
+    # If specified explicitly, create the given number of workers
+    else
+        workers="${1}"
     fi
-    workers="${1}"
-    echo "Creating ${1} workers"
+
+    echo "Creating ${workers} workers"
 
     # Loop from 2 because we should already have at least 1 worker.
     for i in $(seq 2 "${workers}"); do

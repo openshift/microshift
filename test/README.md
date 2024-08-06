@@ -297,14 +297,14 @@ images. Create the configuration and start the webserver using `create`.
 $ ./test/bin/manage_composer_config.sh create
 ```
 
-Optionally, use `create [num_workers]` to create multiple workers for building 
+Optionally, use `create-workers [num_workers]` to create multiple workers for building 
 images in parallel. The image build process is mostly CPU and I/O
 intensive. For a development environment, setting the number of workers to
-half of the CPU number may be a good starting point.
+half of the CPU number may be a good starting point. If no `num_workers` is set, the script
+determines the ideal number of workers based on the number of CPU cores available.
 
 ```
-$ NCPUS=$(lscpu | grep '^CPU(s):' | awk '{print $2}')
-$ ./test/bin/manage_composer_config.sh create $((NCPUS / 2))
+$ ./test/bin/manage_composer_config.sh create-workers
 ```
 
 > This setting is optional and not necessarily recommended for configurations
@@ -320,14 +320,6 @@ images that use RPMs created from source (not already published releases).
 ```
 ./test/bin/build_images.sh -s
 ```
-
-#### Rebuilding from Sources Easily
-
-If you build new RPMs, you need to re-run several steps (build the
-RPMs, build the local repos, build the images, download the images).
-Use `./bin/rebuild_source_images.sh` to automate all of those
-steps with one script while only rebuilding the images that use RPMs
-created from source (not already published releases).
 
 ### Configuring Test Scenarios
 
