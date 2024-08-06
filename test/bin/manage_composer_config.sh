@@ -37,7 +37,7 @@ action_create() {
         action_create-workers "${1}"
     fi
     
-    "${TESTDIR}/bin/manage_webserver.sh"
+    "${TESTDIR}/bin/manage_webserver.sh start"
 }
 
 action_create-workers() {

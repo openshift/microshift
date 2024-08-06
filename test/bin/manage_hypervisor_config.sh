@@ -107,7 +107,7 @@ action_create() {
     firewall_settings "add"
 
     # Start nginx web server
-    "${TESTDIR}/bin/manage_webserver.sh"
+    "${TESTDIR}/bin/manage_webserver.sh start"
 }
 
 action_cleanup() {

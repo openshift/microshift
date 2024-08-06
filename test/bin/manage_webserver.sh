@@ -11,42 +11,18 @@ source "${SCRIPTDIR}/common.sh"
 
 usage() {
     cat - <<EOF
-${BASH_SOURCE[0]} [stop]
-Run this script to start an nginx web server.
+${BASH_SOURCE[0]} (start|stop)
 
   -h           Show this help.
 
-[stop]: Stop the nginx web server.
+start: Start the nginx web server. 
+
+stop: Stop the nginx web server.
 
 EOF
 }
 
-if [ $# -ne 0 ]; then
-    case "${1}" in
-        stop)
-            echo "Stopping web server"
-            sudo pkill nginx || true
-            exit 0
-            ;;
-        -h)
-            usage
-            exit 0
-            ;;
-        *)
-            usage
-            exit 1
-            ;;
-    esac
-fi
-
-echo "Starting web server in ${IMAGEDIR}"
-mkdir -p "${IMAGEDIR}"
-cd "${IMAGEDIR}"
-
-NGINX_CONFIG="${IMAGEDIR}/nginx.conf"
-# See the https://nginx.org/en/docs/http/ngx_http_core_module.html page for
-# a full list of HTTP configuration directives
-cat > "${NGINX_CONFIG}" <<EOF
+nginx_conf="
 worker_processes 32;
 events {
 }
@@ -74,17 +50,55 @@ http {
 }
 pid ${IMAGEDIR}/nginx.pid;
 daemon on;
-EOF
+"
 
-# Allow the current user to write to nginx temporary directories
-sudo chgrp -R "$(id -gn)" /var/lib/nginx
+action_stop() {
+    echo "Stopping web server"
+    sudo pkill nginx || true
+    exit 0
+}
 
-# Kill running nginx processes and wait until down
-sudo pkill nginx || true
-while pidof nginx &>/dev/null ; do
-    sleep 1
-done
+action_start() {
+    echo "Starting web server in ${IMAGEDIR}"
+    mkdir -p "${IMAGEDIR}"
+    cd "${IMAGEDIR}"
 
-nginx \
-    -c "${NGINX_CONFIG}" \
-    -e "${IMAGEDIR}/nginx.log"
+    NGINX_CONFIG="${IMAGEDIR}/nginx.conf"
+    # See the https://nginx.org/en/docs/http/ngx_http_core_module.html page for
+    # a full list of HTTP configuration directives
+    echo "${nginx_conf}" > "${NGINX_CONFIG}"
+
+    # Allow the current user to write to nginx temporary directories
+    sudo chgrp -R "$(id -gn)" /var/lib/nginx
+
+    # Kill running nginx processes and wait until down
+    sudo pkill nginx || true
+    while pidof nginx &>/dev/null ; do
+        sleep 1
+    done
+
+    nginx \
+        -c "${NGINX_CONFIG}" \
+        -e "${IMAGEDIR}/nginx.log"
+}
+
+if [ $# -eq 0 ]; then
+    usage
+    exit 1
+fi
+action="${1}"
+shift
+
+case "${action}" in
+    start|stop)
+        "action_${action}" "$@"
+        ;;
+    -h)
+        usage
+        exit 0
+        ;;
+    *)
+        usage
+        exit 1
+        ;;
+esac
