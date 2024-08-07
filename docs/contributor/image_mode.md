@@ -22,7 +22,7 @@ The procedures described below require the following setup:
 images and running containers
 * A `physical hypervisor host` with the [libvirt](https://libvirt.org/) virtualization
 platform for starting virtual machines that run RHEL OS containing MicroShift binaries
-* A `remote registry` (i.e. `quay.io`) for storing and accessing `bootc` images
+* A `remote registry` (e.g. `quay.io`) for storing and accessing `bootc` images
 
 ## Build MicroShift Bootc Image
 
@@ -154,10 +154,10 @@ $ sudo podman inspect "${IMAGE_NAME}" | grep kernel-core
         "created_by": "kernel-core-5.14.0-427.26.1.el9_4.x86_64"
 ```
 
-When a `bootc` image is started, it uses the host kernel, which is not necessarily
-the same one used for building the image. This means that the `openvswitch` module
-cannot be loaded in the container due to the kernel version mismatch with the
-modules present in the `/lib/modules` directory.
+When a `bootc` image is started as a container, it uses the host kernel, which is
+not necessarily the same one used for building the image. This means that the
+`openvswitch` module cannot be loaded in the container due to the kernel version
+mismatch with the modules present in the `/lib/modules` directory.
 
 One way to work around this problem is to pre-load the `openvswitch` module before
 starting the container as described in the [Run Container](#run-container) section.
@@ -177,7 +177,7 @@ $ sudo vgs
 ```
 
 Otherwise, a new volume group should be set up for MicroShift CSI driver to allocate
-storage in `bootc` MicroShift images.
+storage in `bootc` MicroShift containers.
 
 Run the following commands to create a file to be used for LVM partitioning and
 configure it as a loop device.
