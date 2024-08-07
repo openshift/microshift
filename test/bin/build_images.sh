@@ -680,8 +680,8 @@ if [ -z "${release_info_rpm_base}" ]; then
     exit 1
 fi
 
-SOURCE_VERSION=$(rpm -q --queryformat '%{version}' "${release_info_rpm}")
-SOURCE_VERSION_BASE=$(rpm -q --queryformat '%{version}' "${release_info_rpm_base}")
+SOURCE_VERSION=$(rpm -q --queryformat '%{version}-%{release}' "${release_info_rpm}")
+SOURCE_VERSION_BASE=$(rpm -q --queryformat '%{version}-%{release}' "${release_info_rpm_base}")
 export SOURCE_VERSION
 export SOURCE_VERSION_BASE
 
