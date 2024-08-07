@@ -1,0 +1,10 @@
+- cluster-network-operator embedded-component af36d54203155e32162bf3c5eb0b0ac3f75d32d7 to 65cf6d26dec7261dcaff50907c409dd543a3a8d2
+  - bc95a23 2024-07-31T12:52:21+03:00 Backport ipsec status metric
+  - c2f8b0f 2024-05-22T22:57:42+09:00 Add conditions for ignored-namespaces
+
+- machine-config-operator embedded-component e3f6b6a0df1046063d4ae17e9696050691581731 to 96b78f27beb3a971907e96fdb1870639b78949f5
+  - 1a087afd 2024-07-31T00:37:34+00:00 add node ready check in getAllCandidateMachines
+  - d48fc230 2024-07-23T17:31:47-05:00 OCPBUGS-33357: Check both ready and health ingress endpoints
+  - 79c9b577 2024-07-23T17:31:37-05:00 OPNET-303: Remove weights from ingress check script
+  - f0997690 2024-03-11T23:02:08+00:00 OCPBUGS-22664: Mount /run/nodeip-configuration into coredns containers
+
