@@ -1,0 +1,6 @@
+- ovn-kubernetes image-amd64 d9ff562b47ce6f31919a490dc42ac9944d0633eb to 4b32e36356fcd35317f71b69bc20a27ddcd77fc1
+  - 94505ae 2024-08-05T10:34:55+00:00 Fix registering northd metrics on appropriate nodes
+
+- ovn-kubernetes image-arm64 d9ff562b47ce6f31919a490dc42ac9944d0633eb to 4b32e36356fcd35317f71b69bc20a27ddcd77fc1
+  - 94505ae 2024-08-05T10:34:55+00:00 Fix registering northd metrics on appropriate nodes
+
