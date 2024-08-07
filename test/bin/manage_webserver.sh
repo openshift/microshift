@@ -22,36 +22,6 @@ stop: Stop the nginx web server.
 EOF
 }
 
-nginx_conf="
-worker_processes 32;
-events {
-}
-http {
-    access_log /dev/null;
-    error_log  ${IMAGEDIR}/nginx_error.log;
-    server {
-        listen ${WEB_SERVER_PORT};
-        listen [::]:${WEB_SERVER_PORT};
-        root   ${IMAGEDIR};
-        autoindex on;
-    }
-
-    # Timeout during which a keep-alive client connection will stay open on the server
-    # Default: 75s
-    keepalive_timeout 300s;
-
-    # Timeout for transmitting a response to the client
-    # Default: 60s
-    send_timeout 300s;
-
-    # Buffers used for reading response from a disk
-    # Default: 2 32k
-    output_buffers 2 1m;
-}
-pid ${IMAGEDIR}/nginx.pid;
-daemon on;
-"
-
 action_stop() {
     echo "Stopping web server"
     sudo pkill nginx || true
