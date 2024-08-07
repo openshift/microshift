@@ -1,3 +1,110 @@
-- oc image-arm64 b0b64ea11f1b35c2abaaf2026d70921ce1c84930 to 6ec8f08c0d14509c25075e031d40cf7e4d7d6426
+- api embedded-component 1cd5e299324762879b66c5f5c1c279a98367ee60 to e65e6f54eb3c97dfbfb1629cc59646ee43cd6f62
+  - a912e2a 2024-08-02T07:15:54-04:00 CORS-3594: Setting CAPG as the default infra provider
+  - 2087e06 2024-08-02T11:28:32+02:00 Update security/v1/consts.go
+  - abce052 2024-08-02T10:06:20+02:00 Add OVNObservability feature gate as Tech Preview.
+  - 87ebde3 2024-08-01T15:29:39-04:00 featuregate promotion: use latest release instead of hard coding
+  - 7fdaeea 2024-08-01T15:17:35-04:00 Removing featuregate for chunkSizeMiB config
+  - 4a8f27d 2024-08-01T13:39:53-04:00 NE-1774: Promote `IngressControllerLBSubnetsAWS` to GA
+  - ee5bb7e 2024-08-01T13:39:50-04:00 Add FeatureGateAwareXValidation marker to eipAllocations CEL
+  - ca33fef 2024-08-01T11:24:05-05:00 mcp column to mcn
+  - 69525ea 2024-07-31T17:30:48+02:00 security/v1: add constant for enforcing psa annotation
+  - 213d2fa 2024-07-30T09:58:32+02:00 make update
+  - 4c8badc 2024-07-30T09:52:40+02:00 config/types_feature: check if the .spec.featureSet is in 'CustomNoUpgrade', 'TechPreviewNoUpgrade', 'DevPreviewNoUpgrade', or an empty string.
+  - d90bbea 2024-07-26T09:12:53-07:00 Run update-payload-crds after update-codegen-crds
+
+- cluster-ingress-operator embedded-component a9b7292ed9c9bb22642c28e806461379b9da682c to a01ed6c05aa4c11d39af2dec3c487ba335ec482e
+  - 8b768d2 2024-08-03T01:43:58+10:00 NE-1674: Add LB EIP Allocation for AWS Adds implementation for the new IngressController AWS eipAllocation API. It takes the eipAllocations specified on the IngressController and propagates them to the service.beta.kubernetes.io/aws-load-balancer-eip-allocations annotation on the LB-type Service.
+  - bf596bf 2024-08-03T01:38:50+10:00 Bump openshift/api, update CRD generation Bump openshift/api to add support for AWS EIPAllocation API, and bump Add FeatureGateAwareXValidation marker to eipAllocations CEL NE-1774: Promote IngressControllerLBSubnetsAWS to GA
+
+- cluster-network-operator embedded-component b6ff6df7cd04bd3cb97b04cb5b8c76164fd2c2dc to 68b81c74e40d42373cff9f83363bb9fd001a0d47
+  - d8a0ff2 2024-07-31T15:31:01-04:00 Add proxy env vars to onvkube-node
+
+- kubernetes embedded-component 1cc018a6608886d6702617a429c3e086f4195151 to 43740e9179f50acbf24f0c597f78fa9abd121c96
+  - c736c83f2 2024-07-31T16:45:59-04:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - 6fc0a6904 2024-07-16T23:48:11+00:00 Release commit for Kubernetes v1.30.3
+  - 23660a78a 2024-07-16T15:52:42+00:00 Add funcs in pkg/filesystem/util that can actually set file permissiosn on Windows and update container log dir perms to 660 on Windows
+  - b5ac4e577 2024-07-12T14:11:52+08:00 Fix pv reclaim failed due to its phase is wrongly updated to the Failed state by kcm
+  - 3b5b3a80b 2024-07-11T16:15:27+08:00 Mark a test case which sets up a sample-apiserver as serial due to potential conflicts with other test cases which do the same.
+  - 95f23fd96 2024-07-10T19:10:35+08:00 defaultMaskedPaths must be kept in sync with moby/moby.
+  - 50428ed16 2024-07-09T20:38:33-04:00 gitRepo volume: directory must be max 1 level deep
+  - dc7f0cac7 2024-07-04T16:38:30+02:00 Bump images, dependencies and versions to go 1.22.5 and distroless iptables
+  - c1aea3d7b 2024-07-03T15:57:21+08:00 Fix endpoints status out-of-sync when the pod state changes rapidly
+  - a805b3822 2024-06-23T04:31:21+00:00 fix: skip isPodWorthRequeuing only when SchedulingGates gates the pod
+  - 81a15801b 2024-06-12T17:27:29+09:00 Clean up the featureGates during the matchSuccessPolicy unit tests
+  - 49a2366dd 2024-06-12T15:35:23+09:00 Initialize terminating field in the Job controller unit tests
+  - 46f9e4b41 2024-06-12T15:17:33+09:00 Job: Fix a bug that the SuccessCriteriaMet condition is added to the Job with successPolicy even if the JobSuccessPolicy featureGate is disabled
+  - 85fad5b87 2024-06-11T20:49:01+00:00 Update CHANGELOG/CHANGELOG-1.30.md for v1.30.2
+
+- machine-config-operator embedded-component 76a8bb34c6a4e38ea2a57cd45a39240776c0d85a to 09455486d62f618350646887e3815dece8b2aedd
+  - f3ecb454 2024-08-01T11:03:34-04:00 vendor: remove o/api pin
+
+- oc image-amd64 fb5b9869b919d7c05db692a68daef6eb3b9d71b1 to 6ec8f08c0d14509c25075e031d40cf7e4d7d6426
   - 2b56afe0 2024-08-01T20:44:28-04:00 upgrade-status: fix HasOSImage function
+  - 0f0592f7 2024-08-01T11:40:07-04:00 WRKLDS-1316: Retry and do not fail when logs cannot be updated
+
+- ovn-kubernetes image-amd64 7108849ad061051eb43117d398d0ba63f7788adf to 8f1dcb6a878fcd22b4cf2727abeba7f7c69ba64b
+  - 5e152710 2024-08-01T17:17:22+02:00 Reapply "Merge pull request #2233 from tssurya/ds-merge-24th-july"
+  - 9ddf807f 2024-08-01T05:27:23+02:00 UT flake: fix panic in node IP handler tests
+  - 6f357c07 2024-07-31T19:16:05+02:00 Add new packages to mockery yaml
+  - 19768309 2024-07-31T19:16:05+02:00 e2e: fix isolation test to send traffic via eth0
+  - 2e19c3a9 2024-07-31T19:16:05+02:00 Remove mac value from annotation when network is deleted
+  - 8b77754a 2024-07-31T19:16:05+02:00 Deprecate OvnNodeManagementPortMacAddress
+  - f2ff050e 2024-07-31T19:16:05+02:00 Remove ParseNodeManagementPortMACAddress
+  - 2696e52a 2024-07-31T19:16:03+02:00 Add ParseNodeManagementPortMACAddresses util
+  - 91055bc2 2024-07-31T15:39:00+02:00 Add OvnNodeManagementPortMacAddresses
+  - dc58eabf 2024-07-30T15:49:06+02:00 updating k8sreporter to a version that no longer uses glog
+  - 6159ca35 2024-07-30T15:49:06+02:00 required changes to e2e for the kube rebase to 1.30.2
+  - f452bb3a 2024-07-30T15:49:06+02:00 bump k8s version and supporting pkgs for e2e's
+  - da74bd86 2024-07-30T15:49:06+02:00 changes required in ovnkube.go for k8s bump
+  - 451ef747 2024-07-30T15:49:06+02:00 update sigs.k8s.io/controller-runtime
+  - 8fff5d7e 2024-07-30T15:49:06+02:00 Bump K8sVersion for KIND and CI to 1.30.2
+  - 9be60edf 2024-07-30T15:49:06+02:00 Update golang and k8s versions
+  - d3782131 2024-07-29T21:06:37-04:00 Fixes hybrid overlay from deprecated annotation
+  - 33e65e7e 2024-07-29T13:58:35-04:00 cm: Add event unit tests
+  - aa28a18c 2024-07-29T13:58:35-04:00 udn, l2: Send event on unexpected primary network
+  - c5f637a9 2024-07-29T13:58:35-04:00 cm: Write event on unknown active network
+  - 42bd9487 2024-07-29T13:58:35-04:00 udn,l3: Send event on unexpected primary network
+  - 75d2b9b0 2024-07-29T13:58:35-04:00 udn: Log as errors at CNI
+  - dc9642b2 2024-07-29T13:58:35-04:00 util: Propertly implement IsUnknownActiveNetworkError
+  - c53542d4 2024-07-24T11:58:01-04:00 Ensure config is reset before node ip handler tests
+  - 0038e5b9 2024-07-24T09:41:47-04:00 Make annotation in pod sync only happen for local pods
+  - f38eff61 2024-07-24T12:20:01+02:00 udn, config: a layer2 primary UDN requires subnets
+  - 46d35e6c 2024-07-16T21:05:42+05:30 Add subnet overlap check for transit switch subnet
+  - b07fbdee 2024-07-09T13:29:38+02:00 Use Transaction timeout for MonitorAll call. It allows to change this value via config.
+  - 8e3c8c2c 2024-07-09T13:28:52+02:00 Make OVSDBTimeout for transactions a part of config.Global instead of const. A reasonable value for this timeout depends on the size of the cluster and making it configurable may help solve crashloop problems. It also speeds up testing as timeout may be set to lower value for unit tests. Set default value to 100 second, to allow larger transactions, e.g. 50 address set batch updated on address set sync with dbIDs.
+
+- kubernetes image-amd64 1cc018a6608886d6702617a429c3e086f4195151 to 43740e9179f50acbf24f0c597f78fa9abd121c96
+  - c736c83f2 2024-07-31T16:45:59-04:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - 6fc0a6904 2024-07-16T23:48:11+00:00 Release commit for Kubernetes v1.30.3
+  - 23660a78a 2024-07-16T15:52:42+00:00 Add funcs in pkg/filesystem/util that can actually set file permissiosn on Windows and update container log dir perms to 660 on Windows
+  - b5ac4e577 2024-07-12T14:11:52+08:00 Fix pv reclaim failed due to its phase is wrongly updated to the Failed state by kcm
+  - 3b5b3a80b 2024-07-11T16:15:27+08:00 Mark a test case which sets up a sample-apiserver as serial due to potential conflicts with other test cases which do the same.
+  - 95f23fd96 2024-07-10T19:10:35+08:00 defaultMaskedPaths must be kept in sync with moby/moby.
+  - 50428ed16 2024-07-09T20:38:33-04:00 gitRepo volume: directory must be max 1 level deep
+  - dc7f0cac7 2024-07-04T16:38:30+02:00 Bump images, dependencies and versions to go 1.22.5 and distroless iptables
+  - c1aea3d7b 2024-07-03T15:57:21+08:00 Fix endpoints status out-of-sync when the pod state changes rapidly
+  - a805b3822 2024-06-23T04:31:21+00:00 fix: skip isPodWorthRequeuing only when SchedulingGates gates the pod
+  - 81a15801b 2024-06-12T17:27:29+09:00 Clean up the featureGates during the matchSuccessPolicy unit tests
+  - 49a2366dd 2024-06-12T15:35:23+09:00 Initialize terminating field in the Job controller unit tests
+  - 46f9e4b41 2024-06-12T15:17:33+09:00 Job: Fix a bug that the SuccessCriteriaMet condition is added to the Job with successPolicy even if the JobSuccessPolicy featureGate is disabled
+  - 85fad5b87 2024-06-11T20:49:01+00:00 Update CHANGELOG/CHANGELOG-1.30.md for v1.30.2
+
+- oc image-arm64 6ec8f08c0d14509c25075e031d40cf7e4d7d6426 to 4e7fcfe6aee8558c0fe20f79509a83a7b6ea75a7
+  - 04624f72 2024-08-01T20:28:58-04:00 [OTA-1153]upgrade-status: communicate control plane completion clearly
+
+- kubernetes image-arm64 1cc018a6608886d6702617a429c3e086f4195151 to 43740e9179f50acbf24f0c597f78fa9abd121c96
+  - c736c83f2 2024-07-31T16:45:59-04:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - 6fc0a6904 2024-07-16T23:48:11+00:00 Release commit for Kubernetes v1.30.3
+  - 23660a78a 2024-07-16T15:52:42+00:00 Add funcs in pkg/filesystem/util that can actually set file permissiosn on Windows and update container log dir perms to 660 on Windows
+  - b5ac4e577 2024-07-12T14:11:52+08:00 Fix pv reclaim failed due to its phase is wrongly updated to the Failed state by kcm
+  - 3b5b3a80b 2024-07-11T16:15:27+08:00 Mark a test case which sets up a sample-apiserver as serial due to potential conflicts with other test cases which do the same.
+  - 95f23fd96 2024-07-10T19:10:35+08:00 defaultMaskedPaths must be kept in sync with moby/moby.
+  - 50428ed16 2024-07-09T20:38:33-04:00 gitRepo volume: directory must be max 1 level deep
+  - dc7f0cac7 2024-07-04T16:38:30+02:00 Bump images, dependencies and versions to go 1.22.5 and distroless iptables
+  - c1aea3d7b 2024-07-03T15:57:21+08:00 Fix endpoints status out-of-sync when the pod state changes rapidly
+  - a805b3822 2024-06-23T04:31:21+00:00 fix: skip isPodWorthRequeuing only when SchedulingGates gates the pod
+  - 81a15801b 2024-06-12T17:27:29+09:00 Clean up the featureGates during the matchSuccessPolicy unit tests
+  - 49a2366dd 2024-06-12T15:35:23+09:00 Initialize terminating field in the Job controller unit tests
+  - 46f9e4b41 2024-06-12T15:17:33+09:00 Job: Fix a bug that the SuccessCriteriaMet condition is added to the Job with successPolicy even if the JobSuccessPolicy featureGate is disabled
+  - 85fad5b87 2024-06-11T20:49:01+00:00 Update CHANGELOG/CHANGELOG-1.30.md for v1.30.2
 
