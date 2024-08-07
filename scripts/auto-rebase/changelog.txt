@@ -1,0 +1,20 @@
+- kubernetes embedded-component aba1e8d781a8de14bd80a3e4ea0f9a29c5a8530d to 0e57d5512b76361be6502e45518ce9af776dbc2d
+  - 3134e8731 2024-07-22T10:35:19-05:00 UPSTREAM: 122652: fix compilation issue with 122650
+  - 120b907c1 2024-07-22T09:41:06-05:00 UPSTREAM: <carry>: bump runc to 1.1.11 and carry
+
+- machine-config-operator embedded-component a4756652d07e380d7c6176af382f756d5c48281f to 64434515dba546949bcec20be26f3215a4fc5b53
+  - 29c422cf 2024-07-31T09:29:36-04:00 controller: guard OCL informer with feature gates
+  - cffdf382 2024-07-30T01:51:34+00:00 OCPBUGS-30955: On-Prem resolv prepender to watch for NM changes
+  - 248f3114 2024-07-24T01:10:46+00:00 kubelet: boot without PSI for performance concerns
+  - 4a67bded 2024-05-29T21:44:31+05:30 Introduce versioning for Auto Node Sizing feature
+
+- operator-framework-olm embedded-component a897b786370bbb7d3f9cc2f523aa4c5e5c9fcd55 to 97a3268a20581bb6b9f3fc9e41aed944fa538842
+  - 448e1ab3 2024-07-23T11:42:25+00:00 Updating ose-operator-framework-tools-container image to be consistent with ART for 4.16 Reconciling with https://github.com/openshift/ocp-build-data/tree/3df3b307218b239dc0dfe056090dd74a393c237c/images/ose-operator-framework-tools.yml
+
+- oc image-amd64 ada2fa874dc7dc175da036dae67e8d7a61a27291 to e8fb3c0574da9189b61a87a53956aa820cbfcd2c
+  - 3f7ab7fc 2024-08-02T02:14:44+00:00 Revert "OCPBUGS-35994: pkg/cli/admin/upgrade/rollback: Drop this command"
+
+- kubernetes image-amd64 aba1e8d781a8de14bd80a3e4ea0f9a29c5a8530d to 0e57d5512b76361be6502e45518ce9af776dbc2d
+  - 3134e8731 2024-07-22T10:35:19-05:00 UPSTREAM: 122652: fix compilation issue with 122650
+  - 120b907c1 2024-07-22T09:41:06-05:00 UPSTREAM: <carry>: bump runc to 1.1.11 and carry
+
