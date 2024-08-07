@@ -280,13 +280,9 @@ The steps in this section need to be executed on a `development host`.
 
 The upgrade and rollback test scenarios use multiple builds of
 MicroShift to create images with different versions. Use
-`./test/bin/build_rpms.sh` to build all of the necessary packages.
-
-#### Creating Local RPM Repositories
-
-After building RPMs, run `./test/bin/create_local_repo.sh` to copy the
-necessary files into locations that can be used as RPM repositories by
-Image Builder.
+`./test/bin/build_rpms.sh` to build all of the necessary packages and
+copy the necessary files into locations that can be used as RPM repositories
+by Image Builder.
 
 #### Creating Images
 
