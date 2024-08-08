@@ -11,9 +11,9 @@ metadata:
     openshift.io/node-selector: ""
     workload.openshift.io/allowed: "management"
     include.release.openshift.io/ibm-cloud-managed: "true"
-    include.release.openshift.io/hypershift: "true"
     include.release.openshift.io/self-managed-high-availability: "true"
     capability.openshift.io/name: "OperatorLifecycleManager"
+    include.release.openshift.io/hypershift: "true"
 ---
 apiVersion: v1
 kind: Namespace
@@ -27,9 +27,9 @@ metadata:
     openshift.io/node-selector: ""
     workload.openshift.io/allowed: "management"
     include.release.openshift.io/ibm-cloud-managed: "true"
-    include.release.openshift.io/hypershift: "true"
     include.release.openshift.io/self-managed-high-availability: "true"
     capability.openshift.io/name: "OperatorLifecycleManager"
+    include.release.openshift.io/hypershift: "true"
 ---
 apiVersion: v1
 kind: Namespace
