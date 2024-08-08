@@ -1,10 +1,8 @@
-- cluster-network-operator embedded-component af36d54203155e32162bf3c5eb0b0ac3f75d32d7 to 65cf6d26dec7261dcaff50907c409dd543a3a8d2
-  - bc95a23 2024-07-31T12:52:21+03:00 Backport ipsec status metric
-  - c2f8b0f 2024-05-22T22:57:42+09:00 Add conditions for ignored-namespaces
-
-- machine-config-operator embedded-component e3f6b6a0df1046063d4ae17e9696050691581731 to 96b78f27beb3a971907e96fdb1870639b78949f5
-  - 1a087afd 2024-07-31T00:37:34+00:00 add node ready check in getAllCandidateMachines
-  - d48fc230 2024-07-23T17:31:47-05:00 OCPBUGS-33357: Check both ready and health ingress endpoints
-  - 79c9b577 2024-07-23T17:31:37-05:00 OPNET-303: Remove weights from ingress check script
-  - f0997690 2024-03-11T23:02:08+00:00 OCPBUGS-22664: Mount /run/nodeip-configuration into coredns containers
+- kubernetes image-arm64 61474561fcb21a751f326887df2d943c00354b16 to e82605653d24a933925b80debd6d2b7ab4ccfbc6
+  - 885486e72 2024-08-06T16:31:28+00:00 git commit -m "UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image"
+  - cbb86e0d7 2024-07-17T01:44:24+00:00 Release commit for Kubernetes v1.27.16
+  - 90589b8f6 2024-07-16T15:44:37+00:00 Add funcs in pkg/filesystem/util that can actually set file permissiosn on Windows and update container log dir perms to 660 on Windows
+  - 800a4a847 2024-07-04T16:50:26+02:00 Bump images, dependencies and versions to go 1.22.5 and distroless iptables
+  - a54be727c 2024-06-25T17:53:03+02:00 upgrade to go1.22
+  - ffe14bd33 2024-06-11T20:27:36+00:00 Update CHANGELOG/CHANGELOG-1.27.md for v1.27.15
 
