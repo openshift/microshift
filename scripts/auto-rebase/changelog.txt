@@ -1,6 +1,3 @@
-- ovn-kubernetes image-amd64 d9ff562b47ce6f31919a490dc42ac9944d0633eb to 4b32e36356fcd35317f71b69bc20a27ddcd77fc1
-  - 94505ae 2024-08-05T10:34:55+00:00 Fix registering northd metrics on appropriate nodes
-
-- ovn-kubernetes image-arm64 d9ff562b47ce6f31919a490dc42ac9944d0633eb to 4b32e36356fcd35317f71b69bc20a27ddcd77fc1
-  - 94505ae 2024-08-05T10:34:55+00:00 Fix registering northd metrics on appropriate nodes
+- cluster-network-operator embedded-component 780a589cfc97c824b819f51102f6a643101f1a44 to 1fd7097769bc7c825881934c4ccfde72f3d62a21
+  - 53804c5 2024-08-05T10:19:38+00:00 Fix IC distributed control plane alerts
 
