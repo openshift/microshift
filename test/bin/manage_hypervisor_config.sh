@@ -10,16 +10,20 @@ source "${SCRIPTDIR}/common.sh"
 
 usage() {
     cat - <<EOF
-${BASH_SOURCE[0]} (create|cleanup)
+${BASH_SOURCE[0]} (create|cleanup|cleanup-all)
 
   -h           Show this help.
 
-create: Set up firewall, storage pool and network.
+create: Set up firewall, storage pool and network. 
+        Start nginx file-server to serve images 
+        for test scenarios.
         Uses the VM_POOL_BASENAME, VM_DISK_BASEDIR and
         VM_ISOLATED_NETWORK variables.
 
 cleanup: Undo the settings made by 'create' command.
 
+cleanup-all: Clean up all scenario infrastructure
+             and undo the settings made by 'create' command
 EOF
 }
 
@@ -116,6 +120,9 @@ action_create() {
 
     # Firewall
     firewall_settings "add"
+
+    # Start nginx web server
+    "${TESTDIR}/bin/manage_webserver.sh" "start"
 }
 
 action_cleanup() {
@@ -149,6 +156,19 @@ action_cleanup() {
             sudo virsh pool-undefine "${pool_name}"
         fi
     done
+
+    # Stop nginx web server
+    "${TESTDIR}/bin/manage_webserver.sh" "stop"
+}
+
+action_cleanup-all() {
+    # Clean up all of the VMs
+    for scenario in "${TESTDIR}"/scenarios*/*.sh; do
+        echo "Deleting $(basename "${scenario}")"
+        "${TESTDIR}/bin/scenario.sh" cleanup "${scenario}" &>/dev/null || true
+    done
+
+    action_cleanup
 }
 
 if [ $# -eq 0 ]; then
@@ -159,7 +179,7 @@ action="${1}"
 shift
 
 case "${action}" in
-    create|cleanup)
+    create|cleanup|cleanup-all)
         "action_${action}" "$@"
         ;;
     -h)

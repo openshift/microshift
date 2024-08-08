@@ -116,7 +116,7 @@ cd "${ROOTDIR}"
 # Get firewalld and repos in place. Use scripts to get the right repos
 # for each branch.
 $(dry_run) bash -x ./scripts/devenv-builder/configure-vm.sh --no-build --force-firewall "${PULL_SECRET}"
-$(dry_run) bash -x ./scripts/image-builder/configure.sh
+$(dry_run) bash -x ./test/bin/manage_composer_config.sh create
 
 cd "${ROOTDIR}/test/"
 
@@ -130,16 +130,9 @@ $(dry_run) bash -x ./bin/build_rpms.sh
 # Set up for scenario tests
 $(dry_run) bash -x ./bin/create_local_repo.sh
 
-# Start the web server to host the ostree commit repository for parent images
-$(dry_run) bash -x ./bin/start_webserver.sh
-
 if ${COMPOSER_CLI_BUILDS} ; then
-    # Figure out an optimal number of osbuild workers
-    CPU_CORES="$(grep -c ^processor /proc/cpuinfo)"
-    MAX_WORKERS=$(find "${ROOTDIR}/test/image-blueprints" -name \*.toml | wc -l)
-    CUR_WORKERS="$( [ "${CPU_CORES}" -lt  $(( MAX_WORKERS * 2 )) ] && echo $(( CPU_CORES / 2 )) || echo "${MAX_WORKERS}" )"
-
-    $(dry_run) bash -x ./bin/start_osbuild_workers.sh "${CUR_WORKERS}"
+    # Determine and create the ideal number of workers
+    $(dry_run) bash -x ./bin/manage_composer_config.sh create-workers
 fi
 
 # Check if cache can be used for builds
