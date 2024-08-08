@@ -261,15 +261,25 @@ SUDO permissions configured.
 
 ### Prepare Kickstart File
 
+Set variables pointing to secret files that are included in `kickstart.ks` for
+gaining access to private container registries:
+* `AUTH_CONFIG` file contents are copied to `/etc/ostree/auth.json` at the
+pre-install stage to authenticate `quay.io/myorg` registry access
+* `PULL_SECRET` file contents are copied to `/etc/crio/openshift-pull-secret`
+at the post-install stage to authenticate OpenShift registry access
+
+```
+AUTH_CONFIG=~/.quay-auth.json
+PULL_SECRET=~/.pull-secret.json
+```
+
+> See the `containers-auth.json(5)` manual pages for more information on the
+> syntax of the `AUTH_CONFIG` registry authentication file.
+
 Run the following commands to create the `kickstart.ks` file to be used during
 the virtual machine installation.
 
-> The pull secret file contents are embedded in `kickstart.ks` and they are used
-> to create the `/etc/crio/openshift-pull-secret` file at the post-install stage.
-
 ```
-PULL_SECRET=~/.pull-secret.json
-
 cat > kickstart.ks <<EOFKS
 lang en_US.UTF-8
 keyboard us
@@ -293,6 +303,16 @@ rootpw --lock
 
 # Configure network to use DHCP and activate on boot
 network --bootproto=dhcp --device=link --activate --onboot=on
+
+%pre-install --log=/dev/console --erroronfail
+
+# Create a 'bootc' image registry authentication file
+mkdir -p /etc/ostree
+cat > /etc/ostree/auth.json <<'EOF'
+$(cat "${AUTH_CONFIG}")
+EOF
+
+%end
 
 # Pull a 'bootc' image from a remote registry
 ostreecontainer --url quay.io/myorg/mypath/microshift-4.16-bootc
