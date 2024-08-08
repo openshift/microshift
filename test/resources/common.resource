@@ -69,7 +69,7 @@ Upload String To File    # robocop: disable=too-many-calls-in-keyword
     Put File    ${local_tmp}    ${remote_tmp}    mode=0644
     Remove File    ${local_tmp}
     ${stdout}    ${stderr}    ${rc}=    Execute Command
-    ...    mv ${remote_tmp} ${remote_filename}
+    ...    mv -Z ${remote_tmp} ${remote_filename}
     ...    sudo=True    return_rc=True    return_stdout=True    return_stderr=True
     Should Be Equal As Integers    0    ${rc}
     ${stdout}    ${stderr}    ${rc}=    Execute Command
@@ -120,3 +120,11 @@ Create Random Temp Directory
     ${path}=    Join Path    ${root_path}    ${rand}
     Create Directory    ${path}
     RETURN    ${path}
+
+Create Remote Dir For Path
+    [Documentation]    Create parent dirname if doesnt exist
+    [Arguments]    ${file_path}
+    ${stdout}    ${stderr}    ${rc}=    Execute Command
+    ...    mkdir -pZ $(dirname ${file_path})
+    ...    sudo=True    return_rc=True    return_stdout=True    return_stderr=True
+    Should Be Equal As Integers    0    ${rc}
