@@ -40,5 +40,6 @@ func newCommand() *cobra.Command {
 	cmd.AddCommand(cmds.NewShowConfigCommand(ioStreams))
 	cmd.AddCommand(cmds.NewBackupCommand())
 	cmd.AddCommand(cmds.NewRestoreCommand())
+	cmd.AddCommand(cmds.NewHealthcheckCommand())
 	return cmd
 }
