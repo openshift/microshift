@@ -452,6 +452,17 @@ launch_vm() {
         ;;
     esac
 
+    # Attach the graphical console if specified in the scenario settings
+    local graphics_args
+    graphics_args="none"
+    if "${VNC_CONSOLE}"; then
+        graphics_args="vnc,listen=0.0.0.0"
+    else
+        # The inst.cmdline mode does not allow any interaction and it ensures
+        # that %onerror kickstart handlers are executed on failure
+        vm_extra_args+=" inst.cmdline"
+    fi
+
     for _ in $(seq "${vm_nics}") ; do
         vm_network_args+="--network network=${network_name},model=virtio "
     done
@@ -482,12 +493,6 @@ launch_vm() {
     local attempt=1
     local max_attempts=2
     while true ; do
-        local graphics_args
-        graphics_args="none"
-        if "${VNC_CONSOLE}"; then
-            graphics_args="vnc,listen=0.0.0.0"
-        fi
-
         # Make sure the virt-install command times out after a predefined period.
         # The 'timeout' command sends the HUP signal and, if the process does not
         # exit after 1m, it sends the KILL signal to terminate the process.
