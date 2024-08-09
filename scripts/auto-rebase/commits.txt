@@ -9,10 +9,10 @@ https://github.com/openshift/cluster-openshift-controller-manager-operator embed
 https://github.com/openshift/cluster-policy-controller embedded-component 219f6f6f072d867201d4923d39fd8bcaecbe7c59
 https://github.com/openshift/csi-external-snapshotter embedded-component a6834536936b16dcd9ee81a8753a2ef6dc208541
 https://github.com/openshift/etcd embedded-component 5ed5044c5661c55d297ab0348056b50969af9627
-https://github.com/openshift/kubernetes embedded-component 61474561fcb21a751f326887df2d943c00354b16
+https://github.com/openshift/kubernetes embedded-component e82605653d24a933925b80debd6d2b7ab4ccfbc6
 https://github.com/openshift/kubernetes-kube-storage-version-migrator embedded-component 8558e14a116804168506d06e96eac5a79913a6eb
 https://github.com/openshift/machine-config-operator embedded-component 96b78f27beb3a971907e96fdb1870639b78949f5
-https://github.com/openshift/openshift-controller-manager embedded-component 27209ef14fcfca236ddba24ac7289bb3d01be8e6
+https://github.com/openshift/openshift-controller-manager embedded-component 98a4f65b5f47994ba28b34347de9179e91c11a0e
 https://github.com/openshift/route-controller-manager embedded-component 1a5e72f41b21f5ebcd6f9dd8227d92ad1fffbb1e
 https://github.com/openshift/service-ca-operator embedded-component 3c3f82f7112ee4b5656e5c554f9887acdf881175
 https://github.com/openshift/oc image-amd64 44b3ac26e654777e0283759d45a2b3351823fc5e
@@ -23,7 +23,7 @@ https://github.com/openshift/csi-external-snapshotter image-amd64 a6834536936b16
 https://github.com/openshift/router image-amd64 c3a2430c09ccea623bb8a599ce56a6e267009620
 https://github.com/openshift/kube-rbac-proxy image-amd64 1a646b98d8864e53accb726531d86f084ab13977
 https://github.com/openshift/ovn-kubernetes image-amd64 6a57379ee0eb56c90a4fa9acc123001f61890167
-https://github.com/openshift/kubernetes image-amd64 61474561fcb21a751f326887df2d943c00354b16
+https://github.com/openshift/kubernetes image-amd64 e82605653d24a933925b80debd6d2b7ab4ccfbc6
 https://github.com/openshift/service-ca-operator image-amd64 3c3f82f7112ee4b5656e5c554f9887acdf881175
 https://github.com/openshift/oc image-arm64 44b3ac26e654777e0283759d45a2b3351823fc5e
 https://github.com/openshift/coredns image-arm64 7d3fa777871ed2e5a70715e7f3e71d3f01785330
