@@ -100,6 +100,15 @@ Named Deployment Should Be Available
     [Arguments]    ${name}    ${ns}=${NAMESPACE}    ${timeout}=${DEFAULT_WAIT_TIMEOUT}
     Run With Kubeconfig    oc wait -n ${ns} deploy ${name} --for=condition=Available --timeout=${timeout}
 
+Named Daemonset Should Be Available
+    [Documentation]    Wait for a given daemonset's Available condition to be true
+    ...    ${name}    Name of daemonset to wait for
+    ...    ${ns}    Namespace of named daemonset. Defaults to NAMESPACE suite variable
+    ...    ${timeout}    Period of time to wait for daemonset to reach ready status. Default 60s.
+    [Arguments]    ${name}    ${ns}=${NAMESPACE}    ${timeout}=${DEFAULT_WAIT_TIMEOUT}
+    Run With Kubeconfig
+    ...    oc wait -n ${ns} daemonset ${name} --for=jsonpath='{.status.numberAvailable}'=1 --timeout=${timeout}
+
 Named PVC Should Be Resized
     [Documentation]    Wait for pvc with ${name} to resize to ${to_size}
     ...    ${name}    Name of pvc to wait for

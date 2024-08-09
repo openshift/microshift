@@ -159,7 +159,6 @@ func TestGetActiveConfigFromYAML(t *testing.T) {
 				return c
 			}(),
 		},
-
 		{
 			name: "api-server-advertise-address",
 			config: dedent(`
@@ -368,6 +367,23 @@ func TestGetActiveConfigFromYAML(t *testing.T) {
 						"nodefs.available":  "10%",
 						"nodefs.inodesFree": "5%",
 					},
+				}
+				return c
+			}(),
+		}, {
+			name: "storage",
+			config: dedent(`
+			storage:
+			  driver: "none"
+			  optionalCsiComponents:
+			  - "snapshot-controller" 
+			  - "snapshot-webhook"
+			`),
+			expected: func() *Config {
+				c := mkDefaultConfig()
+				c.Storage = Storage{
+					Driver:                CsiDriverNone,
+					OptionalCSIComponents: []OptionalCsiComponent{CsiComponentSnapshot, CsiComponentSnapshotWebhook},
 				}
 				return c
 			}(),
