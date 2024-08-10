@@ -163,7 +163,7 @@ action_cleanup() {
 
 action_cleanup-all() {
     # Clean up all of the VMs
-    for scenario in "${TESTDIR}"/scenarios*/*.sh; do
+    for scenario in "${TESTDIR}"/scenarios*/*/*.sh; do
         echo "Deleting $(basename "${scenario}")"
         "${TESTDIR}/bin/scenario.sh" cleanup "${scenario}" &>/dev/null || true
     done
