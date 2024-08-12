@@ -1,19 +1,9 @@
-- kubernetes embedded-component 61474561fcb21a751f326887df2d943c00354b16 to e82605653d24a933925b80debd6d2b7ab4ccfbc6
-  - 885486e72 2024-08-06T16:31:28+00:00 git commit -m "UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image"
-  - cbb86e0d7 2024-07-17T01:44:24+00:00 Release commit for Kubernetes v1.27.16
-  - 90589b8f6 2024-07-16T15:44:37+00:00 Add funcs in pkg/filesystem/util that can actually set file permissiosn on Windows and update container log dir perms to 660 on Windows
-  - 800a4a847 2024-07-04T16:50:26+02:00 Bump images, dependencies and versions to go 1.22.5 and distroless iptables
-  - a54be727c 2024-06-25T17:53:03+02:00 upgrade to go1.22
-  - ffe14bd33 2024-06-11T20:27:36+00:00 Update CHANGELOG/CHANGELOG-1.27.md for v1.27.15
+- cluster-network-operator embedded-component 65cf6d26dec7261dcaff50907c409dd543a3a8d2 to 8263aa4703db4f996818ea5d413f218f0335fb52
+  - d7f6f1d 2024-08-07T08:08:32+00:00 Fix IC distributed control plane alerts
 
-- openshift-controller-manager embedded-component 27209ef14fcfca236ddba24ac7289bb3d01be8e6 to 98a4f65b5f47994ba28b34347de9179e91c11a0e
-  - 53fd4fb 2024-05-06T15:44:48+05:30 OCPBUGS-33288, OCPBUGS-33289: updates opentelemetry packages
+- ovn-kubernetes image-amd64 6a57379ee0eb56c90a4fa9acc123001f61890167 to aa1ed513827ba33e2d56d450de7257539c6a8a3e
+  - 6adfee2 2024-08-07T08:00:35+00:00 Fix registering northd metrics on appropriate nodes
 
-- kubernetes image-amd64 61474561fcb21a751f326887df2d943c00354b16 to e82605653d24a933925b80debd6d2b7ab4ccfbc6
-  - 885486e72 2024-08-06T16:31:28+00:00 git commit -m "UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image"
-  - cbb86e0d7 2024-07-17T01:44:24+00:00 Release commit for Kubernetes v1.27.16
-  - 90589b8f6 2024-07-16T15:44:37+00:00 Add funcs in pkg/filesystem/util that can actually set file permissiosn on Windows and update container log dir perms to 660 on Windows
-  - 800a4a847 2024-07-04T16:50:26+02:00 Bump images, dependencies and versions to go 1.22.5 and distroless iptables
-  - a54be727c 2024-06-25T17:53:03+02:00 upgrade to go1.22
-  - ffe14bd33 2024-06-11T20:27:36+00:00 Update CHANGELOG/CHANGELOG-1.27.md for v1.27.15
+- ovn-kubernetes image-arm64 6a57379ee0eb56c90a4fa9acc123001f61890167 to aa1ed513827ba33e2d56d450de7257539c6a8a3e
+  - 6adfee2 2024-08-07T08:00:35+00:00 Fix registering northd metrics on appropriate nodes
 
