@@ -1,0 +1,61 @@
+- cluster-network-operator embedded-component 739536971534310704707375a4903858d7331ad3 to 64bf8adae331c75a21e106f9fb537b2b6a9243a8
+  - 5c59231 2024-06-13T11:32:39+00:00 Use applyconfigurations for updating network.oprerator status
+  - ce0fd1a 2024-06-13T11:32:39+00:00 Vendor fake client-go operator client
+
+- etcd embedded-component bc2fec27ff5b086436d438157c24396f280e0305 to 16202ec4ecea353650b3681979ba73c5d8664d8c
+  - c1e70885 2024-05-30T19:23:02+02:00 DOWNSTREAM <carry>: drop go toolchain directive
+  - eac77f62 2024-05-30T19:13:10+02:00 DOWNSTREAM <carry>: add native binary to installer images
+  - b5333797 2024-05-30T19:07:38+02:00 CORS-3249: DOWNSTREAM <carry>: installer: make etcd binaries static
+  - 0f16923e 2024-05-30T19:07:25+02:00 DOWNSTREAM <carry>: add installer Dockerfile for ART builds
+  - 4622985e 2024-05-30T19:07:14+02:00 DOWNSTREAM <carry>: update Dockerfile golang 1.20 ocp 4.16
+  - 74926bc7 2024-05-30T19:07:03+02:00 DOWNSTREAM: <carry>: Add Dockerfile to build etcd for openshift-installer
+  - bf4fdc77 2024-05-30T19:06:57+02:00 Merge pull request #236 from openshift-bot/art-consistency-openshift-4.16-ose-etcd
+  - 3305cc80 2024-05-30T19:04:56+02:00 DOWNSTREAM <carry>: update Dockerfile golang 1.20 ocp 4.16
+  - a409563b 2024-05-30T18:27:58+02:00 DOWNSTREAM <carry>: resolve merge conflicts
+  - bf51a53a 2024-05-30T06:33:09+12:00 version: bump up to 3.5.14
+  - 8bc3271a 2024-05-23T23:37:11+05:30 config: support AllowedCN and AllowedHostname through config file
+  - 3c990bc4 2024-05-16T14:45:48+05:30 scripts: default to using .go-version's version for tests and builds
+  - 47403158 2024-05-16T14:45:42+05:30 .*: sync go toolchain version and add ability to verify versions
+  - f715ffd7 2024-05-10T18:25:42+05:30 update the go v1.21.10
+  - 9e1dadd7 2024-05-09T21:41:23-04:00 etcdutl: Fix snapshot restore memory alloc issue
+  - 6abc349d 2024-05-09T21:41:16-04:00 server: Implement WithMmapSize option for backend config
+  - 99a64341 2024-05-06T10:31:18-07:00 Add cluster downgrade test.
+  - a5eec4d7 2024-05-06T12:02:49+02:00 Bump bbolt to 1.3.10 for 3.5
+  - cee181d1 2024-05-06T10:03:08+02:00 v3rpc: run health notifier to listen on online defrag state change
+  - 22ca6151 2024-05-01T17:26:02+00:00 build(deps): bump distroless/static-debian11 from `046b92c` to `6d31326`
+  - 750bc0b1 2024-04-30T15:09:51+02:00 gRPC health server sets serving status to NOT_SERVING on defrag
+  - daec41c2 2024-04-29T18:55:52+00:00 e2e: add mix version test of adding last ver to current ver.
+  - 0af22abc 2024-04-24T12:28:20+08:00 server/mvcc: should update currentRev in revMu
+  - c06b17b9 2024-04-24T12:25:19+08:00 server/storage: update currentRev if scheduledCompact > currentRev
+  - 7beff571 2024-04-24T12:23:33+08:00 tests/e2e: reproduce #17780
+  - 6b034466 2024-04-24T12:14:27+08:00 server/mvcc: introduce compactBeforeSetFinishedCompact failpoint
+  - adf1c3f2 2024-04-21T13:17:07+01:00 Update the compaction log when bootstrap and update compact's signature
+  - c391d69b 2024-04-18T19:08:05+00:00 test: add checking snapshot be sent in mix_version_test.
+  - 9331ee32 2024-04-17T13:50:23+02:00 [backport-3.5] server: ignore raft messages if member id mismatch #17078
+  - 464df4a9 2024-04-15T17:04:44-07:00 add experimental-snapshot-catchup-entries flag.
+  - c06ec722 2024-04-08T21:37:06+00:00 test: add mix version e2e test.
+  - 51f31343 2024-04-06T22:58:32+08:00 feat: observe wal write at one time
+  - b6df59cb 2024-04-06T14:40:05+00:00 Add approvals gh workflows.
+  - 1404f5aa 2024-04-05T01:08:21+05:30 [3.5]Add trivy scan as a job in release workflow
+  - 94a1d0c1 2024-04-04T22:33:05+08:00 *: LeaseTimeToLive returns error if leader changed
+  - b78b2140 2024-04-04T22:33:05+08:00 .github: enable failpoints for integration tests
+  - 600b6bfe 2024-04-04T10:55:45+02:00 Bump golang.org/x/net to v0.23.0
+  - 5776e213 2024-04-04T10:55:45+02:00 Bump go-version to 1.21.9 for release-3.5 due to CVE-2023-45288
+  - 61a85b7a 2024-04-03T08:49:28+02:00 Backport initialization of mu in NewCtxClient to release-3.5
+  - 953a023b 2024-04-03T10:50:15+13:00 Backport updates to shellcheck ignores for release.sh script.
+  - 1868848b 2024-04-03T09:51:54+13:00 Backport rename of release script to release.sh.
+  - 107412fc 2024-04-03T09:28:31+13:00 Backport update for release script to use ssh.
+  - d1eb35d5 2024-04-01T17:41:43+00:00 build(deps): bump distroless/static-debian11 from `7e5c6a2` to `046b92c`
+  - 0c2f2083 2024-04-01T09:07:24+00:00 Fix retry requests when receiving ErrGPRCNotSupportedForLearner
+
+- machine-config-operator embedded-component 64434515dba546949bcec20be26f3215a4fc5b53 to d0ce9ec9354040ca3df1f0f46f3e42ccbaf9547c
+  - 6ad8bd6e 2024-06-25T14:48:01+00:00 fixes canonicalized secret creation and updates
+
+- ovn-kubernetes image-amd64 494993b7702336ed9d527c2c9899b85cdd22c7bf to b0250b9f40c38f707f56ab64d73acd490cb946c1
+  - 7d620d54 2024-08-02T17:14:34+02:00 Use Transaction timeout for MonitorAll call. It allows to change this value via config.
+  - 92dcc408 2024-08-02T17:14:27+02:00 Make OVSDBTimeout for transactions a part of config.Global instead of const. A reasonable value for this timeout depends on the size of the cluster and making it configurable may help solve crashloop problems. It also speeds up testing as timeout may be set to lower value for unit tests. Set default value to 100 second, to allow larger transactions, e.g. 50 address set batch updated on address set sync with dbIDs.
+
+- ovn-kubernetes image-arm64 494993b7702336ed9d527c2c9899b85cdd22c7bf to b0250b9f40c38f707f56ab64d73acd490cb946c1
+  - 7d620d54 2024-08-02T17:14:34+02:00 Use Transaction timeout for MonitorAll call. It allows to change this value via config.
+  - 92dcc408 2024-08-02T17:14:27+02:00 Make OVSDBTimeout for transactions a part of config.Global instead of const. A reasonable value for this timeout depends on the size of the cluster and making it configurable may help solve crashloop problems. It also speeds up testing as timeout may be set to lower value for unit tests. Set default value to 100 second, to allow larger transactions, e.g. 50 address set batch updated on address set sync with dbIDs.
+
