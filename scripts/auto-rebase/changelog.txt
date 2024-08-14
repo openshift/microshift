@@ -1,3 +1,3 @@
-- operator-framework-olm embedded-component 97a3268a20581bb6b9f3fc9e41aed944fa538842 to 45bf8edfd28026bd821a83f758856bf8e719dd20
-  - 9d10b697 2024-08-07T16:29:48-03:00 Merge pull request #832 from perdasilva/perdasilva/junittg
+- operator-framework-olm embedded-component 45bf8edfd28026bd821a83f758856bf8e719dd20 to f9c08816690d4a23cc08406c3adce151b38a908c
+  - 9abf1024 2024-08-09T15:03:09-04:00 (fix) Resolver: list CatSrc using client, instead of referring to registry-server cache (#3349)
 
