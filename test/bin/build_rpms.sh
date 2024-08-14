@@ -15,14 +15,14 @@ build_rpms() {
     rm -rf _output/rpmbuild*
 
     # Normal build of current branch from source
-    BUILD_CMDS=('make rpm')
+    local build_cmds=('make rpm')
 
     # In CI, build the current branch from source with the build tools using used by OCP
     if [ -v CI_JOB_NAME ]; then
-        BUILD_CMDS=('make rpm-podman')
+        build_cmds=('make rpm-podman')
     fi
 
-    BUILD_CMDS+=(
+    build_cmds+=(
         # Build RPMs with the version number of the next minor release,
         # but using the same source code as the normal build.
         'make -C test/ fake-next-minor-rpm' \
@@ -33,9 +33,9 @@ build_rpms() {
         # such as: microshift being unable to make a backup or greenboot checks failing
         './test/agent/build.sh' \
     )
-    NUM_BUILD_CMDS="${#BUILD_CMDS[@]}"
-    BUILD_RPMS_LOG="${IMAGEDIR}/build_rpms.json"
-    BUILD_RPMS_JOB_LOG="${IMAGEDIR}/build_rpms_jobs.txt"
+    local -r num_build_cmds="${#build_cmds[@]}"
+    local -r build_rpms_log="${IMAGEDIR}/build_rpms.json"
+    local -r build_rpms_jobs_log="${IMAGEDIR}/build_rpms_jobs.txt"
     mkdir -p "${IMAGEDIR}"
 
     # Show progress for interactive mode when stdin is a terminal
@@ -49,39 +49,39 @@ build_rpms() {
     echo will cite | parallel --citation &>/dev/null
     # Run the commands in parallel
     echo "Starting parallel builds:"
-    printf -- "  - %s\n" "${BUILD_CMDS[@]}"
-    BUILD_OK=true
+    printf -- "  - %s\n" "${build_cmds[@]}"
+    local build_ok=true
     if ! parallel \
         ${progress} \
-        --results "${BUILD_RPMS_LOG}" \
-        --joblog "${BUILD_RPMS_JOB_LOG}" \
-        --jobs "${NUM_BUILD_CMDS}" \
-        ::: "${BUILD_CMDS[@]}" ; then
-        BUILD_OK=false
+        --results "${build_rpms_log}" \
+        --joblog "${build_rpms_jobs_log}" \
+        --jobs "${num_build_cmds}" \
+        ::: "${build_cmds[@]}" ; then
+        build_ok=false
     fi
 
     # Show the summary of the output of the parallel jobs.
-    cat "${BUILD_RPMS_JOB_LOG}"
+    cat "${build_rpms_jobs_log}"
 
-    if [ -f "${BUILD_RPMS_LOG}" ] ; then
-        jq < "${BUILD_RPMS_LOG}"
+    if [ -f "${build_rpms_log}" ] ; then
+        jq < "${build_rpms_log}"
     else
         echo "The RPM build log file does not exist"
-        BUILD_OK=false
+        build_ok=false
     fi
 
-    if ! ${BUILD_OK} ; then
+    if ! ${build_ok} ; then
         echo "RPM build failed"
         exit 1
     fi
 
-    MAX_RUNTIME=$(jq -s 'max_by(.JobRuntime) | .JobRuntime | floor' "${BUILD_RPMS_LOG}")
-    echo "RPM build complete in ${MAX_RUNTIME}s"
+    local -r max_runtime=$(jq -s 'max_by(.JobRuntime) | .JobRuntime | floor' "${build_rpms_log}")
+    echo "RPM build complete in ${max_runtime}s"
 }
 
 make_repo() {
-    local repodir="$1"
-    local builddir="$2"
+    local -r repodir="$1"
+    local -r builddir="$2"
 
     title "Creating RPM repo at ${repodir}"
     if [ -d "${repodir}" ]; then
