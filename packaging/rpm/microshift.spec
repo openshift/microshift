@@ -394,6 +394,7 @@ if [ $1 -eq 1 ]; then
 	# if crio was already started, restart it so it will catch /etc/crio/crio.conf.d/10-microshift.conf
 	systemctl is-active --quiet crio && systemctl restart --quiet crio || true
 fi
+systemctl enable --now crio-wipe
 
 %pre selinux
 %selinux_relabel_pre -s %{selinuxtype}
