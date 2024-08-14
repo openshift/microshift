@@ -127,9 +127,6 @@ source "${SCRIPTDIR}/common.sh"
 # Re-build from source.
 $(dry_run) bash -x ./bin/build_rpms.sh
 
-# Start the web server to host the ostree commit repository for parent images
-$(dry_run) bash -x ./bin/start_webserver.sh
-
 if ${COMPOSER_CLI_BUILDS} ; then
     # Determine and create the ideal number of workers
     $(dry_run) bash -x ./bin/manage_composer_config.sh create-workers
