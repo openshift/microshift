@@ -53,10 +53,10 @@ spec:
           args:
             - '--namespace'
             - openshift-marketplace
-            - --configmapServerImage=$(OPERATOR_REGISTRY_IMAGE)
-            - --opmImage=$(OPERATOR_REGISTRY_IMAGE)
+            - --configmapServerImage=quay.io/operator-framework/configmap-operator-registry:latest
+            - --opmImage=quay.io/operator-framework/configmap-operator-registry:latest
             - --util-image
-            - $(OLM_IMAGE)
+            - quay.io/operator-framework/olm@sha256:de396b540b82219812061d0d753440d5655250c621c753ed1dc67d6154741607
             - --writeStatusName
             - operator-lifecycle-manager-catalog
             - --tls-cert
@@ -66,7 +66,7 @@ spec:
             - --client-ca
             - /profile-collector-cert/tls.crt
             - --set-workload-user-id=false
-          image: quay.io/operator-framework/olm
+          image: quay.io/operator-framework/olm@sha256:de396b540b82219812061d0d753440d5655250c621c753ed1dc67d6154741607
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8443
