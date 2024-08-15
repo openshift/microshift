@@ -1,15 +1,15 @@
 {
   "release": {
-    "base": "4.15.0-0.nightly-arm64-2024-08-13-113030"
+    "base": "4.15.0-0.nightly-arm64-2024-08-15-000745"
   },
   "images": {
-    "cli": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:a86bf8cd9ab26422c89e8ec6c5eeeba694a62b1d8c3e60846b89c05562d54098",
+    "cli": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:efc54fd99b86fd49a6d02efd073aad9cda04ea8c985bd985f67cfabccdfdd7d7",
     "coredns": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:1fc7e89bececb5158f03a2b77ce339b00fb240f76602a6a3cb88548dc4a753e9",
-    "haproxy-router": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:52c47e752a50ad3c2c3ab74b62352a032d76dee0c7ad29813667a20ce1247f51",
-    "kube-rbac-proxy": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:a1c2a07276e92bde42aea01515d0f03d8438ec818804965ee36178c7dc582456",
+    "haproxy-router": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:594451364463fe99b04fb36b2ca8ae848805d9b234b7e14f6698859491224cf9",
+    "kube-rbac-proxy": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:90f28c6db1bd814bfdf04d5d1f11de050c90629e03d3dc15aed668adf2b97e24",
     "openssl": "registry.access.redhat.com/ubi8/openssl@sha256:9e743d947be073808f7f1750a791a3dbd81e694e37161e8c6c6057c2c342d671",
     "ovn-kubernetes-microshift": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:d74a4745b3208ce5af07ff10de4d9138216737ef2afda1572e536adc1e04db8b",
-    "pod": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:098957e04e445654df5b1c540a02e8fc3264c65636f6efa4ad548c6b863c2b6c",
+    "pod": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:80b1e5adc0d1cbf3a51a773d0c660ae6f94780a0c64b165a3a773ed0a1745320",
     "service-ca-operator": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:c7b46cbb0e1b50ef6844d44361f13b8abef737ba6d86e7fd5f165919c55e7f78",
     "topolvm_csi": "registry.redhat.io/lvms4/topolvm-rhel9@sha256:ce0c78c2867fb0b73c4911ae6afd5aaf9a413480cfcf4f31f46f2387c3df97e0",
     "topolvm_csi_registrar": "registry.redhat.io/openshift4/ose-csi-node-driver-registrar@sha256:95691c21198e20d11777d592806fa00c018c17443d9b3aee853891dac6090470",
