@@ -634,12 +634,6 @@ launch_vm() {
         # Record the IP of this VM so our caller can use it to configure
         # port forwarding and the firewall.
         set_vm_property "${vmname}" "ip" "${ip}"
-        # Record the _public_ IP of the VM so the test suite can use it to
-        # access the host. This is useful when the public IP is the
-        # hypervisor forwarding connections. If we have no PUBLIC_IP, use
-        # the VM IP and assume a local connection.
-        
-        # TODO figure out what to do here
         
         #set_vm_property "${vmname}" "public_ip" "${ip}"
         # Set the defaults for the various ports so that connections
@@ -838,6 +832,7 @@ run_tests() {
         local -r api_port=$(get_vm_property "${vmname}" "api_port")
         local -r lb_port=$(get_vm_property "${vmname}" "lb_port")
         local -r vm_ip=$(get_vm_property "${vmname}" "ip")
+
         local variable_file="${SCENARIO_INFO_DIR}/${SCENARIO}/variables.yaml"
         echo "Writing variables to ${variable_file}"
         mkdir -p "$(dirname "${variable_file}")"
