@@ -1,3 +1,3 @@
-- operator-framework-olm embedded-component b102225933d5df5b97fe9a691124087d9c3e24d6 to 54c9bb9ffdf3206dcf415bb78d2d37ed5178d69b
-  - f15c5fe5 2024-08-12T01:37:18+00:00 Merge pull request #832 from perdasilva/perdasilva/junittg
+- kubernetes image-arm64 396c8817940d592049f2fcfdeae4a264c953ea8e to bc3c7c5f9861b366d20e45bf5b696ed56d8e4964
+  - 1a2c0f6ba 2024-08-12T11:08:41+02:00 UPSTREAM: <carry>: Add OpenShift tooling, images, configs and docs
 
