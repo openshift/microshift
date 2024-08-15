@@ -264,4 +264,34 @@ oc get pods -n busybox
 
 ## Storage Configuration
 
-MicroShift's included CSI plugin manages LVM LogicalVolumes to provide persistent workload storage. For specific storage configuration, refer to the dedicated [documentation](../contributor/storage/configuration.md).
+MicroShift's included CSI plugin manages LVM LogicalVolumes to provide persistent workload storage. For LVMS
+configuration, refer to the dedicated [documentation](../contributor/storage/configuration.md).
+
+### Opt-Out of LVMS / Snapshotting Components
+
+Users may prevent either the LVMS CSI driver or the CSI Snapshotter, or both, from being deployed. This is done by
+specifying supported values under `.storage` node of the MicroShift config in the following ways:
+
+```yaml
+  storage
+    driver: **ENUM**
+  ```
+  - Accepted values: `"none"`, `"lvms"`
+  - Empty value or null field defaults to deploying LVMS.
+
+```yaml
+storage
+  optionalCsiComponents: **ARRAY**.
+```
+  - Expected values are: `['csi-snapshot-controller', 'csi-snapshot-webhook', 'none']`. `'none'` is mutually exclusive
+  with all other values.
+  - Empty array defaults to deploying `snapshot-controller` and `snapshot-webhook`.
+
+### Automated Uninstallation is Not Supported
+
+Automated uninstallation is not supported because it poses a risk of orphaning provisioned volumes. Without the LVMS CSI
+driver, the cluster has no knowledge of the underlying storage interface and thus cannot perform
+provisioning/deprovisioning or mount/unmount operations. Workloads with attached volumes must be manually stopped, and
+those volumes must then be manually deleted by the user. Once the MicroShift config `storage` section is specified with
+supported values, the user may restart MicroShift. They should see that MicroShift does not redeploy the disabled
+components after restart.
