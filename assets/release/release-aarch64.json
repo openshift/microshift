@@ -1,16 +1,16 @@
 {
   "release": {
-    "base": "4.14.0-0.nightly-arm64-2024-08-13-143849"
+    "base": "4.14.0-0.nightly-arm64-2024-08-14-124943"
   },
   "images": {
     "cli": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:8d34007ecb2d47fc9a830f59271f1ec2fe727f0fd1df1e7ab2b90ec3943aa5e6",
     "coredns": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:634224ae540c7a5dc8e037348c5879953b18554bcc744ba81dc3d07ddd43f3f4",
     "haproxy-router": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:9ca723119d83d7488209239dcb94841b730be4b8624d2157860310ab60b5a9f1",
-    "kube-rbac-proxy": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:7a039c6c99956a0fd0264459d1782a7b7a1ca005ade48970106c8d589e2a8f7c",
+    "kube-rbac-proxy": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:8933140ca53fb4d4a8e165366a1a61b9832a201c9db3a95f68ad46dcca9fe636",
     "openssl": "registry.access.redhat.com/ubi8/openssl@sha256:9e743d947be073808f7f1750a791a3dbd81e694e37161e8c6c6057c2c342d671",
     "ovn-kubernetes-microshift": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:0ef85fdcce2701af70fcaacaf5f89cf78271cd38c88734aef096c63456333c65",
-    "pod": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:ba0c7610b21fbeb1f843ef33bffd0c7ca4204fe146736ca8f8bb21ea5b1c3d23",
-    "service-ca-operator": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:49023cf5cf32a207964d86441dd69917518e8fe1930c32d6e6af3b26b889f69e",
+    "pod": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:701fc7614fb7a318eede4124ea59a16e1a45446a78994b955b0da81dd9eeaae1",
+    "service-ca-operator": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:8d7daeb2ed76bc161b2af6f35690b4153275f5e306f60aa9b197d5aedd1ca4db",
     "topolvm_csi": "registry.redhat.io/lvms4/topolvm-rhel9@sha256:d0c039eba8157965b0a7971ad4e01576d2c1e31b09fe938554163b324cc4dc73",
     "topolvm_csi_registrar": "registry.redhat.io/openshift4/ose-csi-node-driver-registrar@sha256:caa0bbab808d8cbed476e8fa3e296ceb90f8d7d253e36588fa77e639ea389d55",
     "topolvm_csi_livenessprobe": "registry.redhat.io/openshift4/ose-csi-livenessprobe@sha256:829a8e4d34404abbd22fddb6ebfa0f74daa55f2697fb147da77b83fc8b473d8c",
