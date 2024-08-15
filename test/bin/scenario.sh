@@ -22,7 +22,6 @@ WEB_SERVER_URL="http://${VM_BRIDGE_IP}:${WEB_SERVER_PORT}"
 BOOTC_REGISTRY_URL="${VM_BRIDGE_IP}:5000"
 PULL_SECRET="${PULL_SECRET:-${HOME}/.pull-secret.json}"
 PULL_SECRET_CONTENT="$(jq -c . "${PULL_SECRET}")"
-PUBLIC_IP=${PUBLIC_IP:-""}  # may be overridden in global settings file
 VM_BOOT_TIMEOUT=1200 # Overall total boot times are around 15m
 VM_GREENBOOT_TIMEOUT=1800 # Greenboot readiness may take up to 15-30m depending on the load
 ENABLE_REGISTRY_MIRROR=${ENABLE_REGISTRY_MIRROR:-false}
@@ -281,7 +280,6 @@ prepare_kickstart() {
             -e "s|REPLACE_PULL_SECRET|${PULL_SECRET_CONTENT}|g" \
             -e "s|REPLACE_HOST_NAME|${vm_hostname}|g" \
             -e "s|REPLACE_REDHAT_AUTHORIZED_KEYS|${REDHAT_AUTHORIZED_KEYS}|g" \
-            -e "s|REPLACE_PUBLIC_IP|${PUBLIC_IP}|g" \
             -e "s|REPLACE_FIPS_ENABLED|${fips_enabled}|g" \
             -e "s|REPLACE_ENABLE_MIRROR|${ENABLE_REGISTRY_MIRROR}|g" \
             -e "s|REPLACE_MIRROR_HOSTNAME|${hostname}|g" \
@@ -640,16 +638,16 @@ launch_vm() {
         # access the host. This is useful when the public IP is the
         # hypervisor forwarding connections. If we have no PUBLIC_IP, use
         # the VM IP and assume a local connection.
-        if [ -n "${PUBLIC_IP}" ]; then
-            set_vm_property "${vmname}" "public_ip" "${PUBLIC_IP}"
-        else
-            set_vm_property "${vmname}" "public_ip" "${ip}"
-            # Set the defaults for the various ports so that connections
-            # from the hypervisor to the VM work.
-            set_vm_property "${vmname}" "ssh_port" "22"
-            set_vm_property "${vmname}" "api_port" "6443"
-            set_vm_property "${vmname}" "lb_port" "5678"
-        fi
+        
+        # TODO figure out what to do here
+        
+        #set_vm_property "${vmname}" "public_ip" "${ip}"
+        # Set the defaults for the various ports so that connections
+        # from the hypervisor to the VM work.
+        set_vm_property "${vmname}" "ssh_port" "22"
+        set_vm_property "${vmname}" "api_port" "6443"
+        set_vm_property "${vmname}" "lb_port" "5678"
+        
 
         if wait_for_ssh "${ip}"; then
             record_junit "${vmname}" "ssh-access" "OK"
@@ -770,7 +768,7 @@ stress_testing() {
     local -r condition="${3}"
     local -r value="${4}"
 
-    local -r ssh_host="$(get_vm_property "${vmname}" public_ip)"
+    local -r ssh_host="$(get_vm_property "${vmname}" ip)"
     local -r ssh_user=redhat
     local -r ssh_port="$(get_vm_property "${vmname}" ssh_port)"
     local -r ssh_pkey="${SSH_PRIVATE_KEY:-}"
@@ -827,7 +825,7 @@ run_tests() {
 
     local variable_file
     if [ "${test_is_online}" == "true" ]; then
-        for p in "ssh_port" "api_port" "lb_port" "public_ip" "ip"; do
+        for p in "ssh_port" "api_port" "lb_port" "ip"; do
             f="$(vm_property_filename "${vmname}" "${p}")"
             if [ ! -f "${f}" ]; then
                 error "Cannot read ${f}"
@@ -839,9 +837,7 @@ run_tests() {
         local -r ssh_port=$(get_vm_property "${vmname}" "ssh_port")
         local -r api_port=$(get_vm_property "${vmname}" "api_port")
         local -r lb_port=$(get_vm_property "${vmname}" "lb_port")
-        local -r public_ip=$(get_vm_property "${vmname}" "public_ip")
         local -r vm_ip=$(get_vm_property "${vmname}" "ip")
-
         local variable_file="${SCENARIO_INFO_DIR}/${SCENARIO}/variables.yaml"
         echo "Writing variables to ${variable_file}"
         mkdir -p "$(dirname "${variable_file}")"
@@ -849,7 +845,7 @@ run_tests() {
 VM_IP: ${vm_ip}
 API_PORT: ${api_port}
 LB_PORT: ${lb_port}
-USHIFT_HOST: ${public_ip}
+USHIFT_HOST: ${vm_ip}
 USHIFT_USER: redhat
 SSH_PRIV_KEY: "${SSH_PRIVATE_KEY:-}"
 SSH_PORT: ${ssh_port}
