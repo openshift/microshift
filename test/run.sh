@@ -106,13 +106,13 @@ if [ "${STRESS_TESTING:-}" ]; then
 fi
 
 if ${DRYRUN}; then
-    # shellcheck disable=SC2086
+    # shellcheck disable=SC2086,SC2068
     "${RF_BINARY}" \
         --dryrun \
         --outputdir "${OUTDIR}" \
-        "${TESTS[@]}"
+        ${TESTS[@]}
 else
-    # shellcheck disable=SC2086
+    # shellcheck disable=SC2086,SC2068
     "${RF_BINARY}" \
         ${EXITONFAILURE}  \
         --randomize "${RANDOMIZE}" \
@@ -121,7 +121,7 @@ else
         -V "${RF_VARIABLES}" \
         -x junit.xml \
         --outputdir "${OUTDIR}" \
-        "${TESTS[@]}"
+        ${TESTS[@]}
 fi
 
 # disable stress condition
