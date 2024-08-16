@@ -1,3 +1,12 @@
-- operator-framework-olm embedded-component 45bf8edfd28026bd821a83f758856bf8e719dd20 to f9c08816690d4a23cc08406c3adce151b38a908c
-  - 9abf1024 2024-08-09T15:03:09-04:00 (fix) Resolver: list CatSrc using client, instead of referring to registry-server cache (#3349)
+- kubernetes embedded-component 6abe8a19439b7c352cd3b9ab6d40f1037caa3a10 to 4510e9c7511370d04fbade5700d765c3ef5212c8
+  - 83e93274c 2024-08-12T11:08:14+02:00 UPSTREAM: <carry>: Add OpenShift tooling, images, configs and docs
+
+- machine-config-operator embedded-component d0ce9ec9354040ca3df1f0f46f3e42ccbaf9547c to 2c70c1155007d5aaadd70025f48e4d61158c9bd1
+  - 81d252e0 2024-08-12T18:42:42+00:00 Revert "MCD-pull: run after network-online.target in Azure"
+
+- kubernetes image-amd64 6abe8a19439b7c352cd3b9ab6d40f1037caa3a10 to 4510e9c7511370d04fbade5700d765c3ef5212c8
+  - 83e93274c 2024-08-12T11:08:14+02:00 UPSTREAM: <carry>: Add OpenShift tooling, images, configs and docs
+
+- kubernetes image-arm64 6abe8a19439b7c352cd3b9ab6d40f1037caa3a10 to 4510e9c7511370d04fbade5700d765c3ef5212c8
+  - 83e93274c 2024-08-12T11:08:14+02:00 UPSTREAM: <carry>: Add OpenShift tooling, images, configs and docs
 
