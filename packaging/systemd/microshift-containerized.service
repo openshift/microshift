@@ -5,8 +5,8 @@
 [Unit]
 Description=MicroShift Containerized
 Documentation=man:podman-generate-systemd(1)
-Wants=network-online.target crio.service
-After=network-online.target crio.service
+Wants=network-online.target crio.service crio-wipe.service
+After=network-online.target crio.service crio-wipe.service
 RequiresMountsFor=%t/containers
 
 [Service]
