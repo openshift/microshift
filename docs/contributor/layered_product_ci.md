@@ -132,3 +132,60 @@ Log into the running container and verify that the MicroShift and Layered Produc
 pods are up and running without errors.
 
 ## Run Layered Product Tests
+
+Layered Product tests may be executed inside the running container, or on the host.
+
+When executing tests inside the running container, the MicroShift instance can be
+accessed using the `/var/lib/microshift/resources/kubeadmin/kubeconfig` file.
+
+```bash
+mkdir -p ~/.kube
+sudo cat /var/lib/microshift/resources/kubeadmin/kubeconfig > ~/.kube/config
+
+# Verify that the cluster can be accessed
+oc get nodes
+# Run Layered Product tests
+```
+
+When executing tests on the host (i.e. outside of the running container), it is
+necessary to take extra steps for configuring the access to the MicroShift cluster.
+
+One way of accessing the cluster would be to publish the API Server port 6443
+when starting the container and copy the `kubeconfig` file to the host.
+
+First, start the container with the `--publish 6443:6443` option that exposes
+port 6443 to the host.
+
+```bash
+sudo podman run --rm -it --privileged \
+    -v "${PULL_SECRET}":/etc/crio/openshift-pull-secret:ro \
+    -v /var/lib/containers/storage:/var/lib/containers/storage \
+    --publish 6443:6443 \
+    --name "${IMAGE_NAME}" \
+    "${IMAGE_NAME}"
+```
+
+Log into the container and run the following command to allow access to port
+6443 in the firewall.
+
+```
+sudo firewall-offline-cmd --zone=public --add-port=6443/tcp
+sudo systemctl reload firewalld
+```
+
+> It may be more convenient to add the `firewall-offline-cmd` command to the
+> `Containerfile` when building MicroShift or Layered Product container images.
+
+Wait until MicroShift is up and running in the container and run the following
+commands on the host to copy the `kubeconfig` file from the container locally.
+
+```bash
+mkdir -p ~/.kube
+sudo podman cp ${IMAGE_NAME}:/var/lib/microshift/resources/kubeadmin/kubeconfig ~/.kube/config
+# Fix the copied file ownership
+sudo chown $(id -un). ~/.kube/config
+
+# Verify that the cluster can be accessed
+oc get nodes
+# Run Layered Product tests
+```
