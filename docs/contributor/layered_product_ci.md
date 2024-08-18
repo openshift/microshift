@@ -15,7 +15,7 @@ can be conducted manually or integrated into the package CI/CD processes. See
 ## Build and Publish MicroShift Container Image
 
 Follow the instructions in the [Build Image](./image_mode.md#build-image) section
-to implement the MicroShift container build procedure.
+to implement the MicroShift container image layer build procedure.
 
 > Prebuilt MicroShift bootc container images are not currently available for
 > download.
@@ -25,7 +25,7 @@ product to be tested. A typical customization would be to select a custom versio
 of MicroShift, which may also include pre-released ones that are published at
 [OpenShift Mirror](mirror.openshift.com).
 
-**Example 1: MicroShift 4.17 Engineering Candidate Packages**
+**Example: MicroShift 4.17 Engineering Candidate Packages (fragment)**
 
 ```docker
 ARG USHIFT_VER=4.17
@@ -53,7 +53,7 @@ RUN dnf install -y firewalld microshift && \
     dnf clean all
 ```
 
-**Example 2: MicroShift 4.16 Release Candidate Packages**
+**Example: MicroShift 4.16 Release Candidate Packages (fragment)**
 
 ```docker
 ARG USHIFT_VER=4.16
@@ -82,11 +82,34 @@ RUN dnf install -y firewalld microshift && \
 ```
 
 Finally, follow the instructions in the [Publish Image](./image_mode.md#publish-image)
-section to push the images to a container registry.
+section to push the MicroShift images to a container registry.
 
-## Build and Publish Product Container Image
+## Build and Publish Layered Product Container Image
 
+Follow the instructions in the [Build Image](./image_mode.md#build-image) section
+to implement the Layered Product container image layer build procedure.
 
-## Run Container Image
+Customize the `Containerfile` file according to the requirements of the layered
+product to be tested. A typical customization would be to select a custom version
+of the Layered Product and install it on top of the base MicroShift container image.
+
+**Example: MicroShift GitOps 1.12 Packages (complete)**
+
+```docker
+FROM quay.io/myorg/mypath/microshift-4.16-bootc
+
+ARG GITOPS_VER=1.12
+RUN dnf config-manager --set-enabled gitops-${GITOPS_VER}-for-rhel-9-$(uname -m)-rpms
+RUN dnf install -y microshift-gitops && \
+    dnf clean all
+```
+
+> The `FROM` statement should be updated to denote a valid reference to the base
+> MicroShift container image.
+
+Finally, follow the instructions in the [Publish Image](./image_mode.md#publish-image)
+section to push the Layered Product images to a container registry.
+
+## Run Layered Product Container Image
 
 ## Run Layered Product Tests
