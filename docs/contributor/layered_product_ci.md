@@ -112,4 +112,23 @@ section to push the Layered Product images to a container registry.
 
 ## Run Layered Product Container Image
 
+Follow the instructions in [Run MicroShift Bootc Image](./image_mode.md#run-microshift-bootc-image)
+to [Configure CNI](./image_mode.md#configure-cni), [Configure CSI](./image_mode.md#configure-csi)
+and [Run Container](./image_mode.md#run-container) using the Layered Product image.
+
+```bash
+PULL_SECRET=~/.pull-secret.json
+IMAGE_NAME=microshift-gitops-1.12-bootc
+
+sudo modprobe openvswitch
+sudo podman run --rm -it --privileged \
+    -v "${PULL_SECRET}":/etc/crio/openshift-pull-secret:ro \
+    -v /var/lib/containers/storage:/var/lib/containers/storage \
+    --name "${IMAGE_NAME}" \
+    "${IMAGE_NAME}"
+```
+
+Log into the running container and verify that the MicroShift and Layered Product
+pods are up and running without errors.
+
 ## Run Layered Product Tests
