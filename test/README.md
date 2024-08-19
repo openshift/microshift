@@ -359,9 +359,6 @@ The test scenario tool uses several global settings that may be
 configured before the tool is used in `./test/scenario_settings.sh`.
 You can copy `./test/scenario_settings.sh.example` as a starting point.
 
-`PUBLIC_IP` -- The public IP of the hypervisor, when accessing VMs
-remotely through port-forwarded connections.
-
 `SSH_PUBLIC_KEY` -- The name of the public key file to use for
 providing password-less access to the VMs.
 

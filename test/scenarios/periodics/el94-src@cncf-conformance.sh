@@ -8,8 +8,8 @@ TIMEOUT_TEST=7400
 TIMEOUT_RESULTS=600
 
 prepare_hosts() {
-    local -r primary_host_ip=$(cat "${SCENARIO_INFO_DIR}/${SCENARIO}/vms/host1/public_ip")
-    local -r secondary_host_ip=$(cat "${SCENARIO_INFO_DIR}/${SCENARIO}/vms/host2/public_ip")
+    local -r primary_host_ip=$(cat "${SCENARIO_INFO_DIR}/${SCENARIO}/vms/host1/ip")
+    local -r secondary_host_ip=$(cat "${SCENARIO_INFO_DIR}/${SCENARIO}/vms/host2/ip")
     local -r primary_host_ssh_port=$(cat "${SCENARIO_INFO_DIR}/${SCENARIO}/vms/host1/ssh_port")
     local -r secondary_host_ssh_port=$(cat "${SCENARIO_INFO_DIR}/${SCENARIO}/vms/host2/ssh_port")
     local -r primary_host_name="$(full_vm_name host1)"
