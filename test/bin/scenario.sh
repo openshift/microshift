@@ -635,7 +635,6 @@ launch_vm() {
         # port forwarding and the firewall.
         set_vm_property "${vmname}" "ip" "${ip}"
         
-        #set_vm_property "${vmname}" "public_ip" "${ip}"
         # Set the defaults for the various ports so that connections
         # from the hypervisor to the VM work.
         set_vm_property "${vmname}" "ssh_port" "22"
