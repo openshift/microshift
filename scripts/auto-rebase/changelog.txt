@@ -1,6 +1,15 @@
-- coredns image-arm64 7d3fa777871ed2e5a70715e7f3e71d3f01785330 to fdd6037bf7380a48358b269d78bc8c61c311342c
+- cluster-openshift-controller-manager-operator embedded-component 3985c55f99e1ea013be2db096059c09b2ed98118 to accd87730fd3652584bef210626cab3b6d49271f
+  - 101c467 2024-05-08T15:49:44+05:30 OCPBUGS-33295, OCPBUGS-33296: updates opentelemetry packages
+
+- kubernetes embedded-component e82605653d24a933925b80debd6d2b7ab4ccfbc6 to 98fe96234f91093996b929e8c93f678756d56101
+  - 923cec83e 2024-08-12T11:09:11+02:00 UPSTREAM: <carry>: Add OpenShift tooling, images, configs and docs
+
+- machine-config-operator embedded-component 2801dd2b31e893055e182391aeb74e455f1cf5a2 to 4bb028c4f2d0181b9647b48a286485bfc5774150
+  - 70db920c 2024-08-12T18:41:15+00:00 Revert "MCD-pull: run after network-online.target in Azure"
+
+- coredns image-amd64 7d3fa777871ed2e5a70715e7f3e71d3f01785330 to fdd6037bf7380a48358b269d78bc8c61c311342c
   - c950ff7 2024-07-23T14:18:28+00:00 UPSTREAM: 6354: openshift: Fix OCPBUGS-15755
 
-- kubernetes image-arm64 e82605653d24a933925b80debd6d2b7ab4ccfbc6 to 98fe96234f91093996b929e8c93f678756d56101
+- kubernetes image-amd64 e82605653d24a933925b80debd6d2b7ab4ccfbc6 to 98fe96234f91093996b929e8c93f678756d56101
   - 923cec83e 2024-08-12T11:09:11+02:00 UPSTREAM: <carry>: Add OpenShift tooling, images, configs and docs
 
