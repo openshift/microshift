@@ -25,6 +25,12 @@ product to be tested. A typical customization would be to select a custom versio
 of MicroShift, which may also include pre-released ones that are published at
 [OpenShift Mirror](mirror.openshift.com).
 
+> For a given MicroShift `4.y` version, it is always recommended to use the
+> production builds of MicroShift RPMs as soon as they are available at the
+> `rhocp-4.y-for-rhel-9-$(uname -m)-rpms` repository.
+> Otherwise, use pre-released engineering or release candidate packages from
+> [OpenShift Mirror](mirror.openshift.com).
+
 **Example: MicroShift 4.17 Engineering Candidate Packages (fragment)**
 
 ```docker
