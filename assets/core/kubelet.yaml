@@ -1,37 +1,32 @@
 kind: KubeletConfiguration
 apiVersion: kubelet.config.k8s.io/v1beta1
 authentication:
+  x509:
+    clientCAFile: /etc/kubernetes/kubelet-ca.crt
   anonymous:
     enabled: false
-  x509:
-    clientCAFile: "{{ .clientCAFile }}"
 cgroupDriver: systemd
-cgroupsPerQOS: true
+cgroupRoot: /
 clusterDNS:
-  - "{{ .clusterDNSIP }}"
+  - {{.ClusterDNSIP}}
 clusterDomain: cluster.local
 containerLogMaxSize: 50Mi
-containerRuntimeEndpoint: unix:///var/run/crio/crio.sock
-enforceNodeAllocatable: []
-failSwapOn: false
-featureGates:
-  APIPriorityAndFairness: true
-  DownwardAPIHugePages: true
-  PodSecurity: true
-  RotateKubeletServerCertificate: false # TODO
-kubeAPIBurst: 100
-kubeAPIQPS: 50
+enableSystemLogQuery: true
 maxPods: 250
-nodeStatusReportFrequency: 5m
-rotateCertificates: false # TODO
+kubeAPIQPS: 50
+kubeAPIBurst: 100
+podPidsLimit: 4096
+protectKernelDefaults: true
+rotateCertificates: true
 serializeImagePulls: false
-serverTLSBootstrap: false # TODO
-tlsCertFile: "{{ .tlsCertFile }}"
-tlsPrivateKeyFile: "{{ .tlsPrivateKeyFile }}"
-volumePluginDir: "{{ .volumePluginDir }}"
-{{- if .resolvConf }}
-resolvConf: "{{ .resolvConf }}"
-{{- end }}
-{{ if .userProvidedConfig }}
-{{- .userProvidedConfig -}}
-{{ end }}
+staticPodPath: /etc/kubernetes/manifests
+systemCgroups: /system.slice
+nodeStatusUpdateFrequency: 10s
+nodeStatusReportFrequency: 5m
+serverTLSBootstrap: true
+tlsMinVersion: {{.TLSMinVersion}}
+tlsCipherSuites:
+  {{- range .TLSCipherSuites }}
+    - {{ . }}
+  {{- end }}
+
