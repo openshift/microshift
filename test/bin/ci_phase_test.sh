@@ -88,7 +88,7 @@ cat "${BOOT_TEST_JOB_LOG}"
 
 echo "Boot and test phase complete"
 if ! "${TEST_OK}"; then
-    echo "Some tests failed"
+    echo "Some tests or VM boots failed"
     exit 1
 fi
 exit 0
