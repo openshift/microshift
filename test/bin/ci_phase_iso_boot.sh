@@ -5,7 +5,7 @@
 set -xeuo pipefail
 export PS4='+ $(date "+%T.%N") ${BASH_SOURCE#$HOME/}:$LINENO \011'
 
-echo "This script's functionality has been moved. The script will be removed once the neccessary changes are implemented in the release repository."
+echo "This script's functionality has been moved. The script will be removed once the necessary changes are implemented in the release repository."
 
 exit 0
 
