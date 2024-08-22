@@ -48,8 +48,8 @@ func get_microshift_version_json_num(version_level string) float64 {
 
 	var result map[string]interface{}
 	json.Unmarshal([]byte(json_byte), &result)
-    
-    fmt.Println(result)
+
+	fmt.Println(result)
 
 	number, err := strconv.ParseFloat(fmt.Sprint(result[version_level]), 64)
 	if err != nil {
