@@ -51,6 +51,7 @@ rules:
   - use
   resourceNames:
   - hostnetwork
+  - restricted
 
 - apiGroups:
   - discovery.k8s.io
