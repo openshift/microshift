@@ -75,6 +75,7 @@ To build MicroShift from source and contribute to its development, refer to the 
 - [Quay Mirror Registry Setup for Testing](./docs/contributor/howto_quay_mirror.md)
 - [Multinode Testing Environment for MicroShift](./docs/contributor/multinode/setup.md)
 - [Image Mode for MicroShift](./docs/contributor/image_mode.md)
+- [Layered Product Testing with MicroShift](./docs/contributor/layered_product_ci.md)
 
 ## Community
 Community documentation sources are managed at <https://github.com/redhat-et/microshift-documentation> and published on <https://microshift.io>.

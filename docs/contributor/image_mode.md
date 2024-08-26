@@ -33,7 +33,7 @@ permissions configured.
 
 Create the `Containerfile` file with the following contents.
 
-```
+```docker
 FROM registry.redhat.io/rhel9/rhel-bootc:9.4
 
 ARG USHIFT_VER=4.16
@@ -93,7 +93,7 @@ Note how secrets are used during the image build:
 image from the `registry.redhat.io` registry
 * The build `USER_PASSWD` argument is used to set a password for the `redhat` user
 
-```
+```bash
 PULL_SECRET=~/.pull-secret.json
 USER_PASSWD=<your_redhat_user_password>
 IMAGE_NAME=microshift-4.16-bootc
@@ -105,7 +105,7 @@ sudo podman build --authfile "${PULL_SECRET}" -t "${IMAGE_NAME}" \
 
 Verify that the local MicroShift 4.16 `bootc` image was created.
 
-```
+```bash
 $ sudo podman images "${IMAGE_NAME}"
 REPOSITORY                       TAG         IMAGE ID      CREATED        SIZE
 localhost/microshift-4.16-bootc  latest      193425283c00  2 minutes ago  2.31 GB
@@ -119,7 +119,7 @@ Run the following commands to log into a remote registry and publish the image.
 > another host, or when installing a new operating system with the `bootc`
 > image layer.
 
-```
+```bash
 REGISTRY_URL=quay.io
 REGISTRY_IMG=myorg/mypath/"${IMAGE_NAME}"
 
@@ -144,7 +144,7 @@ Run the following commands on the host to check the `openvswitch` module presenc
 and the version of `kernel-core` package used in the `bootc` image. Note that the
 kernel versions are different.
 
-```
+```bash
 $ find /lib/modules/$(uname -r) -name "openvswitch*"
 /lib/modules/6.9.9-200.fc40.x86_64/kernel/net/openvswitch
 /lib/modules/6.9.9-200.fc40.x86_64/kernel/net/openvswitch/openvswitch.ko.xz
@@ -170,7 +170,8 @@ MicroShift CSI driver to allocate storage.
 
 Run the following command to determine if the volume group exists and it has the
 necessary free space.
-```
+
+```bash
 $ sudo vgs
   VG   #PV #LV #SN Attr   VSize   VFree
   rhel   1   1   0 wz--n- <91.02g <2.02g
@@ -182,7 +183,7 @@ storage in `bootc` MicroShift containers.
 Run the following commands to create a file to be used for LVM partitioning and
 configure it as a loop device.
 
-```
+```bash
 VGFILE=/var/lib/microshift-lvm-storage.img
 VGSIZE=1G
 
@@ -193,7 +194,7 @@ sudo losetup -f "${VGFILE}"
 Query the loop device name and create a free volume group on the device according
 to the MicroShift CSI driver requirements described in [Storage Configuration](./storage/configuration.md).
 
-```
+```bash
 VGLOOP=$(losetup -j ${VGFILE} | cut -d: -f1)
 sudo vgcreate -f -y rhel "${VGLOOP}"
 ```
@@ -204,7 +205,7 @@ the next section.
 > The following commands can be run to detach the loop device and delete the LVM
 > volume group file.
 >
-> ```
+> ```bash
 > sudo losetup -d "${VGLOOP}"
 > sudo rm -f "${VGFILE}"
 > ```
@@ -219,7 +220,7 @@ The host shares the following configuration with the container:
 * A pull secret file for downloading the required OpenShift container images
 * Host container storage for reusing available container images
 
-```
+```bash
 PULL_SECRET=~/.pull-secret.json
 IMAGE_NAME=microshift-4.16-bootc
 
@@ -247,7 +248,7 @@ will be presented in the terminal. Log into the running container using the
 Run the following command to verify that all the MicroShift pods are up and running
 without errors.
 
-```
+```bash
 watch sudo oc get pods -A \
     --kubeconfig /var/lib/microshift/resources/kubeadmin/kubeconfig
 ```
@@ -268,7 +269,7 @@ pre-install stage to authenticate `quay.io/myorg` registry access
 * `PULL_SECRET` file contents are copied to `/etc/crio/openshift-pull-secret`
 at the post-install stage to authenticate OpenShift registry access
 
-```
+```bash
 AUTH_CONFIG=~/.quay-auth.json
 PULL_SECRET=~/.pull-secret.json
 ```
@@ -279,7 +280,7 @@ PULL_SECRET=~/.pull-secret.json
 Run the following commands to create the `kickstart.ks` file to be used during
 the virtual machine installation.
 
-```
+```bash
 cat > kickstart.ks <<EOFKS
 lang en_US.UTF-8
 keyboard us
@@ -346,7 +347,7 @@ RAM and 20GB of storage. The command uses the kickstart file prepared in the
 previous step to pull a `bootc` image from the remote registry and use it to install
 the RHEL operating system.
 
-```
+```bash
 VMNAME=microshift-4.16-bootc
 NETNAME=default
 
@@ -367,7 +368,7 @@ Log into the virtual machine using the `redhat:<password>` credentials.
 Run the following command to verify that all the MicroShift pods are up and running
 without errors.
 
-```
+```bash
 watch sudo oc get pods -A \
     --kubeconfig /var/lib/microshift/resources/kubeadmin/kubeconfig
 ```
