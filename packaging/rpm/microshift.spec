@@ -109,7 +109,7 @@ The microshift-selinux package provides the SELinux policy modules required by M
 Summary: Networking components for MicroShift
 Requires: microshift = %{version}
 Obsoletes: openvswitch3.1 < 3.3
-Requires: (openvswitch3.3 or openvswitch >= 3.3)
+Requires: (openvswitch3.4 or openvswitch >= 3.4)
 Requires: NetworkManager
 Requires: NetworkManager-ovs
 Requires: jq
@@ -519,6 +519,9 @@ fi
 # Use Git command to generate the log and replace the VERSION string
 # LANG=C git log --date="format:%a %b %d %Y" --pretty="tformat:* %cd %an <%ae> VERSION%n- %s%n" packaging/rpm/microshift.spec
 %changelog
+* Mon Aug 26 2024 Nadia Pinaeva <n.m.pinaeva@gmail.com> 4.17.0
+- Update openvswitch to 3.4
+
 * Mon Jul 29 2024 Patryk Matuszak <pmatusza@redhat.com> 4.17.0
 - Add microshift-tuned daemon for unattended TuneD profile activation
 
