@@ -22,9 +22,12 @@ COPY ./rpm-repos/$USHIFT_RPM_REPO_NAME $USHIFT_RPM_REPO_PATH
 # - MicroShift local RPM repository
 # - OpenShift previous minor version RHEL repositories for MicroShift dependencies
 # Install MicroShift, test agent, a few helper utilities and cleanup
+#
+# Allow erasing because update may require a new version of openvswitch and
+# major versions of openvswitch are separate packages that obsolete each other.
 RUN ${REPO_CONFIG_SCRIPT} -create ${USHIFT_RPM_REPO_PATH} && \
     awk 'FNR==1 {print "=== " FILENAME " ==="} {print}' /etc/yum.repos.d/*.repo && \
-    dnf install -y vi firewalld microshift microshift-test-agent && \
+    dnf install -y --allowerasing vi firewalld microshift microshift-test-agent && \
     systemctl enable microshift microshift-test-agent && \
     ${REPO_CONFIG_SCRIPT} -delete && \
     rm -f ${REPO_CONFIG_SCRIPT} && \
