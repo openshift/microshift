@@ -1,3 +1,0 @@
-- oc image-arm64 51ca91a2e3bc21e8d3c6b1850fd1088a1d002ecf to 30c77fb30bef0cf2c4b7ab37862ae060f6faf47d
-  - 95e0aa72 2024-08-20T13:28:44+00:00 Adding examples for add-cluster-role-to-* and remove-cluster-role-from-* so they show in the CLI docs
-
