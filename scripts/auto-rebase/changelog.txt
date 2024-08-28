@@ -1,0 +1,3 @@
+- kube-rbac-proxy image-arm64 8ea2c994df4296ec161023d8ff85f9ea0e383216 to b2d2c462e801d7b8890347c017184153c3c8eaab
+  - 054c74d 2024-05-24T19:40:10+00:00 Updating kube-rbac-proxy-container image to be consistent with ART for 4.17 Reconciling with https://github.com/openshift/ocp-build-data/tree/4c1326094222f9209876f06833179a1b9178faf7/images/kube-rbac-proxy.yml
+
