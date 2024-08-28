@@ -34,7 +34,7 @@ var (
 	apiExtensionsCodecs = serializer.NewCodecFactory(apiExtensionsScheme)
 	crds                = []string{
 		"crd/0000_03_config-operator_02_rangeallocations.crd.yaml",
-		"crd/0000_03_config-operator_01_securitycontextconstraints.crd.yaml",
+		"crd/0000_03_config-operator_01_securitycontextconstraints-Default.crd.yaml",
 		"crd/route.crd.yaml",
 		"crd/storage_version_migration.crd.yaml",
 		"components/lvms/topolvm.io_logicalvolumes.yaml",
