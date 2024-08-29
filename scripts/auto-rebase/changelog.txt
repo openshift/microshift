@@ -1,3 +1,137 @@
-- kube-rbac-proxy image-arm64 8ea2c994df4296ec161023d8ff85f9ea0e383216 to b2d2c462e801d7b8890347c017184153c3c8eaab
+- api embedded-component d6942fb7294e5dea4c617bfcb26e5936dc267481 to 0c4262af246e3d63c2406b07fbd3fe0faaaf6478
+  - 4cbd0bf 2024-08-26T11:16:05-04:00 add UserNamespacesSupport and ProcMountType to TechPreview feature gates
+  - 03e29a6 2024-08-16T18:31:56+00:00 use atomic listType for RouteIngress
+  - 6efb682 2024-08-16T18:31:56+00:00 fix ListsMustHaveSSATags failures
+  - 45c66d3 2024-08-16T18:31:56+00:00 OCPBUGS-36479: remove duplicate featuregate 'ExternalRouteCertificate'
+
+- cluster-ingress-operator embedded-component 6c5fbab5fa4fe90d3cfbdafe0b8f6ab9ea696e27 to 4be51efbed00cc3d9e6d0e5d74bb335df2b53051
+  - cacce48 2024-08-19T14:53:02+00:00 OCPBUGS-38217: Clear LB Status Parameters on LB Type Change
+
+- cluster-network-operator embedded-component 223976deb487ba97a19bbe1704411bbc8cbf8dee to 0be89dc583540bc8b31de46922d9c261137b68ac
+  - db44aad 2024-08-19T18:29:28+02:00 Run codegen
+  - 224012c 2024-08-19T18:29:14+02:00 Add a way to verify the codegen changes to the Makefile
+  - fc871ba 2024-08-19T18:28:45+02:00 Simplify hack/update-codegen.sh
+  - 992e494 2024-08-19T18:27:24+02:00 Add controller-gen as a dependency
+  - 358d280 2024-08-18T10:11:57+00:00 Add networking-console-plugin image to release payload
+
+- kubernetes embedded-component 6074c2109f1795beb5128593b06ebbbf753998a4 to 88e7cc859c37b4aa669e2879e32de895267db9d2
+  - e8194db3d 2024-08-12T15:20:50+00:00 UPSTREAM: 126470: Move APIServingWithRoutine to alpha and disabled by default.
+
+- machine-config-operator embedded-component 34406f7b9d5a7aa167234bcc9ebe1020702a356b to bd740d27b138ee6385950882c2e394381a398737
+  - ceee133f 2024-08-22T12:58:07+00:00 *: ensure listers created after callback
+  - 44abe8b4 2024-08-14T21:02:43+00:00 OCPNODE-1784: Enable CRI-O internal repair feature as the default
+  - 3a00ca5d 2024-08-13T11:50:19+00:00 OCPBUGS-37984: Give keepalived-monitor necessary capabilities
+
+- oc image-amd64 51ca91a2e3bc21e8d3c6b1850fd1088a1d002ecf to 30c77fb30bef0cf2c4b7ab37862ae060f6faf47d
+  - 95e0aa72 2024-08-20T13:28:44+00:00 Adding examples for add-cluster-role-to-* and remove-cluster-role-from-* so they show in the CLI docs
+
+- kube-rbac-proxy image-amd64 8ea2c994df4296ec161023d8ff85f9ea0e383216 to b2d2c462e801d7b8890347c017184153c3c8eaab
   - 054c74d 2024-05-24T19:40:10+00:00 Updating kube-rbac-proxy-container image to be consistent with ART for 4.17 Reconciling with https://github.com/openshift/ocp-build-data/tree/4c1326094222f9209876f06833179a1b9178faf7/images/kube-rbac-proxy.yml
+
+- ovn-kubernetes image-amd64 190304949659af8efca11d173682a373dac97792 to 8c1e32012d004e470ca7edec12887c84d11283b9
+  - 0da90dfe 2024-08-19T10:45:32+02:00 Fixes deleting CNI DEL with UDN
+  - c5285ab6 2024-08-14T23:10:19+02:00 Don't use zone0 for UDN Networks
+  - 0e05804c 2024-08-14T08:28:11+02:00 EndpointSlice mirror controller: handle tombstone deletion
+  - 9030c8ac 2024-08-13T16:41:23+02:00 UT egress firewall: stop node controller in AfterEach.
+  - 1186695a 2024-08-13T16:41:06+02:00 networkClusterController: Remove log in case of an error
+  - 12c52172 2024-08-13T16:41:06+02:00 Add missing return error in case of Pod delete
+  - ba071046 2024-08-13T16:41:06+02:00 Fix retry handling in case IP pool is empty
+  - 4bbc56f4 2024-08-13T10:13:35+02:00 UT flake: fix race condition for nad controller tests
+  - a01f5012 2024-08-12T09:30:09+02:00 EndpointSlice mirror controller: ensure enqueued objects are endpoint slices
+  - 52317f15 2024-08-09T16:05:19+05:30 Delete EgressIP LRP stale nexthops when node is not found
+  - 296c5f9f 2024-08-08T16:54:00+02:00 Use 169.254.0.0/17 as the default masquerade subnet
+  - 6dd66323 2024-08-08T09:51:59-04:00 Use more exact name match when deleting static routes to HO nodes.
+  - 44d236cf 2024-08-08T08:22:46-04:00 Missed updating go version in makefile to 1.22.0
+  - 90be9dbb 2024-08-08T13:24:15+02:00 udn, cni: Add unconfigure iface unit tests
+  - 5204b4e0 2024-08-08T13:09:17+02:00 cni: Extract interface configuration interface
+  - 2dc6a619 2024-08-08T11:52:35+02:00 default net bootstrap: ignore localnet patch ports
+  - 37882b37 2024-08-08T10:54:30+02:00 node: When bootstrapping OVS flows check for the default net patch port.
+  - ea0d3f98 2024-08-08T10:15:12+02:00 udn, cni: Unconfigure interface
+  - d3dafade 2024-08-07T14:46:21-04:00 VRF manager fixup and address comments
+  - ea7ae5d8 2024-08-07T14:46:21-04:00 GH actions: load VRF kernel module
+  - 3e9f84e3 2024-08-07T14:46:21-04:00 UDN: Add vrfmanager unit tests
+  - 570f2166 2024-08-07T14:46:21-04:00 UDN: Add vrfmanager
+  - bef4a75b 2024-08-07T16:53:10+03:00 e2e, networksegmentation: Add connectivity and isolation coverage
+  - 336fb445 2024-08-07T16:53:10+03:00 e2e, networksegmentation: Test UDN management using CRD
+  - 18804bdc 2024-08-07T16:53:10+03:00 userdefinednetwork: Block net-attach-def deletion when being used
+  - 39dca369 2024-08-07T16:53:10+03:00 userdefinednetwork: Implement finalizers
+  - d0d89b07 2024-08-07T16:53:10+03:00 userdefinednetwork: Validate no primary network exist
+  - 5deadf38 2024-08-07T16:53:10+03:00 userdefinednetwork, template: Impl net-attach-def template
+  - ed71b9d2 2024-08-07T16:53:10+03:00 util, cni: Extract validation logic from parsing NAD code
+  - 86003f51 2024-08-07T16:53:10+03:00 userdefinednetwork: Implement UserDefinedNetwork controller
+  - f591a44e 2024-08-07T16:53:10+03:00 clustermanager: UserDefinedNetwork controller scaffolds
+  - a4c6917a 2024-08-07T16:53:07+03:00 informers, factory: Setup UserDefinedNetwork informer
+  - 436937fe 2024-08-07T16:51:08+03:00 utils, clientsets: Add UserDefinedNetwork clientset
+  - cc619963 2024-08-07T16:51:08+03:00 kind: Install UserDefinedNetwork CRD
+  - 57c154f3 2024-08-07T16:51:08+03:00 crds: Introduce UserDefinedNetwork CRD
+  - 9352c84c 2024-08-07T13:24:38+02:00 WIP: proper cleanup for non-IC deployments
+  - 96c0b4cd 2024-08-07T13:24:37+02:00 udn, tests: add IC GW setup tests
+  - 0bfdec57 2024-08-07T13:23:49+02:00 udn, tests: rename getExpectedDataPodsAndSwitches helper
+  - 64edf3f3 2024-08-07T13:23:48+02:00 udn, layer3, tests: assert the OVN NB entities are set up as expected
+  - 332dff94 2024-08-07T13:22:58+02:00 udn, layer3, tests: assert the ovn-k annotations are correctly set
+  - 9b9b8a73 2024-08-06T21:55:08+02:00 udn, tests: allow default cluster annotation to not have the gateway
+  - 434b0590 2024-08-06T21:55:08+02:00 tests: allow ovn pkg unit tests to pre-provision NAD objects
+  - 1ff42ee1 2024-08-06T21:55:08+02:00 tests: allow multi-homing tests to define the subnet mask
+  - 0e2ff030 2024-08-06T21:55:08+02:00 udn, tests: allow addNetwork to be reused for primary UDNs
+  - e1a15057 2024-08-06T21:55:08+02:00 udn, layer3: cleanup GR when NADs or nodes are removed
+  - 3a32fe88 2024-08-06T21:55:08+02:00 Policy based routes: add unit tests
+  - 9cab80bc 2024-08-06T21:55:08+02:00 Policy based routes: include additional input validation
+  - 774d0781 2024-08-06T21:55:08+02:00 udn, egress: use correct ext switch localnet port network name
+  - c7f49348 2024-08-06T21:55:08+02:00 udn, egress: introduce gateway topology manager
+  - 2275260b 2024-08-06T18:29:09+02:00 udn, controlplane, layer3: build GW router config
+  - 2f98bdb3 2024-08-06T18:29:09+02:00 node: Add BridgeID to the L3GatewayConfig annotation.
+  - a028472f 2024-08-06T18:29:09+02:00 udn, netInfo: Add wrapper for getting the external and patch port names.
+  - 8a53a983 2024-08-06T18:29:09+02:00 udn, egress: sync gateway for layer3 primary UDNs
+  - fd43ed88 2024-08-06T18:29:09+02:00 udn, layer3: add COPP for secondary layer3 controllers
+  - 0aafa2bd 2024-08-06T18:29:09+02:00 udn, egress: generalize GW sync function
+  - 47cdbdbf 2024-08-06T18:29:09+02:00 udn, gateway router: generalize gw router cleanup
+  - 4b07516a 2024-08-06T18:29:09+02:00 udn, gateway router: generalize gw router creation
+  - 796e26b6 2024-08-06T18:29:09+02:00 udn, layer3: export policy based routing to a pkg
+  - 620b121e 2024-08-06T18:29:09+02:00 udn, ovn: Add join switch to L3 user defined primary nets.
+  - df2da156 2024-08-06T22:15:46+07:00 Link manager: fix panic when link is removed for a managed addr
+  - 2f0d03b8 2024-08-06T22:15:46+07:00 Route manager: remove managed routes for deleted links
+  - 86ab9264 2024-08-06T22:15:46+07:00 GH actions: load VRF kernel module
+  - fb0d5ca4 2024-08-06T22:15:46+07:00 Route manager: fix panic when managed route link is deleted
+  - 39c23467 2024-08-06T22:15:46+07:00 EIP hosted by secondary host inf: add vrf support
+  - 0b8b66a3 2024-08-06T08:46:37-04:00 fix: link to kind usage docs in contrib README.md
+  - 84629315 2024-08-05T10:11:37-04:00 Delete stale masquerade subnet resources if subnet gets changed at day 2
+  - 41e08279 2024-08-05T01:36:12+03:00 hack/lint.sh: Mount local golangci-lint cache
+  - 6e3bf49f 2024-08-04T17:41:25-04:00 Fixes HO test when HO node switched to OVN node
+  - 11f0b8c0 2024-08-01T17:20:27+00:00 build(deps): bump github.com/docker/docker in /test/e2e
+  - 206d90b8 2024-08-01T18:59:34+05:30 Add e2e test for DNSNameResolver
+  - b92049bb 2024-08-01T18:58:02+05:30 Add support for DNSNameResolver in KIND cluster
+
+- kubernetes image-amd64 6074c2109f1795beb5128593b06ebbbf753998a4 to 88e7cc859c37b4aa669e2879e32de895267db9d2
+  - e8194db3d 2024-08-12T15:20:50+00:00 UPSTREAM: 126470: Move APIServingWithRoutine to alpha and disabled by default.
+
+- ovn-kubernetes image-arm64 8c1e32012d004e470ca7edec12887c84d11283b9 to b024290bcd3798e68664d4b125574953079b7f41
+  - 9ecc3202 2024-08-20T13:43:26+02:00 UDN: Add routes manager
+  - 17ccab17 2024-08-19T13:07:34-07:00 enable interconnect in helm chart
+  - 9b4ae967 2024-08-19T16:16:44+02:00 E2E: Add EgressService with Network reply traffic tests
+  - 210a1808 2024-08-19T16:16:44+02:00 EgressService: Fix ETP=Local ingress reply for LGW
+  - 567f17a0 2024-08-19T14:23:48+02:00 Network Segmentation E2E: Use current pod state when checking readiness
+  - 82192051 2024-08-16T14:23:13-07:00 avoid calling oc.deleteStaleNodeChassis for every node update event
+  - a1e88dcd 2024-08-16T15:59:13-04:00 Fixes deleting CNI DEL with UDN
+  - 2bd058cd 2024-08-16T14:55:00+02:00 dist/images: Use OVS main branch.
+  - 71f97fbb 2024-08-16T07:34:40+02:00 Skip egress test on LGW
+  - 1770664e 2024-08-16T07:34:40+02:00 Add fixme comments for L2 support
+  - 28ff968b 2024-08-16T07:34:40+02:00 udn, layer3: only run openflowmgmr for layer UDNs
+  - baccd04b 2024-08-16T07:34:40+02:00 Skip L2 pod2egress e2e test
+  - 59a50795 2024-08-16T07:34:38+02:00 udn, egress, e2e: assert a pod can reach an entity outside the cluster
+  - fcc835c2 2024-08-15T22:28:03+02:00 unit-test: add L2 tests for UDN openflows
+  - c0f59dcb 2024-08-15T22:28:03+02:00 unit-test: delete UDN openflows for L3 network
+  - 1c903a27 2024-08-15T22:27:15+02:00 unit-test: add UDN openflows L3 UT
+  - c92ae2cd 2024-08-15T21:27:15+02:00 UDN UT: use correct network name value for ext switch port
+  - e42eb35f 2024-08-15T21:27:15+02:00 Add mark based UDN flows on br-ex
+  - bfb1ad56 2024-08-15T21:27:15+02:00 Fix existing flows on br-ex to be network aware
+  - 5dd20f18 2024-08-15T21:27:10+02:00 Invoke Gateway in UserDefinedNetworkGateway
+  - e1673381 2024-08-15T21:23:46+02:00 startup-waiter: Make waiter timeout configurable.
+  - bbd3711f 2024-08-15T19:33:56+02:00 Export gateway as public interface in DNNC
+  - 52ee8d11 2024-08-15T19:33:52+02:00 Add add/del Network utils to openflowmanager
+  - cf4e8694 2024-08-15T19:33:46+02:00 Add bridgeUDNConfiguration for UDN
+  - eed9710e 2024-08-15T19:33:41+02:00 Add masqCTMark to UDNGateway
+  - a9aa95e6 2024-08-14T12:56:03-04:00 Consistently reorder test/e2e imports
+  - a3c5087b 2024-08-14T12:45:50-04:00 Dead code, gofmt, typos, and other trivial fixes
+  - a7817a1e 2024-08-09T13:35:01+01:00 EIP e2e: skip e2e if VRF kernel module isn't loaded on target node
+  - da326fa7 2024-08-08T12:59:12-04:00 E2E testing for UDN with overlapping IPs
 
