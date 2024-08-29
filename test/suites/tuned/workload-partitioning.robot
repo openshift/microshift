@@ -161,7 +161,7 @@ Get Json From Crio Output
     END
 
     ${stdout}    ${stderr}    ${rc}=    Execute Command
-    ...    crictl ps -q | xargs sudo crictl inspect | jq -rs '[.[] | select(.info.runtimeSpec.annotations["target.workload.openshift.io/management"] ${NOT_WORKLOADS})]'
+    ...    crictl ps -q | xargs sudo crictl inspect | jq -rs '[.[][] | select(.info.runtimeSpec.annotations["target.workload.openshift.io/management"] ${NOT_WORKLOADS})]'
     ...    sudo=True
     ...    return_stdout=True
     ...    return_stderr=True
@@ -175,7 +175,7 @@ Crio Save Pod Manifest
     ${path}=    Create Random Temp File
     Set Global Variable    ${DEBUG_OUTPUT_FILE}    ${path}
     ${stdout}    ${stderr}    ${rc}=    Execute Command
-    ...    crictl ps -q | xargs sudo crictl inspect | jq -rs '[.[] | select(.status.id=="${pod_id}")]' >${DEBUG_OUTPUT_FILE} 2>&1
+    ...    crictl ps -q | xargs sudo crictl inspect | jq -rs '[.[][] | select(.status.id=="${pod_id}")]' >${DEBUG_OUTPUT_FILE} 2>&1
     ...    sudo=True
     ...    return_stdout=True
     ...    return_stderr=True
