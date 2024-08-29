@@ -115,3 +115,5 @@
 "[sig-network-edge][Feature:Idling] Unidling with Deployments [apigroup:route.openshift.io] should handle many UDP senders (by continuing to drop all packets on the floor) [Serial] [Suite:openshift/conformance/serial]"
 "[sig-network-edge][Feature:Idling] Unidling with Deployments [apigroup:route.openshift.io] should work with TCP (when fully idled) [Suite:openshift/conformance/parallel]"
 "[sig-network-edge][Feature:Idling] Unidling with Deployments [apigroup:route.openshift.io] should work with UDP [Suite:openshift/conformance/parallel]"
+"[sig-ci] [Early] prow job name should match security mode [Suite:openshift/conformance/parallel]"
+"[sig-ci] [Early] prow job name should match platform type [Suite:openshift/conformance/parallel]"
