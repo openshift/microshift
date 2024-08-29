@@ -1,0 +1,10 @@
+- ovn-kubernetes image-arm64 b0250b9f40c38f707f56ab64d73acd490cb946c1 to 9fa9e577c7ba8a88e5c5856996aff0d794b4167d
+  - 9a445ef2 2024-08-22T11:19:12+01:00 default net bootstrap: ignore localnet patch ports
+  - f1751098 2024-08-22T11:19:12+01:00 node: When bootstrapping OVS flows check for the default net patch port.
+  - 93ab06a7 2024-08-22T11:19:06+01:00 EIP hosted by secondary host inf: add vrf support
+  - 0321dbe7 2024-08-20T10:32:49+01:00 Link manager: fix panic when link is removed for a managed addr
+  - 868f93c6 2024-08-20T10:32:49+01:00 Route manager: remove managed routes for deleted links
+  - 7c9db224 2024-08-20T10:32:49+01:00 GH actions: load VRF kernel module
+  - 69a4a349 2024-08-20T10:32:49+01:00 Route manager: fix panic when managed route link is deleted
+  - ea894a21 2024-08-06T18:10:02+00:00 Fix per-pod MCS/metadata blocking
+
