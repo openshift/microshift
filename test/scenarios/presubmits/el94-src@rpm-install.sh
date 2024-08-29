@@ -13,6 +13,28 @@ export SKIP_GREENBOOT=true
 # did not want to spend the resources on a new VM.
 export TEST_RANDOMIZATION=none
 
+configure_microshift_mirror() {
+    local -r repo=$1
+
+    # `repo` might be empty if we install microshift from rhocp
+    if [[ -z "${repo}" ]] ; then
+        return
+    fi
+
+    local -r tmp_file=$(mktemp)
+    tee "${tmp_file}" >/dev/null <<EOF
+[microshift-mirror-rpms]
+name=MicroShift Mirror
+baseurl=${repo}
+enabled=1
+gpgcheck=0
+skip_if_unavailable=0
+EOF
+    copy_file_to_vm host1 "${tmp_file}" "${tmp_file}"
+    run_command_on_vm host1 "sudo cp ${tmp_file} /etc/yum.repos.d/microshift-mirror-rpms.repo"
+    rm -f "${tmp_file}"
+}
+
 configure_rhocp_repo() {
     local -r rhocp=$1
     local -r version=$2
@@ -72,9 +94,11 @@ scenario_run_tests() {
     # Note that rhocp or beta dependencies repository may not yet exist
     # for the current version. Then, just use whatever we can get for
     # the previous minor version.
-    configure_rhocp_repo "${RHOCP_MINOR_Y}"      "${MINOR_VERSION}"
-    configure_rhocp_repo "${RHOCP_MINOR_Y_BETA}" "${MINOR_VERSION}"
-    configure_rhocp_repo "${RHOCP_MINOR_Y1}"     "${PREVIOUS_MINOR_VERSION}"
+    configure_rhocp_repo "${RHOCP_MINOR_Y}"       "${MINOR_VERSION}"
+    configure_rhocp_repo "${RHOCP_MINOR_Y_BETA}"  "${MINOR_VERSION}"
+    configure_rhocp_repo "${RHOCP_MINOR_Y1}"      "${PREVIOUS_MINOR_VERSION}"
+    configure_rhocp_repo "${RHOCP_MINOR_Y1_BETA}" "${PREVIOUS_MINOR_VERSION}"
+    configure_microshift_mirror "${PREVIOUS_RELEASE_REPO}"
     run_command_on_vm host1 "sudo subscription-manager repos --enable fast-datapath-for-rhel-9-\$(uname -m)-rpms"
 
     run_tests host1 \
