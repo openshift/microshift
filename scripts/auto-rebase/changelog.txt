@@ -1,0 +1,21 @@
+- cluster-openshift-controller-manager-operator embedded-component 45d342cb8ecde4e2fe51ceb613827fb3d219b8a0 to 68e8bcd5c5df5072d5eefb8abd9c9ecab289adf4
+  - 8da3348 2024-06-21T13:35:34+00:00 delay deleting recently created image pull secrets
+  - f0de8e4 2024-06-20T13:15:55+00:00 fix nil pointer reference
+
+- kubernetes embedded-component bc3c7c5f9861b366d20e45bf5b696ed56d8e4964 to 0c3c368d6d63b52628ee7be8527d441923e8e3b0
+  - 0d03e8126 2024-08-22T12:27:11-04:00 UPSTREAM: 115702: fix viewing logs on kubelet log rotate
+
+- ovn-kubernetes image-amd64 4b32e36356fcd35317f71b69bc20a27ddcd77fc1 to ea49a22f8998b39bfa54b7b9c14e0cfa90ff3e3c
+  - 50cbebe 2024-08-09T18:04:52+02:00 Use Transaction timeout for MonitorAll call. It allows to change this value via config.
+  - de57139 2024-08-09T18:04:41+02:00 Make OVSDBTimeout for transactions a part of config.Global instead of const. A reasonable value for this timeout depends on the size of the cluster and making it configurable may help solve crashloop problems. It also speeds up testing as timeout may be set to lower value for unit tests. Set default value to 100 second, to allow larger transactions, e.g. 50 address set batch updated on address set sync with dbIDs.
+
+- kubernetes image-amd64 bc3c7c5f9861b366d20e45bf5b696ed56d8e4964 to 0c3c368d6d63b52628ee7be8527d441923e8e3b0
+  - 0d03e8126 2024-08-22T12:27:11-04:00 UPSTREAM: 115702: fix viewing logs on kubelet log rotate
+
+- ovn-kubernetes image-arm64 4b32e36356fcd35317f71b69bc20a27ddcd77fc1 to ea49a22f8998b39bfa54b7b9c14e0cfa90ff3e3c
+  - 50cbebe 2024-08-09T18:04:52+02:00 Use Transaction timeout for MonitorAll call. It allows to change this value via config.
+  - de57139 2024-08-09T18:04:41+02:00 Make OVSDBTimeout for transactions a part of config.Global instead of const. A reasonable value for this timeout depends on the size of the cluster and making it configurable may help solve crashloop problems. It also speeds up testing as timeout may be set to lower value for unit tests. Set default value to 100 second, to allow larger transactions, e.g. 50 address set batch updated on address set sync with dbIDs.
+
+- kubernetes image-arm64 bc3c7c5f9861b366d20e45bf5b696ed56d8e4964 to 0c3c368d6d63b52628ee7be8527d441923e8e3b0
+  - 0d03e8126 2024-08-22T12:27:11-04:00 UPSTREAM: 115702: fix viewing logs on kubelet log rotate
+
