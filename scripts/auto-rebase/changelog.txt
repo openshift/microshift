@@ -1,4 +1,7 @@
-- ovn-kubernetes image-arm64 b0250b9f40c38f707f56ab64d73acd490cb946c1 to 9fa9e577c7ba8a88e5c5856996aff0d794b4167d
+- openshift-controller-manager embedded-component f0536caff57932e0b5fb88987477f4978463574a to 0d4f33493548b80c314f09895070ca4d1013a3fd
+  - facef38 2024-07-24T16:05:20+00:00 do not re-create a deleted service account
+
+- ovn-kubernetes image-amd64 b0250b9f40c38f707f56ab64d73acd490cb946c1 to 9fa9e577c7ba8a88e5c5856996aff0d794b4167d
   - 9a445ef2 2024-08-22T11:19:12+01:00 default net bootstrap: ignore localnet patch ports
   - f1751098 2024-08-22T11:19:12+01:00 node: When bootstrapping OVS flows check for the default net patch port.
   - 93ab06a7 2024-08-22T11:19:06+01:00 EIP hosted by secondary host inf: add vrf support
