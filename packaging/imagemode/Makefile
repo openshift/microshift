@@ -9,6 +9,7 @@ BASE_IMAGE_TAG ?= 9.4
 #
 # Define the main targets
 #
+.PHONY: all
 all:
 	@echo "make [rhocp | repourl | <build_ver> | run | clean]"
 	@echo "   rhocp:       build a MicroShift bootc image using 'rhocp' repository packages"
@@ -25,6 +26,7 @@ all:
 	@echo "Available build versions:"
 	@$(MAKE) -qp | awk -F':' '/^4.[^\t]*:([^=]|$$)/ {print "   " $$1}' | sort -u
 
+.PHONY: rhocp
 rhocp:
 ifndef USHIFT_VER
 	$(error Run 'make rhocp USHIFT_VER=value')
@@ -44,6 +46,7 @@ endif
 		-t "$${IMAGE_NAME}" \
 		-f Containerfile.rhocp
 
+.PHONY: repourl
 repourl:
 ifndef USHIFT_URL
 	$(error Run 'make repourl USHIFT_URL=value OCPDEP_URL=value')
@@ -69,6 +72,7 @@ endif
 		-t "$${IMAGE_NAME}" \
 		-f Containerfile.repourl
 
+.PHONY: run
 run:
 ifndef IMAGE_VER
 	$(error Run 'make run IMAGE_VER=value')
@@ -83,10 +87,12 @@ endif
 	    "$${IMAGE_NAME}") ; \
 	echo "sudo podman exec -it $${CONT_ID} bash"
 
+.PHONY: stop
 stop:
 	CONT_IDS=$$(sudo podman ps --format "{{.Names}}" | grep '^microshift-' || true) ; \
 	if [ -n "$${CONT_IDS}" ] ; then sudo podman stop $${CONT_IDS} ; fi
 
+.PHONY: clean
 clean:
 	sudo podman rmi -af
 
