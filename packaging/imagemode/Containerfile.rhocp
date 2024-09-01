@@ -4,9 +4,9 @@ FROM ${BASE_IMAGE_URL}:${BASE_IMAGE_TAG}
 
 ARG USHIFT_VER
 RUN dnf config-manager \
-        --set-enabled rhocp-${USHIFT_VER}-for-rhel-9-$(uname -m)-rpms \
-        --set-enabled fast-datapath-for-rhel-9-$(uname -m)-rpms
-RUN dnf upgrade -y && \
+        --set-enabled "rhocp-${USHIFT_VER}-for-rhel-9-$(uname -m)-rpms" \
+        --set-enabled "fast-datapath-for-rhel-9-$(uname -m)-rpms" && \
+    dnf upgrade -y && \
     dnf install -y firewalld microshift && \
     systemctl enable microshift && \
     dnf clean all
@@ -29,4 +29,6 @@ ExecStart=/usr/bin/mount --make-rshared /
 [Install]
 WantedBy=multi-user.target
 EOF
+
+# hadolint ignore=DL3059
 RUN systemctl enable microshift-make-rshared.service

@@ -16,6 +16,7 @@ gpgcheck=0
 enabled=1
 EOF
 
+# hadolint ignore=DL3059
 RUN cat > "/etc/yum.repos.d/${OCPDEP_REPO}.repo" <<EOF
 [${OCPDEP_REPO}]
 name=OpenShift ${USHIFT_VER} Dependencies
@@ -47,4 +48,6 @@ ExecStart=/usr/bin/mount --make-rshared /
 [Install]
 WantedBy=multi-user.target
 EOF
+
+# hadolint ignore=DL3059
 RUN systemctl enable microshift-make-rshared.service
