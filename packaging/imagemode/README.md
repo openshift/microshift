@@ -17,10 +17,10 @@ make [rhocp | repourl | repobase | <build_ver> | run | clean]
                 be provided as 'IMAGE_VER=value' in this case.
    <build_ver>: build a MicroShift bootc image of a specific version from the
                 available predefined configurations listed below
-   run:         run the local 'microshift-${IMAGE_VER}' bootc image version
+   run:         run the 'localhost/microshift-${IMAGE_VER}' bootc image version
                 specified as 'IMAGE_VER=value'
-   stop:        stop the local running 'microshift-*' containers
-   clean:       delete all local container images
+   stop:        stop all running 'microshift-*' containers
+   clean:       delete all 'localhost/microshift-*' container images
 
 Available build versions:
    4.16-el94
@@ -166,9 +166,9 @@ make rhocp USHIFT_VER=4.16 \
     BASE_IMAGE_TAG=latest
 ```
 
-### Clean Local Container Images
+### Clean Local MicroShift Container Images
 
-Run the following command to delete all the local container images.
+Run the following command to delete all the `localhost/microshift-*` container images.
 
 ```bash
 make clean
@@ -182,7 +182,7 @@ make clean
 Log into the `RHEL 9.4 host` using the user credentials that have SUDO permissions
 configured.
 
-The `run` target allows for running the specified local `microshift-*` container
+The `run` target allows for running the specified `localhost/microshift-*` container
 image. The target requires the `IMAGE_VER=value` argument which defines the version
 of the image to be started.
 
@@ -190,7 +190,7 @@ For example, run the following commands to see the available images and start
 one of them.
 
 ```bash
-$ sudo podman images --format "{{.Repository}}" | grep microshift-
+$ sudo podman images --format "{{.Repository}}" | grep ^localhost/microshift-
 localhost/microshift-4.17.0-rc.0
 localhost/microshift-4.16.8
 

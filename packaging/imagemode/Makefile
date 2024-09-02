@@ -22,10 +22,10 @@ all:
 	@echo "                be provided as 'IMAGE_VER=value' in this case."
 	@echo "   <build_ver>: build a MicroShift bootc image of a specific version from the"
 	@echo "                available predefined configurations listed below"
-	@echo "   run:         run the local 'microshift-\$${IMAGE_VER}' bootc image version"
+	@echo "   run:         run the 'localhost/microshift-\$${IMAGE_VER}' bootc image version"
 	@echo "                specified as 'IMAGE_VER=value'"
-	@echo "   stop:        stop the local running 'microshift-*' containers"
-	@echo "   clean:       delete all local container images"
+	@echo "   stop:        stop all running 'microshift-*' containers"
+	@echo "   clean:       delete all 'localhost/microshift-*' container images"
 	@echo ""
 	@echo "Available build versions:"
 	@$(MAKE) -qp | awk -F':' '/^4.[^\t]*:([^=]|$$)/ {print "   " $$1}' | sort -u
@@ -108,7 +108,7 @@ endif
 		-v /var/lib/containers/storage:/var/lib/containers/storage \
 		--replace \
 		--name "$${IMAGE_NAME}" \
-	    "$${IMAGE_NAME}") ; \
+	    "localhost/$${IMAGE_NAME}") ; \
 	echo "sudo podman exec -it $${CONT_ID} bash"
 
 .PHONY: stop
@@ -118,7 +118,8 @@ stop:
 
 .PHONY: clean
 clean:
-	sudo podman rmi -af
+	IMAGES=$$(sudo podman images --format "{{.Repository}}" | grep ^localhost/microshift- || true) ; \
+	if [ -n "$${IMAGES}" ] ; then sudo podman rmi -f $${IMAGES} ; fi
 
 #
 # Predefined container image builds
