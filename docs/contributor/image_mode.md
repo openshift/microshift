@@ -372,3 +372,82 @@ without errors.
 watch sudo oc get pods -A \
     --kubeconfig /var/lib/microshift/resources/kubeadmin/kubeconfig
 ```
+
+## Appendix A: Multi-Architecture Image Build
+
+It is often convenient to build multi-architecture container images and store
+them under the same registry URL using manifest lists.
+
+> See [podman-manifest](https://docs.podman.io/en/latest/markdown/podman-manifest.1.html) for more information.
+
+The [Build Image](#build-image) procedure needs to be adjusted in the following
+manner to create multi-architecture images.
+
+```bash
+PULL_SECRET=~/.pull-secret.json
+USER_PASSWD=<your_redhat_user_password>
+IMAGE_ARCH=amd64 # Use amd64 or arm64 depending on the current platform
+IMAGE_PLATFORM="linux/${IMAGE_ARCH}"
+IMAGE_NAME="microshift-4.16-bootc:linux-${IMAGE_ARCH}"
+
+sudo podman build --authfile "${PULL_SECRET}" -t "${IMAGE_NAME}" \
+    --platform "${IMAGE_PLATFORM}" \
+    --build-arg USER_PASSWD="${USER_PASSWD}" \
+    -f Containerfile
+```
+
+Verify that the local MicroShift 4.16 `bootc` image was created for the specified
+platform.
+
+```bash
+$ sudo podman images "${IMAGE_NAME}"
+REPOSITORY                       TAG          IMAGE ID      CREATED         SIZE
+localhost/microshift-4.16-bootc  linux-amd64  3f7e136fccb5  13 minutes ago  2.19 GB
+```
+
+Repeat the procedure on the other platform (i.e. `arm64`) and proceed by publishing
+the platform-specific `amd64` and `arm64` images to the remote registry as described
+in the [Publish Image](#publish-image) section.
+
+> Cross-platform `podman` builds are not in the scope of this document. Log into
+> the RHEL 9.4 host running on the appropriate architecture to perform the container
+> image builds and publish the platform-specific image to the remote registry.
+
+Finally, create a manifest containing the platform-specific image references
+and publish it to the remote registry.
+
+> Images for **both** `amd64` and `arm64` architectures should have been pushed
+> to the remote registry before creating the manifest.
+
+```bash
+REGISTRY_URL=quay.io
+REGISTRY_ORG=myorg/mypath
+BASE_NAME=microshift-4.16-bootc
+MANIFEST_NAME="${BASE_NAME}:latest"
+
+sudo podman manifest create -a "localhost/${MANIFEST_NAME}" \
+    "${REGISTRY_URL}/${REGISTRY_ORG}/${BASE_NAME}:linux-amd64" \
+    "${REGISTRY_URL}/${REGISTRY_ORG}/${BASE_NAME}:linux-arm64"
+
+sudo podman manifest push \
+    "localhost/${MANIFEST_NAME}" \
+    "${REGISTRY_URL}/${REGISTRY_ORG}/${MANIFEST_NAME}"
+```
+
+> Replace `myorg/mypath` with your remote registry organization name and path.
+
+Inspect the remote manifest to make sure it contains image digests from multiple
+architectures.
+
+```bash
+$ sudo podman manifest inspect \
+    "${REGISTRY_URL}/${REGISTRY_ORG}/${MANIFEST_NAME}" | \
+    jq .manifests[].platform.architecture
+"amd64"
+"arm64"
+```
+
+It is now possible to access images using the manifest name with the `latest` tag
+(e.g. `quay.io/myorg/mypath/microshift-4.16-bootc:latest`). The image for the
+current platform will automatically be pulled from the registry if it is part of
+the manifest list.
