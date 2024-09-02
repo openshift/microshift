@@ -119,10 +119,10 @@ Setup Test
     [Documentation]    Test suite setup
     ${tmp}=    Create Random Temp Directory
     Set Global Variable    ${TMPDIR}    ${tmp}
-    Save Default MicroShift Config
 
 Teardown
     [Documentation]    Test suite teardown
+    Remove Drop In MicroShift Config    10-subjectAltNames
     Remove Kubeconfig
     Logout MicroShift Host
 
@@ -183,7 +183,7 @@ Configure Named Certificates
         ...    \ \ \ \ names:
         ...    \ \ \ \ - ${sni}
     END
-    Upload MicroShift Config    ${subject_alt_names}
+    Drop In MicroShift Config    ${subject_alt_names}    10-subjectAltNames
 
 Generate Random HostName
     [Documentation]    Generate Random Hostname

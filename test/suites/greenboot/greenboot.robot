@@ -57,7 +57,8 @@ Simulate Pod Failure
     ...    Restart Greenboot And Wait For Success
 
     [Teardown]    Run Keywords
-    ...    Restore Default MicroShift Config
+    ...    Remove Drop In MicroShift Config    10-svcNetwork
+    ...    AND
     ...    Cleanup And Start
 
 
@@ -122,7 +123,6 @@ Restore Service
 
 Disrupt Pod Network
     [Documentation]    Prevent Microshift pods From starting correctly
-    Save Default MicroShift Config
     ${configuration}=    Catenate    SEPARATOR=\n
     ...    network:
     ...    \ clusterNetwork:
@@ -130,8 +130,7 @@ Disrupt Pod Network
     ...    \ serviceNetwork:
     ...    \ - 10.66.0.0/16
     ...
-    ${newconfig}=    Extend MicroShift Config    ${configuration}
-    Upload MicroShift Config    ${newconfig}
+    Drop In MicroShift Config    ${configuration}    10-svcNetwork
 
 Cleanup And Start
     [Documentation]    Wipe Microshift data and start it.

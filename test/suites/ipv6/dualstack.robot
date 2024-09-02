@@ -24,7 +24,6 @@ ${HOSTNAME}             hello-microshift.dualstack.cluster.local
 Verify New Pod Works With IPv6
     [Documentation]    Verify IPv6 services are routable.
     [Setup]    Run Keywords
-    ...    Save Default MicroShift Config
     ...    Migrate To Dual Stack
     ...    Create Hello MicroShift Pod
     ...    Expose Hello MicroShift Service Via Route IPv6
@@ -50,13 +49,12 @@ Verify New Pod Works With IPv6
     ...    Delete Hello MicroShift Route
     ...    Delete Hello MicroShift Pod And Service
     ...    Wait For Service Deletion With Timeout
-    ...    Restore Default MicroShift Config
+    ...    Remove Dual Stack Config Drop In
     ...    Restart MicroShift
 
 Verify New Pod Works With IPv4
     [Documentation]    Verify IPv4 services are routable.
     [Setup]    Run Keywords
-    ...    Save Default MicroShift Config
     ...    Migrate To Dual Stack
     ...    Create Hello MicroShift Pod
     ...    Expose Hello MicroShift Service Via Route IPv4
@@ -82,13 +80,12 @@ Verify New Pod Works With IPv4
     ...    Delete Hello MicroShift Route
     ...    Delete Hello MicroShift Pod And Service
     ...    Wait For Service Deletion With Timeout
-    ...    Restore Default MicroShift Config
+    ...    Remove Dual Stack Config Drop In
     ...    Restart MicroShift
 
 Verify Host Network Pods Get Dual Stack IP Addresses
     [Documentation]    Verify host network pods get dual stack IP addresses
     [Setup]    Run Keywords
-    ...    Save Default MicroShift Config
     ...    Migrate To Dual Stack
 
     ${pod_ips}=    Oc Get JsonPath
@@ -100,7 +97,7 @@ Verify Host Network Pods Get Dual Stack IP Addresses
     Should Contain    ${pod_ips}    ${USHIFT_HOST_IP2}
 
     [Teardown]    Run Keywords
-    ...    Restore Default MicroShift Config
+    ...    Remove Dual Stack Config Drop In
     ...    Restart MicroShift
 
 
@@ -117,6 +114,10 @@ Teardown
     Teardown Suite With Namespace
     Logout MicroShift Host
 
+Remove Dual Stack Config Drop In
+    [Documentation]    Remove dual stack config drop-in
+    Remove Drop In MicroShift Config    10-dualstack
+
 Initialize Global Variables
     [Documentation]    Initializes global variables.
     Log    IP1: ${USHIFT_HOST_IP1} IPv6: ${USHIFT_HOST_IP2}
@@ -131,8 +132,7 @@ Migrate To Dual Stack
     ...    network:
     ...    \ \ clusterNetwork: [10.42.0.0/16, fd01::/48]
     ...    \ \ serviceNetwork: [10.43.0.0/16, fd02::/112]
-    ${replaced}=    Replace MicroShift Config    ${dual_stack}
-    Upload MicroShift Config    ${replaced}
+    Drop In MicroShift Config    ${dual_stack}    10-dualstack
     Restart MicroShift
 
 Delete Hello MicroShift Route

@@ -81,7 +81,7 @@ Deploy MicroShift With LVMS By Default
     LVMS Is Deployed
     CSI Snapshot Controller And Webhook Are Deployed
     [Teardown]    Run Keywords
-    ...    Restore Default MicroShift Config
+    ...    Remove Storage Drop In Config
     ...    Restart MicroShift
 
 Deploy MicroShift Without LVMS
@@ -93,7 +93,7 @@ Deploy MicroShift Without LVMS
     Run Keyword And Expect Error    1 != 0
     ...    LVMS Is Deployed
     [Teardown]    Run Keywords
-    ...    Restore Default MicroShift Config
+    ...    Remove Storage Drop In Config
     ...    Restart MicroShift
 
 Deploy MicroShift Without CSI Snapshotter
@@ -105,7 +105,7 @@ Deploy MicroShift Without CSI Snapshotter
     ...    CSI Snapshot Controller And Webhook Are Deployed
 
     [Teardown]    Run Keywords
-    ...    Restore Default MicroShift Config
+    ...    Remove Storage Drop In Config
     ...    Restart MicroShift
 
 
@@ -115,12 +115,12 @@ Setup
     Check Required Env Variables
     Login MicroShift Host
     Setup Kubeconfig    # for readiness checks
-    Save Default MicroShift Config
     Save Journal Cursor
 
 Teardown
     [Documentation]    Test suite teardown
-    Restore Default MicroShift Config
+    Remove Drop In MicroShift Config    10-loglevel
+    Remove Drop In MicroShift Config    10-audit
     Restart MicroShift
     Logout MicroShift Host
     Remove Kubeconfig
@@ -134,26 +134,22 @@ Save Journal Cursor
 
 Setup With Bad Log Level
     [Documentation]    Set log level to an unknown value and restart
-    ${merged}=    Extend MicroShift Config    ${BAD_LOG_LEVEL}
-    Upload MicroShift Config    ${merged}
+    Drop In MicroShift Config    ${BAD_LOG_LEVEL}    10-loglevel
     Restart MicroShift
 
 Setup With Debug Log Level
     [Documentation]    Set log level to debug and restart
-    ${merged}=    Extend MicroShift Config    ${BAD_LOG_LEVEL}
-    Upload MicroShift Config    ${merged}
+    Drop In MicroShift Config    ${DEBUG_LOG_LEVEL}    10-loglevel
     Restart MicroShift
 
 Setup Known Audit Log Profile
     [Documentation]    Setup audit
-    ${merged}=    Extend MicroShift Config    ${AUDIT_PROFILE}
-    Upload MicroShift Config    ${merged}
+    Drop In MicroShift Config    ${AUDIT_PROFILE}    10-audit
     Restart MicroShift
 
 Setup Audit Flags
     [Documentation]    Apply the audit config values set in ${AUDIT_FLAGS}
-    ${merged}=    Extend MicroShift Config    ${AUDIT_FLAGS}
-    Upload MicroShift Config    ${merged}
+    Drop In MicroShift Config    ${AUDIT_FLAGS}    10-audit
     Restart MicroShift
 
 Deploy Storage Config
@@ -161,9 +157,12 @@ Deploy Storage Config
     ...    and restarts microshift.service
     [Arguments]    ${config}
     Cleanup MicroShift    opt='--keep-images'
-    ${merged}=    Extend MicroShift Config    ${config}
-    Upload MicroShift Config    ${merged}
+    Drop In MicroShift Config    ${config}    10-storage
     Start MicroShift
+
+Remove Storage Drop In Config
+    [Documentation]    Remove the previously created drop-in config for storage
+    Remove Drop In MicroShift Config    10-storage
 
 LVMS Is Deployed
     [Documentation]    Wait for LVMS components to deploy

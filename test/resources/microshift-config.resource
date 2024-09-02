@@ -67,6 +67,18 @@ Upload MicroShift Config
     [Arguments]    ${config_content}
     Upload String To File    ${config_content}    /etc/microshift/config.yaml
 
+Drop In MicroShift Config
+    [Documentation]    Upload a drop-in configuration file to the MicroShift host
+    [Arguments]    ${config_content}    ${name}
+    Upload String To File    ${config_content}    /etc/microshift/config.d/${name}.yaml
+
+Remove Drop In MicroShift Config
+    [Documentation]    Remove a drop-in configuration file from MicroShift host
+    [Arguments]    ${name}
+    ${stdout}    ${rc}=    Execute Command
+    ...    rm -f /etc/microshift/config.d/${name}.yaml
+    ...    sudo=True    return_rc=True
+
 Save Lvmd Config
     [Documentation]    If an lvmd.yaml file already exists, preserver it
     ${stdout}    ${rc}=    Execute Command
