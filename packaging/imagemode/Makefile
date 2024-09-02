@@ -11,11 +11,15 @@ BASE_IMAGE_TAG ?= 9.4
 #
 .PHONY: all
 all:
-	@echo "make [rhocp | repourl | <build_ver> | run | clean]"
+	@echo "make [rhocp | repourl | repobase | <build_ver> | run | clean]"
 	@echo "   rhocp:       build a MicroShift bootc image using 'rhocp' repository packages"
 	@echo "                with versions specified as 'USHIFT_VER=value'"
 	@echo "   repourl:     build a MicroShift bootc image using custom repository URLs"
 	@echo "                specified as 'USHIFT_URL=value' and 'OCPDEP_URL=value'"
+	@echo "   repobase:    build a MicroShift bootc image using preconfigured repositories"
+	@echo "                from the base image specified as 'BASE_IMAGE_URL=value' and"
+	@echo "                'BASE_IMAGE_TAG=value'. The produced image version should also"
+	@echo "                be provided as 'IMAGE_VER=value' in this case."
 	@echo "   <build_ver>: build a MicroShift bootc image of a specific version from the"
 	@echo "                available predefined configurations listed below"
 	@echo "   run:         run the local 'microshift-\$${IMAGE_VER}' bootc image version"
@@ -71,6 +75,26 @@ endif
 		--build-arg OCPDEP_URL=$${OCPDEP_URL} \
 		-t "$${IMAGE_NAME}" \
 		-f Containerfile.repourl
+
+.PHONY: repobase
+repobase:
+ifndef BASE_IMAGE_URL
+	$(error Run 'make repobase BASE_IMAGE_URL=value BASE_IMAGE_TAG=value IMAGE_VER=value')
+endif
+ifndef BASE_IMAGE_TAG
+	$(error Run 'make repobase BASE_IMAGE_URL=value BASE_IMAGE_TAG=value IMAGE_VER=value')
+endif
+ifndef IMAGE_VER
+	$(error Run 'make repobase BASE_IMAGE_URL=value BASE_IMAGE_TAG=value IMAGE_VER=value')
+endif
+	IMAGE_NAME="microshift-$${IMAGE_VER}" ; \
+	sudo podman build \
+		--no-cache \
+		--authfile "${PULL_SECRET}" \
+		--build-arg BASE_IMAGE_URL=${BASE_IMAGE_URL} \
+		--build-arg BASE_IMAGE_TAG=${BASE_IMAGE_TAG} \
+		-t "$${IMAGE_NAME}" \
+		-f Containerfile.repobase
 
 .PHONY: run
 run:

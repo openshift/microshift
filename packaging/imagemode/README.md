@@ -6,11 +6,15 @@ directory using `make` rules. Run the following command to see the available opt
 ```bash
 $ cd packaging/imagemode
 $ make
-make [rhocp | repourl | <build_ver> | run | clean]
+make [rhocp | repourl | repobase | <build_ver> | run | clean]
    rhocp:       build a MicroShift bootc image using 'rhocp' repository packages
                 with versions specified as 'USHIFT_VER=value'
    repourl:     build a MicroShift bootc image using custom repository URLs
                 specified as 'USHIFT_URL=value' and 'OCPDEP_URL=value'
+   repobase:    build a MicroShift bootc image using preconfigured repositories
+                from the base image specified as 'BASE_IMAGE_URL=value' and
+                'BASE_IMAGE_TAG=value'. The produced image version should also
+                be provided as 'IMAGE_VER=value' in this case.
    <build_ver>: build a MicroShift bootc image of a specific version from the
                 available predefined configurations listed below
    run:         run the local 'microshift-${IMAGE_VER}' bootc image version
@@ -29,7 +33,8 @@ Available build versions:
 Log into the `RHEL 9.4 host` using the user credentials that have SUDO permissions
 configured.
 
-The `rhocp` and `repourl` targets can be used for building `bootc` container images.
+The `rhocp`, `repourl` and `repobase` targets can be used for building `bootc`
+container images.
 
 ### Build from `rhocp` Repository
 
@@ -54,7 +59,7 @@ $ sudo podman images --format "{{.Repository}}" | grep ^localhost/microshift-4.1
 localhost/microshift-4.16.8
 ```
 
-### Build from Custom Repository
+### Build from Custom URL Repository
 
 The `repourl` target allows for building `bootc` container images that include
 MicroShift packages from custom repositories defined by URLs specified in the
@@ -80,6 +85,43 @@ available MicroShift package version in the repository.
 ```bash
 $ sudo podman images --format "{{.Repository}}" | grep ^localhost/microshift-4.17
 localhost/microshift-4.17.0-rc.0
+```
+
+### Build from Custom Base Image Repository
+
+The `repobase` target allows for building `bootc` container images that include
+MicroShift packages from custom repositories defined in the base image specified
+in the command line.
+
+The target requires the `BASE_IMAGE_URL=value`, `BASE_IMAGE_TAG=value` and `IMAGE_VER=value`
+arguments, which define the base image URL, tag and the version of the produced
+local MicroShift `bootc` container image (i.e. `microshift-${IMAGE_VER}`). All
+the required RPM repository configuration is assumed to be part of the base image.
+
+For example, run the following command to build an image using the local MicroShift
+4.16 image with `rhocp` repositories built in the previous step.
+
+> This example is superficial for the sake of simplicity. The typical use of the
+> `repobase` target would be to decouple the repository configuration and MicroShift
+> image build steps.
+
+```bash
+BASE_IMAGE_URL="localhost/microshift-4.16.9"
+BASE_IMAGE_TAG="latest"
+IMAGE_VER="4.16.9-update"
+
+make repobase \
+    BASE_IMAGE_URL="${BASE_IMAGE_URL}" \
+    BASE_IMAGE_TAG="${BASE_IMAGE_TAG}" \
+    IMAGE_VER="${IMAGE_VER}"
+```
+
+The resulting image will be named `microshift-4.16.9-update` as defined by the
+`IMAGE_VER` argument.
+
+```bash
+$ sudo podman images --format "{{.Repository}}" | grep ^localhost/microshift-"${IMAGE_VER}"
+localhost/microshift-4.16.9-update
 ```
 
 ### Predefined Build Targets
