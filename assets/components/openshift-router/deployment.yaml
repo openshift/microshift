@@ -40,7 +40,11 @@ spec:
             - name: ROUTER_CIPHERSUITES
               value: TLS_AES_128_GCM_SHA256:TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256
             - name: ROUTER_DISABLE_HTTP2
+              value: "false"
+            - name: ROUTER_DONT_LOG_NULL
               value: "true"
+            - name: ROUTER_HTTP_IGNORE_PROBES
+              value: "true"              
             - name: ROUTER_DISABLE_NAMESPACE_OWNERSHIP_CHECK
               value: '{{.RouterNamespaceOwnership}}'
             - name: ROUTER_LOAD_BALANCE_ALGORITHM
