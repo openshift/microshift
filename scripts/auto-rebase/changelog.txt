@@ -1,3 +1,46 @@
-- oc image-arm64 c72b183b6b632269d0210e321931b8fd02fab803 to 2f887e82f90a667eca37234b09ac297ef2394ffe
+- api embedded-component 01b3675ba7b364e312ac5da6e632251fbaefdda0 to 85dc560939ef05322ce0b204174e9a02c5376c19
+  - 9266736 2024-08-29T16:25:34+02:00 CONSOLE-4055: Add "Getting started resources" console capability
+
+- cluster-ingress-operator embedded-component 26f0181b04b2639a0d467a3548f96d60471375d9 to 8252ac492c04d161fbcf60ef82af2989c99f4a9d
+  - 0eb116c 2024-08-29T13:37:25-05:00 Explicitly set DeploymentStrategy for SingleReplica
+  - 523461a 2024-08-22T19:48:31-04:00 Update the condition's lastTransitionTime only if the condition status changes.
+
+- cluster-network-operator embedded-component cbb60dc51cd4aefe4bd1d10a214e481073aa9233 to 5c37b84741da2d5ec63dc0b2ae77e2fdf79c022a
+  - d48adb3 2024-08-29T12:40:32+02:00 OCPBUGS-39189: add required-scc annotation to console-plugin deployment
+  - 3afbade 2024-08-26T17:03:35-04:00 HyperShift: do not use antiaffinity on single replica control planes
+
+- kubernetes embedded-component a092ee7d2b3514278dbbcbd47d87fde356c9b0ec to 191249b6c0b70cf38000467af52bb85346d0dc00
+  - eb80296f3 2024-08-29T13:42:55-03:00 UPSTREAM: 126994: Add required FieldManager for validatingadmissionpolicy e2e
+  - a4376ee06 2024-08-29T00:00:30-04:00 UPSTREAM: <drop>: bump(github.com/openshift/apiserver-library-go)
+
+- machine-config-operator embedded-component 005ee68664fa12db7ec159deb984b30421331950 to eeea7495bc40d0f73dd9c2ba030e678ec598d8b1
+  - c2978cc7 2024-08-07T10:58:18-04:00 Sync MCP with MachineOSConfig update to capture image built completion
+
+- openshift-controller-manager embedded-component aabcbc2cf5d944f64e6ebdbc4e0ce7f1b95bd127 to c9324273f9020b9e7e4b8cb10cfcd230528d1783
+  - bffeaf3 2024-08-28T13:50:27+05:30 OCPBUGS-30704: replaces deprecated square/go-jose wtih go-jose/go-jose
+
+- oc image-amd64 c72b183b6b632269d0210e321931b8fd02fab803 to 93286c9260285c104259f0c50704c4b880c4fec3
+  - 56db34e8 2024-08-29T09:45:11-07:00 pkg/cli/admin/upgrade: --to-latest help "next" -> "latest"
+  - d4cee447 2024-08-27T17:15:17-04:00 OTA-1153: update-status: re-title "Operator Health"
   - 5d693a0b 2024-08-27T16:21:00-04:00 OTA-1309: hide the empty "Worker Upgrade" section
+
+- ovn-kubernetes image-amd64 210daea41c93d6ac12391fa9dfa75ae4b68f0048 to 90d145b1785dd6ac4712753c7a23b758877bdecf
+  - 2e7da21f 2024-08-26T17:25:34+02:00 Dockerfile: Bump OVS to 3.4.0-1 for OKD.
+  - 7cc63688 2024-08-26T17:00:18+02:00 Dockerfile: Bump OVS to 3.4.0-1 The new OVS version is used by the OVN observability.
+
+- kubernetes image-amd64 a092ee7d2b3514278dbbcbd47d87fde356c9b0ec to 191249b6c0b70cf38000467af52bb85346d0dc00
+  - eb80296f3 2024-08-29T13:42:55-03:00 UPSTREAM: 126994: Add required FieldManager for validatingadmissionpolicy e2e
+  - a4376ee06 2024-08-29T00:00:30-04:00 UPSTREAM: <drop>: bump(github.com/openshift/apiserver-library-go)
+
+- oc image-arm64 2f887e82f90a667eca37234b09ac297ef2394ffe to 93286c9260285c104259f0c50704c4b880c4fec3
+  - 56db34e8 2024-08-29T09:45:11-07:00 pkg/cli/admin/upgrade: --to-latest help "next" -> "latest"
+  - d4cee447 2024-08-27T17:15:17-04:00 OTA-1153: update-status: re-title "Operator Health"
+
+- ovn-kubernetes image-arm64 210daea41c93d6ac12391fa9dfa75ae4b68f0048 to 90d145b1785dd6ac4712753c7a23b758877bdecf
+  - 2e7da21f 2024-08-26T17:25:34+02:00 Dockerfile: Bump OVS to 3.4.0-1 for OKD.
+  - 7cc63688 2024-08-26T17:00:18+02:00 Dockerfile: Bump OVS to 3.4.0-1 The new OVS version is used by the OVN observability.
+
+- kubernetes image-arm64 a092ee7d2b3514278dbbcbd47d87fde356c9b0ec to 191249b6c0b70cf38000467af52bb85346d0dc00
+  - eb80296f3 2024-08-29T13:42:55-03:00 UPSTREAM: 126994: Add required FieldManager for validatingadmissionpolicy e2e
+  - a4376ee06 2024-08-29T00:00:30-04:00 UPSTREAM: <drop>: bump(github.com/openshift/apiserver-library-go)
 
