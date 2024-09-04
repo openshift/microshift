@@ -4,8 +4,11 @@ Before=microshift.service sshd.service
 
 [Service]
 ExecStart=/usr/bin/microshift-test-agent.sh
-# Allow agent to finish cleanup instead of (sometimes) getting two consecutive SIGTERMs.
-TimeoutStopSec=5s
+# Default value of KillMode is control-group which results in
+# sending SIGTERM to the process and its child processes.
+# By changing to `mixed`, only the main process will get the
+# SIGTERM and cleanup activities won't be interrupted.
+KillMode=mixed
 
 [Install]
 WantedBy=multi-user.target
