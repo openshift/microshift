@@ -1,9 +1,0 @@
-- machine-config-operator embedded-component 2c70c1155007d5aaadd70025f48e4d61158c9bd1 to 4532a85a67a3e1347ed0a89a6d08ef87d6da2a62
-  - 87d01e70 2024-08-29T15:37:34-04:00 server: disallow insecure ciphers
-
-- ovn-kubernetes image-amd64 9fa9e577c7ba8a88e5c5856996aff0d794b4167d to d5d2d8afef18ee7ee3569a0e2ac08c52d18346ee
-  - 78955429 2024-08-22T14:18:00+02:00 Delete EgressIP LRP stale nexthops when node is not found
-
-- ovn-kubernetes image-arm64 9fa9e577c7ba8a88e5c5856996aff0d794b4167d to d5d2d8afef18ee7ee3569a0e2ac08c52d18346ee
-  - 78955429 2024-08-22T14:18:00+02:00 Delete EgressIP LRP stale nexthops when node is not found
-
