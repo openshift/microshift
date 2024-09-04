@@ -136,5 +136,12 @@ current_boot_actions=$(echo "${deploy}" | jq -c ".\"${current_boot}\"")
 _run_actions "${every_boot_actions}"
 _run_actions "${current_boot_actions}"
 
-# sleep until the reboot, will run cleanup upon exit
-sleep infinity
+# Sleep in a background and wait to not miss the signals.
+# `while true; do sleep 1; done` wasn't behaving as expected
+# it behaved better than just a `sleep infinity`, but failure rate was still unacceptable.
+sleep infinity &
+sleep_pid=$!
+wait "${sleep_pid}"
+# Testing showed that following command is rarely executed, but it doesn't matter as long as the cleanup() runs correctly.
+# For this reason, "Killing process _PID_ (sleep) with signal SIGKILL." message is expected.
+kill "${sleep_pid}"
