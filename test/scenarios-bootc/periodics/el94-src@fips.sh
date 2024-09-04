@@ -13,7 +13,7 @@ scenario_create_vms() {
     check_platform
 
     prepare_kickstart host1 kickstart-bootc.ks.template rhel94-bootc-source-fips true
-    launch_vm host1 rhel-9.4-bootc "" "" "" "" "" "1" "1"
+    launch_vm host1 rhel94-bootc "" "" "" "" "" "1" "1"
 }
 
 scenario_remove_vms() {
