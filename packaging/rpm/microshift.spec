@@ -165,6 +165,26 @@ The microshift-multus-release-info package provides release information files fo
 release. These files contain the list of container image references used by
 the Multus CNI for MicroShift and can be used to embed those images into osbuilder blueprints.
 
+%package flannel
+Summary: flannel CNI for MicroShift
+ExclusiveArch: x86_64 aarch64
+Requires: microshift = %{version}
+
+%description flannel
+The microshift-flannel package provides the required manifests for the flannel CNI and the dependent
+kube-proxy to be installed on MicroShift.
+
+%package flannel-release-info
+Summary: Release information for flannel CNI for MicroShift
+BuildArch: noarch
+Requires: microshift-release-info = %{version}
+
+%description flannel-release-info
+The microshift-flannel-release-info package provides release information files for this
+release. These files contain the list of container image references used by the flannel CNI
+with the dependent kube-proxy for MicroShift and can be used to embed those images
+into osbuilder blueprints.
+
 %package low-latency
 Summary: Baseline configuration for running low latency workload on MicroShift
 BuildArch: noarch
@@ -359,6 +379,45 @@ cat assets/optional/multus/kustomization.x86_64.yaml >> %{buildroot}/%{_prefix}/
 mkdir -p -m755 %{buildroot}%{_datadir}/microshift/release
 install -p -m644 assets/optional/multus/release-multus-{x86_64,aarch64}.json %{buildroot}%{_datadir}/microshift/release/
 
+# kube-proxy
+install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/000-microshift-kube-proxy
+# Copy all the manifests except the arch specific ones
+install -p -m644 assets/optional/kube-proxy/0* %{buildroot}/%{_prefix}/lib/microshift/manifests.d/000-microshift-kube-proxy
+install -p -m644 assets/optional/kube-proxy/kustomization.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/000-microshift-kube-proxy
+
+%ifarch %{arm} aarch64
+cat assets/optional/kube-proxy/kustomization.aarch64.yaml >> %{buildroot}/%{_prefix}/lib/microshift/manifests.d/000-microshift-kube-proxy/kustomization.yaml
+%endif
+
+%ifarch x86_64
+cat assets/optional/kube-proxy/kustomization.x86_64.yaml >> %{buildroot}/%{_prefix}/lib/microshift/manifests.d/000-microshift-kube-proxy/kustomization.yaml
+%endif
+
+# kube-proxy-release-info
+mkdir -p -m755 %{buildroot}%{_datadir}/microshift/release
+install -p -m644 assets/optional/kube-proxy/release-kube-proxy-{x86_64,aarch64}.json %{buildroot}%{_datadir}/microshift/release/
+
+# flannel
+install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/000-microshift-flannel
+install -d -m755 %{buildroot}%{_sysconfdir}/systemd/system
+# Copy all the manifests except the arch specific ones
+install -p -m644 assets/optional/flannel/0* %{buildroot}/%{_prefix}/lib/microshift/manifests.d/000-microshift-flannel
+install -p -m644 assets/optional/flannel/kustomization.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/000-microshift-flannel
+install -p -m644 packaging/flannel/00-disableDefaultCNI.yaml %{buildroot}%{_sysconfdir}/microshift/config.d/00-disableDefaultCNI.yaml
+install -p -m644 packaging/flannel/microshift-flannel.service %{buildroot}%{_sysconfdir}/systemd/system/microshift.service
+
+%ifarch %{arm} aarch64
+cat assets/optional/flannel/kustomization.aarch64.yaml >> %{buildroot}/%{_prefix}/lib/microshift/manifests.d/000-microshift-flannel/kustomization.yaml
+%endif
+
+%ifarch x86_64
+cat assets/optional/flannel/kustomization.x86_64.yaml >> %{buildroot}/%{_prefix}/lib/microshift/manifests.d/000-microshift-flannel/kustomization.yaml
+%endif
+
+# flannel-release-info
+mkdir -p -m755 %{buildroot}%{_datadir}/microshift/release
+install -p -m644 assets/optional/flannel/release-flannel-{x86_64,aarch64}.json %{buildroot}%{_datadir}/microshift/release/
+
 # cleanup kubelet
 install -p -m644 packaging/tuned/microshift-cleanup-kubelet.service %{buildroot}%{_unitdir}/microshift-cleanup-kubelet.service
 
@@ -510,6 +569,18 @@ fi
 %files multus-release-info
 %{_datadir}/microshift/release/release-multus-{x86_64,aarch64}.json
 
+%files flannel
+%dir %{_prefix}/lib/microshift/manifests.d/000-microshift-flannel
+%dir %{_prefix}/lib/microshift/manifests.d/000-microshift-kube-proxy
+%{_prefix}/lib/microshift/manifests.d/000-microshift-flannel/*
+%{_prefix}/lib/microshift/manifests.d/000-microshift-kube-proxy/*
+%config(noreplace) %{_sysconfdir}/microshift/config.d/00-disableDefaultCNI.yaml
+%{_sysconfdir}/systemd/system/microshift.service
+
+%files flannel-release-info
+%{_datadir}/microshift/release/release-flannel-{x86_64,aarch64}.json
+%{_datadir}/microshift/release/release-kube-proxy-{x86_64,aarch64}.json
+
 %files low-latency
 %{_prefix}/lib/tuned/microshift-baseline
 %config(noreplace) %{_sysconfdir}/tuned/microshift-baseline-variables.conf
@@ -522,6 +593,9 @@ fi
 # Use Git command to generate the log and replace the VERSION string
 # LANG=C git log --date="format:%a %b %d %Y" --pretty="tformat:* %cd %an <%ae> VERSION%n- %s%n" packaging/rpm/microshift.spec
 %changelog
+* Mon Sep 16 2024 Praveen Kumar <prkumar@redhat.com> 4.18.0
+- Add microshift-flannel subpackage
+
 * Thu Sep 12 2024 Gregory Giguashvili <ggiguash@redhat.com> 4.17.0
 - Declare openvswitch3.3 package as obsolete to allow seemless upgrade to openvswitch3.4
 
