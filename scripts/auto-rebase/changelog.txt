@@ -1,0 +1,7 @@
+- ovn-kubernetes image-arm64 aa1ed513827ba33e2d56d450de7257539c6a8a3e to 7dbdae0a8b73d385123a1e8d679c640f84e4f9b9
+  - 026c063 2024-08-28T14:06:57+02:00 Use Transaction timeout for MonitorAll call. It allows to change this value via config.
+  - b38199d 2024-08-28T14:06:21+02:00 Make OVSDBTimeout for transactions a part of config.Global instead of const. A reasonable value for this timeout depends on the size of the cluster and making it configurable may help solve crashloop problems. It also speeds up testing as timeout may be set to lower value for unit tests. Set default value to 100 second, to allow larger transactions, e.g. 50 address set batch updated on address set sync with dbIDs.
+
+- kubernetes image-arm64 98fe96234f91093996b929e8c93f678756d56101 to 89dc1a962d95e151d691f8d2387107143f8a80a3
+  - 185ae0ff0 2024-08-26T21:42:19+00:00 UPSTREAM: 115702: fix viewing logs on kubelet log rotate
+
