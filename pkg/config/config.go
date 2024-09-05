@@ -164,6 +164,10 @@ func (c *Config) incorporateUserSettings(u *Config) {
 		c.DNS.BaseDomain = u.DNS.BaseDomain
 	}
 
+	if u.Network.CNIPlugin != "" {
+		c.Network.CNIPlugin = u.Network.CNIPlugin
+	}
+
 	if len(u.Network.ClusterNetwork) != 0 {
 		c.Network.ClusterNetwork = u.Network.ClusterNetwork
 	}
@@ -366,6 +370,10 @@ func (c *Config) validate() error {
 
 	if err := validateNetworkStack(c); err != nil {
 		return fmt.Errorf("error validating networks: %w", err)
+	}
+
+	if !c.Network.validCNIPlugin() {
+		return fmt.Errorf("invalid cni plugin for network configuration  %q", c.Network.CNIPlugin)
 	}
 
 	//nolint:nestif // extracting the nested ifs will just increase the complexity of the if expressions as validation expands

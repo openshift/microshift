@@ -12,6 +12,10 @@ import (
 )
 
 func startCNIPlugin(ctx context.Context, cfg *config.Config, kubeconfigPath string) error {
+	if !cfg.Network.IsEnabled() {
+		klog.Warningf("CNI deployment disabled, OVN-K will not be available")
+		return nil
+	}
 	var (
 		ns = []string{
 			"components/ovn/common/namespace.yaml",

@@ -229,6 +229,15 @@
             "type": "string"
           }
         },
+        "cniPlugin": {
+          "description": "CNIPlugin is a user defined string value matching one of the above CNI values. MicroShift uses this\nvalue to decide whether to deploy the OVN-K as default CNI. An unset field defaults to \"\" during yaml parsing, and thus\ncould mean that the cluster has been upgraded. In order to support the existing out-of-box behavior, MicroShift\nassumes an empty string to mean the OVN-K should be deployed.\nAllowed values are: unset or one of [\"\", \"ovnk\", \"none\"]",
+          "type": "string",
+          "enum": [
+            "",
+            "none",
+            "ovnk"
+          ]
+        },
         "serviceNetwork": {
           "description": "IP address pool for services.\nCurrently, we only support a single entry here.\nThis field is immutable after installation.",
           "type": "array",
