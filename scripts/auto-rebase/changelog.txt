@@ -1,0 +1,3 @@
+- kubernetes image-arm64 0c3c368d6d63b52628ee7be8527d441923e8e3b0 to f154a544dbc77e1d538db19ba989f64c08ef66f0
+  - 6545da524 2024-08-21T14:27:47-04:00 UPSTREAM: 124541: Return from EnsureHostInPool on all NIC errors
+
