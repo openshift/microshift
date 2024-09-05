@@ -1,3 +1,96 @@
-- oc image-arm64 c72b183b6b632269d0210e321931b8fd02fab803 to 2f887e82f90a667eca37234b09ac297ef2394ffe
+- api embedded-component 01b3675ba7b364e312ac5da6e632251fbaefdda0 to 9e399f5fa5fc26e31af8ad56a9840e8e76501a4c
+  - 9266736 2024-08-29T16:25:34+02:00 CONSOLE-4055: Add "Getting started resources" console capability
+  - b667a6f 2024-08-26T16:19:02+02:00 CORS-3582: remove unused installer feature gates
+
+- cluster-ingress-operator embedded-component 26f0181b04b2639a0d467a3548f96d60471375d9 to 8252ac492c04d161fbcf60ef82af2989c99f4a9d
+  - 0eb116c 2024-08-29T13:37:25-05:00 Explicitly set DeploymentStrategy for SingleReplica
+  - 523461a 2024-08-22T19:48:31-04:00 Update the condition's lastTransitionTime only if the condition status changes.
+
+- cluster-network-operator embedded-component cbb60dc51cd4aefe4bd1d10a214e481073aa9233 to 5c37b84741da2d5ec63dc0b2ae77e2fdf79c022a
+  - d48adb3 2024-08-29T12:40:32+02:00 OCPBUGS-39189: add required-scc annotation to console-plugin deployment
+  - 3afbade 2024-08-26T17:03:35-04:00 HyperShift: do not use antiaffinity on single replica control planes
+
+- kubernetes embedded-component a092ee7d2b3514278dbbcbd47d87fde356c9b0ec to 191249b6c0b70cf38000467af52bb85346d0dc00
+  - eb80296f3 2024-08-29T13:42:55-03:00 UPSTREAM: 126994: Add required FieldManager for validatingadmissionpolicy e2e
+  - a4376ee06 2024-08-29T00:00:30-04:00 UPSTREAM: <drop>: bump(github.com/openshift/apiserver-library-go)
+
+- machine-config-operator embedded-component 005ee68664fa12db7ec159deb984b30421331950 to eeea7495bc40d0f73dd9c2ba030e678ec598d8b1
+  - c2978cc7 2024-08-07T10:58:18-04:00 Sync MCP with MachineOSConfig update to capture image built completion
+
+- openshift-controller-manager embedded-component aabcbc2cf5d944f64e6ebdbc4e0ce7f1b95bd127 to c9324273f9020b9e7e4b8cb10cfcd230528d1783
+  - bffeaf3 2024-08-28T13:50:27+05:30 OCPBUGS-30704: replaces deprecated square/go-jose wtih go-jose/go-jose
+
+- oc image-amd64 c72b183b6b632269d0210e321931b8fd02fab803 to 93286c9260285c104259f0c50704c4b880c4fec3
+  - 56db34e8 2024-08-29T09:45:11-07:00 pkg/cli/admin/upgrade: --to-latest help "next" -> "latest"
+  - d4cee447 2024-08-27T17:15:17-04:00 OTA-1153: update-status: re-title "Operator Health"
   - 5d693a0b 2024-08-27T16:21:00-04:00 OTA-1309: hide the empty "Worker Upgrade" section
+
+- kube-rbac-proxy image-amd64 8ea2c994df4296ec161023d8ff85f9ea0e383216 to 89b245aa3dd7a3417000be8ad07287d8b5648872
+  - 51b40f6 2024-08-30T20:04:50+02:00 go.mod,Docker*,.ci*: set to OCP 4.17 and Go 1.22
+  - 89e7067 2024-08-30T19:28:38+02:00 vendor: bump
+  - 3479918 2024-08-30T16:53:11+02:00 .github/workflows: fix mixed indent
+  - 5fd65f0 2024-08-30T16:52:37+02:00 cut release v0.18.1
+  - 5e77859 2024-08-30T16:52:37+02:00 pkg/authn: fix k8s bump issue
+  - fad3619 2024-08-30T16:52:22+02:00 .github: bump kind and go
+  - 8ba2f83 2024-08-30T16:50:52+02:00 go*: bump deps, replace go-jose
+  - 4ce801a 2024-08-02T19:20:20+02:00 Makefile: fix arm64 on MacOS
+  - 064971c 2024-07-09T21:51:49+00:00 build(deps): bump google.golang.org/grpc from 1.64.0 to 1.64.1
+  - e29dd73 2024-06-05T09:10:48+02:00 cut release v0.18.0
+  - 418e9bf 2024-06-05T09:10:48+02:00 go.*: bump deps, fixate otel to v0.46
+  - ec86de4 2024-05-29T12:44:22+02:00 pkg/authn: add context to OIDC authenticator
+  - c3563f8 2024-05-29T12:44:22+02:00 go.*: bump to k8s 1.30
+  - 92ed35f 2024-05-29T12:44:22+02:00 c/k/a/options: wire oidc username prefix up
+  - d96ed1e 2024-05-29T12:44:22+02:00 p/authn,test/e2e/oidc: fix oidc change
+  - e129b0a 2024-05-29T12:44:22+02:00 go*: bump deps (k8s.io v1.29)
+
+- ovn-kubernetes image-amd64 210daea41c93d6ac12391fa9dfa75ae4b68f0048 to 90d145b1785dd6ac4712753c7a23b758877bdecf
+  - 2e7da21f 2024-08-26T17:25:34+02:00 Dockerfile: Bump OVS to 3.4.0-1 for OKD.
+  - 7cc63688 2024-08-26T17:00:18+02:00 Dockerfile: Bump OVS to 3.4.0-1 The new OVS version is used by the OVN observability.
+
+- kubernetes image-amd64 a092ee7d2b3514278dbbcbd47d87fde356c9b0ec to 191249b6c0b70cf38000467af52bb85346d0dc00
+  - eb80296f3 2024-08-29T13:42:55-03:00 UPSTREAM: 126994: Add required FieldManager for validatingadmissionpolicy e2e
+  - a4376ee06 2024-08-29T00:00:30-04:00 UPSTREAM: <drop>: bump(github.com/openshift/apiserver-library-go)
+
+- oc image-arm64 2f887e82f90a667eca37234b09ac297ef2394ffe to b75ae2e3d493dd2a9cb40b771a8c6da2043f6d3d
+  - e8e7022f 2024-09-03T09:27:06+03:00 Update push targets of digest with new appended tags
+  - 56db34e8 2024-08-29T09:45:11-07:00 pkg/cli/admin/upgrade: --to-latest help "next" -> "latest"
+  - d4cee447 2024-08-27T17:15:17-04:00 OTA-1153: update-status: re-title "Operator Health"
+
+- csi-external-snapshotter image-arm64 aa558ca4bc55238e1909119f94eaf33872a76dec to 900a6fb05b5b8bfdeeca9fa8828164185ad17b4f
+  - b1008de 2024-09-03T23:04:48+00:00 UPSTREAM: <carry>: Updating ose-csi-external-snapshotter-container image to be consistent with ART for 4.18 Reconciling with https://github.com/openshift/ocp-build-data/tree/827ab4ccce9cbbcf82c9dbaf6398b61d6cff8d7a/images/ose-csi-external-snapshotter.yml
+
+- csi-external-snapshotter image-arm64 aa558ca4bc55238e1909119f94eaf33872a76dec to 900a6fb05b5b8bfdeeca9fa8828164185ad17b4f
+  - b1008de 2024-09-03T23:04:48+00:00 UPSTREAM: <carry>: Updating ose-csi-external-snapshotter-container image to be consistent with ART for 4.18 Reconciling with https://github.com/openshift/ocp-build-data/tree/827ab4ccce9cbbcf82c9dbaf6398b61d6cff8d7a/images/ose-csi-external-snapshotter.yml
+
+- kube-rbac-proxy image-arm64 8ea2c994df4296ec161023d8ff85f9ea0e383216 to 89b245aa3dd7a3417000be8ad07287d8b5648872
+  - 51b40f6 2024-08-30T20:04:50+02:00 go.mod,Docker*,.ci*: set to OCP 4.17 and Go 1.22
+  - 89e7067 2024-08-30T19:28:38+02:00 vendor: bump
+  - 3479918 2024-08-30T16:53:11+02:00 .github/workflows: fix mixed indent
+  - 5fd65f0 2024-08-30T16:52:37+02:00 cut release v0.18.1
+  - 5e77859 2024-08-30T16:52:37+02:00 pkg/authn: fix k8s bump issue
+  - fad3619 2024-08-30T16:52:22+02:00 .github: bump kind and go
+  - 8ba2f83 2024-08-30T16:50:52+02:00 go*: bump deps, replace go-jose
+  - 4ce801a 2024-08-02T19:20:20+02:00 Makefile: fix arm64 on MacOS
+  - 064971c 2024-07-09T21:51:49+00:00 build(deps): bump google.golang.org/grpc from 1.64.0 to 1.64.1
+  - e29dd73 2024-06-05T09:10:48+02:00 cut release v0.18.0
+  - 418e9bf 2024-06-05T09:10:48+02:00 go.*: bump deps, fixate otel to v0.46
+  - ec86de4 2024-05-29T12:44:22+02:00 pkg/authn: add context to OIDC authenticator
+  - c3563f8 2024-05-29T12:44:22+02:00 go.*: bump to k8s 1.30
+  - 92ed35f 2024-05-29T12:44:22+02:00 c/k/a/options: wire oidc username prefix up
+  - d96ed1e 2024-05-29T12:44:22+02:00 p/authn,test/e2e/oidc: fix oidc change
+  - e129b0a 2024-05-29T12:44:22+02:00 go*: bump deps (k8s.io v1.29)
+
+- ovn-kubernetes image-arm64 210daea41c93d6ac12391fa9dfa75ae4b68f0048 to 152f83824df39012a3221e0cc70dd776f73d559d
+  - 94901685 2024-08-27T16:08:04-04:00 Fixes panic in DPU mgmt port tests
+  - 23615917 2024-08-27T18:25:10+01:00 PBR: remove erroneous constraint to deny host IPs ending in 0
+  - 9baca662 2024-08-27T08:27:22-04:00 Serializes Network Manager Start up
+  - 793a80a7 2024-08-26T19:25:27+02:00 Add OwnPriority logic for UDN Rules
+  - 64742d63 2024-08-26T19:25:27+02:00 UDN: Add iprules manager
+  - 54d52bd4 2024-08-26T19:25:27+02:00 Add metadata to rulesManager controller
+  - 2e7da21f 2024-08-26T17:25:34+02:00 Dockerfile: Bump OVS to 3.4.0-1 for OKD.
+  - 7cc63688 2024-08-26T17:00:18+02:00 Dockerfile: Bump OVS to 3.4.0-1 The new OVS version is used by the OVN observability.
+
+- kubernetes image-arm64 a092ee7d2b3514278dbbcbd47d87fde356c9b0ec to 191249b6c0b70cf38000467af52bb85346d0dc00
+  - eb80296f3 2024-08-29T13:42:55-03:00 UPSTREAM: 126994: Add required FieldManager for validatingadmissionpolicy e2e
+  - a4376ee06 2024-08-29T00:00:30-04:00 UPSTREAM: <drop>: bump(github.com/openshift/apiserver-library-go)
 
