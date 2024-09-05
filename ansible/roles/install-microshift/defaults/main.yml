@@ -1,6 +1,8 @@
 ---
 # install-microshift default vars
 
+crio_metrics_conf: 01-crio-metrics.conf
+crio_metrics_path: "/etc/crio/crio.conf.d/{{ crio_metrics_conf }}"
 etcd_dir: "{{ ansible_env.HOME }}/etcd"
 etcd_repo: https://github.com/openshift/etcd.git
 
