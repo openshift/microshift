@@ -17,12 +17,6 @@
           - cri-tools
         state: present
 
-    - name: start crio service
-      become: yes
-      ansible.builtin.systemd:
-        name: crio
-        state: started
-
     - name: check if microshift dir exists
       ansible.builtin.stat:
         path: "{{ microshift_dir }}"
@@ -133,3 +127,17 @@
     mode: '0600'
   when: not pull_secret.stat.exists
 
+- name: check if crio metrics config is present
+  ansible.builtin.stat:
+    path: "{{ crio_metrics_path }}"
+  register: crio_metrics
+
+- name: enable crio metrics
+  become: yes
+  ansible.builtin.copy:
+    src: "{{ crio_metrics_conf }}"
+    dest: "{{ crio_metrics_path }}"
+    owner: root
+    group: root
+    mode: '0644'
+  when: not crio_metrics.stat.exists
