@@ -1,3 +1,18 @@
-- kubernetes image-arm64 0c3c368d6d63b52628ee7be8527d441923e8e3b0 to f154a544dbc77e1d538db19ba989f64c08ef66f0
+- cluster-network-operator embedded-component 0a77d135421a5893c0d85bf9c57369f54e924cfb to ee72e5e3a48fabdcaa2a800460a7b2694b4fa1fc
+  - 4f5acd9 2024-08-30T04:08:19-04:00 Remove managed cluster checking for live migration
+
+- kubernetes embedded-component 0c3c368d6d63b52628ee7be8527d441923e8e3b0 to f154a544dbc77e1d538db19ba989f64c08ef66f0
   - 6545da524 2024-08-21T14:27:47-04:00 UPSTREAM: 124541: Return from EnsureHostInPool on all NIC errors
+
+- machine-config-operator embedded-component ea70a4a28e0661dbf3c6942322b3bcbda8e767f7 to b55d21df80ead6e00b8b36f21015bc8627b89ed7
+  - 6dffdef9 2024-08-20T11:51:32+01:00 manifests: set required-scc for openshift workloads
+
+- oc image-amd64 1e41aa3e007fc60af9edfc77be1c610205943f4a to 4e8d6894744986c8765f1856137103f5ef6b903d
+  - d1bee35c 2024-09-03T18:35:12+00:00 Ignore pruning when deployment points to replicationcontroller
+
+- kubernetes image-amd64 0c3c368d6d63b52628ee7be8527d441923e8e3b0 to f154a544dbc77e1d538db19ba989f64c08ef66f0
+  - 6545da524 2024-08-21T14:27:47-04:00 UPSTREAM: 124541: Return from EnsureHostInPool on all NIC errors
+
+- oc image-arm64 1e41aa3e007fc60af9edfc77be1c610205943f4a to 4e8d6894744986c8765f1856137103f5ef6b903d
+  - d1bee35c 2024-09-03T18:35:12+00:00 Ignore pruning when deployment points to replicationcontroller
 
