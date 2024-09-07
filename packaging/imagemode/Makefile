@@ -5,6 +5,7 @@
 PULL_SECRET ?= $(HOME)/.pull-secret.json
 BASE_IMAGE_URL ?= registry.redhat.io/rhel9/rhel-bootc
 BASE_IMAGE_TAG ?= 9.4
+DNF_OPTIONS ?=
 
 #
 # Define the main targets
@@ -44,9 +45,10 @@ endif
 	sudo podman build \
 		--no-cache \
 		--authfile "${PULL_SECRET}" \
-		--build-arg BASE_IMAGE_URL=${BASE_IMAGE_URL} \
-		--build-arg BASE_IMAGE_TAG=${BASE_IMAGE_TAG} \
-		--build-arg USHIFT_VER=$${USHIFT_VER} \
+		--build-arg BASE_IMAGE_URL="${BASE_IMAGE_URL}" \
+		--build-arg BASE_IMAGE_TAG="${BASE_IMAGE_TAG}" \
+		--build-arg DNF_OPTIONS="${DNF_OPTIONS}" \
+		--build-arg USHIFT_VER="$${USHIFT_VER}" \
 		-t "$${IMAGE_NAME}" \
 		-f Containerfile.rhocp
 
@@ -68,11 +70,12 @@ endif
 	sudo podman build \
 		--no-cache \
 		--authfile "${PULL_SECRET}" \
-		--build-arg BASE_IMAGE_URL=${BASE_IMAGE_URL} \
-		--build-arg BASE_IMAGE_TAG=${BASE_IMAGE_TAG} \
-		--build-arg USHIFT_VER=$${IMAGE_VER} \
-		--build-arg USHIFT_URL=$${USHIFT_URL} \
-		--build-arg OCPDEP_URL=$${OCPDEP_URL} \
+		--build-arg BASE_IMAGE_URL="${BASE_IMAGE_URL}" \
+		--build-arg BASE_IMAGE_TAG="${BASE_IMAGE_TAG}" \
+		--build-arg DNF_OPTIONS="${DNF_OPTIONS}" \
+		--build-arg USHIFT_VER="$${IMAGE_VER}" \
+		--build-arg USHIFT_URL="$${USHIFT_URL}" \
+		--build-arg OCPDEP_URL="$${OCPDEP_URL}" \
 		-t "$${IMAGE_NAME}" \
 		-f Containerfile.repourl
 
@@ -91,8 +94,9 @@ endif
 	sudo podman build \
 		--no-cache \
 		--authfile "${PULL_SECRET}" \
-		--build-arg BASE_IMAGE_URL=${BASE_IMAGE_URL} \
-		--build-arg BASE_IMAGE_TAG=${BASE_IMAGE_TAG} \
+		--build-arg BASE_IMAGE_URL="${BASE_IMAGE_URL}" \
+		--build-arg BASE_IMAGE_TAG="${BASE_IMAGE_TAG}" \
+		--build-arg DNF_OPTIONS="${DNF_OPTIONS}" \
 		-t "$${IMAGE_NAME}" \
 		-f Containerfile.repobase
 
@@ -133,6 +137,15 @@ clean:
 	@$(MAKE) repourl \
 		USHIFT_URL=https://mirror.openshift.com/pub/openshift-v4/$$(uname -m)/microshift/ocp/latest-4.17/el9/os/ \
 		OCPDEP_URL=https://mirror.openshift.com/pub/openshift-v4/$$(uname -m)/dependencies/rpms/4.17-el9-beta/
+
+.PHONY: 4.18-ec-cos9
+4.18-ec-cos9:
+	@$(MAKE) repourl \
+		BASE_IMAGE_URL=quay.io/centos-bootc/centos-bootc \
+		BASE_IMAGE_TAG=stream9 \
+		DNF_OPTIONS="--allowerasing --nobest" \
+		USHIFT_URL=https://mirror.openshift.com/pub/openshift-v4/$$(uname -m)/microshift/ocp-dev-preview/latest-4.18/el9/os/ \
+		OCPDEP_URL=https://mirror.openshift.com/pub/openshift-v4/$$(uname -m)/dependencies/rpms/4.18-el9-beta/ \
 
 .PHONY: 4.18-ec-el94
 4.18-ec-el94:
