@@ -121,7 +121,10 @@ The microshift-networking package provides the networking components necessary f
 Summary: Greenboot components for MicroShift
 BuildArch: noarch
 Requires: microshift = %{version}
-Requires: greenboot
+Obsoletes: greenboot >= 0.15.5
+Obsoletes: greenboot-default-health-checks >= 0.15.5
+Requires: greenboot < 0.15.5
+Requires: greenboot-default-health-checks < 0.15.5
 Requires: python3-pyyaml
 
 %description greenboot
