@@ -26,7 +26,12 @@ Downgrade Is Blocked
 
     ${initial_deploy_backup}=    Get Future Backup Name For Current Boot
 
-    Deploy Commit Expecting A Rollback    ${OLDER_MICROSHIFT_REF}    write_agent_cfg=False
+    ${is_bootc}=    Is System Bootc
+    IF    ${is_bootc}
+        Deploy Bootc Commit Expecting A Rollback    ${BOOTC_REGISTRY}    ${OLDER_MICROSHIFT_REF}    write_agent_cfg=False
+    ELSE
+        Deploy Commit Expecting A Rollback    ${OLDER_MICROSHIFT_REF}    write_agent_cfg=False
+    END
     Wait Until Greenboot Health Check Exited
     Backup Should Exist    ${initial_deploy_backup}
     Journal Should Have Information About Failed Version Comparison
@@ -36,7 +41,7 @@ Downgrade Is Blocked
 Setup
     [Documentation]    Test suite setup
     Check Required Env Variables
-    Should Not Be Empty    ${OLDER_MICROSHIFT_REF}    FAKE_NEXT_MINOR_REF variable is required
+    Should Not Be Empty    ${OLDER_MICROSHIFT_REF}    OLDER_MICROSHIFT_REF variable is required
     Login MicroShift Host
     Wait Until Greenboot Health Check Exited
 
