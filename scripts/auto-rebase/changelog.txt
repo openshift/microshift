@@ -1,18 +1,57 @@
-- cluster-network-operator embedded-component 0a77d135421a5893c0d85bf9c57369f54e924cfb to ee72e5e3a48fabdcaa2a800460a7b2694b4fa1fc
-  - 4f5acd9 2024-08-30T04:08:19-04:00 Remove managed cluster checking for live migration
+- kubernetes embedded-component f154a544dbc77e1d538db19ba989f64c08ef66f0 to 2ca1a23b5e18bc7bb55798dbc15c195f51e941e0
+  - d1777cb8c 2024-08-28T09:39:38-03:00 UPSTREAM: 126920: add missing RBAC to statefulset-controller for StatefulSetAutoDeletePVC feature
+  - 0014c193d 2024-08-27T13:20:40-03:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - 4f6f23b87 2024-08-27T11:57:59-03:00 UPSTREAM: <carry>: drop slices package from StatefulSet test
+  - 024ab2a13 2024-08-14T19:44:18+00:00 Release commit for Kubernetes v1.28.13
+  - 3d3a70f2c 2024-08-07T12:55:34-07:00 Respect controllers on PVCs for retention policy
+  - 76ce2d3d1 2024-07-31T11:36:15-07:00 Updating kubelet on Windows to query uuid from registry
+  - 7c90766ef 2024-07-25T23:20:11+00:00 Update err message before ratcheting enabled.
+  - 5ec04a79f 2024-07-23T21:19:53+00:00 Hot fix for panic on schema conversion.
+  - a8ef9effd 2024-07-22T13:57:39-07:00 update container ubuntu sha256
+  - f4ff61f91 2024-07-22T13:57:39-07:00 update driver installer
+  - d686fdd8f 2024-07-20T13:49:41+00:00 mount-utils: treat syscall.ENODEV as corrupted mount
+  - e8620d40d 2024-07-17T20:34:02+08:00 api: fix ValidatingAdmissionPolicyList json tag
+  - 2b601dad7 2024-07-17T17:09:19+08:00 apiserver: fix watch namespace
+  - 24a8c53f4 2024-07-17T00:23:06+00:00 Update CHANGELOG/CHANGELOG-1.28.md for v1.28.12
+  - 885493d99 2024-07-16T10:18:25+02:00 Fix that PodIP field is not set for terminal pod
+  - 145e33c05 2024-07-12T19:29:10+02:00 Use omitempty for optional fields in Job Pod Failure Policy
+  - 4f3a79be1 2024-02-24T01:23:05+00:00 bugfix: dont skip reconcile for unchanged policy if last sync failed
 
-- kubernetes embedded-component 0c3c368d6d63b52628ee7be8527d441923e8e3b0 to f154a544dbc77e1d538db19ba989f64c08ef66f0
-  - 6545da524 2024-08-21T14:27:47-04:00 UPSTREAM: 124541: Return from EnsureHostInPool on all NIC errors
+- kubernetes image-amd64 f154a544dbc77e1d538db19ba989f64c08ef66f0 to 2ca1a23b5e18bc7bb55798dbc15c195f51e941e0
+  - d1777cb8c 2024-08-28T09:39:38-03:00 UPSTREAM: 126920: add missing RBAC to statefulset-controller for StatefulSetAutoDeletePVC feature
+  - 0014c193d 2024-08-27T13:20:40-03:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - 4f6f23b87 2024-08-27T11:57:59-03:00 UPSTREAM: <carry>: drop slices package from StatefulSet test
+  - 024ab2a13 2024-08-14T19:44:18+00:00 Release commit for Kubernetes v1.28.13
+  - 3d3a70f2c 2024-08-07T12:55:34-07:00 Respect controllers on PVCs for retention policy
+  - 76ce2d3d1 2024-07-31T11:36:15-07:00 Updating kubelet on Windows to query uuid from registry
+  - 7c90766ef 2024-07-25T23:20:11+00:00 Update err message before ratcheting enabled.
+  - 5ec04a79f 2024-07-23T21:19:53+00:00 Hot fix for panic on schema conversion.
+  - a8ef9effd 2024-07-22T13:57:39-07:00 update container ubuntu sha256
+  - f4ff61f91 2024-07-22T13:57:39-07:00 update driver installer
+  - d686fdd8f 2024-07-20T13:49:41+00:00 mount-utils: treat syscall.ENODEV as corrupted mount
+  - e8620d40d 2024-07-17T20:34:02+08:00 api: fix ValidatingAdmissionPolicyList json tag
+  - 2b601dad7 2024-07-17T17:09:19+08:00 apiserver: fix watch namespace
+  - 24a8c53f4 2024-07-17T00:23:06+00:00 Update CHANGELOG/CHANGELOG-1.28.md for v1.28.12
+  - 885493d99 2024-07-16T10:18:25+02:00 Fix that PodIP field is not set for terminal pod
+  - 145e33c05 2024-07-12T19:29:10+02:00 Use omitempty for optional fields in Job Pod Failure Policy
+  - 4f3a79be1 2024-02-24T01:23:05+00:00 bugfix: dont skip reconcile for unchanged policy if last sync failed
 
-- machine-config-operator embedded-component ea70a4a28e0661dbf3c6942322b3bcbda8e767f7 to b55d21df80ead6e00b8b36f21015bc8627b89ed7
-  - 6dffdef9 2024-08-20T11:51:32+01:00 manifests: set required-scc for openshift workloads
-
-- oc image-amd64 1e41aa3e007fc60af9edfc77be1c610205943f4a to 4e8d6894744986c8765f1856137103f5ef6b903d
-  - d1bee35c 2024-09-03T18:35:12+00:00 Ignore pruning when deployment points to replicationcontroller
-
-- kubernetes image-amd64 0c3c368d6d63b52628ee7be8527d441923e8e3b0 to f154a544dbc77e1d538db19ba989f64c08ef66f0
-  - 6545da524 2024-08-21T14:27:47-04:00 UPSTREAM: 124541: Return from EnsureHostInPool on all NIC errors
-
-- oc image-arm64 1e41aa3e007fc60af9edfc77be1c610205943f4a to 4e8d6894744986c8765f1856137103f5ef6b903d
-  - d1bee35c 2024-09-03T18:35:12+00:00 Ignore pruning when deployment points to replicationcontroller
+- kubernetes image-arm64 f154a544dbc77e1d538db19ba989f64c08ef66f0 to 2ca1a23b5e18bc7bb55798dbc15c195f51e941e0
+  - d1777cb8c 2024-08-28T09:39:38-03:00 UPSTREAM: 126920: add missing RBAC to statefulset-controller for StatefulSetAutoDeletePVC feature
+  - 0014c193d 2024-08-27T13:20:40-03:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - 4f6f23b87 2024-08-27T11:57:59-03:00 UPSTREAM: <carry>: drop slices package from StatefulSet test
+  - 024ab2a13 2024-08-14T19:44:18+00:00 Release commit for Kubernetes v1.28.13
+  - 3d3a70f2c 2024-08-07T12:55:34-07:00 Respect controllers on PVCs for retention policy
+  - 76ce2d3d1 2024-07-31T11:36:15-07:00 Updating kubelet on Windows to query uuid from registry
+  - 7c90766ef 2024-07-25T23:20:11+00:00 Update err message before ratcheting enabled.
+  - 5ec04a79f 2024-07-23T21:19:53+00:00 Hot fix for panic on schema conversion.
+  - a8ef9effd 2024-07-22T13:57:39-07:00 update container ubuntu sha256
+  - f4ff61f91 2024-07-22T13:57:39-07:00 update driver installer
+  - d686fdd8f 2024-07-20T13:49:41+00:00 mount-utils: treat syscall.ENODEV as corrupted mount
+  - e8620d40d 2024-07-17T20:34:02+08:00 api: fix ValidatingAdmissionPolicyList json tag
+  - 2b601dad7 2024-07-17T17:09:19+08:00 apiserver: fix watch namespace
+  - 24a8c53f4 2024-07-17T00:23:06+00:00 Update CHANGELOG/CHANGELOG-1.28.md for v1.28.12
+  - 885493d99 2024-07-16T10:18:25+02:00 Fix that PodIP field is not set for terminal pod
+  - 145e33c05 2024-07-12T19:29:10+02:00 Use omitempty for optional fields in Job Pod Failure Policy
+  - 4f3a79be1 2024-02-24T01:23:05+00:00 bugfix: dont skip reconcile for unchanged policy if last sync failed
 
