@@ -442,15 +442,50 @@ EOF
 #  fips_mode -- Enable FIPS mode (0 - disabled, 1 - enabled).
 #  bootc_mode -- Enable bootc mode (0 - disabled, 1 - enabled).
 launch_vm() {
-    local -r vmname="$1"
-    local -r boot_blueprint="${2:-${DEFAULT_BOOT_BLUEPRINT}}"
-    local -r network_name="${3:-default}"
-    local -r vm_vcpus="${4:-2}"
-    local -r vm_memory="${5:-4096}"
-    local -r vm_disksize="${6:-20}"
-    local -r vm_nics="${7:-1}"
-    local -r fips_mode="${8:-0}"
-    local -r bootc_mode="${9:-0}"
+    #local -r vmname="$1"
+    #local -r boot_blueprint="${2:-${DEFAULT_BOOT_BLUEPRINT}}"
+    #local -r network_name="${3:-default}"
+    #local -r vm_vcpus="${4:-2}"
+    #local -r vm_memory="${5:-4096}"
+    #local -r vm_disksize="${6:-20}"
+    #local -r vm_nics="${7:-1}"
+    #local -r fips_mode="${8:-0}"
+    #local -r bootc_mode="${9:-0}"
+
+    # set defaults
+    local vmname
+    local boot_blueprint="${DEFAULT_BOOT_BLUEPRINT}"
+    local network_name="default"
+    local vm_memory=4096
+    local vm_vcpus=2
+    local vm_disksize=20
+    local vm_nics=1
+    local fips_mode=0
+    local bootc_mode=0
+
+    while [ $# -gt 1 ]; do
+        case "$1" in
+            --vmname|--boot_blueprint|--network_name|--vm_vcpus|--vm_memory|--vm_disksize|--vm_nics)
+                var=${1/--/}
+                eval "$var=\$2"
+                shift 2
+                ;;
+            --fips_mode)
+                fips_mode=1
+                shift
+                ;;
+            --bootc_mode)
+                bootc_mode=1
+                shift
+                ;;
+            *)
+                record_junit "${vmname}" "vm-launch-args" "FAILED"
+                exit 1
+                ;;
+        esac
+    done
+
+    record_junit "${vmname}" "vm-launch-args" "OK"
 
     local -r full_vmname="$(full_vm_name "${vmname}")"
     local -r kickstart_url="${WEB_SERVER_URL}/scenario-info/${SCENARIO}/vms/${vmname}/kickstart.ks"
