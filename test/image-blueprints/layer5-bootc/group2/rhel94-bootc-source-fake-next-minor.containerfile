@@ -17,7 +17,7 @@ COPY ./rpm-repos/$USHIFT_RPM_REPO_NAME $USHIFT_RPM_REPO_PATH
 # Install MicroShift and cleanup
 RUN ${REPO_CONFIG_SCRIPT} -create ${USHIFT_RPM_REPO_PATH} && \
     awk 'FNR==1 {print "=== " FILENAME " ==="} {print}' /etc/yum.repos.d/*.repo && \
-    dnf install -y microshift-4.{{ .Env.FAKE_NEXT_MINOR_VERSION }}.\* && \
+    dnf install -y "microshift-4.{{ .Env.FAKE_NEXT_MINOR_VERSION }}.*" && \
     ${REPO_CONFIG_SCRIPT} -delete && \
     rm -f ${REPO_CONFIG_SCRIPT} && \
     rm -rf $USHIFT_RPM_REPO_PATH && \

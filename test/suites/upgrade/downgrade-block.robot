@@ -28,9 +28,14 @@ Downgrade Is Blocked
 
     ${is_bootc}=    Is System Bootc
     IF    ${is_bootc}
-        Deploy Bootc Commit Expecting A Rollback    ${BOOTC_REGISTRY}    ${OLDER_MICROSHIFT_REF}    write_agent_cfg=False
+        Deploy Bootc Commit Expecting A Rollback
+        ...    ${BOOTC_REGISTRY}
+        ...    ${OLDER_MICROSHIFT_REF}
+        ...    write_agent_cfg=False
     ELSE
-        Deploy Commit Expecting A Rollback    ${OLDER_MICROSHIFT_REF}    write_agent_cfg=False
+        Deploy Commit Expecting A Rollback
+        ...    ${OLDER_MICROSHIFT_REF}
+        ...    write_agent_cfg=False
     END
     Wait Until Greenboot Health Check Exited
     Backup Should Exist    ${initial_deploy_backup}
