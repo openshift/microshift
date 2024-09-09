@@ -1,3 +1,8 @@
+#
+# IMPORTANT: This file is used in container image build pipelines and it must
+# be self-contained. Do not use any external files from the current repository
+# because they would not be accessible in the pipelines.
+#
 ARG BASE_IMAGE_URL
 ARG BASE_IMAGE_TAG
 FROM ${BASE_IMAGE_URL}:${BASE_IMAGE_TAG}
@@ -13,6 +18,14 @@ RUN firewall-offline-cmd --zone=public --add-port=22/tcp && \
     firewall-offline-cmd --zone=trusted --add-source=169.254.169.1
 
 # Create a systemd unit to recursively make the root filesystem subtree
-# shared as required by OVN images
-COPY ./systemd/microshift-make-rshared.service /etc/systemd/system/microshift-make-rshared.service
-RUN systemctl enable microshift-make-rshared.service
+# shared as required by OVN images.
+RUN printf '[Unit]\n\
+Description=Make root filesystem shared\n\
+Before=microshift.service\n\
+ConditionVirtualization=container\n\
+[Service]\n\
+Type=oneshot\n\
+ExecStart=/usr/bin/mount --make-rshared /\n\
+[Install]\n\
+WantedBy=multi-user.target\n' > /etc/systemd/system/microshift-make-rshared.service && \
+    systemctl enable microshift-make-rshared.service
