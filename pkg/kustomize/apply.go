@@ -56,44 +56,41 @@ func (s *Kustomizer) Run(ctx context.Context, ready chan<- struct{}, stopped cha
 	}
 
 	for _, path := range deletePaths {
-		s.deleteKustomizationPath(ctx, path)
+		s.handleKustomizationPath(ctx, path, "Deleting", deleteKustomization)
 	}
 
 	for _, path := range kustomizationPaths {
-		s.applyKustomizationPath(ctx, path)
+		s.handleKustomizationPath(ctx, path, "Applying", applyKustomization)
 	}
 
 	return ctx.Err()
 }
 
-func (s *Kustomizer) applyKustomizationPath(ctx context.Context, path string) {
+func (s *Kustomizer) handleKustomizationPath(ctx context.Context, path string, verb string, actionFunc func(string, string) error) {
 	kustomizationFileNames := konfig.RecognizedKustomizationFileNames()
 
 	for _, filename := range kustomizationFileNames {
 		kustomization := filepath.Join(path, filename)
 
 		if _, err := os.Stat(kustomization); errors.Is(err, os.ErrNotExist) {
-			klog.Infof("No kustomization found at " + kustomization)
+			klog.Infof("No kustomization found at %s - skipping", kustomization)
 			continue
 		}
 
-		klog.Infof("Applying kustomization at %v ", kustomization)
-		if err := applyKustomizationWithRetries(ctx, path, s.kubeconfig); err != nil {
-			klog.Errorf("Applying kustomization at %v failed: %v. Giving up.", kustomization, err)
+		klog.Infof("%s kustomization at %v ", verb, kustomization)
+		err := wait.PollUntilContextTimeout(ctx, retryInterval, retryTimeout, true, func(_ context.Context) (done bool, err error) {
+			if err := actionFunc(path, s.kubeconfig); err != nil {
+				klog.Infof("%s kustomization failed: %s. Retrying in %s.", verb, err, retryInterval)
+				return false, nil
+			}
+			return true, nil
+		})
+		if err != nil {
+			klog.Errorf("%s kustomization at %v failed: %v. Giving up.", verb, kustomization, err)
 		} else {
-			klog.Infof("Kustomization at %v applied successfully.", kustomization)
+			klog.Infof("%s kustomization at %v was successful.", verb, kustomization)
 		}
 	}
-}
-
-func applyKustomizationWithRetries(ctx context.Context, kustomization string, kubeconfig string) error {
-	return wait.PollUntilContextTimeout(ctx, retryInterval, retryTimeout, true, func(_ context.Context) (done bool, err error) {
-		if err := applyKustomization(kustomization, kubeconfig); err != nil {
-			klog.Infof("Applying kustomization failed: %s. Retrying in %s.", err, retryInterval)
-			return false, nil
-		}
-		return true, nil
-	})
 }
 
 func applyKustomization(kustomization string, kubeconfig string) error {
@@ -146,36 +143,6 @@ func applyKustomization(kustomization string, kubeconfig string) error {
 		return err
 	}
 	return o.Run()
-}
-
-func (s *Kustomizer) deleteKustomizationPath(ctx context.Context, path string) {
-	kustomizationFileNames := konfig.RecognizedKustomizationFileNames()
-
-	for _, filename := range kustomizationFileNames {
-		kustomization := filepath.Join(path, filename)
-
-		if _, err := os.Stat(kustomization); errors.Is(err, os.ErrNotExist) {
-			klog.Infof("No kustomization found at " + kustomization)
-			continue
-		}
-
-		klog.Infof("Deleting kustomization at %v ", kustomization)
-		if err := deleteKustomizationWithRetries(ctx, path, s.kubeconfig); err != nil {
-			klog.Errorf("Deleting kustomization at %v failed: %v. Giving up.", kustomization, err)
-		} else {
-			klog.Infof("Kustomization at %v deleted successfully.", kustomization)
-		}
-	}
-}
-
-func deleteKustomizationWithRetries(ctx context.Context, kustomization string, kubeconfig string) error {
-	return wait.PollUntilContextTimeout(ctx, retryInterval, retryTimeout, true, func(_ context.Context) (done bool, err error) {
-		if err := deleteKustomization(kustomization, kubeconfig); err != nil {
-			klog.Infof("Deleting kustomization failed: %s. Retrying in %s.", err, retryInterval)
-			return false, nil
-		}
-		return true, nil
-	})
 }
 
 func deleteKustomization(kustomization string, kubeconfig string) error {
