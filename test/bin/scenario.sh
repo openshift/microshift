@@ -467,7 +467,7 @@ launch_vm() {
         case "$1" in
             --vmname|--boot_blueprint|--network_name|--vm_vcpus|--vm_memory|--vm_disksize|--vm_nics)
                 var=${1/--/}
-                eval "$var=\$2"
+                eval "${var}=\$2"
                 shift 2
                 ;;
             --fips_mode)
