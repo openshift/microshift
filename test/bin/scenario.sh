@@ -463,7 +463,7 @@ launch_vm() {
     local fips_mode=0
     local bootc_mode=0
 
-    while [ $# -gt 1 ]; do
+    while [ $# -gt 0 ]; do
         case "$1" in
             --vmname|--boot_blueprint|--network_name|--vm_vcpus|--vm_memory|--vm_disksize|--vm_nics)
                 var=${1/--/}
