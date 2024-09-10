@@ -1,78 +1,12 @@
-- kubernetes embedded-component 4510e9c7511370d04fbade5700d765c3ef5212c8 to f10c92d5d8e114f65dffa8ff4f876ea072f456bf
-  - c8adacf73 2024-09-04T22:57:01+05:30 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
-  - ad68b3ec8 2024-09-04T22:30:54+05:30 add missing RBAC to statefulset-controller for StatefulSetAutoDeletePVC feature
-  - 6701e9669 2024-09-04T22:29:49+05:30 UPSTREAM: <carry>: drop slices package from StatefulSet test
-  - 234bc6369 2024-08-14T19:42:58+00:00 Release commit for Kubernetes v1.29.8
-  - de16695c9 2024-08-07T10:47:09-07:00 Respect controllers on PVCs for retention policy
-  - 24ee19171 2024-07-31T11:36:40-07:00 Updating kubelet on Windows to query uuid from registry
-  - be2e40df3 2024-07-25T23:18:24+00:00 Update err message before ratcheting feature enabled.
-  - bab60a4f5 2024-07-24T20:50:43+09:00 Terminate restartable init containers ignoring not-started containers
-  - f1cd068f5 2024-07-23T21:21:27+00:00 Hot fix for panic on schema conversion.
-  - 650cf9894 2024-07-20T13:48:57+00:00 mount-utils: treat syscall.ENODEV as corrupted mount
-  - 8d87b97ce 2024-07-17T13:53:03-07:00 update container ubuntu sha256
-  - ccd41951a 2024-07-17T13:52:56-07:00 update driver installer
-  - f454cd38f 2024-07-17T20:28:22+08:00 api: fix ValidatingAdmissionPolicyList json tag
-  - 70fdb7b1c 2024-07-17T17:13:37+08:00 apiserver: fix watch namespace
-  - 534810dbc 2024-07-17T00:29:35+00:00 Update CHANGELOG/CHANGELOG-1.29.md for v1.29.7
-  - 0b381a5c8 2024-07-16T10:18:12+02:00 Fix that PodIP field is not set for terminal pod
-  - f96eac0a0 2024-07-15T13:32:07+02:00 UPSTREAM: <carry>: Disable vSphere tests with pre-provisioned volumes
-  - 111387b1f 2024-07-12T19:28:42+02:00 Use omitempty for optional fields in Job Pod Failure Policy
+- cluster-ingress-operator embedded-component af5d3f6c171354c387e0cfc901110a7211715e9b to 04f9483cc5d30c7086b3e0976a907df30f3a4c38
+  - 9bc6fa2 2024-09-01T14:27:56+00:00 Update the condition's lastTransitionTime only if the condition status changes.
 
-- machine-config-operator embedded-component 4532a85a67a3e1347ed0a89a6d08ef87d6da2a62 to da3a6e3437c9438f146ce50063b1f862fd0156b8
-  - e7bdd501 2024-08-27T10:50:40+00:00 *: ensure listers created after callback
-  - 4fba0476 2024-08-20T11:42:33+01:00 manifests: set required-scc for openshift workloads
+- operator-framework-olm embedded-component f9c08816690d4a23cc08406c3adce151b38a908c to d2feafe8abba9c3e9850cbb14868e9d91432352b
+  - dd9bf6d9 2024-09-04T10:54:06-04:00 (fix) registry pods do not come up again after node failure (#3366)
 
-- oc image-amd64 e8fb3c0574da9189b61a87a53956aa820cbfcd2c to c44c839bcb77d6d41229e2d35e45002fa144cf72
-  - aeef81ee 2024-09-02T08:14:14+00:00 Ignore pruning when deployment points to replicationcontroller
+- ovn-kubernetes image-amd64 a5ade4af1bdd742cddbb6338bbfbc0a554bf71df to 90d0591637753ab3d3b18535e506c47e91194da9
+  - 12046db5 2024-09-02T07:13:39+00:00 Use more exact name match when deleting static routes to HO nodes.
 
-- ovn-kubernetes image-amd64 d5d2d8afef18ee7ee3569a0e2ac08c52d18346ee to a5ade4af1bdd742cddbb6338bbfbc0a554bf71df
-  - c733215a 2024-08-29T12:38:41+03:00 E2E: Add EgressService with Network reply traffic tests
-  - d0960585 2024-08-29T12:38:26+03:00 EgressService: Fix ETP=Local ingress reply for LGW
-
-- kubernetes image-amd64 4510e9c7511370d04fbade5700d765c3ef5212c8 to f10c92d5d8e114f65dffa8ff4f876ea072f456bf
-  - c8adacf73 2024-09-04T22:57:01+05:30 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
-  - ad68b3ec8 2024-09-04T22:30:54+05:30 add missing RBAC to statefulset-controller for StatefulSetAutoDeletePVC feature
-  - 6701e9669 2024-09-04T22:29:49+05:30 UPSTREAM: <carry>: drop slices package from StatefulSet test
-  - 234bc6369 2024-08-14T19:42:58+00:00 Release commit for Kubernetes v1.29.8
-  - de16695c9 2024-08-07T10:47:09-07:00 Respect controllers on PVCs for retention policy
-  - 24ee19171 2024-07-31T11:36:40-07:00 Updating kubelet on Windows to query uuid from registry
-  - be2e40df3 2024-07-25T23:18:24+00:00 Update err message before ratcheting feature enabled.
-  - bab60a4f5 2024-07-24T20:50:43+09:00 Terminate restartable init containers ignoring not-started containers
-  - f1cd068f5 2024-07-23T21:21:27+00:00 Hot fix for panic on schema conversion.
-  - 650cf9894 2024-07-20T13:48:57+00:00 mount-utils: treat syscall.ENODEV as corrupted mount
-  - 8d87b97ce 2024-07-17T13:53:03-07:00 update container ubuntu sha256
-  - ccd41951a 2024-07-17T13:52:56-07:00 update driver installer
-  - f454cd38f 2024-07-17T20:28:22+08:00 api: fix ValidatingAdmissionPolicyList json tag
-  - 70fdb7b1c 2024-07-17T17:13:37+08:00 apiserver: fix watch namespace
-  - 534810dbc 2024-07-17T00:29:35+00:00 Update CHANGELOG/CHANGELOG-1.29.md for v1.29.7
-  - 0b381a5c8 2024-07-16T10:18:12+02:00 Fix that PodIP field is not set for terminal pod
-  - f96eac0a0 2024-07-15T13:32:07+02:00 UPSTREAM: <carry>: Disable vSphere tests with pre-provisioned volumes
-  - 111387b1f 2024-07-12T19:28:42+02:00 Use omitempty for optional fields in Job Pod Failure Policy
-
-- oc image-arm64 e8fb3c0574da9189b61a87a53956aa820cbfcd2c to c44c839bcb77d6d41229e2d35e45002fa144cf72
-  - aeef81ee 2024-09-02T08:14:14+00:00 Ignore pruning when deployment points to replicationcontroller
-
-- ovn-kubernetes image-arm64 d5d2d8afef18ee7ee3569a0e2ac08c52d18346ee to a5ade4af1bdd742cddbb6338bbfbc0a554bf71df
-  - c733215a 2024-08-29T12:38:41+03:00 E2E: Add EgressService with Network reply traffic tests
-  - d0960585 2024-08-29T12:38:26+03:00 EgressService: Fix ETP=Local ingress reply for LGW
-
-- kubernetes image-arm64 4510e9c7511370d04fbade5700d765c3ef5212c8 to f10c92d5d8e114f65dffa8ff4f876ea072f456bf
-  - c8adacf73 2024-09-04T22:57:01+05:30 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
-  - ad68b3ec8 2024-09-04T22:30:54+05:30 add missing RBAC to statefulset-controller for StatefulSetAutoDeletePVC feature
-  - 6701e9669 2024-09-04T22:29:49+05:30 UPSTREAM: <carry>: drop slices package from StatefulSet test
-  - 234bc6369 2024-08-14T19:42:58+00:00 Release commit for Kubernetes v1.29.8
-  - de16695c9 2024-08-07T10:47:09-07:00 Respect controllers on PVCs for retention policy
-  - 24ee19171 2024-07-31T11:36:40-07:00 Updating kubelet on Windows to query uuid from registry
-  - be2e40df3 2024-07-25T23:18:24+00:00 Update err message before ratcheting feature enabled.
-  - bab60a4f5 2024-07-24T20:50:43+09:00 Terminate restartable init containers ignoring not-started containers
-  - f1cd068f5 2024-07-23T21:21:27+00:00 Hot fix for panic on schema conversion.
-  - 650cf9894 2024-07-20T13:48:57+00:00 mount-utils: treat syscall.ENODEV as corrupted mount
-  - 8d87b97ce 2024-07-17T13:53:03-07:00 update container ubuntu sha256
-  - ccd41951a 2024-07-17T13:52:56-07:00 update driver installer
-  - f454cd38f 2024-07-17T20:28:22+08:00 api: fix ValidatingAdmissionPolicyList json tag
-  - 70fdb7b1c 2024-07-17T17:13:37+08:00 apiserver: fix watch namespace
-  - 534810dbc 2024-07-17T00:29:35+00:00 Update CHANGELOG/CHANGELOG-1.29.md for v1.29.7
-  - 0b381a5c8 2024-07-16T10:18:12+02:00 Fix that PodIP field is not set for terminal pod
-  - f96eac0a0 2024-07-15T13:32:07+02:00 UPSTREAM: <carry>: Disable vSphere tests with pre-provisioned volumes
-  - 111387b1f 2024-07-12T19:28:42+02:00 Use omitempty for optional fields in Job Pod Failure Policy
+- ovn-kubernetes image-arm64 a5ade4af1bdd742cddbb6338bbfbc0a554bf71df to 90d0591637753ab3d3b18535e506c47e91194da9
+  - 12046db5 2024-09-02T07:13:39+00:00 Use more exact name match when deleting static routes to HO nodes.
 
