@@ -62,12 +62,18 @@ func (c *MicroShiftmDNSController) Run(ctx context.Context, ready chan<- struct{
 
 	ips := []string{c.NodeIP}
 
-	// Discover additional IPs for the interface (IPv6 LLA ...)
+	// Discover additional IPs for the interface
 	for n := range ifs {
 		addrs, _ := ifs[n].Addrs()
 		if ipInAddrs(c.NodeIP, addrs) {
 			addrs = ovn.ExcludeOVNKubernetesMasqueradeIPs(addrs)
-			addrs = excludeLinkLocalIPs(addrs)
+			addrs = slices.DeleteFunc(
+				addrs,
+				func(addr net.Addr) bool {
+					ipAddr, _, _ := net.ParseCIDR(addr.String())
+					return ipAddr.IsLinkLocalMulticast() || ipAddr.IsLinkLocalUnicast()
+				},
+			)
 			ips = addrsToStrings(addrs)
 		}
 	}
@@ -108,19 +114,5 @@ func addrsToStrings(addrs []net.Addr) []string {
 		ipAddr, _, _ := net.ParseCIDR(a.String())
 		ipAddrs = append(ipAddrs, ipAddr.String())
 	}
-	return ipAddrs
-}
-
-func excludeLinkLocalIPs(addrs []net.Addr) []net.Addr {
-	var ipAddrs = make([]net.Addr, 0)
-
-	for _, a := range addrs {
-		ipAddr, _, _ := net.ParseCIDR(a.String())
-		if ipAddr.IsLinkLocalMulticast() || ipAddr.IsLinkLocalUnicast() {
-			continue
-		}
-		ipAddrs = append(ipAddrs, a)
-	}
-
 	return ipAddrs
 }
