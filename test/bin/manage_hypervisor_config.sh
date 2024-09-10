@@ -137,14 +137,14 @@ action_cleanup() {
 
     if sudo virsh net-info "${VM_IPV6_NETWORK}" &>/dev/null ; then
         bridge_name=$(sudo virsh net-dumpxml ipv6 | yq -p xml '.network.bridge.+@name')
-        sudo ip link del name "${bridge_name}p0"
+        sudo ip link del name "${bridge_name}p0" || true
         sudo virsh net-destroy "${VM_IPV6_NETWORK}"
         sudo virsh net-undefine "${VM_IPV6_NETWORK}"
     fi
 
     if sudo virsh net-info "${VM_DUAL_STACK_NETWORK}" &>/dev/null ; then
         bridge_name=$(sudo virsh net-dumpxml ${VM_DUAL_STACK_NETWORK} | yq -p xml '.network.bridge.+@name')
-        sudo ip link del name "${bridge_name}p0"
+        sudo ip link del name "${bridge_name}p0" || true
         sudo virsh net-destroy "${VM_DUAL_STACK_NETWORK}"
         sudo virsh net-undefine "${VM_DUAL_STACK_NETWORK}"
     fi
