@@ -22,5 +22,5 @@ microshift_version{level="patch"} 0
 ```
 
 ## Grafana dashboard
-You ca try it out [running grafana from a container](https://grafana.com/docs/grafana/latest/setup-grafana/installation/docker/#run-grafana-via-docker-cli) and then [add the dashboard](https://grafana.com/docs/grafana/latest/dashboards/build-dashboards/create-dashboard/#create-a-dashboard) from [the json definition](grafana_dashboard.json):
+You can try it out [running grafana from a container](https://grafana.com/docs/grafana/latest/setup-grafana/installation/docker/#run-grafana-via-docker-cli) and then [add the dashboard](https://grafana.com/docs/grafana/latest/dashboards/build-dashboards/create-dashboard/#create-a-dashboard) from [the json definition](grafana_dashboard.json):
 ![alt text](images/grafana_dashboard.png)
