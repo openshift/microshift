@@ -115,8 +115,8 @@ func applyKustomization(kustomization string, kubeconfig string) error {
 	matchVersionKubeConfigFlags.AddFlags(persistFlags)
 
 	f := cmdutil.NewFactory(matchVersionKubeConfigFlags)
-	stdoutLogger := logWritter{message: fmt.Sprintf("Kustomization (%q)", kustomization)}
-	stderrLogger := logWritter{message: fmt.Sprintf("Kustomization error (%q)", kustomization)}
+	stdoutLogger := logWritter{f: klog.Infof, prelude: fmt.Sprintf("Kustomization (%q)", kustomization)}
+	stderrLogger := logWritter{f: klog.Errorf, prelude: fmt.Sprintf("Kustomization error (%q)", kustomization)}
 	ioStreams := genericclioptions.IOStreams{In: os.Stdin, Out: stdoutLogger, ErrOut: stderrLogger}
 	groups := templates.CommandGroups{
 		{
@@ -198,8 +198,8 @@ func deleteKustomization(kustomization string, kubeconfig string) error {
 
 	f := cmdutil.NewFactory(matchVersionKubeConfigFlags)
 
-	stdoutLogger := logWritter{message: fmt.Sprintf("Kustomization (%q)", kustomization)}
-	stderrLogger := logWritter{message: fmt.Sprintf("Kustomization error (%q)", kustomization)}
+	stdoutLogger := logWritter{f: klog.Infof, prelude: fmt.Sprintf("Kustomization (%q)", kustomization)}
+	stderrLogger := logWritter{f: klog.Errorf, prelude: fmt.Sprintf("Kustomization error (%q)", kustomization)}
 	ioStreams := genericclioptions.IOStreams{In: os.Stdin, Out: stdoutLogger, ErrOut: stderrLogger}
 
 	groups := templates.CommandGroups{
@@ -223,7 +223,7 @@ func deleteKustomization(kustomization string, kubeconfig string) error {
 	if err != nil {
 		return err
 	}
-	warningLogger := logWritter{message: fmt.Sprintf("Kustomization warning (%q)", kustomization)}
+	warningLogger := logWritter{f: klog.Warningf, prelude: fmt.Sprintf("Kustomization warning (%q)", kustomization)}
 	o.WarningPrinter = printers.NewWarningPrinter(warningLogger, printers.WarningPrinterOptions{})
 
 	if err := o.Complete(f, []string{}, cmds); err != nil {
@@ -237,10 +237,11 @@ func deleteKustomization(kustomization string, kubeconfig string) error {
 }
 
 type logWritter struct {
-	message string
+	f       func(format string, args ...interface{})
+	prelude string
 }
 
 func (lw logWritter) Write(p []byte) (n int, err error) {
-	klog.Warningf("%s: %s", lw.message, string(p))
+	lw.f("%s: %s", lw.prelude, string(p))
 	return len(p), nil
 }
