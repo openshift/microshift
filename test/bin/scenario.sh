@@ -428,30 +428,32 @@ EOF
 # If no boot_blueprint is specified, uses DEFAULT_BOOT_BLUEPRINT.
 # If no network_name is specified, uses the "default" network.
 #
-# Arguments
-#  vmname -- The short name of the VM in the scenario (e.g., "host1").
-#  boot_blueprint -- The image blueprint used to create the ISO that
-#                    should be used to boot the VM. This is _not_
-#                    necessarily the image to be installed (see
-#                    prepare_kickstart).
-#  network_name -- The name of the network used when creating the VM.
-#  vm_vcpus -- Number of vCPUs for the VM.
-#  vm_memory -- Size of RAM in MB for the VM.
-#  vm_disksize -- Size of disk in GB for the VM.
-#  vm_nics -- Number of network interfaces for the VM.
-#  fips_mode -- Enable FIPS mode (0 - disabled, 1 - enabled).
-#  bootc_mode -- Enable bootc mode (0 - disabled, 1 - enabled).
-launch_vm() {
-    #local -r vmname="$1"
-    #local -r boot_blueprint="${2:-${DEFAULT_BOOT_BLUEPRINT}}"
-    #local -r network_name="${3:-default}"
-    #local -r vm_vcpus="${4:-2}"
-    #local -r vm_memory="${5:-4096}"
-    #local -r vm_disksize="${6:-20}"
-    #local -r vm_nics="${7:-1}"
-    #local -r fips_mode="${8:-0}"
-    #local -r bootc_mode="${9:-0}"
+# Usage: launch_vm \
+#           --vmname <name> \
+#           [--boot_blueprint <blueprint>] \
+#           [--network_name <name>] \
+#           [--vm_vcpus <vcpus>] \
+#           [--vm_memory <memory>] \
+#           [--vm_disksize <disksize>] \
+#           [--vm_nics <nics>] \
+#           [--fips_mode] \
+#           [--bootc_mode]
+#
+# Arguments:
+#   --vmname <name>: The short name of the VM in the scenario (e.g., "host1").
+#   [--boot_blueprint <blueprint>]: The image blueprint used to create the ISO that
+#                                   should be used to boot the VM. This is _not_
+#                                   necessarily the image to be installed (see
+#                                   prepare_kickstart).
+#   [--network_name <name>]: The name of the network used when creating the VM.
+#   [--vm_vcpus <vcpus>]: Number of vCPUs for the VM.
+#   [--vm_memory <memory>]: Size of RAM in MB for the VM.
+#   [--vm_disksize <disksize>]: Size of disk in GB for the VM.
+#   [--vm_nics <nics>]: Number of network interfaces for the VM.
+#   [--fips_mode]: Enable FIPS mode
+#   [--bootc_mode]: Enable bootc mode
 
+launch_vm() {
     # set defaults
     local vmname
     local boot_blueprint="${DEFAULT_BOOT_BLUEPRINT}"
