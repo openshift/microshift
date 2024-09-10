@@ -7,7 +7,6 @@
     "coredns": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:a375d31f650300f119190fb52c57c59b84df52549cc6253d72b3e098c795c8ad",
     "haproxy-router": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:93c4f1a44ca8356b15e898fbf2147b90e3e9e2efdff804e7d4f5795bb4c87edf",
     "kube-rbac-proxy": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:61629c3b8371a314b32457c12b198e7a944459cd6651e868396586d9e846af43",
-    "openssl": "registry.redhat.io/ubi9@sha256:ed84f34cd929ea6b0c247b6daef54dd79602804a32480a052951021caf429494",
     "ovn-kubernetes-microshift": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:8738375c4a10e9b63599cba2ba936ad991126b9f6ec50d672d414353b2de022a",
     "pod": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:d1615913948889079f885d64a8b6cb110fce133843616522ddb30bac971834a6",
     "service-ca-operator": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:dab84ca35b6a96eea73cded5f65d737113198c492145eef0089277ae9fa39d43",
