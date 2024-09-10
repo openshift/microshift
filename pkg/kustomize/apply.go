@@ -80,8 +80,6 @@ func (s *Kustomizer) handleKustomizationPath(ctx context.Context, path string, v
 }
 
 func applyKustomization(kustomization string, kubeconfig string) error {
-	klog.Infof("Applying kustomization at %s", kustomization)
-
 	kubectlCmd := getKubectlCmd(kustomization, kubeconfig)
 	applyFlags := apply.NewApplyFlags(kubectlCmd.ioStreams)
 	applyFlags.DeleteFlags.FileNameFlags.Kustomize = &kustomization
@@ -104,8 +102,6 @@ func applyKustomization(kustomization string, kubeconfig string) error {
 }
 
 func deleteKustomization(kustomization string, kubeconfig string) error {
-	klog.Infof("Deleting kustomization at %s", kustomization)
-
 	kubectlCmd := getKubectlCmd(kustomization, kubeconfig)
 	cmdutil.AddDryRunFlag(kubectlCmd.cmds)
 
