@@ -12,9 +12,11 @@ import (
 	"github.com/spf13/cobra"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/cli-runtime/pkg/genericclioptions"
+	"k8s.io/cli-runtime/pkg/printers"
 	cliflag "k8s.io/component-base/cli/flag"
 	"k8s.io/klog/v2"
 	"k8s.io/kubectl/pkg/cmd/apply"
+	"k8s.io/kubectl/pkg/cmd/delete"
 	cmdutil "k8s.io/kubectl/pkg/cmd/util"
 	"k8s.io/kubectl/pkg/util/templates"
 	"sigs.k8s.io/kustomize/api/konfig"
@@ -47,6 +49,14 @@ func (s *Kustomizer) Run(ctx context.Context, ready chan<- struct{}, stopped cha
 	kustomizationPaths, err := s.cfg.Manifests.GetKustomizationPaths()
 	if err != nil {
 		return fmt.Errorf("failed to find any kustomization paths: %w", err)
+	}
+	deletePaths, err := s.cfg.Manifests.GetKustomizationDeletePaths()
+	if err != nil {
+		return fmt.Errorf("failed to find any delete kustomization paths: %w", err)
+	}
+
+	for _, path := range deletePaths {
+		s.deleteKustomizationPath(ctx, path)
 	}
 
 	for _, path := range kustomizationPaths {
@@ -105,7 +115,9 @@ func applyKustomization(kustomization string, kubeconfig string) error {
 	matchVersionKubeConfigFlags.AddFlags(persistFlags)
 
 	f := cmdutil.NewFactory(matchVersionKubeConfigFlags)
-	ioStreams := genericclioptions.IOStreams{In: os.Stdin, Out: os.Stdout, ErrOut: os.Stderr}
+	stdoutLogger := logWritter{message: fmt.Sprintf("Kustomization (%q)", kustomization)}
+	stderrLogger := logWritter{message: fmt.Sprintf("Kustomization error (%q)", kustomization)}
+	ioStreams := genericclioptions.IOStreams{In: os.Stdin, Out: stdoutLogger, ErrOut: stderrLogger}
 	groups := templates.CommandGroups{
 		{
 			Message: "Advanced Commands:",
@@ -134,4 +146,101 @@ func applyKustomization(kustomization string, kubeconfig string) error {
 		return err
 	}
 	return o.Run()
+}
+
+func (s *Kustomizer) deleteKustomizationPath(ctx context.Context, path string) {
+	kustomizationFileNames := konfig.RecognizedKustomizationFileNames()
+
+	for _, filename := range kustomizationFileNames {
+		kustomization := filepath.Join(path, filename)
+
+		if _, err := os.Stat(kustomization); errors.Is(err, os.ErrNotExist) {
+			klog.Infof("No kustomization found at " + kustomization)
+			continue
+		}
+
+		klog.Infof("Deleting kustomization at %v ", kustomization)
+		if err := deleteKustomizationWithRetries(ctx, path, s.kubeconfig); err != nil {
+			klog.Errorf("Deleting kustomization at %v failed: %v. Giving up.", kustomization, err)
+		} else {
+			klog.Infof("Kustomization at %v deleted successfully.", kustomization)
+		}
+	}
+}
+
+func deleteKustomizationWithRetries(ctx context.Context, kustomization string, kubeconfig string) error {
+	return wait.PollUntilContextTimeout(ctx, retryInterval, retryTimeout, true, func(_ context.Context) (done bool, err error) {
+		if err := deleteKustomization(kustomization, kubeconfig); err != nil {
+			klog.Infof("Deleting kustomization failed: %s. Retrying in %s.", err, retryInterval)
+			return false, nil
+		}
+		return true, nil
+	})
+}
+
+func deleteKustomization(kustomization string, kubeconfig string) error {
+	klog.Infof("Deleting kustomization at %s", kustomization)
+
+	cmds := &cobra.Command{
+		Use:   "kubectl",
+		Short: "kubectl",
+	}
+	persistFlags := cmds.PersistentFlags()
+	persistFlags.SetNormalizeFunc(cliflag.WarnWordSepNormalizeFunc)
+	persistFlags.SetNormalizeFunc(cliflag.WordSepNormalizeFunc)
+
+	kubeConfigFlags := genericclioptions.NewConfigFlags(true).WithDeprecatedPasswordFlag()
+	kubeConfigFlags.KubeConfig = &kubeconfig
+	kubeConfigFlags.AddFlags(persistFlags)
+
+	matchVersionKubeConfigFlags := cmdutil.NewMatchVersionFlags(kubeConfigFlags)
+	matchVersionKubeConfigFlags.AddFlags(persistFlags)
+
+	f := cmdutil.NewFactory(matchVersionKubeConfigFlags)
+
+	stdoutLogger := logWritter{message: fmt.Sprintf("Kustomization (%q)", kustomization)}
+	stderrLogger := logWritter{message: fmt.Sprintf("Kustomization error (%q)", kustomization)}
+	ioStreams := genericclioptions.IOStreams{In: os.Stdin, Out: stdoutLogger, ErrOut: stderrLogger}
+
+	groups := templates.CommandGroups{
+		{
+			Message: "Basic Commands (Intermediate):",
+			Commands: []*cobra.Command{
+				delete.NewCmdDelete(f, ioStreams),
+			},
+		},
+	}
+	groups.Add(cmds)
+	cmdutil.AddDryRunFlag(cmds)
+
+	deleteFlags := delete.NewDeleteFlags("")
+	deleteFlags.FileNameFlags.Kustomize = &kustomization
+	ignoreNotFound := true
+	deleteFlags.IgnoreNotFound = &ignoreNotFound
+	deleteFlags.AddFlags(cmds)
+
+	o, err := deleteFlags.ToOptions(nil, ioStreams)
+	if err != nil {
+		return err
+	}
+	warningLogger := logWritter{message: fmt.Sprintf("Kustomization warning (%q)", kustomization)}
+	o.WarningPrinter = printers.NewWarningPrinter(warningLogger, printers.WarningPrinterOptions{})
+
+	if err := o.Complete(f, []string{}, cmds); err != nil {
+		return err
+	}
+
+	if err := o.Validate(); err != nil {
+		return err
+	}
+	return o.RunDelete(f)
+}
+
+type logWritter struct {
+	message string
+}
+
+func (lw logWritter) Write(p []byte) (n int, err error) {
+	klog.Warningf("%s: %s", lw.message, string(p))
+	return len(p), nil
 }
