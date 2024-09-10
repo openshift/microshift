@@ -2,10 +2,8 @@ package kustomize
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"os"
-	"path/filepath"
 	"time"
 
 	"github.com/openshift/microshift/pkg/config"
@@ -19,7 +17,6 @@ import (
 	"k8s.io/kubectl/pkg/cmd/delete"
 	cmdutil "k8s.io/kubectl/pkg/cmd/util"
 	"k8s.io/kubectl/pkg/util/templates"
-	"sigs.k8s.io/kustomize/api/konfig"
 )
 
 const (
@@ -67,29 +64,18 @@ func (s *Kustomizer) Run(ctx context.Context, ready chan<- struct{}, stopped cha
 }
 
 func (s *Kustomizer) handleKustomizationPath(ctx context.Context, path string, verb string, actionFunc func(string, string) error) {
-	kustomizationFileNames := konfig.RecognizedKustomizationFileNames()
-
-	for _, filename := range kustomizationFileNames {
-		kustomization := filepath.Join(path, filename)
-
-		if _, err := os.Stat(kustomization); errors.Is(err, os.ErrNotExist) {
-			klog.Infof("No kustomization found at %s - skipping", kustomization)
-			continue
+	klog.Infof("%s kustomization at %v ", verb, path)
+	err := wait.PollUntilContextTimeout(ctx, retryInterval, retryTimeout, true, func(_ context.Context) (done bool, err error) {
+		if err := actionFunc(path, s.kubeconfig); err != nil {
+			klog.Infof("%s kustomization failed: %s. Retrying in %s.", verb, err, retryInterval)
+			return false, nil
 		}
-
-		klog.Infof("%s kustomization at %v ", verb, kustomization)
-		err := wait.PollUntilContextTimeout(ctx, retryInterval, retryTimeout, true, func(_ context.Context) (done bool, err error) {
-			if err := actionFunc(path, s.kubeconfig); err != nil {
-				klog.Infof("%s kustomization failed: %s. Retrying in %s.", verb, err, retryInterval)
-				return false, nil
-			}
-			return true, nil
-		})
-		if err != nil {
-			klog.Errorf("%s kustomization at %v failed: %v. Giving up.", verb, kustomization, err)
-		} else {
-			klog.Infof("%s kustomization at %v was successful.", verb, kustomization)
-		}
+		return true, nil
+	})
+	if err != nil {
+		klog.Errorf("%s kustomization at %v failed: %v. Giving up.", verb, path, err)
+	} else {
+		klog.Infof("%s kustomization at %v was successful.", verb, path)
 	}
 }
 
