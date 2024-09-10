@@ -10,7 +10,7 @@ WEB_SERVER_URL="http://${VM_BRIDGE_IP}:${WEB_SERVER_PORT}"
 scenario_create_vms() {
     prepare_kickstart host1 kickstart-bootc.ks.template cos9-bootc-source-optionals
     # Two nics - one for macvlan, another for ipvlan (they cannot enslave the same interface)
-    launch_vm host1 centos9-bootc "${VM_MULTUS_NETWORK}" "" "" "" "2" "" "1"
+    launch_vm --vmname host1 --boot_blueprint centos9-bootc --network_name "${VM_MULTUS_NETWORK}" --vm_nics 2 --bootc_mode
 }
 
 scenario_remove_vms() {

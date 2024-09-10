@@ -4,7 +4,7 @@
 
 scenario_create_vms() {
     prepare_kickstart host1 kickstart.ks.template rhel-9.4-microshift-source
-    launch_vm host1 rhel-9.4 "${VM_DUAL_STACK_NETWORK}"
+    launch_vm --vmname host1 --boot_blueprint rhel-9.4 --network_name "${VM_DUAL_STACK_NETWORK}"
 }
 
 scenario_remove_vms() {

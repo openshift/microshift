@@ -4,7 +4,7 @@
 
 scenario_create_vms() {
     prepare_kickstart host1 kickstart-liveimg.ks.template ""
-    launch_vm host1 "rhel-9.4-microshift-source-isolated"
+    launch_vm --vmname host1 --boot_blueprint rhel-9.4-microshift-source-isolated
 }
 
 scenario_remove_vms() {

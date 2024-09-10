@@ -10,7 +10,7 @@ WEB_SERVER_URL="http://${VM_BRIDGE_IP}:${WEB_SERVER_PORT}"
 scenario_create_vms() {
     prepare_kickstart host1 kickstart.ks.template rhel-9.4-microshift-source-optionals
     # Two nics - one for macvlan, another for ipvlan (they cannot enslave the same interface)
-    launch_vm host1 "rhel-9.4" "${VM_MULTUS_NETWORK}" "" "" "" 2
+    launch_vm --vmname host1 --boot_blueprint rhel-9.4 --network_name "${VM_MULTUS_NETWORK}" --vm_nics 2
 }
 
 scenario_remove_vms() {
