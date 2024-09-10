@@ -25,6 +25,7 @@ make [rhocp | repourl | repobase | <build_ver> | run | clean]
 Available build versions:
    4.16-el94
    4.17-rc-el94
+   4.18-ec-cos9
    4.18-ec-el94
 ```
 
@@ -76,7 +77,7 @@ For example, run the following command to build an image including the MicroShif
 BASE_URL="https://mirror.openshift.com/pub/openshift-v4"
 make repourl \
     USHIFT_URL="${BASE_URL}/$(uname -m)/microshift/ocp/latest-4.17/el9/os/" \
-	OCPDEP_URL="${BASE_URL}/$(uname -m)/dependencies/rpms/4.17-el9-beta/"
+    OCPDEP_URL="${BASE_URL}/$(uname -m)/dependencies/rpms/4.17-el9-beta/"
 ```
 
 The resulting image will be named `microshift-4.17.z` where `z` is the latest
@@ -157,6 +158,7 @@ default values used in `Containerfile` for `rhocp` and `repourl` targets.
 | PULL_SECRET    | `~/.pull-secret.json` | Used for accessing base `bootc` images |
 | BASE_IMAGE_URL | `registry.redhat.io/rhel9/rhel-bootc` | Base `bootc` image URL |
 | BASE_IMAGE_TAG | `9.4` | Base `bootc` image tag |
+| DNF_OPTIONS    | none | Additional options to be passed to the `dnf` command |
 
 For example, run the following command to override the base `bootc` image default
 tag when building the container image.
@@ -326,4 +328,40 @@ without errors.
 ```
 watch sudo oc get pods -A \
     --kubeconfig /var/lib/microshift/resources/kubeadmin/kubeconfig
+```
+
+## Appendix C: Create CentOS 9 Stream Image Mode Containers
+
+Creating MicroShift image mode containers with CentOS Stream 9 image base can be
+accomplished by using the `repourl` target with build variables override.
+
+Log into a Linux host (e.g. `Fedora`, `CentOS` or `RHEL`) using the user credentials
+that have SUDO permissions configured.
+
+For example, run the following command to build a CentOS Stream 9 image using the
+MicroShift 4.17 Release Candidate version from `mirror.openshift.com` site.
+
+```bash
+BASE_IMAGE_URL=quay.io/centos-bootc/centos-bootc
+BASE_IMAGE_TAG=stream9
+BASE_URL="https://mirror.openshift.com/pub/openshift-v4"
+
+make repourl \
+    BASE_IMAGE_URL="${BASE_IMAGE_URL}" \
+    BASE_IMAGE_TAG="${BASE_IMAGE_TAG}" \
+    USHIFT_URL="${BASE_URL}/$(uname -m)/microshift/ocp/latest-4.17/el9/os/" \
+    OCPDEP_URL="${BASE_URL}/$(uname -m)/dependencies/rpms/4.17-el9-beta/"
+```
+
+Note that RPM packages referenced by the `USHIFT_URL` and `OCPDEP_URL` may conflict
+with those delivered in the CentOS repositories. To work around this problem, add
+the `DNF_OPTIONS="--allowerasing --nobest"` argument to the image build command.
+
+Run a container using the generated image as described in [Appendix A: Run Image Mode Containers](#appendix-a-run-image-mode-containers),
+log into the running container and execute the following command to verify the
+base operating system version.
+
+```bash
+$ cat /etc/redhat-release
+CentOS Stream release 9
 ```
