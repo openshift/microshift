@@ -61,7 +61,7 @@ BuildRequires: systemd
 BuildRequires: golang
 # DO NOT REMOVE
 
-Requires: cri-o >= 1.30.0, cri-o < 1.31.0
+Requires: cri-o >= 1.31.0, cri-o < 1.32.0
 Requires: cri-tools >= 1.31.0, cri-tools < 1.32.0
 Requires: iptables
 Requires: microshift-selinux = %{version}
@@ -521,6 +521,9 @@ fi
 # Use Git command to generate the log and replace the VERSION string
 # LANG=C git log --date="format:%a %b %d %Y" --pretty="tformat:* %cd %an <%ae> VERSION%n- %s%n" packaging/rpm/microshift.spec
 %changelog
+* Wed Sep 11 2024 Gregory Giguashvili <ggiguash@redhat.com> 4.18.0
+- Upgrade CRI-O version dependency to 1.31.0
+
 * Fri Aug 30 2024 Patryk Matuszak <pmatusza@redhat.com> 4.18.0
 - Support for config drop-in directory
 
