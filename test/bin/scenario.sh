@@ -1074,6 +1074,10 @@ case "${action}" in
         action_create "$@"
         action_run "$@"
         ;;
+    create-and-run)
+        action_create "$@"
+        action_run "$@"
+        ;;
     *)
         error "Unknown instruction ${action}"
         usage
