@@ -7,7 +7,7 @@ export TEST_RANDOMIZATION=none
 
 scenario_create_vms() {
     prepare_kickstart host1 kickstart.ks.template rhel-9.4-microshift-source-tuned
-    launch_vm --vmname host1 --boot_blueprint rhel-9.4 --vm_vcpus 6
+    launch_vm --boot_blueprint rhel-9.4 --vm_vcpus 6
 }
 
 scenario_remove_vms() {
