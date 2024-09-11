@@ -1,3 +1,290 @@
-- oc image-arm64 c72b183b6b632269d0210e321931b8fd02fab803 to 2f887e82f90a667eca37234b09ac297ef2394ffe
+- api embedded-component 01b3675ba7b364e312ac5da6e632251fbaefdda0 to 5852b58f4b1071fe85d9c49dff2667a9b2a74841
+  - 212398b 2024-09-05T15:49:11+02:00 add new feature for the Insights Runtime Extractor
+  - 4d5a918 2024-09-05T13:22:46+00:00 Updating ose-cluster-config-api-container image to be consistent with ART for 4.18 Reconciling with https://github.com/openshift/ocp-build-data/tree/827ab4ccce9cbbcf82c9dbaf6398b61d6cff8d7a/images/ose-cluster-config-api.yml
+  - 4dd6143 2024-09-03T10:21:03-04:00 generated
+  - 3cae0d1 2024-09-03T10:20:59-04:00 unit tests
+  - 56224c5 2024-09-03T10:01:38-04:00 introduce VSphereMultiNetworks feature gate
+  - a0ef5c8 2024-09-03T10:01:23-04:00 allow up to 10 networks to be provided to the vSphere platform spec
+  - c066384 2024-09-03T10:08:44+02:00 features: update psa and byoo owners
+  - 34de2c1 2024-08-30T17:29:41+02:00 make update
+  - 2bfb7ae 2024-08-30T17:02:29+02:00 add missing genclient:skipVerbs to authorization types
+  - d5b49d4 2024-08-30T17:02:12+02:00 add ObjectMeta to authorization and security types
+  - 9266736 2024-08-29T16:25:34+02:00 CONSOLE-4055: Add "Getting started resources" console capability
+  - d51b3e8 2024-08-26T15:21:58-03:00 make update
+  - 32db55c 2024-08-26T15:08:25-03:00 Graduate AWSEFSDriverVolumeMetrics to GA
+  - b667a6f 2024-08-26T16:19:02+02:00 CORS-3582: remove unused installer feature gates
+
+- cluster-csi-snapshot-controller-operator embedded-component ffba005bf839897b173cb76d0bb561dcf9c7215c to 8122add3d1529f0ea8fa918b45e3d7b35d5a0388
+  - 7cc3041 2024-09-04T14:03:00+00:00 Updating ose-cluster-csi-snapshot-controller-operator-container image to be consistent with ART for 4.18 Reconciling with https://github.com/openshift/ocp-build-data/tree/827ab4ccce9cbbcf82c9dbaf6398b61d6cff8d7a/images/ose-cluster-csi-snapshot-controller-operator.yml
+
+- cluster-ingress-operator embedded-component 26f0181b04b2639a0d467a3548f96d60471375d9 to 59a477e3254b6351084c24c5444200cfab1c77a9
+  - a6b6bb2 2024-09-03T11:50:38-04:00 OCPBUGS-39151: Add Missing Scope Change Instructions
+  - 0eb116c 2024-08-29T13:37:25-05:00 Explicitly set DeploymentStrategy for SingleReplica
+  - 523461a 2024-08-22T19:48:31-04:00 Update the condition's lastTransitionTime only if the condition status changes.
+
+- cluster-kube-apiserver-operator embedded-component 37df1b1f80d3be6036b9e31975ac42fcb21b6447 to 7b4be9223bbc2d523ba986403bd195478a00fcd3
+  - fa7f7d5 2024-09-06T19:53:53+02:00 introduce --operand-kubernetes-version flag and resolve API group
+  - 6384cdf 2024-09-06T14:16:29+02:00 vendor: update
+  - cfb6fc4 2024-09-06T14:14:53+02:00 *: bump library-go
+
+- cluster-kube-scheduler-operator embedded-component 98ca953ba6955401023e219f37e0af49879355d2 to a55bec3f50d43c28ef08bb8bf8f5d4c63df8eef6
+  - a848e31 2024-09-05T18:21:52+00:00 Updating ose-cluster-kube-scheduler-operator-container image to be consistent with ART for 4.18 Reconciling with https://github.com/openshift/ocp-build-data/tree/827ab4ccce9cbbcf82c9dbaf6398b61d6cff8d7a/images/ose-cluster-kube-scheduler-operator.yml
+
+- cluster-network-operator embedded-component cbb60dc51cd4aefe4bd1d10a214e481073aa9233 to 4a640ed50deaf0c6c4071df7cbd55a3dec949407
+  - 12eaa4f 2024-09-03T13:49:22+02:00 OCPBUGS-39398: Preload networking plugin locales
+  - d48adb3 2024-08-29T12:40:32+02:00 OCPBUGS-39189: add required-scc annotation to console-plugin deployment
+  - 3afbade 2024-08-26T17:03:35-04:00 HyperShift: do not use antiaffinity on single replica control planes
+
+- csi-external-snapshotter embedded-component aa558ca4bc55238e1909119f94eaf33872a76dec to 672a0d5ea97a71afd0dfb50002319f30db2e10d7
+  - ae2aa54 2024-09-05T06:40:44+00:00 UPSTREAM: <carry>: Updating ose-csi-snapshot-controller-container image to be consistent with ART for 4.18 Reconciling with https://github.com/openshift/ocp-build-data/tree/827ab4ccce9cbbcf82c9dbaf6398b61d6cff8d7a/images/ose-csi-snapshot-controller.yml
+  - 099e668 2024-09-05T01:27:33+00:00 UPSTREAM: <carry>: Updating ose-csi-snapshot-validation-webhook-container image to be consistent with ART for 4.18 Reconciling with https://github.com/openshift/ocp-build-data/tree/827ab4ccce9cbbcf82c9dbaf6398b61d6cff8d7a/images/csi-snapshot-validation-webhook.yml
+  - b1008de 2024-09-03T23:04:48+00:00 UPSTREAM: <carry>: Updating ose-csi-external-snapshotter-container image to be consistent with ART for 4.18 Reconciling with https://github.com/openshift/ocp-build-data/tree/827ab4ccce9cbbcf82c9dbaf6398b61d6cff8d7a/images/ose-csi-external-snapshotter.yml
+
+- etcd embedded-component 1fb3165305efc8d986344b555b22592e6e6c1786 to d3e76939ade21ec3080e53c2cf83b3aac15f5119
+  - 5e2d0024 2024-09-02T14:51:04+02:00 DOWNSTREAM: <carry>: ETCD-653: add jq to the etcd image
+
+- kubernetes embedded-component a092ee7d2b3514278dbbcbd47d87fde356c9b0ec to aa0c59c617e950de03bc52a36a26d2f016470a13
+  - a83d289a9 2024-09-05T12:58:02-04:00 UPSTREAM: <carry>: annotate audit events for requests during unready phase and graceful termination phase
+  - eb80296f3 2024-08-29T13:42:55-03:00 UPSTREAM: 126994: Add required FieldManager for validatingadmissionpolicy e2e
+  - a4376ee06 2024-08-29T00:00:30-04:00 UPSTREAM: <drop>: bump(github.com/openshift/apiserver-library-go)
+
+- machine-config-operator embedded-component 005ee68664fa12db7ec159deb984b30421331950 to 9596e8f08b0209b0f73f8071dc36ff2b5a13a7c7
+  - e4fd12e9 2024-09-09T09:25:05-04:00 OSASINFRA-3585: openstack: fetch nodename with config drive first
+  - 3febe3f6 2024-09-06T09:53:37-04:00 drop feature gates dropped in openshift/api#1780
+  - d586d6bf 2024-09-06T09:53:37-04:00 vendor bump
+  - 98e69814 2024-09-04T20:56:28+00:00 Updating ose-machine-config-operator-container image to be consistent with ART for 4.18 Reconciling with https://github.com/openshift/ocp-build-data/tree/827ab4ccce9cbbcf82c9dbaf6398b61d6cff8d7a/images/ose-machine-config-operator.yml
+  - db9e1503 2024-09-04T10:52:57-05:00 OCPBUGS-39438: Persist ethtool hw offload setting for br-ex
+  - b54bd953 2024-09-03T21:45:19-03:00 OpenStack: kubelet-nodename service for IPv6
+  - 8a5d92ca 2024-09-03T12:15:13-04:00 check both RHCOS8 and RHCOS9 SSH key paths
+  - d4d567bc 2024-09-03T12:13:21-04:00 adds ArtifactArchive to help test artifact collection
+  - b4233587 2024-09-03T12:13:10-04:00 fixes node scaledown
+  - 6c7ca1b8 2024-08-29T18:33:32+02:00 OCPBUGS-39222: Do not enable on-prem-resolv-prepender.path for UPI
+  - 7402f8d8 2024-08-27T11:53:41-04:00 deps: containers/image bump
+  - c66a5aca 2024-08-21T16:13:44-04:00 Enable the use of Linux Bridge as the ovs default port connection
+  - c2978cc7 2024-08-07T10:58:18-04:00 Sync MCP with MachineOSConfig update to capture image built completion
+  - 69898919 2024-07-29T13:24:24-04:00 Port {azure,gcp}-routes to nftables
+  - a4969bbd 2024-07-29T13:16:31-04:00 Remove unnecessary {azure,gcp}-routes rules
+  - 2740e039 2024-07-29T13:14:49-04:00 Fix openshift-sdn references in routes scripts
+  - 345ffdcb 2024-07-26T15:38:11-04:00 Clarify the comment on the bz1925698 workaround
+
+- openshift-controller-manager embedded-component aabcbc2cf5d944f64e6ebdbc4e0ce7f1b95bd127 to c9324273f9020b9e7e4b8cb10cfcd230528d1783
+  - bffeaf3 2024-08-28T13:50:27+05:30 OCPBUGS-30704: replaces deprecated square/go-jose wtih go-jose/go-jose
+
+- operator-framework-olm embedded-component 7915649deba09c031b0273c58e47f21eb6975aef to 8dac17a7feed9532363be139d83c0f98200f830a
+  - f572743e 2024-09-06T09:00:04+02:00 adds paginating lister for evaluating CRs' upgrade fitness versus new CRDs. (#3387)
+  - 3acb50ac 2024-09-06T08:59:39+02:00 Fix up CRD with deprecated version e2e flake (#3386)
+  - 2cb9b6b0 2024-09-06T08:59:34+02:00 Remove go.mod commented out base-components version pin (#3380)
+  - 242f135b 2024-09-06T08:59:29+02:00 [OCPBUGS-25341]: perform operator apiService certificate validity checks directly (#3217)
+  - ba3ff93c 2024-09-04T07:09:27+00:00 Updating operator-registry-container image to be consistent with ART for 4.18 Reconciling with https://github.com/openshift/ocp-build-data/tree/827ab4ccce9cbbcf82c9dbaf6398b61d6cff8d7a/images/operator-registry.yml
+  - 8b24a1f0 2024-09-04T02:10:14+00:00 Updating operator-lifecycle-manager-container image to be consistent with ART for 4.18 Reconciling with https://github.com/openshift/ocp-build-data/tree/827ab4ccce9cbbcf82c9dbaf6398b61d6cff8d7a/images/operator-lifecycle-manager.yml
+  - 0add0f03 2024-09-03T23:19:13+00:00 Updating ose-operator-framework-tools-container image to be consistent with ART for 4.18 Reconciling with https://github.com/openshift/ocp-build-data/tree/827ab4ccce9cbbcf82c9dbaf6398b61d6cff8d7a/images/ose-operator-framework-tools.yml
+  - dbb5513d 2024-09-02T11:55:49+02:00 remove base-components version pin
+  - 663f9b85 2024-08-31T00:10:09+00:00 Bump sigs.k8s.io/kind from 0.23.0 to 0.24.0 (#1413)
+  - 78ba9dcb 2024-08-31T00:09:16+00:00 Bump github.com/grpc-ecosystem/grpc-health-probe from 0.4.30 to 0.4.31 (#1414)
+  - 73e615fe 2024-08-31T00:09:02+00:00 remove 'automatically generated' strings from repo (#1412)
+  - 4e03dca5 2024-08-31T00:08:49+00:00 add optional schema migrations; default to olm.bundle.object instead of olm.csv.metadata (#1384)
+  - 8f5fadbc 2024-08-31T00:08:36+00:00 server_test.go: wait to run tests until listeners have started (#1411)
+  - 8f878861 2024-08-31T00:08:22+00:00 Bump k8s.io/client-go from 0.30.3 to 0.31.0 (#1406)
+  - c5407d1e 2024-08-31T00:08:09+00:00 Bump github.com/docker/cli (#1407)
+  - 1cface40 2024-08-31T00:07:55+00:00 Bump sigs.k8s.io/controller-runtime from 0.18.4 to 0.18.5 (#1404)
+  - 486a70aa 2024-08-31T00:07:41+00:00 Bump github.com/containers/common from 0.60.0 to 0.60.1 (#1403)
+  - 8ba81fca 2024-08-31T00:07:28+00:00 Bump github.com/containers/image/v5 from 5.32.0 to 5.32.1 (#1402)
+  - 993f757b 2024-08-31T00:07:13+00:00 Bump golang.org/x/sys from 0.23.0 to 0.24.0 (#1401)
+  - 507ea77a 2024-08-31T00:07:00+00:00 Bump github.com/onsi/ginkgo/v2 from 2.19.1 to 2.20.0 (#1400)
+  - a6add9b1 2024-08-31T00:06:48+00:00 add bingo for managing tool deps (#1394)
+  - 6ffc7e28 2024-08-31T00:06:35+00:00 Bump golang.org/x/net from 0.27.0 to 0.28.0 (#1398)
+  - 6b09a5de 2024-08-31T00:06:23+00:00 Bump golang.org/x/sys from 0.22.0 to 0.23.0 (#1396)
+  - ca743ed3 2024-08-31T00:06:10+00:00 Bump golang.org/x/mod from 0.19.0 to 0.20.0 (#1397)
+  - 5263657f 2024-08-31T00:05:58+00:00 Revert "add bingo for managing tool deps (#1329)" (#1393)
+  - e934a31d 2024-08-31T00:05:46+00:00 add bingo for managing tool deps (#1329)
+  - e8fb9daf 2024-08-31T00:05:33+00:00 Bump google.golang.org/grpc/cmd/protoc-gen-go-grpc from 1.4.0 to 1.5.1 (#1390)
+  - e9074612 2024-08-31T00:05:20+00:00 Bump github.com/onsi/gomega from 1.34.0 to 1.34.1 (#1391)
+  - cbd8418d 2024-08-31T00:05:07+00:00 Bump github.com/containers/common from 0.59.2 to 0.60.0 (#1389)
+  - 1f200bfa 2024-08-31T00:04:54+00:00 Bump github.com/onsi/ginkgo/v2 from 2.19.0 to 2.19.1 (#1388)
+  - 877939cd 2024-08-31T00:04:41+00:00 Bump github.com/grpc-ecosystem/grpc-health-probe from 0.4.29 to 0.4.30 (#1374)
+  - 4f31b951 2024-08-31T00:04:28+00:00 Bump github.com/docker/cli (#1385)
+  - bc7673b4 2024-08-31T00:04:15+00:00 Bump github.com/docker/cli (#1383)
+  - ec0c613c 2024-08-31T00:04:03+00:00 Bump github.com/containerd/containerd from 1.7.19 to 1.7.20 (#1382)
+  - 350e63b0 2024-08-31T00:03:50+00:00 Bump k8s.io/apiextensions-apiserver from 0.30.2 to 0.30.3 (#1379)
+  - 58d01d7f 2024-08-31T00:03:36+00:00 bump distribution to v3.0-beta-1 (#1380)
+  - d68054ff 2024-08-31T00:03:23+00:00 Bump k8s.io/client-go from 0.30.2 to 0.30.3 (#1377)
+  - 83e20014 2024-08-31T00:03:06+00:00 (fix) registry pods do not come up again after node failure (#3366)
+  - 5283472b 2024-08-31T00:02:53+00:00 :seedling: Bump bingo tools (#3379)
+  - 03831ebe 2024-08-31T00:02:39+00:00 :seedling: bump all the things (#3374)
+
+- oc image-amd64 c72b183b6b632269d0210e321931b8fd02fab803 to 7ccae272387f104362a3fcb89cfb042242aa2528
+  - 528a234c 2024-09-05T22:11:04+00:00 Updating ose-cli-artifacts-container image to be consistent with ART for 4.18 Reconciling with https://github.com/openshift/ocp-build-data/tree/827ab4ccce9cbbcf82c9dbaf6398b61d6cff8d7a/images/ose-cli-artifacts.yml
+  - 2de66fa9 2024-09-05T21:42:36+00:00 Updating openshift-enterprise-deployer-container image to be consistent with ART for 4.18 Reconciling with https://github.com/openshift/ocp-build-data/tree/827ab4ccce9cbbcf82c9dbaf6398b61d6cff8d7a/images/openshift-enterprise-deployer.yml
+  - 3b3ffc88 2024-09-04T18:33:27+00:00 Updating ose-tools-container image to be consistent with ART for 4.18 Reconciling with https://github.com/openshift/ocp-build-data/tree/827ab4ccce9cbbcf82c9dbaf6398b61d6cff8d7a/images/ose-tools.yml
+  - 95933a7c 2024-09-04T17:08:08+02:00 pkg/cli/admin/upgrade/: Add `oc adm upgrade recommend` subcommand
+  - fa4aa21b 2024-09-04T12:22:39+00:00 Updating openshift-enterprise-cli-container image to be consistent with ART for 4.18 Reconciling with https://github.com/openshift/ocp-build-data/tree/827ab4ccce9cbbcf82c9dbaf6398b61d6cff8d7a/images/openshift-enterprise-cli.yml
+  - e8e7022f 2024-09-03T09:27:06+03:00 Update push targets of digest with new appended tags
+  - 56db34e8 2024-08-29T09:45:11-07:00 pkg/cli/admin/upgrade: --to-latest help "next" -> "latest"
+  - d4cee447 2024-08-27T17:15:17-04:00 OTA-1153: update-status: re-title "Operator Health"
   - 5d693a0b 2024-08-27T16:21:00-04:00 OTA-1309: hide the empty "Worker Upgrade" section
+
+- csi-external-snapshotter image-amd64 aa558ca4bc55238e1909119f94eaf33872a76dec to 672a0d5ea97a71afd0dfb50002319f30db2e10d7
+  - ae2aa54 2024-09-05T06:40:44+00:00 UPSTREAM: <carry>: Updating ose-csi-snapshot-controller-container image to be consistent with ART for 4.18 Reconciling with https://github.com/openshift/ocp-build-data/tree/827ab4ccce9cbbcf82c9dbaf6398b61d6cff8d7a/images/ose-csi-snapshot-controller.yml
+  - 099e668 2024-09-05T01:27:33+00:00 UPSTREAM: <carry>: Updating ose-csi-snapshot-validation-webhook-container image to be consistent with ART for 4.18 Reconciling with https://github.com/openshift/ocp-build-data/tree/827ab4ccce9cbbcf82c9dbaf6398b61d6cff8d7a/images/csi-snapshot-validation-webhook.yml
+  - b1008de 2024-09-03T23:04:48+00:00 UPSTREAM: <carry>: Updating ose-csi-external-snapshotter-container image to be consistent with ART for 4.18 Reconciling with https://github.com/openshift/ocp-build-data/tree/827ab4ccce9cbbcf82c9dbaf6398b61d6cff8d7a/images/ose-csi-external-snapshotter.yml
+
+- csi-external-snapshotter image-amd64 aa558ca4bc55238e1909119f94eaf33872a76dec to 672a0d5ea97a71afd0dfb50002319f30db2e10d7
+  - ae2aa54 2024-09-05T06:40:44+00:00 UPSTREAM: <carry>: Updating ose-csi-snapshot-controller-container image to be consistent with ART for 4.18 Reconciling with https://github.com/openshift/ocp-build-data/tree/827ab4ccce9cbbcf82c9dbaf6398b61d6cff8d7a/images/ose-csi-snapshot-controller.yml
+  - 099e668 2024-09-05T01:27:33+00:00 UPSTREAM: <carry>: Updating ose-csi-snapshot-validation-webhook-container image to be consistent with ART for 4.18 Reconciling with https://github.com/openshift/ocp-build-data/tree/827ab4ccce9cbbcf82c9dbaf6398b61d6cff8d7a/images/csi-snapshot-validation-webhook.yml
+  - b1008de 2024-09-03T23:04:48+00:00 UPSTREAM: <carry>: Updating ose-csi-external-snapshotter-container image to be consistent with ART for 4.18 Reconciling with https://github.com/openshift/ocp-build-data/tree/827ab4ccce9cbbcf82c9dbaf6398b61d6cff8d7a/images/ose-csi-external-snapshotter.yml
+
+- kube-rbac-proxy image-amd64 8ea2c994df4296ec161023d8ff85f9ea0e383216 to 89b245aa3dd7a3417000be8ad07287d8b5648872
+  - 51b40f6 2024-08-30T20:04:50+02:00 go.mod,Docker*,.ci*: set to OCP 4.17 and Go 1.22
+  - 89e7067 2024-08-30T19:28:38+02:00 vendor: bump
+  - 3479918 2024-08-30T16:53:11+02:00 .github/workflows: fix mixed indent
+  - 5fd65f0 2024-08-30T16:52:37+02:00 cut release v0.18.1
+  - 5e77859 2024-08-30T16:52:37+02:00 pkg/authn: fix k8s bump issue
+  - fad3619 2024-08-30T16:52:22+02:00 .github: bump kind and go
+  - 8ba2f83 2024-08-30T16:50:52+02:00 go*: bump deps, replace go-jose
+  - 4ce801a 2024-08-02T19:20:20+02:00 Makefile: fix arm64 on MacOS
+  - 064971c 2024-07-09T21:51:49+00:00 build(deps): bump google.golang.org/grpc from 1.64.0 to 1.64.1
+  - e29dd73 2024-06-05T09:10:48+02:00 cut release v0.18.0
+  - 418e9bf 2024-06-05T09:10:48+02:00 go.*: bump deps, fixate otel to v0.46
+  - ec86de4 2024-05-29T12:44:22+02:00 pkg/authn: add context to OIDC authenticator
+  - c3563f8 2024-05-29T12:44:22+02:00 go.*: bump to k8s 1.30
+  - 92ed35f 2024-05-29T12:44:22+02:00 c/k/a/options: wire oidc username prefix up
+  - d96ed1e 2024-05-29T12:44:22+02:00 p/authn,test/e2e/oidc: fix oidc change
+  - e129b0a 2024-05-29T12:44:22+02:00 go*: bump deps (k8s.io v1.29)
+
+- ovn-kubernetes image-amd64 210daea41c93d6ac12391fa9dfa75ae4b68f0048 to 14fb7c43a5b54e9be4063de628c996fcfcc3b5ad
+  - 49ddde7e 2024-09-04T11:12:49+01:00 OCPHACK: downstream-only unit tests for services: add UDN support
+  - 0d132d33 2024-09-04T11:12:41+01:00 OCPHACK: Rename unit test file for downstream-only tests
+  - 22727db0 2024-09-03T15:02:09+02:00 Fix E2E util for dropping traffic on a particular port
+  - 54e5a87e 2024-09-03T15:02:09+02:00 EIP e2e: fix IPv6 e2e VRF test
+  - b888c21b 2024-09-03T15:02:09+02:00 EIP e2es - healthcheck: drop packets for IPv6 to cause node unavailability
+  - 51b6cf5c 2024-09-03T15:02:09+02:00 EIP IPv6 e2es: enable for control plane tests
+  - 5115b722 2024-09-02T22:36:25+05:30 Add subnet overlap check for POD and join subnets in net-attach-def
+  - d396c127 2024-08-30T21:49:59+02:00 udn, e2e: Add node port services e2e test for UDN.
+  - fe8e6d1e 2024-08-30T21:49:58+02:00 udn, node: Make br-ex flows network aware.
+  - dc13db74 2024-08-30T21:32:13+02:00 UDN: Lanes should run with ds flag set
+  - 9945deca 2024-08-30T21:32:13+02:00 Delete per-pod SNAT for UDNs
+  - aa321f7c 2024-08-30T21:17:24+02:00 gateway, node, udn: Pass netInfo down to the node port watchers.
+  - c31cf5d8 2024-08-30T21:12:31+02:00 Add per-pod SNAT for UDNs
+  - fd9ee80a 2024-08-30T20:42:23+02:00 Add udn.GetUDNGatewayMasqueradeIPs utils
+  - f31b8f4c 2024-08-30T20:40:19+02:00 node, udn: Allow nodePortWatcher/nodePortWatcherIptables to query the namespace active network
+  - 03b442c1 2024-08-30T20:33:35+02:00 node, udn: Add function to get active bridge net config.
+  - 3d95d472 2024-08-30T20:33:35+02:00 nodePortWatcher: Only build svc cookie if needed.
+  - 816835fd 2024-08-30T20:33:35+02:00 zone_ic_handler: Make sure routes to other zones are added for UDN.
+  - 9f809fea 2024-08-30T20:33:35+02:00 udn, e2e: Don't use secondary node IPs for node port test.
+  - aac171c6 2024-08-30T13:28:57+02:00 Update Dockerfile.fedora to use pre-released 24.09 ovn rpm. Remove tabs.
+  - c3b04197 2024-08-30T10:49:32+00:00 Use faked iptables in UDN gateway tests
+  - 3d0665bc 2024-08-30T10:26:25+02:00 E2E tests for services on UDN
+  - 3d05dec4 2024-08-30T10:26:19+02:00 Allow execution of other network segmentation with WHAT parameter
+  - a39da399 2024-08-30T10:26:19+02:00 Services controller: add unit tests for UDNs
+  - 1aaa2198 2024-08-30T10:26:19+02:00 Services controller: update ExternalIDs in existing unit tests
+  - d2fd6a9b 2024-08-30T10:26:19+02:00 Services controller: add network name to logs
+  - 4cf0a2e9 2024-08-30T10:26:19+02:00 Services controller: add support for UDNs
+  - 73102514 2024-08-29T16:22:34-04:00 Fixes remote node checks to be network aware
+  - a4fbb99b 2024-08-29T20:51:12+02:00 Move mirrored endpointslice constants to types pkg
+  - c94b9379 2024-08-29T12:57:49+02:00 UDN: Add rp_filter loose mode for management port
+  - a95e1014 2024-08-29T11:37:13+02:00 UDN: allow multiple conditions of different types to co-exist in the status.
+  - 7ca7cec2 2024-08-28T13:32:33+02:00 UDN:LGW: Add MASQUERADE IPT Rule
+  - 94901685 2024-08-27T16:08:04-04:00 Fixes panic in DPU mgmt port tests
+  - 23615917 2024-08-27T18:25:10+01:00 PBR: remove erroneous constraint to deny host IPs ending in 0
+  - 9baca662 2024-08-27T08:27:22-04:00 Serializes Network Manager Start up
+  - 793a80a7 2024-08-26T19:25:27+02:00 Add OwnPriority logic for UDN Rules
+  - 64742d63 2024-08-26T19:25:27+02:00 UDN: Add iprules manager
+  - 54d52bd4 2024-08-26T19:25:27+02:00 Add metadata to rulesManager controller
+  - 2e7da21f 2024-08-26T17:25:34+02:00 Dockerfile: Bump OVS to 3.4.0-1 for OKD.
+  - 7cc63688 2024-08-26T17:00:18+02:00 Dockerfile: Bump OVS to 3.4.0-1 The new OVS version is used by the OVN observability.
+  - 28f70c4b 2024-08-12T17:58:07+03:00 docs, api-reference: Add UDN CRD API doc
+  - 05ccb998 2024-08-09T17:21:40+05:30 Change pod and join subnet used with net-attach-def in unit tests
+
+- kubernetes image-amd64 a092ee7d2b3514278dbbcbd47d87fde356c9b0ec to aa0c59c617e950de03bc52a36a26d2f016470a13
+  - a83d289a9 2024-09-05T12:58:02-04:00 UPSTREAM: <carry>: annotate audit events for requests during unready phase and graceful termination phase
+  - eb80296f3 2024-08-29T13:42:55-03:00 UPSTREAM: 126994: Add required FieldManager for validatingadmissionpolicy e2e
+  - a4376ee06 2024-08-29T00:00:30-04:00 UPSTREAM: <drop>: bump(github.com/openshift/apiserver-library-go)
+
+- oc image-arm64 2f887e82f90a667eca37234b09ac297ef2394ffe to 7ccae272387f104362a3fcb89cfb042242aa2528
+  - 528a234c 2024-09-05T22:11:04+00:00 Updating ose-cli-artifacts-container image to be consistent with ART for 4.18 Reconciling with https://github.com/openshift/ocp-build-data/tree/827ab4ccce9cbbcf82c9dbaf6398b61d6cff8d7a/images/ose-cli-artifacts.yml
+  - 2de66fa9 2024-09-05T21:42:36+00:00 Updating openshift-enterprise-deployer-container image to be consistent with ART for 4.18 Reconciling with https://github.com/openshift/ocp-build-data/tree/827ab4ccce9cbbcf82c9dbaf6398b61d6cff8d7a/images/openshift-enterprise-deployer.yml
+  - 3b3ffc88 2024-09-04T18:33:27+00:00 Updating ose-tools-container image to be consistent with ART for 4.18 Reconciling with https://github.com/openshift/ocp-build-data/tree/827ab4ccce9cbbcf82c9dbaf6398b61d6cff8d7a/images/ose-tools.yml
+  - 95933a7c 2024-09-04T17:08:08+02:00 pkg/cli/admin/upgrade/: Add `oc adm upgrade recommend` subcommand
+  - fa4aa21b 2024-09-04T12:22:39+00:00 Updating openshift-enterprise-cli-container image to be consistent with ART for 4.18 Reconciling with https://github.com/openshift/ocp-build-data/tree/827ab4ccce9cbbcf82c9dbaf6398b61d6cff8d7a/images/openshift-enterprise-cli.yml
+  - e8e7022f 2024-09-03T09:27:06+03:00 Update push targets of digest with new appended tags
+  - 56db34e8 2024-08-29T09:45:11-07:00 pkg/cli/admin/upgrade: --to-latest help "next" -> "latest"
+  - d4cee447 2024-08-27T17:15:17-04:00 OTA-1153: update-status: re-title "Operator Health"
+
+- csi-external-snapshotter image-arm64 aa558ca4bc55238e1909119f94eaf33872a76dec to 672a0d5ea97a71afd0dfb50002319f30db2e10d7
+  - ae2aa54 2024-09-05T06:40:44+00:00 UPSTREAM: <carry>: Updating ose-csi-snapshot-controller-container image to be consistent with ART for 4.18 Reconciling with https://github.com/openshift/ocp-build-data/tree/827ab4ccce9cbbcf82c9dbaf6398b61d6cff8d7a/images/ose-csi-snapshot-controller.yml
+  - 099e668 2024-09-05T01:27:33+00:00 UPSTREAM: <carry>: Updating ose-csi-snapshot-validation-webhook-container image to be consistent with ART for 4.18 Reconciling with https://github.com/openshift/ocp-build-data/tree/827ab4ccce9cbbcf82c9dbaf6398b61d6cff8d7a/images/csi-snapshot-validation-webhook.yml
+  - b1008de 2024-09-03T23:04:48+00:00 UPSTREAM: <carry>: Updating ose-csi-external-snapshotter-container image to be consistent with ART for 4.18 Reconciling with https://github.com/openshift/ocp-build-data/tree/827ab4ccce9cbbcf82c9dbaf6398b61d6cff8d7a/images/ose-csi-external-snapshotter.yml
+
+- csi-external-snapshotter image-arm64 aa558ca4bc55238e1909119f94eaf33872a76dec to 672a0d5ea97a71afd0dfb50002319f30db2e10d7
+  - ae2aa54 2024-09-05T06:40:44+00:00 UPSTREAM: <carry>: Updating ose-csi-snapshot-controller-container image to be consistent with ART for 4.18 Reconciling with https://github.com/openshift/ocp-build-data/tree/827ab4ccce9cbbcf82c9dbaf6398b61d6cff8d7a/images/ose-csi-snapshot-controller.yml
+  - 099e668 2024-09-05T01:27:33+00:00 UPSTREAM: <carry>: Updating ose-csi-snapshot-validation-webhook-container image to be consistent with ART for 4.18 Reconciling with https://github.com/openshift/ocp-build-data/tree/827ab4ccce9cbbcf82c9dbaf6398b61d6cff8d7a/images/csi-snapshot-validation-webhook.yml
+  - b1008de 2024-09-03T23:04:48+00:00 UPSTREAM: <carry>: Updating ose-csi-external-snapshotter-container image to be consistent with ART for 4.18 Reconciling with https://github.com/openshift/ocp-build-data/tree/827ab4ccce9cbbcf82c9dbaf6398b61d6cff8d7a/images/ose-csi-external-snapshotter.yml
+
+- kube-rbac-proxy image-arm64 8ea2c994df4296ec161023d8ff85f9ea0e383216 to 89b245aa3dd7a3417000be8ad07287d8b5648872
+  - 51b40f6 2024-08-30T20:04:50+02:00 go.mod,Docker*,.ci*: set to OCP 4.17 and Go 1.22
+  - 89e7067 2024-08-30T19:28:38+02:00 vendor: bump
+  - 3479918 2024-08-30T16:53:11+02:00 .github/workflows: fix mixed indent
+  - 5fd65f0 2024-08-30T16:52:37+02:00 cut release v0.18.1
+  - 5e77859 2024-08-30T16:52:37+02:00 pkg/authn: fix k8s bump issue
+  - fad3619 2024-08-30T16:52:22+02:00 .github: bump kind and go
+  - 8ba2f83 2024-08-30T16:50:52+02:00 go*: bump deps, replace go-jose
+  - 4ce801a 2024-08-02T19:20:20+02:00 Makefile: fix arm64 on MacOS
+  - 064971c 2024-07-09T21:51:49+00:00 build(deps): bump google.golang.org/grpc from 1.64.0 to 1.64.1
+  - e29dd73 2024-06-05T09:10:48+02:00 cut release v0.18.0
+  - 418e9bf 2024-06-05T09:10:48+02:00 go.*: bump deps, fixate otel to v0.46
+  - ec86de4 2024-05-29T12:44:22+02:00 pkg/authn: add context to OIDC authenticator
+  - c3563f8 2024-05-29T12:44:22+02:00 go.*: bump to k8s 1.30
+  - 92ed35f 2024-05-29T12:44:22+02:00 c/k/a/options: wire oidc username prefix up
+  - d96ed1e 2024-05-29T12:44:22+02:00 p/authn,test/e2e/oidc: fix oidc change
+  - e129b0a 2024-05-29T12:44:22+02:00 go*: bump deps (k8s.io v1.29)
+
+- ovn-kubernetes image-arm64 210daea41c93d6ac12391fa9dfa75ae4b68f0048 to 14fb7c43a5b54e9be4063de628c996fcfcc3b5ad
+  - 49ddde7e 2024-09-04T11:12:49+01:00 OCPHACK: downstream-only unit tests for services: add UDN support
+  - 0d132d33 2024-09-04T11:12:41+01:00 OCPHACK: Rename unit test file for downstream-only tests
+  - 22727db0 2024-09-03T15:02:09+02:00 Fix E2E util for dropping traffic on a particular port
+  - 54e5a87e 2024-09-03T15:02:09+02:00 EIP e2e: fix IPv6 e2e VRF test
+  - b888c21b 2024-09-03T15:02:09+02:00 EIP e2es - healthcheck: drop packets for IPv6 to cause node unavailability
+  - 51b6cf5c 2024-09-03T15:02:09+02:00 EIP IPv6 e2es: enable for control plane tests
+  - 5115b722 2024-09-02T22:36:25+05:30 Add subnet overlap check for POD and join subnets in net-attach-def
+  - d396c127 2024-08-30T21:49:59+02:00 udn, e2e: Add node port services e2e test for UDN.
+  - fe8e6d1e 2024-08-30T21:49:58+02:00 udn, node: Make br-ex flows network aware.
+  - dc13db74 2024-08-30T21:32:13+02:00 UDN: Lanes should run with ds flag set
+  - 9945deca 2024-08-30T21:32:13+02:00 Delete per-pod SNAT for UDNs
+  - aa321f7c 2024-08-30T21:17:24+02:00 gateway, node, udn: Pass netInfo down to the node port watchers.
+  - c31cf5d8 2024-08-30T21:12:31+02:00 Add per-pod SNAT for UDNs
+  - fd9ee80a 2024-08-30T20:42:23+02:00 Add udn.GetUDNGatewayMasqueradeIPs utils
+  - f31b8f4c 2024-08-30T20:40:19+02:00 node, udn: Allow nodePortWatcher/nodePortWatcherIptables to query the namespace active network
+  - 03b442c1 2024-08-30T20:33:35+02:00 node, udn: Add function to get active bridge net config.
+  - 3d95d472 2024-08-30T20:33:35+02:00 nodePortWatcher: Only build svc cookie if needed.
+  - 816835fd 2024-08-30T20:33:35+02:00 zone_ic_handler: Make sure routes to other zones are added for UDN.
+  - 9f809fea 2024-08-30T20:33:35+02:00 udn, e2e: Don't use secondary node IPs for node port test.
+  - aac171c6 2024-08-30T13:28:57+02:00 Update Dockerfile.fedora to use pre-released 24.09 ovn rpm. Remove tabs.
+  - c3b04197 2024-08-30T10:49:32+00:00 Use faked iptables in UDN gateway tests
+  - 3d0665bc 2024-08-30T10:26:25+02:00 E2E tests for services on UDN
+  - 3d05dec4 2024-08-30T10:26:19+02:00 Allow execution of other network segmentation with WHAT parameter
+  - a39da399 2024-08-30T10:26:19+02:00 Services controller: add unit tests for UDNs
+  - 1aaa2198 2024-08-30T10:26:19+02:00 Services controller: update ExternalIDs in existing unit tests
+  - d2fd6a9b 2024-08-30T10:26:19+02:00 Services controller: add network name to logs
+  - 4cf0a2e9 2024-08-30T10:26:19+02:00 Services controller: add support for UDNs
+  - 73102514 2024-08-29T16:22:34-04:00 Fixes remote node checks to be network aware
+  - a4fbb99b 2024-08-29T20:51:12+02:00 Move mirrored endpointslice constants to types pkg
+  - c94b9379 2024-08-29T12:57:49+02:00 UDN: Add rp_filter loose mode for management port
+  - a95e1014 2024-08-29T11:37:13+02:00 UDN: allow multiple conditions of different types to co-exist in the status.
+  - 7ca7cec2 2024-08-28T13:32:33+02:00 UDN:LGW: Add MASQUERADE IPT Rule
+  - 94901685 2024-08-27T16:08:04-04:00 Fixes panic in DPU mgmt port tests
+  - 23615917 2024-08-27T18:25:10+01:00 PBR: remove erroneous constraint to deny host IPs ending in 0
+  - 9baca662 2024-08-27T08:27:22-04:00 Serializes Network Manager Start up
+  - 793a80a7 2024-08-26T19:25:27+02:00 Add OwnPriority logic for UDN Rules
+  - 64742d63 2024-08-26T19:25:27+02:00 UDN: Add iprules manager
+  - 54d52bd4 2024-08-26T19:25:27+02:00 Add metadata to rulesManager controller
+  - 2e7da21f 2024-08-26T17:25:34+02:00 Dockerfile: Bump OVS to 3.4.0-1 for OKD.
+  - 7cc63688 2024-08-26T17:00:18+02:00 Dockerfile: Bump OVS to 3.4.0-1 The new OVS version is used by the OVN observability.
+  - 28f70c4b 2024-08-12T17:58:07+03:00 docs, api-reference: Add UDN CRD API doc
+  - 05ccb998 2024-08-09T17:21:40+05:30 Change pod and join subnet used with net-attach-def in unit tests
+
+- kubernetes image-arm64 a092ee7d2b3514278dbbcbd47d87fde356c9b0ec to f6fb9d0651f49b1d3056fc516958d5934bf9bdea
+  - 5d26230d8 2024-09-09T11:36:48-04:00 UPSTREAM: <carry>: bump cadvisor version to fix missing network stats
+  - a83d289a9 2024-09-05T12:58:02-04:00 UPSTREAM: <carry>: annotate audit events for requests during unready phase and graceful termination phase
+  - eb80296f3 2024-08-29T13:42:55-03:00 UPSTREAM: 126994: Add required FieldManager for validatingadmissionpolicy e2e
+  - a4376ee06 2024-08-29T00:00:30-04:00 UPSTREAM: <drop>: bump(github.com/openshift/apiserver-library-go)
 
