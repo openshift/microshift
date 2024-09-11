@@ -4,6 +4,7 @@ Documentation       Tests related to FIPS Validation
 Resource            ../../resources/ostree-health.resource
 Resource            ../../resources/common.resource
 Resource            ../../resources/selinux.resource
+Resource            ../../resources/microshift-host.resource
 Resource            ../../resources/microshift-process.resource
 Library             Collections
 
@@ -23,7 +24,12 @@ ${PULL_SECRET_PATH}         /etc/crio/openshift-pull-secret
 *** Test Cases ***
 Verify Host Is FIPS Enabled
     [Documentation]    Performs a FIPS validation against the host
-    Fips Should Be Enabled
+    ${is_bootc}=    Is System Bootc
+    IF    ${is_bootc}
+        Fips Should Be Enabled Bootc
+    ELSE
+        Fips Should Be Enabled Non-Bootc
+    END
 
 Verify Binary Is FIPS Compliant
     [Documentation]    Performs a FIPS validation against the Microshift binary
@@ -101,13 +107,36 @@ Microshift Binary Should Dynamically Link FIPS Ossl Module
     ...    sudo=False    return_rc=True
     Should Be Equal As Integers    0    ${rc}
 
-Fips Should Be Enabled
-    [Documentation]    Check if FIPS is enabled on RHEL.
+Fips Should Be Enabled Non-Bootc
+    [Documentation]    Check if FIPS is enabled on a non-bootc RHEL
     ${stdout}    ${stderr}    ${rc}=    Execute Command
     ...    bash -x fips-mode-setup --check
     ...    sudo=True    return_rc=True    return_stdout=True    return_stderr=True
     Should Be Equal As Integers    0    ${rc}
     Should Match    ${stdout}    FIPS mode is enabled.
+
+Fips Should Be Enabled Bootc
+    [Documentation]    Check if FIPS is enabled on a bootc RHEL
+
+    # Verify FIPS crypto flag is enabled in the system
+    ${stdout}    ${stderr}    ${rc}=    Execute Command
+    ...    cat /proc/sys/crypto/fips_enabled
+    ...    sudo=False    return_rc=True    return_stdout=True    return_stderr=True
+    Should Be Equal As Integers    0    ${rc}
+    Should Be Equal As Strings    ${stdout.strip()}    1
+
+    # Verify crypto policies are set to FIPS
+    ${stdout}    ${stderr}    ${rc}=    Execute Command
+    ...    update-crypto-policies --show
+    ...    sudo=False    return_rc=True    return_stdout=True    return_stderr=True
+    Should Be Equal As Integers    0    ${rc}
+    Should Be Equal As Strings    ${stdout.strip()}    FIPS
+
+    # Verify initramfs FIPS module presence
+    ${stdout}    ${stderr}    ${rc}=    Execute Command
+    ...    bash -c 'lsinitrd -m 2>/dev/null | grep -Fxq fips'
+    ...    sudo=False    return_rc=True    return_stdout=True    return_stderr=True
+    Should Be Equal As Integers    0    ${rc}
 
 Get Images From Release File
     [Documentation]    Obtains list of Images from Release.
