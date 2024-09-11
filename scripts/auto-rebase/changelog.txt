@@ -1,3 +1,0 @@
-- machine-config-operator embedded-component 5409abac417622d748dfe58f392e79f1b83bbbe4 to c84afcee2dfb6b21d049a9b1a2d710fda9770143
-  - 3105925e 2024-06-12T06:00:42+00:00 OCPBUGS-29919: Decrease logs of haproxy
-
