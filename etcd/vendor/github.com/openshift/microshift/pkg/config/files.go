@@ -1,64 +1,127 @@
 package config
 
 import (
+	"encoding/json"
 	"fmt"
+	"io/fs"
 	"os"
+	"path/filepath"
+	"strings"
 
+	jsonpatch "github.com/evanphx/json-patch"
+	"github.com/openshift/microshift/pkg/util"
 	"sigs.k8s.io/yaml"
 )
 
 const (
-	ConfigFile = "/etc/microshift/config.yaml"
-	DataDir    = "/var/lib/microshift"
-	BackupsDir = "/var/lib/microshift-backups"
+	ConfigFile      = "/etc/microshift/config.yaml"
+	DataDir         = "/var/lib/microshift"
+	BackupsDir      = "/var/lib/microshift-backups"
+	ConfigDropInDir = "/etc/microshift/config.d"
 )
 
-func parse(contents []byte) (*Config, error) {
-	c := &Config{}
-	if err := yaml.Unmarshal(contents, c); err != nil {
-		return nil, fmt.Errorf("failed to decode configuration: %v", err)
+func getActiveConfigFromYAMLDropins(yamlDropins [][]byte) (*Config, error) {
+	var mergedUserConfigPatch []byte
+
+	// Convert YAMLs to JSONs and merge them together to get a single configuration from the user.
+	for _, dropin := range yamlDropins {
+		if strings.TrimSpace(string(dropin)) == "" {
+			continue
+		}
+
+		jsonDropin, err := yaml.YAMLToJSON(dropin)
+		if err != nil {
+			return nil, fmt.Errorf("failed to convert config yaml (%q) to json: %w", string(dropin), err)
+		}
+
+		if mergedUserConfigPatch == nil {
+			mergedUserConfigPatch = jsonDropin
+			continue
+		}
+
+		patched, err := jsonpatch.MergePatch(mergedUserConfigPatch, jsonDropin)
+		if err != nil {
+			return nil, fmt.Errorf("failed to merge dropin (%q) into the config patch (%q): %w", string(jsonDropin), string(mergedUserConfigPatch), err)
+		}
+		mergedUserConfigPatch = patched
 	}
-	return c, nil
+
+	cfg := &Config{}
+	if err := cfg.fillDefaults(); err != nil {
+		return nil, fmt.Errorf("failed to fill config's defaults: %w", err)
+	}
+
+	if len(mergedUserConfigPatch) != 0 {
+		userSettings := &Config{}
+		if err := json.Unmarshal(mergedUserConfigPatch, userSettings); err != nil {
+			return nil, fmt.Errorf("failed to unmarshal user cfg json to config: %w", err)
+		}
+		cfg.incorporateUserSettings(userSettings)
+	}
+
+	if err := cfg.updateComputedValues(); err != nil {
+		return nil, fmt.Errorf("invalid configuration: %w", err)
+	}
+
+	if err := cfg.validate(); err != nil {
+		return nil, fmt.Errorf("invalid configuration: %w", err)
+	}
+
+	return cfg, nil
 }
 
-func getActiveConfigFromYAML(contents []byte) (*Config, error) {
-	userSettings, err := parse(contents)
+// collectUserProvidedConfigs loads all the user provided yaml config files:
+// - main MicroShift config (/etc/microshift/config.yaml), and
+// - YAML files from config drop-in directory (/etc/microshift/config.d)
+func collectUserProvidedConfigs() ([][]byte, error) {
+	dropins := [][]byte{}
+
+	if exists, err := util.PathExists(ConfigFile); err != nil {
+		return nil, err
+	} else if exists {
+		contents, err := os.ReadFile(ConfigFile)
+		if err != nil {
+			return nil, fmt.Errorf("error reading config file %q: %v", ConfigFile, err)
+		}
+		dropins = append(dropins, contents)
+	}
+
+	dropInDirExists, err := util.PathExistsAndIsNotEmpty(ConfigDropInDir)
 	if err != nil {
-		return nil, fmt.Errorf("failed to parse config file %q: %v", ConfigFile, err)
-	}
-
-	// Start with the defaults, then apply the user settings and
-	// recompute dynamic values.
-	results := &Config{}
-	if err := results.fillDefaults(); err != nil {
-		return nil, fmt.Errorf("invalid configuration: %v", err)
-	}
-	results.incorporateUserSettings(userSettings)
-	if err := results.updateComputedValues(); err != nil {
-		return nil, fmt.Errorf("invalid configuration: %v", err)
-	}
-	if err := results.validate(); err != nil {
-		return nil, fmt.Errorf("invalid configuration: %v", err)
-	}
-	return results, nil
-}
-
-// ActiveConfig returns the active configuration. If the configuration
-// file exists, read it and require it to be valid. Otherwise return
-// the default settings.
-func ActiveConfig() (*Config, error) {
-	_, err := os.Stat(ConfigFile)
-	if os.IsNotExist(err) {
-		// No configuration file, use the default settings
-		return NewDefault(), nil
-	} else if err != nil {
 		return nil, err
 	}
 
-	// Read the file and merge user-provided settings with the defaults
-	contents, err := os.ReadFile(ConfigFile)
-	if err != nil {
-		return nil, fmt.Errorf("error reading config file %q: %v", ConfigFile, err)
+	if !dropInDirExists {
+		return dropins, nil
 	}
-	return getActiveConfigFromYAML(contents)
+
+	err = filepath.WalkDir(ConfigDropInDir, func(path string, info fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+		if !info.IsDir() && filepath.Ext(info.Name()) == ".yaml" {
+			contents, err := os.ReadFile(path)
+			if err != nil {
+				return fmt.Errorf("error reading config file %q: %v", path, err)
+			}
+			dropins = append(dropins, contents)
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to walk the config drop-in dir %q: %w", ConfigDropInDir, err)
+	}
+
+	return dropins, nil
+}
+
+// ActiveConfig returns the active configuration which is default config with overrides
+// from user provided config files.
+func ActiveConfig() (*Config, error) {
+	dropins, err := collectUserProvidedConfigs()
+	if err != nil {
+		return nil, err
+	}
+
+	return getActiveConfigFromYAMLDropins(dropins)
 }
