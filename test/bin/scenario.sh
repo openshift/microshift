@@ -429,7 +429,7 @@ EOF
 # If no network_name is specified, uses the "default" network.
 #
 # Usage: launch_vm \
-#           --vmname <name> \
+#           [--vmname <name>] \
 #           [--boot_blueprint <blueprint>] \
 #           [--network_name <name>] \
 #           [--vm_vcpus <vcpus>] \
@@ -440,7 +440,7 @@ EOF
 #           [--bootc_mode]
 #
 # Arguments:
-#   --vmname <name>: The short name of the VM in the scenario (e.g., "host1").
+#   [--vmname <name>]: The short name of the VM in the scenario (e.g., "host1").
 #   [--boot_blueprint <blueprint>]: The image blueprint used to create the ISO that
 #                                   should be used to boot the VM. This is _not_
 #                                   necessarily the image to be installed (see
@@ -455,7 +455,7 @@ EOF
 
 launch_vm() {
     # set defaults
-    local vmname
+    local vmname="host1"
     local boot_blueprint="${DEFAULT_BOOT_BLUEPRINT}"
     local network_name="default"
     local vm_memory=4096
@@ -468,9 +468,15 @@ launch_vm() {
     while [ $# -gt 0 ]; do
         case "$1" in
             --vmname|--boot_blueprint|--network_name|--vm_vcpus|--vm_memory|--vm_disksize|--vm_nics)
-                var=${1/--/}
-                eval "${var}=\$2"
-                shift 2
+                var="${1/--/}"
+                if [ -n "$2" ] && [ "${2:0:1}" != "-" ]; then 
+                    declare "${var}=$2"
+                    shift 2
+                else
+                    error "Failed parsing arguments: ${var} value not set"
+                    record_junit "${vmname}" "vm-launch-args" "FAILED"
+                    exit 1
+                fi
                 ;;
             --fips_mode)
                 fips_mode=1
@@ -481,6 +487,7 @@ launch_vm() {
                 shift
                 ;;
             *)
+                error "Invalid argument: ${1}" 
                 record_junit "${vmname}" "vm-launch-args" "FAILED"
                 exit 1
                 ;;
