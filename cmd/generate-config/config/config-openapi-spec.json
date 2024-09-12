@@ -291,9 +291,14 @@
             "enum": [
               "none",
               "snapshot-controller",
-              "snapshot-webhook"
+              "snapshot-webhook",
+              ""
             ]
-          }
+          },
+          "example": [
+            "snapshot-controller",
+            "snapshot-webhook"
+          ]
         }
       }
     }

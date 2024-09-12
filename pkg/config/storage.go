@@ -26,7 +26,7 @@ const (
 
 // OptionalCsiComponent values determine which CSI components MicroShift should deploy. Currently only csi snapshot components
 // are supported.
-// +kubebuilder:validation:Enum:=none;snapshot-controller;snapshot-webhook
+// +kubebuilder:validation:Enum:=none;snapshot-controller;snapshot-webhook;""
 type OptionalCsiComponent string
 
 const (
@@ -41,6 +41,10 @@ const (
 	CsiComponentSnapshot OptionalCsiComponent = "snapshot-controller"
 	// CsiComponentSnapshotWebhook causes MicroShift to deploy the CSI Snapshot Validation Webhook.
 	CsiComponentSnapshotWebhook OptionalCsiComponent = "snapshot-webhook"
+	// CsiComponentNullAlias is equivalent to not specifying a value. It exists because controller-gen generates
+	// default empty-array values as [""], instead of []. Failing to include this odd value would mean the generated
+	// /etc/microshift/config.default.yaml would break if passed to MicroShift.
+	CsiComponentNullAlias OptionalCsiComponent = ""
 )
 
 // Storage represents a subfield of the MicroShift config data structure. Its purpose to provide a user
@@ -62,6 +66,7 @@ type Storage struct {
 	// objects.
 	// Allowed values are: unset, [], or one or more of ["snapshot-controller", "snapshot-webhook"]
 	// +kubebuilder:validation:Optional
+	// +kubebuilder:example={"snapshot-controller", "snapshot-webhook"}
 	OptionalCSIComponents []OptionalCsiComponent `json:"optionalCsiComponents,omitempty"`
 }
 
@@ -70,7 +75,8 @@ func (s Storage) driverIsValid() (isSupported bool) {
 }
 
 func (s Storage) csiComponentsAreValid() []string {
-	supported := sets.New[OptionalCsiComponent](CsiComponentSnapshot, CsiComponentSnapshotWebhook, CsiComponentNone)
+	supported := sets.New[OptionalCsiComponent](CsiComponentSnapshot, CsiComponentSnapshotWebhook, CsiComponentNone,
+		CsiComponentNullAlias)
 	unsupported := sets.New[string]()
 
 	for _, cfgComp := range s.OptionalCSIComponents {

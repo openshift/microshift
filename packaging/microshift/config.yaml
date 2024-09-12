@@ -131,6 +131,9 @@ storage:
     # storage driver. Like CSIStorageDriver, uninstallation is not supported as this can lead to orphaned storage
     # objects.
     # Allowed values are: unset, [], or one or more of ["snapshot-controller", "snapshot-webhook"]
+    # example:
+    #   - snapshot-controller
+    # - snapshot-webhook
     optionalCsiComponents:
         - ""
 
