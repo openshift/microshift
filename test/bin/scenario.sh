@@ -436,8 +436,8 @@ EOF
 #           [--vm_memory <memory>] \
 #           [--vm_disksize <disksize>] \
 #           [--vm_nics <nics>] \
-#           [--fips_mode] \
-#           [--bootc_mode]
+#           [--fips] \
+#           [--bootc]
 #
 # Arguments:
 #   [--vmname <name>]: The short name of the VM in the scenario (e.g., "host1").
@@ -450,8 +450,8 @@ EOF
 #   [--vm_memory <memory>]: Size of RAM in MB for the VM.
 #   [--vm_disksize <disksize>]: Size of disk in GB for the VM.
 #   [--vm_nics <nics>]: Number of network interfaces for the VM.
-#   [--fips_mode]: Enable FIPS mode
-#   [--bootc_mode]: Enable bootc mode
+#   [--fips]: Enable FIPS mode
+#   [--bootc]: Enable bootc mode
 
 launch_vm() {
     # set defaults
@@ -478,11 +478,11 @@ launch_vm() {
                     exit 1
                 fi
                 ;;
-            --fips_mode)
+            --fips)
                 fips_mode=1
                 shift
                 ;;
-            --bootc_mode)
+            --bootc)
                 bootc_mode=1
                 shift
                 ;;
