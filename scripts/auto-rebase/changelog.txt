@@ -1,6 +1,0 @@
-- cluster-network-operator embedded-component ee72e5e3a48fabdcaa2a800460a7b2694b4fa1fc to c6615ad8625b9931acf4b0d5f2287345321335c3
-  - a5da3e6 2024-03-27T13:39:18+00:00 Tighten the permissions on whereabouts.conf
-
-- machine-config-operator embedded-component b55d21df80ead6e00b8b36f21015bc8627b89ed7 to bb5ac68843493c4adbfd52b2d008e78654f26912
-  - 6735251c 2024-07-30T01:52:16+00:00 OCPBUGS-30955: On-Prem resolv prepender to watch for NM changes
-
