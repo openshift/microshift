@@ -12,11 +12,7 @@ Test Tags           ostree
 
 
 *** Variables ***
-${USHIFT_HOST}          ${EMPTY}
-${USHIFT_USER}          ${EMPTY}
-
 ${UPGRADE_REF}          ${EMPTY}
-
 ${TEST_NAMESPACE}       default
 
 

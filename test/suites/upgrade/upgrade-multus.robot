@@ -10,9 +10,6 @@ Suite Teardown      Teardown
 
 
 *** Variables ***
-${USHIFT_HOST}          ${EMPTY}
-${USHIFT_USER}          ${EMPTY}
-
 ${TARGET_REF}           ${EMPTY}
 
 ${BRIDGE_INTERFACE}     br-test

@@ -12,9 +12,6 @@ Test Tags           ostree
 
 
 *** Variables ***
-${USHIFT_HOST}      ${EMPTY}
-${USHIFT_USER}      ${EMPTY}
-
 ${FAILING_REF}      ${EMPTY}
 ${REASON}           ${EMPTY}
 

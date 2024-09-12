@@ -23,7 +23,6 @@ Downgrade Is Blocked
     ...    and results in system rolling back.
 
     ${initial_deploy_backup}=    Get Future Backup Name For Current Boot
-
     Deploy Commit Expecting A Rollback
     ...    ${OLDER_MICROSHIFT_REF}
     ...    False
