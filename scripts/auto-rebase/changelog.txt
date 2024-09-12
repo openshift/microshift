@@ -1,0 +1,7 @@
+- cluster-ingress-operator embedded-component 04f9483cc5d30c7086b3e0976a907df30f3a4c38 to 57f9674e75908ca11b24792fb9f077233cd7bcf1
+  - fec16e6 2024-09-01T17:17:11+00:00 OCPBUGS-34413: Refine logging for accurate infra CR status updates
+
+- operator-framework-olm embedded-component d2feafe8abba9c3e9850cbb14868e9d91432352b to c4c6542e2b56c33a8baba8266cc0c7d70e98077c
+  - 2fa54ee1 2024-09-10T19:04:40+00:00 adds paginating lister for evaluating CRs' upgrade fitness versus new CRDs. (#3387)
+  - 1a85dfe2 2024-09-10T03:15:11+00:00 Fix up CRD with deprecated version e2e flake (#3386)
+
