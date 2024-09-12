@@ -57,11 +57,17 @@ function print_boot_status() {
     # bootc status command output.
     if which ostree &>/dev/null ; then
         local -r ostree_stat=$(ostree admin status 2>/dev/null || true)
-        [ -n "${ostree_stat}" ] && system_stat="${ostree_stat}"
+        if [ -n "${ostree_stat}" ] ; then
+            system_type="ostree"
+            system_stat="${ostree_stat}"
+        fi
     fi
     if which bootc &>/dev/null ; then
         local -r bootc_stat=$(bootc status --booted --json 2>/dev/null | jq -r .status.type || true)
-        [ "${bootc_stat}" == "bootcHost" ] && system_stat="${bootc_stat}"
+        if [ "${bootc_stat}" == "bootcHost" ] ; then
+            system_type="bootc"
+            system_stat="${bootc_stat}"
+        fi
     fi
 
     echo -e "GRUB boot variables:\n${grub_vars}"
