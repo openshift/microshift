@@ -109,6 +109,7 @@ The microshift-selinux package provides the SELinux policy modules required by M
 Summary: Networking components for MicroShift
 Requires: microshift = %{version}
 Obsoletes: openvswitch3.1 < 3.3
+Obsoletes: openvswitch3.3 < 3.4
 Requires: (openvswitch3.4 or openvswitch >= 3.4)
 Requires: NetworkManager
 Requires: NetworkManager-ovs
@@ -521,6 +522,9 @@ fi
 # Use Git command to generate the log and replace the VERSION string
 # LANG=C git log --date="format:%a %b %d %Y" --pretty="tformat:* %cd %an <%ae> VERSION%n- %s%n" packaging/rpm/microshift.spec
 %changelog
+* Thu Sep 12 2024 Gregory Giguashvili <ggiguash@redhat.com> 4.17.0
+- Declare openvswitch3.3 package as obsolete to allow seemless upgrade to openvswitch3.4
+
 * Wed Sep 11 2024 Gregory Giguashvili <ggiguash@redhat.com> 4.18.0
 - Upgrade CRI-O version dependency to 1.31.0
 
