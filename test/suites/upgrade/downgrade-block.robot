@@ -12,10 +12,8 @@ Test Tags           ostree
 
 
 *** Variables ***
-${USHIFT_HOST}              ${EMPTY}
-${USHIFT_USER}              ${EMPTY}
-
 ${OLDER_MICROSHIFT_REF}     ${EMPTY}
+${BOOTC_REGISTRY}           ${EMPTY}
 
 
 *** Test Cases ***
@@ -26,17 +24,11 @@ Downgrade Is Blocked
 
     ${initial_deploy_backup}=    Get Future Backup Name For Current Boot
 
-    ${is_bootc}=    Is System Bootc
-    IF    ${is_bootc}
-        Deploy Bootc Commit Expecting A Rollback
-        ...    ${BOOTC_REGISTRY}
-        ...    ${OLDER_MICROSHIFT_REF}
-        ...    write_agent_cfg=False
-    ELSE
-        Deploy Commit Expecting A Rollback
-        ...    ${OLDER_MICROSHIFT_REF}
-        ...    write_agent_cfg=False
-    END
+    Deploy Commit Expecting A Rollback
+    ...    ${OLDER_MICROSHIFT_REF}
+    ...    False
+    ...    ${BOOTC_REGISTRY}
+
     Wait Until Greenboot Health Check Exited
     Backup Should Exist    ${initial_deploy_backup}
     Journal Should Have Information About Failed Version Comparison
