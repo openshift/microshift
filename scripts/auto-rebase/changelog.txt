@@ -1,0 +1,3 @@
+- operator-framework-olm embedded-component 5cf4c77a4dceccac671d50fc4ca24d8ec645f5dc to b7d48284c6311b185d573773528587e363e141ef
+  - 17f23b20 2024-09-10T09:22:42+00:00 Fix up CRD with deprecated version e2e flake (#3386)
+
