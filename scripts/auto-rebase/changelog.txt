@@ -1,6 +1,0 @@
-- cluster-network-operator embedded-component 3c87787ef68fe7b8cff9c9f23ccb2217f5b92767 to 7f2d7ad37a01d23d2eccd692860c5cf069855fad
-  - 9df3d77 2024-09-09T20:37:34-04:00 Add ability to configure transit and join switch subnet
-  - 98ee9ac 2024-09-09T20:37:34-04:00 Configure CNO as per new API changes for join and transit switch subnet
-  - 6f791d9 2024-09-09T20:37:34-04:00 Add knobs in cno referencing api change
-  - e1e29d7 2024-09-09T20:36:24-04:00 Bump openshift/api and vendor in changes
-
