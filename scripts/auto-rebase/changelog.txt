@@ -1,59 +1,8 @@
-- api embedded-component 5852b58f4b1071fe85d9c49dff2667a9b2a74841 to 3e5de946111c67cb1f2b09ff7da569012d15931d
-  - 67e03da 2024-09-10T13:03:25-07:00 config/v1/types_cluster_version: Add v4.17 and v4.18 capability sets
+- cluster-ingress-operator embedded-component db0e8114e5b6a15d484baddf37360a1414b69763 to d79cae1208ec8b09d7485cb04e87b80bb33059bf
+  - 8acd88e 2024-09-11T11:27:23-04:00 Add tolerations to survive scheduler taint manager e2e tests
 
-- cluster-dns-operator embedded-component 3a727094ce02cc90e73ca0876eaecaf46f05fbd9 to 208d50c1a5e0aaeb991366daa749abdffa803224
-  - c77b61c 2024-09-04T21:24:57+00:00 Updating ose-cluster-dns-operator-container image to be consistent with ART for 4.18 Reconciling with https://github.com/openshift/ocp-build-data/tree/827ab4ccce9cbbcf82c9dbaf6398b61d6cff8d7a/images/ose-cluster-dns-operator.yml
-
-- cluster-ingress-operator embedded-component 59a477e3254b6351084c24c5444200cfab1c77a9 to db0e8114e5b6a15d484baddf37360a1414b69763
-  - 8edf592 2024-09-05T02:10:24+00:00 Updating ose-cluster-ingress-operator-container image to be consistent with ART for 4.18 Reconciling with https://github.com/openshift/ocp-build-data/tree/827ab4ccce9cbbcf82c9dbaf6398b61d6cff8d7a/images/ose-cluster-ingress-operator.yml
-
-- cluster-kube-apiserver-operator embedded-component c731008f29e6ad878389b976d5305fc8a63a6f31 to 49d13e8c6a3d4543a91b0d023d5040b3b7eddf0b
-  - 13faa5f 2024-09-12T09:12:50+02:00 bindata: increase kube-apiserver failureThreshold
-
-- cluster-network-operator embedded-component 9beb4bfe608f49c40d4d4f438f2ce651f443bb9e to d936ce382648f456461c6a4d4af63a2073664c77
-  - e0bfa7e 2024-09-11T13:33:25+02:00 Configure narrowing=yes for IPsec connections
-
-- cluster-policy-controller embedded-component c502ece1b8bdccdbc58a327520685d9a1d2f59cf to 135a13c4cd8ca6147eb28ed3b3e3e71ba4e5b4fc
-  - 51c2df7 2024-09-12T09:57:00+02:00 pkg/psalabelsyncer: switch to PSA version 'latest'
-
-- kubernetes embedded-component 4cc396f1bc668d4832dd655039cbe88bcb2a491c to ce117ff87249deb45bf9564d976255645e530105
-  - e79ae1c9c 2024-09-11T08:59:34-03:00 UPSTREAM: 127243: Fix invalid label use in validatingadmissionpolicy e2e
-  - 524544966 2024-09-09T14:21:03+02:00 UPSTREAM: <carry>: replace newETCD3ProberMonitor with etcd3RetryingProberMonitor
-  - 2a67828f8 2024-09-09T14:19:07+02:00 UPSTREAM: <carry>: retry_etcdclient: expose retry logic functionality
-  - 7c7d4b59f 2024-09-09T14:18:34+02:00 UPSTREAM: <carry>: add etcd3RetryingProberMonitor for retrying etcd Unavailable errors for the etcd health checker client
-
-- machine-config-operator embedded-component c0266caf33b2e75eb45424ff11b63915bbc1e51d to 0f09c97eb0ce6966037c553f2b57a51e6a0dad32
-  - 26769817 2024-09-11T11:18:47+00:00 Revert "OCPBUGS-39438: Persist ethtool hw offload setting for br-ex"
-  - 09bee0d0 2024-09-11T11:18:47+00:00 Disable ESP offload in vmxnet3 including bonds
-  - 4490c93b 2024-09-09T12:23:36-03:00 Fix openstack-kubelet-nodename service
-
-- route-controller-manager embedded-component a47f6be3676d3eabb864ca339584fe857e1076c5 to 87dfd7936fc5264ad972dcbc4eb0380dc5cff0db
-  - 5bedb01 2024-09-04T10:57:18+00:00 Updating ose-route-controller-manager-container image to be consistent with ART for 4.18 Reconciling with https://github.com/openshift/ocp-build-data/tree/827ab4ccce9cbbcf82c9dbaf6398b61d6cff8d7a/images/ose-route-controller-manager.yml
-
-- oc image-amd64 822207dba2f31d33ffc320a2bb9145153f837fa6 to e3584b965787e221a84b81d53107c41d20250047
-  - f980297d 2024-09-11T09:09:35-04:00 Fixing -o flag in command example
-
-- coredns image-amd64 a656fdfff7685829962410a157c4a42a51775978 to cb1abfaeb7b0c5df4f0c56b0a009b439db1d0949
-  - 6abb229 2024-09-04T13:34:10+00:00 Updating coredns-container image to be consistent with ART for 4.18 Reconciling with https://github.com/openshift/ocp-build-data/tree/827ab4ccce9cbbcf82c9dbaf6398b61d6cff8d7a/images/coredns.yml
-
-- ovn-kubernetes image-amd64 14fb7c43a5b54e9be4063de628c996fcfcc3b5ad to b70ae7f5d24c5fcd69a18399419b41468afa6cac
-  - 4b0a31c1 2024-09-11T17:56:38-04:00 Bump OVN to ovn24.09-24.09.0-beta.31.el9fdp
-
-- kubernetes image-amd64 4cc396f1bc668d4832dd655039cbe88bcb2a491c to ce117ff87249deb45bf9564d976255645e530105
-  - e79ae1c9c 2024-09-11T08:59:34-03:00 UPSTREAM: 127243: Fix invalid label use in validatingadmissionpolicy e2e
-  - 524544966 2024-09-09T14:21:03+02:00 UPSTREAM: <carry>: replace newETCD3ProberMonitor with etcd3RetryingProberMonitor
-  - 2a67828f8 2024-09-09T14:19:07+02:00 UPSTREAM: <carry>: retry_etcdclient: expose retry logic functionality
-  - 7c7d4b59f 2024-09-09T14:18:34+02:00 UPSTREAM: <carry>: add etcd3RetryingProberMonitor for retrying etcd Unavailable errors for the etcd health checker client
-
-- coredns image-arm64 a656fdfff7685829962410a157c4a42a51775978 to cb1abfaeb7b0c5df4f0c56b0a009b439db1d0949
-  - 6abb229 2024-09-04T13:34:10+00:00 Updating coredns-container image to be consistent with ART for 4.18 Reconciling with https://github.com/openshift/ocp-build-data/tree/827ab4ccce9cbbcf82c9dbaf6398b61d6cff8d7a/images/coredns.yml
-
-- ovn-kubernetes image-arm64 14fb7c43a5b54e9be4063de628c996fcfcc3b5ad to b70ae7f5d24c5fcd69a18399419b41468afa6cac
-  - 4b0a31c1 2024-09-11T17:56:38-04:00 Bump OVN to ovn24.09-24.09.0-beta.31.el9fdp
-
-- kubernetes image-arm64 4cc396f1bc668d4832dd655039cbe88bcb2a491c to ce117ff87249deb45bf9564d976255645e530105
-  - e79ae1c9c 2024-09-11T08:59:34-03:00 UPSTREAM: 127243: Fix invalid label use in validatingadmissionpolicy e2e
-  - 524544966 2024-09-09T14:21:03+02:00 UPSTREAM: <carry>: replace newETCD3ProberMonitor with etcd3RetryingProberMonitor
-  - 2a67828f8 2024-09-09T14:19:07+02:00 UPSTREAM: <carry>: retry_etcdclient: expose retry logic functionality
-  - 7c7d4b59f 2024-09-09T14:18:34+02:00 UPSTREAM: <carry>: add etcd3RetryingProberMonitor for retrying etcd Unavailable errors for the etcd health checker client
+- machine-config-operator embedded-component 0f09c97eb0ce6966037c553f2b57a51e6a0dad32 to dceb47ab6ec420b3d30e9d7d5b744d7f1e95c7fd
+  - 49800e41 2024-09-13T15:50:38-04:00 crio: force runc by default
+  - 95d194b0 2024-09-12T11:11:13-04:00 OSASINFRA-3585: openstack: mount config drive when needed
+  - e31340c6 2024-09-10T14:46:05-04:00 node_controller: add nil check for oldPool
 
