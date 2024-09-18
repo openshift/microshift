@@ -4,7 +4,7 @@ https://github.com/openshift/cluster-ingress-operator embedded-component e302d85
 https://github.com/openshift/cluster-kube-apiserver-operator embedded-component 1fe5769f9c30c79140484b11340f40e5208b5d2c
 https://github.com/openshift/cluster-kube-controller-manager-operator embedded-component 4e059638c2cbf003551ee699106dc024760eece3
 https://github.com/openshift/cluster-kube-scheduler-operator embedded-component 33f630dc1f890ca59c5e57fb5b6cc24a3f22a1d4
-https://github.com/openshift/cluster-network-operator embedded-component 7f2d7ad37a01d23d2eccd692860c5cf069855fad
+https://github.com/openshift/cluster-network-operator embedded-component 36ac10c981452076d39284e45d06a54b226fdaff
 https://github.com/openshift/cluster-openshift-controller-manager-operator embedded-component accd87730fd3652584bef210626cab3b6d49271f
 https://github.com/openshift/cluster-policy-controller embedded-component 219f6f6f072d867201d4923d39fd8bcaecbe7c59
 https://github.com/openshift/csi-external-snapshotter embedded-component a6834536936b16dcd9ee81a8753a2ef6dc208541
@@ -12,7 +12,7 @@ https://github.com/openshift/etcd embedded-component 5ed5044c5661c55d297ab034805
 https://github.com/openshift/kubernetes embedded-component 03a907c6d182353a0e9b83a224a6f0398406f6d5
 https://github.com/openshift/kubernetes-kube-storage-version-migrator embedded-component 8558e14a116804168506d06e96eac5a79913a6eb
 https://github.com/openshift/machine-config-operator embedded-component c84afcee2dfb6b21d049a9b1a2d710fda9770143
-https://github.com/openshift/openshift-controller-manager embedded-component 98a4f65b5f47994ba28b34347de9179e91c11a0e
+https://github.com/openshift/openshift-controller-manager embedded-component f7dfe6a9600a1a1951dc6b9ddf14b426b6a27aef
 https://github.com/openshift/route-controller-manager embedded-component 1a5e72f41b21f5ebcd6f9dd8227d92ad1fffbb1e
 https://github.com/openshift/service-ca-operator embedded-component 3c3f82f7112ee4b5656e5c554f9887acdf881175
 https://github.com/openshift/oc image-amd64 44b3ac26e654777e0283759d45a2b3351823fc5e
