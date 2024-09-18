@@ -1,0 +1,3 @@
+- cluster-network-operator embedded-component c6615ad8625b9931acf4b0d5f2287345321335c3 to 092d15be0b1d2b0bffe96bad25a719c27444afda
+  - 4202b1e 2024-09-13T16:58:30+00:00 Add proxy env vars to onvkube-node
+
