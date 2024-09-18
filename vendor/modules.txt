@@ -722,7 +722,7 @@ github.com/openshift/client-go/user/informers/externalversions/internalinterface
 github.com/openshift/client-go/user/informers/externalversions/user
 github.com/openshift/client-go/user/informers/externalversions/user/v1
 github.com/openshift/client-go/user/listers/user/v1
-# github.com/openshift/cluster-policy-controller v0.0.0-20240912102633-135a13c4cd8c
+# github.com/openshift/cluster-policy-controller v0.0.0-20240916125023-644bcb6c6516
 ## explicit; go 1.22.0
 github.com/openshift/cluster-policy-controller/pkg/client/genericinformers
 github.com/openshift/cluster-policy-controller/pkg/cmd/cluster-policy-controller
