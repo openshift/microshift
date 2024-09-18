@@ -930,6 +930,20 @@ load_subscription_manager_plugin() {
     source "${SUBSCRIPTION_MANAGER_PLUGIN}"
 }
 
+# Check if dependencies are running, and if not, start
+#   - nginx server
+#   - registry mirror
+check_dependencies() {
+    if ps aux | grep nginx | grep -v grep > /dev/null; then
+        "${TESTDIR}/bin/manage_webserver.sh" "start"
+    fi
+
+    if ! podman container inspect microshift-local-registry > /dev/null 2>&1; then
+        "${TESTDIR}/bin/mirror_registry.sh"
+    fi
+
+}
+
 action_create() {
     start_junit
     trap "close_junit" EXIT
@@ -961,6 +975,8 @@ action_create() {
         [ "${rc}" -ne 0 ] && record_junit "setup" "scenario_create_vms" "FAILED" ; \
         sos_report true || rc=1 ; \
         close_junit ; exit "${rc}"' EXIT
+
+    check_dependencies
 
     scenario_create_vms
     record_junit "setup" "scenario_create_vms" "OK"
@@ -1012,6 +1028,8 @@ action_run() {
         [ "${rc}" -ne 0 ] && record_junit "run" "scenario_run_tests" "FAILED" ; \
         sos_report true || rc=1 ; \
         close_junit ; exit "${rc}"' EXIT
+
+    check_dependencies
 
     scenario_run_tests
     record_junit "run" "scenario_run_tests" "OK"
