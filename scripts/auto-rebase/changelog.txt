@@ -1,8 +1,6 @@
-- cluster-ingress-operator embedded-component db0e8114e5b6a15d484baddf37360a1414b69763 to d79cae1208ec8b09d7485cb04e87b80bb33059bf
-  - 8acd88e 2024-09-11T11:27:23-04:00 Add tolerations to survive scheduler taint manager e2e tests
+- cluster-kube-controller-manager-operator embedded-component 0a9ed573e35751455bfb24842fd2de0b05379ed0 to 2e999c706995d121ff6d62fcc06ffd8dbf3a8ca7
+  - 8401006 2024-09-16T12:38:26+02:00 Update OWNERS
 
-- machine-config-operator embedded-component 0f09c97eb0ce6966037c553f2b57a51e6a0dad32 to dceb47ab6ec420b3d30e9d7d5b744d7f1e95c7fd
-  - 49800e41 2024-09-13T15:50:38-04:00 crio: force runc by default
-  - 95d194b0 2024-09-12T11:11:13-04:00 OSASINFRA-3585: openstack: mount config drive when needed
-  - e31340c6 2024-09-10T14:46:05-04:00 node_controller: add nil check for oldPool
+- cluster-policy-controller embedded-component 135a13c4cd8ca6147eb28ed3b3e3e71ba4e5b4fc to 644bcb6c65160ad3dc76fdafd629f61434a734ca
+  - c2de03f 2024-09-16T12:40:07+02:00 Update OWNERS
 
