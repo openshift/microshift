@@ -428,29 +428,73 @@ EOF
 # If no boot_blueprint is specified, uses DEFAULT_BOOT_BLUEPRINT.
 # If no network_name is specified, uses the "default" network.
 #
-# Arguments
-#  vmname -- The short name of the VM in the scenario (e.g., "host1").
-#  boot_blueprint -- The image blueprint used to create the ISO that
-#                    should be used to boot the VM. This is _not_
-#                    necessarily the image to be installed (see
-#                    prepare_kickstart).
-#  network_name -- The name of the network used when creating the VM.
-#  vm_vcpus -- Number of vCPUs for the VM.
-#  vm_memory -- Size of RAM in MB for the VM.
-#  vm_disksize -- Size of disk in GB for the VM.
-#  vm_nics -- Number of network interfaces for the VM.
-#  fips_mode -- Enable FIPS mode (0 - disabled, 1 - enabled).
-#  bootc_mode -- Enable bootc mode (0 - disabled, 1 - enabled).
+# Usage: launch_vm \
+#           [--vmname <name>] \
+#           [--boot_blueprint <blueprint>] \
+#           [--network_name <name>] \
+#           [--vm_vcpus <vcpus>] \
+#           [--vm_memory <memory>] \
+#           [--vm_disksize <disksize>] \
+#           [--vm_nics <nics>] \
+#           [--fips] \
+#           [--bootc]
+#
+# Arguments:
+#   [--vmname <name>]: The short name of the VM in the scenario (e.g., "host1").
+#   [--boot_blueprint <blueprint>]: The image blueprint used to create the ISO that
+#                                   should be used to boot the VM. This is _not_
+#                                   necessarily the image to be installed (see
+#                                   prepare_kickstart).
+#   [--network_name <name>]: The name of the network used when creating the VM.
+#   [--vm_vcpus <vcpus>]: Number of vCPUs for the VM.
+#   [--vm_memory <memory>]: Size of RAM in MB for the VM.
+#   [--vm_disksize <disksize>]: Size of disk in GB for the VM.
+#   [--vm_nics <nics>]: Number of network interfaces for the VM.
+#   [--fips]: Enable FIPS mode
+#   [--bootc]: Enable bootc mode
+
 launch_vm() {
-    local -r vmname="$1"
-    local -r boot_blueprint="${2:-${DEFAULT_BOOT_BLUEPRINT}}"
-    local -r network_name="${3:-default}"
-    local -r vm_vcpus="${4:-2}"
-    local -r vm_memory="${5:-4096}"
-    local -r vm_disksize="${6:-20}"
-    local -r vm_nics="${7:-1}"
-    local -r fips_mode="${8:-0}"
-    local -r bootc_mode="${9:-0}"
+    # set defaults
+    local vmname="host1"
+    local boot_blueprint="${DEFAULT_BOOT_BLUEPRINT}"
+    local network_name="default"
+    local vm_memory=4096
+    local vm_vcpus=2
+    local vm_disksize=20
+    local vm_nics=1
+    local fips_mode=0
+    local bootc_mode=0
+
+    while [ $# -gt 0 ]; do
+        case "$1" in
+            --vmname|--boot_blueprint|--network_name|--vm_vcpus|--vm_memory|--vm_disksize|--vm_nics)
+                var="${1/--/}"
+                if [ -n "$2" ] && [ "${2:0:1}" != "-" ]; then 
+                    declare "${var}=$2"
+                    shift 2
+                else
+                    error "Failed parsing arguments: ${var} value not set"
+                    record_junit "${vmname}" "vm-launch-args" "FAILED"
+                    exit 1
+                fi
+                ;;
+            --fips)
+                fips_mode=1
+                shift
+                ;;
+            --bootc)
+                bootc_mode=1
+                shift
+                ;;
+            *)
+                error "Invalid argument: ${1}" 
+                record_junit "${vmname}" "vm-launch-args" "FAILED"
+                exit 1
+                ;;
+        esac
+    done
+
+    record_junit "${vmname}" "vm-launch-args" "OK"
 
     local -r full_vmname="$(full_vm_name "${vmname}")"
     local -r kickstart_url="${WEB_SERVER_URL}/scenario-info/${SCENARIO}/vms/${vmname}/kickstart.ks"
