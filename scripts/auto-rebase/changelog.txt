@@ -1,10 +1,3 @@
-- cluster-network-operator embedded-component 7839dbf5f68f21323a49efb11b2fafd1790bd06c to 5a8c693e6461b104d8ba7aa70bfab29482bf9f10
-  - 6c29a08 2024-09-10T01:58:46+00:00 HyperShift: do not use antiaffinity on single replica control planes
-
-- machine-config-operator embedded-component 0cf3960e758021e1bd20f113e4cf5f86b9f6a5e7 to 6a425abbe5e330f0e7bc0849f4927d4c55d0c9e5
-  - f9b96b38 2024-09-11T10:01:49-04:00 controller: fix OCL status reporting
-  - 5617a788 2024-09-11T09:56:00-04:00 controller: stop using MCN to feed MCP status
-
-- operator-framework-olm embedded-component c4c6542e2b56c33a8baba8266cc0c7d70e98077c to c50e9ce2b292a188e99e72fc6dc59d1fb5e9e0cb
-  - ee2a0816 2024-09-09T15:51:59-05:00 add optional schema migrations; default to olm.bundle.object instead of olm.csv.metadata (#1384)
+- openshift-controller-manager embedded-component 380497db302a64a5524b23204920f0e78bf46f33 to b906ac17726591eb474ce44729af492d692d6779
+  - 17e3191 2024-09-11T09:19:54-04:00 CVE-2024-45496: Reduce Capabilities for Non-Build Containers
 
