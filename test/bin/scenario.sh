@@ -930,18 +930,17 @@ load_subscription_manager_plugin() {
     source "${SUBSCRIPTION_MANAGER_PLUGIN}"
 }
 
-# Check if dependencies are running, and if not, start
+# Check if dependencies are running, and if not, start them
 #   - nginx server
 #   - registry mirror
 check_dependencies() {
-    if ps aux | grep nginx | grep -v grep > /dev/null; then
+    if ! ps aux | grep nginx | grep -v grep > /dev/null; then
         "${TESTDIR}/bin/manage_webserver.sh" "start"
     fi
 
     if ! podman container inspect microshift-local-registry > /dev/null 2>&1; then
         "${TESTDIR}/bin/mirror_registry.sh"
     fi
-
 }
 
 action_create() {
