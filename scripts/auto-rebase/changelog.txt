@@ -1,7 +1,0 @@
-- cluster-network-operator embedded-component 7f2d7ad37a01d23d2eccd692860c5cf069855fad to 36ac10c981452076d39284e45d06a54b226fdaff
-  - 55aef08 2024-09-16T16:54:22+00:00 Add proxy env vars to onvkube-node
-
-- openshift-controller-manager embedded-component 98a4f65b5f47994ba28b34347de9179e91c11a0e to f7dfe6a9600a1a1951dc6b9ddf14b426b6a27aef
-  - 46ab838 2024-09-13T18:12:52+00:00 BUILD-854: Add adambkaplan as approver
-  - ee4a21a 2024-09-11T09:29:22-04:00 CVE-2024-45496: Reduce Capabilities for Non-Build Containers
-
