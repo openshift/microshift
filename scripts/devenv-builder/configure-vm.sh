@@ -137,7 +137,9 @@ if ${INSTALL_BUILD_DEPS} || ${BUILD_AND_RUN}; then
         "${DNF_RETRY}" "update"
     fi
     "${DNF_RETRY}" "install" "gcc git golang cockpit make jq selinux-policy-devel rpm-build jq bash-completion avahi-tools createrepo"
-    sudo systemctl enable --now cockpit.socket
+
+    # run only if booted with systemd
+    [[ -d /run/systemd/system ]] &&  sudo systemctl enable --now cockpit.socket
 fi
 
 GO_VER=1.21.3  # released 2023-10-10 (matches CI images)
