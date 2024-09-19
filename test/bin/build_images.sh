@@ -707,7 +707,7 @@ fi
 trap 'osbuild_logs' EXIT
 
 # Check if webserver is running
-if ! ps aux | grep nginx | grep -v grep > /dev/null; then
+if [ $(pgrep -cx nginx) -eq 0 ] ; then
     "${TESTDIR}/bin/manage_webserver.sh" "start"
 fi
 

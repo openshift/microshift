@@ -934,7 +934,7 @@ load_subscription_manager_plugin() {
 #   - nginx server
 #   - registry mirror
 check_dependencies() {
-    if ! ps aux | grep nginx | grep -v grep > /dev/null; then
+    if [ $(pgrep -cx nginx) -eq 0 ] ; then
         "${TESTDIR}/bin/manage_webserver.sh" "start"
     fi
 
