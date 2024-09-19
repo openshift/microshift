@@ -13,7 +13,7 @@ https://github.com/openshift/etcd embedded-component 1fb3165305efc8d986344b555b2
 https://github.com/openshift/kubernetes embedded-component d3adea4933c942000ceb2c9ca98b1920814f5b34
 https://github.com/openshift/kubernetes-kube-storage-version-migrator embedded-component 34fafc04e5f2872e282617da31175a7e091ffdb2
 https://github.com/openshift/machine-config-operator embedded-component 858c0a2e5965fcff48716c1db01ee76bb1eed9f2
-https://github.com/openshift/openshift-controller-manager embedded-component 4301d6603b205139718037237aa71577e3e8ae68
+https://github.com/openshift/openshift-controller-manager embedded-component 7682a61bedd0db855bb9696bfb08f6078688ea4e
 https://github.com/openshift/operator-framework-olm embedded-component b0d86a042d2b36be77b3b5bca74e73194bfdeee8
 https://github.com/openshift/route-controller-manager embedded-component a47f6be3676d3eabb864ca339584fe857e1076c5
 https://github.com/openshift/service-ca-operator embedded-component 1f7d6472fea332fc307d9c8911f8c3cf57347755
