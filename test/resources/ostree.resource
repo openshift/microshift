@@ -22,13 +22,11 @@ Current Deployment Should Be
 
 Deploy Commit
     [Documentation]    Deploys the given reference on ostree or bootc systems.
-    ...    The '${registry_url}' argument is required on bootc systems.
+    ...    When the '${registry_url}' argument is not empty, the function assumes
+    ...    that a bootc deployment needs to be performed.
     [Arguments]    ${ref}    ${write_agent_cfg}    ${registry_url}
 
-    ${is_bootc}=    Is System Bootc
-    IF    ${is_bootc}
-        Should Not Be Empty    ${registry_url}    registry_url argument is required
-
+    IF    "${registry_url}"!="${EMPTY}"
         # Allow insecure registry access when pulling the container image to be used
         Write Insecure Registry Url    ${registry_url}
         ${deploy_id}=    Rebase Bootc System    ${registry_url}/${ref}
