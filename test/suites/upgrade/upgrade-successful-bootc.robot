@@ -23,16 +23,13 @@ Upgrade
     [Documentation]    Performs an upgrade to a given bootc reference
     ...    and verifies if it was successful, including SELinux validation
 
-    # The system before the upgrade should either by bootc or ostree
-    ${is_bootc}=    Is System Bootc
-    ${is_ostree}=    Is System OSTree
-    ${cond}=    Evaluate    ${is_bootc} == ${FALSE} and ${is_ostree} == ${FALSE}
-    Should Not Be True    ${cond}    The system should either be bootc or ostree
-
     Wait Until Greenboot Health Check Exited
 
     ${future_backup}=    Get Future Backup Name For Current Boot
-    Deploy Bootc Commit Not Expecting A Rollback    ${BOOTC_REGISTRY}    ${TARGET_REF}
+    Deploy Commit Not Expecting A Rollback
+    ...    ${TARGET_REF}
+    ...    False
+    ...    ${BOOTC_REGISTRY}
     Backup Should Exist    ${future_backup}
 
     # SELinux tests do not pass on bootc images yet.

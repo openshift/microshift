@@ -14,9 +14,9 @@ COPY ./rpm-repos/$USHIFT_RPM_REPO_NAME $USHIFT_RPM_REPO_PATH
 # Add the following repositories and print their contents:
 # - MicroShift local RPM repository
 # - OpenShift Mirror Beta previous minor version repository for MicroShift dependencies
-# Install MicroShift, few helper utilities and cleanup
+# Install MicroShift and cleanup
 RUN ${REPO_CONFIG_SCRIPT} -create ${USHIFT_RPM_REPO_PATH} && \
-    dnf install -y vi firewalld microshift microshift-release-info && \
+    dnf install -y firewalld "microshift-{{ .Env.SOURCE_VERSION }}" "microshift-release-info-{{ .Env.SOURCE_VERSION }}" && \
     systemctl enable microshift && \
     ${REPO_CONFIG_SCRIPT} -delete && \
     rm -f ${REPO_CONFIG_SCRIPT} && \

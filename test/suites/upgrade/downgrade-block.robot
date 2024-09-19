@@ -12,10 +12,8 @@ Test Tags           ostree
 
 
 *** Variables ***
-${USHIFT_HOST}              ${EMPTY}
-${USHIFT_USER}              ${EMPTY}
-
 ${OLDER_MICROSHIFT_REF}     ${EMPTY}
+${BOOTC_REGISTRY}           ${EMPTY}
 
 
 *** Test Cases ***
@@ -25,8 +23,11 @@ Downgrade Is Blocked
     ...    and results in system rolling back.
 
     ${initial_deploy_backup}=    Get Future Backup Name For Current Boot
+    Deploy Commit Expecting A Rollback
+    ...    ${OLDER_MICROSHIFT_REF}
+    ...    False
+    ...    ${BOOTC_REGISTRY}
 
-    Deploy Commit Expecting A Rollback    ${OLDER_MICROSHIFT_REF}    write_agent_cfg=False
     Wait Until Greenboot Health Check Exited
     Backup Should Exist    ${initial_deploy_backup}
     Journal Should Have Information About Failed Version Comparison
@@ -36,7 +37,7 @@ Downgrade Is Blocked
 Setup
     [Documentation]    Test suite setup
     Check Required Env Variables
-    Should Not Be Empty    ${OLDER_MICROSHIFT_REF}    FAKE_NEXT_MINOR_REF variable is required
+    Should Not Be Empty    ${OLDER_MICROSHIFT_REF}    OLDER_MICROSHIFT_REF variable is required
     Login MicroShift Host
     Wait Until Greenboot Health Check Exited
 

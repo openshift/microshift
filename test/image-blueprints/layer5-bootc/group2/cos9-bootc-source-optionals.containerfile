@@ -16,7 +16,7 @@ COPY ./rpm-repos/$USHIFT_RPM_REPO_NAME $USHIFT_RPM_REPO_PATH
 # - OpenShift Mirror Beta previous minor version repository for MicroShift dependencies
 # Install MicroShift optional packages and cleanup
 RUN ${REPO_CONFIG_SCRIPT} -create ${USHIFT_RPM_REPO_PATH} && \
-    dnf install -y microshift-olm microshift-multus && \
+    dnf install -y "microshift-olm-{{ .Env.SOURCE_VERSION }}" "microshift-multus-{{ .Env.SOURCE_VERSION }}" && \
     ${REPO_CONFIG_SCRIPT} -delete && \
     rm -f ${REPO_CONFIG_SCRIPT} && \
     rm -rf $USHIFT_RPM_REPO_PATH && \
