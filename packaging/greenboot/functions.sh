@@ -359,8 +359,10 @@ try:
             sys.exit(0)
         finally:
             stream.close()
+except FileNotFoundError:
+    print(f"/etc/microshift/config.yaml does not exist - assuming LVMS is deployed")
 except Exception as e:
-    print(f"error opening config: {e}", file=sys.Stderr)
+    print(f"Cannot decide if LVMS should exist - assuming YES: error opening config: {e}", file=sys.stderr)
     '; then
          return 0
     fi
@@ -401,8 +403,10 @@ try:
             sys.exit(0)
         finally:
             stream.close()
+except FileNotFoundError:
+    print(f"/etc/microshift/config.yaml does not exist - assuming CSI component {sys.argv[1]} is deployed")
 except Exception as e:
-    print(f"error opening config: {e}", file=sys.Stderr)
+    print(f"Cannot decide if CSI component {sys.argv[1]} should be deployed - assuming YES: error opening config: {e}", file=sys.stderr)
 ' "${component}";
     then
         return 0

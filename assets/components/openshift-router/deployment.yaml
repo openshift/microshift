@@ -117,6 +117,14 @@ spec:
               protocol: TCP
           args:
             - -v=4
+      tolerations:
+        # Ensure the pod isn't deleted during serial NoExecuteTaintManager tests.
+        # Remember that NoExecute uses Delete, not Evict, because removing the pod
+        # is non-optional.  This means that PDBs are not honored.
+        - key: "kubernetes.io/e2e-evict-taint-key"
+          operator: "Equal"
+          value: "evictTaintVal"
+          effect: "NoExecute"
       volumes:
         - name: default-certificate
           secret:

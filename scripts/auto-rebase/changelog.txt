@@ -1,3 +1,6 @@
-- oc image-arm64 c72b183b6b632269d0210e321931b8fd02fab803 to 2f887e82f90a667eca37234b09ac297ef2394ffe
-  - 5d693a0b 2024-08-27T16:21:00-04:00 OTA-1309: hide the empty "Worker Upgrade" section
+- cluster-kube-controller-manager-operator embedded-component 0a9ed573e35751455bfb24842fd2de0b05379ed0 to 2e999c706995d121ff6d62fcc06ffd8dbf3a8ca7
+  - 8401006 2024-09-16T12:38:26+02:00 Update OWNERS
+
+- cluster-policy-controller embedded-component 135a13c4cd8ca6147eb28ed3b3e3e71ba4e5b4fc to 644bcb6c65160ad3dc76fdafd629f61434a734ca
+  - c2de03f 2024-09-16T12:40:07+02:00 Update OWNERS
 

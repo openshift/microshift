@@ -10,7 +10,7 @@ scenario_create_vms() {
         return 0
     fi
     prepare_kickstart host1 kickstart.ks.template "${start_commit}"
-    launch_vm host1 rhel-9.4
+    launch_vm 
 }
 
 scenario_remove_vms() {
