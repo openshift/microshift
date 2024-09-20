@@ -666,8 +666,7 @@ fi
 # Determine the version of the RPM in the local repo so we can use it
 # in the blueprint templates.
 if [ ! -d "${LOCAL_REPO}" ]; then
-    error "Run ${SCRIPTDIR}/create_local_repo.sh before building images."
-    exit 1
+    "${TESTDIR}/bin/build_rpms.sh"
 fi
 release_info_rpm=$(find "${LOCAL_REPO}" -name 'microshift-release-info-*.rpm' | sort | tail -n 1)
 if [ -z "${release_info_rpm}" ]; then

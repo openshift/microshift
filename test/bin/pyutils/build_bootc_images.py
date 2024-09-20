@@ -523,7 +523,8 @@ def main():
             raise Exception(f"The input directory '{dir2process}' does not exist")
         # Make sure the local RPM repository exists
         if not os.path.isdir(LOCAL_REPO):
-            raise Exception("Run create_local_repo.sh before building images")
+            build_rpms = f"{SCRIPTDIR}/build_rpms.sh"
+            common.run_command(build_rpms)
         # Initialize force rebuild option
         global FORCE_REBUILD
         if args.force_rebuild:

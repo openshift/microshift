@@ -732,8 +732,7 @@ configure_vm_firewall() {
 # Function to report the full version of locally built RPMs, e.g. "4.17.0"
 local_rpm_version() {
     if [ ! -d "${LOCAL_REPO}" ]; then
-        error "Run ${SCRIPTDIR}/create_local_repo.sh before running this scenario."
-        return 1
+        "${TESTDIR}/bin/build_rpms.sh"
     fi
 
     local -r release_info_rpm=$(find "${LOCAL_REPO}" -name 'microshift-release-info-*.rpm' | sort | tail -n 1)
@@ -789,12 +788,7 @@ run_tests() {
     if [ ! -d "${RF_VENV}" ]; then
         echo "RF_VENV (${RF_VENV}) does not exist, running ${ROOTDIR}/scripts/fetch_tools.sh robotframework"
         "${ROOTDIR}/scripts/fetch_tools.sh" "robotframework"
-        if [ $? -ne 0 ]; then
-            record_junit "${vmname}" "robot_framework_environment" "FAILED"
-            exit 1
-        fi
     fi
-    record_junit "${vmname}" "robot_framework_environment" "OK"
     local rf_binary="${RF_VENV}/bin/robot"
     if [ ! -f "${rf_binary}" ]; then
         error "robot is not installed to ${rf_binary}"
@@ -807,12 +801,7 @@ run_tests() {
     if ! command -v oc &> /dev/null ; then
         echo "OpenShift Client package not installed, installing with ${ROOTDIR}/scripts/fetch_tools.sh oc"
         "${ROOTDIR}/scripts/fetch_tools.sh" "oc"
-        if [ $? -ne 0 ]; then
-            record_junit "${vmname}" "oc_installed" "FAILED"
-            exit 1
-        fi
     fi
-    record_junit "${vmname}" "oc_installed" "OK"
 
     # The IP file is created empty during the launch VM phase if the VM is has no NICs. This is the queue to skip
     # the variable file creation and greenboot check.
