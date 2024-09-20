@@ -1,0 +1,3 @@
+- openshift-controller-manager embedded-component 4301d6603b205139718037237aa71577e3e8ae68 to 7682a61bedd0db855bb9696bfb08f6078688ea4e
+  - e4626d1 2024-09-11T12:54:47+00:00 CVE-2024-45496: Reduce Capabilities for Non-Build Containers
+
