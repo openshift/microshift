@@ -123,32 +123,11 @@ gettool_yq() {
 }
 
 gettool_hadolint() {
-    local ver="2.12.0"
-    declare -A checksums=(
-        ["x86_64"]="56de6d5e5ec427e17b74fa48d51271c7fc0d61244bf5c90e828aab8362d55010"
-        ["aarch64"]="5798551bf19f33951881f15eb238f90aef023f11e7ec7e9f4c37961cb87c5df6")
+    local -r ver="2.12.0"
+    local -r img="ghcr.io/hadolint/hadolint"
 
-    declare -A arch_map=(
-        ["x86_64"]="x86_64"
-        ["aarch64"]="arm64")
-
-    local arch="${arch_map[${ARCH}]}"
-    local checksum="${checksums[${ARCH}]}"
-    local filename="hadolint"
-    local url="https://github.com/hadolint/hadolint/releases/download/v${ver}/hadolint-Linux-${arch}"
-
-    _install "${url}" "${checksum}" "${filename}" "hadolint-Linux-${arch}"
-
-    # SELinux context change is required on some systems to prevent the following error
-    #
-    # SELinux is preventing <exename> from execmod access on the file.
-    # If you want to allow all unconfined executables to use libraries requiring text relocation
-    # that are not labeled textrel_shlib_t, then you must tell SELinux about this by enabling the
-    # 'selinuxuser_execmod' boolean.
-    if which selinuxenabled >/dev/null 2>&1; then
-        if selinuxenabled ; then
-            chcon -t textrel_shlib_t "${DEST_DIR}/${filename}"
-        fi
+    if [ "$(podman images -q "${img}:${ver}" | wc -w)" -eq 0 ] ; then
+        podman pull "${img}:${ver}"
     fi
 }
 
