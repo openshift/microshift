@@ -1,6 +1,31 @@
-- cluster-kube-controller-manager-operator embedded-component 0a9ed573e35751455bfb24842fd2de0b05379ed0 to 2e999c706995d121ff6d62fcc06ffd8dbf3a8ca7
-  - 8401006 2024-09-16T12:38:26+02:00 Update OWNERS
+- api embedded-component 3e5de946111c67cb1f2b09ff7da569012d15931d to 1d6161864959881b9b574d30428e574f92ea5c43
+  - 3c344eb 2024-09-17T10:43:41-04:00 generated
+  - fd78eea 2024-09-17T10:43:40-04:00 move authoritative source of some operator CRD manifests to openshift/api
 
-- cluster-policy-controller embedded-component 135a13c4cd8ca6147eb28ed3b3e3e71ba4e5b4fc to 644bcb6c65160ad3dc76fdafd629f61434a734ca
-  - c2de03f 2024-09-16T12:40:07+02:00 Update OWNERS
+- cluster-ingress-operator embedded-component d79cae1208ec8b09d7485cb04e87b80bb33059bf to 871b2b20f9a3381e7ee31fda34f5821f51fff13c
+  - 4e41fa0 2024-08-08T13:54:45+01:00 Bump IBM/go-sdk-core to v5.17.4
+
+- cluster-kube-controller-manager-operator embedded-component 2e999c706995d121ff6d62fcc06ffd8dbf3a8ca7 to f4da19293909b2723f8fa6060f5cb8660070114e
+  - f0e698c 2024-09-05T04:18:39+00:00 Updating ose-cluster-kube-controller-manager-operator-container image to be consistent with ART for 4.18 Reconciling with https://github.com/openshift/ocp-build-data/tree/827ab4ccce9cbbcf82c9dbaf6398b61d6cff8d7a/images/ose-cluster-kube-controller-manager-operator.yml
+
+- cluster-kube-scheduler-operator embedded-component a55bec3f50d43c28ef08bb8bf8f5d4c63df8eef6 to 1e9ddcfcbfef7a1bb090b11f0dc1af2a4d1c5edb
+  - 913b3c2 2024-09-16T12:36:58+02:00 Update OWNERS
+
+- cluster-policy-controller embedded-component 644bcb6c65160ad3dc76fdafd629f61434a734ca to 35753b6b1e97843c6856c9866fe1d8a205d05df4
+  - 8c88b57 2024-09-05T08:49:47+00:00 Updating ose-cluster-policy-controller-container image to be consistent with ART for 4.18 Reconciling with https://github.com/openshift/ocp-build-data/tree/827ab4ccce9cbbcf82c9dbaf6398b61d6cff8d7a/images/cluster-policy-controller.yml
+
+- machine-config-operator embedded-component dceb47ab6ec420b3d30e9d7d5b744d7f1e95c7fd to 702991da8c042288619870de3d21d310b1d1ebd6
+  - 2af96ab7 2024-09-11T11:19:00-04:00 Check for kernel arg diff in updateOnClusterBuild
+
+- openshift-controller-manager embedded-component c9324273f9020b9e7e4b8cb10cfcd230528d1783 to c8b7e50875be58338892cf5ebcbc55cad822857a
+  - 840801b 2024-09-06T13:50:19-04:00 CVE-2024-45496: Reduce Capabilities for Non-Build Containers
+
+- oc image-amd64 e3584b965787e221a84b81d53107c41d20250047 to 4682bd8222d39d4eb71eb474030a0b6860c61e0e
+  - 4b210253 2024-08-29T15:17:02-04:00 OTA-1292: upgrade-status: improve messages for NotReady/DiskPressure/NetworkUnavailable
+
+- oc image-arm64 e3584b965787e221a84b81d53107c41d20250047 to 95a400196419a730dd6f7d711c58a6859c0408c6
+  - a8fc369d 2024-09-18T13:42:25+03:00 Check cast result in adm prune deployments to prevent panic
+  - d1f9f1bd 2024-09-12T17:53:19-04:00 Rename rsync'd ISO file to -output-name value
+  - 01ab8579 2024-09-10T17:39:03-04:00 OCPBUGS-38450: Fix copy artifacts for all CPU architectures
+  - 4b210253 2024-08-29T15:17:02-04:00 OTA-1292: upgrade-status: improve messages for NotReady/DiskPressure/NetworkUnavailable
 
