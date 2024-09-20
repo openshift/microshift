@@ -414,30 +414,15 @@ Reboot the development virtual machine to finalize the configuration.
 
 #### Using Shared Directory
 
-One way of using the shared directory would be to keep the whole source tree in
-it for easy access from the host.
+Run the following commands to move the original source tree to a shared location
+and link it from the `microshift` user home directory. Note that this allows to
+keep all the user configuration files locally while sharing the source tree.
 
 ```
 MOUNT_DIR=/home/microshift-shared
 
-sudo mkdir -p -m 0755 "${MOUNT_DIR}/microshift"
-sudo chown $(whoami). "${MOUNT_DIR}/microshift"
+sudo mv ~/microshift "${MOUNT_DIR}/"
 
 # Do not attempt to create the link if the target already exists
 [ ! -e ~/microshift ] && ln -s "${MOUNT_DIR}/microshift" ~/microshift
-```
-
-Another way of using the shared directory would be to keep the whole `microshift`
-user home directory on the host and mount it from the virtual machine.
-
-```
-MOUNT_DIR=/home/microshift-shared
-
-sudo mkdir -p -m 0755 "${MOUNT_DIR}/microshift"
-sudo chown $(whoami). "${MOUNT_DIR}/microshift"
-
-# Move the existing home directory
-[ -d /home/microshift ] && sudo mv /home/microshift /home/microshift.local
-# Do not attempt to create the link if the target already exists
-[ ! -L /home/microshift ] && sudo ln -s "${MOUNT_DIR}" /home/microshift
 ```
