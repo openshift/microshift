@@ -943,7 +943,7 @@ check_dependencies() {
         "${TESTDIR}/bin/manage_webserver.sh" "start"
     fi
 
-    if ! podman container inspect microshift-local-registry &> /dev/null ; then
+    if ! podman ps | grep microshift-local-registry &> /dev/null ; then
         "${TESTDIR}/bin/mirror_registry.sh"
     fi
 }
