@@ -1,3 +1,3 @@
-- openshift-controller-manager embedded-component 380497db302a64a5524b23204920f0e78bf46f33 to b906ac17726591eb474ce44729af492d692d6779
-  - 17e3191 2024-09-11T09:19:54-04:00 CVE-2024-45496: Reduce Capabilities for Non-Build Containers
+- cluster-network-operator embedded-component 5a8c693e6461b104d8ba7aa70bfab29482bf9f10 to 32a7e8919ab782d8ede30144c1354236c557a8ed
+  - 6808b4a 2024-07-31T13:57:35+00:00 Handle random crictl errors in iptables-alerter
 
