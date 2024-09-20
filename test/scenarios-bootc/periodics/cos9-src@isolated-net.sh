@@ -1,0 +1,22 @@
+#!/bin/bash
+
+# Sourced from scenario.sh and uses functions defined there.
+
+# Redefine network-related settings to use the isolated network bridge
+VM_BRIDGE_IP="$(get_vm_bridge_ip "${VM_ISOLATED_NETWORK}")"
+# shellcheck disable=SC2034  # used elsewhere
+BOOTC_REGISTRY_URL="${VM_BRIDGE_IP}:5000"
+
+scenario_create_vms() {
+    prepare_kickstart host1 kickstart-bootc.ks.template cos9-bootc-source-isolated
+    # Use the isolated network when creating a VM
+    launch_vm --boot_blueprint centos9-bootc --network_name "${VM_ISOLATED_NETWORK}" --bootc
+}
+
+scenario_remove_vms() {
+    remove_vm host1
+}
+
+scenario_run_tests() {
+    run_tests host1 suites/network/isolated-network.robot
+}
