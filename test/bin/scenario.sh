@@ -787,9 +787,12 @@ run_tests() {
     echo "Running tests with $# args" "$@"
 
     if [ ! -d "${RF_VENV}" ]; then
-        error "RF_VENV (${RF_VENV}) does not exist, create it with: ${ROOTDIR}/scripts/fetch_tools.sh robotframework"
-        record_junit "${vmname}" "robot_framework_environment" "FAILED"
-        exit 1
+        echo "RF_VENV (${RF_VENV}) does not exist, running ${ROOTDIR}/scripts/fetch_tools.sh robotframework"
+        "${ROOTDIR}/scripts/fetch_tools.sh" "robotframework"
+        if [ $? -ne 0 ]; then
+            record_junit "${vmname}" "robot_framework_environment" "FAILED"
+            exit 1
+        fi
     fi
     record_junit "${vmname}" "robot_framework_environment" "OK"
     local rf_binary="${RF_VENV}/bin/robot"
@@ -801,11 +804,13 @@ run_tests() {
     record_junit "${vmname}" "robot_framework_installed" "OK"
 
     # Make sure oc command is available
-    if ! command -v oc &> /dev/null
-    then
-        error "OpenShift Client package not installed, install it with ${ROOTDIR}/scripts/fetch_tools.sh oc"
-        record_junit "${vmname}" "oc_installed" "FAILED"
-        exit 1
+    if ! command -v oc &> /dev/null ; then
+        echo "OpenShift Client package not installed, installing with ${ROOTDIR}/scripts/fetch_tools.sh oc"
+        "${ROOTDIR}/scripts/fetch_tools.sh" "oc"
+        if [ $? -ne 0 ]; then
+            record_junit "${vmname}" "oc_installed" "FAILED"
+            exit 1
+        fi
     fi
     record_junit "${vmname}" "oc_installed" "OK"
 
