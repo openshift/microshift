@@ -145,8 +145,8 @@ gettool_hadolint() {
     # If you want to allow all unconfined executables to use libraries requiring text relocation
     # that are not labeled textrel_shlib_t, then you must tell SELinux about this by enabling the
     # 'selinuxuser_execmod' boolean.
-    if which selinuxenabled >/dev/null 2>&1; then
-        if selinuxenabled ; then
+    if which selinuxenabled >/dev/null 2>&1 && selinuxenabled ; then
+        if ! stat -c "%C" "${DEST_DIR}/${filename}" | grep -qE 'textrel_shlib_t|container_file_t' ; then
             chcon -t textrel_shlib_t "${DEST_DIR}/${filename}"
         fi
     fi
