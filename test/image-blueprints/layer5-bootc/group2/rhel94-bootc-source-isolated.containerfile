@@ -6,7 +6,7 @@ FROM localhost/rhel94-bootc-source:latest
 # Note: Gomplate blocks are commented out to avoid hadolint warnings.
 # {{ range (.Env.SOURCE_IMAGES | strings.Split ",") }}
 RUN --mount=type=secret,id=pullsecret,dst=/run/secrets/pull-secret.json \
-    skopeo copy \
+    GOMAXPROCS=8 skopeo copy \
         --retry-times 3 \
         --authfile /run/secrets/pull-secret.json \
         "docker://{{ . }}" \
