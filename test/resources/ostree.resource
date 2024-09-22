@@ -26,13 +26,17 @@ Deploy Commit
     ...    that a bootc deployment needs to be performed.
     [Arguments]    ${ref}    ${write_agent_cfg}    ${registry_url}
 
+    # Retry on rebasing is an attempt to work around the issue described in
+    # https://github.com/ostreedev/ostree-rs-ext/issues/657
     IF    "${registry_url}"!="${EMPTY}"
         # Allow insecure registry access when pulling the container image to be used
         Write Insecure Registry Url    ${registry_url}
-        ${deploy_id}=    Rebase Bootc System    ${registry_url}/${ref}
+        ${deploy_id}=    Wait Until Keyword Succeeds    3x    5s
+        ...    Rebase Bootc System    ${registry_url}/${ref}
         Remove Insecure Registry Url
     ELSE
-        ${deploy_id}=    Rebase System    ${ref}
+        ${deploy_id}=    Wait Until Keyword Succeeds    3x    5s
+        ...    Rebase System    ${ref}
     END
     IF    ${write_agent_cfg}    TestAgent.Write
 
