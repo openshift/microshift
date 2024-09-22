@@ -7,9 +7,10 @@ FROM localhost/cos9-bootc-source:latest
 # {{ range (.Env.SOURCE_IMAGES | strings.Split ",") }}
 RUN --mount=type=secret,id=pullsecret,dst=/run/secrets/pull-secret.json \
     skopeo copy \
-    --authfile /run/secrets/pull-secret.json \
-    "docker://{{ . }}" \
-    dir:/var/lib/containers/storage-preloaded
+        --retry-times 3 \
+        --authfile /run/secrets/pull-secret.json \
+        "docker://{{ . }}" \
+        dir:/var/lib/containers/storage-preloaded
 # {{ end }}
 
 # Edit the container storage configuration file to include the new path
