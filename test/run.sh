@@ -89,7 +89,7 @@ cd "${SCRIPTDIR}" || (echo "Did not find ${SCRIPTDIR}" 1>&2; exit 1)
 TESTS="$*"
 # if TESTS is not set - run the standard suite.
 if [ -z "${TESTS}" ]; then
-    TESTS=(./suites/standard1 ./suites/standard2 ./suites/osconfig/clusterid.robot)
+    TESTS=(./suites/standard1 ./suites/standard2 ./suites/osconfig/clusterid.robot ./suites/storage/storage-version-migration.robot)
 fi
 
 # enable stress condition
