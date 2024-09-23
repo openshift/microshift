@@ -35,6 +35,9 @@
 # Git related details
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 
+# Don't build flannel subpackage by default
+%{!?with_flannel: %global with_flannel 0}
+
 Name: microshift
 Version: %{version}
 Release: %{release}%{dist}
@@ -165,6 +168,7 @@ The microshift-multus-release-info package provides release information files fo
 release. These files contain the list of container image references used by
 the Multus CNI for MicroShift and can be used to embed those images into osbuilder blueprints.
 
+%if %{with_flannel}
 %package flannel
 Summary: flannel CNI for MicroShift
 ExclusiveArch: x86_64 aarch64
@@ -184,6 +188,7 @@ The microshift-flannel-release-info package provides release information files f
 release. These files contain the list of container image references used by the flannel CNI
 with the dependent kube-proxy for MicroShift and can be used to embed those images
 into osbuilder blueprints.
+%endif
 
 %package low-latency
 Summary: Baseline configuration for running low latency workload on MicroShift
@@ -379,6 +384,7 @@ cat assets/optional/multus/kustomization.x86_64.yaml >> %{buildroot}/%{_prefix}/
 mkdir -p -m755 %{buildroot}%{_datadir}/microshift/release
 install -p -m644 assets/optional/multus/release-multus-{x86_64,aarch64}.json %{buildroot}%{_datadir}/microshift/release/
 
+%if %{with_flannel}
 # kube-proxy
 install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/000-microshift-kube-proxy
 # Copy all the manifests except the arch specific ones
@@ -417,6 +423,7 @@ cat assets/optional/flannel/kustomization.x86_64.yaml >> %{buildroot}/%{_prefix}
 # flannel-release-info
 mkdir -p -m755 %{buildroot}%{_datadir}/microshift/release
 install -p -m644 assets/optional/flannel/release-flannel-{x86_64,aarch64}.json %{buildroot}%{_datadir}/microshift/release/
+%endif
 
 # cleanup kubelet
 install -p -m644 packaging/tuned/microshift-cleanup-kubelet.service %{buildroot}%{_unitdir}/microshift-cleanup-kubelet.service
@@ -569,6 +576,7 @@ fi
 %files multus-release-info
 %{_datadir}/microshift/release/release-multus-{x86_64,aarch64}.json
 
+%if %{with_flannel}
 %files flannel
 %dir %{_prefix}/lib/microshift/manifests.d/000-microshift-flannel
 %dir %{_prefix}/lib/microshift/manifests.d/000-microshift-kube-proxy
@@ -580,6 +588,7 @@ fi
 %files flannel-release-info
 %{_datadir}/microshift/release/release-flannel-{x86_64,aarch64}.json
 %{_datadir}/microshift/release/release-kube-proxy-{x86_64,aarch64}.json
+%endif
 
 %files low-latency
 %{_prefix}/lib/tuned/microshift-baseline
