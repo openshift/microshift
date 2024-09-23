@@ -1,31 +1,42 @@
-- api embedded-component 3e5de946111c67cb1f2b09ff7da569012d15931d to 1d6161864959881b9b574d30428e574f92ea5c43
-  - 3c344eb 2024-09-17T10:43:41-04:00 generated
-  - fd78eea 2024-09-17T10:43:40-04:00 move authoritative source of some operator CRD manifests to openshift/api
+- api embedded-component 1d6161864959881b9b574d30428e574f92ea5c43 to 2669d1ebc91092ec32e77b1d3f503b11f759b855
+  - de692e9 2024-09-19T11:25:05-03:00 generated
+  - 4435e93 2024-09-19T11:07:35-03:00 move authoritative source of storage CRDs manifests to openshift/api
+  - 8abc53a 2024-09-17T17:04:36-04:00 generated
+  - 147b220 2024-09-17T17:04:35-04:00 make operator generations behave as a map list type
+  - 8f68f40 2024-09-17T16:51:35-04:00 generated
+  - 873d8c8 2024-09-17T16:51:19-04:00 copy mco crds to be managed by openshfit/api
 
-- cluster-ingress-operator embedded-component d79cae1208ec8b09d7485cb04e87b80bb33059bf to 871b2b20f9a3381e7ee31fda34f5821f51fff13c
-  - 4e41fa0 2024-08-08T13:54:45+01:00 Bump IBM/go-sdk-core to v5.17.4
+- cluster-kube-apiserver-operator embedded-component 49d13e8c6a3d4543a91b0d023d5040b3b7eddf0b to 9fb047aaed45a81bf817233dde0ca09c8d38e257
+  - cbe3f11 2024-09-20T19:03:34+02:00 cleanup flag validation after they have been added to the installer
+  - 5fe57a1 2024-09-17T08:56:51-04:00 create CRDs from openshift/api
+  - a64a08c 2024-08-19T13:21:45+02:00 Revert "NO-ISSUE: Revert "certrotationcontroller: set AutoRegenerateAfterOfflineExpiry for generated certificates"
 
-- cluster-kube-controller-manager-operator embedded-component 2e999c706995d121ff6d62fcc06ffd8dbf3a8ca7 to f4da19293909b2723f8fa6060f5cb8660070114e
-  - f0e698c 2024-09-05T04:18:39+00:00 Updating ose-cluster-kube-controller-manager-operator-container image to be consistent with ART for 4.18 Reconciling with https://github.com/openshift/ocp-build-data/tree/827ab4ccce9cbbcf82c9dbaf6398b61d6cff8d7a/images/ose-cluster-kube-controller-manager-operator.yml
+- cluster-kube-controller-manager-operator embedded-component f4da19293909b2723f8fa6060f5cb8660070114e to a7e2a74001f3fe7e6be577b2ddef85c3d126a52c
+  - cc3e703 2024-09-17T08:57:37-04:00 create CRDs from openshift/api
 
-- cluster-kube-scheduler-operator embedded-component a55bec3f50d43c28ef08bb8bf8f5d4c63df8eef6 to 1e9ddcfcbfef7a1bb090b11f0dc1af2a4d1c5edb
-  - 913b3c2 2024-09-16T12:36:58+02:00 Update OWNERS
+- cluster-kube-scheduler-operator embedded-component 1e9ddcfcbfef7a1bb090b11f0dc1af2a4d1c5edb to bced8cd6e60108d590dfb1f4aa80d4c718f0b3c6
+  - 206f8e7 2024-09-17T08:58:33-04:00 create CRDs from openshift/api
 
-- cluster-policy-controller embedded-component 644bcb6c65160ad3dc76fdafd629f61434a734ca to 35753b6b1e97843c6856c9866fe1d8a205d05df4
-  - 8c88b57 2024-09-05T08:49:47+00:00 Updating ose-cluster-policy-controller-container image to be consistent with ART for 4.18 Reconciling with https://github.com/openshift/ocp-build-data/tree/827ab4ccce9cbbcf82c9dbaf6398b61d6cff8d7a/images/cluster-policy-controller.yml
+- cluster-network-operator embedded-component d936ce382648f456461c6a4d4af63a2073664c77 to 4eec256fe4565434ccf0f4b44ee74d24c40f6850
+  - 4b45ff6 2024-09-19T15:47:13-04:00 Updates terminationGracePeriodSeconds to 30 seconds for Multus daemonset
 
-- machine-config-operator embedded-component dceb47ab6ec420b3d30e9d7d5b744d7f1e95c7fd to 702991da8c042288619870de3d21d310b1d1ebd6
-  - 2af96ab7 2024-09-11T11:19:00-04:00 Check for kernel arg diff in updateOnClusterBuild
+- cluster-openshift-controller-manager-operator embedded-component 2b962c71d5b3ac179898dc1ece6a98de0b33cd70 to 95bd10ad4841d72b46c58078a1e4d2559d5e2c67
+  - d44e4e4 2024-09-17T09:00:01-04:00 create CRDs from openshift/api
 
-- openshift-controller-manager embedded-component c9324273f9020b9e7e4b8cb10cfcd230528d1783 to c8b7e50875be58338892cf5ebcbc55cad822857a
-  - 840801b 2024-09-06T13:50:19-04:00 CVE-2024-45496: Reduce Capabilities for Non-Build Containers
+- machine-config-operator embedded-component 702991da8c042288619870de3d21d310b1d1ebd6 to 2bea7cd03f26a85f9a76d6c9db7dbb8067a45ee6
+  - 6f583cb6 2024-09-18T15:13:04-04:00 template: remove root-ca write to disk
+  - 5db1478b 2024-09-17T16:54:25-04:00 move crd management to openshift/api to ease feature promotion
+  - acb22625 2024-09-16T12:14:25-04:00 node_controller: sync all old custom pools
+  - 450b9bba 2024-09-16T11:54:52+00:00 Set ESP offloads off in bonds if slaves don't support them
+  - 4208e55e 2024-09-16T11:27:39+00:00 Revert "Disable ESP offload in vmxnet3 including bonds"
+  - 1b03d851 2024-09-13T08:21:57-04:00 on-prem/resolv-prepender: stop leaking tmp files
 
-- oc image-amd64 e3584b965787e221a84b81d53107c41d20250047 to 4682bd8222d39d4eb71eb474030a0b6860c61e0e
-  - 4b210253 2024-08-29T15:17:02-04:00 OTA-1292: upgrade-status: improve messages for NotReady/DiskPressure/NetworkUnavailable
-
-- oc image-arm64 e3584b965787e221a84b81d53107c41d20250047 to 95a400196419a730dd6f7d711c58a6859c0408c6
+- oc image-amd64 4682bd8222d39d4eb71eb474030a0b6860c61e0e to d6387d4acdcc020925d993d896437cffbf883671
+  - eda1ab39 2024-09-20T13:09:39+03:00 Update root-approvers of oc
   - a8fc369d 2024-09-18T13:42:25+03:00 Check cast result in adm prune deployments to prevent panic
   - d1f9f1bd 2024-09-12T17:53:19-04:00 Rename rsync'd ISO file to -output-name value
   - 01ab8579 2024-09-10T17:39:03-04:00 OCPBUGS-38450: Fix copy artifacts for all CPU architectures
-  - 4b210253 2024-08-29T15:17:02-04:00 OTA-1292: upgrade-status: improve messages for NotReady/DiskPressure/NetworkUnavailable
+
+- oc image-arm64 95a400196419a730dd6f7d711c58a6859c0408c6 to d6387d4acdcc020925d993d896437cffbf883671
+  - eda1ab39 2024-09-20T13:09:39+03:00 Update root-approvers of oc
 
