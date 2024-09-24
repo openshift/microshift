@@ -1,0 +1,3 @@
+- cluster-network-operator embedded-component 092d15be0b1d2b0bffe96bad25a719c27444afda to 9748af19538d54cdded9a043bc999dbba54c5914
+  - 7d00569 2024-09-16T16:26:30+00:00 HyperShift: do not use antiaffinity on single replica control planes
+
