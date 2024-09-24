@@ -26,7 +26,8 @@ Deploy Commit Expecting A Rollback
     [Arguments]    ${ref}    ${write_agent_cfg}=${TRUE}
 
     ${initial_deploy_id}=    Get Booted Deployment Id
-    ${deploy_id}=    Rebase System    ${ref}
+    ${deploy_id}=    Wait Until Keyword Succeeds    3x    5s
+    ...    Rebase System    ${ref}
     IF    ${write_agent_cfg}    TestAgent.Write
     Write Greenboot Microshift Wait Timeout    90
     Reboot MicroShift Host
@@ -44,7 +45,8 @@ Deploy Commit Not Expecting A Rollback
     [Arguments]    ${target_ref}    ${write_agent_cfg}=${FALSE}
 
     ${initial_deploy_id}=    Get Booted Deployment Id
-    ${deploy_id}=    Rebase System    ${target_ref}
+    ${deploy_id}=    Wait Until Keyword Succeeds    3x    5s
+    ...    Rebase System    ${target_ref}
     IF    ${write_agent_cfg}    TestAgent.Write
     Reboot MicroShift Host
 
