@@ -776,8 +776,7 @@ configure_vm_firewall() {
 # Function to report the full version of locally built RPMs, e.g. "4.17.0"
 local_rpm_version() {
     if [ ! -d "${LOCAL_REPO}" ]; then
-        error "Run ${SCRIPTDIR}/create_local_repo.sh before running this scenario."
-        return 1
+        "${TESTDIR}/bin/build_rpms.sh"
     fi
 
     local -r release_info_rpm=$(find "${LOCAL_REPO}" -name 'microshift-release-info-*.rpm' | sort | tail -n 1)
@@ -831,9 +830,10 @@ run_tests() {
     echo "Running tests with $# args" "$@"
 
     if [ ! -d "${RF_VENV}" ]; then
-        error "RF_VENV (${RF_VENV}) does not exist, create it with: ${ROOTDIR}/scripts/fetch_tools.sh robotframework"
-        record_junit "${vmname}" "robot_framework_environment" "FAILED"
-        exit 1
+        "${ROOTDIR}/scripts/fetch_tools.sh" "robotframework" || {
+            record_junit "${vmname}" "robot_framework_environment" "FAILED"
+            exit 1
+        }
     fi
     record_junit "${vmname}" "robot_framework_environment" "OK"
     local rf_binary="${RF_VENV}/bin/robot"
@@ -845,11 +845,11 @@ run_tests() {
     record_junit "${vmname}" "robot_framework_installed" "OK"
 
     # Make sure oc command is available
-    if ! command -v oc &> /dev/null
-    then
-        error "OpenShift Client package not installed, install it with ${ROOTDIR}/scripts/fetch_tools.sh oc"
-        record_junit "${vmname}" "oc_installed" "FAILED"
-        exit 1
+    if ! command -v oc &> /dev/null ; then
+        "${ROOTDIR}/scripts/fetch_tools.sh" "oc" || {
+            record_junit "${vmname}" "oc_installed" "FAILED"
+            exit 1
+        }
     fi
     record_junit "${vmname}" "oc_installed" "OK"
 
@@ -974,6 +974,19 @@ load_subscription_manager_plugin() {
     source "${SUBSCRIPTION_MANAGER_PLUGIN}"
 }
 
+# Check if dependencies are running, and if not, start them
+#   - nginx server
+#   - registry mirror
+check_dependencies() {
+    if [ $(pgrep -cx nginx) -eq 0 ] ; then
+        "${TESTDIR}/bin/manage_webserver.sh" "start"
+    fi
+
+    if ! podman ps --format '{{.Names}}' | grep -q ^microshift-local-registry  ; then
+        "${TESTDIR}/bin/mirror_registry.sh"
+    fi
+}
+
 action_create() {
     start_junit
     trap "close_junit" EXIT
@@ -1005,6 +1018,8 @@ action_create() {
         [ "${rc}" -ne 0 ] && record_junit "setup" "scenario_create_vms" "FAILED" ; \
         sos_report true || rc=1 ; \
         close_junit ; exit "${rc}"' EXIT
+
+    check_dependencies
 
     scenario_create_vms
     record_junit "setup" "scenario_create_vms" "OK"
@@ -1056,6 +1071,8 @@ action_run() {
         [ "${rc}" -ne 0 ] && record_junit "run" "scenario_run_tests" "FAILED" ; \
         sos_report true || rc=1 ; \
         close_junit ; exit "${rc}"' EXIT
+
+    check_dependencies
 
     scenario_run_tests
     record_junit "run" "scenario_run_tests" "OK"

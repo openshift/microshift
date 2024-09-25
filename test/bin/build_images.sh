@@ -666,8 +666,7 @@ fi
 # Determine the version of the RPM in the local repo so we can use it
 # in the blueprint templates.
 if [ ! -d "${LOCAL_REPO}" ]; then
-    error "Run ${SCRIPTDIR}/create_local_repo.sh before building images."
-    exit 1
+    "${TESTDIR}/bin/build_rpms.sh"
 fi
 release_info_rpm=$(find "${LOCAL_REPO}" -name 'microshift-release-info-*.rpm' | sort | tail -n 1)
 if [ -z "${release_info_rpm}" ]; then
@@ -705,6 +704,11 @@ if ${EXTRACT_CONTAINER_IMAGES}; then
 fi
 
 trap 'osbuild_logs' EXIT
+
+# Check if webserver is running
+if [ $(pgrep -cx nginx) -eq 0 ] ; then
+    "${TESTDIR}/bin/manage_webserver.sh" "start"
+fi
 
 if [ -n "${LAYER}" ]; then
     for group in "${LAYER}"/group*; do
