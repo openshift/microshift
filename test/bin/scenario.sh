@@ -786,7 +786,6 @@ run_tests() {
     echo "Running tests with $# args" "$@"
 
     if [ ! -d "${RF_VENV}" ]; then
-        echo "RF_VENV (${RF_VENV}) does not exist, running ${ROOTDIR}/scripts/fetch_tools.sh robotframework"
         "${ROOTDIR}/scripts/fetch_tools.sh" "robotframework" || {
             record_junit "${vmname}" "robot_framework_environment" "FAILED"
             exit 1
@@ -803,7 +802,6 @@ run_tests() {
 
     # Make sure oc command is available
     if ! command -v oc &> /dev/null ; then
-        echo "OpenShift Client package not installed, installing with ${ROOTDIR}/scripts/fetch_tools.sh oc"
         "${ROOTDIR}/scripts/fetch_tools.sh" "oc" || {
             record_junit "${vmname}" "oc_installed" "FAILED"
             exit 1
@@ -940,7 +938,7 @@ check_dependencies() {
         "${TESTDIR}/bin/manage_webserver.sh" "start"
     fi
 
-    if ! podman ps | grep microshift-local-registry &> /dev/null ; then
+    if ! podman ps --format '{{.Names}}' | grep -q ^microshift-local-registry  ; then
         "${TESTDIR}/bin/mirror_registry.sh"
     fi
 }

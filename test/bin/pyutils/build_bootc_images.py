@@ -523,8 +523,7 @@ def main():
             raise Exception(f"The input directory '{dir2process}' does not exist")
         # Make sure the local RPM repository exists
         if not os.path.isdir(LOCAL_REPO):
-            build_rpms = f"{SCRIPTDIR}/build_rpms.sh"
-            common.run_command(build_rpms)
+            common.run_command(f"{SCRIPTDIR}/build_rpms.sh")
         # Initialize force rebuild option
         global FORCE_REBUILD
         if args.force_rebuild:
