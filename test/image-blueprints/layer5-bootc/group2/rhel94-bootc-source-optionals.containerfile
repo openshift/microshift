@@ -1,23 +1,20 @@
 FROM localhost/rhel94-bootc-source:latest
 
 # Build arguments
-ARG REPO_CONFIG_SCRIPT=/tmp/microshift_repo_config.sh
 ARG USHIFT_RPM_REPO_NAME=microshift-local
 ARG USHIFT_RPM_REPO_PATH=/tmp/$USHIFT_RPM_REPO_NAME
-
-# Copy the repository configuration script
-COPY --chmod=755 ./bootc-images/microshift_repo_config.sh ${REPO_CONFIG_SCRIPT}
 
 # Copy the MicroShift repository contents
 COPY ./rpm-repos/$USHIFT_RPM_REPO_NAME $USHIFT_RPM_REPO_PATH
 
-# Add the following repositories and print their contents:
-# - MicroShift local RPM repository
-# - OpenShift previous minor version RHEL repositories for MicroShift dependencies
-# Install MicroShift optional packages and cleanup
-RUN ${REPO_CONFIG_SCRIPT} -create ${USHIFT_RPM_REPO_PATH} && \
+# Copy repository configuration
+COPY ./bootc-images/microshift-local.repo ./bootc-images/fast-datapath-rhel9.repo ./bootc-images/rhocp-y.repo \
+    /etc/yum.repos.d/
+
+# Print repository configuration contents.
+# Install MicroShift optional packages and cleanup.
+RUN awk 'FNR==1 {print "=== " FILENAME " ==="} {print}' /etc/yum.repos.d/*.repo && \
     dnf install -y "microshift-olm-{{ .Env.SOURCE_VERSION }}" "microshift-multus-{{ .Env.SOURCE_VERSION }}" && \
-    ${REPO_CONFIG_SCRIPT} -delete && \
-    rm -f ${REPO_CONFIG_SCRIPT} && \
-    rm -rf $USHIFT_RPM_REPO_PATH && \
+    rm -vf /etc/yum.repos.d/microshift-local.repo /etc/yum.repos.d/fast-datapath-rhel9.repo /etc/yum.repos.d/rhocp-y.repo && \
+    rm -rvf $USHIFT_RPM_REPO_PATH && \
     dnf clean all

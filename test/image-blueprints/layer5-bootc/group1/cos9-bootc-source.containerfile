@@ -8,17 +8,16 @@ ARG USHIFT_RPM_REPO_PATH=/tmp/$USHIFT_RPM_REPO_NAME
 COPY ./rpm-repos/$USHIFT_RPM_REPO_NAME $USHIFT_RPM_REPO_PATH
 
 # Copy repository configuration
-# 
 COPY ./bootc-images/microshift-local.repo ./bootc-images/centos9-nfv.repo ./bootc-images/rhocp-y.repo \
     /etc/yum.repos.d/
 
-# Print repository configuration contents
-# Install MicroShift and cleanup
+# Print repository configuration contents.
+# Install MicroShift and cleanup.
 RUN awk 'FNR==1 {print "=== " FILENAME " ==="} {print}' /etc/yum.repos.d/*.repo && \
     dnf install -y firewalld "microshift-{{ .Env.SOURCE_VERSION }}" "microshift-release-info-{{ .Env.SOURCE_VERSION }}" && \
     systemctl enable microshift && \
-    rm -f "/etc/yum.repos.d/{microshift-local.repo,fast-datapath-rhel9.repo,rhel-y.repo}" && \
-    rm -rf $USHIFT_RPM_REPO_PATH && \
+    rm -vf /etc/yum.repos.d/microshift-local.repo /etc/yum.repos.d/centos9-nfv.repo /etc/yum.repos.d/rhocp-y.repo && \
+    rm -rvf $USHIFT_RPM_REPO_PATH && \
     dnf clean all
 
 # Extend Greenboot wait timeout to 10m for MicroShift to be ready.
