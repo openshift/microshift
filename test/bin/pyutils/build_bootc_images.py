@@ -143,10 +143,21 @@ def set_rpm_version_info_vars():
     src_img_cmd += ' | jq -r \'[ .images[] ] | join(",")\''
     SOURCE_IMAGES = common.run_command_in_shell(src_img_cmd)
 
-    # Update the source version environment variables based on the global variables.
+    global SSL_CLIENT_KEY_FILE
+    global SSL_CLIENT_CERT_FILE
+    # Find the first file matching "*-key.pem" in the entitlements directory
+    keyfile = next(glob.iglob("/etc/pki/entitlement/*-key.pem"), None)
+    # Find the first file matching "*.pem" but not "*-key.pem" in the entitlements directory
+    certfile = next((file for file in glob.iglob("/etc/pki/entitlement/*.pem") if not file.endswith("-key.pem")), None)
+    # Replace the entitlement path with the one usable inside a container
+    SSL_CLIENT_KEY_FILE = keyfile.replace("/entitlement/", "/entitlement-host/")
+    SSL_CLIENT_CERT_FILE = certfile.replace("/entitlement/", "/entitlement-host/")
+
+    # Update selected environment variables based on the global variables.
     # These are used for templating container files and images.
     rpmver_globals_vars = [
-        'SOURCE_VERSION', 'SOURCE_VERSION_BASE', 'SOURCE_IMAGES'
+        'SOURCE_VERSION', 'SOURCE_VERSION_BASE', 'SOURCE_IMAGES',
+        'SSL_CLIENT_KEY_FILE', 'SSL_CLIENT_CERT_FILE'
     ]
     for var in rpmver_globals_vars:
         value = globals().get(var)
@@ -559,6 +570,13 @@ def main():
             extract_container_images(f"4.{FAKE_NEXT_MINOR_VERSION}.*", NEXT_REPO, CONTAINER_LIST, args.dry_run)
             extract_container_images(PREVIOUS_RELEASE_VERSION, PREVIOUS_RELEASE_REPO, CONTAINER_LIST, args.dry_run)
             extract_container_images(YMINUS2_RELEASE_VERSION, YMINUS2_RELEASE_REPO, CONTAINER_LIST, args.dry_run)
+        # Process package source templates
+        ipkgdir = f"{SCRIPTDIR}/../package-sources-bootc"
+        for ifile in os.listdir(ipkgdir):
+            # Create full path for output and input file names
+            ofile = os.path.join(BOOTC_IMAGE_DIR, ifile)
+            ifile = os.path.join(ipkgdir, ifile)
+            run_template_cmd(ifile, ofile, args.dry_run)
         # Process individual group directory
         if args.group_dir:
             process_group(args.group_dir, args.build_type, args.dry_run)
