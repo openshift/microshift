@@ -1,0 +1,7 @@
+[microshift-fake-next-minor]
+name = MicroShift Fake Next Minor Version Repo
+baseurl = file:///tmp/{{ path.Base .Env.NEXT_REPO }}/
+enabled = 1
+gpgcheck = 0
+sslverify = 0
+skip_if_unavailable = 0

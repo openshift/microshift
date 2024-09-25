@@ -1,0 +1,11 @@
+[fast-datapath]
+name = Fast Datapath for RHEL 9
+baseurl = https://cdn.redhat.com/content/dist/layered/rhel9/{{ .Env.UNAME_M }}/fast-datapath/os
+enabled = 1
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+sslverify = 1
+sslcacert = /etc/rhsm/ca/redhat-uep.pem
+sslclientkey = {{ .Env.SSL_CLIENT_KEY_FILE }}
+sslclientcert = {{ .Env.SSL_CLIENT_CERT_FILE }}
+skip_if_unavailable = 0
