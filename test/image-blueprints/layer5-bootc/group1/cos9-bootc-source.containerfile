@@ -1,25 +1,23 @@
 FROM quay.io/centos-bootc/centos-bootc:stream9
 
 # Build arguments
-ARG REPO_CONFIG_SCRIPT=/tmp/microshift_repo_config.sh
 ARG USHIFT_RPM_REPO_NAME=microshift-local
 ARG USHIFT_RPM_REPO_PATH=/tmp/$USHIFT_RPM_REPO_NAME
-
-# Copy the repository configuration script
-COPY --chmod=755 ./bootc-images/microshift_repo_config.sh ${REPO_CONFIG_SCRIPT}
 
 # Copy the MicroShift repository contents
 COPY ./rpm-repos/$USHIFT_RPM_REPO_NAME $USHIFT_RPM_REPO_PATH
 
-# Add the following repositories and print their contents:
-# - MicroShift local RPM repository
-# - OpenShift Mirror Beta previous minor version repository for MicroShift dependencies
+# Copy repository configuration
+# 
+COPY ./bootc-images/microshift-local.repo ./bootc-images/centos9-nfv.repo ./bootc-images/rhocp-y.repo \
+    /etc/yum.repos.d/
+
+# Print repository configuration contents
 # Install MicroShift and cleanup
-RUN ${REPO_CONFIG_SCRIPT} -create ${USHIFT_RPM_REPO_PATH} && \
+RUN awk 'FNR==1 {print "=== " FILENAME " ==="} {print}' /etc/yum.repos.d/*.repo && \
     dnf install -y firewalld "microshift-{{ .Env.SOURCE_VERSION }}" "microshift-release-info-{{ .Env.SOURCE_VERSION }}" && \
     systemctl enable microshift && \
-    ${REPO_CONFIG_SCRIPT} -delete && \
-    rm -f ${REPO_CONFIG_SCRIPT} && \
+    rm -f "/etc/yum.repos.d/{microshift-local.repo,fast-datapath-rhel9.repo,rhel-y.repo}" && \
     rm -rf $USHIFT_RPM_REPO_PATH && \
     dnf clean all
 
