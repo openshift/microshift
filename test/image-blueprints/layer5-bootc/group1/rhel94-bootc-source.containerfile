@@ -13,7 +13,7 @@ COPY ./bootc-images/microshift-local.repo ./bootc-images/fast-datapath-rhel9.rep
 
 # Print repository configuration contents.
 # Install MicroShift, test agent and cleanup.
-RUN awk 'FNR==1 {print "=== " FILENAME " ==="} {print}' /etc/yum.repos.d/*.repo && \
+RUN dnf repoinfo --enabled && \
     dnf install -y firewalld "microshift-{{ .Env.SOURCE_VERSION }}" "microshift-release-info-{{ .Env.SOURCE_VERSION }}" microshift-test-agent && \
     systemctl enable microshift microshift-test-agent && \
     rm -vf /etc/yum.repos.d/microshift-local.repo /etc/yum.repos.d/fast-datapath-rhel9.repo /etc/yum.repos.d/rhocp-y.repo && \

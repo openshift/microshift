@@ -13,7 +13,7 @@ COPY ./bootc-images/microshift-local.repo ./bootc-images/centos9-nfv.repo ./boot
 
 # Print repository configuration contents.
 # Install MicroShift and cleanup.
-RUN awk 'FNR==1 {print "=== " FILENAME " ==="} {print}' /etc/yum.repos.d/*.repo && \
+RUN dnf repoinfo --enabled && \
     dnf install -y firewalld "microshift-{{ .Env.SOURCE_VERSION }}" "microshift-release-info-{{ .Env.SOURCE_VERSION }}" && \
     systemctl enable microshift && \
     rm -vf /etc/yum.repos.d/microshift-local.repo /etc/yum.repos.d/centos9-nfv.repo /etc/yum.repos.d/rhocp-y.repo && \

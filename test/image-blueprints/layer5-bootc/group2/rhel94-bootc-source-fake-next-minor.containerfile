@@ -13,7 +13,7 @@ COPY ./bootc-images/microshift-fake-next-minor.repo ./bootc-images/fast-datapath
 
 # Print repository configuration contents.
 # Install MicroShift, test agent and cleanup.
-RUN awk 'FNR==1 {print "=== " FILENAME " ==="} {print}' /etc/yum.repos.d/*.repo && \
+RUN dnf repoinfo --enabled && \
     dnf install -y "microshift-4.{{ .Env.FAKE_NEXT_MINOR_VERSION }}.*" && \
     rm -vf /etc/yum.repos.d/microshift-fake-next-minor.repo /etc/yum.repos.d/fast-datapath-rhel9.repo /etc/yum.repos.d/rhocp-y.repo && \
     rm -rvf $USHIFT_RPM_REPO_PATH && \
