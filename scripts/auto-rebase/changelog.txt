@@ -1,3 +1,0 @@
-- openshift-controller-manager embedded-component 5d529ddb5398dc84023227780ae6c4e678d942dd to aa43a06e9c39d5636160df9b47da588c37601df9
-  - 7d0ab17 2024-09-13T12:28:56+05:30 OCPBUGS-32871: replaces deprecated square/go-jose wtih go-jose/go-jose
-
