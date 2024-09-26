@@ -34,14 +34,33 @@ type Manifests struct {
 // are returned in the order given in the configuration file. The
 // results of any glob patterns are sorted lexicographically.
 func (m *Manifests) GetKustomizationPaths() ([]string, error) {
+	return getKustomizationPaths(m.KustomizePaths)
+}
+
+func (m *Manifests) GetKustomizationDeletePaths() ([]string, error) {
+	deletePaths := make([]string, 0, len(m.KustomizePaths))
+	for _, path := range m.KustomizePaths {
+		// If kustomize path ends with "*": add "delete" dir before it.
+		// Otherwise, just add it at the end.
+		dir, file := filepath.Split(path)
+		newPath := filepath.Join(dir, file, "delete")
+		if file == "*" {
+			newPath = filepath.Join(dir, "delete", file)
+		}
+		deletePaths = append(deletePaths, newPath)
+	}
+	return getKustomizationPaths(deletePaths)
+}
+
+func getKustomizationPaths(kustomizePaths []string) ([]string, error) {
 	kustomizationFileNames := konfig.RecognizedKustomizationFileNames()
 	results := []string{}
-	for _, path := range m.KustomizePaths {
+	for _, path := range kustomizePaths {
 		for _, filename := range kustomizationFileNames {
 			pattern := filepath.Join(path, filename)
 			matches, err := filepath.Glob(pattern)
 			if err != nil {
-				return nil, fmt.Errorf("Could not understand kustomizePath value %v: %w", path, err)
+				return nil, fmt.Errorf("could not understand kustomizePath value %v: %w", path, err)
 			}
 			if len(matches) == 0 {
 				klog.Infof("No kustomize path matches %v", pattern)

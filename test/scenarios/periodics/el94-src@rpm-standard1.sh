@@ -12,5 +12,5 @@ scenario_remove_vms() {
 }
 
 scenario_run_tests() {
-    run_tests host1 suites/standard1
+    run_tests host1 suites/standard1 suites/selinux/validate-selinux-policy.robot
 }

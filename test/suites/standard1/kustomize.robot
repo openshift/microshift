@@ -1,6 +1,8 @@
 *** Settings ***
 Documentation       Tests for applying manifests automatically via the kustomize controller
 
+Library             Collections
+Library             ../../resources/journalctl.py
 Resource            ../../resources/common.resource
 Resource            ../../resources/systemd.resource
 Resource            ../../resources/microshift-config.resource
@@ -19,6 +21,7 @@ ${UNCONFIGURED_DIR}     /home/${USHIFT_USER}/test-manifests.d/unconfigured
 ${YAML_PATH}            /etc/microshift/manifests.d/yaml-ext
 ${YML_PATH}             /etc/microshift/manifests.d/yml-ext
 ${NOEXT_PATH}           /etc/microshift/manifests.d/no-ext
+@{TO_DELETE}            @{EMPTY}
 
 
 *** Test Cases ***
@@ -30,6 +33,16 @@ Load From /etc/microshift/manifestsd
     # Keyword names cannot have '.' in them
     [Documentation]    Subdir of /etc/microshift/manifests.d
     ConfigMap Path Should Match    ${ETC_SUBDIR_NAMESPACE}    ${ETC_SUBDIR}
+
+Delete From /etc/microshift/manifestsd
+    # Keyword names cannot have '.' in them
+    [Documentation]    Delete manifest in /etc/microshift/manifests.d/delete/
+    Verify Manifest Deletion    ${DELETE_ETC_SUBDIR_NAMESPACE}    ${DELETE_ETC_SUBDIR}
+
+Delete From /usr/lib/microshift/manifestsd
+    # Keyword names cannot have '.' in them
+    [Documentation]    Delete manifest in /usr/lib/microshift/manifests.d/delete/
+    Verify Manifest Deletion    ${DELETE_USR_SUBDIR_NAMESPACE}    ${DELETE_USR_SUBDIR}
 
 Load From /usr/lib/microshift/manifests
     [Documentation]    /usr/lib/microshift/manifests
@@ -79,6 +92,12 @@ Setup Suite    # robocop: disable=too-long-keyword
     ${ns}=    Generate Manifests    ${ETC_SUBDIR}
     Set Suite Variable    \${ETC_SUBDIR_NAMESPACE}    ${ns}
 
+    # Used by "Delete from /etc/microshift/manifestsd"
+    ${rand}=    Generate Random String
+    Set Suite Variable    \${DELETE_ETC_SUBDIR}    /etc/microshift/manifests.d/${rand}
+    ${ns}=    Generate Manifests    ${DELETE_ETC_SUBDIR}
+    Set Suite Variable    \${DELETE_ETC_SUBDIR_NAMESPACE}    ${ns}
+
     # Used by "Load From /usr/lib/microshift/manifests"
     ${ns}=    Generate Manifests    /usr/lib/microshift/manifests
     Set Suite Variable    \${USR_NAMESPACE}    ${ns}
@@ -88,6 +107,12 @@ Setup Suite    # robocop: disable=too-long-keyword
     Set Suite Variable    \${USR_SUBDIR}    /usr/lib/microshift/manifests.d/${rand}
     ${ns}=    Generate Manifests    ${USR_SUBDIR}
     Set Suite Variable    \${USR_SUBDIR_NAMESPACE}    ${ns}
+
+    # Used by "Delete from /usr/lib/microshift/manifestsd"
+    ${rand}=    Generate Random String
+    Set Suite Variable    \${DELETE_USR_SUBDIR}    /usr/lib/microshift/manifests.d/${rand}
+    ${ns}=    Generate Manifests    ${DELETE_USR_SUBDIR}
+    Set Suite Variable    \${DELETE_USR_SUBDIR_NAMESPACE}    ${ns}
 
     # Used by "Load From Configured Dir"
     ${ns}=    Generate Manifests    ${NON_DEFAULT_DIR}
@@ -136,6 +161,9 @@ Teardown Suite    # robocop: disable=too-many-calls-in-keyword
     Remove Manifest Directory    ${YAML_PATH}
     Remove Manifest Directory    ${YML_PATH}
     Remove Manifest Directory    ${NOEXT_PATH}
+    FOR    ${path}    IN    @{TO_DELETE}
+        Remove Manifest Directory    ${path}
+    END
 
     Run With Kubeconfig    oc delete namespace ${ETC_NAMESPACE}    allow_fail=True
     Run With Kubeconfig    oc delete namespace ${ETC_SUBDIR_NAMESPACE}    allow_fail=True
@@ -244,3 +272,27 @@ Restore Default Config
         Restart MicroShift
         Sleep    10 seconds    # Wait for systemd to catch up
     END
+
+Verify Manifest Deletion
+    [Documentation]    Verify that manifest deletion works as expected.
+    [Arguments]    ${ns}    ${manifest_path}
+    ConfigMap Path Should Match    ${ns}    ${manifest_path}
+    ${delete_base_dir}    ${delete_manifest_path}=    Get Manifest Deletion Paths    ${manifest_path}
+    Append To List    ${TO_DELETE}    ${delete_base_dir}
+    Command Should Work    mkdir -p ${delete_base_dir}
+    Command Should Work    mv ${manifest_path} ${delete_manifest_path}
+    ${cursor}=    Get Journal Cursor
+    Restart MicroShift
+    ConfigMap Should Be Missing    ${ns}
+    Pattern Should Appear In Log Output
+    ...    ${cursor}
+    ...    Deleting kustomization at ${delete_manifest_path} was successful.
+
+Get Manifest Deletion Paths
+    [Documentation]    For given manifest path, get path to 'delete' subdir and destination dir for manifest to be deleted.
+    [Arguments]    ${manifest_path}
+    ${path_list}=    Split String    ${manifest_path}    /
+    ${manifest_dirname}=    Set Variable    ${path_list}[-1]
+    ${delete_base_dir}=    Evaluate    "/".join(${path_list}[:-1]+["delete"])
+    ${delete_manifest_path}=    Catenate    SEPARATOR=/    ${delete_base_dir}    ${manifest_dirname}
+    RETURN    ${delete_base_dir}    ${delete_manifest_path}
