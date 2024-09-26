@@ -15,7 +15,7 @@ RUN ln -sr /run/secrets/etc-pki-entitlement /etc/pki/entitlement-host && \
 COPY ./rpm-repos/$USHIFT_RPM_REPO_NAME $USHIFT_RPM_REPO_PATH
 
 # Copy repository configuration
-COPY ./bootc-images/microshift-local.repo ./bootc-images/fast-datapath-rhel9.repo ./bootc-images/rhocp-y.repo \
+COPY ./bootc-images/$USHIFT_RPM_REPO_NAME.repo ./bootc-images/microshift-fast-datapath-rhel9.repo ./bootc-images/microshift-rhocp-y.repo \
     /etc/yum.repos.d/
 
 # Print repository configuration contents.
@@ -23,7 +23,7 @@ COPY ./bootc-images/microshift-local.repo ./bootc-images/fast-datapath-rhel9.rep
 RUN dnf repoinfo --enabled && \
     dnf install -y firewalld "microshift-{{ .Env.SOURCE_VERSION }}" "microshift-release-info-{{ .Env.SOURCE_VERSION }}" microshift-test-agent && \
     systemctl enable microshift microshift-test-agent && \
-    rm -vf /etc/yum.repos.d/microshift-local.repo /etc/yum.repos.d/fast-datapath-rhel9.repo /etc/yum.repos.d/rhocp-y.repo && \
+    rm -vf /etc/yum.repos.d/microshift-*.repo && \
     rm -rvf $USHIFT_RPM_REPO_PATH && \
     dnf clean all
 

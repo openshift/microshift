@@ -8,7 +8,7 @@ ARG USHIFT_RPM_REPO_PATH=/tmp/$USHIFT_RPM_REPO_NAME
 COPY ./rpm-repos/$USHIFT_RPM_REPO_NAME $USHIFT_RPM_REPO_PATH
 
 # Copy repository configuration
-COPY ./bootc-images/microshift-local.repo ./bootc-images/centos9-nfv.repo ./bootc-images/rhocp-y.repo \
+COPY ./bootc-images/$USHIFT_RPM_REPO_NAME.repo ./bootc-images/microshift-centos9-nfv.repo ./bootc-images/microshift-rhocp-y.repo \
     /etc/yum.repos.d/
 
 # Print repository configuration contents.
@@ -16,7 +16,7 @@ COPY ./bootc-images/microshift-local.repo ./bootc-images/centos9-nfv.repo ./boot
 RUN dnf repoinfo --enabled && \
     dnf install -y firewalld "microshift-{{ .Env.SOURCE_VERSION }}" "microshift-release-info-{{ .Env.SOURCE_VERSION }}" && \
     systemctl enable microshift && \
-    rm -vf /etc/yum.repos.d/microshift-local.repo /etc/yum.repos.d/centos9-nfv.repo /etc/yum.repos.d/rhocp-y.repo && \
+    rm -vf /etc/yum.repos.d/microshift-*.repo && \
     rm -rvf $USHIFT_RPM_REPO_PATH && \
     dnf clean all
 
