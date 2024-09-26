@@ -1,0 +1,9 @@
+{{- if and (env.Getenv "CURRENT_RELEASE_REPO" "") (strings.HasPrefix "http" .Env.CURRENT_RELEASE_REPO) -}}
+[microshift-crel]
+name = Repository with OpenShift mirror-only RPMs for current release
+baseurl = {{ .Env.CURRENT_RELEASE_REPO }}
+enabled = 1
+gpgcheck = 0
+sslverify = 1
+skip_if_unavailable = 0
+{{- end -}}

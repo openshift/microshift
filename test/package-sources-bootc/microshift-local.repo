@@ -1,0 +1,7 @@
+[microshift-local]
+name = MicroShift Local Repo
+baseurl = file:///tmp/{{ path.Base .Env.LOCAL_REPO }}/
+enabled = 1
+gpgcheck = 0
+sslverify = 0
+skip_if_unavailable = 0

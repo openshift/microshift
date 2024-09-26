@@ -1,0 +1,22 @@
+{{- if env.Getenv "RHOCP_MINOR_Y1" "" -}}
+[rhocp-y1]
+name = Red Hat OpenShift Container Platform 4.{{ .Env.RHOCP_MINOR_Y1 }} for RHEL 9
+baseurl = https://cdn.redhat.com/content/dist/layered/rhel9/{{ .Env.UNAME_M }}/rhocp/4.{{ .Env.RHOCP_MINOR_Y1 }}/os
+enabled = 1
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+sslverify = 1
+sslcacert = /etc/rhsm/ca/redhat-uep.pem
+sslclientkey = {{ .Env.SSL_CLIENT_KEY_FILE }}
+sslclientcert = {{ .Env.SSL_CLIENT_CERT_FILE }}
+skip_if_unavailable = 0
+{{- end -}}
+{{- if env.Getenv "RHOCP_MINOR_Y1_BETA" "" -}}
+[rhocp-y1]
+name = rhocp Y-1 BETA
+baseurl = {{ .Env.RHOCP_MINOR_Y1_BETA }}
+enabled=1
+gpgcheck=0
+sslverify=1
+skip_if_unavailable=0
+{{- end -}}
