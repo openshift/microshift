@@ -19,9 +19,10 @@ export AWS_PAGER=""
 # | c6g.metal     | arm64  | 6     | 128 | $3.02 |
 
 #EC2_INSTANCE_TYPE=c7i.metal-24xl
-EC2_INSTANCE_TYPE=c5n.metal # x86
+#EC2_INSTANCE_TYPE=c5n.metal # x86
 #EC2_INSTANCE_TYPE=t3.2xlarge
 #EC2_INSTANCE_TYPE=t3.large
+EC2_INSTANCE_TYPE=t3.nano
 
 #EC2_INSTANCE_TYPE=c6g.metal # ARM
 #EC2_INSTANCE_TYPE=t4g.medium
@@ -43,6 +44,8 @@ declare -A ami_map=(
   [eu-west-1,arm64,rhel-9.4]=ami-02b8573b23fde21aa     # RHEL-9.4.0_HVM-20240605-arm64-82-Hourly2-GP3
 )
 
+# OPTIONS: instance type, region, stack name, pub key path
+# ACTIONS: create, delete, describe, logs
 
 #REGION=us-west-2
 REGION=eu-west-1
@@ -91,8 +94,7 @@ echo "ARCH: ${ARCH}"
 echo "AMI ID: ${EC2_AMI}" 
 echo "Region: ${REGION}" 
 
-# don't know what this is for here
-# host_device_name="/dev/xvdc"
+# TODO default id_rsa.pub, option to give path to different key
 public_key="/home/${USER}/.ssh/id_ed25519.pub"
 
 cat >"${cf_tpl_file}" <<EOF
@@ -387,24 +389,24 @@ PUBLIC_IP=$(aws --region "${REGION}" cloudformation describe-stacks --stack-name
 
 echo "PUBLIC IP: ${PUBLIC_IP}"
 
-cp ~/.ssh/config ~/.ssh/config.bak
-sed -i '/Host aws/{N;N;d;}' ~/.ssh/config
-tee -a ~/.ssh/config << EOF
-Host aws
-  HostName ${PUBLIC_IP}
-  User ec2-user
-EOF
-
-ssh_cmd() {
-  echo "> ${1}"
-  ssh -o "StrictHostKeyChecking no" aws "$1"
-}
-
-ssh_cmd "sudo subscription-manager register --org 11009103 --activationkey microshift-rhsm-creds"
-ssh_cmd "sudo subscription-manager config --rhsm.manage_repos=1"
-ssh_cmd "sudo subscription-manager repos --enable rhel-9-for-\$(uname -m)-baseos-rpms --enable rhel-9-for-\$(uname -m)-appstream-rpms"
-
-ssh_cmd "sudo dnf install -y git vim tmux rsync"
+# cp ~/.ssh/config ~/.ssh/config.bak
+# sed -i '/Host aws/{N;N;d;}' ~/.ssh/config
+# tee -a ~/.ssh/config << EOF
+# Host aws
+#   HostName ${PUBLIC_IP}
+#   User ec2-user
+# EOF
+# 
+# ssh_cmd() {
+#   echo "> ${1}"
+#   ssh -o "StrictHostKeyChecking no" aws "$1"
+# }
+# 
+# ssh_cmd "sudo subscription-manager register --org 11009103 --activationkey microshift-rhsm-creds"
+# ssh_cmd "sudo subscription-manager config --rhsm.manage_repos=1"
+# ssh_cmd "sudo subscription-manager repos --enable rhel-9-for-\$(uname -m)-baseos-rpms --enable rhel-9-for-\$(uname -m)-appstream-rpms"
+# 
+# ssh_cmd "sudo dnf install -y git vim tmux rsync"
 # scp -o "StrictHostKeyChecking no" $HOME/dev/pull-secret-big ec2-user@${PUBLIC_IP}:~/.pull-secret.json
 # ssh_cmd "git clone https://github.com/pmtk/microshift.git --branch 4.16/profiling"
 # ssh_cmd "git clone https://github.com/pmtk/microshift.git --branch low-latency/warning-job"
@@ -424,7 +426,7 @@ ssh_cmd "sudo dnf install -y git vim tmux rsync"
 # ssh_cmd "bash -x ./microshift/scripts/devenv-builder/manage-vm.sh config"
 # ssh_cmd "bash -x ./scripts/image-builder/cleanup.sh -full"
 
-set +x
-echo
-echo "PUBLIC IP:   ${PUBLIC_IP}"
-echo
+# set +x
+# echo
+# echo "PUBLIC IP:   ${PUBLIC_IP}"
+# echo
