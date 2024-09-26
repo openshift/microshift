@@ -65,6 +65,8 @@ usage() {
     echo "               Defaults to '${CONTAINER_LIST}', skipped if does not exist."
     echo "   -bd DIR     Directory containing the bootc containers data to mirror."
     echo "               Defaults to '${BOOTC_IMAGE_DIR}', skipped if does not exist."
+    echo "   -reuse      Reuse the running registry without stopping and deleting it"
+    echo "               to allow for a faster update of container images."
     exit 1
 }
 
@@ -73,16 +75,22 @@ usage() {
 #
 image_list_file="${CONTAINER_LIST}"
 bootc_image_dir="${BOOTC_IMAGE_DIR}"
+reuse_registry=false
 
 while [ $# -gt 0 ]; do
     case $1 in
     -cf)
         shift
+        [ -z "$1" ] && usage
         image_list_file=$1
         ;;
     -bd)
         shift
+        [ -z "$1" ] && usage
         bootc_image_dir=$1
+        ;;
+    -reuse)
+        reuse_registry=true
         ;;
     *)
         usage
@@ -91,8 +99,10 @@ while [ $# -gt 0 ]; do
     shift
 done
 
-prereqs
-setup_registry
+if ! ${reuse_registry} ; then
+    prereqs
+    setup_registry
+fi
 
 if [ -f "${image_list_file}" ]; then
     mirror_images "${image_list_file}"
