@@ -15,7 +15,9 @@ import (
 	"strings"
 	"time"
 
+	operatorv1 "github.com/openshift/api/operator/v1"
 	"github.com/openshift/microshift/pkg/config/apiserver"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/klog/v2"
@@ -147,6 +149,19 @@ func (c *Config) fillDefaults() error {
 			Http:  ptr.To[int](80),
 			Https: ptr.To[int](443),
 		},
+		TuningOptions: operatorv1.IngressControllerTuningOptions{
+			HeaderBufferBytes:           32768,
+			HeaderBufferMaxRewriteBytes: 8192,
+			HealthCheckInterval:         &metav1.Duration{Duration: 5 * time.Second},
+			ClientTimeout:               &metav1.Duration{Duration: 30 * time.Second},
+			ClientFinTimeout:            &metav1.Duration{Duration: 1 * time.Second},
+			ServerTimeout:               &metav1.Duration{Duration: 30 * time.Second},
+			ServerFinTimeout:            &metav1.Duration{Duration: 1 * time.Second},
+			TunnelTimeout:               &metav1.Duration{Duration: 1 * time.Hour},
+			TLSInspectDelay:             &metav1.Duration{Duration: 5 * time.Second},
+			ThreadCount:                 4,
+			MaxConnections:              5000,
+		},
 	}
 	c.MultiNode.Enabled = false
 	c.Kubelet = nil
@@ -270,6 +285,40 @@ func (c *Config) incorporateUserSettings(u *Config) {
 	}
 	if u.Kubelet != nil {
 		c.Kubelet = u.Kubelet
+	}
+
+	if u.Ingress.TuningOptions.HeaderBufferBytes > 0 {
+		c.Ingress.TuningOptions.HeaderBufferBytes = u.Ingress.TuningOptions.HeaderBufferBytes
+	}
+	if u.Ingress.TuningOptions.HeaderBufferMaxRewriteBytes > 0 {
+		c.Ingress.TuningOptions.HeaderBufferMaxRewriteBytes = u.Ingress.TuningOptions.HeaderBufferMaxRewriteBytes
+	}
+	if u.Ingress.TuningOptions.HealthCheckInterval != nil && u.Ingress.TuningOptions.HealthCheckInterval.Duration >= 1*time.Second {
+		c.Ingress.TuningOptions.HealthCheckInterval = u.Ingress.TuningOptions.HealthCheckInterval
+	}
+	if u.Ingress.TuningOptions.ClientTimeout != nil && u.Ingress.TuningOptions.ClientTimeout.Duration > 0*time.Second {
+		c.Ingress.TuningOptions.ClientTimeout = u.Ingress.TuningOptions.ClientTimeout
+	}
+	if u.Ingress.TuningOptions.ClientFinTimeout != nil && u.Ingress.TuningOptions.ClientFinTimeout.Duration > 0*time.Second {
+		c.Ingress.TuningOptions.ClientFinTimeout = u.Ingress.TuningOptions.ClientFinTimeout
+	}
+	if u.Ingress.TuningOptions.ServerTimeout != nil && u.Ingress.TuningOptions.ServerTimeout.Duration > 0*time.Second {
+		c.Ingress.TuningOptions.ServerTimeout = u.Ingress.TuningOptions.ServerTimeout
+	}
+	if u.Ingress.TuningOptions.ServerFinTimeout != nil && u.Ingress.TuningOptions.ServerFinTimeout.Duration > 0*time.Second {
+		c.Ingress.TuningOptions.ServerFinTimeout = u.Ingress.TuningOptions.ServerFinTimeout
+	}
+	if u.Ingress.TuningOptions.TunnelTimeout != nil && u.Ingress.TuningOptions.TunnelTimeout.Duration > 0*time.Second {
+		c.Ingress.TuningOptions.TunnelTimeout = u.Ingress.TuningOptions.TunnelTimeout
+	}
+	if u.Ingress.TuningOptions.TLSInspectDelay != nil && u.Ingress.TuningOptions.TLSInspectDelay.Duration > 0*time.Second {
+		c.Ingress.TuningOptions.TLSInspectDelay = u.Ingress.TuningOptions.TLSInspectDelay
+	}
+	if u.Ingress.TuningOptions.ThreadCount > 0 {
+		c.Ingress.TuningOptions.ThreadCount = u.Ingress.TuningOptions.ThreadCount
+	}
+	if u.Ingress.TuningOptions.MaxConnections > 0 {
+		c.Ingress.TuningOptions.MaxConnections = u.Ingress.TuningOptions.MaxConnections
 	}
 }
 
