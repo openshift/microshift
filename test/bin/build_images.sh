@@ -419,15 +419,17 @@ do_group() {
         if [ -t 0 ]; then
             progress="--progress"
         fi
-        # Download the files under temporary names
+        # Download the files under temporary names with 30s network timeout
+        # and retries. Note that download options are quoted per each job,
+        # resuting in one option per job in the download_opts array.
         echo "Waiting for image-fetcher to complete..."
         if parallel \
             ${progress} \
             --colsep ' ' \
             --results "${wget_res}" \
             --joblog "${wget_job}" \
-            --jobs $(( ${#download_opts[@]} / 2 )) \
-            wget -c -nv -O "{1}.${wget_tmp}" "{2}" ::: "${download_opts[@]}" ; then
+            --jobs ${#download_opts[@]} \
+            wget -c -nv -T 30 -t 3 -O "{1}.${wget_tmp}" "{2}" ::: "${download_opts[@]}" ; then
             # On successful download, rename the files to their original names
             for fwget in "${VM_DISK_BASEDIR}"/*."${wget_tmp}" ; do
                 local forig
