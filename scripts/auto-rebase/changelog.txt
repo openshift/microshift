@@ -1,0 +1,6 @@
+- machine-config-operator embedded-component bb5ac68843493c4adbfd52b2d008e78654f26912 to fd58cd0ee43045188214ab456934b742711db41c
+  - 22720067 2024-04-16T19:52:26+00:00 bug: Fix configure-ip-forwarding.sh
+
+- operator-framework-olm embedded-component 1da79fef878fb4b89ffd10cab6e1f1c0e0d32867 to 2a0924f9655371f636d16b60e9ae7e49934c5640
+  - 64b21846 2024-09-24T14:57:13+02:00 add optional schema migrations; default to olm.bundle.object instead of olm.csv.metadata (#1384)
+
