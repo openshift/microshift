@@ -186,11 +186,26 @@ func startIngressController(ctx context.Context, cfg *config.Config, kubeconfigP
 	}
 
 	extraParams := assets.RenderParams{
-		"RouterNamespaceOwnership": cfg.Ingress.AdmissionPolicy.NamespaceOwnership == config.NamespaceOwnershipAllowed,
-		"RouterHttpPort":           *cfg.Ingress.Ports.Http,
-		"RouterHttpsPort":          *cfg.Ingress.Ports.Https,
-		"RouterMode":               routerMode,
+		"RouterNamespaceOwnership":    cfg.Ingress.AdmissionPolicy.NamespaceOwnership == config.NamespaceOwnershipAllowed,
+		"RouterHttpPort":              *cfg.Ingress.Ports.Http,
+		"RouterHttpsPort":             *cfg.Ingress.Ports.Https,
+		"RouterMode":                  routerMode,
+		"RouterBufSize":               &cfg.Ingress.TuningOptions.HeaderBufferBytes,
+		"HeaderBufferMaxRewriteBytes": &cfg.Ingress.TuningOptions.HeaderBufferMaxRewriteBytes,
+		"HealthCheckInterval":         &cfg.Ingress.TuningOptions.HealthCheckInterval.Duration,
+		"ClientTimeout":               &cfg.Ingress.TuningOptions.ClientTimeout.Duration,
+		"ClientFinTimeout":            &cfg.Ingress.TuningOptions.ClientFinTimeout.Duration,
+		"ServerTimeout":               &cfg.Ingress.TuningOptions.ServerTimeout.Duration,
+		"ServerFinTimeout":            &cfg.Ingress.TuningOptions.ServerFinTimeout.Duration,
+		"TunnelTimeout":               &cfg.Ingress.TuningOptions.TunnelTimeout.Duration,
+		"TlsInspectDelay":             &cfg.Ingress.TuningOptions.TLSInspectDelay.Duration,
+		"ThreadCount":                 &cfg.Ingress.TuningOptions.ThreadCount,
+		"MaxConnections":              &cfg.Ingress.TuningOptions.MaxConnections,
+		"LogEmptyRequests":            &cfg.Ingress.LogEmptyRequests,
+		"ForwardedHeaderPolicy":       &cfg.Ingress.ForwardedHeaderPolicy,
+		"HTTPEmptyRequestsPolicy":     &cfg.Ingress.HTTPEmptyRequestsPolicy,
 	}
+
 	if err := assets.ApplyServices(ctx, svc, renderTemplate, renderParamsFromConfig(cfg, extraParams), kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply service %v %v", svc, err)
 		return err

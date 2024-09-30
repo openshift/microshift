@@ -28,14 +28,31 @@ dns:
 etcd:
     memoryLimitMB: 0
 ingress:
+    forwardedHeaderPolicy: ""
+    httpEmptyRequestsPolicy: ""
     listenAddress:
         - ""
+    logEmptyRequests: ""
     ports:
         http: 0
         https: 0
     routeAdmissionPolicy:
         namespaceOwnership: ""
     status: ""
+    tuningOptions:
+        clientFinTimeout: ""
+        clientTimeout: ""
+        connectTimeout: ""
+        headerBufferBytes: 0
+        headerBufferMaxRewriteBytes: 0
+        healthCheckInterval: ""
+        maxConnections: 0
+        reloadInterval: ""
+        serverFinTimeout: ""
+        serverTimeout: ""
+        threadCount: 0
+        tlsInspectDelay: ""
+        tunnelTimeout: ""
 kubelet:
 manifests:
     kustomizePaths:
@@ -90,14 +107,31 @@ dns:
 etcd:
     memoryLimitMB: 0
 ingress:
+    forwardedHeaderPolicy: ""
+    httpEmptyRequestsPolicy: Respond
     listenAddress:
         - ""
+    logEmptyRequests: Log
     ports:
         http: 80
         https: 443
     routeAdmissionPolicy:
         namespaceOwnership: InterNamespaceAllowed
     status: Managed
+    tuningOptions:
+        clientFinTimeout: ""
+        clientTimeout: ""
+        connectTimeout: ""
+        headerBufferBytes: 0
+        headerBufferMaxRewriteBytes: 0
+        healthCheckInterval: ""
+        maxConnections: 0
+        reloadInterval: ""
+        serverFinTimeout: ""
+        serverTimeout: ""
+        threadCount: 0
+        tlsInspectDelay: ""
+        tunnelTimeout: ""
 kubelet:
 manifests:
     kustomizePaths:
