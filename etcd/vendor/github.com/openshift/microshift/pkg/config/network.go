@@ -5,9 +5,36 @@ import (
 	"net"
 
 	"github.com/apparentlymart/go-cidr/cidr"
+	"k8s.io/apimachinery/pkg/util/sets"
+)
+
+// CNIPlugin is an enum value that determines whether MicroShift deploys OVNK.
+// +kubebuilder:validation:Enum:="";none;ovnk
+type CNIPlugin string
+
+const (
+	// CniPluginUnset exists to support backwards compatibility with existing MicroShift clusters. When .network.cniPlugin is
+	// "", MicroShift will default to deploying OVNK. This preserves the current deployment behavior of existing
+	// clusters.
+	CniPluginUnset CNIPlugin = ""
+	//  CniPluginNone signals MicroShift to not deploy the LVMS components. Setting the value for a cluster that has already
+	//  deployed LVMS will not cause LVMS to be deleted. Otherwise, volumes already deployed on the cluster would be
+	//  orphaned once their workloads stop or restart.
+	CniPluginNone CNIPlugin = "none"
+	// CniPluginOVNK is equivalent to CniPluginUnset, and explicitly tells MicroShift to deploy OVNK. This option exists to
+	// provide a differentiation between OVNK and potential future CNI options.
+	CniPluginOVNK CNIPlugin = "ovnk"
 )
 
 type Network struct {
+	// CNIPlugin is a user defined string value matching one of the above CNI values. MicroShift uses this
+	// value to decide whether to deploy the OVN-K as default CNI. An unset field defaults to "" during yaml parsing, and thus
+	// could mean that the cluster has been upgraded. In order to support the existing out-of-box behavior, MicroShift
+	// assumes an empty string to mean the OVN-K should be deployed.
+	// Allowed values are: unset or one of ["", "ovnk", "none"]
+	// +kubebuilder:validation:Optional
+	CNIPlugin CNIPlugin `json:"cniPlugin,omitempty"`
+
 	// IP address pool to use for pod IPs.
 	// This field is immutable after installation.
 	// +kubebuilder:default={"10.42.0.0/16"}
@@ -62,4 +89,15 @@ func getClusterDNS(serviceCIDR string) (string, error) {
 func isValidIPAddress(ipAddress string) bool {
 	ip := net.ParseIP(ipAddress)
 	return ip != nil
+}
+
+func (n Network) validCNIPlugin() (isSupported bool) {
+	return sets.New[CNIPlugin](CniPluginUnset, CniPluginOVNK, CniPluginNone).Has(n.CNIPlugin)
+}
+
+// IsEnabled returns false only when .network.cniPlugin: "none". An empty value is considered "enabled"
+// for backwards compatibility. Otherwise, the meaning of the config would silently change after an
+// upgrade from enabled-by-default to disabled-by-default.
+func (n Network) IsEnabled() bool {
+	return n.CNIPlugin != CniPluginNone
 }
