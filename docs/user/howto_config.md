@@ -36,6 +36,20 @@ ingress:
     routeAdmissionPolicy:
         namespaceOwnership: ""
     status: ""
+    tuningOptions:
+        clientFinTimeout: ""
+        clientTimeout: ""
+        connectTimeout: ""
+        headerBufferBytes: 0
+        headerBufferMaxRewriteBytes: 0
+        healthCheckInterval: ""
+        maxConnections: 0
+        reloadInterval: ""
+        serverFinTimeout: ""
+        serverTimeout: ""
+        threadCount: 0
+        tlsInspectDelay: ""
+        tunnelTimeout: ""
 kubelet:
 manifests:
     kustomizePaths:
@@ -98,6 +112,20 @@ ingress:
     routeAdmissionPolicy:
         namespaceOwnership: InterNamespaceAllowed
     status: Managed
+    tuningOptions:
+        clientFinTimeout: ""
+        clientTimeout: ""
+        connectTimeout: ""
+        headerBufferBytes: 0
+        headerBufferMaxRewriteBytes: 0
+        healthCheckInterval: ""
+        maxConnections: 0
+        reloadInterval: ""
+        serverFinTimeout: ""
+        serverTimeout: ""
+        threadCount: 0
+        tlsInspectDelay: ""
+        tunnelTimeout: ""
 kubelet:
 manifests:
     kustomizePaths:

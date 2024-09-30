@@ -1,5 +1,9 @@
 package config
 
+import (
+	operatorv1 "github.com/openshift/api/operator/v1"
+)
+
 const (
 	NamespaceOwnershipStrict  NamespaceOwnershipEnum = "Strict"
 	NamespaceOwnershipAllowed NamespaceOwnershipEnum = "InterNamespaceAllowed"
@@ -13,9 +17,10 @@ type IngressStatusEnum string
 type IngressConfig struct {
 	// Default router status, can be Managed or Removed.
 	// +kubebuilder:default=Managed
-	Status          IngressStatusEnum    `json:"status"`
-	AdmissionPolicy RouteAdmissionPolicy `json:"routeAdmissionPolicy"`
-	Ports           IngressPortsConfig   `json:"ports"`
+	Status          IngressStatusEnum                         `json:"status"`
+	AdmissionPolicy RouteAdmissionPolicy                      `json:"routeAdmissionPolicy"`
+	Ports           IngressPortsConfig                        `json:"ports"`
+	TuningOptions   operatorv1.IngressControllerTuningOptions `json:"tuningOptions"`
 	// List of IP addresses and NIC names where the router will be listening. The NIC
 	// names get translated to all their configured IPs dynamically. Defaults to the
 	// configured IPs in the host at MicroShift start.
