@@ -57,7 +57,7 @@ many of the tests will try to download that file to connect to the API
 remotely.
 
 `USHIFT_USER` should be the username for logging in to `USHIFT_HOST`
-remotely via ssh.
+remotely via ssh and have sudo permission without password.
 
 `SSH_PRIV_KEY` should be an ssh key file to use for authenticating as
 `USHIFT_USER`. The key must not require a password. To connect to
