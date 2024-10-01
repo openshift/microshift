@@ -31,52 +31,13 @@ permissions configured.
 
 ### Build Image
 
-Create the `Containerfile` file with the following contents.
+Download the [Containerfile](../config/Containerfile.bootc-rhel9) using the following
+command and use it for subsequent image builds.
 
-```docker
-FROM registry.redhat.io/rhel9/rhel-bootc:9.4
+```bash
+URL=https://raw.githubusercontent.com/openshift/microshift/refs/heads/main/docs/config/Containerfile.bootc-rhel9
 
-ARG USHIFT_VER=4.16
-RUN dnf config-manager \
-        --set-enabled rhocp-${USHIFT_VER}-for-rhel-9-$(uname -m)-rpms \
-        --set-enabled fast-datapath-for-rhel-9-$(uname -m)-rpms
-RUN dnf install -y firewalld microshift && \
-    systemctl enable microshift && \
-    dnf clean all
-
-# Create a default 'redhat' user with the specified password.
-# Add it to the 'wheel' group to allow for running sudo commands.
-ARG USER_PASSWD
-RUN if [ -z "${USER_PASSWD}" ] ; then \
-        echo USER_PASSWD is a mandatory build argument && exit 1 ; \
-    fi
-RUN useradd -m -d /var/home/redhat -G wheel redhat && \
-    echo "redhat:${USER_PASSWD}" | chpasswd
-
-# Mandatory firewall configuration
-RUN firewall-offline-cmd --zone=public --add-port=22/tcp && \
-    firewall-offline-cmd --zone=trusted --add-source=10.42.0.0/16 && \
-    firewall-offline-cmd --zone=trusted --add-source=169.254.169.1
-# Application-specific firewall configuration
-RUN firewall-offline-cmd --zone=public --add-port=80/tcp && \
-    firewall-offline-cmd --zone=public --add-port=443/tcp && \
-    firewall-offline-cmd --zone=public --add-port=30000-32767/tcp && \
-    firewall-offline-cmd --zone=public --add-port=30000-32767/udp
-
-# Create a systemd unit to recursively make the root filesystem subtree
-# shared as required by OVN images
-RUN cat > /etc/systemd/system/microshift-make-rshared.service <<'EOF'
-[Unit]
-Description=Make root filesystem shared
-Before=microshift.service
-ConditionVirtualization=container
-[Service]
-Type=oneshot
-ExecStart=/usr/bin/mount --make-rshared /
-[Install]
-WantedBy=multi-user.target
-EOF
-RUN systemctl enable microshift-make-rshared.service
+curl -s -o Containerfile "${URL}"
 ```
 
 > **Important:**<br>
