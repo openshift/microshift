@@ -41,7 +41,8 @@ assets:
         src: sailoperator.io_istios.yaml
       - file: 00-sailoperator.io_remoteistios.yaml
         src: sailoperator.io_remoteistios.yaml
-      #TODO missing gateway api CRDs.
+      - file: 00-gateway.networking.k8s.io_crds.yaml
+        src: gateway.networking.k8s.io_crds.yaml
       # Manual Namespace instead of OLM one
       - file: 01-openshift_gateway_api_namespace.yaml
         ignore: "Provided by MicroShift"
