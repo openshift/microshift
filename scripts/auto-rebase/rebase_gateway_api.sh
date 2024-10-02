@@ -89,7 +89,7 @@ rebase_ossm_to() {
     git branch -D "${rebase_branch}" || true
     git checkout -b "${rebase_branch}"
 
-    update_last_ossm_rebase "${operator_bundle_manifest}"
+    update_last_ossm_rebase "${operator_bundle_manifest}" "${gateway_api_version}"
   
     update_ossm_images
     if [[ -n "$(git status -s pkg/release)" ]]; then
@@ -249,6 +249,7 @@ update_ossm_manifests() {
 
 update_last_ossm_rebase() {
     local operator_bundle_manifest="$1"
+    local gateway_api_version="$2"
 
     title "## Updating last_ossm_rebase.sh"
 
@@ -257,7 +258,7 @@ update_last_ossm_rebase() {
     rm -f "${last_rebase_script}"
     cat - >"${last_rebase_script}" <<EOF
 #!/bin/bash -x
-./scripts/auto-rebase/rebase-ossm.sh to "${operator_bundle_manifest}"
+./scripts/auto-rebase/rebase-ossm.sh to "${operator_bundle_manifest}" "${gateway_api_version}"
 EOF
     chmod +x "${last_rebase_script}"
 
