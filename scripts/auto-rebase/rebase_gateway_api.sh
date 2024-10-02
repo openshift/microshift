@@ -55,26 +55,34 @@ check_preconditions() {
         echo "ERROR: missing python's yaml library - please install"
         exit 1
     fi
+
+    if ! hash oc; then
+        echo "ERROR: oc is not present on the system - please install"
+        exit 1
+    fi
 }
 
 download_gateway_api_manifests() {
-    version="$1"
+    dest="$1"
+    version="$2"
 
     title "downloading Gateway API manifests ${version}"
     local GATEWAY_API_STAGING="${STAGING_DIR}/gateway-api"
     rm -rf "${GATEWAY_API_STAGING}"
     mkdir -p "${GATEWAY_API_STAGING}"
 
-    #TODO
+    crd_file="${dest}/gateway.networking.k8s.io_crds.yaml"
+    oc kustomize "github.com/kubernetes-sigs/gateway-api/config/crd?ref=v${version}" > ${crd_file}
 }
 
 # Runs each OSSM rebase step in sequence, commiting the step's output to git
 rebase_ossm_to() {
     local operator_bundle_manifest="$1"
+    local gateway_api_version="$2"
 
     title "# Rebasing OSSM to ${operator_bundle_manifest}"
 
-    download_ossm_operator_bundle_manifest "${operator_bundle_manifest}"
+    download_ossm_operator_bundle_manifest "${operator_bundle_manifest}" "${gateway_api_version}"
 
     # OSSM image names may include `/` and `:`, which make messy branch names.
     rebase_branch="rebase-ossm-${operator_bundle_manifest//[:\/]/-}"
@@ -109,6 +117,7 @@ rebase_ossm_to() {
 # Because OSSM is used without OLM, all of the manifests in the bundle are downloaded.
 download_ossm_operator_bundle_manifest() {
   bundle_manifest="$1"
+  gateway_api_version="$2"
 
   title "downloading OSSM operator bundle manifests ${bundle_manifest}"
   local OSSM_STAGING="${STAGING_DIR}/ossm"
@@ -145,6 +154,7 @@ download_ossm_operator_bundle_manifest() {
         return 1
       }
 
+      download_gateway_api_manifests "${PWD}" "${gateway_api_version}"
       extract_ossm_rbac_from_cluster_service_version "${PWD}" "${csv}" "${namespace}"
       extract_ossm_deploy_from_cluster_service_version "${PWD}" "${csv}" "${namespace}"
 
@@ -444,10 +454,10 @@ check_preconditions
 command=${1:-help}
 case "${command}" in
     to)
-        rebase_ossm_to "$2"
+        rebase_ossm_to "$2" "$3"
         ;;
     download)
-        download_ossm_operator_bundle_manifest "$2"
+        download_ossm_operator_bundle_manifest "$2" "$3"
         ;;
     images)
         update_ossm_images
