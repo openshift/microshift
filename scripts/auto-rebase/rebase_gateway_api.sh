@@ -442,10 +442,10 @@ parse_images() {
 
 usage() {
     echo "Usage:"
-    echo "$(basename "$0") to OSSM_RELEASE_BUNDLE        Performs all the steps to rebase OSSM"
-    echo "$(basename "$0") download OSSM_RELEASE_BUNSLE  Downloads the content of a OSSM release image to disk in preparation for rebasing"
-    echo "$(basename "$0") images                        Updates OSSM images"
-    echo "$(basename "$0") manifests                     Updates OSSM manifests"
+    echo "$(basename "$0") to OSSM_RELEASE_BUNDLE GATEWAY_API_VERSION        Performs all the steps to rebase OSSM"
+    echo "$(basename "$0") download OSSM_RELEASE_BUNSLE GATEWAY_API_VERSION  Downloads the content of a OSSM release image to disk in preparation for rebasing"
+    echo "$(basename "$0") images                                            Updates OSSM images"
+    echo "$(basename "$0") manifests                                         Updates OSSM manifests"
     exit 1
 }
 
