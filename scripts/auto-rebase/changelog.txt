@@ -1,9 +1,19 @@
-- cluster-network-operator embedded-component 4eec256fe4565434ccf0f4b44ee74d24c40f6850 to 1773dcfb930d32b51580b1fa7158d9cbbe7b4274
-  - 9a56d23 2024-09-26T18:15:29+01:00 HOSTEDCP-1981: Add controlplane cli image envar for use with hypershift
+- api embedded-component f89ab92f1597eaed4de5b947c1781adde2bf42fb to d67159445fc413170704f4d27d7d4b1e160efe68
+  - c983c1d 2024-09-26T12:00:26-04:00 RFE-6242: add OpenStackLoadBalancerParameters to ingress API
 
-- machine-config-operator embedded-component 56346ad6c09bb86d6e4b09850dde24b076d101d9 to 8dc705d80b2ab269e6346ebb5d35783fe96c32a3
-  - 669db136 2024-09-23T11:57:26-04:00 openstack: fix non-old systemd compatible unit
+- cluster-kube-apiserver-operator embedded-component 48d9579a5c4d0f6eb9ddbbc96cb44ccda121ce09 to 2eefd79ce2f04541296e6500be50d65dc9ba8bea
+  - a32a100 2024-09-30T13:43:56-04:00 update library-go for new revision controller
+  - 6f3ed3b 2024-09-30T13:38:03-04:00 fitting
 
-- operator-framework-olm embedded-component fccb629eb860057467a9287b23f5f8d2295aead9 to fbd00789eda3c50c35be61d04508e2230b17bffa
-  - c136cee5 2024-09-29T13:27:28+00:00 Improve InstallPlan error handling (#3404)
+- cluster-network-operator embedded-component 1773dcfb930d32b51580b1fa7158d9cbbe7b4274 to 70cb43b37eae06172cb88d9067d83b67e73d685e
+  - 2aad7d4 2024-09-30T10:26:20+02:00 Add certificatesigningrequests/watch RBAC to ovnkube-node
+
+- machine-config-operator embedded-component 8dc705d80b2ab269e6346ebb5d35783fe96c32a3 to f9abd9d45af1028b03ba00fadf5053523a2d7e4f
+  - 3390cf8a 2024-08-28T15:38:28-04:00 adds OCL quickstart and troubleshooting guides
+
+- oc image-arm64 02786574b09edc1bc4ec2361d8056c1d57ae97c0 to 6bba0756103a7df8a126920ecc35dbcd7915d167
+  - 6acee56a 2024-09-30T23:21:04+02:00 OWNERS_ALIASES: Update username of David Hurta
+
+- kubernetes image-arm64 947ea2f8f2a97d76a8bc9382c1ecda89fbc13555 to 22a8059b7385368c1183afed6e426021ffaf208a
+  - 8120f49ce 2024-09-05T10:01:57+00:00 UPSTREAM: <carry>: Updating openshift-enterprise-pod-container image to be consistent with ART for 4.18 Reconciling with https://github.com/openshift/ocp-build-data/tree/827ab4ccce9cbbcf82c9dbaf6398b61d6cff8d7a/images/openshift-enterprise-pod.yml
 
