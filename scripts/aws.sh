@@ -12,23 +12,12 @@ export AWS_PAGER=""
 # | t3.large      | x86_64 | 2     | 8   | $0.12 |
 # | t3.xlarge     | x86_64 | 4     | 16  | $0.24 |
 # | t3.2xlarge    | x86_64 | 8     | 32  | $0.48 |
-# | c5n.2xlarge   | x86_64 | 8     | 21  | $0.60 | not good for low lat, hwlatdetect poor
+# | c5n.2xlarge   | x86_64 | 8     | 21  | $0.60 |
 # | c5n.metal     | x86_64 | 72    | 192 | $5.17 |
 # | t4g.large     | arm64  | 2     | 8   | $0.10 |
 # | t4g.xlarge    | arm64  | 4     | 16  | $0.20 |
 # | c6g.metal     | arm64  | 6     | 128 | $3.02 |
 
-#EC2_INSTANCE_TYPE=c7i.metal-24xl
-#EC2_INSTANCE_TYPE=c5n.metal # x86
-#EC2_INSTANCE_TYPE=t3.2xlarge
-#EC2_INSTANCE_TYPE=t3.large
-EC2_INSTANCE_TYPE=t3.nano
-
-#EC2_INSTANCE_TYPE=c6g.metal # ARM
-#EC2_INSTANCE_TYPE=t4g.medium
-
-# aws ec2 describe-images --region us-west-2 --filters 'Name=name,Values=RHEL-9.*' --query 'Images[*].[Name,ImageId,Architecture]' --output text | sort --reverse
-# aws ec2 describe-images --region eu-west-1 --filters 'Name=name,Values=RHEL-9.*' --query 'Images[*].[Name,ImageId,Architecture]' --output text | sort --reverse
 declare -A ami_map=(
   [us-west-2,x86_64,rhel-9.2]=ami-0378fd0689802d015    # RHEL-9.2.0_HVM-20240229-x86_64-33-Hourly2-GP3
   [us-west-2,x86_64,rhel-9.3]=ami-0c2f1f1137a85327e    # RHEL-9.3.0_HVM-20240229-x86_64-27-Hourly2-GP3
@@ -44,60 +33,44 @@ declare -A ami_map=(
   [eu-west-1,arm64,rhel-9.4]=ami-02b8573b23fde21aa     # RHEL-9.4.0_HVM-20240605-arm64-82-Hourly2-GP3
 )
 
-# OPTIONS: instance type, region, stack name, pub key path
-# ACTIONS: create, delete, describe, logs
+action_create() {
+  if [ -z "${inst_type}" ] ; then
+    echo "ERROR: inst_type not set" 1>&2
+    exit 1
+  fi
 
-#REGION=us-west-2
-REGION=eu-west-1
-stack_name=microshift-pmatusza-stack
-cf_tpl_file=cf-gen.yaml
+  cf_tpl_file=cf-gen.yaml
 
-act="${1:-}"
+  EC2_AMI=""
+  MICROSHIFT_OS=rhel-9.4
 
-if [[ "${act}" == "delete" ]]; then
-	aws --region $REGION cloudformation delete-stack --stack-name $stack_name
-    echo "Waiting for stack to delete"
-	aws --region $REGION cloudformation wait stack-delete-complete --stack-name $stack_name
-	exit 0
-fi
+  ARCH="x86_64"
+  if [[ "${inst_type%.*}" =~ .*"g".* ]]; then
+    ARCH="arm64"
+  fi
 
-if [[ "${act}" == "describe" ]]; then
-	aws --region $REGION cloudformation describe-stack-events --stack-name $stack_name --output json | less
-	exit 0
-fi
+  if [[ "${EC2_AMI}" == "" ]]; then
+    EC2_AMI="${ami_map["${region},${ARCH},${MICROSHIFT_OS}"]}"
+  fi
 
+  ec2Type="VirtualMachine"
+  if [[ "$inst_type" =~ c[0-9]+[gn].metal ]]; then
+    ec2Type="MetalMachine"
+  fi
 
-EC2_AMI=""
-MICROSHIFT_OS=rhel-9.4
-
-ARCH="x86_64"
-if [[ "${EC2_INSTANCE_TYPE%.*}" =~ .*"g".* ]]; then
-	ARCH="arm64"
-fi
-
-if [[ "${EC2_AMI}" == "" ]]; then
-	EC2_AMI="${ami_map["${REGION},${ARCH},${MICROSHIFT_OS}"]}"
-fi
-
-ec2Type="VirtualMachine"
-if [[ "$EC2_INSTANCE_TYPE" =~ c[0-9]+[gn].metal ]]; then
-	ec2Type="MetalMachine"
-fi
-
-ami_id=${EC2_AMI}
-instance_type=${EC2_INSTANCE_TYPE}
+  ami_id=${EC2_AMI}
+  inst_type=${inst_type}
 
 
-echo "Instance type: ${EC2_INSTANCE_TYPE}" 
-echo "OS: ${MICROSHIFT_OS}" 
-echo "ARCH: ${ARCH}" 
-echo "AMI ID: ${EC2_AMI}" 
-echo "Region: ${REGION}" 
+  echo "Instance type: ${inst_type}" 
+  echo "OS: ${MICROSHIFT_OS}" 
+  echo "ARCH: ${ARCH}" 
+  echo "AMI ID: ${EC2_AMI}" 
+  echo "region: ${region}" 
 
-# TODO default id_rsa.pub, option to give path to different key
-public_key="/home/${USER}/.ssh/id_ed25519.pub"
 
-cat >"${cf_tpl_file}" <<EOF
+
+  cat >"${cf_tpl_file}" <<EOF
 AWSTemplateFormatVersion: 2010-09-09
 Description: Template for RHEL machine Launch
 Conditions:
@@ -366,67 +339,115 @@ Outputs:
     Value: !GetAtt RHELInstance.PublicIp
 EOF
 
-aws --region "$REGION" cloudformation create-stack --stack-name "${stack_name}" \
-	--template-body "file://${cf_tpl_file}" \
-	--capabilities CAPABILITY_NAMED_IAM \
-	--parameters \
-	ParameterKey=HostInstanceType,ParameterValue="${instance_type}" \
-	ParameterKey=Machinename,ParameterValue="${stack_name}" \
-	ParameterKey=AmiId,ParameterValue="${ami_id}" \
-	ParameterKey=PublicKeyString,ParameterValue="$(cat ${public_key})"
+  aws --region "$region" cloudformation create-stack --stack-name "${stack_name}" \
+    --template-body "file://${cf_tpl_file}" \
+    --capabilities CAPABILITY_NAMED_IAM \
+    --parameters \
+    ParameterKey=HostInstanceType,ParameterValue="${inst_type}" \
+    ParameterKey=Machinename,ParameterValue="${stack_name}" \
+    ParameterKey=AmiId,ParameterValue="${ami_id}" \
+    ParameterKey=PublicKeyString,ParameterValue="$(cat ${pub_key})"
 
-aws --region "${REGION}" cloudformation wait stack-create-complete --stack-name "${stack_name}"
+  aws --region "${region}" cloudformation wait stack-create-complete --stack-name "${stack_name}"
 
-#aws --region "${REGION}" cloudformation describe-stacks --stack-name "${stack_name}"
+  INSTANCE_ID="$(aws --region "${region}" cloudformation describe-stacks --stack-name "${stack_name}" \
+    --query 'Stacks[].Outputs[?OutputKey == `InstanceId`].OutputValue' --output text)"
 
-INSTANCE_ID="$(aws --region "${REGION}" cloudformation describe-stacks --stack-name "${stack_name}" \
-	--query 'Stacks[].Outputs[?OutputKey == `InstanceId`].OutputValue' --output text)"
+  aws --region "${region}" ec2 wait instance-status-ok --instance-id "${INSTANCE_ID}"
 
-aws --region "${REGION}" ec2 wait instance-status-ok --instance-id "${INSTANCE_ID}"
+  PUBLIC_IP=$(aws --region "${region}" cloudformation describe-stacks --stack-name "${stack_name}" \
+    --query 'Stacks[].Outputs[?OutputKey == `PublicIp`].OutputValue' --output text)
 
-PUBLIC_IP=$(aws --region "${REGION}" cloudformation describe-stacks --stack-name "${stack_name}" \
-	--query 'Stacks[].Outputs[?OutputKey == `PublicIp`].OutputValue' --output text)
+  echo "PUBLIC IP: ${PUBLIC_IP}"
+}
 
-echo "PUBLIC IP: ${PUBLIC_IP}"
+action_delete() {
+  aws --region $region cloudformation delete-stack --stack-name $stack_name
+    echo "Waiting for stack to delete"
+	aws --region $region cloudformation wait stack-delete-complete --stack-name $stack_name
+	exit 0
+}
 
-# cp ~/.ssh/config ~/.ssh/config.bak
-# sed -i '/Host aws/{N;N;d;}' ~/.ssh/config
-# tee -a ~/.ssh/config << EOF
-# Host aws
-#   HostName ${PUBLIC_IP}
-#   User ec2-user
-# EOF
-# 
-# ssh_cmd() {
-#   echo "> ${1}"
-#   ssh -o "StrictHostKeyChecking no" aws "$1"
-# }
-# 
-# ssh_cmd "sudo subscription-manager register --org 11009103 --activationkey microshift-rhsm-creds"
-# ssh_cmd "sudo subscription-manager config --rhsm.manage_repos=1"
-# ssh_cmd "sudo subscription-manager repos --enable rhel-9-for-\$(uname -m)-baseos-rpms --enable rhel-9-for-\$(uname -m)-appstream-rpms"
-# 
-# ssh_cmd "sudo dnf install -y git vim tmux rsync"
-# scp -o "StrictHostKeyChecking no" $HOME/dev/pull-secret-big ec2-user@${PUBLIC_IP}:~/.pull-secret.json
-# ssh_cmd "git clone https://github.com/pmtk/microshift.git --branch 4.16/profiling"
-# ssh_cmd "git clone https://github.com/pmtk/microshift.git --branch low-latency/warning-job"
+action_describe() {
+  aws --region $region cloudformation describe-stack-events --stack-name $stack_name --output json | less
+	exit 0
+}
 
-# rsync --exclude '.git' --exclude '_output' --exclude 'test/scenario_settings.sh' -avz ~/dev/microshift/ ec2-user@${PUBLIC_IP}:~/microshift
+action_logs() {
+  # this is not the correct command          
+  aws --region $region cloudformation get-log-events --stack-name $stack_name
+}
 
-# ssh_cmd "bash -x ./microshift/scripts/devenv-builder/configure-vm.sh --optional-rpms --force-firewall ~/.pull-secret.json"
-#ssh_cmd "sudo systemctl disable --now microshift"
-#ssh_cmd "sudo microshift-cleanup-data --all --keep-images <<< 1"
-#ssh_cmd "sudo rm -rf /var/lib/kubelet"
+usage() {
+  cat - <<EOF
+Script for AWS stack management
 
-#ssh_cmd "sudo subscription-manager repos --enable rhel-9-for-x86_64-rt-rpms"
-#ssh_cmd "sudo dnf install kernel-rt tuna realtime-setup tuned tuned-profiles* realtime-tests -y"
-#ssh_cmd "sudo grubby --set-default=\$(ls /boot/vmlinuz*rt)"
+Usage:
 
-# ssh_cmd "bash -x ./microshift/scripts/image-builder/configure.sh"
-# ssh_cmd "bash -x ./microshift/scripts/devenv-builder/manage-vm.sh config"
-# ssh_cmd "bash -x ./scripts/image-builder/cleanup.sh -full"
+aws.sh (create|delete|describe|logs) \ 
+            --stack_name <name> \
+            [--inst_type <type>] \
+            [--region <region>] \
+            [--pub_key <path>]       
 
-# set +x
-# echo
-# echo "PUBLIC IP:   ${PUBLIC_IP}"
-# echo
+Create
+
+  aws.sh create --stack_name <name> --inst_type <type> [--region <region>] [--pub_key <path>]
+
+Delete|Describe|Logs
+
+  aws.sh (delete|describe|logs) --stack_name <name> [--region <region>]
+
+Arguments:
+  --stack_name <name>:  The name of the stack.
+  [--inst_type <type>]: (create only) The type of instance to create.
+  [--region <region>]:  (create only) The region where the stack should be created. Defaults to eu-west-1.
+  [--pub_key <path>]:   (create only) The path to a .pub file. Defaults to /home/${USER}/.ssh/id_rsa.pub.
+
+EOF
+}
+
+action="$1"
+shift
+
+case "${action}" in
+  create|delete|describe|logs)
+    ;;
+  *)
+    echo "ERROR: Unknown action" 1>&2
+    exit 1
+    ;;
+esac
+
+stack_name=""
+inst_type=""
+region=eu-west-1
+pub_key="/home/${USER}/.ssh/id_rsa.pub"
+
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --inst_type|--region|--stack_name|--pub_key)
+      var="${1/--/}"
+      if [ -n "$2" ] && [ "${2:0:1}" != "-" ]; then 
+          declare "${var}=$2"
+          shift 2
+      else
+          echo "ERROR: Failed parsing arguments: ${var} value not set" 1>&2
+          exit 1
+      fi
+      ;;
+    *)
+      echo "ERROR: Invalid argument: ${1}" 1>&2
+      exit 1
+      ;;
+  esac
+done
+
+if [ -z "${stack_name}" ] ; then
+  echo "ERROR: stack_name not set" 1>&2
+  exit 1
+fi
+
+"action_${action}"
+
+exit 0
