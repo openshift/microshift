@@ -1,6 +1,0 @@
-- kubernetes embedded-component f10c92d5d8e114f65dffa8ff4f876ea072f456bf to 632b078b578ba9af3734f420c57e7e9d584b0930
-  - ddb783068 2024-09-25T07:44:43-04:00 UPSTREAM: <drop>: bump(github.com/openshift/apiserver-library-go)
-
-- kubernetes image-amd64 f10c92d5d8e114f65dffa8ff4f876ea072f456bf to 632b078b578ba9af3734f420c57e7e9d584b0930
-  - ddb783068 2024-09-25T07:44:43-04:00 UPSTREAM: <drop>: bump(github.com/openshift/apiserver-library-go)
-
