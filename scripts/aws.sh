@@ -1,8 +1,12 @@
 #!/bin/bash
 
-set -euo pipefail
+set -uo pipefail
 
 export AWS_PAGER=""
+
+err_log="err.log"
+
+trap 'rm -f "$err_log"' EXIT
 
 declare -A ami_map=(
   [us-west-2,x86_64,rhel-9.2]=ami-0378fd0689802d015    # RHEL-9.2.0_HVM-20240229-x86_64-33-Hourly2-GP3
@@ -18,6 +22,40 @@ declare -A ami_map=(
   [eu-west-1,arm64,rhel-9.3]=ami-016e6894567bb7f3e     # RHEL-9.3.0_HVM-20240229-arm64-27-Hourly2-GP3
   [eu-west-1,arm64,rhel-9.4]=ami-02b8573b23fde21aa     # RHEL-9.4.0_HVM-20240605-arm64-82-Hourly2-GP3
 )
+
+spin() {
+  pid="${1}"
+  message_wait="${2}"
+  message_ok="${3}"
+
+  spin[0]="-"
+  spin[1]="\\"
+  spin[2]="|"
+  spin[3]="/"
+
+  while kill -0 "${pid}" 2>/dev/null
+  do
+    for i in "${spin[@]}"
+    do
+      echo -ne "\r$i ${message_wait}"
+      sleep 0.1
+    done
+  done
+
+  wait "${pid}"
+  exit_status=$?
+
+  if [ "${exit_status}" -ne 0 ] ; then
+    cat "${err_log}"
+    exit 1
+  else
+    length=${#message_wait}
+    length=$((length + 2))
+    printf "\r%${length}s" ""
+    echo -e "\r${message_ok}"
+  fi
+
+}
 
 action_create() {
   if [ -z "${inst_type}" ] ; then
@@ -332,29 +370,33 @@ EOF
     ParameterKey=EC2Type,ParameterValue="${ec2Type}" \
     ParameterKey=PublicKeyString,ParameterValue="$(cat "${pub_key}")"
     
-  echo "Waiting for stack to be created"
-  aws --region "${region}" cloudformation wait stack-create-complete --stack-name "${stack_name}"
+  #echo "Waiting for stack to be created"
+  aws --region "${region}" cloudformation wait stack-create-complete --stack-name "${stack_name}" 2> "${err_log}" &
+  pid=$!
+  spin "${pid}" "Waiting for stack to be created" "Stack created successfully"
 
   # shellcheck disable=SC2016
   instance_id="$(aws --region "${region}" cloudformation describe-stacks --stack-name "${stack_name}" \
     --query 'Stacks[].Outputs[?OutputKey == `InstanceId`].OutputValue' --output text)"
 
-  echo "Waiting for instance status to be OK"
-  aws --region "${region}" ec2 wait instance-status-ok --instance-id "${instance_id}"
+  aws --region "${region}" ec2 wait instance-status-ok --instance-id "${instance_id}" 2> "${err_log}" &
+  pid=$!
+  spin "${pid}" "Waiting for stack status to be OK" "Stack status OK"
 
   # shellcheck disable=SC2016
   public_ip=$(aws --region "${region}" cloudformation describe-stacks --stack-name "${stack_name}" \
     --query 'Stacks[].Outputs[?OutputKey == `PublicIp`].OutputValue' --output text)
 
-  rm "${cf_tpl_file}"
+  rm -f "${cf_tpl_file}"
   
   echo "PUBLIC IP: ${public_ip}"
 }
 
 action_delete() {
   aws --region "${region}" cloudformation delete-stack --stack-name "${stack_name}"
-    echo "Waiting for stack to delete"
-	aws --region "${region}" cloudformation wait stack-delete-complete --stack-name "${stack_name}"
+	aws --region "${region}" cloudformation wait stack-delete-complete --stack-name "${stack_name}" 2> "${err_log}" &
+  pid=$!
+  spin "${pid}" "Waiting for stack to delete" "Stack deleted"
 	exit 0
 }
 
