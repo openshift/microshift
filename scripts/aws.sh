@@ -43,21 +43,18 @@ action_create() {
   fi
 
   ec2Type="VirtualMachine"
-  if [[ "$inst_type" =~ c[0-9]+[gn].metal ]]; then
+  if [[ "${inst_type}" =~ c[0-9]+[gn].metal ]]; then
     ec2Type="MetalMachine"
   fi
 
   ami_id=${EC2_AMI}
-  inst_type=${inst_type}
 
-
+  echo "Stack name: ${stack_name}"
   echo "Instance type: ${inst_type}" 
   echo "OS: ${MICROSHIFT_OS}" 
   echo "ARCH: ${ARCH}" 
   echo "AMI ID: ${EC2_AMI}" 
   echo "region: ${region}" 
-
-
 
   cat >"${cf_tpl_file}" <<EOF
 AWSTemplateFormatVersion: 2010-09-09
@@ -328,41 +325,48 @@ Outputs:
     Value: !GetAtt RHELInstance.PublicIp
 EOF
 
-  aws --region "$region" cloudformation create-stack --stack-name "${stack_name}" \
+  aws --region "${region}" cloudformation create-stack --stack-name "${stack_name}" \
     --template-body "file://${cf_tpl_file}" \
     --capabilities CAPABILITY_NAMED_IAM \
     --parameters \
     ParameterKey=HostInstanceType,ParameterValue="${inst_type}" \
     ParameterKey=Machinename,ParameterValue="${stack_name}" \
     ParameterKey=AmiId,ParameterValue="${ami_id}" \
-    ParameterKey=PublicKeyString,ParameterValue="$(cat ${pub_key})"
+    ParameterKey=EC2Type,ParameterValue="${ec2Type}" \
+    ParameterKey=PublicKeyString,ParameterValue="$(cat "${pub_key}")"
+    
 
   aws --region "${region}" cloudformation wait stack-create-complete --stack-name "${stack_name}"
 
+  # shellcheck disable=SC2016
   instance_id="$(aws --region "${region}" cloudformation describe-stacks --stack-name "${stack_name}" \
     --query 'Stacks[].Outputs[?OutputKey == `InstanceId`].OutputValue' --output text)"
 
   aws --region "${region}" ec2 wait instance-status-ok --instance-id "${instance_id}"
 
+  # shellcheck disable=SC2016
   public_ip=$(aws --region "${region}" cloudformation describe-stacks --stack-name "${stack_name}" \
     --query 'Stacks[].Outputs[?OutputKey == `PublicIp`].OutputValue' --output text)
 
+  rm "${cf_tpl_file}"
+  
   echo "PUBLIC IP: ${public_ip}"
 }
 
 action_delete() {
-  aws --region $region cloudformation delete-stack --stack-name $stack_name
+  aws --region "${region}" cloudformation delete-stack --stack-name "${stack_name}"
     echo "Waiting for stack to delete"
-	aws --region $region cloudformation wait stack-delete-complete --stack-name $stack_name
+	aws --region "${region}" cloudformation wait stack-delete-complete --stack-name "${stack_name}"
 	exit 0
 }
 
 action_describe() {
-  aws --region $region cloudformation describe-stack-events --stack-name $stack_name --output json | less
+  aws --region "${region}" cloudformation describe-stack-events --stack-name "${stack_name}" --output json | less
 	exit 0
 }
 
 action_logs() {
+  # shellcheck disable=SC2016
   instance_id="$(aws --region "${region}" cloudformation describe-stacks --stack-name "${stack_name}" \
     --query 'Stacks[].Outputs[?OutputKey == `InstanceId`].OutputValue' --output text)"
   
