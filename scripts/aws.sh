@@ -1,9 +1,6 @@
 #!/bin/bash
 
-PS4='+ $(date "+%T.%N")\011 '
-
 set -euo pipefail
-#set -x
 
 export AWS_PAGER=""
 
@@ -335,13 +332,14 @@ EOF
     ParameterKey=EC2Type,ParameterValue="${ec2Type}" \
     ParameterKey=PublicKeyString,ParameterValue="$(cat "${pub_key}")"
     
-
+  echo "Waiting for stack to be created"
   aws --region "${region}" cloudformation wait stack-create-complete --stack-name "${stack_name}"
 
   # shellcheck disable=SC2016
   instance_id="$(aws --region "${region}" cloudformation describe-stacks --stack-name "${stack_name}" \
     --query 'Stacks[].Outputs[?OutputKey == `InstanceId`].OutputValue' --output text)"
 
+  echo "Waiting for instance status to be OK"
   aws --region "${region}" ec2 wait instance-status-ok --instance-id "${instance_id}"
 
   # shellcheck disable=SC2016
