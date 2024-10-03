@@ -20,5 +20,5 @@ func (c *cluster) NonLinearizeableMemberList(ctx context.Context) (*MemberListRe
 	if err == nil {
 		return (*MemberListResponse)(resp), nil
 	}
-	return nil, toErr(ctx, err)
+	return nil, ContextError(ctx, err)
 }
