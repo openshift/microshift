@@ -7,17 +7,6 @@ set -euo pipefail
 
 export AWS_PAGER=""
 
-# | Instance Type | Arch   | vCPUs | GiB | Cost  |
-# |---------------|--------|-------|-----|-------|
-# | t3.large      | x86_64 | 2     | 8   | $0.12 |
-# | t3.xlarge     | x86_64 | 4     | 16  | $0.24 |
-# | t3.2xlarge    | x86_64 | 8     | 32  | $0.48 |
-# | c5n.2xlarge   | x86_64 | 8     | 21  | $0.60 |
-# | c5n.metal     | x86_64 | 72    | 192 | $5.17 |
-# | t4g.large     | arm64  | 2     | 8   | $0.10 |
-# | t4g.xlarge    | arm64  | 4     | 16  | $0.20 |
-# | c6g.metal     | arm64  | 6     | 128 | $3.02 |
-
 declare -A ami_map=(
   [us-west-2,x86_64,rhel-9.2]=ami-0378fd0689802d015    # RHEL-9.2.0_HVM-20240229-x86_64-33-Hourly2-GP3
   [us-west-2,x86_64,rhel-9.3]=ami-0c2f1f1137a85327e    # RHEL-9.3.0_HVM-20240229-x86_64-27-Hourly2-GP3
@@ -350,15 +339,15 @@ EOF
 
   aws --region "${region}" cloudformation wait stack-create-complete --stack-name "${stack_name}"
 
-  INSTANCE_ID="$(aws --region "${region}" cloudformation describe-stacks --stack-name "${stack_name}" \
+  instance_id="$(aws --region "${region}" cloudformation describe-stacks --stack-name "${stack_name}" \
     --query 'Stacks[].Outputs[?OutputKey == `InstanceId`].OutputValue' --output text)"
 
-  aws --region "${region}" ec2 wait instance-status-ok --instance-id "${INSTANCE_ID}"
+  aws --region "${region}" ec2 wait instance-status-ok --instance-id "${instance_id}"
 
-  PUBLIC_IP=$(aws --region "${region}" cloudformation describe-stacks --stack-name "${stack_name}" \
+  public_ip=$(aws --region "${region}" cloudformation describe-stacks --stack-name "${stack_name}" \
     --query 'Stacks[].Outputs[?OutputKey == `PublicIp`].OutputValue' --output text)
 
-  echo "PUBLIC IP: ${PUBLIC_IP}"
+  echo "PUBLIC IP: ${public_ip}"
 }
 
 action_delete() {
@@ -374,8 +363,10 @@ action_describe() {
 }
 
 action_logs() {
-  # this is not the correct command          
-  aws --region $region cloudformation get-log-events --stack-name $stack_name
+  instance_id="$(aws --region "${region}" cloudformation describe-stacks --stack-name "${stack_name}" \
+    --query 'Stacks[].Outputs[?OutputKey == `InstanceId`].OutputValue' --output text)"
+  
+  aws ec2 get-console-output --instance-id "${instance_id}" --output text
 }
 
 usage() {
@@ -385,24 +376,24 @@ Script for AWS stack management
 Usage:
 
 aws.sh (create|delete|describe|logs) \ 
-            --stack_name <name> \
-            [--inst_type <type>] \
-            [--region <region>] \
-            [--pub_key <path>]       
+            --stack-name <name> \ 
+            [--inst-type <type>] \ 
+            [--region <region>] \ 
+            [--pub-key <path>]       
 
 Create
 
-  aws.sh create --stack_name <name> --inst_type <type> [--region <region>] [--pub_key <path>]
+  aws.sh create --stack-name <name> --inst-type <type> [--region <region>] [--pub-key <path>]
 
 Delete|Describe|Logs
 
-  aws.sh (delete|describe|logs) --stack_name <name> [--region <region>]
+  aws.sh (delete|describe|logs) --stack-name <name> [--region <region>]
 
 Arguments:
-  --stack_name <name>:  The name of the stack.
-  [--inst_type <type>]: (create only) The type of instance to create.
+  --stack-name <name>:  The name of the stack.
+  [--inst-type <type>]: (create only) The type of instance to create (e.g. t3.large, c5n.metal).
   [--region <region>]:  (create only) The region where the stack should be created. Defaults to eu-west-1.
-  [--pub_key <path>]:   (create only) The path to a .pub file. Defaults to /home/${USER}/.ssh/id_rsa.pub.
+  [--pub-key <path>]:   (create only) The path to a .pub file. Defaults to /home/${USER}/.ssh/id_rsa.pub.
 
 EOF
 }
@@ -414,7 +405,7 @@ case "${action}" in
   create|delete|describe|logs)
     ;;
   *)
-    echo "ERROR: Unknown action" 1>&2
+    usage
     exit 1
     ;;
 esac
@@ -426,28 +417,28 @@ pub_key="/home/${USER}/.ssh/id_rsa.pub"
 
 while [ $# -gt 0 ]; do
   case "$1" in
-    --inst_type|--region|--stack_name|--pub_key)
+    --inst-type|--region|--stack-name|--pub-key)
       var="${1/--/}"
+      var="${var/-/_}"
       if [ -n "$2" ] && [ "${2:0:1}" != "-" ]; then 
           declare "${var}=$2"
           shift 2
       else
-          echo "ERROR: Failed parsing arguments: ${var} value not set" 1>&2
+          usage
           exit 1
       fi
       ;;
     *)
-      echo "ERROR: Invalid argument: ${1}" 1>&2
+      
+      usage
       exit 1
       ;;
   esac
 done
 
 if [ -z "${stack_name}" ] ; then
-  echo "ERROR: stack_name not set" 1>&2
+  usage
   exit 1
 fi
 
 "action_${action}"
-
-exit 0
