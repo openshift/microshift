@@ -158,13 +158,9 @@ download_ossm_operator_bundle_manifest() {
       extract_ossm_rbac_from_cluster_service_version "${PWD}" "${csv}" "${namespace}"
       extract_ossm_deploy_from_cluster_service_version "${PWD}" "${csv}" "${namespace}"
 
-      # Loop over all services and roles since they need to be patched with a namespace if they were not
-      # part of the CSV role definitions
       for file in "${PWD}"/*; do
         if [[ ${file} == *.yaml || ${file} == *.yml ]]; then
             patch_namespace "Service" "${file}" "${namespace}"
-            patch_namespace "Role" "${file}" "${namespace}"
-            patch_namespace "RoleBinding" "${file}" "${namespace}"
         fi
       done
 
