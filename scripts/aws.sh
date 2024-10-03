@@ -37,7 +37,7 @@ spin() {
   do
     for i in "${spin[@]}"
     do
-      echo -ne "\r$i ${message_wait}"
+      echo -ne "\r${i} ${message_wait}"
       sleep 0.1
     done
   done
