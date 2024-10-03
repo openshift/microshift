@@ -1,0 +1,3 @@
+- machine-config-operator embedded-component c84afcee2dfb6b21d049a9b1a2d710fda9770143 to dc45d313d876f6a60162bc220365b6dc21078cbe
+  - 1edade1b 2024-07-30T01:52:58+00:00 OCPBUGS-30955: On-Prem resolv prepender to watch for NM changes
+
