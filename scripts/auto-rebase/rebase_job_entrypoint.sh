@@ -61,7 +61,7 @@ ARM64_RELEASE=${pullspec_release_arm64} \
 #  For example, ocp-release at 4.13 will more often than not
 #  correspond to 4.12 LVMS, until the official 4.13 release when both
 #  components will be 4.13.
-release_lvms="v4.17.0-27"
+release_lvms="v4.17.0-43"
 
 # Since LVMS is not part of the release payload, it is not kept in
 # CI. Use the latest z-stream that coincides with the release
