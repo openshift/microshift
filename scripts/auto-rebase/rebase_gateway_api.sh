@@ -161,6 +161,8 @@ download_ossm_operator_bundle_manifest() {
       for file in "${PWD}"/*; do
         if [[ ${file} == *.yaml || ${file} == *.yml ]]; then
             patch_namespace "Service" "${file}" "${namespace}"
+            patch_namespace "Deployment" "${file}" "${namespace}"
+            patch_image_values "Deployment" "${file}"
         fi
       done
 
@@ -183,54 +185,57 @@ patch_namespace() {
   fi
 }
 
+patch_image_values() {
+  local kind=$1
+  local file=$2
 
-write_ossm_images_for_arch(){
+  if [[ $(yq e ".kind == \"${kind}\"" "${file}") == "true" ]]; then
+    yq 'with(.spec.template.spec.containers[]; .image=.name)' -i "${file}"
+  fi
+}
+
+
+write_ossm_images_for_arch() {
     local arch="$1"
+    title "Updating images for ${arch}"
     arch_dir="${STAGING_DIR}/ossm/${arch}"
     [ -d "${arch_dir}" ] || {
         echo "dir ${arch_dir} not found"
         return 1
     }
 
-    declare -a include_images=(
-        "servicemesh-operator3"
-    )
-
     local csv_manifest="${arch_dir}/servicemeshoperator3.clusterserviceversion.yaml"
     local image_file="${arch_dir}/images"
+    local kustomization_arch_file="${REPOROOT}/assets/optional/gateway-api/kustomization.${GOARCH_TO_UNAME_MAP[${arch}]}.yaml"
 
-    parse_images "${csv_manifest}" "${image_file}"
-
-    if [ "$(wc -l "${image_file}" | cut -d' ' -f1)" -eq 0 ]; then
-        >&2 echo "error: image file (${image_file}) has fewer images than expected (${#include_images})"
-        exit 1
-    fi
-    while read -ers LINE; do
-        name=${LINE%,*}
-        img=${LINE#*,}
-        for included in "${include_images[@]}"; do
-            if [[ "${name}" == "${included}" ]]; then
-                name="$(echo "${name}" | tr '-' '_')"
-                yq -iP -o=json e '.images["'"${name}"'"] = "'"${img}"'"' "${REPOROOT}/assets/release/release-${GOARCH_TO_UNAME_MAP[${arch}]}.json"
-                break;
-            fi
-        done
-    done < "${image_file}"
+    cat <<EOF > "${kustomization_arch_file}"
+images:
+EOF
+    images=$(yq '.spec.relatedImages[].name?' "${csv_manifest}")
+    for image_name in ${images}; do
+        local new_image
+        new_image=$(yq ".spec.relatedImages[] | select(.name == \"${image_name}\") | .image" "${csv_manifest}")
+        local new_image_name="${new_image%@*}"
+        local new_image_digest="${new_image#*@}"
+        echo "$new_image_name@$new_image_digest"
+        cat <<EOF >> "${kustomization_arch_file}"
+  - name: ${image_name}
+    newName: ${new_image_name}
+    digest: ${new_image_digest}
+EOF
+    done
 }
 
-update_ossm_images(){
+update_ossm_images() {
     title "Updating OSSM images"
-
     local workdir="${STAGING_DIR}/ossm"
     [ -d "${workdir}" ] || {
         >&2 echo 'ossm staging dir not found, aborting image update'
         return 1
     }
-    pushd "${workdir}"
     for arch in "${ARCHS[@]}"; do
         write_ossm_images_for_arch "${arch}"
     done
-    popd
 }
 
 update_ossm_manifests() {
