@@ -47,7 +47,7 @@ export FAKE_NEXT_MINOR_VERSION=$(( "${MINOR_VERSION}" + 1 ))
 #
 # For a release branch, the current release repository should come from the
 # official 'rhocp' stream.
-CURRENT_RELEASE_REPO="https://mirror.openshift.com/pub/openshift-v4/$(uname -m)/microshift/ocp/latest-4.17/el9/os"
+CURRENT_RELEASE_REPO="rhocp-4.17-for-rhel-9-$(uname -m)-rpms"
 CURRENT_RELEASE_VERSION="$(get_vrel_from_beta "${CURRENT_RELEASE_REPO}")"
 export CURRENT_RELEASE_REPO
 export CURRENT_RELEASE_VERSION
@@ -76,10 +76,8 @@ export YMINUS2_RELEASE_VERSION
 # Define either a release version or the OpenShift mirror beta repository URL.
 # If the release version is defined, the repository should be deduced from the
 # CURRENT_RELEASE_REPO setting.
-RHOCP_MINOR_Y=""
-RHOCP_MINOR_Y_BETA="https://mirror.openshift.com/pub/openshift-v4/$(uname -m)/dependencies/rpms/4.17-el9-beta/"
-export RHOCP_MINOR_Y
-export RHOCP_MINOR_Y_BETA
+export RHOCP_MINOR_Y=17
+export RHOCP_MINOR_Y_BETA=""
 
 # Define either a release version or the OpenShift mirror beta repository URL.
 # If the release version is defined, the repository should be deduced from the
