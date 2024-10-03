@@ -1,4 +1,8 @@
-- kubernetes image-arm64 5a19a916f2937888d96b28a5a3b97923cebc84a5 to ae78f76bc40f55ae7ec88602c2f5b8da48fe650f
+- etcd embedded-component 1fb3165305efc8d986344b555b22592e6e6c1786 to d984c31e8f83fdd6718502a06046b65554d92e78
+  - 103e85f8 2024-09-27T10:45:57+02:00 NO-JIRA: use golang 1.22 image
+
+- kubernetes embedded-component 5a19a916f2937888d96b28a5a3b97923cebc84a5 to 9f6734309b7466648dcdca0d43223368ff840ae6
+  - 31b0fa844 2024-10-01T08:36:28-03:00 Revert "Merge pull request #2089 from jerpeter1/bump-1.30.5"
   - 709d29899 2024-09-20T12:19:38+00:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
   - 67496077b 2024-09-20T02:15:42+00:00 UPSTREAM: <drop>: manually resolve conflicts
   - 74e84a90c 2024-09-12T00:11:54+00:00 Release commit for Kubernetes v1.30.5
@@ -18,4 +22,32 @@
   - 622b4b279 2024-08-14T11:51:43-07:00 fix a scheduler preemption issue that victim is not patched properly
   - c72ac9878 2024-08-14T09:05:45-07:00 kube-proxy: initialization wait for service and endpoint handlers synced
   - 3ba8e9e80 2024-08-13T16:30:53-07:00 make PodIP.IP and HostIP.IP required.
+
+- machine-config-operator embedded-component 858c0a2e5965fcff48716c1db01ee76bb1eed9f2 to 8432c7310351aafa7e40dbf55526312af86ffb6b
+  - 92df703b 2024-09-06T14:32:39+00:00 Enable the use of Linux Bridge as the ovs default port connection
+
+- kubernetes image-amd64 5a19a916f2937888d96b28a5a3b97923cebc84a5 to 9f6734309b7466648dcdca0d43223368ff840ae6
+  - 31b0fa844 2024-10-01T08:36:28-03:00 Revert "Merge pull request #2089 from jerpeter1/bump-1.30.5"
+  - 709d29899 2024-09-20T12:19:38+00:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - 67496077b 2024-09-20T02:15:42+00:00 UPSTREAM: <drop>: manually resolve conflicts
+  - 74e84a90c 2024-09-12T00:11:54+00:00 Release commit for Kubernetes v1.30.5
+  - cd83ff032 2024-09-06T20:01:02+00:00 Restart the init container to not be stuck in created state
+  - fb1273868 2024-09-06T18:28:46+00:00 succeeded pod is being re-admitted
+  - 8b9d815f2 2024-09-06T16:37:46+00:00 Avoid SidecarContainers code path for non-sidecar pods
+  - f3c9c3ee0 2024-09-04T14:06:50+08:00 Build etcd image of v3.5.15
+  - 3824a453e 2024-09-04T14:06:47+08:00 Update etcd from v3.5.14 to v3.5.15
+  - bb3c7a6c8 2024-09-02T14:41:45+02:00 add missing RBAC to statefulset-controller for StatefulSetAutoDeletePVC feature
+  - 9eb604e1c 2024-08-28T14:32:28+02:00 Bump images, dependencies and versions to go 1.22.6 and distroless iptables
+  - 0d997170c 2024-08-26T12:10:39-04:00 Fix openapi-gen dependency.
+  - 2414588ff 2024-08-22T11:21:54-07:00 update coredns/corefile-migration to v1.0.24 to support coredns v1.11.3
+  - 322c524e7 2024-08-20T11:22:27-07:00 kubeadm: bump coredns to 1.11.3
+  - 9f9d77486 2024-08-19T14:44:50-07:00 kube-up.sh: bump coreDNS to 1.11.3
+  - 26f4e1d7a 2024-08-19T10:01:50+00:00 Add a new workqueue to endpointslice controller for updating topology cache and checking node topology distribution.
+  - b2c937b2a 2024-08-14T19:19:45+00:00 Update CHANGELOG/CHANGELOG-1.30.md for v1.30.4
+  - 622b4b279 2024-08-14T11:51:43-07:00 fix a scheduler preemption issue that victim is not patched properly
+  - c72ac9878 2024-08-14T09:05:45-07:00 kube-proxy: initialization wait for service and endpoint handlers synced
+  - 3ba8e9e80 2024-08-13T16:30:53-07:00 make PodIP.IP and HostIP.IP required.
+
+- kubernetes image-arm64 ae78f76bc40f55ae7ec88602c2f5b8da48fe650f to 9f6734309b7466648dcdca0d43223368ff840ae6
+  - 31b0fa844 2024-10-01T08:36:28-03:00 Revert "Merge pull request #2089 from jerpeter1/bump-1.30.5"
 
