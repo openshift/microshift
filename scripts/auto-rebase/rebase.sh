@@ -214,7 +214,7 @@ require_using_component_commit() {
     commit=$( cd "${STAGING_DIR}/${component}" && git rev-parse HEAD )
     echo "go mod edit -require ${modulepath}@${commit}"
     go mod edit -require "${modulepath}@${commit}"
-    go mod tidy # needed to replace commit with pseudoversion before next invocation of go mod edit
+    go mod tidy -e # needed to replace commit with pseudoversion before next invocation of go mod edit
 }
 
 # Updates a replace directive using an embedded component's commit.
@@ -233,7 +233,7 @@ replace_using_component_commit() {
         commit=$( cd "${STAGING_DIR}/${reponame}" && git rev-parse HEAD )
         echo "go mod edit -replace ${modulepath}=${new_modulepath}@${commit}"
         go mod edit -replace "${modulepath}=${new_modulepath}@${commit}"
-        go mod tidy # needed to replace commit with pseudoversion before next invocation of go mod edit
+        go mod tidy -e # needed to replace commit with pseudoversion before next invocation of go mod edit
         pseudoversion=$(grep_pseudoversion "$(get_replace_directive "$(pwd)/go.mod" "${modulepath}")")
         pseudoversions["${component}"]="${pseudoversion}"
     fi
