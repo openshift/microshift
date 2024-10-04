@@ -208,7 +208,6 @@ require (
 	k8s.io/kube-controller-manager v0.0.0 // indirect
 	k8s.io/kube-scheduler v0.0.0 // indirect
 	k8s.io/kubelet v0.30.1 // indirect
-	k8s.io/legacy-cloud-providers v0.0.0 // indirect
 	k8s.io/metrics v0.0.0 // indirect
 	k8s.io/mount-utils v0.0.0 // indirect
 	k8s.io/pod-security-admission v0.30.1 // indirect
@@ -242,7 +241,6 @@ replace (
 	k8s.io/kubectl => github.com/openshift/kubernetes/staging/src/k8s.io/kubectl v0.0.0-20240925122652-947ea2f8f2a9 // from kubernetes
 	k8s.io/kubelet => github.com/openshift/kubernetes/staging/src/k8s.io/kubelet v0.0.0-20240925122652-947ea2f8f2a9 // from kubernetes
 	k8s.io/kubernetes => github.com/openshift/kubernetes v0.0.0-20240925122652-947ea2f8f2a9 // release kubernetes
-	k8s.io/legacy-cloud-providers => github.com/openshift/kubernetes/staging/src/k8s.io/legacy-cloud-providers v0.0.0-20240925122652-947ea2f8f2a9 // from kubernetes
 	k8s.io/metrics => github.com/openshift/kubernetes/staging/src/k8s.io/metrics v0.0.0-20240925122652-947ea2f8f2a9 // from kubernetes
 	k8s.io/mount-utils => github.com/openshift/kubernetes/staging/src/k8s.io/mount-utils v0.0.0-20240925122652-947ea2f8f2a9 // from kubernetes
 	k8s.io/pod-security-admission => github.com/openshift/kubernetes/staging/src/k8s.io/pod-security-admission v0.0.0-20240925122652-947ea2f8f2a9 // from kubernetes
