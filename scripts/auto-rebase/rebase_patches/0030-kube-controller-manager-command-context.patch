@@ -1,8 +1,8 @@
 diff --git a/vendor/k8s.io/kubernetes/cmd/kube-controller-manager/app/controllermanager.go b/vendor/k8s.io/kubernetes/cmd/kube-controller-manager/app/controllermanager.go
-index 588865dae..53d7c3c97 100644
+index 0356d79d8..0440eff26 100644
 --- a/vendor/k8s.io/kubernetes/cmd/kube-controller-manager/app/controllermanager.go
 +++ b/vendor/k8s.io/kubernetes/cmd/kube-controller-manager/app/controllermanager.go
-@@ -36,7 +36,6 @@ import (
+@@ -38,7 +38,6 @@ import (
  	"k8s.io/apimachinery/pkg/util/sets"
  	"k8s.io/apimachinery/pkg/util/uuid"
  	"k8s.io/apimachinery/pkg/util/wait"
@@ -10,9 +10,9 @@ index 588865dae..53d7c3c97 100644
  	"k8s.io/apiserver/pkg/server/healthz"
  	"k8s.io/apiserver/pkg/server/mux"
  	utilfeature "k8s.io/apiserver/pkg/util/feature"
-@@ -156,8 +155,7 @@ controller, and serviceaccounts controller.`,
- 			// add feature enablement metrics
- 			utilfeature.DefaultMutableFeatureGate.AddMetrics()
+@@ -166,8 +165,7 @@ controller, and serviceaccounts controller.`,
+ 			fg := s.ComponentGlobalsRegistry.FeatureGateFor(utilversion.DefaultKubeComponent)
+ 			fg.(featuregate.MutableFeatureGate).AddMetrics()
  
 -			stopCh := server.SetupSignalHandler()
 -			return Run(context.Background(), c.Complete(), stopCh)
