@@ -36,7 +36,7 @@ type LoadbalancerServiceController struct {
 	Ipv6        bool
 	client      *kubernetes.Clientset
 	indexer     cache.Indexer
-	queue       workqueue.RateLimitingInterface
+	queue       workqueue.TypedRateLimitingInterface[string]
 	informer    cache.SharedIndexInformer
 }
 
@@ -93,7 +93,7 @@ func (c *LoadbalancerServiceController) Run(ctx context.Context, ready chan<- st
 	factory := informers.NewSharedInformerFactory(c.client, defaultInformerResyncPeriod)
 	serviceInformer := factory.Core().V1().Services()
 	c.informer = serviceInformer.Informer()
-	c.queue = workqueue.NewRateLimitingQueue(workqueue.DefaultControllerRateLimiter())
+	c.queue = workqueue.NewTypedRateLimitingQueue(workqueue.DefaultTypedControllerRateLimiter[string]())
 	c.indexer = c.informer.GetIndexer()
 	_, err = c.informer.AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: func(obj interface{}) {
@@ -148,13 +148,13 @@ func (c *LoadbalancerServiceController) processNextItem() bool {
 	}
 	defer c.queue.Done(key)
 
-	err := c.updateServiceStatus(key.(string))
+	err := c.updateServiceStatus(key)
 	c.handleErr(err, key)
 	return true
 }
 
 // handleErr checks if an error happened and makes sure we will retry later.
-func (c *LoadbalancerServiceController) handleErr(err error, key interface{}) {
+func (c *LoadbalancerServiceController) handleErr(err error, key string) {
 	if err == nil {
 		c.queue.Forget(key)
 		return
