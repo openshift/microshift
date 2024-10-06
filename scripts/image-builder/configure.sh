@@ -49,7 +49,7 @@ sudo firewall-cmd --add-service=cockpit --permanent
 
 # The mock utility comes from the EPEL repository
 "${DNF_RETRY}" "install" "https://dl.fedoraproject.org/pub/epel/epel-release-latest-${OSVERSION}.noarch.rpm"
-"${DNF_RETRY}" "install" "mock nginx tomcli parallel"
+"${DNF_RETRY}" "install" "mock nginx tomcli parallel aria2"
 sudo usermod -a -G mock "$(whoami)"
 
 # Verify umask and home directory permissions
