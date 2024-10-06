@@ -82,7 +82,7 @@ func NewCSRApproverController(
 	}
 
 	return f.ToController(
-		"WebhookAuthenticatorCertApprover_"+controllerName,
+		"WebhookAuthenticatorCertApprover_"+controllerName, // don't change what is passed here unless you also remove the old FooDegraded condition
 		eventsRecorder.WithComponentSuffix("webhook-authenticator-cert-approver-"+controllerName),
 	)
 }

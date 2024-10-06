@@ -140,7 +140,10 @@ func NewClientCertificateController(
 		}, c.EventFilterFunc, hubCSRInformer.Informer()).
 		WithSync(c.sync).
 		ResyncEvery(ControllerResyncInterval).
-		ToController(controllerName, recorder), nil
+		ToController(
+			controllerName, // don't change what is passed here unless you also remove the old FooDegraded condition
+			recorder,
+		), nil
 }
 
 func (c *clientCertificateController) sync(ctx context.Context, syncCtx factory.SyncContext) error {

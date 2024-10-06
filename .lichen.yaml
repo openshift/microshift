@@ -22,7 +22,7 @@ exceptions:
   unresolvableLicense:
   - path: "github.com/openshift/openshift-apiserver"
   - path: "github.com/openshift/route-controller-manager"
-  # The CNFC maintains a list of project license exceptions which are safe or Apache-2
+  # The CNCF maintains a list of project license exceptions which are safe or Apache-2
   # compliant, those exceptions are maintained here:
   # https://github.com/cncf/foundation/tree/main/license-exceptions
   licenseNotPermitted:
@@ -34,3 +34,6 @@ exceptions:
     licenses: ["CC-BY-SA-4.0"]  # also dual licensed as Apache-2.0
   - path: "github.com/hashicorp/golang-lru"
     licenses: ["MPL-2.0"]
+override:
+  - path: "sigs.k8s.io/yaml"
+    licenses: ["Apache-2.0", "MIT"] # Override license to match those of LICENSE files

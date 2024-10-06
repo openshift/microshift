@@ -13,12 +13,15 @@ import (
 
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/version"
 	"k8s.io/apiserver/pkg/server"
+	"k8s.io/client-go/tools/record"
 	"k8s.io/component-base/logs"
+
 	"k8s.io/klog/v2"
 
 	operatorv1alpha1 "github.com/openshift/api/operator/v1alpha1"
@@ -68,6 +71,7 @@ type ControllerCommandConfig struct {
 
 	ComponentOwnerReference *corev1.ObjectReference
 	healthChecks            []healthz.HealthChecker
+	eventRecorderOptions    record.CorrelatorOptions
 }
 
 // NewControllerConfig returns a new ControllerCommandConfig which can be used to wire up all the boiler plate of a controller
@@ -82,6 +86,7 @@ func NewControllerCommandConfig(componentName string, version version.Info, star
 
 		DisableServing:        false,
 		DisableLeaderElection: false,
+		eventRecorderOptions:  events.RecommendedClusterSingletonCorrelatorOptions(),
 	}
 }
 
@@ -98,6 +103,11 @@ func (c *ControllerCommandConfig) WithHealthChecks(healthChecks ...healthz.Healt
 
 func (c *ControllerCommandConfig) WithTopologyDetector(topologyDetector TopologyDetector) *ControllerCommandConfig {
 	c.TopologyDetector = topologyDetector
+	return c
+}
+
+func (c *ControllerCommandConfig) WithEventRecorderOptions(eventRecorderOptions record.CorrelatorOptions) *ControllerCommandConfig {
+	c.eventRecorderOptions = eventRecorderOptions
 	return c
 }
 
@@ -318,7 +328,7 @@ func (c *ControllerCommandConfig) StartController(ctx context.Context) error {
 		WithLeaderElection(config.LeaderElection, c.basicFlags.Namespace, c.componentName+"-lock").
 		WithVersion(c.version).
 		WithHealthChecks(c.healthChecks...).
-		WithEventRecorderOptions(events.RecommendedClusterSingletonCorrelatorOptions()).
+		WithEventRecorderOptions(c.eventRecorderOptions).
 		WithRestartOnChange(exitOnChangeReactorCh, startingFileContent, observedFiles...).
 		WithComponentOwnerReference(c.ComponentOwnerReference)
 
