@@ -70,6 +70,14 @@ the ssh agent to provide the correct credentials.
 `API_PORT` should be set when connections are performed through a
 forwarded port.
 
+To ensure the router smoke test works properly on a Microshift host,
+you need to install the `avahi-resolve-host-name` command, which is
+essential for hostname resolution. You can install it using the following command:
+
+```
+sudo dnf install -y avahi-tools
+```
+
 ### Running Tests
 
 Use `run.sh` to run the tests. It will create a Python virtual
