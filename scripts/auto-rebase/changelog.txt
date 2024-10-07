@@ -1,0 +1,6 @@
+- oc image-amd64 4e8d6894744986c8765f1856137103f5ef6b903d to 82316376e25f6453b58258df6bf1e11ec4abb670
+  - 763ded28 2024-10-03T08:45:38+00:00 Check cast result in adm prune deployments to prevent panic
+
+- oc image-arm64 4e8d6894744986c8765f1856137103f5ef6b903d to 82316376e25f6453b58258df6bf1e11ec4abb670
+  - 763ded28 2024-10-03T08:45:38+00:00 Check cast result in adm prune deployments to prevent panic
+
