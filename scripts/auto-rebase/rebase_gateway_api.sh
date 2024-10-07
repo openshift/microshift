@@ -72,7 +72,7 @@ download_gateway_api_manifests() {
     mkdir -p "${GATEWAY_API_STAGING}"
 
     crd_file="${dest}/gateway.networking.k8s.io_crds.yaml"
-    oc kustomize "github.com/kubernetes-sigs/gateway-api/config/crd?ref=v${version}" > ${crd_file}
+    oc kustomize "github.com/kubernetes-sigs/gateway-api/config/crd?ref=v${version}" > "${crd_file}"
 }
 
 # Runs each OSSM rebase step in sequence, commiting the step's output to git
@@ -138,7 +138,7 @@ download_ossm_operator_bundle_manifest() {
   fi
 
   local -r csv="servicemeshoperator3.clusterserviceversion.yaml"
-  local -r namespace=$(yq '.metadata.name' ${REPOROOT}/assets/optional/gateway-api/01-openshift_gateway_api_namespace.yaml)
+  local -r namespace=$(yq '.metadata.name' "${REPOROOT}/assets/optional/gateway-api/01-openshift_gateway_api_namespace.yaml")
 
   for arch in "${ARCHS[@]}"; do
     mkdir -p "${OSSM_STAGING}/${arch}"
@@ -205,7 +205,6 @@ write_ossm_images_for_arch() {
     }
 
     local csv_manifest="${arch_dir}/servicemeshoperator3.clusterserviceversion.yaml"
-    local image_file="${arch_dir}/images"
     local kustomization_arch_file="${REPOROOT}/assets/optional/gateway-api/kustomization.${GOARCH_TO_UNAME_MAP[${arch}]}.yaml"
 
     cat <<EOF > "${kustomization_arch_file}"
@@ -217,7 +216,6 @@ EOF
         new_image=$(yq ".spec.relatedImages[] | select(.name == \"${image_name}\") | .image" "${csv_manifest}")
         local new_image_name="${new_image%@*}"
         local new_image_digest="${new_image#*@}"
-        echo "$new_image_name@$new_image_digest"
         cat <<EOF >> "${kustomization_arch_file}"
   - name: ${image_name}
     newName: ${new_image_name}
