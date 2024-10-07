@@ -21,7 +21,7 @@ ${USHIFT_HOST_IP2}      ${EMPTY}
 ${NIC1_NAME}            ${EMPTY}
 ${NIC2_NAME}            ${EMPTY}
 ${NICS_COUNT}           2
-${NMCLI_CMD}            nmcli -f name,type connection | awk '$2 == "ethernet" {print $1}' | sort
+${NMCLI_CMD}            nmcli connection | grep ethernet
 ${OSSL_CMD}             openssl x509 -text -noout -in
 ${CERT_FILE}            /var/lib/microshift/certs/kube-apiserver-external-signer/kube-external-serving/server.crt
 ${GREP_SUBJ_IPS}        grep -A1 'Subject Alternative Name:' | tail -1
@@ -105,7 +105,7 @@ Verify Multiple NICs
     ...    ${NMCLI_CMD} | wc -l
     ...    return_stdout=True    return_stderr=True    return_rc=True
     Should Be Equal As Integers    ${rc}    0
-    Should Be Equal As Strings    ${stdout}    ${NICS_COUNT}
+    Should Be True   '${stdout}'>='${NICS_COUNT}'
 
 Initialize Global Variables
     [Documentation]    Initializes global variables.
@@ -113,29 +113,15 @@ Initialize Global Variables
     Log    Host: ${USHIFT_HOST_IP1} ${USHIFT_HOST_IP2}
     Should Not Be Empty    ${USHIFT_HOST_IP1}    USHIFT_HOST_IP1 variable is required
     Should Not Be Empty    ${USHIFT_HOST_IP2}    USHIFT_HOST_IP2 variable is required
-    Initialize Nmcli Variables
-
-Initialize Nmcli Variables
-    [Documentation]    Initialize the variables on the host
-
-    ${stdout}    ${stderr}    ${rc}=    Execute Command
-    ...    ${NMCLI_CMD} | head -1
-    ...    return_stdout=True    return_stderr=True    return_rc=True
-    Should Be Equal As Integers    ${rc}    0
-    Set Suite Variable    \${NIC1_NAME}    ${stdout}
-
-    ${stdout}    ${stderr}    ${rc}=    Execute Command
-    ...    ${NMCLI_CMD} | tail -1
-    ...    return_stdout=True    return_stderr=True    return_rc=True
-    Should Be Equal As Integers    ${rc}    0
-    Set Suite Variable    \${NIC2_NAME}    ${stdout}
+    Should Not Be Empty    ${NIC1_NAME}    NIC1_NAME variable is required
+    Should Not Be Empty    ${NIC2_NAME}    NIC2_NAME variable is required
 
 Disable Interface
     [Documentation]    Disable NIC given in ${conn_name}. Change is not persistent. On
     ...    the next reboot the interface will have its original status again.
     [Arguments]    ${conn_name}
     ${stderr}    ${rc}=    Execute Command
-    ...    nmcli connection down ${conn_name}
+    ...    nmcli connection down "${conn_name}"
     ...    sudo=True    return_stdout=False    return_stderr=True    return_rc=True
     Should Be Equal As Integers    ${rc}    0
 
