@@ -1,0 +1,18 @@
+- cluster-network-operator embedded-component 5e5e21afb9ceabe3c2166fb9b2d5d12196a77b26 to 8f39b8c253667d54b3ab83fb91eb3dbf4e266fd2
+  - 66810ca 2024-07-04T18:08:20+00:00 Set mount propagation to HostToContainer for /var/lib/kubelet
+
+- machine-config-operator embedded-component 6a425abbe5e330f0e7bc0849f4927d4c55d0c9e5 to 4f6c77824e15625cf8be17d5782ca8a5dd3f14ec
+  - a2953aff 2024-10-03T11:03:59+00:00 Set ESP offloads off in bonds if slaves don't support them
+
+- oc image-amd64 c44c839bcb77d6d41229e2d35e45002fa144cf72 to cf533b548154f7f2e828a44864477bbbb881692d
+  - df60260d 2024-10-03T04:42:19+00:00 Check cast result in adm prune deployments to prevent panic
+
+- ovn-kubernetes image-amd64 90d0591637753ab3d3b18535e506c47e91194da9 to 52c7ebe90417a98c4e276f735e1824ea04b27cf6
+  - f7c67d4a 2024-09-25T09:56:45+05:30 Add subnet overlap check for transit switch subnet
+
+- oc image-arm64 c44c839bcb77d6d41229e2d35e45002fa144cf72 to cf533b548154f7f2e828a44864477bbbb881692d
+  - df60260d 2024-10-03T04:42:19+00:00 Check cast result in adm prune deployments to prevent panic
+
+- ovn-kubernetes image-arm64 90d0591637753ab3d3b18535e506c47e91194da9 to 52c7ebe90417a98c4e276f735e1824ea04b27cf6
+  - f7c67d4a 2024-09-25T09:56:45+05:30 Add subnet overlap check for transit switch subnet
+
