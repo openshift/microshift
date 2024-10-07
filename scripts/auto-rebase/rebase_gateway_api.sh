@@ -138,7 +138,7 @@ download_ossm_operator_bundle_manifest() {
   fi
 
   local -r csv="servicemeshoperator3.clusterserviceversion.yaml"
-  local -r namespace=$(yq '.metadata.name' "${REPOROOT}/assets/optional/gateway-api/01-openshift_gateway_api_namespace.yaml")
+  local -r namespace=$(yq '.metadata.name' "${REPOROOT}/assets/optional/gateway-api/00-openshift_gateway_api_namespace.yaml")
 
   for arch in "${ARCHS[@]}"; do
     mkdir -p "${OSSM_STAGING}/${arch}"
@@ -334,7 +334,9 @@ extract_ossm_deploy_from_cluster_service_version() {
         .kind = \"Deployment\" |
         .metadata.namespace = \"${namespace}\" |
         .metadata.name = .name |
-        del(.name)
+        del(.name) |
+        .metadata.labels = .label |
+        del(.label)
         " "${csv}" > "${deployment_file}"
   done
 }
@@ -407,7 +409,6 @@ roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
   name: ${service_account_name}
-  namespace: ${namespace}
 subjects:
 - kind: ServiceAccount
   name: ${service_account_name}
