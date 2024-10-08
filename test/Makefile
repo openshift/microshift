@@ -18,13 +18,14 @@ fake-next-minor-rpm:
 # against non-main branches. The base-branch is used for the initial microshift layer deployed in some rpm-ostree scenarios.
 .PHONY: build-base-branch
 build-base-branch: BASE_BRANCH ?=release-$(MAJOR).$(MINOR)
+build-base-branch: RPMBUILD_DIR :=$(REPO)/_output/rpmbuild-base/
 build-base-branch: TMP_REPO !=mktemp -d
 build-base-branch:
-	if ! [ -d "$(REPO)/_output" ]; then mkdir $(REPO)/_output; fi
+	rm -rf $(RPMBUILD_DIR)
 	git clone --single-branch --branch $(BASE_BRANCH) https://github.com/openshift/microshift.git $(TMP_REPO)
 	MICROSHIFT_VERSION="$(MAJOR).$(MINOR).$(PATCH)_base_branch" \
+	RPMBUILD_DIR=$(RPMBUILD_DIR) \
 		$(MAKE) -C $(TMP_REPO) rpm
-	mv $(TMP_REPO)/_output/rpmbuild $(REPO)/_output/rpmbuild-base
 	rm -rf "$(TMP_REPO)"
 
 .PHONY: robotidy
