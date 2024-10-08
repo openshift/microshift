@@ -190,7 +190,7 @@ patch_image_values() {
   local file=$2
 
   if [[ $(yq e ".kind == \"${kind}\"" "${file}") == "true" ]]; then
-    yq 'with(.spec.template.spec.containers[]; .image=.name)' -i "${file}"
+    yq -i 'with(.spec.template.spec.containers[]; .image=.name)' "${file}"
   fi
 }
 
@@ -252,12 +252,12 @@ update_last_ossm_rebase() {
 
     title "## Updating last_ossm_rebase.sh"
 
-    local last_rebase_script="${REPOROOT}/scripts/auto-rebase/last_ossm_rebase.sh"
+    local last_rebase_script="${REPOROOT}/scripts/auto-rebase/last_rebase_gateway_api.sh"
 
     rm -f "${last_rebase_script}"
     cat - >"${last_rebase_script}" <<EOF
 #!/bin/bash -x
-./scripts/auto-rebase/rebase-ossm.sh to "${operator_bundle_manifest}" "${gateway_api_version}"
+./scripts/auto-rebase/rebase_gateway_api.sh to "${operator_bundle_manifest}" "${gateway_api_version}"
 EOF
     chmod +x "${last_rebase_script}"
 
