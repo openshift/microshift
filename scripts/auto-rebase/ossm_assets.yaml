@@ -1,0 +1,17 @@
+assets:
+
+  - dir: optional/gateway-api/
+    src: ossm/amd64/
+    no_clean: True
+    files:
+      # Manual Namespace instead of OLM one
+      - file: 00-openshift_gateway_api_namespace.yaml
+        ignore: "Provided by MicroShift"
+      # Gateway class and istio definitions
+      - file: 02-gatewayclass.yaml
+        ignore: "Provided by MicroShift"
+      - file: 02-istio.yaml
+        ignore: "Provided by MicroShift"
+      #TODO
+      - file: kustomization.yaml
+        ignore: "Provided by MicroShift"

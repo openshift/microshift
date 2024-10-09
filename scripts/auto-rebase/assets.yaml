@@ -300,4 +300,3 @@ assets:
       - file: 05-daemonset.yaml
       - file: release-kube-proxy-aarch64.json
       - file: release-kube-proxy-x86_64.json
-
