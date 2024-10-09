@@ -1,46 +1,61 @@
-- api embedded-component e415140e5d5f18cccd54255f4cd218649e88a328 to b1f700bdd8d22c4033be4e4e9ef751d89ade42e8
-  - 5ed6751 2024-10-03T21:22:42-04:00 RFE-6242: ingress: rename loadBalancerIP to floatingIP
-  - a2ad73e 2024-10-03T16:07:59+01:00 Fix network tests after update to 1.31
-  - 6f1022c 2024-10-03T15:04:37+01:00 Update tests vendor
-  - 1ff8613 2024-10-03T15:04:36+01:00 Update integration tests module to K8s 1.31
-  - 1f55562 2024-10-03T13:47:10+01:00 Add envtest archives for K8s 1.31.1
-  - 692815c 2024-10-03T12:09:32+01:00 Publish kubebuilder openshift binaries to 1.31.0
-  - 444665a 2024-10-01T16:15:14-04:00 generated
-  - b66574f 2024-10-01T13:59:23-04:00 align the easy lowlevel operator condition validation to metav1.Condition
+- api embedded-component b1f700bdd8d22c4033be4e4e9ef751d89ade42e8 to 82e082220d910f489d35880174e2eb90e21f5589
+  - 77162c9 2024-10-02T16:12:22-04:00 CORS-3695: Update the api for aws cluster hosted dns options
 
-- cluster-ingress-operator embedded-component 21d8fb4437149b00bd67ba3f357db6b596115592 to 6587d8cbfc46ab5e3412dbc7d13c935421099516
-  - 8afaffb 2024-09-17T03:39:13-04:00 aws/dns: Always log AWS API endpoints
-  - 8999989 2024-09-17T03:39:01-04:00 aws/dns: Tidy up logging for custom endpoints
-  - e0c2c2b 2024-09-17T03:38:51-04:00 aws/dns: Replace a useless break statement
-  - f634f87 2024-09-17T03:38:31-04:00 aws/dns: Move a to-do for elbv2 custom endpoint
-  - 30f72ca 2024-09-17T03:37:26-04:00 aws/dns: Add test for NewProvider
+- cluster-openshift-controller-manager-operator embedded-component 95bd10ad4841d72b46c58078a1e4d2559d5e2c67 to 0ee6371401da744c7c71723c505463672b9bad45
+  - 0906447 2024-09-18T15:55:35+00:00 Updating ose-cluster-openshift-controller-manager-operator-container image to be consistent with ART for 4.18 Reconciling with https://github.com/openshift/ocp-build-data/tree/dd68246f3237db5db458127566fc7b05b55e1660/images/ose-cluster-openshift-controller-manager-operator.yml
 
-- kubernetes embedded-component 1892e4deb967a2b39cfc2fea87a8bd49274449ef to 8540bd493e8a42ffb61a3f470f71290488332b1c
-  - 1b4e07927 2024-10-03T09:23:47-03:00 UPSTREAM: <carry>: Add OpenShift tooling, images, configs and docs
+- oc image-arm64 4afb880d54e10ac4d0e7a6db0036dc7537bc639d to 3692450b96d57ae3870e5f693e833a0701d0e2b0
+  - 07bd140b 2024-10-07T13:54:12-04:00 day2: additional rbac policy rules
 
-- oc image-amd64 6bba0756103a7df8a126920ecc35dbcd7915d167 to 4afb880d54e10ac4d0e7a6db0036dc7537bc639d
-  - 4afb880d 2024-10-05T13:22:46+00:00 NO-JIRA: Use suggested functions instead of deprecated ones (#1894)
-  - d8cac253 2024-10-04T10:06:03-07:00 pkg/cli/admin/upgrade/recommend: Show most-recent update options
-  - 768f7a04 2024-10-02T07:53:31+03:00 Change kube version in image components
-  - 2c3abbe4 2024-10-02T07:53:31+03:00 React to changes in kubectl/cmd.go
-  - c9a615b7 2024-10-02T07:53:31+03:00 React to interface changes in commands
-  - eac0d7de 2024-10-02T07:53:22+03:00 Bump k8s dependencies to 1.31.1 and go mod tidy/vendor
-  - a915ac6f 2024-10-02T07:53:22+03:00 Update to new go version 1.22.5
-  - 0cd2e2c9 2024-09-30T10:08:40-07:00 pkg/cli/admin/upgrade/recommend/examples: Update examples
+- csi-external-snapshotter image-arm64 672a0d5ea97a71afd0dfb50002319f30db2e10d7 to f52ce8b8b0799a341caf1fb864bba5d9d040a856
+  - 75c7e0d 2024-10-02T14:04:48+02:00 UPSTREAM: <carry>: Add OpenShift files
+  - 126d7fd 2024-08-29T08:31:06+02:00 create changelog v8.1.0
+  - 7b0eb44 2024-08-28T13:39:02-04:00 Remove unwanted file
+  - 3c2470c 2024-08-27T12:00:57+02:00 Add group snapshot controller unit tests
+  - e2b8496 2024-08-26T15:16:19+02:00 fix opMgr.scheduleOpsInFlightMetric go routine leak
+  - f463a99 2024-08-26T11:12:21+00:00 Bump the github-dependencies group across 1 directory with 7 updates
+  - 1226227 2024-08-26T12:37:44+02:00 Look for a VolumeGroupSnapshotClass when getting the class of a VolumeGroupSnapshot
+  - 8b182cc 2024-08-26T12:36:48+02:00 Document Volume Group Snapshot feature in the README file
+  - f0fb893 2024-08-15T07:42:50+00:00 Bump the github-dependencies group across 1 directory with 8 updates
+  - 7d6ba79 2024-08-14T14:30:13+02:00 update kubernetes to v1.31.0
+  - 74451a6 2024-08-14T03:16:56+00:00 Squashed 'release-tools/' changes from f40f0ccd4..988496a1f
+  - c98b259 2024-08-07T19:24:35+02:00 [snapshot-controller] Retry PVC finalizer removal on conflict
+  - b34b8a1 2024-08-02T10:13:37+02:00 update go version in trivy.yaml
+  - f2d374f 2024-08-01T16:04:04+02:00 update kubernetes to 1.31.0-rc.0
+  - 495ff63 2024-07-30T23:04:34-07:00 Update controller deployment to latest version
+  - b2fd105 2024-06-24T11:04:09+00:00 Bump k8s.io/klog/v2 in the k8s-dependencies group
+  - 4f6440c 2024-06-18T22:21:19+02:00 Correctly detect newly created Volume[Group]SnapshotClasses
+  - fe4a04d 2024-06-18T22:19:44+02:00 Avoid group snapshot provisioning with mismatching CSI Drivers
+  - f0f8f08 2024-06-17T11:43:39+00:00 Bump the github-dependencies group across 1 directory with 16 updates
+  - 0109d4b 2024-06-17T11:42:38+00:00 Bump the k8s-dependencies group across 1 directory with 2 updates
+  - 4a2f955 2024-06-17T12:22:58+05:30 Add group snapshot controller metrics
+  - 594e663 2024-06-05T13:22:33+00:00 test: fix trivy error
+  - 9a73243 2024-06-05T13:14:48+00:00 test: ignore spelling error
+  - 5666da4 2024-06-05T13:13:14+00:00 Squashed 'release-tools/' changes from adb3af9d..f40f0ccd
 
-- kubernetes image-amd64 1892e4deb967a2b39cfc2fea87a8bd49274449ef to 8540bd493e8a42ffb61a3f470f71290488332b1c
-  - 1b4e07927 2024-10-03T09:23:47-03:00 UPSTREAM: <carry>: Add OpenShift tooling, images, configs and docs
-
-- oc image-arm64 6bba0756103a7df8a126920ecc35dbcd7915d167 to 4afb880d54e10ac4d0e7a6db0036dc7537bc639d
-  - 4afb880d 2024-10-05T13:22:46+00:00 NO-JIRA: Use suggested functions instead of deprecated ones (#1894)
-  - d8cac253 2024-10-04T10:06:03-07:00 pkg/cli/admin/upgrade/recommend: Show most-recent update options
-  - 768f7a04 2024-10-02T07:53:31+03:00 Change kube version in image components
-  - 2c3abbe4 2024-10-02T07:53:31+03:00 React to changes in kubectl/cmd.go
-  - c9a615b7 2024-10-02T07:53:31+03:00 React to interface changes in commands
-  - eac0d7de 2024-10-02T07:53:22+03:00 Bump k8s dependencies to 1.31.1 and go mod tidy/vendor
-  - a915ac6f 2024-10-02T07:53:22+03:00 Update to new go version 1.22.5
-  - 0cd2e2c9 2024-09-30T10:08:40-07:00 pkg/cli/admin/upgrade/recommend/examples: Update examples
-
-- kubernetes image-arm64 1892e4deb967a2b39cfc2fea87a8bd49274449ef to 8540bd493e8a42ffb61a3f470f71290488332b1c
-  - 1b4e07927 2024-10-03T09:23:47-03:00 UPSTREAM: <carry>: Add OpenShift tooling, images, configs and docs
+- csi-external-snapshotter image-arm64 672a0d5ea97a71afd0dfb50002319f30db2e10d7 to f52ce8b8b0799a341caf1fb864bba5d9d040a856
+  - 75c7e0d 2024-10-02T14:04:48+02:00 UPSTREAM: <carry>: Add OpenShift files
+  - 126d7fd 2024-08-29T08:31:06+02:00 create changelog v8.1.0
+  - 7b0eb44 2024-08-28T13:39:02-04:00 Remove unwanted file
+  - 3c2470c 2024-08-27T12:00:57+02:00 Add group snapshot controller unit tests
+  - e2b8496 2024-08-26T15:16:19+02:00 fix opMgr.scheduleOpsInFlightMetric go routine leak
+  - f463a99 2024-08-26T11:12:21+00:00 Bump the github-dependencies group across 1 directory with 7 updates
+  - 1226227 2024-08-26T12:37:44+02:00 Look for a VolumeGroupSnapshotClass when getting the class of a VolumeGroupSnapshot
+  - 8b182cc 2024-08-26T12:36:48+02:00 Document Volume Group Snapshot feature in the README file
+  - f0fb893 2024-08-15T07:42:50+00:00 Bump the github-dependencies group across 1 directory with 8 updates
+  - 7d6ba79 2024-08-14T14:30:13+02:00 update kubernetes to v1.31.0
+  - 74451a6 2024-08-14T03:16:56+00:00 Squashed 'release-tools/' changes from f40f0ccd4..988496a1f
+  - c98b259 2024-08-07T19:24:35+02:00 [snapshot-controller] Retry PVC finalizer removal on conflict
+  - b34b8a1 2024-08-02T10:13:37+02:00 update go version in trivy.yaml
+  - f2d374f 2024-08-01T16:04:04+02:00 update kubernetes to 1.31.0-rc.0
+  - 495ff63 2024-07-30T23:04:34-07:00 Update controller deployment to latest version
+  - b2fd105 2024-06-24T11:04:09+00:00 Bump k8s.io/klog/v2 in the k8s-dependencies group
+  - 4f6440c 2024-06-18T22:21:19+02:00 Correctly detect newly created Volume[Group]SnapshotClasses
+  - fe4a04d 2024-06-18T22:19:44+02:00 Avoid group snapshot provisioning with mismatching CSI Drivers
+  - f0f8f08 2024-06-17T11:43:39+00:00 Bump the github-dependencies group across 1 directory with 16 updates
+  - 0109d4b 2024-06-17T11:42:38+00:00 Bump the k8s-dependencies group across 1 directory with 2 updates
+  - 4a2f955 2024-06-17T12:22:58+05:30 Add group snapshot controller metrics
+  - 594e663 2024-06-05T13:22:33+00:00 test: fix trivy error
+  - 9a73243 2024-06-05T13:14:48+00:00 test: ignore spelling error
+  - 5666da4 2024-06-05T13:13:14+00:00 Squashed 'release-tools/' changes from adb3af9d..f40f0ccd
 
