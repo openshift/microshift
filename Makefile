@@ -331,6 +331,7 @@ rpm-podman:
 		--rm -i \
 		--volume $$(pwd):/opt/microshift:z \
 		--env TARGET_ARCH=$(TARGET_ARCH) \
+		--env WITH_FLANNEL=$(WITH_FLANNEL) \
 		microshift-builder:$(RPM_BUILDER_IMAGE_TAG) \
 		bash -ilc 'cd /opt/microshift && make rpm & pid=$$! ; \
 				   trap "echo Killing make PID $${pid}; kill $${pid}" INT ; \
