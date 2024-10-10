@@ -1,6 +1,8 @@
-- oc image-amd64 4e8d6894744986c8765f1856137103f5ef6b903d to 82316376e25f6453b58258df6bf1e11ec4abb670
-  - 763ded28 2024-10-03T08:45:38+00:00 Check cast result in adm prune deployments to prevent panic
+- kube-rbac-proxy image-amd64 e8e8c84bcc6d4419970726f3028df4b178c0b1c9 to 9308e7f2a6d984fa7b8ddc125524d7b7356f92ce
+  - 54e793d 2024-10-02T12:36:12+02:00 go mod vendor
+  - d72eb44 2024-10-02T12:36:12+02:00 go.*: bump golang.org/x/net
 
-- oc image-arm64 4e8d6894744986c8765f1856137103f5ef6b903d to 82316376e25f6453b58258df6bf1e11ec4abb670
-  - 763ded28 2024-10-03T08:45:38+00:00 Check cast result in adm prune deployments to prevent panic
+- kube-rbac-proxy image-arm64 e8e8c84bcc6d4419970726f3028df4b178c0b1c9 to 9308e7f2a6d984fa7b8ddc125524d7b7356f92ce
+  - 54e793d 2024-10-02T12:36:12+02:00 go mod vendor
+  - d72eb44 2024-10-02T12:36:12+02:00 go.*: bump golang.org/x/net
 
