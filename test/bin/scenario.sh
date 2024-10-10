@@ -533,11 +533,23 @@ launch_vm() {
     vm_extra_args="fips=${fips_mode}"
     vm_initrd_inject=""
 
-    declare -A os_map=(
-        ["rhel94-bootc"]="rhel9.4"
-        ["rhel-9.4"]="rhel9.4"
-        ["centos9-bootc"]="centos-stream9"
-        ["centos9"]="centos-stream9")
+    local osname
+
+    case "${boot_blueprint}" in
+        rhel*9*4*)
+            osname="rhel9.4"
+            ;;
+        centos9*)
+            osname="centos-stream9"
+            ;;
+        *)
+            record_junit "${vmname}" "osname-parse" "FAILED"
+            exit 1
+            ;;
+    esac
+
+    record_junit "${vmname}" "osname-parse" "OK"
+
 
     # Add support of bootc image directory sharing with virtual machines
     if [ "${bootc_mode}" -ne 0 ] ; then
@@ -545,7 +557,7 @@ launch_vm() {
         # Work around the problem by specifying kernel and initrd paths.
         if [[ "${boot_blueprint}.iso" == *-bootc.iso ]] ; then
             vm_loc_args+=",kernel=images/pxeboot/vmlinuz,initrd=images/pxeboot/initrd.img"
-            vm_loc_args+=" --osinfo name=${os_map[${boot_blueprint}]}"
+            vm_loc_args+=" --osinfo name=${osname}"
         fi
     fi
 
