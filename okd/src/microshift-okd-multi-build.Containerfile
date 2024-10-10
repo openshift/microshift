@@ -42,6 +42,7 @@ COPY --from=builder /src/_output/rpmbuild/RPMS ${USHIFT_RPM_REPO_PATH}
 # Installing MicroShift and cleanup
 RUN ${REPO_CONFIG_SCRIPT} ${USHIFT_RPM_REPO_PATH} && \
     dnf install -y microshift && \
+    if [ "$WITH_FLANNEL" -eq 1 ]; then dnf install -y microshift-flannel; fi && \
     ${REPO_CONFIG_SCRIPT} -delete && \
     rm -f ${REPO_CONFIG_SCRIPT} && \
     rm -rf $USHIFT_RPM_REPO_PATH && \
@@ -53,3 +54,7 @@ RUN ${OKD_CONFIG_SCRIPT} && rm -rf ${OKD_CONFIG_SCRIPT}
 # shared as required by OVN images
 COPY ./packaging/imagemode/systemd/microshift-make-rshared.service /etc/systemd/system/microshift-make-rshared.service
 RUN systemctl enable microshift-make-rshared.service
+# In case of flannel we don't need openvswitch service which is by default enabled as part
+# once microshift is installed so better to disable it because it cause issue when required
+# module is not enabled.
+RUN if [ "$WITH_FLANNEL" -eq 1 ]; then systemctl disable openvswitch; fi

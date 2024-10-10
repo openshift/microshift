@@ -3,7 +3,14 @@
 - building the container with podman multistage build :
   ```bash
   git clone https://github.com/openshift/microshift.git ~/microshift
+  ```
+  To use OVN-K as CNI
+  ```bash
   cd ~/microshift && sudo podman build -f okd/src/microshift-okd-multi-build.Containerfile . -t microshift-okd
+  ```
+  To use flannel as CNI
+  ```bash
+  cd ~/microshift && sudo podman build --env WITH_FLANNEL=1 -f okd/src/microshift-okd-multi-build.Containerfile . -t microshift-okd
   ```
   - build runnable container based on current source:
     1. replace microshift assets images to OKD  upstream images

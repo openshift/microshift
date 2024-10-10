@@ -43,6 +43,18 @@ replace_assets(){
     # update the infra pods for crio
     sed -i 's,pause_image .*,pause_image = '"\"${pod_image}\""',' "packaging/crio.conf.d/10-microshift_${UNAME_TO_GOARCH_MAP[${arch}]}.conf"
 
+    # kube proxy is required for flannel
+    kube_proxy_okd_image_with_hash=$(oc adm release info --image-for="kube-proxy" "${okd_url}:${okd_releaseTag}")
+    echo "kube-proxy ${kube_proxy_okd_image_with_hash}"
+    # The OKD image we retrieve is in the format quay.io/okd/scos-content@sha256:<hash>,
+    # where the image name and digest (hash) are combined in a single string.
+    # However, in the kustomization.${arch}.yaml file, we need the image name (newName) and
+    # the digest in separate fields. To achieve this, we first extract the image name and digest
+    # using parameter expansion, then use the sed command to insert these values into the
+    # appropriate places within the YAML file.
+    kube_proxy_okd_image_name="${kube_proxy_okd_image_with_hash%%@*}"
+    kube_proxy_okd_image_hash="${kube_proxy_okd_image_with_hash##*@}"
+    sed -i "s|newName:.*|newName: ${kube_proxy_okd_image_name}|; s|digest:.*|digest: ${kube_proxy_okd_image_hash}|" "${MICROSHIFT_ROOT}/assets/optional/kube-proxy/kustomization.${arch}.yaml"
 }
 
 usage() {
