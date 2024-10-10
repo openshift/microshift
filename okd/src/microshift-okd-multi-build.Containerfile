@@ -40,8 +40,15 @@ COPY --chmod=755 ./okd/src/configure.sh ${OKD_CONFIG_SCRIPT}
 COPY --from=builder /src/_output/rpmbuild/RPMS ${USHIFT_RPM_REPO_PATH}
 
 # Installing MicroShift and cleanup
+# In case of flannel we don't need openvswitch service which is by default enabled as part
+# once microshift is installed so better to disable it because it cause issue when required
+# module is not enabled.
 RUN ${REPO_CONFIG_SCRIPT} ${USHIFT_RPM_REPO_PATH} && \
     dnf install -y microshift && \
+    if [ "$WITH_FLANNEL" -eq 1 ]; then \
+      dnf install -y microshift-flannel; \
+      systemctl disable openvswitch; \
+    fi && \
     ${REPO_CONFIG_SCRIPT} -delete && \
     rm -f ${REPO_CONFIG_SCRIPT} && \
     rm -rf $USHIFT_RPM_REPO_PATH && \
