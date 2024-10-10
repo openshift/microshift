@@ -89,7 +89,7 @@ type versions struct {
 // getVersions obtains and returns versions of executable and data dir.
 // Version of data will be nil if the MicroShift data does not exist yet.
 func getVersions() (versions, error) {
-	execVer, err := getVersionOfExecutable()
+	execVer, err := GetVersionOfExecutable()
 	if err != nil {
 		return versions{}, fmt.Errorf("failed to get version of MicroShift executable: %w", err)
 	}
@@ -136,7 +136,7 @@ func updateVersionFile(ver versionMetadata) error {
 	if err != nil {
 		return fmt.Errorf("failed to check if system is ostree: %w", err)
 	} else if isOstree {
-		currentDeploymentID, err = getCurrentDeploymentID()
+		currentDeploymentID, err = GetCurrentDeploymentID()
 		if err != nil {
 			return fmt.Errorf("failed to get current deployment ID: %w", err)
 		}
@@ -231,7 +231,7 @@ func versionMetadataFromString(majorMinorPatch string) (versionMetadata, error) 
 	return versionMetadata{Major: major, Minor: minor, Patch: patch}, nil
 }
 
-func getVersionOfExecutable() (versionMetadata, error) {
+func GetVersionOfExecutable() (versionMetadata, error) {
 	ver := version.Get()
 	return versionMetadataFromString(fmt.Sprintf("%s.%s.%s", ver.Major, ver.Minor, ver.Patch))
 }

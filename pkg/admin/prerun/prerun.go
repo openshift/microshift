@@ -111,7 +111,7 @@ func (dm *dataManagement) backup() error {
 		return nil
 	}
 
-	if err := dm.dataManager.Backup(newBackupName); err != nil {
+	if _, err := dm.dataManager.Backup(newBackupName); err != nil {
 		return fmt.Errorf("failed to create backup %q: %w", newBackupName, err)
 	}
 
@@ -140,7 +140,7 @@ func (dm *dataManagement) optionalRestore() error {
 	klog.InfoS("Restore marker file exists - attempting to restore",
 		"path", restoreFilepath)
 
-	currentDeploymentID, err := getCurrentDeploymentID()
+	currentDeploymentID, err := GetCurrentDeploymentID()
 	if err != nil {
 		return err
 	}
@@ -294,7 +294,7 @@ func (dm *dataManagement) backup413() error {
 		}
 	}
 
-	if err := dm.dataManager.Backup(backupName); err != nil {
+	if _, err := dm.dataManager.Backup(backupName); err != nil {
 		return fmt.Errorf("failed to create new 4.13 backup: %w", err)
 	}
 	return nil
