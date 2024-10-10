@@ -1,61 +1,50 @@
-- api embedded-component b1f700bdd8d22c4033be4e4e9ef751d89ade42e8 to 82e082220d910f489d35880174e2eb90e21f5589
-  - 77162c9 2024-10-02T16:12:22-04:00 CORS-3695: Update the api for aws cluster hosted dns options
-
-- cluster-openshift-controller-manager-operator embedded-component 95bd10ad4841d72b46c58078a1e4d2559d5e2c67 to 0ee6371401da744c7c71723c505463672b9bad45
-  - 0906447 2024-09-18T15:55:35+00:00 Updating ose-cluster-openshift-controller-manager-operator-container image to be consistent with ART for 4.18 Reconciling with https://github.com/openshift/ocp-build-data/tree/dd68246f3237db5db458127566fc7b05b55e1660/images/ose-cluster-openshift-controller-manager-operator.yml
-
-- oc image-arm64 4afb880d54e10ac4d0e7a6db0036dc7537bc639d to 3692450b96d57ae3870e5f693e833a0701d0e2b0
-  - 07bd140b 2024-10-07T13:54:12-04:00 day2: additional rbac policy rules
-
-- csi-external-snapshotter image-arm64 672a0d5ea97a71afd0dfb50002319f30db2e10d7 to f52ce8b8b0799a341caf1fb864bba5d9d040a856
-  - 75c7e0d 2024-10-02T14:04:48+02:00 UPSTREAM: <carry>: Add OpenShift files
-  - 126d7fd 2024-08-29T08:31:06+02:00 create changelog v8.1.0
-  - 7b0eb44 2024-08-28T13:39:02-04:00 Remove unwanted file
-  - 3c2470c 2024-08-27T12:00:57+02:00 Add group snapshot controller unit tests
-  - e2b8496 2024-08-26T15:16:19+02:00 fix opMgr.scheduleOpsInFlightMetric go routine leak
-  - f463a99 2024-08-26T11:12:21+00:00 Bump the github-dependencies group across 1 directory with 7 updates
-  - 1226227 2024-08-26T12:37:44+02:00 Look for a VolumeGroupSnapshotClass when getting the class of a VolumeGroupSnapshot
-  - 8b182cc 2024-08-26T12:36:48+02:00 Document Volume Group Snapshot feature in the README file
-  - f0fb893 2024-08-15T07:42:50+00:00 Bump the github-dependencies group across 1 directory with 8 updates
-  - 7d6ba79 2024-08-14T14:30:13+02:00 update kubernetes to v1.31.0
-  - 74451a6 2024-08-14T03:16:56+00:00 Squashed 'release-tools/' changes from f40f0ccd4..988496a1f
-  - c98b259 2024-08-07T19:24:35+02:00 [snapshot-controller] Retry PVC finalizer removal on conflict
-  - b34b8a1 2024-08-02T10:13:37+02:00 update go version in trivy.yaml
-  - f2d374f 2024-08-01T16:04:04+02:00 update kubernetes to 1.31.0-rc.0
-  - 495ff63 2024-07-30T23:04:34-07:00 Update controller deployment to latest version
-  - b2fd105 2024-06-24T11:04:09+00:00 Bump k8s.io/klog/v2 in the k8s-dependencies group
-  - 4f6440c 2024-06-18T22:21:19+02:00 Correctly detect newly created Volume[Group]SnapshotClasses
-  - fe4a04d 2024-06-18T22:19:44+02:00 Avoid group snapshot provisioning with mismatching CSI Drivers
-  - f0f8f08 2024-06-17T11:43:39+00:00 Bump the github-dependencies group across 1 directory with 16 updates
-  - 0109d4b 2024-06-17T11:42:38+00:00 Bump the k8s-dependencies group across 1 directory with 2 updates
-  - 4a2f955 2024-06-17T12:22:58+05:30 Add group snapshot controller metrics
-  - 594e663 2024-06-05T13:22:33+00:00 test: fix trivy error
-  - 9a73243 2024-06-05T13:14:48+00:00 test: ignore spelling error
-  - 5666da4 2024-06-05T13:13:14+00:00 Squashed 'release-tools/' changes from adb3af9d..f40f0ccd
-
-- csi-external-snapshotter image-arm64 672a0d5ea97a71afd0dfb50002319f30db2e10d7 to f52ce8b8b0799a341caf1fb864bba5d9d040a856
-  - 75c7e0d 2024-10-02T14:04:48+02:00 UPSTREAM: <carry>: Add OpenShift files
-  - 126d7fd 2024-08-29T08:31:06+02:00 create changelog v8.1.0
-  - 7b0eb44 2024-08-28T13:39:02-04:00 Remove unwanted file
-  - 3c2470c 2024-08-27T12:00:57+02:00 Add group snapshot controller unit tests
-  - e2b8496 2024-08-26T15:16:19+02:00 fix opMgr.scheduleOpsInFlightMetric go routine leak
-  - f463a99 2024-08-26T11:12:21+00:00 Bump the github-dependencies group across 1 directory with 7 updates
-  - 1226227 2024-08-26T12:37:44+02:00 Look for a VolumeGroupSnapshotClass when getting the class of a VolumeGroupSnapshot
-  - 8b182cc 2024-08-26T12:36:48+02:00 Document Volume Group Snapshot feature in the README file
-  - f0fb893 2024-08-15T07:42:50+00:00 Bump the github-dependencies group across 1 directory with 8 updates
-  - 7d6ba79 2024-08-14T14:30:13+02:00 update kubernetes to v1.31.0
-  - 74451a6 2024-08-14T03:16:56+00:00 Squashed 'release-tools/' changes from f40f0ccd4..988496a1f
-  - c98b259 2024-08-07T19:24:35+02:00 [snapshot-controller] Retry PVC finalizer removal on conflict
-  - b34b8a1 2024-08-02T10:13:37+02:00 update go version in trivy.yaml
-  - f2d374f 2024-08-01T16:04:04+02:00 update kubernetes to 1.31.0-rc.0
-  - 495ff63 2024-07-30T23:04:34-07:00 Update controller deployment to latest version
-  - b2fd105 2024-06-24T11:04:09+00:00 Bump k8s.io/klog/v2 in the k8s-dependencies group
-  - 4f6440c 2024-06-18T22:21:19+02:00 Correctly detect newly created Volume[Group]SnapshotClasses
-  - fe4a04d 2024-06-18T22:19:44+02:00 Avoid group snapshot provisioning with mismatching CSI Drivers
-  - f0f8f08 2024-06-17T11:43:39+00:00 Bump the github-dependencies group across 1 directory with 16 updates
-  - 0109d4b 2024-06-17T11:42:38+00:00 Bump the k8s-dependencies group across 1 directory with 2 updates
-  - 4a2f955 2024-06-17T12:22:58+05:30 Add group snapshot controller metrics
-  - 594e663 2024-06-05T13:22:33+00:00 test: fix trivy error
-  - 9a73243 2024-06-05T13:14:48+00:00 test: ignore spelling error
-  - 5666da4 2024-06-05T13:13:14+00:00 Squashed 'release-tools/' changes from adb3af9d..f40f0ccd
+- ovn-kubernetes image-arm64 b70ae7f5d24c5fcd69a18399419b41468afa6cac to e816f5899f31572c0c93dad9e241557c307a7728
+  - fc3f48f5 2024-09-18T13:11:32+00:00 Add new ovnkube-observ binary to the image.
+  - 4329d466 2024-09-16T14:15:27+02:00 Use fedora 41 instead of rawhide
+  - eab7fe70 2024-09-14T21:59:26+02:00 Fix flaky UT: Reset TestConfig
+  - 65b12e1a 2024-09-14T21:08:09+02:00 E2E: Enable L3 pod2Egress test on LGW
+  - eef8c9d5 2024-09-14T21:08:02+02:00 Add gatewayport to nonIC conditionalSNAT
+  - c4969d9f 2024-09-14T14:06:35+02:00 L2: Add ClusterSubnet SNATs on GR
+  - 5f7ac17a 2024-09-14T14:05:27+02:00 L3: Add PodSubnet SNATs on ovn-cluster-router
+  - 30841546 2024-09-14T13:50:28+02:00 Add buildUDNEgressSNAT util to BSNC controller
+  - 8a47ba5d 2024-09-14T13:50:28+02:00 remove deadcode
+  - 294c7887 2024-09-14T13:50:28+02:00 Update NAT functions to take match expression as argument
+  - 1d3c6a32 2024-09-14T13:50:28+02:00 Update OVN DB Schema; generate libovsdb bindings
+  - 14afcbf9 2024-09-13T15:42:59+00:00 Pin multus to v4.1.0
+  - a4e2a002 2024-09-13T15:42:57+00:00 Fix duplicated UDN tests
+  - 369ac907 2024-09-13T15:39:43+00:00 Fix gateway manager not accounting for UDN join subnets
+  - 961b5df3 2024-09-13T12:33:19+02:00 Fix unit tests to be more explicit
+  - 97b4808f 2024-09-13T12:32:55+02:00 UDN: L3: Use clustersubnets for GR routes
+  - 309c32f7 2024-09-13T12:32:54+02:00 UDN: L3: Use nodesubnet annotations for L3
+  - 8fae3ea6 2024-09-12T16:08:38+02:00 persistentips, util: add AllowsPersistentIPs helper
+  - 725eb873 2024-09-12T16:08:38+02:00 gh, actions: activate net-seg for kv-live-migration
+  - 6e1f2d75 2024-09-12T16:08:38+02:00 kubevirt, e2e: UDN
+  - e712f386 2024-09-12T16:08:38+02:00 kubevirt, e2e: Pin kubevirt to 1.1.0
+  - 813847c4 2024-09-12T16:08:38+02:00 udn: unit test persistent IPs integration
+  - 4508f150 2024-09-12T16:08:38+02:00 udn: set persistentIPs for UDN ifaces
+  - 5b3eacd5 2024-09-12T16:08:38+02:00 contrib/kind: Add kubevirt-ipam opt out flag
+  - 02ce6f28 2024-09-12T16:08:38+02:00 contrib/kind: separate cert-manager and kubevirt-ipam installations
+  - 4a028e9a 2024-09-12T16:08:38+02:00 contrib/kind-common: Add primary-udn passt binary
+  - 7cf7c4e4 2024-09-12T16:08:38+02:00 contrib/kind-common: Add primary-udn NAD
+  - faa0f5f5 2024-09-12T16:08:38+02:00 contrib/kind-common: Patch passt binding to kubevirt CR
+  - 537a64f1 2024-09-11T15:20:21-04:00 Bump OVN for https://issues.redhat.com/browse/FDP-773
+  - 45abadba 2024-09-11T15:20:21-04:00 Adds e2e test: conntrack flush after ovnkube delete
+  - b3ba566d 2024-09-10T17:24:11+02:00 kind: Pin metallb to v0.14.8
+  - 6cdf7ecd 2024-09-10T16:20:42+02:00 Add static route to the hairpin masquerade IPs to pod
+  - 96abe324 2024-09-09T17:48:41+05:30 Add unit tests for UDN while DS is true
+  - d57e8c25 2024-09-06T12:24:15-04:00 add testing of CRDs to the network segmentation tests
+  - c275e72b 2024-09-06T17:16:48+02:00 kubevirt, e2e: Use e2enode to label/unlabel
+  - 4d471bc8 2024-09-05T11:14:30-04:00 udn/nad e2e testing ip family aware
+  - 4ef14cdb 2024-09-05T11:14:30-04:00 validate the ipfamily for network attachments
+  - 24b4749f 2024-09-04T14:24:20+01:00 UDN LGW: ensure masq chain exists before adding rules
+  - 5d2310e7 2024-09-02T10:31:37+02:00 Free disk for dualstack conversion job.
+  - d94b2655 2024-09-02T10:31:37+02:00 Add observability docs
+  - 29ec673f 2024-09-02T10:31:37+02:00 Add observability library and ovnkube-observ binary to run debug mode.
+  - a5d5072d 2024-09-02T10:31:37+02:00 Update libovsdb to the latest version. It allows using `*string` as a client index.
+  - ca417023 2024-09-02T10:31:35+02:00 Add observability manager, add samplingConfig for acl db ops.
+  - d431a614 2024-09-02T10:30:34+02:00 Add config options to enable observability.
+  - 46668987 2024-09-02T10:30:34+02:00 Bump ovn dbs to ovn-org/ovn/tree/branch-24.09.
+  - f0c876f0 2024-09-02T10:30:34+02:00 Print errors on node annotation failure.
+  - 00c15345 2024-08-30T17:22:07+01:00 Emit Event if NAD cannot be parsed
+  - c78d825b 2024-08-27T15:33:45+02:00 Add a source pod create retry function for egress firewall e2e. In our e2e tests, a strange behaviour for ipv6 was seen: newly created pod can't reach ipv6 destination. But if the same pod is re-created, everything works. We don't know what causes that behaviour, so given function is a workaround for this issue. It also only historically fails for the first ef test "Should validate the egress firewall policy functionality for allowed IP", so only used there for now.
 
