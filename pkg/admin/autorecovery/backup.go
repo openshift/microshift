@@ -11,29 +11,39 @@ import (
 	"k8s.io/klog/v2"
 )
 
-func GetBackupName() (data.BackupName, error) {
+const (
+	// Date format: yyyymmddHHMMSS
+	backupCreationTimeFormat = "20060102150405"
+)
+
+func getVersion() (string, error) {
 	isOstree, err := util.PathExists("/run/ostree-booted")
 	if err != nil {
 		return "", fmt.Errorf("failed to check if system is ostree: %w", err)
 	}
 
-	var versionPart string
 	if isOstree {
-		versionPart, err = prerun.GetCurrentDeploymentID()
+		deployID, err := prerun.GetCurrentDeploymentID()
 		if err != nil {
 			return "", err
 		}
-	} else {
-		execVer, err := prerun.GetVersionOfExecutable()
-		if err != nil {
-			return "", fmt.Errorf("failed to get version of MicroShift executable: %w", err)
-		}
-		versionPart = execVer.String()
+		return deployID, nil
 	}
 
-	// Format current time as yyyymmddHHMMSS
-	t := time.Now().Format("20060102150405")
+	execVer, err := prerun.GetVersionOfExecutable()
+	if err != nil {
+		return "", fmt.Errorf("failed to get version of MicroShift executable: %w", err)
+	}
+	return execVer.String(), nil
+}
 
+func GetBackupName() (data.BackupName, error) {
+	versionPart, err := getVersion()
+	if err != nil {
+		return "", err
+	}
+
+	t := time.Now().Format(backupCreationTimeFormat)
 	return data.BackupName(fmt.Sprintf("%s_%s", t, versionPart)), nil
 }
 
