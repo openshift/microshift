@@ -12,7 +12,8 @@ Test Tags           ostree
 
 
 *** Variables ***
-${TARGET_REF}       ${EMPTY}
+${TARGET_REF}        ${EMPTY}
+${BOOTC_REGISTRY}    ${EMPTY}
 
 
 *** Test Cases ***
@@ -31,7 +32,10 @@ First Failed Staged Upgrade Should Not Restore Backup
 
     # We don't expect a rollback here since after the first failure
     # MicroShift should continue with business as usual
-    Deploy Commit Not Expecting A Rollback    ${TARGET_REF}    ${TRUE}
+    Deploy Commit Not Expecting A Rollback
+    ...    ${TARGET_REF}
+    ...    ${TRUE}
+    ...    ${BOOTC_REGISTRY}
 
     Wait Until Greenboot Health Check Exited
 
@@ -59,7 +63,7 @@ Validate Backup Is Not Restored
     Backup Should Exist    ${backup_name}
 
     ${stdout}=    Execute Command
-    ...    cd ${BACKUP_STORAGE} && ls -d1 rhel-* | wc -l
+    ...    find "${BACKUP_STORAGE}" -maxdepth 1 -type d "(" -name "rhel-*" -o -name "default-*" ")" | wc -l
     ...    sudo=False    return_rc=False
 
     ${mark_stdout}    ${mark_stderr}    ${mark_rc}=    Execute Command
