@@ -1,3 +1,3 @@
-- machine-config-operator embedded-component 4f6c77824e15625cf8be17d5782ca8a5dd3f14ec to 6f827c3d8c3c5c826b04963a19ad0d79c2ba50ee
-  - fa93bd08 2024-09-05T23:00:11+00:00 Enable the use of Linux Bridge as the ovs default port connection
+- cluster-network-operator embedded-component 8f39b8c253667d54b3ab83fb91eb3dbf4e266fd2 to fd6dd92100c00fb7e29213029b37a4e667d3bd7b
+  - 36a956a 2024-10-10T11:40:19+00:00 Configure narrowing=yes for IPsec connections
 
