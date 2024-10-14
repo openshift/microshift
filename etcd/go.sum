@@ -174,10 +174,10 @@ github.com/mxk/go-flowrate v0.0.0-20140419014527-cca7078d478f h1:y5//uYreIhSUg3J
 github.com/mxk/go-flowrate v0.0.0-20140419014527-cca7078d478f/go.mod h1:ZdcZmHo+o7JKHSa8/e818NopupXU1YMK5fe1lsApnBw=
 github.com/onsi/gomega v1.33.1 h1:dsYjIxxSR755MDmKVsaFQTE22ChNBcuuTWgkUDSubOk=
 github.com/onsi/gomega v1.33.1/go.mod h1:U4R44UsT+9eLIaYRB2a5qajjtQYn0hauxvRm16AVYg0=
-github.com/openshift/api v0.0.0-20241001152557-e415140e5d5f h1:ya1OmyZm3LIIxI3U9VE9Nyx3ehCHgBwxyFUPflYPWls=
-github.com/openshift/api v0.0.0-20241001152557-e415140e5d5f/go.mod h1:Shkl4HanLwDiiBzakv+con/aMGnVE2MAGvoKp5oyYUo=
-github.com/openshift/build-machinery-go v0.0.0-20240613134303-8359781da660 h1:F0zE2bmdVvaEd18VXuGYQdJJ1FYJu4MIDW9PYZWc9No=
-github.com/openshift/build-machinery-go v0.0.0-20240613134303-8359781da660/go.mod h1:8jcm8UPtg2mCAsxfqKil1xrmRMI3a+XU2TZ9fF8A7TE=
+github.com/openshift/api v0.0.0-20241004095111-b1f700bdd8d2 h1:wCRdyt+nHnJsfuLMJF9RW1JK8G4Gvo//gBy6bZI5USE=
+github.com/openshift/api v0.0.0-20241004095111-b1f700bdd8d2/go.mod h1:Shkl4HanLwDiiBzakv+con/aMGnVE2MAGvoKp5oyYUo=
+github.com/openshift/build-machinery-go v0.0.0-20240910153727-5725581bdf8f h1:JMEDso3xFUIDULgFJmcrTfyPpigF3NyyaP07Yy8tHmI=
+github.com/openshift/build-machinery-go v0.0.0-20240910153727-5725581bdf8f/go.mod h1:8jcm8UPtg2mCAsxfqKil1xrmRMI3a+XU2TZ9fF8A7TE=
 github.com/openshift/etcd/api/v3 v3.5.1-0.20241002015939-fd65559cbf04 h1:8nThW5g1IHi7fG2AFMZonmdx11W1tg0z+kP2CEQRHEM=
 github.com/openshift/etcd/api/v3 v3.5.1-0.20241002015939-fd65559cbf04/go.mod h1:1P4SlIP/VwkDmGo3OlOD7faPeP8KDIFhqvciH5EfN28=
 github.com/openshift/etcd/client/pkg/v3 v3.5.1-0.20241002015939-fd65559cbf04 h1:4aRmUf8EtXhOtnJWlNCOaEsiCAEEXnpmKCPbkUU0okU=
@@ -204,8 +204,8 @@ github.com/openshift/kubernetes/staging/src/k8s.io/component-base v0.0.0-2024100
 github.com/openshift/kubernetes/staging/src/k8s.io/component-base v0.0.0-20241003222616-8540bd493e8a/go.mod h1:LRIIT1R+zMFmkz9XzlBxHvmTqvnAFkM+Fe6mX1Eq+7U=
 github.com/openshift/kubernetes/staging/src/k8s.io/kubectl v0.0.0-20241003222616-8540bd493e8a h1:P0QtANqizeuFjrdqyss2FDPspgtrlqWCkgqQ6QgPG1o=
 github.com/openshift/kubernetes/staging/src/k8s.io/kubectl v0.0.0-20241003222616-8540bd493e8a/go.mod h1:VCaN8kOdiLc/UFWWyWCWMaMKT/UMkti2glNFAFdytsI=
-github.com/openshift/library-go v0.0.0-20241001171606-756adf2188fc h1:QXYkFJn7wLTHAI56l+9DJnLrNynGtXjyOZLgiIglTnE=
-github.com/openshift/library-go v0.0.0-20241001171606-756adf2188fc/go.mod h1:9B1MYPoLtP9tqjWxcbUNVpwxy68zOH/3EIP6c31dAM0=
+github.com/openshift/library-go v0.0.0-20241004114639-65e0327e56bc h1:j0T3EjuQthbCJYwqfCboOahxQhToQz8d5bmZP1sHEGI=
+github.com/openshift/library-go v0.0.0-20241004114639-65e0327e56bc/go.mod h1:9B1MYPoLtP9tqjWxcbUNVpwxy68zOH/3EIP6c31dAM0=
 github.com/openshift/onsi-ginkgo/v2 v2.6.1-0.20240806135314-3946b2b7b2a8 h1:HJvLw9nNfoqCs16h505eP8E1kVmq6KNdzGm5csPlYsQ=
 github.com/openshift/onsi-ginkgo/v2 v2.6.1-0.20240806135314-3946b2b7b2a8/go.mod h1:rlwLi9PilAFJ8jCg9UE1QP6VBpd6/xj3SRC0d6TU0To=
 github.com/opentracing/opentracing-go v1.1.0/go.mod h1:UkNAQd3GIcIGf0SeVgPpRdFStlNbqXla1AfSYxPUl2o=
