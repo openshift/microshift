@@ -1,6 +1,6 @@
 module github.com/openshift/microshift/etcd
 
-go 1.22.0
+go 1.22.5
 
 require github.com/openshift/microshift v0.0.0
 
@@ -11,7 +11,7 @@ replace (
 )
 
 require (
-	github.com/openshift/build-machinery-go v0.0.0-20240613134303-8359781da660
+	github.com/openshift/build-machinery-go v0.0.0-20240910153727-5725581bdf8f
 	github.com/spf13/cobra v1.8.1
 	go.etcd.io/etcd/server/v3 v3.5.13
 	k8s.io/apimachinery v0.31.1
@@ -30,8 +30,8 @@ require (
 	github.com/google/go-cmp v0.6.0 // indirect
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.20.0 // indirect
 	github.com/mxk/go-flowrate v0.0.0-20140419014527-cca7078d478f // indirect
-	github.com/openshift/api v0.0.0-20241001152557-e415140e5d5f // indirect
-	github.com/openshift/library-go v0.0.0-20241001171606-756adf2188fc // indirect
+	github.com/openshift/api v0.0.0-20241004095111-b1f700bdd8d2 // indirect
+	github.com/openshift/library-go v0.0.0-20241004114639-65e0327e56bc // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/vishvananda/netlink v1.1.0 // indirect
 	github.com/vishvananda/netns v0.0.4 // indirect
