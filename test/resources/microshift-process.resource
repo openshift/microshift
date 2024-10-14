@@ -9,6 +9,7 @@ Resource            oc.resource
 Resource            systemd.resource
 Resource            microshift-host.resource
 Resource            microshift-etcd-process.resource
+Resource            ostree-health.resource
 Library             DataFormats.py
 
 
@@ -44,6 +45,11 @@ Wait For MicroShift
     # We could also wait for relevant pods. Can we restructure the
     # greenboot check script to let us use it even when not on a
     # greenboot host?
+
+Wait For Greenboot Health Check To Exit
+    [Documentation]    Wait for the Greenboot Health Check systemd service to exit
+    Wait Until Keyword Succeeds    10m    15s
+    ...    Greenboot Health Check Exited
 
 MicroShift Process ID
     [Documentation]    Return the current MicroShift process ID
