@@ -17,5 +17,5 @@ scenario_run_tests() {
     run_tests host1 \
         --variable "TARGET_REF:rhel94-bootc-source-ostree-parent" \
         --variable "BOOTC_REGISTRY:${BOOTC_REGISTRY_URL}" \
-        suites/upgrade/upgrade-successful-bootc.robot
+        suites/upgrade/upgrade-successful.robot
 }
