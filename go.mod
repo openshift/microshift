@@ -1,17 +1,19 @@
 module github.com/openshift/microshift
 
-go 1.22.0
+go 1.22.5
+
+toolchain go1.22.7
 
 require (
 	github.com/apparentlymart/go-cidr v1.1.0
 	github.com/coreos/go-systemd v0.0.0-20190321100706-95778dfbb74e // openshift-controller-manager
 	github.com/google/go-cmp v0.6.0
 	github.com/miekg/dns v1.1.35 // microshift
-	github.com/openshift/api v0.0.0-20241001152557-e415140e5d5f
-	github.com/openshift/build-machinery-go v0.0.0-20240613134303-8359781da660
+	github.com/openshift/api v0.0.0-20241004095111-b1f700bdd8d2
+	github.com/openshift/build-machinery-go v0.0.0-20240910153727-5725581bdf8f
 	github.com/openshift/client-go v0.0.0-20241001162912-da6d55e4611f
-	github.com/openshift/cluster-policy-controller v0.0.0-20240917174913-35753b6b1e97
-	github.com/openshift/library-go v0.0.0-20241001171606-756adf2188fc
+	github.com/openshift/cluster-policy-controller v0.0.0-20241008123454-916b75ff95b3
+	github.com/openshift/library-go v0.0.0-20241004114639-65e0327e56bc
 	github.com/openshift/route-controller-manager v0.0.0-20240911174253-87dfd7936fc5
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/spf13/cobra v1.8.1
@@ -192,7 +194,7 @@ require (
 	gopkg.in/square/go-jose.v2 v2.6.0 // indirect
 	k8s.io/cluster-bootstrap v0.0.0 // indirect
 	k8s.io/component-helpers v0.30.1 // indirect
-	k8s.io/controller-manager v0.30.1 // indirect
+	k8s.io/controller-manager v0.31.1 // indirect
 	k8s.io/cri-api v0.0.0 // indirect
 	k8s.io/cri-client v0.0.0 // indirect
 	k8s.io/csi-translation-lib v0.0.0 // indirect
@@ -205,7 +207,7 @@ require (
 	k8s.io/kubelet v0.30.1 // indirect
 	k8s.io/metrics v0.0.0 // indirect
 	k8s.io/mount-utils v0.0.0 // indirect
-	k8s.io/pod-security-admission v0.30.1 // indirect
+	k8s.io/pod-security-admission v0.31.1 // indirect
 	sigs.k8s.io/apiserver-network-proxy/konnectivity-client v0.30.3 // indirect
 	sigs.k8s.io/json v0.0.0-20221116044647-bc3834ca7abd // indirect
 	sigs.k8s.io/structured-merge-diff/v4 v4.4.1 // indirect
