@@ -1,8 +1,9 @@
-- kube-rbac-proxy image-amd64 e8e8c84bcc6d4419970726f3028df4b178c0b1c9 to 9308e7f2a6d984fa7b8ddc125524d7b7356f92ce
-  - 54e793d 2024-10-02T12:36:12+02:00 go mod vendor
-  - d72eb44 2024-10-02T12:36:12+02:00 go.*: bump golang.org/x/net
+- cluster-network-operator embedded-component 9748af19538d54cdded9a043bc999dbba54c5914 to e8467505cbc04ecd5dfa1bf52545fa46ed7d0e3d
+  - 0527f74 2024-10-11T14:08:09+00:00 Configure narrowing=yes for IPsec connections
 
-- kube-rbac-proxy image-arm64 e8e8c84bcc6d4419970726f3028df4b178c0b1c9 to 9308e7f2a6d984fa7b8ddc125524d7b7356f92ce
-  - 54e793d 2024-10-02T12:36:12+02:00 go mod vendor
-  - d72eb44 2024-10-02T12:36:12+02:00 go.*: bump golang.org/x/net
+- ovn-kubernetes image-amd64 5af0be89d7a13e44ba9d7129164e18b09afd54d8 to 2aaf5421ba55bb8d23d70a4bb636a05631a46148
+  - effd406 2024-10-04T14:16:42+00:00 Add subnet overlap check for transit switch subnet
+
+- ovn-kubernetes image-arm64 5af0be89d7a13e44ba9d7129164e18b09afd54d8 to 2aaf5421ba55bb8d23d70a4bb636a05631a46148
+  - effd406 2024-10-04T14:16:42+00:00 Add subnet overlap check for transit switch subnet
 
