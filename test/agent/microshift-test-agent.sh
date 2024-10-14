@@ -3,6 +3,7 @@ set -xeuo pipefail
 
 GREENBOOT_CONFIGURATION_FILE=/etc/greenboot/greenboot.conf
 AGENT_CFG=/var/lib/microshift-test-agent.json
+SYSTEMD_NOTIFIED=false
 
 # Example config
 # {
@@ -16,6 +17,10 @@ AGENT_CFG=/var/lib/microshift-test-agent.json
 
 CLEANUP_CMDS=()
 _cleanup() {
+    # Make sure to always notify systemd if the script exited without
+    # sending an explicit notification
+    _notify_systemd
+
     for cmd in "${CLEANUP_CMDS[@]}"; do
         ${cmd}
     done
@@ -84,6 +89,18 @@ _get_current_deployment_id() {
     echo "${id}"
 }
 
+_notify_systemd() {
+    # Avoid double notification
+    if ${SYSTEMD_NOTIFIED} ; then
+        return
+    fi
+
+    if [ -n "${NOTIFY_SOCKET:-}" ] ; then
+        systemd-notify --ready
+    fi
+    SYSTEMD_NOTIFIED=true
+}
+
 prevent_backup() {
     local -r path="/var/lib/microshift-backups"
     if [[ ! -e "${path}" ]]; then
@@ -143,9 +160,7 @@ _run_actions "${current_boot_actions}"
 
 # If running under systemd, notify systemd that the service is ready so that
 # other dependent services in the startup sequence can be started
-if [ -n "${NOTIFY_SOCKET:-}" ] ; then
-    systemd-notify --ready
-fi
+_notify_systemd
 
 # Sleep in background and wait to not miss the signals. If sleep command is
 # interrupted, wait error is ignored and the loop continues. If the script
