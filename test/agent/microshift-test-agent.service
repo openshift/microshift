@@ -1,12 +1,17 @@
 [Unit]
 Description=MicroShift Test Agent
-Before=microshift.service sshd.service
+Before=microshift.service greenboot-healthcheck.service sshd.service
 
 [Service]
+# Script must call 'systemd-notify --ready' to signal its readiness.
+# The notification access is limited to the main script process.
+Type=notify
+NotifyAccess=main
+
 ExecStart=/usr/bin/microshift-test-agent.sh
 # Default value of KillMode is control-group which results in
 # sending SIGTERM to the process and its child processes.
-# By changing to `mixed`, only the main process will get the
+# By changing to 'mixed', only the main process will get the
 # SIGTERM and cleanup activities won't be interrupted.
 KillMode=mixed
 
