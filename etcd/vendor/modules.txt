@@ -189,10 +189,10 @@ github.com/munnerz/goautoneg
 # github.com/mxk/go-flowrate v0.0.0-20140419014527-cca7078d478f
 ## explicit
 github.com/mxk/go-flowrate/flowrate
-# github.com/openshift/api v0.0.0-20241001152557-e415140e5d5f
+# github.com/openshift/api v0.0.0-20241004095111-b1f700bdd8d2
 ## explicit; go 1.22.0
 github.com/openshift/api/config/v1
-# github.com/openshift/build-machinery-go v0.0.0-20240613134303-8359781da660
+# github.com/openshift/build-machinery-go v0.0.0-20240910153727-5725581bdf8f
 ## explicit; go 1.22.0
 github.com/openshift/build-machinery-go
 github.com/openshift/build-machinery-go/make
@@ -202,11 +202,11 @@ github.com/openshift/build-machinery-go/make/targets/golang
 github.com/openshift/build-machinery-go/make/targets/openshift
 github.com/openshift/build-machinery-go/make/targets/openshift/operator
 github.com/openshift/build-machinery-go/scripts
-# github.com/openshift/library-go v0.0.0-20241001171606-756adf2188fc
+# github.com/openshift/library-go v0.0.0-20241004114639-65e0327e56bc
 ## explicit; go 1.22.0
 github.com/openshift/library-go/pkg/operator/apiserver/audit
 # github.com/openshift/microshift v0.0.0 => ../
-## explicit; go 1.22.0
+## explicit; go 1.22.5
 github.com/openshift/microshift/pkg/config
 github.com/openshift/microshift/pkg/config/apiserver
 github.com/openshift/microshift/pkg/util
