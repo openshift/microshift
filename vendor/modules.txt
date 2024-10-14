@@ -431,7 +431,7 @@ github.com/opencontainers/runtime-spec/specs-go
 github.com/opencontainers/selinux/go-selinux
 github.com/opencontainers/selinux/go-selinux/label
 github.com/opencontainers/selinux/pkg/pwalkdir
-# github.com/openshift/api v0.0.0-20241001152557-e415140e5d5f
+# github.com/openshift/api v0.0.0-20241004095111-b1f700bdd8d2
 ## explicit; go 1.22.0
 github.com/openshift/api
 github.com/openshift/api/annotations
@@ -525,7 +525,7 @@ github.com/openshift/apiserver-library-go/pkg/securitycontextconstraints/sysctl
 github.com/openshift/apiserver-library-go/pkg/securitycontextconstraints/user
 github.com/openshift/apiserver-library-go/pkg/securitycontextconstraints/util
 github.com/openshift/apiserver-library-go/pkg/securitycontextconstraints/util/sort
-# github.com/openshift/build-machinery-go v0.0.0-20240613134303-8359781da660
+# github.com/openshift/build-machinery-go v0.0.0-20240910153727-5725581bdf8f
 ## explicit; go 1.22.0
 github.com/openshift/build-machinery-go
 github.com/openshift/build-machinery-go/make
@@ -676,8 +676,8 @@ github.com/openshift/client-go/user/informers/externalversions/internalinterface
 github.com/openshift/client-go/user/informers/externalversions/user
 github.com/openshift/client-go/user/informers/externalversions/user/v1
 github.com/openshift/client-go/user/listers/user/v1
-# github.com/openshift/cluster-policy-controller v0.0.0-20240917174913-35753b6b1e97
-## explicit; go 1.22.0
+# github.com/openshift/cluster-policy-controller v0.0.0-20241008123454-916b75ff95b3
+## explicit; go 1.22.5
 github.com/openshift/cluster-policy-controller/pkg/client/genericinformers
 github.com/openshift/cluster-policy-controller/pkg/cmd/cluster-policy-controller
 github.com/openshift/cluster-policy-controller/pkg/cmd/controller
@@ -689,7 +689,7 @@ github.com/openshift/cluster-policy-controller/pkg/security/controller
 github.com/openshift/cluster-policy-controller/pkg/security/mcs
 github.com/openshift/cluster-policy-controller/pkg/security/uidallocator
 github.com/openshift/cluster-policy-controller/pkg/version
-# github.com/openshift/library-go v0.0.0-20241001171606-756adf2188fc
+# github.com/openshift/library-go v0.0.0-20241004114639-65e0327e56bc
 ## explicit; go 1.22.0
 github.com/openshift/library-go/pkg/apiserver/admission/admissionrestconfig
 github.com/openshift/library-go/pkg/apiserver/admission/admissiontimeout
@@ -1986,7 +1986,7 @@ k8s.io/component-helpers/scheduling/corev1
 k8s.io/component-helpers/scheduling/corev1/nodeaffinity
 k8s.io/component-helpers/storage/ephemeral
 k8s.io/component-helpers/storage/volume
-# k8s.io/controller-manager v0.30.1 => github.com/openshift/kubernetes/staging/src/k8s.io/controller-manager v0.0.0-20241003222616-8540bd493e8a
+# k8s.io/controller-manager v0.31.1 => github.com/openshift/kubernetes/staging/src/k8s.io/controller-manager v0.0.0-20241003222616-8540bd493e8a
 ## explicit; go 1.22.0
 k8s.io/controller-manager/app
 k8s.io/controller-manager/config
@@ -3007,7 +3007,7 @@ k8s.io/metrics/pkg/client/external_metrics
 # k8s.io/mount-utils v0.0.0 => github.com/openshift/kubernetes/staging/src/k8s.io/mount-utils v0.0.0-20241003222616-8540bd493e8a
 ## explicit; go 1.22.0
 k8s.io/mount-utils
-# k8s.io/pod-security-admission v0.30.1 => github.com/openshift/kubernetes/staging/src/k8s.io/pod-security-admission v0.0.0-20241003222616-8540bd493e8a
+# k8s.io/pod-security-admission v0.31.1 => github.com/openshift/kubernetes/staging/src/k8s.io/pod-security-admission v0.0.0-20241003222616-8540bd493e8a
 ## explicit; go 1.22.0
 k8s.io/pod-security-admission/admission
 k8s.io/pod-security-admission/admission/api
