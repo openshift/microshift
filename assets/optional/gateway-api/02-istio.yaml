@@ -1,0 +1,18 @@
+apiVersion: sailoperator.io/v1alpha1
+kind: Istio
+metadata:
+  name: openshift-gateway-api
+spec:
+  version: latest
+  namespace: openshift-gateway-api
+  values:
+    pilot:
+      resources:
+        requests:
+          cpu: 50m
+          memory: 100Mi
+      env:
+        PILOT_ENABLE_GATEWAY_CONTROLLER_MODE: "true"
+        PILOT_GATEWAY_API_CONTROLLER_NAME: "openshift.io/gateway-controller"
+        PILOT_GATEWAY_API_DEFAULT_GATEWAYCLASS: "openshift-default"
+        PILOT_ENABLE_GATEWAY_API_GATEWAYCLASS_CONTROLLER: "true"

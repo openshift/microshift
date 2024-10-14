@@ -1,0 +1,32 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - 00-extensions.istio.io_wasmplugins.yaml
+  - 00-gateway.networking.k8s.io_crds.yaml
+  - 00-networking.istio.io_destinationrules.yaml
+  - 00-networking.istio.io_envoyfilters.yaml
+  - 00-networking.istio.io_gateways.yaml
+  - 00-networking.istio.io_proxyconfigs.yaml
+  - 00-networking.istio.io_serviceentries.yaml
+  - 00-networking.istio.io_sidecars.yaml
+  - 00-networking.istio.io_virtualservices.yaml
+  - 00-networking.istio.io_workloadentries.yaml
+  - 00-networking.istio.io_workloadgroups.yaml
+  - 00-sailoperator.io_istiocnis.yaml
+  - 00-sailoperator.io_istiorevisions.yaml
+  - 00-sailoperator.io_istios.yaml
+  - 00-sailoperator.io_remoteistios.yaml
+  - 00-security.istio.io_authorizationpolicies.yaml
+  - 00-security.istio.io_peerauthentications.yaml
+  - 00-security.istio.io_requestauthentications.yaml
+  - 00-telemetry.istio.io_telemetries.yaml
+  - 00-openshift_gateway_api_namespace.yaml
+  - 01-servicemesh-operator3_apps_v1_deployment.yaml
+  - 01-servicemesh-operator3-metrics-service_v1_service.yaml
+  - 01-servicemesh-operator3_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml
+  - 01-servicemesh-operator3_rbac.authorization.k8s.io_v1_clusterrole.yaml
+  - 01-servicemesh-operator3_rbac.authorization.k8s.io_v1_rolebinding.yaml
+  - 01-servicemesh-operator3_rbac.authorization.k8s.io_v1_role.yaml
+  - 01-servicemesh-operator3_v1_serviceaccount.yaml
+  - 02-gatewayclass.yaml
+  - 02-istio.yaml

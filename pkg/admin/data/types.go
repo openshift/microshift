@@ -16,7 +16,7 @@ type StoragePath string
 type BackupName string
 
 type Manager interface {
-	Backup(BackupName) error
+	Backup(BackupName) (string, error)
 	Restore(BackupName) error
 
 	BackupExists(BackupName) (bool, error)

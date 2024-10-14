@@ -60,7 +60,7 @@ func getDeploymentsFromOSTree() ([]deployment, error) {
 	return status.Deployments, nil
 }
 
-func getCurrentDeploymentID() (string, error) {
+func GetCurrentDeploymentID() (string, error) {
 	deployments, err := getDeploymentsFromOSTree()
 	if err != nil {
 		return "", fmt.Errorf("failed to get deployments: %w", err)

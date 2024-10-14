@@ -620,7 +620,7 @@ func getHostAddresses(ipv4, ipv6 bool) ([]net.IP, error) {
 	addresses := make([]net.IP, 0, len(links)*2)
 	for _, link := range links {
 		// Filter out slave NICs. These include ovs/ovn created interfaces, in case of a restart.
-		if link.Attrs().ParentIndex != 0 || link.Attrs().MasterIndex != 0 {
+		if link.Attrs().MasterIndex != 0 {
 			continue
 		}
 		addressList, err := handle.AddrList(link, family)

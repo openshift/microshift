@@ -125,7 +125,7 @@ cd "${ROOTDIR}/test/"
 source "${SCRIPTDIR}/common.sh"
 
 # Re-build from source.
-$(dry_run) bash -x ./bin/build_rpms.sh
+$(dry_run) env WITH_FLANNEL=1 bash -x ./bin/build_rpms.sh
 
 if ${COMPOSER_CLI_BUILDS} ; then
     # Determine and create the ideal number of workers
