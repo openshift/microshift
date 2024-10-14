@@ -12,8 +12,8 @@ Test Tags           ostree
 
 
 *** Variables ***
-${TARGET_REF}        ${EMPTY}
-${BOOTC_REGISTRY}    ${EMPTY}
+${TARGET_REF}           ${EMPTY}
+${BOOTC_REGISTRY}       ${EMPTY}
 
 
 *** Test Cases ***
