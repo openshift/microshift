@@ -68,6 +68,10 @@ assets:
         ignore: "Provided by MicroShift"
       - file: 02-istio.yaml
         ignore: "Provided by MicroShift"
-      #TODO
+      # Kustomize files
       - file: kustomization.yaml
+        ignore: "Provided by MicroShift"
+      - file: kustomization.x86_64.yaml
+        ignore: "Provided by MicroShift"
+      - file: kustomization.aarch64.yaml
         ignore: "Provided by MicroShift"
