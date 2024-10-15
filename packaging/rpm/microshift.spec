@@ -457,7 +457,7 @@ install -p -m755 packaging/tuned/microshift-tuned.py %{buildroot}%{_bindir}/micr
 install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/000-microshift-gateway-api
 install -p -m644 assets/optional/gateway-api/0* %{buildroot}/%{_prefix}/lib/microshift/manifests.d/000-microshift-gateway-api
 install -p -m644 assets/optional/gateway-api/kustomization.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/000-microshift-gateway-api
-#install -p -m755 packaging/greenboot/microshift-running-check-multus.sh %{buildroot}%{_sysconfdir}/greenboot/check/required.d/41_microshift_running_check_multus.sh
+install -p -m755 packaging/greenboot/microshift-running-check-gateway-api.sh %{buildroot}%{_sysconfdir}/greenboot/check/required.d/41_microshift_running_check_gateway_api.sh
 
 %ifarch %{arm} aarch64
 cat assets/optional/gateway-api/kustomization.aarch64.yaml >> %{buildroot}/%{_prefix}/lib/microshift/manifests.d/000-microshift-gateway-api/kustomization.yaml
@@ -622,7 +622,7 @@ fi
 %files gateway-api
 %dir %{_prefix}/lib/microshift/manifests.d/000-microshift-gateway-api
 %{_prefix}/lib/microshift/manifests.d/000-microshift-gateway-api/*
-#%{_sysconfdir}/greenboot/check/required.d/41_microshift_running_check_multus.sh
+%{_sysconfdir}/greenboot/check/required.d/41_microshift_running_check_gateway_api.sh
 
 
 # Use Git command to generate the log and replace the VERSION string
