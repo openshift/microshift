@@ -7,6 +7,7 @@ Resource            ../../resources/common.resource
 Resource            ../../resources/systemd.resource
 Resource            ../../resources/microshift-config.resource
 Resource            ../../resources/microshift-process.resource
+Resource            ../../resources/ostree-health.resource
 
 Suite Setup         Setup Suite
 Suite Teardown      Teardown Suite
@@ -267,8 +268,7 @@ Restore Default Config
     ${is_ostree}=    Is System OSTree
     IF    ${is_ostree}
         Reboot MicroShift Host
-        Wait For Greenboot Health Check To Exit
-        Wait For MicroShift
+        Wait Until Greenboot Health Check Exited
     ELSE
         Restart MicroShift
         Sleep    10 seconds    # Wait for systemd to catch up

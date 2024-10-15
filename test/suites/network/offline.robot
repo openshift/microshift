@@ -7,7 +7,6 @@ Library             ../../resources/qemu-guest-agent.py
 Library             ../../resources/DataFormats.py
 Resource            ../../resources/libvirt.resource
 Resource            ../../resources/microshift-config.resource
-Resource            ../../resources/microshift-process.resource
 
 Suite Setup         Setup
 Suite Teardown      Teardown
@@ -173,6 +172,11 @@ Start MicroShift
     ...    Systemctl    enable    microshift.service    --now
     Log Many    ${result["stdout"]}    ${result["stderr"]}
     Should Be Equal As Integers    ${result["rc"]}    0
+
+Wait For Greenboot Health Check To Exit
+    [Documentation]    Wait for the Greenboot Health Check systemd service to exit
+    Wait Until Keyword Succeeds    10m    15s
+    ...    Greenboot Health Check Exited
 
 Greenboot Health Check Exited
     [Documentation]    Check that the Greenboot Health Check systemd service has state "exited"
