@@ -59,6 +59,14 @@ Options:
 EOF
 }
 
+run_aws_cli() {
+    if ! "${AWSCLI}" "$@" ; then
+        echo "ERROR: Failed to run AWS CLI command: $*" >&2
+        return 1
+    fi
+    return 0
+}
+
 check_contents(){
     local -r src_dir="s3://${AWS_BUCKET_NAME}/${BCH_SUBDIR}/${UNAME_M}/${TAG_SUBDIR}"
     local -r must_contain_array=("repo\.tar$" "${VM_POOL_BASENAME}/.*\.iso$")
@@ -91,7 +99,7 @@ action_upload() {
     local -r iso_dest="${dst_base}/${VM_POOL_BASENAME}"
 
     echo "Uploading ${iso_size} of ISO images to '${iso_dest}'"
-    "${AWSCLI}" s3 sync --quiet --include '*.iso' "${iso_base}" "${iso_dest}"
+    run_aws_cli s3 sync --quiet --include '*.iso' "${iso_base}" "${iso_dest}"
 
     # Upload ostree commits
     local -r repo_src="${src_base}/repo.tar"
@@ -103,7 +111,7 @@ action_upload() {
 
     local -r repo_size="$(du -csh "${repo_src}" | awk 'END{print $1}')"
     echo "Uploading ${repo_size} of ostree commits to '${repo_dst}'"
-    "${AWSCLI}" s3 cp --quiet "${repo_src}" "${repo_dst}"
+    run_aws_cli s3 cp --quiet "${repo_src}" "${repo_dst}"
     rm -f "${repo_src}"
 }
 
@@ -116,7 +124,7 @@ action_download() {
     local -r iso_dest="${dst_base}/${VM_POOL_BASENAME}"
 
     echo "Downloading ISO images from '${iso_base}'"
-    "${AWSCLI}" s3 sync --quiet --include '*.iso' "${iso_base}" "${iso_dest}"
+    run_aws_cli s3 sync --quiet --include '*.iso' "${iso_base}" "${iso_dest}"
 
     local -r iso_size="$(du -csh "${iso_dest}" | awk 'END{print $1}')"
     echo "Downloaded ${iso_size} of ISO images"
@@ -128,7 +136,7 @@ action_download() {
 
     echo "Downloading ostree commits from '${repo_src}'"
     rm -f "${repo_dst}"
-    "${AWSCLI}" s3 cp --quiet "${repo_src}" "${repo_dst}"
+    run_aws_cli s3 cp --quiet "${repo_src}" "${repo_dst}"
 
     # Unarchive the repo files after the download
     rm -rf "${repo_dir}"
@@ -160,7 +168,7 @@ action_setlast() {
 
     echo "Updating '${dst_file}' with the '${TAG_SUBDIR}' tag"
     echo -n "${TAG_SUBDIR}" > "${src_file}"
-    "${AWSCLI}" s3 cp --quiet "${src_file}" "${dst_file}"
+    run_aws_cli s3 cp --quiet "${src_file}" "${dst_file}"
     rm -f "${src_file}"
 }
 
@@ -169,7 +177,7 @@ action_getlast() {
     local -r dst_file="$(mktemp /tmp/getlast.XXXXXXXX)"
 
     echo "Reading '${src_file}' tag contents"
-    "${AWSCLI}" s3 cp --quiet "${src_file}" "${dst_file}" || true
+    run_aws_cli s3 cp --quiet "${src_file}" "${dst_file}" || true
     if [ -s "${dst_file}" ] ; then
         echo "LAST: $(cat "${dst_file}")"
     else
@@ -183,7 +191,7 @@ action_keep() {
     # Get the last contents with the ${TAG_SUBDIR} default
     local -r last_dir="$(action_getlast | awk '/LAST:/ {print $NF}')"
 
-    for sub_dir in $("${AWSCLI}" s3 ls "${top_dir}/" | awk '{print $NF}'); do
+    for sub_dir in $(run_aws_cli s3 ls "${top_dir}/" | awk '{print $NF}'); do
         if [ "${sub_dir}" = "last" ] ; then
             continue
         fi
@@ -193,7 +201,7 @@ action_keep() {
         fi
 
         echo "Deleting '${sub_dir}' sub-directory"
-        "${AWSCLI}" s3 rm --recursive "${top_dir}/${sub_dir}"
+        run_aws_cli s3 rm --recursive "${top_dir}/${sub_dir}"
     done
 }
 
@@ -240,7 +248,7 @@ if [ ! -e "${AWSCLI}" ] ; then
 fi
 
 # Verify the bucket can be accessed
-if ! "${AWSCLI}" s3 ls "${AWS_BUCKET_NAME}" &>/dev/null ; then
+if ! run_aws_cli s3 ls "${AWS_BUCKET_NAME}" &>/dev/null ; then
     echo "ERROR: Cannot access the '${AWS_BUCKET_NAME}' AWS bucket"
     exit 1
 fi
