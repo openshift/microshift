@@ -105,10 +105,10 @@ gettool_kuttl() {
 }
 
 gettool_yq() {
-    local ver="4.26.1"
+    local ver="4.44.2"
     declare -A checksums=(
-        ["x86_64"]="4d3afe5ddf170ac7e70f4c23eea2969eca357947b56d5d96b8516bdf9ce56577"
-        ["aarch64"]="837a659c5a04599f3ee7300b85bf6ccabdfd7ce39f5222de27281e0ea5bcc477")
+        ["x86_64"]="e4c2570249e3993e33ffa44e592b5eee8545bd807bfbeb596c2986d86cb6c85c"
+        ["aarch64"]="79c22d98b2ff517cb8b1c20499350cbc1e8c753483c8f72a37a299e6e9872a98")
 
     declare -A arch_map=(
         ["x86_64"]="amd64"
