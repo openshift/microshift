@@ -1,0 +1,11 @@
+- oc image-amd64 3692450b96d57ae3870e5f693e833a0701d0e2b0 to f1d465eaae8e4a3facc0a51b5190ff6047dad4a0
+  - 39d7603f 2024-10-14T13:02:35+03:00 Remove redundant defaulting message in description
+
+- oc image-arm64 3692450b96d57ae3870e5f693e833a0701d0e2b0 to 2f7484ac8ab99e3915df8cffda21a8d4b3205195
+  - 2f858b85 2024-10-15T10:58:38+03:00 Do not allow new line in user in create user
+  - 39d7603f 2024-10-14T13:02:35+03:00 Remove redundant defaulting message in description
+
+- kubernetes image-arm64 8540bd493e8a42ffb61a3f470f71290488332b1c to 6c76c890616c214538d2b5d664ccfcb4f5e460bd
+  - b993f1482 2024-10-15T06:22:41-04:00 UPSTREAM: <carry>: Revert "Merge pull request #2067 from sanchezl/decprecated"
+  - 205c34a6a 2024-10-03T12:31:49-04:00 UPSTREAM: <carry>: log only deprecated api requests
+
