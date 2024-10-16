@@ -1,7 +1,7 @@
 FROM localhost/rhel94-test-agent:latest
 
 # Copy repository configuration
-COPY ./bootc-images/microshift-fast-datapath-rhel9.repo ./bootc-images/microshift-prel.repo ./bootc-images/microshift-rhocp-y1.repo\
+COPY ./bootc-images/microshift-fast-datapath-rhel9.repo ./bootc-images/microshift-prel.repo ./bootc-images/microshift-rhocp-y1.repo \
     /etc/yum.repos.d/
 
 # Print repository configuration contents.
