@@ -1,0 +1,3 @@
+- kubernetes image-arm64 9f6734309b7466648dcdca0d43223368ff840ae6 to 6816ea6a977365195404d43756efd1c42ac0b2a7
+  - 5cfe93b58 2024-10-11T10:57:02-03:00 Revert "OCPBUGS-42640: Revert #2089 "OCPBUGS-42167: Bump k8s api to 1.30.5""
+
