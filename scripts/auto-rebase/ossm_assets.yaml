@@ -4,6 +4,62 @@ assets:
     src: ossm/amd64/
     no_clean: True
     files:
+      # CRDs
+      - file: 00-extensions.istio.io_wasmplugins.yaml
+        src: extensions.istio.io_wasmplugins.yaml
+      - file: 00-gateway.networking.k8s.io_crds.yaml
+        src: gateway.networking.k8s.io_crds.yaml
+      - file: 00-metrics-reader_rbac.authorization.k8s.io_v1_clusterrole.yaml
+        src: metrics-reader_rbac.authorization.k8s.io_v1_clusterrole.yaml
+      - file: 00-networking.istio.io_destinationrules.yaml
+        src: networking.istio.io_destinationrules.yaml
+      - file: 00-networking.istio.io_envoyfilters.yaml
+        src: networking.istio.io_envoyfilters.yaml
+      - file: 00-networking.istio.io_gateways.yaml
+        src: networking.istio.io_gateways.yaml
+      - file: 00-networking.istio.io_proxyconfigs.yaml
+        src: networking.istio.io_proxyconfigs.yaml
+      - file: 00-networking.istio.io_serviceentries.yaml
+        src: networking.istio.io_serviceentries.yaml
+      - file: 00-networking.istio.io_sidecars.yaml
+        src: networking.istio.io_sidecars.yaml
+      - file: 00-networking.istio.io_virtualservices.yaml
+        src: networking.istio.io_virtualservices.yaml
+      - file: 00-networking.istio.io_workloadentries.yaml
+        src: networking.istio.io_workloadentries.yaml
+      - file: 00-networking.istio.io_workloadgroups.yaml
+        src: networking.istio.io_workloadgroups.yaml
+      - file: 00-sailoperator.io_istiocnis.yaml
+        src: sailoperator.io_istiocnis.yaml
+      - file: 00-sailoperator.io_istiorevisions.yaml
+        src: sailoperator.io_istiorevisions.yaml
+      - file: 00-sailoperator.io_istios.yaml
+        src: sailoperator.io_istios.yaml
+      - file: 00-sailoperator.io_remoteistios.yaml
+        src: sailoperator.io_remoteistios.yaml
+      - file: 00-security.istio.io_authorizationpolicies.yaml
+        src: security.istio.io_authorizationpolicies.yaml
+      - file: 00-security.istio.io_peerauthentications.yaml
+        src: security.istio.io_peerauthentications.yaml
+      - file: 00-security.istio.io_requestauthentications.yaml
+        src: security.istio.io_requestauthentications.yaml
+      - file: 00-telemetry.istio.io_telemetries.yaml
+        src: telemetry.istio.io_telemetries.yaml
+      # Extracted from CSV
+      - file: 01-servicemesh-operator3-metrics-service_v1_service.yaml
+        src: servicemesh-operator3-metrics-service_v1_service.yaml
+      - file: 01-servicemesh-operator3_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml
+        src: servicemesh-operator3_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml
+      - file: 01-servicemesh-operator3_rbac.authorization.k8s.io_v1_clusterrole.yaml
+        src: servicemesh-operator3_rbac.authorization.k8s.io_v1_clusterrole.yaml
+      - file: 01-servicemesh-operator3_rbac.authorization.k8s.io_v1_rolebinding.yaml
+        src: servicemesh-operator3_rbac.authorization.k8s.io_v1_rolebinding.yaml
+      - file: 01-servicemesh-operator3_rbac.authorization.k8s.io_v1_role.yaml
+        src: servicemesh-operator3_rbac.authorization.k8s.io_v1_role.yaml
+      - file: 01-servicemesh-operator3_v1_serviceaccount.yaml
+        src: servicemesh-operator3_v1_serviceaccount.yaml
+      - file: 03-servicemesh-operator3_apps_v1_deployment.yaml
+        src: servicemesh-operator3_apps_v1_deployment.yaml
       # Manual Namespace instead of OLM one
       - file: 00-openshift_gateway_api_namespace.yaml
         ignore: "Provided by MicroShift"
@@ -12,6 +68,10 @@ assets:
         ignore: "Provided by MicroShift"
       - file: 02-istio.yaml
         ignore: "Provided by MicroShift"
-      #TODO
+      # Kustomize files
       - file: kustomization.yaml
+        ignore: "Provided by MicroShift"
+      - file: kustomization.x86_64.yaml
+        ignore: "Provided by MicroShift"
+      - file: kustomization.aarch64.yaml
         ignore: "Provided by MicroShift"
