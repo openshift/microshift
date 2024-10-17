@@ -1,3 +1,0 @@
-- cluster-network-operator embedded-component 8f39b8c253667d54b3ab83fb91eb3dbf4e266fd2 to fd6dd92100c00fb7e29213029b37a4e667d3bd7b
-  - 36a956a 2024-10-10T11:40:19+00:00 Configure narrowing=yes for IPsec connections
-
