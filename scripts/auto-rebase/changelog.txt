@@ -1,11 +1,38 @@
-- oc image-amd64 3692450b96d57ae3870e5f693e833a0701d0e2b0 to f1d465eaae8e4a3facc0a51b5190ff6047dad4a0
-  - 39d7603f 2024-10-14T13:02:35+03:00 Remove redundant defaulting message in description
+- api embedded-component a1523024209f3122be9e9d53515da470c6a2458b to 5afd6c371db482cf923b80bd13935c2830a0f357
+  - 3a1fc44 2024-10-15T12:37:41+01:00 Update crd-schema-checker dependency
+  - f199b1f 2024-10-14T18:17:45+01:00 Ensure custom feature gate mainfest path is passed into generator
 
-- oc image-arm64 3692450b96d57ae3870e5f693e833a0701d0e2b0 to 2f7484ac8ab99e3915df8cffda21a8d4b3205195
-  - 2f858b85 2024-10-15T10:58:38+03:00 Do not allow new line in user in create user
-  - 39d7603f 2024-10-14T13:02:35+03:00 Remove redundant defaulting message in description
+- cluster-network-operator embedded-component 246c417e9a27f60ffe895e559fd677dc51d62bb9 to 87cc46c73c3a8ef9b05a5b3d15f11a3262c6ee8a
+  - 53e0ae7 2024-10-02T14:10:10+02:00 multi-networkpolicy: Enable for `ipvlan` and `bond` networkds
+  - 435c2ab 2024-09-16T10:24:35+02:00 Enable ovn-k observability when feature gate is enabled. Config option should only be passed to ovnkube-controller. Add getDefaultFeatureGates function to simplify default feature gate setup.
 
-- kubernetes image-arm64 8540bd493e8a42ffb61a3f470f71290488332b1c to 6c76c890616c214538d2b5d664ccfcb4f5e460bd
+- kubernetes embedded-component 8540bd493e8a42ffb61a3f470f71290488332b1c to 6c76c890616c214538d2b5d664ccfcb4f5e460bd
   - b993f1482 2024-10-15T06:22:41-04:00 UPSTREAM: <carry>: Revert "Merge pull request #2067 from sanchezl/decprecated"
   - 205c34a6a 2024-10-03T12:31:49-04:00 UPSTREAM: <carry>: log only deprecated api requests
+
+- machine-config-operator embedded-component adb91c6de5d1f8a23aeacdd92bc8451fdd974247 to ab0cc456a483ad580ba3540a0e66070e9c119322
+  - f871de1b 2024-10-14T13:58:31-04:00 ignore pods in pending phase and set observed generation on MachineOSConfigs
+  - 05f0c59f 2024-10-14T12:39:57-05:00 remove dra manager state
+  - 250d61ab 2024-10-02T10:54:26-04:00 go formatted the pkg/daemon/update.go file
+  - 8ed4eb6c 2024-09-30T10:49:08-04:00 Add sysstat extension support
+
+- openshift-controller-manager embedded-component 528c32ccf4f82560716b34110b8ebdab2acafab8 to 2f2edc7e894208b6f209654a0453bb541971b8d9
+  - 5d93307 2024-10-08T16:26:13+02:00 cleanup root and app OWNERS
+  - 03556ab 2024-10-01T16:23:04-04:00 skip unnecessary apply calls
+
+- oc image-amd64 f1d465eaae8e4a3facc0a51b5190ff6047dad4a0 to 2f7484ac8ab99e3915df8cffda21a8d4b3205195
+  - 2f858b85 2024-10-15T10:58:38+03:00 Do not allow new line in user in create user
+
+- router image-amd64 72114ea78be0a032d5cdddcad694e0a352a00e93 to ddb03a6aec569be5388a0adc789c0d556f5b6df6
+  - bbb2ab7 2024-09-05T23:23:24+00:00 Updating openshift-enterprise-haproxy-router-container image to be consistent with ART for 4.18 Reconciling with https://github.com/openshift/ocp-build-data/tree/827ab4ccce9cbbcf82c9dbaf6398b61d6cff8d7a/images/openshift-enterprise-haproxy-router.yml
+
+- kubernetes image-amd64 8540bd493e8a42ffb61a3f470f71290488332b1c to 6c76c890616c214538d2b5d664ccfcb4f5e460bd
+  - b993f1482 2024-10-15T06:22:41-04:00 UPSTREAM: <carry>: Revert "Merge pull request #2067 from sanchezl/decprecated"
+  - 205c34a6a 2024-10-03T12:31:49-04:00 UPSTREAM: <carry>: log only deprecated api requests
+
+- router image-arm64 72114ea78be0a032d5cdddcad694e0a352a00e93 to ddb03a6aec569be5388a0adc789c0d556f5b6df6
+  - bbb2ab7 2024-09-05T23:23:24+00:00 Updating openshift-enterprise-haproxy-router-container image to be consistent with ART for 4.18 Reconciling with https://github.com/openshift/ocp-build-data/tree/827ab4ccce9cbbcf82c9dbaf6398b61d6cff8d7a/images/openshift-enterprise-haproxy-router.yml
+
+- kubernetes image-arm64 6c76c890616c214538d2b5d664ccfcb4f5e460bd to 81c1851c0291160c33b40bc22f031293ef756879
+  - c8fb14931 2024-10-16T15:13:23+03:00 UPSTREAM: <carry>: Add OpenShift tooling, images, configs and docs
 
