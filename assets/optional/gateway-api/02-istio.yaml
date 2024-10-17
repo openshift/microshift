@@ -3,7 +3,7 @@ kind: Istio
 metadata:
   name: openshift-gateway-api
 spec:
-  version: latest
+  version: v1.23.0
   namespace: openshift-gateway-api
   values:
     pilot:
