@@ -1,0 +1,9 @@
+[Unit]
+Description=MICROSHIFT AUTO RECOVERY
+
+[Service]
+Type=oneshot
+ExecStart=/var/opt/microshift-auto-recovery
+
+[Install]
+WantedBy=multi-user.target
