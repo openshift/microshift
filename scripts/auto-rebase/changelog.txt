@@ -1,3 +1,14 @@
-- kubernetes image-arm64 9f6734309b7466648dcdca0d43223368ff840ae6 to 6816ea6a977365195404d43756efd1c42ac0b2a7
+- kubernetes embedded-component 9f6734309b7466648dcdca0d43223368ff840ae6 to 6816ea6a977365195404d43756efd1c42ac0b2a7
   - 5cfe93b58 2024-10-11T10:57:02-03:00 Revert "OCPBUGS-42640: Revert #2089 "OCPBUGS-42167: Bump k8s api to 1.30.5""
+
+- oc image-amd64 9566b8ef96e5ba67995e97b96529ef4d42516162 to 6bf65cc6db4685b4b299e85d71d43d74ce826478
+  - 6a631a77 2024-09-19T02:08:02+00:00 Rename rsync'd ISO file to -output-name value
+  - 3a6b0c2d 2024-09-19T02:08:02+00:00 OCPBUGS-38450: Fix copy artifacts for all CPU architectures
+
+- kubernetes image-amd64 9f6734309b7466648dcdca0d43223368ff840ae6 to 6816ea6a977365195404d43756efd1c42ac0b2a7
+  - 5cfe93b58 2024-10-11T10:57:02-03:00 Revert "OCPBUGS-42640: Revert #2089 "OCPBUGS-42167: Bump k8s api to 1.30.5""
+
+- oc image-arm64 9566b8ef96e5ba67995e97b96529ef4d42516162 to 6bf65cc6db4685b4b299e85d71d43d74ce826478
+  - 6a631a77 2024-09-19T02:08:02+00:00 Rename rsync'd ISO file to -output-name value
+  - 3a6b0c2d 2024-09-19T02:08:02+00:00 OCPBUGS-38450: Fix copy artifacts for all CPU architectures
 
