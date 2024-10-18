@@ -7,8 +7,7 @@ check_gpg = true
 check_ssl = true
 system = false
 rhsm = true
-{{- end -}}
-{{- if env.Getenv "RHOCP_MINOR_Y_BETA" "" -}}
+{{- else if env.Getenv "RHOCP_MINOR_Y_BETA" "" -}}
 id = "rhocp-y"
 name = "rhocp BETA"
 type = "yum-baseurl"
