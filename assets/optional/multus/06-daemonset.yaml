@@ -38,6 +38,7 @@ spec:
         args:
           - >
             /entrypoint/cnibincopy.sh;
+        terminationMessagePolicy: FallbackToLogsOnError
         volumeMounts:
         - name: cnibin
           mountPath: /host/run/cni/bin
@@ -94,6 +95,7 @@ spec:
               - >
                 rm -vf /host/etc/cni/net.d/00-multus.conf* > /proc/1/fd/1 2>&1;
                 rm -vfr /host/etc/cni/net.d/multus.d > /proc/1/fd/1 2>&1;
+        terminationMessagePolicy: FallbackToLogsOnError
         volumeMounts:
         - mountPath: /entrypoint
           name: cni-binary-copy
