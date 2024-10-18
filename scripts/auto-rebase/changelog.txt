@@ -1,14 +1,9 @@
-- kubernetes embedded-component 9f6734309b7466648dcdca0d43223368ff840ae6 to 6816ea6a977365195404d43756efd1c42ac0b2a7
-  - 5cfe93b58 2024-10-11T10:57:02-03:00 Revert "OCPBUGS-42640: Revert #2089 "OCPBUGS-42167: Bump k8s api to 1.30.5""
+- cluster-network-operator embedded-component d9862a44d80e960ae5b3638a081b41671919b6c6 to 98d46b836db10814440a2646814e38c30acc5f30
+  - 5d133f9 2024-10-14T14:59:28+00:00 Use CNIConfDir for mounting directory to ovn-ipsec-host pod
 
-- oc image-amd64 9566b8ef96e5ba67995e97b96529ef4d42516162 to 6bf65cc6db4685b4b299e85d71d43d74ce826478
-  - 6a631a77 2024-09-19T02:08:02+00:00 Rename rsync'd ISO file to -output-name value
-  - 3a6b0c2d 2024-09-19T02:08:02+00:00 OCPBUGS-38450: Fix copy artifacts for all CPU architectures
+- oc image-amd64 6bf65cc6db4685b4b299e85d71d43d74ce826478 to 897ef0bc49fb17db0896ce481ec8243894410b3d
+  - f10e4abf 2024-09-12T13:41:45-07:00 vendor: Update openshift/api to pick up the v4.17 capability set
 
-- kubernetes image-amd64 9f6734309b7466648dcdca0d43223368ff840ae6 to 6816ea6a977365195404d43756efd1c42ac0b2a7
-  - 5cfe93b58 2024-10-11T10:57:02-03:00 Revert "OCPBUGS-42640: Revert #2089 "OCPBUGS-42167: Bump k8s api to 1.30.5""
-
-- oc image-arm64 9566b8ef96e5ba67995e97b96529ef4d42516162 to 6bf65cc6db4685b4b299e85d71d43d74ce826478
-  - 6a631a77 2024-09-19T02:08:02+00:00 Rename rsync'd ISO file to -output-name value
-  - 3a6b0c2d 2024-09-19T02:08:02+00:00 OCPBUGS-38450: Fix copy artifacts for all CPU architectures
+- oc image-arm64 6bf65cc6db4685b4b299e85d71d43d74ce826478 to 897ef0bc49fb17db0896ce481ec8243894410b3d
+  - f10e4abf 2024-09-12T13:41:45-07:00 vendor: Update openshift/api to pick up the v4.17 capability set
 
