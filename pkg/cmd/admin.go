@@ -201,7 +201,7 @@ created using the naming scheme compatible with "restore --auto-recovery"`)
 
 func NewRestoreCommand() *cobra.Command {
 	autorec := false
-	saveFailed := false
+	dontSaveFailed := false
 
 	cmd := &cobra.Command{
 		Use:               "restore PATH",
@@ -211,7 +211,7 @@ func NewRestoreCommand() *cobra.Command {
 
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if autorec {
-				acManager, err := autorecovery.NewManager(data.StoragePath(args[0]), saveFailed)
+				acManager, err := autorecovery.NewManager(data.StoragePath(args[0]), !dontSaveFailed)
 				if err != nil {
 					return err
 				}
@@ -234,9 +234,9 @@ func NewRestoreCommand() *cobra.Command {
 The PATH argument will be treated as a directory where backups are
 created with "backup --auto-recovery" command.`)
 
-	cmd.Flags().BoolVar(&saveFailed, "save-failed", false,
+	cmd.Flags().BoolVar(&dontSaveFailed, "dont-save-failed", false,
 		`Only applicable if --auto-recovery is also specified.
-It set, a copy of MicroShift data directory will be made inside
+Don't make a copy of MicroShift data directory inside
 "failed" subdirectory for later analysis.`)
 
 	return cmd

@@ -43,7 +43,7 @@ Restore Fails When There Are No Suitable Backups
         Command Should Work    sudo mv ${backup_path} ${new_path}
         Sleep    2s
     END
-    Command Should Fail    microshift restore --auto-recovery ${WORKDIR}
+    Command Should Fail    microshift restore --dont-save-failed --auto-recovery ${WORKDIR}
 
     [Teardown]    Command Should Work    rm -rf ${WORKDIR}
 
@@ -59,10 +59,10 @@ Restore Selects Right Backup
     ${new_path}=    Set Variable    ${{ "${last_backup}[:-1]" + str(int("${last_backup}[-1]")+1) }}
     Command Should Work    sudo mv ${last_backup} ${new_path}
 
-    Command Should Work    microshift restore --auto-recovery ${WORKDIR}
+    Command Should Work    microshift restore --dont-save-failed --auto-recovery ${WORKDIR}
     ${backup_marker}=    Command Should Work    cat /var/lib/microshift/marker
     Should Be Equal As Numbers    ${backup_marker}    2
-    Command Should Work    microshift restore --auto-recovery ${WORKDIR}
+    Command Should Work    microshift restore --dont-save-failed --auto-recovery ${WORKDIR}
 
     [Teardown]    Run Keywords
     ...    Command Should Work    rm -rf ${WORKDIR}
@@ -77,19 +77,19 @@ Previously Restored Backup Is Moved To Special Subdirectory
     ${expected_path}=    Set Variable
     ...    ${{ "/".join( "${last_backup}".split("/")[:-1] + ["restored"] + [ "${last_backup}".split("/")[-1] ] ) }}
     Log    ${expected_path}
-    Command Should Work    microshift restore --auto-recovery ${WORKDIR}
+    Command Should Work    microshift restore --dont-save-failed --auto-recovery ${WORKDIR}
     # On second restore, previously restored backup ^ is moved into restored/ subdir.
-    Command Should Work    microshift restore --auto-recovery ${WORKDIR}
+    Command Should Work    microshift restore --dont-save-failed --auto-recovery ${WORKDIR}
     Command Should Work    ls ${expected_path}
 
     [Teardown]    Command Should Work    rm -rf ${WORKDIR}
 
 MicroShift Data Is Backed Up For Later Analysis
-    [Documentation]    When --save-failed option is given, MicroShift data
-    ...    should be copied to a "failed" subdirectory for later analysis.
+    [Documentation]    By default, MicroShift data should be copied
+    ...    to a "failed" subdirectory for later analysis.
 
     ${last_backup}=    Create Backups    1
-    Command Should Work    microshift restore --save-failed --auto-recovery ${WORKDIR}
+    Command Should Work    microshift restore --auto-recovery ${WORKDIR}
     ${data_backup}=    Command Should Work    ls ${WORKDIR}/failed
     Verify Backup Name    ${data_backup}
 
@@ -101,7 +101,7 @@ State File Is Created
     ${last_backup}=    Create Backups    1
     ${backup_name}=    Remove String    ${last_backup}    ${WORKDIR}
 
-    Command Should Work    microshift restore --auto-recovery ${WORKDIR}
+    Command Should Work    microshift restore --dont-save-failed --auto-recovery ${WORKDIR}
     ${state_json}=    Command Should Work    cat ${WORKDIR}/state.json
     ${state}=    Json Parse    ${state_json}
     Should Be Equal As Strings    ${backup_name}    ${state}[LastBackup]
