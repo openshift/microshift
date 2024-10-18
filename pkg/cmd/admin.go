@@ -234,9 +234,9 @@ func NewRestoreCommand() *cobra.Command {
 The PATH argument will be treated as a directory where backups are
 created with "backup --auto-recovery" command.`)
 
-	cmd.Flags().BoolVar(&saveFailed, "save-failed", false,
+	cmd.Flags().BoolVar(&saveFailed, "save-failed", true,
 		`Only applicable if --auto-recovery is also specified.
-It set, a copy of MicroShift data directory will be made inside
+If true (default), a copy of MicroShift data directory will be made inside
 "failed" subdirectory for later analysis.`)
 
 	return cmd
