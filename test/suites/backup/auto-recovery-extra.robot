@@ -3,6 +3,7 @@ Documentation       Extended tests related to auto-recovery functionality
 
 Resource            ../../resources/microshift-host.resource
 Resource            ../../resources/microshift-process.resource
+Resource            ../../resources/ostree-health.resource
 Library             Collections
 Library             DateTime
 Library             ../../resources/libostree.py
@@ -37,6 +38,33 @@ Using Systemd Dropin To React On Failure Of MicroShift
     ...    Restore Safety Backup
     ...    AND
     ...    Clean Up MicroShift Auto Recovery Unit
+    ...    AND
+    ...    Command Should Work    rm -rf ${WORKDIR}
+
+Auto Recovery On Red Boot
+    [Documentation]    Verify greenboot integration to start auto-recovery procedure.
+
+    Greenboot Workaround For Boot Counter
+    Command Should Work    rm -rf ${SAFETY_BACKUP}
+
+    Stop MicroShift
+    Create Safety Backup
+    Create Backup With Marker
+    Set Up Greenboot Red Script
+
+    Corrupt Etcd Database
+    Start MicroShift Expecting Failure
+
+    ${bootid}=    Get Current Boot Id
+    Command Should Fail    systemctl restart greenboot-healthcheck
+    Wait Until Keyword Succeeds    5m    15s
+    ...    System Should Be Rebooted    ${bootid}
+    Wait Until Greenboot Health Check Exited
+
+    [Teardown]    Run Keywords
+    ...    Restore Safety Backup
+    ...    AND
+    ...    Command Should Work    rm -f /etc/greenboot/red.d/100-auto-recovery.sh
     ...    AND
     ...    Command Should Work    rm -rf ${WORKDIR}
 
@@ -128,10 +156,10 @@ Set Up Greenboot Red Script
     [Documentation]    Set up red script that triggers auto-recovery procedure.
     Command Should Work    mkdir -p /etc/greenboot/red.d
     ${drop_in}=    Operating System.Get File    ./assets/auto-recovery/red-script.sh
-    Upload String To File    ${drop_in}    /etc/greenboot/red.d/100-auto-recovery.sh
+    Upload String To File    ${drop_in}    /etc/greenboot/red.d/99-auto-recovery.sh
 
 Greenboot Workaround For Boot Counter
     [Documentation]    If the grub's boot_success is 1, clears boot_counter.
     # Because of greenboot's bug, we need to it here, so the system doesn't reboot after red boot.
     Command Should Work
-    ...    bash -c "grub2-editenv list | grep -q boot_success=1 && /usr/bin/grub2-editenv /boot/grub2/grubenv unset boot_counter"
+    ...    bash -c "grub2-editenv list | grep -q boot_success=1 && /usr/bin/grub2-editenv /boot/grub2/grubenv unset boot_counter || true"
