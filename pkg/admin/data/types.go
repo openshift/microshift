@@ -2,6 +2,7 @@ package data
 
 import (
 	"fmt"
+	"path/filepath"
 )
 
 type EmptyArgErr struct {
@@ -12,8 +13,16 @@ func (e *EmptyArgErr) Error() string {
 	return fmt.Sprintf("empty argument: %s", e.argName)
 }
 
-type StoragePath string
 type BackupName string
+type StoragePath string
+
+func (sp StoragePath) GetBackupPath(backupName BackupName) string {
+	return filepath.Join(string(sp), string(backupName))
+}
+
+func (sp StoragePath) SubStorage(subdir string) StoragePath {
+	return StoragePath(filepath.Join(string(sp), subdir))
+}
 
 type Manager interface {
 	Backup(BackupName) (string, error)
