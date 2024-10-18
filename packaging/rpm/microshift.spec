@@ -201,6 +201,14 @@ Requires: python3-pyyaml
 The microshift-low-latency package provides a baseline configuration prepared for
 running low latency workloads on MicroShift.
 
+%package gateway-api
+Summary: Gateway API for MicroShift
+ExclusiveArch: x86_64 aarch64
+Requires: microshift = %{version}
+
+%description gateway-api
+The microshift-gateway-api package provides the required manifests for the Gateway API to be installed on MicroShift.
+
 %prep
 # Dynamic detection of the available golang version also works for non-RPM golang packages
 golang_detected=$(go version | awk '{print $3}' | tr -d '[a-z]' | cut -f1-2 -d.)
@@ -445,6 +453,19 @@ install -p -m644 packaging/tuned/runtime-class/kustomization.yaml %{buildroot}/%
 install -p -m644 packaging/tuned/microshift-tuned.service %{buildroot}%{_unitdir}/microshift-tuned.service
 install -p -m755 packaging/tuned/microshift-tuned.py %{buildroot}%{_bindir}/microshift-tuned
 
+# gateway-api
+install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/000-microshift-gateway-api
+install -p -m644 assets/optional/gateway-api/0* %{buildroot}/%{_prefix}/lib/microshift/manifests.d/000-microshift-gateway-api
+install -p -m644 assets/optional/gateway-api/kustomization.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/000-microshift-gateway-api
+install -p -m755 packaging/greenboot/microshift-running-check-gateway-api.sh %{buildroot}%{_sysconfdir}/greenboot/check/required.d/41_microshift_running_check_gateway_api.sh
+
+%ifarch %{arm} aarch64
+cat assets/optional/gateway-api/kustomization.aarch64.yaml >> %{buildroot}/%{_prefix}/lib/microshift/manifests.d/000-microshift-gateway-api/kustomization.yaml
+%endif
+%ifarch x86_64
+cat assets/optional/gateway-api/kustomization.x86_64.yaml >> %{buildroot}/%{_prefix}/lib/microshift/manifests.d/000-microshift-gateway-api/kustomization.yaml
+%endif
+
 %pre networking
 
 getent group hugetlbfs >/dev/null || groupadd -r hugetlbfs
@@ -597,6 +618,11 @@ fi
 %{_prefix}/lib/microshift/manifests.d/002-microshift-low-latency/
 %{_unitdir}/microshift-tuned.service
 %{_bindir}/microshift-tuned
+
+%files gateway-api
+%dir %{_prefix}/lib/microshift/manifests.d/000-microshift-gateway-api
+%{_prefix}/lib/microshift/manifests.d/000-microshift-gateway-api/*
+%{_sysconfdir}/greenboot/check/required.d/41_microshift_running_check_gateway_api.sh
 
 
 # Use Git command to generate the log and replace the VERSION string
