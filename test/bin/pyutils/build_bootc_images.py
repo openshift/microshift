@@ -58,18 +58,6 @@ def cleanup_atexit(dry_run):
         common.run_command_in_shell(["sudo", "podman", "stop", cids], dry_run)
 
 
-def should_skip(file):
-    if not os.path.exists(file):
-        return False
-    # Forcing the rebuild if needed
-    if FORCE_REBUILD:
-        common.print_msg(f"Forcing rebuild of '{file}'")
-        return False
-
-    common.print_msg(f"The '{file}' already exists, skipping")
-    return True
-
-
 def find_latest_rpm(repo_path, version=""):
     rpms = glob.glob(f"{repo_path}/**/microshift-release-info-{version}*.rpm", recursive=True)
     if not rpms:
@@ -276,6 +264,16 @@ def process_image_bootc(groupdir, bootcfile, dry_run):
         groupdir, bootcfile, BOOTC_ISO_DIR)
     bf_targetiso = os.path.join(VM_DISK_BASEDIR, f"{bf_outname}.iso")
 
+    def should_skip(file):
+        # Forcing the rebuild if needed
+        if FORCE_REBUILD:
+            common.print_msg(f"Forcing rebuild of '{file}'")
+            return False
+        if not os.path.exists(file):
+            return False
+        common.print_msg(f"The '{file}' already exists, skipping")
+        return True
+
     # Check if the target artifact exists
     if should_skip(bf_targetiso):
         common.record_junit(bf_path, "process-bootc-image", "SKIPPED")
@@ -349,29 +347,43 @@ def process_image_bootc(groupdir, bootcfile, dry_run):
 
 
 def process_container_encapsulate(groupdir, containerfile, dry_run):
-    ce_path, ce_outname, ce_outdir, ce_logfile = get_process_file_names(
+    ce_path, ce_outname, _, ce_logfile = get_process_file_names(
         groupdir, containerfile, BOOTC_IMAGE_DIR)
-    ce_targetimg = os.path.join(ce_outdir, "manifest.json")
-    ce_tagname = "build_image_tag"
-    ce_tagval = f"localhost/{ce_outname}:latest"
+    ce_targetimg = f"{MIRROR_REGISTRY}/{ce_outname}:latest"
+    ce_localimg = f"localhost/{ce_outname}:latest"
 
-    def get_images_by_label():
-        images_args = [
-            "sudo", "podman", "images",
-            "--filter", f"label={ce_tagname}={ce_tagval}",
-            "--format", "{{.ID}}"
+    def ostree_rev_in_registry(ce_imgref):
+        # Forcing the rebuild if needed
+        if FORCE_REBUILD:
+            common.print_msg(f"Forcing rebuild of '{ce_imgref}'")
+            return False
+
+        # Read the commit revision from the ostree repository (must succeed)
+        src_ref_cmd = [
+            "ostree", "rev-parse",
+            "--repo", os.path.join(IMAGEDIR, "repo"),
+            ce_imgref
         ]
-        imgids = common.run_command_in_shell(images_args, dry_run)
-        # Make sure the ids are normalized in a single line
-        return re.sub(r'\s+', ' ', imgids)
+        src_ref = common.run_command_in_shell(src_ref_cmd, dry_run)
+        if not src_ref:
+            raise Exception(f"Failed to find ostree revision with '{ce_imgref}' reference")
 
-    # Check if the target artifact exists
-    if should_skip(ce_targetimg):
-        common.record_junit(ce_path, "process-container-encapsulate", "SKIPPED")
-        return
+        # Read the commit revision from the registry (may fail, no error output)
+        try:
+            dst_ref_cmd = [
+                "skopeo", "inspect",
+                f"docker://{ce_targetimg}",
+                "2>/dev/null", "|",
+                "jq", "-r", "'.Labels[\"ostree.commit\"]'"
+            ]
+            dst_ref = common.run_command_in_shell(dst_ref_cmd, dry_run)
+            if src_ref == dst_ref:
+                common.print_msg(f"The '{ce_targetimg}' already exists, skipping")
+                return True
+        except:
+            None
+        return False
 
-    # Create the output directories
-    os.makedirs(ce_outdir, exist_ok=True)
     # Run template command on the input file
     ce_outfile = os.path.join(BOOTC_IMAGE_DIR, containerfile)
     run_template_cmd(ce_path, ce_outfile, dry_run)
@@ -382,58 +394,32 @@ def process_container_encapsulate(groupdir, containerfile, dry_run):
         with open(ce_logfile, 'w') as logfile:
             # Read the image reference
             ce_imgref = common.read_file(ce_outfile).strip()
+            # Check if the target artifact already exists in registry with
+            # the same ostree commit
+            if ostree_rev_in_registry(ce_imgref):
+                common.record_junit(ce_path, "process-container-encapsulate", "SKIPPED")
+                return
 
-            # Run the container image build command, also adding a label
-            # to the generated image
+            # Run the container image build command
             build_args = [
                 "sudo", "rpm-ostree", "compose",
                 "container-encapsulate",
-                "--label", f"{ce_tagname}={ce_tagval}",
                 "--repo", os.path.join(IMAGEDIR, "repo"),
                 ce_imgref,
-                f"dir:{ce_outdir}"
+                f"registry:{ce_targetimg}"
             ]
             common.retry_on_exception(3, common.run_command_in_shell, build_args, dry_run, logfile, logfile)
             common.record_junit(ce_path, "build-container", "OK")
 
-            # Fix the directory ownership
-            if not dry_run:
-                common.run_command(
-                    ["sudo", "chown", "-R", f"{getpass.getuser()}.", ce_outdir],
-                    dry_run)
-                common.record_junit(ce_path, "chown-container", "OK")
-
-            # Cleanup previously loaded images if any
-            imgids = get_images_by_label()
-            if imgids:
-                clean_args = [
-                    "sudo", "podman",
-                    "rmi", "-f", imgids
-                ]
-                common.run_command_in_shell(clean_args, dry_run, logfile, logfile)
-                common.record_junit(ce_path, "cleanup-image", "OK")
-
-            # Run the container import command, which might be necessary for
-            # subsequent builds that depend on this container image
-            load_args = [
-                "sudo", "podman", "load",
-                "-i", ce_outdir
+            # Copy the image into the local containers storage as it might be
+            # necessary for subsequent builds that depend on this container image
+            copy_args = [
+                "sudo", "skopeo", "copy",
+                f"docker://{ce_targetimg}",
+                f"containers-storage:{ce_localimg}"
             ]
-            common.run_command_in_shell(load_args, dry_run, logfile, logfile)
-            common.record_junit(ce_path, "load-image", "OK")
-
-            # Get the loaded image ID
-            imgid = get_images_by_label()
-            if not imgid and not dry_run:
-                raise Exception(f"Failed to find image ID for {ce_tagname}={ce_tagval} label")
-
-            # Tag the loaded image
-            tag_args = [
-                "sudo", "podman", "tag",
-                imgid, ce_tagval
-            ]
-            common.run_command_in_shell(tag_args, dry_run, logfile, logfile)
-            common.record_junit(ce_path, "tag-image", "OK")
+            common.retry_on_exception(3, common.run_command_in_shell, copy_args, dry_run, logfile, logfile)
+            common.record_junit(ce_path, "copy-image", "OK")
     except Exception:
         common.record_junit(ce_path, "process-container-encapsulate", "FAILED")
         # Propagate the exception to the caller

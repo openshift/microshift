@@ -56,18 +56,11 @@ mirror_images() {
     rm -f "${ofile}"
 }
 
-mirror_bootc_images() {
-    local -r idir=$1
-    "${ROOTDIR}/scripts/image-builder/mirror-images.sh" --dir-to-reg "${PULL_SECRET}" "${idir}" "${REGISTRY_HOST}"
-}
-
 usage() {
     echo ""
     echo "Usage: ${0} [-cf FILE] [-bd DIR]"
     echo "   -cf FILE    File containing the container image references to mirror."
     echo "               Defaults to '${CONTAINER_LIST}', skipped if does not exist."
-    echo "   -bd DIR     Directory containing the bootc containers data to mirror."
-    echo "               Defaults to '${BOOTC_IMAGE_DIR}', skipped if does not exist."
     echo ""
     echo "The registry data is stored at '${MIRROR_REGISTRY_DIR}' on the host."
     exit 1
@@ -77,7 +70,6 @@ usage() {
 # Main
 #
 image_list_file="${CONTAINER_LIST}"
-bootc_image_dir="${BOOTC_IMAGE_DIR}"
 
 while [ $# -gt 0 ]; do
     case $1 in
@@ -85,11 +77,6 @@ while [ $# -gt 0 ]; do
         shift
         [ -z "$1" ] && usage
         image_list_file=$1
-        ;;
-    -bd)
-        shift
-        [ -z "$1" ] && usage
-        bootc_image_dir=$1
         ;;
     *)
         usage
@@ -105,10 +92,4 @@ if [ -f "${image_list_file}" ]; then
     mirror_images "${image_list_file}"
 else
     echo "WARNING: File '${image_list_file}' does not exist, skipping"
-fi
-
-if [ -d "${bootc_image_dir}" ] ; then
-    mirror_bootc_images "${bootc_image_dir}"
-else
-    echo "WARNING: Directory '${bootc_image_dir}' does not exist, skipping"
 fi
