@@ -18,8 +18,6 @@ source "${SCRIPTDIR}/common_versions.sh"
 
 DEFAULT_BOOT_BLUEPRINT="rhel-9.4"
 LVM_SYSROOT_SIZE="10240"
-WEB_SERVER_URL="http://${VM_BRIDGE_IP}:${WEB_SERVER_PORT}"
-BOOTC_REGISTRY_URL="${VM_BRIDGE_IP}:5000"
 PULL_SECRET="${PULL_SECRET:-${HOME}/.pull-secret.json}"
 PULL_SECRET_CONTENT="$(jq -c . "${PULL_SECRET}")"
 VM_BOOT_TIMEOUT=1200 # Overall total boot times are around 15m
@@ -273,7 +271,7 @@ prepare_kickstart() {
 
         sed -e "s|REPLACE_LVM_SYSROOT_SIZE|${LVM_SYSROOT_SIZE}|g" \
             -e "s|REPLACE_OSTREE_SERVER_URL|${WEB_SERVER_URL}/repo|g" \
-            -e "s|REPLACE_BOOTC_REGISTRY_URL|${BOOTC_REGISTRY_URL}|g" \
+            -e "s|REPLACE_BOOTC_REGISTRY_URL|${MIRROR_REGISTRY_URL}|g" \
             -e "s|REPLACE_RPM_SERVER_URL|${WEB_SERVER_URL}/rpm-repos|g" \
             -e "s|REPLACE_MINOR_VERSION|${MINOR_VERSION}|g" \
             -e "s|REPLACE_BOOT_COMMIT_REF|${boot_commit_ref}|g" \

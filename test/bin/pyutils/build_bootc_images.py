@@ -33,6 +33,7 @@ PULL_SECRET = common.get_env_var('PULL_SECRET', f"{HOME_DIR}/.pull-secret.json")
 # features are required
 BIB_IMAGE = "registry.redhat.io/rhel9/bootc-image-builder:latest"
 GOMPLATE = common.get_env_var('GOMPLATE')
+MIRROR_REGISTRY = common.get_env_var('MIRROR_REGISTRY_URL')
 FORCE_REBUILD = False
 
 
@@ -230,17 +231,9 @@ def get_process_file_names(idir, ifile, obasedir):
 
 
 def process_containerfile(groupdir, containerfile, dry_run):
-    cf_path, cf_outname, cf_outdir, cf_logfile = get_process_file_names(
+    cf_path, cf_outname, _, cf_logfile = get_process_file_names(
         groupdir, containerfile, BOOTC_IMAGE_DIR)
-    cf_targetimg = os.path.join(cf_outdir, "manifest.json")
 
-    # Check if the target artifact exists
-    if should_skip(cf_targetimg):
-        common.record_junit(cf_path, "process-container", "SKIPPED")
-        return
-
-    # Create the output directories
-    os.makedirs(cf_outdir, exist_ok=True)
     # Run template command on the input file
     cf_outfile = os.path.join(BOOTC_IMAGE_DIR, containerfile)
     run_template_cmd(cf_path, cf_outfile, dry_run)
@@ -262,23 +255,13 @@ def process_containerfile(groupdir, containerfile, dry_run):
             common.retry_on_exception(3, common.run_command_in_shell, build_args, dry_run, logfile, logfile)
             common.record_junit(cf_path, "build-container", "OK")
 
-            # Run the container export command
-            if os.path.exists(cf_outdir):
-                shutil.rmtree(cf_outdir)
-            save_args = [
-                "sudo", "podman", "save",
-                "--format", "docker-dir",
-                "-o", cf_outdir, cf_outname
+            push_args = [
+                "sudo", "podman", "push",
+                cf_outname,
+                f"{MIRROR_REGISTRY}/{cf_outname}"
             ]
-            common.run_command_in_shell(save_args, dry_run, logfile, logfile)
-            common.record_junit(cf_path, "save-container", "OK")
-
-            # Fix the directory ownership and move the artifact
-            if not dry_run:
-                common.run_command(
-                    ["sudo", "chown", "-R", f"{getpass.getuser()}.", cf_outdir],
-                    dry_run)
-                common.record_junit(cf_path, "chown-container", "OK")
+            common.run_command_in_shell(push_args, dry_run, logfile, logfile)
+            common.record_junit(cf_path, "push-container", "OK")
     except Exception:
         common.record_junit(cf_path, "process-container", "FAILED")
         # Propagate the exception to the caller
@@ -570,6 +553,8 @@ def main():
             extract_container_images(f"4.{FAKE_NEXT_MINOR_VERSION}.*", NEXT_REPO, CONTAINER_LIST, args.dry_run)
             extract_container_images(PREVIOUS_RELEASE_VERSION, PREVIOUS_RELEASE_REPO, CONTAINER_LIST, args.dry_run)
             extract_container_images(YMINUS2_RELEASE_VERSION, YMINUS2_RELEASE_REPO, CONTAINER_LIST, args.dry_run)
+            # Run the mirror registry
+            common.run_command([f"{SCRIPTDIR}/mirror_registry.sh"], args.dry_run)
         # Process package source templates
         ipkgdir = f"{SCRIPTDIR}/../package-sources-bootc"
         for ifile in os.listdir(ipkgdir):

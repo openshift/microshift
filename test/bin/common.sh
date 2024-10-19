@@ -119,9 +119,6 @@ RF_VENV=${RF_VENV:-${OUTPUTDIR}/robotenv}
 # shellcheck disable=SC2034  # used elsewhere
 export GOMPLATE=${OUTPUTDIR}/bin/gomplate
 
-# Which port the web server should run on.
-WEB_SERVER_PORT=${WEB_SERVER_PORT:-8080}
-
 title() {
     # Only use color when reporting to a terminal
     if [ -t 1 ]; then
@@ -193,6 +190,22 @@ get_vm_bridge_ip() {
 # default network for libvirt VMs.
 # shellcheck disable=SC2034  # used elsewhere
 VM_BRIDGE_IP="$(get_vm_bridge_ip "default")"
+
+# Web server port number
+WEB_SERVER_PORT=${WEB_SERVER_PORT:-8080}
+
+# Web server URL using VM bridge IP with fallback to host name
+# shellcheck disable=SC2034  # used elsewhere
+WEB_SERVER_URL="http://${VM_BRIDGE_IP:-$(hostname)}:${WEB_SERVER_PORT}"
+
+# Mirror registry port number
+# shellcheck disable=SC2034  # used elsewhere
+export MIRROR_REGISTRY_PORT=5000
+
+# Mirror registry URL using VM bridge IP with fallback to host name
+# shellcheck disable=SC2034  # used elsewhere
+MIRROR_REGISTRY_URL="${VM_BRIDGE_IP:-$(hostname)}:${MIRROR_REGISTRY_PORT}"
+export MIRROR_REGISTRY_URL
 
 get_build_branch() {
     local -r ocp_ver="$(grep ^OCP_VERSION "${ROOTDIR}/Makefile.version.$(uname -m).var"  | awk '{print $NF}' | awk -F. '{print $1"."$2}')"

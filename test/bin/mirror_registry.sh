@@ -7,7 +7,7 @@ source "${SCRIPTDIR}/common.sh"
 
 DISTRIBUTION_VERSION=2.8.3
 REGISTRY_IMAGE="quay.io/microshift/distribution:${DISTRIBUTION_VERSION}"
-REGISTRY_HOST=${REGISTRY_HOST:-$(hostname):5000}
+REGISTRY_HOST=${REGISTRY_HOST:-${MIRROR_REGISTRY_URL}}
 PULL_SECRET=${PULL_SECRET:-${HOME}/.pull-secret.json}
 LOCAL_REGISTRY_NAME="microshift-local-registry"
 
@@ -41,7 +41,7 @@ setup_registry() {
     # and it defaults to https. Since this is not supported we need to configure registries.conf so that skopeo tries http instead.
     sudo bash -c 'cat > /etc/containers/registries.conf.d/900-microshift-mirror.conf' << EOF
 [[registry]]
-location = "$(hostname)"
+location = "${REGISTRY_HOST}"
 insecure = true
 EOF
     sudo systemctl restart podman
