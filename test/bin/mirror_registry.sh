@@ -18,7 +18,7 @@ retry_pull_image() {
         else
             return 0
         fi
-        sleep 10
+        sleep $(( "${attempt}" * 10 ))
     done
 
     echo "ERROR: Failed to pull image, quitting after 3 tries"
@@ -26,14 +26,14 @@ retry_pull_image() {
 }
 
 prereqs() {
-    "${SCRIPTDIR}/../../scripts/dnf_retry.sh" "install" "podman skopeo jq"
+    # Install packages if not yet available locally
+    if ! rpm -q podman skopeo jq &>/dev/null ; then
+        "${SCRIPTDIR}/../../scripts/dnf_retry.sh" "install" "podman skopeo jq"
+    fi
     podman stop "${LOCAL_REGISTRY_NAME}" || true
     podman rm "${LOCAL_REGISTRY_NAME}" || true
     retry_pull_image "${REGISTRY_IMAGE}"
     mkdir -p "${MIRROR_REGISTRY_DIR}"
-    podman run -d -p 5000:5000 --restart always \
-        -v "${MIRROR_REGISTRY_DIR}:/var/lib/registry" \
-        --name "${LOCAL_REGISTRY_NAME}" "${REGISTRY_IMAGE}"
 }
 
 setup_registry() {
@@ -44,7 +44,36 @@ setup_registry() {
 location = "${REGISTRY_HOST}"
 insecure = true
 EOF
-    sudo systemctl restart podman
+    # Create the registry configuration file.
+    # See https://distribution.github.io/distribution/about/configuration.
+    cat > "${MIRROR_REGISTRY_DIR}/config.yaml" <<EOF
+version: 0.1
+log:
+  accesslog:
+    disabled: true
+  level: info
+storage:
+    delete:
+      enabled: false
+    cache:
+        blobdescriptor: inmemory
+    filesystem:
+        rootdirectory: /var/lib/registry
+        maxthreads: 1024
+    maintenance:
+        uploadpurging:
+            enabled: false
+http:
+    addr: :5000
+health:
+  storagedriver:
+    enabled: false
+EOF
+    # Start the registry container
+    podman run -d -p "${MIRROR_REGISTRY_PORT}:5000" --restart always \
+        -v "${MIRROR_REGISTRY_DIR}:/var/lib/registry" \
+        -v "${MIRROR_REGISTRY_DIR}/config.yaml:/etc/docker/registry/config.yml" \
+        --name "${LOCAL_REGISTRY_NAME}" "${REGISTRY_IMAGE}"
 }
 
 mirror_images() {

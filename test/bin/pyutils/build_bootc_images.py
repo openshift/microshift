@@ -7,7 +7,6 @@ import glob
 import os
 import platform
 import re
-import shutil
 import sys
 import traceback
 
@@ -380,7 +379,7 @@ def process_container_encapsulate(groupdir, containerfile, dry_run):
             if src_ref == dst_ref:
                 common.print_msg(f"The '{ce_targetimg}' already exists, skipping")
                 return True
-        except:
+        except Exception:
             None
         return False
 
@@ -539,8 +538,8 @@ def main():
             extract_container_images(f"4.{FAKE_NEXT_MINOR_VERSION}.*", NEXT_REPO, CONTAINER_LIST, args.dry_run)
             extract_container_images(PREVIOUS_RELEASE_VERSION, PREVIOUS_RELEASE_REPO, CONTAINER_LIST, args.dry_run)
             extract_container_images(YMINUS2_RELEASE_VERSION, YMINUS2_RELEASE_REPO, CONTAINER_LIST, args.dry_run)
-            # Run the mirror registry
-            common.run_command([f"{SCRIPTDIR}/mirror_registry.sh"], args.dry_run)
+        # Run the mirror registry
+        common.run_command([f"{SCRIPTDIR}/mirror_registry.sh"], args.dry_run)
         # Process package source templates
         ipkgdir = f"{SCRIPTDIR}/../package-sources-bootc"
         for ifile in os.listdir(ipkgdir):
