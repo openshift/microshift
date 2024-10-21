@@ -25,6 +25,7 @@ function skopeo_retry() {
         else
             return 0
         fi
+        sleep $(( "${attempt}" * 10 ))
     done
 
     echo "ERROR: Failed to run skopeo, quitting after 3 tries"
