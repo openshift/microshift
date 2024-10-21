@@ -1,3 +1,6 @@
-- cluster-network-operator embedded-component e8467505cbc04ecd5dfa1bf52545fa46ed7d0e3d to 6af7942e3f86d46eef4416e905d52e2516792b07
-  - d794d8f 2024-10-13T14:34:10+00:00 Update network operator status for IPsec
+- ovn-kubernetes image-amd64 2aaf5421ba55bb8d23d70a4bb636a05631a46148 to 4b26ee518792233cb47f495064ac28789dcca2ba
+  - 49e3184 2024-09-12T05:42:03+00:00 Use more exact name match when deleting static routes to HO nodes.
+
+- ovn-kubernetes image-arm64 2aaf5421ba55bb8d23d70a4bb636a05631a46148 to 4b26ee518792233cb47f495064ac28789dcca2ba
+  - 49e3184 2024-09-12T05:42:03+00:00 Use more exact name match when deleting static routes to HO nodes.
 
