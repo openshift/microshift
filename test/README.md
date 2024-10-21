@@ -342,11 +342,8 @@ scp -r microshift@${MICROSHIFT_HOST}:microshift/_output/test-images/ _output/
 ```
 #### Mirroring the container registry
 In order to avoid possible disruptions from external sources such as container
-registries, there is an option to mirror the registry locally for all the
-images MicroShift requires.
-
-`ENABLE_REGISTRY_MIRROR` -- Boolean value controlling whether there will be a
-local mirror for all MicroShift container images configured in the hypervisor.
+registries, container registry is mirrored locally for all the images MicroShift
+requires.
 
 The registry will contain all images extracted from previously built MicroShift
 RPMs in the `build` phase (taken from `microshift-release-info`).

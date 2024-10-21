@@ -7,7 +7,7 @@ source "${SCRIPTDIR}/common.sh"
 
 DISTRIBUTION_VERSION=2.8.3
 REGISTRY_IMAGE="quay.io/microshift/distribution:${DISTRIBUTION_VERSION}"
-REGISTRY_HOST=${REGISTRY_HOST:-$(hostname):5000}
+REGISTRY_HOST=${REGISTRY_HOST:-${MIRROR_REGISTRY_URL}}
 PULL_SECRET=${PULL_SECRET:-${HOME}/.pull-secret.json}
 LOCAL_REGISTRY_NAME="microshift-local-registry"
 
@@ -18,7 +18,7 @@ retry_pull_image() {
         else
             return 0
         fi
-        sleep 10
+        sleep $(( "${attempt}" * 10 ))
     done
 
     echo "ERROR: Failed to pull image, quitting after 3 tries"
@@ -26,11 +26,14 @@ retry_pull_image() {
 }
 
 prereqs() {
-    "${SCRIPTDIR}/../../scripts/dnf_retry.sh" "install" "podman skopeo jq"
+    # Install packages if not yet available locally
+    if ! rpm -q podman skopeo jq &>/dev/null ; then
+        "${SCRIPTDIR}/../../scripts/dnf_retry.sh" "install" "podman skopeo jq"
+    fi
     podman stop "${LOCAL_REGISTRY_NAME}" || true
     podman rm "${LOCAL_REGISTRY_NAME}" || true
     retry_pull_image "${REGISTRY_IMAGE}"
-    podman run -d -p 5000:5000 --restart always --name "${LOCAL_REGISTRY_NAME}" "${REGISTRY_IMAGE}"
+    mkdir -p "${MIRROR_REGISTRY_DIR}"
 }
 
 setup_registry() {
@@ -38,10 +41,39 @@ setup_registry() {
     # and it defaults to https. Since this is not supported we need to configure registries.conf so that skopeo tries http instead.
     sudo bash -c 'cat > /etc/containers/registries.conf.d/900-microshift-mirror.conf' << EOF
 [[registry]]
-location = "$(hostname)"
+location = "${REGISTRY_HOST}"
 insecure = true
 EOF
-    sudo systemctl restart podman
+    # Create the registry configuration file.
+    # See https://distribution.github.io/distribution/about/configuration.
+    cat > "${MIRROR_REGISTRY_DIR}/config.yaml" <<EOF
+version: 0.1
+log:
+  accesslog:
+    disabled: true
+  level: info
+storage:
+    delete:
+      enabled: false
+    cache:
+        blobdescriptor: inmemory
+    filesystem:
+        rootdirectory: /var/lib/registry
+        maxthreads: 1024
+    maintenance:
+        uploadpurging:
+            enabled: false
+http:
+    addr: :5000
+health:
+  storagedriver:
+    enabled: false
+EOF
+    # Start the registry container
+    podman run -d -p "${MIRROR_REGISTRY_PORT}:5000" --restart always \
+        -v "${MIRROR_REGISTRY_DIR}:/var/lib/registry" \
+        -v "${MIRROR_REGISTRY_DIR}/config.yaml:/etc/docker/registry/config.yml" \
+        --name "${LOCAL_REGISTRY_NAME}" "${REGISTRY_IMAGE}"
 }
 
 mirror_images() {
@@ -53,20 +85,13 @@ mirror_images() {
     rm -f "${ofile}"
 }
 
-mirror_bootc_images() {
-    local -r idir=$1
-    "${ROOTDIR}/scripts/image-builder/mirror-images.sh" --dir-to-reg "${PULL_SECRET}" "${idir}" "${REGISTRY_HOST}"
-}
-
 usage() {
     echo ""
     echo "Usage: ${0} [-cf FILE] [-bd DIR]"
     echo "   -cf FILE    File containing the container image references to mirror."
     echo "               Defaults to '${CONTAINER_LIST}', skipped if does not exist."
-    echo "   -bd DIR     Directory containing the bootc containers data to mirror."
-    echo "               Defaults to '${BOOTC_IMAGE_DIR}', skipped if does not exist."
-    echo "   -reuse      Reuse the running registry without stopping and deleting it"
-    echo "               to allow for a faster update of container images."
+    echo ""
+    echo "The registry data is stored at '${MIRROR_REGISTRY_DIR}' on the host."
     exit 1
 }
 
@@ -74,8 +99,6 @@ usage() {
 # Main
 #
 image_list_file="${CONTAINER_LIST}"
-bootc_image_dir="${BOOTC_IMAGE_DIR}"
-reuse_registry=false
 
 while [ $# -gt 0 ]; do
     case $1 in
@@ -84,14 +107,6 @@ while [ $# -gt 0 ]; do
         [ -z "$1" ] && usage
         image_list_file=$1
         ;;
-    -bd)
-        shift
-        [ -z "$1" ] && usage
-        bootc_image_dir=$1
-        ;;
-    -reuse)
-        reuse_registry=true
-        ;;
     *)
         usage
         ;;
@@ -99,19 +114,11 @@ while [ $# -gt 0 ]; do
     shift
 done
 
-if ! ${reuse_registry} ; then
-    prereqs
-    setup_registry
-fi
+prereqs
+setup_registry
 
 if [ -f "${image_list_file}" ]; then
     mirror_images "${image_list_file}"
 else
     echo "WARNING: File '${image_list_file}' does not exist, skipping"
-fi
-
-if [ -d "${bootc_image_dir}" ] ; then
-    mirror_bootc_images "${bootc_image_dir}"
-else
-    echo "WARNING: Directory '${bootc_image_dir}' does not exist, skipping"
 fi

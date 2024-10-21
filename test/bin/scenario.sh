@@ -18,13 +18,10 @@ source "${SCRIPTDIR}/common_versions.sh"
 
 DEFAULT_BOOT_BLUEPRINT="rhel-9.4"
 LVM_SYSROOT_SIZE="10240"
-WEB_SERVER_URL="http://${VM_BRIDGE_IP}:${WEB_SERVER_PORT}"
-BOOTC_REGISTRY_URL="${VM_BRIDGE_IP}:5000"
 PULL_SECRET="${PULL_SECRET:-${HOME}/.pull-secret.json}"
 PULL_SECRET_CONTENT="$(jq -c . "${PULL_SECRET}")"
 VM_BOOT_TIMEOUT=1200 # Overall total boot times are around 15m
 VM_GREENBOOT_TIMEOUT=1800 # Greenboot readiness may take up to 15-30m depending on the load
-ENABLE_REGISTRY_MIRROR=${ENABLE_REGISTRY_MIRROR:-false}
 SKIP_SOS=${SKIP_SOS:-false}  # may be overridden in global settings file
 SKIP_GREENBOOT=${SKIP_GREENBOOT:-false}  # may be overridden in scenario file
 VNC_CONSOLE=${VNC_CONSOLE:-false}  # may be overridden in global settings file
@@ -273,7 +270,7 @@ prepare_kickstart() {
 
         sed -e "s|REPLACE_LVM_SYSROOT_SIZE|${LVM_SYSROOT_SIZE}|g" \
             -e "s|REPLACE_OSTREE_SERVER_URL|${WEB_SERVER_URL}/repo|g" \
-            -e "s|REPLACE_BOOTC_REGISTRY_URL|${BOOTC_REGISTRY_URL}|g" \
+            -e "s|REPLACE_BOOTC_REGISTRY_URL|${MIRROR_REGISTRY_URL}|g" \
             -e "s|REPLACE_RPM_SERVER_URL|${WEB_SERVER_URL}/rpm-repos|g" \
             -e "s|REPLACE_MINOR_VERSION|${MINOR_VERSION}|g" \
             -e "s|REPLACE_BOOT_COMMIT_REF|${boot_commit_ref}|g" \
@@ -281,7 +278,6 @@ prepare_kickstart() {
             -e "s|REPLACE_HOST_NAME|${vm_hostname}|g" \
             -e "s|REPLACE_REDHAT_AUTHORIZED_KEYS|${REDHAT_AUTHORIZED_KEYS}|g" \
             -e "s|REPLACE_FIPS_ENABLED|${fips_enabled}|g" \
-            -e "s|REPLACE_ENABLE_MIRROR|${ENABLE_REGISTRY_MIRROR}|g" \
             -e "s|REPLACE_MIRROR_HOSTNAME|${hostname}|g" \
             -e "s|REPLACE_VM_BRIDGE_IP|${VM_BRIDGE_IP}|g" \
             "${ifile}" > "${output_file}"

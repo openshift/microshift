@@ -21,9 +21,6 @@ prepare_scenario_sources() {
     fi
 }
 
-ENABLE_REGISTRY_MIRROR=${ENABLE_REGISTRY_MIRROR:-true}
-export ENABLE_REGISTRY_MIRROR
-
 # Log output automatically
 LOGDIR="${ROOTDIR}/_output/ci-logs"
 LOGFILE="${LOGDIR}/$(basename "$0" .sh).log"
@@ -49,9 +46,7 @@ cd "${ROOTDIR}/test"
 bash -x ./bin/manage_hypervisor_config.sh create
 
 # Setup a container registry and mirror images.
-if ${ENABLE_REGISTRY_MIRROR}; then
-    bash -x ./bin/mirror_registry.sh
-fi
+bash -x ./bin/mirror_registry.sh
 
 # Prepare all the scenarios that need to run into a special directory
 prepare_scenario_sources
