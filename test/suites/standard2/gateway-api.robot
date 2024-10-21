@@ -54,9 +54,9 @@ Create Gateway
     ...    Remove File    ${tmp}
     Generate File From Template    ${GATEWAY_MANIFEST_TMPL}    ${tmp}
     Oc Apply    -n ${namespace} -f ${tmp}
+    Run With Kubeconfig    oc wait -n ${namespace} gateway/test-gateway --for="condition=Accepted" --timeout=60s
     Run With Kubeconfig
     ...    oc wait -n ${namespace} deploy test-gateway-openshift-gateway-api --for=condition=Available --timeout=60s
-    Run With Kubeconfig    oc wait -n ${namespace} gateway/test-gateway --for="condition=Accepted" --timeout=60s
     Run With Kubeconfig    oc wait -n ${namespace} gateway/test-gateway --for="condition=Programmed" --timeout=60s
 
 Create HTTP Route
