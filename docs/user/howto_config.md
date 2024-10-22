@@ -28,6 +28,7 @@ dns:
 etcd:
     memoryLimitMB: 0
 ingress:
+    defaultHTTPVersion: ""
     forwardedHeaderPolicy: ""
     httpCompression:
         mimeTypes:
@@ -110,6 +111,7 @@ dns:
 etcd:
     memoryLimitMB: 0
 ingress:
+    defaultHTTPVersion: 1
     forwardedHeaderPolicy: ""
     httpCompression:
         mimeTypes:

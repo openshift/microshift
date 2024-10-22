@@ -191,12 +191,12 @@ func startIngressController(ctx context.Context, cfg *config.Config, kubeconfigP
 	if len(cfg.Ingress.HTTPCompressionPolicy.MimeTypes) > 0 {
 		routerEnableCompression = "true"
 		routerCompressionMime = strings.Join(cfg.GetMIMETypes(cfg.Ingress.HTTPCompressionPolicy.MimeTypes), " ")
-		//operatorv1.Ingress.
-		//GetMIMETypes()
-
 	}
-	//Ingress.HTTPCompressionPolicy
-	//&c
+
+	routerDisableHttp2 := "true"
+	if cfg.Ingress.DefaultHttpVersionPolicy == config.DefaultHttpVersionV2 {
+		routerDisableHttp2 = "false"
+	}
 
 	extraParams := assets.RenderParams{
 		"RouterNamespaceOwnership":    cfg.Ingress.AdmissionPolicy.NamespaceOwnership == config.NamespaceOwnershipAllowed,
@@ -219,6 +219,7 @@ func startIngressController(ctx context.Context, cfg *config.Config, kubeconfigP
 		"HTTPEmptyRequestsPolicy":     &cfg.Ingress.HTTPEmptyRequestsPolicy,
 		"RouterEnableCompression":     routerEnableCompression,
 		"RouterCompressionMime":       routerCompressionMime,
+		"RouterDisableHttp2":          routerDisableHttp2,
 	}
 
 	if err := assets.ApplyServices(ctx, svc, renderTemplate, renderParamsFromConfig(cfg, extraParams), kubeconfigPath); err != nil {

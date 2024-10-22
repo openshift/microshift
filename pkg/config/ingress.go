@@ -5,15 +5,17 @@ import (
 )
 
 const (
-	NamespaceOwnershipStrict  NamespaceOwnershipEnum = "Strict"
-	NamespaceOwnershipAllowed NamespaceOwnershipEnum = "InterNamespaceAllowed"
-	StatusManaged             IngressStatusEnum      = "Managed"
-	StatusRemoved             IngressStatusEnum      = "Removed"
+	NamespaceOwnershipStrict  NamespaceOwnershipEnum   = "Strict"
+	NamespaceOwnershipAllowed NamespaceOwnershipEnum   = "InterNamespaceAllowed"
+	StatusManaged             IngressStatusEnum        = "Managed"
+	StatusRemoved             IngressStatusEnum        = "Removed"
+	DefaultHttpVersionV1      DefaultHttpVersionPolicy = 1
+	DefaultHttpVersionV2      DefaultHttpVersionPolicy = 2
 )
 
 type NamespaceOwnershipEnum string
 type IngressStatusEnum string
-
+type DefaultHttpVersionPolicy int32
 type IngressConfig struct {
 	// Default router status, can be Managed or Removed.
 	// +kubebuilder:default=Managed
@@ -91,6 +93,13 @@ type IngressConfig struct {
 	//
 	// +optional
 	HTTPCompressionPolicy operatorv1.HTTPCompressionPolicy `json:"httpCompression,omitempty"`
+
+	// Determines default http version should be used for the ingress backends
+	// By default,  using version 1.
+	//
+	// +optional
+	// +kubebuilder:default:="1"
+	DefaultHttpVersionPolicy DefaultHttpVersionPolicy `json:"defaultHTTPVersion,omitempty"`
 }
 
 type RouteAdmissionPolicy struct {

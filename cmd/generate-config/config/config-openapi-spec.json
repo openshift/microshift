@@ -142,6 +142,11 @@
         "tuningOptions"
       ],
       "properties": {
+        "defaultHTTPVersion": {
+          "description": "Determines default http version should be used for the ingress backends\nBy default,  using version 1.",
+          "type": "string",
+          "default": "1"
+        },
         "forwardedHeaderPolicy": {
           "description": "forwardedHeaderPolicy specifies when and how ingress router\nsets the Forwarded, X-Forwarded-For, X-Forwarded-Host,\nX-Forwarded-Port, X-Forwarded-Proto, and X-Forwarded-Proto-Version\nHTTP headers.  The value may be one of the following:\n\n\n* \"Append\", which specifies that ingress router appends the\n  headers, preserving existing headers.\n\n\n* \"Replace\", which specifies that ingress router sets the\n  headers, replacing any existing Forwarded or X-Forwarded-* headers.\n\n\n* \"IfNone\", which specifies that ingress router sets the\n  headers if they are not already set.\n\n\n* \"Never\", which specifies that ingress router never sets the\n  headers, preserving any existing headers.\n\n\nBy default, the policy is \"Append\".",
           "type": "string",

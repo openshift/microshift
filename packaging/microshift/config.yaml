@@ -47,6 +47,9 @@ etcd:
     # memory when it gets to this value. 0 means no limit.
     memoryLimitMB: 0
 ingress:
+    # Determines default http version should be used for the ingress backends
+    # By default,  using version 1.
+    defaultHTTPVersion: 1
     # forwardedHeaderPolicy specifies when and how ingress router
     # sets the Forwarded, X-Forwarded-For, X-Forwarded-Host,
     # X-Forwarded-Port, X-Forwarded-Proto, and X-Forwarded-Proto-Version

@@ -163,9 +163,10 @@ func (c *Config) fillDefaults() error {
 			ThreadCount:                 4,
 			MaxConnections:              5000,
 		},
-		LogEmptyRequests:        "Log",
-		ForwardedHeaderPolicy:   "Append",
-		HTTPEmptyRequestsPolicy: "Respond",
+		DefaultHttpVersionPolicy: 1,
+		LogEmptyRequests:         "Log",
+		ForwardedHeaderPolicy:    "Append",
+		HTTPEmptyRequestsPolicy:  "Respond",
 	}
 	c.MultiNode.Enabled = false
 	c.Kubelet = nil
@@ -336,6 +337,10 @@ func (c *Config) incorporateUserSettings(u *Config) {
 
 	if len(u.Ingress.HTTPCompressionPolicy.MimeTypes) > 0 {
 		c.Ingress.HTTPCompressionPolicy = u.Ingress.HTTPCompressionPolicy
+	}
+
+	if u.Ingress.DefaultHttpVersionPolicy > 0 {
+		c.Ingress.DefaultHttpVersionPolicy = u.Ingress.DefaultHttpVersionPolicy
 	}
 
 }
