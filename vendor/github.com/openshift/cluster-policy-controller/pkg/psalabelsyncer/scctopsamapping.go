@@ -287,6 +287,7 @@ func convert_volumes(volumes []securityv1.FSType) uint8 {
 	//     csi
 	//     persistentVolumeClaim
 	//     ephemeral
+	//     image
 	// ------------------------------------
 	// upstream: check_hostPathVolumes
 	// baseline allows: undefined/null
@@ -305,7 +306,8 @@ func convert_volumes(volumes []securityv1.FSType) uint8 {
 			securityv1.FSTypeCSI,
 			securityv1.FSTypePersistentVolumeClaim,
 			securityv1.FSTypeEphemeral,
-			securityv1.FSTypeNone:
+			securityv1.FSTypeNone,
+			securityv1.FSTypeImage:
 			if currentLevel < restricted {
 				currentLevel = restricted
 			}
