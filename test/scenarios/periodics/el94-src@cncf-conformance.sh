@@ -29,7 +29,8 @@ prepare_hosts() {
 
     # Configure secondary host
     scp -3 -P "${primary_host_ssh_port}" \
-        "redhat@${primary_host_ip}:/home/redhat/kubelet-${secondary_host_name}.{key,crt}" \
+        "redhat@${primary_host_ip}:/home/redhat/kubelet-${secondary_host_name}.key" \
+        "redhat@${primary_host_ip}:/home/redhat/kubelet-${secondary_host_name}.crt" \
         "redhat@${primary_host_ip}:/home/redhat/kubeconfig-${primary_host_name}" \
         "redhat@${primary_host_ip}:/home/redhat/lvmd-${primary_host_name}.yaml" \
         "redhat@${secondary_host_ip}":
