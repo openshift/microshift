@@ -29,9 +29,9 @@ prepare_hosts() {
 
     # Configure secondary host
     scp -3 -P "${primary_host_ssh_port}" \
-        "redhat@${primary_host_ip}:/home/redhat/kubelet-${secondary_host_name}.key" \
-        "redhat@${primary_host_ip}:/home/redhat/kubelet-${secondary_host_name}.crt" \
+        "redhat@${primary_host_ip}:/home/redhat/kubelet-${secondary_host_name}.{key,crt}" \
         "redhat@${primary_host_ip}:/home/redhat/kubeconfig-${primary_host_name}" \
+        "redhat@${primary_host_ip}:/home/redhat/lvmd-${primary_host_name}.yaml" \
         "redhat@${secondary_host_ip}":
 
     scp -P "${secondary_host_ssh_port}" "${ROOTDIR}/scripts/multinode/configure-sec.sh" "redhat@${secondary_host_ip}":
@@ -168,7 +168,10 @@ scenario_remove_vms() {
 }
 
 scenario_run_tests() {
-    if prepare_hosts ; then
-        run_sonobuoy
+    if ! prepare_hosts ; then
+        return 1
+    fi
+    if ! run_sonobuoy ; then
+        return 1
     fi
 }
