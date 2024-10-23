@@ -47,13 +47,6 @@ function configure_microshift() {
     if ! ip addr show br-ex 2>/dev/null | grep -q '10.44.0.0/32'; then
         sudo ip addr add 10.44.0.0/32 dev br-ex
     fi
-
-    # Configure MicroShift to allow API server access by an IP address
-    cat <<EOF | sudo tee /etc/microshift/config.yaml &>/dev/null
-apiServer:
-  subjectAltNames:
-    - "10.43.0.1"
-EOF
 }
 
 function wait_for_pod_ready() {
