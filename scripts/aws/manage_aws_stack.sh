@@ -62,14 +62,16 @@ action_create() {
     echo "Waiting for stack to be created"
     aws --region "${region}" cloudformation wait stack-create-complete --stack-name "${stack_name}"
     echo "Stack created successfully"
+    local instance_id
     # shellcheck disable=SC2016
-    local instance_id="$(aws --region "${region}" cloudformation describe-stacks --stack-name "${stack_name}" \
+    instance_id="$(aws --region "${region}" cloudformation describe-stacks --stack-name "${stack_name}" \
         --query 'Stacks[].Outputs[?OutputKey == `InstanceId`].OutputValue' --output text)"
     echo "Waiting for stack status to be OK"
     aws --region "${region}" ec2 wait instance-status-ok --instance-id "${instance_id}"
     echo "Stack status OK"
+    local public_ip
     # shellcheck disable=SC2016
-    local public_ip=$(aws --region "${region}" cloudformation describe-stacks --stack-name "${stack_name}" \
+    public_ip=$(aws --region "${region}" cloudformation describe-stacks --stack-name "${stack_name}" \
         --query 'Stacks[].Outputs[?OutputKey == `PublicIp`].OutputValue' --output text)
 
     echo "PUBLIC IP: ${public_ip}"
@@ -95,9 +97,9 @@ action_describe() {
 action_logs() {
     local -r stack_name="${1}"
     local -r region="${2}"
-
+    local instance_id
     # shellcheck disable=SC2016
-    local instance_id="$(aws --region "${region}" cloudformation describe-stacks --stack-name "${stack_name}" \
+    instance_id="$(aws --region "${region}" cloudformation describe-stacks --stack-name "${stack_name}" \
         --query 'Stacks[].Outputs[?OutputKey == `InstanceId`].OutputValue' --output text)"
 
     aws ec2 get-console-output --instance-id "${instance_id}" --output text
