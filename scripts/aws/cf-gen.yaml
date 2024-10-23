@@ -267,3 +267,4 @@ Outputs:
   PublicIp:
     Description: The bastion host Public IP, will be used for registering minIO server DNS
     Value: !GetAtt RHELInstance.PublicIp
+    
