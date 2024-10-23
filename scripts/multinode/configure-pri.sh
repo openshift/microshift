@@ -48,12 +48,10 @@ function configure_microshift() {
         sudo ip addr add 10.44.0.0/32 dev br-ex
     fi
 
-    # Configure MicroShift to allow API server access by an IP address
+    # Configure MicroShift to advertise apiserver in the node IP
     cat <<EOF | sudo tee /etc/microshift/config.yaml &>/dev/null
 apiServer:
   advertiseAddress: ${PRI_NODE_ADDR}
-  subjectAltNames:
-    - "10.43.0.1"
 EOF
 }
 
