@@ -248,7 +248,7 @@ Resources:
         Fn::Base64: !Sub |
           #!/bin/bash -xe
           echo "====== Authorizing public key ======" | tee -a /tmp/init_output.txt
-          echo "\${PublicKeyString}" >> /home/ec2-user/.ssh/authorized_keys
+          echo "${PublicKeyString}" >> /home/ec2-user/.ssh/authorized_keys
           # Use the same defaults as OCP to avoid failing requests to apiserver, such as
           # requesting logs.
           echo "====== Updating inotify =====" | tee -a /tmp/init_output.txt
