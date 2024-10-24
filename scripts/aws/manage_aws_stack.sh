@@ -33,12 +33,14 @@ action_create() {
     if [[ "${inst_type%.*}" =~ .*"g".* ]]; then
         arch="arm64"
     fi
+    
+    local ec2_type="VirtualMachine"
+    if [[ "${inst_type}" =~ c[0-9]+[gn].metal ]]; then
+        ec2_type="MetalMachine"
+    fi
+
     if [[ "${ami}" == "" ]]; then
         ami=$(get_amis "${os}" "${arch}" "${region}" | head -n 1 | awk '{print $2}')
-    fi
-    local ec2Type="VirtualMachine"
-    if [[ "${inst_type}" =~ c[0-9]+[gn].metal ]]; then
-        ec2Type="MetalMachine"
     fi
     
     echo "Stack name: ${stack_name}"
@@ -52,16 +54,17 @@ action_create() {
         --template-body "file://${cf_tpl_file}" \
         --capabilities CAPABILITY_NAMED_IAM \
         --parameters \
-        ParameterKey=HostInstanceType,ParameterValue="${inst_type}" \
-        ParameterKey=Machinename,ParameterValue="${stack_name}" \
-        ParameterKey=AmiId,ParameterValue="${ami}" \
-        ParameterKey=EC2Type,ParameterValue="${ec2Type}" \
-        ParameterKey=PublicKeyString,ParameterValue="$(cat "${pub_key}")" \
-        ParameterKey=StackLaunchTemplate,ParameterValue="${stack_name}-launch-template"
+            ParameterKey=HostInstanceType,ParameterValue="${inst_type}" \
+            ParameterKey=Machinename,ParameterValue="${stack_name}" \
+            ParameterKey=AmiId,ParameterValue="${ami}" \
+            ParameterKey=EC2Type,ParameterValue="${ec2_type}" \
+            ParameterKey=PublicKeyString,ParameterValue="$(cat "${pub_key}")" \
+            ParameterKey=StackLaunchTemplate,ParameterValue="${stack_name}-launch-template"
     
     echo "Waiting for stack to be created"
     aws --region "${region}" cloudformation wait stack-create-complete --stack-name "${stack_name}"
     echo "Stack created successfully"
+
     local instance_id
     # shellcheck disable=SC2016
     instance_id="$(aws --region "${region}" cloudformation describe-stacks --stack-name "${stack_name}" \
@@ -69,6 +72,7 @@ action_create() {
     echo "Waiting for stack status to be OK"
     aws --region "${region}" ec2 wait instance-status-ok --instance-id "${instance_id}"
     echo "Stack status OK"
+
     local public_ip
     # shellcheck disable=SC2016
     public_ip=$(aws --region "${region}" cloudformation describe-stacks --stack-name "${stack_name}" \
