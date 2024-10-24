@@ -108,6 +108,10 @@ func (dm *manager) Backup(name BackupName) (string, error) {
 		klog.InfoS("Created backup storage directory", "path", dm.storage)
 	}
 
+	if err := CheckIfEnoughSpaceToBackUp(string(dm.storage)); err != nil {
+		return "", err
+	}
+
 	dest := dm.GetBackupPath(name)
 	if err := copyPath(config.DataDir, dest); err != nil {
 		return "", err
@@ -139,6 +143,10 @@ func (dm *manager) Restore(name BackupName) error {
 
 	if err := dm.isMicroShiftBackup(path); err != nil {
 		return fmt.Errorf("%q is not a valid MicroShift backup: %w", path, err)
+	}
+
+	if err := CheckIfEnoughSpaceToRestore(path); err != nil {
+		return err
 	}
 
 	tmp := fmt.Sprintf("%s.saved", config.DataDir)
