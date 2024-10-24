@@ -1,0 +1,90 @@
+[34m# Rebasing to registry.ci.openshift.org/ocp/release:4.17.0-0.nightly-2024-10-23-093605 and registry.ci.openshift.org/ocp-arm64/release-arm64:4.17.0-0.nightly-arm64-2024-10-23-234149[00m
+[34m# Fetching release info for registry.ci.openshift.org/ocp/release:4.17.0-0.nightly-2024-10-23-093605 (amd64)[00m
+[34m# Fetching release info for registry.ci.openshift.org/ocp-arm64/release-arm64:4.17.0-0.nightly-arm64-2024-10-23-234149 (arm64)[00m
+[34m# Extracting registry.ci.openshift.org/ocp/release:4.17.0-0.nightly-2024-10-23-093605 manifest content[00m
+[34m# Cloning registry.ci.openshift.org/ocp/release:4.17.0-0.nightly-2024-10-23-093605 component repos[00m
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/api/.git/
+HEAD is now at 0a88001 Merge pull request #2023 from wking/4.17-cluster-version-capability-sets
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/cluster-csi-snapshot-controller-operator/.git/
+HEAD is now at ffba005 Merge pull request #214 from davidvossel/hcp-tolerations
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/cluster-dns-operator/.git/
+HEAD is now at 54eea5b Merge pull request #415 from arkadeepsen/dnsnameresolver-controller
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/cluster-ingress-operator/.git/
+HEAD is now at cb5306d Merge pull request #1136 from openshift-cherrypick-robot/cherry-pick-1125-to-release-4.17
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/cluster-kube-apiserver-operator/.git/
+HEAD is now at 7bcf866 Merge pull request #1738 from wangke19/backport-prart-consistency-openshift-4.17-ose-cluster-kube-apiserver-operator-release-4.17
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/cluster-kube-controller-manager-operator/.git/
+HEAD is now at 0a9ed57 Merge pull request #814 from tjungblu/ckao_lg_1743
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/cluster-kube-scheduler-operator/.git/
+HEAD is now at 98ca953 Merge pull request #546 from ingvagabund/545
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/cluster-network-operator/.git/
+HEAD is now at 950651d Merge pull request #2536 from openshift-cherrypick-robot/cherry-pick-2532-to-release-4.17
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/cluster-openshift-controller-manager-operator/.git/
+HEAD is now at 2b962c7 Merge pull request #354 from ingvagabund/update-owners
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/cluster-policy-controller/.git/
+HEAD is now at 7209e90 Merge pull request #154 from openshift-cherrypick-robot/cherry-pick-153-to-release-4.17
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/csi-external-snapshotter/.git/
+HEAD is now at aa558ca Merge pull request #156 from dfajmon/rebase-8.0.1
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/etcd/.git/
+HEAD is now at c82057da Merge pull request #291 from Elbehery/rebase-etcd-3.5.16-openshift-4.17
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/kubernetes/.git/
+HEAD is now at 6816ea6a9 Merge pull request #2107 from openshift/revert-2100-revert-2089-1727782587095
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/kubernetes-kube-storage-version-migrator/.git/
+HEAD is now at 34fafc0 Merge pull request #205 from openshift-bot/art-consistency-openshift-4.17-ose-kube-storage-version-migrator
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/machine-config-operator/.git/
+HEAD is now at 6308e62a Merge pull request #4615 from openshift-cherrypick-robot/cherry-pick-4596-to-release-4.17
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/openshift-controller-manager/.git/
+HEAD is now at fddd93b Merge pull request #346 from openshift-cherrypick-robot/cherry-pick-341-to-release-4.17
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/operator-framework-olm/.git/
+HEAD is now at b0d86a04 Merge pull request #860 from grokspawn/pagination-4.17
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/route-controller-manager/.git/
+HEAD is now at a47f6be Merge pull request #44 from ingvagabund/bump-k8s-1.30.1
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/service-ca-operator/.git/
+HEAD is now at 1f7d647 Merge pull request #241 from lunarwhite/fix-doc
+
+[34m# Cloning registry.ci.openshift.org/ocp/release:4.17.0-0.nightly-2024-10-23-093605 image repos[00m
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/amd64/oc/.git/
+HEAD is now at 897ef0bc Merge pull request #1876 from wking/release-4.17-v4.17-capability-set
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/amd64/coredns/.git/
+HEAD is now at d3b441c Merge pull request #118 from gcs278/merge-1.11.3
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/amd64/csi-external-snapshotter/.git/
+HEAD is now at aa558ca Merge pull request #156 from dfajmon/rebase-8.0.1
+
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/amd64/router/.git/
+HEAD is now at a33f2b6 Merge pull request #615 from Miciah/OCPBUGS-38101-bump-k8s.io-slash-star-to-v0.30.3
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/amd64/kube-rbac-proxy/.git/
+HEAD is now at 7718265 Merge pull request #112 from ibihim/kostrows/2024-10-02_OCPBUGS-42697-protobuf-bump
+
+lvms_operator not from release payload, skipping
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/amd64/ovn-kubernetes/.git/
+HEAD is now at 62451d12 Merge pull request #2283 from martinkennelly/merge-28-aug
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/amd64/kubernetes/.git/
+error: RPC failed; curl 55 OpenSSL SSL_write: Connection reset by peer, errno 104
+error: 2985 bytes of body are still expected
+fetch-pack: unexpected disconnect while reading sideband packet
+fatal: early EOF
+fatal: fetch-pack: invalid index-pack output
