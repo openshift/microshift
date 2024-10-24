@@ -58,9 +58,17 @@ func (m *Manager) PerformRestore() error {
 		  RENAME    $STORAGE/$PREVIOUSLY_RESTORED -> $STORAGE/restored/$PREVIOUSLY_RESTORED
 	*/
 
+	if err := data.CheckIfEnoughSpaceToRestore(m.storage.GetBackupPath(restoreCandidate.Name())); err != nil {
+		return err
+	}
+
 	// Copies/creations into intermediate destinations
 	var oldData *data.AtomicDirCopy
 	if m.saveFailed {
+		if err := data.CheckIfEnoughSpaceToBackUp(string(m.storage)); err != nil {
+			return err
+		}
+
 		oldDataBackupName, err := GetBackupName()
 		if err != nil {
 			return err
