@@ -64,13 +64,13 @@ storage:
         uploadpurging:
             enabled: false
 http:
-    addr: :5000
+    addr: :${MIRROR_REGISTRY_PORT}
 health:
   storagedriver:
     enabled: false
 EOF
     # Start the registry container
-    podman run -d -p "${MIRROR_REGISTRY_PORT}:5000" --restart always \
+    podman run -d -p "${MIRROR_REGISTRY_PORT}:${MIRROR_REGISTRY_PORT}" --restart always \
         -v "${MIRROR_REGISTRY_DIR}:/var/lib/registry" \
         -v "${MIRROR_REGISTRY_DIR}/config.yaml:/etc/docker/registry/config.yml" \
         --name "${LOCAL_REGISTRY_NAME}" "${REGISTRY_IMAGE}"

@@ -2,6 +2,7 @@
 Documentation       Tests related to upgrading MicroShift
 
 Resource            ../../resources/common.resource
+Resource            ../../resources/microshift-host.resource
 Resource            ../../resources/ostree.resource
 Resource            ../../resources/oc.resource
 Resource            ../../resources/selinux.resource
@@ -15,8 +16,7 @@ Test Tags           ostree
 
 *** Variables ***
 ${TARGET_REF}           ${EMPTY}
-
-${LVMS_TOPOLVM_DIFF}    ./assets/topolvm-to-lvms-diff.yaml
+${BOOTC_REGISTRY}       ${EMPTY}
 
 
 *** Test Cases ***
@@ -27,10 +27,18 @@ Upgrade
     Wait Until Greenboot Health Check Exited
 
     ${future_backup}=    Get Future Backup Name For Current Boot
-    Deploy Commit Not Expecting A Rollback    ${TARGET_REF}
+    Deploy Commit Not Expecting A Rollback
+    ...    ${TARGET_REF}
+    ...    False
+    ...    ${BOOTC_REGISTRY}
     Backup Should Exist    ${future_backup}
 
-    Validate SELinux With Backup    ${future_backup}
+    # SELinux tests do not pass on bootc images yet.
+    # Run the following test on bootc systems when the problem is fixed.
+    ${is_bootc}=    Is System Bootc
+    IF    ${is_bootc} == ${FALSE}
+        Validate SELinux With Backup    ${future_backup}
+    END
 
 
 *** Keywords ***

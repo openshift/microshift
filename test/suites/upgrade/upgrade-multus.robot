@@ -11,6 +11,7 @@ Suite Teardown      Teardown
 
 *** Variables ***
 ${TARGET_REF}           ${EMPTY}
+${BOOTC_REGISTRY}       ${EMPTY}
 
 ${BRIDGE_INTERFACE}     br-test
 ${BRIDGE_NAD_YAML}      ./assets/multus/bridge-nad.yaml
@@ -30,7 +31,10 @@ Upgrade With Multus Workload
     Set IP For Host Interface    ${BRIDGE_INTERFACE}    ${BRIDGE_IP}
     Connect To Pod Over Local Interface    ${BRIDGE_POD_NAME}    ${NAMESPACE}    ${BRIDGE_INTERFACE}
 
-    Deploy Commit Not Expecting A Rollback    ${TARGET_REF}
+    Deploy Commit Not Expecting A Rollback
+    ...    ${TARGET_REF}
+    ...    ${TRUE}
+    ...    ${BOOTC_REGISTRY}
 
     Named Pod Should Be Ready    ${BRIDGE_POD_NAME}    ${NAMESPACE}
     Set IP For Host Interface    ${BRIDGE_INTERFACE}    ${BRIDGE_IP}

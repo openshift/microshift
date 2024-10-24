@@ -3,8 +3,8 @@
 # Sourced from scenario.sh and uses functions defined there.
 
 scenario_create_vms() {
-    prepare_kickstart host1 kickstart.ks.template "rhel-9.4-microshift-4.${PREVIOUS_MINOR_VERSION}"
-    launch_vm
+    prepare_kickstart host1 kickstart-bootc.ks.template rhel94-bootc-crel
+    launch_vm --boot_blueprint rhel94-bootc --bootc
 }
 
 scenario_remove_vms() {
@@ -13,7 +13,8 @@ scenario_remove_vms() {
 
 scenario_run_tests() {
     run_tests host1 \
-        --variable "FAILING_REF:rhel-9.4-microshift-source" \
+        --variable "FAILING_REF:rhel94-bootc-source" \
         --variable "REASON:fail_greenboot" \
+        --variable "BOOTC_REGISTRY:${MIRROR_REGISTRY_URL}" \
         suites/upgrade/upgrade-fails-and-rolls-back.robot
 }
