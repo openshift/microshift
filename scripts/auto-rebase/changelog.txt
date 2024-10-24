@@ -1,6 +1,0 @@
-- ovn-kubernetes image-amd64 2aaf5421ba55bb8d23d70a4bb636a05631a46148 to 4b26ee518792233cb47f495064ac28789dcca2ba
-  - 49e3184 2024-09-12T05:42:03+00:00 Use more exact name match when deleting static routes to HO nodes.
-
-- ovn-kubernetes image-arm64 2aaf5421ba55bb8d23d70a4bb636a05631a46148 to 4b26ee518792233cb47f495064ac28789dcca2ba
-  - 49e3184 2024-09-12T05:42:03+00:00 Use more exact name match when deleting static routes to HO nodes.
-
