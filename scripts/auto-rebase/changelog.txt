@@ -1,0 +1,16 @@
+- machine-config-operator embedded-component 6f827c3d8c3c5c826b04963a19ad0d79c2ba50ee to 92b503eb5942cc8bd95d5af7ba2852369954c662
+  - 97c83093 2024-10-03T07:06:16+00:00 node_controller: add nil check for oldPool
+  - 40a68cc3 2024-10-03T01:48:59+00:00 node_controller: sync all old custom pools
+
+- openshift-controller-manager embedded-component b906ac17726591eb474ce44729af492d692d6779 to 05ca43957983cd8ea5a5890c5271d7cb228ecdd0
+  - 0ea5be7 2024-10-18T13:50:00+00:00 cleanup root and app OWNERS
+  - ce0bfdc 2024-10-03T08:56:21+00:00 de-dup registry urls
+
+- kube-rbac-proxy image-amd64 8ea2c994df4296ec161023d8ff85f9ea0e383216 to c38f4734c6b6931c75d46674122fb4b838b6e64b
+  - 199186c 2024-10-02T15:44:52+02:00 go mod vendor
+  - e889410 2024-10-02T15:44:52+02:00 go.*: bump protobuf
+
+- kube-rbac-proxy image-arm64 8ea2c994df4296ec161023d8ff85f9ea0e383216 to c38f4734c6b6931c75d46674122fb4b838b6e64b
+  - 199186c 2024-10-02T15:44:52+02:00 go mod vendor
+  - e889410 2024-10-02T15:44:52+02:00 go.*: bump protobuf
+
