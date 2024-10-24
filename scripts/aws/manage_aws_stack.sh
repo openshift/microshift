@@ -128,7 +128,7 @@ get_amis() {
     local -r region="${3}"
     local ami_table
     ami_table=$(aws ec2 describe-images --region "${region}" \
-        --filters "Name=name,Values=${os^^}*HVM-*Hourly2-GP3" "Name=architecture,Values=${arch}*" \
+        --filters "Name=name,Values=$(tr '[:lower:]' '[:upper:]' <<< "${os}")*HVM-*Hourly2-GP3" "Name=architecture,Values=${arch}*" \
         --query 'Images[*].[Name,ImageId,Architecture]' --output text)
   
     echo "${ami_table}" | sort -t'-' -k3,3r
