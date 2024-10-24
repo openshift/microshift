@@ -21,6 +21,12 @@ configure_microshift_mirror() {
         return
     fi
 
+    # `repo` might be an enabled repo from a released version instead
+    # of a mirror.
+    if [[ ! "${repo}" =~ ^http ]]; then
+        return
+    fi
+
     local -r tmp_file=$(mktemp)
     tee "${tmp_file}" >/dev/null <<EOF
 [microshift-mirror-rpms]
