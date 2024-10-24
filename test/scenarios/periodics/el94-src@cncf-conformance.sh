@@ -144,6 +144,13 @@ run_sonobuoy() {
         tar xf "${results_dir}/results.tar.gz" -C "${results_dir}"
         cp "${results_dir}/plugins/e2e/results/global/"{e2e.log,junit_01.xml} "${SCENARIO_INFO_DIR}/${SCENARIO}/"
         rm -r "${results_dir}"
+
+        # If we got the results we need to check if there are any failures
+        # Failures without logs are useless
+        failures=$(~/go/bin/sonobuoy status --json | jq '[.plugins[] | select(."result-status" == "failed")] | length')
+        if [ "${failures}" != "0" ]; then
+            rc=1
+        fi
     fi
 
     if [ ${rc} -eq 0 ] ; then
