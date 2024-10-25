@@ -14,7 +14,9 @@ COPY ./bootc-images/$USHIFT_RPM_REPO_NAME.repo ./bootc-images/microshift-centos9
 # Print repository configuration contents.
 # Install MicroShift optional packages and cleanup.
 RUN dnf repoinfo --enabled && \
-    dnf install -y "microshift-olm-{{ .Env.SOURCE_VERSION }}" "microshift-multus-{{ .Env.SOURCE_VERSION }}" && \
+    dnf install -y "microshift-olm-{{ .Env.SOURCE_VERSION }}" \
+        "microshift-multus-{{ .Env.SOURCE_VERSION }}" \
+        "microshift-gateway-api-{{ .Env.SOURCE_VERSION }}"  && \
     rm -vf /etc/yum.repos.d/microshift-*.repo && \
     rm -rvf $USHIFT_RPM_REPO_PATH && \
     dnf clean all
