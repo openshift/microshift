@@ -202,7 +202,7 @@ write_ossm_images_for_arch() {
 
     local base_release
     base_release=$(yq ".spec.version" "${csv_manifest}")
-    jq -n "{\"release\": {\"base\": \"$base_release\"}, \"images\": {}}" > "${gateway_api_release_json}"
+    jq -n "{\"release\": {\"base\": \"${base_release}\"}, \"images\": {}}" > "${gateway_api_release_json}"
 
     cat <<EOF > "${kustomization_arch_file}"
 images:
