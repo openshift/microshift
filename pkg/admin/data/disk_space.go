@@ -29,8 +29,10 @@ func GetSizeOfDir(path string) (uint64, error) {
 	if err != nil {
 		return 0, fmt.Errorf("failed to get size of %q: %w", path, err)
 	}
-	klog.Infof("Calculated size of %q: %vM", path, size/1024/1024)
-	return uint64(size), nil
+	roundedUp := uint64(float64(size) * 1.1)
+	klog.Infof("Calculated size of %q: %vM - increasing by 10%% for safety: %vM",
+		path, size/1024/1024, roundedUp/1024/1024)
+	return roundedUp, nil
 }
 
 func GetAvailableDiskSpace(path string) (uint64, error) {
