@@ -75,3 +75,8 @@ assets:
         ignore: "Provided by MicroShift"
       - file: kustomization.aarch64.yaml
         ignore: "Provided by MicroShift"
+      # Additional files
+      - file: release-gateway-api-aarch64.json
+        ignore: "Provided by MicroShift"
+      - file: release-gateway-api-x86_64.json
+        ignore: "Provided by MicroShift"
