@@ -198,6 +198,11 @@ write_ossm_images_for_arch() {
 
     local csv_manifest="${arch_dir}/servicemeshoperator3.clusterserviceversion.yaml"
     local kustomization_arch_file="${REPOROOT}/assets/optional/gateway-api/kustomization.${GOARCH_TO_UNAME_MAP[${arch}]}.yaml"
+    local gateway_api_release_json="${REPOROOT}/assets/optional/gateway-api/release-gateway-api-${GOARCH_TO_UNAME_MAP[${arch}]}.json"
+
+    local base_release
+    base_release=$(yq ".spec.version" "${csv_manifest}")
+    jq -n "{\"release\": {\"base\": \"$base_release\"}, \"images\": {}}" > "${gateway_api_release_json}"
 
     cat <<EOF > "${kustomization_arch_file}"
 images:
@@ -213,6 +218,7 @@ EOF
     newName: ${new_image_name}
     digest: ${new_image_digest}
 EOF
+        yq -i -o json ".images += {\"${image_name}\": \"${new_image}\"}" "${gateway_api_release_json}"
     done
 }
 
