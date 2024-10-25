@@ -1,0 +1,14 @@
+{
+  "release": {
+    "base": "3.0.0-tp.1"
+  },
+  "images": {
+    "istio-rhel9-operator-ea78213a4c5e1ef3f419df6910740f040c71ad13514aaac0e22c95e7ff4cb96b-annotation": "registry.redhat.io/openshift-service-mesh-tech-preview/istio-rhel9-operator@sha256:ea78213a4c5e1ef3f419df6910740f040c71ad13514aaac0e22c95e7ff4cb96b",
+    "kube-rbac-proxy": "registry.redhat.io/openshift4/ose-kube-rbac-proxy@sha256:0848d89e9f94be04f17beeee75807d7fd11102737e6483ee674f2cf3ae28f213",
+    "manager": "registry.redhat.io/openshift-service-mesh-tech-preview/istio-rhel9-operator@sha256:ea78213a4c5e1ef3f419df6910740f040c71ad13514aaac0e22c95e7ff4cb96b",
+    "istio-pilot-rhel9-376f64eab0ebeb06035983a60d1e7647c5d41354f31a49cb34f4deb7b6708e3e-annotation": "registry.redhat.io/openshift-service-mesh-tech-preview/istio-pilot-rhel9@sha256:376f64eab0ebeb06035983a60d1e7647c5d41354f31a49cb34f4deb7b6708e3e",
+    "istio-proxyv2-rhel9-cbd6bc47341ab8618609f89d063552e17232541c727429855c01deab73e4d06c-annotation": "registry.redhat.io/openshift-service-mesh-tech-preview/istio-proxyv2-rhel9@sha256:cbd6bc47341ab8618609f89d063552e17232541c727429855c01deab73e4d06c",
+    "istio-must-gather-rhel9-e3978aecaafe2678355e21a7303f8620f53d8b774f6592f10527c15bae957224-annotation": "registry.redhat.io/openshift-service-mesh-tech-preview/istio-must-gather-rhel9@sha256:e3978aecaafe2678355e21a7303f8620f53d8b774f6592f10527c15bae957224",
+    "istio-cni-rhel9-f16cd8a29ddcbb3de77cbfcf7e1da78e42cc0c1c502132d477a01c52689cdf23-annotation": "registry.redhat.io/openshift-service-mesh-tech-preview/istio-cni-rhel9@sha256:f16cd8a29ddcbb3de77cbfcf7e1da78e42cc0c1c502132d477a01c52689cdf23"
+  }
+}
