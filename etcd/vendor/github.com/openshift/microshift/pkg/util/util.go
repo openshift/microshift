@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io/fs"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -24,6 +25,16 @@ func Default(s string, defaultS string) string {
 		return defaultS
 	}
 	return s
+}
+
+func PathExistsFS(fsys fs.StatFS, path string) (bool, error) {
+	if _, err := fsys.Stat(path); err == nil {
+		return true, nil
+	} else if errors.Is(err, os.ErrNotExist) {
+		return false, nil
+	} else {
+		return false, fmt.Errorf("checking if path %q exists in the fsys %q failed: %w", path, fsys, err)
+	}
 }
 
 func PathExists(path string) (bool, error) {

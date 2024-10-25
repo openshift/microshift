@@ -1,11 +1,24 @@
-- cluster-openshift-controller-manager-operator embedded-component 0ee6371401da744c7c71723c505463672b9bad45 to 21b8df3a53ed996e0efebf073151462317c0cc17
-  - 7485f92 2024-10-22T09:00:29+03:00 Implement required Apply and ApplyStatus functions for operator client
-  - 967d8e9 2024-10-15T14:03:28+03:00 Add new instanceName openshift-controller-manager as parameter
-  - 83746c4 2024-10-15T14:02:58+03:00 go mod tidy/vendor for 1.31.1
+- kubernetes embedded-component 81c1851c0291160c33b40bc22f031293ef756879 to 33d201fa7850ac4ea827d79282a2d4b11958ad65
+  - 71c063998 2024-10-22T16:52:25+02:00 UPSTREAM: 128263: CRD type check test fix
 
-- oc image-amd64 2f7484ac8ab99e3915df8cffda21a8d4b3205195 to 0be139a3c858e4182504e163457d85cf5f4cbb07
-  - e26860bf 2024-10-18T10:56:06-04:00 gather discovery when using inspect
+- machine-config-operator embedded-component ade515e8915c95699049a2ca2f1739434e1a9971 to 54144b315275a22cc9140677792ef5ed0189bcde
+  - fe3f7cb2 2024-10-21T17:21:37+02:00 OCPBUGS-43428: Soften haproxy timeout for kubeapi probe
+  - 6c309bf9 2024-10-11T09:46:52-07:00 pkg/operator/status: Block ClusterVersion updates until multi-arch transitions complete
+  - 9092db20 2024-08-13T10:24:03+02:00 Increase connection limit for cluster loadbalancer
 
-- oc image-arm64 2f7484ac8ab99e3915df8cffda21a8d4b3205195 to 0be139a3c858e4182504e163457d85cf5f4cbb07
-  - e26860bf 2024-10-18T10:56:06-04:00 gather discovery when using inspect
+- oc image-amd64 0be139a3c858e4182504e163457d85cf5f4cbb07 to ee93eb5a82af5b61c625df9d3a9b50da9740a7d4
+  - c1ef3284 2024-10-22T04:43:36-07:00 pkg/cli/admin/upgrade/recommend: Add --version option for specific releases
+
+- kubernetes image-amd64 81c1851c0291160c33b40bc22f031293ef756879 to 33d201fa7850ac4ea827d79282a2d4b11958ad65
+  - 71c063998 2024-10-22T16:52:25+02:00 UPSTREAM: 128263: CRD type check test fix
+
+- oc image-arm64 0be139a3c858e4182504e163457d85cf5f4cbb07 to ee93eb5a82af5b61c625df9d3a9b50da9740a7d4
+  - c1ef3284 2024-10-22T04:43:36-07:00 pkg/cli/admin/upgrade/recommend: Add --version option for specific releases
+
+- router image-arm64 d095bdbb4777677f5317e49fb353f41b9c1a22e7 to 40db90072b633e6d0ec7d064bd8441f12065a2c4
+  - 9bc5856 2024-10-22T18:23:07-04:00 Listen for stats connections on v6 addresses when relevant.
+  - 186cc41 2024-10-21T18:04:20+02:00 NE-1815: Enable ALPN for reencrypt routes when DCM is enabled
+
+- kubernetes image-arm64 81c1851c0291160c33b40bc22f031293ef756879 to 33d201fa7850ac4ea827d79282a2d4b11958ad65
+  - 71c063998 2024-10-22T16:52:25+02:00 UPSTREAM: 128263: CRD type check test fix
 
