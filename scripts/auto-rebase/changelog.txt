@@ -1,11 +1,24 @@
-- oc image-amd64 3692450b96d57ae3870e5f693e833a0701d0e2b0 to f1d465eaae8e4a3facc0a51b5190ff6047dad4a0
-  - 39d7603f 2024-10-14T13:02:35+03:00 Remove redundant defaulting message in description
+- kubernetes embedded-component 81c1851c0291160c33b40bc22f031293ef756879 to 33d201fa7850ac4ea827d79282a2d4b11958ad65
+  - 71c063998 2024-10-22T16:52:25+02:00 UPSTREAM: 128263: CRD type check test fix
 
-- oc image-arm64 3692450b96d57ae3870e5f693e833a0701d0e2b0 to 2f7484ac8ab99e3915df8cffda21a8d4b3205195
-  - 2f858b85 2024-10-15T10:58:38+03:00 Do not allow new line in user in create user
-  - 39d7603f 2024-10-14T13:02:35+03:00 Remove redundant defaulting message in description
+- machine-config-operator embedded-component ade515e8915c95699049a2ca2f1739434e1a9971 to 54144b315275a22cc9140677792ef5ed0189bcde
+  - fe3f7cb2 2024-10-21T17:21:37+02:00 OCPBUGS-43428: Soften haproxy timeout for kubeapi probe
+  - 6c309bf9 2024-10-11T09:46:52-07:00 pkg/operator/status: Block ClusterVersion updates until multi-arch transitions complete
+  - 9092db20 2024-08-13T10:24:03+02:00 Increase connection limit for cluster loadbalancer
 
-- kubernetes image-arm64 8540bd493e8a42ffb61a3f470f71290488332b1c to 6c76c890616c214538d2b5d664ccfcb4f5e460bd
-  - b993f1482 2024-10-15T06:22:41-04:00 UPSTREAM: <carry>: Revert "Merge pull request #2067 from sanchezl/decprecated"
-  - 205c34a6a 2024-10-03T12:31:49-04:00 UPSTREAM: <carry>: log only deprecated api requests
+- oc image-amd64 0be139a3c858e4182504e163457d85cf5f4cbb07 to ee93eb5a82af5b61c625df9d3a9b50da9740a7d4
+  - c1ef3284 2024-10-22T04:43:36-07:00 pkg/cli/admin/upgrade/recommend: Add --version option for specific releases
+
+- kubernetes image-amd64 81c1851c0291160c33b40bc22f031293ef756879 to 33d201fa7850ac4ea827d79282a2d4b11958ad65
+  - 71c063998 2024-10-22T16:52:25+02:00 UPSTREAM: 128263: CRD type check test fix
+
+- oc image-arm64 0be139a3c858e4182504e163457d85cf5f4cbb07 to ee93eb5a82af5b61c625df9d3a9b50da9740a7d4
+  - c1ef3284 2024-10-22T04:43:36-07:00 pkg/cli/admin/upgrade/recommend: Add --version option for specific releases
+
+- router image-arm64 d095bdbb4777677f5317e49fb353f41b9c1a22e7 to 40db90072b633e6d0ec7d064bd8441f12065a2c4
+  - 9bc5856 2024-10-22T18:23:07-04:00 Listen for stats connections on v6 addresses when relevant.
+  - 186cc41 2024-10-21T18:04:20+02:00 NE-1815: Enable ALPN for reencrypt routes when DCM is enabled
+
+- kubernetes image-arm64 81c1851c0291160c33b40bc22f031293ef756879 to 33d201fa7850ac4ea827d79282a2d4b11958ad65
+  - 71c063998 2024-10-22T16:52:25+02:00 UPSTREAM: 128263: CRD type check test fix
 

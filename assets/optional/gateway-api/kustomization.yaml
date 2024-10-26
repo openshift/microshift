@@ -21,7 +21,7 @@ resources:
   - 00-security.istio.io_requestauthentications.yaml
   - 00-telemetry.istio.io_telemetries.yaml
   - 00-openshift_gateway_api_namespace.yaml
-  - 01-servicemesh-operator3_apps_v1_deployment.yaml
+  - 03-servicemesh-operator3_apps_v1_deployment.yaml
   - 01-servicemesh-operator3-metrics-service_v1_service.yaml
   - 01-servicemesh-operator3_rbac.authorization.k8s.io_v1_clusterrolebinding.yaml
   - 01-servicemesh-operator3_rbac.authorization.k8s.io_v1_clusterrole.yaml

@@ -98,6 +98,10 @@ EOF
     # Remove the old kubelet configuration file so that it is recreated
     sudo rm -f "${KUBELET_HOME}/kubeconfig"
 
+    # LVMS vg-manager requires presence of the lvmd.yaml file at a specific location
+    sudo mkdir -p /var/lib/microshift/lvms
+    sudo ln "${KUBELET_HOME}/lvmd-${PRI_NODE_HOST}.yaml" /var/lib/microshift/lvms/lvmd.yaml
+
     # Start crio & kubelet
     sudo systemctl enable --now crio
     sudo systemd-run --unit=kubelet --description="Kubelet" \
@@ -175,7 +179,7 @@ SEC_NODE_ADDR=$4
 
 # Verify input file existence
 KUBELET_HOME="${HOME}"
-for file in "kubeconfig-${PRI_NODE_HOST}" "kubelet-${SEC_NODE_HOST}".{key,crt} ; do
+for file in "kubeconfig-${PRI_NODE_HOST}" "kubelet-${SEC_NODE_HOST}".{key,crt} "lvmd-${PRI_NODE_HOST}.yaml"; do
     if [ ! -e "${file}" ] ; then
         echo "The kubelet input file '${file}' is missing"
         exit 1

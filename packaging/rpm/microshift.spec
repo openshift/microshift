@@ -201,6 +201,24 @@ Requires: python3-pyyaml
 The microshift-low-latency package provides a baseline configuration prepared for
 running low latency workloads on MicroShift.
 
+%package gateway-api
+Summary: Gateway API for MicroShift
+ExclusiveArch: x86_64 aarch64
+Requires: microshift = %{version}
+
+%description gateway-api
+The microshift-gateway-api package provides the required manifests for the Gateway API to be installed on MicroShift.
+
+%package gateway-api-release-info
+Summary: Release information for Gateway API for MicroShift
+BuildArch: noarch
+Requires: microshift = %{version}
+
+%description gateway-api-release-info
+The microshift-gateway-api-release-info package provides release information files for this
+release. These files contain the list of container image references used by Gateway API
+and can be used to embed those images into osbuilder blueprints.
+
 %prep
 # Dynamic detection of the available golang version also works for non-RPM golang packages
 golang_detected=$(go version | awk '{print $3}' | tr -d '[a-z]' | cut -f1-2 -d.)
@@ -445,6 +463,23 @@ install -p -m644 packaging/tuned/runtime-class/kustomization.yaml %{buildroot}/%
 install -p -m644 packaging/tuned/microshift-tuned.service %{buildroot}%{_unitdir}/microshift-tuned.service
 install -p -m755 packaging/tuned/microshift-tuned.py %{buildroot}%{_bindir}/microshift-tuned
 
+# gateway-api
+install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/000-microshift-gateway-api
+install -p -m644 assets/optional/gateway-api/0* %{buildroot}/%{_prefix}/lib/microshift/manifests.d/000-microshift-gateway-api
+install -p -m644 assets/optional/gateway-api/kustomization.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/000-microshift-gateway-api
+install -p -m755 packaging/greenboot/microshift-running-check-gateway-api.sh %{buildroot}%{_sysconfdir}/greenboot/check/required.d/41_microshift_running_check_gateway_api.sh
+
+%ifarch %{arm} aarch64
+cat assets/optional/gateway-api/kustomization.aarch64.yaml >> %{buildroot}/%{_prefix}/lib/microshift/manifests.d/000-microshift-gateway-api/kustomization.yaml
+%endif
+%ifarch x86_64
+cat assets/optional/gateway-api/kustomization.x86_64.yaml >> %{buildroot}/%{_prefix}/lib/microshift/manifests.d/000-microshift-gateway-api/kustomization.yaml
+%endif
+
+# gateway-api-release-info
+mkdir -p -m755 %{buildroot}%{_datadir}/microshift/release
+install -p -m644 assets/optional/gateway-api/release-gateway-api-{x86_64,aarch64}.json %{buildroot}%{_datadir}/microshift/release/
+
 %pre networking
 
 getent group hugetlbfs >/dev/null || groupadd -r hugetlbfs
@@ -598,10 +633,27 @@ fi
 %{_unitdir}/microshift-tuned.service
 %{_bindir}/microshift-tuned
 
+%files gateway-api
+%dir %{_prefix}/lib/microshift/manifests.d/000-microshift-gateway-api
+%{_prefix}/lib/microshift/manifests.d/000-microshift-gateway-api/*
+%{_sysconfdir}/greenboot/check/required.d/41_microshift_running_check_gateway_api.sh
+
+%files gateway-api-release-info
+%{_datadir}/microshift/release/release-gateway-api-{x86_64,aarch64}.json
+
 
 # Use Git command to generate the log and replace the VERSION string
 # LANG=C git log --date="format:%a %b %d %Y" --pretty="tformat:* %cd %an <%ae> VERSION%n- %s%n" packaging/rpm/microshift.spec
 %changelog
+* Fri Oct 25 2024 Pablo Acevedo Montserrat <pacevedo@redhat.com> 4.18.0
+- USHIFT-4715: Add gateway-api-release-info rpm
+
+* Tue Oct 15 2024 Pablo Acevedo Montserrat <pacevedo@redhat.com> 4.18.0
+- USHIFT-4565: Add greenboot script
+
+* Tue Oct 15 2024 Pablo Acevedo Montserrat <pacevedo@redhat.com> 4.18.0
+- USHIFT-4565: Add microshift-gateway-api rpm
+
 * Mon Sep 16 2024 Praveen Kumar <prkumar@redhat.com> 4.18.0
 - Add microshift-flannel subpackage
 

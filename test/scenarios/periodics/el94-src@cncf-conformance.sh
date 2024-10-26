@@ -32,6 +32,7 @@ prepare_hosts() {
         "redhat@${primary_host_ip}:/home/redhat/kubelet-${secondary_host_name}.key" \
         "redhat@${primary_host_ip}:/home/redhat/kubelet-${secondary_host_name}.crt" \
         "redhat@${primary_host_ip}:/home/redhat/kubeconfig-${primary_host_name}" \
+        "redhat@${primary_host_ip}:/home/redhat/lvmd-${primary_host_name}.yaml" \
         "redhat@${secondary_host_ip}":
 
     scp -P "${secondary_host_ssh_port}" "${ROOTDIR}/scripts/multinode/configure-sec.sh" "redhat@${secondary_host_ip}":
@@ -143,6 +144,13 @@ run_sonobuoy() {
         tar xf "${results_dir}/results.tar.gz" -C "${results_dir}"
         cp "${results_dir}/plugins/e2e/results/global/"{e2e.log,junit_01.xml} "${SCENARIO_INFO_DIR}/${SCENARIO}/"
         rm -r "${results_dir}"
+
+        # If we got the results we need to check if there are any failures
+        # Failures without logs are useless
+        local -r failures=$(~/go/bin/sonobuoy status --json | jq '[.plugins[] | select(."result-status" == "failed")] | length')
+        if [ "${failures}" != "0" ]; then
+            rc=1
+        fi
     fi
 
     if [ ${rc} -eq 0 ] ; then
@@ -168,7 +176,10 @@ scenario_remove_vms() {
 }
 
 scenario_run_tests() {
-    if prepare_hosts ; then
-        run_sonobuoy
+    if ! prepare_hosts ; then
+        return 1
+    fi
+    if ! run_sonobuoy ; then
+        return 1
     fi
 }
