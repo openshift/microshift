@@ -69,7 +69,7 @@ run_aws_cli() {
 
 check_contents(){
     local -r src_dir="s3://${AWS_BUCKET_NAME}/${BCH_SUBDIR}/${UNAME_M}/${TAG_SUBDIR}"
-    local -r must_contain_array=("repo\.tar$" "${VM_POOL_BASENAME}/.*\.iso$")
+    local -r must_contain_array=("repo\.tar$" "mirror-registry\.tar$" "${VM_POOL_BASENAME}/.*\.iso$")
     
     echo "Checking contents of '${src_dir}'"
     local s3_stdout
@@ -101,18 +101,24 @@ action_upload() {
     echo "Uploading ${iso_size} of ISO images to '${iso_dest}'"
     run_aws_cli s3 sync --quiet --include '*.iso' "${iso_base}" "${iso_dest}"
 
-    # Upload ostree commits
-    local -r repo_src="${src_base}/repo.tar"
-    local -r repo_dst="${dst_base}/repo.tar"
+    # Upload ostree commits and mirror registry
+    for repo in repo mirror-registry ; do
+        local repo_src
+        local repo_dst
+        repo_src="${src_base}/${repo}.tar"
+        repo_dst="${dst_base}/${repo}.tar"
 
-    # Archive the repo files before the upload
-    rm -f "${repo_src}"
-    tar cf "${repo_src}" -C "${src_base}" repo
+        # Archive the directory before the upload
+        rm -f "${repo_src}"
+        tar cf "${repo_src}" -C "${src_base}" "${repo}"
 
-    local -r repo_size="$(du -csh "${repo_src}" | awk 'END{print $1}')"
-    echo "Uploading ${repo_size} of ostree commits to '${repo_dst}'"
-    run_aws_cli s3 cp --quiet "${repo_src}" "${repo_dst}"
-    rm -f "${repo_src}"
+        # Upload the directory
+        local repo_size
+        repo_size="$(du -csh "${repo_src}" | awk 'END{print $1}')"
+        echo "Uploading ${repo_size} of ${repo} archive to '${repo_dst}'"
+        run_aws_cli s3 cp --quiet "${repo_src}" "${repo_dst}"
+        rm -f "${repo_src}"
+    done
 }
 
 action_download() {
@@ -129,22 +135,28 @@ action_download() {
     local -r iso_size="$(du -csh "${iso_dest}" | awk 'END{print $1}')"
     echo "Downloaded ${iso_size} of ISO images"
 
-    # Download ostree commits
-    local -r repo_src="${src_base}/repo.tar"
-    local -r repo_dst="${dst_base}/repo.tar"
-    local -r repo_dir="${dst_base}/repo"
+    # Download ostree commits and mirror registry
+    for repo in repo mirror-registry ; do
+        local repo_src
+        local repo_dst
+        local repo_dir
+        repo_src="${src_base}/${repo}.tar"
+        repo_dst="${dst_base}/${repo}.tar"
+        repo_dir="${dst_base}/${repo}"
 
-    echo "Downloading ostree commits from '${repo_src}'"
-    rm -f "${repo_dst}"
-    run_aws_cli s3 cp --quiet "${repo_src}" "${repo_dst}"
+        echo "Downloading ${repo} archive from '${repo_src}'"
+        rm -f "${repo_dst}"
+        run_aws_cli s3 cp --quiet "${repo_src}" "${repo_dst}"
 
-    # Unarchive the repo files after the download
-    rm -rf "${repo_dir}"
-    tar xf "${repo_dst}" -C "${dst_base}"
-    rm -f "${repo_dst}"
+        # Unarchive the files after the download
+        rm -rf "${repo_dir}"
+        tar xf "${repo_dst}" -C "${dst_base}"
+        rm -f "${repo_dst}"
 
-    local -r repo_size="$(du -csh "${repo_dir}" | awk 'END{print $1}')"
-    echo "Downloaded ${repo_size} of ostree commits"
+        local repo_size
+        repo_size="$(du -csh "${repo_dir}" | awk 'END{print $1}')"
+        echo "Downloaded ${repo_size} of ${repo} archive"
+    done
 }
 
 action_verify() {
