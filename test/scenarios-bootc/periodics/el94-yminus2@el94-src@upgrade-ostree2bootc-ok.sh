@@ -5,7 +5,7 @@
 scenario_create_vms() {
     # The y-1 ostree image will be fetched from the cache as it is not built
     # as part of the bootc image build procedure
-    prepare_kickstart host1 kickstart.ks.template "rhel-9.4-microshift-4.${PREVIOUS_MINOR_VERSION}"
+    prepare_kickstart host1 kickstart.ks.template "rhel-9.4-microshift-4.${YMINUS2_MINOR_VERSION}"
     launch_vm 
 }
 
@@ -15,7 +15,7 @@ scenario_remove_vms() {
 
 scenario_run_tests() {
     run_tests host1 \
-        --variable "TARGET_REF:rhel94-bootc-source-ostree-parent-previous-minor" \
+        --variable "TARGET_REF:rhel94-bootc-source-ostree-parent-yminus2" \
         --variable "BOOTC_REGISTRY:${MIRROR_REGISTRY_URL}" \
         suites/upgrade/upgrade-successful.robot
 }

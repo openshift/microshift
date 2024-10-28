@@ -25,23 +25,18 @@ export IMAGEDIR="${OUTPUTDIR}/test-images"
 VM_POOL_BASENAME="vm-storage"
 
 # The location for storage for the VMs.
-# shellcheck disable=SC2034  # used elsewhere
 export VM_DISK_BASEDIR="${IMAGEDIR}/${VM_POOL_BASENAME}"
 
 # The isolated network name used by some VMs.
-# shellcheck disable=SC2034  # used elsewhere
 export VM_ISOLATED_NETWORK="isolated"
 
 # Libvirt network for Multus tests
-# shellcheck disable=SC2034  # used elsewhere
 export VM_MULTUS_NETWORK="multus"
 
 # Libvirt network for IPv6 tests
-# shellcheck disable=SC2034  # used elsewhere
 export VM_IPV6_NETWORK="ipv6"
 
 # Libvirt network for dual stack tests
-# shellcheck disable=SC2034  # used elsewhere
 export VM_DUAL_STACK_NETWORK="dual-stack"
 
 # Location of RPMs built from source
@@ -57,31 +52,24 @@ NEXT_RPM_SOURCE="${OUTPUTDIR}/rpmbuild-fake-next-minor"
 BASE_RPM_SOURCE="${OUTPUTDIR}/rpmbuild-base"
 
 # Location of local repository used by composer
-# shellcheck disable=SC2034  # used elsewhere
 export LOCAL_REPO="${IMAGEDIR}/rpm-repos/microshift-local"
 
 # Location of local repository used by composer
-# shellcheck disable=SC2034  # used elsewhere
 export NEXT_REPO="${IMAGEDIR}/rpm-repos/microshift-fake-next-minor"
 
 # Location of local repository used by composer
-# shellcheck disable=SC2034  # used elsewhere
 export BASE_REPO="${IMAGEDIR}/rpm-repos/microshift-base"
 
 # Location of container images list for all the built images
-# shellcheck disable=SC2034  # used elsewhere
 export CONTAINER_LIST="${IMAGEDIR}/container-images-list"
 
 # Location of the local mirror registry data
-# shellcheck disable=SC2034  # used elsewhere
 export MIRROR_REGISTRY_DIR="${IMAGEDIR}/mirror-registry"
 
 # Location of container images in oci-dir format for all the bootc images
-# shellcheck disable=SC2034  # used elsewhere
 export BOOTC_IMAGE_DIR="${IMAGEDIR}/bootc-images"
 
 # Location of images produced by bootc ISO build procedure
-# shellcheck disable=SC2034  # used elsewhere
 export BOOTC_ISO_DIR="${IMAGEDIR}/bootc-iso-images"
 
 # Location of data files created by the tools for managing scenarios
@@ -95,12 +83,10 @@ export BOOTC_ISO_DIR="${IMAGEDIR}/bootc-iso-images"
 SCENARIO_INFO_DIR="${SCENARIO_INFO_DIR:-${IMAGEDIR}/scenario-info}"
 
 # Directory to crawl for scenarios when creating/running in batch mode.
-#
 # The CI system will override this depending on the job its running.
 SCENARIO_SOURCES="${SCENARIO_SOURCES:-${TESTDIR}/scenarios}"
 
 # Directory where all the scenarios will be copied for execution
-#
 # shellcheck disable=SC2034  # used elsewhere
 SCENARIOS_TO_RUN="${OUTPUTDIR}/scenarios-to-run"
 
@@ -116,7 +102,6 @@ EXCLUDE_CNCF_CONFORMANCE="${EXCLUDE_CNCF_CONFORMANCE:-false}"
 RF_VENV=${RF_VENV:-${OUTPUTDIR}/robotenv}
 
 # The location of the gomplate binary.
-# shellcheck disable=SC2034  # used elsewhere
 export GOMPLATE=${OUTPUTDIR}/bin/gomplate
 
 title() {
@@ -188,7 +173,6 @@ get_vm_bridge_ip() {
 
 # The IP address of the current host on the bridge used for the
 # default network for libvirt VMs.
-# shellcheck disable=SC2034  # used elsewhere
 VM_BRIDGE_IP="$(get_vm_bridge_ip "default")"
 
 # Web server port number
@@ -199,11 +183,9 @@ WEB_SERVER_PORT=8080
 WEB_SERVER_URL="http://${VM_BRIDGE_IP:-$(hostname)}:${WEB_SERVER_PORT}"
 
 # Mirror registry port number
-# shellcheck disable=SC2034  # used elsewhere
 export MIRROR_REGISTRY_PORT=5000
 
 # Mirror registry URL using VM bridge IP with fallback to host name
-# shellcheck disable=SC2034  # used elsewhere
 MIRROR_REGISTRY_URL="${VM_BRIDGE_IP:-$(hostname)}:${MIRROR_REGISTRY_PORT}"
 export MIRROR_REGISTRY_URL
 

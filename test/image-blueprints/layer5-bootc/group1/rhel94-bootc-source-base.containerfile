@@ -1,7 +1,7 @@
 FROM localhost/rhel94-test-agent:latest
 
 # Build arguments
-ARG USHIFT_RPM_REPO_NAME=microshift-local
+ARG USHIFT_RPM_REPO_NAME=microshift-base
 ARG USHIFT_RPM_REPO_PATH=/tmp/$USHIFT_RPM_REPO_NAME
 
 # Copy the MicroShift repository contents
@@ -12,10 +12,10 @@ COPY ./bootc-images/$USHIFT_RPM_REPO_NAME.repo ./bootc-images/microshift-fast-da
     /etc/yum.repos.d/
 
 # Print repository configuration contents.
-# Install MicroShift, test agent and cleanup.
+# Install MicroShift and cleanup.
 RUN dnf repoinfo --enabled && \
-    dnf install -y firewalld "microshift-{{ .Env.SOURCE_VERSION }}" "microshift-release-info-{{ .Env.SOURCE_VERSION }}" && \
-    systemctl enable microshift microshift-test-agent && \
+    dnf install -y firewalld "microshift-{{ .Env.SOURCE_VERSION_BASE }}" "microshift-release-info-{{ .Env.SOURCE_VERSION_BASE }}" && \
+    systemctl enable microshift && \
     rm -vf /etc/yum.repos.d/microshift-*.repo && \
     rm -rvf $USHIFT_RPM_REPO_PATH && \
     dnf clean all

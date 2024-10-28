@@ -12,8 +12,9 @@ Test Tags           ostree
 
 
 *** Variables ***
-${FAILING_REF}      ${EMPTY}
-${REASON}           ${EMPTY}
+${FAILING_REF}          ${EMPTY}
+${REASON}               ${EMPTY}
+${BOOTC_REGISTRY}       ${EMPTY}
 
 
 *** Test Cases ***
@@ -28,7 +29,10 @@ New Deployment Is Consistently Unhealthy And Rolls Back
     Oc Create    configmap -n default unhealthy-upgrade-test
 
     TestAgent.Add Action For Next Deployment    every    ${REASON}
-    Deploy Commit Expecting A Rollback    ${FAILING_REF}
+    Deploy Commit Expecting A Rollback
+    ...    ${FAILING_REF}
+    ...    True
+    ...    ${BOOTC_REGISTRY}
 
     Wait For MicroShift Service
     Backup Should Exist    ${backup}
