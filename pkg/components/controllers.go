@@ -2,12 +2,22 @@ package components
 
 import (
 	"context"
+	"fmt"
+	"math"
 	"os"
+	"strconv"
+	"strings"
+	"time"
 
+	operatorv1 "github.com/openshift/api/operator/v1"
 	"github.com/openshift/microshift/pkg/assets"
 	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/util/cryptomaterial"
 	"k8s.io/klog/v2"
+)
+
+const (
+	haproxyMaxTimeoutMilliseconds = 2147483647 * time.Millisecond
 )
 
 func startServiceCAController(ctx context.Context, cfg *config.Config, kubeconfigPath string) error {
@@ -177,20 +187,8 @@ func startIngressController(ctx context.Context, cfg *config.Config, kubeconfigP
 		return err
 	}
 
-	routerMode := "v4"
-	if cfg.IsIPv6() {
-		routerMode = "v4v6"
-		if !cfg.IsIPv4() {
-			routerMode = "v6"
-		}
-	}
+	extraParams := generateIngressParams(cfg)
 
-	extraParams := assets.RenderParams{
-		"RouterNamespaceOwnership": cfg.Ingress.AdmissionPolicy.NamespaceOwnership == config.NamespaceOwnershipAllowed,
-		"RouterHttpPort":           *cfg.Ingress.Ports.Http,
-		"RouterHttpsPort":          *cfg.Ingress.Ports.Https,
-		"RouterMode":               routerMode,
-	}
 	if err := assets.ApplyServices(ctx, svc, renderTemplate, renderParamsFromConfig(cfg, extraParams), kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply service %v %v", svc, err)
 		return err
@@ -275,4 +273,119 @@ func startDNSController(ctx context.Context, cfg *config.Config, kubeconfigPath 
 		return err
 	}
 	return nil
+}
+
+// getMIMETypes returns a slice of strings from an array of operatorv1.CompressionMIMETypes.
+// MIME strings that contain spaces must be quoted, as HAProxy requires a space-delimited MIME
+// type list. Also quote/escape any characters that are special to HAProxy (\,', and ").
+// See http://cbonte.github.io/haproxy-dconv/2.2/configuration.html#2.2
+func getMIMETypes(mimeTypes []operatorv1.CompressionMIMEType) []string {
+	mimes := []string{}
+
+	for _, m := range mimeTypes {
+		mimeType := string(m)
+		if strings.ContainsAny(mimeType, ` \"`) {
+			mimeType = strconv.Quote(mimeType)
+		}
+		// A single quote doesn't get escaped by strconv.Quote, so do it explicitly
+		if strings.Contains(mimeType, "'") {
+			mimeType = strings.ReplaceAll(mimeType, "'", "\\'")
+		}
+		mimes = append(mimes, mimeType)
+	}
+
+	return mimes
+}
+
+// durationToHAProxyTimespec converts a time.Duration into a number that
+// HAProxy can consume, in the simplest unit possible. If the value would be
+// truncated by being converted to milliseconds, it outputs in microseconds, or
+// if the value would be truncated by being converted to seconds, it outputs in
+// milliseconds, otherwise if the value wouldn't be truncated by converting to
+// seconds, but would be if converted to minutes, it outputs in seconds, etc.
+// up to a maximum unit in hours (the largest time unit natively supported by
+// time.Duration).
+//
+// Also truncates values to the maximum length HAProxy allows if the value is
+// too large, and truncates values to 0s if they are less than 0.
+func durationToHAProxyTimespec(duration time.Duration) string {
+	if duration <= 0 {
+		return "0s"
+	}
+	if duration > haproxyMaxTimeoutMilliseconds {
+		klog.Warningf("time value %v exceeds the maximum timeout length of %v; truncating to maximum value", duration, haproxyMaxTimeoutMilliseconds)
+		return "2147483647ms"
+	}
+
+	if us := duration.Microseconds(); us%1000 != 0 {
+		return fmt.Sprintf("%dus", us)
+	}
+
+	if ms := duration.Milliseconds(); ms%1000 != 0 {
+		return fmt.Sprintf("%dms", ms)
+	} else if ms%time.Minute.Milliseconds() != 0 {
+		return fmt.Sprintf("%ds", int(math.Round(duration.Seconds())))
+	} else if ms%time.Hour.Milliseconds() != 0 {
+		return fmt.Sprintf("%dm", int(math.Round(duration.Minutes())))
+	} else {
+		return fmt.Sprintf("%dh", int(math.Round(duration.Hours())))
+	}
+}
+
+func generateIngressParams(cfg *config.Config) assets.RenderParams {
+	routerMode := "v4"
+	if cfg.IsIPv6() {
+		routerMode = "v4v6"
+		if !cfg.IsIPv4() {
+			routerMode = "v6"
+		}
+	}
+
+	routerEnableCompression := "false"
+	routerCompressionMime := ""
+	if len(cfg.Ingress.HTTPCompressionPolicy.MimeTypes) > 0 {
+		routerEnableCompression = "true"
+		routerCompressionMime = strings.Join(getMIMETypes(cfg.Ingress.HTTPCompressionPolicy.MimeTypes), " ")
+	}
+
+	routerDisableHttp2 := true
+	if cfg.Ingress.DefaultHttpVersionPolicy == config.DefaultHttpVersionV2 {
+		routerDisableHttp2 = false
+	}
+
+	LogEmptyRequests := false
+	if cfg.Ingress.LogEmptyRequests == operatorv1.LoggingPolicyIgnore {
+		LogEmptyRequests = true
+	}
+
+	HTTPEmptyRequestsPolicy := false
+	if cfg.Ingress.HTTPEmptyRequestsPolicy == operatorv1.HTTPEmptyRequestsPolicyIgnore {
+		HTTPEmptyRequestsPolicy = true
+	}
+
+	extraParams := assets.RenderParams{
+		"RouterNamespaceOwnership":    cfg.Ingress.AdmissionPolicy.NamespaceOwnership == config.NamespaceOwnershipAllowed,
+		"RouterHttpPort":              *cfg.Ingress.Ports.Http,
+		"RouterHttpsPort":             *cfg.Ingress.Ports.Https,
+		"RouterMode":                  routerMode,
+		"RouterBufSize":               &cfg.Ingress.TuningOptions.HeaderBufferBytes,
+		"HeaderBufferMaxRewriteBytes": &cfg.Ingress.TuningOptions.HeaderBufferMaxRewriteBytes,
+		"HealthCheckInterval":         durationToHAProxyTimespec(cfg.Ingress.TuningOptions.HealthCheckInterval.Duration),
+		"ClientTimeout":               durationToHAProxyTimespec(cfg.Ingress.TuningOptions.ClientTimeout.Duration),
+		"ClientFinTimeout":            durationToHAProxyTimespec(cfg.Ingress.TuningOptions.ClientFinTimeout.Duration),
+		"ServerTimeout":               durationToHAProxyTimespec(cfg.Ingress.TuningOptions.ServerTimeout.Duration),
+		"ServerFinTimeout":            durationToHAProxyTimespec(cfg.Ingress.TuningOptions.ServerFinTimeout.Duration),
+		"TunnelTimeout":               durationToHAProxyTimespec(cfg.Ingress.TuningOptions.TunnelTimeout.Duration),
+		"TlsInspectDelay":             durationToHAProxyTimespec(cfg.Ingress.TuningOptions.TLSInspectDelay.Duration),
+		"ThreadCount":                 &cfg.Ingress.TuningOptions.ThreadCount,
+		"MaxConnections":              &cfg.Ingress.TuningOptions.MaxConnections,
+		"LogEmptyRequests":            LogEmptyRequests,
+		"ForwardedHeaderPolicy":       &cfg.Ingress.ForwardedHeaderPolicy,
+		"HTTPEmptyRequestsPolicy":     HTTPEmptyRequestsPolicy,
+		"RouterEnableCompression":     routerEnableCompression,
+		"RouterCompressionMime":       routerCompressionMime,
+		"RouterDisableHttp2":          routerDisableHttp2,
+	}
+
+	return extraParams
 }
