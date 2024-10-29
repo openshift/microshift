@@ -1,4 +1,4 @@
-FROM registry.fedoraproject.org/fedora:37
+FROM registry.fedoraproject.org/fedora:42
 
 # glibc-all-langpacks is needed to make asciibinder read UTF-8 properly
 RUN dnf -y install ruby-devel gcc-c++ redhat-rpm-config make git glibc-all-langpacks && dnf clean all
