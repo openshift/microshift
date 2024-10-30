@@ -9,6 +9,8 @@ Resource            ../../resources/microshift-rpm.resource
 Suite Setup         Setup
 Suite Teardown      Teardown Suite With Namespace
 
+Test Tags           vm-only
+
 
 *** Variables ***
 ${BRIDGE_INTERFACE}         br-test
