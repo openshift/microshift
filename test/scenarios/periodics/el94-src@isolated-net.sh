@@ -8,7 +8,7 @@ VM_BRIDGE_IP="$(get_vm_bridge_ip "${VM_ISOLATED_NETWORK}")"
 WEB_SERVER_URL="http://${VM_BRIDGE_IP}:${WEB_SERVER_PORT}"
 
 scenario_create_vms() {
-    prepare_kickstart host1 kickstart.ks.template rhel-9.4-microshift-source-isolated
+    prepare_kickstart host1 kickstart-isolated.ks.template rhel-9.4-microshift-source-isolated
     # Use the isolated network when creating a VM
     launch_vm  --network_name "${VM_ISOLATED_NETWORK}"
 }
