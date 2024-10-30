@@ -1,0 +1,7 @@
+- machine-config-operator embedded-component d656f31b697c2671aac38bbe46d9e5b22d27ae90 to c499c1b28590e520514f2dbacd78111f13c81c4d
+  - c3c8809d 2024-10-11T16:52:49+00:00 Disable ESP offload for OVS attached interfaces
+  - 3256e6ef 2024-10-10T13:58:26+01:00 manifests: set required-scc for kube-rbac-proxy-crio workloads
+
+- oc image-arm64 ee93eb5a82af5b61c625df9d3a9b50da9740a7d4 to 62471c258d8e92d2d07c97515cc82013cc431cbe
+  - 39272ca9 2024-10-23T18:22:00-04:00 OCPBUGS-43513: Show node-joiner container logs when error occurs
+
