@@ -9,7 +9,7 @@ FROM localhost/rhel94-bootc-source:latest
 #
 # {{ range (.Env.SOURCE_IMAGES | strings.Split ",") }}
 RUN --mount=type=secret,id=pullsecret,dst=/run/secrets/pull-secret.json \
-    for i in {1..3}; do \
+    for i in 1 2 3; do \
         GOMAXPROCS=8 podman pull \
             --authfile /run/secrets/pull-secret.json \
             --root /var/lib/containers/storage-preloaded \
