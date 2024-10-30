@@ -37,6 +37,10 @@ version = "*"
 name = "podman"
 version = "*"
 
+[[packages]]
+name = "skopeo"
+version = "*"
+
 [customizations.services]
 enabled = ["microshift", "microshift-test-agent", "qemu-guest-agent"]
 
