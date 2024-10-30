@@ -1,10 +1,10 @@
 device-classes:
-- name: rhel
-  volume-group: rhel
+- name: default
+  volume-group: ${lvmd_vg}
   spare-gb: 0
   default: true
 - name: thin
-  volume-group: rhel
+  volume-group: ${lvmd_vg}
   spare-gb: 0
   default: false
   type: thin

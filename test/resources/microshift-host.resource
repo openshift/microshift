@@ -61,14 +61,16 @@ Reboot MicroShift Host
 
 Create Thin Storage Pool
     [Documentation]    Create a new thin storage pool
-    ${stderr}    ${rc}=    SSHLibrary.Execute Command    lvcreate --size 4G --thin /dev/rhel --name thin
+    ${lvmd_vg}=    Set Variable If    '${LVMD_VG_OVERRIDE}' != ''    ${LVMD_VG_OVERRIDE}    rhel
+    ${stderr}    ${rc}=    SSHLibrary.Execute Command    lvcreate --size 2G --thin /dev/${lvmd_vg} --name thin
     ...    sudo=True    return_rc=True    return_stderr=True    return_stdout=False
     Log    ${stderr}
     Should Be Equal As Integers    0    ${rc}
 
 Delete Thin Storage Pool
     [Documentation]    Delete the thin storage pool as part of restoring test env
-    ${stderr}    ${rc}=    SSHLibrary.Execute Command    lvremove -y rhel/thin
+    ${lvmd_vg}=    Set Variable If    '${LVMD_VG_OVERRIDE}' != ''    ${LVMD_VG_OVERRIDE}    rhel
+    ${stderr}    ${rc}=    SSHLibrary.Execute Command    lvremove -y ${lvmd_vg}/thin
     ...    sudo=True    return_rc=True    return_stderr=True    return_stdout=False
     Log    ${stderr}
     Should Be Equal As Integers    0    ${rc}
