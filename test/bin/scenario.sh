@@ -15,6 +15,8 @@ SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 source "${SCRIPTDIR}/common.sh"
 # shellcheck source=test/bin/common_versions.sh
 source "${SCRIPTDIR}/common_versions.sh"
+# shellcheck source=test/bin/scenario_container.sh
+source "${SCRIPTDIR}/scenario_container.sh"
 
 DEFAULT_BOOT_BLUEPRINT="rhel-9.4"
 LVM_SYSROOT_SIZE="10240"
