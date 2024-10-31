@@ -1,7 +1,12 @@
-- machine-config-operator embedded-component d656f31b697c2671aac38bbe46d9e5b22d27ae90 to c499c1b28590e520514f2dbacd78111f13c81c4d
-  - c3c8809d 2024-10-11T16:52:49+00:00 Disable ESP offload for OVS attached interfaces
-  - 3256e6ef 2024-10-10T13:58:26+01:00 manifests: set required-scc for kube-rbac-proxy-crio workloads
+- etcd embedded-component fd65559cbf04ccbaf79c8b028a866f1492c0e63a to 825fc46f2c1be39640edce95c49d3b70243e9d6b
+  - a435a4ab 2024-10-28T16:23:23-04:00 Add support for cachi2 based deps Konflux is replacing RH's internal build system OSBS. OSBS supported a build-time dependency injection system called "cachito". Konflux replaces this with "cachi2" which works differently. REMOTE_SOURCES no longer need to be copied into place and there is no need to source cachito's environment information (Konflux automatically rewrites the Dockerfile to source cachi2/cachi2.env before running the original RUN commands). Additionally, cachito appears to have provided go.sum dependencies whereas cachi2 requires all build-time dependencies in go.mod. Missing dependencies are added to go.mod as // indirect in this change.
 
-- oc image-arm64 ee93eb5a82af5b61c625df9d3a9b50da9740a7d4 to 62471c258d8e92d2d07c97515cc82013cc431cbe
+- machine-config-operator embedded-component c499c1b28590e520514f2dbacd78111f13c81c4d to b3a562be44deb94fa4ea86e25a9d83395c3d188d
+  - 3f9acedb 2024-10-25T11:51:50+02:00 OPNET-569: Do not run resolv-prepender from NM dispatcher
+
+- operator-framework-olm embedded-component b980e95a56dc213fa987f55db2f8fb426093e51f to 29f4d1afaf2329f5c14b538fed79078ce9b6dedf
+  - 0f1b3ead 2024-10-30T00:05:48+00:00 fix: buggy nextY logic for maxOCPVersion (#3416)
+
+- oc image-amd64 ee93eb5a82af5b61c625df9d3a9b50da9740a7d4 to 62471c258d8e92d2d07c97515cc82013cc431cbe
   - 39272ca9 2024-10-23T18:22:00-04:00 OCPBUGS-43513: Show node-joiner container logs when error occurs
 
