@@ -1,51 +1,6 @@
-- cluster-network-operator embedded-component fd6dd92100c00fb7e29213029b37a4e667d3bd7b to 90aba6ff9737c0316f566720242e3f396d836d8a
-  - bba19db 2024-10-18T10:22:26+00:00 Use CNIConfDir for mounting directory to ovn-ipsec-host pod
+- cluster-network-operator embedded-component 90aba6ff9737c0316f566720242e3f396d836d8a to cad89f0fe351e5da920167842d476e0c603c5f43
+  - 9edaf24 2024-06-26T12:11:19+00:00 Set global IP forwarding sysctl parameters while starting ovnkube-controller
 
-- kubernetes embedded-component 632b078b578ba9af3734f420c57e7e9d584b0930 to 5865c5bb1ae6723901343b4c6274de5c8da9fbe3
-  - d50c5da04 2024-09-20T03:00:58+00:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
-  - 114a1f580 2024-09-11T20:19:52+00:00 Release commit for Kubernetes v1.29.9
-  - a1f9bf819 2024-09-06T20:01:14+00:00 Restart the init container to not be stuck in created state
-  - 002953704 2024-09-06T18:29:23+00:00 succeeded pod is being re-admitted
-  - 13e07278c 2024-09-06T16:38:12+00:00 Avoid SidecarContainers code path for non-sidecar pods
-  - bbf2bbda7 2024-09-04T14:09:01+08:00 Build etcd image of v3.5.15
-  - 5c47ea245 2024-09-04T14:08:59+08:00 Update etcd from v3.5.14 to v3.5.15
-  - 7cf208cbc 2024-09-02T14:42:21+02:00 add missing RBAC to statefulset-controller for StatefulSetAutoDeletePVC feature
-  - 9042e28e7 2024-08-28T15:14:28+02:00 Bump images, dependencies and versions to go 1.22.6 and distroless iptables
-  - a9d15f3d8 2024-08-19T10:49:14+00:00 Add a new workqueue to endpointslice controller for updating topology cache and checking node topology distribution.
-  - 519736b04 2024-08-14T20:07:03+00:00 Update CHANGELOG/CHANGELOG-1.29.md for v1.29.8
-  - 6f67ce809 2024-08-14T11:54:11-07:00 fix a scheduler preemption issue that victim is not patched properly
-  - c8ead7af3 2024-08-14T09:09:33-07:00 kube-proxy: initialization wait for service and endpoint handlers synced
-
-- machine-config-operator embedded-component 92b503eb5942cc8bd95d5af7ba2852369954c662 to f0ed6257803de71df75665aa4c22aa6f1c29d1ba
-  - 66af07f0 2024-10-03T17:41:42+00:00 Check for kernel arg diff in updateOnClusterBuild
-
-- kubernetes image-amd64 632b078b578ba9af3734f420c57e7e9d584b0930 to 5865c5bb1ae6723901343b4c6274de5c8da9fbe3
-  - d50c5da04 2024-09-20T03:00:58+00:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
-  - 114a1f580 2024-09-11T20:19:52+00:00 Release commit for Kubernetes v1.29.9
-  - a1f9bf819 2024-09-06T20:01:14+00:00 Restart the init container to not be stuck in created state
-  - 002953704 2024-09-06T18:29:23+00:00 succeeded pod is being re-admitted
-  - 13e07278c 2024-09-06T16:38:12+00:00 Avoid SidecarContainers code path for non-sidecar pods
-  - bbf2bbda7 2024-09-04T14:09:01+08:00 Build etcd image of v3.5.15
-  - 5c47ea245 2024-09-04T14:08:59+08:00 Update etcd from v3.5.14 to v3.5.15
-  - 7cf208cbc 2024-09-02T14:42:21+02:00 add missing RBAC to statefulset-controller for StatefulSetAutoDeletePVC feature
-  - 9042e28e7 2024-08-28T15:14:28+02:00 Bump images, dependencies and versions to go 1.22.6 and distroless iptables
-  - a9d15f3d8 2024-08-19T10:49:14+00:00 Add a new workqueue to endpointslice controller for updating topology cache and checking node topology distribution.
-  - 519736b04 2024-08-14T20:07:03+00:00 Update CHANGELOG/CHANGELOG-1.29.md for v1.29.8
-  - 6f67ce809 2024-08-14T11:54:11-07:00 fix a scheduler preemption issue that victim is not patched properly
-  - c8ead7af3 2024-08-14T09:09:33-07:00 kube-proxy: initialization wait for service and endpoint handlers synced
-
-- kubernetes image-arm64 632b078b578ba9af3734f420c57e7e9d584b0930 to 5865c5bb1ae6723901343b4c6274de5c8da9fbe3
-  - d50c5da04 2024-09-20T03:00:58+00:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
-  - 114a1f580 2024-09-11T20:19:52+00:00 Release commit for Kubernetes v1.29.9
-  - a1f9bf819 2024-09-06T20:01:14+00:00 Restart the init container to not be stuck in created state
-  - 002953704 2024-09-06T18:29:23+00:00 succeeded pod is being re-admitted
-  - 13e07278c 2024-09-06T16:38:12+00:00 Avoid SidecarContainers code path for non-sidecar pods
-  - bbf2bbda7 2024-09-04T14:09:01+08:00 Build etcd image of v3.5.15
-  - 5c47ea245 2024-09-04T14:08:59+08:00 Update etcd from v3.5.14 to v3.5.15
-  - 7cf208cbc 2024-09-02T14:42:21+02:00 add missing RBAC to statefulset-controller for StatefulSetAutoDeletePVC feature
-  - 9042e28e7 2024-08-28T15:14:28+02:00 Bump images, dependencies and versions to go 1.22.6 and distroless iptables
-  - a9d15f3d8 2024-08-19T10:49:14+00:00 Add a new workqueue to endpointslice controller for updating topology cache and checking node topology distribution.
-  - 519736b04 2024-08-14T20:07:03+00:00 Update CHANGELOG/CHANGELOG-1.29.md for v1.29.8
-  - 6f67ce809 2024-08-14T11:54:11-07:00 fix a scheduler preemption issue that victim is not patched properly
-  - c8ead7af3 2024-08-14T09:09:33-07:00 kube-proxy: initialization wait for service and endpoint handlers synced
+- machine-config-operator embedded-component f0ed6257803de71df75665aa4c22aa6f1c29d1ba to 20e767851f25a12f9be5701012abb881ac33ab25
+  - 8454be44 2024-09-26T04:09:52+00:00 OCPBUGS-38012: Do not use 'restart' for 'oneshot' service
 
