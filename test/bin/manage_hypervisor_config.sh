@@ -8,6 +8,9 @@ SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # shellcheck source=test/bin/common.sh
 source "${SCRIPTDIR}/common.sh"
 
+VGFILE=/var/lib/microshift-lvm-storage.img
+VGSIZE=10G
+
 usage() {
     cat - <<EOF
 ${BASH_SOURCE[0]} (create|cleanup|cleanup-all)
@@ -123,6 +126,13 @@ action_create() {
 
     # Start nginx web server
     "${TESTDIR}/bin/manage_webserver.sh" "start"
+
+    if ! sudo vgdisplay rhel; then
+        sudo truncate --size="${VGSIZE}" "${VGFILE}"
+        sudo losetup -f "${VGFILE}"
+        local -r vgloop=$(losetup -j /var/lib/microshift-lvm-storage.img | head -n1 | cut -d: -f1)
+        sudo vgcreate -f -y rhel "${vgloop}"
+    fi
 }
 
 action_cleanup() {
@@ -159,6 +169,13 @@ action_cleanup() {
 
     # Stop nginx web server
     "${TESTDIR}/bin/manage_webserver.sh" "stop"
+
+    if [ -e "${VGFILE}" ]; then
+        sudo vgremove rhel
+        local -r vgloop=$(losetup -j "${VGFILE}" | head -n1 | cut -d: -f1)
+        sudo losetup -d "${vgloop}"
+        sudo rm -f "${VGFILE}"
+    fi
 }
 
 action_cleanup-all() {
