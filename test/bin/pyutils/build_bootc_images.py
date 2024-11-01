@@ -229,26 +229,23 @@ def process_containerfile(groupdir, containerfile, dry_run):
     try:
         # Redirect the output to the log file
         with open(cf_logfile, 'w') as logfile:
-            # Run the container build command.
-            # Note: The pull secret is necessary in some builds for pulling embedded
-            # container images specified by SOURCE_IMAGES environment variable.
+            # Run the container build command
+            # Note:
+            # - The pull secret is necessary in some builds for pulling embedded
+            #   container images specified by SOURCE_IMAGES environment variable
+            # - The --cache-to option updates the build layers in the mirror
+            #   registry so no explicit push-to-mirror is necessary
             build_args = [
                 "sudo", "podman", "build",
                 "--authfile", PULL_SECRET,
                 "--secret", f"id=pullsecret,src={PULL_SECRET}",
+                "--cache-to", f"{MIRROR_REGISTRY}/{cf_outname}",
+                "--cache-from", f"{MIRROR_REGISTRY}/{cf_outname}",
                 "-t", cf_outname, "-f", cf_outfile,
                 IMAGEDIR
             ]
             common.retry_on_exception(3, common.run_command_in_shell, build_args, dry_run, logfile, logfile)
             common.record_junit(cf_path, "build-container", "OK")
-
-            push_args = [
-                "sudo", "podman", "push",
-                cf_outname,
-                f"{MIRROR_REGISTRY}/{cf_outname}"
-            ]
-            common.run_command_in_shell(push_args, dry_run, logfile, logfile)
-            common.record_junit(cf_path, "push-container", "OK")
     except Exception:
         common.record_junit(cf_path, "process-container", "FAILED")
         # Propagate the exception to the caller

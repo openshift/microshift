@@ -11,28 +11,21 @@ REGISTRY_HOST=${REGISTRY_HOST:-${MIRROR_REGISTRY_URL}}
 PULL_SECRET=${PULL_SECRET:-${HOME}/.pull-secret.json}
 LOCAL_REGISTRY_NAME="microshift-local-registry"
 
-retry_pull_image() {
-    for attempt in $(seq 3) ; do
-        if ! podman pull "$@" ; then
-            echo "WARNING: Failed to pull image, retry #${attempt}"
-        else
-            return 0
-        fi
-        sleep $(( "${attempt}" * 10 ))
-    done
-
-    echo "ERROR: Failed to pull image, quitting after 3 tries"
-    return 1
-}
-
 prereqs() {
     # Install packages if not yet available locally
     if ! rpm -q podman skopeo jq &>/dev/null ; then
         "${SCRIPTDIR}/../../scripts/dnf_retry.sh" "install" "podman skopeo jq"
     fi
-    podman stop "${LOCAL_REGISTRY_NAME}" || true
-    podman rm "${LOCAL_REGISTRY_NAME}" || true
-    retry_pull_image "${REGISTRY_IMAGE}"
+    # Pull the registry image locally
+    podman rm -f "${LOCAL_REGISTRY_NAME}" || true
+    skopeo copy \
+        --quiet \
+        --retry-times 3 \
+        --preserve-digests \
+        --authfile "${PULL_SECRET}" \
+        "docker://${REGISTRY_IMAGE}" \
+        "containers-storage:${REGISTRY_IMAGE}"
+    # Create registry repository directory
     mkdir -p "${MIRROR_REGISTRY_DIR}"
 }
 
@@ -41,8 +34,23 @@ setup_registry() {
     # and it defaults to https. Since this is not supported we need to configure registries.conf so that skopeo tries http instead.
     sudo bash -c 'cat > /etc/containers/registries.conf.d/900-microshift-mirror.conf' << EOF
 [[registry]]
-location = "${REGISTRY_HOST}"
-insecure = true
+    prefix = ""
+    location = "${REGISTRY_HOST}"
+    insecure = true
+
+[[registry]]
+    prefix = ""
+    location = "quay.io"
+[[registry.mirror]]
+    location = "${REGISTRY_HOST}"
+    insecure = true
+
+[[registry]]
+    prefix = ""
+    location = "registry.redhat.io"
+[[registry.mirror]]
+    location = "${REGISTRY_HOST}"
+    insecure = true
 EOF
     # Create the registry configuration file.
     # See https://distribution.github.io/distribution/about/configuration.
@@ -80,6 +88,31 @@ mirror_images() {
     local -r ifile=$1
     local -r ofile=$(mktemp /tmp/container-list.XXXXXXXX)
 
+    # Mirror the distribution registry and FROM images by tags separately as
+    # mirror-images.sh does not support mirroring by tag
+    echo "${REGISTRY_IMAGE}" > "${ofile}"
+    for cf in "${BOOTC_IMAGE_DIR}"/*.containerfile ; do
+        local src_img
+        src_img=$(grep -i '^FROM ' "${cf}" | awk '$2 !~ /^localhost\// {print $2}')
+        [ -z "${src_img}" ] && continue
+        echo "${src_img}" >> "${ofile}"
+    done
+
+    while read -r src_img ; do
+        local dst_img
+        dst_img="${src_img#*/}"
+        [ -z "${dst_img}" ] && continue
+
+        echo "Mirroring '${src_img}' to '${REGISTRY_HOST}/${dst_img}'"
+        sudo skopeo copy \
+            --quiet \
+            --retry-times 3 \
+            --preserve-digests \
+            --authfile "${PULL_SECRET}" \
+            "docker://${src_img}" "docker://${REGISTRY_HOST}/${dst_img}"
+    done < "${ofile}"
+
+    # Mirror the images by digest
     sort -u "${ifile}" > "${ofile}"
     "${ROOTDIR}/scripts/image-builder/mirror-images.sh" --mirror "${PULL_SECRET}" "${ofile}" "${REGISTRY_HOST}"
     rm -f "${ofile}"
