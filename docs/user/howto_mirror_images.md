@@ -4,19 +4,6 @@ When deploying MicroShift in [air gapped networks](https://en.wikipedia.org/wiki
 it is often necessary to use a custom container registry server because the access
 to the Internet is not allowed.
 
-Note that it is possible to embed the container images in the MicroShift ISO and
-also in the subsequent `ostree` updates by using the `-embed_containers` option
-of the `scripts/image-builder/build.sh` script. Such ISO images and updates can
-be transferred to air gapped environments and installed on MicroShift instances.
-
-> The container embedding procedures are described in the
-> [Offline Containers](../contributor/rhel4edge_iso.md#offline-containers) and
-> [The `ostree` Update Server](../contributor/rhel4edge_iso.md#the-ostree-update-server)
-> sections.
-
-However, a custom air gapped container registry may still be necessary due to
-the user environment and workload requirements. 
-
 This document describes how to mirror MicroShift container images into an existing
 registry in an air gapped environment.
 
