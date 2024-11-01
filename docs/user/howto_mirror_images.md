@@ -80,7 +80,7 @@ and password.
 
 > Install the `skopeo` tool used for copying the container images.
  
-Run the `./scripts/image-builder/mirror-images.sh` script with `--reg-to-dir`
+Run the `./scripts/mirror-images.sh` script with `--reg-to-dir`
 option to initiate the image download procedure into a local directory on a
 host with the Internet connection.
 ```
@@ -89,7 +89,7 @@ IMAGE_LIST_FILE=~/microshift-container-images.txt
 IMAGE_LOCAL_DIR=~/microshift-containers
 
 mkdir -p "${IMAGE_LOCAL_DIR}"
-./scripts/image-builder/mirror-images.sh --reg-to-dir "${IMAGE_PULL_FILE}" "${IMAGE_LIST_FILE}" "${IMAGE_LOCAL_DIR}"
+./scripts/mirror-images.sh --reg-to-dir "${IMAGE_PULL_FILE}" "${IMAGE_LIST_FILE}" "${IMAGE_LOCAL_DIR}"
 ```
 
 The contents of the local directory can now be transferred to an air gapped site
@@ -99,7 +99,7 @@ and imported into the mirror registry.
 
 > Install the `skopeo` tool used for copying the container images.
 
-Run the `./scripts/image-builder/mirror-images.sh` script with `--dir-to-reg` option
+Run the `./scripts/mirror-images.sh` script with `--dir-to-reg` option
 in the air gapped environment to initiate the image upload procedure from a local
 directory to a mirror registry.
 ```
@@ -107,5 +107,5 @@ IMAGE_PULL_FILE=~/.pull-secret-mirror.json
 IMAGE_LOCAL_DIR=~/microshift-containers
 TARGET_REGISTRY=microshift-quay:8443
 
-./scripts/image-builder/mirror-images.sh --dir-to-reg "${IMAGE_PULL_FILE}" "${IMAGE_LOCAL_DIR}" "${TARGET_REGISTRY}"
+./scripts/mirror-images.sh --dir-to-reg "${IMAGE_PULL_FILE}" "${IMAGE_LOCAL_DIR}" "${TARGET_REGISTRY}"
 ```
