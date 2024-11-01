@@ -302,7 +302,7 @@ srpm:
 .PHONY: srpm
 
 image-build-configure:
-	./scripts/image-builder/configure.sh
+	./scripts/devenv-builder/configure-composer.sh
 .PHONY: image-build-configure
 
 image-build-iso: rpm

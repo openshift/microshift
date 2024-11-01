@@ -36,7 +36,7 @@ action_create() {
         exit 1
     fi
     
-    "${ROOTDIR}/scripts/image-builder/configure.sh"
+    "${ROOTDIR}/scripts/devenv-builder/configure-composer.sh"
     
     "${TESTDIR}/bin/manage_webserver.sh" "start"
 }
