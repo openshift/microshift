@@ -1,7 +1,0 @@
-id = "microshift-local"
-name = "MicroShift Local Repo"
-type = "yum-baseurl"
-url = "file://REPLACE_IMAGE_BUILDER_DIR/microshift-local/"
-check_gpg = false
-check_ssl = false
-system = false
