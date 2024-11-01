@@ -49,9 +49,6 @@ $ rpm2cpio microshift-release-info*.noarch.rpm | cpio -idmv
 ./usr/share/microshift/release/release-x86_64.json
 ```
 
-> Optionally use the `scripts/image-builder/download-rpms.sh` script for
-> downloading the released version of MicroShift RPM packages.
-
 The list of container images can be extracted into the `microshift-container-refs.txt`
 file using the following command.
 ```
