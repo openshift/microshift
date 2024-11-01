@@ -1,0 +1,16 @@
+%include /main-prologue.cfg
+%include /main-network.cfg
+%include /main-ostree.cfg
+
+%post --log=/dev/console --erroronfail
+
+# Isolated environments must not perform container registry configuration
+# because it may give the VM access to mirror registry images.
+%include /post-microshift.cfg
+%include /post-system.cfg
+%include /post-network.cfg
+%include /post-fips.cfg
+
+%end
+
+%include /onerror-logs.cfg

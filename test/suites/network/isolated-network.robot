@@ -42,6 +42,7 @@ Verify MicroShift Is Healthy In Isolated Network After Clean And Reboot
     Reboot MicroShift Host
 
     Verify No Internet Access
+    Verify No Registry Access
     Wait Until Greenboot Health Check Exited
 
 
@@ -52,6 +53,7 @@ Setup
     Login MicroShift Host
 
     Verify No Internet Access
+    Verify No Registry Access
     Wait Until Greenboot Health Check Exited
 
 Teardown
@@ -63,6 +65,26 @@ Verify No Internet Access
     ${rc}=    Execute Command
     ...    curl -I redhat.com quay.io registry.redhat.io
     ...    return_stdout=False    return_stderr=False    return_rc=True
+    Should Not Be Equal As Integers    ${rc}    0
+
+Verify No Registry Access
+    [Documentation]    Verifies that container registry is not accessible
+    ...    also taking into account possible mirror registry presence.
+
+    # Get a digest reference for a local image from quay.io.
+    # It must exist because images are preloaded in isolated configurations.
+    ${imageref}    ${stderr}    ${rc}=    Execute Command
+    ...    sudo podman images --format "{{.Repository}}\@{{.Digest}}" | grep ^quay.io/ | head -1
+    ...    return_stdout=True    return_stderr=True    return_rc=True
+    Should Be Equal As Integers    ${rc}    0
+    Should Not Be Empty    ${imageref}
+
+    # Try to copy the image to a local storage and make sure the operation fails.
+    # Note that it is important to try accessing the image by digest because the
+    # mirror registry may be configured with 'mirror-by-digest-only=true' option.
+    ${stdout}    ${stderr}    ${rc}=    Execute Command
+    ...    skopeo copy docker://${imageref} containers-storage:copy-should-fail
+    ...    return_stdout=True    return_stderr=True    return_rc=True
     Should Not Be Equal As Integers    ${rc}    0
 
 Create Load Balancer
