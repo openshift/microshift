@@ -88,12 +88,13 @@ mirror_images() {
     local -r ifile=$1
     local -r ofile=$(mktemp /tmp/container-list.XXXXXXXX)
 
-    # Mirror the distribution registry and FROM images by tags separately as
-    # mirror-images.sh does not support mirroring by tag
+    # Mirror the distribution registry and non-localhost-FROM images by tags
+    # separately as mirror-images.sh does not support mirroring by tag
     echo "${REGISTRY_IMAGE}" > "${ofile}"
-    for cf in "${BOOTC_IMAGE_DIR}"/*.containerfile ; do
+    find "${SCRIPTDIR}/../image-blueprints" -name '*.containerfile' | while read -r cf ; do
         local src_img
-        src_img=$(grep -i '^FROM ' "${cf}" | awk '$2 !~ /^localhost\// {print $2}')
+        src_img=$(awk '/^FROM / && $2 !~ /^localhost\// {print $2}' "${cf}")
+
         [ -z "${src_img}" ] && continue
         echo "${src_img}" >> "${ofile}"
     done
