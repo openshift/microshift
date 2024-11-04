@@ -1,6 +1,6 @@
 # Export shell defined to support Ubuntu
 export SHELL := $(shell which bash)
-
+# Dummy change
 PROJECT_DIR := $(shell dirname $(abspath $(lastword $(MAKEFILE_LIST))))
 
 # Include openshift build-machinery-go libraries
