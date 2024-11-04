@@ -34,6 +34,7 @@ spec:
         image: containernetworking-plugins-microshift
         command: ["/bin/sh"]
         args: ["-c", "rm -f /host/run/cni/dhcp.sock"]
+        terminationMessagePolicy: FallbackToLogsOnError
         volumeMounts:
         - name: socketpath
           mountPath: /host/run/cni
@@ -52,6 +53,7 @@ spec:
             memory: 65Mi
         securityContext:
           privileged: true
+        terminationMessagePolicy: FallbackToLogsOnError
         volumeMounts:
         - name: socketpath
           mountPath: /host/run/cni

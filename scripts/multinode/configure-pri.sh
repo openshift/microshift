@@ -48,11 +48,10 @@ function configure_microshift() {
         sudo ip addr add 10.44.0.0/32 dev br-ex
     fi
 
-    # Configure MicroShift to allow API server access by an IP address
+    # Configure MicroShift to advertise apiserver in the node IP
     cat <<EOF | sudo tee /etc/microshift/config.yaml &>/dev/null
 apiServer:
-  subjectAltNames:
-    - "10.43.0.1"
+  advertiseAddress: ${PRI_NODE_ADDR}
 EOF
 }
 
@@ -162,6 +161,10 @@ EOF
     # Copy the bootstrap kube configuration files
     sudo cp "/var/lib/microshift/resources/kubeadmin/${PRI_NODE_HOST}/kubeconfig" "${KUBELET_HOME}/kubeconfig-${PRI_NODE_HOST}"
     sudo chown "$(whoami)." "${KUBELET_HOME}/kubeconfig-${PRI_NODE_HOST}"
+
+    # Copy lvmd configuration files for the second node
+    sudo cp /var/lib/microshift/lvms/lvmd.yaml "${KUBELET_HOME}/lvmd-${PRI_NODE_HOST}.yaml"
+    sudo chown "$(whoami)." "${KUBELET_HOME}/lvmd-${PRI_NODE_HOST}.yaml"
 }
 
 #
@@ -202,6 +205,7 @@ echo
 echo "Copy the following files to the ${SEC_NODE_HOST} host"
 ls -1 "${KUBELET_HOME}/kubeconfig-${PRI_NODE_HOST}"
 ls -1 "${KUBELET_HOME}/kubelet-${SEC_NODE_HOST}".{key,crt}
+ls -1 "${KUBELET_HOME}/lvmd-${PRI_NODE_HOST}.yaml"
 
 echo
 echo "Done"

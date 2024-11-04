@@ -1,10 +1,6 @@
 #!/bin/bash
 
-# This scenario was disabled because osbuild takes a newest cri-o possible for `cri-o >= 1.25.0` requirement,
-# which happens to be crio >= 1.29 which no longer ships `crun` runtime definition.
-# TODO: Re-enable when new MicroShift EC (with crun runtime definition in cri-o config) is produced.
-
-# Sourced from cleanup_scenario.sh and uses functions defined there.
+# Sourced from scenario.sh and uses functions defined there.
 
 start_commit=rhel-9.4-microshift-crel
 

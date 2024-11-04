@@ -70,14 +70,14 @@ spec:
         - args:
             - -f
             - /flannel
-            - /usr/libexec/cni
+            - /run/cni/bin
           command:
             - cp
           image: flannel-plugin
           imagePullPolicy: IfNotPresent
           name: install-cni-plugin
           volumeMounts:
-            - mountPath: /usr/libexec/cni
+            - mountPath: /run/cni/bin
               name: cni-plugin
         - args:
             - -f
@@ -103,7 +103,8 @@ spec:
             path: /run/flannel
           name: run
         - hostPath:
-            path: /usr/libexec/cni
+            path: /run/cni/bin
+            type: DirectoryOrCreate
           name: cni-plugin
         - hostPath:
             path: /etc/cni/net.d

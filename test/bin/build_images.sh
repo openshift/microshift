@@ -116,16 +116,25 @@ get_blueprint_name() {
     tomcli-get "${filename}" name
 }
 
-# Given a blueprint filename, extract the parent blue filename from
-# the prefix and use that to find the actual blueprint name that
-# composer knows.
+# Given a blueprint filename, extract the parent blueprint filename from the
+# prefix and use that to find the actual blueprint name that composer knows.
 #
 # rhel92-microshift-source -> rhel-9.2
 #
-# FIXME: We may need to change the prefix separator in the future if
-# we need a multi-level hierarchy.
+# The function also supports an explicit parent override directive in the
+# blueprint in the following format: '# parent = rhel-9.4-microshift-4.17'.
+# Note that the directive must be commented out in the blueprint to avoid
+# composer syntax errors.
+#
 get_image_parent() {
     local blueprint_filename="$1"
+
+    # Check for the parent override directive in the blueprint
+    local -r bparent=$(awk -F ' *= *' '/^# *parent *=/ {print $2}' "${blueprint_filename}")
+    if [ -n "${bparent}" ] ; then
+        echo "${bparent}" | xargs # remove quotes if any
+        return
+    fi
 
     local base
     base=$(basename "${blueprint_filename}" .toml)
@@ -327,7 +336,7 @@ do_group() {
         fi
 
         parent_args=""
-        parent=$(get_image_parent "${template}")
+        parent=$(get_image_parent "${blueprint_file}")
         if [ -n "${parent}" ]; then
             parent_args="--parent ${parent} --url http://${ip_addr_default}:${WEB_SERVER_PORT}/repo"
         fi

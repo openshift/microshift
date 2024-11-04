@@ -10,9 +10,8 @@ sslcacert = /etc/rhsm/ca/redhat-uep.pem
 sslclientkey = {{ .Env.SSL_CLIENT_KEY_FILE }}
 sslclientcert = {{ .Env.SSL_CLIENT_CERT_FILE }}
 skip_if_unavailable = 0
-{{- end -}}
-{{- if env.Getenv "RHOCP_MINOR_Y1_BETA" "" -}}
-[rhocp-y1]
+{{- else if env.Getenv "RHOCP_MINOR_Y1_BETA" "" -}}
+[rhocp-y1-beta]
 name = rhocp Y-1 BETA
 baseurl = {{ .Env.RHOCP_MINOR_Y1_BETA }}
 enabled=1

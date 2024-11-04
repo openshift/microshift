@@ -1,0 +1,14 @@
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind: Gateway
+metadata:
+  name: test-gateway
+spec:
+  gatewayClassName: openshift-gateway-api
+  listeners:
+  - name: test
+    hostname: "${HOSTNAME}"
+    port: ${PORT}
+    protocol: HTTP
+    allowedRoutes:
+      namespaces:
+        from: Same

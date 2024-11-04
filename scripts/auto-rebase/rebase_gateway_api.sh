@@ -91,20 +91,12 @@ rebase_ossm_to() {
 
     update_last_ossm_rebase "${operator_bundle_manifest}" "${gateway_api_version}"
   
-    update_ossm_images
-    if [[ -n "$(git status -s pkg/release)" ]]; then
-        title "## Committing changes to pkg/release"
-        git add pkg/release
-        git commit -m "update OSSM images"
-    else
-        echo "No changes in OSSM images."
-    fi
-
     update_ossm_manifests "${operator_bundle_manifest}"
+    update_ossm_images
     if [[ -n "$(git status -s assets)" ]]; then
         title "## Committing changes to assets and pkg/assets"
         git add assets pkg/assets
-        git commit -m "update OSSM manifests"
+        git commit -m "update OSSM manifests and images"
     else
         echo "No changes to OSSM assets."
     fi
@@ -206,6 +198,11 @@ write_ossm_images_for_arch() {
 
     local csv_manifest="${arch_dir}/servicemeshoperator3.clusterserviceversion.yaml"
     local kustomization_arch_file="${REPOROOT}/assets/optional/gateway-api/kustomization.${GOARCH_TO_UNAME_MAP[${arch}]}.yaml"
+    local gateway_api_release_json="${REPOROOT}/assets/optional/gateway-api/release-gateway-api-${GOARCH_TO_UNAME_MAP[${arch}]}.json"
+
+    local base_release
+    base_release=$(yq ".spec.version" "${csv_manifest}")
+    jq -n "{\"release\": {\"base\": \"${base_release}\"}, \"images\": {}}" > "${gateway_api_release_json}"
 
     cat <<EOF > "${kustomization_arch_file}"
 images:
@@ -221,6 +218,7 @@ EOF
     newName: ${new_image_name}
     digest: ${new_image_digest}
 EOF
+        yq -i -o json ".images += {\"${image_name}\": \"${new_image}\"}" "${gateway_api_release_json}"
     done
 }
 
@@ -262,10 +260,10 @@ EOF
     chmod +x "${last_rebase_script}"
 
     (cd "${REPOROOT}" && \
-         if test -n "$(git status -s scripts/auto-rebase/last_ossm_rebase.sh)"; then \
-             title "## Committing changes to last_ossm_rebase.sh" && \
-             git add scripts/auto-rebase/last_ossm_rebase.sh && \
-             git commit -m "update last_ossm_rebase.sh"; \
+         if test -n "$(git status -s scripts/auto-rebase/last_rebase_gateway_api.sh)"; then \
+             title "## Committing changes to last_rebase_gateway_api.sh" && \
+             git add scripts/auto-rebase/last_rebase_gateway_api.sh && \
+             git commit -m "update last_rebase_gateway_api.sh"; \
          fi)
 }
 

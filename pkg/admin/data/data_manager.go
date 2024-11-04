@@ -1,11 +1,8 @@
 package data
 
 import (
-	"bytes"
-	"errors"
 	"fmt"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
 
@@ -16,13 +13,6 @@ import (
 )
 
 var (
-	cpArgs = []string{
-		"--verbose",
-		"--recursive",
-		"--preserve",
-		"--reflink=auto",
-	}
-
 	expectedBackupContent = sets.New[string](
 		// .nodename omitted
 		"certs",
@@ -118,6 +108,10 @@ func (dm *manager) Backup(name BackupName) (string, error) {
 		klog.InfoS("Created backup storage directory", "path", dm.storage)
 	}
 
+	if err := CheckIfEnoughSpaceToBackUp(string(dm.storage)); err != nil {
+		return "", err
+	}
+
 	dest := dm.GetBackupPath(name)
 	if err := copyPath(config.DataDir, dest); err != nil {
 		return "", err
@@ -149,6 +143,10 @@ func (dm *manager) Restore(name BackupName) error {
 
 	if err := dm.isMicroShiftBackup(path); err != nil {
 		return fmt.Errorf("%q is not a valid MicroShift backup: %w", path, err)
+	}
+
+	if err := CheckIfEnoughSpaceToRestore(path); err != nil {
+		return err
 	}
 
 	tmp := fmt.Sprintf("%s.saved", config.DataDir)
@@ -224,48 +222,13 @@ func checkDirectoryContents(existing sets.Set[string]) error {
 }
 
 func copyPath(src, dest string) error {
-	tmpDest := fmt.Sprintf("%s.tmp", dest)
-	if exists, err := pathExists(tmpDest); err != nil {
+	copier := AtomicDirCopy{Source: src, Destination: dest}
+	if err := copier.CopyToIntermediate(); err != nil {
 		return err
-	} else if exists {
-		if err := os.RemoveAll(tmpDest); err != nil {
-			return fmt.Errorf("failed to remove %q: %w", tmpDest, err)
-		}
 	}
-	cmd := exec.Command("cp", append(cpArgs, src, tmpDest)...) //nolint:gosec
-	klog.InfoS("Starting copy to intermediate location", "cmd", cmd)
-
-	var outb, errb bytes.Buffer
-	cmd.Stdout = &outb
-	cmd.Stderr = &errb
-	err := cmd.Run()
-
-	if err != nil {
-		klog.InfoS("Failed to copy to intermediate location", "cmd", cmd,
-			"stdout", strings.ReplaceAll(outb.String(), "\n", `, `),
-			"stderr", errb.String())
-		copyErr := fmt.Errorf("failed to copy %q to %q: %w", src, dest, err)
-		if err := os.RemoveAll(tmpDest); err != nil {
-			return errors.Join(copyErr, fmt.Errorf("failed to remove intermediate path %q: %w", tmpDest, err))
-		}
-		return copyErr
+	if err := copier.RenameToFinal(); err != nil {
+		return err
 	}
-
-	// Path was copied to a temporary location with .tmp suffix.
-	// Now it needs to be renamed into final destination.
-	// This two-step operation should provide a high guarantee that
-	// copying is complete and not partial thanks to rename being OS/filesystem atomic.
-	klog.InfoS("Renaming intermediate path to final destination", "src", tmpDest, "dest", dest)
-	if err := os.Rename(tmpDest, dest); err != nil {
-		klog.InfoS("Failed to rename - removing intermediate path", "path", tmpDest)
-		renameErr := fmt.Errorf("failed to rename %q to %q: %w", tmpDest, dest, err)
-		if err := os.RemoveAll(tmpDest); err != nil {
-			return errors.Join(renameErr, fmt.Errorf("failed to remove %q: %w", tmpDest, err))
-		}
-		return renameErr
-	}
-	klog.InfoS("Renamed intermediate path to final destination", "src", tmpDest, "dest", dest)
-	klog.InfoS("Path copied", "src", src, "dest", dest)
 
 	return nil
 }

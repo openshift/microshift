@@ -2,7 +2,7 @@
 images:
   - name: multus-cni-microshift
     newName: quay.io/openshift-release-dev/ocp-v4.0-art-dev
-    digest: sha256:7e2fabcf0945cac73b5014742877075284b51a08096d6dec636e027303278902
+    digest: sha256:fed16f6fca30c2bdf59dffe7d02110be21ded32eabe2b1d96220d3838c0857fd
   - name: containernetworking-plugins-microshift
     newName: quay.io/openshift-release-dev/ocp-v4.0-art-dev
-    digest: sha256:3a589a47213188e735ad057330a5ee18d36d48c2fb3a8a3259b00816c28f5706
+    digest: sha256:51a6da4314aaa5e45fd1d551c2362c0278d06c29fd0ab5b1352488d0afaf7dd6
