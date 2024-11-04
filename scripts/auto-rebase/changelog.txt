@@ -1,3 +1,12 @@
-- openshift-controller-manager embedded-component f4cf3310400625ac2cb40b3a4bf3d3ccbe3379d3 to a25aab6f01ae68758978ca449a640d75c25562f4
-  - 9c53b9d 2024-10-21T13:17:53+00:00 cleanup root and app OWNERS
+- cluster-network-operator embedded-component d5b4552ec3bcb1b690d3ccad9264dab7f6e10633 to 3c4bce8f481b42bd42faa52350f04763d1a5cf05
+  - 49674fd 2024-10-25T16:11:20-07:00 manifests/02-cncc-credentials: Set skipServiceCheck for GCP
+
+- machine-config-operator embedded-component dc45d313d876f6a60162bc220365b6dc21078cbe to ba0e3ef3bb329cdd69907bba1e10eaebca352fdd
+  - fcfcdfee 2024-10-30T13:02:06-04:00 node_controller: sync all old custom pools
+
+- ovn-kubernetes image-amd64 590797356c889f8c73a664b05ec9298219e00cfe to eb3869e0d6f71407e33b8a8dcbc67d2132359d63
+  - c167881 2024-10-23T16:45:50+08:00 Pin libreswan to the known working version 4.5
+
+- ovn-kubernetes image-arm64 590797356c889f8c73a664b05ec9298219e00cfe to eb3869e0d6f71407e33b8a8dcbc67d2132359d63
+  - c167881 2024-10-23T16:45:50+08:00 Pin libreswan to the known working version 4.5
 
