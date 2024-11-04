@@ -236,6 +236,16 @@ that contains the name `rhel-9.2`, so when the image for
 `rhel92-microshift-source` is built, the parent is configured as the
 `rhel-9.2` image.
 
+To support complex dependencies, a special `# parent = parent_name` directive
+can be added to the blueprint files to override the parent specification. This
+directive must be commented out as it is not recognized by `osbuild-composer`.
+
+```
+# Parent specification directive recognized by test/bin/build_images.sh to be
+# used with the '--parent' argument of 'osbuild-composer'
+# parent = "rhel-9.4-microshift-4.{{ .Env.PREVIOUS_MINOR_VERSION }}"
+```
+
 #### Image Reference Aliases
 
 Sometimes it is useful to use the same image via a different
@@ -301,7 +311,7 @@ images. Create the configuration and start the webserver using `create`.
 $ ./test/bin/manage_composer_config.sh create
 ```
 
-Optionally, use `create-workers [num_workers]` to create multiple workers for building 
+Optionally, use `create-workers [num_workers]` to create multiple workers for building
 images in parallel. The image build process is mostly CPU and I/O
 intensive. For a development environment, setting the number of workers to
 half of the CPU number may be a good starting point. If no `num_workers` is set, the script
