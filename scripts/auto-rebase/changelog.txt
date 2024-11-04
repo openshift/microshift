@@ -1,6 +1,6 @@
-- cluster-network-operator embedded-component 90aba6ff9737c0316f566720242e3f396d836d8a to cad89f0fe351e5da920167842d476e0c603c5f43
-  - 9edaf24 2024-06-26T12:11:19+00:00 Set global IP forwarding sysctl parameters while starting ovnkube-controller
+- ovn-kubernetes image-amd64 52c7ebe90417a98c4e276f735e1824ea04b27cf6 to 81cc8ea374872f75c684d462b0673baa0b76cd46
+  - d090ea49 2024-06-25T14:31:07+05:30 Implementation required to enable Forwarding if it is already disabled
 
-- machine-config-operator embedded-component f0ed6257803de71df75665aa4c22aa6f1c29d1ba to 20e767851f25a12f9be5701012abb881ac33ab25
-  - 8454be44 2024-09-26T04:09:52+00:00 OCPBUGS-38012: Do not use 'restart' for 'oneshot' service
+- ovn-kubernetes image-arm64 52c7ebe90417a98c4e276f735e1824ea04b27cf6 to 81cc8ea374872f75c684d462b0673baa0b76cd46
+  - d090ea49 2024-06-25T14:31:07+05:30 Implementation required to enable Forwarding if it is already disabled
 
