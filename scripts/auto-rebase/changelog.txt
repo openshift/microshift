@@ -1,0 +1,6 @@
+- machine-config-operator embedded-component c1e2223688aea8a5e02d26b53f525860181ca6ba to bebf7523bc6716138ba741f418175ed4cecfdd55
+  - 0c411c30 2024-10-29T09:35:21+00:00 Disable ESP offload for OVS attached interfaces
+
+- operator-framework-olm embedded-component b0d86a042d2b36be77b3b5bca74e73194bfdeee8 to 4cbfa455ffbd86afc26471f29bf46fed9f4779e3
+  - 3e7dfb79 2024-10-29T14:01:44-04:00 Return an error when the IP status cannot be updated (#3410)
+
