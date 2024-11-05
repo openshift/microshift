@@ -123,6 +123,7 @@ Setup Test
 
 Teardown
     [Documentation]    Test suite teardown
+    Restore Default MicroShift Config
     Remove Kubeconfig
     Logout MicroShift Host
 
