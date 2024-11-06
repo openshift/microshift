@@ -5,6 +5,16 @@ modules = []
 groups = []
 distro = "rhel-94"
 
+# Parent specification directive recognized by test/bin/build_images.sh to be
+# used with the '--parent' argument of 'osbuild-composer'
+{{- "\n" -}}
+{{- if env.Getenv "CURRENT_RELEASE_VERSION" "" -}}
+# parent = "rhel-9.4-microshift-4.{{ .Env.PREVIOUS_MINOR_VERSION }}"
+{{- else -}}
+# parent = "rhel-9.4-microshift-4.{{ .Env.CURRENT_RELEASE_VERSION }}"
+{{- end -}}
+{{- "\n" -}}
+
 [[packages]]
 name = "microshift"
 version = "{{ .Env.SOURCE_VERSION_BASE }}"
