@@ -137,7 +137,7 @@ launch_container() {
         --cpus "${vcpus}" \
         --name "${full_ctr_name}" \
         --tls-verify=false \
-        "${image}"; then
+        "${full_image}"; then
         record_junit "${name}" "launch_ctr" "FAILED"
         exit 1
     fi
