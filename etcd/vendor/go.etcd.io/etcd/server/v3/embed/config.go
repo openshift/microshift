@@ -350,7 +350,8 @@ type Config struct {
 	ExperimentalMaxLearners int `json:"experimental-max-learners"`
 
 	// ForceNewCluster starts a new cluster even if previously started; unsafe.
-	ForceNewCluster bool `json:"force-new-cluster"`
+	ForceNewCluster           bool   `json:"force-new-cluster"`
+	ForceNewClusterBumpAmount uint64 `json:"force-new-cluster-bump-amount"`
 
 	EnablePprof           bool   `json:"enable-pprof"`
 	Metrics               string `json:"metrics"`
