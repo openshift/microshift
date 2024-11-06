@@ -334,7 +334,8 @@ extract_ossm_deploy_from_cluster_service_version() {
         .metadata.name = .name |
         del(.name) |
         .metadata.labels = .label |
-        del(.label)
+        del(.label) |
+        del(.spec.template.spec.containers[].resources.limits)
         " "${csv}" > "${deployment_file}"
   done
 }
