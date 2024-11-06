@@ -84,7 +84,7 @@ Router Disabled
     [Setup]    Run Keywords
     ...    Disable Router
 
-    Run With Kubeconfig    oc wait --for=delete namespace/openshift-ingress --timeout=300s
+    Oc Wait    namespace/openshift-ingress    --for=delete --timeout=300s
 
 Router Exposure Configuration
     [Documentation]    Test custom ports and custom listening addresses.
@@ -139,7 +139,7 @@ Wait For Router Ready
     [Documentation]    Wait for the default router to be ready.
     # Wait for the namespace to be ready, as sometimes apiserver may signal readiness before all
     # the manifests have been applied.
-    Run With Kubeconfig    oc wait --for jsonpath='{.status.phase}=Active' --timeout=5m namespace/openshift-ingress
+    Oc Wait    namespace/openshift-ingress    --for jsonpath='{.status.phase}=Active' --timeout=5m
     Named Deployment Should Be Available    router-default    openshift-ingress    5m
 
 Setup With Custom Config

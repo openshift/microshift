@@ -54,9 +54,9 @@ Create Gateway
     ...    Remove File    ${tmp}
     Generate File From Template    ${GATEWAY_MANIFEST_TMPL}    ${tmp}
     Oc Apply    -n ${namespace} -f ${tmp}
-    Oc Wait    -n ${namespace} gateway/test-gateway --for="condition=Accepted" --timeout=120s
-    Oc Wait    -n ${namespace} deploy test-gateway-openshift-gateway-api --for=condition=Available --timeout=120s
-    Oc Wait    -n ${namespace} gateway/test-gateway --for="condition=Programmed" --timeout=120s
+    Oc Wait    -n ${namespace} gateway/test-gateway    --for="condition=Accepted" --timeout=120s
+    Oc Wait    -n ${namespace} deploy test-gateway-openshift-gateway-api    --for=condition=Available --timeout=120s
+    Oc Wait    -n ${namespace} gateway/test-gateway    --for="condition=Programmed" --timeout=120s
 
 Create HTTP Route
     [Documentation]    Create an HTTP route using the given hostname and namespace. Waits for acceptance in a gateway.
@@ -69,9 +69,11 @@ Create HTTP Route
     Generate File From Template    ${HTTP_ROUTE_MANIFEST_TMPL}    ${tmp}
     Oc Apply    -n ${namespace} -f ${tmp}
     Oc Wait
-    ...    -n ${namespace} httproutes/http --for jsonpath='{.status.parents[].conditions[?(@.type=="Accepted")].status}=True' --timeout=120s
+    ...    -n ${namespace} httproutes/http
+    ...    --for jsonpath='{.status.parents[].conditions[?(@.type=="Accepted")].status}=True' --timeout=120s
     Oc Wait
-    ...    -n ${namespace} httproutes/http --for jsonpath='{.status.parents[].conditions[?(@.type=="ResolvedRefs")].status}=True' --timeout=120s
+    ...    -n ${namespace} httproutes/http
+    ...    --for jsonpath='{.status.parents[].conditions[?(@.type=="ResolvedRefs")].status}=True' --timeout=120s
 
 Generate File From Template
     [Documentation]    Generate file from template
