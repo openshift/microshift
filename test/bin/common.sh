@@ -1,5 +1,10 @@
 #!/bin/bash
 
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    echo "This script must be sourced, not executed."
+    exit 1
+fi
+
 UNAME_M=$(uname -m)
 export UNAME_M
 
