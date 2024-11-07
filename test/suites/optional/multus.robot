@@ -145,7 +145,7 @@ Connect To Pod From The Hypervisor
     ${extra_ip}=    Set Variable    ${networks}[1][ips][0]
     Should Contain    ${extra_ip}    192.168.112
 
-    ${result}=    Process.Run Process    curl    -v    ${extra_ip}:8080
+    ${result}=    Process.Run Process    curl    -v    --max-time 15    ${extra_ip}:8080
     Should Contain    ${result.stdout}    Hello MicroShift
 
 Interface Should Not Exist

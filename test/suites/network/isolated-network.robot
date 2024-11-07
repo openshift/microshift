@@ -63,7 +63,7 @@ Teardown
 Verify No Internet Access
     [Documentation]    Verifies that Internet is not accessible
     ${rc}=    Execute Command
-    ...    curl -I redhat.com quay.io registry.redhat.io
+    ...    curl -I --max-time 15 redhat.com quay.io registry.redhat.io
     ...    return_stdout=False    return_stderr=False    return_rc=True
     Should Not Be Equal As Integers    ${rc}    0
 
@@ -93,7 +93,7 @@ Create Load Balancer
 
 Check Load Balancer Service Access
     [Documentation]    Checks if a load balancer service can be accessed.
-    ${rc}=    Run And Return RC    curl -I ${USHIFT_HOST}:${LB_PORTNUM}
+    ${rc}=    Run And Return RC    curl -I --max-time 15 ${USHIFT_HOST}:${LB_PORTNUM}
     Should Be Equal As Integers    ${rc}    0
 
 Delete Load Balancer
