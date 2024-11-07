@@ -646,7 +646,7 @@ launch_vm() {
         fi
 
         # Check if VM creation should be retried
-        ((attempt++))
+        ((attempt++)) || true
         if [ ${attempt} -gt ${max_attempts} ] ; then
             echo "Error running virt-install: giving up on attempt ${attempt}"
             break

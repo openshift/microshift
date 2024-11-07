@@ -142,8 +142,27 @@ launch_container() {
         exit 1
     fi
 
-    # TODO: Poll
-    local -r ip=$(sudo podman inspect "${full_ctr_name}" | jq -r '.[0].NetworkSettings.IPAddress')
+    local ip=""
+    local attempt=0
+    local max_attempts=5
+    while true ; do
+        ((attempt++)) || true
+        echo ${attempt}
+        ip=$(sudo podman inspect "${full_ctr_name}" | jq -r '.[0].NetworkSettings.IPAddress')
+        if [ "${ip}" != "null" ]; then
+            break
+        fi
+
+        if [ ${attempt} -gt ${max_attempts} ] ; then
+            echo "Error running waiting for container's IP - attempt ${attempt}"
+            record_junit "${vmname}" "ip-assignment" "FAILED"
+            return 1
+        fi
+
+        sleep 3s
+    done
+
+    record_junit "${vmname}" "ip-assignment" "OK"
     echo "Container ${full_ctr_name} has IP ${ip}"
 
     # Remove any previous key info for the host
