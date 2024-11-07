@@ -1,3 +1,4 @@
-- machine-config-operator embedded-component 20ffc8e84f8cbeca93507b74366f9f2a0319acad to 99fc14f323aa41a402f7bdbc37cec010fdc048e3
-  - 6c7ee207 2024-10-01T17:51:32+02:00 OCPBUGS-38012: Do not use 'restart' for 'oneshot' service
+- cluster-network-operator embedded-component 6af7942e3f86d46eef4416e905d52e2516792b07 to 7b8459dc88657a44785995a4c0cc88403a95954d
+  - 04b055d 2024-10-08T14:10:44+00:00 Add configurable subnets while running hybrid-overlay-node binary
+  - c1b5eaf 2024-10-04T01:06:53+00:00 Set mount propagation to HostToContainer for /var/lib/kubelet
 
