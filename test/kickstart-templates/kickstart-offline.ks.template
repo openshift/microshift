@@ -7,9 +7,7 @@ network --no-activate --nodefroute --hostname=REPLACE_HOST_NAME
 %post --log=/dev/console --erroronfail
 
 %include /post-system.cfg
-
-# Disable SELinux enforcement for the qemu-guest-agent
-sudo semanage permissive -a virt_qemu_ga_t
+%include /post-offline.cfg
 
 %end
 
