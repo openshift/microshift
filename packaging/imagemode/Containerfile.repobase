@@ -9,8 +9,7 @@ FROM ${BASE_IMAGE_URL}:${BASE_IMAGE_TAG}
 
 ARG DNF_OPTIONS
 
-RUN dnf upgrade -y ${DNF_OPTIONS} && \
-    dnf install -y ${DNF_OPTIONS} firewalld microshift && \
+RUN dnf install -y ${DNF_OPTIONS} firewalld microshift && \
     systemctl enable microshift && \
     dnf clean all
 
