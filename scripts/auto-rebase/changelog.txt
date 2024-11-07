@@ -1,12 +1,3 @@
-- cluster-network-operator embedded-component d5b4552ec3bcb1b690d3ccad9264dab7f6e10633 to 3c4bce8f481b42bd42faa52350f04763d1a5cf05
-  - 49674fd 2024-10-25T16:11:20-07:00 manifests/02-cncc-credentials: Set skipServiceCheck for GCP
-
-- machine-config-operator embedded-component dc45d313d876f6a60162bc220365b6dc21078cbe to ba0e3ef3bb329cdd69907bba1e10eaebca352fdd
-  - fcfcdfee 2024-10-30T13:02:06-04:00 node_controller: sync all old custom pools
-
-- ovn-kubernetes image-amd64 590797356c889f8c73a664b05ec9298219e00cfe to eb3869e0d6f71407e33b8a8dcbc67d2132359d63
-  - c167881 2024-10-23T16:45:50+08:00 Pin libreswan to the known working version 4.5
-
-- ovn-kubernetes image-arm64 590797356c889f8c73a664b05ec9298219e00cfe to eb3869e0d6f71407e33b8a8dcbc67d2132359d63
-  - c167881 2024-10-23T16:45:50+08:00 Pin libreswan to the known working version 4.5
+- machine-config-operator embedded-component ba0e3ef3bb329cdd69907bba1e10eaebca352fdd to cb8c80de1e58a83fca049ba98343a26f9f3bb9a9
+  - bfd8d870 2024-10-29T21:50:51+00:00 node_controller: add nil check for oldPool
 
