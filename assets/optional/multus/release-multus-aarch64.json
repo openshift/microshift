@@ -1,6 +1,6 @@
 {
   "release": {
-    "base": "4.17.0-0.nightly-arm64-2024-11-02-021033"
+    "base": "4.17.0-0.nightly-arm64-2024-11-07-002939"
   },
   "images": {
     "multus-cni-microshift": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:7b64f1986bb6a7123ce31e2900b63a3fc1a528ecccc52ed74c458f011b29f764",
