@@ -1,8 +1,0 @@
-id = "fast-datapath"
-name = "Fast Datapath for RHEL 9"
-type = "yum-baseurl"
-url = "https://cdn.redhat.com/content/dist/layered/rhel9/REPLACE_BUILD_ARCH/fast-datapath/os"
-check_gpg = true
-check_ssl = true
-system = false
-rhsm = true

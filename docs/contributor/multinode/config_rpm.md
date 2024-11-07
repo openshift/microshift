@@ -4,19 +4,6 @@ Log into the `hypervisor host` and follow the instructions described in the
 and configure the `microshift-pri` and `microshift-sec` virtual machines for
 running primary and secondary instances.
 
-> Until the MicroShift 4.14 software is released, it is necessary to compile the
-> MicroShift RPMs from the latest sources on the `development host` and copy
-> them to the `microshift-pri` and `microshift-sec` virtual machines.
->
-> See the [RPM Packages](../devenv_setup.md#rpm-packages) documentation
-> for more information on building MicroShift RPMs.
->
-> Run the following command on the `microshift-pri` and `microshift-sec`
-> virtual machines to upgrade the software.
-> ```
-> sudo dnf localinstall -y microshift*.rpm
-> ```
-
 After the virtual machines are up and running, use the `virsh` command to determine their IP addresses.
 ```
 sudo virsh domifaddr microshift-pri
