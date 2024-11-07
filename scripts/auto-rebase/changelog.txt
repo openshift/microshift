@@ -1,204 +1,109 @@
-- api embedded-component 684b2b1679baeb7742ec7b76c6eab8e0c8036e56 to 04eb3fd119d20785bf11dc9772ae2a4df0c8344e
-  - 808d881 2024-11-01T09:38:46-04:00 update api validation on minimumKubeletVersion
-  - ef8f598 2024-10-31T14:31:18+01:00 add VolumeAttributesClass FeatureGate
-  - 0a8ec78 2024-10-25T12:07:42-04:00 feature gates: Add MinimumKubeletVersion gate
-  - ffa1b52 2024-10-25T10:53:53-04:00 config/types_node: add minimumKubeletVersion
-  - 83d619d 2024-10-25T10:47:11-04:00 kubeapiserver: add minimum kubelet version
+- api embedded-component 04eb3fd119d20785bf11dc9772ae2a4df0c8344e to dfe4d9fc5cef45bc0ea563cba3a7d1c9515a36b5
+  - d4073f4 2024-11-05T17:52:03+00:00 Update controller-tools to latest
+  - 7a12025 2024-11-01T16:33:10-04:00 prevent new featuregates without enhancements
 
-- cluster-ingress-operator embedded-component 8bf1b3637232b08bdb220d8f62698a5b27c21fc9 to aa8860a85b9c74a821d1658487704ca0320308e5
-  - 19eced8 2024-11-01T16:37:21+05:30 Watch Infrastructure object and update AWS user tags
-  - 92649ef 2024-10-30T15:06:54-04:00 NE-1716: Bump Gateway API to v1.0.0
-  - 8126a2f 2024-10-25T16:30:07-04:00 NE-1716: Bump Gateway API to v1.0.0 Separe commit for vendor files.
+- cluster-network-operator embedded-component 4e7def6bb1d3f31631198f281c0800875c6825be to fff6ea5e6f9e070ffa3a7e90a33eac03b7da217e
+  - 5db6378 2024-11-04T14:31:23+01:00 UDN: Allow access to kubernetes/default and dns-default/openshift-dns
 
-- etcd embedded-component 825fc46f2c1be39640edce95c49d3b70243e9d6b to 3b0a2d2116109e115ebff712c65e49f2ed45b6a4
-  - 6de68d76 2024-10-29T12:20:43-04:00 Migrate Dockerfile.art for Konflux
+- etcd embedded-component 3b0a2d2116109e115ebff712c65e49f2ed45b6a4 to e8a81bac544c340485ef3e1166a5b20be6f0e58f
+  - 070d2ced 2024-11-04T16:03:34+01:00 DOWNSTREAM: <carry>: add tls min/max version to grpc proxy
+  - 74d968e1 2024-11-04T15:44:54+01:00 DOWNSTREAM: <carry>: ETCD-696: Add rev bumping to force-new-cluster
 
-- machine-config-operator embedded-component b3a562be44deb94fa4ea86e25a9d83395c3d188d to 9d8a8e3953c696a653647e472547ce9296ca37a8
-  - b5264639 2024-10-29T09:58:43-04:00 pinnedimagests: set resolver to passthrough
+- kubernetes embedded-component 7ca9eb1e9e5ced974033c2b6f26560e22535244c to b903dd22e38b8e6d3eefac0798cfb86295d26fab
+  - 3708d255d 2024-10-24T09:54:35-04:00 UPSTREAM: <carry>: Prefer local endpoint for cluster DNS service
+  - 760f33532 2024-10-23T17:31:25-04:00 UPSTREAM: <carry>: Add standalone kube-proxy image
 
-- operator-framework-olm embedded-component 29f4d1afaf2329f5c14b538fed79078ce9b6dedf to f07f5ee1c0133cd98f300e1650b1945c448fc758
-  - 4bf924a4 2024-11-02T00:04:14+00:00 Fix `--version` flag (#3428)
-  - 76282156 2024-11-01T00:07:42+00:00 Fix release automation (#3426)
-  - 7989f10b 2024-11-01T00:05:05+00:00 build(deps): bump sigs.k8s.io/controller-tools from 0.16.3 to 0.16.5 (#3425)
-  - 8828035a 2024-10-31T00:03:10+00:00 build(deps): bump k8s.io/api from 0.31.1 to 0.31.2 (#3422)
+- machine-config-operator embedded-component 9d8a8e3953c696a653647e472547ce9296ca37a8 to c3ea34361f8418343b48dc43c03065742c0f72a7
+  - d87e5e55 2024-10-31T15:12:58-05:00 Adding tests (mcd_test.go and utils.go)
+  - 0f63d31f 2024-10-31T15:12:16-05:00 metrics gathering implementation (daemon.go and metrics.go)
+  - 2922c86e 2024-10-28T11:57:05-06:00 Add runbook
 
-- oc image-amd64 62471c258d8e92d2d07c97515cc82013cc431cbe to 4309021b5c670048cd15b00e6d823413bbae3659
-  - 833cc92e 2024-10-29T06:47:14-04:00 add MCO owners file
-  - 4e5ca2ba 2024-10-29T06:47:14-04:00 ensure mcs secret type before rotation
-  - 32da04f3 2024-10-25T18:03:41-04:00 Add test to check RsyncInclude for PXE and ISO
-  - c5c1da52 2024-10-14T18:12:00-04:00 WRKLDS-1320: Support PXE files with "node-image create"
+- operator-framework-olm embedded-component f07f5ee1c0133cd98f300e1650b1945c448fc758 to 8459ce13c0feca2a5139b62589f2467cca373b04
+  - 9c26d40b 2024-11-05T00:03:18+00:00 Fix release automation (#3429)
 
-- ovn-kubernetes image-amd64 e816f5899f31572c0c93dad9e241557c307a7728 to fdcbde94329e62ae79c29664b43ee502827b1de2
-  - a97d896c 2024-10-21T12:33:52+02:00 Pin multus to 4.1.3
-  - 30585c17 2024-10-21T12:33:51+02:00 Invert CNI result order for UDN
-  - de390b11 2024-10-21T11:01:47+02:00 Disable kube manager service-lb-controller for kind
-  - 1cb09d40 2024-10-21T11:01:47+02:00 Bump to k8s 1.31
-  - 29240953 2024-10-21T11:01:47+02:00 Add e2e vendor directory to gitignore
-  - c004001e 2024-10-18T16:10:04+02:00 fix deprecated call to -ginkgo.reportFile
-  - cc3c784b 2024-10-18T16:10:04+02:00 update ginkgo to v2
-  - 1e4d8ea5 2024-10-18T16:09:41+02:00 controller: make stop idempotent.
-  - 8dc0ca0b 2024-10-18T13:42:11+02:00 Add e2e for a new subsystem error report mechanism.
-  - db6ca99b 2024-10-18T13:42:11+02:00 Move existing UDN tests using the same UDN config under its own context.
-  - 4ead7745 2024-10-18T13:42:11+02:00 UDN controller: allow other subsystems reporting conditions.
-  - 508f0431 2024-10-18T13:42:11+02:00 parseNodeGatewayRouterJoinNetwork: Avoid unneeded warnings.
-  - c73e0db5 2024-10-17T15:50:53+02:00 node_annotations: Make GetNodeHostAddrs() return stable results.
-  - 6f0312d0 2024-10-16T12:42:09+02:00 doc, multihoming: Add virt ip dynamic condig
-  - fd33c421 2024-10-16T12:42:09+02:00 kubevirt, e2e: Add DHCP/ND test case for UDPN
-  - 435adaf7 2024-10-16T12:42:09+02:00 udpn, e2e: Adapt to multiple default gws
-  - e55d89bd 2024-10-16T12:42:07+02:00 udpn, l2, gw: Configure LOW router preference
-  - 62bef1da 2024-10-16T12:27:03+02:00 udp, l2, gw: Configure RA priodicity
-  - a92c1fc1 2024-10-16T12:27:03+02:00 udpn, l2, gw: Configure ipv6 ra mtu
-  - 828be8dc 2024-10-16T12:27:03+02:00 udpn, l2: Configure lrp dhcpv6_stateful
-  - 99607f1e 2024-10-16T12:27:03+02:00 dhcp, kubevirt, l2: Integrate with primary udn
-  - 4b58ba5c 2024-10-16T12:27:01+02:00 kubevirt, dhcp: Add fqdn and router/dns/mtu opts
-  - 93dbdf49 2024-10-15T12:25:20+02:00 kind: Allow to install custom kubevirt versions
-  - f29d8488 2024-10-09T15:02:26+02:00 Fix UTs for UDNs: don't set exclude_ips
-  - e183df55 2024-10-09T15:02:26+02:00 UDN: Skip adding managementport to clusterPortGrp
-  - 2edeedc0 2024-10-09T14:01:36+02:00 Fix panic in UT
-  - f4e83f55 2024-10-08T12:47:13+02:00 Skip handling NetPol events on non primary networks
-  - fd9a0a15 2024-10-08T12:47:13+02:00 Support NetPol for user defined networks
-  - 005a822c 2024-10-08T11:57:42+02:00 Add UDN pod annotation to open default network ports. An example annotation is k8s.ovn.org/open-default-ports: |   - protocol: tcp     port: 8080   - protocol: udp     port: 8081
-  - 26079c2e 2024-10-08T07:41:52+02:00 Fix sudo perms
-  - e4f360cc 2024-10-04T18:09:25-04:00 interconenct: Ask ovn-northd to bind the remote ports.
-  - 7d4bb980 2024-09-30T13:03:15-07:00 Update readinessprobe for DPUs
-  - a65242d9 2024-09-30T13:03:15-07:00 requested-chassis should not be set for dpu-host nodes
-  - 8c79e294 2024-09-30T13:03:15-07:00 Disable nodeIPManager on dpu nodes
-  - d272c279 2024-09-30T13:03:15-07:00 Fix node certificate handling for DPUs
-  - 47056a66 2024-09-30T13:03:15-07:00 Add gateway options in DPU mode
-  - 1a3854fd 2024-09-30T13:03:15-07:00 service traffic route through Masquerade node IP on dpu host node
-  - ab58b7bc 2024-09-30T13:03:15-07:00 [upstream] dpu bridge mac should not be used in openflow rules
-  - 218c1f16 2024-09-30T13:03:15-07:00 [upstream] not to update ovs openflow in dpu-host mode
-  - a627562c 2024-09-30T13:03:15-07:00 Capture dpu->dpu_host relation during ovnkube-node-dpu bringup
-  - 8d544d91 2024-09-30T13:03:15-07:00 Helm chart fixes for DPUs
-  - de0757f2 2024-09-30T13:03:15-07:00 Add support for nodes managing their own networks
-  - 7eb81144 2024-09-30T11:51:42+01:00 VRF manager: reduce log chat for link updates
-  - d63887ed 2024-09-20T20:23:13+02:00 node: udn: Ensure UDN traffic doesn't leak into default network services.
-  - 03499775 2024-09-20T17:33:37+02:00 Verify udn-allowed-default-services config field
-  - 839842bb 2024-09-20T14:27:53+02:00 Cleanup gateway pod for remote zone. For local zone pods, deleteLogicalPort cleans this up, but before IC this function was called for all non-host-network pods, hence this logic. After IC, deleteLogicalPort won't be called for all remote zone pods, so condition is not needed.
-  - 4b9c42b7 2024-09-20T14:27:47+02:00 Add egress gateway e2e test option to delete gateway pod instead of re-labeling gateway pod. It uses different handlers for update and delete pod internally. Remove external.gateway from the dual-stack exclusion, as it is supported for ipv6.
-  - 760d9e2f 2024-09-20T11:15:57+02:00 Add layer2 UDN tests to services_controller_test.go
-  - 69d70ca8 2024-09-20T11:15:57+02:00 Refactor services_controller_test.go
-  - 36c9b1bd 2024-09-20T11:15:57+02:00 Unskip UDN enabled service test for L2
-  - 3683bf40 2024-09-20T11:15:57+02:00 L2 services support
-  - 86cdf533 2024-09-20T11:15:50+02:00 Conditional SNAT for Layer2 networks
-  - cbff31f9 2024-09-20T10:45:10+02:00 Use correct pod subnets for Layer2 networks
-  - 354fa000 2024-09-20T10:43:55+02:00 Enable access to default network services from user-defined networks
-  - d89b8e93 2024-09-20T10:31:38+02:00 Do not masquerade service traffic
-  - 1b9ae6af 2024-09-20T10:31:30+02:00 Bump github.com/urfave/cli/v2
-  - bc013a8a 2024-09-20T10:04:34+02:00 Fix missing ICMP SNAT for L2 UDNs GR
-  - 1bc62144 2024-09-20T10:04:18+02:00 Adds UDN check to getActiveNetworkForNamespace
-  - d1ebf1c6 2024-09-20T10:04:18+02:00 Make GetActiveNetworkForNamespace use a controller
-  - 5f0dab77 2024-09-19T14:16:58+00:00 Add ginkgo.report to .gitignore
-  - 9bf12b8a 2024-09-19T14:16:57+00:00 Add ovnkube-observ to .gitignore
-  - 6d269b08 2024-09-19T14:16:57+00:00 Don't configure arp proxy for UDNs
-  - 950ff7a2 2024-09-19T16:11:07+02:00 Services E2Es: Reset test variables before each test
-  - 12b9838a 2024-09-18T11:46:28+02:00 fix retries for node events in udn
-  - b0dd59be 2024-09-18T11:46:28+02:00 L2: syncNodeManagementPort should be called after gwManager
-  - f61fbbff 2024-09-18T11:46:28+02:00 Make error logs better
-  - bd58b4c8 2024-09-18T11:46:28+02:00 Add LGW unit tests for secondary networks topologies
-  - d1e41e8c 2024-09-18T11:46:28+02:00 rename hostIfAddr to mgmtIfAddr
-  - a3cc1bdd 2024-09-18T11:46:28+02:00 LGW: L2: Add a new LRP at 1500 for UDN
-  - 9b3eacb6 2024-09-18T11:46:28+02:00 Rename Add to AddSameNodeIPPolicy
-  - e5353179 2024-09-18T11:46:28+02:00 Rename generateMatch to generateNodeIPMatch
-  - 21db02af 2024-09-18T11:46:28+02:00 Expose GetNodeIfAddrAnnotation as a public function
-  - a350b491 2024-09-18T11:46:28+02:00 Fix name of switch for L2
-  - 7be00b7f 2024-09-18T11:46:28+02:00 LGW: Add pod-route towards mpX in L2 network
-  - ea94a5ac 2024-09-18T11:46:27+02:00 Layer2 UDN: Rename gateway switch ports
-  - 03205d3d 2024-09-18T10:06:20+02:00 udn, cni, e2e: Check UDN iface info on network-status
-  - 62acd7e8 2024-09-18T10:06:20+02:00 udn, cni, tests: Must specify cluster ip configs
-  - d2e19395 2024-09-18T10:06:20+02:00 udn, cni, tests: Ensure we report the UDN interface via CNI result
-  - 6f61f393 2024-09-18T10:06:20+02:00 udn, cni, tests: Refactor existing context
-  - c49c07d1 2024-09-18T10:06:20+02:00 udn, cni: Report UDN iface info on network-status
-  - a2d0eb18 2024-09-18T10:06:20+02:00 Pin multus to 4.1.1
-  - 101a749b 2024-09-17T16:34:30-04:00 fedora: Update Dockerfile to OVN release ovn-24.09.0-33.
+- router image-amd64 40db90072b633e6d0ec7d064bd8441f12065a2c4 to e05cf92d31b1ee0c1774229072143f3a694e54ea
+  - e41b130 2024-11-04T19:07:17+01:00 NE-1790: Enable setting zero pool size for blueprint routes via environment variable
 
-- oc image-arm64 62471c258d8e92d2d07c97515cc82013cc431cbe to 4309021b5c670048cd15b00e6d823413bbae3659
-  - 833cc92e 2024-10-29T06:47:14-04:00 add MCO owners file
-  - 4e5ca2ba 2024-10-29T06:47:14-04:00 ensure mcs secret type before rotation
-  - 32da04f3 2024-10-25T18:03:41-04:00 Add test to check RsyncInclude for PXE and ISO
-  - c5c1da52 2024-10-14T18:12:00-04:00 WRKLDS-1320: Support PXE files with "node-image create"
+- ovn-kubernetes image-amd64 fdcbde94329e62ae79c29664b43ee502827b1de2 to c3dc7d42c893a307fc89bd187b9cb045e0b106f2
+  - 7ce7e3c1 2024-10-29T16:09:53-04:00 Only configure IPv6 RAs when ipv6 mode enabled
+  - 95bf3771 2024-10-28T17:12:00-04:00 Adds startup probe to UDN e2e
+  - f02a9d14 2024-10-28T15:57:25-04:00 Dont modify pod routes in tests
+  - 6170c169 2024-10-28T12:15:54-04:00 add an ipv4 single stack CI lane for network-segmentation
+  - cf4c7dbf 2024-10-28T11:54:10-04:00 add correct cidr family to service network isolation tests for UDN
+  - 2b4bfd5b 2024-10-28T11:53:19-04:00 allow UDN network isolation tests to select clusters CIDR family
+  - 8469e9b4 2024-10-25T19:20:41+02:00 docs, localnet: document the physicalNetworkName attr
+  - f68e6fda 2024-10-25T19:20:41+02:00 localnet, tests: add e2e tests to share bridge mappings
+  - 2643dabe 2024-10-25T19:20:41+02:00 localnet, multi-homing: introduce localnet alias
+  - 064f35ea 2024-10-25T18:06:04+02:00 Enable IP forwarding on the UDN management interface
+  - 02147efd 2024-10-25T13:45:20+02:00 Add support for external->svc on L2 UDNs
+  - f6fd10db 2024-10-25T13:45:20+02:00 UDN: L2: Add missing remote LRPs
+  - 4e75e3ef 2024-10-25T13:45:20+02:00 UDN,L2: Ensure CM allocates tunnelIDs for nodes and pods
+  - e6ba13e6 2024-10-25T13:45:20+02:00 Add udn-l2-node-gateway-router-lrp-tunnel-ids annotation
+  - cf93f2eb 2024-10-25T13:45:20+02:00 Convert updateNetworkIDsAnnotation to updateNetworkAnnotation
+  - 8b942317 2024-10-25T13:45:20+02:00 HACK: Update podSubnet for lexocographical correctness
+  - 8633457e 2024-10-24T09:35:43+02:00 Remove 5hours of sleeping time from e2e
+  - d20b2211 2024-10-24T04:32:22+00:00 Add hybird overlay pod IPs to the namespace address_set
+  - 43e1f0e9 2024-10-23T17:24:52+00:00 Set shard-conformance timeout lower tham github timeout
+  - fed46ec3 2024-10-23T14:36:33+00:00 Remove PreStart from NetworkController interface
+  - 5a2a613f 2024-10-22T23:05:27+02:00 Egress node: add default route to external also in update path
+  - c32525b4 2024-10-22T23:04:07+02:00 Only enable Hybrid Overlay in CI lanes when IPv4 is enabled
+  - cadb2d7a 2024-10-22T19:57:10+02:00 E2E test: restart ovnk after applying UDN & service
+  - 11d8ce9e 2024-10-22T19:57:10+02:00 E2E code: use one const for ovnk namespace across all tests
+  - e6f2c889 2024-10-22T19:57:10+02:00 Better error reporting in syncNodeManagementPort
+  - 1490c665 2024-10-22T19:57:10+02:00 Split Default Node Network Controller Start()
+  - 303dd182 2024-10-22T19:57:10+02:00 Split initGateway()
+  - fa2ae0c1 2024-10-22T19:57:10+02:00 Merge local and shared gateway code
+  - 3947ce15 2024-10-22T19:57:10+02:00 Log the error when stopping node network controller manager
+  - fe34f4b2 2024-10-22T18:16:02+02:00 Fix incorrect removal of VRF device
+  - b4137da2 2024-10-22T17:46:27+02:00 hack/lint.sh: Use full image tag
+  - 13adaa85 2024-10-22T10:16:14-04:00 Suppress remote node annotation missing
+  - ab66c99c 2024-10-21T18:02:07+02:00 node: Relax check_ports() for UDN patch ports.
 
-- ovn-kubernetes image-arm64 e816f5899f31572c0c93dad9e241557c307a7728 to fdcbde94329e62ae79c29664b43ee502827b1de2
-  - a97d896c 2024-10-21T12:33:52+02:00 Pin multus to 4.1.3
-  - 30585c17 2024-10-21T12:33:51+02:00 Invert CNI result order for UDN
-  - de390b11 2024-10-21T11:01:47+02:00 Disable kube manager service-lb-controller for kind
-  - 1cb09d40 2024-10-21T11:01:47+02:00 Bump to k8s 1.31
-  - 29240953 2024-10-21T11:01:47+02:00 Add e2e vendor directory to gitignore
-  - c004001e 2024-10-18T16:10:04+02:00 fix deprecated call to -ginkgo.reportFile
-  - cc3c784b 2024-10-18T16:10:04+02:00 update ginkgo to v2
-  - 1e4d8ea5 2024-10-18T16:09:41+02:00 controller: make stop idempotent.
-  - 8dc0ca0b 2024-10-18T13:42:11+02:00 Add e2e for a new subsystem error report mechanism.
-  - db6ca99b 2024-10-18T13:42:11+02:00 Move existing UDN tests using the same UDN config under its own context.
-  - 4ead7745 2024-10-18T13:42:11+02:00 UDN controller: allow other subsystems reporting conditions.
-  - 508f0431 2024-10-18T13:42:11+02:00 parseNodeGatewayRouterJoinNetwork: Avoid unneeded warnings.
-  - c73e0db5 2024-10-17T15:50:53+02:00 node_annotations: Make GetNodeHostAddrs() return stable results.
-  - 6f0312d0 2024-10-16T12:42:09+02:00 doc, multihoming: Add virt ip dynamic condig
-  - fd33c421 2024-10-16T12:42:09+02:00 kubevirt, e2e: Add DHCP/ND test case for UDPN
-  - 435adaf7 2024-10-16T12:42:09+02:00 udpn, e2e: Adapt to multiple default gws
-  - e55d89bd 2024-10-16T12:42:07+02:00 udpn, l2, gw: Configure LOW router preference
-  - 62bef1da 2024-10-16T12:27:03+02:00 udp, l2, gw: Configure RA priodicity
-  - a92c1fc1 2024-10-16T12:27:03+02:00 udpn, l2, gw: Configure ipv6 ra mtu
-  - 828be8dc 2024-10-16T12:27:03+02:00 udpn, l2: Configure lrp dhcpv6_stateful
-  - 99607f1e 2024-10-16T12:27:03+02:00 dhcp, kubevirt, l2: Integrate with primary udn
-  - 4b58ba5c 2024-10-16T12:27:01+02:00 kubevirt, dhcp: Add fqdn and router/dns/mtu opts
-  - 93dbdf49 2024-10-15T12:25:20+02:00 kind: Allow to install custom kubevirt versions
-  - f29d8488 2024-10-09T15:02:26+02:00 Fix UTs for UDNs: don't set exclude_ips
-  - e183df55 2024-10-09T15:02:26+02:00 UDN: Skip adding managementport to clusterPortGrp
-  - 2edeedc0 2024-10-09T14:01:36+02:00 Fix panic in UT
-  - f4e83f55 2024-10-08T12:47:13+02:00 Skip handling NetPol events on non primary networks
-  - fd9a0a15 2024-10-08T12:47:13+02:00 Support NetPol for user defined networks
-  - 005a822c 2024-10-08T11:57:42+02:00 Add UDN pod annotation to open default network ports. An example annotation is k8s.ovn.org/open-default-ports: |   - protocol: tcp     port: 8080   - protocol: udp     port: 8081
-  - 26079c2e 2024-10-08T07:41:52+02:00 Fix sudo perms
-  - e4f360cc 2024-10-04T18:09:25-04:00 interconenct: Ask ovn-northd to bind the remote ports.
-  - 7d4bb980 2024-09-30T13:03:15-07:00 Update readinessprobe for DPUs
-  - a65242d9 2024-09-30T13:03:15-07:00 requested-chassis should not be set for dpu-host nodes
-  - 8c79e294 2024-09-30T13:03:15-07:00 Disable nodeIPManager on dpu nodes
-  - d272c279 2024-09-30T13:03:15-07:00 Fix node certificate handling for DPUs
-  - 47056a66 2024-09-30T13:03:15-07:00 Add gateway options in DPU mode
-  - 1a3854fd 2024-09-30T13:03:15-07:00 service traffic route through Masquerade node IP on dpu host node
-  - ab58b7bc 2024-09-30T13:03:15-07:00 [upstream] dpu bridge mac should not be used in openflow rules
-  - 218c1f16 2024-09-30T13:03:15-07:00 [upstream] not to update ovs openflow in dpu-host mode
-  - a627562c 2024-09-30T13:03:15-07:00 Capture dpu->dpu_host relation during ovnkube-node-dpu bringup
-  - 8d544d91 2024-09-30T13:03:15-07:00 Helm chart fixes for DPUs
-  - de0757f2 2024-09-30T13:03:15-07:00 Add support for nodes managing their own networks
-  - 7eb81144 2024-09-30T11:51:42+01:00 VRF manager: reduce log chat for link updates
-  - d63887ed 2024-09-20T20:23:13+02:00 node: udn: Ensure UDN traffic doesn't leak into default network services.
-  - 03499775 2024-09-20T17:33:37+02:00 Verify udn-allowed-default-services config field
-  - 839842bb 2024-09-20T14:27:53+02:00 Cleanup gateway pod for remote zone. For local zone pods, deleteLogicalPort cleans this up, but before IC this function was called for all non-host-network pods, hence this logic. After IC, deleteLogicalPort won't be called for all remote zone pods, so condition is not needed.
-  - 4b9c42b7 2024-09-20T14:27:47+02:00 Add egress gateway e2e test option to delete gateway pod instead of re-labeling gateway pod. It uses different handlers for update and delete pod internally. Remove external.gateway from the dual-stack exclusion, as it is supported for ipv6.
-  - 760d9e2f 2024-09-20T11:15:57+02:00 Add layer2 UDN tests to services_controller_test.go
-  - 69d70ca8 2024-09-20T11:15:57+02:00 Refactor services_controller_test.go
-  - 36c9b1bd 2024-09-20T11:15:57+02:00 Unskip UDN enabled service test for L2
-  - 3683bf40 2024-09-20T11:15:57+02:00 L2 services support
-  - 86cdf533 2024-09-20T11:15:50+02:00 Conditional SNAT for Layer2 networks
-  - cbff31f9 2024-09-20T10:45:10+02:00 Use correct pod subnets for Layer2 networks
-  - 354fa000 2024-09-20T10:43:55+02:00 Enable access to default network services from user-defined networks
-  - d89b8e93 2024-09-20T10:31:38+02:00 Do not masquerade service traffic
-  - 1b9ae6af 2024-09-20T10:31:30+02:00 Bump github.com/urfave/cli/v2
-  - bc013a8a 2024-09-20T10:04:34+02:00 Fix missing ICMP SNAT for L2 UDNs GR
-  - 1bc62144 2024-09-20T10:04:18+02:00 Adds UDN check to getActiveNetworkForNamespace
-  - d1ebf1c6 2024-09-20T10:04:18+02:00 Make GetActiveNetworkForNamespace use a controller
-  - 5f0dab77 2024-09-19T14:16:58+00:00 Add ginkgo.report to .gitignore
-  - 9bf12b8a 2024-09-19T14:16:57+00:00 Add ovnkube-observ to .gitignore
-  - 6d269b08 2024-09-19T14:16:57+00:00 Don't configure arp proxy for UDNs
-  - 950ff7a2 2024-09-19T16:11:07+02:00 Services E2Es: Reset test variables before each test
-  - 12b9838a 2024-09-18T11:46:28+02:00 fix retries for node events in udn
-  - b0dd59be 2024-09-18T11:46:28+02:00 L2: syncNodeManagementPort should be called after gwManager
-  - f61fbbff 2024-09-18T11:46:28+02:00 Make error logs better
-  - bd58b4c8 2024-09-18T11:46:28+02:00 Add LGW unit tests for secondary networks topologies
-  - d1e41e8c 2024-09-18T11:46:28+02:00 rename hostIfAddr to mgmtIfAddr
-  - a3cc1bdd 2024-09-18T11:46:28+02:00 LGW: L2: Add a new LRP at 1500 for UDN
-  - 9b3eacb6 2024-09-18T11:46:28+02:00 Rename Add to AddSameNodeIPPolicy
-  - e5353179 2024-09-18T11:46:28+02:00 Rename generateMatch to generateNodeIPMatch
-  - 21db02af 2024-09-18T11:46:28+02:00 Expose GetNodeIfAddrAnnotation as a public function
-  - a350b491 2024-09-18T11:46:28+02:00 Fix name of switch for L2
-  - 7be00b7f 2024-09-18T11:46:28+02:00 LGW: Add pod-route towards mpX in L2 network
-  - ea94a5ac 2024-09-18T11:46:27+02:00 Layer2 UDN: Rename gateway switch ports
-  - 03205d3d 2024-09-18T10:06:20+02:00 udn, cni, e2e: Check UDN iface info on network-status
-  - 62acd7e8 2024-09-18T10:06:20+02:00 udn, cni, tests: Must specify cluster ip configs
-  - d2e19395 2024-09-18T10:06:20+02:00 udn, cni, tests: Ensure we report the UDN interface via CNI result
-  - 6f61f393 2024-09-18T10:06:20+02:00 udn, cni, tests: Refactor existing context
-  - c49c07d1 2024-09-18T10:06:20+02:00 udn, cni: Report UDN iface info on network-status
-  - a2d0eb18 2024-09-18T10:06:20+02:00 Pin multus to 4.1.1
-  - 101a749b 2024-09-17T16:34:30-04:00 fedora: Update Dockerfile to OVN release ovn-24.09.0-33.
+- kubernetes image-amd64 7ca9eb1e9e5ced974033c2b6f26560e22535244c to b903dd22e38b8e6d3eefac0798cfb86295d26fab
+  - 3708d255d 2024-10-24T09:54:35-04:00 UPSTREAM: <carry>: Prefer local endpoint for cluster DNS service
+  - 760f33532 2024-10-23T17:31:25-04:00 UPSTREAM: <carry>: Add standalone kube-proxy image
+
+- router image-arm64 40db90072b633e6d0ec7d064bd8441f12065a2c4 to e05cf92d31b1ee0c1774229072143f3a694e54ea
+  - e41b130 2024-11-04T19:07:17+01:00 NE-1790: Enable setting zero pool size for blueprint routes via environment variable
+
+- ovn-kubernetes image-arm64 fdcbde94329e62ae79c29664b43ee502827b1de2 to e3c68e24bd9bbd83dbf7409a8c1414e72a334680
+  - 38be918f 2024-11-04T07:27:32-08:00 OKD-227: bump ovn version to 24.09.0-41 for OKD
+  - 7ce7e3c1 2024-10-29T16:09:53-04:00 Only configure IPv6 RAs when ipv6 mode enabled
+  - 95bf3771 2024-10-28T17:12:00-04:00 Adds startup probe to UDN e2e
+  - f02a9d14 2024-10-28T15:57:25-04:00 Dont modify pod routes in tests
+  - 6170c169 2024-10-28T12:15:54-04:00 add an ipv4 single stack CI lane for network-segmentation
+  - cf4c7dbf 2024-10-28T11:54:10-04:00 add correct cidr family to service network isolation tests for UDN
+  - 2b4bfd5b 2024-10-28T11:53:19-04:00 allow UDN network isolation tests to select clusters CIDR family
+  - 8469e9b4 2024-10-25T19:20:41+02:00 docs, localnet: document the physicalNetworkName attr
+  - f68e6fda 2024-10-25T19:20:41+02:00 localnet, tests: add e2e tests to share bridge mappings
+  - 2643dabe 2024-10-25T19:20:41+02:00 localnet, multi-homing: introduce localnet alias
+  - 064f35ea 2024-10-25T18:06:04+02:00 Enable IP forwarding on the UDN management interface
+  - 02147efd 2024-10-25T13:45:20+02:00 Add support for external->svc on L2 UDNs
+  - f6fd10db 2024-10-25T13:45:20+02:00 UDN: L2: Add missing remote LRPs
+  - 4e75e3ef 2024-10-25T13:45:20+02:00 UDN,L2: Ensure CM allocates tunnelIDs for nodes and pods
+  - e6ba13e6 2024-10-25T13:45:20+02:00 Add udn-l2-node-gateway-router-lrp-tunnel-ids annotation
+  - cf93f2eb 2024-10-25T13:45:20+02:00 Convert updateNetworkIDsAnnotation to updateNetworkAnnotation
+  - 8b942317 2024-10-25T13:45:20+02:00 HACK: Update podSubnet for lexocographical correctness
+  - 8633457e 2024-10-24T09:35:43+02:00 Remove 5hours of sleeping time from e2e
+  - d20b2211 2024-10-24T04:32:22+00:00 Add hybird overlay pod IPs to the namespace address_set
+  - 43e1f0e9 2024-10-23T17:24:52+00:00 Set shard-conformance timeout lower tham github timeout
+  - fed46ec3 2024-10-23T14:36:33+00:00 Remove PreStart from NetworkController interface
+  - 5a2a613f 2024-10-22T23:05:27+02:00 Egress node: add default route to external also in update path
+  - c32525b4 2024-10-22T23:04:07+02:00 Only enable Hybrid Overlay in CI lanes when IPv4 is enabled
+  - cadb2d7a 2024-10-22T19:57:10+02:00 E2E test: restart ovnk after applying UDN & service
+  - 11d8ce9e 2024-10-22T19:57:10+02:00 E2E code: use one const for ovnk namespace across all tests
+  - e6f2c889 2024-10-22T19:57:10+02:00 Better error reporting in syncNodeManagementPort
+  - 1490c665 2024-10-22T19:57:10+02:00 Split Default Node Network Controller Start()
+  - 303dd182 2024-10-22T19:57:10+02:00 Split initGateway()
+  - fa2ae0c1 2024-10-22T19:57:10+02:00 Merge local and shared gateway code
+  - 3947ce15 2024-10-22T19:57:10+02:00 Log the error when stopping node network controller manager
+  - fe34f4b2 2024-10-22T18:16:02+02:00 Fix incorrect removal of VRF device
+  - b4137da2 2024-10-22T17:46:27+02:00 hack/lint.sh: Use full image tag
+  - 13adaa85 2024-10-22T10:16:14-04:00 Suppress remote node annotation missing
+  - ab66c99c 2024-10-21T18:02:07+02:00 node: Relax check_ports() for UDN patch ports.
+
+- kubernetes image-arm64 7ca9eb1e9e5ced974033c2b6f26560e22535244c to 960cb692b229012f1240ef702a41ea4aaa036944
+  - f7a6af325 2024-11-05T07:14:11-05:00 UPSTREAM: <carry>: Bump kube-proxy image to 4.18 base images
+  - 3708d255d 2024-10-24T09:54:35-04:00 UPSTREAM: <carry>: Prefer local endpoint for cluster DNS service
+  - 760f33532 2024-10-23T17:31:25-04:00 UPSTREAM: <carry>: Add standalone kube-proxy image
 
