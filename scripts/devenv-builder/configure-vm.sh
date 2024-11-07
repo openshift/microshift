@@ -229,7 +229,10 @@ fi
 
 if ${BUILD_AND_RUN}; then
     if ${OPTIONAL_RPMS}; then
-        "${DNF_RETRY}" "localinstall" "$(ls -1 ~/microshift/_output/rpmbuild/RPMS/*/*.rpm)"
+        # Skip gateway api rpms because:
+        # - Feature is still dev preview and no tests/docs are guaranteed.
+        # - There is one issue with conformance (see USHIFT-4757) that needs to be addressed in the operator.
+        "${DNF_RETRY}" "localinstall" "$(find ~/microshift/_output/rpmbuild/RPMS -type f -name "*.rpm" -not -name "*gateway-api*")"
     else
         createrepo "${HOME}/microshift/_output/rpmbuild"
         "${DNF_RETRY}" "install" \
