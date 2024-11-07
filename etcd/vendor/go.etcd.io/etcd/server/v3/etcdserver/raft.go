@@ -33,6 +33,8 @@ import (
 	"go.etcd.io/etcd/server/v3/config"
 	"go.etcd.io/etcd/server/v3/etcdserver/api/membership"
 	"go.etcd.io/etcd/server/v3/etcdserver/api/rafthttp"
+	"go.etcd.io/etcd/server/v3/mvcc/backend"
+	"go.etcd.io/etcd/server/v3/revbump"
 	"go.etcd.io/etcd/server/v3/wal"
 	"go.etcd.io/etcd/server/v3/wal/walpb"
 	"go.uber.org/zap"
@@ -570,7 +572,8 @@ func restartNode(cfg config.ServerConfig, snapshot *raftpb.Snapshot) (types.ID, 
 	return id, cl, n, s, w
 }
 
-func restartAsStandaloneNode(cfg config.ServerConfig, snapshot *raftpb.Snapshot) (types.ID, *membership.RaftCluster, raft.Node, *raft.MemoryStorage, *wal.WAL) {
+func restartAsStandaloneNode(cfg config.ServerConfig, snapshot *raftpb.Snapshot, be backend.Backend) (types.ID,
+	*membership.RaftCluster, raft.Node, *raft.MemoryStorage, *wal.WAL) {
 	var walsnap walpb.Snapshot
 	if snapshot != nil {
 		walsnap.Index, walsnap.Term = snapshot.Metadata.Index, snapshot.Metadata.Term
@@ -608,6 +611,13 @@ func restartAsStandaloneNode(cfg config.ServerConfig, snapshot *raftpb.Snapshot)
 	}
 	if len(ents) != 0 {
 		st.Commit = ents[len(ents)-1].Index
+	}
+
+	if cfg.ForceNewClusterBumpAmount > 0 {
+		err = revbump.UnsafeModifyLastRevision(cfg.Logger, cfg.ForceNewClusterBumpAmount, be)
+		if err != nil {
+			cfg.Logger.Fatal("failed to modify last revision", zap.Error(err))
+		}
 	}
 
 	cfg.Logger.Info(
