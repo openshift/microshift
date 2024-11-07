@@ -1,6 +1,6 @@
-- ovn-kubernetes image-amd64 52c7ebe90417a98c4e276f735e1824ea04b27cf6 to 81cc8ea374872f75c684d462b0673baa0b76cd46
-  - d090ea49 2024-06-25T14:31:07+05:30 Implementation required to enable Forwarding if it is already disabled
+- cluster-network-operator embedded-component cad89f0fe351e5da920167842d476e0c603c5f43 to 179c38004739adde111d2fabf08bc94b0c663d9b
+  - 341f58d 2024-10-21T07:51:34+00:00 Exporting environment varialbe NODE_CNI for live migration
 
-- ovn-kubernetes image-arm64 52c7ebe90417a98c4e276f735e1824ea04b27cf6 to 81cc8ea374872f75c684d462b0673baa0b76cd46
-  - d090ea49 2024-06-25T14:31:07+05:30 Implementation required to enable Forwarding if it is already disabled
+- machine-config-operator embedded-component 20e767851f25a12f9be5701012abb881ac33ab25 to 439f25084fa2008d3b04187001fb4212dc530440
+  - fbf7f02f 2024-10-31T11:12:01+00:00 Disable ESP offload for OVS attached interfaces
 
