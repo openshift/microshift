@@ -54,7 +54,7 @@ Remove Kubeconfig
 
 Run With Kubeconfig
     [Documentation]    Run a command using KUBECONFIG from the test suite.
-    [Arguments]    ${cmd}    ${allow_fail}=False
+    [Arguments]    ${cmd}    ${allow_fail}=False    ${return_rc}=False
     ${stdout_file}=    Create Random Temp File
     ${result}=    Run Process    ${cmd}    env:KUBECONFIG=${KUBECONFIG}
     ...    stderr=STDOUT    shell=True
@@ -67,6 +67,7 @@ Run With Kubeconfig
     END
     ${stdout}=    OperatingSystem.Get File    ${stdout_file}
     ${stdout}=    Strip String    ${stdout}    # strip \n character at the end
+    IF    ${return_rc}    RETURN    ${stdout}    ${result.rc}
     RETURN    ${stdout}
 
 Create Namespace
