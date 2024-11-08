@@ -4,8 +4,7 @@
 
 scenario_create_vms() {
     prepare_kickstart host1 kickstart.ks.template rhel-9.4-microshift-source
-    # Create a VM with 2 NICs
-    launch_vm  --vm_nics 2
+    launch_vm  --network default,default
 }
 
 scenario_remove_vms() {

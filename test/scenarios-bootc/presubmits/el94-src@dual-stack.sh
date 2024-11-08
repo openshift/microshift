@@ -4,7 +4,7 @@
 
 scenario_create_vms() {
     prepare_kickstart host1 kickstart-bootc.ks.template rhel94-bootc-source
-    launch_vm --boot_blueprint rhel94-bootc --network_name "${VM_DUAL_STACK_NETWORK}" --bootc
+    launch_vm --boot_blueprint rhel94-bootc --network "${VM_DUAL_STACK_NETWORK}" --bootc
 }
 
 scenario_remove_vms() {

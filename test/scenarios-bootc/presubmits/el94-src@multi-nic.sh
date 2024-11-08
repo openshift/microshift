@@ -4,7 +4,7 @@
 
 scenario_create_vms() {
     prepare_kickstart host1 kickstart-bootc.ks.template rhel94-bootc-source
-    launch_vm --boot_blueprint rhel94-bootc --vm_nics 2 --bootc
+    launch_vm --boot_blueprint rhel94-bootc --network default,default --bootc
 }
 
 scenario_remove_vms() {

@@ -4,7 +4,7 @@
 
 scenario_create_vms() {
     prepare_kickstart host1 kickstart-offline.ks.template ""
-    launch_vm  --boot_blueprint rhel-9.4-microshift-source-isolated --vm_nics 0
+    launch_vm  --boot_blueprint rhel-9.4-microshift-source-isolated --no_network
 }
 
 scenario_remove_vms() {
