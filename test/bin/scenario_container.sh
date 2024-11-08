@@ -27,6 +27,7 @@ process_kickstart_into_script() {
 create_container_entrypoint() {
     local -r name="$1"
     local -r output_dir="${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${name}/"
+    local -r full_ctr_name=$(full_vm_name "${name}")
 
     cat << EOF > "${output_dir}/init.sh"
 #!/bin/bash
@@ -40,6 +41,14 @@ if [ -e /var/adm/microshift-container-init-ok ]; then
     echo "Container already initialized"
     exit 0
 fi
+
+cat << EOF2 >> /etc/microshift/lvmd.yaml
+device-classes:
+- name: default
+  volume-group: ${full_ctr_name}
+  spare-gb: 0
+  default: true
+EOF2
 
 EOF
     chmod +x "${output_dir}/init.sh"
@@ -67,21 +76,24 @@ EOF
 #           [--name <name>]
 #           [--vcpus <vcpus>]
 #           [--memory <memory>]
+#           [--vg_size <volume group size>]
 #
 # Arguments:
 #   --image <image>: Bootc container image for the container.
 #   [--name <name>]: The short name of the container in the scenario (e.g., "host1").
 #   [--vcpus <vcpus>]: Number of vCPUs for the container (default: 2).
 #   [--memory <memory>]: Size of RAM in MB for the container (default: 4096).
+#   [--vg_size <volume group size>]: Size of a LVM VG in GB for a container (default: 1)
 launch_container() {
     local name="host1"
     local image=""
     local memory=4096
     local vcpus=2
+    local vg_size=1
 
     while [ $# -gt 0 ]; do
         case "$1" in
-            --name|--image|--vcpus|--memory)
+            --name|--image|--vcpus|--memory|--vg_size)
                 var="${1/--/}"
                 if [ -n "$2" ] && [ "${2:0:1}" != "-" ]; then
                     declare "${var}=$2"
@@ -117,11 +129,19 @@ launch_container() {
         exit 0
     fi
 
-    sudo modprobe openvswitch
-
     create_container_entrypoint "${name}"
-    local -r output_dir="${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${name}/"
+    local -r output_dir="${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${name}"
     touch "${output_dir}/boot_id"
+
+    local -r vg_file="${output_dir}/lvm.img"
+    sudo truncate --size="${vg_size}G" "${vg_file}"
+    sudo losetup -f "${vg_file}"
+    local -r vg_loop=$(losetup --associated "${vg_file}" | head -n1 | cut -d: -f1)
+    sudo vgcreate --force --yes "${full_ctr_name}" "${vg_loop}"
+
+    sudo modprobe openvswitch
+    sudo modprobe dm-thin-pool
+    sudo modprobe dm-snapshot
 
     if ! sudo podman run \
         --detach \
@@ -155,14 +175,14 @@ launch_container() {
 
         if [ ${attempt} -gt ${max_attempts} ] ; then
             echo "Error running waiting for container's IP - attempt ${attempt}"
-            record_junit "${vmname}" "ip-assignment" "FAILED"
+            record_junit "${name}" "ip-assignment" "FAILED"
             return 1
         fi
 
         sleep 3s
     done
 
-    record_junit "${vmname}" "ip-assignment" "OK"
+    record_junit "${name}" "ip-assignment" "OK"
     echo "Container ${full_ctr_name} has IP ${ip}"
 
     # Remove any previous key info for the host
@@ -197,6 +217,21 @@ remove_container() {
     local name="${1:-host1}"
     local full_ctr_name
     full_ctr_name=$(full_vm_name "${name}")
+
     sudo podman stop "${full_ctr_name}" > /dev/null || true
     sudo podman rm --force "${full_ctr_name}" > /dev/null || true
+
+    if sudo vgdisplay "${full_ctr_name}" >/dev/null; then
+        sudo vgremove --yes "${full_ctr_name}" || true
+    fi
+
+    local -r output_dir="${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${name}"
+    local -r vg_file="${output_dir}/lvm.img"
+    local -r vg_loop=$(losetup --associated "${vg_file}" | head -n1 | cut -d: -f1)
+    if [ -z "${vg_loop}" ]; then
+        sudo losetup -d "${vg_loop}" || true
+    fi
+    if [ -e "${vg_file}" ]; then
+        sudo rm -f "${vg_file}" || true
+    fi
 }
