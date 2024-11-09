@@ -420,21 +420,21 @@ EOF
 # Public function to start a VM.
 #
 # Creates a new VM using the scenario name and the vmname given to
-# create a unique name. Uses the boot_blueprint and network_name
-# arguments to select the ISO and network from which to boot.
+# create a unique name. Uses the boot_blueprint and network
+# arguments to select the ISO and networks from which to boot.
 # If no boot_blueprint is specified, uses DEFAULT_BOOT_BLUEPRINT.
-# If no network_name is specified, uses the "default" network.
+# If no network is specified, uses the "default" network.
 #
 # Usage: launch_vm \
 #           [--vmname <name>] \
 #           [--boot_blueprint <blueprint>] \
-#           [--network_name <name>] \
+#           [--network <name>[,<name>...]] \
 #           [--vm_vcpus <vcpus>] \
 #           [--vm_memory <memory>] \
 #           [--vm_disksize <disksize>] \
-#           [--vm_nics <nics>] \
 #           [--fips] \
-#           [--bootc]
+#           [--bootc] \
+#           [--no_network]
 #
 # Arguments:
 #   [--vmname <name>]: The short name of the VM in the scenario (e.g., "host1").
@@ -442,11 +442,14 @@ EOF
 #                                   should be used to boot the VM. This is _not_
 #                                   necessarily the image to be installed (see
 #                                   prepare_kickstart).
-#   [--network_name <name>]: The name of the network used when creating the VM.
+#   [--network <name>[,<name>...]]: A comma-separated list for the networks used
+#                                   when creating the VM. Each network entry will
+#                                   create a NIC and they are repeatable.
+#   [--no-network]: Do not configure any network attachments (and therefore no
+#                   NICs) for the VM.
 #   [--vm_vcpus <vcpus>]: Number of vCPUs for the VM.
 #   [--vm_memory <memory>]: Size of RAM in MB for the VM.
 #   [--vm_disksize <disksize>]: Size of disk in GB for the VM.
-#   [--vm_nics <nics>]: Number of network interfaces for the VM.
 #   [--fips]: Enable FIPS mode
 #   [--bootc]: Enable bootc mode
 
@@ -454,17 +457,16 @@ launch_vm() {
     # set defaults
     local vmname="host1"
     local boot_blueprint="${DEFAULT_BOOT_BLUEPRINT}"
-    local network_name="default"
+    local network="default"
     local vm_memory=4096
     local vm_vcpus=2
     local vm_disksize=20
-    local vm_nics=1
     local fips_mode=0
     local bootc_mode=0
 
     while [ $# -gt 0 ]; do
         case "$1" in
-            --vmname|--boot_blueprint|--network_name|--vm_vcpus|--vm_memory|--vm_disksize|--vm_nics)
+            --vmname|--boot_blueprint|--vm_vcpus|--vm_memory|--vm_disksize)
                 var="${1/--/}"
                 if [ -n "$2" ] && [ "${2:0:1}" != "-" ]; then
                     declare "${var}=$2"
@@ -474,6 +476,20 @@ launch_vm() {
                     record_junit "${vmname}" "vm-launch-args" "FAILED"
                     exit 1
                 fi
+                ;;
+            --network)
+                if [ -n "$2" ] && [ "${2:0:1}" != "-" ]; then
+                    network="${2//,/ }"
+                    shift 2
+                else
+                    error "Failed parsing network argument: value not set"
+                    record_junit "${vmname}" "vm-launch-args" "FAILED"
+                    exit 1
+                fi
+                ;;
+            --no_network)
+                network=""
+                shift
                 ;;
             --fips)
                 fips_mode=1
@@ -582,8 +598,8 @@ launch_vm() {
         vm_extra_args+=" inst.cmdline"
     fi
 
-    for _ in $(seq "${vm_nics}") ; do
-        vm_network_args+="--network network=${network_name},model=virtio "
+    for n in ${network}; do
+        vm_network_args+="--network network=${n},model=virtio "
     done
     if [ -z "${vm_network_args}" ] ; then
         vm_network_args="--network none"
@@ -677,7 +693,7 @@ launch_vm() {
     sudo virsh start "${full_vmname}"
 
     # If there is at least 1 NIC attached, wait for an IP to be assigned and poll for SSH access
-    if  [ "${vm_nics}" -gt 0 ]; then
+    if  [ -n "${network}" ]; then
         # Wait for an IP to be assigned
         echo "Waiting for VM ${full_vmname} to have an IP"
         local -r ip=$(get_vm_ip "${full_vmname}")
