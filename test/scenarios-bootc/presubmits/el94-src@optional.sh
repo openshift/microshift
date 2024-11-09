@@ -10,7 +10,7 @@ WEB_SERVER_URL="http://${VM_BRIDGE_IP}:${WEB_SERVER_PORT}"
 scenario_create_vms() {
     prepare_kickstart host1 kickstart-bootc.ks.template rhel94-bootc-source-optionals
     # Two nics - one for macvlan, another for ipvlan (they cannot enslave the same interface)
-    launch_vm --boot_blueprint rhel94-bootc --network_name "${VM_MULTUS_NETWORK}" --vm_nics 2 --bootc
+    launch_vm --boot_blueprint rhel94-bootc --network "${VM_MULTUS_NETWORK},${VM_MULTUS_NETWORK}" --bootc
 }
 
 scenario_remove_vms() {

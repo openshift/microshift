@@ -4,7 +4,8 @@
 
 scenario_create_vms() {
     prepare_kickstart host1 kickstart-bootc.ks.template rhel94-bootc-source
-    launch_vm --boot_blueprint rhel94-bootc --vm_nics 2 --bootc
+    # Using multus as secondary network to have 2 nics in different networks.
+    launch_vm --boot_blueprint rhel94-bootc --network default,"${VM_MULTUS_NETWORK}" --bootc
 }
 
 scenario_remove_vms() {
