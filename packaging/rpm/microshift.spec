@@ -322,6 +322,8 @@ mkdir -p -m755 %{buildroot}%{_datadir}/microshift/release
 install -p -m644 assets/release/release-{x86_64,aarch64}.json %{buildroot}%{_datadir}/microshift/release
 mkdir -p -m755 %{buildroot}%{_datadir}/microshift/blueprint
 install -p -m644 packaging/blueprint/blueprint*.toml %{buildroot}%{_datadir}/microshift/blueprint
+mkdir -p -m755 %{buildroot}%{_datadir}/microshift/kickstart
+install -p -m644 packaging/kickstart/kickstart*.ks.template %{buildroot}%{_datadir}/microshift/kickstart
 
 # spec validation files
 mkdir -p -m755 %{buildroot}%{_datadir}/microshift/spec
@@ -566,9 +568,11 @@ fi
 %dir %{_datadir}/microshift
 %dir %{_datadir}/microshift/release
 %dir %{_datadir}/microshift/blueprint
+%dir %{_datadir}/microshift/kickstart
 
 %{_datadir}/microshift/release/release-{x86_64,aarch64}.json
 %{_datadir}/microshift/blueprint/blueprint*.toml
+%{_datadir}/microshift/kickstart/kickstart*.ks.template
 
 %files selinux
 /var/lib/kubelet/pods
