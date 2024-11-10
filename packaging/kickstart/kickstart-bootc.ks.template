@@ -54,7 +54,7 @@ fi
 
 %end
 
-# Pull a 'bootc' image from a remote registry
+# Pull a bootc image from a remote registry
 ostreecontainer --url ${BOOTC_IMAGE_URL}
 
 %post --log=/dev/console --erroronfail

@@ -106,7 +106,24 @@ envsubst < \
 ```
 
 ### OSTree
-<TODO>
+
+The following variables need to be added for creating an OSTree kickstart file.
+
+* `OSTREE_SERVER_URL` contains an OSTree server URL passed to the
+  [ostreesetup](https://pykickstart.readthedocs.io/en/latest/kickstart-docs.html#ostreesetup) kickstart command.
+* `OSTREE_COMMIT_REF` contains an OSTree commit reference to be installed from
+  the server.
+* `AUTH_CONFIG` contents are copied to `/etc/ostree/auth.json` at the pre-install
+  stage to authenticate access to the `OSTREE_SERVER_URL` server. If no server
+  authentication is required, skip this setting.
+
+Example commands setting the variables.
+
+```bash
+export OSTREE_SERVER_URL="<http://my_ostree_server_url>"
+export OSTREE_COMMIT_REF="myostree_commit_reference"
+export AUTH_CONFIG="$(cat ~/.ostree-auth.json)"
+```
 
 Run the following command to create the `kickstart.ks` file to be used during
 the virtual machine installation.
