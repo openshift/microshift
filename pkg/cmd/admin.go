@@ -218,6 +218,10 @@ func NewRestoreCommand() *cobra.Command {
 				return acManager.PerformRestore()
 			}
 
+			if f := cmd.Flag("dont-save-failed"); f != nil && f.Changed {
+				return fmt.Errorf("--dont-save-failed cannot be used without --auto-recovery")
+			}
+
 			// err is checked in PersistentPreRunE
 			storage, name, _ := backupPathToStorageAndName(args[0])
 			dataManager, err := data.NewManager(storage)
