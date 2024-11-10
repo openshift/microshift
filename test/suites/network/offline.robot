@@ -86,7 +86,7 @@ Pod Should Be Reachable Via Ingress
     ...    Run Guest Process    ${GUEST_NAME}
     ...        bash
     ...        -c
-    ...        curl --fail -I -H \"Host: hello-microshift.cluster.local\" ${NODE_IP}:80/principal
+    ...        curl --fail -I --max-time 15 -H \"Host: hello-microshift.cluster.local\" ${NODE_IP}:80/principal
     Log Many    ${result["stdout"]}    ${result["stderr"]}
     Should Be Equal As Integers    ${result["rc"]}    0
 
