@@ -187,7 +187,7 @@ Internal Router Port Should Be Open
     ...    using the given IP address.
     [Arguments]    ${router_ip}    ${port}    ${scheme}=http
     ${stdout}    ${stderr}    ${rc}=    SSHLibrary.Execute Command
-    ...    curl -I --max-time 15 -k ${scheme}://${router_ip}:${port}
+    ...    curl -I -k ${scheme}://${router_ip}:${port}
     ...    sudo=False    return_rc=True    return_stderr=True    return_stdout=True
     Log Many    ${stdout}    ${stderr}
     Should Be Equal As Integers    0    ${rc}
