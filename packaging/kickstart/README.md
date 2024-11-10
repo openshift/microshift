@@ -1,14 +1,15 @@
 The kickstart template files in this directory can be used for installing
-a host running MicroShift as described in the remainder of the document.
+a host running MicroShift.
 
 ## Procedure Overview
 
-* Follow the instructions in [Prerequisites](#prerequisites).
+* Start by configuring the [Prerequisites](#prerequisites).
 * Depending on the desired installation type, follow the instructions from one of
   the [RPM](#RPM), [Image Mode](#image-mode) or [OSTree](#OSTree) sections to
   create a working kickstart file from a template.
-* Follow the instructions in [Create Virtual Machine](#create-virtual-machine)
-  to bootstrap a host using the kickstart file you created in the previous step.
+* Create a virtual machine using the kickstart file from the previous step as
+  described in [Create Virtual Machine](#create-virtual-machine)
+
 
 ## Prepare Kickstart File
 
@@ -21,7 +22,7 @@ files that are copied to the `/usr/share/microshift/kickstart` directory.
 sudo dnf install -y microshift-release-info
 ```
 
-Install the utilities used for kickstart file creation.
+Install the utilities used during the kickstart file creation.
 
 ```bash
 sudo dnf install -y openssl gettext
@@ -30,7 +31,7 @@ sudo dnf install -y openssl gettext
 Set variables pointing to secrets included in `kickstart.ks`.
 
 * `PULL_SECRET` file contents are copied to `/etc/crio/openshift-pull-secret`
-  at the post-install stage to authenticate OpenShift registry access.
+  at the post-install stage to authenticate OpenShift container registry access.
 * `USER_PASSWD` setting is used as an encrypted password for the `redhat` user
   for logging into the host.
 
@@ -38,16 +39,18 @@ Example commands setting the variables.
 
 ```bash
 export PULL_SECRET="$(cat ~/.pull-secret.json)"
-PASSWD_TEXT=<my_redhat_user_password>
+# Only the encrypted password will be included in kickstart
+PASSWD_TEXT=<my_redhat_user_plain_text_password>
 export USER_PASSWD="$(openssl passwd -6 "${PASSWD_TEXT}")"
 ```
 
 ### RPM
 
 The following variables need to be added for creating an RPM kickstart file.
-The activation keys and organization ID can be obtained at [Activation Keys](https://console.redhat.com/insights/connector/activation-keys).
+The activation keys and organization ID can be obtained at the [Activation Keys](https://console.redhat.com/insights/connector/activation-keys) site.
+They will be used for activating the Red Hat subscription during the installation.
 
-> The subscription must include access to the `rhocp-4.xx-for-rhel-9-$(uname -m)-rpms`
+> The subscription must include access to the `rhocp-4.x-for-rhel-9-$(uname -m)-rpms`
 > and `fast-datapath-for-rhel-9-$(uname -m)-rpms` RPM repositories.
 
 * `RHSM_ORG` contains an RHSM organization ID for the subscription registration
@@ -78,15 +81,14 @@ envsubst < \
 
 The following variables need to be added for creating an Image Mode kickstart file.
 
-* `BOOTC_IMAGE_URL` contains a reference of the image to be installed using the
+* `BOOTC_IMAGE_URL` contains a reference to the image to be installed using the
   [ostreecontainer](https://pykickstart.readthedocs.io/en/latest/kickstart-docs.html#ostreecontainer) kickstart command.
-* `AUTH_CONFIG` contents are copied to `/etc/ostree/auth.json` at the pre-install
-  stage to authenticate access to the `BOOTC_IMAGE_URL` image. If no registry
-  authentication is required, skip this setting.
-* `REGISTRY_CONFIG` contents are copied to `/etc/containers/registries.conf.d/999-microshift-registry.conf`.
-  at the pre-install stage to configure access to the registry containing the
-  `BOOTC_IMAGE_URL` image. If no registry configuration is required, skip this
-  setting.
+* `AUTH_CONFIG` contents are copied to `/etc/ostree/auth.json` to authenticate
+  access to the `BOOTC_IMAGE_URL` image. If no registry authentication is required,
+  skip this setting.
+* `REGISTRY_CONFIG` contents are copied to `/etc/containers/registries.conf.d/999-microshift-registry.conf`
+  to configure access to the registry containing the `BOOTC_IMAGE_URL` image.
+  If no registry configuration is required, skip this setting.
 
 Example commands setting the variables.
 
