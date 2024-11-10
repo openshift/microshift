@@ -9,8 +9,10 @@ reboot
 # be used by the CSI driver for storing data.
 zerombr
 clearpart --all --initlabel
+
 # Create boot and swap partitions as required by the current hardware platform
 reqpart --add-boot
+
 # Add an LVM volume group and allocate a system root logical volume
 part pv.01 --grow
 volgroup rhel pv.01
@@ -57,13 +59,13 @@ ostreecontainer --url ${BOOTC_IMAGE_URL}
 
 %post --log=/dev/console --erroronfail
 
+# Create 'redhat' user account
+useradd --password '${USER_PASSWD}' --groups wheel redhat
+
 # Create an OpenShift pull secret file
 cat > /etc/crio/openshift-pull-secret <<'EOF'
 ${PULL_SECRET}
 EOF
 chmod 600 /etc/crio/openshift-pull-secret
-
-# Create 'redhat' user account
-useradd --password '${USER_PASSWD}' --groups wheel redhat
 
 %end
