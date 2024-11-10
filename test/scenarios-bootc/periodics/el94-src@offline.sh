@@ -4,7 +4,7 @@
 
 scenario_create_vms() {
     prepare_kickstart host1 kickstart-bootc-offline.ks.template rhel94-bootc-source-isolated
-    launch_vm --boot_blueprint rhel94-bootc-source-isolated --vm_nics 0 --bootc
+    launch_vm --boot_blueprint rhel94-bootc-source-isolated --no_network --bootc
 }
 
 scenario_remove_vms() {
