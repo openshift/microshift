@@ -1,5 +1,10 @@
 #!/usr/bin/python3
 
+
+"""Tool for extracing Sprint Metrics from JIRA.
+"""
+
+import argparse
 import csv
 from jira import JIRA
 import json
@@ -340,10 +345,10 @@ def write_raw(path, sprints, issues):
             fd.write(json.dumps(sprint.raw))
             fd.write('\n')
 
-def main():
+def main(args):
     logging.basicConfig(level=logging.INFO, format="{asctime} - {levelname} - {message}", style="{", datefmt="%Y-%m-%d %H:%M:%S")
 
-    config = load_sprint_config("sprint_config.json")
+    config = load_sprint_config(args.config)
 
     server = JIRA(server='https://issues.redhat.com', token_auth=config.jira_token)
     logging.info("Logged into JIRA")
@@ -402,4 +407,14 @@ def main():
     write_raw(config.raw_issues_path, sprints, all_issues)
 
 if __name__ == '__main__':
-    main()
+    parser = argparse.ArgumentParser(
+        description=__doc__,
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    parser.add_argument(
+        '--config',
+        default='sprint_config.json',
+        help='Configuration file path',
+    )
+    args = parser.parse_args()
+    main(args)
