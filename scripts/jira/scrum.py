@@ -413,7 +413,7 @@ if __name__ == '__main__':
     )
     parser.add_argument(
         '--config',
-        default='sprint_config.json',
+        default='sprint_metrics_config.json',
         help='Configuration file path',
     )
     args = parser.parse_args()
