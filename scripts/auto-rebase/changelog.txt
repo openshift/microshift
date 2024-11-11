@@ -1,6 +1,3 @@
-- cluster-network-operator embedded-component cad89f0fe351e5da920167842d476e0c603c5f43 to 179c38004739adde111d2fabf08bc94b0c663d9b
-  - 341f58d 2024-10-21T07:51:34+00:00 Exporting environment varialbe NODE_CNI for live migration
-
-- machine-config-operator embedded-component 20e767851f25a12f9be5701012abb881ac33ab25 to 439f25084fa2008d3b04187001fb4212dc530440
-  - fbf7f02f 2024-10-31T11:12:01+00:00 Disable ESP offload for OVS attached interfaces
+- machine-config-operator embedded-component 439f25084fa2008d3b04187001fb4212dc530440 to dec56a4005f72919c43efd236845d1730356a9b0
+  - c2da95a0 2024-11-04T13:18:22-06:00 backport 4.16- metrics gathering implementation (daemon.go and metrics.go)
 
