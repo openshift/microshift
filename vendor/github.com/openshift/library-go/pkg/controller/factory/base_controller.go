@@ -30,21 +30,29 @@ var defaultCacheSyncTimeout = 10 * time.Minute
 
 // baseController represents generic Kubernetes controller boiler-plate
 type baseController struct {
-	name               string
-	cachesToSync       []cache.InformerSynced
-	sync               func(ctx context.Context, controllerContext SyncContext) error
-	syncContext        SyncContext
-	syncDegradedClient operatorv1helpers.OperatorClient
-	resyncEvery        time.Duration
-	resyncSchedules    []cron.Schedule
-	postStartHooks     []PostStartHook
-	cacheSyncTimeout   time.Duration
+	name                   string
+	controllerInstanceName string
+	cachesToSync           []cache.InformerSynced
+	sync                   func(ctx context.Context, controllerContext SyncContext) error
+	syncContext            SyncContext
+	syncDegradedClient     operatorv1helpers.OperatorClient
+	resyncEvery            time.Duration
+	resyncSchedules        []cron.Schedule
+	postStartHooks         []PostStartHook
+	cacheSyncTimeout       time.Duration
 }
 
 var _ Controller = &baseController{}
 
+// Name returns a controller name.
 func (c baseController) Name() string {
 	return c.name
+}
+
+// ControllerInstanceName specifies the controller instance.
+// Useful when the same controller is used multiple times.
+func (c baseController) ControllerInstanceName() string {
+	return c.controllerInstanceName
 }
 
 type scheduledJob struct {
