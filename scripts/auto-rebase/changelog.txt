@@ -1,3 +1,20 @@
-- openshift-controller-manager embedded-component fddd93bf30628b15fee660e94faea94b4a222365 to f299e54abad2f06a51f95bf40b611a5f1519b31e
-  - 86dc07c 2024-11-01T01:46:15+00:00 skip unnecessary apply calls
+- kubernetes embedded-component 6816ea6a977365195404d43756efd1c42ac0b2a7 to 82afd7768f00679805ad74bb832b393f5e3215cc
+  - 710804185 2024-09-25T12:29:26+00:00 UPSTREAM: 125398: Fix issue with scheduler failing on hostname mismatch
+
+- machine-config-operator embedded-component bebf7523bc6716138ba741f418175ed4cecfdd55 to 5ea53a326ccda8712e2d5c93ba503e17e4a7c385
+  - e10e9626 2024-11-04T13:20:13-06:00 backport 4.17- metrics gathering implementation (daemon.go and metrics.go)
+
+- ovn-kubernetes image-amd64 62451d12851aebdd1a3b009a9829f8df796998ad to db5fdfa181cf07be8764377a4396bf0989699014
+  - ad665ccf 2024-10-09T10:00:23+02:00 Cleanup gateway pod for remote zone. For local zone pods, deleteLogicalPort cleans this up, but before IC this function was called for all non-host-network pods, hence this logic. After IC, deleteLogicalPort won't be called for all remote zone pods, so condition is not needed.
+  - 645deca4 2024-10-09T10:00:09+02:00 Add egress gateway e2e test option to delete gateway pod instead of re-labeling gateway pod. It uses different handlers for update and delete pod internally. Remove external.gateway from the dual-stack exclusion, as it is supported for ipv6.
+
+- kubernetes image-amd64 6816ea6a977365195404d43756efd1c42ac0b2a7 to 82afd7768f00679805ad74bb832b393f5e3215cc
+  - 710804185 2024-09-25T12:29:26+00:00 UPSTREAM: 125398: Fix issue with scheduler failing on hostname mismatch
+
+- ovn-kubernetes image-arm64 62451d12851aebdd1a3b009a9829f8df796998ad to db5fdfa181cf07be8764377a4396bf0989699014
+  - ad665ccf 2024-10-09T10:00:23+02:00 Cleanup gateway pod for remote zone. For local zone pods, deleteLogicalPort cleans this up, but before IC this function was called for all non-host-network pods, hence this logic. After IC, deleteLogicalPort won't be called for all remote zone pods, so condition is not needed.
+  - 645deca4 2024-10-09T10:00:09+02:00 Add egress gateway e2e test option to delete gateway pod instead of re-labeling gateway pod. It uses different handlers for update and delete pod internally. Remove external.gateway from the dual-stack exclusion, as it is supported for ipv6.
+
+- kubernetes image-arm64 6816ea6a977365195404d43756efd1c42ac0b2a7 to 82afd7768f00679805ad74bb832b393f5e3215cc
+  - 710804185 2024-09-25T12:29:26+00:00 UPSTREAM: 125398: Fix issue with scheduler failing on hostname mismatch
 
