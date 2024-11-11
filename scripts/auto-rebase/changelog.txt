@@ -1,3 +1,3 @@
-- machine-config-operator embedded-component ba0e3ef3bb329cdd69907bba1e10eaebca352fdd to cb8c80de1e58a83fca049ba98343a26f9f3bb9a9
-  - bfd8d870 2024-10-29T21:50:51+00:00 node_controller: add nil check for oldPool
+- machine-config-operator embedded-component cb8c80de1e58a83fca049ba98343a26f9f3bb9a9 to 4be937fdb421868ffa4db9e834f9593f593dd513
+  - 7a47b0ee 2024-11-07T09:58:03-06:00 backport 4.14- metrics gathering implementation (daemon.go and metrics.go)
 
