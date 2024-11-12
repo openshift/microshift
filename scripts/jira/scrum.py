@@ -10,7 +10,7 @@ from jira import JIRA
 import json
 import logging
 
-#TODO investigate whats wrong with maxResults from sprints in the api.
+# TODO investigate whats wrong with maxResults from sprints in the api.
 SKIP_FIRST_N_SPRINTS = 50
 
 # Sprint name
@@ -94,16 +94,20 @@ CSV_HEADERS = [
 ]
 
 AI_PROMPTS = [
-    'Analyze this data file, corresponding to a development team following scrum practices. Summarize these metrics and their values: velocity, velocity per working day, goal completion, flow efficiency, wip ratios, defect density ratio and removal efficiency, scope change, scope volatility and predictability.',
+    '''Analyze this data file, corresponding to a development team following scrum practices.
+    Summarize these metrics and their values: velocity, velocity per working day, goal completion,
+    flow efficiency, wip ratios, defect density ratio and removal efficiency, scope change, scope volatility and predictability.''',
     'Provide charts, including average and trend, for each of the metrics above. Do them separately.',
     'What changes should the team adopt that would have the highest impact? Explain them in start/stop/continue doing.',
 ]
+
 
 def sprints_in_board(server, board_id, sprint_list):
     def _filter_sprints(sprint):
         return any(sprint.name == s.name for s in sprint_list)
     all_sprints = server.sprints(board_id, startAt=SKIP_FIRST_N_SPRINTS)
     return list(filter(_filter_sprints, all_sprints))
+
 
 def issues_from_ushift(server, query):
     issues = []
@@ -117,123 +121,142 @@ def issues_from_ushift(server, query):
             break
     return issues
 
+
 def issue_planned_in_sprint(sprint_id, sprint_name, start_date):
     def _issue_planned_in_sprint(issue):
         def _filter_changes(change):
-            return  change.created <= start_date and \
-                    any(item.field == 'Sprint' for item in change.items)
+            return change.created <= start_date and \
+                   any(item.field == 'Sprint' for item in change.items)
         filtered_changes = list(filter(_filter_changes, issue.changelog.histories))
         if len(filtered_changes) == 0:
             # An empty filtered_changes could happen either because the sprint was configured when creating the ticket
             # or it was added to the sprint after the start date.
             if any(
-                item.field == 'Sprint' and \
-                str(sprint_id) in item.to and \
-                (item.fromString is None or sprint_name not in item.fromString) and \
-                change.created >= start_date \
-                    for change in issue.changelog.histories for item in change.items):
+                 item.field == 'Sprint' and
+                 str(sprint_id) in item.to and
+                 (item.fromString is None or sprint_name not in item.fromString) and
+                 change.created >= start_date
+                 for change in issue.changelog.histories for item in change.items):
                 return False
             if issue.fields.created >= start_date:
                 return False
             if issue.fields.customfield_12310940 is not None and \
-                str(sprint_id) in "".join(issue.fields.customfield_12310940):
+               str(sprint_id) in "".join(issue.fields.customfield_12310940):
                 return True
             return False
         return any(item.to is not None and str(sprint_id) in item.to for item in filtered_changes[-1].items)
     return _issue_planned_in_sprint
 
+
 def issue_removed_from_sprint(sprint_name, start_date, end_date):
     def _issue_removed_from_sprint(issue):
         def _filter_sprint(change):
             return change.created <= end_date and change.created >= start_date and \
-                any(item.field=='Sprint' for item in change.items)
+                any(item.field == 'Sprint' for item in change.items)
+
         filtered_list = list(filter(_filter_sprint, issue.changelog.histories))
         if len(filtered_list) == 0:
             return False
-        return  any(sprint_name not in item.toString for item in filtered_list[-1].items) and \
-                issue_added_to_sprint(issue, sprint_name, end_date)
+        return issue_added_to_sprint(issue, sprint_name, end_date) and \
+            any(sprint_name not in item.toString for item in filtered_list[-1].items)
+
     return _issue_removed_from_sprint
+
 
 def issue_added_to_sprint(issue, sprint_name, end_date):
     if any(
-        item.field == 'Sprint' and \
-        sprint_name in item.toString and \
-        change.created <= end_date \
-        for change in issue.changelog.histories \
-            for item in change.items):
+         item.field == 'Sprint' and
+         sprint_name in item.toString and
+         change.created <= end_date
+         for change in issue.changelog.histories
+         for item in change.items):
         return True
     return issue_in_sprint(sprint_name, end_date)(issue)
+
 
 def issue_in_sprint(sprint_name, end_date):
     def _issue_in_sprint(issue):
         def _filter_changes(change):
-            return change.created <= end_date and any(item.field=='Sprint' for item in change.items)
+            return change.created <= end_date and any(item.field == 'Sprint' for item in change.items)
         filtered_changes = list(filter(_filter_changes, issue.changelog.histories))
         if len(filtered_changes) == 0:
-            return  issue.fields.customfield_12310940 is not None and \
-                    sprint_name in "".join(issue.fields.customfield_12310940)
+            return issue.fields.customfield_12310940 is not None and \
+                   sprint_name in "".join(issue.fields.customfield_12310940)
         return any(item.field == 'Sprint' and item.toString is not None and sprint_name in item.toString for item in filtered_changes[-1].items)
     return _issue_in_sprint
 
+
 def issue_get_final_state_before_date(issue, end_date):
     def _filter_state_changes(change):
-        return  change.created <= end_date and \
-                any(item.field=='status' for item in change.items)
+        return change.created <= end_date and \
+               any(item.field == 'status' for item in change.items)
     filtered_changes = list(filter(_filter_state_changes, issue.changelog.histories))
     if len(filtered_changes) == 0:
         # if there are no entries default to this state
         return "To Do"
     return filtered_changes[-1].items[-1].toString
 
+
 def issue_resolved(end_date):
     def _issue_resolved(issue):
         def _filter_resolution(change):
-            return  change.created <= end_date and \
-                    any(item.field == 'resolution' \
-                        for item in change.items)
+            return change.created <= end_date and \
+                   any(item.field == 'resolution'
+                       for item in change.items)
+
         if issue_get_final_state_before_date(issue, end_date) in ['Verified', 'VERIFIED', 'Closed', 'CLOSED']:
             return True
         filtered_changes = list(filter(_filter_resolution, issue.changelog.histories))
         if len(filtered_changes) == 0:
             return False
         return any(item.field == 'resolution' and item.toString is not None and 'Done' in item.toString for item in filtered_changes[-1].items)
+
     return _issue_resolved
+
 
 def issue_not_started(end_date):
     def _issue_not_started(issue):
         return issue_get_final_state_before_date(issue, end_date) in ['To Do', 'ToDo', 'New']
     return _issue_not_started
 
+
 def issue_in_progress(end_date):
     def _issue_in_progress(issue):
         return issue_get_final_state_before_date(issue, end_date) in ['ASSIGNED', 'In Progress']
     return _issue_in_progress
+
 
 def issue_in_code_review(end_date):
     def _issue_in_code_review(issue):
         return issue_get_final_state_before_date(issue, end_date) in ['Code Review', 'POST']
     return _issue_in_code_review
 
+
 def issue_in_review(end_date):
     def _issue_in_review(issue):
         return issue_get_final_state_before_date(issue, end_date) in ['Review', 'MODIFIED', 'ON_QA']
     return _issue_in_review
 
+
 def issue_is_bug(issue):
     return issue.fields.issuetype.name == 'Bug'
 
+
 def estimated_story_points(issues, end_date):
     def _filter_changes(change):
-        return any( item.field=='Story Points' and \
-                    len (item.toString) > 0 and \
-                    change.created <= end_date \
-                        for item in change.items)
+        return any(item.field == 'Story Points' and
+                   len(item.toString) > 0 and
+                   change.created <= end_date
+                   for item in change.items)
+
     def _get_story_points(issue):
         filtered_changes = list(filter(_filter_changes, issue.changelog.histories))
         if len(filtered_changes) == 0:
             return int(issue.fields.customfield_12310243) if issue.fields.customfield_12310243 is not None else 0
-        return sum(int(item.toString) if item.field=='Story Points' else 0 for item in filtered_changes[-1].items)
+        return sum(int(item.toString) if item.field == 'Story Points' else 0 for item in filtered_changes[-1].items)
+
     return sum(_get_story_points(issue) for issue in issues)
+
 
 def prepare_csv_row(
     sprint_name,
@@ -260,7 +283,7 @@ def prepare_csv_row(
             goals_total = sprint.goals_total
             working_days = sprint.working_days
             break
-    
+
     name = int(''.join(filter(str.isdigit, sprint_name)))
     planned_story_points = estimated_story_points(planned_issues, end_date)
     removed_story_points = estimated_story_points(removed_issues, end_date)
@@ -301,8 +324,10 @@ def prepare_csv_row(
         CSV_FIELD_WIP_RATIO: round((in_progress_story_points + in_code_review_story_points + in_qa_bug_story_points + not_started_story_points) / planned_story_points, 2),
         CSV_FIELD_SCOPE_VOLATILITY: round((total_story_points - planned_story_points + removed_story_points) / planned_story_points * 100, 2),
         CSV_FIELD_DEFECT_REMOVAL_EFFICIENCY: round(resolved_bug_story_points / all_bug_story_points * 100, 2),
-        CSV_FIELD_FLOW_EFFICIENCY_BUGS: round(resolved_bug_story_points / (resolved_bug_story_points + in_progress_bug_story_points + in_code_review_bug_story_points + in_qa_bug_story_points) * 100, 2),
+        CSV_FIELD_FLOW_EFFICIENCY_BUGS: round(
+            resolved_bug_story_points / (resolved_bug_story_points + in_progress_bug_story_points + in_code_review_bug_story_points + in_qa_bug_story_points) * 100, 2),
     }
+
 
 def write_results_csv(path, rows):
     with open(path, 'w', newline='') as csvfile:
@@ -312,6 +337,7 @@ def write_results_csv(path, rows):
             writer.writerow(row)
     logging.info(f"Wrote CSV to {path}")
 
+
 class Sprint(object):
     def __init__(self, json_dict) -> None:
         mandatory_fields = ['name', 'goals_total', 'goals_achieved', 'working_days']
@@ -319,6 +345,7 @@ class Sprint(object):
             if field not in json_dict:
                 raise ValueError(f'{field} missing from sprints configuration')
             setattr(self, field, json_dict[field])
+
 
 class Config(object):
     def __init__(self, json_dict) -> None:
@@ -331,10 +358,12 @@ class Config(object):
         for sprint in json_dict['sprints']:
             self.sprints.append(Sprint(sprint))
 
+
 def load_sprint_config(path):
     with open(path, 'r') as fd:
         config = json.load(fd)
         return Config(config)
+
 
 def write_raw(path, sprints, issues):
     with open(path, 'w') as fd:
@@ -344,6 +373,7 @@ def write_raw(path, sprints, issues):
         for sprint in sprints:
             fd.write(json.dumps(sprint.raw))
             fd.write('\n')
+
 
 def main(args):
     logging.basicConfig(level=logging.INFO, format="{asctime} - {levelname} - {message}", style="{", datefmt="%Y-%m-%d %H:%M:%S")
@@ -405,6 +435,7 @@ def main(args):
     write_results_csv(config.results_path, csv_rows)
 
     write_raw(config.raw_issues_path, sprints, all_issues)
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
