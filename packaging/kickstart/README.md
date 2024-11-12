@@ -57,8 +57,8 @@ They will be used for activating the Red Hat subscription during the installatio
   command in kickstart.
 * `RHSM_KEY` contains an RHSM activation key for the subscription registration
   command in kickstart.
-* `MICROSHIFT_VER` references the MicroShift version to install using the `4.x`
-  format. Note that the latest available `.y` version will be installed.
+* `MICROSHIFT_VER` references the MicroShift version to install using the `4.y`
+  format. Note that the latest available `.z` version will be installed.
 
 Example commands setting the variables.
 
