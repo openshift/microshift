@@ -2,6 +2,26 @@
 
 
 """Tool for extracing Sprint Metrics from JIRA.
+
+It is mandatory to provide a configuration file in JSON format. The file needs to have this format:
+{
+    "board_id": board id from JIRA. This varies between projects,
+    "jira_query": JQL to use for searching issues,
+    "jira_token": Auth token from JIRA,
+    "results_path": Path for the CSV results file,
+    "raw_issues_path": Path for a raw JSON file with all sprints and issues that were retrieved.,
+    "sprints": [
+        {
+            "name": Sprint name. Needs to match the name in JIRA,
+            "goals_achieved": Number of goals that were achieved,
+            "goals_total": Total number of goals that were included in the sprint,
+            "team_members": Number of team members participating in the sprint's issues,
+            "working_days": Sum of working days from every team member
+        }
+    ]
+}
+
+After running the script you may upload the CSV to a LLM model, using the prompts in AI_PROMPTS variable.
 """
 
 import argparse
