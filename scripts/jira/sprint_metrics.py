@@ -409,7 +409,7 @@ def charts(config):
         metric_data = data[column]
         plt.plot(data['Sprint'], metric_data, marker='o', label="Sprint Values")
         average = metric_data.mean()
-        plt.axhline(y=average, color='r', linestyle='--', label=f"Average ({average:.2f})")
+        plt.axhline(y=average, color='r', linestyle='--', label=f"Average ({average: .2f})")
         sns.regplot(x=data['Sprint'], y=metric_data, scatter=False, color='b', label="Trend Line")
 
         plt.title(f"{column} over Sprints")
@@ -418,6 +418,7 @@ def charts(config):
         plt.legend()
 
     plt.show()
+
 
 def main(args):
     logging.basicConfig(level=logging.INFO, format="{asctime} - {levelname} - {message}", style="{", datefmt="%Y-%m-%d %H:%M:%S")
