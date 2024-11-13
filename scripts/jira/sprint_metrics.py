@@ -416,23 +416,25 @@ def main(args):
             logging.info("Sprint has not finished yet")
             continue
 
-        planned_issues = list(filter(issue_planned_in_sprint(sprint.id, sprint.name, sprint.activatedDate), all_issues))
-        removed_issues = list(filter(issue_removed_from_sprint(sprint.name, sprint.activatedDate, sprint.endDate), all_issues))
-        total_sprint_issues = list(filter(issue_in_sprint(sprint.name, sprint.endDate), all_issues))
-        resolved_issues = list(filter(issue_resolved(sprint.endDate), total_sprint_issues))
-        not_started_issues = list(filter(issue_not_started(sprint.endDate), total_sprint_issues))
-        in_progress_issues = list(filter(issue_in_progress(sprint.endDate), total_sprint_issues))
-        in_code_review_issues = list(filter(issue_in_code_review(sprint.endDate), total_sprint_issues))
+        start_date, end_date = sprint.activatedDate, sprint.completeDate
+
+        planned_issues = list(filter(issue_planned_in_sprint(sprint.id, sprint.name, start_date), all_issues))
+        removed_issues = list(filter(issue_removed_from_sprint(sprint.name, start_date, end_date), all_issues))
+        total_sprint_issues = list(filter(issue_in_sprint(sprint.name, end_date), all_issues))
+        resolved_issues = list(filter(issue_resolved(end_date), total_sprint_issues))
+        not_started_issues = list(filter(issue_not_started(end_date), total_sprint_issues))
+        in_progress_issues = list(filter(issue_in_progress(end_date), total_sprint_issues))
+        in_code_review_issues = list(filter(issue_in_code_review(end_date), total_sprint_issues))
         all_bug_issues = list(filter(issue_is_bug, total_sprint_issues))
-        resolved_bug_issues = list(filter(issue_resolved(sprint.endDate), all_bug_issues))
-        in_qa_bug_issues = list(filter(issue_in_review(sprint.endDate), all_bug_issues))
-        in_code_review_bug_issues = list(filter(issue_in_code_review(sprint.endDate), all_bug_issues))
-        in_progress_bug_issues = list(filter(issue_in_progress(sprint.endDate), all_bug_issues))
-        not_started_bug_issues = list(filter(issue_not_started(sprint.endDate), all_bug_issues))
+        resolved_bug_issues = list(filter(issue_resolved(end_date), all_bug_issues))
+        in_qa_bug_issues = list(filter(issue_in_review(end_date), all_bug_issues))
+        in_code_review_bug_issues = list(filter(issue_in_code_review(end_date), all_bug_issues))
+        in_progress_bug_issues = list(filter(issue_in_progress(end_date), all_bug_issues))
+        not_started_bug_issues = list(filter(issue_not_started(end_date), all_bug_issues))
 
         csv_row = prepare_csv_row(
             sprint.name,
-            sprint.endDate,
+            end_date,
             planned_issues,
             removed_issues,
             total_sprint_issues,
