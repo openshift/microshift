@@ -1,2 +1,5 @@
 jira>=3.5.0
 PyGithub==1.59.0
+pandas>=2.2
+matplotlib>=3.9
+seaborn>=0.13
