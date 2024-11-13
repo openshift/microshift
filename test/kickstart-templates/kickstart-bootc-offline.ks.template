@@ -1,6 +1,6 @@
 %include /main-prologue.cfg
 %include /main-no-network.cfg
-%include /main-liveimg.cfg
+%include /main-ostreecontainer-local.cfg
 
 %post --log=/dev/console --erroronfail
 
