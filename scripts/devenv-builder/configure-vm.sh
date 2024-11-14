@@ -128,6 +128,13 @@ if ${RHEL_SUBSCRIPTION}; then
         sudo subscription-manager repos \
             --enable "rhel-${OSVERSION}-for-$(uname -m)-baseos-rpms" \
             --enable "rhel-${OSVERSION}-for-$(uname -m)-appstream-rpms"
+
+        if dnf repolist --enabled | grep -q "^rhel-${OSVERSION}-baseos-rhui-rpms"; then
+            sudo dnf config-manager --set-disabled "rhel-${OSVERSION}-baseos-rhui-rpms"
+        fi
+        if dnf repolist --enabled | grep -q "^rhel-${OSVERSION}-appstream-rhui-rpms"; then
+            sudo dnf config-manager --set-disabled "rhel-${OSVERSION}-appstream-rhui-rpms"
+        fi
     fi
 fi
 
