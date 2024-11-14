@@ -119,6 +119,10 @@ if ${RHEL_SUBSCRIPTION}; then
         source /etc/os-release
         sudo subscription-manager release --set ${VERSION_ID}
         sudo subscription-manager release --show
+        # https://access.redhat.com/solutions/4251981
+        sudo tee /etc/dnf/vars/releasever >/dev/null <<EOF
+${VERSION_ID}
+EOF
         "${DNF_RETRY}" "clean" "all"
     fi
 
