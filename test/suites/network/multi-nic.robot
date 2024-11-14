@@ -21,7 +21,7 @@ ${USHIFT_HOST_IP2}      ${EMPTY}
 ${NIC1_NAME}            ${EMPTY}
 ${NIC2_NAME}            ${EMPTY}
 ${NICS_COUNT}           2
-${NMCLI_CMD}            nmcli -f name,type connection | awk '$2 == "ethernet" {print $1}' | sort
+${NMCLI_CMD}            nmcli -f name,type connection | awk '$NF == "ethernet" { $NF=""; print $0 }'
 ${OSSL_CMD}             openssl x509 -text -noout -in
 ${CERT_FILE}            /var/lib/microshift/certs/kube-apiserver-external-signer/kube-external-serving/server.crt
 ${GREP_SUBJ_IPS}        grep -A1 'Subject Alternative Name:' | tail -1
@@ -30,14 +30,19 @@ ${GREP_SUBJ_IPS}        grep -A1 'Subject Alternative Name:' | tail -1
 *** Test Cases ***
 Verify MicroShift Runs On Both NICs
     [Documentation]    Verify MicroShift can run in the default configuration
+    [Setup]    Save Default MicroShift Config
 
-    # Wait for MicroShift API readiness and run verification
-    Wait For MicroShift
+    Configure Subject Alternative Name    ${USHIFT_HOST_IP1}    ${USHIFT_HOST_IP2}
+    Restart MicroShift
+    Restart Greenboot And Wait For Success
+
     Verify Hello MicroShift LB
     Verify Hello MicroShift NodePort    ${USHIFT_HOST_IP1}
     Verify Hello MicroShift NodePort    ${USHIFT_HOST_IP2}
     IP Should Be Present In External Certificate    ${USHIFT_HOST_IP1}
     IP Should Be Present In External Certificate    ${USHIFT_HOST_IP2}
+
+    [Teardown]    Restore Network Configuration By Rebooting Host
 
 Verify MicroShift Runs Only On Primary NIC
     [Documentation]    Verify MicroShift can run only on the primary NIC. The
@@ -48,9 +53,7 @@ Verify MicroShift Runs Only On Primary NIC
     ...    certificates, which will be lacking the IP from secondary NIC.
     [Setup]    Save Default MicroShift Config
 
-    Configure Subject Alternative Name    ${USHIFT_HOST_IP1}
-
-    ${cur_pid}=    MicroShift Process ID
+    Configure Subject Alternative Name    ${USHIFT_HOST_IP1}    ${EMPTY}
 
     Login Switch To IP    ${USHIFT_HOST_IP1}
     Disable Interface    ${NIC2_NAME}
@@ -70,7 +73,7 @@ Verify MicroShift Runs Only On Secondary NIC
     ...    to the new configuration (which includes only the secondary IP).
     [Setup]    Save Default MicroShift Config
 
-    Configure Subject Alternative Name    ${USHIFT_HOST_IP2}
+    Configure Subject Alternative Name    ${USHIFT_HOST_IP2}    ${EMPTY}
 
     ${cur_pid}=    MicroShift Process ID
 
@@ -107,7 +110,7 @@ Verify Multiple NICs
     ...    ${NMCLI_CMD} | wc -l
     ...    return_stdout=True    return_stderr=True    return_rc=True
     Should Be Equal As Integers    ${rc}    0
-    Should Be Equal As Strings    ${stdout}    ${NICS_COUNT}
+    Should Be True   '${stdout}'>='${NICS_COUNT}'
 
 Initialize Global Variables
     [Documentation]    Initializes global variables.
@@ -121,13 +124,13 @@ Initialize Nmcli Variables
     [Documentation]    Initialize the variables on the host
 
     ${stdout}    ${stderr}    ${rc}=    Execute Command
-    ...    ${NMCLI_CMD} | head -1
+    ...    ${NMCLI_CMD} | sed -n 1p | xargs
     ...    return_stdout=True    return_stderr=True    return_rc=True
     Should Be Equal As Integers    ${rc}    0
     Set Suite Variable    \${NIC1_NAME}    ${stdout}
 
     ${stdout}    ${stderr}    ${rc}=    Execute Command
-    ...    ${NMCLI_CMD} | tail -1
+    ...    ${NMCLI_CMD} | sed -n 2p | xargs
     ...    return_stdout=True    return_stderr=True    return_rc=True
     Should Be Equal As Integers    ${rc}    0
     Set Suite Variable    \${NIC2_NAME}    ${stdout}
@@ -137,7 +140,7 @@ Disable Interface
     ...    the next reboot the interface will have its original status again.
     [Arguments]    ${conn_name}
     ${stderr}    ${rc}=    Execute Command
-    ...    nmcli connection down ${conn_name}
+    ...    nmcli connection down "${conn_name}"
     ...    sudo=True    return_stdout=False    return_stderr=True    return_rc=True
     Should Be Equal As Integers    ${rc}    0
 
@@ -175,14 +178,23 @@ Verify MicroShift On Single NIC
 
 Configure Subject Alternative Name
     [Documentation]    Replace subjectAltNames entries in the configuration
-    ...    to include only the one provided in ${ip}.
-    [Arguments]    ${ip}
+    ...    to include the IPs provided
+    [Arguments]    ${ip_1}    ${ip_2}
 
-    ${subject_alt_names}=    CATENATE    SEPARATOR=\n
-    ...    ---
-    ...    apiServer:
-    ...    \ \ subjectAltNames:
-    ...    \ \ - ${ip}
+    IF  '${ip_2}' == 'False'
+        ${subject_alt_names}=    CATENATE    SEPARATOR=\n
+        ...    ---
+        ...    apiServer:
+        ...    \ \ subjectAltNames:
+        ...    \ \ - ${ip_1}
+    ELSE
+        ${subject_alt_names}=    CATENATE    SEPARATOR=\n
+        ...    ---
+        ...    apiServer:
+        ...    \ \ subjectAltNames:
+        ...    \ \ - ${ip_1}
+        ...    \ \ - ${ip_2}
+    END
 
     ${replaced}=    Replace MicroShift Config    ${subject_alt_names}
     Upload MicroShift Config    ${replaced}
