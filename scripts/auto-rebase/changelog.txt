@@ -1,3 +1,9 @@
-- machine-config-operator embedded-component cb8c80de1e58a83fca049ba98343a26f9f3bb9a9 to 4be937fdb421868ffa4db9e834f9593f593dd513
-  - 7a47b0ee 2024-11-07T09:58:03-06:00 backport 4.14- metrics gathering implementation (daemon.go and metrics.go)
+- machine-config-operator embedded-component 4be937fdb421868ffa4db9e834f9593f593dd513 to 326ff3abec70893c0fdd4b21aa6a6c52ed31e0d7
+  - f6f16ba6 2024-10-01T17:53:26+02:00 OCPBUGS-38012: Do not use 'restart' for 'oneshot' service
+
+- ovn-kubernetes image-amd64 eb3869e0d6f71407e33b8a8dcbc67d2132359d63 to 86430bef1064d4949b9b0d54accf258532e9e3c4
+  - e3a30dd 2024-11-11T09:48:43+08:00 Revert "Pin libreswan to the known working version 4.5"
+
+- ovn-kubernetes image-arm64 eb3869e0d6f71407e33b8a8dcbc67d2132359d63 to 86430bef1064d4949b9b0d54accf258532e9e3c4
+  - e3a30dd 2024-11-11T09:48:43+08:00 Revert "Pin libreswan to the known working version 4.5"
 
