@@ -114,16 +114,18 @@ Setup
     Check Required Env Variables
     Login MicroShift Host
     Setup Kubeconfig
+    Save Default MicroShift Config
 
 Setup Test
     [Documentation]    Test suite setup
     ${tmp}=    Create Random Temp Directory
     Set Global Variable    ${TMPDIR}    ${tmp}
-    Save Default MicroShift Config
 
 Teardown
     [Documentation]    Test suite teardown
     Remove Kubeconfig
+    Restore Default MicroShift Config
+    Restart MicroShift
     Logout MicroShift Host
 
 Create Keys
