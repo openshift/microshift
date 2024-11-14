@@ -1,4 +1,4 @@
-- cluster-network-operator embedded-component 6af7942e3f86d46eef4416e905d52e2516792b07 to 7b8459dc88657a44785995a4c0cc88403a95954d
-  - 04b055d 2024-10-08T14:10:44+00:00 Add configurable subnets while running hybrid-overlay-node binary
-  - c1b5eaf 2024-10-04T01:06:53+00:00 Set mount propagation to HostToContainer for /var/lib/kubelet
+- machine-config-operator embedded-component 99fc14f323aa41a402f7bdbc37cec010fdc048e3 to 57cf623924677f8385cc2cb9ac2bc81a0d2a1359
+  - 31ed27f3 2024-11-07T09:55:54-06:00 backport 4.15- metrics gathering implementation (daemon.go and metrics.go)
+  - 4b2c7017 2024-11-05T18:30:13+00:00 Disable ESP offload for OVS attached interfaces
 
