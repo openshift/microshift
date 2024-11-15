@@ -129,11 +129,18 @@ if ${RHEL_SUBSCRIPTION}; then
             --enable "rhel-${OSVERSION}-for-$(uname -m)-baseos-rpms" \
             --enable "rhel-${OSVERSION}-for-$(uname -m)-appstream-rpms"
 
+        # Disable the AWS' Red Hat Update Infrastructure (RHUI) repositories.
+        # Having enabled both RHUI and repos from SubMgr might cause conflicts.
         if dnf repolist --enabled | grep -q "^rhel-${OSVERSION}-baseos-rhui-rpms"; then
             sudo dnf config-manager --set-disabled "rhel-${OSVERSION}-baseos-rhui-rpms"
         fi
         if dnf repolist --enabled | grep -q "^rhel-${OSVERSION}-appstream-rhui-rpms"; then
             sudo dnf config-manager --set-disabled "rhel-${OSVERSION}-appstream-rhui-rpms"
+        fi
+
+        # Remove the rh-amazon-rhui-client as its upgrade process re-enables the RHUI repos.
+        if sudo rpm -qa | grep -v rh-amazon-rhui-client; then
+            sudo dnf remove -y rh-amazon-rhui-client
         fi
     fi
 fi
