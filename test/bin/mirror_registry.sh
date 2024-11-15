@@ -81,7 +81,7 @@ mirror_images() {
     local -r ofile=$(mktemp /tmp/container-list.XXXXXXXX)
 
     sort -u "${ifile}" > "${ofile}"
-    "${ROOTDIR}/scripts/image-builder/mirror-images.sh" --mirror "${PULL_SECRET}" "${ofile}" "${REGISTRY_HOST}"
+    "${ROOTDIR}/scripts/mirror-images.sh" --mirror "${PULL_SECRET}" "${ofile}" "${REGISTRY_HOST}"
     rm -f "${ofile}"
 }
 

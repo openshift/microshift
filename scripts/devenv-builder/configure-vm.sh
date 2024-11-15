@@ -128,6 +128,13 @@ if ${RHEL_SUBSCRIPTION}; then
         sudo subscription-manager repos \
             --enable "rhel-${OSVERSION}-for-$(uname -m)-baseos-rpms" \
             --enable "rhel-${OSVERSION}-for-$(uname -m)-appstream-rpms"
+
+        if dnf repolist --enabled | grep -q "^rhel-${OSVERSION}-baseos-rhui-rpms"; then
+            sudo dnf config-manager --set-disabled "rhel-${OSVERSION}-baseos-rhui-rpms"
+        fi
+        if dnf repolist --enabled | grep -q "^rhel-${OSVERSION}-appstream-rhui-rpms"; then
+            sudo dnf config-manager --set-disabled "rhel-${OSVERSION}-appstream-rhui-rpms"
+        fi
     fi
 fi
 
@@ -229,7 +236,10 @@ fi
 
 if ${BUILD_AND_RUN}; then
     if ${OPTIONAL_RPMS}; then
-        "${DNF_RETRY}" "localinstall" "$(ls -1 ~/microshift/_output/rpmbuild/RPMS/*/*.rpm)"
+        # Skip gateway api rpms because:
+        # - Feature is still dev preview and no tests/docs are guaranteed.
+        # - There is one issue with conformance (see USHIFT-4757) that needs to be addressed in the operator.
+        "${DNF_RETRY}" "localinstall" "$(find ~/microshift/_output/rpmbuild/RPMS -type f -name "*.rpm" -not -name "*gateway-api*")"
     else
         createrepo "${HOME}/microshift/_output/rpmbuild"
         "${DNF_RETRY}" "install" \

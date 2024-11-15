@@ -1,7 +1,0 @@
-id = "custom-rpms"
-name = "MicroShift User-Specific RPM Repo"
-type = "yum-baseurl"
-url = "file://REPLACE_IMAGE_BUILDER_DIR/custom-rpms/"
-check_gpg = false
-check_ssl = false
-system = false

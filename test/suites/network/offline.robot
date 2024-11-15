@@ -9,7 +9,6 @@ Resource            ../../resources/libvirt.resource
 Resource            ../../resources/microshift-config.resource
 
 Suite Setup         Setup
-Suite Teardown      Teardown
 
 Test Tags           offline
 
@@ -42,25 +41,22 @@ Load Balancer Services Should Be Running Correctly When Host Is Offline
 
 
 *** Keywords ***
-# Suite Setup / Teardown
 Setup
     [Documentation]    Test suite setup.
     Should Not Be Equal As Strings    ${GUEST_NAME}    ''    The guest name must be set.
     Wait Until Keyword Succeeds    5m    10s
     ...    Guest Agent Is Ready    ${GUEST_NAME}
-    Wait Until Keyword Succeeds    5x    1s
-    ...    Wipe MicroShift
-    Update MicroShift Config
-    Update Guest Network Config
-    Systemctl    enable    microshift.service    --now
-    Systemctl    restart    greenboot-healthcheck.service
-    Wait For Greenboot Health Check To Exit
 
-Teardown
-    [Documentation]    Test suite teardown
-    Restore Default MicroShift Config
-    Restore Guest Network Config
-    Wipe MicroShift
+    # Verify that no active ethernet connections exist. The grep
+    # command returns 1 when no lines are selected.
+    ${result}    ${ignore}=    Run Guest Process    ${GUEST_NAME}
+    ...    bash
+    ...    -c
+    ...    nmcli connection show | grep -q ethernet
+    Should Be Equal As Integers    ${result["rc"]}    1
+
+    # Verify MicroShift successful start on first boot
+    Wait For Greenboot Health Check To Exit
 
 Setup Test
     [Documentation]    Deploy cluster resources to provide an endpoint for testing. Wait for greenboot
@@ -83,13 +79,6 @@ Teardown Test
     Run With Kubeconfig    oc    delete    -n\=${TEST_NS}    -f\=/tmp/hello-microshift.yaml
     Run With Kubeconfig    oc    delete    namespace    ${TEST_NS}
 
-Wipe MicroShift
-    [Documentation]    Execute microshift-cleanup-data on the guest.
-    ${result}    ${exited}=    Run Guest Process    ${GUEST_NAME}
-    ...    bash    -c    microshift-cleanup-data --all --keep-images <<<1
-    Log Many    ${result["stdout"]}    ${result["stderr"]}
-    Should Be Equal As Integers    ${result["rc"]}    0
-
 Pod Should Be Reachable Via Ingress
     [Documentation]    Checks if a load balancer service can be accessed. The curl command must be executed in a
     ...    subshell.
@@ -97,79 +86,7 @@ Pod Should Be Reachable Via Ingress
     ...    Run Guest Process    ${GUEST_NAME}
     ...        bash
     ...        -c
-    ...        curl --fail -I -H \"Host: hello-microshift.cluster.local\" ${NODE_IP}:80/principal
-    Log Many    ${result["stdout"]}    ${result["stderr"]}
-    Should Be Equal As Integers    ${result["rc"]}    0
-
-Update MicroShift Config
-    [Documentation]    Update the MicroShift config to use the offline-network endpoint
-    ${patch}=    Catenate    SEPARATOR=\n
-    ...    node:
-    ...    \ \ hostnameOverride: ${GUEST_NAME}
-    ...    \ \ nodeIP: ${NODE_IP}
-    Write To File    ${GUEST_NAME}    /etc/microshift/config.d/10-hostname.yaml    ${patch}
-
-Update Guest Network Config
-    [Documentation]    Setup the guest's loopback with IP address, hostname, and DNS
-    ${data}=    Read From File    ${GUEST_NAME}    /etc/hosts
-    Set Suite Variable    ${DEFAULT_HOSTS_FILE}    ${data}
-
-    ${data}=    Set Variable    ${EMPTY}
-    TRY
-        ${data}=    Read From File    ${GUEST_NAME}    /etc/resolv.conf
-    EXCEPT    *No such file or directory*    type=glob
-        Log    Default MicroShift config not found, ignoring
-    END
-    Set Suite Variable    ${DEFAULT_RESOLV_FILE}    ${data}
-
-    Write To File    ${GUEST_NAME}    /etc/hosts    \n${NODE_IP} ${GUEST_NAME}\n    append=${TRUE}
-    Write To File    ${GUEST_NAME}    /etc/resolv.conf    \nnameserver 10.44.1.1\n    append=${TRUE}
-    Configure Network Manager
-
-Configure Network Manager
-    [Documentation]    Configure Network Manager to use the loopback interface
-    ${result}    ${exited}=    Run Guest Process    ${GUEST_NAME}
-    ...    nmcli    connection    modify    lo    +ipv4.addresses    ${NODE_IP}/32
-    Should Be Equal As Integers    ${result["rc"]}    0
-    ${result}    ${exited}=    Run Guest Process    ${GUEST_NAME}
-    ...    nmcli    connection    modify    lo    autoconnect    yes
-    Should Be Equal As Integers    ${result["rc"]}    0
-    ${result}    ${exited}=    Run Guest Process    ${GUEST_NAME}    hostnamectl    set-hostname    ${GUEST_NAME}
-    Should Be Equal As Integers    ${result["rc"]}    0
-
-Restore Guest Network Config
-    [Documentation]    Restore the guest's configuration files
-    Write To File    ${GUEST_NAME}    /etc/hosts    ${DEFAULT_HOSTS_FILE}
-
-    ${len}=    Get Length    ${DEFAULT_RESOLV_FILE}
-    IF    ${len} > 0
-        Write To File    ${GUEST_NAME}    /etc/resolv.conf    ${DEFAULT_RESOLV_FILE}
-    ELSE
-        ${result}    ${exited}=    Run Guest Process    ${GUEST_NAME}    rm    /etc/resolv.conf
-        Should Be Equal As Integers    ${result["rc"]}    0
-    END
-
-    ${result}    ${exited}=    Run Guest Process    ${GUEST_NAME}
-    ...    nmcli    connection    modify    lo    -ipv4.addresses    ${NODE_IP}/32
-    Should Be Equal As Integers    ${result["rc"]}    0
-    ${result}    ${exited}=    Run Guest Process    ${GUEST_NAME}
-    ...    nmcli    connection    modify    lo    connection.autoconnect    no
-    Should Be Equal As Integers    ${result["rc"]}    0
-
-Restore Default MicroShift Config
-    [Documentation]    Restore the default MicroShift config for offline start.
-    ${result}    ${ignore}=    Run Guest Process
-    ...    ${GUEST_NAME}
-    ...    rm
-    ...    -f
-    ...    /etc/microshift/config.d/10-hostname.yaml
-    Log Many    ${result["stdout"]}    ${result["stderr"]}
-    Should Be Equal As Integers    ${result["rc"]}    0
-
-Start MicroShift
-    [Documentation]    Restart the MicroShift systemd service
-    ${result}    ${ignore}=    Wait Until Keyword Succeeds    5m    5s
-    ...    Systemctl    enable    microshift.service    --now
+    ...        curl --fail -I --max-time 15 -H \"Host: hello-microshift.cluster.local\" ${NODE_IP}:80/principal
     Log Many    ${result["stdout"]}    ${result["stderr"]}
     Should Be Equal As Integers    ${result["rc"]}    0
 

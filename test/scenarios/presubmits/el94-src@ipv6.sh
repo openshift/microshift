@@ -12,7 +12,7 @@ MIRROR_REGISTRY_URL="${VM_BRIDGE_IP}:${MIRROR_REGISTRY_PORT}"
 
 scenario_create_vms() {
     prepare_kickstart host1 kickstart.ks.template rhel-9.4-microshift-source
-    launch_vm  --network_name "${VM_IPV6_NETWORK}"
+    launch_vm  --network "${VM_IPV6_NETWORK}"
 }
 
 scenario_remove_vms() {

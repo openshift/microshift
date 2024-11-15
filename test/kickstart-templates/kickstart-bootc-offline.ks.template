@@ -1,0 +1,12 @@
+%include /main-prologue.cfg
+%include /main-no-network.cfg
+%include /main-ostreecontainer-local.cfg
+
+%post --log=/dev/console --erroronfail
+
+%include /post-system.cfg
+%include /post-offline.cfg
+
+%end
+
+%include /onerror-logs.cfg

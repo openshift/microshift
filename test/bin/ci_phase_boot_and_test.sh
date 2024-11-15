@@ -38,7 +38,7 @@ cd "${ROOTDIR}"
 bash -x ./scripts/devenv-builder/manage-vm.sh config
 
 # Clean up the image builder cache to free disk for virtual machines
-bash -x ./scripts/image-builder/cleanup.sh -full
+bash -x ./scripts/devenv-builder/cleanup-composer.sh -full
 
 cd "${ROOTDIR}/test"
 

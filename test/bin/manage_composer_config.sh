@@ -36,7 +36,7 @@ action_create() {
         exit 1
     fi
     
-    "${ROOTDIR}/scripts/image-builder/configure.sh"
+    "${ROOTDIR}/scripts/devenv-builder/configure-composer.sh"
     
     "${TESTDIR}/bin/manage_webserver.sh" "start"
 }
@@ -65,7 +65,7 @@ action_create-workers() {
 
 action_cleanup() {
     # Clean up the composer cache
-    "${ROOTDIR}/scripts/image-builder/cleanup.sh" -full
+    "${ROOTDIR}/scripts/devenv-builder/cleanup-composer.sh" -full
 
     "${TESTDIR}/bin/manage_webserver.sh" "stop"
 }

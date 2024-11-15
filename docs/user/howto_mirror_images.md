@@ -4,19 +4,6 @@ When deploying MicroShift in [air gapped networks](https://en.wikipedia.org/wiki
 it is often necessary to use a custom container registry server because the access
 to the Internet is not allowed.
 
-Note that it is possible to embed the container images in the MicroShift ISO and
-also in the subsequent `ostree` updates by using the `-embed_containers` option
-of the `scripts/image-builder/build.sh` script. Such ISO images and updates can
-be transferred to air gapped environments and installed on MicroShift instances.
-
-> The container embedding procedures are described in the
-> [Offline Containers](../contributor/rhel4edge_iso.md#offline-containers) and
-> [The `ostree` Update Server](../contributor/rhel4edge_iso.md#the-ostree-update-server)
-> sections.
-
-However, a custom air gapped container registry may still be necessary due to
-the user environment and workload requirements. 
-
 This document describes how to mirror MicroShift container images into an existing
 registry in an air gapped environment.
 
@@ -49,9 +36,6 @@ $ rpm2cpio microshift-release-info*.noarch.rpm | cpio -idmv
 ./usr/share/microshift/release/release-x86_64.json
 ```
 
-> Optionally use the `scripts/image-builder/download-rpms.sh` script for
-> downloading the released version of MicroShift RPM packages.
-
 The list of container images can be extracted into the `microshift-container-refs.txt`
 file using the following command.
 ```
@@ -83,7 +67,7 @@ and password.
 
 > Install the `skopeo` tool used for copying the container images.
  
-Run the `./scripts/image-builder/mirror-images.sh` script with `--reg-to-dir`
+Run the `./scripts/mirror-images.sh` script with `--reg-to-dir`
 option to initiate the image download procedure into a local directory on a
 host with the Internet connection.
 ```
@@ -92,7 +76,7 @@ IMAGE_LIST_FILE=~/microshift-container-images.txt
 IMAGE_LOCAL_DIR=~/microshift-containers
 
 mkdir -p "${IMAGE_LOCAL_DIR}"
-./scripts/image-builder/mirror-images.sh --reg-to-dir "${IMAGE_PULL_FILE}" "${IMAGE_LIST_FILE}" "${IMAGE_LOCAL_DIR}"
+./scripts/mirror-images.sh --reg-to-dir "${IMAGE_PULL_FILE}" "${IMAGE_LIST_FILE}" "${IMAGE_LOCAL_DIR}"
 ```
 
 The contents of the local directory can now be transferred to an air gapped site
@@ -102,7 +86,7 @@ and imported into the mirror registry.
 
 > Install the `skopeo` tool used for copying the container images.
 
-Run the `./scripts/image-builder/mirror-images.sh` script with `--dir-to-reg` option
+Run the `./scripts/mirror-images.sh` script with `--dir-to-reg` option
 in the air gapped environment to initiate the image upload procedure from a local
 directory to a mirror registry.
 ```
@@ -110,5 +94,5 @@ IMAGE_PULL_FILE=~/.pull-secret-mirror.json
 IMAGE_LOCAL_DIR=~/microshift-containers
 TARGET_REGISTRY=microshift-quay:8443
 
-./scripts/image-builder/mirror-images.sh --dir-to-reg "${IMAGE_PULL_FILE}" "${IMAGE_LOCAL_DIR}" "${TARGET_REGISTRY}"
+./scripts/mirror-images.sh --dir-to-reg "${IMAGE_PULL_FILE}" "${IMAGE_LOCAL_DIR}" "${TARGET_REGISTRY}"
 ```

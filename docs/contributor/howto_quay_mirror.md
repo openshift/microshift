@@ -144,25 +144,8 @@ images to the `microshift-quay` host.
 Follow the instructions in the [Build RHEL for Edge Installer ISO](./rhel4edge_iso.md#build-rhel-for-edge-installer-iso)
 document for creating the MicroShift installer ISO.
 
-Use the following command line arguments for the `scripts/image-builder/build.sh`
-script when building the installer ISO.
-* `-pull_secret_file` with a pull secret containing the mirror registry credentials
-* `-microshift_rpms` pointing to the version of RPMs with mirrored container images
-* `-mirror_registry_host` pointing to the mirror registry host
-* `-ca_trust_files` pointing to the `rootCA.pem` file from the mirror registry host
-
-```
-PULL_SECRET_FILE=~/.pull-secret-mirror.json
-MICROSHIFT_RPMS_DIR=~/microshift-rpms
-MIRROR_REGISTRY_HOST=microshift-quay:8443
-CA_TRUST_FILES=~/microshift-mirror-rootCA.pem
-
-./scripts/image-builder/build.sh \
-    -pull_secret_file     "${PULL_SECRET_FILE}"    \
-    -microshift_rpms      "${MICROSHIFT_RPMS_DIR}" \
-    -mirror_registry_host "${MIRROR_REGISTRY_HOST} \
-    -ca_trust_files       "${CA_CA_TRUST_FILES}"
-```
+> TODO: The `image-builder/build.sh` script has been deprecated.
+> This section will be rewritten in the context of [USHIFT-4289](https://issues.redhat.com/browse/USHIFT-4289).
 
 ## Install MicroShift on RHEL for Edge
 

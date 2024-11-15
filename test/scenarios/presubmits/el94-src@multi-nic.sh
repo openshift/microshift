@@ -4,8 +4,8 @@
 
 scenario_create_vms() {
     prepare_kickstart host1 kickstart.ks.template rhel-9.4-microshift-source
-    # Create a VM with 2 NICs
-    launch_vm  --vm_nics 2
+    # Using multus as secondary network to have 2 nics in different networks.
+    launch_vm --network default,"${VM_MULTUS_NETWORK}"
 }
 
 scenario_remove_vms() {

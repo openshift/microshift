@@ -1,0 +1,56 @@
+lang en_US.UTF-8
+keyboard us
+timezone UTC
+text
+reboot
+
+# Partition the disk with hardware-specific boot and swap partitions, adding an
+# LVM volume that contains a 10GB+ system root. The remainder of the volume will
+# be used by the CSI driver for storing data.
+zerombr
+clearpart --all --initlabel
+
+# Create boot and swap partitions as required by the current hardware platform
+reqpart --add-boot
+
+# Add an LVM volume group and allocate a system root logical volume
+part pv.01 --grow
+volgroup rhel pv.01
+logvol / --vgname=rhel --fstype=xfs --size=10240 --name=root
+
+# Lock root user account
+rootpw --lock
+
+# Configure network to use DHCP and activate on boot
+network --bootproto=dhcp --device=link --activate --onboot=on
+
+# Register the host with RHSM
+rhsm --organization "${RHSM_ORG}" --activation-key "${RHSM_KEY}"
+
+# Minimal package setup
+%packages
+@^minimal-environment
+%end
+
+%post --log=/dev/console --erroronfail
+
+# Create 'redhat' user account
+useradd --password '${USER_PASSWD}' --groups wheel redhat
+
+# Install and configure MicroShift
+dnf install -y \
+    --enablerepo rhocp-${MICROSHIFT_VER}-for-rhel-9-$(uname -m)-rpms \
+    --enablerepo fast-datapath-for-rhel-9-$(uname -m)-rpms \
+    microshift-${MICROSHIFT_VER}\*
+
+systemctl enable microshift
+firewall-offline-cmd --zone=trusted --add-source=10.42.0.0/16
+firewall-offline-cmd --zone=trusted --add-source=169.254.169.1
+
+# Create an OpenShift pull secret file
+cat > /etc/crio/openshift-pull-secret <<'EOF'
+${PULL_SECRET}
+EOF
+chmod 600 /etc/crio/openshift-pull-secret
+
+%end
