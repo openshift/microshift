@@ -4,3 +4,5 @@
 exclude:
   global:
     - origin/**
+    - vendor/**
+    - etcd/vendor/**
