@@ -168,7 +168,9 @@ Deploy Storage Config
 LVMS Is Deployed
     [Documentation]    Wait for LVMS components to deploy
     Named Deployment Should Be Available    lvms-operator    openshift-storage    120s
-    # the daemonset trails the lvms-operator by roughly 1min, so give it extra time to spin up
+    # Wait for vg-manager daemonset to exist before trying to "wait".
+    # `oc wait` fails if the object doesn't exist.
+    Wait Until Resource Exists    daemonset    vg-manager    openshift-storage    120s
     Named Daemonset Should Be Available    vg-manager    openshift-storage    120s
 
 CSI Snapshot Controller And Webhook Are Deployed
