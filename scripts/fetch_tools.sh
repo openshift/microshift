@@ -181,7 +181,6 @@ gettool_robotframework() {
         python3 -m venv "${venv}"
         "${venv}/bin/python3" -m pip install --upgrade pip
         "${venv}/bin/python3" -m pip install -r "${ROOT_DIR}/test/requirements.txt"
-        "${venv}/bin/python3" -m pip install git+https://github.com/MarketSquare/SSHLibrary.git
     fi
 }
 
