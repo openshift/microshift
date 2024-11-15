@@ -49,7 +49,7 @@ Verify MicroShift Runs Only On Primary NIC
     ...    configuration (without the secondary IP) and regenerates the
     ...    certificates, which will be lacking the IP from secondary NIC.
 
-    Configure Subject Alternative Name    ${USHIFT_HOST_IP1}    ${EMPTY}
+    Configure Subject Alternative Name    ${USHIFT_HOST_IP1}
 
     Login Switch To IP    ${USHIFT_HOST_IP1}
     Disable Interface    ${NIC2_NAME}
@@ -68,7 +68,7 @@ Verify MicroShift Runs Only On Secondary NIC
     ...    be that of the secondary NIC, and certificates will be updated according
     ...    to the new configuration (which includes only the secondary IP).
 
-    Configure Subject Alternative Name    ${USHIFT_HOST_IP2}    ${EMPTY}
+    Configure Subject Alternative Name    ${USHIFT_HOST_IP2}
 
     ${cur_pid}=    MicroShift Process ID
 
@@ -174,21 +174,20 @@ Verify MicroShift On Single NIC
 Configure Subject Alternative Name
     [Documentation]    Replace subjectAltNames entries in the configuration
     ...    to include the IPs provided
-    [Arguments]    ${ip_1}    ${ip_2}
+    [Arguments]    @{ips}
 
-    IF    '${ip_2}' == 'False'
+    ${ips_len}=    Get Length    ${ips}
+    Should Be True    '${ips_len}'>'0'
+
+    ${subject_alt_names}=    CATENATE    SEPARATOR=\n
+    ...    ---
+    ...    apiServer:
+    ...    \ \ subjectAltNames:
+
+    FOR    ${ip}    IN    @{ips}
         ${subject_alt_names}=    CATENATE    SEPARATOR=\n
-        ...    ---
-        ...    apiServer:
-        ...    \ \ subjectAltNames:
-        ...    \ \ - ${ip_1}
-    ELSE
-        ${subject_alt_names}=    CATENATE    SEPARATOR=\n
-        ...    ---
-        ...    apiServer:
-        ...    \ \ subjectAltNames:
-        ...    \ \ - ${ip_1}
-        ...    \ \ - ${ip_2}
+        ...    ${subject_alt_names}
+        ...    \ \ - ${ip}
     END
 
     Drop In MicroShift Config    ${subject_alt_names}    10-subjectAltNames
