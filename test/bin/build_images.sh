@@ -314,6 +314,11 @@ do_group() {
             fi
         fi
 
+        if [[ -n "${CACHE_BUILD+x}" ]] && "${CACHE_BUILD}" && [[ "${blueprint}" == "rhel-9.4-microshift-crel" ]]; then
+            # Reconfigure sources before rhel-9.4-microshift-crel, to add rhocp-y repo
+            CACHE_BUILD=false configure_package_sources
+        fi
+
         if sudo composer-cli blueprints list | grep -q "^${blueprint}$"; then
             echo "Removing existing definition of ${blueprint}"
             sudo composer-cli blueprints delete "${blueprint}"
