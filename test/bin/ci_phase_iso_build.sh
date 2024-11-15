@@ -64,7 +64,7 @@ update_build_cache() {
     fi
 
     # Build the composer-cli base layer to be cached
-    $(dry_run) bash -x ./bin/build_images.sh -l ./image-blueprints/layer1-base
+    $(dry_run) env CACHE_BUILD=true bash -x ./bin/build_images.sh -l ./image-blueprints/layer1-base
     # Build the bootc base groups to be cached
     $(dry_run) bash -x ./bin/build_bootc_images.sh -g ./image-blueprints/layer5-bootc/group0
     $(dry_run) bash -x ./bin/build_bootc_images.sh -g ./image-blueprints/layer5-bootc/group1

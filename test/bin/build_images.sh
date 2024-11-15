@@ -80,6 +80,12 @@ configure_package_sources() {
         if sudo composer-cli sources list | grep "^${name}\$"; then
             sudo composer-cli sources delete "${name}"
         fi
+        if [[ -n "${CACHE_BUILD+x}" ]] && "${CACHE_BUILD}" && [[ "${name}" == "rhocp-y" ]]; then
+            # Don't add rhocp-y for cache builds.
+            # rhocp-4.18 contains system packages that are bleeding edge compared to RHSM repos
+            # and they lack dependencies breaking the builds.
+            continue
+        fi
         sudo composer-cli sources add "${outfile}"
     done
 
