@@ -8,3 +8,10 @@ exclude:
     - etcd/vendor/**
     - test/**
     - scripts/**
+ignore:
+  b415eafd-cccd-4f9c-a84a-bcdf06afd5b6:
+    - file: pkg/cmd/init.go
+        reason: "The path is sanitized and does not pose a risk."
+  15421744-3615-455c-821e-de356d755319:
+    - file: pkg/util/net.go
+        reason: "The certificate is permissive on purpose."
