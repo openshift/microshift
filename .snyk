@@ -6,3 +6,5 @@ exclude:
     - origin/**
     - vendor/**
     - etcd/vendor/**
+    - test/**
+    - scripts/**
