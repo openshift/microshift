@@ -105,7 +105,7 @@ Verify Multiple NICs
     ...    ${NMCLI_CMD} | wc -l
     ...    return_stdout=True    return_stderr=True    return_rc=True
     Should Be Equal As Integers    ${rc}    0
-    Should Be True   '${stdout}'>='${NICS_COUNT}'
+    Should Be True    '${stdout}'>='${NICS_COUNT}'
 
 Initialize Global Variables
     [Documentation]    Initializes global variables.
@@ -176,7 +176,7 @@ Configure Subject Alternative Name
     ...    to include the IPs provided
     [Arguments]    ${ip_1}    ${ip_2}
 
-    IF  '${ip_2}' == 'False'
+    IF    '${ip_2}' == 'False'
         ${subject_alt_names}=    CATENATE    SEPARATOR=\n
         ...    ---
         ...    apiServer:
