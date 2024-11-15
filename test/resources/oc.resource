@@ -108,7 +108,7 @@ Named Deployment Should Be Available
     ...    ${ns}    Namespace of named deployment. Defaults to NAMESPACE suite variable
     ...    ${timeout}    Period of time to wait for deployment to reach ready status. Default 60s.
     [Arguments]    ${name}    ${ns}=${NAMESPACE}    ${timeout}=${DEFAULT_WAIT_TIMEOUT}
-    Run With Kubeconfig    oc wait -n ${ns} deploy ${name} --for=condition=Available --timeout=${timeout}
+    Oc Wait    -n ${ns} deploy ${name}    --for=condition=Available --timeout=${timeout}
 
 Named Daemonset Should Be Available
     [Documentation]    Wait for a given daemonset's Available condition to be true
