@@ -1,5 +1,17 @@
 {
     "board_id": 14885,
+    "chart_metrics": [
+        "Velocity",
+        "Velocity per working day",
+        "Goal completion percentage",
+        "Flow efficiency",
+        "WIP ratio",
+        "Defect density ratio",
+        "Defect removal efficiency",
+        "Scope change percentage",
+        "Scope volatility",
+        "Predictability ratio"
+    ],
     "jira_query": "filter=\"MicroShift - Scrum Board\" AND type NOT IN (Sub-task) AND (createdDate >= \"2024/01/01\" or updatedDate >= \"2024/01/01\")",
     "jira_token": "REPLACE ME",
     "results_path": "results.csv",

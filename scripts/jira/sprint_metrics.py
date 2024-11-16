@@ -5,7 +5,8 @@
 
 It is mandatory to provide a configuration file in JSON format. The file needs to have this format:
 {
-    "board_id": board id from JIRA. This varies between projects,
+    "board_id": Board id from JIRA. This varies between projects,
+    "chart_metrics": A list of metrics from the CSV to produce charts,
     "jira_query": JQL to use for searching issues,
     "jira_token": Auth token from JIRA,
     "results_path": Path for the CSV results file,
@@ -29,6 +30,9 @@ import csv
 from jira import JIRA
 import json
 import logging
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 # TODO investigate whats wrong with maxResults from sprints in the api.
 SKIP_FIRST_N_SPRINTS = 50
@@ -117,7 +121,6 @@ AI_PROMPTS = [
     '''Analyze this data file, corresponding to a development team following scrum practices.
     Summarize these metrics and their values: velocity, velocity per working day, goal completion,
     flow efficiency, wip ratios, defect density ratio and removal efficiency, scope change, scope volatility and predictability.''',
-    'Provide charts, including average and trend, for each of the metrics above. Do them separately.',
     'What changes should the team adopt that would have the highest impact? Explain them in start/stop/continue doing.',
 ]
 
@@ -369,7 +372,7 @@ class Sprint(object):
 
 class Config(object):
     def __init__(self, json_dict) -> None:
-        mandatory_fields = ['board_id', 'jira_query', 'jira_token', 'results_path', 'raw_issues_path']
+        mandatory_fields = ['board_id', 'jira_query', 'jira_token', 'results_path', 'raw_issues_path', 'chart_metrics']
         for field in mandatory_fields:
             if field not in json_dict:
                 raise ValueError(f'{field} missing from configuration')
@@ -395,6 +398,28 @@ def write_raw(path, sprints, issues):
             fd.write('\n')
 
 
+def charts(config):
+    data = pd.read_csv(config.results_path)
+    metrics_columns = list(filter(lambda field: field in data, config.chart_metrics))
+    logging.info(f'Charting metrics: {metrics_columns}')
+    sns.set_theme(style="whitegrid")
+    plt.rcParams["figure.figsize"] = (10, 6)
+    for column in metrics_columns:
+        plt.figure()
+        metric_data = data[column]
+        plt.plot(data['Sprint'], metric_data, marker='o', label="Sprint Values")
+        average = metric_data.mean()
+        plt.axhline(y=average, color='r', linestyle='--', label=f"Average ({average: .2f})")
+        sns.regplot(x=data['Sprint'], y=metric_data, scatter=False, color='b', label="Trend Line")
+
+        plt.title(f"{column} over Sprints")
+        plt.xlabel("Sprint")
+        plt.ylabel(column)
+        plt.legend()
+
+    plt.show()
+
+
 def main(args):
     logging.basicConfig(level=logging.INFO, format="{asctime} - {levelname} - {message}", style="{", datefmt="%Y-%m-%d %H:%M:%S")
 
@@ -416,23 +441,25 @@ def main(args):
             logging.info("Sprint has not finished yet")
             continue
 
-        planned_issues = list(filter(issue_planned_in_sprint(sprint.id, sprint.name, sprint.activatedDate), all_issues))
-        removed_issues = list(filter(issue_removed_from_sprint(sprint.name, sprint.activatedDate, sprint.endDate), all_issues))
-        total_sprint_issues = list(filter(issue_in_sprint(sprint.name, sprint.endDate), all_issues))
-        resolved_issues = list(filter(issue_resolved(sprint.endDate), total_sprint_issues))
-        not_started_issues = list(filter(issue_not_started(sprint.endDate), total_sprint_issues))
-        in_progress_issues = list(filter(issue_in_progress(sprint.endDate), total_sprint_issues))
-        in_code_review_issues = list(filter(issue_in_code_review(sprint.endDate), total_sprint_issues))
+        start_date, end_date = sprint.activatedDate, sprint.completeDate
+
+        planned_issues = list(filter(issue_planned_in_sprint(sprint.id, sprint.name, start_date), all_issues))
+        removed_issues = list(filter(issue_removed_from_sprint(sprint.name, start_date, end_date), all_issues))
+        total_sprint_issues = list(filter(issue_in_sprint(sprint.name, end_date), all_issues))
+        resolved_issues = list(filter(issue_resolved(end_date), total_sprint_issues))
+        not_started_issues = list(filter(issue_not_started(end_date), total_sprint_issues))
+        in_progress_issues = list(filter(issue_in_progress(end_date), total_sprint_issues))
+        in_code_review_issues = list(filter(issue_in_code_review(end_date), total_sprint_issues))
         all_bug_issues = list(filter(issue_is_bug, total_sprint_issues))
-        resolved_bug_issues = list(filter(issue_resolved(sprint.endDate), all_bug_issues))
-        in_qa_bug_issues = list(filter(issue_in_review(sprint.endDate), all_bug_issues))
-        in_code_review_bug_issues = list(filter(issue_in_code_review(sprint.endDate), all_bug_issues))
-        in_progress_bug_issues = list(filter(issue_in_progress(sprint.endDate), all_bug_issues))
-        not_started_bug_issues = list(filter(issue_not_started(sprint.endDate), all_bug_issues))
+        resolved_bug_issues = list(filter(issue_resolved(end_date), all_bug_issues))
+        in_qa_bug_issues = list(filter(issue_in_review(end_date), all_bug_issues))
+        in_code_review_bug_issues = list(filter(issue_in_code_review(end_date), all_bug_issues))
+        in_progress_bug_issues = list(filter(issue_in_progress(end_date), all_bug_issues))
+        not_started_bug_issues = list(filter(issue_not_started(end_date), all_bug_issues))
 
         csv_row = prepare_csv_row(
             sprint.name,
-            sprint.endDate,
+            end_date,
             planned_issues,
             removed_issues,
             total_sprint_issues,
@@ -455,6 +482,8 @@ def main(args):
     write_results_csv(config.results_path, csv_rows)
 
     write_raw(config.raw_issues_path, sprints, all_issues)
+
+    charts(config)
 
 
 if __name__ == '__main__':
