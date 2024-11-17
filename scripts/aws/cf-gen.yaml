@@ -7,7 +7,7 @@ Mappings:
    MetalMachine:
      PrimaryVolumeSize: "300"
      SecondaryVolumeSize: "0"
-     Throughput: 500
+     Throughput: 750
      Iops: 6000
    VirtualMachine:
      PrimaryVolumeSize: "200"
@@ -79,6 +79,11 @@ Resources:
         - Key: Name
           Value: RHELVPC
 
+  RHELVPCIPv6Cidr:
+    Type: AWS::EC2::VPCCidrBlock
+    Properties:
+      AmazonProvidedIpv6CidrBlock: true
+      VpcId: !Ref RHELVPC
 ## Setup internet access
 
   RHELInternetGateway:
@@ -96,24 +101,16 @@ Resources:
 
   RHELPublicSubnet:
     Type: AWS::EC2::Subnet
+    DependsOn: RHELVPCIPv6Cidr
     Properties:
       VpcId: !Ref RHELVPC
       CidrBlock: !Ref PublicSubnetCidr
       MapPublicIpOnLaunch: true
+      Ipv6CidrBlock: !Select [ 0, !Cidr [ !Select [ 0, !GetAtt RHELVPC.Ipv6CidrBlocks], 256, 64 ]]
+      AssignIpv6AddressOnCreation: true
       Tags:
         - Key: Name
           Value: RHELPublicSubnet
-
-  RHELNatGatewayEIP:
-    Type: AWS::EC2::EIP
-    DependsOn: RHELGatewayAttachment
-    Properties:
-      Domain: vpc
-  RHELNatGateway:
-    Type: AWS::EC2::NatGateway
-    Properties:
-      AllocationId: !GetAtt RHELNatGatewayEIP.AllocationId
-      SubnetId: !Ref RHELPublicSubnet
 
   RHELRouteTable:
     Type: AWS::EC2::RouteTable
@@ -129,6 +126,14 @@ Resources:
     Properties:
       RouteTableId: !Ref RHELRouteTable
       DestinationCidrBlock: "0.0.0.0/0"
+      GatewayId: !Ref RHELInternetGateway
+
+  RHELPublicRouteIpv6:
+    Type: AWS::EC2::Route
+    DependsOn: RHELGatewayAttachment
+    Properties:
+      RouteTableId: !Ref RHELRouteTable
+      DestinationIpv6CidrBlock: "::/0"
       GatewayId: !Ref RHELInternetGateway
 
   RHELPublicSubnetRouteTableAssociation:
@@ -169,38 +174,74 @@ Resources:
         FromPort: -1
         ToPort: -1
         CidrIp: 0.0.0.0/0
+      - IpProtocol: icmpv6
+        FromPort: -1
+        ToPort: -1
+        CidrIpv6: ::/0
       - IpProtocol: tcp
         FromPort: 22
         ToPort: 22
         CidrIp: 0.0.0.0/0
       - IpProtocol: tcp
+        FromPort: 22
+        ToPort: 22
+        CidrIpv6: ::/0
+      - IpProtocol: tcp
         FromPort: 80
         ToPort: 80
         CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp
+        FromPort: 80
+        ToPort: 80
+        CidrIpv6: ::/0
       - IpProtocol: tcp
         FromPort: 443
         ToPort: 443
         CidrIp: 0.0.0.0/0
       - IpProtocol: tcp
+        FromPort: 443
+        ToPort: 443
+        CidrIpv6: ::/0
+      - IpProtocol: tcp
         FromPort: 5353
         ToPort: 5353
         CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp
+        FromPort: 5353
+        ToPort: 5353
+        CidrIpv6: ::/0
       - IpProtocol: tcp
         FromPort: 5678
         ToPort: 5678
         CidrIp: 0.0.0.0/0
       - IpProtocol: tcp
+        FromPort: 5678
+        ToPort: 5678
+        CidrIpv6: ::/0
+      - IpProtocol: tcp
         FromPort: 6443
         ToPort: 6443
         CidrIp: 0.0.0.0/0
       - IpProtocol: tcp
+        FromPort: 6443
+        ToPort: 6443
+        CidrIpv6: ::/0
+      - IpProtocol: tcp
+        FromPort: 30000
+        ToPort: 32767
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp
+        FromPort: 30000
+        ToPort: 32767
+        CidrIpv6: ::/0
+      - IpProtocol: udp
         FromPort: 30000
         ToPort: 32767
         CidrIp: 0.0.0.0/0
       - IpProtocol: udp
         FromPort: 30000
         ToPort: 32767
-        CidrIp: 0.0.0.0/0
+        CidrIpv6: ::/0
       VpcId: !Ref RHELVPC
 
   rhelLaunchTemplate:
