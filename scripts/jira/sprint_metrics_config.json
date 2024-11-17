@@ -1,0 +1,126 @@
+{
+    "board_id": 14885,
+    "chart_metrics": [
+        "Velocity",
+        "Velocity per working day",
+        "Goal completion percentage",
+        "Flow efficiency",
+        "WIP ratio",
+        "Defect density ratio",
+        "Defect removal efficiency",
+        "Scope change percentage",
+        "Scope volatility",
+        "Predictability ratio"
+    ],
+    "jira_query": "filter=\"MicroShift - Scrum Board\" AND type NOT IN (Sub-task) AND (createdDate >= \"2024/01/01\" or updatedDate >= \"2024/01/01\")",
+    "jira_token": "REPLACE ME",
+    "results_path": "results.csv",
+    "raw_issues_path": "raw.txt",
+    "sprints": [
+        {
+            "name": "uShift Sprint 262",
+            "goals_achieved": 0,
+            "goals_total": 5,
+            "team_members": 8,
+            "working_days": 107
+        },
+        {
+            "name": "uShift Sprint 261",
+            "goals_achieved": 2,
+            "goals_total": 3,
+            "team_members": 8,
+            "working_days": 66
+        },
+        {
+            "name": "uShift Sprint 260",
+            "goals_achieved": 5,
+            "goals_total": 5,
+            "team_members": 8,
+            "working_days": 113
+        },
+        {
+            "name": "uShift Sprint 259",
+            "goals_achieved": 3,
+            "goals_total": 4,
+            "team_members": 8,
+            "working_days": 110
+        },
+        {
+            "name": "uShift Sprint 258",
+            "goals_achieved": 3,
+            "goals_total": 4,
+            "team_members": 8,
+            "working_days": 94
+        },
+        {
+            "name": "uShift Sprint 257",
+            "goals_achieved": 5,
+            "goals_total": 6,
+            "team_members": 8,
+            "working_days": 99
+        },
+        {
+            "name": "uShift Sprint 256",
+            "goals_achieved": 4,
+            "goals_total": 8,
+            "team_members": 8,
+            "working_days": 113
+        },
+        {
+            "name": "uShift Sprint 255",
+            "goals_achieved": 4,
+            "goals_total": 6,
+            "team_members": 8,
+            "working_days": 104
+        },
+        {
+            "name": "uShift Sprint 254",
+            "goals_achieved": 3,
+            "goals_total": 3,
+            "team_members": 8,
+            "working_days": 51
+        },
+        {
+            "name": "uShift Sprint 253",
+            "goals_achieved": 1,
+            "goals_total": 5,
+            "team_members": 8,
+            "working_days": 104
+        },
+        {
+            "name": "uShift Sprint 252",
+            "goals_achieved": 12,
+            "goals_total": 13,
+            "team_members": 8,
+            "working_days": 118
+        },
+        {
+            "name": "uShift Sprint 251",
+            "goals_achieved": 6,
+            "goals_total": 6,
+            "team_members": 8,
+            "working_days": 65
+        },
+        {
+            "name": "uShift Sprint 250",
+            "goals_achieved": 2,
+            "goals_total": 3,
+            "team_members": 8,
+            "working_days": 112
+        },
+        {
+            "name": "uShift Sprint 249",
+            "goals_achieved": 3,
+            "goals_total": 4,
+            "team_members": 8,
+            "working_days": 118
+        },
+        {
+            "name": "uShift Sprint 248",
+            "goals_achieved": 3,
+            "goals_total": 3,
+            "team_members": 8,
+            "working_days": 116
+        }
+    ]
+}
