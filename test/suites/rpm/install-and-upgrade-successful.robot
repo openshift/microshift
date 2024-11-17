@@ -46,7 +46,8 @@ Install Source Version
     [Teardown]    Clean Up Test
 
 Upgrade From Previous Version
-    [Documentation]    Install the previous version, then upgrade
+    [Documentation]    Install the previous version, then upgrade the package
+    ...    also verifying that crio and microshift services were restarted
     # Always install from system repo, because the scenario script
     # is enabling all the repositories needed.
     #
@@ -56,25 +57,10 @@ Upgrade From Previous Version
     Install MicroShift RPM Packages From System Repo
     ...    4.${PREVIOUS_MINOR_VERSION}.*
     ...    check_warnings=False
-
+    # Verify the package version is as expected
     ${version}=    MicroShift Version
     Should Be Equal As Integers    ${version.minor}    ${PREVIOUS_MINOR_VERSION}
-    Start MicroShift
-    Wait For MicroShift
-    Install MicroShift RPM Packages From Repo    ${SOURCE_REPO_URL}    ${TARGET_VERSION}
-    # Restart MicroShift
-    Reboot MicroShift Host
-    # Health of the system is implicitly checked by greenboot successful exit
-    Wait Until Greenboot Health Check Exited
-    [Teardown]    Clean Up Test
-
-Verify Service Restart On Upgrade
-    [Documentation]    Upgrade the package verifying that crio and microshift
-    ...    services were restarted
-    # Install a package and start services
-    Install MicroShift RPM Packages From System Repo
-    ...    4.${PREVIOUS_MINOR_VERSION}.*
-    ...    check_warnings=False
+    # Start the service and wait until initialized
     Start MicroShift
     Wait For MicroShift
     # Take active timestamps for services
@@ -86,11 +72,14 @@ Verify Service Restart On Upgrade
     # Take active timestamps for services
     ${cts2}=    Command Should Work    systemctl show -p ActiveEnterTimestamp crio
     ${mts2}=    Command Should Work    systemctl show -p ActiveEnterTimestamp microshift
-    # Run the verification
+    # Run the timestamp verification
     Verify Service Active Timestamps
     ...    ${cts1}    ${mts1}
     ...    ${cts2}    ${mts2}
-
+    # Restart the host to verify a clean start
+    Reboot MicroShift Host
+    # Health of the system is implicitly checked by greenboot successful exit
+    Wait Until Greenboot Health Check Exited
     [Teardown]    Clean Up Test
 
 
