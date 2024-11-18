@@ -138,14 +138,27 @@ func (s *KubeControllerManager) Run(ctx context.Context, ready chan<- struct{}, 
 	// which expects to be called at most once in a process.
 	cmd := kubecm.NewControllerManagerCommand()
 	cmd.SetArgs(s.args)
+
+	panicChannel := make(chan any, 1)
 	go func() {
+		defer func() {
+			if r := recover(); r != nil {
+				panicChannel <- r
+			}
+		}()
 		errorChannel <- cmd.ExecuteContext(ctx)
 	}()
 
 	if err := s.applyFn(); err != nil {
 		return fmt.Errorf("failed to apply openshift namespaces: %w", err)
 	}
-	return <-errorChannel
+
+	select {
+	case err := <-errorChannel:
+		return err
+	case perr := <-panicChannel:
+		panic(perr)
+	}
 }
 
 func mergeAndConvertToArgs(overrides *kubecontrolplanev1.KubeControllerManagerConfig) ([]string, error) {
