@@ -185,7 +185,8 @@ Configure Named Certificates
         ...    \ \ \ \ names:
         ...    \ \ \ \ - ${sni}
     END
-    Upload MicroShift Config    ${subject_alt_names}
+    ${replaced}=    Replace MicroShift Config    ${subject_alt_names}
+    Upload MicroShift Config    ${replaced}
 
 Generate Random HostName
     [Documentation]    Generate Random Hostname
