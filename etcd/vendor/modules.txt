@@ -192,6 +192,7 @@ github.com/mxk/go-flowrate/flowrate
 # github.com/openshift/api v0.0.0-20241004095111-b1f700bdd8d2
 ## explicit; go 1.22.0
 github.com/openshift/api/config/v1
+github.com/openshift/api/operator/v1
 # github.com/openshift/build-machinery-go v0.0.0-20240910153727-5725581bdf8f
 ## explicit; go 1.22.0
 github.com/openshift/build-machinery-go

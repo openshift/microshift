@@ -45,6 +45,29 @@ ${ROUTER_EXPOSE_FULL}           SEPARATOR=\n
 ...                             \ \ \ \ https: ${ALTERNATIVE_HTTPS_PORT}
 ...                             \ \ listenAddress:
 ...                             \ \ - br-ex
+${ROUTER_TUNING_CONFIG}         SEPARATOR=\n
+...                             ---
+...                             ingress:
+...                             \ \ defaultHTTPVersion: 2
+...                             \ \ forwardedHeaderPolicy: Never
+...                             \ \ httpEmptyRequestsPolicy: Ignore
+...                             \ \ logEmptyRequests: Ignore
+...                             \ \ httpCompression:
+...                             \ \ \ \ mimeTypes:
+...                             \ \ \ \ - "text/html"
+...                             \ \ \ \ - "application/*"
+...                             \ \ tuningOptions:
+...                             \ \ \ \ headerBufferBytes: 5556
+...                             \ \ \ \ headerBufferMaxRewriteBytes: 8000
+...                             \ \ \ \ healthCheckInterval: 4s
+...                             \ \ \ \ clientTimeout: 20s
+...                             \ \ \ \ clientFinTimeout: 1.5s
+...                             \ \ \ \ serverTimeout: 40s
+...                             \ \ \ \ serverFinTimeout: 2s
+...                             \ \ \ \ tunnelTimeout: 1h30m0s
+...                             \ \ \ \ tlsInspectDelay: 6s
+...                             \ \ \ \ threadCount: 3
+...                             \ \ \ \ maxConnections: 60000
 
 
 *** Test Cases ***
@@ -103,6 +126,28 @@ Router Exposure Configuration
 
     [Teardown]    Run Keywords
     ...    Remove Fake IP From NIC
+
+Router Verify Tuning Configuration
+    [Documentation]    Test ingress tuning configuration.
+    [Setup]    Setup With Custom Config    ${ROUTER_TUNING_CONFIG}
+    Wait For Router Ready
+    Pod Environment Should Match Value    openshift-ingress    ROUTER_BUF_SIZE    5556
+    Pod Environment Should Match Value    openshift-ingress    ROUTER_MAX_REWRITE_SIZE    8000
+    Pod Environment Should Match Value    openshift-ingress    ROUTER_BACKEND_CHECK_INTERVAL    4s
+    Pod Environment Should Match Value    openshift-ingress    ROUTER_DEFAULT_CLIENT_TIMEOUT    20s
+    Pod Environment Should Match Value    openshift-ingress    ROUTER_CLIENT_FIN_TIMEOUT    1500ms
+    Pod Environment Should Match Value    openshift-ingress    ROUTER_DEFAULT_SERVER_TIMEOUT    40s
+    Pod Environment Should Match Value    openshift-ingress    ROUTER_DEFAULT_SERVER_FIN_TIMEOUT    2s
+    Pod Environment Should Match Value    openshift-ingress    ROUTER_DEFAULT_TUNNEL_TIMEOUT    90m
+    Pod Environment Should Match Value    openshift-ingress    ROUTER_INSPECT_DELAY    6s
+    Pod Environment Should Match Value    openshift-ingress    ROUTER_THREADS    3
+    Pod Environment Should Match Value    openshift-ingress    ROUTER_MAX_CONNECTIONS    60000
+    Pod Environment Should Match Value    openshift-ingress    ROUTER_SET_FORWARDED_HEADERS    Never
+    Pod Environment Should Match Value    openshift-ingress    ROUTER_HTTP_IGNORE_PROBES    true
+    Pod Environment Should Match Value    openshift-ingress    ROUTER_DONT_LOG_NULL    true
+    Pod Environment Should Match Value    openshift-ingress    ROUTER_ENABLE_COMPRESSION    true
+    Pod Environment Should Match Value    openshift-ingress    ROUTER_COMPRESSION_MIME    text/html application/*
+    Pod Environment Should Match Value    openshift-ingress    ROUTER_DISABLE_HTTP2    false
 
 
 *** Keywords ***
@@ -210,3 +255,13 @@ Remove Fake IP From NIC
     ...    sudo=True    return_rc=True    return_stderr=True    return_stdout=True
     Log Many    ${stdout}    ${stderr}
     Should Be Equal As Integers    0    ${rc}
+
+Pod Environment Should Match Value
+    [Documentation]    Check if config is Matching
+    [Arguments]    ${name_space}    ${env_name}    ${expected_value}
+    ${is}=    Oc Get JsonPath
+    ...    pod
+    ...    ${name_space}
+    ...    ${EMPTY}
+    ...    .items[*].spec.containers[*].env[?(@.name=="${env_name}")].value
+    Should Be Equal As Strings    ${is}    ${expected_value}
