@@ -117,6 +117,6 @@ def lvmd_merge(base, patch):
     for i, p_dc in enumerate(patch_cfg['device-classes']):
         if any(dc['name'] == p_dc['name'] for dc in base_cfg['device-classes']):
             del patch_cfg['device-classes'][i]
-    base_cfg['device-classes'].append(patch_cfg['device-classes'])
+    base_cfg['device-classes'] = base_cfg['device-classes'] + patch_cfg['device-classes']
 
     return yaml.safe_dump(base_cfg)

@@ -1,0 +1,5 @@
+%include /post-microshift.cfg
+%include /post-containers.cfg
+%include /post-system.cfg
+%include /post-network.cfg
+%include /post-bootc-container-tweaks.cfg

@@ -9,6 +9,10 @@ Library             DataFormats.py
 Resource            common.resource
 
 
+*** Variables ***
+${LVMD_VG_OVERRIDE}=    ${EMPTY}
+
+
 *** Keywords ***
 Save Default MicroShift Config
     [Documentation]    Fetch the current config settings and preserve them as the default
@@ -92,8 +96,10 @@ Save Lvmd Config
 
 Extend Lvmd Config
     [Documentation]    Combines the test's device-classes with the remote's lvmd.yaml.
-    ${patch_cfg}=    OperatingSystem.Get File    ./assets/lvmd.yaml
-    ${merged_cfg}=    Lvmd Merge    ${DEFAULT_LVMD_CONFIG}    ${patch_cfg}
+    ${cfg}=    OperatingSystem.Get File    ./assets/lvmd.yaml
+    ${lvmd_vg}=    Set Variable If    '${LVMD_VG_OVERRIDE}' != ''    ${LVMD_VG_OVERRIDE}    rhel
+    ${templated}=    Replace Variables    ${cfg}
+    ${merged_cfg}=    Lvmd Merge    ${DEFAULT_LVMD_CONFIG}    ${templated}
     RETURN    ${merged_cfg}
 
 Restore Lvmd Config

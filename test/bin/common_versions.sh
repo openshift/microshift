@@ -1,6 +1,11 @@
 #!/bin/bash
 set -euo pipefail
 
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    echo "This script must be sourced, not executed."
+    exit 1
+fi
+
 get_vrel_from_beta() {
     local -r beta_repo="$1"
     local -r beta_vrel=$(\
