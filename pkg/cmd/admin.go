@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"flag"
 	"fmt"
 	"os"
 	"os/exec"
@@ -12,6 +13,7 @@ import (
 	"github.com/openshift/microshift/pkg/util"
 
 	"github.com/spf13/cobra"
+	"k8s.io/klog/v2"
 )
 
 func shouldRunPrivileged() error {
@@ -90,6 +92,16 @@ func backupPathToStorageAndName(path string) (data.StoragePath, data.BackupName,
 	return storage, name, nil
 }
 
+// tryConfigureLogsToSkipHeader sets klog's "skip headers" flag to true to avoid printing so called header
+// at the beginning of the log, for example: ??? I1118 13:09:51.121854  132102 state.go:80]
+func tryConfigureLogsToSkipHeader() {
+	flagset := flag.FlagSet{}
+	klog.InitFlags(&flagset)
+	if err := flagset.Parse([]string{"--skip_headers=true"}); err != nil {
+		klog.ErrorS(err, "Failed to parse --skip-headers=true for klog - ignoring")
+	}
+}
+
 // backupRestorePreRun contains necessary checks before attempting to perform
 // backup or restore. It is meant to be used as PersistentPreRunE.
 // It is not a part of RunE because k8s.io/component-base/cli.Run() wrapper
@@ -98,6 +110,8 @@ func backupPathToStorageAndName(path string) (data.StoragePath, data.BackupName,
 // source file and line.
 func backupRestorePreRun(backingUp bool) func(*cobra.Command, []string) error {
 	return func(cmd *cobra.Command, args []string) error {
+		tryConfigureLogsToSkipHeader()
+
 		if err := shouldRunPrivileged(); err != nil {
 			return err
 		}
