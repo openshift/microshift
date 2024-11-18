@@ -1,3 +1,28 @@
-- machine-config-operator embedded-component 439f25084fa2008d3b04187001fb4212dc530440 to dec56a4005f72919c43efd236845d1730356a9b0
-  - c2da95a0 2024-11-04T13:18:22-06:00 backport 4.16- metrics gathering implementation (daemon.go and metrics.go)
+- cluster-openshift-controller-manager-operator embedded-component bcc371ccbc9cab9bcb80b3f1a281a40c28011f59 to 2280f54414cf403aed0a02b3fdb86ee6bf672410
+  - e00ff09 2024-08-09T12:23:43-04:00 bump github.com/golang/protobuf to v1.5.4
+
+- kubernetes embedded-component 5865c5bb1ae6723901343b4c6274de5c8da9fbe3 to 7423cac0f833e38f8453886514a8910f62fd02d1
+  - bb85a9bca 2024-09-27T16:13:22-04:00 UPSTREAM: 125398: Fix issue with scheduler failing on hostname mismatch
+  - 4cc739c5e 2024-09-27T16:12:22-04:00 UPSTREAM: 122022: fix: requeue pods rejected by Extenders properly
+
+- machine-config-operator embedded-component dec56a4005f72919c43efd236845d1730356a9b0 to 4bb3364914c4dbcdfcc08b0914f402cdd38f014f
+  - eed2f698 2024-11-06T16:20:17-06:00 Fix for adding cert to controller config
+
+- ovn-kubernetes image-amd64 81cc8ea374872f75c684d462b0673baa0b76cd46 to e88e6ab3e890917c718e570894cd6899d94debdf
+  - f10cc791 2024-11-12T05:23:33+00:00 Add SDN node subnet gateway IP to host-network address_set
+  - f48863ec 2024-11-08T08:23:24+00:00 Cleanup gateway pod for remote zone. For local zone pods, deleteLogicalPort cleans this up, but before IC this function was called for all non-host-network pods, hence this logic. After IC, deleteLogicalPort won't be called for all remote zone pods, so condition is not needed.
+  - 1cd19ee3 2024-11-08T08:23:24+00:00 Add egress gateway e2e test option to delete gateway pod instead of re-labeling gateway pod. It uses different handlers for update and delete pod internally. Remove external.gateway from the dual-stack exclusion, as it is supported for ipv6.
+
+- kubernetes image-amd64 5865c5bb1ae6723901343b4c6274de5c8da9fbe3 to 7423cac0f833e38f8453886514a8910f62fd02d1
+  - bb85a9bca 2024-09-27T16:13:22-04:00 UPSTREAM: 125398: Fix issue with scheduler failing on hostname mismatch
+  - 4cc739c5e 2024-09-27T16:12:22-04:00 UPSTREAM: 122022: fix: requeue pods rejected by Extenders properly
+
+- ovn-kubernetes image-arm64 81cc8ea374872f75c684d462b0673baa0b76cd46 to e88e6ab3e890917c718e570894cd6899d94debdf
+  - f10cc791 2024-11-12T05:23:33+00:00 Add SDN node subnet gateway IP to host-network address_set
+  - f48863ec 2024-11-08T08:23:24+00:00 Cleanup gateway pod for remote zone. For local zone pods, deleteLogicalPort cleans this up, but before IC this function was called for all non-host-network pods, hence this logic. After IC, deleteLogicalPort won't be called for all remote zone pods, so condition is not needed.
+  - 1cd19ee3 2024-11-08T08:23:24+00:00 Add egress gateway e2e test option to delete gateway pod instead of re-labeling gateway pod. It uses different handlers for update and delete pod internally. Remove external.gateway from the dual-stack exclusion, as it is supported for ipv6.
+
+- kubernetes image-arm64 5865c5bb1ae6723901343b4c6274de5c8da9fbe3 to 7423cac0f833e38f8453886514a8910f62fd02d1
+  - bb85a9bca 2024-09-27T16:13:22-04:00 UPSTREAM: 125398: Fix issue with scheduler failing on hostname mismatch
+  - 4cc739c5e 2024-09-27T16:12:22-04:00 UPSTREAM: 122022: fix: requeue pods rejected by Extenders properly
 
