@@ -1,20 +1,15 @@
-- kubernetes embedded-component 6816ea6a977365195404d43756efd1c42ac0b2a7 to 82afd7768f00679805ad74bb832b393f5e3215cc
-  - 710804185 2024-09-25T12:29:26+00:00 UPSTREAM: 125398: Fix issue with scheduler failing on hostname mismatch
+- cluster-network-operator embedded-component 950651d28fadb5b058ac4652c44eca1b9ac04fbb to 2d07471a3f426950740f269ae79a4b331f6f2d0a
+  - 9e7870d 2024-10-24T12:29:59+00:00 HOSTEDCP-1981: Add controlplane cli image envar for use with hypershift
 
-- machine-config-operator embedded-component bebf7523bc6716138ba741f418175ed4cecfdd55 to 5ea53a326ccda8712e2d5c93ba503e17e4a7c385
-  - e10e9626 2024-11-04T13:20:13-06:00 backport 4.17- metrics gathering implementation (daemon.go and metrics.go)
+- ovn-kubernetes image-amd64 db5fdfa181cf07be8764377a4396bf0989699014 to 01d8c97267775c0212c64e6d5ddc176c9354eae8
+  - 3670f458 2024-11-07T09:30:11+00:00 Add hybird overlay pod IPs to the namespace address_set
+  - b01fcf0f 2024-10-09T11:54:42+08:00 Add static route to the hairpin masquerade IPs to pod
+  - 824d940f 2024-09-04T10:23:16+00:00 Dockerfile: Bump OVS to 3.4.0-1 for OKD.
+  - c8628592 2024-09-04T10:23:16+00:00 Dockerfile: Bump OVS to 3.4.0-1 The new OVS version is used by the OVN observability.
 
-- ovn-kubernetes image-amd64 62451d12851aebdd1a3b009a9829f8df796998ad to db5fdfa181cf07be8764377a4396bf0989699014
-  - ad665ccf 2024-10-09T10:00:23+02:00 Cleanup gateway pod for remote zone. For local zone pods, deleteLogicalPort cleans this up, but before IC this function was called for all non-host-network pods, hence this logic. After IC, deleteLogicalPort won't be called for all remote zone pods, so condition is not needed.
-  - 645deca4 2024-10-09T10:00:09+02:00 Add egress gateway e2e test option to delete gateway pod instead of re-labeling gateway pod. It uses different handlers for update and delete pod internally. Remove external.gateway from the dual-stack exclusion, as it is supported for ipv6.
-
-- kubernetes image-amd64 6816ea6a977365195404d43756efd1c42ac0b2a7 to 82afd7768f00679805ad74bb832b393f5e3215cc
-  - 710804185 2024-09-25T12:29:26+00:00 UPSTREAM: 125398: Fix issue with scheduler failing on hostname mismatch
-
-- ovn-kubernetes image-arm64 62451d12851aebdd1a3b009a9829f8df796998ad to db5fdfa181cf07be8764377a4396bf0989699014
-  - ad665ccf 2024-10-09T10:00:23+02:00 Cleanup gateway pod for remote zone. For local zone pods, deleteLogicalPort cleans this up, but before IC this function was called for all non-host-network pods, hence this logic. After IC, deleteLogicalPort won't be called for all remote zone pods, so condition is not needed.
-  - 645deca4 2024-10-09T10:00:09+02:00 Add egress gateway e2e test option to delete gateway pod instead of re-labeling gateway pod. It uses different handlers for update and delete pod internally. Remove external.gateway from the dual-stack exclusion, as it is supported for ipv6.
-
-- kubernetes image-arm64 6816ea6a977365195404d43756efd1c42ac0b2a7 to 82afd7768f00679805ad74bb832b393f5e3215cc
-  - 710804185 2024-09-25T12:29:26+00:00 UPSTREAM: 125398: Fix issue with scheduler failing on hostname mismatch
+- ovn-kubernetes image-arm64 db5fdfa181cf07be8764377a4396bf0989699014 to 01d8c97267775c0212c64e6d5ddc176c9354eae8
+  - 3670f458 2024-11-07T09:30:11+00:00 Add hybird overlay pod IPs to the namespace address_set
+  - b01fcf0f 2024-10-09T11:54:42+08:00 Add static route to the hairpin masquerade IPs to pod
+  - 824d940f 2024-09-04T10:23:16+00:00 Dockerfile: Bump OVS to 3.4.0-1 for OKD.
+  - c8628592 2024-09-04T10:23:16+00:00 Dockerfile: Bump OVS to 3.4.0-1 The new OVS version is used by the OVN observability.
 
