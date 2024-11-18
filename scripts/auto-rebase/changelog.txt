@@ -1,4 +1,153 @@
-- operator-framework-olm embedded-component 562dbf8dc413cdaf6cee91ae28f065b66a2734fe to 7f5600b3d466ca4b02e314acf98aac1588a06663
-  - 909e9d8e 2024-11-11T00:28:11+00:00 build(deps): bump github.com/prometheus/client_golang (#3417)
-  - 1329e88b 2024-11-11T00:26:03+00:00 build(deps): bump github.com/onsi/ginkgo/v2 from 2.20.2 to 2.21.0 (#3432)
+- api embedded-component a2817b89f7e0989016967055a142d5e88bed18de to 1d987ad446cf1900b218a6bf2d780b9894e6c05f
+  - a1d521d 2024-11-14T07:32:39-07:00 operator/v1: add OLM to scheme
+  - 676e8d1 2024-11-12T15:29:52-07:00 OLM: add OperatorLifecycleManagerV1 capability to olms CRD
+  - 57564f6 2024-11-11T13:07:19+01:00 OCPBUGS-44362: Remove the v1alpha1 schema for ConsolePlugin CRD
+
+- cluster-ingress-operator embedded-component aa8860a85b9c74a821d1658487704ca0320308e5 to 9305d2052be1380508a1950e44cb6d325113726a
+  - 5548993 2024-11-04T09:35:56-05:00 Bump to k8s.io v0.31.1 (and deps)
+
+- cluster-kube-apiserver-operator embedded-component 6f57eb351e819e5d89564661783f953bf84cb43b to dc7ef78344c0648583c3e3b4f4b6bc4b22f3d612
+  - cfe2cab 2024-11-14T09:42:14+01:00 bump deps
+  - 6c27597 2024-11-13T15:42:24+01:00 bump deps
+  - ff4f4a2 2024-11-13T15:42:11+01:00 pin deps
+  - d30dd99 2024-11-07T14:17:55+01:00 react to changes
+
+- cluster-network-operator embedded-component c08eeb28481ac598774ad51c2be03d2e748f74e0 to 6b615be1447aa79252ddc73b10675b4638ae13f7
+  - 66acf7e 2024-11-12T13:23:26+02:00 ovn-k, cudn: Add missing permissions to ovnkube-node
+  - c9658eb 2024-11-11T13:52:57+02:00 bindata, ovn-k: Add ClusterUserDefinedNetwork CRD and RBAC
+  - d7dbead 2024-11-07T11:35:54-05:00 The sysctl daemonset should set requests for memory and cpu
+  - 125851f 2024-11-07T10:19:37+01:00 Use host ipsec binary and libraries
+
+- kubernetes embedded-component e7a7a8d687079e02b36a459284a85cdb27f68e1e to a3f31a4f2c587420f1ddb3bcdb161bf64a8c436b
+  - 0669dae2a 2024-11-08T14:32:56-05:00 UPSTREAM: <drop>: ./hack/update-vendor.sh
+  - da405c06f 2024-11-08T14:30:17-05:00 UPSTREAM: <carry>: add openshift-tests-extension compatible binary
+
+- machine-config-operator embedded-component 518286cf32fc743a235397a2e85a57506acc2401 to 47a4dc728e94fe7964b6dae74eb8f89c9b282c00
+  - 68620e34 2024-11-13T15:57:44-05:00 operator: add unit tests for secret sync
+  - 8109d7c3 2024-11-13T15:53:50-05:00 operator: sync entitlement secret before build
+  - c6f76c58 2024-11-13T12:52:59-05:00 ensure MCN desired config has a non empty value
+  - 5147bbc1 2024-11-13T13:46:08+00:00 Disable tx chksum for driver IDPF on GCP C3/C4
+  - b43cbed5 2024-11-08T17:21:08-05:00 sync: Sort the moscs alphanumerically
+  - 86ef7282 2024-11-07T12:37:49-05:00 modularizes on-cluster layering components
+  - 208ff040 2024-11-05T13:17:31-05:00 node_controller: Add event handler for delete MOSC resource
+  - 14c5fcfb 2024-11-01T14:37:04-04:00 daemon & templates: removal of pivot cmd and references
+  - e9b693c1 2024-11-01T14:35:08-04:00 container file: user add step enhancement
+
+- operator-framework-olm embedded-component 7f5600b3d466ca4b02e314acf98aac1588a06663 to 1d2da2553d9407d20c003157d07819b984fa01d6
+  - 2c2bc280 2024-11-14T00:04:50+00:00 build(deps): bump github.com/onsi/gomega from 1.34.2 to 1.35.1 (#3439)
+  - 8855915a 2024-11-14T00:03:45+00:00 build(deps): bump github.com/fsnotify/fsnotify from 1.7.0 to 1.8.0 (#3440)
+  - 8aae4926 2024-11-14T00:03:29+00:00 build(deps): bump github.com/prometheus/common from 0.60.0 to 0.60.1 (#3437)
+  - 97c012aa 2024-11-13T00:03:58+00:00 build(deps): bump golang.org/x/net from 0.30.0 to 0.31.0 (#3438)
+  - 15c241af 2024-11-12T00:12:33+00:00 Addresses more goreleaser deprecated flags (#1473)
+  - c0066790 2024-11-12T00:11:38+00:00 Address goreleaser deprecations (#1472)
+  - 17362245 2024-11-12T00:11:25+00:00 Fix upstream-builder image build (#1467)
+  - b591c5c4 2024-11-12T00:11:12+00:00 Bump google.golang.org/protobuf from 1.34.2 to 1.35.1 (#1468)
+  - c2496c71 2024-11-12T00:10:59+00:00 Bump github.com/mattn/go-sqlite3 from 1.14.23 to 1.14.24 (#1469)
+  - 1a8b14e7 2024-11-12T00:10:45+00:00 Bump golang.org/x/net from 0.29.0 to 0.30.0 (#1463)
+  - c217085f 2024-11-12T00:10:32+00:00 Bump golang.org/x/text from 0.18.0 to 0.19.0 (#1465)
+  - e0e35248 2024-11-12T00:10:19+00:00 Bump golang.org/x/sys from 0.25.0 to 0.26.0 (#1464)
+  - 8a5618fe 2024-11-12T00:10:05+00:00 Bump github.com/containers/common from 0.60.3 to 0.60.4 (#1462)
+  - 1744f263 2024-11-12T00:09:51+00:00 Bump google.golang.org/grpc from 1.67.0 to 1.67.1 (#1461)
+  - b201dd58 2024-11-12T00:09:22+00:00 Bump github.com/containers/common from 0.60.2 to 0.60.3 (#1459)
+  - e95cad93 2024-11-12T00:08:53+00:00 Bump google.golang.org/grpc from 1.66.2 to 1.67.0 (#1458)
+  - f69a6911 2024-11-12T00:08:39+00:00 Bump github.com/docker/cli (#1457)
+  - c83177b5 2024-11-12T00:08:21+00:00 Bump github.com/docker/cli (#1456)
+  - fd82ed19 2024-11-12T00:08:07+00:00 Bump github.com/grpc-ecosystem/grpc-health-probe from 0.4.32 to 0.4.34 (#1455)
+  - 4d92d697 2024-11-12T00:07:52+00:00 explicitly handle SIGINT and SIGTERM (#1448)
+  - 74458119 2024-11-12T00:07:34+00:00 Bump k8s.io/apiextensions-apiserver from 0.31.0 to 0.31.1 (#1453)
+  - 0ff26f0c 2024-11-12T00:07:11+00:00 template/*: allow passing custom bundle renderer (#1423)
+  - f5d06d1b 2024-11-12T00:06:39+00:00 Bump github.com/maxbrunsfeld/counterfeiter/v6 from 6.8.1 to 6.9.0 (#1450)
+  - 22c062b8 2024-11-12T00:06:19+00:00 Bump google.golang.org/grpc from 1.66.1 to 1.66.2 (#1449)
+  - e255ab0a 2024-11-12T00:06:06+00:00 set default goal since bingo disrupts it (#1447)
+  - 045ade7c 2024-11-12T00:05:46+00:00 Bump github.com/containerd/containerd from 1.7.21 to 1.7.22 (#1444)
+  - dab71b7d 2024-11-12T00:05:28+00:00 Bump google.golang.org/grpc from 1.66.0 to 1.66.1 (#1445)
+  - 219745e3 2024-11-12T00:05:15+00:00 Bump github.com/docker/cli (#1446)
+  - d79b4b05 2024-11-12T00:05:02+00:00 Bump github.com/golang-migrate/migrate/v4 from 4.17.1 to 4.18.1 (#1443)
+  - 6725fd9d 2024-11-12T00:04:42+00:00 Fix canonical image ref resolution (#3434)
+  - 6558d84d 2024-11-12T00:04:24+00:00 build(deps): bump github.com/operator-framework/operator-registry (#3430)
+  - 0d94eabb 2024-11-12T00:03:56+00:00 fix: set correct groupName tag for packages.operators.coreos.com (#3406)
+
+- oc image-amd64 5110357c067c5933e75604504f1521927ccaaf27 to df7cb575e0e2b8f79f897f090a638c4e4e1fe406
+  - 856030a4 2024-11-11T20:40:28+03:00 Fix newapp unit test failure by using different image
+  - 22cf5c6c 2024-11-08T12:45:32-08:00 pkg/cli/admin/upgrade/recommend: Treat Upgradeable=False as a conditional update risk
+  - 35e30288 2024-11-08T12:43:36-05:00 always retry in case of image pull error
+
+- ovn-kubernetes image-amd64 e3c68e24bd9bbd83dbf7409a8c1414e72a334680 to 99c44e88d2c7aa7a95f950dc182a2979ae729e97
+  - f9fa20e3 2024-11-09T14:27:12+01:00 Release IDs only for primary L2 UDNs
+  - 61ede88c 2024-11-08T17:12:29-05:00 Fixes auto-assignment of reviewers after repo migration
+  - 2372fca6 2024-11-05T12:35:44-05:00 Repo migration updates
+  - 6e422b37 2024-11-05T13:35:53+02:00 udn controller: Initialize namespace-tracker on start
+  - 9093fb68 2024-11-05T13:35:53+02:00 e2e,net-seg,cluster-udn: connectivity,isolation & pod2egress coverage
+  - d5ebf1fd 2024-11-05T13:35:53+02:00 e2e,net-seg: Add Cluster UDN controller func. tests
+  - 39e7e57a 2024-11-05T13:34:36+02:00 udn controller: Synchronize NAD creation
+  - c55f02c5 2024-11-05T13:33:49+02:00 cluster-udn: Enqueue NAD events in the right controller
+  - cc7fa0f5 2024-11-05T13:33:49+02:00 udn controller: Reconcile affected namespaces events
+  - 1e9dd35c 2024-11-05T13:33:48+02:00 cluster-udn: Implement CUDN controller
+  - 7f5e251d 2024-11-05T12:04:59+02:00 cluster-udn: Cluster UDN controller scaffolds
+  - ce78ab1b 2024-11-05T12:04:59+02:00 udn controller,tests: Simplify tests setup
+  - e67ffcbd 2024-11-05T12:04:59+02:00 utils,fake client: Populate NAD fake-client tracker
+  - b9513a76 2024-11-05T12:04:59+02:00 udn controller: Simplify reconcile function
+  - 794fbb48 2024-11-05T12:04:59+02:00 udn controller: Delete NAD explicitly
+  - 245f254a 2024-11-05T12:04:59+02:00 udn controller: Export NAD create & delete code
+  - 8b8f353c 2024-11-05T12:04:59+02:00 udn controller: Export NAD validations code
+  - cd52bd0e 2024-11-05T12:04:59+02:00 udn,template: Enable NAD rendering for CUDN objects
+  - 3ee9611b 2024-11-05T12:04:59+02:00 informers, factory: Setup CUDN informers
+  - 217d69be 2024-11-05T12:04:59+02:00 kind: Install ClusterUserDefinedNetwork CRD
+  - b31afc43 2024-11-05T12:04:54+02:00 crds: Introduce ClusterUserDefinedNetwork CRD
+  - a5ac6a33 2024-11-04T12:17:59+01:00 network manager: ignore topology not managed errors
+  - 5827107b 2024-11-04T12:17:59+01:00 cluster manager: the Start method is topology agnostic
+  - b2ca695a 2024-11-03T10:49:22+01:00 change PR template to be checklist
+  - be1e6989 2024-10-30T14:58:40+00:00 e2e flake fix: kubevirt
+  - 858ff061 2024-10-10T15:23:25+02:00 Bump OVN to ovn24.09-24.09.0-33.el9fdp
+
+- kubernetes image-amd64 e7a7a8d687079e02b36a459284a85cdb27f68e1e to a3f31a4f2c587420f1ddb3bcdb161bf64a8c436b
+  - 0669dae2a 2024-11-08T14:32:56-05:00 UPSTREAM: <drop>: ./hack/update-vendor.sh
+  - da405c06f 2024-11-08T14:30:17-05:00 UPSTREAM: <carry>: add openshift-tests-extension compatible binary
+
+- oc image-arm64 5110357c067c5933e75604504f1521927ccaaf27 to b36ab488abc0f0afe97b5724a51e0364b66e2003
+  - 1b3045e2 2024-11-16T03:30:31+00:00 NO-JIRA: adm release: cleanups (#1914)
+  - aaa6d774 2024-11-15T12:39:26-08:00 pkg/cli/admin/upgrade/recommend: Fix "no updates to <MAJOR>.<MINOR> available" error message
+  - c04ddb22 2024-11-15T12:39:26-08:00 pkg/cli/admin/upgrade/recommend: Expand "URL" to "Release URL"
+  - d53af317 2024-11-15T12:39:07-08:00 pkg/cli/admin/upgrade/recommend: "no known issues..." placeholder
+  - 21c3b92e 2024-11-14T10:57:39-05:00 OTA-1224: status: simplify worker status line
+  - 856030a4 2024-11-11T20:40:28+03:00 Fix newapp unit test failure by using different image
+  - 22cf5c6c 2024-11-08T12:45:32-08:00 pkg/cli/admin/upgrade/recommend: Treat Upgradeable=False as a conditional update risk
+  - 35e30288 2024-11-08T12:43:36-05:00 always retry in case of image pull error
+
+- router image-arm64 6c988a565350d9599c5aa1d835bdb69739cea2c6 to 78322373359023782b66c3e58e3178b9a4932bde
+  - a405953 2024-11-15T09:18:30-05:00 Support appProtocol: kubernetes.io/h2c
+  - e3a81dd 2024-11-15T09:18:22-05:00 Add test cases for appProtocol
+  - 83087f0 2024-11-15T09:18:14-05:00 Rename mustCreate to mustCreateRoute
+
+- ovn-kubernetes image-arm64 e3c68e24bd9bbd83dbf7409a8c1414e72a334680 to 99c44e88d2c7aa7a95f950dc182a2979ae729e97
+  - f9fa20e3 2024-11-09T14:27:12+01:00 Release IDs only for primary L2 UDNs
+  - 61ede88c 2024-11-08T17:12:29-05:00 Fixes auto-assignment of reviewers after repo migration
+  - 2372fca6 2024-11-05T12:35:44-05:00 Repo migration updates
+  - 6e422b37 2024-11-05T13:35:53+02:00 udn controller: Initialize namespace-tracker on start
+  - 9093fb68 2024-11-05T13:35:53+02:00 e2e,net-seg,cluster-udn: connectivity,isolation & pod2egress coverage
+  - d5ebf1fd 2024-11-05T13:35:53+02:00 e2e,net-seg: Add Cluster UDN controller func. tests
+  - 39e7e57a 2024-11-05T13:34:36+02:00 udn controller: Synchronize NAD creation
+  - c55f02c5 2024-11-05T13:33:49+02:00 cluster-udn: Enqueue NAD events in the right controller
+  - cc7fa0f5 2024-11-05T13:33:49+02:00 udn controller: Reconcile affected namespaces events
+  - 1e9dd35c 2024-11-05T13:33:48+02:00 cluster-udn: Implement CUDN controller
+  - 7f5e251d 2024-11-05T12:04:59+02:00 cluster-udn: Cluster UDN controller scaffolds
+  - ce78ab1b 2024-11-05T12:04:59+02:00 udn controller,tests: Simplify tests setup
+  - e67ffcbd 2024-11-05T12:04:59+02:00 utils,fake client: Populate NAD fake-client tracker
+  - b9513a76 2024-11-05T12:04:59+02:00 udn controller: Simplify reconcile function
+  - 794fbb48 2024-11-05T12:04:59+02:00 udn controller: Delete NAD explicitly
+  - 245f254a 2024-11-05T12:04:59+02:00 udn controller: Export NAD create & delete code
+  - 8b8f353c 2024-11-05T12:04:59+02:00 udn controller: Export NAD validations code
+  - cd52bd0e 2024-11-05T12:04:59+02:00 udn,template: Enable NAD rendering for CUDN objects
+  - 3ee9611b 2024-11-05T12:04:59+02:00 informers, factory: Setup CUDN informers
+  - 217d69be 2024-11-05T12:04:59+02:00 kind: Install ClusterUserDefinedNetwork CRD
+  - b31afc43 2024-11-05T12:04:54+02:00 crds: Introduce ClusterUserDefinedNetwork CRD
+  - a5ac6a33 2024-11-04T12:17:59+01:00 network manager: ignore topology not managed errors
+  - 5827107b 2024-11-04T12:17:59+01:00 cluster manager: the Start method is topology agnostic
+  - b2ca695a 2024-11-03T10:49:22+01:00 change PR template to be checklist
+  - be1e6989 2024-10-30T14:58:40+00:00 e2e flake fix: kubevirt
+  - 858ff061 2024-10-10T15:23:25+02:00 Bump OVN to ovn24.09-24.09.0-33.el9fdp
+
+- kubernetes image-arm64 e7a7a8d687079e02b36a459284a85cdb27f68e1e to a3f31a4f2c587420f1ddb3bcdb161bf64a8c436b
+  - 0669dae2a 2024-11-08T14:32:56-05:00 UPSTREAM: <drop>: ./hack/update-vendor.sh
+  - da405c06f 2024-11-08T14:30:17-05:00 UPSTREAM: <carry>: add openshift-tests-extension compatible binary
 
