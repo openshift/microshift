@@ -73,11 +73,22 @@ func (s *KubeStorageVersionMigrator) Run(ctx context.Context, ready chan<- struc
 		close(ready)
 	}()
 
+	panicChannel := make(chan any, 1)
 	go func() {
+		defer func() {
+			if r := recover(); r != nil {
+				panicChannel <- r
+			}
+		}()
 		errorChannel <- s.runMigrator(ctx)
 	}()
 
-	return <-errorChannel
+	select {
+	case err := <-errorChannel:
+		return err
+	case perr := <-panicChannel:
+		panic(perr)
+	}
 }
 
 func (s *KubeStorageVersionMigrator) runMigrator(ctx context.Context) error {
