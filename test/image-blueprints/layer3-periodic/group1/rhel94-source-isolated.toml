@@ -41,6 +41,11 @@ version = "*"
 name = "skopeo"
 version = "*"
 
+# For FIPS test
+[[packages]]
+name = "crypto-policies-scripts"
+version = "*"
+
 [customizations.services]
 enabled = ["microshift", "microshift-test-agent", "qemu-guest-agent"]
 
