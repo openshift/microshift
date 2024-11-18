@@ -73,7 +73,8 @@ Oc Wait
     ...    return_rc=${TRUE}
     IF    ${rc} != 0
         Run With Kubeconfig    oc describe ${resource}    allow_fail=${TRUE}
-        Fail    'oc wait ${resource} ${opts}' failed
+        Log    'oc wait ${resource} ${opts}' failed
+        Should Be Equal As Integers    ${rc}    0
     END
     RETURN    ${output}
 
