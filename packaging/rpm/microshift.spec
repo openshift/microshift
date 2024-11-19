@@ -494,11 +494,11 @@ usermod -a -G hugetlbfs openvswitch
 
 %systemd_post microshift.service
 
-# only for install, not on upgrades
-if [ $1 -eq 1 ]; then
-	# if crio was already started, restart it so it will catch /etc/crio/crio.conf.d/10-microshift.conf
-	systemctl is-active --quiet crio && systemctl restart --quiet crio || true
-fi
+# Restart crio and microshift services if they are active, both on installs and upgrades
+# - Crio should pick up potential configuration updates
+# - MicroShift should refresh running containers, pick up potential manifest updates, etc.
+systemctl is-active --quiet crio       && systemctl restart --quiet crio       || true
+systemctl is-active --quiet microshift && systemctl restart --quiet microshift || true
 
 %pre selinux
 %selinux_relabel_pre -s %{selinuxtype}
@@ -649,6 +649,9 @@ fi
 # Use Git command to generate the log and replace the VERSION string
 # LANG=C git log --date="format:%a %b %d %Y" --pretty="tformat:* %cd %an <%ae> VERSION%n- %s%n" packaging/rpm/microshift.spec
 %changelog
+* Mon Nov 11 2024 Gregory Giguashvili <ggiguash@redhat.com> 4.18.0
+- Restart crio and microshift services on RPM post-install
+
 * Sun Nov 10 2024 Gregory Giguashvili <ggiguash@redhat.com> 4.18.0
 - Add sample kickstart files to microshift-release-info RPM
 
