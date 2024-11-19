@@ -6,7 +6,7 @@ each layer or group under `test/image-blueprints-bootc` directory.
 
 ## Bootc Base Layer
 
-Artifacts build in this layer are cached.
+Artifacts built in this layer are cached.
 
 |Group |Build Time|Description|
 |------|----------|-----------|
@@ -15,7 +15,7 @@ Artifacts build in this layer are cached.
 
 ## Bootc Source Layer
 
-Artifacts build in this layer cannot be cached as they depend on the current sources.
+Artifacts built in this layer cannot be cached as they depend on the current sources.
 
 |Group |Build Time|Description|
 |------|----------|-----------|
