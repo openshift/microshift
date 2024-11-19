@@ -71,8 +71,8 @@ health:
 EOF
     # Start the registry container
     podman run -d -p "${MIRROR_REGISTRY_PORT}:${MIRROR_REGISTRY_PORT}" --restart always \
-        -v "${MIRROR_REGISTRY_DIR}:/var/lib/registry" \
-        -v "${MIRROR_REGISTRY_DIR}/config.yaml:/etc/docker/registry/config.yml" \
+        -v "${MIRROR_REGISTRY_DIR}:/var/lib/registry:z" \
+        -v "${MIRROR_REGISTRY_DIR}/config.yaml:/etc/docker/registry/config.yml:z" \
         --name "${LOCAL_REGISTRY_NAME}" "${REGISTRY_IMAGE}"
 }
 
