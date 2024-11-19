@@ -13,6 +13,8 @@ Artifacts built in this layer are cached.
 |group1| Short    | Basic prerequisites
 |group2| Long     | Artifacts independent of current sources
 
+> Note: Total build times are up to 15 minutes.
+
 ## Bootc Source Layer
 
 Artifacts built in this layer cannot be cached as they depend on the current sources.
@@ -23,6 +25,8 @@ Artifacts built in this layer cannot be cached as they depend on the current sou
 |group2| Average  | Current source artifacts on RHEL
 |group3| Average  | Current source artifacts on CentOS (with 1 exception)
 
-> Note: The `rhel94-bootc-source-isolated.image-bootc` file is an exception in
-> `group4` as it uses RHEL. This is done not to create a group with a single
-> file.
+> Note:
+> * Total build times are up to 15 minutes.
+> * The `rhel94-bootc-source-isolated.image-bootc` file is an exception in
+>   `group3` as it uses RHEL. This is done not to create a group with a single
+>   file.
