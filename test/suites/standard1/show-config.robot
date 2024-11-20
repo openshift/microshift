@@ -12,10 +12,10 @@ Suite Teardown      Teardown
 
 
 *** Variables ***
-${MEMLIMIT128}      SEPARATOR=\n
+${MEMLIMIT256}      SEPARATOR=\n
 ...                 ---
 ...                 etcd:
-...                 \ \ memoryLimitMB: 128
+...                 \ \ memoryLimitMB: 256
 
 
 *** Test Cases ***
@@ -33,7 +33,7 @@ No Mode Argument
     ...    sudo=True    return_rc=True
     Should Be Equal As Integers    0    ${rc}
     ${config}=    Yaml Parse    ${output}
-    Should Be Equal As Integers    128    ${config.etcd.memoryLimitMB}
+    Should Be Equal As Integers    256    ${config.etcd.memoryLimitMB}
 
 Explicit Mode Default
     [Documentation]    Test with explicit '--mode default'
@@ -43,7 +43,7 @@ Explicit Mode Default
 Explicit Mode Effective
     [Documentation]    Test with explicit '--mode effective'
     ${config}=    Show Config    effective
-    Should Be Equal As Integers    128    ${config.etcd.memoryLimitMB}
+    Should Be Equal As Integers    256    ${config.etcd.memoryLimitMB}
 
 Mode Unknown
     [Documentation]    Test with explicit '--mode no-such-mode'
@@ -58,7 +58,7 @@ Setup
     [Documentation]    Test suite setup
     Check Required Env Variables
     Login MicroShift Host
-    Drop In MicroShift Config    ${MEMLIMIT128}    10-etcd
+    Drop In MicroShift Config    ${MEMLIMIT256}    10-etcd
 
 Teardown
     [Documentation]    Test suite teardown
