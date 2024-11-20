@@ -9,12 +9,12 @@ exclude:
 version: v1.25.1
 # ignores vulnerabilities until expiry date; change duration by modifying expiry date
 ignore:
-  go/TooPermissiveTrustManager:
+  '15421744-3615-455c-821e-de356d755319':
     - pkg/util/net.go:
         reason: None Given
         expires: 2024-12-20T09:11:06.778Z
         created: 2024-11-20T09:11:06.782Z
-  go/PT:
+  'b415eafd-cccd-4f9c-a84a-bcdf06afd5b6':
     - pkg/cmd/init.go:
         reason: None Given
         expires: 2024-12-20T09:12:22.273Z
