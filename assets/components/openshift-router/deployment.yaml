@@ -40,7 +40,7 @@ spec:
             - name: ROUTER_CIPHERSUITES
               value: TLS_AES_128_GCM_SHA256:TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256
             - name: ROUTER_DISABLE_HTTP2
-              value: '{{.RouterDisableHttp2}}'
+              value: '{{ .RouterDisableHttp2 }}'
             - name: ROUTER_DISABLE_NAMESPACE_OWNERSHIP_CHECK
               value: '{{.RouterNamespaceOwnership}}'
             - name: ROUTER_LOAD_BALANCE_ALGORITHM
@@ -50,11 +50,11 @@ spec:
             - name: ROUTER_SERVICE_NAME
               value: default
             - name: ROUTER_SET_FORWARDED_HEADERS
-              value: '{{.ForwardedHeaderPolicy}}'
+              value: '{{ .ForwardedHeaderPolicy }}'
             - name: ROUTER_TCP_BALANCE_SCHEME
               value: source
             - name: ROUTER_THREADS
-              value: '{{.ThreadCount}}'
+              value: '{{ .ThreadCount }}'
             - name: SSL_MIN_VERSION
               value: TLSv1.2
             - name: ROUTER_USE_PROXY_PROTOCOL
@@ -66,33 +66,33 @@ spec:
             - name: ROUTER_IP_V4_V6_MODE
               value: '{{ .RouterMode }}'
             - name: ROUTER_BUF_SIZE
-              value: '{{.RouterBufSize}}'
+              value: '{{ .RouterBufSize }}'
             - name: ROUTER_MAX_REWRITE_SIZE
-              value: '{{.HeaderBufferMaxRewriteBytes}}'
+              value: '{{ .HeaderBufferMaxRewriteBytes }}'
             - name: ROUTER_BACKEND_CHECK_INTERVAL
-              value: '{{.HealthCheckInterval}}'
+              value: '{{ .HealthCheckInterval }}'
             - name: ROUTER_DEFAULT_CLIENT_TIMEOUT
-              value: '{{.ClientTimeout}}'
+              value: '{{ .ClientTimeout }}'
             - name: ROUTER_CLIENT_FIN_TIMEOUT
-              value: '{{.ClientFinTimeout}}'
+              value: '{{ .ClientFinTimeout }}'
             - name: ROUTER_DEFAULT_SERVER_TIMEOUT
-              value: '{{.ServerTimeout}}'
+              value: '{{ .ServerTimeout }}'
             - name: ROUTER_DEFAULT_SERVER_FIN_TIMEOUT
-              value: '{{.ServerFinTimeout}}'
+              value: '{{ .ServerFinTimeout }}'
             - name: ROUTER_DEFAULT_TUNNEL_TIMEOUT
-              value: '{{.TunnelTimeout}}'
+              value: '{{ .TunnelTimeout }}'
             - name: ROUTER_INSPECT_DELAY
-              value: '{{.TlsInspectDelay}}'
+              value: '{{ .TlsInspectDelay }}'
             - name: ROUTER_MAX_CONNECTIONS
-              value: '{{.MaxConnections}}'
+              value: '{{ .MaxConnections }}'
             - name: ROUTER_DONT_LOG_NULL
-              value: '{{.LogEmptyRequests}}'
+              value: '{{ .LogEmptyRequests }}'
             - name: ROUTER_HTTP_IGNORE_PROBES
-              value: '{{.HTTPEmptyRequestsPolicy}}'
+              value: '{{ .HTTPEmptyRequestsPolicy }}'
             - name: ROUTER_ENABLE_COMPRESSION
-              value: '{{.RouterEnableCompression}}'
+              value: '{{ .RouterEnableCompression }}'
             - name: ROUTER_COMPRESSION_MIME
-              value: '{{.RouterCompressionMime}}'
+              value: '{{ .RouterCompressionMime }}'
           livenessProbe:
             failureThreshold: 3
             httpGet:
