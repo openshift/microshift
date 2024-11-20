@@ -1,6 +1,4 @@
-# References:
-# https://docs.snyk.io/scan-applications/snyk-code/using-snyk-code-from-the-cli/excluding-directories-and-files-from-the-snyk-code-cli-test
-# https://docs.snyk.io/snyk-cli/commands/ignore
+# Snyk (https://snyk.io) policy file, patches or ignores known vulnerabilities.
 exclude:
   global:
     - origin/**
@@ -8,10 +6,17 @@ exclude:
     - etcd/vendor/**
     - test/**
     - scripts/**
+version: v1.25.1
+# ignores vulnerabilities until expiry date; change duration by modifying expiry date
 ignore:
-  b415eafd-cccd-4f9c-a84a-bcdf06afd5b6:
-    - pkg/cmd/init.go:
-        reason: "The path is sanitized and does not pose a risk."
-  15421744-3615-455c-821e-de356d755319:
+  go/TooPermissiveTrustManager:
     - pkg/util/net.go:
-        reason: "The certificate is permissive on purpose."
+        reason: None Given
+        expires: 2024-12-20T09:11:06.778Z
+        created: 2024-11-20T09:11:06.782Z
+  go/PT:
+    - pkg/cmd/init.go:
+        reason: None Given
+        expires: 2024-12-20T09:12:22.273Z
+        created: 2024-11-20T09:12:22.280Z
+patch: {}
