@@ -1,6 +1,6 @@
+%include /pre-host-resolution.cfg
 %include /main-prologue.cfg
 %include /main-network.cfg
-%include /main-host-resolution.cfg
 %include /main-ostreecontainer.cfg
 
 %post --log=/dev/console --erroronfail
