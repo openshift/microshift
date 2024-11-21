@@ -40,34 +40,32 @@ function mirror_registry() {
     process_image_copy() {
         local -r img_pull_file=$1
         local -r dest_registry=$2
-        local -r image_tag=$3
-        local -r image_cnt=$(cut -d' ' -f1 <<< "$4")
-        local -r src_img=$(cut -d' ' -f2 <<< "$4")
+        local -r src_img=$(cut -d' ' -f2 <<< "$3")
 
         # Remove the source registry prefix and SHA
         local dst_img
         dst_img=$(echo "${src_img}" | cut -d '/' -f 2-)
-        dst_img=$(echo "${dst_img}" | awk -F'@' '{print $1}')
+        local dst_img_no_tag
+        dst_img_no_tag=$(echo "${dst_img}" | awk -F'@|:' '{print $1}')
         # Add the target registry prefix
         dst_img="${dest_registry}/${dst_img}"
+        dst_img_no_tag="${dest_registry}/${dst_img_no_tag}"
 
         # Run the image mirror and tag command
         echo "Mirroring '${src_img}' to '${dst_img}'"
         skopeo_retry copy --all --quiet \
             --preserve-digests \
             --authfile "${img_pull_file}" \
-            docker://"${src_img}" docker://"${dst_img}:${image_tag}-${image_cnt}"
+            docker://"${src_img}" docker://"${dst_img}"
 
-        echo "Tagging '${dst_img}' as 'latest'"
+        echo "Tagging '${dst_img_no_tag}' as 'latest'"
         skopeo_retry copy --all --quiet \
             --preserve-digests \
             --authfile "${img_pull_file}" \
-            docker://"${dst_img}:${image_tag}-${image_cnt}" docker://"${dst_img}:latest"
+            docker://"${dst_img}" docker://"${dst_img_no_tag}:latest"
+
     }
 
-    # Use timestamp as a tag on the target images to avoid
-    # their overwrite by the 'latest' automatic tagging
-    local -r image_tag=mirror-$(date +%y%m%d%H%M%S)
     # Export functions for xargs to use
     export -f process_image_copy
     export -f skopeo_retry
@@ -75,7 +73,7 @@ function mirror_registry() {
     # Note that the counter and image pairs are passed as one argument by replacing "{}" in xarg input.
     awk '{print NR, $0}' "${img_file_list}" | \
         xargs -P 8 -I {} \
-        bash -c 'process_image_copy "$@"' _ "${img_pull_file}" "${dest_registry}" "${image_tag}" "{}"
+        bash -c 'process_image_copy "$@"' _ "${img_pull_file}" "${dest_registry}" "{}"
 }
 
 function registry_to_dir() {
