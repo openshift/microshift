@@ -29,7 +29,7 @@ def start_junit(groupdir):
     delete_file(JUNIT_LOGFILE)
     timestamp = get_timestamp("%Y-%m-%dT%H:%M:%S")
     append_file(JUNIT_LOGFILE, f'''<?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="microshift-test-framework:{group}" timestamp="{timestamp}">''')
+<testsuite name="microshift-test-framework:{group}" timestamp="{timestamp}">\n''')
 
 
 def close_junit():
@@ -38,7 +38,7 @@ def close_junit():
     if not JUNIT_LOGFILE:
         raise Exception("Attempt to close junit without starting it first")
     # Close the unit
-    append_file(JUNIT_LOGFILE, '</testsuite>')
+    append_file(JUNIT_LOGFILE, '</testsuite>\n')
     # Reset the junit log directory
     JUNIT_LOGFILE = None
 
@@ -56,18 +56,18 @@ def record_junit(object, step, status, start=0.0):
         # BEGIN CRITICAL SECTION
         JUNIT_LOCK.acquire()
 
-        append_file(JUNIT_LOGFILE, f'<testcase classname="{object}" name="{step}"{t}>')
+        append_file(JUNIT_LOGFILE, f'<testcase classname="{object}" name="{step}"{t}>\n')
         # Add a message according to the status
         if status == "OK":
             pass
         elif status.startswith("SKIP"):
-            append_file(JUNIT_LOGFILE, f'<skipped message="{status}" type="{step}-skipped" />')
+            append_file(JUNIT_LOGFILE, f'<skipped message="{status}" type="{step}-skipped" />\n')
         elif status.startswith("FAIL"):
-            append_file(JUNIT_LOGFILE, f'<failure message="{status}" type="${step}-failure" />')
+            append_file(JUNIT_LOGFILE, f'<failure message="{status}" type="${step}-failure" />\n')
         else:
             raise Exception(f"Invalid junit status '{status}'")
         # Close the test case block
-        append_file(JUNIT_LOGFILE, '</testcase>')
+        append_file(JUNIT_LOGFILE, '</testcase>\n')
     except Exception:
         # Propagate the exception to the caller
         raise
