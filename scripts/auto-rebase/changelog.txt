@@ -1,3 +1,0 @@
-- oc image-arm64 b36ab488abc0f0afe97b5724a51e0364b66e2003 to bdce85daf64eda40dd1b604270b85c67a296bc93
-  - d47e1619 2024-11-15T14:26:17-05:00 upgrade status: show updating cluster operator names in the output
-
