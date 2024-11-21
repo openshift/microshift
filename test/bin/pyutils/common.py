@@ -43,7 +43,7 @@ def close_junit():
     JUNIT_LOGFILE = None
 
 
-def record_junit(object, step, status, start=0.0):
+def record_junit(object, step, status, start=0.0, log_filepath=''):
     """Add a message for the specified object and step with OK, SKIP or FAIL status.
     Recording messages is synchronized and it can be called from different threads.
     """
@@ -63,7 +63,10 @@ def record_junit(object, step, status, start=0.0):
         elif status.startswith("SKIP"):
             append_file(JUNIT_LOGFILE, f'<skipped message="{status}" type="{step}-skipped" />\n')
         elif status.startswith("FAIL"):
-            append_file(JUNIT_LOGFILE, f'<failure message="{status}" type="${step}-failure" />\n')
+            desc = ''
+            if log_filepath:
+                desc = f"\n{escape_xml(get_last_n_lines(log_filepath, 15))}\n"
+            append_file(JUNIT_LOGFILE, f'<failure message="{status}" type="${step}-failure">{desc}</failure>\n')
         else:
             raise Exception(f"Invalid junit status '{status}'")
         # Close the test case block
@@ -236,3 +239,24 @@ def retry_on_exception(max_attempts, func, *args, **kwargs):
                 print_msg(f"Error: Reached maximum of {max_attempts} attempts, fatal error")
                 # Propagate the exception to the caller
                 raise
+
+
+def get_last_n_lines(filename: str, lines: int):
+    """Get last N lines from a file"""
+    with open(filename, 'rb') as f:
+        # Go to the end of the file to get its length.
+        len = f.seek(0, 2)
+        # Iterate from end of the file to the beginning of the file
+        # char by char counting newlines.
+        for i in range(len, 0, -1):
+            f.seek(i)
+            if f.read(1) == b'\n':
+                lines -= 1
+            if lines < 0:
+                break
+        return f.read().decode(encoding='utf-8').strip()
+
+
+def escape_xml(input: str):
+    """Escape xml by replacing &<>\' chars with their character references"""
+    return input.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;").replace("'", "&apos;")

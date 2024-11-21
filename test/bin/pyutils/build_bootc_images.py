@@ -254,7 +254,7 @@ def process_containerfile(groupdir, containerfile, dry_run):
             common.run_command_in_shell(push_args, dry_run, logfile, logfile)
             common.record_junit(cf_path, "push-container", "OK", start)
     except Exception:
-        common.record_junit(cf_path, "process-container", "FAILED", start_process_container)
+        common.record_junit(cf_path, "process-container", "FAILED", start_process_container, log_filepath=cf_logfile)
         # Propagate the exception to the caller
         raise
     finally:
@@ -338,7 +338,7 @@ def process_image_bootc(groupdir, bootcfile, dry_run):
             common.retry_on_exception(3, common.run_command_in_shell, build_args, dry_run, logfile, logfile)
             common.record_junit(bf_path, "build-bootc-image", "OK", start)
     except Exception:
-        common.record_junit(bf_path, "process-bootc-image", "FAILED", start_process_bootc_image)
+        common.record_junit(bf_path, "process-bootc-image", "FAILED", start_process_bootc_image, log_filepath=bf_logfile)
         # Propagate the exception to the caller
         raise
     finally:
@@ -431,7 +431,7 @@ def process_container_encapsulate(groupdir, containerfile, dry_run):
             common.retry_on_exception(3, common.run_command_in_shell, copy_args, dry_run, logfile, logfile)
             common.record_junit(ce_path, "copy-image", "OK", start)
     except Exception:
-        common.record_junit(ce_path, "process-container-encapsulate", "FAILED", start_process_container_encapsulate)
+        common.record_junit(ce_path, "process-container-encapsulate", "FAILED", start_process_container_encapsulate, log_filepath=ce_logfile)
         # Propagate the exception to the caller
         raise
     finally:
