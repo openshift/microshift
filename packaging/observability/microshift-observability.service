@@ -1,0 +1,12 @@
+[Unit]
+Description=MicroShift Observability
+After=microshift.service
+PartOf=microshift.service
+
+[Service]
+ExecStart=/usr/bin/opentelemetry-collector --config=/etc/microshift/opentelemetry-collector.yaml
+Restart=always
+User=root
+
+[Install]
+RequiredBy=microshift.service
