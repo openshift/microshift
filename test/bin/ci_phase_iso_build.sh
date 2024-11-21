@@ -65,9 +65,8 @@ update_build_cache() {
 
     # Build the composer-cli base layer to be cached
     $(dry_run) bash -x ./bin/build_images.sh -l ./image-blueprints/layer1-base
-    # Build the bootc base groups to be cached
-    $(dry_run) bash -x ./bin/build_bootc_images.sh -g ./image-blueprints/layer5-bootc/group0
-    $(dry_run) bash -x ./bin/build_bootc_images.sh -g ./image-blueprints/layer5-bootc/group1
+    # Build the bootc base layer to be cached
+    $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/layer1-base
 
     # Upload the images and update the 'last' setting
     ./bin/manage_build_cache.sh upload  -b "${SCENARIO_BUILD_BRANCH}" -t "${SCENARIO_BUILD_TAG}"
@@ -102,7 +101,8 @@ run_image_build() {
 
 # Run bootc image build
 run_bootc_image_build() {
-    $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints/layer5-bootc
+    $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/layer1-base
+    $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/layer2-source
 }
 
 cat /etc/os-release
