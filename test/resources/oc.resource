@@ -119,6 +119,12 @@ Named Daemonset Should Be Available
     [Arguments]    ${name}    ${ns}=${NAMESPACE}    ${timeout}=${DEFAULT_WAIT_TIMEOUT}
     Oc Wait    -n ${ns} daemonset ${name}    --for=jsonpath='{.status.numberAvailable}'=1 --timeout=${timeout}
 
+Wait Until Resource Exists
+    [Documentation]    Waits for a resource to exist.
+    [Arguments]    ${type}    ${name}    ${ns}=${NAMESPACE}    ${timeout}=${DEFAULT_WAIT_TIMEOUT}
+    Wait Until Keyword Succeeds    ${timeout}    5s
+    ...    Oc Get    ${type}    ${ns}    ${name}
+
 Named PVC Should Be Resized
     [Documentation]    Wait for pvc with ${name} to resize to ${to_size}
     ...    ${name}    Name of pvc to wait for
