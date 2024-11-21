@@ -1,0 +1,90 @@
+# Opentelemetry-collector-small.yaml provides a minimal set of metrics and logs for monitoring system, node, and
+# workload resource usage for CPU, Memory, Disk, and Network. Included also are all cluster events of "Warning" type.
+
+# This configuration exports:
+# - Contain, Pod, and Node metrics
+# - Kubernetes Events (Warnings only)
+# - Host's CPU, Mem, Disk, and Network Metrics
+# - System journals for microshift.service, microshift-observability.service, and microshift-etcd.scope, priority < Info
+
+receivers:
+  kubeletstats:
+    auth_type: tls
+    ca_file: /var/lib/microshift/certs/ca-bundle/client-ca.crt
+    key_file: /var/lib/microshift/certs/admin-kubeconfig-signer/openshift-observability-client/client.key
+    cert_file: /var/lib/microshift/certs/admin-kubeconfig-signer/openshift-observability-client/client.crt
+    insecure_skip_verify: true
+    collection_interval: 20s
+    endpoint: "${env:K8S_NODE_NAME}:10250"
+    node: ${env:K8S_NODE_NAME}
+    k8s_api_config:
+      auth_type: kubeConfig
+  k8s_events:
+    auth_type: kubeConfig
+  hostmetrics:
+    root_path: /
+    collection_interval: 10s
+    scrapers:
+      cpu:
+      memory:
+      network:
+      disk:
+      filesystem:
+  journald:
+    units:
+      - microshift
+      - microshift-observability
+      - microshift-etcd
+      - crio
+      - openvswitch.service
+
+processors:
+  batch:
+  resourcedetection/system:
+    detectors: [ "system" ]
+    system:
+      hostname_sources: [ "os" ]
+
+exporters:
+  otlp:
+    sending_queue:
+      storage: file_storage
+    endpoint: ${env:K8S_NODE_NAME}:4317 # Valid OTLP endpoint required
+    tls:
+      insecure: true
+
+extensions:
+  file_storage:
+    directory: /var/lib/microshift-observability
+
+service:
+  extensions: [ file_storage ]
+  pipelines:
+    metrics/kubeletstats:
+      receivers: [ kubeletstats ]
+      processors: [ batch ]
+      exporters: [ otlp ]  # Uncomment to enable OTLP
+    metrics/hostmetrics:
+      receivers: [ hostmetrics ]
+      processors: [ resourcedetection/system, batch ]
+      exporters: [ otlp ]  # Uncomment to enable OTLP
+    logs/kube_events:
+      receivers: [ k8s_events ]
+      processors: [ resourcedetection/system, batch ]
+      exporters: [ otlp ]
+    logs/host:
+      receivers: [ hostmetrics ]
+      processors: [ resourcedetection/system ]
+      exporters: [ otlp ]
+    logs/journald:
+      receivers: [ journald ]
+      processors: [ resourcedetection/system ]
+      exporters: [ otlp ]
+  telemetry:
+    metrics:
+      readers:
+        - periodic:
+            exporter:
+              otlp:
+                protocol: http/protobuf
+                endpoint: http://127.0.0.1:4318
