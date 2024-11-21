@@ -8,6 +8,7 @@ import os
 import platform
 import re
 import sys
+import time
 import traceback
 
 import common
@@ -226,6 +227,7 @@ def process_containerfile(groupdir, containerfile, dry_run):
     run_template_cmd(cf_path, cf_outfile, dry_run)
 
     common.print_msg(f"Processing {containerfile} with logs in {cf_logfile}")
+    start_process_container = time.time()
     try:
         # Redirect the output to the log file
         with open(cf_logfile, 'w') as logfile:
@@ -239,18 +241,20 @@ def process_containerfile(groupdir, containerfile, dry_run):
                 "-t", cf_outname, "-f", cf_outfile,
                 IMAGEDIR
             ]
+            start = time.time()
             common.retry_on_exception(3, common.run_command_in_shell, build_args, dry_run, logfile, logfile)
-            common.record_junit(cf_path, "build-container", "OK")
+            common.record_junit(cf_path, "build-container", "OK", start)
 
             push_args = [
                 "sudo", "podman", "push",
                 cf_outname,
                 f"{MIRROR_REGISTRY}/{cf_outname}"
             ]
+            start = time.time()
             common.run_command_in_shell(push_args, dry_run, logfile, logfile)
-            common.record_junit(cf_path, "push-container", "OK")
+            common.record_junit(cf_path, "push-container", "OK", start)
     except Exception:
-        common.record_junit(cf_path, "process-container", "FAILED")
+        common.record_junit(cf_path, "process-container", "FAILED", start_process_container)
         # Propagate the exception to the caller
         raise
     finally:
@@ -286,6 +290,7 @@ def process_image_bootc(groupdir, bootcfile, dry_run):
     run_template_cmd(bf_path, bf_outfile, dry_run)
 
     common.print_msg(f"Processing {bootcfile} with logs in {bf_logfile}")
+    start_process_bootc_image = time.time()
     try:
         # Redirect the output to the log file
         with open(bf_logfile, 'w') as logfile:
@@ -295,8 +300,9 @@ def process_image_bootc(groupdir, bootcfile, dry_run):
                 "sudo", "podman", "pull",
                 "--authfile", PULL_SECRET, BIB_IMAGE
             ]
+            start = time.time()
             common.retry_on_exception(3, common.run_command_in_shell, pull_args, dry_run, logfile, logfile)
-            common.record_junit(bf_path, "pull-bootc-bib", "OK")
+            common.record_junit(bf_path, "pull-bootc-bib", "OK", start)
 
             # Read the image reference
             bf_imgref = common.read_file(bf_outfile).strip()
@@ -307,8 +313,9 @@ def process_image_bootc(groupdir, bootcfile, dry_run):
                     "sudo", "podman", "pull",
                     "--authfile", PULL_SECRET, bf_imgref
                 ]
+                start = time.time()
                 common.retry_on_exception(3, common.run_command_in_shell, pull_args, dry_run, logfile, logfile)
-                common.record_junit(bf_path, "pull-bootc-image", "OK")
+                common.record_junit(bf_path, "pull-bootc-image", "OK", start)
 
             # The podman command with security elevation and
             # mount of output / container storage
@@ -327,10 +334,11 @@ def process_image_bootc(groupdir, bootcfile, dry_run):
                 "--local",
                 bf_imgref
             ]
+            start = time.time()
             common.retry_on_exception(3, common.run_command_in_shell, build_args, dry_run, logfile, logfile)
-            common.record_junit(bf_path, "build-bootc-image", "OK")
+            common.record_junit(bf_path, "build-bootc-image", "OK", start)
     except Exception:
-        common.record_junit(bf_path, "process-bootc-image", "FAILED")
+        common.record_junit(bf_path, "process-bootc-image", "FAILED", start_process_bootc_image)
         # Propagate the exception to the caller
         raise
     finally:
@@ -388,6 +396,7 @@ def process_container_encapsulate(groupdir, containerfile, dry_run):
     run_template_cmd(ce_path, ce_outfile, dry_run)
 
     common.print_msg(f"Processing {containerfile} with logs in {ce_logfile}")
+    start_process_container_encapsulate = time.time()
     try:
         # Redirect the output to the log file
         with open(ce_logfile, 'w') as logfile:
@@ -407,8 +416,9 @@ def process_container_encapsulate(groupdir, containerfile, dry_run):
                 ce_imgref,
                 f"registry:{ce_targetimg}"
             ]
+            start = time.time()
             common.retry_on_exception(3, common.run_command_in_shell, build_args, dry_run, logfile, logfile)
-            common.record_junit(ce_path, "build-container", "OK")
+            common.record_junit(ce_path, "build-container", "OK", start)
 
             # Copy the image into the local containers storage as it might be
             # necessary for subsequent builds that depend on this container image
@@ -417,10 +427,11 @@ def process_container_encapsulate(groupdir, containerfile, dry_run):
                 f"docker://{ce_targetimg}",
                 f"containers-storage:{ce_localimg}"
             ]
+            start = time.time()
             common.retry_on_exception(3, common.run_command_in_shell, copy_args, dry_run, logfile, logfile)
-            common.record_junit(ce_path, "copy-image", "OK")
+            common.record_junit(ce_path, "copy-image", "OK", start)
     except Exception:
-        common.record_junit(ce_path, "process-container-encapsulate", "FAILED")
+        common.record_junit(ce_path, "process-container-encapsulate", "FAILED", start_process_container_encapsulate)
         # Propagate the exception to the caller
         raise
     finally:

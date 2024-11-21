@@ -43,15 +43,20 @@ def close_junit():
     JUNIT_LOGFILE = None
 
 
-def record_junit(object, step, status):
+def record_junit(object, step, status, start=0.0):
     """Add a message for the specified object and step with OK, SKIP or FAIL status.
     Recording messages is synchronized and it can be called from different threads.
     """
+    t = ''
+    if start != 0.0:
+        duration = time.time() - start
+        t = f' time="{duration}"'
+
     try:
         # BEGIN CRITICAL SECTION
         JUNIT_LOCK.acquire()
 
-        append_file(JUNIT_LOGFILE, f'<testcase classname="{object}" name="{step}">')
+        append_file(JUNIT_LOGFILE, f'<testcase classname="{object}" name="{step}"{t}>')
         # Add a message according to the status
         if status == "OK":
             pass
