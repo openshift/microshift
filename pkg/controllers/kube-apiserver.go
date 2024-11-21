@@ -389,8 +389,21 @@ func (s *KubeAPIServer) Run(ctx context.Context, ready chan<- struct{}, stopped 
 		"--openshift-config", fd.Name(),
 		"-v", strconv.Itoa(s.verbosity),
 	})
+
+	panicChannel := make(chan any, 1)
 	go func() {
+		defer func() {
+			if r := recover(); r != nil {
+				panicChannel <- r
+			}
+		}()
 		errorChannel <- cmd.ExecuteContext(ctx)
 	}()
-	return <-errorChannel
+
+	select {
+	case err := <-errorChannel:
+		return err
+	case perr := <-panicChannel:
+		panic(perr)
+	}
 }

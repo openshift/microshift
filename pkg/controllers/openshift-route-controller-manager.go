@@ -187,9 +187,20 @@ func (s *OCPRouteControllerManager) Run(ctx context.Context, ready chan<- struct
 		close(ready)
 	}()
 
+	panicChannel := make(chan any, 1)
 	go func() {
+		defer func() {
+			if r := recover(); r != nil {
+				panicChannel <- r
+			}
+		}()
 		errc <- s.run(ctx)
 	}()
 
-	return <-errc
+	select {
+	case err := <-errc:
+		return err
+	case perr := <-panicChannel:
+		panic(perr)
+	}
 }
