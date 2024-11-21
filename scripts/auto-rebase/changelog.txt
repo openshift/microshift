@@ -1,0 +1,8 @@
+- ovn-kubernetes image-amd64 86430bef1064d4949b9b0d54accf258532e9e3c4 to fed26197728719ec25a09a43589fd31594775995
+  - 0e118ac 2024-11-15T16:27:56+01:00 Cleanup gateway pod for remote zone. For local zone pods, deleteLogicalPort cleans this up, but before IC this function was called for all non-host-network pods, hence this logic. After IC, deleteLogicalPort won't be called for all remote zone pods, so condition is not needed.
+  - 57a5cf3 2024-11-15T16:26:32+01:00 Add egress gateway e2e test option to delete gateway pod instead of re-labeling gateway pod. It uses different handlers for update and delete pod internally. Remove external.gateway from the dual-stack exclusion, as it is supported for ipv6.
+
+- ovn-kubernetes image-arm64 86430bef1064d4949b9b0d54accf258532e9e3c4 to fed26197728719ec25a09a43589fd31594775995
+  - 0e118ac 2024-11-15T16:27:56+01:00 Cleanup gateway pod for remote zone. For local zone pods, deleteLogicalPort cleans this up, but before IC this function was called for all non-host-network pods, hence this logic. After IC, deleteLogicalPort won't be called for all remote zone pods, so condition is not needed.
+  - 57a5cf3 2024-11-15T16:26:32+01:00 Add egress gateway e2e test option to delete gateway pod instead of re-labeling gateway pod. It uses different handlers for update and delete pod internally. Remove external.gateway from the dual-stack exclusion, as it is supported for ipv6.
+
