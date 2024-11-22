@@ -32,7 +32,7 @@ function mirror_registry() {
         local dst_img
         dst_img=$(echo "${src_img}" | cut -d '/' -f 2-)
         local dst_img_no_tag
-        dst_img_no_tag=$(echo "${dst_img}" | awk -F'@|:' '{print $1}')
+        dst_img_no_tag="${dst_img%%[@:]*}"
         # Add the target registry prefix
         dst_img="${dest_registry}/${dst_img}"
         dst_img_no_tag="${dest_registry}/${dst_img_no_tag}"
@@ -56,10 +56,8 @@ function mirror_registry() {
 
     # Export functions for xargs to use
     export -f process_image_copy
-    # Generate a list with an incremental counter for each image and run copy in parallel.
-    # Note that the counter and image pairs are passed as one argument by replacing "{}" in xarg input.
-    awk '{print NR, $0}' "${img_file_list}" | \
-        xargs -P 8 -I {} \
+    # Note that images are passed as one argument by replacing "{}" in xarg input.
+    xargs -P 8 -I {} -a "${img_file_list}" \
         bash -c 'process_image_copy "$@"' _ "${img_pull_file}" "${dest_registry}" "{}"
 }
 
@@ -111,7 +109,7 @@ function dir_to_registry() {
         src_img=$(dirname "${src_manifest}")
         # Add the target registry prefix and remove SHA
         local -r dst_img="${dest_registry}/${src_img}"
-        local -r dst_img_no_tag="${dest_registry}/$(echo "${src_img}" | awk -F'@|:' '{print $1}')"
+        local -r dst_img_no_tag="${dest_registry}/${src_img%%[@:]*}"
 
         # Run the image upload and tag commands
         echo "Uploading '${src_img}' to '${dst_img}'"
