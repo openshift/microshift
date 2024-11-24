@@ -1,6 +1,6 @@
 FROM registry.redhat.io/rhel9/rhel-bootc:9.4
 
-ARG USHIFT_VER=4.16
+ARG USHIFT_VER=4.17
 RUN dnf config-manager \
         --set-enabled "rhocp-${USHIFT_VER}-for-rhel-9-$(uname -m)-rpms" \
         --set-enabled "fast-datapath-for-rhel-9-$(uname -m)-rpms"
