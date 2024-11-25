@@ -132,11 +132,9 @@ clean:
 4.16-el94:
 	@$(MAKE) rhocp USHIFT_VER=4.16
 
-.PHONY: 4.17-rc-el94
-4.17-rc-el94:
-	@$(MAKE) repourl \
-		USHIFT_URL=https://mirror.openshift.com/pub/openshift-v4/$$(uname -m)/microshift/ocp/latest-4.17/el9/os/ \
-		OCPDEP_URL=https://mirror.openshift.com/pub/openshift-v4/$$(uname -m)/dependencies/rpms/4.17-el9-beta/
+.PHONY: 4.17-el94
+4.17-el94:
+	@$(MAKE) rhocp USHIFT_VER=4.17
 
 .PHONY: 4.18-ec-cos9
 4.18-ec-cos9:
