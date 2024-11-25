@@ -1,6 +1,6 @@
-[{{ ocp_repo_name }}]
-name=MicroShift {{ ocp_version }}  RPMs for RHEL {{ ansible_distribution_major_version }}
-baseurl={{ ocpbeta_base_url }}
+[{{ item.repo_name }}]
+name=MicroShift {{ ocp_version }} RPMs for RHEL {{ ansible_distribution_major_version }}
+baseurl={{ item.repo_url }}
 enabled=1
 gpgcheck=0
 skip_if_unavailable=0

@@ -1,0 +1,13 @@
+- name: create mirrors block
+  block:
+    - name: check if microshift_version is valid for pre-release
+      ansible.builtin.uri:
+        url: "{{ item.repo_url }}"
+        method: GET
+        status_code: 200
+        timeout: 5
+
+    - name: install microshift mirror repo for pre-releases
+      ansible.builtin.template:
+        src: ocpbeta.repo.j2
+        dest: "/etc/yum.repos.d/{{ item.repo_name }}.repo"
