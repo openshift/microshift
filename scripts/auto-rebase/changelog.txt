@@ -1,63 +1,21 @@
-- kubernetes embedded-component 82afd7768f00679805ad74bb832b393f5e3215cc to 5a24e858060a609366c5ff1402ec1424e9f7e403
-  - 7d05d3567 2024-11-13T18:14:21+00:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
-  - 00f20d443 2024-10-22T20:26:47+00:00 Release commit for Kubernetes v1.30.6
-  - 4dea121a2 2024-10-16T10:32:45-07:00 bump golang to 1.22.8
-  - d60b52f2a 2024-10-09T21:38:12+08:00 kubeadm: fix a bug where the RemoveMember function did not return the correct member list when the member to be removed did not exist
-  - 3a295d45a 2024-10-02T07:09:10-04:00 Fix deleted UDP endpoint detection
-  - 8b6280115 2024-10-01T07:05:26-04:00 Fix daemonset to ensure old unhealthy pods are counted towards max unavailable budget.
-  - 2ed334849 2024-09-25T19:25:03+08:00 kubeadm: check the member list status before adding or removing an etcd member
-  - bbba9afbb 2024-09-25T19:25:03+08:00 kubeadm: check whether the peer URL for the added etcd member already exists when the MemberAddAsLearner/MemberAdd fails
-  - 3bf7f842e 2024-09-24T11:30:56-07:00 bump go to 1.22.7
-  - 47c8669c0 2024-09-18T11:09:17-07:00 bugfix: endpoints controller track resource version conrrectly
-  - 9844402a9 2024-09-18T11:09:17-07:00 define some default kube-apiserver flags for tests disabling unneded controllers
-  - a82c315d2 2024-09-17T11:47:46+02:00 Remove `socat` and `ebtables` from kubeadm preflight checks
-  - 7d80a596f 2024-09-13T14:24:51+00:00 Add activeDeadlineSeconds to kubeadm upgrade-health-check job
-  - cb805766a 2024-09-12T00:33:42+00:00 Update CHANGELOG/CHANGELOG-1.30.md for v1.30.5
-  - a361ec621 2024-09-11T23:19:37+00:00 run update-vendor.sh and fix up broken go.sum(s)
-  - 074f92595 2024-09-11T21:55:19+00:00 Fix verify-vendor script to check all go.mod and go.sum files
-  - caf31c0dc 2024-08-29T00:15:41+00:00 update vendor
-  - 95ebd3954 2024-08-29T00:12:56+00:00 fix memory leak from global MeterProvider
+- cluster-network-operator embedded-component 2d07471a3f426950740f269ae79a4b331f6f2d0a to 7768811ef167eb33a0eaafc5c3eb30fdd02470fd
+  - b90ac63 2024-11-22T09:36:55-08:00 OVN-Kubernetes node RBAC tightening
+  - 717e5f7 2024-11-15T08:37:26+00:00 bindata, ovn-k: Add ClusterUserDefinedNetwork CRD and RBAC
+  - 2fc56fc 2024-11-12T17:40:55+01:00 Use host ipsec binary and libraries
+  - b8a074a 2024-11-12T17:40:46+01:00 Provide support for user owned IPsec machine configs
+  - 9027fd9 2024-10-29T18:59:39+00:00 onv-k, udn: Update UserDefinedNetwork CRD
+  - f657323 2024-10-21T15:58:16+00:00 Adds UDN list/watch to ovnknode rbac
 
-- machine-config-operator embedded-component 5ea53a326ccda8712e2d5c93ba503e17e4a7c385 to 39e1cd3c3b04229c48988be1fb7f99b95856aff3
-  - e1073e62 2024-11-14T16:36:37+00:00 Disable tx chksum for driver IDPF on GCP C3/C4
+- machine-config-operator embedded-component 39e1cd3c3b04229c48988be1fb7f99b95856aff3 to f5d2289db0692156343a4f8e48b654583d1c7352
+  - 57e60ff6 2024-11-22T15:52:02-05:00 Revert "Merge pull request #4635 from sohankunkerkar/default-runc"
+  - 5bf9366d 2024-11-21T16:32:22-05:00 controller: default to runc when upgrading clusters from 4.17 to 4.18
 
-- kubernetes image-amd64 82afd7768f00679805ad74bb832b393f5e3215cc to 5a24e858060a609366c5ff1402ec1424e9f7e403
-  - 7d05d3567 2024-11-13T18:14:21+00:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
-  - 00f20d443 2024-10-22T20:26:47+00:00 Release commit for Kubernetes v1.30.6
-  - 4dea121a2 2024-10-16T10:32:45-07:00 bump golang to 1.22.8
-  - d60b52f2a 2024-10-09T21:38:12+08:00 kubeadm: fix a bug where the RemoveMember function did not return the correct member list when the member to be removed did not exist
-  - 3a295d45a 2024-10-02T07:09:10-04:00 Fix deleted UDP endpoint detection
-  - 8b6280115 2024-10-01T07:05:26-04:00 Fix daemonset to ensure old unhealthy pods are counted towards max unavailable budget.
-  - 2ed334849 2024-09-25T19:25:03+08:00 kubeadm: check the member list status before adding or removing an etcd member
-  - bbba9afbb 2024-09-25T19:25:03+08:00 kubeadm: check whether the peer URL for the added etcd member already exists when the MemberAddAsLearner/MemberAdd fails
-  - 3bf7f842e 2024-09-24T11:30:56-07:00 bump go to 1.22.7
-  - 47c8669c0 2024-09-18T11:09:17-07:00 bugfix: endpoints controller track resource version conrrectly
-  - 9844402a9 2024-09-18T11:09:17-07:00 define some default kube-apiserver flags for tests disabling unneded controllers
-  - a82c315d2 2024-09-17T11:47:46+02:00 Remove `socat` and `ebtables` from kubeadm preflight checks
-  - 7d80a596f 2024-09-13T14:24:51+00:00 Add activeDeadlineSeconds to kubeadm upgrade-health-check job
-  - cb805766a 2024-09-12T00:33:42+00:00 Update CHANGELOG/CHANGELOG-1.30.md for v1.30.5
-  - a361ec621 2024-09-11T23:19:37+00:00 run update-vendor.sh and fix up broken go.sum(s)
-  - 074f92595 2024-09-11T21:55:19+00:00 Fix verify-vendor script to check all go.mod and go.sum files
-  - caf31c0dc 2024-08-29T00:15:41+00:00 update vendor
-  - 95ebd3954 2024-08-29T00:12:56+00:00 fix memory leak from global MeterProvider
+- operator-framework-olm embedded-component 4cbfa455ffbd86afc26471f29bf46fed9f4779e3 to 649dfc4dc0a7fca1c25c7678665a55ad8ce53040
+  - 7744dd7e 2024-11-19T14:05:22-06:00 fix: call TokenRequest API when service account token secret is missing (#3377)
 
-- kubernetes image-arm64 82afd7768f00679805ad74bb832b393f5e3215cc to 5a24e858060a609366c5ff1402ec1424e9f7e403
-  - 7d05d3567 2024-11-13T18:14:21+00:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
-  - 00f20d443 2024-10-22T20:26:47+00:00 Release commit for Kubernetes v1.30.6
-  - 4dea121a2 2024-10-16T10:32:45-07:00 bump golang to 1.22.8
-  - d60b52f2a 2024-10-09T21:38:12+08:00 kubeadm: fix a bug where the RemoveMember function did not return the correct member list when the member to be removed did not exist
-  - 3a295d45a 2024-10-02T07:09:10-04:00 Fix deleted UDP endpoint detection
-  - 8b6280115 2024-10-01T07:05:26-04:00 Fix daemonset to ensure old unhealthy pods are counted towards max unavailable budget.
-  - 2ed334849 2024-09-25T19:25:03+08:00 kubeadm: check the member list status before adding or removing an etcd member
-  - bbba9afbb 2024-09-25T19:25:03+08:00 kubeadm: check whether the peer URL for the added etcd member already exists when the MemberAddAsLearner/MemberAdd fails
-  - 3bf7f842e 2024-09-24T11:30:56-07:00 bump go to 1.22.7
-  - 47c8669c0 2024-09-18T11:09:17-07:00 bugfix: endpoints controller track resource version conrrectly
-  - 9844402a9 2024-09-18T11:09:17-07:00 define some default kube-apiserver flags for tests disabling unneded controllers
-  - a82c315d2 2024-09-17T11:47:46+02:00 Remove `socat` and `ebtables` from kubeadm preflight checks
-  - 7d80a596f 2024-09-13T14:24:51+00:00 Add activeDeadlineSeconds to kubeadm upgrade-health-check job
-  - cb805766a 2024-09-12T00:33:42+00:00 Update CHANGELOG/CHANGELOG-1.30.md for v1.30.5
-  - a361ec621 2024-09-11T23:19:37+00:00 run update-vendor.sh and fix up broken go.sum(s)
-  - 074f92595 2024-09-11T21:55:19+00:00 Fix verify-vendor script to check all go.mod and go.sum files
-  - caf31c0dc 2024-08-29T00:15:41+00:00 update vendor
-  - 95ebd3954 2024-08-29T00:12:56+00:00 fix memory leak from global MeterProvider
+- oc image-amd64 dde885f94df59c4816acc36814ffec3b55d4a1ca to 8b0472f0fae6851cbf8187a3b509deb9ee1be2c6
+  - 0a5488cf 2024-11-13T19:28:18+00:00 Fix newapp unit test failure by using different image
+
+- oc image-arm64 dde885f94df59c4816acc36814ffec3b55d4a1ca to 8b0472f0fae6851cbf8187a3b509deb9ee1be2c6
+  - 0a5488cf 2024-11-13T19:28:18+00:00 Fix newapp unit test failure by using different image
 
