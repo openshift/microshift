@@ -1,11 +1,3 @@
-- machine-config-operator embedded-component 57cf623924677f8385cc2cb9ac2bc81a0d2a1359 to 657ab58b76a99f2e566714bead33674c08ff9301
-  - 9c2db3da 2024-11-06T16:15:45-06:00 Fix for adding cert to controller config
-
-- ovn-kubernetes image-amd64 4b26ee518792233cb47f495064ac28789dcca2ba to 0d35785ab8c4fccea85a0d2e6dc49fe1da2d11cd
-  - 2010fe4 2024-11-08T08:24:02+00:00 Cleanup gateway pod for remote zone. For local zone pods, deleteLogicalPort cleans this up, but before IC this function was called for all non-host-network pods, hence this logic. After IC, deleteLogicalPort won't be called for all remote zone pods, so condition is not needed.
-  - e94f28d 2024-11-08T08:24:02+00:00 Add egress gateway e2e test option to delete gateway pod instead of re-labeling gateway pod. It uses different handlers for update and delete pod internally. Remove external.gateway from the dual-stack exclusion, as it is supported for ipv6.
-
-- ovn-kubernetes image-arm64 4b26ee518792233cb47f495064ac28789dcca2ba to 0d35785ab8c4fccea85a0d2e6dc49fe1da2d11cd
-  - 2010fe4 2024-11-08T08:24:02+00:00 Cleanup gateway pod for remote zone. For local zone pods, deleteLogicalPort cleans this up, but before IC this function was called for all non-host-network pods, hence this logic. After IC, deleteLogicalPort won't be called for all remote zone pods, so condition is not needed.
-  - e94f28d 2024-11-08T08:24:02+00:00 Add egress gateway e2e test option to delete gateway pod instead of re-labeling gateway pod. It uses different handlers for update and delete pod internally. Remove external.gateway from the dual-stack exclusion, as it is supported for ipv6.
+- ovn-kubernetes image-arm64 0d35785ab8c4fccea85a0d2e6dc49fe1da2d11cd to 5de3de7c87247fdc66f7663dd8447a09dbd65526
+  - 6944e3a 2024-11-20T17:02:03+08:00 Bump ovs to 3.1.0-137
 
