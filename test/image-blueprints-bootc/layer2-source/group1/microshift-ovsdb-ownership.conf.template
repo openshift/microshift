@@ -1,0 +1,2 @@
+[Service]
+ExecStartPre=/bin/chown -R openvswitch. /etc/openvswitch

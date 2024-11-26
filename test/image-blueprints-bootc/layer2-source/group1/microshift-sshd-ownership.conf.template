@@ -1,0 +1,2 @@
+[Service]
+ExecStartPre=/usr/bin/find /etc/ssh/ -name "ssh_*_key" -exec /bin/chgrp ssh_keys {} +
