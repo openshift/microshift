@@ -235,8 +235,8 @@ def process_containerfile(groupdir, containerfile, dry_run):
             # Note:
             # - The pull secret is necessary in some builds for pulling embedded
             #   container images specified by SOURCE_IMAGES environment variable
-            # - The --cache-to option updates the build layers in the mirror
-            #   registry so no explicit push-to-mirror is necessary
+            # - The explicit push-to-mirror sets the 'latest' tag as all the build
+            #   layers are in the mirror due to 'cache-to' option
             build_args = [
                 "sudo", "podman", "build",
                 "--authfile", PULL_SECRET,
@@ -249,6 +249,15 @@ def process_containerfile(groupdir, containerfile, dry_run):
             start = time.time()
             common.retry_on_exception(3, common.run_command_in_shell, build_args, dry_run, logfile, logfile)
             common.record_junit(cf_path, "build-container", "OK", start)
+
+            push_args = [
+                "sudo", "podman", "push",
+                cf_outname,
+                f"{MIRROR_REGISTRY}/{cf_outname}"
+            ]
+            start = time.time()
+            common.run_command_in_shell(push_args, dry_run, logfile, logfile)
+            common.record_junit(cf_path, "push-container", "OK", start)
     except Exception:
         common.record_junit(cf_path, "process-container", "FAILED", start_process_container, log_filepath=cf_logfile)
         # Propagate the exception to the caller
