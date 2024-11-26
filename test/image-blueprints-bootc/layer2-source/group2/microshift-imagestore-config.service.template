@@ -1,0 +1,8 @@
+[Unit]
+Description=Configure the image store directory for MicroShift
+Before=microshift.service
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/microshift-imagestore-config /var/lib/containers/storage /var/lib/containers/storage-preloaded
+[Install]
+WantedBy=multi-user.target
