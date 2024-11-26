@@ -1,2 +1,4 @@
+# The openvswitch database files must be owned by the appropriate user
+# and its primary group
 [Service]
-ExecStartPre=/bin/chown -R openvswitch. /etc/openvswitch
+ExecStartPre=/bin/chown -Rh openvswitch. /etc/openvswitch

@@ -1,2 +1,4 @@
+# Change group of ssh key files if they are not owned by root already because
+# that is the new expected default upstream
 [Service]
-ExecStartPre=/usr/bin/find /etc/ssh/ -name "ssh_*_key" -exec /bin/chgrp ssh_keys {} +
+ExecStartPre=/usr/bin/find /etc/ssh/ -name "ssh_*_key" -a '!' -gid 0 -exec /bin/chgrp ssh_keys {} +
