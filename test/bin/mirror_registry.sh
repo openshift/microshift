@@ -84,12 +84,10 @@ EOF
 
 mirror_images() {
     local -r ifile=$1
-    local -r ofile=$(mktemp /tmp/container-list.XXXXXXXX)
     local -r ffile=$(mktemp /tmp/from-list.XXXXXXXX)
+    local -r ofile=$(mktemp /tmp/container-list.XXXXXXXX)
 
-    # Add the distribution registry and non-localhost-FROM images
-    # to the mirrored list explicitly
-    echo "${REGISTRY_IMAGE}" > "${ffile}"
+    # Add non-localhost-FROM images to the mirrored list
     find "${SCRIPTDIR}/../image-blueprints-bootc" -name '*.containerfile' | while read -r cf ; do
         local src_img
         src_img=$(awk '/^FROM / && $2 !~ /^localhost\// {print $2}' "${cf}")
