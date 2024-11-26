@@ -15,7 +15,7 @@ scenario_remove_vms() {
 
 scenario_run_tests() {
     run_tests host1 \
-        --variable "TARGET_REF:rhel94-bootc-source-ostree-parent-yminus2" \
+        --variable "TARGET_REF:rhel94-bootc-source" \
         --variable "BOOTC_REGISTRY:${MIRROR_REGISTRY_URL}" \
         suites/upgrade/upgrade-successful.robot
 }
