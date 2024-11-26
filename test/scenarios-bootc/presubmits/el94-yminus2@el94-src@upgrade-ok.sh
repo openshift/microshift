@@ -3,7 +3,7 @@
 # Sourced from scenario.sh and uses functions defined there.
 
 scenario_create_vms() {
-    prepare_kickstart host1 kickstart-bootc.ks.template rhel94-ostree-microshift-yminus2
+    prepare_kickstart host1 kickstart-bootc.ks.template rhel94-bootc-yminus2
     launch_vm --boot_blueprint rhel94-bootc --bootc
 }
 
