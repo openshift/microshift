@@ -9,7 +9,7 @@ fi
 get_vrel_from_beta() {
     local -r beta_repo="$1"
     local -r beta_vrel=$(\
-        sudo dnf repoquery microshift \
+        dnf repoquery microshift \
             --quiet \
             --queryformat '%{version}-%{release}' \
             --disablerepo '*' \
@@ -26,7 +26,7 @@ get_vrel_from_beta() {
 get_vrel_from_rhsm() {
     local -r rhsm_repo="$1"
     local -r rhsm_vrel=$(\
-        sudo dnf repoquery microshift \
+        dnf repoquery microshift \
             --quiet \
             --queryformat '%{version}-%{release}' \
             --repo "${rhsm_repo}" \

@@ -54,9 +54,9 @@ extract_container_images() {
         dnf_options="--repo ${repo_spec}"
     fi
     # shellcheck disable=SC2086  # double quotes
-    sudo dnf download ${dnf_options} microshift-release-info-"${version}"
+    dnf download ${dnf_options} microshift-release-info-"${version}"
     get_container_images "${version}" "${IMAGEDIR}/release-info-rpms" | sed 's/,/\n/g' >> "${outfile}"
-    sudo rm -f microshift-release-info-*.rpm
+    rm -f microshift-release-info-*.rpm
     popd
 }
 
