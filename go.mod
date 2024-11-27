@@ -2,7 +2,7 @@ module github.com/openshift/microshift
 
 go 1.22.5
 
-toolchain go1.22.7
+toolchain go1.22.9
 
 require (
 	github.com/apparentlymart/go-cidr v1.1.0
@@ -20,7 +20,7 @@ require (
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.9.0
 	github.com/vishvananda/netlink v1.1.0
-	go.etcd.io/etcd/client/pkg/v3 v3.5.16
+	go.etcd.io/etcd/client/pkg/v3 v3.5.17
 	go.etcd.io/etcd/client/v3 v3.5.14
 	golang.org/x/sys v0.25.0
 	gopkg.in/yaml.v3 v3.0.1
@@ -159,7 +159,7 @@ require (
 	github.com/syndtr/gocapability v0.0.0-20200815063812-42c35b437635 // indirect
 	github.com/vishvananda/netns v0.0.4 // indirect
 	github.com/xlab/treeprint v1.2.0 // indirect
-	go.etcd.io/etcd/api/v3 v3.5.16 // indirect
+	go.etcd.io/etcd/api/v3 v3.5.17 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/github.com/emicklei/go-restful/otelrestful v0.42.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.53.0 // indirect
@@ -247,9 +247,9 @@ replace (
 )
 
 replace (
-	go.etcd.io/etcd/api/v3 => github.com/openshift/etcd/api/v3 v3.5.1-0.20241105150955-e8a81bac544c // from etcd
-	go.etcd.io/etcd/client/pkg/v3 => github.com/openshift/etcd/client/pkg/v3 v3.5.1-0.20241105150955-e8a81bac544c // from etcd
-	go.etcd.io/etcd/client/v3 => github.com/openshift/etcd/client/v3 v3.5.1-0.20241105150955-e8a81bac544c // from etcd
+	go.etcd.io/etcd/api/v3 => github.com/openshift/etcd/api/v3 v3.5.1-0.20241118170732-914783cae63a // from etcd
+	go.etcd.io/etcd/client/pkg/v3 => github.com/openshift/etcd/client/pkg/v3 v3.5.1-0.20241118170732-914783cae63a // from etcd
+	go.etcd.io/etcd/client/v3 => github.com/openshift/etcd/client/v3 v3.5.1-0.20241118170732-914783cae63a // from etcd
 )
 
 replace sigs.k8s.io/kube-storage-version-migrator => github.com/openshift/kubernetes-kube-storage-version-migrator v0.0.3-0.20240910155719-50d17147f15d // release kube-storage-version-migrator via kubernetes-kube-storage-version-migrator
