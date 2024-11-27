@@ -1,4 +1,8 @@
-# The openvswitch database files must be owned by the appropriate user
-# and its primary group
+# The openvswitch database files must be owned by the appropriate user and its
+# primary group. Note that the user and its group may be overwritten too, so
+# they need to be recreated in this case.
 [Service]
-ExecStartPre=/bin/chown -Rh openvswitch. /etc/openvswitch
+ExecStartPre=/bin/sh -c '/bin/getent passwd openvswitch >/dev/null || useradd -r openvswitch'
+ExecStartPre=/bin/sh -c '/bin/getent group hugetlbfs >/dev/null || groupadd -r hugetlbfs'
+ExecStartPre=/sbin/usermod -a -G hugetlbfs openvswitch
+ExecStartPre=/bin/chown -Rhv openvswitch. /etc/openvswitch
