@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/openshift/microshift/pkg/util/sigchannel"
+	"github.com/openshift/microshift/pkg/util/startuplogger"
 	"k8s.io/klog/v2"
 )
 
@@ -62,6 +63,8 @@ func (m *ServiceManager) Run(ctx context.Context, ready chan<- struct{}, stopped
 	// 	fmt.Error("error: %v", err)
 	// }
 
+	startupLogger := startuplogger.NewStartupLogger()
+
 	readyMap := make(map[string]<-chan struct{})
 	stoppedMap := make(map[string]<-chan struct{})
 
@@ -84,7 +87,7 @@ func (m *ServiceManager) Run(ctx context.Context, ready chan<- struct{}, stopped
 		}
 
 		// Start the service and store its ready and stopped channels
-		serviceReady, serviceStopped := m.asyncRun(ctx, service)
+		serviceReady, serviceStopped := m.asyncRun(ctx, service, startupLogger)
 		readyMap[service.Name()] = serviceReady
 		stoppedMap[service.Name()] = serviceStopped
 	}
@@ -95,13 +98,20 @@ func (m *ServiceManager) Run(ctx context.Context, ready chan<- struct{}, stopped
 		close(ready)
 	}()
 
+	//TODO redo this
+	err := startupLogger.OutputData()
+	if err != nil {
+		klog.Errorf("failed to write to file")
+	}
+
 	// Stop manager when all services stopped
 	<-sigchannel.And(values(stoppedMap))
 	return ctx.Err()
 }
 
-func (m *ServiceManager) asyncRun(ctx context.Context, service Service) (<-chan struct{}, <-chan struct{}) {
+func (m *ServiceManager) asyncRun(ctx context.Context, service Service, startupLogger *startuplogger.StartupLogger) (<-chan struct{}, <-chan struct{}) {
 	ready, stopped := make(chan struct{}), make(chan struct{})
+
 	klog.WithMicroshiftLoggerComponent(service.Name(), func() {
 		go func() {
 			defer func() {
@@ -122,6 +132,7 @@ func (m *ServiceManager) asyncRun(ctx context.Context, service Service) (<-chan 
 			go func() {
 				<-ready
 				klog.InfoS("SERVICE READY", "service", service.Name(), "since-start", time.Since(svcStart))
+				startupLogger.LogService(service.Name(), service.Dependencies(), svcStart, time.Now())
 			}()
 			go func() {
 				<-stopped
