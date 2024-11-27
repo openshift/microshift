@@ -21,6 +21,10 @@ apiServer:
             - ""
     subjectAltNames:
         - ""
+    tls:
+        cipherSuites:
+            - ""
+        minVersion: ""
 debugging:
     logLevel: ""
 dns:
@@ -102,6 +106,10 @@ apiServer:
             - ""
     subjectAltNames:
         - ""
+    tls:
+        cipherSuites:
+            - ""
+        minVersion: v1.2
 debugging:
     logLevel: Normal
 dns:

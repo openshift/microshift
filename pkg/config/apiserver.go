@@ -32,6 +32,8 @@ type ApiServer struct {
 	// advertising because of dual stack limitations there. This is only to
 	// make ovnk work properly.
 	AdvertiseAddresses []string `json:"-"`
+
+	TLS TLSConfig `json:"tls"`
 }
 
 // NamedCertificateEntry provides certificate details
@@ -54,4 +56,16 @@ type AuditLog struct {
 	// profile is the OpenShift profile specifying a specific logging policy
 	// +kubebuilder:default=Default
 	Profile string `json:"profile"`
+}
+
+type TLSConfig struct {
+	// CipherSuites lists the allowed cipher suites that the API server will
+	// accept and serve.
+	CipherSuites []string `json:"cipherSuites"`
+
+	// MinVersion specifies which TLS version is the minimum version of TLS
+	// to serve from the API server.
+	// +kubebuilder:validation:Enum:=v1.2;v1.3
+	// +kubebuilder:default=v1.2
+	MinVersion string `json:"minVersion"`
 }
