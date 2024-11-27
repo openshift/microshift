@@ -31,7 +31,7 @@ HOME_DIR = common.get_env_var("HOME")
 PULL_SECRET = common.get_env_var('PULL_SECRET', f"{HOME_DIR}/.pull-secret.json")
 # Switch to quay.io/centos-bootc/bootc-image-builder:latest if any new upstream
 # features are required
-BIB_IMAGE = "registry.redhat.io/rhel9/bootc-image-builder:latest"
+BIB_IMAGE = "registry.redhat.io/rhel9/bootc-image-builder:9.5-1731471209"
 GOMPLATE = common.get_env_var('GOMPLATE')
 MIRROR_REGISTRY = common.get_env_var('MIRROR_REGISTRY_URL')
 FORCE_REBUILD = False
