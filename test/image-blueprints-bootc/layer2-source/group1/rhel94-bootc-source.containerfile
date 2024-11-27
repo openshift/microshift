@@ -38,8 +38,5 @@ RUN firewall-offline-cmd --zone=public --add-port=22/tcp && \
 
 # Install systemd configuration drop-ins to fix potential permission problems
 # when upgrading from older ostree commits to bootc container layers
-RUN mkdir -p /etc/systemd/system/sshd.service.d && \
-    mkdir -p /etc/systemd/system/ovsdb-server.service.d
-
-COPY --chmod=644 ./bootc-images/microshift-sshd-ownership.conf /etc/systemd/system/sshd.service.d/microshift-sshd-ownership.conf
+RUN mkdir -p /etc/systemd/system/ovsdb-server.service.d
 COPY --chmod=644 ./bootc-images/microshift-ovsdb-ownership.conf /etc/systemd/system/ovsdb-server.service.d/microshift-ovsdb-ownership.conf

@@ -128,11 +128,14 @@ EOF
 
 # WORKAROUND START
 # When going from "just RHEL" to RHEL+MicroShift+dependencies there might be a
-# problem with groups. Following line ensures that sshd's keys are owned by
+# problem with groups. Following line ensures that sshd keys are owned by
 # ssh_keys group and not some other.
-# When removing, change Before= in microshift-test-agent.service
+# Note:
+# - Only change group if the keys are not already owned by root because that is
+#   the new expected default upstream
+# - When removing the workaround, change Before= in microshift-test-agent.service
 if [ -d /etc/ssh ] ; then
-    find /etc/ssh -name 'ssh_host*key' -exec chown -v root:ssh_keys {} \;
+    find /etc/ssh -name 'ssh_host*key' -a '!' -gid 0 -exec chown -v root:ssh_keys {} \;
 else
     echo "The /etc/ssh directory does not exist, skipping file ownership update"
 fi
