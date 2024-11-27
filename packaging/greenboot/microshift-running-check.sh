@@ -54,19 +54,6 @@ function lvmsShouldBeDeployed() {
     fi
 }
 
-# Check if MicroShift API 'readyz' and 'livez' health endpoints are OK
-#
-# args: None
-# return: 0 if all API health endpoints are OK, or 1 otherwise
-function microshift_health_endpoints_ok() {
-    local -r check_rd=$(${OCGET_CMD} --raw='/readyz?verbose' | awk '$2 != "ok"')
-    local -r check_lv=$(${OCGET_CMD} --raw='/livez?verbose'  | awk '$2 != "ok"')
-
-    [ "${check_rd}" != "readyz check passed" ] && return 1
-    [ "${check_lv}" != "livez check passed"  ] && return 1
-    return 0
-}
-
 # Check if any MicroShift pods are in the 'Running' status
 #
 # args: None
@@ -104,16 +91,6 @@ fi
 WAIT_TIMEOUT_SECS=$(get_wait_timeout)
 
 /usr/bin/microshift healthcheck -v=2 --timeout="${WAIT_TIMEOUT_SECS}s"
-
-# Wait for MicroShift API health endpoints to be OK
-echo "Waiting ${WAIT_TIMEOUT_SECS}s for MicroShift API health endpoints to be OK"
-if ! wait_for "${WAIT_TIMEOUT_SECS}" microshift_health_endpoints_ok ; then
-    log_failure_cmd "health-readyz" "${OCGET_CMD} --raw=/readyz?verbose"
-    log_failure_cmd "health-livez"  "${OCGET_CMD} --raw=/livez?verbose"
-
-    echo "Error: Timed out waiting for MicroShift API health endpoints to be OK"
-    exit 1
-fi
 
 if lvmsShouldBeDeployed; then
     PODS_NS_LIST+=(openshift-storage)
