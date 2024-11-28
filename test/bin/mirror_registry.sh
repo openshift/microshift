@@ -37,12 +37,14 @@ setup_registry() {
     prefix = ""
     location = "${REGISTRY_HOST}"
     insecure = true
+
 [[registry]]
     prefix = ""
     location = "quay.io"
 [[registry.mirror]]
     location = "${REGISTRY_HOST}"
     insecure = true
+
 [[registry]]
     prefix = ""
     location = "registry.redhat.io"
