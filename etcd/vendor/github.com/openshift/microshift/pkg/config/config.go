@@ -242,6 +242,12 @@ func (c *Config) incorporateUserSettings(u *Config) {
 	if u.ApiServer.AuditLog.MaxFileSize != 0 {
 		c.ApiServer.AuditLog.MaxFileSize = u.ApiServer.AuditLog.MaxFileSize
 	}
+	if len(u.ApiServer.TLS.CipherSuites) != 0 {
+		c.ApiServer.TLS.CipherSuites = u.ApiServer.TLS.CipherSuites
+	}
+	if u.ApiServer.TLS.MinVersion != "" {
+		c.ApiServer.TLS.MinVersion = u.ApiServer.TLS.MinVersion
+	}
 
 	if u.Debugging.LogLevel != "" {
 		c.Debugging.LogLevel = u.Debugging.LogLevel
@@ -415,6 +421,10 @@ func (c *Config) updateComputedValues() error {
 		c.ApiServer.AdvertiseAddresses = append(c.ApiServer.AdvertiseAddresses, ip)
 	}
 
+	if err := c.ApiServer.TLS.UpdateValues(); err != nil {
+		return fmt.Errorf("unable to update TLS configuration: %v", err)
+	}
+
 	c.computeLoggingSetting()
 
 	return nil
@@ -542,6 +552,11 @@ func (c *Config) validate() error {
 	if errs := c.Storage.IsValid(); c.Storage.IsEnabled() && len(errs) > 0 {
 		return fmt.Errorf("error validating storage: %w", errors.Join(errs...))
 	}
+
+	if err := c.ApiServer.TLS.Validate(); err != nil {
+		return fmt.Errorf("error validating apiServer.tls: %v", err)
+	}
+
 	return nil
 }
 
