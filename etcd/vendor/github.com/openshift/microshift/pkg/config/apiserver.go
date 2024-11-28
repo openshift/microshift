@@ -1,5 +1,12 @@
 package config
 
+import (
+	"fmt"
+	"slices"
+
+	configv1 "github.com/openshift/api/config/v1"
+)
+
 type ApiServer struct {
 	// SubjectAltNames added to API server certs
 	SubjectAltNames []string `json:"subjectAltNames"`
@@ -32,6 +39,8 @@ type ApiServer struct {
 	// advertising because of dual stack limitations there. This is only to
 	// make ovnk work properly.
 	AdvertiseAddresses []string `json:"-"`
+
+	TLS TLSConfig `json:"tls"`
 }
 
 // NamedCertificateEntry provides certificate details
@@ -54,4 +63,57 @@ type AuditLog struct {
 	// profile is the OpenShift profile specifying a specific logging policy
 	// +kubebuilder:default=Default
 	Profile string `json:"profile"`
+}
+
+type TLSConfig struct {
+	// CipherSuites lists the allowed cipher suites that the API server will
+	// accept and serve. If unset or empty it defaults to:
+	// TLS_AES_128_GCM_SHA256, TLS_AES_256_GCM_SHA384, TLS_CHACHA20_POLY1305_SHA256,
+	// ECDHE-ECDSA-AES128-GCM-SHA256, ECDHE-RSA-AES128-GCM-SHA256 ECDHE-ECDSA-AES256-GCM-SHA384,
+	// ECDHE-RSA-AES256-GCM-SHA384, ECDHE-ECDSA-CHACHA20-POLY1305, ECDHE-RSA-CHACHA20-POLY1305,
+	// DHE-RSA-AES128-GCM-SHA256, DHE-RSA-AES256-GCM-SHA384
+	CipherSuites []string `json:"cipherSuites"`
+
+	// MinVersion specifies which TLS version is the minimum version of TLS
+	// to serve from the API server.
+	// +kubebuilder:validation:Enum:=VersionTLS12;VersionTLS13
+	// +kubebuilder:default=VersionTLS12
+	MinVersion string `json:"minVersion"`
+}
+
+func (t *TLSConfig) UpdateValues() error {
+	if len(t.CipherSuites) > 0 {
+		return nil
+	}
+	if t.MinVersion == "" {
+		t.MinVersion = string(configv1.VersionTLS12)
+	}
+	switch t.MinVersion {
+	case string(configv1.VersionTLS12):
+		t.CipherSuites = configv1.TLSProfiles[configv1.TLSProfileIntermediateType].Ciphers
+	case string(configv1.VersionTLS13):
+		t.CipherSuites = configv1.TLSProfiles[configv1.TLSProfileModernType].Ciphers
+	}
+	return nil
+}
+
+func (t *TLSConfig) Validate() error {
+	if len(t.CipherSuites) == 0 {
+		return fmt.Errorf("unsupported empty cipher suites")
+	}
+	var cipherSuites []string
+	switch t.MinVersion {
+	case string(configv1.VersionTLS12):
+		cipherSuites = configv1.TLSProfiles[configv1.TLSProfileIntermediateType].Ciphers
+	case string(configv1.VersionTLS13):
+		cipherSuites = configv1.TLSProfiles[configv1.TLSProfileModernType].Ciphers
+	default:
+		return fmt.Errorf("unsupported value %s for tls.MinVersion", t.MinVersion)
+	}
+	for _, suite := range t.CipherSuites {
+		if !slices.Contains(cipherSuites, suite) {
+			return fmt.Errorf("unsupported cipher suite %s for TLS version %s", suite, t.MinVersion)
+		}
+	}
+	return nil
 }
