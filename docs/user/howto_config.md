@@ -109,7 +109,7 @@ apiServer:
     tls:
         cipherSuites:
             - ""
-        minVersion: v1.2
+        minVersion: VersionTLS12
 debugging:
     logLevel: Normal
 dns:

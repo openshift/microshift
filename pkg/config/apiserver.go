@@ -65,9 +65,6 @@ type AuditLog struct {
 	Profile string `json:"profile"`
 }
 
-const TLS_Version_12 = "v1.2"
-const TLS_Version_13 = "v1.3"
-
 type TLSConfig struct {
 	// CipherSuites lists the allowed cipher suites that the API server will
 	// accept and serve.
@@ -75,34 +72,22 @@ type TLSConfig struct {
 
 	// MinVersion specifies which TLS version is the minimum version of TLS
 	// to serve from the API server.
-	// +kubebuilder:validation:Enum:=v1.2;v1.3
-	// +kubebuilder:default=v1.2
+	// +kubebuilder:validation:Enum:=VersionTLS12;VersionTLS13
+	// +kubebuilder:default=VersionTLS12
 	MinVersion string `json:"minVersion"`
 }
 
-func (t *TLSConfig) getTLSVersion() (configv1.TLSProtocolVersion, error) {
-	switch t.MinVersion {
-	case TLS_Version_12:
-		return configv1.VersionTLS12, nil
-	case TLS_Version_13:
-		return configv1.VersionTLS13, nil
-	default:
-		return "", fmt.Errorf("unsupported value %v for minVersion", t.MinVersion)
-	}
-}
-
-func (t *TLSConfig) UpdateCipherSuites() error {
+func (t *TLSConfig) UpdateValues() error {
 	if len(t.CipherSuites) > 0 {
 		return nil
 	}
-	version, err := t.getTLSVersion()
-	if err != nil {
-		return err
+	if t.MinVersion == "" {
+		t.MinVersion = string(configv1.VersionTLS12)
 	}
-	switch version {
-	case configv1.VersionTLS12:
+	switch t.MinVersion {
+	case string(configv1.VersionTLS12):
 		t.CipherSuites = configv1.TLSProfiles[configv1.TLSProfileIntermediateType].Ciphers
-	case configv1.VersionTLS13:
+	case string(configv1.VersionTLS13):
 		t.CipherSuites = configv1.TLSProfiles[configv1.TLSProfileModernType].Ciphers
 	}
 	return nil
@@ -112,16 +97,14 @@ func (t *TLSConfig) Validate() error {
 	if len(t.CipherSuites) == 0 {
 		return fmt.Errorf("unsupported empty cipher suites")
 	}
-	version, err := t.getTLSVersion()
-	if err != nil {
-		return err
-	}
 	var cipherSuites []string
-	switch version {
-	case configv1.VersionTLS12:
+	switch t.MinVersion {
+	case string(configv1.VersionTLS12):
 		cipherSuites = configv1.TLSProfiles[configv1.TLSProfileIntermediateType].Ciphers
-	case configv1.VersionTLS13:
+	case string(configv1.VersionTLS13):
 		cipherSuites = configv1.TLSProfiles[configv1.TLSProfileModernType].Ciphers
+	default:
+		return fmt.Errorf("unsupported value %s for tls.MinVersion", t.MinVersion)
 	}
 	for _, suite := range t.CipherSuites {
 		if !slices.Contains(cipherSuites, suite) {

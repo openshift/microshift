@@ -107,9 +107,6 @@ func (c *Config) fillDefaults() error {
 		SubjectAltNames: subjectAltNames,
 		URL:             "https://localhost:6443",
 		Port:            6443,
-		TLS: TLSConfig{
-			MinVersion:   TLS_Version_12,
-		},
 	}
 	c.ApiServer.AuditLog = AuditLog{
 		MaxFileAge:  0,
@@ -424,8 +421,8 @@ func (c *Config) updateComputedValues() error {
 		c.ApiServer.AdvertiseAddresses = append(c.ApiServer.AdvertiseAddresses, ip)
 	}
 
-	if err := c.ApiServer.TLS.UpdateCipherSuites(); err != nil {
-		return fmt.Errorf("unable to compute TLS cipher suites: %v", err)
+	if err := c.ApiServer.TLS.UpdateValues(); err != nil {
+		return fmt.Errorf("unable to update TLS configuration: %v", err)
 	}
 
 	c.computeLoggingSetting()

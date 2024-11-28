@@ -30,7 +30,7 @@ apiServer:
             - ""
         # MinVersion specifies which TLS version is the minimum version of TLS
         # to serve from the API server.
-        minVersion: v1.2
+        minVersion: VersionTLS12
 debugging:
     # Valid values are: "Normal", "Debug", "Trace", "TraceAll".
     # Defaults to "Normal".
