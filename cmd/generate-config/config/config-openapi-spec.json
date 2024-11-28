@@ -108,10 +108,10 @@
             "minVersion": {
               "description": "MinVersion specifies which TLS version is the minimum version of TLS\nto serve from the API server.",
               "type": "string",
-              "default": "v1.2",
+              "default": "VersionTLS12",
               "enum": [
-                "v1.2",
-                "v1.3"
+                "VersionTLS12",
+                "VersionTLS13"
               ]
             }
           }
