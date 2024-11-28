@@ -1,30 +1,15 @@
-FROM localhost/rhel94-ostree-microshift-yminus2:latest
-
-# Build arguments
-ARG USHIFT_RPM_REPO_NAME=microshift-local
-ARG USHIFT_RPM_REPO_PATH=/tmp/$USHIFT_RPM_REPO_NAME
-
-# Work around the missing ostree-container functionality:
-# - Enable librhsm which enables host subscriptions to work in containers
-# - Image has /opt symlink pointing to a non-existent /var/opt, so create the latter
-RUN ln -sr /run/secrets/etc-pki-entitlement /etc/pki/entitlement-host && \
-    ln -sr /run/secrets/rhsm /etc/rhsm-host && \
-    mkdir -p /var/opt
-
-# Copy the MicroShift repository contents
-COPY ./rpm-repos/$USHIFT_RPM_REPO_NAME $USHIFT_RPM_REPO_PATH
+FROM localhost/rhel94-test-agent:latest
 
 # Copy repository configuration
-COPY ./bootc-images/$USHIFT_RPM_REPO_NAME.repo ./bootc-images/microshift-fast-datapath-rhel9.repo ./bootc-images/microshift-rhocp-y.repo \
+COPY ./bootc-images/microshift-fast-datapath-rhel9.repo /bootc-images/microshift-rhocp-y2.repo \
     /etc/yum.repos.d/
 
 # Print repository configuration contents.
-# Install MicroShift, test agent and cleanup.
+# Install MicroShift and cleanup.
 RUN dnf repoinfo --enabled && \
-    dnf install -y firewalld "microshift-{{ .Env.SOURCE_VERSION }}" "microshift-release-info-{{ .Env.SOURCE_VERSION }}" microshift-test-agent && \
-    systemctl enable microshift microshift-test-agent && \
+    dnf install -y firewalld "microshift-{{ .Env.YMINUS2_RELEASE_VERSION }}" "microshift-release-info-{{ .Env.YMINUS2_RELEASE_VERSION }}" && \
+    systemctl enable microshift && \
     rm -vf /etc/yum.repos.d/microshift-*.repo && \
-    rm -rvf $USHIFT_RPM_REPO_PATH && \
     dnf clean all
 
 # Extend Greenboot wait timeout to 10m for MicroShift to be ready.

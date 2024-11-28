@@ -51,12 +51,5 @@ RUN sed -i '/^additionalimagestores.*/a\   "/var/lib/containers/storage-preloade
 # the container subsystem.
 # See https://github.com/ostreedev/ostree-rs-ext/issues/654
 COPY --chmod=755 ./bootc-images/microshift-imagestore-config.sh /usr/bin/microshift-imagestore-config
-RUN printf '[Unit]\n\
-Description=Configure the image store directory for MicroShift\n\
-Before=microshift.service\n\
-[Service]\n\
-Type=oneshot\n\
-ExecStart=/usr/bin/microshift-imagestore-config /var/lib/containers/storage /var/lib/containers/storage-preloaded\n\
-[Install]\n\
-WantedBy=multi-user.target\n' > /etc/systemd/system/microshift-imagestore-config.service && \
-    systemctl enable microshift-imagestore-config.service
+COPY --chmod=644 ./bootc-images/microshift-imagestore-config.service /etc/systemd/system/microshift-imagestore-config.service
+RUN systemctl enable microshift-imagestore-config.service

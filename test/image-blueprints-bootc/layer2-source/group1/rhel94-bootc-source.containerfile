@@ -35,3 +35,8 @@ RUN firewall-offline-cmd --zone=public --add-port=22/tcp && \
     firewall-offline-cmd --zone=public --add-port=6443/tcp && \
     firewall-offline-cmd --zone=public --add-port=30000-32767/tcp && \
     firewall-offline-cmd --zone=public --add-port=30000-32767/udp
+
+# Install systemd configuration drop-ins to fix potential permission problems
+# when upgrading from older ostree commits to bootc container layers
+RUN mkdir -p /etc/systemd/system/ovsdb-server.service.d
+COPY --chmod=644 ./bootc-images/microshift-ovsdb-ownership.conf /etc/systemd/system/ovsdb-server.service.d/microshift-ovsdb-ownership.conf
