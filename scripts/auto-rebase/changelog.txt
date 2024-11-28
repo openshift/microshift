@@ -1,0 +1,151 @@
+- api embedded-component 1d987ad446cf1900b218a6bf2d780b9894e6c05f to a09992e80c6891cc0bfa2fa7ec6af42af37c452e
+  - ed47362 2024-11-22T16:11:58+00:00 Re-add schemachecker comparator name to outputs
+  - 25cf429 2024-11-22T08:41:40-05:00 Made VSphereMultiVCenters feature gate GA
+  - c6a467f 2024-11-22T03:02:57+05:30 update '*/tests/*/*.yaml' with regex 'featureGate: ([\-]{0,1}\w+)\n' replace with: 'featureGates:\n- $1\n'
+  - b2fa21d 2024-11-22T02:55:16+05:30 Allow multiple FeatureGates in integration test config
+  - 15f5718 2024-11-20T08:51:50-03:00 make update
+  - 277d0ec 2024-11-20T08:45:12-03:00 Delete the crd directory before copying CRDs into it
+  - a7c415d 2024-11-19T15:48:00-03:00 Rename files to use the default run-level for storage
+  - 917f3bf 2024-11-19T09:18:19-05:00 remove NewOLM from hypershift, promote to Default SelfManaged
+  - 09b6316 2024-11-18T16:58:36-05:00 Nutanix: allow multi-subnets in Machine providerSpec and failureDomain configuration
+  - 7f3382e 2024-11-15T07:26:47-08:00 config/v1/tests/clusterversions.config.openshift.io/ImageStreamImportMode: New tests
+  - 31505ab 2024-11-14T19:20:17-08:00 config/v1: Update generated assets for Release.architecture
+  - 1392f06 2024-11-14T16:16:38-08:00 config/v1/types_cluster_version: Add 'architecture' to the release structure
+  - fec2140 2024-11-13T12:28:20-07:00 Update vendor for crd-schema-checker
+  - 85de6ce 2024-11-13T12:26:44-07:00 Add pretty printing of warning and info level from generators
+
+- cluster-csi-snapshot-controller-operator embedded-component 8122add3d1529f0ea8fa918b45e3d7b35d5a0388 to 42ed4cc366a40c28b22e0aea02ba8075dc2831eb
+  - 6107247 2024-11-18T09:35:34+01:00 Add spec.unhealthyEvictionPolicy: AlwaysAllow to all pdbs
+  - cfff3fc 2024-11-18T09:35:26+01:00 fix all errors after openshift's library-go and api bumps
+  - 314e628 2024-11-08T10:34:10+01:00 Bump all deps for 4.18
+
+- cluster-ingress-operator embedded-component 9305d2052be1380508a1950e44cb6d325113726a to 8be174945db79b0660bd0fd21ed279ab7b6aafbf
+  - a8096c0 2024-11-21T22:10:02-05:00 Add unit tests to verify update of Infra CR with Ingress LB IPs
+  - 4b1cc71 2024-11-21T22:10:02-05:00 Add tests that verify the EndpointPublishingStrategy
+  - db05f51 2024-11-21T22:10:02-05:00 Update AWSPlatformStatus with Ingress LB IPs when BYO DNS is enabled
+  - 9a58b76 2024-11-21T22:10:02-05:00 Vendoring updates
+  - 9532e78 2024-11-20T17:28:01+01:00 NE-1790: Enable Dynamic Configuration Manager feature gate
+  - 04e2c24 2024-11-15T14:57:28+01:00 NE-1790: Bump openshift/api 20241018083007-4f6053f954b0
+  - 46a8f14 2024-11-14T20:47:24-05:00 Add unit tests for `shouldRecreateLoadBalancer`
+  - 84f57a6 2024-11-14T20:47:21-05:00 openstack: support setting LB IP
+  - 737cd08 2024-11-14T19:53:55-05:00 controller/ingress: rename lb to lbStatus variable
+  - 7c219db 2024-11-14T19:53:55-05:00 vendoring: bump openshift/api
+  - f8e2bcd 2024-11-13T19:51:25-05:00 Use Client Cert Auth for ARO HCP deployments
+
+- cluster-kube-apiserver-operator embedded-component dc7ef78344c0648583c3e3b4f4b6bc4b22f3d612 to 8ef2c1d874971a0badd9d55b122d907f34dedc0d
+  - ae4e0c3 2024-11-20T11:13:17+01:00 react to changes
+  - 23dd96c 2024-11-20T11:03:26+01:00 react to changes
+  - 51c2a5e 2024-11-20T10:57:29+01:00 bump library-go
+
+- cluster-kube-controller-manager-operator embedded-component e3e3ce7ab328bbb4d8701aa944aa63bb5258eb4b to ce2c021f23f5d178da6ea35d98a229137e5a81c4
+  - 219824d 2024-11-20T10:35:08+01:00 react to changes
+  - 8d72c7a 2024-11-19T18:22:06+01:00 bump library-go
+
+- cluster-kube-scheduler-operator embedded-component 56e6c1360ba2df730c8e723dfb100a912ec9cff6 to e4c772cd344e538342a4e1cd91635b387e1c18ba
+  - 279893b 2024-11-20T10:31:04+01:00 react to changes
+  - dcb3997 2024-11-19T18:36:51+01:00 bump library-go
+
+- cluster-network-operator embedded-component 6b615be1447aa79252ddc73b10675b4638ae13f7 to e750244e08b30194c7b8e432ff5073be8f0a9be8
+  - 23a19ce 2024-11-20T11:51:23-05:00 Add nodeslicepool
+  - bb55f4e 2024-11-12T13:37:23-08:00 SDN-5234: rebase k8s v1.31.1
+
+- etcd embedded-component e8a81bac544c340485ef3e1166a5b20be6f0e58f to 914783cae63a13b90971c65e28c3349c1ecb7dfb
+  - d0bb18db 2024-11-14T13:54:00+01:00 Merge pull request #301 from tjungblu/luisbackporttls
+  - c1fc8b1b 2024-11-14T13:53:19+01:00 Merge pull request #300 from tjungblu/bump_mark_force_new_c
+  - 71363d50 2024-11-14T13:50:50+01:00 DOWNSTREAM: <carry>: add tls min/max version to grpc proxy
+  - fb8d653e 2024-11-14T13:50:43+01:00 DOWNSTREAM: <carry>: ETCD-696: Add rev bumping to force-new-cluster
+  - 093714ce 2024-11-14T13:50:35+01:00 Migrate Dockerfile.art for Konflux
+  - f9e1585b 2024-11-14T13:50:15+01:00 Add support for cachi2 based deps Konflux is replacing RH's internal build system OSBS. OSBS supported a build-time dependency injection system called "cachito". Konflux replaces this with "cachi2" which works differently. REMOTE_SOURCES no longer need to be copied into place and there is no need to source cachito's environment information (Konflux automatically rewrites the Dockerfile to source cachi2/cachi2.env before running the original RUN commands). Additionally, cachito appears to have provided go.sum dependencies whereas cachi2 requires all build-time dependencies in go.mod. Missing dependencies are added to go.mod as // indirect in this change.
+  - e41ee0d7 2024-11-14T13:49:30+01:00 NO-JIRA: use golang 1.22 image
+  - d6686b5f 2024-11-14T13:48:43+01:00 DOWNSTREAM: <carry>: ETCD-656: Automate datadir move after quorum-restore
+  - 5093370a 2024-11-14T13:48:26+01:00 DOWNSTREAM: <carry>: ETCD-653: add jq to the etcd image
+  - 71c78f7d 2024-11-14T13:47:56+01:00 DOWNSTREAM <carry>: use build image go1.21-ocp4.17
+  - 0a29526e 2024-11-14T13:47:15+01:00 DOWNSTREAM <carry>: add native binary to installer images
+  - 1833eabe 2024-11-14T13:46:30+01:00 CORS-3249: DOWNSTREAM <carry>: installer: make etcd binaries static
+  - 4c4c386f 2024-11-14T13:45:55+01:00 DOWNSTREAM <carry>: add installer Dockerfile for ART builds
+  - e56d0867 2024-11-14T13:43:24+01:00 DOWNSTREAM <carry>: update Dockerfile golang 1.20 ocp 4.16
+  - 8bd6dac2 2024-11-14T13:42:05+01:00 DOWNSTREAM: <carry>: Add Dockerfile to build etcd for openshift-installer
+  - d354e250 2024-11-14T13:36:41+01:00 DOWNSTREAM <carry>: update Dockerfile golang 1.20 ocp 4.16
+  - add74deb 2024-11-14T13:34:50+01:00 DOWNSTREAM <carry>: resolve merge conflicts
+  - e410b118 2024-11-14T13:33:08+01:00 NO-JIRA: use golang 1.22 image
+  - 1e24cb9f 2024-11-14T13:32:07+01:00 DOWNSTREAM: <carry>: ETCD-656: Automate datadir move after quorum-restore
+  - 507c0de8 2024-11-12T09:30:31-07:00 version: bump up to 3.5.17
+  - cb970e5c 2024-11-11T22:40:28-07:00 release: use GitHub's gh to create GitHub release
+  - 76275d62 2024-11-11T09:06:02+01:00 release: properly change working dir if tmp location already exists
+  - b2ba4882 2024-11-08T12:39:46+01:00 fix(defrag): close temp file in case of error
+  - bceca16a 2024-11-06T21:33:43-08:00 Bump go toolchain to 1.22.9
+  - f26ff912 2024-11-06T14:18:35+01:00 chore(e2e): adapt defrag tests for 3.5
+  - 1d175079 2024-11-06T14:05:04+01:00 fix(defrag): handle defragdb failure
+  - ae6655f1 2024-11-06T14:04:56+01:00 fix(defrag): handle no space left error
+  - 5ec08a23 2024-10-30T09:49:46+00:00 chore(e2e): backport TestNoErrorLogsDuringNormalOperations test
+  - 17ab1fa6 2024-10-29T12:18:35+13:00 Remove defunct actuated arm64 workflows.
+  - dea4eb3e 2024-10-28T12:15:59-07:00 [3.5] Fix risk of a partial write txn being applied
+  - e5905727 2024-10-25T19:08:05-07:00 [serverWatchStream] terminate recvLoop on sws.close()
+  - 2dbfe58a 2024-10-05T19:23:07+00:00 github/workflows: use ECR mirror for Trivy's DB
+  - 60217686 2024-10-02T23:39:04+05:30 Bump go version to 1.22.8
+  - b56619e1 2024-09-17T01:24:48+00:00 Ensure commits are signed in scripts/release.sh.
+  - 6a3018fc 2024-09-12T08:43:57+02:00 docs: remove warning that etcd 3.5.0 was not yet released
+
+- kubernetes embedded-component a3f31a4f2c587420f1ddb3bcdb161bf64a8c436b to db7182344d1535fb685200e03c2acad2fc276527
+  - a3cd81b36 2024-11-25T21:05:07+00:00 UPSTREAM: <drop>: Enable format library for 4.18
+
+- machine-config-operator embedded-component 47a4dc728e94fe7964b6dae74eb8f89c9b282c00 to c761b7cabfe50839e573299b02de148559e652eb
+  - fee1b99d 2024-11-22T10:06:01-05:00 validate extensions and packages before OCL build
+  - 69e89548 2024-11-22T10:05:38-05:00 moves extensions validation into ctrlcommon
+  - 0ce0cbc1 2024-11-21T12:51:39-05:00 Install extensions via Containerfile for OCL
+  - eab130a3 2024-11-21T07:21:14-05:00 Revert "MCO-643: MCO-645: Implement a rotation mechanism for the MCS TLS cert"
+  - 242572e0 2024-11-20T16:45:56-05:00 deployment: Set min resource reqs,forward logs, tolerations
+  - b4b74511 2024-11-20T11:59:02-05:00 Use Jobs for OCL builds
+  - 6b0ad96a 2024-11-20T11:08:10-05:00 Extend in-cluster DNS support to AWS Platform
+  - 4f7de719 2024-11-19T14:39:24-05:00 deployment: Ensures machine-os-builder has a higher priority when getting scheduled since its a part of the cluster control plane
+  - d121b913 2024-11-15T09:06:48-05:00 certcontroller: add unit tests
+  - 90a5e75b 2024-11-15T09:06:48-05:00 certcontroller: only start if machine/cluster api is used
+  - 850788d1 2024-11-15T09:06:48-05:00 controller: add MCS CA/secret management
+  - bfff5e91 2024-11-15T09:06:34-05:00 operator: render from MCS CA configmap
+  - fc874ec1 2024-11-15T09:06:34-05:00 server: start certwatcher
+  - 5ce9b36a 2024-11-13T10:31:55-05:00 Containerfile: Add proxy configs trustedCA to the Trust Anchors of the system wide trust store buildah-build: Add the mounted additional-trust-bundle and proxy configuration to the build context of buildah buildrequestopts: Get AdditionalTrustBundle and Proxy config from controller config buildrequest: Mount additionalTrustBundle to the image-build container
+
+- operator-framework-olm embedded-component 1d2da2553d9407d20c003157d07819b984fa01d6 to e27da48ff810af17f4863a19af8291f46c262197
+  - 7a7665ca 2024-11-19T00:03:48+00:00 Update OWNERS - Add camilamacedo86 under reviewers (#3441)
+
+- oc image-amd64 df7cb575e0e2b8f79f897f090a638c4e4e1fe406 to 9e568296a9b2f774e9321825e2b0c314ee9df566
+  - 587d5941 2024-11-21T20:13:16+03:00 Revert "OCPBUGS-37344: Skip inspection of the daemonset pods running on data plane"
+  - 7aebefa5 2024-11-20T23:10:21-05:00 OTA-1393: status: recognize the process of migration to multi-arch
+  - 1fa88a5c 2024-11-20T11:26:45-05:00 make create and monitor logs more similar and uniform
+  - 1b3045e2 2024-11-16T03:30:31+00:00 NO-JIRA: adm release: cleanups (#1914)
+  - aaa6d774 2024-11-15T12:39:26-08:00 pkg/cli/admin/upgrade/recommend: Fix "no updates to <MAJOR>.<MINOR> available" error message
+  - c04ddb22 2024-11-15T12:39:26-08:00 pkg/cli/admin/upgrade/recommend: Expand "URL" to "Release URL"
+  - d53af317 2024-11-15T12:39:07-08:00 pkg/cli/admin/upgrade/recommend: "no known issues..." placeholder
+  - d47e1619 2024-11-15T14:26:17-05:00 upgrade status: show updating cluster operator names in the output
+  - cee613e0 2024-11-15T10:03:46-05:00 added report flag to force saving the report
+  - 0235cd5b 2024-11-15T09:47:06-05:00 save automatically the report in case of failure
+  - f7acc358 2024-11-15T09:06:27-05:00 added progress on create command using the workflow report
+  - 339d039b 2024-11-15T09:06:27-05:00 manage error code from workflow report
+  - 1cf7255d 2024-11-15T09:06:27-05:00 refactor for checking explicitly min supported version
+  - 21c3b92e 2024-11-14T10:57:39-05:00 OTA-1224: status: simplify worker status line
+
+- router image-amd64 6c988a565350d9599c5aa1d835bdb69739cea2c6 to be319d0bb83f75b52b707df46422f6892dfaaa56
+  - 68f0e2c 2024-11-21T16:55:02+01:00 NE-1815: Add verifyhost to dynamic server slots for re-encrypt routes (DCM)
+  - a405953 2024-11-15T09:18:30-05:00 Support appProtocol: kubernetes.io/h2c
+  - e3a81dd 2024-11-15T09:18:22-05:00 Add test cases for appProtocol
+  - 83087f0 2024-11-15T09:18:14-05:00 Rename mustCreate to mustCreateRoute
+
+- kubernetes image-amd64 a3f31a4f2c587420f1ddb3bcdb161bf64a8c436b to db7182344d1535fb685200e03c2acad2fc276527
+  - a3cd81b36 2024-11-25T21:05:07+00:00 UPSTREAM: <drop>: Enable format library for 4.18
+
+- oc image-arm64 bdce85daf64eda40dd1b604270b85c67a296bc93 to 9e568296a9b2f774e9321825e2b0c314ee9df566
+  - 587d5941 2024-11-21T20:13:16+03:00 Revert "OCPBUGS-37344: Skip inspection of the daemonset pods running on data plane"
+  - 7aebefa5 2024-11-20T23:10:21-05:00 OTA-1393: status: recognize the process of migration to multi-arch
+  - 1fa88a5c 2024-11-20T11:26:45-05:00 make create and monitor logs more similar and uniform
+  - cee613e0 2024-11-15T10:03:46-05:00 added report flag to force saving the report
+  - 0235cd5b 2024-11-15T09:47:06-05:00 save automatically the report in case of failure
+  - f7acc358 2024-11-15T09:06:27-05:00 added progress on create command using the workflow report
+  - 339d039b 2024-11-15T09:06:27-05:00 manage error code from workflow report
+  - 1cf7255d 2024-11-15T09:06:27-05:00 refactor for checking explicitly min supported version
+
+- router image-arm64 78322373359023782b66c3e58e3178b9a4932bde to be319d0bb83f75b52b707df46422f6892dfaaa56
+  - 68f0e2c 2024-11-21T16:55:02+01:00 NE-1815: Add verifyhost to dynamic server slots for re-encrypt routes (DCM)
+
+- kubernetes image-arm64 a3f31a4f2c587420f1ddb3bcdb161bf64a8c436b to db7182344d1535fb685200e03c2acad2fc276527
+  - a3cd81b36 2024-11-25T21:05:07+00:00 UPSTREAM: <drop>: Enable format library for 4.18
+
