@@ -1,5 +1,12 @@
 package config
 
+import (
+	"fmt"
+	"slices"
+
+	configv1 "github.com/openshift/api/config/v1"
+)
+
 type ApiServer struct {
 	// SubjectAltNames added to API server certs
 	SubjectAltNames []string `json:"subjectAltNames"`
@@ -58,6 +65,9 @@ type AuditLog struct {
 	Profile string `json:"profile"`
 }
 
+const TLS_Version_12 = "v1.2"
+const TLS_Version_13 = "v1.3"
+
 type TLSConfig struct {
 	// CipherSuites lists the allowed cipher suites that the API server will
 	// accept and serve.
@@ -68,4 +78,55 @@ type TLSConfig struct {
 	// +kubebuilder:validation:Enum:=v1.2;v1.3
 	// +kubebuilder:default=v1.2
 	MinVersion string `json:"minVersion"`
+}
+
+func (t *TLSConfig) getTLSVersion() (configv1.TLSProtocolVersion, error) {
+	switch t.MinVersion {
+	case TLS_Version_12:
+		return configv1.VersionTLS12, nil
+	case TLS_Version_13:
+		return configv1.VersionTLS13, nil
+	default:
+		return "", fmt.Errorf("unsupported value %v for minVersion", t.MinVersion)
+	}
+}
+
+func (t *TLSConfig) UpdateCipherSuites() error {
+	if len(t.CipherSuites) > 0 {
+		return nil
+	}
+	version, err := t.getTLSVersion()
+	if err != nil {
+		return err
+	}
+	switch version {
+	case configv1.VersionTLS12:
+		t.CipherSuites = configv1.TLSProfiles[configv1.TLSProfileIntermediateType].Ciphers
+	case configv1.VersionTLS13:
+		t.CipherSuites = configv1.TLSProfiles[configv1.TLSProfileModernType].Ciphers
+	}
+	return nil
+}
+
+func (t *TLSConfig) Validate() error {
+	if len(t.CipherSuites) == 0 {
+		return fmt.Errorf("unsupported empty cipher suites")
+	}
+	version, err := t.getTLSVersion()
+	if err != nil {
+		return err
+	}
+	var cipherSuites []string
+	switch version {
+	case configv1.VersionTLS12:
+		cipherSuites = configv1.TLSProfiles[configv1.TLSProfileIntermediateType].Ciphers
+	case configv1.VersionTLS13:
+		cipherSuites = configv1.TLSProfiles[configv1.TLSProfileModernType].Ciphers
+	}
+	for _, suite := range t.CipherSuites {
+		if !slices.Contains(cipherSuites, suite) {
+			return fmt.Errorf("unsupported cipher suite %s for TLS version %s", suite, t.MinVersion)
+		}
+	}
+	return nil
 }

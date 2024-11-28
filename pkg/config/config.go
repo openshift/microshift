@@ -107,6 +107,9 @@ func (c *Config) fillDefaults() error {
 		SubjectAltNames: subjectAltNames,
 		URL:             "https://localhost:6443",
 		Port:            6443,
+		TLS: TLSConfig{
+			MinVersion:   TLS_Version_12,
+		},
 	}
 	c.ApiServer.AuditLog = AuditLog{
 		MaxFileAge:  0,
@@ -241,6 +244,12 @@ func (c *Config) incorporateUserSettings(u *Config) {
 	}
 	if u.ApiServer.AuditLog.MaxFileSize != 0 {
 		c.ApiServer.AuditLog.MaxFileSize = u.ApiServer.AuditLog.MaxFileSize
+	}
+	if len(u.ApiServer.TLS.CipherSuites) != 0 {
+		c.ApiServer.TLS.CipherSuites = u.ApiServer.TLS.CipherSuites
+	}
+	if u.ApiServer.TLS.MinVersion != "" {
+		c.ApiServer.TLS.MinVersion = u.ApiServer.TLS.MinVersion
 	}
 
 	if u.Debugging.LogLevel != "" {
@@ -415,6 +424,10 @@ func (c *Config) updateComputedValues() error {
 		c.ApiServer.AdvertiseAddresses = append(c.ApiServer.AdvertiseAddresses, ip)
 	}
 
+	if err := c.ApiServer.TLS.UpdateCipherSuites(); err != nil {
+		return fmt.Errorf("unable to compute TLS cipher suites: %v", err)
+	}
+
 	c.computeLoggingSetting()
 
 	return nil
@@ -542,6 +555,11 @@ func (c *Config) validate() error {
 	if errs := c.Storage.IsValid(); c.Storage.IsEnabled() && len(errs) > 0 {
 		return fmt.Errorf("error validating storage: %w", errors.Join(errs...))
 	}
+
+	if err := c.ApiServer.TLS.Validate(); err != nil {
+		return fmt.Errorf("error validating apiServer.tls: %v", err)
+	}
+
 	return nil
 }
 
