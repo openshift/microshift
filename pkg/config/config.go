@@ -421,9 +421,7 @@ func (c *Config) updateComputedValues() error {
 		c.ApiServer.AdvertiseAddresses = append(c.ApiServer.AdvertiseAddresses, ip)
 	}
 
-	if err := c.ApiServer.TLS.UpdateValues(); err != nil {
-		return fmt.Errorf("unable to update TLS configuration: %v", err)
-	}
+	c.ApiServer.TLS.UpdateValues()
 
 	c.computeLoggingSetting()
 
