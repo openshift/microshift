@@ -96,9 +96,20 @@ func (s *KubeScheduler) Run(ctx context.Context, ready chan<- struct{}, stopped 
 		return err
 	}
 
+	panicChannel := make(chan any, 1)
 	go func() {
+		defer func() {
+			if r := recover(); r != nil {
+				panicChannel <- r
+			}
+		}()
 		errorChannel <- kubescheduler.Run(ctx, cc, sched)
 	}()
 
-	return <-errorChannel
+	select {
+	case err := <-errorChannel:
+		return err
+	case perr := <-panicChannel:
+		panic(perr)
+	}
 }
