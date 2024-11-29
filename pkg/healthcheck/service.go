@@ -95,10 +95,6 @@ func (s *Systemd) IsServiceActiveAndNotFailed(ctx context.Context, service strin
 		return false, fmt.Errorf("service %s has failed", service)
 	}
 
-	if activeState == "inactive" {
-		return false, fmt.Errorf("service %s is inactive", service)
-	}
-
 	// https://github.com/systemd/systemd/blob/0dd6fe931d08f17e4ee2c6410c993b7f2ffc1dd3/src/systemctl/systemctl-is-active.c#L55-L64
 	return activeState == "active" || activeState == "reloading", nil
 }
