@@ -13,5 +13,10 @@ func MicroShiftHealthcheck(ctx context.Context, timeout time.Duration) error {
 		return nil
 	}
 
+	if err := waitForCoreWorkloads(timeout); err != nil {
+		logPodsAndEvents()
+		return err
+	}
+
 	return nil
 }
