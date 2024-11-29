@@ -73,7 +73,7 @@ def is_rhocp_available(ver):
 
     try:
         # Run the dnf command to check for cri-o in the specified repository
-        repo_info = common.run_command_in_shell(f"sudo dnf repository-packages --showduplicates {repository} info cri-o")
+        repo_info = common.run_command_in_shell(f"dnf repository-packages --showduplicates {repository} info cri-o")
         common.print_msg(repo_info)
         return True
     except Exception:
@@ -86,10 +86,10 @@ def get_rhocp_beta_url_if_available(ver):
 
     try:
         # Run the dnf command to check for cri-o in the specified repository
-        repo_info = common.run_command_in_shell(f"sudo dnf repository-packages --showduplicates --disablerepo '*' --repofrompath 'this,{url_amd}' this info cri-o")
+        repo_info = common.run_command_in_shell(f"dnf repository-packages --showduplicates --disablerepo '*' --repofrompath 'this,{url_amd}' this info cri-o")
         common.print_msg(repo_info)
 
-        repo_info = common.run_command_in_shell(f"sudo dnf repository-packages --showduplicates --disablerepo '*' --repofrompath 'this,{url_arm}' this info cri-o")
+        repo_info = common.run_command_in_shell(f"dnf repository-packages --showduplicates --disablerepo '*' --repofrompath 'this,{url_arm}' this info cri-o")
         common.print_msg(repo_info)
 
         # Use specific minor version RHOCP mirror only if both arches are available.
@@ -186,7 +186,7 @@ def extract_container_images(version, repo_spec, outfile, dry_run=False):
         dnf_options.extend(["--repo", repo_spec])
 
     # Construct and execute the dnf download command
-    dnf_command = ["sudo", "dnf", "download"] + dnf_options + [f"microshift-release-info-{version}"]
+    dnf_command = ["dnf", "download"] + dnf_options + [f"microshift-release-info-{version}"]
     if common.run_command(dnf_command, dry_run) is not None:
         images_output = get_container_images(str(image_path), version)
         with open(outfile, "a") as f:
@@ -195,7 +195,7 @@ def extract_container_images(version, repo_spec, outfile, dry_run=False):
 
         # Cleanup RPM files
         rpm_list = list(map(str, image_path.glob("microshift-release-info-*.rpm")))
-        common.run_command(["sudo", "rm", "-f"] + rpm_list, dry_run)
+        common.run_command(["rm", "-f"] + rpm_list, dry_run)
     # Restore the current directory
     common.popd()
 
@@ -231,13 +231,18 @@ def process_containerfile(groupdir, containerfile, dry_run):
     try:
         # Redirect the output to the log file
         with open(cf_logfile, 'w') as logfile:
-            # Run the container build command.
-            # Note: The pull secret is necessary in some builds for pulling embedded
-            # container images specified by SOURCE_IMAGES environment variable.
+            # Run the container build command
+            # Note:
+            # - The pull secret is necessary in some builds for pulling embedded
+            #   container images specified by SOURCE_IMAGES environment variable
+            # - The explicit push-to-mirror sets the 'latest' tag as all the build
+            #   layers are in the mirror due to 'cache-to' option
             build_args = [
                 "sudo", "podman", "build",
                 "--authfile", PULL_SECRET,
                 "--secret", f"id=pullsecret,src={PULL_SECRET}",
+                "--cache-to", f"{MIRROR_REGISTRY}/{cf_outname}",
+                "--cache-from", f"{MIRROR_REGISTRY}/{cf_outname}",
                 "-t", cf_outname, "-f", cf_outfile,
                 IMAGEDIR
             ]
