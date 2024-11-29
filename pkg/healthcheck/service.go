@@ -3,9 +3,12 @@ package healthcheck
 import (
 	"context"
 	"fmt"
+	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/coreos/go-systemd/v22/dbus"
+	"github.com/openshift/microshift/pkg/config"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/klog/v2"
 )
@@ -98,4 +101,14 @@ func (s *Systemd) IsServiceActiveAndNotFailed(ctx context.Context, service strin
 
 	// https://github.com/systemd/systemd/blob/0dd6fe931d08f17e4ee2c6410c993b7f2ffc1dd3/src/systemctl/systemctl-is-active.c#L55-L64
 	return activeState == "active" || activeState == "reloading", nil
+}
+
+func printPrerunLog() {
+	contents, err := os.ReadFile(filepath.Join(config.BackupsDir, "prerun_failed.log"))
+	if err != nil && !os.IsNotExist(err) {
+		klog.Errorf("Failed to read prerun_failed.log: %v", err)
+	}
+	if len(contents) > 0 {
+		klog.Infof("Prerun failure log:\n%s", string(contents))
+	}
 }

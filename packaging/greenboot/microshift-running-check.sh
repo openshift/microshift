@@ -103,9 +103,6 @@ fi
 # Set the wait timeout for the current check based on the boot counter
 WAIT_TIMEOUT_SECS=$(get_wait_timeout)
 
-# Always log potential MicroShift upgrade errors on failure
-LOG_FAILURE_FILES+=("/var/lib/microshift-backups/prerun_failed.log")
-
 /usr/bin/microshift healthcheck -v=2 --timeout="${WAIT_TIMEOUT_SECS}s"
 
 # Wait for MicroShift API health endpoints to be OK
