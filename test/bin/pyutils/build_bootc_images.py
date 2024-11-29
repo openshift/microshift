@@ -178,7 +178,10 @@ def extract_container_images(version, repo_spec, outfile, dry_run=False):
         dnf_options.extend(["--repofrompath", f"{repo_name},{repo_spec}", "--repo", repo_name])
     elif re.match(r'^/.*', repo_spec):
         # If the spec is a path, set up the arguments to point to that path.
-        dnf_options.extend(["--repofrompath", f"{repo_name},{repo_spec}", "--repo", repo_name, "--setopt=strict=False"])
+        # Disabling dnf strict option and refreshing cache are required because the
+        # download command does not run elevated.
+        dnf_options.extend(["--repofrompath", f"{repo_name},{repo_spec}", "--repo", repo_name,
+                            "--setopt=strict=False", "--refresh"])
     elif repo_spec:
         # If the spec is a name, assume it is already known to the
         # system through normal configuration. The repo does not need
