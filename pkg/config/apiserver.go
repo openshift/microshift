@@ -25,6 +25,8 @@ type ApiServer struct {
 
 	AuditLog AuditLog `json:"auditLog"`
 
+	TLS TLSConfig `json:"tls"`
+
 	// The URL and Port of the API server cannot be changed by the user.
 	URL  string `json:"-"`
 	Port int    `json:"-"`
@@ -40,8 +42,6 @@ type ApiServer struct {
 	// advertising because of dual stack limitations there. This is only to
 	// make ovnk work properly.
 	AdvertiseAddresses []string `json:"-"`
-
-	TLS TLSConfig `json:"tls"`
 }
 
 // NamedCertificateEntry provides certificate details
@@ -68,11 +68,13 @@ type AuditLog struct {
 
 type TLSConfig struct {
 	// CipherSuites lists the allowed cipher suites that the API server will
-	// accept and serve.
+	// accept and serve. Defaults to cipher suites from the minVersion config
+	// parameter.
 	CipherSuites []string `json:"cipherSuites"`
 
 	// MinVersion specifies which TLS version is the minimum version of TLS
-	// to serve from the API server.
+	// to serve from the API server. Allowed values: VersionTLS12, VersionTLS13.
+	// Defaults to VersionTLS12.
 	// +kubebuilder:validation:Enum:=VersionTLS12;VersionTLS13
 	// +kubebuilder:default=VersionTLS12
 	MinVersion string `json:"minVersion"`
