@@ -53,7 +53,7 @@ func (m *ServiceManager) AddService(s Service) error {
 	return nil
 }
 
-func (m *ServiceManager) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
+func (m *ServiceManager) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}, startLog *startuplogger.StartupLogger) error {
 	defer close(stopped)
 
 	services := m.services
@@ -62,8 +62,6 @@ func (m *ServiceManager) Run(ctx context.Context, ready chan<- struct{}, stopped
 	// if err != nil {
 	// 	fmt.Error("error: %v", err)
 	// }
-
-	startupLogger := startuplogger.NewStartupLogger()
 
 	readyMap := make(map[string]<-chan struct{})
 	stoppedMap := make(map[string]<-chan struct{})
@@ -87,7 +85,7 @@ func (m *ServiceManager) Run(ctx context.Context, ready chan<- struct{}, stopped
 		}
 
 		// Start the service and store its ready and stopped channels
-		serviceReady, serviceStopped := m.asyncRun(ctx, service, startupLogger)
+		serviceReady, serviceStopped := m.asyncRun(ctx, service, startLog)
 		readyMap[service.Name()] = serviceReady
 		stoppedMap[service.Name()] = serviceStopped
 	}
@@ -98,18 +96,12 @@ func (m *ServiceManager) Run(ctx context.Context, ready chan<- struct{}, stopped
 		close(ready)
 	}()
 
-	//TODO redo this
-	err := startupLogger.OutputData()
-	if err != nil {
-		klog.Errorf("failed to write to file")
-	}
-
 	// Stop manager when all services stopped
 	<-sigchannel.And(values(stoppedMap))
 	return ctx.Err()
 }
 
-func (m *ServiceManager) asyncRun(ctx context.Context, service Service, startupLogger *startuplogger.StartupLogger) (<-chan struct{}, <-chan struct{}) {
+func (m *ServiceManager) asyncRun(ctx context.Context, service Service, startLog *startuplogger.StartupLogger) (<-chan struct{}, <-chan struct{}) {
 	ready, stopped := make(chan struct{}), make(chan struct{})
 
 	klog.WithMicroshiftLoggerComponent(service.Name(), func() {
@@ -132,7 +124,7 @@ func (m *ServiceManager) asyncRun(ctx context.Context, service Service, startupL
 			go func() {
 				<-ready
 				klog.InfoS("SERVICE READY", "service", service.Name(), "since-start", time.Since(svcStart))
-				startupLogger.LogService(service.Name(), service.Dependencies(), svcStart, time.Now())
+				startLog.LogService(service.Name(), service.Dependencies(), svcStart, time.Now())
 			}()
 			go func() {
 				<-stopped

@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"os"
 	"time"
+
+	"k8s.io/klog/v2"
 )
 
 type ServiceData struct {
@@ -25,9 +27,21 @@ func (s ServiceData) MarshalJSON() ([]byte, error) {
 }
 
 type StartupLogger struct {
-	services []ServiceData
-	//microshiftStart time.Time
-	//microshiftReady time.Time
+	services        []ServiceData
+	microshiftStart time.Time
+	microshiftReady time.Time
+}
+
+func (l StartupLogger) MarshalJSON() ([]byte, error) {
+	return json.Marshal(struct {
+		MicroshiftStart string        `json:"microshiftStart"`
+		MicroshiftReady string        `json:"microshiftReady"`
+		Services        []ServiceData `json:"services"`
+	}{
+		MicroshiftStart: l.microshiftStart.Format(time.RFC3339),
+		MicroshiftReady: l.microshiftReady.Format(time.RFC3339),
+		Services:        l.services,
+	})
 }
 
 func NewStartupLogger() *StartupLogger {
@@ -45,13 +59,23 @@ func (l *StartupLogger) LogService(serviceName string, dependencies []string, st
 	l.services = append(l.services, serviceData)
 }
 
+func (l *StartupLogger) LogMicroshiftStart(start time.Time) {
+	l.microshiftStart = start
+}
+
+func (l *StartupLogger) LogMicroshiftReady(ready time.Time) {
+	l.microshiftReady = ready
+}
+
 func (l *StartupLogger) OutputData() error {
-	var output []ServiceData
+	jsonOutput, _ := json.MarshalIndent(l, "", "  ")
 
-	output = append(output, l.services...)
+	klog.Info(string(jsonOutput))
 
-	jsonOutput, _ := json.MarshalIndent(output, "", "  ")
-	//TODO find suitable export location
-	return os.WriteFile("/tmp/service_logs.json", jsonOutput, 0644)
+	path, save := os.LookupEnv("STARTUP_LOGS_PATH")
+	if save {
+		return os.WriteFile(path, jsonOutput, 0644)
+	}
 
+	return nil
 }
