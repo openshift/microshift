@@ -20,3 +20,11 @@ func MicroShiftHealthcheck(ctx context.Context, timeout time.Duration) error {
 
 	return nil
 }
+
+func NamespacesHealthcheck(ctx context.Context, timeout time.Duration, namespaces []string) error {
+	if err := waitForNamespaces(timeout, namespaces); err != nil {
+		logPodsAndEvents()
+		return err
+	}
+	return nil
+}
