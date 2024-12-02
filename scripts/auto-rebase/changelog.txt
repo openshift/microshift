@@ -1,4 +1,0 @@
-- cluster-network-operator embedded-component acaf6667986d6cb14ab70578ff34140e3c3b97b0 to 80bb25e6e718582c95353a30b99e90d6b9f5870a
-  - a59e594 2024-11-20T16:29:20+01:00 Provide support for user owned IPsec machine configs
-  - 795c6d4 2024-11-20T16:25:15+01:00 Use host ipsec binary and libraries
-
