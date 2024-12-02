@@ -1,8 +1,0 @@
-- ovn-kubernetes image-amd64 fed26197728719ec25a09a43589fd31594775995 to 85400d6159a1bb65c30117b6ef3a6f9a354cbeab
-  - a024014 2024-11-20T18:27:09+01:00 Delete EgressIP LRP stale nexthops when node is not found
-  - 1d0af7d 2024-11-20T21:14:53+08:00 Bump ovs to 3.1.0-137
-
-- ovn-kubernetes image-arm64 fed26197728719ec25a09a43589fd31594775995 to 85400d6159a1bb65c30117b6ef3a6f9a354cbeab
-  - a024014 2024-11-20T18:27:09+01:00 Delete EgressIP LRP stale nexthops when node is not found
-  - 1d0af7d 2024-11-20T21:14:53+08:00 Bump ovs to 3.1.0-137
-
