@@ -259,7 +259,7 @@ def process_containerfile(groupdir, containerfile, dry_run):
                 f"{MIRROR_REGISTRY}/{cf_outname}"
             ]
             start = time.time()
-            common.run_command_in_shell(push_args, dry_run, logfile, logfile)
+            common.retry_on_exception(3, common.run_command_in_shell, push_args, dry_run, logfile, logfile)
             common.record_junit(cf_path, "push-container", "OK", start)
     except Exception:
         common.record_junit(cf_path, "process-container", "FAILED", start_process_container, log_filepath=cf_logfile)
