@@ -110,9 +110,8 @@ func TestGetLvmdConfigForVGs(t *testing.T) {
 }
 
 func Test_newLvmdConfigFromFile(t *testing.T) {
-	iToP := func(i int) *uint64 {
-		r := uint64(i)
-		return &r
+	iToP := func(i uint64) *uint64 {
+		return &i
 	}
 
 	type args struct {

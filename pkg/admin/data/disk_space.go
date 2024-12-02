@@ -40,7 +40,15 @@ func GetAvailableDiskSpace(path string) (uint64, error) {
 	if err := syscall.Statfs(path, &stat); err != nil {
 		return 0, fmt.Errorf("failed to get available disk space of %q: %w", path, err)
 	}
-	available := stat.Bavail * uint64(stat.Bsize)
+
+	var unsignedBsize uint64
+	if stat.Bsize < 0 {
+		unsignedBsize = 0
+	} else {
+		unsignedBsize = uint64(stat.Bsize)
+	}
+
+	available := stat.Bavail * unsignedBsize
 	klog.Infof("Calculated available disk space for %q: %vM", path, available/1024/1024)
 	return available, nil
 }
