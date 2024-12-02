@@ -18,6 +18,20 @@ function usage() {
     exit 1
 }
 
+function skopeo_retry() {
+    for attempt in $(seq 3) ; do
+        if ! skopeo "$@" ; then
+            echo "WARNING: Failed to run skopeo, retry #${attempt}"
+        else
+            return 0
+        fi
+        sleep $(( "${attempt}" * 10 ))
+    done
+
+    echo "ERROR: Failed to run skopeo, quitting after 3 tries"
+    return 1
+}
+
 function mirror_registry() {
     local -r img_pull_file=$1
     local -r img_file_list=$2
@@ -39,15 +53,13 @@ function mirror_registry() {
 
         # Run the image mirror and tag command
         echo "Mirroring '${src_img}' to '${dst_img}'"
-        skopeo copy --all --quiet \
-            --retry-times 3 \
+        skopeo_retry copy --all --quiet \
             --preserve-digests \
             --authfile "${img_pull_file}" \
             docker://"${src_img}" docker://"${dst_img}"
 
         echo "Tagging '${dst_img_no_tag}' as 'latest'"
-        skopeo copy --all --quiet \
-            --retry-times 3 \
+        skopeo_retry copy --all --quiet \
             --preserve-digests \
             --authfile "${img_pull_file}" \
             docker://"${dst_img}" docker://"${dst_img_no_tag}:latest"
@@ -56,6 +68,7 @@ function mirror_registry() {
 
     # Export functions for xargs to use
     export -f process_image_copy
+    export -f skopeo_retry
     # Note that images are passed as one argument by replacing "{}" in xarg input.
     xargs -P 8 -I {} -a "${img_file_list}" \
         bash -c 'process_image_copy "$@"' _ "${img_pull_file}" "${dest_registry}" "{}"
@@ -78,8 +91,7 @@ function registry_to_dir() {
         # Run the image download command
         echo "Downloading '${src_img}' to '${local_dir}'"
         mkdir -p "${local_dir}/${dst_img}"
-        skopeo copy --all --quiet \
-            --retry-times 3 \
+        skopeo_retry copy --all --quiet \
             --preserve-digests \
             --authfile "${img_pull_file}" \
             docker://"${src_img}" dir://"${local_dir}/${dst_img}"
@@ -87,6 +99,7 @@ function registry_to_dir() {
 
     # Export functions for xargs to use
     export -f process_image_copy
+    export -f skopeo_retry
     # Generate a list for each image and run copy in parallel.
     # Note that the image is passed by replacing "{}" in xarg input.
     xargs -P 8 -I {} -a "${img_file_list}" \
@@ -113,15 +126,13 @@ function dir_to_registry() {
 
         # Run the image upload and tag commands
         echo "Uploading '${src_img}' to '${dst_img}'"
-        skopeo copy --all --quiet \
-            --retry-times 3 \
+        skopeo_retry copy --all --quiet \
             --preserve-digests \
             --authfile "${img_pull_file}" \
             dir://"${local_dir}/${src_img}" docker://"${dst_img}"
 
         echo "Tagging '${dst_img}' as '${dst_img_no_tag}:latest'"
         skopeo copy --all --quiet \
-            --retry-times 3 \
             --preserve-digests \
             --authfile "${img_pull_file}" \
             docker://"${dst_img}" docker://"${dst_img_no_tag}:latest"
@@ -129,6 +140,7 @@ function dir_to_registry() {
 
     # Export functions for xargs to use
     export -f process_image_copy
+    export -f skopeo_retry
 
     # Generate a list with an incremental counter for each image and run copy in parallel.
     # Note that the counter and image pairs are passed as one argument by replacing "{}" in xarg input.
