@@ -299,6 +299,17 @@ does_commit_exist() {
     fi
 }
 
+# Checks if provided image ref exists in local image storage
+does_image_exist() {
+    local -r image="${1}"
+
+    if [[ "$(sudo podman images -q "${image}")" != "" ]]; then
+        return 0
+    else
+        return 1
+    fi
+}
+
 # Show the IP address of the VM
 function get_vm_ip {
     local -r vmname="${1}"
