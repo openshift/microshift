@@ -11,6 +11,15 @@ OCGET_OPT="--no-headers"
 OCGET_CMD="oc get ${OCCONFIG_OPT}"
 OCROLLOUT_CMD="oc rollout ${OCCONFIG_OPT}"
 
+echo "--------------------"
+echo "DEPRECATION NOTICE:"
+echo "/usr/share/microshift/functions/greenboot.sh is now deprecated and will be removed in future release."
+echo "Planned removal: MicroShift 4.21"
+echo ""
+echo "As a replacement consider using 'microshift healthcheck --namespaces' command"
+echo "--------------------"
+echo ""
+
 # Note about the output
 # This file runs as part of a systemd unit, greenboot-healthcheck. All of the
 # output is captured by journald, and in order to link it to the unit it
