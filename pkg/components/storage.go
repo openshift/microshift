@@ -206,9 +206,13 @@ func loadCSIPluginConfig(ctx context.Context,
 	// check if dir exists, otherwise the watcher errors
 	fi, err := os.Stat(usrCfgDir)
 	if err != nil {
-		return nil, fmt.Errorf("config directory %q cannot be watched: %v", usrCfgDir, err)
+		e := fmt.Errorf("config directory %q cannot be watched: %v", usrCfgDir, err)
+		cancel(e)
+		return nil, e
 	} else if !fi.IsDir() {
-		return nil, fmt.Errorf("config directory %q is not a directory", usrCfgDir)
+		e := fmt.Errorf("config directory %q is not a directory", usrCfgDir)
+		cancel(e)
+		return nil, e
 	}
 
 	if _, err := os.Stat(usrCfg); err == nil {

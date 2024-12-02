@@ -137,6 +137,7 @@ func removeDirIfExists(path string) error {
 func GenerateUniqueTempPath(path string) (string, error) {
 	// 1000 tries
 	for i := 0; i < 1000; i++ {
+		//nolint:gosec
 		rnd := rand.IntN(100000)
 		newPath := fmt.Sprintf("%s.tmp.%d", path, rnd)
 		if exists, err := util.PathExists(newPath); err != nil {
