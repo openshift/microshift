@@ -3,6 +3,11 @@
 # Sourced from scenario.sh and uses functions defined there.
 
 scenario_create_vms() {
+    if [[ "${CURRENT_RELEASE_REPO}" == "" ]] ; then
+        # Empty string means there's no EC build yet, so the test needs to be skipped.
+        exit 0
+    fi
+
     if [[ "${CURRENT_RELEASE_REPO}" == http* ]] ; then
         # Discover a pre-release MicroShift bootc image reference on the mirror
         local -r mirror_url="$(dirname "${CURRENT_RELEASE_REPO}")/bootc-pullspec.txt"
@@ -33,10 +38,18 @@ scenario_create_vms() {
 }
 
 scenario_remove_vms() {
+    if [[ "${CURRENT_RELEASE_REPO}" == "" ]] ; then
+        # Empty string means there's no EC build yet, so the test needs to be skipped.
+        exit 0
+    fi
     remove_vm host1
 }
 
 scenario_run_tests() {
+    if [[ "${CURRENT_RELEASE_REPO}" == "" ]] ; then
+        # Empty string means there's no EC build yet, so the test needs to be skipped.
+        exit 0
+    fi
     run_tests host1 suites/standard1/
     # When SELinux is working on bootc systems add following suite:
     # suites/selinux/validate-selinux-policy.robot
