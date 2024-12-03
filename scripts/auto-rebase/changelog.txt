@@ -1,21 +1,11 @@
-- cluster-network-operator embedded-component 2d07471a3f426950740f269ae79a4b331f6f2d0a to 7768811ef167eb33a0eaafc5c3eb30fdd02470fd
-  - b90ac63 2024-11-22T09:36:55-08:00 OVN-Kubernetes node RBAC tightening
-  - 717e5f7 2024-11-15T08:37:26+00:00 bindata, ovn-k: Add ClusterUserDefinedNetwork CRD and RBAC
-  - 2fc56fc 2024-11-12T17:40:55+01:00 Use host ipsec binary and libraries
-  - b8a074a 2024-11-12T17:40:46+01:00 Provide support for user owned IPsec machine configs
-  - 9027fd9 2024-10-29T18:59:39+00:00 onv-k, udn: Update UserDefinedNetwork CRD
-  - f657323 2024-10-21T15:58:16+00:00 Adds UDN list/watch to ovnknode rbac
+- machine-config-operator embedded-component f5d2289db0692156343a4f8e48b654583d1c7352 to 911e8829ee867544a650b61751c66f571396bd5c
+  - eda705e6 2024-09-10T06:08:21+00:00 OCPBUGS-39222: Do not enable on-prem-resolv-prepender.path for UPI
 
-- machine-config-operator embedded-component 39e1cd3c3b04229c48988be1fb7f99b95856aff3 to f5d2289db0692156343a4f8e48b654583d1c7352
-  - 57e60ff6 2024-11-22T15:52:02-05:00 Revert "Merge pull request #4635 from sohankunkerkar/default-runc"
-  - 5bf9366d 2024-11-21T16:32:22-05:00 controller: default to runc when upgrading clusters from 4.17 to 4.18
+- ovn-kubernetes image-amd64 01d8c97267775c0212c64e6d5ddc176c9354eae8 to f1fed30814655ebf01015570e6f806d1250e4b8f
+  - 0126ba78 2024-11-21T15:08:03+01:00 network manager: ignore topology not managed errors
+  - b635ea71 2024-11-21T15:08:03+01:00 cluster manager: the Start method is topology agnostic
 
-- operator-framework-olm embedded-component 4cbfa455ffbd86afc26471f29bf46fed9f4779e3 to 649dfc4dc0a7fca1c25c7678665a55ad8ce53040
-  - 7744dd7e 2024-11-19T14:05:22-06:00 fix: call TokenRequest API when service account token secret is missing (#3377)
-
-- oc image-amd64 dde885f94df59c4816acc36814ffec3b55d4a1ca to 8b0472f0fae6851cbf8187a3b509deb9ee1be2c6
-  - 0a5488cf 2024-11-13T19:28:18+00:00 Fix newapp unit test failure by using different image
-
-- oc image-arm64 dde885f94df59c4816acc36814ffec3b55d4a1ca to 8b0472f0fae6851cbf8187a3b509deb9ee1be2c6
-  - 0a5488cf 2024-11-13T19:28:18+00:00 Fix newapp unit test failure by using different image
+- ovn-kubernetes image-arm64 01d8c97267775c0212c64e6d5ddc176c9354eae8 to f1fed30814655ebf01015570e6f806d1250e4b8f
+  - 0126ba78 2024-11-21T15:08:03+01:00 network manager: ignore topology not managed errors
+  - b635ea71 2024-11-21T15:08:03+01:00 cluster manager: the Start method is topology agnostic
 
