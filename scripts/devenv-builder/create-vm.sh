@@ -40,6 +40,9 @@ SYSROOTSIZE=$(( SYSROOTSIZE * 1024 ))
 SWAPSIZE=$(( SWAPSIZE * 1024 ))
 # Network name
 NETWORK=${NETWORK:-default}
+# Pool name - determin the pool for vm disk the volume
+MICROSHIFT_VOL_POOL="${MICROSHIFT_VOL_POOL:-default}"
+
 
 KICKSTART_FILE=$(mktemp "/tmp/kickstart-${VMNAME}-XXXXX.ks")
 cat < "${ROOTDIR}/config/kickstart.ks.template" | \
@@ -57,7 +60,7 @@ virt-install \
     --name ${VMNAME} \
     --vcpus ${NCPUS} \
     --memory ${RAMSIZE} \
-    --disk path=./${VMNAME}.qcow2,size=${DISKSIZE} \
+    --disk pool=${MICROSHIFT_VOL_POOL},path=./${VMNAME}.qcow2,size=${DISKSIZE} \
     --network network=${NETWORK},model=virtio \
     --events on_reboot=restart \
     --location ${ISOFILE} \

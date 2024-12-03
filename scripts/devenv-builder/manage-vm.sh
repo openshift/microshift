@@ -90,6 +90,7 @@ function action_create {
     export DISKSIZE="${DISKSIZE:-100}"
     export SWAPSIZE="${SWAPSIZE:-8}"
     export DATAVOLSIZE="${DATAVOLSIZE:-2}"
+    export MICROSHIFT_VOL_POOL="${MICROSHIFT_VOL_POOL}"
     if [ -z "${ISOFILE}" ]; then
         ISOFILE="${VMDISKDIR}/$(get_base_isofile "${MICROSHIFT_RHEL_VERSION}")"
     fi
