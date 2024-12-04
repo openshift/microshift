@@ -789,6 +789,7 @@ configure_vm_firewall() {
     # - On-host pod communication
     run_command_on_vm "${vmname}" "sudo firewall-cmd --permanent --zone=trusted --add-source=10.42.0.0/16"
     run_command_on_vm "${vmname}" "sudo firewall-cmd --permanent --zone=trusted --add-source=169.254.169.1"
+    run_command_on_vm "${vmname}" "sudo firewall-cmd --permanent --zone=trusted --add-source=fd01::/48"
 
     # Networking / firewall configuration instructions
     # - Incoming for the router
