@@ -281,6 +281,7 @@ if ${BUILD_AND_RUN} || ${FORCE_FIREWALL}; then
     sudo systemctl enable firewalld --now
     sudo firewall-cmd --permanent --zone=trusted --add-source=10.42.0.0/16
     sudo firewall-cmd --permanent --zone=trusted --add-source=169.254.169.1
+    sudo firewall-cmd --permanent --zone=trusted --add-source=fd01::/48
     sudo firewall-cmd --permanent --zone=public --add-port=80/tcp
     sudo firewall-cmd --permanent --zone=public --add-port=443/tcp
     sudo firewall-cmd --permanent --zone=public --add-port=5353/udp
