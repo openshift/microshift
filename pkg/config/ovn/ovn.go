@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"regexp"
 
+	"github.com/openshift/microshift/pkg/util"
 	"k8s.io/klog/v2"
 	"sigs.k8s.io/yaml"
 )
@@ -70,10 +71,10 @@ func (o *OVNKubernetesConfig) validateConfig() error {
 	return nil
 }
 
-// getClusterMTU retrieves MTU from ovn-kubernetes gateway interface "br-ex",
-// and falls back to use 1500 when "br-ex" mtu is unable to get or less than 0.
+// getClusterMTU retrieves MTU from the default route network interface,
+// and falls back to use 1500 when unable to get the mtu or less than 0.
 func (o *OVNKubernetesConfig) getClusterMTU(multinode bool) {
-	link, err := net.InterfaceByName(OVNGatewayInterface)
+	link, err := util.FindDefaultRouteInterface()
 	if err == nil && link.MTU > 0 {
 		o.MTU = link.MTU
 	} else {
