@@ -260,6 +260,15 @@ prepare_kickstart() {
         exit 1
     fi
 
+    # For bootc kickstart templates, make sure that commit references are
+    # fully qualified. Unqualified references are assumed to be served from
+    # the local mirror registry.
+    if [[ "${template}" == *bootc* ]] ; then
+        if [ "$(dirname "${boot_commit_ref}")" == "." ] ; then
+            boot_commit_ref="${MIRROR_REGISTRY_URL}/${boot_commit_ref}"
+        fi
+    fi
+
     mkdir -p "${output_dir}"
     for ifile in "${KICKSTART_TEMPLATE_DIR}/${template}" "${KICKSTART_TEMPLATE_DIR}"/includes/*.cfg ; do
         local output_file
