@@ -8,6 +8,8 @@ import (
 	"path/filepath"
 	"regexp"
 
+	"github.com/openshift/microshift/pkg/util"
+	"github.com/vishvananda/netlink"
 	"k8s.io/klog/v2"
 	"sigs.k8s.io/yaml"
 )
@@ -40,10 +42,6 @@ func (o *OVNKubernetesConfig) Validate() error {
 	if err != nil {
 		return fmt.Errorf("failed to validate OVS bridge: %w", err)
 	}
-	err = o.validateConfig()
-	if err != nil {
-		return fmt.Errorf("failed to validate OVN-K configuration: %w", err)
-	}
 	return nil
 }
 
@@ -56,28 +54,29 @@ func (o *OVNKubernetesConfig) validateOVSBridge() error {
 	return nil
 }
 
-// validateConfig validates the user defined configuration in /etc/microshift/ovn.yaml
-func (o *OVNKubernetesConfig) validateConfig() error {
-	// validate MTU conf
-	iface, err := net.InterfaceByName(OVNGatewayInterface)
-	if err != nil {
-		return fmt.Errorf("failed to find OVN gateway interface %q: %w", OVNGatewayInterface, err)
-	}
+// getClusterMTU retrieves MTU from the default route network interface,
+// and falls back to use 1500 when unable to get the mtu or ipFamily than 0.
+func (o *OVNKubernetesConfig) getClusterMTU(multinode bool, ipFamily int) {
+	klog.Infof("getClusterMTU: finding default route interface")
+	o.MTU = defaultMTU
 
-	if iface.MTU < o.MTU {
-		return fmt.Errorf("interface MTU (%d) is too small for specified overlay (%d)", iface.MTU, o.MTU)
-	}
-	return nil
-}
+	// if configure both IPV4 and IPV6 check the smallest
+	//nolint:nestif
+	if ipFamily == netlink.FAMILY_ALL {
+		mtu, err := util.FindDefaultRouteMinMTU()
 
-// getClusterMTU retrieves MTU from ovn-kubernetes gateway interface "br-ex",
-// and falls back to use 1500 when "br-ex" mtu is unable to get or less than 0.
-func (o *OVNKubernetesConfig) getClusterMTU(multinode bool) {
-	link, err := net.InterfaceByName(OVNGatewayInterface)
-	if err == nil && link.MTU > 0 {
-		o.MTU = link.MTU
+		if err == nil {
+			o.MTU = mtu
+		} else {
+			klog.Infof("getClusterMTU: error %s.", err)
+		}
 	} else {
-		o.MTU = defaultMTU
+		mtu, err := util.FindDefaultRouteMTU(ipFamily)
+		if err == nil {
+			o.MTU = mtu
+		} else {
+			klog.Infof("getClusterMTU: error %s.", err)
+		}
 	}
 
 	if multinode {
@@ -86,12 +85,12 @@ func (o *OVNKubernetesConfig) getClusterMTU(multinode bool) {
 }
 
 // withDefaults returns the default values when ovn.yaml is not provided
-func (o *OVNKubernetesConfig) withDefaults(multinode bool) *OVNKubernetesConfig {
-	o.getClusterMTU(multinode)
+func (o *OVNKubernetesConfig) withDefaults(multinode bool, ipFamily int) *OVNKubernetesConfig {
+	o.getClusterMTU(multinode, ipFamily)
 	return o
 }
 
-func newOVNKubernetesConfigFromFile(path string, multinode bool) (*OVNKubernetesConfig, error) {
+func newOVNKubernetesConfigFromFile(path string, multinode bool, ipFamily int) (*OVNKubernetesConfig, error) {
 	o := new(OVNKubernetesConfig)
 	buf, err := os.ReadFile(path)
 	if err != nil {
@@ -104,24 +103,24 @@ func newOVNKubernetesConfigFromFile(path string, multinode bool) (*OVNKubernetes
 	}
 	// in case mtu is not defined
 	if o.MTU == 0 {
-		o.getClusterMTU(multinode)
+		o.getClusterMTU(multinode, ipFamily)
 	}
 	klog.Infof("parsed OVNKubernetes config from file %q: %+v", path, o)
 
 	return o, nil
 }
 
-func NewOVNKubernetesConfigFromFileOrDefault(dir string, multinode bool) (*OVNKubernetesConfig, error) {
+func NewOVNKubernetesConfigFromFileOrDefault(dir string, multinode bool, ipFamily int) (*OVNKubernetesConfig, error) {
 	path := filepath.Join(dir, ovnConfigFileName)
 	if _, err := os.Stat(path); err != nil {
 		if errors.Is(err, os.ErrNotExist) {
 			klog.Infof("OVNKubernetes config file not found, assuming default values")
-			return new(OVNKubernetesConfig).withDefaults(multinode), nil
+			return new(OVNKubernetesConfig).withDefaults(multinode, ipFamily), nil
 		}
 		return nil, fmt.Errorf("failed to get OVNKubernetes config file: %v", err)
 	}
 
-	o, err := newOVNKubernetesConfigFromFile(path, multinode)
+	o, err := newOVNKubernetesConfigFromFile(path, multinode, ipFamily)
 	if err == nil {
 		return o, nil
 	}
