@@ -54,25 +54,6 @@ function lvmsShouldBeDeployed() {
     fi
 }
 
-# Check the microshift.service systemd unit activity, terminating the script
-# with the SIGTERM signal if the unit reports a failed state
-#
-# args: None
-# return: 0 if the systemd unit is active, or 1 otherwise
-function microshift_service_active() {
-    local -r is_failed=$(systemctl is-failed microshift.service)
-    local -r is_active=$(systemctl is-active microshift.service)
-
-    # Terminate the script in case of a failed service - nothing to wait for
-    if [ "${is_failed}" = "failed" ] ; then
-        echo "Error: The microshift.service systemd unit is failed. Terminating..."
-        kill -TERM ${SCRIPT_PID}
-    fi
-    # Check the service activity
-    [ "${is_active}" = "active" ] && return 0
-    return 1
-}
-
 # Check if MicroShift API 'readyz' and 'livez' health endpoints are OK
 #
 # args: None
@@ -113,6 +94,7 @@ echo "STARTED"
 print_boot_status
 
 # Exit if the MicroShift service is not enabled
+# TODO: Remove when `microshift healthcheck` is complete.
 if [ "$(systemctl is-enabled microshift.service 2>/dev/null)" != "enabled" ] ; then
     echo "MicroShift service is not enabled. Exiting..."
     exit 0
@@ -121,15 +103,7 @@ fi
 # Set the wait timeout for the current check based on the boot counter
 WAIT_TIMEOUT_SECS=$(get_wait_timeout)
 
-# Always log potential MicroShift upgrade errors on failure
-LOG_FAILURE_FILES+=("/var/lib/microshift-backups/prerun_failed.log")
-
-# Wait for MicroShift service to be active (failed status terminates the script)
-echo "Waiting ${WAIT_TIMEOUT_SECS}s for MicroShift service to be active and not failed"
-if ! wait_for "${WAIT_TIMEOUT_SECS}" microshift_service_active ; then
-    echo "Error: Timed out waiting for MicroShift service to be active"
-    exit 1
-fi
+/usr/bin/microshift healthcheck -v=2 --timeout="${WAIT_TIMEOUT_SECS}s"
 
 # Wait for MicroShift API health endpoints to be OK
 echo "Waiting ${WAIT_TIMEOUT_SECS}s for MicroShift API health endpoints to be OK"
