@@ -7,8 +7,8 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/openshift/microshift/pkg/servicemanager/startuprecorder"
 	"github.com/openshift/microshift/pkg/util/sigchannel"
-	"github.com/openshift/microshift/pkg/util/startuplogger"
 	"k8s.io/klog/v2"
 )
 
@@ -18,15 +18,17 @@ type ServiceManager struct {
 
 	services   []Service
 	serviceMap map[string]Service
+	startRec   *startuprecorder.StartupRecorder
 }
 
-func NewServiceManager() *ServiceManager {
+func NewServiceManager(startRec *startuprecorder.StartupRecorder) *ServiceManager {
 	return &ServiceManager{
 		name: "service-manager",
 		deps: []string{},
 
 		services:   []Service{},
 		serviceMap: make(map[string]Service),
+		startRec:   startRec,
 	}
 }
 func (s *ServiceManager) Name() string           { return s.name }
@@ -53,7 +55,7 @@ func (m *ServiceManager) AddService(s Service) error {
 	return nil
 }
 
-func (m *ServiceManager) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}, startLog *startuplogger.StartupLogger) error {
+func (m *ServiceManager) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
 	defer close(stopped)
 
 	services := m.services
@@ -85,7 +87,7 @@ func (m *ServiceManager) Run(ctx context.Context, ready chan<- struct{}, stopped
 		}
 
 		// Start the service and store its ready and stopped channels
-		serviceReady, serviceStopped := m.asyncRun(ctx, service, startLog)
+		serviceReady, serviceStopped := m.asyncRun(ctx, service)
 		readyMap[service.Name()] = serviceReady
 		stoppedMap[service.Name()] = serviceStopped
 	}
@@ -101,7 +103,7 @@ func (m *ServiceManager) Run(ctx context.Context, ready chan<- struct{}, stopped
 	return ctx.Err()
 }
 
-func (m *ServiceManager) asyncRun(ctx context.Context, service Service, startLog *startuplogger.StartupLogger) (<-chan struct{}, <-chan struct{}) {
+func (m *ServiceManager) asyncRun(ctx context.Context, service Service) (<-chan struct{}, <-chan struct{}) {
 	ready, stopped := make(chan struct{}), make(chan struct{})
 
 	klog.WithMicroshiftLoggerComponent(service.Name(), func() {
@@ -123,8 +125,7 @@ func (m *ServiceManager) asyncRun(ctx context.Context, service Service, startLog
 			svcStart := time.Now()
 			go func() {
 				<-ready
-				klog.InfoS("SERVICE READY", "service", service.Name(), "since-start", time.Since(svcStart))
-				startLog.LogService(service.Name(), service.Dependencies(), svcStart, time.Now())
+				m.startRec.LogServiceReady(service.Name(), service.Dependencies(), svcStart, time.Now())
 			}()
 			go func() {
 				<-stopped

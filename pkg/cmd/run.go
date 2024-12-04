@@ -22,10 +22,10 @@ import (
 	"github.com/openshift/microshift/pkg/node"
 	"github.com/openshift/microshift/pkg/release"
 	"github.com/openshift/microshift/pkg/servicemanager"
+	"github.com/openshift/microshift/pkg/servicemanager/startuprecorder"
 	"github.com/openshift/microshift/pkg/sysconfwatch"
 	"github.com/openshift/microshift/pkg/util"
 	"github.com/openshift/microshift/pkg/util/cryptomaterial/certchains"
-	"github.com/openshift/microshift/pkg/util/startuplogger"
 	"github.com/openshift/microshift/pkg/version"
 	"github.com/spf13/cobra"
 
@@ -135,12 +135,9 @@ func RunMicroshift(cfg *config.Config) error {
 		klog.Fatalf("MicroShift must be run privileged")
 	}
 
-	startLog := startuplogger.NewStartupLogger()
-
-	klog.InfoS("MICROSHIFT STARTING")
 	microshiftStart := time.Now()
-
-	startLog.LogMicroshiftStart(microshiftStart)
+	startRec := *startuprecorder.New()
+	startRec.LogMicroshiftStart(microshiftStart)
 
 	// Tell the logging code that it's OK to receive reconfiguration
 	// instructions unless those instructions are different. This
@@ -198,8 +195,7 @@ func RunMicroshift(cfg *config.Config) error {
 
 	// Establish the context we will use to control execution
 	runCtx, runCancel := context.WithCancel(context.Background())
-
-	m := servicemanager.NewServiceManager()
+	m := servicemanager.NewServiceManager(&startRec)
 	util.Must(m.AddService(node.NewNetworkConfiguration(cfg)))
 	util.Must(m.AddService(controllers.NewEtcd(cfg)))
 	util.Must(m.AddService(sysconfwatch.NewSysConfWatchController(cfg)))
@@ -252,7 +248,7 @@ func RunMicroshift(cfg *config.Config) error {
 	ready, stopped := make(chan struct{}), make(chan struct{})
 	go func() {
 		klog.Infof("Started %s", m.Name())
-		if err := m.Run(runCtx, ready, stopped, startLog); err != nil {
+		if err := m.Run(runCtx, ready, stopped); err != nil {
 			klog.Errorf("Stopped %s: %v", m.Name(), err)
 		} else {
 			klog.Infof("%s completed", m.Name())
@@ -265,10 +261,8 @@ func RunMicroshift(cfg *config.Config) error {
 
 	select {
 	case <-ready:
-		klog.InfoS("MICROSHIFT READY", "since-start", time.Since(microshiftStart))
-
-		startLog.LogMicroshiftReady(time.Now())
-		startLog.OutputData()
+		startRec.LogMicroshiftReady(time.Now())
+		startRec.OutputData()
 
 		os.Setenv("NOTIFY_SOCKET", notifySocket)
 		if supported, err := daemon.SdNotify(false, daemon.SdNotifyReady); err != nil {
