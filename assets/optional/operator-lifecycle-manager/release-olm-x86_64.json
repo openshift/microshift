@@ -1,10 +1,10 @@
 {
   "release": {
-    "base": "4.18.0-0.nightly-2024-11-15-113437"
+    "base": "4.19.0-0.nightly-2024-12-03-043701"
   },
   "images": {
-    "operator-lifecycle-manager": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:20448ab31d9c315b183a1f9513ddab38a56bbc09753699d9e706e4cab59f779c",
-    "operator-registry": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:cdce1fbff25887d02322224b1f6f3554cc53e7c0fce7fd91ce01198aa1090a07",
-    "kube-rbac-proxy": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:4e801562a4ae0aa26a165287b5994e572b03bbde42d2afcab975296ebdd35f12"
+    "operator-lifecycle-manager": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:d76ca3d6f3016ba9987141836f8dbd753a8cc5d8334918473d47ec2cc3ebf518",
+    "operator-registry": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:539e58540311bf8507ee249a0920b59d3eda9bf30568958ad6bd2ce35074d397",
+    "kube-rbac-proxy": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:17442def8485156c57b859c531e535e2bae77b96b4ec41dbb339584df44483ba"
   }
 }
