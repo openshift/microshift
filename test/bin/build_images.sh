@@ -45,7 +45,9 @@ extract_container_images() {
         dnf_options="--repofrompath ${repo_name},${repo_spec} --repo ${repo_name}"
     elif [[ "${repo_spec}" =~ ^/.* ]]; then
         # If the spec is a path, set up the arguments to point to that path.
-        dnf_options="--repofrompath ${repo_name},${repo_spec} --repo ${repo_name}"
+        # Disabling dnf strict option and refreshing cache are required because the
+        # download command does not run elevated.
+        dnf_options="--repofrompath ${repo_name},${repo_spec} --repo ${repo_name} --setopt=strict=False --refresh"
     elif [[ -n ${repo_spec} ]]; then
         # If the spec is a name, assume it is already known to the
         # system through normal configuration. The repo does not need
