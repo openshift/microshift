@@ -3,6 +3,10 @@
 # Sourced from scenario.sh and uses functions defined there.
 
 scenario_create_vms() {
+    if [[ "${CURRENT_RELEASE_REPO}" == "" ]] ; then
+        # TODO: While 4.19-ec is not available, it needs to exit without an error.
+        exit 0
+    fi
     if [[ "${CURRENT_RELEASE_REPO}" == http* ]] ; then
         # Discover a pre-release MicroShift bootc image reference on the mirror
         local -r mirror_url="$(dirname "${CURRENT_RELEASE_REPO}")/bootc-pullspec.txt"
@@ -33,9 +37,17 @@ scenario_create_vms() {
 }
 
 scenario_remove_vms() {
+    if [[ "${CURRENT_RELEASE_REPO}" == "" ]] ; then
+        # TODO: While 4.19-ec is not available, it needs to exit without an error.
+        exit 0
+    fi
     remove_vm host1
 }
 
 scenario_run_tests() {
+    if [[ "${CURRENT_RELEASE_REPO}" == "" ]] ; then
+        # TODO: While 4.19-ec is not available, it needs to exit without an error.
+        exit 0
+    fi
     run_tests host1 suites/standard2/
 }

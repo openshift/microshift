@@ -9,9 +9,9 @@ distro = "rhel-94"
 # used with the '--parent' argument of 'osbuild-composer'
 {{- "\n" -}}
 {{- if env.Getenv "CURRENT_RELEASE_VERSION" "" -}}
-# parent = "rhel-9.4-microshift-4.{{ .Env.PREVIOUS_MINOR_VERSION }}"
-{{- else -}}
 # parent = "rhel-9.4-microshift-crel-optionals"
+{{- else -}}
+# parent = "rhel-9.4-microshift-4.{{ .Env.PREVIOUS_MINOR_VERSION }}"
 {{- end -}}
 {{- "\n" -}}
 

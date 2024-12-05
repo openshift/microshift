@@ -1,3 +1,4 @@
+{{- if env.Getenv "CURRENT_RELEASE_VERSION" "" -}}
 FROM localhost/rhel94-test-agent:latest
 
 # Copy repository configuration
@@ -29,3 +30,4 @@ RUN firewall-offline-cmd --zone=public --add-port=22/tcp && \
     firewall-offline-cmd --zone=public --add-port=6443/tcp && \
     firewall-offline-cmd --zone=public --add-port=30000-32767/tcp && \
     firewall-offline-cmd --zone=public --add-port=30000-32767/udp
+{{- end -}}
