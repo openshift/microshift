@@ -330,11 +330,12 @@ Some ovn-kubernetes traffic needs to be explicitly allowed when `firewalld` serv
 - Pod to host
 - Pod to host service (kubernetes service backed by host endpoints)
 
-Insert and reload the following firewall rules to allow these ovn-kubernetes traffic:
+Insert and reload the following firewall rules to allow these ovn-kubernetes traffic (note the `clusterNetwork` must be added to the rules, this example shows defaults):
 
 ```text
 sudo firewall-cmd --permanent --zone=trusted --add-source=10.42.0.0/16
 sudo firewall-cmd --permanent --zone=trusted --add-source=169.254.169.1
+sudo firewall-cmd --permanent --zone=trusted --add-source=fd01::/48
 sudo firewall-cmd --reload
 ```
 
