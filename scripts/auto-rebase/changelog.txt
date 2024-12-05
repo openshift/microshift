@@ -1,11 +1,6 @@
-- machine-config-operator embedded-component f5d2289db0692156343a4f8e48b654583d1c7352 to 911e8829ee867544a650b61751c66f571396bd5c
-  - eda705e6 2024-09-10T06:08:21+00:00 OCPBUGS-39222: Do not enable on-prem-resolv-prepender.path for UPI
+- oc image-amd64 8b0472f0fae6851cbf8187a3b509deb9ee1be2c6 to 13001b02b86dbd91f65268fb93325e8c88164ee0
+  - e3d6ac9b 2024-11-13T16:48:56+00:00 OCPBUGS-43513: Show node-joiner container logs when error occurs
 
-- ovn-kubernetes image-amd64 01d8c97267775c0212c64e6d5ddc176c9354eae8 to f1fed30814655ebf01015570e6f806d1250e4b8f
-  - 0126ba78 2024-11-21T15:08:03+01:00 network manager: ignore topology not managed errors
-  - b635ea71 2024-11-21T15:08:03+01:00 cluster manager: the Start method is topology agnostic
-
-- ovn-kubernetes image-arm64 01d8c97267775c0212c64e6d5ddc176c9354eae8 to f1fed30814655ebf01015570e6f806d1250e4b8f
-  - 0126ba78 2024-11-21T15:08:03+01:00 network manager: ignore topology not managed errors
-  - b635ea71 2024-11-21T15:08:03+01:00 cluster manager: the Start method is topology agnostic
+- oc image-arm64 8b0472f0fae6851cbf8187a3b509deb9ee1be2c6 to 13001b02b86dbd91f65268fb93325e8c88164ee0
+  - e3d6ac9b 2024-11-13T16:48:56+00:00 OCPBUGS-43513: Show node-joiner container logs when error occurs
 
