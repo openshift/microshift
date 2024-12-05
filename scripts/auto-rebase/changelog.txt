@@ -1,0 +1,3 @@
+- machine-config-operator embedded-component 326ff3abec70893c0fdd4b21aa6a6c52ed31e0d7 to dbd860c427d31db182489ae3eab9a595622f3e25
+  - 0175c961 2024-12-02T17:20:21+00:00 render: sort list of source machineconfigs
+
