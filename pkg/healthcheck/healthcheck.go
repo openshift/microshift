@@ -13,5 +13,9 @@ func MicroShiftHealthcheck(ctx context.Context, timeout time.Duration) error {
 		return nil
 	}
 
+	if err := apiServerShouldBeLiveAndReady(ctx, timeout); err != nil {
+		return err
+	}
+
 	return nil
 }
