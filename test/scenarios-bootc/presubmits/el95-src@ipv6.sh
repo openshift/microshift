@@ -15,8 +15,8 @@ WEB_SERVER_URL="http://[${VM_BRIDGE_IP}]:${WEB_SERVER_PORT}"
 MIRROR_REGISTRY_URL="$(hostname):${MIRROR_REGISTRY_PORT}"
 
 scenario_create_vms() {
-    prepare_kickstart host1 kickstart-bootc.ks.template rhel94-bootc-source
-    launch_vm --boot_blueprint rhel94-bootc --network "${VM_IPV6_NETWORK}" --bootc
+    prepare_kickstart host1 kickstart-bootc.ks.template rhel95-bootc-source
+    launch_vm --boot_blueprint rhel95-bootc --network "${VM_IPV6_NETWORK}" --bootc
 }
 
 scenario_remove_vms() {

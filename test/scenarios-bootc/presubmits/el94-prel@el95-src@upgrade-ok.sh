@@ -3,7 +3,7 @@
 # Sourced from scenario.sh and uses functions defined there.
 
 scenario_create_vms() {
-    prepare_kickstart host1 kickstart-bootc.ks.template rhel94-bootc-source-fake-next-minor
+    prepare_kickstart host1 kickstart-bootc.ks.template rhel94-bootc-prel
     launch_vm --boot_blueprint rhel94-bootc --bootc
 }
 
@@ -13,7 +13,7 @@ scenario_remove_vms() {
 
 scenario_run_tests() {
     run_tests host1 \
-        --variable "OLDER_MICROSHIFT_REF:rhel94-bootc-source" \
+        --variable "TARGET_REF:rhel95-bootc-source" \
         --variable "BOOTC_REGISTRY:${MIRROR_REGISTRY_URL}" \
-        suites/upgrade/downgrade-block.robot
+        suites/upgrade/upgrade-successful.robot
 }

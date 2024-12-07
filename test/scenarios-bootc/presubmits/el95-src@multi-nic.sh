@@ -3,8 +3,9 @@
 # Sourced from scenario.sh and uses functions defined there.
 
 scenario_create_vms() {
-    prepare_kickstart host1 kickstart-bootc.ks.template rhel94-bootc-source
-    launch_vm --boot_blueprint rhel94-bootc --network "${VM_DUAL_STACK_NETWORK}" --bootc
+    prepare_kickstart host1 kickstart-bootc.ks.template rhel95-bootc-source
+    # Using multus as secondary network to have 2 nics in different networks.
+    launch_vm --boot_blueprint rhel95-bootc --network default,"${VM_MULTUS_NETWORK}" --bootc
 }
 
 scenario_remove_vms() {
@@ -19,5 +20,5 @@ scenario_run_tests() {
     run_tests host1 \
         --variable "USHIFT_HOST_IP1:${vm_ip1}" \
         --variable "USHIFT_HOST_IP2:${vm_ip2}" \
-        suites/ipv6/dualstack.robot
+        suites/network/multi-nic.robot
 }
