@@ -1,4 +1,4 @@
-FROM localhost/rhel94-bootc-source:latest
+FROM localhost/rhel95-bootc-source:latest
 
 # Add fips=1 kernel argument
 # See https://containers.github.io/bootc/building/kernel-arguments.html

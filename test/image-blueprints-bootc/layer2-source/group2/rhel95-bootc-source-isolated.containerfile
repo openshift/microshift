@@ -1,4 +1,4 @@
-FROM localhost/rhel94-bootc-source:latest
+FROM localhost/rhel95-bootc-source:latest
 
 # The qemu-guest-agent is used in offline tests
 RUN dnf install -y qemu-guest-agent && \

@@ -1,4 +1,4 @@
-FROM localhost/rhel94-bootc-source:latest
+FROM localhost/rhel95-bootc-source:latest
 
 # Build arguments
 ARG USHIFT_RPM_REPO_NAME=microshift-fake-next-minor
