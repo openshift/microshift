@@ -4,7 +4,7 @@
 
 scenario_create_vms() {
     prepare_kickstart host1 kickstart-bootc-container.ks.template ""
-    launch_container --image rhel94-bootc-source
+    launch_container --image rhel95-bootc-source
 }
 
 scenario_remove_vms() {
@@ -12,5 +12,5 @@ scenario_remove_vms() {
 }
 
 scenario_run_tests() {
-    run_tests host1 suites/standard1/
+    run_tests host1 suites/backup/auto-recovery.robot suites/backup/auto-recovery-extra.robot
 }

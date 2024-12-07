@@ -4,7 +4,7 @@
 
 scenario_create_vms() {
     prepare_kickstart host1 kickstart-bootc-container.ks.template ""
-    launch_container --image rhel94-bootc-source --vg_size 3
+    launch_container --image rhel95-bootc-source-optionals
 }
 
 scenario_remove_vms() {
@@ -12,7 +12,5 @@ scenario_remove_vms() {
 }
 
 scenario_run_tests() {
-    run_tests host1 \
-        --variable "LVMD_VG_OVERRIDE:$(full_vm_name host1)" \
-        suites/storage/
+    run_tests host1 --exclude vm-only suites/optional/
 }
