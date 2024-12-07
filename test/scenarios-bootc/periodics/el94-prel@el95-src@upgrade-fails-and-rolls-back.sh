@@ -13,7 +13,7 @@ scenario_remove_vms() {
 
 scenario_run_tests() {
     run_tests host1 \
-        --variable "FAILING_REF:rhel94-bootc-source" \
+        --variable "FAILING_REF:rhel95-bootc-source" \
         --variable "REASON:fail_greenboot" \
         --variable "BOOTC_REGISTRY:${MIRROR_REGISTRY_URL}" \
         suites/upgrade/upgrade-fails-and-rolls-back.robot

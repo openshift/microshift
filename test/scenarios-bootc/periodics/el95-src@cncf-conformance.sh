@@ -164,10 +164,10 @@ run_sonobuoy() {
 }
 
 scenario_create_vms() {
-    prepare_kickstart host1 kickstart-bootc.ks.template rhel94-bootc-source
-    prepare_kickstart host2 kickstart-bootc.ks.template rhel94-bootc-source
-    launch_vm --vmname host1 --boot_blueprint rhel94-bootc --bootc
-    launch_vm --vmname host2 --boot_blueprint rhel94-bootc --bootc
+    prepare_kickstart host1 kickstart-bootc.ks.template rhel95-bootc-source
+    prepare_kickstart host2 kickstart-bootc.ks.template rhel95-bootc-source
+    launch_vm --vmname host1 --boot_blueprint rhel95-bootc --bootc
+    launch_vm --vmname host2 --boot_blueprint rhel95-bootc --bootc
 }
 
 scenario_remove_vms() {

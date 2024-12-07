@@ -28,7 +28,7 @@ scenario_create_vms() {
     fi
 
     prepare_kickstart host1 kickstart-bootc.ks.template "${bootc_spec}"
-    launch_vm --boot_blueprint rhel94-bootc --bootc
+    launch_vm --boot_blueprint rhel95-bootc --bootc
 
     # Open the firewall ports. Other scenarios get this behavior by embedding
     # settings in the blueprint, but we cannot open firewall ports in published
