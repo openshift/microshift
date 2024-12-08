@@ -138,7 +138,7 @@
 - name: vnstat collection tasks
   block:
     - name: wait for vnstat db to populate
-      ansible.builtin.shell: vnstat | grep rx
+      ansible.builtin.shell: vnstat | grep today
       retries: 60
       delay: 10
       register: vnstat_db
