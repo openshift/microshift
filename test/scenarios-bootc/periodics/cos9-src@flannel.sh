@@ -4,7 +4,7 @@
 
 scenario_create_vms() {
     prepare_kickstart host1 kickstart-bootc.ks.template cos9-bootc-source
-    launch_vm --boot_blueprint centos9-bootc --bootc
+    launch_vm --boot_blueprint centos9-bootc
 
     # Open the firewall ports. Other scenarios get this behavior by
     # embedding settings in the blueprint, but there is no blueprint
