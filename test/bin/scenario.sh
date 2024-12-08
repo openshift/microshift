@@ -455,7 +455,6 @@ EOF
 #           [--vm_memory <memory>] \
 #           [--vm_disksize <disksize>] \
 #           [--fips] \
-#           [--bootc] \
 #           [--no_network]
 #
 # Arguments:
@@ -473,7 +472,6 @@ EOF
 #   [--vm_memory <memory>]: Size of RAM in MB for the VM.
 #   [--vm_disksize <disksize>]: Size of disk in GB for the VM.
 #   [--fips]: Enable FIPS mode
-#   [--bootc]: Enable bootc mode
 
 launch_vm() {
     # set defaults
@@ -484,7 +482,6 @@ launch_vm() {
     local vm_vcpus=2
     local vm_disksize=20
     local fips_mode=0
-    local bootc_mode=0
 
     while [ $# -gt 0 ]; do
         case "$1" in
@@ -515,10 +512,6 @@ launch_vm() {
                 ;;
             --fips)
                 fips_mode=1
-                shift
-                ;;
-            --bootc)
-                bootc_mode=1
                 shift
                 ;;
             *)

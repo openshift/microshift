@@ -10,7 +10,7 @@ MIRROR_REGISTRY_URL="${VM_BRIDGE_IP}:${MIRROR_REGISTRY_PORT}"
 scenario_create_vms() {
     prepare_kickstart host1 kickstart-bootc-isolated.ks.template rhel95-bootc-source-isolated
     # Use the isolated network when creating a VM
-    launch_vm --boot_blueprint rhel95-bootc --network "${VM_ISOLATED_NETWORK}" --bootc
+    launch_vm --boot_blueprint rhel95-bootc --network "${VM_ISOLATED_NETWORK}"
 }
 
 scenario_remove_vms() {

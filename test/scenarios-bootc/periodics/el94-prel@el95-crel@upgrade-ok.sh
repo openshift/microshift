@@ -10,7 +10,7 @@ scenario_create_vms() {
         return 0
     fi
     prepare_kickstart host1 kickstart-bootc.ks.template rhel94-bootc-prel
-    launch_vm --boot_blueprint rhel94-bootc --bootc
+    launch_vm --boot_blueprint rhel94-bootc
 }
 
 scenario_remove_vms() {
