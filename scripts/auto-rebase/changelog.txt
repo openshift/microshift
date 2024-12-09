@@ -1,6 +1,12 @@
-- oc image-amd64 8b0472f0fae6851cbf8187a3b509deb9ee1be2c6 to 13001b02b86dbd91f65268fb93325e8c88164ee0
-  - e3d6ac9b 2024-11-13T16:48:56+00:00 OCPBUGS-43513: Show node-joiner container logs when error occurs
+- cluster-network-operator embedded-component 7768811ef167eb33a0eaafc5c3eb30fdd02470fd to c3e09bc436f73a60827d4c7c380dca700705047f
+  - 82c53dc 2024-11-11T03:09:33+00:00 Pass transit_switch_subnet options in ovnkube-node pod
 
-- oc image-arm64 8b0472f0fae6851cbf8187a3b509deb9ee1be2c6 to 13001b02b86dbd91f65268fb93325e8c88164ee0
-  - e3d6ac9b 2024-11-13T16:48:56+00:00 OCPBUGS-43513: Show node-joiner container logs when error occurs
+- ovn-kubernetes image-arm64 f1fed30814655ebf01015570e6f806d1250e4b8f to fccd62a2c9efaeadf1c502ab95b28beb99aa543c
+  - f9bb07fb 2024-12-03T14:45:43+01:00 Dockerfile: Update OVN to the 24.03.2-32.el9fdp minor release.
+
+- kubernetes image-arm64 5a24e858060a609366c5ff1402ec1424e9f7e403 to d8494300e320fece784adaefe6596fd653813cfa
+  - 83cfec97e 2024-11-29T16:15:08+00:00 UPSTREAM: <carry>: Fixup inconsistent go.mod
+  - 0f1ba5484 2024-11-25T10:07:53+00:00 UPSTREAM: <drop>: Enable format library for 4.18
+  - c701dceaa 2024-11-22T13:01:10+00:00 UPSTREAM: 123572: feature: add name formats library to CEL
+  - 2d777d8ac 2024-11-22T13:00:51+00:00 UPSTREAM: 123572: test: typecheck cel test cases
 
