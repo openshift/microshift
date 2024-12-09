@@ -6,7 +6,7 @@
     path: "{{ prometheus_dir }}"
   register: promdir
 
-- name: Check if the file exists
+- name: check if the file exists
   ansible.builtin.stat:
     path: "{{ sa_token_file }}"
   register: token_file
