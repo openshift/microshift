@@ -135,9 +135,11 @@ func RunMicroshift(cfg *config.Config) error {
 		klog.Fatalf("MicroShift must be run privileged")
 	}
 
+	os.Setenv("STARTUP_LOGS_PATH", "/tmp/startup_times.json")
+
 	microshiftStart := time.Now()
-	startRec := *startuprecorder.New()
-	startRec.LogMicroshiftStart(microshiftStart)
+	startRec := startuprecorder.New()
+	startRec.MicroshiftStarts(microshiftStart)
 
 	// Tell the logging code that it's OK to receive reconfiguration
 	// instructions unless those instructions are different. This
@@ -195,7 +197,7 @@ func RunMicroshift(cfg *config.Config) error {
 
 	// Establish the context we will use to control execution
 	runCtx, runCancel := context.WithCancel(context.Background())
-	m := servicemanager.NewServiceManager(&startRec)
+	m := servicemanager.NewServiceManager(startRec)
 	util.Must(m.AddService(node.NewNetworkConfiguration(cfg)))
 	util.Must(m.AddService(controllers.NewEtcd(cfg)))
 	util.Must(m.AddService(sysconfwatch.NewSysConfWatchController(cfg)))
@@ -219,7 +221,7 @@ func RunMicroshift(cfg *config.Config) error {
 	notifySocket := os.Getenv("NOTIFY_SOCKET")
 	os.Unsetenv("NOTIFY_SOCKET")
 
-	klog.InfoS("MICROSHIFT STARTING SERVICES", "since-start", time.Since(microshiftStart))
+	startRec.ServicesStart(microshiftStart)
 
 	_, rotationDate, err := certchains.WhenToRotateAtEarliest(certChains)
 	if err != nil {
@@ -261,7 +263,7 @@ func RunMicroshift(cfg *config.Config) error {
 
 	select {
 	case <-ready:
-		startRec.LogMicroshiftReady(time.Now())
+		startRec.MicroshiftReady()
 		startRec.OutputData()
 
 		os.Setenv("NOTIFY_SOCKET", notifySocket)

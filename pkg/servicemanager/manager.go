@@ -125,7 +125,7 @@ func (m *ServiceManager) asyncRun(ctx context.Context, service Service) (<-chan 
 			svcStart := time.Now()
 			go func() {
 				<-ready
-				m.startRec.LogServiceReady(service.Name(), service.Dependencies(), svcStart, time.Now())
+				m.startRec.ServiceReady(service.Name(), service.Dependencies(), svcStart)
 			}()
 			go func() {
 				<-stopped
