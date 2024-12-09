@@ -36,9 +36,9 @@ Set MemoryHigh Limit Unlimited
     Expect MemoryHigh    infinity
 
 Set MemoryHigh Limit 256MB
-    [Documentation]    Set the memory limit for etcd to 128MB and ensure it takes effect
+    [Documentation]    Set the memory limit for etcd to 256MB and ensure it takes effect
     [Setup]    Setup With Custom Config    ${MEMLIMIT256}
-    # Expecting the setting to be 128 * 1024 * 1024
+    # Expecting the setting to be 256 * 1024 * 1024
     Expect MemoryHigh    268435456
     [Teardown]    Restore Default Config
 
