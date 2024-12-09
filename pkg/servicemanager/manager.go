@@ -7,6 +7,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/openshift/microshift/pkg/servicemanager/startuprecorder"
 	"github.com/openshift/microshift/pkg/util/sigchannel"
 	"k8s.io/klog/v2"
 )
@@ -17,15 +18,17 @@ type ServiceManager struct {
 
 	services   []Service
 	serviceMap map[string]Service
+	startRec   *startuprecorder.StartupRecorder
 }
 
-func NewServiceManager() *ServiceManager {
+func NewServiceManager(startRec *startuprecorder.StartupRecorder) *ServiceManager {
 	return &ServiceManager{
 		name: "service-manager",
 		deps: []string{},
 
 		services:   []Service{},
 		serviceMap: make(map[string]Service),
+		startRec:   startRec,
 	}
 }
 func (s *ServiceManager) Name() string           { return s.name }
@@ -102,6 +105,7 @@ func (m *ServiceManager) Run(ctx context.Context, ready chan<- struct{}, stopped
 
 func (m *ServiceManager) asyncRun(ctx context.Context, service Service) (<-chan struct{}, <-chan struct{}) {
 	ready, stopped := make(chan struct{}), make(chan struct{})
+
 	klog.WithMicroshiftLoggerComponent(service.Name(), func() {
 		go func() {
 			defer func() {
@@ -121,7 +125,7 @@ func (m *ServiceManager) asyncRun(ctx context.Context, service Service) (<-chan 
 			svcStart := time.Now()
 			go func() {
 				<-ready
-				klog.InfoS("SERVICE READY", "service", service.Name(), "since-start", time.Since(svcStart))
+				m.startRec.ServiceReady(service.Name(), service.Dependencies(), svcStart)
 			}()
 			go func() {
 				<-stopped
