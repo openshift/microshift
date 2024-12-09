@@ -29,7 +29,7 @@ Artifacts built in this layer cannot be cached as they depend on the current sou
 |group2| Average  | Current source artifacts on RHEL
 |group3| Average  | Current source artifacts on CentOS (with 1 exception)
 
-The `rhel94-bootc-source-isolated.image-bootc` file is an exception in `group3`
-as it uses RHEL. This helps avoid creation of another group with a single file.
+One of the isolated source image files is an exception in `group3` as it uses
+RHEL. This helps avoid creation of another group with a single file.
 
 > Note: Total build times are up to 10 minutes.

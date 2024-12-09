@@ -13,7 +13,7 @@ scenario_create_vms() {
     check_platform
 
     prepare_kickstart host1 kickstart-bootc.ks.template cos9-bootc-source-fips true
-    launch_vm --boot_blueprint centos9-bootc --fips --bootc
+    launch_vm --boot_blueprint centos9-bootc --fips
 }
 
 scenario_remove_vms() {
