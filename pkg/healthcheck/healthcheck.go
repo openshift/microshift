@@ -2,7 +2,10 @@ package healthcheck
 
 import (
 	"context"
+	"strings"
 	"time"
+
+	"k8s.io/klog/v2"
 )
 
 func MicroShiftHealthcheck(ctx context.Context, timeout time.Duration) error {
@@ -18,6 +21,8 @@ func MicroShiftHealthcheck(ctx context.Context, timeout time.Duration) error {
 		return err
 	}
 
+	klog.Info("MicroShift is ready")
+
 	return nil
 }
 
@@ -26,5 +31,6 @@ func NamespacesHealthcheck(ctx context.Context, timeout time.Duration, namespace
 		logPodsAndEvents()
 		return err
 	}
+	klog.Infof("Workloads in %s namespaces are ready", strings.Join(namespaces, ", "))
 	return nil
 }
