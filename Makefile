@@ -34,7 +34,6 @@ OUTPUT_DIR :=_output
 RPM_BUILD_DIR :=$(OUTPUT_DIR)/rpmbuild
 CROSS_BUILD_BINDIR :=$(OUTPUT_DIR)/bin
 FROM_SOURCE :=false
-CTR_CMD :=$(or $(shell which podman 2>/dev/null), $(shell which docker 2>/dev/null))
 ARCH :=$(shell uname -m |sed -e "s/x86_64/amd64/" |sed -e "s/aarch64/arm64/")
 PULLSECRET ?= ~/.pull-secret.json
 
@@ -171,19 +170,9 @@ verify-py:
 verify-rf:
 	./scripts/verify/verify-rf.sh
 
-# When run inside a container, the file contents are redirected via stdin and
-# the output of errors does not contain the file path. Work around this issue
-# by replacing the '^-:' token in the output by the actual file name.
 .PHONY: verify-containers
 verify-containers:
-	./scripts/fetch_tools.sh hadolint ; \
-	FILES=$$(find . -iname '*containerfile*' -o -iname '*dockerfile*' | grep -v "vendor\|_output\|origin\|.git") ; \
-	for f in $${FILES} ; do \
-		echo "$${f}" ; \
-		podman run --rm -i \
-			-v "$$(pwd)/.hadolint.yaml:/.hadolint.yaml:ro" \
-			ghcr.io/hadolint/hadolint:2.12.0 < "$${f}" | sed "s|^-:|$${f}:|" ; \
-	done
+	./scripts/verify/verify-containers.sh
 
 # Vulnerability check is not run in any default verify target
 # It should be run explicitly before the release to track and fix known vulnerabilities
