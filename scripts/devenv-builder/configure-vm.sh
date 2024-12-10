@@ -139,7 +139,7 @@ if ${RHEL_SUBSCRIPTION}; then
         fi
 
         # Remove the rh-amazon-rhui-client as its upgrade process re-enables the RHUI repos.
-        if sudo rpm -qa | grep -v rh-amazon-rhui-client; then
+        if sudo rpm -q rh-amazon-rhui-client > /dev/null; then
             sudo dnf remove -y rh-amazon-rhui-client
         fi
     fi
