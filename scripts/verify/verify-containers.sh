@@ -4,7 +4,8 @@ set -x
 
 ROOTDIR=$(git rev-parse --show-toplevel)
 
-FILES=$(find "${ROOTDIR}" -iname '*containerfile*' -o -iname '*dockerfile*' | grep -v "vendor\|_output\|origin\|.git")
+cd "${ROOTDIR}"
+FILES=$(find . -iname '*containerfile*' -o -iname '*dockerfile*' | grep -v "vendor\|_output\|origin\|.git")
 # When run inside a container, the file contents are redirected via stdin and
 # the output of errors does not contain the file path. Work around this issue
 # by replacing the '^-:' token in the output by the actual file name.
