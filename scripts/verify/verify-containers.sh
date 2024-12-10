@@ -1,5 +1,6 @@
 #!/bin/bash
 set -euo pipefail
+set -x
 
 ROOTDIR=$(git rev-parse --show-toplevel)
 
