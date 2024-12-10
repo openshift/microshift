@@ -10,10 +10,12 @@ import (
 
 	"github.com/openshift/microshift/pkg/config"
 	"k8s.io/cli-runtime/pkg/genericclioptions"
+	"k8s.io/client-go/util/homedir"
 	"k8s.io/klog/v2"
 	"k8s.io/kubectl/pkg/cmd/get"
 	"k8s.io/kubectl/pkg/cmd/rollout"
 	cmdutil "k8s.io/kubectl/pkg/cmd/util"
+	"k8s.io/utils/ptr"
 )
 
 func waitForNamespaces(timeout time.Duration, namespaces []string) error {
@@ -82,10 +84,16 @@ func csiComponentsAreExpected(cfg *config.Config) bool {
 // waitForReadyNamespace waits for ready workloads (daemonsets, deployments, and statefulsets)
 // in a given namespace.
 func waitForReadyNamespace(timeout time.Duration, ns string) error {
-	kubeconfig := filepath.Join(config.DataDir, "resources", string(config.KubeAdmin), "kubeconfig")
 	cliOptions := genericclioptions.NewConfigFlags(true).WithDeprecatedPasswordFlag()
-	cliOptions.KubeConfig = &kubeconfig
+	cliOptions.KubeConfig = ptr.To(filepath.Join(config.DataDir, "resources", string(config.KubeAdmin), "kubeconfig"))
 	cliOptions.Namespace = &ns
+	if homedir.HomeDir() == "" {
+		// By default client writes cache to $HOME/.kube/cache.
+		// However, when healthcheck is executed by greenboot, the $HOME is empty,
+		// so discovery client wants to write to /.kube which is immutable on ostre
+		// causing flood of warnings (and is not elegant to create new root level directory).
+		cliOptions.CacheDir = ptr.To(filepath.Join("tmp", ".kube", "cache"))
+	}
 	matchVersionKubeConfigFlags := cmdutil.NewMatchVersionFlags(cliOptions)
 	f := cmdutil.NewFactory(matchVersionKubeConfigFlags)
 
@@ -122,9 +130,15 @@ func waitForReadyNamespace(timeout time.Duration, ns string) error {
 }
 
 func logPodsAndEvents() {
-	kubeconfig := filepath.Join(config.DataDir, "resources", string(config.KubeAdmin), "kubeconfig")
 	cliOptions := genericclioptions.NewConfigFlags(true).WithDeprecatedPasswordFlag()
-	cliOptions.KubeConfig = &kubeconfig
+	cliOptions.KubeConfig = ptr.To(filepath.Join(config.DataDir, "resources", string(config.KubeAdmin), "kubeconfig"))
+	if homedir.HomeDir() == "" {
+		// By default client writes cache to $HOME/.kube/cache.
+		// However, when healthcheck is executed by greenboot, the $HOME is empty,
+		// so discovery client wants to write to /.kube which is immutable on ostre
+		// causing flood of warnings (and is not elegant to create new root level directory).
+		cliOptions.CacheDir = ptr.To(filepath.Join("tmp", ".kube", "cache"))
+	}
 	matchVersionKubeConfigFlags := cmdutil.NewMatchVersionFlags(cliOptions)
 	f := cmdutil.NewFactory(matchVersionKubeConfigFlags)
 
