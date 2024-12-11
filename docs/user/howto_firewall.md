@@ -23,7 +23,9 @@ The following ports are optional and they should be considered for MicroShift if
 
 ## Firewalld
 The following commands can be used for enabling `firewalld` and opening all the above mentioned source IP addresses and ports.
-> Use the appropriate pod IP range if it is different from the default `10.42.0.0/16` setting.
+> Use the appropriate pod IPv4 range if it is different from the default `10.42.0.0/16` setting.
+> Use the appropriate pod IPv6 range if it is different from `fd01::/48`.
+> If you are not using IPv6 the corresponding rule is not enforced and does not have an impact in networking.
 
 > Use the appropriate optional settings when requiring external access to services running on MicroShift (e.g. port 6443 for api server, ports 80 and 443 for applications exposed through the router, mdns service for receiving mdns query etc.).
 
@@ -31,8 +33,9 @@ The following commands can be used for enabling `firewalld` and opening all the 
 sudo dnf install -y firewalld
 sudo systemctl enable firewalld --now
 # Mandatory settings
-sudo firewall-cmd --permanent --zone=trusted --add-source=10.42.0.0/16 
+sudo firewall-cmd --permanent --zone=trusted --add-source=10.42.0.0/16
 sudo firewall-cmd --permanent --zone=trusted --add-source=169.254.169.1
+sudo firewall-cmd --permanent --zone=trusted --add-source=fd01::/48
 sudo firewall-cmd --reload
 # Optional settings
 sudo firewall-cmd --permanent --zone=public --add-port=80/tcp
