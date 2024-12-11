@@ -24,9 +24,13 @@ type MicroshiftData struct {
 	TimeToReady   time.Duration `json:"timeToReady"`
 }
 
-type StartupRecorder struct {
+type StartupData struct {
 	Services   []ServiceData  `json:"services"`
 	Microshift MicroshiftData `json:"microshift"`
+}
+
+type StartupRecorder struct {
+	Data StartupData
 
 	m sync.Mutex
 }
@@ -51,29 +55,29 @@ func (l *StartupRecorder) ServiceReady(serviceName string, dependencies []string
 
 	l.m.Lock()
 	defer l.m.Unlock()
-	l.Services = append(l.Services, serviceData)
+	l.Data.Services = append(l.Data.Services, serviceData)
 }
 
 func (l *StartupRecorder) MicroshiftStarts(start time.Time) {
 	klog.InfoS("MICROSHIFT STARTING")
-	l.Microshift.Start = start
+	l.Data.Microshift.Start = start
 }
 
 func (l *StartupRecorder) MicroshiftReady() {
 	ready := time.Now()
 
-	klog.InfoS("MICROSHIFT READY", "since-start", time.Since(l.Microshift.Start))
-	l.Microshift.Ready = ready
-	l.Microshift.TimeToReady = ready.Sub(l.Microshift.Start)
+	klog.InfoS("MICROSHIFT READY", "since-start", time.Since(l.Data.Microshift.Start))
+	l.Data.Microshift.Ready = ready
+	l.Data.Microshift.TimeToReady = ready.Sub(l.Data.Microshift.Start)
 }
 
 func (l *StartupRecorder) ServicesStart(start time.Time) {
 	klog.InfoS("MICROSHIFT STARTING SERVICES", "since-start", time.Since(start))
-	l.Microshift.ServicesStart = start
+	l.Data.Microshift.ServicesStart = start
 }
 
 func (l *StartupRecorder) OutputData() {
-	jsonOutput, err := json.Marshal(l)
+	jsonOutput, err := json.Marshal(l.Data)
 	if err != nil {
 		klog.Error("Failed to marshal startup data")
 
