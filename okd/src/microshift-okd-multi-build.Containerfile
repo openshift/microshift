@@ -40,7 +40,8 @@ COPY --chmod=755 ./okd/src/configure.sh ${OKD_CONFIG_SCRIPT}
 COPY --from=builder /src/_output/rpmbuild/RPMS ${USHIFT_RPM_REPO_PATH}
 
 # Install nfv-openvswitch repo which provides openvswitch extra policy package
-RUN dnf install -y centos-release-nfv-openvswitch
+RUN dnf install -y centos-release-nfv-openvswitch && \
+    dnf clean all
 
 # Installing MicroShift and cleanup
 # In case of flannel we don't need openvswitch service which is by default enabled as part

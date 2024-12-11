@@ -34,7 +34,6 @@ OUTPUT_DIR :=_output
 RPM_BUILD_DIR :=$(OUTPUT_DIR)/rpmbuild
 CROSS_BUILD_BINDIR :=$(OUTPUT_DIR)/bin
 FROM_SOURCE :=false
-CTR_CMD :=$(or $(shell which podman 2>/dev/null), $(shell which docker 2>/dev/null))
 ARCH :=$(shell uname -m |sed -e "s/x86_64/amd64/" |sed -e "s/aarch64/arm64/")
 PULLSECRET ?= ~/.pull-secret.json
 
@@ -136,8 +135,10 @@ verify: verify-fast
 verify-fast: verify-go verify-assets verify-sh verify-py verify-config verify-rf
 
 # Full verification checks that should run in CI
+# Note that jobs using podman (e.g. verify-containers) cannot run as part of
+# the verify job.
 .PHONY: verify-ci
-verify-ci: verify-fast verify-images verify-licenses verify-containers
+verify-ci: verify-fast verify-images verify-licenses
 
 .PHONY: verify-images
 verify-images:
@@ -171,22 +172,15 @@ verify-py:
 verify-rf:
 	./scripts/verify/verify-rf.sh
 
-# When run inside a container, the file contents are redirected via stdin and
-# the output of errors does not contain the file path. Work around this issue
-# by replacing the '^-:' token in the output by the actual file name.
+# Container check is not run in any default verify target as it uses the podman
+# command, which does not work in the containerized verify CI job.
+# Container verification is performed as part of the image build procedure.
 .PHONY: verify-containers
 verify-containers:
-	./scripts/fetch_tools.sh hadolint ; \
-	FILES=$$(find . -iname '*containerfile*' -o -iname '*dockerfile*' | grep -v "vendor\|_output\|origin\|.git") ; \
-	for f in $${FILES} ; do \
-		echo "$${f}" ; \
-		podman run --rm -i \
-			-v "$$(pwd)/.hadolint.yaml:/.hadolint.yaml:ro" \
-			ghcr.io/hadolint/hadolint:2.12.0 < "$${f}" | sed "s|^-:|$${f}:|" ; \
-	done
+	./scripts/verify/verify-containers.sh
 
-# Vulnerability check is not run in any default verify target
-# It should be run explicitly before the release to track and fix known vulnerabilities
+# Vulnerability check is not run in any default verify target.
+# It should be run explicitly before the release to track and fix known vulnerabilities.
 # Note: Errors are ignored to allow listing vulnerabilities from all the dependencies
 .PHONY: verify-govulncheck
 verify-govulncheck: microshift etcd
