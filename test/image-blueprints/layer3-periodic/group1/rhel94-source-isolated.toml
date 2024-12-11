@@ -48,7 +48,7 @@ enabled = ["mdns", "ssh", "http", "https"]
 
 [[customizations.firewall.zones]]
 name = "trusted"
-sources = ["10.42.0.0/16", "169.254.169.1"]
+sources = ["10.42.0.0/16", "169.254.169.1", "fd01::/48"]
 
 # Override the default qemu-ga service configuration on the guest to allow all RPCs.
 # BLOCK_RPCS is a deny-list of qemu-guest-agent RPCs to block, such as file read/write, process execution, etc. By
