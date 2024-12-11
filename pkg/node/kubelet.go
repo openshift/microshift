@@ -147,6 +147,8 @@ func (s *KubeletServer) generateConfig(cfg *config.Config) ([]byte, error) {
 		"volumePluginDir":    config.DataDir + "/kubelet-plugins/volume/exec",
 		"clusterDNSIP":       cfg.Network.DNS,
 		"resolvConf":         resolvConf,
+		"tlsCipherSuites":    strings.Join(cfg.ApiServer.TLS.CipherSuites, ","),
+		"tlsMinVersion":      cfg.ApiServer.TLS.MinVersion,
 		"userProvidedConfig": userProvidedConfig,
 	}
 
