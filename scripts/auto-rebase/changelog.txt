@@ -1,3 +1,0 @@
-- ovn-kubernetes image-arm64 99c44e88d2c7aa7a95f950dc182a2979ae729e97 to 5fda1fe2286bf20138dd407ddd05410e80490be3
-  - 776e76a0 2024-12-09T00:11:39+00:00 pin libreswan to 4.6-3.el9_0.3
-
