@@ -80,14 +80,13 @@ func (l *StartupRecorder) OutputData() {
 	jsonOutput, err := json.Marshal(l.Data)
 	if err != nil {
 		klog.Error("Failed to marshal startup data")
-
 	}
 
 	klog.Infof("Startup data: %s", string(jsonOutput))
 
 	path, ok := os.LookupEnv("STARTUP_LOGS_PATH")
 	if ok {
-		err = os.WriteFile(path, jsonOutput, 0644)
+		err = os.WriteFile(path, jsonOutput, 0600)
 		if err != nil {
 			klog.Error("Failed to write startup data to file")
 		}
