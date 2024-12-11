@@ -22,6 +22,7 @@ import (
 	"github.com/openshift/microshift/pkg/node"
 	"github.com/openshift/microshift/pkg/release"
 	"github.com/openshift/microshift/pkg/servicemanager"
+	"github.com/openshift/microshift/pkg/servicemanager/startuprecorder"
 	"github.com/openshift/microshift/pkg/sysconfwatch"
 	"github.com/openshift/microshift/pkg/util"
 	"github.com/openshift/microshift/pkg/util/cryptomaterial/certchains"
@@ -134,8 +135,9 @@ func RunMicroshift(cfg *config.Config) error {
 		klog.Fatalf("MicroShift must be run privileged")
 	}
 
-	klog.InfoS("MICROSHIFT STARTING")
 	microshiftStart := time.Now()
+	startRec := startuprecorder.New()
+	startRec.MicroshiftStarts(microshiftStart)
 
 	// Tell the logging code that it's OK to receive reconfiguration
 	// instructions unless those instructions are different. This
@@ -193,8 +195,7 @@ func RunMicroshift(cfg *config.Config) error {
 
 	// Establish the context we will use to control execution
 	runCtx, runCancel := context.WithCancel(context.Background())
-
-	m := servicemanager.NewServiceManager()
+	m := servicemanager.NewServiceManager(startRec)
 	util.Must(m.AddService(node.NewNetworkConfiguration(cfg)))
 	util.Must(m.AddService(controllers.NewEtcd(cfg)))
 	util.Must(m.AddService(sysconfwatch.NewSysConfWatchController(cfg)))
@@ -218,7 +219,7 @@ func RunMicroshift(cfg *config.Config) error {
 	notifySocket := os.Getenv("NOTIFY_SOCKET")
 	os.Unsetenv("NOTIFY_SOCKET")
 
-	klog.InfoS("MICROSHIFT STARTING SERVICES", "since-start", time.Since(microshiftStart))
+	startRec.ServicesStart(microshiftStart)
 
 	_, rotationDate, err := certchains.WhenToRotateAtEarliest(certChains)
 	if err != nil {
@@ -260,7 +261,9 @@ func RunMicroshift(cfg *config.Config) error {
 
 	select {
 	case <-ready:
-		klog.InfoS("MICROSHIFT READY", "since-start", time.Since(microshiftStart))
+		startRec.MicroshiftReady()
+		startRec.OutputData()
+
 		os.Setenv("NOTIFY_SOCKET", notifySocket)
 		if supported, err := daemon.SdNotify(false, daemon.SdNotifyReady); err != nil {
 			klog.Warningf("error sending sd_notify readiness message: %v", err)
