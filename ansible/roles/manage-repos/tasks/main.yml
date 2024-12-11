@@ -40,30 +40,18 @@
     ansible.builtin.set_fact:
       microshift_prerelease: "{{ 'rc' in microshift_version or 'ec' in microshift_version }}"
 
-  - block:
-    - name: check if microshift_version is valid for pre-release
-      ansible.builtin.uri:
-        url: "{{ ocpbeta_base_url }}"
-        method: GET
-        status_code: 200
-        timeout: 5
-
-    - name: install microshift mirror repo for pre-releases
-      ansible.builtin.template:
-        src: ocpbeta.repo.j2
-        dest: /etc/yum.repos.d/{{ ocp_repo_name }}.repo
+  - name: create microshift prerelease mirrors
+    include_tasks: roles/manage-repos/tasks/create-mirrors.yaml
+    loop: "{{ repo_list }}"
     when:
       - microshift_prerelease
       - not build_microshift
 
-  - name: overwrite ocp_version if microshift_prerelease
-    ansible.builtin.set_fact:
-      ocp_version: "{{ ocp_version.split('.')[0] }}.{{ (ocp_version.split('.')[1] | int) - 1 }}"
-    when: microshift_prerelease
-
   - name: enable required repos for microshift
     community.general.rhsm_repository:
       name: "{{ rhel_repos }}"
+    when:
+      - not microshift_prerelease
 
   - name: install EPEL repo
     ansible.builtin.dnf:
