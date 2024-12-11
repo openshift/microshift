@@ -607,7 +607,7 @@ spec:
                     a route is exposed.
                   properties:
                     conditions:
-                      description: Conditions is the state of the route, may be empty.
+                      description: conditions is the state of the route, may be empty.
                       items:
                         description: |-
                           RouteIngressCondition contains details for the current condition of this route on a particular
@@ -629,12 +629,12 @@ spec:
                             type: string
                           status:
                             description: |-
-                              Status is the status of the condition.
+                              status is the status of the condition.
                               Can be True, False, Unknown.
                             type: string
                           type:
                             description: |-
-                              Type is the type of the condition.
+                              type is the type of the condition.
                               Currently only Admitted or UnservableInFutureVersions.
                             type: string
                         required:
@@ -646,7 +646,7 @@ spec:
                       - type
                       x-kubernetes-list-type: map
                     host:
-                      description: Host is the host string under which the route is
+                      description: host is the host string under which the route is
                         exposed; this value is required
                       type: string
                     routerCanonicalHostname:

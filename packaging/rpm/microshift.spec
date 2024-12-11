@@ -10,7 +10,7 @@
 
 # golang specifics
 # Needs to match go.mod go directive
-%global golang_version 1.22
+%global golang_version 1.23
 #debuginfo not supported with Go
 %global debug_package %{nil}
 # modifying the Go binaries breaks the DWARF debugging
