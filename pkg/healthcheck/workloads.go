@@ -146,23 +146,32 @@ func logPodsAndEvents() {
 	ioStreams := genericclioptions.IOStreams{In: os.Stdin, Out: &output, ErrOut: &output}
 
 	cmdGet := get.NewCmdGet("", f, ioStreams)
-	if err := cmdGet.Flag("output").Value.Set("wide"); err != nil {
-		klog.Errorf("Failed to set up --output=wide flag: %v", err)
-	}
-	if err := cmdGet.Flag("all-namespaces").Value.Set("true"); err != nil {
-		klog.Errorf("Failed to set up --all-namespaces=true flag: %v", err)
+	opts := get.NewGetOptions("", ioStreams)
+	opts.AllNamespaces = true
+	opts.PrintFlags.OutputFormat = ptr.To("wide")
+	if err := opts.Complete(f, cmdGet, []string{"DUMMY"}); err != nil {
+		klog.Errorf("Failed to complete get's options: %v", err)
+		return
 	}
 
-	output.WriteString("Pods:\n")
-	cmdGet.Run(cmdGet, []string{"pods"})
-
-	output.WriteString("\nEvents:\n")
-	if err := cmdGet.Flag("sort-by").Value.Set(".metadata.creationTimestamp"); err != nil {
-		klog.Errorf("Failed to set up --sort-by=.metadata.creationTimestamp flag: %v", err)
+	if err := opts.Validate(); err != nil {
+		klog.Errorf("Failed to validate get's options: %v", err)
+		return
 	}
-	cmdGet.Run(cmdGet, []string{"events"})
 
-	klog.Infof("Debug information:\n%s", output.String())
+	output.WriteString("---------- PODS:\n")
+	if err := opts.Run(f, []string{"pods"}); err != nil {
+		klog.Errorf("Failed to run 'get pods': %v", err)
+		return
+	}
+	output.WriteString("\n---------- EVENTS:\n")
+	opts.SortBy = ".metadata.creationTimestamp"
+	if err := opts.Run(f, []string{"events"}); err != nil {
+		klog.Errorf("Failed to run 'get events': %v", err)
+		return
+	}
+
+	klog.Infof("DEBUG INFORMATION\n%s", output.String())
 }
 
 // AllErrGroup is a helper to wait for all goroutines and get all errors that occurred.
