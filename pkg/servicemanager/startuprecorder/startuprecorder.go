@@ -91,6 +91,5 @@ func (l *StartupRecorder) OutputData() {
 		if err != nil {
 			klog.Error("Failed to write startup data to file")
 		}
-
 	}
 }

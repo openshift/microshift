@@ -135,8 +135,6 @@ func RunMicroshift(cfg *config.Config) error {
 		klog.Fatalf("MicroShift must be run privileged")
 	}
 
-	os.Setenv("STARTUP_LOGS_PATH", "/tmp/startup_times.json")
-
 	microshiftStart := time.Now()
 	startRec := startuprecorder.New()
 	startRec.MicroshiftStarts(microshiftStart)
