@@ -1,0 +1,6 @@
+- ovn-kubernetes image-amd64 85400d6159a1bb65c30117b6ef3a6f9a354cbeab to f5eceb4222b59b49a50100fccd733cee322097c7
+  - e58ae8f 2024-11-27T10:26:59+08:00 pin libreswan to 4.6-3.el9_0.3
+
+- ovn-kubernetes image-arm64 85400d6159a1bb65c30117b6ef3a6f9a354cbeab to f5eceb4222b59b49a50100fccd733cee322097c7
+  - e58ae8f 2024-11-27T10:26:59+08:00 pin libreswan to 4.6-3.el9_0.3
+
