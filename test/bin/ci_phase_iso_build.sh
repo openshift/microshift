@@ -99,8 +99,10 @@ run_image_build() {
     fi
 }
 
-# Run bootc image build
+# Run container file verification and bootc image build
 run_bootc_image_build() {
+    make -C "${ROOTDIR}" verify-containers
+
     $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/layer1-base
     $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/layer2-source
 }

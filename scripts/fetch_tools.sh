@@ -122,15 +122,6 @@ gettool_yq() {
     _install "${url}" "${checksum}" "${filename}" "yq_linux_${arch}"
 }
 
-gettool_hadolint() {
-    local -r ver="2.12.0"
-    local -r img="ghcr.io/hadolint/hadolint"
-
-    if [ "$(podman images -q "${img}:${ver}" | wc -w)" -eq 0 ] ; then
-        podman pull "${img}:${ver}"
-    fi
-}
-
 gettool_lichen() {
     local ver="v0.1.7"
     GOBIN=${DEST_DIR} GOFLAGS="" go install github.com/uw-labs/lichen@${ver}
