@@ -2,6 +2,7 @@ package healthcheck
 
 import (
 	"errors"
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -18,10 +19,16 @@ import (
 	"k8s.io/utils/ptr"
 )
 
-func waitForNamespaces(timeout time.Duration, namespaces []string) error {
+type NamespaceWorkloads struct {
+	Deployments  []string `json:"deployments"`
+	DaemonSets   []string `json:"daemonsets"`
+	StatefulSets []string `json:"statefulsets"`
+}
+
+func waitForWorkloads(timeout time.Duration, workloads map[string]NamespaceWorkloads) error {
 	aeg := &AllErrGroup{}
-	for _, ns := range namespaces {
-		aeg.Go(func() error { return waitForReadyNamespace(timeout, ns) })
+	for ns, wls := range workloads {
+		aeg.Go(func() error { return waitForWorkloadsInNamespace(timeout, ns, wls) })
 	}
 
 	errs := aeg.Wait()
@@ -31,59 +38,88 @@ func waitForNamespaces(timeout time.Duration, namespaces []string) error {
 	return nil
 }
 
-func getCoreMicroShiftNamespaces() ([]string, error) {
+func getCoreMicroShiftWorkloads() (map[string]NamespaceWorkloads, error) {
 	cfg, err := config.ActiveConfig()
 	if err != nil {
 		return nil, err
 	}
-	namespaces := []string{"openshift-ovn-kubernetes", "openshift-service-ca", "openshift-ingress", "openshift-dns"}
-	namespaces = append(namespaces, getOptionalNamespacesIfApplicable(cfg)...)
-	return namespaces, nil
+
+	workloads := map[string]NamespaceWorkloads{
+		"openshift-ovn-kubernetes": {
+			DaemonSets: []string{"ovnkube-master", "ovnkube-node"},
+		},
+		"openshift-service-ca": {
+			Deployments: []string{"service-ca"},
+		},
+		"openshift-ingress": {
+			Deployments: []string{"router-default"},
+		},
+		"openshift-dns": {
+			DaemonSets: []string{
+				"dns-default",
+				"node-resolver",
+			},
+		},
+	}
+	fillOptionalWorkloadsIfApplicable(cfg, workloads)
+
+	return workloads, nil
 }
 
 func waitForCoreWorkloads(timeout time.Duration) error {
-	namespaces, err := getCoreMicroShiftNamespaces()
+	workloads, err := getCoreMicroShiftWorkloads()
 	if err != nil {
 		return err
 	}
 
-	return waitForNamespaces(timeout, namespaces)
+	return waitForWorkloads(timeout, workloads)
 }
 
-func getOptionalNamespacesIfApplicable(cfg *config.Config) []string {
-	namespaces := []string{}
-
+func fillOptionalWorkloadsIfApplicable(cfg *config.Config, workloads map[string]NamespaceWorkloads) {
 	klog.V(2).Infof("Configured storage driver value: %q", string(cfg.Storage.Driver))
 	if cfg.Storage.IsEnabled() {
 		klog.Infof("LVMS is enabled")
-		namespaces = append(namespaces, "openshift-storage")
+		workloads["openshift-storage"] = NamespaceWorkloads{
+			DaemonSets:  []string{"vg-manager"},
+			Deployments: []string{"lvms-operator"},
+		}
 	}
-	if csiComponentsAreExpected(cfg) {
+	if comps := getExpectedCSIComponents(cfg); len(comps) != 0 {
 		klog.Infof("At least one CSI Component is enabled")
-		namespaces = append(namespaces, "kube-system")
+		workloads["kube-system"] = NamespaceWorkloads{
+			Deployments: comps,
+		}
 	}
-	return namespaces
 }
 
-func csiComponentsAreExpected(cfg *config.Config) bool {
+func getExpectedCSIComponents(cfg *config.Config) []string {
 	klog.V(2).Infof("Configured optional CSI components: %v", cfg.Storage.OptionalCSIComponents)
 
 	if len(cfg.Storage.OptionalCSIComponents) == 0 {
-		return true
+		return []string{"csi-snapshot-controller", "csi-snapshot-webhook"}
 	}
 
 	// Validation fails when there's more than one component provided and one of them is "None".
 	// In other words: if "None" is used, it can be the only element.
 	if len(cfg.Storage.OptionalCSIComponents) == 1 && cfg.Storage.OptionalCSIComponents[0] == config.CsiComponentNone {
-		return false
+		return nil
 	}
 
-	return true
+	deployments := []string{}
+	for _, comp := range cfg.Storage.OptionalCSIComponents {
+		if comp == config.CsiComponentSnapshot {
+			deployments = append(deployments, "csi-snapshot-controller")
+		}
+		if comp == config.CsiComponentSnapshotWebhook {
+			deployments = append(deployments, "csi-snapshot-webhook")
+		}
+	}
+	return deployments
 }
 
 // waitForReadyNamespace waits for ready workloads (daemonsets, deployments, and statefulsets)
 // in a given namespace.
-func waitForReadyNamespace(timeout time.Duration, ns string) error {
+func waitForWorkloadsInNamespace(timeout time.Duration, ns string, workloads NamespaceWorkloads) error {
 	cliOptions := genericclioptions.NewConfigFlags(true).WithDeprecatedPasswordFlag()
 	cliOptions.KubeConfig = ptr.To(filepath.Join(config.DataDir, "resources", string(config.KubeAdmin), "kubeconfig"))
 	cliOptions.Namespace = &ns
@@ -102,7 +138,19 @@ func waitForReadyNamespace(timeout time.Duration, ns string) error {
 	ioStreams := genericclioptions.IOStreams{In: os.Stdin, Out: &stdout, ErrOut: &stderr}
 	rolloutOpts := rollout.NewRolloutStatusOptions(ioStreams)
 	rolloutOpts.Timeout = timeout
-	err := rolloutOpts.Complete(f, []string{"daemonset,deployment,statefulset"})
+
+	args := []string{}
+	for _, ds := range workloads.DaemonSets {
+		args = append(args, fmt.Sprintf("daemonset/%s", ds))
+	}
+	for _, deploy := range workloads.Deployments {
+		args = append(args, fmt.Sprintf("deployment/%s", deploy))
+	}
+	for _, statefulset := range workloads.StatefulSets {
+		args = append(args, fmt.Sprintf("statefulset/%s", statefulset))
+	}
+
+	err := rolloutOpts.Complete(f, args)
 	if err != nil {
 		klog.Errorf("Failed to complete 'rollout' options for %q namespace: %v", ns, err)
 		return err
@@ -114,7 +162,7 @@ func waitForReadyNamespace(timeout time.Duration, ns string) error {
 		return err
 	}
 
-	klog.Infof("Waiting for workloads in %q namespace", ns)
+	klog.Infof("Waiting for following workloads in %q namespace: %s", ns, strings.Join(args, " "))
 	err = rolloutOpts.Run()
 	klog.V(2).Infof("Rollout output for %q namespace: stdout='%s' stderr='%s'",
 		ns,

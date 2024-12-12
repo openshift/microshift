@@ -2,7 +2,7 @@ package healthcheck
 
 import (
 	"context"
-	"strings"
+	"encoding/json"
 	"time"
 
 	"k8s.io/klog/v2"
@@ -26,11 +26,33 @@ func MicroShiftHealthcheck(ctx context.Context, timeout time.Duration) error {
 	return nil
 }
 
-func NamespacesHealthcheck(ctx context.Context, timeout time.Duration, namespaces []string) error {
-	if err := waitForNamespaces(timeout, namespaces); err != nil {
+func CustomWorkloadHealthcheck(ctx context.Context, timeout time.Duration, definition string) error {
+	workloads := map[string]NamespaceWorkloads{}
+
+	err := json.Unmarshal([]byte(definition), &workloads)
+	if err != nil {
+		return err
+	}
+	klog.V(2).Infof("Deserialized '%s' into %+v", definition, workloads)
+
+	if err := waitForWorkloads(timeout, workloads); err != nil {
 		logPodsAndEvents()
 		return err
 	}
-	klog.Infof("Workloads in %s namespaces are ready", strings.Join(namespaces, ", "))
+	return nil
+}
+
+func EasyCustomWorkloadHealthcheck(ctx context.Context, timeout time.Duration, namespace string, deployments, daemonsets, statefulsets []string) error {
+	workloads := map[string]NamespaceWorkloads{
+		namespace: {
+			Deployments:  deployments,
+			DaemonSets:   daemonsets,
+			StatefulSets: statefulsets,
+		},
+	}
+	if err := waitForWorkloads(timeout, workloads); err != nil {
+		logPodsAndEvents()
+		return err
+	}
 	return nil
 }

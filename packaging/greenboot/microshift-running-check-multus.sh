@@ -27,4 +27,4 @@ print_boot_status
 # Set the wait timeout for the current check based on the boot counter
 WAIT_TIMEOUT_SECS=$(get_wait_timeout)
 
-/usr/bin/microshift healthcheck -v=2 --timeout="${WAIT_TIMEOUT_SECS}s" --namespaces openshift-multus
+/usr/bin/microshift healthcheck -v=2 --timeout="${WAIT_TIMEOUT_SECS}s" --namespace openshift-multus --daemonsets multus,dhcp-daemon
