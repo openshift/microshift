@@ -1,0 +1,14 @@
+- cluster-network-operator embedded-component 80bb25e6e718582c95353a30b99e90d6b9f5870a to 07b4bfd42dab06335d73693325f4e2afe1c31368
+  - 88ac710 2024-12-05T11:27:02+05:30 Pass transit_switch_subnet options in ovnkube-node pod
+
+- machine-config-operator embedded-component 4bb3364914c4dbcdfcc08b0914f402cdd38f014f to 64460169e27091d8f8373b0952604ba2700d6d67
+  - 47549f1e 2024-12-11T06:20:11+00:00 Remove trailing periods from AWS provided hostnames
+
+- ovn-kubernetes image-amd64 cb50d1472dc0bd6ff8d96aa3dd9b68897be85479 to e7ae53822521e520c4c1be31ba3bfb3388187989
+  - 7e539fff 2024-12-10T01:18:11+00:00 pin libreswan to 4.6-3.el9_0.3
+  - 706dd235 2024-12-03T15:33:01+01:00 Dockerfile: Update OVN to the 24.03.2-32.el9fdp minor release.
+
+- ovn-kubernetes image-arm64 cb50d1472dc0bd6ff8d96aa3dd9b68897be85479 to e7ae53822521e520c4c1be31ba3bfb3388187989
+  - 7e539fff 2024-12-10T01:18:11+00:00 pin libreswan to 4.6-3.el9_0.3
+  - 706dd235 2024-12-03T15:33:01+01:00 Dockerfile: Update OVN to the 24.03.2-32.el9fdp minor release.
+
