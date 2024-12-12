@@ -228,17 +228,11 @@ def process_containerfile(groupdir, containerfile, dry_run):
     # Run template command on the input file
     cf_outfile = os.path.join(BOOTC_IMAGE_DIR, containerfile)
     run_template_cmd(cf_path, cf_outfile, dry_run)
-    # Templating may generate an empty file.
-    # Detect empty files by counting uncommented lines.
-    grep_args = [
-        "grep", "--count", "--invert-match",
-        "-e", "^\\s*$", "-e", "^\\s*#",
-        cf_outfile, "||", "true"
-    ]
-    nlines = common.run_command_in_shell(grep_args, dry_run)
-    if nlines == "0":
-        common.print_msg(f"Skipping an empty {containerfile} file")
-        return
+    # Templating may generate an empty file
+    if not dry_run:
+        if not common.file_has_valid_lines(cf_outfile):
+            common.print_msg(f"Skipping an empty {containerfile} file")
+            return
 
     common.print_msg(f"Processing {containerfile} with logs in {cf_logfile}")
     start_process_container = time.time()

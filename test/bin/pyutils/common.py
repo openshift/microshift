@@ -182,6 +182,19 @@ def delete_file(file_path: str):
         pass
 
 
+def file_has_valid_lines(file_path: str) -> bool:
+    """Check if a text file contains at least one non-empty, non-commented line"""
+    try:
+        with open(file_path, 'r') as file:
+            for line in file:
+                sline = line.strip()
+                if sline and not sline.startswith('#'):
+                    return True
+        return False
+    except FileNotFoundError:
+        return False
+
+
 def basename(path: str):
     """Return a base name of the path"""
     return pathlib.Path(path).name
