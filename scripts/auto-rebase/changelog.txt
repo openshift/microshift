@@ -1,12 +1,36 @@
-- cluster-network-operator embedded-component 7768811ef167eb33a0eaafc5c3eb30fdd02470fd to c3e09bc436f73a60827d4c7c380dca700705047f
-  - 82c53dc 2024-11-11T03:09:33+00:00 Pass transit_switch_subnet options in ovnkube-node pod
-
-- ovn-kubernetes image-arm64 f1fed30814655ebf01015570e6f806d1250e4b8f to fccd62a2c9efaeadf1c502ab95b28beb99aa543c
-  - f9bb07fb 2024-12-03T14:45:43+01:00 Dockerfile: Update OVN to the 24.03.2-32.el9fdp minor release.
-
-- kubernetes image-arm64 5a24e858060a609366c5ff1402ec1424e9f7e403 to d8494300e320fece784adaefe6596fd653813cfa
+- kubernetes embedded-component 5a24e858060a609366c5ff1402ec1424e9f7e403 to a5b43ecd85c008a57d346dbd53360c788a1a8bd1
   - 83cfec97e 2024-11-29T16:15:08+00:00 UPSTREAM: <carry>: Fixup inconsistent go.mod
   - 0f1ba5484 2024-11-25T10:07:53+00:00 UPSTREAM: <drop>: Enable format library for 4.18
   - c701dceaa 2024-11-22T13:01:10+00:00 UPSTREAM: 123572: feature: add name formats library to CEL
   - 2d777d8ac 2024-11-22T13:00:51+00:00 UPSTREAM: 123572: test: typecheck cel test cases
+  - 777f620a3 2024-11-01T16:35:17-04:00 UPSTREAM: 125923: e2e_node: use restart instead of start stop
+  - 54e92e6da 2024-11-01T16:35:17-04:00 UPSTREAM: 125923: e2e_node: add a test to verify the kubelet starts
+  - 40151eb71 2024-10-25T05:14:11+00:00 UPSTREAM: <carry>: kubelet/cm: move CPU reading from cm to cm/cpumanager
+  - 65330c1fd 2024-10-25T05:14:11+00:00 UPSTREAM: <carry>: kubelet/cm: fix bug where kubelet restarts from missing cpuset cgroup
+
+- machine-config-operator embedded-component 911e8829ee867544a650b61751c66f571396bd5c to 119a374e94ea622c080409cc82f106ac737d4e85
+  - 9ea02a8d 2024-12-09T17:03:46+00:00 Remove trailing periods from AWS provided hostnames
+
+- ovn-kubernetes image-amd64 f1fed30814655ebf01015570e6f806d1250e4b8f to b7f678bef4af18ed556c537728736afe12a487b4
+  - 5edc3de0 2024-12-09T15:22:52+08:00 pin libreswan to 4.6-3.el9_0.3
+  - f9bb07fb 2024-12-03T14:45:43+01:00 Dockerfile: Update OVN to the 24.03.2-32.el9fdp minor release.
+
+- kubernetes image-amd64 5a24e858060a609366c5ff1402ec1424e9f7e403 to a5b43ecd85c008a57d346dbd53360c788a1a8bd1
+  - 83cfec97e 2024-11-29T16:15:08+00:00 UPSTREAM: <carry>: Fixup inconsistent go.mod
+  - 0f1ba5484 2024-11-25T10:07:53+00:00 UPSTREAM: <drop>: Enable format library for 4.18
+  - c701dceaa 2024-11-22T13:01:10+00:00 UPSTREAM: 123572: feature: add name formats library to CEL
+  - 2d777d8ac 2024-11-22T13:00:51+00:00 UPSTREAM: 123572: test: typecheck cel test cases
+  - 777f620a3 2024-11-01T16:35:17-04:00 UPSTREAM: 125923: e2e_node: use restart instead of start stop
+  - 54e92e6da 2024-11-01T16:35:17-04:00 UPSTREAM: 125923: e2e_node: add a test to verify the kubelet starts
+  - 40151eb71 2024-10-25T05:14:11+00:00 UPSTREAM: <carry>: kubelet/cm: move CPU reading from cm to cm/cpumanager
+  - 65330c1fd 2024-10-25T05:14:11+00:00 UPSTREAM: <carry>: kubelet/cm: fix bug where kubelet restarts from missing cpuset cgroup
+
+- ovn-kubernetes image-arm64 fccd62a2c9efaeadf1c502ab95b28beb99aa543c to b7f678bef4af18ed556c537728736afe12a487b4
+  - 5edc3de0 2024-12-09T15:22:52+08:00 pin libreswan to 4.6-3.el9_0.3
+
+- kubernetes image-arm64 d8494300e320fece784adaefe6596fd653813cfa to a5b43ecd85c008a57d346dbd53360c788a1a8bd1
+  - 777f620a3 2024-11-01T16:35:17-04:00 UPSTREAM: 125923: e2e_node: use restart instead of start stop
+  - 54e92e6da 2024-11-01T16:35:17-04:00 UPSTREAM: 125923: e2e_node: add a test to verify the kubelet starts
+  - 40151eb71 2024-10-25T05:14:11+00:00 UPSTREAM: <carry>: kubelet/cm: move CPU reading from cm to cm/cpumanager
+  - 65330c1fd 2024-10-25T05:14:11+00:00 UPSTREAM: <carry>: kubelet/cm: fix bug where kubelet restarts from missing cpuset cgroup
 
