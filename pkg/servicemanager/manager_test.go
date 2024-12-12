@@ -10,6 +10,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/openshift/microshift/pkg/servicemanager/startuprecorder"
 	"github.com/openshift/microshift/pkg/util/sigchannel"
 	"github.com/stretchr/testify/assert"
 )
@@ -43,7 +44,8 @@ func TestAddService(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		m := NewServiceManager()
+		s := startuprecorder.New()
+		m := NewServiceManager(s)
 		for _, servicetest := range test {
 			got := "<nil>"
 			if err := m.AddService(servicetest.service); err != nil {
@@ -75,7 +77,8 @@ func TestRunToCompletion(t *testing.T) {
 		return nil
 	}
 
-	m := NewServiceManager()
+	s := startuprecorder.New()
+	m := NewServiceManager(s)
 	assert.NoError(t, m.AddService(NewGenericService("foo", nil, runToCompletionFunc)))
 	assert.NoError(t, m.AddService(NewGenericService("bar", []string{"foo"}, runToCompletionFunc)))
 	wg.Add(2)
@@ -110,7 +113,8 @@ func TestRunCancellation(t *testing.T) {
 		return nil
 	}
 
-	m := NewServiceManager()
+	s := startuprecorder.New()
+	m := NewServiceManager(s)
 	assert.NoError(t, m.AddService(NewGenericService("foo", nil, runToCompletionFunc)))
 	assert.NoError(t, m.AddService(NewGenericService("bar", []string{"foo"}, runToCompletionFunc)))
 	wg.Add(2)
@@ -150,7 +154,8 @@ func TestRunToServiceCrash(t *testing.T) {
 		return errors.New("I'm crashing")
 	}
 
-	m := NewServiceManager()
+	s := startuprecorder.New()
+	m := NewServiceManager(s)
 	assert.NoError(t, m.AddService(NewGenericService("foo", nil, waitForContext)))
 	assert.NoError(t, m.AddService(NewGenericService("bar-crash", []string{"foo"}, runAndPanic)))
 	wg.Add(2)
@@ -205,7 +210,9 @@ func TestRunToServicePanic(t *testing.T) {
 		wg.Done()
 		panic("I'm in panic")
 	}
-	m := NewServiceManager()
+
+	s := startuprecorder.New()
+	m := NewServiceManager(s)
 	assert.NoError(t, m.AddService(NewGenericService("foo", nil, waitForContext)))
 	assert.NoError(t, m.AddService(NewGenericService("bar-panic", []string{"foo"}, runAndCrash)))
 	wg.Add(2)
