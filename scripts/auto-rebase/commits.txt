@@ -1,8 +1,8 @@
-https://github.com/openshift/api embedded-component a09992e80c6891cc0bfa2fa7ec6af42af37c452e
+https://github.com/openshift/api embedded-component 29859d55727bb0b6294838e93898424ac57e4c04
 https://github.com/openshift/cluster-csi-snapshot-controller-operator embedded-component 42ed4cc366a40c28b22e0aea02ba8075dc2831eb
 https://github.com/openshift/cluster-dns-operator embedded-component 208d50c1a5e0aaeb991366daa749abdffa803224
 https://github.com/openshift/cluster-ingress-operator embedded-component 8be174945db79b0660bd0fd21ed279ab7b6aafbf
-https://github.com/openshift/cluster-kube-apiserver-operator embedded-component 8ef2c1d874971a0badd9d55b122d907f34dedc0d
+https://github.com/openshift/cluster-kube-apiserver-operator embedded-component 4babb3f18c19d2bef584a8389f34b8428cf52b9c
 https://github.com/openshift/cluster-kube-controller-manager-operator embedded-component ce2c021f23f5d178da6ea35d98a229137e5a81c4
 https://github.com/openshift/cluster-kube-scheduler-operator embedded-component e4c772cd344e538342a4e1cd91635b387e1c18ba
 https://github.com/openshift/cluster-network-operator embedded-component ee9c01de80d4a2f57847018a0e48701c718dba91
@@ -12,9 +12,9 @@ https://github.com/openshift/csi-external-snapshotter embedded-component f52ce8b
 https://github.com/openshift/etcd embedded-component 914783cae63a13b90971c65e28c3349c1ecb7dfb
 https://github.com/openshift/kubernetes embedded-component 205ac00c56dd2340b90dc0e328be84e77219197c
 https://github.com/openshift/kubernetes-kube-storage-version-migrator embedded-component 50d17147f15d8b216e7c41f91d1bd7d307ca8c73
-https://github.com/openshift/machine-config-operator embedded-component c761b7cabfe50839e573299b02de148559e652eb
+https://github.com/openshift/machine-config-operator embedded-component 434269de72a280d7edf9f2f2d9d2380782f3a68e
 https://github.com/openshift/openshift-controller-manager embedded-component 3ebe2f4f3900d6a3748ef0faf3535f635dbf7d11
-https://github.com/openshift/operator-framework-olm embedded-component e27da48ff810af17f4863a19af8291f46c262197
+https://github.com/openshift/operator-framework-olm embedded-component 57a4299d9f3d8c3ee3c7f60971fdc57ed47b6d35
 https://github.com/openshift/route-controller-manager embedded-component 07daee4d2f0b5c7aaca56ee45ff6dfdf97680db0
 https://github.com/openshift/service-ca-operator embedded-component 1f7d6472fea332fc307d9c8911f8c3cf57347755
 https://github.com/openshift/oc image-amd64 c64c430e48013ced1705344bb95ba1bdfb2a1a0b
@@ -23,7 +23,7 @@ https://github.com/openshift/csi-external-snapshotter image-amd64 f52ce8b8b0799a
 https://github.com/openshift/csi-external-snapshotter image-amd64 f52ce8b8b0799a341caf1fb864bba5d9d040a856
 https://github.com/openshift/router image-amd64 be319d0bb83f75b52b707df46422f6892dfaaa56
 https://github.com/openshift/kube-rbac-proxy image-amd64 526498ab32996a0f67a96530ad7173f955e3fbe2
-https://github.com/openshift/ovn-kubernetes image-amd64 99c44e88d2c7aa7a95f950dc182a2979ae729e97
+https://github.com/openshift/ovn-kubernetes image-amd64 24e9946a28826e1c4f4a135674261c62bc89a3b8
 https://github.com/openshift/kubernetes image-amd64 205ac00c56dd2340b90dc0e328be84e77219197c
 https://github.com/openshift/service-ca-operator image-amd64 1f7d6472fea332fc307d9c8911f8c3cf57347755
 https://github.com/openshift/oc image-arm64 c64c430e48013ced1705344bb95ba1bdfb2a1a0b
@@ -32,6 +32,6 @@ https://github.com/openshift/csi-external-snapshotter image-arm64 f52ce8b8b0799a
 https://github.com/openshift/csi-external-snapshotter image-arm64 f52ce8b8b0799a341caf1fb864bba5d9d040a856
 https://github.com/openshift/router image-arm64 be319d0bb83f75b52b707df46422f6892dfaaa56
 https://github.com/openshift/kube-rbac-proxy image-arm64 526498ab32996a0f67a96530ad7173f955e3fbe2
-https://github.com/openshift/ovn-kubernetes image-arm64 5fda1fe2286bf20138dd407ddd05410e80490be3
+https://github.com/openshift/ovn-kubernetes image-arm64 24e9946a28826e1c4f4a135674261c62bc89a3b8
 https://github.com/openshift/kubernetes image-arm64 205ac00c56dd2340b90dc0e328be84e77219197c
 https://github.com/openshift/service-ca-operator image-arm64 1f7d6472fea332fc307d9c8911f8c3cf57347755
