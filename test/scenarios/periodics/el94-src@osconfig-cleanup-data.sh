@@ -12,5 +12,5 @@ scenario_remove_vms() {
 }
 
 scenario_run_tests() {
-    run_tests host1 test/scenarios/periodics/el94-src@osconfig.sh
+    run_tests host1 suites/osconfig/cleanup-data.robot
 }
