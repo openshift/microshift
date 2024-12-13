@@ -1,6 +1,9 @@
-- oc image-arm64 c724dcbbd0e2fc80320ee3a035e88831fe713a4b to 6e588cf64c6575fa0b862a9d497b92687f9d0d6e
-  - cce3f5d0 2024-12-03T05:05:10-05:00 fix oc adm node-image create --pxe command to copy the correct artifacts
+- oc image-arm64 6e588cf64c6575fa0b862a9d497b92687f9d0d6e to 02503fe1c31903252e45f50f55922ef3f11c1360
+  - 398f6f25 2024-12-11T00:18:01-05:00 OCPBUGS-45991: Mark --report and --pxe flags as experimental
+  - b3fb741c 2023-09-13T10:56:58-07:00 pkg/cli/admin/release/extract_tools: Enable ImageRegistry, etc. on 4.13-to-4.14
 
-- ovn-kubernetes image-arm64 97a2e6b7e17fca030dcda1b1edd884ef8c9b46dd to c713669ede0fb5663e72ad055238037ae2e17938
-  - 1bc93172 2024-12-10T13:50:43+08:00 Bump OVS version to 3.4.0-18
+- kubernetes image-arm64 8ac36bf977d93ee5db979a4bda774d4a0f3b3367 to 3c62f738ce74a624d46b4f73f25d6c15b3a80a2b
+  - 6fded69bb 2024-12-06T14:53:42+01:00 UPSTREAM: <carry>: require configuration file enablement
+  - 234263863 2024-12-06T10:51:56+01:00 UPSTREAM: 126750: update comments
+  - 691924b19 2024-12-06T10:51:56+01:00 UPSTREAM: 126750: Add takeByTopologyUnCoreCachePacked if policy option align-cpus-by-uncorecache is enabled.  Adding new function to evaluate uncore cache id. Reverse allocation logic.  Implement preferAlignByUncorecache within TakeByTopologyNUMAPacked, along with new test cases.
 
