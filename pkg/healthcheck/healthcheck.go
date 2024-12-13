@@ -16,8 +16,12 @@ func MicroShiftHealthcheck(ctx context.Context, timeout time.Duration) error {
 		return nil
 	}
 
-	if err := waitForCoreWorkloads(ctx, timeout); err != nil {
-		logPodsAndEvents()
+	workloads, err := getCoreMicroShiftWorkloads()
+	if err != nil {
+		return err
+	}
+
+	if err := waitForWorkloads(ctx, timeout, workloads); err != nil {
 		return err
 	}
 
@@ -36,9 +40,9 @@ func CustomWorkloadHealthcheck(ctx context.Context, timeout time.Duration, defin
 	klog.V(2).Infof("Deserialized '%s' into %+v", definition, workloads)
 
 	if err := waitForWorkloads(ctx, timeout, workloads); err != nil {
-		logPodsAndEvents()
 		return err
 	}
+	klog.Info("Workloads are ready")
 	return nil
 }
 
@@ -52,8 +56,8 @@ func EasyCustomWorkloadHealthcheck(ctx context.Context, timeout time.Duration, n
 	}
 
 	if err := waitForWorkloads(ctx, timeout, workloads); err != nil {
-		logPodsAndEvents()
 		return err
 	}
+	klog.Info("Workloads are ready")
 	return nil
 }
