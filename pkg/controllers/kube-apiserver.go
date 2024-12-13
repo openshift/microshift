@@ -41,7 +41,6 @@ import (
 
 	configv1 "github.com/openshift/api/config/v1"
 	kubecontrolplanev1 "github.com/openshift/api/kubecontrolplane/v1"
-	"github.com/openshift/library-go/pkg/crypto"
 	"github.com/openshift/library-go/pkg/operator/resource/resourcemerge"
 
 	embedded "github.com/openshift/microshift/assets"
@@ -243,8 +242,8 @@ func (s *KubeAPIServer) configure(cfg *config.Config) error {
 			ServingInfo: configv1.HTTPServingInfo{
 				ServingInfo: configv1.ServingInfo{
 					BindAddress:       net.JoinHostPort("0.0.0.0", strconv.Itoa(cfg.ApiServer.Port)),
-					MinTLSVersion:     string(fixedTLSProfile.MinTLSVersion),
-					CipherSuites:      crypto.OpenSSLToIANACipherSuites(fixedTLSProfile.Ciphers),
+					MinTLSVersion:     cfg.ApiServer.TLS.MinVersion,
+					CipherSuites:      cfg.ApiServer.TLS.CipherSuites,
 					NamedCertificates: namedCerts,
 				},
 			},

@@ -75,7 +75,9 @@ func (s *OCPRouteControllerManager) configure(cfg *config.Config) error {
 					CertFile: cryptomaterial.ServingCertPath(servingCertDir),
 					KeyFile:  cryptomaterial.ServingKeyPath(servingCertDir),
 				},
-				ClientCA: cryptomaterial.TotalClientCABundlePath(cryptomaterial.CertsDirectory(config.DataDir)),
+				ClientCA:      cryptomaterial.TotalClientCABundlePath(cryptomaterial.CertsDirectory(config.DataDir)),
+				MinTLSVersion: cfg.ApiServer.TLS.MinVersion,
+				CipherSuites:  cfg.ApiServer.TLS.CipherSuites,
 			},
 		},
 		Controllers: []string{

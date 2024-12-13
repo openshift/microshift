@@ -12,6 +12,7 @@ import (
 	"syscall"
 	"time"
 
+	configv1 "github.com/openshift/api/config/v1"
 	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/util/cryptomaterial"
 
@@ -36,15 +37,6 @@ func NewRunEtcdCommand() *cobra.Command {
 	}
 
 	return cmd
-}
-
-var tlsCipherSuites = []string{
-	"TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384",
-	"TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384",
-	"TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256",
-	"TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256",
-	"TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305",
-	"TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305",
 }
 
 type EtcdService struct {
@@ -92,7 +84,10 @@ func (s *EtcdService) configure(cfg *config.Config) {
 	s.etcdCfg.Name = cfg.Node.HostnameOverride
 	s.etcdCfg.InitialCluster = fmt.Sprintf("%s=https://%s:2380", cfg.Node.HostnameOverride, "localhost")
 
-	s.etcdCfg.CipherSuites = tlsCipherSuites
+	s.etcdCfg.TlsMinVersion = getTLSMinVersion(cfg.ApiServer.TLS.MinVersion)
+	if cfg.ApiServer.TLS.MinVersion != string(configv1.VersionTLS13) {
+		s.etcdCfg.CipherSuites = cfg.ApiServer.TLS.CipherSuites
+	}
 	s.etcdCfg.ClientTLSInfo.CertFile = cryptomaterial.PeerCertPath(etcdServingCertDir)
 	s.etcdCfg.ClientTLSInfo.KeyFile = cryptomaterial.PeerKeyPath(etcdServingCertDir)
 	s.etcdCfg.ClientTLSInfo.TrustedCAFile = etcdSignerCertPath
@@ -186,6 +181,16 @@ func setURL(hostnames []string, port string) []url.URL {
 		urls[i] = *u
 	}
 	return urls
+}
+
+func getTLSMinVersion(minVersion string) string {
+	switch minVersion {
+	case string(configv1.VersionTLS12):
+		return "TLS1.2"
+	case string(configv1.VersionTLS13):
+		return "TLS1.3"
+	}
+	return ""
 }
 
 // The following 'fragemented' logic is copied from the Openshift Cluster Etcd Operator.

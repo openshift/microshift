@@ -48,6 +48,16 @@ ${LVMS_CSI_SNAPSHOT_DISABLED}       SEPARATOR=\n
 ...                                 storage:
 ...                                 \ \ driver: "none"
 ...                                 \ \ optionalCsiComponents: [ none ]
+${TLS_13_MIN_VERSION}               SEPARATOR=\n
+...                                 apiServer:
+...                                 \ \ tls:
+...                                 \ \ \ \ minVersion: VersionTLS13
+${TLS_12_CUSTOM_CIPHER}             SEPARATOR=\n
+...                                 apiServer:
+...                                 \ \ tls:
+...                                 \ \ \ \ cipherSuites:
+...                                 \ \ \ \ - TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+...                                 \ \ \ \ minVersion: VersionTLS12
 
 
 *** Test Cases ***
@@ -108,6 +118,42 @@ Deploy MicroShift Without CSI Snapshotter
     ...    Remove Storage Drop In Config
     ...    Restart MicroShift
 
+Custom TLS 1_3 configuration
+    [Documentation]    Configure API server to use TLS 1.3 and verify only that
+    ...    version works
+    [Setup]    Setup TLS Configuration    ${TLS_13_MIN_VERSION}
+
+    ${rc}=    Execute Command
+    ...    openssl s_client -connect ${USHIFT_HOST}:6443 -tls1_3 <<< "Q"
+    ...    sudo=True    return_stdout=False    return_stderr=False    return_rc=True
+    Should Be Equal As Integers    ${rc}    0
+
+    ${rc}=    Execute Command
+    ...    openssl s_client -connect ${USHIFT_HOST}:6443 -tls1_2
+    ...    sudo=True    return_stdout=False    return_stderr=False    return_rc=True
+    Should Not Be Equal As Integers    ${rc}    0
+
+    [Teardown]    Run Keywords
+    ...    Remove TLS Drop In Config
+    ...    Restart MicroShift
+
+Custom TLS 1_2 configuration
+    [Documentation]    Configure a custom cipher suite using TLS 1.2 and verify
+    ...    it is used
+    [Setup]    Setup TLS Configuration    ${TLS_12_CUSTOM_CIPHER}
+
+    ${rc}=    Execute Command
+    ...    openssl s_client -connect ${USHIFT_HOST}:6443 -tls1_2 <<< "Q" 2>/dev/null | grep "Cipher is ECDHE-RSA-AES128-GCM-SHA256"
+    ...    sudo=True
+    ...    return_stdout=False
+    ...    return_stderr=False
+    ...    return_rc=True
+    Should Be Equal As Integers    ${rc}    0
+
+    [Teardown]    Run Keywords
+    ...    Remove TLS Drop In Config
+    ...    Restart MicroShift
+
 
 *** Keywords ***
 Setup
@@ -159,6 +205,16 @@ Deploy Storage Config
     Cleanup MicroShift    opt='--keep-images'
     Drop In MicroShift Config    ${config}    10-storage
     Start MicroShift
+
+Setup TLS Configuration
+    [Documentation]    Apply the TLS configuration in the argument
+    [Arguments]    ${config}
+    Drop In MicroShift Config    ${config}    10-tls
+    Restart MicroShift
+
+Remove TLS Drop In Config
+    [Documentation]    Remove the previously created drop-in config for storage
+    Remove Drop In MicroShift Config    10-tls
 
 Remove Storage Drop In Config
     [Documentation]    Remove the previously created drop-in config for storage
