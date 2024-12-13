@@ -1,22 +1,24 @@
 package healthcheck
 
 import (
+	"context"
+	"fmt"
+	"path/filepath"
+
 	"github.com/openshift/microshift/pkg/config"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/klog/v2"
+
+	coreclientv1 "k8s.io/client-go/kubernetes/typed/core/v1"
 )
 
-// getCoreMicroShiftWorkloads assembles a structure with the core MicroShift
-// workloads that the healthcheck should verify.
-func getCoreMicroShiftWorkloads() (map[string]NamespaceWorkloads, error) {
-	cfg, err := config.ActiveConfig()
-	if err != nil {
-		return nil, err
-	}
-
+// getMicroShiftWorkloads assembles a structure with the MicroShift
+// workloads that the healthcheck should verify: both core
+// (expected every time) and optional (deployed by MicroShift shipped RPMs).
+func getMicroShiftWorkloads(ctx context.Context) (map[string]NamespaceWorkloads, error) {
 	workloads := map[string]NamespaceWorkloads{
-		"openshift-ovn-kubernetes": {
-			DaemonSets: []string{"ovnkube-master", "ovnkube-node"},
-		},
 		"openshift-service-ca": {
 			Deployments: []string{"service-ca"},
 		},
@@ -30,12 +32,27 @@ func getCoreMicroShiftWorkloads() (map[string]NamespaceWorkloads, error) {
 			},
 		},
 	}
-	fillOptionalWorkloadsIfApplicable(cfg, workloads)
+
+	cfg, err := config.ActiveConfig()
+	if err != nil {
+		return nil, err
+	}
+
+	if cfg.Network.IsEnabled() {
+		workloads["openshift-ovn-kubernetes"] = NamespaceWorkloads{
+			DaemonSets: []string{"ovnkube-master", "ovnkube-node"},
+		}
+	}
+
+	storageComponents(cfg, workloads)
+	if err := optionalComponents(ctx, workloads); err != nil {
+		return nil, err
+	}
 
 	return workloads, nil
 }
 
-func fillOptionalWorkloadsIfApplicable(cfg *config.Config, workloads map[string]NamespaceWorkloads) {
+func storageComponents(cfg *config.Config, workloads map[string]NamespaceWorkloads) {
 	klog.V(2).Infof("Configured storage driver value: %q", string(cfg.Storage.Driver))
 	if cfg.Storage.IsEnabled() {
 		klog.Infof("LVMS is enabled")
@@ -45,7 +62,6 @@ func fillOptionalWorkloadsIfApplicable(cfg *config.Config, workloads map[string]
 		}
 	}
 	if comps := getExpectedCSIComponents(cfg); len(comps) != 0 {
-		klog.Infof("At least one CSI Component is enabled")
 		workloads["kube-system"] = NamespaceWorkloads{
 			Deployments: comps,
 		}
@@ -68,11 +84,58 @@ func getExpectedCSIComponents(cfg *config.Config) []string {
 	deployments := []string{}
 	for _, comp := range cfg.Storage.OptionalCSIComponents {
 		if comp == config.CsiComponentSnapshot {
+			klog.Infof("CSI Snapshot Controller is enabled")
 			deployments = append(deployments, "csi-snapshot-controller")
 		}
 		if comp == config.CsiComponentSnapshotWebhook {
+			klog.Infof("CSI Snapshot Webhook is enabled")
 			deployments = append(deployments, "csi-snapshot-webhook")
 		}
 	}
 	return deployments
+}
+
+// optionalComponents checks for existence of namespaces that are deployed
+// using MicroShift's optional RPMs. If the namespace exists, the workloads
+// are added to the map of expected readiness.
+func optionalComponents(ctx context.Context, workloads map[string]NamespaceWorkloads) error {
+	optionalComponents := map[string]NamespaceWorkloads{
+		"openshift-multus": {
+			DaemonSets: []string{"multus", "dhcp-daemon"},
+		},
+		"openshift-operator-lifecycle-manager": {
+			Deployments: []string{"olm-operator", "catalog-operator"},
+		},
+		"openshift-gateway-api": {
+			Deployments: []string{"servicemesh-operator3", "istiod-openshift-gateway-api"},
+		},
+		"kube-flannel": {
+			DaemonSets: []string{"kube-flannel-ds"},
+		},
+		"kube-proxy": {
+			DaemonSets: []string{"kube-proxy"},
+		},
+	}
+
+	restConfig, err := clientcmd.BuildConfigFromFlags("", filepath.Join(config.DataDir, "resources", string(config.KubeAdmin), "kubeconfig"))
+	if err != nil {
+		return fmt.Errorf("failed to create restConfig: %v", err)
+	}
+	client, err := coreclientv1.NewForConfig(restConfig)
+	if err != nil {
+		return fmt.Errorf("failed to create client: %v", err)
+	}
+
+	for ns, wls := range optionalComponents {
+		if _, err = client.Namespaces().Get(ctx, ns, v1.GetOptions{}); err != nil {
+			if !apierrors.IsNotFound(err) {
+				klog.Errorf("Failure getting %q namespace: %v", ns, err)
+				return err
+			}
+		} else {
+			workloads[ns] = wls
+		}
+	}
+
+	return nil
 }

@@ -16,7 +16,7 @@ func MicroShiftHealthcheck(ctx context.Context, timeout time.Duration) error {
 		return nil
 	}
 
-	workloads, err := getCoreMicroShiftWorkloads()
+	workloads, err := getMicroShiftWorkloads(ctx)
 	if err != nil {
 		return err
 	}

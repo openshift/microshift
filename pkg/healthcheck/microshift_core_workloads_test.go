@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func Test_csiComponentsAreExpected(t *testing.T) {
+func Test_getExpectedCSIComponents(t *testing.T) {
 	testData := []struct {
 		name           string
 		cfg            config.Config
