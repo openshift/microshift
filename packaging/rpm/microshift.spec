@@ -372,7 +372,6 @@ install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/001-microshi
 # Copy all the OLM manifests except the arch specific ones
 install -p -m644 assets/optional/operator-lifecycle-manager/0000* %{buildroot}/%{_prefix}/lib/microshift/manifests.d/001-microshift-olm
 install -p -m644 assets/optional/operator-lifecycle-manager/kustomization.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/001-microshift-olm
-install -p -m755 packaging/greenboot/microshift-running-check-olm.sh %{buildroot}%{_sysconfdir}/greenboot/check/required.d/50_microshift_running_check_olm.sh
 
 %ifarch %{arm} aarch64
 cat assets/optional/operator-lifecycle-manager/kustomization.aarch64.yaml >> %{buildroot}/%{_prefix}/lib/microshift/manifests.d/001-microshift-olm/kustomization.yaml
@@ -391,7 +390,6 @@ install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/000-microshi
 # Copy all the Multus manifests except the arch specific ones
 install -p -m644 assets/optional/multus/0* %{buildroot}/%{_prefix}/lib/microshift/manifests.d/000-microshift-multus
 install -p -m644 assets/optional/multus/kustomization.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/000-microshift-multus
-install -p -m755 packaging/greenboot/microshift-running-check-multus.sh %{buildroot}%{_sysconfdir}/greenboot/check/required.d/41_microshift_running_check_multus.sh
 install -p -m755 packaging/crio.conf.d/12-microshift-multus.conf %{buildroot}%{_sysconfdir}/crio/crio.conf.d/12-microshift-multus.conf
 
 %ifarch %{arm} aarch64
@@ -471,7 +469,6 @@ install -p -m755 packaging/tuned/microshift-tuned.py %{buildroot}%{_bindir}/micr
 install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/000-microshift-gateway-api
 install -p -m644 assets/optional/gateway-api/0* %{buildroot}/%{_prefix}/lib/microshift/manifests.d/000-microshift-gateway-api
 install -p -m644 assets/optional/gateway-api/kustomization.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/000-microshift-gateway-api
-install -p -m755 packaging/greenboot/microshift-running-check-gateway-api.sh %{buildroot}%{_sysconfdir}/greenboot/check/required.d/41_microshift_running_check_gateway_api.sh
 
 %ifarch %{arm} aarch64
 cat assets/optional/gateway-api/kustomization.aarch64.yaml >> %{buildroot}/%{_prefix}/lib/microshift/manifests.d/000-microshift-gateway-api/kustomization.yaml
@@ -603,7 +600,6 @@ fi
 %files olm
 %dir %{_prefix}/lib/microshift/manifests.d/001-microshift-olm
 %{_prefix}/lib/microshift/manifests.d/001-microshift-olm/*
-%{_sysconfdir}/greenboot/check/required.d/50_microshift_running_check_olm.sh
 
 %files olm-release-info
 %{_datadir}/microshift/release/release-olm-{x86_64,aarch64}.json
@@ -611,7 +607,6 @@ fi
 %files multus
 %dir %{_prefix}/lib/microshift/manifests.d/000-microshift-multus
 %{_prefix}/lib/microshift/manifests.d/000-microshift-multus/*
-%{_sysconfdir}/greenboot/check/required.d/41_microshift_running_check_multus.sh
 %{_sysconfdir}/crio/crio.conf.d/12-microshift-multus.conf
 
 %files multus-release-info
@@ -642,7 +637,6 @@ fi
 %files gateway-api
 %dir %{_prefix}/lib/microshift/manifests.d/000-microshift-gateway-api
 %{_prefix}/lib/microshift/manifests.d/000-microshift-gateway-api/*
-%{_sysconfdir}/greenboot/check/required.d/41_microshift_running_check_gateway_api.sh
 
 %files gateway-api-release-info
 %{_datadir}/microshift/release/release-gateway-api-{x86_64,aarch64}.json
@@ -651,6 +645,9 @@ fi
 # Use Git command to generate the log and replace the VERSION string
 # LANG=C git log --date="format:%a %b %d %Y" --pretty="tformat:* %cd %an <%ae> VERSION%n- %s%n" packaging/rpm/microshift.spec
 %changelog
+* Mon Dec 16 2024 Patryk Matuszak <pmatusza@redhat.com> 4.19.0
+- Remove healthchecks scripts for optional components in favor of 'microshift healthcheck' command
+
 * Mon Nov 11 2024 Gregory Giguashvili <ggiguash@redhat.com> 4.18.0
 - Restart crio and microshift services on RPM post-install
 
