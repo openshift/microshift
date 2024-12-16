@@ -1,14 +1,12 @@
-- cluster-network-operator embedded-component 80bb25e6e718582c95353a30b99e90d6b9f5870a to 07b4bfd42dab06335d73693325f4e2afe1c31368
-  - 88ac710 2024-12-05T11:27:02+05:30 Pass transit_switch_subnet options in ovnkube-node pod
+- cluster-network-operator embedded-component 07b4bfd42dab06335d73693325f4e2afe1c31368 to efa14fa349e7cd9ecd44dc90ad5dc1c7c52fea4c
+  - b8a047a 2024-12-12T09:57:09+01:00 Cleanup ipsec entries from sidecar container
+  - 7c1536d 2024-12-12T09:57:00+01:00 Remove ip xfrm state when IPsec is disabled
 
-- machine-config-operator embedded-component 4bb3364914c4dbcdfcc08b0914f402cdd38f014f to 64460169e27091d8f8373b0952604ba2700d6d67
-  - 47549f1e 2024-12-11T06:20:11+00:00 Remove trailing periods from AWS provided hostnames
+- ovn-kubernetes image-amd64 e7ae53822521e520c4c1be31ba3bfb3388187989 to cd453e4951659e8de2bc824798ce3c70089352f9
+  - a2be9e21 2024-12-10T16:04:04+08:00 Bump OVS to 3.3.0-62.el9fdp for OCP 4.16
+  - 05455df3 2024-11-12T08:26:57+00:00 Add static route to the hairpin masquerade IPs to pod
 
-- ovn-kubernetes image-amd64 cb50d1472dc0bd6ff8d96aa3dd9b68897be85479 to e7ae53822521e520c4c1be31ba3bfb3388187989
-  - 7e539fff 2024-12-10T01:18:11+00:00 pin libreswan to 4.6-3.el9_0.3
-  - 706dd235 2024-12-03T15:33:01+01:00 Dockerfile: Update OVN to the 24.03.2-32.el9fdp minor release.
-
-- ovn-kubernetes image-arm64 cb50d1472dc0bd6ff8d96aa3dd9b68897be85479 to e7ae53822521e520c4c1be31ba3bfb3388187989
-  - 7e539fff 2024-12-10T01:18:11+00:00 pin libreswan to 4.6-3.el9_0.3
-  - 706dd235 2024-12-03T15:33:01+01:00 Dockerfile: Update OVN to the 24.03.2-32.el9fdp minor release.
+- ovn-kubernetes image-arm64 e7ae53822521e520c4c1be31ba3bfb3388187989 to cd453e4951659e8de2bc824798ce3c70089352f9
+  - a2be9e21 2024-12-10T16:04:04+08:00 Bump OVS to 3.3.0-62.el9fdp for OCP 4.16
+  - 05455df3 2024-11-12T08:26:57+00:00 Add static route to the hairpin masquerade IPs to pod
 
