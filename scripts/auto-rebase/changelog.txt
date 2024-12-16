@@ -1,9 +1,71 @@
-- oc image-arm64 6e588cf64c6575fa0b862a9d497b92687f9d0d6e to 02503fe1c31903252e45f50f55922ef3f11c1360
-  - 398f6f25 2024-12-11T00:18:01-05:00 OCPBUGS-45991: Mark --report and --pxe flags as experimental
-  - b3fb741c 2023-09-13T10:56:58-07:00 pkg/cli/admin/release/extract_tools: Enable ImageRegistry, etc. on 4.13-to-4.14
+- api embedded-component 831aaaf072a90c489eca2392f9895015e92aee2c to 1a7b90faeadfea580606b4d24ad6e290eaf0fefb
+  - fdd0236a 2024-12-11T15:29:45+01:00 alert-relabel list should not be a pointer
+  - fd5b4f32 2024-12-11T10:04:02+01:00 Insights types - unify duration validation
+  - e566bcbf 2024-12-10T12:13:59-05:00 feat: add HighlyAvailableArbiter control plane topology as feature for techpreview
+  - 083203ca 2024-12-09T21:08:31+05:30 Add KMSEncryptionProvider FeatureGate + generated files from `PROTO_OPTIONAL="true" make update`
 
-- kubernetes image-arm64 8ac36bf977d93ee5db979a4bda774d4a0f3b3367 to 3c62f738ce74a624d46b4f73f25d6c15b3a80a2b
+- cluster-dns-operator embedded-component 208d50c1a5e0aaeb991366daa749abdffa803224 to 0a9deeea4c335e259747b35267811a4a040289fd
+  - 87425f0 2024-12-05T00:36:48+00:00 Updating ose-cluster-dns-operator-container image to be consistent with ART for 4.19 Reconciling with https://github.com/openshift/ocp-build-data/tree/a39508c86497b4e5e463d7b2c78e51e577be9e7d/images/ose-cluster-dns-operator.yml
+
+- cluster-kube-apiserver-operator embedded-component d429a315d8073b8f5d7b122c895c6d40ddd09662 to 8ddb15d01947f35a1f30eac102fa466857beb17a
+  - e8adb5c 2024-12-10T17:04:52-03:00 Remove check for duplicate groups for FeatureGates
+  - dea2e4f 2024-12-10T13:11:21-03:00 Add resource.k8s.io/v1beta1 for Kubernetes 1.32
+
+- cluster-kube-controller-manager-operator embedded-component ce2c021f23f5d178da6ea35d98a229137e5a81c4 to c8341b6b72ad221f16a5276729138adf9a347abe
+  - 7ef78a3 2024-12-06T16:35:41+01:00 bump go to 1.23
+  - 1ee94bc 2024-12-05T07:17:57+00:00 Updating ose-cluster-kube-controller-manager-operator-container image to be consistent with ART for 4.19 Reconciling with https://github.com/openshift/ocp-build-data/tree/a39508c86497b4e5e463d7b2c78e51e577be9e7d/images/ose-cluster-kube-controller-manager-operator.yml
+
+- cluster-network-operator embedded-component eff7f1d30de00064d4f257cf312797576cb34a2f to de93ea6e09e9afda32bc0a95a08b7b703ce31985
+  - 553516e 2024-12-11T18:35:09+01:00 Skip including default crypto policies to avoid authby issue
+  - 41ab2eb 2024-12-10T19:26:25+01:00 Dockerfile: bump the base images
+  - 413fc4b 2024-12-09T11:06:27+01:00 Bump the openshift api version
+  - 97d3f6e 2024-12-09T10:40:11+01:00 Run go mod vendor
+  - b25b8e5 2024-11-27T11:17:26+01:00 Cleanup ipsec entries from sidecar container
+  - b5a8e2f 2024-11-27T11:17:26+01:00 Remove ip xfrm state when IPsec is disabled
+
+- cluster-openshift-controller-manager-operator embedded-component 08c64512c055ae246b3a14f6d1088d39988c44fe to 0b04b66c041c19abc6a04a31fc5b2688249eb0de
+  - 8df6510 2024-12-05T19:01:57+00:00 Updating ose-cluster-openshift-controller-manager-operator-container image to be consistent with ART for 4.19 Reconciling with https://github.com/openshift/ocp-build-data/tree/a39508c86497b4e5e463d7b2c78e51e577be9e7d/images/ose-cluster-openshift-controller-manager-operator.yml
+
+- cluster-policy-controller embedded-component 5fd852525909ce6eab52972ba9ce8fcf56528eb9 to 327d3cbd82fd013a9d5d5733eb04cc0dcd97aec5
+  - 2607098 2024-12-06T16:32:08+01:00 bump go to 1.23
+  - 89fe225 2024-12-06T16:31:50+01:00 Updating ose-cluster-policy-controller-container image to be consistent with ART for 4.19 Reconciling with https://github.com/openshift/ocp-build-data/tree/a39508c86497b4e5e463d7b2c78e51e577be9e7d/images/cluster-policy-controller.yml
+  - 75c251a 2024-12-06T16:26:35+01:00 pin dependencies for k8s.io/kubernetes
+
+- kubernetes embedded-component 8ac36bf977d93ee5db979a4bda774d4a0f3b3367 to 3c62f738ce74a624d46b4f73f25d6c15b3a80a2b
   - 6fded69bb 2024-12-06T14:53:42+01:00 UPSTREAM: <carry>: require configuration file enablement
   - 234263863 2024-12-06T10:51:56+01:00 UPSTREAM: 126750: update comments
   - 691924b19 2024-12-06T10:51:56+01:00 UPSTREAM: 126750: Add takeByTopologyUnCoreCachePacked if policy option align-cpus-by-uncorecache is enabled.  Adding new function to evaluate uncore cache id. Reverse allocation logic.  Implement preferAlignByUncorecache within TakeByTopologyNUMAPacked, along with new test cases.
+
+- machine-config-operator embedded-component 67789532e4569ece95eb98fed1dde03409f065e9 to eacd5926aa87e1fcc1c1208349761320fa2173d0
+  - 4422f17d 2024-12-11T23:02:08-05:00 update timeouts & improve debuggability of ocl e2e tests
+  - 09f90926 2024-12-11T13:50:16-05:00 daemon: preserve logs on shutdown
+  - aba18f36 2024-12-10T19:13:00-05:00 reconciler: only build mosb's currently targeted by the MCP osbuildcontroller_test: Unit testing for cascading failure
+  - a49c33d9 2024-12-09T20:09:26-05:00 daemon: add nil check for annotation fetching
+  - f6a5d80a 2024-12-06T10:20:23-05:00 trying to wait for sub-contorllers
+
+- operator-framework-olm embedded-component 829e5f64c12269fe2a7370a5a83ab08c0111c6e8 to 63ceefbd13ec2d5f21d117b9cac7112cd315f70d
+  - 9151a1ea 2024-12-12T12:23:16+01:00 Remove m1kola from owners
+  - 32567fed 2024-12-10T00:05:00+00:00 CRD upgrade existing CR validation fix (#3442)
+  - da84cec8 2024-12-04T05:08:06+00:00 Updating operator-registry-container image to be consistent with ART for 4.19 Reconciling with https://github.com/openshift/ocp-build-data/tree/2ea3e6158c93ca104b9d59fd58a71536fa01fb2d/images/operator-registry.yml
+  - 299c40ab 2024-12-04T00:22:22+00:00 Updating operator-lifecycle-manager-container image to be consistent with ART for 4.19 Reconciling with https://github.com/openshift/ocp-build-data/tree/2ea3e6158c93ca104b9d59fd58a71536fa01fb2d/images/operator-lifecycle-manager.yml
+
+- route-controller-manager embedded-component c625ae02c1475330182b9ace5a051f2bf3ab7095 to 4a534edbd515d370ff5fe5bb9f2e01e1622e72af
+  - f231d77 2024-12-12T11:44:20+00:00 Updated OWNERS file to reflect current team
+
+- oc image-amd64 c724dcbbd0e2fc80320ee3a035e88831fe713a4b to 8295ffc32fa52816a6605aff3fc322aa2aa8de7e
+  - 398f6f25 2024-12-11T00:18:01-05:00 OCPBUGS-45991: Mark --report and --pxe flags as experimental
+  - 0dd21ddf 2024-12-06T00:49:00+01:00 OCPBUGS-19824: release new: replace 0.0.1-snapshot more
+  - cce3f5d0 2024-12-03T05:05:10-05:00 fix oc adm node-image create --pxe command to copy the correct artifacts
+  - b3fb741c 2023-09-13T10:56:58-07:00 pkg/cli/admin/release/extract_tools: Enable ImageRegistry, etc. on 4.13-to-4.14
+
+- ovn-kubernetes image-amd64 97a2e6b7e17fca030dcda1b1edd884ef8c9b46dd to c713669ede0fb5663e72ad055238037ae2e17938
+  - 1bc93172 2024-12-10T13:50:43+08:00 Bump OVS version to 3.4.0-18
+
+- kubernetes image-amd64 8ac36bf977d93ee5db979a4bda774d4a0f3b3367 to 3c62f738ce74a624d46b4f73f25d6c15b3a80a2b
+  - 6fded69bb 2024-12-06T14:53:42+01:00 UPSTREAM: <carry>: require configuration file enablement
+  - 234263863 2024-12-06T10:51:56+01:00 UPSTREAM: 126750: update comments
+  - 691924b19 2024-12-06T10:51:56+01:00 UPSTREAM: 126750: Add takeByTopologyUnCoreCachePacked if policy option align-cpus-by-uncorecache is enabled.  Adding new function to evaluate uncore cache id. Reverse allocation logic.  Implement preferAlignByUncorecache within TakeByTopologyNUMAPacked, along with new test cases.
+
+- oc image-arm64 02503fe1c31903252e45f50f55922ef3f11c1360 to 8295ffc32fa52816a6605aff3fc322aa2aa8de7e
+  - 0dd21ddf 2024-12-06T00:49:00+01:00 OCPBUGS-19824: release new: replace 0.0.1-snapshot more
 
