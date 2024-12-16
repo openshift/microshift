@@ -2,13 +2,13 @@
 images:
   - name: quay.io/operator-framework/olm
     newName: quay.io/openshift-release-dev/ocp-v4.0-art-dev
-    digest: sha256:0bc6f82068e1839646476ad8c670f81d260de230d287d99b1542475562fc5cad
+    digest: sha256:10d93747e7acfd7ad47e8947067209ab588f73c4413a008c9bab1069bf21d6a1
   - name: quay.io/operator-framework/configmap-operator-registry
     newName: quay.io/openshift-release-dev/ocp-v4.0-art-dev
-    digest: sha256:f67cf9e40d963b3a02cfd7a5a0eff2f9c60dd20a45f76503ff9b4e295113d187
+    digest: sha256:20d88475e28e2b45772441a7b55f481848df1135177913672dfed27259bdfea3
   - name: quay.io/openshift/origin-kube-rbac-proxy
     newName: quay.io/openshift-release-dev/ocp-v4.0-art-dev
-    digest: sha256:06ed58d47be7591f30cf327789d5f40ae9f88bcf3054c3c8a8df3e66942e0e5d
+    digest: sha256:5164589b06fc66cfcf3cb58361ba7c203cfe496f15b22584043e03f8849b4a75
 
 patches:
   - patch: |-
@@ -16,12 +16,12 @@ patches:
        path: /spec/template/spec/containers/0/env/-
        value:
          name: OPERATOR_REGISTRY_IMAGE 
-         value: quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:f67cf9e40d963b3a02cfd7a5a0eff2f9c60dd20a45f76503ff9b4e295113d187
+         value: quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:20d88475e28e2b45772441a7b55f481848df1135177913672dfed27259bdfea3
      - op: add
        path: /spec/template/spec/containers/0/env/-
        value:
          name: OLM_IMAGE 
-         value: quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:0bc6f82068e1839646476ad8c670f81d260de230d287d99b1542475562fc5cad
+         value: quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:10d93747e7acfd7ad47e8947067209ab588f73c4413a008c9bab1069bf21d6a1
     target:
       kind: Deployment
       labelSelector: app=catalog-operator
