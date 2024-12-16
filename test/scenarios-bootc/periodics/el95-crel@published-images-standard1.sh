@@ -51,6 +51,6 @@ scenario_run_tests() {
         exit 0
     fi
     run_tests host1 suites/standard1/
-    # When SELinux is working on bootc systems add following suite:
+    # When SELinux is working on RHEL 9.6 bootc systems add following suite:
     # suites/selinux/validate-selinux-policy.robot
 }
