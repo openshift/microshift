@@ -243,6 +243,8 @@ def process_containerfile(groupdir, containerfile, dry_run):
             # Note:
             # - The pull secret is necessary in some builds for pulling embedded
             #   container images specified by SOURCE_IMAGES environment variable
+            # - Host registry configuration is used during to container build to
+            #   benefit from local mirror registry when pulling containers
             # - The explicit push-to-mirror sets the 'latest' tag as all the build
             #   layers are in the mirror due to 'cache-to' option
             build_args = [
@@ -251,6 +253,7 @@ def process_containerfile(groupdir, containerfile, dry_run):
                 "--secret", f"id=pullsecret,src={PULL_SECRET}",
                 "--cache-to", f"{MIRROR_REGISTRY}/{cf_outname}",
                 "--cache-from", f"{MIRROR_REGISTRY}/{cf_outname}",
+                "-v", "/etc/containers/registries.conf.d:/etc/containers/registries.conf.d:ro,z",
                 "-t", cf_outname, "-f", cf_outfile,
                 IMAGEDIR
             ]
