@@ -1,21 +1,5 @@
-- api embedded-component a09992e80c6891cc0bfa2fa7ec6af42af37c452e to 29859d55727bb0b6294838e93898424ac57e4c04
-  - 65e5a9c 2024-12-09T11:48:23-05:00 OCPBUGS-45309: disable pod security admission by default in 4.18
-
-- cluster-kube-apiserver-operator embedded-component 8ef2c1d874971a0badd9d55b122d907f34dedc0d to 4babb3f18c19d2bef584a8389f34b8428cf52b9c
-  - d8f62b7 2024-12-09T11:24:50-05:00 revert dev cert rotation
-
-- machine-config-operator embedded-component c761b7cabfe50839e573299b02de148559e652eb to 434269de72a280d7edf9f2f2d9d2380782f3a68e
-  - 3232b901 2024-12-09T09:25:42+00:00 Remove trailing periods from AWS provided hostnames
-
-- operator-framework-olm embedded-component e27da48ff810af17f4863a19af8291f46c262197 to 57a4299d9f3d8c3ee3c7f60971fdc57ed47b6d35
-  - 8668a8a6 2024-12-10T21:00:57+00:00 CRD upgrade existing CR validation fix (#3442)
-
-- ovn-kubernetes image-amd64 99c44e88d2c7aa7a95f950dc182a2979ae729e97 to 24e9946a28826e1c4f4a135674261c62bc89a3b8
-  - 31f76ecf 2024-12-11T09:32:53+00:00 Bump OVS version to 3.4.0-18
-  - 776e76a0 2024-12-09T00:11:39+00:00 pin libreswan to 4.6-3.el9_0.3
-  - cb59972c 2024-09-05T21:14:00+00:00 Updating ovn-kubernetes-microshift-container image to be consistent with ART for 4.18 Reconciling with https://github.com/openshift/ocp-build-data/tree/827ab4ccce9cbbcf82c9dbaf6398b61d6cff8d7a/images/ovn-kubernetes-microshift.yml
-
-- ovn-kubernetes image-arm64 5fda1fe2286bf20138dd407ddd05410e80490be3 to 24e9946a28826e1c4f4a135674261c62bc89a3b8
-  - 31f76ecf 2024-12-11T09:32:53+00:00 Bump OVS version to 3.4.0-18
-  - cb59972c 2024-09-05T21:14:00+00:00 Updating ovn-kubernetes-microshift-container image to be consistent with ART for 4.18 Reconciling with https://github.com/openshift/ocp-build-data/tree/827ab4ccce9cbbcf82c9dbaf6398b61d6cff8d7a/images/ovn-kubernetes-microshift.yml
+- cluster-network-operator embedded-component ee9c01de80d4a2f57847018a0e48701c718dba91 to 911d8ef7e9e6d70bb68aeaae0849b206d9b487b5
+  - 00cc503 2024-12-12T14:49:36+01:00 Skip including default crypto policies to avoid authby issue
+  - e58b561 2024-12-12T08:20:55+00:00 Cleanup ipsec entries from sidecar container
+  - ea18156 2024-12-12T08:20:55+00:00 Remove ip xfrm state when IPsec is disabled
 
