@@ -15,6 +15,19 @@ JUNIT_LOGFILE = None
 JUNIT_LOCK = threading.Lock()
 
 
+class MeasureRunTimeInScope:
+    def __init__(self, msg, file=sys.stderr):
+        self.start_time = time.time()
+        self.msg = msg
+        self.file = file
+        print_msg(msg, file)
+
+    def __del__(self):
+        dtime = time.time() - self.start_time
+        stime = time.strftime("%H:%M:%S", time.gmtime(dtime))
+        print_msg(f"{self.msg} (ELAPSED={stime})", self.file)
+
+
 def start_junit(groupdir):
     """Create a new junit file with the group name and timestampt header"""
     # Initialize the junit log file path
@@ -114,7 +127,7 @@ def run_command(command: List[str], dry_run: bool):
         print_msg(f"[DRY RUN] {' '.join(command)}")
         return None
 
-    print_msg(f"[RUN] {' '.join(command)}")
+    _ = MeasureRunTimeInScope(f"[RUN] {' '.join(command)}")
     return subprocess.run(command, check=True)
 
 
@@ -129,7 +142,7 @@ def run_command_in_shell(command: List[str], dry_run: bool = False,
         print_msg(f"[DRY RUN] {command}")
         return ""
 
-    print_msg(f"[SHELL] {command}")
+    _ = MeasureRunTimeInScope(f"[SHELL] {command}")
     # Run the command and return its output
     result = subprocess.run(
         command,
