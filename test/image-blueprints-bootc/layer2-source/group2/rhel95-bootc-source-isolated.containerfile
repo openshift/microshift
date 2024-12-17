@@ -34,8 +34,11 @@ RUN --mount=type=secret,id=pullsecret,dst=/run/secrets/pull-secret.json \
             --authfile /run/secrets/pull-secret.json \
             --root /var/lib/containers/storage-preloaded \
             "docker://{{ . }}" && break; \
-        echo "Attempt $i failed. Retrying in 5 seconds..."; \
-        sleep 5; \
+        if [ $i -eq 3 ] ; then \
+            echo "ERROR: Failed to pull {{ . }} image after 3 attempts"; \
+            exit 1; \
+        fi; \
+        echo "Attempt $i failed. Retrying in 5 seconds..." && sleep 5; \
     done
 # {{ end }}
 
