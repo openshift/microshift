@@ -1,5 +1,0 @@
-- cluster-network-operator embedded-component ee9c01de80d4a2f57847018a0e48701c718dba91 to 911d8ef7e9e6d70bb68aeaae0849b206d9b487b5
-  - 00cc503 2024-12-12T14:49:36+01:00 Skip including default crypto policies to avoid authby issue
-  - e58b561 2024-12-12T08:20:55+00:00 Cleanup ipsec entries from sidecar container
-  - ea18156 2024-12-12T08:20:55+00:00 Remove ip xfrm state when IPsec is disabled
-
