@@ -98,7 +98,7 @@ func newOVNKubernetesConfigFromFile(path string, multinode bool) (*OVNKubernetes
 		return nil, err
 	}
 
-	err = yaml.Unmarshal(buf, &o)
+	err = yaml.Unmarshal(buf, o)
 	if err != nil {
 		return nil, fmt.Errorf("parsing OVNKubernetes config: %v", err)
 	}
