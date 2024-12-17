@@ -3,8 +3,8 @@
 # Sourced from scenario.sh and uses functions defined there.
 
 scenario_create_vms() {
-    prepare_kickstart host1 kickstart-bootc.ks.template cos9-bootc-source
-    launch_vm --boot_blueprint centos9-bootc
+    prepare_kickstart host1 kickstart.ks.template rhel-9.4-microshift-source
+    launch_vm 
 }
 
 scenario_remove_vms() {
@@ -12,5 +12,5 @@ scenario_remove_vms() {
 }
 
 scenario_run_tests() {
-    run_tests host1 suites/backup/backups.robot
+    run_tests host1 suites/osconfig/lifecycle.robot
 }
