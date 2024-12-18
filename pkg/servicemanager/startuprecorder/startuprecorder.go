@@ -32,11 +32,19 @@ type StartupData struct {
 type StartupRecorder struct {
 	Data StartupData
 
-	m sync.Mutex
+	ServiceCount int
+	AllLogged    chan struct{}
+	m            sync.Mutex
 }
 
 func New() *StartupRecorder {
-	return &StartupRecorder{}
+	return &StartupRecorder{
+		AllLogged: make(chan struct{}),
+	}
+}
+
+func (l *StartupRecorder) AddService() {
+	l.ServiceCount++
 }
 
 func (l *StartupRecorder) ServiceReady(serviceName string, dependencies []string, start time.Time) {
@@ -56,6 +64,10 @@ func (l *StartupRecorder) ServiceReady(serviceName string, dependencies []string
 	l.m.Lock()
 	defer l.m.Unlock()
 	l.Data.Services = append(l.Data.Services, serviceData)
+	l.ServiceCount--
+	if l.ServiceCount == 0 {
+		close(l.AllLogged)
+	}
 }
 
 func (l *StartupRecorder) MicroshiftStarts(start time.Time) {
