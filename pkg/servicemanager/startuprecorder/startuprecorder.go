@@ -107,7 +107,5 @@ func (l *StartupRecorder) OutputData() {
 		case <-time.After(30 * time.Second):
 			klog.Error("StartupRecorder timed out")
 		}
-
 	}()
-
 }
