@@ -33,13 +33,13 @@ type StartupRecorder struct {
 	Data StartupData
 
 	ServiceCount int
-	AllLogged    chan struct{}
+	allLogged    chan struct{}
 	m            sync.Mutex
 }
 
 func New() *StartupRecorder {
 	return &StartupRecorder{
-		AllLogged: make(chan struct{}),
+		allLogged: make(chan struct{}),
 	}
 }
 
@@ -62,7 +62,7 @@ func (l *StartupRecorder) ServiceReady(serviceName string, dependencies []string
 	l.Data.Services = append(l.Data.Services, serviceData)
 	l.ServiceCount--
 	if l.ServiceCount == 0 {
-		close(l.AllLogged)
+		close(l.allLogged)
 	}
 }
 
@@ -88,22 +88,26 @@ func (l *StartupRecorder) ServicesStart(start time.Time) {
 
 func (l *StartupRecorder) OutputData() {
 	go func() {
-		<-l.AllLogged
-
-		jsonOutput, err := json.Marshal(l.Data)
-		if err != nil {
-			klog.Error("Failed to marshal startup data")
-		}
-
-		klog.Infof("Startup data: %s", string(jsonOutput))
-
-		path, ok := os.LookupEnv("STARTUP_LOGS_PATH")
-		if ok {
-			err = os.WriteFile(path, jsonOutput, 0600)
+		select {
+		case <-l.allLogged:
+			jsonOutput, err := json.Marshal(l.Data)
 			if err != nil {
-				klog.Error("Failed to write startup data to file")
+				klog.Error("Failed to marshal startup data")
 			}
+
+			klog.Infof("Startup data: %s", string(jsonOutput))
+
+			path, ok := os.LookupEnv("STARTUP_LOGS_PATH")
+			if ok {
+				err = os.WriteFile(path, jsonOutput, 0600)
+				if err != nil {
+					klog.Error("Failed to write startup data to file")
+				}
+			}
+		case <-time.After(30 * time.Second):
+			klog.Error("StartupRecorder timed out")
 		}
+
 	}()
 
 }
