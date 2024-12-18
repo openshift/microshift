@@ -14,9 +14,6 @@ func getCoreMicroShiftWorkloads() (map[string]NamespaceWorkloads, error) {
 	}
 
 	workloads := map[string]NamespaceWorkloads{
-		"openshift-ovn-kubernetes": {
-			DaemonSets: []string{"ovnkube-master", "ovnkube-node"},
-		},
 		"openshift-service-ca": {
 			Deployments: []string{"service-ca"},
 		},
@@ -31,6 +28,11 @@ func getCoreMicroShiftWorkloads() (map[string]NamespaceWorkloads, error) {
 		},
 	}
 	fillOptionalWorkloadsIfApplicable(cfg, workloads)
+	if cfg.Network.IsEnabled() {
+		workloads["openshift-ovn-kubernetes"] = NamespaceWorkloads{
+			DaemonSets: []string{"ovnkube-master", "ovnkube-node"},
+		}
+	}
 
 	return workloads, nil
 }
