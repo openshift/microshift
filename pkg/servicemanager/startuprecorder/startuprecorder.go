@@ -43,10 +43,6 @@ func New() *StartupRecorder {
 	}
 }
 
-func (l *StartupRecorder) AddService() {
-	l.ServiceCount++
-}
-
 func (l *StartupRecorder) ServiceReady(serviceName string, dependencies []string, start time.Time) {
 	ready := time.Now()
 	timeToReady := ready.Sub(start)
@@ -81,6 +77,8 @@ func (l *StartupRecorder) MicroshiftReady() {
 	klog.InfoS("MICROSHIFT READY", "since-start", time.Since(l.Data.Microshift.Start))
 	l.Data.Microshift.Ready = ready
 	l.Data.Microshift.TimeToReady = ready.Sub(l.Data.Microshift.Start)
+
+	l.OutputData()
 }
 
 func (l *StartupRecorder) ServicesStart(start time.Time) {
@@ -89,18 +87,23 @@ func (l *StartupRecorder) ServicesStart(start time.Time) {
 }
 
 func (l *StartupRecorder) OutputData() {
-	jsonOutput, err := json.Marshal(l.Data)
-	if err != nil {
-		klog.Error("Failed to marshal startup data")
-	}
+	go func() {
+		<-l.AllLogged
 
-	klog.Infof("Startup data: %s", string(jsonOutput))
-
-	path, ok := os.LookupEnv("STARTUP_LOGS_PATH")
-	if ok {
-		err = os.WriteFile(path, jsonOutput, 0600)
+		jsonOutput, err := json.Marshal(l.Data)
 		if err != nil {
-			klog.Error("Failed to write startup data to file")
+			klog.Error("Failed to marshal startup data")
 		}
-	}
+
+		klog.Infof("Startup data: %s", string(jsonOutput))
+
+		path, ok := os.LookupEnv("STARTUP_LOGS_PATH")
+		if ok {
+			err = os.WriteFile(path, jsonOutput, 0600)
+			if err != nil {
+				klog.Error("Failed to write startup data to file")
+			}
+		}
+	}()
+
 }

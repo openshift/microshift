@@ -49,7 +49,7 @@ func (m *ServiceManager) AddService(s Service) error {
 			return fmt.Errorf("dependecy '%s' of service '%s' not yet defined", dependency, s.Name())
 		}
 	}
-	m.startRec.AddService()
+
 	m.services = append(m.services, s)
 	m.serviceMap[s.Name()] = s
 	return nil
@@ -59,6 +59,8 @@ func (m *ServiceManager) Run(ctx context.Context, ready chan<- struct{}, stopped
 	defer close(stopped)
 
 	services := m.services
+
+	m.startRec.ServiceCount = len(services)
 	// No need for topological sorting here as long as we enforce order while adding services.
 	// services, err := m.topoSort(services)
 	// if err != nil {
@@ -95,7 +97,6 @@ func (m *ServiceManager) Run(ctx context.Context, ready chan<- struct{}, stopped
 	// If we receive readiness signals from all services, signal readiness of manager
 	go func() {
 		<-sigchannel.And(values(readyMap))
-		<-m.startRec.AllLogged
 		close(ready)
 	}()
 
