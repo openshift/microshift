@@ -4,39 +4,31 @@ import plotly.express as px
 import datetime
 import numpy as np
 
-def format_time_ns(nanoseconds):
-    """
-    Convert time from nanoseconds to a human-readable string.
-
-    Args:
-    nanoseconds (int): Time in nanoseconds.
-
-    Returns:
-    str: Time formatted as a human-readable string (e.g., '1.57 s', '2.89 ms', '123 ns').
-    """
-    if nanoseconds >= 1e9:  # More than or equal to 1 second
+def readable_time(nanoseconds):
+    if nanoseconds >= 1e9:
         return f"{nanoseconds / 1e9:.2f} s"
-    elif nanoseconds >= 1e6:  # More than or equal to 1 millisecond
+    elif nanoseconds >= 1e6:
         return f"{nanoseconds / 1e6:.2f} ms"
-    elif nanoseconds >= 1e3:  # More than or equal to 1 microsecond
+    elif nanoseconds >= 1e3:
         return f"{nanoseconds / 1e3:.2f} μs"
-    else:  # Less than 1 microsecond
+    else:
         return f"{nanoseconds} ns"
+
 
 with open("scripts/startup_times.json", "r") as f:
     json_data = json.load(f)
 
 services = json_data["services"]
-microshift_start = json_data["microshiftStart"]
-microshift_ready = json_data["microshiftReady"]
+microshift = json_data["microshift"]
+microshift_start = microshift["start"]
+microshift_serv_start = microshift["servicesStart"]
+microshift_ready = microshift["ready"]
 
 df = pd.DataFrame(services)
 
 df["start"] = pd.to_datetime(df["start"])
 df["ready"] = pd.to_datetime(df["ready"])
-df["timeToReadyReadable"] = df["timeToReady"].apply(format_time_ns)
-
-#print(df.dtypes)
+df["timeToReadyReadable"] = df["timeToReady"].apply(readable_time)
 
 fig = px.timeline(
     df,
