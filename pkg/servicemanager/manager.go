@@ -59,6 +59,8 @@ func (m *ServiceManager) Run(ctx context.Context, ready chan<- struct{}, stopped
 	defer close(stopped)
 
 	services := m.services
+
+	m.startRec.ServiceCount = len(services)
 	// No need for topological sorting here as long as we enforce order while adding services.
 	// services, err := m.topoSort(services)
 	// if err != nil {

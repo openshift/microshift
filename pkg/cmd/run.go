@@ -262,7 +262,6 @@ func RunMicroshift(cfg *config.Config) error {
 	select {
 	case <-ready:
 		startRec.MicroshiftReady()
-		startRec.OutputData()
 
 		os.Setenv("NOTIFY_SOCKET", notifySocket)
 		if supported, err := daemon.SdNotify(false, daemon.SdNotifyReady); err != nil {

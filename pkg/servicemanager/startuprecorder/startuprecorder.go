@@ -32,11 +32,15 @@ type StartupData struct {
 type StartupRecorder struct {
 	Data StartupData
 
-	m sync.Mutex
+	ServiceCount int
+	allLogged    chan struct{}
+	m            sync.Mutex
 }
 
 func New() *StartupRecorder {
-	return &StartupRecorder{}
+	return &StartupRecorder{
+		allLogged: make(chan struct{}),
+	}
 }
 
 func (l *StartupRecorder) ServiceReady(serviceName string, dependencies []string, start time.Time) {
@@ -56,6 +60,10 @@ func (l *StartupRecorder) ServiceReady(serviceName string, dependencies []string
 	l.m.Lock()
 	defer l.m.Unlock()
 	l.Data.Services = append(l.Data.Services, serviceData)
+	l.ServiceCount--
+	if l.ServiceCount == 0 {
+		close(l.allLogged)
+	}
 }
 
 func (l *StartupRecorder) MicroshiftStarts(start time.Time) {
@@ -69,6 +77,8 @@ func (l *StartupRecorder) MicroshiftReady() {
 	klog.InfoS("MICROSHIFT READY", "since-start", time.Since(l.Data.Microshift.Start))
 	l.Data.Microshift.Ready = ready
 	l.Data.Microshift.TimeToReady = ready.Sub(l.Data.Microshift.Start)
+
+	l.OutputData()
 }
 
 func (l *StartupRecorder) ServicesStart(start time.Time) {
@@ -77,18 +87,25 @@ func (l *StartupRecorder) ServicesStart(start time.Time) {
 }
 
 func (l *StartupRecorder) OutputData() {
-	jsonOutput, err := json.Marshal(l.Data)
-	if err != nil {
-		klog.Error("Failed to marshal startup data")
-	}
+	go func() {
+		select {
+		case <-l.allLogged:
+			jsonOutput, err := json.Marshal(l.Data)
+			if err != nil {
+				klog.Error("Failed to marshal startup data")
+			}
 
-	klog.Infof("Startup data: %s", string(jsonOutput))
+			klog.Infof("Startup data: %s", string(jsonOutput))
 
-	path, ok := os.LookupEnv("STARTUP_LOGS_PATH")
-	if ok {
-		err = os.WriteFile(path, jsonOutput, 0600)
-		if err != nil {
-			klog.Error("Failed to write startup data to file")
+			path, ok := os.LookupEnv("STARTUP_LOGS_PATH")
+			if ok {
+				err = os.WriteFile(path, jsonOutput, 0600)
+				if err != nil {
+					klog.Error("Failed to write startup data to file")
+				}
+			}
+		case <-time.After(30 * time.Second):
+			klog.Error("StartupRecorder timed out")
 		}
-	}
+	}()
 }
