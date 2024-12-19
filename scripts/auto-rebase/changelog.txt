@@ -1,12 +1,7 @@
-- cluster-network-operator embedded-component 07b4bfd42dab06335d73693325f4e2afe1c31368 to efa14fa349e7cd9ecd44dc90ad5dc1c7c52fea4c
-  - b8a047a 2024-12-12T09:57:09+01:00 Cleanup ipsec entries from sidecar container
-  - 7c1536d 2024-12-12T09:57:00+01:00 Remove ip xfrm state when IPsec is disabled
+- cluster-network-operator embedded-component efa14fa349e7cd9ecd44dc90ad5dc1c7c52fea4c to aa286367d966f61fe06b4bb107e2b324328450ff
+  - b67bafc 2024-12-13T18:48:14+01:00 Skip including default crypto policies to avoid authby issue
+  - 530e7be 2024-12-11T02:19:19-05:00 Prevent live migration process from flapping between step-2 and step-3
 
-- ovn-kubernetes image-amd64 e7ae53822521e520c4c1be31ba3bfb3388187989 to cd453e4951659e8de2bc824798ce3c70089352f9
-  - a2be9e21 2024-12-10T16:04:04+08:00 Bump OVS to 3.3.0-62.el9fdp for OCP 4.16
-  - 05455df3 2024-11-12T08:26:57+00:00 Add static route to the hairpin masquerade IPs to pod
-
-- ovn-kubernetes image-arm64 e7ae53822521e520c4c1be31ba3bfb3388187989 to cd453e4951659e8de2bc824798ce3c70089352f9
-  - a2be9e21 2024-12-10T16:04:04+08:00 Bump OVS to 3.3.0-62.el9fdp for OCP 4.16
-  - 05455df3 2024-11-12T08:26:57+00:00 Add static route to the hairpin masquerade IPs to pod
+- operator-framework-olm embedded-component d718c4c564975f3d4fac468987c4424691201790 to cee1f16cea7e10b8317c8e75420b84820ff19607
+  - bcf32067 2024-12-16T07:15:49+00:00 CRD upgrade existing CR validation fix (#3442)
 
