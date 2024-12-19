@@ -7,6 +7,7 @@ Resource            ../../resources/common.resource
 Resource            ../../resources/systemd.resource
 Resource            ../../resources/microshift-config.resource
 Resource            ../../resources/microshift-process.resource
+Resource            ../../resources/ostree.resource
 Resource            ../../resources/ostree-health.resource
 
 Suite Setup         Setup Suite
@@ -234,13 +235,6 @@ ConfigMap Should Be Missing
     ...    stderr=STDOUT
     ...    shell=True
     Should Be Equal As Integers    ${result.rc}    1
-
-Create Usr Directory Overlay
-    [Documentation]    Make /usr dir writable by creating an overlay, rebooting will go back to being immutable.
-    ${stdout}    ${rc}=    Execute Command
-    ...    rpm-ostree usroverlay
-    ...    sudo=True    return_rc=True
-    Should Be Equal As Integers    0    ${rc}
 
 Clear Manifest Directory
     [Documentation]    Remove the contents of the manifest directory

@@ -123,3 +123,19 @@ Expected Boot Count
     ...    sudo=True    return_rc=False
 
     Should Be Equal As Integers    ${reboot_count}    ${stdout}
+
+Create Usr Directory Overlay
+    [Documentation]    Make /usr dir writable by creating an overlay, rebooting
+    ...    will go back to being immutable.
+
+    ${is_bootc}=    Is System Bootc
+    IF    ${is_bootc}
+        ${cmd}=    Set Variable    bootc
+    ELSE
+        ${cmd}=    Set Variable    rpm-ostree
+    END
+
+    ${rc}=    Execute Command
+    ...    ${cmd} usroverlay
+    ...    sudo=True    return_rc=True
+    Should Be Equal As Integers    0    ${rc}
