@@ -95,10 +95,10 @@ function get_wait_timeout() {
     [ -f "${conf_file}" ] && source ${conf_file}
 
     # Read and verify the wait timeout value, allowing for the [60..9999] range
-    local base_timeout=${MICROSHIFT_WAIT_TIMEOUT_SEC:-300}
+    local base_timeout=${MICROSHIFT_WAIT_TIMEOUT_SEC:-600}
     local reSecs='^[1-9]{1}[0-9]{0,3}$'
     if [[ ! ${base_timeout} =~ ${reSecs} ]] ; then
-        base_timeout=300
+        base_timeout=600
         >&2 echo "Could not parse MICROSHIFT_WAIT_TIMEOUT_SEC value '${MICROSHIFT_WAIT_TIMEOUT_SEC}': using '${base_timeout}' instead"
     fi
     if [[ ${base_timeout} -lt 60 ]] ; then

@@ -68,16 +68,6 @@ data = """
 BLOCK_RPCS=
 FSFREEZE_HOOK_PATHNAME=/etc/qemu-ga/fsfreeze-hook"""
 
-# Extend Greenboot wait timeout to 10m for MicroShift to be ready.
-# Greenboot configuration must come after RPM install to avoid
-# /etc/greenboot/greenboot.conf overwrite by the package update.
-[[customizations.files]]
-path = "/etc/greenboot/greenboot.conf"
-data = """
-GREENBOOT_WATCHDOG_CHECK_ENABLED=true
-MICROSHIFT_WAIT_TIMEOUT_SEC=600
-"""
-
 [[containers]]
 source = "quay.io/microshift/busybox:1.36"
 
