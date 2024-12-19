@@ -3,6 +3,7 @@ package cmd
 import (
 	"context"
 	"fmt"
+	"os"
 	"time"
 
 	"github.com/openshift/microshift/pkg/healthcheck"
@@ -39,6 +40,10 @@ Checking health of a custom workloads can be achieved in two ways:
 `,
 
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if os.Geteuid() > 0 {
+				return fmt.Errorf("command must be run with root privileges")
+			}
+
 			if namespace != "" && custom != "" {
 				return fmt.Errorf("only --namespace or --custom can be provided")
 			}
