@@ -1,3 +1,0 @@
-- machine-config-operator embedded-component dbd860c427d31db182489ae3eab9a595622f3e25 to 4f8b6f2a0e1a8ec475e5ef1dd8effd9306804518
-  - c3bf4e22 2024-12-11T15:52:18+00:00 Remove trailing periods from AWS provided hostnames
-
