@@ -4,7 +4,7 @@ https://github.com/openshift/cluster-ingress-operator embedded-component 57f9674
 https://github.com/openshift/cluster-kube-apiserver-operator embedded-component de2f2ac2fc9a811bd2b1db4f912c5a0092bfc3d0
 https://github.com/openshift/cluster-kube-controller-manager-operator embedded-component 0338b3be6912024d03def2c26f0fa10218fc2c25
 https://github.com/openshift/cluster-kube-scheduler-operator embedded-component 630f63bc7a30d2662bbb5115233144079de6eef6
-https://github.com/openshift/cluster-network-operator embedded-component efa14fa349e7cd9ecd44dc90ad5dc1c7c52fea4c
+https://github.com/openshift/cluster-network-operator embedded-component aa286367d966f61fe06b4bb107e2b324328450ff
 https://github.com/openshift/cluster-openshift-controller-manager-operator embedded-component 2280f54414cf403aed0a02b3fdb86ee6bf672410
 https://github.com/openshift/cluster-policy-controller embedded-component eaea543f4c845a7b65705f12e162cc121bb12f88
 https://github.com/openshift/csi-external-snapshotter embedded-component 5315d37a1e5415e8b6870f23e50238681979cc28
@@ -13,7 +13,7 @@ https://github.com/openshift/kubernetes embedded-component 67d33871ba24f0e8c4d2d
 https://github.com/openshift/kubernetes-kube-storage-version-migrator embedded-component 969a60e9e2466c44f5b3ffd43fe3ecab11bf1e51
 https://github.com/openshift/machine-config-operator embedded-component 64460169e27091d8f8373b0952604ba2700d6d67
 https://github.com/openshift/openshift-controller-manager embedded-component 05ca43957983cd8ea5a5890c5271d7cb228ecdd0
-https://github.com/openshift/operator-framework-olm embedded-component d718c4c564975f3d4fac468987c4424691201790
+https://github.com/openshift/operator-framework-olm embedded-component cee1f16cea7e10b8317c8e75420b84820ff19607
 https://github.com/openshift/route-controller-manager embedded-component 3112b458983c6fca6f77d5a945fb0026186dace6
 https://github.com/openshift/service-ca-operator embedded-component 538c7b98a689e573b61e1abb1cb649da470c5fac
 https://github.com/openshift/oc image-amd64 cf533b548154f7f2e828a44864477bbbb881692d
