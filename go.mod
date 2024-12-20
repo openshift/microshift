@@ -14,7 +14,7 @@ require (
 	github.com/openshift/client-go v0.0.0-20241001162912-da6d55e4611f
 	github.com/openshift/cluster-policy-controller v0.0.0-20241210163452-327d3cbd82fd
 	github.com/openshift/library-go v0.0.0-20241107160307-0064ad7bd060
-	github.com/openshift/route-controller-manager v0.0.0-20241212133037-4a534edbd515
+	github.com/openshift/route-controller-manager v0.0.0-20241218160919-bc97534a12a7
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/spf13/cobra v1.8.1
 	github.com/spf13/pflag v1.0.5
@@ -124,7 +124,6 @@ require (
 	github.com/karrick/godirwalk v1.17.0 // indirect
 	github.com/libopenstorage/openstorage v1.0.0 // indirect
 	github.com/liggitt/tabwriter v0.0.0-20181228230101-89fcab3d43de // indirect
-	github.com/lithammer/dedent v1.1.0 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/mistifyio/go-zfs v2.1.2-0.20190413222219-f784269be439+incompatible // indirect
 	github.com/mitchellh/go-wordwrap v1.0.1 // indirect
