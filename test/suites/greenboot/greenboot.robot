@@ -93,21 +93,19 @@ Cleanup User Workload
 
 Disrupt Service
     [Documentation]    Prevent Microshift service from starting correctly.
-    ${is_ostree}=    Is System OSTree
 
     ${stdout}    ${rc}=    Execute Command
     ...    which hostname
     ...    sudo=False    return_rc=True
     IF    ${rc} == 0    Set Suite Variable    \${HOSTNAME_BIN_PATH}    ${stdout}
 
-    ${cmd}=    Set Variable    sudo chmod 000 ${HOSTNAME_BIN_PATH}
-    IF    ${is_ostree}
-        ${cmd}=    Set Variable    sudo rpm-ostree usroverlay && sudo chmod 000 ${HOSTNAME_BIN_PATH}
-    END
+    # This covers both ostree and bootc systems
+    ${is_ostree}=    Is System OSTree
+    IF    ${is_ostree}    Create Usr Directory Overlay
 
-    ${stdout}    ${rc}=    Execute Command
-    ...    ${cmd}
-    ...    sudo=False    return_rc=True
+    ${rc}=    Execute Command
+    ...    chmod 000 ${HOSTNAME_BIN_PATH}
+    ...    sudo=True    return_rc=True
     Should Be Equal As Integers    0    ${rc}
 
 Restore Service
