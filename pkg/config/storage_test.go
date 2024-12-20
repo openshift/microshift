@@ -57,7 +57,7 @@ func TestStorage_IsValid(t *testing.T) {
 			name: "is valid when a driver is set and csi-components are valid",
 			fields: fields{
 				Driver:        CsiDriverLVMS,
-				CSIComponents: []OptionalCsiComponent{CsiComponentSnapshot, CsiComponentSnapshotWebhook},
+				CSIComponents: []OptionalCsiComponent{CsiComponentSnapshot},
 			},
 			want: []error{},
 		},
@@ -73,7 +73,7 @@ func TestStorage_IsValid(t *testing.T) {
 			name: "is valid when the driver is unset and csi-components are valid",
 			fields: fields{
 				Driver:        CsiDriverUnset,
-				CSIComponents: []OptionalCsiComponent{CsiComponentSnapshot, CsiComponentSnapshotWebhook},
+				CSIComponents: []OptionalCsiComponent{CsiComponentSnapshot},
 			},
 			want: []error{},
 		},
@@ -81,7 +81,7 @@ func TestStorage_IsValid(t *testing.T) {
 			name: "is invalid when driver is valid, but csi-components are invalid",
 			fields: fields{
 				Driver:        CsiDriverLVMS,
-				CSIComponents: []OptionalCsiComponent{"foobar", CsiComponentSnapshot, CsiComponentSnapshotWebhook},
+				CSIComponents: []OptionalCsiComponent{"foobar", CsiComponentSnapshot},
 			},
 			want: []error{
 				fmt.Errorf("invalid CSI components: [foobar]"),
@@ -91,7 +91,7 @@ func TestStorage_IsValid(t *testing.T) {
 			name: "is invalid when driver is invalid, but CSI components are valid",
 			fields: fields{
 				Driver:        "foobar",
-				CSIComponents: []OptionalCsiComponent{CsiComponentSnapshot, CsiComponentSnapshotWebhook},
+				CSIComponents: []OptionalCsiComponent{CsiComponentSnapshot},
 			},
 			want: []error{
 				fmt.Errorf("invalid driver \"foobar\""),
@@ -125,7 +125,6 @@ func TestStorage_csiComponentIsValid(t *testing.T) {
 			fields: fields{
 				CSIComponents: []OptionalCsiComponent{
 					CsiComponentSnapshot,
-					CsiComponentSnapshotWebhook,
 				},
 			},
 			want: []string{},
@@ -230,7 +229,7 @@ func TestStorage_noneIsMutuallyExclusive(t *testing.T) {
 		{
 			name: "passes when none is not in a list of values",
 			fields: fields{
-				CSIComponents: []OptionalCsiComponent{CsiComponentSnapshot, CsiComponentSnapshotWebhook},
+				CSIComponents: []OptionalCsiComponent{CsiComponentSnapshot},
 			},
 			want:  nil,
 			want1: true,

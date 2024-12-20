@@ -126,7 +126,7 @@ func getExpectedCSIComponents(cfg *config.Config) []string {
 	klog.V(2).Infof("Configured optional CSI components: %v", cfg.Storage.OptionalCSIComponents)
 
 	if len(cfg.Storage.OptionalCSIComponents) == 0 {
-		return []string{"csi-snapshot-controller", "csi-snapshot-webhook"}
+		return []string{"csi-snapshot-controller"}
 	}
 
 	// Validation fails when there's more than one component provided and one of them is "None".
@@ -139,9 +139,6 @@ func getExpectedCSIComponents(cfg *config.Config) []string {
 	for _, comp := range cfg.Storage.OptionalCSIComponents {
 		if comp == config.CsiComponentSnapshot {
 			deployments = append(deployments, "csi-snapshot-controller")
-		}
-		if comp == config.CsiComponentSnapshotWebhook {
-			deployments = append(deployments, "csi-snapshot-webhook")
 		}
 	}
 	return deployments

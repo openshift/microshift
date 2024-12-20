@@ -374,15 +374,14 @@ storage:
     driver: ""
     # OptionalCSIComponents is a user defined slice of CSIComponent values. These value tell MicroShift which
     # additional, non-driver, CSI controllers to deploy on start. MicroShift will deploy snapshot controller
-    # and webhook when no components are specified. This preserves the current deployment behavior of existing
+    # when no components are specified. This preserves the current deployment behavior of existing
     # clusters. Users must set `.storage.optionalCsiComponents: []` to explicitly tell MicroShift not to deploy any CSI
     # components. The CSI Driver is excluded as it is typically deployed via the same manifest as the accompanying
     # storage driver. Like CSIStorageDriver, uninstallation is not supported as this can lead to orphaned storage
     # objects.
-    # Allowed values are: unset, [], or one or more of ["snapshot-controller", "snapshot-webhook"]
+    # Allowed values are: unset, [], or one or more of ["snapshot-controller"]
     # example:
     #   - snapshot-controller
-    # - snapshot-webhook
     optionalCsiComponents:
         - ""
 
