@@ -367,9 +367,9 @@ specifying supported values under `.storage` node of the MicroShift config in th
 storage
   optionalCsiComponents: **ARRAY**.
 ```
-  - Expected values are: `['csi-snapshot-controller', 'csi-snapshot-webhook', 'none']`. `'none'` is mutually exclusive
+  - Expected values are: `['csi-snapshot-controller', 'none']`. `'none'` is mutually exclusive
   with all other values.
-  - Empty array defaults to deploying `snapshot-controller` and `snapshot-webhook`.
+  - Empty array defaults to deploying `snapshot-controller`.
 
 ### Automated Uninstallation is Not Supported
 

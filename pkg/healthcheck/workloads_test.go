@@ -18,7 +18,7 @@ func Test_csiComponentsAreExpected(t *testing.T) {
 			cfg: config.Config{Storage: config.Storage{
 				OptionalCSIComponents: []config.OptionalCsiComponent{},
 			}},
-			expectedResult: []string{"csi-snapshot-controller", "csi-snapshot-webhook"},
+			expectedResult: []string{"csi-snapshot-controller"},
 		},
 		{
 			name: "none",
@@ -33,20 +33,6 @@ func Test_csiComponentsAreExpected(t *testing.T) {
 				OptionalCSIComponents: []config.OptionalCsiComponent{config.CsiComponentSnapshot},
 			}},
 			expectedResult: []string{"csi-snapshot-controller"},
-		},
-		{
-			name: "only webhook",
-			cfg: config.Config{Storage: config.Storage{
-				OptionalCSIComponents: []config.OptionalCsiComponent{config.CsiComponentSnapshotWebhook},
-			}},
-			expectedResult: []string{"csi-snapshot-webhook"},
-		},
-		{
-			name: "controller & webhook",
-			cfg: config.Config{Storage: config.Storage{
-				OptionalCSIComponents: []config.OptionalCsiComponent{config.CsiComponentSnapshot, config.CsiComponentSnapshotWebhook},
-			}},
-			expectedResult: []string{"csi-snapshot-controller", "csi-snapshot-webhook"},
 		},
 	}
 	for _, td := range testData {

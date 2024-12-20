@@ -105,7 +105,7 @@ Disrupt Service
 
     ${rc}=    Execute Command
     ...    chmod 000 ${HOSTNAME_BIN_PATH}
-    ...    sudo=True    return_rc=True
+    ...    sudo=True    return_rc=True    return_stdout=False
     Should Be Equal As Integers    0    ${rc}
 
 Restore Service

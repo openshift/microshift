@@ -26,12 +26,12 @@ const (
 
 // OptionalCsiComponent values determine which CSI components MicroShift should deploy. Currently only csi snapshot components
 // are supported.
-// +kubebuilder:validation:Enum:=none;snapshot-controller;snapshot-webhook;""
+// +kubebuilder:validation:Enum:=none;snapshot-controller;""
 type OptionalCsiComponent string
 
 const (
 	// CsiComponentNone exists to support backwards compatibility with existing MicroShift clusters. By default,
-	// MicroShift will deploy snapshot controller and webhook when no components are specified. This preserves the
+	// MicroShift will deploy snapshot controller when no components are specified. This preserves the
 	// current deployment behavior of existing clusters. Users must set .storage.with-csi-components: [ "none" ] to
 	// explicitly tell MicroShift not to deploy any CSI components. The CSI Driver is excluded as it is typically
 	// deployed via the same manifest as the accompanying storage driver. Like DriverOpt, uninstallation is not
@@ -39,8 +39,6 @@ const (
 	CsiComponentNone OptionalCsiComponent = "none"
 	// CsiComponentSnapshot causes MicroShift to deploy the CSI Snapshot controller.
 	CsiComponentSnapshot OptionalCsiComponent = "snapshot-controller"
-	// CsiComponentSnapshotWebhook causes MicroShift to deploy the CSI Snapshot Validation Webhook.
-	CsiComponentSnapshotWebhook OptionalCsiComponent = "snapshot-webhook"
 	// CsiComponentNullAlias is equivalent to not specifying a value. It exists because controller-gen generates
 	// default empty-array values as [""], instead of []. Failing to include this odd value would mean the generated
 	// /etc/microshift/config.default.yaml would break if passed to MicroShift.
@@ -59,14 +57,14 @@ type Storage struct {
 	Driver CSIStorageDriver `json:"driver,omitempty"`
 	// OptionalCSIComponents is a user defined slice of CSIComponent values. These value tell MicroShift which
 	// additional, non-driver, CSI controllers to deploy on start. MicroShift will deploy snapshot controller
-	// and webhook when no components are specified. This preserves the current deployment behavior of existing
+	// when no components are specified. This preserves the current deployment behavior of existing
 	// clusters. Users must set `.storage.optionalCsiComponents: []` to explicitly tell MicroShift not to deploy any CSI
 	// components. The CSI Driver is excluded as it is typically deployed via the same manifest as the accompanying
 	// storage driver. Like CSIStorageDriver, uninstallation is not supported as this can lead to orphaned storage
 	// objects.
-	// Allowed values are: unset, [], or one or more of ["snapshot-controller", "snapshot-webhook"]
+	// Allowed values are: unset, [], or one or more of ["snapshot-controller"]
 	// +kubebuilder:validation:Optional
-	// +kubebuilder:example={"snapshot-controller", "snapshot-webhook"}
+	// +kubebuilder:example={"snapshot-controller"}
 	OptionalCSIComponents []OptionalCsiComponent `json:"optionalCsiComponents,omitempty"`
 }
 
@@ -75,7 +73,7 @@ func (s Storage) driverIsValid() (isSupported bool) {
 }
 
 func (s Storage) csiComponentsAreValid() []string {
-	supported := sets.New[OptionalCsiComponent](CsiComponentSnapshot, CsiComponentSnapshotWebhook, CsiComponentNone,
+	supported := sets.New[OptionalCsiComponent](CsiComponentSnapshot, CsiComponentNone,
 		CsiComponentNullAlias)
 	unsupported := sets.New[string]()
 
