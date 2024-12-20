@@ -1,7 +1,12 @@
 package healthcheck
 
 import (
+	"bytes"
+	"encoding/json"
+	"os/exec"
+
 	"github.com/openshift/microshift/pkg/config"
+	"github.com/openshift/microshift/pkg/util"
 	"k8s.io/klog/v2"
 )
 
@@ -14,9 +19,6 @@ func getCoreMicroShiftWorkloads() (map[string]NamespaceWorkloads, error) {
 	}
 
 	workloads := map[string]NamespaceWorkloads{
-		"openshift-ovn-kubernetes": {
-			DaemonSets: []string{"ovnkube-master", "ovnkube-node"},
-		},
 		"openshift-service-ca": {
 			Deployments: []string{"service-ca"},
 		},
@@ -30,15 +32,82 @@ func getCoreMicroShiftWorkloads() (map[string]NamespaceWorkloads, error) {
 			},
 		},
 	}
-	fillOptionalWorkloadsIfApplicable(cfg, workloads)
+	if cfg.Network.IsEnabled() {
+		workloads["openshift-ovn-kubernetes"] = NamespaceWorkloads{
+			DaemonSets: []string{"ovnkube-master", "ovnkube-node"},
+		}
+	}
+	if err := fillOptionalWorkloadsIfApplicable(cfg, workloads); err != nil {
+		return nil, err
+	}
 
 	return workloads, nil
 }
 
-func fillOptionalWorkloadsIfApplicable(cfg *config.Config, workloads map[string]NamespaceWorkloads) {
-	klog.V(2).Infof("Configured storage driver value: %q", string(cfg.Storage.Driver))
-	if cfg.Storage.IsEnabled() {
-		klog.Infof("LVMS is enabled")
+func lvmsIsExpected(cfg *config.Config) (bool, error) {
+	cfgFile := "/etc/microshift/lvmd.yaml"
+	if exists, err := util.PathExists(cfgFile); err != nil {
+		return false, err
+	} else if exists {
+		klog.Infof("%s exists - expecting LVMS to be deployed", cfgFile)
+		return true, nil
+	}
+
+	if !cfg.Storage.IsEnabled() {
+		klog.Infof("LVMS is disabled via config. Configured value: %q", string(cfg.Storage.Driver))
+		return false, nil
+	}
+
+	cmd := exec.Command("vgs", "--readonly", "--options=name", "--reportformat=json")
+	output, err := cmd.Output()
+	if err != nil {
+		return false, err
+	}
+	out := &bytes.Buffer{}
+	err = json.Compact(out, output)
+	if err != nil {
+		klog.Errorf("Failed to compact 'vgs' output: %s", string(output))
+	} else {
+		klog.V(2).Infof("vgs reported: %s", out.String())
+	}
+
+	report := struct {
+		Report []struct {
+			VGs []struct {
+				VGName string `json:"vg_name"`
+			} `json:"vg"`
+		} `json:"report"`
+	}{}
+
+	err = json.Unmarshal(output, &report)
+	if err != nil {
+		return false, err
+	}
+
+	if len(report.Report) == 0 || len(report.Report[0].VGs) == 0 {
+		klog.Infof("Detected 0 volume groups - LVMS is not expected")
+		return false, nil
+	}
+
+	if len(report.Report[0].VGs) == 1 {
+		klog.Infof("Detected 1 volume group (%s) - LVMS is expected", report.Report[0].VGs[0].VGName)
+		return true, nil
+	}
+
+	for _, vg := range report.Report[0].VGs {
+		if vg.VGName == "microshift" {
+			klog.Infof("Found volume group named 'microshift' - LVMS is expected")
+			return true, nil
+		}
+	}
+
+	return false, nil
+}
+
+func fillOptionalWorkloadsIfApplicable(cfg *config.Config, workloads map[string]NamespaceWorkloads) error {
+	if expected, err := lvmsIsExpected(cfg); err != nil {
+		return err
+	} else if expected {
 		workloads["openshift-storage"] = NamespaceWorkloads{
 			DaemonSets:  []string{"vg-manager"},
 			Deployments: []string{"lvms-operator"},
@@ -50,6 +119,7 @@ func fillOptionalWorkloadsIfApplicable(cfg *config.Config, workloads map[string]
 			Deployments: comps,
 		}
 	}
+	return nil
 }
 
 func getExpectedCSIComponents(cfg *config.Config) []string {
