@@ -3,7 +3,7 @@
 
 vm_name: microshift-dev
 vm_disk_dir: /var/lib/libvirt/images
-iso_file: /var/lib/libvirt/images/rhel-9.2-x86_64-dvd.iso
+iso_file: /var/lib/libvirt/images/rhel-9.4-x86_64-dvd.iso
 num_cpu: 4
 ram_size: 8
 disk_size: 60
