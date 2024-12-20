@@ -1,0 +1,6 @@
+- machine-config-operator embedded-component 434269de72a280d7edf9f2f2d9d2380782f3a68e to 2bc91afa09de6fba41e1bca2178c1a49ef30db1a
+  - 30dcfb22 2024-12-13T13:13:41-06:00 added required-scc annotation release 4.18
+
+- operator-framework-olm embedded-component 57a4299d9f3d8c3ee3c7f60971fdc57ed47b6d35 to 6156b61b05d6e345db44edfa7d38138ea0373631
+  - 0787bf26 2024-12-17T15:30:09-05:00 [release-4.18] OCPBUGS-46474:catalog-operator: Delete Pods that were evicted (#3459)
+
