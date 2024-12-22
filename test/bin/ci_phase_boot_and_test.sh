@@ -16,9 +16,10 @@ prepare_scenario_sources() {
     rm -rf "${SCENARIOS_TO_RUN}"
     mkdir -p "${SCENARIOS_TO_RUN}"
     cp "${SCENARIO_SOURCES}"/*.sh "${SCENARIOS_TO_RUN}"/
-    if ${EXCLUDE_CNCF_CONFORMANCE}; then
-        find "${SCENARIOS_TO_RUN}" -name "*cncf-conformance.sh" -delete
-    fi
+    # TODO: Undo this change
+    # if ${EXCLUDE_CNCF_CONFORMANCE}; then
+    #     find "${SCENARIOS_TO_RUN}" -name "*cncf-conformance.sh" -delete
+    # fi
 }
 
 # Log output automatically
