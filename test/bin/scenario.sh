@@ -527,7 +527,7 @@ launch_vm() {
     local -r full_vmname="$(full_vm_name "${vmname}")"
     local -r kickstart_url="${WEB_SERVER_URL}/scenario-info/${SCENARIO}/vms/${vmname}/kickstart.ks"
 
-    local -r vm_pool_name="${VM_POOL_BASENAME}-${SCENARIO}"
+    local -r vm_pool_name="${VM_POOL_BASENAME}-${SCENARIO}-${vmname}"
     local -r vm_pool_dir="${VM_DISK_BASEDIR}/${vm_pool_name}"
 
     # See if the VM already exists
