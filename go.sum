@@ -419,8 +419,8 @@ github.com/openshift/library-go v0.0.0-20241107160307-0064ad7bd060 h1:jiDC7d8d+j
 github.com/openshift/library-go v0.0.0-20241107160307-0064ad7bd060/go.mod h1:9B1MYPoLtP9tqjWxcbUNVpwxy68zOH/3EIP6c31dAM0=
 github.com/openshift/onsi-ginkgo/v2 v2.6.1-0.20241008152707-25bf9f14db44 h1:dKUAGq29JBk2oRn955gnnz3sG/UhlkUKh1ISleLiews=
 github.com/openshift/onsi-ginkgo/v2 v2.6.1-0.20241008152707-25bf9f14db44/go.mod h1:rlwLi9PilAFJ8jCg9UE1QP6VBpd6/xj3SRC0d6TU0To=
-github.com/openshift/route-controller-manager v0.0.0-20241212133037-4a534edbd515 h1:LL1+VHNNV4XD7OMt/TjlIOGiptjOxA5RAFRTj0ajHR4=
-github.com/openshift/route-controller-manager v0.0.0-20241212133037-4a534edbd515/go.mod h1:O7hb1v/ChR4wqZ4ikcP3cEq8UMceeFhbFwlj/O1PcM0=
+github.com/openshift/route-controller-manager v0.0.0-20241218160919-bc97534a12a7 h1:5XEaTtPg1PrGzMuq1Rlc8NyEBqlRilwBDr164DamL4s=
+github.com/openshift/route-controller-manager v0.0.0-20241218160919-bc97534a12a7/go.mod h1:O7hb1v/ChR4wqZ4ikcP3cEq8UMceeFhbFwlj/O1PcM0=
 github.com/orisano/pixelmatch v0.0.0-20220722002657-fb0b55479cde/go.mod h1:nZgzbfBr3hhjoZnS66nKrHmduYNpc34ny7RK4z5/HM0=
 github.com/pelletier/go-toml v1.2.0/go.mod h1:5z9KED0ma1S8pY6P1sdut58dfprrGBbd/94hg7ilaic=
 github.com/peterbourgon/diskv v2.0.1+incompatible h1:UBdAOUP5p4RWqPBg048CAvpKN+vxiaj6gdUUzhl4XmI=
