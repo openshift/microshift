@@ -1,7 +1,0 @@
-- cluster-network-operator embedded-component efa14fa349e7cd9ecd44dc90ad5dc1c7c52fea4c to aa286367d966f61fe06b4bb107e2b324328450ff
-  - b67bafc 2024-12-13T18:48:14+01:00 Skip including default crypto policies to avoid authby issue
-  - 530e7be 2024-12-11T02:19:19-05:00 Prevent live migration process from flapping between step-2 and step-3
-
-- operator-framework-olm embedded-component d718c4c564975f3d4fac468987c4424691201790 to cee1f16cea7e10b8317c8e75420b84820ff19607
-  - bcf32067 2024-12-16T07:15:49+00:00 CRD upgrade existing CR validation fix (#3442)
-
