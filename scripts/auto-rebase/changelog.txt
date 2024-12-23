@@ -1,0 +1,19 @@
+- cluster-network-operator embedded-component 780c0217eec9a42039303cdc6173d4b188f21f39 to fee8c3129c028c6b72eff93a0f814678d997951e
+  - 41d4c27 2024-12-16T11:03:54+01:00 Skip including default crypto policies to avoid authby issue
+  - 0ce67a7 2024-12-12T10:01:33+01:00 Cleanup ipsec entries from sidecar container
+  - 41dd276 2024-12-12T10:01:24+01:00 Remove ip xfrm state when IPsec is disabled
+  - 32b8bcb 2024-12-09T10:06:12+00:00 Pass transit_switch_subnet options in ovnkube-node pod
+  - f6a2383 2024-10-21T07:51:57+00:00 Exporting environment varialbe NODE_CNI for live migration
+
+- machine-config-operator embedded-component 4d5d7297319b4d466f6edbc1bea316ce8560b854 to 842b60b1ff77a2f2bcb263a4b9488651758eb7f9
+  - aa212031 2024-12-11T12:25:55+00:00 Remove trailing periods from AWS provided hostnames
+
+- operator-framework-olm embedded-component 2a0924f9655371f636d16b60e9ae7e49934c5640 to f690dd8788b7334ff6d593a2d2f9db077db73d08
+  - e25f8235 2024-12-16T20:52:32+00:00 CRD upgrade existing CR validation fix (#3442)
+
+- ovn-kubernetes image-amd64 5de3de7c87247fdc66f7663dd8447a09dbd65526 to 9c4d3010d46a438f5fe3e2da14832ac0b38de7c2
+  - 32f906c 2024-11-27T10:20:54+08:00 pin libreswan to 4.6-3.el9_0.3
+
+- ovn-kubernetes image-arm64 5de3de7c87247fdc66f7663dd8447a09dbd65526 to 9c4d3010d46a438f5fe3e2da14832ac0b38de7c2
+  - 32f906c 2024-11-27T10:20:54+08:00 pin libreswan to 4.6-3.el9_0.3
+
