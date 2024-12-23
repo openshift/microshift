@@ -1,42 +1,6 @@
-- cluster-network-operator embedded-component 3ec01ef2075fc94dfbade8441e6f13985f39303e to 37be1f8c3b4296048a2bd385ffc6636fc3603f38
-  - 491050f 2024-12-13T14:14:19+01:00 Skip including default crypto policies to avoid authby issue
+- machine-config-operator embedded-component 119a374e94ea622c080409cc82f106ac737d4e85 to d7c30c8b04e46f2b86e1b8ee3ed5ed11cfd2fadc
+  - 1fb734a5 2024-12-16T15:31:57-05:00 controller: default to runc when upgrading clusters from 4.17 to 4.18
 
-- etcd embedded-component c82057da87388662904654d4f01acd06595ee22d to 23c5a247c3e601f7806a0bbffdc6d201a55bf469
-  - d26fba86 2024-10-29T15:37:16-04:00 Add support for cachi2 based deps
-
-- kubernetes embedded-component df0195cb1143b34da26b6aa490ab812036e77898 to f868289cea8577c895fa957b466f209b9af6a1a2
-  - c0eea14a8 2024-12-12T12:22:30-05:00 UPSTREAM: <carry>: PR-124064 fix grace period used for immediate evictions
-  - f6a95ed8e 2024-12-10T05:03:35+00:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
-  - 6eb00ed1c 2024-12-10T04:49:54+00:00 UPSTREAM: <drop>: manually resolve conflicts
-  - 0c76c645d 2024-11-19T17:26:34+00:00 Release commit for Kubernetes v1.30.7
-  - ff3d440e2 2024-10-31T08:48:47+01:00 server/config: assing system:apiserver user to system:authenticated group
-  - df37614d6 2024-10-30T15:38:09+08:00 bugfix(scheduler): preemption picks wrong victim node with higher priority pod on it.
-  - 02ed463dc 2024-10-22T20:53:51+00:00 Update CHANGELOG/CHANGELOG-1.30.md for v1.30.6
-  - f08622720 2024-09-24T07:29:06+00:00 tests for nodes with different nodeName and name
-  - b1c9d7eb0 2024-09-24T07:24:26+00:00 manually revert #109877
-
-- operator-framework-olm embedded-component 649dfc4dc0a7fca1c25c7678665a55ad8ce53040 to a8acb3d612717850bff384af0eaa06b6f0f5e136
-  - 794452ad 2024-12-11T14:51:46+00:00 CRD upgrade existing CR validation fix (#3442)
-
-- kubernetes image-amd64 df0195cb1143b34da26b6aa490ab812036e77898 to f868289cea8577c895fa957b466f209b9af6a1a2
-  - c0eea14a8 2024-12-12T12:22:30-05:00 UPSTREAM: <carry>: PR-124064 fix grace period used for immediate evictions
-  - f6a95ed8e 2024-12-10T05:03:35+00:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
-  - 6eb00ed1c 2024-12-10T04:49:54+00:00 UPSTREAM: <drop>: manually resolve conflicts
-  - 0c76c645d 2024-11-19T17:26:34+00:00 Release commit for Kubernetes v1.30.7
-  - ff3d440e2 2024-10-31T08:48:47+01:00 server/config: assing system:apiserver user to system:authenticated group
-  - df37614d6 2024-10-30T15:38:09+08:00 bugfix(scheduler): preemption picks wrong victim node with higher priority pod on it.
-  - 02ed463dc 2024-10-22T20:53:51+00:00 Update CHANGELOG/CHANGELOG-1.30.md for v1.30.6
-  - f08622720 2024-09-24T07:29:06+00:00 tests for nodes with different nodeName and name
-  - b1c9d7eb0 2024-09-24T07:24:26+00:00 manually revert #109877
-
-- kubernetes image-arm64 df0195cb1143b34da26b6aa490ab812036e77898 to f868289cea8577c895fa957b466f209b9af6a1a2
-  - c0eea14a8 2024-12-12T12:22:30-05:00 UPSTREAM: <carry>: PR-124064 fix grace period used for immediate evictions
-  - f6a95ed8e 2024-12-10T05:03:35+00:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
-  - 6eb00ed1c 2024-12-10T04:49:54+00:00 UPSTREAM: <drop>: manually resolve conflicts
-  - 0c76c645d 2024-11-19T17:26:34+00:00 Release commit for Kubernetes v1.30.7
-  - ff3d440e2 2024-10-31T08:48:47+01:00 server/config: assing system:apiserver user to system:authenticated group
-  - df37614d6 2024-10-30T15:38:09+08:00 bugfix(scheduler): preemption picks wrong victim node with higher priority pod on it.
-  - 02ed463dc 2024-10-22T20:53:51+00:00 Update CHANGELOG/CHANGELOG-1.30.md for v1.30.6
-  - f08622720 2024-09-24T07:29:06+00:00 tests for nodes with different nodeName and name
-  - b1c9d7eb0 2024-09-24T07:24:26+00:00 manually revert #109877
+- operator-framework-olm embedded-component a8acb3d612717850bff384af0eaa06b6f0f5e136 to b31ed59e501aa4853c29126af6857d3639498b7b
+  - b49080f0 2024-12-18T22:02:02+00:00 OCPBUGS-46474:catalog-operator: Delete Pods that were evicted (#3459)
 
