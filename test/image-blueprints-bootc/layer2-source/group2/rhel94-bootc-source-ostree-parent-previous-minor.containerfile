@@ -27,11 +27,6 @@ RUN dnf repoinfo --enabled && \
     rm -rvf $USHIFT_RPM_REPO_PATH && \
     dnf clean all
 
-# Extend Greenboot wait timeout to 10m for MicroShift to be ready.
-# Greenboot configuration must come after RPM install to avoid
-# /etc/greenboot/greenboot.conf overwrite by the package update.
-RUN printf "\nMICROSHIFT_WAIT_TIMEOUT_SEC=600\n" >> /etc/greenboot/greenboot.conf
-
 # Configure firewall
 RUN firewall-offline-cmd --zone=public --add-port=22/tcp && \
     firewall-offline-cmd --zone=trusted --add-source=10.42.0.0/16 && \

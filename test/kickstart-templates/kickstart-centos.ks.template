@@ -10,9 +10,6 @@
 %include /post-network.cfg
 
 %include /post-cos9rpm.cfg
-# Greenboot configuration must come after RPM install to avoid
-# /etc/greenboot/greenboot.conf overwrite by the package update
-%include /post-greenboot.cfg
 
 %end
 
