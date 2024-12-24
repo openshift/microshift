@@ -23,6 +23,11 @@ function configure_system() {
     sudo systemctl stop firewalld
     sudo systemctl disable firewalld
 
+    # Greenboot checks are tuned for a single node
+    sudo systemctl stop greenboot-healthcheck
+    sudo systemctl reset-failed greenboot-healthcheck
+    sudo systemctl disable greenboot-healthcheck
+
     # Configure the MicroShift host name
     sudo hostnamectl hostname "${PRI_NODE_HOST}"
 

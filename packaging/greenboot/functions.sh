@@ -16,7 +16,7 @@ echo "DEPRECATION NOTICE:"
 echo "/usr/share/microshift/functions/greenboot.sh is now deprecated and will be removed in future release."
 echo "Planned removal: MicroShift 4.21"
 echo ""
-echo "As a replacement consider using 'microshift healthcheck --namespaces' command"
+echo "As a replacement consider using 'microshift healthcheck' command"
 echo "--------------------"
 echo ""
 
