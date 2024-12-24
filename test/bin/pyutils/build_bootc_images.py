@@ -594,4 +594,5 @@ def main():
 
 
 if __name__ == "__main__":
+    _ = common.MeasureRunTimeInScope("[MAIN] Building Images")
     main()
