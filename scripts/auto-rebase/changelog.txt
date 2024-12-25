@@ -1,3 +1,0 @@
-- api embedded-component b88d0670990113e8e3e87017aaab5968d2e7339a to 188620a9ab5eaad36199cf83d9a0afcb08fdfd52
-  - 80c3c40c 2024-12-18T10:23:49+01:00 add initial Monitoring CRD api
-
