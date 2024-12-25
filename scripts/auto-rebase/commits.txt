@@ -12,7 +12,7 @@ https://github.com/openshift/csi-external-snapshotter embedded-component f52ce8b
 https://github.com/openshift/etcd embedded-component 914783cae63a13b90971c65e28c3349c1ecb7dfb
 https://github.com/openshift/kubernetes embedded-component 205ac00c56dd2340b90dc0e328be84e77219197c
 https://github.com/openshift/kubernetes-kube-storage-version-migrator embedded-component 50d17147f15d8b216e7c41f91d1bd7d307ca8c73
-https://github.com/openshift/machine-config-operator embedded-component 2bc91afa09de6fba41e1bca2178c1a49ef30db1a
+https://github.com/openshift/machine-config-operator embedded-component b05eb03a96b8a886e0389ce4762a6ad29d91c36a
 https://github.com/openshift/openshift-controller-manager embedded-component 3ebe2f4f3900d6a3748ef0faf3535f635dbf7d11
 https://github.com/openshift/operator-framework-olm embedded-component 6156b61b05d6e345db44edfa7d38138ea0373631
 https://github.com/openshift/route-controller-manager embedded-component 07daee4d2f0b5c7aaca56ee45ff6dfdf97680db0
