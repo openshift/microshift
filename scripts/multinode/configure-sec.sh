@@ -22,6 +22,11 @@ function configure_system() {
     sudo systemctl stop firewalld
     sudo systemctl disable firewalld
 
+    # Greenboot checks are tuned for a single node
+    sudo systemctl stop greenboot-healthcheck
+    sudo systemctl reset-failed greenboot-healthcheck
+    sudo systemctl disable greenboot-healthcheck
+
     # Configure the MicroShift host name
     sudo hostnamectl hostname "${SEC_NODE_HOST}"
 
@@ -148,22 +153,33 @@ function configure_node() {
     ${OC_CMD} label nodes "${SEC_NODE_HOST}" node-role.kubernetes.io/worker=
 }
 
-function wait_all_pods_ready() {
-    # shellcheck source=packaging/greenboot/functions.sh
-    source /usr/share/microshift/functions/greenboot.sh
-
-    local -r PODS_NS_LIST=(openshift-ovn-kubernetes openshift-service-ca openshift-ingress openshift-dns openshift-storage kube-system)
-    local -r PODS_CT_LIST=(3                        1                    1                 4             3                 2)
-    local -r WAIT_TIMEOUT_SECS=300
-
-    # Wait for MicroShift core pods to enter ready state
-    for i in "${!PODS_NS_LIST[@]}"; do
-        local CHECK_PODS_NS=${PODS_NS_LIST[${i}]}
-        local CHECK_PODS_CT=${PODS_CT_LIST[${i}]}
-
-        echo "Waiting ${WAIT_TIMEOUT_SECS}s for ${CHECK_PODS_CT} pod(s) from the '${CHECK_PODS_NS}' namespace to be in 'Ready' state"
-        wait_for "${WAIT_TIMEOUT_SECS}" namespace_pods_ready
-    done
+function wait_namespace_resources_ready() {
+    local -r wait_secs=600
+    local -r custom_json=$(cat <<EOF
+{
+    "openshift-ovn-kubernetes": {
+        "daemonsets": ["ovnkube-master", "ovnkube-node"]
+    },
+    "openshift-service-ca": {
+        "deployments": ["service-ca"]
+    },
+    "openshift-ingress": {
+        "deployments": ["router-default"]
+    },
+    "openshift-dns": {
+        "daemonsets": ["dns-default", "node-resolver"]
+    },
+    "openshift-storage": {
+        "deployments": ["lvms-operator"],
+        "daemonsets": ["vg-manager"]
+    },
+    "kube-system": {
+        "deployments": ["csi-snapshot-controller"]
+    }
+}
+EOF
+)
+    sudo microshift healthcheck -v=2 --timeout="${wait_secs}s" --custom "${custom_json}"
 }
 
 #
@@ -198,8 +214,8 @@ configure_kubelet
 # Configure second node the multinode environment
 configure_node
 
-# Wait for all pods to be ready
-wait_all_pods_ready
+# Wait for all core namespace resources to be ready
+wait_namespace_resources_ready
 
 echo
 echo "Done"
