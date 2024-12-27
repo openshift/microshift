@@ -1,4 +1,0 @@
-- machine-config-operator embedded-component 2bc91afa09de6fba41e1bca2178c1a49ef30db1a to b05eb03a96b8a886e0389ce4762a6ad29d91c36a
-  - 5fa2e60d 2024-12-16T14:56:45+00:00 trying to wait for sub-contorllers
-  - 02947311 2024-12-11T19:43:50+00:00 operator: update alert on pause of required mcp
-
