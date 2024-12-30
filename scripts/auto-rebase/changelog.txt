@@ -1,6 +1,0 @@
-- ovn-kubernetes image-amd64 604f3cb92b77150ce1c66e147eddd0d553216441 to d60fad7b368831724701ebc90f6581a554eb673f
-  - e0c8a695 2024-12-20T16:08:42-05:00 interconenct: Ask ovn-northd to bind the remote ports.
-
-- ovn-kubernetes image-arm64 604f3cb92b77150ce1c66e147eddd0d553216441 to d60fad7b368831724701ebc90f6581a554eb673f
-  - e0c8a695 2024-12-20T16:08:42-05:00 interconenct: Ask ovn-northd to bind the remote ports.
-
