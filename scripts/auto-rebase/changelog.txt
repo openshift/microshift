@@ -1,0 +1,3 @@
+- cluster-network-operator embedded-component 3c4bce8f481b42bd42faa52350f04763d1a5cf05 to 25e9db2a125494fe87e199acf31320c97f2ea8df
+  - 7983a16 2024-12-19T13:03:47+00:00 Pass transit_switch_subnet options in ovnkube-node pod
+
