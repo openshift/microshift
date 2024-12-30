@@ -265,7 +265,7 @@ prepare_kickstart() {
     # the local mirror registry.
     if [[ "${template}" == *bootc* ]] ; then
         if [ "$(dirname "${boot_commit_ref}")" == "." ] ; then
-            boot_commit_ref="${MIRROR_REGISTRY_URL}/${boot_commit_ref}"
+            boot_commit_ref="${MIRROR_REGISTRY_URL}/microshift/${boot_commit_ref}"
         fi
     fi
 
