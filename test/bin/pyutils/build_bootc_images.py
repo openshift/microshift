@@ -249,8 +249,8 @@ def process_containerfile(groupdir, containerfile, dry_run):
                 "sudo", "podman", "build",
                 "--authfile", PULL_SECRET,
                 "--secret", f"id=pullsecret,src={PULL_SECRET}",
-                "--cache-to", f"{MIRROR_REGISTRY}/{cf_outname}",
-                "--cache-from", f"{MIRROR_REGISTRY}/{cf_outname}",
+                "--cache-to", f"{MIRROR_REGISTRY}/microshift/{cf_outname}",
+                "--cache-from", f"{MIRROR_REGISTRY}/microshift/{cf_outname}",
                 "-t", cf_outname, "-f", cf_outfile,
                 IMAGEDIR
             ]
@@ -261,7 +261,7 @@ def process_containerfile(groupdir, containerfile, dry_run):
             push_args = [
                 "sudo", "podman", "push",
                 cf_outname,
-                f"{MIRROR_REGISTRY}/{cf_outname}"
+                f"{MIRROR_REGISTRY}/microshift/{cf_outname}"
             ]
             start = time.time()
             common.retry_on_exception(3, common.run_command_in_shell, push_args, dry_run, logfile, logfile)
@@ -369,7 +369,7 @@ def process_image_bootc(groupdir, bootcfile, dry_run):
 def process_container_encapsulate(groupdir, containerfile, dry_run):
     ce_path, ce_outname, _, ce_logfile = get_process_file_names(
         groupdir, containerfile, BOOTC_IMAGE_DIR)
-    ce_targetimg = f"{MIRROR_REGISTRY}/{ce_outname}:latest"
+    ce_targetimg = f"{MIRROR_REGISTRY}/microshift/{ce_outname}:latest"
     ce_localimg = f"localhost/{ce_outname}:latest"
 
     def ostree_rev_in_registry(ce_imgref):
@@ -564,6 +564,11 @@ def main():
             extract_container_images(YMINUS2_RELEASE_VERSION, YMINUS2_RELEASE_REPO, CONTAINER_LIST, args.dry_run)
         # Run the mirror registry
         common.run_command([f"{SCRIPTDIR}/mirror_registry.sh"], args.dry_run)
+        # Add local registry credentials to the input pull secret file
+        global PULL_SECRET
+        opull_secret = os.path.join(BOOTC_IMAGE_DIR, "pull_secret.json", )
+        common.update_pull_secret(PULL_SECRET, opull_secret, MIRROR_REGISTRY)
+        PULL_SECRET = opull_secret
         # Process package source templates
         ipkgdir = f"{SCRIPTDIR}/../package-sources-bootc"
         for ifile in os.listdir(ipkgdir):
