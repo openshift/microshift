@@ -19,25 +19,6 @@ setup_prereqs() {
         "${SCRIPTDIR}/../../scripts/dnf_retry.sh" "install" "podman skopeo jq"
     fi
 
-    # # Delete running containers if any
-    for n in postgres redis quay ; do
-        local cn="microshift-${n}"
-        echo "Removing '${cn}' container"
-        sudo podman rm -f "${cn}" || true
-    done
-
-    # Pull the registry images locally
-    for i in "${POSTGRES_IMAGE}" "${REDIS_IMAGE}" "${QUAY_IMAGE}" ; do
-        echo "Pulling '${i}' image locally"
-        sudo skopeo copy \
-            --authfile "${PULL_SECRET}" \
-            --quiet \
-            --retry-times 3 \
-            --preserve-digests \
-            "docker://${i}" \
-            "containers-storage:${i}"
-    done
-
     # TLS authentication is disabled in Quay local registry. The mirror-images.sh
     # helper uses skopeo without TLS options and it defaults to https, so we need
     # to configure registries.conf.d for skopeo to try http instead.
@@ -89,6 +70,33 @@ setup_registry() {
     local redis_ip
     local new_db=false
 
+    # No setup is necessary if ALL the containers are already running
+    if [ -n "$(sudo podman ps -q --filter "name=microshift-postgres" --filter "status=running")" ] &&
+       [ -n "$(sudo podman ps -q --filter "name=microshift-redis"    --filter "status=running")" ] &&
+       [ -n "$(sudo podman ps -q --filter "name=microshift-quay"     --filter "status=running")" ] ; then
+       echo "All containers are running - skipping mirror registry setup"
+       return
+    fi
+
+    # Delete running containers if any
+    for n in postgres redis quay ; do
+        local cn="microshift-${n}"
+        echo "Removing '${cn}' container"
+        sudo podman rm -f "${cn}" || true
+    done
+
+    # Pull the registry images locally
+    for i in "${POSTGRES_IMAGE}" "${REDIS_IMAGE}" "${QUAY_IMAGE}" ; do
+        echo "Pulling '${i}' image locally"
+        sudo skopeo copy \
+            --authfile "${PULL_SECRET}" \
+            --quiet \
+            --retry-times 3 \
+            --preserve-digests \
+            "docker://${i}" \
+            "containers-storage:${i}"
+    done
+
     # Set up Postgres
     # See https://github.com/quay/quay/blob/master/docs/quick-local-deployment.md#set-up-postgres
     if [ ! -d "${MIRROR_REGISTRY_DIR}/postgres" ] ; then
@@ -104,7 +112,7 @@ setup_registry() {
         -e POSTGRES_DB=quay \
         -p 5432:5432 \
         -v "${MIRROR_REGISTRY_DIR}/postgres:/var/lib/postgresql/data:Z" \
-        "${POSTGRES_IMAGE}"
+        "${POSTGRES_IMAGE}" >/dev/null
     postgres_ip=$(sudo podman inspect -f "{{.NetworkSettings.IPAddress}}" microshift-postgres)
 
     # Retry the query until the database is available
@@ -123,10 +131,11 @@ setup_registry() {
 
     # Setup and run Redis
     # See https://github.com/quay/quay/blob/master/docs/quick-local-deployment.md#set-up-redis
+    echo "Running Redis container"
     sudo podman run -d --rm --name microshift-redis \
         -p 6379:6379 \
         "${REDIS_IMAGE}" \
-        --requirepass strongpassword
+        --requirepass strongpassword >/dev/null
     redis_ip=$(sudo podman inspect -f "{{.NetworkSettings.IPAddress}}" microshift-redis)
 
     # Set up Quay
@@ -150,11 +159,12 @@ setup_registry() {
 
     # Run Quay container
     # See https://github.com/quay/quay/blob/master/docs/quick-local-deployment.md#run-quay
+    echo "Running Quay container"
     sudo podman run -d --rm --name=microshift-quay \
         -p "${MIRROR_REGISTRY_PORT}:8080" \
         -v "${QUAY_CONFIG_DIR}:/conf/stack:Z" \
         -v "${MIRROR_REGISTRY_DIR}/storage:/datastorage:Z" \
-        "${QUAY_IMAGE}"
+        "${QUAY_IMAGE}" >/dev/null
 
     # Wait until the Quay instance is started
     for i in $(seq 60) ; do
