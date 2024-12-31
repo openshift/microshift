@@ -260,6 +260,7 @@ def process_containerfile(groupdir, containerfile, dry_run):
 
             push_args = [
                 "sudo", "podman", "push",
+                "--authfile", PULL_SECRET,
                 cf_outname,
                 f"{MIRROR_REGISTRY}/microshift/{cf_outname}"
             ]
