@@ -285,8 +285,7 @@ def update_pull_secret(ifname: str, ofname: str, registry: str):
     # Local registry authentication entry
     new_secret = {
         registry: {
-            "auth": encoded_pass,
-            "email": "microshift@redhat.com"
+            "auth": encoded_pass
         }
     }
     # Read the input data

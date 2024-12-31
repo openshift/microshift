@@ -249,8 +249,8 @@ def process_containerfile(groupdir, containerfile, dry_run):
                 "sudo", "podman", "build",
                 "--authfile", PULL_SECRET,
                 "--secret", f"id=pullsecret,src={PULL_SECRET}",
-                "--cache-to", f"{MIRROR_REGISTRY}/microshift/{cf_outname}",
-                "--cache-from", f"{MIRROR_REGISTRY}/microshift/{cf_outname}",
+                "--cache-to", f"{MIRROR_REGISTRY}/{cf_outname}",
+                "--cache-from", f"{MIRROR_REGISTRY}/{cf_outname}",
                 "-t", cf_outname, "-f", cf_outfile,
                 IMAGEDIR
             ]
@@ -262,7 +262,7 @@ def process_containerfile(groupdir, containerfile, dry_run):
                 "sudo", "podman", "push",
                 "--authfile", PULL_SECRET,
                 cf_outname,
-                f"{MIRROR_REGISTRY}/microshift/{cf_outname}"
+                f"{MIRROR_REGISTRY}/{cf_outname}"
             ]
             start = time.time()
             common.retry_on_exception(3, common.run_command_in_shell, push_args, dry_run, logfile, logfile)
@@ -370,7 +370,7 @@ def process_image_bootc(groupdir, bootcfile, dry_run):
 def process_container_encapsulate(groupdir, containerfile, dry_run):
     ce_path, ce_outname, _, ce_logfile = get_process_file_names(
         groupdir, containerfile, BOOTC_IMAGE_DIR)
-    ce_targetimg = f"{MIRROR_REGISTRY}/microshift/{ce_outname}:latest"
+    ce_targetimg = f"{MIRROR_REGISTRY}/{ce_outname}:latest"
     ce_localimg = f"localhost/{ce_outname}:latest"
 
     def ostree_rev_in_registry(ce_imgref):

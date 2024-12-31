@@ -5,7 +5,7 @@ SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # shellcheck source=test/bin/common.sh
 source "${SCRIPTDIR}/common.sh"
 
-REGISTRY_HOST=${REGISTRY_HOST:-${MIRROR_REGISTRY_URL}}
+REGISTRY_URL=${REGISTRY_URL:-${MIRROR_REGISTRY_URL}}
 PULL_SECRET=${PULL_SECRET:-${HOME}/.pull-secret.json}
 
 POSTGRES_IMAGE="docker.io/library/postgres:10.12"
@@ -25,21 +25,21 @@ setup_prereqs() {
     sudo bash -c 'cat > /etc/containers/registries.conf.d/900-microshift-mirror.conf' << EOF
 [[registry]]
     prefix = ""
-    location = "${REGISTRY_HOST}"
+    location = "${REGISTRY_URL}"
     insecure = true
 
 [[registry]]
     prefix = ""
     location = "quay.io"
 [[registry.mirror]]
-    location = "${REGISTRY_HOST}/microshift"
+    location = "${REGISTRY_URL}"
     insecure = true
 
 [[registry]]
     prefix = ""
     location = "registry.redhat.io"
 [[registry.mirror]]
-    location = "${REGISTRY_HOST}/microshift"
+    location = "${REGISTRY_URL}"
     insecure = true
 EOF
 
@@ -53,8 +53,7 @@ EOF
 {
     "auths": {
         "${MIRROR_REGISTRY_URL}": {
-            "auth": "$(echo -n 'microshift:microshift' | base64)",
-            "email": "microshift@redhat.com"
+            "auth": "$(echo -n 'microshift:microshift' | base64)"
         }
     }
 }
@@ -152,7 +151,7 @@ setup_registry() {
     # template is regenerated.
     POSTGRES_IP="${postgres_ip}" \
     REDIS_IP="${redis_ip}" \
-    QUAY_URL="${REGISTRY_HOST}" \
+    QUAY_URL="$(dirname "${REGISTRY_URL}")" \
     envsubst \
         < "${SCRIPTDIR}/../assets/quay/config.yaml.template" \
         > "${QUAY_CONFIG_DIR}/config.yaml"
@@ -169,7 +168,7 @@ setup_registry() {
     # Wait until the Quay instance is started
     for i in $(seq 60) ; do
         sleep 1
-        if curl -sI "${REGISTRY_HOST}" &>/dev/null ; then
+        if curl -sI "${REGISTRY_URL}" &>/dev/null ; then
             i=0
             break
         fi
@@ -216,7 +215,7 @@ mirror_images() {
     done
 
     sort -u "${ifile}" "${ffile}" > "${ofile}"
-    "${ROOTDIR}/scripts/mirror-images.sh" --mirror "${PULL_SECRET}" "${ofile}" "${REGISTRY_HOST}/microshift"
+    "${ROOTDIR}/scripts/mirror-images.sh" --mirror "${PULL_SECRET}" "${ofile}" "${REGISTRY_URL}"
     rm -f "${ofile}" "${ffile}"
 }
 

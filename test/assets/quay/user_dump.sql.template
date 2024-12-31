@@ -21,7 +21,7 @@ SET row_security = off;
 --
 
 COPY public."user" (id, uuid, username, password_hash, email, verified, stripe_id, organization, robot, invoice_email, invalid_login_attempts, last_invalid_login, removed_tag_expiration_s, enabled, invoice_email_address, company, family_name, given_name, location, maximum_queued_builds_count, creation_date, last_accessed) FROM stdin;
-1	781bf4e3-2458-4b6a-9137-e80ea516be1d	microshift	$MICROSHIFT_PASSWORD_HASH	microshift@redhat.com	t	\N	f	f	f	0	2024-12-30 11:40:06.096595	1209600	t	\N	\N	\N	\N	\N	\N	2024-12-30 11:40:06.096597	\N
+1	781bf4e3-2458-4b6a-9137-e80ea516be1d	microshift	$MICROSHIFT_PASSWORD_HASH	noemail@redhat.com	t	\N	f	f	f	0	2024-12-30 11:40:06.096595	1209600	t	\N	\N	\N	\N	\N	\N	2024-12-30 11:40:06.096597	\N
 \.
 
 
