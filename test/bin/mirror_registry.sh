@@ -156,11 +156,27 @@ setup_registry() {
         < "${SCRIPTDIR}/../assets/quay/config.yaml.template" \
         > "${QUAY_CONFIG_DIR}/config.yaml"
 
+    # Enable Quay dual-stack server support if the local host supports IPv6
+    local podman_network=""
+    if ping -6 -c 1 ::1 &>/dev/null ; then
+        # Add the configuration option
+        # See https://docs.redhat.com/en/documentation/red_hat_quay/3.11/html-single/configure_red_hat_quay/index?utm_source=chatgpt.com#config-fields-ipv6
+        echo "FEATURE_LISTEN_IP_VERSION: dual-stack" >> "${QUAY_CONFIG_DIR}/config.yaml"
+        # Enable both IPv4 and IPv6 podman container network for the root user
+        # See https://access.redhat.com/solutions/6196301
+        if ! sudo podman network exists microshift-ipv6-dual-stack ; then
+            sudo podman network create microshift-ipv6-dual-stack --ipv6 >/dev/null
+        fi
+        podman_network="--network=microshift-ipv6-dual-stack"
+    fi
+
     # Run Quay container
     # See https://github.com/quay/quay/blob/master/docs/quick-local-deployment.md#run-quay
     echo "Running Quay container"
     sudo podman run -d --rm --name=microshift-quay \
+        "${podman_network}" \
         -p "${MIRROR_REGISTRY_PORT}:8080" \
+        -p "[::]:${MIRROR_REGISTRY_PORT}:8080" \
         -v "${QUAY_CONFIG_DIR}:/conf/stack:Z" \
         -v "${MIRROR_REGISTRY_DIR}/storage:/datastorage:Z" \
         "${QUAY_IMAGE}" >/dev/null
