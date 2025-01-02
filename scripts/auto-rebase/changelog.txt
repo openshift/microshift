@@ -1,0 +1,3 @@
+- cluster-network-operator embedded-component de93ea6e09e9afda32bc0a95a08b7b703ce31985 to 9d96bcc4fc4653970e135a87ce380b0fb57f0587
+  - 29cb6f9 2024-12-27T10:32:48+00:00 Add support for route advertisements
+
