@@ -1,3 +1,6 @@
-- cluster-network-operator embedded-component de93ea6e09e9afda32bc0a95a08b7b703ce31985 to 9d96bcc4fc4653970e135a87ce380b0fb57f0587
-  - 29cb6f9 2024-12-27T10:32:48+00:00 Add support for route advertisements
+- cluster-openshift-controller-manager-operator embedded-component 0b04b66c041c19abc6a04a31fc5b2688249eb0de to 91369d1d6c1e6196425c2f8742068c03bda1457d
+  - 56ce916 2024-12-20T18:10:05+05:30 NO-JIRA: Add team members to the OWNERS file
+
+- openshift-controller-manager embedded-component 3ebe2f4f3900d6a3748ef0faf3535f635dbf7d11 to 29531eafbff8b466bbee6a02c345f43245053482
+  - cd0d0ac 2024-12-20T17:59:30+05:30 NO-JIRA: Add team members to the OWNERS file
 
