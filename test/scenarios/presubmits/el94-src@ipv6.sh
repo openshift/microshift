@@ -11,7 +11,8 @@ WEB_SERVER_URL="http://[${VM_BRIDGE_IP}]:${WEB_SERVER_PORT}"
 MIRROR_REGISTRY_URL="${VM_BRIDGE_IP}:${MIRROR_REGISTRY_PORT}"
 
 scenario_create_vms() {
-    prepare_kickstart host1 kickstart.ks.template rhel-9.4-microshift-source
+    # Enable IPv6 single stack in kickstart
+    prepare_kickstart host1 kickstart.ks.template rhel-9.4-microshift-source false true
     launch_vm  --network "${VM_IPV6_NETWORK}"
 }
 
