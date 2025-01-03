@@ -1,0 +1,3 @@
+- machine-config-operator embedded-component b05eb03a96b8a886e0389ce4762a6ad29d91c36a to c9bd3ae71c5c31dba32911f963f3da51c566362f
+  - b2925413 2024-12-04T04:11:51+00:00 operator: retry if images.json has a mismatch
+
