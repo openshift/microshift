@@ -1,6 +1,11 @@
-- cluster-openshift-controller-manager-operator embedded-component 0b04b66c041c19abc6a04a31fc5b2688249eb0de to 91369d1d6c1e6196425c2f8742068c03bda1457d
-  - 56ce916 2024-12-20T18:10:05+05:30 NO-JIRA: Add team members to the OWNERS file
-
-- openshift-controller-manager embedded-component 3ebe2f4f3900d6a3748ef0faf3535f635dbf7d11 to 29531eafbff8b466bbee6a02c345f43245053482
-  - cd0d0ac 2024-12-20T17:59:30+05:30 NO-JIRA: Add team members to the OWNERS file
+- api embedded-component 188620a9ab5eaad36199cf83d9a0afcb08fdfd52 to d6d8306a24ec146d7e8cb7bdc1259a2144dc77a0
+  - 640d2bf8 2024-12-20T12:31:10-05:00 MachineOSBuild: relax CEL for conditions
+  - 09629e5e 2024-12-19T11:13:54-05:00 Readd removed NodeDisruptionPolicy tests
+  - 065faacf 2024-12-19T11:13:51-05:00 Further MOSC/MOSB updates
+  - 2ac96767 2024-12-13T10:08:23-05:00 Additional MOSC/MOSB updates
+  - 9e7c2320 2024-12-13T10:08:23-05:00 Additional fixes for MOSC/MOSB
+  - 360f44c8 2024-12-13T10:08:23-05:00 Update godoc and validation for MOSC/MOSB
+  - 09dad20f 2024-12-13T10:08:23-05:00 Temporarily exclude v1 MOSC/MOSB from payload
+  - 5beb7826 2024-12-13T10:08:23-05:00 Add v1 versions of OnClusterBuild APIs
+  - 61de3ec9 2024-12-13T10:08:21-05:00 MachineOSConfig: set ImageSecretObjectReference to optional
 
