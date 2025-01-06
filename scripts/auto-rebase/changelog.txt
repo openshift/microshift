@@ -1,6 +1,3 @@
-- ovn-kubernetes image-amd64 cd453e4951659e8de2bc824798ce3c70089352f9 to b24157b7b38f1be8a6175a2c7cae0fe8ece97f67
-  - aef4d609 2024-12-24T13:46:45+00:00 interconenct: Ask ovn-northd to bind the remote ports.
-
-- ovn-kubernetes image-arm64 cd453e4951659e8de2bc824798ce3c70089352f9 to b24157b7b38f1be8a6175a2c7cae0fe8ece97f67
-  - aef4d609 2024-12-24T13:46:45+00:00 interconenct: Ask ovn-northd to bind the remote ports.
+- operator-framework-olm embedded-component cee1f16cea7e10b8317c8e75420b84820ff19607 to 32cbf3f7b400d89e131ac00713cd426afd0fcce5
+  - 3fbad515 2025-01-02T16:12:46+00:00 OCPBUGS-46474:catalog-operator: Delete Pods that were evicted (#3459)
 
