@@ -240,16 +240,23 @@ EOF
 #                     first on the host. This usually matches an image
 #                     blueprint name.
 #  fips_enabled -- Enable FIPS mode (true or false).
+#  ipv6_only -- Only use IPv6 single stack configuration by explicitly
+#               disabling IPv4 (true or false)
 prepare_kickstart() {
     local vmname="$1"
     local template="$2"
     local boot_commit_ref="$3"
     local fips_enabled=${4:-false}
+    local ipv6_only=${5:-false}
 
     local -r full_vmname="$(full_vm_name "${vmname}")"
     local -r output_dir="${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}"
     local -r vm_hostname="${full_vmname/./-}"
     local -r hostname=$(hostname)
+    local ipv6_opt=""
+    if ${ipv6_only} ; then
+        ipv6_opt="--noipv4 --ipv6 auto"
+    fi
 
     validate_vm_hostname "${vm_hostname}"
 
@@ -287,6 +294,7 @@ prepare_kickstart() {
             -e "s|REPLACE_BOOT_COMMIT_REF|${boot_commit_ref}|g" \
             -e "s|REPLACE_PULL_SECRET|${PULL_SECRET_CONTENT}|g" \
             -e "s|REPLACE_HOST_NAME|${vm_hostname}|g" \
+            -e "s|REPLACE_IPV6_ONLY|${ipv6_opt}|g" \
             -e "s|REPLACE_REDHAT_AUTHORIZED_KEYS|${REDHAT_AUTHORIZED_KEYS}|g" \
             -e "s|REPLACE_FIPS_ENABLED|${fips_enabled}|g" \
             -e "s|REPLACE_MIRROR_HOSTNAME|${hostname}|g" \
