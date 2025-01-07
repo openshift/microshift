@@ -337,6 +337,119 @@ watch sudo oc get pods -A \
     --kubeconfig /var/lib/microshift/resources/kubeadmin/kubeconfig
 ```
 
+## Using Bootc Image Builder (BIB)
+
+The [bootc-image-builder](https://github.com/osbuild/bootc-image-builder), is a containerized tool to
+create disk images from bootc images. You can use the images that you build to deploy disk images in
+different environments, such as the edge, server, and clouds.
+
+### Prepare Build Config File
+A build config is a Toml (or JSON) file with customizations for the resulting image.
+The config file is mapped into the container directory to /config.toml. The customizations are
+specified under a customizations object.
+
+Set variables pointing to secret files that are included in `config.toml` for
+gaining access to private container registries:
+* `PULL_SECRET` file contents are copied to `/etc/crio/openshift-pull-secret`
+  at the post-install stage to authenticate OpenShift registry access
+
+```bash
+PULL_SECRET=~/.pull-secret.json
+IMAGE_NAME=microshift-4.17-bootc
+```
+
+Run the following command to create the `kickstart.ks` file to be used during
+the virtual machine installation. If you want to embed the kickstart file directly
+to iso using BIB please refer to [upstream docs](https://osbuild.org/docs/bootc/#anaconda-iso-installer-options-installer-mapping)
+
+```bash
+cat > kickstart.ks <<EOFKS
+lang en_US.UTF-8
+keyboard us
+timezone UTC
+text
+reboot
+
+# Partition the disk with hardware-specific boot and swap partitions, adding an
+# LVM volume that contains a 10GB+ system root. The remainder of the volume will
+# be used by the CSI driver for storing data.
+zerombr
+clearpart --all --initlabel
+# Create boot and swap partitions as required by the current hardware platform
+reqpart --add-boot
+# Add an LVM volume group and allocate a system root logical volume
+part pv.01 --grow
+volgroup rhel pv.01
+logvol / --vgname=rhel --fstype=xfs --size=10240 --name=root
+
+# Lock root user account
+rootpw --lock
+
+# Configure network to use DHCP and activate on boot
+network --bootproto=dhcp --device=link --activate --onboot=on
+
+%post --log=/dev/console --erroronfail
+
+# Create an OpenShift pull secret file
+cat > /etc/crio/openshift-pull-secret <<'EOF'
+$(cat "${PULL_SECRET}")
+EOF
+chmod 600 /etc/crio/openshift-pull-secret
+
+%end
+EOFKS
+```
+
+### Create ISO image using BIB
+
+```bash
+mkdir ./output
+
+sudo podman run --authfile ${PULL_SECRET} --rm -it \
+    --privileged \
+    --security-opt label=type:unconfined_t \
+    -v /var/lib/containers/storage:/var/lib/containers/storage \
+    -v ./config.toml:/config.toml:ro  \
+    -v ./output:/output \
+    registry.redhat.io/rhel9/bootc-image-builder:latest \
+    --local \
+    --type iso \
+    --config /config.toml \
+    localhost/${IMAGE_NAME}:latest
+```
+
+### Create Virtual Machine
+
+Copy the `install.iso` file to the `/var/lib/libvirt/images` directory.
+
+```bash
+VMNAME=microshift-4.17-bootc
+NETNAME=default
+
+sudo cp -Z ./output/bootiso/install.iso /var/lib/libvirt/images/${VMNAME}.iso
+
+sudo virt-install \
+    --name ${VMNAME} \
+    --vcpus 2 \
+    --memory 2048 \
+    --disk path=/var/lib/libvirt/images/${VMNAME}.qcow2,size=20 \
+    --network network=${NETNAME},model=virtio \
+    --events on_reboot=restart \
+    --location /var/lib/libvirt/images/${VMNAME}.iso \
+    --initrd-inject kickstart.ks \
+    --extra-args "inst.ks=file://kickstart.ks" \
+    --wait
+```
+
+Log into the virtual machine using the `redhat:<password>` credentials.
+Run the following command to verify that all the MicroShift pods are up and running
+without errors.
+
+```bash
+watch sudo oc get pods -A \
+    --kubeconfig /var/lib/microshift/resources/kubeadmin/kubeconfig
+```
+
 ## Appendix A: Multi-Architecture Image Build
 
 It is often convenient to build multi-architecture container images and store
