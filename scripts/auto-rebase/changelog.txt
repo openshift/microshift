@@ -1,0 +1,24 @@
+- api embedded-component d6d8306a24ec146d7e8cb7bdc1259a2144dc77a0 to 361e35fd82e5499f995317ddf6feb628ae26c33f
+  - ce6753e9 2025-01-06T17:58:16+00:00 Add example of ratcheting minimum value in example tests
+  - 1247e969 2025-01-06T17:58:11+00:00 Add initialCRDPatches option to onUpdate tests
+  - 718d8a3d 2025-01-03T16:03:10+00:00 Add yaml-patch to tests vendor
+  - 3cd0df9e 2025-01-03T16:02:36+00:00 Remove unexpected example CRDs
+
+- cluster-ingress-operator embedded-component dbdff16b1173dd3992e5be42203e8afbae1cb06f to 2856e6ddee396b3cb5492ac128c3015956651b51
+  - 9735e68 2024-12-18T14:26:18+01:00 NE-1790: Follow up to enable Dynamic Configuration Manager feature gate
+  - 2e7bf27 2024-12-05T05:22:43+00:00 Updating ose-cluster-ingress-operator-container image to be consistent with ART for 4.19 Reconciling with https://github.com/openshift/ocp-build-data/tree/a39508c86497b4e5e463d7b2c78e51e577be9e7d/images/ose-cluster-ingress-operator.yml
+  - f3551d0 2024-11-28T10:33:13+00:00 gatewayapi: Use single watch for CRDs
+
+- machine-config-operator embedded-component f0d60f54b8318a84c4d6e6e9e54319b02bdc4dc9 to 53cdf40bd9345283ddfeba1648b3f3d160a5b7f9
+  - 2d1f23a7 2025-01-06T12:56:56-05:00 bump(openshift/api)
+
+- oc image-amd64 c6733714145f520d55b39c250f6e2ec977233c19 to e3b2070c4526bdcbc36ef734ec9f8bcf53d5e1c5
+  - 36d65caf 2024-12-13T04:21:34-05:00 NO-ISSUE: Remove experimental tag for --report and --pxe
+
+- oc image-arm64 c6733714145f520d55b39c250f6e2ec977233c19 to e3b2070c4526bdcbc36ef734ec9f8bcf53d5e1c5
+  - 36d65caf 2024-12-13T04:21:34-05:00 NO-ISSUE: Remove experimental tag for --report and --pxe
+
+- router image-arm64 282180b5d4599c00bdb1a85b919948d21146cf8d to 7a688b0eab5a27fe13988a21022c774cdeb964b2
+  - 7a688b0 2025-01-06T20:10:37+00:00 OCPBUGS-33958: secret re-creation scenario for externalCertificate with active informer (#614)
+  - 66f932a 2024-11-19T14:27:44+00:00 Make idle-close-on-response configurable in HAProxy template
+
