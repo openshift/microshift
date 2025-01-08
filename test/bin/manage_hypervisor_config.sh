@@ -14,8 +14,8 @@ ${BASH_SOURCE[0]} (create|cleanup|cleanup-all)
 
   -h           Show this help.
 
-create: Set up firewall, storage pool and network. 
-        Start nginx file-server to serve images 
+create: Set up firewall, storage pool and network.
+        Start nginx file-server to serve images
         for test scenarios.
         Uses the VM_POOL_BASENAME, VM_DISK_BASEDIR and
         VM_ISOLATED_NETWORK variables.
@@ -30,6 +30,11 @@ EOF
 firewall_settings() {
     local -r action=$1
 
+    # Web server port to allow access from virtual machines
+    sudo firewall-cmd --permanent --zone=public "--${action}-port"="${WEB_SERVER_PORT}/tcp"
+    # VNC ports for remote console connection to virtual machines
+    sudo firewall-cmd --permanent --zone=public "--${action}-port=5900-5999/tcp"
+    # Enable mDNS over libvirt network
     sudo firewall-cmd --permanent --zone=libvirt "--${action}-service=mdns"
 
     for netname in default "${VM_ISOLATED_NETWORK}" "${VM_MULTUS_NETWORK}" "${VM_IPV6_NETWORK}" "${VM_DUAL_STACK_NETWORK}"; do
@@ -39,13 +44,23 @@ firewall_settings() {
 
         local vm_bridge
         vm_bridge=$(sudo virsh net-dumpxml "${netname}" | yq -p xml '.network.bridge.+@name')
+        # Setting for Quay to enable isolated network tests
+        # Allow all incoming and outgoing traffic on the isolated bridge interface
+        if [ "${netname}" == "${VM_ISOLATED_NETWORK}" ] ; then
+            if [ "${action}" == "add" ] ; then
+                sudo iptables -I LIBVIRT_FWI -i "${vm_bridge}" -j ACCEPT
+                sudo iptables -I LIBVIRT_FWO -o "${vm_bridge}" -j ACCEPT
+            else
+                sudo iptables -D LIBVIRT_FWI -i "${vm_bridge}" -j ACCEPT
+                sudo iptables -D LIBVIRT_FWO -o "${vm_bridge}" -j ACCEPT
+            fi
+        fi
 
         for ip in $(ip addr show "${vm_bridge}" | grep "scope global" | awk '{print $2}'); do
             sudo firewall-cmd --permanent --zone=trusted "--${action}-source"="${ip}"
         done
-        sudo firewall-cmd --permanent --zone=public  "--${action}-port"="${WEB_SERVER_PORT}/tcp"
-        sudo firewall-cmd --reload
     done
+    sudo firewall-cmd --reload
 }
 
 action_create() {
@@ -150,7 +165,7 @@ action_cleanup() {
     fi
 
     # Storage pool
-    for pool_name in $(sudo virsh pool-list --name | awk '/vm-storage/ {print $1}') ; do       
+    for pool_name in $(sudo virsh pool-list --name | awk '/vm-storage/ {print $1}') ; do
         if sudo virsh pool-info "${pool_name}" &>/dev/null; then
             sudo virsh pool-destroy "${pool_name}"
             sudo virsh pool-undefine "${pool_name}"
