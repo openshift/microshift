@@ -13,7 +13,7 @@ Test Tags           slow
 
 
 *** Variables ***
-${HELLO_USHIFT_INGRESS}     ./assets/hello-microshift-ingress.yaml
+${HELLO_USHIFT_INGRESS}     ./assets/services/hello-microshift-ingress.yaml
 ${HOSTNAME}                 hello-microshift.cluster.local
 
 
