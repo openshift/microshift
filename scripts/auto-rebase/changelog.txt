@@ -1,3 +1,3 @@
-- operator-framework-olm embedded-component cee1f16cea7e10b8317c8e75420b84820ff19607 to 32cbf3f7b400d89e131ac00713cd426afd0fcce5
-  - 3fbad515 2025-01-02T16:12:46+00:00 OCPBUGS-46474:catalog-operator: Delete Pods that were evicted (#3459)
+- cluster-network-operator embedded-component aa286367d966f61fe06b4bb107e2b324328450ff to b5eb4ae75b428e748cbf6a7e6b68da2b4687cbf3
+  - 4570d9c 2024-12-22T22:58:31-05:00 start feature migration when the cluster CNI is changed to the target type
 
