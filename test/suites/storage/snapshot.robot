@@ -19,9 +19,9 @@ ${POD_NAME_STATIC}      base
 ${TEST_DATA}            FOOBAR
 ${SOURCE_KUSTOMIZE}     assets/kustomizations/patches/pvc-thin
 ${RESTORE_KUSTOMIZE}    assets/kustomizations/patches/pvc-from-snapshot
-${SNAPSHOT}             assets/snapshot.yaml
-${STORAGE_CLASS}        assets/storage-class-thin.yaml
-${SNAPSHOT_CLASS}       assets/volume-snapshot-class.yaml
+${SNAPSHOT}             assets/storage/snapshot.yaml
+${STORAGE_CLASS}        assets/storage/storage-class-thin.yaml
+${SNAPSHOT_CLASS}       assets/storage/volume-snapshot-class.yaml
 
 
 *** Test Cases ***

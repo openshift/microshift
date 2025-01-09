@@ -96,7 +96,7 @@ Save Lvmd Config
 
 Extend Lvmd Config
     [Documentation]    Combines the test's device-classes with the remote's lvmd.yaml.
-    ${cfg}=    OperatingSystem.Get File    ./assets/lvmd.yaml
+    ${cfg}=    OperatingSystem.Get File    ./assets/storage/lvmd.yaml
     ${lvmd_vg}=    Set Variable If    '${LVMD_VG_OVERRIDE}' != ''    ${LVMD_VG_OVERRIDE}    rhel
     ${templated}=    Replace Variables    ${cfg}
     ${merged_cfg}=    Lvmd Merge    ${DEFAULT_LVMD_CONFIG}    ${templated}
