@@ -1,0 +1,122 @@
+assets:
+  - dir: optional/rhoai/kserve/
+    no_clean: True
+    files:
+      - file: kustomization.yaml
+        ignore: "MicroShift specific overrides"
+      - file: inferenceservice-config-microshift-patch.yaml
+        ignore: "MicroShift specific overrides"
+
+  - dir: optional/rhoai/kserve/overlays/odh/
+    src: rhoai/operator/kserve/overlays/odh/
+    files:
+      - file: inferenceservice-config-patch.yaml
+      - file: kustomization.yaml
+      - file: params.env
+      - file: params.yaml
+      - file: remove-namespace.yaml
+      - file: set-resources-manager-patch.yaml
+      - file: user-cluster-roles.yaml
+
+  - dir: optional/rhoai/kserve/default/
+    src: rhoai/operator/kserve/default/
+    files:
+      - file: cainjection_conversion_webhook.yaml
+      - file: clusterservingruntime_validatingwebhook_cainjection_patch.yaml
+      - file: inferencegraph_validatingwebhook_cainjection_patch.yaml
+      - file: isvc_mutatingwebhook_cainjection_patch.yaml
+      - file: isvc_validatingwebhook_cainjection_patch.yaml
+      - file: kustomization.yaml
+      - file: localmodel_manager_image_patch.yaml
+      - file: manager_auth_proxy_patch.yaml
+      - file: manager_image_patch.yaml
+      - file: manager_prometheus_metrics_patch.yaml
+      - file: manager_resources_patch.yaml
+      - file: network-policies.yaml
+      - file: servingruntime_validationwebhook_cainjection_patch.yaml
+      - file: svc_webhook_cainjection_patch.yaml
+      - file: trainedmodel_validatingwebhook_cainjection_patch.yaml
+
+  - dir: optional/rhoai/kserve/crd/
+    src: rhoai/operator/kserve/crd/
+    files:
+      - file: kustomization.yaml
+
+  - dir: optional/rhoai/kserve/crd/full/
+    src: rhoai/operator/kserve/crd/full/
+    files:
+      - file: serving.kserve.io_clusterlocalmodels.yaml
+      - file: serving.kserve.io_clusterservingruntimes.yaml
+      - file: serving.kserve.io_clusterstoragecontainers.yaml
+      - file: serving.kserve.io_inferencegraphs.yaml
+      - file: serving.kserve.io_inferenceservices.yaml
+      - file: serving.kserve.io_localmodelnodegroups.yaml
+      - file: serving.kserve.io_servingruntimes.yaml
+      - file: serving.kserve.io_trainedmodels.yaml
+
+  - dir: optional/rhoai/kserve/crd/patches/
+    src: rhoai/operator/kserve/crd/patches/
+    files:
+      - file: protocol.yaml
+
+  - dir: optional/rhoai/kserve/configmap/
+    src: rhoai/operator/kserve/configmap/
+    files:
+      - file: kustomization.yaml
+      - file: inferenceservice.yaml
+
+  - dir: optional/rhoai/kserve/rbac/
+    src: rhoai/operator/kserve/rbac/
+    files:
+      - file: auth_proxy_role_binding.yaml
+      - file: auth_proxy_role.yaml
+      - file: auth_proxy_service.yaml
+      - file: kustomization.yaml
+      - file: leader_election_role_binding.yaml
+      - file: leader_election_role.yaml
+      - file: role_binding.yaml
+      - file: role.yaml
+      - file: service_account.yaml
+
+  - dir: optional/rhoai/kserve/rbac/localmodel/
+    src: rhoai/operator/kserve/rbac/localmodel/
+    files:
+      - file: role_binding.yaml
+      - file: role.yaml
+      - file: service_account.yaml
+
+  - dir: optional/rhoai/kserve/manager/
+    src: rhoai/operator/kserve/manager/
+    files:
+      - file: kustomization.yaml
+      - file: manager.yaml
+      - file: service.yaml
+
+  - dir: optional/rhoai/kserve/webhook/
+    src: rhoai/operator/kserve/webhook/
+    files:
+      - file: kustomization.yaml
+      - file: manifests.yaml
+      - file: service.yaml
+
+  # Serving Runtimes
+  # - dir: optional/rhoai/runtimes/
+  #   src: rhoai/operator/odh-model-controller/runtimes/
+  #   files:
+  #     - file: kustomization.yaml
+  #       ignore: "MicroShift specific kustomization"
+  #       git_restore: True
+  #     - file: caikit-standalone.yaml
+  #       src: caikit-standalone-template.yaml
+  #     - file: caikit-tgis.yaml
+  #       src: caikit-tgis-template.yaml
+  #     - file: ovms-kserve.yaml
+  #       src: ovms-kserve-template.yaml
+  #     - file: tgis.yaml
+  #       src: tgis-template.yaml
+  #     - file: vllm-gaudi.yaml
+  #       src: vllm-gaudi-template.yaml
+  #     - file: vllm-rocm.yaml
+  #       src: vllm-rocm-template.yaml
+  #     - file: vllm.yaml
+  #       src: vllm-template.yaml

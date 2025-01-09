@@ -74,8 +74,9 @@ def copy(src, dst):
 def clear_dir(path):
     """Clear the contents of a directory."""
     path = os.path.join(ASSETS_DIR, path)
-    logging.info(f"Clearing directory {path}")
-    shutil.rmtree(path)
+    if os.path.isdir(path):
+        logging.info(f"Clearing directory {path}")
+        shutil.rmtree(path)
     os.makedirs(path)
 
 
