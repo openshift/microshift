@@ -18,9 +18,9 @@ ${GUEST_NAME}           ${EMPTY}
 
 ${NODE_IP}              10.44.0.1
 
-${SERVER_POD}           assets/hello-microshift.yaml
-${SERVER_INGRESS}       assets/hello-microshift-ingress.yaml
-${SERVER_SVC}           assets/hello-microshift-service.yaml
+${SERVER_POD}           assets/hello/hello-microshift.yaml
+${SERVER_INGRESS}       assets/hello/hello-microshift-ingress.yaml
+${SERVER_SVC}           assets/hello/hello-microshift-service.yaml
 ${TEST_NS}              ${EMPTY}
 
 

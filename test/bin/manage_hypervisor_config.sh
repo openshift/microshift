@@ -60,7 +60,7 @@ action_create() {
 
     # Isolated network
     if ! sudo sudo virsh net-info "${VM_ISOLATED_NETWORK}" &>/dev/null ; then
-        local -r netconfig_tmpl="${SCRIPTDIR}/../assets/isolated-network.xml"
+        local -r netconfig_tmpl="${SCRIPTDIR}/../assets/network/isolated-network.xml"
         local -r netconfig_file="${IMAGEDIR}/infra/isolated-network.xml"
 
         mkdir -p "$(dirname "${netconfig_file}")"
@@ -72,7 +72,7 @@ action_create() {
     fi
 
     if ! sudo sudo virsh net-info "${VM_MULTUS_NETWORK}" &>/dev/null ; then
-        local -r multus_netconfig_tmpl="${SCRIPTDIR}/../assets/multus-network.xml"
+        local -r multus_netconfig_tmpl="${SCRIPTDIR}/../assets/network/multus-network.xml"
         local -r multus_netconfig_file="${IMAGEDIR}/infra/multus-network.xml"
 
         mkdir -p "$(dirname "${multus_netconfig_file}")"
@@ -85,7 +85,7 @@ action_create() {
 
     # IPv6 network
     if ! sudo sudo virsh net-info "${VM_IPV6_NETWORK}" &>/dev/null ; then
-        local -r ipv6_netconfig_tmpl="${SCRIPTDIR}/../assets/ipv6-network.xml"
+        local -r ipv6_netconfig_tmpl="${SCRIPTDIR}/../assets/network/ipv6-network.xml"
         local -r ipv6_netconfig_file="${IMAGEDIR}/infra/ipv6-network.xml"
 
         mkdir -p "$(dirname "${ipv6_netconfig_file}")"
@@ -102,7 +102,7 @@ action_create() {
     fi
 
     if ! sudo sudo virsh net-info "${VM_DUAL_STACK_NETWORK}" &>/dev/null ; then
-        local -r dual_stack_netconfig_tmpl="${SCRIPTDIR}/../assets/dual-stack-network.xml"
+        local -r dual_stack_netconfig_tmpl="${SCRIPTDIR}/../assets/network/dual-stack-network.xml"
         local -r dual_stack_netconfig_file="${IMAGEDIR}/infra/dual-stack-network.xml"
 
         mkdir -p "$(dirname "${dual_stack_netconfig_file}")"
