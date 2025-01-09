@@ -1,0 +1,3 @@
+- cluster-network-operator embedded-component 25e9db2a125494fe87e199acf31320c97f2ea8df to 9a0391243931ff480885f5dbcee8e34a1212aeb7
+  - e801dbb 2024-10-04T01:07:33+00:00 Set mount propagation to HostToContainer for /var/lib/kubelet
+
