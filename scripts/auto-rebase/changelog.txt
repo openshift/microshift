@@ -1,0 +1,3 @@
+- machine-config-operator embedded-component d7c30c8b04e46f2b86e1b8ee3ed5ed11cfd2fadc to c5dc36a12c3c0e55e7379d39d3394b0fb34ed0d4
+  - 7e7d64cd 2025-01-06T15:01:27-05:00 trying to wait for sub-contorllers
+
