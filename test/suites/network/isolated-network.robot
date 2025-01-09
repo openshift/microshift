@@ -14,7 +14,7 @@ Test Tags           network
 
 *** Variables ***
 ${USHIFT_HOST}      ${EMPTY}
-${LB_CONFIG}        assets/services/isolated-lb-service.yaml
+${LB_CONFIG}        assets/network/isolated-lb-service.yaml
 ${LB_NSPACE}        openshift-ingress
 ${LB_SRVNAME}       isolated-lb-service
 ${LB_PORTNUM}       31111

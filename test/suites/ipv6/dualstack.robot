@@ -149,12 +149,12 @@ Wait For Service Deletion With Timeout
 
 Expose Hello MicroShift Service Via Route IPv4
     [Documentation]    Expose the "hello microshift" application through the Route
-    Run With Kubeconfig    oc apply -n ${NAMESPACE} -f assets/services/hello-microshift-service.yaml
+    Run With Kubeconfig    oc apply -n ${NAMESPACE} -f assets/hello/hello-microshift-service.yaml
     Oc Expose    svc hello-microshift --hostname ${HOSTNAME} -n ${NAMESPACE}
 
 Expose Hello MicroShift Service Via Route IPv6
     [Documentation]    Expose the "hello microshift" application through the Route
-    Run With Kubeconfig    oc apply -n ${NAMESPACE} -f assets/services/hello-microshift-service-ipv6.yaml
+    Run With Kubeconfig    oc apply -n ${NAMESPACE} -f assets/hello/hello-microshift-service-ipv6.yaml
     Oc Expose    svc hello-microshift --hostname ${HOSTNAME} -n ${NAMESPACE}
 
 Network APIs With Test Label Are Gone

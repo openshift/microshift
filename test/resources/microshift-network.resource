@@ -9,7 +9,7 @@ Resource            common.resource
 
 
 *** Variables ***
-${HELLO_USHIFT}     ./assets/services/hello-microshift.yaml
+${HELLO_USHIFT}     ./assets/hello/hello-microshift.yaml
 ${LB_PORT}          5678
 ${NP_PORT}          32222
 ${HTTP_PORT}        80
