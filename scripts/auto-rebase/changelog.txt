@@ -1,0 +1,15 @@
+- cluster-openshift-controller-manager-operator embedded-component 20af082dea1e932a5be3cc8f1f2c166959302e18 to f1711cf30f683ec0eaa187cd5168caae9e8c1254
+  - 451e012 2025-01-02T10:42:42+00:00 NO-JIRA: Add team members to the OWNERS file
+
+- machine-config-operator embedded-component c9bd3ae71c5c31dba32911f963f3da51c566362f to a964f19a214946f0e5f1197c545d3805393d0705
+  - c9dbd970 2024-12-10T20:30:03+00:00 daemon: add nil check for annotation fetching
+
+- openshift-controller-manager embedded-component 3ebe2f4f3900d6a3748ef0faf3535f635dbf7d11 to 5bfc8081a65ea3e0d23306c0398143a9987d659e
+  - 1e74e8c 2025-01-02T10:38:28+00:00 NO-JIRA: Add team members to the OWNERS file
+
+- oc image-amd64 c64c430e48013ced1705344bb95ba1bdfb2a1a0b to 5e62301694fdb1723bac4b293948b1bbb11cab21
+  - 7be50bc0 2024-12-16T11:37:59+00:00 fix oc adm node-image create --pxe command to copy the correct artifacts
+
+- oc image-arm64 c64c430e48013ced1705344bb95ba1bdfb2a1a0b to 5e62301694fdb1723bac4b293948b1bbb11cab21
+  - 7be50bc0 2024-12-16T11:37:59+00:00 fix oc adm node-image create --pxe command to copy the correct artifacts
+
