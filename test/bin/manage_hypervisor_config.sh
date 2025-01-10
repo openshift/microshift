@@ -44,17 +44,6 @@ firewall_settings() {
 
         local vm_bridge
         vm_bridge=$(sudo virsh net-dumpxml "${netname}" | yq -p xml '.network.bridge.+@name')
-        # Setting for Quay to enable isolated network tests
-        # Allow all incoming and outgoing traffic on the isolated bridge interface
-        if [ "${netname}" == "${VM_ISOLATED_NETWORK}" ] ; then
-            if [ "${action}" == "add" ] ; then
-                sudo iptables -I LIBVIRT_FWI -i "${vm_bridge}" -j ACCEPT
-                sudo iptables -I LIBVIRT_FWO -o "${vm_bridge}" -j ACCEPT
-            else
-                sudo iptables -D LIBVIRT_FWI -i "${vm_bridge}" -j ACCEPT
-                sudo iptables -D LIBVIRT_FWO -o "${vm_bridge}" -j ACCEPT
-            fi
-        fi
 
         for ip in $(ip addr show "${vm_bridge}" | grep "scope global" | awk '{print $2}'); do
             sudo firewall-cmd --permanent --zone=trusted "--${action}-source"="${ip}"
