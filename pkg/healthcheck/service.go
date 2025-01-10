@@ -28,7 +28,7 @@ func microshiftServiceShouldBeOk(ctx context.Context, timeout time.Duration) (bo
 	}
 	klog.Info("microshift.service is enabled")
 
-	klog.Info("Waiting for microshift.service to be ready")
+	klog.Infof("Waiting %v for microshift.service to be ready", timeout)
 	if err := wait.PollUntilContextTimeout(ctx, time.Second, timeout, true, func(ctx context.Context) (done bool, err error) {
 		return systemd.IsServiceActiveAndNotFailed(ctx, "microshift.service")
 	}); err != nil {

@@ -55,7 +55,7 @@ func waitForWorkloads(ctx context.Context, timeout time.Duration, workloads map[
 }
 
 func waitForDaemonSet(ctx context.Context, client *appsclientv1.AppsV1Client, timeout time.Duration, namespace, name string) error {
-	klog.Infof("Waiting for daemonset/%s in %s", name, namespace)
+	klog.Infof("Waiting %v for daemonset/%s in %s", timeout, name, namespace)
 	err := wait.PollUntilContextTimeout(ctx, 10*time.Second, timeout, true, func(ctx context.Context) (done bool, err error) {
 		ds, err := client.DaemonSets(namespace).Get(ctx, name, v1.GetOptions{})
 		if err != nil {
@@ -91,7 +91,7 @@ func waitForDaemonSet(ctx context.Context, client *appsclientv1.AppsV1Client, ti
 }
 
 func waitForDeployment(ctx context.Context, client *appsclientv1.AppsV1Client, timeout time.Duration, namespace, name string) error {
-	klog.Infof("Waiting for deployment/%s in %s", name, namespace)
+	klog.Infof("Waiting %v for deployment/%s in %s", timeout, name, namespace)
 	err := wait.PollUntilContextTimeout(ctx, 10*time.Second, timeout, true, func(ctx context.Context) (done bool, err error) {
 		deployment, err := client.Deployments(namespace).Get(ctx, name, v1.GetOptions{})
 		if err != nil {
@@ -134,7 +134,7 @@ func waitForDeployment(ctx context.Context, client *appsclientv1.AppsV1Client, t
 }
 
 func waitForStatefulSet(ctx context.Context, client *appsclientv1.AppsV1Client, timeout time.Duration, namespace, name string) error {
-	klog.Infof("Waiting for statefulset/%s in %s", name, namespace)
+	klog.Infof("Waiting %v for statefulset/%s in %s", timeout, name, namespace)
 	err := wait.PollUntilContextTimeout(ctx, 10*time.Second, timeout, true, func(ctx context.Context) (done bool, err error) {
 		sts, err := client.StatefulSets(namespace).Get(ctx, name, v1.GetOptions{})
 		if err != nil {
