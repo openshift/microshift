@@ -64,7 +64,11 @@ action_create() {
 
     # Isolated network
     if ! sudo sudo virsh net-info "${VM_ISOLATED_NETWORK}" &>/dev/null ; then
-        local -r netconfig_tmpl="${SCRIPTDIR}/../assets/isolated-network.xml"
+        # Isolated network creates a NAT network which is later on constrained
+        # for outgoing traffic to only the hypervisor and the virtual machines
+        # This is achieved using a nwfilter, which is created here and specified
+        # in scenario.sh.
+        local -r netconfig_tmpl="${SCRIPTDIR}/../assets/network/isolated-network.xml"
         local -r netconfig_file="${IMAGEDIR}/infra/isolated-network.xml"
 
         mkdir -p "$(dirname "${netconfig_file}")"
@@ -73,6 +77,14 @@ action_create() {
         sudo virsh net-define    "${netconfig_file}"
         sudo virsh net-start     "${VM_ISOLATED_NETWORK}"
         sudo virsh net-autostart "${VM_ISOLATED_NETWORK}"
+
+        local -r netfilter_tmpl="${SCRIPTDIR}/../assets/network/isolated-netfilter.xml"
+        local -r netfilter_file="${IMAGEDIR}/infra/isolated-netfilter.xml"
+
+        mkdir -p "$(dirname "${netfilter_file}")"
+        envsubst <"${netfilter_tmpl}" >"${netfilter_file}"
+
+        sudo virsh nwfilter-define "${netfilter_file}"
     fi
 
     if ! sudo sudo virsh net-info "${VM_MULTUS_NETWORK}" &>/dev/null ; then
@@ -137,6 +149,7 @@ action_cleanup() {
     if sudo virsh net-info "${VM_ISOLATED_NETWORK}" &>/dev/null ; then
         sudo virsh net-destroy "${VM_ISOLATED_NETWORK}"
         sudo virsh net-undefine "${VM_ISOLATED_NETWORK}"
+        sudo virsh nwfilter-undefine "${VM_ISOLATED_NETWORK}"
     fi
 
     if sudo virsh net-info "${VM_IPV6_NETWORK}" &>/dev/null ; then
