@@ -594,7 +594,13 @@ launch_vm() {
     fi
 
     for n in ${network}; do
-        vm_network_args+="--network network=${n},model=virtio "
+        # For simplicity we assume that network filters are named the same as the networks
+        # If there is a filter with the same name as the network, attach it to the NIC
+        vm_network_args+="--network network=${n},model=virtio"
+        if sudo virsh nwfilter-list | awk '{print $2}' | grep -qx "${n}"; then
+            vm_network_args+=",filterref=${n}"
+        fi
+        vm_network_args+=" "
     done
     if [ -z "${vm_network_args}" ] ; then
         vm_network_args="--network none"
@@ -1004,11 +1010,11 @@ load_subscription_manager_plugin() {
 #   - nginx server
 #   - registry mirror
 check_dependencies() {
-    if [ $(pgrep -cx nginx) -eq 0 ] ; then
+    if [ $(pgrep -cx -U "$(id -u)" nginx) -eq 0 ] ; then
         "${TESTDIR}/bin/manage_webserver.sh" "start"
     fi
 
-    if ! podman ps --format '{{.Names}}' | grep -q ^microshift-local-registry  ; then
+    if ! sudo podman ps --format '{{.Names}}' | grep -q ^microshift-quay  ; then
         "${TESTDIR}/bin/mirror_registry.sh"
     fi
 }

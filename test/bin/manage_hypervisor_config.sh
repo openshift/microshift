@@ -14,8 +14,8 @@ ${BASH_SOURCE[0]} (create|cleanup|cleanup-all)
 
   -h           Show this help.
 
-create: Set up firewall, storage pool and network. 
-        Start nginx file-server to serve images 
+create: Set up firewall, storage pool and network.
+        Start nginx file-server to serve images
         for test scenarios.
         Uses the VM_POOL_BASENAME, VM_DISK_BASEDIR and
         VM_ISOLATED_NETWORK variables.
@@ -30,6 +30,11 @@ EOF
 firewall_settings() {
     local -r action=$1
 
+    # Web server port to allow access from virtual machines
+    sudo firewall-cmd --permanent --zone=public "--${action}-port"="${WEB_SERVER_PORT}/tcp"
+    # VNC ports for remote console connection to virtual machines
+    sudo firewall-cmd --permanent --zone=public "--${action}-port=5900-5999/tcp"
+    # Enable mDNS over libvirt network
     sudo firewall-cmd --permanent --zone=libvirt "--${action}-service=mdns"
 
     for netname in default "${VM_ISOLATED_NETWORK}" "${VM_MULTUS_NETWORK}" "${VM_IPV6_NETWORK}" "${VM_DUAL_STACK_NETWORK}"; do
@@ -43,9 +48,8 @@ firewall_settings() {
         for ip in $(ip addr show "${vm_bridge}" | grep "scope global" | awk '{print $2}'); do
             sudo firewall-cmd --permanent --zone=trusted "--${action}-source"="${ip}"
         done
-        sudo firewall-cmd --permanent --zone=public  "--${action}-port"="${WEB_SERVER_PORT}/tcp"
-        sudo firewall-cmd --reload
     done
+    sudo firewall-cmd --reload
 }
 
 action_create() {
@@ -60,6 +64,10 @@ action_create() {
 
     # Isolated network
     if ! sudo sudo virsh net-info "${VM_ISOLATED_NETWORK}" &>/dev/null ; then
+        # Isolated network creates a NAT network which is later on constrained
+        # for outgoing traffic to only the hypervisor and the virtual machines
+        # This is achieved using a nwfilter, which is created here and specified
+        # in scenario.sh.
         local -r netconfig_tmpl="${SCRIPTDIR}/../assets/network/isolated-network.xml"
         local -r netconfig_file="${IMAGEDIR}/infra/isolated-network.xml"
 
@@ -69,6 +77,14 @@ action_create() {
         sudo virsh net-define    "${netconfig_file}"
         sudo virsh net-start     "${VM_ISOLATED_NETWORK}"
         sudo virsh net-autostart "${VM_ISOLATED_NETWORK}"
+
+        local -r netfilter_tmpl="${SCRIPTDIR}/../assets/network/isolated-netfilter.xml"
+        local -r netfilter_file="${IMAGEDIR}/infra/isolated-netfilter.xml"
+
+        mkdir -p "$(dirname "${netfilter_file}")"
+        envsubst <"${netfilter_tmpl}" >"${netfilter_file}"
+
+        sudo virsh nwfilter-define "${netfilter_file}"
     fi
 
     if ! sudo sudo virsh net-info "${VM_MULTUS_NETWORK}" &>/dev/null ; then
@@ -133,6 +149,7 @@ action_cleanup() {
     if sudo virsh net-info "${VM_ISOLATED_NETWORK}" &>/dev/null ; then
         sudo virsh net-destroy "${VM_ISOLATED_NETWORK}"
         sudo virsh net-undefine "${VM_ISOLATED_NETWORK}"
+        sudo virsh nwfilter-undefine "${VM_ISOLATED_NETWORK}"
     fi
 
     if sudo virsh net-info "${VM_IPV6_NETWORK}" &>/dev/null ; then
@@ -150,7 +167,7 @@ action_cleanup() {
     fi
 
     # Storage pool
-    for pool_name in $(sudo virsh pool-list --name | awk '/vm-storage/ {print $1}') ; do       
+    for pool_name in $(sudo virsh pool-list --name | awk '/vm-storage/ {print $1}') ; do
         if sudo virsh pool-info "${pool_name}" &>/dev/null; then
             sudo virsh pool-destroy "${pool_name}"
             sudo virsh pool-undefine "${pool_name}"
