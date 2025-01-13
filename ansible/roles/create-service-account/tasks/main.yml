@@ -10,7 +10,7 @@
   ansible.builtin.command: oc create -f metrics-sa.yaml
 
 - name: create token for service account
-  ansible.builtin.command: oc create token metrics-server -n kube-system --duration 72h
+  ansible.builtin.command: oc create token metrics-server -n kube-system --duration 720h
   register: token
 
 - name: remove metrics service account yaml

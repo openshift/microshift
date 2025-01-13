@@ -4,7 +4,7 @@
 COMMAND="oc get pods -A -o 'jsonpath={..status.conditions[?(@.type==\"Ready\")].status}'"
 # Define the specific output we are waiting for
 EXPECTED_PODS=6
-ALL_PODS=8
+ALL_PODS=10
 # Define the location of the microshift kubeconfig
 KUBECONFIG="/var/lib/microshift/resources/kubeadmin/kubeconfig"
 USER_KUBECONFIG="${HOME}/.kube"
@@ -35,6 +35,29 @@ echo "Kubeconfig: ${DURATION} seconds"
 sudo cp ${KUBECONFIG} "${USER_KUBECONFIG}"/config
 sudo chown "${USER}":"${USER}" "${USER_KUBECONFIG}"/config
 
+# podcheck_nostorage fn waits for an expected number of non-storage pods to be in Ready state
+podcheck_nostorage() {
+  expected=$1
+  while true; do
+      OUTPUT=$(eval "oc get po -A --no-headers")
+      PODS_READY=$(echo "${OUTPUT}" | grep -vE "csi|lvm" | grep -c Running)
+
+      # Wait until all pods report ready
+      if [[ ${PODS_READY} -ge ${expected} ]]; then
+          break
+      fi
+      sleep 1
+  done
+
+  oc get po -A
+
+  # Calculate the time it took for all pods to be running
+  END_TIME=$(date +%s)
+  DURATION=$((END_TIME - START_TIME))
+
+  echo "Boot: ${DURATION} seconds (${expected} pods)"
+}
+
 # podcheck fn waits for an expected number of pods to be in Ready state
 podcheck() {
   expected=$1
@@ -58,5 +81,5 @@ podcheck() {
   echo "Boot: ${DURATION} seconds (${expected} pods)"
 }
 
-podcheck ${EXPECTED_PODS}
+podcheck_nostorage ${EXPECTED_PODS}
 podcheck ${ALL_PODS}

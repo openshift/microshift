@@ -1,10 +1,12 @@
 ---
 # manage-repos default vars
 
-microshift_version: 4.14.0-rc.4
-ocp_repo_name: microshift-{{ ocp_version }}-for-rhel-{{ ansible_distribution_major_version }}-mirrorbeta-{{ ansible_architecture }}-rpms
+microshift_version: 4.18.0-rc.3
 ocp_version: "{{ microshift_version.split('.')[0] }}.{{ microshift_version.split('.')[1] }}"
-ocpbeta_base_url: "https://mirror.openshift.com/pub/openshift-v4/{{ ansible_architecture }}/microshift/ocp/{{ microshift_version }}/el9/os/"
+repo_list:
+  - { repo_name: 'microshift-{{ ocp_version }}-for-rhel-{{ ansible_distribution_major_version }}-mirrorbeta-{{ ansible_architecture }}-rpms', repo_url: "https://mirror.openshift.com/pub/openshift-v4/{{ ansible_architecture }}/microshift/ocp/{{ microshift_version }}/el9/os/"}
+  - { repo_name: 'microshift-{{ ocp_version }}-deps-for-rhel-{{ ansible_distribution_major_version }}-mirrorbeta-{{ ansible_architecture }}-rpms', repo_url: "https://mirror.openshift.com/pub/openshift-v4/{{ ansible_architecture }}/dependencies/rpms/{{ ocp_version }}-el9-beta/" }
+
 rhel_beta: ''
 rhel_repos:
   - rhel-{{ ansible_distribution_major_version }}-for-{{ ansible_architecture }}-baseos-{{ rhel_beta }}rpms
