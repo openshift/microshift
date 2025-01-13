@@ -331,6 +331,9 @@ install -p -m644 packaging/kickstart/kickstart*.ks.template %{buildroot}%{_datad
 mkdir -p -m755 %{buildroot}%{_datadir}/microshift/spec
 install -p -m644 cmd/generate-config/config/config-openapi-spec.json %{buildroot}%{_datadir}/microshift/spec/config-openapi-spec.json
 
+mkdir -p -m755 %{buildroot}%{_sysconfdir}/systemd/system/crio.service.d
+install -p -m644 packaging/systemd/crio-watchdog.conf %{buildroot}%{_sysconfdir}/systemd/system/crio.service.d/microshift-watchdog.conf
+
 # Memory tweaks to the OpenvSwitch services
 mkdir -p -m755 %{buildroot}%{_sysconfdir}/systemd/system/ovs-vswitchd.service.d
 mkdir -p -m755 %{buildroot}%{_sysconfdir}/systemd/system/ovsdb-server.service.d
@@ -552,6 +555,7 @@ fi
 %{_sysconfdir}/crio/crio.conf.d/00-crio-crun.conf
 %{_sysconfdir}/crio/crio.conf.d/10-microshift.conf
 %{_datadir}/microshift/spec/config-openapi-spec.json
+%{_sysconfdir}/systemd/system/crio.service.d/microshift-watchdog.conf
 %dir %{_sysconfdir}/microshift
 %dir %{_sysconfdir}/microshift/config.d
 %dir %{_sysconfdir}/microshift/manifests
