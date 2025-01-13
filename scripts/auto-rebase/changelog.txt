@@ -1,7 +1,7 @@
-- oc image-arm64 5e62301694fdb1723bac4b293948b1bbb11cab21 to fd653741e664d1f498af2885f4f2f48cd401677e
+- oc image-amd64 5e62301694fdb1723bac4b293948b1bbb11cab21 to fd653741e664d1f498af2885f4f2f48cd401677e
   - bb91cb38 2024-12-12T15:44:23+00:00 OCPBUGS-45991: Mark --report and --pxe flags as experimental
 
-- ovn-kubernetes image-arm64 24e9946a28826e1c4f4a135674261c62bc89a3b8 to 930d8645c00fd2273c4cbb6e1d3c057e0967f0a1
+- ovn-kubernetes image-amd64 24e9946a28826e1c4f4a135674261c62bc89a3b8 to 930d8645c00fd2273c4cbb6e1d3c057e0967f0a1
   - 1243011a 2024-12-13T09:48:47-08:00 hard code disable-udn-host-isolation to "true"
   - 0bc2c516 2024-12-13T13:32:49+01:00 UDN Gateway: Ignore EndpointSlices without a service label
   - e0f77fcf 2024-12-12T18:02:25-08:00 unit tests: speed up by small sleep before cache sync wait
