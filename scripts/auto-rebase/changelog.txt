@@ -1,92 +1,27 @@
-- machine-config-operator embedded-component 53cdf40bd9345283ddfeba1648b3f3d160a5b7f9 to f362e75dfe36d645269e3eb730fd42b5c250a4e7
-  - 29da1c73 2024-12-23T11:26:28-07:00 Add MCDPivotError runbook to prometheus rules
-  - 377a78bb 2024-12-16T17:38:15-08:00 pkg/operator/status: Drop PoolUpdating as an Upgradeable=False condition
-  - 3ac848ab 2024-12-10T08:36:24-05:00 Add AUTHFILE option to make image
-  - 8b454bb0 2024-12-03T12:39:01-05:00 drain_controller: add drain failure events
-  - bb20d6ad 2024-12-02T15:55:51-05:00 drain_controller: minor lint fixes
+- api embedded-component 361e35fd82e5499f995317ddf6feb628ae26c33f to 78bd56dba39ba9848f38db2d63fa5f20c6e4707d
+  - ac87bccc 2025-01-08T07:59:59-05:00 Add vSphere multi disk support
 
-- operator-framework-olm embedded-component 5f22e55433edcfad01545e4a3b95fc23857523ce to 5423c783cc28cff7a9dc9000478f8b7b8b299762
-  - 17c97e6f 2025-01-08T00:04:57+00:00 Makefile: re-add run-local target (#3458)
-  - 56d68146 2025-01-08T00:03:23+00:00 Bumps go/net to v0.33.0 (#3479)
-  - 0b0ac268 2025-01-07T00:04:10+00:00 Bumps go/net to v0.33.0 (#3479)
-  - e84b1516 2025-01-07T00:02:39+00:00 build(deps): bump github.com/onsi/ginkgo/v2 from 2.22.0 to 2.22.2 (#3478)
+- kubernetes-kube-storage-version-migrator embedded-component 50d17147f15d8b216e7c41f91d1bd7d307ca8c73 to 4c521b09f4dc55ac69234419e083f3815646f4a9
+  - 27884c4 2025-01-08T10:07:13+05:30 OCPBUGS-45383: Updating ose-kube-storage-version-migrator-container image to be consistent with ART for 4.19
 
-- router image-amd64 282180b5d4599c00bdb1a85b919948d21146cf8d to 7a688b0eab5a27fe13988a21022c774cdeb964b2
-  - 7a688b0 2025-01-06T20:10:37+00:00 OCPBUGS-33958: secret re-creation scenario for externalCertificate with active informer (#614)
-  - 66f932a 2024-11-19T14:27:44+00:00 Make idle-close-on-response configurable in HAProxy template
+- machine-config-operator embedded-component f362e75dfe36d645269e3eb730fd42b5c250a4e7 to b08fa0ed31ec785ce9466a155d8ba3925cefbe2c
+  - d0db86bc 2025-01-08T19:32:54-05:00 OCPBUGS-48195: new buffer for decoding clusterOverridePolicyJSON
+  - 0fd1b8c5 2025-01-06T10:09:00-05:00 Reapply "crio: drop crun subcgroup"
 
-- ovn-kubernetes image-amd64 038aea1608e0e2b53f5b56f0df17f69a6d8b464d to d8e16ec751e6c754ae1418b4aeb054dcc6d08fb3
-  - b722f854 2024-12-18T17:50:32-05:00 Test for go mod or go vendor inconsistencies
-  - 5e6160d6 2024-12-18T17:18:55+00:00 EIP e2es: for host network pods, block until fully deleted
-  - 60eaa60a 2024-12-18T16:44:22+01:00 Remove service from cache on add failure
-  - 4d3411e6 2024-12-18T16:44:22+01:00 Do not log skipped services on delete
-  - 19931e2b 2024-12-18T14:05:13+00:00 Fix ESVC parameter & EIP tests following change to ginkgo v2
-  - dcdc7203 2024-12-18T13:40:53+00:00 Make node gw Reconcile -> updateSNATRules thread safe
-  - 5709baca 2024-12-18T13:40:53+00:00 Update DefaultNodeNetworkController Reconcile to return error on failure
-  - cdac0bda 2024-12-18T13:40:53+00:00 Don't SNAT to mgmt port if pod network advertised
-  - 2f947c80 2024-12-18T13:40:53+00:00 Support reconciliation for management port
-  - 78974ad1 2024-12-18T14:36:47+01:00 Revert "Fix for unexistent package msbuild in latest ubuntu images"
-  - 1e7084ec 2024-12-18T07:16:01+00:00 Ensure only ginkgo v2 for DescribeTable support
-  - 36422b47 2024-12-17T15:08:25-08:00 helper_linux: Set mtu_request for ovs-doca ports
-  - 3a3e2f98 2024-12-17T18:46:47+00:00 Send ingress to kernel in LGW mode if pod network advertised
-  - fcb3df94 2024-12-17T18:46:47+00:00 Don't SNAT to node IP in LGW mode if pod network advertised
-  - 70356c2a 2024-12-17T11:04:28+01:00 udn, e2e, svc: external client and load balancer
-  - 94c6f244 2024-12-17T11:04:28+01:00 udn, e2e, services: Don't delete fr namespace
-  - 9bf22f99 2024-12-17T11:04:28+01:00 udn,e2e,service: Bind to ovn-udn1 interface
-  - a886c571 2024-12-17T11:04:28+01:00 ci,network-segmentation: Install metallb
-  - c7bd1eb5 2024-12-17T11:04:28+01:00 kind: Pin metallb to a dev-env fixded version
-  - a787d518 2024-12-16T17:01:36+00:00 EIP E2E: fixup e2es to run in dualstack environment
-  - 79bf0930 2024-12-16T17:01:36+00:00 EIP multi NIC: fix selection of mgmt port IP in dualstack mode
-  - 33534987 2024-12-16T17:01:31+00:00 Fixes pkt larger dispatch flows for UDNs
-  - 604072eb 2024-12-16T16:15:46+00:00 Revert "Statically set GH runner image to ubuntu 22.04 for tests"
-  - 7f7f8a47 2024-12-16T16:08:18+00:00 Fix for unexistent package msbuild in latest ubuntu images
-  - bae72883 2024-12-16T07:11:11+00:00 Statically set GH runner image to ubuntu 22.04 for tests
-  - 18c0211f 2024-12-13T11:40:54-08:00 fix flaky VM live migration e2e case
-  - ec23ccd7 2024-12-13T11:39:16-08:00 Add support for ocp-traffic-flow-tests in GitHub workflows
-  - 3f5189b6 2024-12-13T11:39:16-08:00 nit: fix kind export logs warning
-  - 1b7a6c24 2024-12-13T17:42:22+00:00 Get route advertisement information in network manager
-  - 6137284a 2024-12-13T17:19:54+00:00 Zone & node network controllers reconcile NetInfo changes
-  - 2f860b91 2024-12-13T17:19:52+00:00 Remove BasicNetInfo, add MutableNetInfo and ReconcilableNetInfo
-  - 9a6ecf21 2024-12-13T17:17:02+00:00 Update nad controller type names
-
-- ovn-kubernetes image-arm64 038aea1608e0e2b53f5b56f0df17f69a6d8b464d to d8e16ec751e6c754ae1418b4aeb054dcc6d08fb3
-  - b722f854 2024-12-18T17:50:32-05:00 Test for go mod or go vendor inconsistencies
-  - 5e6160d6 2024-12-18T17:18:55+00:00 EIP e2es: for host network pods, block until fully deleted
-  - 60eaa60a 2024-12-18T16:44:22+01:00 Remove service from cache on add failure
-  - 4d3411e6 2024-12-18T16:44:22+01:00 Do not log skipped services on delete
-  - 19931e2b 2024-12-18T14:05:13+00:00 Fix ESVC parameter & EIP tests following change to ginkgo v2
-  - dcdc7203 2024-12-18T13:40:53+00:00 Make node gw Reconcile -> updateSNATRules thread safe
-  - 5709baca 2024-12-18T13:40:53+00:00 Update DefaultNodeNetworkController Reconcile to return error on failure
-  - cdac0bda 2024-12-18T13:40:53+00:00 Don't SNAT to mgmt port if pod network advertised
-  - 2f947c80 2024-12-18T13:40:53+00:00 Support reconciliation for management port
-  - 78974ad1 2024-12-18T14:36:47+01:00 Revert "Fix for unexistent package msbuild in latest ubuntu images"
-  - 1e7084ec 2024-12-18T07:16:01+00:00 Ensure only ginkgo v2 for DescribeTable support
-  - 36422b47 2024-12-17T15:08:25-08:00 helper_linux: Set mtu_request for ovs-doca ports
-  - 3a3e2f98 2024-12-17T18:46:47+00:00 Send ingress to kernel in LGW mode if pod network advertised
-  - fcb3df94 2024-12-17T18:46:47+00:00 Don't SNAT to node IP in LGW mode if pod network advertised
-  - 70356c2a 2024-12-17T11:04:28+01:00 udn, e2e, svc: external client and load balancer
-  - 94c6f244 2024-12-17T11:04:28+01:00 udn, e2e, services: Don't delete fr namespace
-  - 9bf22f99 2024-12-17T11:04:28+01:00 udn,e2e,service: Bind to ovn-udn1 interface
-  - a886c571 2024-12-17T11:04:28+01:00 ci,network-segmentation: Install metallb
-  - c7bd1eb5 2024-12-17T11:04:28+01:00 kind: Pin metallb to a dev-env fixded version
-  - a787d518 2024-12-16T17:01:36+00:00 EIP E2E: fixup e2es to run in dualstack environment
-  - 79bf0930 2024-12-16T17:01:36+00:00 EIP multi NIC: fix selection of mgmt port IP in dualstack mode
-  - 33534987 2024-12-16T17:01:31+00:00 Fixes pkt larger dispatch flows for UDNs
-  - 604072eb 2024-12-16T16:15:46+00:00 Revert "Statically set GH runner image to ubuntu 22.04 for tests"
-  - 7f7f8a47 2024-12-16T16:08:18+00:00 Fix for unexistent package msbuild in latest ubuntu images
-  - bae72883 2024-12-16T07:11:11+00:00 Statically set GH runner image to ubuntu 22.04 for tests
-  - 18c0211f 2024-12-13T11:40:54-08:00 fix flaky VM live migration e2e case
-  - ec23ccd7 2024-12-13T11:39:16-08:00 Add support for ocp-traffic-flow-tests in GitHub workflows
-  - 3f5189b6 2024-12-13T11:39:16-08:00 nit: fix kind export logs warning
-  - 1b7a6c24 2024-12-13T17:42:22+00:00 Get route advertisement information in network manager
-  - 6137284a 2024-12-13T17:19:54+00:00 Zone & node network controllers reconcile NetInfo changes
-  - 2f860b91 2024-12-13T17:19:52+00:00 Remove BasicNetInfo, add MutableNetInfo and ReconcilableNetInfo
-  - 9a6ecf21 2024-12-13T17:17:02+00:00 Update nad controller type names
-
-- service-ca-operator image-arm64 1f7d6472fea332fc307d9c8911f8c3cf57347755 to 1e65678429c82df5ae97da4dde8dbe03d75062e6
+- service-ca-operator embedded-component 1f7d6472fea332fc307d9c8911f8c3cf57347755 to 1e65678429c82df5ae97da4dde8dbe03d75062e6
   - 66d26cc 2025-01-06T15:29:20+01:00 Bump api, update CRD path
   - 94a4e07 2025-01-06T15:29:20+01:00 React to library-go changes
   - 3f749f1 2024-12-05T13:24:48+01:00 Bump library-go
   - 560bea7 2024-11-25T14:08:06+01:00 Updating ose-service-ca-operator-container image to be consistent with ART for 4.18 Reconciling with https://github.com/openshift/ocp-build-data/tree/827ab4ccce9cbbcf82c9dbaf6398b61d6cff8d7a/images/ose-service-ca-operator.yml
   - a0fcd9e 2024-11-25T12:59:30+01:00 Bump go to 1.22.0
+
+- service-ca-operator image-amd64 1f7d6472fea332fc307d9c8911f8c3cf57347755 to 1e65678429c82df5ae97da4dde8dbe03d75062e6
+  - 66d26cc 2025-01-06T15:29:20+01:00 Bump api, update CRD path
+  - 94a4e07 2025-01-06T15:29:20+01:00 React to library-go changes
+  - 3f749f1 2024-12-05T13:24:48+01:00 Bump library-go
+  - 560bea7 2024-11-25T14:08:06+01:00 Updating ose-service-ca-operator-container image to be consistent with ART for 4.18 Reconciling with https://github.com/openshift/ocp-build-data/tree/827ab4ccce9cbbcf82c9dbaf6398b61d6cff8d7a/images/ose-service-ca-operator.yml
+  - a0fcd9e 2024-11-25T12:59:30+01:00 Bump go to 1.22.0
+
+- kubernetes image-arm64 3c62f738ce74a624d46b4f73f25d6c15b3a80a2b to 309f240e18f1da87bbe86c18746774d6d302f8ef
+  - 172a47bcf 2024-12-05T13:30:57+00:00 UPSTREAM: <carry>: Updating openshift-enterprise-pod-container image to be consistent with ART for 4.19 Reconciling with https://github.com/openshift/ocp-build-data/tree/a39508c86497b4e5e463d7b2c78e51e577be9e7d/images/openshift-enterprise-pod.yml
 
