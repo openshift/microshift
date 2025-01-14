@@ -7,52 +7,22 @@ source "${SCRIPTDIR}/common.sh"
 
 PULL_SECRET=${PULL_SECRET:-${HOME}/.pull-secret.json}
 
-<<<<<<< HEAD
-retry_pull_image() {
-    for attempt in $(seq 3) ; do
-        if ! podman pull "$@" ; then
-            echo "WARNING: Failed to pull image, retry #${attempt}"
-        else
-            return 0
-        fi
-        sleep $(( "${attempt}" * 10 ))
-    done
-
-    echo "ERROR: Failed to pull image, quitting after 3 tries"
-    return 1
-}
-
-prereqs() {
-=======
 POSTGRES_IMAGE="docker.io/library/postgres:10.12"
 REDIS_IMAGE="docker.io/library/redis:5.0.7"
 QUAY_IMAGE="quay.io/microshift/quay:v3.11.7-$(uname -m)"
 QUAY_CONFIG_DIR="${MIRROR_REGISTRY_DIR}/config"
 
 setup_prereqs() {
->>>>>>> e975c22da (Port mirror registry script to use Quay)
     # Install packages if not yet available locally
     if ! rpm -q podman skopeo jq &>/dev/null ; then
         "${SCRIPTDIR}/../../scripts/dnf_retry.sh" "install" "podman skopeo jq"
     fi
-<<<<<<< HEAD
-    podman stop "${LOCAL_REGISTRY_NAME}" || true
-    podman rm "${LOCAL_REGISTRY_NAME}" || true
-    retry_pull_image "${REGISTRY_IMAGE}"
-    mkdir -p "${MIRROR_REGISTRY_DIR}"
-}
-=======
->>>>>>> e975c22da (Port mirror registry script to use Quay)
 
     # TLS authentication is disabled in Quay local registry. The mirror-images.sh
     # helper uses skopeo without TLS options and it defaults to https, so we need
     # to configure registries.conf.d for skopeo to try http instead.
     sudo bash -c 'cat > /etc/containers/registries.conf.d/900-microshift-mirror.conf' << EOF
 [[registry]]
-<<<<<<< HEAD
-location = "${REGISTRY_HOST}"
-insecure = true
-=======
     prefix = ""
     location = "${MIRROR_REGISTRY_URL}"
     insecure = true
@@ -70,7 +40,6 @@ insecure = true
 [[registry.mirror]]
     location = "${MIRROR_REGISTRY_URL}"
     insecure = true
->>>>>>> e975c22da (Port mirror registry script to use Quay)
 EOF
 
     # Create registry repository base directory structure
@@ -174,10 +143,12 @@ setup_registry() {
     # Set up Quay
     # See https://docs.projectquay.io/deploy_quay.html#poc-deploying-quay
 
-    # Create the configuration template using the minimal configuration settings.
-    # If template is updated, replace hardcoded Postgres, Redis IPs and Quay URL
-    # by respective variables.
-    # See https://docs.projectquay.io/deploy_quay.html#preparing-configuration-file
+    # Create the configuration from from a template, which was generated according
+    # to the instructions at:
+    # https://github.com/quay/quay/blob/master/docs/quick-local-deployment.md#build-the-quay-configuration-via-configtool
+    # Notes for template generation:
+    #  - Set 'microshift' super user name
+    #  - Hardcoded Postgres, Redis IPs and Quay URL must be replaced by respective variables
     POSTGRES_IP="${postgres_ip}" \
     REDIS_IP="${redis_ip}" \
     QUAY_URL="${quay_url}" \
@@ -185,13 +156,10 @@ setup_registry() {
         < "${SCRIPTDIR}/../assets/quay/config.yaml.template" \
         > "${QUAY_CONFIG_DIR}/config.yaml"
 
-    # Enable superuser creation using API
-    # See https://docs.projectquay.io/deploy_quay.html#configuring-superuser
-    cat >> "${QUAY_CONFIG_DIR}/config.yaml" <<EOF
-FEATURE_USER_INITIALIZE: true
-SUPER_USERS:
-    - microshift
-EOF
+    # Enable first user creation using API
+    # See https://docs.projectquay.io/config_quay.html#using-the-api-to-create-first-user
+    echo "FEATURE_USER_INITIALIZE: true" >> "${QUAY_CONFIG_DIR}/config.yaml"
+
     # Enable Quay dual-stack server support if the local host supports IPv6
     local podman_network=""
     if ping -6 -c 1 ::1 &>/dev/null ; then
@@ -236,14 +204,13 @@ EOF
         exit 1
     fi
 
-    # Create the superuser, verifying the creation was successful
+    # Create the first user, verifying the creation was successful
     # See https://docs.projectquay.io/config_quay.html#using-the-api-to-create-first-user
     if ${new_db} ; then
-        local response
-        response="$(curl -s -X POST -k  "${quay_url}/api/v1/user/initialize" \
-            --header 'Content-Type: application/json' \
-            --data '{ "username":"microshift", "password":"microshift", "email":"noemail@redhat.com", "access_token":true}')"
-        jq -e 'if .access_token then true else error(.message) end' <<< "${response}" >/dev/null
+        curl -X POST -k  "${MIRROR_REGISTRY_URL}/api/v1/user/initialize" \
+        --header 'Content-Type: application/json' \
+        --data '{ "username":"microshift", "password":"microshift", "email":"noemail@redhat.com", "access_token":true}' | \
+            jq -e 'if .access_token then empty else error(.message) end'
     fi
 }
 
