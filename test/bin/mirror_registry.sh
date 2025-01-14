@@ -95,6 +95,7 @@ EOF
 }
 
 setup_registry() {
+    local -r quay_url="$(hostname):${MIRROR_REGISTRY_PORT}"
     local postgres_ip
     local redis_ip
     local new_db=false
@@ -111,7 +112,7 @@ setup_registry() {
     for n in postgres redis quay ; do
         local cn="microshift-${n}"
         echo "Removing '${cn}' container"
-        sudo podman rm -f "${cn}" || true
+        sudo podman rm -f --time 0 "${cn}" || true
     done
 
     # Pull the registry images in background locally
@@ -129,7 +130,7 @@ setup_registry() {
     wait
 
     # Set up Postgres
-    # See https://github.com/quay/quay/blob/master/docs/quick-local-deployment.md#set-up-postgres
+    # See https://docs.projectquay.io/deploy_quay.html#poc-configuring-database
     if [ ! -d "${MIRROR_REGISTRY_DIR}/postgres" ] ; then
         mkdir -p "${MIRROR_REGISTRY_DIR}/postgres"
         setfacl -m u:26:-wx "${MIRROR_REGISTRY_DIR}/postgres"
@@ -138,9 +139,10 @@ setup_registry() {
 
     echo "Running Postgres container"
     sudo podman run -d --rm --name microshift-postgres \
-        -e POSTGRES_USER=user \
-        -e POSTGRES_PASSWORD=pass \
+        -e POSTGRES_USER=quayuser \
+        -e POSTGRES_PASSWORD=quaypass \
         -e POSTGRES_DB=quay \
+        -e POSTGRESQL_ADMIN_PASSWORD=adminpass \
         -p 5432:5432 \
         -v "${MIRROR_REGISTRY_DIR}/postgres:/var/lib/postgresql/data:Z" \
         "${POSTGRES_IMAGE}" >/dev/null
@@ -150,7 +152,7 @@ setup_registry() {
     for i in $(seq 60) ; do
         sleep 1
         if sudo podman exec -it microshift-postgres \
-            /bin/bash -c 'echo "CREATE EXTENSION IF NOT EXISTS pg_trgm" | psql -d quay -U user' >/dev/null ; then
+            /bin/bash -c 'echo "CREATE EXTENSION IF NOT EXISTS pg_trgm" | psql -d quay -U quayuser' >/dev/null ; then
             i=0
             break
         fi
@@ -161,7 +163,7 @@ setup_registry() {
     fi
 
     # Setup and run Redis
-    # See https://github.com/quay/quay/blob/master/docs/quick-local-deployment.md#set-up-redis
+    # See https://docs.projectquay.io/deploy_quay.html#poc-configuring-redis
     echo "Running Redis container"
     sudo podman run -d --rm --name microshift-redis \
         -p 6379:6379 \
@@ -170,34 +172,31 @@ setup_registry() {
     redis_ip=$(sudo podman inspect -f "{{.NetworkSettings.IPAddress}}" microshift-redis)
 
     # Set up Quay
-    # See https://docs.projectquay.io/deploy_quay.html#preparing-local-storage
-    if [ ! -d "${MIRROR_REGISTRY_DIR}/storage" ] ; then
-        mkdir -p "${MIRROR_REGISTRY_DIR}/storage"
-        setfacl -m u:1001:-wx "${MIRROR_REGISTRY_DIR}/storage"
-    fi
+    # See https://docs.projectquay.io/deploy_quay.html#poc-deploying-quay
 
-    # Create the configuration from from a template, which was generated according
-    # to the instructions at:
-    # https://github.com/quay/quay/blob/master/docs/quick-local-deployment.md#build-the-quay-configuration-via-configtool
-    # Notes for template generation:
-    #  - Set 'microshift' super user name
-    #  - Hardcoded Postgres, Redis IPs and Quay URL must be replaced by respective variables
+    # Create the configuration template using the minimal configuration settings.
+    # If template is updated, replace hardcoded Postgres, Redis IPs and Quay URL
+    # by respective variables.
+    # See https://docs.projectquay.io/deploy_quay.html#preparing-configuration-file
     POSTGRES_IP="${postgres_ip}" \
     REDIS_IP="${redis_ip}" \
-    QUAY_URL="$(hostname):${MIRROR_REGISTRY_PORT}" \
+    QUAY_URL="${quay_url}" \
     envsubst \
         < "${SCRIPTDIR}/../assets/quay/config.yaml.template" \
         > "${QUAY_CONFIG_DIR}/config.yaml"
 
-    # Enable first user creation using API
-    # See https://docs.projectquay.io/config_quay.html#using-the-api-to-create-first-user
-    echo "FEATURE_USER_INITIALIZE: true" >> "${QUAY_CONFIG_DIR}/config.yaml"
-
+    # Enable superuser creation using API
+    # See https://docs.projectquay.io/deploy_quay.html#configuring-superuser
+    cat >> "${QUAY_CONFIG_DIR}/config.yaml" <<EOF
+FEATURE_USER_INITIALIZE: true
+SUPER_USERS:
+    - microshift
+EOF
     # Enable Quay dual-stack server support if the local host supports IPv6
     local podman_network=""
     if ping -6 -c 1 ::1 &>/dev/null ; then
         # Add the configuration option
-        # See https://docs.redhat.com/en/documentation/red_hat_quay/3.11/html-single/configure_red_hat_quay/index?utm_source=chatgpt.com#config-fields-ipv6
+        # See https://docs.redhat.com/en/documentation/red_hat_quay/3/html-single/configure_red_hat_quay/index?utm_source=chatgpt.com#config-fields-ipv6
         echo "FEATURE_LISTEN_IP_VERSION: dual-stack" >> "${QUAY_CONFIG_DIR}/config.yaml"
         # Enable both IPv4 and IPv6 podman container network for the root user
         # See https://access.redhat.com/solutions/6196301
@@ -207,10 +206,16 @@ setup_registry() {
         podman_network="--network=microshift-ipv6-dual-stack"
     fi
 
+    # See https://docs.projectquay.io/deploy_quay.html#preparing-local-storage
+    if [ ! -d "${MIRROR_REGISTRY_DIR}/storage" ] ; then
+        mkdir -p "${MIRROR_REGISTRY_DIR}/storage"
+        setfacl -m u:1001:-wx "${MIRROR_REGISTRY_DIR}/storage"
+    fi
+
     # Run Quay container
-    # See https://github.com/quay/quay/blob/master/docs/quick-local-deployment.md#run-quay
+    # See https://docs.projectquay.io/deploy_quay.html#deploy-quay-registry
     echo "Running Quay container"
-    sudo podman run -d --rm --name=microshift-quay \
+    sudo podman run -d --name=microshift-quay \
         "${podman_network}" \
         -p "${MIRROR_REGISTRY_PORT}:8080" \
         -p "[::]:${MIRROR_REGISTRY_PORT}:8080" \
@@ -221,7 +226,7 @@ setup_registry() {
     # Wait until the Quay instance is started
     for i in $(seq 60) ; do
         sleep 1
-        if curl -sI "${MIRROR_REGISTRY_URL}" &>/dev/null ; then
+        if curl -sI "${quay_url}" 2>/dev/null | grep -Eq "HTTP.*200 OK" ; then
             i=0
             break
         fi
@@ -231,13 +236,14 @@ setup_registry() {
         exit 1
     fi
 
-    # Create the first user, verifying the creation was successful
+    # Create the superuser, verifying the creation was successful
     # See https://docs.projectquay.io/config_quay.html#using-the-api-to-create-first-user
     if ${new_db} ; then
-        curl -X POST -k  "${MIRROR_REGISTRY_URL}/api/v1/user/initialize" \
-        --header 'Content-Type: application/json' \
-        --data '{ "username":"microshift", "password":"microshift", "email":"noemail@redhat.com", "access_token":true}' | \
-            jq -e 'if .access_token then empty else error(.message) end'
+        local response
+        response="$(curl -s -X POST -k  "${quay_url}/api/v1/user/initialize" \
+            --header 'Content-Type: application/json' \
+            --data '{ "username":"microshift", "password":"microshift", "email":"noemail@redhat.com", "access_token":true}')"
+        jq -e 'if .access_token then true else error(.message) end' <<< "${response}" >/dev/null
     fi
 }
 
