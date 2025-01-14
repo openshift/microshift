@@ -83,7 +83,7 @@ setup_registry() {
         sudo podman rm -f "${cn}" || true
     done
 
-    # Pull the registry images locally
+    # Pull the registry images in background locally
     for i in "${POSTGRES_IMAGE}" "${REDIS_IMAGE}" "${QUAY_IMAGE}" ; do
         echo "Pulling '${i}' image locally"
         sudo skopeo copy \
@@ -92,8 +92,10 @@ setup_registry() {
             --retry-times 3 \
             --preserve-digests \
             "docker://${i}" \
-            "containers-storage:${i}"
+            "containers-storage:${i}" &
     done
+    # Wait until the image pull is complete
+    wait
 
     # Set up Postgres
     # See https://github.com/quay/quay/blob/master/docs/quick-local-deployment.md#set-up-postgres
@@ -146,14 +148,19 @@ setup_registry() {
     # Create the configuration from from a template, which was generated according
     # to the instructions at:
     # https://github.com/quay/quay/blob/master/docs/quick-local-deployment.md#build-the-quay-configuration-via-configtool
-    # Note: Hardcoded IP and URL must be replaced by respective variables if the
-    # template is regenerated.
+    # Notes for template generation:
+    #  - Set 'microshift' super user name
+    #  - Hardcoded Postgres, Redis IPs and Quay URL must be replaced by respective variables
     POSTGRES_IP="${postgres_ip}" \
     REDIS_IP="${redis_ip}" \
     QUAY_URL="$(hostname):${MIRROR_REGISTRY_PORT}" \
     envsubst \
         < "${SCRIPTDIR}/../assets/quay/config.yaml.template" \
         > "${QUAY_CONFIG_DIR}/config.yaml"
+
+    # Enable first user creation using API
+    # See https://docs.projectquay.io/config_quay.html#using-the-api-to-create-first-user
+    echo "FEATURE_USER_INITIALIZE: true" >> "${QUAY_CONFIG_DIR}/config.yaml"
 
     # Enable Quay dual-stack server support if the local host supports IPv6
     local podman_network=""
@@ -193,19 +200,13 @@ setup_registry() {
         exit 1
     fi
 
-    # Import the database template content with the 'microshift:microshift' user
-    # definition. The template was exported using the following command:
-    # sudo podman exec -it microshift-postgres /usr/bin/pg_dump --data-only -d quay -U user -t public.user
-    #
-    # Note: Replace the password hash with '$MICROSHIFT_PASSWORD_HASH' string
-    # before committing the template into the source repository.
+    # Create the first user, verifying the creation was successful
+    # See https://docs.projectquay.io/config_quay.html#using-the-api-to-create-first-user
     if ${new_db} ; then
-        MICROSHIFT_PASSWORD_HASH="$(htpasswd -bnBC 12 "" microshift | tr -d ':\n')" \
-        envsubst \
-            < "${SCRIPTDIR}/../assets/quay/user_dump.sql.template" \
-            > "${QUAY_CONFIG_DIR}/user_dump.sql"
-        sudo podman cp "${QUAY_CONFIG_DIR}/user_dump.sql" microshift-postgres:/tmp/user_dump.sql
-        sudo podman exec -it microshift-postgres psql -d quay -U user -f /tmp/user_dump.sql >/dev/null
+        curl -X POST -k  "${MIRROR_REGISTRY_URL}/api/v1/user/initialize" \
+        --header 'Content-Type: application/json' \
+        --data '{ "username":"microshift", "password":"microshift", "email":"noemail@redhat.com", "access_token":true}' | \
+            jq -e 'if .access_token then empty else error(.message) end'
     fi
 }
 
