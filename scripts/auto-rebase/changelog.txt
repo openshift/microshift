@@ -1,3 +1,8 @@
-- cluster-network-operator embedded-component aa286367d966f61fe06b4bb107e2b324328450ff to b5eb4ae75b428e748cbf6a7e6b68da2b4687cbf3
-  - 4570d9c 2024-12-22T22:58:31-05:00 start feature migration when the cluster CNI is changed to the target type
+- machine-config-operator embedded-component 64460169e27091d8f8373b0952604ba2700d6d67 to adc9ad759067e02cf643ec4beaf731d5245bbfe3
+  - 5b4f6445 2025-01-08T03:15:18+00:00 trying to wait for sub-contorllers
+  - 56876029 2024-10-26T05:18:55+00:00 OCPBUGS-43428: Soften haproxy timeout for kubeapi probe
+  - f477d74a 2024-10-23T20:53:22+00:00 openstack: fix non-old systemd compatible unit
+
+- openshift-controller-manager embedded-component 05ca43957983cd8ea5a5890c5271d7cb228ecdd0 to 0e91805ec91f46b80b553027fd8a8aab194f50fc
+  - 0be2674 2025-01-09T05:10:41+00:00 NO-JIRA: Add team members to the OWNERS file
 
