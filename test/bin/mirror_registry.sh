@@ -143,12 +143,10 @@ setup_registry() {
     # Set up Quay
     # See https://docs.projectquay.io/deploy_quay.html#poc-deploying-quay
 
-    # Create the configuration from from a template, which was generated according
-    # to the instructions at:
-    # https://github.com/quay/quay/blob/master/docs/quick-local-deployment.md#build-the-quay-configuration-via-configtool
-    # Notes for template generation:
-    #  - Set 'microshift' super user name
-    #  - Hardcoded Postgres, Redis IPs and Quay URL must be replaced by respective variables
+    # Create the configuration template using the minimal configuration settings.
+    # If template is updated, replace hardcoded Postgres, Redis IPs and Quay URL
+    # by respective variables.
+    # See https://docs.projectquay.io/deploy_quay.html#preparing-configuration-file
     POSTGRES_IP="${postgres_ip}" \
     REDIS_IP="${redis_ip}" \
     QUAY_URL="${quay_url}" \
@@ -156,15 +154,18 @@ setup_registry() {
         < "${SCRIPTDIR}/../assets/quay/config.yaml.template" \
         > "${QUAY_CONFIG_DIR}/config.yaml"
 
-    # Enable first user creation using API
-    # See https://docs.projectquay.io/config_quay.html#using-the-api-to-create-first-user
-    echo "FEATURE_USER_INITIALIZE: true" >> "${QUAY_CONFIG_DIR}/config.yaml"
-
+    # Enable superuser creation using API
+    # See https://docs.projectquay.io/deploy_quay.html#configuring-superuser
+    cat >> "${QUAY_CONFIG_DIR}/config.yaml" <<EOF
+FEATURE_USER_INITIALIZE: true
+SUPER_USERS:
+    - microshift
+EOF
     # Enable Quay dual-stack server support if the local host supports IPv6
     local podman_network=""
     if ping -6 -c 1 ::1 &>/dev/null ; then
         # Add the configuration option
-        # See https://docs.redhat.com/en/documentation/red_hat_quay/3/html-single/configure_red_hat_quay/index#config-fields-ipv6
+        # See https://docs.redhat.com/en/documentation/red_hat_quay/3/html-single/configure_red_hat_quay/index?utm_source=chatgpt.com#config-fields-ipv6
         echo "FEATURE_LISTEN_IP_VERSION: dual-stack" >> "${QUAY_CONFIG_DIR}/config.yaml"
         # Enable both IPv4 and IPv6 podman container network for the root user
         # See https://access.redhat.com/solutions/6196301
@@ -204,13 +205,14 @@ setup_registry() {
         exit 1
     fi
 
-    # Create the first user, verifying the creation was successful
+    # Create the superuser, verifying the creation was successful
     # See https://docs.projectquay.io/config_quay.html#using-the-api-to-create-first-user
     if ${new_db} ; then
-        curl -X POST -k  "${MIRROR_REGISTRY_URL}/api/v1/user/initialize" \
-        --header 'Content-Type: application/json' \
-        --data '{ "username":"microshift", "password":"microshift", "email":"noemail@redhat.com", "access_token":true}' | \
-            jq -e 'if .access_token then empty else error(.message) end'
+        local response
+        response="$(curl -s -X POST -k  "${quay_url}/api/v1/user/initialize" \
+            --header 'Content-Type: application/json' \
+            --data '{ "username":"microshift", "password":"microshift", "email":"noemail@redhat.com", "access_token":true}')"
+        jq -e 'if .access_token then true else error(.message) end' <<< "${response}" >/dev/null
     fi
 }
 
