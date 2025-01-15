@@ -219,7 +219,7 @@ EOF
 finalize_registry() {
     # Ensure that all the created repositories are public
     sudo podman exec -it microshift-postgres \
-        psql -d quay -U user -c 'UPDATE public.repository SET visibility_id = 1' >/dev/null
+        psql -d quay -U quayuser -c 'UPDATE public.repository SET visibility_id = 1' >/dev/null
 }
 
 mirror_images() {
@@ -279,3 +279,4 @@ setup_prereqs
 setup_registry
 mirror_images "${image_list_file}"
 finalize_registry
+echo "OK"
