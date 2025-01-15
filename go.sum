@@ -363,8 +363,8 @@ github.com/openshift/etcd/client/v3 v3.5.1-0.20241118170732-914783cae63a h1:Tza8
 github.com/openshift/etcd/client/v3 v3.5.1-0.20241118170732-914783cae63a/go.mod h1:j2d4eXTHWkT2ClBgnnEPm/Wuu7jsqku41v9DZ3OtjQo=
 github.com/openshift/kubernetes v0.0.0-20241211151829-3c62f738ce74 h1:S7gWMp0a9klu7IKkWRUMsRepXA/J7UWQ+boYac3vW2w=
 github.com/openshift/kubernetes v0.0.0-20241211151829-3c62f738ce74/go.mod h1:i/tRYbbdCLJCAobxOdsAUjYoYmUVsx16LAVn4mPHZgY=
-github.com/openshift/kubernetes-kube-storage-version-migrator v0.0.3-0.20240910155719-50d17147f15d h1:rnYg1QgPmhuRhyEILvhh20Cmc08ohEwLjMj8oSUBZk8=
-github.com/openshift/kubernetes-kube-storage-version-migrator v0.0.3-0.20240910155719-50d17147f15d/go.mod h1:9YVOqIQLlM6x6xS8I4B1Wo2X57lnOJvbYD96VGJ0q8Q=
+github.com/openshift/kubernetes-kube-storage-version-migrator v0.0.3-0.20250108152203-4c521b09f4dc h1:CWT77Ik9sZKya4ZMBtRLB3b/05Yq5M5BI2RqddZD02c=
+github.com/openshift/kubernetes-kube-storage-version-migrator v0.0.3-0.20250108152203-4c521b09f4dc/go.mod h1:mVJrzaBTOQrLN5fh90Lr9bxlnln151d6lk4G+DEmLeI=
 github.com/openshift/kubernetes/staging/src/k8s.io/api v0.0.0-20241211151829-3c62f738ce74 h1:JOyCcFzzxvN6+amXvg1Bq9WCEzEPb0X5/2HbkSKB1CU=
 github.com/openshift/kubernetes/staging/src/k8s.io/api v0.0.0-20241211151829-3c62f738ce74/go.mod h1:Lx6jvlmXgJVnqVDARguhONKwlnGahRSWUl57wJltaj8=
 github.com/openshift/kubernetes/staging/src/k8s.io/apiextensions-apiserver v0.0.0-20241211151829-3c62f738ce74 h1:elyhhDslh6CKQNQuX6WWUE+i3sy1uSz/168MEE6Cmw0=

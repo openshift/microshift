@@ -12,6 +12,10 @@
   ```bash
   cd ~/microshift && sudo podman build --env WITH_FLANNEL=1 -f okd/src/microshift-okd-multi-build.Containerfile . -t microshift-okd
   ```
+  To embed all component images
+  ```bash
+  cd ~/microshift && sudo podman build --env EMBED_CONTAINER_IMAGES=1 -f okd/src/microshift-okd-multi-build.Containerfile . -t microshift-okd
+  ```
   - build runnable container based on current source:
     1. replace microshift assets images to OKD  upstream images
     1. will build microshift RPMs and repo based on current sources.
