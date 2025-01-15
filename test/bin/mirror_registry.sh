@@ -220,11 +220,6 @@ finalize_registry() {
     # Ensure that all the created repositories are public
     sudo podman exec -it microshift-postgres \
         psql -d quay -U quayuser -c 'UPDATE public.repository SET visibility_id = 1' >/dev/null
-    # Ensure that permissions are open for the current user on the mirror registry
-    # directories and files. This is necessary to avoid 'find' command errors.
-    sudo chgrp -R "$(id -gn)" "${MIRROR_REGISTRY_DIR}"
-    sudo find "${MIRROR_REGISTRY_DIR}" -type d -exec sudo chmod a+rx '{}' \;
-    sudo find "${MIRROR_REGISTRY_DIR}" -type f -exec sudo chmod a+r  '{}' \;
 }
 
 mirror_images() {
