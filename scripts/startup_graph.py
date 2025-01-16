@@ -2,6 +2,7 @@ import json
 import pandas as pd
 import plotly.express as px
 import numpy as np
+import argparse
 
 def readable_time(nanoseconds):
     if nanoseconds >= 1e9:
@@ -13,8 +14,12 @@ def readable_time(nanoseconds):
     else:
         return f"{nanoseconds} ns"
 
+parser = argparse.ArgumentParser(description="Generate Gantt chart depicting startup times of MicroShift services.")
+parser.add_argument("file_path", help="The path to the JSON file containing MicroShift startup data")
 
-with open("scripts/startup_times.json", "r") as f:
+args = parser.parse_args()
+
+with open(args.file_path, "r") as f:
     json_data = json.load(f)
 
 services = json_data["services"]
@@ -22,6 +27,7 @@ microshift = json_data["microshift"]
 microshift_start = pd.to_datetime(microshift["start"])
 microshift_serv_start = pd.to_datetime(microshift["servicesStart"])
 microshift_ready = pd.to_datetime(microshift["ready"])
+microshift_timeToReady = readable_time(microshift["timeToReady"])
 
 df = pd.DataFrame(services)
 
@@ -30,9 +36,11 @@ df["ready"] = pd.to_datetime(df["ready"])
 df["adjustedReady"] = df["ready"]
 df["timeToReady_ns"] = df["timeToReady"]
 df["timeToReady"] = df["timeToReady"].apply(readable_time)
+df["name"] = df.apply(lambda row: f"{row['name']} ({row['timeToReady']}) ", axis=1)
 
 min_width = pd.Timedelta(milliseconds=30)
 
+# adjust all lines to have minimum thickness
 df["adjustedReady"] = np.where(
     (df["ready"] - df["start"]) < min_width,
     df["start"] + min_width,
@@ -58,7 +66,7 @@ fig = px.timeline(
         "start": False,
         "ready": False,
         "timeToReady": True,
-        "timeToReady_ns": True,
+        "timeToReady_ns": False,
         "dependencies": True
     },
     color_continuous_scale=custom_color_scale,
@@ -73,7 +81,6 @@ fig.update_layout(
 )
 
 fig.add_vline(x=microshift_start, line_dash="dash")
-#fig.add_vline(x=microshift_serv_start, line_dash="dash")
 fig.add_vline(x=microshift_ready, line_dash="dash")
 
 fig.add_annotation(
@@ -91,7 +98,7 @@ fig.add_annotation(
     x=microshift_ready,
     y=1.01,
     yref="paper",
-    text="Microshift ready",
+    text=f"Microshift ready ({microshift_timeToReady})",
     showarrow=False,
     xanchor="center",
     yanchor="bottom",
@@ -99,3 +106,5 @@ fig.add_annotation(
 )
 
 fig.show()
+
+
