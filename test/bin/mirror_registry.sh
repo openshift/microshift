@@ -165,7 +165,7 @@ EOF
     local podman_network=""
     if ping -6 -c 1 ::1 &>/dev/null ; then
         # Add the configuration option
-        # See https://docs.redhat.com/en/documentation/red_hat_quay/3/html-single/configure_red_hat_quay/index?utm_source=chatgpt.com#config-fields-ipv6
+        # See https://docs.redhat.com/en/documentation/red_hat_quay/3/html-single/configure_red_hat_quay/index#config-fields-ipv6
         echo "FEATURE_LISTEN_IP_VERSION: dual-stack" >> "${QUAY_CONFIG_DIR}/config.yaml"
         # Enable both IPv4 and IPv6 podman container network for the root user
         # See https://access.redhat.com/solutions/6196301
