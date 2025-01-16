@@ -103,8 +103,23 @@ Set Up MicroShift Auto Recovery Unit    # robocop: disable=too-many-calls-in-key
 
     Command Should Work    systemctl daemon-reload
 
+    ${stdout}    ${stderr}    ${rc}=    SSHLibrary.Execute Command
+    ...    systemctl status microshift-auto-recovery.service
+    ...    sudo=True
+    ...    return_rc=True
+    ...    return_stderr=True
+    ...    return_stdout=True
+    Command Should Work    systemctl show microshift.service
+
 Clean Up MicroShift Auto Recovery Unit
     [Documentation]    Remove the microshift-auto-recovery.service and microshift.service's drop-in.
+    ${stdout}    ${stderr}    ${rc}=    SSHLibrary.Execute Command
+    ...    systemctl status microshift-auto-recovery.service
+    ...    sudo=True
+    ...    return_rc=True
+    ...    return_stderr=True
+    ...    return_stdout=True
+    Command Should Work    systemctl show microshift.service
     Command Should Work    rm -rf /etc/systemd/system/microshift.service.d
     Command Should Work    rm -f /etc/systemd/system/microshift-auto-recovery.service
     Command Should Work    rm -f /var/opt/microshift-auto-recovery
