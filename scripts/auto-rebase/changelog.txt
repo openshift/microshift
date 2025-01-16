@@ -1,27 +1,23 @@
-- api embedded-component 361e35fd82e5499f995317ddf6feb628ae26c33f to 78bd56dba39ba9848f38db2d63fa5f20c6e4707d
-  - ac87bccc 2025-01-08T07:59:59-05:00 Add vSphere multi disk support
+- api embedded-component 78bd56dba39ba9848f38db2d63fa5f20c6e4707d to c1a063b1614ac3ccb0fc5ab49ba6158dfe8e3d3e
+  - b701a1fa 2025-01-08T09:43:03+01:00 ipam, virt: graduate persistent ips feature gate to GA
 
-- kubernetes-kube-storage-version-migrator embedded-component 50d17147f15d8b216e7c41f91d1bd7d307ca8c73 to 4c521b09f4dc55ac69234419e083f3815646f4a9
-  - 27884c4 2025-01-08T10:07:13+05:30 OCPBUGS-45383: Updating ose-kube-storage-version-migrator-container image to be consistent with ART for 4.19
+- cluster-network-operator embedded-component 9d96bcc4fc4653970e135a87ce380b0fb57f0587 to 2a17ab877fa8e7bef1703be85caed52ada384977
+  - 4668f71 2025-01-09T17:53:41-05:00 Disable adding/removing the UDN namespace label
 
-- machine-config-operator embedded-component f362e75dfe36d645269e3eb730fd42b5c250a4e7 to b08fa0ed31ec785ce9466a155d8ba3925cefbe2c
-  - d0db86bc 2025-01-08T19:32:54-05:00 OCPBUGS-48195: new buffer for decoding clusterOverridePolicyJSON
-  - 0fd1b8c5 2025-01-06T10:09:00-05:00 Reapply "crio: drop crun subcgroup"
-
-- service-ca-operator embedded-component 1f7d6472fea332fc307d9c8911f8c3cf57347755 to 1e65678429c82df5ae97da4dde8dbe03d75062e6
-  - 66d26cc 2025-01-06T15:29:20+01:00 Bump api, update CRD path
-  - 94a4e07 2025-01-06T15:29:20+01:00 React to library-go changes
-  - 3f749f1 2024-12-05T13:24:48+01:00 Bump library-go
-  - 560bea7 2024-11-25T14:08:06+01:00 Updating ose-service-ca-operator-container image to be consistent with ART for 4.18 Reconciling with https://github.com/openshift/ocp-build-data/tree/827ab4ccce9cbbcf82c9dbaf6398b61d6cff8d7a/images/ose-service-ca-operator.yml
-  - a0fcd9e 2024-11-25T12:59:30+01:00 Bump go to 1.22.0
-
-- service-ca-operator image-amd64 1f7d6472fea332fc307d9c8911f8c3cf57347755 to 1e65678429c82df5ae97da4dde8dbe03d75062e6
-  - 66d26cc 2025-01-06T15:29:20+01:00 Bump api, update CRD path
-  - 94a4e07 2025-01-06T15:29:20+01:00 React to library-go changes
-  - 3f749f1 2024-12-05T13:24:48+01:00 Bump library-go
-  - 560bea7 2024-11-25T14:08:06+01:00 Updating ose-service-ca-operator-container image to be consistent with ART for 4.18 Reconciling with https://github.com/openshift/ocp-build-data/tree/827ab4ccce9cbbcf82c9dbaf6398b61d6cff8d7a/images/ose-service-ca-operator.yml
-  - a0fcd9e 2024-11-25T12:59:30+01:00 Bump go to 1.22.0
-
-- kubernetes image-arm64 3c62f738ce74a624d46b4f73f25d6c15b3a80a2b to 309f240e18f1da87bbe86c18746774d6d302f8ef
+- kubernetes embedded-component 3c62f738ce74a624d46b4f73f25d6c15b3a80a2b to 309f240e18f1da87bbe86c18746774d6d302f8ef
   - 172a47bcf 2024-12-05T13:30:57+00:00 UPSTREAM: <carry>: Updating openshift-enterprise-pod-container image to be consistent with ART for 4.19 Reconciling with https://github.com/openshift/ocp-build-data/tree/a39508c86497b4e5e463d7b2c78e51e577be9e7d/images/openshift-enterprise-pod.yml
+
+- machine-config-operator embedded-component b08fa0ed31ec785ce9466a155d8ba3925cefbe2c to 2a5d118838ed91860f4c371f378397670c86f5c2
+  - 969f3ffa 2025-01-08T14:23:21-05:00 Update machine-config-daemon-pull.service.yaml and policy-no-sigstoresigned.yaml
+  - 2b16d22e 2024-12-17T08:33:11-06:00 OCPBUGS-41489: Specify interface type when adding ovs-port
+  - 38b0447e 2024-12-11T15:20:03+01:00 MGMT-19337: enable injection of custom kubelet labels via env var for master nodes
+
+- oc image-amd64 e3b2070c4526bdcbc36ef734ec9f8bcf53d5e1c5 to e005223acd7c478bac070134c16f5533a258be12
+  - 8a9474c5 2025-01-10T04:41:24-05:00 OCPBUGS-38975: monitor should not exit for temp api disconnect
+
+- kubernetes image-amd64 3c62f738ce74a624d46b4f73f25d6c15b3a80a2b to 309f240e18f1da87bbe86c18746774d6d302f8ef
+  - 172a47bcf 2024-12-05T13:30:57+00:00 UPSTREAM: <carry>: Updating openshift-enterprise-pod-container image to be consistent with ART for 4.19 Reconciling with https://github.com/openshift/ocp-build-data/tree/a39508c86497b4e5e463d7b2c78e51e577be9e7d/images/openshift-enterprise-pod.yml
+
+- oc image-arm64 e3b2070c4526bdcbc36ef734ec9f8bcf53d5e1c5 to e005223acd7c478bac070134c16f5533a258be12
+  - 8a9474c5 2025-01-10T04:41:24-05:00 OCPBUGS-38975: monitor should not exit for temp api disconnect
 
