@@ -16,8 +16,16 @@ def readable_time(nanoseconds):
         return f"{nanoseconds} ns"
 
 
-parser = argparse.ArgumentParser(description="Generate Gantt chart of startup times of MicroShift services.")
-parser.add_argument("file_path", help="The path to the JSON file containing MicroShift startup data")
+parser = argparse.ArgumentParser(description="Generate a Gantt chart of MicroShift internal services startup times.")
+parser.add_argument(
+    "file_path",
+    help=(
+        "The path to the JSON file containing MicroShift startup data. "
+        "Data can be extracted from MicroShift logs by using:\n\n"
+        "  sudo journalctl -u microshift | grep 'Startup data' | grep -oP '\\{.*\\}' > data.json"
+    ),  # noqa: W605
+)
+
 
 args = parser.parse_args()
 
@@ -92,7 +100,7 @@ fig.add_annotation(
     x=microshift_start,
     y=1.01,
     yref="paper",
-    text="Microshift start",
+    text="MicroShift start",
     showarrow=False,
     xanchor="center",
     yanchor="bottom",
@@ -103,7 +111,7 @@ fig.add_annotation(
     x=microshift_ready,
     y=1.01,
     yref="paper",
-    text=f"Microshift ready ({microshift_timeToReady})",
+    text=f"MicroShift ready ({microshift_timeToReady})",
     showarrow=False,
     xanchor="center",
     yanchor="bottom",
