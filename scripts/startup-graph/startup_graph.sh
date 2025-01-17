@@ -30,7 +30,7 @@ action_generate() {
         "${venv}/bin/python3" -m pip install -r "${SCRIPT_DIR}/requirements.txt"
     fi
 
-    "${venv}/bin/python3" "${SCRIPT_DIR}/startup_graph.py" "${path}"
+    "${venv}/bin/python3" "${SCRIPT_DIR}/graph_gen.py" "${path}"
 }
 
 usage() {
