@@ -14,7 +14,7 @@ def readable_time(nanoseconds):
     else:
         return f"{nanoseconds} ns"
 
-parser = argparse.ArgumentParser(description="Generate Gantt chart depicting startup times of MicroShift services.")
+parser = argparse.ArgumentParser(description="Generate Gantt chart of startup times of MicroShift services.")
 parser.add_argument("file_path", help="The path to the JSON file containing MicroShift startup data")
 
 args = parser.parse_args()
@@ -36,11 +36,11 @@ df["ready"] = pd.to_datetime(df["ready"])
 df["adjustedReady"] = df["ready"]
 df["timeToReady_ns"] = df["timeToReady"]
 df["timeToReady"] = df["timeToReady"].apply(readable_time)
-df["name"] = df.apply(lambda row: f"{row['name']} ({row['timeToReady']}) ", axis=1)
-
-min_width = pd.Timedelta(milliseconds=30)
+df["name_time"] = df.apply(lambda row: f"{row['name']} ({row['timeToReady']}) ", axis=1)
 
 # adjust all lines to have minimum thickness
+min_width = pd.Timedelta(milliseconds=30)
+
 df["adjustedReady"] = np.where(
     (df["ready"] - df["start"]) < min_width,
     df["start"] + min_width,
@@ -60,17 +60,20 @@ fig = px.timeline(
     df,
     x_start="start",
     x_end="adjustedReady",
-    y="name",
+    y="name_time",
     color="timeToReady_ns",
     hover_data={
+        "name": True,
         "start": False,
         "ready": False,
+        "adjustedReady": False,
         "timeToReady": True,
         "timeToReady_ns": False,
-        "dependencies": True
+        "dependencies": True,
+        "name_time": False
     },
     color_continuous_scale=custom_color_scale,
-    labels={"name": "Service"} 
+    labels={"name": "Service"}
 )
 
 fig.update_yaxes(autorange="reversed")
