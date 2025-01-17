@@ -12,7 +12,7 @@ action_get_data() {
         exit 1
     fi
 
-    sudo journalctl -u microshift | grep 'Startup data' | grep -oP '\\{.*\\}' > "${path}"
+    sudo journalctl -u microshift | grep 'Startup data' | grep -oP '\{.*\}' | tail -n 1 > "${path}"
 }
 
 action_generate() {
@@ -33,9 +33,15 @@ action_generate() {
     "${venv}/bin/python3" "${SCRIPT_DIR}/graph_gen.py" "${path}"
 }
 
+action_cleanup() {
+    local venv="${ROOT_DIR}/_output/graphenv"
+
+    rm -rf "${venv}"
+}
+
 usage() {
     cat - <<EOF
-${BASH_SOURCE[0]} (generate|get-data) data.json
+${BASH_SOURCE[0]} (generate|get-data|cleanup) data.json
 
     -h           Show this help.
 
@@ -46,6 +52,8 @@ ${BASH_SOURCE[0]} (generate|get-data) data.json
         extract MicroShift internal service startup times
         from journalctl and save to data.json
 
+    cleanup
+        delete python virtual environment
 
 EOF
 }
@@ -58,7 +66,7 @@ action="${1//-/_}"
 shift
 
 case "${action}" in
-    get_data|generate)
+    get_data|generate|cleanup)
         "action_${action}" "$@"
         ;;
     -h)
