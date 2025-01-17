@@ -4,6 +4,7 @@ import plotly.express as px
 import numpy as np
 import argparse
 
+
 def readable_time(nanoseconds):
     if nanoseconds >= 1e9:
         return f"{nanoseconds / 1e9:.2f} s"
@@ -13,6 +14,7 @@ def readable_time(nanoseconds):
         return f"{nanoseconds / 1e3:.2f} μs"
     else:
         return f"{nanoseconds} ns"
+
 
 parser = argparse.ArgumentParser(description="Generate Gantt chart of startup times of MicroShift services.")
 parser.add_argument("file_path", help="The path to the JSON file containing MicroShift startup data")
@@ -109,5 +111,3 @@ fig.add_annotation(
 )
 
 fig.show()
-
-
