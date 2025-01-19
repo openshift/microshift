@@ -383,6 +383,7 @@ def process_container_encapsulate(groupdir, containerfile, dry_run):
         try:
             dst_ref_cmd = [
                 "skopeo", "inspect",
+                "--authfile", PULL_SECRET,
                 f"docker://{ce_targetimg}",
                 "2>/dev/null", "|",
                 "jq", "-r", "'.Labels[\"ostree.commit\"]'"
@@ -428,6 +429,7 @@ def process_container_encapsulate(groupdir, containerfile, dry_run):
             # necessary for subsequent builds that depend on this container image
             copy_args = [
                 "sudo", "skopeo", "copy",
+                "--authfile", PULL_SECRET,
                 f"docker://{ce_targetimg}",
                 f"containers-storage:{ce_localimg}"
             ]
