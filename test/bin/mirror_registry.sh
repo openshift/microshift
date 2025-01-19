@@ -253,6 +253,7 @@ finalize_registry() {
 mirror_images() {
     local -r ifile=$1
     local -r ofile=$(mktemp /tmp/container-list.XXXXXXXX)
+    local -r ffile=$(mktemp /tmp/from-list.XXXXXXXX)
 
     # Add non-localhost-FROM images to the mirrored list
     find "${SCRIPTDIR}/../image-blueprints-bootc" -name '*.containerfile' | while read -r cf ; do
