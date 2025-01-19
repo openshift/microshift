@@ -423,9 +423,12 @@ def process_container_encapsulate(groupdir, containerfile, dry_run):
                 common.record_junit(ce_path, "process-container-encapsulate", "SKIPPED")
                 return
 
-            # Run the container image build command
+            # Run the container image build command.
+            # The REGISTRY_AUTH_FILE setting is required for skopeo to succeed
+            # in accessing container registries that might require authentication.
             build_args = [
-                "sudo", "rpm-ostree", "compose",
+                "sudo", f"REGISTRY_AUTH_FILE={PULL_SECRET}",
+                "rpm-ostree", "compose",
                 "container-encapsulate",
                 "--repo", os.path.join(IMAGEDIR, "repo"),
                 ce_imgref,
