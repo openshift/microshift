@@ -41,7 +41,7 @@ EOF
     # TLS authentication is disabled in Quay local registry. The mirror-images.sh
     # helper uses skopeo without TLS options and it defaults to https, so we need
     # to configure registries.conf.d for skopeo to try http instead.
-    sudo bash -c 'cat > /etc/containers/registries.conf.d/900-microshift-mirror.conf' << EOF
+    sudo bash -c 'cat > /etc/containers/registries.conf.d/900-microshift-mirror.conf' <<EOF
 [[registry]]
     prefix = ""
     location = "${MIRROR_REGISTRY_URL}"
@@ -63,11 +63,24 @@ EOF
 EOF
 
 # Complete the source registry configuration to use sigstore attachments.
-# Note that registry.redhat.io.yaml should already be present.
-sudo bash -c 'cat > /etc/containers/registries.d/registry.quay.io.yaml' <<EOF
+# Note that registry.redhat.io.yaml file already exists, but it is missing the
+# sigstore attachment enablement setting.
+sudo bash -c 'cat > /etc/containers/registries.d/registry.quay.io.yaml' <<'EOF'
 docker:
     quay.io:
         use-sigstore-attachments: true
+EOF
+
+if [   -e /etc/containers/registries.d/registry.redhat.io.yaml ] &&
+   [ ! -e /etc/containers/registries.d/registry.redhat.io.yaml.orig ]; then
+   sudo mv /etc/containers/registries.d/registry.redhat.io.yaml /etc/containers/registries.d/registry.redhat.io.yaml.orig
+fi
+
+sudo bash -c 'cat > /etc/containers/registries.d/registry.redhat.io.yaml' <<'EOF'
+docker:
+    registry.redhat.io:
+        use-sigstore-attachments: true
+        sigstore: https://registry.redhat.io/containers/sigstore
 EOF
 
 # Configure the destination local registry to use sigstore attachments.
