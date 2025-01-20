@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
 
 	"gopkg.in/yaml.v3"
 	v1ext "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
@@ -81,7 +82,7 @@ func (p crdParser) toYamlNodeObject(val map[string]v1ext.JSONSchemaProps) *yaml.
 		}
 
 		if !p.NoComments {
-			keyNode.HeadComment = field.Description
+			keyNode.HeadComment = strings.ReplaceAll(field.Description, "\n\n\n", "\n#\n")
 		}
 
 		var valueNode *yaml.Node
