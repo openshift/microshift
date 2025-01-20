@@ -377,13 +377,12 @@ func TestGetActiveConfigFromYAML(t *testing.T) {
 			  driver: "none"
 			  optionalCsiComponents:
 			  - "snapshot-controller" 
-			  - "snapshot-webhook"
 			`),
 			expected: func() *Config {
 				c := mkDefaultConfig()
 				c.Storage = Storage{
 					Driver:                CsiDriverNone,
-					OptionalCSIComponents: []OptionalCsiComponent{CsiComponentSnapshot, CsiComponentSnapshotWebhook},
+					OptionalCSIComponents: []OptionalCsiComponent{CsiComponentSnapshot},
 				}
 				return c
 			}(),

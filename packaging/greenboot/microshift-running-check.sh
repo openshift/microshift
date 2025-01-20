@@ -145,7 +145,7 @@ if lvmsShouldBeDeployed; then
     PODS_NS_LIST+=(openshift-storage)
     PODS_CT_LIST+=(2)
 fi
-declare -a csi_components=('csi-snapshot-controller' 'csi-snapshot-webhook')
+declare -a csi_components=('csi-snapshot-controller')
 csi_pods_ct=0
 for csi_c in "${csi_components[@]}"; do
     if csiComponentShouldBeDeployed "${csi_c}"; then
