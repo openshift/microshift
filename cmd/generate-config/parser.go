@@ -134,9 +134,12 @@ func (p crdParser) toYamlNodeArray(val *v1ext.JSONSchemaPropsOrArray) *yaml.Node
 		case jsonTypeArray:
 			valueNode = p.toYamlNodeArray(val.Schema.Items)
 		default:
-			valueNode = p.toYamlNodeValue(*val.Schema)
+			// No default to avoid arrays ending up [""].
+			// Instead, they'll appear as [].
 		}
-		node.Content = append(node.Content, valueNode)
+		if valueNode != nil {
+			node.Content = append(node.Content, valueNode)
+		}
 
 		return node
 	}
