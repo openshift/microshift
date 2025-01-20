@@ -168,6 +168,7 @@ type IngressControllerTuningOptions struct {
 	// If unset, the default timeout is 30s
 	// +kubebuilder:validation:Optional
 	// +kubebuilder:validation:Format=duration
+	// +kubebuilder:default:="30s"
 	// +optional
 	ClientTimeout *metav1.Duration `json:"clientTimeout,omitempty"`
 
@@ -178,6 +179,7 @@ type IngressControllerTuningOptions struct {
 	// If unset, the default timeout is 1s
 	// +kubebuilder:validation:Optional
 	// +kubebuilder:validation:Format=duration
+	// +kubebuilder:default:="1s"
 	// +optional
 	ClientFinTimeout *metav1.Duration `json:"clientFinTimeout,omitempty"`
 
@@ -187,6 +189,7 @@ type IngressControllerTuningOptions struct {
 	// If unset, the default timeout is 30s
 	// +kubebuilder:validation:Optional
 	// +kubebuilder:validation:Format=duration
+	// +kubebuilder:default:="30s"
 	// +optional
 	ServerTimeout *metav1.Duration `json:"serverTimeout,omitempty"`
 
@@ -197,6 +200,7 @@ type IngressControllerTuningOptions struct {
 	// If unset, the default timeout is 1s
 	// +kubebuilder:validation:Optional
 	// +kubebuilder:validation:Format=duration
+	// +kubebuilder:default:="1s"
 	// +optional
 	ServerFinTimeout *metav1.Duration `json:"serverFinTimeout,omitempty"`
 
@@ -206,6 +210,7 @@ type IngressControllerTuningOptions struct {
 	// If unset, the default timeout is 1h
 	// +kubebuilder:validation:Optional
 	// +kubebuilder:validation:Format=duration
+	// +kubebuilder:default:="1h"
 	// +optional
 	TunnelTimeout *metav1.Duration `json:"tunnelTimeout,omitempty"`
 
@@ -219,6 +224,7 @@ type IngressControllerTuningOptions struct {
 	// If unset, the default inspect delay is 5s
 	// +kubebuilder:validation:Optional
 	// +kubebuilder:validation:Format=duration
+	// +kubebuilder:default:="5s"
 	// +optional
 	TLSInspectDelay *metav1.Duration `json:"tlsInspectDelay,omitempty"`
 
@@ -246,6 +252,7 @@ type IngressControllerTuningOptions struct {
 	// +kubebuilder:validation:Optional
 	// +kubebuilder:validation:Pattern=^(0|([0-9]+(\.[0-9]+)?(ns|us|µs|μs|ms|s|m|h))+)$
 	// +kubebuilder:validation:Type:=string
+	// +kubebuilder:default:="5s"
 	// +optional
 	HealthCheckInterval *metav1.Duration `json:"healthCheckInterval,omitempty"`
 

@@ -133,17 +133,17 @@ ingress:
         namespaceOwnership: InterNamespaceAllowed
     status: Managed
     tuningOptions:
-        clientFinTimeout: ""
-        clientTimeout: ""
+        clientFinTimeout: 1s
+        clientTimeout: 30s
         headerBufferBytes: 0
         headerBufferMaxRewriteBytes: 0
-        healthCheckInterval: ""
+        healthCheckInterval: 5s
         maxConnections: 0
-        serverFinTimeout: ""
-        serverTimeout: ""
+        serverFinTimeout: 1s
+        serverTimeout: 30s
         threadCount: 0
-        tlsInspectDelay: ""
-        tunnelTimeout: ""
+        tlsInspectDelay: 5s
+        tunnelTimeout: 1h
 kubelet:
 manifests:
     kustomizePaths:

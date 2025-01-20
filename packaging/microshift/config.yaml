@@ -165,13 +165,13 @@ ingress:
 
 
         # If unset, the default timeout is 1s
-        clientFinTimeout: ""
+        clientFinTimeout: 1s
         # clientTimeout defines how long a connection will be held open while
         # waiting for a client response.
 
 
         # If unset, the default timeout is 30s
-        clientTimeout: ""
+        clientTimeout: 30s
         # headerBufferBytes describes how much memory should be reserved
         # (in bytes) for IngressController connection sessions.
         # Note that this value must be at least 16384 if HTTP/2 is
@@ -225,7 +225,7 @@ ingress:
 
         # Currently the minimum allowed value is 1s and the maximum allowed value is
         # 2147483647ms (24.85 days).  Both are subject to change over time.
-        healthCheckInterval: ""
+        healthCheckInterval: 5s
         # maxConnections defines the maximum number of simultaneous
         # connections that can be established per HAProxy process.
         # Increasing this value allows each ingress controller pod to
@@ -280,13 +280,13 @@ ingress:
 
 
         # If unset, the default timeout is 1s
-        serverFinTimeout: ""
+        serverFinTimeout: 1s
         # serverTimeout defines how long a connection will be held open while
         # waiting for a server/backend response.
 
 
         # If unset, the default timeout is 30s
-        serverTimeout: ""
+        serverTimeout: 30s
         # threadCount defines the number of threads created per HAProxy process.
         # Creating more threads allows each ingress controller pod to handle more
         # connections, at the cost of more system resources being used. HAProxy
@@ -311,13 +311,13 @@ ingress:
 
 
         # If unset, the default inspect delay is 5s
-        tlsInspectDelay: ""
+        tlsInspectDelay: 5s
         # tunnelTimeout defines how long a tunnel connection (including
         # websockets) will be held open while the tunnel is idle.
 
 
         # If unset, the default timeout is 1h
-        tunnelTimeout: ""
+        tunnelTimeout: 1h
 # Settings specified in this section are transferred as-is into the Kubelet config.
 kubelet:
 manifests:
