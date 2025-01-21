@@ -47,7 +47,8 @@ sudo mkdir -p /etc/osbuild-composer/repositories/
 if grep -qE "Red Hat Enterprise Linux.*Beta" /etc/redhat-release; then
     sudo sed -i "s,dist/rhel${VERSION_ID_MAJOR}/${VERSION_ID},beta/rhel${VERSION_ID_MAJOR}/${VERSION_ID_MAJOR},g" "${COMPOSER_CONFIG}"
 else
-    sudo sed -i "s,dist/rhel${VERSION_ID_MAJOR}/${VERSION_ID},${VERSION_ID_EUS}/rhel${VERSION_ID_MAJOR}/${VERSION_ID},g" "${COMPOSER_CONFIG}"
+    sudo sed -i "s,dist/rhel${VERSION_ID_MAJOR}/${VERSION_ID}/$(uname -m)/baseos/,${VERSION_ID_EUS}/rhel${VERSION_ID_MAJOR}/${VERSION_ID}/$(uname -m)/baseos/,g" "${COMPOSER_CONFIG}"
+    sudo sed -i "s,dist/rhel${VERSION_ID_MAJOR}/${VERSION_ID}/$(uname -m)/appstream/,${VERSION_ID_EUS}/rhel${VERSION_ID_MAJOR}/${VERSION_ID}/$(uname -m)/appstream/,g" "${COMPOSER_CONFIG}"
 fi
 
 composer_active=$(sudo systemctl is-active osbuild-composer.service || true)
