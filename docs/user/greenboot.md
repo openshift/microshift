@@ -49,16 +49,12 @@ following commands:
 Exiting the health check script with a non-zero status will have the boot declared
 as failed. The following validations are performed by the script.
 
-|Validation                                           |Pass  |Fail  |
-|-----------------------------------------------------|------|------|
-|Check the script runs with 'root' permissions        |Next  |exit 0|
-|Check microshift.service is enabled                  |Next  |exit 0|
-|Wait for microshift.service to be active (!failed)   |Next  |exit 1|
-|Wait for Kubernetes API health endpoints to be OK    |Next  |exit 1|
-|Wait for any Pod to start                            |Next  |exit 1|
-|For each core namespace, wait for images to be pulled|Next  |exit 1|
-|For each core namespace, wait for Pods to be ready   |Next  |exit 1|
-|For each core namespace, check Pods not restarting   |exit 0|exit 1|
+| Validation                                                  | Pass | Fail   |
+|-------------------------------------------------------------|------|--------|
+| Check the script runs with 'root' permissions               | Next | exit 0 |
+| Check microshift.service is enabled                         | Next | exit 0 |
+| Wait for microshift.service to be active (!failed)          | Next | exit 1 |
+| For each core namespace, wait for readiness of the workload | Next | exit 1 |
 
 The pre-rollback script runs the `sudo microshift-cleanup-data --ovn` command
 to prepare the system for a potential software downgrade.

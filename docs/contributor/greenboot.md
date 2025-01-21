@@ -46,25 +46,30 @@ sudo journalctl -o cat -u greenboot-healthcheck.service
 
 ### Health Check Implementation
 
-The script utilizes the MicroShift health check functions that are available
-in the `/usr/share/microshift/functions/greenboot.sh` file to reuse procedures
-already implemented for the MicroShift core services. These functions need a
-definition of the user workload namespaces and the expected count of pods.
-
-```bash
-PODS_NS_LIST=(busybox)
-PODS_CT_LIST=(1      )
-```
+The script utilizes the MicroShift `healthcheck` command that is part of the
+`microshift` binary to reuse procedures already implemented for the MicroShift
+core services. 
 
 The script starts by running sanity checks to verify that it is executed from
-the `root` account and that the MicroShift service is enabled.
+the `root` account.
 
-Finally, the MicroShift health check functions are called to perform the
-following actions:
-- Get a wait timeout of the current boot cycle for the `wait_for` function
-- Call the `namespace_images_downloaded` function to wait until pod images are available
-- Call the `namespace_pods_ready` function to wait until pods are ready
-- Call the `namespace_pods_not_restarting` function to verify pods are not restarting
+Then, it executes `microshift healthcheck` command with following options:
+- `-v=2` to increase verbosity of the output
+- `--timeout="${WAIT_TIMEOUT_SECS}s"` to override default 300s timeout value
+- `--namespace busybox` to specify the Namespace of the workloads
+- `--deployments busybox-deployment` to specify Deployment to check the readiness of
+
+Internally, `microshift healthcheck` checks if workload of the provided type exists and verifies its
+status for the specified timeout duration, so the amount of ready replicas (Pods) matches the expected amount.
+
+`microshift healthcheck` also accepts other parameters to specify other kinds
+of workload: `--daemonsets` and `--statefulsets`. These options take
+comma-delimited list of resources, e.g.: `--daemonsets ovnkube-master,ovnkube-node`.
+
+Alternatively, a `--custom` option can be used with a JSON string, for example:
+```
+microshift healthcheck --custom '{"openshift-storage":{"deployments": ["lvms-operator"], "daemonsets": ["vg-manager"]}, "openshift-ovn-kubernetes":{"daemonsets": ["ovnkube-master", "ovnkube-node"]}}'
+```
 
 ## MicroShift Service Failure
 
