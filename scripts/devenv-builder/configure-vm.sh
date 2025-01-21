@@ -191,7 +191,6 @@ if ${BUILD_AND_RUN}; then
 fi
 
 if ${RHEL_SUBSCRIPTION}; then
-    OSVERSION=$(awk -F: '{print $5}' /etc/system-release-cpe)
     sudo subscription-manager config --rhsm.manage_repos=1
 
     RHOCP=$("${RHOCP_REPO}")
