@@ -53,21 +53,20 @@ core services.
 The script starts by running sanity checks to verify that it is executed from
 the `root` account.
 
-Then, executes `microshift healthcheck` command with following options:
+Then, it executes `microshift healthcheck` command with following options:
 - `-v=2` to increase verbosity of the output
 - `--timeout="${WAIT_TIMEOUT_SECS}s"` to override default 300s timeout value
 - `--namespace busybox` to specify the Namespace of the workloads
 - `--deployments busybox-deployment` to specify Deployment to check the readiness of
 
-Internally, `microshift healthcheck` with above set of parameters, for a
-specified time, checks if workload of provided type exists, then verifies its
-status so the amount of ready replicas (Pods) matches the expected amount.
+Internally, `microshift healthcheck` checks if workload of the provided type exists and verifies its
+status for the specified timeout duration, so the amount of ready replicas (Pods) matches the expected amount.
 
 `microshift healthcheck` also accepts other parameters to specify other kinds
 of workload: `--daemonsets` and `--statefulsets`. These options take
 comma-delimited list of resources, e.g.: `--daemonsets ovnkube-master,ovnkube-node`.
 
-Alternatively, an `--custom` option can be used with a JSON string, for example:
+Alternatively, a `--custom` option can be used with a JSON string, for example:
 ```
 microshift healthcheck --custom '{"openshift-storage":{"deployments": ["lvms-operator"], "daemonsets": ["vg-manager"]}, "openshift-ovn-kubernetes":{"daemonsets": ["ovnkube-master", "ovnkube-node"]}}'
 ```
