@@ -242,7 +242,7 @@ and can be used to embed those images into osbuilder blueprints or bootc contain
 
 %package observability
 Summary: OpenTelemetry-Collector configured for MicroShift
-BuildArch: x86_64 aarch64
+BuildArch: noarch
 Requires: microshift = %{version}
 Requires: opentelemetry-collector
 
