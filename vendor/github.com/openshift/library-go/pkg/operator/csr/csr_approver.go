@@ -175,9 +175,9 @@ func getCertApprovalCondition(status *certapiv1.CertificateSigningRequestStatus)
 }
 
 type ServiceAccountApprover struct {
-	saGroups        sets.Set[string] // saGroups is the set of groups for the SA expected to have created the CSR
-	saName          string
-	expectedSubject string
+	saGroups         sets.Set[string] // saGroups is the set of groups for the SA expected to have created the CSR
+	saName           string
+	expectedSubjects sets.Set[string]
 }
 
 // ServiceAccountApprover approves CSRs with a given subject issued by the provided service account
@@ -185,9 +185,20 @@ func NewServiceAccountApprover(saNamespace, saName, expectedSubject string, addi
 	saGroups := append(serviceaccount.MakeGroupNames(saNamespace), "system:authenticated")
 
 	return &ServiceAccountApprover{
-		saName:          serviceaccount.MakeUsername(saNamespace, saName),
-		saGroups:        sets.New(append(saGroups, additionalGroups...)...),
-		expectedSubject: expectedSubject,
+		saName:           serviceaccount.MakeUsername(saNamespace, saName),
+		saGroups:         sets.New(append(saGroups, additionalGroups...)...),
+		expectedSubjects: sets.New(expectedSubject),
+	}
+}
+
+// NewServiceAccountMultiSubjectsApprover approves CSRs with given subjects issued by the provided service account
+func NewServiceAccountMultiSubjectsApprover(saNamespace, saName string, expectedSubject []string, additionalGroups ...string) *ServiceAccountApprover {
+	saGroups := append(serviceaccount.MakeGroupNames(saNamespace), "system:authenticated")
+
+	return &ServiceAccountApprover{
+		saName:           serviceaccount.MakeUsername(saNamespace, saName),
+		saGroups:         sets.New(append(saGroups, additionalGroups...)...),
+		expectedSubjects: sets.New(expectedSubject...),
 	}
 }
 
@@ -204,8 +215,8 @@ func (a *ServiceAccountApprover) Approve(csrObj *certapiv1.CertificateSigningReq
 		return CSRDenied, fmt.Sprintf("CSR %q was created by a user with unexpected groups: %v", csrObj.Name, sets.List(csrGroups)), nil
 	}
 
-	if expectedSubject := a.expectedSubject; x509CSR.Subject.String() != expectedSubject {
-		return CSRDenied, fmt.Sprintf("expected the CSR's subject to be %q, but it is %q", expectedSubject, x509CSR.Subject.String()), nil
+	if expectedSubjects := a.expectedSubjects; !expectedSubjects.Has(x509CSR.Subject.String()) {
+		return CSRDenied, fmt.Sprintf("expected the CSR's subject to be one of %q, but it is %q", sets.List(expectedSubjects), x509CSR.Subject.String()), nil
 	}
 
 	return CSRApproved, "", nil

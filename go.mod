@@ -9,11 +9,11 @@ require (
 	github.com/coreos/go-systemd v0.0.0-20190321100706-95778dfbb74e // openshift-controller-manager
 	github.com/google/go-cmp v0.6.0
 	github.com/miekg/dns v1.1.35 // microshift
-	github.com/openshift/api v0.0.0-20241004095111-b1f700bdd8d2
+	github.com/openshift/api v0.0.0-20241203091751-58d4ac495429
 	github.com/openshift/build-machinery-go v0.0.0-20240910153727-5725581bdf8f
-	github.com/openshift/client-go v0.0.0-20241001162912-da6d55e4611f
-	github.com/openshift/cluster-policy-controller v0.0.0-20241210163452-327d3cbd82fd
-	github.com/openshift/library-go v0.0.0-20241107160307-0064ad7bd060
+	github.com/openshift/client-go v0.0.0-20241203091221-452dfb8fa071
+	github.com/openshift/cluster-policy-controller v0.0.0-20250120184244-f5a25728ff43
+	github.com/openshift/library-go v0.0.0-20241218091209-6018a90c28d0
 	github.com/openshift/route-controller-manager v0.0.0-20241218160919-bc97534a12a7
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/spf13/cobra v1.8.1

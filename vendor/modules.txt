@@ -431,7 +431,7 @@ github.com/opencontainers/runtime-spec/specs-go
 github.com/opencontainers/selinux/go-selinux
 github.com/opencontainers/selinux/go-selinux/label
 github.com/opencontainers/selinux/pkg/pwalkdir
-# github.com/openshift/api v0.0.0-20241004095111-b1f700bdd8d2
+# github.com/openshift/api v0.0.0-20241203091751-58d4ac495429
 ## explicit; go 1.22.0
 github.com/openshift/api
 github.com/openshift/api/annotations
@@ -535,7 +535,7 @@ github.com/openshift/build-machinery-go/make/targets/golang
 github.com/openshift/build-machinery-go/make/targets/openshift
 github.com/openshift/build-machinery-go/make/targets/openshift/operator
 github.com/openshift/build-machinery-go/scripts
-# github.com/openshift/client-go v0.0.0-20241001162912-da6d55e4611f
+# github.com/openshift/client-go v0.0.0-20241203091221-452dfb8fa071
 ## explicit; go 1.22.0
 github.com/openshift/client-go/apiserver/applyconfigurations/apiserver/v1
 github.com/openshift/client-go/apiserver/applyconfigurations/internal
@@ -676,7 +676,7 @@ github.com/openshift/client-go/user/informers/externalversions/internalinterface
 github.com/openshift/client-go/user/informers/externalversions/user
 github.com/openshift/client-go/user/informers/externalversions/user/v1
 github.com/openshift/client-go/user/listers/user/v1
-# github.com/openshift/cluster-policy-controller v0.0.0-20241210163452-327d3cbd82fd
+# github.com/openshift/cluster-policy-controller v0.0.0-20250120184244-f5a25728ff43
 ## explicit; go 1.23.0
 github.com/openshift/cluster-policy-controller/pkg/client/genericinformers
 github.com/openshift/cluster-policy-controller/pkg/cmd/cluster-policy-controller
@@ -689,7 +689,7 @@ github.com/openshift/cluster-policy-controller/pkg/security/controller
 github.com/openshift/cluster-policy-controller/pkg/security/mcs
 github.com/openshift/cluster-policy-controller/pkg/security/uidallocator
 github.com/openshift/cluster-policy-controller/pkg/version
-# github.com/openshift/library-go v0.0.0-20241107160307-0064ad7bd060
+# github.com/openshift/library-go v0.0.0-20241218091209-6018a90c28d0
 ## explicit; go 1.22.0
 github.com/openshift/library-go/pkg/apiserver/admission/admissionrestconfig
 github.com/openshift/library-go/pkg/apiserver/admission/admissiontimeout
