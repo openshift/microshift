@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"runtime/debug"
 	"syscall"
 	"time"
 
@@ -112,7 +113,7 @@ func (m *ServiceManager) asyncRun(ctx context.Context, service Service) (<-chan 
 		go func() {
 			defer func() {
 				if r := recover(); r != nil {
-					klog.Errorf("%s panicked: %s", service.Name(), r)
+					klog.Errorf("%s panicked: %s trace: %s.", service.Name(), r, debug.Stack())
 					klog.Error("Stopping MicroShift")
 					if err := syscall.Kill(syscall.Getpid(), syscall.SIGTERM); err != nil {
 						klog.Warningf("error killing process: %v", err)
