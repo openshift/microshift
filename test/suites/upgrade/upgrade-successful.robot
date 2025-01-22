@@ -18,6 +18,8 @@ Test Tags           ostree
 ${TARGET_REF}           ${EMPTY}
 ${BOOTC_REGISTRY}       ${EMPTY}
 
+${CSI_WEBHOOK_DIFF}     ./assets/storage/csi-webhook-deletion-diff.yaml
+
 
 *** Test Cases ***
 Upgrade
@@ -39,6 +41,9 @@ Upgrade
     IF    ${is_bootc} == ${FALSE}
         Validate SELinux With Backup    ${future_backup}
     END
+
+    # Verifies that CSI Snapshot Webhook resources are cleaned up after migration
+    Oc Wait    -f ${CSI_WEBHOOK_DIFF}    --for=Delete --timeout=${DEFAULT_WAIT_TIMEOUT}
 
 
 *** Keywords ***
