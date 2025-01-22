@@ -499,6 +499,7 @@ install -p -m644 assets/optional/gateway-api/release-gateway-api-{x86_64,aarch64
 #observability
 install -p -m644 packaging/observability/opentelemetry-collector.yaml -D %{buildroot}%{_sysconfdir}/microshift/opentelemetry-collector.yaml
 install -p -m644 packaging/observability/microshift-observability.service %{buildroot}%{_unitdir}/
+install -d -m755 %{buildroot}%{_sharedstatedir}/microshift-observability
 
 %pre networking
 
@@ -669,6 +670,7 @@ fi
 %files observability
 %config %{_sysconfdir}/microshift/opentelemetry-collector.yaml
 %config %{_unitdir}/microshift-observability.service
+%dir %{_sharedstatedir}/microshift-observability
 
 # Use Git command to generate the log and replace the VERSION string
 # LANG=C git log --date="format:%a %b %d %Y" --pretty="tformat:* %cd %an <%ae> VERSION%n- %s%n" packaging/rpm/microshift.spec
