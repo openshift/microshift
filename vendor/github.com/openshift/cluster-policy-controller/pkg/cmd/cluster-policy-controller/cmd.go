@@ -10,6 +10,7 @@ import (
 	"github.com/openshift/library-go/pkg/controller/controllercmd"
 
 	clusterpolicyversion "github.com/openshift/cluster-policy-controller/pkg/version"
+	"k8s.io/utils/clock"
 )
 
 const (
@@ -18,7 +19,7 @@ const (
 )
 
 func NewClusterPolicyControllerCommand(name string) *cobra.Command {
-	cmd := controllercmd.NewControllerCommandConfig("cluster-policy-controller", clusterpolicyversion.Get(), RunClusterPolicyController).
+	cmd := controllercmd.NewControllerCommandConfig("cluster-policy-controller", clusterpolicyversion.Get(), RunClusterPolicyController, clock.RealClock{}).
 		WithComponentOwnerReference(&corev1.ObjectReference{
 			Kind:      "Pod",
 			Name:      os.Getenv(podNameEnv),

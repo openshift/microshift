@@ -2,6 +2,7 @@ package controller
 
 import (
 	"context"
+	"fmt"
 
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/selection"
@@ -10,12 +11,19 @@ import (
 )
 
 const (
-	controllerName                    = "csr-approver-controller"
-	monitoringServiceAccountNamespace = "openshift-monitoring"
-	monitoringServiceAccountName      = "cluster-monitoring-operator"
-	monitoringCertificateSubject      = "CN=system:serviceaccount:openshift-monitoring:prometheus-k8s"
-	monitoringLabelKey                = "metrics.openshift.io/csr.subject"
-	monitoringLabelValue              = "prometheus"
+	controllerName                = "csr-approver-controller"
+	monitoringNamespace           = "openshift-monitoring"
+	monitoringRequesterSA         = "cluster-monitoring-operator"
+	monitoringSubjectNameLabelKey = "metrics.openshift.io/csr.subject"
+	prometheus                    = "prometheus"
+	metricsServer                 = "metrics-server"
+)
+
+var (
+	monitoringCertificateSubjects = []string{
+		fmt.Sprintf("CN=system:serviceaccount:%s:%s-k8s", monitoringNamespace, prometheus),
+		fmt.Sprintf("CN=system:serviceaccount:%s:%s", monitoringNamespace, metricsServer),
+	}
 )
 
 func RunCSRApproverController(ctx context.Context, controllerCtx *EnhancedControllerContext) (bool, error) {
@@ -25,7 +33,7 @@ func RunCSRApproverController(ctx context.Context, controllerCtx *EnhancedContro
 	}
 
 	selector := labels.NewSelector()
-	labelsRequirement, err := labels.NewRequirement(monitoringLabelKey, selection.Equals, []string{monitoringLabelValue})
+	labelsRequirement, err := labels.NewRequirement(monitoringSubjectNameLabelKey, selection.In, []string{prometheus, metricsServer})
 	if err != nil {
 		return true, err
 	}
@@ -37,7 +45,7 @@ func RunCSRApproverController(ctx context.Context, controllerCtx *EnhancedContro
 		kubeClient.CertificatesV1().CertificateSigningRequests(),
 		controllerCtx.KubernetesInformers.Certificates().V1().CertificateSigningRequests(),
 		csr.NewLabelFilter(selector),
-		csr.NewServiceAccountApprover(monitoringServiceAccountNamespace, monitoringServiceAccountName, monitoringCertificateSubject),
+		csr.NewServiceAccountMultiSubjectsApprover(monitoringNamespace, monitoringRequesterSA, monitoringCertificateSubjects),
 		controllerCtx.EventRecorder)
 
 	go controller.Run(ctx, 1)
