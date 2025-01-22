@@ -7,13 +7,14 @@ import (
 	"sync"
 
 	"github.com/openshift/library-go/pkg/operator/events"
+	"k8s.io/utils/clock"
 )
 
 var (
 	lock sync.Mutex
 )
 
-var assetsEventRecorder events.Recorder = events.NewLoggingEventRecorder("microshift-assets")
+var assetsEventRecorder events.Recorder = events.NewLoggingEventRecorder("microshift-assets", clock.RealClock{})
 
 type RenderParams map[string]interface{}
 

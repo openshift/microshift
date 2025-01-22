@@ -24,6 +24,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/serializer"
 	"k8s.io/klog/v2"
+	"k8s.io/utils/clock"
 
 	configv1 "github.com/openshift/api/config/v1"
 	openshiftcontrolplanev1 "github.com/openshift/api/openshiftcontrolplane/v1"
@@ -101,7 +102,7 @@ func (s *OCPRouteControllerManager) configure(cfg *config.Config) error {
 	}
 
 	const namespace = "openshift-route-controller-manager"
-	builder := controllercmd.NewController(s.Name(), route_controller_manager.RunRouteControllerManager).
+	builder := controllercmd.NewController(s.Name(), route_controller_manager.RunRouteControllerManager, clock.RealClock{}).
 		WithKubeConfigFile(s.kubeconfig, nil).
 		WithComponentNamespace(namespace).
 		// Without an explicit owner reference, the builder will try using POD_NAME or the

@@ -27,6 +27,7 @@ import (
 	unstructuredv1 "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/serializer"
+	"k8s.io/utils/clock"
 )
 
 type ClusterPolicyController struct {
@@ -74,7 +75,7 @@ func (s *ClusterPolicyController) configure(cfg *config.Config) error {
 	}
 
 	const namespace = "openshift-kube-controller-manager"
-	builder := controllercmd.NewController(s.Name(), clusterpolicycontroller.RunClusterPolicyController).
+	builder := controllercmd.NewController(s.Name(), clusterpolicycontroller.RunClusterPolicyController, clock.RealClock{}).
 		WithKubeConfigFile(s.kubeconfig, nil).
 		WithComponentNamespace(namespace).
 		// Without an explicit owner reference, the builder will try using POD_NAME or the
