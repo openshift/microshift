@@ -8,6 +8,7 @@ import (
 	"github.com/openshift/microshift/pkg/assets"
 	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/config/ovn"
+	"github.com/vishvananda/netlink"
 	"k8s.io/klog/v2"
 )
 
@@ -52,7 +53,16 @@ func startCNIPlugin(ctx context.Context, cfg *config.Config, kubeconfigPath stri
 		}
 	}
 
-	ovnConfig, err := ovn.NewOVNKubernetesConfigFromFileOrDefault(filepath.Dir(config.ConfigFile), cfg.MultiNode.Enabled)
+	ipFamily := netlink.FAMILY_ALL
+	if cfg.IsIPv4() && !cfg.IsIPv6() {
+		ipFamily = netlink.FAMILY_V4
+	}
+
+	if cfg.IsIPv6() && !cfg.IsIPv4() {
+		ipFamily = netlink.FAMILY_V6
+	}
+
+	ovnConfig, err := ovn.NewOVNKubernetesConfigFromFileOrDefault(filepath.Dir(config.ConfigFile), cfg.MultiNode.Enabled, ipFamily)
 	if err != nil {
 		return fmt.Errorf("failed to create OVN-K configuration from %q: %w", config.ConfigFile, err)
 	}
