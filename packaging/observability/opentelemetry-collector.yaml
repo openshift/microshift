@@ -82,3 +82,13 @@ service:
       receivers: [journald, filelog/kube-system, filelog/workload]
       exporters:
       - otlp
+    # Export opentelemetry-collector metrics to an OTLP endpoint. This should be configured by the user to point to
+    # a local or remote OTLP backend.
+    telemetry:
+      metrics:
+        readers:
+          - periodic:
+              exporter:
+                otlp:
+                  protocol: grpc/protobuf
+                  endpoint: http://localhost:14317
