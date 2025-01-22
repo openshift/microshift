@@ -13,4 +13,8 @@ TimeoutStartSec=60
 RestartSec=200ms
 
 [Install]
-RequiredBy=multi-user.target
+# Observability starts after microshift because of a dependency on microshift-generated
+# certs. If observability fails to start however, we don't want microshift to continue running
+# and sending metrics and logs into the void. Setting the RequiredBy=microshift.service
+# will cause microshift to stop if observability fails to start.
+RequiredBy=multi-user.target microshift.service

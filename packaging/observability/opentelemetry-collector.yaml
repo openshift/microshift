@@ -1,11 +1,15 @@
+# Basic Opentelemetry-collector configuration file for MicroShift
+# This file provides a starting config for users to customize to their needs. Exporters are disabled (nop) by default.
+# This is because the exporter endpoints are not knowable at installation. Users are therefore encouraged
+# to specify their own copy of this file, customized to their needs, including the otlp exporter endpoint.
 receivers:
-#  otlp:
-#    protocol:
-#      grpc: $MICROSHIFT_IP:6666
-#  filelog/workload:
-#    Path: /….
-#  filelog/kube-system:
-#    Path: /….
+  filelog/workload:
+    include:
+      - /var/log/pods/
+    exclude:
+      - /var/log/pods/openshift-*
+  filelog/kube-system:
+    include: /var/log/pods/openshift-*
   kubeletstats:
     auth_type: tls
     ca_file: /etc/pki/microshift-opentelemetry-collector-client/client-ca.crt
@@ -35,47 +39,46 @@ receivers:
   journald:
     units:
     - microshift
+    - microshift-etcd
+    - microshift-ovs-init
+    - microshift-tuned
     - crio
 
 processors:
   resourcedetection/system:
-    detectors: [system]
+    detectors: ["system", "env"]
     system:
+      hostname_sources: ["os"]
 
 exporters:
+# EXAMPLE OTLP (Prometheus) ENDPOINT CONFIG
+# The otlp exporter requires an endpoint listening for OTLP connections. To prevent spamming the log with Go
+# stack traces, the exporter is disabled. The endpoint is not known at installation, thus a tire-kicking of the
+# microshift-observability package would result in stack traces spam in logs.
   otlp:
     sending_queue:
       storage: file_storage
-    endpoint: # IP|HOSTNAME REQUIRED
+    endpoint: localhost:12345 # Valid OTLP endpoint required
     tls:
       insecure: true
-  debug:
 
 extensions:
   file_storage:
-    directory: /var/lib/otelcol
-    create_directory: true
-    fsync: true
-    compaction:
-      directory: /var/lib/otelcol
-      on_rebound: true
-      # when allocated data exceeds this amount, the "compaction needed" flag will be enabled
-      # rebound_needed_threshold_mib: 100 # Default
-      # if the "compaction needed" flag is set and allocated data drops below this amount, compaction will begin and the "compaction needed" flag will be cleared
-      # rebound_trigger_threshold_mib: 10 # Default
-      # specifies how frequently the conditions for compaction are being checked
-      check_interval: 5s # Default
+    directory: /var/lib/microshift-observability
 
 service:
   extensions: [file_storage]
   pipelines:
     metrics/kubeletstats:
       receivers: [kubeletstats]
-      exporters: [otlp]
+      exporters:
+      - otlp
     metrics:
       receivers: [hostmetrics, hostmetrics/disk, hostmetrics/network]
       processors: [resourcedetection/system]
-      exporters: [otlp, debug]
+      exporters:
+      - otlp
     logs:
-      receivers: [journald]
-      exporters: [otlp, debug]
+      receivers: [journald, filelog/kube-system, filelog/workload]
+      exporters:
+      - otlp
