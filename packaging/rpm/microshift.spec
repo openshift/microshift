@@ -568,9 +568,11 @@ mkdir -p -m755 %{buildroot}%{_datadir}/microshift/release
 install -p -m644 assets/optional/ai-model-serving/release-ai-model-serving-x86_64.json %{buildroot}%{_datadir}/microshift/release/
 
 #observability
+install -d -m755 %{buildroot}%{_presetdir}
+install -d -m755 %{buildroot}%{_sharedstatedir}/microshift-observability
 install -p -m644 packaging/observability/opentelemetry-collector.yaml -D %{buildroot}%{_sysconfdir}/microshift/opentelemetry-collector.yaml
 install -p -m644 packaging/observability/microshift-observability.service %{buildroot}%{_unitdir}/
-install -d -m755 %{buildroot}%{_sharedstatedir}/microshift-observability
+install -p -m644 packaging/observability/90-enable-microshift-observability.preset %{buildroot}%{_presetdir}/
 
 %pre networking
 
@@ -752,6 +754,7 @@ fi
 %files observability
 %config %{_sysconfdir}/microshift/opentelemetry-collector.yaml
 %config %{_unitdir}/microshift-observability.service
+%config %{_presetdir}/90-enable-microshift-observability.preset
 %dir %{_sharedstatedir}/microshift-observability
 
 # Use Git command to generate the log and replace the VERSION string
