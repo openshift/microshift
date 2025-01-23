@@ -1,3 +1,47 @@
-- openshift-controller-manager embedded-component 0e91805ec91f46b80b553027fd8a8aab194f50fc to bcf6e58edbcc8e7ce6f7e4d0658635688e0fc114
-  - 66a076f 2024-11-04T14:05:35+00:00 skip unnecessary apply calls
+- kubernetes embedded-component 67d33871ba24f0e8c4d2d201a4c4decaabfa1eca to ef2a55c520f6a4c95996ff54c41fb58959750306
+  - 699b05928 2024-12-13T13:54:28+00:00 UPSTREAM: 129011: skip TestCreateBlobDisk test
+  - 8ca52ceff 2024-12-10T13:58:07+00:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - 4cbf88203 2024-12-10T13:43:03+00:00 UPSTREAM: <drop>: manually resolve conflicts
+  - 960a2f019 2024-11-20T13:40:02+00:00 Release commit for Kubernetes v1.29.11
+  - 99b90640b 2024-11-07T10:51:24+00:00 Build etcd image v3.5.16
+  - 7aced6f0c 2024-11-07T09:41:34+00:00 Update etcd from v3.5.15 to v3.5.16
+  - 994aaf907 2024-10-31T09:05:29+01:00 server/config: assing system:apiserver user to system:authenticated group
+  - 69066c22e 2024-10-30T15:39:38+08:00 bugfix(scheduler): preemption picks wrong victim node with higher priority pod on it.
+  - 0fadafe69 2024-10-22T20:59:52+00:00 Update CHANGELOG/CHANGELOG-1.29.md for v1.29.10
+  - f2d5b1d26 2024-10-12T11:17:54+08:00 tests for nodes with different nodeName and name
+  - c4a818406 2024-10-12T10:33:21+08:00 manually revert #109877
+
+- operator-framework-olm embedded-component 32cbf3f7b400d89e131ac00713cd426afd0fcce5 to 4ff31a477af44f7804c188fbd1946b9b239ab3fd
+  - f0b6089b 2025-01-21T08:41:40+01:00 [CARRY] address lint issues in namespace labeler plugin
+  - 1e2919e2 2025-01-21T08:41:32+01:00 [CARRY] fixup ns labeler plugin
+  - 231e3e58 2025-01-21T08:41:22+01:00 :bug: Switch queue informer to use types.Namespace name; relocate deletion handler (#3483)
+  - 1fcca4a3 2025-01-20T11:21:26+01:00 bump golang.org/x/net to 0.34.0 (#3485)
+  - c5af7203 2025-01-20T11:20:49+01:00 Upgrade github.com/joelanford/ignore from v0.1.0 to v0.1.1 (#1527)
+  - fbd4cea9 2025-01-20T10:38:09+01:00 bump golang.org/x/net to 0.34.0 (#387)
+
+- kubernetes image-amd64 67d33871ba24f0e8c4d2d201a4c4decaabfa1eca to ef2a55c520f6a4c95996ff54c41fb58959750306
+  - 699b05928 2024-12-13T13:54:28+00:00 UPSTREAM: 129011: skip TestCreateBlobDisk test
+  - 8ca52ceff 2024-12-10T13:58:07+00:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - 4cbf88203 2024-12-10T13:43:03+00:00 UPSTREAM: <drop>: manually resolve conflicts
+  - 960a2f019 2024-11-20T13:40:02+00:00 Release commit for Kubernetes v1.29.11
+  - 99b90640b 2024-11-07T10:51:24+00:00 Build etcd image v3.5.16
+  - 7aced6f0c 2024-11-07T09:41:34+00:00 Update etcd from v3.5.15 to v3.5.16
+  - 994aaf907 2024-10-31T09:05:29+01:00 server/config: assing system:apiserver user to system:authenticated group
+  - 69066c22e 2024-10-30T15:39:38+08:00 bugfix(scheduler): preemption picks wrong victim node with higher priority pod on it.
+  - 0fadafe69 2024-10-22T20:59:52+00:00 Update CHANGELOG/CHANGELOG-1.29.md for v1.29.10
+  - f2d5b1d26 2024-10-12T11:17:54+08:00 tests for nodes with different nodeName and name
+  - c4a818406 2024-10-12T10:33:21+08:00 manually revert #109877
+
+- kubernetes image-arm64 67d33871ba24f0e8c4d2d201a4c4decaabfa1eca to ef2a55c520f6a4c95996ff54c41fb58959750306
+  - 699b05928 2024-12-13T13:54:28+00:00 UPSTREAM: 129011: skip TestCreateBlobDisk test
+  - 8ca52ceff 2024-12-10T13:58:07+00:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - 4cbf88203 2024-12-10T13:43:03+00:00 UPSTREAM: <drop>: manually resolve conflicts
+  - 960a2f019 2024-11-20T13:40:02+00:00 Release commit for Kubernetes v1.29.11
+  - 99b90640b 2024-11-07T10:51:24+00:00 Build etcd image v3.5.16
+  - 7aced6f0c 2024-11-07T09:41:34+00:00 Update etcd from v3.5.15 to v3.5.16
+  - 994aaf907 2024-10-31T09:05:29+01:00 server/config: assing system:apiserver user to system:authenticated group
+  - 69066c22e 2024-10-30T15:39:38+08:00 bugfix(scheduler): preemption picks wrong victim node with higher priority pod on it.
+  - 0fadafe69 2024-10-22T20:59:52+00:00 Update CHANGELOG/CHANGELOG-1.29.md for v1.29.10
+  - f2d5b1d26 2024-10-12T11:17:54+08:00 tests for nodes with different nodeName and name
+  - c4a818406 2024-10-12T10:33:21+08:00 manually revert #109877
 
