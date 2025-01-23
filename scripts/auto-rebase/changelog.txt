@@ -1,0 +1,325 @@
+- cluster-csi-snapshot-controller-operator embedded-component 42ed4cc366a40c28b22e0aea02ba8075dc2831eb to 46902b494ed0a608a48d2a04faf6e4ed2f9a6a5b
+  - 95b72be 2025-01-13T16:32:54+00:00 Add missing WithSyncDegradedOnError errors
+  - 9bdf8ba 2025-01-13T16:32:54+00:00 Fix rbac roles to allow removal of deployment, pdb and services
+  - 513fd36 2025-01-13T16:32:54+00:00 Drop feature-gate change from openshift/api
+  - 5edd568 2025-01-13T16:32:54+00:00 Add code for removing webhook controller and stuff
+  - e08ee29 2025-01-13T16:32:54+00:00 Bring back webbook resources for now
+  - fbe602a 2025-01-13T16:32:54+00:00 Bring latest version of CRDs
+  - b2bbdbb 2025-01-13T16:32:54+00:00 Remove rbac files from assets
+  - 99a196a 2025-01-13T16:32:54+00:00 Patch rbac rules as per upstream requirements
+  - 0f6f1c0 2025-01-13T16:32:54+00:00 Copy the v1beta1 CRDs from code
+  - 4d3374e 2025-01-13T16:32:54+00:00 Remove clusterbindings for webhook
+  - 70bc73d 2025-01-13T16:32:54+00:00 Remove all of the code related to installation of webhook
+  - b4c8794 2025-01-13T16:32:54+00:00 Change external-snapshotter to use featuregate for volumegroupSnapshot
+  - f21708b 2025-01-13T16:32:54+00:00 Bump API from forked version to make featuregate GA
+
+- csi-external-snapshotter embedded-component f52ce8b8b0799a341caf1fb864bba5d9d040a856 to 0332c00fc1e325ff69ba0d2036899729ccf143fc
+  - c6b6037 2025-01-13T12:48:28-05:00 UPSTREAM: <carry>: Downgrade golang version
+  - 6ff7745 2024-12-10T16:56:25-05:00 UPSTREAM: <carry>: ship webhook image with snapshot-controller
+  - a1074f5 2024-12-10T15:11:20+05:30 Add nil check for groupSnapshotContent in deleteCSIGroupSnapshotOperation and unit tests
+  - a992258 2024-12-09T20:59:28-05:00 Add release notes for v8.2.0
+  - 965e259 2024-12-09T20:33:36+00:00 wip: Snapshot Controller startup should not LIST all volumesnapshots
+  - 370225d 2024-12-09T19:30:08+00:00 Update the API Approved Annotation
+  - cb86a44 2024-12-09T11:18:56+00:00 Change CreationTime in VolumeGroupSnapshotContentStatus from *int64 to *metav1.Time
+  - ab1c827 2024-12-05T09:54:44+00:00 UPSTREAM: <carry>: Updating ose-csi-snapshot-controller-container image to be consistent with ART for 4.19 Reconciling with https://github.com/openshift/ocp-build-data/tree/a39508c86497b4e5e463d7b2c78e51e577be9e7d/images/ose-csi-snapshot-controller.yml
+  - 52f291b 2024-12-05T04:39:52+00:00 UPSTREAM: <carry>: Updating ose-csi-snapshot-validation-webhook-container image to be consistent with ART for 4.19 Reconciling with https://github.com/openshift/ocp-build-data/tree/a39508c86497b4e5e463d7b2c78e51e577be9e7d/images/csi-snapshot-validation-webhook.yml
+  - 34854a6 2024-12-04T08:04:10+01:00 Dont call DeleteSnapshot when VS belong to VGS
+  - fc7ed96 2024-12-03T21:30:38+00:00 UPSTREAM: <carry>: Updating ose-csi-external-snapshotter-container image to be consistent with ART for 4.19 Reconciling with https://github.com/openshift/ocp-build-data/tree/2ea3e6158c93ca104b9d59fd58a71536fa01fb2d/images/ose-csi-external-snapshotter.yml
+  - 7b6db9d 2024-12-03T13:34:41+01:00 replace deprecated Queue and RateLimiter
+  - af1f842 2024-12-03T06:46:26+01:00 replace enable-volume-group-snapshots with featuregate
+  - 2c63f95 2024-12-02T19:03:44+00:00 Improve VolumeSnapshotPairList comments
+  - 42b9deb 2024-12-02T19:03:44+00:00 Improve VolumeGroupSnapshotStatus comments
+  - 341ac4c 2024-12-02T19:03:44+00:00 Remove unused structures
+  - 58bae80 2024-12-02T19:03:44+00:00 Remove v1alpha1 API
+  - 57560c1 2024-12-02T19:03:44+00:00 Update VolumeGroupSnapshot to v1beta1
+  - 79502ab 2024-12-02T17:46:24+00:00 Bump the k8s-dependencies group across 1 directory with 2 updates
+  - c70f946 2024-12-02T16:51:25+00:00 Use ownership to identify volume group snapshot members
+  - e42baeb 2024-12-02T13:01:59+00:00 Bump the github-dependencies group across 1 directory with 14 updates
+  - 3b654a9 2024-11-26T16:34:14+01:00 ci: use go version from go.mod for trivy
+  - e81beb3 2024-11-26T08:36:44+00:00 Add the snapshot bound finalizer when deletionPolicy is set to Retain
+  - 79eba72 2024-11-25T18:13:25+01:00 remove unused labels from util
+  - 023d38d 2024-11-25T12:52:17+01:00 use annotation to storage the groupsnapshot handle
+  - 4103d3e 2024-11-25T08:43:58+00:00 Add error checking to processGroupSnapshotWithDeletionTimestamp
+  - 847f8c3 2024-11-24T22:28:59+01:00 Prevent infinite loop deleting group snapshots
+  - a12d2b5 2024-11-22T20:15:47+00:00 Do not panic when a default snapshotclass does not exist
+  - 05fdebb 2024-11-22T16:23:45+05:30 update CSI spec to have official version
+  - 9f167db 2024-11-22T12:59:21+08:00 Squashed 'release-tools/' changes from 988496a1f..e31de525b
+  - 7697342 2024-11-21T19:42:17+05:30 remove validation-webhook as it is being deprecated
+  - d190d11 2024-11-20T23:18:44+00:00 Only dynamic provisioning for an independent snapshot needs a snapshot class
+  - 7c1c530 2024-11-20T15:55:20+00:00 Set VolumeHandle for dynamic provisioned VolumeGroupSnapshots
+  - 1ea7a1a 2024-11-20T07:45:50+00:00 Remove PVCVolumeSnapshotRefList from VolumeGroupSnapshot API
+  - 5414afe 2024-11-19T12:25:42+00:00 Remove PVVolumeSnapshotContentList from the VolumeGroupSnapshotContentStatus API
+  - 85b60dd 2024-11-19T08:09:38+05:30 include feature gate in snapshotter
+  - e4730bc 2024-11-11T16:58:46+01:00 Pass context on in GroupSnapshot sync functions
+  - 65bbcad 2024-11-08T14:59:24+00:00 Add PV informer and indexer
+  - 7002ac8 2024-11-07T13:51:18+00:00 test: fix trivy action
+  - 811740c 2024-11-07T07:40:17+00:00 Set PVC Name
+  - ca171a5 2024-11-05T12:24:32-05:00 update vendor
+  - e60f5c0 2024-11-05T10:51:00-05:00 Remove volumeGroupSnapshotRef immutable validation rule
+  - 0685454 2024-11-05T09:29:58+05:30 update csi spec
+  - 86b7ce1 2024-11-04T16:46:23+00:00 Centralize VolumeGroupSnapshot members resource creation in the snapshot-controller
+  - 02bddb9 2024-11-04T11:53:49+00:00 Bump the github-dependencies group across 1 directory with 17 updates
+  - 722c022 2024-10-30T11:24:05+05:30 add paramter for list groupsnapshot
+  - 3c2c470 2024-10-25T07:55:22+00:00 Add and set the new pvVolumeSnapshotContentList field
+  - 8a60c40 2024-10-23T17:52:17+00:00 Fix typo in error message message
+  - 23dde47 2024-09-10T12:51:24+00:00 test: fix trivy github action error
+  - 5fd0af2 2024-09-09T13:28:10+02:00 Use protobuf encoding for core K8s APIs in external-snapshotter
+
+- machine-config-operator embedded-component 0672e126107b97c6f98d8fa2a8404f776f7be052 to da8e8b51fda20798d8690901f01b80eb010f34db
+  - 8d8b97be 2025-01-13T18:12:28+00:00 OCPBUGS-41489: Specify interface type when adding ovs-port
+  - f73b9c4b 2025-01-09T20:13:55+00:00 OCPBUGS-48195: new buffer for decoding clusterOverridePolicyJSON
+
+- operator-framework-olm embedded-component 6156b61b05d6e345db44edfa7d38138ea0373631 to 182471a8d72ee38d2ff82ce44db6903e66c4b22b
+  - a5fa8a2c 2025-01-21T14:34:07-05:00 sort lists of identifiers and conflict messages to reduce SAT solver non-determinism (#3491)
+  - 3261a0bf 2025-01-21T14:32:45-05:00 :bug: use operator cache provider for deprecation updates to limit calls to GRPC server (#3490)
+  - cf773f6b 2025-01-21T08:39:07+01:00 [CARRY] address lint issues in namespace labeler plugin
+  - 1d7eee7d 2025-01-21T08:38:51+01:00 [CARRY] fixup ns labeler plugin
+  - 49a6bf5d 2025-01-20T19:28:12+00:00 bug: Switch queue informer to use types.Namespace name; relocate deletion handler (#3483)
+  - a1ef7418 2025-01-16T10:47:19+01:00 bump golang.org/x/net to 0.34.0 (#3485)
+  - c8a0d375 2025-01-16T10:45:12+01:00 Upgrade github.com/joelanford/ignore from v0.1.0 to v0.1.1 (#1527)
+  - 5c2bb01b 2025-01-16T10:42:17+01:00 bump golang.org/x/net to 0.34.0 (#387)
+
+- csi-external-snapshotter image-amd64 f52ce8b8b0799a341caf1fb864bba5d9d040a856 to 0332c00fc1e325ff69ba0d2036899729ccf143fc
+  - c6b6037 2025-01-13T12:48:28-05:00 UPSTREAM: <carry>: Downgrade golang version
+  - 6ff7745 2024-12-10T16:56:25-05:00 UPSTREAM: <carry>: ship webhook image with snapshot-controller
+  - a1074f5 2024-12-10T15:11:20+05:30 Add nil check for groupSnapshotContent in deleteCSIGroupSnapshotOperation and unit tests
+  - a992258 2024-12-09T20:59:28-05:00 Add release notes for v8.2.0
+  - 965e259 2024-12-09T20:33:36+00:00 wip: Snapshot Controller startup should not LIST all volumesnapshots
+  - 370225d 2024-12-09T19:30:08+00:00 Update the API Approved Annotation
+  - cb86a44 2024-12-09T11:18:56+00:00 Change CreationTime in VolumeGroupSnapshotContentStatus from *int64 to *metav1.Time
+  - ab1c827 2024-12-05T09:54:44+00:00 UPSTREAM: <carry>: Updating ose-csi-snapshot-controller-container image to be consistent with ART for 4.19 Reconciling with https://github.com/openshift/ocp-build-data/tree/a39508c86497b4e5e463d7b2c78e51e577be9e7d/images/ose-csi-snapshot-controller.yml
+  - 52f291b 2024-12-05T04:39:52+00:00 UPSTREAM: <carry>: Updating ose-csi-snapshot-validation-webhook-container image to be consistent with ART for 4.19 Reconciling with https://github.com/openshift/ocp-build-data/tree/a39508c86497b4e5e463d7b2c78e51e577be9e7d/images/csi-snapshot-validation-webhook.yml
+  - 34854a6 2024-12-04T08:04:10+01:00 Dont call DeleteSnapshot when VS belong to VGS
+  - fc7ed96 2024-12-03T21:30:38+00:00 UPSTREAM: <carry>: Updating ose-csi-external-snapshotter-container image to be consistent with ART for 4.19 Reconciling with https://github.com/openshift/ocp-build-data/tree/2ea3e6158c93ca104b9d59fd58a71536fa01fb2d/images/ose-csi-external-snapshotter.yml
+  - 7b6db9d 2024-12-03T13:34:41+01:00 replace deprecated Queue and RateLimiter
+  - af1f842 2024-12-03T06:46:26+01:00 replace enable-volume-group-snapshots with featuregate
+  - 2c63f95 2024-12-02T19:03:44+00:00 Improve VolumeSnapshotPairList comments
+  - 42b9deb 2024-12-02T19:03:44+00:00 Improve VolumeGroupSnapshotStatus comments
+  - 341ac4c 2024-12-02T19:03:44+00:00 Remove unused structures
+  - 58bae80 2024-12-02T19:03:44+00:00 Remove v1alpha1 API
+  - 57560c1 2024-12-02T19:03:44+00:00 Update VolumeGroupSnapshot to v1beta1
+  - 79502ab 2024-12-02T17:46:24+00:00 Bump the k8s-dependencies group across 1 directory with 2 updates
+  - c70f946 2024-12-02T16:51:25+00:00 Use ownership to identify volume group snapshot members
+  - e42baeb 2024-12-02T13:01:59+00:00 Bump the github-dependencies group across 1 directory with 14 updates
+  - 3b654a9 2024-11-26T16:34:14+01:00 ci: use go version from go.mod for trivy
+  - e81beb3 2024-11-26T08:36:44+00:00 Add the snapshot bound finalizer when deletionPolicy is set to Retain
+  - 79eba72 2024-11-25T18:13:25+01:00 remove unused labels from util
+  - 023d38d 2024-11-25T12:52:17+01:00 use annotation to storage the groupsnapshot handle
+  - 4103d3e 2024-11-25T08:43:58+00:00 Add error checking to processGroupSnapshotWithDeletionTimestamp
+  - 847f8c3 2024-11-24T22:28:59+01:00 Prevent infinite loop deleting group snapshots
+  - a12d2b5 2024-11-22T20:15:47+00:00 Do not panic when a default snapshotclass does not exist
+  - 05fdebb 2024-11-22T16:23:45+05:30 update CSI spec to have official version
+  - 9f167db 2024-11-22T12:59:21+08:00 Squashed 'release-tools/' changes from 988496a1f..e31de525b
+  - 7697342 2024-11-21T19:42:17+05:30 remove validation-webhook as it is being deprecated
+  - d190d11 2024-11-20T23:18:44+00:00 Only dynamic provisioning for an independent snapshot needs a snapshot class
+  - 7c1c530 2024-11-20T15:55:20+00:00 Set VolumeHandle for dynamic provisioned VolumeGroupSnapshots
+  - 1ea7a1a 2024-11-20T07:45:50+00:00 Remove PVCVolumeSnapshotRefList from VolumeGroupSnapshot API
+  - 5414afe 2024-11-19T12:25:42+00:00 Remove PVVolumeSnapshotContentList from the VolumeGroupSnapshotContentStatus API
+  - 85b60dd 2024-11-19T08:09:38+05:30 include feature gate in snapshotter
+  - e4730bc 2024-11-11T16:58:46+01:00 Pass context on in GroupSnapshot sync functions
+  - 65bbcad 2024-11-08T14:59:24+00:00 Add PV informer and indexer
+  - 7002ac8 2024-11-07T13:51:18+00:00 test: fix trivy action
+  - 811740c 2024-11-07T07:40:17+00:00 Set PVC Name
+  - ca171a5 2024-11-05T12:24:32-05:00 update vendor
+  - e60f5c0 2024-11-05T10:51:00-05:00 Remove volumeGroupSnapshotRef immutable validation rule
+  - 0685454 2024-11-05T09:29:58+05:30 update csi spec
+  - 86b7ce1 2024-11-04T16:46:23+00:00 Centralize VolumeGroupSnapshot members resource creation in the snapshot-controller
+  - 02bddb9 2024-11-04T11:53:49+00:00 Bump the github-dependencies group across 1 directory with 17 updates
+  - 722c022 2024-10-30T11:24:05+05:30 add paramter for list groupsnapshot
+  - 3c2c470 2024-10-25T07:55:22+00:00 Add and set the new pvVolumeSnapshotContentList field
+  - 8a60c40 2024-10-23T17:52:17+00:00 Fix typo in error message message
+  - 23dde47 2024-09-10T12:51:24+00:00 test: fix trivy github action error
+  - 5fd0af2 2024-09-09T13:28:10+02:00 Use protobuf encoding for core K8s APIs in external-snapshotter
+
+- csi-external-snapshotter image-amd64 f52ce8b8b0799a341caf1fb864bba5d9d040a856 to 0332c00fc1e325ff69ba0d2036899729ccf143fc
+  - c6b6037 2025-01-13T12:48:28-05:00 UPSTREAM: <carry>: Downgrade golang version
+  - 6ff7745 2024-12-10T16:56:25-05:00 UPSTREAM: <carry>: ship webhook image with snapshot-controller
+  - a1074f5 2024-12-10T15:11:20+05:30 Add nil check for groupSnapshotContent in deleteCSIGroupSnapshotOperation and unit tests
+  - a992258 2024-12-09T20:59:28-05:00 Add release notes for v8.2.0
+  - 965e259 2024-12-09T20:33:36+00:00 wip: Snapshot Controller startup should not LIST all volumesnapshots
+  - 370225d 2024-12-09T19:30:08+00:00 Update the API Approved Annotation
+  - cb86a44 2024-12-09T11:18:56+00:00 Change CreationTime in VolumeGroupSnapshotContentStatus from *int64 to *metav1.Time
+  - ab1c827 2024-12-05T09:54:44+00:00 UPSTREAM: <carry>: Updating ose-csi-snapshot-controller-container image to be consistent with ART for 4.19 Reconciling with https://github.com/openshift/ocp-build-data/tree/a39508c86497b4e5e463d7b2c78e51e577be9e7d/images/ose-csi-snapshot-controller.yml
+  - 52f291b 2024-12-05T04:39:52+00:00 UPSTREAM: <carry>: Updating ose-csi-snapshot-validation-webhook-container image to be consistent with ART for 4.19 Reconciling with https://github.com/openshift/ocp-build-data/tree/a39508c86497b4e5e463d7b2c78e51e577be9e7d/images/csi-snapshot-validation-webhook.yml
+  - 34854a6 2024-12-04T08:04:10+01:00 Dont call DeleteSnapshot when VS belong to VGS
+  - fc7ed96 2024-12-03T21:30:38+00:00 UPSTREAM: <carry>: Updating ose-csi-external-snapshotter-container image to be consistent with ART for 4.19 Reconciling with https://github.com/openshift/ocp-build-data/tree/2ea3e6158c93ca104b9d59fd58a71536fa01fb2d/images/ose-csi-external-snapshotter.yml
+  - 7b6db9d 2024-12-03T13:34:41+01:00 replace deprecated Queue and RateLimiter
+  - af1f842 2024-12-03T06:46:26+01:00 replace enable-volume-group-snapshots with featuregate
+  - 2c63f95 2024-12-02T19:03:44+00:00 Improve VolumeSnapshotPairList comments
+  - 42b9deb 2024-12-02T19:03:44+00:00 Improve VolumeGroupSnapshotStatus comments
+  - 341ac4c 2024-12-02T19:03:44+00:00 Remove unused structures
+  - 58bae80 2024-12-02T19:03:44+00:00 Remove v1alpha1 API
+  - 57560c1 2024-12-02T19:03:44+00:00 Update VolumeGroupSnapshot to v1beta1
+  - 79502ab 2024-12-02T17:46:24+00:00 Bump the k8s-dependencies group across 1 directory with 2 updates
+  - c70f946 2024-12-02T16:51:25+00:00 Use ownership to identify volume group snapshot members
+  - e42baeb 2024-12-02T13:01:59+00:00 Bump the github-dependencies group across 1 directory with 14 updates
+  - 3b654a9 2024-11-26T16:34:14+01:00 ci: use go version from go.mod for trivy
+  - e81beb3 2024-11-26T08:36:44+00:00 Add the snapshot bound finalizer when deletionPolicy is set to Retain
+  - 79eba72 2024-11-25T18:13:25+01:00 remove unused labels from util
+  - 023d38d 2024-11-25T12:52:17+01:00 use annotation to storage the groupsnapshot handle
+  - 4103d3e 2024-11-25T08:43:58+00:00 Add error checking to processGroupSnapshotWithDeletionTimestamp
+  - 847f8c3 2024-11-24T22:28:59+01:00 Prevent infinite loop deleting group snapshots
+  - a12d2b5 2024-11-22T20:15:47+00:00 Do not panic when a default snapshotclass does not exist
+  - 05fdebb 2024-11-22T16:23:45+05:30 update CSI spec to have official version
+  - 9f167db 2024-11-22T12:59:21+08:00 Squashed 'release-tools/' changes from 988496a1f..e31de525b
+  - 7697342 2024-11-21T19:42:17+05:30 remove validation-webhook as it is being deprecated
+  - d190d11 2024-11-20T23:18:44+00:00 Only dynamic provisioning for an independent snapshot needs a snapshot class
+  - 7c1c530 2024-11-20T15:55:20+00:00 Set VolumeHandle for dynamic provisioned VolumeGroupSnapshots
+  - 1ea7a1a 2024-11-20T07:45:50+00:00 Remove PVCVolumeSnapshotRefList from VolumeGroupSnapshot API
+  - 5414afe 2024-11-19T12:25:42+00:00 Remove PVVolumeSnapshotContentList from the VolumeGroupSnapshotContentStatus API
+  - 85b60dd 2024-11-19T08:09:38+05:30 include feature gate in snapshotter
+  - e4730bc 2024-11-11T16:58:46+01:00 Pass context on in GroupSnapshot sync functions
+  - 65bbcad 2024-11-08T14:59:24+00:00 Add PV informer and indexer
+  - 7002ac8 2024-11-07T13:51:18+00:00 test: fix trivy action
+  - 811740c 2024-11-07T07:40:17+00:00 Set PVC Name
+  - ca171a5 2024-11-05T12:24:32-05:00 update vendor
+  - e60f5c0 2024-11-05T10:51:00-05:00 Remove volumeGroupSnapshotRef immutable validation rule
+  - 0685454 2024-11-05T09:29:58+05:30 update csi spec
+  - 86b7ce1 2024-11-04T16:46:23+00:00 Centralize VolumeGroupSnapshot members resource creation in the snapshot-controller
+  - 02bddb9 2024-11-04T11:53:49+00:00 Bump the github-dependencies group across 1 directory with 17 updates
+  - 722c022 2024-10-30T11:24:05+05:30 add paramter for list groupsnapshot
+  - 3c2c470 2024-10-25T07:55:22+00:00 Add and set the new pvVolumeSnapshotContentList field
+  - 8a60c40 2024-10-23T17:52:17+00:00 Fix typo in error message message
+  - 23dde47 2024-09-10T12:51:24+00:00 test: fix trivy github action error
+  - 5fd0af2 2024-09-09T13:28:10+02:00 Use protobuf encoding for core K8s APIs in external-snapshotter
+
+- csi-external-snapshotter image-arm64 f52ce8b8b0799a341caf1fb864bba5d9d040a856 to d7c9fea63728a4996d2b84b075d7f3def21a6340
+  - 54a62c0 2025-01-22T08:04:26+00:00 UPSTREAM: <carry>: Updating ose-csi-external-snapshotter-container image to be consistent with ART for 4.18 Reconciling with https://github.com/openshift/ocp-build-data/tree/b163b67a10ddfe91db1d3beae44531ecb997b57f/images/ose-csi-external-snapshotter.yml
+  - c6b6037 2025-01-13T12:48:28-05:00 UPSTREAM: <carry>: Downgrade golang version
+  - 6ff7745 2024-12-10T16:56:25-05:00 UPSTREAM: <carry>: ship webhook image with snapshot-controller
+  - a1074f5 2024-12-10T15:11:20+05:30 Add nil check for groupSnapshotContent in deleteCSIGroupSnapshotOperation and unit tests
+  - a992258 2024-12-09T20:59:28-05:00 Add release notes for v8.2.0
+  - 965e259 2024-12-09T20:33:36+00:00 wip: Snapshot Controller startup should not LIST all volumesnapshots
+  - 370225d 2024-12-09T19:30:08+00:00 Update the API Approved Annotation
+  - cb86a44 2024-12-09T11:18:56+00:00 Change CreationTime in VolumeGroupSnapshotContentStatus from *int64 to *metav1.Time
+  - ab1c827 2024-12-05T09:54:44+00:00 UPSTREAM: <carry>: Updating ose-csi-snapshot-controller-container image to be consistent with ART for 4.19 Reconciling with https://github.com/openshift/ocp-build-data/tree/a39508c86497b4e5e463d7b2c78e51e577be9e7d/images/ose-csi-snapshot-controller.yml
+  - 52f291b 2024-12-05T04:39:52+00:00 UPSTREAM: <carry>: Updating ose-csi-snapshot-validation-webhook-container image to be consistent with ART for 4.19 Reconciling with https://github.com/openshift/ocp-build-data/tree/a39508c86497b4e5e463d7b2c78e51e577be9e7d/images/csi-snapshot-validation-webhook.yml
+  - 34854a6 2024-12-04T08:04:10+01:00 Dont call DeleteSnapshot when VS belong to VGS
+  - fc7ed96 2024-12-03T21:30:38+00:00 UPSTREAM: <carry>: Updating ose-csi-external-snapshotter-container image to be consistent with ART for 4.19 Reconciling with https://github.com/openshift/ocp-build-data/tree/2ea3e6158c93ca104b9d59fd58a71536fa01fb2d/images/ose-csi-external-snapshotter.yml
+  - 7b6db9d 2024-12-03T13:34:41+01:00 replace deprecated Queue and RateLimiter
+  - af1f842 2024-12-03T06:46:26+01:00 replace enable-volume-group-snapshots with featuregate
+  - 2c63f95 2024-12-02T19:03:44+00:00 Improve VolumeSnapshotPairList comments
+  - 42b9deb 2024-12-02T19:03:44+00:00 Improve VolumeGroupSnapshotStatus comments
+  - 341ac4c 2024-12-02T19:03:44+00:00 Remove unused structures
+  - 58bae80 2024-12-02T19:03:44+00:00 Remove v1alpha1 API
+  - 57560c1 2024-12-02T19:03:44+00:00 Update VolumeGroupSnapshot to v1beta1
+  - 79502ab 2024-12-02T17:46:24+00:00 Bump the k8s-dependencies group across 1 directory with 2 updates
+  - c70f946 2024-12-02T16:51:25+00:00 Use ownership to identify volume group snapshot members
+  - e42baeb 2024-12-02T13:01:59+00:00 Bump the github-dependencies group across 1 directory with 14 updates
+  - 3b654a9 2024-11-26T16:34:14+01:00 ci: use go version from go.mod for trivy
+  - e81beb3 2024-11-26T08:36:44+00:00 Add the snapshot bound finalizer when deletionPolicy is set to Retain
+  - 79eba72 2024-11-25T18:13:25+01:00 remove unused labels from util
+  - 023d38d 2024-11-25T12:52:17+01:00 use annotation to storage the groupsnapshot handle
+  - 4103d3e 2024-11-25T08:43:58+00:00 Add error checking to processGroupSnapshotWithDeletionTimestamp
+  - 847f8c3 2024-11-24T22:28:59+01:00 Prevent infinite loop deleting group snapshots
+  - a12d2b5 2024-11-22T20:15:47+00:00 Do not panic when a default snapshotclass does not exist
+  - 05fdebb 2024-11-22T16:23:45+05:30 update CSI spec to have official version
+  - 9f167db 2024-11-22T12:59:21+08:00 Squashed 'release-tools/' changes from 988496a1f..e31de525b
+  - 7697342 2024-11-21T19:42:17+05:30 remove validation-webhook as it is being deprecated
+  - d190d11 2024-11-20T23:18:44+00:00 Only dynamic provisioning for an independent snapshot needs a snapshot class
+  - 7c1c530 2024-11-20T15:55:20+00:00 Set VolumeHandle for dynamic provisioned VolumeGroupSnapshots
+  - 1ea7a1a 2024-11-20T07:45:50+00:00 Remove PVCVolumeSnapshotRefList from VolumeGroupSnapshot API
+  - 5414afe 2024-11-19T12:25:42+00:00 Remove PVVolumeSnapshotContentList from the VolumeGroupSnapshotContentStatus API
+  - 85b60dd 2024-11-19T08:09:38+05:30 include feature gate in snapshotter
+  - e4730bc 2024-11-11T16:58:46+01:00 Pass context on in GroupSnapshot sync functions
+  - 65bbcad 2024-11-08T14:59:24+00:00 Add PV informer and indexer
+  - 7002ac8 2024-11-07T13:51:18+00:00 test: fix trivy action
+  - 811740c 2024-11-07T07:40:17+00:00 Set PVC Name
+  - ca171a5 2024-11-05T12:24:32-05:00 update vendor
+  - e60f5c0 2024-11-05T10:51:00-05:00 Remove volumeGroupSnapshotRef immutable validation rule
+  - 0685454 2024-11-05T09:29:58+05:30 update csi spec
+  - 86b7ce1 2024-11-04T16:46:23+00:00 Centralize VolumeGroupSnapshot members resource creation in the snapshot-controller
+  - 02bddb9 2024-11-04T11:53:49+00:00 Bump the github-dependencies group across 1 directory with 17 updates
+  - 722c022 2024-10-30T11:24:05+05:30 add paramter for list groupsnapshot
+  - 3c2c470 2024-10-25T07:55:22+00:00 Add and set the new pvVolumeSnapshotContentList field
+  - 8a60c40 2024-10-23T17:52:17+00:00 Fix typo in error message message
+  - 23dde47 2024-09-10T12:51:24+00:00 test: fix trivy github action error
+  - 5fd0af2 2024-09-09T13:28:10+02:00 Use protobuf encoding for core K8s APIs in external-snapshotter
+
+- csi-external-snapshotter image-arm64 f52ce8b8b0799a341caf1fb864bba5d9d040a856 to d7c9fea63728a4996d2b84b075d7f3def21a6340
+  - 54a62c0 2025-01-22T08:04:26+00:00 UPSTREAM: <carry>: Updating ose-csi-external-snapshotter-container image to be consistent with ART for 4.18 Reconciling with https://github.com/openshift/ocp-build-data/tree/b163b67a10ddfe91db1d3beae44531ecb997b57f/images/ose-csi-external-snapshotter.yml
+  - c6b6037 2025-01-13T12:48:28-05:00 UPSTREAM: <carry>: Downgrade golang version
+  - 6ff7745 2024-12-10T16:56:25-05:00 UPSTREAM: <carry>: ship webhook image with snapshot-controller
+  - a1074f5 2024-12-10T15:11:20+05:30 Add nil check for groupSnapshotContent in deleteCSIGroupSnapshotOperation and unit tests
+  - a992258 2024-12-09T20:59:28-05:00 Add release notes for v8.2.0
+  - 965e259 2024-12-09T20:33:36+00:00 wip: Snapshot Controller startup should not LIST all volumesnapshots
+  - 370225d 2024-12-09T19:30:08+00:00 Update the API Approved Annotation
+  - cb86a44 2024-12-09T11:18:56+00:00 Change CreationTime in VolumeGroupSnapshotContentStatus from *int64 to *metav1.Time
+  - ab1c827 2024-12-05T09:54:44+00:00 UPSTREAM: <carry>: Updating ose-csi-snapshot-controller-container image to be consistent with ART for 4.19 Reconciling with https://github.com/openshift/ocp-build-data/tree/a39508c86497b4e5e463d7b2c78e51e577be9e7d/images/ose-csi-snapshot-controller.yml
+  - 52f291b 2024-12-05T04:39:52+00:00 UPSTREAM: <carry>: Updating ose-csi-snapshot-validation-webhook-container image to be consistent with ART for 4.19 Reconciling with https://github.com/openshift/ocp-build-data/tree/a39508c86497b4e5e463d7b2c78e51e577be9e7d/images/csi-snapshot-validation-webhook.yml
+  - 34854a6 2024-12-04T08:04:10+01:00 Dont call DeleteSnapshot when VS belong to VGS
+  - fc7ed96 2024-12-03T21:30:38+00:00 UPSTREAM: <carry>: Updating ose-csi-external-snapshotter-container image to be consistent with ART for 4.19 Reconciling with https://github.com/openshift/ocp-build-data/tree/2ea3e6158c93ca104b9d59fd58a71536fa01fb2d/images/ose-csi-external-snapshotter.yml
+  - 7b6db9d 2024-12-03T13:34:41+01:00 replace deprecated Queue and RateLimiter
+  - af1f842 2024-12-03T06:46:26+01:00 replace enable-volume-group-snapshots with featuregate
+  - 2c63f95 2024-12-02T19:03:44+00:00 Improve VolumeSnapshotPairList comments
+  - 42b9deb 2024-12-02T19:03:44+00:00 Improve VolumeGroupSnapshotStatus comments
+  - 341ac4c 2024-12-02T19:03:44+00:00 Remove unused structures
+  - 58bae80 2024-12-02T19:03:44+00:00 Remove v1alpha1 API
+  - 57560c1 2024-12-02T19:03:44+00:00 Update VolumeGroupSnapshot to v1beta1
+  - 79502ab 2024-12-02T17:46:24+00:00 Bump the k8s-dependencies group across 1 directory with 2 updates
+  - c70f946 2024-12-02T16:51:25+00:00 Use ownership to identify volume group snapshot members
+  - e42baeb 2024-12-02T13:01:59+00:00 Bump the github-dependencies group across 1 directory with 14 updates
+  - 3b654a9 2024-11-26T16:34:14+01:00 ci: use go version from go.mod for trivy
+  - e81beb3 2024-11-26T08:36:44+00:00 Add the snapshot bound finalizer when deletionPolicy is set to Retain
+  - 79eba72 2024-11-25T18:13:25+01:00 remove unused labels from util
+  - 023d38d 2024-11-25T12:52:17+01:00 use annotation to storage the groupsnapshot handle
+  - 4103d3e 2024-11-25T08:43:58+00:00 Add error checking to processGroupSnapshotWithDeletionTimestamp
+  - 847f8c3 2024-11-24T22:28:59+01:00 Prevent infinite loop deleting group snapshots
+  - a12d2b5 2024-11-22T20:15:47+00:00 Do not panic when a default snapshotclass does not exist
+  - 05fdebb 2024-11-22T16:23:45+05:30 update CSI spec to have official version
+  - 9f167db 2024-11-22T12:59:21+08:00 Squashed 'release-tools/' changes from 988496a1f..e31de525b
+  - 7697342 2024-11-21T19:42:17+05:30 remove validation-webhook as it is being deprecated
+  - d190d11 2024-11-20T23:18:44+00:00 Only dynamic provisioning for an independent snapshot needs a snapshot class
+  - 7c1c530 2024-11-20T15:55:20+00:00 Set VolumeHandle for dynamic provisioned VolumeGroupSnapshots
+  - 1ea7a1a 2024-11-20T07:45:50+00:00 Remove PVCVolumeSnapshotRefList from VolumeGroupSnapshot API
+  - 5414afe 2024-11-19T12:25:42+00:00 Remove PVVolumeSnapshotContentList from the VolumeGroupSnapshotContentStatus API
+  - 85b60dd 2024-11-19T08:09:38+05:30 include feature gate in snapshotter
+  - e4730bc 2024-11-11T16:58:46+01:00 Pass context on in GroupSnapshot sync functions
+  - 65bbcad 2024-11-08T14:59:24+00:00 Add PV informer and indexer
+  - 7002ac8 2024-11-07T13:51:18+00:00 test: fix trivy action
+  - 811740c 2024-11-07T07:40:17+00:00 Set PVC Name
+  - ca171a5 2024-11-05T12:24:32-05:00 update vendor
+  - e60f5c0 2024-11-05T10:51:00-05:00 Remove volumeGroupSnapshotRef immutable validation rule
+  - 0685454 2024-11-05T09:29:58+05:30 update csi spec
+  - 86b7ce1 2024-11-04T16:46:23+00:00 Centralize VolumeGroupSnapshot members resource creation in the snapshot-controller
+  - 02bddb9 2024-11-04T11:53:49+00:00 Bump the github-dependencies group across 1 directory with 17 updates
+  - 722c022 2024-10-30T11:24:05+05:30 add paramter for list groupsnapshot
+  - 3c2c470 2024-10-25T07:55:22+00:00 Add and set the new pvVolumeSnapshotContentList field
+  - 8a60c40 2024-10-23T17:52:17+00:00 Fix typo in error message message
+  - 23dde47 2024-09-10T12:51:24+00:00 test: fix trivy github action error
+  - 5fd0af2 2024-09-09T13:28:10+02:00 Use protobuf encoding for core K8s APIs in external-snapshotter
+
+- ovn-kubernetes image-arm64 930d8645c00fd2273c4cbb6e1d3c057e0967f0a1 to 34fa86e259b122aa98b35349f5080ec842fba50c
+  - b722f854 2024-12-18T17:50:32-05:00 Test for go mod or go vendor inconsistencies
+  - 5e6160d6 2024-12-18T17:18:55+00:00 EIP e2es: for host network pods, block until fully deleted
+  - 60eaa60a 2024-12-18T16:44:22+01:00 Remove service from cache on add failure
+  - 4d3411e6 2024-12-18T16:44:22+01:00 Do not log skipped services on delete
+  - 19931e2b 2024-12-18T14:05:13+00:00 Fix ESVC parameter & EIP tests following change to ginkgo v2
+  - dcdc7203 2024-12-18T13:40:53+00:00 Make node gw Reconcile -> updateSNATRules thread safe
+  - 5709baca 2024-12-18T13:40:53+00:00 Update DefaultNodeNetworkController Reconcile to return error on failure
+  - cdac0bda 2024-12-18T13:40:53+00:00 Don't SNAT to mgmt port if pod network advertised
+  - 2f947c80 2024-12-18T13:40:53+00:00 Support reconciliation for management port
+  - 78974ad1 2024-12-18T14:36:47+01:00 Revert "Fix for unexistent package msbuild in latest ubuntu images"
+  - 1e7084ec 2024-12-18T07:16:01+00:00 Ensure only ginkgo v2 for DescribeTable support
+  - 36422b47 2024-12-17T15:08:25-08:00 helper_linux: Set mtu_request for ovs-doca ports
+  - 3a3e2f98 2024-12-17T18:46:47+00:00 Send ingress to kernel in LGW mode if pod network advertised
+  - fcb3df94 2024-12-17T18:46:47+00:00 Don't SNAT to node IP in LGW mode if pod network advertised
+  - 70356c2a 2024-12-17T11:04:28+01:00 udn, e2e, svc: external client and load balancer
+  - 94c6f244 2024-12-17T11:04:28+01:00 udn, e2e, services: Don't delete fr namespace
+  - 9bf22f99 2024-12-17T11:04:28+01:00 udn,e2e,service: Bind to ovn-udn1 interface
+  - a886c571 2024-12-17T11:04:28+01:00 ci,network-segmentation: Install metallb
+  - c7bd1eb5 2024-12-17T11:04:28+01:00 kind: Pin metallb to a dev-env fixded version
+  - a787d518 2024-12-16T17:01:36+00:00 EIP E2E: fixup e2es to run in dualstack environment
+  - 79bf0930 2024-12-16T17:01:36+00:00 EIP multi NIC: fix selection of mgmt port IP in dualstack mode
+  - 33534987 2024-12-16T17:01:31+00:00 Fixes pkt larger dispatch flows for UDNs
+  - 604072eb 2024-12-16T16:15:46+00:00 Revert "Statically set GH runner image to ubuntu 22.04 for tests"
+  - 7f7f8a47 2024-12-16T16:08:18+00:00 Fix for unexistent package msbuild in latest ubuntu images
+  - bae72883 2024-12-16T07:11:11+00:00 Statically set GH runner image to ubuntu 22.04 for tests
+  - 18c0211f 2024-12-13T11:40:54-08:00 fix flaky VM live migration e2e case
+  - ec23ccd7 2024-12-13T11:39:16-08:00 Add support for ocp-traffic-flow-tests in GitHub workflows
+  - 3f5189b6 2024-12-13T11:39:16-08:00 nit: fix kind export logs warning
+  - 1b7a6c24 2024-12-13T17:42:22+00:00 Get route advertisement information in network manager
+  - 6137284a 2024-12-13T17:19:54+00:00 Zone & node network controllers reconcile NetInfo changes
+  - 2f860b91 2024-12-13T17:19:52+00:00 Remove BasicNetInfo, add MutableNetInfo and ReconcilableNetInfo
+  - 9a6ecf21 2024-12-13T17:17:02+00:00 Update nad controller type names
+
