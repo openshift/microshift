@@ -52,15 +52,16 @@ processors:
 
 exporters:
 # EXAMPLE OTLP (Prometheus) ENDPOINT CONFIG
-# The otlp exporter requires an endpoint listening for OTLP connections. To prevent spamming the log with Go
-# stack traces, the exporter is disabled. The endpoint is not known at installation, thus a tire-kicking of the
-# microshift-observability package would result in stack traces spam in logs.
-  otlp:
-    sending_queue:
-      storage: file_storage
-    endpoint: localhost:12345 # Valid OTLP endpoint required
-    tls:
-      insecure: true
+# The otlp exporter expects an endpoint listening for OTLP connections. This is disabled by default.
+# To enable the otlp exporter, uncomment the below section from "otlp:" to "insecure: true", inclusive. Be sure to also
+# uncomment the exporters under "services.pipelines.[metrics, metrics/kubeletstats, logs]".
+#  otlp:
+#    sending_queue:
+#      storage: file_storage
+#    endpoint: localhost:12345 # Valid OTLP endpoint required
+#    tls:
+#      insecure: true
+  debug:
 
 extensions:
   file_storage:
@@ -71,16 +72,17 @@ service:
   pipelines:
     metrics/kubeletstats:
       receivers: [kubeletstats]
-      exporters: [otlp]
+      exporters: [debug]  # Optional, enabled by default. Comment out to disable.
+#      exporters: [otlp]  # Uncomment to enable OTLP
     metrics:
       receivers: [hostmetrics, hostmetrics/disk, hostmetrics/network]
       processors: [resourcedetection/system]
-      exporters: [otlp]
+      exporters: [debug]  # Optional, enabled by default. Comment out to disable.
+#      exporters: [otlp]  # Uncomment to enable OTLP
     logs:
       receivers: [journald, filelog/kube-system, filelog/workload]
-      exporters: [otlp]
-    # Export opentelemetry-collector metrics to an OTLP endpoint. This should be configured by the user to point to
-    # a local or remote OTLP backend.
+      exporters: [debug]  # Optional, enabled by default. Comment out to disable.
+#      exporters: [otlp]  # Uncomment to enable OTLP
   telemetry:
     metrics:
       readers:
