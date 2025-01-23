@@ -1,0 +1,11 @@
+- cluster-network-operator embedded-component 37be1f8c3b4296048a2bd385ffc6636fc3603f38 to d942457aad39685ac278f36834fab3ff3a2cf74f
+  - c107b0a 2024-11-25T11:54:04+00:00 ovn-k, cudn: Add missing permissions to ovnkube-node
+
+- operator-framework-olm embedded-component b31ed59e501aa4853c29126af6857d3639498b7b to d39d739496e20e02d998e783617c9a6abdf4fb02
+  - 9faf8967 2025-01-20T14:54:41+01:00 [CARRY] address lint issues in namespace labeler plugin
+  - 1efcd954 2025-01-20T14:41:00+01:00 [CARRY] fixup ns labeler plugin
+  - 2e44c570 2025-01-20T14:36:13+01:00 :bug: Switch queue informer to use types.Namespace name; relocate deletion handler (#3483)
+  - e660452e 2025-01-20T11:17:03+01:00 bump golang.org/x/net to 0.34.0 (#3485)
+  - 1f9946bc 2025-01-20T11:15:23+01:00 Upgrade github.com/joelanford/ignore from v0.1.0 to v0.1.1 (#1527)
+  - 6eb76c2b 2025-01-20T11:12:51+01:00 bump golang.org/x/net to 0.34.0 (#387)
+
