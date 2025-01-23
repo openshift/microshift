@@ -1,17 +1,17 @@
 {
   "release": {
-    "base": "4.18.0-0.nightly-2025-01-15-030107"
+    "base": "4.18.0-0.nightly-2025-01-22-051622"
   },
   "images": {
     "cli": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:5144aef5994b0ffe47dd2008bf03f61ec0282446af80f5b8fee902f0c9890fd6",
     "coredns": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:8677b12826bd9d33e8f6bb96d70bbcdaf3c5dec9e28a8b72af2c2e60620b6b19",
     "haproxy-router": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:0cc368c51c39d9826ba0267431389da3f405659ee624d1ce2d112228c60c1801",
-    "kube-rbac-proxy": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:cef15546af8dd88a07a4c9715bfc81bc2f43f2e36c80a2d95c3fb3485fb31d48",
+    "kube-rbac-proxy": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:891711f2a1d882a201e9e423b51aab2a500e9404efac0161364ed1815c870fd7",
     "ovn-kubernetes-microshift": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:0eb42e39a62950ce0c4ca98fdac70e6dd8c7a7fdb37ecc133f0234f7b6353dc6",
     "pod": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:937e6ee08ea4bd899126c8daf2a9fa8c27ea3850257baeb278ecd8cad207fc47",
     "service-ca-operator": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:a870f9818c582a6dda22d591b0121bc1331c26eafc97bf007bcaaacb9c43e743",
     "lvms_operator": "registry.redhat.io/lvms4/lvms-rhel9-operator@sha256:bd6dc4d6e90fdbcdb844759e203c9c591abc5ac29a956257a90bda101a37b76e",
-    "csi-snapshot-controller": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:31d9234ca87bcb644468c00195368de69383310dad22fdb88b4ec0a55eda627a",
-    "csi-snapshot-validation-webhook": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:45de22ed8e8644046c024ca117aba239b9fa585c1f847a4b2be83a272cba7c3d"
+    "csi-snapshot-controller": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:284960a82e996fb160064c44943297e7cf223477bed92fbc04112b9c56bf900f",
+    "csi-snapshot-validation-webhook": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:02c303312e9aae21cefd19ab627d7ab56579308e700c630152db2d72489b54aa"
   }
 }
