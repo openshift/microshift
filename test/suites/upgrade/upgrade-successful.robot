@@ -18,6 +18,8 @@ Test Tags           ostree
 ${TARGET_REF}           ${EMPTY}
 ${BOOTC_REGISTRY}       ${EMPTY}
 
+${CSI_WEBHOOK_DIFF}     ./assets/csi-webhook-deletion-diff.yaml
+
 
 *** Test Cases ***
 Upgrade
@@ -38,6 +40,13 @@ Upgrade
     ${is_bootc}=    Is System Bootc
     IF    ${is_bootc} == ${FALSE}
         Validate SELinux With Backup    ${future_backup}
+    END
+
+    # Skip CSI webhook deletion check if upgrade is to "crel" because (at the time of writing)
+    # it doesn't yet contain the deletion.
+    IF    'microshift-crel' not in '${TARGET_REF}'
+        # Verifies that CSI Webhook resources are cleaned up after migration
+        Oc Wait    -f ${CSI_WEBHOOK_DIFF}    --for=Delete --timeout=${DEFAULT_WAIT_TIMEOUT}
     END
 
 

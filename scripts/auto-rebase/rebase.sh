@@ -789,18 +789,6 @@ EOF
     yq -i 'del(.spec.template.spec.priorityClassName) | del(.spec.template.spec.containers[0].securityContext.seccompProfile)' $target
     yq -i 'with(.spec.template.spec.containers[0].securityContext; .runAsUser = 65534)' $target
 
-    local target="${REPOROOT}/assets/components/csi-snapshot-controller/webhook_deployment.yaml"
-    yq -i '.metadata.namespace = "kube-system"' $target
-    yq -i '.spec.template.spec.containers[0].image = "{{ .ReleaseImage.csi_snapshot_validation_webhook }}"' $target
-    yq -i 'with(.spec.template.spec.containers[0].args;  .[] |= sub("\${LOG_LEVEL}", "2") )' $target
-    yq -i 'del(.spec.template.spec.priorityClassName)' $target
-    yq -i 'with(.spec.template.spec.containers[0].securityContext; .runAsUser = 65534)' $target
-
-    yq -i '.metadata.namespace = "kube-system"' "${REPOROOT}/assets/components/csi-snapshot-controller/webhook_service.yaml"
-    yq -i '.metadata.namespace = "kube-system"' "${REPOROOT}/assets/components/csi-snapshot-controller/webhook_serviceaccount.yaml"
-
-    yq -i '.webhooks[0].clientConfig.service.namespace="kube-system"' "${REPOROOT}/assets/components/csi-snapshot-controller/webhook_config.yaml"
-
     yq -i '.metadata.namespace = "kube-system"' "${REPOROOT}/assets/components/csi-snapshot-controller/serviceaccount.yaml"
 
     local target="${REPOROOT}/assets/components/csi-snapshot-controller/05_operand_rbac.yaml"

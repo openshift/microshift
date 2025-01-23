@@ -408,7 +408,7 @@
           ]
         },
         "optionalCsiComponents": {
-          "description": "OptionalCSIComponents is a user defined slice of CSIComponent values. These value tell MicroShift which\nadditional, non-driver, CSI controllers to deploy on start. MicroShift will deploy snapshot controller\nand webhook when no components are specified. This preserves the current deployment behavior of existing\nclusters. Users must set `.storage.optionalCsiComponents: []` to explicitly tell MicroShift not to deploy any CSI\ncomponents. The CSI Driver is excluded as it is typically deployed via the same manifest as the accompanying\nstorage driver. Like CSIStorageDriver, uninstallation is not supported as this can lead to orphaned storage\nobjects.\nAllowed values are: unset, [], or one or more of [\"snapshot-controller\", \"snapshot-webhook\"]",
+          "description": "OptionalCSIComponents is a user defined slice of CSIComponent values. These value tell MicroShift which\nadditional, non-driver, CSI controllers to deploy on start. MicroShift will deploy snapshot controller\nand webhook when no components are specified. This preserves the current deployment behavior of existing\nclusters. Users must set `.storage.optionalCsiComponents: []` to explicitly tell MicroShift not to deploy any CSI\ncomponents. The CSI Driver is excluded as it is typically deployed via the same manifest as the accompanying\nstorage driver. Like CSIStorageDriver, uninstallation is not supported as this can lead to orphaned storage\nobjects.\nAllowed values are: unset, [], or one or more of [\"snapshot-controller\"]",
           "type": "array",
           "items": {
             "description": "OptionalCsiComponent values determine which CSI components MicroShift should deploy. Currently only csi snapshot components\nare supported.",
@@ -416,13 +416,11 @@
             "enum": [
               "none",
               "snapshot-controller",
-              "snapshot-webhook",
               ""
             ]
           },
           "example": [
-            "snapshot-controller",
-            "snapshot-webhook"
+            "snapshot-controller"
           ]
         }
       }
