@@ -153,7 +153,7 @@ function wait_all_pods_ready() {
     source /usr/share/microshift/functions/greenboot.sh
 
     local -r PODS_NS_LIST=(openshift-ovn-kubernetes openshift-service-ca openshift-ingress openshift-dns openshift-storage kube-system)
-    local -r PODS_CT_LIST=(3                        1                    1                 4             3                 2)
+    local -r PODS_CT_LIST=(3                        1                    1                 4             3                 1)
     local -r WAIT_TIMEOUT_SECS=300
 
     # Wait for MicroShift core pods to enter ready state
