@@ -29,8 +29,12 @@ version = "*"
 name = "systemd-resolved"
 version = "*"
 
+[[packages]]
+name = "sysstat"
+version = "*"
+
 [customizations.services]
-enabled = ["microshift", "microshift-test-agent"]
+enabled = ["microshift", "microshift-test-agent", "log-system-load"]
 
 [customizations.firewall]
 ports = ["22:tcp", "80:tcp", "443:tcp", "5353:udp", "6443:tcp", "30000-32767:tcp", "30000-32767:udp"]
@@ -41,3 +45,37 @@ enabled = ["mdns", "ssh", "http", "https"]
 [[customizations.firewall.zones]]
 name = "trusted"
 sources = ["10.42.0.0/16", "169.254.169.1"]
+
+[[customizations.files]]
+path = "/etc/systemd/system/log-system-load.service"
+data = """[Unit]
+Description=LOG SYSTEM LOAD
+
+[Service]
+ExecStart=/etc/log-system-load.sh
+Restart=always
+User=root
+
+[Install]
+WantedBy=multi-user.target
+"""
+
+[[customizations.files]]
+path = "/etc/log-system-load.sh"
+mode = "0755"
+data = """
+#!/usr/bin/env bash
+
+while true; do
+  echo '==============='
+  date
+  echo '--------- iostat'
+  iostat -xm
+  echo '--------- mpstat'
+  mpstat
+  echo '--------- free'
+  free
+  echo '==============='
+  sleep 10
+done
+"""

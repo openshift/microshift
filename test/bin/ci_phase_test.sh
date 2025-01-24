@@ -38,6 +38,10 @@ fi
 
 cat "${TEST_JOB_LOG}"
 
+echo ==========
+podman logs microshift-local-registry
+echo ==========
+
 echo "Test phase complete"
 if ! "${TEST_OK}"; then
     echo "Some tests failed"
