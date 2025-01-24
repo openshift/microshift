@@ -4,6 +4,12 @@ import (
 	"context"
 	"fmt"
 
+	arv1 "k8s.io/api/admissionregistration/v1"
+	appsv1 "k8s.io/api/apps/v1"
+	corev1 "k8s.io/api/core/v1"
+	rbacv1 "k8s.io/api/rbac/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/klog/v2"
 
@@ -31,6 +37,11 @@ func startCSISnapshotController(ctx context.Context, cfg *config.Config, kubecon
 		deploy = []string{"components/csi-snapshot-controller/csi_controller_deployment.yaml"}
 	)
 
+	if err := deleteCSIWebhook(ctx, kubeconfigPath); err != nil {
+		klog.Warningf("Failed to delete resources of CSI Webhook: %v", err)
+		return err
+	}
+
 	// Deploy CSI Controller Deployment
 	//nolint:nestif
 	if csiComps.Has(config.CsiComponentSnapshot) || csiComps.Len() == 0 {
@@ -51,4 +62,16 @@ func startCSISnapshotController(ctx context.Context, cfg *config.Config, kubecon
 		klog.Warningf("CSI snapshot controller is disabled")
 	}
 	return nil
+}
+
+func deleteCSIWebhook(ctx context.Context, kubeconfigPath string) error {
+	klog.Infof("Deleting resources of CSI Webhook")
+	return assets.DeleteGeneric(ctx, []runtime.Object{
+		&arv1.ValidatingWebhookConfiguration{ObjectMeta: metav1.ObjectMeta{Name: "snapshot.storage.k8s.io"}},
+		&appsv1.Deployment{ObjectMeta: metav1.ObjectMeta{Name: "csi-snapshot-webhook", Namespace: "kube-system"}},
+		&corev1.Service{ObjectMeta: metav1.ObjectMeta{Name: "csi-snapshot-webhook", Namespace: "kube-system"}},
+		&rbacv1.ClusterRole{ObjectMeta: metav1.ObjectMeta{Name: "csi-snapshot-webhook-clusterrole"}},
+		&rbacv1.ClusterRoleBinding{ObjectMeta: metav1.ObjectMeta{Name: "csi-snapshot-webhook-clusterrolebinding"}},
+		&corev1.ServiceAccount{ObjectMeta: metav1.ObjectMeta{Name: "csi-snapshot-webhook", Namespace: "kube-system"}},
+	}, kubeconfigPath)
 }
