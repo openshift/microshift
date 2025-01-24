@@ -89,6 +89,7 @@ run_sonobuoy() {
     done
     if [ ${rc} -ne 0 ] ; then
         echo "Failed to start tests after 5m"
+        ~/go/bin/sonobuoy status --json
         record_junit "run_sonobuoy" "wait_e2e_running" "FAILED"
         return ${rc}
     fi
@@ -99,6 +100,7 @@ run_sonobuoy() {
     start=$(date +%s)
     while true ; do
         ~/go/bin/sonobuoy status --json > "${stat_file}"
+        cat "${stat_file}"
         if [ "$(jq -r '.status' "${stat_file}")" != "running" ] ; then
             break
         fi
@@ -142,6 +144,7 @@ run_sonobuoy() {
         local -r results_dir=$(mktemp -d -p /tmp)
         ~/go/bin/sonobuoy retrieve "${results_dir}" -f results.tar.gz
         tar xf "${results_dir}/results.tar.gz" -C "${results_dir}"
+        cp "${results_dir}/results.tar.gz" "${SCENARIO_INFO_DIR}/${SCENARIO}/sonobuoy-results.tar.gz"
         cp "${results_dir}/plugins/e2e/results/global/"{e2e.log,junit_01.xml} "${SCENARIO_INFO_DIR}/${SCENARIO}/"
         rm -r "${results_dir}"
 
