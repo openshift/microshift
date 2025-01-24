@@ -4,8 +4,6 @@ set -exo pipefail
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 DNF_RETRY="${SCRIPTDIR}/../dnf_retry.sh"
 
-OSVERSION=$(awk -F: '{print $5}' /etc/system-release-cpe)
-
 # Necessary for embedding container images
 if [ ! -e /etc/osbuild-worker/pull-secret.json ] ; then
     sudo mkdir -p /etc/osbuild-worker
@@ -23,20 +21,35 @@ fi
      createrepo yum-utils selinux-policy-devel jq wget lorax rpm-build \
      containernetworking-plugins expect httpd-tools"
 
-if grep -qE "Red Hat Enterprise Linux.*Beta" /etc/redhat-release; then
-   VID=$(source /etc/os-release && echo "${VERSION_ID}")
-   sudo sed -i "s,dist/rhel9/${VID},beta/rhel9/9,g" /usr/share/osbuild-composer/repositories/rhel-"${VID}".json
+# Parse the OS versions and determine if EUS
+source /etc/os-release
+VERSION_ID_MAJOR="$(awk -F. '{print $1}' <<< "${VERSION_ID}")"
+VERSION_ID_MINOR="$(awk -F. '{print $2}' <<< "${VERSION_ID}")"
+VERSION_ID_EUS="dist"
+if (( "${VERSION_ID_MINOR}" % 2 == 0 )) ; then
+    VERSION_ID_EUS="eus"
 fi
 
-# Following edits composer's configuration to enable RT repository.
-# Duplicate first repository (baseos), change its name, and replace 'baseos' with 'rt'.
-# kernel-rt is only available for x86_64.
+# Edit composer configuration file for the current operating system
+COMPOSER_CONFIG="/etc/osbuild-composer/repositories/rhel-${VERSION_ID}.json"
+
+# Enable RT repository by duplicating the 'baseos' repository, changing its name,
+# and replacing 'baseos' with 'rt'.
+# Note that kernel-rt is only available for x86_64.
 "${SCRIPTDIR}/../fetch_tools.sh" yq
 sudo mkdir -p /etc/osbuild-composer/repositories/
-source /etc/os-release
-sudo "${SCRIPTDIR}/../../_output/bin/yq" \
+"${SCRIPTDIR}/../../_output/bin/yq" \
     '.["x86_64"] += (.["x86_64"][0] | .name = "kernel-rt" | .baseurl |= sub("baseos", "rt"))' \
-    "/usr/share/osbuild-composer/repositories/rhel-${VERSION_ID}.json" | jq | sudo tee "/etc/osbuild-composer/repositories/rhel-${VERSION_ID}.json" >/dev/null
+    "/usr/share/osbuild-composer/repositories/rhel-${VERSION_ID}.json" | jq | sudo tee "${COMPOSER_CONFIG}" >/dev/null
+
+# Enable beta or EUS repositories.
+# The configuration will remain unchanged for non-beta and non-EUS operating systems.
+if grep -qE "Red Hat Enterprise Linux.*Beta" /etc/redhat-release; then
+    sudo sed -i "s,dist/rhel${VERSION_ID_MAJOR}/${VERSION_ID},beta/rhel${VERSION_ID_MAJOR}/${VERSION_ID_MAJOR},g" "${COMPOSER_CONFIG}"
+else
+    sudo sed -i "s,dist/rhel${VERSION_ID_MAJOR}/${VERSION_ID}/$(uname -m)/baseos/,${VERSION_ID_EUS}/rhel${VERSION_ID_MAJOR}/${VERSION_ID}/$(uname -m)/baseos/,g" "${COMPOSER_CONFIG}"
+    sudo sed -i "s,dist/rhel${VERSION_ID_MAJOR}/${VERSION_ID}/$(uname -m)/appstream/,${VERSION_ID_EUS}/rhel${VERSION_ID_MAJOR}/${VERSION_ID}/$(uname -m)/appstream/,g" "${COMPOSER_CONFIG}"
+fi
 
 composer_active=$(sudo systemctl is-active osbuild-composer.service || true)
 sudo systemctl enable osbuild-composer.socket --now
@@ -48,7 +61,7 @@ sudo systemctl enable cockpit.socket --now
 sudo firewall-cmd --add-service=cockpit --permanent
 
 # The mock utility comes from the EPEL repository
-"${DNF_RETRY}" "install" "https://dl.fedoraproject.org/pub/epel/epel-release-latest-${OSVERSION}.noarch.rpm"
+"${DNF_RETRY}" "install" "https://dl.fedoraproject.org/pub/epel/epel-release-latest-${VERSION_ID_MAJOR}.noarch.rpm"
 "${DNF_RETRY}" "install" "mock nginx tomcli parallel aria2"
 sudo usermod -a -G mock "$(whoami)"
 
