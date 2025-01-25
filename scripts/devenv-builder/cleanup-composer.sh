@@ -128,4 +128,7 @@ if [ "${FULL_CLEAN}" = 1 ] ; then
     title "Cleaning up user cache"
     rm -rf ~/.cache 2>/dev/null || true
     sudo rm -rf /tmp/containers/* 2>/dev/null || true
+
+    title "Reverting osbuilder customizations"
+    sudo rm -rf /etc/osbuild-composer /etc/osbuild-worker
 fi
