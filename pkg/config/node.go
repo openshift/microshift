@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/openshift/microshift/pkg/util"
 	"k8s.io/klog/v2"
 )
 
@@ -49,8 +50,18 @@ func (c *Config) establishNodeName(dataDir string) (string, error) {
 		if err := os.MkdirAll(dataDir, 0700); err != nil {
 			return "", fmt.Errorf("failed to create data dir: %w", err)
 		}
-		if err := os.WriteFile(filePath, []byte(name), 0400); err != nil {
+		tmpPath, err := util.GenerateUniqueTempPath(filePath)
+		if err != nil {
+			return "", fmt.Errorf("failed to generate temp path for %s: %w", filePath, err)
+		}
+		if err := os.WriteFile(tmpPath, []byte(name), 0400); err != nil {
 			return "", fmt.Errorf("failed to write nodename file %q: %v", filePath, err)
+		}
+		if err := os.Rename(tmpPath, filePath); err != nil {
+			if err := os.RemoveAll(tmpPath); err != nil {
+				klog.Errorf("Failed to remove intermediate path %q: %v", tmpPath, err)
+			}
+			return "", fmt.Errorf("failed to rename %s to %s: %w", tmpPath, filePath, err)
 		}
 		return name, nil
 	} else if err != nil {
