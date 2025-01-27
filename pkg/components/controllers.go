@@ -386,6 +386,7 @@ func generateIngressParams(cfg *config.Config) assets.RenderParams {
 		"RouterEnableCompression":     routerEnableCompression,
 		"RouterCompressionMime":       routerCompressionMime,
 		"RouterDisableHttp2":          routerDisableHttp2,
+		"ServingCertificateSecret":    &cfg.Ingress.ServingCertificateSecret,
 	}
 
 	return extraParams
