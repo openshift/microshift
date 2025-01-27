@@ -1,14 +1,13 @@
-- cluster-network-operator embedded-component fee8c3129c028c6b72eff93a0f814678d997951e to d69278e76edaa4fcde0c9c78edd686fecad16a95
-  - e2c948c 2024-12-24T12:35:15+00:00 Prevent live migration process from flapping between step-2 and step-3
+- cluster-openshift-controller-manager-operator embedded-component 68e8bcd5c5df5072d5eefb8abd9c9ecab289adf4 to 1ae0ba75cfdb910990437ab2898690b9e3f8f94a
+  - 23cdeaa 2025-01-24T11:31:52+05:30 OCPBUGS-48832: add new team members to the OWNERS file
 
-- openshift-controller-manager embedded-component f2afd434358966ccc09f55d4915d2689ed2cb1b6 to ff69ddfb8f9c752f77e96e867f667e5b8c149935
-  - 9c9a7a5 2025-01-10T15:07:46+00:00 NO-JIRA: Add team members to the OWNERS file
+- machine-config-operator embedded-component 842b60b1ff77a2f2bcb263a4b9488651758eb7f9 to b608d409f85d9d2f5ec8837d33490fdc6b6883a6
+  - fa0b850c 2025-01-20T10:24:30+08:00 trying to wait for sub-contorllers
 
-- ovn-kubernetes image-amd64 9c4d3010d46a438f5fe3e2da14832ac0b38de7c2 to cc1522a772fbd586a192a8ceb02980a41734f7b6
-  - defd136 2025-01-06T17:34:56+00:00 interconenct: Ask ovn-northd to bind the remote ports.
-  - 70aa8bf 2024-12-18T17:01:37+08:00 Add hybird overlay pod IPs to the namespace address_set
-
-- ovn-kubernetes image-arm64 9c4d3010d46a438f5fe3e2da14832ac0b38de7c2 to cc1522a772fbd586a192a8ceb02980a41734f7b6
-  - defd136 2025-01-06T17:34:56+00:00 interconenct: Ask ovn-northd to bind the remote ports.
-  - 70aa8bf 2024-12-18T17:01:37+08:00 Add hybird overlay pod IPs to the namespace address_set
+- operator-framework-olm embedded-component f690dd8788b7334ff6d593a2d2f9db077db73d08 to ba9df23efe901d3e5e8e0d51fcf378b20a622fd3
+  - af8db221 2025-01-22T11:24:16+01:00 sort lists of identifiers and conflict messages to reduce SAT solver non-determinism (#3491)
+  - 0372b14d 2025-01-22T11:21:38+01:00 :bug: use operator cache provider for deprecation updates to limit calls to GRPC server (#3490)
+  - df32b3ef 2025-01-20T11:24:58+01:00 bump golang.org/x/net to 0.34.0 (#3485)
+  - 1076c3b6 2025-01-20T11:24:27+01:00 Upgrade github.com/joelanford/ignore from v0.1.0 to v0.1.1 (#1527)
+  - ae0feaca 2025-01-20T11:23:54+01:00 bump golang.org/x/net to 0.34.0 (#387)
 
