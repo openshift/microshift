@@ -88,6 +88,11 @@ func (t *TLSConfig) UpdateValues() {
 	case string(configv1.VersionTLS12):
 		if len(t.CipherSuites) == 0 {
 			t.CipherSuites = getIANACipherSuites(configv1.TLSProfiles[configv1.TLSProfileIntermediateType].Ciphers)
+		} else {
+			// Either of these cipher suites are required for TLS 1.2 in Golang, include one of them if user didnt.
+			if !slices.Contains(t.CipherSuites, "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256") && !slices.Contains(t.CipherSuites, "TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256") {
+				t.CipherSuites = append(t.CipherSuites, "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256")
+			}
 		}
 	case string(configv1.VersionTLS13):
 		// Golang does not allow specifying cipher suites when using tls 1.3, so we
