@@ -27,9 +27,10 @@ type IngressConfig struct {
 	// List of IP addresses and NIC names where the router will be listening. The NIC
 	// names get translated to all their configured IPs dynamically. Defaults to the
 	// configured IPs in the host at MicroShift start.
-	ListenAddress      []string `json:"listenAddress"`
-	ServingCertificate []byte   `json:"-"`
-	ServingKey         []byte   `json:"-"`
+	ListenAddress            []string `json:"listenAddress"`
+	ServingCertificate       []byte   `json:"-"`
+	ServingKey               []byte   `json:"-"`
+	ServingCertificateSecret string   `json:"certificateSecret"`
 	// logEmptyRequests specifies how connections on which no request is
 	// received should be logged.  Typically, these empty requests come from
 	// load balancers' health probes or Web browsers' speculative
