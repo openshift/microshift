@@ -1,109 +1,56 @@
-- api embedded-component 366ffb8c60da233a10af049e3869048531b7f6a1 to c21a6eb290e4c665e7c986b11657dee5d48a510e
-  - 28e2884e 2025-01-22T16:42:04+01:00 OCPBUGS-48740: Add missing CSP directives
-  - 4e504a84 2025-01-21T12:57:56-05:00 Update vSphere data disk max size doc
-  - 5c608cf8 2025-01-21T14:50:22+00:00 Update KAL to introduce statussubresource and maxlength linters
-  - c51a4598 2025-01-16T18:04:31+00:00 Monitoring Config should start life as v1alpha1
+- api embedded-component c21a6eb290e4c665e7c986b11657dee5d48a510e to a770960d61e0f5518549477e96ee4d1f5a8bc047
+  - ffe2efd1 2025-01-24T12:26:45-05:00 Update to k8s 1.32
+  - e8a4d21e 2025-01-22T18:11:00+00:00 Add example of using two required featuregates for one validation
+  - 57973618 2025-01-08T10:25:36+00:00 Handle requiredFeatureGates in partial manifests and manifest merge
+  - 0b156575 2025-01-08T10:25:35+00:00 Update controller-tools
+  - 52d7b3fe 2025-01-08T10:25:28+00:00 Add Example2 feature gate to demonstrate FG dependencies
 
-- cluster-kube-apiserver-operator embedded-component 218530fdea4e89b93bc6e136d8b5d8c3beacdd51 to fef044da6d5f71c44327ff78fb64502f264acb00
-  - 253190d 2025-01-21T16:05:25-05:00 Bump library-go for static pod controller apply fixes.
+- cluster-ingress-operator embedded-component 2856e6ddee396b3cb5492ac128c3015956651b51 to cba3e44da2e6b48bc84e80cd715d6637e2713368
+  - 1385b13 2025-01-22T09:23:46+00:00 OCPBUGS-43745: Add support for idle connection termination policy
+  - 9a6016e 2025-01-13T15:43:39+00:00 OCPBUGS-43745: vendor openshift/api#2102
+  - 79aee04 2025-01-09T17:03:37+00:00 test/http2: enhance response handlers
 
-- cluster-kube-controller-manager-operator embedded-component c8341b6b72ad221f16a5276729138adf9a347abe to 648cde093339d7de29a2a28f1d4b1e3977c12b52
-  - ae6745e 2025-01-22T10:49:55-05:00 Bump library-go for static pod controller apply fixes.
+- cluster-kube-apiserver-operator embedded-component fef044da6d5f71c44327ff78fb64502f264acb00 to bb90f17b3978b41882ecb12e28d0012e8324d69a
+  - cb8d752 2025-01-23T09:47:20+08:00 ART requests updates to 4.19 image ose-cluster-kube-apiserver-operator-container
 
-- cluster-network-operator embedded-component a967bf84a777795ff47f199c5200341809d250b1 to 0dfccc148f815b67cc472945d8d7aec68e0b6a74
-  - 976710d 2025-01-20T03:26:36+02:00 ovn-k,rbac: Enable non-admin users create & modify UDN CRs
-  - 95338aa 2025-01-15T17:29:01+02:00 ovn-k,rbac: Add UDN to cluster-reader
+- cluster-kube-scheduler-operator embedded-component b1cc4471e2f6c5dc81b2b9471f4634f1ecdb88b4 to fcefcca15b1e7812f45bfeec10ee771011551635
+  - 1230099 2025-01-22T11:15:40-05:00 Bump library-go for static pod controller apply fixes.
 
-- machine-config-operator embedded-component 0082265a118b9a01664b726fb25d40719c699409 to 11b9ad07624cf75365c7897b922a54716f1951e5
-  - f65a6ae2 2025-01-21T14:24:32-06:00 daemon: add new error for missing bootstrap MC
-  - e4ff8fc7 2025-01-21T09:24:47-06:00 operator/controller: propogate MCP degrade to CO
-  - 2f4e055a 2025-01-17T10:53:35-06:00 OCPBUGS-48566: Enable nmstate-configuration on all platforms
-  - 057219e6 2025-01-16T12:42:57-05:00 Conditionally run openshift-gcp-routes.service.yaml
-  - 5329991d 2025-01-16T12:42:57-05:00 Set /etc/NetworkManager/conf.d/dns-servers.conf for GCP
+- cluster-network-operator embedded-component 0dfccc148f815b67cc472945d8d7aec68e0b6a74 to 51a6fc7c63b778f1d6640f6dbb0ebad9f1d4c078
+  - 4e57dcd 2025-01-23T21:24:25+01:00 Keep ovn ipsec enabled during the upgrade     The following change on the machine pool `status.MachineCount == status.UpdatedMachineCount && hasSourceInMachineConfigStatus(status, machineConfigs)` is introduced with PR https://github.com/openshift/cluster-network-operator/pull/2349 which ensures IPsec machine config is always installed on all the nodes in the cluster, So this is deleting the IPsec daemonset as per the CNO state machine for IPsec when the condition is not met. But this is also accidentally disabling IPsec in OVN which is not an expected behavior. This causes ovs-monitor-ipsec to refresh existing ipsec connections unnecessarily when IPsec pod comes up as it is not able to find remote_name from the tunnel. This may also trigger deleting IPsec connection entries from openshift.conf file if ovs-monitor-ipsec is not killed timely when ipsec daemonset is removed. So this commit enables ovn ipsec option as long as the API is set with Full mode.
 
-- ovn-kubernetes image-amd64 d8e16ec751e6c754ae1418b4aeb054dcc6d08fb3 to cd2cd1bf1da301ac11aaa0b75b55966ff886d97a
-  - a6f73bbb 2025-01-14T14:54:58+00:00 OVN DNC: ignore secondary network transit switches when cleaning up a CDN "node" switches
-  - e5d2c4cc 2025-01-14T11:26:38+02:00 e2e,net-seg,udn: Wait for condition to populate
-  - 61860a9f 2025-01-10T09:46:27-08:00 can not update gateway IP if nodePort is disabled
-  - 95d30a1d 2025-01-09T18:16:39-05:00 Ensure network manager is shutdown in tests
-  - b0386ac9 2025-01-09T14:57:05-08:00 Use kubernetes-traffic-flow-tests new repo
-  - 7f7b7a90 2025-01-09T14:04:28-08:00 helm: improve helm/basic-deploy.sh for new OVN Kubernetes org
-  - 042391dc 2025-01-09T17:18:37+01:00 Migrate EgressService rules from iptables to nftables
-  - faa798bc 2025-01-09T17:18:37+01:00 Improve egress service repair unit test
-  - 0c83337f 2025-01-09T10:18:49+01:00 Fix WatchNamespaces for UDNs
-  - 064f0d23 2025-01-08T15:43:35+01:00 Fix e2e test UDN CIDRs for IPv6 only cluster
-  - b35ff473 2025-01-08T15:43:14+01:00 Add ipv6 network-segmentation test lane
-  - 465b128b 2025-01-08T11:49:32+00:00 RouteImport: change re-subscription timer to ticker
-  - 26563378 2025-01-08T11:49:32+00:00 Import learnt BGP routes into OVN
-  - 29a420fb 2025-01-07T16:34:15+01:00 go-controller: fix typo in test script
-  - 97d9b67a 2025-01-07T15:00:06+02:00 UDN,CUDN conditions: Rename NetworkReady condition NetworkCreated
-  - 054efe76 2025-01-07T09:45:15+01:00 Services controller: Handle startup failures
-  - f3f438d9 2025-01-07T09:45:15+01:00 Fix a potential nil dereference
-  - 48a7d60a 2025-01-07T09:10:08+01:00 Fix subnet check for assigned pod IPs
-  - 97d0504f 2025-01-06T11:32:38-08:00 Fix issues in DPU host initialization
-  - 4e344ecd 2025-01-06T11:08:38-08:00 Add nftables binaries to ubuntu arm image
-  - b7a05314 2025-01-06T18:26:23+02:00 test, networksegmentation: Use random names for CUDN objects
-  - 30f1e6c1 2025-01-06T18:25:57+02:00 test,networksegmentation: Wait for CUDN object be gone
-  - f401ff55 2025-01-06T14:21:56+02:00 test,networksegmentation: Wait for CUDN status populate in primary network exist test
-  - e2b9f0a2 2024-12-26T13:44:14+00:00 do not assign an ID to network still used by a controller being stopped
-  - c3ab26dc 2024-12-26T13:44:13+00:00 Inform network aware controllers of network changes
-  - 81449ddd 2024-12-26T13:44:13+00:00 Fix egress IP tests
-  - a13297ee 2024-12-26T13:44:13+00:00 Fix network controllers constructors not using the same NetInfo for their subcontrollers
-  - 7c03f3f4 2024-12-26T13:44:13+00:00 Fix deadlock when comparing mutableNetInfo with self
-  - 4c0eb713 2024-12-26T13:44:13+00:00 Fix receiver names of nad controller
-  - 3d1ec7ad 2024-12-26T13:44:13+00:00 Reconcile RouteAdvertisements from cluster manager
-  - 90136b5f 2024-12-26T13:44:13+00:00 Add FRRConfiguration to factory
-  - 6c544704 2024-12-26T13:44:13+00:00 UDN gw: use network name as VRF name for cluster UDNs
-  - 6dcb602d 2024-12-26T13:44:13+00:00 VRF manager: manage VRFs with any name
-  - adb1fc8b 2024-12-26T13:44:13+00:00 Assign network ID from network manager
-  - 6c366bb4 2024-12-20T15:27:05-08:00 Do not update EncapIP if it is configured
-  - 33f957d4 2024-12-20T12:21:06+00:00 EIP E2Es: create const for httpd image name and add image tag
-  - 1aedb9ae 2024-12-20T12:21:06+00:00 EIP/ESVC: remove code to remove legacy no reroutes for nodes
-  - 6c4e0212 2024-12-20T12:21:06+00:00 Add UDN Layer2 support for an Egress IP assigned to the primary interface
-  - 06c26bc4 2024-12-19T17:55:18+00:00 Add missing enum validation for RouteAdvertisements
-  - 1290c908 2024-12-18T20:23:44+01:00 udn host isolation: fix initialSync.
-  - 8da4dc9a 2024-12-16T13:32:21+02:00 managedTap: Use the new bridge type name
+- kubernetes embedded-component 4b2db1ec33faa3ffc305e5ffa7376908cc955370 to d6d0ba181b25cdd0db6ca436038fe39c90a58ac3
+  - 9213bbed2 2025-01-20T10:29:13-03:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - a78aa4712 2024-12-10T11:37:26+00:00 Release commit for Kubernetes v1.31.4
+  - 80964efae 2024-11-27T13:29:30+00:00 fix isLikelyNotMountPointStatx relative path issue
+  - 779a0827a 2024-11-21T14:55:35+01:00 Bump images, dependencies and versions to go 1.22.9 and distroless iptables
+  - 953a3a8aa 2024-11-19T14:02:11+00:00 Update CHANGELOG/CHANGELOG-1.31.md for v1.31.3
+  - ea299acf9 2024-11-14T20:00:41+02:00 Ensure that a node's CIDR isn't released until the node is deleted
 
-- ovn-kubernetes image-arm64 d8e16ec751e6c754ae1418b4aeb054dcc6d08fb3 to cd2cd1bf1da301ac11aaa0b75b55966ff886d97a
-  - a6f73bbb 2025-01-14T14:54:58+00:00 OVN DNC: ignore secondary network transit switches when cleaning up a CDN "node" switches
-  - e5d2c4cc 2025-01-14T11:26:38+02:00 e2e,net-seg,udn: Wait for condition to populate
-  - 61860a9f 2025-01-10T09:46:27-08:00 can not update gateway IP if nodePort is disabled
-  - 95d30a1d 2025-01-09T18:16:39-05:00 Ensure network manager is shutdown in tests
-  - b0386ac9 2025-01-09T14:57:05-08:00 Use kubernetes-traffic-flow-tests new repo
-  - 7f7b7a90 2025-01-09T14:04:28-08:00 helm: improve helm/basic-deploy.sh for new OVN Kubernetes org
-  - 042391dc 2025-01-09T17:18:37+01:00 Migrate EgressService rules from iptables to nftables
-  - faa798bc 2025-01-09T17:18:37+01:00 Improve egress service repair unit test
-  - 0c83337f 2025-01-09T10:18:49+01:00 Fix WatchNamespaces for UDNs
-  - 064f0d23 2025-01-08T15:43:35+01:00 Fix e2e test UDN CIDRs for IPv6 only cluster
-  - b35ff473 2025-01-08T15:43:14+01:00 Add ipv6 network-segmentation test lane
-  - 465b128b 2025-01-08T11:49:32+00:00 RouteImport: change re-subscription timer to ticker
-  - 26563378 2025-01-08T11:49:32+00:00 Import learnt BGP routes into OVN
-  - 29a420fb 2025-01-07T16:34:15+01:00 go-controller: fix typo in test script
-  - 97d9b67a 2025-01-07T15:00:06+02:00 UDN,CUDN conditions: Rename NetworkReady condition NetworkCreated
-  - 054efe76 2025-01-07T09:45:15+01:00 Services controller: Handle startup failures
-  - f3f438d9 2025-01-07T09:45:15+01:00 Fix a potential nil dereference
-  - 48a7d60a 2025-01-07T09:10:08+01:00 Fix subnet check for assigned pod IPs
-  - 97d0504f 2025-01-06T11:32:38-08:00 Fix issues in DPU host initialization
-  - 4e344ecd 2025-01-06T11:08:38-08:00 Add nftables binaries to ubuntu arm image
-  - b7a05314 2025-01-06T18:26:23+02:00 test, networksegmentation: Use random names for CUDN objects
-  - 30f1e6c1 2025-01-06T18:25:57+02:00 test,networksegmentation: Wait for CUDN object be gone
-  - f401ff55 2025-01-06T14:21:56+02:00 test,networksegmentation: Wait for CUDN status populate in primary network exist test
-  - e2b9f0a2 2024-12-26T13:44:14+00:00 do not assign an ID to network still used by a controller being stopped
-  - c3ab26dc 2024-12-26T13:44:13+00:00 Inform network aware controllers of network changes
-  - 81449ddd 2024-12-26T13:44:13+00:00 Fix egress IP tests
-  - a13297ee 2024-12-26T13:44:13+00:00 Fix network controllers constructors not using the same NetInfo for their subcontrollers
-  - 7c03f3f4 2024-12-26T13:44:13+00:00 Fix deadlock when comparing mutableNetInfo with self
-  - 4c0eb713 2024-12-26T13:44:13+00:00 Fix receiver names of nad controller
-  - 3d1ec7ad 2024-12-26T13:44:13+00:00 Reconcile RouteAdvertisements from cluster manager
-  - 90136b5f 2024-12-26T13:44:13+00:00 Add FRRConfiguration to factory
-  - 6c544704 2024-12-26T13:44:13+00:00 UDN gw: use network name as VRF name for cluster UDNs
-  - 6dcb602d 2024-12-26T13:44:13+00:00 VRF manager: manage VRFs with any name
-  - adb1fc8b 2024-12-26T13:44:13+00:00 Assign network ID from network manager
-  - 6c366bb4 2024-12-20T15:27:05-08:00 Do not update EncapIP if it is configured
-  - 33f957d4 2024-12-20T12:21:06+00:00 EIP E2Es: create const for httpd image name and add image tag
-  - 1aedb9ae 2024-12-20T12:21:06+00:00 EIP/ESVC: remove code to remove legacy no reroutes for nodes
-  - 6c4e0212 2024-12-20T12:21:06+00:00 Add UDN Layer2 support for an Egress IP assigned to the primary interface
-  - 06c26bc4 2024-12-19T17:55:18+00:00 Add missing enum validation for RouteAdvertisements
-  - 1290c908 2024-12-18T20:23:44+01:00 udn host isolation: fix initialSync.
-  - 8da4dc9a 2024-12-16T13:32:21+02:00 managedTap: Use the new bridge type name
+- machine-config-operator embedded-component 11b9ad07624cf75365c7897b922a54716f1951e5 to 38fb1b8bd28da78a79bb96eb3c9e978bab2752ff
+  - 9117787c 2025-01-09T08:50:55-06:00 Revert "OCPBUGS-44832: Revert MCS CA rotation"
+  - 13e7ac90 2025-01-08T11:13:20-06:00 client go bump
+  - 6a53bc91 2024-12-18T10:11:20-05:00 controller: add extension validation to controller
+
+- ovn-kubernetes image-amd64 cd2cd1bf1da301ac11aaa0b75b55966ff886d97a to fcf25ea44a89c3cd9d6a287a7e7b3f04fb1e36d7
+  - 41eaacfa 2025-01-21T10:32:09+01:00 Bump OVN to ovn24.09-24.09.1-10.el9fdp
+
+- kubernetes image-amd64 4b2db1ec33faa3ffc305e5ffa7376908cc955370 to d6d0ba181b25cdd0db6ca436038fe39c90a58ac3
+  - 9213bbed2 2025-01-20T10:29:13-03:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - a78aa4712 2024-12-10T11:37:26+00:00 Release commit for Kubernetes v1.31.4
+  - 80964efae 2024-11-27T13:29:30+00:00 fix isLikelyNotMountPointStatx relative path issue
+  - 779a0827a 2024-11-21T14:55:35+01:00 Bump images, dependencies and versions to go 1.22.9 and distroless iptables
+  - 953a3a8aa 2024-11-19T14:02:11+00:00 Update CHANGELOG/CHANGELOG-1.31.md for v1.31.3
+  - ea299acf9 2024-11-14T20:00:41+02:00 Ensure that a node's CIDR isn't released until the node is deleted
+
+- ovn-kubernetes image-arm64 cd2cd1bf1da301ac11aaa0b75b55966ff886d97a to fcf25ea44a89c3cd9d6a287a7e7b3f04fb1e36d7
+  - 41eaacfa 2025-01-21T10:32:09+01:00 Bump OVN to ovn24.09-24.09.1-10.el9fdp
+
+- kubernetes image-arm64 4b2db1ec33faa3ffc305e5ffa7376908cc955370 to d6d0ba181b25cdd0db6ca436038fe39c90a58ac3
+  - 9213bbed2 2025-01-20T10:29:13-03:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - a78aa4712 2024-12-10T11:37:26+00:00 Release commit for Kubernetes v1.31.4
+  - 80964efae 2024-11-27T13:29:30+00:00 fix isLikelyNotMountPointStatx relative path issue
+  - 779a0827a 2024-11-21T14:55:35+01:00 Bump images, dependencies and versions to go 1.22.9 and distroless iptables
+  - 953a3a8aa 2024-11-19T14:02:11+00:00 Update CHANGELOG/CHANGELOG-1.31.md for v1.31.3
+  - ea299acf9 2024-11-14T20:00:41+02:00 Ensure that a node's CIDR isn't released until the node is deleted
 
