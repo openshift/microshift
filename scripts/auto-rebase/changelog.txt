@@ -1,3 +1,0 @@
-- openshift-controller-manager embedded-component a25aab6f01ae68758978ca449a640d75c25562f4 to 6e86dee5d30921e84f557ca214022e587c824e88
-  - 5db1854 2025-01-16T07:14:31+00:00 NO-JIRA: Add team members to the OWNERS file
-
