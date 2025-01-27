@@ -42,5 +42,11 @@ scenario_remove_vms() {
 }
 
 scenario_run_tests() {
-    run_tests host1 suites/standard2/
+    if [[ "${CURRENT_RELEASE_REPO}" == "" ]] ; then
+        # TODO: While 4.19-ec is not available, it needs to exit without an error.
+        exit 0
+    fi
+    run_tests host1 \
+        --variable "IMAGE_SIGSTORE_ENABLED:True" \
+        suites/standard2/
 }
