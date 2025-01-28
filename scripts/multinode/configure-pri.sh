@@ -196,8 +196,15 @@ configure_system
 configure_microshift
 
 # Run MicroShift in the multinode mode
-# shellcheck disable=SC2024
-sudo nohup microshift run --multinode &> "$(mktemp /tmp/microshift-log.XXXXXXXXXX)" &
+sudo mkdir -p /etc/systemd/system/microshift.service.d
+cat <<EOF | sudo tee /etc/systemd/system/microshift.service.d/multinode.conf &>/dev/null
+[Service]
+# Clear previous ExecStart, otherwise systemd would try to run both.
+ExecStart=
+ExecStart=microshift run --multinode
+EOF
+sudo systemctl daemon-reload
+sudo systemctl start microshift.service
 
 # Wait for the service-ca pod to be ready
 wait_for_pod_ready "openshift-service-ca" "service-ca"
