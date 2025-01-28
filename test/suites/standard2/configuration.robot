@@ -61,6 +61,29 @@ ${TLS_13_MIN_VERSION}               SEPARATOR=\n
 
 
 *** Test Cases ***
+MicroShift Starts Using Default Config
+    [Documentation]    Default (example) config should not fail to be parsed
+    ...    and prevent MicroShift from starting.
+    # Copy existing config.yaml as a drop-in because it has subjectAltNames
+    # required by the `Restart MicroShift` keyword (sets up required kubeconfig).
+    [Setup]    Run Keywords
+    ...    Save Default MicroShift Config
+    ...    AND
+    ...    Command Should Work    mkdir -p /etc/microshift/config.d/
+    ...    AND
+    ...    Command Should Work    cp /etc/microshift/config.yaml /etc/microshift/config.d/00-ci.yaml
+    ...    AND
+    ...    Command Should Work    cp /etc/microshift/config.yaml.default /etc/microshift/config.yaml
+
+    Restart MicroShift
+
+    [Teardown]    Run Keywords
+    ...    Restore Default MicroShift Config
+    ...    AND
+    ...    Command Should Work    rm -f /etc/microshift/config.d/00-ci.yaml
+    ...    AND
+    ...    Restart MicroShift
+
 Unknown Log Level Produces Warning
     [Documentation]    Logs should warn that the log level setting is unknown
     Setup With Bad Log Level
