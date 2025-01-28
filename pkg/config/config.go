@@ -165,6 +165,7 @@ func (c *Config) fillDefaults() error {
 		LogEmptyRequests:         "Log",
 		ForwardedHeaderPolicy:    "Append",
 		HTTPEmptyRequestsPolicy:  "Respond",
+		ServingCertificateSecret: "router-certs-default",
 	}
 	c.MultiNode.Enabled = false
 	c.Kubelet = nil
@@ -344,6 +345,11 @@ func (c *Config) incorporateUserSettings(u *Config) {
 	if u.Ingress.DefaultHttpVersionPolicy > 0 {
 		c.Ingress.DefaultHttpVersionPolicy = u.Ingress.DefaultHttpVersionPolicy
 	}
+
+	if len(u.Ingress.ServingCertificateSecret) != 0 {
+		c.Ingress.ServingCertificateSecret = u.Ingress.ServingCertificateSecret
+	}
+
 }
 
 // updateComputedValues examins the existing settings and converts any
