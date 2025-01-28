@@ -2,6 +2,11 @@
 
 # Sourced from scenario.sh and uses functions defined there.
 
+# Enable container signature verification for published MicroShift images.
+# These are ec / rc / z-stream, thus guaranteed to be signed.
+# shellcheck disable=SC2034  # used elsewhere
+IMAGE_SIGSTORE_ENABLED=true
+
 scenario_create_vms() {
     if [[ "${CURRENT_RELEASE_REPO}" == "" ]] ; then
         # TODO: While 4.19-ec is not available, it needs to exit without an error.
@@ -49,5 +54,7 @@ scenario_run_tests() {
         # TODO: While 4.19-ec is not available, it needs to exit without an error.
         exit 0
     fi
-    run_tests host1 suites/standard2/
+    run_tests host1 \
+        --variable "IMAGE_SIGSTORE_ENABLED:True" \
+        suites/standard2/
 }
