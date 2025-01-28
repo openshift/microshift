@@ -48,16 +48,16 @@ ${LVMS_CSI_SNAPSHOT_DISABLED}       SEPARATOR=\n
 ...                                 storage:
 ...                                 \ \ driver: "none"
 ...                                 \ \ optionalCsiComponents: [ none ]
-${TLS_13_MIN_VERSION}               SEPARATOR=\n
-...                                 apiServer:
-...                                 \ \ tls:
-...                                 \ \ \ \ minVersion: VersionTLS13
 ${TLS_12_CUSTOM_CIPHER}             SEPARATOR=\n
 ...                                 apiServer:
 ...                                 \ \ tls:
 ...                                 \ \ \ \ cipherSuites:
-...                                 \ \ \ \ - TLS_AES_128_GCM_SHA256
+...                                 \ \ \ \ - TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256
 ...                                 \ \ \ \ minVersion: VersionTLS12
+${TLS_13_MIN_VERSION}               SEPARATOR=\n
+...                                 apiServer:
+...                                 \ \ tls:
+...                                 \ \ \ \ minVersion: VersionTLS13
 
 
 *** Test Cases ***
@@ -122,11 +122,15 @@ Custom TLS 1_2 configuration
     [Documentation]    Configure a custom cipher suite using TLS 1.2 and verify it is used
     [Setup]    Setup TLS Configuration    ${TLS_12_CUSTOM_CIPHER}
 
-    ${stdout}    ${rc}=    Openssl Connect Command    -tls1_2
+    ${stdout}    ${rc}=    Openssl Connect Command    -tls1_2 -cipher ECDHE-RSA-CHACHA20-POLY1305
+    Should Be Equal As Integers    ${rc}    0
+    Should Contain    ${stdout}    TLSv1.2, Cipher is ECDHE-RSA-CHACHA20-POLY1305
+
+    ${stdout}    ${rc}=    Openssl Connect Command    -tls1_2 -cipher ECDHE-RSA-AES128-GCM-SHA256
     Should Be Equal As Integers    ${rc}    0
     Should Contain    ${stdout}    TLSv1.2, Cipher is ECDHE-RSA-AES128-GCM-SHA256
 
-    ${stdout}    ${rc}=    Openssl Connect Command    -tls1_3
+    ${stdout}    ${rc}=    Openssl Connect Command    -tls1_3 -ciphersuites TLS_AES_128_GCM_SHA256
     Should Be Equal As Integers    ${rc}    0
     Should Contain    ${stdout}    TLSv1.3, Cipher is TLS_AES_128_GCM_SHA256
 
@@ -230,8 +234,8 @@ CSI Snapshot Controller Is Deployed
 
 Openssl Connect Command
     [Documentation]    Run openssl connect command in the remote server
-    [Arguments]    ${tls_flag_version}
+    [Arguments]    ${args}
     ${stdout}    ${rc}=    Execute Command
-    ...    openssl s_client -connect ${USHIFT_HOST}:6443 ${tls_flag_version} <<< "Q"
+    ...    openssl s_client -connect ${USHIFT_HOST}:6443 ${args} <<< "Q"
     ...    sudo=True    return_stdout=True    return_stderr=False    return_rc=True
     RETURN    ${stdout}    ${rc}
