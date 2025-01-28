@@ -48,16 +48,16 @@ ${LVMS_CSI_SNAPSHOT_DISABLED}       SEPARATOR=\n
 ...                                 storage:
 ...                                 \ \ driver: "none"
 ...                                 \ \ optionalCsiComponents: [ none ]
-${TLS_13_MIN_VERSION}               SEPARATOR=\n
-...                                 apiServer:
-...                                 \ \ tls:
-...                                 \ \ \ \ minVersion: VersionTLS13
 ${TLS_12_CUSTOM_CIPHER}             SEPARATOR=\n
 ...                                 apiServer:
 ...                                 \ \ tls:
 ...                                 \ \ \ \ cipherSuites:
-...                                 \ \ \ \ - TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+...                                 \ \ \ \ - TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256
 ...                                 \ \ \ \ minVersion: VersionTLS12
+${TLS_13_MIN_VERSION}               SEPARATOR=\n
+...                                 apiServer:
+...                                 \ \ tls:
+...                                 \ \ \ \ minVersion: VersionTLS13
 
 
 *** Test Cases ***
@@ -141,37 +141,37 @@ Deploy MicroShift Without CSI Snapshotter
     ...    Remove Storage Drop In Config
     ...    Restart MicroShift
 
-Custom TLS 1_3 configuration
-    [Documentation]    Configure API server to use TLS 1.3 and verify only that
-    ...    version works
-    [Setup]    Setup TLS Configuration    ${TLS_13_MIN_VERSION}
+Custom TLS 1_2 configuration
+    [Documentation]    Configure a custom cipher suite using TLS 1.2 and verify it is used
+    [Setup]    Setup TLS Configuration    ${TLS_12_CUSTOM_CIPHER}
 
-    ${rc}=    Execute Command
-    ...    openssl s_client -connect ${USHIFT_HOST}:6443 -tls1_3 <<< "Q"
-    ...    sudo=True    return_stdout=False    return_stderr=False    return_rc=True
+    ${stdout}    ${rc}=    Openssl Connect Command    -tls1_2 -cipher ECDHE-RSA-CHACHA20-POLY1305
     Should Be Equal As Integers    ${rc}    0
+    Should Contain    ${stdout}    TLSv1.2, Cipher is ECDHE-RSA-CHACHA20-POLY1305
 
-    ${rc}=    Execute Command
-    ...    openssl s_client -connect ${USHIFT_HOST}:6443 -tls1_2
-    ...    sudo=True    return_stdout=False    return_stderr=False    return_rc=True
-    Should Not Be Equal As Integers    ${rc}    0
+    ${stdout}    ${rc}=    Openssl Connect Command    -tls1_2 -cipher ECDHE-RSA-AES128-GCM-SHA256
+    Should Be Equal As Integers    ${rc}    0
+    Should Contain    ${stdout}    TLSv1.2, Cipher is ECDHE-RSA-AES128-GCM-SHA256
+
+    ${stdout}    ${rc}=    Openssl Connect Command    -tls1_3 -ciphersuites TLS_AES_128_GCM_SHA256
+    Should Be Equal As Integers    ${rc}    0
+    Should Contain    ${stdout}    TLSv1.3, Cipher is TLS_AES_128_GCM_SHA256
 
     [Teardown]    Run Keywords
     ...    Remove TLS Drop In Config
     ...    Restart MicroShift
 
-Custom TLS 1_2 configuration
-    [Documentation]    Configure a custom cipher suite using TLS 1.2 and verify
-    ...    it is used
-    [Setup]    Setup TLS Configuration    ${TLS_12_CUSTOM_CIPHER}
+Custom TLS 1_3 configuration
+    [Documentation]    Configure API server to use TLS 1.3 and verify only that version works
+    [Setup]    Setup TLS Configuration    ${TLS_13_MIN_VERSION}
 
-    ${rc}=    Execute Command
-    ...    openssl s_client -connect ${USHIFT_HOST}:6443 -tls1_2 <<< "Q" 2>/dev/null | grep "Cipher is ECDHE-RSA-AES128-GCM-SHA256"
-    ...    sudo=True
-    ...    return_stdout=False
-    ...    return_stderr=False
-    ...    return_rc=True
+    ${stdout}    ${rc}=    Openssl Connect Command    -tls1_2
+    Should Be Equal As Integers    ${rc}    1
+    Should Contain    ${stdout}    TLSv1.2
+
+    ${stdout}    ${rc}=    Openssl Connect Command    -tls1_3
     Should Be Equal As Integers    ${rc}    0
+    Should Contain    ${stdout}    TLSv1.3
 
     [Teardown]    Run Keywords
     ...    Remove TLS Drop In Config
@@ -254,3 +254,11 @@ LVMS Is Deployed
 CSI Snapshot Controller Is Deployed
     [Documentation]    Wait for CSI snapshot controller to be deployed
     Named Deployment Should Be Available    csi-snapshot-controller    kube-system    120s
+
+Openssl Connect Command
+    [Documentation]    Run openssl connect command in the remote server
+    [Arguments]    ${args}
+    ${stdout}    ${rc}=    Execute Command
+    ...    openssl s_client -connect ${USHIFT_HOST}:6443 ${args} <<< "Q"
+    ...    sudo=True    return_stdout=True    return_stderr=False    return_rc=True
+    RETURN    ${stdout}    ${rc}
