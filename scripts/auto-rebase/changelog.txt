@@ -1,52 +1,43 @@
-- api embedded-component c21a6eb290e4c665e7c986b11657dee5d48a510e to a770960d61e0f5518549477e96ee4d1f5a8bc047
-  - ffe2efd1 2025-01-24T12:26:45-05:00 Update to k8s 1.32
-  - e8a4d21e 2025-01-22T18:11:00Z Add example of using two required featuregates for one validation
-  - 57973618 2025-01-08T10:25:36Z Handle requiredFeatureGates in partial manifests and manifest merge
-  - 0b156575 2025-01-08T10:25:35Z Update controller-tools
-  - 52d7b3fe 2025-01-08T10:25:28Z Add Example2 feature gate to demonstrate FG dependencies
+- api embedded-component a770960d61e0f5518549477e96ee4d1f5a8bc047 to d2791f98ff089e54629c68546c0b04d6f359a156
+  - 0deac16b 2025-01-27T10:26:47+00:00 Add separate Make target for feature promotion
+  - bf5951f8 2025-01-24T14:48:44-06:00 change OCL CRD deployment to v1
+  - 601c52cd 2025-01-15T17:10:41+05:30 update tests
+  - 93a9a838 2025-01-15T17:10:31+05:30 Update dns1123Subdomain validation message for machineNamePrefix
 
-- cluster-ingress-operator embedded-component 2856e6ddee396b3cb5492ac128c3015956651b51 to cba3e44da2e6b48bc84e80cd715d6637e2713368
-  - 1385b13 2025-01-22T09:23:46Z OCPBUGS-43745: Add support for idle connection termination policy
-  - 9a6016e 2025-01-13T15:43:39Z OCPBUGS-43745: vendor openshift/api#2102
-  - 79aee04 2025-01-09T17:03:37Z test/http2: enhance response handlers
+- cluster-ingress-operator embedded-component cba3e44da2e6b48bc84e80cd715d6637e2713368 to 3ad38c6e688f78cacb66665246c154e5ac439499
+  - 88c2ddc 2025-01-24T18:26:03+01:00 OCPBUGS-43745: Skip Test_IdleConnectionTerminationPolicyDeferred when DCM feature gate is enabled
+  - f6f1dbe 2025-01-23T18:19:33+08:00 Add Makefile target to run k8s Gateway API conformance test
 
-- cluster-kube-apiserver-operator embedded-component fef044da6d5f71c44327ff78fb64502f264acb00 to bb90f17b3978b41882ecb12e28d0012e8324d69a
-  - cb8d752 2025-01-23T09:47:20+08:00 ART requests updates to 4.19 image ose-cluster-kube-apiserver-operator-container
+- cluster-kube-apiserver-operator embedded-component bb90f17b3978b41882ecb12e28d0012e8324d69a to 1c44cc51cbbd5e565c3ecf13b277f3a0fbfe20a4
+  - ea0ac00 2025-01-27T08:41:19-03:00 bump(k8s): go mod vendor
+  - ab607c7 2025-01-27T08:41:03-03:00 bump(k8s): update k8s.io/* dependencies to v1.32.1
 
-- cluster-kube-scheduler-operator embedded-component b1cc4471e2f6c5dc81b2b9471f4634f1ecdb88b4 to fcefcca15b1e7812f45bfeec10ee771011551635
-  - 1230099 2025-01-22T11:15:40-05:00 Bump library-go for static pod controller apply fixes.
+- cluster-kube-controller-manager-operator embedded-component 648cde093339d7de29a2a28f1d4b1e3977c12b52 to b10f56219139602b782b8a3016926facf9c38ff4
+  - 7ea780b 2025-01-27T08:51:39-03:00 bump(k8s): go mod vendor
+  - f6258b0 2025-01-27T08:51:24-03:00 bump(k8s): update k8s.io/* dependencies to v1.32.1
 
-- cluster-network-operator embedded-component 0dfccc148f815b67cc472945d8d7aec68e0b6a74 to 51a6fc7c63b778f1d6640f6dbb0ebad9f1d4c078
-  - 4e57dcd 2025-01-23T21:24:25+01:00 Keep ovn ipsec enabled during the upgrade     The following change on the machine pool `status.MachineCount == status.UpdatedMachineCount && hasSourceInMachineConfigStatus(status, machineConfigs)` is introduced with PR https://github.com/openshift/cluster-network-operator/pull/2349 which ensures IPsec machine config is always installed on all the nodes in the cluster, So this is deleting the IPsec daemonset as per the CNO state machine for IPsec when the condition is not met. But this is also accidentally disabling IPsec in OVN which is not an expected behavior. This causes ovs-monitor-ipsec to refresh existing ipsec connections unnecessarily when IPsec pod comes up as it is not able to find remote_name from the tunnel. This may also trigger deleting IPsec connection entries from openshift.conf file if ovs-monitor-ipsec is not killed timely when ipsec daemonset is removed. So this commit enables ovn ipsec option as long as the API is set with Full mode.
+- cluster-kube-scheduler-operator embedded-component fcefcca15b1e7812f45bfeec10ee771011551635 to ad48eca03e8025ac5dc19c7f6f82d461f01dec06
+  - 4b3f7a3 2025-01-27T08:47:00-03:00 bump(k8s): go mod vendor
+  - 5bb9b1a 2025-01-27T08:46:47-03:00 bump(k8s): update k8s.io/* dependencies to v1.32.1
 
-- kubernetes embedded-component 4b2db1ec33faa3ffc305e5ffa7376908cc955370 to d6d0ba181b25cdd0db6ca436038fe39c90a58ac3
-  - 9213bbed2 2025-01-20T10:29:13-03:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
-  - a78aa4712 2024-12-10T11:37:26Z Release commit for Kubernetes v1.31.4
-  - 80964efae 2024-11-27T13:29:30Z fix isLikelyNotMountPointStatx relative path issue
-  - 779a0827a 2024-11-21T14:55:35+01:00 Bump images, dependencies and versions to go 1.22.9 and distroless iptables
-  - 953a3a8aa 2024-11-19T14:02:11Z Update CHANGELOG/CHANGELOG-1.31.md for v1.31.3
-  - ea299acf9 2024-11-14T20:00:41+02:00 Ensure that a node's CIDR isn't released until the node is deleted
+- cluster-network-operator embedded-component 51a6fc7c63b778f1d6640f6dbb0ebad9f1d4c078 to fd44ba0fd77806080d71917ffa0869c148cd18d2
+  - 1b50df8 2025-01-21T15:13:54+01:00 (C)UDN CRD: add IPAM section and IPAM.Mode field.
 
-- machine-config-operator embedded-component 11b9ad07624cf75365c7897b922a54716f1951e5 to 38fb1b8bd28da78a79bb96eb3c9e978bab2752ff
-  - 9117787c 2025-01-09T08:50:55-06:00 Revert "OCPBUGS-44832: Revert MCS CA rotation"
-  - 13e7ac90 2025-01-08T11:13:20-06:00 client go bump
-  - 6a53bc91 2024-12-18T10:11:20-05:00 controller: add extension validation to controller
+- machine-config-operator embedded-component 38fb1b8bd28da78a79bb96eb3c9e978bab2752ff to b2e4422c9880a7f71ca5e27e86a0b68bf6ec73be
+  - 1de506c9 2025-01-24T14:54:30-06:00 update e2e tests for OCL v1 API
+  - 6c476d9d 2025-01-24T14:54:30-06:00 add units for global pull secret clone mechanism
+  - 81339f70 2025-01-24T14:54:30-06:00 add global pull secret clone mechanism
+  - 056db85e 2025-01-24T14:54:30-06:00 update unit tests for OCL v1 API
+  - 26505706 2025-01-24T14:54:30-06:00 daemon: remove OCL secrets mounting mechanism
+  - f5687b2d 2025-01-24T14:54:30-06:00 reconcile OCL API from v1alpha1 -> v1
+  - fdd24a6d 2025-01-24T14:54:30-06:00 vendor: pick up client-go updates
+  - dcbddc59 2025-01-23T16:09:23+01:00 MGMT-19337: enable injection of custom kubelet labels via env var for master and worker nodes in base template
+  - 010efe33 2025-01-21T06:28:27-05:00 OCPBUGS-46072: create /run/nodeip-configuration before use
 
-- ovn-kubernetes image-amd64 cd2cd1bf1da301ac11aaa0b75b55966ff886d97a to fcf25ea44a89c3cd9d6a287a7e7b3f04fb1e36d7
-  - 41eaacfa 2025-01-21T10:32:09+01:00 Bump OVN to ovn24.09-24.09.1-10.el9fdp
-
-- kubernetes image-amd64 4b2db1ec33faa3ffc305e5ffa7376908cc955370 to d6d0ba181b25cdd0db6ca436038fe39c90a58ac3
-  - 9213bbed2 2025-01-20T10:29:13-03:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
-  - a78aa4712 2024-12-10T11:37:26Z Release commit for Kubernetes v1.31.4
-  - 80964efae 2024-11-27T13:29:30Z fix isLikelyNotMountPointStatx relative path issue
-  - 779a0827a 2024-11-21T14:55:35+01:00 Bump images, dependencies and versions to go 1.22.9 and distroless iptables
-  - 953a3a8aa 2024-11-19T14:02:11Z Update CHANGELOG/CHANGELOG-1.31.md for v1.31.3
-  - ea299acf9 2024-11-14T20:00:41+02:00 Ensure that a node's CIDR isn't released until the node is deleted
-
-- oc image-arm64 e005223acd7c478bac070134c16f5533a258be12 to 56e146c6e21829512c5f118d026030002aaf63d1
+- oc image-amd64 e005223acd7c478bac070134c16f5533a258be12 to 56e146c6e21829512c5f118d026030002aaf63d1
   - 7de55e3f 2025-01-13T23:13:56-06:00 admin/upgrade/status/examples/README: Document *-alerts.json
 
-- ovn-kubernetes image-arm64 cd2cd1bf1da301ac11aaa0b75b55966ff886d97a to 44f5d08bf2201bdbff7acb7e6a57bbdd7f2d0f19
+- ovn-kubernetes image-amd64 fcf25ea44a89c3cd9d6a287a7e7b3f04fb1e36d7 to 44f5d08bf2201bdbff7acb7e6a57bbdd7f2d0f19
   - d108b05b 2025-01-24T22:02:12+01:00 Revert "hard code disable-udn-host-isolation to "true""
   - e82f43db 2025-01-24T18:23:09+01:00 Cleanup networkpolicy when a namespace was already removed
   - 988cb71e 2025-01-24T18:23:05+01:00 Get active network from annotations on pod deletion
@@ -63,7 +54,7 @@
   - ab83afb4 2025-01-23T17:26:11+01:00 UDN isolation: trigger update on open-default-ports annotation change.
   - bbc56776 2025-01-23T09:54:25+01:00 Fix race between NAD and NetPol deletions
   - f21f8fb5 2025-01-22T15:22:52-05:00 Fixes SNAT removal with egress IP
-  - f0723b30 2025-01-22T18:55:05Z Set network ID on netInfo even when already annotated
+  - f0723b30 2025-01-22T18:55:05+00:00 Set network ID on netInfo even when already annotated
   - e65cc4e7 2025-01-22T12:35:24-05:00 Unit tests: set klog level explicitly
   - c5b834d4 2025-01-22T16:59:15+01:00 EIP node: skip OVN managed interfaces that don't serve as secondary
   - 0306d4ce 2025-01-22T15:00:46+01:00 Do not rely on the active network while removing the EndpointSlice
@@ -71,7 +62,6 @@
   - 0a06cfe1 2025-01-21T15:29:33+01:00 docs: update (C)UDN CRD reference.
   - 46c34a2c 2025-01-21T15:28:43+01:00 e2e, pudn: Use port to check overlapping isolation
   - 561af6ef 2025-01-21T14:09:28+01:00 Use annotations in mirrored EndpointSlices for potentially long values
-  - 41eaacfa 2025-01-21T10:32:09+01:00 Bump OVN to ovn24.09-24.09.1-10.el9fdp
   - 089009ce 2025-01-20T14:24:22-05:00 Skip session affinity conformance test
   - 344d4dca 2025-01-20T20:03:46+01:00 Remove per-pod-SNAT for UDNs
   - 9743feba 2025-01-20T19:01:15+01:00 Refactor and fix UDN/CUDN readiness checks
@@ -79,7 +69,7 @@
   - 0058b326 2025-01-20T14:48:27+01:00 e2e/external_gateways: Update test to avoid accidental matching of conntrack entries.
   - e8a0e68b 2025-01-18T15:01:47-05:00 Fix missing error wrap on IC remote node add
   - 87de9f82 2025-01-18T14:39:48-05:00 Suppress layer 2 missing pod anno errors
-  - 4be55de6 2025-01-18T09:49:21Z EIP: reduce log spam from errors that arent really errors due to race for data
+  - 4be55de6 2025-01-18T09:49:21+00:00 EIP: reduce log spam from errors that arent really errors due to race for data
   - a3c44c24 2025-01-17T13:00:18-08:00 Add missing host-cidrs annotation for DPU Host
   - 8bbeac79 2025-01-17T14:38:44+01:00 Fix pods cleanup in ClusterUserDefinedNetwork test
   - f31b70f1 2025-01-16T13:36:21+02:00 e2e,udn crd: Use the right IP family according to env
@@ -97,14 +87,6 @@
   - 7bb83ce1 2025-01-13T16:23:06-05:00 Disable adding/removing the UDN namespace label
   - d31b0475 2025-01-13T16:23:06-05:00 Require namespace label for primary UDN
   - 6c5f5d99 2025-01-12T14:19:19-08:00 Update OVS bridge flows for supporting gateway VLANs
-  - d940cab5 2025-01-12T06:11:51Z UDN EIP IP: change scope from link to global
+  - d940cab5 2025-01-12T06:11:51+00:00 UDN EIP IP: change scope from link to global
   - 901989c9 2024-12-19T11:40:39+01:00 (C)UDN CRD: update CEL validations.
-
-- kubernetes image-arm64 4b2db1ec33faa3ffc305e5ffa7376908cc955370 to d6d0ba181b25cdd0db6ca436038fe39c90a58ac3
-  - 9213bbed2 2025-01-20T10:29:13-03:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
-  - a78aa4712 2024-12-10T11:37:26Z Release commit for Kubernetes v1.31.4
-  - 80964efae 2024-11-27T13:29:30Z fix isLikelyNotMountPointStatx relative path issue
-  - 779a0827a 2024-11-21T14:55:35+01:00 Bump images, dependencies and versions to go 1.22.9 and distroless iptables
-  - 953a3a8aa 2024-11-19T14:02:11Z Update CHANGELOG/CHANGELOG-1.31.md for v1.31.3
-  - ea299acf9 2024-11-14T20:00:41+02:00 Ensure that a node's CIDR isn't released until the node is deleted
 
