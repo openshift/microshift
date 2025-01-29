@@ -66,6 +66,7 @@ MicroShift Starts Using Default Config
     ...    and prevent MicroShift from starting.
     # Copy existing config.yaml as a drop-in because it has subjectAltNames
     # required by the `Restart MicroShift` keyword (sets up required kubeconfig).
+    [Tags]    defaultcfg
     [Setup]    Run Keywords
     ...    Save Default MicroShift Config
     ...    AND
