@@ -126,6 +126,8 @@ github.com/davecgh/go-spew/spew
 # github.com/distribution/reference v0.5.0
 ## explicit; go 1.20
 github.com/distribution/reference
+# github.com/docker/docker v27.4.1+incompatible
+## explicit
 # github.com/docker/go-units v0.5.0
 ## explicit
 github.com/docker/go-units
@@ -206,9 +208,6 @@ github.com/golang/protobuf/ptypes/any
 github.com/golang/protobuf/ptypes/duration
 github.com/golang/protobuf/ptypes/timestamp
 github.com/golang/protobuf/ptypes/wrappers
-# github.com/golang/snappy v0.0.4
-## explicit
-github.com/golang/snappy
 # github.com/google/btree v1.0.1
 ## explicit; go 1.12
 github.com/google/btree
@@ -314,10 +313,6 @@ github.com/google/uuid
 # github.com/gorilla/websocket v1.5.0
 ## explicit; go 1.12
 github.com/gorilla/websocket
-# github.com/grafana/regexp v0.0.0-20240518133315-a468a5bfb3bc
-## explicit; go 1.21
-github.com/grafana/regexp
-github.com/grafana/regexp/syntax
 # github.com/gregjones/httpcache v0.0.0-20180305231024-9cad4c3443a7
 ## explicit
 github.com/gregjones/httpcache
@@ -385,6 +380,8 @@ github.com/mistifyio/go-zfs
 # github.com/mitchellh/go-wordwrap v1.0.1
 ## explicit; go 1.14
 github.com/mitchellh/go-wordwrap
+# github.com/moby/docker-image-spec v1.3.1
+## explicit; go 1.18
 # github.com/moby/spdystream v0.4.0
 ## explicit; go 1.13
 github.com/moby/spdystream
@@ -808,12 +805,6 @@ github.com/prometheus/common/model
 github.com/prometheus/procfs
 github.com/prometheus/procfs/internal/fs
 github.com/prometheus/procfs/internal/util
-# github.com/prometheus/prometheus v0.301.0
-## explicit; go 1.22.7
-github.com/prometheus/prometheus/model/exemplar
-github.com/prometheus/prometheus/model/histogram
-github.com/prometheus/prometheus/model/labels
-github.com/prometheus/prometheus/prompb
 # github.com/robfig/cron v1.2.0
 ## explicit
 github.com/robfig/cron
@@ -1240,7 +1231,7 @@ gopkg.in/yaml.v2
 # gopkg.in/yaml.v3 v3.0.1
 ## explicit
 gopkg.in/yaml.v3
-# k8s.io/api v0.31.3 => github.com/openshift/kubernetes/staging/src/k8s.io/api v0.0.0-20250124032227-d6d0ba181b25
+# k8s.io/api v0.31.1 => github.com/openshift/kubernetes/staging/src/k8s.io/api v0.0.0-20250124032227-d6d0ba181b25
 ## explicit; go 1.22.0
 k8s.io/api/admission/v1
 k8s.io/api/admission/v1beta1
@@ -1347,7 +1338,7 @@ k8s.io/apiextensions-apiserver/pkg/generated/openapi
 k8s.io/apiextensions-apiserver/pkg/registry/customresource
 k8s.io/apiextensions-apiserver/pkg/registry/customresource/tableconvertor
 k8s.io/apiextensions-apiserver/pkg/registry/customresourcedefinition
-# k8s.io/apimachinery v0.31.3 => github.com/openshift/kubernetes/staging/src/k8s.io/apimachinery v0.0.0-20250124032227-d6d0ba181b25
+# k8s.io/apimachinery v0.31.1 => github.com/openshift/kubernetes/staging/src/k8s.io/apimachinery v0.0.0-20250124032227-d6d0ba181b25
 ## explicit; go 1.22.0
 k8s.io/apimachinery/pkg/api/equality
 k8s.io/apimachinery/pkg/api/errors
@@ -1599,7 +1590,7 @@ k8s.io/cli-runtime/pkg/genericclioptions
 k8s.io/cli-runtime/pkg/genericiooptions
 k8s.io/cli-runtime/pkg/printers
 k8s.io/cli-runtime/pkg/resource
-# k8s.io/client-go v0.31.3 => github.com/openshift/kubernetes/staging/src/k8s.io/client-go v0.0.0-20250124032227-d6d0ba181b25
+# k8s.io/client-go v0.31.1 => github.com/openshift/kubernetes/staging/src/k8s.io/client-go v0.0.0-20250124032227-d6d0ba181b25
 ## explicit; go 1.22.0
 k8s.io/client-go/applyconfigurations
 k8s.io/client-go/applyconfigurations/admissionregistration/v1
