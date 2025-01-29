@@ -1,86 +1,112 @@
-- ovn-kubernetes image-amd64 34fa86e259b122aa98b35349f5080ec842fba50c to f0ab7904387fc2588c5110f1ff9d7187d5ce3e11
-  - a6f73bbb 2025-01-14T14:54:58+00:00 OVN DNC: ignore secondary network transit switches when cleaning up a CDN "node" switches
-  - e5d2c4cc 2025-01-14T11:26:38+02:00 e2e,net-seg,udn: Wait for condition to populate
-  - 61860a9f 2025-01-10T09:46:27-08:00 can not update gateway IP if nodePort is disabled
-  - 95d30a1d 2025-01-09T18:16:39-05:00 Ensure network manager is shutdown in tests
-  - b0386ac9 2025-01-09T14:57:05-08:00 Use kubernetes-traffic-flow-tests new repo
-  - 7f7b7a90 2025-01-09T14:04:28-08:00 helm: improve helm/basic-deploy.sh for new OVN Kubernetes org
-  - 042391dc 2025-01-09T17:18:37+01:00 Migrate EgressService rules from iptables to nftables
-  - faa798bc 2025-01-09T17:18:37+01:00 Improve egress service repair unit test
-  - 0c83337f 2025-01-09T10:18:49+01:00 Fix WatchNamespaces for UDNs
-  - 064f0d23 2025-01-08T15:43:35+01:00 Fix e2e test UDN CIDRs for IPv6 only cluster
-  - b35ff473 2025-01-08T15:43:14+01:00 Add ipv6 network-segmentation test lane
-  - 465b128b 2025-01-08T11:49:32+00:00 RouteImport: change re-subscription timer to ticker
-  - 26563378 2025-01-08T11:49:32+00:00 Import learnt BGP routes into OVN
-  - 29a420fb 2025-01-07T16:34:15+01:00 go-controller: fix typo in test script
-  - 97d9b67a 2025-01-07T15:00:06+02:00 UDN,CUDN conditions: Rename NetworkReady condition NetworkCreated
-  - 054efe76 2025-01-07T09:45:15+01:00 Services controller: Handle startup failures
-  - f3f438d9 2025-01-07T09:45:15+01:00 Fix a potential nil dereference
-  - 48a7d60a 2025-01-07T09:10:08+01:00 Fix subnet check for assigned pod IPs
-  - 97d0504f 2025-01-06T11:32:38-08:00 Fix issues in DPU host initialization
-  - 4e344ecd 2025-01-06T11:08:38-08:00 Add nftables binaries to ubuntu arm image
-  - b7a05314 2025-01-06T18:26:23+02:00 test, networksegmentation: Use random names for CUDN objects
-  - 30f1e6c1 2025-01-06T18:25:57+02:00 test,networksegmentation: Wait for CUDN object be gone
-  - f401ff55 2025-01-06T14:21:56+02:00 test,networksegmentation: Wait for CUDN status populate in primary network exist test
-  - e2b9f0a2 2024-12-26T13:44:14+00:00 do not assign an ID to network still used by a controller being stopped
-  - c3ab26dc 2024-12-26T13:44:13+00:00 Inform network aware controllers of network changes
-  - 81449ddd 2024-12-26T13:44:13+00:00 Fix egress IP tests
-  - a13297ee 2024-12-26T13:44:13+00:00 Fix network controllers constructors not using the same NetInfo for their subcontrollers
-  - 7c03f3f4 2024-12-26T13:44:13+00:00 Fix deadlock when comparing mutableNetInfo with self
-  - 4c0eb713 2024-12-26T13:44:13+00:00 Fix receiver names of nad controller
-  - 3d1ec7ad 2024-12-26T13:44:13+00:00 Reconcile RouteAdvertisements from cluster manager
-  - 90136b5f 2024-12-26T13:44:13+00:00 Add FRRConfiguration to factory
-  - 6c544704 2024-12-26T13:44:13+00:00 UDN gw: use network name as VRF name for cluster UDNs
-  - 6dcb602d 2024-12-26T13:44:13+00:00 VRF manager: manage VRFs with any name
-  - adb1fc8b 2024-12-26T13:44:13+00:00 Assign network ID from network manager
-  - 6c366bb4 2024-12-20T15:27:05-08:00 Do not update EncapIP if it is configured
-  - 33f957d4 2024-12-20T12:21:06+00:00 EIP E2Es: create const for httpd image name and add image tag
-  - 1aedb9ae 2024-12-20T12:21:06+00:00 EIP/ESVC: remove code to remove legacy no reroutes for nodes
-  - 6c4e0212 2024-12-20T12:21:06+00:00 Add UDN Layer2 support for an Egress IP assigned to the primary interface
-  - 06c26bc4 2024-12-19T17:55:18+00:00 Add missing enum validation for RouteAdvertisements
-  - 1290c908 2024-12-18T20:23:44+01:00 udn host isolation: fix initialSync.
-  - 8da4dc9a 2024-12-16T13:32:21+02:00 managedTap: Use the new bridge type name
+- cluster-network-operator embedded-component 3dcc293ae93174f099054b75a4d0cde5ca039f9b to 8d768a83424e930352ca565094c24208dadb4725
+  - 8a2e192 2025-01-27T22:43:49+00:00 (C)UDN CRD: add IPAM section and IPAM.Mode field.
 
-- ovn-kubernetes image-arm64 34fa86e259b122aa98b35349f5080ec842fba50c to f0ab7904387fc2588c5110f1ff9d7187d5ce3e11
-  - a6f73bbb 2025-01-14T14:54:58+00:00 OVN DNC: ignore secondary network transit switches when cleaning up a CDN "node" switches
-  - e5d2c4cc 2025-01-14T11:26:38+02:00 e2e,net-seg,udn: Wait for condition to populate
-  - 61860a9f 2025-01-10T09:46:27-08:00 can not update gateway IP if nodePort is disabled
-  - 95d30a1d 2025-01-09T18:16:39-05:00 Ensure network manager is shutdown in tests
-  - b0386ac9 2025-01-09T14:57:05-08:00 Use kubernetes-traffic-flow-tests new repo
-  - 7f7b7a90 2025-01-09T14:04:28-08:00 helm: improve helm/basic-deploy.sh for new OVN Kubernetes org
-  - 042391dc 2025-01-09T17:18:37+01:00 Migrate EgressService rules from iptables to nftables
-  - faa798bc 2025-01-09T17:18:37+01:00 Improve egress service repair unit test
-  - 0c83337f 2025-01-09T10:18:49+01:00 Fix WatchNamespaces for UDNs
-  - 064f0d23 2025-01-08T15:43:35+01:00 Fix e2e test UDN CIDRs for IPv6 only cluster
-  - b35ff473 2025-01-08T15:43:14+01:00 Add ipv6 network-segmentation test lane
-  - 465b128b 2025-01-08T11:49:32+00:00 RouteImport: change re-subscription timer to ticker
-  - 26563378 2025-01-08T11:49:32+00:00 Import learnt BGP routes into OVN
-  - 29a420fb 2025-01-07T16:34:15+01:00 go-controller: fix typo in test script
-  - 97d9b67a 2025-01-07T15:00:06+02:00 UDN,CUDN conditions: Rename NetworkReady condition NetworkCreated
-  - 054efe76 2025-01-07T09:45:15+01:00 Services controller: Handle startup failures
-  - f3f438d9 2025-01-07T09:45:15+01:00 Fix a potential nil dereference
-  - 48a7d60a 2025-01-07T09:10:08+01:00 Fix subnet check for assigned pod IPs
-  - 97d0504f 2025-01-06T11:32:38-08:00 Fix issues in DPU host initialization
-  - 4e344ecd 2025-01-06T11:08:38-08:00 Add nftables binaries to ubuntu arm image
-  - b7a05314 2025-01-06T18:26:23+02:00 test, networksegmentation: Use random names for CUDN objects
-  - 30f1e6c1 2025-01-06T18:25:57+02:00 test,networksegmentation: Wait for CUDN object be gone
-  - f401ff55 2025-01-06T14:21:56+02:00 test,networksegmentation: Wait for CUDN status populate in primary network exist test
-  - e2b9f0a2 2024-12-26T13:44:14+00:00 do not assign an ID to network still used by a controller being stopped
-  - c3ab26dc 2024-12-26T13:44:13+00:00 Inform network aware controllers of network changes
-  - 81449ddd 2024-12-26T13:44:13+00:00 Fix egress IP tests
-  - a13297ee 2024-12-26T13:44:13+00:00 Fix network controllers constructors not using the same NetInfo for their subcontrollers
-  - 7c03f3f4 2024-12-26T13:44:13+00:00 Fix deadlock when comparing mutableNetInfo with self
-  - 4c0eb713 2024-12-26T13:44:13+00:00 Fix receiver names of nad controller
-  - 3d1ec7ad 2024-12-26T13:44:13+00:00 Reconcile RouteAdvertisements from cluster manager
-  - 90136b5f 2024-12-26T13:44:13+00:00 Add FRRConfiguration to factory
-  - 6c544704 2024-12-26T13:44:13+00:00 UDN gw: use network name as VRF name for cluster UDNs
-  - 6dcb602d 2024-12-26T13:44:13+00:00 VRF manager: manage VRFs with any name
-  - adb1fc8b 2024-12-26T13:44:13+00:00 Assign network ID from network manager
-  - 6c366bb4 2024-12-20T15:27:05-08:00 Do not update EncapIP if it is configured
-  - 33f957d4 2024-12-20T12:21:06+00:00 EIP E2Es: create const for httpd image name and add image tag
-  - 1aedb9ae 2024-12-20T12:21:06+00:00 EIP/ESVC: remove code to remove legacy no reroutes for nodes
-  - 6c4e0212 2024-12-20T12:21:06+00:00 Add UDN Layer2 support for an Egress IP assigned to the primary interface
-  - 06c26bc4 2024-12-19T17:55:18+00:00 Add missing enum validation for RouteAdvertisements
-  - 1290c908 2024-12-18T20:23:44+01:00 udn host isolation: fix initialSync.
-  - 8da4dc9a 2024-12-16T13:32:21+02:00 managedTap: Use the new bridge type name
+- machine-config-operator embedded-component c3c615e27f62881947ba84a2d42454df86cfad48 to 158c393d63629581981a7feea2b3dbf8b284ea27
+  - 92c3c4d9 2025-01-24T01:52:47+00:00 controller: add extension validation to controller
+
+- ovn-kubernetes image-amd64 f0ab7904387fc2588c5110f1ff9d7187d5ce3e11 to 1b2d4eb9e76916676bc10fdde5d683c7cd8bdff5
+  - 34411135 2025-01-27T07:53:19-05:00 Revert "hard code disable-udn-host-isolation to "true""
+  - e82f43db 2025-01-24T18:23:09+01:00 Cleanup networkpolicy when a namespace was already removed
+  - 988cb71e 2025-01-24T18:23:05+01:00 Get active network from annotations on pod deletion
+  - a1427dc8 2025-01-23T18:04:30+01:00 gateway_localnet_linux_test.go: Fix various test issues.
+  - 29ec1066 2025-01-23T17:50:59+01:00 subnet_allocator: Take lock when reading subnetAllocatorRanges.
+  - 3bf51092 2025-01-23T17:50:59+01:00 node_ip_handler_linux_test: Avoid DATA race due to concurrent config access.
+  - 199d61d4 2025-01-23T17:50:59+01:00 gateway_localnet_linux_test: Serialize access to openflow manager flow table.
+  - ad85acc8 2025-01-23T17:50:59+01:00 ovn_test: Properly shutdown the watch factory.
+  - f952cee7 2025-01-23T17:50:31+01:00 factory: Reduce event queue size for unit tests.
+  - 6dda0b51 2025-01-23T17:49:05+01:00 factory: Bump the event queue size to 1K.
+  - fe17136c 2025-01-23T17:49:05+01:00 factory: Reduce contention on informer locks.
+  - 2b8be272 2025-01-23T17:49:05+01:00 factory: Use 15 event queues per informer for pod, node and namespace.
+  - 5530ab8a 2025-01-23T17:49:05+01:00 Always use queued informer
+  - ab83afb4 2025-01-23T17:26:11+01:00 UDN isolation: trigger update on open-default-ports annotation change.
+  - bbc56776 2025-01-23T09:54:25+01:00 Fix race between NAD and NetPol deletions
+  - f21f8fb5 2025-01-22T15:22:52-05:00 Fixes SNAT removal with egress IP
+  - f0723b30 2025-01-22T18:55:05+00:00 Set network ID on netInfo even when already annotated
+  - e65cc4e7 2025-01-22T12:35:24-05:00 Unit tests: set klog level explicitly
+  - c5b834d4 2025-01-22T16:59:15+01:00 EIP node: skip OVN managed interfaces that don't serve as secondary
+  - 0306d4ce 2025-01-22T15:00:46+01:00 Do not rely on the active network while removing the EndpointSlice
+  - 16ef5d8c 2025-01-21T16:59:47+01:00 Ignore removed namespaces in clustermanager
+  - 0a06cfe1 2025-01-21T15:29:33+01:00 docs: update (C)UDN CRD reference.
+  - 46c34a2c 2025-01-21T15:28:43+01:00 e2e, pudn: Use port to check overlapping isolation
+  - 561af6ef 2025-01-21T14:09:28+01:00 Use annotations in mirrored EndpointSlices for potentially long values
+  - 089009ce 2025-01-20T14:24:22-05:00 Skip session affinity conformance test
+  - 344d4dca 2025-01-20T20:03:46+01:00 Remove per-pod-SNAT for UDNs
+  - 9743feba 2025-01-20T19:01:15+01:00 Refactor and fix UDN/CUDN readiness checks
+  - 73492d99 2025-01-20T14:48:27+01:00 Dockerfile.fedora: Bump OVN to ovn24.09-24.09.1-10.fc41
+  - 0058b326 2025-01-20T14:48:27+01:00 e2e/external_gateways: Update test to avoid accidental matching of conntrack entries.
+  - e8a0e68b 2025-01-18T15:01:47-05:00 Fix missing error wrap on IC remote node add
+  - 87de9f82 2025-01-18T14:39:48-05:00 Suppress layer 2 missing pod anno errors
+  - 4be55de6 2025-01-18T09:49:21+00:00 EIP: reduce log spam from errors that arent really errors due to race for data
+  - a3c44c24 2025-01-17T13:00:18-08:00 Add missing host-cidrs annotation for DPU Host
+  - 8bbeac79 2025-01-17T14:38:44+01:00 Fix pods cleanup in ClusterUserDefinedNetwork test
+  - f31b70f1 2025-01-16T13:36:21+02:00 e2e,udn crd: Use the right IP family according to env
+  - 299db52c 2025-01-16T10:14:58+01:00 (C)UDN CRD: add IPAM section and IPAM.Mode field.
+  - da702b8b 2025-01-14T21:01:42-05:00 Fix multicast tests for ipv6 with UDN
+  - 10a2af04 2025-01-14T16:50:31+01:00 Add GetInterfaceUDNs to convert interface name to (C)UDN ns+name.
+  - b8c3d788 2025-01-13T16:23:07-05:00 Adds E2E to verify UDN label cannot be added/removed later
+  - a084679e 2025-01-13T16:23:07-05:00 Adds e2e test to for wiring pod with missing UDN label
+  - ef21acb5 2025-01-13T16:23:07-05:00 Remove per network load balancer groups on cleanup
+  - a9b3e445 2025-01-13T16:23:06-05:00 Update kubevirt e2es
+  - 0dd81cf4 2025-01-13T16:23:06-05:00 Fix egress IP delete path
+  - 253025a4 2025-01-13T16:23:06-05:00 Fix egress IP tests
+  - 41dfd98d 2025-01-13T16:23:06-05:00 Fix multicast net seg tests ip family
+  - 0b71fe6c 2025-01-13T16:23:06-05:00 Update E2Es to for required UDN label
+  - 7bb83ce1 2025-01-13T16:23:06-05:00 Disable adding/removing the UDN namespace label
+  - d31b0475 2025-01-13T16:23:06-05:00 Require namespace label for primary UDN
+  - 6c5f5d99 2025-01-12T14:19:19-08:00 Update OVS bridge flows for supporting gateway VLANs
+  - d940cab5 2025-01-12T06:11:51+00:00 UDN EIP IP: change scope from link to global
+  - 901989c9 2024-12-19T11:40:39+01:00 (C)UDN CRD: update CEL validations.
+
+- ovn-kubernetes image-arm64 f0ab7904387fc2588c5110f1ff9d7187d5ce3e11 to 1b2d4eb9e76916676bc10fdde5d683c7cd8bdff5
+  - 34411135 2025-01-27T07:53:19-05:00 Revert "hard code disable-udn-host-isolation to "true""
+  - e82f43db 2025-01-24T18:23:09+01:00 Cleanup networkpolicy when a namespace was already removed
+  - 988cb71e 2025-01-24T18:23:05+01:00 Get active network from annotations on pod deletion
+  - a1427dc8 2025-01-23T18:04:30+01:00 gateway_localnet_linux_test.go: Fix various test issues.
+  - 29ec1066 2025-01-23T17:50:59+01:00 subnet_allocator: Take lock when reading subnetAllocatorRanges.
+  - 3bf51092 2025-01-23T17:50:59+01:00 node_ip_handler_linux_test: Avoid DATA race due to concurrent config access.
+  - 199d61d4 2025-01-23T17:50:59+01:00 gateway_localnet_linux_test: Serialize access to openflow manager flow table.
+  - ad85acc8 2025-01-23T17:50:59+01:00 ovn_test: Properly shutdown the watch factory.
+  - f952cee7 2025-01-23T17:50:31+01:00 factory: Reduce event queue size for unit tests.
+  - 6dda0b51 2025-01-23T17:49:05+01:00 factory: Bump the event queue size to 1K.
+  - fe17136c 2025-01-23T17:49:05+01:00 factory: Reduce contention on informer locks.
+  - 2b8be272 2025-01-23T17:49:05+01:00 factory: Use 15 event queues per informer for pod, node and namespace.
+  - 5530ab8a 2025-01-23T17:49:05+01:00 Always use queued informer
+  - ab83afb4 2025-01-23T17:26:11+01:00 UDN isolation: trigger update on open-default-ports annotation change.
+  - bbc56776 2025-01-23T09:54:25+01:00 Fix race between NAD and NetPol deletions
+  - f21f8fb5 2025-01-22T15:22:52-05:00 Fixes SNAT removal with egress IP
+  - f0723b30 2025-01-22T18:55:05+00:00 Set network ID on netInfo even when already annotated
+  - e65cc4e7 2025-01-22T12:35:24-05:00 Unit tests: set klog level explicitly
+  - c5b834d4 2025-01-22T16:59:15+01:00 EIP node: skip OVN managed interfaces that don't serve as secondary
+  - 0306d4ce 2025-01-22T15:00:46+01:00 Do not rely on the active network while removing the EndpointSlice
+  - 16ef5d8c 2025-01-21T16:59:47+01:00 Ignore removed namespaces in clustermanager
+  - 0a06cfe1 2025-01-21T15:29:33+01:00 docs: update (C)UDN CRD reference.
+  - 46c34a2c 2025-01-21T15:28:43+01:00 e2e, pudn: Use port to check overlapping isolation
+  - 561af6ef 2025-01-21T14:09:28+01:00 Use annotations in mirrored EndpointSlices for potentially long values
+  - 089009ce 2025-01-20T14:24:22-05:00 Skip session affinity conformance test
+  - 344d4dca 2025-01-20T20:03:46+01:00 Remove per-pod-SNAT for UDNs
+  - 9743feba 2025-01-20T19:01:15+01:00 Refactor and fix UDN/CUDN readiness checks
+  - 73492d99 2025-01-20T14:48:27+01:00 Dockerfile.fedora: Bump OVN to ovn24.09-24.09.1-10.fc41
+  - 0058b326 2025-01-20T14:48:27+01:00 e2e/external_gateways: Update test to avoid accidental matching of conntrack entries.
+  - e8a0e68b 2025-01-18T15:01:47-05:00 Fix missing error wrap on IC remote node add
+  - 87de9f82 2025-01-18T14:39:48-05:00 Suppress layer 2 missing pod anno errors
+  - 4be55de6 2025-01-18T09:49:21+00:00 EIP: reduce log spam from errors that arent really errors due to race for data
+  - a3c44c24 2025-01-17T13:00:18-08:00 Add missing host-cidrs annotation for DPU Host
+  - 8bbeac79 2025-01-17T14:38:44+01:00 Fix pods cleanup in ClusterUserDefinedNetwork test
+  - f31b70f1 2025-01-16T13:36:21+02:00 e2e,udn crd: Use the right IP family according to env
+  - 299db52c 2025-01-16T10:14:58+01:00 (C)UDN CRD: add IPAM section and IPAM.Mode field.
+  - da702b8b 2025-01-14T21:01:42-05:00 Fix multicast tests for ipv6 with UDN
+  - 10a2af04 2025-01-14T16:50:31+01:00 Add GetInterfaceUDNs to convert interface name to (C)UDN ns+name.
+  - b8c3d788 2025-01-13T16:23:07-05:00 Adds E2E to verify UDN label cannot be added/removed later
+  - a084679e 2025-01-13T16:23:07-05:00 Adds e2e test to for wiring pod with missing UDN label
+  - ef21acb5 2025-01-13T16:23:07-05:00 Remove per network load balancer groups on cleanup
+  - a9b3e445 2025-01-13T16:23:06-05:00 Update kubevirt e2es
+  - 0dd81cf4 2025-01-13T16:23:06-05:00 Fix egress IP delete path
+  - 253025a4 2025-01-13T16:23:06-05:00 Fix egress IP tests
+  - 41dfd98d 2025-01-13T16:23:06-05:00 Fix multicast net seg tests ip family
+  - 0b71fe6c 2025-01-13T16:23:06-05:00 Update E2Es to for required UDN label
+  - 7bb83ce1 2025-01-13T16:23:06-05:00 Disable adding/removing the UDN namespace label
+  - d31b0475 2025-01-13T16:23:06-05:00 Require namespace label for primary UDN
+  - 6c5f5d99 2025-01-12T14:19:19-08:00 Update OVS bridge flows for supporting gateway VLANs
+  - d940cab5 2025-01-12T06:11:51+00:00 UDN EIP IP: change scope from link to global
+  - 901989c9 2024-12-19T11:40:39+01:00 (C)UDN CRD: update CEL validations.
 
