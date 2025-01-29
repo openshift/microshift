@@ -43,7 +43,10 @@ scenario_run_tests() {
         # TODO: While 4.19-ec is not available, it needs to exit without an error.
         exit 0
     fi
+    # Until 4.19 EC starts including correct default config,
+    # the test 'MicroShift Starts Using Default Config' needs to be skipped.
     run_tests host1 \
         --variable "IMAGE_SIGSTORE_ENABLED:True" \
+        --exclude defaultcfg \
         suites/standard2/
 }
