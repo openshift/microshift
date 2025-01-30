@@ -1,4 +1,0 @@
-- operator-framework-olm embedded-component d39d739496e20e02d998e783617c9a6abdf4fb02 to f667826eb6c9e2bfe779922f0b8e6a9bf2a833ed
-  - ad89eadb 2025-01-22T11:13:31+01:00 sort lists of identifiers and conflict messages to reduce SAT solver non-determinism (#3491)
-  - 43746663 2025-01-22T11:13:31+01:00 :bug: use operator cache provider for deprecation updates to limit calls to GRPC server (#3490)
-
