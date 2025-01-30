@@ -146,6 +146,12 @@ Custom TLS 1_2 configuration
     [Documentation]    Configure a custom cipher suite using TLSv1.2 as min version and verify it is used
     [Setup]    Setup TLS Configuration    ${TLS_12_CUSTOM_CIPHER}
 
+    ${config}=    Show Config    effective
+    Should Be Equal    ${config.apiServer.tls.minVersion}    VersionTLS12
+    Length Should Be    ${config.apiServer.tls.cipherSuites}    2
+    Should Contain    ${config.apiServer.tls.cipherSuites}    TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256
+    Should Contain    ${config.apiServer.tls.cipherSuites}    TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+
     # custom cipher defined for this test
     ${stdout}    ${rc}=    Openssl Connect Command
     ...    ${USHIFT_HOST}:6443
@@ -170,12 +176,6 @@ Custom TLS 1_2 configuration
     Check TLS On Internal Endpoints    -tls1_2    0
     Check TLS On Internal Endpoints    -tls1_3    0
 
-    ${config}=    Show Config    effective
-    Should Be Equal    ${config.apiServer.tls.minVersion}    VersionTLS12
-    Length Should Be    ${config.apiServer.tls.cipherSuites}    2
-    Should Contain    ${config.apiServer.tls.cipherSuites}    TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256
-    Should Contain    ${config.apiServer.tls.cipherSuites}    TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-
     [Teardown]    Run Keywords
     ...    Remove TLS Drop In Config
     ...    Restart MicroShift
@@ -184,6 +184,13 @@ Custom TLS 1_3 configuration
     [Documentation]    Configure API server to use TLSv1.3 as min version and verify only that version works
     ...    TLSv1.2 must fail and cipher suites for TLSv1.3 can not be config by the user, always 3 are enabled.
     [Setup]    Setup TLS Configuration    ${TLS_13_MIN_VERSION}
+
+    ${config}=    Show Config    effective
+    Should Be Equal    ${config.apiServer.tls.minVersion}    VersionTLS13
+    Length Should Be    ${config.apiServer.tls.cipherSuites}    3
+    Should Contain    ${config.apiServer.tls.cipherSuites}    TLS_AES_128_GCM_SHA256
+    Should Contain    ${config.apiServer.tls.cipherSuites}    TLS_AES_256_GCM_SHA384
+    Should Contain    ${config.apiServer.tls.cipherSuites}    TLS_CHACHA20_POLY1305_SHA256
 
     ${stdout}    ${rc}=    Openssl Connect Command    ${USHIFT_HOST}:6443    -tls1_2
     Should Be Equal As Integers    ${rc}    1
@@ -209,13 +216,6 @@ Custom TLS 1_3 configuration
 
     Check TLS On Internal Endpoints    -tls1_2    1
     Check TLS On Internal Endpoints    -tls1_3    0
-
-    ${config}=    Show Config    effective
-    Should Be Equal    ${config.apiServer.tls.minVersion}    VersionTLS13
-    Length Should Be    ${config.apiServer.tls.cipherSuites}    3
-    Should Contain    ${config.apiServer.tls.cipherSuites}    TLS_AES_128_GCM_SHA256
-    Should Contain    ${config.apiServer.tls.cipherSuites}    TLS_AES_256_GCM_SHA384
-    Should Contain    ${config.apiServer.tls.cipherSuites}    TLS_CHACHA20_POLY1305_SHA256
 
     [Teardown]    Run Keywords
     ...    Remove TLS Drop In Config
