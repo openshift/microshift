@@ -58,6 +58,7 @@ ${TLS_13_MIN_VERSION}               SEPARATOR=\n
 ...                                 apiServer:
 ...                                 \ \ tls:
 ...                                 \ \ \ \ minVersion: VersionTLS13
+${APISERVER_ETCD_CLIENT_CERT}       /var/lib/microshift/certs/etcd-signer/apiserver-etcd-client
 
 
 *** Test Cases ***
@@ -142,36 +143,77 @@ Deploy MicroShift Without CSI Snapshotter
     ...    Restart MicroShift
 
 Custom TLS 1_2 configuration
-    [Documentation]    Configure a custom cipher suite using TLS 1.2 and verify it is used
+    [Documentation]    Configure a custom cipher suite using TLSv1.2 as min version and verify it is used
     [Setup]    Setup TLS Configuration    ${TLS_12_CUSTOM_CIPHER}
 
-    ${stdout}    ${rc}=    Openssl Connect Command    -tls1_2 -cipher ECDHE-RSA-CHACHA20-POLY1305
+    # custom cipher defined for this test
+    ${stdout}    ${rc}=    Openssl Connect Command
+    ...    ${USHIFT_HOST}:6443
+    ...    -tls1_2 -cipher ECDHE-RSA-CHACHA20-POLY1305
     Should Be Equal As Integers    ${rc}    0
     Should Contain    ${stdout}    TLSv1.2, Cipher is ECDHE-RSA-CHACHA20-POLY1305
 
-    ${stdout}    ${rc}=    Openssl Connect Command    -tls1_2 -cipher ECDHE-RSA-AES128-GCM-SHA256
+    # mandatory cipher needed for internal enpoints (i.e. etcd), set if not defined by the user
+    ${stdout}    ${rc}=    Openssl Connect Command
+    ...    ${USHIFT_HOST}:6443
+    ...    -tls1_2 -cipher ECDHE-RSA-AES128-GCM-SHA256
     Should Be Equal As Integers    ${rc}    0
     Should Contain    ${stdout}    TLSv1.2, Cipher is ECDHE-RSA-AES128-GCM-SHA256
 
-    ${stdout}    ${rc}=    Openssl Connect Command    -tls1_3 -ciphersuites TLS_AES_128_GCM_SHA256
+    # when TLSv1.2 is set as min version, TLSv1.3 must also work
+    ${stdout}    ${rc}=    Openssl Connect Command
+    ...    ${USHIFT_HOST}:6443
+    ...    -tls1_3 -ciphersuites TLS_AES_128_GCM_SHA256
     Should Be Equal As Integers    ${rc}    0
     Should Contain    ${stdout}    TLSv1.3, Cipher is TLS_AES_128_GCM_SHA256
+
+    Check TLS On Internal Endpoints    -tls1_2
+
+    ${config}=    Show Config    effective
+    Should Be Equal    ${config.apiServer.tls.minVersion}    VersionTLS12
+    Length Should Be    ${config.apiServer.tls.cipherSuites}    2
+    Should Contain    ${config.apiServer.tls.cipherSuites}    TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256
+    Should Contain    ${config.apiServer.tls.cipherSuites}    TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
 
     [Teardown]    Run Keywords
     ...    Remove TLS Drop In Config
     ...    Restart MicroShift
 
 Custom TLS 1_3 configuration
-    [Documentation]    Configure API server to use TLS 1.3 and verify only that version works
+    [Documentation]    Configure API server to use TLSv1.3 as min version and verify only that version works
+    ...    TLSv1.2 must fail and cipher suites for TLSv1.3 can not be config by the user, always 3 are enabled.
     [Setup]    Setup TLS Configuration    ${TLS_13_MIN_VERSION}
 
-    ${stdout}    ${rc}=    Openssl Connect Command    -tls1_2
+    ${stdout}    ${rc}=    Openssl Connect Command    ${USHIFT_HOST}:6443    -tls1_2
     Should Be Equal As Integers    ${rc}    1
     Should Contain    ${stdout}    TLSv1.2
 
-    ${stdout}    ${rc}=    Openssl Connect Command    -tls1_3
+    ${stdout}    ${rc}=    Openssl Connect Command
+    ...    ${USHIFT_HOST}:6443
+    ...    -tls1_3 -ciphersuites TLS_AES_128_GCM_SHA256
     Should Be Equal As Integers    ${rc}    0
-    Should Contain    ${stdout}    TLSv1.3
+    Should Contain    ${stdout}    TLSv1.3, Cipher is TLS_AES_128_GCM_SHA256
+
+    ${stdout}    ${rc}=    Openssl Connect Command
+    ...    ${USHIFT_HOST}:6443
+    ...    -tls1_3 -ciphersuites TLS_AES_256_GCM_SHA384
+    Should Be Equal As Integers    ${rc}    0
+    Should Contain    ${stdout}    TLSv1.3, Cipher is TLS_AES_256_GCM_SHA384
+
+    ${stdout}    ${rc}=    Openssl Connect Command
+    ...    ${USHIFT_HOST}:6443
+    ...    -tls1_3 -ciphersuites TLS_CHACHA20_POLY1305_SHA256
+    Should Be Equal As Integers    ${rc}    0
+    Should Contain    ${stdout}    TLSv1.3, Cipher is TLS_CHACHA20_POLY1305_SHA256
+
+    Check TLS On Internal Endpoints    -tls1_3
+
+    ${config}=    Show Config    effective
+    Should Be Equal    ${config.apiServer.tls.minVersion}    VersionTLS13
+    Length Should Be    ${config.apiServer.tls.cipherSuites}    3
+    Should Contain    ${config.apiServer.tls.cipherSuites}    TLS_AES_128_GCM_SHA256
+    Should Contain    ${config.apiServer.tls.cipherSuites}    TLS_AES_256_GCM_SHA384
+    Should Contain    ${config.apiServer.tls.cipherSuites}    TLS_CHACHA20_POLY1305_SHA256
 
     [Teardown]    Run Keywords
     ...    Remove TLS Drop In Config
@@ -256,9 +298,30 @@ CSI Snapshot Controller Is Deployed
     Named Deployment Should Be Available    csi-snapshot-controller    kube-system    120s
 
 Openssl Connect Command
-    [Documentation]    Run openssl connect command in the remote server
-    [Arguments]    ${args}
+    [Documentation]    Run Openssl Connect Command in the remote server
+    [Arguments]    ${host_and_port}    ${args}
     ${stdout}    ${rc}=    Execute Command
-    ...    openssl s_client -connect ${USHIFT_HOST}:6443 ${args} <<< "Q"
+    ...    openssl s_client -connect ${host_and_port} ${args} <<< "Q"
     ...    sudo=True    return_stdout=True    return_stderr=False    return_rc=True
     RETURN    ${stdout}    ${rc}
+
+Check TLS On Internal Endpoints
+    [Documentation]    Run Openssl Connect Command to check k8s internal endpoints
+    [Arguments]    ${tls_flag}
+    # kubelet endpoint
+    ${stdout}    ${rc}=    Openssl Connect Command    ${USHIFT_HOST}:10250    ${tls_flag}
+    Should Be Equal As Integers    ${rc}    0
+
+    # kube controller manager endpoint
+    ${stdout}    ${rc}=    Openssl Connect Command    ${USHIFT_HOST}:10257    ${tls_flag}
+    Should Be Equal As Integers    ${rc}    0
+
+    # kube scheduler endpoint
+    ${stdout}    ${rc}=    Openssl Connect Command    ${USHIFT_HOST}:10259    ${tls_flag}
+    Should Be Equal As Integers    ${rc}    0
+
+    # etcd endpoint, need to use cert and key because etcd requires mTLS
+    Set Test Variable    ${CERT_ARG}    -cert ${APISERVER_ETCD_CLIENT_CERT}/client.crt
+    Set Test Variable    ${KEY_ARG}    -key ${APISERVER_ETCD_CLIENT_CERT}/client.key
+    ${stdout}    ${rc}=    Openssl Connect Command    localhost:2379    ${tls_flag} ${CERT_ARG} ${KEY_ARG}
+    Should Be Equal As Integers    ${rc}    0

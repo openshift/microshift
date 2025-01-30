@@ -64,13 +64,3 @@ Teardown
     [Documentation]    Test suite teardown
     Remove Drop In MicroShift Config    10-etcd
     Logout MicroShift Host
-
-Show Config
-    [Documentation]    Run microshift show-config with ${mode}
-    [Arguments]    ${mode}
-    ${output}    ${rc}=    Execute Command
-    ...    microshift show-config --mode ${mode}
-    ...    sudo=True    return_rc=True
-    Should Be Equal As Integers    0    ${rc}
-    ${yaml_data}=    Yaml Parse    ${output}
-    RETURN    ${yaml_data}
