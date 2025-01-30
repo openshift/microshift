@@ -6,9 +6,6 @@
 VM_BRIDGE_IP="$(get_vm_bridge_ip "${VM_MULTUS_NETWORK}")"
 # shellcheck disable=SC2034  # used elsewhere
 WEB_SERVER_URL="http://${VM_BRIDGE_IP}:${WEB_SERVER_PORT}"
-# Disable signature verification due to unsigned images used in this test
-# shellcheck disable=SC2034  # used elsewhere
-IMAGE_SIGSTORE_ENABLED=false
 
 scenario_create_vms() {
     prepare_kickstart host1 kickstart-bootc.ks.template rhel94-bootc-source-optionals
