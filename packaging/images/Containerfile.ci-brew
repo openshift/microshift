@@ -8,5 +8,8 @@ ARG DNF=dnf
 # Install brew and other dependencies
 RUN ${DNF} install -y epel-release && \
     ${DNF} install -y koji git golang && \
-    ${DNF} clean all && \
-    ln -sv /usr/bin/koji /usr/bin/brew
+    ${DNF} clean all
+
+# Configure brew and create top-level source directory
+RUN ln -sv /usr/bin/koji /usr/bin/brew && \
+    mkdir --mode=0775 /go
