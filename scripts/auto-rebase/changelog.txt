@@ -1,7 +1,4 @@
-- cluster-openshift-controller-manager-operator embedded-component 2280f54414cf403aed0a02b3fdb86ee6bf672410 to 2ed3cf9965f8e6832cffde84f3de2fe210b79b49
-  - 66d1396 2025-01-21T11:11:22+00:00 OCPBUGS-48657: Add new team members to owners file
-
-- operator-framework-olm embedded-component 4ff31a477af44f7804c188fbd1946b9b239ab3fd to 48d68f52674ad5afb2d40d032abb0892a5dafee6
-  - 88a1bbf9 2025-01-22T11:14:31+01:00 sort lists of identifiers and conflict messages to reduce SAT solver non-determinism (#3491)
-  - 6bbfb0a1 2025-01-22T11:14:25+01:00 :bug: use operator cache provider for deprecation updates to limit calls to GRPC server (#3490)
+- machine-config-operator embedded-component adc9ad759067e02cf643ec4beaf731d5245bbfe3 to 9e721f05c02ec0dd8d1f4d58b95462bb87748f17
+  - 98c4efba 2025-01-10T17:33:24+00:00 operator: update alert on pause of required mcp
+  - 2410e2e3 2024-09-10T06:09:03+00:00 OCPBUGS-39222: Do not enable on-prem-resolv-prepender.path for UPI
 
