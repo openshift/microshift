@@ -624,7 +624,7 @@ launch_vm() {
     vm_extra_args+=" inst.ks=file:/$(basename "${kickstart_file}")"
     vm_initrd_inject+=" --initrd-inject ${kickstart_file}"
     # Download and inject all the kickstart include files
-    wget -r -q -nd -A "*.cfg" -P "${kickstart_idir}" "$(dirname "${kickstart_url}")"
+    wget -r -q -nd -A "*.cfg" -P "${kickstart_idir}" "$(dirname "${kickstart_url}")/"
     for cfg_file in "${kickstart_idir}"/*.cfg ; do
         vm_initrd_inject+=" --initrd-inject ${cfg_file}"
     done
@@ -1078,10 +1078,15 @@ action_login() {
         vmname="$1"
     fi
 
-    ssh_port=$(get_vm_property "${vmname}" "ssh_port")
+    ssh_port=$(get_vm_property "${vmname}" "ssh_port" || true)
     ip=$(get_vm_property "${vmname}" "ip")
 
-    ssh "redhat@${ip}" -p "${ssh_port}"
+    if [ -z "${ssh_port}" ] ; then
+        local -r full_vmname="$(full_vm_name "${vmname}")"
+        sudo virsh console "${full_vmname}"
+    else
+        ssh "redhat@${ip}" -p "${ssh_port}"
+    fi
 }
 
 action_run() {
