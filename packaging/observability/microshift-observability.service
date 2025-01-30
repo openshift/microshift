@@ -7,7 +7,6 @@ PartOf=microshift.service
 ExecStart=/usr/bin/opentelemetry-collector --config=/etc/microshift/opentelemetry-collector.yaml
 Restart=always
 User=root
-TimeoutStartSec=60
 
 [Install]
-RequiredBy=multi-user.target microshift.service
+RequiredBy=microshift.service

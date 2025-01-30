@@ -184,6 +184,15 @@ func certSetup(cfg *config.Config) (*certchains.CertificateChains, error) {
 					Hostnames: []string{cfg.Node.HostnameOverride, cfg.Node.NodeIP},
 				},
 			),
+		).WithClientCertificates(
+			&certchains.ClientCertificateSigningRequestInfo{
+				CSRMeta: certchains.CSRMeta{
+					Name:         "observability-to-kubelet-client",
+					ValidityDays: cryptomaterial.ShortLivedCertificateValidityDays,
+				},
+				UserInfo: &user.DefaultInfo{Name: "observability-to-kubelet", Groups: []string{""},
+				},
+			},
 		),
 		certchains.NewCertificateSigner(
 			"aggregator-signer",
