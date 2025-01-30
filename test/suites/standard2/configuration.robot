@@ -167,7 +167,8 @@ Custom TLS 1_2 configuration
     Should Be Equal As Integers    ${rc}    0
     Should Contain    ${stdout}    TLSv1.3, Cipher is TLS_AES_128_GCM_SHA256
 
-    Check TLS On Internal Endpoints    -tls1_2
+    Check TLS On Internal Endpoints    -tls1_2    0
+    Check TLS On Internal Endpoints    -tls1_3    0
 
     ${config}=    Show Config    effective
     Should Be Equal    ${config.apiServer.tls.minVersion}    VersionTLS12
@@ -206,7 +207,8 @@ Custom TLS 1_3 configuration
     Should Be Equal As Integers    ${rc}    0
     Should Contain    ${stdout}    TLSv1.3, Cipher is TLS_CHACHA20_POLY1305_SHA256
 
-    Check TLS On Internal Endpoints    -tls1_3
+    Check TLS On Internal Endpoints    -tls1_2    1
+    Check TLS On Internal Endpoints    -tls1_3    0
 
     ${config}=    Show Config    effective
     Should Be Equal    ${config.apiServer.tls.minVersion}    VersionTLS13
@@ -307,21 +309,21 @@ Openssl Connect Command
 
 Check TLS On Internal Endpoints
     [Documentation]    Run Openssl Connect Command to check k8s internal endpoints
-    [Arguments]    ${tls_flag}
+    [Arguments]    ${tls_flag}    ${return_code}
     # kubelet endpoint
     ${stdout}    ${rc}=    Openssl Connect Command    ${USHIFT_HOST}:10250    ${tls_flag}
-    Should Be Equal As Integers    ${rc}    0
+    Should Be Equal As Integers    ${rc}    ${return_code}
 
     # kube controller manager endpoint
     ${stdout}    ${rc}=    Openssl Connect Command    ${USHIFT_HOST}:10257    ${tls_flag}
-    Should Be Equal As Integers    ${rc}    0
+    Should Be Equal As Integers    ${rc}    ${return_code}
 
     # kube scheduler endpoint
     ${stdout}    ${rc}=    Openssl Connect Command    ${USHIFT_HOST}:10259    ${tls_flag}
-    Should Be Equal As Integers    ${rc}    0
+    Should Be Equal As Integers    ${rc}    ${return_code}
 
     # etcd endpoint, need to use cert and key because etcd requires mTLS
     Set Test Variable    ${CERT_ARG}    -cert ${APISERVER_ETCD_CLIENT_CERT}/client.crt
     Set Test Variable    ${KEY_ARG}    -key ${APISERVER_ETCD_CLIENT_CERT}/client.key
     ${stdout}    ${rc}=    Openssl Connect Command    localhost:2379    ${tls_flag} ${CERT_ARG} ${KEY_ARG}
-    Should Be Equal As Integers    ${rc}    0
+    Should Be Equal As Integers    ${rc}    ${return_code}
