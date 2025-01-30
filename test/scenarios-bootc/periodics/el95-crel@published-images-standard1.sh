@@ -2,6 +2,11 @@
 
 # Sourced from scenario.sh and uses functions defined there.
 
+# Enable container signature verification for published MicroShift images.
+# These are ec / rc / z-stream, thus guaranteed to be signed.
+# shellcheck disable=SC2034  # used elsewhere
+IMAGE_SIGSTORE_ENABLED=true
+
 scenario_create_vms() {
     if [[ "${CURRENT_RELEASE_REPO}" == "" ]] ; then
         # Empty string means there's no EC build yet, so the test needs to be skipped.
@@ -50,7 +55,9 @@ scenario_run_tests() {
         # Empty string means there's no EC build yet, so the test needs to be skipped.
         exit 0
     fi
-    run_tests host1 suites/standard1/
+    run_tests host1 \
+        --variable "IMAGE_SIGSTORE_ENABLED:True" \
+        suites/standard1/
     # When SELinux is working on RHEL 9.6 bootc systems add following suite:
     # suites/selinux/validate-selinux-policy.robot
 }

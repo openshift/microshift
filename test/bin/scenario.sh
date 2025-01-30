@@ -309,7 +309,8 @@ prepare_kickstart() {
     record_junit "${vmname}" "prepare_kickstart" "OK"
 }
 
-# Checks if provided commit exists in local ostree repository
+# Checks if provided commit exists in local ostree repository.
+# Returns 0 when the ref exists or 1 otherwise.
 does_commit_exist() {
     local -r commit="${1}"
 
@@ -320,11 +321,12 @@ does_commit_exist() {
     fi
 }
 
-# Checks if provided image ref exists in local image storage
+# Checks if provided image ref exists in the mirror registry.
+# Returns 0 when the ref exists or 1 otherwise.
 does_image_exist() {
     local -r image="${1}"
 
-    if [[ "$(sudo podman images -q "${image}")" != "" ]]; then
+    if skopeo inspect "docker://${MIRROR_REGISTRY_URL}/${image}" &>/dev/null ; then
         return 0
     else
         return 1
