@@ -1,0 +1,27 @@
+- api embedded-component 55c9ecba501fbe31f5e0a6613f30cff76039a10e to d15841be6bdeeb556cac490a084cb3ffb2aee215
+  - 90df916 2025-01-29T11:55:22+01:00 OCPBUGS-48377: Add IdleCloseOnResponse field to IngressControllerSpec
+
+- kubernetes embedded-component 7665f4b7049dc15c6559d91d8db45cef318e4c0f to e411fa899e95a590ef75e2ef7defad8221c1edac
+  - d14a81f34 2025-01-28T11:54:10-07:00 UPSTREAM: 129675: Fix Portworx plugin's CSI translation to copy secret name & namespace
+
+- machine-config-operator embedded-component 158c393d63629581981a7feea2b3dbf8b284ea27 to c4babd8a0ae9508fc29285d9d46745a8ac3b0b05
+  - 3eec2366 2025-01-13T15:25:12+00:00 node controller: clarify when 'maxUnavailible' is invalid in alert
+
+- oc image-amd64 fd653741e664d1f498af2885f4f2f48cd401677e to 36c93092776f8d964b4d09fa4c4f299d1ab55a08
+  - 09169e12 2025-01-28T14:21:42-05:00 Address `github.com/docker/docker` CVE
+
+- ovn-kubernetes image-amd64 1b2d4eb9e76916676bc10fdde5d683c7cd8bdff5 to b41a3aba093f66f7dd46680339d06fb75dba7492
+  - db07151c 2025-01-23T17:06:46+00:00 Bump OVN to ovn24.09-24.09.1-10.el9fdp
+
+- kubernetes image-amd64 7665f4b7049dc15c6559d91d8db45cef318e4c0f to e411fa899e95a590ef75e2ef7defad8221c1edac
+  - d14a81f34 2025-01-28T11:54:10-07:00 UPSTREAM: 129675: Fix Portworx plugin's CSI translation to copy secret name & namespace
+
+- oc image-arm64 fd653741e664d1f498af2885f4f2f48cd401677e to 36c93092776f8d964b4d09fa4c4f299d1ab55a08
+  - 09169e12 2025-01-28T14:21:42-05:00 Address `github.com/docker/docker` CVE
+
+- ovn-kubernetes image-arm64 1b2d4eb9e76916676bc10fdde5d683c7cd8bdff5 to b41a3aba093f66f7dd46680339d06fb75dba7492
+  - db07151c 2025-01-23T17:06:46+00:00 Bump OVN to ovn24.09-24.09.1-10.el9fdp
+
+- kubernetes image-arm64 7665f4b7049dc15c6559d91d8db45cef318e4c0f to e411fa899e95a590ef75e2ef7defad8221c1edac
+  - d14a81f34 2025-01-28T11:54:10-07:00 UPSTREAM: 129675: Fix Portworx plugin's CSI translation to copy secret name & namespace
+
