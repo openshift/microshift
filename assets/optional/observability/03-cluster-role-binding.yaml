@@ -8,6 +8,5 @@ roleRef:
   kind: ClusterRole
   name: openshift-observability-client
 subjects:
-  - kind: ServiceAccount
+  - kind: User
     name: openshift-observability-client
-    namespace: openshift-observability
