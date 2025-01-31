@@ -10,8 +10,8 @@ index 0356d79d8..0440eff26 100644
  	"k8s.io/apiserver/pkg/server/healthz"
  	"k8s.io/apiserver/pkg/server/mux"
  	utilfeature "k8s.io/apiserver/pkg/util/feature"
-@@ -166,8 +165,7 @@ controller, and serviceaccounts controller.`,
- 			fg := s.ComponentGlobalsRegistry.FeatureGateFor(utilversion.DefaultKubeComponent)
+@@ -153,8 +152,7 @@ controller, and serviceaccounts controller.`,
+ 			fg := s.ComponentGlobalsRegistry.FeatureGateFor(featuregate.DefaultKubeComponent)
  			fg.(featuregate.MutableFeatureGate).AddMetrics()
  
 -			stopCh := server.SetupSignalHandler()
