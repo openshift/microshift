@@ -6,6 +6,8 @@ assets:
         ignore: "MicroShift specific overrides"
       - file: inferenceservice-config-microshift-patch.yaml
         ignore: "MicroShift specific overrides"
+      - file: namespace.yaml
+        ignore: "MicroShift specific overrides"
 
   - dir: optional/rhoai/kserve/overlays/odh/
     src: rhoai/operator/kserve/overlays/odh/

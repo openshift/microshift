@@ -3,6 +3,7 @@ kind: Kustomization
 
 resources:
 - crd/full/serving.kserve.io_clusterservingruntimes.yaml
+- namespace.yaml
 - overlays/odh/
 
 patches:
