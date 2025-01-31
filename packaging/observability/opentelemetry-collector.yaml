@@ -12,9 +12,9 @@ receivers:
     include: /var/log/pods/openshift-*
   kubeletstats:
     auth_type: tls
-    ca_file:  /var/lib/microshift/certs/
-    key_file: /var/lib/microshift/certs/
-    cert_file: /var/lib/microshift/certs/
+    ca_file: /var/lib/microshift/certs/ca-bundle/client-ca.crt
+    key_file: /var/lib/microshift/certs/admin-kubeconfig-signer/openshift-observability-client/client.key
+    cert_file: /var/lib/microshift/certs/admin-kubeconfig-signer/openshift-observability-client/client.crt
     insecure_skip_verify: true
     collection_interval: 20s
     endpoint: "localhost:10250"

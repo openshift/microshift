@@ -1,14 +1,8 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: openshift-observability
+  name: openshift-observability-client
 rules:
   - apiGroups: [""]
     resources: ["nodes/stats"]
-    verbs: ["get"]
-
-  # Only needed if you are using extra_metadata_labels or
-  # are collecting the request/limit utilization metrics
-  - apiGroups: [""]
-    resources: ["nodes/proxy"]
     verbs: ["get"]

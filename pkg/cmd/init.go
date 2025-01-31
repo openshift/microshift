@@ -154,7 +154,16 @@ func certSetup(cfg *config.Config) (*certchains.CertificateChains, error) {
 					ValidityDays: cryptomaterial.LongLivedCertificateValidityDays,
 				},
 				UserInfo: &user.DefaultInfo{Name: "system:admin", Groups: []string{"system:masters"}},
-			}),
+			}).WithClientCertificates(
+			&certchains.ClientCertificateSigningRequestInfo{
+				CSRMeta: certchains.CSRMeta{
+					Name:         "openshift-observability-client",
+					ValidityDays: cryptomaterial.ShortLivedCertificateValidityDays,
+				},
+				UserInfo: &user.DefaultInfo{Name: "openshift-observability-client", Groups: []string{""},
+				},
+			},
+		),
 
 		// kubelet + CSR signing chain
 		certchains.NewCertificateSigner(
@@ -184,15 +193,6 @@ func certSetup(cfg *config.Config) (*certchains.CertificateChains, error) {
 					Hostnames: []string{cfg.Node.HostnameOverride, cfg.Node.NodeIP},
 				},
 			),
-		).WithClientCertificates(
-			&certchains.ClientCertificateSigningRequestInfo{
-				CSRMeta: certchains.CSRMeta{
-					Name:         "observability-to-kubelet-client",
-					ValidityDays: cryptomaterial.ShortLivedCertificateValidityDays,
-				},
-				UserInfo: &user.DefaultInfo{Name: "observability-to-kubelet", Groups: []string{""},
-				},
-			},
 		),
 		certchains.NewCertificateSigner(
 			"aggregator-signer",
@@ -272,15 +272,6 @@ func certSetup(cfg *config.Config) (*certchains.CertificateChains, error) {
 				},
 				Hostnames: []string{
 					"localhost",
-				},
-			},
-		).WithClientCertificates(
-			&certchains.ClientCertificateSigningRequestInfo{
-				CSRMeta: certchains.CSRMeta{
-					Name: "observability",
-					ValidityDays: cryptomaterial.ShortLivedCertificateValidityDays,
-				},
-				UserInfo: &user.DefaultInfo{Name: "observability", Groups: []string{"observability"},
 				},
 			},
 		),
