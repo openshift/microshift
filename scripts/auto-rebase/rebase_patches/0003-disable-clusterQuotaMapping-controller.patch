@@ -42,7 +42,7 @@ index d402786d..eb81d0bc 100644
  	// ADMISSION
 -	clusterQuotaMappingController := newClusterQuotaMappingController(kubeInformers.Core().V1().Namespaces(), openshiftInformers.OpenshiftQuotaInformers.Quota().V1().ClusterResourceQuotas())
 -	genericConfig.AddPostStartHookOrDie("quota.openshift.io-clusterquotamapping", func(context genericapiserver.PostStartHookContext) error {
--		go clusterQuotaMappingController.Run(5, context.StopCh)
+-		go clusterQuotaMappingController.Run(5, context.Done())
 -		return nil
 -	})
  

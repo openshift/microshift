@@ -138,7 +138,7 @@
       ],
       "properties": {
         "baseDomain": {
-          "description": "baseDomain is the base domain of the cluster. All managed DNS records will\nbe sub-domains of this base.\n\n\nFor example, given the base domain `example.com`, router exposed\ndomains will be formed as `*.apps.example.com` by default,\nand API service will have a DNS entry for `api.example.com`,\nas well as \"api-int.example.com\" for internal k8s API access.\n\n\nOnce set, this field cannot be changed.",
+          "description": "baseDomain is the base domain of the cluster. All managed DNS records will\nbe sub-domains of this base.\n\nFor example, given the base domain `example.com`, router exposed\ndomains will be formed as `*.apps.example.com` by default,\nand API service will have a DNS entry for `api.example.com`,\nas well as \"api-int.example.com\" for internal k8s API access.\n\nOnce set, this field cannot be changed.",
           "type": "string",
           "default": "example.com",
           "example": "microshift.example.com"
@@ -175,7 +175,7 @@
           "default": "1"
         },
         "forwardedHeaderPolicy": {
-          "description": "forwardedHeaderPolicy specifies when and how ingress router\nsets the Forwarded, X-Forwarded-For, X-Forwarded-Host,\nX-Forwarded-Port, X-Forwarded-Proto, and X-Forwarded-Proto-Version\nHTTP headers.  The value may be one of the following:\n\n\n* \"Append\", which specifies that ingress router appends the\n  headers, preserving existing headers.\n\n\n* \"Replace\", which specifies that ingress router sets the\n  headers, replacing any existing Forwarded or X-Forwarded-* headers.\n\n\n* \"IfNone\", which specifies that ingress router sets the\n  headers if they are not already set.\n\n\n* \"Never\", which specifies that ingress router never sets the\n  headers, preserving any existing headers.\n\n\nBy default, the policy is \"Append\".",
+          "description": "forwardedHeaderPolicy specifies when and how ingress router\nsets the Forwarded, X-Forwarded-For, X-Forwarded-Host,\nX-Forwarded-Port, X-Forwarded-Proto, and X-Forwarded-Proto-Version\nHTTP headers.  The value may be one of the following:\n\n* \"Append\", which specifies that ingress router appends the\n  headers, preserving existing headers.\n\n* \"Replace\", which specifies that ingress router sets the\n  headers, replacing any existing Forwarded or X-Forwarded-* headers.\n\n* \"IfNone\", which specifies that ingress router sets the\n  headers if they are not already set.\n\n* \"Never\", which specifies that ingress router never sets the\n  headers, preserving any existing headers.\n\nBy default, the policy is \"Append\".",
           "type": "string",
           "enum": [
             "Append",
@@ -189,10 +189,10 @@
           "type": "object",
           "properties": {
             "mimeTypes": {
-              "description": "mimeTypes is a list of MIME types that should have compression applied.\nThis list can be empty, in which case the ingress controller does not apply compression.\n\n\nNote: Not all MIME types benefit from compression, but HAProxy will still use resources\nto try to compress if instructed to.  Generally speaking, text (html, css, js, etc.)\nformats benefit from compression, but formats that are already compressed (image,\naudio, video, etc.) benefit little in exchange for the time and cpu spent on compressing\nagain. See https://joehonton.medium.com/the-gzip-penalty-d31bd697f1a2",
+              "description": "mimeTypes is a list of MIME types that should have compression applied.\nThis list can be empty, in which case the ingress controller does not apply compression.\n\nNote: Not all MIME types benefit from compression, but HAProxy will still use resources\nto try to compress if instructed to.  Generally speaking, text (html, css, js, etc.)\nformats benefit from compression, but formats that are already compressed (image,\naudio, video, etc.) benefit little in exchange for the time and cpu spent on compressing\nagain. See https://joehonton.medium.com/the-gzip-penalty-d31bd697f1a2",
               "type": "array",
               "items": {
-                "description": "CompressionMIMEType defines the format of a single MIME type.\nE.g. \"text/css; charset=utf-8\", \"text/html\", \"text/*\", \"image/svg+xml\",\n\"application/octet-stream\", \"X-custom/customsub\", etc.\n\n\nThe format should follow the Content-Type definition in RFC 1341:\nContent-Type := type \"/\" subtype *[\";\" parameter]\n  - The type in Content-Type can be one of:\n    application, audio, image, message, multipart, text, video, or a custom\n    type preceded by \"X-\" and followed by a token as defined below.\n  - The token is a string of at least one character, and not containing white\n    space, control characters, or any of the characters in the tspecials set.\n  - The tspecials set contains the characters ()\u003c\u003e@,;:\\\"/[]?.=\n  - The subtype in Content-Type is also a token.\n  - The optional parameter/s following the subtype are defined as:\n    token \"=\" (token / quoted-string)\n  - The quoted-string, as defined in RFC 822, is surrounded by double quotes\n    and can contain white space plus any character EXCEPT \\, \", and CR.\n    It can also contain any single ASCII character as long as it is escaped by \\.",
+                "description": "CompressionMIMEType defines the format of a single MIME type.\nE.g. \"text/css; charset=utf-8\", \"text/html\", \"text/*\", \"image/svg+xml\",\n\"application/octet-stream\", \"X-custom/customsub\", etc.\n\nThe format should follow the Content-Type definition in RFC 1341:\nContent-Type := type \"/\" subtype *[\";\" parameter]\n  - The type in Content-Type can be one of:\n    application, audio, image, message, multipart, text, video, or a custom\n    type preceded by \"X-\" and followed by a token as defined below.\n  - The token is a string of at least one character, and not containing white\n    space, control characters, or any of the characters in the tspecials set.\n  - The tspecials set contains the characters ()\u003c\u003e@,;:\\\"/[]?.=\n  - The subtype in Content-Type is also a token.\n  - The optional parameter/s following the subtype are defined as:\n    token \"=\" (token / quoted-string)\n  - The quoted-string, as defined in RFC 822, is surrounded by double quotes\n    and can contain white space plus any character EXCEPT \\, \", and CR.\n    It can also contain any single ASCII character as long as it is escaped by \\.",
                 "type": "string",
                 "pattern": "^(?i)(x-[^][ ()\\\\\u003c\u003e@,;:\"/?.=\\x00-\\x1F\\x7F]+|application|audio|image|message|multipart|text|video)/[^][ ()\\\\\u003c\u003e@,;:\"/?.=\\x00-\\x1F\\x7F]+(; *[^][ ()\\\\\u003c\u003e@,;:\"/?.=\\x00-\\x1F\\x7F]+=([^][ ()\\\\\u003c\u003e@,;:\"/?.=\\x00-\\x1F\\x7F]+|\"(\\\\[\\x00-\\x7F]|[^\\x0D\"\\\\])*\"))*$"
               },
@@ -201,7 +201,7 @@
           }
         },
         "httpEmptyRequestsPolicy": {
-          "description": "httpEmptyRequestsPolicy describes how HTTP connections should be\nhandled if the connection times out before a request is received.\nAllowed values for this field are \"Respond\" and \"Ignore\".  If the\nfield is set to \"Respond\", the ingress controller sends an HTTP 400\nor 408 response, logs the connection (if access logging is enabled),\nand counts the connection in the appropriate metrics.  If the field\nis set to \"Ignore\", the ingress controller closes the connection\nwithout sending a response, logging the connection, or incrementing\nmetrics.  The default value is \"Respond\".\n\n\nTypically, these connections come from load balancers' health probes\nor Web browsers' speculative connections (\"preconnect\") and can be\nsafely ignored.  However, these requests may also be caused by\nnetwork errors, and so setting this field to \"Ignore\" may impede\ndetection and diagnosis of problems.  In addition, these requests may\nbe caused by port scans, in which case logging empty requests may aid\nin detecting intrusion attempts.",
+          "description": "httpEmptyRequestsPolicy describes how HTTP connections should be\nhandled if the connection times out before a request is received.\nAllowed values for this field are \"Respond\" and \"Ignore\".  If the\nfield is set to \"Respond\", the ingress controller sends an HTTP 400\nor 408 response, logs the connection (if access logging is enabled),\nand counts the connection in the appropriate metrics.  If the field\nis set to \"Ignore\", the ingress controller closes the connection\nwithout sending a response, logging the connection, or incrementing\nmetrics.  The default value is \"Respond\".\n\nTypically, these connections come from load balancers' health probes\nor Web browsers' speculative connections (\"preconnect\") and can be\nsafely ignored.  However, these requests may also be caused by\nnetwork errors, and so setting this field to \"Ignore\" may impede\ndetection and diagnosis of problems.  In addition, these requests may\nbe caused by port scans, in which case logging empty requests may aid\nin detecting intrusion attempts.",
           "type": "string",
           "default": "Respond",
           "enum": [
@@ -251,7 +251,7 @@
           ],
           "properties": {
             "namespaceOwnership": {
-              "description": "Describes how host name claims across namespaces should be handled.\n\n\nValue must be one of:\n\n\n- Strict: Do not allow routes in different namespaces to claim the same host.\n\n\n- InterNamespaceAllowed: Allow routes to claim different paths of the same\n  host name across namespaces.\n\n\nIf empty, the default is InterNamespaceAllowed.",
+              "description": "Describes how host name claims across namespaces should be handled.\n\nValue must be one of:\n\n- Strict: Do not allow routes in different namespaces to claim the same host.\n\n- InterNamespaceAllowed: Allow routes to claim different paths of the same\n  host name across namespaces.\n\nIf empty, the default is InterNamespaceAllowed.",
               "type": "string",
               "default": "InterNamespaceAllowed"
             }
@@ -267,67 +267,67 @@
           "type": "object",
           "properties": {
             "clientFinTimeout": {
-              "description": "clientFinTimeout defines how long a connection will be held open while\nwaiting for the client response to the server/backend closing the\nconnection.\n\n\nIf unset, the default timeout is 1s",
+              "description": "clientFinTimeout defines how long a connection will be held open while\nwaiting for the client response to the server/backend closing the\nconnection.\n\nIf unset, the default timeout is 1s",
               "type": "string",
               "format": "duration",
               "default": "1s"
             },
             "clientTimeout": {
-              "description": "clientTimeout defines how long a connection will be held open while\nwaiting for a client response.\n\n\nIf unset, the default timeout is 30s",
+              "description": "clientTimeout defines how long a connection will be held open while\nwaiting for a client response.\n\nIf unset, the default timeout is 30s",
               "type": "string",
               "format": "duration",
               "default": "30s"
             },
             "headerBufferBytes": {
-              "description": "headerBufferBytes describes how much memory should be reserved\n(in bytes) for IngressController connection sessions.\nNote that this value must be at least 16384 if HTTP/2 is\nenabled for the IngressController (https://tools.ietf.org/html/rfc7540).\nIf this field is empty, the IngressController will use a default value\nof 32768 bytes.\n\n\nSetting this field is generally not recommended as headerBufferBytes\nvalues that are too small may break the IngressController and\nheaderBufferBytes values that are too large could cause the\nIngressController to use significantly more memory than necessary.",
+              "description": "headerBufferBytes describes how much memory should be reserved\n(in bytes) for IngressController connection sessions.\nNote that this value must be at least 16384 if HTTP/2 is\nenabled for the IngressController (https://tools.ietf.org/html/rfc7540).\nIf this field is empty, the IngressController will use a default value\nof 32768 bytes.\n\nSetting this field is generally not recommended as headerBufferBytes\nvalues that are too small may break the IngressController and\nheaderBufferBytes values that are too large could cause the\nIngressController to use significantly more memory than necessary.",
               "type": "integer",
               "format": "int32",
               "minimum": 16384
             },
             "headerBufferMaxRewriteBytes": {
-              "description": "headerBufferMaxRewriteBytes describes how much memory should be reserved\n(in bytes) from headerBufferBytes for HTTP header rewriting\nand appending for IngressController connection sessions.\nNote that incoming HTTP requests will be limited to\n(headerBufferBytes - headerBufferMaxRewriteBytes) bytes, meaning\nheaderBufferBytes must be greater than headerBufferMaxRewriteBytes.\nIf this field is empty, the IngressController will use a default value\nof 8192 bytes.\n\n\nSetting this field is generally not recommended as\nheaderBufferMaxRewriteBytes values that are too small may break the\nIngressController and headerBufferMaxRewriteBytes values that are too\nlarge could cause the IngressController to use significantly more memory\nthan necessary.",
+              "description": "headerBufferMaxRewriteBytes describes how much memory should be reserved\n(in bytes) from headerBufferBytes for HTTP header rewriting\nand appending for IngressController connection sessions.\nNote that incoming HTTP requests will be limited to\n(headerBufferBytes - headerBufferMaxRewriteBytes) bytes, meaning\nheaderBufferBytes must be greater than headerBufferMaxRewriteBytes.\nIf this field is empty, the IngressController will use a default value\nof 8192 bytes.\n\nSetting this field is generally not recommended as\nheaderBufferMaxRewriteBytes values that are too small may break the\nIngressController and headerBufferMaxRewriteBytes values that are too\nlarge could cause the IngressController to use significantly more memory\nthan necessary.",
               "type": "integer",
               "format": "int32",
               "minimum": 4096
             },
             "healthCheckInterval": {
-              "description": "healthCheckInterval defines how long the router waits between two consecutive\nhealth checks on its configured backends.  This value is applied globally as\na default for all routes, but may be overridden per-route by the route annotation\n\"router.openshift.io/haproxy.health.check.interval\".\n\n\nExpects an unsigned duration string of decimal numbers, each with optional\nfraction and a unit suffix, eg \"300ms\", \"1.5h\" or \"2h45m\".\nValid time units are \"ns\", \"us\" (or \"µs\" U+00B5 or \"μs\" U+03BC), \"ms\", \"s\", \"m\", \"h\".\n\n\nSetting this to less than 5s can cause excess traffic due to too frequent\nTCP health checks and accompanying SYN packet storms.  Alternatively, setting\nthis too high can result in increased latency, due to backend servers that are no\nlonger available, but haven't yet been detected as such.\n\n\nAn empty or zero healthCheckInterval means no opinion and IngressController chooses\na default, which is subject to change over time.\nCurrently the default healthCheckInterval value is 5s.\n\n\nCurrently the minimum allowed value is 1s and the maximum allowed value is\n2147483647ms (24.85 days).  Both are subject to change over time.",
+              "description": "healthCheckInterval defines how long the router waits between two consecutive\nhealth checks on its configured backends.  This value is applied globally as\na default for all routes, but may be overridden per-route by the route annotation\n\"router.openshift.io/haproxy.health.check.interval\".\n\nExpects an unsigned duration string of decimal numbers, each with optional\nfraction and a unit suffix, eg \"300ms\", \"1.5h\" or \"2h45m\".\nValid time units are \"ns\", \"us\" (or \"µs\" U+00B5 or \"μs\" U+03BC), \"ms\", \"s\", \"m\", \"h\".\n\nSetting this to less than 5s can cause excess traffic due to too frequent\nTCP health checks and accompanying SYN packet storms.  Alternatively, setting\nthis too high can result in increased latency, due to backend servers that are no\nlonger available, but haven't yet been detected as such.\n\nAn empty or zero healthCheckInterval means no opinion and IngressController chooses\na default, which is subject to change over time.\nCurrently the default healthCheckInterval value is 5s.\n\nCurrently the minimum allowed value is 1s and the maximum allowed value is\n2147483647ms (24.85 days).  Both are subject to change over time.",
               "type": "string",
               "default": "5s",
               "pattern": "^(0|([0-9]+(\\.[0-9]+)?(ns|us|µs|μs|ms|s|m|h))+)$"
             },
             "maxConnections": {
-              "description": "maxConnections defines the maximum number of simultaneous\nconnections that can be established per HAProxy process.\nIncreasing this value allows each ingress controller pod to\nhandle more connections but at the cost of additional\nsystem resources being consumed.\n\n\nPermitted values are: empty, 0, -1, and the range\n2000-2000000.\n\n\nIf this field is empty or 0, the IngressController will use\nthe default value of 50000, but the default is subject to\nchange in future releases.\n\n\nIf the value is -1 then HAProxy will dynamically compute a\nmaximum value based on the available ulimits in the running\ncontainer. Selecting -1 (i.e., auto) will result in a large\nvalue being computed (~520000 on OpenShift \u003e=4.10 clusters)\nand therefore each HAProxy process will incur significant\nmemory usage compared to the current default of 50000.\n\n\nSetting a value that is greater than the current operating\nsystem limit will prevent the HAProxy process from\nstarting.\n\n\nIf you choose a discrete value (e.g., 750000) and the\nrouter pod is migrated to a new node, there's no guarantee\nthat that new node has identical ulimits configured. In\nsuch a scenario the pod would fail to start. If you have\nnodes with different ulimits configured (e.g., different\ntuned profiles) and you choose a discrete value then the\nguidance is to use -1 and let the value be computed\ndynamically at runtime.\n\n\nYou can monitor memory usage for router containers with the\nfollowing metric:\n'container_memory_working_set_bytes{container=\"router\",namespace=\"openshift-ingress\"}'.\n\n\nYou can monitor memory usage of individual HAProxy\nprocesses in router containers with the following metric:\n'container_memory_working_set_bytes{container=\"router\",namespace=\"openshift-ingress\"}/container_processes{container=\"router\",namespace=\"openshift-ingress\"}'.",
+              "description": "maxConnections defines the maximum number of simultaneous\nconnections that can be established per HAProxy process.\nIncreasing this value allows each ingress controller pod to\nhandle more connections but at the cost of additional\nsystem resources being consumed.\n\nPermitted values are: empty, 0, -1, and the range\n2000-2000000.\n\nIf this field is empty or 0, the IngressController will use\nthe default value of 50000, but the default is subject to\nchange in future releases.\n\nIf the value is -1 then HAProxy will dynamically compute a\nmaximum value based on the available ulimits in the running\ncontainer. Selecting -1 (i.e., auto) will result in a large\nvalue being computed (~520000 on OpenShift \u003e=4.10 clusters)\nand therefore each HAProxy process will incur significant\nmemory usage compared to the current default of 50000.\n\nSetting a value that is greater than the current operating\nsystem limit will prevent the HAProxy process from\nstarting.\n\nIf you choose a discrete value (e.g., 750000) and the\nrouter pod is migrated to a new node, there's no guarantee\nthat that new node has identical ulimits configured. In\nsuch a scenario the pod would fail to start. If you have\nnodes with different ulimits configured (e.g., different\ntuned profiles) and you choose a discrete value then the\nguidance is to use -1 and let the value be computed\ndynamically at runtime.\n\nYou can monitor memory usage for router containers with the\nfollowing metric:\n'container_memory_working_set_bytes{container=\"router\",namespace=\"openshift-ingress\"}'.\n\nYou can monitor memory usage of individual HAProxy\nprocesses in router containers with the following metric:\n'container_memory_working_set_bytes{container=\"router\",namespace=\"openshift-ingress\"}/container_processes{container=\"router\",namespace=\"openshift-ingress\"}'.",
               "type": "integer",
               "format": "int32"
             },
             "serverFinTimeout": {
-              "description": "serverFinTimeout defines how long a connection will be held open while\nwaiting for the server/backend response to the client closing the\nconnection.\n\n\nIf unset, the default timeout is 1s",
+              "description": "serverFinTimeout defines how long a connection will be held open while\nwaiting for the server/backend response to the client closing the\nconnection.\n\nIf unset, the default timeout is 1s",
               "type": "string",
               "format": "duration",
               "default": "1s"
             },
             "serverTimeout": {
-              "description": "serverTimeout defines how long a connection will be held open while\nwaiting for a server/backend response.\n\n\nIf unset, the default timeout is 30s",
+              "description": "serverTimeout defines how long a connection will be held open while\nwaiting for a server/backend response.\n\nIf unset, the default timeout is 30s",
               "type": "string",
               "format": "duration",
               "default": "30s"
             },
             "threadCount": {
-              "description": "threadCount defines the number of threads created per HAProxy process.\nCreating more threads allows each ingress controller pod to handle more\nconnections, at the cost of more system resources being used. HAProxy\ncurrently supports up to 64 threads. If this field is empty, the\nIngressController will use the default value.  The current default is 4\nthreads, but this may change in future releases.\n\n\nSetting this field is generally not recommended. Increasing the number\nof HAProxy threads allows ingress controller pods to utilize more CPU\ntime under load, potentially starving other pods if set too high.\nReducing the number of threads may cause the ingress controller to\nperform poorly.",
+              "description": "threadCount defines the number of threads created per HAProxy process.\nCreating more threads allows each ingress controller pod to handle more\nconnections, at the cost of more system resources being used. HAProxy\ncurrently supports up to 64 threads. If this field is empty, the\nIngressController will use the default value.  The current default is 4\nthreads, but this may change in future releases.\n\nSetting this field is generally not recommended. Increasing the number\nof HAProxy threads allows ingress controller pods to utilize more CPU\ntime under load, potentially starving other pods if set too high.\nReducing the number of threads may cause the ingress controller to\nperform poorly.",
               "type": "integer",
               "format": "int32",
               "maximum": 64,
               "minimum": 1
             },
             "tlsInspectDelay": {
-              "description": "tlsInspectDelay defines how long the router can hold data to find a\nmatching route.\n\n\nSetting this too short can cause the router to fall back to the default\ncertificate for edge-terminated or reencrypt routes even when a better\nmatching certificate could be used.\n\n\nIf unset, the default inspect delay is 5s",
+              "description": "tlsInspectDelay defines how long the router can hold data to find a\nmatching route.\n\nSetting this too short can cause the router to fall back to the default\ncertificate for edge-terminated or reencrypt routes even when a better\nmatching certificate could be used.\n\nIf unset, the default inspect delay is 5s",
               "type": "string",
               "format": "duration",
               "default": "5s"
             },
             "tunnelTimeout": {
-              "description": "tunnelTimeout defines how long a tunnel connection (including\nwebsockets) will be held open while the tunnel is idle.\n\n\nIf unset, the default timeout is 1h",
+              "description": "tunnelTimeout defines how long a tunnel connection (including\nwebsockets) will be held open while the tunnel is idle.\n\nIf unset, the default timeout is 1h",
               "type": "string",
               "format": "duration",
               "default": "1h"
