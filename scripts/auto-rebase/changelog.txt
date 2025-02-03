@@ -1,4 +1,0 @@
-- machine-config-operator embedded-component adc9ad759067e02cf643ec4beaf731d5245bbfe3 to 9e721f05c02ec0dd8d1f4d58b95462bb87748f17
-  - 98c4efba 2025-01-10T17:33:24+00:00 operator: update alert on pause of required mcp
-  - 2410e2e3 2024-09-10T06:09:03+00:00 OCPBUGS-39222: Do not enable on-prem-resolv-prepender.path for UPI
-
