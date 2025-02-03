@@ -152,29 +152,18 @@ Custom TLS 1_2 configuration
     Should Contain    ${config.apiServer.tls.cipherSuites}    TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256
     Should Contain    ${config.apiServer.tls.cipherSuites}    TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
 
+    # on TLSv1.2, openssl ciphers string codes (defined by IANA) does not excatly match openshift ones
     # custom cipher defined for this test
-    ${stdout}    ${rc}=    Openssl Connect Command
-    ...    ${USHIFT_HOST}:6443
-    ...    -tls1_2 -cipher ECDHE-RSA-CHACHA20-POLY1305
-    Should Be Equal As Integers    ${rc}    0
-    Should Contain    ${stdout}    TLSv1.2, Cipher is ECDHE-RSA-CHACHA20-POLY1305
+    Check TLS Endpoints    0    TLSv1.2    ECDHE-RSA-CHACHA20-POLY1305    # TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256
+    Check TLS Endpoints    1    TLSv1.3    ECDHE-RSA-CHACHA20-POLY1305    # TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256
 
     # mandatory cipher needed for internal enpoints (i.e. etcd), set if not defined by the user
-    ${stdout}    ${rc}=    Openssl Connect Command
-    ...    ${USHIFT_HOST}:6443
-    ...    -tls1_2 -cipher ECDHE-RSA-AES128-GCM-SHA256
-    Should Be Equal As Integers    ${rc}    0
-    Should Contain    ${stdout}    TLSv1.2, Cipher is ECDHE-RSA-AES128-GCM-SHA256
+    Check TLS Endpoints    0    TLSv1.2    ECDHE-RSA-AES128-GCM-SHA256    # TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+    Check TLS Endpoints    1    TLSv1.3    ECDHE-RSA-AES128-GCM-SHA256    # TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
 
     # when TLSv1.2 is set as min version, TLSv1.3 must also work
-    ${stdout}    ${rc}=    Openssl Connect Command
-    ...    ${USHIFT_HOST}:6443
-    ...    -tls1_3 -ciphersuites TLS_AES_128_GCM_SHA256
-    Should Be Equal As Integers    ${rc}    0
-    Should Contain    ${stdout}    TLSv1.3, Cipher is TLS_AES_128_GCM_SHA256
-
-    Check TLS On Internal Endpoints    -tls1_2    0
-    Check TLS On Internal Endpoints    -tls1_3    0
+    Check TLS Endpoints    1    TLSv1.2    TLS_AES_128_GCM_SHA256
+    Check TLS Endpoints    0    TLSv1.3    TLS_AES_128_GCM_SHA256
 
     [Teardown]    Run Keywords
     ...    Remove TLS Drop In Config
@@ -192,30 +181,13 @@ Custom TLS 1_3 configuration
     Should Contain    ${config.apiServer.tls.cipherSuites}    TLS_AES_256_GCM_SHA384
     Should Contain    ${config.apiServer.tls.cipherSuites}    TLS_CHACHA20_POLY1305_SHA256
 
-    ${stdout}    ${rc}=    Openssl Connect Command    ${USHIFT_HOST}:6443    -tls1_2
-    Should Be Equal As Integers    ${rc}    1
-    Should Contain    ${stdout}    TLSv1.2
-
-    ${stdout}    ${rc}=    Openssl Connect Command
-    ...    ${USHIFT_HOST}:6443
-    ...    -tls1_3 -ciphersuites TLS_AES_128_GCM_SHA256
-    Should Be Equal As Integers    ${rc}    0
-    Should Contain    ${stdout}    TLSv1.3, Cipher is TLS_AES_128_GCM_SHA256
-
-    ${stdout}    ${rc}=    Openssl Connect Command
-    ...    ${USHIFT_HOST}:6443
-    ...    -tls1_3 -ciphersuites TLS_AES_256_GCM_SHA384
-    Should Be Equal As Integers    ${rc}    0
-    Should Contain    ${stdout}    TLSv1.3, Cipher is TLS_AES_256_GCM_SHA384
-
-    ${stdout}    ${rc}=    Openssl Connect Command
-    ...    ${USHIFT_HOST}:6443
-    ...    -tls1_3 -ciphersuites TLS_CHACHA20_POLY1305_SHA256
-    Should Be Equal As Integers    ${rc}    0
-    Should Contain    ${stdout}    TLSv1.3, Cipher is TLS_CHACHA20_POLY1305_SHA256
-
-    Check TLS On Internal Endpoints    -tls1_2    1
-    Check TLS On Internal Endpoints    -tls1_3    0
+    # checking the 3 ciphers available for TLSv1.3 on openshift
+    Check TLS Endpoints    1    TLSv1.2    TLS_AES_128_GCM_SHA256
+    Check TLS Endpoints    0    TLSv1.3    TLS_AES_128_GCM_SHA256
+    Check TLS Endpoints    1    TLSv1.2    TLS_AES_256_GCM_SHA384
+    Check TLS Endpoints    0    TLSv1.3    TLS_AES_256_GCM_SHA384
+    Check TLS Endpoints    1    TLSv1.2    TLS_CHACHA20_POLY1305_SHA256
+    Check TLS Endpoints    0    TLSv1.3    TLS_CHACHA20_POLY1305_SHA256
 
     [Teardown]    Run Keywords
     ...    Remove TLS Drop In Config
@@ -307,23 +279,26 @@ Openssl Connect Command
     ...    sudo=True    return_stdout=True    return_stderr=False    return_rc=True
     RETURN    ${stdout}    ${rc}
 
-Check TLS On Internal Endpoints
+Check TLS Endpoints
     [Documentation]    Run Openssl Connect Command to check k8s internal endpoints
-    [Arguments]    ${tls_flag}    ${return_code}
-    # kubelet endpoint
-    ${stdout}    ${rc}=    Openssl Connect Command    ${USHIFT_HOST}:10250    ${tls_flag}
-    Should Be Equal As Integers    ${rc}    ${return_code}
+    [Arguments]    ${return_code}    ${tls_version}    ${cipher}
+    IF    "${tls_version}" == "TLSv1.2"
+        Set Test Variable    ${TLS_AND_CIPHER_ARGS}    -tls1_2 -cipher ${cipher}
+    ELSE IF    "${tls_version}" == "TLSv1.3"
+        Set Test Variable    ${TLS_AND_CIPHER_ARGS}    -tls1_3 -ciphersuites ${cipher}
+    END
 
-    # kube controller manager endpoint
-    ${stdout}    ${rc}=    Openssl Connect Command    ${USHIFT_HOST}:10257    ${tls_flag}
-    Should Be Equal As Integers    ${rc}    ${return_code}
-
-    # kube scheduler endpoint
-    ${stdout}    ${rc}=    Openssl Connect Command    ${USHIFT_HOST}:10259    ${tls_flag}
-    Should Be Equal As Integers    ${rc}    ${return_code}
+    # api server, kubelet, kube controller manager and kube scheduler endpoint ports
+    FOR    ${port}    IN    6443    10250    10257    10259
+        ${stdout}    ${rc}=    Openssl Connect Command    ${USHIFT_HOST}:${port}    ${TLS_AND_CIPHER_ARGS}
+        Should Be Equal As Integers    ${return_code}    ${rc}
+        IF    "${rc}" == "0"
+            Should Contain    ${stdout}    ${tls_version}, Cipher is ${cipher}
+        END
+    END
 
     # etcd endpoint, need to use cert and key because etcd requires mTLS
     Set Test Variable    ${CERT_ARG}    -cert ${APISERVER_ETCD_CLIENT_CERT}/client.crt
     Set Test Variable    ${KEY_ARG}    -key ${APISERVER_ETCD_CLIENT_CERT}/client.key
-    ${stdout}    ${rc}=    Openssl Connect Command    localhost:2379    ${tls_flag} ${CERT_ARG} ${KEY_ARG}
-    Should Be Equal As Integers    ${rc}    ${return_code}
+    ${stdout}    ${rc}=    Openssl Connect Command    localhost:2379    ${TLS_AND_CIPHER_ARGS} ${CERT_ARG} ${KEY_ARG}
+    Should Be Equal As Integers    ${return_code}    ${rc}
