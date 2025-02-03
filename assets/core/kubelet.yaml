@@ -27,6 +27,8 @@ rotateCertificates: false # TODO
 serializeImagePulls: false
 serverTLSBootstrap: false # TODO
 tlsCertFile: "{{ .tlsCertFile }}"
+tlsCipherSuites: [{{.tlsCipherSuites}}]
+tlsMinVersion: "{{ .tlsMinVersion }}"
 tlsPrivateKeyFile: "{{ .tlsPrivateKeyFile }}"
 volumePluginDir: "{{ .volumePluginDir }}"
 {{- if .resolvConf }}
