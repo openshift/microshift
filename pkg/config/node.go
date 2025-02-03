@@ -46,28 +46,35 @@ func (c *Config) establishNodeName(dataDir string) (string, error) {
 	filePath := filepath.Join(dataDir, ".nodename")
 	contents, err := os.ReadFile(filePath)
 	if os.IsNotExist(err) {
-		// ensure that dataDir exists
-		if err := os.MkdirAll(dataDir, 0700); err != nil {
-			return "", fmt.Errorf("failed to create data dir: %w", err)
-		}
-		tmpPath, err := util.GenerateUniqueTempPath(filePath)
-		if err != nil {
-			return "", fmt.Errorf("failed to generate temp path for %s: %w", filePath, err)
-		}
-		if err := os.WriteFile(tmpPath, []byte(name), 0400); err != nil {
-			return "", fmt.Errorf("failed to write nodename file %q: %v", filePath, err)
-		}
-		if err := os.Rename(tmpPath, filePath); err != nil {
-			if err := os.RemoveAll(tmpPath); err != nil {
-				klog.Errorf("Failed to remove intermediate path %q: %v", tmpPath, err)
-			}
-			return "", fmt.Errorf("failed to rename %s to %s: %w", tmpPath, filePath, err)
+		if err := c.createNodeNameFile(name, filePath, dataDir); err != nil {
+			return "", err
 		}
 		return name, nil
 	} else if err != nil {
 		return "", err
 	}
 	return string(contents), nil
+}
+
+func (c *Config) createNodeNameFile(nodeName, filePath, dataDir string) error {
+	// ensure that dataDir exists
+	if err := os.MkdirAll(dataDir, 0700); err != nil {
+		return fmt.Errorf("failed to create data dir: %w", err)
+	}
+	tmpPath, err := util.GenerateUniqueTempPath(filePath)
+	if err != nil {
+		return fmt.Errorf("failed to generate temp path for %s: %w", filePath, err)
+	}
+	if err := os.WriteFile(tmpPath, []byte(nodeName), 0400); err != nil {
+		return fmt.Errorf("failed to write nodename file %q: %v", filePath, err)
+	}
+	if err := os.Rename(tmpPath, filePath); err != nil {
+		if err := os.RemoveAll(tmpPath); err != nil {
+			klog.Errorf("Failed to remove intermediate path %q: %v", tmpPath, err)
+		}
+		return fmt.Errorf("failed to rename %s to %s: %w", tmpPath, filePath, err)
+	}
+	return nil
 }
 
 // Validate the NodeName to be used for this MicroShift instances
