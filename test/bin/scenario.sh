@@ -135,6 +135,68 @@ copy_file_from_vm() {
     scp -P "${ssh_port}" "redhat@${ip}:${remote_filename}" "${local_filename}"
 }
 
+copy_file_to_vm_offline() {
+    # TODO change to parameters when finished
+    local -r vmname="host1"
+    local -r remote_filename="/tmp/sos-wrapper.sh"
+    local -r local_filename="/tmp/sos-wrapper.sh"
+    local -r full_vmname="el95-src-offline-host1"
+
+    # TODO async?
+    local file_open_handle="$(sudo virsh qemu-agent-command ${full_vmname} \
+        "$(jq -n --arg path "$remote_filename" \
+        '{"execute": "guest-file-open", "arguments": {"path": $path, "mode": "w"}}')" | jq '.return')"
+
+    local buffer="$(base64 -w 0 ${local_filename})"
+
+    sudo virsh qemu-agent-command ${full_vmname} \
+        "$(jq -n --argjson handle "$file_open_handle" --arg buf "$buffer" \
+        '{"execute": "guest-file-write", "arguments": {"handle": $handle, "buf-b64": $buf}}')"
+    
+    sudo virsh qemu-agent-command ${full_vmname} \
+        "$(jq -n --argjson handle "$file_open_handle" \
+        '{"execute": "guest-file-close", "arguments": {"handle": $handle}}')"
+}
+
+copy_file_from_vm_offline() {
+    # TODO change to parameters when finished
+    local -r vmname="host1"
+    local -r remote_filename="/tmp/sos-wrapper.sh"
+    local -r local_filename="/tmp/sos-wrapper.sh"
+    local -r full_vmname="el95-src-offline-host1"
+
+    local file_open_handle="$(sudo virsh qemu-agent-command ${full_vmname} \
+        "$(jq -n --arg path "$remote_filename" \
+        '{"execute": "guest-file-open", "arguments": {"path": $path, "mode": "r"}}')" | jq '.return')"
+    
+    full_content=""
+    while true; do
+        read_json="$(sudo virsh qemu-agent-command ${full_vmname} \
+            "$(jq -n --argjson handle "$file_open_handle" --argjson count 4096 \
+            '{"execute": "guest-file-read", "arguments": {"handle": $handle, "count": $count}}')")"
+
+        chunk=$(echo "$read_json" | jq -r '.return."buf-b64"')
+
+        if [[ -z "$chunk" ]]; then
+            break
+        fi
+
+        full_content+=$(echo "$chunk" | base64 -d)
+
+        eof_flag="$(echo "$read_json" | jq -r '.return.eof')"
+        if [[ "$eof_flag" == "true" ]]; then
+            break
+        fi
+    done
+
+    sudo virsh qemu-agent-command ${full_vmname} \
+        "$(jq -n --argjson handle "$file_open_handle" \
+        '{"execute": "guest-file-close", "arguments": {"handle": $handle}}')"
+    
+    echo "${full_content}" >> "${local_filename}"
+
+}
+
 sos_report() {
     local -r junit="${1:-false}"
 
@@ -1181,6 +1243,9 @@ case "${action}" in
     create-and-run)
         action_create "$@"
         action_run "$@"
+        ;;
+    debug)
+        copy_file_from_vm_offline "$@"
         ;;
     *)
         error "Unknown instruction ${action}"
