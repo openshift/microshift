@@ -603,8 +603,8 @@ update_openshift_manifests() {
     yq -i '.rotateCertificates = false | .rotateCertificates line_comment="TODO"' "${REPOROOT}/assets/core/kubelet.yaml"
     yq -i '.serverTLSBootstrap = false | .serverTLSBootstrap line_comment="TODO"' "${REPOROOT}/assets/core/kubelet.yaml"
 
-    yq -i 'del(.tlsMinVersion)' "${REPOROOT}/assets/core/kubelet.yaml"
-    yq -i 'del(.tlsCipherSuites)' "${REPOROOT}/assets/core/kubelet.yaml"
+    yq -i 'with(.tlsMinVersion; . = "{{ .tlsMinVersion }}" | . style="double")' "${REPOROOT}/assets/core/kubelet.yaml"
+    yq -i 'with(.tlsCipherSuites; . = ["{{ .tlsCipherSuites }}"] | . style="flow")' "${REPOROOT}/assets/core/kubelet.yaml"
 
     # Clear and re-create featureGates
     yq -i 'del(.featureGates.AlibabaPlatform)' "${REPOROOT}/assets/core/kubelet.yaml"
@@ -636,6 +636,7 @@ resolvConf: "{{ .resolvConf }}"
 {{- .userProvidedConfig -}}
 {{ end }}
 EOF
+    sed -i "s/'{{ \.tlsCipherSuites }}'/{{ \.tlsCipherSuites }}/g" "${REPOROOT}/assets/core/kubelet.yaml"
 
     #-- OpenShift control plane ---------------------------
     yq -i 'with(.admission.pluginConfig.PodSecurity.configuration.defaults;
