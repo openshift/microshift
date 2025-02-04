@@ -122,3 +122,13 @@ Clear Lvmd Config
     ...    sudo=True    return_rc=True    return_stderr=True    return_stdout=False
     Log    ${stderr}
     Should Be Equal As Integers    0    ${rc}
+
+Show Config
+    [Documentation]    Run microshift show-config with ${mode}
+    [Arguments]    ${mode}
+    ${output}    ${rc}=    Execute Command
+    ...    microshift show-config --mode ${mode}
+    ...    sudo=True    return_rc=True
+    Should Be Equal As Integers    0    ${rc}
+    ${yaml_data}=    Yaml Parse    ${output}
+    RETURN    ${yaml_data}
