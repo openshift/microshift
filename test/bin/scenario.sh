@@ -931,27 +931,14 @@ EOF
         record_junit "${vmname}" "pre_test_greenboot_check" "OK"
     fi
 
-    # Make sure the test execution times out after a predefined period.
-    # The 'timeout' command sends the HUP signal and, if the test does not
-    # exit after 5m, it sends the KILL signal to terminate the process.
-    local var_arg=${variable_file:+-V "${variable_file}"}
-    local timeout_robot="timeout -v --kill-after=5m ${TEST_EXECUTION_TIMEOUT} ${rf_binary}"
-    if [ -t 0 ]; then
-        # Disable timeout for interactive mode when stdin is a terminal.
-        # This is necessary for proper handling of test interruption by user.
-        timeout_robot="${rf_binary}"
-    fi
-
-    # shellcheck disable=SC2086
-    if ! ${timeout_robot} \
-        --name "${SCENARIO}" \
-        --randomize "${TEST_RANDOMIZATION}" \
-        --loglevel TRACE \
-        --outputdir "${SCENARIO_INFO_DIR}/${SCENARIO}" \
-        --debugfile "${SCENARIO_INFO_DIR}/${SCENARIO}/rf-debug.log" \
-        -x junit.xml \
-        ${var_arg} \
-        "$@" ; then
+    if ! "./${SCRIPTDIR}/run_rf_tests.sh" \
+            -i "${variable_file}" \
+            -b "${rf_binary}" \
+            -o "${SCENARIO_INFO_DIR}/${SCENARIO}" \
+            -s "${SCENARIO}" \
+            -r "${TEST_RANDOMIZATION}" \
+            -t "${TEST_EXECUTION_TIMEOUT}" \
+    ; then
         # Log junit message on the command timeout
         if [ $? -ge 124 ] ; then
             record_junit "${vmname}" "run_test_timed_out_${TEST_EXECUTION_TIMEOUT}" "FAILED"
