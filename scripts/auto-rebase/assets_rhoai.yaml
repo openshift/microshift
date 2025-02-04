@@ -1,4 +1,5 @@
 assets:
+# kserve
   - dir: optional/rhoai/kserve/
     no_clean: True
     files:
@@ -102,23 +103,22 @@ assets:
       - file: service.yaml
 
   # Serving Runtimes
-  # - dir: optional/rhoai/runtimes/
-  #   src: rhoai/operator/odh-model-controller/runtimes/
-  #   files:
-  #     - file: kustomization.yaml
-  #       ignore: "MicroShift specific kustomization"
-  #       git_restore: True
-  #     - file: caikit-standalone.yaml
-  #       src: caikit-standalone-template.yaml
-  #     - file: caikit-tgis.yaml
-  #       src: caikit-tgis-template.yaml
-  #     - file: ovms-kserve.yaml
-  #       src: ovms-kserve-template.yaml
-  #     - file: tgis.yaml
-  #       src: tgis-template.yaml
-  #     - file: vllm-gaudi.yaml
-  #       src: vllm-gaudi-template.yaml
-  #     - file: vllm-rocm.yaml
-  #       src: vllm-rocm-template.yaml
-  #     - file: vllm.yaml
-  #       src: vllm-template.yaml
+  - dir: optional/rhoai/runtimes/
+    src: rhoai/operator/odh-model-controller/runtimes/
+    files:
+      - file: kustomization.yaml
+        git_restore: True
+      - file: caikit-standalone.yaml
+        src: caikit-standalone-template.yaml
+      - file: caikit-tgis.yaml
+        src: caikit-tgis-template.yaml
+      - file: ovms-kserve.yaml
+        src: ovms-kserve-template.yaml
+      - file: tgis.yaml
+        src: tgis-template.yaml
+      - file: vllm-gaudi.yaml
+        src: vllm-gaudi-template.yaml
+      - file: vllm-rocm.yaml
+        src: vllm-rocm-template.yaml
+      - file: vllm.yaml
+        src: vllm-template.yaml

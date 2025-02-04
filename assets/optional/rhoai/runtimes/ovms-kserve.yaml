@@ -1,0 +1,51 @@
+apiVersion: serving.kserve.io/v1alpha1
+kind: ClusterServingRuntime
+metadata:
+  annotations:
+    openshift.io/display-name: OpenVINO Model Server
+    opendatahub.io/recommended-accelerators: '["nvidia.com/gpu"]'
+  name: kserve-ovms
+  labels:
+    opendatahub.io/dashboard: 'true'
+spec:
+  multiModel: false
+  annotations:
+    prometheus.io/port: '8888'
+    prometheus.io/path: /metrics
+  supportedModelFormats:
+    - name: openvino_ir
+      version: opset13
+      autoSelect: true
+    - name: onnx
+      version: '1'
+    - name: tensorflow
+      version: '1'
+      autoSelect: true
+    - name: tensorflow
+      version: '2'
+      autoSelect: true
+    - name: paddle
+      version: '2'
+      autoSelect: true
+    - name: pytorch
+      version: '2'
+      autoSelect: true
+  protocolVersions:
+    - v2
+    - grpc-v2
+  containers:
+    - name: kserve-container
+      image: ovms-image
+      args:
+        - '--model_name={{.Name}}'
+        - '--port=8001'
+        - '--rest_port=8888'
+        - '--model_path=/mnt/models'
+        - '--file_system_poll_wait_seconds=0'
+        - '--grpc_bind_address=0.0.0.0'
+        - '--rest_bind_address=0.0.0.0'
+        - '--target_device=AUTO'
+        - '--metrics_enable'
+      ports:
+        - containerPort: 8888
+          protocol: TCP

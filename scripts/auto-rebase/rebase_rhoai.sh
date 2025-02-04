@@ -104,13 +104,47 @@ download_rhoai_manifests() {
 }
 
 process_rhoai_manifests() {
+    title "Copying manifests from staging dir to assets/"
     "${REPOROOT}/scripts/auto-rebase/handle_assets.py" ./scripts/auto-rebase/assets_rhoai.yaml
 
-    
+    update_runtimes
+}
+
+update_runtimes() {
+    title "Dropping template containers from ServingRuntimes and changing them to ClusterServingRuntimes"
+    for runtime in $(find "${REPOROOT}/assets/optional/rhoai/runtimes/" -iname '*.yaml' -not -name 'kustomization.yaml'); do
+        yq --inplace '.objects[0] | .kind = "ClusterServingRuntime"' "${runtime}"
+        containers_amount=$(yq '.spec.containers | length' "${runtime}")
+        for ((i=0; i<containers_amount; i++)); do
+            idx="${i}" yq --inplace --string-interpolation=false \
+                '.spec.containers[env(idx)].image |= sub("\$\((.*)\)", "${1}")' \
+                "${runtime}"
+        done
+    done
+
+    title "Creating ServingRuntime images kustomization"
+
+    local -r kustomization_images="${REPOROOT}/assets/optional/rhoai/runtimes/kustomization.x86_64.yaml"
+    cat <<EOF > "${kustomization_images}"
+
+images:
+EOF
+
+    images=$(cat "${STAGING_OPERATOR}"/odh-model-controller/base/*.env | grep "\-image")
+    for image in ${images}; do
+        local image_name="${image%=*}"
+        local image_ref="${image#*=}"
+        local image_ref_repo="${image_ref%@*}"
+        local image_ref_digest="${image_ref#*@}"
+        tee -a "${kustomization_images}" <<EOF
+  - name: ${image_name}
+    newName: ${image_ref_repo}
+    digest: ${image_ref_digest}
+EOF
+    done
 }
 
 download_rhoai_manifests "registry.redhat.io/rhoai/odh-operator-bundle:v2.16.0"
 process_rhoai_manifests
 
-# Copy kserve/ and /odh-model-controller/runtimes/
 #local -r version=$(yq '.spec.version' "${STAGING_BUNDLE}/${CSV_FILENAME}")

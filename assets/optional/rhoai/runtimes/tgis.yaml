@@ -1,0 +1,32 @@
+apiVersion: serving.kserve.io/v1alpha1
+kind: ClusterServingRuntime
+metadata:
+  name: tgis-grpc-runtime
+  annotations:
+    openshift.io/display-name: TGIS Standalone ServingRuntime for KServe
+    opendatahub.io/recommended-accelerators: '["nvidia.com/gpu"]'
+  labels:
+    opendatahub.io/dashboard: 'true'
+spec:
+  annotations:
+    prometheus.io/port: '3000'
+    prometheus.io/path: '/metrics'
+  multiModel: false
+  supportedModelFormats:
+    - autoSelect: true
+      name: pytorch
+  containers:
+    - name: kserve-container
+      image: tgis-image
+      command: ['text-generation-launcher']
+      args:
+        - '--model-name=/mnt/models/'
+        - '--port=3000'
+        - '--grpc-port=8033'
+      env:
+        - name: HF_HOME
+          value: /tmp/hf_home
+      ports:
+        - containerPort: 8033
+          name: h2c
+          protocol: TCP

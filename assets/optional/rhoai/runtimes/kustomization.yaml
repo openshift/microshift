@@ -1,0 +1,11 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+- caikit-standalone.yaml
+- caikit-tgis.yaml
+- ovms-kserve.yaml
+- tgis.yaml
+- vllm-gaudi.yaml
+- vllm-rocm.yaml
+- vllm.yaml
