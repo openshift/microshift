@@ -933,7 +933,7 @@ EOF
         record_junit "${vmname}" "pre_test_greenboot_check" "OK"
     fi
 
-    if ! "./${SCRIPTDIR}/run_rf_tests.sh" \
+    if ! "${SCRIPTDIR}/run_rf_tests.sh" \
             -i "${variable_file}" \
             -b "${rf_binary}" \
             -o "${SCENARIO_INFO_DIR}/${SCENARIO}" \
