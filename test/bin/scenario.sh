@@ -940,7 +940,8 @@ EOF
             -s "${SCENARIO}" \
             -r "${TEST_RANDOMIZATION}" \
             -t "${TEST_EXECUTION_TIMEOUT}" \
-    ; then
+            "$@" ; \
+    then
         # Log junit message on the command timeout
         if [ $? -ge 124 ] ; then
             record_junit "${vmname}" "run_test_timed_out_${TEST_EXECUTION_TIMEOUT}" "FAILED"
