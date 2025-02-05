@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math"
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
@@ -431,6 +432,28 @@ func generateIngressParams(cfg *config.Config) assets.RenderParams {
 		RouterAllowWildcardRoutes = true
 	}
 
+	// clientCAPath := cfg.Ingress.ClientTLS.ClientCertificatePolicy
+
+	clientAuthPolicy := ""
+	clientCABundleFilename := "ca-bundle.pem"
+	clientCAMountPath := "/etc/pki/tls/client-ca"
+	clientCAMapName := ""
+	clientAuthCAPath := ""
+
+	if len(cfg.Ingress.ClientTLS.ClientCertificatePolicy) != 0 {
+		switch cfg.Ingress.ClientTLS.ClientCertificatePolicy {
+		case operatorv1.ClientCertificatePolicyRequired:
+			clientAuthPolicy = "required"
+		case operatorv1.ClientCertificatePolicyOptional:
+			clientAuthPolicy = "optional"
+		}
+		if len(cfg.Ingress.ClientTLS.ClientCA.Name) != 0 {
+			clientCAMapName = cfg.Ingress.ClientTLS.ClientCA.Name
+		}
+		clientAuthCAPath = filepath.Join(clientCAMountPath, clientCABundleFilename)
+
+	}
+
 	extraParams := assets.RenderParams{
 		"RouterNamespaceOwnership":    cfg.Ingress.AdmissionPolicy.NamespaceOwnership == config.NamespaceOwnershipAllowed,
 		"RouterHttpPort":              *cfg.Ingress.Ports.Http,
@@ -458,6 +481,11 @@ func generateIngressParams(cfg *config.Config) assets.RenderParams {
 		"RouterCiphersSuites":         RouterCiphersSuites,
 		"RouterSSLMinVersion":         RouterSSLMinVersion,
 		"RouterAllowWildcardRoutes":   RouterAllowWildcardRoutes,
+		"ClientCAMapName":             clientCAMapName,
+		"ClientAuthPolicy":            clientAuthPolicy,
+		"ClientAuthCAPath":            clientAuthCAPath,
+		"ClientCABundleFilename":      clientCABundleFilename,
+		"ClientCAMountPath":           clientCAMountPath,
 	}
 
 	return extraParams

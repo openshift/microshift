@@ -93,6 +93,12 @@ spec:
               value: '{{ .RouterEnableCompression }}'
             - name: ROUTER_COMPRESSION_MIME
               value: '{{ .RouterCompressionMime }}'
+            {{- if .ClientAuthCAPath }}
+            - name: ROUTER_MUTUAL_TLS_AUTH
+              value: '{{ .ClientAuthPolicy }}'
+            - name: ROUTER_MUTUAL_TLS_AUTH_CA
+              value: '{{ .ClientAuthCAPath }}'
+            {{- end }}
           livenessProbe:
             failureThreshold: 3
             httpGet:
@@ -122,7 +128,7 @@ spec:
             successThreshold: 1
             timeoutSeconds: 1
           resources:
-            requests:
+            requests: 
               cpu: 100m
               memory: 256Mi
           volumeMounts:
@@ -132,6 +138,13 @@ spec:
             - mountPath: /var/run/configmaps/service-ca
               name: service-ca-bundle
               readOnly: true
+            {{- if .ClientCAMapName }}
+            - mountPath: '{{ .ClientCAMountPath }}'
+              name: '{{ .ClientCAMapName}}'
+              readOnly: true
+            {{- end }}
+
+
           image: '{{ .ReleaseImage.haproxy_router }}'
           ports:
             - name: http
@@ -166,6 +179,16 @@ spec:
                 path: service-ca.crt
             name: service-ca-bundle
             optional: false
+        {{- if .ClientCAMapName }}
+        - name: '{{ .ClientCAMapName }}'
+          configMap:
+            defaultMode: 420
+            items:
+            - key: '{{ .ClientCABundleFilename }}'
+              path: '{{ .ClientCABundleFilename }}'
+            name: '{{ .ClientCAMapName }}'
+            optional: false
+        {{- end }}
       restartPolicy: Always
       dnsPolicy: ClusterFirst
       nodeSelector:
