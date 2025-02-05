@@ -4,14 +4,13 @@ set -xeuo pipefail
 IFS=$'\n\t'
 
 # path vars
-SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-ROOTDIR="${SCRIPTDIR}/"
+TEST_BIN_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 # default config
 DRYRUN=""
-OUTDIR="${ROOTDIR}/_output/e2e-$(date +%Y%m%d-%H%M%S)"
-RF_VENV="${ROOTDIR}/_output/robotenv"
-RF_VARIABLES="${SCRIPTDIR}/variables.yaml"
+OUTDIR="${TEST_BIN_DIR}/_output/e2e-$(date +%Y%m%d-%H%M%S)"
+RF_VENV="${TEST_BIN_DIR}/_output/robotenv"
+RF_VARIABLES="${TEST_BIN_DIR}/variables.yaml"
 SCENARIO="Default Name"
 TEST_RANDOMIZATION="all"
 TEST_EXECUTION_TIMEOUT="300m"
@@ -89,11 +88,11 @@ shift $((OPTIND-1))
 
 if [ ! -f "${RF_VARIABLES}" ]; then
     echo "Please create or provide a variables file at ${RF_VARIABLES}" 1>&2
-    echo "See ${SCRIPTDIR}/variables.yaml.example for the expected content." 1>&2
+    echo "See ${TEST_BIN_DIR}/variables.yaml.example for the expected content." 1>&2
     exit 1
 fi
 
-cd "${SCRIPTDIR}" || (echo "Did not find ${SCRIPTDIR}" 1>&2; exit 1)
+cd "${TEST_BIN_DIR}" || (echo "Did not find ${TEST_BIN_DIR}" 1>&2; exit 1)
 
 TESTS="$*"
 if [ -z "${TESTS}" ]; then
@@ -105,7 +104,7 @@ fi
 if [ "${STRESS_TESTING:-}" ]; then
     # DEST_DIR var is the python env dir used by fetch_tools.sh to install the tools
     export DEST_DIR="${RF_VENV}"
-    "${ROOTDIR}/scripts/fetch_tools.sh" yq
+    "${TEST_BIN_DIR}/../../scripts/fetch_tools.sh" yq
     YQ_BINARY="${RF_VENV}/yq"
 
     CONDITION="${STRESS_TESTING%=*}"
@@ -116,7 +115,7 @@ if [ "${STRESS_TESTING:-}" ]; then
     SSH_PORT=$("${YQ_BINARY}" '.SSH_PORT' "${RF_VARIABLES}")
     SSH_PKEY=$("${YQ_BINARY}" '.SSH_PRIV_KEY' "${RF_VARIABLES}")
 
-    "${SCRIPTDIR}"/bin/stress_testing.sh -e "${CONDITION}" -v "${VALUE}" -h "${SSH_HOST}" -u "${SSH_USER}" -p "${SSH_PORT}" -k "${SSH_PKEY}"
+    "${TEST_BIN_DIR}/stress_testing.sh" -e "${CONDITION}" -v "${VALUE}" -h "${SSH_HOST}" -u "${SSH_USER}" -p "${SSH_PORT}" -k "${SSH_PKEY}"
 fi
 
 # Make sure the test execution times out after a predefined period.
@@ -135,7 +134,7 @@ fi
     ${EXITONFAILURE}  \
     --name "${SCENARIO}" \
     --randomize "${TEST_RANDOMIZATION}" \
-    --prerunmodifier "${SCRIPTDIR}/../resources/SkipTests.py:${SKIP_TESTS:-}" \
+    --prerunmodifier "${TEST_BIN_DIR}/../resources/SkipTests.py:${SKIP_TESTS:-}" \
     --loglevel TRACE \
     --outputdir "${OUTDIR}" \
     --debugfile "${OUTDIR}/rf-debug.log" \
@@ -145,5 +144,5 @@ fi
 
 # disable stress condition
 if [ "${STRESS_TESTING:-}" ]; then
-    "${SCRIPTDIR}"/bin/stress_testing.sh -d "${CONDITION}" -h "${SSH_HOST}" -u "${SSH_USER}" -p "${SSH_PORT}" -k "${SSH_PKEY}"
+    "${TEST_BIN_DIR}/stress_testing.sh" -d "${CONDITION}" -h "${SSH_HOST}" -u "${SSH_USER}" -p "${SSH_PORT}" -k "${SSH_PKEY}"
 fi
