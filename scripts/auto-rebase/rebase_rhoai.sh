@@ -19,6 +19,8 @@ STAGING_OPERATOR="${STAGING_RHOAI}/operator"
 CSV_FILENAME="rhods-operator.clusterserviceversion.yaml"
 PULL_SECRET_FILE="${HOME}/.pull-secret.json"
 
+RELEASE_JSON="${REPOROOT}/assets/optional/rhoai/release-x86_64.json"
+
 title() {
     echo -e "\E[34m$1\E[00m";
 }
@@ -107,7 +109,21 @@ process_rhoai_manifests() {
     title "Copying manifests from staging dir to assets/"
     "${REPOROOT}/scripts/auto-rebase/handle_assets.py" ./scripts/auto-rebase/assets_rhoai.yaml
 
+    title "Initializing release.json file"
+    local -r version=$(yq '.spec.version' "${STAGING_BUNDLE}/${CSV_FILENAME}")
+    echo "{ \"release\": {\"base\": \"${version}\"}, \"images\": {}}" | yq -o json > "${RELEASE_JSON}"
+
     update_runtimes
+    update_kserve
+}
+
+update_kserve() {
+    local -r kserve_images=$(cat ${STAGING_OPERATOR}/kserve/overlays/odh/params.env)
+    for image in ${kserve_images}; do
+        local image_name="${image%=*}"
+        local image_ref="${image#*=}"
+        yq -i ".images.${image_name} = \"${image_ref}\"" "${RELEASE_JSON}"
+    done
 }
 
 update_runtimes() {
@@ -130,21 +146,22 @@ update_runtimes() {
 images:
 EOF
 
-    images=$(cat "${STAGING_OPERATOR}"/odh-model-controller/base/*.env | grep "\-image")
+    local -r images=$(cat "${STAGING_OPERATOR}"/odh-model-controller/base/*.env | grep "\-image")
     for image in ${images}; do
         local image_name="${image%=*}"
         local image_ref="${image#*=}"
         local image_ref_repo="${image_ref%@*}"
         local image_ref_digest="${image_ref#*@}"
+
         tee -a "${kustomization_images}" <<EOF
   - name: ${image_name}
     newName: ${image_ref_repo}
     digest: ${image_ref_digest}
 EOF
+
+        yq -i ".images.${image_name} = \"${image_ref}\"" "${RELEASE_JSON}"
     done
 }
 
 download_rhoai_manifests "registry.redhat.io/rhoai/odh-operator-bundle:v2.16.0"
 process_rhoai_manifests
-
-#local -r version=$(yq '.spec.version' "${STAGING_BUNDLE}/${CSV_FILENAME}")
