@@ -309,7 +309,8 @@ prepare_kickstart() {
     record_junit "${vmname}" "prepare_kickstart" "OK"
 }
 
-# Checks if provided commit exists in local ostree repository
+# Checks if provided commit exists in local ostree repository.
+# Returns 0 when the ref exists or 1 otherwise.
 does_commit_exist() {
     local -r commit="${1}"
 
@@ -320,11 +321,12 @@ does_commit_exist() {
     fi
 }
 
-# Checks if provided image ref exists in local image storage
+# Checks if provided image ref exists in the mirror registry.
+# Returns 0 when the ref exists or 1 otherwise.
 does_image_exist() {
     local -r image="${1}"
 
-    if [[ "$(sudo podman images -q "${image}")" != "" ]]; then
+    if skopeo inspect "docker://${MIRROR_REGISTRY_URL}/${image}" &>/dev/null ; then
         return 0
     else
         return 1
@@ -622,7 +624,7 @@ launch_vm() {
     vm_extra_args+=" inst.ks=file:/$(basename "${kickstart_file}")"
     vm_initrd_inject+=" --initrd-inject ${kickstart_file}"
     # Download and inject all the kickstart include files
-    wget -r -q -nd -A "*.cfg" -P "${kickstart_idir}" "$(dirname "${kickstart_url}")"
+    wget -r -q -nd -A "*.cfg" -P "${kickstart_idir}" "$(dirname "${kickstart_url}")/"
     for cfg_file in "${kickstart_idir}"/*.cfg ; do
         vm_initrd_inject+=" --initrd-inject ${cfg_file}"
     done
@@ -1063,10 +1065,15 @@ action_login() {
         vmname="$1"
     fi
 
-    ssh_port=$(get_vm_property "${vmname}" "ssh_port")
+    ssh_port=$(get_vm_property "${vmname}" "ssh_port" || true)
     ip=$(get_vm_property "${vmname}" "ip")
 
-    ssh "redhat@${ip}" -p "${ssh_port}"
+    if [ -z "${ssh_port}" ] ; then
+        local -r full_vmname="$(full_vm_name "${vmname}")"
+        sudo virsh console "${full_vmname}"
+    else
+        ssh "redhat@${ip}" -p "${ssh_port}"
+    fi
 }
 
 action_run() {
