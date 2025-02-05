@@ -160,8 +160,7 @@ func certSetup(cfg *config.Config) (*certchains.CertificateChains, error) {
 					Name:         "openshift-observability-client",
 					ValidityDays: cryptomaterial.ShortLivedCertificateValidityDays,
 				},
-				UserInfo: &user.DefaultInfo{Name: "openshift-observability-client", Groups: []string{""},
-				},
+				UserInfo: &user.DefaultInfo{Name: "openshift-observability-client", Groups: []string{""}},
 			},
 		),
 
