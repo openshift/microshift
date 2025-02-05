@@ -741,7 +741,7 @@ EOF
     yq -i '.spec.template.spec.serviceAccount = "router"' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
     yq -i '.spec.template.spec.securityContext = {}' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
     yq -i '.spec.template.spec.schedulerName = "default-scheduler"' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
-    yq -i '.spec.template.spec.volumes[0].secret.secretName = "router-certs-default"' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
+    yq -i '.spec.template.spec.volumes[0].secret.secretName = "{{ .ServingCertificateSecret }}"' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
     sed -i '/#.*at runtime/d' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
     sed -i '/#.*at run-time/d' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
     yq -i '.metadata.labels += {"ingresscontroller.operator.openshift.io/owning-ingresscontroller": "default"}' "${REPOROOT}"/assets/components/openshift-router/service-internal.yaml
@@ -765,7 +765,22 @@ EOF
     # Must use sed instead of yq because unquoted {{ .RouterHttpPort }} is interpreted as yaml object and yq has no option to not interpret it (like provide is as quoted string but produce unquoted output).
     # It needs to be last manipulation of the file, otherwise yq commands after this one would expand the {{ .RouterHttpPort }}.
     sed -i 's/port: 80/port: {{ .RouterHttpPort }}/g; s/port: 443/port: {{ .RouterHttpsPort }}/g' "${REPOROOT}"/assets/components/openshift-router/service-cloud.yaml
-
+    # Add some values
+   
+    # patch the manifests 
+    # patch can be created using git:
+    #    git diff HEAD~1 assets/components/openshift-router/deployment.yaml > scripts/auto-rebase/manifests_patches/010-ingress-deployment-clientCA.patch
+    pushd  ${REPOROOT}
+    for patch_file in "${REPOROOT}"/scripts/auto-rebase/manifests_patches/*.patch; do
+        echo "Checking patch ${patch_file}"
+        if git apply --check "${patch_file}" 2> /dev/null; then
+            git apply "${patch_file}"
+            echo "${patch_file} - Patch applied"
+        else
+            echo "Patch was already applied"
+        fi
+    done
+    popd
     #-- service-ca ----------------------------------------
     # Render operand manifest templates like the operator would
     # TODO: Remove the following annotations once CPC correctly creates them automatically

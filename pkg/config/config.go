@@ -365,6 +365,13 @@ func (c *Config) incorporateUserSettings(u *Config) {
 		c.Ingress.TLSSecurityProfile = u.Ingress.TLSSecurityProfile
 	}
 
+	if len(u.Ingress.AdmissionPolicy.WildcardPolicy) != 0 {
+		c.Ingress.AdmissionPolicy.WildcardPolicy = u.Ingress.AdmissionPolicy.WildcardPolicy
+	}
+	if len(u.Ingress.ClientTLS.ClientCertificatePolicy) != 0 {
+		c.Ingress.ClientTLS = u.Ingress.ClientTLS
+	}
+
 }
 
 // updateComputedValues examins the existing settings and converts any

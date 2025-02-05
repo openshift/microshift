@@ -120,6 +120,13 @@ type IngressConfig struct {
 	//
 	// +optional
 	TLSSecurityProfile *configv1.TLSSecurityProfile `json:"tlsSecurityProfile,omitempty"`
+
+	// clientTLS specifies settings for requesting and verifying client
+	// certificates, which can be used to enable mutual TLS for
+	// edge-terminated and reencrypt routes.
+	//
+	// +optional
+	ClientTLS operatorv1.ClientTLS `json:"clientTLS,omitempty"`
 }
 
 // IngressControllerTuningOptions specifies options for tuning the performance
