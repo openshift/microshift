@@ -243,12 +243,16 @@ def process_containerfile(groupdir, containerfile, dry_run):
             # Note:
             # - The pull secret is necessary in some builds for pulling embedded
             #   container images specified by SOURCE_IMAGES environment variable
+            # - The no-hostname option is necessary to avoid embedding /etc/hostname
+            #   file into the image, so that it can be later overridden during the
+            #   installation by anaconda when this image is deployed.
             # - The explicit push-to-mirror sets the 'latest' tag as all the build
             #   layers are in the mirror due to 'cache-to' option
             build_args = [
                 "sudo", "podman", "build",
                 "--authfile", PULL_SECRET,
                 "--secret", f"id=pullsecret,src={PULL_SECRET}",
+                "--no-hostname",
                 "--cache-to", f"{MIRROR_REGISTRY}/{cf_outname}",
                 "--cache-from", f"{MIRROR_REGISTRY}/{cf_outname}",
                 "-t", cf_outname, "-f", cf_outfile,
