@@ -937,7 +937,7 @@ EOF
             -i "${variable_file}" \
             -b "${rf_binary}" \
             -o "${SCENARIO_INFO_DIR}/${SCENARIO}" \
-            -s "${SCENARIO}" \
+            -c "${SCENARIO}" \
             -r "${TEST_RANDOMIZATION}" \
             -t "${TEST_EXECUTION_TIMEOUT}" \
             "$@" ; \
