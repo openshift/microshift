@@ -6,15 +6,21 @@
   ```
   To use OVN-K as CNI
   ```bash
-  cd ~/microshift && sudo podman build -f okd/src/microshift-okd-multi-build.Containerfile . -t microshift-okd
+  cd ~/microshift
+  sudo podman build --no-hostname \
+    -f okd/src/microshift-okd-multi-build.Containerfile . -t microshift-okd
   ```
   To use flannel as CNI
   ```bash
-  cd ~/microshift && sudo podman build --env WITH_FLANNEL=1 -f okd/src/microshift-okd-multi-build.Containerfile . -t microshift-okd
+  cd ~/microshift
+  sudo podman build --no-hostname --env WITH_FLANNEL=1 \
+    -f okd/src/microshift-okd-multi-build.Containerfile . -t microshift-okd
   ```
   To embed all component images
   ```bash
-  cd ~/microshift && sudo podman build --env EMBED_CONTAINER_IMAGES=1 -f okd/src/microshift-okd-multi-build.Containerfile . -t microshift-okd
+  cd ~/microshift
+  sudo podman build --no-hostname --env EMBED_CONTAINER_IMAGES=1 \
+    -f okd/src/microshift-okd-multi-build.Containerfile . -t microshift-okd
   ```
   - build runnable container based on current source:
     1. replace microshift assets images to OKD  upstream images
@@ -22,7 +28,7 @@
     1. will build micrsoshift_okd bootc container based on `centos-bootc:stream9`
     1. apply upstream customization  (see below)
 
-- running the container with ovn-kubernetes 
+- running the container with ovn-kubernetes
   - make sure to load the openvswitch kernel module  :
     > `sudo modprobe openvswitch`
 
@@ -35,10 +41,10 @@
 - verify everything is working:
   ```bash
     export KUBECONFIG=/var/lib/microshift/resources/kubeadmin/kubeconfig
-    > oc get nodes  
+    > oc get nodes
     NAME           STATUS   ROLES                         AGE     VERSION
     d2877aa41787   Ready    control-plane,master,worker   7m39s   v1.30.3
-    
+
     > oc get pods
     NAMESPACE                  NAME                                       READY   STATUS    RESTARTS        AGE
     kube-system                csi-snapshot-controller-7d6c78bc58-5p7tb   1/1     Running   0               8m52s
@@ -65,4 +71,4 @@
   make: *** [/src/vendor/github.com/openshift/build-machinery-go/make/targets/golang/build.mk:16: build] Error 1
   Error: building at STEP "RUN make build": while running runtime: exit status 2
   ```
-  
+

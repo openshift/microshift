@@ -45,6 +45,7 @@ endif
 	sudo podman build \
 		--no-cache \
 		--authfile "${PULL_SECRET}" \
+		--no-hostname \
 		--build-arg BASE_IMAGE_URL="${BASE_IMAGE_URL}" \
 		--build-arg BASE_IMAGE_TAG="${BASE_IMAGE_TAG}" \
 		--build-arg DNF_OPTIONS="${DNF_OPTIONS}" \
@@ -70,6 +71,7 @@ endif
 	sudo podman build \
 		--no-cache \
 		--authfile "${PULL_SECRET}" \
+		--no-hostname \
 		--build-arg BASE_IMAGE_URL="${BASE_IMAGE_URL}" \
 		--build-arg BASE_IMAGE_TAG="${BASE_IMAGE_TAG}" \
 		--build-arg DNF_OPTIONS="${DNF_OPTIONS}" \
@@ -94,6 +96,7 @@ endif
 	sudo podman build \
 		--no-cache \
 		--authfile "${PULL_SECRET}" \
+		--no-hostname \
 		--build-arg BASE_IMAGE_URL="${BASE_IMAGE_URL}" \
 		--build-arg BASE_IMAGE_TAG="${BASE_IMAGE_TAG}" \
 		--build-arg DNF_OPTIONS="${DNF_OPTIONS}" \

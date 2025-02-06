@@ -60,9 +60,14 @@ USER_PASSWD="<your_redhat_user_password>"
 IMAGE_NAME=microshift-4.17-bootc
 
 sudo podman build --authfile "${PULL_SECRET}" -t "${IMAGE_NAME}" \
+    --no-hostname \
     --build-arg USER_PASSWD="${USER_PASSWD}" \
     -f Containerfile
 ```
+
+> Note: The `--no-hostname` argument is required to avoid embedding `/etc/hostname`
+> file into the image. This allows for a proper host name setting by the anaconda
+> installer if the image is used for installing a new operating system.
 
 Verify that the local MicroShift 4.17 `bootc` image was created.
 
@@ -468,6 +473,7 @@ IMAGE_PLATFORM="linux/${IMAGE_ARCH}"
 IMAGE_NAME="microshift-4.17-bootc:linux-${IMAGE_ARCH}"
 
 sudo podman build --authfile "${PULL_SECRET}" -t "${IMAGE_NAME}" \
+    --no-hostname \
     --platform "${IMAGE_PLATFORM}" \
     --build-arg USER_PASSWD="${USER_PASSWD}" \
     -f Containerfile
