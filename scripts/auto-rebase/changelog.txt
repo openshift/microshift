@@ -1,3 +1,3 @@
-- machine-config-operator embedded-component 4f8b6f2a0e1a8ec475e5ef1dd8effd9306804518 to caedf7e7dacfd1bded0e93b430d6dba7aecf92df
-  - 638e48cd 2025-01-27T10:29:08+08:00 trying to wait for sub-contorllers
+- cluster-openshift-controller-manager-operator embedded-component accd87730fd3652584bef210626cab3b6d49271f to 09d62091346f86f54938587acfd680f6bd6b7af6
+  - 8971d4c 2025-01-24T09:54:02+00:00 OCPBUGS-48832: add new team members to the OWNERS file
 
