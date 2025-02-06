@@ -1,29 +1,28 @@
-- api embedded-component d15841be6bdeeb556cac490a084cb3ffb2aee215 to a32333aa93b82932556b6adb1590490220abe10c
-  - 228b2c4 2025-02-03T17:10:17+00:00 Use BASE_REF env var to pull the release version for sippy data
-  - 8ec9cb9 2025-01-24T18:28:53+01:00 Promote UDN feature to GA
+- api embedded-component a32333aa93b82932556b6adb1590490220abe10c to 3175f3026f905a311fa0a462afce2393c42d7f87
+  - 6c554f1 2025-01-13T13:16:45+01:00 ipam, virt: graduate persistent ips feature gate to GA
 
-- cluster-kube-apiserver-operator embedded-component 4babb3f18c19d2bef584a8389f34b8428cf52b9c to a77db53429b161c62ea284b9d91f2c47fd0c525c
-  - d738b84 2025-02-03T10:48:16-05:00 Bump library-go for static pod controller apply fixes.
+- cluster-network-operator embedded-component 224efe3703ae1b01eeb815d9db6dd5ccc445feff to e98cac9c69c0cdf0a08c3a6f688c11dae2ac7d93
+  - db58526 2025-02-01T05:09:39+00:00 Fix UDN and CUDN hostSubnet validation
 
-- cluster-kube-controller-manager-operator embedded-component ce2c021f23f5d178da6ea35d98a229137e5a81c4 to 0fac9aa9a20b3c843e0e832a2849db6a7e3441c1
-  - 93892f3 2025-02-03T10:53:52-05:00 Bump library-go for static pod controller apply fixes.
-
-- cluster-kube-scheduler-operator embedded-component e4c772cd344e538342a4e1cd91635b387e1c18ba to 6182930dde5ec8dd22bd50481e8b369ce673484c
-  - 8952eea 2025-02-03T10:55:30-05:00 Bump library-go for static pod controller apply fixes.
-
-- kubernetes embedded-component e18ecb4c7c8e2d8ca398f0ecdf76119d9f471cf3 to ff3bcb85459e1c94917fbde7c4528c644b09ca2a
-  - 469d2bdc7 2025-02-03T09:07:44+00:00 UPSTREAM: <carry>: disable etcd readiness checks by default
-
-- oc image-amd64 36c93092776f8d964b4d09fa4c4f299d1ab55a08 to a50d4c0e41a6eff7aafe21dbe564359a0b622bb1
-  - ee3ff9a6 2025-01-22T04:05:05+00:00 OCPBUGS-38975: monitor should not exit for temp api disconnect
-
-- kubernetes image-amd64 e18ecb4c7c8e2d8ca398f0ecdf76119d9f471cf3 to ff3bcb85459e1c94917fbde7c4528c644b09ca2a
-  - 469d2bdc7 2025-02-03T09:07:44+00:00 UPSTREAM: <carry>: disable etcd readiness checks by default
-
-- oc image-arm64 36c93092776f8d964b4d09fa4c4f299d1ab55a08 to a50d4c0e41a6eff7aafe21dbe564359a0b622bb1
-  - ee3ff9a6 2025-01-22T04:05:05+00:00 OCPBUGS-38975: monitor should not exit for temp api disconnect
-
-- kubernetes image-arm64 e18ecb4c7c8e2d8ca398f0ecdf76119d9f471cf3 to 5f71ced928d02ee98ecc2a0f23f9e5b45dfa3275
+- kubernetes embedded-component ff3bcb85459e1c94917fbde7c4528c644b09ca2a to 5f71ced928d02ee98ecc2a0f23f9e5b45dfa3275
   - ff471cba8 2025-02-03T19:37:30+00:00 UPSTREAM: <carry>: log only deprecated api requests
-  - 469d2bdc7 2025-02-03T09:07:44+00:00 UPSTREAM: <carry>: disable etcd readiness checks by default
+
+- kubernetes image-amd64 ff3bcb85459e1c94917fbde7c4528c644b09ca2a to 5f71ced928d02ee98ecc2a0f23f9e5b45dfa3275
+  - ff471cba8 2025-02-03T19:37:30+00:00 UPSTREAM: <carry>: log only deprecated api requests
+
+- kubernetes image-arm64 5f71ced928d02ee98ecc2a0f23f9e5b45dfa3275 to acb9630c20d2fa0d11bad4c38c7b28e2db9d818b
+  - 0c68a455f 2025-02-04T11:31:24-05:00 UPSTREAM: <carry>: Don't retry storage calls with side effects.
+  - d2d1c4138 2025-01-20T17:13:16+01:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - 79b096c6b 2025-01-20T17:13:16+01:00 UPSTREAM: <drop>: manually resolve conflicts
+  - af64d838a 2025-01-15T14:32:36+00:00 Release commit for Kubernetes v1.31.5
+  - c94919d68 2025-01-13T14:46:05-08:00 kubelet: use env vars in node log query PS command
+  - 774adff44 2025-01-06T15:08:09-08:00 webhook: alter regex to account for x509sha1 GODEBUG removal
+  - ec1a3974b 2025-01-02T15:01:34+02:00 kubeadm: fix a bug where the node.skipPhases in UpgradeNodeConfiguration is not respected by 'kubeadm upgrade node'
+  - eb8c23995 2024-12-30T09:13:26+01:00 Bump images, dependencies and versions to go 1.22.10 and distroless iptables
+  - b82572f6f 2024-12-20T10:03:38+03:00 Do not attempt to truncate revision history if revisionHistoryLimit is negative
+  - 1f830174c 2024-12-18T19:47:41+01:00 fetch cni plugins from GitHub releases
+  - b555e6b2a 2024-12-16T10:40:28-05:00 Fix volume expansion offline
+  - b8265e785 2024-12-12T15:59:00+01:00 prevent unnecessary resolving of iscsi/fc devices to dm
+  - fd78b5296 2024-12-10T11:57:04+00:00 Update CHANGELOG/CHANGELOG-1.31.md for v1.31.4
+  - 04f5b2038 2024-12-03T09:47:51+08:00 kubelet: Fix the volume manager did't check the device mount state in the actual state of the world before marking the volume as detached. It may cause a pod to be stuck in the Terminating state due to the above issue when it was deleted.
 
