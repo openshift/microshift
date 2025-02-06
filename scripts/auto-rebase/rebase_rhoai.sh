@@ -21,11 +21,18 @@ PULL_SECRET_FILE="${HOME}/.pull-secret.json"
 
 RELEASE_JSON="${REPOROOT}/assets/optional/rhoai/release-x86_64.json"
 
+KEEP_STAGING="${KEEP_STAGING:-false}"
+
 title() {
     echo -e "\E[34m$1\E[00m";
 }
 
 check_preconditions() {
+    if [[ "${REPOROOT}" != "$(pwd)" ]]; then
+        echo "Script must be executed from root of the MicroShift repository"
+        exit 1
+    fi
+
     if ! hash yq; then
         title "Installing yq"
 
@@ -83,7 +90,7 @@ get_auth() {
 download_rhoai_manifests() {
     local -r bundle_ref="${1}"
 
-    # Jan 2025: Only x86_64 is supported (https://access.redhat.com/articles/rhoai-supported-configs)
+    # Jan/Feb 2025: Only x86_64 is supported (https://access.redhat.com/articles/rhoai-supported-configs)
     # therefore there's no loop over architectures.
 
     rm -rf "${STAGING_RHOAI}" && mkdir -p "${STAGING_BUNDLE}" "${STAGING_OPERATOR}"
@@ -110,7 +117,7 @@ process_rhoai_manifests() {
     "${REPOROOT}/scripts/auto-rebase/handle_assets.py" ./scripts/auto-rebase/assets_rhoai.yaml
 
     title "Initializing release.json file"
-    local -r version=$(yq '.spec.version' "${STAGING_BUNDLE}/${CSV_FILENAME}")
+    local -r version=$(get_rhoai_bundle_version)
     echo "{ \"release\": {\"base\": \"${version}\"}, \"images\": {}}" | yq -o json > "${RELEASE_JSON}"
 
     update_runtimes
@@ -138,7 +145,7 @@ update_runtimes() {
         done
     done
 
-    title "Creating ServingRuntime images kustomization"
+    title "Creating ClusterServingRuntimes images kustomization"
 
     local -r kustomization_images="${REPOROOT}/assets/optional/rhoai/runtimes/kustomization.x86_64.yaml"
     cat <<EOF > "${kustomization_images}"
@@ -153,7 +160,7 @@ EOF
         local image_ref_repo="${image_ref%@*}"
         local image_ref_digest="${image_ref#*@}"
 
-        tee -a "${kustomization_images}" <<EOF
+        cat <<EOF >> "${kustomization_images}"
   - name: ${image_name}
     newName: ${image_ref_repo}
     digest: ${image_ref_digest}
@@ -163,5 +170,74 @@ EOF
     done
 }
 
-download_rhoai_manifests "registry.redhat.io/rhoai/odh-operator-bundle:v2.16.0"
-process_rhoai_manifests
+get_rhoai_bundle_version() {
+    yq '.spec.version' "${STAGING_BUNDLE}/${CSV_FILENAME}"
+}
+
+update_last_rebase_rhoai_sh() {
+    local -r operator_bundle="${1}"
+
+    title "Updating last_rebase_rhoai.sh"
+    local -r last_rebase_script="${REPOROOT}/scripts/auto-rebase/last_rebase_rhoai.sh"
+
+    rm -f "${last_rebase_script}"
+    cat - >"${last_rebase_script}" <<EOF
+#!/bin/bash -x
+./scripts/auto-rebase/rebase_rhoai.sh to "${operator_bundle}"
+EOF
+    chmod +x "${last_rebase_script}"
+}
+
+rebase_model_serving_to() {
+    local -r operator_bundle="${1}"
+
+    title "Rebasing RHOAI Model Serving for MicroShift to ${operator_bundle}"
+
+    download_rhoai_manifests "${operator_bundle}"
+    local -r version=$(get_rhoai_bundle_version)
+
+    update_last_rebase_rhoai_sh "${operator_bundle}"
+
+    process_rhoai_manifests
+
+    if [[ -n "$(git status -s assets ./scripts/auto-rebase/last_rebase_rhoai.sh)" ]]; then
+        branch="rebase-rhoai-${version}"
+        title "Detected changes to assets/ or last_rebase_rhoai.sh - creating branch ${branch}"
+        git branch -D "${branch}" 2>/dev/null || true && git checkout -b "${branch}"
+
+        title "Committing changes"
+        git add assets ./scripts/auto-rebase/last_rebase_rhoai.sh
+        git commit -m "Update RHOAI"
+    else
+        title "No changes to assets/ or last_rebase_rhoai.sh"
+    fi
+
+    if ! "${KEEP_STAGING}"; then
+        title "Removing staging directory"
+        rm -rf "${STAGING_RHOAI}"
+    fi
+}
+
+usage() {
+    echo "Usage:"
+    echo "$(basename "$0") to RHOAI_OPERATOR_BUNDLE           Performs all the steps to rebase RHOAI Model Serving for MicroShift"
+    echo "$(basename "$0") download RHOAI_OPERATOR_BUNDLE     Downloads the contents of the RHOAI Operator (Bundle) to disk in preparation for rebasing"
+    echo "$(basename "$0") process                            Process already downloaded RHOAI Operator (Bundle) artifacts to update RHOAI Model Serving for MicroShift"
+    exit 1
+}
+
+check_preconditions
+
+command=${1:-help}
+case "${command}" in
+    to)
+        rebase_model_serving_to "$2"
+        ;;
+    download)
+        download_rhoai_manifests "$2"
+        ;;
+    process)
+        process_rhoai_manifests
+        ;;
+    *) usage;;
+esac
