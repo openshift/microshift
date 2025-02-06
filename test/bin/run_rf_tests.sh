@@ -129,7 +129,7 @@ if [ -t 0 ]; then
 fi
 
 # shellcheck disable=SC2086,SC2068
-"${timeout_robot}" \
+${timeout_robot} \
     ${DRYRUN} \
     ${EXITONFAILURE}  \
     --name "${SCENARIO}" \
