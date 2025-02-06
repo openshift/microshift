@@ -118,18 +118,8 @@ if [ "${STRESS_TESTING:-}" ]; then
     "${TEST_BIN_DIR}/stress_testing.sh" -e "${CONDITION}" -v "${VALUE}" -h "${SSH_HOST}" -u "${SSH_USER}" -p "${SSH_PORT}" -k "${SSH_PKEY}"
 fi
 
-# Make sure the test execution times out after a predefined period.
-# The 'timeout' command sends the HUP signal and, if the test does not
-# exit after 5m, it sends the KILL signal to terminate the process.
-timeout_robot="timeout -v --kill-after=5m ${TEST_EXECUTION_TIMEOUT} ${RF_BINARY}"
-if [ -t 0 ]; then
-    # Disable timeout for interactive mode when stdin is a terminal.
-    # This is necessary for proper handling of test interruption by user.
-    timeout_robot="${RF_BINARY}"
-fi
-
 # shellcheck disable=SC2086,SC2068
-${timeout_robot} \
+${RF_BINARY} \
     ${DRYRUN} \
     ${EXITONFAILURE}  \
     --name "${SCENARIO}" \
