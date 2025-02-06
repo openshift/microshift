@@ -1,6 +1,6 @@
 module github.com/openshift/microshift
 
-go 1.22.0
+go 1.22.11
 
 require (
 	github.com/apparentlymart/go-cidr v1.1.0
