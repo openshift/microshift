@@ -197,6 +197,10 @@ FEATURE_USER_INITIALIZE: true
 SUPER_USERS:
     - microshift
 EOF
+    # Enable public repository creation on push
+    # See https://docs.redhat.com/en/documentation/red_hat_quay/3/html-single/configure_red_hat_quay/index#config-fields-misc
+    echo "CREATE_PRIVATE_REPO_ON_PUSH: false" >> "${QUAY_CONFIG_DIR}/config.yaml"
+
     # Enable Quay dual-stack server support if the local host supports IPv6
     local podman_network=""
     if ping -6 -c 1 ::1 &>/dev/null ; then
@@ -221,7 +225,7 @@ EOF
     # See https://docs.projectquay.io/deploy_quay.html#deploy-quay-registry
     echo "Running Quay container"
     sudo podman run -d --name=microshift-quay \
-        "${podman_network}" \
+        ${podman_network} \
         -p "${MIRROR_REGISTRY_PORT}:8080" \
         -p "[::]:${MIRROR_REGISTRY_PORT}:8080" \
         -v "${QUAY_CONFIG_DIR}:/conf/stack:Z" \
@@ -253,9 +257,6 @@ EOF
 }
 
 finalize_registry() {
-    # Ensure that all the created repositories are public
-    sudo podman exec -it microshift-postgres \
-        psql -d quay -U quayuser -c 'UPDATE public.repository SET visibility_id = 1' >/dev/null
     # Ensure that permissions are open for the current user on the mirror registry
     # directories and files. This is necessary to avoid 'find' command errors.
     sudo chgrp -R "$(id -gn)" "${MIRROR_REGISTRY_DIR}"
