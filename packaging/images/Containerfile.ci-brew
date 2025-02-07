@@ -1,0 +1,16 @@
+ARG BASE_IMAGE_URL
+ARG BASE_IMAGE_TAG
+FROM ${BASE_IMAGE_URL}:${BASE_IMAGE_TAG}
+
+# Allow dnf command override to operate in minimal images, etc.
+ARG DNF=dnf
+
+# Install brew and other dependencies
+RUN ${DNF} upgrade -y && \
+    ${DNF} install -y epel-release && \
+    ${DNF} install -y koji git golang && \
+    ${DNF} clean all
+
+# Configure brew and create top-level source directory
+RUN ln -sv /usr/bin/koji /usr/bin/brew && \
+    mkdir --mode=0775 /go
