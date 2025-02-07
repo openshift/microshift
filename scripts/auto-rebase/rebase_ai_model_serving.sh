@@ -19,7 +19,7 @@ STAGING_OPERATOR="${STAGING_RHOAI}/operator"
 CSV_FILENAME="rhods-operator.clusterserviceversion.yaml"
 PULL_SECRET_FILE="${HOME}/.pull-secret.json"
 
-RELEASE_JSON="${REPOROOT}/assets/optional/rhoai/release-x86_64.json"
+RELEASE_JSON="${REPOROOT}/assets/optional/ai-model-serving/release-ai-model-serving-x86_64.json"
 
 KEEP_STAGING="${KEEP_STAGING:-false}"
 
@@ -116,7 +116,7 @@ download_rhoai_manifests() {
 
 process_rhoai_manifests() {
     title "Copying manifests from staging dir to assets/"
-    "${REPOROOT}/scripts/auto-rebase/handle_assets.py" ./scripts/auto-rebase/assets_rhoai.yaml
+    "${REPOROOT}/scripts/auto-rebase/handle_assets.py" ./scripts/auto-rebase/assets_ai_model_serving.yaml
 
     title "Initializing release.json file"
     local -r version=$(get_rhoai_bundle_version)
@@ -138,7 +138,7 @@ update_kserve() {
 update_runtimes() {
     title "Dropping template containers from ServingRuntimes and changing them to ClusterServingRuntimes"
     shopt -s globstar nullglob
-    for runtime in "${REPOROOT}/assets/optional/rhoai/runtimes/"*.yaml; do
+    for runtime in "${REPOROOT}/assets/optional/ai-model-serving/runtimes/"*.yaml; do
         if [[ $(basename "${runtime}") == "kustomization.yaml" ]]; then
             continue
         fi
@@ -154,7 +154,7 @@ update_runtimes() {
 
     title "Creating ClusterServingRuntimes images kustomization"
 
-    local -r kustomization_images="${REPOROOT}/assets/optional/rhoai/runtimes/kustomization.x86_64.yaml"
+    local -r kustomization_images="${REPOROOT}/assets/optional/ai-model-serving/runtimes/kustomization.x86_64.yaml"
     cat <<EOF > "${kustomization_images}"
 
 images:
@@ -181,42 +181,42 @@ get_rhoai_bundle_version() {
     yq '.spec.version' "${STAGING_BUNDLE}/${CSV_FILENAME}"
 }
 
-update_last_rebase_rhoai_sh() {
+update_last_rebase_ai_model_serving_sh() {
     local -r operator_bundle="${1}"
 
-    title "Updating last_rebase_rhoai.sh"
-    local -r last_rebase_script="${REPOROOT}/scripts/auto-rebase/last_rebase_rhoai.sh"
+    title "Updating last_rebase_ai_model_serving.sh"
+    local -r last_rebase_script="${REPOROOT}/scripts/auto-rebase/last_rebase_ai_model_serving.sh"
 
     rm -f "${last_rebase_script}"
     cat - >"${last_rebase_script}" <<EOF
 #!/bin/bash -x
-./scripts/auto-rebase/rebase_rhoai.sh to "${operator_bundle}"
+./scripts/auto-rebase/rebase_ai_model_serving.sh to "${operator_bundle}"
 EOF
     chmod +x "${last_rebase_script}"
 }
 
-rebase_model_serving_to() {
+rebase_ai_model_serving_to() {
     local -r operator_bundle="${1}"
 
-    title "Rebasing RHOAI Model Serving for MicroShift to ${operator_bundle}"
+    title "Rebasing AI Model Serving for MicroShift to ${operator_bundle}"
 
     download_rhoai_manifests "${operator_bundle}"
     local -r version=$(get_rhoai_bundle_version)
 
-    update_last_rebase_rhoai_sh "${operator_bundle}"
+    update_last_rebase_ai_model_serving_sh "${operator_bundle}"
 
     process_rhoai_manifests
 
-    if [[ -n "$(git status -s assets ./scripts/auto-rebase/last_rebase_rhoai.sh)" ]]; then
-        branch="rebase-rhoai-${version}"
-        title "Detected changes to assets/ or last_rebase_rhoai.sh - creating branch ${branch}"
+    if [[ -n "$(git status -s assets ./scripts/auto-rebase/last_rebase_ai_model_serving.sh)" ]]; then
+        branch="rebase-ai-model_serving-${version}"
+        title "Detected changes to assets/ or last_rebase_ai_model_serving.sh - creating branch ${branch}"
         git branch -D "${branch}" 2>/dev/null || true && git checkout -b "${branch}"
 
         title "Committing changes"
-        git add assets ./scripts/auto-rebase/last_rebase_rhoai.sh
-        git commit -m "Update RHOAI"
+        git add assets ./scripts/auto-rebase/last_rebase_ai_model_serving.sh
+        git commit -m "Update AI Model Serving for MicroShift"
     else
-        title "No changes to assets/ or last_rebase_rhoai.sh"
+        title "No changes to assets/ or last_rebase_ai_model_serving.sh"
     fi
 
     if ! "${KEEP_STAGING}"; then
@@ -238,7 +238,7 @@ check_preconditions
 command=${1:-help}
 case "${command}" in
     to)
-        rebase_model_serving_to "$2"
+        rebase_ai_model_serving_to "$2"
         ;;
     download)
         download_rhoai_manifests "$2"

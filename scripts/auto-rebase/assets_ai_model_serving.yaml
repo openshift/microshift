@@ -1,14 +1,14 @@
 assets:
-  - dir: optional/rhoai/
+  - dir: optional/ai-model-serving/
     no_clean: True
     files:
       - file: kustomization.yaml
         ignore: "MicroShift specific overrides"
-      - file: release-x86_64.json
+      - file: release-ai-model-serving-x86_64.json
         ignore: "Release info file"
 
 # kserve
-  - dir: optional/rhoai/kserve/
+  - dir: optional/ai-model-serving/kserve/
     no_clean: True
     files:
       - file: kustomization.yaml
@@ -18,7 +18,7 @@ assets:
       - file: namespace.yaml
         ignore: "MicroShift specific overrides"
 
-  - dir: optional/rhoai/kserve/overlays/odh/
+  - dir: optional/ai-model-serving/kserve/overlays/odh/
     src: rhoai/operator/kserve/overlays/odh/
     files:
       - file: inferenceservice-config-patch.yaml
@@ -29,7 +29,7 @@ assets:
       - file: set-resources-manager-patch.yaml
       - file: user-cluster-roles.yaml
 
-  - dir: optional/rhoai/kserve/default/
+  - dir: optional/ai-model-serving/kserve/default/
     src: rhoai/operator/kserve/default/
     files:
       - file: cainjection_conversion_webhook.yaml
@@ -48,12 +48,12 @@ assets:
       - file: svc_webhook_cainjection_patch.yaml
       - file: trainedmodel_validatingwebhook_cainjection_patch.yaml
 
-  - dir: optional/rhoai/kserve/crd/
+  - dir: optional/ai-model-serving/kserve/crd/
     src: rhoai/operator/kserve/crd/
     files:
       - file: kustomization.yaml
 
-  - dir: optional/rhoai/kserve/crd/full/
+  - dir: optional/ai-model-serving/kserve/crd/full/
     src: rhoai/operator/kserve/crd/full/
     files:
       - file: serving.kserve.io_clusterlocalmodels.yaml
@@ -65,18 +65,18 @@ assets:
       - file: serving.kserve.io_servingruntimes.yaml
       - file: serving.kserve.io_trainedmodels.yaml
 
-  - dir: optional/rhoai/kserve/crd/patches/
+  - dir: optional/ai-model-serving/kserve/crd/patches/
     src: rhoai/operator/kserve/crd/patches/
     files:
       - file: protocol.yaml
 
-  - dir: optional/rhoai/kserve/configmap/
+  - dir: optional/ai-model-serving/kserve/configmap/
     src: rhoai/operator/kserve/configmap/
     files:
       - file: kustomization.yaml
       - file: inferenceservice.yaml
 
-  - dir: optional/rhoai/kserve/rbac/
+  - dir: optional/ai-model-serving/kserve/rbac/
     src: rhoai/operator/kserve/rbac/
     files:
       - file: auth_proxy_role_binding.yaml
@@ -89,21 +89,21 @@ assets:
       - file: role.yaml
       - file: service_account.yaml
 
-  - dir: optional/rhoai/kserve/rbac/localmodel/
+  - dir: optional/ai-model-serving/kserve/rbac/localmodel/
     src: rhoai/operator/kserve/rbac/localmodel/
     files:
       - file: role_binding.yaml
       - file: role.yaml
       - file: service_account.yaml
 
-  - dir: optional/rhoai/kserve/manager/
+  - dir: optional/ai-model-serving/kserve/manager/
     src: rhoai/operator/kserve/manager/
     files:
       - file: kustomization.yaml
       - file: manager.yaml
       - file: service.yaml
 
-  - dir: optional/rhoai/kserve/webhook/
+  - dir: optional/ai-model-serving/kserve/webhook/
     src: rhoai/operator/kserve/webhook/
     files:
       - file: kustomization.yaml
@@ -111,7 +111,7 @@ assets:
       - file: service.yaml
 
   # Serving Runtimes
-  - dir: optional/rhoai/runtimes/
+  - dir: optional/ai-model-serving/runtimes/
     src: rhoai/operator/odh-model-controller/runtimes/
     files:
       - file: kustomization.yaml
