@@ -32,7 +32,7 @@ func (s *state) SaveToIntermediate() error {
 	if err != nil {
 		return err
 	}
-	path, err := data.GenerateUniqueTempPath(filepath.Join(s.storagePath, stateFilename))
+	path, err := util.GenerateUniqueTempPath(filepath.Join(s.storagePath, stateFilename))
 	if err != nil {
 		return err
 	}
