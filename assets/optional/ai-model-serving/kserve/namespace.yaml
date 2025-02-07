@@ -1,4 +1,4 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: opendatahub
+  name: redhat-ods-applications
