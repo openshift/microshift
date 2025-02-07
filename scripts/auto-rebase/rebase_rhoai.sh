@@ -97,6 +97,7 @@ download_rhoai_manifests() {
     local -r authentication="$(get_auth)"
 
     title "Fetching RHOAI CSV"
+    # shellcheck disable=SC2086
     oc image extract \
         ${authentication} \
         --path "/manifests/${CSV_FILENAME}:${STAGING_BUNDLE}" \
@@ -105,6 +106,7 @@ download_rhoai_manifests() {
 
     local -r operator_ref=$(yq '.spec.relatedImages[] | select(.name == "odh-rhel8-operator-*") | .image' "${STAGING_BUNDLE}/${CSV_FILENAME}")
     title "Fetching RHOAI manifests"
+    # shellcheck disable=SC2086
     oc image extract \
         ${authentication} \
         --path "/opt/manifests/:${STAGING_OPERATOR}" \
@@ -125,7 +127,7 @@ process_rhoai_manifests() {
 }
 
 update_kserve() {
-    local -r kserve_images=$(cat ${STAGING_OPERATOR}/kserve/overlays/odh/params.env)
+    local -r kserve_images=$(cat "${STAGING_OPERATOR}/kserve/overlays/odh/params.env")
     for image in ${kserve_images}; do
         local image_name="${image%=*}"
         local image_ref="${image#*=}"
@@ -135,10 +137,15 @@ update_kserve() {
 
 update_runtimes() {
     title "Dropping template containers from ServingRuntimes and changing them to ClusterServingRuntimes"
-    for runtime in $(find "${REPOROOT}/assets/optional/rhoai/runtimes/" -iname '*.yaml' -not -name 'kustomization.yaml'); do
+    shopt -s globstar nullglob
+    for runtime in "${REPOROOT}/assets/optional/rhoai/runtimes/"*.yaml; do
+        if [[ $(basename "${runtime}") == "kustomization.yaml" ]]; then
+            continue
+        fi
         yq --inplace '.objects[0] | .kind = "ClusterServingRuntime"' "${runtime}"
         containers_amount=$(yq '.spec.containers | length' "${runtime}")
         for ((i=0; i<containers_amount; i++)); do
+            # shellcheck disable=SC2016
             idx="${i}" yq --inplace --string-interpolation=false \
                 '.spec.containers[env(idx)].image |= sub("\$\((.*)\)", "${1}")' \
                 "${runtime}"
