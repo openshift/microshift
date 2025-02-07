@@ -18,6 +18,18 @@ ${OLD_HOSTNAME}     ${EMPTY}
 
 
 *** Test Cases ***
+Verify proper host name setting
+    [Documentation]    Verify a host name setting was performed successfully
+    ...    by the anaconda installer
+
+    ${name}=    Command Should Work    hostname
+    # The format of the host name includes scenario, suite and hostX parts.
+    # Check the suite and host part of the name to allow the test usage in
+    # multiple scenarios.
+    Should Not Contain    ${name}    localhost
+    Should Contain    ${name}    -standard
+    Should Contain    ${name}    -host
+
 Verify local name resolution
     [Documentation]    Verify correct name resolution through mDNS
     [Setup]    Configure New Hostname
