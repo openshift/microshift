@@ -1,16 +1,23 @@
-- api embedded-component a32333aa93b82932556b6adb1590490220abe10c to 3175f3026f905a311fa0a462afce2393c42d7f87
-  - 6c554f1 2025-01-13T13:16:45+01:00 ipam, virt: graduate persistent ips feature gate to GA
+- cluster-csi-snapshot-controller-operator embedded-component 46902b494ed0a608a48d2a04faf6e4ed2f9a6a5b to 6fe700087e8be6513285edd18f461790fecc65c3
+  - 0133119 2025-02-04T16:54:45+00:00 Support HCP labels
 
-- cluster-network-operator embedded-component 224efe3703ae1b01eeb815d9db6dd5ccc445feff to e98cac9c69c0cdf0a08c3a6f688c11dae2ac7d93
-  - db58526 2025-02-01T05:09:39+00:00 Fix UDN and CUDN hostSubnet validation
+- kubernetes embedded-component 5f71ced928d02ee98ecc2a0f23f9e5b45dfa3275 to acb9630c20d2fa0d11bad4c38c7b28e2db9d818b
+  - 0c68a455f 2025-02-04T11:31:24-05:00 UPSTREAM: <carry>: Don't retry storage calls with side effects.
+  - d2d1c4138 2025-01-20T17:13:16+01:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - 79b096c6b 2025-01-20T17:13:16+01:00 UPSTREAM: <drop>: manually resolve conflicts
+  - af64d838a 2025-01-15T14:32:36+00:00 Release commit for Kubernetes v1.31.5
+  - c94919d68 2025-01-13T14:46:05-08:00 kubelet: use env vars in node log query PS command
+  - 774adff44 2025-01-06T15:08:09-08:00 webhook: alter regex to account for x509sha1 GODEBUG removal
+  - ec1a3974b 2025-01-02T15:01:34+02:00 kubeadm: fix a bug where the node.skipPhases in UpgradeNodeConfiguration is not respected by 'kubeadm upgrade node'
+  - eb8c23995 2024-12-30T09:13:26+01:00 Bump images, dependencies and versions to go 1.22.10 and distroless iptables
+  - b82572f6f 2024-12-20T10:03:38+03:00 Do not attempt to truncate revision history if revisionHistoryLimit is negative
+  - 1f830174c 2024-12-18T19:47:41+01:00 fetch cni plugins from GitHub releases
+  - b555e6b2a 2024-12-16T10:40:28-05:00 Fix volume expansion offline
+  - b8265e785 2024-12-12T15:59:00+01:00 prevent unnecessary resolving of iscsi/fc devices to dm
+  - fd78b5296 2024-12-10T11:57:04+00:00 Update CHANGELOG/CHANGELOG-1.31.md for v1.31.4
+  - 04f5b2038 2024-12-03T09:47:51+08:00 kubelet: Fix the volume manager did't check the device mount state in the actual state of the world before marking the volume as detached. It may cause a pod to be stuck in the Terminating state due to the above issue when it was deleted.
 
-- kubernetes embedded-component ff3bcb85459e1c94917fbde7c4528c644b09ca2a to 5f71ced928d02ee98ecc2a0f23f9e5b45dfa3275
-  - ff471cba8 2025-02-03T19:37:30+00:00 UPSTREAM: <carry>: log only deprecated api requests
-
-- kubernetes image-amd64 ff3bcb85459e1c94917fbde7c4528c644b09ca2a to 5f71ced928d02ee98ecc2a0f23f9e5b45dfa3275
-  - ff471cba8 2025-02-03T19:37:30+00:00 UPSTREAM: <carry>: log only deprecated api requests
-
-- kubernetes image-arm64 5f71ced928d02ee98ecc2a0f23f9e5b45dfa3275 to acb9630c20d2fa0d11bad4c38c7b28e2db9d818b
+- kubernetes image-amd64 5f71ced928d02ee98ecc2a0f23f9e5b45dfa3275 to acb9630c20d2fa0d11bad4c38c7b28e2db9d818b
   - 0c68a455f 2025-02-04T11:31:24-05:00 UPSTREAM: <carry>: Don't retry storage calls with side effects.
   - d2d1c4138 2025-01-20T17:13:16+01:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
   - 79b096c6b 2025-01-20T17:13:16+01:00 UPSTREAM: <drop>: manually resolve conflicts
