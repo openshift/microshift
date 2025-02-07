@@ -1,7 +1,7 @@
-UNAME ?= $$(uname -m)
+ARCH ?= $$(uname -m)
 BASE_IMAGE_URL ?= quay.io/centos/centos
 BASE_IMAGE_TAG ?= stream9
-QUAY_IMAGE_URL ?= quay.io/microshift/microshift-ci
+DEST_IMAGE_REPO ?= quay.io/microshift/microshift-ci
 
 .PHONY: all build publish
 all:
@@ -15,8 +15,7 @@ build:
 		podman build \
 			--build-arg BASE_IMAGE_URL="${BASE_IMAGE_URL}" \
 			--build-arg BASE_IMAGE_TAG="${BASE_IMAGE_TAG}" \
-			--build-arg DNF=dnf \
-			--tag "${QUAY_IMAGE_URL}":"$${tag}"-"${UNAME}" \
+			--tag "${DEST_IMAGE_REPO}":"$${tag}"-"${ARCH}" \
 			--file "$${file}"|| exit 1; \
 	done
 
@@ -24,5 +23,5 @@ publish:
 	for file in Containerfile.ci* ; do \
 		tag="$$(awk -F. '{print $$NF}' <<< "$${file}")" ; \
 		podman push \
-			"${QUAY_IMAGE_URL}":"$${tag}"-"${UNAME}" || exit 1; \
+			"${DEST_IMAGE_REPO}":"$${tag}"-"${ARCH}" || exit 1; \
 	done

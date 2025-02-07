@@ -6,7 +6,8 @@ FROM ${BASE_IMAGE_URL}:${BASE_IMAGE_TAG}
 ARG DNF=dnf
 
 # Install brew and other dependencies
-RUN ${DNF} install -y epel-release && \
+RUN ${DNF} upgrade -y && \
+    ${DNF} install -y epel-release && \
     ${DNF} install -y koji git golang && \
     ${DNF} clean all
 
