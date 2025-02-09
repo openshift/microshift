@@ -142,6 +142,12 @@ setup_registry() {
         new_db=true
     fi
 
+    # The number of maximum connections to the database is increased from the
+    # default of 100 to avoid 'FATAL: sorry, too many clients already' errors.
+    #
+    # Note that the container log still shows the default setting of 100. Run
+    # the 'echo SHOW max_connections | psql -d quay -U quayuser' query to
+    # determine the current setting.
     echo "Running Postgres container"
     sudo podman run -d --rm --name microshift-postgres \
         -e POSTGRES_USER=quayuser \
@@ -150,7 +156,7 @@ setup_registry() {
         -e POSTGRESQL_ADMIN_PASSWORD=adminpass \
         -p 5432:5432 \
         -v "${MIRROR_REGISTRY_DIR}/postgres:/var/lib/postgresql/data:Z" \
-        "${POSTGRES_IMAGE}" >/dev/null
+        "${POSTGRES_IMAGE}" -c max_connections=1024 >/dev/null
     postgres_ip=$(sudo podman inspect -f "{{.NetworkSettings.IPAddress}}" microshift-postgres)
 
     # Retry the query until the database is available
