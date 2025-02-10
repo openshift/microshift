@@ -3,6 +3,6 @@ kind: ValidatingWebhookConfiguration
 metadata:
   name: clusterservingruntime.serving.kserve.io
   annotations:
-    cert-manager.io/inject-ca-from: $(kserveNamespace)/serving-cert
+    service.beta.openshift.io/inject-cabundle: "true"
 webhooks:
   - name: clusterservingruntime.kserve-webhook-server.validator
