@@ -69,7 +69,7 @@ sudo podman build --authfile "${PULL_SECRET}" -t "${IMAGE_NAME}" \
 > may cause unintended operating system version upgrade (e.g. from `9.4` to
 > `9.5`). To prevent this from happening, use the following command instead.
 > ```
-> RUN dnf upgrade -y --releasever=$(rpm -q --qf "%{VERSION}" redhat-release)
+> RUN dnf upgrade -y --releasever="$(rpm -q --qf "%{VERSION}" redhat-release)"
 > ```
 
 Verify that the local MicroShift 4.16 `bootc` image was created.
