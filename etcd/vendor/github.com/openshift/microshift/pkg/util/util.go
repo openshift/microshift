@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io/fs"
+	"math/rand/v2"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -141,4 +142,21 @@ func (l LogFilePath) Remove() error {
 		return os.Remove(string(l))
 	}
 	return err
+}
+
+// GenerateUniqueTempPath returns a filepath from given path with extra suffix
+// which doesn't exist.
+func GenerateUniqueTempPath(path string) (string, error) {
+	// 1000 tries
+	for i := 0; i < 1000; i++ {
+		//nolint:gosec
+		rnd := rand.IntN(100000)
+		newPath := fmt.Sprintf("%s.tmp.%d", path, rnd)
+		if exists, err := PathExists(newPath); err != nil {
+			return "", err
+		} else if !exists {
+			return newPath, nil
+		}
+	}
+	return "", fmt.Errorf("attempted to generate unique temporary path (%q) for 1000 tries - giving up", path)
 }
