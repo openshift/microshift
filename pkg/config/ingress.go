@@ -1,6 +1,7 @@
 package config
 
 import (
+	configv1 "github.com/openshift/api/config/v1"
 	operatorv1 "github.com/openshift/api/operator/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -102,6 +103,19 @@ type IngressConfig struct {
 	// +optional
 	// +kubebuilder:default:="1"
 	DefaultHttpVersionPolicy DefaultHttpVersionPolicy `json:"defaultHTTPVersion,omitempty"`
+
+	// tlsSecurityProfile specifies settings for TLS connections for ingresscontrollers.
+	//
+	// If unset, the default is based on the apiservers.config.openshift.io/cluster resource.
+	//
+	// Note that when using the Old, Intermediate, and Modern profile types, the effective
+	// profile configuration is subject to change between releases. For example, given
+	// a specification to use the Intermediate profile deployed on release X.Y.Z, an upgrade
+	// to release X.Y.Z+1 may cause a new profile configuration to be applied to the ingress
+	// controller, resulting in a rollout.
+	//
+	// +optional
+	TLSSecurityProfile *configv1.TLSSecurityProfile `json:"tlsSecurityProfile,omitempty"`
 }
 
 // IngressControllerTuningOptions specifies options for tuning the performance
