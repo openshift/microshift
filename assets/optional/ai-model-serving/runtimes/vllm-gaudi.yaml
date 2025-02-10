@@ -1,5 +1,5 @@
 apiVersion: serving.kserve.io/v1alpha1
-kind: ClusterServingRuntime
+kind: ServingRuntime
 metadata:
   name: vllm-gaudi-runtime
   annotations:

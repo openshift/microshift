@@ -133,132 +133,6 @@ update_kserve() {
         local image_ref="${image#*=}"
         yq -i ".images.${image_name} = \"${image_ref}\"" "${RELEASE_JSON}"
     done
-
-    title "Applying patch to enable webhook for ClusterServingRuntime"
-    git apply << 'EOF'
-diff --git a/assets/optional/ai-model-serving/kserve/default/kustomization.yaml b/assets/optional/ai-model-serving/kserve/default/kustomization.yaml
-index f57fd2367..67a556c5f 100644
---- a/assets/optional/ai-model-serving/kserve/default/kustomization.yaml
-+++ b/assets/optional/ai-model-serving/kserve/default/kustomization.yaml
-@@ -53,11 +53,11 @@ replacements:
-     select:
-       kind: ValidatingWebhookConfiguration
-       name: inferencegraph.serving.kserve.io
--#  - fieldPaths:
--#    - webhooks.*.clientConfig.service.name
--#    select:
--#      kind: ValidatingWebhookConfiguration
--#      name: clusterservingruntime.serving.kserve.io
-+  - fieldPaths:
-+    - webhooks.*.clientConfig.service.name
-+    select:
-+      kind: ValidatingWebhookConfiguration
-+      name: clusterservingruntime.serving.kserve.io
-   - fieldPaths:
-     - webhooks.*.clientConfig.service.name
-     select:
-@@ -99,11 +99,11 @@ replacements:
-     select:
-       kind: ValidatingWebhookConfiguration
-       name: inferencegraph.serving.kserve.io
--#  - fieldPaths:
--#    - webhooks.*.clientConfig.service.namespace
--#    select:
--#      kind: ValidatingWebhookConfiguration
--#      name: clusterservingruntime.serving.kserve.io
-+  - fieldPaths:
-+    - webhooks.*.clientConfig.service.namespace
-+    select:
-+      kind: ValidatingWebhookConfiguration
-+      name: clusterservingruntime.serving.kserve.io
-   - fieldPaths:
-     - webhooks.*.clientConfig.service.namespace
-     select:
-@@ -192,7 +192,7 @@ patches:
- - path: isvc_validatingwebhook_cainjection_patch.yaml
- - path: inferencegraph_validatingwebhook_cainjection_patch.yaml
- - path: trainedmodel_validatingwebhook_cainjection_patch.yaml
--#- path: clusterservingruntime_validatingwebhook_cainjection_patch.yaml
-+- path: clusterservingruntime_validatingwebhook_cainjection_patch.yaml
- - path: servingruntime_validationwebhook_cainjection_patch.yaml
- - path: svc_webhook_cainjection_patch.yaml
- - path: manager_resources_patch.yaml
-diff --git a/assets/optional/ai-model-serving/kserve/webhook/manifests.yaml b/assets/optional/ai-model-serving/kserve/webhook/manifests.yaml
-index ddac00f33..248bdadc5 100644
---- a/assets/optional/ai-model-serving/kserve/webhook/manifests.yaml
-+++ b/assets/optional/ai-model-serving/kserve/webhook/manifests.yaml
-@@ -131,32 +131,32 @@ webhooks:
-         resources:
-           - inferencegraphs
- ---
--#apiVersion: admissionregistration.k8s.io/v1
--#kind: ValidatingWebhookConfiguration
--#metadata:
--#  creationTimestamp: null
--#  name: clusterservingruntime.serving.kserve.io
--#webhooks:
--#  - clientConfig:
--#      service:
--#        name: $(webhookServiceName)
--#        namespace: $(kserveNamespace)
--#        path: /validate-serving-kserve-io-v1alpha1-clusterservingruntime
--#    failurePolicy: Fail
--#    name: clusterservingruntime.kserve-webhook-server.validator
--#    sideEffects: None
--#    admissionReviewVersions: ["v1beta1"]
--#    rules:
--#      - apiGroups:
--#          - serving.kserve.io
--#        apiVersions:
--#          - v1alpha1
--#        operations:
--#          - CREATE
--#          - UPDATE
--#        resources:
--#          - clusterservingruntimes
--#---
-+apiVersion: admissionregistration.k8s.io/v1
-+kind: ValidatingWebhookConfiguration
-+metadata:
-+ creationTimestamp: null
-+ name: clusterservingruntime.serving.kserve.io
-+webhooks:
-+ - clientConfig:
-+     service:
-+       name: $(webhookServiceName)
-+       namespace: $(kserveNamespace)
-+       path: /validate-serving-kserve-io-v1alpha1-clusterservingruntime
-+   failurePolicy: Fail
-+   name: clusterservingruntime.kserve-webhook-server.validator
-+   sideEffects: None
-+   admissionReviewVersions: ["v1beta1"]
-+   rules:
-+     - apiGroups:
-+         - serving.kserve.io
-+       apiVersions:
-+         - v1alpha1
-+       operations:
-+         - CREATE
-+         - UPDATE
-+       resources:
-+         - clusterservingruntimes
-+---
- apiVersion: admissionregistration.k8s.io/v1
- kind: ValidatingWebhookConfiguration
- metadata:
- diff --git a/assets/optional/ai-model-serving/kserve/default/clusterservingruntime_validatingwebhook_cainjection_patch.yaml b/assets/optional/ai-model-serving/kserve/default/clusterservingruntime_validatingwebhook_cainjection_patch.yaml
-index 9967fe4380..1b31e84ae7 100644
---- a/assets/optional/ai-model-serving/kserve/default/clusterservingruntime_validatingwebhook_cainjection_patch.yaml
-+++ b/assets/optional/ai-model-serving/kserve/default/clusterservingruntime_validatingwebhook_cainjection_patch.yaml
-@@ -3,6 +3,6 @@ kind: ValidatingWebhookConfiguration
- metadata:
-   name: clusterservingruntime.serving.kserve.io
-   annotations:
--    cert-manager.io/inject-ca-from: $(kserveNamespace)/serving-cert
-+    service.beta.openshift.io/inject-cabundle: "true"
- webhooks:
-   - name: clusterservingruntime.kserve-webhook-server.validator
-EOF
 }
 
 update_runtimes() {
@@ -268,7 +142,7 @@ update_runtimes() {
         if [[ $(basename "${runtime}") == "kustomization.yaml" ]]; then
             continue
         fi
-        yq --inplace '.objects[0] | .kind = "ClusterServingRuntime"' "${runtime}"
+        yq --inplace '.objects[0]' "${runtime}"
         containers_amount=$(yq '.spec.containers | length' "${runtime}")
         for ((i=0; i<containers_amount; i++)); do
             # shellcheck disable=SC2016
