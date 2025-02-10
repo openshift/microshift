@@ -1,0 +1,18 @@
+- kubernetes embedded-component ef2a55c520f6a4c95996ff54c41fb58959750306 to 148a3899faa172900675334f74463f0f87af6594
+  - 66b084b87 2025-02-06T14:41:11-05:00 UPSTREAM: <carry>: e2e_node: use restart instead of start stop
+  - 3b7c0615f 2025-02-06T10:26:11-05:00 UPSTREAM: 125923: e2e_node: add a test to verify the kubelet starts
+  - e4fe3b1d9 2025-02-06T10:26:11-05:00 UPSTREAM: <carry>: kubelet/cm: move CPU reading from cm to cm/cpumanager
+  - 287ad89e6 2025-02-06T10:26:11-05:00 UPSTREAM: <carry>: kubelet/cm: fix bug where kubelet restarts from missing cpuset cgroup
+
+- kubernetes image-amd64 ef2a55c520f6a4c95996ff54c41fb58959750306 to 148a3899faa172900675334f74463f0f87af6594
+  - 66b084b87 2025-02-06T14:41:11-05:00 UPSTREAM: <carry>: e2e_node: use restart instead of start stop
+  - 3b7c0615f 2025-02-06T10:26:11-05:00 UPSTREAM: 125923: e2e_node: add a test to verify the kubelet starts
+  - e4fe3b1d9 2025-02-06T10:26:11-05:00 UPSTREAM: <carry>: kubelet/cm: move CPU reading from cm to cm/cpumanager
+  - 287ad89e6 2025-02-06T10:26:11-05:00 UPSTREAM: <carry>: kubelet/cm: fix bug where kubelet restarts from missing cpuset cgroup
+
+- kubernetes image-arm64 ef2a55c520f6a4c95996ff54c41fb58959750306 to 148a3899faa172900675334f74463f0f87af6594
+  - 66b084b87 2025-02-06T14:41:11-05:00 UPSTREAM: <carry>: e2e_node: use restart instead of start stop
+  - 3b7c0615f 2025-02-06T10:26:11-05:00 UPSTREAM: 125923: e2e_node: add a test to verify the kubelet starts
+  - e4fe3b1d9 2025-02-06T10:26:11-05:00 UPSTREAM: <carry>: kubelet/cm: move CPU reading from cm to cm/cpumanager
+  - 287ad89e6 2025-02-06T10:26:11-05:00 UPSTREAM: <carry>: kubelet/cm: fix bug where kubelet restarts from missing cpuset cgroup
+
