@@ -1,4 +1,4 @@
-FROM registry.redhat.io/rhel9/rhel-bootc:9.4
+FROM registry.redhat.io/rhel9-eus/rhel-9.4-bootc:9.4
 
 # Build a container image to be used by Bootc Image Builder in the subsequent
 # stages for producing ISO images.
