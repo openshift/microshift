@@ -1,0 +1,149 @@
+- api embedded-component d9e1a2e1fe6b1d989e4b19bedaf930756434783d to 9e59a77ed2e001a28bf82cc1084699a4989bba23
+  - 045163b9 2025-02-06T12:11:27+00:00 ClusterOperator Conditions should be a listType=map
+  - 4ff8991d 2025-02-05T00:30:11+05:30 Add the field MarketType to AwsMachineProviderConfig
+  - de08c347 2025-02-03T17:30:50+01:00 Use BASE_REF env var to pull the release version for sippy data
+  - a01bc656 2025-01-31T13:47:15+00:00 Add sentinel to check CRD changes have been served
+  - 40542185 2025-01-31T13:47:14+00:00 Update wording for length limits in API errors
+  - ff49aba9 2025-01-31T13:47:13+00:00 Update envtest binaries to v1.32.1
+  - 6c7b743f 2025-01-31T13:47:12+00:00 Add ratcheting tests for PowerVS service endpoints
+  - 9727a72d 2025-01-31T09:04:29+01:00 tools/Makefile: update publish-kubebuilder-tools instructions
+  - 3b53484a 2025-01-31T08:55:51+01:00 Add envtest archives for K8s 1.32.1
+  - 6c61bd80 2025-01-30T14:12:24-05:00 upkeep: update component name for arbiter feature
+  - d6fe607d 2025-01-21T18:12:50+01:00 operator/v1alpha1: Add ClusterVersionOperator to scheme
+  - 3ede7176 2025-01-20T18:13:32+01:00 Graduate UserDefinedNetworks to GA
+
+- cluster-ingress-operator embedded-component 3ad38c6e688f78cacb66665246c154e5ac439499 to edf5e71e8b08ef23a4d8f0b3fee5630c66625967
+  - d2160e6 2025-01-31T12:09:56-05:00 OCPBUGS-32776: Fix IBM Public Cloud DNS Provider Update Logic
+  - 7ee110b 2025-01-29T18:27:43-05:00 OCPBUGS-42045: Add an Internal Warmup for IBMCloud DNS in E2E
+  - 7e2b804 2025-01-29T18:26:52-05:00 OCPBUGS-48780: Extend E2E DNS Resolution Timeout to 10 Minutes
+  - c5d48ec 2025-01-16T21:00:03-05:00 Add Missing Test Cases in IBM Cloud Unit Tests
+  - 0b9e89b 2024-09-12T22:02:00-04:00 Clear IBM DNS Provider Unit Tests CallHistory
+
+- cluster-kube-apiserver-operator embedded-component 1c44cc51cbbd5e565c3ecf13b277f3a0fbfe20a4 to c3e5c905f77ac8367e168eb9d7a0c744eb8bd330
+  - 707728f 2025-02-07T01:24:21+08:00 increase waitForFallbackDegradedConditionTimeout
+  - 5f6f8e6 2025-02-03T15:59:45+01:00 bump(library-go)
+  - 275f05d 2025-01-31T15:12:56+01:00 bindata/alerts/slo: fix burnrate calculation
+  - 9b84c5d 2025-01-30T15:09:06+01:00 alerts: update APIRemovedInNextEUSReleaseInUse for 1.32
+  - d030fb5 2025-01-15T16:51:45+01:00 adjust histograms 'le' related selectors
+
+- cluster-kube-controller-manager-operator embedded-component b10f56219139602b782b8a3016926facf9c38ff4 to b067f5fef7b7af1cbce88fe49c62a8dd3ce8a3c6
+  - 116a610 2025-01-31T22:45:43+01:00 Bump to latest library-go
+
+- cluster-kube-scheduler-operator embedded-component ad48eca03e8025ac5dc19c7f6f82d461f01dec06 to 4210c04aec1c7fde8f4c294421e090ebf9248285
+  - 5e4d9c1 2025-01-31T23:43:10+01:00 Bump to latest library-go
+
+- cluster-network-operator embedded-component 9ee349a119c769bc390d6699b61e59094ddbc2c7 to ff96ab47006095ad40478fa72d586ae5f33148e1
+  - de74e61 2025-02-02T11:22:59+02:00 ovn-k,cudn crd: Ensure matching toplogy and topology-config
+  - 9ccaa50 2025-01-31T19:30:22+01:00 Fix UDN and CUDN hostSubnet validation
+  - ff0b147 2025-01-31T13:08:09+01:00 Keep rendering OVN IPsec when its daemonset not available
+  - 5c6f343 2025-01-30T17:46:39+00:00 OVNK should be able to annotate network ID on NADs
+  - c7f54f2 2025-01-30T16:28:05+02:00 frr-k8s: align manifests with operator
+  - 3c99d4f 2025-01-30T12:18:42+01:00 Remove 4.13 IPsec upgrade handling
+
+- kubernetes embedded-component cc13ce0f2f8bed35ac14af6be2895e7fcf4e6623 to 1e7267c0c3a654a9daf9f8bbb77f66d4f4326e9b
+  - 74408fb75 2025-02-03T10:25:59-05:00 UPSTREAM: <carry>: Don't retry storage calls with side effects.
+  - c557fd56a 2025-01-29T10:01:52-05:00 UPSTREAM: <carry>: Add benluddy to DOWNSTREAM_OWNERS.
+  - 084abc579 2025-01-29T09:19:42-03:00 UPSTREAM: <drop>: downgrade grpc library to 1.65.0
+  - 30b315a13 2025-01-22T15:26:13+01:00 UPSTREAM: <carry>: disable etcd readiness checks by default
+  - 937595ed8 2025-01-21T15:47:35+01:00 UPSTREAM: <carry>: log only deprecated api requests
+  - 0943016a4 2025-01-14T16:27:40+01:00 UPSTREAM: 129180: prevent unnecessary resolving of iscsi/fc devices to dm
+  - a9038f3e6 2025-01-08T15:41:31+00:00 UPSTREAM: 129506: Simplify status subresource ratcheting testing
+  - df57efdb9 2025-01-07T14:12:41+00:00 UPSTREAM: 129506: Fix status subresource ratcheting
+  - 7a1b89d2b 2024-12-10T22:16:52-05:00 UPSTREAM: <carry>: add arbiter node role to known labels
+
+- machine-config-operator embedded-component ca3540309f6fa8bfbba1da6a7c95b0befb6d2b84 to 6546cf271c5d39f4c07ac464daeb38b56a4e7b4e
+  - ee6d1f6b 2025-02-07T14:13:13-05:00 controller: use OCL specific informer factory
+  - 5a2d40eb 2025-02-04T16:10:02-07:00 Add SystemMemoryExceedsReservation runbook to alert
+  - db66b998 2025-02-03T08:32:59-05:00 documentation: update sysstat support version
+  - 4c9d2f8c 2025-01-31T14:00:19-05:00 controller: consider rollback nodes unavailable
+  - e7976ab5 2025-01-30T11:01:15+04:00 Revert "OCPEDGE-1419 Add ksan-storage extension"
+  - c867381b 2025-01-28T12:15:32-06:00 OCPBUGS-49436: Make resolv-prepender env file optional
+
+- oc image-amd64 1ab51e8ae705b76381478f3c729321a97f83bac3 to cbc8edcc9c58cd8b2238d01e55ae8c8b0979ec4e
+  - cbc8edcc 2025-02-03T13:04:28+00:00 STOR-2040: CLI command to display bound pvc filesystem usage percentage (#1854)
+
+- router image-amd64 20f7f41430f7c660438c32532ccd7b453b014b68 to b447c4d27d38a6c5f6ce2d5ceda88dbc9b90c661
+  - b49f382 2025-01-31T09:38:00-05:00 OCPBUGS-45290: Reject All CA-Signed Certs Using SHA1
+
+- ovn-kubernetes image-amd64 dcb1b19e7463c93053bd05ac6bde416154632c94 to 831ee6e43d419106190e5e9daba0cdaa51e6a7fb
+  - d40191e1 2025-02-05T12:35:23+01:00 kv, e2e: Reduce live migration disruption treshold
+  - 7e5ad64d 2025-02-05T12:35:22+01:00 kv, e2e: Keep underlay with delete-namespace=false
+  - b08bd371 2025-02-05T11:50:09+01:00 kv, e2e, localnet: Activate tests
+  - 62624ab7 2025-02-05T11:50:09+01:00 kv, udn: Remove addresses when we disable LSP
+  - afb4549f 2025-02-05T11:50:09+01:00 kv, localnet: Swich LSP Enabled field on migration
+  - 0a79dabf 2025-02-04T18:14:59+01:00 kubevirt, e2e: Check ipv4 gateway mac after lm
+  - 4ab5dfef 2025-02-04T18:13:49+01:00 kubevirt: Function to reconcile IPv4 gateway mac
+  - 976a3c6a 2025-02-04T10:56:32-05:00 Bump OVN to 24.09.2-14 for FDP-1131
+  - c9ff16e5 2025-02-04T12:47:30+02:00 e2e, kubevirt, UDN: Check migration with snat-per-pod
+  - ad9391f9 2025-02-04T09:32:53+02:00 e2e, kubevirt, UDN: Increase VM's memory
+  - dd96d126 2025-02-04T09:32:53+02:00 e2e, kubevirt, UDN: Add failed lm test for l2 pudn
+  - d2922db7 2025-02-04T09:32:53+02:00 e2e, kubevirt, UDN: Check n/s egress not broken after LM
+  - 0e69eb92 2025-02-04T09:32:53+02:00 e2e, kubevirt, UDN: Check n/s tcp not broken after LM
+  - a95f2a8b 2025-02-04T09:32:53+02:00 e2e, kubevirt, UDN: Check e/w tcp not broken after LM
+  - f7ce763c 2025-02-04T09:32:53+02:00 e2e, kubevirt, UDN: Add north south traffic test
+  - a91e2b2e 2025-02-04T09:32:53+02:00 e2e, kubevirt, UDN: Use fedora and iperf
+  - 123d692d 2025-02-03T13:16:11-08:00 change slack url to point to the cloud-native workspace
+  - 47a12af8 2025-02-03T15:06:44-05:00 test/e2e, go.mod: run go mod tidy
+  - 45944ef4 2025-02-03T15:06:44-05:00 Add network name conflict e2e
+  - b5163625 2025-02-03T17:46:19+01:00 factory/handler: avoid deadlock on shutdown.
+  - 6dc458cb 2025-02-03T15:43:48+01:00 Fix conflicting network prefix for (C)UDNs.
+  - 3fbbc5b1 2025-01-31T16:16:15-05:00 Fixes 1 minute delay for primary UDN controllers to start
+  - a2cbe9d2 2025-01-31T19:23:48+01:00 Fix UDN and CUDN subnet validation
+  - 96b87986 2025-01-30T20:23:12+02:00 crd, cudn: Ensure matching toplogy and topology-config
+  - 5f65e69a 2025-01-29T18:20:56-05:00 Fix CUDN unit test for status matching
+  - 73783c2b 2025-01-29T18:20:56-05:00 Fixes starting services/multinetpolicy on wrong controllers
+  - ce13e95c 2025-01-29T18:20:56-05:00 Make open default ports semantically correct
+  - 1234953a 2025-01-29T18:20:54-05:00 Do not get active network for non-primary controllers
+  - 715675c8 2025-01-29T19:45:42+01:00 UserDefinedNetworks: Ignore pods and namespaces from different networks
+  - c496a442 2025-01-29T19:00:13+01:00 Get the network ID from the NAD for zone/node ctrls
+  - f13b2449 2025-01-29T19:00:13+01:00 Use partial parsing for network sepcific CIDRs
+  - 13814c88 2025-01-29T19:00:13+01:00 Improve annotation changes detection
+  - 4e18d5bb 2025-01-29T10:48:14+01:00 Check if cluster manager controller has retry pod framework
+  - 52116562 2024-12-06T01:15:32+00:00 Updating ovn-kubernetes-microshift-container image to be consistent with ART for 4.19 Reconciling with https://github.com/openshift/ocp-build-data/tree/a39508c86497b4e5e463d7b2c78e51e577be9e7d/images/ovn-kubernetes-microshift.yml
+
+- kubernetes image-amd64 cc13ce0f2f8bed35ac14af6be2895e7fcf4e6623 to 1e7267c0c3a654a9daf9f8bbb77f66d4f4326e9b
+  - 74408fb75 2025-02-03T10:25:59-05:00 UPSTREAM: <carry>: Don't retry storage calls with side effects.
+  - c557fd56a 2025-01-29T10:01:52-05:00 UPSTREAM: <carry>: Add benluddy to DOWNSTREAM_OWNERS.
+  - 084abc579 2025-01-29T09:19:42-03:00 UPSTREAM: <drop>: downgrade grpc library to 1.65.0
+  - 30b315a13 2025-01-22T15:26:13+01:00 UPSTREAM: <carry>: disable etcd readiness checks by default
+  - 937595ed8 2025-01-21T15:47:35+01:00 UPSTREAM: <carry>: log only deprecated api requests
+  - 0943016a4 2025-01-14T16:27:40+01:00 UPSTREAM: 129180: prevent unnecessary resolving of iscsi/fc devices to dm
+  - a9038f3e6 2025-01-08T15:41:31+00:00 UPSTREAM: 129506: Simplify status subresource ratcheting testing
+  - df57efdb9 2025-01-07T14:12:41+00:00 UPSTREAM: 129506: Fix status subresource ratcheting
+  - 7a1b89d2b 2024-12-10T22:16:52-05:00 UPSTREAM: <carry>: add arbiter node role to known labels
+
+- oc image-arm64 1ab51e8ae705b76381478f3c729321a97f83bac3 to cbc8edcc9c58cd8b2238d01e55ae8c8b0979ec4e
+  - cbc8edcc 2025-02-03T13:04:28+00:00 STOR-2040: CLI command to display bound pvc filesystem usage percentage (#1854)
+
+- ovn-kubernetes image-arm64 d7ee0a462da13315de6ba9cb184e7fea58b7ce50 to 831ee6e43d419106190e5e9daba0cdaa51e6a7fb
+  - d40191e1 2025-02-05T12:35:23+01:00 kv, e2e: Reduce live migration disruption treshold
+  - 7e5ad64d 2025-02-05T12:35:22+01:00 kv, e2e: Keep underlay with delete-namespace=false
+  - b08bd371 2025-02-05T11:50:09+01:00 kv, e2e, localnet: Activate tests
+  - 62624ab7 2025-02-05T11:50:09+01:00 kv, udn: Remove addresses when we disable LSP
+  - afb4549f 2025-02-05T11:50:09+01:00 kv, localnet: Swich LSP Enabled field on migration
+  - 0a79dabf 2025-02-04T18:14:59+01:00 kubevirt, e2e: Check ipv4 gateway mac after lm
+  - 4ab5dfef 2025-02-04T18:13:49+01:00 kubevirt: Function to reconcile IPv4 gateway mac
+  - 976a3c6a 2025-02-04T10:56:32-05:00 Bump OVN to 24.09.2-14 for FDP-1131
+  - c9ff16e5 2025-02-04T12:47:30+02:00 e2e, kubevirt, UDN: Check migration with snat-per-pod
+  - ad9391f9 2025-02-04T09:32:53+02:00 e2e, kubevirt, UDN: Increase VM's memory
+  - dd96d126 2025-02-04T09:32:53+02:00 e2e, kubevirt, UDN: Add failed lm test for l2 pudn
+  - d2922db7 2025-02-04T09:32:53+02:00 e2e, kubevirt, UDN: Check n/s egress not broken after LM
+  - 0e69eb92 2025-02-04T09:32:53+02:00 e2e, kubevirt, UDN: Check n/s tcp not broken after LM
+  - a95f2a8b 2025-02-04T09:32:53+02:00 e2e, kubevirt, UDN: Check e/w tcp not broken after LM
+  - f7ce763c 2025-02-04T09:32:53+02:00 e2e, kubevirt, UDN: Add north south traffic test
+  - a91e2b2e 2025-02-04T09:32:53+02:00 e2e, kubevirt, UDN: Use fedora and iperf
+  - 123d692d 2025-02-03T13:16:11-08:00 change slack url to point to the cloud-native workspace
+  - 47a12af8 2025-02-03T15:06:44-05:00 test/e2e, go.mod: run go mod tidy
+  - 45944ef4 2025-02-03T15:06:44-05:00 Add network name conflict e2e
+  - b5163625 2025-02-03T17:46:19+01:00 factory/handler: avoid deadlock on shutdown.
+  - 6dc458cb 2025-02-03T15:43:48+01:00 Fix conflicting network prefix for (C)UDNs.
+  - 96b87986 2025-01-30T20:23:12+02:00 crd, cudn: Ensure matching toplogy and topology-config
+  - 52116562 2024-12-06T01:15:32+00:00 Updating ovn-kubernetes-microshift-container image to be consistent with ART for 4.19 Reconciling with https://github.com/openshift/ocp-build-data/tree/a39508c86497b4e5e463d7b2c78e51e577be9e7d/images/ovn-kubernetes-microshift.yml
+
+- kubernetes image-arm64 ae495d909ff59bcd47de6dd82635da4d5ca3a9ac to 1e7267c0c3a654a9daf9f8bbb77f66d4f4326e9b
+  - 74408fb75 2025-02-03T10:25:59-05:00 UPSTREAM: <carry>: Don't retry storage calls with side effects.
+  - c557fd56a 2025-01-29T10:01:52-05:00 UPSTREAM: <carry>: Add benluddy to DOWNSTREAM_OWNERS.
+  - 30b315a13 2025-01-22T15:26:13+01:00 UPSTREAM: <carry>: disable etcd readiness checks by default
+  - 937595ed8 2025-01-21T15:47:35+01:00 UPSTREAM: <carry>: log only deprecated api requests
+  - 0943016a4 2025-01-14T16:27:40+01:00 UPSTREAM: 129180: prevent unnecessary resolving of iscsi/fc devices to dm
+
