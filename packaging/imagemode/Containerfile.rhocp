@@ -8,6 +8,7 @@ ARG USHIFT_VER
 RUN dnf config-manager \
         --set-enabled "rhocp-${USHIFT_VER}-for-rhel-9-$(uname -m)-rpms" \
         --set-enabled "fast-datapath-for-rhel-9-$(uname -m)-rpms" && \
+    dnf upgrade -y --releasever=$(rpm -q --qf "%{VERSION}" redhat-release) && \
     dnf install -y ${DNF_OPTIONS} firewalld microshift && \
     systemctl enable microshift && \
     dnf clean all

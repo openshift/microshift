@@ -3,7 +3,7 @@
 # using NAME=value make arguments
 #
 PULL_SECRET ?= $(HOME)/.pull-secret.json
-BASE_IMAGE_URL ?= registry.redhat.io/rhel9/rhel-bootc
+BASE_IMAGE_URL ?= registry.redhat.io/rhel9-eus/rhel-9.4-bootc
 BASE_IMAGE_TAG ?= 9.4
 DNF_OPTIONS ?=
 
