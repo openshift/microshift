@@ -9,15 +9,27 @@ import (
 	"strings"
 	"time"
 
+	configv1 "github.com/openshift/api/config/v1"
 	operatorv1 "github.com/openshift/api/operator/v1"
 	"github.com/openshift/microshift/pkg/assets"
 	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/util/cryptomaterial"
+	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/klog/v2"
 )
 
 const (
 	haproxyMaxTimeoutMilliseconds = 2147483647 * time.Millisecond
+)
+
+var (
+	tlsVersion13Ciphers = sets.NewString(
+		"TLS_AES_128_GCM_SHA256",
+		"TLS_AES_256_GCM_SHA384",
+		"TLS_CHACHA20_POLY1305_SHA256",
+		"TLS_AES_128_CCM_SHA256",
+		"TLS_AES_128_CCM_8_SHA256",
+	)
 )
 
 func startServiceCAController(ctx context.Context, cfg *config.Config, kubeconfigPath string) error {
@@ -331,6 +343,25 @@ func durationToHAProxyTimespec(duration time.Duration) string {
 	} else {
 		return fmt.Sprintf("%dh", int(math.Round(duration.Hours())))
 	}
+}
+
+// tlsProfileSpecForSecurityProfile returns a TLS profile spec based on the
+// provided security profile, or the "Intermediate" profile if an unknown
+// security profile type is provided.  Note that the return value must not be
+// mutated by the caller; the caller must make a copy if it needs to mutate the
+// value.
+func tlsProfileSpecForSecurityProfile(profile *configv1.TLSSecurityProfile) *configv1.TLSProfileSpec {
+	if profile != nil {
+		if profile.Type == configv1.TLSProfileCustomType {
+			if profile.Custom != nil {
+				return &profile.Custom.TLSProfileSpec
+			}
+			return &configv1.TLSProfileSpec{}
+		} else if spec, ok := configv1.TLSProfiles[profile.Type]; ok {
+			return spec
+		}
+	}
+	return configv1.TLSProfiles[configv1.TLSProfileIntermediateType]
 }
 
 func generateIngressParams(cfg *config.Config) assets.RenderParams {
