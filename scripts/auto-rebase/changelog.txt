@@ -1,3 +1,9 @@
-- oc image-arm64 ae1bd9e4a75b8ab617a569e5c8e1a0d7285a16f6 to 1b0bf0849072a4d9ef2e79c1ed80a60b4b4c1bba
+- cluster-network-operator embedded-component d942457aad39685ac278f36834fab3ff3a2cf74f to b0ce1c3b34921ec55bbb7686baafc43b20e7d1b3
+  - 6b87d0d 2024-11-21T20:13:03+00:00 Add nodeslicepool
+
+- machine-config-operator embedded-component 3594c4b2eb42d8c9e56a146baea52d9c147721b0 to 830665b0c9b44e32294f0f1cecf17735f2bd5d18
+  - b55e89f7 2025-01-29T22:59:25+00:00 node controller: clarify when 'maxUnavailible' is invalid in alert
+
+- oc image-amd64 ae1bd9e4a75b8ab617a569e5c8e1a0d7285a16f6 to 1b0bf0849072a4d9ef2e79c1ed80a60b4b4c1bba
   - 6f459acb 2025-01-28T14:23:54-05:00 Address `github.com/docker/docker` CVE
 
