@@ -26,7 +26,7 @@ gpgcheck=0
 enabled=1
 EOF
 
-RUN dnf upgrade -y --releasever=$(rpm -q --qf "%{VERSION}" redhat-release) && \
+RUN dnf upgrade -y --releasever="$(rpm -q --qf "%{VERSION}" redhat-release)" && \
     dnf install -y ${DNF_OPTIONS} firewalld microshift && \
     systemctl enable microshift && \
     dnf clean all
