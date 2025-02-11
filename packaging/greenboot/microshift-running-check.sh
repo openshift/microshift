@@ -19,4 +19,7 @@ print_boot_status
 # Set the wait timeout for the current check based on the boot counter
 WAIT_TIMEOUT_SECS=$(get_wait_timeout)
 
-/usr/bin/microshift healthcheck -v=2 --timeout="${WAIT_TIMEOUT_SECS}s"
+if ! microshift healthcheck \
+        -v=2 --timeout="${WAIT_TIMEOUT_SECS}s"; then
+    create_fail_marker_and_exit
+fi
