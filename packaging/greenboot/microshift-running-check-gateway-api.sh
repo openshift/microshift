@@ -19,7 +19,7 @@ if [ "$(id -u)" -ne 0 ] ; then
     exit 1
 fi
 
-exit_early_if_previous_checks_failed
+exit_if_fail_marker_exists
 
 echo "STARTED"
 

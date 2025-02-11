@@ -137,17 +137,17 @@ function get_wait_timeout() {
     echo "${wait_timeout}"
 }
 
-# Exit early if previous MicroShift healthcheck scripts failed.
-function exit_early_if_previous_checks_failed() {
+# Exit if previous MicroShift healthcheck scripts failed.
+function exit_if_fail_marker_exists() {
     if [ -f "${MICROSHIFT_GREENBOOT_FAIL_MARKER}" ]; then
-        >&2 echo "${MICROSHIFT_GREENBOOT_FAIL_MARKER} file exists. Exiting early."
+        >&2 echo "'${MICROSHIFT_GREENBOOT_FAIL_MARKER}' file exists, exiting with an error"
         exit 1
     fi
 }
 
 # Create fail marker and exit
 function create_fail_marker_and_exit() {
-    >&2 echo "Creating ${MICROSHIFT_GREENBOOT_FAIL_MARKER} and exiting with error."
+    >&2 echo "Creating '${MICROSHIFT_GREENBOOT_FAIL_MARKER}' file and exiting with an error."
     touch "${MICROSHIFT_GREENBOOT_FAIL_MARKER}"
     exit 1
 }
