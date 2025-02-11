@@ -143,6 +143,7 @@ func (c *Config) fillDefaults() error {
 		Status: StatusManaged,
 		AdmissionPolicy: RouteAdmissionPolicy{
 			NamespaceOwnership: NamespaceOwnershipAllowed,
+			WildcardPolicy:     WildcardPolicyDisallowed,
 		},
 		Ports: IngressPortsConfig{
 			Http:  ptr.To[int](80),

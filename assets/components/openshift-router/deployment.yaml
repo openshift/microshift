@@ -32,7 +32,7 @@ spec:
             - name: RELOAD_INTERVAL
               value: 5s
             - name: ROUTER_ALLOW_WILDCARD_ROUTES
-              value: "false"
+              value: '{{ .RouterAllowWildcardRoutes }}'
             - name: ROUTER_CANONICAL_HOSTNAME
               value: router-default.apps.{{ .BaseDomain }}
             - name: ROUTER_CIPHERS

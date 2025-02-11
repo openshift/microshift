@@ -13,11 +13,15 @@ const (
 	StatusRemoved             IngressStatusEnum        = "Removed"
 	DefaultHttpVersionV1      DefaultHttpVersionPolicy = 1
 	DefaultHttpVersionV2      DefaultHttpVersionPolicy = 2
+	WildcardPolicyAllowed     WildcardPolicy           = "WildcardsAllowed"
+	WildcardPolicyDisallowed  WildcardPolicy           = "WildcardsDisallowed"
 )
 
 type NamespaceOwnershipEnum string
 type IngressStatusEnum string
 type DefaultHttpVersionPolicy int32
+type WildcardPolicy string
+
 type IngressConfig struct {
 	// Default router status, can be Managed or Removed.
 	// +kubebuilder:default=Managed
@@ -330,6 +334,23 @@ type RouteAdmissionPolicy struct {
 	// If empty, the default is InterNamespaceAllowed.
 	// +kubebuilder:default="InterNamespaceAllowed"
 	NamespaceOwnership NamespaceOwnershipEnum `json:"namespaceOwnership"`
+	// wildcardPolicy describes how routes with wildcard policies should
+	// be handled for the ingress controller. WildcardPolicy controls use
+	// of routes [1] exposed by the ingress controller based on the route's
+	// wildcard policy.
+	//
+	// [1] https://github.com/openshift/api/blob/master/route/v1/types.go
+	//
+	// Note: Updating WildcardPolicy from WildcardsAllowed to WildcardsDisallowed
+	// will cause admitted routes with a wildcard policy of Subdomain to stop
+	// working. These routes must be updated to a wildcard policy of None to be
+	// readmitted by the ingress controller.
+	//
+	// WildcardPolicy supports WildcardsAllowed and WildcardsDisallowed values.
+	//
+	// If empty, defaults to "WildcardsDisallowed".
+	//
+	WildcardPolicy WildcardPolicy `json:"wildcardPolicy,omitempty"`
 }
 
 type IngressPortsConfig struct {
