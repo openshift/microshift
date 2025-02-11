@@ -1,0 +1,34 @@
+apiVersion: serving.kserve.io/v1alpha1
+kind: ServingRuntime
+metadata:
+  name: vllm-rocm-runtime
+  annotations:
+    openshift.io/display-name: vLLM ROCm ServingRuntime for KServe
+    opendatahub.io/recommended-accelerators: '["amd.com/gpu"]'
+  labels:
+    opendatahub.io/dashboard: 'true'
+spec:
+  annotations:
+    prometheus.io/port: '8080'
+    prometheus.io/path: '/metrics'
+  multiModel: false
+  supportedModelFormats:
+    - autoSelect: true
+      name: vLLM
+  containers:
+    - name: kserve-container
+      image: vllm-rocm-image
+      command:
+        - python
+        - -m
+        - vllm.entrypoints.openai.api_server
+      args:
+        - "--port=8080"
+        - "--model=/mnt/models"
+        - "--served-model-name={{.Name}}"
+      env:
+        - name: HF_HOME
+          value: /tmp/hf_home
+      ports:
+        - containerPort: 8080
+          protocol: TCP
