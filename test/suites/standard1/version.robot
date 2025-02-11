@@ -64,16 +64,7 @@ Metadata File Contents
 Expected OS Version
     [Documentation]    Ensure the OS version is as expected by the test.
 
-    ${os_id}=    Command Should Work    awk -F= '/^ID=/ {print $2}' /etc/os-release | xargs
-    IF    '${os_id}' == 'rhel'
-        ${package_name}=    Set Variable    redhat-release
-    ELSE IF    '${os_id}' == 'centos'
-        ${package_name}=    Set Variable    centos-stream-release
-    ELSE
-        Fail    Expected OS Version only supports RHEL or CentOS operating systems
-    END
-
-    ${os_version}=    Command Should Work    rpm -qi ${package_name} | awk -F: '/^Version/ {print $2}' | xargs
+    ${os_version}=    Command Should Work    bash -c '. /etc/os-release && echo "\${VERSION_ID}"'
     Should Be Equal As Strings    ${EXPECTED_OS_VERSION}    ${os_version}
 
 
