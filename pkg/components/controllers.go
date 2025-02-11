@@ -395,6 +395,42 @@ func generateIngressParams(cfg *config.Config) assets.RenderParams {
 		HTTPEmptyRequestsPolicy = true
 	}
 
+	tlsProfileSpec := tlsProfileSpecForSecurityProfile(cfg.Ingress.TLSSecurityProfile)
+	var tls13Ciphers, otherCiphers []string
+	for _, cipher := range tlsProfileSpec.Ciphers {
+		if tlsVersion13Ciphers.Has(cipher) {
+			tls13Ciphers = append(tls13Ciphers, cipher)
+		} else {
+			otherCiphers = append(otherCiphers, cipher)
+		}
+	}
+
+	RouterCiphers := strings.Join(otherCiphers, ":")
+	RouterCiphersSuites := ""
+	if len(tls13Ciphers) != 0 {
+		RouterCiphersSuites = strings.Join(tls13Ciphers, ":")
+	}
+
+	var RouterSSLMinVersion string
+	switch tlsProfileSpec.MinTLSVersion {
+	// TLS 1.0 is not supported, convert to TLS 1.1.
+	case configv1.VersionTLS10:
+		RouterSSLMinVersion = "TLSv1.1"
+	case configv1.VersionTLS11:
+		RouterSSLMinVersion = "TLSv1.1"
+	case configv1.VersionTLS12:
+		RouterSSLMinVersion = "TLSv1.2"
+	case configv1.VersionTLS13:
+		RouterSSLMinVersion = "TLSv1.3"
+	default:
+		RouterSSLMinVersion = "TLSv1.2"
+	}
+
+	RouterAllowWildcardRoutes := false
+	if cfg.Ingress.AdmissionPolicy.WildcardPolicy == config.WildcardPolicyAllowed {
+		RouterAllowWildcardRoutes = true
+	}
+
 	extraParams := assets.RenderParams{
 		"RouterNamespaceOwnership":    cfg.Ingress.AdmissionPolicy.NamespaceOwnership == config.NamespaceOwnershipAllowed,
 		"RouterHttpPort":              *cfg.Ingress.Ports.Http,
@@ -418,6 +454,10 @@ func generateIngressParams(cfg *config.Config) assets.RenderParams {
 		"RouterCompressionMime":       routerCompressionMime,
 		"RouterDisableHttp2":          routerDisableHttp2,
 		"ServingCertificateSecret":    &cfg.Ingress.ServingCertificateSecret,
+		"RouterCiphers":               RouterCiphers,
+		"RouterCiphersSuites":         RouterCiphersSuites,
+		"RouterSSLMinVersion":         RouterSSLMinVersion,
+		"RouterAllowWildcardRoutes":   RouterAllowWildcardRoutes,
 	}
 
 	return extraParams
