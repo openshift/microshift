@@ -35,7 +35,6 @@ scenario_run_tests() {
     # Run a minimal test for this scenario as its main functionality is
     # to verify container image signature check is enabled
 	run_tests host1 \
-        --variable "EXPECTED_OS_VERSION:9.5" \
         --variable "IMAGE_SIGSTORE_ENABLED:True" \
         suites/standard1/containers-policy.robot
 }
