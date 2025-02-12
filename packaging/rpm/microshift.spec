@@ -222,6 +222,26 @@ The microshift-gateway-api-release-info package provides release information fil
 release. These files contain the list of container image references used by Gateway API
 and can be used to embed those images into osbuilder blueprints or bootc containerfiles.
 
+%package observability
+Summary: OpenTelemetry-Collector configured for MicroShift
+BuildArch: noarch
+Requires: microshift = %{version}
+Requires: opentelemetry-collector
+
+%description observability
+Deploys the Red Hat build of Opentelemetry-Collector as a systemd service on host. MicroShift provides client
+certificates to permit access to the kube-apiserver metrics endpoints. If a user defined Opentelemetry-Collector exists
+at /etc/microshift/opentelemetry-collector.yaml, this config is used. Otherwise, a default config is provided. Note that
+the default configuration requires the backend endpoint be set by the user. The OTLP export must also be specified as
+.service.pipelines.$RECIEVER.exporter: "otlp".  The specification for the OTLP configuration is:
+
+  otlp:
+    sending_queue:
+      storage: file_storage
+    endpoint: localhost:12345 # Valid OTLP endpoint required
+    tls:
+      insecure: true
+
 %prep
 # Dynamic detection of the available golang version also works for non-RPM golang packages
 golang_detected=$(go version | awk '{print $3}' | tr -d '[a-z]' | cut -f1-2 -d.)
@@ -485,6 +505,19 @@ cat assets/optional/gateway-api/kustomization.x86_64.yaml >> %{buildroot}/%{_pre
 mkdir -p -m755 %{buildroot}%{_datadir}/microshift/release
 install -p -m644 assets/optional/gateway-api/release-gateway-api-{x86_64,aarch64}.json %{buildroot}%{_datadir}/microshift/release/
 
+#observability
+install -d -m755 %{buildroot}%{_presetdir}
+install -d -m755 %{buildroot}%{_sharedstatedir}/microshift-observability
+install -p -m644 packaging/observability/opentelemetry-collector.yaml -D %{buildroot}%{_sysconfdir}/microshift/opentelemetry-collector.yaml
+install -p -m644 packaging/observability/microshift-observability.service %{buildroot}%{_unitdir}/
+install -p -m644 packaging/observability/90-enable-microshift-observability.preset %{buildroot}%{_presetdir}/
+install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/003-microshift-observability/
+install -p -m644 assets/optional/observability/00-namespace.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/003-microshift-observability/00-namespace.yaml
+install -p -m644 assets/optional/observability/01-service-account.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/003-microshift-observability/01-service-account.yaml
+install -p -m644 assets/optional/observability/02-cluster-role.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/003-microshift-observability/02-cluster-role.yaml
+install -p -m644 assets/optional/observability/03-cluster-role-binding.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/003-microshift-observability/03-cluster-role-binding.yaml
+install -p -m644 assets/optional/observability/kustomization.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/003-microshift-observability/kustomization.yaml
+
 %pre networking
 
 getent group hugetlbfs >/dev/null || groupadd -r hugetlbfs
@@ -541,6 +574,9 @@ if [ $1 -eq 1 ]; then
 	# if crio was already started, restart it so it will catch /etc/crio/crio.conf.d/12-microshift-multus.conf
 	systemctl is-active --quiet crio && systemctl restart --quiet crio || true
 fi
+
+%post observability
+%systemd_post microshift-observability.service
 
 %files
 %license LICENSE
@@ -647,6 +683,19 @@ fi
 
 %files gateway-api-release-info
 %{_datadir}/microshift/release/release-gateway-api-{x86_64,aarch64}.json
+
+%files observability
+%config %{_sysconfdir}/microshift/opentelemetry-collector.yaml
+%config %{_unitdir}/microshift-observability.service
+%config %{_presetdir}/90-enable-microshift-observability.preset
+%dir %{_sharedstatedir}/microshift-observability
+%config %{_prefix}/lib/microshift/manifests.d/003-microshift-observability/00-namespace.yaml
+%config %{_prefix}/lib/microshift/manifests.d/003-microshift-observability/01-service-account.yaml
+%config %{_prefix}/lib/microshift/manifests.d/003-microshift-observability/02-cluster-role.yaml
+%config %{_prefix}/lib/microshift/manifests.d/003-microshift-observability/03-cluster-role-binding.yaml
+%config %{_prefix}/lib/microshift/manifests.d/003-microshift-observability/kustomization.yaml
+
+%dir %{_prefix}/lib/microshift/manifests.d/003-microshift-observability
 
 
 # Use Git command to generate the log and replace the VERSION string

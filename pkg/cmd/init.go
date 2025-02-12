@@ -154,7 +154,15 @@ func certSetup(cfg *config.Config) (*certchains.CertificateChains, error) {
 					ValidityDays: cryptomaterial.LongLivedCertificateValidityDays,
 				},
 				UserInfo: &user.DefaultInfo{Name: "system:admin", Groups: []string{"system:masters"}},
-			}),
+			}).WithClientCertificates(
+			&certchains.ClientCertificateSigningRequestInfo{
+				CSRMeta: certchains.CSRMeta{
+					Name:         "openshift-observability-client",
+					ValidityDays: cryptomaterial.ShortLivedCertificateValidityDays,
+				},
+				UserInfo: &user.DefaultInfo{Name: "openshift-observability-client", Groups: []string{""}},
+			},
+		),
 
 		// kubelet + CSR signing chain
 		certchains.NewCertificateSigner(
