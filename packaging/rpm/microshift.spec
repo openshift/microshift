@@ -92,9 +92,9 @@ BuildRequires: gettext
 %description release-info
 The microshift-release package provides release information files for this
 release. These files contain the list of container image references used by
-MicroShift and can be used to embed those images into osbuilder blueprints.
-An example of such osbuilder blueprints for x86_64 and aarch64 platforms are
-also included in the package.
+MicroShift and can be used to embed those images into osbuilder blueprints
+or bootc containerfiles. An example of such osbuilder blueprints for x86_64 and
+aarch64 platforms are also included in the package.
 
 
 %package selinux
@@ -150,7 +150,7 @@ Requires: microshift-release-info = %{version}
 The microshift-olm-release-info package provides release information files for this
 release. These files contain the list of container image references used by
 the Operator Lifecycle Manager for MicroShift and can be used to embed those
-images into osbuilder blueprints.
+images into osbuilder blueprints or bootc containerfiles.
 
 %package multus
 Summary: Multus CNI for MicroShift
@@ -168,7 +168,8 @@ Requires: microshift-release-info = %{version}
 %description multus-release-info
 The microshift-multus-release-info package provides release information files for this
 release. These files contain the list of container image references used by
-the Multus CNI for MicroShift and can be used to embed those images into osbuilder blueprints.
+the Multus CNI for MicroShift and can be used to embed those images into
+osbuilder blueprints or bootc containerfiles.
 
 %if %{with_flannel}
 %package flannel
@@ -189,7 +190,7 @@ Requires: microshift-release-info = %{version}
 The microshift-flannel-release-info package provides release information files for this
 release. These files contain the list of container image references used by the flannel CNI
 with the dependent kube-proxy for MicroShift and can be used to embed those images
-into osbuilder blueprints.
+into osbuilder blueprints or bootc containerfiles.
 %endif
 
 %package low-latency
@@ -219,7 +220,7 @@ Requires: microshift = %{version}
 %description gateway-api-release-info
 The microshift-gateway-api-release-info package provides release information files for this
 release. These files contain the list of container image references used by Gateway API
-and can be used to embed those images into osbuilder blueprints.
+and can be used to embed those images into osbuilder blueprints or bootc containerfiles.
 
 %prep
 # Dynamic detection of the available golang version also works for non-RPM golang packages
@@ -651,6 +652,9 @@ fi
 # Use Git command to generate the log and replace the VERSION string
 # LANG=C git log --date="format:%a %b %d %Y" --pretty="tformat:* %cd %an <%ae> VERSION%n- %s%n" packaging/rpm/microshift.spec
 %changelog
+* Wed Feb 12 2025 Patryk Matuszak <pmatusza@redhat.com> 4.19.0
+- Update RPM descriptions to mention bootc containerfiles
+
 * Mon Nov 11 2024 Gregory Giguashvili <ggiguash@redhat.com> 4.18.0
 - Restart crio and microshift services on RPM post-install
 
