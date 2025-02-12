@@ -156,7 +156,7 @@ default values used in `Containerfile` for `rhocp` and `repourl` targets.
 | Parameter Name | Default Value | Comment |
 |----------------|---------------|---------|
 | PULL_SECRET    | `~/.pull-secret.json` | Used for accessing base `bootc` images |
-| BASE_IMAGE_URL | `registry.redhat.io/rhel9/rhel-bootc` | Base `bootc` image URL |
+| BASE_IMAGE_URL | `registry.redhat.io/rhel9-eus/rhel-9.4-bootc` | Base `bootc` image URL |
 | BASE_IMAGE_TAG | `9.4` | Base `bootc` image tag |
 | DNF_OPTIONS    | none | Additional options to be passed to the `dnf` command |
 

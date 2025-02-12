@@ -5,7 +5,9 @@ FROM ${BASE_IMAGE_URL}:${BASE_IMAGE_TAG}
 ARG DNF_OPTIONS
 ARG USHIFT_VER
 
-RUN dnf config-manager \
+# hadolint ignore=SC1091
+RUN . /etc/os-release && dnf upgrade -y --releasever="${VERSION_ID}" && \
+    dnf config-manager \
         --set-enabled "rhocp-${USHIFT_VER}-for-rhel-9-$(uname -m)-rpms" \
         --set-enabled "fast-datapath-for-rhel-9-$(uname -m)-rpms" && \
     dnf install -y ${DNF_OPTIONS} firewalld microshift && \

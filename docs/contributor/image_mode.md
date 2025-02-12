@@ -50,8 +50,8 @@ curl -s -o Containerfile "${URL}"
 Run the following image build command to create a local `bootc` image.
 
 Note how secrets are used during the image build:
-* The podman `--authfile` argument is required to pull the base `rhel-bootc:9.4`
-image from the `registry.redhat.io` registry
+* The podman `--authfile` argument is required to pull the base image from the
+`registry.redhat.io` registry
 * The build `USER_PASSWD` argument is used to set a password for the `redhat` user
 
 ```bash
@@ -63,6 +63,14 @@ sudo podman build --authfile "${PULL_SECRET}" -t "${IMAGE_NAME}" \
     --build-arg USER_PASSWD="${USER_PASSWD}" \
     -f Containerfile
 ```
+
+> **Important:**<br>
+> If `dnf upgrade` command is used in the container image build procedure, it
+> may cause unintended operating system version upgrade (e.g. from `9.4` to
+> `9.5`). To prevent this from happening, use the following command instead.
+> ```
+> RUN . /etc/os-release && dnf upgrade -y --releasever="${VERSION_ID}"
+> ```
 
 Verify that the local MicroShift 4.17 `bootc` image was created.
 

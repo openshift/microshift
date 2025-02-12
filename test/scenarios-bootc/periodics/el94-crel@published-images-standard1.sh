@@ -9,9 +9,10 @@ IMAGE_SIGSTORE_ENABLED=true
 
 scenario_create_vms() {
     if [[ "${CURRENT_RELEASE_REPO}" == "" ]] ; then
-        # TODO: While 4.19-ec is not available, it needs to exit without an error.
+        # Empty string means there's no EC build yet, so the test needs to be skipped.
         exit 0
     fi
+
     if [[ "${CURRENT_RELEASE_REPO}" == http* ]] ; then
         # Discover a pre-release MicroShift bootc image reference on the mirror
         local -r mirror_url="$(dirname "${CURRENT_RELEASE_REPO}")/bootc-pullspec.txt"
@@ -32,7 +33,7 @@ scenario_create_vms() {
     fi
 
     prepare_kickstart host1 kickstart-bootc.ks.template "${bootc_spec}"
-    launch_vm --boot_blueprint rhel95-bootc
+    launch_vm --boot_blueprint rhel94-bootc
 
     # Open the firewall ports. Other scenarios get this behavior by embedding
     # settings in the blueprint, but we cannot open firewall ports in published
@@ -43,7 +44,7 @@ scenario_create_vms() {
 
 scenario_remove_vms() {
     if [[ "${CURRENT_RELEASE_REPO}" == "" ]] ; then
-        # TODO: While 4.19-ec is not available, it needs to exit without an error.
+        # Empty string means there's no EC build yet, so the test needs to be skipped.
         exit 0
     fi
     remove_vm host1
@@ -51,13 +52,13 @@ scenario_remove_vms() {
 
 scenario_run_tests() {
     if [[ "${CURRENT_RELEASE_REPO}" == "" ]] ; then
-        # TODO: While 4.19-ec is not available, it needs to exit without an error.
+        # Empty string means there's no EC build yet, so the test needs to be skipped.
         exit 0
     fi
-    # Until 4.19 EC starts including correct default config,
-    # the test 'MicroShift Starts Using Default Config' needs to be skipped.
     run_tests host1 \
-        --exclude defaultcfg \
+        --variable "EXPECTED_OS_VERSION:9.4" \
         --variable "IMAGE_SIGSTORE_ENABLED:True" \
-        suites/standard2/
+        suites/standard1/
+    # When SELinux is working on RHEL 9.6 bootc systems add following suite:
+    # suites/selinux/validate-selinux-policy.robot
 }
