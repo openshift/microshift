@@ -10,7 +10,7 @@ Resource   ../resources/common.resource
 Resource    ../../resources/common.resource
 
 Suite Setup    Setup Suite And Set Journal Cursor
-Suite Teardown    Teardown
+Suite Teardown    Teardown Suite And Unset Journal Cursor
 
 *** Variables ***
 ${JOURNAL_CUR}    ${EMPTY}
@@ -58,7 +58,7 @@ Setup Suite And Set Journal Cursor
     ${cur}    Get Journal Cursor
     Set Suite Variable    ${JOURNAL_CUR}   ${cur}
 
-Teardown
+Teardown Suite And Unset Journal Cursor
     [Documentation]    Test suite teardown
     ${JOURNAL_CUR}    Set Variable    ${EMPTY}
     Teardown Suite
