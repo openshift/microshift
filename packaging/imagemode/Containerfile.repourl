@@ -26,7 +26,9 @@ gpgcheck=0
 enabled=1
 EOF
 
-RUN dnf install -y ${DNF_OPTIONS} firewalld microshift && \
+# hadolint ignore=SC1091
+RUN . /etc/os-release && dnf upgrade -y --releasever="${VERSION_ID}" && \
+    dnf install -y ${DNF_OPTIONS} firewalld microshift && \
     systemctl enable microshift && \
     dnf clean all
 
