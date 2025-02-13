@@ -11,8 +11,7 @@ COPY ./bootc-images/microshift-fast-datapath-rhel9.repo ./bootc-images/microshif
 RUN dnf repoinfo --enabled && \
     dnf install -y firewalld \
         "microshift-{{ .Env.CURRENT_RELEASE_VERSION }}" "microshift-release-info-{{ .Env.CURRENT_RELEASE_VERSION }}" \
-        "microshift-olm-{{ .Env.CURRENT_RELEASE_VERSION }}" "microshift-multus-{{ .Env.CURRENT_RELEASE_VERSION }}" \
-        "microshift-observability-{{ .Env.CURRENT_RELEASE_VERSION }}"  && \
+        "microshift-olm-{{ .Env.CURRENT_RELEASE_VERSION }}" "microshift-multus-{{ .Env.CURRENT_RELEASE_VERSION }}"  && \
     systemctl enable microshift && \
     rm -vf /etc/yum.repos.d/microshift-*.repo && \
     dnf clean all

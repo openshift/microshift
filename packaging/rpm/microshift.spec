@@ -239,7 +239,7 @@ Requires: microshift = %{version}
 The microshift-ai-model-serving-release-info package provides release information files for this
 release. These files contain the list of container image references used by Model Serving
 and can be used to embed those images into osbuilder blueprints or bootc containerfiles.
-4
+
 %package observability
 Summary: OpenTelemetry-Collector configured for MicroShift
 BuildArch: noarch
@@ -620,6 +620,16 @@ if [ $1 -eq 0 ]; then
     %selinux_modules_uninstall -s %{selinuxtype} microshift
 fi
 
+%postun observability
+# When uninstall, the package will leave behind a broken symlink at /etc/systemd/system/microshift.service.requires/
+# microshift-observability.service. If not cleaned up, systemd will still assume the requirement still exists, which
+# will prevent microshift from running.
+if [ $1 -eq 0 ]; then
+    systemctl disable --now microshift-observability.service > /dev/null 2>&1 || :
+    rm -f /etc/systemd/system/multi-user.target.wants/microshift-observability.service || :
+    systemctl daemon-reload
+fi
+
 %posttrans selinux
 
 %selinux_relabel_post -s %{selinuxtype}
@@ -766,17 +776,16 @@ fi
 %{_datadir}/microshift/release/release-ai-model-serving-x86_64.json
 
 %files observability
+%dir %{_prefix}/lib/microshift/manifests.d/003-microshift-observability
+%dir %{_sharedstatedir}/microshift-observability
 %config %{_sysconfdir}/microshift/opentelemetry-collector.yaml
 %config %{_unitdir}/microshift-observability.service
 %config %{_presetdir}/90-enable-microshift-observability.preset
-%dir %{_sharedstatedir}/microshift-observability
 %config %{_prefix}/lib/microshift/manifests.d/003-microshift-observability/00-namespace.yaml
 %config %{_prefix}/lib/microshift/manifests.d/003-microshift-observability/01-service-account.yaml
 %config %{_prefix}/lib/microshift/manifests.d/003-microshift-observability/02-cluster-role.yaml
 %config %{_prefix}/lib/microshift/manifests.d/003-microshift-observability/03-cluster-role-binding.yaml
 %config %{_prefix}/lib/microshift/manifests.d/003-microshift-observability/kustomization.yaml
-
-%dir %{_prefix}/lib/microshift/manifests.d/003-microshift-observability
 
 
 # Use Git command to generate the log and replace the VERSION string
