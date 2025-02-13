@@ -371,7 +371,6 @@ func (c *Config) incorporateUserSettings(u *Config) {
 	if len(u.Ingress.ClientTLS.ClientCertificatePolicy) != 0 {
 		c.Ingress.ClientTLS = u.Ingress.ClientTLS
 	}
-
 }
 
 // updateComputedValues examins the existing settings and converts any
