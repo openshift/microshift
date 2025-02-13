@@ -451,7 +451,6 @@ func generateIngressParams(cfg *config.Config) assets.RenderParams {
 			clientCAMapName = cfg.Ingress.ClientTLS.ClientCA.Name
 		}
 		clientAuthCAPath = filepath.Join(clientCAMountPath, clientCABundleFilename)
-
 	}
 
 	extraParams := assets.RenderParams{
