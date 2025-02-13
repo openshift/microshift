@@ -14,9 +14,10 @@ COPY ./rpm-repos/$USHIFT_RPM_REPO_NAME $USHIFT_RPM_REPO_PATH
 # Add the following repositories and print their contents:
 # - MicroShift local RPM repository
 # - OpenShift previous minor version RHEL repositories for MicroShift dependencies
-# Install MicroShift optional packages and cleanup
+# Install MicroShift optional packages and cleanup.
+# Make sure that systemd-resolved is installed as it is used in tests.
 RUN ${REPO_CONFIG_SCRIPT} -create ${USHIFT_RPM_REPO_PATH} && \
-    dnf install -y microshift-olm microshift-multus && \
+    dnf install -y microshift-olm microshift-multus systemd-resolved && \
     ${REPO_CONFIG_SCRIPT} -delete && \
     rm -f ${REPO_CONFIG_SCRIPT} && \
     rm -rf $USHIFT_RPM_REPO_PATH && \
