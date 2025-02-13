@@ -220,7 +220,7 @@ Requires: microshift = %{version}
 The microshift-gateway-api-release-info package provides release information files for this
 release. These files contain the list of container image references used by Gateway API
 and can be used to embed those images into osbuilder blueprints.
-
+4
 %package observability
 Summary: OpenTelemetry-Collector configured for MicroShift
 BuildArch: noarch
@@ -228,8 +228,8 @@ Requires: microshift = %{version}
 Requires: opentelemetry-collector
 
 %description observability
-Deploys the Red Hat build of Opentelemetry-Collector as a systemd service on host. MicroShift provides client
-certificates to permit access to the kube-apiserver metrics endpoints. If a user defined Opentelemetry-Collector exists
+Deploys the Red Hat build of OpenTelemetry-Collector as a systemd service on host. MicroShift provides client
+certificates to permit access to the kube-apiserver metrics endpoints. If a user defined OpenTelemetry-Collector exists
 at /etc/microshift/opentelemetry-collector.yaml, this config is used. Otherwise, a default config is provided. Note that
 the default configuration requires the backend endpoint be set by the user. The OTLP export must also be specified as
 .service.pipelines.$RECIEVER.exporter: "otlp".  The specification for the OTLP configuration is:
