@@ -237,7 +237,7 @@ run_command_on_vm_offline() {
     shift
     shift
     local -r args="$*"
-    local -r full_vmname="el95-src-offline-host1"
+    local -r full_vmname="$(full_vm_name "${vmname}")"
 
     echo "running command: $command $args"
 
@@ -393,6 +393,10 @@ EOF
     }
 }
 
+invoke_qemu_script() {
+    "${ROOTDIR}/_output/robotenv/bin/python" "${ROOTDIR}/test/resources/qemu-guest-agent.py" "$@"
+}
+
 sos_report_for_vm_offline() {
     local -r vmdir="${1}"
     local -r vmname="${2}"
@@ -419,29 +423,52 @@ chmod +r /tmp/sosreport-* || echo "WARNING: The sos report files do not exist in
 EOF
     wait_for_qemu_agent "${vmname}"
 
-    copy_file_to_vm_offline "${vmname}" "/tmp/sos-wrapper.sh" "/tmp/sos-wrapper.sh"
-    copy_file_to_vm_offline "${vmname}" "${ROOTDIR}/scripts/microshift-sos-report.sh" "/tmp/microshift-sos-report.sh"
-    run_command_on_vm_offline "${vmname}" /bin/bash -c "sudo bash -x /tmp/sos-wrapper.sh"
+    invoke_qemu_script "upload" \
+        "--vm"  "${full_vmname}" \
+        "--src" "/tmp/sos-wrapper.sh" \
+        "--dst" "/tmp/sos-wrapper.sh"
+    #copy_file_to_vm_offline "${vmname}" "/tmp/sos-wrapper.sh" "/tmp/sos-wrapper.sh"
+
+    invoke_qemu_script "upload" \
+        "--vm"  "${full_vmname}" \
+        "--src" "${ROOTDIR}/scripts/microshift-sos-report.sh" \
+        "--dst" "/tmp/microshift-sos-report.sh"
+    #copy_file_to_vm_offline "${vmname}" "${ROOTDIR}/scripts/microshift-sos-report.sh" "/tmp/microshift-sos-report.sh"
+
+    invoke_qemu_script "bash" \
+        "--vm"  "${full_vmname}" \
+        "--args"  "sudo bash -x /tmp/sos-wrapper.sh"
+    #run_command_on_vm_offline "${vmname}" /bin/bash -c "sudo bash -x /tmp/sos-wrapper.sh"
     
     mkdir -p "${vmdir}/sos"
 
     local -r sosfiles="$(find_files_on_vm_offline "${vmname}" "/tmp" "sosreport-*")"
     while IFS= read -r line; do
         local filename="$(basename "$line")"
-        #"${ROOTDIR}/_output/robotenv/bin/python" "${ROOTDIR}/test/resources/qemu-guest-agent.py" "copy_from_VM" "--vm"  "${full_vmname}" "--src" "$line" "--dst" "${vmdir}/sos/${filename}"
-        copy_file_from_vm_offline "${vmname}" "$line" "${vmdir}/sos/${filename}" || {
-            echo "WARNING: Ignoring an error when copying sos report files"
-        }
+        invoke_qemu_script "download" \
+            "--vm"  "${full_vmname}" \
+            "--src" "$line" \
+            "--dst" "${vmdir}/sos/${filename}"
+        #copy_file_from_vm_offline "${vmname}" "$line" "${vmdir}/sos/${filename}" || {
+        #    echo "WARNING: Ignoring an error when copying sos report files"
+        #}
     done <<< "$sosfiles"
 
-    run_command_on_vm_offline "${vmname}" /bin/bash -c "sudo journalctl > /tmp/journal_$(date +'%Y-%m-%d_%H:%M:%S').log"
+    invoke_qemu_script "bash" \
+        "--vm"  "${full_vmname}" \
+        "--args"  "sudo journalctl > /tmp/journal_$(date +'%Y-%m-%d_%H:%M:%S').log"
+    #run_command_on_vm_offline "${vmname}" /bin/bash -c "sudo journalctl > /tmp/journal_$(date +'%Y-%m-%d_%H:%M:%S').log"
 
     local -r journalfiles="$(find_files_on_vm_offline "${vmname}" "/tmp" "journal*.log")"
     while IFS= read -r line; do
         local filename="$(basename "$line")"
-        copy_file_from_vm_offline "${vmname}" "$line" "${vmdir}/sos/${filename}" || {
-            echo "WARNING: Ignoring an error when copying sos report files"
-        }
+        invoke_qemu_script "download" \
+            "--vm"  "${full_vmname}" \
+            "--src" "$line" \
+            "--dst" "${vmdir}/sos/${filename}"
+        #copy_file_from_vm_offline "${vmname}" "$line" "${vmdir}/sos/${filename}" || {
+        #    echo "WARNING: Ignoring an error when copying sos report files"
+        #}
     done <<< "$journalfiles"
 
     # Also copy the logs from the /var/log/anaconda directory to
@@ -449,17 +476,32 @@ EOF
     # Note: we cannot use `anaconda` sos report plugin because
     # it also includes the kickstart files that may expose the
     # OpenShift Pull Secret and SSH keys.
-    run_command_on_vm_offline "${vmname}" /bin/bash -c "sudo mkdir -p /tmp/var-log-anaconda"
-    run_command_on_vm_offline "${vmname}" /bin/bash -c 'sudo cp /var/log/anaconda/*.log /tmp/var-log-anaconda/'
-    run_command_on_vm_offline "${vmname}" /bin/bash -c "sudo chmod +r /tmp/var-log-anaconda/*.log"
+    invoke_qemu_script "bash" \
+        "--vm"  "${full_vmname}" \
+        "--args"  "sudo mkdir -p /tmp/var-log-anaconda"
+    #run_command_on_vm_offline "${vmname}" /bin/bash -c "sudo mkdir -p /tmp/var-log-anaconda"
+
+    invoke_qemu_script "bash" \
+        "--vm"  "${full_vmname}" \
+        "--args"  'sudo cp /var/log/anaconda/*.log /tmp/var-log-anaconda/'
+    #run_command_on_vm_offline "${vmname}" /bin/bash -c 'sudo cp /var/log/anaconda/*.log /tmp/var-log-anaconda/'
+
+    invoke_qemu_script "bash" \
+        "--vm"  "${full_vmname}" \
+        "--args"  "sudo chmod +r /tmp/var-log-anaconda/*.log"
+    #run_command_on_vm_offline "${vmname}" /bin/bash -c "sudo chmod +r /tmp/var-log-anaconda/*.log"
 
     mkdir -p "${vmdir}/anaconda"
     local -r anacondafiles="$(find_files_on_vm_offline "${vmname}" "/tmp/var-log-anaconda/" "*.log")"
     while IFS= read -r line; do
         local filename="$(basename "$line")"
-        copy_file_from_vm_offline "${vmname}" "$line" "${vmdir}/anaconda/${filename}" || {
-            echo "WARNING: Ignoring an error when copying sos report files"
-        }
+        invoke_qemu_script "download" \
+            "--vm"  "${full_vmname}" \
+            "--src" "$line" \
+            "--dst" "${vmdir}/anaconda/${filename}"
+        #copy_file_from_vm_offline "${vmname}" "$line" "${vmdir}/anaconda/${filename}" || {
+        #   echo "WARNING: Ignoring an error when copying sos report files"
+        #}
     done <<< "$anacondafiles"
 }
 

@@ -21,6 +21,7 @@ If you are looking for keywords to control the guest VM itself, see ./libvirt.re
 from __future__ import annotations  # Support for Python 3.7 and earlier
 
 import json
+import argparse
 from base64 import b64decode, b64encode
 
 from robot.libraries.BuiltIn import BuiltIn, DotDict
@@ -431,3 +432,61 @@ def guest_agent_is_ready(vm_name: str):
     _execute(vm_name, {
         'execute': 'guest-ping',
     })
+
+def download_file(vm_name: str, src: str, dst: str): # TODO add desc
+    handle = _open_file(vm_name, src, 'r')
+    try:
+        content = _execute(vm_name, {
+            'execute': 'guest-file-read',
+            'arguments': {
+                'handle': handle,
+                'count': 40960
+            }
+        })
+    finally:
+        _close_file(vm_name, handle)
+
+    content = b64decode(content['buf-b64'])
+
+    with open(dst, "wb") as f:
+        f.write(content)
+
+def upload_file(vm_name: str, src: str, dst: str): # TODO add desc
+    with open(src, "r") as f:
+        content = f.read()
+    
+    write_to_file(vm_name, dst, content)
+
+def main():
+    parser = argparse.ArgumentParser()
+
+    subparsers = parser.add_subparsers(dest="command", required=True)
+
+    cp_from_parser = subparsers.add_parser("download", help="Copy file from VM")
+    cp_from_parser.add_argument("--vm", required=True, help="domain name")
+    cp_from_parser.add_argument("--src", required=True, help="source path on VM")
+    cp_from_parser.add_argument("--dst", required=True, help="local destination path")
+
+    cp_to_parser = subparsers.add_parser("upload", help="Copy file to VM")
+    cp_to_parser.add_argument("--vm", required=True, help="domain name")
+    cp_to_parser.add_argument("--src", required=True, help="path to local file")
+    cp_to_parser.add_argument("--dst", required=True, help="destination path on VM")
+
+    run_parser = subparsers.add_parser("bash", help="run bash command on VM")
+    run_parser.add_argument("--vm", required=True, help="domain name")
+    run_parser.add_argument("--args", required=True, help="arguments")
+
+    args = parser.parse_args()
+
+    if args.command == "download":
+        print(f"Downloading {args.src} from VM to {args.dst}")
+        download_file(args.vm, args.src, args.dst)
+    elif args.command == "upload":
+        print(f"Uploading {args.src} to VM as {args.dst}")
+        upload_file(args.vm, args.src, args.dst)
+    elif args.command == "bash":
+        print(f"Running {args.args}")
+        print(run_guest_process(args.vm, "/bin/bash", "-c", args.args))
+
+if __name__ == "__main__":
+    main()
