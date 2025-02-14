@@ -1,23 +1,7 @@
-- kubernetes embedded-component 1e7267c0c3a654a9daf9f8bbb77f66d4f4326e9b to c71f354e5ea84e690c0d34c0e7305b943f64454a
-  - 474be9163 2025-02-06T06:37:37-05:00 UPSTREAM: <drop>: ./hack/update-vendor.sh for openshift-tests-extension
-
-- ovn-kubernetes image-amd64 831ee6e43d419106190e5e9daba0cdaa51e6a7fb to b608027dce7584684b6ec513a6d1dc7fe148f3de
-  - 44d5a694 2025-02-09T19:48:51+01:00 [UDN: host isolation] check that node uses cgroup v2.
-  - 0e48baff 2025-02-06T20:40:03-05:00 Improves multiplexed internal informer performance
-  - d59d69c8 2025-02-06T14:42:29-05:00 Make dbus controller more efficient
-  - e0c62454 2025-02-05T19:06:54+01:00 Fix EIP UT Flake: Don't delete the node on which pod lives
-  - adfa997f 2025-02-04T16:38:33-05:00 Reverts 49e141a0a41793f94750a8bc998af05b7033dd91
-
-- kubernetes image-amd64 1e7267c0c3a654a9daf9f8bbb77f66d4f4326e9b to c71f354e5ea84e690c0d34c0e7305b943f64454a
-  - 474be9163 2025-02-06T06:37:37-05:00 UPSTREAM: <drop>: ./hack/update-vendor.sh for openshift-tests-extension
-
-- ovn-kubernetes image-arm64 831ee6e43d419106190e5e9daba0cdaa51e6a7fb to b608027dce7584684b6ec513a6d1dc7fe148f3de
-  - 44d5a694 2025-02-09T19:48:51+01:00 [UDN: host isolation] check that node uses cgroup v2.
-  - 0e48baff 2025-02-06T20:40:03-05:00 Improves multiplexed internal informer performance
-  - d59d69c8 2025-02-06T14:42:29-05:00 Make dbus controller more efficient
-  - e0c62454 2025-02-05T19:06:54+01:00 Fix EIP UT Flake: Don't delete the node on which pod lives
-  - adfa997f 2025-02-04T16:38:33-05:00 Reverts 49e141a0a41793f94750a8bc998af05b7033dd91
-
-- kubernetes image-arm64 1e7267c0c3a654a9daf9f8bbb77f66d4f4326e9b to c71f354e5ea84e690c0d34c0e7305b943f64454a
-  - 474be9163 2025-02-06T06:37:37-05:00 UPSTREAM: <drop>: ./hack/update-vendor.sh for openshift-tests-extension
+- kubernetes image-arm64 c71f354e5ea84e690c0d34c0e7305b943f64454a to cc907f560ac6272d02cbcc6c97122ef098a85649
+  - 8d49c6636 2025-02-11T13:09:31+01:00 UPSTREAM: <drop>: make update
+  - ec59bc9f4 2025-02-11T13:09:31+01:00 UPSTREAM: <carry>: Remove Azure in-tree tests skip
+  - 998efde2a 2025-02-11T13:09:27+01:00 UPSTREAM: 130015: Disable ServiceAccountNodeAudienceRestriction feature gate by default in v1.32
+  - 4f5513c3d 2025-02-10T16:51:25-03:00 UPSTREAM: <carry>: List images from external test binary
+  - 93d5301c4 2025-01-09T13:49:55-05:00 UPSTREAM: <carry>: util: inform the kubelet it has a new enough kernel for idmapped mounts
 
