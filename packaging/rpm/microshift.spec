@@ -109,7 +109,8 @@ The microshift-selinux package provides the SELinux policy modules required by M
 Summary: Networking components for MicroShift
 Requires: microshift = %{version}
 Obsoletes: openvswitch3.1 < 3.3
-Requires: (openvswitch3.3 or openvswitch >= 3.3)
+Obsoletes: openvswitch3.3 < 3.4
+Requires: (openvswitch3.4 or openvswitch >= 3.4)
 Requires: NetworkManager
 Requires: NetworkManager-ovs
 Requires: jq
@@ -122,6 +123,7 @@ Summary: Greenboot components for MicroShift
 BuildArch: noarch
 Requires: microshift = %{version}
 Requires: greenboot
+Requires: python3-pyyaml
 
 %description greenboot
 The microshift-greenboot package provides the Greenboot scripts used for verifying that MicroShift is up and running.
@@ -518,6 +520,12 @@ fi
 # Use Git command to generate the log and replace the VERSION string
 # LANG=C git log --date="format:%a %b %d %Y" --pretty="tformat:* %cd %an <%ae> VERSION%n- %s%n" packaging/rpm/microshift.spec
 %changelog
+* Thu Sep 12 2024 Gregory Giguashvili <ggiguash@redhat.com> 4.17.0
+- Declare openvswitch3.3 package as obsolete to allow seemless upgrade to openvswitch3.4
+
+* Mon Aug 26 2024 Nadia Pinaeva <n.m.pinaeva@gmail.com> 4.17.0
+- Update openvswitch to 3.4
+
 * Mon Jul 29 2024 Patryk Matuszak <pmatusza@redhat.com> 4.17.0
 - Add microshift-tuned daemon for unattended TuneD profile activation
 

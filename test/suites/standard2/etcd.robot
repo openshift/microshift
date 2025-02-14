@@ -15,10 +15,10 @@ Test Tags           configuration    etcd    restart    slow
 
 *** Variables ***
 ${ETCD_SYSTEMD_UNIT}    microshift-etcd.scope
-${MEMLIMIT128}          SEPARATOR=\n
+${MEMLIMIT256}          SEPARATOR=\n
 ...                     ---
 ...                     etcd:
-...                     \ \ memoryLimitMB: 128
+...                     \ \ memoryLimitMB: 256
 ${MEMLIMIT0}            SEPARATOR=\n
 ...                     ---
 ...                     etcd:
@@ -35,11 +35,11 @@ Set MemoryHigh Limit Unlimited
     [Setup]    Setup With Custom Config    ${MEMLIMIT0}
     Expect MemoryHigh    infinity
 
-Set MemoryHigh Limit 128MB
-    [Documentation]    Set the memory limit for etcd to 128MB and ensure it takes effect
-    [Setup]    Setup With Custom Config    ${MEMLIMIT128}
-    # Expecting the setting to be 128 * 1024 * 1024
-    Expect MemoryHigh    134217728
+Set MemoryHigh Limit 256MB
+    [Documentation]    Set the memory limit for etcd to 256MB and ensure it takes effect
+    [Setup]    Setup With Custom Config    ${MEMLIMIT256}
+    # Expecting the setting to be 256 * 1024 * 1024
+    Expect MemoryHigh    268435456
     [Teardown]    Restore Default Config
 
 

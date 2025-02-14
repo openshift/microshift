@@ -22,24 +22,23 @@ COPY ./rpm-repos/$USHIFT_RPM_REPO_NAME $USHIFT_RPM_REPO_PATH
 # - MicroShift local RPM repository
 # - OpenShift previous minor version RHEL repositories for MicroShift dependencies
 # Install MicroShift, test agent, a few helper utilities and cleanup
+#
+# Allow erasing because update may require a new version of openvswitch and
+# major versions of openvswitch are separate packages that obsolete each other.
 RUN ${REPO_CONFIG_SCRIPT} -create ${USHIFT_RPM_REPO_PATH} && \
     awk 'FNR==1 {print "=== " FILENAME " ==="} {print}' /etc/yum.repos.d/*.repo && \
-    dnf install -y vi firewalld microshift microshift-test-agent && \
+    dnf install -y --allowerasing vi firewalld microshift microshift-test-agent && \
     systemctl enable microshift microshift-test-agent && \
     ${REPO_CONFIG_SCRIPT} -delete && \
     rm -f ${REPO_CONFIG_SCRIPT} && \
     rm -rf $USHIFT_RPM_REPO_PATH && \
     dnf clean all
 
-# Extend Greenboot wait timeout to 10m for MicroShift to be ready.
-# Greenboot configuration must come after RPM install to avoid
-# /etc/greenboot/greenboot.conf overwrite by the package update.
-RUN printf "\nMICROSHIFT_WAIT_TIMEOUT_SEC=600\n" >> /etc/greenboot/greenboot.conf
-
 # Configure firewall
 RUN firewall-offline-cmd --zone=public --add-port=22/tcp && \
     firewall-offline-cmd --zone=trusted --add-source=10.42.0.0/16 && \
     firewall-offline-cmd --zone=trusted --add-source=169.254.169.1 && \
+    firewall-offline-cmd --zone=trusted --add-source=fd01::/48 && \
     firewall-offline-cmd --zone=public --add-port=80/tcp && \
     firewall-offline-cmd --zone=public --add-port=443/tcp && \
     firewall-offline-cmd --zone=public --add-port=5353/udp && \

@@ -3,8 +3,8 @@ set -e
 
 SCRIPT_NAME=$(basename "$0")
 SCRIPT_PID=$$
-PODS_NS_LIST=(openshift-ovn-kubernetes openshift-service-ca openshift-ingress openshift-dns kube-system)
-PODS_CT_LIST=(2                        1                    1                 2             2)
+PODS_NS_LIST=(openshift-ovn-kubernetes openshift-service-ca openshift-ingress openshift-dns)
+PODS_CT_LIST=(2 1 1 2)
 LOG_POD_EVENTS=false
 
 # Source the MicroShift health check functions library
@@ -25,18 +25,20 @@ function forced_termination() {
     exit 1
 }
 
-# Check preconditions for existence of topolvm deployment.
+# Check preconditions for existence of lvms deployment.
 # Adapted from MicroShift code.
 #
 # args: None
-# return: 0 if topolvm readiness should be checked, 1 otherwise
-function topolvmShouldBeDeployed() {
+# return: 0 if lvms readiness should be checked, 1 otherwise
+function lvmsShouldBeDeployed() {
     if ! hash vgs 2>/dev/null; then
         return 1
     fi
-
     if [ -f /etc/microshift/lvmd.yaml ]; then
         return 0
+    fi
+    if ! lvmsDriverShouldExist; then
+        return 1
     fi
 
     local -r volume_groups=$(vgs --readonly --options=name --noheadings)
@@ -139,9 +141,20 @@ if ! wait_for "${WAIT_TIMEOUT_SECS}" microshift_health_endpoints_ok ; then
     exit 1
 fi
 
-if topolvmShouldBeDeployed; then
+if lvmsShouldBeDeployed; then
     PODS_NS_LIST+=(openshift-storage)
     PODS_CT_LIST+=(2)
+fi
+declare -a csi_components=('csi-snapshot-controller' 'csi-snapshot-webhook')
+csi_pods_ct=0
+for csi_c in "${csi_components[@]}"; do
+    if csiComponentShouldBeDeployed "${csi_c}"; then
+        (( csi_pods_ct += 1 ))
+    fi
+done
+if [ ${csi_pods_ct} -gt 0 ]; then
+    PODS_NS_LIST+=(kube-system)
+    PODS_CT_LIST+=("${csi_pods_ct}")
 fi
 
 # Starting pod-specific checks
@@ -160,7 +173,7 @@ for i in "${!PODS_NS_LIST[@]}"; do
     CHECK_PODS_NS=${PODS_NS_LIST[${i}]}
 
     echo "Waiting ${WAIT_TIMEOUT_SECS}s for pod image(s) from the '${CHECK_PODS_NS}' namespace to be downloaded"
-    if ! wait_for "${WAIT_TIMEOUT_SECS}" namespace_images_downloaded ; then
+    if ! wait_for "${WAIT_TIMEOUT_SECS}" namespace_images_downloaded; then
         echo "Error: Timed out waiting for pod image(s) from the '${CHECK_PODS_NS}' namespace to be downloaded"
         exit 1
     fi
@@ -172,7 +185,7 @@ for i in "${!PODS_NS_LIST[@]}"; do
     CHECK_PODS_CT=${PODS_CT_LIST[${i}]}
 
     echo "Waiting ${WAIT_TIMEOUT_SECS}s for ${CHECK_PODS_CT} pod(s) from the '${CHECK_PODS_NS}' namespace to be in 'Ready' state"
-    if ! wait_for "${WAIT_TIMEOUT_SECS}" namespace_pods_ready ; then
+    if ! wait_for "${WAIT_TIMEOUT_SECS}" namespace_pods_ready; then
         echo "Error: Timed out waiting for ${CHECK_PODS_CT} pod(s) in the '${CHECK_PODS_NS}' namespace to be in 'Ready' state"
         exit 1
     fi

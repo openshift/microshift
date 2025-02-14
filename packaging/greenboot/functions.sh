@@ -72,10 +72,10 @@ function get_wait_timeout() {
     [ -f "${conf_file}" ] && source ${conf_file}
 
     # Read and verify the wait timeout value, allowing for the [60..9999] range
-    local base_timeout=${MICROSHIFT_WAIT_TIMEOUT_SEC:-300}
+    local base_timeout=${MICROSHIFT_WAIT_TIMEOUT_SEC:-600}
     local reSecs='^[1-9]{1}[0-9]{0,3}$'
     if [[ ! ${base_timeout} =~ ${reSecs} ]] ; then
-        base_timeout=300
+        base_timeout=600
         >&2 echo "Could not parse MICROSHIFT_WAIT_TIMEOUT_SEC value '${MICROSHIFT_WAIT_TIMEOUT_SEC}': using '${base_timeout}' instead"
     fi
     if [[ ${base_timeout} -lt 60 ]] ; then
@@ -293,4 +293,100 @@ function log_script_exit() {
     else
         echo "FINISHED"
     fi
+}
+
+# lvmsDriverShouldExist shallowly wraps some python yaml parsing to determine if the LVMS-Operator is expected to be
+# deployed.
+# args:
+#   none
+# return:
+#   0:  "true", expect the driver to be running
+#   1:  "false", do not expect the driver to be running
+function lvmsDriverShouldExist() {
+    # The python script checks the config's .storage.driver value. Parsing errors are ignored, these will be caught
+    # by MicroShift during startup, before this greenboot script is run. The script favors verbosity over simplified
+    # code.
+    # args:
+    #   None
+    # return:
+    #   None
+    # exit code:
+    #   0: The lvms components should be checked for. This case occurs for any one of:
+    #       - .storage.driver == one of ["", "lvms"]
+    #       - .storage.driver is unset (indicates default config)
+    #       - .storage is unset (indicates default config)
+    #       - the file cannot be opened (indicates default config)
+    #   1: The lvms components should not be checked for. This case occurs for:
+    #       - .storage.driver == "none"
+    if python -c \
+'import yaml, sys
+try:
+    with open("/etc/microshift/config.yaml") as stream:
+        try:
+            config = yaml.safe_load(stream)
+            if config["storage"]["driver"] == "none":
+                sys.exit(1)
+            elif config["storage"]["driver"] == "lvms":
+                sys.exit(0)
+            elif config["storage"]["driver"] == "":
+                sys.exit(0)
+            else:
+                sys.exit(1)
+        except KeyError as e:
+            sys.exit(0)
+        finally:
+            stream.close()
+except FileNotFoundError:
+    print(f"/etc/microshift/config.yaml does not exist - assuming LVMS is deployed")
+except Exception as e:
+    print(f"Cannot decide if LVMS should exist - assuming YES: error opening config: {e}", file=sys.stderr)
+    '; then
+         return 0
+    fi
+    return 1
+}
+
+# csiComponentsShouldBeDeployed checks for a given csi component string identifier in the config's
+# .storage.optionalCsiComponents array.
+# args:
+#   $1    "some-csi-component"
+# return:
+#   0:    the component should be checked for. This case occurs for any one of:
+#           - .storage is unset
+#           - .storage.optionalCsiComponents is unset
+#           - "some-csi-component" matches an element in .storage.optionalCsiComponents
+#   1:    the component should not be checked for. This case occurs for:
+#           - .storage.optionalCsiComponents is set and does not contain "some-csi-component"
+#           - .storage.optionalCsiComponents is set and len(.storage.optionalCsiComponents) == 0
+function csiComponentShouldBeDeployed() {
+    local -r component="${1?csiComponentsShouldBeDeployed expects a single string argument, got none}"
+
+    if python -c \
+'import sys
+import yaml
+try:
+    with open("/etc/microshift/config.yaml") as stream:
+        try:
+            config = yaml.safe_load(stream)
+            if len(config["storage"]["optionalCsiComponents"]) == 0:
+                sys.exit(0)
+            elif "none" in config["storage"]["optionalCsiComponents"]:
+                sys.exit(1)
+            elif sys.argv[1] in config["storage"]["optionalCsiComponents"]:
+                sys.exit(0)
+            else:
+                sys.exit(1)
+        except KeyError as e:
+            sys.exit(0)
+        finally:
+            stream.close()
+except FileNotFoundError:
+    print(f"/etc/microshift/config.yaml does not exist - assuming CSI component {sys.argv[1]} is deployed")
+except Exception as e:
+    print(f"Cannot decide if CSI component {sys.argv[1]} should be deployed - assuming YES: error opening config: {e}", file=sys.stderr)
+' "${component}";
+    then
+        return 0
+    fi
+    return 1
 }

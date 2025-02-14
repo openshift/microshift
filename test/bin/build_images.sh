@@ -410,38 +410,41 @@ do_group() {
 
     # Run image-fetcher while osbuilder is running in background
     if [ ${#download_opts[@]} -ne 0 ]; then
-        local -r wget_tmp="wget.part"
-        local -r wget_res="${IMAGEDIR}/image_fetcher_result.json"
-        local -r wget_job="${IMAGEDIR}/image_fetcher_jobs.txt"
+        local -r dload_tmp="download.part"
+        local -r dload_res="${IMAGEDIR}/image_fetcher_result.json"
+        local -r dload_job="${IMAGEDIR}/image_fetcher_jobs.txt"
 
         local fetch_ok=true
         local progress=""
         if [ -t 0 ]; then
             progress="--progress"
         fi
-        # Download the files under temporary names
+        # Download the files under temporary names with 30s network timeout
+        # and retries. Note that download options are quoted per each job,
+        # resuting in one option per job in the download_opts array.
         echo "Waiting for image-fetcher to complete..."
         if parallel \
             ${progress} \
             --colsep ' ' \
-            --results "${wget_res}" \
-            --joblog "${wget_job}" \
-            --jobs $(( ${#download_opts[@]} / 2 )) \
-            wget -c -nv -O "{1}.${wget_tmp}" "{2}" ::: "${download_opts[@]}" ; then
+            --results "${dload_res}" \
+            --joblog "${dload_job}" \
+            --jobs ${#download_opts[@]} \
+            aria2c --max-connection-per-server=4 --split=4 --max-tries=3 --timeout=30 \
+                --continue --dir=/ -o "{1}.${dload_tmp}" "{2}" ::: "${download_opts[@]}" ; then
             # On successful download, rename the files to their original names
-            for fwget in "${VM_DISK_BASEDIR}"/*."${wget_tmp}" ; do
+            for dload_file in "${VM_DISK_BASEDIR}"/*."${dload_tmp}" ; do
                 local forig
-                forig="$(basename -s ".${wget_tmp}" "${fwget}")"
-                mv "${fwget}" "${VM_DISK_BASEDIR}/${forig}"
+                forig="$(basename -s ".${dload_tmp}" "${dload_file}")"
+                mv "${dload_file}" "${VM_DISK_BASEDIR}/${forig}"
             done
         else
             fetch_ok=false
         fi
 
         # Show the summary of the output of the parallel jobs.
-        cat "${wget_job}"
-        if [ -f "${wget_res}" ] ; then
-            jq < "${wget_res}"
+        cat "${dload_job}"
+        if [ -f "${dload_res}" ] ; then
+            jq < "${dload_res}"
         else
             echo "The image-fetcher results file does not exist"
             fetch_ok=false

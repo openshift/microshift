@@ -38,6 +38,7 @@ var (
 		"169.254.0.0/16",
 		"::1/128",
 		"fe80::/10",
+		"fd69::/125",
 	}
 )
 
@@ -50,6 +51,7 @@ type Config struct {
 	Debugging Debugging     `json:"debugging"`
 	Manifests Manifests     `json:"manifests"`
 	Ingress   IngressConfig `json:"ingress"`
+	Storage   Storage       `json:"storage"`
 
 	// Settings specified in this section are transferred as-is into the Kubelet config.
 	// +kubebuilder:validation:Schemaless
@@ -146,7 +148,6 @@ func (c *Config) fillDefaults() error {
 			Https: ptr.To[int](443),
 		},
 	}
-
 	c.MultiNode.Enabled = false
 	c.Kubelet = nil
 
@@ -257,6 +258,12 @@ func (c *Config) incorporateUserSettings(u *Config) {
 		c.ApiServer.NamedCertificates = u.ApiServer.NamedCertificates
 	}
 
+	if u.Storage.Driver != "" {
+		c.Storage.Driver = u.Storage.Driver
+	}
+	if len(u.Storage.OptionalCSIComponents) > 0 {
+		c.Storage.OptionalCSIComponents = u.Storage.OptionalCSIComponents
+	}
 	if u.Kubelet != nil {
 		c.Kubelet = u.Kubelet
 	}
@@ -457,6 +464,9 @@ func (c *Config) validate() error {
 		return fmt.Errorf("error validating node.nodeIPv6: %w", err)
 	}
 
+	if errs := c.Storage.IsValid(); c.Storage.IsEnabled() && len(errs) > 0 {
+		return fmt.Errorf("error validating storage: %w", errors.Join(errs...))
+	}
 	return nil
 }
 

@@ -61,10 +61,21 @@ Oc Exec
     RETURN    ${output}
 
 Oc Wait
-    [Documentation]    Run 'oc wait' on a specific resource in the current test namespace
+    [Documentation]    Run 'oc wait' on a specific resource.
+    ...    'resource' should contain: "-n namespace" (if applicable), name, and kind.
+    ...    For example: "-n test-ns pod test-pod".
+    ...    'opts' should contain a condition and additional parameters like timeout.
     ...    Returns the combined STDOUT/STDERR output of the command.
-    [Arguments]    ${opts}
-    ${output}=    Run With Kubeconfig    oc wait ${opts}
+    [Arguments]    ${resource}    ${opts}
+    ${output}    ${rc}=    Run With Kubeconfig
+    ...    oc wait ${resource} ${opts}
+    ...    allow_fail=${TRUE}
+    ...    return_rc=${TRUE}
+    IF    ${rc} != 0
+        Run With Kubeconfig    oc describe ${resource}    allow_fail=${TRUE}
+        Log    'oc wait ${resource} ${opts}' failed
+        Should Be Equal As Integers    ${rc}    0
+    END
     RETURN    ${output}
 
 Named Pod Should Be Ready
@@ -74,7 +85,7 @@ Named Pod Should Be Ready
     ...    ${timeout}    Period of time to wait for pod to reach ready status. Default 60s.
     [Arguments]    ${name}    ${ns}=${NAMESPACE}    ${timeout}=${DEFAULT_WAIT_TIMEOUT}
 
-    Run With Kubeconfig    oc wait -n ${ns} pod/${name} --for="condition=Ready" --timeout=${timeout}
+    Oc Wait    -n ${ns} pod/${name}    --for="condition=Ready" --timeout=${timeout}
 
 Named Pod Should Be Deleted
     [Documentation]    Wait for pod with ${name} to be deleted
@@ -82,7 +93,7 @@ Named Pod Should Be Deleted
     ...    ${ns}    Namespace of named pod. Defaults to NAMESPACE suite variable
     ...    ${timeout}    Period of time to wait for pod to reach ready status. Default 60s.
     [Arguments]    ${name}    ${ns}=${NAMESPACE}    ${timeout}=${DEFAULT_WAIT_TIMEOUT}
-    Run With Kubeconfig    oc wait -n ${ns} pod/${name} --for=delete --timeout=${timeout}
+    Oc Wait    -n ${ns} pod/${name}    --for=delete --timeout=${timeout}
 
 Labeled Pod Should Be Ready
     [Documentation]    Wait for pod(s) ready by ${label} to become "Ready"
@@ -90,7 +101,7 @@ Labeled Pod Should Be Ready
     ...    ${ns}    Namespace of named pod. Defaults to NAMESPACE suite variable
     ...    ${timeout}    Period of time to wait for pod to reach ready status. Default 60s.
     [Arguments]    ${label}    ${ns}=${NAMESPACE}    ${timeout}=${DEFAULT_WAIT_TIMEOUT}
-    Run With Kubeconfig    oc wait -n ${ns} pod --selector="${label}" --for=condition=Ready --timeout=${timeout}
+    Oc Wait    -n ${ns} pod --selector="${label}"    --for=condition=Ready --timeout=${timeout}
 
 Named Deployment Should Be Available
     [Documentation]    Wait for a given deployment's Available condition to be true
@@ -98,7 +109,21 @@ Named Deployment Should Be Available
     ...    ${ns}    Namespace of named deployment. Defaults to NAMESPACE suite variable
     ...    ${timeout}    Period of time to wait for deployment to reach ready status. Default 60s.
     [Arguments]    ${name}    ${ns}=${NAMESPACE}    ${timeout}=${DEFAULT_WAIT_TIMEOUT}
-    Run With Kubeconfig    oc wait -n ${ns} deploy ${name} --for=condition=Available --timeout=${timeout}
+    Oc Wait    -n ${ns} deploy ${name}    --for=condition=Available --timeout=${timeout}
+
+Named Daemonset Should Be Available
+    [Documentation]    Wait for a given daemonset's Available condition to be true
+    ...    ${name}    Name of daemonset to wait for
+    ...    ${ns}    Namespace of named daemonset. Defaults to NAMESPACE suite variable
+    ...    ${timeout}    Period of time to wait for daemonset to reach ready status. Default 60s.
+    [Arguments]    ${name}    ${ns}=${NAMESPACE}    ${timeout}=${DEFAULT_WAIT_TIMEOUT}
+    Oc Wait    -n ${ns} daemonset ${name}    --for=jsonpath='{.status.numberAvailable}'=1 --timeout=${timeout}
+
+Wait Until Resource Exists
+    [Documentation]    Waits for a resource to exist.
+    [Arguments]    ${type}    ${name}    ${ns}=${NAMESPACE}    ${timeout}=${DEFAULT_WAIT_TIMEOUT}
+    Wait Until Keyword Succeeds    ${timeout}    5s
+    ...    Oc Get    ${type}    ${ns}    ${name}
 
 Named PVC Should Be Resized
     [Documentation]    Wait for pvc with ${name} to resize to ${to_size}
@@ -107,10 +132,8 @@ Named PVC Should Be Resized
     ...    ${to_size}    Size pvc is expected to be updated to
     ...    ${timeout}    Period of time to wait for pvc to resize to new size. Default 60s.
     [Arguments]    ${name}    ${to_size}    ${ns}=${NAMESPACE}    ${timeout}=${DEFAULT_WAIT_TIMEOUT}
-    ${cmd}=    Catenate
-    ...    oc wait -n ${ns} pvc/${name} --for=jsonpath="{.spec.resources.requests.storage}"=${to_size}
-    ...    --timeout=${timeout}
-    Run With Kubeconfig    ${cmd}
+    Oc Wait    -n ${ns} pvc/${name}
+    ...    --for=jsonpath="{.spec.resources.requests.storage}"=${to_size} --timeout=${timeout}
 
 Named PVC Should Be Deleted
     [Documentation]    Wait for pvc with ${name} to be deleted
@@ -118,8 +141,7 @@ Named PVC Should Be Deleted
     ...    ${ns}    Namespace of named pvc. Defaults to NAMESPACE suite variable
     ...    ${timeout}    Period of time to wait for pvc to be deleted. Default 60s.
     [Arguments]    ${name}    ${ns}=${NAMESPACE}    ${timeout}=${DEFAULT_WAIT_TIMEOUT}
-    ${timeout_opt}=    Set Variable    --timeout\=${timeout}
-    ${output}=    Run With Kubeconfig    oc wait -n ${ns} pvc/${name} --for=Delete ${timeout_opt}
+    ${output}=    Oc Wait    -n ${ns} pvc/${name}    --for=Delete --timeout=${timeout}
     RETURN    ${output}
 
 Named VolumeSnapshot Should Be Ready
@@ -127,7 +149,7 @@ Named VolumeSnapshot Should Be Ready
     ...    ${name}    Name of volumesnapshot to wait for
     ...    ${timeout}    Period of time to wait for volumeSnapshot ready "readyToUse" state. Default 60s.
     [Arguments]    ${name}    ${timeout}=${DEFAULT_WAIT_TIMEOUT}
-    Run With Kubeconfig    oc wait volumesnapshot/${name} -n ${NAMESPACE} --for=jsonpath='{.status.readyToUse}=true'
+    Oc Wait    volumesnapshot/${name} -n ${NAMESPACE}    --for=jsonpath='{.status.readyToUse}=true'
 
 Named VolumeSnapshot Should Be Deleted
     [Documentation]    Wait for volumesnapshot with ${name} to be deleted
@@ -135,7 +157,7 @@ Named VolumeSnapshot Should Be Deleted
     ...    ${ns}    Namespace of named pod. Defaults to NAMESPACE suite variable, specified by
     ...    ${timeout}    Period of time to wait for volumesnapshot to reach ready status. Default 60s.
     [Arguments]    ${name}    ${ns}=${NAMESPACE}    ${timeout}=${DEFAULT_WAIT_TIMEOUT}
-    Run With Kubeconfig    oc wait -n ${ns} volumesnapshot/${name} --for=Delete --timeout=${timeout}
+    Oc Wait    -n ${ns} volumesnapshot/${name}    --for=Delete --timeout=${timeout}
 
 Oc Create
     [Documentation]    Run 'oc create' on a specific resource in the current test namespace

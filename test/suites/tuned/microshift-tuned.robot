@@ -41,7 +41,8 @@ Variables Are Changed
     Should Not Be Equal    ${old_hash}    ${new_hash}
 
 No Reboot If Not Allowed
-    [Documentation]    If reboot_after_apply is False, then microshift-tuned should not reboot the host even if the profile changed.
+    [Documentation]    If reboot_after_apply is False, then microshift-tuned should not reboot the host even if the
+    ...    profile changed.
 
     Command Should Work
     ...    sed -i 's/^offline_cpu_set=.*$/offline_cpu_set=3/' /etc/tuned/microshift-baseline-variables.conf

@@ -40,7 +40,7 @@ spec:
       containers:
       - name: dhcp-daemon
         image: containernetworking-plugins-microshift
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         command: ["/usr/src/plugins/bin/dhcp"]
         args:
         - "daemon"

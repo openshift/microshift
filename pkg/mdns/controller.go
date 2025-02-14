@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net"
+	"slices"
 	"strings"
 	"sync"
 
@@ -18,6 +19,8 @@ type MicroShiftmDNSController struct {
 	NodeName   string
 	NodeIP     string
 	KubeConfig string
+	isIpv4     bool
+	isIpv6     bool
 	myIPs      []string
 	resolver   *server.Resolver
 	hostCount  map[string]int
@@ -29,6 +32,8 @@ func NewMicroShiftmDNSController(cfg *config.Config) *MicroShiftmDNSController {
 		NodeIP:     cfg.Node.NodeIP,
 		NodeName:   cfg.Node.HostnameOverride,
 		KubeConfig: cfg.KubeConfigPath(config.KubeAdmin),
+		isIpv4:     cfg.IsIPv4(),
+		isIpv6:     cfg.IsIPv6(),
 		hostCount:  make(map[string]int),
 	}
 }
@@ -62,11 +67,31 @@ func (c *MicroShiftmDNSController) Run(ctx context.Context, ready chan<- struct{
 
 	ips := []string{c.NodeIP}
 
-	// Discover additional IPs for the interface (IPv6 LLA ...)
+	// Discover additional IPs for the interface
 	for n := range ifs {
 		addrs, _ := ifs[n].Addrs()
 		if ipInAddrs(c.NodeIP, addrs) {
 			addrs = ovn.ExcludeOVNKubernetesMasqueradeIPs(addrs)
+			addrs = slices.DeleteFunc(
+				addrs,
+				func(addr net.Addr) bool {
+					ipAddr, _, _ := net.ParseCIDR(addr.String())
+					return ipAddr.IsLinkLocalMulticast() || ipAddr.IsLinkLocalUnicast()
+				},
+			)
+			addrs = slices.DeleteFunc(
+				addrs,
+				func(addr net.Addr) bool {
+					ipAddr, _, _ := net.ParseCIDR(addr.String())
+					// This function deletes on a true return.
+					// If the IP family matches what MicroShift has been configured, we need
+					// to keep the IP, hence the false return.
+					if ipAddr.To4() == nil {
+						return !c.isIpv6
+					}
+					return !c.isIpv4
+				},
+			)
 			ips = addrsToStrings(addrs)
 		}
 	}

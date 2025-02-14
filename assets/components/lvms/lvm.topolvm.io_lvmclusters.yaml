@@ -226,10 +226,11 @@ spec:
                               type: integer
                             sizePercent:
                               default: 90
-                              description: SizePercent specifies the percentage of
-                                space in the LVM volume group for creating the thin
-                                pool.
-                              maximum: 90
+                              description: |-
+                                SizePercent specifies the percentage of space in the LVM volume group for creating the thin pool.
+                                If the size configuration is 100, the whole disk will be used.
+                                By default, 90% of the disk is used for the thin pool to allow for data or metadata expansion later on.
+                              maximum: 100
                               minimum: 10
                               type: integer
                           required:

@@ -335,9 +335,11 @@ type Config struct {
 	// Requires experimental-enable-lease-checkpoint to be enabled.
 	// Deprecated in v3.6.
 	// TODO: Delete in v3.7
-	ExperimentalEnableLeaseCheckpointPersist bool          `json:"experimental-enable-lease-checkpoint-persist"`
-	ExperimentalCompactionBatchLimit         int           `json:"experimental-compaction-batch-limit"`
-	ExperimentalWatchProgressNotifyInterval  time.Duration `json:"experimental-watch-progress-notify-interval"`
+	ExperimentalEnableLeaseCheckpointPersist bool `json:"experimental-enable-lease-checkpoint-persist"`
+	ExperimentalCompactionBatchLimit         int  `json:"experimental-compaction-batch-limit"`
+	// ExperimentalCompactionSleepInterval is the sleep interval between every etcd compaction loop.
+	ExperimentalCompactionSleepInterval     time.Duration `json:"experimental-compaction-sleep-interval"`
+	ExperimentalWatchProgressNotifyInterval time.Duration `json:"experimental-watch-progress-notify-interval"`
 	// ExperimentalWarningApplyDuration is the time duration after which a warning is generated if applying request
 	// takes more time than this value.
 	ExperimentalWarningApplyDuration time.Duration `json:"experimental-warning-apply-duration"`
@@ -446,15 +448,15 @@ type configJSON struct {
 }
 
 type securityConfig struct {
-	CertFile        string `json:"cert-file"`
-	KeyFile         string `json:"key-file"`
-	ClientCertFile  string `json:"client-cert-file"`
-	ClientKeyFile   string `json:"client-key-file"`
-	CertAuth        bool   `json:"client-cert-auth"`
-	TrustedCAFile   string `json:"trusted-ca-file"`
-	AutoTLS         bool   `json:"auto-tls"`
-	AllowedCN       string `json:"allowed-cn"`
-	AllowedHostname string `json:"allowed-hostname"`
+	CertFile         string   `json:"cert-file"`
+	KeyFile          string   `json:"key-file"`
+	ClientCertFile   string   `json:"client-cert-file"`
+	ClientKeyFile    string   `json:"client-key-file"`
+	CertAuth         bool     `json:"client-cert-auth"`
+	TrustedCAFile    string   `json:"trusted-ca-file"`
+	AutoTLS          bool     `json:"auto-tls"`
+	AllowedCNs       []string `json:"allowed-cn"`
+	AllowedHostnames []string `json:"allowed-hostname"`
 }
 
 // NewConfig creates a new Config populated with default values.
@@ -523,8 +525,8 @@ func NewConfig() *Config {
 		ExperimentalDowngradeCheckTime:           DefaultDowngradeCheckTime,
 		ExperimentalMemoryMlock:                  false,
 		ExperimentalTxnModeWriteWithSharedBuffer: true,
-		ExperimentalMaxLearners:                  membership.DefaultMaxLearners,
 		ExperimentalStopGRPCServiceOnDefrag:      false,
+		ExperimentalMaxLearners:                  membership.DefaultMaxLearners,
 
 		ExperimentalCompactHashCheckEnabled: false,
 		ExperimentalCompactHashCheckTime:    time.Minute,
@@ -635,8 +637,8 @@ func (cfg *configYAML) configFromFile(path string) error {
 		tls.ClientKeyFile = ysc.ClientKeyFile
 		tls.ClientCertAuth = ysc.CertAuth
 		tls.TrustedCAFile = ysc.TrustedCAFile
-		tls.AllowedCN = ysc.AllowedCN
-		tls.AllowedHostname = ysc.AllowedHostname
+		tls.AllowedCNs = ysc.AllowedCNs
+		tls.AllowedHostnames = ysc.AllowedHostnames
 	}
 	copySecurityDetails(&cfg.ClientTLSInfo, &cfg.ClientSecurityJSON)
 	copySecurityDetails(&cfg.PeerTLSInfo, &cfg.PeerSecurityJSON)

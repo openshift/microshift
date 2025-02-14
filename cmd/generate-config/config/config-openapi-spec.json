@@ -9,7 +9,8 @@
     "kubelet",
     "manifests",
     "network",
-    "node"
+    "node",
+    "storage"
   ],
   "properties": {
     "apiServer": {
@@ -265,6 +266,39 @@
         "nodeIPv6": {
           "description": "IPv6 address of the node, passed to the kubelet. This parameter\nis only allowed when dual stack deployment is configured.",
           "type": "string"
+        }
+      }
+    },
+    "storage": {
+      "description": "Storage represents a subfield of the MicroShift config data structure. Its purpose to provide a user\nfacing interface to control whether MicroShift should deploy LVMS on startup.",
+      "type": "object",
+      "properties": {
+        "driver": {
+          "description": "Driver is a user defined string value matching one of the above CSIStorageDriver values. MicroShift uses this\nvalue to decide whether to deploy the LVMS operator. An unset field defaults to \"\" during yaml parsing, and thus\ncould mean that the cluster has been upgraded. In order to support the existing out-of-box behavior, MicroShift\nassumes an empty string to mean the storage driver should be deployed.\nAllowed values are: unset or one of [\"\", \"lvms\", \"none\"]",
+          "type": "string",
+          "enum": [
+            "",
+            "none",
+            "lvms"
+          ]
+        },
+        "optionalCsiComponents": {
+          "description": "OptionalCSIComponents is a user defined slice of CSIComponent values. These value tell MicroShift which\nadditional, non-driver, CSI controllers to deploy on start. MicroShift will deploy snapshot controller\nand webhook when no components are specified. This preserves the current deployment behavior of existing\nclusters. Users must set `.storage.optionalCsiComponents: []` to explicitly tell MicroShift not to deploy any CSI\ncomponents. The CSI Driver is excluded as it is typically deployed via the same manifest as the accompanying\nstorage driver. Like CSIStorageDriver, uninstallation is not supported as this can lead to orphaned storage\nobjects.\nAllowed values are: unset, [], or one or more of [\"snapshot-controller\", \"snapshot-webhook\"]",
+          "type": "array",
+          "items": {
+            "description": "OptionalCsiComponent values determine which CSI components MicroShift should deploy. Currently only csi snapshot components\nare supported.",
+            "type": "string",
+            "enum": [
+              "none",
+              "snapshot-controller",
+              "snapshot-webhook",
+              ""
+            ]
+          },
+          "example": [
+            "snapshot-controller",
+            "snapshot-webhook"
+          ]
         }
       }
     }

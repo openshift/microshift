@@ -44,24 +44,24 @@ validate_vm_hostname() {
     local vm_name="$1"
 
     if [ -z "${vm_name}" ]; then
-        error "VM hostname cannot be empty string" 
+        error "VM hostname cannot be empty string"
         record_junit "${vm_name}" "vm_hostname_validation" "FAILED"
         exit 1
     fi
 
     if [ ${#vm_name} -gt 64 ]; then
-        error "VM hostname is too long" 
+        error "VM hostname is too long"
         record_junit "${vm_name}" "vm_hostname_validation" "FAILED"
         exit 1
     fi
-    
+
     if ! echo "${vm_name}" | grep -E '^([a-zA-Z0-9]+-*[a-zA-Z0-9]+)+$|^[a-zA-Z0-9]+$' > /dev/null; then
         error "VM hostname is invalid"
         record_junit "${vm_name}" "vm_hostname_validation" "FAILED"
         exit 1
     fi
 
-    record_junit "${vm_name}" "vm_hostname_validation" "OK"   
+    record_junit "${vm_name}" "vm_hostname_validation" "OK"
 }
 
 vm_property_filename() {
@@ -514,6 +514,17 @@ launch_vm() {
         ;;
     esac
 
+    # Attach the graphical console if specified in the scenario settings
+    local graphics_args
+    graphics_args="none"
+    if "${VNC_CONSOLE}"; then
+        graphics_args="vnc,listen=0.0.0.0"
+    else
+        # The inst.cmdline mode does not allow any interaction and it ensures
+        # that %onerror kickstart handlers are executed on failure
+        vm_extra_args+=" inst.cmdline"
+    fi
+
     for _ in $(seq "${vm_nics}") ; do
         vm_network_args+="--network network=${network_name},model=virtio "
     done
@@ -544,12 +555,6 @@ launch_vm() {
     local attempt=1
     local max_attempts=2
     while true ; do
-        local graphics_args
-        graphics_args="none"
-        if "${VNC_CONSOLE}"; then
-            graphics_args="vnc,listen=0.0.0.0"
-        fi
-
         # Make sure the virt-install command times out after a predefined period.
         # The 'timeout' command sends the HUP signal and, if the process does not
         # exit after 1m, it sends the KILL signal to terminate the process.
@@ -717,6 +722,7 @@ configure_vm_firewall() {
     # - On-host pod communication
     run_command_on_vm "${vmname}" "sudo firewall-cmd --permanent --zone=trusted --add-source=10.42.0.0/16"
     run_command_on_vm "${vmname}" "sudo firewall-cmd --permanent --zone=trusted --add-source=169.254.169.1"
+    run_command_on_vm "${vmname}" "sudo firewall-cmd --permanent --zone=trusted --add-source=fd01::/48"
 
     # Networking / firewall configuration instructions
     # - Incoming for the router

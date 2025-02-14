@@ -565,6 +565,12 @@ update_openshift_manifests() {
     title "Modifying OpenShift manifests"
 
     #-- Kubelet -------------------------------------------
+
+    # The tlsCipherSuites field was change from a scalar value to gotemplate which broke the yaml formatting and
+    # confused yq. Before processing, delete the offending go templated field.
+    # https://github.com/openshift/machine-config-operator/commit/3b979e1ddf2a6e2c3e9b4a7872e31db888da1d57
+    sed -i '/tlsCipherSuites:/,/{{- end }}/d' "${REPOROOT}/assets/core/kubelet.yaml"
+
     # Drop MCO's boilerplate and keep KubeletConfiguration only
     yq -i '.contents.inline' "${REPOROOT}/assets/core/kubelet.yaml"
 

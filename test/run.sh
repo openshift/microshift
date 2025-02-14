@@ -10,11 +10,13 @@ RF_VENV="${ROOTDIR}/_output/robotenv"
 RF_VARIABLES="${SCRIPTDIR}/variables.yaml"
 DRYRUN=false
 OUTDIR="${ROOTDIR}/_output/e2e-$(date +%Y%m%d-%H%M%S)"
+RANDOMIZE=all
+EXITONFAILURE=""
 
 function usage {
     local -r script_name=$(basename "$0")
     cat - <<EOF
-${script_name} [-h] [-n] [-o output_dir] [-v venv_dir] [-i var_file] [-s name=value] [-k test_names] [test suite files]
+${script_name} [-h] [-n] [-o output_dir] [-v venv_dir] [-i var_file] [-s name=value] [-k test_names] [-r randomize_value] [-x] [test suite files]
 
 Options:
 
@@ -25,10 +27,12 @@ Options:
   -i PATH            The variables file. (${RF_VARIABLES})
   -s NAME=VALUE      To enable a stress condition.
   -k SKIP_TESTS      Comma separated list of tests to skip.
+  -r RANDOMIZE       Define RF Test order (${RANDOMIZE})
+  -x                 Stops test execution if any test fails. The remaining tests are marked as failed without actually executing them.
 EOF
 }
 
-while getopts "hno:v:i:s:k:" opt; do
+while getopts "hno:v:i:s:k:r:x" opt; do
     case ${opt} in
         h)
             usage
@@ -51,6 +55,12 @@ while getopts "hno:v:i:s:k:" opt; do
             ;;
         k)
             SKIP_TESTS=${OPTARG}
+            ;;
+        r)
+            RANDOMIZE=${OPTARG}
+            ;;
+        x)
+            EXITONFAILURE="--exitonfailure"
             ;;
         *)
             usage
@@ -79,7 +89,7 @@ cd "${SCRIPTDIR}" || (echo "Did not find ${SCRIPTDIR}" 1>&2; exit 1)
 TESTS="$*"
 # if TESTS is not set - run the standard suite.
 if [ -z "${TESTS}" ]; then
-    TESTS=(./suites/standard1 ./suites/standard2 ./suites/osconfig/clusterid.robot)
+    TESTS=(./suites/standard1 ./suites/standard2 ./suites/osconfig/clusterid.robot ./suites/storage/storage-version-migration.robot)
 fi
 
 # enable stress condition
@@ -96,21 +106,22 @@ if [ "${STRESS_TESTING:-}" ]; then
 fi
 
 if ${DRYRUN}; then
-    # shellcheck disable=SC2086
+    # shellcheck disable=SC2086,SC2068
     "${RF_BINARY}" \
         --dryrun \
         --outputdir "${OUTDIR}" \
-        "${TESTS[@]}"
+        ${TESTS[@]}
 else
-    # shellcheck disable=SC2086
+    # shellcheck disable=SC2086,SC2068
     "${RF_BINARY}" \
-        --randomize all \
+        ${EXITONFAILURE}  \
+        --randomize "${RANDOMIZE}" \
         --prerunmodifier "${SCRIPTDIR}/resources/SkipTests.py:${SKIP_TESTS:-}" \
         --loglevel TRACE \
         -V "${RF_VARIABLES}" \
         -x junit.xml \
         --outputdir "${OUTDIR}" \
-        "${TESTS[@]}"
+        ${TESTS[@]}
 fi
 
 # disable stress condition
