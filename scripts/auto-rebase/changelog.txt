@@ -1,12 +1,12 @@
-- cluster-kube-apiserver-operator embedded-component aa95a2b0ecfe4892d6a936bb2da58412edce0fe0 to 4fae6738a9ffd1c108cd9ab3ac6c1382c5eece42
-  - f07aa3c 2025-02-10T17:07:16+00:00 increase waitForFallbackDegradedConditionTimeout
+- api embedded-component 0a88001628266522c84e6c6c25ed5a44aced6d8b to 0cfc958f642b11b1c2020d0da9eb96daff8fb588
+  - 2d0aadb 2024-08-28T14:22:34+00:00 Added CEL to prevent vCenters from changing to unsupported config after install.
 
-- machine-config-operator embedded-component 830665b0c9b44e32294f0f1cecf17735f2bd5d18 to 11006a412aba038bbddc5b3c1a8040ca1d9c8b47
-  - eca90741 2025-01-31T13:31:03+00:00 operator: clear co degrade immediately
+- machine-config-operator embedded-component 11006a412aba038bbddc5b3c1a8040ca1d9c8b47 to 263e1e421e9abae512ab60e443b512792965ebf2
+  - afa9f520 2025-01-31T16:06:28-05:00 controller: add extension validation to MC validation & move extensions validation helpers into ctrlcommon
 
-- ovn-kubernetes image-amd64 d60fad7b368831724701ebc90f6581a554eb673f to 126537f0fa6a27ec33e29d14ae5725474a283278
-  - e64d7549 2025-01-23T16:47:15-08:00 fixes overzealous deletion of SNAT in egressIP
+- ovn-kubernetes image-amd64 126537f0fa6a27ec33e29d14ae5725474a283278 to aa5bec3a1ac01ed11f8df4501747c993ef11f78e
+  - 685d3806 2025-01-22T17:05:12-05:00 Fixes unexpected mp0 route removal during start up
 
-- ovn-kubernetes image-arm64 d60fad7b368831724701ebc90f6581a554eb673f to 126537f0fa6a27ec33e29d14ae5725474a283278
-  - e64d7549 2025-01-23T16:47:15-08:00 fixes overzealous deletion of SNAT in egressIP
+- ovn-kubernetes image-arm64 126537f0fa6a27ec33e29d14ae5725474a283278 to aa5bec3a1ac01ed11f8df4501747c993ef11f78e
+  - 685d3806 2025-01-22T17:05:12-05:00 Fixes unexpected mp0 route removal during start up
 
