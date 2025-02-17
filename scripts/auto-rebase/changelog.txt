@@ -1,3 +1,3 @@
-- machine-config-operator embedded-component 9e721f05c02ec0dd8d1f4d58b95462bb87748f17 to 4791e3c369b244caee9e490458aed4526a89302b
-  - c326b33d 2025-02-07T04:06:11+00:00 node controller: clarify when 'maxUnavailible' is invalid in alert
+- cluster-kube-apiserver-operator embedded-component de2f2ac2fc9a811bd2b1db4f912c5a0092bfc3d0 to f47238554feb2fa6dbce3333adc7e26ffe2d8424
+  - ef16ba8 2025-02-11T13:55:59+00:00 increase waitForFallbackDegradedConditionTimeout
 
