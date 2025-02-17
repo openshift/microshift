@@ -18,7 +18,7 @@ scenario_create_vms() {
         local -r mirror_url="$(dirname "${CURRENT_RELEASE_REPO}")/bootc-pullspec.txt"
         local -r bootc_spec="$(curl -s "${mirror_url}")"
 
-        if [ -z "${bootc_spec}" ] || [[ "${bootc_spec}" != quay.io/openshift* ]] ; then
+        if [ -z "${bootc_spec}" ] || [[ "${bootc_spec}" != quay.io/* ]] ; then
             echo "ERROR: Failed to retrieve a bootc pull spec from '${mirror_url}'"
             exit 1
         fi
