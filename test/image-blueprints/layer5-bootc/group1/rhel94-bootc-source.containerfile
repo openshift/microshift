@@ -17,7 +17,7 @@ COPY ./rpm-repos/$USHIFT_RPM_REPO_NAME $USHIFT_RPM_REPO_PATH
 # Install MicroShift, test agent, a few helper utilities and cleanup
 RUN ${REPO_CONFIG_SCRIPT} -create ${USHIFT_RPM_REPO_PATH} && \
     awk 'FNR==1 {print "=== " FILENAME " ==="} {print}' /etc/yum.repos.d/*.repo && \
-    dnf install -y vi firewalld microshift microshift-test-agent && \
+    dnf install -y firewalld systemd-resolved microshift microshift-test-agent && \
     systemctl enable microshift microshift-test-agent && \
     ${REPO_CONFIG_SCRIPT} -delete && \
     rm -f ${REPO_CONFIG_SCRIPT} && \
