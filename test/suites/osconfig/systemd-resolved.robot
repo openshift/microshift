@@ -4,6 +4,7 @@ Documentation       Verify MicroShift host name resolution with and without syst
 Resource            ../../resources/common.resource
 Resource            ../../resources/microshift-host.resource
 Resource            ../../resources/microshift-process.resource
+Resource            ../../resources/ostree.resource
 Resource            ../../resources/ostree-health.resource
 Resource            ../../resources/systemd.resource
 
@@ -132,30 +133,22 @@ Uninstall Systemd-Resolved
 
     ${is_ostree}=    Is System OSTree
     IF    ${is_ostree} == ${TRUE}
-        ${stdout}    ${stderr}    ${rc}=    Execute Command
-        ...    rpm-ostree override remove systemd-resolved
-        ...    sudo=True    return_rc=True    return_stdout=True    return_stderr=True
-        Should Be Equal As Integers    0    ${rc}
-
-        Reboot MicroShift Host
-        Wait Until Greenboot Health Check Exited
-    ELSE
-        ${stdout}    ${stderr}    ${rc}=    Execute Command
-        ...    dnf remove -y systemd-resolved
-        ...    sudo=True    return_rc=True    return_stdout=True    return_stderr=True
+        ${stdout}    ${rc}=    Execute Command
+        ...    rpm-ostree usroverlay
+        ...    sudo=True    return_rc=True
         Should Be Equal As Integers    0    ${rc}
     END
+
+    ${stdout}    ${stderr}    ${rc}=    Execute Command
+    ...    rpm -ev systemd-resolved
+    ...    sudo=True    return_rc=True    return_stdout=True    return_stderr=True
+    Should Be Equal As Integers    0    ${rc}
 
 Restore Systemd-Resolved
     [Documentation]    Install the systemd-resolved package
 
     ${is_ostree}=    Is System OSTree
     IF    ${is_ostree} == ${TRUE}
-        ${stdout}    ${stderr}    ${rc}=    Execute Command
-        ...    rpm-ostree rollback
-        ...    sudo=True    return_rc=True    return_stdout=True    return_stderr=True
-        Should Be Equal As Integers    0    ${rc}
-
         Reboot MicroShift Host
         Wait Until Greenboot Health Check Exited
     ELSE
