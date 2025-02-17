@@ -9,6 +9,9 @@ TESTDIR="$(cd "${SCRIPTDIR}/.." && pwd)"
 # The location of the root of the git repo, relative to the script.
 ROOTDIR="$(cd "${TESTDIR}/.." && pwd)"
 
+# Most output should be written under this directory
+OUTPUTDIR="${ROOTDIR}/_output"
+
 # The location of shared kickstart templates
 # shellcheck disable=SC2034  # used elsewhere
 KICKSTART_TEMPLATE_DIR="${TESTDIR}/kickstart-templates"
@@ -19,7 +22,7 @@ INSTALLER_IMAGE_BLUEPRINT="rhel-9.2"
 
 # The location for downloading all of the image-related output.
 # The location the web server should serve.
-export IMAGEDIR="${ROOTDIR}/_output/test-images"
+export IMAGEDIR="${OUTPUTDIR}/test-images"
 
 # The storage pool base name for VMs.
 # The actual pool names will be '${VM_POOL_BASENAME}-${SCENARIO}'.
@@ -35,19 +38,19 @@ export VM_ISOLATED_NETWORK="isolated"
 
 # Location of RPMs built from source
 # shellcheck disable=SC2034  # used elsewhere
-RPM_SOURCE="${ROOTDIR}/_output/rpmbuild"
+RPM_SOURCE="${OUTPUTDIR}/rpmbuild"
 
 # Location of RPMs built from source
 # shellcheck disable=SC2034  # used elsewhere
-NEXT_RPM_SOURCE="${ROOTDIR}/_output/rpmbuild-fake-next-minor"
+NEXT_RPM_SOURCE="${OUTPUTDIR}/rpmbuild-fake-next-minor"
 
 # Location of RPMs built from source
 # shellcheck disable=SC2034  # used elsewhere
-YPLUS2_RPM_SOURCE="${ROOTDIR}/_output/rpmbuild-fake-yplus2-minor"
+YPLUS2_RPM_SOURCE="${OUTPUTDIR}/rpmbuild-fake-yplus2-minor"
 
 # Location of RPMs built from source
 # shellcheck disable=SC2034  # used elsewhere
-BASE_RPM_SOURCE="${ROOTDIR}/_output/rpmbuild-base"
+BASE_RPM_SOURCE="${OUTPUTDIR}/rpmbuild-base"
 
 # Location of local repository used by composer
 # shellcheck disable=SC2034  # used elsewhere
@@ -80,14 +83,25 @@ SCENARIO_INFO_DIR="${SCENARIO_INFO_DIR:-${IMAGEDIR}/scenario-info}"
 # The CI system will override this depending on the job its running.
 SCENARIO_SOURCES="${SCENARIO_SOURCES:-${TESTDIR}/scenarios}"
 
+# Directory where all the scenarios will be copied for execution
+#
+# shellcheck disable=SC2034  # used elsewhere
+SCENARIOS_TO_RUN="${OUTPUTDIR}/scenarios-to-run"
+
+# Exclude CNCF Conformance tests from execution. These tests run
+# in serial mode and they need a significant amount of time to
+# complete. Setting this variable to true will exclude them from
+# the scenario test list.
+EXCLUDE_CNCF_CONFORMANCE="${EXCLUDE_CNCF_CONFORMANCE:-false}"
+
 # The location of the robot framework virtualenv.
 # The CI system will override this.
 # shellcheck disable=SC2034  # used elsewhere
-RF_VENV=${RF_VENV:-${ROOTDIR}/_output/robotenv}
+RF_VENV=${RF_VENV:-${OUTPUTDIR}/robotenv}
 
 # The location of the gomplate binary.
 # shellcheck disable=SC2034  # used elsewhere
-GOMPLATE=${ROOTDIR}/_output/bin/gomplate
+GOMPLATE=${OUTPUTDIR}/bin/gomplate
 
 # Which port the web server should run on.
 WEB_SERVER_PORT=${WEB_SERVER_PORT:-8080}
@@ -199,4 +213,4 @@ SCENARIO_BUILD_TAG_PREV="$(date -d "yesterday" '+%y%m%d')"
 
 # The location of the awscli binary.
 # shellcheck disable=SC2034  # used elsewhere
-AWSCLI=${ROOTDIR}/_output/bin/aws
+AWSCLI="${OUTPUTDIR}/bin/aws"

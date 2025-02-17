@@ -1,9 +1,3 @@
-- cluster-network-operator embedded-component 837a9e1feba344828b9cb599c81df93fec55d636 to acd87541954fdc56dc1785e8c0f26e0f86cd1548
-  - 40299ac 2024-02-05T21:52:47+00:00 Network node identity: tolarate all taints
-
-- ovn-kubernetes image-amd64 87016e74e1e6ed438e03d8fa2d9b4ee1a8241756 to 4d6dd53d3eee7b39f4b851f8a5e32dbd278274d8
-  - 3e6cc2a 2024-02-08T15:31:40+01:00 Run go mod vendor && go mod tidy
-  - a273640 2024-02-08T15:31:40+01:00 Add UTs for session affinity config's
-  - 4d92442 2024-02-08T15:31:40+01:00 Vendor in the files from k8s
-  - 5daa77d 2024-02-08T15:31:40+01:00 Support permanent session affinity
+- cluster-kube-apiserver-operator embedded-component 1fe5769f9c30c79140484b11340f40e5208b5d2c to 9267f4543589ccb408d3e62fc0e35708d4b783df
+  - f172ab3 2025-02-13T02:25:59+00:00 increase waitForFallbackDegradedConditionTimeout
 

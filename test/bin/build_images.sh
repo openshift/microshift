@@ -272,7 +272,23 @@ do_group() {
         echo "Building edge-commit from ${blueprint} ${parent_args}"
         # shellcheck disable=SC2086  # quote to avoid glob expansion
         build_cmd="sudo composer-cli compose start-ostree ${parent_args} --ref ${blueprint} ${blueprint} edge-commit"
-        buildid=$(${build_cmd} | awk '{print $2}')
+        for _ in $(seq 3); do
+            set +e
+            build_cmd_output=$(${build_cmd})
+            rc=$?
+            set -e
+            if [[ "${rc}" -eq 0 ]]; then
+                buildid=$(echo "${build_cmd_output}" | awk '/^Compose/ {print $2}')
+                break
+            fi
+            sleep 15
+        done
+
+        if [[ "${rc}" -ne 0 ]]; then
+            echo "Command failed consistently: ${build_cmd}"
+            exit 1
+        fi
+
         echo "Build ID ${buildid}"
         # Record a "build name" to be used as part of the unique
         # filename for the log we download next.
@@ -299,6 +315,12 @@ do_group() {
         # wait_images.py returns possibly updated list of builds that must be handled
         # "update" means replacing initial build ID with retry build ID
         builds_to_get=$(time "${SCRIPTDIR}/wait_images.py" "${buildid_list[@]}")
+    fi
+
+    builds_to_get_num="$(echo "${builds_to_get}" | awk -F' ' '{print NF}')"
+    if [ "${#buildid_list[@]}" -ne "${builds_to_get_num}" ]; then
+        echo "wait_images.py returned unexpected amount of build IDs"
+        return 1
     fi
 
     echo "Downloading build logs, metadata, and image"
@@ -374,6 +396,7 @@ do_group() {
             record_junit "${groupdir}" "${alias_name}" "alias" "OK"
         else
             record_junit "${groupdir}" "${alias_name}" "alias" "FAILED"
+            return 1
         fi
     done
 

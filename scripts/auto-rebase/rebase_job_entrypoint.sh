@@ -13,7 +13,7 @@ if [[ "$JOB_NAME" == rehearse* ]]; then
     export DRY_RUN=y
 fi
 
-cp /secrets/ci-pull-secret/.dockercfg "$HOME/.pull-secret.json" || {
+cp /secrets/import-secret/.dockercfg "$HOME/.pull-secret.json" || {
     echo "WARN: Could not copy registry secret file"
 }
 
@@ -46,6 +46,6 @@ release_lvms="v4.13.1-5"
 # Since LVMS is not part of the release payload, it is not kept in
 # CI. Use the latest z-stream that coincides with the release
 # payload's X.Y version
-pullspec_release_lvms="registry.access.redhat.com/lvms4/lvms-operator-bundle:${release_lvms}"
+pullspec_release_lvms="registry.redhat.io/lvms4/lvms-operator-bundle:${release_lvms}"
 
 ./scripts/auto-rebase/rebase.sh lvms-to "${pullspec_release_lvms}"

@@ -89,6 +89,11 @@ assets:
     - file: webhook_config.yaml
     - file: webhook_deployment.yaml
     - file: webhook_service.yaml
+    - file: webhook_serviceaccount.yaml
+    - file: webhook_clusterrole.yaml
+      src: ./rbac/
+    - file: webhook_clusterrolebinding.yaml
+      src: ./rbac/
     - file: volumesnapshotclasses.yaml
     - file: volumesnapshotcontents.yaml
     - file: volumesnapshots.yaml

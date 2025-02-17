@@ -17,4 +17,3 @@ serviceAccountPublicKeyFiles:
   # The following path contains the public keys needed to verify bound sa
   # tokens. This is only supported post-bootstrap.
   - /etc/kubernetes/static-pod-resources/configmaps/bound-sa-token-signing-certs
-

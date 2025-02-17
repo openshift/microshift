@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Sourced from cleanup_scenario.sh and uses functions defined there.
+# Sourced from scenario.sh and uses functions defined there.
 
 scenario_create_vms() {
     prepare_kickstart host1 kickstart.ks.template rhel-9.2-microshift-source
@@ -12,5 +12,5 @@ scenario_remove_vms() {
 }
 
 scenario_run_tests() {
-    run_tests host1 suites/standard/
+    run_tests host1 suites/standard2/
 }
