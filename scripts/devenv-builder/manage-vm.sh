@@ -21,10 +21,17 @@ SSH_PASSWORD_OPTS="-o PubkeyAuthentication=no -o PreferredAuthentications=passwo
 
 # Show the IP address of the VM
 function get_ip {
-    sudo virsh domifaddr "$1" \
-        | grep ipv \
-        | awk '{print $4}' \
-        | cut -f1 -d/
+    # To avoid stale DHCP leases test each of the IP addresses reported by
+    # domifaddr. Include it only if the VM responds to a ping.
+    # In order to have a predictable output, list ipv4 first and then ipv6.
+    for ipv in ipv4 ipv6; do
+        iplist=$(sudo virsh domifaddr "$1" | grep "${ipv}" | awk '{print $4}' | cut -f1 -d/ || true)
+        for ip in ${iplist}; do
+            if ping -c 1 -W 1 "${ip}" &> /dev/null; then
+                echo "${ip}"
+            fi
+        done
+    done
 }
 
 # Use the RHEL version and other settings to build a unique VM name
