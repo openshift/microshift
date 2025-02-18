@@ -59,10 +59,11 @@ def cleanup_atexit(dry_run):
         common.run_command_in_shell(["sudo", "podman", "stop", cids], dry_run)
 
 
-def find_latest_rpm(repo_path, version=""):
-    rpms = glob.glob(f"{repo_path}/**/microshift-release-info-{version}*.rpm", recursive=True)
+def find_latest_rpm(repo_path, version="", subpkg=""):
+    subpkg = f"-{subpkg}" if subpkg else ""
+    rpms = glob.glob(f"{repo_path}/**/microshift{subpkg}-release-info-{version}*.rpm", recursive=True)
     if not rpms:
-        raise Exception(f"Failed to find 'microshift-release-info-{version}*' RPM in {repo_path}")
+        raise Exception(f"Failed to find 'microshift{subpkg}-release-info-{version}*' RPM in {repo_path}")
     rpms.sort()
     return rpms[-1]
 
