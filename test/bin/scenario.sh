@@ -247,14 +247,14 @@ wait_for_qemu_agent() {
     local -r max_retries=30
     local -r sleep_time=2
     local -r full_vmname="$(full_vm_name "${vmname}")" 
-    echo "Waiting for QEMU agent to become available on VM: $full_vmname..."
+    echo "Waiting for QEMU agent to become available on VM: ${full_vmname}..."
     for ((i=1; i<=max_retries; i++)); do
-        if sudo virsh qemu-agent-command "$full_vmname" '{"execute":"guest-ping"}' --timeout 2 &>/dev/null; then
+        if sudo virsh qemu-agent-command "${full_vmname}" '{"execute":"guest-ping"}' --timeout 2 &>/dev/null; then
             echo "QEMU agent is now available"
             return 0
         fi
-        echo "Attempt $i/$max_retries: QEMU agent not ready, retrying in $sleep_time seconds"
-        sleep "$sleep_time"
+        echo "Attempt ${i}/${max_retries}: QEMU agent not ready, retrying in ${sleep_time} seconds"
+        sleep "${sleep_time}"
     done
     echo "QEMU agent did not respond within the timeout period."
     return 1

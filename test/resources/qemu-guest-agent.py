@@ -434,9 +434,11 @@ def guest_agent_is_ready(vm_name: str):
         'execute': 'guest-ping',
     })
 
+
 def _find_files(vm_name: str, dir: str, pattern: str):
     content, _ = run_guest_process(vm_name, "/bin/find", dir, "-maxdepth", "1", "-name", pattern)
     return content['stdout']
+
 
 def _download_file(vm_name: str, src: str, dst: str):
     print(f"Downloading {src}")
@@ -457,6 +459,7 @@ def _download_file(vm_name: str, src: str, dst: str):
 
     with open(dst, "wb") as f:
         f.write(content)
+
 
 def download_files(vm_name: str, src_dir: str, dst_dir: str, pattern: str):
     """
@@ -480,7 +483,7 @@ def download_files(vm_name: str, src_dir: str, dst_dir: str, pattern: str):
         src = src_dir + filename
         dst = dst_dir + filename
         _download_file(vm_name, src, dst)
-    
+
 
 def upload_file(vm_name: str, src: str, dst: str):
     """
@@ -495,8 +498,9 @@ def upload_file(vm_name: str, src: str, dst: str):
 
     with open(src, "r") as f:
         content = f.read()
-    
+
     write_to_file(vm_name, dst, content)
+
 
 def main():
     parser = argparse.ArgumentParser()
@@ -527,6 +531,7 @@ def main():
     elif args.command == "bash":
         print(f"Running {args.args}")
         run_guest_process(args.vm, "/bin/bash", "-c", args.args)
+
 
 if __name__ == "__main__":
     main()
