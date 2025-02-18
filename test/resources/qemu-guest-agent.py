@@ -461,11 +461,6 @@ def _download_file(vm_name: str, src: str, dst: str):
     finally:
         _close_file(vm_name, handle)
 
-    #with open(dst, "wb") as f:
-    #    bytes = f.write(full_file)
-    #    print("bytes written: ", bytes)
-
-
 def download_files(vm_name: str, src_dir: str, dst_dir: str, pattern: str):
     """
     :param vm_name:     The name of the VM to download the files from
