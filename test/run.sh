@@ -27,6 +27,7 @@ Options:
   -i PATH  The variables file. (${RF_VARIABLES})
   -k SKIP_TESTS      Comma separated list of tests to skip.
   -r RANDOMIZE       Define RF Test order (${RANDOMIZE})
+                     Valid values: all|suites|tests|none
 EOF
 }
 
