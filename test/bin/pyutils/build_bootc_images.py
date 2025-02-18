@@ -7,6 +7,7 @@ import glob
 import os
 import platform
 import re
+import json
 import sys
 import time
 import traceback
@@ -122,6 +123,7 @@ def set_rpm_version_info_vars():
 
     release_info_rpm = find_latest_rpm(LOCAL_REPO)
     release_info_rpm_base = find_latest_rpm(BASE_REPO)
+    release_info_aims_rpm = find_latest_rpm(LOCAL_REPO, subpkg="ai-model-serving")
 
     SOURCE_VERSION = common.run_command_in_shell(f"rpm -q --queryformat '%{{version}}-%{{release}}' {release_info_rpm}")
     SOURCE_VERSION_BASE = common.run_command_in_shell(f"rpm -q --queryformat '%{{version}}-%{{release}}' {release_info_rpm_base}")
@@ -143,6 +145,19 @@ def set_rpm_version_info_vars():
     src_img_cmd += ' | jq -r \'[ .images[] ] | join(",")\''
     SOURCE_IMAGES = common.run_command_in_shell(src_img_cmd)
 
+    # List of images used in AI Model Serving
+    global SOURCE_IMAGES_AIMS
+    global SOURCE_IMAGES_AIMS_OVMS
+    SOURCE_IMAGES_AIMS = ""
+    SOURCE_IMAGES_AIMS_OVMS = ""
+    if UNAME_M == "x86_64":
+        src_img_cmd = f"rpm2cpio {release_info_aims_rpm} | cpio -i --to-stdout '*release-ai-model-serving-{UNAME_M}.json' 2>/dev/null"
+        aims_release_info = json.loads(common.run_command_in_shell(src_img_cmd))
+        # Only take images starting with 'kserve' which are necessary for kserve itself
+        # and 'ovms-image' which is OpenVINO Model Server. Including all model servers would make the image way too big.
+        SOURCE_IMAGES_AIMS = ','.join([v for k, v in aims_release_info['images'].items() if k.startswith('kserve') or k == 'ovms-image'])
+        SOURCE_IMAGES_AIMS_OVMS = aims_release_info['images']['ovms-image']
+
     global SSL_CLIENT_KEY_FILE
     global SSL_CLIENT_CERT_FILE
     # Find the first file matching "*-key.pem" in the entitlements directory
@@ -157,6 +172,7 @@ def set_rpm_version_info_vars():
     # These are used for templating container files and images.
     rpmver_globals_vars = [
         'SOURCE_VERSION', 'SOURCE_VERSION_BASE', 'BREW_VERSION', 'SOURCE_IMAGES',
+        'SOURCE_IMAGES_AIMS', 'SOURCE_IMAGES_AIMS_OVMS',
         'SSL_CLIENT_KEY_FILE', 'SSL_CLIENT_CERT_FILE'
     ]
     for var in rpmver_globals_vars:
