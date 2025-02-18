@@ -23,6 +23,7 @@ from __future__ import annotations  # Support for Python 3.7 and earlier
 import json
 import argparse
 from base64 import b64decode, b64encode
+from os.path import basename
 
 from robot.libraries.BuiltIn import BuiltIn, DotDict
 from robot.libraries.Process import Process, ExecutionResult
@@ -433,7 +434,13 @@ def guest_agent_is_ready(vm_name: str):
         'execute': 'guest-ping',
     })
 
-def download_file(vm_name: str, src: str, dst: str): # TODO add desc
+def _find_files(vm_name: str, dir: str, pattern: str):
+    content, _ = run_guest_process(vm_name, "/bin/find", dir, "-maxdepth", "1", "-name", pattern)
+    return content['stdout']
+
+def _download_file(vm_name: str, src: str, dst: str):
+    print(f"Downloading {src}")
+
     handle = _open_file(vm_name, src, 'r')
     try:
         content = _execute(vm_name, {
@@ -451,7 +458,41 @@ def download_file(vm_name: str, src: str, dst: str): # TODO add desc
     with open(dst, "wb") as f:
         f.write(content)
 
-def upload_file(vm_name: str, src: str, dst: str): # TODO add desc
+def download_files(vm_name: str, src_dir: str, dst_dir: str, pattern: str):
+    """
+    :param vm_name:     The name of the VM to download the files from
+    :type vm_name:      str
+    :param src_dir:     Source directory where the files are located on the VM
+    :type src_dir:      str
+    :param dst_dir:     Destination directory where the downloaded files should be saved
+    :type dst_dir:      str
+    :param pattern:     Pattern or filename, e.g. sosreport-*, journal.log
+    :type pattern:      str
+    """
+    if (not src_dir.endswith('/')):
+        src_dir = src_dir + '/'
+    if (not dst_dir.endswith('/')):
+        dst_dir = dst_dir + '/'
+
+    files = _find_files(vm_name, src_dir, pattern).splitlines()
+    for file in files:
+        filename = basename(file)
+        src = src_dir + filename
+        dst = dst_dir + filename
+        _download_file(vm_name, src, dst)
+    
+
+def upload_file(vm_name: str, src: str, dst: str):
+    """
+    :param vm_name:     The name of the VM to upload the file to
+    :type vm_name:      str
+    :param src:         The absolute path to a source local file, e.g. "/tmp/foo"
+    :type src:          str
+    :param dst:         The absolute path to the destination file on guest, e.g. "/tmp/foo"
+    :type dst:          str
+    """
+    print(f"Uploading {src}")
+
     with open(src, "r") as f:
         content = f.read()
     
@@ -462,31 +503,30 @@ def main():
 
     subparsers = parser.add_subparsers(dest="command", required=True)
 
-    cp_from_parser = subparsers.add_parser("download", help="Copy file from VM")
+    cp_from_parser = subparsers.add_parser("download", help="Copy file(s) from VM")
     cp_from_parser.add_argument("--vm", required=True, help="domain name")
-    cp_from_parser.add_argument("--src", required=True, help="source path on VM")
-    cp_from_parser.add_argument("--dst", required=True, help="local destination path")
+    cp_from_parser.add_argument("--src_dir", required=True, help="source path on VM")
+    cp_from_parser.add_argument("--dst_dir", required=True, help="local destination path")
+    cp_from_parser.add_argument("--pat", required=True, help="filename or pattern")
 
     cp_to_parser = subparsers.add_parser("upload", help="Copy file to VM")
     cp_to_parser.add_argument("--vm", required=True, help="domain name")
     cp_to_parser.add_argument("--src", required=True, help="path to local file")
     cp_to_parser.add_argument("--dst", required=True, help="destination path on VM")
 
-    run_parser = subparsers.add_parser("bash", help="run bash command on VM")
-    run_parser.add_argument("--vm", required=True, help="domain name")
-    run_parser.add_argument("--args", required=True, help="arguments")
+    bash_parser = subparsers.add_parser("bash", help="run bash command on VM")
+    bash_parser.add_argument("--vm", required=True, help="domain name")
+    bash_parser.add_argument("--args", required=True, help="arguments")
 
     args = parser.parse_args()
 
     if args.command == "download":
-        print(f"Downloading {args.src} from VM to {args.dst}")
-        download_file(args.vm, args.src, args.dst)
+        download_files(args.vm, args.src_dir, args.dst_dir, args.pat)
     elif args.command == "upload":
-        print(f"Uploading {args.src} to VM as {args.dst}")
         upload_file(args.vm, args.src, args.dst)
     elif args.command == "bash":
         print(f"Running {args.args}")
-        print(run_guest_process(args.vm, "/bin/bash", "-c", args.args))
+        run_guest_process(args.vm, "/bin/bash", "-c", args.args)
 
 if __name__ == "__main__":
     main()

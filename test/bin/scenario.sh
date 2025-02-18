@@ -135,161 +135,6 @@ copy_file_from_vm() {
     scp -P "${ssh_port}" "redhat@${ip}:${remote_filename}" "${local_filename}"
 }
 
-copy_file_to_vm_offline() {
-    local -r vmname="$1"
-    local -r local_filename="$2"
-    local -r remote_filename="$3"
-    local -r full_vmname="$(full_vm_name "${vmname}")"
-
-    echo "copying $local_filename to VM"
-
-    local file_open_handle="$(sudo virsh qemu-agent-command ${full_vmname} \
-        "$(jq -n --arg path "$remote_filename" \
-        '{"execute": "guest-file-open", "arguments": {"path": $path, "mode": "w"}}')" | jq '.return')"
-
-    local buffer="$(base64 -w 0 ${local_filename})"
-
-    sudo virsh qemu-agent-command ${full_vmname} \
-        "$(jq -n --argjson handle "$file_open_handle" --arg buf "$buffer" \
-        '{"execute": "guest-file-write", "arguments": {"handle": $handle, "buf-b64": $buf}}')"
-    
-    sudo virsh qemu-agent-command ${full_vmname} \
-        "$(jq -n --argjson handle "$file_open_handle" \
-        '{"execute": "guest-file-close", "arguments": {"handle": $handle}}')"
-}
-
-find_files_on_vm_offline() {
-    local -r vmname="$1"
-    local -r directory="$2"
-    local -r pattern="$3"
-    local -r full_vmname="$(full_vm_name "${vmname}")"
-
-    list_files_json=$(sudo virsh qemu-agent-command "${full_vmname}" \
-    "$(jq -n --arg path "${directory}" --arg pattern "${pattern}" \
-    '{"execute": "guest-exec", "arguments": {"path": "/bin/find", "arg": [$path, "-name", $pattern], "capture-output" : true}}')")
-
-    local pid="$(echo ${list_files_json} | jq -r '.return.pid')"
-
-    local result
-    while true; do
-        result=$(sudo virsh qemu-agent-command "${full_vmname}" \
-            "$(jq -n --argjson pid "$pid" '{"execute": "guest-exec-status", "arguments": {"pid": $pid}}')")
-
-        local exited
-        exited=$(echo "$result" | jq -r '.return.exited')
-
-        if [[ "$exited" == "true" ]]; then
-            break
-        fi
-
-        sleep 0.5
-    done
-
-    data="$(echo "${result}" | jq -r '.return."out-data"' | base64 -d)"
-
-    echo "${data}"
-}
-
-copy_file_from_vm_offline() {
-    local -r vmname="$1"
-    local -r remote_filename="$2"
-    local -r local_filename="$3"
-    local -r full_vmname="$(full_vm_name "${vmname}")"
-
-    echo "copying $remote_filename from VM"
-
-    local file_open_handle="$(sudo virsh qemu-agent-command ${full_vmname} \
-        "$(jq -n --arg path "$remote_filename" \
-        '{"execute": "guest-file-open", "arguments": {"path": $path, "mode": "r"}}')" | jq '.return')"
-    
-    full_content=""
-    while true; do
-        read_json="$(sudo virsh qemu-agent-command ${full_vmname} \
-            "$(jq -n --argjson handle "$file_open_handle" --argjson count 49152 \
-            '{"execute": "guest-file-read", "arguments": {"handle": $handle, "count": $count}}')")"
-
-        chunk=$(echo "$read_json" | jq -r '.return."buf-b64"')
-
-        if [[ -z "$chunk" ]]; then # TODO this might be redundant
-            break
-        fi
-
-        if [[ -n "$chunk" ]]; then
-            echo "$chunk" | base64 -d >> "${local_filename}"
-        else
-            break
-        fi
-
-        eof_flag="$(echo "$read_json" | jq -r '.return.eof')"
-        if [[ "$eof_flag" == "true" ]]; then
-            break
-        fi
-    done
-
-    sudo virsh qemu-agent-command ${full_vmname} \
-        "$(jq -n --argjson handle "$file_open_handle" \
-        '{"execute": "guest-file-close", "arguments": {"handle": $handle}}')"
-}
-
-run_command_on_vm_offline() {
-    local -r vmname="$1"
-    local -r command="$2"
-    shift
-    shift
-    local -r args="$*"
-    local -r full_vmname="$(full_vm_name "${vmname}")"
-
-    echo "running command: $command $args"
-
-    cmd_args=$(jq -n --argjson args "$(printf '%s\n' "$@" | jq -R . | jq -s .)" --arg cmd "$command" '{execute: "guest-exec", arguments: {path: $cmd, arg: $args, "capture-output": true}}')
-
-    echo "final command: $cmd_args"
-
-    local exec_res="$(sudo virsh qemu-agent-command ${full_vmname} ${cmd_args})"
-
-    local pid="$(echo ${exec_res} | jq -r '.return.pid')"
-
-    local result
-    while true; do
-        result=$(sudo virsh qemu-agent-command "${full_vmname}" \
-            "$(jq -n --argjson pid "$pid" '{"execute": "guest-exec-status", "arguments": {"pid": $pid}}')")
-
-        local exited
-        exited=$(echo "$result" | jq -r '.return.exited')
-
-        if [[ "$exited" == "true" ]]; then
-            break
-        fi
-
-        sleep 0.5
-    done
-
-    echo "${result}"
-    echo "${result}" | jq -r '.return."out-data"' | base64 --decode
-}
-
-wait_for_qemu_agent() {
-    local -r vmname="$1"
-    local -r max_retries=30
-    local -r sleep_time=2
-    local -r full_vmname="$(full_vm_name "${vmname}")" 
-
-    echo "Waiting for QEMU agent to become available on VM: $full_vmname..."
-
-    for ((i=1; i<=max_retries; i++)); do
-        if sudo virsh qemu-agent-command "$full_vmname" '{"execute":"guest-ping"}' --timeout 2 &>/dev/null; then
-            echo "QEMU agent is now available!"
-            return 0
-        fi
-        echo "Attempt $i/$max_retries: QEMU agent not ready, retrying in $sleep_time seconds..."
-        sleep "$sleep_time"
-    done
-
-    echo "QEMU agent did not respond within the timeout period."
-    return 1
-}
-
-
 sos_report() {
     local -r junit="${1:-false}"
 
@@ -397,6 +242,24 @@ invoke_qemu_script() {
     "${ROOTDIR}/_output/robotenv/bin/python" "${ROOTDIR}/test/resources/qemu-guest-agent.py" "$@"
 }
 
+wait_for_qemu_agent() {
+    local -r vmname="$1"
+    local -r max_retries=30
+    local -r sleep_time=2
+    local -r full_vmname="$(full_vm_name "${vmname}")" 
+    echo "Waiting for QEMU agent to become available on VM: $full_vmname..."
+    for ((i=1; i<=max_retries; i++)); do
+        if sudo virsh qemu-agent-command "$full_vmname" '{"execute":"guest-ping"}' --timeout 2 &>/dev/null; then
+            echo "QEMU agent is now available"
+            return 0
+        fi
+        echo "Attempt $i/$max_retries: QEMU agent not ready, retrying in $sleep_time seconds"
+        sleep "$sleep_time"
+    done
+    echo "QEMU agent did not respond within the timeout period."
+    return 1
+}
+
 sos_report_for_vm_offline() {
     local -r vmdir="${1}"
     local -r vmname="${2}"
@@ -421,6 +284,9 @@ else
 fi
 chmod +r /tmp/sosreport-* || echo "WARNING: The sos report files do not exist in /tmp"
 EOF
+
+    "${ROOTDIR}/scripts/fetch_tools.sh" "robotframework"
+
     wait_for_qemu_agent "${vmname}"
 
     invoke_qemu_script "upload" \
@@ -441,35 +307,26 @@ EOF
     #run_command_on_vm_offline "${vmname}" /bin/bash -c "sudo bash -x /tmp/sos-wrapper.sh"
     
     mkdir -p "${vmdir}/sos"
-
-    local -r sosfiles="$(find_files_on_vm_offline "${vmname}" "/tmp" "sosreport-*")"
-    while IFS= read -r line; do
-        local filename="$(basename "$line")"
-        invoke_qemu_script "download" \
-            "--vm"  "${full_vmname}" \
-            "--src" "$line" \
-            "--dst" "${vmdir}/sos/${filename}"
-        #copy_file_from_vm_offline "${vmname}" "$line" "${vmdir}/sos/${filename}" || {
-        #    echo "WARNING: Ignoring an error when copying sos report files"
-        #}
-    done <<< "$sosfiles"
+    
+    invoke_qemu_script "download" \
+        "--vm"  "${full_vmname}" \
+        "--src_dir" "/tmp" \
+        "--dst_dir" "${vmdir}/sos" \
+        "--pat" "sosreport-*"
 
     invoke_qemu_script "bash" \
         "--vm"  "${full_vmname}" \
         "--args"  "sudo journalctl > /tmp/journal_$(date +'%Y-%m-%d_%H:%M:%S').log"
     #run_command_on_vm_offline "${vmname}" /bin/bash -c "sudo journalctl > /tmp/journal_$(date +'%Y-%m-%d_%H:%M:%S').log"
 
-    local -r journalfiles="$(find_files_on_vm_offline "${vmname}" "/tmp" "journal*.log")"
-    while IFS= read -r line; do
-        local filename="$(basename "$line")"
-        invoke_qemu_script "download" \
-            "--vm"  "${full_vmname}" \
-            "--src" "$line" \
-            "--dst" "${vmdir}/sos/${filename}"
-        #copy_file_from_vm_offline "${vmname}" "$line" "${vmdir}/sos/${filename}" || {
-        #    echo "WARNING: Ignoring an error when copying sos report files"
-        #}
-    done <<< "$journalfiles"
+    #local -r journalfiles="$(find_files_on_vm_offline "${vmname}" "/tmp" "journal*.log")"
+    
+    invoke_qemu_script "download" \
+        "--vm"  "${full_vmname}" \
+        "--src_dir" "/tmp" \
+        "--dst_dir" "${vmdir}/sos" \
+        "--pat" "journal*.log"
+
 
     # Also copy the logs from the /var/log/anaconda directory to
     # collect information about potentially failed installations.
@@ -492,17 +349,13 @@ EOF
     #run_command_on_vm_offline "${vmname}" /bin/bash -c "sudo chmod +r /tmp/var-log-anaconda/*.log"
 
     mkdir -p "${vmdir}/anaconda"
-    local -r anacondafiles="$(find_files_on_vm_offline "${vmname}" "/tmp/var-log-anaconda/" "*.log")"
-    while IFS= read -r line; do
-        local filename="$(basename "$line")"
-        invoke_qemu_script "download" \
-            "--vm"  "${full_vmname}" \
-            "--src" "$line" \
-            "--dst" "${vmdir}/anaconda/${filename}"
-        #copy_file_from_vm_offline "${vmname}" "$line" "${vmdir}/anaconda/${filename}" || {
-        #   echo "WARNING: Ignoring an error when copying sos report files"
-        #}
-    done <<< "$anacondafiles"
+  
+    invoke_qemu_script "download" \
+        "--vm"  "${full_vmname}" \
+        "--src_dir" "/tmp/var-log-anaconda" \
+        "--dst_dir" "${vmdir}/anaconda" \
+        "--pat" "*.log"
+        
 }
 
 # Public function to render a unique kickstart from a template for a
