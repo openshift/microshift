@@ -227,7 +227,7 @@ def get_process_file_names(idir, ifile, obasedir):
     path = os.path.join(idir, ifile)
     outname = os.path.splitext(ifile)[0]
     outdir = os.path.join(obasedir, outname)
-    logfile = os.path.join(obasedir, f"{outname}.log")
+    logfile = os.path.join(obasedir, f"{ifile}.log")
     return path, outname, outdir, logfile
 
 
