@@ -445,20 +445,25 @@ def _download_file(vm_name: str, src: str, dst: str):
 
     handle = _open_file(vm_name, src, 'r')
     try:
-        content = _execute(vm_name, {
-            'execute': 'guest-file-read',
-            'arguments': {
-                'handle': handle,
-                'count': 40960
-            }
-        })
+        with open(dst, "wb") as f:
+            while True:
+                content = _execute(vm_name, {
+                    'execute': 'guest-file-read',
+                    'arguments': {
+                        'handle': handle,
+                        'count': 10240
+                    }
+                })
+                f.write(b64decode(content['buf-b64']))
+
+                if content['eof'] == True:
+                    break
     finally:
         _close_file(vm_name, handle)
 
-    content = b64decode(content['buf-b64'])
-
-    with open(dst, "wb") as f:
-        f.write(content)
+    #with open(dst, "wb") as f:
+    #    bytes = f.write(full_file)
+    #    print("bytes written: ", bytes)
 
 
 def download_files(vm_name: str, src_dir: str, dst_dir: str, pattern: str):
