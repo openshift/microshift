@@ -6,15 +6,15 @@ set -xeuo pipefail
 MANAGEMENT_CPUSET="0-3"
 
 # Rest for the workloads
-WORKLOAD_CPUSET="4-17"
+WORKLOAD_CPUSET="4-23"
 
-# c5n.metal's NUMA configuration is:
-#   NUMA node0 CPU(s):     0-17,36-53
-#   NUMA node1 CPU(s):     18-35,54-71
+# c5.metal's NUMA configuration is:
+#   NUMA node0 CPU(s):     0-23,48-71
+#   NUMA node1 CPU(s):     24-47,72-95
 # Let's offline following CPUs to only run test on a single NUMA node with SMT disabled:
-# - 35-53 - SMT part of the NUMA node0
-# - 18-34,54-71 which is NUMA node1
-OFFLINE_CPUSET="18-71"
+# - 48-71 - SMT part of the NUMA node0
+# - 24-47,72-95 which is NUMA node1
+OFFLINE_CPUSET="24-95"
 
 # Kubelet configuration - most important stuff:
 # - CPU Manager "static" policy

@@ -32,13 +32,17 @@ func (s *state) SaveToIntermediate() error {
 	if err != nil {
 		return err
 	}
-	path, err := util.GenerateUniqueTempPath(filepath.Join(s.storagePath, stateFilename))
+	file, err := util.CreateTempFile(filepath.Join(s.storagePath, stateFilename))
 	if err != nil {
 		return err
 	}
+	defer file.Close()
+	path := file.Name()
 	s.intermediatePath = path
 	klog.InfoS("Saving intermediate state", "state", contents, "path", path)
-	return os.WriteFile(path, contents, 0600)
+	_, err = file.Write(contents)
+
+	return err
 }
 
 func (s *state) MoveToFinal() error {

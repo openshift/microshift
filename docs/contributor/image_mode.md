@@ -57,7 +57,7 @@ Note how secrets are used during the image build:
 ```bash
 PULL_SECRET=~/.pull-secret.json
 USER_PASSWD="<your_redhat_user_password>"
-IMAGE_NAME=microshift-4.17-bootc
+IMAGE_NAME=microshift-4.18-bootc
 
 sudo podman build --authfile "${PULL_SECRET}" -t "${IMAGE_NAME}" \
     --build-arg USER_PASSWD="${USER_PASSWD}" \
@@ -72,12 +72,12 @@ sudo podman build --authfile "${PULL_SECRET}" -t "${IMAGE_NAME}" \
 > RUN . /etc/os-release && dnf upgrade -y --releasever="${VERSION_ID}"
 > ```
 
-Verify that the local MicroShift 4.17 `bootc` image was created.
+Verify that the local MicroShift 4.18 `bootc` image was created.
 
 ```bash
 $ sudo podman images "${IMAGE_NAME}"
 REPOSITORY                       TAG         IMAGE ID      CREATED        SIZE
-localhost/microshift-4.17-bootc  latest      193425283c00  2 minutes ago  2.31 GB
+localhost/microshift-4.18-bootc  latest      193425283c00  2 minutes ago  2.31 GB
 ```
 
 ### Publish Image
@@ -118,7 +118,7 @@ $ find /lib/modules/$(uname -r) -name "openvswitch*"
 /lib/modules/6.9.9-200.fc40.x86_64/kernel/net/openvswitch
 /lib/modules/6.9.9-200.fc40.x86_64/kernel/net/openvswitch/openvswitch.ko.xz
 
-$ IMAGE_NAME=microshift-4.17-bootc
+$ IMAGE_NAME=microshift-4.18-bootc
 $ sudo podman inspect "${IMAGE_NAME}" | grep kernel-core
         "created_by": "kernel-core-5.14.0-427.26.1.el9_4.x86_64"
 ```
@@ -191,7 +191,7 @@ The host shares the following configuration with the container:
 
 ```bash
 PULL_SECRET=~/.pull-secret.json
-IMAGE_NAME=microshift-4.17-bootc
+IMAGE_NAME=microshift-4.18-bootc
 
 sudo modprobe openvswitch
 sudo podman run --rm -it --privileged \
@@ -243,7 +243,7 @@ to be installed
 ```bash
 AUTH_CONFIG=~/.quay-auth.json
 PULL_SECRET=~/.pull-secret.json
-IMAGE_REF="quay.io/<myorg>/<mypath>/microshift-4.17-bootc"
+IMAGE_REF="quay.io/<myorg>/<mypath>/microshift-4.18-bootc"
 ```
 
 > See the `containers-auth.json(5)` manual pages for more information on the
@@ -320,7 +320,7 @@ previous step to pull a `bootc` image from the remote registry and use it to ins
 the RHEL operating system.
 
 ```bash
-VMNAME=microshift-4.17-bootc
+VMNAME=microshift-4.18-bootc
 NETNAME=default
 
 sudo virt-install \
@@ -347,23 +347,38 @@ watch sudo oc get pods -A \
 
 ## Using Bootc Image Builder (BIB)
 
-The [bootc-image-builder](https://github.com/osbuild/bootc-image-builder), is a containerized tool to
-create disk images from bootc images. You can use the images that you build to deploy disk images in
-different environments, such as the edge, server, and clouds.
+The [bootc-image-builder](https://github.com/osbuild/bootc-image-builder), is a
+containerized tool to create disk images from bootc images. You can use the images
+that you build to deploy disk images in different environments, such as the edge,
+server, and clouds.
 
-### Prepare Build Config File
-A build config is a Toml (or JSON) file with customizations for the resulting image.
-The config file is mapped into the container directory to /config.toml. The customizations are
-specified under a customizations object.
+### Create ISO image using BIB
 
-Set variables pointing to secret files that are included in `config.toml` for
+```bash
+PULL_SECRET=~/.pull-secret.json
+IMAGE_NAME=microshift-4.18-bootc
+
+mkdir ./output
+sudo podman run --authfile ${PULL_SECRET} --rm -it \
+    --privileged \
+    --security-opt label=type:unconfined_t \
+    -v /var/lib/containers/storage:/var/lib/containers/storage \
+    -v ./output:/output \
+    registry.redhat.io/rhel9/bootc-image-builder:latest \
+    --local \
+    --type iso \
+    localhost/${IMAGE_NAME}:latest
+```
+
+### Prepare Kickstart File
+
+Set variables pointing to secret files that are included in `kickstart.ks` for
 gaining access to private container registries:
 * `PULL_SECRET` file contents are copied to `/etc/crio/openshift-pull-secret`
   at the post-install stage to authenticate OpenShift registry access
 
 ```bash
 PULL_SECRET=~/.pull-secret.json
-IMAGE_NAME=microshift-4.17-bootc
 ```
 
 Run the following command to create the `kickstart.ks` file to be used during
@@ -408,30 +423,12 @@ chmod 600 /etc/crio/openshift-pull-secret
 EOFKS
 ```
 
-### Create ISO image using BIB
-
-```bash
-mkdir ./output
-
-sudo podman run --authfile ${PULL_SECRET} --rm -it \
-    --privileged \
-    --security-opt label=type:unconfined_t \
-    -v /var/lib/containers/storage:/var/lib/containers/storage \
-    -v ./config.toml:/config.toml:ro  \
-    -v ./output:/output \
-    registry.redhat.io/rhel9/bootc-image-builder:latest \
-    --local \
-    --type iso \
-    --config /config.toml \
-    localhost/${IMAGE_NAME}:latest
-```
-
 ### Create Virtual Machine
 
 Copy the `install.iso` file to the `/var/lib/libvirt/images` directory.
 
 ```bash
-VMNAME=microshift-4.17-bootc
+VMNAME=microshift-4.18-bootc
 NETNAME=default
 
 sudo cp -Z ./output/bootiso/install.iso /var/lib/libvirt/images/${VMNAME}.iso
@@ -473,7 +470,7 @@ PULL_SECRET=~/.pull-secret.json
 USER_PASSWD="<your_redhat_user_password>"
 IMAGE_ARCH=amd64 # Use amd64 or arm64 depending on the current platform
 IMAGE_PLATFORM="linux/${IMAGE_ARCH}"
-IMAGE_NAME="microshift-4.17-bootc:linux-${IMAGE_ARCH}"
+IMAGE_NAME="microshift-4.18-bootc:linux-${IMAGE_ARCH}"
 
 sudo podman build --authfile "${PULL_SECRET}" -t "${IMAGE_NAME}" \
     --platform "${IMAGE_PLATFORM}" \
@@ -481,13 +478,13 @@ sudo podman build --authfile "${PULL_SECRET}" -t "${IMAGE_NAME}" \
     -f Containerfile
 ```
 
-Verify that the local MicroShift 4.17 `bootc` image was created for the specified
+Verify that the local MicroShift 4.18 `bootc` image was created for the specified
 platform.
 
 ```bash
 $ sudo podman images "${IMAGE_NAME}"
 REPOSITORY                       TAG          IMAGE ID      CREATED         SIZE
-localhost/microshift-4.17-bootc  linux-amd64  3f7e136fccb5  13 minutes ago  2.19 GB
+localhost/microshift-4.18-bootc  linux-amd64  3f7e136fccb5  13 minutes ago  2.19 GB
 ```
 
 Repeat the procedure on the other platform (i.e. `arm64`) and proceed by publishing
@@ -507,7 +504,7 @@ and publish it to the remote registry.
 ```bash
 REGISTRY_URL=quay.io
 REGISTRY_ORG=myorg/mypath
-BASE_NAME=microshift-4.17-bootc
+BASE_NAME=microshift-4.18-bootc
 MANIFEST_NAME="${BASE_NAME}:latest"
 
 sudo podman manifest create -a "localhost/${MANIFEST_NAME}" \
@@ -533,6 +530,50 @@ $ sudo podman manifest inspect \
 ```
 
 It is now possible to access images using the manifest name with the `latest` tag
-(e.g. `quay.io/myorg/mypath/microshift-4.17-bootc:latest`). The image for the
+(e.g. `quay.io/myorg/mypath/microshift-4.18-bootc:latest`). The image for the
 current platform will automatically be pulled from the registry if it is part of
 the manifest list.
+
+## Appendix C: The rpm-ostree to Image Mode Upgrade Procedure
+
+Refer to RHEL documentation for generic instructions on upgrading `rpm-ostree`
+systems to Image Mode. The upgrade process should be planned carefully considering
+the following guidelines:
+* Follow instructions in RHEL documentation for converting `rpm-ostree` blueprints to
+  Image Mode container files
+* Consider using [rpm-ostree compose container-encapsulate](https://coreos.github.io/rpm-ostree/container/#converting-ostree-commits-to-new-base-images)
+  to experiment with Image Mode based on the existing `ostree` commits
+* Invest in defining a proper container build pipeline for fully adopting Image Mode
+
+If reinstalling MicroShift devices from scratch is not an option, read the remainder
+of this section that outlines the upgrade details specific to MicroShift.
+
+Upgrading existing systems during the transition from `rpm-ostree` to Image Mode
+may pose the challenge of [UID / GID Drift](https://github.com/bootc-dev/bootc/issues/673)
+because the existing `rpm-ostree` and the new Image Mode images are not derived
+from the same parent image.
+
+One way of working around this issue is to add `systemd` units that run before the
+affected system services and apply the necessary fixes.
+
+> Note: The workaround is only necessary for `rpm-ostree` to Image Mode upgrade
+> and it can be removed once all the devices are running the upgraded image.
+
+Add the following command to the MicroShift image build procedure to create a
+`systemd` unit file solving a potential UID / GID drift for `ovsdb-server.service`.
+
+```
+# Install systemd configuration drop-ins to fix potential permission problems
+# when upgrading from older rpm-ostree commits to Image Mode container layers
+RUN mkdir -p /etc/systemd/system/ovsdb-server.service.d && \
+    cat > /etc/systemd/system/ovsdb-server.service.d/microshift-ovsdb-ownership.conf <<'EOF'
+# The openvswitch database files must be owned by the appropriate user and its
+# primary group. Note that the user and its group may be overwritten too, so
+# they need to be recreated in this case.
+[Service]
+ExecStartPre=/bin/sh -c '/bin/getent passwd openvswitch >/dev/null || useradd -r openvswitch'
+ExecStartPre=/bin/sh -c '/bin/getent group hugetlbfs >/dev/null || groupadd -r hugetlbfs'
+ExecStartPre=/sbin/usermod -a -G hugetlbfs openvswitch
+ExecStartPre=/bin/chown -Rhv openvswitch. /etc/openvswitch
+EOF
+```

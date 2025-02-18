@@ -17,9 +17,10 @@ var (
 	// data dir as a backup with Copy-On-Write feature.
 	cpArgs = []string{
 		"--verbose",
-		"--recursive",    // copy directories recursively
-		"--preserve",     // preserve mode, ownership, timestamps
-		"--reflink=auto", // enable Copy-on-Write copy
+		"--recursive",           // copy directories recursively
+		"--no-target-directory", // do not create subdirectory in the target dir
+		"--preserve",            // preserve mode, ownership, timestamps
+		"--reflink=auto",        // enable Copy-on-Write copy
 	}
 )
 
@@ -41,7 +42,7 @@ func (c *AtomicDirCopy) CopyToIntermediate() error {
 		return nil
 	}
 	var err error
-	c.intermediatePath, err = util.GenerateUniqueTempPath(c.Destination)
+	c.intermediatePath, err = util.CreateTempDir(c.Destination)
 	if err != nil {
 		return err
 	}
