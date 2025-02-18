@@ -339,14 +339,19 @@ function get_vm_ip {
     local -r start=$(date +%s)
     local ip
     ip=$("${ROOTDIR}/scripts/devenv-builder/manage-vm.sh" ip -n "${vmname}" | head -1)
-    while [ "${ip}" = "" ]; do
+    while true; do
         now=$(date +%s)
         if [ $(( now - start )) -ge ${VM_BOOT_TIMEOUT} ]; then
             echo "Timed out while waiting for IP retrieval"
             exit 1
         fi
         sleep 1
+        # Try pinging the IP address to avoid stale DHCP leases that would falsely
+        # return as the current IP for the VM.
         ip=$("${ROOTDIR}/scripts/devenv-builder/manage-vm.sh" ip -n "${vmname}" | head -1)
+        if ping -c 1 -W 1 "${ip}" &> /dev/null; then
+          break
+        fi
     done
     echo "${ip}"
 }
