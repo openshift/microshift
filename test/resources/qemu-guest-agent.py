@@ -456,10 +456,11 @@ def _download_file(vm_name: str, src: str, dst: str):
                 })
                 f.write(b64decode(content['buf-b64']))
 
-                if content['eof'] == True:
+                if content['eof'] is True:
                     break
     finally:
         _close_file(vm_name, handle)
+
 
 def download_files(vm_name: str, src_dir: str, dst_dir: str, pattern: str):
     """
