@@ -162,27 +162,22 @@ sos_report() {
             echo "Creating sos report offline"
             if ! sos_report_for_vm_offline "${vmdir}" "${vmname}"; then
                 scenario_result=1
-                if "${junit}"; then
-                    record_junit "${vmname}" "sos-report" "FAILED"
-                fi
-            else
-                if "${junit}"; then
-                    record_junit "${vmname}" "sos-report" "OK"
-                fi
-            fi
-            continue
-        fi
-
-        if ! sos_report_for_vm "${vmdir}" "${vmname}"; then
-            scenario_result=1
-            if "${junit}"; then
-                record_junit "${vmname}" "sos-report" "FAILED"
             fi
         else
-            if "${junit}"; then
+            if ! sos_report_for_vm "${vmdir}" "${vmname}"; then
+                scenario_result=1
+            fi
+        fi
+
+        if "${junit}"; then
+            if [ "${scenario_result}" -eq "1" ]; then
+                record_junit "${vmname}" "sos-report" "FAILED"
+            else
                 record_junit "${vmname}" "sos-report" "OK"
             fi
         fi
+
+
     done
     return "${scenario_result}"
 }
