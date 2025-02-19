@@ -1,0 +1,4 @@
+- machine-config-operator embedded-component 5ad8612aa1ba1ee240b545946e052d39311aaa7a to d1aebf38a30cc1462acc0ea173c351955ff33fc3
+  - fb86e861 2025-01-28T12:18:21-05:00 internal: use node name instead of object
+  - aff2c36e 2025-01-27T11:40:31-05:00 stamp boot images CM in syncMachineConfiguration
+
