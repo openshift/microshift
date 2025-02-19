@@ -24,12 +24,13 @@ def get_advisories(ocp_version: str) -> dict[str, int]:
     urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
     try:
-        microshift_xy_version = ".".join(ocp_version.split(".")[:2])
-        request = requests.get(f"https://raw.githubusercontent.com/openshift-eng/ocp-build-data/refs/heads/openshift-{microshift_xy_version}/releases.yml", verify=False)
+        microshift_xy_version = '.'.join(ocp_version.split('.')[:2])
+        request = requests.get(f'https://raw.githubusercontent.com/openshift-eng/ocp-build-data/refs/heads/openshift-{microshift_xy_version}/releases.yml', verify=False)
         request.raise_for_status()
     except requests.exceptions.HTTPError as err:
         raise SystemExit(err)
     result = yaml.load(str(request.text), Loader=yaml.SafeLoader)
+
     if ocp_version in result['releases']:
         return result['releases'][ocp_version]['assembly']['group']['advisories']
     else:
@@ -47,7 +48,7 @@ def get_advisory_info(advisory_id: int) -> dict[str, str]:
     urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
     try:
-        request = requests.get(f"https://errata.devel.redhat.com/cve/show/{advisory_id}.json", verify=False)
+        request = requests.get(f'https://errata.devel.redhat.com/cve/show/{advisory_id}.json', verify=False)
         request.raise_for_status()
     except requests.exceptions.HTTPError as err:
         raise SystemExit(err)
@@ -70,7 +71,7 @@ def search_microshift_tickets(affects_version: str, cve_id: str) -> jira.client.
             (jira.client.ResultList): a list with all the Jira tickets matching the query
     """
     server = jira.JIRA(server=SERVER_URL, token_auth=os.environ.get('JIRA_API_TOKEN'))
-    jira_tickets = server.search_issues(f"summary  ~ '{cve_id}' and component = MicroShift and affectedVersion = {affects_version}")
+    jira_tickets = server.search_issues(f'summary  ~ "{cve_id}" and component = MicroShift and affectedVersion = {affects_version}')
     if jira_tickets is None:
         raise ValueError
     if not isinstance(jira_tickets, jira.client.ResultList):
@@ -102,7 +103,7 @@ def get_report(ocp_version: str) -> dict[str, dict]:
         cve_list = advisory_info['cve']
         advisory_dict = dict()
         advisory_dict['type'] = advisory_type
-        advisory_dict['url'] = f"https://errata.devel.redhat.com/advisory/{advisory_id}"
+        advisory_dict['url'] = f'https://errata.devel.redhat.com/advisory/{advisory_id}'
         advisory_dict['cves'] = dict()
         for cve in cve_list:
             jira_tickets = search_microshift_tickets(".".join(ocp_version.split(".")[:2]), cve)
@@ -121,7 +122,7 @@ def get_report(ocp_version: str) -> dict[str, dict]:
 def main():
     if len(sys.argv) != 2:
         usage()
-        raise ValueError("Invalid number of arguments")
+        raise ValueError('Invalid number of arguments')
 
     ocp_version = str(sys.argv[1])
     result_json = get_report(ocp_version)
