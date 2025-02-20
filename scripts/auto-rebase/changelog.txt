@@ -1,3 +1,4 @@
-- cluster-kube-apiserver-operator embedded-component de2f2ac2fc9a811bd2b1db4f912c5a0092bfc3d0 to f47238554feb2fa6dbce3333adc7e26ffe2d8424
-  - ef16ba8 2025-02-11T13:55:59+00:00 increase waitForFallbackDegradedConditionTimeout
+- machine-config-operator embedded-component 4791e3c369b244caee9e490458aed4526a89302b to 4da8e68d757e78574fa3ca9ab6b0552fc9111e66
+  - 7ed831c6 2025-02-14T14:12:15+00:00 controller: add extension validation to MC validation & move extensions validation helpers into ctrlcommon
+  - 670bfb97 2024-10-22T11:43:24+00:00 render_controller: If renderedMC currently in use by MCP gets deleted, regenerate it without reconciling, since its duplicated in MCD update function
 
