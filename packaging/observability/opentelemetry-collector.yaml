@@ -10,6 +10,9 @@ receivers:
       - /var/log/pods/openshift-*
   filelog/kube-system:
     include: /var/log/pods/openshift-*
+  k8s_events:
+    auth_type: kubeConfig
+    namespaces: ["all"]
   kubeletstats:
     auth_type: tls
     ca_file: /var/lib/microshift/certs/ca-bundle/client-ca.crt
@@ -42,6 +45,7 @@ receivers:
     - microshift-etcd
     - microshift-ovs-init
     - microshift-tuned
+    - microshift-observability
     - crio
 
 processors:
@@ -83,6 +87,9 @@ service:
       receivers: [journald, filelog/kube-system, filelog/workload]
       exporters: [debug]  # Optional, enabled by default. Comment out to disable.
 #      exporters: [otlp]  # Uncomment to enable OTLP
+    logs/k8s-events:
+      receivers: [k8s_events]
+      exporters: [debug]
   telemetry:
     metrics:
       readers:

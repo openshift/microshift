@@ -544,6 +544,15 @@ func initKubeconfigs(
 	); err != nil {
 		return err
 	}
+	observabilityClientCertPEM, observabilityClientKeyPEM, err := certChains.GetCertKey("admin-kubeconfig-signer", "openshift-observability-client")
+	if err := util.KubeConfigWithClientCerts(
+		cfg.KubeConfigPath(config.ObservabilityClient),
+		cfg.ApiServer.URL,
+		internalTrustPEM,
+		observabilityClientCertPEM, observabilityClientKeyPEM,
+	); err != nil {
+		return err
+	}
 	return nil
 }
 
