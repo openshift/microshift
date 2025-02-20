@@ -1,4 +1,19 @@
-- machine-config-operator embedded-component 5ad8612aa1ba1ee240b545946e052d39311aaa7a to d1aebf38a30cc1462acc0ea173c351955ff33fc3
-  - fb86e861 2025-01-28T12:18:21-05:00 internal: use node name instead of object
-  - aff2c36e 2025-01-27T11:40:31-05:00 stamp boot images CM in syncMachineConfiguration
+- api embedded-component f5b09d13c01f3a2a4228744f87fd84066adf10d9 to da6bf56dce7bdd1f45bb8adabdfc8b76e96946e6
+  - e16f0aef 2025-02-18T10:39:49-05:00 tools: vendor depenedency updates
+  - f1e135b5 2025-02-18T10:39:15-05:00 tools: update openshift/controller-tools commit
+  - 97c40087 2025-02-13T14:06:49-05:00 Added thinProvisioned flag for data disks
+  - c9ae927b 2025-01-27T11:30:46-05:00 Promote GatewayAPI to Tech Preview
+
+- kubernetes embedded-component cc907f560ac6272d02cbcc6c97122ef098a85649 to 79a6bafe8c66e9d2fe02cd33a45a5d37519de91e
+  - 99ea4b0f5 2025-01-17T14:16:40+01:00 UPSTREAM: <carry>: fix request Host storing in openshift.io/during-graceful audit log annotation
+
+- machine-config-operator embedded-component d1aebf38a30cc1462acc0ea173c351955ff33fc3 to cc36c4fa421faf452b440a8acb8047e2f54e0da2
+  - bc97e0e8 2025-02-18T19:41:54+00:00 OpenStack afterburn-hostname depends on afterburn service
+  - d89efd5c 2025-02-18T08:58:07-03:00 Enforce VIPs to be collocated at the same host
+
+- kubernetes image-amd64 cc907f560ac6272d02cbcc6c97122ef098a85649 to 79a6bafe8c66e9d2fe02cd33a45a5d37519de91e
+  - 99ea4b0f5 2025-01-17T14:16:40+01:00 UPSTREAM: <carry>: fix request Host storing in openshift.io/during-graceful audit log annotation
+
+- kubernetes image-arm64 cc907f560ac6272d02cbcc6c97122ef098a85649 to 79a6bafe8c66e9d2fe02cd33a45a5d37519de91e
+  - 99ea4b0f5 2025-01-17T14:16:40+01:00 UPSTREAM: <carry>: fix request Host storing in openshift.io/during-graceful audit log annotation
 
