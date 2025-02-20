@@ -71,7 +71,9 @@ def search_microshift_tickets(affects_version: str, cve_id: str) -> jira.client.
             (jira.client.ResultList): a list with all the Jira tickets matching the query
     """
     server = jira.JIRA(server=SERVER_URL, token_auth=os.environ.get('JIRA_API_TOKEN'))
-    jira_tickets = server.search_issues(f'summary  ~ "{cve_id}" and component = MicroShift and affectedVersion = {affects_version}')
+    jira_tickets = server.search_issues(f'''
+        summary  ~ "{cve_id}" and component = MicroShift and (affectedVersion = {affects_version} or affectedVersion = {affects_version}.z)
+    ''')
     if jira_tickets is None:
         raise ValueError
     if not isinstance(jira_tickets, jira.client.ResultList):
