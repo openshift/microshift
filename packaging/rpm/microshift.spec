@@ -620,16 +620,6 @@ if [ $1 -eq 0 ]; then
     %selinux_modules_uninstall -s %{selinuxtype} microshift
 fi
 
-%postun observability
-# When uninstall, the package will leave behind a broken symlink at /etc/systemd/system/microshift.service.requires/
-# microshift-observability.service. If not cleaned up, systemd will still assume the requirement still exists, which
-# will prevent microshift from running.
-if [ $1 -eq 0 ]; then
-    systemctl disable --now microshift-observability.service > /dev/null 2>&1 || :
-    rm -f /etc/systemd/system/multi-user.target.wants/microshift-observability.service || :
-    systemctl daemon-reload
-fi
-
 %posttrans selinux
 
 %selinux_relabel_post -s %{selinuxtype}
@@ -657,6 +647,9 @@ fi
 
 %post observability
 %systemd_post microshift-observability.service
+
+%postun observability
+%systemd_preun microshift-observability.service
 
 %files
 %license LICENSE

@@ -34,6 +34,13 @@ Logs Should Contain Exported Log Data
     ...    \ "log records": [0-9]+\\}
     Pattern Should Appear In Log Output    ${JOURNAL_CUR}    ${pattern}    unit="microshift-observability"
 
+Logs Should Not Contain Reciever Errors
+    [Documentation]    Internal receiver errors are not treated as fatal. Typically these are due to a miconfiguration
+    ...    and thus indicate the provided default config should be reviewed.
+
+    ${pattern}   Catenate    SEPARATOR= \\s+\\{"error":.*\\}
+    Pattern Should Not Appear In Log Output    ${JOURNAL_CUR}    ${pattern}    unit="microshift-observability"
+
 
 *** Keywords ***
 Setup Suite And Set Journal Cursor

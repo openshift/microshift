@@ -12,6 +12,7 @@ const (
 	Kubelet                 KubeConfigID = "kubelet"
 	ClusterPolicyController KubeConfigID = "cluster-policy-controller"
 	RouteControllerManager  KubeConfigID = "route-controller-manager"
+	ObservabilityClient     KubeConfigID = "observability-client"
 )
 
 // KubeConfigPath returns the path to the specified kubeconfig file.
