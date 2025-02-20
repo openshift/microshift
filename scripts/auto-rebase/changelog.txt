@@ -1,12 +1,57 @@
-- api embedded-component 0a88001628266522c84e6c6c25ed5a44aced6d8b to 0cfc958f642b11b1c2020d0da9eb96daff8fb588
-  - 2d0aadb 2024-08-28T14:22:34+00:00 Added CEL to prevent vCenters from changing to unsupported config after install.
+- kubernetes embedded-component f868289cea8577c895fa957b466f209b9af6a1a2 to 75240ebc82a1963a5474049f7ab30cfd09d85cd6
+  - 8ab983400 2025-02-11T18:35:50+00:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - e25d066bf 2025-02-11T18:35:50+00:00 UPSTREAM: <drop>: manually resolve conflicts
+  - a87cd6906 2025-01-15T14:33:08+00:00 Release commit for Kubernetes v1.30.9
+  - 9c25992dc 2025-01-13T16:21:53-08:00 kubelet: use env vars in node log query PS command
+  - 198ccd5bf 2025-01-07T21:33:01+08:00 Fix kubelet on Windows fails if a pod has SecurityContext with RunAsUser.
+  - 5eafd5ece 2025-01-06T15:06:57-08:00 webhook: alter regex to account for x509sha1 GODEBUG removal
+  - be0a79c22 2024-12-30T09:16:41+01:00 Bump images, dependencies and versions to go 1.22.10 and distroless iptables
+  - f914eaea5 2024-12-20T10:04:49+03:00 Do not attempt to truncate revision history if revisionHistoryLimit is negative
+  - a0b6935b4 2024-12-18T15:17:19+01:00 fetch cni plugins from GitHub releases
+  - be8a74d95 2024-12-16T10:40:41-05:00 Fix volume expansion offline
+  - a08269ac2 2024-12-12T15:59:35+01:00 prevent unnecessary resolving of iscsi/fc devices to dm
+  - a2f210344 2024-12-10T11:45:41+00:00 Update CHANGELOG/CHANGELOG-1.30.md for v1.30.8
+  - 354eac776 2024-12-10T11:25:04+00:00 Release commit for Kubernetes v1.30.8
+  - 780ebfa49 2024-12-03T09:56:10+08:00 kubelet: Fix the volume manager did't check the device mount state in the actual state of the world before marking the volume as detached. It may cause a pod to be stuck in the Terminating state due to the above issue when it was deleted.
+  - 469dc866d 2024-11-27T13:31:42+00:00 fix isLikelyNotMountPointStatx relative path issue
+  - d51c183a5 2024-11-21T16:22:52+01:00 Bump images, dependencies and versions to go 1.22.9 and distroless iptables
+  - 976373ce2 2024-11-19T17:41:38+00:00 Update CHANGELOG/CHANGELOG-1.30.md for v1.30.7
 
-- machine-config-operator embedded-component 11006a412aba038bbddc5b3c1a8040ca1d9c8b47 to 263e1e421e9abae512ab60e443b512792965ebf2
-  - afa9f520 2025-01-31T16:06:28-05:00 controller: add extension validation to MC validation & move extensions validation helpers into ctrlcommon
+- kubernetes image-amd64 f868289cea8577c895fa957b466f209b9af6a1a2 to 75240ebc82a1963a5474049f7ab30cfd09d85cd6
+  - 8ab983400 2025-02-11T18:35:50+00:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - e25d066bf 2025-02-11T18:35:50+00:00 UPSTREAM: <drop>: manually resolve conflicts
+  - a87cd6906 2025-01-15T14:33:08+00:00 Release commit for Kubernetes v1.30.9
+  - 9c25992dc 2025-01-13T16:21:53-08:00 kubelet: use env vars in node log query PS command
+  - 198ccd5bf 2025-01-07T21:33:01+08:00 Fix kubelet on Windows fails if a pod has SecurityContext with RunAsUser.
+  - 5eafd5ece 2025-01-06T15:06:57-08:00 webhook: alter regex to account for x509sha1 GODEBUG removal
+  - be0a79c22 2024-12-30T09:16:41+01:00 Bump images, dependencies and versions to go 1.22.10 and distroless iptables
+  - f914eaea5 2024-12-20T10:04:49+03:00 Do not attempt to truncate revision history if revisionHistoryLimit is negative
+  - a0b6935b4 2024-12-18T15:17:19+01:00 fetch cni plugins from GitHub releases
+  - be8a74d95 2024-12-16T10:40:41-05:00 Fix volume expansion offline
+  - a08269ac2 2024-12-12T15:59:35+01:00 prevent unnecessary resolving of iscsi/fc devices to dm
+  - a2f210344 2024-12-10T11:45:41+00:00 Update CHANGELOG/CHANGELOG-1.30.md for v1.30.8
+  - 354eac776 2024-12-10T11:25:04+00:00 Release commit for Kubernetes v1.30.8
+  - 780ebfa49 2024-12-03T09:56:10+08:00 kubelet: Fix the volume manager did't check the device mount state in the actual state of the world before marking the volume as detached. It may cause a pod to be stuck in the Terminating state due to the above issue when it was deleted.
+  - 469dc866d 2024-11-27T13:31:42+00:00 fix isLikelyNotMountPointStatx relative path issue
+  - d51c183a5 2024-11-21T16:22:52+01:00 Bump images, dependencies and versions to go 1.22.9 and distroless iptables
+  - 976373ce2 2024-11-19T17:41:38+00:00 Update CHANGELOG/CHANGELOG-1.30.md for v1.30.7
 
-- ovn-kubernetes image-amd64 126537f0fa6a27ec33e29d14ae5725474a283278 to aa5bec3a1ac01ed11f8df4501747c993ef11f78e
-  - 685d3806 2025-01-22T17:05:12-05:00 Fixes unexpected mp0 route removal during start up
-
-- ovn-kubernetes image-arm64 126537f0fa6a27ec33e29d14ae5725474a283278 to aa5bec3a1ac01ed11f8df4501747c993ef11f78e
-  - 685d3806 2025-01-22T17:05:12-05:00 Fixes unexpected mp0 route removal during start up
+- kubernetes image-arm64 f868289cea8577c895fa957b466f209b9af6a1a2 to 75240ebc82a1963a5474049f7ab30cfd09d85cd6
+  - 8ab983400 2025-02-11T18:35:50+00:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - e25d066bf 2025-02-11T18:35:50+00:00 UPSTREAM: <drop>: manually resolve conflicts
+  - a87cd6906 2025-01-15T14:33:08+00:00 Release commit for Kubernetes v1.30.9
+  - 9c25992dc 2025-01-13T16:21:53-08:00 kubelet: use env vars in node log query PS command
+  - 198ccd5bf 2025-01-07T21:33:01+08:00 Fix kubelet on Windows fails if a pod has SecurityContext with RunAsUser.
+  - 5eafd5ece 2025-01-06T15:06:57-08:00 webhook: alter regex to account for x509sha1 GODEBUG removal
+  - be0a79c22 2024-12-30T09:16:41+01:00 Bump images, dependencies and versions to go 1.22.10 and distroless iptables
+  - f914eaea5 2024-12-20T10:04:49+03:00 Do not attempt to truncate revision history if revisionHistoryLimit is negative
+  - a0b6935b4 2024-12-18T15:17:19+01:00 fetch cni plugins from GitHub releases
+  - be8a74d95 2024-12-16T10:40:41-05:00 Fix volume expansion offline
+  - a08269ac2 2024-12-12T15:59:35+01:00 prevent unnecessary resolving of iscsi/fc devices to dm
+  - a2f210344 2024-12-10T11:45:41+00:00 Update CHANGELOG/CHANGELOG-1.30.md for v1.30.8
+  - 354eac776 2024-12-10T11:25:04+00:00 Release commit for Kubernetes v1.30.8
+  - 780ebfa49 2024-12-03T09:56:10+08:00 kubelet: Fix the volume manager did't check the device mount state in the actual state of the world before marking the volume as detached. It may cause a pod to be stuck in the Terminating state due to the above issue when it was deleted.
+  - 469dc866d 2024-11-27T13:31:42+00:00 fix isLikelyNotMountPointStatx relative path issue
+  - d51c183a5 2024-11-21T16:22:52+01:00 Bump images, dependencies and versions to go 1.22.9 and distroless iptables
+  - 976373ce2 2024-11-19T17:41:38+00:00 Update CHANGELOG/CHANGELOG-1.30.md for v1.30.7
 
