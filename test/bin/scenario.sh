@@ -158,26 +158,23 @@ sos_report() {
 
         vmname=$(basename "${vmdir}")
         ip=$(get_vm_property "${vmname}" ip)
+
+        sos_func="sos_report_for_vm"
         if [ -z "${ip}" ]; then
-            echo "Creating sos report offline"
-            if ! sos_report_for_vm_offline "${vmdir}" "${vmname}"; then
-                scenario_result=1
+            echo "Creating sos reports offline"
+            sos_func="sos_report_for_vm_offline"
+        fi
+
+        if ! "${sos_func}" "${vmdir}" "${vmname}"; then
+            scenario_result=1
+            if "${junit}"; then
+                record_junit "${vmname}" "sos-report" "FAILED"
             fi
         else
-            if ! sos_report_for_vm "${vmdir}" "${vmname}"; then
-                scenario_result=1
-            fi
-        fi
-
-        if "${junit}"; then
-            if [ "${scenario_result}" -eq "1" ]; then
-                record_junit "${vmname}" "sos-report" "FAILED"
-            else
+            if "${junit}"; then
                 record_junit "${vmname}" "sos-report" "OK"
-            fi
+            fi  
         fi
-
-
     done
     return "${scenario_result}"
 }

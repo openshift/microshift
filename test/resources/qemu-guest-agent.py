@@ -473,17 +473,16 @@ def download_files(vm_name: str, src_dir: str, dst_dir: str, pattern: str):
     :param pattern:     Pattern or filename, e.g. sosreport-*, journal.log
     :type pattern:      str
     """
-    if (not src_dir.endswith('/')):
+    if not src_dir.endswith('/'):
         src_dir = src_dir + '/'
-    if (not dst_dir.endswith('/')):
+    if not dst_dir.endswith('/'):
         dst_dir = dst_dir + '/'
 
     files = _find_files(vm_name, src_dir, pattern).splitlines()
     for file in files:
         filename = basename(file)
-        src = src_dir + filename
         dst = dst_dir + filename
-        _download_file(vm_name, src, dst)
+        _download_file(vm_name, file, dst)
 
 
 def upload_file(vm_name: str, src: str, dst: str):
@@ -519,7 +518,7 @@ def main():
     cp_to_parser.add_argument("--src", required=True, help="path to local file")
     cp_to_parser.add_argument("--dst", required=True, help="destination path on VM")
 
-    bash_parser = subparsers.add_parser("bash", help="run bash command on VM")
+    bash_parser = subparsers.add_parser("bash", help="Run bash command on VM")
     bash_parser.add_argument("--vm", required=True, help="domain name")
     bash_parser.add_argument("--args", required=True, help="arguments")
 
