@@ -1,8 +1,10 @@
 package certrotation
 
 import (
+	"github.com/google/go-cmp/cmp"
 	"github.com/openshift/api/annotations"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/klog/v2"
 )
 
 const (
@@ -25,14 +27,20 @@ func (a AdditionalAnnotations) EnsureTLSMetadataUpdate(meta *metav1.ObjectMeta) 
 		meta.Annotations = make(map[string]string)
 	}
 	if len(a.JiraComponent) > 0 && meta.Annotations[annotations.OpenShiftComponent] != a.JiraComponent {
+		diff := cmp.Diff(meta.Annotations[annotations.OpenShiftComponent], a.JiraComponent)
+		klog.V(2).Infof("Updating %q annotation for %s/%s, diff: %s", annotations.OpenShiftComponent, meta.Name, meta.Namespace, diff)
 		meta.Annotations[annotations.OpenShiftComponent] = a.JiraComponent
 		modified = true
 	}
 	if len(a.Description) > 0 && meta.Annotations[annotations.OpenShiftDescription] != a.Description {
+		diff := cmp.Diff(meta.Annotations[annotations.OpenShiftDescription], a.Description)
+		klog.V(2).Infof("Updating %q annotation for %s/%s, diff: %s", annotations.OpenShiftDescription, meta.Name, meta.Namespace, diff)
 		meta.Annotations[annotations.OpenShiftDescription] = a.Description
 		modified = true
 	}
 	if len(a.AutoRegenerateAfterOfflineExpiry) > 0 && meta.Annotations[AutoRegenerateAfterOfflineExpiryAnnotation] != a.AutoRegenerateAfterOfflineExpiry {
+		diff := cmp.Diff(meta.Annotations[AutoRegenerateAfterOfflineExpiryAnnotation], a.AutoRegenerateAfterOfflineExpiry)
+		klog.V(2).Infof("Updating %q annotation for %s/%s, diff: %s", AutoRegenerateAfterOfflineExpiryAnnotation, meta.Name, meta.Namespace, diff)
 		meta.Annotations[AutoRegenerateAfterOfflineExpiryAnnotation] = a.AutoRegenerateAfterOfflineExpiry
 		modified = true
 	}
