@@ -195,11 +195,11 @@ github.com/munnerz/goautoneg
 # github.com/mxk/go-flowrate v0.0.0-20140419014527-cca7078d478f
 ## explicit
 github.com/mxk/go-flowrate/flowrate
-# github.com/openshift/api v0.0.0-20250124212313-a770960d61e0
+# github.com/openshift/api v0.0.0-20250213010142-f5b09d13c01f
 ## explicit; go 1.23.0
 github.com/openshift/api/config/v1
 github.com/openshift/api/operator/v1
-# github.com/openshift/build-machinery-go v0.0.0-20250102153059-e85a1a7ecb5c
+# github.com/openshift/build-machinery-go v0.0.0-20250211133638-a00a772ae1a2
 ## explicit; go 1.22.0
 github.com/openshift/build-machinery-go
 github.com/openshift/build-machinery-go/make
@@ -209,7 +209,7 @@ github.com/openshift/build-machinery-go/make/targets/golang
 github.com/openshift/build-machinery-go/make/targets/openshift
 github.com/openshift/build-machinery-go/make/targets/openshift/operator
 github.com/openshift/build-machinery-go/scripts
-# github.com/openshift/library-go v0.0.0-20250127111945-0f76e23726cd
+# github.com/openshift/library-go v0.0.0-20250217144305-c917e6d528b2
 ## explicit; go 1.23.0
 github.com/openshift/library-go/pkg/crypto
 github.com/openshift/library-go/pkg/operator/apiserver/audit
@@ -451,11 +451,11 @@ go.uber.org/zap/internal/pool
 go.uber.org/zap/internal/stacktrace
 go.uber.org/zap/zapcore
 go.uber.org/zap/zapgrpc
-# golang.org/x/crypto v0.31.0
+# golang.org/x/crypto v0.33.0
 ## explicit; go 1.20
 golang.org/x/crypto/bcrypt
 golang.org/x/crypto/blowfish
-# golang.org/x/net v0.32.0
+# golang.org/x/net v0.35.0
 ## explicit; go 1.18
 golang.org/x/net/context
 golang.org/x/net/html
@@ -464,6 +464,7 @@ golang.org/x/net/http/httpguts
 golang.org/x/net/http2
 golang.org/x/net/http2/hpack
 golang.org/x/net/idna
+golang.org/x/net/internal/httpcommon
 golang.org/x/net/internal/socks
 golang.org/x/net/internal/timeseries
 golang.org/x/net/proxy
@@ -473,19 +474,19 @@ golang.org/x/net/websocket
 ## explicit; go 1.18
 golang.org/x/oauth2
 golang.org/x/oauth2/internal
-# golang.org/x/sync v0.10.0
+# golang.org/x/sync v0.11.0
 ## explicit; go 1.18
 golang.org/x/sync/errgroup
-# golang.org/x/sys v0.28.0
+# golang.org/x/sys v0.30.0
 ## explicit; go 1.18
 golang.org/x/sys/plan9
 golang.org/x/sys/unix
 golang.org/x/sys/windows
 golang.org/x/sys/windows/registry
-# golang.org/x/term v0.27.0
+# golang.org/x/term v0.29.0
 ## explicit; go 1.18
 golang.org/x/term
-# golang.org/x/text v0.21.0
+# golang.org/x/text v0.22.0
 ## explicit; go 1.18
 golang.org/x/text/encoding
 golang.org/x/text/encoding/internal
@@ -630,7 +631,7 @@ gopkg.in/natefinch/lumberjack.v2
 # gopkg.in/yaml.v3 v3.0.1
 ## explicit
 gopkg.in/yaml.v3
-# k8s.io/api v0.32.1 => github.com/openshift/kubernetes/staging/src/k8s.io/api v0.0.0-20250219035048-79a6bafe8c66
+# k8s.io/api v0.32.2 => github.com/openshift/kubernetes/staging/src/k8s.io/api v0.0.0-20250219035048-79a6bafe8c66
 ## explicit; go 1.23.0
 k8s.io/api/admission/v1
 k8s.io/api/admission/v1beta1
@@ -691,7 +692,7 @@ k8s.io/api/storage/v1
 k8s.io/api/storage/v1alpha1
 k8s.io/api/storage/v1beta1
 k8s.io/api/storagemigration/v1alpha1
-# k8s.io/apimachinery v0.32.1 => github.com/openshift/kubernetes/staging/src/k8s.io/apimachinery v0.0.0-20250219035048-79a6bafe8c66
+# k8s.io/apimachinery v0.32.2 => github.com/openshift/kubernetes/staging/src/k8s.io/apimachinery v0.0.0-20250219035048-79a6bafe8c66
 ## explicit; go 1.23.0
 k8s.io/apimachinery/pkg/api/equality
 k8s.io/apimachinery/pkg/api/errors
@@ -753,7 +754,7 @@ k8s.io/apimachinery/pkg/watch
 k8s.io/apimachinery/third_party/forked/golang/json
 k8s.io/apimachinery/third_party/forked/golang/netutil
 k8s.io/apimachinery/third_party/forked/golang/reflect
-# k8s.io/apiserver v0.32.1 => github.com/openshift/kubernetes/staging/src/k8s.io/apiserver v0.0.0-20250219035048-79a6bafe8c66
+# k8s.io/apiserver v0.32.2 => github.com/openshift/kubernetes/staging/src/k8s.io/apiserver v0.0.0-20250219035048-79a6bafe8c66
 ## explicit; go 1.23.0
 k8s.io/apiserver/pkg/apis/audit
 k8s.io/apiserver/pkg/apis/audit/v1
@@ -764,7 +765,7 @@ k8s.io/cli-runtime/pkg/genericclioptions
 k8s.io/cli-runtime/pkg/genericiooptions
 k8s.io/cli-runtime/pkg/printers
 k8s.io/cli-runtime/pkg/resource
-# k8s.io/client-go v0.32.1 => github.com/openshift/kubernetes/staging/src/k8s.io/client-go v0.0.0-20250219035048-79a6bafe8c66
+# k8s.io/client-go v0.32.2 => github.com/openshift/kubernetes/staging/src/k8s.io/client-go v0.0.0-20250219035048-79a6bafe8c66
 ## explicit; go 1.23.0
 k8s.io/client-go/applyconfigurations/admissionregistration/v1
 k8s.io/client-go/applyconfigurations/admissionregistration/v1alpha1
@@ -923,7 +924,7 @@ k8s.io/client-go/util/jsonpath
 k8s.io/client-go/util/keyutil
 k8s.io/client-go/util/watchlist
 k8s.io/client-go/util/workqueue
-# k8s.io/component-base v0.32.1 => github.com/openshift/kubernetes/staging/src/k8s.io/component-base v0.0.0-20250219035048-79a6bafe8c66
+# k8s.io/component-base v0.32.2 => github.com/openshift/kubernetes/staging/src/k8s.io/component-base v0.0.0-20250219035048-79a6bafe8c66
 ## explicit; go 1.23.0
 k8s.io/component-base/cli
 k8s.io/component-base/cli/flag
@@ -970,7 +971,7 @@ k8s.io/kubectl/pkg/util/openapi
 k8s.io/kubectl/pkg/util/templates
 k8s.io/kubectl/pkg/util/term
 k8s.io/kubectl/pkg/validation
-# k8s.io/utils v0.0.0-20241104100929-3ea5e8cea738
+# k8s.io/utils v0.0.0-20241210054802-24370beab758
 ## explicit; go 1.18
 k8s.io/utils/clock
 k8s.io/utils/clock/testing
@@ -979,8 +980,8 @@ k8s.io/utils/internal/third_party/forked/golang/net
 k8s.io/utils/net
 k8s.io/utils/pointer
 k8s.io/utils/ptr
-# sigs.k8s.io/json v0.0.0-20241010143419-9aa6b5e7a4b3
-## explicit; go 1.21
+# sigs.k8s.io/json v0.0.0-20241014173422-cfa47c3a1cc8
+## explicit; go 1.23
 sigs.k8s.io/json
 sigs.k8s.io/json/internal/golang/encoding/json
 # sigs.k8s.io/kustomize/api v0.18.0
@@ -1061,7 +1062,7 @@ sigs.k8s.io/kustomize/kyaml/yaml/internal/k8sgen/pkg/util/validation/field
 sigs.k8s.io/kustomize/kyaml/yaml/merge2
 sigs.k8s.io/kustomize/kyaml/yaml/schema
 sigs.k8s.io/kustomize/kyaml/yaml/walk
-# sigs.k8s.io/structured-merge-diff/v4 v4.4.2
+# sigs.k8s.io/structured-merge-diff/v4 v4.5.0
 ## explicit; go 1.13
 sigs.k8s.io/structured-merge-diff/v4/fieldpath
 sigs.k8s.io/structured-merge-diff/v4/merge
