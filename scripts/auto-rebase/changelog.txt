@@ -1,19 +1,80 @@
-- api embedded-component f5b09d13c01f3a2a4228744f87fd84066adf10d9 to da6bf56dce7bdd1f45bb8adabdfc8b76e96946e6
-  - e16f0aef 2025-02-18T10:39:49-05:00 tools: vendor depenedency updates
-  - f1e135b5 2025-02-18T10:39:15-05:00 tools: update openshift/controller-tools commit
-  - 97c40087 2025-02-13T14:06:49-05:00 Added thinProvisioned flag for data disks
-  - c9ae927b 2025-01-27T11:30:46-05:00 Promote GatewayAPI to Tech Preview
+- api embedded-component da6bf56dce7bdd1f45bb8adabdfc8b76e96946e6 to cfbda0b31000d72d41e6f58014adca6d9efaf060
+  - cedb0852 2025-02-18T15:35:32-06:00 review resolution
+  - d0f74a99 2025-02-18T15:24:12-06:00 featuregate for catalogd metas web api
+  - eafe808c 2025-02-18T07:29:48-05:00 CORS-3842: Add API Updates for GCP Custom API Endpoints
 
-- kubernetes embedded-component cc907f560ac6272d02cbcc6c97122ef098a85649 to 79a6bafe8c66e9d2fe02cd33a45a5d37519de91e
-  - 99ea4b0f5 2025-01-17T14:16:40+01:00 UPSTREAM: <carry>: fix request Host storing in openshift.io/during-graceful audit log annotation
+- cluster-ingress-operator embedded-component edf5e71e8b08ef23a4d8f0b3fee5630c66625967 to 26f8b0f9c9fa30ff84f08f7e1f9da87aef431891
+  - e2c66d3 2025-02-04T19:35:54+05:30 OCPBUGS-31550: Ensure SMCP and Gateway API subscription are reconciled upon deletion
 
-- machine-config-operator embedded-component d1aebf38a30cc1462acc0ea173c351955ff33fc3 to cc36c4fa421faf452b440a8acb8047e2f54e0da2
-  - bc97e0e8 2025-02-18T19:41:54+00:00 OpenStack afterburn-hostname depends on afterburn service
-  - d89efd5c 2025-02-18T08:58:07-03:00 Enforce VIPs to be collocated at the same host
+- cluster-kube-apiserver-operator embedded-component 194f646e25eb32de5c0dbbbbb35db131e8019292 to baa0b921ce57958626ac28c4f788c6a50c7e978a
+  - e32cbb3 2025-01-28T19:56:16+01:00 targetconfigcontroller: check live etcd endpoints
 
-- kubernetes image-amd64 cc907f560ac6272d02cbcc6c97122ef098a85649 to 79a6bafe8c66e9d2fe02cd33a45a5d37519de91e
-  - 99ea4b0f5 2025-01-17T14:16:40+01:00 UPSTREAM: <carry>: fix request Host storing in openshift.io/during-graceful audit log annotation
+- cluster-kube-controller-manager-operator embedded-component b067f5fef7b7af1cbce88fe49c62a8dd3ce8a3c6 to 9a7a572080a663bda581c0567e3921a99acd993e
+  - 52d2bab 2025-01-17T11:37:07+08:00 Bump TraceAll log level to v=10
 
-- kubernetes image-arm64 cc907f560ac6272d02cbcc6c97122ef098a85649 to 79a6bafe8c66e9d2fe02cd33a45a5d37519de91e
-  - 99ea4b0f5 2025-01-17T14:16:40+01:00 UPSTREAM: <carry>: fix request Host storing in openshift.io/during-graceful audit log annotation
+- cluster-openshift-controller-manager-operator embedded-component 91369d1d6c1e6196425c2f8742068c03bda1457d to 0ab30996207ada63ef2e2fd4f47aac03b0872c9a
+  - d137be4 2025-02-17T18:40:00+01:00 react to library-go changes
+  - ca70e1f 2025-02-17T17:35:07+01:00 go mod vendor
+  - db1a20e 2025-02-17T17:34:41+01:00 bump(k8s): update k8s.io/* dependencies to v1.32.2
+
+- cluster-policy-controller embedded-component f5a25728ff4391a4774bd67f9cc50ec72c96ba13 to 5cc0d0ecd3cdfe8e2fbb55bb62de7fb047b2a127
+  - 95fcf0a 2025-02-17T17:07:57+01:00 go mod vendor
+  - be6feec 2025-02-17T17:06:19+01:00 bump(k8s): update k8s.io/* dependencies to v1.32.2
+
+- machine-config-operator embedded-component cc36c4fa421faf452b440a8acb8047e2f54e0da2 to 93b5bb2c9c73ddb329e69925fca437840a1b73d2
+  - dc02fb51 2025-02-13T11:01:58-05:00 crio: Master, Worker and Arbiter /etc/crio/crio.conf.d/00-default contains runtime_root for runc
+
+- oc image-amd64 7c38ff702605a62d3218fed748c22062476d2c1c to 0b61b9029ca2f4ab3e41a2b2126c01658c4e9cce
+  - 4d19abdf 2025-02-07T10:54:44-08:00 pkg/cli/admin/upgrade: Track PodDisruptionBudget alert label
+  - 120d57db 2025-02-07T10:54:39-08:00 pkg/cli/admin/upgrade/recommend: Alert detail sections
+  - e11b84da 2025-02-07T10:46:49-08:00 pkg/cli/admin/upgrade/recommend: Initial precheck implementation
+  - 387d758a 2025-02-07T10:32:39-08:00 pkg/cli/admin/upgrade/recommend: Add a blank line after Progressing message
+  - cbc72525 2025-01-30T15:18:03+03:00 React to changes and update k8s version to 1.32.1
+  - 3a32c8e1 2025-01-30T15:08:42+03:00 Update dependencies compatible with 1.32 k8s
+  - 26ec9589 2025-01-29T09:02:59-08:00 pkg/cli/admin/upgrade/recommend/examples/4.16.27-degraded-monitoring: New test-case
+
+- ovn-kubernetes image-amd64 b608027dce7584684b6ec513a6d1dc7fe148f3de to 2e689e10bffbd7a2833be5e75a48b5311586a83d
+  - 8973f8e2 2025-02-12T20:31:37+01:00 Fix CM-EIP controller flake
+  - ce618849 2025-02-12T13:52:36+01:00 Fix Kind IPV6 deplyoment with RUN_IN_CONTAINER
+  - c07163ed 2025-02-11T10:18:17-05:00 Change dynamic_neigh_routers to false for the Interconnect topology.
+  - 359b4142 2025-02-10T21:31:37+00:00 [UDN: host isolation]: fix lint
+  - 3275d498 2025-02-10T17:20:55+01:00 [UDN: host isolation] don't return error for pods with no IPs assigned.
+  - e7b36a0b 2025-02-10T10:44:30-05:00 Add some more ExpectNoError checks to the e2e tests
+  - 1dc62cb6 2025-02-10T10:44:30-05:00 Reimplement e2epod.DeletePodWithWait to correctly handle pods that get restarted.
+  - 2d91da3d 2025-02-10T15:39:48+00:00 Enrich CNI request pod UID error with the mismatched UIDs
+  - c66c22b5 2025-02-10T12:52:33+01:00 [UDN: host isolation] Fix node event reporting.
+  - 60b5ebb4 2025-02-06T15:42:05+01:00 observability-lib/model: reduce dependencies by duplicating constants
+  - d59150a3 2025-02-06T09:20:11-05:00 Slightly fix UDN local gateway masquerade rules (and unit tests)
+  - 500dd720 2025-02-06T09:19:58-05:00 Fix some nftables checking in the unit tests
+  - 66c768f0 2025-01-27T18:20:27-05:00 Handles unspecified protocol in network policy port
+  - 7739a847 2025-01-22T20:53:25+05:30 Add e2e test to validate that egressfirewall supports DNS name in caps
+  - dd3ffe6a 2025-01-08T14:36:24+02:00 docs/multi-network-policies: Refactor to meet org template
+  - 57c979b8 2025-01-08T14:36:20+02:00 docs/multi-homing: Refactor to meet org template
+
+- oc image-arm64 7c38ff702605a62d3218fed748c22062476d2c1c to 0b61b9029ca2f4ab3e41a2b2126c01658c4e9cce
+  - 4d19abdf 2025-02-07T10:54:44-08:00 pkg/cli/admin/upgrade: Track PodDisruptionBudget alert label
+  - 120d57db 2025-02-07T10:54:39-08:00 pkg/cli/admin/upgrade/recommend: Alert detail sections
+  - e11b84da 2025-02-07T10:46:49-08:00 pkg/cli/admin/upgrade/recommend: Initial precheck implementation
+  - 387d758a 2025-02-07T10:32:39-08:00 pkg/cli/admin/upgrade/recommend: Add a blank line after Progressing message
+  - cbc72525 2025-01-30T15:18:03+03:00 React to changes and update k8s version to 1.32.1
+  - 3a32c8e1 2025-01-30T15:08:42+03:00 Update dependencies compatible with 1.32 k8s
+  - 26ec9589 2025-01-29T09:02:59-08:00 pkg/cli/admin/upgrade/recommend/examples/4.16.27-degraded-monitoring: New test-case
+
+- ovn-kubernetes image-arm64 b608027dce7584684b6ec513a6d1dc7fe148f3de to 2e689e10bffbd7a2833be5e75a48b5311586a83d
+  - 8973f8e2 2025-02-12T20:31:37+01:00 Fix CM-EIP controller flake
+  - ce618849 2025-02-12T13:52:36+01:00 Fix Kind IPV6 deplyoment with RUN_IN_CONTAINER
+  - c07163ed 2025-02-11T10:18:17-05:00 Change dynamic_neigh_routers to false for the Interconnect topology.
+  - 359b4142 2025-02-10T21:31:37+00:00 [UDN: host isolation]: fix lint
+  - 3275d498 2025-02-10T17:20:55+01:00 [UDN: host isolation] don't return error for pods with no IPs assigned.
+  - e7b36a0b 2025-02-10T10:44:30-05:00 Add some more ExpectNoError checks to the e2e tests
+  - 1dc62cb6 2025-02-10T10:44:30-05:00 Reimplement e2epod.DeletePodWithWait to correctly handle pods that get restarted.
+  - 2d91da3d 2025-02-10T15:39:48+00:00 Enrich CNI request pod UID error with the mismatched UIDs
+  - c66c22b5 2025-02-10T12:52:33+01:00 [UDN: host isolation] Fix node event reporting.
+  - 60b5ebb4 2025-02-06T15:42:05+01:00 observability-lib/model: reduce dependencies by duplicating constants
+  - d59150a3 2025-02-06T09:20:11-05:00 Slightly fix UDN local gateway masquerade rules (and unit tests)
+  - 500dd720 2025-02-06T09:19:58-05:00 Fix some nftables checking in the unit tests
+  - 66c768f0 2025-01-27T18:20:27-05:00 Handles unspecified protocol in network policy port
+  - 7739a847 2025-01-22T20:53:25+05:30 Add e2e test to validate that egressfirewall supports DNS name in caps
+  - dd3ffe6a 2025-01-08T14:36:24+02:00 docs/multi-network-policies: Refactor to meet org template
+  - 57c979b8 2025-01-08T14:36:20+02:00 docs/multi-homing: Refactor to meet org template
 
