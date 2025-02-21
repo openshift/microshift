@@ -11,13 +11,13 @@ replace (
 )
 
 require (
-	github.com/openshift/api v0.0.0-20250124212313-a770960d61e0
-	github.com/openshift/build-machinery-go v0.0.0-20250102153059-e85a1a7ecb5c
+	github.com/openshift/api v0.0.0-20250213010142-f5b09d13c01f
+	github.com/openshift/build-machinery-go v0.0.0-20250211133638-a00a772ae1a2
 	github.com/spf13/cobra v1.8.1
 	go.etcd.io/etcd/server/v3 v3.5.16
-	k8s.io/apimachinery v0.32.1
+	k8s.io/apimachinery v0.32.2
 	k8s.io/cli-runtime v0.0.0
-	k8s.io/component-base v0.32.1
+	k8s.io/component-base v0.32.2
 	k8s.io/klog/v2 v2.130.1
 	k8s.io/kubectl v0.0.0
 	sigs.k8s.io/yaml v1.4.0
@@ -32,18 +32,18 @@ require (
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.24.0 // indirect
 	github.com/klauspost/compress v1.17.11 // indirect
 	github.com/mxk/go-flowrate v0.0.0-20140419014527-cca7078d478f // indirect
-	github.com/openshift/library-go v0.0.0-20250127111945-0f76e23726cd // indirect
+	github.com/openshift/library-go v0.0.0-20250217144305-c917e6d528b2 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/vishvananda/netlink v1.3.1-0.20240905180732-b1ce50cfa9be // indirect
 	github.com/vishvananda/netns v0.0.4 // indirect
 	github.com/x448/float16 v0.8.4 // indirect
 	go.opentelemetry.io/auto/sdk v1.1.0 // indirect
 	go.opentelemetry.io/otel/metric v1.33.0 // indirect
-	golang.org/x/sync v0.10.0 // indirect
+	golang.org/x/sync v0.11.0 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20241216192217-9240e9c98484 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20241209162323-e6fa225c2576 // indirect
 	gopkg.in/evanphx/json-patch.v4 v4.12.0 // indirect
-	k8s.io/apiserver v0.32.1 // indirect
+	k8s.io/apiserver v0.32.2 // indirect
 )
 
 require (
@@ -119,12 +119,12 @@ require (
 	go.opentelemetry.io/proto/otlp v1.4.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.27.0 // indirect
-	golang.org/x/crypto v0.31.0 // indirect
-	golang.org/x/net v0.32.0 // indirect
+	golang.org/x/crypto v0.33.0 // indirect
+	golang.org/x/net v0.35.0 // indirect
 	golang.org/x/oauth2 v0.24.0 // indirect
-	golang.org/x/sys v0.28.0 // indirect
-	golang.org/x/term v0.27.0 // indirect
-	golang.org/x/text v0.21.0 // indirect
+	golang.org/x/sys v0.30.0 // indirect
+	golang.org/x/term v0.29.0 // indirect
+	golang.org/x/text v0.22.0 // indirect
 	golang.org/x/time v0.8.0 // indirect
 	google.golang.org/genproto v0.0.0-20240123012728-ef4313101c80 // indirect
 	google.golang.org/grpc v1.69.0 // indirect
@@ -132,14 +132,14 @@ require (
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
-	k8s.io/api v0.32.1 // indirect
-	k8s.io/client-go v0.32.1 // indirect
+	k8s.io/api v0.32.2 // indirect
+	k8s.io/client-go v0.32.2 // indirect
 	k8s.io/kube-openapi v0.0.0-20241105132330-32ad38e42d3f // indirect
-	k8s.io/utils v0.0.0-20241104100929-3ea5e8cea738 // indirect
-	sigs.k8s.io/json v0.0.0-20241010143419-9aa6b5e7a4b3 // indirect
+	k8s.io/utils v0.0.0-20241210054802-24370beab758 // indirect
+	sigs.k8s.io/json v0.0.0-20241014173422-cfa47c3a1cc8 // indirect
 	sigs.k8s.io/kustomize/api v0.18.0 // indirect
 	sigs.k8s.io/kustomize/kyaml v0.18.1 // indirect
-	sigs.k8s.io/structured-merge-diff/v4 v4.4.2 // indirect
+	sigs.k8s.io/structured-merge-diff/v4 v4.5.0 // indirect
 )
 
 replace (
