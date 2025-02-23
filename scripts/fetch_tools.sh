@@ -203,6 +203,28 @@ gettool_oc() {
     popd &>/dev/null
 }
 
+gettool_brew() {
+    # See https://spaces.redhat.com/display/Brew/Using+the+Brew+Prod+environment#UsingtheBrewProdenvironment-Fedora
+    if ! command -v koji &>/dev/null ; then
+        sudo dnf install -y koji
+    fi
+
+    if ! command -v brew &>/dev/null ; then
+        sudo ln -sv /usr/bin/koji /usr/bin/brew
+    fi
+
+    if [ ! -f ~/.koji/config ] ; then
+        mkdir -p ~/.koji
+        cat > ~/.koji/config <<EOF
+[brew]
+server = https://brewhub.engineering.redhat.com/brewhub
+topdir = /mnt/redhat/brewroot
+weburl = https://brewweb.engineering.redhat.com
+topurl = http://download.devel.redhat.com/brewroot
+EOF
+    fi
+}
+
 tool_getters=$(declare -F | awk '$3 ~ /^gettool_/ {print $3}' | sed 's/^gettool_//g')
 
 usage() {
