@@ -4,6 +4,10 @@ MicroShift CI uses custom images that are based on standard CentOS 9 Stream imag
 contents and a few additional tools. The image build and publishing process is
 implemented as `make` rules.
 
+> **Important:**<p>
+> The build must be run on a Red Hat CSB machine to get access to the required
+> public certificate files.
+
 Run the following command to see the available options.
 
 ```bash
