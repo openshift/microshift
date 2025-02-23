@@ -69,13 +69,13 @@ run_aws_cli() {
 
 check_contents(){
     local -r src_dir="s3://${AWS_BUCKET_NAME}/${BCH_SUBDIR}/${UNAME_M}/${TAG_SUBDIR}"
-    local -r must_contain_array=("repo\.tar$" "${VM_POOL_BASENAME}/.*\.iso$")
-    
+    local -r must_contain_array=("brew-rpms\.tar$" "repo\.tar$" "${VM_POOL_BASENAME}/.*\.iso$")
+
     echo "Checking contents of '${src_dir}'"
     local s3_stdout
-    s3_stdout=$(${AWSCLI} s3 ls "${src_dir}" --recursive) || return 1
+    s3_stdout=$("${AWSCLI}" s3 ls "${src_dir}" --recursive) || return 1
 
-    for item in "${must_contain_array[@]}"; do 
+    for item in "${must_contain_array[@]}"; do
         if ! echo "${s3_stdout}" | grep -qE "${item}";  then
             return 1
         fi
@@ -101,18 +101,22 @@ action_upload() {
     echo "Uploading ${iso_size} of ISO images to '${iso_dest}'"
     run_aws_cli s3 sync --quiet --include '*.iso' "${iso_base}" "${iso_dest}"
 
-    # Upload ostree commits
-    local -r repo_src="${src_base}/repo.tar"
-    local -r repo_dst="${dst_base}/repo.tar"
+    # Upload brew-rpms and repo archives
+    for dir in brew-rpms repo ; do
+        local pkg_src="${src_base}/${dir}.tar"
+        local pkg_dst="${dst_base}/${dir}.tar"
 
-    # Archive the repo files before the upload
-    rm -f "${repo_src}"
-    tar cf "${repo_src}" -C "${src_base}" repo
+        # Archive the files before the upload
+        rm -f "${pkg_src}"
+        tar cf "${pkg_src}" -C "${src_base}" "${dir}"
 
-    local -r repo_size="$(du -csh "${repo_src}" | awk 'END{print $1}')"
-    echo "Uploading ${repo_size} of ostree commits to '${repo_dst}'"
-    run_aws_cli s3 cp --quiet "${repo_src}" "${repo_dst}"
-    rm -f "${repo_src}"
+        local repo_size
+        repo_size="$(du -csh "${pkg_src}" | awk 'END{print $1}')"
+
+        echo "Uploading ${repo_size} of data to '${pkg_dst}'"
+        run_aws_cli s3 cp --quiet "${pkg_src}" "${pkg_dst}"
+        rm -f "${pkg_src}"
+    done
 }
 
 action_download() {
@@ -129,22 +133,25 @@ action_download() {
     local -r iso_size="$(du -csh "${iso_dest}" | awk 'END{print $1}')"
     echo "Downloaded ${iso_size} of ISO images"
 
-    # Download ostree commits
-    local -r repo_src="${src_base}/repo.tar"
-    local -r repo_dst="${dst_base}/repo.tar"
-    local -r repo_dir="${dst_base}/repo"
+    # Download brew-rpms and repo archives
+    for dir in brew-rpms repo ; do
+        local pkg_src="${src_base}/${dir}.tar"
+        local pkg_dst="${dst_base}/${dir}.tar"
+        local pkg_dir="${dst_base}/${dir}"
 
-    echo "Downloading ostree commits from '${repo_src}'"
-    rm -f "${repo_dst}"
-    run_aws_cli s3 cp --quiet "${repo_src}" "${repo_dst}"
+        echo "Downloading data from '${pkg_src}'"
+        rm -f "${pkg_dst}"
+        run_aws_cli s3 cp --quiet "${pkg_src}" "${pkg_dst}"
 
-    # Unarchive the repo files after the download
-    rm -rf "${repo_dir}"
-    tar xf "${repo_dst}" -C "${dst_base}"
-    rm -f "${repo_dst}"
+        # Unarchive the files after the download
+        rm -rf "${pkg_dir}"
+        tar xf "${pkg_dst}" -C "${dst_base}"
+        rm -f "${pkg_dst}"
 
-    local -r repo_size="$(du -csh "${repo_dir}" | awk 'END{print $1}')"
-    echo "Downloaded ${repo_size} of ostree commits"
+        local repo_size
+        repo_size="$(du -csh "${pkg_dir}" | awk 'END{print $1}')"
+        echo "Downloaded ${repo_size} of data"
+    done
 }
 
 action_verify() {
