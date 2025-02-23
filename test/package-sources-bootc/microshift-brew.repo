@@ -1,0 +1,7 @@
+[microshift-base]
+name = "MicroShift {{ .Env.BREW_REPO }} Repo"
+baseurl = file:///tmp/{{ path.Base .Env.BREW_REPO }}/
+enabled = 1
+gpgcheck = 0
+sslverify = 0
+skip_if_unavailable = 0
