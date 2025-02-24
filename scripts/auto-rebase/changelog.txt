@@ -1,4 +1,0 @@
-- machine-config-operator embedded-component 4791e3c369b244caee9e490458aed4526a89302b to 4da8e68d757e78574fa3ca9ab6b0552fc9111e66
-  - 7ed831c6 2025-02-14T14:12:15+00:00 controller: add extension validation to MC validation & move extensions validation helpers into ctrlcommon
-  - 670bfb97 2024-10-22T11:43:24+00:00 render_controller: If renderedMC currently in use by MCP gets deleted, regenerate it without reconciling, since its duplicated in MCD update function
-
