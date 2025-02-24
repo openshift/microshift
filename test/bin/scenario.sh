@@ -35,8 +35,11 @@ TEST_EXECUTION_TIMEOUT="30m" # may be overriden in scenario file
 SUBSCRIPTION_MANAGER_PLUGIN="${SUBSCRIPTION_MANAGER_PLUGIN:-${SCRIPTDIR}/subscription_manager_register.sh}"  # may be overridden in global settings file
 
 full_vm_name() {
-    local base="${1}"
-    echo "${SCENARIO//@/-}-${base}"
+    local -r base="${1}"
+    local -r type="$(get_scenario_type_from_path "${SCENARIO_SCRIPT}")"
+    # Add a type suffix to the name to allow running scenarios from different
+    # build types on the same hypervisor
+    echo "${SCENARIO//@/-}-${type}-${base}"
 }
 
 # hostname validation
@@ -541,7 +544,7 @@ launch_vm() {
     local -r full_vmname="$(full_vm_name "${vmname}")"
     local -r kickstart_url="${WEB_SERVER_URL}/scenario-info/${SCENARIO}/vms/${vmname}/kickstart.ks"
 
-    local -r vm_pool_name="${VM_POOL_BASENAME}-${SCENARIO}"
+    local -r vm_pool_name="${VM_POOL_BASENAME}-${full_vmname}"
     local -r vm_pool_dir="${VM_DISK_BASEDIR}/${vm_pool_name}"
 
     # See if the VM already exists
@@ -762,7 +765,7 @@ remove_vm() {
 
     # Remove the VM storage pool
     if ! ${keep_pool} ; then
-        local -r vm_pool_name="${VM_POOL_BASENAME}-${SCENARIO}"
+        local -r vm_pool_name="${VM_POOL_BASENAME}-$(full_vmname)"
         if sudo virsh pool-info "${vm_pool_name}" &>/dev/null; then
             sudo virsh pool-destroy "${vm_pool_name}"
             sudo virsh pool-undefine "${vm_pool_name}"

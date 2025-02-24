@@ -87,14 +87,6 @@ export BOOTC_ISO_DIR="${IMAGEDIR}/bootc-iso-images"
 # shellcheck disable=SC2034  # used elsewhere
 SCENARIO_INFO_DIR="${SCENARIO_INFO_DIR:-${IMAGEDIR}/scenario-info}"
 
-# Directory to crawl for scenarios when creating/running in batch mode.
-# The CI system will override this depending on the job its running.
-SCENARIO_SOURCES="${SCENARIO_SOURCES:-${TESTDIR}/scenarios}"
-
-# Directory where all the scenarios will be copied for execution
-# shellcheck disable=SC2034  # used elsewhere
-SCENARIOS_TO_RUN="${OUTPUTDIR}/scenarios-to-run"
-
 # Exclude CNCF Conformance tests from execution. These tests run
 # in serial mode and they need a significant amount of time to
 # complete. Setting this variable to true will exclude them from
@@ -248,3 +240,24 @@ if [ -f "${DEV_OVERRIDES}" ]; then
     # shellcheck disable=SC1090
     source "${DEV_OVERRIDES}"
 fi
+
+# Return a scenario type based on its original path name
+get_scenario_type_from_path() {
+    local type
+
+    case "${1}" in
+    */scenarios/*|*/scenarios-ostree/*)
+        type="ostree"
+        ;;
+    */scenarios-bootc/*)
+        type="bootc"
+        ;;
+    */scenarios-bootc-containers/*)
+        type="bootc-containers"
+        ;;
+    *)
+        type="unknown"
+        ;;
+    esac
+    echo "${type}"
+}
