@@ -143,32 +143,32 @@ Deploy MicroShift Without CSI Snapshotter
     ...    Remove Storage Drop In Config
     ...    Restart MicroShift
 
-# Custom TLS 1_2 configuration
-#    [Documentation]    Configure a custom cipher suite using TLSv1.2 as min version and verify it is used
-#    [Setup]    Setup TLS Configuration    ${TLS_12_CUSTOM_CIPHER}
+Custom TLS 1_2 configuration
+    [Documentation]    Configure a custom cipher suite using TLSv1.2 as min version and verify it is used
+    [Setup]    Setup TLS Configuration    ${TLS_12_CUSTOM_CIPHER}
 
-#    ${config}=    Show Config    effective
-#    Should Be Equal    ${config.apiServer.tls.minVersion}    VersionTLS12
-#    Length Should Be    ${config.apiServer.tls.cipherSuites}    2
-#    Should Contain    ${config.apiServer.tls.cipherSuites}    TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256
-#    Should Contain    ${config.apiServer.tls.cipherSuites}    TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+    ${config}=    Show Config    effective
+    Should Be Equal    ${config.apiServer.tls.minVersion}    VersionTLS12
+    Length Should Be    ${config.apiServer.tls.cipherSuites}    2
+    Should Contain    ${config.apiServer.tls.cipherSuites}    TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256
+    Should Contain    ${config.apiServer.tls.cipherSuites}    TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
 
-#    # on TLSv1.2, openssl ciphers string codes (defined by IANA) does not excatly match openshift ones
-#    # custom cipher defined for this test
-#    Check TLS Endpoints    0    TLSv1.2    ECDHE-RSA-CHACHA20-POLY1305    # TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256
-#    Check TLS Endpoints    1    TLSv1.3    ECDHE-RSA-CHACHA20-POLY1305    # TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256
+    # on TLSv1.2, openssl ciphers string codes (defined by IANA) does not excatly match openshift ones
+    # custom cipher defined for this test
+    Check TLS Endpoints    0    TLSv1.2    ECDHE-RSA-CHACHA20-POLY1305    # TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256
+    Check TLS Endpoints    1    TLSv1.3    ECDHE-RSA-CHACHA20-POLY1305    # TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256
 
-#    # mandatory cipher needed for internal enpoints (i.e. etcd), set if not defined by the user
-#    Check TLS Endpoints    0    TLSv1.2    ECDHE-RSA-AES128-GCM-SHA256    # TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-#    Check TLS Endpoints    1    TLSv1.3    ECDHE-RSA-AES128-GCM-SHA256    # TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+    # mandatory cipher needed for internal enpoints (i.e. etcd), set if not defined by the user
+    Check TLS Endpoints    0    TLSv1.2    ECDHE-RSA-AES128-GCM-SHA256    # TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+    Check TLS Endpoints    1    TLSv1.3    ECDHE-RSA-AES128-GCM-SHA256    # TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
 
-#    # when TLSv1.2 is set as min version, TLSv1.3 must also work
-#    Check TLS Endpoints    1    TLSv1.2    TLS_AES_128_GCM_SHA256
-#    Check TLS Endpoints    0    TLSv1.3    TLS_AES_128_GCM_SHA256
+    # when TLSv1.2 is set as min version, TLSv1.3 must also work
+    Check TLS Endpoints    1    TLSv1.2    TLS_AES_128_GCM_SHA256
+    Check TLS Endpoints    0    TLSv1.3    TLS_AES_128_GCM_SHA256
 
-#    [Teardown]    Run Keywords
-#    ...    Remove TLS Drop In Config
-#    ...    Restart MicroShift
+    [Teardown]    Run Keywords
+    ...    Remove TLS Drop In Config
+    ...    Restart MicroShift
 
 Custom TLS 1_3 configuration
     [Documentation]    Configure API server to use TLSv1.3 as min version and verify only that version works
