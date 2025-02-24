@@ -1,3 +1,0 @@
-- machine-config-operator embedded-component caedf7e7dacfd1bded0e93b430d6dba7aecf92df to e999361cfc7c83c2ffe30a1b64443083da5fccf1
-  - 6d19b7e7 2025-02-12T13:28:56+00:00 node controller: clarify when 'maxUnavailible' is invalid in alert
-
