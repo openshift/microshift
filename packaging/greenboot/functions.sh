@@ -152,6 +152,14 @@ function create_fail_marker_and_exit() {
     exit 1
 }
 
+# Clear fail marker
+function clear_fail_marker() {
+    if [ -f "${MICROSHIFT_GREENBOOT_FAIL_MARKER}" ]; then
+        >&2 echo "'${MICROSHIFT_GREENBOOT_FAIL_MARKER}' file exists - removing"
+        rm -f "${MICROSHIFT_GREENBOOT_FAIL_MARKER}"
+    fi
+}
+
 # Run a command with a second delay until it returns a zero exit status
 #
 # arg1: Time in seconds to wait for a command to succeed
