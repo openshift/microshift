@@ -10,6 +10,16 @@ import jira
 import yaml
 
 SERVER_URL = 'https://issues.redhat.com/'
+JIRA_API_TOKEN = os.environ.get('JIRA_API_TOKEN')
+
+
+def usage():
+    print("""\
+        usage: advisory_publication_report.py OCP_VERSION
+
+        arguments:
+            OCP_VERSION: The OCP versions to analyse if MicroShift version should be published. Format: "4.X.Z"\
+    """)
 
 
 def get_advisories(ocp_version: str) -> dict[str, int]:
@@ -20,7 +30,6 @@ def get_advisories(ocp_version: str) -> dict[str, int]:
         Returns:
             (dict): advisory dict with type and id
     """
-    # Suppress only InsecureRequestWarning
     urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
     try:
@@ -29,10 +38,10 @@ def get_advisories(ocp_version: str) -> dict[str, int]:
         request.raise_for_status()
     except requests.exceptions.HTTPError as err:
         raise SystemExit(err)
-    result = yaml.load(str(request.text), Loader=yaml.SafeLoader)
+    releases_dict = yaml.load(str(request.text), Loader=yaml.SafeLoader)
 
-    if ocp_version in result['releases']:
-        return result['releases'][ocp_version]['assembly']['group']['advisories']
+    if ocp_version in releases_dict['releases']:
+        return releases_dict['releases'][ocp_version]['assembly']['group']['advisories']
     else:
         raise KeyError(f"{ocp_version} OCP version does NOT exist")
 
@@ -52,8 +61,8 @@ def get_advisory_info(advisory_id: int) -> dict[str, str]:
         request.raise_for_status()
     except requests.exceptions.HTTPError as err:
         raise SystemExit(err)
-
     advisory_info = json.loads(request.text)
+
     if advisory_info is None:
         raise ValueError
     if not isinstance(advisory_info, dict):
@@ -70,24 +79,14 @@ def search_microshift_tickets(affects_version: str, cve_id: str) -> jira.client.
         Returns:
             (jira.client.ResultList): a list with all the Jira tickets matching the query
     """
-    server = jira.JIRA(server=SERVER_URL, token_auth=os.environ.get('JIRA_API_TOKEN'))
+    server = jira.JIRA(server=SERVER_URL, token_auth=JIRA_API_TOKEN)
     jira_tickets = server.search_issues(f'''
         summary  ~ "{cve_id}" and component = MicroShift and (affectedVersion = {affects_version} or affectedVersion = {affects_version}.z)
     ''')
-    if jira_tickets is None:
-        raise ValueError
+
     if not isinstance(jira_tickets, jira.client.ResultList):
         raise TypeError
     return jira_tickets
-
-
-def usage():
-    print("""\
-        usage: advisory_publication_report.py OCP_VERSION
-
-        arguments:
-            OCP_VERSION: The OCP versions to analyse if MicroShift version should be published. Format: "4.X.Z"\
-    """)
 
 
 def get_report(ocp_version: str) -> dict[str, dict]:
@@ -125,6 +124,9 @@ def main():
     if len(sys.argv) != 2:
         usage()
         raise ValueError('Invalid number of arguments')
+
+    if JIRA_API_TOKEN is None:
+        raise ValueError('JIRA_API_TOKEN var not found in the env')
 
     ocp_version = str(sys.argv[1])
     result_json = get_report(ocp_version)
