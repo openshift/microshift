@@ -564,6 +564,10 @@ func (c *Config) validate() error {
 		return fmt.Errorf("error validating apiServer.tls: %v", err)
 	}
 
+	if err := c.Telemetry.validate(); err != nil {
+		return fmt.Errorf("error validating telemetry: %v", err)
+	}
+
 	return nil
 }
 
