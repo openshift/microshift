@@ -143,7 +143,7 @@ if [ $# -gt 0 ] && [ "$1" = "-update_cache" ] ; then
     if ${HAS_CACHE_ACCESS} ; then
         # Re-build from source before updating the cache because some
         # build artifacts may be cached
-        $(dry_run) env WITH_FLANNEL=1 bash -x ./bin/build_rpms.sh
+        $(dry_run) bash -x ./bin/build_rpms.sh
 
         update_build_cache
     else
@@ -163,7 +163,7 @@ else
 
     # Re-build from source after downloading the cache because
     # the build may depend on some cached artifacts
-    $(dry_run) env WITH_FLANNEL=1 bash -x ./bin/build_rpms.sh
+    $(dry_run) bash -x ./bin/build_rpms.sh
 
     # Optionally run bootc image builds
     if ${COMPOSER_CLI_BUILDS} ; then
