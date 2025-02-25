@@ -107,6 +107,8 @@ if [ "$(id -u)" -ne 0 ] ; then
     exit 1
 fi
 
+clear_fail_marker
+
 echo "STARTED"
 
 # Print the boot variable status
