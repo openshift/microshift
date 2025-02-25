@@ -94,14 +94,38 @@ make_repo() {
 
     # Create the local RPM repository for whatever was built from source.
     echo "Copying RPMs from ${builddir} to ${repodir}"
-    # shellcheck disable=SC2086  # no quotes for command arguments to allow word splitting
-    cp -R ${builddir}/{RPMS,SPECS,SRPMS} "${repodir}/"
+    if [ -d "${builddir}" ] ; then
+        find "${builddir}" -name \*.rpm -exec cp -R "{}" "${repodir}/" \;
+    else
+        echo "WARNING: The '${builddir}' directory does not exist, skipping"
+    fi
 
     createrepo "${repodir}"
 
     echo "Fixing permissions of RPM repo contents"
     find "${repodir}" -type f -exec chmod a+r  {} \;
     find "${repodir}" -type d -exec chmod a+rx {} \;
+}
+
+# Note: Brew RPM download requires a VPN connection.
+#
+# The brew RPMs are part of the CI cache. If access to VPN is not available and
+# the cached artifacts are not present locally, an empty brew source directory
+# is created so that other procedures do not fail.
+download_brew_rpms() {
+    mkdir -p "${BREW_RPM_SOURCE}"
+    if "${SCRIPTDIR}/manage_brew_rpms.sh" access ; then
+        # shellcheck source=test/bin/common_versions.sh
+        source "${SCRIPTDIR}/common_versions.sh"
+        # Delete the old RPMs before the download
+        echo "Cleaning up old brew downloads"
+        rm -rf "${BREW_RPM_SOURCE}"
+        # Run the download procedure
+        bash -x "${SCRIPTDIR}/../../scripts/fetch_tools.sh" brew
+        bash -x "${SCRIPTDIR}/manage_brew_rpms.sh" download "4.${MINOR_VERSION}" "${BREW_RPM_SOURCE}"
+    else
+        echo "WARNING: The Brew Hub site is not accessible, skipping the download"
+    fi
 }
 
 create_local_repo() {
@@ -111,12 +135,16 @@ create_local_repo() {
     make_repo "${LOCAL_REPO}" "${RPM_SOURCE}"
     make_repo "${NEXT_REPO}" "${NEXT_RPM_SOURCE}"
     make_repo "${BASE_REPO}" "${BASE_RPM_SOURCE}"
-    
-    # Force recreation of dnf cache after rebuilding the repositories
+    make_repo "${BREW_REPO}" "${BREW_RPM_SOURCE}/${UNAME_M}"
+
+    # Force recreation of dnf caches after rebuilding the repositories
     sudo dnf clean all
+         dnf clean all
 }
 
-
+#
+# Main
+#
 build_rpms
-
+download_brew_rpms
 create_local_repo

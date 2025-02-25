@@ -126,9 +126,6 @@ cd "${ROOTDIR}/test/"
 # shellcheck source=test/bin/common.sh
 source "${SCRIPTDIR}/common.sh"
 
-# Re-build from source.
-$(dry_run) bash -x ./bin/build_rpms.sh
-
 if ${COMPOSER_CLI_BUILDS} ; then
     # Determine and create the ideal number of workers
     $(dry_run) bash -x ./bin/manage_composer_config.sh create-workers
@@ -144,6 +141,10 @@ fi
 # Check the build mode: "try using cache" (default) or "update cache"
 if [ $# -gt 0 ] && [ "$1" = "-update_cache" ] ; then
     if ${HAS_CACHE_ACCESS} ; then
+        # Re-build from source before updating the cache because some
+        # build artifacts may be cached
+        $(dry_run) bash -x ./bin/build_rpms.sh
+
         update_build_cache
     else
         echo "ERROR: Access to the build cache is not available"
@@ -159,6 +160,10 @@ else
     if ! ${GOT_CACHED_DATA} ; then
         echo "WARNING: Build cache is not available, rebuilding all the artifacts"
     fi
+
+    # Re-build from source after downloading the cache because
+    # the build may depend on some cached artifacts
+    $(dry_run) bash -x ./bin/build_rpms.sh
 
     # Optionally run bootc image builds
     if ${COMPOSER_CLI_BUILDS} ; then

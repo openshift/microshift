@@ -4,12 +4,18 @@ FROM ${BASE_IMAGE_URL}:${BASE_IMAGE_TAG}
 
 # Allow dnf command override to operate in minimal images, etc.
 ARG DNF=dnf
+# Public certificate required for accessing the brew server site
+ARG BREW_CERT
 
 # Install brew and other dependencies
 RUN ${DNF} upgrade -y && \
     ${DNF} install -y epel-release && \
-    ${DNF} install -y koji git golang && \
+    ${DNF} install -y koji git golang jq && \
     ${DNF} clean all
+
+# Install the brew certificate
+RUN echo "${BREW_CERT}" > /etc/pki/ca-trust/source/anchors/brew-server.pem && \
+    update-ca-trust
 
 # Configure brew and create top-level source directory
 RUN ln -sv /usr/bin/koji /usr/bin/brew && \

@@ -56,6 +56,10 @@ NEXT_RPM_SOURCE="${OUTPUTDIR}/rpmbuild-fake-next-minor"
 # shellcheck disable=SC2034  # used elsewhere
 BASE_RPM_SOURCE="${OUTPUTDIR}/rpmbuild-base"
 
+# Location of RPM packages downloaded from brew
+# shellcheck disable=SC2034  # used elsewhere
+BREW_RPM_SOURCE="${IMAGEDIR}/brew-rpms"
+
 # Location of local repository used by composer
 export LOCAL_REPO="${IMAGEDIR}/rpm-repos/microshift-local"
 
@@ -64,6 +68,9 @@ export NEXT_REPO="${IMAGEDIR}/rpm-repos/microshift-fake-next-minor"
 
 # Location of local repository used by composer
 export BASE_REPO="${IMAGEDIR}/rpm-repos/microshift-base"
+
+# Location of local repository used by composer
+export BREW_REPO="${IMAGEDIR}/rpm-repos/microshift-brew"
 
 # Location of container images list for all the built images
 export CONTAINER_LIST="${IMAGEDIR}/container-images-list"
