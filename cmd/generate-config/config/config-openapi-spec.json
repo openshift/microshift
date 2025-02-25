@@ -10,7 +10,8 @@
     "manifests",
     "network",
     "node",
-    "storage"
+    "storage",
+    "telemetry"
   ],
   "properties": {
     "apiServer": {
@@ -455,6 +456,25 @@
           "example": [
             "snapshot-controller"
           ]
+        }
+      }
+    },
+    "telemetry": {
+      "type": "object",
+      "required": [
+        "endpoint",
+        "status"
+      ],
+      "properties": {
+        "endpoint": {
+          "description": "Endpoint where to send telemetry data.",
+          "type": "string",
+          "default": "https://infogw.api.openshift.com"
+        },
+        "status": {
+          "description": "Telemetry status, which can be Enabled or Disabled. Defaults to Enabled.",
+          "type": "string",
+          "default": "Enabled"
         }
       }
     }

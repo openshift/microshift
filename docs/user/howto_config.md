@@ -69,6 +69,9 @@ node:
 storage:
     driver: ""
     optionalCsiComponents: []
+telemetry:
+    endpoint: ""
+    status: ""
 
 ```
 <!---
@@ -151,6 +154,9 @@ node:
 storage:
     driver: ""
     optionalCsiComponents: []
+telemetry:
+    endpoint: https://infogw.api.openshift.com
+    status: Enabled
 
 ```
 <!---

@@ -18,6 +18,7 @@ type Telemetry struct {
 	Status TelemetryStatusEnum `json:"status"`
 
 	// Endpoint where to send telemetry data.
+	// +kubebuilder:default="https://infogw.api.openshift.com"
 	Endpoint string `json:"endpoint"`
 }
 
