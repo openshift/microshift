@@ -1,80 +1,38 @@
-- api embedded-component da6bf56dce7bdd1f45bb8adabdfc8b76e96946e6 to cfbda0b31000d72d41e6f58014adca6d9efaf060
-  - cedb0852 2025-02-18T15:35:32-06:00 review resolution
-  - d0f74a99 2025-02-18T15:24:12-06:00 featuregate for catalogd metas web api
-  - eafe808c 2025-02-18T07:29:48-05:00 CORS-3842: Add API Updates for GCP Custom API Endpoints
+- oc image-arm64 0b61b9029ca2f4ab3e41a2b2126c01658c4e9cce to a7e8def99f63040840bc41427f4d1947f9d555bd
+  - 6e2d3bea 2025-02-19T20:50:40-05:00 trt-1995: Update Unconditional Feature Gate Notation
+  - 1ed9bf7b 2025-02-19T14:57:39+05:30 fix suggestions
+  - 4df16fe7 2025-02-13T17:39:04+05:30 add % and improve message
 
-- cluster-ingress-operator embedded-component edf5e71e8b08ef23a4d8f0b3fee5630c66625967 to 26f8b0f9c9fa30ff84f08f7e1f9da87aef431891
-  - e2c66d3 2025-02-04T19:35:54+05:30 OCPBUGS-31550: Ensure SMCP and Gateway API subscription are reconciled upon deletion
+- router image-arm64 b447c4d27d38a6c5f6ce2d5ceda88dbc9b90c661 to b41f9d05467fb7b3f6c2dafa6ac4b5e25164c0b6
+  - f0926cb 2025-01-21T18:10:34+08:00 Enhance func:parseIPList to handle mixed validity IP list.
+  - b92f3e2 2024-12-06T02:56:49+00:00 Updating openshift-enterprise-haproxy-router-container image to be consistent with ART for 4.19 Reconciling with https://github.com/openshift/ocp-build-data/tree/a39508c86497b4e5e463d7b2c78e51e577be9e7d/images/openshift-enterprise-haproxy-router.yml
+  - 13fd919 2024-12-05T19:59:01+00:00 Updating ose-haproxy-router-base-container image to be consistent with ART for 4.19 Reconciling with https://github.com/openshift/ocp-build-data/tree/a39508c86497b4e5e463d7b2c78e51e577be9e7d/images/ose-haproxy-router-base.yml
 
-- cluster-kube-apiserver-operator embedded-component 194f646e25eb32de5c0dbbbbb35db131e8019292 to baa0b921ce57958626ac28c4f788c6a50c7e978a
-  - e32cbb3 2025-01-28T19:56:16+01:00 targetconfigcontroller: check live etcd endpoints
+- kube-rbac-proxy image-arm64 23f96a23777c1b5fcdb587602c156903c32fe52c to 591277560f328601273f88f2881e09ccccd90a97
+  - 43c58c7 2025-02-24T11:52:55+00:00 go*: update go version
+  - 1040c44 2025-02-24T08:18:40+00:00 vendor: bump
+  - 56b9dd8 2025-02-24T08:18:39+00:00 *: cut release v0.19.0
+  - 35afcb9 2025-02-24T08:18:24+00:00 go*: bump deps
+  - 7a6f5ff 2025-02-24T08:17:05+00:00 build(deps): bump golang.org/x/crypto from 0.29.0 to 0.31.0
+  - 94f18c5 2025-02-24T08:17:05+00:00 pkg/authn: OIDC authenticator defaults to using host's root CA pool if CA file is not provided
+  - 3d4e894 2024-12-03T21:02:07+00:00 Updating kube-rbac-proxy-container image to be consistent with ART for 4.19 Reconciling with https://github.com/openshift/ocp-build-data/tree/2ea3e6158c93ca104b9d59fd58a71536fa01fb2d/images/kube-rbac-proxy.yml
 
-- cluster-kube-controller-manager-operator embedded-component b067f5fef7b7af1cbce88fe49c62a8dd3ce8a3c6 to 9a7a572080a663bda581c0567e3921a99acd993e
-  - 52d2bab 2025-01-17T11:37:07+08:00 Bump TraceAll log level to v=10
-
-- cluster-openshift-controller-manager-operator embedded-component 91369d1d6c1e6196425c2f8742068c03bda1457d to 0ab30996207ada63ef2e2fd4f47aac03b0872c9a
-  - d137be4 2025-02-17T18:40:00+01:00 react to library-go changes
-  - ca70e1f 2025-02-17T17:35:07+01:00 go mod vendor
-  - db1a20e 2025-02-17T17:34:41+01:00 bump(k8s): update k8s.io/* dependencies to v1.32.2
-
-- cluster-policy-controller embedded-component f5a25728ff4391a4774bd67f9cc50ec72c96ba13 to 5cc0d0ecd3cdfe8e2fbb55bb62de7fb047b2a127
-  - 95fcf0a 2025-02-17T17:07:57+01:00 go mod vendor
-  - be6feec 2025-02-17T17:06:19+01:00 bump(k8s): update k8s.io/* dependencies to v1.32.2
-
-- machine-config-operator embedded-component cc36c4fa421faf452b440a8acb8047e2f54e0da2 to 93b5bb2c9c73ddb329e69925fca437840a1b73d2
-  - dc02fb51 2025-02-13T11:01:58-05:00 crio: Master, Worker and Arbiter /etc/crio/crio.conf.d/00-default contains runtime_root for runc
-
-- oc image-amd64 7c38ff702605a62d3218fed748c22062476d2c1c to 0b61b9029ca2f4ab3e41a2b2126c01658c4e9cce
-  - 4d19abdf 2025-02-07T10:54:44-08:00 pkg/cli/admin/upgrade: Track PodDisruptionBudget alert label
-  - 120d57db 2025-02-07T10:54:39-08:00 pkg/cli/admin/upgrade/recommend: Alert detail sections
-  - e11b84da 2025-02-07T10:46:49-08:00 pkg/cli/admin/upgrade/recommend: Initial precheck implementation
-  - 387d758a 2025-02-07T10:32:39-08:00 pkg/cli/admin/upgrade/recommend: Add a blank line after Progressing message
-  - cbc72525 2025-01-30T15:18:03+03:00 React to changes and update k8s version to 1.32.1
-  - 3a32c8e1 2025-01-30T15:08:42+03:00 Update dependencies compatible with 1.32 k8s
-  - 26ec9589 2025-01-29T09:02:59-08:00 pkg/cli/admin/upgrade/recommend/examples/4.16.27-degraded-monitoring: New test-case
-
-- ovn-kubernetes image-amd64 b608027dce7584684b6ec513a6d1dc7fe148f3de to 2e689e10bffbd7a2833be5e75a48b5311586a83d
-  - 8973f8e2 2025-02-12T20:31:37+01:00 Fix CM-EIP controller flake
-  - ce618849 2025-02-12T13:52:36+01:00 Fix Kind IPV6 deplyoment with RUN_IN_CONTAINER
-  - c07163ed 2025-02-11T10:18:17-05:00 Change dynamic_neigh_routers to false for the Interconnect topology.
-  - 359b4142 2025-02-10T21:31:37+00:00 [UDN: host isolation]: fix lint
-  - 3275d498 2025-02-10T17:20:55+01:00 [UDN: host isolation] don't return error for pods with no IPs assigned.
-  - e7b36a0b 2025-02-10T10:44:30-05:00 Add some more ExpectNoError checks to the e2e tests
-  - 1dc62cb6 2025-02-10T10:44:30-05:00 Reimplement e2epod.DeletePodWithWait to correctly handle pods that get restarted.
-  - 2d91da3d 2025-02-10T15:39:48+00:00 Enrich CNI request pod UID error with the mismatched UIDs
-  - c66c22b5 2025-02-10T12:52:33+01:00 [UDN: host isolation] Fix node event reporting.
-  - 60b5ebb4 2025-02-06T15:42:05+01:00 observability-lib/model: reduce dependencies by duplicating constants
-  - d59150a3 2025-02-06T09:20:11-05:00 Slightly fix UDN local gateway masquerade rules (and unit tests)
-  - 500dd720 2025-02-06T09:19:58-05:00 Fix some nftables checking in the unit tests
-  - 66c768f0 2025-01-27T18:20:27-05:00 Handles unspecified protocol in network policy port
-  - 7739a847 2025-01-22T20:53:25+05:30 Add e2e test to validate that egressfirewall supports DNS name in caps
-  - dd3ffe6a 2025-01-08T14:36:24+02:00 docs/multi-network-policies: Refactor to meet org template
-  - 57c979b8 2025-01-08T14:36:20+02:00 docs/multi-homing: Refactor to meet org template
-
-- oc image-arm64 7c38ff702605a62d3218fed748c22062476d2c1c to 0b61b9029ca2f4ab3e41a2b2126c01658c4e9cce
-  - 4d19abdf 2025-02-07T10:54:44-08:00 pkg/cli/admin/upgrade: Track PodDisruptionBudget alert label
-  - 120d57db 2025-02-07T10:54:39-08:00 pkg/cli/admin/upgrade/recommend: Alert detail sections
-  - e11b84da 2025-02-07T10:46:49-08:00 pkg/cli/admin/upgrade/recommend: Initial precheck implementation
-  - 387d758a 2025-02-07T10:32:39-08:00 pkg/cli/admin/upgrade/recommend: Add a blank line after Progressing message
-  - cbc72525 2025-01-30T15:18:03+03:00 React to changes and update k8s version to 1.32.1
-  - 3a32c8e1 2025-01-30T15:08:42+03:00 Update dependencies compatible with 1.32 k8s
-  - 26ec9589 2025-01-29T09:02:59-08:00 pkg/cli/admin/upgrade/recommend/examples/4.16.27-degraded-monitoring: New test-case
-
-- ovn-kubernetes image-arm64 b608027dce7584684b6ec513a6d1dc7fe148f3de to 2e689e10bffbd7a2833be5e75a48b5311586a83d
-  - 8973f8e2 2025-02-12T20:31:37+01:00 Fix CM-EIP controller flake
-  - ce618849 2025-02-12T13:52:36+01:00 Fix Kind IPV6 deplyoment with RUN_IN_CONTAINER
-  - c07163ed 2025-02-11T10:18:17-05:00 Change dynamic_neigh_routers to false for the Interconnect topology.
-  - 359b4142 2025-02-10T21:31:37+00:00 [UDN: host isolation]: fix lint
-  - 3275d498 2025-02-10T17:20:55+01:00 [UDN: host isolation] don't return error for pods with no IPs assigned.
-  - e7b36a0b 2025-02-10T10:44:30-05:00 Add some more ExpectNoError checks to the e2e tests
-  - 1dc62cb6 2025-02-10T10:44:30-05:00 Reimplement e2epod.DeletePodWithWait to correctly handle pods that get restarted.
-  - 2d91da3d 2025-02-10T15:39:48+00:00 Enrich CNI request pod UID error with the mismatched UIDs
-  - c66c22b5 2025-02-10T12:52:33+01:00 [UDN: host isolation] Fix node event reporting.
-  - 60b5ebb4 2025-02-06T15:42:05+01:00 observability-lib/model: reduce dependencies by duplicating constants
-  - d59150a3 2025-02-06T09:20:11-05:00 Slightly fix UDN local gateway masquerade rules (and unit tests)
-  - 500dd720 2025-02-06T09:19:58-05:00 Fix some nftables checking in the unit tests
-  - 66c768f0 2025-01-27T18:20:27-05:00 Handles unspecified protocol in network policy port
-  - 7739a847 2025-01-22T20:53:25+05:30 Add e2e test to validate that egressfirewall supports DNS name in caps
-  - dd3ffe6a 2025-01-08T14:36:24+02:00 docs/multi-network-policies: Refactor to meet org template
-  - 57c979b8 2025-01-08T14:36:20+02:00 docs/multi-homing: Refactor to meet org template
+- kubernetes image-arm64 79a6bafe8c66e9d2fe02cd33a45a5d37519de91e to 86db063ce6f244acf7d437bda201600d568f9548
+  - 5a6f4b379 2025-02-17T13:31:19-05:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - 67a30c0ad 2025-02-12T21:19:46+00:00 Release commit for Kubernetes v1.32.2
+  - ae0ec29cb 2025-02-10T21:27:24-06:00 Bump images, dependencies and versions to go 1.23.6 and distroless iptables
+  - 953ac56c2 2025-02-06T13:50:47-06:00 Disable ServiceAccountNodeAudienceRestriction feature gate by default in v1.32
+  - 302fab741 2025-02-06T10:57:29-08:00 Kubelet server handler cleanup
+  - fa6882367 2025-02-03T18:44:30+01:00 Bump images, dependencies and versions to go 1.23.5 and distroless iptables
+  - 45b2f1c20 2025-01-31T10:43:10+01:00 Fix the remaining flaky integration tests in Job controller
+  - 9d0179ee1 2025-01-31T10:42:59+01:00 WIP: fix the flaky Job integration tests
+  - 5cc748f32 2025-01-28T17:52:52+02:00 kubeadm: use the v1beta4 EtcdAPICall timeout for etcd calls
+  - 9ade604a0 2025-01-23T13:06:39+01:00 hack: backport apidiff.sh
+  - 11c3bd303 2025-01-22T09:22:35+08:00 Fix: touch /dev/null permission denied on macos
+  - 4e43ab095 2025-01-21T15:09:17+05:30 Added check for multipath device mapper
+  - 051414a53 2025-01-17T06:01:40+00:00 Fix Portworx plugin's CSI translation to copy secret name & namespace
+  - 6473e7b6c 2025-01-15T15:00:37+00:00 Update CHANGELOG/CHANGELOG-1.32.md for v1.32.1
+  - 0bf3f03dd 2025-01-14T18:57:28-05:00 We still can't rely on first condition being fs-expansion pending condition
+  - 570f55018 2025-01-14T18:57:28-05:00 Bump CSI sidecars to fix CI issues and such
+  - 8ed6e5c88 2025-01-14T09:25:55+02:00 kubeadm: remove misplaced error during image pull
 
