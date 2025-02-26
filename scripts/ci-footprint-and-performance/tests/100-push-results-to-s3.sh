@@ -11,10 +11,10 @@ export AWS_PROFILE=microshift-ci
 export AWS_BUCKET_NAME=microshift-footprint-and-performance
 
 JOB_TYPE=${JOB_TYPE:-}
-#if [[ "${JOB_TYPE}" != "periodic" ]]; then
-#    : Non periodic job was detected - skipping pushing results to S3
-#    exit 0
-#fi
+if [[ "${JOB_TYPE}" != "periodic" ]]; then
+    : Non periodic job was detected - skipping pushing results to S3
+    exit 0
+fi
 
 if [ ! -e "${AWSCLI}" ] ; then
     "${ROOTDIR}/scripts/fetch_tools.sh" awscli
