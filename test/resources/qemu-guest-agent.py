@@ -517,7 +517,7 @@ def wait_for_guest_agent(vm_name: str):
             guest_agent_is_ready(vm_name)
             print("QEMU agent is now available")
             return
-        except:
+        except Exception:
             print(f"Attempt {i}/{max_retries}: QEMU agent not ready, retrying in {sleep_time} seconds")
             sleep(sleep_time)
 
