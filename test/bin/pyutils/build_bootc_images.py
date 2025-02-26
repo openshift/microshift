@@ -568,7 +568,7 @@ def main():
 
         # Determine versions of RPM packages
         set_rpm_version_info_vars()
-        # Prepare container image lists for mirroring registries
+        # Prepare container images list for mirroring registries
         common.delete_file(CONTAINER_LIST)
         if args.no_extract_images:
             common.print_msg("Skipping container image extraction")
@@ -578,6 +578,9 @@ def main():
             extract_container_images(f"4.{FAKE_NEXT_MINOR_VERSION}.*", NEXT_REPO, CONTAINER_LIST, args.dry_run)
             extract_container_images(PREVIOUS_RELEASE_VERSION, PREVIOUS_RELEASE_REPO, CONTAINER_LIST, args.dry_run)
             extract_container_images(YMINUS2_RELEASE_VERSION, YMINUS2_RELEASE_REPO, CONTAINER_LIST, args.dry_run)
+        # Sort the images list, only leaving unique entries
+        common.sort_uniq_file(CONTAINER_LIST)
+
         # Process package source templates
         ipkgdir = f"{SCRIPTDIR}/../package-sources-bootc"
         for ifile in os.listdir(ipkgdir):
