@@ -24,6 +24,7 @@ import json
 import argparse
 from base64 import b64decode, b64encode
 from os.path import basename
+from time import sleep
 
 from robot.libraries.BuiltIn import BuiltIn, DotDict
 from robot.libraries.Process import Process, ExecutionResult
@@ -502,6 +503,25 @@ def upload_file(vm_name: str, src: str, dst: str):
     write_to_file(vm_name, dst, content)
 
 
+def wait_for_guest_agent(vm_name: str):
+    """
+    :param vm_name:     The name of the VM to ping repeatedly
+    :type vm_name:      str
+    """
+    max_retries = 30
+    sleep_time = 2
+
+    print(f"Waiting for QEMU agent to become available on VM: {vm_name}...")
+    for i in range(1, max_retries):
+        try:
+            guest_agent_is_ready(vm_name)
+            print("QEMU agent is now available")
+            return
+        except:
+            print(f"Attempt {i}/{max_retries}: QEMU agent not ready, retrying in {sleep_time} seconds")
+            sleep(sleep_time)
+
+
 def main():
     parser = argparse.ArgumentParser()
 
@@ -522,6 +542,9 @@ def main():
     bash_parser.add_argument("--vm", required=True, help="domain name")
     bash_parser.add_argument("--args", required=True, help="arguments")
 
+    wait_parser = subparsers.add_parser("wait", help="Wait for guest agent to be ready")
+    wait_parser.add_argument("--vm", required=True, help="domain name")
+
     args = parser.parse_args()
 
     if args.command == "download":
@@ -531,6 +554,8 @@ def main():
     elif args.command == "bash":
         print(f"Running {args.args}")
         run_guest_process(args.vm, "/bin/bash", "-c", args.args)
+    elif args.command == "wait":
+        wait_for_guest_agent(args.vm)
 
 
 if __name__ == "__main__":

@@ -219,24 +219,6 @@ invoke_qemu_script() {
     "${ROOTDIR}/_output/robotenv/bin/python" "${ROOTDIR}/test/resources/qemu-guest-agent.py" "$@"
 }
 
-wait_for_qemu_agent() {
-    local -r vmname="$1"
-    local -r max_retries=30
-    local -r sleep_time=2
-    local -r full_vmname="$(full_vm_name "${vmname}")" 
-    echo "Waiting for QEMU agent to become available on VM: ${full_vmname}..."
-    for ((i=1; i<=max_retries; i++)); do
-        if sudo virsh qemu-agent-command "${full_vmname}" '{"execute":"guest-ping"}' --timeout 2 &>/dev/null; then
-            echo "QEMU agent is now available"
-            return 0
-        fi
-        echo "Attempt ${i}/${max_retries}: QEMU agent not ready, retrying in ${sleep_time} seconds"
-        sleep "${sleep_time}"
-    done
-    echo "QEMU agent did not respond within the timeout period."
-    return 1
-}
-
 sos_report_for_vm_offline() {
     local -r vmdir="${1}"
     local -r vmname="${2}"
@@ -244,7 +226,9 @@ sos_report_for_vm_offline() {
 
     "${ROOTDIR}/scripts/fetch_tools.sh" "robotframework"
 
-    wait_for_qemu_agent "${vmname}"
+    #wait_for_qemu_agent "${vmname}"
+    invoke_qemu_script "wait" \
+        "--vm" "${full_vmname}"
 
     invoke_qemu_script "upload" \
         "--vm"  "${full_vmname}" \
