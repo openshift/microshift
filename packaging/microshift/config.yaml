@@ -344,4 +344,9 @@ storage:
     # example:
     #   - snapshot-controller
     optionalCsiComponents: []
+telemetry:
+    # Endpoint where to send telemetry data.
+    endpoint: https://infogw.api.openshift.com
+    # Telemetry status, which can be Enabled or Disabled. Defaults to Enabled.
+    status: Enabled
 
