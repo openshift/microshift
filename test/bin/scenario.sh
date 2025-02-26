@@ -158,16 +158,14 @@ sos_report() {
 
         vmname=$(basename "${vmdir}")
         ip=$(get_vm_property "${vmname}" ip)
+
+        sos_func="sos_report_for_vm"
         if [ -z "${ip}" ]; then
-            # skip hosts without NICs
-            # FIXME: use virsh to copy sos report files
-            if "${junit}"; then
-                record_junit "${vmname}" "sos-report" "SKIP"
-            fi
-            continue
+            echo "Creating sos reports offline"
+            sos_func="sos_report_for_vm_offline"
         fi
 
-        if ! sos_report_for_vm "${vmdir}" "${vmname}"; then
+        if ! "${sos_func}" "${vmdir}" "${vmname}"; then
             scenario_result=1
             if "${junit}"; then
                 record_junit "${vmname}" "sos-report" "FAILED"
@@ -175,7 +173,7 @@ sos_report() {
         else
             if "${junit}"; then
                 record_junit "${vmname}" "sos-report" "OK"
-            fi
+            fi  
         fi
     done
     return "${scenario_result}"
@@ -188,23 +186,8 @@ sos_report_for_vm() {
     # can't rely on the wrapper being there or working if it
     # is. Copy the script to the host, just in case, along with a
     # wrapper that knows how to execute it or the installed version.
-    cat - >/tmp/sos-wrapper.sh <<EOF
-#!/usr/bin/env bash
-if ! hash sos ; then
-    echo "WARNING: The sos command does not exist"
-elif [ -f /usr/bin/microshift-sos-report ]; then
-    /usr/bin/microshift-sos-report || {
-        echo "WARNING: The /usr/bin/microshift-sos-report script failed"
-    }
-else
-    chmod +x /tmp/microshift-sos-report.sh
-    PROFILES=network,security /tmp/microshift-sos-report.sh || {
-        echo "WARNING: The /tmp/microshift-sos-report.sh script failed"
-    }
-fi
-chmod +r /tmp/sosreport-* || echo "WARNING: The sos report files do not exist in /tmp"
-EOF
-    copy_file_to_vm "${vmname}" "/tmp/sos-wrapper.sh" "/tmp/sos-wrapper.sh"
+
+    copy_file_to_vm "${vmname}" "${ROOTDIR}/test/assets/sos-wrapper.sh" "/tmp/sos-wrapper.sh" 
     copy_file_to_vm "${vmname}" "${ROOTDIR}/scripts/microshift-sos-report.sh" "/tmp/microshift-sos-report.sh"
     run_command_on_vm "${vmname}" "sudo bash -x /tmp/sos-wrapper.sh"
     mkdir -p "${vmdir}/sos"
@@ -230,6 +213,75 @@ EOF
     copy_file_from_vm "${vmname}" "/tmp/var-log-anaconda/*.log" "${vmdir}/anaconda" || {
         echo "WARNING: Ignoring an error when copying anaconda logs"
     }
+}
+
+invoke_qemu_script() {
+    "${ROOTDIR}/_output/robotenv/bin/python" "${ROOTDIR}/test/resources/qemu-guest-agent.py" "$@"
+}
+
+sos_report_for_vm_offline() {
+    local -r vmdir="${1}"
+    local -r vmname="${2}"
+    local -r full_vmname="$(full_vm_name "${vmname}")"
+
+    "${ROOTDIR}/scripts/fetch_tools.sh" "robotframework"
+
+    #wait_for_qemu_agent "${vmname}"
+    invoke_qemu_script "wait" \
+        "--vm" "${full_vmname}"
+
+    invoke_qemu_script "upload" \
+        "--vm"  "${full_vmname}" \
+        "--src" "${ROOTDIR}/test/assets/sos-wrapper.sh" \
+        "--dst" "/tmp/sos-wrapper.sh"
+
+    invoke_qemu_script "upload" \
+        "--vm"  "${full_vmname}" \
+        "--src" "${ROOTDIR}/scripts/microshift-sos-report.sh" \
+        "--dst" "/tmp/microshift-sos-report.sh"
+
+    invoke_qemu_script "bash" \
+        "--vm"  "${full_vmname}" \
+        "--args"  "sudo bash -x /tmp/sos-wrapper.sh"
+    
+    mkdir -p "${vmdir}/sos"
+    
+    invoke_qemu_script "download" \
+        "--vm"  "${full_vmname}" \
+        "--src_dir" "/tmp" \
+        "--dst_dir" "${vmdir}/sos" \
+        "--pat" "sosreport-*"
+
+    invoke_qemu_script "bash" \
+        "--vm"  "${full_vmname}" \
+        "--args"  "sudo journalctl > /tmp/journal_$(date +'%Y-%m-%d_%H:%M:%S').log"
+
+    invoke_qemu_script "download" \
+        "--vm"  "${full_vmname}" \
+        "--src_dir" "/tmp" \
+        "--dst_dir" "${vmdir}/sos" \
+        "--pat" "journal*.log"
+
+    # Also copy the logs from the /var/log/anaconda directory
+    invoke_qemu_script "bash" \
+        "--vm"  "${full_vmname}" \
+        "--args"  "sudo mkdir -p /tmp/var-log-anaconda"
+
+    invoke_qemu_script "bash" \
+        "--vm"  "${full_vmname}" \
+        "--args"  'sudo cp /var/log/anaconda/*.log /tmp/var-log-anaconda/'
+
+    invoke_qemu_script "bash" \
+        "--vm"  "${full_vmname}" \
+        "--args"  "sudo chmod +r /tmp/var-log-anaconda/*.log"
+
+    mkdir -p "${vmdir}/anaconda"
+
+    invoke_qemu_script "download" \
+        "--vm"  "${full_vmname}" \
+        "--src_dir" "/tmp/var-log-anaconda" \
+        "--dst_dir" "${vmdir}/anaconda" \
+        "--pat" "*.log" 
 }
 
 # Public function to render a unique kickstart from a template for a
