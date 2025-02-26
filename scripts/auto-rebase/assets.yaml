@@ -294,3 +294,12 @@ assets:
       - file: 05-daemonset.yaml
       - file: release-kube-proxy-aarch64.json
       - file: release-kube-proxy-x86_64.json
+
+  - dir: optional/observability/
+    ignore: "they don't exist in upstream repository - only in microshift"
+    files:
+      - file: 00-namespace.yaml
+      - file: 01-service-account.yaml
+      - file: 02-cluster-role.yaml
+      - file: 03-cluster-role-binding.yaml
+      - file: kustomization.yaml
