@@ -9,7 +9,7 @@ This script will generate a report with advisories, CVEs and jira tickets releva
 ### Steps
 1. Find advisory ids for a OCP version from [ocp-build-data repository](https://github.com/openshift-eng/ocp-build-data)
    - For example, for release `4.17` check [`releases.yml`](https://github.com/openshift-eng/ocp-build-data/blob/openshift-4.17/releases.yml)
-2. Get list of CVEs from a Red Hat advisory using [Red Hat errata API](https://errata.devel.redhat.com/documentation/developer-guide/api-http-api.html#get-cveshowerrata_id.json)
+2. Get the list of CVEs from a Red Hat advisory using [Red Hat errata API](https://errata.devel.redhat.com/documentation/developer-guide/api-http-api.html#get-cveshowerrata_id.json)
    - Only available behind the Red Hat VPN
    - Example for [`144556` advisory](https://errata.devel.redhat.com/cve/show/144556.json)
 3. Query Jira to find if there are any MicroShift ticket to address a CVE fix
