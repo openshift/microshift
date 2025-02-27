@@ -164,10 +164,15 @@ func selectIPFromHostInterface(nodeIP string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	// Sort all interfaces by index. If an index goes up to 256 it gets listed
-	// before index 1 in the function above. These devices are not from the OS,
-	// but other pods/containers, rendering wrong IP addresses to take for the
-	// node IP. Ensure we take the lower indices first.
+	// Sort all interfaces by index. Interfaces are listed in the same ordering as
+	// in /proc/net/dev. The ordering is not based in interface index, and it is
+	// not guaranteed to list system interfaces first. Veth interfaces from containers
+	// could get listed first and retrieve the wrong node IP.
+	// The index is assigned sequentially depending on the order of kmods loading
+	// and interface creation. Since the interfaces we are looking for belong to
+	// NetworkManager and the ones that could get a wrong node IP depend on a systemd
+	// unit that requires system networking to be ready, we can assume the lower
+	// indices are safe to use.
 	slices.SortFunc(ifaces, func(a, b tcpnet.Interface) int {
 		if a.Index > b.Index {
 			return 1
