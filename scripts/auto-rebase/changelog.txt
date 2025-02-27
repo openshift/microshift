@@ -1,16 +1,24 @@
-- cluster-network-operator embedded-component b0ce1c3b34921ec55bbb7686baafc43b20e7d1b3 to 58ddfcfac19f71930ccb55614f40fe7f8dbc5b05
-  - 059246c 2025-02-06T17:33:59+00:00 Update egressfirewall CRD to be consistent with ovn-kubernetes repo
+- kubernetes embedded-component 75240ebc82a1963a5474049f7ab30cfd09d85cd6 to 98fe56995ed880a36943adc615688f2f5bd1a2d3
+  - 559dac3a1 2025-02-18T18:43:27+00:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - f3e36afb6 2025-02-18T18:32:57+00:00 UPSTREAM: <drop>: manually resolve conflicts
+  - ccc69071d 2025-02-12T21:24:57+00:00 Release commit for Kubernetes v1.30.10
+  - 0963b145c 2025-02-10T14:28:23-06:00 Bump images, dependencies and versions to go 1.22.12 and distroless iptables
+  - a7c65364b 2025-02-06T11:11:38-08:00 Kubelet server handler cleanup
+  - 1c6380b7c 2025-02-03T18:39:13+01:00 Bump images, dependencies and versions to go 1.22.11 and distroless iptables
+  - 37573be18 2025-01-28T17:52:00+02:00 kubeadm: use the v1beta4 EtcdAPICall timeout for etcd calls
+  - 6cb38ff71 2025-01-22T10:42:46+05:30 Added check for multipath device mapper
+  - d58b53614 2025-01-17T17:16:21+05:30 Fix Go vet errors for master golang
+  - f7e807048 2025-01-15T15:01:10+00:00 Update CHANGELOG/CHANGELOG-1.30.md for v1.30.9
+  - 3212c129d 2025-01-13T08:54:09+00:00 Update pkg/controlplane/apiserver/config_test.go
+  - a277aaf6c 2025-01-03T11:33:08+00:00 prioritize user EtcdOptions.StorageConfig.StorageObjectCountTracker
+  - 6e12360e4 2025-01-03T11:33:08+00:00 Fix: StorageObjectCountTracker is nil, apf estimator got ObjectCountNotFoundErr
+  - 5a0ed8bab 2024-12-10T02:07:23+00:00 bump cadvisor to v0.49.2 in release 1.30
+  - b3fc4ba11 2024-08-18T21:32:26-05:00 .*: fix lint errors
+  - 94ba9a67c 2024-08-18T21:32:26-05:00 hack: disable SA1006 check
+  - 0fdb16fe5 2024-08-18T21:32:23-05:00 hack/tools: bump go-tools for go1.23.0
+  - 9491d8297 2024-07-03T16:56:44+05:30 Bump govulncheck to 1.1.2
 
-- machine-config-operator embedded-component 263e1e421e9abae512ab60e443b512792965ebf2 to 467061987c1e6b90d8f854c9b0eec82fd8bd2d1c
-  - 7c22b50f 2025-02-06T22:34:49+00:00 Update the storage.conf configuration file template
-
-- oc image-amd64 1b0bf0849072a4d9ef2e79c1ed80a60b4b4c1bba to 2510f852661f4ace4fb5ae83de643e74e66ca36b
-  - 0670fc4e 2025-02-18T10:57:43+00:00 Add HOST env var in oc debug for sos report collects more
-
-- oc image-arm64 1b0bf0849072a4d9ef2e79c1ed80a60b4b4c1bba to 2510f852661f4ace4fb5ae83de643e74e66ca36b
-  - 0670fc4e 2025-02-18T10:57:43+00:00 Add HOST env var in oc debug for sos report collects more
-
-- ovn-kubernetes image-arm64 aa5bec3a1ac01ed11f8df4501747c993ef11f78e to fd0a1f15e587f83c4e2d6f1721ef7d6dcb1337a3
+- ovn-kubernetes image-amd64 aa5bec3a1ac01ed11f8df4501747c993ef11f78e to fd0a1f15e587f83c4e2d6f1721ef7d6dcb1337a3
   - c00b2330 2025-02-13T14:02:25+02:00 kv, e2e: Reduce live migration disruption treshold
   - 39bd49b5 2025-02-13T14:02:25+02:00 kv, e2e: Keep underlay with delete-namespace=false
   - f2ea309b 2025-02-13T14:02:25+02:00 kv, e2e, localnet: Activate tests
@@ -28,4 +36,44 @@
   - ba4f0750 2025-02-12T21:42:11+02:00 libovsdb, lsp: Dynamically add updatable fields by name
   - b553afd4 2025-02-12T21:42:11+02:00 Fix duplicated UDN tests
   - e18b9c46 2025-02-12T21:41:58+02:00 podNetworkController: Remove remnants of primaryUDN
+
+- kubernetes image-amd64 75240ebc82a1963a5474049f7ab30cfd09d85cd6 to 98fe56995ed880a36943adc615688f2f5bd1a2d3
+  - 559dac3a1 2025-02-18T18:43:27+00:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - f3e36afb6 2025-02-18T18:32:57+00:00 UPSTREAM: <drop>: manually resolve conflicts
+  - ccc69071d 2025-02-12T21:24:57+00:00 Release commit for Kubernetes v1.30.10
+  - 0963b145c 2025-02-10T14:28:23-06:00 Bump images, dependencies and versions to go 1.22.12 and distroless iptables
+  - a7c65364b 2025-02-06T11:11:38-08:00 Kubelet server handler cleanup
+  - 1c6380b7c 2025-02-03T18:39:13+01:00 Bump images, dependencies and versions to go 1.22.11 and distroless iptables
+  - 37573be18 2025-01-28T17:52:00+02:00 kubeadm: use the v1beta4 EtcdAPICall timeout for etcd calls
+  - 6cb38ff71 2025-01-22T10:42:46+05:30 Added check for multipath device mapper
+  - d58b53614 2025-01-17T17:16:21+05:30 Fix Go vet errors for master golang
+  - f7e807048 2025-01-15T15:01:10+00:00 Update CHANGELOG/CHANGELOG-1.30.md for v1.30.9
+  - 3212c129d 2025-01-13T08:54:09+00:00 Update pkg/controlplane/apiserver/config_test.go
+  - a277aaf6c 2025-01-03T11:33:08+00:00 prioritize user EtcdOptions.StorageConfig.StorageObjectCountTracker
+  - 6e12360e4 2025-01-03T11:33:08+00:00 Fix: StorageObjectCountTracker is nil, apf estimator got ObjectCountNotFoundErr
+  - 5a0ed8bab 2024-12-10T02:07:23+00:00 bump cadvisor to v0.49.2 in release 1.30
+  - b3fc4ba11 2024-08-18T21:32:26-05:00 .*: fix lint errors
+  - 94ba9a67c 2024-08-18T21:32:26-05:00 hack: disable SA1006 check
+  - 0fdb16fe5 2024-08-18T21:32:23-05:00 hack/tools: bump go-tools for go1.23.0
+  - 9491d8297 2024-07-03T16:56:44+05:30 Bump govulncheck to 1.1.2
+
+- kubernetes image-arm64 75240ebc82a1963a5474049f7ab30cfd09d85cd6 to 98fe56995ed880a36943adc615688f2f5bd1a2d3
+  - 559dac3a1 2025-02-18T18:43:27+00:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - f3e36afb6 2025-02-18T18:32:57+00:00 UPSTREAM: <drop>: manually resolve conflicts
+  - ccc69071d 2025-02-12T21:24:57+00:00 Release commit for Kubernetes v1.30.10
+  - 0963b145c 2025-02-10T14:28:23-06:00 Bump images, dependencies and versions to go 1.22.12 and distroless iptables
+  - a7c65364b 2025-02-06T11:11:38-08:00 Kubelet server handler cleanup
+  - 1c6380b7c 2025-02-03T18:39:13+01:00 Bump images, dependencies and versions to go 1.22.11 and distroless iptables
+  - 37573be18 2025-01-28T17:52:00+02:00 kubeadm: use the v1beta4 EtcdAPICall timeout for etcd calls
+  - 6cb38ff71 2025-01-22T10:42:46+05:30 Added check for multipath device mapper
+  - d58b53614 2025-01-17T17:16:21+05:30 Fix Go vet errors for master golang
+  - f7e807048 2025-01-15T15:01:10+00:00 Update CHANGELOG/CHANGELOG-1.30.md for v1.30.9
+  - 3212c129d 2025-01-13T08:54:09+00:00 Update pkg/controlplane/apiserver/config_test.go
+  - a277aaf6c 2025-01-03T11:33:08+00:00 prioritize user EtcdOptions.StorageConfig.StorageObjectCountTracker
+  - 6e12360e4 2025-01-03T11:33:08+00:00 Fix: StorageObjectCountTracker is nil, apf estimator got ObjectCountNotFoundErr
+  - 5a0ed8bab 2024-12-10T02:07:23+00:00 bump cadvisor to v0.49.2 in release 1.30
+  - b3fc4ba11 2024-08-18T21:32:26-05:00 .*: fix lint errors
+  - 94ba9a67c 2024-08-18T21:32:26-05:00 hack: disable SA1006 check
+  - 0fdb16fe5 2024-08-18T21:32:23-05:00 hack/tools: bump go-tools for go1.23.0
+  - 9491d8297 2024-07-03T16:56:44+05:30 Bump govulncheck to 1.1.2
 
