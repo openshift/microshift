@@ -164,7 +164,18 @@ func selectIPFromHostInterface(nodeIP string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-
+	// Sort all interfaces by index. If an index goes up to 256 it gets listed
+	// before index 1 in the function above. These devices are not from the OS,
+	// but other pods/containers, rendering wrong IP addresses to take for the
+	// node IP. Ensure we take the lower indices first.
+	slices.SortFunc(ifaces, func(a, b tcpnet.Interface) int {
+		if a.Index > b.Index {
+			return 1
+		} else if a.Index < b.Index {
+			return -1
+		}
+		return 0
+	})
 	// get list of interfaces
 	for _, i := range ifaces {
 		if i.Name == "br-ex" {
