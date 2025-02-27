@@ -197,6 +197,17 @@ def delete_file(file_path: str):
         pass
 
 
+def sort_uniq_file(file_path: str):
+    """Sort the file by lines and overwrite it with the sorted and unique line output"""
+    # Read, sort, and filter unique lines
+    with open(file_path, 'r') as f:
+        unique_lines = sorted(set(f.readlines()))
+
+    # Write the result back to the file
+    with open(file_path, 'w') as f:
+        f.writelines(unique_lines)
+
+
 def file_has_valid_lines(file_path: str) -> bool:
     """Check if a text file contains at least one non-empty, non-commented line"""
     try:
