@@ -578,7 +578,9 @@ install -p -m644 assets/optional/ai-model-serving/release-ai-model-serving-x86_6
 #observability
 install -d -m755 %{buildroot}%{_presetdir}
 install -d -m755 %{buildroot}%{_sharedstatedir}/microshift-observability
-install -p -m644 packaging/observability/opentelemetry-collector.yaml -D %{buildroot}%{_sysconfdir}/microshift/opentelemetry-collector.yaml
+install -p -m644 packaging/observability/opentelemetry-collector-large.yaml -D %{buildroot}%{_sysconfdir}/microshift/opentelemetry-collector-large.yaml
+install -p -m644 packaging/observability/opentelemetry-collector-medium.yaml -D %{buildroot}%{_sysconfdir}/microshift/opentelemetry-collector-medium.yaml
+install -p -m644 packaging/observability/opentelemetry-collector-small.yaml -D %{buildroot}%{_sysconfdir}/microshift/opentelemetry-collector-small.yaml
 install -p -m644 packaging/observability/microshift-observability.service %{buildroot}%{_unitdir}/
 install -p -m644 packaging/observability/90-enable-microshift-observability.preset %{buildroot}%{_presetdir}/
 install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/003-microshift-observability/
@@ -771,7 +773,9 @@ fi
 %files observability
 %dir %{_prefix}/lib/microshift/manifests.d/003-microshift-observability
 %dir %{_sharedstatedir}/microshift-observability
-%config %{_sysconfdir}/microshift/opentelemetry-collector.yaml
+%config %{_sysconfdir}/microshift/opentelemetry-collector-small.yaml
+%config %{_sysconfdir}/microshift/opentelemetry-collector-medium.yaml
+%config %{_sysconfdir}/microshift/opentelemetry-collector-large.yaml
 %config %{_unitdir}/microshift-observability.service
 %config %{_presetdir}/90-enable-microshift-observability.preset
 %config %{_prefix}/lib/microshift/manifests.d/003-microshift-observability/00-namespace.yaml
