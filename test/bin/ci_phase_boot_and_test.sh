@@ -8,10 +8,16 @@ export PS4='+ $(date "+%T.%N") ${BASH_SOURCE#$HOME/}:$LINENO \011'
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # shellcheck source=test/bin/common.sh
 source "${SCRIPTDIR}/common.sh"
+# Directory to crawl for scenarios when creating/running in batch mode.
+# The CI system will override this depending on the job its running.
+SCENARIO_SOURCES="${SCENARIO_SOURCES:-${TESTDIR}/scenarios}"
+# Directory where all the scenarios will be copied for execution, preserving
+# the original scenario type derived from its directory name.
+SCENARIOS_TO_RUN="${OUTPUTDIR}/scenarios-$(get_scenario_type_from_path "${SCENARIO_SOURCES}")"
 
 # Copy the scenario definition files to a temporary location from
 # which they will be read. This allows filtering the tests from a
-# specific $SCENARIO_SOURCES directory.
+# specific $SCENARIO_SOURCES directory set by CI.
 prepare_scenario_sources() {
     rm -rf "${SCENARIOS_TO_RUN}"
     mkdir -p "${SCENARIOS_TO_RUN}"
@@ -48,7 +54,8 @@ bash -x ./bin/manage_hypervisor_config.sh create
 # Setup a container registry and mirror images.
 bash -x ./bin/mirror_registry.sh
 
-# Prepare all the scenarios that need to run into a special directory
+# Prepare all the scenarios that need to run into an output directory
+# where all the relevant scenarios will be copied for execution
 prepare_scenario_sources
 
 BOOT_TEST_JOB_LOG="${IMAGEDIR}/boot_test_jobs.txt"
