@@ -53,6 +53,7 @@ type Config struct {
 	Manifests Manifests     `json:"manifests"`
 	Ingress   IngressConfig `json:"ingress"`
 	Storage   Storage       `json:"storage"`
+	Telemetry Telemetry     `json:"telemetry"`
 
 	// Settings specified in this section are transferred as-is into the Kubelet config.
 	// +kubebuilder:validation:Schemaless
@@ -168,6 +169,7 @@ func (c *Config) fillDefaults() error {
 	}
 	c.MultiNode.Enabled = false
 	c.Kubelet = nil
+	c.Telemetry = telemetryDefaults()
 
 	return nil
 }
@@ -343,6 +345,13 @@ func (c *Config) incorporateUserSettings(u *Config) {
 	}
 	if u.Ingress.DefaultHttpVersionPolicy > 0 {
 		c.Ingress.DefaultHttpVersionPolicy = u.Ingress.DefaultHttpVersionPolicy
+	}
+
+	if u.Telemetry.Status != "" {
+		c.Telemetry.Status = u.Telemetry.Status
+	}
+	if u.Telemetry.Endpoint != "" {
+		c.Telemetry.Endpoint = u.Telemetry.Endpoint
 	}
 }
 
@@ -553,6 +562,10 @@ func (c *Config) validate() error {
 
 	if err := c.ApiServer.TLS.Validate(); err != nil {
 		return fmt.Errorf("error validating apiServer.tls: %v", err)
+	}
+
+	if err := c.Telemetry.validate(); err != nil {
+		return fmt.Errorf("error validating telemetry: %v", err)
 	}
 
 	return nil
