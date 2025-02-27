@@ -12,7 +12,7 @@ This script will generate a report with advisories, CVEs and jira tickets releva
 2. Get the list of CVEs from a Red Hat advisory using [Red Hat errata API](https://errata.devel.redhat.com/documentation/developer-guide/api-http-api.html#get-cveshowerrata_id.json)
    - Only available behind the Red Hat VPN
    - Example for [`144556` advisory](https://errata.devel.redhat.com/cve/show/144556.json)
-3. Query Jira to find if there are any MicroShift ticket to address a CVE fix
+3. Query Jira to find if there are any MicroShift tickets to address a CVE fix
    - Example for [`summary  ~ "CVE-2024-21626" AND component = MicroShift and (affectedVersion = 4.17 or affectedVersion = 4.17.z)`](https://issues.redhat.com/issues/?jql=summary%20%20~%20%22CVE-2024-21626%22%20AND%20component%20%3D%20MicroShift%20and%20(affectedVersion%20%3D%204.17%20or%20affectedVersion%20%3D%204.17.z)) query
 
 ## Requisites
