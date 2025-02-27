@@ -1,91 +1,46 @@
-- api embedded-component cfbda0b31000d72d41e6f58014adca6d9efaf060 to 544b3ca4e8f59633ced91c3f93fa4b67a87dd102
-  - 7559b706 2025-02-19T20:15:56-08:00 no-jira: correct default CIDR for ipv6 join subnet in API descriptors
-  - 79fcfda2 2025-02-12T18:00:06+01:00 Add CEL validation for RegistrySources in Image API
+- kubernetes embedded-component 86db063ce6f244acf7d437bda201600d568f9548 to c44e83d45f377c079cebd613a6ad987168462cda
+  - f352d0b6b 2025-02-25T12:18:39+05:30 UPSTREAM: <drop>: bump openshift/api@107848b719c5
+  - 6c59c65f0 2025-02-24T09:12:51+03:00 UPSTREAM: <carry>: Re-enable temporarily disabled port-forward test
+  - d0b99d270 2025-02-07T15:23:56-05:00 UPSTREAM: <carry>: authorizer: move mininum kubelet version authorizer to pkg/kubeapiserver and add authorization mode
+  - 9f66d116b 2025-02-07T15:23:56-05:00 UPSTREAM: <carry>: authorization: add minimumkubeletversion package
+  - 3df68695d 2025-02-07T11:02:53-05:00 UPSTREAM: <carry>: update vendor to use new apiserver/node package
+  - e78506633 2025-02-07T11:02:53-05:00 UPSTREAM: <carry>: features: add MinimumKubeletVersion feature
 
-- cluster-kube-apiserver-operator embedded-component baa0b921ce57958626ac28c4f788c6a50c7e978a to f743f844173d77dbd2a0c80d1f0158c700767400
-  - 294315b 2025-02-20T16:21:20+08:00 Bump TraceAll log level to v=10
+- machine-config-operator embedded-component 244bc58da1f9d1602dee94fbc89244992d400631 to b8ba7c1fba65dfa360f6b2f115d48b69cbc46513
+  - 1169e575 2025-02-24T12:31:23-05:00 debug log
+  - e5accd63 2025-02-24T12:31:23-05:00 daemon/osrelease: add additional case for IsEL()
+  - d4817369 2025-02-24T08:38:25-05:00 increase WaitForPoolComplete() timeout
+  - 1c2b8627 2025-02-20T12:03:21-05:00 Remove OCL Extensions test
+  - a4131ad6 2025-02-20T16:35:48+01:00 Add two-node-ha extension support required by Two Node OpenShift
 
-- kubernetes embedded-component 79a6bafe8c66e9d2fe02cd33a45a5d37519de91e to 86db063ce6f244acf7d437bda201600d568f9548
-  - 5a6f4b379 2025-02-17T13:31:19-05:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
-  - 67a30c0ad 2025-02-12T21:19:46+00:00 Release commit for Kubernetes v1.32.2
-  - ae0ec29cb 2025-02-10T21:27:24-06:00 Bump images, dependencies and versions to go 1.23.6 and distroless iptables
-  - 953ac56c2 2025-02-06T13:50:47-06:00 Disable ServiceAccountNodeAudienceRestriction feature gate by default in v1.32
-  - 302fab741 2025-02-06T10:57:29-08:00 Kubelet server handler cleanup
-  - fa6882367 2025-02-03T18:44:30+01:00 Bump images, dependencies and versions to go 1.23.5 and distroless iptables
-  - 45b2f1c20 2025-01-31T10:43:10+01:00 Fix the remaining flaky integration tests in Job controller
-  - 9d0179ee1 2025-01-31T10:42:59+01:00 WIP: fix the flaky Job integration tests
-  - 5cc748f32 2025-01-28T17:52:52+02:00 kubeadm: use the v1beta4 EtcdAPICall timeout for etcd calls
-  - 9ade604a0 2025-01-23T13:06:39+01:00 hack: backport apidiff.sh
-  - 11c3bd303 2025-01-22T09:22:35+08:00 Fix: touch /dev/null permission denied on macos
-  - 4e43ab095 2025-01-21T15:09:17+05:30 Added check for multipath device mapper
-  - 051414a53 2025-01-17T06:01:40+00:00 Fix Portworx plugin's CSI translation to copy secret name & namespace
-  - 6473e7b6c 2025-01-15T15:00:37+00:00 Update CHANGELOG/CHANGELOG-1.32.md for v1.32.1
-  - 0bf3f03dd 2025-01-14T18:57:28-05:00 We still can't rely on first condition being fs-expansion pending condition
-  - 570f55018 2025-01-14T18:57:28-05:00 Bump CSI sidecars to fix CI issues and such
-  - 8ed6e5c88 2025-01-14T09:25:55+02:00 kubeadm: remove misplaced error during image pull
+- operator-framework-olm embedded-component 500679af63800bd6dfc0acc5d153d3ef4ce706df to bf218bbc5469e1494fc9bbbe969b696a5a8cf371
+  - d631a816 2025-02-25T00:03:35+00:00 :seedling: bump the k8s-dependencies group with 2 updates (#3520)
+  - 31b22385 2025-02-25T00:02:38+00:00 :seedling: bump github.com/spf13/cobra from 1.8.1 to 1.9.1 (#3522)
 
-- machine-config-operator embedded-component 93b5bb2c9c73ddb329e69925fca437840a1b73d2 to 244bc58da1f9d1602dee94fbc89244992d400631
-  - c75a0037 2025-02-18T14:41:54-05:00 daemon: clarify OSUpdate events
-  - 88813e23 2025-02-04T09:54:35-05:00 update cluster-reader cluster role's permissions
-  - dc5abd47 2025-01-20T12:10:51+01:00 Remove trailing period from Openstack provided hostnames
+- oc image-amd64 a7e8def99f63040840bc41427f4d1947f9d555bd to b2f8216d285c2ec38acc7aa8c41a5689062b61c8
+  - b6bae7fc 2025-02-19T22:31:19-08:00 pkg/cli/admin/upgrade/recommend: "Upstream" -> "Upstream update service"
+  - 96677c6c 2025-01-22T15:43:06-05:00 Test case for lowercase Jira ticket names
 
-- operator-framework-olm embedded-component bdee5d97472604a99d90537969fbe4dc103b94a6 to 500679af63800bd6dfc0acc5d153d3ef4ce706df
-  - f6ab002e 2025-02-23T00:03:59+00:00 :seedling: bump github.com/prometheus/client_golang (#3521)
-  - 70932489 2025-02-23T00:03:01+00:00 build(deps): bump k8s.io/apiextensions-apiserver from 0.32.1 to 0.32.2 (#3515)
-  - 0d77519e 2025-02-23T00:02:43+00:00 group k8s prs (#3517)
-  - 456bc1e4 2025-02-18T00:08:04+00:00 build(deps): bump golang.org/x/net from 0.34.0 to 0.35.0 (#3510)
-  - e8e0d85b 2025-02-18T00:07:02+00:00 build(deps): bump sigs.k8s.io/controller-tools from 0.17.1 to 0.17.2 (#3508)
-  - e564b2fd 2025-02-18T00:06:45+00:00 build(deps): bump golang.org/x/time from 0.9.0 to 0.10.0 (#3511)
-  - e3fb767a 2025-02-18T00:06:29+00:00 build(deps): bump github.com/containers/image/v5 from 5.33.1 to 5.34.0 (#3504)
-  - 69cc9ee4 2025-02-18T00:06:10+00:00 build(deps): bump k8s.io/apiextensions-apiserver from 0.32.0 to 0.32.1 (#3506)
-  - 328c78c5 2025-02-18T00:05:53+00:00 build(deps): bump github.com/spf13/pflag from 1.0.5 to 1.0.6 (#3507)
-  - 4f538abe 2025-02-18T00:05:38+00:00 build(deps): bump github.com/evanphx/json-patch (#3505)
-  - 528ff6e1 2025-02-18T00:05:23+00:00 build(deps): bump k8s.io/kube-aggregator from 0.32.0 to 0.32.1 (#3500)
-  - c190cdda 2025-02-18T00:05:08+00:00 build(deps): bump sigs.k8s.io/controller-runtime from 0.19.4 to 0.20.1 (#3499)
-  - 4638ebdf 2025-02-18T00:04:53+00:00 build(deps): bump github.com/otiai10/copy from 1.14.0 to 1.14.1 (#3501)
-  - fa4279d2 2025-02-18T00:04:38+00:00 build(deps): bump golang.org/x/time from 0.8.0 to 0.9.0 (#3502)
-  - ba00ceb2 2025-02-18T00:04:23+00:00 build(deps): bump github.com/containers/image/v5 from 5.33.0 to 5.33.1 (#3498)
-  - 309d88a9 2025-02-18T00:04:08+00:00 build(deps): bump k8s.io/apiserver from 0.32.0 to 0.32.1 (#3494)
-  - 9205c4b0 2025-02-18T00:03:52+00:00 build(deps): bump sigs.k8s.io/controller-tools from 0.17.0 to 0.17.1 (#3495)
-  - cce6637e 2025-02-18T00:03:35+00:00 build(deps): bump k8s.io/code-generator from 0.32.0 to 0.32.1 (#3493)
-  - 61d1891d 2025-02-18T00:03:19+00:00 build(deps): bump github.com/prometheus/common from 0.61.0 to 0.62.0 (#3492)
-  - 6040c8dc 2025-02-18T00:03:01+00:00 build(deps): bump k8s.io/component-base from 0.32.0 to 0.32.1 (#3496)
+- kubernetes image-amd64 86db063ce6f244acf7d437bda201600d568f9548 to c44e83d45f377c079cebd613a6ad987168462cda
+  - f352d0b6b 2025-02-25T12:18:39+05:30 UPSTREAM: <drop>: bump openshift/api@107848b719c5
+  - 6c59c65f0 2025-02-24T09:12:51+03:00 UPSTREAM: <carry>: Re-enable temporarily disabled port-forward test
+  - d0b99d270 2025-02-07T15:23:56-05:00 UPSTREAM: <carry>: authorizer: move mininum kubelet version authorizer to pkg/kubeapiserver and add authorization mode
+  - 9f66d116b 2025-02-07T15:23:56-05:00 UPSTREAM: <carry>: authorization: add minimumkubeletversion package
+  - 3df68695d 2025-02-07T11:02:53-05:00 UPSTREAM: <carry>: update vendor to use new apiserver/node package
+  - e78506633 2025-02-07T11:02:53-05:00 UPSTREAM: <carry>: features: add MinimumKubeletVersion feature
 
-- oc image-amd64 0b61b9029ca2f4ab3e41a2b2126c01658c4e9cce to a7e8def99f63040840bc41427f4d1947f9d555bd
-  - 6e2d3bea 2025-02-19T20:50:40-05:00 trt-1995: Update Unconditional Feature Gate Notation
-  - 1ed9bf7b 2025-02-19T14:57:39+05:30 fix suggestions
-  - 4df16fe7 2025-02-13T17:39:04+05:30 add % and improve message
+- oc image-arm64 a7e8def99f63040840bc41427f4d1947f9d555bd to b2f8216d285c2ec38acc7aa8c41a5689062b61c8
+  - b6bae7fc 2025-02-19T22:31:19-08:00 pkg/cli/admin/upgrade/recommend: "Upstream" -> "Upstream update service"
+  - 96677c6c 2025-01-22T15:43:06-05:00 Test case for lowercase Jira ticket names
 
-- router image-amd64 b447c4d27d38a6c5f6ce2d5ceda88dbc9b90c661 to b41f9d05467fb7b3f6c2dafa6ac4b5e25164c0b6
-  - f0926cb 2025-01-21T18:10:34+08:00 Enhance func:parseIPList to handle mixed validity IP list.
-  - b92f3e2 2024-12-06T02:56:49+00:00 Updating openshift-enterprise-haproxy-router-container image to be consistent with ART for 4.19 Reconciling with https://github.com/openshift/ocp-build-data/tree/a39508c86497b4e5e463d7b2c78e51e577be9e7d/images/openshift-enterprise-haproxy-router.yml
-  - 13fd919 2024-12-05T19:59:01+00:00 Updating ose-haproxy-router-base-container image to be consistent with ART for 4.19 Reconciling with https://github.com/openshift/ocp-build-data/tree/a39508c86497b4e5e463d7b2c78e51e577be9e7d/images/ose-haproxy-router-base.yml
-
-- kube-rbac-proxy image-amd64 23f96a23777c1b5fcdb587602c156903c32fe52c to 591277560f328601273f88f2881e09ccccd90a97
-  - 43c58c7 2025-02-24T11:52:55+00:00 go*: update go version
-  - 1040c44 2025-02-24T08:18:40+00:00 vendor: bump
-  - 56b9dd8 2025-02-24T08:18:39+00:00 *: cut release v0.19.0
-  - 35afcb9 2025-02-24T08:18:24+00:00 go*: bump deps
-  - 7a6f5ff 2025-02-24T08:17:05+00:00 build(deps): bump golang.org/x/crypto from 0.29.0 to 0.31.0
-  - 94f18c5 2025-02-24T08:17:05+00:00 pkg/authn: OIDC authenticator defaults to using host's root CA pool if CA file is not provided
-  - 3d4e894 2024-12-03T21:02:07+00:00 Updating kube-rbac-proxy-container image to be consistent with ART for 4.19 Reconciling with https://github.com/openshift/ocp-build-data/tree/2ea3e6158c93ca104b9d59fd58a71536fa01fb2d/images/kube-rbac-proxy.yml
-
-- kubernetes image-amd64 79a6bafe8c66e9d2fe02cd33a45a5d37519de91e to 86db063ce6f244acf7d437bda201600d568f9548
-  - 5a6f4b379 2025-02-17T13:31:19-05:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
-  - 67a30c0ad 2025-02-12T21:19:46+00:00 Release commit for Kubernetes v1.32.2
-  - ae0ec29cb 2025-02-10T21:27:24-06:00 Bump images, dependencies and versions to go 1.23.6 and distroless iptables
-  - 953ac56c2 2025-02-06T13:50:47-06:00 Disable ServiceAccountNodeAudienceRestriction feature gate by default in v1.32
-  - 302fab741 2025-02-06T10:57:29-08:00 Kubelet server handler cleanup
-  - fa6882367 2025-02-03T18:44:30+01:00 Bump images, dependencies and versions to go 1.23.5 and distroless iptables
-  - 45b2f1c20 2025-01-31T10:43:10+01:00 Fix the remaining flaky integration tests in Job controller
-  - 9d0179ee1 2025-01-31T10:42:59+01:00 WIP: fix the flaky Job integration tests
-  - 5cc748f32 2025-01-28T17:52:52+02:00 kubeadm: use the v1beta4 EtcdAPICall timeout for etcd calls
-  - 9ade604a0 2025-01-23T13:06:39+01:00 hack: backport apidiff.sh
-  - 11c3bd303 2025-01-22T09:22:35+08:00 Fix: touch /dev/null permission denied on macos
-  - 4e43ab095 2025-01-21T15:09:17+05:30 Added check for multipath device mapper
-  - 051414a53 2025-01-17T06:01:40+00:00 Fix Portworx plugin's CSI translation to copy secret name & namespace
-  - 6473e7b6c 2025-01-15T15:00:37+00:00 Update CHANGELOG/CHANGELOG-1.32.md for v1.32.1
-  - 0bf3f03dd 2025-01-14T18:57:28-05:00 We still can't rely on first condition being fs-expansion pending condition
-  - 570f55018 2025-01-14T18:57:28-05:00 Bump CSI sidecars to fix CI issues and such
-  - 8ed6e5c88 2025-01-14T09:25:55+02:00 kubeadm: remove misplaced error during image pull
+- kubernetes image-arm64 86db063ce6f244acf7d437bda201600d568f9548 to efd4d776fd6178a96e55e12bc035d4425febfe24
+  - a0c862244 2025-02-25T14:13:59-05:00 UPSTREAM: <carry>: ./hack/update-vendor.sh for openshift-tests-extension
+  - edf2ddc6d 2025-02-25T09:05:40-03:00 UPSTREAM: <drop>: make update
+  - d169e64c9 2025-02-25T08:52:20-03:00 UPSTREAM: <carry>: unskip RecoverVolumeExpansionFailure tests
+  - f352d0b6b 2025-02-25T12:18:39+05:30 UPSTREAM: <drop>: bump openshift/api@107848b719c5
+  - 6c59c65f0 2025-02-24T09:12:51+03:00 UPSTREAM: <carry>: Re-enable temporarily disabled port-forward test
+  - d0b99d270 2025-02-07T15:23:56-05:00 UPSTREAM: <carry>: authorizer: move mininum kubelet version authorizer to pkg/kubeapiserver and add authorization mode
+  - 9f66d116b 2025-02-07T15:23:56-05:00 UPSTREAM: <carry>: authorization: add minimumkubeletversion package
+  - 3df68695d 2025-02-07T11:02:53-05:00 UPSTREAM: <carry>: update vendor to use new apiserver/node package
+  - e78506633 2025-02-07T11:02:53-05:00 UPSTREAM: <carry>: features: add MinimumKubeletVersion feature
 
