@@ -226,9 +226,13 @@ sos_report_for_vm_offline() {
 
     "${ROOTDIR}/scripts/fetch_tools.sh" "robotframework"
 
-    #wait_for_qemu_agent "${vmname}"
     invoke_qemu_script "wait" \
         "--vm" "${full_vmname}"
+    ready="$?"
+    if [ "${ready}" -ne 0 ]; then
+        echo "QEMU agent not available, exiting"
+        exit 1
+    fi
 
     invoke_qemu_script "upload" \
         "--vm"  "${full_vmname}" \
@@ -248,9 +252,9 @@ sos_report_for_vm_offline() {
     
     invoke_qemu_script "download" \
         "--vm"  "${full_vmname}" \
-        "--src_dir" "/tmp" \
-        "--dst_dir" "${vmdir}/sos" \
-        "--pat" "sosreport-*"
+        "--src_dir" "/tmp/" \
+        "--dst_dir" "${vmdir}/sos/" \
+        "--filename" "sosreport-*"
 
     invoke_qemu_script "bash" \
         "--vm"  "${full_vmname}" \
@@ -258,9 +262,9 @@ sos_report_for_vm_offline() {
 
     invoke_qemu_script "download" \
         "--vm"  "${full_vmname}" \
-        "--src_dir" "/tmp" \
-        "--dst_dir" "${vmdir}/sos" \
-        "--pat" "journal*.log"
+        "--src_dir" "/tmp/" \
+        "--dst_dir" "${vmdir}/sos/" \
+        "--filename" "journal*.log"
 
     # Also copy the logs from the /var/log/anaconda directory
     invoke_qemu_script "bash" \
@@ -279,9 +283,9 @@ sos_report_for_vm_offline() {
 
     invoke_qemu_script "download" \
         "--vm"  "${full_vmname}" \
-        "--src_dir" "/tmp/var-log-anaconda" \
-        "--dst_dir" "${vmdir}/anaconda" \
-        "--pat" "*.log" 
+        "--src_dir" "/tmp/var-log-anaconda/" \
+        "--dst_dir" "${vmdir}/anaconda/" \
+        "--filename" "*.log" 
 }
 
 # Public function to render a unique kickstart from a template for a

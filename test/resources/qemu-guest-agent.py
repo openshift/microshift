@@ -15,11 +15,15 @@ keywords:
     - read_from_file
     - write_to_file
     - guest_agent_is_ready
+    - download_files
+    - upload_file
+    - wait_for_guest_agent
 
 If you are looking for keywords to control the guest VM itself, see ./libvirt.resource
 """
 from __future__ import annotations  # Support for Python 3.7 and earlier
 
+import sys
 import json
 import argparse
 from base64 import b64decode, b64encode
@@ -437,7 +441,7 @@ def guest_agent_is_ready(vm_name: str):
 
 
 def _find_files(vm_name: str, dir: str, pattern: str):
-    content, _ = run_guest_process(vm_name, "/bin/find", dir, "-maxdepth", "1", "-name", pattern)
+    content, _ = run_guest_process(vm_name, "/bin/find", dir, "-maxdepth", "1", "-type", "f", "-name", pattern)
     return content['stdout']
 
 
@@ -474,11 +478,6 @@ def download_files(vm_name: str, src_dir: str, dst_dir: str, pattern: str):
     :param pattern:     Pattern or filename, e.g. sosreport-*, journal.log
     :type pattern:      str
     """
-    if not src_dir.endswith('/'):
-        src_dir = src_dir + '/'
-    if not dst_dir.endswith('/'):
-        dst_dir = dst_dir + '/'
-
     files = _find_files(vm_name, src_dir, pattern).splitlines()
     for file in files:
         filename = basename(file)
@@ -516,10 +515,12 @@ def wait_for_guest_agent(vm_name: str):
         try:
             guest_agent_is_ready(vm_name)
             print("QEMU agent is now available")
-            return
+            return 0
         except Exception:
             print(f"Attempt {i}/{max_retries}: QEMU agent not ready, retrying in {sleep_time} seconds")
             sleep(sleep_time)
+    
+    raise RuntimeError(f"QEMU agent not available after {max_retries} retries")
 
 
 def main():
@@ -531,7 +532,7 @@ def main():
     cp_from_parser.add_argument("--vm", required=True, help="domain name")
     cp_from_parser.add_argument("--src_dir", required=True, help="source path on VM")
     cp_from_parser.add_argument("--dst_dir", required=True, help="local destination path")
-    cp_from_parser.add_argument("--pat", required=True, help="filename or pattern")
+    cp_from_parser.add_argument("--filename", required=True, help="filename, supports bash glob patterns (i.e. '*', '[]' and '?')")
 
     cp_to_parser = subparsers.add_parser("upload", help="Copy file to VM")
     cp_to_parser.add_argument("--vm", required=True, help="domain name")
@@ -548,7 +549,7 @@ def main():
     args = parser.parse_args()
 
     if args.command == "download":
-        download_files(args.vm, args.src_dir, args.dst_dir, args.pat)
+        download_files(args.vm, args.src_dir, args.dst_dir, args.filename)
     elif args.command == "upload":
         upload_file(args.vm, args.src, args.dst)
     elif args.command == "bash":
