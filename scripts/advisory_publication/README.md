@@ -2,7 +2,7 @@
 
 ## Description
 
-Every week for every OCP release MicroShift team decide if a new MicroShift version should be publish.
+Each week for every minor OCP release, the MicroShift team decides if a new MicroShift version should be publish.
 The decision is done if there are important changes/fixes to the published.
 This script will generate a report with advisory, CVEs and jira ticket relevant info for every OCP version to make the decision.
 
