@@ -4,7 +4,7 @@
 
 Each week for every minor OCP release, the MicroShift team decides if a new MicroShift version should be publish.
 The decision is based on if there are important changes/fixes to MicroShift or the OCP images it depends on.
-This script will generate a report with advisory, CVEs and jira ticket relevant info for every OCP version to make the decision.
+This script will generate a report with advisories, CVEs and jira tickets relevant to making the decision.
 
 ### Steps
 1. Find advisory ids for a OCP version from [ocp-build-data repository](https://github.com/openshift-eng/ocp-build-data)
