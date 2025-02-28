@@ -3,7 +3,7 @@
 set -euo pipefail
 
 DEST="/etc/microshift/manifests.d/10-ai-model-serving-test/"
-MODEL_IMAGE="oci://quay.io/pmatusza/microshift-testing:resnet"
+MODEL_IMAGE="oci://quay.io/microshift/ai-testing-model:ovms-resnet50"
 
 OVMS_IMAGE="$(jq -r '.images | with_entries(select(.key == "ovms-image")) | .[]' /usr/share/microshift/release/release-ai-model-serving-"$(uname -i)".json)"
 if [ -z "${OVMS_IMAGE}" ]; then

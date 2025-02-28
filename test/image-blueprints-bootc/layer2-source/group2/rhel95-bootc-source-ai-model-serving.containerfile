@@ -48,7 +48,7 @@ FSFREEZE_HOOK_PATHNAME=/etc/qemu-ga/fsfreeze-hook\n' > /etc/sysconfig/qemu-ga
 RUN --mount=type=secret,id=pullsecret,dst=/run/secrets/pull-secret.json \
     images="$(jq -r '.images | .[]' /usr/share/microshift/release/release-x86_64.json)" ; \
     images="${images} $(jq -r '.images | with_entries(select(.key | startswith("kserve") or startswith("ovms-image"))) | .[]' /usr/share/microshift/release/release-ai-model-serving-x86_64.json)" ; \
-    images="${images} quay.io/microshift/busybox:1.36 quay.io/pmatusza/microshift-testing:resnet" ; \
+    images="${images} quay.io/microshift/busybox:1.36 quay.io/microshift/ai-testing-model:ovms-resnet50" ; \
     echo "${images}" ; \
     for img in ${images} ; do \
         for i in 1 2 3; do \
