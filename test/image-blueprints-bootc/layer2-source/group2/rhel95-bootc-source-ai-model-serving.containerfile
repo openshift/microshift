@@ -98,8 +98,10 @@ COPY --chmod=644 ./bootc-images/microshift-imagestore-config.service /etc/system
 RUN systemctl enable microshift-imagestore-config.service
 
 # Test data
+# hadolint ignore=DL3059
 RUN mkdir /etc/microshift/manifests.d/10-ai-model-serving-test/
 
+# hadolint ignore=DL3059
 RUN cat <<EOF > /etc/microshift/manifests.d/10-ai-model-serving-test/kustomization.yaml
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
@@ -107,6 +109,7 @@ resources:
 - resources.yaml
 EOF
 
+# hadolint ignore=DL3059
 RUN cat <<EOF > /etc/microshift/manifests.d/10-ai-model-serving-test/resources.yaml
 apiVersion: v1
 kind: Namespace
@@ -203,10 +206,12 @@ spec:
 EOF
 
 # Download an image from the examples to use to test the inference.
+# hadolint ignore=DL3059
 RUN curl -o /etc/microshift/manifests.d/10-ai-model-serving-test/bee.jpeg https://raw.githubusercontent.com/openvinotoolkit/model_server/main/demos/common/static/images/bee.jpeg
 
 # Create script to prepare the query because using QEMU Guest Agent
 # involves multiple layers of JSON and quoting, which is difficult to solve.
+# hadolint ignore=DL3059
 RUN cat <<'EOF' > /etc/microshift/manifests.d/10-ai-model-serving-test/prepare-query.sh
 #!/usr/bin/env bash
 set -xeuo pipefail
@@ -224,6 +229,7 @@ printf "%08X" $(stat --format=%s "${PAYLOAD}") | sed 's/\(..\)/\1\n/g' | tac | t
 cat "${PAYLOAD}" >> "${OUTPUT}"
 EOF
 
+# hadolint ignore=DL3059
 RUN chmod +x /etc/microshift/manifests.d/10-ai-model-serving-test/prepare-query.sh
 
 # {{- end }}
