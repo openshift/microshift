@@ -7,7 +7,6 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/openshift/microshift/pkg/util"
 	"k8s.io/klog/v2"
 )
 
@@ -61,12 +60,23 @@ func (c *Config) createNodeNameFile(nodeName, filePath, dataDir string) error {
 	if err := os.MkdirAll(dataDir, 0700); err != nil {
 		return fmt.Errorf("failed to create data dir: %w", err)
 	}
-	tmpPath, err := util.GenerateUniqueTempPath(filePath)
+	dir, filename := filepath.Split(filePath)
+	pattern := filename + ".tmp."
+	//tmpPath, err := util.GenerateUniqueTempPath(filePath)
+	file, err := os.CreateTemp(dir, pattern)
 	if err != nil {
 		return fmt.Errorf("failed to generate temp path for %s: %w", filePath, err)
 	}
-	if err := os.WriteFile(tmpPath, []byte(nodeName), 0400); err != nil {
+	tmpPath := file.Name()
+	file.Close()
+	/* if _, err := file.Write([]byte(nodeName)); err != nil {
 		return fmt.Errorf("failed to write nodename file %q: %v", filePath, err)
+	} */
+	/* if err := file.Close(); err != nil {
+		return fmt.Errorf("failed to close file %q: %v", file.Name(), err)
+	} */
+	if err := os.WriteFile(tmpPath, []byte(nodeName), 0400); err != nil {
+		return fmt.Errorf("failed to write nodename file %q: %v", tmpPath, err)
 	}
 	if err := os.Rename(tmpPath, filePath); err != nil {
 		if err := os.RemoveAll(tmpPath); err != nil {
