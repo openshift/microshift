@@ -1,3 +1,5 @@
+# {{- if and (env.Getenv "UNAME_M" "") (eq "x86_64" .Env.UNAME_M) }}
+# Currently, RHOAI is only available for x86_64
 FROM localhost/rhel95-bootc-source:latest
 
 # Build arguments
@@ -221,3 +223,4 @@ printf "%08X" $(stat --format=%s "${PAYLOAD}") | sed 's/\(..\)/\1\n/g' | tac | t
 # Add the data, i.e. the image
 cat "${PAYLOAD}" >> "${OUTPUT}"
 EOF
+# {{- end }}
