@@ -1,66 +1,30 @@
-- api embedded-component 3175f3026f905a311fa0a462afce2393c42d7f87 to cb44c196e68fc38178d56190d9de078069154a7b
-  - 4e28da9 2025-02-20T12:56:36-05:00 bump controller-tools to 4.18 latest commit
+- etcd embedded-component 914783cae63a13b90971c65e28c3349c1ecb7dfb to afac40f734a0440eb0983d7308e86aea9a04bbe9
+  - d218e76a 2025-02-01T21:17:49+01:00 DOWNSTREAM: <carry>: add tls min/max version to grpc proxy
+  - 61d6cdc9 2025-02-01T21:17:03+01:00 DOWNSTREAM: <carry>: ETCD-696: Add rev bumping to force-new-cluster
+  - baeb45f8 2025-02-01T21:16:53+01:00 Migrate Dockerfile.art for Konflux
+  - 07fbe656 2025-02-01T21:16:42+01:00 Add support for cachi2 based deps Konflux is replacing RH's internal build system OSBS. OSBS supported a build-time dependency injection system called "cachito". Konflux replaces this with "cachi2" which works differently. REMOTE_SOURCES no longer need to be copied into place and there is no need to source cachito's environment information (Konflux automatically rewrites the Dockerfile to source cachi2/cachi2.env before running the original RUN commands). Additionally, cachito appears to have provided go.sum dependencies whereas cachi2 requires all build-time dependencies in go.mod. Missing dependencies are added to go.mod as // indirect in this change.
+  - c7effce7 2025-02-01T21:13:38+01:00 DOWNSTREAM <carry>: resolve merge conflicts
+  - 1512d9ed 2025-02-01T21:13:27+01:00 NO-JIRA: use golang 1.22 image
+  - ec17aed3 2025-02-01T21:13:17+01:00 DOWNSTREAM: <carry>: ETCD-656: Automate datadir move after quorum-restore
+  - 5bca08ec 2025-01-25T08:14:51+13:00 version: bump up to 3.5.18
+  - 0c8e7b19 2025-01-22T15:10:06+00:00 Ensure all goroutines created by StartEtcd to exit before closing the errc
+  - c6fcd270 2025-01-21T16:43:03-05:00 mvcc: restore tombstone index if it's first revision
+  - 3ff20e6f 2025-01-16T15:27:00-08:00 Bump go toolchain to 1.22.11
+  - 80b0a73e 2025-01-11T07:17:00+00:00 Avoid deadlock in etcd.Close when stopping during bootstrapping
+  - e5b7e089 2025-01-10T16:16:10+00:00 etcdutl/etcdutl: use datadir package to build wal/snapdir
+  - 9b241941 2025-01-10T06:37:53+00:00 Remove duplicated <-s.ReadyNotify()
+  - b9a7aed9 2025-01-10T06:32:12+00:00 Do not wait for ready notify if the server is stopping
+  - 8943d8fc 2025-01-09T16:26:23-08:00 Update release_notes.tpl.txt
+  - f627f57e 2025-01-09T15:06:20-08:00 bump golang.org/x/net from 0.25.0 to 0.34.0
+  - c5d14b46 2025-01-09T12:27:17-08:00 bump golang.org/x/crypto from 0.21.0 to 0.32.0
+  - c1ab521a 2025-01-08T10:18:35+00:00 Fix mixVersion test case: ensure a snapshot to be sent out
+  - 5d284fda 2024-12-30T20:26:54+00:00 *: support custom content check offline in v2store
+  - 727c9b65 2024-12-04T14:13:14+05:30 Bump go toolchain to 1.22.9
+  - 28a19f76 2024-12-03T18:29:39+00:00 Print warning message for deprecated flags if set
+  - 83045bca 2024-11-22T22:37:49+08:00 fix runtime error: comparing uncomparable type
+  - c84e84c5 2024-11-18T09:14:01+01:00 add tls min/max version to grpc proxy
+  - e61b4958 2024-11-15T13:24:38+01:00 Bump golang-jwt/jwt to 4.5.1 to address GO-2024-3250
 
-- cluster-kube-apiserver-operator embedded-component 763313c860ea43fcfc9b1ac00ebae096b57c078e to 087c72f1e261fb7c42fe6fc5d73a1f70d3c76d2f
-  - 45e0252 2024-12-13T13:58:51+00:00 make update go format
-  - f21e257 2024-12-13T13:58:51+00:00 skip generating certs when networkConfig.status.ServiceNetwork is nil
-
-- cluster-network-operator embedded-component b48488a6ee4c9e1ae778217817266baddd5f3e51 to cad5e40c4c21a8d1d638c20ed23529aa05ab0824
-  - da95a13 2025-02-12T11:20:55+00:00 OVNK should be able to annotate network ID on NADs
-  - 5240ef9 2025-02-12T11:20:53+00:00 Add support for route advertisements
-
-- kubernetes embedded-component acb9630c20d2fa0d11bad4c38c7b28e2db9d818b to 6020cf5333bdeb77f95fa33f8272e5251ea28edc
-  - 4bdfededc 2025-02-17T14:12:15+01:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
-  - 6b3560758 2025-02-12T21:24:12+00:00 Release commit for Kubernetes v1.31.6
-  - 4e49e903c 2025-02-10T14:30:58-06:00 Bump images, dependencies and versions to go 1.22.12 and distroless iptables
-  - 4272f7016 2025-02-06T11:04:01-08:00 Kubelet server handler cleanup
-  - 56652a09e 2025-02-03T18:42:09+01:00 Bump images, dependencies and versions to go 1.22.11 and distroless iptables
-  - 739d6155f 2025-01-31T10:43:59+01:00 Fix the remaining flaky integration tests in Job controller
-  - ac7239cdd 2025-01-31T10:43:54+01:00 WIP: fix the flaky Job integration tests
-  - 4f9453c11 2025-01-28T17:52:29+02:00 kubeadm: use the v1beta4 EtcdAPICall timeout for etcd calls
-  - aee841a0f 2025-01-23T13:10:35+01:00 hack: backport apidiff.sh
-  - 8f8cca81a 2025-01-22T10:27:01+05:30 Added check for multipath device mapper
-  - c5958ed88 2025-01-22T09:23:19+08:00 Fix: touch /dev/null permission denied on macos
-  - ae081128a 2025-01-17T06:04:48+00:00 Fix Portworx plugin's CSI translation to copy secret name & namespace
-  - 96b174718 2025-01-15T14:59:02+00:00 Update CHANGELOG/CHANGELOG-1.31.md for v1.31.5
-  - aabc56c6e 2025-01-14T09:25:28+02:00 kubeadm: remove misplaced error during image pull
-  - 9d10ddb06 2025-01-08T15:11:34+05:30 Fix Go vet errors for master golang
-  - 15c8eac3f 2024-12-30T13:31:32-08:00 hack/tools: bump go-tools for go1.23.0
-  - 4fd080971 2024-11-22T10:36:52-05:00 Fix nil pointer dereference in selectable fields check When checking specVersion.SelectableFields, if specVersion is nil, a nil pointer dereference could occur. This change updates the conditional to use || instead of &&, ensuring that the check for specVersion being nil happens first, avoiding potential runtime panics.
-
-- machine-config-operator embedded-component 965278a90f8d3d01d8c20bf87a8a5f26278748c3 to 83031233b51454446a4dc19b13d71d8a90c6c60a
-  - 5b498e45 2025-02-12T13:37:48+00:00 daemon: update log verbs
-
-- oc image-amd64 a50d4c0e41a6eff7aafe21dbe564359a0b622bb1 to eb9bc9b02fc27a48cceccc0140fc3f8ee1414c64
-  - 2e794987 2025-02-25T12:25:04-05:00 Bump `go-jose` for CVE-2025-27144
-  - ca2e0046 2025-01-28T11:06:26-05:00 Address `golang.org/x/*` CVEs
-
-- router image-amd64 061909a4c397c048e6def163fda5d227c75f176b to 15430fd4fa51f63bb5413200fe524b670e79c1cf
-  - bb824cc 2025-02-02T08:47:44+00:00 OCPBUGS-45290: Reject All CA-Signed Certs Using SHA1
-
-- kubernetes image-amd64 acb9630c20d2fa0d11bad4c38c7b28e2db9d818b to 6020cf5333bdeb77f95fa33f8272e5251ea28edc
-  - 4bdfededc 2025-02-17T14:12:15+01:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
-  - 6b3560758 2025-02-12T21:24:12+00:00 Release commit for Kubernetes v1.31.6
-  - 4e49e903c 2025-02-10T14:30:58-06:00 Bump images, dependencies and versions to go 1.22.12 and distroless iptables
-  - 4272f7016 2025-02-06T11:04:01-08:00 Kubelet server handler cleanup
-  - 56652a09e 2025-02-03T18:42:09+01:00 Bump images, dependencies and versions to go 1.22.11 and distroless iptables
-  - 739d6155f 2025-01-31T10:43:59+01:00 Fix the remaining flaky integration tests in Job controller
-  - ac7239cdd 2025-01-31T10:43:54+01:00 WIP: fix the flaky Job integration tests
-  - 4f9453c11 2025-01-28T17:52:29+02:00 kubeadm: use the v1beta4 EtcdAPICall timeout for etcd calls
-  - aee841a0f 2025-01-23T13:10:35+01:00 hack: backport apidiff.sh
-  - 8f8cca81a 2025-01-22T10:27:01+05:30 Added check for multipath device mapper
-  - c5958ed88 2025-01-22T09:23:19+08:00 Fix: touch /dev/null permission denied on macos
-  - ae081128a 2025-01-17T06:04:48+00:00 Fix Portworx plugin's CSI translation to copy secret name & namespace
-  - 96b174718 2025-01-15T14:59:02+00:00 Update CHANGELOG/CHANGELOG-1.31.md for v1.31.5
-  - aabc56c6e 2025-01-14T09:25:28+02:00 kubeadm: remove misplaced error during image pull
-  - 9d10ddb06 2025-01-08T15:11:34+05:30 Fix Go vet errors for master golang
-  - 15c8eac3f 2024-12-30T13:31:32-08:00 hack/tools: bump go-tools for go1.23.0
-  - 4fd080971 2024-11-22T10:36:52-05:00 Fix nil pointer dereference in selectable fields check When checking specVersion.SelectableFields, if specVersion is nil, a nil pointer dereference could occur. This change updates the conditional to use || instead of &&, ensuring that the check for specVersion being nil happens first, avoiding potential runtime panics.
-
-- oc image-arm64 a50d4c0e41a6eff7aafe21dbe564359a0b622bb1 to eb9bc9b02fc27a48cceccc0140fc3f8ee1414c64
-  - 2e794987 2025-02-25T12:25:04-05:00 Bump `go-jose` for CVE-2025-27144
-  - ca2e0046 2025-01-28T11:06:26-05:00 Address `golang.org/x/*` CVEs
-
-- router image-arm64 061909a4c397c048e6def163fda5d227c75f176b to 15430fd4fa51f63bb5413200fe524b670e79c1cf
-  - bb824cc 2025-02-02T08:47:44+00:00 OCPBUGS-45290: Reject All CA-Signed Certs Using SHA1
+- machine-config-operator embedded-component 83031233b51454446a4dc19b13d71d8a90c6c60a to d3aff45960a611a4008d75dd523c289aa97acbb1
+  - 0d60b2ca 2025-02-24T14:32:05+00:00 update cluster-reader cluster role's permissions
 
