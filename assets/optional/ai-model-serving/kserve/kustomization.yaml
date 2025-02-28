@@ -7,3 +7,10 @@ resources:
 
 patches:
 - path: inferenceservice-config-microshift-patch.yaml
+- target:
+    kind: Deployment
+    name: kserve-controller-manager
+  patch: |-
+    - op: replace
+      path: /spec/template/spec/containers/0/imagePullPolicy
+      value: IfNotPresent

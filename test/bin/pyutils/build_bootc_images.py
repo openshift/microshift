@@ -7,6 +7,7 @@ import glob
 import os
 import platform
 import re
+import json
 import sys
 import time
 import traceback
@@ -59,10 +60,11 @@ def cleanup_atexit(dry_run):
         common.run_command_in_shell(["sudo", "podman", "stop", cids], dry_run)
 
 
-def find_latest_rpm(repo_path, version=""):
-    rpms = glob.glob(f"{repo_path}/**/microshift-release-info-{version}*.rpm", recursive=True)
+def find_latest_rpm(repo_path, version="", subpkg=""):
+    subpkg = f"-{subpkg}" if subpkg else ""
+    rpms = glob.glob(f"{repo_path}/**/microshift{subpkg}-release-info-{version}*.rpm", recursive=True)
     if not rpms:
-        raise Exception(f"Failed to find 'microshift-release-info-{version}*' RPM in {repo_path}")
+        raise Exception(f"Failed to find 'microshift{subpkg}-release-info-{version}*' RPM in {repo_path}")
     rpms.sort()
     return rpms[-1]
 
@@ -121,6 +123,7 @@ def set_rpm_version_info_vars():
 
     release_info_rpm = find_latest_rpm(LOCAL_REPO)
     release_info_rpm_base = find_latest_rpm(BASE_REPO)
+    release_info_aims_rpm = find_latest_rpm(LOCAL_REPO, subpkg="ai-model-serving")
 
     SOURCE_VERSION = common.run_command_in_shell(f"rpm -q --queryformat '%{{version}}-%{{release}}' {release_info_rpm}")
     SOURCE_VERSION_BASE = common.run_command_in_shell(f"rpm -q --queryformat '%{{version}}-%{{release}}' {release_info_rpm_base}")
@@ -142,6 +145,19 @@ def set_rpm_version_info_vars():
     src_img_cmd += ' | jq -r \'[ .images[] ] | join(",")\''
     SOURCE_IMAGES = common.run_command_in_shell(src_img_cmd)
 
+    # List of images used in AI Model Serving
+    global SOURCE_IMAGES_AIMS
+    global SOURCE_IMAGES_AIMS_OVMS
+    SOURCE_IMAGES_AIMS = ""
+    SOURCE_IMAGES_AIMS_OVMS = ""
+    if UNAME_M == "x86_64":
+        src_img_cmd = f"rpm2cpio {release_info_aims_rpm} | cpio -i --to-stdout '*release-ai-model-serving-{UNAME_M}.json' 2>/dev/null"
+        aims_release_info = json.loads(common.run_command_in_shell(src_img_cmd))
+        # Only take images starting with 'kserve' which are necessary for kserve itself
+        # and 'ovms-image' which is OpenVINO Model Server. Including all model servers would make the image way too big.
+        SOURCE_IMAGES_AIMS = ','.join([v for k, v in aims_release_info['images'].items() if k.startswith('kserve') or k == 'ovms-image'])
+        SOURCE_IMAGES_AIMS_OVMS = aims_release_info['images']['ovms-image']
+
     global SSL_CLIENT_KEY_FILE
     global SSL_CLIENT_CERT_FILE
     # Find the first file matching "*-key.pem" in the entitlements directory
@@ -156,6 +172,7 @@ def set_rpm_version_info_vars():
     # These are used for templating container files and images.
     rpmver_globals_vars = [
         'SOURCE_VERSION', 'SOURCE_VERSION_BASE', 'BREW_VERSION', 'SOURCE_IMAGES',
+        'SOURCE_IMAGES_AIMS', 'SOURCE_IMAGES_AIMS_OVMS',
         'SSL_CLIENT_KEY_FILE', 'SSL_CLIENT_CERT_FILE'
     ]
     for var in rpmver_globals_vars:
@@ -227,7 +244,7 @@ def get_process_file_names(idir, ifile, obasedir):
     path = os.path.join(idir, ifile)
     outname = os.path.splitext(ifile)[0]
     outdir = os.path.join(obasedir, outname)
-    logfile = os.path.join(obasedir, f"{outname}.log")
+    logfile = os.path.join(obasedir, f"{ifile}.log")
     return path, outname, outdir, logfile
 
 
@@ -312,6 +329,11 @@ def process_image_bootc(groupdir, bootcfile, dry_run):
     # Run template command on the input file
     bf_outfile = os.path.join(BOOTC_IMAGE_DIR, bootcfile)
     run_template_cmd(bf_path, bf_outfile, dry_run)
+    # Templating may generate an empty file
+    if not dry_run:
+        if not common.file_has_valid_lines(bf_outfile):
+            common.print_msg(f"Skipping an empty {bootcfile} file")
+            return
 
     common.print_msg(f"Processing {bootcfile} with logs in {bf_logfile}")
     start_process_bootc_image = time.time()
