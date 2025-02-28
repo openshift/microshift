@@ -390,7 +390,7 @@ def read_from_file(vm_name: str, path: str) -> str:
     information on the guest-file-read API call. See https://qemu-project.gitlab.io/qemu/interop/qemu-ga-ref.html#qapidoc-54
     for more information on the guest-file-close API call.
     """
-    content=bytearray()
+    content = bytearray()
     for chunk in _stream_file(vm_name, path):
         content.extend(chunk)
 
