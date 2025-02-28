@@ -1,3 +1,11 @@
+# This is a MicroShift specific kserve configuration.
+# For RHOAI kserve configuration see: assets/optional/ai-model-serving/kserve/overlays/odh/inferenceservice-config-patch.yaml
+# For upstream kserve configuration and description of the config see: assets/optional/ai-model-serving/kserve/configmap/inferenceservice.yaml
+#
+# The difference compared to RHOAI's kserve configuration is the `deploy` section setting:
+# `defaultDeploymentMode` set to `RawDeployment`.
+#
+# The ingress (istio) is disabled (just like RHOAI, unlike the upstream).
 apiVersion: v1
 kind: ConfigMap
 metadata:
