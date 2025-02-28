@@ -1,1 +1,3 @@
+{{- if and (env.Getenv "UNAME_M" "") (eq "x86_64" .Env.UNAME_M) }}
 localhost/rhel95-bootc-source-ai-model-serving:latest
+{{- end }}
