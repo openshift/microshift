@@ -1,3 +1,5 @@
+# {{- if and (env.Getenv "UNAME_M" "") (eq "x86_64" .Env.UNAME_M) }}
+# Currently, RHOAI is only available for x86_64
 FROM localhost/rhel95-bootc-source:latest
 
 # Build arguments
@@ -223,4 +225,5 @@ cat "${PAYLOAD}" >> "${OUTPUT}"
 EOF
 
 RUN chmod +x /etc/microshift/manifests.d/10-ai-model-serving-test/prepare-query.sh
+
 # {{- end }}
