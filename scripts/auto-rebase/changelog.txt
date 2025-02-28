@@ -1,46 +1,9 @@
-- kubernetes embedded-component 86db063ce6f244acf7d437bda201600d568f9548 to c44e83d45f377c079cebd613a6ad987168462cda
-  - f352d0b6b 2025-02-25T12:18:39+05:30 UPSTREAM: <drop>: bump openshift/api@107848b719c5
-  - 6c59c65f0 2025-02-24T09:12:51+03:00 UPSTREAM: <carry>: Re-enable temporarily disabled port-forward test
-  - d0b99d270 2025-02-07T15:23:56-05:00 UPSTREAM: <carry>: authorizer: move mininum kubelet version authorizer to pkg/kubeapiserver and add authorization mode
-  - 9f66d116b 2025-02-07T15:23:56-05:00 UPSTREAM: <carry>: authorization: add minimumkubeletversion package
-  - 3df68695d 2025-02-07T11:02:53-05:00 UPSTREAM: <carry>: update vendor to use new apiserver/node package
-  - e78506633 2025-02-07T11:02:53-05:00 UPSTREAM: <carry>: features: add MinimumKubeletVersion feature
+- oc image-arm64 b2f8216d285c2ec38acc7aa8c41a5689062b61c8 to 514a4581b8a6b8b0aef5832e50adf1037ffd9566
+  - cbecb375 2025-02-25T15:41:27-08:00 pkg/cli/admin/upgrade/recommend: Configureable version for test fixtures
+  - f7378ff1 2025-02-25T15:41:27-08:00 pkg/cli/admin/upgrade/recommend/examples/README: Catch up with --show-outdated-releases
+  - 04ddd208 2025-02-25T10:45:16+03:00 Bump indirect dependency go-jose to 4.0.5 version
 
-- machine-config-operator embedded-component 244bc58da1f9d1602dee94fbc89244992d400631 to b8ba7c1fba65dfa360f6b2f115d48b69cbc46513
-  - 1169e575 2025-02-24T12:31:23-05:00 debug log
-  - e5accd63 2025-02-24T12:31:23-05:00 daemon/osrelease: add additional case for IsEL()
-  - d4817369 2025-02-24T08:38:25-05:00 increase WaitForPoolComplete() timeout
-  - 1c2b8627 2025-02-20T12:03:21-05:00 Remove OCL Extensions test
-  - a4131ad6 2025-02-20T16:35:48+01:00 Add two-node-ha extension support required by Two Node OpenShift
-
-- operator-framework-olm embedded-component 500679af63800bd6dfc0acc5d153d3ef4ce706df to bf218bbc5469e1494fc9bbbe969b696a5a8cf371
-  - d631a816 2025-02-25T00:03:35+00:00 :seedling: bump the k8s-dependencies group with 2 updates (#3520)
-  - 31b22385 2025-02-25T00:02:38+00:00 :seedling: bump github.com/spf13/cobra from 1.8.1 to 1.9.1 (#3522)
-
-- oc image-amd64 a7e8def99f63040840bc41427f4d1947f9d555bd to b2f8216d285c2ec38acc7aa8c41a5689062b61c8
-  - b6bae7fc 2025-02-19T22:31:19-08:00 pkg/cli/admin/upgrade/recommend: "Upstream" -> "Upstream update service"
-  - 96677c6c 2025-01-22T15:43:06-05:00 Test case for lowercase Jira ticket names
-
-- kubernetes image-amd64 86db063ce6f244acf7d437bda201600d568f9548 to c44e83d45f377c079cebd613a6ad987168462cda
-  - f352d0b6b 2025-02-25T12:18:39+05:30 UPSTREAM: <drop>: bump openshift/api@107848b719c5
-  - 6c59c65f0 2025-02-24T09:12:51+03:00 UPSTREAM: <carry>: Re-enable temporarily disabled port-forward test
-  - d0b99d270 2025-02-07T15:23:56-05:00 UPSTREAM: <carry>: authorizer: move mininum kubelet version authorizer to pkg/kubeapiserver and add authorization mode
-  - 9f66d116b 2025-02-07T15:23:56-05:00 UPSTREAM: <carry>: authorization: add minimumkubeletversion package
-  - 3df68695d 2025-02-07T11:02:53-05:00 UPSTREAM: <carry>: update vendor to use new apiserver/node package
-  - e78506633 2025-02-07T11:02:53-05:00 UPSTREAM: <carry>: features: add MinimumKubeletVersion feature
-
-- oc image-arm64 a7e8def99f63040840bc41427f4d1947f9d555bd to b2f8216d285c2ec38acc7aa8c41a5689062b61c8
-  - b6bae7fc 2025-02-19T22:31:19-08:00 pkg/cli/admin/upgrade/recommend: "Upstream" -> "Upstream update service"
-  - 96677c6c 2025-01-22T15:43:06-05:00 Test case for lowercase Jira ticket names
-
-- kubernetes image-arm64 86db063ce6f244acf7d437bda201600d568f9548 to efd4d776fd6178a96e55e12bc035d4425febfe24
-  - a0c862244 2025-02-25T14:13:59-05:00 UPSTREAM: <carry>: ./hack/update-vendor.sh for openshift-tests-extension
-  - edf2ddc6d 2025-02-25T09:05:40-03:00 UPSTREAM: <drop>: make update
-  - d169e64c9 2025-02-25T08:52:20-03:00 UPSTREAM: <carry>: unskip RecoverVolumeExpansionFailure tests
-  - f352d0b6b 2025-02-25T12:18:39+05:30 UPSTREAM: <drop>: bump openshift/api@107848b719c5
-  - 6c59c65f0 2025-02-24T09:12:51+03:00 UPSTREAM: <carry>: Re-enable temporarily disabled port-forward test
-  - d0b99d270 2025-02-07T15:23:56-05:00 UPSTREAM: <carry>: authorizer: move mininum kubelet version authorizer to pkg/kubeapiserver and add authorization mode
-  - 9f66d116b 2025-02-07T15:23:56-05:00 UPSTREAM: <carry>: authorization: add minimumkubeletversion package
-  - 3df68695d 2025-02-07T11:02:53-05:00 UPSTREAM: <carry>: update vendor to use new apiserver/node package
-  - e78506633 2025-02-07T11:02:53-05:00 UPSTREAM: <carry>: features: add MinimumKubeletVersion feature
+- kubernetes image-arm64 efd4d776fd6178a96e55e12bc035d4425febfe24 to 0d5e1846a2163960301184f0582fcfb3e805bee1
+  - 33d7ffce5 2025-02-26T09:21:03-05:00 UPSTREAM: <carry>: admission: validate minimumKubeletVersion
+  - 91780bc84 2025-02-26T09:21:03-05:00 UPSTREAM: <carry>: crdvalidation: move latency profile file to be agnostic of field
 
