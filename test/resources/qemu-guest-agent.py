@@ -23,7 +23,6 @@ If you are looking for keywords to control the guest VM itself, see ./libvirt.re
 """
 from __future__ import annotations  # Support for Python 3.7 and earlier
 
-import sys
 import json
 import argparse
 from base64 import b64decode, b64encode
@@ -352,6 +351,27 @@ def _close_file(vm_name, handle):
     _execute(vm_name, agent_cmd_wrapper)
 
 
+def _stream_file(vm_name: str, path: str) -> str:
+    handle = _open_file(vm_name, path, 'r')
+    try:
+        while True:
+            content = _execute(vm_name, {
+                'execute': 'guest-file-read',
+                'arguments': {
+                    'handle': handle,
+                    'count': 10240
+                }
+            })
+
+            yield b64decode(content['buf-b64'])
+
+            if content['eof'] is True:
+                break
+
+    finally:
+        _close_file(vm_name, handle)
+
+
 def read_from_file(vm_name: str, path: str) -> str:
     """
     :param vm_name:         The name of the VM to execute the command on
@@ -370,19 +390,11 @@ def read_from_file(vm_name: str, path: str) -> str:
     information on the guest-file-read API call. See https://qemu-project.gitlab.io/qemu/interop/qemu-ga-ref.html#qapidoc-54
     for more information on the guest-file-close API call.
     """
-    handle = _open_file(vm_name, path, 'r')
-    try:
-        content = _execute(vm_name, {
-            'execute': 'guest-file-read',
-            'arguments': {
-                'handle': handle,
-                'count': 40960
-            }
-        })
-    finally:
-        _close_file(vm_name, handle)
+    content=bytearray()
+    for chunk in _stream_file(vm_name, path):
+        content.extend(chunk)
 
-    return b64decode(content['buf-b64']).decode('utf-8')
+    return content
 
 
 def write_to_file(vm_name: str, path: str, content: str, append=False) -> int:
@@ -448,23 +460,9 @@ def _find_files(vm_name: str, dir: str, pattern: str):
 def _download_file(vm_name: str, src: str, dst: str):
     print(f"Downloading {src}")
 
-    handle = _open_file(vm_name, src, 'r')
-    try:
-        with open(dst, "wb") as f:
-            while True:
-                content = _execute(vm_name, {
-                    'execute': 'guest-file-read',
-                    'arguments': {
-                        'handle': handle,
-                        'count': 10240
-                    }
-                })
-                f.write(b64decode(content['buf-b64']))
-
-                if content['eof'] is True:
-                    break
-    finally:
-        _close_file(vm_name, handle)
+    with open(dst, "wb") as f:
+        for chunk in _stream_file(vm_name, src):
+            f.write(chunk)
 
 
 def download_files(vm_name: str, src_dir: str, dst_dir: str, pattern: str):
@@ -519,7 +517,7 @@ def wait_for_guest_agent(vm_name: str):
         except Exception:
             print(f"Attempt {i}/{max_retries}: QEMU agent not ready, retrying in {sleep_time} seconds")
             sleep(sleep_time)
-    
+
     raise RuntimeError(f"QEMU agent not available after {max_retries} retries")
 
 
