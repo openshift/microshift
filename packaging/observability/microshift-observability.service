@@ -6,6 +6,7 @@ AssertPathExists=/var/lib/microshift/resources/observability-client/kubeconfig
 
 [Service]
 Environment=KUBECONFIG=/var/lib/microshift/resources/observability-client/kubeconfig
+Environment=K8S_NODE_NAME="%l"
 ExecStart=/usr/bin/opentelemetry-collector --config=/etc/microshift/opentelemetry-collector.yaml
 Restart=always
 User=root

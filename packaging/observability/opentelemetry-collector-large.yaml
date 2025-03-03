@@ -50,7 +50,7 @@ receivers:
 
 processors:
   resourcedetection/system:
-    detectors: ["system", "env"]
+    detectors: ["system"]
     system:
       hostname_sources: ["os"]
 

@@ -10,7 +10,21 @@ receivers:
     cert_file: /var/lib/microshift/certs/admin-kubeconfig-signer/openshift-observability-client/client.crt
     insecure_skip_verify: true
     collection_interval: 20s
-    endpoint: "localhost:10250"
+    endpoint: "${env:K8S_NODE_NAME}:10250"
+    node: ${env:K8S_NODE_NAME}
+    k8s_api_config:
+      auth_type: kubeConfig
+    metrics:
+      k8s.node.cpu.usage:
+        enabled: true
+      k8s.pod.cpu.usage:
+        enabled: true
+      container.cpu.usage:
+        enabled: true
+      k8s.container.memory.node.utilization:
+        enabled: true
+      k8s.pod.memory.node.utilization:
+        enabled: true
   hostmetrics:
     root_path: /
     collection_interval: 10s
@@ -32,7 +46,7 @@ receivers:
 
 processors:
   resourcedetection/system:
-    detectors: ["system", "env"]
+    detectors: ["system"]
     system:
       hostname_sources: ["os"]
 
@@ -56,22 +70,15 @@ extensions:
 service:
   extensions: [file_storage]
   pipelines:
-    metrics/kubeletstats:
+    metrics/cluster:
       receivers: [kubeletstats]
       exporters: [debug]  # Optional, enabled by default. Comment out to disable.
 #      exporters: [otlp]  # Uncomment to enable OTLP
-    metrics:
+    metrics/host:
       receivers: [hostmetrics, hostmetrics/disk, hostmetrics/network]
       processors: [resourcedetection/system]
       exporters: [debug]  # Optional, enabled by default. Comment out to disable.
 #      exporters: [otlp]  # Uncomment to enable OTLP
-    logs:
-      receivers: [journald, filelog/kube-system, filelog/workload]
-      exporters: [debug]  # Optional, enabled by default. Comment out to disable.
-#      exporters: [otlp]  # Uncomment to enable OTLP
-    logs/k8s-events:
-      receivers: [k8s_events]
-      exporters: [debug]
   telemetry:
     metrics:
       readers:
