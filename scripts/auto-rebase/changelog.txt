@@ -1,9 +1,123 @@
-- oc image-arm64 b2f8216d285c2ec38acc7aa8c41a5689062b61c8 to 514a4581b8a6b8b0aef5832e50adf1037ffd9566
+- api embedded-component 544b3ca4e8f59633ced91c3f93fa4b67a87dd102 to 1ee1ef83110046a60c1b083b09ee1f1506913793
+  - 6b76c18e 2025-02-26T10:37:18-05:00 operators/v1: reject new node statuses with current or target revision set
+  - 275cd402 2025-02-26T10:00:29-05:00 Fix FeatureGateNewOLMCatalogdAPIV1Metas spelling error
+  - 347c75c7 2025-02-25T10:22:57-05:00 Add PKI field with SigstoreImageVerificationPKI fg to (cluster)imagepolicy
+
+- cluster-kube-apiserver-operator embedded-component f743f844173d77dbd2a0c80d1f0158c700767400 to 34af639409ff04da7e89f214c804145587e9334e
+  - 613134b 2025-02-27T13:11:27+01:00 MON-4129: slos: accomodate for Prometheus v3 "le" normalization
+  - a730266 2025-02-26T10:04:58+01:00 MON-4129: revert https://github.com/openshift/cluster-kube-apiserver-operator/pull/1784
+  - 0e78d80 2025-02-03T15:14:28-05:00 targetconfigcontroller: inject authorization-mode just in case observer doesn't run
+  - 386c3c6 2025-02-03T15:14:28-05:00 observeAuthMode: drop authorization-mode from default config and specify strictly with observer
+  - e4c99d6 2024-12-19T09:50:08-05:00 add MinimumKubeletVersion authorization-mode if feature is on
+  - 607e4fb 2024-12-19T09:50:08-05:00 configobserver: add minimumkubeletversion
+
+- cluster-kube-controller-manager-operator embedded-component 9a7a572080a663bda581c0567e3921a99acd993e to 6a932ac83494daf0cf6eecd83068ce7a2c665238
+  - 01cdb57 2025-02-21T09:23:01+08:00 readme: describe mapping between logLevel and log level
+
+- cluster-network-operator embedded-component ff96ab47006095ad40478fa72d586ae5f33148e1 to d09028dfda8c632e4c4730319b9f07f0ac92d82a
+  - ac08fa2 2025-02-25T13:27:57-08:00 Add "centos" to supported OS id's
+
+- etcd embedded-component 914783cae63a13b90971c65e28c3349c1ecb7dfb to d36de75cb3fa96e25893d7b824b01c177490a261
+  - 00cfb7b5 2025-02-01T21:44:55+01:00 DOWNSTREAM: <carry>: add tls min/max version to grpc proxy
+  - 2d9b4619 2025-02-01T21:44:20+01:00 DOWNSTREAM: <carry>: ETCD-696: Add rev bumping to force-new-cluster
+  - 33c01d92 2025-02-01T21:44:09+01:00 Migrate Dockerfile.art for Konflux
+  - a4926df5 2025-02-01T21:43:57+01:00 Add support for cachi2 based deps Konflux is replacing RH's internal build system OSBS. OSBS supported a build-time dependency injection system called "cachito". Konflux replaces this with "cachi2" which works differently. REMOTE_SOURCES no longer need to be copied into place and there is no need to source cachito's environment information (Konflux automatically rewrites the Dockerfile to source cachi2/cachi2.env before running the original RUN commands). Additionally, cachito appears to have provided go.sum dependencies whereas cachi2 requires all build-time dependencies in go.mod. Missing dependencies are added to go.mod as // indirect in this change.
+  - 08044e8f 2025-02-01T21:42:58+01:00 DOWNSTREAM <carry>: resolve merge conflicts
+  - 52b53a8e 2025-02-01T21:42:45+01:00 NO-JIRA: use golang 1.22 image
+  - 049c0809 2025-02-01T21:42:31+01:00 DOWNSTREAM: <carry>: ETCD-656: Automate datadir move after quorum-restore
+  - 5bca08ec 2025-01-25T08:14:51+13:00 version: bump up to 3.5.18
+  - 0c8e7b19 2025-01-22T15:10:06+00:00 Ensure all goroutines created by StartEtcd to exit before closing the errc
+  - c6fcd270 2025-01-21T16:43:03-05:00 mvcc: restore tombstone index if it's first revision
+  - 3ff20e6f 2025-01-16T15:27:00-08:00 Bump go toolchain to 1.22.11
+  - 80b0a73e 2025-01-11T07:17:00+00:00 Avoid deadlock in etcd.Close when stopping during bootstrapping
+  - e5b7e089 2025-01-10T16:16:10+00:00 etcdutl/etcdutl: use datadir package to build wal/snapdir
+  - 9b241941 2025-01-10T06:37:53+00:00 Remove duplicated <-s.ReadyNotify()
+  - b9a7aed9 2025-01-10T06:32:12+00:00 Do not wait for ready notify if the server is stopping
+  - 8943d8fc 2025-01-09T16:26:23-08:00 Update release_notes.tpl.txt
+  - f627f57e 2025-01-09T15:06:20-08:00 bump golang.org/x/net from 0.25.0 to 0.34.0
+  - c5d14b46 2025-01-09T12:27:17-08:00 bump golang.org/x/crypto from 0.21.0 to 0.32.0
+  - c1ab521a 2025-01-08T10:18:35+00:00 Fix mixVersion test case: ensure a snapshot to be sent out
+  - 5d284fda 2024-12-30T20:26:54+00:00 *: support custom content check offline in v2store
+  - 727c9b65 2024-12-04T14:13:14+05:30 Bump go toolchain to 1.22.9
+  - 28a19f76 2024-12-03T18:29:39+00:00 Print warning message for deprecated flags if set
+  - 83045bca 2024-11-22T22:37:49+08:00 fix runtime error: comparing uncomparable type
+  - c84e84c5 2024-11-18T09:14:01+01:00 add tls min/max version to grpc proxy
+  - e61b4958 2024-11-15T13:24:38+01:00 Bump golang-jwt/jwt to 4.5.1 to address GO-2024-3250
+
+- kubernetes embedded-component c44e83d45f377c079cebd613a6ad987168462cda to c3a6a36c352ab7a0616fd1e6ffedaf872b4aba21
+  - 33d7ffce5 2025-02-26T09:21:03-05:00 UPSTREAM: <carry>: admission: validate minimumKubeletVersion
+  - 91780bc84 2025-02-26T09:21:03-05:00 UPSTREAM: <carry>: crdvalidation: move latency profile file to be agnostic of field
+  - 613b73f22 2025-02-26T15:10:50+01:00 UPSTREAM: <carry>: Disable VolumeGroupSnapshot tests
+  - eda230da1 2025-02-26T14:58:23+01:00 UPSTREAM: 128972: Add crd from external snapshotter
+  - a0c862244 2025-02-25T14:13:59-05:00 UPSTREAM: <carry>: ./hack/update-vendor.sh for openshift-tests-extension
+  - edf2ddc6d 2025-02-25T09:05:40-03:00 UPSTREAM: <drop>: make update
+  - d169e64c9 2025-02-25T08:52:20-03:00 UPSTREAM: <carry>: unskip RecoverVolumeExpansionFailure tests
+
+- machine-config-operator embedded-component b8ba7c1fba65dfa360f6b2f115d48b69cbc46513 to 2320deabaac93c8bae12d4d8c35842965720bac8
+  - f2f99a26 2025-02-24T16:38:36-06:00 OCPBUGS-41489: configure-ovs workaround for ovs-if-br-ex bug
+  - 9970e04c 2025-02-07T16:21:17-05:00 handle MachineConfigPool changes while the OSBuildController is shut down
+  - dd1dabaa 2025-02-06T17:52:14-05:00 ensure that build jobs are always reconciled
+
+- operator-framework-olm embedded-component bf218bbc5469e1494fc9bbbe969b696a5a8cf371 to 6dd1017cdc814695820aeeb95be6cc28d6c411b5
+  - cdf5b57e 2025-02-27T15:25:42+00:00 Bump github.com/google/go-cmp from 0.6.0 to 0.7.0 (#1590)
+  - dd828cff 2025-02-27T15:24:49+00:00 Bump github.com/docker/cli (#1589)
+  - a4a93578 2025-02-27T15:24:36+00:00 Bump github.com/spf13/cobra from 1.8.1 to 1.9.1 (#1586)
+  - 71f6fb35 2025-02-27T15:24:22+00:00 Bump sigs.k8s.io/controller-runtime from 0.20.1 to 0.20.2 (#1585)
+  - d2bbe2de 2025-02-27T15:24:09+00:00 Bump k8s.io/apiextensions-apiserver from 0.32.1 to 0.32.2 (#1584)
+  - 9bd2159b 2025-02-27T15:23:56+00:00 🌱 synch dockerfiles with grpc-health-probe version in go.mod (#1577)
+  - ecc12518 2025-02-27T15:23:42+00:00 Bump github.com/distribution/distribution/v3 (#1580)
+  - 207cddf6 2025-02-27T15:23:29+00:00 exponential retry on name resolution to registries (#1576)
+  - a797d7bc 2025-02-27T15:23:16+00:00 Bump golang.org/x/net from 0.34.0 to 0.35.0 (#1578)
+  - 0d366d68 2025-02-27T15:23:02+00:00 Bump github.com/containerd/errdefs from 0.3.0 to 1.0.0 (#1579)
+  - 4030659a 2025-02-27T15:22:49+00:00 enable linting and bingo management of the lint tool (#1524)
+  - d86fa57c 2025-02-27T15:22:36+00:00 Bump google.golang.org/protobuf from 1.36.4 to 1.36.5 (#1574)
+  - 68be8ebd 2025-02-27T15:22:22+00:00 Bump golang.org/x/text from 0.21.0 to 0.22.0 (#1571)
+  - e8767be0 2025-02-27T15:22:09+00:00 Bump golang.org/x/sync from 0.10.0 to 0.11.0 (#1568)
+  - 8274c848 2025-02-27T15:21:56+00:00 Bump go.etcd.io/bbolt from 1.3.11 to 1.4.0 (#1573)
+  - f33adfdc 2025-02-27T15:21:42+00:00 Bump golang.org/x/mod from 0.22.0 to 0.23.0 (#1570)
+  - bff6ac54 2025-02-27T15:21:29+00:00 Bump golang.org/x/sys from 0.29.0 to 0.30.0 (#1569)
+  - 22f32534 2025-02-27T15:21:16+00:00 Bump github.com/containers/common from 0.61.1 to 0.62.0 (#1566)
+  - 40bf7f66 2025-02-27T15:21:03+00:00 Bump github.com/containers/image/v5 from 5.33.1 to 5.34.0 (#1567)
+  - 72f91458 2025-02-27T15:20:49+00:00 Bump github.com/spf13/pflag from 1.0.5 to 1.0.6 (#1565)
+  - c333ec75 2025-02-27T15:20:36+00:00 Bump github.com/golang-migrate/migrate/v4 from 4.18.1 to 4.18.2 (#1563)
+  - 6dc4ebfd 2025-02-27T15:20:23+00:00 Bump google.golang.org/protobuf from 1.36.3 to 1.36.4 (#1562)
+  - bacc24af 2025-02-27T15:20:09+00:00 Bump google.golang.org/grpc from 1.69.4 to 1.70.0 (#1560)
+  - 6b3b0145 2025-02-27T15:19:55+00:00 Bump sigs.k8s.io/controller-runtime from 0.20.0 to 0.20.1 (#1559)
+  - fa464448 2025-02-27T15:19:41+00:00 Bump github.com/docker/cli (#1558)
+  - 90f761fa 2025-02-27T15:19:28+00:00 Bump sigs.k8s.io/controller-runtime from 0.19.4 to 0.20.0 (#1556)
+  - 5b240192 2025-02-27T15:19:15+00:00 Bump k8s.io/apiextensions-apiserver from 0.32.0 to 0.32.1 (#1554)
+  - bdec4db8 2025-02-27T15:18:59+00:00 Bump k8s.io/apimachinery from 0.32.0 to 0.32.1 (#1555)
+  - 738d4cb8 2025-02-27T15:18:46+00:00 Bump github.com/containers/common from 0.61.0 to 0.61.1 (#1553)
+  - 33947afe 2025-02-27T15:18:32+00:00 Bump k8s.io/api from 0.32.0 to 0.32.1 (#1552)
+  - f385375b 2025-02-27T15:18:18+00:00 Bump github.com/distribution/distribution/v3 (#1542)
+  - 2a8f2c46 2025-02-27T15:18:03+00:00 Bump github.com/containers/image/v5 from 5.33.0 to 5.33.1 (#1549)
+  - 18cdb562 2025-02-27T15:17:50+00:00 Bump google.golang.org/protobuf from 1.36.2 to 1.36.3 (#1550)
+  - 0d4c170f 2025-02-27T15:17:36+00:00 Bump github.com/grpc-ecosystem/grpc-health-probe from 0.4.36 to 0.4.37 (#1551)
+  - cfc6f25f 2025-02-27T15:17:22+00:00 Bump github.com/grpc-ecosystem/grpc-health-probe from 0.4.34 to 0.4.36 (#1548)
+  - d71ec99c 2025-02-27T15:17:09+00:00 Bump github.com/docker/cli (#1543)
+  - 0a73e52a 2025-02-27T15:16:55+00:00 fix bingo-upgrade target (#1547)
+  - 5e964ae8 2025-02-27T15:16:42+00:00 Bump github.com/grpc-ecosystem/go-grpc-middleware/v2 from 2.1.0 to 2.2.0 (#1544)
+  - 4ff33210 2025-02-27T15:16:28+00:00 Bump google.golang.org/grpc from 1.68.1 to 1.69.4 (#1546)
+  - 34d0b430 2025-02-27T15:16:13+00:00 Bump github.com/otiai10/copy from 1.14.0 to 1.14.1 (#1545)
+  - 26702565 2025-02-27T15:15:53+00:00 Update operator-registry to v1.51.0 (#3525)
+  - 2a56d091 2025-02-27T15:15:26+00:00 :seedling: Bump github.com/google/go-cmp from 0.6.0 to 0.7.0 (#3523)
+  - 1e742e24 2025-02-26T00:03:28+00:00 add missing pod disruption reasons to isPodDead (#3519)
+
+- oc image-amd64 b2f8216d285c2ec38acc7aa8c41a5689062b61c8 to 514a4581b8a6b8b0aef5832e50adf1037ffd9566
   - cbecb375 2025-02-25T15:41:27-08:00 pkg/cli/admin/upgrade/recommend: Configureable version for test fixtures
   - f7378ff1 2025-02-25T15:41:27-08:00 pkg/cli/admin/upgrade/recommend/examples/README: Catch up with --show-outdated-releases
   - 04ddd208 2025-02-25T10:45:16+03:00 Bump indirect dependency go-jose to 4.0.5 version
 
-- kubernetes image-arm64 efd4d776fd6178a96e55e12bc035d4425febfe24 to 0d5e1846a2163960301184f0582fcfb3e805bee1
+- kubernetes image-amd64 c44e83d45f377c079cebd613a6ad987168462cda to c3a6a36c352ab7a0616fd1e6ffedaf872b4aba21
   - 33d7ffce5 2025-02-26T09:21:03-05:00 UPSTREAM: <carry>: admission: validate minimumKubeletVersion
   - 91780bc84 2025-02-26T09:21:03-05:00 UPSTREAM: <carry>: crdvalidation: move latency profile file to be agnostic of field
+  - 613b73f22 2025-02-26T15:10:50+01:00 UPSTREAM: <carry>: Disable VolumeGroupSnapshot tests
+  - eda230da1 2025-02-26T14:58:23+01:00 UPSTREAM: 128972: Add crd from external snapshotter
+  - a0c862244 2025-02-25T14:13:59-05:00 UPSTREAM: <carry>: ./hack/update-vendor.sh for openshift-tests-extension
+  - edf2ddc6d 2025-02-25T09:05:40-03:00 UPSTREAM: <drop>: make update
+  - d169e64c9 2025-02-25T08:52:20-03:00 UPSTREAM: <carry>: unskip RecoverVolumeExpansionFailure tests
+
+- kubernetes image-arm64 0d5e1846a2163960301184f0582fcfb3e805bee1 to c3a6a36c352ab7a0616fd1e6ffedaf872b4aba21
+  - 613b73f22 2025-02-26T15:10:50+01:00 UPSTREAM: <carry>: Disable VolumeGroupSnapshot tests
+  - eda230da1 2025-02-26T14:58:23+01:00 UPSTREAM: 128972: Add crd from external snapshotter
 
