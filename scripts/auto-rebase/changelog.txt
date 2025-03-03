@@ -1,12 +1,6 @@
-- cluster-kube-apiserver-operator embedded-component aabc7863cdbd76f8909a10fbc1be53b032e4ec31 to b5b212e5cecf729bb15248d26edbd55dbe7253a9
-  - a031e5b 2025-02-13T01:58:29+00:00 increase waitForFallbackDegradedConditionTimeout
+- ovn-kubernetes image-amd64 f749d5f5981d0041356671ed0c361133c3273e6d to 01af23cb323ec1506b5faf23e3e0d3b59df24fc8
+  - b338432 2025-01-20T13:10:34+00:00 Add SDN node subnet gateway IP to host-network address_set
 
-- machine-config-operator embedded-component b608d409f85d9d2f5ec8837d33490fdc6b6883a6 to 9040a70ce67b34643aa4fd17dece6a9b65a48d95
-  - 3868f711 2025-02-10T20:59:45+00:00 node controller: clarify when 'maxUnavailible' is invalid in alert
-
-- ovn-kubernetes image-amd64 cc1522a772fbd586a192a8ceb02980a41734f7b6 to f749d5f5981d0041356671ed0c361133c3273e6d
-  - 1cd6dfd 2024-12-13T11:46:41+00:00 Add static route to the hairpin masquerade IPs to pod
-
-- ovn-kubernetes image-arm64 cc1522a772fbd586a192a8ceb02980a41734f7b6 to f749d5f5981d0041356671ed0c361133c3273e6d
-  - 1cd6dfd 2024-12-13T11:46:41+00:00 Add static route to the hairpin masquerade IPs to pod
+- ovn-kubernetes image-arm64 f749d5f5981d0041356671ed0c361133c3273e6d to 01af23cb323ec1506b5faf23e3e0d3b59df24fc8
+  - b338432 2025-01-20T13:10:34+00:00 Add SDN node subnet gateway IP to host-network address_set
 
