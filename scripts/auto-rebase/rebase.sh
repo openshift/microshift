@@ -646,6 +646,7 @@ EOF
     yq -i 'del(.extendedArguments.pv-recycler-pod-template-filepath-nfs)' "${REPOROOT}"/assets/controllers/kube-controller-manager/defaultconfig.yaml
     yq -i 'del(.extendedArguments.flex-volume-plugin-dir)' "${REPOROOT}"/assets/controllers/kube-controller-manager/defaultconfig.yaml
     yq -i '.spec.names.shortNames = ["scc"]' "${REPOROOT}"/assets/crd/0000_03_config-operator_01_securitycontextconstraints.crd.yaml
+    yq -i '.apiServerArguments.authorization-mode = ["Scope","SystemMasters","RBAC","Node"]' "${REPOROOT}"/assets/controllers/kube-apiserver/defaultconfig.yaml
 
     #-- openshift-dns -------------------------------------
     # Render operand manifest templates like the operator would
