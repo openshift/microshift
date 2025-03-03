@@ -1,6 +1,6 @@
 *** Settings ***
-Documentation       This suite performs basic log scans to determine if the opentelemetry-collector is exporting data and
-...                 in a healthy state
+Documentation       This suite performs basic log scans to determine if the opentelemetry-collector is exporting data
+...                 and in a healthy state
 
 Library             OperatingSystem
 Library             String
