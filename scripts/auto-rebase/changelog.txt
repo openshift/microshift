@@ -1,30 +1,16 @@
-- etcd embedded-component 914783cae63a13b90971c65e28c3349c1ecb7dfb to afac40f734a0440eb0983d7308e86aea9a04bbe9
-  - d218e76a 2025-02-01T21:17:49+01:00 DOWNSTREAM: <carry>: add tls min/max version to grpc proxy
-  - 61d6cdc9 2025-02-01T21:17:03+01:00 DOWNSTREAM: <carry>: ETCD-696: Add rev bumping to force-new-cluster
-  - baeb45f8 2025-02-01T21:16:53+01:00 Migrate Dockerfile.art for Konflux
-  - 07fbe656 2025-02-01T21:16:42+01:00 Add support for cachi2 based deps Konflux is replacing RH's internal build system OSBS. OSBS supported a build-time dependency injection system called "cachito". Konflux replaces this with "cachi2" which works differently. REMOTE_SOURCES no longer need to be copied into place and there is no need to source cachito's environment information (Konflux automatically rewrites the Dockerfile to source cachi2/cachi2.env before running the original RUN commands). Additionally, cachito appears to have provided go.sum dependencies whereas cachi2 requires all build-time dependencies in go.mod. Missing dependencies are added to go.mod as // indirect in this change.
-  - c7effce7 2025-02-01T21:13:38+01:00 DOWNSTREAM <carry>: resolve merge conflicts
-  - 1512d9ed 2025-02-01T21:13:27+01:00 NO-JIRA: use golang 1.22 image
-  - ec17aed3 2025-02-01T21:13:17+01:00 DOWNSTREAM: <carry>: ETCD-656: Automate datadir move after quorum-restore
-  - 5bca08ec 2025-01-25T08:14:51+13:00 version: bump up to 3.5.18
-  - 0c8e7b19 2025-01-22T15:10:06+00:00 Ensure all goroutines created by StartEtcd to exit before closing the errc
-  - c6fcd270 2025-01-21T16:43:03-05:00 mvcc: restore tombstone index if it's first revision
-  - 3ff20e6f 2025-01-16T15:27:00-08:00 Bump go toolchain to 1.22.11
-  - 80b0a73e 2025-01-11T07:17:00+00:00 Avoid deadlock in etcd.Close when stopping during bootstrapping
-  - e5b7e089 2025-01-10T16:16:10+00:00 etcdutl/etcdutl: use datadir package to build wal/snapdir
-  - 9b241941 2025-01-10T06:37:53+00:00 Remove duplicated <-s.ReadyNotify()
-  - b9a7aed9 2025-01-10T06:32:12+00:00 Do not wait for ready notify if the server is stopping
-  - 8943d8fc 2025-01-09T16:26:23-08:00 Update release_notes.tpl.txt
-  - f627f57e 2025-01-09T15:06:20-08:00 bump golang.org/x/net from 0.25.0 to 0.34.0
-  - c5d14b46 2025-01-09T12:27:17-08:00 bump golang.org/x/crypto from 0.21.0 to 0.32.0
-  - c1ab521a 2025-01-08T10:18:35+00:00 Fix mixVersion test case: ensure a snapshot to be sent out
-  - 5d284fda 2024-12-30T20:26:54+00:00 *: support custom content check offline in v2store
-  - 727c9b65 2024-12-04T14:13:14+05:30 Bump go toolchain to 1.22.9
-  - 28a19f76 2024-12-03T18:29:39+00:00 Print warning message for deprecated flags if set
-  - 83045bca 2024-11-22T22:37:49+08:00 fix runtime error: comparing uncomparable type
-  - c84e84c5 2024-11-18T09:14:01+01:00 add tls min/max version to grpc proxy
-  - e61b4958 2024-11-15T13:24:38+01:00 Bump golang-jwt/jwt to 4.5.1 to address GO-2024-3250
+- cluster-ingress-operator embedded-component 8be174945db79b0660bd0fd21ed279ab7b6aafbf to a730e8a7af570d3921cd44c1468f38a250a6e647
+  - f16a8ee 2025-02-27T22:25:05+01:00 OCPBUGS-43745: Skip Test_IdleConnectionTerminationPolicyDeferred when DCM feature gate is enabled
+  - e90a5a7 2025-02-27T22:24:00+01:00 OCPBUGS-43745: Add e2e tests for for IdleConnectionTerminationPolicy
+  - 7e4df03 2025-02-27T22:23:28+01:00 test/http2: enhance response handlers
+  - f83eb11 2025-02-25T17:09:10+01:00 OCPBUGS-43745: Add support for idle connection termination policy
+  - 95f7dd9 2025-02-25T17:09:10+01:00 OCPBUGS-48377: Vendor openshift/api#2178
 
-- machine-config-operator embedded-component 83031233b51454446a4dc19b13d71d8a90c6c60a to d3aff45960a611a4008d75dd523c289aa97acbb1
-  - 0d60b2ca 2025-02-24T14:32:05+00:00 update cluster-reader cluster role's permissions
+- machine-config-operator embedded-component d3aff45960a611a4008d75dd523c289aa97acbb1 to 7f706b7a3b7d8ac3ca8bd058229ed66dbddf789e
+  - 5ec802ae 2025-02-18T21:35:45+00:00 Enforce VIPs to be collocated at the same host
+
+- router image-amd64 15430fd4fa51f63bb5413200fe524b670e79c1cf to d8058949aaf91dcdea050c58e6a34ef5f6670c67
+  - ef0af34 2025-01-14T13:47:53+00:00 Make idle-close-on-response configurable in HAProxy template
+
+- router image-arm64 15430fd4fa51f63bb5413200fe524b670e79c1cf to d8058949aaf91dcdea050c58e6a34ef5f6670c67
+  - ef0af34 2025-01-14T13:47:53+00:00 Make idle-close-on-response configurable in HAProxy template
 
