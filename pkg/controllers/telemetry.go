@@ -50,6 +50,11 @@ func (t *TelemetryManager) Dependencies() []string {
 
 func (t *TelemetryManager) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
 	defer close(stopped)
+	defer close(ready)
+
+	if t.config.Telemetry.Status == config.StatusDisabled {
+		return nil
+	}
 
 	clusterId, err := getClusterId()
 	if err != nil {
@@ -58,21 +63,6 @@ func (t *TelemetryManager) Run(ctx context.Context, ready chan<- struct{}, stopp
 	pullSecret, err := readPullSecret()
 	if err != nil {
 		return fmt.Errorf("unable to get pull secret: %v", err)
-	}
-
-	panicChannel := make(chan any, 1)
-	go func() {
-		defer func() {
-			if r := recover(); r != nil {
-				panicChannel <- r
-			}
-		}()
-	}()
-
-	close(ready)
-
-	if t.config.Telemetry.Status == config.StatusDisabled {
-		return nil
 	}
 
 	_ = telemetry.NewTelemetryClient(t.config.Telemetry.Endpoint, clusterId, pullSecret)
@@ -88,8 +78,7 @@ func (t *TelemetryManager) Run(ctx context.Context, ready chan<- struct{}, stopp
 			}
 		}
 	}()
-	perr := <-panicChannel
-	panic(perr)
+	return nil
 }
 
 func getClusterId() (string, error) {
