@@ -1,0 +1,31 @@
+[34m# Rebasing to registry.ci.openshift.org/ocp/release:4.17.0-0.nightly-2025-02-28-145158 and registry.ci.openshift.org/ocp-arm64/release-arm64:4.17.0-0.nightly-arm64-2025-02-28-145200[00m
+[34m# Fetching release info for registry.ci.openshift.org/ocp/release:4.17.0-0.nightly-2025-02-28-145158 (amd64)[00m
+[34m# Fetching release info for registry.ci.openshift.org/ocp-arm64/release-arm64:4.17.0-0.nightly-arm64-2025-02-28-145200 (arm64)[00m
+[34m# Extracting registry.ci.openshift.org/ocp/release:4.17.0-0.nightly-2025-02-28-145158 manifest content[00m
+[34m# Cloning registry.ci.openshift.org/ocp/release:4.17.0-0.nightly-2025-02-28-145158 component repos[00m
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/api/.git/
+HEAD is now at 0cfc958 Merge pull request #2014 from openshift-cherrypick-robot/cherry-pick-2006-to-release-4.17
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/cluster-csi-snapshot-controller-operator/.git/
+HEAD is now at ffba005 Merge pull request #214 from davidvossel/hcp-tolerations
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/cluster-dns-operator/.git/
+HEAD is now at 54eea5b Merge pull request #415 from arkadeepsen/dnsnameresolver-controller
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/cluster-ingress-operator/.git/
+HEAD is now at cb5306d Merge pull request #1136 from openshift-cherrypick-robot/cherry-pick-1125-to-release-4.17
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/cluster-kube-apiserver-operator/.git/
+HEAD is now at 4fae673 Merge pull request #1803 from openshift-cherrypick-robot/cherry-pick-1798-to-release-4.17
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/cluster-kube-controller-manager-operator/.git/
+HEAD is now at 0a9ed57 Merge pull request #814 from tjungblu/ckao_lg_1743
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/cluster-kube-scheduler-operator/.git/
+HEAD is now at 98ca953 Merge pull request #546 from ingvagabund/545
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/cluster-network-operator/.git/
+HEAD is now at 58ddfcf Merge pull request #2642 from openshift-cherrypick-robot/cherry-pick-2631-to-release-4.17
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/cluster-openshift-controller-manager-operator/.git/
+fatal: unable to access 'https://github.com/openshift/cluster-openshift-controller-manager-operator/': Failed to connect to github.com port 443: Connection timed out
