@@ -27,6 +27,12 @@ import (
 	"k8s.io/klog/v2"
 )
 
+const (
+	// This file path must match the one in packaging/crio.conf.d/10-microshift_*.conf
+	// entry for global_auth_file.
+	PullSecretFilePath = "/etc/crio/openshift-pull-secret"
+)
+
 type TelemetryManager struct {
 	config *config.Config
 }
@@ -49,7 +55,7 @@ func (t *TelemetryManager) Run(ctx context.Context, ready chan<- struct{}, stopp
 	if err != nil {
 		return fmt.Errorf("unable to get cluster id: %v", err)
 	}
-	pullSecret, err := readPullSecret("/etc/crio/openshift-pull-secret")
+	pullSecret, err := readPullSecret()
 	if err != nil {
 		return fmt.Errorf("unable to get pull secret: %v", err)
 	}
@@ -64,6 +70,10 @@ func (t *TelemetryManager) Run(ctx context.Context, ready chan<- struct{}, stopp
 	}()
 
 	close(ready)
+
+	if t.config.Telemetry.Status == config.StatusDisabled {
+		return nil
+	}
 
 	_ = telemetry.NewTelemetryClient(t.config.Telemetry.Endpoint, clusterId, pullSecret)
 	go func() {
@@ -83,16 +93,15 @@ func (t *TelemetryManager) Run(ctx context.Context, ready chan<- struct{}, stopp
 }
 
 func getClusterId() (string, error) {
-	filePath := "/var/lib/microshift/cluster-id"
-	data, err := os.ReadFile(filePath)
+	data, err := os.ReadFile(ClusterIDFilePath)
 	if err != nil {
 		return "", fmt.Errorf("failed to read file: %v", err)
 	}
 	return string(data), nil
 }
 
-func readPullSecret(filePath string) (string, error) {
-	data, err := os.ReadFile(filePath)
+func readPullSecret() (string, error) {
+	data, err := os.ReadFile(PullSecretFilePath)
 	if err != nil {
 		return "", fmt.Errorf("failed to read file: %v", err)
 	}
