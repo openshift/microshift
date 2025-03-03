@@ -30,7 +30,7 @@ import (
 const (
 	// This file path must match the one in packaging/crio.conf.d/10-microshift_*.conf
 	// entry for global_auth_file.
-	PullSecretFilePath = "/etc/crio/openshift-pull-secret"
+	PullSecretFilePath = "/etc/crio/openshift-pull-secret" // #nosec G101
 )
 
 type TelemetryManager struct {

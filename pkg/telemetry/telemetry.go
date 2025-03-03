@@ -23,7 +23,7 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/golang/protobuf/proto"
+	proto "github.com/gogo/protobuf/proto"
 	"github.com/golang/snappy"
 	"github.com/prometheus/prometheus/prompb"
 	"k8s.io/klog/v2"
@@ -70,7 +70,7 @@ func (t *TelemetryClient) Send(ctx context.Context, metrics []Metric) error {
 	compressed := snappy.Encode(nil, data)
 	reader := bytes.NewReader(compressed)
 
-	req, err := http.NewRequestWithContext(ctx, "POST", t.endpoint, reader)
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, t.endpoint, reader)
 	if err != nil {
 		return fmt.Errorf("unable to create request: %v", err)
 	}
@@ -104,8 +104,8 @@ func (t *TelemetryClient) Send(ctx context.Context, metrics []Metric) error {
 }
 
 func convertMetricsToWriteRequest(metrics []Metric) *prompb.WriteRequest {
-	var timeSeriesList []prompb.TimeSeries
-	var metricMetadataList []prompb.MetricMetadata
+	timeSeriesList := make([]prompb.TimeSeries, 0)
+	metricMetadataList := make([]prompb.MetricMetadata, 0)
 	for _, metric := range metrics {
 		labels := []prompb.Label{
 			{Name: "__name__", Value: metric.Name},
