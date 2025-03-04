@@ -30,6 +30,10 @@ import (
 	"k8s.io/klog/v2"
 )
 
+var (
+	ClusterIDFilePath = filepath.Join(config.DataDir, "cluster-id")
+)
+
 type ClusterID struct {
 	cfg *config.Config
 }
@@ -75,12 +79,9 @@ func (s *ClusterID) Run(ctx context.Context, ready chan<- struct{}, stopped chan
 }
 
 func initClusterIDFile(clusterID string) error {
-	// The location of the cluster ID file
-	fileName := filepath.Join(config.DataDir, "cluster-id")
-
 	// Read and verify the cluster ID file if it already exists,
 	// logging a warning if the cluster ID is inconsistent
-	data, err := os.ReadFile(fileName)
+	data, err := os.ReadFile(ClusterIDFilePath)
 	if err != nil && !os.IsNotExist(err) {
 		// File exists, but cannot be read
 		return err
@@ -90,10 +91,10 @@ func initClusterIDFile(clusterID string) error {
 			// Consistent cluster ID file exists
 			return nil
 		}
-		klog.Warningf("Overwriting an inconsistent MicroShift Cluster ID '%v' in '%v' file", string(data), fileName)
+		klog.Warningf("Overwriting an inconsistent MicroShift Cluster ID '%v' in '%v' file", string(data), ClusterIDFilePath)
 	}
 
 	// Write a new cluster ID file
-	klog.Infof("Writing MicroShift Cluster ID '%v' to '%v'", clusterID, fileName)
-	return os.WriteFile(fileName, []byte(clusterID), 0400)
+	klog.Infof("Writing MicroShift Cluster ID '%v' to '%v'", clusterID, ClusterIDFilePath)
+	return os.WriteFile(ClusterIDFilePath, []byte(clusterID), 0400)
 }
