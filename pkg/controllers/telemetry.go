@@ -53,6 +53,7 @@ func (t *TelemetryManager) Run(ctx context.Context, ready chan<- struct{}, stopp
 	defer close(ready)
 
 	if t.config.Telemetry.Status == config.StatusDisabled {
+		klog.Info("Telemetry is disabled")
 		return nil
 	}
 
