@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"k8s.io/apimachinery/pkg/util/sets"
+	"k8s.io/klog/v2"
 )
 
 func Must(err error) {
@@ -144,10 +145,31 @@ func (l LogFilePath) Remove() error {
 	return err
 }
 
+// GetTempPathArgs returns the directory in which to create a temp file
+// along with the pattern for the temp file name.
+func GetTempPathArgs(path string) (string, string) {
+	dir, file := filepath.Split(path)
+	pattern := file + ".tmp."
+	return dir, pattern
+}
+
+// CreateTempFile creates a temporary file from given path and returns
+// resulting file.
+func CreateTempFile(path string) (*os.File, error) {
+	dir, pattern := GetTempPathArgs(path)
+	return os.CreateTemp(dir, pattern)
+}
+
+func CreateTempDir(path string) (string, error) {
+	dir, pattern := GetTempPathArgs(path)
+	return os.MkdirTemp(dir, pattern)
+}
+
 // GenerateUniqueTempPath returns a filepath from given path with extra suffix
 // which doesn't exist.
 func GenerateUniqueTempPath(path string) (string, error) {
 	// 1000 tries
+	klog.Info("Called GenerateUniqueTempPath, original string: ", path)
 	for i := 0; i < 1000; i++ {
 		//nolint:gosec
 		rnd := rand.IntN(100000)
@@ -155,6 +177,7 @@ func GenerateUniqueTempPath(path string) (string, error) {
 		if exists, err := PathExists(newPath); err != nil {
 			return "", err
 		} else if !exists {
+			klog.Info("generated path: ", newPath)
 			return newPath, nil
 		}
 	}
