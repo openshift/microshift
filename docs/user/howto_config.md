@@ -29,6 +29,12 @@ dns:
 etcd:
     memoryLimitMB: 0
 ingress:
+    certificateSecret: ""
+    clientTLS:
+        allowedSubjectPatterns: []
+        clientCA:
+            name: ""
+        clientCertificatePolicy: ""
     defaultHTTPVersion: 0
     forwardedHeaderPolicy: ""
     httpCompression:
@@ -41,7 +47,16 @@ ingress:
         https: 0
     routeAdmissionPolicy:
         namespaceOwnership: ""
+        wildcardPolicy: ""
     status: ""
+    tlsSecurityProfile:
+        custom:
+            ciphers: []
+            minTLSVersion: ""
+        intermediate: {}
+        modern: {}
+        old: {}
+        type: ""
     tuningOptions:
         clientFinTimeout: ""
         clientTimeout: ""
@@ -108,6 +123,12 @@ dns:
 etcd:
     memoryLimitMB: 0
 ingress:
+    certificateSecret: ""
+    clientTLS:
+        allowedSubjectPatterns: []
+        clientCA:
+            name: ""
+        clientCertificatePolicy: ""
     defaultHTTPVersion: 1
     forwardedHeaderPolicy: ""
     httpCompression:
@@ -120,7 +141,16 @@ ingress:
         https: 443
     routeAdmissionPolicy:
         namespaceOwnership: InterNamespaceAllowed
+        wildcardPolicy: ""
     status: Managed
+    tlsSecurityProfile:
+        custom:
+            ciphers: []
+            minTLSVersion: ""
+        intermediate: {}
+        modern: {}
+        old: {}
+        type: ""
     tuningOptions:
         clientFinTimeout: 1s
         clientTimeout: 30s
