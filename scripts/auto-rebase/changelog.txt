@@ -1,16 +1,18 @@
-- cluster-ingress-operator embedded-component 8be174945db79b0660bd0fd21ed279ab7b6aafbf to a730e8a7af570d3921cd44c1468f38a250a6e647
-  - f16a8ee 2025-02-27T22:25:05+01:00 OCPBUGS-43745: Skip Test_IdleConnectionTerminationPolicyDeferred when DCM feature gate is enabled
-  - e90a5a7 2025-02-27T22:24:00+01:00 OCPBUGS-43745: Add e2e tests for for IdleConnectionTerminationPolicy
-  - 7e4df03 2025-02-27T22:23:28+01:00 test/http2: enhance response handlers
-  - f83eb11 2025-02-25T17:09:10+01:00 OCPBUGS-43745: Add support for idle connection termination policy
-  - 95f7dd9 2025-02-25T17:09:10+01:00 OCPBUGS-48377: Vendor openshift/api#2178
-
-- machine-config-operator embedded-component d3aff45960a611a4008d75dd523c289aa97acbb1 to 7f706b7a3b7d8ac3ca8bd058229ed66dbddf789e
-  - 5ec802ae 2025-02-18T21:35:45+00:00 Enforce VIPs to be collocated at the same host
-
-- router image-amd64 15430fd4fa51f63bb5413200fe524b670e79c1cf to d8058949aaf91dcdea050c58e6a34ef5f6670c67
-  - ef0af34 2025-01-14T13:47:53+00:00 Make idle-close-on-response configurable in HAProxy template
-
-- router image-arm64 15430fd4fa51f63bb5413200fe524b670e79c1cf to d8058949aaf91dcdea050c58e6a34ef5f6670c67
-  - ef0af34 2025-01-14T13:47:53+00:00 Make idle-close-on-response configurable in HAProxy template
+- ovn-kubernetes image-arm64 5f6ad07d88d8470b2d525803c60bdb5cd0164639 to 799f96146c2056a50ae8252a87c03de1cc698f13
+  - ee203116 2025-02-24T10:20:56+00:00 Fix CM-EIP controller flake
+  - 6b21a404 2025-02-24T10:20:56+00:00 Fix Kind IPV6 deplyoment with RUN_IN_CONTAINER
+  - 4e4539ea 2025-02-24T10:20:56+00:00 Change dynamic_neigh_routers to false for the Interconnect topology.
+  - 7c3652c0 2025-02-24T10:20:55+00:00 fix lint
+  - 87f2ceb4 2025-02-24T10:20:55+00:00 don't return error for pods with no IPs assigned.
+  - 1a9ba9a7 2025-02-24T10:20:55+00:00 Add some more ExpectNoError checks to the e2e tests
+  - a1f8c2bc 2025-02-24T10:20:55+00:00 Reimplement e2epod.DeletePodWithWait to correctly handle pods that get restarted.
+  - d10321d9 2025-02-24T10:20:55+00:00 Enrich CNI request pod UID error with the mismatched UIDs
+  - 5bac5168 2025-02-24T10:20:55+00:00 Fix node event reporting.
+  - 18089e08 2025-02-24T10:20:55+00:00 observability-lib/model: reduce dependencies by duplicating constants
+  - be77a99e 2025-02-24T10:20:55+00:00 Slightly fix UDN local gateway masquerade rules (and unit tests)
+  - fc5d9373 2025-02-24T10:20:55+00:00 Fix some nftables checking in the unit tests
+  - bc7e86e4 2025-02-24T10:20:55+00:00 Handles unspecified protocol in network policy port
+  - 9e4907d4 2025-02-24T10:20:55+00:00 Add e2e test to validate that egressfirewall supports DNS name in caps
+  - 1629b3ea 2025-02-24T10:20:55+00:00 docs/multi-network-policies: Refactor to meet org template
+  - db6e142b 2025-02-24T10:20:55+00:00 docs/multi-homing: Refactor to meet org template
 
