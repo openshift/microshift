@@ -502,8 +502,9 @@ def upload_file(vm_name: str, src: str, dst: str):
 
 def wait_for_guest_agent(vm_name: str):
     """
-    :param vm_name:     The name of the VM to ping repeatedly
-    :type vm_name:      str
+    :param vm_name:         The name of the VM to ping repeatedly
+    :type vm_name:          str
+    :raises RuntimeError:   If the guest-ping fails after max_retries
     """
     max_retries = 30
     sleep_time = 2
@@ -513,7 +514,7 @@ def wait_for_guest_agent(vm_name: str):
         try:
             guest_agent_is_ready(vm_name)
             print("QEMU agent is now available")
-            return 0
+            return
         except Exception:
             print(f"Attempt {i}/{max_retries}: QEMU agent not ready, retrying in {sleep_time} seconds")
             sleep(sleep_time)

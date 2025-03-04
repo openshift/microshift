@@ -228,11 +228,6 @@ sos_report_for_vm_offline() {
 
     invoke_qemu_script "wait" \
         "--vm" "${full_vmname}"
-    ready="$?"
-    if [ "${ready}" -ne 0 ]; then
-        echo "QEMU agent not available, exiting"
-        exit 1
-    fi
 
     invoke_qemu_script "upload" \
         "--vm"  "${full_vmname}" \
