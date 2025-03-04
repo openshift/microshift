@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"io/fs"
-	"math/rand/v2"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -13,7 +12,6 @@ import (
 	"time"
 
 	"k8s.io/apimachinery/pkg/util/sets"
-	"k8s.io/klog/v2"
 )
 
 func Must(err error) {
@@ -163,23 +161,4 @@ func CreateTempFile(path string) (*os.File, error) {
 func CreateTempDir(path string) (string, error) {
 	dir, pattern := GetTempPathArgs(path)
 	return os.MkdirTemp(dir, pattern)
-}
-
-// GenerateUniqueTempPath returns a filepath from given path with extra suffix
-// which doesn't exist.
-func GenerateUniqueTempPath(path string) (string, error) {
-	// 1000 tries
-	klog.Info("Called GenerateUniqueTempPath, original string: ", path)
-	for i := 0; i < 1000; i++ {
-		//nolint:gosec
-		rnd := rand.IntN(100000)
-		newPath := fmt.Sprintf("%s.tmp.%d", path, rnd)
-		if exists, err := PathExists(newPath); err != nil {
-			return "", err
-		} else if !exists {
-			klog.Info("generated path: ", newPath)
-			return newPath, nil
-		}
-	}
-	return "", fmt.Errorf("attempted to generate unique temporary path (%q) for 1000 tries - giving up", path)
 }
