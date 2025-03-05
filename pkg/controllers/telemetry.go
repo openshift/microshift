@@ -61,13 +61,17 @@ func (t *TelemetryManager) Run(ctx context.Context, ready chan<- struct{}, stopp
 	if err != nil {
 		return fmt.Errorf("unable to get cluster id: %v", err)
 	}
-	pullSecret, err := readPullSecret()
-	if err != nil {
-		return fmt.Errorf("unable to get pull secret: %v", err)
-	}
 
-	_ = telemetry.NewTelemetryClient(t.config.Telemetry.Endpoint, clusterId, pullSecret)
 	go func() {
+
+		pullSecret, err := readPullSecret()
+		if err != nil {
+			klog.Infof("Disabling telemetry: unable to get pull secret: %v", err)
+			return
+		}
+
+		_ = telemetry.NewTelemetryClient(t.config.Telemetry.Endpoint, clusterId, pullSecret)
+
 		klog.Infof("First metrics collection")
 		for {
 			select {
