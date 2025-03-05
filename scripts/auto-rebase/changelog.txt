@@ -1,34 +1,98 @@
-- api embedded-component 1ee1ef83110046a60c1b083b09ee1f1506913793 to f587fb60f627fcdcff72a34293cb0771a8897338
-  - 09148e88 2025-02-27T09:18:19+01:00 security: add annotation for validated SCC type
-  - 19379d6c 2025-02-26T13:27:26+00:00 Add example of excluding subnets pattern
+- cluster-ingress-operator embedded-component 26f8b0f9c9fa30ff84f08f7e1f9da87aef431891 to 69cadab177d66bb2324897db4be50ae67fab1fc7
+  - 6ed63fe 2025-01-24T17:57:12+01:00 NE-1936: Bump k8s.io dependencies to v0.32.1
 
-- cluster-kube-apiserver-operator embedded-component 34af639409ff04da7e89f214c804145587e9334e to c13665bdedd2ee30d28ff83c187ea739d9b8094d
-  - 1d1f9e4 2025-03-03T17:07:29+08:00 readme: describe mapping between LogLevel and log level
-  - 4d75af9 2025-02-28T13:42:09+01:00 configobservation/auth: remove webhook token authenticator when auth type is OIDC
-  - 846e179 2025-02-28T13:42:09+01:00 configobservation/auth: remove auth metadata config when auth type is None or OIDC
-  - ecdc657 2025-02-28T13:42:09+01:00 operator: add structured auth config as a revision configmap
-  - d6e1d16 2025-02-28T13:42:08+01:00 configobservation/auth: add external OIDC config observer
-  - ede574e 2025-02-28T13:42:08+01:00 configobservation/auth: prune configs returned by config observers to what they manage
-  - b652ddb 2024-12-03T12:50:16+01:00 configobservation/auth: add unit tests for auth metadata config observer
+- cluster-network-operator embedded-component c2322a96435f1dc25d6d79482b5fcbcdf0e5d7f9 to 972dea1fa5ac0b403496f88b2b0c59e1aa471de8
+  - b99b606 2025-02-28T14:45:01+01:00 Better handling of status manager machine config cache
+  - 080f445 2025-02-28T14:45:01+01:00 Use network config last seen annotation for machine config
+  - b3c03e4 2025-02-28T14:45:00+01:00 Report network status for machine config deletes
+  - 97309ac 2025-02-28T14:45:00+01:00 Use source kind for machine config watcher
+  - cab04d3 2025-02-28T14:45:00+01:00 Revert "Update network operator status for IPsec"
+  - 78d1ab1 2025-02-28T14:45:00+01:00 Make machine config handling to be more generic
+  - 76fb242 2025-02-28T14:45:00+01:00 Report IPsec machine config progressing status
+  - 4753cfa 2025-02-28T14:45:00+01:00 Add machine config watcher for status manager
 
-- cluster-kube-controller-manager-operator embedded-component 6a932ac83494daf0cf6eecd83068ce7a2c665238 to 84e020145ed33c98597f675fff638c83f4d351a4
-  - ebf8fb7 2025-02-28T09:42:39+08:00 Update README.md
-  - 736e228 2025-02-27T17:25:03+08:00 readme: describe mapping between operatorLogLevel and log level
+- machine-config-operator embedded-component 07ba85e326d5777452d555e179b99309c6aa4a6b to 19ba3dda6e7a34fe5f15917152271191f9adb655
+  - 24d9a767 2025-03-01T11:11:21-05:00 go.mod: Kube bump to 1.32 operator.go: NewKubeRecorder now needs a Passive clock as an argument status.go: SetStatusConditions now needs a Passive clock as an argument Dockerfile: Multi arch builds for 1.32 golang is not yet supported, hence reverting
 
-- cluster-network-operator embedded-component d09028dfda8c632e4c4730319b9f07f0ac92d82a to c2322a96435f1dc25d6d79482b5fcbcdf0e5d7f9
-  - 68e28f8 2025-02-26T15:41:38-05:00 Enable whereabouts fast ranges
+- oc image-amd64 514a4581b8a6b8b0aef5832e50adf1037ffd9566 to e7e738cc324d3cde21df43c3e22286ff595d493d
+  - bcd1edc9 2025-03-03T15:13:25+03:00 Bump x/oauth2 and x/crypto
 
-- etcd embedded-component d36de75cb3fa96e25893d7b824b01c177490a261 to e9234c8be833630785710e02700ffbffb63b7952
-  - 42c9ce82 2025-02-28T10:08:25-05:00 DOWNSTREAM: <carry> fix a compaction induce latency issue
+- ovn-kubernetes image-amd64 2e689e10bffbd7a2833be5e75a48b5311586a83d to 66faee9937abbd9abc8e72e160c6fb2f4e606e9b
+  - 57a2590a 2025-02-27T18:31:54+01:00 Add thelper linter and fixes
+  - 866e65fe 2025-02-27T18:31:54+01:00 Add testify linter and fixes
+  - cd0eae1b 2025-02-27T18:31:54+01:00 Add ginkgolinter and fixes
+  - a3570ad9 2025-02-27T18:31:54+01:00 Lint unit tests
+  - b4f8c4e2 2025-02-26T23:53:33+05:30 Add BGP support for user defined networks
+  - f47e0524 2025-02-26T14:52:26+01:00 ocspinning: Enable the feature at runtime
+  - 48763af3 2025-02-26T10:36:18+02:00 change recorder name to better representation
+  - aca93559 2025-02-25T20:52:48+02:00 docs/multi-homing: Add missing physicalNetworkName reference
+  - 0c9e677f 2025-02-25T12:07:23-05:00 Move egressIP podAssignment to syncmap
+  - a9753ea7 2025-02-25T22:22:44+05:30 Copy labels from UDN to corresponding NAD
+  - 2ef561f0 2025-02-25T11:46:31-05:00 Serialize egress IP handling
+  - 1bb1d25e 2025-02-24T12:49:26+00:00 Update .golangci.yml deprecated fields
+  - 202f0598 2025-02-24T12:49:26+00:00 Clean up unused parameters from management port interface
+  - a8cbb257 2025-02-24T12:49:26+00:00 Add rule for libovsdb/ovsdb to importas linter and fix
+  - 9ea5b14a 2025-02-24T12:49:26+00:00 Add gci linter and fixes
+  - 28401dc2 2025-02-24T12:49:25+00:00 Add revive error-naming linter and fixes
+  - 52fa1a9b 2025-02-24T12:49:25+00:00 Add importas linter and fixes
+  - 321af998 2025-02-24T12:49:25+00:00 Add revive dup import linter
+  - 683e7646 2025-02-24T12:49:25+00:00 Add revive unused parameter linter and fixes
+  - ac5b8333 2025-02-24T12:49:25+00:00 Enable all govet lint and fixes
+  - 8a42b869 2025-02-24T12:49:20+00:00 Add goimports linter and fixes
+  - 02515aed 2025-02-24T12:34:14+00:00 Remove deprecated exportloopref linter
+  - b454cc2c 2025-02-20T14:39:09+01:00 Make retest command work with multiple workflows
+  - b425b0ff 2025-02-19T13:10:29-08:00 Add podAntiAffinity rule to ovnkube-identity deployment
+  - d8a2262d 2025-02-18T10:05:39-05:00 Fixes CreateOrReplaceLogicalRouterStaticRouteWithPredicate timeout
+  - 8c232236 2025-02-17T17:03:42-05:00 Perf improvement: egress ip/qos reroute rules
+  - 8e1c61cf 2025-02-17T16:49:39-05:00 Fix updateNetworkStatus
+  - 1a5a6c27 2025-02-17T14:40:49-05:00 Fixes CNI primary udn log message
+  - 4a0eb31f 2025-02-17T12:14:26-05:00 Fixes nodeSubnetChanged
+  - fb3d38c1 2025-02-17T12:01:21-05:00 Remove macAddressChanged
+  - 0a28657b 2025-02-17T14:58:09+01:00 build, images: pass the OCI_BIN variable to the img building scripts
+  - 4717e7b6 2025-02-13T18:06:39-05:00 Add better logging for cluster manager network controller
+  - fe7aa602 2025-02-13T18:04:48-05:00 Make network controllers have infinite attempts
+  - 88619db2 2025-02-13T14:20:49-08:00 Enhance EgressQoS CR as a generic QoS feature
+  - 085fea50 2025-02-13T19:27:20+01:00 kind: ovn branch and repo
+  - e12c11ee 2025-01-31T21:06:37+00:00 [TRIVIAL] helm: remove duplicate key in values-single-node-zone.yaml: enablePersistentIPs
 
-- machine-config-operator embedded-component 2320deabaac93c8bae12d4d8c35842965720bac8 to 07ba85e326d5777452d555e179b99309c6aa4a6b
-  - 9ad1298c 2025-02-26T16:05:54-05:00 Set ownerReference for OCL build objects
-  - e7cca243 2024-12-18T16:23:59-06:00 OPNET-629: Mark haproxy unhealthy if no healthy backends
+- oc image-arm64 514a4581b8a6b8b0aef5832e50adf1037ffd9566 to e7e738cc324d3cde21df43c3e22286ff595d493d
+  - bcd1edc9 2025-03-03T15:13:25+03:00 Bump x/oauth2 and x/crypto
 
-- openshift-controller-manager embedded-component 29531eafbff8b466bbee6a02c345f43245053482 to ed3eae5db73699e2b6ad0b513589e06b4bf6f5aa
-  - 62dfc66 2025-02-26T11:28:37+01:00 add .snyk file
-  - d85793a 2025-02-25T20:22:55+01:00 react to upstream changes
-  - b79bdb1 2025-02-25T14:06:02+01:00 Updating ose-openshift-controller-manager-container image to be consistent with ART for 4.19
-  - 67b01c3 2025-02-17T17:33:38+01:00 go mod vendor
-  - 827a60a 2025-02-17T17:33:38+01:00 bump(k8s): update k8s.io/* dependencies to v1.32.2
+- ovn-kubernetes image-arm64 2e689e10bffbd7a2833be5e75a48b5311586a83d to 66faee9937abbd9abc8e72e160c6fb2f4e606e9b
+  - 57a2590a 2025-02-27T18:31:54+01:00 Add thelper linter and fixes
+  - 866e65fe 2025-02-27T18:31:54+01:00 Add testify linter and fixes
+  - cd0eae1b 2025-02-27T18:31:54+01:00 Add ginkgolinter and fixes
+  - a3570ad9 2025-02-27T18:31:54+01:00 Lint unit tests
+  - b4f8c4e2 2025-02-26T23:53:33+05:30 Add BGP support for user defined networks
+  - f47e0524 2025-02-26T14:52:26+01:00 ocspinning: Enable the feature at runtime
+  - 48763af3 2025-02-26T10:36:18+02:00 change recorder name to better representation
+  - aca93559 2025-02-25T20:52:48+02:00 docs/multi-homing: Add missing physicalNetworkName reference
+  - 0c9e677f 2025-02-25T12:07:23-05:00 Move egressIP podAssignment to syncmap
+  - a9753ea7 2025-02-25T22:22:44+05:30 Copy labels from UDN to corresponding NAD
+  - 2ef561f0 2025-02-25T11:46:31-05:00 Serialize egress IP handling
+  - 1bb1d25e 2025-02-24T12:49:26+00:00 Update .golangci.yml deprecated fields
+  - 202f0598 2025-02-24T12:49:26+00:00 Clean up unused parameters from management port interface
+  - a8cbb257 2025-02-24T12:49:26+00:00 Add rule for libovsdb/ovsdb to importas linter and fix
+  - 9ea5b14a 2025-02-24T12:49:26+00:00 Add gci linter and fixes
+  - 28401dc2 2025-02-24T12:49:25+00:00 Add revive error-naming linter and fixes
+  - 52fa1a9b 2025-02-24T12:49:25+00:00 Add importas linter and fixes
+  - 321af998 2025-02-24T12:49:25+00:00 Add revive dup import linter
+  - 683e7646 2025-02-24T12:49:25+00:00 Add revive unused parameter linter and fixes
+  - ac5b8333 2025-02-24T12:49:25+00:00 Enable all govet lint and fixes
+  - 8a42b869 2025-02-24T12:49:20+00:00 Add goimports linter and fixes
+  - 02515aed 2025-02-24T12:34:14+00:00 Remove deprecated exportloopref linter
+  - b454cc2c 2025-02-20T14:39:09+01:00 Make retest command work with multiple workflows
+  - b425b0ff 2025-02-19T13:10:29-08:00 Add podAntiAffinity rule to ovnkube-identity deployment
+  - d8a2262d 2025-02-18T10:05:39-05:00 Fixes CreateOrReplaceLogicalRouterStaticRouteWithPredicate timeout
+  - 8c232236 2025-02-17T17:03:42-05:00 Perf improvement: egress ip/qos reroute rules
+  - 8e1c61cf 2025-02-17T16:49:39-05:00 Fix updateNetworkStatus
+  - 1a5a6c27 2025-02-17T14:40:49-05:00 Fixes CNI primary udn log message
+  - 4a0eb31f 2025-02-17T12:14:26-05:00 Fixes nodeSubnetChanged
+  - fb3d38c1 2025-02-17T12:01:21-05:00 Remove macAddressChanged
+  - 0a28657b 2025-02-17T14:58:09+01:00 build, images: pass the OCI_BIN variable to the img building scripts
+  - 4717e7b6 2025-02-13T18:06:39-05:00 Add better logging for cluster manager network controller
+  - fe7aa602 2025-02-13T18:04:48-05:00 Make network controllers have infinite attempts
+  - 88619db2 2025-02-13T14:20:49-08:00 Enhance EgressQoS CR as a generic QoS feature
+  - 085fea50 2025-02-13T19:27:20+01:00 kind: ovn branch and repo
+  - e12c11ee 2025-01-31T21:06:37+00:00 [TRIVIAL] helm: remove duplicate key in values-single-node-zone.yaml: enablePersistentIPs
 
