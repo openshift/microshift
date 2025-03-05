@@ -46,22 +46,23 @@ type MetricLabel struct {
 }
 
 type TelemetryClient struct {
-	encodedAuth string
-	endpoint    string
-	clusterId   string
+	endpoint  string
+	clusterId string
 }
 
-func NewTelemetryClient(baseURL, clusterId, pullSecret string) *TelemetryClient {
-	authString := fmt.Sprintf(authString, pullSecret, clusterId)
-	encodedAuth := base64.StdEncoding.EncodeToString([]byte(authString))
+func NewTelemetryClient(baseURL, clusterId string) *TelemetryClient {
 	return &TelemetryClient{
-		encodedAuth: encodedAuth,
-		endpoint:    fmt.Sprintf("%s/metrics/v1/receive", baseURL),
-		clusterId:   clusterId,
+		endpoint:  fmt.Sprintf("%s/metrics/v1/receive", baseURL),
+		clusterId: clusterId,
 	}
 }
 
-func (t *TelemetryClient) Send(ctx context.Context, metrics []Metric) error {
+func (t *TelemetryClient) encodeAuth(pullSecret string) string {
+	authString := fmt.Sprintf(authString, pullSecret, t.clusterId)
+	return base64.StdEncoding.EncodeToString([]byte(authString))
+}
+
+func (t *TelemetryClient) Send(ctx context.Context, pullSecret string, metrics []Metric) error {
 	wr := convertMetricsToWriteRequest(metrics)
 	data, err := proto.Marshal(wr)
 	if err != nil {
@@ -80,7 +81,7 @@ func (t *TelemetryClient) Send(ctx context.Context, metrics []Metric) error {
 	}
 	req.Header.Set("Content-Type", "application/x-protobuf")
 	req.Header.Set("Content-Encoding", "snappy")
-	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", t.encodedAuth))
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", t.encodeAuth(pullSecret)))
 
 	client := &http.Client{}
 	resp, err := client.Do(req)

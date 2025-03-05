@@ -63,23 +63,32 @@ func (t *TelemetryManager) Run(ctx context.Context, ready chan<- struct{}, stopp
 	}
 
 	go func() {
-
-		pullSecret, err := readPullSecret()
-		if err != nil {
-			klog.Infof("Disabling telemetry: unable to get pull secret: %v", err)
-			return
+		client := telemetry.NewTelemetryClient(t.config.Telemetry.Endpoint, clusterId)
+		collectAndSend := func() {
+			pullSecret, err := readPullSecret()
+			if err != nil {
+				klog.Errorf("Unable to get pull secret: %v", err)
+				return
+			}
+			//TODO swap with collected metrics from client.
+			metrics := []telemetry.Metric{}
+			if err := client.Send(ctx, pullSecret, metrics); err != nil {
+				klog.Errorf("Failed to send metrics: %v", err)
+			}
 		}
 
-		_ = telemetry.NewTelemetryClient(t.config.Telemetry.Endpoint, clusterId, pullSecret)
-
 		klog.Infof("First metrics collection")
+		collectAndSend()
+
 		for {
 			select {
 			case <-ctx.Done():
 				klog.Infof("collect and send for the last time")
+				collectAndSend()
 				return
 			case <-time.After(time.Hour):
 				klog.Infof("collect and send again")
+				collectAndSend()
 			}
 		}
 	}()
