@@ -145,7 +145,7 @@ func (l LogFilePath) Remove() error {
 
 // GetTempPathArgs returns the directory in which to create a temp file
 // along with the pattern for the temp file name.
-func GetTempPathArgs(path string) (string, string) {
+func getTempPathArgs(path string) (string, string) {
 	dir, file := filepath.Split(path)
 	pattern := file + ".tmp."
 	return dir, pattern
@@ -154,13 +154,13 @@ func GetTempPathArgs(path string) (string, string) {
 // CreateTempFile creates a temporary file from given path and returns
 // resulting file
 func CreateTempFile(path string) (*os.File, error) {
-	dir, pattern := GetTempPathArgs(path)
+	dir, pattern := getTempPathArgs(path)
 	return os.CreateTemp(dir, pattern)
 }
 
 // CreateTempDir creates a temporary directory from given path and returns
 // the pathname of the new directory.
 func CreateTempDir(path string) (string, error) {
-	dir, pattern := GetTempPathArgs(path)
+	dir, pattern := getTempPathArgs(path)
 	return os.MkdirTemp(dir, pattern)
 }
