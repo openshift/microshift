@@ -152,12 +152,14 @@ func GetTempPathArgs(path string) (string, string) {
 }
 
 // CreateTempFile creates a temporary file from given path and returns
-// resulting file.
+// resulting file
 func CreateTempFile(path string) (*os.File, error) {
 	dir, pattern := GetTempPathArgs(path)
 	return os.CreateTemp(dir, pattern)
 }
 
+// CreateTempDir creates a temporary directory from given path and returns
+// the pathname of the new directory.
 func CreateTempDir(path string) (string, error) {
 	dir, pattern := GetTempPathArgs(path)
 	return os.MkdirTemp(dir, pattern)
