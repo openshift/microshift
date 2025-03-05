@@ -98,3 +98,11 @@ func initClusterIDFile(clusterID string) error {
 	klog.Infof("Writing MicroShift Cluster ID '%v' to '%v'", clusterID, ClusterIDFilePath)
 	return os.WriteFile(ClusterIDFilePath, []byte(clusterID), 0400)
 }
+
+func GetClusterId() (string, error) {
+	data, err := os.ReadFile(ClusterIDFilePath)
+	if err != nil {
+		return "", fmt.Errorf("failed to read file: %v", err)
+	}
+	return string(data), nil
+}

@@ -89,12 +89,15 @@ func (t *TelemetryClient) Send(ctx context.Context, pullSecret string, metrics [
 		return fmt.Errorf("unable to do the request: %v", err)
 	}
 	defer func() {
+		// Discard the body to close the TCP socket right away instead of waiting for
+		// the timeout in TIME_WAIT.
 		if _, err := io.Copy(io.Discard, resp.Body); err != nil {
 			klog.Error(err, "error discarding body")
 		}
 		resp.Body.Close()
 	}()
 	if resp.StatusCode == http.StatusOK {
+		klog.Infof("Metrics sent successfully")
 		return nil
 	}
 	body, err := io.ReadAll(resp.Body)

@@ -49,58 +49,51 @@ func (t *TelemetryManager) Dependencies() []string {
 }
 
 func (t *TelemetryManager) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
+	// The service manager expects a service to get ready eventually before a timeout or else
+	// MicroShift fails to start correctly. Stopping a service is relevant only when stopping
+	// MicroShift, therefore if Telemetry is disabled we need to signal a fake readiness (even
+	// though it is technically correct, the service is ready even if it is not going to do anything).
+	// For stoppin the service we need to close the stopped channel or else MicroShift fails
+	// to stop gracefully.
 	defer close(stopped)
-	defer close(ready)
-
 	if t.config.Telemetry.Status == config.StatusDisabled {
 		klog.Info("Telemetry is disabled")
+		close(ready)
 		return nil
 	}
-
-	clusterId, err := getClusterId()
+	clusterId, err := GetClusterId()
 	if err != nil {
+		close(ready)
 		return fmt.Errorf("unable to get cluster id: %v", err)
 	}
-
-	go func() {
-		client := telemetry.NewTelemetryClient(t.config.Telemetry.Endpoint, clusterId)
-		collectAndSend := func() {
-			pullSecret, err := readPullSecret()
-			if err != nil {
-				klog.Errorf("Unable to get pull secret: %v", err)
-				return
-			}
-			//TODO swap with collected metrics from client.
-			metrics := []telemetry.Metric{}
-			if err := client.Send(ctx, pullSecret, metrics); err != nil {
-				klog.Errorf("Failed to send metrics: %v", err)
-			}
+	close(ready)
+	client := telemetry.NewTelemetryClient(t.config.Telemetry.Endpoint, clusterId)
+	collectAndSend := func() {
+		pullSecret, err := readPullSecret()
+		if err != nil {
+			klog.Errorf("Unable to get pull secret: %v", err)
+			return
 		}
-
-		klog.Infof("First metrics collection")
-		collectAndSend()
-
-		for {
-			select {
-			case <-ctx.Done():
-				klog.Infof("collect and send for the last time")
-				collectAndSend()
-				return
-			case <-time.After(time.Hour):
-				klog.Infof("collect and send again")
-				collectAndSend()
-			}
+		//TODO swap with collected metrics from client.
+		metrics := []telemetry.Metric{}
+		if err := client.Send(ctx, pullSecret, metrics); err != nil {
+			klog.Errorf("Failed to send metrics: %v", err)
 		}
-	}()
-	return nil
-}
-
-func getClusterId() (string, error) {
-	data, err := os.ReadFile(ClusterIDFilePath)
-	if err != nil {
-		return "", fmt.Errorf("failed to read file: %v", err)
 	}
-	return string(data), nil
+
+	klog.Infof("First metrics collection")
+	collectAndSend()
+	for {
+		select {
+		case <-ctx.Done():
+			klog.Infof("Collect and send for the last time")
+			collectAndSend()
+			return nil
+		case <-time.After(time.Hour):
+			klog.Infof("Collect and send again")
+			collectAndSend()
+		}
+	}
 }
 
 func readPullSecret() (string, error) {
