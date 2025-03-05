@@ -32,7 +32,7 @@ func (s *state) SaveToIntermediate() error {
 	if err != nil {
 		return err
 	}
-	file, err := os.CreateTemp(s.storagePath, stateFilename)
+	file, err := util.CreateTempFile(filepath.Join(s.storagePath, stateFilename))
 	if err != nil {
 		return err
 	}
