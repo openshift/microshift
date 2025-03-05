@@ -41,7 +41,6 @@ func (c *AtomicDirCopy) CopyToIntermediate() error {
 		return nil
 	}
 	var err error
-
 	c.intermediatePath, err = util.CreateTempDir(c.Destination)
 	if err != nil {
 		return err
