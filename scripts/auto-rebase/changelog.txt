@@ -1,4 +1,20 @@
-- ovn-kubernetes image-arm64 5f6ad07d88d8470b2d525803c60bdb5cd0164639 to 799f96146c2056a50ae8252a87c03de1cc698f13
+- api embedded-component cb44c196e68fc38178d56190d9de078069154a7b to e7f23be12279d3c245c013c234f967e5ccb426e2
+  - cb627f2 2025-03-04T08:19:59-05:00 Add example of ratcheting minimum value in example tests
+  - 6d07156 2025-03-04T08:19:48-05:00 Add initialCRDPatches option to onUpdate tests
+  - a8e9c1e 2025-03-04T08:19:40-05:00 Add yaml-patch to tests vendor
+  - c8ef681 2025-03-04T08:19:29-05:00 Remove unexpected example CRDs
+  - e424d05 2025-02-27T13:06:16+00:00 operators/v1: reject new node statuses with current or target revision set
+
+- machine-config-operator embedded-component 7f706b7a3b7d8ac3ca8bd058229ed66dbddf789e to c0e95912c69b3404355e056fb157acbbeb6be285
+  - 0a28a500 2025-02-27T16:20:11+00:00 OCPBUGS-41489: configure-ovs workaround for ovs-if-br-ex bug
+  - 0315a04a 2025-02-14T15:40:31+00:00 OCPBUGS-49436: Make resolv-prepender env file optional
+  - 753614ec 2025-01-23T17:43:15+00:00 OCPBUGS-48566: Enable nmstate-configuration on all platforms
+  - 74348f8a 2025-01-10T21:10:56+00:00 Update machine-config-daemon-pull.service.yaml and policy-no-sigstoresigned.yaml
+
+- operator-framework-olm embedded-component 182471a8d72ee38d2ff82ce44db6903e66c4b22b to 877b6fd3d425043a1bd45b5d24ecebb69f5544c4
+  - e31a86b2 2025-02-28T13:43:59-05:00 Bump github.com/distribution/distribution/v3 (#1580)
+
+- ovn-kubernetes image-amd64 5f6ad07d88d8470b2d525803c60bdb5cd0164639 to 799f96146c2056a50ae8252a87c03de1cc698f13
   - ee203116 2025-02-24T10:20:56+00:00 Fix CM-EIP controller flake
   - 6b21a404 2025-02-24T10:20:56+00:00 Fix Kind IPV6 deplyoment with RUN_IN_CONTAINER
   - 4e4539ea 2025-02-24T10:20:56+00:00 Change dynamic_neigh_routers to false for the Interconnect topology.
