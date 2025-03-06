@@ -821,7 +821,7 @@ remove_vm() {
 
     # Remove the VM storage pool
     if ! ${keep_pool} ; then
-        local -r vm_pool_name="${VM_POOL_BASENAME}-$(full_vmname)"
+        local -r vm_pool_name="${VM_POOL_BASENAME}-${full_vmname}"
         if sudo virsh pool-info "${vm_pool_name}" &>/dev/null; then
             sudo virsh pool-destroy "${vm_pool_name}"
             sudo virsh pool-undefine "${vm_pool_name}"
