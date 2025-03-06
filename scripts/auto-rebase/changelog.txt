@@ -1,98 +1,21 @@
-- cluster-ingress-operator embedded-component 26f8b0f9c9fa30ff84f08f7e1f9da87aef431891 to 69cadab177d66bb2324897db4be50ae67fab1fc7
-  - 6ed63fe 2025-01-24T17:57:12+01:00 NE-1936: Bump k8s.io dependencies to v0.32.1
+- api embedded-component f587fb60f627fcdcff72a34293cb0771a8897338 to 1cd9f24f0563610d1b75e18a90c005b427332016
+  - 8fb01636 2025-03-04T15:44:54-05:00 feat: add dualreplica featuregate
+  - 1c61d279 2025-03-04T17:16:20+01:00 Add SELinuxMount and SELinuxChangePolicy feature gates
+  - d978968c 2025-02-25T22:00:38-08:00 API changes to IBMCloudPlatform for supporting dynamic endpoint overrides
 
-- cluster-network-operator embedded-component c2322a96435f1dc25d6d79482b5fcbcdf0e5d7f9 to 972dea1fa5ac0b403496f88b2b0c59e1aa471de8
-  - b99b606 2025-02-28T14:45:01+01:00 Better handling of status manager machine config cache
-  - 080f445 2025-02-28T14:45:01+01:00 Use network config last seen annotation for machine config
-  - b3c03e4 2025-02-28T14:45:00+01:00 Report network status for machine config deletes
-  - 97309ac 2025-02-28T14:45:00+01:00 Use source kind for machine config watcher
-  - cab04d3 2025-02-28T14:45:00+01:00 Revert "Update network operator status for IPsec"
-  - 78d1ab1 2025-02-28T14:45:00+01:00 Make machine config handling to be more generic
-  - 76fb242 2025-02-28T14:45:00+01:00 Report IPsec machine config progressing status
-  - 4753cfa 2025-02-28T14:45:00+01:00 Add machine config watcher for status manager
+- cluster-csi-snapshot-controller-operator embedded-component a68ffe82329d198f79508daeb6c63c6bc2a4e19a to 4958fc82ce750b97e49d83f5082127c59d0f05c7
+  - 94bbf6a 2025-02-25T12:49:55+01:00 bump all deps 4.19
 
-- machine-config-operator embedded-component 07ba85e326d5777452d555e179b99309c6aa4a6b to 19ba3dda6e7a34fe5f15917152271191f9adb655
-  - 24d9a767 2025-03-01T11:11:21-05:00 go.mod: Kube bump to 1.32 operator.go: NewKubeRecorder now needs a Passive clock as an argument status.go: SetStatusConditions now needs a Passive clock as an argument Dockerfile: Multi arch builds for 1.32 golang is not yet supported, hence reverting
+- kubernetes embedded-component c3a6a36c352ab7a0616fd1e6ffedaf872b4aba21 to 6e49b3b40e79053565852e0cfc6a25b204022e20
+  - dbc91f7a3 2025-03-03T17:44:48+00:00 UPSTREAM: 130097: Modify how to check the status
 
-- oc image-amd64 514a4581b8a6b8b0aef5832e50adf1037ffd9566 to e7e738cc324d3cde21df43c3e22286ff595d493d
-  - bcd1edc9 2025-03-03T15:13:25+03:00 Bump x/oauth2 and x/crypto
+- machine-config-operator embedded-component 19ba3dda6e7a34fe5f15917152271191f9adb655 to f911d8fec09108c21dd5f645febfd8b8da6994a4
+  - 48301b36 2025-03-03T13:36:40-05:00 add revert logic to OCL path in MCD
 
-- ovn-kubernetes image-amd64 2e689e10bffbd7a2833be5e75a48b5311586a83d to 66faee9937abbd9abc8e72e160c6fb2f4e606e9b
-  - 57a2590a 2025-02-27T18:31:54+01:00 Add thelper linter and fixes
-  - 866e65fe 2025-02-27T18:31:54+01:00 Add testify linter and fixes
-  - cd0eae1b 2025-02-27T18:31:54+01:00 Add ginkgolinter and fixes
-  - a3570ad9 2025-02-27T18:31:54+01:00 Lint unit tests
-  - b4f8c4e2 2025-02-26T23:53:33+05:30 Add BGP support for user defined networks
-  - f47e0524 2025-02-26T14:52:26+01:00 ocspinning: Enable the feature at runtime
-  - 48763af3 2025-02-26T10:36:18+02:00 change recorder name to better representation
-  - aca93559 2025-02-25T20:52:48+02:00 docs/multi-homing: Add missing physicalNetworkName reference
-  - 0c9e677f 2025-02-25T12:07:23-05:00 Move egressIP podAssignment to syncmap
-  - a9753ea7 2025-02-25T22:22:44+05:30 Copy labels from UDN to corresponding NAD
-  - 2ef561f0 2025-02-25T11:46:31-05:00 Serialize egress IP handling
-  - 1bb1d25e 2025-02-24T12:49:26+00:00 Update .golangci.yml deprecated fields
-  - 202f0598 2025-02-24T12:49:26+00:00 Clean up unused parameters from management port interface
-  - a8cbb257 2025-02-24T12:49:26+00:00 Add rule for libovsdb/ovsdb to importas linter and fix
-  - 9ea5b14a 2025-02-24T12:49:26+00:00 Add gci linter and fixes
-  - 28401dc2 2025-02-24T12:49:25+00:00 Add revive error-naming linter and fixes
-  - 52fa1a9b 2025-02-24T12:49:25+00:00 Add importas linter and fixes
-  - 321af998 2025-02-24T12:49:25+00:00 Add revive dup import linter
-  - 683e7646 2025-02-24T12:49:25+00:00 Add revive unused parameter linter and fixes
-  - ac5b8333 2025-02-24T12:49:25+00:00 Enable all govet lint and fixes
-  - 8a42b869 2025-02-24T12:49:20+00:00 Add goimports linter and fixes
-  - 02515aed 2025-02-24T12:34:14+00:00 Remove deprecated exportloopref linter
-  - b454cc2c 2025-02-20T14:39:09+01:00 Make retest command work with multiple workflows
-  - b425b0ff 2025-02-19T13:10:29-08:00 Add podAntiAffinity rule to ovnkube-identity deployment
-  - d8a2262d 2025-02-18T10:05:39-05:00 Fixes CreateOrReplaceLogicalRouterStaticRouteWithPredicate timeout
-  - 8c232236 2025-02-17T17:03:42-05:00 Perf improvement: egress ip/qos reroute rules
-  - 8e1c61cf 2025-02-17T16:49:39-05:00 Fix updateNetworkStatus
-  - 1a5a6c27 2025-02-17T14:40:49-05:00 Fixes CNI primary udn log message
-  - 4a0eb31f 2025-02-17T12:14:26-05:00 Fixes nodeSubnetChanged
-  - fb3d38c1 2025-02-17T12:01:21-05:00 Remove macAddressChanged
-  - 0a28657b 2025-02-17T14:58:09+01:00 build, images: pass the OCI_BIN variable to the img building scripts
-  - 4717e7b6 2025-02-13T18:06:39-05:00 Add better logging for cluster manager network controller
-  - fe7aa602 2025-02-13T18:04:48-05:00 Make network controllers have infinite attempts
-  - 88619db2 2025-02-13T14:20:49-08:00 Enhance EgressQoS CR as a generic QoS feature
-  - 085fea50 2025-02-13T19:27:20+01:00 kind: ovn branch and repo
-  - e12c11ee 2025-01-31T21:06:37+00:00 [TRIVIAL] helm: remove duplicate key in values-single-node-zone.yaml: enablePersistentIPs
+- kubernetes image-amd64 c3a6a36c352ab7a0616fd1e6ffedaf872b4aba21 to 6e49b3b40e79053565852e0cfc6a25b204022e20
+  - dbc91f7a3 2025-03-03T17:44:48+00:00 UPSTREAM: 130097: Modify how to check the status
 
-- oc image-arm64 514a4581b8a6b8b0aef5832e50adf1037ffd9566 to e7e738cc324d3cde21df43c3e22286ff595d493d
-  - bcd1edc9 2025-03-03T15:13:25+03:00 Bump x/oauth2 and x/crypto
-
-- ovn-kubernetes image-arm64 2e689e10bffbd7a2833be5e75a48b5311586a83d to 66faee9937abbd9abc8e72e160c6fb2f4e606e9b
-  - 57a2590a 2025-02-27T18:31:54+01:00 Add thelper linter and fixes
-  - 866e65fe 2025-02-27T18:31:54+01:00 Add testify linter and fixes
-  - cd0eae1b 2025-02-27T18:31:54+01:00 Add ginkgolinter and fixes
-  - a3570ad9 2025-02-27T18:31:54+01:00 Lint unit tests
-  - b4f8c4e2 2025-02-26T23:53:33+05:30 Add BGP support for user defined networks
-  - f47e0524 2025-02-26T14:52:26+01:00 ocspinning: Enable the feature at runtime
-  - 48763af3 2025-02-26T10:36:18+02:00 change recorder name to better representation
-  - aca93559 2025-02-25T20:52:48+02:00 docs/multi-homing: Add missing physicalNetworkName reference
-  - 0c9e677f 2025-02-25T12:07:23-05:00 Move egressIP podAssignment to syncmap
-  - a9753ea7 2025-02-25T22:22:44+05:30 Copy labels from UDN to corresponding NAD
-  - 2ef561f0 2025-02-25T11:46:31-05:00 Serialize egress IP handling
-  - 1bb1d25e 2025-02-24T12:49:26+00:00 Update .golangci.yml deprecated fields
-  - 202f0598 2025-02-24T12:49:26+00:00 Clean up unused parameters from management port interface
-  - a8cbb257 2025-02-24T12:49:26+00:00 Add rule for libovsdb/ovsdb to importas linter and fix
-  - 9ea5b14a 2025-02-24T12:49:26+00:00 Add gci linter and fixes
-  - 28401dc2 2025-02-24T12:49:25+00:00 Add revive error-naming linter and fixes
-  - 52fa1a9b 2025-02-24T12:49:25+00:00 Add importas linter and fixes
-  - 321af998 2025-02-24T12:49:25+00:00 Add revive dup import linter
-  - 683e7646 2025-02-24T12:49:25+00:00 Add revive unused parameter linter and fixes
-  - ac5b8333 2025-02-24T12:49:25+00:00 Enable all govet lint and fixes
-  - 8a42b869 2025-02-24T12:49:20+00:00 Add goimports linter and fixes
-  - 02515aed 2025-02-24T12:34:14+00:00 Remove deprecated exportloopref linter
-  - b454cc2c 2025-02-20T14:39:09+01:00 Make retest command work with multiple workflows
-  - b425b0ff 2025-02-19T13:10:29-08:00 Add podAntiAffinity rule to ovnkube-identity deployment
-  - d8a2262d 2025-02-18T10:05:39-05:00 Fixes CreateOrReplaceLogicalRouterStaticRouteWithPredicate timeout
-  - 8c232236 2025-02-17T17:03:42-05:00 Perf improvement: egress ip/qos reroute rules
-  - 8e1c61cf 2025-02-17T16:49:39-05:00 Fix updateNetworkStatus
-  - 1a5a6c27 2025-02-17T14:40:49-05:00 Fixes CNI primary udn log message
-  - 4a0eb31f 2025-02-17T12:14:26-05:00 Fixes nodeSubnetChanged
-  - fb3d38c1 2025-02-17T12:01:21-05:00 Remove macAddressChanged
-  - 0a28657b 2025-02-17T14:58:09+01:00 build, images: pass the OCI_BIN variable to the img building scripts
-  - 4717e7b6 2025-02-13T18:06:39-05:00 Add better logging for cluster manager network controller
-  - fe7aa602 2025-02-13T18:04:48-05:00 Make network controllers have infinite attempts
-  - 88619db2 2025-02-13T14:20:49-08:00 Enhance EgressQoS CR as a generic QoS feature
-  - 085fea50 2025-02-13T19:27:20+01:00 kind: ovn branch and repo
-  - e12c11ee 2025-01-31T21:06:37+00:00 [TRIVIAL] helm: remove duplicate key in values-single-node-zone.yaml: enablePersistentIPs
+- kubernetes image-arm64 c3a6a36c352ab7a0616fd1e6ffedaf872b4aba21 to abc29e3ec6ee8054408f4c2a0e0781e2af49f9c4
+  - 813a08c10 2025-03-04T18:53:05+00:00 UPSTREAM: <carry>: OCPBUGS-45274: Enable PodRejectionStatus test
+  - dbc91f7a3 2025-03-03T17:44:48+00:00 UPSTREAM: 130097: Modify how to check the status
 
