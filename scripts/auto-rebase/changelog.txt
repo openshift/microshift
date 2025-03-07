@@ -1,6 +1,0 @@
-- ovn-kubernetes image-amd64 f749d5f5981d0041356671ed0c361133c3273e6d to 01af23cb323ec1506b5faf23e3e0d3b59df24fc8
-  - b338432 2025-01-20T13:10:34+00:00 Add SDN node subnet gateway IP to host-network address_set
-
-- ovn-kubernetes image-arm64 f749d5f5981d0041356671ed0c361133c3273e6d to 01af23cb323ec1506b5faf23e3e0d3b59df24fc8
-  - b338432 2025-01-20T13:10:34+00:00 Add SDN node subnet gateway IP to host-network address_set
-
