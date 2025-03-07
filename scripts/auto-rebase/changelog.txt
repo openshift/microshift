@@ -1,21 +1,4 @@
-- api embedded-component f587fb60f627fcdcff72a34293cb0771a8897338 to 1cd9f24f0563610d1b75e18a90c005b427332016
-  - 8fb01636 2025-03-04T15:44:54-05:00 feat: add dualreplica featuregate
-  - 1c61d279 2025-03-04T17:16:20+01:00 Add SELinuxMount and SELinuxChangePolicy feature gates
-  - d978968c 2025-02-25T22:00:38-08:00 API changes to IBMCloudPlatform for supporting dynamic endpoint overrides
-
-- cluster-csi-snapshot-controller-operator embedded-component a68ffe82329d198f79508daeb6c63c6bc2a4e19a to 4958fc82ce750b97e49d83f5082127c59d0f05c7
-  - 94bbf6a 2025-02-25T12:49:55+01:00 bump all deps 4.19
-
-- kubernetes embedded-component c3a6a36c352ab7a0616fd1e6ffedaf872b4aba21 to 6e49b3b40e79053565852e0cfc6a25b204022e20
-  - dbc91f7a3 2025-03-03T17:44:48+00:00 UPSTREAM: 130097: Modify how to check the status
-
-- machine-config-operator embedded-component 19ba3dda6e7a34fe5f15917152271191f9adb655 to f911d8fec09108c21dd5f645febfd8b8da6994a4
-  - 48301b36 2025-03-03T13:36:40-05:00 add revert logic to OCL path in MCD
-
-- kubernetes image-amd64 c3a6a36c352ab7a0616fd1e6ffedaf872b4aba21 to 6e49b3b40e79053565852e0cfc6a25b204022e20
-  - dbc91f7a3 2025-03-03T17:44:48+00:00 UPSTREAM: 130097: Modify how to check the status
-
-- kubernetes image-arm64 c3a6a36c352ab7a0616fd1e6ffedaf872b4aba21 to abc29e3ec6ee8054408f4c2a0e0781e2af49f9c4
-  - 813a08c10 2025-03-04T18:53:05+00:00 UPSTREAM: <carry>: OCPBUGS-45274: Enable PodRejectionStatus test
-  - dbc91f7a3 2025-03-03T17:44:48+00:00 UPSTREAM: 130097: Modify how to check the status
+- kubernetes image-arm64 abc29e3ec6ee8054408f4c2a0e0781e2af49f9c4 to 4dada5ed6a07cb22fb5ea2da82b32cebfe12aa97
+  - 52938ee0c 2025-03-03T18:43:47+01:00 UPSTREAM: <carry>: Print better error when no TEST_PROVIDER is set
+  - 05d22e6eb 2025-03-03T15:14:53+01:00 UPSTREAM: <carry>: Initialize testContext before enumerating tests
 
