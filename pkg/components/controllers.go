@@ -5,19 +5,32 @@ import (
 	"fmt"
 	"math"
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
 
+	configv1 "github.com/openshift/api/config/v1"
 	operatorv1 "github.com/openshift/api/operator/v1"
 	"github.com/openshift/microshift/pkg/assets"
 	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/util/cryptomaterial"
+	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/klog/v2"
 )
 
 const (
 	haproxyMaxTimeoutMilliseconds = 2147483647 * time.Millisecond
+)
+
+var (
+	tlsVersion13Ciphers = sets.NewString(
+		"TLS_AES_128_GCM_SHA256",
+		"TLS_AES_256_GCM_SHA384",
+		"TLS_CHACHA20_POLY1305_SHA256",
+		"TLS_AES_128_CCM_SHA256",
+		"TLS_AES_128_CCM_8_SHA256",
+	)
 )
 
 func startServiceCAController(ctx context.Context, cfg *config.Config, kubeconfigPath string) error {
@@ -333,6 +346,25 @@ func durationToHAProxyTimespec(duration time.Duration) string {
 	}
 }
 
+// tlsProfileSpecForSecurityProfile returns a TLS profile spec based on the
+// provided security profile, or the "Intermediate" profile if an unknown
+// security profile type is provided.  Note that the return value must not be
+// mutated by the caller; the caller must make a copy if it needs to mutate the
+// value.
+func tlsProfileSpecForSecurityProfile(profile *configv1.TLSSecurityProfile) *configv1.TLSProfileSpec {
+	if profile != nil {
+		if profile.Type == configv1.TLSProfileCustomType {
+			if profile.Custom != nil {
+				return &profile.Custom.TLSProfileSpec
+			}
+			return &configv1.TLSProfileSpec{}
+		} else if spec, ok := configv1.TLSProfiles[profile.Type]; ok {
+			return spec
+		}
+	}
+	return configv1.TLSProfiles[configv1.TLSProfileIntermediateType]
+}
+
 func generateIngressParams(cfg *config.Config) assets.RenderParams {
 	routerMode := "v4"
 	if cfg.IsIPv6() {
@@ -364,6 +396,67 @@ func generateIngressParams(cfg *config.Config) assets.RenderParams {
 		HTTPEmptyRequestsPolicy = true
 	}
 
+	tlsProfileSpec := tlsProfileSpecForSecurityProfile(cfg.Ingress.TLSSecurityProfile)
+	var tls13Ciphers, otherCiphers []string
+	for _, cipher := range tlsProfileSpec.Ciphers {
+		if tlsVersion13Ciphers.Has(cipher) {
+			tls13Ciphers = append(tls13Ciphers, cipher)
+		} else {
+			otherCiphers = append(otherCiphers, cipher)
+		}
+	}
+
+	RouterCiphers := strings.Join(otherCiphers, ":")
+	RouterCiphersSuites := ""
+	if len(tls13Ciphers) != 0 {
+		RouterCiphersSuites = strings.Join(tls13Ciphers, ":")
+	}
+
+	var RouterSSLMinVersion string
+	switch tlsProfileSpec.MinTLSVersion {
+	// TLS 1.0 is not supported, convert to TLS 1.1.
+	case configv1.VersionTLS10:
+		RouterSSLMinVersion = "TLSv1.1"
+	case configv1.VersionTLS11:
+		RouterSSLMinVersion = "TLSv1.1"
+	case configv1.VersionTLS12:
+		RouterSSLMinVersion = "TLSv1.2"
+	case configv1.VersionTLS13:
+		RouterSSLMinVersion = "TLSv1.3"
+	default:
+		RouterSSLMinVersion = "TLSv1.2"
+	}
+
+	RouterAllowWildcardRoutes := false
+	if cfg.Ingress.AdmissionPolicy.WildcardPolicy == config.WildcardPolicyAllowed {
+		RouterAllowWildcardRoutes = true
+	}
+
+	// clientCAPath := cfg.Ingress.ClientTLS.ClientCertificatePolicy
+
+	clientAuthPolicy := ""
+	clientCABundleFilename := "ca-bundle.pem"
+	clientCAMountPath := "/etc/pki/tls/client-ca"
+	clientCAMapName := ""
+	clientAuthCAPath := ""
+	clientAuthFilter := ""
+
+	if len(cfg.Ingress.ClientTLS.ClientCertificatePolicy) != 0 {
+		switch cfg.Ingress.ClientTLS.ClientCertificatePolicy {
+		case operatorv1.ClientCertificatePolicyRequired:
+			clientAuthPolicy = "required"
+		case operatorv1.ClientCertificatePolicyOptional:
+			clientAuthPolicy = "optional"
+		}
+		if len(cfg.Ingress.ClientTLS.ClientCA.Name) != 0 {
+			clientCAMapName = cfg.Ingress.ClientTLS.ClientCA.Name
+			if len(cfg.Ingress.ClientTLS.AllowedSubjectPatterns) != 0 {
+				clientAuthFilter = "(?:" + strings.Join(cfg.Ingress.ClientTLS.AllowedSubjectPatterns, "|") + ")"
+			}
+		}
+		clientAuthCAPath = filepath.Join(clientCAMountPath, clientCABundleFilename)
+	}
+
 	extraParams := assets.RenderParams{
 		"RouterNamespaceOwnership":    cfg.Ingress.AdmissionPolicy.NamespaceOwnership == config.NamespaceOwnershipAllowed,
 		"RouterHttpPort":              *cfg.Ingress.Ports.Http,
@@ -386,6 +479,17 @@ func generateIngressParams(cfg *config.Config) assets.RenderParams {
 		"RouterEnableCompression":     routerEnableCompression,
 		"RouterCompressionMime":       routerCompressionMime,
 		"RouterDisableHttp2":          routerDisableHttp2,
+		"ServingCertificateSecret":    &cfg.Ingress.ServingCertificateSecret,
+		"RouterCiphers":               RouterCiphers,
+		"RouterCiphersSuites":         RouterCiphersSuites,
+		"RouterSSLMinVersion":         RouterSSLMinVersion,
+		"RouterAllowWildcardRoutes":   RouterAllowWildcardRoutes,
+		"ClientCAMapName":             clientCAMapName,
+		"ClientAuthPolicy":            clientAuthPolicy,
+		"ClientAuthCAPath":            clientAuthCAPath,
+		"ClientAuthFilter":            clientAuthFilter,
+		"ClientCABundleFilename":      clientCABundleFilename,
+		"ClientCAMountPath":           clientCAMountPath,
 	}
 
 	return extraParams
