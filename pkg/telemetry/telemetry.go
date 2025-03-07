@@ -22,15 +22,32 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"time"
 
 	proto "github.com/gogo/protobuf/proto"
 	"github.com/golang/snappy"
+	"github.com/openshift/microshift/pkg/config"
+	io_prometheus_client "github.com/prometheus/client_model/go"
 	"github.com/prometheus/prometheus/prompb"
 	"k8s.io/klog/v2"
 )
 
 const (
 	authString = `{"authorization_token": "%s", "cluster_id": "%s"}`
+
+	MetricNameCPUCapacity       = "cluster:capacity_cpu_cores:sum"
+	MetricNameMemoryCapacity    = "cluster:capacity_memory_bytes:sum"
+	MetricNameCPUUsage          = "cluster:cpu_usage_cores:sum"
+	MetricNameMemoryUsage       = "cluster:memory_usage_bytes:sum"
+	MetricNameResourceUsage     = "cluster:usage:resources:sum"
+	MetricNameContainersUsage   = "cluster:usage:containers:sum"
+	MetricNameMicroShiftVersion = "microshift_version"
+
+	LabelNameID           = "_id"
+	LabelNameArch         = "label_kubernetes_io_arch"
+	LabelNameOS           = "label_node_openshift_io_os_id"
+	LabelNameInstanceType = "label_beta_kubernetes_io_instance_type"
+	LabelNameResource     = "resource"
 )
 
 type Metric struct {
@@ -105,6 +122,124 @@ func (t *TelemetryClient) Send(ctx context.Context, pullSecret string, metrics [
 		return fmt.Errorf("unable to read body: %v", err)
 	}
 	return fmt.Errorf("request unsuccessful. Status code: %v. Body: %v", resp.StatusCode, string(body))
+}
+
+func (t *TelemetryClient) Collect(cfg *config.Config) ([]Metric, error) {
+	kubeletMetrics, err := fetchKubeletMetrics(cfg)
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch kubelet metrics: %v", err)
+	}
+
+	osVersionID, err := fetchOsVersionID()
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch os version id: %v", err)
+	}
+	klog.Infof("collected os version id: %v", osVersionID)
+
+	// metrics := make([]Metric, 0)
+	capacityMetrics, err := computeCapacityMetrics(cfg, t.clusterId, kubeletMetrics)
+	if err != nil {
+		return nil, fmt.Errorf("failed to compute capacity metrics: %v", err)
+	}
+	klog.Infof("computed capacity metrics: %v", capacityMetrics)
+
+	usageMetrics, err := computeUsageMetrics(cfg, t.clusterId, kubeletMetrics)
+	if err != nil {
+		return nil, fmt.Errorf("failed to compute usage metrics: %v", err)
+	}
+	klog.Infof("computed usage metrics: %v", usageMetrics)
+
+	return nil, nil
+}
+
+func computeCapacityMetrics(cfg *config.Config, clusterId string, kubeletMetrics map[string]*io_prometheus_client.MetricFamily) ([]Metric, error) {
+	nodeLabels, err := fetchNodeLabels(cfg)
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch node labels: %v", err)
+	}
+
+	osIdValue, ok := nodeLabels["node.openshift.io/os_id"]
+	if !ok {
+		return nil, fmt.Errorf("node label node.openshift.io/os_id not found")
+	}
+	instanceTypeValue, ok := nodeLabels["node.kubernetes.io/instance-type"]
+	if !ok {
+		return nil, fmt.Errorf("node label node.kubernetes.io/instance-type not found")
+	}
+	kubeletCPUCapacity, ok := kubeletMetrics["machine_cpu_cores"]
+	if !ok {
+		return nil, fmt.Errorf("metric machine_cpu_cores not found")
+	}
+	kubeletMemoryCapacity, ok := kubeletMetrics["machine_memory_bytes"]
+	if !ok {
+		return nil, fmt.Errorf("metric machine_memory_bytes not found")
+	}
+	return []Metric{
+		Metric{
+			Name: MetricNameCPUCapacity,
+			Labels: []MetricLabel{
+				{Name: LabelNameID, Value: clusterId},
+				{Name: LabelNameOS, Value: osIdValue},
+				{Name: LabelNameInstanceType, Value: instanceTypeValue},
+			},
+			Timestamp: time.Now().UnixNano() / time.Millisecond.Nanoseconds(),
+			Value:     aggregateMetricValues(kubeletCPUCapacity.Metric),
+		},
+		Metric{
+			Name: MetricNameMemoryCapacity,
+			Labels: []MetricLabel{
+				{Name: LabelNameID, Value: clusterId},
+				{Name: LabelNameOS, Value: osIdValue},
+				{Name: LabelNameInstanceType, Value: instanceTypeValue},
+			},
+			Timestamp: time.Now().UnixNano() / time.Millisecond.Nanoseconds(),
+			Value:     aggregateMetricValues(kubeletMemoryCapacity.Metric),
+		},
+	}, nil
+}
+
+func computeUsageMetrics(cfg *config.Config, clusterId string, kubeletMetrics map[string]*io_prometheus_client.MetricFamily) ([]Metric, error) {
+	kubeResources, err := fetchKubernetesResources(cfg)
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch kubernetes resources: %v", err)
+	}
+	//node_cpu_usage_seconds_total
+	//machine_cpu_cores
+	//TODO usage for cpu.
+
+	resourceMetrics := make([]Metric, 6)
+	for i, resource := range []string{"pods", "namespaces", "services", "ingresses.networking.k8s.io", "routes.route.openshift.io", "customresourcedefinitions.apiextensions.k8s.io"} {
+		resourceMetrics[i] = Metric{
+			Name: MetricNameResourceUsage,
+			Labels: []MetricLabel{
+				{Name: LabelNameID, Value: clusterId},
+				{Name: LabelNameResource, Value: resource},
+			},
+			Timestamp: time.Now().UnixNano() / time.Millisecond.Nanoseconds(),
+			Value:     float64(kubeResources[resource]),
+		}
+	}
+
+	kubeletWorkingBytes, ok := kubeletMetrics["node_memory_working_set_bytes"]
+	if !ok {
+		return nil, fmt.Errorf("metric machine_cpu_cores not found")
+	}
+	kubeletCapacityBytes, ok := kubeletMetrics["machine_memory_bytes"]
+	if !ok {
+		return nil, fmt.Errorf("metric machine_memory_bytes not found")
+	}
+	resourceMetrics = append(resourceMetrics, Metric{
+		Name: MetricNameMemoryUsage,
+		Labels: []MetricLabel{
+			{Name: LabelNameID, Value: clusterId},
+		},
+		Timestamp: time.Now().UnixNano() / time.Millisecond.Nanoseconds(),
+		Value:     aggregateMetricValues(kubeletWorkingBytes.Metric) / aggregateMetricValues(kubeletCapacityBytes.Metric),
+	})
+
+	//TODO containers usage.
+
+	return resourceMetrics, nil
 }
 
 func convertMetricsToWriteRequest(metrics []Metric) *prompb.WriteRequest {
