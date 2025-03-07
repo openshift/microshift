@@ -439,6 +439,7 @@ func generateIngressParams(cfg *config.Config) assets.RenderParams {
 	clientCAMountPath := "/etc/pki/tls/client-ca"
 	clientCAMapName := ""
 	clientAuthCAPath := ""
+	clientAuthFilter := ""
 
 	if len(cfg.Ingress.ClientTLS.ClientCertificatePolicy) != 0 {
 		switch cfg.Ingress.ClientTLS.ClientCertificatePolicy {
@@ -449,6 +450,9 @@ func generateIngressParams(cfg *config.Config) assets.RenderParams {
 		}
 		if len(cfg.Ingress.ClientTLS.ClientCA.Name) != 0 {
 			clientCAMapName = cfg.Ingress.ClientTLS.ClientCA.Name
+			if len(cfg.Ingress.ClientTLS.AllowedSubjectPatterns) != 0 {
+				clientAuthFilter = "(?:" + strings.Join(cfg.Ingress.ClientTLS.AllowedSubjectPatterns, "|") + ")"
+			}
 		}
 		clientAuthCAPath = filepath.Join(clientCAMountPath, clientCABundleFilename)
 	}
@@ -483,6 +487,7 @@ func generateIngressParams(cfg *config.Config) assets.RenderParams {
 		"ClientCAMapName":             clientCAMapName,
 		"ClientAuthPolicy":            clientAuthPolicy,
 		"ClientAuthCAPath":            clientAuthCAPath,
+		"ClientAuthFilter":            clientAuthFilter,
 		"ClientCABundleFilename":      clientCABundleFilename,
 		"ClientCAMountPath":           clientCAMountPath,
 	}

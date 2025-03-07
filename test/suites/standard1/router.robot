@@ -75,6 +75,7 @@ ${ROUTER_SECURITY_CONFIG}       SEPARATOR=\n
 ...                             \ \ routeAdmissionPolicy:
 ...                             \ \ \ \ wildcardPolicy: WildcardsAllowed
 ...                             \ \ clientTLS:
+...                             \ \ \ \ allowedSubjectPatterns: ["route-custom.apps.example.com"]
 ...                             \ \ \ \ clientCertificatePolicy: Required
 ...                             \ \ \ \ clientCA:
 ...                             \ \ \ \ \ \ name: router-ca-certs-custom
@@ -186,6 +187,10 @@ Router Verify Security Configuration
     ...    ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES256-GCM-SHA384
     Pod Environment Should Match Value    openshift-ingress    ROUTER_CIPHERSUITES    TLS_CHACHA20_POLY1305_SHA256
     Pod Environment Should Match Value    openshift-ingress    SSL_MIN_VERSION    TLSv1.3
+    Pod Environment Should Match Value
+    ...    openshift-ingress
+    ...    ROUTER_MUTUAL_TLS_AUTH_FILTER
+    ...    (?:route-custom.apps.example.com)
     Pod Volume Should Contain Secret    openshift-ingress    default-certificate    router-certs-custom
     [Teardown]    Delete Custom CA Secret
 

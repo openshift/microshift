@@ -1,24 +1,37 @@
 diff --git a/assets/components/openshift-router/deployment.yaml b/assets/components/openshift-router/deployment.yaml
-index b77c25331..bb0f2fb7c 100644
+index a63157f21..596be2aa0 100644
 --- a/assets/components/openshift-router/deployment.yaml
 +++ b/assets/components/openshift-router/deployment.yaml
-@@ -93,6 +93,10 @@ spec:
+@@ -93,6 +93,14 @@ spec:
                value: '{{ .RouterEnableCompression }}'
              - name: ROUTER_COMPRESSION_MIME
                value: '{{ .RouterCompressionMime }}'
-+            {{- if .ClientCAPath }}
++            {{- if .ClientAuthCAPath }}
++            - name: ROUTER_MUTUAL_TLS_AUTH
++              value: '{{ .ClientAuthPolicy }}'
 +            - name: ROUTER_MUTUAL_TLS_AUTH_CA
-+              value: '{{ .ClientCAPath }}'
++              value: '{{ .ClientAuthCAPath }}'
++            - name: ROUTER_MUTUAL_TLS_AUTH_FILTER
++              value: '{{ .ClientAuthFilter }}'
 +            {{- end }}
            livenessProbe:
              failureThreshold: 3
              httpGet:
-@@ -132,6 +136,13 @@ spec:
+@@ -122,7 +130,7 @@ spec:
+             successThreshold: 1
+             timeoutSeconds: 1
+           resources:
+-            requests:
++            requests: 
+               cpu: 100m
+               memory: 256Mi
+           volumeMounts:
+@@ -132,6 +140,13 @@ spec:
              - mountPath: /var/run/configmaps/service-ca
                name: service-ca-bundle
                readOnly: true
 +            {{- if .ClientCAMapName }}
-+            - mountPath: /var/run/configmaps/client-ca
++            - mountPath: '{{ .ClientCAMountPath }}'
 +              name: '{{ .ClientCAMapName}}'
 +              readOnly: true
 +            {{- end }}
@@ -27,22 +40,20 @@ index b77c25331..bb0f2fb7c 100644
            image: '{{ .ReleaseImage.haproxy_router }}'
            ports:
              - name: http
-@@ -166,6 +177,18 @@ spec:
+@@ -166,6 +181,16 @@ spec:
                  path: service-ca.crt
              name: service-ca-bundle
              optional: false
 +        {{- if .ClientCAMapName }}
-+        - name: '{{ .ClientCAMapName}}'
-+          configmap:
++        - name: '{{ .ClientCAMapName }}'
++          configMap:
 +            defaultMode: 420
 +            items:
-+              - key: ca-bundle.pem
-+                path: ca-bundle.pem
-+            name: '{{ .ClientCAMapName}}'
++            - key: '{{ .ClientCABundleFilename }}'
++              path: '{{ .ClientCABundleFilename }}'
++            name: '{{ .ClientCAMapName }}'
 +            optional: false
 +        {{- end }}
-+
-+
        restartPolicy: Always
        dnsPolicy: ClusterFirst
        nodeSelector:

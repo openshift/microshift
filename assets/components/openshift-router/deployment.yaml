@@ -98,6 +98,8 @@ spec:
               value: '{{ .ClientAuthPolicy }}'
             - name: ROUTER_MUTUAL_TLS_AUTH_CA
               value: '{{ .ClientAuthCAPath }}'
+            - name: ROUTER_MUTUAL_TLS_AUTH_FILTER
+              value: '{{ .ClientAuthFilter }}'
             {{- end }}
           livenessProbe:
             failureThreshold: 3
