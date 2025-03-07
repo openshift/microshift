@@ -69,6 +69,8 @@ func (t *TelemetryManager) Run(ctx context.Context, ready chan<- struct{}, stopp
 	close(ready)
 	client := telemetry.NewTelemetryClient(t.config.Telemetry.Endpoint, clusterId)
 	collectAndSend := func() {
+		sendCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
 		pullSecret, err := readPullSecret()
 		if err != nil {
 			klog.Errorf("Unable to get pull secret: %v", err)
@@ -79,7 +81,7 @@ func (t *TelemetryManager) Run(ctx context.Context, ready chan<- struct{}, stopp
 			klog.Errorf("Failed to collect metrics: %v", err)
 			return
 		}
-		if err := client.Send(ctx, pullSecret, metrics); err != nil {
+		if err := client.Send(sendCtx, pullSecret, metrics); err != nil {
 			klog.Errorf("Failed to send metrics: %v", err)
 		}
 	}
