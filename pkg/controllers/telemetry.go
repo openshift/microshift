@@ -74,8 +74,11 @@ func (t *TelemetryManager) Run(ctx context.Context, ready chan<- struct{}, stopp
 			klog.Errorf("Unable to get pull secret: %v", err)
 			return
 		}
-		//TODO swap with collected metrics from client.
-		metrics := []telemetry.Metric{}
+		metrics, err := client.Collect(t.config)
+		if err != nil {
+			klog.Errorf("Failed to collect metrics: %v", err)
+			return
+		}
 		if err := client.Send(ctx, pullSecret, metrics); err != nil {
 			klog.Errorf("Failed to send metrics: %v", err)
 		}
