@@ -7,6 +7,7 @@ spec:
     metadata:
       annotations:
         target.workload.openshift.io/management: '{"effect": "PreferredDuringScheduling"}'
+        openshift.io/required-scc: restricted
       labels:
         ingresscontroller.operator.openshift.io/deployment-ingresscontroller: default
     spec:
