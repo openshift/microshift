@@ -5,12 +5,13 @@ SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # shellcheck source=test/bin/common.sh
 source "${SCRIPTDIR}/common.sh"
 
-PULL_SECRET=${PULL_SECRET:-${HOME}/.pull-secret.json}
-
 POSTGRES_IMAGE="docker.io/library/postgres:10.12"
 REDIS_IMAGE="docker.io/library/redis:5.0.7"
 QUAY_IMAGE="quay.io/microshift/quay:v3.11.7-$(uname -m)"
 QUAY_CONFIG_DIR="${MIRROR_REGISTRY_DIR}/config"
+
+PULL_SECRET=${PULL_SECRET:-${HOME}/.pull-secret.json}
+QUAY_PULL_SECRET="${QUAY_CONFIG_DIR}/pull_secret.json"
 
 setup_prereqs() {
     # Install packages if not yet available locally
@@ -33,10 +34,8 @@ setup_prereqs() {
     }
 }
 EOF
-    jq -s '.[0] * .[1]' "${PULL_SECRET}" "${QUAY_CONFIG_DIR}/microshift_auth.json" > "${QUAY_CONFIG_DIR}/pull_secret.json"
-    chmod 600 "${QUAY_CONFIG_DIR}/pull_secret.json"
-    # Reset the pull secret variable to point to the new file
-    PULL_SECRET="${QUAY_CONFIG_DIR}/pull_secret.json"
+    jq -s '.[0] * .[1]' "${PULL_SECRET}" "${QUAY_CONFIG_DIR}/microshift_auth.json" > "${QUAY_PULL_SECRET}"
+    chmod 600 "${QUAY_PULL_SECRET}"
 
     # TLS authentication is disabled in Quay local registry. The mirror-images.sh
     # helper uses skopeo without TLS options and it defaults to https, so we need
@@ -124,7 +123,6 @@ setup_registry() {
     for i in "${POSTGRES_IMAGE}" "${REDIS_IMAGE}" "${QUAY_IMAGE}" ; do
         echo "Pulling '${i}' image locally"
         sudo skopeo copy \
-            --authfile "${PULL_SECRET}" \
             --quiet \
             --retry-times 3 \
             --preserve-digests \
@@ -268,6 +266,8 @@ finalize_registry() {
     sudo chgrp -R "$(id -gn)" "${MIRROR_REGISTRY_DIR}"
     sudo find "${MIRROR_REGISTRY_DIR}" -type d -exec sudo chmod a+rx '{}' \;
     sudo find "${MIRROR_REGISTRY_DIR}" -type f -exec sudo chmod a+r  '{}' \;
+    # Delete the combined pull secret file
+    rm -f "${QUAY_PULL_SECRET}"
 }
 
 mirror_images() {
@@ -285,7 +285,7 @@ mirror_images() {
     done
 
     sort -u "${ifile}" "${ffile}" > "${ofile}"
-    "${ROOTDIR}/scripts/mirror-images.sh" --mirror "${PULL_SECRET}" "${ofile}" "${MIRROR_REGISTRY_URL}"
+    "${ROOTDIR}/scripts/mirror-images.sh" --mirror "${QUAY_PULL_SECRET}" "${ofile}" "${MIRROR_REGISTRY_URL}"
     rm -f "${ofile}" "${ffile}"
 }
 
