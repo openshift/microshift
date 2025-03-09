@@ -347,9 +347,10 @@ watch sudo oc get pods -A \
 
 ## Using Bootc Image Builder (BIB)
 
-The [bootc-image-builder](https://github.com/osbuild/bootc-image-builder), is a containerized tool to
-create disk images from bootc images. You can use the images that you build to deploy disk images in
-different environments, such as the edge, server, and clouds.
+The [bootc-image-builder](https://github.com/osbuild/bootc-image-builder), is a
+containerized tool to create disk images from bootc images. You can use the images
+that you build to deploy disk images in different environments, such as the edge,
+server, and clouds.
 
 ### Create ISO image using BIB
 
@@ -366,7 +367,6 @@ sudo podman run --authfile ${PULL_SECRET} --rm -it \
     registry.redhat.io/rhel9/bootc-image-builder:latest \
     --local \
     --type iso \
-    --config /config.toml \
     localhost/${IMAGE_NAME}:latest
 ```
 
@@ -565,11 +565,13 @@ OpenShift container registries.
 ```bash
 PULL_SECRET=~/.pull-secret.json
 BASE_IMAGE_NAME=microshift-4.18-bootc
+BASE_IMAGE_TAG=latest
 IMAGE_NAME=microshift-4.18-bootc-embedded
 
 sudo podman build --authfile "${PULL_SECRET}" -t "${IMAGE_NAME}" \
     --secret "id=pullsecret,src=${PULL_SECRET}" \
-    --build-arg USHIFT_BASE_IMAGE="${BASE_IMAGE_NAME}" \
+    --build-arg USHIFT_BASE_IMAGE_NAME="${BASE_IMAGE_NAME}" \
+    --build-arg USHIFT_BASE_IMAGE_TAG="${BASE_IMAGE_TAG}" \
     -f Containerfile.embedded
 ```
 

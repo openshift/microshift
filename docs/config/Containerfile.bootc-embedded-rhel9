@@ -1,5 +1,6 @@
-ARG USHIFT_BASE_IMAGE
-FROM $USHIFT_BASE_IMAGE:latest
+ARG USHIFT_BASE_IMAGE_NAME
+ARG USHIFT_BASE_IMAGE_TAG
+FROM $USHIFT_BASE_IMAGE_NAME:$USHIFT_BASE_IMAGE_TAG
 
 # Pull the container image dependencies into /var/lib/containers/storage-preloaded
 RUN --mount=type=secret,id=pullsecret,dst=/run/secrets/pull-secret.json \
