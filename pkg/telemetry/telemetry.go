@@ -63,16 +63,20 @@ type MetricLabel struct {
 }
 
 type TelemetryClient struct {
-	endpoint                 string
-	clusterId                string
-	lastCumulativeCPUSeconds float64
+	endpoint  string
+	clusterId string
+	// next two attributes are required to compute the cpu usage based
+	// on the cpu seconds we get from kubelet.
+	previousCPUSeconds   float64
+	previousCPUtimestamp int64
 }
 
 func NewTelemetryClient(baseURL, clusterId string) *TelemetryClient {
 	return &TelemetryClient{
-		endpoint:                 fmt.Sprintf("%s/metrics/v1/receive", baseURL),
-		clusterId:                clusterId,
-		lastCumulativeCPUSeconds: 0,
+		endpoint:             fmt.Sprintf("%s/metrics/v1/receive", baseURL),
+		clusterId:            clusterId,
+		previousCPUSeconds:   0,
+		previousCPUtimestamp: 0,
 	}
 }
 
@@ -132,29 +136,29 @@ func (t *TelemetryClient) Collect(cfg *config.Config) ([]Metric, error) {
 		return nil, fmt.Errorf("failed to fetch kubelet metrics: %v", err)
 	}
 
-	osVersionID, err := fetchOsVersionID()
-	if err != nil {
-		return nil, fmt.Errorf("failed to fetch os version id: %v", err)
-	}
-	klog.Infof("collected os version id: %v", osVersionID)
-
-	// metrics := make([]Metric, 0)
-	capacityMetrics, err := computeCapacityMetrics(cfg, t.clusterId, kubeletMetrics)
+	metrics := make([]Metric, 0)
+	capacityMetrics, err := computeCapacityMetrics(cfg, kubeletMetrics)
 	if err != nil {
 		return nil, fmt.Errorf("failed to compute capacity metrics: %v", err)
 	}
-	klog.Infof("computed capacity metrics: %v", capacityMetrics)
+	metrics = append(metrics, capacityMetrics...)
 
-	usageMetrics, lastCPUSeconds, err := computeUsageMetrics(cfg, t.clusterId, kubeletMetrics, t.lastCumulativeCPUSeconds)
+	usageMetrics, currentCPUSeconds, err := computeUsageMetrics(cfg, kubeletMetrics, t.previousCPUSeconds, t.previousCPUtimestamp)
 	if err != nil {
 		return nil, fmt.Errorf("failed to compute usage metrics: %v", err)
 	}
-	klog.Infof("computed usage metrics: %v", usageMetrics)
-	t.lastCumulativeCPUSeconds = lastCPUSeconds
-	return nil, nil
+	t.previousCPUSeconds = currentCPUSeconds
+	t.previousCPUtimestamp = time.Now().UnixNano() / time.Millisecond.Nanoseconds()
+	metrics = append(metrics, usageMetrics...)
+
+	for i := range metrics {
+		metrics[i].Labels = append(metrics[i].Labels, MetricLabel{Name: LabelNameID, Value: t.clusterId})
+	}
+
+	return metrics, nil
 }
 
-func computeCapacityMetrics(cfg *config.Config, clusterId string, kubeletMetrics map[string]*io_prometheus_client.MetricFamily) ([]Metric, error) {
+func computeCapacityMetrics(cfg *config.Config, kubeletMetrics map[string]*io_prometheus_client.MetricFamily) ([]Metric, error) {
 	nodeLabels, err := fetchNodeLabels(cfg)
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch node labels: %v", err)
@@ -176,46 +180,46 @@ func computeCapacityMetrics(cfg *config.Config, clusterId string, kubeletMetrics
 	if !ok {
 		return nil, fmt.Errorf("metric machine_memory_bytes not found")
 	}
+	currentTimestamp := time.Now().UnixNano() / time.Millisecond.Nanoseconds()
 	return []Metric{
-		Metric{
+		{
 			Name: MetricNameCPUCapacity,
 			Labels: []MetricLabel{
-				{Name: LabelNameID, Value: clusterId},
 				{Name: LabelNameOS, Value: osIdValue},
 				{Name: LabelNameInstanceType, Value: instanceTypeValue},
 			},
-			Timestamp: time.Now().UnixNano() / time.Millisecond.Nanoseconds(),
+			Timestamp: currentTimestamp,
 			Value:     aggregateMetricValues(kubeletCPUCapacity.Metric),
 		},
-		Metric{
+		{
 			Name: MetricNameMemoryCapacity,
 			Labels: []MetricLabel{
-				{Name: LabelNameID, Value: clusterId},
 				{Name: LabelNameOS, Value: osIdValue},
 				{Name: LabelNameInstanceType, Value: instanceTypeValue},
 			},
-			Timestamp: time.Now().UnixNano() / time.Millisecond.Nanoseconds(),
+			Timestamp: currentTimestamp,
 			Value:     aggregateMetricValues(kubeletMemoryCapacity.Metric),
 		},
 	}, nil
 }
 
-// TODO return current seconds.
-func computeUsageMetrics(cfg *config.Config, clusterId string, kubeletMetrics map[string]*io_prometheus_client.MetricFamily, previousCPUSeconds float64) ([]Metric, float64, error) {
+func computeUsageMetrics(cfg *config.Config, kubeletMetrics map[string]*io_prometheus_client.MetricFamily, previousCPUSeconds float64, previousTimestamp int64) ([]Metric, float64, error) {
 	kubeResources, err := fetchKubernetesResources(cfg)
 	if err != nil {
 		return nil, 0, fmt.Errorf("failed to fetch kubernetes resources: %v", err)
 	}
 
-	resourceMetrics := make([]Metric, 6)
-	for i, resource := range []string{"pods", "namespaces", "services", "ingresses.networking.k8s.io", "routes.route.openshift.io", "customresourcedefinitions.apiextensions.k8s.io"} {
+	currentTimestamp := time.Now().UnixNano() / time.Millisecond.Nanoseconds()
+
+	resourceTypes := []string{"pods", "namespaces", "services", "ingresses.networking.k8s.io", "routes.route.openshift.io", "customresourcedefinitions.apiextensions.k8s.io"}
+	resourceMetrics := make([]Metric, len(resourceTypes))
+	for i, resource := range resourceTypes {
 		resourceMetrics[i] = Metric{
 			Name: MetricNameResourceUsage,
 			Labels: []MetricLabel{
-				{Name: LabelNameID, Value: clusterId},
 				{Name: LabelNameResource, Value: resource},
 			},
-			Timestamp: time.Now().UnixNano() / time.Millisecond.Nanoseconds(),
+			Timestamp: currentTimestamp,
 			Value:     float64(kubeResources[resource]),
 		}
 	}
@@ -229,44 +233,40 @@ func computeUsageMetrics(cfg *config.Config, clusterId string, kubeletMetrics ma
 		return nil, 0, fmt.Errorf("metric machine_memory_bytes not found")
 	}
 	resourceMetrics = append(resourceMetrics, Metric{
-		Name: MetricNameMemoryUsage,
-		Labels: []MetricLabel{
-			{Name: LabelNameID, Value: clusterId},
-		},
-		Timestamp: time.Now().UnixNano() / time.Millisecond.Nanoseconds(),
+		Name:      MetricNameMemoryUsage,
+		Labels:    []MetricLabel{},
+		Timestamp: currentTimestamp,
 		Value:     aggregateMetricValues(kubeletWorkingBytes.Metric) / aggregateMetricValues(kubeletCapacityBytes.Metric),
 	})
 
-	kubeletCPUSeconds, ok := kubeletMetrics["node_cpu_seconds_total"]
+	kubeletCPUSeconds, ok := kubeletMetrics["node_cpu_usage_seconds_total"]
 	if !ok {
-		return nil, 0, fmt.Errorf("metric node_cpu_seconds_total not found")
+		return nil, 0, fmt.Errorf("metric node_cpu_usage_seconds_total not found")
 	}
-	cpuUsage := (aggregateMetricValues(kubeletCPUSeconds.Metric) - previousCPUSeconds) / time.Minute.Seconds()
+	cpuUsage := (aggregateMetricValues(kubeletCPUSeconds.Metric) - previousCPUSeconds) * 1000 / float64(currentTimestamp-previousTimestamp)
+	if previousTimestamp == 0 {
+		cpuUsage = 0
+	}
 	resourceMetrics = append(resourceMetrics, Metric{
-		Name: MetricNameCPUUsage,
-		Labels: []MetricLabel{
-			{Name: LabelNameID, Value: clusterId},
-		},
-		Timestamp: time.Now().UnixNano() / time.Millisecond.Nanoseconds(),
+		Name:      MetricNameCPUUsage,
+		Labels:    []MetricLabel{},
+		Timestamp: currentTimestamp,
 		Value:     cpuUsage,
 	})
 
-	//TODO prettify this.
 	kubeletRunningContainers, ok := kubeletMetrics["kubelet_running_containers"]
 	if !ok {
 		return nil, 0, fmt.Errorf("metric kubelet_running_containers not found")
 	}
 	runningContainers := filterMetricsByLabel(kubeletRunningContainers.Metric, "status", "running")
-	value := float64(0)
+	value := 0.0
 	for _, metric := range runningContainers {
 		value += *metric.Untyped.Value
 	}
 	resourceMetrics = append(resourceMetrics, Metric{
-		Name: MetricNameMemoryUsage,
-		Labels: []MetricLabel{
-			{Name: LabelNameID, Value: clusterId},
-		},
-		Timestamp: time.Now().UnixNano() / time.Millisecond.Nanoseconds(),
+		Name:      MetricNameContainersUsage,
+		Labels:    []MetricLabel{},
+		Timestamp: currentTimestamp,
 		Value:     value,
 	})
 

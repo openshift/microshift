@@ -94,7 +94,7 @@ func (t *TelemetryManager) Run(ctx context.Context, ready chan<- struct{}, stopp
 			klog.Infof("Collect and send for the last time")
 			collectAndSend()
 			return nil
-		case <-time.After(time.Minute):
+		case <-time.After(time.Hour):
 			klog.Infof("Collect and send again")
 			collectAndSend()
 		}
