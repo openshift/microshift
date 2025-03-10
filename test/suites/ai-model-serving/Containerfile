@@ -1,0 +1,8 @@
+# AI Model Serving test depends on a OpenVino's resnet example model packaged as OCI image.
+# To build and push simply:
+# podman build -t quay.io/microshift/ai-testing-model:ovms-resnet50 . && podman push quay.io/microshift/ai-testing-model:ovms-resnet50
+FROM quay.io/microshift/busybox:1.37
+RUN mkdir -p /models/1 && chmod -R 755 /models/1
+RUN wget -q -P /models/1 \
+  https://storage.openvinotoolkit.org/repositories/open_model_zoo/2022.1/models_bin/2/resnet50-binary-0001/FP32-INT1/resnet50-binary-0001.bin \
+  https://storage.openvinotoolkit.org/repositories/open_model_zoo/2022.1/models_bin/2/resnet50-binary-0001/FP32-INT1/resnet50-binary-0001.xml

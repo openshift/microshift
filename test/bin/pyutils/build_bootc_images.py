@@ -227,7 +227,7 @@ def get_process_file_names(idir, ifile, obasedir):
     path = os.path.join(idir, ifile)
     outname = os.path.splitext(ifile)[0]
     outdir = os.path.join(obasedir, outname)
-    logfile = os.path.join(obasedir, f"{outname}.log")
+    logfile = os.path.join(obasedir, f"{ifile}.log")
     return path, outname, outdir, logfile
 
 
@@ -312,6 +312,11 @@ def process_image_bootc(groupdir, bootcfile, dry_run):
     # Run template command on the input file
     bf_outfile = os.path.join(BOOTC_IMAGE_DIR, bootcfile)
     run_template_cmd(bf_path, bf_outfile, dry_run)
+    # Templating may generate an empty file
+    if not dry_run:
+        if not common.file_has_valid_lines(bf_outfile):
+            common.print_msg(f"Skipping an empty {bootcfile} file")
+            return
 
     common.print_msg(f"Processing {bootcfile} with logs in {bf_logfile}")
     start_process_bootc_image = time.time()
