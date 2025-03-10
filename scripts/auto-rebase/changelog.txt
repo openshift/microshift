@@ -1,13 +1,6 @@
-- machine-config-operator embedded-component 467061987c1e6b90d8f854c9b0eec82fd8bd2d1c to 3da4faa0a834ce663e561f423f29bc0e941b6af5
-  - 834f736b 2025-03-03T14:54:16-06:00 OCPBUGS-41489: configure-ovs workaround for ovs-if-br-ex bug
-  - 4cfd4a5b 2025-02-26T17:15:42+00:00 daemon: update log verbs
-  - 1eb23200 2025-02-17T16:50:13+00:00 OCPBUGS-46072: create /run/nodeip-configuration before use
+- machine-config-operator embedded-component 3da4faa0a834ce663e561f423f29bc0e941b6af5 to 0f85e35a0b9f7342907597e74e20dfc9fa30ee67
+  - 9cdf1edc 2025-02-27T03:32:01+00:00 update cluster-reader cluster role's permissions
 
-- oc image-amd64 2510f852661f4ace4fb5ae83de643e74e66ca36b to 0000b3ef257d07f423dfdf9b6d274214d1b0c846
-  - 8f84a405 2025-02-25T12:24:13-05:00 Bump `go-jose` for CVE-2025-27144
-  - f74e5086 2025-01-28T11:02:42-05:00 Address `golang.org/x/*` CVEs
-
-- oc image-arm64 2510f852661f4ace4fb5ae83de643e74e66ca36b to 0000b3ef257d07f423dfdf9b6d274214d1b0c846
-  - 8f84a405 2025-02-25T12:24:13-05:00 Bump `go-jose` for CVE-2025-27144
-  - f74e5086 2025-01-28T11:02:42-05:00 Address `golang.org/x/*` CVEs
+- operator-framework-olm embedded-component f667826eb6c9e2bfe779922f0b8e6a9bf2a833ed to e9262fe971f881d6a014be70112b0f4cd5b82921
+  - cd3b82bf 2025-03-04T13:54:00-05:00 Bump github.com/distribution/distribution/v3
 
