@@ -16,7 +16,6 @@ limitations under the License.
 package telemetry
 
 import (
-	"bufio"
 	"bytes"
 	"context"
 	"crypto/tls"
@@ -26,7 +25,6 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-	"strings"
 
 	routev1 "github.com/openshift/client-go/route/clientset/versioned/typed/route/v1"
 	"github.com/openshift/microshift/pkg/config"
@@ -69,6 +67,7 @@ func makeHTTPClient() (*http.Client, error) {
 	tlsConfig := &tls.Config{
 		RootCAs:      caCertPool,                    // Use the custom CA
 		Certificates: []tls.Certificate{clientCert}, // Use the client certificate and key
+		MinVersion:   tls.VersionTLS13,
 	}
 
 	client := &http.Client{
@@ -119,16 +118,6 @@ func filterMetricsByLabel(metrics []*io_prometheus_client.Metric, labelName stri
 		}
 	}
 	return filteredMetrics
-}
-
-func filterMetricFamiliesByName(metricFamilies map[string]*io_prometheus_client.MetricFamily, names []string) map[string]*io_prometheus_client.MetricFamily {
-	filteredFamilies := make(map[string]*io_prometheus_client.MetricFamily)
-	for _, name := range names {
-		if data, ok := metricFamilies[name]; ok {
-			filteredFamilies[name] = data
-		}
-	}
-	return filteredFamilies
 }
 
 func fetchKubeletMetrics(cfg *config.Config) (map[string]*io_prometheus_client.MetricFamily, error) {
@@ -243,26 +232,4 @@ func fetchKubernetesResources(cfg *config.Config) (map[string]int, error) {
 		"customresourcedefinitions.apiextensions.k8s.io": len(crdList.Items),
 	}
 	return metrics, nil
-}
-
-func fetchOsVersionID() (string, error) {
-	file, err := os.Open("/etc/os-release")
-	if err != nil {
-		return "", fmt.Errorf("error opening /etc/os-release: %w", err)
-	}
-	defer file.Close()
-
-	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		line := scanner.Text()
-		if strings.HasPrefix(line, "VERSION_ID=") {
-			return strings.Trim(strings.SplitN(line, "=", 2)[1], `"`), nil
-		}
-	}
-
-	if err := scanner.Err(); err != nil {
-		return "", fmt.Errorf("error reading /etc/os-release: %w", err)
-	}
-
-	return "", fmt.Errorf("VERSION_ID not found in /etc/os-release")
 }
