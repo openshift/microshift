@@ -137,7 +137,7 @@ func fetchKubeletMetrics(cfg *config.Config) (map[string]*io_prometheus_client.M
 		return nil, fmt.Errorf("error creating HTTP client: %v", err)
 	}
 
-	metricsData := []byte{}
+	metricFamilies := make(map[string]*io_prometheus_client.MetricFamily)
 	kubeletEndpoints := []string{kubeletMetrics, kubeletMetricsCAdvisor, kubeletMetricsResource}
 	for _, endpoint := range kubeletEndpoints {
 		endpoint = fmt.Sprintf(endpoint, cfg.Node.HostnameOverride)
@@ -145,12 +145,14 @@ func fetchKubeletMetrics(cfg *config.Config) (map[string]*io_prometheus_client.M
 		if err != nil {
 			return nil, fmt.Errorf("error fetching kubelet metrics from endpoint %v: %v", endpoint, err)
 		}
-		metricsData = append(metricsData, data...)
-	}
-	parser := expfmt.TextParser{}
-	metricFamilies, err := parser.TextToMetricFamilies(bytes.NewReader(metricsData))
-	if err != nil {
-		return nil, fmt.Errorf("error parsing metrics: %v", err)
+		parser := expfmt.TextParser{}
+		families, err := parser.TextToMetricFamilies(bytes.NewReader(data))
+		if err != nil {
+			return nil, fmt.Errorf("error parsing metrics from %v: %v", endpoint, err)
+		}
+		for k, v := range families {
+			metricFamilies[k] = v
+		}
 	}
 	return metricFamilies, nil
 }
