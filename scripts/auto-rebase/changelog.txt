@@ -1,4 +1,77 @@
-- kubernetes image-arm64 abc29e3ec6ee8054408f4c2a0e0781e2af49f9c4 to 4dada5ed6a07cb22fb5ea2da82b32cebfe12aa97
+- api embedded-component 1cd9f24f0563610d1b75e18a90c005b427332016 to b8da3bfeaf773d9dce2ea56edc9a1cf06cfdbd80
+  - 114523da 2025-03-05T12:19:15+01:00 NE-1954: Introduce GatewayAPIController feature gate
+  - c65ff8d8 2025-03-05T09:01:47+01:00 feat: address review
+  - db70b403 2025-03-05T08:57:32+01:00 Support TDX confidential type selection on GCP
+  - 2c7ccd16 2025-03-05T08:33:53+01:00 Support SEV_SNP confidential type selection on GCP
+  - f71dc449 2025-03-04T09:34:06+01:00 feat: use cel to validate https URLs
+  - e3e1bb2f 2025-03-03T15:26:33+01:00 feat: address review
+  - 7644f6cc 2025-03-03T10:29:54+01:00 feat: run make generate
+  - 06e70388 2025-02-28T11:31:58+01:00 feat: address review
+  - 94ba938b 2025-02-28T11:27:16+01:00 fear: add InsightsDataGather tests
+  - acae319c 2025-02-28T11:27:16+01:00 feat: add DataGather tests
+  - 344665b8 2025-02-28T11:27:16+01:00 fix: verify check
+  - 6772a54c 2025-02-28T11:27:13+01:00 feat: run make generate
+  - bfc62b89 2025-02-28T11:20:11+01:00 feat: use PersistentVolumeClaimReference struct
+  - 692c083a 2025-02-28T11:20:11+01:00 feat: storagePath must not contain colon
+  - e42c161f 2025-02-28T11:20:11+01:00 feat: improvements based on reviews
+  - ad606716 2025-02-28T11:20:11+01:00 feat: run generate for InsightsDataGather storageSpec
+  - 7782888c 2025-02-28T11:20:10+01:00 feat: add storageSpec to InsightsDataGather CRD
+  - d561eef8 2025-02-28T11:20:10+01:00 feat: run generate for storageSpec
+  - 11218fce 2025-02-28T11:20:10+01:00 feat: add storageSpec to DataGather CRD
+  - f2e70341 2025-02-16T23:49:40-08:00 config/v1/types_cluster_version: Explain image and version both set
+
+- cluster-dns-operator embedded-component 0a9deeea4c335e259747b35267811a4a040289fd to 659813065170f4e52f80b7a29bbab64bfa9aa172
+  - 2e9eef1 2025-02-26T13:32:19+01:00 Add runbook-url for CoreDNSErrorsHigh
+
+- etcd embedded-component e9234c8be833630785710e02700ffbffb63b7952 to 63a774631341b1bdf9ad49baedee25e047f62629
+  - 0f2d70f8 2025-03-06T00:30:42+01:00 DOWNSTREAM: <carry>: add tls min/max version to grpc proxy
+  - 0c5165a7 2025-03-06T00:30:35+01:00 DOWNSTREAM: <carry>: ETCD-696: Add rev bumping to force-new-cluster
+  - 5e67c03f 2025-03-06T00:30:15+01:00 Migrate Dockerfile.art for Konflux
+  - 0af886b1 2025-03-06T00:29:38+01:00 Add support for cachi2 based deps Konflux is replacing RH's internal build system OSBS. OSBS supported a build-time dependency injection system called "cachito". Konflux replaces this with "cachi2" which works differently. REMOTE_SOURCES no longer need to be copied into place and there is no need to source cachito's environment information (Konflux automatically rewrites the Dockerfile to source cachi2/cachi2.env before running the original RUN commands). Additionally, cachito appears to have provided go.sum dependencies whereas cachi2 requires all build-time dependencies in go.mod. Missing dependencies are added to go.mod as // indirect in this change.
+  - 58df66c4 2025-03-05T23:19:42+01:00 DOWNSTREAM <carry>: resolve merge conflicts
+  - 951f5209 2025-03-05T23:19:16+01:00 NO-JIRA: use golang 1.23 image
+  - fdecc125 2025-03-05T21:55:50+01:00 DOWNSTREAM: <carry>: ETCD-656: Automate datadir move after quorum-restore
+  - 815eaba0 2025-03-05T11:33:28-08:00 version: bump up to 3.5.19
+  - 3d2cce61 2025-03-05T17:18:54+00:00 Add verify released binary assets GitHub workflow
+  - 607e5551 2025-03-04T16:51:41-08:00 dependency: bump golang.org/x/net from v0.34.0 to v0.36.0
+  - db3d20d9 2025-03-04T16:34:45-08:00 Bump go toolchain to 1.23.7
+  - 36013010 2025-02-24T16:08:22-08:00 dependency: Bump golang.org/x/crypto from v0.32.0 to v0.35.0
+  - a2f96f08 2025-02-18T04:02:37+08:00 bump go to v1.23.6
+  - da930c70 2025-02-12T22:54:54+00:00 fix a compaction induce latency issue
+  - 5d569b11 2025-02-04T19:30:15-03:00 bumping go to version 1.22.12
+  - 1af71f66 2025-02-04T13:20:09+00:00 Add learner id into log when being promoted or removed
+  - da04eae0 2025-02-03T15:23:48+00:00 Bump actions/download-artifact to v4.1.8
+  - 23ee9a63 2025-02-03T15:16:18+00:00 Bump actions/upload-artifact to v4.6.0
+  - 8e338700 2025-02-03T15:11:20+00:00 Bump github.com/golang/glog to v1.2.4 to address CVE-2024-45339
+  - 729fb392 2025-02-03T15:08:38+00:00 Bump go.mongodb.org/mongo-driver to v1.5.4 to address CVE-2021-20329
+  - 62a5010f 2025-01-27T08:39:34+00:00 add learner check to readyz
+  - b9c1ae21 2025-01-25T22:36:33-08:00 tools: add mixed read-write performance evaluation scripts
+
+- kubernetes embedded-component 6e49b3b40e79053565852e0cfc6a25b204022e20 to 2f2cf3874c491fae316a4537b274f31ec899dc05
+  - 0f107dd91 2025-03-06T14:15:48+01:00 UPSTREAM: <carry>: Revert "Initialize testContext before enumerating tests"
+  - 6d81ce9da 2025-03-06T14:15:29+01:00 UPSTREAM: <carry>: Revert "Print better error when no TEST_PROVIDER is set"
+  - 813a08c10 2025-03-04T18:53:05+00:00 UPSTREAM: <carry>: OCPBUGS-45274: Enable PodRejectionStatus test
   - 52938ee0c 2025-03-03T18:43:47+01:00 UPSTREAM: <carry>: Print better error when no TEST_PROVIDER is set
   - 05d22e6eb 2025-03-03T15:14:53+01:00 UPSTREAM: <carry>: Initialize testContext before enumerating tests
+
+- machine-config-operator embedded-component f911d8fec09108c21dd5f645febfd8b8da6994a4 to 5dcc44abebbfb5dbeaaa8ef2569ba211032e1c00
+  - 3dbb8d88 2025-03-05T15:04:01+01:00 Update the MCS iptables debug command in docs
+  - f96669ea 2025-03-04T16:02:35-07:00 Add MCDRebootError runbook to alert
+
+- oc image-amd64 e7e738cc324d3cde21df43c3e22286ff595d493d to 6de369b1203d09db5ce6d7d9fa8ed668504ccc75
+  - 7589534e 2025-03-06T11:20:42-08:00 pkg/cli/admin/upgrade/recommend: Populate RESTConfig
+
+- kubernetes image-amd64 6e49b3b40e79053565852e0cfc6a25b204022e20 to 2f2cf3874c491fae316a4537b274f31ec899dc05
+  - 0f107dd91 2025-03-06T14:15:48+01:00 UPSTREAM: <carry>: Revert "Initialize testContext before enumerating tests"
+  - 6d81ce9da 2025-03-06T14:15:29+01:00 UPSTREAM: <carry>: Revert "Print better error when no TEST_PROVIDER is set"
+  - 813a08c10 2025-03-04T18:53:05+00:00 UPSTREAM: <carry>: OCPBUGS-45274: Enable PodRejectionStatus test
+  - 52938ee0c 2025-03-03T18:43:47+01:00 UPSTREAM: <carry>: Print better error when no TEST_PROVIDER is set
+  - 05d22e6eb 2025-03-03T15:14:53+01:00 UPSTREAM: <carry>: Initialize testContext before enumerating tests
+
+- oc image-arm64 e7e738cc324d3cde21df43c3e22286ff595d493d to 6de369b1203d09db5ce6d7d9fa8ed668504ccc75
+  - 7589534e 2025-03-06T11:20:42-08:00 pkg/cli/admin/upgrade/recommend: Populate RESTConfig
+
+- kubernetes image-arm64 4dada5ed6a07cb22fb5ea2da82b32cebfe12aa97 to 2f2cf3874c491fae316a4537b274f31ec899dc05
+  - 0f107dd91 2025-03-06T14:15:48+01:00 UPSTREAM: <carry>: Revert "Initialize testContext before enumerating tests"
+  - 6d81ce9da 2025-03-06T14:15:29+01:00 UPSTREAM: <carry>: Revert "Print better error when no TEST_PROVIDER is set"
 
