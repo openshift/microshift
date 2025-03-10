@@ -1,4 +1,4 @@
-FROM registry.redhat.io/rhel9/rhel-bootc:9.5
+FROM registry.stage.redhat.io/rhel9-eus/rhel-9.6-bootc:9.6
 
 # Build arguments
 ARG USHIFT_RPM_REPO_NAME=microshift-local

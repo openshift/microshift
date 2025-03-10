@@ -1,6 +1,6 @@
 # {{- if env.Getenv "CURRENT_RELEASE_VERSION" "" -}}
 # Note: This comment makes templating add a new line before the code
-FROM localhost/rhel95-test-agent:latest
+FROM localhost/rhel96-test-agent:latest
 
 # Copy repository configuration
 COPY ./bootc-images/microshift-fast-datapath-rhel9.repo ./bootc-images/microshift-crel.repo ./bootc-images/microshift-rhocp-y.repo \

@@ -1,9 +1,7 @@
-# {{- if env.Getenv "BREW_VERSION" "" -}}
-# Note: This comment makes templating add a new line before the code
-FROM localhost/rhel95-test-agent:latest
+FROM localhost/rhel96-test-agent:latest
 
 # Build arguments
-ARG USHIFT_RPM_REPO_NAME=microshift-brew
+ARG USHIFT_RPM_REPO_NAME=microshift-local
 ARG USHIFT_RPM_REPO_PATH=/tmp/$USHIFT_RPM_REPO_NAME
 
 # Copy the MicroShift repository contents
@@ -17,7 +15,7 @@ COPY ./bootc-images/$USHIFT_RPM_REPO_NAME.repo ./bootc-images/microshift-fast-da
 # Install MicroShift, test agent and cleanup.
 RUN dnf repoinfo --enabled && \
     dnf install -y firewalld systemd-resolved \
-        "microshift-{{ .Env.BREW_VERSION }}" "microshift-release-info-{{ .Env.BREW_VERSION }}" && \
+        "microshift-{{ .Env.SOURCE_VERSION }}" "microshift-release-info-{{ .Env.SOURCE_VERSION }}" && \
     systemctl enable microshift microshift-test-agent && \
     rm -vf /etc/yum.repos.d/microshift-*.repo && \
     rm -rvf $USHIFT_RPM_REPO_PATH && \
@@ -34,4 +32,8 @@ RUN firewall-offline-cmd --zone=public --add-port=22/tcp && \
     firewall-offline-cmd --zone=public --add-port=6443/tcp && \
     firewall-offline-cmd --zone=public --add-port=30000-32767/tcp && \
     firewall-offline-cmd --zone=public --add-port=30000-32767/udp
-# {{- end -}}
+
+# Install systemd configuration drop-ins to fix potential permission problems
+# when upgrading from older ostree commits to bootc container layers
+RUN mkdir -p /etc/systemd/system/ovsdb-server.service.d
+COPY --chmod=644 ./bootc-images/microshift-ovsdb-ownership.conf /etc/systemd/system/ovsdb-server.service.d/microshift-ovsdb-ownership.conf
