@@ -1,6 +1,4 @@
-- oc image-amd64 cf533b548154f7f2e828a44864477bbbb881692d to ee354f66de43b037ef8b0ed55ce65c6c42aa7b9c
-  - 888c3652 2025-02-19T12:37:12+00:00 Add HOST env var in oc debug for sos report collects more
-
-- oc image-arm64 cf533b548154f7f2e828a44864477bbbb881692d to ee354f66de43b037ef8b0ed55ce65c6c42aa7b9c
-  - 888c3652 2025-02-19T12:37:12+00:00 Add HOST env var in oc debug for sos report collects more
+- machine-config-operator embedded-component 4da8e68d757e78574fa3ca9ab6b0552fc9111e66 to 824efb659bc6dd5b3bf356fea76a96b480cf99dc
+  - b9a0315a 2025-03-05T14:58:51+00:00 OCPBUGS-46072: create /run/nodeip-configuration before use
+  - 0de84792 2025-03-04T17:42:52+00:00 OCPBUGS-41489: configure-ovs workaround for ovs-if-br-ex bug
 
