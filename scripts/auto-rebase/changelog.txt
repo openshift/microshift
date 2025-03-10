@@ -1,34 +1,9 @@
-- api embedded-component cb44c196e68fc38178d56190d9de078069154a7b to e7f23be12279d3c245c013c234f967e5ccb426e2
-  - cb627f2 2025-03-04T08:19:59-05:00 Add example of ratcheting minimum value in example tests
-  - 6d07156 2025-03-04T08:19:48-05:00 Add initialCRDPatches option to onUpdate tests
-  - a8e9c1e 2025-03-04T08:19:40-05:00 Add yaml-patch to tests vendor
-  - c8ef681 2025-03-04T08:19:29-05:00 Remove unexpected example CRDs
-  - e424d05 2025-02-27T13:06:16+00:00 operators/v1: reject new node statuses with current or target revision set
+- cluster-network-operator embedded-component cad5e40c4c21a8d1d638c20ed23529aa05ab0824 to 475a4839fa80f73d0cc154fb49197574511d073a
+  - 0c5fee8 2024-09-05T10:59:34+00:00 Updating cluster-network-operator-container image to be consistent with ART for 4.18 Reconciling with https://github.com/openshift/ocp-build-data/tree/827ab4ccce9cbbcf82c9dbaf6398b61d6cff8d7a/images/cluster-network-operator.yml
 
-- machine-config-operator embedded-component 7f706b7a3b7d8ac3ca8bd058229ed66dbddf789e to c0e95912c69b3404355e056fb157acbbeb6be285
-  - 0a28a500 2025-02-27T16:20:11+00:00 OCPBUGS-41489: configure-ovs workaround for ovs-if-br-ex bug
-  - 0315a04a 2025-02-14T15:40:31+00:00 OCPBUGS-49436: Make resolv-prepender env file optional
-  - 753614ec 2025-01-23T17:43:15+00:00 OCPBUGS-48566: Enable nmstate-configuration on all platforms
-  - 74348f8a 2025-01-10T21:10:56+00:00 Update machine-config-daemon-pull.service.yaml and policy-no-sigstoresigned.yaml
+- etcd embedded-component afac40f734a0440eb0983d7308e86aea9a04bbe9 to 98b19154718fd94d4e8ad30824c00ba1de87cb78
+  - cb8d1361 2025-02-28T10:39:01-05:00 DOWNSTREAM: <carry> fix a compaction induce latency issue
 
-- operator-framework-olm embedded-component 182471a8d72ee38d2ff82ce44db6903e66c4b22b to 877b6fd3d425043a1bd45b5d24ecebb69f5544c4
-  - e31a86b2 2025-02-28T13:43:59-05:00 Bump github.com/distribution/distribution/v3 (#1580)
-
-- ovn-kubernetes image-amd64 5f6ad07d88d8470b2d525803c60bdb5cd0164639 to 799f96146c2056a50ae8252a87c03de1cc698f13
-  - ee203116 2025-02-24T10:20:56+00:00 Fix CM-EIP controller flake
-  - 6b21a404 2025-02-24T10:20:56+00:00 Fix Kind IPV6 deplyoment with RUN_IN_CONTAINER
-  - 4e4539ea 2025-02-24T10:20:56+00:00 Change dynamic_neigh_routers to false for the Interconnect topology.
-  - 7c3652c0 2025-02-24T10:20:55+00:00 fix lint
-  - 87f2ceb4 2025-02-24T10:20:55+00:00 don't return error for pods with no IPs assigned.
-  - 1a9ba9a7 2025-02-24T10:20:55+00:00 Add some more ExpectNoError checks to the e2e tests
-  - a1f8c2bc 2025-02-24T10:20:55+00:00 Reimplement e2epod.DeletePodWithWait to correctly handle pods that get restarted.
-  - d10321d9 2025-02-24T10:20:55+00:00 Enrich CNI request pod UID error with the mismatched UIDs
-  - 5bac5168 2025-02-24T10:20:55+00:00 Fix node event reporting.
-  - 18089e08 2025-02-24T10:20:55+00:00 observability-lib/model: reduce dependencies by duplicating constants
-  - be77a99e 2025-02-24T10:20:55+00:00 Slightly fix UDN local gateway masquerade rules (and unit tests)
-  - fc5d9373 2025-02-24T10:20:55+00:00 Fix some nftables checking in the unit tests
-  - bc7e86e4 2025-02-24T10:20:55+00:00 Handles unspecified protocol in network policy port
-  - 9e4907d4 2025-02-24T10:20:55+00:00 Add e2e test to validate that egressfirewall supports DNS name in caps
-  - 1629b3ea 2025-02-24T10:20:55+00:00 docs/multi-network-policies: Refactor to meet org template
-  - db6e142b 2025-02-24T10:20:55+00:00 docs/multi-homing: Refactor to meet org template
+- machine-config-operator embedded-component c0e95912c69b3404355e056fb157acbbeb6be285 to 9f18ef9ca8a4aff64948a11967d50d4c60606f82
+  - 7e8f9078 2025-02-17T10:54:44-06:00 Merge pull request #4710 from dkhater-redhat/status-reporting-ocl
 
