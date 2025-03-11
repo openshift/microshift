@@ -570,7 +570,7 @@ def main():
             dir2process = args.layer_dir
         if args.input_file:
             args.input_file = os.path.abspath(args.input_file)
-            dir2process = os.path.split(args.input_file)[0]
+            dir2process = os.path.dirname(args.input_file)
         # Make sure the input directory exists
         if not os.path.isdir(dir2process):
             raise Exception(f"The input directory '{dir2process}' does not exist")
