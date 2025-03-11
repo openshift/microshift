@@ -650,7 +650,7 @@ fi
 %post observability
 %systemd_post microshift-observability.service
 
-%postun observability
+%preun observability
 %systemd_preun microshift-observability.service
 
 %files
@@ -771,13 +771,13 @@ fi
 %{_datadir}/microshift/release/release-ai-model-serving-x86_64.json
 
 %files observability
+%{_unitdir}/microshift-observability.service
+%{_presetdir}/90-enable-microshift-observability.preset
 %dir %{_prefix}/lib/microshift/manifests.d/003-microshift-observability
 %dir %{_sharedstatedir}/microshift-observability
 %config %{_sysconfdir}/microshift/opentelemetry-collector-small.yaml
 %config %{_sysconfdir}/microshift/opentelemetry-collector-medium.yaml
 %config %{_sysconfdir}/microshift/opentelemetry-collector-large.yaml
-%config %{_unitdir}/microshift-observability.service
-%config %{_presetdir}/90-enable-microshift-observability.preset
 %config %{_prefix}/lib/microshift/manifests.d/003-microshift-observability/00-namespace.yaml
 %config %{_prefix}/lib/microshift/manifests.d/003-microshift-observability/01-service-account.yaml
 %config %{_prefix}/lib/microshift/manifests.d/003-microshift-observability/02-cluster-role.yaml
