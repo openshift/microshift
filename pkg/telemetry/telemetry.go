@@ -130,20 +130,28 @@ func (t *TelemetryClient) Send(ctx context.Context, pullSecret string, metrics [
 	return fmt.Errorf("request unsuccessful. Status code: %v. Body: %v", resp.StatusCode, string(body))
 }
 
-func (t *TelemetryClient) Collect(cfg *config.Config) ([]Metric, error) {
+func (t *TelemetryClient) Collect(ctx context.Context, cfg *config.Config) ([]Metric, error) {
 	kubeletMetrics, err := fetchKubeletMetrics(cfg)
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch kubelet metrics: %v", err)
 	}
+	nodeLabels, err := fetchNodeLabels(ctx, cfg)
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch node labels: %v", err)
+	}
+	kubeResources, err := fetchKubernetesResources(ctx, cfg)
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch kubernetes resources: %v", err)
+	}
 
 	metrics := make([]Metric, 0)
-	capacityMetrics, err := computeCapacityMetrics(cfg, kubeletMetrics)
+	capacityMetrics, err := computeCapacityMetrics(kubeletMetrics, nodeLabels)
 	if err != nil {
 		return nil, fmt.Errorf("failed to compute capacity metrics: %v", err)
 	}
 	metrics = append(metrics, capacityMetrics...)
 
-	usageMetrics, currentCPUSeconds, err := computeUsageMetrics(cfg, kubeletMetrics, t.previousCPUSeconds, t.previousCPUtimestamp)
+	usageMetrics, currentCPUSeconds, err := computeUsageMetrics(kubeletMetrics, kubeResources, t.previousCPUSeconds, t.previousCPUtimestamp)
 	if err != nil {
 		return nil, fmt.Errorf("failed to compute usage metrics: %v", err)
 	}
@@ -158,12 +166,7 @@ func (t *TelemetryClient) Collect(cfg *config.Config) ([]Metric, error) {
 	return metrics, nil
 }
 
-func computeCapacityMetrics(cfg *config.Config, kubeletMetrics map[string]*io_prometheus_client.MetricFamily) ([]Metric, error) {
-	nodeLabels, err := fetchNodeLabels(cfg)
-	if err != nil {
-		return nil, fmt.Errorf("failed to fetch node labels: %v", err)
-	}
-
+func computeCapacityMetrics(kubeletMetrics map[string]*io_prometheus_client.MetricFamily, nodeLabels map[string]string) ([]Metric, error) {
 	osIdValue, ok := nodeLabels["node.openshift.io/os_id"]
 	if !ok {
 		return nil, fmt.Errorf("node label node.openshift.io/os_id not found")
@@ -203,12 +206,7 @@ func computeCapacityMetrics(cfg *config.Config, kubeletMetrics map[string]*io_pr
 	}, nil
 }
 
-func computeUsageMetrics(cfg *config.Config, kubeletMetrics map[string]*io_prometheus_client.MetricFamily, previousCPUSeconds float64, previousTimestamp int64) ([]Metric, float64, error) {
-	kubeResources, err := fetchKubernetesResources(cfg)
-	if err != nil {
-		return nil, 0, fmt.Errorf("failed to fetch kubernetes resources: %v", err)
-	}
-
+func computeUsageMetrics(kubeletMetrics map[string]*io_prometheus_client.MetricFamily, kubeResources map[string]int, previousCPUSeconds float64, previousTimestamp int64) ([]Metric, float64, error) {
 	currentTimestamp := time.Now().UnixNano() / time.Millisecond.Nanoseconds()
 
 	resourceTypes := []string{"pods", "namespaces", "services", "ingresses.networking.k8s.io", "routes.route.openshift.io", "customresourcedefinitions.apiextensions.k8s.io"}

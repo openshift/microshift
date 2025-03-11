@@ -146,7 +146,7 @@ func fetchKubeletMetrics(cfg *config.Config) (map[string]*io_prometheus_client.M
 	return metricFamilies, nil
 }
 
-func fetchNodeLabels(cfg *config.Config) (map[string]string, error) {
+func fetchNodeLabels(ctx context.Context, cfg *config.Config) (map[string]string, error) {
 	kubeconfig := filepath.Join(cfg.KubeConfigRootAdminPath(), "kubeconfig")
 	config, err := clientcmd.BuildConfigFromFlags("", kubeconfig)
 	if err != nil {
@@ -157,7 +157,7 @@ func fetchNodeLabels(cfg *config.Config) (map[string]string, error) {
 	if err != nil {
 		return nil, fmt.Errorf("error creating Kubernetes clientset: %w", err)
 	}
-	nodes, err := clientset.CoreV1().Nodes().List(context.Background(), metav1.ListOptions{})
+	nodes, err := clientset.CoreV1().Nodes().List(ctx, metav1.ListOptions{})
 	if err != nil {
 		return nil, fmt.Errorf("unable to get node labels: %v", err)
 	}
@@ -170,7 +170,7 @@ func fetchNodeLabels(cfg *config.Config) (map[string]string, error) {
 	return labels, nil
 }
 
-func fetchKubernetesResources(cfg *config.Config) (map[string]int, error) {
+func fetchKubernetesResources(ctx context.Context, cfg *config.Config) (map[string]int, error) {
 	kubeconfig := filepath.Join(cfg.KubeConfigRootAdminPath(), "kubeconfig")
 	config, err := clientcmd.BuildConfigFromFlags("", kubeconfig)
 	if err != nil {
@@ -181,7 +181,7 @@ func fetchKubernetesResources(cfg *config.Config) (map[string]int, error) {
 	if err != nil {
 		return nil, fmt.Errorf("error creating Kubernetes clientset: %w", err)
 	}
-	pods, err := clientset.CoreV1().Pods("").List(context.TODO(), metav1.ListOptions{})
+	pods, err := clientset.CoreV1().Pods("").List(ctx, metav1.ListOptions{})
 	if err != nil {
 		return nil, fmt.Errorf("error listing pods: %w", err)
 	}
@@ -191,15 +191,15 @@ func fetchKubernetesResources(cfg *config.Config) (map[string]int, error) {
 			runningPods++
 		}
 	}
-	namespaces, err := clientset.CoreV1().Namespaces().List(context.TODO(), metav1.ListOptions{})
+	namespaces, err := clientset.CoreV1().Namespaces().List(ctx, metav1.ListOptions{})
 	if err != nil {
 		return nil, fmt.Errorf("error listing namespaces: %w", err)
 	}
-	services, err := clientset.CoreV1().Services("").List(context.TODO(), metav1.ListOptions{})
+	services, err := clientset.CoreV1().Services("").List(ctx, metav1.ListOptions{})
 	if err != nil {
 		return nil, fmt.Errorf("error listing services: %w", err)
 	}
-	ingresses, err := clientset.NetworkingV1().Ingresses("").List(context.TODO(), metav1.ListOptions{})
+	ingresses, err := clientset.NetworkingV1().Ingresses("").List(ctx, metav1.ListOptions{})
 	if err != nil {
 		return nil, fmt.Errorf("error listing ingresses: %w", err)
 	}
@@ -209,7 +209,7 @@ func fetchKubernetesResources(cfg *config.Config) (map[string]int, error) {
 		return nil, fmt.Errorf("error creating dynamic client: %v", err)
 	}
 	crdGVR := apiextensionsv1.SchemeGroupVersion.WithResource("customresourcedefinitions")
-	crdList, err := dynamicClient.Resource(crdGVR).List(context.TODO(), metav1.ListOptions{})
+	crdList, err := dynamicClient.Resource(crdGVR).List(ctx, metav1.ListOptions{})
 	if err != nil {
 		return nil, fmt.Errorf("error listing CRDs: %v", err)
 	}
@@ -218,7 +218,7 @@ func fetchKubernetesResources(cfg *config.Config) (map[string]int, error) {
 	if err != nil {
 		return nil, fmt.Errorf("error creating OpenShift route client: %w", err)
 	}
-	routes, err := routeClient.Routes("").List(context.TODO(), metav1.ListOptions{})
+	routes, err := routeClient.Routes("").List(ctx, metav1.ListOptions{})
 	if err != nil {
 		return nil, fmt.Errorf("error listing routes: %w", err)
 	}
