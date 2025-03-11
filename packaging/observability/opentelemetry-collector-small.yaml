@@ -1,7 +1,10 @@
-# Basic Opentelemetry-collector configuration file for MicroShift
-# This file provides a starting config for users to customize to their needs. Exporters are disabled (nop) by default.
-# This is because the exporter endpoints are not knowable at installation. Users are therefore encouraged
-# to specify their own copy of this file, customized to their needs, including the otlp exporter endpoint.
+# Opentelemetry-collector-small.yaml provides a minimal set of metrics and logs for monitoring system, node, and
+# workload resource usage for CPU, Memory, Disk, and Network. Included also are all cluster events of "Warning" type.
+
+# Metrics Exported
+#    cpu, mem, disk, network by Pod
+#   K8s events, type "warning"
+
 receivers:
   kubeletstats:
     auth_type: tls
@@ -14,53 +17,30 @@ receivers:
     node: ${env:K8S_NODE_NAME}
     k8s_api_config:
       auth_type: kubeConfig
-    metrics:
-      k8s.node.cpu.usage:
-        enabled: true
-      k8s.pod.cpu.usage:
-        enabled: true
-      container.cpu.usage:
-        enabled: true
-      k8s.container.memory.node.utilization:
-        enabled: true
-      k8s.pod.memory.node.utilization:
-        enabled: true
+  k8s_events:
+    auth_type: kubeConfig
   hostmetrics:
     root_path: /
     collection_interval: 10s
     scrapers:
       cpu:
-      load:
       memory:
-  hostmetrics/disk:
-    root_path: /
-    collection_interval: 10s
-    scrapers:
+      network:
       disk:
       filesystem:
-  hostmetrics/network:
-    root_path: /
-    collection_interval: 10s
-    scrapers:
-      network:
-
 processors:
+  batch:
   resourcedetection/system:
-    detectors: ["system"]
+    detectors: [ "system" ]
     system:
-      hostname_sources: ["os"]
-
+      hostname_sources: [ "os" ]
 exporters:
-# EXAMPLE OTLP (Prometheus) ENDPOINT CONFIG
-# The otlp exporter expects an endpoint listening for OTLP connections. This is disabled by default.
-# To enable the otlp exporter, uncomment the below section from "otlp:" to "insecure: true", inclusive. Be sure to also
-# uncomment the exporters under "services.pipelines.[metrics, metrics/kubeletstats, logs]".
-#  otlp:
-#    sending_queue:
-#      storage: file_storage
-#    endpoint: localhost:12345 # Valid OTLP endpoint required
-#    tls:
-#      insecure: true
+  otlp:
+    sending_queue:
+      storage: file_storage
+    endpoint: ${env:K8S_NODE_NAME}:4317 # Valid OTLP endpoint required
+    tls:
+      insecure: true
   debug:
 
 extensions:
@@ -68,22 +48,28 @@ extensions:
     directory: /var/lib/microshift-observability
 
 service:
-  extensions: [file_storage]
+  extensions: [ file_storage ]
   pipelines:
-    metrics/cluster:
-      receivers: [kubeletstats]
-      exporters: [debug]  # Optional, enabled by default. Comment out to disable.
-#      exporters: [otlp]  # Uncomment to enable OTLP
-    metrics/host:
-      receivers: [hostmetrics, hostmetrics/disk, hostmetrics/network]
-      processors: [resourcedetection/system]
-      exporters: [debug]  # Optional, enabled by default. Comment out to disable.
-#      exporters: [otlp]  # Uncomment to enable OTLP
+    metrics/kubeletstats:
+      receivers: [ kubeletstats ]
+      processors: [ batch ]
+      exporters: [ debug, otlp ]  # Uncomment to enable OTLP
+    metrics/hostmetrics:
+      receivers: [ hostmetrics ]
+      processors: [ resourcedetection/system, batch ]
+      exporters: [ debug, otlp ]  # Uncomment to enable OTLP
+    logs/kube_events:
+      receivers: [ k8s_events ]
+      processors: [ batch ]
+      exporters: [ otlp ]
+    logs/host:
+      receivers: [ hostmetrics ]
+      exporters: [ otlp ]
   telemetry:
     metrics:
       readers:
         - periodic:
             exporter:
               otlp:
-                protocol: grpc/protobuf
-                endpoint: http://localhost:14317
+                protocol: http/protobuf
+                endpoint: http://127.0.0.1:4318
