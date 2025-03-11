@@ -468,6 +468,18 @@ def process_container_encapsulate(groupdir, containerfile, dry_run):
         common.run_command(["sed", f"s/^/{ce_outname}: /", ce_logfile], dry_run)
 
 
+def process_templates(dir, dry_run):
+    for ifile in os.listdir(dir):
+        if not ifile.endswith(".template"):
+            continue
+        # Create full path for output and input file names
+        ofile = os.path.join(BOOTC_IMAGE_DIR, ifile)
+        ifile = os.path.join(dir, ifile)
+        # Strip the .template suffix from the output file name
+        ofile = ofile.removesuffix(".template")
+        run_template_cmd(ifile, ofile, dry_run)
+
+
 def process_group(groupdir, build_type, dry_run=False):
     futures = []
     try:
@@ -475,15 +487,7 @@ def process_group(groupdir, build_type, dry_run=False):
         common.start_junit(groupdir)
         # Process all the template files in the current group directory
         # before starting the parallel processing
-        for ifile in os.listdir(groupdir):
-            if not ifile.endswith(".template"):
-                continue
-            # Create full path for output and input file names
-            ofile = os.path.join(BOOTC_IMAGE_DIR, ifile)
-            ifile = os.path.join(groupdir, ifile)
-            # Strip the .template suffix from the output file name
-            ofile = ofile.removesuffix(".template")
-            run_template_cmd(ifile, ofile, dry_run)
+        process_templates(groupdir, dry_run)
 
         # Parallel processing loop
         with concurrent.futures.ProcessPoolExecutor() as executor:
@@ -524,6 +528,20 @@ def process_group(groupdir, build_type, dry_run=False):
         # Close junit file
         common.close_junit()
 
+def build_single_image(dir, file, dry_run):
+    # Open the junit file
+    common.start_junit(dir)
+    # Process all the template files in the current group directory
+    # before starting the parallel processing
+    process_templates(dir, dry_run)
+    
+    if file.endswith(".containerfile"):
+        process_containerfile(dir, file, dry_run)
+    elif file.endswith(".image-bootc"):
+        process_image_bootc(dir, file, dry_run)
+    elif file.endswith(".container-encapsulate"):
+        process_container_encapsulate(dir, file, dry_run)
+
 
 def main():
     # Parse command line arguments
@@ -537,6 +555,7 @@ def main():
     dirgroup = parser.add_mutually_exclusive_group(required=True)
     dirgroup.add_argument("-l", "--layer-dir", type=str, help="Path to the layer directory to process.")
     dirgroup.add_argument("-g", "--group-dir", type=str, help="Path to the group directory to process.")
+    dirgroup.add_argument("-i", "--input-file", type=str, help="Path to a single input file to process.")
 
     args = parser.parse_args()
     success_message = False
@@ -548,6 +567,9 @@ def main():
         if args.layer_dir:
             args.layer_dir = os.path.abspath(args.layer_dir)
             dir2process = args.layer_dir
+        if args.input_file:
+            args.input_file = os.path.abspath(args.input_file)
+            dir2process = os.path.split(args.input_file)[0]
         # Make sure the input directory exists
         if not os.path.isdir(dir2process):
             raise Exception(f"The input directory '{dir2process}' does not exist")
@@ -598,13 +620,16 @@ def main():
         # Process individual group directory
         if args.group_dir:
             process_group(args.group_dir, args.build_type, args.dry_run)
-        else:
+        elif args.layer_dir:
             # Process layer directory contents sorted by length and then alphabetically
             for item in sorted(os.listdir(args.layer_dir), key=lambda i: (len(i), i)):
                 item_path = os.path.join(args.layer_dir, item)
                 # Check if this item is a directory
                 if os.path.isdir(item_path):
                     process_group(item_path, args.build_type, args.dry_run)
+        else:
+            # Process a single file
+            build_single_image(dir2process, os.path.basename(args.input_file), args.dry_run)
         # Toggle the success flag
         success_message = True
     except Exception as e:
