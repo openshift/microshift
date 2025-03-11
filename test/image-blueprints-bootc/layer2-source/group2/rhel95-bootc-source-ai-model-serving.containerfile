@@ -41,15 +41,40 @@ RUN printf '\
 BLOCK_RPCS=\n\
 FSFREEZE_HOOK_PATHNAME=/etc/qemu-ga/fsfreeze-hook\n' > /etc/sysconfig/qemu-ga
 
-# Build a whitespace separated list of images to be embedded. All images are in single layer.
+# Embed images based on contents of release-info RPMs.
+# First RUN embeds MicroShift core images.
+# Second RUN embeds AI Model Serving images.
+# Two RUNs to create separate layer so they don't grow too big.
 #
 # Note:
 # - Retries work around sporadic "cannot set user namespace" podman error.
 RUN --mount=type=secret,id=pullsecret,dst=/run/secrets/pull-secret.json \
     images="$(jq -r '.images | .[]' /usr/share/microshift/release/release-x86_64.json)" ; \
-    images="${images} $(jq -r '.images | with_entries(select(.key | startswith("kserve") or startswith("ovms-image"))) | .[]' /usr/share/microshift/release/release-ai-model-serving-x86_64.json)" ; \
-    images="${images} quay.io/microshift/busybox:1.36 quay.io/microshift/ai-testing-model:ovms-resnet50" ; \
-    echo "${images}" ; \
+    for img in ${images} ; do \
+        for i in 1 2 3; do \
+            GOMAXPROCS=8 podman pull \
+                --authfile /run/secrets/pull-secret.json \
+                --root /var/lib/containers/storage-preloaded \
+                "docker://${img}" && break; \
+            if [ $i -eq 3 ] ; then \
+                echo "ERROR: Failed to pull ${img} image after 3 attempts"; \
+                exit 1; \
+            fi; \
+            echo "Attempt $i failed. Retrying in 5 seconds..." && sleep 5; \
+        done ; \
+    done
+
+# Images are filtered:
+# - `kserve*` are required for the kserve components
+# - `ovms-image` is needed for OpenVino Model Server
+# Images of remaining ServingRuntimes are omitted due to their size (they vary between 2 and 5 GiB).
+# Embedding them would unnecessarily increase size of the bootc image, size of the ISO installer,
+# required VM's disk size, and would greatly increase build and VM creations times.
+#
+# Additionally, OCI image with resnet50 model is embedded.
+RUN --mount=type=secret,id=pullsecret,dst=/run/secrets/pull-secret.json \
+    images="$(jq -r '.images | with_entries(select(.key | startswith("kserve") or startswith("ovms-image"))) | .[]' /usr/share/microshift/release/release-ai-model-serving-x86_64.json)" ; \
+    images="${images} quay.io/microshift/ai-testing-model:ovms-resnet50" ; \
     for img in ${images} ; do \
         for i in 1 2 3; do \
             GOMAXPROCS=8 podman pull \
