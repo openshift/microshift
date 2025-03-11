@@ -528,13 +528,14 @@ def process_group(groupdir, build_type, dry_run=False):
         # Close junit file
         common.close_junit()
 
+
 def build_single_image(dir, file, dry_run):
     # Open the junit file
     common.start_junit(dir)
     # Process all the template files in the current group directory
     # before starting the parallel processing
     process_templates(dir, dry_run)
-    
+
     if file.endswith(".containerfile"):
         process_containerfile(dir, file, dry_run)
     elif file.endswith(".image-bootc"):
