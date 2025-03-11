@@ -130,7 +130,7 @@ spec:
             successThreshold: 1
             timeoutSeconds: 1
           resources:
-            requests: 
+            requests:
               cpu: 100m
               memory: 256Mi
           volumeMounts:
@@ -145,8 +145,6 @@ spec:
               name: '{{ .ClientCAMapName}}'
               readOnly: true
             {{- end }}
-
-
           image: '{{ .ReleaseImage.haproxy_router }}'
           ports:
             - name: http

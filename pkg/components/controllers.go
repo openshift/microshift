@@ -6,6 +6,7 @@ import (
 	"math"
 	"os"
 	"path/filepath"
+	"regexp/syntax"
 	"strconv"
 	"strings"
 	"time"
@@ -201,7 +202,10 @@ func startIngressController(ctx context.Context, cfg *config.Config, kubeconfigP
 		return err
 	}
 
-	extraParams := generateIngressParams(cfg)
+	extraParams, err := generateIngressParams(cfg)
+	if err != nil {
+		return err
+	}
 
 	if err := assets.ApplyServices(ctx, svc, renderTemplate, renderParamsFromConfig(cfg, extraParams), kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply service %v %v", svc, err)
@@ -365,7 +369,18 @@ func tlsProfileSpecForSecurityProfile(profile *configv1.TLSSecurityProfile) *con
 	return configv1.TLSProfiles[configv1.TLSProfileIntermediateType]
 }
 
-func generateIngressParams(cfg *config.Config) assets.RenderParams {
+// validateClientTLS validates the given ingresscontroller's client TLS
+// configuration.
+func validateClientTLS(patterns []string) error {
+	for _, pattern := range patterns {
+		if _, err := syntax.Parse(pattern, syntax.Perl); err != nil {
+			return fmt.Errorf("failed to parse clientTLS.allowedSubjectPatterns: %w ", err)
+		}
+	}
+	return nil
+}
+
+func generateIngressParams(cfg *config.Config) (assets.RenderParams, error) {
 	routerMode := "v4"
 	if cfg.IsIPv6() {
 		routerMode = "v4v6"
@@ -415,9 +430,7 @@ func generateIngressParams(cfg *config.Config) assets.RenderParams {
 	var RouterSSLMinVersion string
 	switch tlsProfileSpec.MinTLSVersion {
 	// TLS 1.0 is not supported, convert to TLS 1.1.
-	case configv1.VersionTLS10:
-		RouterSSLMinVersion = "TLSv1.1"
-	case configv1.VersionTLS11:
+	case configv1.VersionTLS10, configv1.VersionTLS11:
 		RouterSSLMinVersion = "TLSv1.1"
 	case configv1.VersionTLS12:
 		RouterSSLMinVersion = "TLSv1.2"
@@ -431,8 +444,6 @@ func generateIngressParams(cfg *config.Config) assets.RenderParams {
 	if cfg.Ingress.AdmissionPolicy.WildcardPolicy == config.WildcardPolicyAllowed {
 		RouterAllowWildcardRoutes = true
 	}
-
-	// clientCAPath := cfg.Ingress.ClientTLS.ClientCertificatePolicy
 
 	clientAuthPolicy := ""
 	clientCABundleFilename := "ca-bundle.pem"
@@ -450,10 +461,16 @@ func generateIngressParams(cfg *config.Config) assets.RenderParams {
 		}
 		if len(cfg.Ingress.ClientTLS.ClientCA.Name) != 0 {
 			clientCAMapName = cfg.Ingress.ClientTLS.ClientCA.Name
-			if len(cfg.Ingress.ClientTLS.AllowedSubjectPatterns) != 0 {
-				clientAuthFilter = "(?:" + strings.Join(cfg.Ingress.ClientTLS.AllowedSubjectPatterns, "|") + ")"
-			}
 		}
+
+		if len(cfg.Ingress.ClientTLS.AllowedSubjectPatterns) != 0 {
+			err := validateClientTLS(cfg.Ingress.ClientTLS.AllowedSubjectPatterns)
+			if err != nil {
+				return nil, err
+			}
+			clientAuthFilter = "(?:" + strings.Join(cfg.Ingress.ClientTLS.AllowedSubjectPatterns, "|") + ")"
+		}
+
 		clientAuthCAPath = filepath.Join(clientCAMountPath, clientCABundleFilename)
 	}
 
@@ -492,5 +509,5 @@ func generateIngressParams(cfg *config.Config) assets.RenderParams {
 		"ClientCAMountPath":           clientCAMountPath,
 	}
 
-	return extraParams
+	return extraParams, nil
 }

@@ -32,10 +32,19 @@ type IngressConfig struct {
 	// List of IP addresses and NIC names where the router will be listening. The NIC
 	// names get translated to all their configured IPs dynamically. Defaults to the
 	// configured IPs in the host at MicroShift start.
-	ListenAddress            []string `json:"listenAddress"`
-	ServingCertificate       []byte   `json:"-"`
-	ServingKey               []byte   `json:"-"`
-	ServingCertificateSecret string   `json:"certificateSecret"`
+	ListenAddress      []string `json:"listenAddress"`
+	ServingCertificate []byte   `json:"-"`
+	ServingKey         []byte   `json:"-"`
+
+	// ServingCertificateSecret references a kubernetes.io/tls type secret containing the TLS cert info for serving secure traffic.
+	// The secret must exist in the openshift-ingress namespace and contain the following required fields:
+	// - Secret.Data["tls.key"] - TLS private key.
+	// - Secret.Data["tls.crt"] - TLS certificate.
+	//
+	// +optional
+	// +kubebuilder:default:="router-certs-default"
+	ServingCertificateSecret string `json:"certificateSecret"`
+
 	// logEmptyRequests specifies how connections on which no request is
 	// received should be logged.  Typically, these empty requests come from
 	// load balancers' health probes or Web browsers' speculative

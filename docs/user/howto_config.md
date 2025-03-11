@@ -123,7 +123,7 @@ dns:
 etcd:
     memoryLimitMB: 0
 ingress:
-    certificateSecret: ""
+    certificateSecret: router-certs-default
     clientTLS:
         allowedSubjectPatterns: []
         clientCA:

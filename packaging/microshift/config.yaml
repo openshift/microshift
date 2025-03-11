@@ -52,7 +52,11 @@ etcd:
     # memory when it gets to this value. 0 means no limit.
     memoryLimitMB: 0
 ingress:
-    certificateSecret: ""
+    # ServingCertificateSecret references a kubernetes.io/tls type secret containing the TLS cert info for serving secure traffic.
+    # The secret must exist in the openshift-ingress namespace and contain the following required fields:
+    # - Secret.Data["tls.key"] - TLS private key.
+    # - Secret.Data["tls.crt"] - TLS certificate.
+    certificateSecret: router-certs-default
     # clientTLS specifies settings for requesting and verifying client
     # certificates, which can be used to enable mutual TLS for
     # edge-terminated and reencrypt routes.
