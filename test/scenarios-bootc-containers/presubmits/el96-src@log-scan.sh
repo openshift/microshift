@@ -10,7 +10,7 @@ export TEST_RANDOMIZATION=none
 
 scenario_create_vms() {
     prepare_kickstart host1 kickstart-bootc-container.ks.template ""
-    launch_container --image rhel95-bootc-source
+    launch_container --image rhel96-bootc-source
 }
 
 scenario_remove_vms() {

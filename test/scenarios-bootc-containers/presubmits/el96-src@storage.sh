@@ -4,7 +4,7 @@
 
 scenario_create_vms() {
     prepare_kickstart host1 kickstart-bootc-container.ks.template ""
-    launch_container --image rhel95-bootc-source --vg_size 3
+    launch_container --image rhel96-bootc-source --vg_size 3
 }
 
 scenario_remove_vms() {
