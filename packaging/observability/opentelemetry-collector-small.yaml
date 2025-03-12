@@ -1,9 +1,11 @@
 # Opentelemetry-collector-small.yaml provides a minimal set of metrics and logs for monitoring system, node, and
 # workload resource usage for CPU, Memory, Disk, and Network. Included also are all cluster events of "Warning" type.
 
-# Metrics Exported
-#    cpu, mem, disk, network by Pod
-#   K8s events, type "warning"
+# This configuration exports:
+# - Contain, Pod, and Node metrics
+# - Kubernetes Events (Warnings only)
+# - Host's CPU, Mem, Disk, and Network Metrics
+# - System journals for microshift.service, microshift-observability.service, and microshift-etcd.scope, priority < Info
 
 receivers:
   kubeletstats:
@@ -28,12 +30,45 @@ receivers:
       network:
       disk:
       filesystem:
+  journald:
+    units:
+      - microshift
+      - microshift-observability
+      - microshift-etcd
+      - crio
+      - openvswitch.service
+
 processors:
   batch:
   resourcedetection/system:
     detectors: [ "system" ]
     system:
       hostname_sources: [ "os" ]
+  transform/journald:
+    log_statements:
+      # Only useful for structured logging
+      - context: log
+        statements:
+          - merge_maps(cache, body, "insert")
+          # Create a map of sys log levels to their numerical value as an index of the array
+          - append(cache["syslog_table"], values = ["EMERG", "ALERT", "CRIT", "ERR", "WARNING", "NOTICE"])
+          - set(severity_number, Int(cache["PRIORITY"]))
+          # TODO The below set() call is producing parsing errors that I can't pin down. It seems like the nested access
+          # cannot be done dynamically. Replacing severity_number with an int literal works, but is unhelpful for the purpose
+          # of the lookup.
+          # Error:  unable to parse OTTL statement "set(severity_text, cache[\"syslog_table\"][severity_number])":
+          #         statement has invalid syntax: 1:41: unexpected token "[" (expected ")" Key*)
+          # - set(severity_text, cache["syslog_table"][severity_number])
+
+      - context: log
+        statements:
+          - set(resource.attributes["service.name"], "journald")
+  filter/severity:
+    error_mode: ignore
+    logs:
+      log_record:
+        - severity_number < SEVERITY_NUMBER_WARN
+
 exporters:
   otlp:
     sending_queue:
@@ -41,7 +76,9 @@ exporters:
     endpoint: ${env:K8S_NODE_NAME}:4317 # Valid OTLP endpoint required
     tls:
       insecure: true
+  # TODO remove debug
   debug:
+    verbosity: detailed
 
 extensions:
   file_storage:
@@ -53,18 +90,23 @@ service:
     metrics/kubeletstats:
       receivers: [ kubeletstats ]
       processors: [ batch ]
-      exporters: [ debug, otlp ]  # Uncomment to enable OTLP
+      exporters: [ otlp ]  # Uncomment to enable OTLP
     metrics/hostmetrics:
       receivers: [ hostmetrics ]
       processors: [ resourcedetection/system, batch ]
-      exporters: [ debug, otlp ]  # Uncomment to enable OTLP
+      exporters: [ otlp ]  # Uncomment to enable OTLP
     logs/kube_events:
       receivers: [ k8s_events ]
-      processors: [ batch ]
+      processors: [ filter/severity, batch ]
       exporters: [ otlp ]
     logs/host:
       receivers: [ hostmetrics ]
       exporters: [ otlp ]
+    logs/journald:
+      receivers: [ journald ]
+      processors: [ transform/journald ]
+      # TODO remove debug
+      exporters: [ otlp, debug ]
   telemetry:
     metrics:
       readers:
