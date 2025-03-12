@@ -725,6 +725,9 @@ from the same parent image.
 One way of working around this issue is to add `systemd` units that run before the
 affected system services and apply the necessary fixes.
 
+> Note: The workaround is only necessary for `rpm-ostree` to Image Mode upgrade
+> and it can be removed once all the devices are running the upgraded image.
+
 Add the following command to the MicroShift image build procedure to create a
 `systemd` unit file solving a potential UID / GID drift for `ovsdb-server.service`.
 
