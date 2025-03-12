@@ -9,8 +9,8 @@
 export TEST_RANDOMIZATION=none
 
 scenario_create_vms() {
-    prepare_kickstart host1 kickstart-bootc.ks.template rhel95-bootc-source
-    launch_vm --boot_blueprint rhel95-bootc
+    prepare_kickstart host1 kickstart-bootc.ks.template rhel96-bootc-source
+    launch_vm --boot_blueprint rhel96-bootc
 }
 
 scenario_remove_vms() {

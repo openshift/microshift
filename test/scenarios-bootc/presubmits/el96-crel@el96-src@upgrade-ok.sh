@@ -2,7 +2,7 @@
 
 # Sourced from scenario.sh and uses functions defined there.
 
-start_image=rhel95-bootc-crel
+start_image=rhel96-bootc-crel
 
 scenario_create_vms() {
     if ! does_image_exist "${start_image}"; then
@@ -10,7 +10,7 @@ scenario_create_vms() {
         return 0
     fi
     prepare_kickstart host1 kickstart-bootc.ks.template "${start_image}"
-    launch_vm --boot_blueprint rhel95-bootc
+    launch_vm --boot_blueprint rhel96-bootc
 }
 
 scenario_remove_vms() {
@@ -27,7 +27,7 @@ scenario_run_tests() {
         return 0
     fi
     run_tests host1 \
-        --variable "TARGET_REF:rhel95-bootc-source" \
+        --variable "TARGET_REF:rhel96-bootc-source" \
         --variable "BOOTC_REGISTRY:${MIRROR_REGISTRY_URL}" \
         suites/upgrade/upgrade-successful.robot
 }

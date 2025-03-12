@@ -8,9 +8,9 @@ VM_BRIDGE_IP="$(get_vm_bridge_ip "${VM_MULTUS_NETWORK}")"
 WEB_SERVER_URL="http://${VM_BRIDGE_IP}:${WEB_SERVER_PORT}"
 
 scenario_create_vms() {
-    prepare_kickstart host1 kickstart-bootc.ks.template rhel95-bootc-source-optionals
+    prepare_kickstart host1 kickstart-bootc.ks.template rhel96-bootc-source-optionals
     # Two nics - one for macvlan, another for ipvlan (they cannot enslave the same interface)
-    launch_vm --boot_blueprint rhel95-bootc --network "${VM_MULTUS_NETWORK},${VM_MULTUS_NETWORK}"
+    launch_vm --boot_blueprint rhel96-bootc --network "${VM_MULTUS_NETWORK},${VM_MULTUS_NETWORK}"
 }
 
 scenario_remove_vms() {
