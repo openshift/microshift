@@ -49,7 +49,7 @@ FSFREEZE_HOOK_PATHNAME=/etc/qemu-ga/fsfreeze-hook\n' > /etc/sysconfig/qemu-ga
 # Note:
 # - Retries work around sporadic "cannot set user namespace" podman error.
 RUN --mount=type=secret,id=pullsecret,dst=/run/secrets/pull-secret.json \
-    images="$(jq -r '.images | .[]' /usr/share/microshift/release/release-x86_64.json)" ; \
+    images="$(jq -r '.images | .[]' /usr/share/microshift/release/release-"$(uname -m)".json)" ; \
     for img in ${images} ; do \
         for i in 1 2 3; do \
             GOMAXPROCS=8 podman pull \
@@ -73,7 +73,7 @@ RUN --mount=type=secret,id=pullsecret,dst=/run/secrets/pull-secret.json \
 #
 # Additionally, OCI image with resnet50 model is embedded.
 RUN --mount=type=secret,id=pullsecret,dst=/run/secrets/pull-secret.json \
-    images="$(jq -r '.images | with_entries(select(.key | startswith("kserve") or startswith("ovms-image"))) | .[]' /usr/share/microshift/release/release-ai-model-serving-x86_64.json)" ; \
+    images="$(jq -r '.images | with_entries(select(.key | startswith("kserve") or startswith("ovms-image"))) | .[]' /usr/share/microshift/release/release-ai-model-serving-"$(uname -m)".json)" ; \
     images="${images} quay.io/microshift/ai-testing-model:ovms-resnet50" ; \
     for img in ${images} ; do \
         for i in 1 2 3; do \
