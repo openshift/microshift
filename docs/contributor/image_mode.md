@@ -702,3 +702,46 @@ without errors.
 watch sudo oc get pods -A \
     --kubeconfig /var/lib/microshift/resources/kubeadmin/kubeconfig
 ```
+
+## Appendix C: The rpm-ostree to Image Mode Upgrade Procedure
+
+Refer to RHEL documentation for generic instructions on upgrading `rpm-ostree`
+systems to Image Mode. The upgrade process should be planned carefully considering
+the following guidelines:
+* Follow instructions in RHEL documentation for converting `rpm-ostree` blueprints to
+  Image Mode container files
+* Consider using [rpm-ostree compose container-encapsulate](https://coreos.github.io/rpm-ostree/container/#converting-ostree-commits-to-new-base-images)
+  to experiment with Image Mode based on the existing `ostree` commits
+* Invest in defining a proper container build pipeline for fully adopting Image Mode
+
+If reinstalling MicroShift devices from scratch is not an option, read the remainder
+of this section that outlines the upgrade details specific to MicroShift.
+
+Upgrading existing systems during the transition from `rpm-ostree` to Image Mode
+may pose the challenge of [UID / GID Drift](https://github.com/bootc-dev/bootc/issues/673)
+because the existing `rpm-ostree` and the new Image Mode images are not derived
+from the same parent image.
+
+One way of working around this issue is to add `systemd` units that run before the
+affected system services and apply the necessary fixes.
+
+> Note: The workaround is only necessary for `rpm-ostree` to Image Mode upgrade
+> and it can be removed once all the devices are running the upgraded image.
+
+Add the following command to the MicroShift image build procedure to create a
+`systemd` unit file solving a potential UID / GID drift for `ovsdb-server.service`.
+
+```
+# Install systemd configuration drop-ins to fix potential permission problems
+# when upgrading from older rpm-ostree commits to Image Mode container layers
+RUN mkdir -p /etc/systemd/system/ovsdb-server.service.d && \
+    cat > /etc/systemd/system/ovsdb-server.service.d/microshift-ovsdb-ownership.conf <<'EOF'
+# The openvswitch database files must be owned by the appropriate user and its
+# primary group. Note that the user and its group may be overwritten too, so
+# they need to be recreated in this case.
+[Service]
+ExecStartPre=/bin/sh -c '/bin/getent passwd openvswitch >/dev/null || useradd -r openvswitch'
+ExecStartPre=/bin/sh -c '/bin/getent group hugetlbfs >/dev/null || groupadd -r hugetlbfs'
+ExecStartPre=/sbin/usermod -a -G hugetlbfs openvswitch
+ExecStartPre=/bin/chown -Rhv openvswitch. /etc/openvswitch
+EOF
