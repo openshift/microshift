@@ -1,0 +1,51 @@
+ARG USHIFT_BASE_IMAGE_NAME
+ARG USHIFT_BASE_IMAGE_TAG
+FROM $USHIFT_BASE_IMAGE_NAME:$USHIFT_BASE_IMAGE_TAG
+
+# Pull the container image dependencies into /var/lib/containers/storage-preloaded
+RUN --mount=type=secret,id=pullsecret,dst=/run/secrets/pull-secret.json \
+    images=$(jq -r '.images | .[]' "/usr/share/microshift/release/release-$(uname -m).json") ; \
+    for i in ${images} ; do \
+        podman pull \
+            --authfile /run/secrets/pull-secret.json \
+            --root /var/lib/containers/storage-preloaded \
+            "docker://${i}" ; \
+    done
+
+# Edit the container storage configuration file to include the new path
+RUN sed -i '/^additionalimagestores.*/a\   "/var/lib/containers/storage-preloaded",' /etc/containers/storage.conf
+
+# Apply a workaround to set the SELinux context on the new storage directory and
+# also restore 'NET_BIND_SERVICE' capability that is currently lost when including
+# images in the container.
+#
+# Note: This requires setting the additional image stores path to a read-write
+# location on the file system. The images will still be treated as read-only by
+# the container subsystem.
+# See https://github.com/ostreedev/ostree-rs-ext/issues/654
+#
+# hadolint ignore=DL3059
+RUN cat > /usr/bin/microshift-imagestore-config <<'EOF'
+#!/bin/bash
+set -euxo pipefail
+DEF_IMGPATH="$1"
+NEW_IMGPATH="$2"
+semanage fcontext -a -e "${DEF_IMGPATH}" "${NEW_IMGPATH}"
+restorecon -R "${NEW_IMGPATH}"
+find "${NEW_IMGPATH}" -type f -path "*/usr/sbin/haproxy" -exec setcap "cap_net_bind_service=+ep" {} \;
+EOF
+
+# hadolint ignore=DL3059
+RUN cat > /etc/systemd/system/microshift-imagestore-config.service <<'EOF'
+[Unit]
+Description=Configure the image store directory for MicroShift
+Before=microshift.service
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/microshift-imagestore-config /var/lib/containers/storage /var/lib/containers/storage-preloaded
+[Install]
+WantedBy=multi-user.target
+EOF
+
+RUN chmod 755 /usr/bin/microshift-imagestore-config && \
+    systemctl enable microshift-imagestore-config.service

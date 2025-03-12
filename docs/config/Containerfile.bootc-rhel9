@@ -1,12 +1,12 @@
 FROM registry.redhat.io/rhel9-eus/rhel-9.4-bootc:9.4
 
-ARG USHIFT_VER=4.17
+ARG USHIFT_VER=4.18
 # hadolint ignore=SC1091
 RUN . /etc/os-release && dnf upgrade -y --releasever="${VERSION_ID}" && \
     dnf config-manager \
         --set-enabled "rhocp-${USHIFT_VER}-for-rhel-9-$(uname -m)-rpms" \
         --set-enabled "fast-datapath-for-rhel-9-$(uname -m)-rpms" && \
-    dnf install -y firewalld microshift && \
+    dnf install -y firewalld jq microshift microshift-release-info && \
     systemctl enable microshift && \
     dnf clean all
 
