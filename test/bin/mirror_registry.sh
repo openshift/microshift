@@ -133,21 +133,28 @@ setup_registry() {
     wait
 
     # Set up Postgres
+    #
+    # The following changes are implemented on top of the documented procedure:
+    # - The setfacl command is not used because the container is run with the
+    #   current user and group permissions.
+    # - The container is run with the current user and group permissions to avoid
+    #   permission denied issues in the user home directory.
+    # - The number of maximum connections to the database is increased from the
+    #   default of 100 to avoid 'FATAL: sorry, too many clients already' errors.
+    #
     # See https://docs.projectquay.io/deploy_quay.html#poc-configuring-database
     if [ ! -d "${MIRROR_REGISTRY_DIR}/postgres" ] ; then
         mkdir -p "${MIRROR_REGISTRY_DIR}/postgres"
-        setfacl -m u:26:-wx "${MIRROR_REGISTRY_DIR}/postgres"
+        # setfacl -m u:26:-wx "${MIRROR_REGISTRY_DIR}/postgres"
         new_db=true
     fi
 
-    # The number of maximum connections to the database is increased from the
-    # default of 100 to avoid 'FATAL: sorry, too many clients already' errors.
-    #
     # Note that the container log still shows the default setting of 100. Run
     # the 'echo SHOW max_connections | psql -d quay -U quayuser' query to
     # determine the current setting.
     echo "Running Postgres container"
     sudo podman run -d --rm --name microshift-postgres \
+        --user "$(id -u):$(id -g)" \
         -e POSTGRES_USER=quayuser \
         -e POSTGRES_PASSWORD=quaypass \
         -e POSTGRES_DB=quay \
