@@ -8,7 +8,7 @@
 # shellcheck disable=SC2034  # used elsewhere
 IMAGE_SIGSTORE_ENABLED=true
 
-start_image=rhel95-bootc-crel-optionals
+start_image=rhel96-bootc-crel-optionals
 
 scenario_create_vms() {
     if ! does_image_exist "${start_image}"; then
@@ -16,7 +16,7 @@ scenario_create_vms() {
         return 0
     fi
     prepare_kickstart host1 kickstart-bootc.ks.template "${start_image}"
-    launch_vm --boot_blueprint rhel95-bootc
+    launch_vm --boot_blueprint rhel96-bootc
 }
 
 scenario_remove_vms() {
@@ -35,7 +35,7 @@ scenario_run_tests() {
     # Run a minimal test for this scenario as its main functionality is
     # to verify container image signature check is enabled
 	run_tests host1 \
-        --variable "EXPECTED_OS_VERSION:9.5" \
+        --variable "EXPECTED_OS_VERSION:9.6" \
         --variable "IMAGE_SIGSTORE_ENABLED:True" \
         suites/standard1/containers-policy.robot
 }

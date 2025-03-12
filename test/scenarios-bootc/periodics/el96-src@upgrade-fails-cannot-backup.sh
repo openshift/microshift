@@ -3,8 +3,8 @@
 # Sourced from scenario.sh and uses functions defined there.
 
 scenario_create_vms() {
-    prepare_kickstart host1 kickstart-bootc.ks.template rhel95-bootc-source
-    launch_vm --boot_blueprint rhel95-bootc
+    prepare_kickstart host1 kickstart-bootc.ks.template rhel96-bootc-source
+    launch_vm --boot_blueprint rhel96-bootc
 }
 
 scenario_remove_vms() {
@@ -13,7 +13,7 @@ scenario_remove_vms() {
 
 scenario_run_tests() {
     run_tests host1 \
-        --variable "FAILING_REF:rhel95-bootc-source-aux" \
+        --variable "FAILING_REF:rhel96-bootc-source-aux" \
         --variable "REASON:prevent_backup" \
         --variable "BOOTC_REGISTRY:${MIRROR_REGISTRY_URL}" \
         suites/upgrade/upgrade-fails-and-rolls-back.robot

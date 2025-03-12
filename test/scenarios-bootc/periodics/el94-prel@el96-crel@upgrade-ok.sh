@@ -2,7 +2,7 @@
 
 # Sourced from scenario.sh and uses functions defined there.
 
-dest_image=rhel95-bootc-crel
+dest_image=rhel96-bootc-crel
 
 scenario_create_vms() {
     if ! does_image_exist "${dest_image}"; then

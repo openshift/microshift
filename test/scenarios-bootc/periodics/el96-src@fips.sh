@@ -12,8 +12,8 @@ check_platform() {
 scenario_create_vms() {
     check_platform
 
-    prepare_kickstart host1 kickstart-bootc.ks.template rhel95-bootc-source-fips true
-    launch_vm --boot_blueprint rhel95-bootc --fips
+    prepare_kickstart host1 kickstart-bootc.ks.template rhel96-bootc-source-fips true
+    launch_vm --boot_blueprint rhel96-bootc --fips
 }
 
 scenario_remove_vms() {

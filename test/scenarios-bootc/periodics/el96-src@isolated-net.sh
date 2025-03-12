@@ -8,9 +8,9 @@ VM_BRIDGE_IP="$(get_vm_bridge_ip "${VM_ISOLATED_NETWORK}")"
 MIRROR_REGISTRY_URL="${VM_BRIDGE_IP}:${MIRROR_REGISTRY_PORT}/microshift"
 
 scenario_create_vms() {
-    prepare_kickstart host1 kickstart-bootc-isolated.ks.template rhel95-bootc-source-isolated
+    prepare_kickstart host1 kickstart-bootc-isolated.ks.template rhel96-bootc-source-isolated
     # Use the isolated network when creating a VM
-    launch_vm --boot_blueprint rhel95-bootc --network "${VM_ISOLATED_NETWORK}"
+    launch_vm --boot_blueprint rhel96-bootc --network "${VM_ISOLATED_NETWORK}"
 }
 
 scenario_remove_vms() {
