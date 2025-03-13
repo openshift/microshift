@@ -1,4 +1,31 @@
-- machine-config-operator embedded-component 4da8e68d757e78574fa3ca9ab6b0552fc9111e66 to 824efb659bc6dd5b3bf356fea76a96b480cf99dc
-  - b9a0315a 2025-03-05T14:58:51+00:00 OCPBUGS-46072: create /run/nodeip-configuration before use
-  - 0de84792 2025-03-04T17:42:52+00:00 OCPBUGS-41489: configure-ovs workaround for ovs-if-br-ex bug
+- cluster-network-operator embedded-component b5eb4ae75b428e748cbf6a7e6b68da2b4687cbf3 to 13c13b703e38dd453ae404dc735030ea2358590f
+  - b7410a0 2025-02-19T17:56:20+00:00 Update egressfirewall CRD to be consistent with ovn-kubernetes repo
+
+- ovn-kubernetes image-amd64 b24157b7b38f1be8a6175a2c7cae0fe8ece97f67 to 87e64b772528470577795c4f82a09e5cb253491a
+  - f3585576 2025-03-09T09:48:50+02:00 kv, udn: Remove addresses when we disable LSP
+  - 80f6570e 2025-03-09T09:48:25+02:00 kv, localnet: Swich LSP Enabled field on migration
+  - 7b59e37f 2025-03-06T10:53:36+02:00 podNetworkController: Switch back source pod LSP after failed migration
+  - 257c0f26 2025-03-06T10:53:10+02:00 podNetworkController: Switch enabled LSP flags for VM migration
+  - 31efd1b9 2025-03-06T10:52:40+02:00 tests, multi-homing: Move controller reconcile test setup to helpers
+  - da63e826 2025-03-06T10:51:51+02:00 tests, multi-homing: Expand test infra for multiple pod creation
+  - e73153df 2025-03-06T10:51:06+02:00 kubevirt/pod: Add function to discover pod migration status
+  - f96b7fb0 2025-03-06T10:45:19+02:00 libovsdb, lsp: Dynamically add updatable fields by name
+  - 1ee9a684 2025-03-06T10:45:19+02:00 ovn: Add secondary layer 2,3 unit tests
+  - 0a788fae 2025-03-06T10:45:12+02:00 tests: allow multi-homing tests to define the subnet mask
+  - 5792a815 2025-03-06T10:37:05+02:00 udn, tests: allow addNetwork to be reused
+  - 4bdaa206 2025-03-05T13:15:32-08:00 fixes overzealous deletion of SNAT in egressIP
+
+- ovn-kubernetes image-arm64 b24157b7b38f1be8a6175a2c7cae0fe8ece97f67 to 87e64b772528470577795c4f82a09e5cb253491a
+  - f3585576 2025-03-09T09:48:50+02:00 kv, udn: Remove addresses when we disable LSP
+  - 80f6570e 2025-03-09T09:48:25+02:00 kv, localnet: Swich LSP Enabled field on migration
+  - 7b59e37f 2025-03-06T10:53:36+02:00 podNetworkController: Switch back source pod LSP after failed migration
+  - 257c0f26 2025-03-06T10:53:10+02:00 podNetworkController: Switch enabled LSP flags for VM migration
+  - 31efd1b9 2025-03-06T10:52:40+02:00 tests, multi-homing: Move controller reconcile test setup to helpers
+  - da63e826 2025-03-06T10:51:51+02:00 tests, multi-homing: Expand test infra for multiple pod creation
+  - e73153df 2025-03-06T10:51:06+02:00 kubevirt/pod: Add function to discover pod migration status
+  - f96b7fb0 2025-03-06T10:45:19+02:00 libovsdb, lsp: Dynamically add updatable fields by name
+  - 1ee9a684 2025-03-06T10:45:19+02:00 ovn: Add secondary layer 2,3 unit tests
+  - 0a788fae 2025-03-06T10:45:12+02:00 tests: allow multi-homing tests to define the subnet mask
+  - 5792a815 2025-03-06T10:37:05+02:00 udn, tests: allow addNetwork to be reused
+  - 4bdaa206 2025-03-05T13:15:32-08:00 fixes overzealous deletion of SNAT in egressIP
 
