@@ -12,7 +12,7 @@ require (
 	github.com/openshift/api v0.0.0-20250213010142-f5b09d13c01f
 	github.com/openshift/build-machinery-go v0.0.0-20250211133638-a00a772ae1a2
 	github.com/openshift/client-go v0.0.0-20250131180035-f7ec47e2d87a
-	github.com/openshift/cluster-policy-controller v0.0.0-20250219201634-5cc0d0ecd3cd
+	github.com/openshift/cluster-policy-controller v0.0.0-20250310152427-748524784686
 	github.com/openshift/library-go v0.0.0-20250217144305-c917e6d528b2
 	github.com/openshift/route-controller-manager v0.0.0-20241218160919-bc97534a12a7
 	github.com/pkg/errors v0.9.1 // indirect
@@ -248,9 +248,9 @@ replace (
 )
 
 replace (
-	go.etcd.io/etcd/api/v3 => github.com/openshift/etcd/api/v3 v3.5.1-0.20250307195440-63a774631341 // from etcd
-	go.etcd.io/etcd/client/pkg/v3 => github.com/openshift/etcd/client/pkg/v3 v3.5.1-0.20250307195440-63a774631341 // from etcd
-	go.etcd.io/etcd/client/v3 => github.com/openshift/etcd/client/v3 v3.5.1-0.20250307195440-63a774631341 // from etcd
+	go.etcd.io/etcd/api/v3 => github.com/openshift/etcd/api/v3 v3.5.1-0.20250311155124-bd0cae2096ab // from etcd
+	go.etcd.io/etcd/client/pkg/v3 => github.com/openshift/etcd/client/pkg/v3 v3.5.1-0.20250311155124-bd0cae2096ab // from etcd
+	go.etcd.io/etcd/client/v3 => github.com/openshift/etcd/client/v3 v3.5.1-0.20250311155124-bd0cae2096ab // from etcd
 )
 
 replace sigs.k8s.io/kube-storage-version-migrator => github.com/openshift/kubernetes-kube-storage-version-migrator v0.0.3-0.20250108152203-4c521b09f4dc // release kube-storage-version-migrator via kubernetes-kube-storage-version-migrator
