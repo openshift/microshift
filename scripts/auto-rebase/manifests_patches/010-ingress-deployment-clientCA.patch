@@ -1,0 +1,50 @@
+diff --git a/assets/components/openshift-router/deployment.yaml b/assets/components/openshift-router/deployment.yaml
+index a63157f21..596be2aa0 100644
+--- a/assets/components/openshift-router/deployment.yaml
++++ b/assets/components/openshift-router/deployment.yaml
+@@ -93,6 +93,14 @@ spec:
+               value: '{{ .RouterEnableCompression }}'
+             - name: ROUTER_COMPRESSION_MIME
+               value: '{{ .RouterCompressionMime }}'
++            {{- if .ClientAuthCAPath }}
++            - name: ROUTER_MUTUAL_TLS_AUTH
++              value: '{{ .ClientAuthPolicy }}'
++            - name: ROUTER_MUTUAL_TLS_AUTH_CA
++              value: '{{ .ClientAuthCAPath }}'
++            - name: ROUTER_MUTUAL_TLS_AUTH_FILTER
++              value: '{{ .ClientAuthFilter }}'
++            {{- end }}
+           livenessProbe:
+             failureThreshold: 3
+             httpGet:
+@@ -132,6 +140,13 @@ spec:
+             - mountPath: /var/run/configmaps/service-ca
+               name: service-ca-bundle
+               readOnly: true
++            {{- if .ClientCAMapName }}
++            - mountPath: '{{ .ClientCAMountPath }}'
++              name: '{{ .ClientCAMapName}}'
++              readOnly: true
++            {{- end }}
++
++
+           image: '{{ .ReleaseImage.haproxy_router }}'
+           ports:
+             - name: http
+@@ -166,6 +181,16 @@ spec:
+                 path: service-ca.crt
+             name: service-ca-bundle
+             optional: false
++        {{- if .ClientCAMapName }}
++        - name: '{{ .ClientCAMapName }}'
++          configMap:
++            defaultMode: 420
++            items:
++            - key: '{{ .ClientCABundleFilename }}'
++              path: '{{ .ClientCABundleFilename }}'
++            name: '{{ .ClientCAMapName }}'
++            optional: false
++        {{- end }}
+       restartPolicy: Always
+       dnsPolicy: ClusterFirst
+       nodeSelector:
