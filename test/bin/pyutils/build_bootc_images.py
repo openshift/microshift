@@ -473,7 +473,7 @@ def process_container_encapsulate(groupdir, containerfile, dry_run):
         common.run_command(["sed", f"s/^/{ce_outname}: /", ce_logfile], dry_run)
 
 
-def process_group(groupdir, build_type, dry_run=False):
+def process_group(groupdir, build_type, pattern="*", dry_run=False):
     futures = []
     try:
         # Open the junit file
@@ -493,7 +493,9 @@ def process_group(groupdir, build_type, dry_run=False):
         # Parallel processing loop
         with concurrent.futures.ProcessPoolExecutor() as executor:
             # Scan group directory contents sorted by length and then alphabetically
-            for file in sorted(os.listdir(groupdir), key=lambda i: (len(i), i)):
+            paths = glob.glob(os.path.join(groupdir, pattern))
+            files = [os.path.basename(file) for file in paths]
+            for file in sorted(files, key=lambda i: (len(i), i)):
                 if file.endswith(".containerfile"):
                     if build_type and build_type != "containerfile":
                         common.print_msg(f"Skipping '{file}' due to '{build_type}' filter")
@@ -542,10 +544,12 @@ def main():
     dirgroup = parser.add_mutually_exclusive_group(required=True)
     dirgroup.add_argument("-l", "--layer-dir", type=str, help="Path to the layer directory to process.")
     dirgroup.add_argument("-g", "--group-dir", type=str, help="Path to the group directory to process.")
+    dirgroup.add_argument("-t", "--template", type=str, help="Path to a template to build. Allows glob patterns (requires double qoutes).")
 
     args = parser.parse_args()
     success_message = False
     try:
+        pattern = "*"
         # Convert input directories to absolute paths
         if args.group_dir:
             args.group_dir = os.path.abspath(args.group_dir)
@@ -553,6 +557,10 @@ def main():
         if args.layer_dir:
             args.layer_dir = os.path.abspath(args.layer_dir)
             dir2process = args.layer_dir
+        if args.template:
+            args.template = os.path.abspath(args.template)
+            dir2process = os.path.dirname(args.template)
+            pattern = os.path.basename(args.template)
         # Make sure the input directory exists
         if not os.path.isdir(dir2process):
             raise Exception(f"The input directory '{dir2process}' does not exist")
@@ -600,16 +608,16 @@ def main():
         opull_secret = os.path.join(BOOTC_IMAGE_DIR, "pull_secret.json", )
         common.update_pull_secret(PULL_SECRET, opull_secret, MIRROR_REGISTRY)
         PULL_SECRET = opull_secret
-        # Process individual group directory
-        if args.group_dir:
-            process_group(args.group_dir, args.build_type, args.dry_run)
-        else:
-            # Process layer directory contents sorted by length and then alphabetically
+        # Process layer directory contents sorted by length and then alphabetically
+        if args.layer_dir:
             for item in sorted(os.listdir(args.layer_dir), key=lambda i: (len(i), i)):
                 item_path = os.path.join(args.layer_dir, item)
                 # Check if this item is a directory
                 if os.path.isdir(item_path):
-                    process_group(item_path, args.build_type, args.dry_run)
+                    process_group(item_path, args.build_type, dry_run=args.dry_run)
+        else:
+            # Process individual group directory or template
+            process_group(dir2process, args.build_type, pattern, args.dry_run)
         # Toggle the success flag
         success_message = True
     except Exception as e:

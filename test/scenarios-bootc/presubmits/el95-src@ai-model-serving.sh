@@ -34,5 +34,5 @@ scenario_run_tests() {
     local -r full_guest_name=$(full_vm_name host1)
     run_tests host1 \
         --variable "GUEST_NAME:${full_guest_name}" \
-        suites/ai-model-serving/ai-model-serving-offline.robot
+        suites/ai-model-serving/ai-model-serving.robot
 }
