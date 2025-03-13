@@ -72,14 +72,8 @@ function mirror_registry() {
         skopeo_retry copy ${skopeo_opts} --quiet \
             --preserve-digests \
             --authfile "${img_pull_file}" \
+            --additional-tag  "${dst_img_no_tag}:latest" \
             docker://"${src_img}" docker://"${dst_img}"
-
-        echo "Tagging '${dst_img_no_tag}' as 'latest'"
-        # shellcheck disable=SC2086
-        skopeo_retry copy ${skopeo_opts} --quiet \
-            --preserve-digests \
-            --authfile "${img_pull_file}" \
-            docker://"${dst_img}" docker://"${dst_img_no_tag}:latest"
     }
 
     # Export functions for xargs to use
@@ -153,14 +147,8 @@ function dir_to_registry() {
         skopeo_retry copy ${skopeo_opts} --quiet \
             --preserve-digests \
             --authfile "${img_pull_file}" \
+            --additional-tag  "${dst_img_no_tag}:latest" \
             dir://"${local_dir}/${src_img}" docker://"${dst_img}"
-
-        echo "Tagging '${dst_img}' as '${dst_img_no_tag}:latest'"
-        # shellcheck disable=SC2086
-        skopeo_retry copy ${skopeo_opts} --quiet \
-            --preserve-digests \
-            --authfile "${img_pull_file}" \
-            docker://"${dst_img}" docker://"${dst_img_no_tag}:latest"
     }
 
     # Export functions for xargs to use
