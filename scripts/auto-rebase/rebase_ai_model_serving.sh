@@ -160,7 +160,7 @@ update_runtimes() {
 images:
 EOF
 
-    local -r images=$(cat "${STAGING_OPERATOR}"/odh-model-controller/base/*.env | grep "\-image")
+    local -r images=$(cat "${STAGING_OPERATOR}"/modelcontroller/base/*.env | grep "\-image")
     for image in ${images}; do
         local image_name="${image%=*}"
         local image_ref="${image#*=}"
