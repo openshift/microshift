@@ -1,9 +1,3 @@
-- cluster-network-operator embedded-component cad5e40c4c21a8d1d638c20ed23529aa05ab0824 to 475a4839fa80f73d0cc154fb49197574511d073a
-  - 0c5fee8 2024-09-05T10:59:34+00:00 Updating cluster-network-operator-container image to be consistent with ART for 4.18 Reconciling with https://github.com/openshift/ocp-build-data/tree/827ab4ccce9cbbcf82c9dbaf6398b61d6cff8d7a/images/cluster-network-operator.yml
-
-- etcd embedded-component afac40f734a0440eb0983d7308e86aea9a04bbe9 to 98b19154718fd94d4e8ad30824c00ba1de87cb78
-  - cb8d1361 2025-02-28T10:39:01-05:00 DOWNSTREAM: <carry> fix a compaction induce latency issue
-
-- machine-config-operator embedded-component c0e95912c69b3404355e056fb157acbbeb6be285 to 9f18ef9ca8a4aff64948a11967d50d4c60606f82
-  - 7e8f9078 2025-02-17T10:54:44-06:00 Merge pull request #4710 from dkhater-redhat/status-reporting-ocl
+- cluster-dns-operator embedded-component 208d50c1a5e0aaeb991366daa749abdffa803224 to 7cafd0c7dca2edb154b8444602b600b5901afeba
+  - 98a3250 2025-02-26T14:48:23+01:00 Add runbook-url for CoreDNSErrorsHigh
 
