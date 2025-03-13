@@ -1,0 +1,4 @@
+- cluster-network-operator embedded-component d69278e76edaa4fcde0c9c78edd686fecad16a95 to 8a99c6d47560843bb4b30cb921d4049913582ad3
+  - 369c045 2025-02-26T07:39:54-05:00 Use applyconfigurations for updating network.oprerator status
+  - 0ffe372 2025-02-26T07:39:35-05:00 Vendor fake client-go operator client
+
