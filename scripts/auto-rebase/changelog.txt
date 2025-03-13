@@ -1,6 +1,9 @@
-- machine-config-operator embedded-component 3da4faa0a834ce663e561f423f29bc0e941b6af5 to 0f85e35a0b9f7342907597e74e20dfc9fa30ee67
-  - 9cdf1edc 2025-02-27T03:32:01+00:00 update cluster-reader cluster role's permissions
+- cluster-dns-operator embedded-component 54eea5bb02911cdf0c7fb6dbb80366eb5a923ea7 to 81507f04686df3e16793b270084ead0a2a67fb38
+  - a50b0e4 2025-02-26T14:52:48+01:00 Add runbook-url for CoreDNSErrorsHigh
 
-- operator-framework-olm embedded-component f667826eb6c9e2bfe779922f0b8e6a9bf2a833ed to e9262fe971f881d6a014be70112b0f4cd5b82921
-  - cd3b82bf 2025-03-04T13:54:00-05:00 Bump github.com/distribution/distribution/v3
+- ovn-kubernetes image-amd64 fd0a1f15e587f83c4e2d6f1721ef7d6dcb1337a3 to c621cdc876ffb219c7877a1db2f500ba541dba6c
+  - 3d161b28 2025-03-05T10:40:21-05:00 Change dynamic_neigh_routers to false for the Interconnect topology.
+
+- ovn-kubernetes image-arm64 fd0a1f15e587f83c4e2d6f1721ef7d6dcb1337a3 to c621cdc876ffb219c7877a1db2f500ba541dba6c
+  - 3d161b28 2025-03-05T10:40:21-05:00 Change dynamic_neigh_routers to false for the Interconnect topology.
 
