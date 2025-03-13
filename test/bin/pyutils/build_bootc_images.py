@@ -539,11 +539,12 @@ def main():
     dirgroup = parser.add_mutually_exclusive_group(required=True)
     dirgroup.add_argument("-l", "--layer-dir", type=str, help="Path to the layer directory to process.")
     dirgroup.add_argument("-g", "--group-dir", type=str, help="Path to the group directory to process.")
-    dirgroup.add_argument("-t", "--template", type=str, help="Path to a template to build. Allows glob patterns.")
+    dirgroup.add_argument("-t", "--template", type=str, help="Path to a template to build. Allows glob patterns (requires double qoutes).")
 
     args = parser.parse_args()
     success_message = False
     try:
+        pattern = "*"
         # Convert input directories to absolute paths
         if args.group_dir:
             args.group_dir = os.path.abspath(args.group_dir)
@@ -554,6 +555,7 @@ def main():
         if args.template:
             args.template = os.path.abspath(args.template)
             dir2process = os.path.dirname(args.template)
+            pattern = os.path.basename(args.template)
         # Make sure the input directory exists
         if not os.path.isdir(dir2process):
             raise Exception(f"The input directory '{dir2process}' does not exist")
@@ -601,19 +603,16 @@ def main():
         opull_secret = os.path.join(BOOTC_IMAGE_DIR, "pull_secret.json", )
         common.update_pull_secret(PULL_SECRET, opull_secret, MIRROR_REGISTRY)
         PULL_SECRET = opull_secret
-        # Process individual group directory
-        if args.group_dir:
-            process_group(args.group_dir, args.build_type, dry_run=args.dry_run)
-        elif args.layer_dir:
-            # Process layer directory contents sorted by length and then alphabetically
+        # Process layer directory contents sorted by length and then alphabetically
+        if args.layer_dir:
             for item in sorted(os.listdir(args.layer_dir), key=lambda i: (len(i), i)):
                 item_path = os.path.join(args.layer_dir, item)
                 # Check if this item is a directory
                 if os.path.isdir(item_path):
                     process_group(item_path, args.build_type, dry_run=args.dry_run)
         else:
-            # Process template(s)
-            process_group(dir2process, args.build_type, os.path.basename(args.template), args.dry_run)
+            # Process individual group directory or template
+            process_group(dir2process, args.build_type, pattern, args.dry_run)
         # Toggle the success flag
         success_message = True
     except Exception as e:
