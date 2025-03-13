@@ -22,6 +22,7 @@ PULL_SECRET_FILE="${HOME}/.pull-secret.json"
 RELEASE_JSON="${REPOROOT}/assets/optional/ai-model-serving/release-ai-model-serving-x86_64.json"
 
 KEEP_STAGING="${KEEP_STAGING:-false}"
+NO_BRANCH=${NO_BRANCH:-false}
 
 title() {
     echo -e "\E[34m$1\E[00m";
@@ -230,9 +231,13 @@ rebase_ai_model_serving_to() {
     process_rhoai_manifests
 
     if [[ -n "$(git status -s assets ./scripts/auto-rebase/last_rebase_ai_model_serving.sh)" ]]; then
-        branch="rebase-ai-model_serving-${version}"
-        title "Detected changes to assets/ or last_rebase_ai_model_serving.sh - creating branch ${branch}"
-        git branch -D "${branch}" 2>/dev/null || true && git checkout -b "${branch}"
+        title "Detected changes to assets/ or last_rebase_ai_model_serving.sh"
+
+        if ! "${NO_BRANCH}"; then
+            branch="rebase-ai-model_serving-${version}"
+            title "Creating branch ${branch}"
+            git branch -D "${branch}" 2>/dev/null || true && git checkout -b "${branch}"
+        fi
 
         title "Committing changes"
         git add assets ./scripts/auto-rebase/last_rebase_ai_model_serving.sh
