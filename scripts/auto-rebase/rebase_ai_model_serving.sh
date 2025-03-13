@@ -133,6 +133,28 @@ update_kserve() {
         local image_ref="${image#*=}"
         yq -i ".images.${image_name} = \"${image_ref}\"" "${RELEASE_JSON}"
     done
+
+    # Update kserve's config
+    local -r microshift_config="${REPOROOT}/assets/optional/ai-model-serving/kserve/inferenceservice-config-microshift-patch.yaml"
+    local -r rhoai_config="${REPOROOT}/assets/optional/ai-model-serving/kserve/overlays/odh/inferenceservice-config-patch.yaml"
+
+    # Clear the file and add a comment on top
+    cat <<EOF > "${microshift_config}"
+# This is a MicroShift specific kserve configuration.
+# For RHOAI kserve configuration see: assets/optional/ai-model-serving/kserve/overlays/odh/inferenceservice-config-patch.yaml
+# For upstream kserve configuration and description of the config see: assets/optional/ai-model-serving/kserve/configmap/inferenceservice.yaml
+#
+# The difference compared to RHOAI's kserve configuration is the 'deploy' section setting:
+# 'defaultDeploymentMode' set to 'RawDeployment'.
+#
+# The ingress (istio) is disabled (just like RHOAI, unlike the upstream).
+EOF
+
+    # Append upstream RHOAI config
+    cat "${rhoai_config}" >> "${microshift_config}"
+
+    # Change Deployment Mode
+    sed -i 's/"defaultDeploymentMode": "Serverless"/"defaultDeploymentMode": "RawDeployment"/g' "${microshift_config}"
 }
 
 update_runtimes() {
