@@ -1,6 +1,7 @@
 package config
 
 import (
+	configv1 "github.com/openshift/api/config/v1"
 	operatorv1 "github.com/openshift/api/operator/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -12,11 +13,15 @@ const (
 	StatusRemoved             IngressStatusEnum        = "Removed"
 	DefaultHttpVersionV1      DefaultHttpVersionPolicy = 1
 	DefaultHttpVersionV2      DefaultHttpVersionPolicy = 2
+	WildcardPolicyAllowed     WildcardPolicy           = "WildcardsAllowed"
+	WildcardPolicyDisallowed  WildcardPolicy           = "WildcardsDisallowed"
 )
 
 type NamespaceOwnershipEnum string
 type IngressStatusEnum string
 type DefaultHttpVersionPolicy int32
+type WildcardPolicy string
+
 type IngressConfig struct {
 	// Default router status, can be Managed or Removed.
 	// +kubebuilder:default=Managed
@@ -30,6 +35,16 @@ type IngressConfig struct {
 	ListenAddress      []string `json:"listenAddress"`
 	ServingCertificate []byte   `json:"-"`
 	ServingKey         []byte   `json:"-"`
+
+	// ServingCertificateSecret references a kubernetes.io/tls type secret containing the TLS cert info for serving secure traffic.
+	// The secret must exist in the openshift-ingress namespace and contain the following required fields:
+	// - Secret.Data["tls.key"] - TLS private key.
+	// - Secret.Data["tls.crt"] - TLS certificate.
+	//
+	// +optional
+	// +kubebuilder:default:="router-certs-default"
+	ServingCertificateSecret string `json:"certificateSecret"`
+
 	// logEmptyRequests specifies how connections on which no request is
 	// received should be logged.  Typically, these empty requests come from
 	// load balancers' health probes or Web browsers' speculative
@@ -101,6 +116,26 @@ type IngressConfig struct {
 	// +optional
 	// +kubebuilder:default:="1"
 	DefaultHttpVersionPolicy DefaultHttpVersionPolicy `json:"defaultHTTPVersion,omitempty"`
+
+	// tlsSecurityProfile specifies settings for TLS connections for ingresscontrollers.
+	//
+	// If unset, the default is based on the apiservers.config.openshift.io/cluster resource.
+	//
+	// Note that when using the Old, Intermediate, and Modern profile types, the effective
+	// profile configuration is subject to change between releases. For example, given
+	// a specification to use the Intermediate profile deployed on release X.Y.Z, an upgrade
+	// to release X.Y.Z+1 may cause a new profile configuration to be applied to the ingress
+	// controller, resulting in a rollout.
+	//
+	// +optional
+	TLSSecurityProfile *configv1.TLSSecurityProfile `json:"tlsSecurityProfile,omitempty"`
+
+	// clientTLS specifies settings for requesting and verifying client
+	// certificates, which can be used to enable mutual TLS for
+	// edge-terminated and reencrypt routes.
+	//
+	// +optional
+	ClientTLS operatorv1.ClientTLS `json:"clientTLS,omitempty"`
 }
 
 // IngressControllerTuningOptions specifies options for tuning the performance
@@ -315,6 +350,23 @@ type RouteAdmissionPolicy struct {
 	// If empty, the default is InterNamespaceAllowed.
 	// +kubebuilder:default="InterNamespaceAllowed"
 	NamespaceOwnership NamespaceOwnershipEnum `json:"namespaceOwnership"`
+	// wildcardPolicy describes how routes with wildcard policies should
+	// be handled for the ingress controller. WildcardPolicy controls use
+	// of routes [1] exposed by the ingress controller based on the route's
+	// wildcard policy.
+	//
+	// [1] https://github.com/openshift/api/blob/master/route/v1/types.go
+	//
+	// Note: Updating WildcardPolicy from WildcardsAllowed to WildcardsDisallowed
+	// will cause admitted routes with a wildcard policy of Subdomain to stop
+	// working. These routes must be updated to a wildcard policy of None to be
+	// readmitted by the ingress controller.
+	//
+	// WildcardPolicy supports WildcardsAllowed and WildcardsDisallowed values.
+	//
+	// If empty, defaults to "WildcardsDisallowed".
+	//
+	WildcardPolicy WildcardPolicy `json:"wildcardPolicy,omitempty"`
 }
 
 type IngressPortsConfig struct {
