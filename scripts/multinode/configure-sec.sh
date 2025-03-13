@@ -149,6 +149,12 @@ function configure_node() {
         exit 1
     fi
 
+    # Check all the nodes have the same kubelet version
+    if ! ${OC_CMD} get node -o json | jq -e '[.items[].status.nodeInfo.kubeletVersion] | unique | length == 1' > /dev/null; then
+        echo "Error: kubelet versions do not match"
+        exit 1
+    fi
+
     # Labeling the second node as a worker
     ${OC_CMD} label nodes "${SEC_NODE_HOST}" node-role.kubernetes.io/worker=
 }
