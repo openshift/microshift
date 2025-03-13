@@ -1,0 +1,22 @@
+# https://developers.redhat.com/articles/2025/01/30/build-and-deploy-modelcar-container-openshift-ai
+#
+# podman build -t quay.io/microshift/ai-testing-model:vllm-granite-3b-code-base-2k .
+# podman push quay.io/microshift/ai-testing-model:vllm-granite-3b-code-base-2k
+
+FROM registry.access.redhat.com/ubi9/python-311:latest as base
+
+USER root
+
+RUN pip install huggingface-hub
+
+# Download the model file from hugging face
+COPY download_model.py /tmp/
+RUN python /tmp/download_model.py
+
+# Final image containing only the essential model files
+FROM registry.access.redhat.com/ubi9/ubi-micro:9.4
+
+# Copy the model files from the base container
+COPY --from=base /models /models
+
+USER 1001
