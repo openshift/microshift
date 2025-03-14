@@ -13,9 +13,6 @@ Suite Teardown      Teardown Suite
 
 *** Variables ***
 ${USHIFT_HOST}=             ${EMPTY}
-${MODEL_NAME}=              openvino-resnet
-${DOMAIN}=                  ${MODEL_NAME}-predictor-test-ai.apps.example.com
-${NAMESPACE}=               test-ai
 ${OVMS_KSERVE_MANIFEST}=    /tmp/ovms-kserve.yaml
 ${OVMS_REQUEST}=            /tmp/ovms-request.json
 
@@ -24,7 +21,11 @@ ${OVMS_REQUEST}=            /tmp/ovms-request.json
 Test OpenVINO model
     [Documentation]    Sanity test for AI OpenVino Model Serving
 
-    Create Namespace    ${NAMESPACE}
+    Set Test Variable    ${MODEL_NAME}    openvino-resnet
+    Set Test Variable    ${DOMAIN}    ${MODEL_NAME}-predictor-test-ai.apps.example.com
+    ${ns}=    Create Unique Namespace
+    Set Test Variable    ${NAMESPACE}    ${ns}
+    
     Deploy OpenVINO Server
     Deploy OpenVINO Resnet Model
 
