@@ -1,5 +1,5 @@
 *** Settings ***
-Documentation       Tests verifying hostname resolution
+Documentation       Tests verifying hostname
 
 Resource            ../../resources/microshift-process.resource
 Resource            ../../resources/microshift-host.resource
@@ -18,8 +18,18 @@ ${OLD_HOSTNAME}     ${EMPTY}
 
 
 *** Test Cases ***
-Verify local name resolution
-    [Documentation]    Verify correct name resolution through mDNS
+Verify Local Host Name
+    [Documentation]    Verify correct host name setting
+
+    ${hostname}=    Command Should Work    hostname
+    # Host name sanity test includes:
+    # - It should not be a localhost
+    # - It should contain the suite name as this is how the testing framework names VMs
+    Should Not Contain    ${hostname}    local
+    Should Contain    ${hostname}    standard
+
+Verify Local Host Name Resolution
+    [Documentation]    Verify correct host name resolution through mDNS
     [Setup]    Configure New Hostname
 
     Named Deployment Should Be Available    router-default    timeout=${DEFAULT_WAIT_TIMEOUT}    ns=openshift-ingress
