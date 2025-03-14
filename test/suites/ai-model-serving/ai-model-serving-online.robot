@@ -1,7 +1,6 @@
 *** Settings ***
 Documentation       Sanity test for AI Model Serving
 
-Library             OperatingSystem
 Library             String
 Library             Process
 Library             ../../resources/DataFormats.py
@@ -44,12 +43,12 @@ Test OpenVINO model
 Deploy OpenVINO Server
     [Documentation]    Deploys OpenVino server.
 
-    ${ovms_image}=    Execute Command
+    ${ovms_image}=    Command Should Work
     ...    jq -r '.images | with_entries(select(.key == "ovms-image")) | .[]' /usr/share/microshift/release/release-ai-model-serving-"$(uname -i)".json
     SSHLibrary.Get File
     ...    /usr/lib/microshift/manifests.d/001-microshift-ai-model-serving/runtimes/ovms-kserve.yaml
     ...    ${OVMS_KSERVE_MANIFEST}
-    Run Command    sed -i "s,image: ovms-image,image: ${ovms_image}," "${OVMS_KSERVE_MANIFEST}"
+    Local Command Should Work    sed -i "s,image: ovms-image,image: ${ovms_image}," "${OVMS_KSERVE_MANIFEST}"
     Oc Apply    -n ${NAMESPACE} -f ${OVMS_KSERVE_MANIFEST}
 
 Deploy OpenVINO Resnet Model
@@ -68,7 +67,7 @@ Check If Model Is Ready
     ...    -i ${DOMAIN}/v2/models/${MODEL_NAME}/ready
     ...    --connect-to "${DOMAIN}::${USHIFT_HOST}:"
     Wait Until Keyword Succeeds    10x    10s
-    ...    Run Command    ${cmd}
+    ...    Local Command Should Work    ${cmd}
 
 Query Model Metrics Endpoint
     [Documentation]    Makes a query against the model server metrics endpoint.
@@ -79,18 +78,18 @@ Query Model Metrics Endpoint
     ...    --request GET
     ...    ${DOMAIN}/metrics
     ...    --connect-to "${DOMAIN}::${USHIFT_HOST}:"
-    ${output}=    Run Command    ${cmd}
+    ${output}=    Local Command Should Work    ${cmd}
     Should Contain    ${output}    ovms_requests_success Number of successful requests to a model or a DAG.
 
 Prepare Request Data
     [Documentation]    Executes a script that prepares a request data.
 
-    Run Command    bash -x assets/ai-model-serving/ovms-query-preparation.sh ${OVMS_REQUEST}
+    Local Command Should Work    bash -x assets/ai-model-serving/ovms-query-preparation.sh ${OVMS_REQUEST}
 
 Remove Tmp Data
     [Documentation]    Remove temp data for this test.
 
-    Run Command    rm ${OVMS_REQUEST} ${OVMS_KSERVE_MANIFEST}
+    Local Command Should Work    rm ${OVMS_REQUEST} ${OVMS_KSERVE_MANIFEST}
 
 Query Model Infer Endpoint
     [Documentation]    Makes a query against the model server.
@@ -105,7 +104,7 @@ Query Model Infer Endpoint
     ...    --header "Inference-Header-Content-Length: 63"
     ...    ${DOMAIN}/v2/models/${MODEL_NAME}/infer
     ...    --connect-to "${DOMAIN}::${USHIFT_HOST}:"
-    ${output}=    Run Command    ${cmd}
+    ${output}=    Local Command Should Work    ${cmd}
     ${result}=    Json Parse    ${output}
     ${data}=    Set Variable    ${result["outputs"][0]["data"]}
     # Following expression can be referred to as 'argmax': index of the highest element.
@@ -117,10 +116,3 @@ Query Model Infer Endpoint
     # - https://github.com/openvinotoolkit/model_server/tree/releases/2025/0/client/python/kserve-api/samples#run-the-client-to-perform-inference-1
     # - https://github.com/openvinotoolkit/model_server/blob/releases/2025/0/demos/image_classification/input_images.txt
     Should Be Equal As Integers    ${argmax}    309
-
-Run Command
-    [Documentation]    Executes shell command locallt, checks the return code, and returns stdout.
-    [Arguments]    ${cmd}
-    ${rc}    ${stdout}=    Run And Return RC And Output    ${cmd}
-    Should Be Equal As Integers    ${rc}    0
-    RETURN    ${stdout}
