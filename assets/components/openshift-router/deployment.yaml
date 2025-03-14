@@ -56,7 +56,7 @@ spec:
             - name: ROUTER_THREADS
               value: '{{ .ThreadCount }}'
             - name: SSL_MIN_VERSION
-              value:  '{{ .RouterSSLMinVersion }}'
+              value: '{{ .RouterSSLMinVersion }}'
             - name: ROUTER_USE_PROXY_PROTOCOL
               value: "false"
             - name: GRACEFUL_SHUTDOWN_DELAY
@@ -145,6 +145,8 @@ spec:
               name: '{{ .ClientCAMapName}}'
               readOnly: true
             {{- end }}
+
+
           image: '{{ .ReleaseImage.haproxy_router }}'
           ports:
             - name: http
