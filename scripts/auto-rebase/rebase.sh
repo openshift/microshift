@@ -688,6 +688,7 @@ EOF
     yq -i '.spec.minReadySeconds = 30' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
     yq -i '.spec.selector = {"matchLabels": {"ingresscontroller.operator.openshift.io/deployment-ingresscontroller": "default"}}' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
     yq -i '.spec.template.metadata += {"labels": {"ingresscontroller.operator.openshift.io/deployment-ingresscontroller": "default"}}' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
+    yq -i '.spec.template.metadata.annotations += {"openshift.io/required-scc": "restricted"}' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
     yq -i '.spec.template.spec.containers[0].image = "{{ .ReleaseImage.haproxy_router }}"' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
     yq -i '.spec.template.spec.containers[0].env += {"name": "STATS_PORT", "value": "1936"}' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
     yq -i '.spec.template.spec.containers[0].env += {"name": "RELOAD_INTERVAL", "value": "5s"}' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
