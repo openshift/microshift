@@ -1,0 +1,117 @@
+# Opentelemetry-collector-small.yaml provides a minimal set of metrics and logs for monitoring system, node, and
+# workload resource usage for CPU, Memory, Disk, and Network. Included also are all cluster events of "Warning" type.
+
+# This configuration exports:
+# - Contain, Pod, and Node metrics
+# - Kubernetes Events (Warnings only)
+# - Host's CPU, Mem, Disk, and Network Metrics
+# - System journals for microshift.service, microshift-observability.service, and microshift-etcd.scope, priority < Info
+
+receivers:
+  kubeletstats:
+    auth_type: tls
+    ca_file: /var/lib/microshift/certs/ca-bundle/client-ca.crt
+    key_file: /var/lib/microshift/certs/admin-kubeconfig-signer/openshift-observability-client/client.key
+    cert_file: /var/lib/microshift/certs/admin-kubeconfig-signer/openshift-observability-client/client.crt
+    insecure_skip_verify: true
+    collection_interval: 20s
+    endpoint: "${env:K8S_NODE_NAME}:10250"
+    node: ${env:K8S_NODE_NAME}
+    k8s_api_config:
+      auth_type: kubeConfig
+  k8s_events:
+    auth_type: kubeConfig
+  hostmetrics:
+    root_path: /
+    collection_interval: 10s
+    scrapers:
+      cpu:
+      memory:
+      network:
+      disk:
+      filesystem:
+  journald:
+    units:
+      - microshift
+      - microshift-observability
+      - microshift-etcd
+      - crio
+      - openvswitch.service
+
+processors:
+  batch:
+  resourcedetection/system:
+    detectors: [ "system" ]
+    system:
+      hostname_sources: [ "os" ]
+  transform/journald:
+    log_statements:
+      # Only useful for structured logging
+      - context: log
+        statements:
+          - merge_maps(cache, body, "insert")
+          # Create a map of sys log levels to their numerical value as an index of the array
+          - append(cache["syslog_table"], values = ["EMERG", "ALERT", "CRIT", "ERR", "WARNING", "NOTICE"])
+          - set(severity_number, Int(cache["PRIORITY"]))
+          # TODO The below set() call is producing parsing errors that I can't pin down. It seems like the nested access
+          # cannot be done dynamically. Replacing severity_number with an int literal works, but is unhelpful for the purpose
+          # of the lookup.
+          # Error:  unable to parse OTTL statement "set(severity_text, cache[\"syslog_table\"][severity_number])":
+          #         statement has invalid syntax: 1:41: unexpected token "[" (expected ")" Key*)
+          # - set(severity_text, cache["syslog_table"][severity_number])
+
+      - context: log
+        statements:
+          - set(resource.attributes["service.name"], "journald")
+  filter/severity:
+    error_mode: ignore
+    logs:
+      log_record:
+        - severity_number < SEVERITY_NUMBER_WARN
+
+exporters:
+  otlp:
+    sending_queue:
+      storage: file_storage
+    endpoint: ${env:K8S_NODE_NAME}:4317 # Valid OTLP endpoint required
+    tls:
+      insecure: true
+  # TODO remove debug
+  debug:
+    verbosity: detailed
+
+extensions:
+  file_storage:
+    directory: /var/lib/microshift-observability
+
+service:
+  extensions: [ file_storage ]
+  pipelines:
+    metrics/kubeletstats:
+      receivers: [ kubeletstats ]
+      processors: [ batch ]
+      exporters: [ otlp ]  # Uncomment to enable OTLP
+    metrics/hostmetrics:
+      receivers: [ hostmetrics ]
+      processors: [ resourcedetection/system, batch ]
+      exporters: [ otlp ]  # Uncomment to enable OTLP
+    logs/kube_events:
+      receivers: [ k8s_events ]
+      processors: [ filter/severity, batch ]
+      exporters: [ otlp ]
+    logs/host:
+      receivers: [ hostmetrics ]
+      exporters: [ otlp ]
+    logs/journald:
+      receivers: [ journald ]
+      processors: [ transform/journald ]
+      # TODO remove debug
+      exporters: [ otlp, debug ]
+  telemetry:
+    metrics:
+      readers:
+        - periodic:
+            exporter:
+              otlp:
+                protocol: http/protobuf
+                endpoint: http://127.0.0.1:4318
