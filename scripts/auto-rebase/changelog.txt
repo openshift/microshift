@@ -1,32 +1,13 @@
-- api embedded-component b8da3bfeaf773d9dce2ea56edc9a1cf06cfdbd80 to 14a17c7009c4bea5534e3a2ea0d0a42e4f15d79a
-  - b8d74abd 2025-03-10T16:19:05+01:00 features: add ShortCertRotation
+- cluster-ingress-operator embedded-component 257abf3bdbdfd7ba7264dddf28b8969125da6b11 to 7dc12cf28557f8c80460435649cfc393761e0285
+  - 80a7f60 2025-03-12T09:38:20+01:00 Makefile: Enable running specific unit tests
+  - 3e74ced 2025-03-12T09:37:26+01:00 NE-1981: Move controller test helpers to dedicated package
 
-- cluster-csi-snapshot-controller-operator embedded-component 4958fc82ce750b97e49d83f5082127c59d0f05c7 to b1a1105065835fcd881529299bc431921f4aa156
-  - f5292e6 2025-03-10T12:40:23+01:00 bump library-go
+- cluster-network-operator embedded-component 2d60b748416747a0652a10b27aa53b3ee1e30fa0 to b2f717758e01faa85ece045aaa63f65dbbce7d17
+  - 2452abe 2025-03-11T12:36:28+02:00 ovn-k: sync EgressService with upstream
 
-- cluster-ingress-operator embedded-component 69cadab177d66bb2324897db4be50ae67fab1fc7 to 257abf3bdbdfd7ba7264dddf28b8969125da6b11
-  - 8e73871 2025-03-11T11:19:01+01:00 e2e: serialize TestGatewayAPI to avoid webhook race condition
-  - 22ca3e4 2025-03-11T11:19:01+01:00 NE-1953: Add Validating Admission Policy for Gateway API CRDs
-  - 3d72b24 2025-03-10T14:20:58+01:00 NE-1954: Implement GatewayAPIController feature gate
-  - d9cf3df 2025-03-06T15:01:58+01:00  NE-1954: Bump openshift/api to get GatewayAPIController feature gate
-
-- cluster-kube-controller-manager-operator embedded-component 84e020145ed33c98597f675fff638c83f4d351a4 to 75f30cdb07d58ce71c0a247207a5d91799a48cc0
-  - 03b7cf2 2025-03-10T12:48:11+01:00 Run SELinux warning controller
-
-- cluster-network-operator embedded-component 972dea1fa5ac0b403496f88b2b0c59e1aa471de8 to 2d60b748416747a0652a10b27aa53b3ee1e30fa0
-  - 7840900 2025-03-05T15:54:15+02:00 frr-k8s: rename validatingwebhook name
-
-- cluster-policy-controller embedded-component 5cc0d0ecd3cdfe8e2fbb55bb62de7fb047b2a127 to 748524784686a5f397490563882cbfb88f9acd01
-  - 284f2af 2025-03-10T12:21:37+00:00 pkg/psalabelsyncer: add MinimallySufficientPodSecurityStandard annotation
-
-- etcd embedded-component 63a774631341b1bdf9ad49baedee25e047f62629 to bd0cae2096abb1d2087e858bbce3f9c06b215f8d
-  - d4e4b326 2024-12-04T14:39:22+00:00 Updating ose-etcd-container image to be consistent with ART for 4.19 Reconciling with https://github.com/openshift/ocp-build-data/tree/2ea3e6158c93ca104b9d59fd58a71536fa01fb2d/images/ose-etcd.yml
-
-- service-ca-operator embedded-component 1e65678429c82df5ae97da4dde8dbe03d75062e6 to fdd9502ff3446725b4f1fbf6902547dba9266061
-  - 00a30ff 2025-03-07T15:52:49+08:00 update k8s.io/* dependencies to v0.32.2
-  - b8cd381 2025-03-07T12:45:31+08:00 Update go 1.23 and ocp 4.19
-
-- service-ca-operator image-amd64 1e65678429c82df5ae97da4dde8dbe03d75062e6 to fdd9502ff3446725b4f1fbf6902547dba9266061
-  - 00a30ff 2025-03-07T15:52:49+08:00 update k8s.io/* dependencies to v0.32.2
-  - b8cd381 2025-03-07T12:45:31+08:00 Update go 1.23 and ocp 4.19
+- machine-config-operator embedded-component 5dcc44abebbfb5dbeaaa8ef2569ba211032e1c00 to 6e460d14449088ca10549456b27d1f85cca93db8
+  - d7f6276d 2025-03-07T10:14:03-05:00 e2e: add Ignition upgrade test case
+  - 410f667d 2025-03-06T15:39:02-05:00 msbic: attempt Ignition stub upgrade
+  - abc1abe1 2025-03-06T15:39:02-05:00 msbic: use releaseVersion from configmap
+  - aff0e238 2025-03-06T15:39:02-05:00 msbic: remove injection of managed secret
 
