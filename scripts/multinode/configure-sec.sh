@@ -70,21 +70,21 @@ function configure_microshift() {
 function configure_kubelet() {
     # Download the kubelet executable
     local kube_arch="amd64"
-    local kube_hash="cb2845fff0ce41c400489393da73925d28fbee54cfeb7834cd4d11e622cbd3a7"
+    local kube_hash="50619fff95bdd7e690c049cc083f495ae0e7c66d0cdf6a8bcad298af5fe28438"
 
     case $(uname -m) in
         x86_64)
             ;;
         aarch64)
             kube_arch="arm64"
-            kube_hash="dbb09d297d924575654db38ed2fc627e35913c2d4000c34613ac6de4995457d0"
+            kube_hash="fbd98311e96b9dcdd73d1688760d410cc70aefce26272ff2f20eef51a7c0d1da"
             ;;
         *)
             echo "Unsupported kubelet architecture $(uname -m)"
             exit 1
     esac
 
-    curl -sLO "https://dl.k8s.io/release/v1.27.1/bin/linux/${kube_arch}/kubelet" --output-dir "${KUBELET_HOME}"
+    curl -sLO "https://dl.k8s.io/release/v1.31.1/bin/linux/${kube_arch}/kubelet" --output-dir "${KUBELET_HOME}"
     cat <<EOF > "${KUBELET_HOME}/kubelet.sha256"
 ${kube_hash} ${KUBELET_HOME}/kubelet
 EOF
