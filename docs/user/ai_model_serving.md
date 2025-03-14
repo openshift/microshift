@@ -6,23 +6,6 @@ It includes limited subset of Red Hat OpenShift AI (RHOAI):
 and the `ServingRuntimes` object type that is namespace-specific.
 Now you can train your models in the cloud and serve them on the edge.
 
-## Limitations
-- AI Model Serving on MicroShift is only available on the x86_64 platform.
-- AI Model Serving on MicroShift supports a very specific subset of the RHOAI Operator components.
-- You must secure the exposed model server's endpoint (e.g. OAUTH2).
-- Not all model servers support IPv6.
-
-## Known issues
-- Because of [a bug in kserve](https://github.com/kserve/kserve/pull/4274)
-  ([to be ported to RHOAI](https://issues.redhat.com/browse/RHOAIENG-21106)),
-  rebooting a MicroShift host can result in the model server failing if it was using ModelCar (a model in an OCI image).
-- Because of MicroShift's architecture, installing the `microshift-ai-model-serving`
-  RPM before running `systemctl start microshift` for the first time,
-  can cause MicroShift to failure to start. However, MicroShift will automatically restart
-  and then start successfully. See [OCPBUGS-51365](https://issues.redhat.com/browse/OCPBUGS-51365).
-- Currently, `ClusterServingRuntimes` are not supported by RHOAI, which means that
-  you will need to copy the `ServingRuntime` shipped within the package to your workload's namespace.
-
 ## Definitions
 
 - [ServingRuntime](https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self-managed/2.17/html/serving_models/serving-large-models_serving-large-models#servingruntime)
@@ -508,3 +491,20 @@ Alternatively, you can copy the ConfigMap from `/usr/lib/microshift/manifests.d/
 
 After tweaking it, you must apply the ConfigMap and restart kserve (e.g. by deleting Pod or scaling the Deployment down to 0 and back to 1).
 For RHEL For Edge and RHEL Image Mode systems, create a new manifest making sure it's applied after `/usr/lib/microshift/manifests.d/001-microshift-ai-model-serving`.
+
+### Limitations
+- AI Model Serving on MicroShift is only available on the x86_64 platform.
+- AI Model Serving on MicroShift supports a very specific subset of the RHOAI Operator components.
+- You must secure the exposed model server's endpoint (e.g. OAUTH2).
+- Not all model servers support IPv6.
+
+### Known issues
+- Because of [a bug in kserve](https://github.com/kserve/kserve/pull/4274)
+  ([to be ported to RHOAI](https://issues.redhat.com/browse/RHOAIENG-21106)),
+  rebooting a MicroShift host can result in the model server failing if it was using ModelCar (a model in an OCI image).
+- Because of MicroShift's architecture, installing the `microshift-ai-model-serving`
+  RPM before running `systemctl start microshift` for the first time,
+  can cause MicroShift to failure to start. However, MicroShift will automatically restart
+  and then start successfully. See [OCPBUGS-51365](https://issues.redhat.com/browse/OCPBUGS-51365).
+- Currently, `ClusterServingRuntimes` are not supported by RHOAI, which means that
+  you will need to copy the `ServingRuntime` shipped within the package to your workload's namespace.
