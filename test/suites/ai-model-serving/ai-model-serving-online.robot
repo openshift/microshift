@@ -25,7 +25,7 @@ Test OpenVINO model
     Set Test Variable    ${DOMAIN}    ${MODEL_NAME}-predictor-test-ai.apps.example.com
     ${ns}=    Create Unique Namespace
     Set Test Variable    ${NAMESPACE}    ${ns}
-    
+
     Deploy OpenVINO Serving Runtime
     Deploy OpenVINO Resnet Model
 
