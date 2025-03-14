@@ -1,69 +1,74 @@
 # AI Model Serving on MicroShift
 
-AI Model Serving on MicroShift is a platform for serving AI models.
-It includes limited subset of Red Hat OpenShift AI (RHOAI): [kserve](https://github.com/opendatahub-io/kserve) and ServingRuntimes.
+AI Model Serving on MicroShift is a single-model serving platform for AI models.
+It includes limited subset of Red Hat OpenShift AI (RHOAI):
+[KServe in Raw Deployment Mode](https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self-managed/2.17/html/serving_models/serving-large-models_serving-large-models#raw_deployment_mode)
+and the `ServingRuntimes` object type that is namespace-specific.
 Now you can train your models in the cloud and serve them on the edge.
 
-MicroShift is intended for the edge (small footprint, low resources),
-therefore kserve is configured to use a "Raw Deployment" mode which means that:
-- Kubernetes Deployments and Services will be created, and
-- neither Service Mesh (Istio) nor Serverless (Knative) are required.
-
-Additionally, automatic creation of the Ingress objects is disabled. If you want to expose your model outside the cluster,
-create a Route object instead.
-
-[Learn more about Raw deployment mode from RHOAI documentation](https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self-managed/2.17/html/serving_models/serving-large-models_serving-large-models#raw_deployment_mode)
-
 ## Limitations
-- Currently, AI Model Serving on MicroShift is only available on x86_64 platform.
-- AI Model Serving on MicroShift only includes very specific subset of RHOAI.
-- Securing (e.g. OAUTH2) exposed model server's endpoint is user's responsibility
+- AI Model Serving on MicroShift is only available on the x86_64 platform.
+- AI Model Serving on MicroShift supports a very specific subset of the RHOAI Operator components.
+- You must secure the exposed model server's endpoint (e.g. OAUTH2).
+- Not all model servers support IPv6.
 
 ## Known issues
-- Because of [bug in kserve](https://github.com/kserve/kserve/pull/4274)
+- Because of [a bug in kserve](https://github.com/kserve/kserve/pull/4274)
   ([to be ported to RHOAI](https://issues.redhat.com/browse/RHOAIENG-21106)),
-  rebooting a MicroShift host can result model server not coming back up if it was using ModelCar (model in OCI image).
-- Because of MicroShift's architecture, installing microshift-ai-model-serving RPM before running `systemctl start microshift` for the first time,
-  can cause a failure to start up, however MicroShift will restart and then start successfully. See [OCPBUGS-51365](https://issues.redhat.com/browse/OCPBUGS-51365).
-  - **It might also cause the ServingRuntimes to not be deployed because kustomizer gives up before webhook is available**
-- Currently, ClusterServingRuntimes are not supported by RHOAI which means that
-  user needs to copy ServingRuntime shipped within the package to their workload's namespace.
-  In future releases we're hoping to transition to ClusterServingRuntime which is ServingRuntime usable from any namespace
-  (if users will need to override some options, they still will be able to create ServingRuntime which take precedence over ClusterServingRuntime).
+  rebooting a MicroShift host can result in the model server failing if it was using ModelCar (a model in an OCI image).
+- Because of MicroShift's architecture, installing the `microshift-ai-model-serving`
+  RPM before running `systemctl start microshift` for the first time,
+  can cause MicroShift to failure to start. However, MicroShift will automatically restart
+  and then start successfully. See [OCPBUGS-51365](https://issues.redhat.com/browse/OCPBUGS-51365).
+- Currently, `ClusterServingRuntimes` are not supported by RHOAI, which means that
+  you will need to copy the `ServingRuntime` shipped within the package to your workload's namespace.
 
 ## Definitions
 
 - [ServingRuntime](https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self-managed/2.17/html/serving_models/serving-large-models_serving-large-models#servingruntime)
+  - For more information about Serving Runtimes refer to [upstream Kserve documentation](https://kserve.github.io/website/latest/modelserving/servingruntimes/)
 - [InferenceService](https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self-managed/2.17/html/serving_models/serving-large-models_serving-large-models#inferenceservice)
 
-## Supported ServingRuntimes
+## Supported model-serving runtimes
 
-For the list of supported Serving Runtimes refer to
+Currently MicroShift supports following model-serving runtimes:
+- OpenVINO Model Server
+- vLLM ServingRuntime for KServe
+
+Following runtimes are included but not supported at the time:
+- Caikit Text Generation Inference Server (Caikit-TGIS) ServingRuntime for KServe
+- Caikit Standalone ServingRuntime for KServe
+- Text Generation Inference Server (TGIS) Standalone ServingRuntime for KServe
+- vLLM ServingRuntime with Gaudi accelerators support for KServe
+- vLLM ROCm ServingRuntime for KServe
+
+Refer to
 [RHOAI documentation](https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self-managed/2.17/html/serving_models/serving-large-models_serving-large-models#supported-model-serving-runtimes_serving-large-models).
-Keep in mind that in MicroShift they are created directly as ServingRuntimes in `redhat-ods-applications`, not as templates,
-so they need to be copied to workload's namespace.
+for details about the model-serving runtimes.
 
 ## General usage overview
 
-1. Prepare model for serving
-1. Configure OS and MicroShift for the hardware - driver & device plugin
-1. Install AI Model Serving for MicroShift
+1. Develop, test, and prepare model for serving
+1. Configure the OS and MicroShift for the hardware - driver & device plugin
+1. Install `microshift-ai-model-serving` package (and restart MicroShift)
 1. (Optional) Package model into an OCI image (ModelCar)
-1. Select suitable Serving Runtime (Model Server)
+1. Select suitable model-serving runtime (Model Server)
 1. Copy ServingRuntime Custom Resource from `redhat-ods-applications` to your own namespace
-1. Create InferenceService
-1. Create Route
-1. Make requests against model server
+1. Create `InferenceService` object
+1. (Optional) Create `Route` object
+1. Make requests against the model server
 
 ## Setting up hardware - drivers and device plugins
 
-In order to enable GPU/hardware accelerator for Red Hat Device Edge,
-you must follow partner's guidance on installing Operator, or driver for RHEL and Device Plugin for Kubernetes.
-Operators may be more convenient, but installing only the driver and device plugin may be more resource efficient.
+To enable GPU/hardware accelerators for MicroShift, follow the Partner's guidance
+on installing either an Operator or a driver for RHEL plus a device plugin for
+Kubernetes. Operators might be more convenient, but using only the driver and
+device plugin may be more resource efficient.
 
-MicroShift does not provide support for partner's procedure.
-In case of any problems consult partner's documentation or support.
-Following links serve only as examples / pointers and may not include everything needed.
+MicroShift cannot provide support for a Partner's procedure.
+For troubleshooting, consult the Partner's documentation or product support.
+The following links are examples and pointers only.
+These links might not include everything you need, but are a good place to start.
 - NVIDIA:
   - [GPU Operator](https://docs.nvidia.com/datacenter/cloud-native/gpu-operator/latest/index.html)
   - [Device Plugin](https://github.com/NVIDIA/k8s-device-plugin)
@@ -78,15 +83,16 @@ Following links serve only as examples / pointers and may not include everything
   - [Device Plugin](https://github.com/ROCm/k8s-device-plugin)
   - [Driver](https://rocm.docs.amd.com/projects/install-on-linux/en/latest/install/install-overview.html)
 
-## Step by step guide
+## Step-by-step guide
 
 Below is an example usage of AI Model Serving for MicroShift.
-It uses OpenVino Model Server (OVMS) and resnet50 model.
-OVMS can run on CPU, no hardware accelerator is needed for this example.
+It uses the OpenVino Model Server (OVMS) and ResNet-50 model.
+Note: OVMS can run on the CPU, so configuring an additional hardware accelerator is not included in this example.
 
 ### Installing AI Model Serving for MicroShift
 
-`microshift-ai-model-serving` RPM contains manifests that deploy `kserve` and `ServingRuntimes` in `redhat-ods-applications` namespace.
+The `microshift-ai-model-serving` RPM contains manifests that deploy `kserve`
+with Raw Deployment mode enabled and `ServingRuntimes` objects in the `redhat-ods-applications` namespace.
 
 To install AI Model Serving for MicroShift run following command:
 ```bash
@@ -94,7 +100,7 @@ sudo dnf install microshift-ai-model-serving
 ```
 
 After installing the package (and restarting MicroShift),
-there should be new Pod running in `redhat-ods-applications` namespace:
+there should be new Pod running in the `redhat-ods-applications` namespace:
 ```sh
 $ oc get pods -n redhat-ods-applications
 NAME                                        READY   STATUS    RESTARTS   AGE
@@ -103,23 +109,23 @@ kserve-controller-manager-7fc9fc688-kttmm   1/1     Running   0          1h
 
 You can also install the release info package. It contains JSON file with image references
 useful for offline procedures or deploying copy of a ServingRuntime to your namespace during
-bootc image build:
+a bootc image build:
 ```bash
 sudo dnf install microshift-ai-model-serving-release-info
 ```
 
-### Package model into an OCI image (ModelCar)
+### Packaging the AI model into an OCI image (ModelCar)
 
-You can package your model into an OCI image and make use of what is known as [ModelCar](https://kserve.github.io/website/latest/modelserving/storage/oci/) approach.
+You can package your model into an OCI image and make use of what is known as the [ModelCar](https://kserve.github.io/website/latest/modelserving/storage/oci/) approach.
 This can help you set up offline environments because the model can be embedded just like any other container image.
 
-Exact directory structure depends on the model server.
-Below is an example Containerfile with RESNET50 model compatible with OpenVino Model Server (OVMS)
+The exact directory structure depends on the model server.
+Below is an example Containerfile with a ResNet-50 model compatible with OpenVino Model Server (OVMS)
 used in the OVMS' examples.
 
 See "How to build a ModelCar container" section of
 [Build and deploy a ModelCar container in OpenShift AI](https://developers.redhat.com/articles/2025/01/30/build-and-deploy-modelcar-container-openshift-ai)
-article for guidance on building OCI image with a model from huggingface suitable for vLLM model server.
+article for guidance on building OCI image with a model from Hugging Face suitable for an vLLM model server.
 
 ```Dockerfile
 FROM quay.io/microshift/busybox:1.37
@@ -135,13 +141,14 @@ podman build -t IMAGE_REF .
 podman push IMAGE_REF
 ```
 
-For purposes of this documentation, we'll build it locally and use without pushing to registry first.
+For this example, we'll build the image locally and use it right away without pushing it to registry first.
 `sudo` is required to make it part of the root's container storage and usable by MicroShift
-as CRI-O and Podman share the storage.
+because CRI-O and Podman share the storage.
 
-For offline use cases make sure to include a tag other than `latest`.
-If the `latest` tag is used, the container that fetches and sets up the model will be set up with `imagePullPolicy: Always`
-and local image will be ignored. For any other tag, the `imagePullPolicy` will be `IfNotPresent`.
+For offline use cases, be sure to include a tag other than `latest`.
+If the `latest` tag is used, the container that fetches and sets up the model
+will be configured with the `imagePullPolicy:` set to `Always` and the local image
+will be ignored. If you use any other tag, the `imagePullPolicy:` is set to `IfNotPresent`.
 
 ```sh
 sudo podman build -t ovms-resnet50:test .
@@ -165,61 +172,72 @@ Successfully tagged localhost/ovms-resnet50:test
 ac4606eb6cb3e6be2fbee9d6bc271df212eb22e6a45a2c33394d9c73dc3bb4cf
 ```
 
-Run following command to make sure the image exists
+Run the following command to make sure the image exists:
 ```sh
 sudo podman images | grep ovms-resnet50
 ```
 
 Example output:
 ```
-localhost/ovms-resnet50                                     test          ac4606eb6cb3  3 minutes ago  27.5 MB
+localhost/ovms-resnet50          test          ac4606eb6cb3  3 minutes ago  27.5 MB
 ```
 
-### Create namespace
+### Creating your namespace
 
-Use following command to create new namespace that will be used throughout this guide.
-
+Use the following command to create a new namespace that will be used throughout this guide:
 ```sh
 oc create ns ai-demo
 ```
 
-### Deploying ServingRuntime to workload's namespace
+### Deploying ServingRuntime to the workload's namespace
 
-First, you must select ServingRuntime that supports the format of your model.
-Then, you need to create ServingRuntime in your workload's namespace:
-it can be done in two ways: manual and suitable for automation.
+First, you must select the ServingRuntime that supports the format of your model.
+Then, you need to create the ServingRuntime in your workload's namespace.
 
-For more information about ServingRuntimes refer to
+If the cluster is already running, you can export the desired `ServingRuntime` to a file and tweak it.
+If they cluster is not running or you want to prepare a manifest, you can use
+original definition on the disk.
+
+For more information about ServingRuntimes refer to the
 [RHOAI documentation](https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self-managed/2.17/html/serving_models/serving-large-models_serving-large-models#model-serving-runtimes_serving-large-models)
 
-#### Manually - from running cluster
+#### Exporting ServingRuntime from a live cluster
 
-You can use following command to save ServingRuntime definition to a yaml file:
+Use following command to list available ServingRuntimes:
+```sh
+oc get -n redhat-ods-applications servingruntimes
+```
+
+Run following command to save ServingRuntime definition to a YAML file:
 ```sh
 oc get -n redhat-ods-applications servingruntimes kserve-ovms -o yaml > ovms.yaml
 ```
-Then, you need to remove following metadata:
+
+Edit the saved file and remove `.metadata.namespace` to allow creating the object in different namespace.
+Optionally, remove also other metadata:
 - `creationTimestamp`
 - `generation`
 - `resourceVersion`
 - `uid`
-- `namespace`
 
-Then you can re-create the ServingRuntime in a custom namespace:
+Re-create the ServingRuntime in a custom namespace:
 ```sh
 oc create -n ai-demo -f ./ovms.yaml
 ```
 
-#### Automatically based on installed manifests and release info
+#### Create ServingRuntime based on installed manifests and release info
+
+This approach does not require a live cluster, so it can be part of CI/CD automation.
 
 Overview of the procedure:
 1. Install `microshift-ai-model-serving-release-info` RPM
-1. Extract image reference of particular ServingRuntime from the release info file
-1. Make a copy of chosen ServingRuntime yaml file
-1. Substitute placeholder used for `image:` field with actual image reference
-1. Create the object using file or make it part of manifest (kustomization)
+1. Extract the image reference of a particular `ServingRuntime` from the release info file
+1. Make a copy of the chosen ServingRuntime YAML file
+1. Add the actual image reference to the `image:` parameter field value
+1. Create the object using the file or make it part of a manifest (kustomization)
 
-Example below shows the process to OpenVino Model Server (OVMS) ServingRuntime:
+The following example shows the process of reusing `microshift-ai-model-serving` manifest's files
+to re-create OVMS `ServingRuntime` in the workload's namespace:
 ```sh
 # Get image reference for the 'ovms-image'
 OVMS_IMAGE="$(jq -r '.images | with_entries(select(.key == "ovms-image")) | .[]' /usr/share/microshift/release/release-ai-model-serving-"$(uname -i)".json)"
@@ -236,28 +254,29 @@ Then you can re-create the ServingRuntime in a custom namespace:
 oc create -n ai-demo -f ./ovms-kserve.yaml
 ```
 
-Alternatively, if the procedure above is part of bootc Containerfile and
-the ServingRuntime ends up as part of new manifest, the namespace can set in `kustomization.yaml`:
+Alternatively, if the preceding procedure is part of a bootc Containerfile and
+the ServingRuntime ends up as part of new manifest, the namespace can set in the `kustomization.yaml`:
 ```yaml
 namespace: ai-demo
 ```
 
-### Create InferenceService
+### Creating the InferenceService custom resource
 
-Next, we need to create InferenceService custom resource.
+Next, we need to create InferenceService custom resource (CR).
 InferenceService instructs kserve on how to create a Deployment for serving the model.
-Kserve uses ServingRuntime based on `modelFormat` specified in InferenceService.
+Kserve uses the ServingRuntime based on `modelFormat` specified in InferenceService.
 
 It's possible to add extra arguments that will be passed to the model server using `.spec.predictor.model.args`.
 
-Below is example of InferenceService with model in `openvino_ir` format.
-It features additional argument `--layout=NHWC:NCHW` to make OVMS accept the
-request data in different format than usual for demonstration purposes.
+The following is an example of an InferenceService with a model in the `openvino_ir` format.
+It features an additional argument, `--layout=NHWC:NCHW` to make OVMS accept the
+request input data in a different layout than the model was originally exported with.
 Extra args are passed through to the OVMS container.
 
-For more information about InferenceService CR refer to
+For more information about the InferenceService CR refer to
 [RHOAI documentation](https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self-managed/2.17/html/serving_models/serving-large-models_serving-large-models#inferenceservice).
 
+Example `InferenceService` object with an `openvino_ir` model format
 ```yaml
 apiVersion: serving.kserve.io/v1beta1
 kind: InferenceService
@@ -274,7 +293,7 @@ spec:
       - --layout=NHWC:NCHW
 ```
 
-Save the example above of the InferenceService to a file, and create it on the cluster:
+Save the the InferenceService example to a file, then create it on the cluster:
 ```sh
 oc create -n ai-demo -f ./FILE.yaml
 ```
@@ -285,23 +304,30 @@ inferenceservice.serving.kserve.io/ovms-resnet50 created
 ```
 
 Soon, a Deployment and a Pod should appear in that namespace.
-Depending on the size of ServingRuntime's image and size of the ModelCar OCI image,
+Depending on the size of ServingRuntime's image and the size of the ModelCar OCI image,
 it may take a while for the Pod to become ready.
 
+You can check the status of the Deployment with following command:
 ```sh
 $ oc get -n ai-demo deployment
 NAME                      READY   UP-TO-DATE   AVAILABLE   AGE
 ovms-resnet50-predictor   1/1     1            1           72s
 ```
 
+You can wait for the Deployment to become ready with following command:
+```sh
+$ oc rollout status -n ai-demo deployment ovms-resnet50-predictor
+deployment "ovms-resnet50-predictor" successfully rolled out
+```
+
+You can check the status of the Pod with following command:
 ```sh
 $ oc get -n ai-demo pod
 NAME                                       READY   STATUS    RESTARTS      AGE
 ovms-resnet50-predictor-6fdb566b7f-bc9k5   2/2     Running   1 (72s ago)   74s
 ```
 
-Kserve will also create a Service.
-
+Kserve will also create a Service:
 ```sh
 $ oc get svc -n ai-demo
 NAME                      TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)   AGE
@@ -311,8 +337,9 @@ ovms-resnet50-predictor   ClusterIP   None         <none>        80/TCP    119s
 #### Specifying hardware accelerators
 
 InferenceService can also include plethora of different options.
-For example it can contain `resources` section that is passed to the Deployment and then to the Pod,
-so the model server gets access to the NVIDIA hardware (thanks to the device plugin):
+For example, the CR can contain a `resources` section that is passed to the Deployment and then to the Pod,
+so that the model server gets access to the hardware (thanks to the device plugin).
+In this example, an NVIDIA device:
 ```yaml
 spec:
   predictor:
@@ -326,12 +353,12 @@ spec:
 
 For complete InferenceService specification refer to [kserve API Reference](https://kserve.github.io/website/latest/reference/api/).
 
-### Create Route
+### Creating a Route
 
-> Note: You don't need to wait for model server Pod's readiness before creating Route.
+> Note: You don't need to wait for the model server Pod's readiness before creating Route.
 
-Finally, we can create an OpenShift Route CR to expose the service.
-You can either use `oc expose svc` command or create definition in a YAML file and apply it.
+Create an OpenShift Route CR to expose the service.
+You can either use the `oc expose svc` command or create definition in a YAML file and apply it.
 
 ```sh
 $ oc expose svc -n ai-demo ovms-resnet50-predictor
@@ -344,12 +371,12 @@ ovms-resnet50-predictor   ovms-resnet50-predictor-ai-demo.apps.example.com   Tru
 
 ### Querying the model server
 
-Finally, we'll check if our model is ready for inference and we'll reuse OVMS examples to test the inference.
+You are ready to check if your model is ready for inference. We'll reuse the OVMS examples to test the inference.
 
-Get the IP of the MicroShift cluster and assign it to the `IP` variable.
-Use the HOST value of the Route created in previous step and assign to the `DOMAIN` variable.
+Get the `IP` of the MicroShift cluster and assign it to the `IP` variable.
+Use the `HOST` value of the Route and assign it to the `DOMAIN` variable.
 Next, run the following `curl` command.
-Alternatively, instead of using `--connect-to "${DOMAIN}::${IP}:"`,
+Alternatively, instead of using the `--connect-to "${DOMAIN}::${IP}:"` flag,
 you can use real DNS, or add the IP and the domain to the `/etc/hosts` file.
 ```sh
 DOMAIN=ovms-resnet50-predictor-ai-demo.apps.example.com
@@ -367,29 +394,30 @@ content-length: 0
 set-cookie: 56bb4b6df4f80f0b59f56aa0a5a91c1a=4af1408b4a1c40925456f73033d4a7d1; path=/; HttpOnly
 ```
 
-We can also query model's metadata:
+We can also query the model's metadata:
 ```sh
 curl "${DOMAIN}/v2/models/ovms-resnet50" \
     --connect-to "${DOMAIN}::${IP}:"
 ```
-Output:
+
+Example output:
 ```json
 {"name":"ovms-resnet50","versions":["1"],"platform":"OpenVINO","inputs":[{"name":"0","datatype":"FP32","shape":[1,224,224,3]}],"outputs":[{"name":"1463","datatype":"FP32","shape":[1,1000]}]
 ```
 
-Let's try querying actual model - following example verifies if inference is in accordance to the training data.
+Let's try querying the actual model - the following example verifies whether the inference is in accordance with the training data.
 
 First, download an image of a bee from the OpenVino examples:
 ```sh
 curl -O https://raw.githubusercontent.com/openvinotoolkit/model_server/main/demos/common/static/images/bee.jpeg
 ```
 
-Next, we need to create the request data.
+Next, create the request data:
 1. Start with an inference header in JSON format.
-1. Get the size of the header. It needs to be passed to the OVMS later in form of HTTP header.
-1. Append size of the image to the request file. OVMS expects 4 bytes (little endian).
-   Command below uses `xxd` utility which is part of `vim-common` package.
-1. Append the image to the request file.
+1. Get the size of the header. It needs to be passed to the OVMS later in form of an HTTP header.
+1. Append the size of the image to the request file. OVMS expects 4 bytes (little endian).
+   The following command uses the `xxd` utility which is part of the `vim-common` package.
+1. Append the image to the request file:
 
 ```sh
 IMAGE=./bee.jpeg
@@ -408,7 +436,7 @@ printf "%08X" $(stat --format=%s "${IMAGE}") | sed 's/\(..\)/\1\n/g' | tac | tr 
 cat "${IMAGE}" >> "${REQ}"
 ```
 
-Now we can make an inference request against the model server using `ovms-resnet50` model.
+Now we can make an inference request against the model server that is using the `ovms-resnet50` model.
 ```sh
 curl \
     --data-binary "@./request.json" \
@@ -417,8 +445,8 @@ curl \
     --connect-to "${DOMAIN}::${IP}:" > response.json
 ```
 
-Response saved to a `response.json` is a JSON object which a structure as shown below.
-Contents of `.outputs[0].data` were omitted from the example for brevity.
+A response saved to a `response.json` is a JSON object which has the following structure:
+The contents of `.outputs[0].data` were omitted from the example for brevity.
 ```json
 {
     "model_name": "ovms-resnet50",
@@ -432,8 +460,8 @@ Contents of `.outputs[0].data` were omitted from the example for brevity.
 }
 ```
 
-To verify the response, we'll use python.
-We need to obtain index of the highest element in the `.outputs[0].data`.
+To verify the response, we'll use Python.
+We need to obtain the index of the highest element in the `.outputs[0].data`.
 
 ```python
 import json
@@ -446,7 +474,7 @@ argmax = data.index(max(data))
 print(argmax)
 ```
 
-The output of the script above should be `309`.
+The output of the Python script we just ran should be `309`.
 We can validate it against [resnet's input data](https://github.com/openvinotoolkit/model_server/blob/main/client/common/resnet_input_images.txt):
 ```
 ../../../../demos/common/static/images/bee.jpeg 309
@@ -473,10 +501,10 @@ ovms_requests_success{api="KServe",interface="REST",method="ModelMetadata",name=
 ## Appendix
 ### Overriding kserve configuration
 
-If you wish to override kserve settings, you need to make a copy of existing ConfigMap, tweak desired settings, and overwrite existing ConfigMap.
+If you wish to override kserve settings, you need to make a copy of existing ConfigMap, tweak the desired settings, and overwrite the existing ConfigMap.
 
-Settings are stored in a ConfigMap named `inferenceservice-config` in namespace `redhat-ods-applications`.
-Alternatively, you can copy it from `/usr/lib/microshift/manifests.d/001-microshift-ai-model-serving/kserve/inferenceservice-config-microshift-patch.yaml`.
+Settings are stored in a ConfigMap named `inferenceservice-config` in the `redhat-ods-applications` namespace.
+Alternatively, you can copy the ConfigMap from `/usr/lib/microshift/manifests.d/001-microshift-ai-model-serving/kserve/inferenceservice-config-microshift-patch.yaml`.
 
-After tweaking it, you must apply it and restart kserve (e.g. deleting Pod or scaling the Deployment down to 0 and back to 1).
-For OSTree/bootc systems, create a new manifest making sure it's applied after `/usr/lib/microshift/manifests.d/001-microshift-ai-model-serving`.
+After tweaking it, you must apply the ConfigMap and restart kserve (e.g. by deleting Pod or scaling the Deployment down to 0 and back to 1).
+For RHEL For Edge and RHEL Image Mode systems, create a new manifest making sure it's applied after `/usr/lib/microshift/manifests.d/001-microshift-ai-model-serving`.
