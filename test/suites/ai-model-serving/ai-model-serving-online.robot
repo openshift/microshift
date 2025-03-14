@@ -26,7 +26,7 @@ Test OpenVINO model
     ${ns}=    Create Unique Namespace
     Set Test Variable    ${NAMESPACE}    ${ns}
     
-    Deploy OpenVINO Server
+    Deploy OpenVINO Serving Runtime
     Deploy OpenVINO Resnet Model
 
     Check If Model Is Ready
@@ -41,7 +41,7 @@ Test OpenVINO model
 
 
 *** Keywords ***
-Deploy OpenVINO Server
+Deploy OpenVINO Serving Runtime
     [Documentation]    Deploys OpenVino server.
 
     ${ovms_image}=    Command Should Work
