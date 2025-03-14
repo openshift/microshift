@@ -5,12 +5,13 @@ SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # shellcheck source=test/bin/common.sh
 source "${SCRIPTDIR}/common.sh"
 
-PULL_SECRET=${PULL_SECRET:-${HOME}/.pull-secret.json}
-
 POSTGRES_IMAGE="docker.io/library/postgres:10.12"
 REDIS_IMAGE="docker.io/library/redis:5.0.7"
 QUAY_IMAGE="quay.io/microshift/quay:v3.11.7-$(uname -m)"
 QUAY_CONFIG_DIR="${MIRROR_REGISTRY_DIR}/config"
+
+PULL_SECRET=${PULL_SECRET:-${HOME}/.pull-secret.json}
+QUAY_PULL_SECRET="${QUAY_CONFIG_DIR}/pull_secret.json"
 
 setup_prereqs() {
     # Install packages if not yet available locally
@@ -33,10 +34,8 @@ setup_prereqs() {
     }
 }
 EOF
-    jq -s '.[0] * .[1]' "${PULL_SECRET}" "${QUAY_CONFIG_DIR}/microshift_auth.json" > "${QUAY_CONFIG_DIR}/pull_secret.json"
-    chmod 600 "${QUAY_CONFIG_DIR}/pull_secret.json"
-    # Reset the pull secret variable to point to the new file
-    PULL_SECRET="${QUAY_CONFIG_DIR}/pull_secret.json"
+    jq -s '.[0] * .[1]' "${PULL_SECRET}" "${QUAY_CONFIG_DIR}/microshift_auth.json" > "${QUAY_PULL_SECRET}"
+    chmod 600 "${QUAY_PULL_SECRET}"
 
     # TLS authentication is disabled in Quay local registry. The mirror-images.sh
     # helper uses skopeo without TLS options and it defaults to https, so we need
@@ -124,7 +123,6 @@ setup_registry() {
     for i in "${POSTGRES_IMAGE}" "${REDIS_IMAGE}" "${QUAY_IMAGE}" ; do
         echo "Pulling '${i}' image locally"
         sudo skopeo copy \
-            --authfile "${PULL_SECRET}" \
             --quiet \
             --retry-times 3 \
             --preserve-digests \
@@ -135,21 +133,28 @@ setup_registry() {
     wait
 
     # Set up Postgres
+    #
+    # The following changes are implemented on top of the documented procedure:
+    # - The setfacl command is not used because the container is run with the
+    #   current user and group permissions.
+    # - The container is run with the current user and group permissions to avoid
+    #   permission denied issues in the user home directory.
+    # - The number of maximum connections to the database is increased from the
+    #   default of 100 to avoid 'FATAL: sorry, too many clients already' errors.
+    #
     # See https://docs.projectquay.io/deploy_quay.html#poc-configuring-database
     if [ ! -d "${MIRROR_REGISTRY_DIR}/postgres" ] ; then
         mkdir -p "${MIRROR_REGISTRY_DIR}/postgres"
-        setfacl -m u:26:-wx "${MIRROR_REGISTRY_DIR}/postgres"
+        # setfacl -m u:26:-wx "${MIRROR_REGISTRY_DIR}/postgres"
         new_db=true
     fi
 
-    # The number of maximum connections to the database is increased from the
-    # default of 100 to avoid 'FATAL: sorry, too many clients already' errors.
-    #
     # Note that the container log still shows the default setting of 100. Run
     # the 'echo SHOW max_connections | psql -d quay -U quayuser' query to
     # determine the current setting.
     echo "Running Postgres container"
     sudo podman run -d --rm --name microshift-postgres \
+        --user "$(id -u):$(id -g)" \
         -e POSTGRES_USER=quayuser \
         -e POSTGRES_PASSWORD=quaypass \
         -e POSTGRES_DB=quay \
@@ -268,6 +273,8 @@ finalize_registry() {
     sudo chgrp -R "$(id -gn)" "${MIRROR_REGISTRY_DIR}"
     sudo find "${MIRROR_REGISTRY_DIR}" -type d -exec sudo chmod a+rx '{}' \;
     sudo find "${MIRROR_REGISTRY_DIR}" -type f -exec sudo chmod a+r  '{}' \;
+    # Delete the combined pull secret file
+    rm -f "${QUAY_PULL_SECRET}"
 }
 
 mirror_images() {
@@ -285,7 +292,7 @@ mirror_images() {
     done
 
     sort -u "${ifile}" "${ffile}" > "${ofile}"
-    "${ROOTDIR}/scripts/mirror-images.sh" --mirror "${PULL_SECRET}" "${ofile}" "${MIRROR_REGISTRY_URL}"
+    "${ROOTDIR}/scripts/mirror-images.sh" --mirror "${QUAY_PULL_SECRET}" "${ofile}" "${MIRROR_REGISTRY_URL}"
     rm -f "${ofile}" "${ffile}"
 }
 

@@ -69,7 +69,7 @@ run_aws_cli() {
 
 check_contents(){
     local -r src_dir="s3://${AWS_BUCKET_NAME}/${BCH_SUBDIR}/${UNAME_M}/${TAG_SUBDIR}"
-    local -r must_contain_array=("brew-rpms\.tar$" "repo\.tar$" "${VM_POOL_BASENAME}/.*\.iso$")
+    local -r must_contain_array=("mirror-registry\.tar$" "brew-rpms\.tar$" "repo\.tar$" "${VM_POOL_BASENAME}/.*\.iso$")
 
     echo "Checking contents of '${src_dir}'"
     local s3_stdout
@@ -101,8 +101,8 @@ action_upload() {
     echo "Uploading ${iso_size} of ISO images to '${iso_dest}'"
     run_aws_cli s3 sync --quiet --include '*.iso' "${iso_base}" "${iso_dest}"
 
-    # Upload brew-rpms and repo archives
-    for dir in brew-rpms repo ; do
+    # Upload mirror-registry, brew-rpms and repo archives
+    for dir in mirror-registry brew-rpms repo ; do
         local pkg_src="${src_base}/${dir}.tar"
         local pkg_dst="${dst_base}/${dir}.tar"
 
@@ -133,8 +133,8 @@ action_download() {
     local -r iso_size="$(du -csh "${iso_dest}" | awk 'END{print $1}')"
     echo "Downloaded ${iso_size} of ISO images"
 
-    # Download brew-rpms and repo archives
-    for dir in brew-rpms repo ; do
+    # Download mirror-registry, brew-rpms and repo archives
+    for dir in mirror-registry brew-rpms repo ; do
         local pkg_src="${src_base}/${dir}.tar"
         local pkg_dst="${dst_base}/${dir}.tar"
         local pkg_dir="${dst_base}/${dir}"
