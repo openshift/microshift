@@ -72,7 +72,7 @@ function mirror_registry() {
         skopeo_retry copy ${skopeo_opts} --quiet \
             --preserve-digests \
             --authfile "${img_pull_file}" \
-            --additional-tag  "${dst_img_no_tag}:latest" \
+            --additional-tag "${dst_img_no_tag}:latest" \
             docker://"${src_img}" docker://"${dst_img}"
     }
 
@@ -147,7 +147,7 @@ function dir_to_registry() {
         skopeo_retry copy ${skopeo_opts} --quiet \
             --preserve-digests \
             --authfile "${img_pull_file}" \
-            --additional-tag  "${dst_img_no_tag}:latest" \
+            --additional-tag "${dst_img_no_tag}:latest" \
             dir://"${local_dir}/${src_img}" docker://"${dst_img}"
     }
 
