@@ -91,12 +91,13 @@ func (t *TelemetryManager) Run(ctx context.Context, ready chan<- struct{}, stopp
 	klog.Infof("MicroShift starting, sending first metrics collection")
 	collectAndSend()
 
+	ticker := time.NewTicker(time.Hour)
 	for {
 		select {
 		case <-ctx.Done():
 			klog.Infof("MicroShift stopping, metrics shutting down")
 			return nil
-		case <-time.After(time.Hour):
+		case <-ticker.C:
 			klog.Infof("Collect telemetry data to report back")
 			collectAndSend()
 		}
