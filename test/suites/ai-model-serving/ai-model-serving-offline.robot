@@ -52,7 +52,7 @@ Query Model Metrics
     ...    --fail
     ...    --request GET
     ...    ${DOMAIN}/metrics
-    ...    --connect-to "${DOMAIN}::${USHIFT_HOST}:"
+    ...    --connect-to "${DOMAIN}::${IP}:"
     ${output}=    Guest Process Should Succeed    ${cmd}
     Should Contain    ${output}    ovms_requests_success Number of successful requests to a model or a DAG.
 
