@@ -25,6 +25,7 @@ Sanity Test
     Wait For A Deployment    test-ai    openvino-resnet-predictor
     Wait Until Keyword Succeeds    10x    10s
     ...    Check If Model Is Ready
+    Query Model Metrics
     Prepare Request Data
     Query Model Server
 
@@ -43,6 +44,17 @@ Check If Model Is Ready
     ...    -i ${DOMAIN}/v2/models/${MODEL_NAME}/ready
     ...    --connect-to "${DOMAIN}::${IP}:"
     Guest Process Should Succeed    ${cmd}
+
+Query Model Metrics
+    [Documentation]    Makes a query against the model server metrics endpoint.
+    ${cmd}=    Catenate
+    ...    curl
+    ...    --fail
+    ...    --request GET
+    ...    ${DOMAIN}/metrics
+    ...    --connect-to "${DOMAIN}::${IP}:"
+    ${output}=    Guest Process Should Succeed    ${cmd}
+    Should Contain    ${output}    ovms_requests_success Number of successful requests to a model or a DAG.
 
 Query Model Server
     [Documentation]    Makes a query against the model server.
