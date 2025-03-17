@@ -1,0 +1,10 @@
+- cluster-dns-operator embedded-component 49290d7db2194df73dfaeb1e719580dabf166690 to 73aa60d1fd4e86aed93d67ddac62586ecbb70644
+  - b68567f 2025-02-26T15:01:43+01:00 Add runbook-url for CoreDNSErrorsHigh
+
+- cluster-network-operator embedded-component d69278e76edaa4fcde0c9c78edd686fecad16a95 to 8a99c6d47560843bb4b30cb921d4049913582ad3
+  - 369c045 2025-02-26T07:39:54-05:00 Use applyconfigurations for updating network.oprerator status
+  - 0ffe372 2025-02-26T07:39:35-05:00 Vendor fake client-go operator client
+
+- machine-config-operator embedded-component 9040a70ce67b34643aa4fd17dece6a9b65a48d95 to 21fb23c61d82dd83a0ede096c8ac7a78820e7ae9
+  - cabbd67d 2024-10-26T05:19:35+00:00 OCPBUGS-43428: Soften haproxy timeout for kubeapi probe
+
