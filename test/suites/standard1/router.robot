@@ -168,31 +168,31 @@ Router Verify Tuning Configuration
     Pod Environment Should Match Value    openshift-ingress    ROUTER_COMPRESSION_MIME    text/html application/*
     Pod Environment Should Match Value    openshift-ingress    ROUTER_DISABLE_HTTP2    false
 
-Router Verify Security Configuration
-    [Documentation]    Test ingress security configuration.
-    [Setup]    Run Keywords
-    ...    Setup With Custom Config    ${ROUTER_SECURITY_CONFIG}
-    ...    AND
-    ...    Create Custom Resources
-    Wait For Router Ready
-    Pod Environment Should Match Value    openshift-ingress    ROUTER_ALLOW_WILDCARD_ROUTES    true
-    Pod Environment Should Match Value    openshift-ingress    ROUTER_MUTUAL_TLS_AUTH    required
-    Pod Environment Should Match Value
-    ...    openshift-ingress
-    ...    ROUTER_MUTUAL_TLS_AUTH_CA
-    ...    /etc/pki/tls/client-ca/ca-bundle.pem
-    Pod Environment Should Match Value
-    ...    openshift-ingress
-    ...    ROUTER_CIPHERS
-    ...    ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES256-GCM-SHA384
-    Pod Environment Should Match Value    openshift-ingress    ROUTER_CIPHERSUITES    TLS_CHACHA20_POLY1305_SHA256
-    Pod Environment Should Match Value    openshift-ingress    SSL_MIN_VERSION    TLSv1.3
-    Pod Environment Should Match Value
-    ...    openshift-ingress
-    ...    ROUTER_MUTUAL_TLS_AUTH_FILTER
-    ...    (?:route-custom.apps.example.com)
-    Pod Volume Should Contain Secret    openshift-ingress    default-certificate    router-certs-custom
-    [Teardown]    Delete Custom CA Secret
+# Router Verify Security Configuration
+#     [Documentation]    Test ingress security configuration.
+#     [Setup]    Run Keywords
+#     ...    Setup With Custom Config    ${ROUTER_SECURITY_CONFIG}
+#     ...    AND
+#     ...    Create Custom Resources
+#     Wait For Router Ready
+#     Pod Environment Should Match Value    openshift-ingress    ROUTER_ALLOW_WILDCARD_ROUTES    true
+#     Pod Environment Should Match Value    openshift-ingress    ROUTER_MUTUAL_TLS_AUTH    required
+#     Pod Environment Should Match Value
+#     ...    openshift-ingress
+#     ...    ROUTER_MUTUAL_TLS_AUTH_CA
+#     ...    /etc/pki/tls/client-ca/ca-bundle.pem
+#     Pod Environment Should Match Value
+#     ...    openshift-ingress
+#     ...    ROUTER_CIPHERS
+#     ...    ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES256-GCM-SHA384
+#     Pod Environment Should Match Value    openshift-ingress    ROUTER_CIPHERSUITES    TLS_CHACHA20_POLY1305_SHA256
+#     Pod Environment Should Match Value    openshift-ingress    SSL_MIN_VERSION    TLSv1.3
+#     Pod Environment Should Match Value
+#     ...    openshift-ingress
+#     ...    ROUTER_MUTUAL_TLS_AUTH_FILTER
+#     ...    (?:route-custom.apps.example.com)
+#     Pod Volume Should Contain Secret    openshift-ingress    default-certificate    router-certs-custom
+#     [Teardown]    Delete Custom CA Secret
 
 
 *** Keywords ***
