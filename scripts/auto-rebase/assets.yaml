@@ -248,7 +248,7 @@ assets:
       - file: release-olm-x86_64.json
         ignore: "gets generated during image rebase"
 
-  - dir: optional/multus/
+  - dir: components/multus/
     ignore: "they don't exist in upstream repository - only in microshift"
     files:
       - file: kustomization.yaml

@@ -975,8 +975,8 @@ update_multus_images() {
         arch=${GOARCH_TO_UNAME_MAP["${goarch}"]:-noarch}
 
         local release_file="${STAGING_DIR}/release_${goarch}.json"
-        local kustomization_arch_file="${REPOROOT}/assets/optional/multus/kustomization.${arch}.yaml"
-        local multus_release_json="${REPOROOT}/assets/optional/multus/release-multus-${arch}.json"
+        local kustomization_arch_file="${REPOROOT}/assets/components/multus/kustomization.${arch}.yaml"
+        local multus_release_json="${REPOROOT}/assets/components/multus/release-multus-${arch}.json"
 
         local base_release
         base_release=$(jq -r ".metadata.version" "${release_file}")
