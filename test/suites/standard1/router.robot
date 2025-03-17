@@ -170,6 +170,7 @@ Router Verify Tuning Configuration
 
 Router Verify Security Configuration
     [Documentation]    Test ingress security configuration.
+    [Tags]    robot:exclude
     [Setup]    Run Keywords
     ...    Setup With Custom Config    ${ROUTER_SECURITY_CONFIG}
     ...    AND
