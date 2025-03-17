@@ -31,7 +31,7 @@ for details about the model-serving runtimes.
 
 ## General usage overview
 
-1. Develop, test, and prepare model for serving
+1. Develop, train, test, and prepare model for serving
 1. Configure the OS and MicroShift for the hardware - driver & device plugin
 1. Install `microshift-ai-model-serving` package (and restart MicroShift)
 1. (Optional) Package model into an OCI image (ModelCar)
@@ -467,7 +467,7 @@ You can try querying the model using other images mentioned in the resnet's inpu
 
 #### Getting the model server's metrics
 
-To obtain metrics of the model server simply make a request on `/metrics` endpoint:
+To obtain Prometheus metrics of the model server simply make a request on `/metrics` endpoint:
 ```sh
 curl "${DOMAIN}/metrics" \
     --connect-to "${DOMAIN}::${IP}:"
@@ -480,6 +480,12 @@ Partial example output:
 ovms_requests_success{api="KServe",interface="REST",method="ModelReady",name="ovms-resnet50"} 4
 ovms_requests_success{api="KServe",interface="REST",method="ModelMetadata",name="ovms-resnet50",version="1"} 1
 ```
+
+#### Other Inference Protocol endpoints
+
+To learn more about kserve endpoints see upstream documentation:
+- [V1 Inference Protocol](https://kserve.github.io/website/latest/modelserving/data_plane/v1_protocol/)
+- [Open Inference Protocol (V2)](https://kserve.github.io/website/latest/modelserving/data_plane/v2_protocol/)
 
 ## Appendix
 ### Overriding kserve configuration
@@ -497,6 +503,7 @@ For RHEL For Edge and RHEL Image Mode systems, create a new manifest making sure
 - AI Model Serving on MicroShift supports a very specific subset of the RHOAI Operator components.
 - You must secure the exposed model server's endpoint (e.g. OAUTH2).
 - Not all model servers support IPv6.
+- Only OCI (ModelCar) model delivery system is tested and supported
 
 ### Known issues
 - Because of [a bug in kserve](https://github.com/kserve/kserve/pull/4274)
