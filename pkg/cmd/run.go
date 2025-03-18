@@ -209,7 +209,6 @@ func RunMicroshift(cfg *config.Config) error {
 	util.Must(m.AddService(controllers.NewInfrastructureServices(cfg)))
 	util.Must(m.AddService(controllers.NewClusterPolicyController(cfg)))
 	util.Must(m.AddService(controllers.NewVersionManager(cfg)))
-	util.Must(m.AddService(kustomize.NewKustomizer(cfg)))
 	util.Must(m.AddService(node.NewKubeletServer(cfg)))
 	util.Must(m.AddService(loadbalancerservice.NewLoadbalancerServiceController(cfg)))
 	util.Must(m.AddService(controllers.NewKubeStorageVersionMigrator(cfg)))
@@ -272,6 +271,9 @@ func RunMicroshift(cfg *config.Config) error {
 		} else {
 			klog.Info("service does not support sd_notify readiness messages")
 		}
+
+		// After MicroShift's core becomes ready, run the kustomizer (delete and/or apply manifests).
+		kustomize.NewKustomizer(cfg).RunStandalone(runCtx)
 
 		// Watch for SIGTERM to exit, now that we are ready.
 		<-sigTerm

@@ -2,6 +2,7 @@ package kustomize
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"time"
@@ -21,7 +22,7 @@ import (
 
 const (
 	retryInterval = 10 * time.Second
-	retryTimeout  = 1 * time.Minute
+	retryTimeout  = 10 * time.Minute
 )
 
 type Kustomizer struct {
@@ -38,6 +39,15 @@ func NewKustomizer(cfg *config.Config) *Kustomizer {
 
 func (s *Kustomizer) Name() string           { return "kustomizer" }
 func (s *Kustomizer) Dependencies() []string { return []string{"kube-apiserver"} }
+
+func (s *Kustomizer) RunStandalone(ctx context.Context) {
+	ready, stopped := make(chan struct{}), make(chan struct{})
+	go func() {
+		if err := s.Run(ctx, ready, stopped); err != nil && !errors.Is(err, context.Canceled) {
+			klog.Errorf("Kustomizer failed: %v", err)
+		}
+	}()
+}
 
 func (s *Kustomizer) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
 	defer close(stopped)
