@@ -24,6 +24,7 @@ import (
 
 	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/telemetry"
+	"github.com/openshift/microshift/pkg/util"
 	"k8s.io/klog/v2"
 )
 
@@ -58,6 +59,16 @@ func (t *TelemetryManager) Run(ctx context.Context, ready chan<- struct{}, stopp
 	defer close(stopped)
 	if t.config.Telemetry.Status == config.StatusDisabled {
 		klog.Info("Telemetry is disabled")
+		close(ready)
+		return nil
+	}
+	connected, err := util.HasDefaultRoute()
+	if err != nil {
+		close(ready)
+		return fmt.Errorf("unable to check default routes: %v", err)
+	}
+	if !connected {
+		klog.Info("Disconnected cluster detected, telemetry disabled")
 		close(ready)
 		return nil
 	}
