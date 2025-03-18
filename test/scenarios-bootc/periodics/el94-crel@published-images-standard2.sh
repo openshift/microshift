@@ -8,23 +8,20 @@
 IMAGE_SIGSTORE_ENABLED=true
 
 scenario_create_vms() {
+    local bootc_spec
     if [[ "${CURRENT_RELEASE_REPO}" == http* ]] ; then
         # Discover a pre-release MicroShift bootc image reference on the mirror
         local -r mirror_url="$(dirname "${CURRENT_RELEASE_REPO}")/bootc-pullspec.txt"
-        local -r bootc_spec="$(curl -s "${mirror_url}")"
 
+        bootc_spec="$(curl -s "${mirror_url}")"
         if [ -z "${bootc_spec}" ] || [[ "${bootc_spec}" != quay.io/openshift* ]] ; then
             echo "ERROR: Failed to retrieve a bootc pull spec from '${mirror_url}'"
             exit 1
         fi
     else
-        # Discover a released MicroShift bootc image reference in public registry.
-        #
-        # TODO: When the current release is updated to 'rhocp', this test will
-        # generate an error and will need to be updated to discover the public
-        # MicroShift bootc image references.
-        echo "ERROR: Code for detecting the released bootc images is missing"
-        exit 1
+        # Use the latest released MicroShift bootc image reference in public
+        # registry for the current minor version
+        bootc_spec="registry.redhat.io/openshift4/microshift-bootc-rhel9:v4.${MINOR_VERSION}"
     fi
 
     prepare_kickstart host1 kickstart-bootc.ks.template "${bootc_spec}"
