@@ -19,8 +19,8 @@ COPY ./bootc-images/$USHIFT_RPM_REPO_NAME.repo ./bootc-images/microshift-fast-da
 # vim-common for xxd utility
 RUN dnf repoinfo --enabled && \
     dnf install -y \
-        "microshift-ai-model-serving-{{ .Env.SOURCE_VERSION }}" \
         "microshift-release-info-{{ .Env.SOURCE_VERSION }}" \
+        "microshift-ai-model-serving-{{ .Env.SOURCE_VERSION }}" \
         "microshift-ai-model-serving-release-info-{{ .Env.SOURCE_VERSION }}" \
         vim-common \
         qemu-guest-agent && \
@@ -41,15 +41,16 @@ RUN printf '\
 BLOCK_RPCS=\n\
 FSFREEZE_HOOK_PATHNAME=/etc/qemu-ga/fsfreeze-hook\n' > /etc/sysconfig/qemu-ga
 
-# Embed images based on contents of release-info RPMs.
-# First RUN embeds MicroShift core images.
-# Second RUN embeds AI Model Serving images.
-# Two RUNs to create separate layer so they don't grow too big.
+# Embed images based on contents of release-info RPMs:
+# - First RUN embeds MicroShift core images.
+# - Second RUN embeds AI Model Serving images.
 #
 # Note:
 # - Retries work around sporadic "cannot set user namespace" podman error.
+# - Two RUN commands create separate layer so they do not grow too big.
 RUN --mount=type=secret,id=pullsecret,dst=/run/secrets/pull-secret.json \
-    images="$(jq -r '.images | .[]' /usr/share/microshift/release/release-"$(uname -m)".json)" ; \
+    images="$(jq -r '.images[]' /usr/share/microshift/release/release-"$(uname -m)".json)" ; \
+    images="${images} quay.io/microshift/busybox:1.36" ; \
     for img in ${images} ; do \
         for i in 1 2 3; do \
             GOMAXPROCS=8 podman pull \
@@ -88,7 +89,6 @@ RUN --mount=type=secret,id=pullsecret,dst=/run/secrets/pull-secret.json \
             echo "Attempt $i failed. Retrying in 5 seconds..." && sleep 5; \
         done ; \
     done
-
 
 # Edit the container storage configuration file to include the new path
 RUN sed -i '/^additionalimagestores.*/a\   "/usr/lib/containers/storage",' /etc/containers/storage.conf
