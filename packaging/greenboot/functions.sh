@@ -6,6 +6,8 @@
 SCRIPT_NAME=$(basename "$0")
 SCRIPT_PID=$$
 
+MICROSHIFT_GREENBOOT_FAIL_MARKER=/run/microshift-greenboot-healthcheck-failed
+
 OCCONFIG_OPT="--kubeconfig /var/lib/microshift/resources/kubeadmin/kubeconfig"
 OCGET_OPT="--no-headers"
 OCGET_CMD="oc get ${OCCONFIG_OPT}"
@@ -95,10 +97,10 @@ function get_wait_timeout() {
     [ -f "${conf_file}" ] && source ${conf_file}
 
     # Read and verify the wait timeout value, allowing for the [60..9999] range
-    local base_timeout=${MICROSHIFT_WAIT_TIMEOUT_SEC:-300}
+    local base_timeout=${MICROSHIFT_WAIT_TIMEOUT_SEC:-600}
     local reSecs='^[1-9]{1}[0-9]{0,3}$'
     if [[ ! ${base_timeout} =~ ${reSecs} ]] ; then
-        base_timeout=300
+        base_timeout=600
         >&2 echo "Could not parse MICROSHIFT_WAIT_TIMEOUT_SEC value '${MICROSHIFT_WAIT_TIMEOUT_SEC}': using '${base_timeout}' instead"
     fi
     if [[ ${base_timeout} -lt 60 ]] ; then
@@ -124,6 +126,29 @@ function get_wait_timeout() {
     [ ${wait_timeout} -le 0 ] && wait_timeout=${base_timeout}
 
     echo "${wait_timeout}"
+}
+
+# Exit if previous MicroShift healthcheck scripts failed.
+function exit_if_fail_marker_exists() {
+    if [ -f "${MICROSHIFT_GREENBOOT_FAIL_MARKER}" ]; then
+        >&2 echo "'${MICROSHIFT_GREENBOOT_FAIL_MARKER}' file exists, exiting with an error"
+        exit 1
+    fi
+}
+
+# Create fail marker and exit
+function create_fail_marker_and_exit() {
+    >&2 echo "Creating '${MICROSHIFT_GREENBOOT_FAIL_MARKER}' file and exiting with an error."
+    touch "${MICROSHIFT_GREENBOOT_FAIL_MARKER}"
+    exit 1
+}
+
+# Clear fail marker
+function clear_fail_marker() {
+    if [ -f "${MICROSHIFT_GREENBOOT_FAIL_MARKER}" ]; then
+        >&2 echo "'${MICROSHIFT_GREENBOOT_FAIL_MARKER}' file exists - removing"
+        rm -f "${MICROSHIFT_GREENBOOT_FAIL_MARKER}"
+    fi
 }
 
 # Run a command with a second delay until it returns a zero exit status

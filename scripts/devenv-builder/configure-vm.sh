@@ -114,9 +114,17 @@ if ${RHEL_SUBSCRIPTION}; then
     fi
     sudo subscription-manager config --rhsm.manage_repos=1
 
+    # Parse the OS versions and determine if EUS
+    source /etc/os-release
+    VERSION_ID_MAJOR="$(awk -F. '{print $1}' <<< "${VERSION_ID}")"
+    VERSION_ID_MINOR="$(awk -F. '{print $2}' <<< "${VERSION_ID}")"
+    VERSION_ID_EUS=""
+    if (( "${VERSION_ID_MINOR}" % 2 == 0 )) ; then
+        VERSION_ID_EUS="-eus"
+    fi
+
     if ${SET_RHEL_RELEASE} && ! ${RHEL_BETA_VERSION} ; then
         # https://access.redhat.com/solutions/238533
-        source /etc/os-release
         sudo subscription-manager release --set ${VERSION_ID}
         sudo subscription-manager release --show
         "${DNF_RETRY}" "clean" "all"
@@ -124,22 +132,21 @@ if ${RHEL_SUBSCRIPTION}; then
 
     # Enable RHEL CDN repos to avoid problems with incomplete RHUI mirrors
     if ! ${RHEL_BETA_VERSION} ; then
-        OSVERSION=$(awk -F: '{print $5}' /etc/system-release-cpe)
         sudo subscription-manager repos \
-            --enable "rhel-${OSVERSION}-for-$(uname -m)-baseos-rpms" \
-            --enable "rhel-${OSVERSION}-for-$(uname -m)-appstream-rpms"
+            --enable "rhel-${VERSION_ID_MAJOR}-for-$(uname -m)-baseos${VERSION_ID_EUS}-rpms" \
+            --enable "rhel-${VERSION_ID_MAJOR}-for-$(uname -m)-appstream${VERSION_ID_EUS}-rpms"
 
         # Disable the AWS' Red Hat Update Infrastructure (RHUI) repositories.
         # Having enabled both RHUI and repos from SubMgr might cause conflicts.
-        if dnf repolist --enabled | grep -q "^rhel-${OSVERSION}-baseos-rhui-rpms"; then
-            sudo dnf config-manager --set-disabled "rhel-${OSVERSION}-baseos-rhui-rpms"
+        if dnf repolist --enabled | grep -q "^rhel-${VERSION_ID_MAJOR}-baseos-rhui-rpms"; then
+            sudo dnf config-manager --set-disabled "rhel-${VERSION_ID_MAJOR}-baseos-rhui-rpms"
         fi
-        if dnf repolist --enabled | grep -q "^rhel-${OSVERSION}-appstream-rhui-rpms"; then
-            sudo dnf config-manager --set-disabled "rhel-${OSVERSION}-appstream-rhui-rpms"
+        if dnf repolist --enabled | grep -q "^rhel-${VERSION_ID_MAJOR}-appstream-rhui-rpms"; then
+            sudo dnf config-manager --set-disabled "rhel-${VERSION_ID_MAJOR}-appstream-rhui-rpms"
         fi
 
         # Remove the rh-amazon-rhui-client as its upgrade process re-enables the RHUI repos.
-        if sudo rpm -qa | grep -v rh-amazon-rhui-client; then
+        if rpm -q rh-amazon-rhui-client > /dev/null; then
             sudo dnf remove -y rh-amazon-rhui-client
         fi
     fi
@@ -156,7 +163,7 @@ if ${INSTALL_BUILD_DEPS} || ${BUILD_AND_RUN}; then
     [[ -d /run/systemd/system ]] &&  sudo systemctl enable --now cockpit.socket
 fi
 
-GO_VER=1.22.7
+GO_VER=1.22.9
 GO_ARCH=$([ "$(uname -m)" == "x86_64" ] && echo "amd64" || echo "arm64")
 GO_INSTALL_DIR="/usr/local/go${GO_VER}"
 if ${INSTALL_BUILD_DEPS} && [ ! -d "${GO_INSTALL_DIR}" ]; then
@@ -184,7 +191,6 @@ if ${BUILD_AND_RUN}; then
 fi
 
 if ${RHEL_SUBSCRIPTION}; then
-    OSVERSION=$(awk -F: '{print $5}' /etc/system-release-cpe)
     sudo subscription-manager config --rhsm.manage_repos=1
 
     RHOCP=$("${RHOCP_REPO}")
@@ -210,7 +216,7 @@ EOF
 
     # Enable fast-datapath (ovn) only for non-beta. Beta RHEL will use openvswitch from RHOCP beta mirror.
     if ! ${RHEL_BETA_VERSION}; then
-        sudo subscription-manager repos --enable "fast-datapath-for-rhel-${OSVERSION}-$(uname -m)-rpms"
+        sudo subscription-manager repos --enable "fast-datapath-for-rhel-${VERSION_ID_MAJOR}-$(uname -m)-rpms"
     fi
 else
     "${DNF_RETRY}" "install" "centos-release-nfv-common"
@@ -286,6 +292,7 @@ if ${BUILD_AND_RUN} || ${FORCE_FIREWALL}; then
     sudo systemctl enable firewalld --now
     sudo firewall-cmd --permanent --zone=trusted --add-source=10.42.0.0/16
     sudo firewall-cmd --permanent --zone=trusted --add-source=169.254.169.1
+    sudo firewall-cmd --permanent --zone=trusted --add-source=fd01::/48
     sudo firewall-cmd --permanent --zone=public --add-port=80/tcp
     sudo firewall-cmd --permanent --zone=public --add-port=443/tcp
     sudo firewall-cmd --permanent --zone=public --add-port=5353/udp

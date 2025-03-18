@@ -1,0 +1,33 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: csi-snapshot-webhook-clusterrole
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: csi-snapshot-webhook-clusterrolebinding
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingWebhookConfiguration
+metadata:
+  name: snapshot.storage.k8s.io
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: csi-snapshot-webhook
+  namespace: kube-system
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: csi-snapshot-webhook
+  namespace: kube-system
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: csi-snapshot-webhook
+  namespace: kube-system

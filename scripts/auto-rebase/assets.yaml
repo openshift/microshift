@@ -37,7 +37,9 @@ assets:
       - file: service-cloud.yaml
       - file: serving-certificate.yaml
         git_restore: True
-      - file: cluster-role-aggregate-route.yaml
+      - file: cluster-role-aggregate-edit-route.yaml
+        git_restore: True
+      - file: cluster-role-aggregate-admin-route.yaml
         git_restore: True
 
   - dir: components/ovn/
@@ -89,14 +91,6 @@ assets:
     files:
     - file: csi_controller_deployment.yaml
     - file: serviceaccount.yaml
-    - file: webhook_config.yaml
-    - file: webhook_deployment.yaml
-    - file: webhook_service.yaml
-    - file: webhook_serviceaccount.yaml
-    - file: webhook_clusterrole.yaml
-      src: ./rbac/
-    - file: webhook_clusterrolebinding.yaml
-      src: ./rbac/
     - file: volumesnapshotclasses.yaml
     - file: volumesnapshotcontents.yaml
     - file: volumesnapshots.yaml

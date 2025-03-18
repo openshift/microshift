@@ -9,9 +9,9 @@ distro = "rhel-94"
 # used with the '--parent' argument of 'osbuild-composer'
 {{- "\n" -}}
 {{- if env.Getenv "CURRENT_RELEASE_VERSION" "" -}}
-# parent = "rhel-9.4-microshift-4.{{ .Env.PREVIOUS_MINOR_VERSION }}"
-{{- else -}}
 # parent = "rhel-9.4-microshift-crel-optionals"
+{{- else -}}
+# parent = "rhel-9.4-microshift-4.{{ .Env.PREVIOUS_MINOR_VERSION }}"
 {{- end -}}
 {{- "\n" -}}
 
@@ -62,14 +62,4 @@ enabled = ["mdns", "ssh", "http", "https"]
 
 [[customizations.firewall.zones]]
 name = "trusted"
-sources = ["10.42.0.0/16", "169.254.169.1"]
-
-# Extend Greenboot wait timeout to 10m for MicroShift to be ready.
-# Greenboot configuration must come after RPM install to avoid
-# /etc/greenboot/greenboot.conf overwrite by the package update.
-[[customizations.files]]
-path = "/etc/greenboot/greenboot.conf"
-data = """
-GREENBOOT_WATCHDOG_CHECK_ENABLED=true
-MICROSHIFT_WAIT_TIMEOUT_SEC=600
-"""
+sources = ["10.42.0.0/16", "169.254.169.1", "fd01::/48"]

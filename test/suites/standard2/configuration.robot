@@ -51,6 +51,29 @@ ${LVMS_CSI_SNAPSHOT_DISABLED}       SEPARATOR=\n
 
 
 *** Test Cases ***
+MicroShift Starts Using Default Config
+    [Documentation]    Default (example) config should not fail to be parsed
+    ...    and prevent MicroShift from starting.
+    # Copy existing config.yaml as a drop-in because it has subjectAltNames
+    # required by the `Restart MicroShift` keyword (sets up required kubeconfig).
+    [Setup]    Run Keywords
+    ...    Save Default MicroShift Config
+    ...    AND
+    ...    Command Should Work    mkdir -p /etc/microshift/config.d/
+    ...    AND
+    ...    Command Should Work    cp /etc/microshift/config.yaml /etc/microshift/config.d/00-ci.yaml
+    ...    AND
+    ...    Command Should Work    cp /etc/microshift/config.yaml.default /etc/microshift/config.yaml
+
+    Restart MicroShift
+
+    [Teardown]    Run Keywords
+    ...    Restore Default MicroShift Config
+    ...    AND
+    ...    Command Should Work    rm -f /etc/microshift/config.d/00-ci.yaml
+    ...    AND
+    ...    Restart MicroShift
+
 Unknown Log Level Produces Warning
     [Documentation]    Logs should warn that the log level setting is unknown
     Setup With Bad Log Level
@@ -79,7 +102,7 @@ Deploy MicroShift With LVMS By Default
     [Documentation]    Verify that LVMS and CSI snapshotting are deployed when config fields are null.
     [Setup]    Deploy Storage Config    ${LVMS_DEFAULT}
     LVMS Is Deployed
-    CSI Snapshot Controller And Webhook Are Deployed
+    CSI Snapshot Controller Is Deployed
     [Teardown]    Run Keywords
     ...    Remove Storage Drop In Config
     ...    Restart MicroShift
@@ -89,7 +112,7 @@ Deploy MicroShift Without LVMS
     ...    components are still deployed.
     [Setup]    Deploy Storage Config    ${LVMS_DISABLED}
 
-    CSI Snapshot Controller And Webhook Are Deployed
+    CSI Snapshot Controller Is Deployed
     Run Keyword And Expect Error    1 != 0
     ...    LVMS Is Deployed
     [Teardown]    Run Keywords
@@ -102,7 +125,7 @@ Deploy MicroShift Without CSI Snapshotter
 
     LVMS Is Deployed
     Run Keyword And Expect Error    1 != 0
-    ...    CSI Snapshot Controller And Webhook Are Deployed
+    ...    CSI Snapshot Controller Is Deployed
 
     [Teardown]    Run Keywords
     ...    Remove Storage Drop In Config
@@ -172,7 +195,6 @@ LVMS Is Deployed
     Wait Until Resource Exists    daemonset    vg-manager    openshift-storage    120s
     Named Daemonset Should Be Available    vg-manager    openshift-storage    120s
 
-CSI Snapshot Controller And Webhook Are Deployed
-    [Documentation]    Wait for CSI snapshot controller and webhook to be deployed
+CSI Snapshot Controller Is Deployed
+    [Documentation]    Wait for CSI snapshot controller to be deployed
     Named Deployment Should Be Available    csi-snapshot-controller    kube-system    120s
-    Named Deployment Should Be Available    csi-snapshot-webhook    kube-system    120s

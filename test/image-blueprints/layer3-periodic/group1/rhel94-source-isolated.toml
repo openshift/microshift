@@ -52,7 +52,7 @@ enabled = ["mdns", "ssh", "http", "https"]
 
 [[customizations.firewall.zones]]
 name = "trusted"
-sources = ["10.42.0.0/16", "169.254.169.1"]
+sources = ["10.42.0.0/16", "169.254.169.1", "fd01::/48"]
 
 # Override the default qemu-ga service configuration on the guest to allow all RPCs.
 # BLOCK_RPCS is a deny-list of qemu-guest-agent RPCs to block, such as file read/write, process execution, etc. By
@@ -67,16 +67,6 @@ data = """
 # It provides settings for "/lib/systemd/system/qemu-guest-agent.service".
 BLOCK_RPCS=
 FSFREEZE_HOOK_PATHNAME=/etc/qemu-ga/fsfreeze-hook"""
-
-# Extend Greenboot wait timeout to 10m for MicroShift to be ready.
-# Greenboot configuration must come after RPM install to avoid
-# /etc/greenboot/greenboot.conf overwrite by the package update.
-[[customizations.files]]
-path = "/etc/greenboot/greenboot.conf"
-data = """
-GREENBOOT_WATCHDOG_CHECK_ENABLED=true
-MICROSHIFT_WAIT_TIMEOUT_SEC=600
-"""
 
 [[containers]]
 source = "quay.io/microshift/busybox:1.36"

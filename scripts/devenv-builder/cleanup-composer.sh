@@ -16,10 +16,10 @@ clean_podman_images() {
 
     title "Cleaning up running containers"
     for id in $(sudo podman ps -a | awk '{print $1}') ; do
-        sudo podman rm -f "${id}"
+        sudo podman rm -f --volumes --time 0 "${id}" || true
     done
     for id in $(podman ps -a | awk '{print $1}') ; do
-        podman rm -f "${id}"
+        podman rm -f --volumes --time 0 "${id}" || true
     done
 
     if [ "${FULL_CLEAN}" = 1 ] ; then
@@ -128,4 +128,7 @@ if [ "${FULL_CLEAN}" = 1 ] ; then
     title "Cleaning up user cache"
     rm -rf ~/.cache 2>/dev/null || true
     sudo rm -rf /tmp/containers/* 2>/dev/null || true
+
+    title "Reverting osbuilder customizations"
+    sudo rm -rf /etc/osbuild-composer /etc/osbuild-worker
 fi

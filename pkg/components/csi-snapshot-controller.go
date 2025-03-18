@@ -4,6 +4,12 @@ import (
 	"context"
 	"fmt"
 
+	arv1 "k8s.io/api/admissionregistration/v1"
+	appsv1 "k8s.io/api/apps/v1"
+	corev1 "k8s.io/api/core/v1"
+	rbacv1 "k8s.io/api/rbac/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/klog/v2"
 
@@ -16,7 +22,7 @@ func startCSISnapshotController(ctx context.Context, cfg *config.Config, kubecon
 	if len(cfg.Storage.OptionalCSIComponents) == 0 {
 		// Upgraded clusters will not have set .storage.*, so we need to support the prior default behavior and deploy
 		// CSI snapshots when .storage.optionalCsiComponents is nil.
-		csiComps.Insert(config.CsiComponentSnapshot, config.CsiComponentSnapshotWebhook)
+		csiComps.Insert(config.CsiComponentSnapshot)
 	} else if csiComps.Has(config.CsiComponentNone) {
 		// User set a zero-len slice, indicating that the cluster supports optional CSI components, and that they should
 		// be disabled.
@@ -25,34 +31,15 @@ func startCSISnapshotController(ctx context.Context, cfg *config.Config, kubecon
 	}
 
 	var (
-		whSA     = []string{"components/csi-snapshot-controller/webhook_serviceaccount.yaml"}
-		whCfg    = []string{"components/csi-snapshot-controller/webhook_config.yaml"}
-		whDeploy = []string{"components/csi-snapshot-controller/webhook_deployment.yaml"}
-		whSvc    = []string{"components/csi-snapshot-controller/webhook_service.yaml"}
-		cr       = []string{"components/csi-snapshot-controller/clusterrole.yaml"}
-		crb      = []string{"components/csi-snapshot-controller/clusterrolebinding.yaml"}
-		sa       = []string{"components/csi-snapshot-controller/serviceaccount.yaml"}
-		deploy   = []string{"components/csi-snapshot-controller/csi_controller_deployment.yaml"}
+		cr     = []string{"components/csi-snapshot-controller/clusterrole.yaml"}
+		crb    = []string{"components/csi-snapshot-controller/clusterrolebinding.yaml"}
+		sa     = []string{"components/csi-snapshot-controller/serviceaccount.yaml"}
+		deploy = []string{"components/csi-snapshot-controller/csi_controller_deployment.yaml"}
 	)
 
-	// Deploy Webhook
-	//nolint:nestif
-	if csiComps.Has(config.CsiComponentSnapshotWebhook) {
-		klog.Infof("deploying CSI snapshot webhook")
-		if err := assets.ApplyServiceAccounts(ctx, whSA, kubeconfigPath); err != nil {
-			return fmt.Errorf("apply service account: %w", err)
-		}
-		if err := assets.ApplyDeployments(ctx, whDeploy, renderTemplate, renderParamsFromConfig(cfg, nil), kubeconfigPath); err != nil {
-			return fmt.Errorf("apply deployment: %w", err)
-		}
-		if err := assets.ApplyValidatingWebhookConfiguration(ctx, whCfg, kubeconfigPath); err != nil {
-			return fmt.Errorf("apply validationWebhookConfiguration: %w", err)
-		}
-		if err := assets.ApplyDeployments(ctx, deploy, renderTemplate, renderParamsFromConfig(cfg, nil), kubeconfigPath); err != nil {
-			return fmt.Errorf("apply deployments: %w", err)
-		}
-	} else {
-		klog.Warningf("CSI snapshot webhook is disabled")
+	if err := deleteCSIWebhook(ctx, kubeconfigPath); err != nil {
+		klog.Warningf("Failed to delete resources of CSI Webhook: %v", err)
+		return err
 	}
 
 	// Deploy CSI Controller Deployment
@@ -68,11 +55,23 @@ func startCSISnapshotController(ctx context.Context, cfg *config.Config, kubecon
 		if err := assets.ApplyServiceAccounts(ctx, sa, kubeconfigPath); err != nil {
 			return fmt.Errorf("apply service account: %w", err)
 		}
-		if err := assets.ApplyServices(ctx, whSvc, nil, map[string]interface{}{}, kubeconfigPath); err != nil {
-			return fmt.Errorf("apply service: %w", err)
+		if err := assets.ApplyDeployments(ctx, deploy, renderTemplate, renderParamsFromConfig(cfg, nil), kubeconfigPath); err != nil {
+			return fmt.Errorf("apply deployments: %w", err)
 		}
 	} else {
 		klog.Warningf("CSI snapshot controller is disabled")
 	}
 	return nil
+}
+
+func deleteCSIWebhook(ctx context.Context, kubeconfigPath string) error {
+	klog.Infof("Deleting resources of CSI Webhook")
+	return assets.DeleteGeneric(ctx, []runtime.Object{
+		&arv1.ValidatingWebhookConfiguration{ObjectMeta: metav1.ObjectMeta{Name: "snapshot.storage.k8s.io"}},
+		&appsv1.Deployment{ObjectMeta: metav1.ObjectMeta{Name: "csi-snapshot-webhook", Namespace: "kube-system"}},
+		&corev1.Service{ObjectMeta: metav1.ObjectMeta{Name: "csi-snapshot-webhook", Namespace: "kube-system"}},
+		&rbacv1.ClusterRole{ObjectMeta: metav1.ObjectMeta{Name: "csi-snapshot-webhook-clusterrole"}},
+		&rbacv1.ClusterRoleBinding{ObjectMeta: metav1.ObjectMeta{Name: "csi-snapshot-webhook-clusterrolebinding"}},
+		&corev1.ServiceAccount{ObjectMeta: metav1.ObjectMeta{Name: "csi-snapshot-webhook", Namespace: "kube-system"}},
+	}, kubeconfigPath)
 }

@@ -1,10 +1,12 @@
-FROM registry.redhat.io/rhel9/rhel-bootc:9.4
+FROM registry.redhat.io/rhel9-eus/rhel-9.4-bootc:9.4
 
-ARG USHIFT_VER=4.16
-RUN dnf config-manager \
+ARG USHIFT_VER=4.17
+# hadolint ignore=SC1091
+RUN . /etc/os-release && dnf upgrade -y --releasever="${VERSION_ID}" && \
+    dnf config-manager \
         --set-enabled "rhocp-${USHIFT_VER}-for-rhel-9-$(uname -m)-rpms" \
-        --set-enabled "fast-datapath-for-rhel-9-$(uname -m)-rpms"
-RUN dnf install -y firewalld microshift && \
+        --set-enabled "fast-datapath-for-rhel-9-$(uname -m)-rpms" && \
+    dnf install -y firewalld microshift && \
     systemctl enable microshift && \
     dnf clean all
 
@@ -21,8 +23,9 @@ RUN useradd -m -d /var/home/redhat -G wheel redhat && \
 # Mandatory firewall configuration
 RUN firewall-offline-cmd --zone=public --add-port=22/tcp && \
     firewall-offline-cmd --zone=trusted --add-source=10.42.0.0/16 && \
-    firewall-offline-cmd --zone=trusted --add-source=169.254.169.1
-# Application-specific firewall configuration
+    firewall-offline-cmd --zone=trusted --add-source=169.254.169.1 && \
+    firewall-offline-cmd --zone=trusted --add-source=fd01::/48
+    # Application-specific firewall configuration
 RUN firewall-offline-cmd --zone=public --add-port=80/tcp && \
     firewall-offline-cmd --zone=public --add-port=443/tcp && \
     firewall-offline-cmd --zone=public --add-port=30000-32767/tcp && \

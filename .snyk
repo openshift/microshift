@@ -1,6 +1,9 @@
-# References:
-# https://docs.snyk.io/scan-applications/snyk-code/using-snyk-code-from-the-cli/excluding-directories-and-files-from-the-snyk-code-cli-test
-# https://docs.snyk.io/snyk-cli/commands/ignore
+# Snyk (https://snyk.io) policy file, patches or ignores known vulnerabilities.
 exclude:
   global:
     - origin/**
+    - vendor/**
+    - etcd/vendor/**
+    - test/**
+    - scripts/**
+version: v1.25.1

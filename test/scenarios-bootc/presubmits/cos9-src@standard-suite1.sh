@@ -12,7 +12,7 @@ scenario_remove_vms() {
 }
 
 scenario_run_tests() {
-    run_tests host1 suites/standard1/
-    # When SELinux is working on bootc systems add following suite:
-    # suites/selinux/validate-selinux-policy.robot
+    run_tests host1 \
+        --variable "EXPECTED_OS_VERSION:9" \
+        suites/standard1/ suites/selinux/validate-selinux-policy.robot
 }

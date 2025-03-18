@@ -40,6 +40,8 @@ if [ "$(id -u)" -ne 0 ] ; then
     exit 1
 fi
 
+exit_if_fail_marker_exists
+
 echo "STARTED"
 
 # Print the boot variable status
@@ -62,5 +64,5 @@ LOG_POD_EVENTS=true
 echo "Waiting ${WAIT_TIMEOUT_SECS}s for '${CHECK_DEPLOY_NS}' deployments to be ready"
 if ! wait_for "${WAIT_TIMEOUT_SECS}" namespace_deployment_ready ; then
     echo "Error: Timed out waiting for '${CHECK_DEPLOY_NS}' deployments to be ready"
-    exit 1
+    create_fail_marker_and_exit
 fi

@@ -26,6 +26,7 @@ VM_BOOT_TIMEOUT=1200 # Overall total boot times are around 15m
 VM_GREENBOOT_TIMEOUT=1800 # Greenboot readiness may take up to 15-30m depending on the load
 SKIP_SOS=${SKIP_SOS:-false}  # may be overridden in global settings file
 SKIP_GREENBOOT=${SKIP_GREENBOOT:-false}  # may be overridden in scenario file
+IMAGE_SIGSTORE_ENABLED=false # may be overridden in scenario file
 VNC_CONSOLE=${VNC_CONSOLE:-false}  # may be overridden in global settings file
 TEST_RANDOMIZATION="all"  # may be overridden in scenario file
 TEST_EXECUTION_TIMEOUT="30m" # may be overriden in scenario file
@@ -260,6 +261,15 @@ prepare_kickstart() {
         exit 1
     fi
 
+    # For bootc kickstart templates, make sure that commit references are
+    # fully qualified. Unqualified references are assumed to be served from
+    # the local mirror registry.
+    if [[ "${template}" == *bootc* ]] ; then
+        if [ "$(dirname "${boot_commit_ref}")" == "." ] ; then
+            boot_commit_ref="${MIRROR_REGISTRY_URL}/${boot_commit_ref}"
+        fi
+    fi
+
     mkdir -p "${output_dir}"
     for ifile in "${KICKSTART_TEMPLATE_DIR}/${template}" "${KICKSTART_TEMPLATE_DIR}"/includes/*.cfg ; do
         local output_file
@@ -283,16 +293,30 @@ prepare_kickstart() {
             -e "s|REPLACE_MIRROR_HOSTNAME|${hostname}|g" \
             -e "s|REPLACE_MIRROR_PORT|${MIRROR_REGISTRY_PORT}|g" \
             -e "s|REPLACE_VM_BRIDGE_IP|${VM_BRIDGE_IP}|g" \
+            -e "s|REPLACE_IMAGE_SIGSTORE_ENABLED|${IMAGE_SIGSTORE_ENABLED}|g" \
             "${ifile}" > "${output_file}"
     done
     record_junit "${vmname}" "prepare_kickstart" "OK"
 }
 
-# Checks if provided commit exists in local ostree repository
+# Checks if provided commit exists in local ostree repository.
+# Returns 0 when the ref exists or 1 otherwise.
 does_commit_exist() {
     local -r commit="${1}"
 
     if ostree refs --repo "${IMAGEDIR}/repo" | grep -q "${commit}"; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+# Checks if provided image ref exists in the mirror registry.
+# Returns 0 when the ref exists or 1 otherwise.
+does_image_exist() {
+    local -r image="${1}"
+
+    if skopeo inspect "docker://${MIRROR_REGISTRY_URL}/${image}" &>/dev/null ; then
         return 0
     else
         return 1
@@ -305,14 +329,19 @@ function get_vm_ip {
     local -r start=$(date +%s)
     local ip
     ip=$("${ROOTDIR}/scripts/devenv-builder/manage-vm.sh" ip -n "${vmname}" | head -1)
-    while [ "${ip}" = "" ]; do
+    while true; do
         now=$(date +%s)
         if [ $(( now - start )) -ge ${VM_BOOT_TIMEOUT} ]; then
             echo "Timed out while waiting for IP retrieval"
             exit 1
         fi
         sleep 1
+        # Try pinging the IP address to avoid stale DHCP leases that would falsely
+        # return as the current IP for the VM.
         ip=$("${ROOTDIR}/scripts/devenv-builder/manage-vm.sh" ip -n "${vmname}" | head -1)
+        if ping -c 1 -W 1 "${ip}" &> /dev/null; then
+          break
+        fi
     done
     echo "${ip}"
 }
@@ -601,7 +630,13 @@ launch_vm() {
     fi
 
     for n in ${network}; do
-        vm_network_args+="--network network=${n},model=virtio "
+        # For simplicity we assume that network filters are named the same as the networks
+        # If there is a filter with the same name as the network, attach it to the NIC
+        vm_network_args+="--network network=${n},model=virtio"
+        if sudo virsh nwfilter-list | awk '{print $2}' | grep -qx "${n}"; then
+            vm_network_args+=",filterref=${n}"
+        fi
+        vm_network_args+=" "
     done
     if [ -z "${vm_network_args}" ] ; then
         vm_network_args="--network none"
@@ -789,6 +824,7 @@ configure_vm_firewall() {
     # - On-host pod communication
     run_command_on_vm "${vmname}" "sudo firewall-cmd --permanent --zone=trusted --add-source=10.42.0.0/16"
     run_command_on_vm "${vmname}" "sudo firewall-cmd --permanent --zone=trusted --add-source=169.254.169.1"
+    run_command_on_vm "${vmname}" "sudo firewall-cmd --permanent --zone=trusted --add-source=fd01::/48"
 
     # Networking / firewall configuration instructions
     # - Incoming for the router
@@ -1010,11 +1046,11 @@ load_subscription_manager_plugin() {
 #   - nginx server
 #   - registry mirror
 check_dependencies() {
-    if [ $(pgrep -cx nginx) -eq 0 ] ; then
+    if [ $(pgrep -cx -U "$(id -u)" nginx) -eq 0 ] ; then
         "${TESTDIR}/bin/manage_webserver.sh" "start"
     fi
 
-    if ! podman ps --format '{{.Names}}' | grep -q ^microshift-local-registry  ; then
+    if ! sudo podman ps --format '{{.Names}}' | grep -q ^microshift-quay  ; then
         "${TESTDIR}/bin/mirror_registry.sh"
     fi
 }

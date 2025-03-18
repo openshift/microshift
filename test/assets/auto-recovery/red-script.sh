@@ -24,5 +24,9 @@ else
 fi
 
 echo "System is unhealthy and greenboot's 'deployment testing' procedure is not active - running auto-recovery for MicroShift"
+
+echo "Making sure MicroShift is stopped and doesn't restart preventing from restoring the backup."
+systemctl stop microshift
+
 microshift restore --auto-recovery /var/lib/microshift-auto-recovery
 systemctl reboot

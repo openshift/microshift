@@ -1,0 +1,6 @@
+- cluster-network-operator embedded-component 475a4839fa80f73d0cc154fb49197574511d073a to 5d380cb3a88d78ac5c6f3d8dd8188d06ac6da1b4
+  - aeda5f8 2025-03-02T12:08:00+02:00 frr-k8s: align manifests with operator
+
+- operator-framework-olm embedded-component 877b6fd3d425043a1bd45b5d24ecebb69f5544c4 to 802665ed8c0a1b62165353151da210addbfe0c73
+  - 5d11fcbe 2025-03-12T19:49:11+00:00 add missing pod disruption reasons to isPodDead (#3519)
+

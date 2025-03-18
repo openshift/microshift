@@ -38,7 +38,6 @@
     > oc get pods
     NAMESPACE                  NAME                                       READY   STATUS    RESTARTS        AGE
     kube-system                csi-snapshot-controller-7d6c78bc58-5p7tb   1/1     Running   0               8m52s
-    kube-system                csi-snapshot-webhook-5598db6db4-rmrpx      1/1     Running   0               8m54s
     openshift-dns              dns-default-2q89q                          2/2     Running   0               7m34s
     openshift-dns              node-resolver-k2c5h                        1/1     Running   0               8m54s
     openshift-ingress          router-default-db4b598b9-x8lvb             1/1     Running   0               8m52s

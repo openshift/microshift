@@ -107,6 +107,8 @@ if [ "$(id -u)" -ne 0 ] ; then
     exit 1
 fi
 
+clear_fail_marker
+
 echo "STARTED"
 
 # Print the boot variable status
@@ -128,7 +130,7 @@ LOG_FAILURE_FILES+=("/var/lib/microshift-backups/prerun_failed.log")
 echo "Waiting ${WAIT_TIMEOUT_SECS}s for MicroShift service to be active and not failed"
 if ! wait_for "${WAIT_TIMEOUT_SECS}" microshift_service_active ; then
     echo "Error: Timed out waiting for MicroShift service to be active"
-    exit 1
+    create_fail_marker_and_exit
 fi
 
 # Wait for MicroShift API health endpoints to be OK
@@ -138,14 +140,14 @@ if ! wait_for "${WAIT_TIMEOUT_SECS}" microshift_health_endpoints_ok ; then
     log_failure_cmd "health-livez"  "${OCGET_CMD} --raw=/livez?verbose"
 
     echo "Error: Timed out waiting for MicroShift API health endpoints to be OK"
-    exit 1
+    create_fail_marker_and_exit
 fi
 
 if lvmsShouldBeDeployed; then
     PODS_NS_LIST+=(openshift-storage)
     PODS_CT_LIST+=(2)
 fi
-declare -a csi_components=('csi-snapshot-controller' 'csi-snapshot-webhook')
+declare -a csi_components=('csi-snapshot-controller')
 csi_pods_ct=0
 for csi_c in "${csi_components[@]}"; do
     if csiComponentShouldBeDeployed "${csi_c}"; then
@@ -165,7 +167,7 @@ LOG_POD_EVENTS=true
 echo "Waiting ${WAIT_TIMEOUT_SECS}s for any pods to be running"
 if ! wait_for "${WAIT_TIMEOUT_SECS}" any_pods_running ; then
     echo "Error: Timed out waiting for any MicroShift pod to be running"
-    exit 1
+    create_fail_marker_and_exit
 fi
 
 # Wait for MicroShift core pod images to be downloaded
@@ -175,7 +177,7 @@ for i in "${!PODS_NS_LIST[@]}"; do
     echo "Waiting ${WAIT_TIMEOUT_SECS}s for pod image(s) from the '${CHECK_PODS_NS}' namespace to be downloaded"
     if ! wait_for "${WAIT_TIMEOUT_SECS}" namespace_images_downloaded; then
         echo "Error: Timed out waiting for pod image(s) from the '${CHECK_PODS_NS}' namespace to be downloaded"
-        exit 1
+        create_fail_marker_and_exit
     fi
 done
 
@@ -187,7 +189,7 @@ for i in "${!PODS_NS_LIST[@]}"; do
     echo "Waiting ${WAIT_TIMEOUT_SECS}s for ${CHECK_PODS_CT} pod(s) from the '${CHECK_PODS_NS}' namespace to be in 'Ready' state"
     if ! wait_for "${WAIT_TIMEOUT_SECS}" namespace_pods_ready; then
         echo "Error: Timed out waiting for ${CHECK_PODS_CT} pod(s) in the '${CHECK_PODS_NS}' namespace to be in 'Ready' state"
-        exit 1
+        create_fail_marker_and_exit
     fi
 done
 
@@ -216,5 +218,5 @@ done
 
 # Exit with an error code if the pod restart check failed
 if ${check_failed} ; then
-    exit 1
+    create_fail_marker_and_exit
 fi
