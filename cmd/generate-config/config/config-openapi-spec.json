@@ -243,12 +243,14 @@
             "clientFinTimeout": {
               "description": "clientFinTimeout defines how long a connection will be held open while\nwaiting for the client response to the server/backend closing the\nconnection.\n\n\nIf unset, the default timeout is 1s",
               "type": "string",
-              "format": "duration"
+              "format": "duration",
+              "default": "1s"
             },
             "clientTimeout": {
               "description": "clientTimeout defines how long a connection will be held open while\nwaiting for a client response.\n\n\nIf unset, the default timeout is 30s",
               "type": "string",
-              "format": "duration"
+              "format": "duration",
+              "default": "30s"
             },
             "headerBufferBytes": {
               "description": "headerBufferBytes describes how much memory should be reserved\n(in bytes) for IngressController connection sessions.\nNote that this value must be at least 16384 if HTTP/2 is\nenabled for the IngressController (https://tools.ietf.org/html/rfc7540).\nIf this field is empty, the IngressController will use a default value\nof 32768 bytes.\n\n\nSetting this field is generally not recommended as headerBufferBytes\nvalues that are too small may break the IngressController and\nheaderBufferBytes values that are too large could cause the\nIngressController to use significantly more memory than necessary.",
@@ -265,6 +267,7 @@
             "healthCheckInterval": {
               "description": "healthCheckInterval defines how long the router waits between two consecutive\nhealth checks on its configured backends.  This value is applied globally as\na default for all routes, but may be overridden per-route by the route annotation\n\"router.openshift.io/haproxy.health.check.interval\".\n\n\nExpects an unsigned duration string of decimal numbers, each with optional\nfraction and a unit suffix, eg \"300ms\", \"1.5h\" or \"2h45m\".\nValid time units are \"ns\", \"us\" (or \"µs\" U+00B5 or \"μs\" U+03BC), \"ms\", \"s\", \"m\", \"h\".\n\n\nSetting this to less than 5s can cause excess traffic due to too frequent\nTCP health checks and accompanying SYN packet storms.  Alternatively, setting\nthis too high can result in increased latency, due to backend servers that are no\nlonger available, but haven't yet been detected as such.\n\n\nAn empty or zero healthCheckInterval means no opinion and IngressController chooses\na default, which is subject to change over time.\nCurrently the default healthCheckInterval value is 5s.\n\n\nCurrently the minimum allowed value is 1s and the maximum allowed value is\n2147483647ms (24.85 days).  Both are subject to change over time.",
               "type": "string",
+              "default": "5s",
               "pattern": "^(0|([0-9]+(\\.[0-9]+)?(ns|us|µs|μs|ms|s|m|h))+)$"
             },
             "maxConnections": {
@@ -275,12 +278,14 @@
             "serverFinTimeout": {
               "description": "serverFinTimeout defines how long a connection will be held open while\nwaiting for the server/backend response to the client closing the\nconnection.\n\n\nIf unset, the default timeout is 1s",
               "type": "string",
-              "format": "duration"
+              "format": "duration",
+              "default": "1s"
             },
             "serverTimeout": {
               "description": "serverTimeout defines how long a connection will be held open while\nwaiting for a server/backend response.\n\n\nIf unset, the default timeout is 30s",
               "type": "string",
-              "format": "duration"
+              "format": "duration",
+              "default": "30s"
             },
             "threadCount": {
               "description": "threadCount defines the number of threads created per HAProxy process.\nCreating more threads allows each ingress controller pod to handle more\nconnections, at the cost of more system resources being used. HAProxy\ncurrently supports up to 64 threads. If this field is empty, the\nIngressController will use the default value.  The current default is 4\nthreads, but this may change in future releases.\n\n\nSetting this field is generally not recommended. Increasing the number\nof HAProxy threads allows ingress controller pods to utilize more CPU\ntime under load, potentially starving other pods if set too high.\nReducing the number of threads may cause the ingress controller to\nperform poorly.",
@@ -292,12 +297,14 @@
             "tlsInspectDelay": {
               "description": "tlsInspectDelay defines how long the router can hold data to find a\nmatching route.\n\n\nSetting this too short can cause the router to fall back to the default\ncertificate for edge-terminated or reencrypt routes even when a better\nmatching certificate could be used.\n\n\nIf unset, the default inspect delay is 5s",
               "type": "string",
-              "format": "duration"
+              "format": "duration",
+              "default": "5s"
             },
             "tunnelTimeout": {
               "description": "tunnelTimeout defines how long a tunnel connection (including\nwebsockets) will be held open while the tunnel is idle.\n\n\nIf unset, the default timeout is 1h",
               "type": "string",
-              "format": "duration"
+              "format": "duration",
+              "default": "1h"
             }
           }
         }

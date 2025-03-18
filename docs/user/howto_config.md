@@ -17,10 +17,8 @@ apiServer:
     namedCertificates:
         - certPath: ""
           keyPath: ""
-          names:
-            - ""
-    subjectAltNames:
-        - ""
+          names: []
+    subjectAltNames: []
 debugging:
     logLevel: ""
 dns:
@@ -31,11 +29,9 @@ ingress:
     defaultHTTPVersion: 0
     forwardedHeaderPolicy: ""
     httpCompression:
-        mimeTypes:
-            - ""
+        mimeTypes: []
     httpEmptyRequestsPolicy: ""
-    listenAddress:
-        - ""
+    listenAddress: []
     logEmptyRequests: ""
     ports:
         http: 0
@@ -57,14 +53,11 @@ ingress:
         tunnelTimeout: ""
 kubelet:
 manifests:
-    kustomizePaths:
-        - ""
+    kustomizePaths: []
 network:
-    clusterNetwork:
-        - ""
+    clusterNetwork: []
     cniPlugin: ""
-    serviceNetwork:
-        - ""
+    serviceNetwork: []
     serviceNodePortRange: ""
 node:
     hostnameOverride: ""
@@ -72,8 +65,7 @@ node:
     nodeIPv6: ""
 storage:
     driver: ""
-    optionalCsiComponents:
-        - ""
+    optionalCsiComponents: []
 
 ```
 <!---
@@ -98,10 +90,8 @@ apiServer:
     namedCertificates:
         - certPath: ""
           keyPath: ""
-          names:
-            - ""
-    subjectAltNames:
-        - ""
+          names: []
+    subjectAltNames: []
 debugging:
     logLevel: Normal
 dns:
@@ -112,11 +102,9 @@ ingress:
     defaultHTTPVersion: 1
     forwardedHeaderPolicy: ""
     httpCompression:
-        mimeTypes:
-            - ""
+        mimeTypes: []
     httpEmptyRequestsPolicy: Respond
-    listenAddress:
-        - ""
+    listenAddress: []
     logEmptyRequests: Log
     ports:
         http: 80
@@ -125,17 +113,17 @@ ingress:
         namespaceOwnership: InterNamespaceAllowed
     status: Managed
     tuningOptions:
-        clientFinTimeout: ""
-        clientTimeout: ""
+        clientFinTimeout: 1s
+        clientTimeout: 30s
         headerBufferBytes: 0
         headerBufferMaxRewriteBytes: 0
-        healthCheckInterval: ""
+        healthCheckInterval: 5s
         maxConnections: 0
-        serverFinTimeout: ""
-        serverTimeout: ""
+        serverFinTimeout: 1s
+        serverTimeout: 30s
         threadCount: 0
-        tlsInspectDelay: ""
-        tunnelTimeout: ""
+        tlsInspectDelay: 5s
+        tunnelTimeout: 1h
 kubelet:
 manifests:
     kustomizePaths:
@@ -156,8 +144,7 @@ node:
     nodeIPv6: ""
 storage:
     driver: ""
-    optionalCsiComponents:
-        - ""
+    optionalCsiComponents: []
 
 ```
 <!---
