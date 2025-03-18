@@ -33,7 +33,7 @@ scenario_create_vms() {
     fi
 
     prepare_kickstart host1 kickstart-bootc.ks.template "${bootc_spec}"
-    launch_vm --boot_blueprint rhel94-bootc
+    launch_vm --boot_blueprint rhel96-bootc
 
     # Open the firewall ports. Other scenarios get this behavior by embedding
     # settings in the blueprint, but we cannot open firewall ports in published
@@ -58,7 +58,5 @@ scenario_run_tests() {
     run_tests host1 \
         --variable "EXPECTED_OS_VERSION:9.4" \
         --variable "IMAGE_SIGSTORE_ENABLED:True" \
-        suites/standard1/
-    # When SELinux is working on RHEL 9.6 bootc systems add following suite:
-    # suites/selinux/validate-selinux-policy.robot
+        suites/standard1/ suites/selinux/validate-selinux-policy.robot
 }
