@@ -493,6 +493,14 @@
             "ovnk"
           ]
         },
+        "multusStatus": {
+          "description": "MultusStatus controls the deployment of the Multus CNI.\nChanging from \"Enabled\" to \"Disabled\" will not cause Multus CNI to be deleted.\nAllowed values are: unset (disabled), \"Enabled\", or \"Disabled\"",
+          "type": "string",
+          "enum": [
+            "Enabled",
+            "Disabled"
+          ]
+        },
         "serviceNetwork": {
           "description": "IP address pool for services.\nCurrently, we only support a single entry here.\nThis field is immutable after installation.",
           "type": "array",

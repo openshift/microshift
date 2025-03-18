@@ -215,6 +215,10 @@ func (c *Config) incorporateUserSettings(u *Config) {
 		c.Network.DNS = u.Network.DNS
 	}
 
+	if u.Network.MultusStatus != "" {
+		c.Network.MultusStatus = u.Network.MultusStatus
+	}
+
 	if u.Etcd.MemoryLimitMB != 0 {
 		c.Etcd.MemoryLimitMB = u.Etcd.MemoryLimitMB
 	}
