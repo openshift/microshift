@@ -17,26 +17,18 @@ RUN printf '\
 BLOCK_RPCS=\n\
 FSFREEZE_HOOK_PATHNAME=/etc/qemu-ga/fsfreeze-hook\n' > /etc/sysconfig/qemu-ga
 
-# Embed images based on contents of release-info RPMs.
-#
-# Note:
-# - Retries work around sporadic "cannot set user namespace" podman error.
+# Embed images based on contents of release-info RPMs
+COPY --chmod=755 ./bootc-images/microshift-copy-images.sh /usr/bin/microshift-copy-images
 RUN --mount=type=secret,id=pullsecret,dst=/run/secrets/pull-secret.json \
-    images="$(jq -r '.images | .[]' /usr/share/microshift/release/release-"$(uname -m)".json)" ; \
+    images="$(jq -r ".images[]" /usr/share/microshift/release/release-"$(uname -m)".json)" ; \
     images="${images} quay.io/microshift/busybox:1.36" ; \
-    for img in ${images} ; do \
-        for i in 1 2 3; do \
-            GOMAXPROCS=8 podman pull \
-                --authfile /run/secrets/pull-secret.json \
-                --root /usr/lib/containers/storage \
-                "docker://${img}" && break; \
-            if [ $i -eq 3 ] ; then \
-                echo "ERROR: Failed to pull ${img} image after 3 attempts"; \
-                exit 1; \
-            fi; \
-            echo "Attempt $i failed. Retrying in 5 seconds..." && sleep 5; \
-        done ; \
-    done
+    IMAGE_PULL_LIST="${images}" /usr/bin/microshift-copy-images -pull
 
-# Edit the container storage configuration file to include the new path
-RUN sed -i '/^additionalimagestores.*/a\   "/usr/lib/containers/storage",' /etc/containers/storage.conf
+# Install a systemd drop-in unit to address the problem with image upgrades
+# overwriting the container images in additional store. The workaround is to
+# copy the images from the pre-loaded to the main container storage directory.
+# In this case, it is not necessary to update /etc/containers/storage.conf with
+# the additional store path.
+# See https://issues.redhat.com/browse/RHEL-75827
+RUN mkdir -p /etc/systemd/system/microshift.service.d
+COPY --chmod=644 ./bootc-images/microshift-copy-images.conf /etc/systemd/system/microshift.service.d/microshift-copy-images.conf
