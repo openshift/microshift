@@ -2,7 +2,7 @@
 # workload resource usage for CPU, Memory, Disk, and Network. Included also are all cluster events of "Warning" type.
 
 # This configuration exports:
-# - Contain, Pod, and Node metrics
+# - Container, Pod, and Node metrics
 # - Kubernetes Events (Warnings only)
 # - Host's CPU, Mem, Disk, and Network Metrics
 # - System journals for selected MicroShift services and dependencies, priority < Info
@@ -49,7 +49,10 @@ exporters:
   otlp:
     sending_queue:
       storage: file_storage
-    endpoint: ${env:K8S_NODE_NAME}:4317 # Valid OTLP endpoint required
+    # endpoint must point to an ip or hostname and port of an otlp service. Here, the K8S_NODE_NAME is used because it
+    # will be resolved to the local node's hostname automatically. An unreachable endpoint will reported in they logs
+    # of the microshift-observability service.
+    endpoint: ${env:K8S_NODE_NAME}:4317
     tls:
       insecure: true
 
@@ -86,5 +89,8 @@ service:
         - periodic:
             exporter:
               otlp:
+                # endpoint must point to an ip or hostname and port of an otlp service. Here, the K8S_NODE_NAME is used
+                #  because it will be resolved to the local node's hostname automatically. An unreachable endpoint will
+                #  reported in they logs of the microshift-observability service.
                 protocol: http/protobuf
-                endpoint: http://127.0.0.1:4318
+                endpoint: http://${env:K8S_NODE_NAME}:4318
