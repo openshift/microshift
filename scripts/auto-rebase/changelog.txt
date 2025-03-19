@@ -1,0 +1,56 @@
+- cluster-ingress-operator embedded-component 7dc12cf28557f8c80460435649cfc393761e0285 to 924279a66d42d633d658113846d68e8d3805ec26
+  - dd0fc42 2025-03-12T13:44:10-04:00 Manage OSSM operator subscription manually to ensure a compatible version is installed
+
+- cluster-kube-apiserver-operator embedded-component c13665bdedd2ee30d28ff83c187ea739d9b8094d to e41854880dcb1a9df3322c1494c93e9a9ac0babe
+  - b84db30 2025-03-14T08:27:10+01:00 Bump library-go
+
+- cluster-network-operator embedded-component b2f717758e01faa85ece045aaa63f65dbbce7d17 to 510b7508ad7a66d1742c5d9f83a4143fa860029c
+  - f7bf9bc 2025-03-14T09:03:49-04:00 Update managed Azure HCP cloud network config
+  - ea6db11 2025-03-11T11:43:10-04:00 Correct namespace ref and cert dir
+
+- etcd embedded-component bd0cae2096abb1d2087e858bbce3f9c06b215f8d to 80d288f7ccb6c11128e2d697e7d26805c487150b
+  - 0ad5ea55 2025-03-13T13:12:03-04:00 DOWNSTREAM: <carry>: OCPBUGS-50510: make hardware related timeout delay configurable
+
+- kubernetes embedded-component d6f2dd28529e5ecc8cdffaf443253f74382c2b60 to 2ed17b46fa89c438d5983268bdc352ba8bd9b4bb
+  - d0c1b6d2c 2025-03-17T06:25:00-04:00 UPSTREAM: <carry>: translate all existing rules to use filtering and the environemntSelector in the specs
+  - 40e44d8ef 2025-03-07T18:08:33+01:00 UPSTREAM: <carry>: Add volume group snapshot test driver
+
+- machine-config-operator embedded-component adafd58169f40eec1110a9fd47473457ca8e5f9d to 13ad337e5ae9399c305269daaa22e09a610d61a6
+  - f6c5964a 2025-03-13T10:49:46-04:00 Add scc label to arbitor crio-metrics-proxy
+  - 9773ac9c 2025-03-07T17:10:27-05:00 daemon: ensure ostree-finalize-staged is started before rebooting
+  - 76712800 2024-12-09T10:12:46-08:00 Give bonding slaves time to implicitly activate.
+  - a6773f61 2024-12-09T10:01:32-08:00 Revert "Race in configure-ovs.sh affects bonding interface configuration."
+  - 50817d16 2024-09-23T14:31:24-07:00 Race in configure-ovs.sh affects bonding interface configuration.
+
+- operator-framework-olm embedded-component 6dd1017cdc814695820aeeb95be6cc28d6c411b5 to e7c4a6900a8b47fef5bf8f5587b0088ba4a057c8
+  - 7fede92c 2025-03-15T00:06:46+00:00 Upgrade controller-gen from v0.17.0 to v0.17.2 (#411)
+  - c9a8c3ee 2025-03-15T00:05:56+00:00 upgraded google.golang.org/genproto/googleapis/api v0.0.0-20240826202546-f6391c0de4c7 => v0.0.0-20250303144028-a0af3efb3deb (#410)
+  - 6da537e6 2025-03-15T00:05:43+00:00 Upgrade YQ version used from v4.28.1 to v4.45.1 (#412)
+  - 8201db95 2025-03-15T00:05:32+00:00 upgraded golang.org/x/oauth2 v0.23.0 => v0.27.0 (#408)
+  - c88fbfb1 2025-03-15T00:05:20+00:00 Bump sigs.k8s.io/controller-runtime from 0.20.1 to 0.20.2 (#405)
+  - c4ea5699 2025-03-15T00:05:08+00:00 Bump github.com/spf13/cobra from 1.8.1 to 1.9.1 (#406)
+  - c785eb84 2025-03-15T00:04:56+00:00 Bump k8s libs to v0.32.2 (#404)
+  - c20c4425 2025-03-15T00:04:44+00:00 OCPBUGS#30001: Fix catalogsource typo for API docs (#402)
+  - aedc2ed7 2025-03-15T00:04:32+00:00 Bump sigs.k8s.io/controller-runtime from 0.20.0 to 0.20.1 (#400)
+  - 8aa5195f 2025-03-15T00:04:20+00:00 Bump sigs.k8s.io/controller-runtime from 0.19.4 to 0.20.0 (#396)
+  - 0cd7ddcc 2025-03-15T00:04:08+00:00 Bump k8s.io/apiextensions-apiserver from 0.32.0 to 0.32.1 (#394)
+  - 48463de1 2025-03-15T00:03:52+00:00 :seedling: Bump sigs.k8s.io/controller-runtime (#3533)
+  - 576ad78d 2025-03-15T00:03:35+00:00 :seedling: Bump github.com/operator-framework/api from 0.29.0 to 0.30.0 (#3534)
+  - 2daa1b4d 2025-03-14T00:06:42+00:00 :seedling: Bump github.com/containers/image/v5 from 5.34.1 to 5.34.2 (#3536)
+  - d13886a1 2025-03-14T00:05:31+00:00 :seedling: Bump github.com/prometheus/client_golang (#3535)
+  - 2c8292d8 2025-03-14T00:05:16+00:00 :seedling: Bump golang.org/x/net from 0.35.0 to 0.37.0 (#3537)
+  - 755cd694 2025-03-14T00:04:59+00:00 :seedling: Bump github.com/containers/image/v5 from 5.34.0 to 5.34.1 (#3527)
+  - 671718fb 2025-03-14T00:04:44+00:00 Update OWNERS - remove stevekuznetsov (#3531)
+  - 39ae922a 2025-03-14T00:04:23+00:00 upgraded golang.org/x/oauth2 v0.25.0 => v0.28.0 (#3528)
+  - 75188674 2025-03-14T00:04:07+00:00 Revert "fix: update PSA versions to match Kubernetes API version (#3524)" (#3530)
+  - e192c069 2025-03-14T00:03:50+00:00 fix: update PSA versions to match Kubernetes API version (#3524)
+  - e5f3b5d3 2025-03-06T09:59:29-05:00 Update DOWNSTREAM owners files
+  - b6b4883d 2025-03-06T10:46:39+00:00 Ensure that PSA label is latest instead of pinning versions
+
+- kubernetes image-amd64 d6f2dd28529e5ecc8cdffaf443253f74382c2b60 to 2ed17b46fa89c438d5983268bdc352ba8bd9b4bb
+  - d0c1b6d2c 2025-03-17T06:25:00-04:00 UPSTREAM: <carry>: translate all existing rules to use filtering and the environemntSelector in the specs
+  - 40e44d8ef 2025-03-07T18:08:33+01:00 UPSTREAM: <carry>: Add volume group snapshot test driver
+
+- kubernetes image-arm64 f4a27c46e464f735615c60fc0b067471e7073e13 to 2ed17b46fa89c438d5983268bdc352ba8bd9b4bb
+  - d0c1b6d2c 2025-03-17T06:25:00-04:00 UPSTREAM: <carry>: translate all existing rules to use filtering and the environemntSelector in the specs
+
