@@ -3,7 +3,7 @@ kind: ClusterRole
 metadata:
   name: openshift-observability-client
 rules:
-  # Opentelemetry Component: kubeletstats receiver
+  # OpenTelemetry Component: kubeletstats receiver
   - apiGroups: [""]
     resources: ["nodes/stats"]
     verbs: ["get"]
