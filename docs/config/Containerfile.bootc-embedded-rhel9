@@ -1,0 +1,40 @@
+ARG USHIFT_BASE_IMAGE_NAME
+ARG USHIFT_BASE_IMAGE_TAG
+FROM $USHIFT_BASE_IMAGE_NAME:$USHIFT_BASE_IMAGE_TAG
+
+ENV IMAGE_STORAGE_DIR=/usr/lib/containers/storage
+ENV IMAGE_LIST_FILE=${IMAGE_STORAGE_DIR}/image-list.txt
+
+# Pull the container image dependencies into /usr/lib/containers/storage:
+# - Each image goes into a sub-directory named after the image pull spec SHA
+# - An image list file is created to map between image pull spec and its SHA
+# hadolint ignore=DL4006
+RUN --mount=type=secret,id=pullsecret,dst=/run/secrets/pull-secret.json \
+    images="$(jq -r ".images[]" /usr/share/microshift/release/release-"$(uname -m)".json)" ; \
+    mkdir -p "${IMAGE_STORAGE_DIR}" ; \
+    for img in ${images} ; do \
+        sha="$(echo "${img}" | sha256sum | awk '{print $1}')" ; \
+        skopeo copy --all --preserve-digests \
+            --authfile /run/secrets/pull-secret.json \
+            "docker://${img}" "dir:$IMAGE_STORAGE_DIR/${sha}" ; \
+        echo "${img},${sha}" >> "${IMAGE_LIST_FILE}" ; \
+    done
+
+# Install a systemd drop-in unit to address the problem with image upgrades
+# overwriting the container images in additional store. The workaround is to
+# copy the images from the pre-loaded to the main container storage directory.
+# In this case, it is not necessary to update /etc/containers/storage.conf with
+# the additional store path.
+# See https://issues.redhat.com/browse/RHEL-75827
+RUN mkdir -p /etc/systemd/system/microshift.service.d
+# hadolint ignore=DL3059
+RUN cat > /etc/systemd/system/microshift.service.d/microshift-copy-images.conf <<EOF
+[Service]
+ExecStartPre=/bin/bash -eux -o pipefail -c '\
+    while IFS="," read -r img sha ; do \
+        skopeo copy --preserve-digests \
+            "dir:${IMAGE_STORAGE_DIR}/\${sha}" \
+            "containers-storage:\${img}" ; \
+    done < "${IMAGE_LIST_FILE}" \
+'
+EOF

@@ -57,7 +57,7 @@ Note how secrets are used during the image build:
 ```bash
 PULL_SECRET=~/.pull-secret.json
 USER_PASSWD=<your_redhat_user_password>
-IMAGE_NAME=microshift-4.16-bootc
+IMAGE_NAME=microshift-4.18-bootc
 
 sudo podman build --authfile "${PULL_SECRET}" -t "${IMAGE_NAME}" \
     --build-arg USER_PASSWD="${USER_PASSWD}" \
@@ -67,17 +67,17 @@ sudo podman build --authfile "${PULL_SECRET}" -t "${IMAGE_NAME}" \
 > **Important:**<br>
 > If `dnf upgrade` command is used in the container image build procedure, it
 > may cause unintended operating system version upgrade (e.g. from `9.4` to
-> `9.5`). To prevent this from happening, use the following command instead.
+> `9.6`). To prevent this from happening, use the following command instead.
 > ```
 > RUN . /etc/os-release && dnf upgrade -y --releasever="${VERSION_ID}"
 > ```
 
-Verify that the local MicroShift 4.16 `bootc` image was created.
+Verify that the local MicroShift 4.18 `bootc` image was created.
 
 ```bash
 $ sudo podman images "${IMAGE_NAME}"
 REPOSITORY                       TAG         IMAGE ID      CREATED        SIZE
-localhost/microshift-4.16-bootc  latest      193425283c00  2 minutes ago  2.31 GB
+localhost/microshift-4.18-bootc  latest      193425283c00  2 minutes ago  2.31 GB
 ```
 
 ### Publish Image
@@ -118,7 +118,7 @@ $ find /lib/modules/$(uname -r) -name "openvswitch*"
 /lib/modules/6.9.9-200.fc40.x86_64/kernel/net/openvswitch
 /lib/modules/6.9.9-200.fc40.x86_64/kernel/net/openvswitch/openvswitch.ko.xz
 
-$ IMAGE_NAME=microshift-4.16-bootc
+$ IMAGE_NAME=microshift-4.18-bootc
 $ sudo podman inspect "${IMAGE_NAME}" | grep kernel-core
         "created_by": "kernel-core-5.14.0-427.26.1.el9_4.x86_64"
 ```
@@ -191,7 +191,7 @@ The host shares the following configuration with the container:
 
 ```bash
 PULL_SECRET=~/.pull-secret.json
-IMAGE_NAME=microshift-4.16-bootc
+IMAGE_NAME=microshift-4.18-bootc
 
 sudo modprobe openvswitch
 sudo podman run --rm -it --privileged \
@@ -286,7 +286,7 @@ EOF
 %end
 
 # Pull a 'bootc' image from a remote registry
-ostreecontainer --url quay.io/myorg/mypath/microshift-4.16-bootc
+ostreecontainer --url quay.io/myorg/mypath/microshift-4.18-bootc
 
 %post --log=/dev/console --erroronfail
 
@@ -317,7 +317,7 @@ previous step to pull a `bootc` image from the remote registry and use it to ins
 the RHEL operating system.
 
 ```bash
-VMNAME=microshift-4.16-bootc
+VMNAME=microshift-4.18-bootc
 NETNAME=default
 
 sudo virt-install \
@@ -357,7 +357,7 @@ PULL_SECRET=~/.pull-secret.json
 USER_PASSWD=<your_redhat_user_password>
 IMAGE_ARCH=amd64 # Use amd64 or arm64 depending on the current platform
 IMAGE_PLATFORM="linux/${IMAGE_ARCH}"
-IMAGE_NAME="microshift-4.16-bootc:linux-${IMAGE_ARCH}"
+IMAGE_NAME="microshift-4.18-bootc:linux-${IMAGE_ARCH}"
 
 sudo podman build --authfile "${PULL_SECRET}" -t "${IMAGE_NAME}" \
     --platform "${IMAGE_PLATFORM}" \
@@ -365,13 +365,13 @@ sudo podman build --authfile "${PULL_SECRET}" -t "${IMAGE_NAME}" \
     -f Containerfile
 ```
 
-Verify that the local MicroShift 4.16 `bootc` image was created for the specified
+Verify that the local MicroShift 4.18 `bootc` image was created for the specified
 platform.
 
 ```bash
 $ sudo podman images "${IMAGE_NAME}"
 REPOSITORY                       TAG          IMAGE ID      CREATED         SIZE
-localhost/microshift-4.16-bootc  linux-amd64  3f7e136fccb5  13 minutes ago  2.19 GB
+localhost/microshift-4.18-bootc  linux-amd64  3f7e136fccb5  13 minutes ago  2.19 GB
 ```
 
 Repeat the procedure on the other platform (i.e. `arm64`) and proceed by publishing
@@ -391,7 +391,7 @@ and publish it to the remote registry.
 ```bash
 REGISTRY_URL=quay.io
 REGISTRY_ORG=myorg/mypath
-BASE_NAME=microshift-4.16-bootc
+BASE_NAME=microshift-4.18-bootc
 MANIFEST_NAME="${BASE_NAME}:latest"
 
 sudo podman manifest create -a "localhost/${MANIFEST_NAME}" \
@@ -417,6 +417,6 @@ $ sudo podman manifest inspect \
 ```
 
 It is now possible to access images using the manifest name with the `latest` tag
-(e.g. `quay.io/myorg/mypath/microshift-4.16-bootc:latest`). The image for the
+(e.g. `quay.io/myorg/mypath/microshift-4.18-bootc:latest`). The image for the
 current platform will automatically be pulled from the registry if it is part of
 the manifest list.

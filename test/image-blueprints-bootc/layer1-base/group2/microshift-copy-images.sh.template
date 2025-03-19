@@ -20,7 +20,7 @@ pull_images() {
     mkdir -p "${STORAGE_DIR}"
     for img in ${IMAGE_PULL_LIST} ; do
         local sha
-        sha=$(sha256sum <<< "${img}" | awk '{print $1}')
+        sha="$(sha256sum <<< "${img}" | awk '{print $1}')"
         for i in 1 2 3; do
             skopeo copy --all --preserve-digests \
                 --authfile "${PULL_SECRET}" \
