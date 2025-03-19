@@ -67,7 +67,7 @@ sudo podman build --authfile "${PULL_SECRET}" -t "${IMAGE_NAME}" \
 > **Important:**<br>
 > If `dnf upgrade` command is used in the container image build procedure, it
 > may cause unintended operating system version upgrade (e.g. from `9.4` to
-> `9.5`). To prevent this from happening, use the following command instead.
+> `9.6`). To prevent this from happening, use the following command instead.
 > ```
 > RUN . /etc/os-release && dnf upgrade -y --releasever="${VERSION_ID}"
 > ```
