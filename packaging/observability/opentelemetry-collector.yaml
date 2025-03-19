@@ -5,7 +5,7 @@
 # - Contain, Pod, and Node metrics
 # - Kubernetes Events (Warnings only)
 # - Host's CPU, Mem, Disk, and Network Metrics
-# - System journals for microshift.service, microshift-observability.service, and microshift-etcd.scope, priority < Info
+# - System journals for selected MicroShift services and dependencies, priority < Info
 
 receivers:
   kubeletstats:

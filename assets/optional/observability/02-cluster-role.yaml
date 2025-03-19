@@ -7,7 +7,7 @@ rules:
   - apiGroups: [""]
     resources: ["nodes/stats"]
     verbs: ["get"]
-  # Opentelemetry Component: k8s_event receiver
+  # OpenTelemetry Component: k8s_event receiver
   - apiGroups:
     - ""
     resources:

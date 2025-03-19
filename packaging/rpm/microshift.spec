@@ -783,7 +783,7 @@ fi
 # LANG=C git log --date="format:%a %b %d %Y" --pretty="tformat:* %cd %an <%ae> VERSION%n- %s%n" packaging/rpm/microshift.spec
 %changelog
 * Mon Mar 17 2025 Jon Cope <jcope@redhat.com> 4.19.0
-- add microshift sub-package to enable the optional deployment of opentelemetry-collector, preconfigured for microshift
+- Add an optional microshift-oservability RPM to enable OpenTelemetry collector preconfigured for MicroShift
 
 * Thu Feb 13 2025 Patryk Matuszak <pmatusza@redhat.com> 4.19.0
 - Add new RPM with AI Model Serving for MicroShift

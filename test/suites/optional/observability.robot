@@ -53,7 +53,7 @@ Setup Suite And Set Journal Cursor
     ...    Journal Contains Enough Lines To Test
 
 Journal Contains Enough Lines To Test
-    [Documentation]    Execution should wait until there are at least 10 lines of journal data to process. This is
+    [Documentation]    Execution should wait until there are at least 50 lines of journal data to process. This is
     ...    necessary because opentelemetry-collector will write debug output in batches. Thus, it can often happen
     ...    that there is not enough log data to gain an accurate read of the process's state, resulting in a false
     ...    negative signal (the opentelemetry-collector is healthy, but did not yet write data to journal.
