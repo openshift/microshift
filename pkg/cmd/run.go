@@ -214,6 +214,7 @@ func RunMicroshift(cfg *config.Config) error {
 	util.Must(m.AddService(loadbalancerservice.NewLoadbalancerServiceController(cfg)))
 	util.Must(m.AddService(controllers.NewKubeStorageVersionMigrator(cfg)))
 	util.Must(m.AddService(controllers.NewClusterID(cfg)))
+	util.Must(m.AddService(controllers.NewTelemetryManager(cfg)))
 
 	// Storing and clearing the env, so other components don't send the READY=1 until MicroShift is fully ready
 	notifySocket := os.Getenv("NOTIFY_SOCKET")

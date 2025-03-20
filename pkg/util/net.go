@@ -173,7 +173,23 @@ func selectIPFromHostInterface(nodeIP string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-
+	// Sort all interfaces by index. Interfaces are listed in the same ordering as
+	// in /proc/net/dev. The ordering is not based in interface index, and it is
+	// not guaranteed to list system interfaces first. Veth interfaces from containers
+	// could get listed first and retrieve the wrong node IP.
+	// The index is assigned sequentially depending on the order of kmods loading
+	// and interface creation. Since the interfaces we are looking for belong to
+	// NetworkManager and the ones that could get a wrong node IP depend on a systemd
+	// unit that requires system networking to be ready, we can assume the lower
+	// indices are safe to use.
+	slices.SortFunc(ifaces, func(a, b tcpnet.Interface) int {
+		if a.Index > b.Index {
+			return 1
+		} else if a.Index < b.Index {
+			return -1
+		}
+		return 0
+	})
 	// get list of interfaces
 	for _, i := range ifaces {
 		if i.Name == "br-ex" {
@@ -345,4 +361,18 @@ func findDefaultRouteForFamily(family int) (routeStruct, error) {
 		}
 	}
 	return routeStruct{}, fmt.Errorf("no default gateway found")
+}
+
+// HasDefaultRoute returns whether the host has a default route for IPv4 or IPv6.
+func HasDefaultRoute() (bool, error) {
+	routes, err := netlink.RouteList(nil, netlink.FAMILY_ALL)
+	if err != nil {
+		return false, fmt.Errorf("failed to get route list: %v", err)
+	}
+	for _, route := range routes {
+		if route.Dst == nil || route.Dst.IP.Equal(tcpnet.IPv4zero) || route.Dst.IP.Equal(tcpnet.IPv6zero) {
+			return true, nil
+		}
+	}
+	return false, nil
 }

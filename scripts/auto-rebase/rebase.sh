@@ -646,6 +646,7 @@ EOF
     yq -i 'del(.extendedArguments.pv-recycler-pod-template-filepath-nfs)' "${REPOROOT}"/assets/controllers/kube-controller-manager/defaultconfig.yaml
     yq -i 'del(.extendedArguments.flex-volume-plugin-dir)' "${REPOROOT}"/assets/controllers/kube-controller-manager/defaultconfig.yaml
     yq -i '.spec.names.shortNames = ["scc"]' "${REPOROOT}"/assets/crd/0000_03_config-operator_01_securitycontextconstraints.crd.yaml
+    yq -i '.apiServerArguments.authorization-mode = ["Scope","SystemMasters","RBAC","Node"]' "${REPOROOT}"/assets/controllers/kube-apiserver/defaultconfig.yaml
 
     #-- openshift-dns -------------------------------------
     # Render operand manifest templates like the operator would
@@ -687,13 +688,14 @@ EOF
     yq -i '.spec.minReadySeconds = 30' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
     yq -i '.spec.selector = {"matchLabels": {"ingresscontroller.operator.openshift.io/deployment-ingresscontroller": "default"}}' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
     yq -i '.spec.template.metadata += {"labels": {"ingresscontroller.operator.openshift.io/deployment-ingresscontroller": "default"}}' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
+    yq -i '.spec.template.metadata.annotations += {"openshift.io/required-scc": "restricted"}' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
     yq -i '.spec.template.spec.containers[0].image = "{{ .ReleaseImage.haproxy_router }}"' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
     yq -i '.spec.template.spec.containers[0].env += {"name": "STATS_PORT", "value": "1936"}' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
     yq -i '.spec.template.spec.containers[0].env += {"name": "RELOAD_INTERVAL", "value": "5s"}' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
-    yq -i '.spec.template.spec.containers[0].env += {"name": "ROUTER_ALLOW_WILDCARD_ROUTES", "value": "false"}' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
+    yq -i '.spec.template.spec.containers[0].env += {"name": "ROUTER_ALLOW_WILDCARD_ROUTES", "value": "{{ .RouterAllowWildcardRoutes }}"}' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
     yq -i '.spec.template.spec.containers[0].env += {"name": "ROUTER_CANONICAL_HOSTNAME", "value": "router-default.apps.{{ .BaseDomain }}"}' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
-    yq -i '.spec.template.spec.containers[0].env += {"name": "ROUTER_CIPHERS", "value": "ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384"}' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
-    yq -i '.spec.template.spec.containers[0].env += {"name": "ROUTER_CIPHERSUITES", "value": "TLS_AES_128_GCM_SHA256:TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256"}' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
+    yq -i '.spec.template.spec.containers[0].env += {"name": "ROUTER_CIPHERS", "value": "{{ .RouterCiphers }}"}' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
+    yq -i '.spec.template.spec.containers[0].env += {"name": "ROUTER_CIPHERSUITES", "value": "{{ .RouterCiphersSuites }}"}' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
     yq -i '.spec.template.spec.containers[0].env += {"name": "ROUTER_DISABLE_HTTP2", "value": "{{ .RouterDisableHttp2 }}"}' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
     yq -i '.spec.template.spec.containers[0].env += {"name": "ROUTER_DISABLE_NAMESPACE_OWNERSHIP_CHECK", "value": "{{.RouterNamespaceOwnership}}"}' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
     yq -i '.spec.template.spec.containers[0].env += {"name": "ROUTER_LOAD_BALANCE_ALGORITHM", "value": "random"}' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
@@ -705,7 +707,7 @@ EOF
     yq -i '.spec.template.spec.containers[0].env += {"name": "ROUTER_SET_FORWARDED_HEADERS", "value": "{{ .ForwardedHeaderPolicy }}"}' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
     yq -i '.spec.template.spec.containers[0].env += {"name": "ROUTER_TCP_BALANCE_SCHEME", "value": "source"}' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
     yq -i '.spec.template.spec.containers[0].env += {"name": "ROUTER_THREADS", "value": "{{ .ThreadCount }}"}' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
-    yq -i '.spec.template.spec.containers[0].env += {"name": "SSL_MIN_VERSION", "value": "TLSv1.2"}' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
+    yq -i '.spec.template.spec.containers[0].env += {"name": "SSL_MIN_VERSION", "value": "{{ .RouterSSLMinVersion }}"}' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
     #    Not use proxy protocol due to lack of load balancer support
     yq -i '.spec.template.spec.containers[0].env += {"name": "ROUTER_USE_PROXY_PROTOCOL", "value": "false"}' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
     yq -i '.spec.template.spec.containers[0].env += {"name": "GRACEFUL_SHUTDOWN_DELAY", "value": "1s"}' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
@@ -740,7 +742,7 @@ EOF
     yq -i '.spec.template.spec.serviceAccount = "router"' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
     yq -i '.spec.template.spec.securityContext = {}' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
     yq -i '.spec.template.spec.schedulerName = "default-scheduler"' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
-    yq -i '.spec.template.spec.volumes[0].secret.secretName = "router-certs-default"' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
+    yq -i '.spec.template.spec.volumes[0].secret.secretName = "{{ .ServingCertificateSecret }}"' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
     sed -i '/#.*at runtime/d' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
     sed -i '/#.*at run-time/d' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
     yq -i '.metadata.labels += {"ingresscontroller.operator.openshift.io/owning-ingresscontroller": "default"}' "${REPOROOT}"/assets/components/openshift-router/service-internal.yaml
@@ -764,7 +766,21 @@ EOF
     # Must use sed instead of yq because unquoted {{ .RouterHttpPort }} is interpreted as yaml object and yq has no option to not interpret it (like provide is as quoted string but produce unquoted output).
     # It needs to be last manipulation of the file, otherwise yq commands after this one would expand the {{ .RouterHttpPort }}.
     sed -i 's/port: 80/port: {{ .RouterHttpPort }}/g; s/port: 443/port: {{ .RouterHttpsPort }}/g' "${REPOROOT}"/assets/components/openshift-router/service-cloud.yaml
-
+   
+    # patch the manifests 
+    # patch can be created using git:
+    #    git diff HEAD~1 assets/components/openshift-router/deployment.yaml > scripts/auto-rebase/manifests_patches/010-ingress-deployment-clientCA.patch
+    pushd  ${REPOROOT}
+    for patch_file in "${REPOROOT}"/scripts/auto-rebase/manifests_patches/*.patch; do
+        echo "Checking patch ${patch_file}"
+        if git apply --check "${patch_file}" 2> /dev/null; then
+            git apply "${patch_file}"
+            echo "${patch_file} - Patch applied"
+        else
+            echo "Patch was already applied"
+        fi
+    done
+    popd
     #-- service-ca ----------------------------------------
     # Render operand manifest templates like the operator would
     # TODO: Remove the following annotations once CPC correctly creates them automatically

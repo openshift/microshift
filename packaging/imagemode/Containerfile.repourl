@@ -28,7 +28,7 @@ EOF
 
 # hadolint ignore=SC1091
 RUN . /etc/os-release && dnf upgrade -y --releasever="${VERSION_ID}" && \
-    dnf install -y ${DNF_OPTIONS} firewalld microshift && \
+    dnf install -y ${DNF_OPTIONS} firewalld microshift microshift-release-info && \
     systemctl enable microshift && \
     dnf clean all
 

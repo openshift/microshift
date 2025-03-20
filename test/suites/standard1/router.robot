@@ -68,6 +68,25 @@ ${ROUTER_TUNING_CONFIG}         SEPARATOR=\n
 ...                             \ \ \ \ tlsInspectDelay: 6s
 ...                             \ \ \ \ threadCount: 3
 ...                             \ \ \ \ maxConnections: 60000
+${ROUTER_SECURITY_CONFIG}       SEPARATOR=\n
+...                             ---
+...                             ingress:
+...                             \ \ certificateSecret: router-certs-custom
+...                             \ \ routeAdmissionPolicy:
+...                             \ \ \ \ wildcardPolicy: WildcardsAllowed
+...                             \ \ clientTLS:
+...                             \ \ \ \ allowedSubjectPatterns: ["route-custom.apps.example.com"]
+...                             \ \ \ \ clientCertificatePolicy: Required
+...                             \ \ \ \ clientCA:
+...                             \ \ \ \ \ \ name: router-ca-certs-custom
+...                             \ \ tlsSecurityProfile:
+...                             \ \ \ \ type: Custom
+...                             \ \ \ \ custom:
+...                             \ \ \ \ \ \ Ciphers:
+...                             \ \ \ \ \ \ - ECDHE-RSA-AES256-GCM-SHA384
+...                             \ \ \ \ \ \ - DHE-RSA-AES256-GCM-SHA384
+...                             \ \ \ \ \ \ - TLS_CHACHA20_POLY1305_SHA256
+...                             \ \ \ \ \ \ MinTLSVersion: VersionTLS13
 
 
 *** Test Cases ***
@@ -148,6 +167,33 @@ Router Verify Tuning Configuration
     Pod Environment Should Match Value    openshift-ingress    ROUTER_ENABLE_COMPRESSION    true
     Pod Environment Should Match Value    openshift-ingress    ROUTER_COMPRESSION_MIME    text/html application/*
     Pod Environment Should Match Value    openshift-ingress    ROUTER_DISABLE_HTTP2    false
+
+Router Verify Security Configuration
+    [Documentation]    Test ingress security configuration.
+    [Tags]    robot:exclude
+    [Setup]    Run Keywords
+    ...    Setup With Custom Config    ${ROUTER_SECURITY_CONFIG}
+    ...    AND
+    ...    Create Custom Resources
+    Wait For Router Ready
+    Pod Environment Should Match Value    openshift-ingress    ROUTER_ALLOW_WILDCARD_ROUTES    true
+    Pod Environment Should Match Value    openshift-ingress    ROUTER_MUTUAL_TLS_AUTH    required
+    Pod Environment Should Match Value
+    ...    openshift-ingress
+    ...    ROUTER_MUTUAL_TLS_AUTH_CA
+    ...    /etc/pki/tls/client-ca/ca-bundle.pem
+    Pod Environment Should Match Value
+    ...    openshift-ingress
+    ...    ROUTER_CIPHERS
+    ...    ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES256-GCM-SHA384
+    Pod Environment Should Match Value    openshift-ingress    ROUTER_CIPHERSUITES    TLS_CHACHA20_POLY1305_SHA256
+    Pod Environment Should Match Value    openshift-ingress    SSL_MIN_VERSION    TLSv1.3
+    Pod Environment Should Match Value
+    ...    openshift-ingress
+    ...    ROUTER_MUTUAL_TLS_AUTH_FILTER
+    ...    (?:route-custom.apps.example.com)
+    Pod Volume Should Contain Secret    openshift-ingress    default-certificate    router-certs-custom
+    [Teardown]    Delete Custom CA Secret
 
 
 *** Keywords ***
@@ -265,3 +311,26 @@ Pod Environment Should Match Value
     ...    ${EMPTY}
     ...    .items[*].spec.containers[*].env[?(@.name=="${env_name}")].value
     Should Be Equal As Strings    ${is}    ${expected_value}
+
+Pod Volume Should Contain Secret
+    [Documentation]    Check if pod volume exists by Name
+    [Arguments]    ${name_space}    ${volume_name}    ${expected_value}
+    ${is}=    Oc Get JsonPath
+    ...    pod
+    ...    ${name_space}
+    ...    ${EMPTY}
+    ...    .items[*].spec.volumes[?(@.name=="${volume_name}")].secret.secretName
+    Should Be Equal As Strings    ${is}    ${expected_value}
+
+Create Custom Resources
+    [Documentation]    Copy Default certs to custom
+    Run With Kubeconfig
+    ...    oc get secret router-certs-default -n openshift-ingress -oyaml | sed 's/name: .*/name: router-certs-custom/' | oc create -f - -oyaml | true
+    Run With Kubeconfig    oc extract configmap/openshift-service-ca.crt --to=/tmp/ --confirm
+    Run With Kubeconfig
+    ...    oc create configmap router-ca-certs-custom -n openshift-ingress --from-file=ca-bundle.pem=/tmp/service-ca.crt --dry-run -o yaml | oc apply -f -
+
+Delete Custom CA Secret
+    [Documentation]    Copy Default certs to custom
+    Oc Delete    secret/router-certs-custom -n openshift-ingress
+    Oc Delete    configmap/router-ca-certs-custom -n openshift-ingress

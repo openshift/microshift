@@ -34,11 +34,6 @@ apiServerArguments:
     - "true"
   anonymous-auth:
     - "true"
-  authorization-mode:
-    - Scope
-    - SystemMasters
-    - RBAC
-    - Node
   audit-log-format:
     - json
   audit-log-maxbackup:
@@ -181,6 +176,11 @@ apiServerArguments:
   # See issue: golang.org/issue/26162
   strict-transport-security-directives:
     - max-age=31536000,includeSubDomains,preload
+  authorization-mode:
+    - Scope
+    - SystemMasters
+    - RBAC
+    - Node
 authConfig:
   oauthMetadataFile: ""
 consolePublicURL: ""

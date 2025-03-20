@@ -1,0 +1,30 @@
+# Definition of InferenceService with a model packages in form of OCI image.
+# Features extra argument for the model server (--layout), so the data layout
+# format expected by the model server matches what we send during testing.
+apiVersion: "serving.kserve.io/v1beta1"
+kind: "InferenceService"
+metadata:
+  name: openvino-resnet
+spec:
+  predictor:
+    model:
+      protocolVersion: v2
+      modelFormat:
+        name: openvino_ir
+      storageUri: "oci://quay.io/microshift/ai-testing-model:ovms-resnet50"
+      args:
+      - --layout=NHWC:NCHW
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: openvino-resnet-predictor
+spec:
+  host: openvino-resnet-predictor-test-ai.apps.example.com
+  port:
+    targetPort: 8888
+  to:
+    kind: Service
+    name: openvino-resnet-predictor
+    weight: 100
+  wildcardPolicy: None

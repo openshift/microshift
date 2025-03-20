@@ -1,0 +1,95 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+DEST="/etc/microshift/manifests.d/10-ai-model-serving-test/"
+MODEL_IMAGE="oci://quay.io/microshift/ai-testing-model:ovms-resnet50"
+
+OVMS_IMAGE="$(jq -r '.images | with_entries(select(.key == "ovms-image")) | .[]' /usr/share/microshift/release/release-ai-model-serving-"$(uname -i)".json)"
+if [ -z "${OVMS_IMAGE}" ]; then
+    echo "Failed to get 'ovms-image' from ai-model-serving's release info"
+    exit 1
+fi
+
+mkdir -p "${DEST}"
+
+cat <<EOF > "${DEST}/kustomization.yaml"
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: test-ai
+
+resources:
+- resources.yaml
+- ovms-kserve.yaml
+EOF
+
+# Copy 'OpenVino Media Server' ServingRuntime CR and update image with a value taken from the ai-model-serving's release info.
+# Replacing the image is needed because it holds a placeholder substituted by the kustomizer at runtime.
+cp /usr/lib/microshift/manifests.d/001-microshift-ai-model-serving/runtimes/ovms-kserve.yaml "${DEST}/ovms-kserve.yaml"
+sed -i "s,image: ovms-image,image: ${OVMS_IMAGE}," "${DEST}/ovms-kserve.yaml"
+
+cat <<EOF > "${DEST}/resources.yaml"
+apiVersion: v1
+kind: Namespace
+metadata:
+    name: test-ai
+---
+# Definition of InferenceService with a model packages in form of OCI image.
+# Features extra argument for the model server (--layout), so the data layout
+# format expected by the model server matches what we send during testing.
+apiVersion: "serving.kserve.io/v1beta1"
+kind: "InferenceService"
+metadata:
+  name: openvino-resnet
+  namespace: test-ai
+spec:
+  predictor:
+    model:
+      protocolVersion: v2
+      modelFormat:
+        name: openvino_ir
+      storageUri: "${MODEL_IMAGE}"
+      args:
+      - --layout=NHWC:NCHW
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: openvino-resnet-predictor
+  namespace: test-ai
+spec:
+  host: openvino-resnet-predictor-test-ai.apps.example.com
+  port:
+    targetPort: 8888
+  to:
+    kind: Service
+    name: openvino-resnet-predictor
+    weight: 100
+  wildcardPolicy: None
+EOF
+
+# Download an image from the examples to use to test the inference.
+curl -o "${DEST}/bee.jpeg" \
+    https://raw.githubusercontent.com/openvinotoolkit/model_server/main/demos/common/static/images/bee.jpeg
+
+# Create script to prepare the query because using QEMU Guest Agent
+# involves multiple layers of JSON and quoting, which is difficult to solve.
+cat <<'EOF' > "${DEST}/prepare-query.sh"
+#!/usr/bin/env bash
+set -xeuo pipefail
+
+OUTPUT=/tmp/request.json
+PAYLOAD=/etc/microshift/manifests.d/10-ai-model-serving-test/bee.jpeg
+
+# Add an inference header (len=63)
+echo -n '{"inputs" : [{"name": "0", "shape": [1], "datatype": "BYTES"}]}' > "${OUTPUT}"
+
+# Add size of the data (image) in binary format (4 bytes, little endian)
+printf "%08X" $(stat --format=%s "${PAYLOAD}") | sed 's/\(..\)/\1\n/g' | tac | tr -d '\n' | xxd -r -p >> "${OUTPUT}"
+
+# Add the data, i.e. the image
+cat "${PAYLOAD}" >> "${OUTPUT}"
+EOF
+
+chmod +x "${DEST}/prepare-query.sh"

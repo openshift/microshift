@@ -1,0 +1,16 @@
+ARG USHIFT_BASE_IMAGE_NAME
+ARG USHIFT_BASE_IMAGE_TAG
+FROM $USHIFT_BASE_IMAGE_NAME:$USHIFT_BASE_IMAGE_TAG
+
+# Pull the container image dependencies into /usr/lib/containers/storage
+RUN --mount=type=secret,id=pullsecret,dst=/run/secrets/pull-secret.json \
+    images=$(jq -r '.images | .[]' "/usr/share/microshift/release/release-$(uname -m).json") ; \
+    for i in ${images} ; do \
+        podman pull \
+            --authfile /run/secrets/pull-secret.json \
+            --root /usr/lib/containers/storage \
+            "docker://${i}" ; \
+    done
+
+# Edit the container storage configuration file to include the new path
+RUN sed -i '/^additionalimagestores.*/a\   "/usr/lib/containers/storage",' /etc/containers/storage.conf

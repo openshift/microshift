@@ -11,7 +11,7 @@ ARG DNF_OPTIONS
 
 # Do not run 'dnf upgrade' command to avoid overrides of the base
 # images specified by the container image build pipelines.
-RUN dnf install -y ${DNF_OPTIONS} firewalld microshift && \
+RUN dnf install -y ${DNF_OPTIONS} firewalld microshift microshift-release-info && \
     systemctl enable microshift && \
     dnf clean all
 

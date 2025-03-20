@@ -3,6 +3,7 @@ set -eo pipefail
 
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 BUILD_AND_RUN=true
+START=true
 INSTALL_BUILD_DEPS=true
 FORCE_FIREWALL=false
 RHEL_SUBSCRIPTION=false
@@ -22,12 +23,14 @@ function usage() {
     echo "Usage: $(basename "$0") [--no-build] [--no-build-deps] [--force-firewall] [--no-set-release-version] <openshift-pull-secret-file>"
     echo ""
     echo "  --no-build                Do not build, install and start MicroShift"
+    echo "  --no-start                Do not start MicroShift after building and installing"
     echo "  --no-build-deps           Do not install dependencies for building binaries and RPMs (implies --no-build)"
     echo "  --force-firewall          Install and configure firewalld regardless of other options"
     echo "  --no-set-release-version  Do NOT set the release subscription to the current release version"
     echo "  --skip-dnf-update         Do NOT run dnf update"
     echo "  --pull-images             Force pulling of container images before starting MicroShift"
     echo "  --optional-rpms           Install optional RPMs (OLM, Multus) along with core MicroShift RPMs"
+    echo "  --skip-optional-rpms      Comma separated list of optional RPMs to skip."
 
     [ -n "$1" ] && echo -e "\nERROR: $1"
     exit 1
@@ -37,6 +40,10 @@ while [ $# -gt 1 ]; do
     case "$1" in
     --no-build)
         BUILD_AND_RUN=false
+        shift
+        ;;
+    --no-start)
+        START=false
         shift
         ;;
     --no-build-deps)
@@ -64,6 +71,10 @@ while [ $# -gt 1 ]; do
         OPTIONAL_RPMS=true
         shift
         ;;
+    --skip-optional-rpms)
+        OPTIONAL_SKIPPED_RPMS=$2
+        shift 2
+        ;;        
     *) usage ;;
     esac
 done
@@ -258,7 +269,13 @@ if ${BUILD_AND_RUN}; then
         # Skip gateway api rpms because:
         # - Feature is still dev preview and no tests/docs are guaranteed.
         # - There is one issue with conformance (see USHIFT-4757) that needs to be addressed in the operator.
-        SKIPPED_RPMS="gateway-api ai-model-serving low-latency"
+
+        if [ -n "${OPTIONAL_SKIPPED_RPMS}" ] ; then
+            SKIPPED_RPMS="gateway-api ${OPTIONAL_SKIPPED_RPMS//,/ }"
+        else
+            SKIPPED_RPMS="gateway-api"
+        fi
+        
         # shellcheck disable=SC2046,SC2086
         "${DNF_RETRY}" "localinstall" "$(find ~/microshift/_output/rpmbuild/RPMS -type f -name "*.rpm" $(printf ' -not -name *%s* ' ${SKIPPED_RPMS}))" 
     else
@@ -317,7 +334,9 @@ if ${BUILD_AND_RUN}; then
         # shellcheck disable=SC2046
         "${PULL_RETRY}" $(rpm -qa | grep -e  "microshift.*-release-info" | xargs rpm -ql | grep $(uname -m).json | xargs jq -r '.images | values[]')
     fi
-    sudo systemctl start microshift
+    if ${START}; then
+        sudo systemctl start microshift
+    fi
 
     echo ""
     echo "The configuration phase completed. Run the following commands to:"
