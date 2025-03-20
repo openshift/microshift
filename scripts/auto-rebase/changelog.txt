@@ -1,7 +1,6 @@
-- cluster-dns-operator embedded-component 8ddf28f959955e2b1b319856c0d47ae6729bcc31 to a4b1cfb4927052f4e21e919d0af05f78ca4fcace
-  - 3c82acb 2025-02-26T14:57:05+01:00 Add runbook-url for CoreDNSErrorsHigh
+- cluster-network-operator embedded-component 13c13b703e38dd453ae404dc735030ea2358590f to 48848fe7e78418922f0cbb3b99d458cd484123c6
+  - 9d2a1db 2025-02-24T22:19:05-05:00 Not update status.migration of the network.config CR to empty
 
-- machine-config-operator embedded-component 824efb659bc6dd5b3bf356fea76a96b480cf99dc to 1c575a33308289d8518be24d9e8fa6e9db13c150
-  - e2bbdd20 2025-03-07T16:23:39+00:00 update cluster-reader cluster role's permissions
-  - 57abf8f4 2025-02-26T20:01:49+00:00 Update the storage.conf configuration file template
+- machine-config-operator embedded-component 1c575a33308289d8518be24d9e8fa6e9db13c150 to acb5acfbb3dec64c3f6c69adf9f2cfc53b862ac2
+  - 59260850 2025-03-05T16:08:32-05:00 daemon & server: update log verbs
 
