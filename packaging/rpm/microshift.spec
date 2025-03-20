@@ -247,16 +247,7 @@ Requires: opentelemetry-collector
 %description observability
 Deploys the Red Hat build of OpenTelemetry-Collector as a systemd service on host. MicroShift provides client
 certificates to permit access to the kube-apiserver metrics endpoints. If a user-defined OpenTelemetry-Collector exists
-at /etc/microshift/opentelemetry-collector.yaml, this config is used. Otherwise, a default config is provided. Note that
-the default configuration requires the backend endpoint be set by the user. The OTLP export must also be specified as
-.service.pipelines.$RECEIVER.exporter: "otlp". The specification for the OTLP configuration is:
-
-  otlp:
-    sending_queue:
-      storage: file_storage
-    endpoint: localhost:12345 # Valid OTLP endpoint required
-    tls:
-      insecure: true
+at /etc/microshift/opentelemetry-collector.yaml, this config is used. Otherwise, a default config is provided.
 
 %prep
 # Dynamic detection of the available golang version also works for non-RPM golang packages

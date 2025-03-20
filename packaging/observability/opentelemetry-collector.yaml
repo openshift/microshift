@@ -1,4 +1,4 @@
-# Opentelemetry-collector-small.yaml provides a minimal set of metrics and logs for monitoring system, node, and
+# Opentelemetry-collector.yaml provides a minimal set of metrics and logs for monitoring system, node, and
 # workload resource usage for CPU, Memory, Disk, and Network. Included also are all cluster events of "Warning" type.
 
 # This configuration exports:
@@ -37,7 +37,8 @@ receivers:
       - microshift-etcd
       - crio
       - openvswitch.service
-
+      - ovsdb-server.service
+      - ovs-vswitchd.service
 processors:
   batch:
   resourcedetection/system:
@@ -66,11 +67,11 @@ service:
     metrics/kubeletstats:
       receivers: [ kubeletstats ]
       processors: [ batch ]
-      exporters: [ otlp ]  # Uncomment to enable OTLP
+      exporters: [ otlp ]
     metrics/hostmetrics:
       receivers: [ hostmetrics ]
       processors: [ resourcedetection/system, batch ]
-      exporters: [ otlp ]  # Uncomment to enable OTLP
+      exporters: [ otlp ]
     logs/kube_events:
       receivers: [ k8s_events ]
       processors: [ resourcedetection/system, batch ]
