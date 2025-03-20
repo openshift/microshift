@@ -40,6 +40,8 @@ Upgrade With Multus Workload
     Set IP For Host Interface    ${BRIDGE_INTERFACE}    ${BRIDGE_IP}
     Connect To Pod Over Local Interface    ${BRIDGE_POD_NAME}    ${NAMESPACE}    ${BRIDGE_INTERFACE}
 
+    Verify Multus Embedded Manifests
+
     [Teardown]    Remove NAD And Pod    ${BRIDGE_NAD_YAML}    ${BRIDGE_POD_YAML}
 
 
@@ -52,3 +54,16 @@ Setup
 Teardown
     [Documentation]    Test suite teardown
     Teardown Suite With Namespace
+
+Verify Multus Embedded Manifests
+    [Documentation]    Delete Multus' DHCP Daemon and reboot host to make sure
+    ...    it comes back even though the manifests do not exist anymore.
+
+    SSHLibrary.File Should Exist    /etc/greenboot/check/required.d/41_microshift_running_check_multus.sh
+    SSHLibrary.File Should Exist    /etc/crio/crio.conf.d/12-microshift-multus.conf
+    SSHLibrary.Directory Should Not Exist    /usr/lib/microshift/manifests.d/000-microshift-multus/
+
+    Oc Delete    -n openshift-multus ds/dhcp-daemon
+    Reboot MicroShift Host
+    Wait Until Greenboot Health Check Exited
+    Oc Get    daemonset    openshift-multus    dhcp-daemon

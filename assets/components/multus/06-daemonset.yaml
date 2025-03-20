@@ -32,7 +32,7 @@ spec:
       - operator: Exists
       initContainers:
       - name: install-container-network-plugins
-        image: containernetworking-plugins-microshift
+        image: '{{ .ContainerNetworkingPluginsImage }}'
         imagePullPolicy: IfNotPresent
         command: [ "/bin/bash", "-ec", "--" ]
         args:
@@ -51,7 +51,7 @@ spec:
           value: "{bridge,ipvlan,macvlan,static,dhcp,host-local}"
       containers:
       - name: kube-multus
-        image: multus-cni-microshift
+        image: '{{ .MultusCNIImage }}'
         imagePullPolicy: IfNotPresent
         command: [ "/bin/bash", "-ec", "--" ]
         args:

@@ -12,6 +12,10 @@ import (
 // +kubebuilder:validation:Enum:="";none;ovnk
 type CNIPlugin string
 
+// MultusStatusEnum is an enum value that determines whether MicroShift deploys Multus CNI.
+// +kubebuilder:validation:Enum:=Enabled;Disabled
+type MultusStatusEnum string
+
 const (
 	// CniPluginUnset exists to support backwards compatibility with existing MicroShift clusters. When .network.cniPlugin is
 	// "", MicroShift will default to deploying OVNK. This preserves the current deployment behavior of existing
@@ -24,6 +28,12 @@ const (
 	// CniPluginOVNK is equivalent to CniPluginUnset, and explicitly tells MicroShift to deploy OVNK. This option exists to
 	// provide a differentiation between OVNK and potential future CNI options.
 	CniPluginOVNK CNIPlugin = "ovnk"
+
+	// MultusEnabled signals MicroShift to deploy Multus CNI.
+	MultusEnabled MultusStatusEnum = "Enabled"
+
+	// MultusEnabled signals MicroShift to not deploy Multus CNI.
+	MultusDisabled MultusStatusEnum = "Disabled"
 )
 
 type Network struct {
@@ -55,6 +65,13 @@ type Network struct {
 	// +kubebuilder:validation:Pattern=`^([0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])-([0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$`
 	// +kubebuilder:default="30000-32767"
 	ServiceNodePortRange string `json:"serviceNodePortRange"`
+
+	// MultusStatus controls the deployment of the Multus CNI.
+	// Changing from "Enabled" to "Disabled" will not cause Multus CNI to be deleted.
+	// Allowed values are: unset (disabled), "Enabled", or "Disabled"
+	//
+	// +kubebuilder:validation:Optional
+	MultusStatus MultusStatusEnum `json:"multusStatus"`
 
 	// The DNS server to use
 	DNS string `json:"-"`
@@ -100,4 +117,8 @@ func (n Network) validCNIPlugin() (isSupported bool) {
 // upgrade from enabled-by-default to disabled-by-default.
 func (n Network) IsEnabled() bool {
 	return n.CNIPlugin != CniPluginNone
+}
+
+func (n Network) IsMultusEnabled() bool {
+	return n.MultusStatus == MultusEnabled
 }
