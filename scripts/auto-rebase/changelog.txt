@@ -1,9 +1,4 @@
-- cluster-network-operator embedded-component 58ddfcfac19f71930ccb55614f40fe7f8dbc5b05 to 8f0b637e09e55c50a06ffd0c1db812ed09b5ad3c
-  - 323704a 2025-02-27T20:04:44+02:00 ovn-k, units-test: Test OVN Kubernetes rendering
-  - a4ece26 2025-02-27T19:58:21+02:00 ovn-k,rbac: Enable non-admin users create & modify UDN CRs
-  - 93fa2a9 2025-02-27T19:58:21+02:00 ovn-k,rbac: Add UDN to cluster-reader
-
-- machine-config-operator embedded-component 0f85e35a0b9f7342907597e74e20dfc9fa30ee67 to a2af041b7eb58071d034090e0b451b51177a147f
-  - ef6f57ea 2025-03-04T16:50:20+00:00 OCPBUGS-48566: Enable nmstate-configuration on all platforms
-  - f13a830a 2025-02-18T17:22:51+00:00 daemon: add nil check for annotation fetching
+- machine-config-operator embedded-component a2af041b7eb58071d034090e0b451b51177a147f to e22d6adfdffb9ee3af2b5518910c22e231306a25
+  - e472fcdc 2025-03-18T00:12:57+00:00 daemon: ensure ostree-finalize-staged is started before rebooting
+  - 4d44c277 2025-02-28T01:18:04+00:00 Enforce VIPs to be collocated at the same host
 
