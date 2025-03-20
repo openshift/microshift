@@ -11,8 +11,7 @@ scenario_create_vms() {
     prepare_kickstart host1 kickstart.ks.template rhel-9.4-microshift-source-optionals
     # Two nics - one for macvlan, another for ipvlan (they cannot enslave the same interface)
     launch_vm  --network "${VM_MULTUS_NETWORK},${VM_MULTUS_NETWORK}"
-    local tempfile
-    tempfile=$(mktemp)
+    local -r tempfile="$(mktemp)"
 
     copy_file_from_vm "host1" /etc/microshift/opentelemetry-collector.yaml "${tempfile}"
     # add the debug exporter and set all pipelines to use only the debug exporter. This is necessary, otherwise

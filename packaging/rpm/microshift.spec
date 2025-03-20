@@ -249,7 +249,7 @@ Deploys the Red Hat build of OpenTelemetry-Collector as a systemd service on hos
 certificates to permit access to the kube-apiserver metrics endpoints. If a user-defined OpenTelemetry-Collector exists
 at /etc/microshift/opentelemetry-collector.yaml, this config is used. Otherwise, a default config is provided. Note that
 the default configuration requires the backend endpoint be set by the user. The OTLP export must also be specified as
-.service.pipelines.$RECIEVER.exporter: "otlp". The specification for the OTLP configuration is:
+.service.pipelines.$RECEIVER.exporter: "otlp". The specification for the OTLP configuration is:
 
   otlp:
     sending_queue:
@@ -580,11 +580,7 @@ install -p -m644 packaging/observability/opentelemetry-collector.yaml -D %{build
 install -p -m644 packaging/observability/microshift-observability.service %{buildroot}%{_unitdir}/
 install -p -m644 packaging/observability/90-enable-microshift-observability.preset %{buildroot}%{_presetdir}/
 install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/003-microshift-observability/
-install -p -m644 assets/optional/observability/00-namespace.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/003-microshift-observability/00-namespace.yaml
-install -p -m644 assets/optional/observability/01-service-account.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/003-microshift-observability/01-service-account.yaml
-install -p -m644 assets/optional/observability/02-cluster-role.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/003-microshift-observability/02-cluster-role.yaml
-install -p -m644 assets/optional/observability/03-cluster-role-binding.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/003-microshift-observability/03-cluster-role-binding.yaml
-install -p -m644 assets/optional/observability/kustomization.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/003-microshift-observability/kustomization.yaml
+install -p -m644 assets/optional/observability/*.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/003-microshift-observability/
 
 %pre networking
 
@@ -772,11 +768,7 @@ fi
 %{_unitdir}/microshift-observability.service
 %{_presetdir}/90-enable-microshift-observability.preset
 %{_sysconfdir}/microshift/opentelemetry-collector.yaml
-%{_prefix}/lib/microshift/manifests.d/003-microshift-observability/00-namespace.yaml
-%{_prefix}/lib/microshift/manifests.d/003-microshift-observability/01-service-account.yaml
-%{_prefix}/lib/microshift/manifests.d/003-microshift-observability/02-cluster-role.yaml
-%{_prefix}/lib/microshift/manifests.d/003-microshift-observability/03-cluster-role-binding.yaml
-%{_prefix}/lib/microshift/manifests.d/003-microshift-observability/kustomization.yaml
+%{_prefix}/lib/microshift/manifests.d/003-microshift-observability/*
 
 
 # Use Git command to generate the log and replace the VERSION string

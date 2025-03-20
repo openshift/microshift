@@ -27,8 +27,11 @@ def get_journal_cursor(unit="microshift") -> str:
 
 
 def get_log_output_with_pattern(cursor: str, pattern: str, unit="microshift") -> tuple[str, int]:
-    """Get the logs since the cursor matching the pattern and return the log content and exit code. Optional argument
-    `unit` may be used to specify a systemd unit other than microshift, for example microshift-observability.service."""
+    """
+    Get the logs since the cursor matching the pattern and return the log content and exit code.
+    Optional argument `unit` may be used to specify a systemd unit other than microshift,
+    for example microshift-observability.service.
+    """
     stdout, rc = libostree.remote_sudo_rc(
         f"journalctl -u {unit} --cursor='{cursor}' --no-pager --grep '{pattern}'"
     )
