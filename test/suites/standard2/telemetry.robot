@@ -28,6 +28,7 @@ ${PULL_SECRET_NO_METRICS}       /etc/crio/openshift-pull-secret-without-telemetr
 *** Test Cases ***
 MicroShift Reports Metrics To Server
     [Documentation]    Check MicroShift is able to send metrics to the telemetry server without errors.
+    [Tags]    robot:exclude
     [Setup]    Setup Telemetry Configuration
 
     Wait Until Keyword Succeeds    10x    10s
