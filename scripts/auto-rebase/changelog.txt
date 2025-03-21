@@ -1,0 +1,12 @@
+- api embedded-component 8a7efbfb531684ef0ff566a882096df03e0f499c to 477760860ebdd921db389cf539439b0ec1064179
+  - 28ccba1d 2025-03-19T16:40:27-04:00 remove inactive reviewers and ex-Red Hatters from OWNERS, add everettraven
+  - 80f8dcff 2025-03-19T11:12:08+00:00 Remove patch tags from CRD conditions
+  - ea7057f8 2025-03-18T14:11:59+00:00 Update KAL to the latest version
+  - c86f460c 2025-03-11T10:46:36+01:00 add MaxAllowedBlockVolumesPerNode field to VSphereCSIDriverConfigSpec
+
+- cluster-network-operator embedded-component 510b7508ad7a66d1742c5d9f83a4143fa860029c to 1daca87a5c6ebd5e6d7b5bcc4374119b59061af6
+  - 11c08e6 2025-03-17T23:22:49+01:00 Check on ipsec.service instead of libreswan package on host
+  - cb99bc3 2025-03-17T20:02:27+01:00 Add version check for machine config operator
+  - 865ac69 2025-03-17T19:38:45+01:00 Mount top level directory for IPsec host paths
+  - 37693e9 2025-03-17T19:38:45+01:00 Move to use newer IPsec DaemonSets irrespective of MCP state
+

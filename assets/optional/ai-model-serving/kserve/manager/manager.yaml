@@ -27,6 +27,8 @@ spec:
       containers:
       - command:
         - /manager
+        args:
+        - "--leader-elect"
         image: ko://github.com/kserve/kserve/cmd/manager
         imagePullPolicy: Always
         name: manager

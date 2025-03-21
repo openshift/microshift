@@ -2,8 +2,8 @@
 # For RHOAI kserve configuration see: assets/optional/ai-model-serving/kserve/overlays/odh/inferenceservice-config-patch.yaml
 # For upstream kserve configuration and description of the config see: assets/optional/ai-model-serving/kserve/configmap/inferenceservice.yaml
 #
-# The difference compared to RHOAI's kserve configuration is the `deploy` section setting:
-# `defaultDeploymentMode` set to `RawDeployment`.
+# The difference compared to RHOAI's kserve configuration is the 'deploy' section setting:
+# 'defaultDeploymentMode' set to 'RawDeployment'.
 #
 # The ingress (istio) is disabled (just like RHOAI, unlike the upstream).
 apiVersion: v1
@@ -13,6 +13,14 @@ metadata:
   namespace: kserve
 data:
   explainers: "{}"
+  oauthProxy: |- 
+    {
+      "image" : "$(oauth-proxy)",
+      "memoryRequest": "64Mi",
+      "memoryLimit": "128Mi",
+      "cpuRequest": "100m",
+      "cpuLimit": "200m"
+    }
   storageInitializer: |-
     {
         "image" : "$(kserve-storage-initializer)",
@@ -34,7 +42,7 @@ data:
         "ingressClassName" : "istio",
         "domainTemplate": "{{ .Name }}-{{ .Namespace }}.{{ .IngressDomain }}",
         "urlScheme": "https",
-        "disableIstioVirtualHost": false,
+        "disableIstioVirtualHost": false, 
         "disableIngressCreation": true
     }
   logger: |-
@@ -68,7 +76,12 @@ data:
         "memoryRequest": "100Mi",
         "memoryLimit": "1Gi",
         "cpuRequest": "100m",
-        "cpuLimit": "1"
+        "cpuLimit": "1",
+        "headers": {
+          "propagate": [
+            "Authorization"
+          ]
+        }
     }
   deploy: |-
     {
