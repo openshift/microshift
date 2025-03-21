@@ -50,10 +50,10 @@ FSFREEZE_HOOK_PATHNAME=/etc/qemu-ga/fsfreeze-hook\n' > /etc/sysconfig/qemu-ga
 COPY --chmod=755 ./bootc-images/microshift-copy-images.sh /usr/bin/microshift-copy-images
 RUN --mount=type=secret,id=pullsecret,dst=/run/secrets/pull-secret.json \
     images="$(jq -r ".images[]" /usr/share/microshift/release/release-"$(uname -m)".json)" ; \
-    IMAGE_PULL_LIST="${images}" /usr/bin/microshift-copy-images -pull
+    IMAGE_PULL_LIST="${images}" /usr/bin/microshift-copy-images pull
 
 # Images are filtered:
-# - 'kserve*'' are required for the kserve components
+# - 'kserve*' are required for the kserve components
 # - 'ovms-image' is needed for OpenVino Model Server
 # Images of remaining ServingRuntimes are omitted due to their size (they vary between 2 and 5 GiB).
 # Embedding them would unnecessarily increase size of the bootc image, size of the ISO installer,
@@ -63,11 +63,11 @@ RUN --mount=type=secret,id=pullsecret,dst=/run/secrets/pull-secret.json \
 RUN --mount=type=secret,id=pullsecret,dst=/run/secrets/pull-secret.json \
     images="$(jq -r '.images | with_entries(select(.key | startswith("kserve") or startswith("ovms-image"))) | .[]' /usr/share/microshift/release/release-ai-model-serving-"$(uname -m)".json)" ; \
     images="${images} quay.io/microshift/ai-testing-model:ovms-resnet50" ; \
-    IMAGE_PULL_LIST="${images}" /usr/bin/microshift-copy-images -pull
+    IMAGE_PULL_LIST="${images}" /usr/bin/microshift-copy-images pull
 
 # Install a systemd drop-in unit to address the problem with image upgrades
 # overwriting the container images in additional store. The workaround is to
-# copy the images from the pre-loaded to the main container storage directory.
+# copy the images from the pre-loaded to the main container storage.
 # In this case, it is not necessary to update /etc/containers/storage.conf with
 # the additional store path.
 # See https://issues.redhat.com/browse/RHEL-75827
