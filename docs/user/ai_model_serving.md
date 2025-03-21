@@ -14,11 +14,9 @@ Now you can train your models in the cloud and serve them on the edge.
 
 ## Supported model-serving runtimes
 
-Currently MicroShift supports following model-serving runtimes:
+Currently AI Model Serving on MicroShift ships with following model-serving runtimes:
 - OpenVINO Model Server
 - vLLM ServingRuntime for KServe
-
-Following runtimes are included but not supported at the time:
 - Caikit Text Generation Inference Server (Caikit-TGIS) ServingRuntime for KServe
 - Caikit Standalone ServingRuntime for KServe
 - Text Generation Inference Server (TGIS) Standalone ServingRuntime for KServe
@@ -34,11 +32,11 @@ for details about the model-serving runtimes.
 1. Develop, train, test, and prepare model for serving
 1. Configure the OS and MicroShift for the hardware - driver & device plugin
 1. Install `microshift-ai-model-serving` package (and restart MicroShift)
-1. (Optional) Package model into an OCI image (ModelCar)
+1. Package model into an OCI image (ModelCar)
 1. Select suitable model-serving runtime (Model Server)
 1. Copy ServingRuntime Custom Resource from `redhat-ods-applications` to your own namespace
 1. Create `InferenceService` object
-1. (Optional) Create `Route` object
+1. Create `Route` object
 1. Make requests against the model server
 
 ## Setting up hardware - drivers and device plugins
@@ -79,10 +77,10 @@ with Raw Deployment mode enabled and `ServingRuntimes` objects in the `redhat-od
 
 To install AI Model Serving for MicroShift run following command:
 ```bash
-sudo dnf install microshift-ai-model-serving
+sudo dnf install -y microshift-ai-model-serving
 ```
 
-After installing the package (and restarting MicroShift),
+After installing the package and restarting MicroShift,
 there should be new Pod running in the `redhat-ods-applications` namespace:
 ```sh
 $ oc get pods -n redhat-ods-applications
@@ -94,7 +92,7 @@ You can also install the release info package. It contains JSON file with image 
 useful for offline procedures or deploying copy of a ServingRuntime to your namespace during
 a bootc image build:
 ```bash
-sudo dnf install microshift-ai-model-serving-release-info
+sudo dnf install -y microshift-ai-model-serving-release-info
 ```
 
 ### Packaging the AI model into an OCI image (ModelCar)
