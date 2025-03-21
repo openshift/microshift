@@ -174,30 +174,6 @@ original definition on the disk.
 For more information about ServingRuntimes refer to the
 [RHOAI documentation](https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self-managed/2.17/html/serving_models/serving-large-models_serving-large-models#model-serving-runtimes_serving-large-models)
 
-#### Exporting ServingRuntime from a live cluster
-
-Use following command to list available ServingRuntimes:
-```sh
-oc get -n redhat-ods-applications servingruntimes
-```
-
-Run following command to save ServingRuntime definition to a YAML file:
-```sh
-oc get -n redhat-ods-applications servingruntimes kserve-ovms -o yaml > ovms.yaml
-```
-
-Edit the saved file and remove `.metadata.namespace` to allow creating the object in different namespace.
-Optionally, remove also other metadata:
-- `creationTimestamp`
-- `generation`
-- `resourceVersion`
-- `uid`
-
-Re-create the ServingRuntime in a custom namespace:
-```sh
-oc create -n ai-demo -f ./ovms.yaml
-```
-
 #### Create ServingRuntime based on installed manifests and release info
 
 This approach does not require a live cluster, so it can be part of CI/CD automation.
