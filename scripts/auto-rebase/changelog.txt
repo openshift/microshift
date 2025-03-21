@@ -1,6 +1,34 @@
-- cluster-network-operator embedded-component 475a4839fa80f73d0cc154fb49197574511d073a to 5d380cb3a88d78ac5c6f3d8dd8188d06ac6da1b4
-  - aeda5f8 2025-03-02T12:08:00+02:00 frr-k8s: align manifests with operator
+- cluster-ingress-operator embedded-component a730e8a7af570d3921cd44c1468f38a250a6e647 to b0222ed2054e3ff7b87f4f90d72b42b6cf2b53a7
+  - e05ad9a 2025-03-14T11:25:22+00:00 Add e2e for GatewayAPI CRDs pre-upgrade check
+  - 4b23f97 2025-03-14T11:20:03+00:00 Add Gateway API CRDs test cases to computeOperatorUpgradeableCondition unit test
+  - f1b9360 2025-03-14T10:50:33+00:00 Add GatewayAPI CRDs pre-upgrade check in Operator's Upgradeable condition
+  - 00a3f73 2025-03-13T23:03:38+00:00 Refactor status controller: computeOperatorUpgradeableCondition
 
-- operator-framework-olm embedded-component 877b6fd3d425043a1bd45b5d24ecebb69f5544c4 to 802665ed8c0a1b62165353151da210addbfe0c73
-  - 5d11fcbe 2025-03-12T19:49:11+00:00 add missing pod disruption reasons to isPodDead (#3519)
+- machine-config-operator embedded-component 9f18ef9ca8a4aff64948a11967d50d4c60606f82 to 4bcd4e66dce68e03e5026e378447377af10ac827
+  - bb95f1f2 2025-03-14T04:16:16+00:00 daemon: ensure ostree-finalize-staged is started before rebooting
+  - 17a67182 2025-03-14T01:02:22+00:00 kubelet_config_controller: Update ObservedGeneration render_controller: Make function name AreMCGeneratingSubControllersCompletedForPool explicit apihelpers: match the KubeletConfig to the Pool using MachineConfigPoolSelector
+
+- operator-framework-olm embedded-component 802665ed8c0a1b62165353151da210addbfe0c73 to cc44b486ea91015a30946029b3a0be3af49ea789
+  - 98179cd7 2025-03-14T00:35:54+00:00 Ensure that PSA label is latest instead of pinning versions
+
+- service-ca-operator embedded-component 1f7d6472fea332fc307d9c8911f8c3cf57347755 to 30efb529a5b7db5d6f352f6ac0470d8385268539
+  - 0dea2d8 2025-01-08T15:32:48+01:00 Bump api, update CRD path
+  - 11c4e24 2025-01-08T15:32:42+01:00 React to library-go changes
+  - 6b3c72b 2025-01-08T15:32:36+01:00 Bump library-go
+  - e4d34c5 2025-01-08T15:32:26+01:00 Updating ose-service-ca-operator-container image to be consistent with ART for 4.18 Reconciling with https://github.com/openshift/ocp-build-data/tree/827ab4ccce9cbbcf82c9dbaf6398b61d6cff8d7a/images/ose-service-ca-operator.yml
+  - 4684f3f 2025-01-08T15:32:18+01:00 Bump go to 1.22.0
+
+- service-ca-operator image-amd64 1f7d6472fea332fc307d9c8911f8c3cf57347755 to 30efb529a5b7db5d6f352f6ac0470d8385268539
+  - 0dea2d8 2025-01-08T15:32:48+01:00 Bump api, update CRD path
+  - 11c4e24 2025-01-08T15:32:42+01:00 React to library-go changes
+  - 6b3c72b 2025-01-08T15:32:36+01:00 Bump library-go
+  - e4d34c5 2025-01-08T15:32:26+01:00 Updating ose-service-ca-operator-container image to be consistent with ART for 4.18 Reconciling with https://github.com/openshift/ocp-build-data/tree/827ab4ccce9cbbcf82c9dbaf6398b61d6cff8d7a/images/ose-service-ca-operator.yml
+  - 4684f3f 2025-01-08T15:32:18+01:00 Bump go to 1.22.0
+
+- service-ca-operator image-arm64 1f7d6472fea332fc307d9c8911f8c3cf57347755 to 30efb529a5b7db5d6f352f6ac0470d8385268539
+  - 0dea2d8 2025-01-08T15:32:48+01:00 Bump api, update CRD path
+  - 11c4e24 2025-01-08T15:32:42+01:00 React to library-go changes
+  - 6b3c72b 2025-01-08T15:32:36+01:00 Bump library-go
+  - e4d34c5 2025-01-08T15:32:26+01:00 Updating ose-service-ca-operator-container image to be consistent with ART for 4.18 Reconciling with https://github.com/openshift/ocp-build-data/tree/827ab4ccce9cbbcf82c9dbaf6398b61d6cff8d7a/images/ose-service-ca-operator.yml
+  - 4684f3f 2025-01-08T15:32:18+01:00 Bump go to 1.22.0
 
