@@ -3,7 +3,7 @@
     "base": "4.18.0-0.nightly-arm64-2024-08-29-120159"
   },
   "images": {
-    "flannel": "docker.io/flannel/flannel@sha256:16fc8a9bc02163d9c02056ec6ac649d47f6f9a5e3adb5c1f2e93b547dba1315f",
-    "flannel-plugin": "docker.io/flannel/flannel-cni-plugin@sha256:2a6ed38c6f14402aec3433ca0613a3a0e54993d3fa59124687dd94cb39fb59cb"
+    "flannel": "docker.io/flannel/flannel@sha256:2a120e84be40412d2ce27c483165e2e8ccb4941fb33568aa8c68beb9140968f9",
+    "flannel-plugin": "docker.io/flannel/flannel-cni-plugin@sha256:72d30ed052c1ef18cb3de6357009ffb7e5f8eb99599b3e216a4ff692d47c5796"
   }
 }
