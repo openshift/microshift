@@ -1,6 +1,7 @@
 *** Settings ***
 Documentation       Keywords for working with the MicroShift host
 
+Library             OperatingSystem
 Library             SSHLibrary
 Library             libostree.py
 

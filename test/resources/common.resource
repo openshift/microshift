@@ -128,3 +128,13 @@ Create Remote Dir For Path
     ...    mkdir -pZ $(dirname ${file_path})
     ...    sudo=True    return_rc=True    return_stdout=True    return_stderr=True
     Should Be Equal As Integers    0    ${rc}
+
+Local Command Should Work
+    [Documentation]    Run a command localy, log stdout, fail if RC is not 0, return stdout.
+    ...    stderr is redirected to the stdout
+    [Arguments]    ${command}
+    ${rc}    ${stdout}=    Run And Return RC And Output
+    ...    ${command} 2>&1
+    Log    ${stdout}
+    Should Be Equal As Integers    0    ${rc}
+    RETURN    ${stdout}

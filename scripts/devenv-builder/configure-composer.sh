@@ -13,7 +13,7 @@ install_and_configure_composer() {
         git composer-cli ostree rpm-ostree \
         cockpit-composer bash-completion podman runc genisoimage \
         createrepo yum-utils selinux-policy-devel jq wget lorax rpm-build \
-        containernetworking-plugins expect httpd-tools"
+        containernetworking-plugins expect httpd-tools vim-common"
 
     # The mock utility comes from the EPEL repository
     "${DNF_RETRY}" "install" "https://dl.fedoraproject.org/pub/epel/epel-release-latest-${version_id_major}.noarch.rpm"

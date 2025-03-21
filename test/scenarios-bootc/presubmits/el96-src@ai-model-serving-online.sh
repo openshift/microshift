@@ -18,8 +18,8 @@ scenario_create_vms() {
     check_platform true
 
     # Increased disk size because of the additional embedded images (especially OVMS which is ~3.5GiB)
-    LVM_SYSROOT_SIZE=20480 prepare_kickstart host1 kickstart-bootc-offline.ks.template rhel96-bootc-source-ai-model-serving
-    launch_vm --boot_blueprint rhel96-bootc-source-ai-model-serving --no_network --vm_disksize 30
+    LVM_SYSROOT_SIZE=20480 prepare_kickstart host1 kickstart-bootc.ks.template rhel96-bootc-source-optionals
+    launch_vm --boot_blueprint rhel96-bootc --vm_disksize 30
 }
 
 scenario_remove_vms() {
@@ -31,8 +31,6 @@ scenario_remove_vms() {
 scenario_run_tests() {
     check_platform
 
-    local -r full_guest_name=$(full_vm_name host1)
     run_tests host1 \
-        --variable "GUEST_NAME:${full_guest_name}" \
-        suites/ai-model-serving/ai-model-serving.robot
+        suites/ai-model-serving/ai-model-serving-online.robot
 }

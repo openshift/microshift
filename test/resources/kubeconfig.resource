@@ -2,6 +2,7 @@
 Documentation       Keywords for accessing a kubeconfig file for the MicroShift host
 
 Library             OperatingSystem
+Library             Process
 Library             String
 Library             DataFormats.py
 Library             libipv6.py
@@ -56,7 +57,7 @@ Run With Kubeconfig
     [Documentation]    Run a command using KUBECONFIG from the test suite.
     [Arguments]    ${cmd}    ${allow_fail}=False    ${return_rc}=False
     ${stdout_file}=    Create Random Temp File
-    ${result}=    Run Process    ${cmd}    env:KUBECONFIG=${KUBECONFIG}
+    ${result}=    Process.Run Process    ${cmd}    env:KUBECONFIG=${KUBECONFIG}
     ...    stderr=STDOUT    shell=True
     ...    stdout=${stdout_file}
 
