@@ -99,7 +99,7 @@ func (t *TelemetryManager) Run(ctx context.Context, ready chan<- struct{}, stopp
 		}
 	}
 
-	klog.Infof("MicroShift starting, sending first metrics collection")
+	klog.Infof("MicroShift telemetry starting, sending first metrics collection. Cluster Id: %v", clusterId)
 	collectAndSend()
 
 	ticker := time.NewTicker(time.Hour)
