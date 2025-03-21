@@ -217,7 +217,9 @@ write_lvms_images_for_arch(){
         for included in "${include_images[@]}"; do
             if [[ "${name}" == "${included}" ]]; then
                 name="$(echo "${name}" | tr '-' '_')"
-                yq -iP -o=json e '.images["'"${name}"'"] = "'"${img}"'"' "${REPOROOT}/assets/release/release-${GOARCH_TO_UNAME_MAP[${arch}]}.json"
+                arch_digest=$(oc -a "${PULL_SECRET_FILE}" image info -o json --filter-by-os "linux/${arch}" "${img}" | jq -r '.digest')
+                arch_img="${img%@*}@${arch_digest}"
+                name="${name}" img="${arch_img}" yq -iP -o=json e '.images[env(name)] = env(img)' "${REPOROOT}/assets/release/release-${GOARCH_TO_UNAME_MAP[${arch}]}.json"
                 break;
             fi
         done
@@ -247,6 +249,8 @@ update_lvms_manifests() {
         return 1
     }
     "${REPOROOT}/scripts/auto-rebase/handle_assets.py" ./scripts/auto-rebase/lvms_assets.yaml
+
+    yq -i '.spec.template.spec.containers[0].image = "{{ .ReleaseImage.lvms_operator }}"' "${REPOROOT}/assets/components/lvms/lvms-operator_apps_v1_deployment.yaml"
 }
 
 update_last_lvms_rebase() {
