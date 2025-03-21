@@ -816,6 +816,7 @@ EOF
 
     update_olm_images
     update_multus_images
+    update_kubeproxy_images
 
     popd >/dev/null
 }
@@ -1115,6 +1116,44 @@ patches:
       kind: Deployment
       labelSelector: app=catalog-operator
 EOF
+    done  # for goarch
+}
+
+update_kubeproxy_images() {
+    title "Rebasing kube-proxy images"
+
+    for goarch in amd64 arm64; do
+        arch=${GOARCH_TO_UNAME_MAP["${goarch}"]:-noarch}
+
+        local release_file="${STAGING_DIR}/release_${goarch}.json"
+        local kustomization_arch_file="${REPOROOT}/assets/optional/kube-proxy/kustomization.${arch}.yaml"
+        local kubeproxy_release_json="${REPOROOT}/assets/optional/kube-proxy/release-kube-proxy-${arch}.json"
+
+        local base_release
+        base_release=$(jq -r ".metadata.version" "${release_file}")
+        jq -n "{\"release\": {\"base\": \"$base_release\"}, \"images\": {}}" > "${kubeproxy_release_json}"
+
+        # Create extra kustomization for each arch in separate file.
+        # Right file (depending on arch) should be appended during rpmbuild to kustomization.yaml.
+        cat <<EOF > "${kustomization_arch_file}"
+
+images:
+EOF
+
+        for container in kube-proxy; do
+            local new_image
+            new_image=$(jq -r ".references.spec.tags[] | select(.name == \"${container}\") | .from.name" "${release_file}")
+            local new_image_name="${new_image%@*}"
+            local new_image_digest="${new_image#*@}"
+
+            cat <<EOF >> "${kustomization_arch_file}"
+  - name: ${container}
+    newName: ${new_image_name}
+    digest: ${new_image_digest}
+EOF
+
+            yq -i -o json ".images += {\"${container}\": \"${new_image}\"}" "${kubeproxy_release_json}"
+        done  # for container
     done  # for goarch
 }
 
