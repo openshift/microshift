@@ -109,7 +109,8 @@ See "How to build a ModelCar container" section of
 article for guidance on building OCI image with a model from Hugging Face suitable for an vLLM model server.
 
 ```Dockerfile
-FROM quay.io/microshift/busybox:1.37
+FROM registry.access.redhat.com/ubi9/ubi-minimal:latest
+RUN microdnf install -y wget && microdnf clean all
 RUN mkdir -p /models/1 && chmod -R 755 /models/1
 RUN wget -q -P /models/1 \
   https://storage.openvinotoolkit.org/repositories/open_model_zoo/2022.1/models_bin/2/resnet50-binary-0001/FP32-INT1/resnet50-binary-0001.bin \
@@ -133,26 +134,31 @@ will be ignored. If you use any other tag, the `imagePullPolicy:` is set to `IfN
 
 ```sh
 $ sudo podman build -t ovms-resnet50:test .
-STEP 1/3: FROM quay.io/microshift/busybox:1.37
-Trying to pull quay.io/microshift/busybox:1.37...
+STEP 1/4: FROM registry.access.redhat.com/ubi9/ubi-minimal:latest
+Trying to pull registry.access.redhat.com/ubi9/ubi-minimal:latest...
 Getting image source signatures
-Copying blob a46fbb00284b done   |
-Copying config 27a71e19c9 done   |
+Checking if image destination supports signatures
+Copying blob 533b69cfd644 done   |
+Copying blob 863e9a7e2102 done   |
+Copying config 098048e6f9 done   |
 Writing manifest to image destination
-STEP 2/3: RUN mkdir -p /models/1 && chmod -R 755 /models/1
---> eacb7039436a
-STEP 3/3: RUN wget -q -P /models/1   https://storage.openvinotoolkit.org/repositories/open_model_zoo/2022.1/models_bin/2/resnet50-binary-0001/FP32-INT1/resnet50-binary-0001.bin   https://storage.openvinotoolkit.org/repositories/open_model_zoo/2022.1/models_bin/2/resnet50-binary-0001/FP32-INT1/resnet50-binary-0001.xml
-wget: note: TLS certificate validation not implemented
-COMMIT ovms-resnet50
---> ac4606eb6cb3
+Storing signatures
+STEP 2/4: RUN microdnf install -y wget && microdnf clean all
+<< SNIP >>
+--> 4c74352ad42e
+STEP 3/4: RUN mkdir -p /models/1 && chmod -R 755 /models/1
+--> bfd31acb1e81
+STEP 4/4: RUN wget -q -P /models/1   https://storage.openvinotoolkit.org/repositories/open_model_zoo/2022.1/models_bin/2/resnet50-binary-0001/FP32-INT1/resnet50-binary-0001.bin   https://storage.openvinotoolkit.org/repositories/open_model_zoo/2022.1/models_bin/2/resnet50-binary-0001/FP32-INT1/resnet50-binary-0001.xml
+COMMIT ovms-resnet50:test
+--> 375b265c1c4b
 Successfully tagged localhost/ovms-resnet50:test
-ac4606eb6cb3e6be2fbee9d6bc271df212eb22e6a45a2c33394d9c73dc3bb4cf
+375b265c1c4bc6f0a059c8739fb2b3a46e1b563728f6d9c51f26f29bb2c87c3e
 ```
 
 Run the following command to make sure the image exists:
 ```sh
 $ sudo podman images | grep ovms-resnet50
-localhost/ovms-resnet50          test          ac4606eb6cb3  3 minutes ago  27.5 MB
+localhost/ovms-resnet50          test          375b265c1c4b  3 minutes ago  136 MB
 ```
 
 ### Creating your namespace
