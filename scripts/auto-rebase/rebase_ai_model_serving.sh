@@ -22,6 +22,7 @@ PULL_SECRET_FILE="${HOME}/.pull-secret.json"
 RELEASE_JSON="${REPOROOT}/assets/optional/ai-model-serving/release-ai-model-serving-x86_64.json"
 
 KEEP_STAGING="${KEEP_STAGING:-false}"
+NO_BRANCH=${NO_BRANCH:-false}
 
 title() {
     echo -e "\E[34m$1\E[00m";
@@ -133,6 +134,28 @@ update_kserve() {
         local image_ref="${image#*=}"
         yq -i ".images.${image_name} = \"${image_ref}\"" "${RELEASE_JSON}"
     done
+
+    # Update kserve's config
+    local -r microshift_config="${REPOROOT}/assets/optional/ai-model-serving/kserve/inferenceservice-config-microshift-patch.yaml"
+    local -r rhoai_config="${REPOROOT}/assets/optional/ai-model-serving/kserve/overlays/odh/inferenceservice-config-patch.yaml"
+
+    # Clear the file and add a comment on top
+    cat <<EOF > "${microshift_config}"
+# This is a MicroShift specific kserve configuration.
+# For RHOAI kserve configuration see: assets/optional/ai-model-serving/kserve/overlays/odh/inferenceservice-config-patch.yaml
+# For upstream kserve configuration and description of the config see: assets/optional/ai-model-serving/kserve/configmap/inferenceservice.yaml
+#
+# The difference compared to RHOAI's kserve configuration is the 'deploy' section setting:
+# 'defaultDeploymentMode' set to 'RawDeployment'.
+#
+# The ingress (istio) is disabled (just like RHOAI, unlike the upstream).
+EOF
+
+    # Append upstream RHOAI config
+    cat "${rhoai_config}" >> "${microshift_config}"
+
+    # Change Deployment Mode
+    sed -i 's/"defaultDeploymentMode": "Serverless"/"defaultDeploymentMode": "RawDeployment"/g' "${microshift_config}"
 }
 
 update_runtimes() {
@@ -160,7 +183,7 @@ update_runtimes() {
 images:
 EOF
 
-    local -r images=$(cat "${STAGING_OPERATOR}"/odh-model-controller/base/*.env | grep "\-image")
+    local -r images=$(cat "${STAGING_OPERATOR}"/modelcontroller/base/*.env | grep "\-image")
     for image in ${images}; do
         local image_name="${image%=*}"
         local image_ref="${image#*=}"
@@ -208,9 +231,13 @@ rebase_ai_model_serving_to() {
     process_rhoai_manifests
 
     if [[ -n "$(git status -s assets ./scripts/auto-rebase/last_rebase_ai_model_serving.sh)" ]]; then
-        branch="rebase-ai-model_serving-${version}"
-        title "Detected changes to assets/ or last_rebase_ai_model_serving.sh - creating branch ${branch}"
-        git branch -D "${branch}" 2>/dev/null || true && git checkout -b "${branch}"
+        title "Detected changes to assets/ or last_rebase_ai_model_serving.sh"
+
+        if ! "${NO_BRANCH}"; then
+            branch="rebase-ai-model_serving-${version}"
+            title "Creating branch ${branch}"
+            git branch -D "${branch}" 2>/dev/null || true && git checkout -b "${branch}"
+        fi
 
         title "Committing changes"
         git add assets ./scripts/auto-rebase/last_rebase_ai_model_serving.sh

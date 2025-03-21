@@ -59,6 +59,7 @@ func TestConfigure(t *testing.T) {
 		"--controllers=-bootstrapsigner",
 		"--controllers=-tokencleaner",
 		"--controllers=-ttl",
+		"--controllers=selinux-warning-controller",
 		"--enable-dynamic-provisioning=true",
 		"--kube-api-burst=300",
 		"--kube-api-qps=150",

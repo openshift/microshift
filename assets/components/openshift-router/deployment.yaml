@@ -7,6 +7,7 @@ spec:
     metadata:
       annotations:
         target.workload.openshift.io/management: '{"effect": "PreferredDuringScheduling"}'
+        openshift.io/required-scc: restricted
       labels:
         ingresscontroller.operator.openshift.io/deployment-ingresscontroller: default
     spec:
@@ -32,13 +33,13 @@ spec:
             - name: RELOAD_INTERVAL
               value: 5s
             - name: ROUTER_ALLOW_WILDCARD_ROUTES
-              value: "false"
+              value: '{{ .RouterAllowWildcardRoutes }}'
             - name: ROUTER_CANONICAL_HOSTNAME
               value: router-default.apps.{{ .BaseDomain }}
             - name: ROUTER_CIPHERS
-              value: ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384
+              value: '{{ .RouterCiphers }}'
             - name: ROUTER_CIPHERSUITES
-              value: TLS_AES_128_GCM_SHA256:TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256
+              value: '{{ .RouterCiphersSuites }}'
             - name: ROUTER_DISABLE_HTTP2
               value: '{{ .RouterDisableHttp2 }}'
             - name: ROUTER_DISABLE_NAMESPACE_OWNERSHIP_CHECK
@@ -56,7 +57,7 @@ spec:
             - name: ROUTER_THREADS
               value: '{{ .ThreadCount }}'
             - name: SSL_MIN_VERSION
-              value: TLSv1.2
+              value: '{{ .RouterSSLMinVersion }}'
             - name: ROUTER_USE_PROXY_PROTOCOL
               value: "false"
             - name: GRACEFUL_SHUTDOWN_DELAY
@@ -93,6 +94,14 @@ spec:
               value: '{{ .RouterEnableCompression }}'
             - name: ROUTER_COMPRESSION_MIME
               value: '{{ .RouterCompressionMime }}'
+            {{- if .ClientAuthCAPath }}
+            - name: ROUTER_MUTUAL_TLS_AUTH
+              value: '{{ .ClientAuthPolicy }}'
+            - name: ROUTER_MUTUAL_TLS_AUTH_CA
+              value: '{{ .ClientAuthCAPath }}'
+            - name: ROUTER_MUTUAL_TLS_AUTH_FILTER
+              value: '{{ .ClientAuthFilter }}'
+            {{- end }}
           livenessProbe:
             failureThreshold: 3
             httpGet:
@@ -132,6 +141,13 @@ spec:
             - mountPath: /var/run/configmaps/service-ca
               name: service-ca-bundle
               readOnly: true
+            {{- if .ClientCAMapName }}
+            - mountPath: '{{ .ClientCAMountPath }}'
+              name: '{{ .ClientCAMapName}}'
+              readOnly: true
+            {{- end }}
+
+
           image: '{{ .ReleaseImage.haproxy_router }}'
           ports:
             - name: http
@@ -157,7 +173,7 @@ spec:
         - name: default-certificate
           secret:
             defaultMode: 420
-            secretName: router-certs-default
+            secretName: '{{ .ServingCertificateSecret }}'
         - name: service-ca-bundle
           configMap:
             defaultMode: 420
@@ -166,6 +182,16 @@ spec:
                 path: service-ca.crt
             name: service-ca-bundle
             optional: false
+        {{- if .ClientCAMapName }}
+        - name: '{{ .ClientCAMapName }}'
+          configMap:
+            defaultMode: 420
+            items:
+            - key: '{{ .ClientCABundleFilename }}'
+              path: '{{ .ClientCABundleFilename }}'
+            name: '{{ .ClientCAMapName }}'
+            optional: false
+        {{- end }}
       restartPolicy: Always
       dnsPolicy: ClusterFirst
       nodeSelector:

@@ -26,6 +26,7 @@ ORG_ENV = "ORG"
 REPO_ENV = "REPO"
 AMD64_RELEASE_ENV = "AMD64_RELEASE"
 ARM64_RELEASE_ENV = "ARM64_RELEASE"
+RHOAI_RELEASE_ENV = "RHOAI_RELEASE"
 JOB_NAME_ENV = "JOB_NAME"
 BUILD_ID_ENV = "BUILD_ID"
 DRY_RUN_ENV = "DRY_RUN"
@@ -34,7 +35,7 @@ BASE_BRANCH_ENV = "BASE_BRANCH"
 BOT_REMOTE_NAME = "bot-creds"
 REMOTE_ORIGIN = "origin"
 
-# List of reviewers to always requestes review from
+# List of reviewers to always request review from
 REVIEWERS = []
 
 # If True, then just log action such as branch push and PR or comment creation
@@ -72,6 +73,26 @@ def run_rebase_sh(release_amd64, release_arm64):
     start = timer()
     result = subprocess.run(
         args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True, check=False)
+    logging.info(f"Return code: {result.returncode}. Output:\n" +
+                 "==================================================\n" +
+                 f"{result.stdout}" +
+                 "==================================================\n")
+    end = timer() - start
+    logging.info(f"Script returned code: {result.returncode}. It ran for {end/60:.0f}m{end%60:.0f}s.")
+    return RebaseScriptResult(success=result.returncode == 0, output=result.stdout)
+
+
+def run_rebase_ai_model_serving_sh(release):
+    """Run the 'rebase_ai_model_serving.sh' script with the given release version and return the script's output."""
+    script_dir = os.path.abspath(os.path.dirname(__file__))
+    args = [f"{script_dir}/rebase_ai_model_serving.sh", "to", release]
+    env = os.environ.copy()
+    env["NO_BRANCH"] = "true"
+    logging.info(f"Running: '{' '.join(args)}'")
+    start = timer()
+    result = subprocess.run(
+        args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True, check=False,
+        env=env)
     logging.info(f"Return code: {result.returncode}. Output:\n" +
                  "==================================================\n" +
                  f"{result.stdout}" +
@@ -455,6 +476,7 @@ def main():
     repo = try_get_env(REPO_ENV)
     release_amd = try_get_env(AMD64_RELEASE_ENV)
     release_arm = try_get_env(ARM64_RELEASE_ENV)
+    rhoai_release = try_get_env(RHOAI_RELEASE_ENV)
     base_branch_override = try_get_env(BASE_BRANCH_ENV, die=False)
 
     global REMOTE_DRY_RUN
@@ -472,18 +494,27 @@ def main():
     )
 
     rebase_result = run_rebase_sh(release_amd, release_arm)
-    if rebase_result.success:
+    ai_rebase_result = run_rebase_ai_model_serving_sh(rhoai_release)
+
+    rebases_succeeded = rebase_result.success and ai_rebase_result.success
+
+    if rebases_succeeded:
         # TODO How can we inform team that rebase job ran successfully just there was nothing new?
         make_sure_rebase_script_created_new_commits_or_exit(git_repo, base_branch)
         if rebase_script_made_changes_considered_functional(git_repo, base_branch):
             logging.info("Detected functional changes made by rebase script - proceeding with creating PR")
         else:
-            logging.info("Rebase did not produce any change considered to be functional - quiting")
+            logging.info("Rebase did not produce any change considered to be functional - quitting")
             sys.exit(0)
     else:
         logging.warning("Rebase script failed - everything will be committed")
-        with open('rebase_sh.log', mode='w', encoding='utf-8') as writer:
-            writer.write(rebase_result.output)
+        with open('rebase.log', mode='w', encoding='utf-8') as writer:
+            output = ("rebase.sh:\n" +
+                      f"{rebase_result.stdout}" +
+                      "==================================================\n" +
+                      "rebase_ai_model_serving.sh:\n" +
+                      f"{ai_rebase_result.stdout}")
+            writer.write(output)
         if git_repo.active_branch.name == base_branch:
             # rebase.sh didn't reach the step that would create a branch
             # so script needs to create it

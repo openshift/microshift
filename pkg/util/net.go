@@ -362,3 +362,17 @@ func findDefaultRouteForFamily(family int) (routeStruct, error) {
 	}
 	return routeStruct{}, fmt.Errorf("no default gateway found")
 }
+
+// HasDefaultRoute returns whether the host has a default route for IPv4 or IPv6.
+func HasDefaultRoute() (bool, error) {
+	routes, err := netlink.RouteList(nil, netlink.FAMILY_ALL)
+	if err != nil {
+		return false, fmt.Errorf("failed to get route list: %v", err)
+	}
+	for _, route := range routes {
+		if route.Dst == nil || route.Dst.IP.Equal(tcpnet.IPv4zero) || route.Dst.IP.Equal(tcpnet.IPv6zero) {
+			return true, nil
+		}
+	}
+	return false, nil
+}

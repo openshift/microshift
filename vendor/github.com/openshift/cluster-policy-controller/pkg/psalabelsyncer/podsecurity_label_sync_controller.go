@@ -372,6 +372,13 @@ func (c *PodSecurityAdmissionLabelSynchronizationController) syncNamespace(ctx c
 		}
 	}
 
+	if ns.Annotations[securityv1.MinimallySufficientPodSecurityStandard] != string(psaLevel) {
+		nsApplyConfig.WithAnnotations(map[string]string{
+			securityv1.MinimallySufficientPodSecurityStandard: string(psaLevel),
+		})
+		shouldUpdate = true
+	}
+
 	if !shouldUpdate {
 		return nil
 	}

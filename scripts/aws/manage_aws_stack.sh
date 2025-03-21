@@ -30,7 +30,7 @@ action_create() {
     local -r cf_tpl_file="${SCRIPTDIR}/cf-gen.yaml"
     
     local arch="x86_64"
-    if [[ "${inst_type%.*}" =~ .*"g".* ]]; then
+    if [[ "${inst_type%.*}" =~ .+"g".* ]]; then
         arch="arm64"
     fi
     

@@ -134,14 +134,6 @@ def set_rpm_version_info_vars():
     except Exception:
         BREW_VERSION = ""
 
-    # The source images are used in selected container image builds
-    global SOURCE_IMAGES
-
-    src_img_cmd = f"rpm2cpio {release_info_rpm}"
-    src_img_cmd += f' | cpio -i --to-stdout "*release-{UNAME_M}.json" 2>/dev/null'
-    src_img_cmd += ' | jq -r \'[ .images[] ] | join(",")\''
-    SOURCE_IMAGES = common.run_command_in_shell(src_img_cmd)
-
     global SSL_CLIENT_KEY_FILE
     global SSL_CLIENT_CERT_FILE
     # Find the first file matching "*-key.pem" in the entitlements directory
@@ -155,7 +147,7 @@ def set_rpm_version_info_vars():
     # Update selected environment variables based on the global variables.
     # These are used for templating container files and images.
     rpmver_globals_vars = [
-        'SOURCE_VERSION', 'SOURCE_VERSION_BASE', 'BREW_VERSION', 'SOURCE_IMAGES',
+        'SOURCE_VERSION', 'SOURCE_VERSION_BASE', 'BREW_VERSION',
         'SSL_CLIENT_KEY_FILE', 'SSL_CLIENT_CERT_FILE'
     ]
     for var in rpmver_globals_vars:
@@ -227,7 +219,7 @@ def get_process_file_names(idir, ifile, obasedir):
     path = os.path.join(idir, ifile)
     outname = os.path.splitext(ifile)[0]
     outdir = os.path.join(obasedir, outname)
-    logfile = os.path.join(obasedir, f"{outname}.log")
+    logfile = os.path.join(obasedir, f"{ifile}.log")
     return path, outname, outdir, logfile
 
 
@@ -252,7 +244,7 @@ def process_containerfile(groupdir, containerfile, dry_run):
             # Run the container build command
             # Note:
             # - The pull secret is necessary in some builds for pulling embedded
-            #   container images specified by SOURCE_IMAGES environment variable
+            #   container images referenced in release-info RPMs
             # - The explicit push-to-mirror sets the 'latest' tag as all the build
             #   layers are in the mirror due to 'cache-to' option
             build_args = [
@@ -312,6 +304,11 @@ def process_image_bootc(groupdir, bootcfile, dry_run):
     # Run template command on the input file
     bf_outfile = os.path.join(BOOTC_IMAGE_DIR, bootcfile)
     run_template_cmd(bf_path, bf_outfile, dry_run)
+    # Templating may generate an empty file
+    if not dry_run:
+        if not common.file_has_valid_lines(bf_outfile):
+            common.print_msg(f"Skipping an empty {bootcfile} file")
+            return
 
     common.print_msg(f"Processing {bootcfile} with logs in {bf_logfile}")
     start_process_bootc_image = time.time()
@@ -468,7 +465,7 @@ def process_container_encapsulate(groupdir, containerfile, dry_run):
         common.run_command(["sed", f"s/^/{ce_outname}: /", ce_logfile], dry_run)
 
 
-def process_group(groupdir, build_type, dry_run=False):
+def process_group(groupdir, build_type, pattern="*", dry_run=False):
     futures = []
     try:
         # Open the junit file
@@ -488,7 +485,9 @@ def process_group(groupdir, build_type, dry_run=False):
         # Parallel processing loop
         with concurrent.futures.ProcessPoolExecutor() as executor:
             # Scan group directory contents sorted by length and then alphabetically
-            for file in sorted(os.listdir(groupdir), key=lambda i: (len(i), i)):
+            paths = glob.glob(os.path.join(groupdir, pattern))
+            files = [os.path.basename(file) for file in paths]
+            for file in sorted(files, key=lambda i: (len(i), i)):
                 if file.endswith(".containerfile"):
                     if build_type and build_type != "containerfile":
                         common.print_msg(f"Skipping '{file}' due to '{build_type}' filter")
@@ -537,10 +536,12 @@ def main():
     dirgroup = parser.add_mutually_exclusive_group(required=True)
     dirgroup.add_argument("-l", "--layer-dir", type=str, help="Path to the layer directory to process.")
     dirgroup.add_argument("-g", "--group-dir", type=str, help="Path to the group directory to process.")
+    dirgroup.add_argument("-t", "--template", type=str, help="Path to a template to build. Allows glob patterns (requires double qoutes).")
 
     args = parser.parse_args()
     success_message = False
     try:
+        pattern = "*"
         # Convert input directories to absolute paths
         if args.group_dir:
             args.group_dir = os.path.abspath(args.group_dir)
@@ -548,6 +549,10 @@ def main():
         if args.layer_dir:
             args.layer_dir = os.path.abspath(args.layer_dir)
             dir2process = args.layer_dir
+        if args.template:
+            args.template = os.path.abspath(args.template)
+            dir2process = os.path.dirname(args.template)
+            pattern = os.path.basename(args.template)
         # Make sure the input directory exists
         if not os.path.isdir(dir2process):
             raise Exception(f"The input directory '{dir2process}' does not exist")
@@ -595,16 +600,16 @@ def main():
         opull_secret = os.path.join(BOOTC_IMAGE_DIR, "pull_secret.json", )
         common.update_pull_secret(PULL_SECRET, opull_secret, MIRROR_REGISTRY)
         PULL_SECRET = opull_secret
-        # Process individual group directory
-        if args.group_dir:
-            process_group(args.group_dir, args.build_type, args.dry_run)
-        else:
-            # Process layer directory contents sorted by length and then alphabetically
+        # Process layer directory contents sorted by length and then alphabetically
+        if args.layer_dir:
             for item in sorted(os.listdir(args.layer_dir), key=lambda i: (len(i), i)):
                 item_path = os.path.join(args.layer_dir, item)
                 # Check if this item is a directory
                 if os.path.isdir(item_path):
-                    process_group(item_path, args.build_type, args.dry_run)
+                    process_group(item_path, args.build_type, dry_run=args.dry_run)
+        else:
+            # Process individual group directory or template
+            process_group(dir2process, args.build_type, pattern, args.dry_run)
         # Toggle the success flag
         success_message = True
     except Exception as e:

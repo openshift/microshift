@@ -2,7 +2,7 @@ FROM quay.io/centos-bootc/centos-bootc:stream9 as builder
 
 	
 ARG OKD_REPO=quay.io/okd/scos-release
-ARG OKD_VERSION_TAG=4.17.0-0.okd-scos-2024-08-21-100712
+ARG OKD_VERSION_TAG=4.18.0-okd-scos.4
 ARG REPO_DIR=/src/_output/rpmbuild/RPMS/
 ENV USER=microshift
 ENV HOME=/microshift
