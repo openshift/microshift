@@ -132,11 +132,7 @@ will be configured with the `imagePullPolicy:` set to `Always` and the local ima
 will be ignored. If you use any other tag, the `imagePullPolicy:` is set to `IfNotPresent`.
 
 ```sh
-sudo podman build -t ovms-resnet50:test .
-```
-
-Example output:
-```
+$ sudo podman build -t ovms-resnet50:test .
 STEP 1/3: FROM quay.io/microshift/busybox:1.37
 Trying to pull quay.io/microshift/busybox:1.37...
 Getting image source signatures
@@ -155,11 +151,7 @@ ac4606eb6cb3e6be2fbee9d6bc271df212eb22e6a45a2c33394d9c73dc3bb4cf
 
 Run the following command to make sure the image exists:
 ```sh
-sudo podman images | grep ovms-resnet50
-```
-
-Example output:
-```
+$ sudo podman images | grep ovms-resnet50
 localhost/ovms-resnet50          test          ac4606eb6cb3  3 minutes ago  27.5 MB
 ```
 
@@ -276,11 +268,7 @@ spec:
 
 Save the the InferenceService example to a file, then create it on the cluster:
 ```sh
-oc create -n ai-demo -f ./FILE.yaml
-```
-
-Output:
-```
+$ oc create -n ai-demo -f ./FILE.yaml
 inferenceservice.serving.kserve.io/ovms-resnet50 created
 ```
 
@@ -288,21 +276,14 @@ Soon, a Deployment and a Pod should appear in that namespace.
 Depending on the size of ServingRuntime's image and the size of the ModelCar OCI image,
 it may take a while for the Pod to become ready.
 
-You can check the status of the Deployment with following command:
 ```sh
 $ oc get -n ai-demo deployment
 NAME                      READY   UP-TO-DATE   AVAILABLE   AGE
 ovms-resnet50-predictor   1/1     1            1           72s
-```
 
-You can wait for the Deployment to become ready with following command:
-```sh
 $ oc rollout status -n ai-demo deployment ovms-resnet50-predictor
 deployment "ovms-resnet50-predictor" successfully rolled out
-```
 
-You can check the status of the Pod with following command:
-```sh
 $ oc get -n ai-demo pod
 NAME                                       READY   STATUS    RESTARTS      AGE
 ovms-resnet50-predictor-6fdb566b7f-bc9k5   2/2     Running   1 (72s ago)   74s
