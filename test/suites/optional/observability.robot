@@ -3,18 +3,19 @@ Documentation       This suite performs basic log scans to determine if the open
 ...                 and in a healthy state
 
 Library             OperatingSystem
-Library             String
+Library             SSHLibrary
 Library             ../../resources/journalctl.py
 Resource            ../../resources/kubeconfig.resource
 Resource            ../../resources/common.resource
+Resource            ../../resources/systemd.resource
 
-Suite Setup         Setup Suite And Set Journal Cursor
-Suite Teardown      Teardown Suite
+Suite Setup         Setup Suite And Prepare Test Host
+Suite Teardown      Teardown Suite And Revert Test Host
 
 
 *** Variables ***
 ${JOURNAL_CUR}      ${EMPTY}
-
+${CONFIG_ORIGINAL}
 
 *** Test Cases ***
 Logs Should Contain Exported Metric Data
@@ -43,10 +44,11 @@ Logs Should Not Contain Reciever Errors
 
 
 *** Keywords ***
-Setup Suite And Set Journal Cursor
+Setup Suite And Prepare Test Host
     [Documentation]    The service starts after MicroShift starts and thus will start generating pertinant log data
     ...    right away. When the suite is executed, immediately get the cursor for the microshift-observability unit.
     Setup Suite
+    Deploy Debug Config
     ${cur}    Get Journal Cursor    unit=microshift-observability
     Set Suite Variable    ${JOURNAL_CUR}    ${cur}
     Wait Until Keyword Succeeds    1 min    5 sec
@@ -61,3 +63,25 @@ Journal Contains Enough Lines To Test
     ${output}    ${rc}    Get Log Output With Pattern    ${JOURNAL_CUR}    .*    microshift-observability
     ${line_cnt}    Get Line Count    ${output}
     Should Be True    ${line_cnt} > 50
+
+Deploy Debug Config
+    [Documentation]    Dynamically set all exporters in the opentelemetry-collector config to "debug", otherwise the
+    ...    process will attempt to stream data to a non-existent service, resulting in the log being spammed with
+    ...    errors.
+    ${cfg}    Create Random Temp File
+    SSHLibrary.Get File     /etc/microshift/opentelemetry-collector.yaml    ${cfg}
+    Set Suite Variable     ${CONFIG_ORIGINAL}    ${cfg}
+    ${yq_cmd}    Catenate
+    ...    yq '.service.pipelines |= with_entries(.value.exporters |= [ "debug" ])
+    ...    | .exporters["debug"] = {}'
+    ${rc}    ${cfg_patched}    OperatingSystem.Run And Return Rc And Output    ${yq_cmd} ${cfg}
+    Should Be Equal As Integers    ${rc}    0
+    Upload String To File    ${cfg_patched}    /etc/microshift/opentelemetry-collector.yaml
+    Systemctl     restart     microshift-observability
+
+Teardown Suite And Revert Test Host
+    [Documentation]    Calls the global Teardown Suite keyword and restores the opentelemetry-collector.yaml to its
+    ...    original state
+    SSHLibrary.Put File     ${CONFIG_ORIGINAL}    /etc/microshift/opentelemetry.yaml
+    Teardown Suite
+

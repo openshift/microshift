@@ -1,6 +1,6 @@
 #!/bin/bash
 set -euo pipefail
-
+set -x
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # shellcheck source=test/bin/common.sh
 source "${SCRIPTDIR}/common.sh"
@@ -156,7 +156,7 @@ setup_registry() {
         -e POSTGRESQL_ADMIN_PASSWORD=adminpass \
         -p 5432:5432 \
         -v "${MIRROR_REGISTRY_DIR}/postgres:/var/lib/postgresql/data:Z" \
-        "${POSTGRES_IMAGE}" -c max_connections=1024 >/dev/null
+        "${POSTGRES_IMAGE}" -c max_connections=1024
     postgres_ip=$(sudo podman inspect -f "{{.NetworkSettings.IPAddress}}" microshift-postgres)
 
     # Retry the query until the database is available
@@ -179,7 +179,7 @@ setup_registry() {
     sudo podman run -d --rm --name microshift-redis \
         -p 6379:6379 \
         "${REDIS_IMAGE}" \
-        --requirepass strongpassword >/dev/null
+        --requirepass strongpassword
     redis_ip=$(sudo podman inspect -f "{{.NetworkSettings.IPAddress}}" microshift-redis)
 
     # Set up Quay
