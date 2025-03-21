@@ -5,9 +5,10 @@ FROM $USHIFT_BASE_IMAGE_NAME:$USHIFT_BASE_IMAGE_TAG
 ENV IMAGE_STORAGE_DIR=/usr/lib/containers/storage
 ENV IMAGE_LIST_FILE=${IMAGE_STORAGE_DIR}/image-list.txt
 
-# Pull the container image dependencies into /usr/lib/containers/storage:
-# - Each image goes into a sub-directory named after the image pull spec SHA
-# - An image list file is created to map between image pull spec and its SHA
+# Pull the container images into /usr/lib/containers/storage:
+# - Each image goes into a separate sub-directory
+# - Sub-directories are named after the image reference string SHA
+# - An image list file maps image references to their name SHA
 # hadolint ignore=DL4006
 RUN --mount=type=secret,id=pullsecret,dst=/run/secrets/pull-secret.json \
     images="$(jq -r ".images[]" /usr/share/microshift/release/release-"$(uname -m)".json)" ; \
@@ -22,7 +23,7 @@ RUN --mount=type=secret,id=pullsecret,dst=/run/secrets/pull-secret.json \
 
 # Install a systemd drop-in unit to address the problem with image upgrades
 # overwriting the container images in additional store. The workaround is to
-# copy the images from the pre-loaded to the main container storage directory.
+# copy the images from the pre-loaded to the main container storage.
 # In this case, it is not necessary to update /etc/containers/storage.conf with
 # the additional store path.
 # See https://issues.redhat.com/browse/RHEL-75827

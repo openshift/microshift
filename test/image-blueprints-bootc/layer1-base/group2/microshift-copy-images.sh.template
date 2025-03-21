@@ -7,25 +7,25 @@ IMAGE_LIST_FILE="${STORAGE_DIR}/image-list.txt"
 PULL_SECRET="${PULL_SECRET:-/run/secrets/pull-secret.json}"
 
 usage() {
-    echo "Usage: $(basename "$0") <-pull | -copy>"
-    echo "   -pull   Pull images specified in IMAGE_PULL_LIST environment, store them"
-    echo "           at '${STORAGE_DIR}/<PULL_SPEC_SHA>' and create '${IMAGE_LIST_FILE}'"
-    echo "           containing map of pulls specs and their SHA"
-    echo "   -copy   Copy images from '${STORAGE_DIR}' to the local container storage"
-    echo "           using '${IMAGE_LIST_FILE}' as a reference"
+    echo "Usage: $(basename "$0") <pull | copy>"
+    echo "   pull   Pull images specified in IMAGE_PULL_LIST environment, store them"
+    echo "          at '${STORAGE_DIR}/<PULL_SPEC_SHA>' and create '${IMAGE_LIST_FILE}'"
+    echo "          containing map of pulls specs and their SHA"
+    echo "   copy   Copy images from '${STORAGE_DIR}' to the local container storage"
+    echo "          using '${IMAGE_LIST_FILE}' as a reference"
     exit 1
 }
 
 pull_images() {
     mkdir -p "${STORAGE_DIR}"
-    for img in ${IMAGE_PULL_LIST} ; do
+    for img in ${IMAGE_PULL_LIST}; do
         local sha
         sha="$(sha256sum <<< "${img}" | awk '{print $1}')"
         for i in 1 2 3; do
             skopeo copy --all --preserve-digests \
                 --authfile "${PULL_SECRET}" \
                 "docker://${img}" "dir:${STORAGE_DIR}/${sha}" && break
-            if [ ${i} -eq 3 ] ; then
+            if [ "${i}" -eq 3 ] ; then
                 echo "ERROR: Failed to pull ${img} image after 3 attempts"
                 exit 1
             fi
@@ -44,11 +44,11 @@ copy_images() {
 }
 
 case "${1:-}" in
--pull)
+pull)
     pull_images
     ;;
 
--copy)
+copy)
     copy_images
     ;;
 *)
