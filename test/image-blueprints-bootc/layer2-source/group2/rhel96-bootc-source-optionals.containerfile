@@ -21,7 +21,8 @@ RUN dnf repoinfo --enabled && \
         "microshift-ai-model-serving-{{ .Env.SOURCE_VERSION }}" \
         "microshift-ai-model-serving-release-info-{{ .Env.SOURCE_VERSION }}" \
 # {{- end }}
-        "microshift-gateway-api-{{ .Env.SOURCE_VERSION }}" && \
+        "microshift-gateway-api-{{ .Env.SOURCE_VERSION }}" \
+        "microshift-observability-{{ .Env.SOURCE_VERSION }}" && \
     rm -vf /etc/yum.repos.d/microshift-*.repo && \
     rm -rvf $USHIFT_RPM_REPO_PATH && \
     dnf clean all
