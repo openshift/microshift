@@ -499,6 +499,7 @@ EOF
         cat - >>"${JUNIT_OUTPUT_FILE}" <<EOF
 <skipped message="${results}" type="${step}-skipped" />
 EOF
+        touch "${JUNIT_SCENARIO_FILE}"
         ;;
         *)
         cat - >>"${JUNIT_OUTPUT_FILE}" <<EOF
@@ -1217,6 +1218,7 @@ SCENARIO_SCRIPT="$(realpath "$1")"
 shift
 SCENARIO=$(basename "${SCENARIO_SCRIPT}" .sh)
 JUNIT_OUTPUT_FILE="${SCENARIO_INFO_DIR}/${SCENARIO}/phase_${action}/junit.xml"
+JUNIT_SCENARIO_FILE="${SCENARIO_INFO_DIR}/${SCENARIO}/junit.xml"
 
 # Change directory to the test root
 cd "${SCRIPTDIR}/.."
