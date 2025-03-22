@@ -9,9 +9,24 @@ POSTGRES_IMAGE="docker.io/library/postgres:10.12"
 REDIS_IMAGE="docker.io/library/redis:5.0.7"
 QUAY_IMAGE="quay.io/microshift/quay:v3.11.7-$(uname -m)"
 QUAY_CONFIG_DIR="${MIRROR_REGISTRY_DIR}/config"
+QUAY_STORAGE_DIR="${MIRROR_REGISTRY_DIR}/storage"
 
 PULL_SECRET=${PULL_SECRET:-${HOME}/.pull-secret.json}
 QUAY_PULL_SECRET="${QUAY_CONFIG_DIR}/pull_secret.json"
+
+reset_storage_permissions() {
+    # Ensure that permissions are open for the current user on the mirror registry
+    # directories and files
+    if [ -d "${MIRROR_REGISTRY_DIR}" ] ; then
+        sudo chgrp -R "$(id -gn)" "${MIRROR_REGISTRY_DIR}"
+        sudo find "${MIRROR_REGISTRY_DIR}" -type d -exec chmod a+rx '{}' +
+        sudo find "${MIRROR_REGISTRY_DIR}" -type f -exec chmod a+r  '{}' +
+    fi
+    # Quay storage directory expects 1001 owner ID
+    if [ -d "${QUAY_STORAGE_DIR}" ] ; then
+        sudo chown -R 1001 "${QUAY_STORAGE_DIR}"
+    fi
+}
 
 setup_prereqs() {
     # Install packages if not yet available locally
@@ -19,9 +34,11 @@ setup_prereqs() {
         "${SCRIPTDIR}/../../scripts/dnf_retry.sh" "install" "podman skopeo jq"
     fi
 
-    # Create registry repository base directory structure
+    # Create registry repository base directory structure and reset permissions
+    # if downloaded from cache
     mkdir -p "${MIRROR_REGISTRY_DIR}"
     mkdir -p "${QUAY_CONFIG_DIR}"
+    reset_storage_permissions
 
     # Create a new pull secret file containing authentication information for both
     # remote (from PULL_SECRET environment) and local registries
@@ -227,9 +244,9 @@ EOF
     fi
 
     # See https://docs.projectquay.io/deploy_quay.html#preparing-local-storage
-    if [ ! -d "${MIRROR_REGISTRY_DIR}/storage" ] ; then
-        mkdir -p "${MIRROR_REGISTRY_DIR}/storage"
-        setfacl -m u:1001:-wx "${MIRROR_REGISTRY_DIR}/storage"
+    if [ ! -d "${QUAY_STORAGE_DIR}" ] ; then
+        mkdir -p "${QUAY_STORAGE_DIR}"
+        setfacl -m u:1001:-wx "${QUAY_STORAGE_DIR}"
     fi
 
     # Run Quay container
@@ -240,7 +257,7 @@ EOF
         -p "${MIRROR_REGISTRY_PORT}:8080" \
         -p "[::]:${MIRROR_REGISTRY_PORT}:8080" \
         -v "${QUAY_CONFIG_DIR}:/conf/stack:Z" \
-        -v "${MIRROR_REGISTRY_DIR}/storage:/datastorage:Z" \
+        -v "${QUAY_STORAGE_DIR}:/datastorage:Z" \
         "${QUAY_IMAGE}" >/dev/null
 
     # Wait until the Quay instance is started
@@ -268,11 +285,7 @@ EOF
 }
 
 finalize_registry() {
-    # Ensure that permissions are open for the current user on the mirror registry
-    # directories and files. This is necessary to avoid 'find' command errors.
-    sudo chgrp -R "$(id -gn)" "${MIRROR_REGISTRY_DIR}"
-    sudo find "${MIRROR_REGISTRY_DIR}" -type d -exec chmod a+rx '{}' +
-    sudo find "${MIRROR_REGISTRY_DIR}" -type f -exec chmod a+r  '{}' +
+    reset_storage_permissions
     # Delete the combined pull secret file
     rm -f "${QUAY_PULL_SECRET}"
 }
