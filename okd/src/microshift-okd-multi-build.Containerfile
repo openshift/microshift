@@ -44,7 +44,7 @@ COPY --from=builder /src/_output/rpmbuild/RPMS ${USHIFT_RPM_REPO_PATH}
 # once microshift is installed so better to disable it because it cause issue when required
 # module is not enabled.
 RUN ${REPO_CONFIG_SCRIPT} ${USHIFT_RPM_REPO_PATH} && \
-    dnf install -y microshift && \
+    dnf install -y microshift microshift-release-info && \
     if [ "$WITH_FLANNEL" -eq 1 ]; then \
       dnf install -y microshift-flannel; \
       systemctl disable openvswitch; \
@@ -55,6 +55,20 @@ RUN ${REPO_CONFIG_SCRIPT} ${USHIFT_RPM_REPO_PATH} && \
     dnf clean all
     
 RUN ${OKD_CONFIG_SCRIPT} && rm -rf ${OKD_CONFIG_SCRIPT}
+
+# If the EMBED_CONTAINER_IMAGES environment variable is set to 1:
+# 1. Temporarily configure user namespace UID and GID mappings by writing to /etc/subuid and /etc/subgid and clean it later
+#    - This allows the skopeo command to operate properly which requires user namespace support.
+#    - Without it following error occur during image build
+#       - FATA[0129] copying system image from manifest list:[...]unpacking failed (error: exit status 1; output: potentially insufficient UIDs or GIDs available[...]
+# 2. Extract the list of image URLs from a JSON file (`release-$(uname -m).json`) while excluding the "lvms_operator" image.
+#    - `lvms_operator` image is excluded because it is not available upstream
+RUN if [ "$EMBED_CONTAINER_IMAGES" -eq 1 ]; then \
+      echo "root:100000:65536" > /etc/subuid; \
+      echo "root:100000:65536" > /etc/subgid; \
+      jq -r '.images | to_entries | map(select(.key != "lvms_operator")) | .[].value' /usr/share/microshift/release/release-$(uname -m).json |  xargs -n 1 -I {} skopeo copy docker://{} containers-storage:{}; \
+      rm -f /etc/subuid /etc/subgid; \
+   fi
 
 # Create a systemd unit to recursively make the root filesystem subtree
 # shared as required by OVN images
