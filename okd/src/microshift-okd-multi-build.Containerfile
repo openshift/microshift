@@ -11,7 +11,8 @@ ENV GOMODCACHE=/microshift/.cache
 
 # Adding non-root user for building microshift
 RUN useradd -m -s /bin/bash microshift -d /microshift && \
-    echo 'microshift  ALL=(ALL)  NOPASSWD: ALL' >/etc/sudoers.d/microshift 
+    echo 'microshift  ALL=(ALL)  NOPASSWD: ALL' >/etc/sudoers.d/microshift && \
+    chmod 0640 /etc/shadow
 COPY . /src 
 RUN chown -R microshift:microshift /microshift /src
 
