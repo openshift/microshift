@@ -1,6 +1,3 @@
-- cluster-network-operator embedded-component 13c13b703e38dd453ae404dc735030ea2358590f to 48848fe7e78418922f0cbb3b99d458cd484123c6
-  - 9d2a1db 2025-02-24T22:19:05-05:00 Not update status.migration of the network.config CR to empty
-
-- machine-config-operator embedded-component 1c575a33308289d8518be24d9e8fa6e9db13c150 to acb5acfbb3dec64c3f6c69adf9f2cfc53b862ac2
-  - 59260850 2025-03-05T16:08:32-05:00 daemon & server: update log verbs
+- machine-config-operator embedded-component acb5acfbb3dec64c3f6c69adf9f2cfc53b862ac2 to b5dc445d6ee0d1fe2674a9cf9c01074716484bf2
+  - 6b150258 2025-03-19T14:15:41+00:00 daemon: ensure ostree-finalize-staged is started before rebooting
 
