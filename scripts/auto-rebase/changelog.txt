@@ -1,12 +1,118 @@
-- api embedded-component 8a7efbfb531684ef0ff566a882096df03e0f499c to 477760860ebdd921db389cf539439b0ec1064179
-  - 28ccba1d 2025-03-19T16:40:27-04:00 remove inactive reviewers and ex-Red Hatters from OWNERS, add everettraven
-  - 80f8dcff 2025-03-19T11:12:08+00:00 Remove patch tags from CRD conditions
-  - ea7057f8 2025-03-18T14:11:59+00:00 Update KAL to the latest version
-  - c86f460c 2025-03-11T10:46:36+01:00 add MaxAllowedBlockVolumesPerNode field to VSphereCSIDriverConfigSpec
+- api embedded-component 477760860ebdd921db389cf539439b0ec1064179 to 3aa9dd5b9002b370acc8ca4b4b041d682c22ca85
+  - 0216bc1a 2025-03-18T13:57:29-04:00 pis to v1
 
-- cluster-network-operator embedded-component 510b7508ad7a66d1742c5d9f83a4143fa860029c to 1daca87a5c6ebd5e6d7b5bcc4374119b59061af6
-  - 11c08e6 2025-03-17T23:22:49+01:00 Check on ipsec.service instead of libreswan package on host
-  - cb99bc3 2025-03-17T20:02:27+01:00 Add version check for machine config operator
-  - 865ac69 2025-03-17T19:38:45+01:00 Mount top level directory for IPsec host paths
-  - 37693e9 2025-03-17T19:38:45+01:00 Move to use newer IPsec DaemonSets irrespective of MCP state
+- kubernetes embedded-component 2ed17b46fa89c438d5983268bdc352ba8bd9b4bb to 1601b9e27d8570364d9a1b94be16a0ca7b744a7e
+  - e1bb18965 2025-03-19T16:12:25-04:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - 21f6297de 2025-03-19T16:12:25-04:00 UPSTREAM: <carry>: disable default off feature
+  - e6e170ad5 2025-03-19T09:44:08-04:00 UPSTREAM: <drop>: manually resolve conflicts
+  - 32cc146f7 2025-03-11T19:52:20+00:00 Release commit for Kubernetes v1.32.3
+  - b6fd7487f 2025-03-06T11:01:10-08:00 Update status before returning err
+  - 31c7235f4 2025-03-04T16:05:35+00:00 Modify how to check the status
+  - 8636d1b42 2025-03-03T13:40:33-08:00 Add the feature gate `OrderedNamespaceDeletion` for apiserver.
+  - 2a60692f5 2025-02-28T22:47:53+00:00 conntrack reconciler must check the dst port
+  - 642b0eae3 2025-02-28T22:19:00+05:30 fix(pod/util): typos in getting pod validation options
+  - dbf78217a 2025-02-27T10:53:15+09:00 Add Additional Tests
+  - 1d3fafa1c 2025-02-27T10:53:14+09:00 Fix typo
+  - 7826934ad 2025-02-27T10:53:14+09:00 Add ControllerRoles Test
+  - 019c9b4d2 2025-02-27T10:53:14+09:00 Fix Fixture Data
+  - 549220b61 2025-02-27T10:53:13+09:00 Add Watch to controller roles
+  - 1c07a3984 2025-02-24T11:43:29+01:00 fix copyright year
+  - 849aa0858 2025-02-24T11:41:32+01:00 Generate register files for all examples
+  - 6ad919952 2025-02-24T11:41:32+01:00 add simpletype pkg in v1 for register-gen test
+  - 5fa72a8c1 2025-02-24T11:40:42+01:00 Add codegen::register to hack/update-codegen.sh
+  - c05e46c16 2025-02-24T11:40:42+01:00 Add missing imports in register-gen
+  - 4c2a0b85f 2025-02-21T23:45:41+00:00 Revert "Add random interval to nodeStatusReport interval every time after an actual node status change"
+  - 99eedea5c 2025-02-20T19:33:34-08:00 Remove the feature-gate check before populating serverRunOptions.Flagz
+  - a0eb3acf3 2025-02-20T18:54:51-08:00 test: Add emulated-version flag verification in flagz test
+  - 8b3a93b84 2025-02-20T18:54:04-08:00 fix: flagz endpoint to return parsed flags value
+  - 412c353d0 2025-02-20T15:22:01+02:00 kubeadm: fix panic when no UpgradeConfiguration was found in the config file
+  - f5fc57e1e 2025-02-18T21:21:21-05:00 proxy: should add PingPeriod for websocket translator
+  - 1f27b7527 2025-02-14T13:00:04-05:00 Honor KUBE_HACK_TOOLS_GOTOOLCHAIN
+  - 00f135bb6 2025-02-14T14:14:22+01:00 Deflake the PodReplacementPolicyFeatureToggling Job integration test
+  - 1ac9e213a 2025-02-13T12:46:53+01:00 Limit ResourceQuota LIST requests to times when informer is not synced
+  - ac28939fd 2025-02-12T21:40:30+00:00 Update CHANGELOG/CHANGELOG-1.32.md for v1.32.2
+  - d428c6b8f 2025-02-12T14:22:12+05:30 kubelet: fix DRA registration test
+  - d589f5665 2025-02-10T16:45:38+01:00 Fix the flaky Job test: TestSuccessPolicy_ReEnabling
+  - f0022d375 2025-02-07T17:40:31+05:30 bump netlink
+  - 00faa5e7a 2025-01-24T09:17:19+01:00 DRA CEL: skip estimating the cost in the scheduler
+  - f89e4c08c 2025-01-17T14:27:49+01:00 DRA CEL: add missing size estimator
+
+- oc image-amd64 fe18ae25a123e896fd218210073141f7f5811465 to 57018b1991282fd743495e240efe056f5f37be4a
+  - ff2cf653 2025-03-20T12:58:34+03:00 Use fedora image in unit tests instead of centos
+
+- kubernetes image-amd64 2ed17b46fa89c438d5983268bdc352ba8bd9b4bb to 1601b9e27d8570364d9a1b94be16a0ca7b744a7e
+  - e1bb18965 2025-03-19T16:12:25-04:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - 21f6297de 2025-03-19T16:12:25-04:00 UPSTREAM: <carry>: disable default off feature
+  - e6e170ad5 2025-03-19T09:44:08-04:00 UPSTREAM: <drop>: manually resolve conflicts
+  - 32cc146f7 2025-03-11T19:52:20+00:00 Release commit for Kubernetes v1.32.3
+  - b6fd7487f 2025-03-06T11:01:10-08:00 Update status before returning err
+  - 31c7235f4 2025-03-04T16:05:35+00:00 Modify how to check the status
+  - 8636d1b42 2025-03-03T13:40:33-08:00 Add the feature gate `OrderedNamespaceDeletion` for apiserver.
+  - 2a60692f5 2025-02-28T22:47:53+00:00 conntrack reconciler must check the dst port
+  - 642b0eae3 2025-02-28T22:19:00+05:30 fix(pod/util): typos in getting pod validation options
+  - dbf78217a 2025-02-27T10:53:15+09:00 Add Additional Tests
+  - 1d3fafa1c 2025-02-27T10:53:14+09:00 Fix typo
+  - 7826934ad 2025-02-27T10:53:14+09:00 Add ControllerRoles Test
+  - 019c9b4d2 2025-02-27T10:53:14+09:00 Fix Fixture Data
+  - 549220b61 2025-02-27T10:53:13+09:00 Add Watch to controller roles
+  - 1c07a3984 2025-02-24T11:43:29+01:00 fix copyright year
+  - 849aa0858 2025-02-24T11:41:32+01:00 Generate register files for all examples
+  - 6ad919952 2025-02-24T11:41:32+01:00 add simpletype pkg in v1 for register-gen test
+  - 5fa72a8c1 2025-02-24T11:40:42+01:00 Add codegen::register to hack/update-codegen.sh
+  - c05e46c16 2025-02-24T11:40:42+01:00 Add missing imports in register-gen
+  - 4c2a0b85f 2025-02-21T23:45:41+00:00 Revert "Add random interval to nodeStatusReport interval every time after an actual node status change"
+  - 99eedea5c 2025-02-20T19:33:34-08:00 Remove the feature-gate check before populating serverRunOptions.Flagz
+  - a0eb3acf3 2025-02-20T18:54:51-08:00 test: Add emulated-version flag verification in flagz test
+  - 8b3a93b84 2025-02-20T18:54:04-08:00 fix: flagz endpoint to return parsed flags value
+  - 412c353d0 2025-02-20T15:22:01+02:00 kubeadm: fix panic when no UpgradeConfiguration was found in the config file
+  - f5fc57e1e 2025-02-18T21:21:21-05:00 proxy: should add PingPeriod for websocket translator
+  - 1f27b7527 2025-02-14T13:00:04-05:00 Honor KUBE_HACK_TOOLS_GOTOOLCHAIN
+  - 00f135bb6 2025-02-14T14:14:22+01:00 Deflake the PodReplacementPolicyFeatureToggling Job integration test
+  - 1ac9e213a 2025-02-13T12:46:53+01:00 Limit ResourceQuota LIST requests to times when informer is not synced
+  - ac28939fd 2025-02-12T21:40:30+00:00 Update CHANGELOG/CHANGELOG-1.32.md for v1.32.2
+  - d428c6b8f 2025-02-12T14:22:12+05:30 kubelet: fix DRA registration test
+  - d589f5665 2025-02-10T16:45:38+01:00 Fix the flaky Job test: TestSuccessPolicy_ReEnabling
+  - f0022d375 2025-02-07T17:40:31+05:30 bump netlink
+  - 00faa5e7a 2025-01-24T09:17:19+01:00 DRA CEL: skip estimating the cost in the scheduler
+  - f89e4c08c 2025-01-17T14:27:49+01:00 DRA CEL: add missing size estimator
+
+- oc image-arm64 fe18ae25a123e896fd218210073141f7f5811465 to 33cbfe154012e938b00420aa6c4a62e38184da99
+  - 1157fa2f 2025-03-20T19:26:19+01:00 debug: suggest nsenter in addition to chroot
+  - ff2cf653 2025-03-20T12:58:34+03:00 Use fedora image in unit tests instead of centos
+
+- kubernetes image-arm64 2ed17b46fa89c438d5983268bdc352ba8bd9b4bb to 1601b9e27d8570364d9a1b94be16a0ca7b744a7e
+  - e1bb18965 2025-03-19T16:12:25-04:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - 21f6297de 2025-03-19T16:12:25-04:00 UPSTREAM: <carry>: disable default off feature
+  - e6e170ad5 2025-03-19T09:44:08-04:00 UPSTREAM: <drop>: manually resolve conflicts
+  - 32cc146f7 2025-03-11T19:52:20+00:00 Release commit for Kubernetes v1.32.3
+  - b6fd7487f 2025-03-06T11:01:10-08:00 Update status before returning err
+  - 31c7235f4 2025-03-04T16:05:35+00:00 Modify how to check the status
+  - 8636d1b42 2025-03-03T13:40:33-08:00 Add the feature gate `OrderedNamespaceDeletion` for apiserver.
+  - 2a60692f5 2025-02-28T22:47:53+00:00 conntrack reconciler must check the dst port
+  - 642b0eae3 2025-02-28T22:19:00+05:30 fix(pod/util): typos in getting pod validation options
+  - dbf78217a 2025-02-27T10:53:15+09:00 Add Additional Tests
+  - 1d3fafa1c 2025-02-27T10:53:14+09:00 Fix typo
+  - 7826934ad 2025-02-27T10:53:14+09:00 Add ControllerRoles Test
+  - 019c9b4d2 2025-02-27T10:53:14+09:00 Fix Fixture Data
+  - 549220b61 2025-02-27T10:53:13+09:00 Add Watch to controller roles
+  - 1c07a3984 2025-02-24T11:43:29+01:00 fix copyright year
+  - 849aa0858 2025-02-24T11:41:32+01:00 Generate register files for all examples
+  - 6ad919952 2025-02-24T11:41:32+01:00 add simpletype pkg in v1 for register-gen test
+  - 5fa72a8c1 2025-02-24T11:40:42+01:00 Add codegen::register to hack/update-codegen.sh
+  - c05e46c16 2025-02-24T11:40:42+01:00 Add missing imports in register-gen
+  - 4c2a0b85f 2025-02-21T23:45:41+00:00 Revert "Add random interval to nodeStatusReport interval every time after an actual node status change"
+  - 99eedea5c 2025-02-20T19:33:34-08:00 Remove the feature-gate check before populating serverRunOptions.Flagz
+  - a0eb3acf3 2025-02-20T18:54:51-08:00 test: Add emulated-version flag verification in flagz test
+  - 8b3a93b84 2025-02-20T18:54:04-08:00 fix: flagz endpoint to return parsed flags value
+  - 412c353d0 2025-02-20T15:22:01+02:00 kubeadm: fix panic when no UpgradeConfiguration was found in the config file
+  - f5fc57e1e 2025-02-18T21:21:21-05:00 proxy: should add PingPeriod for websocket translator
+  - 1f27b7527 2025-02-14T13:00:04-05:00 Honor KUBE_HACK_TOOLS_GOTOOLCHAIN
+  - 00f135bb6 2025-02-14T14:14:22+01:00 Deflake the PodReplacementPolicyFeatureToggling Job integration test
+  - 1ac9e213a 2025-02-13T12:46:53+01:00 Limit ResourceQuota LIST requests to times when informer is not synced
+  - ac28939fd 2025-02-12T21:40:30+00:00 Update CHANGELOG/CHANGELOG-1.32.md for v1.32.2
+  - d428c6b8f 2025-02-12T14:22:12+05:30 kubelet: fix DRA registration test
+  - d589f5665 2025-02-10T16:45:38+01:00 Fix the flaky Job test: TestSuccessPolicy_ReEnabling
+  - f0022d375 2025-02-07T17:40:31+05:30 bump netlink
+  - 00faa5e7a 2025-01-24T09:17:19+01:00 DRA CEL: skip estimating the cost in the scheduler
+  - f89e4c08c 2025-01-17T14:27:49+01:00 DRA CEL: add missing size estimator
 
