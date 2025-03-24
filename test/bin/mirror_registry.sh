@@ -76,6 +76,13 @@ EOF
 [[registry.mirror]]
     location = "${MIRROR_REGISTRY_URL}"
     insecure = true
+
+[[registry]]
+    prefix = ""
+    location = "localhost"
+[[registry.mirror]]
+    location = "${MIRROR_REGISTRY_URL}"
+    insecure = true
 EOF
 
 # Complete the source registry configuration to use sigstore attachments.
