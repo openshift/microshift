@@ -1,3 +1,0 @@
-- cluster-dns-operator embedded-component 0ea96c98243f4f0afae3331fc3766200a4c038b5 to 0164e3c4464f03d5ddbbba5d426f4bf02822753d
-  - 7163900 2025-02-26T15:06:26+01:00 Add runbook-url for CoreDNSErrorsHigh
-
