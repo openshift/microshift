@@ -18,7 +18,7 @@ EOF
     cat > "${OCP_MIRROR_REPO_FILE}" <<EOF
 [openshift-mirror-beta]
 name=OpenShift Mirror Beta Repository
-baseurl=https://mirror.openshift.com/pub/openshift-v4/$(uname -m)/dependencies/rpms/4.18-el9-beta/
+baseurl=https://mirror.openshift.com/pub/openshift-v4/$(uname -m)/dependencies/rpms/4.19-el9-beta/
 enabled=1
 gpgcheck=0
 skip_if_unavailable=0
