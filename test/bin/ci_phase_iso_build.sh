@@ -112,6 +112,7 @@ run_bootc_image_build() {
         fi
     else
         $(dry_run) bash -x ./bin/build_bootc_images.sh
+    fi
 }
 
 cat /etc/os-release
