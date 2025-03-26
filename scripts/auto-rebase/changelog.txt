@@ -1,0 +1,7 @@
+- ovn-kubernetes image-arm64 66faee9937abbd9abc8e72e160c6fb2f4e606e9b to 12b33c120f3240ed9df2bdfcc01d3bd0a313b3c7
+  - 9c4499b0 2025-03-20T14:51:14+01:00 Update OVN to FDP25.A.1 24.09.2-41.
+
+- kubernetes image-arm64 1601b9e27d8570364d9a1b94be16a0ca7b744a7e to d365efdad4f566821463becaf0d5551a1a5c322f
+  - e8636393a 2025-03-21T08:42:50-03:00 UPSTREAM: <drop>: update test annotations
+  - de143cff7 2025-03-21T08:38:12-03:00 UPSTREAM: <carry>: annotate networking test as broken as per Jira ticket
+
