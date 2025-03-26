@@ -56,25 +56,23 @@ func (s *EtcdService) Run(ctx context.Context, ready chan<- struct{}, stopped ch
 	// Check to see if we should run as a systemd run or directly as a binary.
 	runningAsSvc := os.Getenv("INVOCATION_ID") != ""
 
-	// Get the path to the etcd binary based on the MicroShift binary location.
-	microshiftExecPath, err := os.Executable()
+	// Obtain the executable path
+	etcdPath, err := getEtcdServicePath()
 	if err != nil {
-		return fmt.Errorf("%v failed to get exec path: %v", s.Name(), err)
+		return err
 	}
-	etcdPath := filepath.Join(filepath.Dir(microshiftExecPath), "microshift-etcd")
-	// Not running the etcd binary directly, the proper etcd arguments
-	// are handled in etcd/cmd/microshift-etcd/run.go.
-	args := []string{}
 
-	// If we're launching MicroShift as a service, we need to do the
-	// same with etcd, so wrap it in a transient systemd-unit that's
-	// tied to the MicroShift service lifetime.
+	// If MicroShift is launched as a service, etcd should be launched in the
+	// same manner. This is done by wrapping etcd in a transient systemd-unit
+	// that is tied to the MicroShift service lifetime.
 	var exe string
+	var args []string
 	if runningAsSvc {
 		if err := stopMicroshiftEtcdScopeIfExists(); err != nil {
 			return err
 		}
 
+		// Append systemd arguments
 		args = append(args,
 			"--uid=root",
 			"--scope",
@@ -83,18 +81,25 @@ func (s *EtcdService) Run(ctx context.Context, ready chan<- struct{}, stopped ch
 			"--property", "Before=microshift.service",
 			"--property", "BindsTo=microshift.service",
 		)
-
 		if s.memoryLimit > 0 {
 			args = append(args, "--property", fmt.Sprintf("MemoryHigh=%vM", s.memoryLimit))
 		}
-
+		// Mark the end of the systemd-run options
+		args = append(args, "--")
+		// Put the etcd executable as an argument to systemd
 		args = append(args, etcdPath)
 
+		// Select the systemd runner executable
 		exe = "systemd-run"
 	} else {
+		// Select the etcd executable
 		exe = etcdPath
 	}
-	args = append(args, "run")
+
+	// Append the etcd service arguments
+	etcdArgs := getEtcdServiceArgs()
+	args = append(args, etcdArgs...)
+
 	// Not using context as canceling ctx sends SIGKILL to process
 	klog.Infof("starting etcd via %s with args %v", exe, args)
 	cmd := exec.Command(exe, args...)
@@ -146,6 +151,32 @@ func (s *EtcdService) Run(ctx context.Context, ready chan<- struct{}, stopped ch
 	// Wait for MicroShift to be done
 	<-ctx.Done()
 	return ctx.Err()
+}
+
+func getEtcdServicePath() (string, error) {
+	etcdPath := os.Getenv("MICROSHIFT_ETCD_SERVICE_PATH")
+	if etcdPath == "" {
+		// Get the path to the etcd binary based on the MicroShift binary location
+		microshiftExecPath, err := os.Executable()
+		if err != nil {
+			return "", fmt.Errorf("failed to get exec path: %v", err)
+		}
+		return filepath.Join(filepath.Dir(microshiftExecPath), "microshift-etcd"), nil
+	}
+	return etcdPath, nil
+}
+
+func getEtcdServiceArgs() []string {
+	args := []string{}
+
+	etcdArgs := os.Getenv("MICROSHIFT_ETCD_SERVICE_ARGS")
+	if etcdArgs == "" {
+		// The proper etcd arguments are handled in etcd/cmd/microshift-etcd/run.go.
+		args = append(args, "run")
+	} else {
+		// Non-default backend arguments should all be handled by it
+	}
+	return args
 }
 
 func stopMicroshiftEtcdScopeIfExists() error {
