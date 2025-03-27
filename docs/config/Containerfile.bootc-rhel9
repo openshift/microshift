@@ -6,7 +6,7 @@ RUN . /etc/os-release && dnf upgrade -y --releasever="${VERSION_ID}" && \
     dnf config-manager \
         --set-enabled "rhocp-${USHIFT_VER}-for-rhel-9-$(uname -m)-rpms" \
         --set-enabled "fast-datapath-for-rhel-9-$(uname -m)-rpms" && \
-    dnf install -y firewalld microshift && \
+    dnf install -y firewalld jq microshift microshift-release-info && \
     systemctl enable microshift && \
     dnf clean all
 
