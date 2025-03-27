@@ -2,7 +2,7 @@
 
 # Sourced from scenario.sh and uses functions defined there.
 
-start_image=rhel96-bootc-crel-isolated
+start_image=rhel94-bootc-crel-isolated
 
 scenario_create_vms() {
     if ! does_image_exist "${start_image}"; then
@@ -10,7 +10,7 @@ scenario_create_vms() {
         return 0
     fi
     prepare_kickstart host1 kickstart-bootc.ks.template "${start_image}"
-    launch_vm --boot_blueprint rhel96-bootc
+    launch_vm --boot_blueprint rhel94-bootc
 }
 
 scenario_remove_vms() {
@@ -27,8 +27,7 @@ scenario_run_tests() {
         return 0
     fi
     run_tests host1 \
-        --variable "FAILING_REF:rhel96-bootc-source-isolated" \
-        --variable "REASON:fail_greenboot" \
+        --variable "TARGET_REF:rhel94-bootc-source-isolated" \
         --variable "BOOTC_REGISTRY:${MIRROR_REGISTRY_URL}" \
-        suites/upgrade/upgrade-fails-and-rolls-back.robot
+        suites/upgrade/upgrade-successful.robot
 }
