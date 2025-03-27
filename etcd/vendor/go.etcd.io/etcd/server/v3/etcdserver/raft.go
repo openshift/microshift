@@ -19,6 +19,7 @@ import (
 	"expvar"
 	"fmt"
 	"log"
+	"math/rand/v2"
 	"sort"
 	"sync"
 	"time"
@@ -578,7 +579,7 @@ func restartAsStandaloneNode(cfg config.ServerConfig, snapshot *raftpb.Snapshot,
 	if snapshot != nil {
 		walsnap.Index, walsnap.Term = snapshot.Metadata.Index, snapshot.Metadata.Term
 	}
-	w, id, cid, st, ents := readWAL(cfg.Logger, cfg.WALDir(), walsnap, cfg.UnsafeNoFsync)
+	w, id, _, st, ents := readWAL(cfg.Logger, cfg.WALDir(), walsnap, cfg.UnsafeNoFsync)
 
 	// discard the previously uncommitted entries
 	for i, ent := range ents {
@@ -604,8 +605,12 @@ func restartAsStandaloneNode(cfg config.ServerConfig, snapshot *raftpb.Snapshot,
 	)
 	ents = append(ents, toAppEnts...)
 
+	cl := membership.NewCluster(cfg.Logger, membership.WithMaxLearners(cfg.ExperimentalMaxLearners))
+	cid := types.ID(rand.Uint64())
+	cl.SetID(id, cid)
+
 	// force commit newly appended entries
-	err := w.Save(raftpb.HardState{}, toAppEnts)
+	err := w.SaveWithMetadata(raftpb.HardState{}, toAppEnts, &pb.Metadata{NodeID: uint64(id), ClusterID: uint64(cid)})
 	if err != nil {
 		cfg.Logger.Fatal("failed to save hard state and entries", zap.Error(err))
 	}
@@ -627,8 +632,6 @@ func restartAsStandaloneNode(cfg config.ServerConfig, snapshot *raftpb.Snapshot,
 		zap.Uint64("commit-index", st.Commit),
 	)
 
-	cl := membership.NewCluster(cfg.Logger, membership.WithMaxLearners(cfg.ExperimentalMaxLearners))
-	cl.SetID(id, cid)
 	s := raft.NewMemoryStorage()
 	if snapshot != nil {
 		s.ApplySnapshot(*snapshot)
