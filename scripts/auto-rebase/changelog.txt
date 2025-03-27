@@ -1,7 +1,69 @@
-- ovn-kubernetes image-arm64 66faee9937abbd9abc8e72e160c6fb2f4e606e9b to 12b33c120f3240ed9df2bdfcc01d3bd0a313b3c7
-  - 9c4499b0 2025-03-20T14:51:14+01:00 Update OVN to FDP25.A.1 24.09.2-41.
+- api embedded-component 3aa9dd5b9002b370acc8ca4b4b041d682c22ca85 to 0f14a211af331fdff85df33c6112e48cb8405dd3
+  - d8e63009 2025-03-25T14:40:26+00:00 Update vendor
+  - af37962a 2025-03-25T13:45:28+00:00 Update compatibility gen to gengo v2
+  - ed97866d 2025-03-25T13:45:27+00:00 Execute updated deepcopy gen
+  - 1f374da4 2025-03-25T13:45:25+00:00 Update deepcopy generator to gengo v2
+  - 4790b499 2025-03-24T17:06:03+01:00 feat: update insightsDataGather to v1alpha2 with GathererConfig
+  - 4207302a 2025-03-20T09:20:11-04:00 ability-to-add-second-logo-pt6
+  - 8ada9f62 2025-03-12T17:55:45+05:30 make update
+  - 9e752e31 2025-03-12T17:55:23+05:30 [FeatureGate/KMSEncryptionProvider] APIServer config for AWS KMS
 
-- kubernetes image-arm64 1601b9e27d8570364d9a1b94be16a0ca7b744a7e to d365efdad4f566821463becaf0d5551a1a5c322f
+- cluster-csi-snapshot-controller-operator embedded-component b1a1105065835fcd881529299bc431921f4aa156 to 7d1e842d8920df6788b92a36b7f0564cb4a49f0e
+  - 43315ac 2025-02-18T15:33:20+01:00 update readme link
+  - ff0b5f8 2025-02-18T15:21:10+01:00 remove csi-snapshot-validation-webhook image
+
+- cluster-ingress-operator embedded-component 924279a66d42d633d658113846d68e8d3805ec26 to 1b72b75bd12ae929dbae3ff0e71ab3bb7017c4c8
+  - 95b36d0 2025-03-24T15:15:32-04:00 dns/gcp: Allow configuring custom endpoints
+  - 25dde98 2025-03-21T00:39:15-04:00 gatewayapi-conformance.sh: Shorten gatewayclass
+  - 0aeb2d3 2025-03-21T00:39:15-04:00 gatewayclass: Reconcile the oldest gatewayclass
+  - 8fe21cc 2025-03-21T00:39:15-04:00 gatewayapi-conformance.sh: Fix CoreDNS deployment
+  - cfb791d 2025-03-21T00:39:15-04:00 assertHttpRouteConnection: Increase error logging
+  - 7fd3169 2025-03-21T00:39:15-04:00 gatewayclass: Improve ownerReferences handling
+  - 01ec282 2025-03-21T00:39:15-04:00 gatewayapi-conformance.sh: Fix MaxTimeToConsistency
+  - 863e2ac 2025-03-21T00:39:15-04:00 Add gateway-labeler controller
+  - 3567b7f 2025-03-21T00:39:15-04:00 Move gatewayclass controller consts to names.go
+  - decc04b 2025-03-21T00:39:15-04:00 createGatewayClass: Fix get error handling
+  - fd4db95 2025-03-21T00:39:15-04:00 ensureCRDs: Report all served versions of the CRDs
+  - e48a111 2025-03-21T00:39:15-04:00 assertGatewaySuccessful: Log gateway on failure
+  - 2c2213b 2025-03-21T00:39:15-04:00 gatewayapi-conformance.sh: Echo clone dir
+  - 5c76a85 2025-03-21T00:39:15-04:00 desiredSubscription: Add "owned" annotation
+  - 5b17879 2025-03-21T00:39:15-04:00 Bump to OSSM 3.0 for Gateway API support
+  - 5c30510 2025-03-20T15:44:17+01:00 TestGatewayAPI: Remove t.Helper() from subtests
+  - 70d00ff 2025-03-20T15:44:17+01:00 NE-1953: Add experimental Gateway API group to Validating Admission Policy
+
+- etcd embedded-component 80d288f7ccb6c11128e2d697e7d26805c487150b to 2f703d6792c6f60b89f5b51d8018ba70a24d6472
+  - f0cf6bb7 2025-03-12T11:04:19-04:00 add new internal wal type to track metadata changes
+  - 16beb959 2025-03-11T09:53:21-04:00 try failing again
+  - 799a807a 2025-03-07T17:24:40-05:00 revert fatal log
+  - a8e02927 2025-03-07T16:07:49-05:00 make sure to update metadata if we're given it
+  - e5527181 2025-03-07T13:20:08-05:00 add fatal log where non-recovery members are hot looping
+  - 176edcf3 2025-03-07T10:42:19-05:00 Try to save new cluster id to wal
+  - 0f0a5929 2025-03-03T08:56:29-05:00 Add time component to cluster id during --force-new-cluster
+
+- kubernetes embedded-component 1601b9e27d8570364d9a1b94be16a0ca7b744a7e to d365efdad4f566821463becaf0d5551a1a5c322f
   - e8636393a 2025-03-21T08:42:50-03:00 UPSTREAM: <drop>: update test annotations
   - de143cff7 2025-03-21T08:38:12-03:00 UPSTREAM: <carry>: annotate networking test as broken as per Jira ticket
+
+- machine-config-operator embedded-component fe8353e4ea7e72dfd69105069b870a37a87478ec to dadb5688c841aa042f279729d3789309325ef1fe
+  - 3549f569 2025-03-25T14:59:35-04:00 upgrade monitor: update not yet set default value
+  - d599cff2 2025-03-05T16:55:58-05:00 update (Cluster)Imagepolicy PKI config to policy.json
+
+- operator-framework-olm embedded-component e7c4a6900a8b47fef5bf8f5587b0088ba4a057c8 to 84b340e84ff53899465eed6ddb6d790a6297be2d
+  - 9c5364a8 2025-03-20T00:03:55+00:00 :seedling: Bump github.com/onsi/ginkgo/v2 from 2.22.2 to 2.23.0 (#3539)
+  - e2c0090a 2025-03-20T00:02:50+00:00 :seedling: Bump github.com/prometheus/common from 0.62.0 to 0.63.0 (#3542)
+  - 344fe18e 2025-03-20T00:02:32+00:00 :seedling: Bump github.com/containerd/containerd from 1.7.25 to 1.7.27 (#3543)
+
+- oc image-amd64 57018b1991282fd743495e240efe056f5f37be4a to f2c6ae49d3ba3b58e506d5948bceb3a752def432
+  - 7adf7721 2025-03-25T06:22:37+08:00 Fix: Use ProxyFromEnvironment when creating HTTP transport
+  - 1157fa2f 2025-03-20T19:26:19+01:00 debug: suggest nsenter in addition to chroot
+
+- ovn-kubernetes image-amd64 66faee9937abbd9abc8e72e160c6fb2f4e606e9b to 12b33c120f3240ed9df2bdfcc01d3bd0a313b3c7
+  - 9c4499b0 2025-03-20T14:51:14+01:00 Update OVN to FDP25.A.1 24.09.2-41.
+
+- kubernetes image-amd64 1601b9e27d8570364d9a1b94be16a0ca7b744a7e to d365efdad4f566821463becaf0d5551a1a5c322f
+  - e8636393a 2025-03-21T08:42:50-03:00 UPSTREAM: <drop>: update test annotations
+  - de143cff7 2025-03-21T08:38:12-03:00 UPSTREAM: <carry>: annotate networking test as broken as per Jira ticket
+
+- oc image-arm64 33cbfe154012e938b00420aa6c4a62e38184da99 to f2c6ae49d3ba3b58e506d5948bceb3a752def432
+  - 7adf7721 2025-03-25T06:22:37+08:00 Fix: Use ProxyFromEnvironment when creating HTTP transport
 
