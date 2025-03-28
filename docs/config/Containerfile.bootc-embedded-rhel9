@@ -28,7 +28,7 @@ RUN --mount=type=secret,id=pullsecret,dst=/run/secrets/pull-secret.json \
 # the additional store path.
 # See https://issues.redhat.com/browse/RHEL-75827
 RUN cat > /usr/bin/microshift-copy-images <<EOF
-#/bin/bash
+#!/bin/bash
 set -eux -o pipefail
 while IFS="," read -r img sha ; do
     skopeo copy --preserve-digests \
@@ -42,5 +42,5 @@ RUN chmod 755 /usr/bin/microshift-copy-images && \
 
 RUN cat > /etc/systemd/system/microshift.service.d/microshift-copy-images.conf <<EOF
 [Service]
-ExecStartPre=/bin/bash -c /usr/bin/microshift-copy-images
+ExecStartPre=/usr/bin/microshift-copy-images
 EOF
