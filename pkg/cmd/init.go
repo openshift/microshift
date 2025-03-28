@@ -154,7 +154,15 @@ func certSetup(cfg *config.Config) (*certchains.CertificateChains, error) {
 					ValidityDays: cryptomaterial.LongLivedCertificateValidityDays,
 				},
 				UserInfo: &user.DefaultInfo{Name: "system:admin", Groups: []string{"system:masters"}},
-			}),
+			}).WithClientCertificates(
+			&certchains.ClientCertificateSigningRequestInfo{
+				CSRMeta: certchains.CSRMeta{
+					Name:         "openshift-observability-client",
+					ValidityDays: cryptomaterial.ShortLivedCertificateValidityDays,
+				},
+				UserInfo: &user.DefaultInfo{Name: "openshift-observability-client", Groups: []string{""}},
+			},
+		),
 
 		// kubelet + CSR signing chain
 		certchains.NewCertificateSigner(
@@ -533,6 +541,18 @@ func initKubeconfigs(
 		cfg.ApiServer.URL,
 		internalTrustPEM,
 		routeControllerManagerCertPEM, routeControllerManagerKeyPEM,
+	); err != nil {
+		return err
+	}
+	observabilityClientCertPEM, observabilityClientKeyPEM, err := certChains.GetCertKey("admin-kubeconfig-signer", "openshift-observability-client")
+	if err != nil {
+		return err
+	}
+	if err := util.KubeConfigWithClientCerts(
+		cfg.KubeConfigPath(config.ObservabilityClient),
+		cfg.ApiServer.URL,
+		internalTrustPEM,
+		observabilityClientCertPEM, observabilityClientKeyPEM,
 	); err != nil {
 		return err
 	}

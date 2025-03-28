@@ -5,14 +5,16 @@ import libostree
 _log = BuiltIn().log
 
 
-def get_journal_cursor() -> str:
-    """Return the cursor value for the MicroShift logs.
+def get_journal_cursor(unit="microshift") -> str:
+    """Return the cursor value for the unit's logs.
 
-    Return a value that can be used to find new MicroShift log
+    Return a value that can be used to find new service log
     output. See --cursor argument to journalctl for details.
+
+    Optional argument `unit` may be used to specify a systemd unit other than microshift, for example microshift-observability.service
     """
     stdout, rc = libostree.remote_sudo_rc(
-        "journalctl -u microshift --show-cursor --no-pager -n 0"
+        f"journalctl -u {unit} --show-cursor --no-pager -n 0"
     )
     BuiltIn().should_be_equal_as_integers(rc, 0)
     # Produces output like:
@@ -24,27 +26,31 @@ def get_journal_cursor() -> str:
     return cursor
 
 
-def get_log_output_with_pattern(cursor: str, pattern: str) -> tuple[str, int]:
-    """Get the logs since the cursor matching the pattern and return the log content and exit code."""
+def get_log_output_with_pattern(cursor: str, pattern: str, unit="microshift") -> tuple[str, int]:
+    """
+    Get the logs since the cursor matching the pattern and return the log content and exit code.
+    Optional argument `unit` may be used to specify a systemd unit other than microshift,
+    for example microshift-observability.service.
+    """
     stdout, rc = libostree.remote_sudo_rc(
-        f"journalctl -u microshift --cursor='{cursor}' --no-pager --grep '{pattern}'"
+        f"journalctl -u {unit} --cursor='{cursor}' --no-pager --grep '{pattern}'"
     )
     BuiltIn().log(f"log lines matching '{pattern}':\n{stdout}")
     return stdout, rc
 
 
-def pattern_should_not_appear_in_log_output(cursor, pattern):
+def pattern_should_not_appear_in_log_output(cursor, pattern, unit="microshift"):
     """Get the logs since the cursor and verify that the pattern does not appear."""
-    stdout, rc = get_log_output_with_pattern(cursor, pattern)
+    stdout, rc = get_log_output_with_pattern(cursor, pattern, unit)
     # The grep argument causes journalctl to exit with an error if the
     # pattern is not found, therefore we want the return code to be 1,
     # indicating that there was no match.
     BuiltIn().should_be_equal_as_integers(rc, 1)
 
 
-def pattern_should_appear_in_log_output(cursor, pattern):
+def pattern_should_appear_in_log_output(cursor, pattern, unit="microshift"):
     """Get the logs since the cursor and verify that the pattern does not appear."""
-    stdout, rc = get_log_output_with_pattern(cursor, pattern)
+    stdout, rc = get_log_output_with_pattern(cursor, pattern, unit)
     # The grep argument causes journalctl to exit with an error if the
     # pattern is not found, therefore we want the return code to be 0,
     # indicating that there was a match.
