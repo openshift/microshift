@@ -1,69 +1,47 @@
-- api embedded-component 3aa9dd5b9002b370acc8ca4b4b041d682c22ca85 to 0f14a211af331fdff85df33c6112e48cb8405dd3
-  - d8e63009 2025-03-25T14:40:26+00:00 Update vendor
-  - af37962a 2025-03-25T13:45:28+00:00 Update compatibility gen to gengo v2
-  - ed97866d 2025-03-25T13:45:27+00:00 Execute updated deepcopy gen
-  - 1f374da4 2025-03-25T13:45:25+00:00 Update deepcopy generator to gengo v2
-  - 4790b499 2025-03-24T17:06:03+01:00 feat: update insightsDataGather to v1alpha2 with GathererConfig
-  - 4207302a 2025-03-20T09:20:11-04:00 ability-to-add-second-logo-pt6
-  - 8ada9f62 2025-03-12T17:55:45+05:30 make update
-  - 9e752e31 2025-03-12T17:55:23+05:30 [FeatureGate/KMSEncryptionProvider] APIServer config for AWS KMS
-
-- cluster-csi-snapshot-controller-operator embedded-component b1a1105065835fcd881529299bc431921f4aa156 to 7d1e842d8920df6788b92a36b7f0564cb4a49f0e
-  - 43315ac 2025-02-18T15:33:20+01:00 update readme link
-  - ff0b5f8 2025-02-18T15:21:10+01:00 remove csi-snapshot-validation-webhook image
-
-- cluster-ingress-operator embedded-component 924279a66d42d633d658113846d68e8d3805ec26 to 1b72b75bd12ae929dbae3ff0e71ab3bb7017c4c8
-  - 95b36d0 2025-03-24T15:15:32-04:00 dns/gcp: Allow configuring custom endpoints
-  - 25dde98 2025-03-21T00:39:15-04:00 gatewayapi-conformance.sh: Shorten gatewayclass
-  - 0aeb2d3 2025-03-21T00:39:15-04:00 gatewayclass: Reconcile the oldest gatewayclass
-  - 8fe21cc 2025-03-21T00:39:15-04:00 gatewayapi-conformance.sh: Fix CoreDNS deployment
-  - cfb791d 2025-03-21T00:39:15-04:00 assertHttpRouteConnection: Increase error logging
-  - 7fd3169 2025-03-21T00:39:15-04:00 gatewayclass: Improve ownerReferences handling
-  - 01ec282 2025-03-21T00:39:15-04:00 gatewayapi-conformance.sh: Fix MaxTimeToConsistency
-  - 863e2ac 2025-03-21T00:39:15-04:00 Add gateway-labeler controller
-  - 3567b7f 2025-03-21T00:39:15-04:00 Move gatewayclass controller consts to names.go
-  - decc04b 2025-03-21T00:39:15-04:00 createGatewayClass: Fix get error handling
-  - fd4db95 2025-03-21T00:39:15-04:00 ensureCRDs: Report all served versions of the CRDs
-  - e48a111 2025-03-21T00:39:15-04:00 assertGatewaySuccessful: Log gateway on failure
-  - 2c2213b 2025-03-21T00:39:15-04:00 gatewayapi-conformance.sh: Echo clone dir
-  - 5c76a85 2025-03-21T00:39:15-04:00 desiredSubscription: Add "owned" annotation
-  - 5b17879 2025-03-21T00:39:15-04:00 Bump to OSSM 3.0 for Gateway API support
-  - 5c30510 2025-03-20T15:44:17+01:00 TestGatewayAPI: Remove t.Helper() from subtests
-  - 70d00ff 2025-03-20T15:44:17+01:00 NE-1953: Add experimental Gateway API group to Validating Admission Policy
-
-- etcd embedded-component 80d288f7ccb6c11128e2d697e7d26805c487150b to 2f703d6792c6f60b89f5b51d8018ba70a24d6472
-  - f0cf6bb7 2025-03-12T11:04:19-04:00 add new internal wal type to track metadata changes
-  - 16beb959 2025-03-11T09:53:21-04:00 try failing again
-  - 799a807a 2025-03-07T17:24:40-05:00 revert fatal log
-  - a8e02927 2025-03-07T16:07:49-05:00 make sure to update metadata if we're given it
-  - e5527181 2025-03-07T13:20:08-05:00 add fatal log where non-recovery members are hot looping
-  - 176edcf3 2025-03-07T10:42:19-05:00 Try to save new cluster id to wal
-  - 0f0a5929 2025-03-03T08:56:29-05:00 Add time component to cluster id during --force-new-cluster
-
-- kubernetes embedded-component 1601b9e27d8570364d9a1b94be16a0ca7b744a7e to d365efdad4f566821463becaf0d5551a1a5c322f
-  - e8636393a 2025-03-21T08:42:50-03:00 UPSTREAM: <drop>: update test annotations
-  - de143cff7 2025-03-21T08:38:12-03:00 UPSTREAM: <carry>: annotate networking test as broken as per Jira ticket
-
-- machine-config-operator embedded-component fe8353e4ea7e72dfd69105069b870a37a87478ec to dadb5688c841aa042f279729d3789309325ef1fe
-  - 3549f569 2025-03-25T14:59:35-04:00 upgrade monitor: update not yet set default value
-  - d599cff2 2025-03-05T16:55:58-05:00 update (Cluster)Imagepolicy PKI config to policy.json
-
-- operator-framework-olm embedded-component e7c4a6900a8b47fef5bf8f5587b0088ba4a057c8 to 84b340e84ff53899465eed6ddb6d790a6297be2d
-  - 9c5364a8 2025-03-20T00:03:55+00:00 :seedling: Bump github.com/onsi/ginkgo/v2 from 2.22.2 to 2.23.0 (#3539)
-  - e2c0090a 2025-03-20T00:02:50+00:00 :seedling: Bump github.com/prometheus/common from 0.62.0 to 0.63.0 (#3542)
-  - 344fe18e 2025-03-20T00:02:32+00:00 :seedling: Bump github.com/containerd/containerd from 1.7.25 to 1.7.27 (#3543)
-
-- oc image-amd64 57018b1991282fd743495e240efe056f5f37be4a to f2c6ae49d3ba3b58e506d5948bceb3a752def432
-  - 7adf7721 2025-03-25T06:22:37+08:00 Fix: Use ProxyFromEnvironment when creating HTTP transport
-  - 1157fa2f 2025-03-20T19:26:19+01:00 debug: suggest nsenter in addition to chroot
-
-- ovn-kubernetes image-amd64 66faee9937abbd9abc8e72e160c6fb2f4e606e9b to 12b33c120f3240ed9df2bdfcc01d3bd0a313b3c7
-  - 9c4499b0 2025-03-20T14:51:14+01:00 Update OVN to FDP25.A.1 24.09.2-41.
-
-- kubernetes image-amd64 1601b9e27d8570364d9a1b94be16a0ca7b744a7e to d365efdad4f566821463becaf0d5551a1a5c322f
-  - e8636393a 2025-03-21T08:42:50-03:00 UPSTREAM: <drop>: update test annotations
-  - de143cff7 2025-03-21T08:38:12-03:00 UPSTREAM: <carry>: annotate networking test as broken as per Jira ticket
-
-- oc image-arm64 33cbfe154012e938b00420aa6c4a62e38184da99 to f2c6ae49d3ba3b58e506d5948bceb3a752def432
-  - 7adf7721 2025-03-25T06:22:37+08:00 Fix: Use ProxyFromEnvironment when creating HTTP transport
+- ovn-kubernetes image-arm64 12b33c120f3240ed9df2bdfcc01d3bd0a313b3c7 to 0f6638ab81a33cd275febfd9f3330dc12c9f2936
+  - a637c80f 2025-03-20T13:47:37+01:00 e2e: Add test for L3UDNPod->external advertised by BGP
+  - ff971e25 2025-03-19T18:17:21+01:00 Use NetInfo in management port
+  - 23e4eb23 2025-03-19T18:17:21+01:00 Move management port implementation to new package
+  - ccf448ca 2025-03-19T18:17:21+01:00 Add management port package, interfaces and usage
+  - 018d3142 2025-03-19T18:17:21+01:00 Clean up gateway_localnet_linux_test.go
+  - 68c75381 2025-03-19T18:17:21+01:00 Remove quoting from nft rules so that knftables.ParseDump doesn't fail
+  - 62b331d6 2025-03-19T18:17:21+01:00 Move gateway/management port shared types
+  - 979b761c 2025-03-19T18:17:21+01:00 Create flow cache on start instead of init
+  - 90ed0743 2025-03-19T18:17:21+01:00 Remove management port dead params/code
+  - 8d531c21 2025-03-19T18:17:21+01:00 Fix failing tests when executed in container due to missing fake helpers
+  - 20f85175 2025-03-19T18:17:21+01:00 Rename default node network controller PreStart to Init
+  - 042ac411 2025-03-19T17:28:08+01:00 [multinetpol] Update controller to handle endPort.
+  - 2a3e1950 2025-03-19T16:37:58+01:00 Create the frrconfig in frr-k8s-system namespace
+  - 8b3ea809 2025-03-19T10:53:01+00:00 E2Es: drop container rights for unpriv pods
+  - 94fb425f 2025-03-19T17:56:27+09:00 dist/images: fix cleanup command for northd
+  - cbab4178 2025-03-18T21:02:25+01:00 Add BGP e2e test for pod->external
+  - 44233ca2 2025-03-18T21:02:23+01:00 Add a new CP lane for BGP tests
+  - 6cdfa095 2025-03-18T20:58:03+01:00 BGP, shard: don't use frr as the default gateway
+  - 4c9fa198 2025-03-18T12:52:31+00:00 net controller: reconcile on physical net name updates
+  - 36e85f45 2025-03-18T00:31:42+01:00 e2e: skip ETP local conformance tests if default pod network is advertised
+  - 8f9797f4 2025-03-18T00:31:42+01:00 e2e: run shard-conformance advertising default network
+  - d48e073d 2025-03-17T09:25:51+02:00 udn, l3: Send event when the IP pool is exhausted
+  - 06d2ac17 2025-03-17T09:25:51+02:00 udn, l2: Send event when the IP pool is exhausted
+  - 8f76d4ca 2025-03-17T09:25:51+02:00 allocator/ip: Expand error info when ip range is full
+  - 95b6ca54 2025-03-14T19:23:07+01:00 kind: Pint kubevirt to v1.4.0
+  - edc12a2d 2025-03-14T15:41:36+01:00 test/e2e, multihoming: Check VLAN-ID change on NAD update
+  - c7cae3d0 2025-03-14T15:41:36+01:00 test/e2e, multihoming: Check exclude-subnet change on NAD update
+  - 1ccb6e55 2025-03-14T15:41:36+01:00 test/e2e, multihoming: Check MTU change on NAD update
+  - f574d427 2025-03-14T15:41:36+01:00 test/e2e, multihoming: Separate NADSpec creation from NAD creation
+  - 2437047a 2025-03-13T10:33:04+01:00 awesome-pages is not awesome-nav :/
+  - ae7fdd99 2025-03-12T18:07:08+01:00 [e2e, multihoming] Rename multi-netpol tests to avoid duplication.
+  - 4812ec97 2025-03-12T18:07:02+01:00 [multinetpol] Update to use the latest 1.0.1 release.
+  - 7f7e82e9 2025-03-12T17:30:16+01:00 Update community meeting timing and platform details
+  - 9a6ef80e 2025-03-12T11:45:42+00:00 Support UDNs for EIP route advertisements
+  - 8f6e3ee9 2025-03-12T11:45:42+00:00 Add GetActiveNetworkForNamespaceFast to network manager
+  - a7971548 2025-03-11T09:40:28+02:00 EgressService: add additionalPrinterColumn for .status.host
+  - 562f752b 2025-03-07T10:44:57-05:00 Refactor ID nomenclature
+  - 029f4f65 2025-03-05T18:11:59-05:00 Fix receiver methods for SecondaryNodeNetworkController
+  - 532c7d03 2025-03-05T18:11:59-05:00 Removes stale code relying on networkID from nodes/caches
+  - 167945e9 2025-03-04T14:45:06-05:00 Fixes getting networkID for network controllers
+  - 5aa587ed 2025-03-04T14:45:06-05:00 Adds NeedsNodeAllocation function
+  - 9530aaea 2025-03-04T14:45:05-05:00 Reduce node events caused by zone cluster controller
+  - 836ec368 2025-03-04T14:45:05-05:00 Limit cluster manager node allocator updates/logs
+  - 298c6674 2025-03-03T21:25:21+00:00 RouteAdvertisements: fail if DisableMP is unset
+  - 2cd8a7bd 2025-02-28T18:46:51+01:00 Support Gateway accelerated interface (Bypass port)
 
