@@ -177,17 +177,6 @@ function get_latency {
     echo "${AVG_LATENCY}ms"
 }
 
-function tbd {
-    echo -e "This action is not implemented yet"
-}
-
-function check_command {
-    if ! run $1 &> /dev/null ; then
-        echo -e "ERROR: $1: command not found"
-        exit 1
-    fi
-}
-
 # network outage
 function network_outage {
     network_outage_ready
