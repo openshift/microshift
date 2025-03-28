@@ -1,0 +1,6 @@
+# Address the problem with image upgrades overwriting the container images in
+# additional store. The workaround is to copy the images from the pre-loaded
+# to the main container storage.
+# See https://issues.redhat.com/browse/RHEL-75827
+[Service]
+ExecStartPre=/usr/bin/microshift-copy-images copy
