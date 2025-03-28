@@ -3,6 +3,7 @@ Documentation       Keywords common to many test suites
 
 Library             OperatingSystem
 Library             String
+Library             yaml
 Library             SSHLibrary
 Resource            ../resources/kubeconfig.resource
 
@@ -138,3 +139,20 @@ Local Command Should Work
     Log    ${stdout}
     Should Be Equal As Integers    0    ${rc}
     RETURN    ${stdout}
+
+Compare Output Logs
+    [Documentation]    Compares actual log output against expected patterns
+    [Arguments]    ${actual_str}    ${expected_str}
+    @{expected_lines}=    Split To Lines    ${expected_str}
+    FOR    ${pattern}    IN    @{expected_lines}
+        ${pattern}=    Strip String    ${pattern}
+        Should Match Regexp    ${actual_str}    ${pattern}
+    END
+
+Get Expected Message
+    [Documentation]    Get the usage message for a specific command from the YAML file
+    [Arguments]    ${path}    ${action}    ${resource}
+    ${yaml_file}=    OperatingSystem.Get File    ${path}
+    ${messages_dict}=    yaml.Safe Load    ${yaml_file}
+    ${message}=    Set Variable    ${messages_dict}[${action}][${resource}]
+    RETURN    ${message}

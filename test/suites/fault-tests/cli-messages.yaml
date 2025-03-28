@@ -1,0 +1,180 @@
+microshift:
+  default: |
+    MicroShift, a minimal OpenShift
+
+    Usage:
+      microshift [flags]
+      microshift [command]
+
+    Available Commands:
+      backup      Create a backup of MicroShift data
+      completion  Generate the autocompletion script for the specified shell
+      healthcheck Verify health of the MicroShift
+      help        Help about any command
+      restore     Restore MicroShift data from a backup
+      run         Run MicroShift
+      show-config Print MicroShift's configuration
+      version     Print MicroShift version information
+
+    Flags:
+      -h, --help      help for microshift
+      -v, --v Level   number for the log level verbosity
+
+    Use "microshift [command] --help" for more information about a command.
+  --help: |
+    MicroShift, a minimal OpenShift
+
+    Usage:
+      microshift [flags]
+      microshift [command]
+
+    Available Commands:
+      backup      Create a backup of MicroShift data
+      completion  Generate the autocompletion script for the specified shell
+      healthcheck Verify health of the MicroShift
+      help        Help about any command
+      restore     Restore MicroShift data from a backup
+      run         Run MicroShift
+      show-config Print MicroShift's configuration
+      version     Print MicroShift version information
+
+    Flags:
+      -h, --help      help for microshift
+      -v, --v Level   number for the log level verbosity
+
+    Use "microshift [command] --help" for more information about a command.
+microshift backup:
+  default: |
+    Error: command requires an argument
+
+    Usage:
+      microshift backup PATH [flags]
+
+    Flags:
+          --auto-recovery   Changes the behavior of the backup command.
+                            The PATH argument will be treated as a directory where backups are
+                            created using the naming scheme compatible with "restore --auto-recovery"
+      -h, --help            help for backup
+
+  --help: |
+    Create a backup of MicroShift data. PATH should not exist.
+
+    Usage:
+      microshift backup PATH [flags]
+
+    Flags:
+          --auto-recovery   Changes the behavior of the backup command.
+                            The PATH argument will be treated as a directory where backups are
+                            created using the naming scheme compatible with "restore --auto-recovery"
+      -h, --help            help for backup
+    
+    Global Flags:
+      -v, --v Level   number for the log level verbosity
+microshift completion:
+  default: |
+    Generate the autocompletion script for microshift for the specified shell.
+    See each sub-command's help for details on how to use the generated script.
+
+    Usage:
+      microshift completion [command]
+
+    Available Commands:
+      bash        Generate the autocompletion script for bash
+      fish        Generate the autocompletion script for fish
+      powershell  Generate the autocompletion script for powershell
+      zsh         Generate the autocompletion script for zsh
+
+    Flags:
+      -h, --help   help for completion
+
+    Global Flags:
+      -v, --v Level   number for the log level verbosity
+
+    Use "microshift completion [command] --help" for more information about a command.
+  --help: |
+    Generate the autocompletion script for microshift for the specified shell.
+    See each sub-command's help for details on how to use the generated script.
+
+    Usage:
+      microshift completion [command]
+
+    Available Commands:
+      bash        Generate the autocompletion script for bash
+      fish        Generate the autocompletion script for fish
+      powershell  Generate the autocompletion script for powershell
+      zsh         Generate the autocompletion script for zsh
+
+    Flags:
+      -h, --help   help for completion
+
+    Global Flags:
+      -v, --v Level   number for the log level verbosity
+
+    Use "microshift completion [command] --help" for more information about a command.
+microshift help:
+  default: |
+    MicroShift, a minimal OpenShift
+
+    Usage:
+      microshift [flags]
+      microshift [command]
+
+    Available Commands:
+      backup      Create a backup of MicroShift data
+      completion  Generate the autocompletion script for the specified shell
+      healthcheck Verify health of the MicroShift
+      help        Help about any command
+      restore     Restore MicroShift data from a backup
+      run         Run MicroShift
+      show-config Print MicroShift's configuration
+      version     Print MicroShift version information
+
+    Flags:
+      -h, --help      help for microshift
+      -v, --v Level   number for the log level verbosity
+
+    Use "microshift [command] --help" for more information about a command.
+  --help: |
+    Help provides help for any command in the application.
+    Simply type microshift help [path to command] for full details.
+
+    Usage:
+      microshift help [command] [flags]
+
+    Flags:
+      -h, --help   help for help
+
+    Global Flags:
+      -v, --v Level   number for the log level verbosity
+microshift restore:
+  default: |
+    Error: command requires an argument
+
+    Usage:
+      microshift restore PATH [flags]
+
+    Flags:
+          --auto-recovery      Changes the behavior of the restore command.
+                               The PATH argument will be treated as a directory where backups are
+                               created with "backup --auto-recovery" command.
+          --dont-save-failed   Only applicable if --auto-recovery is also specified.
+                               Don't make a copy of MicroShift data directory inside
+                               "failed" subdirectory for later analysis.
+      -h, --help               help for restore
+  --help: |
+    Restore MicroShift data from a backup
+
+    Usage:
+      microshift restore PATH [flags]
+
+    Flags:
+          --auto-recovery      Changes the behavior of the restore command.
+                               The PATH argument will be treated as a directory where backups are
+                               created with "backup --auto-recovery" command.
+          --dont-save-failed   Only applicable if --auto-recovery is also specified.
+                               Don't make a copy of MicroShift data directory inside
+                               "failed" subdirectory for later analysis.
+      -h, --help               help for restore
+
+    Global Flags:
+      -v, --v Level   number for the log level verbosity

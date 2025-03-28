@@ -41,6 +41,7 @@ Wait For MicroShift
     ...    MicroShift Is Ready
     Wait Until Keyword Succeeds    30x    10s
     ...    MicroShift Is Live
+    All Pods Should Be Running    timeout=300s
     # We could also wait for relevant pods. Can we restructure the
     # greenboot check script to let us use it even when not on a
     # greenboot host?
