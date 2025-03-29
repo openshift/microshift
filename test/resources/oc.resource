@@ -186,3 +186,12 @@ Oc Logs
     [Arguments]    ${opts}    ${namespace}
     ${output}=    Run With Kubeconfig    oc logs -n ${namespace} ${opts}
     RETURN    ${output}
+
+All Pods Should Be Running
+    [Documentation]    Check if all pods are running in the current namespace
+    [Arguments]    ${ns}=-A    ${timeout}=${DEFAULT_WAIT_TIMEOUT}
+    IF    "${ns}"=="-A"
+        Oc Wait    pods --all -A    --for="condition=Ready" --timeout=${timeout}
+    ELSE
+        Oc Wait    pods --all -n ${ns}    --for="condition=Ready" --timeout=${timeout}
+    END

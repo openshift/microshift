@@ -137,24 +137,27 @@ Change Hostname
 
 Command Should Work
     [Documentation]    Run a command remotely, log stderr, fail if RC is not 0, return stdout
-    [Arguments]    ${command}
-    ${stdout}    ${stderr}    ${rc}=    SSHLibrary.Execute Command
-    ...    ${command}
-    ...    sudo=True
-    ...    return_rc=True
-    ...    return_stderr=True
-    ...    return_stdout=True
-    Log    ${stderr}
-    Should Be Equal As Integers    0    ${rc}
+    [Arguments]    ${command}    ${sudo_mode}=True    ${expected_rc}=0
+    ${stdout}    ${stderr}    ${rc}=    Command Execution    ${command}    ${sudo_mode}
+    Should Be Equal As Numbers    ${rc}    ${expected_rc}
     RETURN    ${stdout}
 
 Command Should Fail
     [Documentation]    Run a command remotely, expect command to fail
-    [Arguments]    ${command}
+    [Arguments]    ${command}    ${sudo_mode}=True    ${expected_rc}=1
+    ${stdout}    ${stderr}    ${rc}=    Command Execution    ${command}    ${sudo_mode}
+    Should Be Equal As Numbers    ${rc}    ${expected_rc}
+    RETURN    ${stderr}
+
+Command Execution
+    [Documentation]    Run a command remotely, log stdout and stderr. Don't check RC.
+    [Arguments]    ${command}    ${sudo_mode}=True
     ${stdout}    ${stderr}    ${rc}=    SSHLibrary.Execute Command
     ...    ${command}
-    ...    sudo=True
+    ...    sudo=${sudo_mode}
     ...    return_rc=True
     ...    return_stderr=True
     ...    return_stdout=True
-    Should Not Be Equal As Integers    0    ${rc}
+    Log    ${stdout}
+    Log    ${stderr}
+    RETURN    ${stdout}    ${stderr}    ${rc}
