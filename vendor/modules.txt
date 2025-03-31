@@ -868,7 +868,7 @@ github.com/vishvananda/netns
 # github.com/xlab/treeprint v1.2.0
 ## explicit; go 1.13
 github.com/xlab/treeprint
-# go.etcd.io/etcd/api/v3 v3.5.18 => github.com/openshift/etcd/api/v3 v3.5.1-0.20250321131051-abfca6b7fe67
+# go.etcd.io/etcd/api/v3 v3.5.18 => github.com/openshift/etcd/api/v3 v3.5.1-0.20250325012632-0d9e0a907c4a
 ## explicit; go 1.22
 go.etcd.io/etcd/api/v3/authpb
 go.etcd.io/etcd/api/v3/etcdserverpb
@@ -876,7 +876,7 @@ go.etcd.io/etcd/api/v3/membershippb
 go.etcd.io/etcd/api/v3/mvccpb
 go.etcd.io/etcd/api/v3/v3rpc/rpctypes
 go.etcd.io/etcd/api/v3/version
-# go.etcd.io/etcd/client/pkg/v3 v3.5.18 => github.com/openshift/etcd/client/pkg/v3 v3.5.1-0.20250321131051-abfca6b7fe67
+# go.etcd.io/etcd/client/pkg/v3 v3.5.18 => github.com/openshift/etcd/client/pkg/v3 v3.5.1-0.20250325012632-0d9e0a907c4a
 ## explicit; go 1.22
 go.etcd.io/etcd/client/pkg/v3/fileutil
 go.etcd.io/etcd/client/pkg/v3/logutil
@@ -884,7 +884,7 @@ go.etcd.io/etcd/client/pkg/v3/systemd
 go.etcd.io/etcd/client/pkg/v3/tlsutil
 go.etcd.io/etcd/client/pkg/v3/transport
 go.etcd.io/etcd/client/pkg/v3/types
-# go.etcd.io/etcd/client/v3 v3.5.10 => github.com/openshift/etcd/client/v3 v3.5.1-0.20250321131051-abfca6b7fe67
+# go.etcd.io/etcd/client/v3 v3.5.10 => github.com/openshift/etcd/client/v3 v3.5.1-0.20250325012632-0d9e0a907c4a
 ## explicit; go 1.22
 go.etcd.io/etcd/client/v3
 go.etcd.io/etcd/client/v3/credentials
@@ -3257,8 +3257,8 @@ sigs.k8s.io/yaml
 # k8s.io/sample-apiserver => github.com/openshift/kubernetes/staging/src/k8s.io/sample-apiserver v0.0.0-20250220215240-98fe56995ed8
 # k8s.io/sample-cli-plugin => github.com/openshift/kubernetes/staging/src/k8s.io/sample-cli-plugin v0.0.0-20250220215240-98fe56995ed8
 # k8s.io/sample-controller => github.com/openshift/kubernetes/staging/src/k8s.io/sample-controller v0.0.0-20250220215240-98fe56995ed8
-# go.etcd.io/etcd/api/v3 => github.com/openshift/etcd/api/v3 v3.5.1-0.20250321131051-abfca6b7fe67
-# go.etcd.io/etcd/client/pkg/v3 => github.com/openshift/etcd/client/pkg/v3 v3.5.1-0.20250321131051-abfca6b7fe67
-# go.etcd.io/etcd/client/v3 => github.com/openshift/etcd/client/v3 v3.5.1-0.20250321131051-abfca6b7fe67
+# go.etcd.io/etcd/api/v3 => github.com/openshift/etcd/api/v3 v3.5.1-0.20250325012632-0d9e0a907c4a
+# go.etcd.io/etcd/client/pkg/v3 => github.com/openshift/etcd/client/pkg/v3 v3.5.1-0.20250325012632-0d9e0a907c4a
+# go.etcd.io/etcd/client/v3 => github.com/openshift/etcd/client/v3 v3.5.1-0.20250325012632-0d9e0a907c4a
 # sigs.k8s.io/kube-storage-version-migrator => github.com/openshift/kubernetes-kube-storage-version-migrator v0.0.3-0.20240605171054-34fafc04e5f2
 # k8s.io/endpointslice => github.com/openshift/kubernetes/staging/src/k8s.io/endpointslice v0.0.0-20250220215240-98fe56995ed8

@@ -1,49 +1,17 @@
-- etcd embedded-component 23c5a247c3e601f7806a0bbffdc6d201a55bf469 to abfca6b7fe678873df8da0ca792877f882f0d522
-  - 07097326 2025-03-17T22:15:52+01:00 Add support for cachi2 based deps
-  - 93b3c60b 2025-03-17T22:14:43+01:00 DOWNSTREAM <carry>: add native binary to installer images
-  - 7a38e602 2025-03-17T22:14:05+01:00 CORS-3249: DOWNSTREAM <carry>: installer: make etcd binaries static
-  - d12fb24f 2025-03-17T22:13:05+01:00 DOWNSTREAM <carry>: add installer Dockerfile for ART builds
-  - 2b591625 2025-03-17T22:09:05+01:00 DOWNSTREAM: <carry>: Add Dockerfile to build etcd for openshift-installer
-  - c8b5e016 2025-03-17T22:00:11+01:00 DOWNSTREAM <carry>: resolve merge conflicts
-  - 84ed0b2e 2025-03-17T21:59:23+01:00 NO-JIRA: use golang 1.22 image
-  - 5bca08ec 2025-01-25T08:14:51+13:00 version: bump up to 3.5.18
-  - 0c8e7b19 2025-01-22T15:10:06+00:00 Ensure all goroutines created by StartEtcd to exit before closing the errc
-  - c6fcd270 2025-01-21T16:43:03-05:00 mvcc: restore tombstone index if it's first revision
-  - 3ff20e6f 2025-01-16T15:27:00-08:00 Bump go toolchain to 1.22.11
-  - 80b0a73e 2025-01-11T07:17:00+00:00 Avoid deadlock in etcd.Close when stopping during bootstrapping
-  - e5b7e089 2025-01-10T16:16:10+00:00 etcdutl/etcdutl: use datadir package to build wal/snapdir
-  - 9b241941 2025-01-10T06:37:53+00:00 Remove duplicated <-s.ReadyNotify()
-  - b9a7aed9 2025-01-10T06:32:12+00:00 Do not wait for ready notify if the server is stopping
-  - 8943d8fc 2025-01-09T16:26:23-08:00 Update release_notes.tpl.txt
-  - f627f57e 2025-01-09T15:06:20-08:00 bump golang.org/x/net from 0.25.0 to 0.34.0
-  - c5d14b46 2025-01-09T12:27:17-08:00 bump golang.org/x/crypto from 0.21.0 to 0.32.0
-  - c1ab521a 2025-01-08T10:18:35+00:00 Fix mixVersion test case: ensure a snapshot to be sent out
-  - 5d284fda 2024-12-30T20:26:54+00:00 *: support custom content check offline in v2store
-  - 727c9b65 2024-12-04T14:13:14+05:30 Bump go toolchain to 1.22.9
-  - 28a19f76 2024-12-03T18:29:39+00:00 Print warning message for deprecated flags if set
-  - 83045bca 2024-11-22T22:37:49+08:00 fix runtime error: comparing uncomparable type
-  - c84e84c5 2024-11-18T09:14:01+01:00 add tls min/max version to grpc proxy
-  - e61b4958 2024-11-15T13:24:38+01:00 Bump golang-jwt/jwt to 4.5.1 to address GO-2024-3250
-  - 507c0de8 2024-11-12T09:30:31-07:00 version: bump up to 3.5.17
-  - cb970e5c 2024-11-11T22:40:28-07:00 release: use GitHub's gh to create GitHub release
-  - 76275d62 2024-11-11T09:06:02+01:00 release: properly change working dir if tmp location already exists
-  - b2ba4882 2024-11-08T12:39:46+01:00 fix(defrag): close temp file in case of error
-  - bceca16a 2024-11-06T21:33:43-08:00 Bump go toolchain to 1.22.9
-  - f26ff912 2024-11-06T14:18:35+01:00 chore(e2e): adapt defrag tests for 3.5
-  - 1d175079 2024-11-06T14:05:04+01:00 fix(defrag): handle defragdb failure
-  - ae6655f1 2024-11-06T14:04:56+01:00 fix(defrag): handle no space left error
-  - 5ec08a23 2024-10-30T09:49:46+00:00 chore(e2e): backport TestNoErrorLogsDuringNormalOperations test
-  - 17ab1fa6 2024-10-29T12:18:35+13:00 Remove defunct actuated arm64 workflows.
-  - dea4eb3e 2024-10-28T12:15:59-07:00 [3.5] Fix risk of a partial write txn being applied
-  - e5905727 2024-10-25T19:08:05-07:00 [serverWatchStream] terminate recvLoop on sws.close()
-  - 2dbfe58a 2024-10-05T19:23:07+00:00 github/workflows: use ECR mirror for Trivy's DB
-  - 60217686 2024-10-02T23:39:04+05:30 Bump go version to 1.22.8
-  - b56619e1 2024-09-17T01:24:48+00:00 Ensure commits are signed in scripts/release.sh.
-  - 6a3018fc 2024-09-12T08:43:57+02:00 docs: remove warning that etcd 3.5.0 was not yet released
+- etcd embedded-component abfca6b7fe678873df8da0ca792877f882f0d522 to 0d9e0a907c4aea7c4b2bff627478785fb99511f5
+  - 23b2cc12 2025-03-21T13:14:40+00:00 DOWNSTREAM: <carry> fix a compaction induce latency issue
 
-- machine-config-operator embedded-component e22d6adfdffb9ee3af2b5518910c22e231306a25 to 1d0d635f2eb82057c5a533527639186f85394559
-  - 1f0fbe8c 2025-03-17T14:21:07+00:00 kubelet_config_controller: Update ObservedGeneration render_controller: Make function name AreMCGeneratingSubControllersCompletedForPool explicit apihelpers: match the KubeletConfig to the Pool using MachineConfigPoolSelector
+- machine-config-operator embedded-component 1d0d635f2eb82057c5a533527639186f85394559 to 143ea7b41456a4d9337cf5524cc5e51e9761bd4c
+  - bc61799e 2025-03-21T08:55:50+00:00 Fixing typos for MachineConfigNode
+  - 2e46d760 2025-03-20T12:18:07+01:00 Add crio dependency for ipsec.service
+  - 77e4ef21 2025-03-20T12:17:57+01:00 Add ipsec connect wait service
 
-- operator-framework-olm embedded-component e9262fe971f881d6a014be70112b0f4cd5b82921 to 51e6ca2c24b6e231f175297acc5c8ff1eb5acf2b
-  - dc54ed61 2025-03-19T02:02:41+00:00 Ensure that PSA label is latest instead of pinning versions
+- operator-framework-olm embedded-component 51e6ca2c24b6e231f175297acc5c8ff1eb5acf2b to d3b1715867b6e96a9ee71e158a9f0fd6ab6f792f
+  - 8d12ead4 2025-03-13T12:26:56+00:00 add missing pod disruption reasons to isPodDead (#3519)
+
+- ovn-kubernetes image-amd64 c621cdc876ffb219c7877a1db2f500ba541dba6c to b02d1af7d45ae88c91785ebc83ddec23348596cf
+  - a0ead881 2025-03-20T15:11:10+01:00 Update OVN to FDP25.A.1 24.03.5-40.
+
+- ovn-kubernetes image-arm64 c621cdc876ffb219c7877a1db2f500ba541dba6c to b02d1af7d45ae88c91785ebc83ddec23348596cf
+  - a0ead881 2025-03-20T15:11:10+01:00 Update OVN to FDP25.A.1 24.03.5-40.
 
