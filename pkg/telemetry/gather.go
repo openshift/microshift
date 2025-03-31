@@ -16,6 +16,7 @@ limitations under the License.
 package telemetry
 
 import (
+	"bufio"
 	"bytes"
 	"context"
 	"crypto/tls"
@@ -24,10 +25,13 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"os/exec"
 	"path/filepath"
+	"strings"
 
 	routev1 "github.com/openshift/client-go/route/clientset/versioned/typed/route/v1"
 	"github.com/openshift/microshift/pkg/config"
+	"github.com/openshift/microshift/pkg/util"
 	"github.com/openshift/microshift/pkg/util/cryptomaterial"
 	io_prometheus_client "github.com/prometheus/client_model/go"
 	"github.com/prometheus/common/expfmt"
@@ -42,6 +46,10 @@ const (
 	kubeletMetricsCAdvisor = "https://%s:10250/metrics/cadvisor"
 	kubeletMetricsResource = "https://%s:10250/metrics/resource"
 	kubeletMetrics         = "https://%s:10250/metrics"
+
+	DeploymentTypeBootC  = "bootc"
+	DeploymentTypeOSTree = "ostree"
+	DeploymentTypeRPM    = "rpm"
 )
 
 func makeHTTPClient() (*http.Client, error) {
@@ -232,4 +240,54 @@ func fetchKubernetesResources(ctx context.Context, cfg *config.Config) (map[stri
 		"customresourcedefinitions.apiextensions.k8s.io": len(crdList.Items),
 	}
 	return metrics, nil
+}
+func getOSVersion() (string, error) {
+	file, err := os.Open("/etc/os-release")
+	if err != nil {
+		return "", fmt.Errorf("error opening /etc/os-release: %w", err)
+	}
+	defer file.Close()
+
+	var version string
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		line := scanner.Text()
+		if strings.HasPrefix(line, "VERSION_ID=") {
+			version = strings.TrimPrefix(line, "VERSION_ID=")
+			version = strings.Trim(version, `"`)
+			break
+		}
+	}
+	if err := scanner.Err(); err != nil {
+		return "", fmt.Errorf("error reading /etc/os-release: %w", err)
+	}
+	if version == "" {
+		return "", fmt.Errorf("VERSION_ID not found in /etc/os-release")
+	}
+	return version, nil
+}
+
+func getDeploymentType() string {
+	if _, err := os.Stat("/run/bootc.json"); err == nil {
+		return DeploymentTypeBootC
+	}
+	if cmdline, err := os.ReadFile("/proc/cmdline"); err == nil {
+		if strings.Contains(string(cmdline), "bootc") {
+			return DeploymentTypeBootC
+		}
+	}
+	if _, err := exec.LookPath("bootc"); err == nil {
+		return DeploymentTypeBootC
+	}
+	if _, err := exec.LookPath("ostree"); err == nil {
+		output, err := exec.Command("ostree", "admin", "status").Output()
+		if err == nil && strings.Contains(string(output), "bootc") {
+			return DeploymentTypeBootC
+		}
+	}
+	isOstree, err := util.PathExists("/run/ostree-booted")
+	if err == nil && isOstree {
+		return DeploymentTypeOSTree
+	}
+	return DeploymentTypeRPM
 }

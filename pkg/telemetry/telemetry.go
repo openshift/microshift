@@ -26,6 +26,7 @@ import (
 
 	proto "github.com/gogo/protobuf/proto"
 	"github.com/golang/snappy"
+	"github.com/openshift/microshift/pkg/admin/prerun"
 	"github.com/openshift/microshift/pkg/config"
 	io_prometheus_client "github.com/prometheus/client_model/go"
 	"github.com/prometheus/prometheus/prompb"
@@ -43,11 +44,14 @@ const (
 	MetricNameContainersUsage   = "cluster:usage:containers:sum"
 	MetricNameMicroShiftVersion = "microshift_version"
 
-	LabelNameID           = "_id"
-	LabelNameArch         = "label_kubernetes_io_arch"
-	LabelNameOS           = "label_node_openshift_io_os_id"
-	LabelNameInstanceType = "label_beta_kubernetes_io_instance_type"
-	LabelNameResource     = "resource"
+	LabelNameID             = "_id"
+	LabelNameArch           = "label_kubernetes_io_arch"
+	LabelNameOS             = "label_node_openshift_io_os_id"
+	LabelNameInstanceType   = "label_beta_kubernetes_io_instance_type"
+	LabelNameResource       = "resource"
+	LabelNameVersion        = "version"
+	LabelNameDeploymentType = "deployment_type"
+	LabelNameOSVersion      = "os_version_id"
 )
 
 type Metric struct {
@@ -159,6 +163,12 @@ func (t *TelemetryClient) Collect(ctx context.Context, cfg *config.Config) ([]Me
 	t.previousCPUtimestamp = time.Now().UnixNano() / time.Millisecond.Nanoseconds()
 	metrics = append(metrics, usageMetrics...)
 
+	versionMetric, err := computeMicroShiftVersionMetric()
+	if err != nil {
+		return nil, fmt.Errorf("failed to compute microshift version metric: %v", err)
+	}
+	metrics = append(metrics, versionMetric)
+
 	for i := range metrics {
 		metrics[i].Labels = append(metrics[i].Labels, MetricLabel{Name: LabelNameID, Value: t.clusterId})
 	}
@@ -269,6 +279,24 @@ func computeUsageMetrics(kubeletMetrics map[string]*io_prometheus_client.MetricF
 	})
 
 	return resourceMetrics, aggregateMetricValues(kubeletCPUSeconds.Metric), nil
+}
+
+func computeMicroShiftVersionMetric() (Metric, error) {
+	osVersion, err := getOSVersion()
+	if err != nil {
+		return Metric{}, fmt.Errorf("failed to get OS version: %v", err)
+	}
+	currentTimestamp := time.Now().UnixNano() / time.Millisecond.Nanoseconds()
+	return Metric{
+		Name: MetricNameMicroShiftVersion,
+		Labels: []MetricLabel{
+			{Name: LabelNameVersion, Value: prerun.GetVersionStringOfData()},
+			{Name: LabelNameOSVersion, Value: osVersion},
+			{Name: LabelNameDeploymentType, Value: getDeploymentType()},
+		},
+		Timestamp: currentTimestamp,
+		Value:     float64(currentTimestamp),
+	}, nil
 }
 
 func convertMetricsToWriteRequest(metrics []Metric) *prompb.WriteRequest {
