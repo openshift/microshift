@@ -32,16 +32,3 @@ RUN firewall-offline-cmd --zone=public --add-port=22/tcp && \
     firewall-offline-cmd --zone=public --add-port=6443/tcp && \
     firewall-offline-cmd --zone=public --add-port=30000-32767/tcp && \
     firewall-offline-cmd --zone=public --add-port=30000-32767/udp
-
-# Configure crun runtime for crio, required on CentOS 9
-RUN mkdir -p /etc/crio/crio.conf.d/ && \
-    printf '\
-[crio.runtime.runtimes.crun]\n\
-runtime_path = ""\n\
-runtime_type = "oci"\n\
-runtime_root = "/run/crun"\n\
-runtime_config_path = ""\n\
-monitor_path = ""\n\
-monitor_cgroup = "system.slice"\n\
-monitor_exec_cgroup = ""\n\
-privileged_without_host_devices = false\n' > "/etc/crio/crio.conf.d/microshift-crun.conf"
