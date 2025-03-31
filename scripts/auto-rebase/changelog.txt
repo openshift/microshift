@@ -1,4 +1,27 @@
-- ovn-kubernetes image-arm64 12b33c120f3240ed9df2bdfcc01d3bd0a313b3c7 to 0f6638ab81a33cd275febfd9f3330dc12c9f2936
+- api embedded-component 0f14a211af331fdff85df33c6112e48cb8405dd3 to 4521905c611e7c512439f544769c537fd1a5422e
+  - 2fb95309 2025-03-20T10:48:32-04:00 updates to v1alpha1 api for MCN
+
+- cluster-ingress-operator embedded-component 1b72b75bd12ae929dbae3ff0e71ab3bb7017c4c8 to 7f0fd6df636a5032c15469cfcb0b10e8cfbb5e66
+  - e2eb4f0 2025-03-27T19:44:24-04:00 test/e2e: Add test for Istio manual deployment
+  - 1c7a295 2025-03-25T10:49:23+01:00 NE-1969: Add "v1" version to OpenShift GatewayClass controller name
+
+- machine-config-operator embedded-component dadb5688c841aa042f279729d3789309325ef1fe to 06f828868216169b00eb17ddf8f271ac8c7b2913
+  - 995bf261 2025-03-26T15:07:01+01:00 Rework controller and server to support ign to 3.5
+  - 275ebe05 2025-03-26T14:55:18+01:00 Changed ign 3.4 imports and refs to 3.5
+  - 2961e043 2025-03-26T14:55:16+01:00 Bump ignition to v2.20.0 and sync vendor
+  - 1cceb88e 2025-03-21T17:39:14-04:00 use the same success criteria for OCL e2e tests
+
+- openshift-controller-manager embedded-component ed3eae5db73699e2b6ad0b513589e06b4bf6f5aa to 49eb6f8ae6e87dbdd4c3f49902a1eca5ef85b3f1
+  - 43e8fd9 2025-03-26T02:43:49-04:00 correct calculated refresh time
+
+- oc image-amd64 f2c6ae49d3ba3b58e506d5948bceb3a752def432 to 314ad39cc654af2016f57f7308bf1ec70fe14ca3
+  - 314ad39c 2025-03-28T15:01:08-04:00 Revert "NO-JIRA: `adm release new`: simplify `writePayload`" (#2000)
+  - 2f3d8491 2025-03-25T18:48:33+01:00 `adm release new`: simplify no operator error condition
+  - 38f6e6ab 2025-03-25T17:10:57+01:00 `adm release new`: improve `writePayload` readability
+  - 7e7c8e19 2025-03-25T17:10:03+01:00 `adm release new`: inline and eliminate `writeNestedTarHeader`
+  - 72e2108a 2025-03-24T18:35:12+01:00 `adm release new`: simplify `writePayload`
+
+- ovn-kubernetes image-amd64 12b33c120f3240ed9df2bdfcc01d3bd0a313b3c7 to 0f6638ab81a33cd275febfd9f3330dc12c9f2936
   - a637c80f 2025-03-20T13:47:37+01:00 e2e: Add test for L3UDNPod->external advertised by BGP
   - ff971e25 2025-03-19T18:17:21+01:00 Use NetInfo in management port
   - 23e4eb23 2025-03-19T18:17:21+01:00 Move management port implementation to new package
@@ -44,4 +67,11 @@
   - 836ec368 2025-03-04T14:45:05-05:00 Limit cluster manager node allocator updates/logs
   - 298c6674 2025-03-03T21:25:21+00:00 RouteAdvertisements: fail if DisableMP is unset
   - 2cd8a7bd 2025-02-28T18:46:51+01:00 Support Gateway accelerated interface (Bypass port)
+
+- oc image-arm64 f2c6ae49d3ba3b58e506d5948bceb3a752def432 to 314ad39cc654af2016f57f7308bf1ec70fe14ca3
+  - 314ad39c 2025-03-28T15:01:08-04:00 Revert "NO-JIRA: `adm release new`: simplify `writePayload`" (#2000)
+  - 2f3d8491 2025-03-25T18:48:33+01:00 `adm release new`: simplify no operator error condition
+  - 38f6e6ab 2025-03-25T17:10:57+01:00 `adm release new`: improve `writePayload` readability
+  - 7e7c8e19 2025-03-25T17:10:03+01:00 `adm release new`: inline and eliminate `writeNestedTarHeader`
+  - 72e2108a 2025-03-24T18:35:12+01:00 `adm release new`: simplify `writePayload`
 
