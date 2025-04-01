@@ -44,7 +44,7 @@ Delete Namespace
     [Documentation]    Remove gateway api specific namespace.
     Remove Namespace    ${NS_GATEWAY}
 
-Create Gateway
+Create Gateway    # robocop: disable=too-many-calls-in-keyword
     [Documentation]    Create a gateway using given hostname and port. Waits for readiness
     [Arguments]    ${hostname}    ${port}    ${namespace}
     ${tmp}=    Set Variable    /tmp/gateway.yaml
@@ -55,7 +55,19 @@ Create Gateway
     Generate File From Template    ${GATEWAY_MANIFEST_TMPL}    ${tmp}
     Oc Apply    -n ${namespace} -f ${tmp}
     Oc Wait    -n ${namespace} gateway/test-gateway    --for="condition=Accepted" --timeout=120s
-    Oc Wait    -n ${namespace} deploy test-gateway-openshift-gateway-api    --for=condition=Available --timeout=120s
+    TRY
+        Oc Wait
+        ...    -n ${namespace} deploy test-gateway-openshift-gateway-api
+        ...    --for=condition=Available --timeout=120s
+    EXCEPT
+        Run With Kubeconfig    oc get deploy -n ${namespace}    allow_fail=${TRUE}
+        Run With Kubeconfig    oc get events -n ${namespace} --sort-by='.lastTimestamp'    allow_fail=${TRUE}
+        Run With Kubeconfig    oc describe -n ${namespace} gateway/test-gateway    allow_fail=${TRUE}
+        Run With Kubeconfig    oc logs -n openshift-gateway-api deploy/istiod-openshift-gateway-api
+        ...    allow_fail=${TRUE}
+        SSHLibrary.Execute Command    df -h
+        Fail    Waiting for deployment timed out
+    END
     Oc Wait    -n ${namespace} gateway/test-gateway    --for="condition=Programmed" --timeout=120s
 
 Create HTTP Route
