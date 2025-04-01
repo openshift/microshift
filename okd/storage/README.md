@@ -1,36 +1,55 @@
 ## examples for using with storage
 
-### run Microshift with upsteam topolvm storage
+### building and running Microshift with upsteam TopoLVM storage
 
 1. prepare the LVM backend on the host (example only)
     ```bash
     truncate --size=20G /tmp/lvmdisk
     losetup -f /tmp/lvmdisk
     device_name=$(losetup -j /tmp/lvmdisk | cut -d: -f1)
-    vgcreate -f -y myvg1 /dev/${device_name}
+    vgcreate -f -y myvg1 ${device_name}
     lvcreate -T myvg1/thinpool -L 6G
     ```
+1. build microshift with upstream TopoLVM Support
+  ```bash
+  cd ~/microshift && sudo podman build --env WITH_FLANNEL=1 --env WITH_TOPOLVM=1 -f okd/src/microshift-okd-multi-build.Containerfile . -t microshift-okd
+  ```
 
 
 1. run microshift in OKD and wait for it to be ready
     ```bash
-        export kustomize_dir=/usr/lib/microshift/manifests.d/001-topolvm
-        sudo podman run --privileged --rm --name microshift-okd \
-          -v $(pwd)/okd/storage/topolvm:${kustomize_dir}:z \
-          --hostname 127.0.0.1.nip.io \
-          -p 5432:5432 -p 6443:6443 \
-          -d localhost/microshift-okd-4.19
+          sudo podman run --privileged --rm --name microshift-okd \
+            --volume /dev:/dev:rslave \
+            --hostname 127.0.0.1.nip.io \
+            -p 5432:5432 -p 6443:6443 \
+            -d localhost/microshift-okd
     ```
 
 1. wait for all the components to come up 
     ```bash
     > sudo podman exec  microshift-okd bash -c "microshift healthcheck --namespace topolvm-system --deployments topolvm-controller "
-    ??? I0331 14:38:46.838208    5894 service.go:29] microshift.service is enabled
+    ??? I0331 14:38:46.838208    5894 service.go:29] microshift.service is enabled 
     ??? I0331 14:38:46.838235    5894 service.go:31] Waiting 5m0s for microshift.service to be ready
     ??? I0331 14:38:46.839291    5894 service.go:38] microshift.service is ready
     ??? I0331 14:38:46.840014    5894 workloads.go:94] Waiting 5m0s for deployment/topolvm-controller in topolvm-system
     ??? I0331 14:38:46.844984    5894 workloads.go:132] Deployment/topolvm-controller in topolvm-system is ready
     ??? I0331 14:38:46.845003    5894 healthcheck.go:75] Workloads are ready
+
+    > oc get pods -A
+    NAMESPACE              NAME                                       READY   STATUS    RESTARTS        AGE
+    cert-manager           cert-manager-5f864bbfd-bpd6h               1/1     Running   0               4m49s
+    cert-manager           cert-manager-cainjector-589dc747b5-cfwjf   1/1     Running   0               4m49s
+    cert-manager           cert-manager-webhook-5987c7ff58-mzq6l      1/1     Running   0               4m49s
+    kube-flannel           kube-flannel-ds-6nvq6                      1/1     Running   0               4m12s
+    kube-proxy             kube-proxy-zlvb2                           1/1     Running   0               4m12s
+    kube-system            csi-snapshot-controller-75d84cb97c-nkfsz   1/1     Running   0               4m50s
+    openshift-dns          dns-default-dbjh4                          2/2     Running   0               4m1s
+    openshift-dns          node-resolver-mt8m7                        1/1     Running   0               4m12s
+    openshift-ingress      router-default-59cbb858cc-6mzbx            1/1     Running   0               4m49s
+    openshift-service-ca   service-ca-df6759f9d-24d2n                 1/1     Running   0               4m49s
+    topolvm-system         topolvm-controller-9cd8649c9-5tcln         5/5     Running   0               4m49s
+    topolvm-system         topolvm-lvmd-0-2bmjq                       1/1     Running   0               4m1s
+    topolvm-system         topolvm-node-lwxz5                         3/3     Running   1 (3m36s ago)   4m1s
     ```
 
 

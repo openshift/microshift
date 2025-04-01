@@ -21,14 +21,16 @@ EOF
 wget https://github.com/cert-manager/cert-manager/releases/download/${CERT_MANAGER_VERSION}/cert-manager.yaml -O manifests/cert-manager.yaml
 
 # install helm
- curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
- chmod 700 get_helm.sh
-./get_helm.sh
+ curl -fsSL -o /tmp/get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+ chmod 700 /tmp/get_helm.sh
+ /tmp/get_helm.sh
 
+# TODO: install HELM
 # generate manifests using helm
-helm template --output-dir base --include-crds --namespace=topolvm-system --version=${TOPO_LVM_VERSION} topolvm topolvm/topolvm > manifests/topolvm.yaml
+helm template --include-crds --namespace=topolvm-system --version=${TOPO_LVM_VERSION} topolvm topolvm/topolvm > manifests/topolvm.yaml
 
 # patch replicas to 1
+# shellcheck disable=SC2016
 yq e '. | select(.kind == "Deployment") as $deployment | select(.kind != "Deployment") as $other | $deployment.spec.replicas = 1 | ($deployment, $other)' -i manifests/topolvm.yaml
 
 # generate kustomize
