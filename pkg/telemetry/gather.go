@@ -25,7 +25,6 @@ import (
 	"io"
 	"net/http"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
 
@@ -268,25 +267,10 @@ func getOSVersion() (string, error) {
 }
 
 func getDeploymentType() string {
-	if _, err := os.Stat("/run/bootc.json"); err == nil {
+	if util.IsBootC() {
 		return DeploymentTypeBootC
 	}
-	if cmdline, err := os.ReadFile("/proc/cmdline"); err == nil {
-		if strings.Contains(string(cmdline), "bootc") {
-			return DeploymentTypeBootC
-		}
-	}
-	if _, err := exec.LookPath("bootc"); err == nil {
-		return DeploymentTypeBootC
-	}
-	if _, err := exec.LookPath("ostree"); err == nil {
-		output, err := exec.Command("ostree", "admin", "status").Output()
-		if err == nil && strings.Contains(string(output), "bootc") {
-			return DeploymentTypeBootC
-		}
-	}
-	isOstree, err := util.PathExists("/run/ostree-booted")
-	if err == nil && isOstree {
+	if util.IsOSTree() {
 		return DeploymentTypeOSTree
 	}
 	return DeploymentTypeRPM

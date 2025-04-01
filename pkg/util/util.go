@@ -2,11 +2,13 @@ package util
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io/fs"
 	"net/http"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 	"time"
@@ -163,4 +165,33 @@ func CreateTempFile(path string) (*os.File, error) {
 func CreateTempDir(path string) (string, error) {
 	dir, pattern := getTempPathArgs(path)
 	return os.MkdirTemp(dir, pattern)
+}
+
+func IsOSTree() bool {
+	exists, err := PathExists("/run/ostree-booted")
+	if err != nil {
+		return false
+	}
+	return exists
+}
+
+func IsBootC() bool {
+	cmd := exec.Command("bootc", "status", "--booted", "--json")
+	output, err := cmd.Output()
+	if err != nil {
+		return false
+	}
+
+	var result struct {
+		Status struct {
+			Type string `json:"type"`
+		} `json:"status"`
+	}
+
+	err = json.Unmarshal(output, &result)
+	if err != nil {
+		return false
+	}
+
+	return result.Status.Type == "bootcHost"
 }
