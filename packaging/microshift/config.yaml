@@ -521,10 +521,11 @@ network:
     # assumes an empty string to mean the OVN-K should be deployed.
     # Allowed values are: unset or one of ["", "ovnk", "none"]
     cniPlugin: ""
-    # MultusStatus controls the deployment of the Multus CNI.
-    # Changing from "Enabled" to "Disabled" will not cause Multus CNI to be deleted.
-    # Allowed values are: unset (disabled), "Enabled", or "Disabled"
-    multusStatus: ""
+    multus:
+        # Status controls the deployment of the Multus CNI.
+        # Changing from "Enabled" to "Disabled" will not cause Multus CNI to be deleted.
+        # Allowed values are: unset (disabled), "Enabled", or "Disabled"
+        status: Disabled
     # IP address pool for services.
     # Currently, we only support a single entry here.
     # This field is immutable after installation.

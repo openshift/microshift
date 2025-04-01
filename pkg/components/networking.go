@@ -122,7 +122,7 @@ func startCNIPlugin(ctx context.Context, cfg *config.Config, kubeconfigPath stri
 }
 
 func deployMultus(ctx context.Context, cfg *config.Config, kubeconfigPath string) error {
-	if !cfg.Network.IsMultusEnabled() {
+	if !cfg.Network.Multus.IsEnabled() {
 		klog.Warningf("Multus CNI is disabled. Uninstall is not supported if it was installed previously.")
 		return nil
 	}

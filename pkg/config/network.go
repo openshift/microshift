@@ -36,6 +36,16 @@ const (
 	MultusDisabled MultusStatusEnum = "Disabled"
 )
 
+type Multus struct {
+	// Status controls the deployment of the Multus CNI.
+	// Changing from "Enabled" to "Disabled" will not cause Multus CNI to be deleted.
+	// Allowed values are: unset (disabled), "Enabled", or "Disabled"
+	//
+	// +kubebuilder:validation:Optional
+	// +kubebuilder:default=Disabled
+	Status MultusStatusEnum `json:"status"`
+}
+
 type Network struct {
 	// CNIPlugin is a user defined string value matching one of the above CNI values. MicroShift uses this
 	// value to decide whether to deploy the OVN-K as default CNI. An unset field defaults to "" during yaml parsing, and thus
@@ -66,12 +76,7 @@ type Network struct {
 	// +kubebuilder:default="30000-32767"
 	ServiceNodePortRange string `json:"serviceNodePortRange"`
 
-	// MultusStatus controls the deployment of the Multus CNI.
-	// Changing from "Enabled" to "Disabled" will not cause Multus CNI to be deleted.
-	// Allowed values are: unset (disabled), "Enabled", or "Disabled"
-	//
-	// +kubebuilder:validation:Optional
-	MultusStatus MultusStatusEnum `json:"multusStatus"`
+	Multus Multus `json:"multus"`
 
 	// The DNS server to use
 	DNS string `json:"-"`
@@ -119,6 +124,6 @@ func (n Network) IsEnabled() bool {
 	return n.CNIPlugin != CniPluginNone
 }
 
-func (n Network) IsMultusEnabled() bool {
-	return n.MultusStatus == MultusEnabled
+func (m Multus) IsEnabled() bool {
+	return m.Status == MultusEnabled
 }
