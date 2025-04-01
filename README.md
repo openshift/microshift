@@ -40,42 +40,12 @@ For production deployments, MicroShift can be run on bare metal hardware or hype
 - [Hypervisors certified for Red Hat Enterprise Linux](https://access.redhat.com/solutions/certified-hypervisors)
 
 ## User Documentation
-To install, configure and run MicroShift, refer to the following documentation:
-
-- [Getting Started with MicroShift](./docs/user/getting_started.md)
-- [MicroShift Configuration](./docs/user/howto_config.md)
-- [MicroShift kubeconfig Handling](./docs/user/howto_kubeconfig.md)
-- [Embedding MicroShift Container Images for Offline Deployments](./docs/user/howto_offline_containers.md)
-- [MicroShift Behind Proxy](./docs/user/howto_http_proxy.md)
-- [Load Balancer for User Workloads](./docs/user/howto_load_balancer.md)
-- [AMQ Broker on MicroShift](./docs/user/howto_amq_broker.md)
-- [MicroShift Mitigation of System Configuration Changes](./docs/user/howto_sysconf_watch.md)
-- [Firewall Configuration](./docs/user/howto_firewall.md)
-- [Integrating MicroShift with Greenboot](./docs/user/greenboot.md)
-- [Mirror MicroShift Container Images](./docs/user/howto_mirror_images.md)
-- [Debugging Tips](./docs/user/debugging_tips.md)
-- [Known Limitations](./docs/user/known_limitations.md)
+To install, configure and run MicroShift, refer to the documentation in the
+[user](./docs/user) folder.
 
 ## Contributor Documentation
-To build MicroShift from source and contribute to its development, refer to the following documentation:
-
-- [MicroShift Design](./docs/contributor/design.md)
-- [Enabled OpenShift APIs](./docs/contributor/enabled_apis.md)
-- [MicroShift Development Environment](./docs/contributor/devenv_setup.md)
-- [MicroShift Development Environment in Cloud](./docs/contributor/devenv_cloud.md)
-- [Rebasing MicroShift](./docs/contributor/rebase.md)
-- [Install MicroShift on RHEL for Edge](./docs/contributor/rhel4edge_iso.md)
-- [OpenShift CI for MicroShift](./docs/contributor/openshift_ci.md)
-- [RPM Packages for Development and Testing](./docs/contributor/rpm_packages.md)
-- [MicroShift Storage Plugin Overview](./docs/contributor/storage/default_csi_plugin.md)
-- [MicroShift Network Plugin Overview](./docs/contributor/network/default_cni_plugin.md)
-- [MicroShift Host Networking Overview](./docs/contributor/network/host_networking.md)
-- [MicroShift Traffic Flows Overview](./docs/contributor/network/ovn_kubernetes_traffic_flows.md)
-- [Testing MicroShift Integration with Greenboot](./docs/contributor/greenboot.md)
-- [Quay Mirror Registry Setup for Testing](./docs/contributor/howto_quay_mirror.md)
-- [Multinode Testing Environment for MicroShift](./docs/contributor/multinode/setup.md)
-- [Image Mode for MicroShift](./docs/contributor/image_mode.md)
-- [Layered Product Testing with MicroShift](./docs/contributor/layered_product_ci.md)
+To build MicroShift from source and contribute to its development, refer to the
+documentation in [contributor](./docs/contributor) folder.
 
 ## Community
 Community documentation sources are managed at <https://github.com/redhat-et/microshift-documentation> and published on <https://microshift.io>.
