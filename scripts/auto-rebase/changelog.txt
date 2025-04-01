@@ -1,77 +1,14 @@
-- api embedded-component 0f14a211af331fdff85df33c6112e48cb8405dd3 to 4521905c611e7c512439f544769c537fd1a5422e
-  - 2fb95309 2025-03-20T10:48:32-04:00 updates to v1alpha1 api for MCN
+- cluster-ingress-operator embedded-component 7f0fd6df636a5032c15469cfcb0b10e8cfbb5e66 to 81e314f2e9b41b6616ad2c3db657e869915577a8
+  - 92e89a2 2025-03-27T19:01:16-04:00 testGatewayAPIObjects: Improve logging
+  - ff903c7 2025-03-27T14:03:29-04:00 TestCanaryRoute: Add more logging.
+  - b615bc4 2025-03-27T14:03:29-04:00 status: Add Gateway API objects to relatedObjects
 
-- cluster-ingress-operator embedded-component 1b72b75bd12ae929dbae3ff0e71ab3bb7017c4c8 to 7f0fd6df636a5032c15469cfcb0b10e8cfbb5e66
-  - e2eb4f0 2025-03-27T19:44:24-04:00 test/e2e: Add test for Istio manual deployment
-  - 1c7a295 2025-03-25T10:49:23+01:00 NE-1969: Add "v1" version to OpenShift GatewayClass controller name
+- csi-external-snapshotter embedded-component 1fc6ee158070b34f84a94489b33accb333714727 to ff900d0dee7c1765d053ccf523ca87c5e1b61b5c
+  - 4777754 2025-03-10T13:24:52+01:00 UPSTREAM: <carry>: remove csi-snapshot-validation-webhook
 
-- machine-config-operator embedded-component dadb5688c841aa042f279729d3789309325ef1fe to 06f828868216169b00eb17ddf8f271ac8c7b2913
-  - 995bf261 2025-03-26T15:07:01+01:00 Rework controller and server to support ign to 3.5
-  - 275ebe05 2025-03-26T14:55:18+01:00 Changed ign 3.4 imports and refs to 3.5
-  - 2961e043 2025-03-26T14:55:16+01:00 Bump ignition to v2.20.0 and sync vendor
-  - 1cceb88e 2025-03-21T17:39:14-04:00 use the same success criteria for OCL e2e tests
+- csi-external-snapshotter image-amd64 1fc6ee158070b34f84a94489b33accb333714727 to ff900d0dee7c1765d053ccf523ca87c5e1b61b5c
+  - 4777754 2025-03-10T13:24:52+01:00 UPSTREAM: <carry>: remove csi-snapshot-validation-webhook
 
-- openshift-controller-manager embedded-component ed3eae5db73699e2b6ad0b513589e06b4bf6f5aa to 49eb6f8ae6e87dbdd4c3f49902a1eca5ef85b3f1
-  - 43e8fd9 2025-03-26T02:43:49-04:00 correct calculated refresh time
-
-- oc image-amd64 f2c6ae49d3ba3b58e506d5948bceb3a752def432 to 314ad39cc654af2016f57f7308bf1ec70fe14ca3
-  - 314ad39c 2025-03-28T15:01:08-04:00 Revert "NO-JIRA: `adm release new`: simplify `writePayload`" (#2000)
-  - 2f3d8491 2025-03-25T18:48:33+01:00 `adm release new`: simplify no operator error condition
-  - 38f6e6ab 2025-03-25T17:10:57+01:00 `adm release new`: improve `writePayload` readability
-  - 7e7c8e19 2025-03-25T17:10:03+01:00 `adm release new`: inline and eliminate `writeNestedTarHeader`
-  - 72e2108a 2025-03-24T18:35:12+01:00 `adm release new`: simplify `writePayload`
-
-- ovn-kubernetes image-amd64 12b33c120f3240ed9df2bdfcc01d3bd0a313b3c7 to 0f6638ab81a33cd275febfd9f3330dc12c9f2936
-  - a637c80f 2025-03-20T13:47:37+01:00 e2e: Add test for L3UDNPod->external advertised by BGP
-  - ff971e25 2025-03-19T18:17:21+01:00 Use NetInfo in management port
-  - 23e4eb23 2025-03-19T18:17:21+01:00 Move management port implementation to new package
-  - ccf448ca 2025-03-19T18:17:21+01:00 Add management port package, interfaces and usage
-  - 018d3142 2025-03-19T18:17:21+01:00 Clean up gateway_localnet_linux_test.go
-  - 68c75381 2025-03-19T18:17:21+01:00 Remove quoting from nft rules so that knftables.ParseDump doesn't fail
-  - 62b331d6 2025-03-19T18:17:21+01:00 Move gateway/management port shared types
-  - 979b761c 2025-03-19T18:17:21+01:00 Create flow cache on start instead of init
-  - 90ed0743 2025-03-19T18:17:21+01:00 Remove management port dead params/code
-  - 8d531c21 2025-03-19T18:17:21+01:00 Fix failing tests when executed in container due to missing fake helpers
-  - 20f85175 2025-03-19T18:17:21+01:00 Rename default node network controller PreStart to Init
-  - 042ac411 2025-03-19T17:28:08+01:00 [multinetpol] Update controller to handle endPort.
-  - 2a3e1950 2025-03-19T16:37:58+01:00 Create the frrconfig in frr-k8s-system namespace
-  - 8b3ea809 2025-03-19T10:53:01+00:00 E2Es: drop container rights for unpriv pods
-  - 94fb425f 2025-03-19T17:56:27+09:00 dist/images: fix cleanup command for northd
-  - cbab4178 2025-03-18T21:02:25+01:00 Add BGP e2e test for pod->external
-  - 44233ca2 2025-03-18T21:02:23+01:00 Add a new CP lane for BGP tests
-  - 6cdfa095 2025-03-18T20:58:03+01:00 BGP, shard: don't use frr as the default gateway
-  - 4c9fa198 2025-03-18T12:52:31+00:00 net controller: reconcile on physical net name updates
-  - 36e85f45 2025-03-18T00:31:42+01:00 e2e: skip ETP local conformance tests if default pod network is advertised
-  - 8f9797f4 2025-03-18T00:31:42+01:00 e2e: run shard-conformance advertising default network
-  - d48e073d 2025-03-17T09:25:51+02:00 udn, l3: Send event when the IP pool is exhausted
-  - 06d2ac17 2025-03-17T09:25:51+02:00 udn, l2: Send event when the IP pool is exhausted
-  - 8f76d4ca 2025-03-17T09:25:51+02:00 allocator/ip: Expand error info when ip range is full
-  - 95b6ca54 2025-03-14T19:23:07+01:00 kind: Pint kubevirt to v1.4.0
-  - edc12a2d 2025-03-14T15:41:36+01:00 test/e2e, multihoming: Check VLAN-ID change on NAD update
-  - c7cae3d0 2025-03-14T15:41:36+01:00 test/e2e, multihoming: Check exclude-subnet change on NAD update
-  - 1ccb6e55 2025-03-14T15:41:36+01:00 test/e2e, multihoming: Check MTU change on NAD update
-  - f574d427 2025-03-14T15:41:36+01:00 test/e2e, multihoming: Separate NADSpec creation from NAD creation
-  - 2437047a 2025-03-13T10:33:04+01:00 awesome-pages is not awesome-nav :/
-  - ae7fdd99 2025-03-12T18:07:08+01:00 [e2e, multihoming] Rename multi-netpol tests to avoid duplication.
-  - 4812ec97 2025-03-12T18:07:02+01:00 [multinetpol] Update to use the latest 1.0.1 release.
-  - 7f7e82e9 2025-03-12T17:30:16+01:00 Update community meeting timing and platform details
-  - 9a6ef80e 2025-03-12T11:45:42+00:00 Support UDNs for EIP route advertisements
-  - 8f6e3ee9 2025-03-12T11:45:42+00:00 Add GetActiveNetworkForNamespaceFast to network manager
-  - a7971548 2025-03-11T09:40:28+02:00 EgressService: add additionalPrinterColumn for .status.host
-  - 562f752b 2025-03-07T10:44:57-05:00 Refactor ID nomenclature
-  - 029f4f65 2025-03-05T18:11:59-05:00 Fix receiver methods for SecondaryNodeNetworkController
-  - 532c7d03 2025-03-05T18:11:59-05:00 Removes stale code relying on networkID from nodes/caches
-  - 167945e9 2025-03-04T14:45:06-05:00 Fixes getting networkID for network controllers
-  - 5aa587ed 2025-03-04T14:45:06-05:00 Adds NeedsNodeAllocation function
-  - 9530aaea 2025-03-04T14:45:05-05:00 Reduce node events caused by zone cluster controller
-  - 836ec368 2025-03-04T14:45:05-05:00 Limit cluster manager node allocator updates/logs
-  - 298c6674 2025-03-03T21:25:21+00:00 RouteAdvertisements: fail if DisableMP is unset
-  - 2cd8a7bd 2025-02-28T18:46:51+01:00 Support Gateway accelerated interface (Bypass port)
-
-- oc image-arm64 f2c6ae49d3ba3b58e506d5948bceb3a752def432 to 314ad39cc654af2016f57f7308bf1ec70fe14ca3
-  - 314ad39c 2025-03-28T15:01:08-04:00 Revert "NO-JIRA: `adm release new`: simplify `writePayload`" (#2000)
-  - 2f3d8491 2025-03-25T18:48:33+01:00 `adm release new`: simplify no operator error condition
-  - 38f6e6ab 2025-03-25T17:10:57+01:00 `adm release new`: improve `writePayload` readability
-  - 7e7c8e19 2025-03-25T17:10:03+01:00 `adm release new`: inline and eliminate `writeNestedTarHeader`
-  - 72e2108a 2025-03-24T18:35:12+01:00 `adm release new`: simplify `writePayload`
+- csi-external-snapshotter image-arm64 1fc6ee158070b34f84a94489b33accb333714727 to ff900d0dee7c1765d053ccf523ca87c5e1b61b5c
+  - 4777754 2025-03-10T13:24:52+01:00 UPSTREAM: <carry>: remove csi-snapshot-validation-webhook
 
