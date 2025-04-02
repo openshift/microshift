@@ -44,6 +44,10 @@ name = "microshift-gateway-api"
 version = "{{ .Env.SOURCE_VERSION }}"
 
 [[packages]]
+name = "microshift-observability"
+version = "{{ .Env.SOURCE_VERSION }}"
+
+[[packages]]
 name = "microshift-test-agent"
 version = "*"
 
