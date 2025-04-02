@@ -311,9 +311,6 @@ install -p -m755 ./_output/microshift-etcd %{buildroot}%{_bindir}/microshift-etc
 install -p -m755 scripts/microshift-cleanup-data.sh %{buildroot}%{_bindir}/microshift-cleanup-data
 install -p -m755 scripts/microshift-sos-report.sh %{buildroot}%{_bindir}/microshift-sos-report
 
-install -d -m755 %{buildroot}%{_sharedstatedir}/microshift
-install -d -m755 %{buildroot}%{_sharedstatedir}/microshift-backups
-
 install -d -m755 %{buildroot}%{_sysconfdir}/crio/crio.conf.d
 
 %ifarch %{arm} aarch64
@@ -562,9 +559,8 @@ cat assets/optional/ai-model-serving/runtimes/kustomization.x86_64.yaml >> %{bui
 mkdir -p -m755 %{buildroot}%{_datadir}/microshift/release
 install -p -m644 assets/optional/ai-model-serving/release-ai-model-serving-x86_64.json %{buildroot}%{_datadir}/microshift/release/
 
-#observability
+# observability
 install -d -m755 %{buildroot}%{_presetdir}
-install -d -m755 %{buildroot}%{_sharedstatedir}/microshift-observability
 install -p -m644 packaging/observability/opentelemetry-collector.yaml -D %{buildroot}%{_sysconfdir}/microshift/opentelemetry-collector.yaml
 install -p -m644 packaging/observability/microshift-observability.service %{buildroot}%{_unitdir}/
 install -p -m644 packaging/observability/90-enable-microshift-observability.preset %{buildroot}%{_presetdir}/
@@ -752,7 +748,6 @@ fi
 
 %files observability
 %dir %{_prefix}/lib/microshift/manifests.d/003-microshift-observability
-%dir %{_sharedstatedir}/microshift-observability
 %{_unitdir}/microshift-observability.service
 %{_presetdir}/90-enable-microshift-observability.preset
 %{_sysconfdir}/microshift/opentelemetry-collector.yaml
@@ -764,6 +759,9 @@ fi
 %changelog
 * Mon Mar 31 2025 Gregory Giguashvili <ggiguash@redhat.com> 4.19.0
 - Default crio runtime is crun
+
+* Mon Mar 31 2025 Patryk Matuszak <pmatusza@redhat.com> 4.19.0
+- Remove unnecessary /var/lib subdir creation
 
 * Mon Mar 17 2025 Jon Cope <jcope@redhat.com> 4.19.0
 - Add an optional microshift-oservability RPM to enable OpenTelemetry collector preconfigured for MicroShift
