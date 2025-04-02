@@ -61,14 +61,19 @@ OLM Should Be Ready
 Create CatalogSource
     [Documentation]    Create CatalogSource resource with Red Hat Community Catalog Index.
     Oc Create    -f ${CATALOG_SOURCE}
-    Wait Until Keyword Succeeds    120s    5s
+    Wait Until Keyword Succeeds    5m    10s
     ...    CatalogSource Should Be Ready    ${MARKETPLACE_NAMESPACE}    redhat-operators
 
 CatalogSource Should Be Ready
     [Documentation]    Checks if CatalogSource is ready.
     [Arguments]    ${namespace}    ${name}
     ${catalog}=    Oc Get    catalogsources    ${namespace}    ${name}
-    Should Be Equal As Strings    READY    ${catalog.status.connectionState.lastObservedState}
+    TRY
+        Should Be Equal As Strings    READY    ${catalog.status.connectionState.lastObservedState}
+    EXCEPT
+        Run With Kubeconfig    oc get events -n openshift-marketplace --sort-by='.lastTimestamp'
+        Fail    Catalog Source Is Not Ready
+    END
 
 Create Subscription
     [Documentation]    Creates subscription.
