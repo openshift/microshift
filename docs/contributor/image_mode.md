@@ -4,7 +4,11 @@ Follow the instructions in [Image Mode for MicroShift Users](../user/image_mode.
 to create a bootable container image, store this image in a remote registry and
 use it for installing a new RHEL operating system.
 
-This document demonstrates how to boot RHEL from the container image using `podman`.
+This document demonstrates how to run a `bootc` image using `podman`.
+
+> **NOTE**:<br>
+> Use the `podman` approach only for development purposes to benefit from
+> the fast turnaround times it allows. Do not use it for production use cases.
 
 The procedures described below require the following setup:
 * A `RHEL 9.4 host` with an active Red Hat subscription for building MicroShift `bootc`

@@ -17,9 +17,10 @@ for more information.
 
 The procedures described below require the following setup:
 * A `RHEL 9.4 host` with an active Red Hat subscription for building MicroShift `bootc`
-images
-* A `physical hypervisor host` with the [libvirt](https://libvirt.org/) virtualization
-platform for starting virtual machines that run RHEL OS containing MicroShift binaries
+images. For development purposes, you can use the [Red Hat Developer subscription](https://developers.redhat.com/products/rhel/download), which is free of charge.
+* A `hypervisor host` with a virtualization technology that supports RHEL. In
+this documentation, [libvirt](https://libvirt.org/) virtualization is used as
+an example.
 * A `remote registry` (e.g. `quay.io`) for storing and accessing `bootc` images
 
 ## Build MicroShift Bootc Image
@@ -44,6 +45,15 @@ curl -s -o Containerfile "${URL}"
 > repositories enabled by default, we need to enable the `rhocp` and `fast-datapath`
 > repositories for installing MicroShift and its dependencies. These repositories
 > must be accessible in the host subscription, but not necessarily enabled on the host.
+
+Examine the `rhocp` and `fast-datapath` repositories that are available in the host
+subscription.
+
+```bash
+sudo subscription-manager repos --list | \
+    grep '^Repo ID:' | \
+    grep -E 'fast-datapath|rhocp-4.*-for-rhel' | sort
+```
 
 Run the following image build command to create a local `bootc` image.
 
@@ -78,23 +88,25 @@ REPOSITORY                       TAG         IMAGE ID      CREATED        SIZE
 localhost/microshift-4.18-bootc  latest      193425283c00  2 minutes ago  2.31 GB
 ```
 
-### Publish Image
+### Push Image to Registry
 
-Run the following commands to log into a remote registry and publish the image.
+Run the following commands to log into a remote registry and push the image to
+a remote registry.
 
 > The image from the remote registry can be used for running the container on
 > another host, or when installing a new operating system with the `bootc`
 > image layer.
 
 ```bash
-REGISTRY_URL=quay.io
-REGISTRY_IMG=myorg/mypath/"${IMAGE_NAME}"
+REGISTRY_URL=<myreg>
+REGISTRY_IMG=<myorg>/<mypath>/"${IMAGE_NAME}"
 
 sudo podman login "${REGISTRY_URL}"
 sudo podman push localhost/"${IMAGE_NAME}" "${REGISTRY_URL}/${REGISTRY_IMG}"
 ```
 
-> Replace `myorg/mypath` with your remote registry organization name and path.
+> Replace `<myreg>` with the URL to your remote registry, and `<myorg>/<mypath>`
+> with your organization name and path inside your remote registry.
 
 ## Run MicroShift Bootc Virtual Machine
 
@@ -106,17 +118,20 @@ SUDO permissions configured.
 Set variables pointing to secret files that are included in `kickstart.ks` for
 gaining access to private container registries:
 * `AUTH_CONFIG` file contents are copied to `/etc/ostree/auth.json` at the
-pre-install stage to authenticate `quay.io/myorg` registry access
+pre-install stage to authenticate `<myreg>/<myorg>` registry access
 * `PULL_SECRET` file contents are copied to `/etc/crio/openshift-pull-secret`
 at the post-install stage to authenticate OpenShift registry access
 * `IMAGE_REF` variable contains the MicroShift bootc container image reference
 to be installed
 
 ```bash
-AUTH_CONFIG=~/.quay-auth.json
+AUTH_CONFIG=~/.registry-auth.json
 PULL_SECRET=~/.pull-secret.json
-IMAGE_REF="quay.io/<myorg>/<mypath>/microshift-4.18-bootc"
+IMAGE_REF="<myreg>/<myorg>/<mypath>/microshift-4.18-bootc"
 ```
+
+> Replace `<myreg>` with the URL to your remote registry, and `<myorg>/<mypath>`
+> with your organization name and path inside your remote registry.
 
 > See the `containers-auth.json(5)` manual pages for more information on the
 > syntax of the `AUTH_CONFIG` registry authentication file.
@@ -179,8 +194,6 @@ The kickstart file uses a special [ostreecontainer](https://pykickstart.readthed
 directive to pull a `bootc` image from the remote registry and use it to install
 the RHEL operating system.
 
-> Replace `myorg/mypath` with your remote registry organization name and path.
-
 ### Create Virtual Machine
 
 Download a RHEL boot ISO image from https://developers.redhat.com/products/rhel/download.
@@ -220,9 +233,9 @@ watch sudo oc get pods -A \
 ## Using Bootc Image Builder (BIB)
 
 The [bootc-image-builder](https://github.com/osbuild/bootc-image-builder), is a
-containerized tool to create disk images from bootc images. You can use the images
-that you build to deploy disk images in different environments, such as the edge,
-server, and clouds.
+containerized tool to create disk images from bootc images. You can use the tool
+to generate various image artifacts and deploy them in different environments,
+such as the edge, server, and clouds.
 
 ### Create ISO image using BIB
 
@@ -297,7 +310,8 @@ EOFKS
 
 ### Create Virtual Machine
 
-Copy the `install.iso` file to the `/var/lib/libvirt/images` directory.
+Run the following commands to copy the `./output/install.iso` file to the
+`/var/lib/libvirt/images` directory and create a virtual machine.
 
 ```bash
 VMNAME=microshift-4.18-bootc
@@ -334,6 +348,9 @@ for isolated (no Internet access) setup or for improving MicroShift first startu
 performance. The container image references are specific to platform and to each
 MicroShift version.
 
+Use this approach to create a fully self contained image that does not have any
+external dependencies on startup.
+
 ### Build Container Image
 
 Download the [Containerfile.embedded](../config/Containerfile.bootc-embedded-rhel9) using
@@ -344,6 +361,9 @@ URL=https://raw.githubusercontent.com/openshift/microshift/refs/heads/main/docs/
 
 curl -s -o Containerfile.embedded "${URL}"
 ```
+
+> Review comments in the `Containerfile.embedded` file to understand how container
+> dependencies are embedded during the `bootc` image build.
 
 Run the following image build command to create a local `bootc` image with embedded
 container dependencies. It is using a base image built according to the instructions
