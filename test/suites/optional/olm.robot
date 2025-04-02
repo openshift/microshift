@@ -72,6 +72,8 @@ CatalogSource Should Be Ready
         Should Be Equal As Strings    READY    ${catalog.status.connectionState.lastObservedState}
     EXCEPT
         Run With Kubeconfig    oc get events -n openshift-marketplace --sort-by='.lastTimestamp'
+        Run With Kubeconfig    oc get pods -n openshift-marketplace
+        SSHLibrary.Execute Command    df -h
         Fail    Catalog Source Is Not Ready
     END
 
