@@ -43,7 +43,7 @@ sudo podman run --privileged --rm --name microshift-okd -d \
     microshift-okd
 ```
 
-Run the following command to verify that the Kine SQLine backend is used by MicroShift.
+Run the following command to verify that the Kine SQLite backend is used by MicroShift.
 
 ```bash
 sudo podman exec -it microshift-okd /bin/bash -e <<EOF
@@ -97,7 +97,7 @@ sudo podman run --privileged --rm --name microshift-okd -d \
     microshift-okd
 ```
 
-Run the following command to verify that the Kine SQLine backend is used by MicroShift.
+Run the following command to verify that the Kine PostgreSQL backend is used by MicroShift.
 
 ```bash
 sudo podman exec -it microshift-okd /bin/bash -e <<EOF
