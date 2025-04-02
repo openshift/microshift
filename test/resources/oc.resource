@@ -66,13 +66,15 @@ Oc Wait
     ...    For example: "-n test-ns pod test-pod".
     ...    'opts' should contain a condition and additional parameters like timeout.
     ...    Returns the combined STDOUT/STDERR output of the command.
-    [Arguments]    ${resource}    ${opts}
+    [Arguments]    ${resource}    ${opts}    ${timeout}=300s
     ${output}    ${rc}=    Run With Kubeconfig
-    ...    oc wait ${resource} ${opts}
+    ...    oc wait ${resource} ${opts} --timeout=${timeout}
     ...    allow_fail=${TRUE}
     ...    return_rc=${TRUE}
     IF    ${rc} != 0
-        Run With Kubeconfig    oc describe ${resource}    allow_fail=${TRUE}
+        Run With Kubeconfig    oc describe ${resource}
+        ...    allow_fail=${TRUE}
+        ...    timeout=${timeout}
         Log    'oc wait ${resource} ${opts}' failed
         Should Be Equal As Integers    ${rc}    0
     END
@@ -191,7 +193,7 @@ All Pods Should Be Running
     [Documentation]    Check if all pods are running in the current namespace
     [Arguments]    ${ns}=-A    ${timeout}=${DEFAULT_WAIT_TIMEOUT}
     IF    "${ns}"=="-A"
-        Oc Wait    pods --all -A    --for="condition=Ready" --timeout=${timeout}
+        Oc Wait    pods --all -A    --for="condition=Ready"    timeout=${timeout}
     ELSE
-        Oc Wait    pods --all -n ${ns}    --for="condition=Ready" --timeout=${timeout}
+        Oc Wait    pods --all -n ${ns}    --for="condition=Ready"    timeout=${timeout}
     END
