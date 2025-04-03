@@ -57,7 +57,7 @@ Note how secrets are used during the image build:
 ```bash
 PULL_SECRET=~/.pull-secret.json
 USER_PASSWD=<your_redhat_user_password>
-IMAGE_NAME=microshift-4.16-bootc
+IMAGE_NAME=microshift-4.18-bootc
 
 sudo podman build --authfile "${PULL_SECRET}" -t "${IMAGE_NAME}" \
     --build-arg USER_PASSWD="${USER_PASSWD}" \
@@ -67,17 +67,17 @@ sudo podman build --authfile "${PULL_SECRET}" -t "${IMAGE_NAME}" \
 > **Important:**<br>
 > If `dnf upgrade` command is used in the container image build procedure, it
 > may cause unintended operating system version upgrade (e.g. from `9.4` to
-> `9.5`). To prevent this from happening, use the following command instead.
+> `9.6`). To prevent this from happening, use the following command instead.
 > ```
 > RUN . /etc/os-release && dnf upgrade -y --releasever="${VERSION_ID}"
 > ```
 
-Verify that the local MicroShift 4.16 `bootc` image was created.
+Verify that the local MicroShift 4.18 `bootc` image was created.
 
 ```bash
 $ sudo podman images "${IMAGE_NAME}"
 REPOSITORY                       TAG         IMAGE ID      CREATED        SIZE
-localhost/microshift-4.16-bootc  latest      193425283c00  2 minutes ago  2.31 GB
+localhost/microshift-4.18-bootc  latest      193425283c00  2 minutes ago  2.31 GB
 ```
 
 ### Publish Image
@@ -118,7 +118,7 @@ $ find /lib/modules/$(uname -r) -name "openvswitch*"
 /lib/modules/6.9.9-200.fc40.x86_64/kernel/net/openvswitch
 /lib/modules/6.9.9-200.fc40.x86_64/kernel/net/openvswitch/openvswitch.ko.xz
 
-$ IMAGE_NAME=microshift-4.16-bootc
+$ IMAGE_NAME=microshift-4.18-bootc
 $ sudo podman inspect "${IMAGE_NAME}" | grep kernel-core
         "created_by": "kernel-core-5.14.0-427.26.1.el9_4.x86_64"
 ```
@@ -191,7 +191,7 @@ The host shares the following configuration with the container:
 
 ```bash
 PULL_SECRET=~/.pull-secret.json
-IMAGE_NAME=microshift-4.16-bootc
+IMAGE_NAME=microshift-4.18-bootc
 
 sudo modprobe openvswitch
 sudo podman run --rm -it --privileged \
@@ -286,7 +286,7 @@ EOF
 %end
 
 # Pull a 'bootc' image from a remote registry
-ostreecontainer --url quay.io/myorg/mypath/microshift-4.16-bootc
+ostreecontainer --url quay.io/myorg/mypath/microshift-4.18-bootc
 
 %post --log=/dev/console --erroronfail
 
@@ -317,7 +317,7 @@ previous step to pull a `bootc` image from the remote registry and use it to ins
 the RHEL operating system.
 
 ```bash
-VMNAME=microshift-4.16-bootc
+VMNAME=microshift-4.18-bootc
 NETNAME=default
 
 sudo virt-install \
@@ -328,6 +328,116 @@ sudo virt-install \
     --network network=${NETNAME},model=virtio \
     --events on_reboot=restart \
     --location /var/lib/libvirt/images/rhel-9.4-$(uname -m)-boot.iso \
+    --initrd-inject kickstart.ks \
+    --extra-args "inst.ks=file://kickstart.ks" \
+    --wait
+```
+
+Log into the virtual machine using the `redhat:<password>` credentials.
+Run the following command to verify that all the MicroShift pods are up and running
+without errors.
+
+```bash
+watch sudo oc get pods -A \
+    --kubeconfig /var/lib/microshift/resources/kubeadmin/kubeconfig
+```
+
+## Using Bootc Image Builder (BIB)
+
+The [bootc-image-builder](https://github.com/osbuild/bootc-image-builder), is a
+containerized tool to create disk images from bootc images. You can use the images
+that you build to deploy disk images in different environments, such as the edge,
+server, and clouds.
+
+### Create ISO image using BIB
+
+```bash
+PULL_SECRET=~/.pull-secret.json
+IMAGE_NAME=microshift-4.18-bootc
+
+mkdir ./output
+sudo podman run --authfile ${PULL_SECRET} --rm -it \
+    --privileged \
+    --security-opt label=type:unconfined_t \
+    -v /var/lib/containers/storage:/var/lib/containers/storage \
+    -v ./output:/output \
+    registry.redhat.io/rhel9/bootc-image-builder:latest \
+    --local \
+    --type iso \
+    localhost/${IMAGE_NAME}:latest
+```
+
+### Prepare Kickstart File
+
+Set variables pointing to secret files that are included in `kickstart.ks` for
+gaining access to private container registries:
+* `PULL_SECRET` file contents are copied to `/etc/crio/openshift-pull-secret`
+  at the post-install stage to authenticate OpenShift registry access
+
+```bash
+PULL_SECRET=~/.pull-secret.json
+```
+
+Run the following command to create the `kickstart.ks` file to be used during
+the virtual machine installation. If you want to embed the kickstart file directly
+to iso using BIB please refer to [upstream docs](https://osbuild.org/docs/bootc/#anaconda-iso-installer-options-installer-mapping)
+
+```bash
+cat > kickstart.ks <<EOFKS
+lang en_US.UTF-8
+keyboard us
+timezone UTC
+text
+reboot
+
+# Partition the disk with hardware-specific boot and swap partitions, adding an
+# LVM volume that contains a 10GB+ system root. The remainder of the volume will
+# be used by the CSI driver for storing data.
+zerombr
+clearpart --all --initlabel
+# Create boot and swap partitions as required by the current hardware platform
+reqpart --add-boot
+# Add an LVM volume group and allocate a system root logical volume
+part pv.01 --grow
+volgroup rhel pv.01
+logvol / --vgname=rhel --fstype=xfs --size=10240 --name=root
+
+# Lock root user account
+rootpw --lock
+
+# Configure network to use DHCP and activate on boot
+network --bootproto=dhcp --device=link --activate --onboot=on
+
+%post --log=/dev/console --erroronfail
+
+# Create an OpenShift pull secret file
+cat > /etc/crio/openshift-pull-secret <<'EOF'
+$(cat "${PULL_SECRET}")
+EOF
+chmod 600 /etc/crio/openshift-pull-secret
+
+%end
+EOFKS
+```
+
+### Create Virtual Machine
+
+Copy the `install.iso` file to the `/var/lib/libvirt/images` directory.
+
+```bash
+VMNAME=microshift-4.18-bootc
+NETNAME=default
+
+sudo cp -Z ./output/bootiso/install.iso /var/lib/libvirt/images/${VMNAME}.iso
+
+sudo virt-install \
+    --name ${VMNAME} \
+    --vcpus 2 \
+    --memory 2048 \
+    --disk path=/var/lib/libvirt/images/${VMNAME}.qcow2,size=20 \
+    --network network=${NETNAME},model=virtio \
+    --events on_reboot=restart \
+    --location /var/lib/libvirt/images/${VMNAME}.iso \
     --initrd-inject kickstart.ks \
     --extra-args "inst.ks=file://kickstart.ks" \
     --wait
@@ -357,7 +467,7 @@ PULL_SECRET=~/.pull-secret.json
 USER_PASSWD=<your_redhat_user_password>
 IMAGE_ARCH=amd64 # Use amd64 or arm64 depending on the current platform
 IMAGE_PLATFORM="linux/${IMAGE_ARCH}"
-IMAGE_NAME="microshift-4.16-bootc:linux-${IMAGE_ARCH}"
+IMAGE_NAME="microshift-4.18-bootc:linux-${IMAGE_ARCH}"
 
 sudo podman build --authfile "${PULL_SECRET}" -t "${IMAGE_NAME}" \
     --platform "${IMAGE_PLATFORM}" \
@@ -365,13 +475,13 @@ sudo podman build --authfile "${PULL_SECRET}" -t "${IMAGE_NAME}" \
     -f Containerfile
 ```
 
-Verify that the local MicroShift 4.16 `bootc` image was created for the specified
+Verify that the local MicroShift 4.18 `bootc` image was created for the specified
 platform.
 
 ```bash
 $ sudo podman images "${IMAGE_NAME}"
 REPOSITORY                       TAG          IMAGE ID      CREATED         SIZE
-localhost/microshift-4.16-bootc  linux-amd64  3f7e136fccb5  13 minutes ago  2.19 GB
+localhost/microshift-4.18-bootc  linux-amd64  3f7e136fccb5  13 minutes ago  2.19 GB
 ```
 
 Repeat the procedure on the other platform (i.e. `arm64`) and proceed by publishing
@@ -391,7 +501,7 @@ and publish it to the remote registry.
 ```bash
 REGISTRY_URL=quay.io
 REGISTRY_ORG=myorg/mypath
-BASE_NAME=microshift-4.16-bootc
+BASE_NAME=microshift-4.18-bootc
 MANIFEST_NAME="${BASE_NAME}:latest"
 
 sudo podman manifest create -a "localhost/${MANIFEST_NAME}" \
@@ -417,6 +527,174 @@ $ sudo podman manifest inspect \
 ```
 
 It is now possible to access images using the manifest name with the `latest` tag
-(e.g. `quay.io/myorg/mypath/microshift-4.16-bootc:latest`). The image for the
+(e.g. `quay.io/myorg/mypath/microshift-4.18-bootc:latest`). The image for the
 current platform will automatically be pulled from the registry if it is part of
 the manifest list.
+
+## Appendix B: Embedding Container Images in Bootc Builds
+
+Adding MicroShift container image dependencies to bootc images may be necessary
+for isolated (no Internet access) setup or for improving MicroShift first startup
+performance. The container image references are specific to platform and to each
+MicroShift version.
+
+### Build Container Image
+
+Download the [Containerfile.embedded](../config/Containerfile.bootc-embedded-rhel9) using
+the following command and use it for subsequent image builds.
+
+```bash
+URL=https://raw.githubusercontent.com/openshift/microshift/refs/heads/main/docs/config/Containerfile.bootc-embedded-rhel9
+
+curl -s -o Containerfile.embedded "${URL}"
+```
+
+Run the following image build command to create a local `bootc` image with embedded
+container dependencies. It is using a base image built according to the instructions
+in the [Build Image](#build-image) section.
+
+Note how secrets are used during the image build:
+* The podman `--authfile` argument is required to pull the base image from the
+`registry.redhat.io` registry
+* The podman `--secret` argument is required to pull image dependencies from the
+OpenShift container registries.
+
+```bash
+PULL_SECRET=~/.pull-secret.json
+BASE_IMAGE_NAME=microshift-4.18-bootc
+IMAGE_NAME=microshift-4.18-bootc-embedded
+
+sudo podman build --authfile "${PULL_SECRET}" -t "${IMAGE_NAME}" \
+    --secret "id=pullsecret,src=${PULL_SECRET}" \
+    --build-arg USHIFT_BASE_IMAGE_NAME="${BASE_IMAGE_NAME}" \
+    --build-arg USHIFT_BASE_IMAGE_TAG=latest \
+    -f Containerfile.embedded
+```
+
+Verify that the local MicroShift 4.18 `bootc` image was created.
+
+```bash
+$ sudo podman images "${IMAGE_NAME}"
+REPOSITORY                                TAG         IMAGE ID      CREATED             SIZE
+localhost/microshift-4.18-bootc-embedded  latest      6490d8f5752a  About a minute ago  3.75 GB
+```
+
+### Build Installation Image
+
+Follow the instructions in [Create ISO Image Using BIB](#create-iso-image-using-bib)
+to build an ISO from the container image with embedded container dependencies.
+
+> Note: Make sure to set the `IMAGE_NAME` variable to `microshift-4.18-bootc-embedded`
+
+### Prepare Kickstart File
+
+Set variables pointing to secret files that are included in `kickstart.ks` for
+gaining access to private container registries:
+* `PULL_SECRET` file contents are copied to `/etc/crio/openshift-pull-secret`
+  at the post-install stage to authenticate OpenShift registry access
+
+```bash
+PULL_SECRET=~/.pull-secret.json
+IMAGE_NAME=microshift-4.18-bootc-embedded
+```
+
+Run the following command to create the `kickstart.ks` file to be used during
+the virtual machine installation.
+
+```bash
+cat > kickstart.ks <<EOFKS
+lang en_US.UTF-8
+keyboard us
+timezone UTC
+text
+reboot
+
+# Partition the disk with hardware-specific boot and swap partitions, adding an
+# LVM volume that contains a 10GB+ system root. The remainder of the volume will
+# be used by the CSI driver for storing data.
+zerombr
+clearpart --all --initlabel
+# Create boot and swap partitions as required by the current hardware platform
+reqpart --add-boot
+# Add an LVM volume group and allocate a system root logical volume
+part pv.01 --grow
+volgroup rhel pv.01
+logvol / --vgname=rhel --fstype=xfs --size=10240 --name=root
+
+# Lock root user account
+rootpw --lock
+
+# Configure network to use DHCP and activate on boot
+network --bootproto=dhcp --device=link --activate --onboot=on
+
+# Configure bootc to install from the local embedded container repository.
+# See /osbuild-base.ks on ISO images generated by bootc-image-builder.
+ostreecontainer --transport oci --url /run/install/repo/container
+
+%post --log=/dev/console --erroronfail
+
+# Update the image reference for updates to work correctly.
+# See /osbuild.ks on ISO images generated by bootc-image-builder.
+bootc switch --mutate-in-place --transport registry localhost/${IMAGE_NAME}
+
+# Create an OpenShift pull secret file
+cat > /etc/crio/openshift-pull-secret <<'EOF'
+$(cat "${PULL_SECRET}")
+EOF
+chmod 600 /etc/crio/openshift-pull-secret
+
+%end
+EOFKS
+```
+
+### Configure Isolated Network
+
+Before creating a virtual machine, it is necessary to configure a `libvirt`
+network without Internet access. Run the following commands to create such
+a network.
+
+```bash
+VM_ISOLATED_NETWORK=microshift-isolated-network
+
+cat > isolated-network.xml <<EOF
+<network>
+  <name>${VM_ISOLATED_NETWORK}</name>
+  <forward mode='none'/>
+  <ip address='192.168.111.1' netmask='255.255.255.0' localPtr='yes'>
+    <dhcp>
+      <range start='192.168.111.100' end='192.168.111.254'/>
+    </dhcp>
+  </ip>
+</network>
+EOF
+
+sudo virsh net-define isolated-network.xml
+sudo virsh net-start     "${VM_ISOLATED_NETWORK}"
+sudo virsh net-autostart "${VM_ISOLATED_NETWORK}"
+```
+
+### Create Virtual Machine
+
+Follow the instructions in [Create Virtual Machine](#create-virtual-machine-1)
+to bootstrap a virtual machine from the ISO with embedded container dependencies.
+
+> Note: Make sure to set the `NETNAME` variable to the `VM_ISOLATED_NETWORK`
+> isolated network name.
+
+Log into the virtual machine **console** using the `redhat:<password>` credentials.
+
+Run the following command to verify that there is no Internet access, thus
+no container image dependencies could have been pulled over the network.
+
+```bash
+$ curl -I redhat.com
+curl: (6) Could not resolve host: redhat.com
+```
+
+Run the following command to verify that all the MicroShift pods are up and running
+without errors.
+
+```bash
+watch sudo oc get pods -A \
+    --kubeconfig /var/lib/microshift/resources/kubeadmin/kubeconfig
+```

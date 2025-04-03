@@ -124,14 +124,6 @@ def set_rpm_version_info_vars():
     SOURCE_VERSION = common.run_command_in_shell(f"rpm -q --queryformat '%{{version}}-%{{release}}' {release_info_rpm}")
     SOURCE_VERSION_BASE = common.run_command_in_shell(f"rpm -q --queryformat '%{{version}}-%{{release}}' {release_info_rpm_base}")
 
-    # The source images are used in selected container image builds
-    global SOURCE_IMAGES
-
-    src_img_cmd = f"rpm2cpio {release_info_rpm}"
-    src_img_cmd += f' | cpio -i --to-stdout "*release-{UNAME_M}.json" 2>/dev/null'
-    src_img_cmd += ' | jq -r \'[ .images[] ] | join(",")\''
-    SOURCE_IMAGES = common.run_command_in_shell(src_img_cmd)
-
     global SSL_CLIENT_KEY_FILE
     global SSL_CLIENT_CERT_FILE
     # Find the first file matching "*-key.pem" in the entitlements directory
@@ -145,7 +137,7 @@ def set_rpm_version_info_vars():
     # Update selected environment variables based on the global variables.
     # These are used for templating container files and images.
     rpmver_globals_vars = [
-        'SOURCE_VERSION', 'SOURCE_VERSION_BASE', 'SOURCE_IMAGES',
+        'SOURCE_VERSION', 'SOURCE_VERSION_BASE',
         'SSL_CLIENT_KEY_FILE', 'SSL_CLIENT_CERT_FILE'
     ]
     for var in rpmver_globals_vars:
@@ -234,9 +226,12 @@ def process_containerfile(groupdir, containerfile, dry_run):
     try:
         # Redirect the output to the log file
         with open(cf_logfile, 'w') as logfile:
-            # Run the container build command.
-            # Note: The pull secret is necessary in some builds for pulling embedded
-            # container images specified by SOURCE_IMAGES environment variable.
+            # Run the container build command
+            # Note:
+            # - The pull secret is necessary in some builds for pulling embedded
+            #   container images referenced in release-info RPMs
+            # - The explicit push-to-mirror sets the 'latest' tag as all the build
+            #   layers are in the mirror due to 'cache-to' option
             build_args = [
                 "sudo", "podman", "build",
                 "--authfile", PULL_SECRET,
