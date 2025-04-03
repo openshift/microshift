@@ -314,8 +314,6 @@ install -p -m755 scripts/microshift-sos-report.sh %{buildroot}%{_bindir}/microsh
 
 install -d -m755 %{buildroot}%{_sysconfdir}/crio/crio.conf.d
 
-install -p -m644 packaging/crio.conf.d/00-crio-crun.conf %{buildroot}%{_sysconfdir}/crio/crio.conf.d/00-crio-crun.conf
-
 %ifarch %{arm} aarch64
 install -p -m644 packaging/crio.conf.d/10-microshift_arm64.conf %{buildroot}%{_sysconfdir}/crio/crio.conf.d/10-microshift.conf
 %endif
@@ -641,7 +639,6 @@ fi
 %{_bindir}/microshift-sos-report
 %{_unitdir}/microshift.service
 %{_unitdir}/microshift-cleanup-kubelet.service
-%{_sysconfdir}/crio/crio.conf.d/00-crio-crun.conf
 %{_sysconfdir}/crio/crio.conf.d/10-microshift.conf
 %{_datadir}/microshift/spec/config-openapi-spec.json
 %dir %{_sysconfdir}/microshift
@@ -761,6 +758,9 @@ fi
 # Use Git command to generate the log and replace the VERSION string
 # LANG=C git log --date="format:%a %b %d %Y" --pretty="tformat:* %cd %an <%ae> VERSION%n- %s%n" packaging/rpm/microshift.spec
 %changelog
+* Mon Mar 31 2025 Gregory Giguashvili <ggiguash@redhat.com> 4.19.0
+- Default crio runtime is crun
+
 * Tue Apr 01 2025 Gregory Giguashvili <ggiguash@redhat.com> 4.19.0
 - Add hostname package dependency to microshift RPM
 
