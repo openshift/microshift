@@ -1,17 +1,74 @@
-- etcd embedded-component abfca6b7fe678873df8da0ca792877f882f0d522 to 0d9e0a907c4aea7c4b2bff627478785fb99511f5
-  - 23b2cc12 2025-03-21T13:14:40+00:00 DOWNSTREAM: <carry> fix a compaction induce latency issue
+- cluster-network-operator embedded-component 8f0b637e09e55c50a06ffd0c1db812ed09b5ad3c to cf90595d759b3cf9511de22f190368f46585ef3e
+  - 9c969cc 2025-03-31T11:21:59+02:00 Check on ipsec.service instead of libreswan package on host
+  - cb9555e 2025-03-31T11:21:59+02:00 Add version check for machine config operator
+  - 84477fb 2025-03-31T11:21:59+02:00 Mount top level directory for IPsec host paths
+  - 775a1fd 2025-03-31T11:21:59+02:00 Move to use newer IPsec DaemonSets irrespective of MCP state
+  - bf7e75d 2025-03-31T11:21:56+02:00 Better handling of status manager machine config cache
+  - 5762c31 2025-03-31T11:20:54+02:00 Use network config last seen annotation for machine config
+  - 951a5a0 2025-03-31T11:14:59+02:00 Report network status for machine config deletes
+  - d0a2ba7 2025-03-31T11:14:59+02:00 Use source kind for machine config watcher
+  - b8f6b09 2025-03-31T11:14:59+02:00 Revert "Update network operator status for IPsec"
+  - 9e157c3 2025-03-31T11:14:59+02:00 Make machine config handling to be more generic
+  - 4baec87 2025-03-31T11:14:59+02:00 Report IPsec machine config progressing status
+  - f1d1051 2025-03-31T11:14:59+02:00 Add machine config watcher for status manager
+  - 6e66e2c 2025-03-31T11:14:59+02:00 Keep rendering OVN IPsec when its daemonset not available
+  - 28fe356 2025-03-31T11:14:59+02:00 Remove 4.13 IPsec upgrade handling
+  - 67bd2c3 2025-03-31T11:14:59+02:00 Keep ovn ipsec enabled during the upgrade     The following change on the machine pool `status.MachineCount == status.UpdatedMachineCount && hasSourceInMachineConfigStatus(status, machineConfigs)` is introduced with PR https://github.com/openshift/cluster-network-operator/pull/2349 which ensures IPsec machine config is always installed on all the nodes in the cluster, So this is deleting the IPsec daemonset as per the CNO state machine for IPsec when the condition is not met. But this is also accidentally disabling IPsec in OVN which is not an expected behavior. This causes ovs-monitor-ipsec to refresh existing ipsec connections unnecessarily when IPsec pod comes up as it is not able to find remote_name from the tunnel. This may also trigger deleting IPsec connection entries from openshift.conf file if ovs-monitor-ipsec is not killed timely when ipsec daemonset is removed. So this commit enables ovn ipsec option as long as the API is set with Full mode.
+  - b0e7d9a 2025-03-31T11:14:59+02:00 Restart IPsec service only when needed
+  - 552efde 2025-03-31T11:14:59+02:00 Revert "Configure narrowing=yes for IPsec connections"
+  - 38ca568 2025-03-31T11:14:59+02:00 Cleanup ipsec state only when ipsec is not full mode
 
-- machine-config-operator embedded-component 1d0d635f2eb82057c5a533527639186f85394559 to 143ea7b41456a4d9337cf5524cc5e51e9761bd4c
-  - bc61799e 2025-03-21T08:55:50+00:00 Fixing typos for MachineConfigNode
-  - 2e46d760 2025-03-20T12:18:07+01:00 Add crio dependency for ipsec.service
-  - 77e4ef21 2025-03-20T12:17:57+01:00 Add ipsec connect wait service
+- kubernetes embedded-component 98fe56995ed880a36943adc615688f2f5bd1a2d3 to 89ebee0309adcf066eb7e837f403269d85319513
+  - 5f36ac61c 2025-03-31T21:19:11+00:00 UPSTREAM: <drop>: Disable default off feature
+  - 767c623b3 2025-03-20T12:22:18+00:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - dc99b533b 2025-03-20T12:13:27+00:00 UPSTREAM: <drop>: manually resolve conflicts
+  - 6a074997c 2025-03-11T19:51:05+00:00 Release commit for Kubernetes v1.30.11
+  - e9e207bff 2025-03-06T10:59:15-08:00 Update status before returning err
+  - 00e531f3b 2025-03-05T12:43:13-08:00 Add the feature gate `OrderedNamespaceDeletion` for apiserver.
+  - 1dcf4ef2d 2025-02-20T15:23:52+02:00 kubeadm: fix panic when no UpgradeConfiguration was found in the config file
+  - 8524c468f 2025-02-18T16:39:36-05:00 proxy: should add PingPeriod for websocket translator
+  - 6abab5aeb 2025-02-15T15:39:24-05:00 Bump to build with go 1.23.6
+  - 76d8dd161 2025-02-14T12:54:03-05:00 Honor KUBE_HACK_TOOLS_GOTOOLCHAIN
+  - 280816387 2025-02-12T21:53:31+00:00 Update CHANGELOG/CHANGELOG-1.30.md for v1.30.10
 
-- operator-framework-olm embedded-component 51e6ca2c24b6e231f175297acc5c8ff1eb5acf2b to d3b1715867b6e96a9ee71e158a9f0fd6ab6f792f
-  - 8d12ead4 2025-03-13T12:26:56+00:00 add missing pod disruption reasons to isPodDead (#3519)
+- service-ca-operator embedded-component 1f7d6472fea332fc307d9c8911f8c3cf57347755 to f1b63073aa91cf1c226d0ec46d3dfc2d65c3877f
+  - 6263498 2025-03-27T14:39:08+08:00 Recovery replaces and add 0000_50_service-ca-operator_02_crd.yaml to manifests dir
+  - 37961fa 2025-03-27T14:30:31+08:00 Update library-go and react changes
+  - a624735 2025-03-22T02:16:18+08:00 Upadate go 1.22 and ocp 4.17
 
-- ovn-kubernetes image-amd64 c621cdc876ffb219c7877a1db2f500ba541dba6c to b02d1af7d45ae88c91785ebc83ddec23348596cf
-  - a0ead881 2025-03-20T15:11:10+01:00 Update OVN to FDP25.A.1 24.03.5-40.
+- kubernetes image-amd64 98fe56995ed880a36943adc615688f2f5bd1a2d3 to 89ebee0309adcf066eb7e837f403269d85319513
+  - 5f36ac61c 2025-03-31T21:19:11+00:00 UPSTREAM: <drop>: Disable default off feature
+  - 767c623b3 2025-03-20T12:22:18+00:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - dc99b533b 2025-03-20T12:13:27+00:00 UPSTREAM: <drop>: manually resolve conflicts
+  - 6a074997c 2025-03-11T19:51:05+00:00 Release commit for Kubernetes v1.30.11
+  - e9e207bff 2025-03-06T10:59:15-08:00 Update status before returning err
+  - 00e531f3b 2025-03-05T12:43:13-08:00 Add the feature gate `OrderedNamespaceDeletion` for apiserver.
+  - 1dcf4ef2d 2025-02-20T15:23:52+02:00 kubeadm: fix panic when no UpgradeConfiguration was found in the config file
+  - 8524c468f 2025-02-18T16:39:36-05:00 proxy: should add PingPeriod for websocket translator
+  - 6abab5aeb 2025-02-15T15:39:24-05:00 Bump to build with go 1.23.6
+  - 76d8dd161 2025-02-14T12:54:03-05:00 Honor KUBE_HACK_TOOLS_GOTOOLCHAIN
+  - 280816387 2025-02-12T21:53:31+00:00 Update CHANGELOG/CHANGELOG-1.30.md for v1.30.10
 
-- ovn-kubernetes image-arm64 c621cdc876ffb219c7877a1db2f500ba541dba6c to b02d1af7d45ae88c91785ebc83ddec23348596cf
-  - a0ead881 2025-03-20T15:11:10+01:00 Update OVN to FDP25.A.1 24.03.5-40.
+- service-ca-operator image-amd64 1f7d6472fea332fc307d9c8911f8c3cf57347755 to f1b63073aa91cf1c226d0ec46d3dfc2d65c3877f
+  - 6263498 2025-03-27T14:39:08+08:00 Recovery replaces and add 0000_50_service-ca-operator_02_crd.yaml to manifests dir
+  - 37961fa 2025-03-27T14:30:31+08:00 Update library-go and react changes
+  - a624735 2025-03-22T02:16:18+08:00 Upadate go 1.22 and ocp 4.17
+
+- kubernetes image-arm64 98fe56995ed880a36943adc615688f2f5bd1a2d3 to 89ebee0309adcf066eb7e837f403269d85319513
+  - 5f36ac61c 2025-03-31T21:19:11+00:00 UPSTREAM: <drop>: Disable default off feature
+  - 767c623b3 2025-03-20T12:22:18+00:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - dc99b533b 2025-03-20T12:13:27+00:00 UPSTREAM: <drop>: manually resolve conflicts
+  - 6a074997c 2025-03-11T19:51:05+00:00 Release commit for Kubernetes v1.30.11
+  - e9e207bff 2025-03-06T10:59:15-08:00 Update status before returning err
+  - 00e531f3b 2025-03-05T12:43:13-08:00 Add the feature gate `OrderedNamespaceDeletion` for apiserver.
+  - 1dcf4ef2d 2025-02-20T15:23:52+02:00 kubeadm: fix panic when no UpgradeConfiguration was found in the config file
+  - 8524c468f 2025-02-18T16:39:36-05:00 proxy: should add PingPeriod for websocket translator
+  - 6abab5aeb 2025-02-15T15:39:24-05:00 Bump to build with go 1.23.6
+  - 76d8dd161 2025-02-14T12:54:03-05:00 Honor KUBE_HACK_TOOLS_GOTOOLCHAIN
+  - 280816387 2025-02-12T21:53:31+00:00 Update CHANGELOG/CHANGELOG-1.30.md for v1.30.10
+
+- service-ca-operator image-arm64 1f7d6472fea332fc307d9c8911f8c3cf57347755 to f1b63073aa91cf1c226d0ec46d3dfc2d65c3877f
+  - 6263498 2025-03-27T14:39:08+08:00 Recovery replaces and add 0000_50_service-ca-operator_02_crd.yaml to manifests dir
+  - 37961fa 2025-03-27T14:30:31+08:00 Update library-go and react changes
+  - a624735 2025-03-22T02:16:18+08:00 Upadate go 1.22 and ocp 4.17
 
