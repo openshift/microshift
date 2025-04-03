@@ -71,8 +71,8 @@ RUN --mount=type=secret,id=pullsecret,dst=/run/secrets/pull-secret.json \
 # In this case, it is not necessary to update /etc/containers/storage.conf with
 # the additional store path.
 # See https://issues.redhat.com/browse/RHEL-75827
-RUN mkdir -p /etc/systemd/system/microshift.service.d
-COPY --chmod=644 ./bootc-images/microshift-copy-images.conf /etc/systemd/system/microshift.service.d/microshift-copy-images.conf
+RUN mkdir -p /usr/lib/systemd/system/microshift.service.d
+COPY --chmod=644 ./bootc-images/microshift-copy-images.conf /usr/lib/systemd/system/microshift.service.d/microshift-copy-images.conf
 
 # Create test data
 COPY --chmod=755 ./bootc-images/ai-model-serving-test-data.sh /tmp/ai-model-serving-test-data.sh
