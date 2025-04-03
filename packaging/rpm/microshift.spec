@@ -73,6 +73,7 @@ Requires: microshift-greenboot = %{version}
 Requires: conntrack-tools
 Requires: sos
 Requires: crun
+Requires: hostname
 Requires: openshift-clients
 
 %{?systemd_requires}
@@ -649,6 +650,9 @@ fi
 # Use Git command to generate the log and replace the VERSION string
 # LANG=C git log --date="format:%a %b %d %Y" --pretty="tformat:* %cd %an <%ae> VERSION%n- %s%n" packaging/rpm/microshift.spec
 %changelog
+* Tue Apr 01 2025 Gregory Giguashvili <ggiguash@redhat.com> 4.18.z
+- Add hostname package dependency to microshift RPM
+
 * Mon Nov 11 2024 Gregory Giguashvili <ggiguash@redhat.com> 4.18.0
 - Restart crio and microshift services on RPM post-install
 
