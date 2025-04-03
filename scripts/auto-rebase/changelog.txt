@@ -1,3 +1,10 @@
-- machine-config-operator embedded-component acb5acfbb3dec64c3f6c69adf9f2cfc53b862ac2 to b5dc445d6ee0d1fe2674a9cf9c01074716484bf2
-  - 6b150258 2025-03-19T14:15:41+00:00 daemon: ensure ostree-finalize-staged is started before rebooting
+- machine-config-operator embedded-component b5dc445d6ee0d1fe2674a9cf9c01074716484bf2 to 8600a368d3b40d6e5bd7adfec1fb7a40cb6a217b
+  - 015aa755 2025-03-24T15:06:02+00:00 Fixing typos for MachineConfigNode
+  - 43480b17 2025-03-21T01:19:52+00:00 kubelet_config_controller: Update ObservedGeneration render_controller: Make function name AreMCGeneratingSubControllersCompletedForPool explicit apihelpers: match the KubeletConfig to the Pool using MachineConfigPoolSelector
+
+- ovn-kubernetes image-amd64 87e64b772528470577795c4f82a09e5cb253491a to 961bff913e2a04d640941f73d4632452adbaffaf
+  - fd9a8c0d 2025-03-20T15:13:03+01:00 Update OVN to FDP25.A.1 24.03.5-40.
+
+- ovn-kubernetes image-arm64 87e64b772528470577795c4f82a09e5cb253491a to 961bff913e2a04d640941f73d4632452adbaffaf
+  - fd9a8c0d 2025-03-20T15:13:03+01:00 Update OVN to FDP25.A.1 24.03.5-40.
 
