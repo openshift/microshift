@@ -27,15 +27,20 @@ RUN --mount=type=secret,id=pullsecret,dst=/run/secrets/pull-secret.json \
 # In this case, it is not necessary to update /etc/containers/storage.conf with
 # the additional store path.
 # See https://issues.redhat.com/browse/RHEL-75827
-RUN mkdir -p /etc/systemd/system/microshift.service.d
-# hadolint ignore=DL3059
+RUN cat > /usr/bin/microshift-copy-images <<EOF
+#!/bin/bash
+set -eux -o pipefail
+while IFS="," read -r img sha ; do
+    skopeo copy --preserve-digests \
+        "dir:${IMAGE_STORAGE_DIR}/\${sha}" \
+        "containers-storage:\${img}"
+done < "${IMAGE_LIST_FILE}"
+EOF
+
+RUN chmod 755 /usr/bin/microshift-copy-images && \
+    mkdir -p /etc/systemd/system/microshift.service.d
+
 RUN cat > /etc/systemd/system/microshift.service.d/microshift-copy-images.conf <<EOF
 [Service]
-ExecStartPre=/bin/bash -eux -o pipefail -c '\
-    while IFS="," read -r img sha ; do \
-        skopeo copy --preserve-digests \
-            "dir:${IMAGE_STORAGE_DIR}/\${sha}" \
-            "containers-storage:\${img}" ; \
-    done < "${IMAGE_LIST_FILE}" \
-'
+ExecStartPre=/usr/bin/microshift-copy-images
 EOF
