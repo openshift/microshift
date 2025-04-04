@@ -491,7 +491,7 @@ close_junit() {
     
     local line="<testsuite name=\"infrastructure for ${SCENARIO}\" tests=\"${TESTCASES}\" failures=\"${FAILURES}\" skipped=\"${SKIPPED}\" timestamp=\"${TIMESTAMP}\">"
     
-    sed -i "2c$line" "${JUNIT_OUTPUT_FILE}"
+    sed -i "2c${line}" "${JUNIT_OUTPUT_FILE}"
 }
 
 
