@@ -35,9 +35,9 @@ TEST_EXECUTION_TIMEOUT="30m" # may be overriden in scenario file
 SUBSCRIPTION_MANAGER_PLUGIN="${SUBSCRIPTION_MANAGER_PLUGIN:-${SCRIPTDIR}/subscription_manager_register.sh}"  # may be overridden in global settings file
 
 declare -i TESTCASES=0
-FAILURES=0
-TIMESTAMP=0
-SKIPPED=0
+declare -i FAILURES=0
+declare -i SKIPPED=0
+TIMESTAMP="$(date --iso-8601=ns)"
 
 full_vm_name() {
     local -r base="${1}"
@@ -478,11 +478,9 @@ start_junit() {
 
     echo "Creating ${JUNIT_OUTPUT_FILE}"
 
-    TIMESTAMP="$(date --iso-8601=ns)"
-
     cat - >"${JUNIT_OUTPUT_FILE}" <<EOF
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="infrastructure for ${SCENARIO}" timestamp="${TIMESTAMP}">
+<testsuite name="infrastructure for ${SCENARIO}" tests="${TESTCASES}" failures="${FAILURES}" skipped="${SKIPPED}" timestamp="${TIMESTAMP}\">
 EOF
 }
 
