@@ -38,7 +38,6 @@ MicroShift Reports Metrics To Server
 
     [Teardown]    Remove Telemetry Configuration
 
-
 MicroShift Reports Metrics To Server Through Proxy
     [Documentation]    Check MicroShift is able to send metrics to the telemetry server through a proxy without errors.
     [Tags]    robot:exclude
@@ -48,6 +47,7 @@ MicroShift Reports Metrics To Server Through Proxy
     ...    Should Find Metrics Success
 
     [Teardown]    Remove Telemetry Configuration With Proxy
+
 
 *** Keywords ***
 Setup
@@ -93,7 +93,10 @@ Setup Telemetry Configuration With Proxy
     [Documentation]    Enables the telemetry feature in MicroShift configuration file
     ...    and restarts microshift.service
     Start Proxy Server    host=${PROXY_HOST}    port=${PROXY_PORT}
-    ${proxy_config}=    Catenate    SEPARATOR=\n    ${ENABLE_TELEMETRY}    \ \ proxy: http://${PROXY_HOST}:${PROXY_PORT}
+    ${proxy_config}=    Catenate
+    ...    SEPARATOR=\n
+    ...    ${ENABLE_TELEMETRY}
+    ...    \ \ proxy: http://${PROXY_HOST}:${PROXY_PORT}
     Drop In MicroShift Config    ${proxy_config}    10-telemetry-proxy
     Stop MicroShift
     ${cursor}=    Get Journal Cursor
@@ -106,10 +109,6 @@ Remove Telemetry Configuration With Proxy
     Remove Drop In MicroShift Config    10-telemetry-proxy
     Restart MicroShift
     Stop Proxy Server
-
-Build Proxy Configuration
-    [Documentation]    Builds the proxy configuration for telemetry
-    Set Suite Variable    ${ENABLE_TELEMETRY_PROXY}    ${proxy_config}
 
 Configure Pull Secrets
     [Documentation]    Sets up the pull secrets for the MicroShift cluster.

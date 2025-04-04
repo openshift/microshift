@@ -68,6 +68,7 @@ class ProxyHandler(BaseHTTPRequestHandler):
                     return
                 (dst if s is src else src).sendall(data)
 
+
 class ProxyServer:
     def __init__(self, host="0.0.0.0", port=8080):
         self.server = HTTPServer((host, port), ProxyHandler)
@@ -84,6 +85,7 @@ class ProxyServer:
         self.server.shutdown()
         self.server.server_close()
         print("Proxy server stopped")
+
 
 class ProxyLibrary:
     def __init__(self):
