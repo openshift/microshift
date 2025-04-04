@@ -103,8 +103,18 @@ run_image_build() {
 run_bootc_image_build() {
     make -C "${ROOTDIR}" verify-containers
 
-    $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/layer1-base
-    $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/layer2-source
+    if [ -v CI_JOB_NAME ] ; then
+        $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/layer1-base
+        $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/layer2-presubmit
+    
+        if [[ "${CI_JOB_NAME}" =~ .*periodic.* ]]; then
+            $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/layer3-periodic
+        fi
+    else
+        $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/layer1-base
+        $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/layer2-presubmit
+        $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/layer3-periodic
+    fi
 }
 
 cat /etc/os-release
