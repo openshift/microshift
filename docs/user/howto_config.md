@@ -86,6 +86,7 @@ storage:
     optionalCsiComponents: []
 telemetry:
     endpoint: ""
+    proxy: ""
     status: ""
 
 ```
@@ -186,6 +187,7 @@ storage:
     optionalCsiComponents: []
 telemetry:
     endpoint: https://infogw.api.openshift.com
+    proxy: ""
     status: Enabled
 
 ```
