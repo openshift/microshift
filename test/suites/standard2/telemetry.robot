@@ -5,6 +5,7 @@ Resource            ../../resources/common.resource
 Resource            ../../resources/microshift-config.resource
 Resource            ../../resources/microshift-process.resource
 Library             ../../resources/journalctl.py
+Library             ../../resources/ProxyLibrary.py
 
 Suite Setup         Setup
 Suite Teardown      Teardown
@@ -13,7 +14,8 @@ Test Tags           restart    slow
 
 
 *** Variables ***
-# Temporary use of the telemetry production server until staging is ready.
+${PROXY_HOST}                   ${EMPTY}
+${PROXY_PORT}                   ${EMPTY}
 ${TELEMETRY_WRITE_ENDPOINT}     https://infogw.api.openshift.com
 ${ENABLE_TELEMETRY}             SEPARATOR=\n
 ...                             telemetry:
@@ -37,10 +39,21 @@ MicroShift Reports Metrics To Server
     [Teardown]    Remove Telemetry Configuration
 
 
+MicroShift Reports Metrics To Server Through Proxy
+    [Documentation]    Check MicroShift is able to send metrics to the telemetry server through a proxy without errors.
+    [Tags]    robot:exclude
+    [Setup]    Setup Telemetry Configuration With Proxy
+
+    Wait Until Keyword Succeeds    10x    10s
+    ...    Should Find Metrics Success
+
+    [Teardown]    Remove Telemetry Configuration With Proxy
+
 *** Keywords ***
 Setup
     [Documentation]    Test suite setup
     Check Required Env Variables
+    Check Required Proxy Variables
     Login MicroShift Host
     Configure Pull Secrets
     Setup Kubeconfig
@@ -51,6 +64,15 @@ Teardown
     Restart MicroShift
     Logout MicroShift Host
     Remove Kubeconfig
+
+Check Required Proxy Variables
+    [Documentation]    Check if the required proxy variables are set
+    IF    "${PROXY_HOST}"=="${EMPTY}"
+        Fatal Error    PROXY_HOST variable is required
+    END
+    IF    "${PROXY_PORT}"=="${EMPTY}"
+        Fatal Error    PROXY_PORT variable is required
+    END
 
 Setup Telemetry Configuration
     [Documentation]    Enables the telemetry feature in MicroShift configuration file
@@ -66,6 +88,28 @@ Remove Telemetry Configuration
     ...    and restarts microshift.service
     Remove Drop In MicroShift Config    10-telemetry
     Restart MicroShift
+
+Setup Telemetry Configuration With Proxy
+    [Documentation]    Enables the telemetry feature in MicroShift configuration file
+    ...    and restarts microshift.service
+    Start Proxy Server    host=${PROXY_HOST}    port=${PROXY_PORT}
+    ${proxy_config}=    Catenate    SEPARATOR=\n    ${ENABLE_TELEMETRY}    \ \ proxy: http://${PROXY_HOST}:${PROXY_PORT}
+    Drop In MicroShift Config    ${proxy_config}    10-telemetry-proxy
+    Stop MicroShift
+    ${cursor}=    Get Journal Cursor
+    Set Suite Variable    \${CURSOR}    ${cursor}
+    Restart MicroShift
+
+Remove Telemetry Configuration With Proxy
+    [Documentation]    Removes the telemetry feature from MicroShift configuration file
+    ...    and restarts microshift.service
+    Remove Drop In MicroShift Config    10-telemetry-proxy
+    Restart MicroShift
+    Stop Proxy Server
+
+Build Proxy Configuration
+    [Documentation]    Builds the proxy configuration for telemetry
+    Set Suite Variable    ${ENABLE_TELEMETRY_PROXY}    ${proxy_config}
 
 Configure Pull Secrets
     [Documentation]    Sets up the pull secrets for the MicroShift cluster.
