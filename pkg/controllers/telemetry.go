@@ -79,7 +79,7 @@ func (t *TelemetryManager) Run(ctx context.Context, ready chan<- struct{}, stopp
 	}
 	close(ready)
 
-	client := telemetry.NewTelemetryClient(t.config.Telemetry.Endpoint, clusterId)
+	client := telemetry.NewTelemetryClient(t.config.Telemetry.Endpoint, clusterId, t.config.Telemetry.Proxy)
 
 	collectAndSend := func() {
 		reqCtx, reqCancel := context.WithTimeout(ctx, 10*time.Second)
