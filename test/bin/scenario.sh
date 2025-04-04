@@ -34,7 +34,7 @@ TEST_RANDOMIZATION="all"  # may be overridden in scenario file
 TEST_EXECUTION_TIMEOUT="30m" # may be overriden in scenario file
 SUBSCRIPTION_MANAGER_PLUGIN="${SUBSCRIPTION_MANAGER_PLUGIN:-${SCRIPTDIR}/subscription_manager_register.sh}"  # may be overridden in global settings file
 
-TESTCASES=0
+declare -i TESTCASES=0
 FAILURES=0
 TIMESTAMP=0
 SKIPPED=0
@@ -487,18 +487,19 @@ EOF
 }
 
 close_junit() {
-    echo '</testsuite>' >>"${JUNIT_OUTPUT_FILE}"
-    local line='<?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="infrastructure for '"${SCENARIO}"'" tests='"${TESTCASES}"' failures='"${FAILURES}"' skipped='"${SKIPPED}"' timestamp="'"${TIMESTAMP}"'">'
-    sed -i "1,2c\\
-$line" "${JUNIT_OUTPUT_FILE}"
+    echo '</testsuite>' >> "${JUNIT_OUTPUT_FILE}"
+    
+    local line="<testsuite name=\"infrastructure for ${SCENARIO}\" tests=\"${TESTCASES}\" failures=\"${FAILURES}\" skipped=\"${SKIPPED}\" timestamp=\"${TIMESTAMP}\">"
+    
+    sed -i "2c$line" "${JUNIT_OUTPUT_FILE}"
 }
+
 
 record_junit() {
     local vmname="$1"
     local step="$2"
     local results="$3"
-    ((TESTCASES++))
+    TESTCASES=$((TESTCASES+1))
     cat - >>"${JUNIT_OUTPUT_FILE}" <<EOF
 <testcase classname="${SCENARIO} ${vmname}" name="${step}">
 EOF
@@ -507,13 +508,13 @@ EOF
         OK)
         ;;
         SKIP*)
-        ((SKIPPED++));
+        SKIPPED=$((SKIPPED+1));
         cat - >>"${JUNIT_OUTPUT_FILE}" <<EOF
 <skipped message="${results}" type="${step}-skipped" />
 EOF
         ;;
         *)
-        ((FAILURES++));
+        FAILURES=$((FAILURES+1));
         cat - >>"${JUNIT_OUTPUT_FILE}" <<EOF
 <failure message="${results}" type="${step}-failure" />
 EOF
