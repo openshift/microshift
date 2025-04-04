@@ -280,6 +280,14 @@ assets:
       - file: release-flannel-aarch64.json
       - file: release-flannel-x86_64.json
 
+  - dir: optional/topolvm/
+    ignore: "they don't exist in upstream repository - only in microshift"
+    files:
+      - file: kustomization.yaml
+      - file: 01-namespace.yaml
+      - file: 02-cert-manager.yaml
+      - file: 03-topolvm.yaml
+
   - dir: optional/kube-proxy/
     ignore: "they don't exist in upstream repository - only in microshift"
     files:

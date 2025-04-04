@@ -68,7 +68,12 @@ EOF
   # algorithm.
   # shellcheck disable=SC2086
   # We want word splitting to happen with RPMBUILD_OPT for flags to be interpreted correctly
-  rpmbuild --quiet ${RPMBUILD_OPT} --define "_topdir ${RPMBUILD_DIR}" --define "_binary_payload w19T8.zstdio" --define "with_flannel ${WITH_FLANNEL}" "${RPMBUILD_DIR}"SPECS/microshift.spec
+  rpmbuild --quiet ${RPMBUILD_OPT} \
+   --define "_topdir ${RPMBUILD_DIR}" \
+   --define "_binary_payload w19T8.zstdio" \
+   --define "with_flannel ${WITH_FLANNEL}" \
+   --define "with_topolvm ${WITH_TOPOLVM}" \
+   "${RPMBUILD_DIR}"SPECS/microshift.spec
 }
 
 print_info() {
