@@ -1,27 +1,7 @@
-- api embedded-component 4521905c611e7c512439f544769c537fd1a5422e to c36b6ae2bbb5a057df71a5762d1aa58b42b85fc9
-  - d7cc9952 2025-03-27T14:07:59+00:00 Ignore partial manifests when running schemacheck
-  - daced88f 2025-03-04T19:30:40+05:30 Remove enum value of "v1" for cgroupMode field
+- ovn-kubernetes image-arm64 0f6638ab81a33cd275febfd9f3330dc12c9f2936 to 0945de7bb96457865eab84e3ef1440c1bca722b1
+  - 979d3dc2 2024-12-10T08:21:42+00:00 Updating ose-ovn-kubernetes-container image to be consistent with ART for 4.19 Reconciling with https://github.com/openshift/ocp-build-data/tree/4b2f673ee2d572dfbfc158903fc5067e552d0f31/images/ose-ovn-kubernetes.yml
 
-- cluster-csi-snapshot-controller-operator embedded-component 7d1e842d8920df6788b92a36b7f0564cb4a49f0e to d5e6c5b4b579f53b33ccd80d4cdff4a1ee9a815a
-  - 25c0a6c 2025-03-20T08:47:38-03:00 NO-JIRA: Update bertinatto from OWNERS
-
-- cluster-kube-apiserver-operator embedded-component e41854880dcb1a9df3322c1494c93e9a9ac0babe to 4dce19de399c07cf34f6e1f4aba520aa74ab3304
-  - 14da437 2025-03-19T15:13:56+01:00 operator: add topology metrics
-
-- cluster-network-operator embedded-component 1daca87a5c6ebd5e6d7b5bcc4374119b59061af6 to b4c073189af5665cfbb74b48ce75766465e5e034
-  - 8f20fc3 2025-03-26T12:19:20-04:00 Auto opt in for whereabouts-controller
-
-- kubernetes embedded-component d365efdad4f566821463becaf0d5551a1a5c322f to f45d8b995e23c1441af31972890ebcb210cee127
-  - 1beeb26d8 2025-03-12T15:17:00-04:00 UPSTREAM: <carry>: remove old k8s-tests external binary
-
-- machine-config-operator embedded-component 06f828868216169b00eb17ddf8f271ac8c7b2913 to 9026ff2d802ec862eb66915856394b28ed791a01
-  - 92fa003b 2025-03-31T00:23:24-04:00 Ensure build job is deleted when rebuild is triggered
-  - 5e2b725b 2025-03-28T11:55:53-04:00 start: Use v1 API for the PIS controller go.mod: Update the API and client-go pinned_image_set: use the v1 instead of v1alpha1 PIS
-  - 765b7b82 2025-03-18T09:10:24-04:00 daemon: update desired config version in MCN spec in OCL upgrade
-
-- kubernetes image-amd64 d365efdad4f566821463becaf0d5551a1a5c322f to f45d8b995e23c1441af31972890ebcb210cee127
-  - 1beeb26d8 2025-03-12T15:17:00-04:00 UPSTREAM: <carry>: remove old k8s-tests external binary
-
-- kubernetes image-arm64 d365efdad4f566821463becaf0d5551a1a5c322f to f45d8b995e23c1441af31972890ebcb210cee127
-  - 1beeb26d8 2025-03-12T15:17:00-04:00 UPSTREAM: <carry>: remove old k8s-tests external binary
+- kubernetes image-arm64 f45d8b995e23c1441af31972890ebcb210cee127 to 95c8dfdc377a0413a18be8103d77c1439745fcb6
+  - ade095fb7 2025-04-02T20:56:57+02:00 UPSTREAM: <carry>: Update group snapshot test rules
+  - 57fd241aa 2025-04-02T07:55:33+03:00 UPSTREAM: 129808: e2e: bump port-forward timeout
 
