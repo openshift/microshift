@@ -132,7 +132,7 @@ func getVersions() (versions, error) {
 
 func updateVersionFile(ver versionMetadata) error {
 	currentDeploymentID := ""
-	isOstree, err := util.PathExists("/run/ostree-booted")
+	isOstree, err := util.IsOSTree()
 	if err != nil {
 		return fmt.Errorf("failed to check if system is ostree: %w", err)
 	} else if isOstree {

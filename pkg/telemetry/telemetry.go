@@ -28,6 +28,7 @@ import (
 	"github.com/golang/snappy"
 	"github.com/openshift/microshift/pkg/admin/prerun"
 	"github.com/openshift/microshift/pkg/config"
+	"github.com/openshift/microshift/pkg/util"
 	io_prometheus_client "github.com/prometheus/client_model/go"
 	"github.com/prometheus/prometheus/prompb"
 	"k8s.io/klog/v2"
@@ -282,15 +283,19 @@ func computeUsageMetrics(kubeletMetrics map[string]*io_prometheus_client.MetricF
 }
 
 func computeMicroShiftVersionMetric() (Metric, error) {
-	osVersion, err := getOSVersion()
+	osVersion, err := util.GetOSVersion()
 	if err != nil {
 		return Metric{}, fmt.Errorf("failed to get OS version: %v", err)
 	}
 	currentTimestamp := time.Now().UnixNano() / time.Millisecond.Nanoseconds()
+	version, err := prerun.GetVersionOfExecutable()
+	if err != nil {
+		return Metric{}, fmt.Errorf("failed to get version of executable: %v", err)
+	}
 	return Metric{
 		Name: MetricNameMicroShiftVersion,
 		Labels: []MetricLabel{
-			{Name: LabelNameVersion, Value: prerun.GetVersionStringOfData()},
+			{Name: LabelNameVersion, Value: version.String()},
 			{Name: LabelNameOSVersion, Value: osVersion},
 			{Name: LabelNameDeploymentType, Value: getDeploymentType()},
 		},

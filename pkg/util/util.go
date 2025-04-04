@@ -167,15 +167,33 @@ func CreateTempDir(path string) (string, error) {
 	return os.MkdirTemp(dir, pattern)
 }
 
-func IsOSTree() bool {
-	exists, err := PathExists("/run/ostree-booted")
-	if err != nil {
-		return false
-	}
-	return exists
+func IsOSTree() (bool, error) {
+	return PathExists("/run/ostree-booted")
 }
 
-func IsBootC() bool {
+func GetOSVersion() (string, error) {
+	data, err := os.ReadFile("/etc/os-release")
+	if err != nil {
+		return "", fmt.Errorf("error reading /etc/os-release: %v", err)
+	}
+	content := string(data)
+
+	var version string
+	lines := strings.Split(content, "\n")
+	for _, line := range lines {
+		if strings.HasPrefix(line, "VERSION_ID=") {
+			version = strings.TrimPrefix(line, "VERSION_ID=")
+			version = strings.Trim(version, `"`)
+			break
+		}
+	}
+	if version == "" {
+		return "", fmt.Errorf("VERSION_ID not found in /etc/os-release")
+	}
+	return version, nil
+}
+
+func IsBootc() bool {
 	cmd := exec.Command("bootc", "status", "--booted", "--json")
 	output, err := cmd.Output()
 	if err != nil {

@@ -16,7 +16,6 @@ limitations under the License.
 package telemetry
 
 import (
-	"bufio"
 	"bytes"
 	"context"
 	"crypto/tls"
@@ -26,7 +25,6 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-	"strings"
 
 	routev1 "github.com/openshift/client-go/route/clientset/versioned/typed/route/v1"
 	"github.com/openshift/microshift/pkg/config"
@@ -240,37 +238,12 @@ func fetchKubernetesResources(ctx context.Context, cfg *config.Config) (map[stri
 	}
 	return metrics, nil
 }
-func getOSVersion() (string, error) {
-	file, err := os.Open("/etc/os-release")
-	if err != nil {
-		return "", fmt.Errorf("error opening /etc/os-release: %w", err)
-	}
-	defer file.Close()
-
-	var version string
-	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		line := scanner.Text()
-		if strings.HasPrefix(line, "VERSION_ID=") {
-			version = strings.TrimPrefix(line, "VERSION_ID=")
-			version = strings.Trim(version, `"`)
-			break
-		}
-	}
-	if err := scanner.Err(); err != nil {
-		return "", fmt.Errorf("error reading /etc/os-release: %w", err)
-	}
-	if version == "" {
-		return "", fmt.Errorf("VERSION_ID not found in /etc/os-release")
-	}
-	return version, nil
-}
 
 func getDeploymentType() string {
-	if util.IsBootC() {
+	if util.IsBootc() {
 		return DeploymentTypeBootC
 	}
-	if util.IsOSTree() {
+	if exists, _ := util.IsOSTree(); exists {
 		return DeploymentTypeOSTree
 	}
 	return DeploymentTypeRPM
