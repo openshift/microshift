@@ -411,24 +411,14 @@ mkdir -p -m755 %{buildroot}%{_datadir}/microshift/release
 install -p -m644 assets/optional/operator-lifecycle-manager/release-olm-{x86_64,aarch64}.json %{buildroot}%{_datadir}/microshift/release/
 
 # multus
-install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/000-microshift-multus
-# Copy all the Multus manifests except the arch specific ones
-install -p -m644 assets/optional/multus/0* %{buildroot}/%{_prefix}/lib/microshift/manifests.d/000-microshift-multus
-install -p -m644 assets/optional/multus/kustomization.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/000-microshift-multus
+install -d -m755 %{buildroot}%{_sysconfdir}/microshift/config.d
+install -p -m644 packaging/microshift/dropins/enable-multus.yaml %{buildroot}%{_sysconfdir}/microshift/config.d/00-enable-multus.yaml
 install -p -m755 packaging/greenboot/microshift-running-check-multus.sh %{buildroot}%{_sysconfdir}/greenboot/check/required.d/41_microshift_running_check_multus.sh
 install -p -m755 packaging/crio.conf.d/12-microshift-multus.conf %{buildroot}%{_sysconfdir}/crio/crio.conf.d/12-microshift-multus.conf
 
-%ifarch %{arm} aarch64
-cat assets/optional/multus/kustomization.aarch64.yaml >> %{buildroot}/%{_prefix}/lib/microshift/manifests.d/000-microshift-multus/kustomization.yaml
-%endif
-
-%ifarch x86_64
-cat assets/optional/multus/kustomization.x86_64.yaml >> %{buildroot}/%{_prefix}/lib/microshift/manifests.d/000-microshift-multus/kustomization.yaml
-%endif
-
 # multus-release-info
 mkdir -p -m755 %{buildroot}%{_datadir}/microshift/release
-install -p -m644 assets/optional/multus/release-multus-{x86_64,aarch64}.json %{buildroot}%{_datadir}/microshift/release/
+install -p -m644 assets/components/multus/release-multus-{x86_64,aarch64}.json %{buildroot}%{_datadir}/microshift/release/
 
 %if %{with_flannel}
 # kube-proxy
@@ -698,8 +688,7 @@ fi
 %{_datadir}/microshift/release/release-olm-{x86_64,aarch64}.json
 
 %files multus
-%dir %{_prefix}/lib/microshift/manifests.d/000-microshift-multus
-%{_prefix}/lib/microshift/manifests.d/000-microshift-multus/*
+%{_sysconfdir}/microshift/config.d/00-enable-multus.yaml
 %{_sysconfdir}/greenboot/check/required.d/41_microshift_running_check_multus.sh
 %{_sysconfdir}/crio/crio.conf.d/12-microshift-multus.conf
 
@@ -758,6 +747,9 @@ fi
 # Use Git command to generate the log and replace the VERSION string
 # LANG=C git log --date="format:%a %b %d %Y" --pretty="tformat:* %cd %an <%ae> VERSION%n- %s%n" packaging/rpm/microshift.spec
 %changelog
+* Wed Apr 04 2025 Patryk Matuszak <pmatusza@redhat.com> 4.19.0
+- Replace Multus manifests with drop-in configuration
+
 * Mon Mar 31 2025 Gregory Giguashvili <ggiguash@redhat.com> 4.19.0
 - Default crio runtime is crun
 

@@ -75,6 +75,8 @@ manifests:
 network:
     clusterNetwork: []
     cniPlugin: ""
+    multus:
+        status: ""
     serviceNetwork: []
     serviceNodePortRange: ""
 node:
@@ -174,6 +176,8 @@ network:
     clusterNetwork:
         - 10.42.0.0/16
     cniPlugin: ""
+    multus:
+        status: Disabled
     serviceNetwork:
         - 10.43.0.0/16
     serviceNodePortRange: 30000-32767

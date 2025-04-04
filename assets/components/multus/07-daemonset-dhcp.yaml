@@ -31,7 +31,7 @@ spec:
       - operator: Exists
       initContainers:
       - name: dhcp-daemon-initialization
-        image: containernetworking-plugins-microshift
+        image: '{{ .ContainerNetworkingPluginsImage }}'
         command: ["/bin/sh"]
         args: ["-c", "rm -f /host/run/cni/dhcp.sock"]
         terminationMessagePolicy: FallbackToLogsOnError
@@ -40,7 +40,7 @@ spec:
           mountPath: /host/run/cni
       containers:
       - name: dhcp-daemon
-        image: containernetworking-plugins-microshift
+        image: '{{ .ContainerNetworkingPluginsImage }}'
         imagePullPolicy: IfNotPresent
         command: ["/usr/src/plugins/bin/dhcp"]
         args:
