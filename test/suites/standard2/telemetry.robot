@@ -19,6 +19,9 @@ ${ENABLE_TELEMETRY}             SEPARATOR=\n
 ...                             telemetry:
 ...                             \ \ status: Enabled
 ...                             \ \ endpoint: ${TELEMETRY_WRITE_ENDPOINT}
+${DISABLE_TELEMETRY}            SEPARATOR=\n
+...                             telemetry:
+...                             \ \ status: Disabled
 ${JOURNAL_CURSOR}               ${EMPTY}
 ${PULL_SECRET}                  /etc/crio/openshift-pull-secret
 ${PULL_SECRET_METRICS}          /etc/crio/openshift-pull-secret-with-telemetry
@@ -29,10 +32,31 @@ ${PULL_SECRET_NO_METRICS}       /etc/crio/openshift-pull-secret-without-telemetr
 MicroShift Reports Metrics To Server
     [Documentation]    Check MicroShift is able to send metrics to the telemetry server without errors.
     [Tags]    robot:exclude
-    [Setup]    Setup Telemetry Configuration
+    [Setup]    Setup Telemetry Configuration    ${ENABLE_TELEMETRY}    ${PULL_SECRET_METRICS}
 
-    Wait Until Keyword Succeeds    10x    10s
-    ...    Should Find Metrics Success
+    Should Find Metrics Success    Metrics sent successfully
+    Should Find Metrics Success    MicroShift telemetry starting, sending first metrics collection.
+
+    [Teardown]    Remove Telemetry Configuration
+
+MicroShift Fails to Report Metrics To Server: Telemetry Disabled
+    [Documentation]    Check MicroShift is not able to send metrics to the telemetry server when it is disabled.
+    [Tags]    robot:exclude
+    [Setup]    Setup Telemetry Configuration    ${DISABLE_TELEMETRY}    ${PULL_SECRET_METRICS}
+
+    Should Find Metrics Success    Telemetry is disabled
+    Should Find Metrics Fails    Metrics sent successfully
+
+    [Teardown]    Remove Telemetry Configuration
+
+MicroShift Fails to Report Metrics To Server: Wrong Pull Secret
+    [Documentation]    Check MicroShift is not able to send metrics to the telemetry server when the pull secret is wrong.
+    [Tags]    robot:exclude    # comm
+    [Setup]    Setup Telemetry Configuration    ${ENABLE_TELEMETRY}    ${PULL_SECRET_NO_METRICS}
+
+    Should Find Metrics Success    MicroShift telemetry starting, sending first metrics collection.
+    Should Find Metrics Success    Unable to get pull secret: cloud.openshift.com not found
+    Should Find Metrics Fails    Metrics sent successfully
 
     [Teardown]    Remove Telemetry Configuration
 
@@ -42,35 +66,36 @@ Setup
     [Documentation]    Test suite setup
     Check Required Env Variables
     Login MicroShift Host
-    Configure Pull Secrets
-    Setup Kubeconfig
 
 Teardown
     [Documentation]    Test suite teardown
-    Restore Pull Secrets
-    Restart MicroShift
     Logout MicroShift Host
     Remove Kubeconfig
 
 Setup Telemetry Configuration
     [Documentation]    Enables the telemetry feature in MicroShift configuration file
     ...    and restarts microshift.service
-    Drop In MicroShift Config    ${ENABLE_TELEMETRY}    10-telemetry
+    [Arguments]    ${telemetry_config}    ${new_pull_secret}
+    Configure Pull Secrets    ${new_pull_secret}
+    Setup Kubeconfig
+    Drop In MicroShift Config    ${telemetry_config}    10-telemetry
     Stop MicroShift
     ${cursor}=    Get Journal Cursor
-    Set Suite Variable    \${CURSOR}    ${cursor}
-    Restart MicroShift
+    Set Test Variable    \${JOURNAL_CURSOR}    ${cursor}
+    Start MicroShift
 
 Remove Telemetry Configuration
     [Documentation]    Removes the telemetry feature from MicroShift configuration file
     ...    and restarts microshift.service
     Remove Drop In MicroShift Config    10-telemetry
+    Restore Pull Secrets
     Restart MicroShift
 
 Configure Pull Secrets
     [Documentation]    Sets up the pull secrets for the MicroShift cluster.
+    [Arguments]    ${new_pull_secret}
     ${rc}=    SSHLibrary.Execute Command
-    ...    grep -q cloud.openshift.com ${PULL_SECRET} || sudo ln -sf ${PULL_SECRET_METRICS} ${PULL_SECRET}
+    ...    grep -q cloud.openshift.com ${PULL_SECRET} || sudo ln -sf ${new_pull_secret} ${PULL_SECRET}
     ...    sudo=True
     ...    return_rc=True
     ...    return_stderr=False
@@ -85,5 +110,12 @@ Restore Pull Secrets
     Should Be Equal As Integers    ${rc}    0
 
 Should Find Metrics Success
-    [Documentation]    Logs should contain metrics success message
-    Pattern Should Appear In Log Output    ${CURSOR}    Metrics sent successfully
+    [Documentation]    Logs should contain metrics message
+    [Arguments]    ${pattern}
+    Wait Until Keyword Succeeds    10x    10s
+    ...    Pattern Should Appear In Log Output    ${JOURNAL_CURSOR}    ${pattern}
+
+Should Find Metrics Fails
+    [Documentation]    Logs should not contain metrics message
+    [Arguments]    ${pattern}
+    Pattern Should Not Appear In Log Output    ${JOURNAL_CURSOR}    ${pattern}
