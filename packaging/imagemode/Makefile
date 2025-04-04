@@ -98,7 +98,16 @@ endif
 		--build-arg BASE_IMAGE_TAG="${BASE_IMAGE_TAG}" \
 		--build-arg DNF_OPTIONS="${DNF_OPTIONS}" \
 		-t "$${IMAGE_NAME}" \
-		-f Containerfile.repobase
+		-f Containerfile.repobase || exit 1 ; \
+	sudo podman build \
+		--no-cache \
+		--authfile "${PULL_SECRET}" \
+		--secret "id=pullsecret,src=${PULL_SECRET}" \
+		--build-arg BASE_IMAGE_URL="${BASE_IMAGE_URL}" \
+		--build-arg BASE_IMAGE_TAG="${BASE_IMAGE_TAG}" \
+		--build-arg DNF_OPTIONS="${DNF_OPTIONS}" \
+		-t "$${IMAGE_NAME}-embedded" \
+		-f Containerfile-embedded.repobase || exit 1 ; \
 
 .PHONY: run
 run:
