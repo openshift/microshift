@@ -1,0 +1,82 @@
+#
+# IMPORTANT: This file is used in container image build pipelines and it must
+# be self-contained. Do not use any external files from the current repository
+# because they would not be accessible in the pipelines.
+#
+# The first part of this file is the same as in Containerfile.repobase
+#
+ARG BASE_IMAGE_URL
+ARG BASE_IMAGE_TAG
+FROM ${BASE_IMAGE_URL}:${BASE_IMAGE_TAG}
+
+ARG DNF_OPTIONS
+
+# Do not run 'dnf upgrade' command to avoid overrides of the base
+# images specified by the container image build pipelines.
+RUN dnf install -y ${DNF_OPTIONS} firewalld microshift microshift-release-info && \
+    systemctl enable microshift && \
+    dnf clean all
+
+# Mandatory firewall configuration
+RUN firewall-offline-cmd --zone=public --add-port=22/tcp && \
+    firewall-offline-cmd --zone=trusted --add-source=10.42.0.0/16 && \
+    firewall-offline-cmd --zone=trusted --add-source=169.254.169.1
+
+# Create a systemd unit to recursively make the root filesystem subtree
+# shared as required by OVN images.
+RUN printf '[Unit]\n\
+Description=Make root filesystem shared\n\
+Before=microshift.service\n\
+ConditionVirtualization=container\n\
+[Service]\n\
+Type=oneshot\n\
+ExecStart=/usr/bin/mount --make-rshared /\n\
+[Install]\n\
+WantedBy=multi-user.target\n' > /usr/lib/systemd/system/microshift-make-rshared.service && \
+    systemctl enable microshift-make-rshared.service
+
+#
+# Container image embedding code starts here
+#
+ENV IMAGE_STORAGE_DIR=/usr/lib/containers/storage
+ENV IMAGE_LIST_FILE=${IMAGE_STORAGE_DIR}/image-list.txt
+
+# Pull the container images into /usr/lib/containers/storage:
+# - Each image goes into a separate sub-directory
+# - Sub-directories are named after the image reference string SHA
+# - An image list file maps image references to their name SHA
+# hadolint ignore=DL4006
+RUN --mount=type=secret,id=pullsecret,dst=/run/secrets/pull-secret.json \
+    images="$(jq -r ".images[]" /usr/share/microshift/release/release-"$(uname -m)".json)" ; \
+    mkdir -p "${IMAGE_STORAGE_DIR}" ; \
+    for img in ${images} ; do \
+        sha="$(echo "${img}" | sha256sum | awk '{print $1}')" ; \
+        skopeo copy --all --preserve-digests \
+            --authfile /run/secrets/pull-secret.json \
+            "docker://${img}" "dir:$IMAGE_STORAGE_DIR/${sha}" ; \
+        echo "${img},${sha}" >> "${IMAGE_LIST_FILE}" ; \
+    done
+
+# Install a systemd drop-in unit to address the problem with image upgrades
+# overwriting the container images in additional store. The workaround is to
+# copy the images from the pre-loaded to the main container storage.
+# In this case, it is not necessary to update /etc/containers/storage.conf with
+# the additional store path.
+# See https://issues.redhat.com/browse/RHEL-75827
+RUN cat > /usr/bin/microshift-copy-images <<EOF
+#!/bin/bash
+set -eux -o pipefail
+while IFS="," read -r img sha ; do
+    skopeo copy --preserve-digests \
+        "dir:${IMAGE_STORAGE_DIR}/\${sha}" \
+        "containers-storage:\${img}"
+done < "${IMAGE_LIST_FILE}"
+EOF
+
+RUN chmod 755 /usr/bin/microshift-copy-images && \
+    mkdir -p /usr/lib/systemd/system/microshift.service.d
+
+RUN cat > /usr/lib/systemd/system/microshift.service.d/microshift-copy-images.conf <<EOF
+[Service]
+ExecStartPre=/usr/bin/microshift-copy-images
+EOF
