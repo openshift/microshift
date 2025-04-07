@@ -36,6 +36,7 @@ receivers:
       - openvswitch.service
       - ovsdb-server.service
       - ovs-vswitchd.service
+
 processors:
   batch:
   resourcedetection/system:

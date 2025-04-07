@@ -20,6 +20,7 @@ receivers:
   journald:
     units:
       - microshift
+
 processors:
   batch:
   resourcedetection/system:
