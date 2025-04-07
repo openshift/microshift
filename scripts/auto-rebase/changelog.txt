@@ -1,0 +1,3 @@
+- machine-config-operator embedded-component e999361cfc7c83c2ffe30a1b64443083da5fccf1 to 555364e98951e9e316aaf91d021b61fe17340bda
+  - 678b425b 2025-03-25T14:45:07-04:00 kubelet_config_controller: Update ObservedGeneration render_controller: Make function name AreMCGeneratingSubControllersCompletedForPool explicit apihelpers: match the KubeletConfig to the Pool using MachineConfigPoolSelector
+
