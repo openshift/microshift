@@ -68,6 +68,10 @@ update_build_cache() {
     # Build the bootc base layer to be cached
     $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/layer1-base
 
+    # Prepare for the cache upload by stopping composer services and cleaning
+    # temporary artifacts
+    ./bin/manage_composer_config.sh cleanup
+
     # Upload the images and update the 'last' setting
     ./bin/manage_build_cache.sh upload  -b "${SCENARIO_BUILD_BRANCH}" -t "${SCENARIO_BUILD_TAG}"
     ./bin/manage_build_cache.sh setlast -b "${SCENARIO_BUILD_BRANCH}" -t "${SCENARIO_BUILD_TAG}"
