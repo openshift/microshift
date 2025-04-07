@@ -54,6 +54,9 @@ RUN ${REPO_CONFIG_SCRIPT} ${USHIFT_RPM_REPO_PATH} && \
         dnf install -y microshift-flannel ; \
         systemctl disable openvswitch ; \
     fi && \
+    if [ -n "$WITH_TOPOLVM" ] ; then \
+        dnf install -y microshift-topolvm ; \
+    fi && \
     ${REPO_CONFIG_SCRIPT} -delete && \
     rm -f ${REPO_CONFIG_SCRIPT} && \
     rm -rf $USHIFT_RPM_REPO_PATH && \
