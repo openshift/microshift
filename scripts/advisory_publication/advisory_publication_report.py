@@ -114,7 +114,7 @@ def get_report(ocp_version: str) -> dict[str, dict]:
                 jira_ticket_dict['id'] = ticket.key
                 jira_ticket_dict['summary'] = ticket.fields.summary
                 jira_ticket_dict['status'] = ticket.fields.status.name
-                jira_ticket_dict['resolution'] = ticket.fields.resolution.name
+                jira_ticket_dict['resolution'] = str(ticket.fields.resolution)
                 advisory_dict['cves'][cve]['jira_ticket'] = jira_ticket_dict
         result_json[advisory_info['advisory']] = advisory_dict
     return result_json
