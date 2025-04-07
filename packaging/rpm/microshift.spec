@@ -774,14 +774,14 @@ fi
 # Use Git command to generate the log and replace the VERSION string
 # LANG=C git log --date="format:%a %b %d %Y" --pretty="tformat:* %cd %an <%ae> VERSION%n- %s%n" packaging/rpm/microshift.spec
 %changelog
-* Wed Apr 04 2025 Patryk Matuszak <pmatusza@redhat.com> 4.19.0
+* Fri Apr 04 2025 Patryk Matuszak <pmatusza@redhat.com> 4.19.0
 - Replace Multus manifests with drop-in configuration
-
-* Mon Mar 31 2025 Gregory Giguashvili <ggiguash@redhat.com> 4.19.0
-- Default crio runtime is crun
 
 * Tue Apr 01 2025 Gregory Giguashvili <ggiguash@redhat.com> 4.19.0
 - Add hostname package dependency to microshift RPM
+
+* Mon Mar 31 2025 Gregory Giguashvili <ggiguash@redhat.com> 4.19.0
+- Default crio runtime is crun
 
 * Mon Mar 31 2025 Patryk Matuszak <pmatusza@redhat.com> 4.19.0
 - Remove unnecessary /var/lib subdir creation
