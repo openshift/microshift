@@ -21,7 +21,7 @@ ${ENABLE_TELEMETRY}             SEPARATOR=\n
 ...                             telemetry:
 ...                             \ \ status: Enabled
 ...                             \ \ endpoint: ${TELEMETRY_WRITE_ENDPOINT}
-${JOURNAL_CURSOR}               ${EMPTY}
+${CURSOR}                       ${EMPTY}
 ${PULL_SECRET}                  /etc/crio/openshift-pull-secret
 ${PULL_SECRET_METRICS}          /etc/crio/openshift-pull-secret-with-telemetry
 ${PULL_SECRET_NO_METRICS}       /etc/crio/openshift-pull-secret-without-telemetry
@@ -30,7 +30,7 @@ ${PULL_SECRET_NO_METRICS}       /etc/crio/openshift-pull-secret-without-telemetr
 *** Test Cases ***
 MicroShift Reports Metrics To Server
     [Documentation]    Check MicroShift is able to send metrics to the telemetry server without errors.
-    [Tags]    robot:exclude
+    # [Tags]    robot:exclude
     [Setup]    Setup Telemetry Configuration
 
     Wait Until Keyword Succeeds    10x    10s
@@ -67,12 +67,9 @@ Teardown
 
 Check Required Proxy Variables
     [Documentation]    Check if the required proxy variables are set
-    IF    "${PROXY_HOST}"=="${EMPTY}"
-        Fatal Error    PROXY_HOST variable is required
-    END
-    IF    "${PROXY_PORT}"=="${EMPTY}"
-        Fatal Error    PROXY_PORT variable is required
-    END
+    Should Not Be Empty    ${PROXY_HOST}    PROXY_HOST variable is required
+    ${string_value}=    Convert To String    ${PROXY_PORT}
+    Should Not Be Empty    ${string_value}    PROXY_PORT variable is required
 
 Setup Telemetry Configuration
     [Documentation]    Enables the telemetry feature in MicroShift configuration file
