@@ -2,11 +2,13 @@ package util
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io/fs"
 	"net/http"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 	"time"
@@ -163,4 +165,51 @@ func CreateTempFile(path string) (*os.File, error) {
 func CreateTempDir(path string) (string, error) {
 	dir, pattern := getTempPathArgs(path)
 	return os.MkdirTemp(dir, pattern)
+}
+
+func IsOSTree() (bool, error) {
+	return PathExists("/run/ostree-booted")
+}
+
+func GetOSVersion() (string, error) {
+	data, err := os.ReadFile("/etc/os-release")
+	if err != nil {
+		return "", fmt.Errorf("error reading /etc/os-release: %v", err)
+	}
+	content := string(data)
+
+	var version string
+	lines := strings.Split(content, "\n")
+	for _, line := range lines {
+		if strings.HasPrefix(line, "VERSION_ID=") {
+			version = strings.TrimPrefix(line, "VERSION_ID=")
+			version = strings.Trim(version, `"`)
+			break
+		}
+	}
+	if version == "" {
+		return "", fmt.Errorf("VERSION_ID not found in /etc/os-release")
+	}
+	return version, nil
+}
+
+func IsBootc() bool {
+	cmd := exec.Command("bootc", "status", "--booted", "--json")
+	output, err := cmd.Output()
+	if err != nil {
+		return false
+	}
+
+	var result struct {
+		Status struct {
+			Type string `json:"type"`
+		} `json:"status"`
+	}
+
+	err = json.Unmarshal(output, &result)
+	if err != nil {
+		return false
+	}
+
+	return result.Status.Type == "bootcHost"
 }
