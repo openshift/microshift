@@ -1,7 +1,44 @@
-- ovn-kubernetes image-arm64 0f6638ab81a33cd275febfd9f3330dc12c9f2936 to 0945de7bb96457865eab84e3ef1440c1bca722b1
-  - 979d3dc2 2024-12-10T08:21:42+00:00 Updating ose-ovn-kubernetes-container image to be consistent with ART for 4.19 Reconciling with https://github.com/openshift/ocp-build-data/tree/4b2f673ee2d572dfbfc158903fc5067e552d0f31/images/ose-ovn-kubernetes.yml
+- api embedded-component c36b6ae2bbb5a057df71a5762d1aa58b42b85fc9 to 84bcaa112ae705ac3cfd4bdaaf1f309a2c396c56
+  - b0320d3f 2025-04-02T10:17:11-04:00 tools: bump openshift controller-tools to latest commit
+  - ca3a2396 2025-04-01T18:03:33-04:00 tombstone unneeded field and type in v1alpha1 api for MCN
+  - c487b49a 2025-03-24T11:27:17-05:00 IBMCloud: Add IBM Cloud CAPI install TechPreview FG
 
-- kubernetes image-arm64 f45d8b995e23c1441af31972890ebcb210cee127 to 95c8dfdc377a0413a18be8103d77c1439745fcb6
+- cluster-ingress-operator embedded-component 81e314f2e9b41b6616ad2c3db657e869915577a8 to 6fe4db1fb589aabec6ce85c34180971ebf1e7089
+  - 6fe4db1 2025-04-03T07:26:06+00:00 test: add e2e for gwapi rbac mgmt
+  - 2fe87da 2025-04-03T07:26:06+00:00 feat: add rbac mgmt to gwapi ctrl
+  - ca112b7 2025-04-03T07:26:06+00:00 feat: add manifest loaders for the gwapi cluster roles
+  - 0072a35 2025-04-03T07:26:06+00:00 feat: add the gwapi aggregated cluster roles
+
+- cluster-network-operator embedded-component b4c073189af5665cfbb74b48ce75766465e5e034 to 720212febdc1fccf5552f3f0b8f9f7ce42437f4c
+  - c587bba 2025-04-01T15:58:26+00:00 frr-k8s: tolerate all taints
+  - c2467ee 2025-04-01T09:52:30-04:00 Bump to k8s v1.32
+
+- kubernetes embedded-component f45d8b995e23c1441af31972890ebcb210cee127 to ab01febeea8ddbdf96c353a2ef35324ea69e4eb7
   - ade095fb7 2025-04-02T20:56:57+02:00 UPSTREAM: <carry>: Update group snapshot test rules
   - 57fd241aa 2025-04-02T07:55:33+03:00 UPSTREAM: 129808: e2e: bump port-forward timeout
+  - 77d3dadf2 2025-04-01T16:54:34-04:00 UPSTREAM: <carry>: fix OVNKubernetes network skips
+
+- machine-config-operator embedded-component 9026ff2d802ec862eb66915856394b28ed791a01 to 7331a534e7e9c653b307afdeffa39a5eeb54429b
+  - 7db944f4 2025-04-02T09:48:39-04:00 ensure proxy config exists when reverting from OCL to non-OCL
+  - 1e232fb8 2025-04-02T09:46:32-04:00 add revert logic to OCL path in MCD
+  - 26f96ef8 2025-04-02T08:34:05+05:30 Remove cgroupv1 references in MCO
+  - 4b2c8928 2025-04-01T11:53:10+02:00 Drop broken feature which statically configures DHCP addresses
+  - ae28e0f9 2025-03-28T17:28:12-04:00 pinned_image_set: Get rid of setting mcn.Status.PinnedImageSets field
+  - f546c1dd 2025-03-28T17:47:57+01:00 Modify regex for ipsec showstates command
+  - 63d4103b 2025-03-25T13:01:57-04:00 pinned_image_set: update the status of only the primary pool
+
+- ovn-kubernetes image-amd64 0f6638ab81a33cd275febfd9f3330dc12c9f2936 to c86639d138c8e215402303eec3625db0922a6201
+  - 96ab6ace 2025-03-25T17:26:48+00:00 Updating ose-ovn-kubernetes-base-container image to be consistent with ART for 4.19 Reconciling with https://github.com/openshift/ocp-build-data/tree/6d536f5ca5a55ea4d382766403635c15d18becf3/images/ovn-kubernetes-base.yml
+  - 979d3dc2 2024-12-10T08:21:42+00:00 Updating ose-ovn-kubernetes-container image to be consistent with ART for 4.19 Reconciling with https://github.com/openshift/ocp-build-data/tree/4b2f673ee2d572dfbfc158903fc5067e552d0f31/images/ose-ovn-kubernetes.yml
+
+- kubernetes image-amd64 f45d8b995e23c1441af31972890ebcb210cee127 to ab01febeea8ddbdf96c353a2ef35324ea69e4eb7
+  - ade095fb7 2025-04-02T20:56:57+02:00 UPSTREAM: <carry>: Update group snapshot test rules
+  - 57fd241aa 2025-04-02T07:55:33+03:00 UPSTREAM: 129808: e2e: bump port-forward timeout
+  - 77d3dadf2 2025-04-01T16:54:34-04:00 UPSTREAM: <carry>: fix OVNKubernetes network skips
+
+- ovn-kubernetes image-arm64 0945de7bb96457865eab84e3ef1440c1bca722b1 to c86639d138c8e215402303eec3625db0922a6201
+  - 96ab6ace 2025-03-25T17:26:48+00:00 Updating ose-ovn-kubernetes-base-container image to be consistent with ART for 4.19 Reconciling with https://github.com/openshift/ocp-build-data/tree/6d536f5ca5a55ea4d382766403635c15d18becf3/images/ovn-kubernetes-base.yml
+
+- kubernetes image-arm64 95c8dfdc377a0413a18be8103d77c1439745fcb6 to ab01febeea8ddbdf96c353a2ef35324ea69e4eb7
+  - 77d3dadf2 2025-04-01T16:54:34-04:00 UPSTREAM: <carry>: fix OVNKubernetes network skips
 
