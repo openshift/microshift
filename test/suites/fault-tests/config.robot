@@ -91,6 +91,7 @@ Restore Config File
     Command Should Work    rm ${BACKUP_CONFIG}    sudo_mode=True
     Command Execution    systemctl restart microshift
     Wait For MicroShift
+    All Pods Should Be Running    timeout=300s
 
 Drop In Invalid Config
     [Documentation]    Create an invalid configuration file

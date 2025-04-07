@@ -31,7 +31,7 @@ SKIP_GREENBOOT=${SKIP_GREENBOOT:-false}  # may be overridden in scenario file
 IMAGE_SIGSTORE_ENABLED=false # may be overridden in scenario file
 VNC_CONSOLE=${VNC_CONSOLE:-false}  # may be overridden in global settings file
 TEST_RANDOMIZATION="all"  # may be overridden in scenario file
-TEST_EXECUTION_TIMEOUT="60m" # may be overriden in scenario file
+TEST_EXECUTION_TIMEOUT="30m" # may be overriden in scenario file
 SUBSCRIPTION_MANAGER_PLUGIN="${SUBSCRIPTION_MANAGER_PLUGIN:-${SCRIPTDIR}/subscription_manager_register.sh}"  # may be overridden in global settings file
 
 full_vm_name() {

@@ -42,6 +42,7 @@ Network Disconnection
     ${system_rebooted}=    Is System Rebooted    ${old_bootid}
     Should Not Be True    ${system_rebooted}
     Wait For MicroShift
+    All Pods Should Be Running    timeout=300s
 
     ${output}    ${rc}=    Get Log Output With Pattern    ${cursor}    kubelet
     ${expected_str}=    Get Expected Message    suites/fault-tests/log-messages.yaml    disconnect    network
