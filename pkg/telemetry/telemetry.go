@@ -192,6 +192,10 @@ func (t *TelemetryClient) Collect(ctx context.Context, cfg *config.Config) ([]Me
 }
 
 func computeCapacityMetrics(kubeletMetrics map[string]*io_prometheus_client.MetricFamily, nodeLabels map[string]string) ([]Metric, error) {
+	archValue, ok := nodeLabels["kubernetes.io/arch"]
+	if !ok {
+		return nil, fmt.Errorf("node label kubernetes.io/arch not found")
+	}
 	osIdValue, ok := nodeLabels["node.openshift.io/os_id"]
 	if !ok {
 		return nil, fmt.Errorf("node label node.openshift.io/os_id not found")
@@ -215,6 +219,7 @@ func computeCapacityMetrics(kubeletMetrics map[string]*io_prometheus_client.Metr
 			Labels: []MetricLabel{
 				{Name: LabelNameOS, Value: osIdValue},
 				{Name: LabelNameInstanceType, Value: instanceTypeValue},
+				{Name: LabelNameArch, Value: archValue},
 			},
 			Timestamp: currentTimestamp,
 			Value:     aggregateMetricValues(kubeletCPUCapacity.Metric),
@@ -224,6 +229,7 @@ func computeCapacityMetrics(kubeletMetrics map[string]*io_prometheus_client.Metr
 			Labels: []MetricLabel{
 				{Name: LabelNameOS, Value: osIdValue},
 				{Name: LabelNameInstanceType, Value: instanceTypeValue},
+				{Name: LabelNameArch, Value: archValue},
 			},
 			Timestamp: currentTimestamp,
 			Value:     aggregateMetricValues(kubeletMemoryCapacity.Metric),
