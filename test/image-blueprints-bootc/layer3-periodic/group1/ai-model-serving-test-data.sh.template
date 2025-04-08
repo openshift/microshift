@@ -26,7 +26,7 @@ EOF
 
 # Copy 'OpenVino Media Server' ServingRuntime CR and update image with a value taken from the ai-model-serving's release info.
 # Replacing the image is needed because it holds a placeholder substituted by the kustomizer at runtime.
-cp /usr/lib/microshift/manifests.d/001-microshift-ai-model-serving/runtimes/ovms-kserve.yaml "${DEST}/ovms-kserve.yaml"
+cp /usr/lib/microshift/manifests.d/050-microshift-ai-model-serving-runtimes/ovms-kserve.yaml "${DEST}/ovms-kserve.yaml"
 sed -i "s,image: ovms-image,image: ${OVMS_IMAGE}," "${DEST}/ovms-kserve.yaml"
 
 cat <<EOF > "${DEST}/resources.yaml"
