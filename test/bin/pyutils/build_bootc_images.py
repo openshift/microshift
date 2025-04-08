@@ -238,9 +238,45 @@ def process_containerfile(groupdir, containerfile, dry_run):
 
     common.print_msg(f"Processing {containerfile} with logs in {cf_logfile}")
     start_process_container = time.time()
+
+    def should_skip(image, cached):
+        # Forcing the rebuild if needed
+        if FORCE_REBUILD:
+            common.print_msg(f"Forcing rebuild of '{image}'")
+            return False
+        if cached:
+            common.print_msg(f"The '{image}' already exists, skipping")
+            return True
+        return False
+
     try:
         # Redirect the output to the log file
         with open(cf_logfile, 'w') as logfile:
+            is_cached = False
+            # Check if the container image exists in the mirror registry and skip
+            # the subsequent build command if the image has already been cached.
+            #
+            # Note: No retries. Failure to inspect the image is ignored.
+            try:
+                inspect_args = [
+                    "sudo", "skopeo", "inspect",
+                    "--authfile", PULL_SECRET,
+                    f"docker://{MIRROR_REGISTRY}/{cf_outname}",
+                    "&>/dev/null"
+                ]
+                start = time.time()
+                common.run_command_in_shell(inspect_args, dry_run, logfile, logfile)
+                common.record_junit(cf_path, "inspect-image", "OK", start)
+
+                is_cached = True
+            except Exception:
+                None
+
+            # Check if the target artifact exists
+            if should_skip(cf_outname, is_cached):
+                common.record_junit(cf_path, "process-containerfile", "SKIPPED")
+                return
+
             # Run the container build command
             # Note:
             # - The pull secret is necessary in some builds for pulling embedded
