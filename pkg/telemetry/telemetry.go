@@ -79,7 +79,7 @@ type TelemetryClient struct {
 	transport http.RoundTripper
 }
 
-func NewTelemetryClient(baseURL, clusterId, proxy string) *TelemetryClient {
+func NewTelemetryClient(endpoint, clusterId, proxy string) *TelemetryClient {
 	transport := http.DefaultTransport
 	if proxy != "" {
 		// Proxy was validated before reaching this point, ignore the error because it cant happen.
@@ -89,7 +89,7 @@ func NewTelemetryClient(baseURL, clusterId, proxy string) *TelemetryClient {
 		}
 	}
 	return &TelemetryClient{
-		endpoint:             fmt.Sprintf("%s/metrics/v1/receive", baseURL),
+		endpoint:             endpoint,
 		clusterId:            clusterId,
 		previousCPUSeconds:   0,
 		previousCPUtimestamp: 0,
