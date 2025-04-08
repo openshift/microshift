@@ -93,3 +93,21 @@ cat "${PAYLOAD}" >> "${OUTPUT}"
 EOF
 
 chmod +x "${DEST}/prepare-query.sh"
+
+# Test kserve's ConfigMap override
+OVERRIDE_TEST_DIR="/usr/lib/microshift/manifests.d/011-override-kserve-config/"
+mkdir -p "${OVERRIDE_TEST_DIR}"
+
+cat <<EOF > "${OVERRIDE_TEST_DIR}/kustomization.yaml"
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: redhat-ods-applications
+resources:
+- configmap.yaml
+EOF
+
+# Copy the configmap and and change:
+# - .ingress.disableIngressCreation from true to false
+# - .ingress.ingressDomain from example.com to bad.com (just in case to not make conflicts with default router domain used in tests which is example.com).
+cp /usr/lib/microshift/manifests.d/010-microshift-ai-model-serving-kserve/inferenceservice-config-microshift-patch.yaml "${OVERRIDE_TEST_DIR}/configmap.yaml"
+sed -i -e 's,example.com,bad.com,g' -e 's,disableIngressCreation": true,disableIngressCreation": false,g' "${OVERRIDE_TEST_DIR}/configmap.yaml"

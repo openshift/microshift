@@ -29,6 +29,10 @@ Sanity Test
     Prepare Request Data
     Query Model Server
 
+    # Check if ingress exists.
+    # Enabled only for testing purposes to test Kserve's settings override.
+    offline.Run With Kubeconfig    oc    get    ingress    -n    test-ai    openvino-resnet
+
 
 *** Keywords ***
 Wait For A Deployment
