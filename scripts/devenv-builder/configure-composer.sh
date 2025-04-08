@@ -23,7 +23,7 @@ install_and_configure_composer() {
     # Necessary for embedding container images
     if [ ! -e /etc/osbuild-worker/pull-secret.json ] ; then
         sudo mkdir -p /etc/osbuild-worker
-        sudo ln -s /etc/crio/openshift-pull-secret /etc/osbuild-worker/pull-secret.json
+        sudo ln -sf /etc/crio/openshift-pull-secret /etc/osbuild-worker/pull-secret.json
         sudo tee /etc/osbuild-worker/osbuild-worker.toml &>/dev/null <<EOF
 [containers]
 auth_file_path = "/etc/osbuild-worker/pull-secret.json"
@@ -98,6 +98,38 @@ enable_beta_or_eus_repositories() {
     else
         sudo sed -i "s,dist/rhel${version_id_major}/${version_id}/$(uname -m)/baseos/,${version_id_eus}/rhel${version_id_major}/${version_id}/$(uname -m)/baseos/,g" "${composer_config}"
         sudo sed -i "s,dist/rhel${version_id_major}/${version_id}/$(uname -m)/appstream/,${version_id_eus}/rhel${version_id_major}/${version_id}/$(uname -m)/appstream/,g" "${composer_config}"
+    fi
+    # If the host OS is configured to use the internal repo, overwrite the composer_config to match
+    if dnf repolist | grep -q download.eng.brq.redhat.com; then
+        # The gpgkey from /usr/share/osbuild-composer/repositories is valid and common for all repos
+        local -r GPGKEY=$(ARCH=$(uname -m) jq '.[env.ARCH][] | select(.name=="baseos") | .gpgkey' /usr/share/osbuild-composer/repositories/rhel-9.6.json)
+        sudo tee "${composer_config}" &>/dev/null <<EOF
+{
+  "$(uname -m)": [
+    {
+      "name": "baseos",
+      "baseurl": "http://download.eng.brq.redhat.com/rhel-${version_id_major}/nightly/RHEL-${version_id_major}/latest-RHEL-${version_id}/compose/BaseOS/$(uname -m)/os",
+      "gpgkey": ${GPGKEY},
+      "rhsm": false,
+      "check_gpg": true
+    },
+    {
+      "name": "appstream",
+      "baseurl": "http://download.eng.brq.redhat.com/rhel-${version_id_major}/nightly/RHEL-${version_id_major}/latest-RHEL-${version_id}/compose/AppStream/$(uname -m)/os",
+      "gpgkey": ${GPGKEY},
+      "rhsm": false,
+      "check_gpg": true
+    },
+    {
+      "name": "rt",
+      "baseurl": "http://download.eng.brq.redhat.com/rhel-${version_id_major}/nightly/RHEL-${version_id_major}/latest-RHEL-${version_id}/compose/RT/$(uname -m)/os",
+      "gpgkey": ${GPGKEY},
+      "rhsm": false,
+      "check_gpg": true
+    }
+  ]
+}
+EOF
     fi
 }
 
