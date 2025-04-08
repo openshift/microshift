@@ -35,7 +35,7 @@ action_start() {
     PROM_CONFIG="${IMAGEDIR}/prometheus.yml"
     # Empty configuration file will take all defaults.
     # A config file is required to add remote-write enabling.
-    touch ${PROM_CONFIG}
+    touch "${PROM_CONFIG}"
 
     echo "Stopping previous instance of Prometheus"
     action_stop
