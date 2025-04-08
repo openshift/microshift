@@ -37,6 +37,8 @@
 
 # Don't build flannel subpackage by default
 %{!?with_flannel: %global with_flannel 0}
+# Don't build topolvm subpackage by default
+%{!?with_topolvm: %global with_topolvm 0}
 
 Name: microshift
 Version: %{version}
@@ -190,6 +192,17 @@ The microshift-flannel-release-info package provides release information files f
 release. These files contain the list of container image references used by the flannel CNI
 with the dependent kube-proxy for MicroShift and can be used to embed those images
 into osbuilder blueprints or bootc containerfiles.
+%endif
+
+%if %{with_topolvm}
+%package topolvm
+Summary: TopoLVM CSI Plugin for MicroShift
+ExclusiveArch: x86_64 aarch64
+Requires: microshift = %{version}
+
+%description topolvm
+The microshift-topolvm package provides the required manifests for the TopoLVM CSI and the dependent
+cert-manager to be installed on MicroShift.
 %endif
 
 %package low-latency
@@ -461,6 +474,13 @@ mkdir -p -m755 %{buildroot}%{_datadir}/microshift/release
 install -p -m644 assets/optional/flannel/release-flannel-{x86_64,aarch64}.json %{buildroot}%{_datadir}/microshift/release/
 %endif
 
+%if %{with_topolvm}
+# topolvm
+install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/001-microshift-topolvm
+install -p -m644 assets/optional/topolvm/*.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/001-microshift-topolvm
+install -p -m644 packaging/microshift/dropins/disable-storage-csi.yaml %{buildroot}%{_sysconfdir}/microshift/config.d/01-disable-storage-csi.yaml
+%endif
+
 # cleanup kubelet
 install -p -m644 packaging/tuned/microshift-cleanup-kubelet.service %{buildroot}%{_unitdir}/microshift-cleanup-kubelet.service
 
@@ -707,6 +727,13 @@ fi
 %files flannel-release-info
 %{_datadir}/microshift/release/release-flannel-{x86_64,aarch64}.json
 %{_datadir}/microshift/release/release-kube-proxy-{x86_64,aarch64}.json
+%endif
+
+%if %{with_topolvm}
+%files topolvm
+%dir %{_prefix}/lib/microshift/manifests.d/001-microshift-topolvm
+%{_prefix}/lib/microshift/manifests.d/001-microshift-topolvm/*
+%config(noreplace) %{_sysconfdir}/microshift/config.d/01-disable-storage-csi.yaml
 %endif
 
 %files low-latency
