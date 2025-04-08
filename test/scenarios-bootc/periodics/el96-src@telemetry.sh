@@ -17,7 +17,7 @@ scenario_run_tests() {
         --variable "PROXY_HOST:$(hostname)" \
         --variable "PROXY_PORT:9001" \
         --variable "PROMETHEUS_HOST:$(hostname)" \
-        --variable "PROMETHEUS_PORT:9090" \
+        --variable "PROMETHEUS_PORT:9091" \
         suites/telemetry/telemetry.robot
     ${SCRIPTDIR}/manage_prometheus.sh stop
 }
