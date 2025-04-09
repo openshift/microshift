@@ -9,6 +9,8 @@ SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # shellcheck source=test/bin/common.sh
 source "${SCRIPTDIR}/common.sh"
 
+PROMETHEUS_DIR="${IMAGEDIR}/prometheus"
+
 usage() {
     cat - <<EOF
 ${BASH_SOURCE[0]} (start|stop)
@@ -29,10 +31,9 @@ action_stop() {
 }
 
 action_start() {
-    mkdir -p "${IMAGEDIR}"
-    cd "${IMAGEDIR}"
+    mkdir -p "${PROMETHEUS_DIR}"
 
-    PROM_CONFIG="${IMAGEDIR}/prometheus.yml"
+    PROM_CONFIG="${PROMETHEUS_DIR}/prometheus.yml"
     # Empty configuration file will take all defaults.
     # A config file is required to add remote-write enabling.
     touch "${PROM_CONFIG}"
@@ -43,7 +44,7 @@ action_start() {
     echo "Starting Prometheus"
     podman run -d --rm --name prometheus \
         -p 9091:9090 \
-        -v "${IMAGEDIR}:/etc/prometheus:Z" \
+        -v "${PROMETHEUS_DIR}:/etc/prometheus" \
         docker.io/prom/prometheus \
         --config.file=/etc/prometheus/prometheus.yml \
         --web.enable-remote-write-receiver > /dev/null

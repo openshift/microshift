@@ -7,6 +7,7 @@ Resource            ../../resources/microshift-config.resource
 Resource            ../../resources/microshift-process.resource
 Library             ../../resources/journalctl.py
 Library             ../../resources/prometheus.py
+Library             ../../resources/ProxyLibrary.py
 
 Suite Setup         Setup
 Suite Teardown      Teardown
@@ -15,6 +16,10 @@ Test Tags           restart    slow
 
 
 *** Variables ***
+${PROXY_HOST}                   ${EMPTY}
+${PROXY_PORT}                   ${EMPTY}
+${PROMETHEUS_HOST}              ${EMPTY}
+${PROMETHEUS_PORT}              ${EMPTY}
 ${TELEMETRY_WRITE_ENDPOINT}     https://infogw.api.openshift.com/metrics/v1/receive
 ${ENABLE_TELEMETRY}             SEPARATOR=\n
 ...                             telemetry:
@@ -28,8 +33,16 @@ ${PULL_SECRET_NO_METRICS}       /etc/crio/openshift-pull-secret-without-telemetr
 *** Test Cases ***
 MicroShift Reports Metrics To Server
     [Documentation]    Check MicroShift is able to send metrics to the telemetry server without errors.
-    [Tags]    robot:exclude
     [Setup]    Setup Telemetry Configuration
+
+    Wait Until Keyword Succeeds    10x    10s
+    ...    Should Find Metrics Success
+
+    [Teardown]    Remove Telemetry Configuration
+
+MicroShift Reports Metrics To Server Through Proxy
+    [Documentation]    Check MicroShift is able to send metrics to the telemetry server through a proxy without errors.
+    [Setup]    Setup Telemetry Configuration With Proxy
 
     Wait Until Keyword Succeeds    10x    10s
     ...    Should Find Metrics Success
@@ -104,6 +117,7 @@ Check MicroShift Metrics In Local Server    # robocop: disable=too-long-test-cas
 Setup
     [Documentation]    Test suite setup
     Check Required Env Variables
+    Check Required Telemetry Variables
     Login MicroShift Host
     Configure Pull Secrets
     Setup Kubeconfig
@@ -115,6 +129,15 @@ Teardown
     Logout MicroShift Host
     Remove Kubeconfig
 
+Check Required Telemetry Variables
+    [Documentation]    Check if the required proxy variables are set
+    Should Not Be Empty    ${PROXY_HOST}    PROXY_HOST variable is required
+    ${string_value}=    Convert To String    ${PROXY_PORT}
+    Should Not Be Empty    ${string_value}    PROXY_PORT variable is required
+    Should Not Be Empty    ${PROMETHEUS_HOST}    PROMETHEUS_HOST variable is required
+    ${string_value}=    Convert To String    ${PROMETHEUS_PORT}
+    Should Not Be Empty    ${string_value}    PROMETHEUS_PORT variable is required
+
 Setup Telemetry Configuration
     [Documentation]    Enables the telemetry feature in MicroShift configuration file
     ...    and restarts microshift.service
@@ -123,6 +146,21 @@ Setup Telemetry Configuration
     ...    ${ENABLE_TELEMETRY}
     ...    \ \ endpoint: ${TELEMETRY_WRITE_ENDPOINT}
     Drop In MicroShift Config    ${config}    10-telemetry
+    Stop MicroShift
+    ${cursor}=    Get Journal Cursor
+    Set Suite Variable    \${CURSOR}    ${cursor}
+    Restart MicroShift
+
+Setup Telemetry Configuration With Proxy
+    [Documentation]    Enables the telemetry feature in MicroShift configuration file
+    ...    and restarts microshift.service
+    Start Proxy Server    host=${PROXY_HOST}    port=${PROXY_PORT}
+    ${proxy_config}=    Catenate
+    ...    SEPARATOR=\n
+    ...    ${ENABLE_TELEMETRY}
+    ...    \ \ endpoint: ${TELEMETRY_WRITE_ENDPOINT}
+    ...    \ \ proxy: http://${PROXY_HOST}:${PROXY_PORT}
+    Drop In MicroShift Config    ${proxy_config}    10-telemetry
     Stop MicroShift
     ${cursor}=    Get Journal Cursor
     Set Suite Variable    \${CURSOR}    ${cursor}
