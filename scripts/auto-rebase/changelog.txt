@@ -1,44 +1,115 @@
-- api embedded-component c36b6ae2bbb5a057df71a5762d1aa58b42b85fc9 to 84bcaa112ae705ac3cfd4bdaaf1f309a2c396c56
-  - b0320d3f 2025-04-02T10:17:11-04:00 tools: bump openshift controller-tools to latest commit
-  - ca3a2396 2025-04-01T18:03:33-04:00 tombstone unneeded field and type in v1alpha1 api for MCN
-  - c487b49a 2025-03-24T11:27:17-05:00 IBMCloud: Add IBM Cloud CAPI install TechPreview FG
+- api embedded-component 84bcaa112ae705ac3cfd4bdaaf1f309a2c396c56 to 00e6260bd8b88542106696c5a3f555256a6146d6
+  - eb58fd16 2025-04-03T15:12:38-04:00 Removed VSphereControlPlaneMachineSet feature gate
+  - 9e0a9459 2025-04-01T10:24:19-04:00 Generate v1 crds for PIS
 
-- cluster-ingress-operator embedded-component 81e314f2e9b41b6616ad2c3db657e869915577a8 to 6fe4db1fb589aabec6ce85c34180971ebf1e7089
-  - 6fe4db1 2025-04-03T07:26:06+00:00 test: add e2e for gwapi rbac mgmt
-  - 2fe87da 2025-04-03T07:26:06+00:00 feat: add rbac mgmt to gwapi ctrl
-  - ca112b7 2025-04-03T07:26:06+00:00 feat: add manifest loaders for the gwapi cluster roles
-  - 0072a35 2025-04-03T07:26:06+00:00 feat: add the gwapi aggregated cluster roles
+- cluster-ingress-operator embedded-component 6fe4db1fb589aabec6ce85c34180971ebf1e7089 to 1410fe02a76e33c00208fb3d9a9f00fa38cb527e
+  - 18606a8 2025-04-02T19:25:54-04:00 NE-2008: Add GRPC conformance tests
 
-- cluster-network-operator embedded-component b4c073189af5665cfbb74b48ce75766465e5e034 to 720212febdc1fccf5552f3f0b8f9f7ce42437f4c
-  - c587bba 2025-04-01T15:58:26+00:00 frr-k8s: tolerate all taints
-  - c2467ee 2025-04-01T09:52:30-04:00 Bump to k8s v1.32
+- cluster-kube-apiserver-operator embedded-component 4dce19de399c07cf34f6e1f4aba520aa74ab3304 to 963692e0d0b46d52236ca27f1adf20aebec2c25d
+  - fa69c81 2025-04-04T11:15:36+02:00 add `cluster:infrastructure_topology:info` recording rule
+  - 983f086 2025-04-04T10:01:55+02:00 add `cluster:controlplane_topology:info` recording rule
 
-- kubernetes embedded-component f45d8b995e23c1441af31972890ebcb210cee127 to ab01febeea8ddbdf96c353a2ef35324ea69e4eb7
-  - ade095fb7 2025-04-02T20:56:57+02:00 UPSTREAM: <carry>: Update group snapshot test rules
-  - 57fd241aa 2025-04-02T07:55:33+03:00 UPSTREAM: 129808: e2e: bump port-forward timeout
-  - 77d3dadf2 2025-04-01T16:54:34-04:00 UPSTREAM: <carry>: fix OVNKubernetes network skips
+- cluster-network-operator embedded-component 720212febdc1fccf5552f3f0b8f9f7ce42437f4c to 2ca824bfbd32ad196d1ac8e4167bfd369f464f66
+  - 29d6fa4 2025-03-28T10:47:36+03:00 frr-k8s: sync with upstream's fd limit
+  - 7d3f281 2025-03-28T10:47:28+03:00 frr-k8s: Add BGPSessionState CRD
 
-- machine-config-operator embedded-component 9026ff2d802ec862eb66915856394b28ed791a01 to 7331a534e7e9c653b307afdeffa39a5eeb54429b
-  - 7db944f4 2025-04-02T09:48:39-04:00 ensure proxy config exists when reverting from OCL to non-OCL
-  - 1e232fb8 2025-04-02T09:46:32-04:00 add revert logic to OCL path in MCD
-  - 26f96ef8 2025-04-02T08:34:05+05:30 Remove cgroupv1 references in MCO
-  - 4b2c8928 2025-04-01T11:53:10+02:00 Drop broken feature which statically configures DHCP addresses
-  - ae28e0f9 2025-03-28T17:28:12-04:00 pinned_image_set: Get rid of setting mcn.Status.PinnedImageSets field
-  - f546c1dd 2025-03-28T17:47:57+01:00 Modify regex for ipsec showstates command
-  - 63d4103b 2025-03-25T13:01:57-04:00 pinned_image_set: update the status of only the primary pool
+- csi-external-snapshotter embedded-component ff900d0dee7c1765d053ccf523ca87c5e1b61b5c to ac82cafc95b301f67f46ee0db93720d55177a19b
+  - 9cd8753 2025-04-01T13:17:01+02:00 UPSTREAM: <carry>: Add OpenShift files
+  - 012b188 2025-02-26T15:36:02-05:00 Update changelog for v8.2.1
+  - 2ec74dc 2025-02-26T15:35:13-05:00 Squashed 'release-tools/' changes from e31de525b..90efb2ca5
+  - 462f230 2025-02-26T15:35:04-05:00 Fix CVEs by bumping go & x/net
+  - 01b7f49 2025-02-26T15:34:28-05:00 Fix spelling error flagged by codespell
+  - 77fe23b 2025-02-26T15:34:21-05:00 Add leader election, work-queue, process, and Go runtime metrics
+  - 35baa51 2025-02-26T15:34:06-05:00 update kubernetes to 1.32
+  - 67ac488 2025-02-03T16:36:27+01:00 Update deployment to v8.2.0
+  - 7a803f9 2024-12-18T17:12:48+00:00 Update deployment to v8.2.0
 
-- ovn-kubernetes image-amd64 0f6638ab81a33cd275febfd9f3330dc12c9f2936 to c86639d138c8e215402303eec3625db0922a6201
-  - 96ab6ace 2025-03-25T17:26:48+00:00 Updating ose-ovn-kubernetes-base-container image to be consistent with ART for 4.19 Reconciling with https://github.com/openshift/ocp-build-data/tree/6d536f5ca5a55ea4d382766403635c15d18becf3/images/ovn-kubernetes-base.yml
-  - 979d3dc2 2024-12-10T08:21:42+00:00 Updating ose-ovn-kubernetes-container image to be consistent with ART for 4.19 Reconciling with https://github.com/openshift/ocp-build-data/tree/4b2f673ee2d572dfbfc158903fc5067e552d0f31/images/ose-ovn-kubernetes.yml
+- kubernetes embedded-component ab01febeea8ddbdf96c353a2ef35324ea69e4eb7 to c17291b1e40554b4e5b3ccff01b6d590af2e7a43
+  - 3f117a24a 2025-03-11T15:08:56-03:00 UPSTREAM: 130422: Propagate error when creating CustomResourceStorage instead of panic'ing
 
-- kubernetes image-amd64 f45d8b995e23c1441af31972890ebcb210cee127 to ab01febeea8ddbdf96c353a2ef35324ea69e4eb7
-  - ade095fb7 2025-04-02T20:56:57+02:00 UPSTREAM: <carry>: Update group snapshot test rules
-  - 57fd241aa 2025-04-02T07:55:33+03:00 UPSTREAM: 129808: e2e: bump port-forward timeout
-  - 77d3dadf2 2025-04-01T16:54:34-04:00 UPSTREAM: <carry>: fix OVNKubernetes network skips
+- oc image-amd64 314ad39cc654af2016f57f7308bf1ec70fe14ca3 to 1719de833ae8e8a272ff55ca2a80489e6c791d92
+  - b677dde2 2025-03-17T14:29:46-04:00 pkg/cli/admin/release/info: support generating RPM diffs
+  - f81b9a41 2025-03-17T14:29:45-04:00 pkg/cli/admin/release/info: support retrieving just some images
+  - d98ed4de 2025-03-17T14:29:44-04:00 pkg/cli/admin/release/info: factor out images retrieval
+  - 61eb7680 2025-03-17T14:29:43-04:00 pkg/cli/admin/release/info: also capture component tags
 
-- ovn-kubernetes image-arm64 0945de7bb96457865eab84e3ef1440c1bca722b1 to c86639d138c8e215402303eec3625db0922a6201
-  - 96ab6ace 2025-03-25T17:26:48+00:00 Updating ose-ovn-kubernetes-base-container image to be consistent with ART for 4.19 Reconciling with https://github.com/openshift/ocp-build-data/tree/6d536f5ca5a55ea4d382766403635c15d18becf3/images/ovn-kubernetes-base.yml
+- csi-external-snapshotter image-amd64 ff900d0dee7c1765d053ccf523ca87c5e1b61b5c to ac82cafc95b301f67f46ee0db93720d55177a19b
+  - 9cd8753 2025-04-01T13:17:01+02:00 UPSTREAM: <carry>: Add OpenShift files
+  - 012b188 2025-02-26T15:36:02-05:00 Update changelog for v8.2.1
+  - 2ec74dc 2025-02-26T15:35:13-05:00 Squashed 'release-tools/' changes from e31de525b..90efb2ca5
+  - 462f230 2025-02-26T15:35:04-05:00 Fix CVEs by bumping go & x/net
+  - 01b7f49 2025-02-26T15:34:28-05:00 Fix spelling error flagged by codespell
+  - 77fe23b 2025-02-26T15:34:21-05:00 Add leader election, work-queue, process, and Go runtime metrics
+  - 35baa51 2025-02-26T15:34:06-05:00 update kubernetes to 1.32
+  - 67ac488 2025-02-03T16:36:27+01:00 Update deployment to v8.2.0
+  - 7a803f9 2024-12-18T17:12:48+00:00 Update deployment to v8.2.0
 
-- kubernetes image-arm64 95c8dfdc377a0413a18be8103d77c1439745fcb6 to ab01febeea8ddbdf96c353a2ef35324ea69e4eb7
-  - 77d3dadf2 2025-04-01T16:54:34-04:00 UPSTREAM: <carry>: fix OVNKubernetes network skips
+- ovn-kubernetes image-amd64 c86639d138c8e215402303eec3625db0922a6201 to 253890a6dead8e3ac594b9584334c163a2c768ac
+  - 6061601d 2025-04-02T13:12:44+02:00 ci: set /mnt/docker-data as docker storage
+  - 8025dac7 2025-04-02T13:12:44+02:00 ci: use go.mod for actions/setup-go
+  - f5f88eab 2025-04-02T13:12:44+02:00 Fix UDN gateway panic when DelNetwork fails
+  - 99a11763 2025-04-02T13:12:44+02:00 Bump test/e2e to k8s v1.32.2
+  - 03745808 2025-04-02T13:12:44+02:00 Bump go-controller go v1.23, k8s v1.32.3 and linter
+  - 140224c7 2025-04-01T14:39:03+02:00 e2e: attempt to fix GRPC health-check flakes
+  - 26220ee7 2025-04-01T14:39:03+02:00 routeimport: remove related skip after adding L3 UDNs imports
+  - 3ff308ca 2025-04-01T14:39:03+02:00 bgp: reset bgpserver and bgpnet for consecutive kind setups
+  - a4e8078f 2025-04-01T14:39:03+02:00 routeimport: set outport to external port in imported routes
+  - 94569073 2025-04-01T14:39:03+02:00 routeimport: add L3 networks
+  - a42b480b 2025-04-01T14:39:03+02:00 routeimport: simplify c.tables handling in syncLinkUpdate
+  - cca981e1 2025-04-01T14:39:03+02:00 routeimport: get table from netlink on syncNetwork
+  - 5e7955d2 2025-04-01T14:39:03+02:00 Add types.CUDNPrefix
+  - af1a7f99 2025-04-01T14:39:03+02:00 routeimport: Fix usage of netlink IfInfomsg.Type to Header.Type
+  - 90280c68 2025-04-01T14:39:03+02:00 routeimport: Add ParseNetworkIDFromVRFName
+  - fe4d8f2f 2025-04-01T14:39:03+02:00 routeimport: remove duplicated network ID
+  - 11f2a0cb 2025-04-01T12:04:58+02:00 kv, e2e: Add localnet ipamless live migration
+  - 00d50a36 2025-03-31T10:56:00+02:00 kind: Remove passt
+  - 70f68993 2025-03-23T22:11:50-07:00 fix typo in networkqos okep
+  - 362653b1 2025-03-20T18:07:37+01:00 e2e: connect to localnet from default network
+  - f978967a 2025-03-20T18:07:37+01:00 Allow default network pods to reach localnet on the same node
+
+- kubernetes image-amd64 ab01febeea8ddbdf96c353a2ef35324ea69e4eb7 to c17291b1e40554b4e5b3ccff01b6d590af2e7a43
+  - 3f117a24a 2025-03-11T15:08:56-03:00 UPSTREAM: 130422: Propagate error when creating CustomResourceStorage instead of panic'ing
+
+- oc image-arm64 314ad39cc654af2016f57f7308bf1ec70fe14ca3 to 1719de833ae8e8a272ff55ca2a80489e6c791d92
+  - b677dde2 2025-03-17T14:29:46-04:00 pkg/cli/admin/release/info: support generating RPM diffs
+  - f81b9a41 2025-03-17T14:29:45-04:00 pkg/cli/admin/release/info: support retrieving just some images
+  - d98ed4de 2025-03-17T14:29:44-04:00 pkg/cli/admin/release/info: factor out images retrieval
+  - 61eb7680 2025-03-17T14:29:43-04:00 pkg/cli/admin/release/info: also capture component tags
+
+- csi-external-snapshotter image-arm64 ff900d0dee7c1765d053ccf523ca87c5e1b61b5c to ac82cafc95b301f67f46ee0db93720d55177a19b
+  - 9cd8753 2025-04-01T13:17:01+02:00 UPSTREAM: <carry>: Add OpenShift files
+  - 012b188 2025-02-26T15:36:02-05:00 Update changelog for v8.2.1
+  - 2ec74dc 2025-02-26T15:35:13-05:00 Squashed 'release-tools/' changes from e31de525b..90efb2ca5
+  - 462f230 2025-02-26T15:35:04-05:00 Fix CVEs by bumping go & x/net
+  - 01b7f49 2025-02-26T15:34:28-05:00 Fix spelling error flagged by codespell
+  - 77fe23b 2025-02-26T15:34:21-05:00 Add leader election, work-queue, process, and Go runtime metrics
+  - 35baa51 2025-02-26T15:34:06-05:00 update kubernetes to 1.32
+  - 67ac488 2025-02-03T16:36:27+01:00 Update deployment to v8.2.0
+  - 7a803f9 2024-12-18T17:12:48+00:00 Update deployment to v8.2.0
+
+- ovn-kubernetes image-arm64 c86639d138c8e215402303eec3625db0922a6201 to 253890a6dead8e3ac594b9584334c163a2c768ac
+  - 6061601d 2025-04-02T13:12:44+02:00 ci: set /mnt/docker-data as docker storage
+  - 8025dac7 2025-04-02T13:12:44+02:00 ci: use go.mod for actions/setup-go
+  - f5f88eab 2025-04-02T13:12:44+02:00 Fix UDN gateway panic when DelNetwork fails
+  - 99a11763 2025-04-02T13:12:44+02:00 Bump test/e2e to k8s v1.32.2
+  - 03745808 2025-04-02T13:12:44+02:00 Bump go-controller go v1.23, k8s v1.32.3 and linter
+  - 140224c7 2025-04-01T14:39:03+02:00 e2e: attempt to fix GRPC health-check flakes
+  - 26220ee7 2025-04-01T14:39:03+02:00 routeimport: remove related skip after adding L3 UDNs imports
+  - 3ff308ca 2025-04-01T14:39:03+02:00 bgp: reset bgpserver and bgpnet for consecutive kind setups
+  - a4e8078f 2025-04-01T14:39:03+02:00 routeimport: set outport to external port in imported routes
+  - 94569073 2025-04-01T14:39:03+02:00 routeimport: add L3 networks
+  - a42b480b 2025-04-01T14:39:03+02:00 routeimport: simplify c.tables handling in syncLinkUpdate
+  - cca981e1 2025-04-01T14:39:03+02:00 routeimport: get table from netlink on syncNetwork
+  - 5e7955d2 2025-04-01T14:39:03+02:00 Add types.CUDNPrefix
+  - af1a7f99 2025-04-01T14:39:03+02:00 routeimport: Fix usage of netlink IfInfomsg.Type to Header.Type
+  - 90280c68 2025-04-01T14:39:03+02:00 routeimport: Add ParseNetworkIDFromVRFName
+  - fe4d8f2f 2025-04-01T14:39:03+02:00 routeimport: remove duplicated network ID
+  - 11f2a0cb 2025-04-01T12:04:58+02:00 kv, e2e: Add localnet ipamless live migration
+  - 00d50a36 2025-03-31T10:56:00+02:00 kind: Remove passt
+  - 70f68993 2025-03-23T22:11:50-07:00 fix typo in networkqos okep
+  - 362653b1 2025-03-20T18:07:37+01:00 e2e: connect to localnet from default network
+  - f978967a 2025-03-20T18:07:37+01:00 Allow default network pods to reach localnet on the same node
+
+- kubernetes image-arm64 ab01febeea8ddbdf96c353a2ef35324ea69e4eb7 to c17291b1e40554b4e5b3ccff01b6d590af2e7a43
+  - 3f117a24a 2025-03-11T15:08:56-03:00 UPSTREAM: 130422: Propagate error when creating CustomResourceStorage instead of panic'ing
 
