@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"time"
 
 	proto "github.com/gogo/protobuf/proto"
@@ -74,14 +75,25 @@ type TelemetryClient struct {
 	// on the cpu seconds we get from kubelet.
 	previousCPUSeconds   float64
 	previousCPUtimestamp int64
+	// For proxy configuration.
+	transport http.RoundTripper
 }
 
-func NewTelemetryClient(baseURL, clusterId string) *TelemetryClient {
+func NewTelemetryClient(baseURL, clusterId, proxy string) *TelemetryClient {
+	transport := http.DefaultTransport
+	if proxy != "" {
+		// Proxy was validated before reaching this point, ignore the error because it cant happen.
+		u, _ := url.Parse(proxy)
+		transport = &http.Transport{
+			Proxy: http.ProxyURL(u),
+		}
+	}
 	return &TelemetryClient{
 		endpoint:             fmt.Sprintf("%s/metrics/v1/receive", baseURL),
 		clusterId:            clusterId,
 		previousCPUSeconds:   0,
 		previousCPUtimestamp: 0,
+		transport:            transport,
 	}
 }
 
@@ -111,7 +123,9 @@ func (t *TelemetryClient) Send(ctx context.Context, pullSecret string, metrics [
 	req.Header.Set("Content-Encoding", "snappy")
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", t.encodeAuth(pullSecret)))
 
-	client := &http.Client{}
+	client := &http.Client{
+		Transport: t.transport,
+	}
 	resp, err := client.Do(req)
 	if err != nil {
 		return fmt.Errorf("unable to do the request: %v", err)
