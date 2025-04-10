@@ -43,8 +43,8 @@ action_start() {
 
     echo "Starting Prometheus"
     podman run -d --rm --name prometheus \
-        -p 9091:9090 \
-        -v "${PROMETHEUS_DIR}:/etc/prometheus" \
+        -p 9092:9090 \
+        -v "${PROMETHEUS_DIR}:/etc/prometheus:Z" \
         docker.io/prom/prometheus \
         --config.file=/etc/prometheus/prometheus.yml \
         --web.enable-remote-write-receiver > /dev/null

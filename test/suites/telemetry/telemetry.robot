@@ -55,7 +55,7 @@ Check MicroShift Metrics In Local Server    # robocop: disable=too-long-test-cas
 
     ${system_arch}=    Get System Architecture
     ${deployment_type}=    Get Deployment Type
-    ${arch}=    Set Variable If    "${system_arch}" == "x86_64"    amd64    aarch64
+    ${arch}=    Set Variable If    "${system_arch}" == "x86_64"    amd64    arm64
     ${cluster_id}=    Get MicroShift Cluster ID From File
     ${os_version}=    Get Host OS Version
     ${microshift_ver}=    MicroShift Version
