@@ -1,6 +1,9 @@
-- machine-config-operator embedded-component 28740b628797734ed26d4b4926530f6d41d4ce6b to 85ff8f1f6f6017bace77fed7638d489c957d507a
-  - 62f36dd9 2025-04-01T12:41:48+00:00 daemon: clarify OSUpdate events
+- machine-config-operator embedded-component 85ff8f1f6f6017bace77fed7638d489c957d507a to 20f26604558b44f4bdc105e52246ddec7898e020
+  - 19a888b8 2025-03-26T10:21:06-07:00 Consolidate OpenStack and PowerVS hostname handling into mco-hostname script
 
-- openshift-controller-manager embedded-component 5bfc8081a65ea3e0d23306c0398143a9987d659e to eec49c5b91ec801640e973743b46a55689f5eb40
-  - c04839f 2025-03-27T11:42:47+00:00 correct calculated refresh time
+- ovn-kubernetes image-amd64 4af08abc39c013bf3f0a493afd3c50d8f7f07805 to 09261dc5c16b81bf98f44fab62d26838d5a28f8e
+  - 33dcc93d 2025-04-07T14:47:58+01:00 EIP no reroute: allow multiple entries for pod to pod and pod to join
+
+- ovn-kubernetes image-arm64 4af08abc39c013bf3f0a493afd3c50d8f7f07805 to 09261dc5c16b81bf98f44fab62d26838d5a28f8e
+  - 33dcc93d 2025-04-07T14:47:58+01:00 EIP no reroute: allow multiple entries for pod to pod and pod to join
 
