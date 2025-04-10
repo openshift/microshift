@@ -1,3 +1,0 @@
-- machine-config-operator embedded-component 143ea7b41456a4d9337cf5524cc5e51e9761bd4c to 95ff6412be3b5cf798e2729657302c77fb24b564
-  - b12cb227 2025-03-27T00:46:44-04:00 OCPBUGS-52188: ignore mc not found error
-
