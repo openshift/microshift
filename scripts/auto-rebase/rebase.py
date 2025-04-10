@@ -102,6 +102,23 @@ def run_rebase_ai_model_serving_sh(release):
     return RebaseScriptResult(success=result.returncode == 0, output=result.stdout)
 
 
+def run_rebase_flannel():
+    """Run the 'rebase_flannel.sh' script and return the script's output."""
+    script_dir = os.path.abspath(os.path.dirname(__file__))
+    args = [f"{script_dir}/rebase_flannel.sh"]
+    logging.info(f"Running: '{' '.join(args)}'")
+    start = timer()
+    result = subprocess.run(
+        args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True, check=False)
+    logging.info(f"Return code: {result.returncode}. Output:\n" +
+                 "==================================================\n" +
+                 f"{result.stdout}" +
+                 "==================================================\n")
+    end = timer() - start
+    logging.info(f"Script returned code: {result.returncode}. It ran for {end/60:.0f}m{end%60:.0f}s.")
+    return RebaseScriptResult(success=result.returncode == 0, output=result.stdout)
+
+
 def commit_str(commit):
     """Returns the first 8 characters of the commit's SHA hash and the commit summary."""
     return f"{commit.hexsha[:8]} - {commit.summary}"
