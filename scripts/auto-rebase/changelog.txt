@@ -1,24 +1,4 @@
-- cluster-network-operator embedded-component 48848fe7e78418922f0cbb3b99d458cd484123c6 to 10162672f39b812dbfdbc3fa51f634c7851c1df1
-  - 49a9cac 2025-03-31T19:36:28+02:00 Check on ipsec.service instead of libreswan package on host
-  - b69f2b1 2025-03-31T19:36:28+02:00 Add version check for machine config operator
-  - 2952c4c 2025-03-31T19:36:28+02:00 Mount top level directory for IPsec host paths
-  - 6ca6f7e 2025-03-31T19:36:28+02:00 Move to use newer IPsec DaemonSets irrespective of MCP state
-  - af448a9 2025-03-31T19:36:16+02:00 Better handling of status manager machine config cache
-  - 31e5a84 2025-03-31T19:29:50+02:00 Use network config last seen annotation for machine config
-  - 6bb894d 2025-03-31T19:24:01+02:00 Report network status for machine config deletes
-  - f3e7d66 2025-03-31T19:24:01+02:00 Use source kind for machine config watcher
-  - 1557b46 2025-03-31T19:24:01+02:00 Revert "Update network operator status for IPsec"
-  - 72b1052 2025-03-31T19:24:01+02:00 Make machine config handling to be more generic
-  - b387cdb 2025-03-31T19:24:01+02:00 Report IPsec machine config progressing status
-  - 17c38e9 2025-03-31T19:24:01+02:00 Add machine config watcher for status manager
-  - da5ac11 2025-03-31T19:24:01+02:00 Keep rendering OVN IPsec when its daemonset not available
-  - 87539e2 2025-03-31T19:24:01+02:00 Remove 4.13 IPsec upgrade handling
-  - 2592e00 2025-03-31T19:24:01+02:00 Keep ovn ipsec enabled during the upgrade     The following change on the machine pool `status.MachineCount == status.UpdatedMachineCount && hasSourceInMachineConfigStatus(status, machineConfigs)` is introduced with PR https://github.com/openshift/cluster-network-operator/pull/2349 which ensures IPsec machine config is always installed on all the nodes in the cluster, So this is deleting the IPsec daemonset as per the CNO state machine for IPsec when the condition is not met. But this is also accidentally disabling IPsec in OVN which is not an expected behavior. This causes ovs-monitor-ipsec to refresh existing ipsec connections unnecessarily when IPsec pod comes up as it is not able to find remote_name from the tunnel. This may also trigger deleting IPsec connection entries from openshift.conf file if ovs-monitor-ipsec is not killed timely when ipsec daemonset is removed. So this commit enables ovn ipsec option as long as the API is set with Full mode.
-  - ea3b35d 2025-03-31T19:24:01+02:00 Restart IPsec service only when needed
-  - 30432f0 2025-03-31T19:24:01+02:00 Revert "Configure narrowing=yes for IPsec connections"
-  - be18899 2025-03-31T19:24:01+02:00 Cleanup ipsec state only when ipsec is not full mode
-
-- machine-config-operator embedded-component 8600a368d3b40d6e5bd7adfec1fb7a40cb6a217b to 4e8c9e662a0f5e3a841533fc0ace5cb203c7ca19
-  - b09c4ace 2025-03-20T15:28:30+01:00 Add crio dependency for ipsec.service
-  - c31fd9c9 2025-03-20T15:28:19+01:00 Add ipsec connect wait service
+- machine-config-operator embedded-component 4e8c9e662a0f5e3a841533fc0ace5cb203c7ca19 to d00398e9d7c250a6361222a1024209ca4f73f79d
+  - c44123cd 2025-03-18T14:36:38+00:00 Enforce VIPs to be collocated at the same host
+  - ca84d739 2025-03-13T00:18:34+00:00 OCPBUGS-48566: Enable nmstate-configuration on all platforms
 
