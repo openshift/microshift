@@ -45,7 +45,7 @@ Deploy OpenVINO Serving Runtime
     ${ovms_image}=    Command Should Work
     ...    jq -r '.images | with_entries(select(.key == "ovms-image")) | .[]' /usr/share/microshift/release/release-ai-model-serving-"$(uname -i)".json
     SSHLibrary.Get File
-    ...    /usr/lib/microshift/manifests.d/001-microshift-ai-model-serving/runtimes/ovms-kserve.yaml
+    ...    /usr/lib/microshift/manifests.d/050-microshift-ai-model-serving-runtimes/ovms-kserve.yaml
     ...    ${OVMS_KSERVE_MANIFEST}
     Local Command Should Work    sed -i "s,image: ovms-image,image: ${ovms_image}," "${OVMS_KSERVE_MANIFEST}"
     Oc Apply    -n ${NAMESPACE} -f ${OVMS_KSERVE_MANIFEST}

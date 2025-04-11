@@ -198,7 +198,7 @@ to re-create OVMS `ServingRuntime` in the workload's namespace:
 OVMS_IMAGE="$(jq -r '.images | with_entries(select(.key == "ovms-image")) | .[]' /usr/share/microshift/release/release-ai-model-serving-"$(uname -i)".json)"
 
 # Duplicate the original ServingRuntime yaml
-cp /usr/lib/microshift/manifests.d/001-microshift-ai-model-serving/runtimes/ovms-kserve.yaml ./ovms-kserve.yaml
+cp /usr/lib/microshift/manifests.d/050-microshift-ai-model-serving-runtimes/ovms-kserve.yaml ./ovms-kserve.yaml
 
 # Update the image reference
 sed -i "s,image: ovms-image,image: ${OVMS_IMAGE}," ./ovms-kserve.yaml
@@ -454,10 +454,10 @@ To learn more about kserve endpoints see upstream documentation:
 If you wish to override kserve settings, you need to make a copy of existing ConfigMap, tweak the desired settings, and overwrite the existing ConfigMap.
 
 Settings are stored in a ConfigMap named `inferenceservice-config` in the `redhat-ods-applications` namespace.
-Alternatively, you can copy the ConfigMap from `/usr/lib/microshift/manifests.d/001-microshift-ai-model-serving/kserve/inferenceservice-config-microshift-patch.yaml`.
+Alternatively, you can copy the ConfigMap from `/usr/lib/microshift/manifests.d/010-microshift-ai-model-serving-kserve/inferenceservice-config-microshift-patch.yaml`.
 
 After tweaking it, you must apply the ConfigMap and restart kserve (e.g. by deleting Pod or scaling the Deployment down to 0 and back to 1).
-For RHEL For Edge and RHEL Image Mode systems, create a new manifest making sure it's applied after `/usr/lib/microshift/manifests.d/001-microshift-ai-model-serving`.
+For RHEL For Edge and RHEL Image Mode systems, create a new manifest making sure it's applied after `/usr/lib/microshift/manifests.d/010-microshift-ai-model-serving-kserve`.
 
 ### Limitations
 - AI Model Serving on MicroShift is only available on the x86_64 platform.
