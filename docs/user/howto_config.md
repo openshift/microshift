@@ -190,7 +190,7 @@ storage:
     driver: ""
     optionalCsiComponents: []
 telemetry:
-    endpoint: https://infogw.api.openshift.com
+    endpoint: https://infogw.api.openshift.com/metrics/v1/receive
     proxy: ""
     status: Enabled
 
