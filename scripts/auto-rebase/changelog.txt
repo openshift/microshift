@@ -1,9 +1,8 @@
-- machine-config-operator embedded-component 85ff8f1f6f6017bace77fed7638d489c957d507a to 20f26604558b44f4bdc105e52246ddec7898e020
-  - 19a888b8 2025-03-26T10:21:06-07:00 Consolidate OpenStack and PowerVS hostname handling into mco-hostname script
+- api embedded-component e7f23be12279d3c245c013c234f967e5ccb426e2 to d6c84c55a124ab4bd96b1a18c916d3f314f1a95a
+  - 3de9a1b 2025-04-09T09:22:40-04:00 tools: bump openshift/controller-tools to latest commit
 
-- ovn-kubernetes image-amd64 4af08abc39c013bf3f0a493afd3c50d8f7f07805 to 09261dc5c16b81bf98f44fab62d26838d5a28f8e
-  - 33dcc93d 2025-04-07T14:47:58+01:00 EIP no reroute: allow multiple entries for pod to pod and pod to join
-
-- ovn-kubernetes image-arm64 4af08abc39c013bf3f0a493afd3c50d8f7f07805 to 09261dc5c16b81bf98f44fab62d26838d5a28f8e
-  - 33dcc93d 2025-04-07T14:47:58+01:00 EIP no reroute: allow multiple entries for pod to pod and pod to join
+- cluster-kube-apiserver-operator embedded-component 087c72f1e261fb7c42fe6fc5d73a1f70d3c76d2f to ad0e7bf6fb078047e58a923fa057293c0e5535ac
+  - b1d96fb 2025-04-03T18:02:04+02:00 Bump library-go to latest release-4.18
+  - 569574c 2025-02-13T15:26:03+01:00 change to sum:apiserver_request:burnrate6h
+  - 8f5e1c4 2025-02-13T15:25:55+01:00 bindata/alerts/slo: fix burnrate calculation
 
