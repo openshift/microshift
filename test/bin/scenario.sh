@@ -19,7 +19,7 @@ source "${SCRIPTDIR}/common_versions.sh"
 source "${SCRIPTDIR}/scenario_container.sh"
 
 DEFAULT_BOOT_BLUEPRINT="rhel-9.4"
-LVM_SYSROOT_SIZE="10240"
+LVM_SYSROOT_SIZE="15360"
 PULL_SECRET="${PULL_SECRET:-${HOME}/.pull-secret.json}"
 PULL_SECRET_CONTENT="$(jq -c . "${PULL_SECRET}")"
 VM_BOOT_TIMEOUT=1200 # Overall total boot times are around 15m
