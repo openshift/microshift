@@ -1,0 +1,63 @@
+# This configuration exports:
+# - Container, Pod, Volume, and Node metrics
+# - Kubernetes Events (Warnings only)
+
+receivers:
+  kubeletstats:
+    auth_type: tls
+    ca_file: /var/lib/microshift/certs/ca-bundle/client-ca.crt
+    key_file: /var/lib/microshift/certs/admin-kubeconfig-signer/openshift-observability-client/client.key
+    cert_file: /var/lib/microshift/certs/admin-kubeconfig-signer/openshift-observability-client/client.crt
+    insecure_skip_verify: true
+    collection_interval: 20s
+    endpoint: "${env:K8S_NODE_NAME}:10250"
+    node: ${env:K8S_NODE_NAME}
+    k8s_api_config:
+      auth_type: kubeConfig
+  kube_events:
+    auth_type: kubeConfig
+
+processors:
+  batch:
+  resourcedetection/system:
+    detectors: [ "system" ]
+    system:
+      hostname_sources: [ "os" ]
+
+exporters:
+  otlp:
+    sending_queue:
+      storage: file_storage
+    # Endpoint must point to an ip or hostname and port of an otlp service. Here, the K8S_NODE_NAME is used because it
+    # will be resolved to the local node's hostname automatically. An unreachable endpoint will reported in the logs
+    # of the microshift-observability service.
+    endpoint: ${env:K8S_NODE_NAME}:4317
+    tls:
+      insecure: true
+
+extensions:
+  file_storage:
+    directory: /var/lib/microshift-observability
+
+service:
+  extensions: [ file_storage ]
+  pipelines:
+    metrics/kubeletstats:
+      receivers: [ kubeletstats ]
+      processors: [ batch ]
+      exporters: [ otlp ]
+    logs/kube_events:
+      receivers: [ k8s_events ]
+      processors: [ resourcedetection/system, batch ]
+      exporters: [ otlp ]
+  telemetry:
+    metrics:
+      readers:
+        - periodic:
+            exporter:
+              otlp:
+                # Endpoint must point to an ip or hostname and port of an otlp service. Here, the K8S_NODE_NAME is used
+                # because it will be resolved to the local node's hostname automatically. An unreachable endpoint will
+                # reported in the logs of the microshift-observability service.
+                protocol: http/protobuf
+                endpoint: http://${env:K8S_NODE_NAME}:4318
