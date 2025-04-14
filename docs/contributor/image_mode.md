@@ -734,8 +734,8 @@ Add the following command to the MicroShift image build procedure to create a
 ```
 # Install systemd configuration drop-ins to fix potential permission problems
 # when upgrading from older rpm-ostree commits to Image Mode container layers
-RUN mkdir -p /etc/systemd/system/ovsdb-server.service.d && \
-    cat > /etc/systemd/system/ovsdb-server.service.d/microshift-ovsdb-ownership.conf <<'EOF'
+RUN mkdir -p /usr/lib/systemd/system/ovsdb-server.service.d && \
+    cat > /usr/lib/systemd/system/ovsdb-server.service.d/microshift-ovsdb-ownership.conf <<'EOF'
 # The openvswitch database files must be owned by the appropriate user and its
 # primary group. Note that the user and its group may be overwritten too, so
 # they need to be recreated in this case.

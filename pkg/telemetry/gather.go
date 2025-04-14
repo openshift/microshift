@@ -28,6 +28,7 @@ import (
 
 	routev1 "github.com/openshift/client-go/route/clientset/versioned/typed/route/v1"
 	"github.com/openshift/microshift/pkg/config"
+	"github.com/openshift/microshift/pkg/util"
 	"github.com/openshift/microshift/pkg/util/cryptomaterial"
 	io_prometheus_client "github.com/prometheus/client_model/go"
 	"github.com/prometheus/common/expfmt"
@@ -42,6 +43,10 @@ const (
 	kubeletMetricsCAdvisor = "https://%s:10250/metrics/cadvisor"
 	kubeletMetricsResource = "https://%s:10250/metrics/resource"
 	kubeletMetrics         = "https://%s:10250/metrics"
+
+	DeploymentTypeBootC  = "bootc"
+	DeploymentTypeOSTree = "ostree"
+	DeploymentTypeRPM    = "rpm"
 )
 
 func makeHTTPClient() (*http.Client, error) {
@@ -232,4 +237,14 @@ func fetchKubernetesResources(ctx context.Context, cfg *config.Config) (map[stri
 		"customresourcedefinitions.apiextensions.k8s.io": len(crdList.Items),
 	}
 	return metrics, nil
+}
+
+func getDeploymentType() string {
+	if util.IsBootc() {
+		return DeploymentTypeBootC
+	}
+	if exists, _ := util.IsOSTree(); exists {
+		return DeploymentTypeOSTree
+	}
+	return DeploymentTypeRPM
 }

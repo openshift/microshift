@@ -470,6 +470,7 @@
       "type": "object",
       "required": [
         "clusterNetwork",
+        "multus",
         "serviceNetwork",
         "serviceNodePortRange"
       ],
@@ -492,6 +493,20 @@
             "none",
             "ovnk"
           ]
+        },
+        "multus": {
+          "type": "object",
+          "properties": {
+            "status": {
+              "description": "Status controls the deployment of the Multus CNI.\nChanging from \"Enabled\" to \"Disabled\" will not cause Multus CNI to be deleted.\nAllowed values are: unset (disabled), \"Enabled\", or \"Disabled\"",
+              "type": "string",
+              "default": "Disabled",
+              "enum": [
+                "Enabled",
+                "Disabled"
+              ]
+            }
+          }
         },
         "serviceNetwork": {
           "description": "IP address pool for services.\nCurrently, we only support a single entry here.\nThis field is immutable after installation.",
@@ -568,6 +583,7 @@
       "type": "object",
       "required": [
         "endpoint",
+        "proxy",
         "status"
       ],
       "properties": {
@@ -575,6 +591,10 @@
           "description": "Endpoint where to send telemetry data.",
           "type": "string",
           "default": "https://infogw.api.openshift.com"
+        },
+        "proxy": {
+          "description": "HTTP proxy to use exclusively for telemetry data. If unset telemetry will\ndefault to use the system configured proxy.",
+          "type": "string"
         },
         "status": {
           "description": "Telemetry status, which can be Enabled or Disabled. Defaults to Enabled.",

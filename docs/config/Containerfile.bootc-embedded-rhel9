@@ -38,9 +38,9 @@ done < "${IMAGE_LIST_FILE}"
 EOF
 
 RUN chmod 755 /usr/bin/microshift-copy-images && \
-    mkdir -p /etc/systemd/system/microshift.service.d
+    mkdir -p /usr/lib/systemd/system/microshift.service.d
 
-RUN cat > /etc/systemd/system/microshift.service.d/microshift-copy-images.conf <<EOF
+RUN cat > /usr/lib/systemd/system/microshift.service.d/microshift-copy-images.conf <<EOF
 [Service]
 ExecStartPre=/usr/bin/microshift-copy-images
 EOF

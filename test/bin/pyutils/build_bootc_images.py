@@ -32,7 +32,7 @@ HOME_DIR = common.get_env_var("HOME")
 PULL_SECRET = common.get_env_var('PULL_SECRET', f"{HOME_DIR}/.pull-secret.json")
 # Switch to quay.io/centos-bootc/bootc-image-builder:latest if any new upstream
 # features are required
-BIB_IMAGE = "registry.redhat.io/rhel9/bootc-image-builder:latest"
+BIB_IMAGE = "registry.stage.redhat.io/rhel9-eus/rhel-9.6-bootc-image-builder:9.6"
 GOMPLATE = common.get_env_var('GOMPLATE')
 MIRROR_REGISTRY = common.get_env_var('MIRROR_REGISTRY_URL')
 FORCE_REBUILD = False
@@ -238,9 +238,45 @@ def process_containerfile(groupdir, containerfile, dry_run):
 
     common.print_msg(f"Processing {containerfile} with logs in {cf_logfile}")
     start_process_container = time.time()
+
+    def should_skip(image, cached):
+        # Forcing the rebuild if needed
+        if FORCE_REBUILD:
+            common.print_msg(f"Forcing rebuild of '{image}'")
+            return False
+        if cached:
+            common.print_msg(f"The '{image}' already exists, skipping")
+            return True
+        return False
+
     try:
         # Redirect the output to the log file
         with open(cf_logfile, 'w') as logfile:
+            is_cached = False
+            # Check if the container image exists in the mirror registry and skip
+            # the subsequent build command if the image has already been cached.
+            #
+            # Note: No retries. Failure to inspect the image is ignored.
+            try:
+                inspect_args = [
+                    "sudo", "skopeo", "inspect",
+                    "--authfile", PULL_SECRET,
+                    f"docker://{MIRROR_REGISTRY}/{cf_outname}",
+                    "&>/dev/null"
+                ]
+                start = time.time()
+                common.run_command_in_shell(inspect_args, dry_run, logfile, logfile)
+                common.record_junit(cf_path, "inspect-image", "OK", start)
+
+                is_cached = True
+            except Exception:
+                None
+
+            # Check if the target artifact exists
+            if should_skip(cf_outname, is_cached):
+                common.record_junit(cf_path, "process-containerfile", "SKIPPED")
+                return
+
             # Run the container build command
             # Note:
             # - The pull secret is necessary in some builds for pulling embedded
@@ -326,7 +362,7 @@ def process_image_bootc(groupdir, bootcfile, dry_run):
             common.record_junit(bf_path, "pull-bootc-bib", "OK", start)
 
             # Read the image reference
-            bf_imgref = common.read_file(bf_outfile).strip()
+            bf_imgref = common.read_file_valid_lines(bf_outfile).strip()
 
             # If not already local, download the image to be used by bootc image builder
             if not bf_imgref.startswith('localhost/'):
@@ -352,7 +388,6 @@ def process_image_bootc(groupdir, bootcfile, dry_run):
             build_args += [
                 BIB_IMAGE,
                 "--type", "anaconda-iso",
-                "--local",
                 bf_imgref
             ]
             start = time.time()

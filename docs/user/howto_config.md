@@ -75,6 +75,8 @@ manifests:
 network:
     clusterNetwork: []
     cniPlugin: ""
+    multus:
+        status: ""
     serviceNetwork: []
     serviceNodePortRange: ""
 node:
@@ -86,6 +88,7 @@ storage:
     optionalCsiComponents: []
 telemetry:
     endpoint: ""
+    proxy: ""
     status: ""
 
 ```
@@ -174,6 +177,8 @@ network:
     clusterNetwork:
         - 10.42.0.0/16
     cniPlugin: ""
+    multus:
+        status: Disabled
     serviceNetwork:
         - 10.43.0.0/16
     serviceNodePortRange: 30000-32767
@@ -186,6 +191,7 @@ storage:
     optionalCsiComponents: []
 telemetry:
     endpoint: https://infogw.api.openshift.com
+    proxy: ""
     status: Enabled
 
 ```

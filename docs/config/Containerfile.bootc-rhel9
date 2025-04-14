@@ -33,7 +33,7 @@ RUN firewall-offline-cmd --zone=public --add-port=80/tcp && \
 
 # Create a systemd unit to recursively make the root filesystem subtree
 # shared as required by OVN images
-RUN cat > /etc/systemd/system/microshift-make-rshared.service <<'EOF'
+RUN cat > /usr/lib/systemd/system/microshift-make-rshared.service <<'EOF'
 [Unit]
 Description=Make root filesystem shared
 Before=microshift.service

@@ -1,7 +1,11 @@
-- ovn-kubernetes image-arm64 0f6638ab81a33cd275febfd9f3330dc12c9f2936 to 0945de7bb96457865eab84e3ef1440c1bca722b1
-  - 979d3dc2 2024-12-10T08:21:42+00:00 Updating ose-ovn-kubernetes-container image to be consistent with ART for 4.19 Reconciling with https://github.com/openshift/ocp-build-data/tree/4b2f673ee2d572dfbfc158903fc5067e552d0f31/images/ose-ovn-kubernetes.yml
+- ovn-kubernetes image-arm64 253890a6dead8e3ac594b9584334c163a2c768ac to e356c93468c4b686eca25a1ec92e7cf9ec0d8bf3
+  - 27033e32 2025-04-07T15:24:32+02:00 EIP no reroute: allow multiple entries for pod to pod and pod to join
+  - f76582f4 2025-04-03T20:00:36+02:00 ci: fix actions/setup-go@v5 warnings
+  - 837a638b 2025-04-03T20:00:36+02:00 ci: fix submit code coverage to Coveralls
+  - a3d569aa 2025-04-03T20:00:36+02:00 kind: rely on --force when removing containers and networks
+  - cca01b1a 2025-04-03T10:35:42+02:00 Explicitly probe for frr-k8s webhook readiness
+  - 764685a5 2025-03-19T18:09:35+08:00 unpin libreswan version
 
-- kubernetes image-arm64 f45d8b995e23c1441af31972890ebcb210cee127 to 95c8dfdc377a0413a18be8103d77c1439745fcb6
-  - ade095fb7 2025-04-02T20:56:57+02:00 UPSTREAM: <carry>: Update group snapshot test rules
-  - 57fd241aa 2025-04-02T07:55:33+03:00 UPSTREAM: 129808: e2e: bump port-forward timeout
+- kubernetes image-arm64 c17291b1e40554b4e5b3ccff01b6d590af2e7a43 to e15f4f8936ca26f9de398b849c4632a57bba1914
+  - 07d437ae1 2025-04-04T11:45:51+01:00 UPSTREAM: 130450: Fix implementation of ContainsCIDR to allow non-equal addresses
 

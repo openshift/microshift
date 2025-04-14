@@ -30,5 +30,5 @@ ConditionVirtualization=container\n\
 Type=oneshot\n\
 ExecStart=/usr/bin/mount --make-rshared /\n\
 [Install]\n\
-WantedBy=multi-user.target\n' > /etc/systemd/system/microshift-make-rshared.service && \
+WantedBy=multi-user.target\n' > /usr/lib/systemd/system/microshift-make-rshared.service && \
     systemctl enable microshift-make-rshared.service

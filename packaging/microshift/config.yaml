@@ -521,6 +521,11 @@ network:
     # assumes an empty string to mean the OVN-K should be deployed.
     # Allowed values are: unset or one of ["", "ovnk", "none"]
     cniPlugin: ""
+    multus:
+        # Status controls the deployment of the Multus CNI.
+        # Changing from "Enabled" to "Disabled" will not cause Multus CNI to be deleted.
+        # Allowed values are: unset (disabled), "Enabled", or "Disabled"
+        status: Disabled
     # IP address pool for services.
     # Currently, we only support a single entry here.
     # This field is immutable after installation.
@@ -565,6 +570,9 @@ storage:
 telemetry:
     # Endpoint where to send telemetry data.
     endpoint: https://infogw.api.openshift.com
+    # HTTP proxy to use exclusively for telemetry data. If unset telemetry will
+    # default to use the system configured proxy.
+    proxy: ""
     # Telemetry status, which can be Enabled or Disabled. Defaults to Enabled.
     status: Enabled
 

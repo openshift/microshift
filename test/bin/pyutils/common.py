@@ -183,6 +183,17 @@ def read_file(file_path: str):
     return content
 
 
+def read_file_valid_lines(file_path: str):
+    """Read the file contents skipping empty and commented lines and return them to the caller"""
+    content = []
+    with open(file_path, 'r') as file:
+        for line in file:
+            sline = line.strip()
+            if sline and not sline.startswith('#'):
+                content.append(line)
+    return ''.join(content)
+
+
 def append_file(file_path: str, content: str):
     """Append the specified content to a file"""
     with open(file_path, 'a') as file:
