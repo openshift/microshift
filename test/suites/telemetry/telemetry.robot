@@ -61,6 +61,10 @@ Check MicroShift Metrics In Local Server    # robocop: disable=too-long-test-cas
     ${microshift_ver}=    MicroShift Version
     ${microshift_version}=    Set Variable    ${microshift_ver.major}.${microshift_ver.minor}.${microshift_ver.patch}
 
+    # Ensure metrics have been sent before checking in Prometheus.
+    Wait Until Keyword Succeeds    10x    10s
+    ...    Should Find Metrics Success
+
     Check Prometheus Query
     ...    ${PROMETHEUS_HOST}
     ...    ${PROMETHEUS_PORT}
@@ -174,6 +178,9 @@ Setup Local Telemetry Configuration
     ...    ${ENABLE_TELEMETRY}
     ...    \ \ endpoint: http://${PROMETHEUS_HOST}:${PROMETHEUS_PORT}/api/v1/write
     Drop In MicroShift Config    ${config}    10-telemetry
+    Stop MicroShift
+    ${cursor}=    Get Journal Cursor
+    Set Suite Variable    \${CURSOR}    ${cursor}
     Restart MicroShift
 
 Remove Telemetry Configuration
