@@ -1,4 +1,0 @@
-- machine-config-operator embedded-component 4e8c9e662a0f5e3a841533fc0ace5cb203c7ca19 to d00398e9d7c250a6361222a1024209ca4f73f79d
-  - c44123cd 2025-03-18T14:36:38+00:00 Enforce VIPs to be collocated at the same host
-  - ca84d739 2025-03-13T00:18:34+00:00 OCPBUGS-48566: Enable nmstate-configuration on all platforms
-
