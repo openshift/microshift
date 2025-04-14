@@ -4,7 +4,7 @@ set -euo pipefail
 
 SCRIPT_NAME=$(basename "$0")
 PROFILES="${PROFILES:-network,security,microshift}"
-PLUGINS="${PLUGINS:-container_log,crio,logs,rpmostree,rpm}"
+PLUGINS="${PLUGINS:-container_log,crio,firewalld,logs,rpmostree,rpm}"
 TEMPDIR="/tmp"
 
 function usage() {
