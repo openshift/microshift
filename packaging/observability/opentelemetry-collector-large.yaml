@@ -3,6 +3,7 @@
 # - Kubernetes Events (Warnings only)
 # - Host's CPU, Mem, Disk, and Network Metrics
 # - System journals for selected MicroShift services and dependencies, priority < Info
+# - Individual Pods' metrics if they have "prometheus.io/scrape": "true" annotation
 
 receivers:
   kubeletstats:
@@ -36,6 +37,30 @@ receivers:
       - openvswitch.service
       - ovsdb-server.service
       - ovs-vswitchd.service
+  prometheus:
+    config:
+      scrape_configs:
+        - job_name: k8s
+          scrape_interval: 10s
+          kubernetes_sd_configs:
+            - kubeconfig_file: /var/lib/microshift/resources/observability-client/kubeconfig
+              role: pod
+          relabel_configs:
+              # Only scrape Pods with annotation "prometheus.io/scrape": "true"
+            - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
+              action: keep
+              regex: true
+              # Use value of "prometheus.io/path" annotation for scraping
+            - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_path]
+              action: replace
+              target_label: __metrics_path__
+              regex: (.+)
+              # Use value of "prometheus.io/port" annotation for scraping
+            - source_labels: [__address__, __meta_kubernetes_pod_annotation_prometheus_io_port]
+              action: replace
+              regex: ([^:]+)(?::\d+)?;(\d+)
+              replacement: $1:$2
+              target_label: __address__
 
 processors:
   batch:
@@ -81,6 +106,10 @@ service:
     logs/journald:
       receivers: [ journald ]
       processors: [ resourcedetection/system ]
+      exporters: [ otlp ]
+    metrics/pods:
+      receivers: [ prometheus ]
+      processors: [ batch ]
       exporters: [ otlp ]
   telemetry:
     metrics:
