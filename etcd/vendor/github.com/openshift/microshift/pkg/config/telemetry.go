@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"net/url"
 )
 
 const (
@@ -20,6 +21,10 @@ type Telemetry struct {
 	// Endpoint where to send telemetry data.
 	// +kubebuilder:default="https://infogw.api.openshift.com"
 	Endpoint string `json:"endpoint"`
+
+	// HTTP proxy to use exclusively for telemetry data. If unset telemetry will
+	// default to use the system configured proxy.
+	Proxy string `json:"proxy"`
 }
 
 func telemetryDefaults() Telemetry {
@@ -32,6 +37,11 @@ func telemetryDefaults() Telemetry {
 func (t *Telemetry) validate() error {
 	if t.Status != StatusEnabled && t.Status != StatusDisabled {
 		return fmt.Errorf("invalid telemetry status: %s", t.Status)
+	}
+	if t.Proxy != "" {
+		if _, err := url.Parse(t.Proxy); err != nil {
+			return fmt.Errorf("invalid telemetry proxy URL: %s", t.Proxy)
+		}
 	}
 	return nil
 }
