@@ -1,4 +1,31 @@
-- ovn-kubernetes image-arm64 253890a6dead8e3ac594b9584334c163a2c768ac to e356c93468c4b686eca25a1ec92e7cf9ec0d8bf3
+- api embedded-component 00e6260bd8b88542106696c5a3f555256a6146d6 to 8fcc4e71758aefadc7bf7da355ca8619bcc1d34d
+  - d4a3a8c8 2025-04-07T14:46:44-04:00 Removed VSphereStaticIPs feature gate
+  - 607b001c 2025-03-27T09:51:12-04:00 Add feature flag for NewOLMPreflightPermissionCheck
+
+- cluster-csi-snapshot-controller-operator embedded-component d5e6c5b4b579f53b33ccd80d4cdff4a1ee9a815a to cf99de974354133f853928cff9e19ad19c5347d9
+  - 62d484a 2025-04-07T23:17:52+02:00 add readOnlyRootFilesystem=true to operator deployments
+  - 6e3d250 2025-04-01T16:47:56-06:00 rbac: remove wildcards from clusterrole
+
+- cluster-ingress-operator embedded-component 1410fe02a76e33c00208fb3d9a9f00fa38cb527e to 9537a3ff013ca7e7fa0294b3757885431de4f136
+  - 5107b0e 2025-04-08T20:54:09+02:00 NE-2009: Move VAP to Default featureset
+  - b9d2420 2025-04-07T09:25:18-04:00 Wait for install plans to enter the "Requires Approval" phase before approving them.
+  - d7e22a3 2025-04-03T09:23:36-04:00 desiredIstio: Specify priorityClassName
+
+- cluster-network-operator embedded-component 2ca824bfbd32ad196d1ac8e4167bfd369f464f66 to 66f0e1346e30bcf5df8c87397c3158a39758ece0
+  - a8648b3 2025-04-04T14:12:11+03:00 OCPBUGS-53180: Add IPv6 NGINX configuration
+
+- kubernetes embedded-component c17291b1e40554b4e5b3ccff01b6d590af2e7a43 to e15f4f8936ca26f9de398b849c4632a57bba1914
+  - 07d437ae1 2025-04-04T11:45:51+01:00 UPSTREAM: 130450: Fix implementation of ContainsCIDR to allow non-equal addresses
+
+- machine-config-operator embedded-component 7331a534e7e9c653b307afdeffa39a5eeb54429b to 43fe1cb52bb0fedacce7deb8f2af740d59fff2fe
+  - 46d2c505 2025-04-07T18:13:18-06:00 Add ExtremelyHighIndividualControlPlaneMemory runbook to alert
+  - 0c219070 2025-04-04T09:36:52-07:00 pkg/operator/status: Drop kubelet skew guard
+  - 357209f5 2025-04-03T15:55:17-04:00 GCP: Adding back the gcp-routes.service for all GCP installs
+  - 2ed66e81 2025-03-28T14:01:35-04:00 Add /etc/docker/certs.d to template
+  - 4c35481e 2025-03-20T13:43:07-05:00 OCPBUGS-53425: Make mtu-migration run after wait-for-primary-ip
+  - ce71d44f 2025-02-17T18:31:35+02:00 kubelet-service: narrow down restorecon path
+
+- ovn-kubernetes image-amd64 253890a6dead8e3ac594b9584334c163a2c768ac to e356c93468c4b686eca25a1ec92e7cf9ec0d8bf3
   - 27033e32 2025-04-07T15:24:32+02:00 EIP no reroute: allow multiple entries for pod to pod and pod to join
   - f76582f4 2025-04-03T20:00:36+02:00 ci: fix actions/setup-go@v5 warnings
   - 837a638b 2025-04-03T20:00:36+02:00 ci: fix submit code coverage to Coveralls
@@ -6,6 +33,21 @@
   - cca01b1a 2025-04-03T10:35:42+02:00 Explicitly probe for frr-k8s webhook readiness
   - 764685a5 2025-03-19T18:09:35+08:00 unpin libreswan version
 
-- kubernetes image-arm64 c17291b1e40554b4e5b3ccff01b6d590af2e7a43 to e15f4f8936ca26f9de398b849c4632a57bba1914
+- kubernetes image-amd64 c17291b1e40554b4e5b3ccff01b6d590af2e7a43 to e15f4f8936ca26f9de398b849c4632a57bba1914
   - 07d437ae1 2025-04-04T11:45:51+01:00 UPSTREAM: 130450: Fix implementation of ContainsCIDR to allow non-equal addresses
+
+- oc image-arm64 1719de833ae8e8a272ff55ca2a80489e6c791d92 to beeaf0904b6e9a7c22a73af9e92327f50a4d6918
+  - 73cc5a42 2025-04-10T13:00:27-04:00 COS-3023: Fixing rpmdiff permissions when running in container
+
+- ovn-kubernetes image-arm64 e356c93468c4b686eca25a1ec92e7cf9ec0d8bf3 to bb61d2c16ef07744b19d1e6c7af0e60a224d1b11
+  - 08663ad2 2025-03-31T09:23:11+02:00 Dockerfile: Bump OVS version to 3.5.0-0.9
+
+- kubernetes image-arm64 e15f4f8936ca26f9de398b849c4632a57bba1914 to c9e894ae535ca2ac95dc63b993af965b7568382b
+  - 0256129a9 2025-04-09T12:08:48-03:00 UPSTREAM: <drop> : make update
+  - ed4eaceb6 2025-03-18T16:12:07-03:00 UPSTREAM: <carry> : OCPBUGS-53249: skip UDP LoadBalancer on external
+
+- service-ca-operator image-arm64 fdd9502ff3446725b4f1fbf6902547dba9266061 to 422ebd8b9450954626c765911238162f16beca10
+  - d31c1f6 2025-04-04T09:29:01+02:00 Generate certs valid for 45 minutes when ShortRotation featuregate is enabled
+  - 98ea32a 2025-03-19T09:13:54+01:00 Bump library-go to latest master
+  - b508239 2025-03-19T09:13:46+01:00 Bump openshift/api to latest master
 
