@@ -14,7 +14,7 @@ receivers:
     node: ${env:K8S_NODE_NAME}
     k8s_api_config:
       auth_type: kubeConfig
-  kube_events:
+  k8s_events:
     auth_type: kubeConfig
 
 processors:
