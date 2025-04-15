@@ -11,7 +11,7 @@ receivers:
     key_file: /var/lib/microshift/certs/admin-kubeconfig-signer/openshift-observability-client/client.key
     cert_file: /var/lib/microshift/certs/admin-kubeconfig-signer/openshift-observability-client/client.crt
     insecure_skip_verify: true
-    collection_interval: 20s
+    collection_interval: 10s
     endpoint: "${env:K8S_NODE_NAME}:10250"
     node: ${env:K8S_NODE_NAME}
     k8s_api_config:
