@@ -49,7 +49,7 @@ MicroShift Reports Metrics To Server Through Proxy
 
     [Teardown]    Remove Telemetry Configuration
 
-Check MicroShift Metrics In Local Server    # robocop: disable=too-long-test-case
+Check MicroShift Metrics In Local Server    # robocop: disable=too-long-test-case,too-many-calls-in-test-case
     [Documentation]    Check the expected metrics are sent to the local server.
     [Setup]    Setup Local Telemetry Configuration
 
@@ -57,6 +57,7 @@ Check MicroShift Metrics In Local Server    # robocop: disable=too-long-test-cas
     ${deployment_type}=    Get Deployment Type
     ${arch}=    Set Variable If    "${system_arch}" == "x86_64"    amd64    arm64
     ${cluster_id}=    Get MicroShift Cluster ID From File
+    ${os_id}=    Get Host OS Id
     ${os_version}=    Get Host OS Version
     ${microshift_ver}=    MicroShift Version
     ${microshift_version}=    Set Variable    ${microshift_ver.major}.${microshift_ver.minor}.${microshift_ver.patch}
@@ -68,11 +69,11 @@ Check MicroShift Metrics In Local Server    # robocop: disable=too-long-test-cas
     Check Prometheus Query
     ...    ${PROMETHEUS_HOST}
     ...    ${PROMETHEUS_PORT}
-    ...    cluster:capacity_cpu_cores:sum{_id="${cluster_id}",label_beta_kubernetes_io_instance_type="rhde",label_node_openshift_io_os_id="rhel",label_kubernetes_io_arch="${arch}"}
+    ...    cluster:capacity_cpu_cores:sum{_id="${cluster_id}",label_beta_kubernetes_io_instance_type="rhde",label_node_openshift_io_os_id="${os_id}",label_kubernetes_io_arch="${arch}"}
     Check Prometheus Query
     ...    ${PROMETHEUS_HOST}
     ...    ${PROMETHEUS_PORT}
-    ...    cluster:capacity_memory_bytes:sum{_id="${cluster_id}",label_beta_kubernetes_io_instance_type="rhde",label_node_openshift_io_os_id="rhel",label_kubernetes_io_arch="${arch}"}
+    ...    cluster:capacity_memory_bytes:sum{_id="${cluster_id}",label_beta_kubernetes_io_instance_type="rhde",label_node_openshift_io_os_id="${os_id}",label_kubernetes_io_arch="${arch}"}
     Check Prometheus Query
     ...    ${PROMETHEUS_HOST}
     ...    ${PROMETHEUS_PORT}

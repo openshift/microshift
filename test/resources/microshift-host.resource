@@ -177,18 +177,20 @@ Get Deployment Type
     ${is_ostree}=    Is System Ostree
     ${cluster_id}=    Get MicroShift Cluster ID From File
 
-    ${deployment_type}=    Set Variable    rpm
     IF    ${is_bootc} == ${TRUE}
-        ${deployment_type}=    Set Variable    bootc
+        RETURN    bootc
     ELSE IF    ${is_ostree} == ${TRUE}
-        ${deployment_type}=    Set Variable    ostree
+        RETURN    ostree
     END
-    RETURN    ${deployment_type}
+    RETURN    rpm
+
+Get Host OS Id
+    [Documentation]    Returns the host OS id
+    ${os_id}=    Command Should Work    bash -c '. /etc/os-release && echo "\${ID}"'
+    Should Not Be Empty    ${os_id}
+    RETURN    ${os_id}
 
 Get Host OS Version
     [Documentation]    Returns the host OS version
-    ${stdout}    ${rc}=    Execute Command
-    ...    grep ^VERSION_ID= /etc/os-release | cut -d= -f2 | tr -d '"'
-    ...    shell=True    return_rc=True
-    Should Be Equal As Integers    0    ${rc}
-    RETURN    ${stdout}
+    ${os_version}=    Command Should Work    bash -c '. /etc/os-release && echo "\${VERSION_ID}"'
+    RETURN    ${os_version}
