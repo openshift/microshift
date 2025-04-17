@@ -1,0 +1,3 @@
+[34m# Rebasing to registry.ci.openshift.org/ocp/release:4.14.0-0.nightly-2025-04-13-082712 and registry.ci.openshift.org/ocp-arm64/release-arm64:4.14.0-0.nightly-arm64-2025-04-15-192804[00m
+[34m# Fetching release info for registry.ci.openshift.org/ocp/release:4.14.0-0.nightly-2025-04-13-082712 (amd64)[00m
+error: unable to read image registry.ci.openshift.org/ocp/release:4.14.0-0.nightly-2025-04-13-082712: Head "https://registry.ci.openshift.org/v2/ocp/release/manifests/4.14.0-0.nightly-2025-04-13-082712": unauthorized: unable to validate token
