@@ -1,8 +1,6 @@
-- api embedded-component e7f23be12279d3c245c013c234f967e5ccb426e2 to d6c84c55a124ab4bd96b1a18c916d3f314f1a95a
-  - 3de9a1b 2025-04-09T09:22:40-04:00 tools: bump openshift/controller-tools to latest commit
+- cluster-network-operator embedded-component 670c2e35eb315547eceae8a3a1b6e19638ff4f44 to 692029cc58e9facfc31601e13b2d3097f4f37325
+  - deb4c3c 2025-04-08T12:20:17+00:00 OCPBUGS-53180: Add IPv6 NGINX configuration
 
-- cluster-kube-apiserver-operator embedded-component 087c72f1e261fb7c42fe6fc5d73a1f70d3c76d2f to ad0e7bf6fb078047e58a923fa057293c0e5535ac
-  - b1d96fb 2025-04-03T18:02:04+02:00 Bump library-go to latest release-4.18
-  - 569574c 2025-02-13T15:26:03+01:00 change to sum:apiserver_request:burnrate6h
-  - 8f5e1c4 2025-02-13T15:25:55+01:00 bindata/alerts/slo: fix burnrate calculation
+- machine-config-operator embedded-component 20f26604558b44f4bdc105e52246ddec7898e020 to c3b71f5aab700255ea33850a4e055449e8019261
+  - 41ffa64a 2025-04-09T20:47:04+00:00 OCPBUGS-53425: Make mtu-migration run after wait-for-primary-ip
 
