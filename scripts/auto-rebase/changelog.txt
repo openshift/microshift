@@ -1,11 +1,197 @@
-- ovn-kubernetes image-arm64 253890a6dead8e3ac594b9584334c163a2c768ac to e356c93468c4b686eca25a1ec92e7cf9ec0d8bf3
+- api embedded-component 00e6260bd8b88542106696c5a3f555256a6146d6 to b7680e188c5efa5780f93cb89dfa73d728ed5f12
+  - 088accfb 2025-04-14T08:06:04-04:00 Revert "Merge pull request #2261 from alebedev87/gwapi-promote-ga"
+  - 2a65f17d 2025-04-14T12:58:29+01:00 Temporarily pin feature-gate-analyzer to 4.19
+  - d4a3a8c8 2025-04-07T14:46:44-04:00 Removed VSphereStaticIPs feature gate
+  - 4bebb581 2025-04-02T20:20:13+02:00 NE-2009: Enable GatewayAPI featuregate in Default featureset
+  - 607b001c 2025-03-27T09:51:12-04:00 Add feature flag for NewOLMPreflightPermissionCheck
+  - 4790e275 2025-03-18T23:47:15+01:00 image/v1/types: improve documentation
+
+- cluster-csi-snapshot-controller-operator embedded-component d5e6c5b4b579f53b33ccd80d4cdff4a1ee9a815a to cf99de974354133f853928cff9e19ad19c5347d9
+  - 62d484a 2025-04-07T23:17:52+02:00 add readOnlyRootFilesystem=true to operator deployments
+  - 6e3d250 2025-04-01T16:47:56-06:00 rbac: remove wildcards from clusterrole
+
+- cluster-ingress-operator embedded-component 1410fe02a76e33c00208fb3d9a9f00fa38cb527e to c762f7d8b1d3a2e600f0f3bc962d7f5a92b6b4d1
+  - afc2929 2025-04-15T15:27:46+02:00 NE-2009: Relax pod bound validating admission rule for HyperShift
+  - 4eb3a46 2025-04-14T23:35:34+02:00 NE-1969: Set Degraded=True if unmanaged Gateway API CRDs exist
+  - d2b8c89 2025-04-11T23:06:13+01:00 Add Gateway API DNS Feature e2e test
+  - 5107b0e 2025-04-08T20:54:09+02:00 NE-2009: Move VAP to Default featureset
+  - 4c5265c 2025-04-07T12:33:12-04:00 desiredIstio: Specify workload annotation
+  - 58959aa 2025-04-07T12:23:37-04:00 desiredSubscription: Specify annotations and SCC
+  - b9d2420 2025-04-07T09:25:18-04:00 Wait for install plans to enter the "Requires Approval" phase before approving them.
+  - d7e22a3 2025-04-03T09:23:36-04:00 desiredIstio: Specify priorityClassName
+
+- cluster-kube-apiserver-operator embedded-component 963692e0d0b46d52236ca27f1adf20aebec2c25d to 93fe617f5239c8ef3933eb4ef1d04695ce3ab630
+  - 6575c3d 2025-04-14T09:00:47+02:00 Revert "OCPBUGS-43777: certrotationcontroller: run tests which runs deployment and creates projects"
+  - 8e9f70e 2025-04-03T13:14:14+02:00 HACK: don't change rotation period for kube-apiserver-to-kubelet-signer
+  - 7a60d73 2025-04-03T13:14:14+02:00 Set OPERATOR_IMAGE_VERSION env var for kube-apiserver pods
+  - 44d9321 2025-04-03T13:14:14+02:00 certrotation: use custom period for certs when ShortCertRotation is enabled
+  - 10c593b 2025-03-17T09:16:31+01:00 certrotationcontroller: use minutes instead of days when FeatureShortCertRotation is enabled
+  - 1093d53 2025-03-13T14:17:23+01:00 certrotationcontroller: run tests which creates deployments and projects
+  - 5511007 2025-03-13T14:17:19+01:00 Bump library-go
+  - f7c5ae4 2025-03-13T11:27:53+01:00 Bump openshift/api
+
+- cluster-kube-controller-manager-operator embedded-component 75f30cdb07d58ce71c0a247207a5d91799a48cc0 to cec410b7f877a6eef57968889a644b848bdb540a
+  - 066dcd6 2025-04-14T13:02:41+02:00 Bump library-go
+
+- cluster-kube-scheduler-operator embedded-component 4210c04aec1c7fde8f4c294421e090ebf9248285 to 8740a60de76690a17d5081db078eb93dfdb7a066
+  - 777416d 2025-04-14T13:02:23+02:00 Bump library-go
+
+- cluster-network-operator embedded-component 2ca824bfbd32ad196d1ac8e4167bfd369f464f66 to 05086126558eeb90ed2be5356d4b4bc201fd4290
+  - 9577258 2025-04-10T09:13:58+02:00 Add missing backendAddressPools read permission on azure
+  - 6e82842 2025-04-09T17:46:06-04:00 whereabouts watcher
+  - 717bee1 2025-04-07T17:18:09-04:00 update install-cni script
+  - a8648b3 2025-04-04T14:12:11+03:00 OCPBUGS-53180: Add IPv6 NGINX configuration
+  - c88f5d8 2025-03-07T17:59:28+01:00 Use library-go crypto utility for generating CA
+  - b5a792a 2025-03-07T17:59:28+01:00 Add unit tests for cert signer
+  - 0b672af 2025-03-07T17:59:28+01:00 Use cno client to update CSR approval
+  - 093a33c 2025-03-07T17:59:11+01:00 Validate CSR user name before signing it
+
+- etcd embedded-component 2f703d6792c6f60b89f5b51d8018ba70a24d6472 to a5421dfe551a2e9c911a75062a4cdeb7473f5c26
+  - d28d8076 2025-03-30T07:43:44+02:00 DOWNSTREAM: <carry>: OCPBUGS-50510: make hardware related timeout delay configurable
+  - 52c2627f 2025-03-30T07:43:34+02:00 DOWNSTREAM: <carry>:add new internal wal type to track metadata changes
+  - 2a42300c 2025-03-30T07:43:10+02:00 DOWNSTREAM: <carry>:try failing again
+  - e2078e0f 2025-03-30T07:42:47+02:00 DOWNSTREAM: <carry>:revert fatal log
+  - 60e3f2e4 2025-03-30T07:42:27+02:00 DOWNSTREAM: <carry>:make sure to update metadata if we're given it
+  - 078afe9f 2025-03-30T07:41:48+02:00 DOWNSTREAM: <carry>:add fatal log where non-recovery members are hot looping
+  - 85fb3bda 2025-03-30T07:41:13+02:00 DOWNSTREAM: <carry>: Try to save new cluster id to wal
+  - 6775d485 2025-03-30T07:39:28+02:00 DOWNSTREAM: <carry>: add tls min/max version to grpc proxy
+  - de91aafe 2025-03-30T07:39:21+02:00 DOWNSTREAM: <carry>: ETCD-696: Add rev bumping to force-new-cluster
+  - a8abc7ce 2025-03-30T07:39:17+02:00 Migrate Dockerfile.art for Konflux
+  - 86c05d6f 2025-03-30T07:39:11+02:00 Add support for cachi2 based deps Konflux is replacing RH's internal build system OSBS. OSBS supported a build-time dependency injection system called "cachito". Konflux replaces this with "cachi2" which works differently. REMOTE_SOURCES no longer need to be copied into place and there is no need to source cachito's environment information (Konflux automatically rewrites the Dockerfile to source cachi2/cachi2.env before running the original RUN commands). Additionally, cachito appears to have provided go.sum dependencies whereas cachi2 requires all build-time dependencies in go.mod. Missing dependencies are added to go.mod as // indirect in this change.
+  - 159d9ab8 2025-03-30T07:39:06+02:00 DOWNSTREAM <carry>: resolve merge conflicts
+  - 235c6275 2025-03-30T07:39:01+02:00 NO-JIRA: use golang 1.23 image
+  - bceb79fc 2025-03-30T07:38:55+02:00 DOWNSTREAM: <carry>: ETCD-656: Automate datadir move after quorum-restore
+  - a17edfd5 2025-03-27T15:56:36-07:00 version: bump up to 3.5.21
+  - 14b8ce4d 2025-03-27T14:14:12-07:00 dependency: bump golang.org/x/net from v0.36.0 to v0.38.0
+  - 6439620a 2025-03-23T21:11:24-07:00 dependency: bump github.com/golang-jwt/jwt/v4 from 4.5.1 to 4.5.2
+  - ac31c34d 2025-03-21T13:04:31-07:00 version: bump up to 3.5.20
+  - 0a51fc24 2025-03-20T08:32:20+00:00 Add e2e test to verify etcd is able to automatically fix the issue caused by https://github.com/etcd-io/etcd/issues/19557
+  - 341af039 2025-03-14T12:50:59+00:00 Fix the issue that learner promotion command doesn't support json output
+  - 9ae4074b 2025-03-14T10:46:26+00:00 Enhance the e2e teat framework to support adding & promoting learner member
+  - a1cb13b9 2025-03-11T16:53:32+00:00 fix failed test cases
+  - e3cd57aa 2025-03-11T13:56:34+00:00 overwrite the member if already exist
+  - d32c22d3 2025-03-11T13:56:34+00:00 add verification to check whether membership data is in sync between v2store and v3store
+  - b77e4ec5 2025-03-11T11:01:45+00:00 Update server unit test cases to set a backend
+  - 075cbc5c 2025-03-10T09:21:27+00:00 fix: grpcproxy can get stuck in and endless loop causing high cpu usage
+  - 8609552a 2025-03-06T10:52:12-08:00 back port gofail comments to release-3.5
+  - cda443c8 2025-03-05T19:16:24+00:00 deflakey: TestCompactionHash in integration
+  - 5245f6fb 2025-02-18T19:25:17+08:00 perf(release3.5): use RLock in Demoted method for read-only access to expiry
+
+- kubernetes embedded-component c17291b1e40554b4e5b3ccff01b6d590af2e7a43 to c9e894ae535ca2ac95dc63b993af965b7568382b
+  - 0256129a9 2025-04-09T12:08:48-03:00 UPSTREAM: <drop> : make update
+  - 07d437ae1 2025-04-04T11:45:51+01:00 UPSTREAM: 130450: Fix implementation of ContainsCIDR to allow non-equal addresses
+  - ed4eaceb6 2025-03-18T16:12:07-03:00 UPSTREAM: <carry> : OCPBUGS-53249: skip UDP LoadBalancer on external
+
+- machine-config-operator embedded-component 7331a534e7e9c653b307afdeffa39a5eeb54429b to d5e84665d5cdce0fb0b03066ebe075655ec4a32e
+  - 0656eb01 2025-04-10T18:28:06-04:00 upgrade monitor: only set LastFailedGeneration when it is non-zero
+  - 57eee4a6 2025-04-10T17:22:56-04:00 OCPBUGS-53408: wait for build and ensure OS image is actually new
+  - 46d2c505 2025-04-07T18:13:18-06:00 Add ExtremelyHighIndividualControlPlaneMemory runbook to alert
+  - 0c219070 2025-04-04T09:36:52-07:00 pkg/operator/status: Drop kubelet skew guard
+  - e275bbe7 2025-04-04T09:28:17-04:00 daemon & upgrade monitor: update references for updated v1alpha1 MCN api
+  - 357209f5 2025-04-03T15:55:17-04:00 GCP: Adding back the gcp-routes.service for all GCP installs
+  - 908e2947 2025-04-02T19:10:20-04:00 bump(client-go): update client-go dependency to commit b3bad3b & go mod vendor
+  - 529e88eb 2025-04-02T19:10:20-04:00 bump(api): update api dependency to commit 3d7abe9 & go mod vendor
+  - 2ed66e81 2025-03-28T14:01:35-04:00 Add /etc/docker/certs.d to template
+  - 4c35481e 2025-03-20T13:43:07-05:00 OCPBUGS-53425: Make mtu-migration run after wait-for-primary-ip
+  - ce71d44f 2025-02-17T18:31:35+02:00 kubelet-service: narrow down restorecon path
+
+- service-ca-operator embedded-component fdd9502ff3446725b4f1fbf6902547dba9266061 to 422ebd8b9450954626c765911238162f16beca10
+  - d31c1f6 2025-04-04T09:29:01+02:00 Generate certs valid for 45 minutes when ShortRotation featuregate is enabled
+  - 98ea32a 2025-03-19T09:13:54+01:00 Bump library-go to latest master
+  - b508239 2025-03-19T09:13:46+01:00 Bump openshift/api to latest master
+
+- oc image-amd64 1719de833ae8e8a272ff55ca2a80489e6c791d92 to beeaf0904b6e9a7c22a73af9e92327f50a4d6918
+  - 73cc5a42 2025-04-10T13:00:27-04:00 COS-3023: Fixing rpmdiff permissions when running in container
+
+- ovn-kubernetes image-amd64 253890a6dead8e3ac594b9584334c163a2c768ac to 3b45a034f51363d473b82d3e44f76f285cc530b3
+  - dde4c477 2025-04-11T22:19:33+02:00 routeimport: account for CUDN network name prefix
+  - 752b7b20 2025-04-11T20:53:49+02:00 Check GetNADs length
+  - 059e3c6b 2025-04-11T20:53:49+02:00 Add BGP support for Layer2 primary UDN in SGW
+  - e9289b1e 2025-04-11T13:32:32+02:00 Add an unreachable default route for a UDN
+  - 1b1f7131 2025-04-11T13:32:32+02:00 Remove default route if UDN network is advertised on its own VRF
+  - 59656d82 2025-04-11T12:33:35+02:00 Adapt e2e tests to new universal network selector API
+  - 2af5f56b 2025-04-11T12:33:35+02:00 RouteAdvertisements: switch label selectors to standard convention
+  - 65188add 2025-04-11T12:33:35+02:00 RouteAdvertisements: update API to use universal NetworkSelector
+  - 58e5d3fb 2025-04-11T12:33:35+02:00 Add universal NetworkSelector API
+  - 2d647a2c 2025-04-10T18:32:10+02:00 Revert "Add universal NetworkSelector API"
+  - c177b355 2025-04-10T18:32:10+02:00 Revert "RouteAdvertisements: update API to use universal NetworkSelector"
+  - d5e38207 2025-04-10T18:32:10+02:00 Revert "RouteAdvertisements: switch label selectors to standard convention"
+  - 23a9876e 2025-04-10T18:27:56+02:00 RouteAdvertisements: switch label selectors to standard convention
+  - 396ad2c4 2025-04-10T18:27:56+02:00 RouteAdvertisements: update API to use universal NetworkSelector
+  - 3bb6054a 2025-04-10T18:27:56+02:00 Add universal NetworkSelector API
+  - dae3da16 2025-04-10T10:57:29+02:00 Add E2Es for testing isolation between BGP advertised networks
+  - e6a2e98b 2025-04-09T22:52:56+02:00 kind: check minimum version available
+  - a7d2ca18 2025-04-09T14:07:17+03:00 ut, pod annotations: Fix typo
+  - 96146722 2025-04-09T14:07:16+03:00 allocator, pod: Add ipv6 lla gateway for l2 udpn
+  - 9d76591e 2025-04-08T19:51:39+00:00 helm: use version v3.17.2
+  - f7db1c20 2025-04-08T19:51:31+00:00 kind: move KIND_IMAGE and K8S_VERSION to set_common_default_params
+  - c386b357 2025-04-08T19:47:36+00:00 github/workflows/test.yml: add network-segmentation to e2e matrix
+  - cdacd52d 2025-04-08T19:47:36+00:00 Network Segmentation: Sync up rbacs for helm
+  - 71481d14 2025-04-08T19:47:36+00:00 Network Segmentation: Add flag to enable the feature in helm
+  - 3ad7f01d 2025-04-08T08:49:14-07:00 add job to test github pages deployment
   - 27033e32 2025-04-07T15:24:32+02:00 EIP no reroute: allow multiple entries for pod to pod and pod to join
   - f76582f4 2025-04-03T20:00:36+02:00 ci: fix actions/setup-go@v5 warnings
   - 837a638b 2025-04-03T20:00:36+02:00 ci: fix submit code coverage to Coveralls
   - a3d569aa 2025-04-03T20:00:36+02:00 kind: rely on --force when removing containers and networks
+  - 5f86091e 2025-04-03T20:39:38+03:00 docs,okeps: Localnet API
   - cca01b1a 2025-04-03T10:35:42+02:00 Explicitly probe for frr-k8s webhook readiness
+  - 40242981 2025-04-01T15:39:20+02:00 Copy OVS rpms to be installed when building from source
+  - 08663ad2 2025-03-31T09:23:11+02:00 Dockerfile: Bump OVS version to 3.5.0-0.9
+  - f92b3022 2025-03-23T18:00:33+02:00 util: Add ipv6 lla gateway pod annotation field
+  - 993ec0dc 2025-03-23T18:00:33+02:00 ut, pod annotations: Align test configuration
   - 764685a5 2025-03-19T18:09:35+08:00 unpin libreswan version
 
-- kubernetes image-arm64 c17291b1e40554b4e5b3ccff01b6d590af2e7a43 to e15f4f8936ca26f9de398b849c4632a57bba1914
+- kubernetes image-amd64 c17291b1e40554b4e5b3ccff01b6d590af2e7a43 to c9e894ae535ca2ac95dc63b993af965b7568382b
+  - 0256129a9 2025-04-09T12:08:48-03:00 UPSTREAM: <drop> : make update
   - 07d437ae1 2025-04-04T11:45:51+01:00 UPSTREAM: 130450: Fix implementation of ContainsCIDR to allow non-equal addresses
+  - ed4eaceb6 2025-03-18T16:12:07-03:00 UPSTREAM: <carry> : OCPBUGS-53249: skip UDP LoadBalancer on external
+
+- service-ca-operator image-amd64 fdd9502ff3446725b4f1fbf6902547dba9266061 to 422ebd8b9450954626c765911238162f16beca10
+  - d31c1f6 2025-04-04T09:29:01+02:00 Generate certs valid for 45 minutes when ShortRotation featuregate is enabled
+  - 98ea32a 2025-03-19T09:13:54+01:00 Bump library-go to latest master
+  - b508239 2025-03-19T09:13:46+01:00 Bump openshift/api to latest master
+
+- oc image-arm64 1719de833ae8e8a272ff55ca2a80489e6c791d92 to beeaf0904b6e9a7c22a73af9e92327f50a4d6918
+  - 73cc5a42 2025-04-10T13:00:27-04:00 COS-3023: Fixing rpmdiff permissions when running in container
+
+- ovn-kubernetes image-arm64 e356c93468c4b686eca25a1ec92e7cf9ec0d8bf3 to 3b45a034f51363d473b82d3e44f76f285cc530b3
+  - dde4c477 2025-04-11T22:19:33+02:00 routeimport: account for CUDN network name prefix
+  - 752b7b20 2025-04-11T20:53:49+02:00 Check GetNADs length
+  - 059e3c6b 2025-04-11T20:53:49+02:00 Add BGP support for Layer2 primary UDN in SGW
+  - e9289b1e 2025-04-11T13:32:32+02:00 Add an unreachable default route for a UDN
+  - 1b1f7131 2025-04-11T13:32:32+02:00 Remove default route if UDN network is advertised on its own VRF
+  - 59656d82 2025-04-11T12:33:35+02:00 Adapt e2e tests to new universal network selector API
+  - 2af5f56b 2025-04-11T12:33:35+02:00 RouteAdvertisements: switch label selectors to standard convention
+  - 65188add 2025-04-11T12:33:35+02:00 RouteAdvertisements: update API to use universal NetworkSelector
+  - 58e5d3fb 2025-04-11T12:33:35+02:00 Add universal NetworkSelector API
+  - 2d647a2c 2025-04-10T18:32:10+02:00 Revert "Add universal NetworkSelector API"
+  - c177b355 2025-04-10T18:32:10+02:00 Revert "RouteAdvertisements: update API to use universal NetworkSelector"
+  - d5e38207 2025-04-10T18:32:10+02:00 Revert "RouteAdvertisements: switch label selectors to standard convention"
+  - 23a9876e 2025-04-10T18:27:56+02:00 RouteAdvertisements: switch label selectors to standard convention
+  - 396ad2c4 2025-04-10T18:27:56+02:00 RouteAdvertisements: update API to use universal NetworkSelector
+  - 3bb6054a 2025-04-10T18:27:56+02:00 Add universal NetworkSelector API
+  - dae3da16 2025-04-10T10:57:29+02:00 Add E2Es for testing isolation between BGP advertised networks
+  - e6a2e98b 2025-04-09T22:52:56+02:00 kind: check minimum version available
+  - a7d2ca18 2025-04-09T14:07:17+03:00 ut, pod annotations: Fix typo
+  - 96146722 2025-04-09T14:07:16+03:00 allocator, pod: Add ipv6 lla gateway for l2 udpn
+  - 9d76591e 2025-04-08T19:51:39+00:00 helm: use version v3.17.2
+  - f7db1c20 2025-04-08T19:51:31+00:00 kind: move KIND_IMAGE and K8S_VERSION to set_common_default_params
+  - c386b357 2025-04-08T19:47:36+00:00 github/workflows/test.yml: add network-segmentation to e2e matrix
+  - cdacd52d 2025-04-08T19:47:36+00:00 Network Segmentation: Sync up rbacs for helm
+  - 71481d14 2025-04-08T19:47:36+00:00 Network Segmentation: Add flag to enable the feature in helm
+  - 3ad7f01d 2025-04-08T08:49:14-07:00 add job to test github pages deployment
+  - 5f86091e 2025-04-03T20:39:38+03:00 docs,okeps: Localnet API
+  - 40242981 2025-04-01T15:39:20+02:00 Copy OVS rpms to be installed when building from source
+  - 08663ad2 2025-03-31T09:23:11+02:00 Dockerfile: Bump OVS version to 3.5.0-0.9
+  - f92b3022 2025-03-23T18:00:33+02:00 util: Add ipv6 lla gateway pod annotation field
+  - 993ec0dc 2025-03-23T18:00:33+02:00 ut, pod annotations: Align test configuration
+
+- kubernetes image-arm64 e15f4f8936ca26f9de398b849c4632a57bba1914 to c9e894ae535ca2ac95dc63b993af965b7568382b
+  - 0256129a9 2025-04-09T12:08:48-03:00 UPSTREAM: <drop> : make update
+  - ed4eaceb6 2025-03-18T16:12:07-03:00 UPSTREAM: <carry> : OCPBUGS-53249: skip UDP LoadBalancer on external
+
+- service-ca-operator image-arm64 fdd9502ff3446725b4f1fbf6902547dba9266061 to 422ebd8b9450954626c765911238162f16beca10
+  - d31c1f6 2025-04-04T09:29:01+02:00 Generate certs valid for 45 minutes when ShortRotation featuregate is enabled
+  - 98ea32a 2025-03-19T09:13:54+01:00 Bump library-go to latest master
+  - b508239 2025-03-19T09:13:46+01:00 Bump openshift/api to latest master
 
