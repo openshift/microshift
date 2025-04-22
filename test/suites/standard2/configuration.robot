@@ -194,6 +194,12 @@ Custom TLS 1_3 configuration
     ...    Remove TLS Drop In Config
     ...    Restart MicroShift
 
+Crio Uses Crun Runtime
+    [Documentation]    Verify that crio uses crun as its default runtime
+
+    ${runtime}=    Command Should Work    crictl info | jq -r '.runtimeHandlers[].name | select(. != null)'
+    Should Be Equal As Strings    ${runtime}    crun
+
 
 *** Keywords ***
 Setup

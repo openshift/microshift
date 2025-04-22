@@ -85,13 +85,6 @@ Create New MicroShift Cluster
     Setup Kubeconfig
     Restart Greenboot And Wait For Success
 
-Get MicroShift Cluster ID From File
-    [Documentation]    Read and return the cluster ID from the file.
-    ${id}=    Command Should Work    cat ${CLUSTERID_FILE}
-
-    Should Not Be Empty    ${id}
-    RETURN    ${id}
-
 Get MicroShift Cluster ID From Namespace
     [Documentation]    Read and return the cluster ID from the kube-system namespace.
     ${clusterid}=    Oc Get Jsonpath    namespaces    ${CLUSTERID_NS}    ${CLUSTERID_NS}    .metadata.uid

@@ -1,0 +1,8 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - 00-psql-namespace.yaml
+  - 01-pv-volume.yaml
+  - 02-pvc-volume.yaml
+  - 03-psql-service.yaml
+  - 04-psql-deployment.yaml

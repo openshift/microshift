@@ -1,8 +1,8 @@
 [Unit]
 Description=MicroShift Observability
 After=microshift.service
-PartOf=microshift.service
-AssertPathExists=/var/lib/microshift/resources/observability-client/kubeconfig
+Requires=microshift.service
+ConditionPathExists=/var/lib/microshift/resources/observability-client/kubeconfig
 
 [Service]
 Environment=KUBECONFIG=/var/lib/microshift/resources/observability-client/kubeconfig
@@ -13,4 +13,4 @@ Restart=always
 User=root
 
 [Install]
-RequiredBy=microshift.service
+WantedBy=microshift.service

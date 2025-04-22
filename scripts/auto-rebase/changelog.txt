@@ -1,14 +1,11 @@
-- cluster-ingress-operator embedded-component 7f0fd6df636a5032c15469cfcb0b10e8cfbb5e66 to 81e314f2e9b41b6616ad2c3db657e869915577a8
-  - 92e89a2 2025-03-27T19:01:16-04:00 testGatewayAPIObjects: Improve logging
-  - ff903c7 2025-03-27T14:03:29-04:00 TestCanaryRoute: Add more logging.
-  - b615bc4 2025-03-27T14:03:29-04:00 status: Add Gateway API objects to relatedObjects
+- ovn-kubernetes image-arm64 253890a6dead8e3ac594b9584334c163a2c768ac to e356c93468c4b686eca25a1ec92e7cf9ec0d8bf3
+  - 27033e32 2025-04-07T15:24:32+02:00 EIP no reroute: allow multiple entries for pod to pod and pod to join
+  - f76582f4 2025-04-03T20:00:36+02:00 ci: fix actions/setup-go@v5 warnings
+  - 837a638b 2025-04-03T20:00:36+02:00 ci: fix submit code coverage to Coveralls
+  - a3d569aa 2025-04-03T20:00:36+02:00 kind: rely on --force when removing containers and networks
+  - cca01b1a 2025-04-03T10:35:42+02:00 Explicitly probe for frr-k8s webhook readiness
+  - 764685a5 2025-03-19T18:09:35+08:00 unpin libreswan version
 
-- csi-external-snapshotter embedded-component 1fc6ee158070b34f84a94489b33accb333714727 to ff900d0dee7c1765d053ccf523ca87c5e1b61b5c
-  - 4777754 2025-03-10T13:24:52+01:00 UPSTREAM: <carry>: remove csi-snapshot-validation-webhook
-
-- csi-external-snapshotter image-amd64 1fc6ee158070b34f84a94489b33accb333714727 to ff900d0dee7c1765d053ccf523ca87c5e1b61b5c
-  - 4777754 2025-03-10T13:24:52+01:00 UPSTREAM: <carry>: remove csi-snapshot-validation-webhook
-
-- csi-external-snapshotter image-arm64 1fc6ee158070b34f84a94489b33accb333714727 to ff900d0dee7c1765d053ccf523ca87c5e1b61b5c
-  - 4777754 2025-03-10T13:24:52+01:00 UPSTREAM: <carry>: remove csi-snapshot-validation-webhook
+- kubernetes image-arm64 c17291b1e40554b4e5b3ccff01b6d590af2e7a43 to e15f4f8936ca26f9de398b849c4632a57bba1914
+  - 07d437ae1 2025-04-04T11:45:51+01:00 UPSTREAM: 130450: Fix implementation of ContainsCIDR to allow non-equal addresses
 

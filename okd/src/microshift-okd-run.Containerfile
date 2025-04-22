@@ -30,5 +30,5 @@ RUN ${OKD_CONFIG_SCRIPT} && rm -rf ${OKD_CONFIG_SCRIPT}
 
 # Create a systemd unit to recursively make the root filesystem subtree
 # shared as required by OVN images
-COPY ./packaging/imagemode/systemd/microshift-make-rshared.service /etc/systemd/system/microshift-make-rshared.service
+COPY ./packaging/imagemode/systemd/microshift-make-rshared.service /usr/lib/systemd/system/microshift-make-rshared.service
 RUN systemctl enable microshift-make-rshared.service
