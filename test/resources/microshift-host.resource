@@ -158,3 +158,39 @@ Command Should Fail
     ...    return_stderr=True
     ...    return_stdout=True
     Should Not Be Equal As Integers    0    ${rc}
+
+Get System Architecture
+    [Documentation]    Returns the system architecture
+    ${arch}=    Command Should Work    uname -m
+    RETURN    ${arch}
+
+Get MicroShift Cluster ID From File
+    [Documentation]    Read and return the cluster ID from the file.
+    ${id}=    Command Should Work    cat /var/lib/microshift/cluster-id
+
+    Should Not Be Empty    ${id}
+    RETURN    ${id}
+
+Get Deployment Type
+    [Documentation]    Returns whether the target system is bootc, ostree or rpm
+    ${is_bootc}=    Is System Bootc
+    ${is_ostree}=    Is System Ostree
+    ${cluster_id}=    Get MicroShift Cluster ID From File
+
+    IF    ${is_bootc} == ${TRUE}
+        RETURN    bootc
+    ELSE IF    ${is_ostree} == ${TRUE}
+        RETURN    ostree
+    END
+    RETURN    rpm
+
+Get Host OS Id
+    [Documentation]    Returns the host OS id
+    ${os_id}=    Command Should Work    bash -c '. /etc/os-release && echo "\${ID}"'
+    Should Not Be Empty    ${os_id}
+    RETURN    ${os_id}
+
+Get Host OS Version
+    [Documentation]    Returns the host OS version
+    ${os_version}=    Command Should Work    bash -c '. /etc/os-release && echo "\${VERSION_ID}"'
+    RETURN    ${os_version}

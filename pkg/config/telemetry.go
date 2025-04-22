@@ -8,7 +8,7 @@ import (
 const (
 	StatusEnabled   TelemetryStatusEnum = "Enabled"
 	StatusDisabled  TelemetryStatusEnum = "Disabled"
-	defaultEndpoint                     = "https://infogw.api.openshift.com"
+	defaultEndpoint                     = "https://infogw.api.openshift.com/metrics/v1/receive"
 )
 
 type TelemetryStatusEnum string
@@ -19,7 +19,7 @@ type Telemetry struct {
 	Status TelemetryStatusEnum `json:"status"`
 
 	// Endpoint where to send telemetry data.
-	// +kubebuilder:default="https://infogw.api.openshift.com"
+	// +kubebuilder:default="https://infogw.api.openshift.com/metrics/v1/receive"
 	Endpoint string `json:"endpoint"`
 
 	// HTTP proxy to use exclusively for telemetry data. If unset telemetry will

@@ -79,7 +79,7 @@ type TelemetryClient struct {
 	transport http.RoundTripper
 }
 
-func NewTelemetryClient(baseURL, clusterId, proxy string) *TelemetryClient {
+func NewTelemetryClient(endpoint, clusterId, proxy string) *TelemetryClient {
 	transport := http.DefaultTransport
 	if proxy != "" {
 		// Proxy was validated before reaching this point, ignore the error because it cant happen.
@@ -89,7 +89,7 @@ func NewTelemetryClient(baseURL, clusterId, proxy string) *TelemetryClient {
 		}
 	}
 	return &TelemetryClient{
-		endpoint:             fmt.Sprintf("%s/metrics/v1/receive", baseURL),
+		endpoint:             endpoint,
 		clusterId:            clusterId,
 		previousCPUSeconds:   0,
 		previousCPUtimestamp: 0,
@@ -138,7 +138,7 @@ func (t *TelemetryClient) Send(ctx context.Context, pullSecret string, metrics [
 		}
 		resp.Body.Close()
 	}()
-	if resp.StatusCode == http.StatusOK {
+	if resp.StatusCode >= 200 && resp.StatusCode < 300 {
 		klog.Infof("Metrics sent successfully")
 		return nil
 	}
@@ -192,6 +192,10 @@ func (t *TelemetryClient) Collect(ctx context.Context, cfg *config.Config) ([]Me
 }
 
 func computeCapacityMetrics(kubeletMetrics map[string]*io_prometheus_client.MetricFamily, nodeLabels map[string]string) ([]Metric, error) {
+	archValue, ok := nodeLabels["kubernetes.io/arch"]
+	if !ok {
+		return nil, fmt.Errorf("node label kubernetes.io/arch not found")
+	}
 	osIdValue, ok := nodeLabels["node.openshift.io/os_id"]
 	if !ok {
 		return nil, fmt.Errorf("node label node.openshift.io/os_id not found")
@@ -215,6 +219,7 @@ func computeCapacityMetrics(kubeletMetrics map[string]*io_prometheus_client.Metr
 			Labels: []MetricLabel{
 				{Name: LabelNameOS, Value: osIdValue},
 				{Name: LabelNameInstanceType, Value: instanceTypeValue},
+				{Name: LabelNameArch, Value: archValue},
 			},
 			Timestamp: currentTimestamp,
 			Value:     aggregateMetricValues(kubeletCPUCapacity.Metric),
@@ -224,6 +229,7 @@ func computeCapacityMetrics(kubeletMetrics map[string]*io_prometheus_client.Metr
 			Labels: []MetricLabel{
 				{Name: LabelNameOS, Value: osIdValue},
 				{Name: LabelNameInstanceType, Value: instanceTypeValue},
+				{Name: LabelNameArch, Value: archValue},
 			},
 			Timestamp: currentTimestamp,
 			Value:     aggregateMetricValues(kubeletMemoryCapacity.Metric),
