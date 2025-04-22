@@ -28,6 +28,10 @@ spec:
         - name: service-ca-controller
           image: '{{ .ReleaseImage.service_ca_operator }}'
           imagePullPolicy: IfNotPresent
+          env:
+            - name: OPERAND_IMAGE_VERSION
+              value: "0.0.1-snapshot"
+          terminationMessagePolicy: FallbackTo
           command: ["service-ca-operator", "controller"]
           ports:
             - containerPort: 8443
