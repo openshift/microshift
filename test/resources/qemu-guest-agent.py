@@ -359,7 +359,7 @@ def _stream_file(vm_name: str, path: str) -> str:
                 'execute': 'guest-file-read',
                 'arguments': {
                     'handle': handle,
-                    'count': 10240
+                    'count': 100 * 1024
                 }
             })
 
