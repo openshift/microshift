@@ -27,10 +27,10 @@ import json
 import argparse
 from base64 import b64decode, b64encode
 from os.path import basename
+import subprocess
 from time import sleep
 
 from robot.libraries.BuiltIn import BuiltIn, DotDict
-from robot.libraries.Process import Process, ExecutionResult
 from robot.utils.robottime import timestr_to_secs
 
 
@@ -39,13 +39,13 @@ def _execute(vm_name: str, agent_message: dict) -> dict | int:
     msg = json.dumps(agent_message)
     virsh_args += f'\'{msg}\''
 
-    result: ExecutionResult = Process().run_process(virsh_args, shell=True)
+    result = subprocess.run(virsh_args, shell=True, capture_output=True, text=True)
     # Only raise an error if the virsh command itself fails.  The guest-agent may return a non-zero exit code which
     # should be handled by the keyword caller.
-    if result.rc != 0:
+    if result.returncode != 0:
         raise RuntimeError(f'virsh command failed:\nstdout={result.stdout}'
                            f'\nstderr={result.stderr}'
-                           f'\nrc={result.rc}')
+                           f'\nrc={result.returncode}')
     #  qemu-agent-command returns data to stdout as:
     #  {
     #    return: {
