@@ -224,7 +224,8 @@ sos_report_for_vm() {
 }
 
 invoke_qemu_script() {
-    "${ROOTDIR}/_output/robotenv/bin/python" "${ROOTDIR}/test/resources/qemu-guest-agent.py" "$@"
+    timeout --verbose --foreground 2m \
+        "${ROOTDIR}/_output/robotenv/bin/python" "${ROOTDIR}/test/resources/qemu-guest-agent.py" "$@"
 }
 
 sos_report_for_vm_offline() {
