@@ -1,6 +1,7 @@
 from robot.libraries.BuiltIn import BuiltIn
 
 import libostree
+import time
 
 _log = BuiltIn().log
 
@@ -39,19 +40,31 @@ def get_log_output_with_pattern(cursor: str, pattern: str, unit="microshift") ->
     return stdout, rc
 
 
-def pattern_should_not_appear_in_log_output(cursor, pattern, unit="microshift"):
+def pattern_should_not_appear_in_log_output(cursor, pattern, unit="microshift", retries=30, wait=10):
     """Get the logs since the cursor and verify that the pattern does not appear."""
-    stdout, rc = get_log_output_with_pattern(cursor, pattern, unit)
     # The grep argument causes journalctl to exit with an error if the
     # pattern is not found, therefore we want the return code to be 1,
     # indicating that there was no match.
-    BuiltIn().should_be_equal_as_integers(rc, 1)
+
+    for attempt in range(1, retries + 2):
+        stdout, rc = get_log_output_with_pattern(cursor, pattern, unit)
+        if rc == 1 or attempt > retries:
+            BuiltIn().should_be_equal_as_integers(rc, 1)
+            return
+        BuiltIn().log(f"Attempt {attempt}/{retries} failed. Retrying in {wait}s...")
+        time.sleep(wait)
 
 
-def pattern_should_appear_in_log_output(cursor, pattern, unit="microshift"):
-    """Get the logs since the cursor and verify that the pattern does not appear."""
-    stdout, rc = get_log_output_with_pattern(cursor, pattern, unit)
+def pattern_should_appear_in_log_output(cursor, pattern, unit="microshift", retries=30, wait=10):
+    """Get the logs since the cursor and verify that the pattern does appear."""
     # The grep argument causes journalctl to exit with an error if the
     # pattern is not found, therefore we want the return code to be 0,
     # indicating that there was a match.
-    BuiltIn().should_be_equal_as_integers(rc, 0)
+
+    for attempt in range(1, retries + 2):
+        stdout, rc = get_log_output_with_pattern(cursor, pattern, unit)
+        if rc == 0 or attempt > retries:
+            BuiltIn().should_be_equal_as_integers(rc, 0)
+            return
+        BuiltIn().log(f"Attempt {attempt}/{retries} failed. Retrying in {wait}s...")
+        time.sleep(wait)
