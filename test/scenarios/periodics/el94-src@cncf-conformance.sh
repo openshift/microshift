@@ -67,10 +67,11 @@ run_sonobuoy() {
     fi
 
     # Initiate test startup
-    go install github.com/vmware-tanzu/sonobuoy@v0.57.2
+    go install github.com/vmware-tanzu/sonobuoy@v0.57.3
     ~/go/bin/sonobuoy run \
         --mode=certified-conformance \
         --dns-namespace=openshift-dns \
+        --plugin-env=e2e.E2E_EXTRA_GINKGO_ARGS=-v \
         --dns-pod-labels=dns.operator.openshift.io/daemonset-dns=default || rc=$?
     if [ ${rc} -ne 0 ] ; then
         record_junit "run_sonobuoy" "start_e2e" "FAILED"
@@ -110,12 +111,20 @@ run_sonobuoy() {
             rc=1
             echo "Tests running for ${TIMEOUT_TEST}s. Timing out"
             record_junit "run_sonobuoy" "wait_e2e_finished" "FAILED"
+
+            oc get nodes -o wide
+            oc get pods -A -o wide
+            oc get svc -A -o wide
+            oc logs -n sonobuoy $(oc get pods -n sonobuoy -l sonobuoy-plugin=e2e -o=jsonpath="{.items[0].metadata.name}") > "${SCENARIO_INFO_DIR}/${SCENARIO}/e2e-pod-fail.log"
+            echo "E2E Pod log saved to ${SCENARIO_INFO_DIR}/${SCENARIO}/e2e-pod.log"
+
             break
         fi
         # Print progress information
         jq '.plugins[] | select(.plugin=="e2e") | .["result-counts"], .progress' "${stat_file}"
         sleep 60
     done
+    oc logs -n sonobuoy $(oc get pods -n sonobuoy -l sonobuoy-plugin=e2e -o=jsonpath="{.items[0].metadata.name}") > "${SCENARIO_INFO_DIR}/${SCENARIO}/e2e-pod.log"
     # If the timeout is exceeded, proceed to attempt collecting test results
     if [ ${rc} -eq 0 ] ; then
         record_junit "run_sonobuoy" "wait_e2e_finished" "OK"
