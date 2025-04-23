@@ -878,6 +878,8 @@ configure_vm_firewall() {
     # - Incoming for NodePort services
     run_command_on_vm "${vmname}" "sudo firewall-cmd --permanent --zone=public --add-port=30000-32767/tcp"
     run_command_on_vm "${vmname}" "sudo firewall-cmd --permanent --zone=public --add-port=30000-32767/udp"
+    # - Default Prometheus exporter port (for observability and telemetry RF tests)
+    run_command_on_vm "${vmname}" "sudo firewall-cmd --permanent --zone=public --add-port=8889/tcp"
 
     run_command_on_vm "${vmname}" "sudo firewall-cmd --reload"
 }
