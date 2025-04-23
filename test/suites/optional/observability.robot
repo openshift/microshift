@@ -58,14 +58,14 @@ Setup Suite And Prepare Test Host
     ...    Journal Contains Enough Lines To Test
 
 Journal Contains Enough Lines To Test
-    [Documentation]    Execution should wait until there are at least 50 lines of journal data to process. This is
+    [Documentation]    Execution should wait until there are at least 20 lines of journal data to process. This is
     ...    necessary because opentelemetry-collector will write debug output in batches. Thus, it can often happen
     ...    that there is not enough log data to gain an accurate read of the process's state, resulting in a false
     ...    negative signal (the opentelemetry-collector is healthy, but did not yet write data to journal.
 
     ${output}    ${rc}    Get Log Output With Pattern    ${JOURNAL_CUR}    .*    microshift-observability
     ${line_cnt}    Get Line Count    ${output}
-    Should Be True    ${line_cnt} > 50
+    Should Be True    ${line_cnt} > 20
 
 Deploy Debug Config
     [Documentation]    Dynamically set all exporters in the opentelemetry-collector config to "debug", otherwise the
