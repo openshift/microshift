@@ -145,7 +145,7 @@ Teardown Suite And Revert Test Host
 Set Back Original OTEL Configuration
     [Documentation]    Set Back Original OTEL Configuration
 
-    ${def_config_str}    Command Should Work    cat ${DEFAULT_CONFIG_PATH}
+    ${def_config_str}    Local Command Should Work    cat ${DEFAULT_CONFIG_PATH}
     Upload String To File    ${def_config_str}    ${OTEL_CONFIG_PATH}
     Systemctl    restart    microshift-observability
 
