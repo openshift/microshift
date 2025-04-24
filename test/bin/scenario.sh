@@ -33,6 +33,7 @@ VNC_CONSOLE=${VNC_CONSOLE:-false}  # may be overridden in global settings file
 TEST_RANDOMIZATION="all"  # may be overridden in scenario file
 TEST_EXECUTION_TIMEOUT="30m" # may be overriden in scenario file
 SUBSCRIPTION_MANAGER_PLUGIN="${SUBSCRIPTION_MANAGER_PLUGIN:-${SCRIPTDIR}/subscription_manager_register.sh}"  # may be overridden in global settings file
+RUN_HOST_OVERRIDE=""  # target any given VM for running scenarios
 
 declare -i TESTCASES=0
 declare -i FAILURES=0
@@ -398,21 +399,25 @@ function get_vm_ip {
     local -r vmname="${1}"
     local -r start=$(date +%s)
     local ip
-    ip=$("${ROOTDIR}/scripts/devenv-builder/manage-vm.sh" ip -n "${vmname}" | head -1)
-    while true; do
-        now=$(date +%s)
-        if [ $(( now - start )) -ge ${VM_BOOT_TIMEOUT} ]; then
-            echo "Timed out while waiting for IP retrieval"
-            exit 1
-        fi
-        sleep 1
-        # Try pinging the IP address to avoid stale DHCP leases that would falsely
-        # return as the current IP for the VM.
-        ip=$("${ROOTDIR}/scripts/devenv-builder/manage-vm.sh" ip -n "${vmname}" | head -1)
-        if ping -c 1 -W 1 "${ip}" &> /dev/null; then
-          break
-        fi
-    done
+    if [[ "${vmname}" =~ ([0-9]{1,3}\.){3}[0-9]{1,3} ]]; then
+            ip="${BASH_REMATCH[0]}"
+    else
+       ip=$("${ROOTDIR}/scripts/devenv-builder/manage-vm.sh" ip -n "${vmname}" | head -1)
+       while true; do
+           now=$(date +%s)
+           if [ $(( now - start )) -ge ${VM_BOOT_TIMEOUT} ]; then
+               echo "Timed out while waiting for IP retrieval"
+               exit 1
+           fi
+           sleep 1
+           # Try pinging the IP address to avoid stale DHCP leases that would falsely
+           # return as the current IP for the VM.
+           ip=$("${ROOTDIR}/scripts/devenv-builder/manage-vm.sh" ip -n "${vmname}" | head -1)
+           if ping -c 1 -W 1 "${ip}" &> /dev/null; then
+             break
+           fi
+       done
+    fi
     echo "${ip}"
 }
 
@@ -933,8 +938,19 @@ stress_testing() {
 
 # Run the tests for the current scenario
 run_tests() {
-    local -r vmname="${1}"
-    local -r full_vmname="$(full_vm_name "${vmname}")"
+    local vmname="${1}"
+    local full_vmname
+    full_vmname="$(full_vm_name "${vmname}")"
+    if [[ -n "${RUN_HOST_OVERRIDE}" ]]; then
+	vmname="${RUN_HOST_OVERRIDE}"
+	full_vmname="$(full_vm_name "${vmname}")"
+        ip=$(get_vm_ip "${full_vmname}")
+	set_vm_property "${vmname}" "ip" "${ip}"
+        set_vm_property "${vmname}" "ssh_port" "22"
+        set_vm_property "${vmname}" "api_port" "6443"
+        set_vm_property "${vmname}" "lb_port" "5678"
+    fi
+
     shift
 
     echo "Running tests with $# args" "$@"
@@ -994,7 +1010,7 @@ VM_IP: ${vm_ip}
 API_PORT: ${api_port}
 LB_PORT: ${lb_port}
 USHIFT_HOST: ${vm_ip}
-USHIFT_USER: redhat
+USHIFT_USER: "${USHIFT_USER:-redhat}"
 SSH_PRIV_KEY: "${SSH_PRIVATE_KEY:-}"
 SSH_PORT: ${ssh_port}
 EOF
@@ -1187,7 +1203,12 @@ action_run() {
         sos_report true || rc=1 ; \
         close_junit ; exit "${rc}"' EXIT
 
-    check_dependencies
+    if [ $# -eq 0 ]; then
+        RUN_HOST_OVERRIDE=""
+	check_dependencies
+    else
+        RUN_HOST_OVERRIDE="$1"
+    fi
 
     scenario_run_tests
     record_junit "run" "scenario_run_tests" "OK"
@@ -1216,6 +1237,9 @@ Settings
 Login
 
   scenario.sh login <scenario-script> [<host>]
+Run
+
+  scenario.sh run <scenario-script> [<host | ip>]
 EOF
 }
 
