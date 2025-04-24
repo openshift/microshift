@@ -51,7 +51,7 @@ processors:
 exporters:
   debug: # exports metrics only in journalctl log
   prometheus:
-    endpoint: "0.0.0.0:{{PROM_EXPORTER_PORT}}"
+    endpoint: "{{NODE_IP}}:{{PROM_EXPORTER_PORT}}"
     send_timestamps: true
     metric_expiration: 30m
   prometheusremotewrite:
