@@ -377,6 +377,7 @@ func (c *Controller) sync(key queueKey) error {
 
 	ingress, err := c.ingressLister.Ingresses(key.namespace).Get(key.name)
 	if kerrors.IsNotFound(err) {
+		c.ResetIngressMetrics(key.namespace, key.name)
 		return nil
 	}
 	if err != nil {

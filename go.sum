@@ -525,8 +525,8 @@ github.com/openshift/library-go v0.0.0-20240528110646-354b673304be h1:a59nZ27dqy
 github.com/openshift/library-go v0.0.0-20240528110646-354b673304be/go.mod h1:PdASVamWinll2BPxiUpXajTwZxV8A1pQbWEsCN1od7I=
 github.com/openshift/onsi-ginkgo/v2 v2.6.1-0.20240314173009-2cd07f4ca53d h1:GDn4rF5hmB+d0tnFcPQhPy1YTooJH6U+HeYYdyjktmI=
 github.com/openshift/onsi-ginkgo/v2 v2.6.1-0.20240314173009-2cd07f4ca53d/go.mod h1:HlxMHtYF57y6Dpf+mc5529KKmSq9h2FpCF+/ZkwUxKM=
-github.com/openshift/route-controller-manager v0.0.0-20240604082609-a47f6be3676d h1:Uyw8Ec+s68hwmCjx8opxM6LNmhgl+mvDL6wGvxRsMMc=
-github.com/openshift/route-controller-manager v0.0.0-20240604082609-a47f6be3676d/go.mod h1:O7hb1v/ChR4wqZ4ikcP3cEq8UMceeFhbFwlj/O1PcM0=
+github.com/openshift/route-controller-manager v0.0.0-20250422024752-cd4a3dc28ce3 h1:M5j/MpJiWKo8bccT2hWUSCHBHFnqex9M/Lmy7xoz3AI=
+github.com/openshift/route-controller-manager v0.0.0-20250422024752-cd4a3dc28ce3/go.mod h1:O7hb1v/ChR4wqZ4ikcP3cEq8UMceeFhbFwlj/O1PcM0=
 github.com/pelletier/go-toml v1.2.0/go.mod h1:5z9KED0ma1S8pY6P1sdut58dfprrGBbd/94hg7ilaic=
 github.com/peterbourgon/diskv v2.0.1+incompatible h1:UBdAOUP5p4RWqPBg048CAvpKN+vxiaj6gdUUzhl4XmI=
 github.com/peterbourgon/diskv v2.0.1+incompatible/go.mod h1:uqqh8zWWbv1HBMNONnaR/tNboyR3/BZd58JJSHlUSCU=
