@@ -1,0 +1,3 @@
+- route-controller-manager embedded-component a47f6be3676d3eabb864ca339584fe857e1076c5 to cd4a3dc28ce3a7fe5a65a00df20cfcddb561bf49
+  - e85a0cb 2025-03-13T13:24:48+00:00 ingress: Reset metrics when ingress is deleted
+
