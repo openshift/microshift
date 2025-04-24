@@ -8,7 +8,7 @@ images:
     digest: sha256:3c2587c12c564c799fbe6a15411accf85827485fa344f43b68be1af63a58ad00
   - name: quay.io/openshift/origin-kube-rbac-proxy
     newName: quay.io/openshift-release-dev/ocp-v4.0-art-dev
-    digest: sha256:a53a845dd405c35336adcfbbba64684566997943b1ccbb1bd1629ae17731e13a
+    digest: sha256:372264e59072ba3ffb8e81079d29f4a1769a3adf6821ed7236eed2caf81fa199
 
 patches:
   - patch: |-
