@@ -23,7 +23,7 @@ receivers:
     cert_file: /var/lib/microshift/certs/admin-kubeconfig-signer/openshift-observability-client/client.crt
     insecure_skip_verify: true
     collection_interval: 20s
-    endpoint: "{{NODE_IP}}:10250"
+    endpoint: "[{{NODE_IP}}]:10250"
     node: "{{NODE_IP}}"
     k8s_api_config:
       auth_type: kubeConfig
@@ -51,13 +51,13 @@ processors:
 exporters:
   debug: # exports metrics only in journalctl log
   prometheus:
-    endpoint: "{{NODE_IP}}:{{PROM_EXPORTER_PORT}}"
+    endpoint: "[{{NODE_IP}}]:{{PROM_EXPORTER_PORT}}"
     send_timestamps: true
     metric_expiration: 30m
   prometheusremotewrite:
-    endpoint: "http://{{PROMETHEUS_HOST}}:{{PROMETHEUS_PORT}}/api/v1/write"
+    endpoint: "http://[{{PROMETHEUS_HOST}}]:{{PROMETHEUS_PORT}}/api/v1/write"
   loki: # only for logs, exports the logs in the loki server
-    endpoint: "http://{{LOKI_HOST}}:{{LOKI_PORT}}/loki/api/v1/push"
+    endpoint: "http://[{{LOKI_HOST}}]:{{LOKI_PORT}}/loki/api/v1/push"
 
 extensions:
   file_storage:
