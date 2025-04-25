@@ -37,7 +37,7 @@ Host Metrics Are Exported
     ...    system_cpu_time_seconds_total{cpu="cpu0",state="idle"}
 
     Check Prometheus Exporter
-    ...    ${USHIFT_HOST}
+    ...    [${USHIFT_HOST}]
     ...    ${PROM_EXPORTER_PORT}
     ...    system_cpu_time_seconds_total{cpu="cpu0",state="idle"}
 
@@ -55,7 +55,7 @@ Kube Metrics Are Exported
     ...    container_cpu_time_seconds_total
 
     Check Prometheus Exporter
-    ...    ${USHIFT_HOST}
+    ...    [${USHIFT_HOST}]
     ...    ${PROM_EXPORTER_PORT}
     ...    container_cpu_time_seconds_total
 
@@ -65,7 +65,7 @@ Kube Metrics Are Exported
     ...    k8s_pod_cpu_time_seconds_total
 
     Check Prometheus Exporter
-    ...    ${USHIFT_HOST}
+    ...    [${USHIFT_HOST}]
     ...    ${PROM_EXPORTER_PORT}
     ...    k8s_pod_cpu_time_seconds_total
 
