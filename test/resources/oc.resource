@@ -190,7 +190,7 @@ Oc Logs
     RETURN    ${output}
 
 All Pods Should Be Running
-    [Documentation]    Check if all pods are running in the current namespace
+    [Documentation]    Check if all pods are running in the given namespace
     [Arguments]    ${ns}=-A    ${timeout}=${DEFAULT_WAIT_TIMEOUT}
     IF    "${ns}"=="-A"
         Oc Wait    pods --all -A    --for="condition=Ready"    timeout=${timeout}

@@ -89,7 +89,7 @@ Delete Pod And Wait For Recovery
     [Documentation]    Delete a pod and wait for it to be recreated and ready
     [Arguments]    ${namespace}    ${pod_name}
     Run With Kubeconfig
-    ...    oc get pod -n ${namespace} | grep ${pod_name} | awk '{print $1}' | xargs oc delete pod -n ${namespace} --force --grace-period=0
+    ...    oc get pod -n ${namespace} -o=name | grep ${pod_name} | xargs oc delete -n ${namespace} --force --grace-period=0
     ...    allow_fail=${TRUE}
     Sleep    5s
     All Pods Should Be Running    ns=${namespace}
