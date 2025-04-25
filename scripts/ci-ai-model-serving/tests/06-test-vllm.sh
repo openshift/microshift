@@ -20,7 +20,7 @@ oc create ns test-vllm
 # Get the vLLM image from the release info to: 
 # 1. pre-fetch it
 # 2. update the vllm ServingRuntime CR
-VLLM_IMAGE="$(jq -r '.images | with_entries(select(.key == "vllm-image")) | .[]' /usr/share/microshift/release/release-ai-model-serving-"$(uname -i)".json)"
+VLLM_IMAGE="$(jq -r '.images | with_entries(select(.key == "vllm-cuda-image")) | .[]' /usr/share/microshift/release/release-ai-model-serving-"$(uname -i)".json)"
 
 # Pull the images before creating K8s objects to make the test more
 # deterministic (both images are several GiB in size, so they take a while to download).
