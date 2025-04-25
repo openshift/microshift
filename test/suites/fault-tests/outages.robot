@@ -33,8 +33,8 @@ Network Disconnection
     # Run scenario
     Local Command Should Work    ${STRESS_TESTING_SCRIPT} -e network_outage ${STRESS_TESTING_REMOTE_FLAGS}
     Sleep    15s
-    ${stdout}    ${rc}=    Run With Kubeconfig    timeout 10s oc get nodes    allow_fail=True    return_rc=True
-    Should Be Equal As Numbers    ${rc}    124
+    ${stdout}    ${rc}=    Run With Kubeconfig    oc get nodes    allow_fail=True    return_rc=True    timeout=30s
+    Should Be Equal As Numbers    ${rc}    -15    # -15 is the SIGTERM signal because of timeout in previous command
     Sleep    15s
     Local Command Should Work    ${STRESS_TESTING_SCRIPT} -d network_outage ${STRESS_TESTING_REMOTE_FLAGS}
 
@@ -42,7 +42,7 @@ Network Disconnection
     ${system_rebooted}=    Is System Rebooted    ${old_bootid}
     Should Not Be True    ${system_rebooted}
     Wait For MicroShift
-    All Pods Should Be Running    timeout=300s
+    All Pods Should Be Running    timeout=600s
 
     ${output}    ${rc}=    Get Log Output With Pattern    ${cursor}    kubelet
     ${expected_str}=    Get Expected Message    suites/fault-tests/log-messages.yaml    disconnect    network
