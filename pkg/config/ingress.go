@@ -136,6 +136,20 @@ type IngressConfig struct {
 	//
 	// +optional
 	ClientTLS operatorv1.ClientTLS `json:"clientTLS,omitempty"`
+
+	// httpErrorCodePages specifies a configmap with custom error pages.
+	// The administrator must create this configmap in the openshift-config namespace.
+	// This configmap should have keys in the format "error-page-<error code>.http",
+	// where <error code> is an HTTP error code.
+	// For example, "error-page-503.http" defines an error page for HTTP 503 responses.
+	// Currently only error pages for 503 and 404 responses can be customized.
+	// Each value in the configmap should be the full response, including HTTP headers.
+	// Eg- https://raw.githubusercontent.com/openshift/router/fadab45747a9b30cc3f0a4b41ad2871f95827a93/images/router/haproxy/conf/error-page-503.http
+	// If this field is empty, the ingress controller uses the default error pages.
+	HttpErrorCodePages configv1.ConfigMapNameReference `json:"httpErrorCodePages,omitempty"`
+
+	// accessLogging describes how the client requests should be logged.
+	AccessLogging AccessLogging `json:"accessLogging,omitempty"`
 }
 
 // IngressControllerTuningOptions specifies options for tuning the performance
@@ -376,4 +390,51 @@ type IngressPortsConfig struct {
 	// Default router https port. Must be in range 1-65535.
 	// +kubebuilder:default=443
 	Https *int `json:"https"`
+}
+
+type AccessLogging struct {
+	// Status of the access logging. If set to "Enabled", the router will
+	// log all requests to the access log. If set to "Disabled", the router
+	// will not log any requests to the access log.
+	//+kubebuilder:default=Disabled
+	//+kubebuilder:validation:Enum=Disabled;Enabled
+	Status string `json:"status"`
+
+	// httpLogFormat specifies the format of the log message for an HTTP
+	// request.
+	//
+	// If this field is empty, log messages use the implementation's default
+	// HTTP log format.  For HAProxy's default HTTP log format, see the
+	// HAProxy documentation:
+	// http://cbonte.github.io/haproxy-dconv/2.0/configuration.html#8.2.3
+	//
+	// Note that this format only applies to cleartext HTTP connections
+	// and to secure HTTP connections for which the ingress controller
+	// terminates encryption (that is, edge-terminated or reencrypt
+	// connections).  It does not affect the log format for TLS passthrough
+	// connections.
+	//
+	// +optional
+	HttpLogFormat string `json:"httpLogFormat,omitempty"`
+
+	// httpCaptureHeaders defines HTTP headers that should be captured in
+	// access logs.  If this field is empty, no headers are captured.
+	//
+	// Note that this option only applies to cleartext HTTP connections
+	// and to secure HTTP connections for which the ingress controller
+	// terminates encryption (that is, edge-terminated or reencrypt
+	// connections).  Headers cannot be captured for TLS passthrough
+	// connections.
+	//
+	// +optional
+	HTTPCaptureHeaders operatorv1.IngressControllerCaptureHTTPHeaders `json:"httpCaptureHeaders,omitempty"`
+
+	// httpCaptureCookies specifies HTTP cookies that should be captured in
+	// access logs.  If this field is empty, no cookies are captured.
+	//
+	// +nullable
+	// +optional
+	// +kubebuilder:validation:MaxItems=1
+	// +listType=atomic
+	HTTPCaptureCookies []operatorv1.IngressControllerCaptureHTTPCookie `json:"httpCaptureCookies,omitempty"`
 }

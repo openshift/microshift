@@ -169,6 +169,131 @@
         "tuningOptions"
       ],
       "properties": {
+        "accessLogging": {
+          "description": "accessLogging describes how the client requests should be logged.",
+          "type": "object",
+          "required": [
+            "status"
+          ],
+          "properties": {
+            "httpCaptureCookies": {
+              "description": "httpCaptureCookies specifies HTTP cookies that should be captured in\naccess logs.  If this field is empty, no cookies are captured.",
+              "type": "array",
+              "maxItems": 1,
+              "items": {
+                "description": "IngressControllerCaptureHTTPCookie describes an HTTP cookie that should be\ncaptured.",
+                "type": "object",
+                "required": [
+                  "matchType",
+                  "maxLength"
+                ],
+                "properties": {
+                  "matchType": {
+                    "description": "matchType specifies the type of match to be performed on the cookie\nname.  Allowed values are \"Exact\" for an exact string match and\n\"Prefix\" for a string prefix match.  If \"Exact\" is specified, a name\nmust be specified in the name field.  If \"Prefix\" is provided, a\nprefix must be specified in the namePrefix field.  For example,\nspecifying matchType \"Prefix\" and namePrefix \"foo\" will capture a\ncookie named \"foo\" or \"foobar\" but not one named \"bar\".  The first\nmatching cookie is captured.",
+                    "type": "string",
+                    "enum": [
+                      "Exact",
+                      "Prefix"
+                    ]
+                  },
+                  "maxLength": {
+                    "description": "maxLength specifies a maximum length of the string that will be\nlogged, which includes the cookie name, cookie value, and\none-character delimiter.  If the log entry exceeds this length, the\nvalue will be truncated in the log message.  Note that the ingress\ncontroller may impose a separate bound on the total length of HTTP\nheaders in a request.",
+                    "type": "integer",
+                    "maximum": 1024,
+                    "minimum": 1
+                  },
+                  "name": {
+                    "description": "name specifies a cookie name.  Its value must be a valid HTTP cookie\nname as defined in RFC 6265 section 4.1.",
+                    "type": "string",
+                    "maxLength": 1024,
+                    "minLength": 0,
+                    "pattern": "^[-!#$%\u0026'*+.0-9A-Z^_`a-z|~]*$"
+                  },
+                  "namePrefix": {
+                    "description": "namePrefix specifies a cookie name prefix.  Its value must be a valid\nHTTP cookie name as defined in RFC 6265 section 4.1.",
+                    "type": "string",
+                    "maxLength": 1024,
+                    "minLength": 0,
+                    "pattern": "^[-!#$%\u0026'*+.0-9A-Z^_`a-z|~]*$"
+                  }
+                }
+              },
+              "nullable": true,
+              "x-kubernetes-list-type": "atomic"
+            },
+            "httpCaptureHeaders": {
+              "description": "httpCaptureHeaders defines HTTP headers that should be captured in\naccess logs.  If this field is empty, no headers are captured.\n\nNote that this option only applies to cleartext HTTP connections\nand to secure HTTP connections for which the ingress controller\nterminates encryption (that is, edge-terminated or reencrypt\nconnections).  Headers cannot be captured for TLS passthrough\nconnections.",
+              "type": "object",
+              "properties": {
+                "request": {
+                  "description": "request specifies which HTTP request headers to capture.\n\nIf this field is empty, no request headers are captured.",
+                  "type": "array",
+                  "items": {
+                    "description": "IngressControllerCaptureHTTPHeader describes an HTTP header that should be\ncaptured.",
+                    "type": "object",
+                    "required": [
+                      "maxLength",
+                      "name"
+                    ],
+                    "properties": {
+                      "maxLength": {
+                        "description": "maxLength specifies a maximum length for the header value.  If a\nheader value exceeds this length, the value will be truncated in the\nlog message.  Note that the ingress controller may impose a separate\nbound on the total length of HTTP headers in a request.",
+                        "type": "integer",
+                        "minimum": 1
+                      },
+                      "name": {
+                        "description": "name specifies a header name.  Its value must be a valid HTTP header\nname as defined in RFC 2616 section 4.2.",
+                        "type": "string",
+                        "pattern": "^[-!#$%\u0026'*+.0-9A-Z^_`a-z|~]+$"
+                      }
+                    }
+                  },
+                  "nullable": true,
+                  "x-kubernetes-list-type": "atomic"
+                },
+                "response": {
+                  "description": "response specifies which HTTP response headers to capture.\n\nIf this field is empty, no response headers are captured.",
+                  "type": "array",
+                  "items": {
+                    "description": "IngressControllerCaptureHTTPHeader describes an HTTP header that should be\ncaptured.",
+                    "type": "object",
+                    "required": [
+                      "maxLength",
+                      "name"
+                    ],
+                    "properties": {
+                      "maxLength": {
+                        "description": "maxLength specifies a maximum length for the header value.  If a\nheader value exceeds this length, the value will be truncated in the\nlog message.  Note that the ingress controller may impose a separate\nbound on the total length of HTTP headers in a request.",
+                        "type": "integer",
+                        "minimum": 1
+                      },
+                      "name": {
+                        "description": "name specifies a header name.  Its value must be a valid HTTP header\nname as defined in RFC 2616 section 4.2.",
+                        "type": "string",
+                        "pattern": "^[-!#$%\u0026'*+.0-9A-Z^_`a-z|~]+$"
+                      }
+                    }
+                  },
+                  "nullable": true,
+                  "x-kubernetes-list-type": "atomic"
+                }
+              }
+            },
+            "httpLogFormat": {
+              "description": "httpLogFormat specifies the format of the log message for an HTTP\nrequest.\n\nIf this field is empty, log messages use the implementation's default\nHTTP log format.  For HAProxy's default HTTP log format, see the\nHAProxy documentation:\nhttp://cbonte.github.io/haproxy-dconv/2.0/configuration.html#8.2.3\n\nNote that this format only applies to cleartext HTTP connections\nand to secure HTTP connections for which the ingress controller\nterminates encryption (that is, edge-terminated or reencrypt\nconnections).  It does not affect the log format for TLS passthrough\nconnections.",
+              "type": "string"
+            },
+            "status": {
+              "description": "Status of the access logging. If set to \"Enabled\", the router will\nlog all requests to the access log. If set to \"Disabled\", the router\nwill not log any requests to the access log.",
+              "type": "string",
+              "default": "Disabled",
+              "enum": [
+                "Disabled",
+                "Enabled"
+              ]
+            }
+          }
+        },
         "certificateSecret": {
           "description": "ServingCertificateSecret references a kubernetes.io/tls type secret containing the TLS cert info for serving secure traffic.\nThe secret must exist in the openshift-ingress namespace and contain the following required fields:\n- Secret.Data[\"tls.key\"] - TLS private key.\n- Secret.Data[\"tls.crt\"] - TLS certificate.",
           "type": "string",
@@ -254,6 +379,19 @@
             "Respond",
             "Ignore"
           ]
+        },
+        "httpErrorCodePages": {
+          "description": "httpErrorCodePages specifies a configmap with custom error pages.\nThe administrator must create this configmap in the openshift-config namespace.\nThis configmap should have keys in the format \"error-page-\u003cerror code\u003e.http\",\nwhere \u003cerror code\u003e is an HTTP error code.\nFor example, \"error-page-503.http\" defines an error page for HTTP 503 responses.\nCurrently only error pages for 503 and 404 responses can be customized.\nEach value in the configmap should be the full response, including HTTP headers.\nEg- https://raw.githubusercontent.com/openshift/router/fadab45747a9b30cc3f0a4b41ad2871f95827a93/images/router/haproxy/conf/error-page-503.http\nIf this field is empty, the ingress controller uses the default error pages.",
+          "type": "object",
+          "required": [
+            "name"
+          ],
+          "properties": {
+            "name": {
+              "description": "name is the metadata.name of the referenced config map",
+              "type": "string"
+            }
+          }
         },
         "listenAddress": {
           "description": "List of IP addresses and NIC names where the router will be listening. The NIC\nnames get translated to all their configured IPs dynamically. Defaults to the\nconfigured IPs in the host at MicroShift start.",
