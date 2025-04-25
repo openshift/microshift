@@ -11,6 +11,13 @@ scenario_create_vms() {
     prepare_kickstart host1 kickstart.ks.template rhel-9.4-microshift-source-optionals
     # Two nics - one for macvlan, another for ipvlan (they cannot enslave the same interface)
     launch_vm  --network "${VM_MULTUS_NETWORK},${VM_MULTUS_NETWORK}"
+
+    # Open the firewall ports. Other scenarios get this behavior by
+    # embedding settings in the blueprint, but there is no blueprint
+    # for this scenario. We need do this step before running the RF
+    # suite so that suite can assume it can reach all of the same
+    # ports as for any other test.
+    configure_vm_firewall host1
 }
 
 scenario_remove_vms() {
@@ -18,5 +25,13 @@ scenario_remove_vms() {
 }
 
 scenario_run_tests() {
-    run_tests host1 suites/optional/
+        run_tests host1 \
+        --variable "PROXY_HOST:${VM_BRIDGE_IP}" \
+        --variable "PROXY_PORT:9001" \
+        --variable "PROMETHEUS_HOST:$(hostname)" \
+        --variable "PROMETHEUS_PORT:9092" \
+        --variable "LOKI_HOST:$(hostname)" \
+        --variable "LOKI_PORT:3100" \
+        --variable "PROM_EXPORTER_PORT:8889" \
+        suites/optional/
 }
