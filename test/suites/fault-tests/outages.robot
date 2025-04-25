@@ -50,16 +50,16 @@ Network Disconnection
 
 Delete A Pod
     [Documentation]    Test to delete pods and verify they are recreated properly
-    [Template]    Delete in ${NAMESPACE} ${POD_NAME} pod
-    kube-system    csi-snapshot-controller
-    openshift-dns    dns-default
-    openshift-dns    node-resolver
-    openshift-ingress    router-default
-    openshift-ovn-kubernetes    ovnkube-master
-    openshift-ovn-kubernetes    ovnkube-node
-    openshift-service-ca    service-ca
-    openshift-storage    lvms-operator
-    openshift-storage    vg-manager
+    [Template]    Delete Pod ${POD_NAME} In ${NAMESPACE}
+    csi-snapshot-controller    kube-system
+    dns-default    openshift-dns
+    node-resolver    openshift-dns
+    router-default    openshift-ingress
+    ovnkube-master    openshift-ovn-kubernetes
+    ovnkube-node    openshift-ovn-kubernetes
+    service-ca    openshift-service-ca
+    lvms-operator    openshift-storage
+    vg-manager    openshift-storage
 
 
 *** Keywords ***
@@ -74,7 +74,7 @@ Teardown
     Remove Kubeconfig
     Logout MicroShift Host
 
-Delete In ${namespace} ${pod_name} Pod
+Delete Pod ${pod_name} In ${namespace}
     [Documentation]    Delete a pod in the specified namespace and verify the expected log messages
     ${cursor}=    Get Journal Cursor
     Delete Pod And Wait For Recovery    ${namespace}    ${pod_name}
