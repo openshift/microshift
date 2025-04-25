@@ -1,5 +1,6 @@
 import sys
 import requests
+import libipv6
 
 
 def check_prometheus_query(host: str, port: int, query: str) -> None:
@@ -22,7 +23,8 @@ def check_prometheus_query(host: str, port: int, query: str) -> None:
 def check_prometheus_exporter(host: str, port: int, query: str) -> None:
     """Check the metric is available int Prometheus Exporter
     Fails if the response is empty."""
-    base_url = f"http://{host}:{port}/metrics"
+    address = libipv6.add_brackets_if_ipv6(host)
+    base_url = f"http://{address}:{port}/metrics"
     _log(f"Querying Prometheus Exporter: {base_url}")
     response = requests.get(base_url)
     _log(f"Response: {response.status_code} {response.text}")
