@@ -81,8 +81,7 @@ Delete Pod ${pod_name} In ${namespace}
 
     ${actual_str}    ${rc}=    Get Log Output With Pattern    ${cursor}    kubelet.go.*${namespace}
     ${expected_str}=    Get Expected Message    suites/fault-tests/log-messages.yaml    delete    pod
-    ${expected_str}=    Replace String    ${expected_str}    {{namespace}}    ${namespace}
-    ${expected_str}=    Replace String    ${expected_str}    {{pod_name}}    ${pod_name}
+    ${expected_str}=    Replace Variables    ${expected_str}
     Compare Output Logs    ${actual_str}    ${expected_str}
 
 Delete Pod And Wait For Recovery

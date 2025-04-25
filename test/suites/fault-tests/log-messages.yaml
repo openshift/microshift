@@ -1,9 +1,9 @@
 delete: 
     pod: |
-        .*microshift.* kubelet I.* kubelet\.go:\d+\] "SyncLoop DELETE" source="api" pods=\["{{namespace}}\/{{pod_name}}.*"\]
-        .*microshift.* kubelet I.* kubelet\.go:\d+\] "SyncLoop REMOVE" source="api" pods=\["{{namespace}}\/{{pod_name}}.*"\]
-        .*microshift.* kubelet I.* kubelet\.go:\d+\] "SyncLoop ADD" source="api" pods=\["{{namespace}}\/{{pod_name}}.*"\]
-        .*microshift.* kubelet I.* kubelet\.go:\d+\] "SyncLoop \(PLEG\): event for pod" pod="{{namespace}}\/{{pod_name}}.*" event=\{"ID":".*","Type":"ContainerStarted","Data":".*"\}
+        .*microshift.* kubelet I.* kubelet\\.go:\\d+\\] "SyncLoop DELETE" source="api" pods=\\["${namespace}\\/${pod_name}.*"\\]
+        .*microshift.* kubelet I.* kubelet\\.go:\\d+\\] "SyncLoop REMOVE" source="api" pods=\\["${namespace}\\/${pod_name}.*"\\]
+        .*microshift.* kubelet I.* kubelet\\.go:\\d+\\] "SyncLoop ADD" source="api" pods=\\["${namespace}\\/${pod_name}.*"\\]
+        .*microshift.* kubelet I.* kubelet\\.go:\\d+\\] "SyncLoop \\(PLEG\\): event for pod" pod="${namespace}\\/${pod_name}.*" event=\\{"ID":".*","Type":"ContainerStarted","Data":".*"\\}
 disconnect:
     network: |
         .*microshift.* kubelet I.* kubelet\.go:\d+\] "SyncLoop \(probe\)" probe="(readiness|liveness)" status="(startup|unhealthy|not ready|ready|unhealthy|started)" pod="openshift-.*"
