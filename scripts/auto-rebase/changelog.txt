@@ -1,3 +1,0 @@
-- operator-framework-olm embedded-component 48d68f52674ad5afb2d40d032abb0892a5dafee6 to 174007cb5b9da4307de88a6cd569ffae40cda646
-  - 48b3d53d 2025-03-20T13:08:16+00:00 Ensure that PSA label is latest instead of pinning versions
-
