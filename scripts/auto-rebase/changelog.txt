@@ -1,6 +1,0 @@
-- ovn-kubernetes image-amd64 1ba21a20c877b452d0b0c091644eb34ff60352fe to 29480264f322f96070fea4961c9a6438b5e1a513
-  - a34762a 2025-04-22T11:55:58+02:00 Bump OVN to 23.09.6-12 to consume fix for FDP-905
-
-- ovn-kubernetes image-arm64 1ba21a20c877b452d0b0c091644eb34ff60352fe to 29480264f322f96070fea4961c9a6438b5e1a513
-  - a34762a 2025-04-22T11:55:58+02:00 Bump OVN to 23.09.6-12 to consume fix for FDP-905
-
