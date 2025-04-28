@@ -137,16 +137,16 @@ Change Hostname
 
 Command Should Work
     [Documentation]    Run a command remotely, log stderr, fail if RC is not 0, return stdout
-    [Arguments]    ${command}    ${sudo_mode}=True    ${expected_rc}=0
+    [Arguments]    ${command}    ${sudo_mode}=True
     ${stdout}    ${stderr}    ${rc}=    Command Execution    ${command}    ${sudo_mode}
-    Should Be Equal As Numbers    ${rc}    ${expected_rc}
+    Should Be Equal As Integers    ${rc}    0
     RETURN    ${stdout}
 
 Command Should Fail
-    [Documentation]    Run a command remotely, expect command to fail
-    [Arguments]    ${command}    ${sudo_mode}=True    ${expected_rc}=1
+    [Documentation]    Run a command remotely, log stderr, fail if RC is 0, return stdout
+    [Arguments]    ${command}    ${sudo_mode}=True
     ${stdout}    ${stderr}    ${rc}=    Command Execution    ${command}    ${sudo_mode}
-    Should Be Equal As Numbers    ${rc}    ${expected_rc}
+    Should Not Be Equal As Integers    ${rc}    0
     RETURN    ${stderr}
 
 Command Execution
