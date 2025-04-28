@@ -4,6 +4,7 @@ Documentation       Fault Test For MicroShift
 Library             OperatingSystem
 Library             Process
 Library             Collections
+Library             yaml
 Library             ../../resources/journalctl.py
 Resource            ../../resources/fault-tests.resource
 Resource            ../../resources/oc.resource

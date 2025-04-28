@@ -3,7 +3,6 @@ Documentation       Keywords common to many test suites
 
 Library             OperatingSystem
 Library             String
-Library             yaml
 Library             SSHLibrary
 Resource            ../resources/kubeconfig.resource
 
