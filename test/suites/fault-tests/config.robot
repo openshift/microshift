@@ -1,7 +1,7 @@
 *** Settings ***
 Documentation       Test suite for MicroShift configuration error scenarios
 
-Resource            ../../resources/common.resource
+Resource            ../../resources/fault-tests.resource
 Resource            ../../resources/microshift-host.resource
 Resource            ../../resources/microshift-config.resource
 Resource            ../../resources/microshift-process.resource

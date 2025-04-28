@@ -6,7 +6,7 @@ Library             Process
 Library             Collections
 Library             yaml
 Library             ../../resources/journalctl.py
-Resource            ../../resources/common.resource
+Resource            ../../resources/fault-tests.resource
 Resource            ../../resources/oc.resource
 Resource            ../../resources/microshift-process.resource
 
