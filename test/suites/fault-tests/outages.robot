@@ -45,8 +45,8 @@ Network Disconnection
     All Pods Should Be Running    timeout=600s
 
     ${output}    ${rc}=    Get Log Output With Pattern    ${cursor}    kubelet
-    ${expected_str}=    Get Expected Message    suites/fault-tests/log-messages.yaml    disconnect    network
-    Compare Output Logs    ${output}    ${expected_str}
+    @{expected_lines}=    Get Expected Messages    suites/fault-tests/log-messages.yaml    disconnect    network
+    Compare Output Logs    ${output}    @{expected_lines}
 
 Delete A Pod
     [Documentation]    Test to delete pods and verify they are recreated properly
@@ -80,9 +80,13 @@ Delete Pod ${pod_name} In ${namespace}
     Delete Pod And Wait For Recovery    ${namespace}    ${pod_name}
 
     ${actual_str}    ${rc}=    Get Log Output With Pattern    ${cursor}    kubelet.go.*${namespace}
-    ${expected_str}=    Get Expected Message    suites/fault-tests/log-messages.yaml    delete    pod
-    ${expected_str}=    Replace Variables    ${expected_str}
-    Compare Output Logs    ${actual_str}    ${expected_str}
+    @{expected_lines}=    Get Expected Messages    suites/fault-tests/log-messages.yaml    delete    pod
+    ${expected_lines_replaced}=    Create List
+    FOR    ${line}    IN    @{expected_lines}
+        ${line_with_vars}=    Replace Variables    ${line}
+        Append To List    ${expected_lines_replaced}    ${line_with_vars}
+    END
+    Compare Output Logs    ${actual_str}    @{expected_lines_replaced}
 
 Delete Pod And Wait For Recovery
     [Documentation]    Delete a pod and wait for it to be recreated and ready
