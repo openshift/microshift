@@ -1,3 +1,6 @@
-- route-controller-manager embedded-component a47f6be3676d3eabb864ca339584fe857e1076c5 to cd4a3dc28ce3a7fe5a65a00df20cfcddb561bf49
-  - e85a0cb 2025-03-13T13:24:48+00:00 ingress: Reset metrics when ingress is deleted
+- cluster-network-operator embedded-component cf90595d759b3cf9511de22f190368f46585ef3e to 5f2fe68003e8f17304d7000f8672a0f6ff2eaf8b
+  - 8ea0522 2025-04-15T17:00:37+00:00 OCPBUGS-53180: Add IPv6 NGINX configuration
+
+- machine-config-operator embedded-component 95ff6412be3b5cf798e2729657302c77fb24b564 to 8c86422ffddcad9d55ad07342cfffa35eb59dacc
+  - 32f18865 2025-01-10T15:36:22+00:00 OPNET-569: Do not run resolv-prepender from NM dispatcher
 
