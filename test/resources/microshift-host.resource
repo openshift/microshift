@@ -158,8 +158,6 @@ Command Execution
     ...    return_rc=True
     ...    return_stderr=True
     ...    return_stdout=True
-    Log    ${stdout}
-    Log    ${stderr}
     RETURN    ${stdout}    ${stderr}    ${rc}
 
 Get System Architecture
