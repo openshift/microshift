@@ -26,8 +26,6 @@ scenario_remove_vms() {
 
 scenario_run_tests() {
         run_tests host1 \
-        --variable "PROXY_HOST:${VM_BRIDGE_IP}" \
-        --variable "PROXY_PORT:9001" \
         --variable "PROMETHEUS_HOST:$(hostname)" \
         --variable "PROMETHEUS_PORT:9092" \
         --variable "LOKI_HOST:$(hostname)" \
