@@ -111,11 +111,23 @@ Setup Suite And Prepare Test Host
     [Documentation]    The service starts after MicroShift starts and thus will start generating pertinent log data
     ...    right away. When the suite is executed, immediately get the cursor for the microshift-observability unit.
     Setup Suite
+    Check Required Observability Variables
     Set Test OTEL Configuration
     ${cur}    Get Journal Cursor    unit=microshift-observability
     Set Suite Variable    ${JOURNAL_CUR}    ${cur}
     Wait Until Keyword Succeeds    5 min    10 sec
     ...    Journal Contains Enough Lines To Test
+
+Check Required Observability Variables
+    [Documentation]    Check if the required proxy variables are set
+    Should Not Be Empty    ${PROMETHEUS_HOST}    PROMETHEUS_HOST variable is required
+    ${string_value}=    Convert To String    ${PROMETHEUS_PORT}
+    Should Not Be Empty    ${string_value}    PROMETHEUS_PORT variable is required
+    Should Not Be Empty    ${LOKI_HOST}    LOKI_HOST variable is required
+    ${string_value}=    Convert To String    ${LOKI_PORT}
+    Should Not Be Empty    ${string_value}    LOKI_PORT variable is required
+    ${string_value}=    Convert To String    ${PROM_EXPORTER_PORT}
+    Should Not Be Empty    ${string_value}    PROM_EXPORTER_PORT variable is required
 
 Journal Contains Enough Lines To Test
     [Documentation]    Execution should wait until there are at least 50 lines of journal data to process. This is
