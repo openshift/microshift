@@ -32,7 +32,7 @@ HOME_DIR = common.get_env_var("HOME")
 PULL_SECRET = common.get_env_var('PULL_SECRET', f"{HOME_DIR}/.pull-secret.json")
 # Switch to quay.io/centos-bootc/bootc-image-builder:latest if any new upstream
 # features are required
-BIB_IMAGE = "registry.stage.redhat.io/rhel9-eus/rhel-9.6-bootc-image-builder:9.6"
+BIB_IMAGE = "registry.redhat.io/rhel9/bootc-image-builder:latest"
 GOMPLATE = common.get_env_var('GOMPLATE')
 MIRROR_REGISTRY = common.get_env_var('MIRROR_REGISTRY_URL')
 FORCE_REBUILD = False
@@ -388,6 +388,7 @@ def process_image_bootc(groupdir, bootcfile, dry_run):
             build_args += [
                 BIB_IMAGE,
                 "--type", "anaconda-iso",
+                "--local",
                 bf_imgref
             ]
             start = time.time()

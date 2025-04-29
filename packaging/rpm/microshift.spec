@@ -521,49 +521,46 @@ install -p -m644 assets/optional/gateway-api/release-gateway-api-{x86_64,aarch64
 # ai-model-serving
 # Currently only x86_64 is supported. Following `ifarch` prevents building aarch64 RPM by not specifying the files for the aarch64 architecture.
 %ifarch x86_64
-install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/001-microshift-ai-model-serving
-install -p -m644  ./assets/optional/ai-model-serving/*.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/001-microshift-ai-model-serving/
+install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/010-microshift-ai-model-serving-kserve
+install -p -m644  ./assets/optional/ai-model-serving/kserve/*.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/010-microshift-ai-model-serving-kserve
 
-install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/001-microshift-ai-model-serving/kserve
-install -p -m644  ./assets/optional/ai-model-serving/kserve/*.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/001-microshift-ai-model-serving/kserve
+install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/010-microshift-ai-model-serving-kserve/configmap/
+install -p -m644  ./assets/optional/ai-model-serving/kserve/configmap/* %{buildroot}/%{_prefix}/lib/microshift/manifests.d/010-microshift-ai-model-serving-kserve/configmap/
 
-install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/001-microshift-ai-model-serving/kserve/configmap/
-install -p -m644  ./assets/optional/ai-model-serving/kserve/configmap/* %{buildroot}/%{_prefix}/lib/microshift/manifests.d/001-microshift-ai-model-serving/kserve/configmap/
+install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/010-microshift-ai-model-serving-kserve/crd/
+install -p -m644  ./assets/optional/ai-model-serving/kserve/crd/*.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/010-microshift-ai-model-serving-kserve/crd/
 
-install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/001-microshift-ai-model-serving/kserve/crd/
-install -p -m644  ./assets/optional/ai-model-serving/kserve/crd/*.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/001-microshift-ai-model-serving/kserve/crd/
+install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/010-microshift-ai-model-serving-kserve/crd/full/
+install -p -m644  ./assets/optional/ai-model-serving/kserve/crd/full/*.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/010-microshift-ai-model-serving-kserve/crd/full/
 
-install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/001-microshift-ai-model-serving/kserve/crd/full/
-install -p -m644  ./assets/optional/ai-model-serving/kserve/crd/full/*.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/001-microshift-ai-model-serving/kserve/crd/full/
+install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/010-microshift-ai-model-serving-kserve/crd/patches/
+install -p -m644  ./assets/optional/ai-model-serving/kserve/crd/patches/*.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/010-microshift-ai-model-serving-kserve/crd/patches/
 
-install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/001-microshift-ai-model-serving/kserve/crd/patches/
-install -p -m644  ./assets/optional/ai-model-serving/kserve/crd/patches/*.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/001-microshift-ai-model-serving/kserve/crd/patches/
+install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/010-microshift-ai-model-serving-kserve/default/
+install -p -m644  ./assets/optional/ai-model-serving/kserve/default/*.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/010-microshift-ai-model-serving-kserve/default/
 
-install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/001-microshift-ai-model-serving/kserve/default/
-install -p -m644  ./assets/optional/ai-model-serving/kserve/default/*.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/001-microshift-ai-model-serving/kserve/default/
+install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/010-microshift-ai-model-serving-kserve/manager/
+install -p -m644  ./assets/optional/ai-model-serving/kserve/manager/*.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/010-microshift-ai-model-serving-kserve/manager/
 
-install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/001-microshift-ai-model-serving/kserve/manager/
-install -p -m644  ./assets/optional/ai-model-serving/kserve/manager/*.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/001-microshift-ai-model-serving/kserve/manager/
+install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/010-microshift-ai-model-serving-kserve/overlays/odh/
+install -p -m644  ./assets/optional/ai-model-serving/kserve/overlays/odh/* %{buildroot}/%{_prefix}/lib/microshift/manifests.d/010-microshift-ai-model-serving-kserve/overlays/odh/
 
-install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/001-microshift-ai-model-serving/kserve/overlays/odh/
-install -p -m644  ./assets/optional/ai-model-serving/kserve/overlays/odh/* %{buildroot}/%{_prefix}/lib/microshift/manifests.d/001-microshift-ai-model-serving/kserve/overlays/odh/
+install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/010-microshift-ai-model-serving-kserve/rbac/
+install -p -m644  ./assets/optional/ai-model-serving/kserve/rbac/*.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/010-microshift-ai-model-serving-kserve/rbac/
 
-install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/001-microshift-ai-model-serving/kserve/rbac/
-install -p -m644  ./assets/optional/ai-model-serving/kserve/rbac/*.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/001-microshift-ai-model-serving/kserve/rbac/
+install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/010-microshift-ai-model-serving-kserve/rbac/localmodel/
+install -p -m644  ./assets/optional/ai-model-serving/kserve/rbac/localmodel/*.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/010-microshift-ai-model-serving-kserve/rbac/localmodel/
 
-install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/001-microshift-ai-model-serving/kserve/rbac/localmodel/
-install -p -m644  ./assets/optional/ai-model-serving/kserve/rbac/localmodel/*.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/001-microshift-ai-model-serving/kserve/rbac/localmodel/
+install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/010-microshift-ai-model-serving-kserve/webhook/
+install -p -m644  ./assets/optional/ai-model-serving/kserve/webhook/*.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/010-microshift-ai-model-serving-kserve/webhook/
 
-install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/001-microshift-ai-model-serving/kserve/webhook/
-install -p -m644  ./assets/optional/ai-model-serving/kserve/webhook/*.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/001-microshift-ai-model-serving/kserve/webhook/
-
-install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/001-microshift-ai-model-serving/runtimes
-install -p -m644 assets/optional/ai-model-serving/runtimes/*.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/001-microshift-ai-model-serving/runtimes
-rm -v %{buildroot}/%{_prefix}/lib/microshift/manifests.d/001-microshift-ai-model-serving/runtimes/kustomization.x86_64.yaml
+install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/050-microshift-ai-model-serving-runtimes
+install -p -m644 assets/optional/ai-model-serving/runtimes/*.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/050-microshift-ai-model-serving-runtimes
+rm -v %{buildroot}/%{_prefix}/lib/microshift/manifests.d/050-microshift-ai-model-serving-runtimes/kustomization.x86_64.yaml
 
 install -p -m755 packaging/greenboot/microshift-running-check-ai-model-serving.sh %{buildroot}%{_sysconfdir}/greenboot/check/required.d/41_microshift_running_check_ai_model_serving.sh
 
-cat assets/optional/ai-model-serving/runtimes/kustomization.x86_64.yaml >> %{buildroot}/%{_prefix}/lib/microshift/manifests.d/001-microshift-ai-model-serving/runtimes/kustomization.yaml
+cat assets/optional/ai-model-serving/runtimes/kustomization.x86_64.yaml >> %{buildroot}/%{_prefix}/lib/microshift/manifests.d/050-microshift-ai-model-serving-runtimes/kustomization.yaml
 %endif
 
 # ai-model-serving-release-info
@@ -755,8 +752,10 @@ fi
 # Currently only x86_64 is supported. Following `ifarch` prevents building aarch64 RPM by not specifying the files for the aarch64 architecture.
 %ifarch x86_64
 %files ai-model-serving
-%dir %{_prefix}/lib/microshift/manifests.d/001-microshift-ai-model-serving
-%{_prefix}/lib/microshift/manifests.d/001-microshift-ai-model-serving/*
+%dir %{_prefix}/lib/microshift/manifests.d/010-microshift-ai-model-serving-kserve
+%dir %{_prefix}/lib/microshift/manifests.d/050-microshift-ai-model-serving-runtimes
+%{_prefix}/lib/microshift/manifests.d/010-microshift-ai-model-serving-kserve/*
+%{_prefix}/lib/microshift/manifests.d/050-microshift-ai-model-serving-runtimes/*
 %{_sysconfdir}/greenboot/check/required.d/41_microshift_running_check_ai_model_serving.sh
 %endif
 
@@ -774,14 +773,17 @@ fi
 # Use Git command to generate the log and replace the VERSION string
 # LANG=C git log --date="format:%a %b %d %Y" --pretty="tformat:* %cd %an <%ae> VERSION%n- %s%n" packaging/rpm/microshift.spec
 %changelog
-* Wed Apr 04 2025 Patryk Matuszak <pmatusza@redhat.com> 4.19.0
-- Replace Multus manifests with drop-in configuration
+* Wed Apr 09 2025 Patryk Matuszak <pmatusza@redhat.com> 4.19.0
+- Split AIMS manifest into two: kserve and manifests
 
-* Mon Mar 31 2025 Gregory Giguashvili <ggiguash@redhat.com> 4.19.0
-- Default crio runtime is crun
+* Fri Apr 04 2025 Patryk Matuszak <pmatusza@redhat.com> 4.19.0
+- Replace Multus manifests with drop-in configuration
 
 * Tue Apr 01 2025 Gregory Giguashvili <ggiguash@redhat.com> 4.19.0
 - Add hostname package dependency to microshift RPM
+
+* Mon Mar 31 2025 Gregory Giguashvili <ggiguash@redhat.com> 4.19.0
+- Default crio runtime is crun
 
 * Mon Mar 31 2025 Patryk Matuszak <pmatusza@redhat.com> 4.19.0
 - Remove unnecessary /var/lib subdir creation

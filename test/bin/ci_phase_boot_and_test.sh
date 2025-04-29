@@ -51,6 +51,12 @@ cd "${ROOTDIR}/test"
 # Set up the hypervisor configuration for the tests and start webserver
 bash -x ./bin/manage_hypervisor_config.sh create
 
+# Setup a prometheus server for metrics testing
+bash -x ./bin/manage_prometheus.sh start
+
+# Setup a loki server for metrics testing
+bash -x ./bin/manage_loki.sh start
+
 # Setup a container registry and mirror images.
 bash -x ./bin/mirror_registry.sh
 
