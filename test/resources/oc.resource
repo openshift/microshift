@@ -68,13 +68,13 @@ Oc Wait
     ...    Returns the combined STDOUT/STDERR output of the command.
     [Arguments]    ${resource}    ${opts}
     ${output}    ${rc}=    Run With Kubeconfig
-    ...    oc wait ${resource} ${opts} --timeout=${timeout}
+    ...    oc wait ${resource} ${opts}
     ...    allow_fail=${TRUE}
     ...    return_rc=${TRUE}
     IF    ${rc} != 0
         Run With Kubeconfig    oc describe ${resource}
         ...    allow_fail=${TRUE}
-        ...    timeout=${timeout}
+        ...    timeout=${DEFAULT_WAIT_TIMEOUT}
         Log    'oc wait ${resource} ${opts}' failed
         Should Be Equal As Integers    ${rc}    0
     END
