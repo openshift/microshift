@@ -41,7 +41,6 @@ MicroShift Reports Metrics To Server
 
     [Teardown]    Remove Telemetry Configuration
 
-
 MicroShift Reports Metrics To Server Through Proxy
     [Documentation]    Check MicroShift is able to send metrics to the telemetry server through a proxy without errors.
 
