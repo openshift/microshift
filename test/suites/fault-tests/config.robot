@@ -106,8 +106,5 @@ Check Systemctl Status Logs
     ${log_text}=    SSHLibrary.Execute Command
     ...    journalctl -u microshift.service -o short | tail -c 32000
     ...    sudo=True    return_stdout=True
-    @{expected_lines}=    Get Expected Messages
-    ...    suites/fault-tests/log-messages.yaml
-    ...    ${error_type}
-    ...    ${error_case}
+    @{expected_lines}=    Get Expected Fault Messages    ${error_type}    ${error_case}
     Compare Output Logs    ${log_text}    @{expected_lines}

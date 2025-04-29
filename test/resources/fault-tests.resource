@@ -15,10 +15,10 @@ Compare Output Logs
         Should Match Regexp    ${actual_str}    ${pattern}
     END
 
-Get Expected Messages
+Get Expected Fault Messages
     [Documentation]    Get the usage message for a specific command from the YAML file
-    [Arguments]    ${path}    ${action}    ${resource}
-    ${yaml_file}=    OperatingSystem.Get File    ${path}
+    [Arguments]    ${action}    ${resource}
+    ${yaml_file}=    OperatingSystem.Get File    resources/fault-test-messages.yaml
     ${messages_dict}=    yaml.Safe Load    ${yaml_file}
     ${messages}=    Set Variable    ${messages_dict}[${action}][${resource}]
     @{message_lines}=    Split To Lines    ${messages}

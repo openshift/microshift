@@ -11,7 +11,7 @@ disconnect:
         .*microshift.* kubelet I.* kubelet\.go:\d+\] "SyncLoop \(probe\)" probe="(readiness|liveness)" status="(startup|unhealthy|not ready|ready|unhealthy|started)" pod="openshift-.*"
         .*microshift.* kubelet I.* kubelet\.go:\d+\] "SyncLoop \(probe\)" probe="(readiness|liveness)" status="(startup|unhealthy|not ready|ready|unhealthy|started)" pod="openshift-.*"
 config:
-    invalid_cipher: |
+    tls_invalid_cipher: |
         .*microshift.* E.* run\.go:\d+\] "command failed" err="invalid configuration: error validating apiServer.tls: unsupported cipher suite TLS_INVALID_CIPHER for TLS version VersionTLS12"
-    invalid_tls_version: |
+    tls_invalid_version: |
         .*microshift.* E.* run\.go:\d+\] "command failed" err="invalid configuration: error validating apiServer.tls: unsupported value VersionTLSInvalid for tls.MinVersion"
