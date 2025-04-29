@@ -1,6 +1,8 @@
 package config
 
 import (
+	"fmt"
+
 	configv1 "github.com/openshift/api/config/v1"
 	operatorv1 "github.com/openshift/api/operator/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -15,7 +17,12 @@ const (
 	DefaultHttpVersionV2      DefaultHttpVersionPolicy = 2
 	WildcardPolicyAllowed     WildcardPolicy           = "WildcardsAllowed"
 	WildcardPolicyDisallowed  WildcardPolicy           = "WildcardsDisallowed"
+
+	AccessLoggingEnabled  AccessLoggingStatusEnum = "Enabled"
+	AccessLoggingDisabled AccessLoggingStatusEnum = "Disabled"
 )
+
+type AccessLoggingStatusEnum string
 
 type NamespaceOwnershipEnum string
 type IngressStatusEnum string
@@ -146,6 +153,7 @@ type IngressConfig struct {
 	// Each value in the configmap should be the full response, including HTTP headers.
 	// Eg- https://raw.githubusercontent.com/openshift/router/fadab45747a9b30cc3f0a4b41ad2871f95827a93/images/router/haproxy/conf/error-page-503.http
 	// If this field is empty, the ingress controller uses the default error pages.
+	// +kubebuilder:validation:Optional
 	HttpErrorCodePages configv1.ConfigMapNameReference `json:"httpErrorCodePages,omitempty"`
 
 	// accessLogging describes how the client requests should be logged.
@@ -398,7 +406,7 @@ type AccessLogging struct {
 	// will not log any requests to the access log.
 	//+kubebuilder:default=Disabled
 	//+kubebuilder:validation:Enum=Disabled;Enabled
-	Status string `json:"status"`
+	Status AccessLoggingStatusEnum `json:"status"`
 
 	// httpLogFormat specifies the format of the log message for an HTTP
 	// request.
@@ -414,6 +422,9 @@ type AccessLogging struct {
 	// connections).  It does not affect the log format for TLS passthrough
 	// connections.
 	//
+	// +kubebuilder:validation:Optional
+	// +kubebuilder:validation:Type:=string
+	// +kubebuilder:default:=""
 	// +optional
 	HttpLogFormat string `json:"httpLogFormat,omitempty"`
 
@@ -427,7 +438,7 @@ type AccessLogging struct {
 	// connections.
 	//
 	// +optional
-	HTTPCaptureHeaders operatorv1.IngressControllerCaptureHTTPHeaders `json:"httpCaptureHeaders,omitempty"`
+	HttpCaptureHeaders operatorv1.IngressControllerCaptureHTTPHeaders `json:"httpCaptureHeaders,omitempty"`
 
 	// httpCaptureCookies specifies HTTP cookies that should be captured in
 	// access logs.  If this field is empty, no cookies are captured.
@@ -436,5 +447,13 @@ type AccessLogging struct {
 	// +optional
 	// +kubebuilder:validation:MaxItems=1
 	// +listType=atomic
-	HTTPCaptureCookies []operatorv1.IngressControllerCaptureHTTPCookie `json:"httpCaptureCookies,omitempty"`
+	HttpCaptureCookies []operatorv1.IngressControllerCaptureHTTPCookie `json:"httpCaptureCookies,omitempty"`
+}
+
+func (a *AccessLogging) Validate() error {
+	if a.Status != AccessLoggingEnabled && a.Status != AccessLoggingDisabled {
+		return fmt.Errorf("invalid access logging status: %s", a.Status)
+	}
+	//TODO need to validate the rest of the values, including defaults.
+	return nil
 }

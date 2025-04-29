@@ -281,7 +281,8 @@
             },
             "httpLogFormat": {
               "description": "httpLogFormat specifies the format of the log message for an HTTP\nrequest.\n\nIf this field is empty, log messages use the implementation's default\nHTTP log format.  For HAProxy's default HTTP log format, see the\nHAProxy documentation:\nhttp://cbonte.github.io/haproxy-dconv/2.0/configuration.html#8.2.3\n\nNote that this format only applies to cleartext HTTP connections\nand to secure HTTP connections for which the ingress controller\nterminates encryption (that is, edge-terminated or reencrypt\nconnections).  It does not affect the log format for TLS passthrough\nconnections.",
-              "type": "string"
+              "type": "string",
+              "default": ""
             },
             "status": {
               "description": "Status of the access logging. If set to \"Enabled\", the router will\nlog all requests to the access log. If set to \"Disabled\", the router\nwill not log any requests to the access log.",
