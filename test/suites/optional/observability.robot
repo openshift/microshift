@@ -121,12 +121,12 @@ Setup Suite And Prepare Test Host
 Check Required Observability Variables
     [Documentation]    Check if the required proxy variables are set
     Should Not Be Empty    ${PROMETHEUS_HOST}    PROMETHEUS_HOST variable is required
-    ${string_value}=    Convert To String    ${PROMETHEUS_PORT}
+    ${string_value}    Convert To String    ${PROMETHEUS_PORT}
     Should Not Be Empty    ${string_value}    PROMETHEUS_PORT variable is required
     Should Not Be Empty    ${LOKI_HOST}    LOKI_HOST variable is required
-    ${string_value}=    Convert To String    ${LOKI_PORT}
+    ${string_value}    Convert To String    ${LOKI_PORT}
     Should Not Be Empty    ${string_value}    LOKI_PORT variable is required
-    ${string_value}=    Convert To String    ${PROM_EXPORTER_PORT}
+    ${string_value}    Convert To String    ${PROM_EXPORTER_PORT}
     Should Not Be Empty    ${string_value}    PROM_EXPORTER_PORT variable is required
 
 Journal Contains Enough Lines To Test
