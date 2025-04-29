@@ -37,9 +37,6 @@ ${TLS_INVALID_VERSION}              SEPARATOR=\n
 ...                                 \ \ \ \ - TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256
 ...                                 \ \ \ \ minVersion: VersionTLSInvalid
 ${APISERVER_ETCD_CLIENT_CERT}       /var/lib/microshift/certs/etcd-signer/apiserver-etcd-client
-${CONFIG_PATH}                      /etc/microshift/config.yaml
-${BACKUP_CONFIG}                    /tmp/microshift_config.yaml.bak
-${FAULT_TIMEOUT}                    60s
 
 
 *** Test Cases ***
@@ -96,23 +93,17 @@ Custom TLS 1_3 configuration
 
 TLS Config: Unsupported Cipher Suite
     [Documentation]    Test behavior when TLS version is set to an unsupported cipher suite
-    [Setup]    Setup Invalid TLS Configuration    ${TLS_INVALID_CIPHER}
 
-    Check Systemctl Status Logs    config    tls_invalid_cipher
-
-    [Teardown]    Run Keywords
-    ...    Remove TLS Drop In Config
-    ...    Restart MicroShift
+    Setup Invalid TLS Configuration    ${TLS_INVALID_CIPHER}
+    Check Journal Logs    config    tls_invalid_cipher
+    Restore Valid TLS Configuration
 
 TLS Config: Invalid TLS Version
     [Documentation]    Test behavior when TLS version is set to an invalid value
-    [Setup]    Setup Invalid TLS Configuration    ${TLS_INVALID_VERSION}
 
-    Check Systemctl Status Logs    config    tls_invalid_version
-
-    [Teardown]    Run Keywords
-    ...    Remove TLS Drop In Config
-    ...    Restart MicroShift
+    Setup Invalid TLS Configuration    ${TLS_INVALID_VERSION}
+    Check Journal Logs    config    tls_invalid_version
+    Restore Valid TLS Configuration
 
 
 *** Keywords ***
@@ -121,7 +112,6 @@ Setup
     Check Required Env Variables
     Login MicroShift Host
     Setup Kubeconfig    # for readiness checks
-    Save Journal Cursor
 
 Teardown
     [Documentation]    Test suite teardown
@@ -134,7 +124,7 @@ Save Journal Cursor
     ...    Save the journal cursor then restart MicroShift so we capture the
     ...    shutdown messages and startup messages.
     ${cursor}=    Get Journal Cursor
-    Set Suite Variable    \${CURSOR}    ${cursor}
+    Set Test Variable    \${CURSOR}    ${cursor}
 
 Setup TLS Configuration
     [Documentation]    Apply the TLS configuration in the argument
@@ -146,6 +136,7 @@ Setup Invalid TLS Configuration
     [Documentation]    Apply the TLS configuration in the argument
     [Arguments]    ${config}
     Drop In MicroShift Config    ${config}    10-tls
+    Save Journal Cursor
     ${stdout}    ${stderr}    ${rc}=    Execute Command
     ...    systemctl restart microshift.service
     ...    sudo=True    return_stdout=True    return_stderr=True    return_rc=True
@@ -154,6 +145,15 @@ Setup Invalid TLS Configuration
 Remove TLS Drop In Config
     [Documentation]    Remove the previously created drop-in config for storage
     Remove Drop In MicroShift Config    10-tls
+
+Restore Valid TLS Configuration
+    [Documentation]    Restore the TLS configuration
+    Remove TLS Drop In Config
+    Sleep    10s    # To avoid systemctl start error: Start request repeated too quickly
+    ${stdout}    ${stderr}    ${rc}=    Execute Command
+    ...    systemctl restart microshift.service
+    ...    sudo=True    return_stdout=True    return_stderr=True    return_rc=True
+    Should Be Equal As Numbers    0    ${rc}
 
 Openssl Connect Command
     [Documentation]    Run Openssl Connect Command in the remote server
@@ -187,11 +187,9 @@ Check TLS Endpoints
     ${stdout}    ${rc}=    Openssl Connect Command    localhost:2379    ${TLS_AND_CIPHER_ARGS} ${CERT_ARG} ${KEY_ARG}
     Should Be Equal As Integers    ${return_code}    ${rc}
 
-Check Systemctl Status Logs
+Check Journal Logs
     [Documentation]    Verify system logs contain expected error messages for configuration errors
     [Arguments]    ${error_type}    ${error_case}
-    ${log_text}=    SSHLibrary.Execute Command
-    ...    journalctl -u microshift.service -o short | tail -c 32000
-    ...    sudo=True    return_stdout=True
+    ${output}    ${rc}=    Get Log Output With Pattern    ${CURSOR}    apiServer.tls
     @{expected_lines}=    Get Expected Fault Messages    ${error_type}    ${error_case}
-    Compare Output Logs    ${log_text}    @{expected_lines}
+    Compare Output Logs    ${output}    @{expected_lines}
