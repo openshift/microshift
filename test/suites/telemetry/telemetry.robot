@@ -16,18 +16,33 @@ Test Tags           restart    slow
 
 
 *** Variables ***
-${PROXY_HOST}                   ${EMPTY}
-${PROXY_PORT}                   ${EMPTY}
-${PROMETHEUS_HOST}              ${EMPTY}
-${PROMETHEUS_PORT}              ${EMPTY}
-${TELEMETRY_WRITE_ENDPOINT}     https://infogw.api.openshift.com/metrics/v1/receive
-${ENABLE_TELEMETRY}             SEPARATOR=\n
-...                             telemetry:
-...                             \ \ status: Enabled
-${JOURNAL_CURSOR}               ${EMPTY}
-${PULL_SECRET}                  /etc/crio/openshift-pull-secret
-${PULL_SECRET_METRICS}          /etc/crio/openshift-pull-secret-with-telemetry
-${PULL_SECRET_NO_METRICS}       /etc/crio/openshift-pull-secret-without-telemetry
+${PROXY_HOST}                       ${EMPTY}
+${PROXY_PORT}                       ${EMPTY}
+${PROMETHEUS_HOST}                  ${EMPTY}
+${PROMETHEUS_PORT}                  ${EMPTY}
+${TELEMETRY_WRITE_ENDPOINT}         https://infogw.api.openshift.com/metrics/v1/receive
+${PROXY_ENDPOINT}                   http://${PROXY_HOST}:${PROXY_PORT}/api/v1/write
+${ENABLE_TELEMETRY}                 SEPARATOR=\n
+...                                 telemetry:
+...                                 \ \ status: Enabled
+...                                 \ \ endpoint: ${TELEMETRY_WRITE_ENDPOINT}
+${DISABLE_TELEMETRY}                SEPARATOR=\n
+...                                 telemetry:
+...                                 \ \ status: Disabled
+...                                 \ \ endpoint: ${TELEMETRY_WRITE_ENDPOINT}
+${ENABLE_TELEMETRY_WITH_PROXY}      SEPARATOR=\n
+...                                 telemetry:
+...                                 \ \ status: Enabled
+...                                 \ \ endpoint: ${TELEMETRY_WRITE_ENDPOINT}
+...                                 \ \ proxy: ${PROXY_ENDPOINT}
+${ENABLE_TELEMETRY_TO_PROMETHUS}    SEPARATOR=\n
+...                                 telemetry:
+...                                 \ \ status: Enabled
+...                                 \ \ endpoint: http://${PROMETHEUS_HOST}:${PROMETHEUS_PORT}/api/v1/write
+${JOURNAL_CURSOR}                   ${EMPTY}
+${PULL_SECRET}                      /etc/crio/openshift-pull-secret
+${PULL_SECRET_METRICS}              /etc/crio/openshift-pull-secret-with-telemetry
+${PULL_SECRET_NO_METRICS}           /etc/crio/openshift-pull-secret-without-telemetry
 
 
 *** Test Cases ***
@@ -36,8 +51,8 @@ MicroShift Reports Metrics To Server
 
     Setup Telemetry Configuration    ${ENABLE_TELEMETRY}    ${PULL_SECRET_METRICS}
 
-    Should Find Metrics Success    Metrics sent successfully
-    Should Find Metrics Success    MicroShift telemetry starting, sending first metrics collection.
+    Should Find Metrics In Journal Log Success    Metrics sent successfully
+    Should Find Metrics In Journal Log Success    MicroShift telemetry starting, sending first metrics collection.
 
     [Teardown]    Remove Telemetry Configuration
 
@@ -45,19 +60,20 @@ MicroShift Reports Metrics To Server Through Proxy
     [Documentation]    Check MicroShift is able to send metrics to the telemetry server through a proxy without errors.
 
     Start Proxy Server    host=${PROXY_HOST}    port=${PROXY_PORT}
-    Setup Telemetry Configuration    ${ENABLE_TELEMETRY_AND_PROXY}    ${PULL_SECRET_METRICS}
+    Setup Telemetry Configuration    ${ENABLE_TELEMETRY_WITH_PROXY}    ${PULL_SECRET_METRICS}
 
-    Should Find Metrics Success    Metrics sent successfully
-    Should Find Metrics Success    MicroShift telemetry starting, sending first metrics collection.
+    Should Find Metrics In Journal Log Success    Metrics sent successfully
+    Should Find Metrics In Journal Log Success    MicroShift telemetry starting, sending first metrics collection.
 
+    Stop Proxy Server
     [Teardown]    Remove Telemetry Configuration
 
 MicroShift Fails to Report Metrics To Server Telemetry Disabled
     [Documentation]    Check MicroShift is not able to send metrics to the telemetry server when it is disabled.
     Setup Telemetry Configuration    ${DISABLE_TELEMETRY}    ${PULL_SECRET_METRICS}
 
-    Should Find Metrics Success    Telemetry is disabled
-    Should Find Metrics Fails    Metrics sent successfully
+    Should Find Metrics In Journal Log Success    Telemetry is disabled
+    Should Find Metrics In Journal Log Fails    Metrics sent successfully
 
     [Teardown]    Remove Telemetry Configuration
 
@@ -65,15 +81,15 @@ MicroShift Fails to Report Metrics To Server Wrong Pull Secret
     [Documentation]    Check MicroShift is not able to send metrics to the telemetry server when the pull secret is wrong.
     Setup Telemetry Configuration    ${ENABLE_TELEMETRY}    ${PULL_SECRET_NO_METRICS}
 
-    Should Find Metrics Success    MicroShift telemetry starting, sending first metrics collection.
-    Should Find Metrics Success    Unable to get pull secret: cloud.openshift.com not found
-    Should Find Metrics Fails    Metrics sent successfully
+    Should Find Metrics In Journal Log Success    MicroShift telemetry starting, sending first metrics collection.
+    Should Find Metrics In Journal Log Success    Unable to get pull secret: cloud.openshift.com not found
+    Should Find Metrics In Journal Log Fails    Metrics sent successfully
 
     [Teardown]    Remove Telemetry Configuration
 
-Check MicroShift Metrics In Local Server    # robocop: disable=too-long-test-case,too-many-calls-in-test-case
+Check MicroShift Metrics Sent To Prometheus Server    # robocop: disable=too-many-calls-in-test-case
     [Documentation]    Check the expected metrics are sent to the local server.
-    [Setup]    Setup Local Telemetry Configuration
+    Setup Telemetry Configuration    ${ENABLE_TELEMETRY_TO_PROMETHUS}    ${PULL_SECRET_METRICS}
 
     ${system_arch}=    Get System Architecture
     ${deployment_type}=    Get Deployment Type
@@ -84,56 +100,29 @@ Check MicroShift Metrics In Local Server    # robocop: disable=too-long-test-cas
     ${microshift_ver}=    MicroShift Version
     ${microshift_version}=    Set Variable    ${microshift_ver.major}.${microshift_ver.minor}.${microshift_ver.patch}
 
-    # Ensure metrics have been sent before checking in Prometheus.
-    Should Find Metrics Success    Metrics sent successfully
-
-    Check Prometheus Query
-    ...    ${PROMETHEUS_HOST}
-    ...    ${PROMETHEUS_PORT}
+    Should Find Metrics In Prometheus Server
     ...    cluster:capacity_cpu_cores:sum{_id="${cluster_id}",label_beta_kubernetes_io_instance_type="rhde",label_node_openshift_io_os_id="${os_id}",label_kubernetes_io_arch="${arch}"}
-    Check Prometheus Query
-    ...    ${PROMETHEUS_HOST}
-    ...    ${PROMETHEUS_PORT}
+    Should Find Metrics In Prometheus Server
     ...    cluster:capacity_memory_bytes:sum{_id="${cluster_id}",label_beta_kubernetes_io_instance_type="rhde",label_node_openshift_io_os_id="${os_id}",label_kubernetes_io_arch="${arch}"}
-    Check Prometheus Query
-    ...    ${PROMETHEUS_HOST}
-    ...    ${PROMETHEUS_PORT}
+    Should Find Metrics In Prometheus Server
     ...    cluster:cpu_usage_cores:sum{_id="${cluster_id}"}
-    Check Prometheus Query
-    ...    ${PROMETHEUS_HOST}
-    ...    ${PROMETHEUS_PORT}
+    Should Find Metrics In Prometheus Server
     ...    cluster:memory_usage_bytes:sum{_id="${cluster_id}"}
-    Check Prometheus Query
-    ...    ${PROMETHEUS_HOST}
-    ...    ${PROMETHEUS_PORT}
+    Should Find Metrics In Prometheus Server
     ...    cluster:usage:resources:sum{_id="${cluster_id}",resource="pods"}
-    Check Prometheus Query
-    ...    ${PROMETHEUS_HOST}
-    ...    ${PROMETHEUS_PORT}
+    Should Find Metrics In Prometheus Server
     ...    cluster:usage:resources:sum{_id="${cluster_id}",resource="namespaces"}
-    Check Prometheus Query
-    ...    ${PROMETHEUS_HOST}
-    ...    ${PROMETHEUS_PORT}
+    Should Find Metrics In Prometheus Server
     ...    cluster:usage:resources:sum{_id="${cluster_id}",resource="services"}
-    Check Prometheus Query
-    ...    ${PROMETHEUS_HOST}
-    ...    ${PROMETHEUS_PORT}
+    Should Find Metrics In Prometheus Server
     ...    cluster:usage:resources:sum{_id="${cluster_id}",resource="ingresses.networking.k8s.io"}
-    Check Prometheus Query
-    ...    ${PROMETHEUS_HOST}
-    ...    ${PROMETHEUS_PORT}
+    Should Find Metrics In Prometheus Server
     ...    cluster:usage:resources:sum{_id="${cluster_id}",resource="routes.route.openshift.io"}
-    Check Prometheus Query
-    ...    ${PROMETHEUS_HOST}
-    ...    ${PROMETHEUS_PORT}
+    Should Find Metrics In Prometheus Server
     ...    cluster:usage:resources:sum{_id="${cluster_id}",resource="customresourcedefinitions.apiextensions.k8s.io"}
-    Check Prometheus Query
-    ...    ${PROMETHEUS_HOST}
-    ...    ${PROMETHEUS_PORT}
+    Should Find Metrics In Prometheus Server
     ...    cluster:usage:containers:sum{_id="${cluster_id}"}
-    Check Prometheus Query
-    ...    ${PROMETHEUS_HOST}
-    ...    ${PROMETHEUS_PORT}
+    Should Find Metrics In Prometheus Server
     ...    microshift_version{_id="${cluster_id}",deployment_type="${deployment_type}",os_version_id="${os_version}",version="${microshift_version}"}
 
     [Teardown]    Remove Telemetry Configuration
@@ -173,39 +162,10 @@ Setup Telemetry Configuration
     ...    and restarts microshift.service
     [Arguments]    ${config}    ${new_pull_secret}
     Configure Pull Secrets    ${new_pull_secret}
-    Setup Kubeconfig
     Drop In MicroShift Config    ${config}    10-telemetry
     Stop MicroShift
     ${cursor}=    Get Journal Cursor
     Set Test Variable    \${CURSOR}    ${cursor}
-    Restart MicroShift
-
-Setup Telemetry Configuration With Proxy
-    [Documentation]    Enables the telemetry feature in MicroShift configuration file
-    ...    and restarts microshift.service
-    Start Proxy Server    host=${PROXY_HOST}    port=${PROXY_PORT}
-    ${proxy_config}=    Catenate
-    ...    SEPARATOR=\n
-    ...    ${ENABLE_TELEMETRY}
-    ...    \ \ endpoint: ${TELEMETRY_WRITE_ENDPOINT}
-    ...    \ \ proxy: http://${PROXY_HOST}:${PROXY_PORT}
-    Drop In MicroShift Config    ${proxy_config}    10-telemetry
-    Stop MicroShift
-    ${cursor}=    Get Journal Cursor
-    Set Suite Variable    \${CURSOR}    ${cursor}
-    Restart MicroShift
-
-Setup Local Telemetry Configuration
-    [Documentation]    Enables the telemetry feature in MicroShift configuration file
-    ...    and restarts microshift.service
-    ${config}=    Catenate
-    ...    SEPARATOR=\n
-    ...    ${ENABLE_TELEMETRY}
-    ...    \ \ endpoint: http://${PROMETHEUS_HOST}:${PROMETHEUS_PORT}/api/v1/write
-    Drop In MicroShift Config    ${config}    10-telemetry
-    Stop MicroShift
-    ${cursor}=    Get Journal Cursor
-    Set Suite Variable    \${CURSOR}    ${cursor}
     Restart MicroShift
 
 Remove Telemetry Configuration
@@ -214,13 +174,6 @@ Remove Telemetry Configuration
     Remove Drop In MicroShift Config    10-telemetry
     Restore Pull Secrets
     Restart MicroShift
-
-Remove Telemetry Configuration With Proxy
-    [Documentation]    Removes the telemetry feature from MicroShift configuration file
-    ...    and restarts microshift.service
-    Remove Drop In MicroShift Config    10-telemetry-proxy
-    Restart MicroShift
-    Stop Proxy Server
 
 Configure Pull Secrets
     [Documentation]    Sets up the pull secrets for the MicroShift cluster.
@@ -241,13 +194,19 @@ Restore Pull Secrets
     ...    sudo=True    return_rc=True    return_stderr=False    return_stdout=False
     Should Be Equal As Integers    ${rc}    0
 
-Should Find Metrics Success
+Should Find Metrics In Journal Log Success
     [Documentation]    Logs should contain metrics message
     [Arguments]    ${pattern}
     Wait Until Keyword Succeeds    10x    10s
     ...    Pattern Should Appear In Log Output    ${CURSOR}    ${pattern}
 
-Should Find Metrics Fails
+Should Find Metrics In Journal Log Fails
     [Documentation]    Logs should not contain metrics message
     [Arguments]    ${pattern}
     Pattern Should Not Appear In Log Output    ${CURSOR}    ${pattern}
+
+Should Find Metrics In Prometheus Server
+    [Documentation]    Check if the metric is on the Prometheus server
+    [Arguments]    ${metric}
+    Wait Until Keyword Succeeds    10x    10s
+    ...    Check Prometheus Query    ${PROMETHEUS_HOST}    ${PROMETHEUS_PORT}    ${metric}
