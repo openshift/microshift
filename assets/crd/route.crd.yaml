@@ -6,7 +6,6 @@ metadata:
     api.openshift.io/merged-by-featuregates: "true"
     include.release.openshift.io/ibm-cloud-managed: "true"
     include.release.openshift.io/self-managed-high-availability: "true"
-    release.openshift.io/feature-set: Default
   name: routes.route.openshift.io
 spec:
   group: route.openshift.io
@@ -501,6 +500,23 @@ spec:
                       the short service name (service.namespace.svc), which allows infrastructure generated certificates to automatically
                       verify.
                     type: string
+                  externalCertificate:
+                    description: |-
+                      externalCertificate provides certificate contents as a secret reference.
+                      This should be a single serving certificate, not a certificate
+                      chain. Do not include a CA certificate. The secret referenced should
+                      be present in the same namespace as that of the Route.
+                      Forbidden when `certificate` is set.
+                      The router service account needs to be granted with read-only access to this secret,
+                      please refer to openshift docs for additional details.
+                    properties:
+                      name:
+                        description: |-
+                          name of the referent.
+                          More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                        type: string
+                    type: object
+                    x-kubernetes-map-type: atomic
                   insecureEdgeTerminationPolicy:
                     description: |-
                       insecureEdgeTerminationPolicy indicates the desired behavior for insecure connections to a route. While
@@ -540,6 +556,8 @@ spec:
                 - termination
                 type: object
                 x-kubernetes-validations:
+                - message: cannot have both spec.tls.certificate and spec.tls.externalCertificate
+                  rule: '!(has(self.certificate) && has(self.externalCertificate))'
                 - message: 'cannot have both spec.tls.termination: passthrough and
                     spec.tls.insecureEdgeTerminationPolicy: Allow'
                   rule: 'has(self.termination) && has(self.insecureEdgeTerminationPolicy)
