@@ -3,7 +3,7 @@ kind: ServingRuntime
 metadata:
   name: vllm-rocm-runtime
   annotations:
-    openshift.io/display-name: vLLM AMD GPU ServingRuntime for KServe
+    openshift.io/display-name: vLLM ROCm ServingRuntime for KServe
     opendatahub.io/recommended-accelerators: '["amd.com/gpu"]'
   labels:
     opendatahub.io/dashboard: 'true'

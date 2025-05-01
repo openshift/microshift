@@ -1,20 +1,19 @@
 {
   "release": {
-    "base": "2.19.0"
+    "base": "2.18.0"
   },
   "images": {
-    "caikit-tgis-image": "quay.io/modh/caikit-tgis-serving@sha256:2c7eef73708b5d73de33153459ac7238fdcf517cdc3544c775981f5814b4b6ed",
-    "caikit-standalone-image": "quay.io/modh/caikit-nlp@sha256:ada8949b81e646809101edfc76738eb5aac362f783eb2facc8aeed21c7c1512f",
+    "vllm-gaudi-image": "quay.io/modh/vllm@sha256:db2aa1ea8d0fe550e1c3e333c37861ed894205263746bf373ab8d7453299a8c4",
+    "vllm-rocm-image": "quay.io/modh/vllm@sha256:05abd450806958f384fad2ca142b120f6a6edc2662b3627455f5dd2eb808a5b8",
+    "caikit-tgis-image": "quay.io/modh/caikit-tgis-serving@sha256:3cbd01ca3c79de84eec111fa451fef6e2071d11c74550692d04862e45bc95e0a",
+    "caikit-standalone-image": "quay.io/modh/caikit-nlp@sha256:0dce5563a84c0ec715c4486d17388fcf6b4968b19917b7a259cdb2fb7d4fdbb0",
     "tgis-image": "quay.io/modh/text-generation-inference@sha256:aebf545d8048a59174f70334dc90c6b97ead4602a39cb7598ea68c8d199168a2",
-    "ovms-image": "quay.io/modh/openvino_model_server@sha256:53b7fcf95de9b81e4c8652d0bf4e84e22d5b696827a5d951d863420c68b9cfe8",
-    "vllm-cuda-image": "quay.io/modh/vllm@sha256:4f550996130e7d16cacb24ca9a2865e7cf51eddaab014ceaf31a1ea6ef86d4ec",
-    "vllm-cpu-image": "quay.io/modh/vllm@sha256:881495befb6f807fa6e55f24e820fa67022b57d8ce0022305d89abe799c490fa",
-    "vllm-gaudi-image": "quay.io/modh/vllm@sha256:af6a071be36d8a99476f145d1589d7ede97d2760b93335b14ca26de7417e438c",
-    "vllm-rocm-image": "quay.io/modh/vllm@sha256:7e1d1985b0dd2b5ba2df41fc9c8c3edf13a2d9ed8a4d84db8f00eb6c753bc5c5",
-    "kserve-controller": "quay.io/modh/kserve-controller@sha256:62aa39acd23cd8097fc48b5b30fe35572efb46adc5d04e4215aadb77193e71df",
-    "kserve-agent": "quay.io/modh/kserve-agent@sha256:84d037d1ad3126f089298460a380041e2f819ce3af3ff21fc781bbf6b6ea81e3",
-    "kserve-router": "quay.io/modh/kserve-router@sha256:9def4776bc51cd2d78f4d6d57fd707a207616de4f7064c1f9a440af3f42ce741",
-    "kserve-storage-initializer": "quay.io/modh/kserve-storage-initializer@sha256:d361e822b8db152f431d7be48ad5afb6e459497e61441da9db961a63d5e7b242",
-    "oauth-proxy": "registry.redhat.io/openshift4/ose-oauth-proxy@sha256:bd49cfc8452b3d96467cc222db9487e120abc6cc5ba81349c6b3703706f36a08"
+    "ovms-image": "quay.io/modh/openvino_model_server@sha256:428c00232cbf3b38a3929a0d22d0e13c6388ce353e3853cc2956d175eacf6724",
+    "vllm-image": "quay.io/modh/vllm@sha256:4f1f6b5738b311332b2bc786ea71259872e570081807592d97b4bd4cb65c4be1",
+    "kserve-controller": "quay.io/modh/kserve-controller@sha256:d53b9bd146b6724d3d1048f4aa150deef9f75e4159228f531f5e56007bee8524",
+    "kserve-agent": "quay.io/modh/kserve-agent@sha256:faa49dab2dabc88d7d098d0999c56f2a27cf89891aa3984ef7a9387afa846e3c",
+    "kserve-router": "quay.io/modh/kserve-router@sha256:65fc0f323cbdebf822c7bb13552dc7ab223cb1a2cb2c849021b16d7482a76b51",
+    "kserve-storage-initializer": "quay.io/modh/kserve-storage-initializer@sha256:a7063ac313014abd07ffaa618ae0cdbd3237ad42e2eca272c2ff7d114f10e6fd",
+    "oauth-proxy": "registry.redhat.io/openshift4/ose-oauth-proxy@sha256:234af927030921ab8f7333f61f967b4b4dee37a1b3cf85689e9e63240dd62800"
   }
 }
