@@ -1,6 +1,7 @@
-- cluster-network-operator embedded-component cf90595d759b3cf9511de22f190368f46585ef3e to 5f2fe68003e8f17304d7000f8672a0f6ff2eaf8b
-  - 8ea0522 2025-04-15T17:00:37+00:00 OCPBUGS-53180: Add IPv6 NGINX configuration
+- api embedded-component 0cfc958f642b11b1c2020d0da9eb96daff8fb588 to ace59d6ad5ceb98ff1d0760da329654f68b39d66
+  - 40536da 2025-02-03T14:25:57+01:00 OCPBUGS-49702: Add IdleConnectionTerminationPolicy field to IngressControllerSpec
 
-- machine-config-operator embedded-component 95ff6412be3b5cf798e2729657302c77fb24b564 to 8c86422ffddcad9d55ad07342cfffa35eb59dacc
-  - 32f18865 2025-01-10T15:36:22+00:00 OPNET-569: Do not run resolv-prepender from NM dispatcher
+- machine-config-operator embedded-component 8c86422ffddcad9d55ad07342cfffa35eb59dacc to 95b720defc004d4da4b88292c4ab7d069cda1088
+  - 35528dd0 2025-04-17T13:52:52+00:00 OCPBUGS-53425: Make mtu-migration run after wait-for-primary-ip
+  - a632c468 2025-03-04T18:20:00+00:00 on-prem/resolv-prepender: stop leaking tmp files
 
