@@ -106,3 +106,12 @@ func (c *Controller) Collect(ch chan<- prometheus.Metric) {
 
 	unmanagedRoutes.Collect(ch)
 }
+
+// ResetIngressMetrics clears metrics for the specified ingress by setting its
+// series data to 0.  This is appropriate to do when an ingress object is
+// deleted to prevent stale metrics from triggering alerts.  As Collect only
+// updates metrics for ingresses that exist at the time when Collect is called,
+// it does not clear metrics for deleted routes.
+func (c *Controller) ResetIngressMetrics(namespace, ingressName string) {
+	ingressesWithoutClassName.WithLabelValues(ingressName, namespace).Set(0.0)
+}
