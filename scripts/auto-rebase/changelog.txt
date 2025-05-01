@@ -1,10 +1,14 @@
-- cluster-network-operator embedded-component 670c2e35eb315547eceae8a3a1b6e19638ff4f44 to 692029cc58e9facfc31601e13b2d3097f4f37325
-  - deb4c3c 2025-04-08T12:20:17+00:00 OCPBUGS-53180: Add IPv6 NGINX configuration
+- kubernetes embedded-component 97471c6ac55733da63e4db6680889897a5915ca7 to 0b8a68191de069deeca944e443a5ead7e0469b41
+  - d656a89fb 2025-04-10T10:42:13-03:00 UPSTREAM: <carry> : OCPBUGS-54807: skip UDP LoadBalancer on external
+  - 4ca059e15 2025-04-10T10:34:37-03:00 UPSTREAM: <drop> : make update
 
-- machine-config-operator embedded-component 20f26604558b44f4bdc105e52246ddec7898e020 to c3b71f5aab700255ea33850a4e055449e8019261
-  - 41ffa64a 2025-04-09T20:47:04+00:00 OCPBUGS-53425: Make mtu-migration run after wait-for-primary-ip
+- machine-config-operator embedded-component c3b71f5aab700255ea33850a4e055449e8019261 to b927430d6bad82dc043dfd8f3a4d6bc362d1519e
+  - 934a9c14 2025-04-23T18:37:22+00:00 operator: fix timeout in syncRenderConfig
+  - bce389b0 2025-04-23T17:09:08+00:00 msbic: default AWS to us-east-1 region
+  - 44e4e4f5 2025-04-21T21:56:56+05:30 Update CO status condition message to a clearer version
+  - e6d24c79 2025-03-24T16:06:51-05:00 removing uncessary bind mount option rw
 
-- kubernetes image-arm64 97471c6ac55733da63e4db6680889897a5915ca7 to 0b8a68191de069deeca944e443a5ead7e0469b41
+- kubernetes image-amd64 97471c6ac55733da63e4db6680889897a5915ca7 to 0b8a68191de069deeca944e443a5ead7e0469b41
   - d656a89fb 2025-04-10T10:42:13-03:00 UPSTREAM: <carry> : OCPBUGS-54807: skip UDP LoadBalancer on external
   - 4ca059e15 2025-04-10T10:34:37-03:00 UPSTREAM: <drop> : make update
 
