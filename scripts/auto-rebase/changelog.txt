@@ -1,8 +1,0 @@
-- ovn-kubernetes image-amd64 f5eceb4222b59b49a50100fccd733cee322097c7 to 51b4e0f5ececf9e9fee834e7598f5b9b505d4faf
-  - 2e938b9 2025-04-08T18:27:03+00:00 Dockerfile.base: bump OVS version to 3.3.
-  - f88ed08 2025-02-11T16:09:08+00:00 Bump OVN to 23.09.6-12 to consume fix for FDP-905
-
-- ovn-kubernetes image-arm64 f5eceb4222b59b49a50100fccd733cee322097c7 to 51b4e0f5ececf9e9fee834e7598f5b9b505d4faf
-  - 2e938b9 2025-04-08T18:27:03+00:00 Dockerfile.base: bump OVS version to 3.3.
-  - f88ed08 2025-02-11T16:09:08+00:00 Bump OVN to 23.09.6-12 to consume fix for FDP-905
-
