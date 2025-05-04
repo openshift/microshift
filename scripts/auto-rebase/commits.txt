@@ -1,4 +1,4 @@
-https://github.com/openshift/api embedded-component e577b4d83475e00f762184e90d97f7526681defe
+https://github.com/openshift/api embedded-component d22fca85e3b9f77f0cf2b43759a5ff927e605f57
 https://github.com/openshift/cluster-csi-snapshot-controller-operator embedded-component cf99de974354133f853928cff9e19ad19c5347d9
 https://github.com/openshift/cluster-dns-operator embedded-component 659813065170f4e52f80b7a29bbab64bfa9aa172
 https://github.com/openshift/cluster-ingress-operator embedded-component 2e6bd66d4ad11f58b8dea2677a94751bb372dca5

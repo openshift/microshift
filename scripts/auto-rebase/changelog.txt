@@ -1,0 +1,7 @@
+- api embedded-component e577b4d83475e00f762184e90d97f7526681defe to d22fca85e3b9f77f0cf2b43759a5ff927e605f57
+  - e5a4dc40 2025-04-28T10:46:22+02:00 make update
+  - 49f9c6de 2025-04-28T10:38:42+02:00 features: enable ServiceAccountTokenNodeBinding
+  - 42c53671 2025-04-25T15:46:32+01:00 Enable nomaps linter
+  - 4f87a133 2025-04-25T15:40:23+01:00 Update tools vendor
+  - fe7ee721 2025-04-25T15:40:06+01:00 Update kube-api-linter to kube-sigs
+
