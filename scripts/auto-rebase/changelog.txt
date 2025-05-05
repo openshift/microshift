@@ -1,6 +1,0 @@
-- cluster-network-operator embedded-component 10162672f39b812dbfdbc3fa51f634c7851c1df1 to db952dd8188afc450be6f8c60d00e9068377c266
-  - 6b2c571 2025-04-06T22:46:08-04:00 Fix feature migration for EgressIP
-
-- route-controller-manager embedded-component 3112b458983c6fca6f77d5a945fb0026186dace6 to 9ff2408eb11efe30253ba6a7e9ad4bf92dcb8fab
-  - 2c32d90 2025-04-22T02:48:39+00:00 ingress: Reset metrics when ingress is deleted
-
