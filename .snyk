@@ -6,4 +6,9 @@ exclude:
     - etcd/vendor/**
     - test/**
     - scripts/**
+ignore:
+  '7154f7f8-a0c9-42ec-b8b7-dc8727837ddf':
+    - '*':
+        reason: 'Known remove all usage'
+        path: 'pkg/cmd/init.go'
 version: v1.25.1
