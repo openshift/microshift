@@ -93,17 +93,15 @@ Custom TLS 1_3 configuration
 
 TLS Config: Unsupported Cipher Suite
     [Documentation]    Test behavior when TLS version is set to an unsupported cipher suite
-
-    Setup Invalid TLS Configuration    ${TLS_INVALID_CIPHER}
+    [Setup]    Setup Invalid TLS Configuration    ${TLS_INVALID_CIPHER}
     Check Journal Logs    config    tls_invalid_cipher
-    Restore Valid TLS Configuration
+    [Teardown]    Restore Valid TLS Configuration
 
 TLS Config: Invalid TLS Version
     [Documentation]    Test behavior when TLS version is set to an invalid value
-
-    Setup Invalid TLS Configuration    ${TLS_INVALID_VERSION}
+    [Setup]    Setup Invalid TLS Configuration    ${TLS_INVALID_VERSION}
     Check Journal Logs    config    tls_invalid_version
-    Restore Valid TLS Configuration
+    [Teardown]    Restore Valid TLS Configuration
 
 
 *** Keywords ***
