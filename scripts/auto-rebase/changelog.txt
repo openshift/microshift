@@ -1,14 +1,8 @@
-- kubernetes embedded-component 97471c6ac55733da63e4db6680889897a5915ca7 to 0b8a68191de069deeca944e443a5ead7e0469b41
-  - d656a89fb 2025-04-10T10:42:13-03:00 UPSTREAM: <carry> : OCPBUGS-54807: skip UDP LoadBalancer on external
-  - 4ca059e15 2025-04-10T10:34:37-03:00 UPSTREAM: <drop> : make update
+- machine-config-operator embedded-component b927430d6bad82dc043dfd8f3a4d6bc362d1519e to 4ed95576efa8c69091777849db22b32b2264e7fb
+  - 92828b87 2025-04-29T10:41:58-05:00 usbguard and libreswan patch
+  - 0e8c79b6 2025-04-28T09:06:17-04:00 msbic: skip windows machinesets
+  - b0d3dafe 2025-04-09T14:31:21+03:00 kubelet-service: narrow down restorecon path
 
-- machine-config-operator embedded-component c3b71f5aab700255ea33850a4e055449e8019261 to b927430d6bad82dc043dfd8f3a4d6bc362d1519e
-  - 934a9c14 2025-04-23T18:37:22+00:00 operator: fix timeout in syncRenderConfig
-  - bce389b0 2025-04-23T17:09:08+00:00 msbic: default AWS to us-east-1 region
-  - 44e4e4f5 2025-04-21T21:56:56+05:30 Update CO status condition message to a clearer version
-  - e6d24c79 2025-03-24T16:06:51-05:00 removing uncessary bind mount option rw
-
-- kubernetes image-amd64 97471c6ac55733da63e4db6680889897a5915ca7 to 0b8a68191de069deeca944e443a5ead7e0469b41
-  - d656a89fb 2025-04-10T10:42:13-03:00 UPSTREAM: <carry> : OCPBUGS-54807: skip UDP LoadBalancer on external
-  - 4ca059e15 2025-04-10T10:34:37-03:00 UPSTREAM: <drop> : make update
+- operator-framework-olm embedded-component cc44b486ea91015a30946029b3a0be3af49ea789 to 3ea075d56e2f3f25ca520022366797c94897e632
+  - 6fb8afab 2025-04-28T14:48:41-04:00 CVE-2025-27144: pin go-jose/v4@v4.0.5 (#3550)
 
