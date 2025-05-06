@@ -110,7 +110,8 @@ func RetryGet(ctx context.Context, url, additionalCAPath string) int {
 		c := http.Client{
 			Transport: &http.Transport{
 				TLSClientConfig: &tls.Config{
-					RootCAs: rootCAs,
+					RootCAs:    rootCAs,
+					MinVersion: tls.VersionTLS12,
 				},
 			},
 		}
