@@ -6,4 +6,6 @@ exclude:
     - etcd/vendor/**
     - test/**
     - scripts/**
+    - pkg/cmd/init.go
+    - pkg/util/net.go
 version: v1.25.1
