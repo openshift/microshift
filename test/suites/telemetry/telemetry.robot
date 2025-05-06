@@ -48,29 +48,25 @@ ${PULL_SECRET_NO_METRICS}           /etc/crio/openshift-pull-secret-without-tele
 *** Test Cases ***
 MicroShift Reports Metrics To Server
     [Documentation]    Check MicroShift is able to send metrics to the telemetry server without errors.
+    [Setup]    Setup Telemetry Configuration    ${ENABLE_TELEMETRY}    ${PULL_SECRET_METRICS}
 
-    Setup Telemetry Configuration    ${ENABLE_TELEMETRY}    ${PULL_SECRET_METRICS}
-
-    Should Find Metrics In Journal Log Success    Metrics sent successfully
     Should Find Metrics In Journal Log Success    MicroShift telemetry starting, sending first metrics collection.
+    Should Find Metrics In Journal Log Success    Metrics sent successfully
 
     [Teardown]    Remove Telemetry Configuration
 
 MicroShift Reports Metrics To Server Through Proxy
     [Documentation]    Check MicroShift is able to send metrics to the telemetry server through a proxy without errors.
+    [Setup]    Setup Telemetry Configuration With Proxy    ${ENABLE_TELEMETRY_WITH_PROXY}    ${PULL_SECRET_METRICS}
 
-    Start Proxy Server    host=${PROXY_HOST}    port=${PROXY_PORT}
-    Setup Telemetry Configuration    ${ENABLE_TELEMETRY_WITH_PROXY}    ${PULL_SECRET_METRICS}
-
-    Should Find Metrics In Journal Log Success    Metrics sent successfully
     Should Find Metrics In Journal Log Success    MicroShift telemetry starting, sending first metrics collection.
+    Should Find Metrics In Journal Log Success    Metrics sent successfully
 
-    Stop Proxy Server
-    [Teardown]    Remove Telemetry Configuration
+    [Teardown]    Remove Telemetry Configuration With Proxy
 
 MicroShift Fails to Report Metrics To Server Telemetry Disabled
     [Documentation]    Check MicroShift is not able to send metrics to the telemetry server when it is disabled.
-    Setup Telemetry Configuration    ${DISABLE_TELEMETRY}    ${PULL_SECRET_METRICS}
+    [Setup]    Setup Telemetry Configuration    ${DISABLE_TELEMETRY}    ${PULL_SECRET_METRICS}
 
     Should Find Metrics In Journal Log Success    Telemetry is disabled
     Should Find Metrics In Journal Log Fails    Metrics sent successfully
@@ -79,7 +75,7 @@ MicroShift Fails to Report Metrics To Server Telemetry Disabled
 
 MicroShift Fails to Report Metrics To Server Wrong Pull Secret
     [Documentation]    Check MicroShift is not able to send metrics to the telemetry server when the pull secret is wrong.
-    Setup Telemetry Configuration    ${ENABLE_TELEMETRY}    ${PULL_SECRET_NO_METRICS}
+    [Setup]    Setup Telemetry Configuration    ${ENABLE_TELEMETRY}    ${PULL_SECRET_NO_METRICS}
 
     Should Find Metrics In Journal Log Success    MicroShift telemetry starting, sending first metrics collection.
     Should Find Metrics In Journal Log Success    Unable to get pull secret: cloud.openshift.com not found
@@ -132,7 +128,6 @@ Check MicroShift Metrics Sent To Prometheus Server    # robocop: disable=too-man
 Setup
     [Documentation]    Test suite setup
     Check Required Env Variables
-    Check Required Proxy Variables
     Check Required Telemetry Variables
     Login MicroShift Host
     Setup Kubeconfig
@@ -143,16 +138,13 @@ Teardown
     Remove Kubeconfig
 
 Check Required Telemetry Variables
-    [Documentation]    Check if the required proxy variables are set
+    [Documentation]    Check if the required telemetry variables are set
     Should Not Be Empty    ${PROXY_HOST}    PROXY_HOST variable is required
     ${string_value}=    Convert To String    ${PROXY_PORT}
     Should Not Be Empty    ${string_value}    PROXY_PORT variable is required
     Should Not Be Empty    ${PROMETHEUS_HOST}    PROMETHEUS_HOST variable is required
     ${string_value}=    Convert To String    ${PROMETHEUS_PORT}
     Should Not Be Empty    ${string_value}    PROMETHEUS_PORT variable is required
-
-Check Required Proxy Variables
-    [Documentation]    Check if the required proxy variables are set
     Should Not Be Empty    ${PROXY_HOST}    PROXY_HOST variable is required
     ${string_value}=    Convert To String    ${PROXY_PORT}
     Should Not Be Empty    ${string_value}    PROXY_PORT variable is required
@@ -168,12 +160,23 @@ Setup Telemetry Configuration
     Set Test Variable    \${CURSOR}    ${cursor}
     Restart MicroShift
 
+Setup Telemetry Configuration With Proxy
+    [Documentation]    Start proxy server and setup Telemetry config
+    [Arguments]    ${config}    ${new_pull_secret}
+    Start Proxy Server    host=${PROXY_HOST}    port=${PROXY_PORT}
+    Setup Telemetry Configuration    ${config}    ${new_pull_secret}
+
 Remove Telemetry Configuration
     [Documentation]    Removes the telemetry feature from MicroShift configuration file
     ...    and restarts microshift.service
     Remove Drop In MicroShift Config    10-telemetry
     Restore Pull Secrets
     Restart MicroShift
+
+Remove Telemetry Configuration With Proxy
+    [Documentation]    Stop proxy server and remove Telemetry config
+    Stop Proxy Server
+    Remove Telemetry Configuration
 
 Configure Pull Secrets
     [Documentation]    Sets up the pull secrets for the MicroShift cluster.
