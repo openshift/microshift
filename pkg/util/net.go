@@ -18,6 +18,7 @@ package util
 import (
 	"context"
 	"crypto/tls"
+	"crypto/x509"
 	"fmt"
 	tcpnet "net"
 	"net/http"
@@ -83,12 +84,33 @@ found:
 }
 
 func RetryInsecureGet(ctx context.Context, url string) int {
+	return RetryGet(ctx, url, "")
+}
+
+func RetryGet(ctx context.Context, url, additionalCAPath string) int {
+	rootCAs, err := x509.SystemCertPool()
+	if err != nil {
+		klog.Infof("Warning: Failed to load system CA certificates: %v. Creating an empty pool.", err)
+		rootCAs = x509.NewCertPool()
+	}
+	if additionalCAPath != "" {
+		caCert, err := os.ReadFile(additionalCAPath)
+		if err != nil {
+			klog.Errorf("failed to read CA certificate %s: %v", additionalCAPath, err)
+			return 0
+		}
+
+		if !rootCAs.AppendCertsFromPEM(caCert) {
+			klog.Errorf("failed to append CA certificate %s to pool", additionalCAPath)
+			return 0
+		}
+	}
 	status := 0
-	err := wait.PollUntilContextTimeout(ctx, 5*time.Second, 120*time.Second, false, func(ctx context.Context) (bool, error) {
+	err = wait.PollUntilContextTimeout(ctx, 5*time.Second, 120*time.Second, false, func(ctx context.Context) (bool, error) {
 		c := http.Client{
 			Transport: &http.Transport{
 				TLSClientConfig: &tls.Config{
-					InsecureSkipVerify: true, //nolint:gosec
+					RootCAs: rootCAs,
 				},
 			},
 		}
