@@ -1,7 +1,14 @@
-- api embedded-component e577b4d83475e00f762184e90d97f7526681defe to d22fca85e3b9f77f0cf2b43759a5ff927e605f57
-  - e5a4dc40 2025-04-28T10:46:22+02:00 make update
-  - 49f9c6de 2025-04-28T10:38:42+02:00 features: enable ServiceAccountTokenNodeBinding
-  - 42c53671 2025-04-25T15:46:32+01:00 Enable nomaps linter
-  - 4f87a133 2025-04-25T15:40:23+01:00 Update tools vendor
-  - fe7ee721 2025-04-25T15:40:06+01:00 Update kube-api-linter to kube-sigs
+- api embedded-component d22fca85e3b9f77f0cf2b43759a5ff927e605f57 to 7152b1b11175dfb0c132626b9f82967405d55959
+  - 446c4bf6 2025-04-30T13:33:02+02:00 README: Add criteria for featuregate test result windows and flake handling
+
+- machine-config-operator embedded-component e44d380686aee42f784a277236dbac49b083441e to 7cf30502a5ff034b4017a4f0988ecd9a29ec93e3
+  - 5eb8694d 2025-04-29T16:01:30-05:00 updated log to specify when no state changes
+  - a48bebe0 2025-04-09T13:30:20-04:00 AWS Custom-DNS: Update services that run on control plane nodes
+
+- openshift-controller-manager embedded-component 49eb6f8ae6e87dbdd4c3f49902a1eca5ef85b3f1 to 39ebafcc026c27abd1181b38e919076e3ec1b465
+  - aac411e 2025-05-02T11:59:50+05:30 fix: fixed vendor inconsistency failure to pass verify-deps job
+  - 591db09 2025-04-17T05:38:03+00:00 OCPBUGS-54695:Empty proxy variables are causing issues during the build Problem:  Irrespective of default proxy settings these proxy variables are set on build containers. If any defaults are set they reflect those setting ,if not set they are set to null on the build container. Having these null variables are causing problems to some customers as its breaking some required apps on container   HTTP_PROXY,http_proxy,HTTPS_PROXY,https_proxy,NO_PROXY,no_proxy Fix:  Code changed only to add these proxy variables only if they are defined in defaults and if they are not null.
+
+- kubernetes image-arm64 76a7b9964ebe022596bbbabe2e2ca371b02b2752 to 83565d533048d2c0c574d94a66bc01f21cd039ec
+  - 162e867f4 2025-04-25T14:03:40-04:00 UPSTREAM: <carry>: use OTE for spec filtering in e2e tests
 
