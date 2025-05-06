@@ -611,7 +611,7 @@ func cleanupStaleKubeconfigs(cfg *config.Config, path string) error {
 		}
 	}
 	for _, deletePath := range deleteDirs {
-		if err := os.RemoveAll(deletePath); err != nil {
+		if err := os.RemoveAll(filepath.Clean(deletePath)); err != nil {
 			klog.Warningf("Unable to remove %s: %v", deletePath, err)
 		}
 		klog.Infof("Removed stale kubeconfig %s", deletePath)
