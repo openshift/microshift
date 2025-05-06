@@ -78,7 +78,7 @@ To build MicroShift from source and contribute to its development, refer to the 
 - [Layered Product Testing with MicroShift](./docs/contributor/layered_product_ci.md)
 
 ## Community
-Community documentation sources are managed at <https://github.com/redhat-et/microshift-documentation> and published on <https://microshift.io>.
+Community build and CI sources managed at <https://github.com/microshift-io/microshift> and documentation sources are managed at <https://github.com/redhat-et/microshift-documentation> and published on <https://microshift.io>.
 
 To get started with MicroShift, please refer to the [Getting Started](https://microshift.io/docs/getting-started/) section of the MicroShift [User Documentation](https://microshift.io/docs/user-documentation/).
 

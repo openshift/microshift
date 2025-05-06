@@ -195,7 +195,7 @@ assets:
       - file: storage_version_migration.crd.yaml
         src:  0000_50_cluster-kube-storage-version-migrator-operator_01_storage_migration_crd.yaml
       - file: route.crd.yaml
-        src: /api/route/v1/zz_generated.crd-manifests/routes-Default.crd.yaml
+        src: /api/route/v1/zz_generated.crd-manifests/routes.crd.yaml
 
 
   - dir: release/

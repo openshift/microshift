@@ -55,11 +55,12 @@ Remove Kubeconfig
 
 Run With Kubeconfig
     [Documentation]    Run a command using KUBECONFIG from the test suite.
-    [Arguments]    ${cmd}    ${allow_fail}=False    ${return_rc}=False
+    [Arguments]    ${cmd}    ${allow_fail}=False    ${return_rc}=False    ${timeout}=300s
     ${stdout_file}=    Create Random Temp File
     ${result}=    Process.Run Process    ${cmd}    env:KUBECONFIG=${KUBECONFIG}
     ...    stderr=STDOUT    shell=True
     ...    stdout=${stdout_file}
+    ...    timeout=${timeout}
 
     Log    ${result.stdout}
     Log    ${result.stderr}
