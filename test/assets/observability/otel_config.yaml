@@ -1,0 +1,83 @@
+# This OTEL config is only for testing purposes
+receivers:
+  hostmetrics:
+    root_path: /
+    collection_interval: 10s
+    scrapers:
+      cpu:
+      memory:
+      network:
+      disk:
+      filesystem:
+  journald:
+    units:
+      - microshift
+      - microshift-observability
+      - microshift-etcd
+      - crio
+      - openvswitch.service
+  kubeletstats:
+    auth_type: tls
+    ca_file: /var/lib/microshift/certs/ca-bundle/client-ca.crt
+    key_file: /var/lib/microshift/certs/admin-kubeconfig-signer/openshift-observability-client/client.key
+    cert_file: /var/lib/microshift/certs/admin-kubeconfig-signer/openshift-observability-client/client.crt
+    insecure_skip_verify: true
+    collection_interval: 20s
+    endpoint: "[{{NODE_IP}}]:10250"
+    node: "{{NODE_IP}}"
+    k8s_api_config:
+      auth_type: kubeConfig
+  k8s_events:
+    auth_type: kubeConfig
+
+processors:
+  batch:
+    timeout: 1s
+  resourcedetection/system:
+    detectors: [ "system" ]
+    system:
+      hostname_sources: [ "os" ]
+  resource/journald:
+    attributes:
+      - action: upsert
+        key: service.name
+        value: journald
+  resource/kube_events:
+    attributes:
+      - action: upsert
+        key: service.name
+        value: kube_events
+
+exporters:
+  debug: # exports metrics only in journalctl log
+  prometheus:
+    endpoint: "[{{NODE_IP}}]:{{PROM_EXPORTER_PORT}}"
+    send_timestamps: true
+    metric_expiration: 30m
+  prometheusremotewrite:
+    endpoint: "http://[{{PROMETHEUS_HOST}}]:{{PROMETHEUS_PORT}}/api/v1/write"
+  loki: # only for logs, exports the logs in the loki server
+    endpoint: "http://[{{LOKI_HOST}}]:{{LOKI_PORT}}/loki/api/v1/push"
+
+extensions:
+  file_storage:
+    directory: /var/lib/microshift-observability
+
+service:
+  extensions: [ file_storage ]
+  pipelines:
+    metrics/hostmetrics:
+      receivers: [ hostmetrics ]
+      processors: [ resourcedetection/system ]
+      exporters: [ debug, prometheus, prometheusremotewrite ]
+    metrics/kubeletstats:
+      receivers: [ kubeletstats ]
+      exporters: [ debug, prometheus, prometheusremotewrite ]
+    logs/journald:
+      receivers: [ journald ]
+      processors: [ batch, resource/journald ]
+      exporters: [ debug, loki ]
+    logs/kube_events:
+      receivers: [ k8s_events ]
+      processors: [ batch, resource/kube_events ]
+      exporters: [ debug, loki ]
