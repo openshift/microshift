@@ -45,7 +45,7 @@ action_start() {
     podman run -d --rm --name prometheus \
         -p 9092:9090 \
         -v "${PROMETHEUS_DIR}:/etc/prometheus:Z" \
-        docker.io/prom/prometheus \
+        quay.io/prometheus/prometheus \
         --config.file=/etc/prometheus/prometheus.yml \
         --web.enable-remote-write-receiver > /dev/null
 }
