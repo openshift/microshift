@@ -466,6 +466,13 @@ $ ./test/bin/scenario.sh run \
       ./test/scenarios/el92-src@standard-suite.sh
 ```
 
+To execute a specific scenario on your target VM, use the following
+command.
+```
+$ ./test/bin/scenario.sh run \
+      ./test/scenarios/el92-src@standard-suite.sh <vm_ip>
+```
+
 ### Scenario Definitions
 
 Scenarios are saved as shell scripts under `./test/scenarios` and
