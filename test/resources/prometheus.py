@@ -18,15 +18,18 @@ def _run_prometheus_query(host: str, port: int, query: str) -> requests.Response
         raise Exception(f"Prometheus query failed with status: {response.json().get('status')}")
     return response
 
+
 def check_prometheus_query(host: str, port: int, query: str) -> None:
     response = _run_prometheus_query(host, port, query)
     if not response.json().get("data", {}).get("result") or len(response.json().get("data", {}).get("result")) == 0:
         raise Exception("Prometheus query returned no results")
 
+
 def check_prometheus_query_is_missing(host: str, port: int, query: str) -> None:
     response = _run_prometheus_query(host, port, query)
     if response.json().get("data", {}).get("result") and len(response.json().get("data", {}).get("result")) == 1:
         raise Exception("Prometheus query returned no results")
+
 
 def check_prometheus_exporter(host: str, port: int, query: str) -> None:
     """Check the metric is available int Prometheus Exporter
