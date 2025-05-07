@@ -99,31 +99,31 @@ enable_beta_or_eus_repositories() {
         sudo sed -i "s,dist/rhel${version_id_major}/${version_id}/$(uname -m)/baseos/,${version_id_eus}/rhel${version_id_major}/${version_id}/$(uname -m)/baseos/,g" "${composer_config}"
         sudo sed -i "s,dist/rhel${version_id_major}/${version_id}/$(uname -m)/appstream/,${version_id_eus}/rhel${version_id_major}/${version_id}/$(uname -m)/appstream/,g" "${composer_config}"
     fi
-    # If the host OS is configured to use the internal repo, overwrite the composer_config to match
+    # If the host OS is configured to use the internal repo, overwrite the composer configuration to match
     if dnf repolist | grep -q download.eng.brq.redhat.com; then
         # The gpgkey from /usr/share/osbuild-composer/repositories is valid and common for all repos
-        local -r GPGKEY=$(ARCH=$(uname -m) jq '.[env.ARCH][] | select(.name=="baseos") | .gpgkey' /usr/share/osbuild-composer/repositories/rhel-9.6.json)
+        local -r gpgkey=$(ARCH=$(uname -m) jq '.[env.ARCH][] | select(.name=="baseos") | .gpgkey' /usr/share/osbuild-composer/repositories/rhel-"${version_id}".json)
         sudo tee "${composer_config}" &>/dev/null <<EOF
 {
   "$(uname -m)": [
     {
       "name": "baseos",
       "baseurl": "http://download.eng.brq.redhat.com/rhel-${version_id_major}/nightly/RHEL-${version_id_major}/latest-RHEL-${version_id}/compose/BaseOS/$(uname -m)/os",
-      "gpgkey": ${GPGKEY},
+      "gpgkey": ${gpgkey},
       "rhsm": false,
       "check_gpg": true
     },
     {
       "name": "appstream",
       "baseurl": "http://download.eng.brq.redhat.com/rhel-${version_id_major}/nightly/RHEL-${version_id_major}/latest-RHEL-${version_id}/compose/AppStream/$(uname -m)/os",
-      "gpgkey": ${GPGKEY},
+      "gpgkey": ${gpgkey},
       "rhsm": false,
       "check_gpg": true
     },
     {
       "name": "rt",
       "baseurl": "http://download.eng.brq.redhat.com/rhel-${version_id_major}/nightly/RHEL-${version_id_major}/latest-RHEL-${version_id}/compose/RT/$(uname -m)/os",
-      "gpgkey": ${GPGKEY},
+      "gpgkey": ${gpgkey},
       "rhsm": false,
       "check_gpg": true
     }
