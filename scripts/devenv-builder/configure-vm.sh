@@ -110,6 +110,10 @@ fi
 if grep -qE 'Red Hat Enterprise Linux.*Beta' /etc/redhat-release; then
     RHEL_BETA_VERSION=true
 fi
+# If internal repos are in use set RHEL_BETA_VERSION
+if dnf repolist | grep -q download.eng.brq.redhat.com; then
+    RHEL_BETA_VERSION=true
+fi
 
 OCP_PULL_SECRET=$1
 [ ! -e "${OCP_PULL_SECRET}" ] && usage "OpenShift pull secret file '${OCP_PULL_SECRET}' does not exist"
