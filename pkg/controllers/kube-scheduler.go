@@ -24,6 +24,7 @@ import (
 
 	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/util"
+	"github.com/openshift/microshift/pkg/util/cryptomaterial"
 
 	klog "k8s.io/klog/v2"
 	kubescheduler "k8s.io/kubernetes/cmd/kube-scheduler/app"
@@ -55,6 +56,10 @@ func (s *KubeScheduler) configure(cfg *config.Config) {
 	s.options.Authorization.RemoteKubeConfigFile = cfg.KubeConfigPath(config.KubeScheduler)
 	s.options.SecureServing.MinTLSVersion = cfg.ApiServer.TLS.MinVersion
 	s.options.SecureServing.CipherSuites = cfg.ApiServer.TLS.CipherSuites
+	// Use the same certificates as the apiserver for localhost communication
+	// to avoid creating new certificates just for this component having the same CN/SAN.
+	s.options.SecureServing.ServerCert.CertKey.CertFile = cryptomaterial.ServingCertPath(cryptomaterial.KubeAPIServerLocalhostServingCertDir(cryptomaterial.CertsDirectory(config.DataDir)))
+	s.options.SecureServing.ServerCert.CertKey.KeyFile = cryptomaterial.ServingKeyPath(cryptomaterial.KubeAPIServerLocalhostServingCertDir(cryptomaterial.CertsDirectory(config.DataDir)))
 	s.kubeconfig = cfg.KubeConfigPath(config.KubeScheduler)
 }
 
@@ -80,7 +85,7 @@ func (s *KubeScheduler) Run(ctx context.Context, ready chan<- struct{}, stopped 
 	// run readiness check
 	go func() {
 		// This endpoint uses a self-signed certificate on purpose, we need to skip verification.
-		healthcheckStatus := util.RetryInsecureGet(ctx, "https://localhost:10259/healthz")
+		healthcheckStatus := util.RetryGet(ctx, "https://localhost:10259/healthz", cryptomaterial.CACertPath(cryptomaterial.KubeAPIServerLocalhostSigner(cryptomaterial.CertsDirectory(config.DataDir))))
 		if healthcheckStatus != 200 {
 			klog.Errorf("%s healthcheck failed due to kube-scheduler failure to start", s.Name())
 			errorChannel <- errors.New("kube-scheduler healthcheck failed")

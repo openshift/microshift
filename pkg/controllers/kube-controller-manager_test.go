@@ -28,6 +28,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 	embedded "github.com/openshift/microshift/assets"
 	"github.com/openshift/microshift/pkg/config"
+	"github.com/openshift/microshift/pkg/util/cryptomaterial"
 )
 
 func TestKCMDefaultConfigAsset(t *testing.T) {
@@ -72,8 +73,10 @@ func TestConfigure(t *testing.T) {
 		"--secure-port=10257",
 		fmt.Sprintf("--service-account-private-key-file=%s", kcmServiceAccountPrivateKeyFile()),
 		fmt.Sprintf("--service-cluster-ip-range=%s", cfg.Network.ServiceNetwork[0]),
+		fmt.Sprintf("--tls-cert-file=%s", cryptomaterial.ServingCertPath(cryptomaterial.KubeAPIServerLocalhostServingCertDir(cryptomaterial.CertsDirectory(config.DataDir)))),
 		fmt.Sprintf("--tls-cipher-suites=%s", strings.Join(crypto.OpenSSLToIANACipherSuites(fixedTLSProfile.Ciphers), ",")),
 		fmt.Sprintf("--tls-min-version=%s", string(fixedTLSProfile.MinTLSVersion)),
+		fmt.Sprintf("--tls-private-key-file=%s", cryptomaterial.ServingKeyPath(cryptomaterial.KubeAPIServerLocalhostServingCertDir(cryptomaterial.CertsDirectory(config.DataDir)))),
 		"--use-service-account-credentials=true",
 		"-v=2",
 	}
