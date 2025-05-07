@@ -362,6 +362,9 @@ func (c *Config) incorporateUserSettings(u *Config) {
 	if u.Telemetry.Endpoint != "" {
 		c.Telemetry.Endpoint = u.Telemetry.Endpoint
 	}
+	if u.Telemetry.Proxy != "" {
+		c.Telemetry.Proxy = u.Telemetry.Proxy
+	}
 	if len(u.Ingress.ServingCertificateSecret) != 0 {
 		c.Ingress.ServingCertificateSecret = u.Ingress.ServingCertificateSecret
 	}

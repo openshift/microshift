@@ -442,6 +442,19 @@ ovms_requests_success{api="KServe",interface="REST",method="ModelReady",name="ov
 ovms_requests_success{api="KServe",interface="REST",method="ModelMetadata",name="ovms-resnet50",version="1"} 1
 ```
 
+##### Scraping model server's metrics with microshift-observability (OTEL)
+
+In order to scrape model server's metrics with microshift-observability:
+1. Your OTEL configuration needs to include prometheus receiver (see [opentelemetry-collector-large.yaml](/packaging/observability/opentelemetry-collector-large.yaml) preset of example)
+1. Your InferenceService CR needs to include following annotation which will be passed-through to the Pod:
+   ```yaml
+   apiVersion: serving.kserve.io/v1beta1
+   kind: InferenceService
+   metadata:
+     annotations:
+       prometheus.io/scrape: "true"
+   ```
+
 #### Other Inference Protocol endpoints
 
 To learn more about kserve endpoints see upstream documentation:

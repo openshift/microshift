@@ -109,14 +109,14 @@ Check Required Observability Variables
     Should Not Be Empty    ${string_value}    PROM_EXPORTER_PORT variable is required
 
 Journal Contains Enough Lines To Test
-    [Documentation]    Execution should wait until there are at least 50 lines of journal data to process. This is
+    [Documentation]    Execution should wait until there are at least 20 lines of journal data to process. This is
     ...    necessary because opentelemetry-collector will write debug output in batches. Thus, it can often happen
     ...    that there is not enough log data to gain an accurate read of the process's state, resulting in a false
     ...    negative signal (the opentelemetry-collector is healthy, but did not yet write data to journal.
 
     ${output}    ${rc}    Get Log Output With Pattern    ${JOURNAL_CUR}    .*    microshift-observability
     ${line_cnt}    Get Line Count    ${output}
-    Should Be True    ${line_cnt} > 50
+    Should Be True    ${line_cnt} > 20
 
 Set Test OTEL Configuration
     [Documentation]    Set Test OTEL Configuration
