@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"regexp"
 
 	configv1 "github.com/openshift/api/config/v1"
 	operatorv1 "github.com/openshift/api/operator/v1"
@@ -20,6 +21,10 @@ const (
 
 	AccessLoggingEnabled  AccessLoggingStatusEnum = "Enabled"
 	AccessLoggingDisabled AccessLoggingStatusEnum = "Disabled"
+)
+
+var (
+	headerNamePattern = regexp.MustCompile(`^[-!#$%&'*+.0-9A-Z^_` + "`" + `a-z|~]+$`)
 )
 
 type AccessLoggingStatusEnum string
@@ -454,6 +459,86 @@ func (a *AccessLogging) Validate() error {
 	if a.Status != AccessLoggingEnabled && a.Status != AccessLoggingDisabled {
 		return fmt.Errorf("invalid access logging status: %s", a.Status)
 	}
-	//TODO need to validate the rest of the values, including defaults.
+	if len(a.HttpCaptureCookies) > 1 {
+		return fmt.Errorf("invalid number of capture cookies: %d. Must be 1 at most", len(a.HttpCaptureCookies))
+	}
+	if len(a.HttpCaptureCookies) == 1 {
+		cookie := a.HttpCaptureCookies[0]
+		if isDefaultCookie(&cookie) {
+			a.HttpCaptureCookies = nil
+		} else if err := validateCookie(&cookie); err != nil {
+			return err
+		}
+	}
+	if len(a.HttpCaptureHeaders.Request) > 0 {
+		filteredList := make([]operatorv1.IngressControllerCaptureHTTPHeader, 0)
+		for _, h := range a.HttpCaptureHeaders.Request {
+			if isDefaultHeader(&h) {
+				continue
+			} else if err := validateHeader(&h); err != nil {
+				return fmt.Errorf("invalid request header: %s", err)
+			}
+			filteredList = append(filteredList, h)
+		}
+		a.HttpCaptureHeaders.Request = filteredList
+	}
+	if len(a.HttpCaptureHeaders.Response) > 0 {
+		filteredList := make([]operatorv1.IngressControllerCaptureHTTPHeader, 0)
+		for _, h := range a.HttpCaptureHeaders.Response {
+			if isDefaultHeader(&h) {
+				continue
+			} else if err := validateHeader(&h); err != nil {
+				return fmt.Errorf("invalid response header: %s", err)
+			}
+			filteredList = append(filteredList, h)
+		}
+		a.HttpCaptureHeaders.Response = filteredList
+	}
+	return nil
+}
+
+func isDefaultHeader(h *operatorv1.IngressControllerCaptureHTTPHeader) bool {
+	return h.MaxLength == 0 && h.Name == ""
+}
+
+func validateHeader(h *operatorv1.IngressControllerCaptureHTTPHeader) error {
+	if h.Name == "" {
+		return fmt.Errorf("header name is required")
+	}
+	if !headerNamePattern.MatchString(h.Name) {
+		return fmt.Errorf("header name '%s' contains invalid characters", h.Name)
+	}
+	if h.MaxLength < 1 {
+		return fmt.Errorf("header '%s' maxLength must be at least 1", h.Name)
+	}
+	return nil
+}
+
+func isDefaultCookie(c *operatorv1.IngressControllerCaptureHTTPCookie) bool {
+	return c.MatchType == "" && c.MaxLength == 0 && c.Name == "" && c.NamePrefix == ""
+}
+
+func validateCookie(c *operatorv1.IngressControllerCaptureHTTPCookie) error {
+	if c.MatchType != "Exact" && c.MatchType != "Prefix" {
+		return fmt.Errorf("invalid cookie match type: %s. Must be `Exact` or `Prefix`", c.MatchType)
+	}
+	if c.MaxLength < 1 || c.MaxLength > 1024 {
+		return fmt.Errorf("invalid cookie maxLength: %d. Must be between 1 and 1024", c.MaxLength)
+	}
+	if c.MatchType == "Exact" {
+		if len(c.Name) > 1024 {
+			return fmt.Errorf("invalid cookie name length: %d. Must be less than 1024", len(c.Name))
+		}
+		if !headerNamePattern.MatchString(c.Name) {
+			return fmt.Errorf("cookie name '%s' contains invalid characters", c.Name)
+		}
+	} else {
+		if len(c.NamePrefix) > 1024 {
+			return fmt.Errorf("invalid cookie namePrefix length: %d. Must be less than 1024", len(c.NamePrefix))
+		}
+		if !headerNamePattern.MatchString(c.NamePrefix) {
+			return fmt.Errorf("cookie namePrefix '%s' contains invalid characters", c.NamePrefix)
+		}
+	}
 	return nil
 }
