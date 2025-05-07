@@ -1,0 +1,50 @@
+- api embedded-component e577b4d83475e00f762184e90d97f7526681defe to d22fca85e3b9f77f0cf2b43759a5ff927e605f57
+  - e5a4dc40 2025-04-28T10:46:22+02:00 make update
+  - 49f9c6de 2025-04-28T10:38:42+02:00 features: enable ServiceAccountTokenNodeBinding
+  - 42c53671 2025-04-25T15:46:32+01:00 Enable nomaps linter
+  - 4f87a133 2025-04-25T15:40:23+01:00 Update tools vendor
+  - fe7ee721 2025-04-25T15:40:06+01:00 Update kube-api-linter to kube-sigs
+
+- cluster-kube-apiserver-operator embedded-component 93fe617f5239c8ef3933eb4ef1d04695ce3ab630 to 23b5175aa2d5b8f7364ef4aed1966745d6735c2a
+  - a13b667 2025-05-02T10:31:46-04:00 revert dev cert rotation
+
+- kubernetes embedded-component 76a7b9964ebe022596bbbabe2e2ca371b02b2752 to f6cfe0c54a1fa9314c65e30c613df641c7226ed0
+  - 977351202 2025-04-23T09:36:50-04:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - 59526cd48 2025-04-22T15:56:13+00:00 Release commit for Kubernetes v1.32.4
+  - 7b326a951 2025-04-03T08:46:13+01:00 Fix race for sending errors in watch
+  - b5f6d82ff 2025-04-02T13:20:20+03:00 CHANGELOG-1.32: fix release note about kubeadm upgrade phases
+  - 01b87d211 2025-03-13T09:39:16+00:00 Fix implementation of ContainsCIDR to allow non-equal addresses
+  - a0ad8fb28 2025-03-11T20:15:04+00:00 Update CHANGELOG/CHANGELOG-1.32.md for v1.32.3
+  - e3daed873 2025-03-10T18:59:14+08:00 fix handle terminating pvc when kubelet rebuild dsw
+  - ef4a6f983 2025-03-10T18:59:14+08:00 fix e2e
+  - ad0c8a10e 2025-03-10T18:59:14+08:00 add e2e test to reproduce unexpected unmount after kubelet is restarted
+
+- machine-config-operator embedded-component e44d380686aee42f784a277236dbac49b083441e to 35e6ec8fb41e0c7d03d97d433a13b3f5d59e23e4
+  - 7d9b0d79 2025-05-05T16:09:57+00:00 Revert "OCPBUGS-44757: decrease leases for kubelet on azure"
+
+- openshift-controller-manager embedded-component 49eb6f8ae6e87dbdd4c3f49902a1eca5ef85b3f1 to 8be524d728d03e61ee029ad2f7229ca97c93f87f
+  - a5b3bd2 2025-05-02T11:15:58+00:00 fix: fixed vendor inconsistency failure to pass verify-deps job
+  - 550e9b4 2025-05-02T11:15:58+00:00 OCPBUGS-54695:Empty proxy variables are causing issues during the build Problem: Irrespective of default proxy settings these proxy variables are set on build containers. If any defaults are set they reflect those setting ,if not set they are set to null on the build container. Having these null variables are causing problems to some customers as its breaking some required apps on container HTTP_PROXY,http_proxy,HTTPS_PROXY,https_proxy,NO_PROXY,no_proxy Fix: Code changed only to add these proxy variables only if they are defined in defaults and if they are not null.
+
+- kubernetes image-amd64 76a7b9964ebe022596bbbabe2e2ca371b02b2752 to f6cfe0c54a1fa9314c65e30c613df641c7226ed0
+  - 977351202 2025-04-23T09:36:50-04:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - 59526cd48 2025-04-22T15:56:13+00:00 Release commit for Kubernetes v1.32.4
+  - 7b326a951 2025-04-03T08:46:13+01:00 Fix race for sending errors in watch
+  - b5f6d82ff 2025-04-02T13:20:20+03:00 CHANGELOG-1.32: fix release note about kubeadm upgrade phases
+  - 01b87d211 2025-03-13T09:39:16+00:00 Fix implementation of ContainsCIDR to allow non-equal addresses
+  - a0ad8fb28 2025-03-11T20:15:04+00:00 Update CHANGELOG/CHANGELOG-1.32.md for v1.32.3
+  - e3daed873 2025-03-10T18:59:14+08:00 fix handle terminating pvc when kubelet rebuild dsw
+  - ef4a6f983 2025-03-10T18:59:14+08:00 fix e2e
+  - ad0c8a10e 2025-03-10T18:59:14+08:00 add e2e test to reproduce unexpected unmount after kubelet is restarted
+
+- kubernetes image-arm64 76a7b9964ebe022596bbbabe2e2ca371b02b2752 to f6cfe0c54a1fa9314c65e30c613df641c7226ed0
+  - 977351202 2025-04-23T09:36:50-04:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - 59526cd48 2025-04-22T15:56:13+00:00 Release commit for Kubernetes v1.32.4
+  - 7b326a951 2025-04-03T08:46:13+01:00 Fix race for sending errors in watch
+  - b5f6d82ff 2025-04-02T13:20:20+03:00 CHANGELOG-1.32: fix release note about kubeadm upgrade phases
+  - 01b87d211 2025-03-13T09:39:16+00:00 Fix implementation of ContainsCIDR to allow non-equal addresses
+  - a0ad8fb28 2025-03-11T20:15:04+00:00 Update CHANGELOG/CHANGELOG-1.32.md for v1.32.3
+  - e3daed873 2025-03-10T18:59:14+08:00 fix handle terminating pvc when kubelet rebuild dsw
+  - ef4a6f983 2025-03-10T18:59:14+08:00 fix e2e
+  - ad0c8a10e 2025-03-10T18:59:14+08:00 add e2e test to reproduce unexpected unmount after kubelet is restarted
+
