@@ -132,8 +132,8 @@ Teardown Suite And Revert Test Host
     [Documentation]    Set back original OTEL config and teardown Suite
     Set Back Original OTEL Configuration
     Teardown Suite
-    Start Loki Server
-    Start Prometheus Server
+    Stop Loki Server
+    Stop Prometheus Server
 
 Set Back Original OTEL Configuration
     [Documentation]    Set Back Original OTEL Configuration
