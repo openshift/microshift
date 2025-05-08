@@ -18,7 +18,7 @@ Suite Teardown      Teardown Suite And Revert Test Host
 *** Variables ***
 ${JOURNAL_CUR}              ${EMPTY}
 ${DEFAULT_CONFIG_PATH}      ../packaging/observability/opentelemetry-collector.yaml
-${OTEL_CONFIG_PATH}         /etc/microshift/opentelemetry-collector.yaml
+${OTEL_CONFIG_PATH}         /etc/microshift/observability/opentelemetry-collector.yaml
 ${TEST_CONFIG_PATH}         assets/observability/otel_config.yaml
 
 
