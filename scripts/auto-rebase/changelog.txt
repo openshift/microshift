@@ -1,3 +1,39 @@
-- machine-config-operator embedded-component 95b720defc004d4da4b88292c4ab7d069cda1088 to ae7f1c03d9381ad0cc80f99c4f0d06dad6f4c02e
-  - 98652cf7 2025-04-29T22:16:01+00:00 msbic: default AWS to us-east-1 region
+- kubernetes embedded-component 89ebee0309adcf066eb7e837f403269d85319513 to 1a087a5f1cd7e495b2433236f92b2dc351b457d3
+  - 895e0c534 2025-04-29T04:27:00+00:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - 66f4b3fc7 2025-04-22T15:58:21+00:00 Release commit for Kubernetes v1.30.12
+  - 48d8b1cc9 2025-04-18T10:18:47+08:00 fix lints
+  - 82cdad07e 2025-04-03T08:48:42+01:00 Fix race for sending errors in watch
+  - 854828406 2025-03-11T20:13:18+00:00 Update CHANGELOG/CHANGELOG-1.30.md for v1.30.11
+  - bf07bcada 2025-03-11T10:25:27+08:00 fix handle terminating pvc when kubelet rebuild dsw
+  - e0a9cf7d7 2025-03-10T19:00:24+08:00 fix e2e
+  - 2ca67d857 2025-03-10T19:00:24+08:00 add e2e test to reproduce unexpected unmount after kubelet is restarted
+  - 2f59101c2 2025-02-10T16:06:34-08:00 Add tests
+  - 1b3d37b4c 2025-02-10T14:51:38-08:00 do not install handler for /metrics/slis using sync.Once
+
+- machine-config-operator embedded-component ae7f1c03d9381ad0cc80f99c4f0d06dad6f4c02e to b25916385f6a702a14eed4a45c56c44b389e5468
+  - 4ee64fed 2025-04-30T23:28:54+00:00 msbic: skip windows machinesets
+
+- kubernetes image-amd64 89ebee0309adcf066eb7e837f403269d85319513 to 1a087a5f1cd7e495b2433236f92b2dc351b457d3
+  - 895e0c534 2025-04-29T04:27:00+00:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - 66f4b3fc7 2025-04-22T15:58:21+00:00 Release commit for Kubernetes v1.30.12
+  - 48d8b1cc9 2025-04-18T10:18:47+08:00 fix lints
+  - 82cdad07e 2025-04-03T08:48:42+01:00 Fix race for sending errors in watch
+  - 854828406 2025-03-11T20:13:18+00:00 Update CHANGELOG/CHANGELOG-1.30.md for v1.30.11
+  - bf07bcada 2025-03-11T10:25:27+08:00 fix handle terminating pvc when kubelet rebuild dsw
+  - e0a9cf7d7 2025-03-10T19:00:24+08:00 fix e2e
+  - 2ca67d857 2025-03-10T19:00:24+08:00 add e2e test to reproduce unexpected unmount after kubelet is restarted
+  - 2f59101c2 2025-02-10T16:06:34-08:00 Add tests
+  - 1b3d37b4c 2025-02-10T14:51:38-08:00 do not install handler for /metrics/slis using sync.Once
+
+- kubernetes image-arm64 89ebee0309adcf066eb7e837f403269d85319513 to 1a087a5f1cd7e495b2433236f92b2dc351b457d3
+  - 895e0c534 2025-04-29T04:27:00+00:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - 66f4b3fc7 2025-04-22T15:58:21+00:00 Release commit for Kubernetes v1.30.12
+  - 48d8b1cc9 2025-04-18T10:18:47+08:00 fix lints
+  - 82cdad07e 2025-04-03T08:48:42+01:00 Fix race for sending errors in watch
+  - 854828406 2025-03-11T20:13:18+00:00 Update CHANGELOG/CHANGELOG-1.30.md for v1.30.11
+  - bf07bcada 2025-03-11T10:25:27+08:00 fix handle terminating pvc when kubelet rebuild dsw
+  - e0a9cf7d7 2025-03-10T19:00:24+08:00 fix e2e
+  - 2ca67d857 2025-03-10T19:00:24+08:00 add e2e test to reproduce unexpected unmount after kubelet is restarted
+  - 2f59101c2 2025-02-10T16:06:34-08:00 Add tests
+  - 1b3d37b4c 2025-02-10T14:51:38-08:00 do not install handler for /metrics/slis using sync.Once
 
