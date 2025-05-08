@@ -1,0 +1,5 @@
+- machine-config-operator embedded-component d00398e9d7c250a6361222a1024209ca4f73f79d to 19d2a0275bf5e566dff786fbc88fe97c69d131d9
+  - fd548872 2025-05-02T21:39:20+00:00 msbic: skip windows machinesets
+  - e6435067 2025-04-17T13:53:33+00:00 OCPBUGS-53425: Make mtu-migration run after wait-for-primary-ip
+  - 2350fce9 2024-06-21T13:21:04+00:00 Fix for adding cert to controller config
+
