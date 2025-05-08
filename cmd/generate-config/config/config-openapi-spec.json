@@ -5,6 +5,7 @@
     "debugging",
     "dns",
     "etcd",
+    "genericDevicePlugin",
     "ingress",
     "kubelet",
     "manifests",
@@ -156,6 +157,34 @@
           "description": "Set a memory limit on the etcd process; etcd will begin paging\nmemory when it gets to this value. 0 means no limit.",
           "type": "integer",
           "format": "int64"
+        }
+      }
+    },
+    "genericDevicePlugin": {
+      "type": "object",
+      "required": [
+        "devices",
+        "domain",
+        "status"
+      ],
+      "properties": {
+        "devices": {
+          "description": "Devices configuration"
+        },
+        "domain": {
+          "description": "Domain with which devices will be present in the cluster,\ne.g. device.microshift.io/serial.",
+          "type": "string",
+          "default": "device.microshift.io"
+        },
+        "status": {
+          "description": "Generic Device Plugin status, can be Enabled or Disabled",
+          "type": "string",
+          "default": "Disabled",
+          "enum": [
+            "Enabled",
+            "Disabled",
+            ""
+          ]
         }
       }
     },

@@ -51,6 +51,14 @@ etcd:
     # Set a memory limit on the etcd process; etcd will begin paging
     # memory when it gets to this value. 0 means no limit.
     memoryLimitMB: 0
+genericDevicePlugin:
+    # Devices configuration
+    devices:
+    # Domain with which devices will be present in the cluster,
+    # e.g. device.microshift.io/serial.
+    domain: device.microshift.io
+    # Generic Device Plugin status, can be Enabled or Disabled
+    status: Disabled
 ingress:
     # accessLogging describes how the client requests should be logged.
     accessLogging:
