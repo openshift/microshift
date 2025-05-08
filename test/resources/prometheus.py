@@ -21,14 +21,16 @@ def _run_prometheus_query(host: str, port: int, query: str) -> requests.Response
 
 def check_prometheus_query(host: str, port: int, query: str) -> None:
     response = _run_prometheus_query(host, port, query)
-    if not response.json().get("data", {}).get("result") or len(response.json().get("data", {}).get("result")) == 0:
+    data_result_list: list = response.json().get("data", {}).get("result")
+    if not data_result_list or len(data_result_list) == 0:
         raise Exception("Prometheus query returned no results")
 
 
 def check_prometheus_query_is_missing(host: str, port: int, query: str) -> None:
     response = _run_prometheus_query(host, port, query)
-    if response.json().get("data", {}).get("result") and len(response.json().get("data", {}).get("result")) == 1:
-        raise Exception("Prometheus query returned no results")
+    data_result_list: list = response.json().get("data", {}).get("result")
+    if data_result_list and len(data_result_list) > 0:
+        raise Exception("Prometheus query returned results")
 
 
 def check_prometheus_exporter(host: str, port: int, query: str) -> None:
