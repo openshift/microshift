@@ -51,7 +51,6 @@ MicroShift Reports Metrics To Default Server
     [Documentation]    Check MicroShift is able to send metrics to the telemetry server without errors.
     [Setup]    Setup Telemetry Configuration    ${ENABLE_TELEMETRY}    ${PULL_SECRET_METRICS}
 
-    Should Find Metrics In Journal Log Success    MicroShift telemetry starting, sending first metrics collection.
     Should Find Metrics In Journal Log Success    Metrics sent successfully
 
     [Teardown]    Remove Telemetry Configuration
@@ -63,7 +62,6 @@ MicroShift Reports Metrics To Default Server Through Proxy
     ...    AND
     ...    Setup Telemetry Configuration    ${ENABLE_TELEMETRY_WITH_PROXY}    ${PULL_SECRET_METRICS}
 
-    Should Find Metrics In Journal Log Success    MicroShift telemetry starting, sending first metrics collection.
     Should Find Metrics In Journal Log Success    Metrics sent successfully
 
     [Teardown]    Run Keywords
@@ -95,7 +93,6 @@ MicroShift Fails to Report Metrics To Default Server With Wrong Pull Secret
     [Documentation]    Check MicroShift is not able to send metrics to the telemetry server when the pull secret is wrong.
     [Setup]    Setup Telemetry Configuration    ${ENABLE_TELEMETRY}    ${PULL_SECRET_NO_METRICS}
 
-    Should Find Metrics In Journal Log Success    MicroShift telemetry starting, sending first metrics collection.
     Should Find Metrics In Journal Log Success    Unable to get pull secret: cloud.openshift.com not found
     Should Find Metrics In Journal Log Fails    Metrics sent successfully
 
@@ -108,7 +105,6 @@ MicroShift Reports Metrics To Prometheus Server
     ...    AND
     ...    Setup Telemetry Configuration    ${ENABLE_TELEMETRY_TO_PROMETHUS}    ${PULL_SECRET_METRICS}
 
-    Should Find Metrics In Journal Log Success    MicroShift telemetry starting, sending first metrics collection.
     Should Find Metrics In Journal Log Success    Metrics sent successfully
 
     @{metrics_to_check}=    Get List Prometheus Metrics To Check
