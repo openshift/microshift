@@ -29,6 +29,21 @@ dns:
 etcd:
     memoryLimitMB: 0
 ingress:
+    accessLogging:
+        httpCaptureCookies:
+            - matchType: ""
+              maxLength: 0
+              name: ""
+              namePrefix: ""
+        httpCaptureHeaders:
+            request:
+                - maxLength: 0
+                  name: ""
+            response:
+                - maxLength: 0
+                  name: ""
+        httpLogFormat: ""
+        status: ""
     certificateSecret: ""
     clientTLS:
         allowedSubjectPatterns: []
@@ -40,6 +55,8 @@ ingress:
     httpCompression:
         mimeTypes: []
     httpEmptyRequestsPolicy: ""
+    httpErrorCodePages:
+        name: ""
     listenAddress: []
     logEmptyRequests: ""
     ports:
@@ -126,6 +143,21 @@ dns:
 etcd:
     memoryLimitMB: 0
 ingress:
+    accessLogging:
+        httpCaptureCookies:
+            - matchType: ""
+              maxLength: 0
+              name: ""
+              namePrefix: ""
+        httpCaptureHeaders:
+            request:
+                - maxLength: 0
+                  name: ""
+            response:
+                - maxLength: 0
+                  name: ""
+        httpLogFormat: ""
+        status: Disabled
     certificateSecret: router-certs-default
     clientTLS:
         allowedSubjectPatterns: []
@@ -137,6 +169,8 @@ ingress:
     httpCompression:
         mimeTypes: []
     httpEmptyRequestsPolicy: Respond
+    httpErrorCodePages:
+        name: ""
     listenAddress: []
     logEmptyRequests: Log
     ports:
