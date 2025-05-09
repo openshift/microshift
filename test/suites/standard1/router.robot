@@ -140,6 +140,8 @@ Router Namespace Ownership
 
     [Teardown]    Run Keywords
     ...    Delete Namespaces
+    ...    AND
+    ...    Remove Custom Config
 
 Router Disabled
     [Documentation]    Disable the router and check the namespace does not exist.
@@ -147,6 +149,8 @@ Router Disabled
     ...    Disable Router
 
     Oc Wait    namespace/openshift-ingress    --for=delete --timeout=300s
+
+    [Teardown]    Remove Custom Config
 
 Router Exposure Configuration
     [Documentation]    Test custom ports and custom listening addresses.
@@ -165,6 +169,8 @@ Router Exposure Configuration
 
     [Teardown]    Run Keywords
     ...    Remove Fake IP From NIC
+    ...    AND
+    ...    Remove Custom Config
 
 Router Verify Tuning Configuration
     [Documentation]    Test ingress tuning configuration.
@@ -187,6 +193,8 @@ Router Verify Tuning Configuration
     Pod Environment Should Match Value    openshift-ingress    ROUTER_ENABLE_COMPRESSION    true
     Pod Environment Should Match Value    openshift-ingress    ROUTER_COMPRESSION_MIME    text/html application/*
     Pod Environment Should Match Value    openshift-ingress    ROUTER_DISABLE_HTTP2    false
+
+    [Teardown]    Remove Custom Config
 
 Router Verify Security Configuration
     [Documentation]    Test ingress security configuration.
@@ -213,7 +221,10 @@ Router Verify Security Configuration
     ...    ROUTER_MUTUAL_TLS_AUTH_FILTER
     ...    (?:route-custom.apps.example.com)
     Pod Volume Should Contain Secret    openshift-ingress    default-certificate    router-certs-custom
-    [Teardown]    Delete Custom CA Secret
+    [Teardown]    Run Keywords
+    ...    Delete Custom CA Secret
+    ...    AND
+    ...    Remove Custom Config
 
 Router Verify Access Logging Configuration
     [Documentation]    Test ingress access logging configuration.
@@ -241,7 +252,10 @@ Router Verify Access Logging Configuration
 
     Check Access Logs    some-format
 
-    [Teardown]    Oc Delete    -f ${ROUTER_ERROR_CODE_CONFIGMAP}
+    [Teardown]    Run Keywords
+    ...    Oc Delete    -f ${ROUTER_ERROR_CODE_CONFIGMAP}
+    ...    AND
+    ...    Remove Custom Config
 
 
 *** Keywords ***
@@ -285,6 +299,11 @@ Setup With Custom Config
     [Documentation]    Install a custom config and restart MicroShift.
     [Arguments]    ${config_content}
     Drop In MicroShift Config    ${config_content}    10-ingress
+    Restart MicroShift
+
+Remove Custom Config
+    [Documentation]    Remove the custom config and restart MicroShift.
+    Remove Drop In MicroShift Config    10-ingress
     Restart MicroShift
 
 Setup Namespaces
