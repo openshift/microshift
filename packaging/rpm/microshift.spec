@@ -568,8 +568,8 @@ mkdir -p -m755 %{buildroot}%{_datadir}/microshift/release
 install -p -m644 assets/optional/ai-model-serving/release-ai-model-serving-x86_64.json %{buildroot}%{_datadir}/microshift/release/
 
 # observability
-install -d -m755 %{buildroot}%{_presetdir}
-install -p -m644 packaging/observability/opentelemetry-collector.yaml -D %{buildroot}%{_sysconfdir}/microshift/opentelemetry-collector.yaml
+install -d -m755 %{buildroot}/%{_sysconfdir}/microshift/observability
+install -p -m644 packaging/observability/*.yaml -D %{buildroot}%{_sysconfdir}/microshift/observability/
 install -p -m644 packaging/observability/microshift-observability.service %{buildroot}%{_unitdir}/
 install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/003-microshift-observability/
 install -p -m644 assets/optional/observability/*.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/003-microshift-observability/
@@ -763,14 +763,22 @@ fi
 
 %files observability
 %dir %{_prefix}/lib/microshift/manifests.d/003-microshift-observability
+%dir %{_sysconfdir}/microshift/observability/
 %{_unitdir}/microshift-observability.service
-%{_sysconfdir}/microshift/opentelemetry-collector.yaml
+%config(noreplace) %{_sysconfdir}/microshift/observability/opentelemetry-collector.yaml
+%{_sysconfdir}/microshift/observability/opentelemetry-collector-*.yaml
 %{_prefix}/lib/microshift/manifests.d/003-microshift-observability/*
 
 
 # Use Git command to generate the log and replace the VERSION string
 # LANG=C git log --date="format:%a %b %d %Y" --pretty="tformat:* %cd %an <%ae> VERSION%n- %s%n" packaging/rpm/microshift.spec
 %changelog
+* Thu May 08 2025 Patryk Matuszak <pmatusza@redhat.com> 4.19.0
+- Include OpenTelemetry configuration examples in the RPM
+
+* Wed Apr 16 2025 vanhalenar <thalenar@redhat.com> 4.19.0
+- Remove observability preset that enables the service automatically
+
 * Wed Apr 09 2025 Patryk Matuszak <pmatusza@redhat.com> 4.19.0
 - Split AIMS manifest into two: kserve and manifests
 
