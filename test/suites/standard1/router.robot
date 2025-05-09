@@ -118,7 +118,6 @@ Router Namespace Ownership
     ...    Setup Hello MicroShift Pods In Multiple Namespaces
 
     Configure Namespace Ownership Strict
-    Wait For Router Ready
     Wait Until Keyword Succeeds    60x    1s
     ...    Http Port Should Be Open    ${HTTP_PORT}
     ${result_1}=    Run Keyword And Return Status
@@ -130,7 +129,6 @@ Router Namespace Ownership
     END
 
     Configure Namespace Ownership Allowed
-    Wait For Router Ready
     Wait Until Keyword Succeeds    60x    1s
     ...    Http Port Should Be Open    ${HTTP_PORT}
     Wait Until Keyword Succeeds    60x    2s
@@ -138,13 +136,11 @@ Router Namespace Ownership
     Wait Until Keyword Succeeds    60x    2s
     ...    Access Hello Microshift Success    ${HTTP_PORT}    path=/${NS_OWNERSHIP_2}
 
-    [Teardown]    Run Keywords
-    ...    Delete Namespaces
+    [Teardown]    Delete Namespaces
 
 Router Disabled
     [Documentation]    Disable the router and check the namespace does not exist.
-    [Setup]    Run Keywords
-    ...    Disable Router
+    [Setup]    Disable Router
 
     Oc Wait    namespace/openshift-ingress    --for=delete --timeout=300s
 
@@ -163,13 +159,15 @@ Router Exposure Configuration
     Wait Until Keyword Succeeds    60x    2s
     ...    Internal Router Port Should Be Open    ${FAKE_LISTEN_IP}    ${ALTERNATIVE_HTTP_PORT}    http
 
-    [Teardown]    Run Keywords
-    ...    Remove Fake IP From NIC
+    [Teardown]    Remove Fake IP From NIC
 
 Router Verify Tuning Configuration
     [Documentation]    Test ingress tuning configuration.
-    [Setup]    Setup With Custom Config    ${ROUTER_TUNING_CONFIG}
-    Wait For Router Ready
+    [Setup]    Run Keywords
+    ...    Setup With Custom Config    ${ROUTER_TUNING_CONFIG}
+    ...    AND
+    ...    Wait For Router Ready
+
     Pod Environment Should Match Value    openshift-ingress    ROUTER_BUF_SIZE    5556
     Pod Environment Should Match Value    openshift-ingress    ROUTER_MAX_REWRITE_SIZE    8000
     Pod Environment Should Match Value    openshift-ingress    ROUTER_BACKEND_CHECK_INTERVAL    4s
@@ -194,8 +192,10 @@ Router Verify Security Configuration
     [Setup]    Run Keywords
     ...    Setup With Custom Config    ${ROUTER_SECURITY_CONFIG}
     ...    AND
+    ...    Wait For Router Ready
+    ...    AND
     ...    Create Custom Resources
-    Wait For Router Ready
+
     Pod Environment Should Match Value    openshift-ingress    ROUTER_ALLOW_WILDCARD_ROUTES    true
     Pod Environment Should Match Value    openshift-ingress    ROUTER_MUTUAL_TLS_AUTH    required
     Pod Environment Should Match Value
@@ -213,11 +213,16 @@ Router Verify Security Configuration
     ...    ROUTER_MUTUAL_TLS_AUTH_FILTER
     ...    (?:route-custom.apps.example.com)
     Pod Volume Should Contain Secret    openshift-ingress    default-certificate    router-certs-custom
+
     [Teardown]    Delete Custom CA Secret
 
 Router Verify Access Logging Configuration
     [Documentation]    Test ingress access logging configuration.
     [Setup]    Run Keywords
+    ...    Remove Custom Config
+    ...    AND
+    ...    Restart MicroShift
+    ...    AND
     ...    Oc Apply    -f ${ROUTER_ERROR_CODE_CONFIGMAP}
     ...    AND
     ...    Setup With Custom Config    ${ROUTER_ACCESS_LOGGING_CONFIG}
@@ -238,7 +243,6 @@ Router Verify Access Logging Configuration
     ...    openshift-ingress
     ...    ROUTER_ERRORFILE_404
     ...    /var/lib/haproxy/errorfiles/error-page-404.http
-
     Check Access Logs    some-format
 
     [Teardown]    Oc Delete    -f ${ROUTER_ERROR_CODE_CONFIGMAP}
@@ -254,25 +258,32 @@ Setup
 Teardown
     [Documentation]    Special teardown for the suite, will finish off by restoring the original
     ...    configuration and restarting MicroShift.
-    Remove Drop In MicroShift Config    10-ingress
+    Remove Custom Config
     Restart MicroShift
     Teardown Suite With Namespace
 
 Configure Namespace Ownership Allowed
     [Documentation]    Configure MicroShift to use InterNamespaceAllowed namespace ownership.
     Setup With Custom Config    ${OWNERSHIP_ALLOW}
+    Wait For Router Ready
 
 Configure Namespace Ownership Strict
     [Documentation]    Configure MicroShift to use Strict namespace ownership.
     Setup With Custom Config    ${OWNERSHIP_STRICT}
+    Wait For Router Ready
 
 Configure Router Exposure
     [Documentation]    Configure MicroShift to use Strict namespace ownership.
     Setup With Custom Config    ${ROUTER_EXPOSE_FULL}
+    Wait For Router Ready
 
 Disable Router
     [Documentation]    Disable router.
     Setup With Custom Config    ${ROUTER_REMOVED}
+
+Remove Custom Config
+    [Documentation]    Remove custom config.
+    Remove Drop In MicroShift Config    10-ingress
 
 Wait For Router Ready
     [Documentation]    Wait for the default router to be ready.
@@ -387,5 +398,4 @@ Check Access Logs
     [Documentation]    Retrieve and check if a pattern appears in the router's access logs.
     [Arguments]    ${pattern}
     ${logs}=    Oc Logs    deployment/router-default -c access-logs    openshift-ingress
-    Log    ${logs}
     Should Contain    ${logs}    ${pattern}
