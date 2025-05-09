@@ -10,6 +10,7 @@ Library             ../../resources/loki.py
 Resource            ../../resources/kubeconfig.resource
 Resource            ../../resources/common.resource
 Resource            ../../resources/systemd.resource
+Resource            ../../resources/observability.resource
 
 Suite Setup         Setup Suite And Prepare Test Host
 Suite Teardown      Teardown Suite And Revert Test Host
@@ -31,15 +32,9 @@ Host Metrics Are Exported
     ...    \ [0-9]+, "metrics": [0-9]+, "data points": [0-9]+}
     Pattern Should Appear In Log Output    ${JOURNAL_CUR}    ${pattern}    unit="microshift-observability"
 
-    Check Prometheus Query
-    ...    ${PROMETHEUS_HOST}
-    ...    ${PROMETHEUS_PORT}
-    ...    system_cpu_time_seconds_total{cpu="cpu0",state="idle"}
-
-    Check Prometheus Exporter
-    ...    ${USHIFT_HOST}
-    ...    ${PROM_EXPORTER_PORT}
-    ...    system_cpu_time_seconds_total{cpu="cpu0",state="idle"}
+    Set Test Variable    ${METRIC}    system_cpu_time_seconds_total{cpu="cpu0",state="idle"}
+    Check Prometheus Query    ${PROMETHEUS_HOST}    ${PROMETHEUS_PORT}    ${METRIC}
+    Check Prometheus Exporter    ${USHIFT_HOST}    ${PROM_EXPORTER_PORT}    ${METRIC}
 
 Kube Metrics Are Exported
     [Documentation]    The opentelemetry-collector should be able to export kube metrics.
@@ -49,25 +44,13 @@ Kube Metrics Are Exported
     ...    \ [0-9]+, "metrics": [0-9]+, "data points": [0-9]+}
     Pattern Should Appear In Log Output    ${JOURNAL_CUR}    ${pattern}    unit="microshift-observability"
 
-    Check Prometheus Query
-    ...    ${PROMETHEUS_HOST}
-    ...    ${PROMETHEUS_PORT}
-    ...    container_cpu_time_seconds_total
+    Set Test Variable    ${METRIC}    container_cpu_time_seconds_total
+    Check Prometheus Query    ${PROMETHEUS_HOST}    ${PROMETHEUS_PORT}    ${METRIC}
+    Check Prometheus Exporter    ${USHIFT_HOST}    ${PROM_EXPORTER_PORT}    ${METRIC}
 
-    Check Prometheus Exporter
-    ...    ${USHIFT_HOST}
-    ...    ${PROM_EXPORTER_PORT}
-    ...    container_cpu_time_seconds_total
-
-    Check Prometheus Query
-    ...    ${PROMETHEUS_HOST}
-    ...    ${PROMETHEUS_PORT}
-    ...    k8s_pod_cpu_time_seconds_total
-
-    Check Prometheus Exporter
-    ...    ${USHIFT_HOST}
-    ...    ${PROM_EXPORTER_PORT}
-    ...    k8s_pod_cpu_time_seconds_total
+    Set Test Variable    ${METRIC}    k8s_pod_cpu_time_seconds_total
+    Check Prometheus Query    ${PROMETHEUS_HOST}    ${PROMETHEUS_PORT}    ${METRIC}
+    Check Prometheus Exporter    ${USHIFT_HOST}    ${PROM_EXPORTER_PORT}    ${METRIC}
 
 Journald Logs Are Exported
     [Documentation]    The opentelemetry-collector should be able to export logs to journald.
@@ -78,10 +61,7 @@ Journald Logs Are Exported
     ...    \ "log records": [0-9]+\\}
     Pattern Should Appear In Log Output    ${JOURNAL_CUR}    ${pattern}    unit="microshift-observability"
 
-    Check Loki Query
-    ...    ${LOKI_HOST}
-    ...    ${LOKI_PORT}
-    ...    {job="journald",exporter="OTLP"}
+    Check Loki Query    ${LOKI_HOST}    ${LOKI_PORT}    {job="journald",exporter="OTLP"}
 
 Kube Events Logs Are Exported
     [Documentation]    The opentelemetry-collector should be able to export logs to journald.
@@ -92,10 +72,7 @@ Kube Events Logs Are Exported
     ...    \ "log records": [0-9]+\\}
     Pattern Should Appear In Log Output    ${JOURNAL_CUR}    ${pattern}    unit="microshift-observability"
 
-    Check Loki Query
-    ...    ${LOKI_HOST}
-    ...    ${LOKI_PORT}
-    ...    {job="kube_events",exporter="OTLP"}
+    Check Loki Query    ${LOKI_HOST}    ${LOKI_PORT}    {job="kube_events",exporter="OTLP"}
 
 Logs Should Not Contain Receiver Errors
     [Documentation]    Internal receiver errors are not treated as fatal. Typically these are due to a misconfiguration
@@ -110,6 +87,8 @@ Logs Should Not Contain Receiver Errors
 Setup Suite And Prepare Test Host
     [Documentation]    The service starts after MicroShift starts and thus will start generating pertinent log data
     ...    right away. When the suite is executed, immediately get the cursor for the microshift-observability unit.
+    Start Prometheus Server
+    Start Loki Server
     Setup Suite
     Check Required Observability Variables
     Set Test OTEL Configuration
@@ -153,6 +132,8 @@ Teardown Suite And Revert Test Host
     [Documentation]    Set back original OTEL config and teardown Suite
     Set Back Original OTEL Configuration
     Teardown Suite
+    Stop Loki Server
+    Stop Prometheus Server
 
 Set Back Original OTEL Configuration
     [Documentation]    Set Back Original OTEL Configuration
