@@ -529,9 +529,9 @@ func generateIngressParams(cfg *config.Config) (assets.RenderParams, error) {
 }
 
 func serializeCaptureHeaders(captureHeaders []operatorv1.IngressControllerCaptureHTTPHeader) string {
-	var headerSpecs []string
-	for _, header := range captureHeaders {
-		headerSpecs = append(headerSpecs, fmt.Sprintf("%s:%d", header.Name, header.MaxLength))
+	headerSpecs := make([]string, len(captureHeaders))
+	for i, header := range captureHeaders {
+		headerSpecs[i] = fmt.Sprintf("%s:%d", header.Name, header.MaxLength)
 	}
 	return strings.Join(headerSpecs, ",")
 }

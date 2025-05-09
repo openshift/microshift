@@ -532,13 +532,13 @@ func validateCookie(c *operatorv1.IngressControllerCaptureHTTPCookie) error {
 		if !headerNamePattern.MatchString(c.Name) {
 			return fmt.Errorf("cookie name '%s' contains invalid characters", c.Name)
 		}
-	} else {
-		if len(c.NamePrefix) > 1024 {
-			return fmt.Errorf("invalid cookie namePrefix length: %d. Must be less than 1024", len(c.NamePrefix))
-		}
-		if !headerNamePattern.MatchString(c.NamePrefix) {
-			return fmt.Errorf("cookie namePrefix '%s' contains invalid characters", c.NamePrefix)
-		}
+		return nil
+	}
+	if len(c.NamePrefix) > 1024 {
+		return fmt.Errorf("invalid cookie namePrefix length: %d. Must be less than 1024", len(c.NamePrefix))
+	}
+	if !headerNamePattern.MatchString(c.NamePrefix) {
+		return fmt.Errorf("cookie namePrefix '%s' contains invalid characters", c.NamePrefix)
 	}
 	return nil
 }
