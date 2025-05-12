@@ -1,43 +1,16 @@
-- etcd embedded-component 98b19154718fd94d4e8ad30824c00ba1de87cb78 to 72173bc741f97fa70e52bf9f34df9c23f7612c2d
-  - 5973a37f 2025-05-05T20:40:35+00:00 DOWNSTREAM: <carry>: OCPBUGS-50510: make hardware related timeout delay configurable
+- api embedded-component d6c84c55a124ab4bd96b1a18c916d3f314f1a95a to d21e7b9699338d2d989fbe43523acf0bc6a9477c
+  - 951d1e9 2025-05-06T15:11:45-04:00 config: add uid and extra claim mappings for external OIDC configuration
+  - c35e732 2025-03-17T15:38:08-04:00 Allow spaces in AWS resource tags
 
-- kubernetes embedded-component 0b8a68191de069deeca944e443a5ead7e0469b41 to af98ede23aa2ef0067fb011b42359e3ca2fb783c
-  - b9e1dc605 2025-04-25T00:32:30+02:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
-  - 3f46d435c 2025-04-22T15:53:27+00:00 Release commit for Kubernetes v1.31.8
-  - de2117a41 2025-04-03T08:47:31+01:00 Fix race for sending errors in watch
-  - de93867c9 2025-03-11T20:22:37+00:00 Update CHANGELOG/CHANGELOG-1.31.md for v1.31.7
-  - 3836d5874 2025-03-10T18:59:59+08:00 fix handle terminating pvc when kubelet rebuild dsw
-  - 77de0b99c 2025-03-10T18:59:59+08:00 fix e2e
-  - ab4389f17 2025-03-10T18:59:59+08:00 add e2e test to reproduce unexpected unmount after kubelet is restarted
+- kubernetes embedded-component af98ede23aa2ef0067fb011b42359e3ca2fb783c to d060f964d37d5ac94a75897551526703286b7ca1
+  - bf06ebef1 2025-05-01T17:53:23-07:00 UPSTREAM: 127757: scheduler Improve CSILimits plugin accuracy by using VolumeAttachments
 
-- machine-config-operator embedded-component 4ed95576efa8c69091777849db22b32b2264e7fb to 57836ffd43680785e7a24e794013be9702946c4a
-  - 13cceb06 2025-04-29T15:13:35-07:00 pkg/operator/status: Drop kubelet skew guard, add RHEL guard
+- route-controller-manager embedded-component 07daee4d2f0b5c7aaca56ee45ff6dfdf97680db0 to ce6ffa24dac3a5f49f70818e1159e40eaf27a6a3
+  - 6f6b467 2025-04-24T13:32:01+00:00 PR adds error handling and event recording for failed Ingress to Route conversion. It ensures that any errors encountered during the conversion process are properly logged and recorded as events, improving the observability and debugging capabilities of the system.
 
-- oc image-amd64 eb9bc9b02fc27a48cceccc0140fc3f8ee1414c64 to 35f7af703663a7459e0bc494e69ed2cc80543d04
-  - 56912d91 2025-05-02T12:58:27+00:00 Use fedora image in unit tests instead of centos
-  - 0c097aea 2025-04-28T21:29:41+00:00 Add support for idms/icsp in node image command
-  - c896baa9 2025-04-28T21:29:41+00:00 OCPBUGS-53106: Get installer image from configMap for node-image command
+- kubernetes image-amd64 af98ede23aa2ef0067fb011b42359e3ca2fb783c to d060f964d37d5ac94a75897551526703286b7ca1
+  - bf06ebef1 2025-05-01T17:53:23-07:00 UPSTREAM: 127757: scheduler Improve CSILimits plugin accuracy by using VolumeAttachments
 
-- kubernetes image-amd64 0b8a68191de069deeca944e443a5ead7e0469b41 to af98ede23aa2ef0067fb011b42359e3ca2fb783c
-  - b9e1dc605 2025-04-25T00:32:30+02:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
-  - 3f46d435c 2025-04-22T15:53:27+00:00 Release commit for Kubernetes v1.31.8
-  - de2117a41 2025-04-03T08:47:31+01:00 Fix race for sending errors in watch
-  - de93867c9 2025-03-11T20:22:37+00:00 Update CHANGELOG/CHANGELOG-1.31.md for v1.31.7
-  - 3836d5874 2025-03-10T18:59:59+08:00 fix handle terminating pvc when kubelet rebuild dsw
-  - 77de0b99c 2025-03-10T18:59:59+08:00 fix e2e
-  - ab4389f17 2025-03-10T18:59:59+08:00 add e2e test to reproduce unexpected unmount after kubelet is restarted
-
-- oc image-arm64 eb9bc9b02fc27a48cceccc0140fc3f8ee1414c64 to 35f7af703663a7459e0bc494e69ed2cc80543d04
-  - 56912d91 2025-05-02T12:58:27+00:00 Use fedora image in unit tests instead of centos
-  - 0c097aea 2025-04-28T21:29:41+00:00 Add support for idms/icsp in node image command
-  - c896baa9 2025-04-28T21:29:41+00:00 OCPBUGS-53106: Get installer image from configMap for node-image command
-
-- kubernetes image-arm64 0b8a68191de069deeca944e443a5ead7e0469b41 to af98ede23aa2ef0067fb011b42359e3ca2fb783c
-  - b9e1dc605 2025-04-25T00:32:30+02:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
-  - 3f46d435c 2025-04-22T15:53:27+00:00 Release commit for Kubernetes v1.31.8
-  - de2117a41 2025-04-03T08:47:31+01:00 Fix race for sending errors in watch
-  - de93867c9 2025-03-11T20:22:37+00:00 Update CHANGELOG/CHANGELOG-1.31.md for v1.31.7
-  - 3836d5874 2025-03-10T18:59:59+08:00 fix handle terminating pvc when kubelet rebuild dsw
-  - 77de0b99c 2025-03-10T18:59:59+08:00 fix e2e
-  - ab4389f17 2025-03-10T18:59:59+08:00 add e2e test to reproduce unexpected unmount after kubelet is restarted
+- kubernetes image-arm64 af98ede23aa2ef0067fb011b42359e3ca2fb783c to d060f964d37d5ac94a75897551526703286b7ca1
+  - bf06ebef1 2025-05-01T17:53:23-07:00 UPSTREAM: 127757: scheduler Improve CSILimits plugin accuracy by using VolumeAttachments
 
