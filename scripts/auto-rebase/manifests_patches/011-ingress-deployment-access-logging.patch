@@ -2,7 +2,7 @@ diff --git a/assets/components/openshift-router/deployment.yaml b/assets/compone
 index 916e4b601..9261e3700 100644
 --- a/assets/components/openshift-router/deployment.yaml
 +++ b/assets/components/openshift-router/deployment.yaml
-@@ -102,6 +102,34 @@ spec:
+@@ -102,6 +102,39 @@ spec:
              - name: ROUTER_MUTUAL_TLS_AUTH_FILTER
                value: '{{ .ClientAuthFilter }}'
              {{- end }}
@@ -14,19 +14,24 @@ index 916e4b601..9261e3700 100644
 +            {{- if .HttpLogFormat }}
 +            - name: ROUTER_SYSLOG_FORMAT
 +              value: '{{ .HttpLogFormat }}'
++            {{- /* HttpLogFormat */}}
 +            {{- end }}
 +            {{- if .HttpCaptureHeadersRequest }}
 +            - name: ROUTER_CAPTURE_HTTP_REQUEST_HEADERS
 +              value: '{{ .HttpCaptureHeadersRequest }}'
++            {{- /* HttpCaptureHeadersRequest */}}
 +            {{- end }}
 +            {{- if .HttpCaptureHeadersResponse }}
 +            - name: ROUTER_CAPTURE_HTTP_RESPONSE_HEADERS
 +              value: '{{ .HttpCaptureHeadersResponse }}'
++            {{- /* HttpCaptureHeadersResponse */}}
 +            {{- end }}
 +            {{- if .HttpCaptureCookies }}
 +            - name: ROUTER_CAPTURE_HTTP_COOKIE
 +              value: '{{ .HttpCaptureCookies }}'
++            {{- /* HttpCaptureCookies */}}
 +            {{- end }}
++            {{- /* AccessLoggingEnabled */}}
 +            {{- end }}
 +            {{- if .HttpErrorCodePages }}
 +            - name: ROUTER_ERRORFILE_503
@@ -37,7 +42,7 @@ index 916e4b601..9261e3700 100644
            livenessProbe:
              failureThreshold: 3
              httpGet:
-@@ -146,8 +174,16 @@ spec:
+@@ -146,8 +179,16 @@ spec:
                name: '{{ .ClientCAMapName}}'
                readOnly: true
              {{- end }}
@@ -56,7 +61,7 @@ index 916e4b601..9261e3700 100644
            image: '{{ .ReleaseImage.haproxy_router }}'
            ports:
              - name: http
-@@ -161,6 +197,29 @@ spec:
+@@ -161,6 +202,29 @@ spec:
                protocol: TCP
            args:
              - -v=4

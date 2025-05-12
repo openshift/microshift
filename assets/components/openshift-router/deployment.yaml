@@ -110,19 +110,24 @@ spec:
             {{- if .HttpLogFormat }}
             - name: ROUTER_SYSLOG_FORMAT
               value: '{{ .HttpLogFormat }}'
+            {{- /* HttpLogFormat */}}
             {{- end }}
             {{- if .HttpCaptureHeadersRequest }}
             - name: ROUTER_CAPTURE_HTTP_REQUEST_HEADERS
               value: '{{ .HttpCaptureHeadersRequest }}'
+            {{- /* HttpCaptureHeadersRequest */}}
             {{- end }}
             {{- if .HttpCaptureHeadersResponse }}
             - name: ROUTER_CAPTURE_HTTP_RESPONSE_HEADERS
               value: '{{ .HttpCaptureHeadersResponse }}'
+            {{- /* HttpCaptureHeadersResponse */}}
             {{- end }}
             {{- if .HttpCaptureCookies }}
             - name: ROUTER_CAPTURE_HTTP_COOKIE
               value: '{{ .HttpCaptureCookies }}'
+            {{- /* HttpCaptureCookies */}}
             {{- end }}
+            {{- /* AccessLoggingEnabled */}}
             {{- end }}
             {{- if .HttpErrorCodePages }}
             - name: ROUTER_ERRORFILE_503
