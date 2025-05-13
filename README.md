@@ -41,11 +41,11 @@ For production deployments, MicroShift can be run on bare metal hardware or hype
 
 ## User Documentation
 To install, configure and run MicroShift, refer to the documentation in the
-[user](./docs/user) folder.
+[user](./docs/user/README.md) folder.
 
 ## Contributor Documentation
 To build MicroShift from source and contribute to its development, refer to the
-documentation in [contributor](./docs/contributor) folder.
+documentation in [contributor](./docs/contributor/README.md) folder.
 
 ## Community
 Community documentation sources are managed at <https://github.com/redhat-et/microshift-documentation> and published on <https://microshift.io>.
