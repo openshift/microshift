@@ -18,22 +18,17 @@ ssh_build_vm() {
     ssh -o USER=microshift -q "${VM_IPADDR}" "$@"
 }
 
-MICROSHIFT_BRANCH="$1"
+MICROSHIFT_REPO_OWNER=${1:-openshift}
+MICROSHIFT_REPO_BRANCH="${2:-main}"
+RPM_ORIGIN="${3:-all}"
+
 CONFIG_VM=false
-
-if [ -z "${MICROSHIFT_BRANCH}" ]; then
-    log "No MicroShift branch specified as the first argument. Using 'main' as default."
-    MICROSHIFT_BRANCH="main"
-fi
-log "Using MicroShift branch: ${MICROSHIFT_BRANCH}"
-
-
 VM_NAME="microshift-dev"
-REPO_NAME="microshift-${MICROSHIFT_BRANCH}-repo"
+REPO_NAME="microshift-${MICROSHIFT_REPO_BRANCH}-repo"
 
 if [ ! -d "${HOME}/${REPO_NAME}" ]; then
     log "Cloning MicroShift repository..."
-    git clone https://github.com/openshift/microshift.git --single-branch --branch "${MICROSHIFT_BRANCH}" "${HOME}/${REPO_NAME}"
+    git clone "https://github.com/${MICROSHIFT_REPO_OWNER}/microshift.git" --single-branch --branch "${MICROSHIFT_REPO_BRANCH}" "${HOME}/${REPO_NAME}"
 else
     log "Directory ${HOME}/${REPO_NAME} already exists. Skipping clone."
 
@@ -62,13 +57,16 @@ fi
 ssh_build_vm "sudo rm -rf ${HOME}/.cache ${HOME}/.local"
 if ( ! ssh_build_vm "test -d ${HOME}/${REPO_NAME}" ); then
     log "Cloning MicroShift repository..."
-    ssh_build_vm git clone https://github.com/openshift/microshift.git --single-branch --branch "${MICROSHIFT_BRANCH}" "${HOME}/${REPO_NAME}"
+    ssh_build_vm git clone "https://github.com/${MICROSHIFT_REPO_OWNER}/microshift.git" --single-branch --branch "${MICROSHIFT_REPO_BRANCH}" "${HOME}/${REPO_NAME}"
 else
     log "Directory ${HOME}/${REPO_NAME} already exists. Skipping clone."
+    ssh_build_vm git -C "${HOME}/${REPO_NAME}" fetch "${MICROSHIFT_REPO_OWNER}"
+    ssh_build_vm git -C "${HOME}/${REPO_NAME}" checkout "${MICROSHIFT_REPO_BRANCH}"
+    ssh_build_vm git -C "${HOME}/${REPO_NAME}" pull
 fi
 
 if ( ! ssh_build_vm "test -d ${HOME}/${REPO_NAME}/_output/test-images/rpm-repos/" ); then
-    # ssh_build_vm "bash -x ${HOME}/${REPO_NAME}/test/bin/build_rpms.sh"
+    ssh_build_vm "bash -x ${HOME}/${REPO_NAME}/test/bin/build_rpms.sh ${RPM_ORIGIN}"
     log "RPM packages available: ${HOME}/${REPO_NAME}/_output/test-images/rpm-repos/"
 else
     log "RPM packages available: ${HOME}/${REPO_NAME}/_output/test-images/rpm-repos/"
