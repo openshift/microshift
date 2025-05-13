@@ -98,3 +98,7 @@ export RHOCP_MINOR_Y1_BETA
 # Define a release version as it is not expected to use the OpenShift mirror
 # for the y-2 release.
 export RHOCP_MINOR_Y2=17
+
+# The version of Sonobuoy package used in CNCF tests.
+# See https://github.com/vmware-tanzu/sonobuoy/releases.
+export CNCF_SONOBUOY_VERSION=v0.57.3

@@ -67,7 +67,7 @@ run_sonobuoy() {
     fi
 
     # Initiate test startup
-    go install github.com/vmware-tanzu/sonobuoy@v0.57.2
+    go install "github.com/vmware-tanzu/sonobuoy@${CNCF_SONOBUOY_VERSION}"
     ~/go/bin/sonobuoy run \
         --mode=certified-conformance \
         --dns-namespace=openshift-dns \
