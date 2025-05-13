@@ -30,6 +30,8 @@ assets:
         git_restore: True
       - file: configmap.yaml
         git_restore: True
+      - file: configmap-accesslog.yaml
+        git_restore: True
       - file: deployment.yaml
       - file: namespace.yaml
       - file: service-account.yaml

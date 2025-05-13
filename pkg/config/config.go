@@ -171,6 +171,9 @@ func (c *Config) fillDefaults() error {
 		TLSSecurityProfile: &configv1.TLSSecurityProfile{
 			Type: configv1.TLSProfileIntermediateType,
 		},
+		AccessLogging: AccessLogging{
+			Status: AccessLoggingDisabled,
+		},
 	}
 	c.MultiNode.Enabled = false
 	c.Kubelet = nil
@@ -378,6 +381,24 @@ func (c *Config) incorporateUserSettings(u *Config) {
 	if len(u.Ingress.ClientTLS.ClientCertificatePolicy) != 0 {
 		c.Ingress.ClientTLS = u.Ingress.ClientTLS
 	}
+	if u.Ingress.HttpErrorCodePages.Name != "" {
+		c.Ingress.HttpErrorCodePages.Name = u.Ingress.HttpErrorCodePages.Name
+	}
+	if u.Ingress.AccessLogging.Status != "" {
+		c.Ingress.AccessLogging.Status = u.Ingress.AccessLogging.Status
+	}
+	if u.Ingress.AccessLogging.HttpLogFormat != "" {
+		c.Ingress.AccessLogging.HttpLogFormat = u.Ingress.AccessLogging.HttpLogFormat
+	}
+	if u.Ingress.AccessLogging.HttpCaptureHeaders.Request != nil {
+		c.Ingress.AccessLogging.HttpCaptureHeaders.Request = u.Ingress.AccessLogging.HttpCaptureHeaders.Request
+	}
+	if u.Ingress.AccessLogging.HttpCaptureHeaders.Response != nil {
+		c.Ingress.AccessLogging.HttpCaptureHeaders.Response = u.Ingress.AccessLogging.HttpCaptureHeaders.Response
+	}
+	if u.Ingress.AccessLogging.HttpCaptureCookies != nil {
+		c.Ingress.AccessLogging.HttpCaptureCookies = u.Ingress.AccessLogging.HttpCaptureCookies
+	}
 }
 
 // updateComputedValues examins the existing settings and converts any
@@ -573,6 +594,11 @@ func (c *Config) validate() error {
 			return fmt.Errorf("error validating ingress.listenAddress: %w", err)
 		}
 	}
+
+	if err := c.Ingress.AccessLogging.Validate(); err != nil {
+		return fmt.Errorf("error validating ingress.accessLogging: %w", err)
+	}
+
 	if err := validateAuditLogConfig(c.ApiServer.AuditLog); err != nil {
 		return fmt.Errorf("error validating apiserver.auditLog:\n%w", err)
 	}
