@@ -116,6 +116,7 @@ make_repo() {
 # the cached artifacts are not present locally, an empty brew source directory
 # is created so that other procedures do not fail.
 download_brew_rpms() {
+    MICROSHIFT_VERSION="${1}"
     mkdir -p "${BREW_RPM_SOURCE}"
     if "${SCRIPTDIR}/manage_brew_rpms.sh" access ; then
         # shellcheck source=test/bin/common_versions.sh
@@ -125,7 +126,7 @@ download_brew_rpms() {
         rm -rf "${BREW_RPM_SOURCE}"
         # Run the download procedure
         bash -x "${SCRIPTDIR}/../../scripts/fetch_tools.sh" brew
-        bash -x "${SCRIPTDIR}/manage_brew_rpms.sh" download "4.${MINOR_VERSION}" "${BREW_RPM_SOURCE}"
+        bash -x "${SCRIPTDIR}/manage_brew_rpms.sh" download "${MICROSHIFT_VERSION}" "${BREW_RPM_SOURCE}"
     else
         echo "WARNING: The Brew Hub site is not accessible, skipping the download"
     fi
@@ -142,12 +143,22 @@ create_local_repo() {
 
     # Force recreation of dnf caches after rebuilding the repositories
     sudo dnf clean all
-         dnf clean all
+    dnf clean all
 }
 
-#
-# Main
-#
-build_rpms
-download_brew_rpms
+ACTION="${1:-all}" # Default to "all" if no argument is provided
+MICROSHIFT_VERSION="${2:-"4.${MINOR_VERSION}"}" 
+if [[ "${ACTION}" == "all" ]]; then
+    build_rpms
+    download_brew_rpms "${MICROSHIFT_VERSION}"
+elif [[ "${ACTION}" == "source" ]]; then
+    build_rpms
+elif [[ "${ACTION}" == "brew" ]]; then
+    download_brew_rpms "${MICROSHIFT_VERSION}"
+else
+    echo "Invalid action specified: '${ACTION}'." >&2
+    echo "Usage: $0 [build|download|all]" >&2
+    echo "If no action is specified, 'all' (build and download) is assumed." >&2
+    exit 1
+fi
 create_local_repo
