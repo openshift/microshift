@@ -13,6 +13,8 @@ WITH_TOPOLVM=${WITH_TOPOLVM:-1}
 
 # shellcheck source=test/bin/common.sh
 source "${SCRIPTDIR}/common.sh"
+# shellcheck source=test/bin/common_versions.sh
+source "${SCRIPTDIR}/common_version.sh"
 
 build_rpms() {
     cd "${ROOTDIR}"
@@ -119,8 +121,6 @@ download_brew_rpms() {
     MICROSHIFT_VERSION="${1}"
     mkdir -p "${BREW_RPM_SOURCE}"
     if "${SCRIPTDIR}/manage_brew_rpms.sh" access ; then
-        # shellcheck source=test/bin/common_versions.sh
-        source "${SCRIPTDIR}/common_versions.sh"
         # Delete the old RPMs before the download
         echo "Cleaning up old brew downloads"
         rm -rf "${BREW_RPM_SOURCE}"
