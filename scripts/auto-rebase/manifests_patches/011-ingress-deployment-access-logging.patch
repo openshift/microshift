@@ -42,12 +42,10 @@ index 916e4b601..9261e3700 100644
            livenessProbe:
              failureThreshold: 3
              httpGet:
-@@ -146,8 +179,16 @@ spec:
+@@ -146,6 +179,16 @@ spec:
                name: '{{ .ClientCAMapName}}'
                readOnly: true
              {{- end }}
--
--
 +            {{- if .HttpErrorCodePages }}
 +            - mountPath: /var/lib/haproxy/errorfiles
 +              name: error-code-pages

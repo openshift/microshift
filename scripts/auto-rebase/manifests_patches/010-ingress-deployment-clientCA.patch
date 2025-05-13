@@ -17,7 +17,7 @@ index a63157f21..596be2aa0 100644
            livenessProbe:
              failureThreshold: 3
              httpGet:
-@@ -132,6 +140,13 @@ spec:
+@@ -132,6 +140,11 @@ spec:
              - mountPath: /var/run/configmaps/service-ca
                name: service-ca-bundle
                readOnly: true
@@ -26,12 +26,10 @@ index a63157f21..596be2aa0 100644
 +              name: '{{ .ClientCAMapName}}'
 +              readOnly: true
 +            {{- end }}
-+
-+
            image: '{{ .ReleaseImage.haproxy_router }}'
            ports:
              - name: http
-@@ -166,6 +181,16 @@ spec:
+@@ -166,6 +179,16 @@ spec:
                  path: service-ca.crt
              name: service-ca-bundle
              optional: false
