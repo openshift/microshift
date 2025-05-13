@@ -60,7 +60,7 @@ if ( ! ssh_build_vm "test -d ${HOME}/${REPO_NAME}" ); then
     ssh_build_vm git clone "https://github.com/${MICROSHIFT_REPO_OWNER}/microshift.git" --single-branch --branch "${MICROSHIFT_REPO_BRANCH}" "${HOME}/${REPO_NAME}"
 else
     log "Directory ${HOME}/${REPO_NAME} already exists. Skipping clone."
-    ssh_build_vm git -C "${HOME}/${REPO_NAME}" fetch "${MICROSHIFT_REPO_OWNER}"
+    ssh_build_vm git -C "${HOME}/${REPO_NAME}" fetch
     ssh_build_vm git -C "${HOME}/${REPO_NAME}" checkout "${MICROSHIFT_REPO_BRANCH}"
     ssh_build_vm git -C "${HOME}/${REPO_NAME}" pull
 fi
