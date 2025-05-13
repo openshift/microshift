@@ -14,7 +14,7 @@ WITH_TOPOLVM=${WITH_TOPOLVM:-1}
 # shellcheck source=test/bin/common.sh
 source "${SCRIPTDIR}/common.sh"
 # shellcheck source=test/bin/common_versions.sh
-source "${SCRIPTDIR}/common_version.sh"
+source "${SCRIPTDIR}/common_versions.sh"
 
 build_rpms() {
     cd "${ROOTDIR}"
