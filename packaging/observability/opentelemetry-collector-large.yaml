@@ -1,9 +1,9 @@
-# This configuration exports:
-# - Container, Pod, Volume, and Node metrics
-# - Kubernetes Events (Warnings only)
-# - Host's CPU, Mem, Disk, and Network Metrics
+# Following file contains OpenTelemetry Collector configuration that exports:
+# - Resource usage metrics of MicroShift's Containers, Pods, Volumes, and Node
+# - Kubernetes Events
+# - Host's CPU, memory, disk, and network usage metrics
 # - System journals for selected MicroShift services and dependencies, priority < Info
-# - Individual Pods' metrics if they have "prometheus.io/scrape": "true" annotation
+# - Metrics exposed by Pods that have "prometheus.io/scrape": "true" annotation
 
 receivers:
   kubeletstats:
@@ -37,6 +37,7 @@ receivers:
       - openvswitch.service
       - ovsdb-server.service
       - ovs-vswitchd.service
+    priority: info
   prometheus:
     config:
       scrape_configs:
