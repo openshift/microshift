@@ -147,7 +147,7 @@ create_local_repo() {
 }
 
 ACTION="${1:-all}" # Default to "all" if no argument is provided
-MICROSHIFT_VERSION="${2:-"4.${MINOR_VERSION}"}" 
+MICROSHIFT_VERSION="${2:-"4.${MINOR_VERSION}"}${2}"
 if [[ "${ACTION}" == "all" ]]; then
     build_rpms
     download_brew_rpms "${MICROSHIFT_VERSION}"
