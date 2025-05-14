@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"math"
+	"net"
 	"os"
 	"path/filepath"
 	"regexp/syntax"
@@ -484,6 +485,24 @@ func generateIngressParams(cfg *config.Config) (assets.RenderParams, error) {
 		clientAuthCAPath = filepath.Join(clientCAMountPath, clientCABundleFilename)
 	}
 
+	var accessLoggingMaxLength uint32 = 0
+	if cfg.Ingress.AccessLogging.Status == config.AccessLoggingEnabled {
+		if cfg.Ingress.AccessLogging.Destination.Type == operatorv1.ContainerLoggingDestinationType && cfg.Ingress.AccessLogging.Destination.Container != nil {
+			accessLoggingMaxLength = uint32(cfg.Ingress.AccessLogging.Destination.Container.MaxLength)
+		} else if cfg.Ingress.AccessLogging.Destination.Type == operatorv1.SyslogLoggingDestinationType && cfg.Ingress.AccessLogging.Destination.Syslog != nil {
+			accessLoggingMaxLength = cfg.Ingress.AccessLogging.Destination.Syslog.MaxLength
+		}
+	}
+	accessLoggingSyslogAddress := ""
+	if cfg.Ingress.AccessLogging.Destination.Syslog != nil {
+		port := fmt.Sprintf("%d", cfg.Ingress.AccessLogging.Destination.Syslog.Port)
+		accessLoggingSyslogAddress = net.JoinHostPort(cfg.Ingress.AccessLogging.Destination.Syslog.Address, port)
+	}
+	accessLoggingSyslogFacility := ""
+	if cfg.Ingress.AccessLogging.Destination.Syslog != nil {
+		accessLoggingSyslogFacility = cfg.Ingress.AccessLogging.Destination.Syslog.Facility
+	}
+
 	extraParams := assets.RenderParams{
 		"RouterNamespaceOwnership":    cfg.Ingress.AdmissionPolicy.NamespaceOwnership == config.NamespaceOwnershipAllowed,
 		"RouterHttpPort":              *cfg.Ingress.Ports.Http,
@@ -518,6 +537,9 @@ func generateIngressParams(cfg *config.Config) (assets.RenderParams, error) {
 		"ClientCABundleFilename":      clientCABundleFilename,
 		"ClientCAMountPath":           clientCAMountPath,
 		"AccessLoggingEnabled":        cfg.Ingress.AccessLogging.Status == config.AccessLoggingEnabled,
+		"AccessLoggingMaxLength":      accessLoggingMaxLength,
+		"AccessLoggingSyslogAddress":  accessLoggingSyslogAddress,
+		"AccessLoggingSyslogFacility": accessLoggingSyslogFacility,
 		"HttpLogFormat":               cfg.Ingress.AccessLogging.HttpLogFormat,
 		"HttpErrorCodePages":          cfg.Ingress.HttpErrorCodePages.Name,
 		"HttpCaptureHeadersRequest":   serializeCaptureHeaders(cfg.Ingress.AccessLogging.HttpCaptureHeaders.Request),
