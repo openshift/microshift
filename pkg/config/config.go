@@ -16,6 +16,7 @@ import (
 	"time"
 
 	configv1 "github.com/openshift/api/config/v1"
+	operatorv1 "github.com/openshift/api/operator/v1"
 	"github.com/openshift/microshift/pkg/config/apiserver"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/sets"
@@ -173,6 +174,9 @@ func (c *Config) fillDefaults() error {
 		},
 		AccessLogging: AccessLogging{
 			Status: AccessLoggingDisabled,
+			Destination: operatorv1.LoggingDestination{
+				Type: operatorv1.ContainerLoggingDestinationType,
+			},
 		},
 	}
 	c.MultiNode.Enabled = false
@@ -386,6 +390,15 @@ func (c *Config) incorporateUserSettings(u *Config) {
 	}
 	if u.Ingress.AccessLogging.Status != "" {
 		c.Ingress.AccessLogging.Status = u.Ingress.AccessLogging.Status
+	}
+	if u.Ingress.AccessLogging.Destination.Type != "" {
+		c.Ingress.AccessLogging.Destination.Type = u.Ingress.AccessLogging.Destination.Type
+	}
+	if u.Ingress.AccessLogging.Destination.Container != nil {
+		c.Ingress.AccessLogging.Destination.Container = u.Ingress.AccessLogging.Destination.Container
+	}
+	if u.Ingress.AccessLogging.Destination.Syslog != nil {
+		c.Ingress.AccessLogging.Destination.Syslog = u.Ingress.AccessLogging.Destination.Syslog
 	}
 	if u.Ingress.AccessLogging.HttpLogFormat != "" {
 		c.Ingress.AccessLogging.HttpLogFormat = u.Ingress.AccessLogging.HttpLogFormat
