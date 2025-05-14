@@ -104,9 +104,23 @@ spec:
             {{- end }}
             {{- if .AccessLoggingEnabled }}
             - name: ROUTER_SYSLOG_ADDRESS
+            {{- if .AccessLoggingSyslogAddress }}
+              value: '{{ .AccessLoggingSyslogAddress }}'
+            {{- else }}
               value: /var/lib/rsyslog/rsyslog.sock
+            {{- /* AccessLoggingSyslogAddress*/}}
+            {{- end }}
             - name: ROUTER_LOG_LEVEL
               value: info
+            {{- if .AccessLoggingMaxLength}}
+            - name: ROUTER_LOG_MAX_LENGTH
+              value: '{{ .AccessLoggingMaxLength }}'
+            {{- /* AccessLoggingMaxLength */}}
+            {{- end }}
+            {{- if .AccessLoggingSyslogFacility }}
+            - name: ROUTER_LOG_FACILITY
+              value: {{ .AccessLoggingSyslogFacility }}
+            {{- end }}
             {{- if .HttpLogFormat }}
             - name: ROUTER_SYSLOG_FORMAT
               value: '{{ .HttpLogFormat }}'
@@ -184,7 +198,7 @@ spec:
               name: error-code-pages
               readOnly: true
             {{- end }}
-            {{- if .AccessLoggingEnabled }}
+            {{- if and .AccessLoggingEnabled (not .AccessLoggingSyslogAddress) }}
             - mountPath: /var/lib/rsyslog
               name: rsyslog-socket
               readOnly: false
@@ -202,7 +216,7 @@ spec:
               protocol: TCP
           args:
             - -v=4
-        {{- if .AccessLoggingEnabled }}
+        {{- if and .AccessLoggingEnabled (not .AccessLoggingSyslogAddress) }}
         - name: access-logs
           imagePullPolicy: IfNotPresent
           terminationMessagePolicy: FallbackToLogsOnError
@@ -261,7 +275,7 @@ spec:
           configMap:
             name: {{ .HttpErrorCodePages }}
         {{- end }}
-        {{- if .AccessLoggingEnabled }}
+        {{- if and .AccessLoggingEnabled (not .AccessLoggingSyslogAddress) }}
         - name: rsyslog-socket
           emptyDir: {}
         - name: rsyslog-config

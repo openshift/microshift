@@ -2,15 +2,29 @@ diff --git a/assets/components/openshift-router/deployment.yaml b/assets/compone
 index 916e4b601..9261e3700 100644
 --- a/assets/components/openshift-router/deployment.yaml
 +++ b/assets/components/openshift-router/deployment.yaml
-@@ -102,6 +102,39 @@ spec:
+@@ -102,6 +102,53 @@ spec:
              - name: ROUTER_MUTUAL_TLS_AUTH_FILTER
                value: '{{ .ClientAuthFilter }}'
              {{- end }}
 +            {{- if .AccessLoggingEnabled }}
 +            - name: ROUTER_SYSLOG_ADDRESS
++            {{- if .AccessLoggingSyslogAddress }}
++              value: '{{ .AccessLoggingSyslogAddress }}'
++            {{- else }}
 +              value: /var/lib/rsyslog/rsyslog.sock
++            {{- /* AccessLoggingSyslogAddress*/}}
++            {{- end }}
 +            - name: ROUTER_LOG_LEVEL
 +              value: info
++            {{- if .AccessLoggingMaxLength}}
++            - name: ROUTER_LOG_MAX_LENGTH
++              value: '{{ .AccessLoggingMaxLength }}'
++            {{- /* AccessLoggingMaxLength */}}
++            {{- end }}
++            {{- if .AccessLoggingSyslogFacility }}
++            - name: ROUTER_LOG_FACILITY
++              value: {{ .AccessLoggingSyslogFacility }}
++            {{- end }}
 +            {{- if .HttpLogFormat }}
 +            - name: ROUTER_SYSLOG_FORMAT
 +              value: '{{ .HttpLogFormat }}'
@@ -42,7 +56,7 @@ index 916e4b601..9261e3700 100644
            livenessProbe:
              failureThreshold: 3
              httpGet:
-@@ -146,6 +179,16 @@ spec:
+@@ -146,6 +193,16 @@ spec:
                name: '{{ .ClientCAMapName}}'
                readOnly: true
              {{- end }}
@@ -51,7 +65,7 @@ index 916e4b601..9261e3700 100644
 +              name: error-code-pages
 +              readOnly: true
 +            {{- end }}
-+            {{- if .AccessLoggingEnabled }}
++            {{- if and .AccessLoggingEnabled (not .AccessLoggingSyslogAddress) }}
 +            - mountPath: /var/lib/rsyslog
 +              name: rsyslog-socket
 +              readOnly: false
@@ -59,11 +73,11 @@ index 916e4b601..9261e3700 100644
            image: '{{ .ReleaseImage.haproxy_router }}'
            ports:
              - name: http
-@@ -161,6 +202,29 @@ spec:
+@@ -161,6 +216,29 @@ spec:
                protocol: TCP
            args:
              - -v=4
-+        {{- if .AccessLoggingEnabled }}
++        {{- if and .AccessLoggingEnabled (not .AccessLoggingSyslogAddress) }}
 +        - name: access-logs
 +          imagePullPolicy: IfNotPresent
 +          terminationMessagePolicy: FallbackToLogsOnError
@@ -89,7 +103,7 @@ index 916e4b601..9261e3700 100644
        tolerations:
          # Ensure the pod isn't deleted during serial NoExecuteTaintManager tests.
          # Remember that NoExecute uses Delete, not Evict, because removing the pod
-@@ -192,6 +251,19 @@ spec:
+@@ -192,6 +270,19 @@ spec:
              name: '{{ .ClientCAMapName }}'
              optional: false
          {{- end }}
@@ -98,7 +112,7 @@ index 916e4b601..9261e3700 100644
 +          configMap:
 +            name: {{ .HttpErrorCodePages }}
 +        {{- end }}
-+        {{- if .AccessLoggingEnabled }}
++        {{- if and .AccessLoggingEnabled (not .AccessLoggingSyslogAddress) }}
 +        - name: rsyslog-socket
 +          emptyDir: {}
 +        - name: rsyslog-config
