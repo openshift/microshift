@@ -173,9 +173,100 @@
           "description": "accessLogging describes how the client requests should be logged.",
           "type": "object",
           "required": [
+            "destination",
             "status"
           ],
           "properties": {
+            "destination": {
+              "description": "destination is where access logs go.",
+              "type": "object",
+              "required": [
+                "type"
+              ],
+              "properties": {
+                "container": {
+                  "description": "container holds parameters for the Container logging destination.\nPresent only if type is Container.",
+                  "type": "object",
+                  "properties": {
+                    "maxLength": {
+                      "description": "maxLength is the maximum length of the log message.\n\nValid values are integers in the range 480 to 8192, inclusive.\n\nWhen omitted, the default value is 1024.",
+                      "type": "integer",
+                      "format": "int32",
+                      "default": 1024,
+                      "maximum": 8192,
+                      "minimum": 480
+                    }
+                  }
+                },
+                "syslog": {
+                  "description": "syslog holds parameters for a syslog endpoint.  Present only if\ntype is Syslog.",
+                  "type": "object",
+                  "required": [
+                    "address",
+                    "port"
+                  ],
+                  "properties": {
+                    "address": {
+                      "description": "address is the IP address of the syslog endpoint that receives log\nmessages.",
+                      "type": "string"
+                    },
+                    "facility": {
+                      "description": "facility specifies the syslog facility of log messages.\n\nIf this field is empty, the facility is \"local1\".",
+                      "type": "string",
+                      "enum": [
+                        "kern",
+                        "user",
+                        "mail",
+                        "daemon",
+                        "auth",
+                        "syslog",
+                        "lpr",
+                        "news",
+                        "uucp",
+                        "cron",
+                        "auth2",
+                        "ftp",
+                        "ntp",
+                        "audit",
+                        "alert",
+                        "cron2",
+                        "local0",
+                        "local1",
+                        "local2",
+                        "local3",
+                        "local4",
+                        "local5",
+                        "local6",
+                        "local7"
+                      ]
+                    },
+                    "maxLength": {
+                      "description": "maxLength is the maximum length of the log message.\n\nValid values are integers in the range 480 to 4096, inclusive.\n\nWhen omitted, the default value is 1024.",
+                      "type": "integer",
+                      "format": "int32",
+                      "default": 1024,
+                      "maximum": 4096,
+                      "minimum": 480
+                    },
+                    "port": {
+                      "description": "port is the UDP port number of the syslog endpoint that receives log\nmessages.",
+                      "type": "integer",
+                      "format": "int32",
+                      "maximum": 65535,
+                      "minimum": 1
+                    }
+                  }
+                },
+                "type": {
+                  "description": "type is the type of destination for logs.  It must be one of the\nfollowing:\n\n* Container\n\nThe ingress operator configures the sidecar container named \"logs\" on\nthe ingress controller pod and configures the ingress controller to\nwrite logs to the sidecar.  The logs are then available as container\nlogs.  The expectation is that the administrator configures a custom\nlogging solution that reads logs from this sidecar.  Note that using\ncontainer logs means that logs may be dropped if the rate of logs\nexceeds the container runtime's or the custom logging solution's\ncapacity.\n\n* Syslog\n\nLogs are sent to a syslog endpoint.  The administrator must specify\nan endpoint that can receive syslog messages.  The expectation is\nthat the administrator has configured a custom syslog instance.",
+                  "type": "string",
+                  "enum": [
+                    "Container",
+                    "Syslog"
+                  ]
+                }
+              }
+            },
             "httpCaptureCookies": {
               "description": "httpCaptureCookies specifies HTTP cookies that should be captured in\naccess logs.  If this field is empty, no cookies are captured.",
               "type": "array",

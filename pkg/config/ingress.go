@@ -413,6 +413,11 @@ type AccessLogging struct {
 	//+kubebuilder:validation:Enum=Disabled;Enabled
 	Status AccessLoggingStatusEnum `json:"status"`
 
+	// destination is where access logs go.
+	//
+	// +required
+	Destination operatorv1.LoggingDestination `json:"destination"`
+
 	// httpLogFormat specifies the format of the log message for an HTTP
 	// request.
 	//
