@@ -92,6 +92,10 @@ ${ROUTER_ACCESS_LOGGING_CONFIG}     SEPARATOR=\n
 ...                                 ingress:
 ...                                 \ \ accessLogging:
 ...                                 \ \ \ \ status: Enabled
+...                                 \ \ \ \ destination:
+...                                 \ \ \ \ \ \ type: Container
+...                                 \ \ \ \ \ \ container:
+...                                 \ \ \ \ \ \ \ \ maxLength: 2000
 ...                                 \ \ \ \ httpCaptureCookies:
 ...                                 \ \ \ \ - matchType: Exact
 ...                                 \ \ \ \ \ \ maxLength: 20
@@ -106,6 +110,19 @@ ${ROUTER_ACCESS_LOGGING_CONFIG}     SEPARATOR=\n
 ...                                 \ \ \ \ httpLogFormat: some-format
 ...                                 \ \ httpErrorCodePages:
 ...                                 \ \ \ \ name: router-error-pages
+${ROUTER_ACCESS_LOGGING_CONFIG_SYSLOG}     SEPARATOR=\n
+...                                 ---
+...                                 ingress:
+...                                 \ \ accessLogging:
+...                                 \ \ \ \ status: Enabled
+...                                 \ \ \ \ destination:
+...                                 \ \ \ \ \ \ type: Syslog
+...                                 \ \ \ \ \ \ syslog:
+...                                 \ \ \ \ \ \ \ \ address: 1.2.3.4
+...                                 \ \ \ \ \ \ \ \ port: 9000
+...                                 \ \ \ \ \ \ \ \ facility: local7
+...                                 \ \ \ \ \ \ \ \ maxLength: 1000
+
 ${ROUTER_ERROR_CODE_CONFIGMAP}      assets/network/router-error-configmap.yaml
 
 
@@ -216,7 +233,7 @@ Router Verify Security Configuration
 
     [Teardown]    Delete Custom CA Secret
 
-Router Verify Access Logging Configuration
+Router Verify Access Logging Configuration Container
     [Documentation]    Test ingress access logging configuration.
     [Setup]    Run Keywords
     ...    Remove Custom Config
@@ -231,6 +248,7 @@ Router Verify Access Logging Configuration
 
     Pod Environment Should Match Value    openshift-ingress    ROUTER_SYSLOG_ADDRESS    /var/lib/rsyslog/rsyslog.sock
     Pod Environment Should Match Value    openshift-ingress    ROUTER_LOG_LEVEL    info
+    Pod Environment Should Match Value    openshift-ingress    ROUTER_LOG_MAX_LENGTH    2000
     Pod Environment Should Match Value    openshift-ingress    ROUTER_SYSLOG_FORMAT    some-format
     Pod Environment Should Match Value    openshift-ingress    ROUTER_CAPTURE_HTTP_REQUEST_HEADERS    header1:11
     Pod Environment Should Match Value    openshift-ingress    ROUTER_CAPTURE_HTTP_RESPONSE_HEADERS    header2:12
@@ -246,6 +264,18 @@ Router Verify Access Logging Configuration
     Check Access Logs    some-format
 
     [Teardown]    Oc Delete    -f ${ROUTER_ERROR_CODE_CONFIGMAP}
+
+Router Verify Access Logging Configuration Syslog
+    [Documentation]    Test ingress access logging configuration.
+    [Setup]    Run Keywords
+    ...    Setup With Custom Config    ${ROUTER_ACCESS_LOGGING_CONFIG_SYSLOG}
+    ...    AND
+    ...    Wait For Router Ready
+
+    Pod Environment Should Match Value    openshift-ingress    ROUTER_SYSLOG_ADDRESS    1.2.3.4:9000
+    Pod Environment Should Match Value    openshift-ingress    ROUTER_LOG_LEVEL    info
+    Pod Environment Should Match Value    openshift-ingress    ROUTER_LOG_MAX_LENGTH    1000
+    Pod Environment Should Match Value    openshift-ingress    ROUTER_LOG_FACILITY     local7
 
 
 *** Keywords ***
