@@ -1,7 +1,7 @@
-# This configuration exports:
-# - Container, Pod, Volume, and Node metrics
-# - Kubernetes Events (Warnings only)
-# - MicroShift service journald
+# Following file contains OpenTelemetry Collector configuration that exports:
+# - Resource usage metrics of MicroShift's Containers, Pods, Volumes, and Node
+# - Kubernetes Events
+# - System journal for MicroShift service, priority < Info
 
 receivers:
   kubeletstats:
@@ -20,6 +20,7 @@ receivers:
   journald:
     units:
       - microshift
+    priority: info
 
 processors:
   batch:

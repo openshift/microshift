@@ -1,6 +1,6 @@
-# This configuration exports:
-# - Container, Pod, Volume, and Node metrics
-# - Kubernetes Events (Warnings only)
+# Following file contains OpenTelemetry Collector configuration that exports:
+# - Resource usage metrics of MicroShift's Containers, Pods, Volumes, and Node
+# - Kubernetes Events
 
 receivers:
   kubeletstats:
