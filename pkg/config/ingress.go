@@ -473,36 +473,38 @@ func (a *AccessLogging) Validate() error {
 		return fmt.Errorf("invalid access logging status: %s", a.Status)
 	}
 
-	if a.Status == AccessLoggingEnabled {
-		switch a.Destination.Type {
-		case operatorv1.ContainerLoggingDestinationType:
-			if a.Destination.Container != nil {
-				if a.Destination.Container.MaxLength > 0 && (a.Destination.Container.MaxLength < 480 || a.Destination.Container.MaxLength > 8192) {
-					return fmt.Errorf("invalid container maxLength: %d. Must be between 480 and 8192", a.Destination.Container.MaxLength)
-				}
+	if a.Status == AccessLoggingDisabled {
+		return nil
+	}
+
+	switch a.Destination.Type {
+	case operatorv1.ContainerLoggingDestinationType:
+		if a.Destination.Container != nil {
+			if a.Destination.Container.MaxLength > 0 && (a.Destination.Container.MaxLength < 480 || a.Destination.Container.MaxLength > 8192) {
+				return fmt.Errorf("invalid container maxLength: %d. Must be between 480 and 8192", a.Destination.Container.MaxLength)
 			}
-		case operatorv1.SyslogLoggingDestinationType:
-			if a.Destination.Syslog == nil {
-				return fmt.Errorf("destination syslog is required")
-			}
-			if a.Destination.Syslog.Address == "" {
-				return fmt.Errorf("destination syslog address is required")
-			}
-			if net.ParseIP(a.Destination.Syslog.Address) == nil {
-				return fmt.Errorf("invalid syslog address: %s. Must be a valid IPv4 or IPv6 address", a.Destination.Syslog.Address)
-			}
-			if a.Destination.Syslog.Port < 1 || a.Destination.Syslog.Port > 65535 {
-				return fmt.Errorf("invalid syslog port: %d. Must be between 1 and 65535", a.Destination.Syslog.Port)
-			}
-			if a.Destination.Syslog.Facility != "" && !slices.Contains(allowedFacilities, a.Destination.Syslog.Facility) {
-				return fmt.Errorf("invalid syslog facility: %s. Must be one of %v", a.Destination.Syslog.Facility, allowedFacilities)
-			}
-			if a.Destination.Syslog.MaxLength > 0 && (a.Destination.Syslog.MaxLength < 480 || a.Destination.Syslog.MaxLength > 8192) {
-				return fmt.Errorf("invalid syslog maxLength: %d. Must be between 480 and 8192", a.Destination.Syslog.MaxLength)
-			}
-		default:
-			return fmt.Errorf("invalid access logging destination type: %s", a.Destination.Type)
 		}
+	case operatorv1.SyslogLoggingDestinationType:
+		if a.Destination.Syslog == nil {
+			return fmt.Errorf("destination syslog is required")
+		}
+		if a.Destination.Syslog.Address == "" {
+			return fmt.Errorf("destination syslog address is required")
+		}
+		if net.ParseIP(a.Destination.Syslog.Address) == nil {
+			return fmt.Errorf("invalid syslog address: %s. Must be a valid IPv4 or IPv6 address", a.Destination.Syslog.Address)
+		}
+		if a.Destination.Syslog.Port < 1 || a.Destination.Syslog.Port > 65535 {
+			return fmt.Errorf("invalid syslog port: %d. Must be between 1 and 65535", a.Destination.Syslog.Port)
+		}
+		if a.Destination.Syslog.Facility != "" && !slices.Contains(allowedFacilities, a.Destination.Syslog.Facility) {
+			return fmt.Errorf("invalid syslog facility: %s. Must be one of %v", a.Destination.Syslog.Facility, allowedFacilities)
+		}
+		if a.Destination.Syslog.MaxLength > 0 && (a.Destination.Syslog.MaxLength < 480 || a.Destination.Syslog.MaxLength > 8192) {
+			return fmt.Errorf("invalid syslog maxLength: %d. Must be between 480 and 8192", a.Destination.Syslog.MaxLength)
+		}
+	default:
+		return fmt.Errorf("invalid access logging destination type: %s", a.Destination.Type)
 	}
 
 	if len(a.HttpCaptureCookies) > 1 {

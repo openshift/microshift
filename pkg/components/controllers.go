@@ -485,12 +485,12 @@ func generateIngressParams(cfg *config.Config) (assets.RenderParams, error) {
 		clientAuthCAPath = filepath.Join(clientCAMountPath, clientCABundleFilename)
 	}
 
-	var accessLoggingMaxLength uint32 = 0
+	accessLoggingMaxLength := 0
 	if cfg.Ingress.AccessLogging.Status == config.AccessLoggingEnabled {
 		if cfg.Ingress.AccessLogging.Destination.Type == operatorv1.ContainerLoggingDestinationType && cfg.Ingress.AccessLogging.Destination.Container != nil {
-			accessLoggingMaxLength = uint32(cfg.Ingress.AccessLogging.Destination.Container.MaxLength)
+			accessLoggingMaxLength = int(cfg.Ingress.AccessLogging.Destination.Container.MaxLength)
 		} else if cfg.Ingress.AccessLogging.Destination.Type == operatorv1.SyslogLoggingDestinationType && cfg.Ingress.AccessLogging.Destination.Syslog != nil {
-			accessLoggingMaxLength = cfg.Ingress.AccessLogging.Destination.Syslog.MaxLength
+			accessLoggingMaxLength = int(cfg.Ingress.AccessLogging.Destination.Syslog.MaxLength)
 		}
 	}
 	accessLoggingSyslogAddress := ""
