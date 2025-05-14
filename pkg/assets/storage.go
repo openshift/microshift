@@ -25,7 +25,7 @@ var (
 	scCodecs = serializer.NewCodecFactory(scScheme)
 )
 
-func scClient(kubeconfigPath string) *scclientv1.StorageV1Client {
+func StorageV1Client(kubeconfigPath string) *scclientv1.StorageV1Client {
 	restConfig, err := clientcmd.BuildConfigFromFlags("", kubeconfigPath)
 	if err != nil {
 		panic(err)
@@ -80,7 +80,7 @@ func applySCs(ctx context.Context, scs []string, handler resourceHandler, render
 
 func ApplyStorageClasses(ctx context.Context, scs []string, render RenderFunc, params RenderParams, kubeconfigPath string) error {
 	sc := &scApplier{}
-	sc.Client = scClient(kubeconfigPath)
+	sc.Client = StorageV1Client(kubeconfigPath)
 	return applySCs(ctx, scs, sc, render, params)
 }
 

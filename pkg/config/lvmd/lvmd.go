@@ -6,7 +6,10 @@ import (
 	"os/exec"
 	"strings"
 
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/klog/v2"
+	v1 "k8s.io/kubernetes/pkg/apis/core"
+	"k8s.io/kubernetes/pkg/apis/storage"
 	"sigs.k8s.io/yaml"
 )
 
@@ -151,4 +154,38 @@ func LvmPresentOnMachine() error {
 		return fmt.Errorf("failed to find 'vgs' command line tool: %w", err)
 	}
 	return nil
+}
+
+func deviceClassToStorageClass(dc *DeviceClass) *storage.StorageClass {
+	reclaimPolicy := v1.PersistentVolumeReclaimDelete
+	bindingMode := storage.VolumeBindingWaitForFirstConsumer
+	allowVolExpansion := true
+
+	return &storage.StorageClass{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: strings.Join([]string{"topolvm-provisioner", dc.Name}, "-"),
+			Annotations: map[string]string{
+				"storageclass.kubernetes.io/is-default-class": "false",
+			},
+		},
+		Provisioner: "topolvm.io",
+		Parameters: map[string]string{
+			"csi.storage.k8s.io/fstype": "xfs",
+		},
+		ReclaimPolicy:        &reclaimPolicy,
+		VolumeBindingMode:    &bindingMode,
+		AllowVolumeExpansion: &allowVolExpansion,
+	}
+}
+
+// ToStorageClassList takes a Lvmd object pointer and returns a list of storageClasses representing each device class
+// StorageClass names are a concatenation of `topolvm-provision` and `DeviceClass.Name`. If
+// lvmd.DeviceClasses[*].
+func ToStorageClassList(lvmd *Lvmd) []*storage.StorageClass {
+	var storageClasses []*storage.StorageClass
+	for _, dc := range lvmd.DeviceClasses {
+		storageClass := deviceClassToStorageClass(dc)
+		storageClasses = append(storageClasses, storageClass)
+	}
+	return storageClasses
 }

@@ -5,6 +5,10 @@ import (
 	"reflect"
 	"testing"
 
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	v1 "k8s.io/kubernetes/pkg/apis/core"
+	"k8s.io/kubernetes/pkg/apis/storage"
+
 	"github.com/stretchr/testify/assert"
 )
 
@@ -168,6 +172,121 @@ func Test_newLvmdConfigFromFile(t *testing.T) {
 				g, _ := json.Marshal(got)
 				w, _ := json.Marshal(tt.want)
 				t.Errorf("NewLvmdConfigFromFile() = %s, want %s", string(g), string(w))
+			}
+		})
+	}
+}
+
+func TestToStorageClassList(t *testing.T) {
+	pvcrd := v1.PersistentVolumeReclaimDelete
+	vpmWait := storage.VolumeBindingWaitForFirstConsumer
+	allowVolExp := true
+
+	type args struct {
+		lvmd *Lvmd
+	}
+	tests := []struct {
+		name string
+		args args
+		want []*storage.StorageClass
+	}{
+		{
+			name: "single device class",
+			args: args{
+				lvmd: &Lvmd{
+					SocketName: "/run/lvmd/lvmd.socket",
+					DeviceClasses: []*DeviceClass{
+						{
+							Name:        "single",
+							Default:     true,
+							VolumeGroup: "vg_1",
+							SpareGB:     uint64Ptr(5),
+						},
+					},
+				},
+			},
+			want: []*storage.StorageClass{
+				{
+					ObjectMeta: metav1.ObjectMeta{
+						Name: "topolvm-provisioner-single",
+						Annotations: map[string]string{
+							"storageclass.kubernetes.io/is-default-class": "false",
+						},
+					},
+					Provisioner: "topolvm.io",
+					Parameters: map[string]string{
+						"csi.storage.k8s.io/fstype": "xfs",
+					},
+					ReclaimPolicy:        &pvcrd,
+					VolumeBindingMode:    &vpmWait,
+					AllowVolumeExpansion: &allowVolExp,
+				},
+			},
+		},
+		{
+			name: "multiple device classes with default set",
+			args: args{
+				lvmd: &Lvmd{
+					SocketName: "/run/lvmd/lvmd.socket",
+					DeviceClasses: []*DeviceClass{
+						{
+							Name:        "v0",
+							Default:     true,
+							VolumeGroup: "vg_1",
+							SpareGB:     uint64Ptr(5),
+						},
+						{
+							Name:        "v1",
+							Default:     false,
+							VolumeGroup: "vg_2",
+							SpareGB:     uint64Ptr(10),
+						},
+					},
+				},
+			},
+			want: []*storage.StorageClass{
+				{
+					ObjectMeta: metav1.ObjectMeta{
+						Name: "topolvm-provisioner-v0",
+						Annotations: map[string]string{
+							"storageclass.kubernetes.io/is-default-class": "false",
+						},
+					},
+					Provisioner: "topolvm.io",
+					Parameters: map[string]string{
+						"csi.storage.k8s.io/fstype": "xfs",
+					},
+					ReclaimPolicy:        &pvcrd,
+					VolumeBindingMode:    &vpmWait,
+					AllowVolumeExpansion: &allowVolExp,
+				},
+				{
+					ObjectMeta: metav1.ObjectMeta{
+						Name: "topolvm-provisioner-v0",
+						Annotations: map[string]string{
+							"storageclass.kubernetes.io/is-default-class": "false",
+						},
+					},
+					Provisioner: "topolvm.io",
+					Parameters: map[string]string{
+						"csi.storage.k8s.io/fstype": "xfs",
+					},
+					ReclaimPolicy:        &pvcrd,
+					VolumeBindingMode:    &vpmWait,
+					AllowVolumeExpansion: &allowVolExp,
+				},
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := ToStorageClassList(tt.args.lvmd)
+			if len(got) != len(tt.want) {
+				t.Errorf("len(got) = %v, len(want) %v", got, tt.want)
+			}
+			if !reflect.DeepEqual(got[0], tt.want[0]) {
+				t.Errorf("got[0] = %v\nwant[0] = %v", *(got[0]), *(tt.want[0]))
 			}
 		})
 	}

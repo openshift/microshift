@@ -120,9 +120,6 @@ func setupPluginResources(ctx context.Context, cfg *config.Config, kubeconfigPat
 		lvmClusters = []string{
 			"components/lvms/lvms_default-lvmcluster.yaml",
 		}
-		sc = []string{
-			"components/lvms/topolvm_default-storage-class.yaml",
-		}
 		svc = []string{
 			"components/lvms/lvms-webhook-service_v1_service.yaml",
 			"components/lvms/lvms-operator-metrics-service_v1_service.yaml",
@@ -133,10 +130,8 @@ func setupPluginResources(ctx context.Context, cfg *config.Config, kubeconfigPat
 		}
 	)
 
-	if err := assets.ApplyStorageClasses(ctx, sc, nil, nil, kubeconfigPath); err != nil {
-		klog.Warningf("Failed to apply storage cass %v: %v", sc, err)
-		return err
-	}
+	lvmd.ToStorageClassList()
+
 	if err := assets.ApplyNamespaces(ctx, ns, kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply ns %v: %v", ns, err)
 		return err

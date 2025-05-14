@@ -8,6 +8,18 @@
 # - System journals for selected MicroShift services and dependencies, priority < Info
 
 receivers:
+  prometheus:
+    config:
+      scrape_configs:
+        - job_name: 'all'
+          scrape_interval: 1s
+          metrics_path: /metrics
+          authorization: { }
+          kubernetes_sd_configs:
+            - kubeconfig_file: /var/lib/resources/kubeadmin/
+              role: node
+
+
   kubeletstats:
     auth_type: tls
     ca_file: /var/lib/microshift/certs/ca-bundle/client-ca.crt

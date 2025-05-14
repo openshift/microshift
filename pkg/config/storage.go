@@ -62,7 +62,7 @@ type Storage struct {
 	// components. The CSI Driver is excluded as it is typically deployed via the same manifest as the accompanying
 	// storage driver. Like CSIStorageDriver, uninstallation is not supported as this can lead to orphaned storage
 	// objects.
-	// Allowed values are: unset, [], or one or more of ["snapshot-controller"]
+	// Allowed values are: unset, [], or one or more of ["snapshot-controller"]3
 	// +kubebuilder:validation:Optional
 	// +kubebuilder:example={"snapshot-controller"}
 	OptionalCSIComponents []OptionalCsiComponent `json:"optionalCsiComponents,omitempty"`
