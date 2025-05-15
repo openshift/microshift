@@ -1,7 +1,281 @@
-- api embedded-component e577b4d83475e00f762184e90d97f7526681defe to d22fca85e3b9f77f0cf2b43759a5ff927e605f57
-  - e5a4dc40 2025-04-28T10:46:22+02:00 make update
-  - 49f9c6de 2025-04-28T10:38:42+02:00 features: enable ServiceAccountTokenNodeBinding
-  - 42c53671 2025-04-25T15:46:32+01:00 Enable nomaps linter
-  - 4f87a133 2025-04-25T15:40:23+01:00 Update tools vendor
-  - fe7ee721 2025-04-25T15:40:06+01:00 Update kube-api-linter to kube-sigs
+- api embedded-component d22fca85e3b9f77f0cf2b43759a5ff927e605f57 to 0c841e776cfe3c2467f850067dcfc6370d045276
+  - 7f939ffa 2025-05-09T13:54:11+02:00 feat: align DataGather with InsightsDataGather
+  - a7e14924 2025-05-08T07:05:33-04:00 SPLAT-2168: introduce AWSDedicatedHosts feature gate
+  - 81ce3a99 2025-05-07T17:29:01+01:00 Drop BareMetalLoadBalancer feature gate
+  - 46fd2283 2025-05-07T11:35:19+01:00 Remove upstream on-by-default cloud feature gates (CloudDualStackNodeIPs, DisableKubeletCloudCredentialProviders)
+  - 4d05e47f 2025-05-06T09:47:29+02:00 feat: introduce v1alpha2 for Insights DataGather
+  - 7df83cfb 2025-05-02T15:22:14+01:00 Remove MachineAPIProviderOpenStack feature gate
+  - 1c616a39 2025-04-30T12:35:49-04:00 vsphere bootimg feature
+  - 446c4bf6 2025-04-30T13:33:02+02:00 README: Add criteria for featuregate test result windows and flake handling
+  - 31cf4280 2025-04-30T06:51:44-04:00 Removed VSphereMultiVCenters feature gate
+  - b89a1683 2025-04-23T13:53:55-04:00 Add Azure Multi Disk feature gate
+
+- cluster-kube-apiserver-operator embedded-component 93fe617f5239c8ef3933eb4ef1d04695ce3ab630 to af13d7a097b5f42fde81964f42fe834e981de3b6
+  - ac0635a 2025-05-08T13:21:58+02:00 webhookcontroller: change cert lifetime argument to time.Duration
+  - ee80340 2025-05-07T13:52:25+02:00 bump library-go
+  - 498dc3f 2025-05-06T20:39:23+02:00 Change validity / refresh for some certs which should not be affected by dev cycle rotation change
+  - 4950dc3 2025-04-23T16:06:48+02:00 Always display month/ten month/year
+  - 47a3620 2025-04-15T08:19:49+02:00 Revert "Revert "OCPBUGS-43777: certrotationcontroller: run tests which runs deployment and creates projects""
+
+- cluster-kube-scheduler-operator embedded-component 8740a60de76690a17d5081db078eb93dfdb7a066 to 0d060e4b9cfbe1bdbc5991dde5424161ff44c932
+  - e803110 2025-05-02T15:39:40-04:00 enable the schedule plugin if the featuregate is enabled
+
+- cluster-network-operator embedded-component 2a1d6159a44bf8aa26bba9981f144006a1d99990 to 6df9296e008bcbe4cb62d2cef60de67320adb0fb
+  - bc5f08e 2025-04-29T03:35:56-04:00 Pass '--gateway-mode' flag for ovnkube-cluster-manager
+  - cb79f6e 2025-04-14T20:13:52-04:00 Remove env var related to ARO HCP MIv2
+
+- kubernetes embedded-component 76a7b9964ebe022596bbbabe2e2ca371b02b2752 to 633fd3c14dbbe72d3b56eb0fada5ac66d09f98aa
+  - a3adf3715 2025-05-12T10:56:48-03:00 UPSTREAM: <drop>: make update
+  - d0faa57e4 2025-05-12T10:33:35-03:00 UPSTREAM: <carry>: fix generation of annotations
+  - 24bf6d5c8 2025-05-08T13:47:56-04:00 UPSTREAM: <carry>: revert: NO-JIRA: UPSTREAM: <carry>: Mark admissionregistration.k8s.io/v1beta1 as deprecated.
+  - f4bd47cda 2025-05-08T10:00:17-04:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - 5d8d2630f 2025-05-07T10:06:26-04:00 UPSTREAM: 131495: Handle unsupported node expansion for RWX volumes
+  - f959e468a 2025-05-06T14:07:34-04:00 UPSTREAM: <carry>: Mark admissionregistration.k8s.io/v1beta1 as deprecated.
+  - 7d585bcb1 2025-05-01T12:02:28-04:00 UPSTREAM: 131418: Check for newer fields when deciding expansion recovery feature status
+  - ba07fe126 2025-04-29T14:42:20+02:00 UPSTREAM: 130047: adjusting loopback certificate validity in kube-apiserver
+  - 4d4f642d0 2025-04-28T13:27:57+02:00 UPSTREAM: 131236: RWX tests should create RWX volumes
+  - 162e867f4 2025-04-25T14:03:40-04:00 UPSTREAM: <carry>: use OTE for spec filtering in e2e tests
+  - 59526cd48 2025-04-22T15:56:13+00:00 Release commit for Kubernetes v1.32.4
+  - 7b326a951 2025-04-03T08:46:13+01:00 Fix race for sending errors in watch
+  - b5f6d82ff 2025-04-02T13:20:20+03:00 CHANGELOG-1.32: fix release note about kubeadm upgrade phases
+  - 01b87d211 2025-03-13T09:39:16+00:00 Fix implementation of ContainsCIDR to allow non-equal addresses
+  - a0ad8fb28 2025-03-11T20:15:04+00:00 Update CHANGELOG/CHANGELOG-1.32.md for v1.32.3
+  - e3daed873 2025-03-10T18:59:14+08:00 fix handle terminating pvc when kubelet rebuild dsw
+  - ef4a6f983 2025-03-10T18:59:14+08:00 fix e2e
+  - ad0c8a10e 2025-03-10T18:59:14+08:00 add e2e test to reproduce unexpected unmount after kubelet is restarted
+
+- machine-config-operator embedded-component e44d380686aee42f784a277236dbac49b083441e to a09f116ff66ddf996847b444b05694d39687ae32
+  - 04498b60 2025-05-13T09:41:27-04:00 Compare the osImageURLs for OS validation check
+  - 2294c177 2025-05-12T12:23:55-06:00 Add KubeletHealthState runbook to alert
+  - 244549f0 2025-05-12T13:00:47-04:00 OCPBUGS-55439: scope MCD node listers to current node
+  - 920a2718 2025-05-09T11:31:27-05:00 parsing error to report full-render reconciliation fails vs partial render fails
+  - d7c647a2 2025-05-08T16:05:08-04:00 msbic: add hot loop detection
+  - 8ba4f206 2025-05-06T15:56:15-04:00 upgrade monitor: only set curret generation value in pinned image set reference in MCN when the value is valid
+  - 5b69a64c 2025-05-05T09:34:26-05:00 Revert "OCPBUGS-44757: decrease leases for kubelet on azure"
+  - 918429f9 2025-05-01T08:33:08-04:00 OWNERS: update owners file with current MCO team members
+  - 5eb8694d 2025-04-29T16:01:30-05:00 updated log to specify when no state changes
+  - 826477f8 2025-04-29T10:16:06-04:00 node_controller: implement LayeredNodeState
+  - debbcf23 2025-04-29T15:01:57+02:00 Use auto=start only for IPsec out connections
+  - d21d4047 2025-04-29T10:17:00+00:00 OCPNODE-3173: Disable OCI artifact mount by default.
+  - ca4fcd9e 2025-04-28T11:17:16+02:00 OCPBUGS-55327: Bugfix Ignition compression merge
+  - a48bebe0 2025-04-09T13:30:20-04:00 AWS Custom-DNS: Update services that run on control plane nodes
+
+- openshift-controller-manager embedded-component 49eb6f8ae6e87dbdd4c3f49902a1eca5ef85b3f1 to ed71ab5838640944094fd3e8c42c5497562cca6a
+  - 5f6a9dc 2025-05-09T09:36:14-04:00 legacy image pull secret rollback controller
+  - 3211ab0 2025-05-09T09:36:14-04:00 introduce rollback controllers
+  - aac411e 2025-05-02T11:59:50+05:30 fix: fixed vendor inconsistency failure to pass verify-deps job
+  - 591db09 2025-04-17T05:38:03+00:00 OCPBUGS-54695:Empty proxy variables are causing issues during the build Problem:  Irrespective of default proxy settings these proxy variables are set on build containers. If any defaults are set they reflect those setting ,if not set they are set to null on the build container. Having these null variables are causing problems to some customers as its breaking some required apps on container   HTTP_PROXY,http_proxy,HTTPS_PROXY,https_proxy,NO_PROXY,no_proxy Fix:  Code changed only to add these proxy variables only if they are defined in defaults and if they are not null.
+
+- operator-framework-olm embedded-component ec31de865be0c822d967ec8fe563c6eb8c4757e5 to c55cf59ef1b52f54aeb9d0ad99dd90f4c041b852
+  - d240189d 2025-05-14T00:06:26+00:00 Bump github.com/grpc-ecosystem/grpc-health-probe from 0.4.37 to 0.4.38 (#1666)
+  - ea441d6f 2025-05-14T00:05:18+00:00 Bump golang.org/x/net from 0.39.0 to 0.40.0 (#1667)
+  - f05d510e 2025-05-14T00:05:02+00:00 containers/image: remove signatures when copying in to OCI layout (#1664)
+  - ab01b4f1 2025-05-14T00:04:46+00:00 Bump github.com/golang-migrate/migrate/v4 from 4.18.2 to 4.18.3 (#1662)
+  - 6411e063 2025-05-14T00:04:31+00:00 Bump github.com/grpc-ecosystem/go-grpc-middleware/v2 from 2.3.1 to 2.3.2 (#1663)
+  - fad6a47d 2025-05-14T00:04:15+00:00 fixup go-verdiff job (#1660)
+  - e9171dff 2025-05-14T00:03:58+00:00 :seedling: Bump github.com/operator-framework/operator-registry (#3575)
+  - eb5d1a5b 2025-05-13T00:05:35+00:00 :seedling: Bump golang.org/x/net from 0.39.0 to 0.40.0 (#3570)
+  - e6571748 2025-05-13T00:04:37+00:00 :seedling: Bump github.com/prometheus/client_golang (#3571)
+  - be00100c 2025-05-13T00:04:22+00:00 :seedling: Bump golang.org/x/sync from 0.13.0 to 0.14.0 (#3569)
+  - 38f49668 2025-05-13T00:04:07+00:00 Update even configuration for go-verdiff (#3574)
+  - ff6963c2 2025-05-13T00:03:49+00:00 Disable FailForward bad resource e2e (#3572)
+  - 390c7183 2025-05-06T00:04:30+00:00 add support for ConsolePlugin (#3551)
+  - 80a5403e 2025-05-06T00:03:33+00:00 handle optionality of spec.grpcPodConfig.extractContent.cacheDir (#3556)
+  - 0cd44e02 2025-04-30T15:56:00-04:00 Add containers_image_openpgp to GO_BUILD_TAGS
+  - 2df3c684 2025-04-30T15:55:57-04:00 make grpcPodConfig.extractContent.cacheDir an optional field (#421)
+  - 169b6ebb 2025-04-30T15:55:55-04:00 Bump golang.org/x/net from 0.36.0 to 0.38.0 (#422)
+  - ee0e3c53 2025-04-30T15:55:52-04:00 Bump sigs.k8s.io/controller-runtime in the k8s-dependencies group (#420)
+  - bf9f224b 2025-04-30T15:55:50-04:00 group k8s and golang.org/x dependencies (#419)
+  - 3fcebdcd 2025-04-30T15:55:48-04:00 Bump k8s.io/apiextensions-apiserver from 0.32.2 to 0.32.3 (#418)
+  - dd219106 2025-04-30T15:55:45-04:00 Bump golang.org/x/net from 0.34.0 to 0.36.0 (#414)
+  - 62991226 2025-04-30T15:55:42-04:00 Bump sigs.k8s.io/controller-runtime from 0.20.2 to 0.20.3 (#413)
+  - d19fa03d 2025-04-30T15:55:39-04:00 pkg/image: fixup containers/image registry test with a test-defined signature policy (#1654)
+  - dc2e9305 2025-04-30T15:55:37-04:00 Add go-version check to avoid introduces an version that we cannot support yet (#1657)
+  - dd467c91 2025-04-30T15:55:34-04:00 Revert : Bump github.com/distribution/distribution/v3 from 3.0.0-rc.3 to 3.0.0-rc.4  PR: 1620 (#1656)
+  - 66237027 2025-04-30T15:55:31-04:00 Bump github.com/operator-framework/api from 0.30.0 to 0.31.0 (#1655)
+  - 3b0d0b03 2025-04-30T15:55:29-04:00 bumping go-grpc-middleware with replace for k8s 1.32 (#1653)
+  - e105a97d 2025-04-30T15:55:27-04:00 Upgrade google.golang.org/grpc from v1.71.1 to v1.72.0 (#1652)
+  - a0df8b76 2025-04-30T15:55:19-04:00 Containers image registry implementation with opt-in caching (#1626)
+  - 162aa790 2025-04-30T14:45:12-04:00 Bump github.com/mattn/go-sqlite3 from 1.14.27 to 1.14.28 (#1643)
+  - 872981fa 2025-04-30T14:45:12-04:00 Bump github.com/containers/common from 0.62.3 to 0.63.0 (#1645)
+  - 93a10517 2025-04-30T14:45:12-04:00 Bump github.com/docker/cli (#1646)
+  - 8892ee48 2025-04-30T14:45:12-04:00 Bump github.com/containers/image/v5 from 5.34.3 to 5.35.0 (#1642)
+  - 87afb4cd 2025-04-30T14:45:11-04:00 add support for ConsolePlugin (#1634)
+  - 8e4d72bc 2025-04-30T14:45:11-04:00 Bump github.com/onsi/ginkgo/v2 from 2.23.3 to 2.23.4 (#1641)
+  - ca610caa 2025-04-30T14:45:11-04:00 Bump github.com/mattn/go-sqlite3 from 1.14.24 to 1.14.27 (#1639)
+  - 663ee64e 2025-04-30T14:45:11-04:00 pkg/configmap: sort configmap data by key when loading bundle (#1630)
+  - e68eb942 2025-04-30T14:45:11-04:00 Bump golang.org/x/net from 0.37.0 to 0.39.0 (#1640)
+  - 7abfa7b2 2025-04-30T14:45:11-04:00 Bump google.golang.org/grpc from 1.71.0 to 1.71.1 (#1637)
+  - ac065b67 2025-04-30T14:45:10-04:00 Bump golang.org/x/sync from 0.12.0 to 0.13.0 (#1636)
+  - 9db40a3f 2025-04-30T14:45:10-04:00 Bump github.com/onsi/gomega from 1.36.3 to 1.37.0 (#1635)
+  - 7053b9fd 2025-04-30T14:45:10-04:00 Bump golang.org/x/text from 0.23.0 to 0.24.0 (#1638)
+  - 91e349e0 2025-04-30T14:45:10-04:00 Bump github.com/distribution/distribution/v3 from 3.0.0-rc.4 to 3.0.0 (#1633)
+  - 594fe2c2 2025-04-30T14:45:10-04:00 Bump golang.org/x/sys from 0.31.0 to 0.32.0 (#1632)
+  - d29f4377 2025-04-30T14:45:10-04:00 Bump github.com/containers/common from 0.62.2 to 0.62.3 (#1631)
+  - 16790db9 2025-04-30T14:45:09-04:00 Bump github.com/distribution/distribution/v3 from 3.0.0-rc.3 to 3.0.0-rc.4 (#1620)
+  - 7a163dbf 2025-04-30T14:45:09-04:00 Bump sigs.k8s.io/controller-runtime from 0.20.3 to 0.20.4 (#1623)
+  - a7ae8912 2025-04-30T14:45:09-04:00 Bump github.com/docker/cli (#1628)
+  - 00e2a1c7 2025-04-30T14:45:09-04:00 (fix) declCfg non-closed file descriptor (#1625)
+  - 94375127 2025-04-30T14:45:09-04:00 .github/workflows/test.yml: bump to ubunutu-latest (#1627)
+  - 02f0b17e 2025-04-30T14:45:09-04:00 Bump github.com/onsi/gomega from 1.36.2 to 1.36.3 (#1621)
+  - 9b996a39 2025-04-30T14:45:08-04:00 Bump google.golang.org/protobuf from 1.36.5 to 1.36.6 (#1624)
+  - 3ee03c1d 2025-04-30T14:45:08-04:00 Bump github.com/onsi/ginkgo/v2 from 2.23.2 to 2.23.3 (#1622)
+  - caa48e7d 2025-04-30T14:45:08-04:00 Bump github.com/onsi/ginkgo/v2 from 2.23.1 to 2.23.2 (#1619)
+  - 637fea27 2025-04-30T14:45:08-04:00 Bump github.com/docker/cli (#1617)
+  - e8ce9223 2025-04-30T14:45:08-04:00 group k8s and golang.org/x dependencies (#1616)
+  - 85116f1f 2025-04-30T14:45:08-04:00 Bump github.com/onsi/ginkgo/v2 from 2.23.0 to 2.23.1 (#1618)
+  - f9b2519c 2025-04-30T14:45:07-04:00 Bump github.com/containerd/containerd from 1.7.26 to 1.7.27 (#1615)
+  - 25ce4d77 2025-04-30T14:45:07-04:00 Bump github.com/containers/common from 0.62.1 to 0.62.2 (#1612)
+  - e33b99b0 2025-04-30T14:45:07-04:00 Bump k8s.io/apiextensions-apiserver from 0.32.2 to 0.32.3 (#1614)
+  - 3983589d 2025-04-30T14:45:07-04:00 Bump sigs.k8s.io/kind from 0.26.0 to 0.27.0 (#1587)
+  - 17ab7c18 2025-04-30T14:45:07-04:00 Bump golang.org/x/mod from 0.23.0 to 0.24.0 (#1606)
+  - a31aa2f0 2025-04-30T14:45:07-04:00 Bump github.com/containers/image/v5 from 5.34.1 to 5.34.2 (#1609)
+  - 2f8a09c5 2025-04-30T14:45:06-04:00 Bump k8s.io/apimachinery from 0.32.2 to 0.32.3 (#1610)
+  - 071c9e59 2025-04-30T14:45:06-04:00 Bump golang.org/x/net from 0.36.0 to 0.37.0 (#1601)
+  - 7ae56cdc 2025-04-30T14:45:06-04:00 Bump sigs.k8s.io/controller-runtime from 0.20.2 to 0.20.3 (#1607)
+  - b0bf58ca 2025-04-30T14:45:06-04:00 Bump github.com/onsi/ginkgo/v2 from 2.22.2 to 2.23.0 (#1602)
+  - 4a1c9464 2025-04-30T14:45:06-04:00 Bump golang.org/x/text from 0.22.0 to 0.23.0 (#1603)
+  - e1e660ba 2025-04-30T14:45:06-04:00 Bump golang.org/x/sync from 0.11.0 to 0.12.0 (#1604)
+  - 49a53511 2025-04-30T14:45:06-04:00 upgraded golang.org/x/oauth2 v0.23.0 => v0.27.0 (#1595)
+  - 868cafe2 2025-04-30T14:45:05-04:00 Bump github.com/operator-framework/api from 0.29.0 to 0.30.0 (#1598)
+  - bce4dc94 2025-04-30T14:45:05-04:00 Bump golang.org/x/net from 0.35.0 to 0.36.0 (#1599)
+  - 1055e342 2025-04-30T14:45:05-04:00 Bump google.golang.org/grpc from 1.70.0 to 1.71.0 (#1600)
+  - 74eb9197 2025-04-30T14:45:05-04:00 Bump github.com/containers/common from 0.62.0 to 0.62.1 (#1597)
+  - 7f140f23 2025-04-30T14:45:05-04:00 Bump github.com/opencontainers/image-spec from 1.1.0 to 1.1.1 (#1596)
+  - 169ecfb9 2025-04-30T14:45:05-04:00 Bump github.com/containers/image/v5 from 5.34.0 to 5.34.1 (#1594)
+  - c6d9c19b 2025-04-30T14:45:04-04:00 Bump github.com/docker/cli (#1592)
+  - a8286c01 2025-04-30T14:45:04-04:00 Bump github.com/containerd/containerd from 1.7.25 to 1.7.26 (#1593)
+  - 1dc0d776 2025-04-30T14:45:04-04:00 🌱 Add go-version check to avoid upgrade versions for those that we cannot support yet (#3561)
+  - 475d4375 2025-04-30T14:44:58-04:00 🌱 Upgrade github.com/operator-framework/operator-registry from 1.51.0 to 1.53.0 (#3562)
+  - 188ef499 2025-04-30T09:39:25-04:00 :seedling: Bump github.com/fsnotify/fsnotify from 1.8.0 to 1.9.0 (#3563)
+  - 6c160c4e 2025-04-30T09:39:19-04:00 :seedling: Bump github.com/prometheus/client_model from 0.6.1 to 0.6.2 (#3566)
+  - 448eb103 2025-04-30T09:39:14-04:00 fix(olm): improve error logging for missing olm.managed label (#3558)
+  - 33702a0c 2025-04-30T09:39:08-04:00 :seedling: Bump golang.org/x/net from 0.37.0 to 0.39.0 (#3552)
+  - aab06ef0 2025-04-30T09:39:03-04:00 :seedling: Bump github.com/onsi/gomega from 1.36.2 to 1.37.0 (#3554)
+
+- oc image-amd64 e468aa68e754e22997f526fcdbbd470387ff5e33 to 596e583e459f47dc944211223a13108107a99b44
+  - 06037161 2025-05-07T11:15:20-04:00 make 'oc status' compatible with bare kube
+  - 092229a3 2025-04-09T11:11:02-04:00 Adding sos.conf file for default sos config into the tools image
+
+- ovn-kubernetes image-amd64 f7dd74f4c2b944f85176546839546e505ee96189 to f9ab1db81294cc6dc8953c35f9394f81c037d5ff
+  - a1e4cbae 2025-05-10T11:08:02-04:00 Revert "OCPBUGS-44285, OCPBUGS-37733, OCPBUGS-55824, OCPBUGS-54375: Downstream Merge 7th May 2025"
+  - 936e6214 2025-05-07T12:41:42+02:00 Revert "e2e: connect to host-networked pod from localnet"
+  - ebb73398 2025-05-07T12:41:42+02:00 Revert "Add flow for host -> localnet on same node"
+  - 78a94d4d 2025-05-07T10:31:35+02:00 Refactor routemanager
+  - b0f6d9f2 2025-05-07T08:29:45+08:00 Skip L2 UDN route advertisements tests for LGW mode
+  - d5aa5d52 2025-05-07T08:29:45+08:00 Pass gateway mode parameter to ovn-cluster-manager in ovnkube.sh
+  - a13d977e 2025-05-03T09:36:55-07:00 gateway_mtu should be set on router ports only if node supports it
+  - 508747e1 2025-05-01T20:37:22-07:00 Remove redundant nodeprimaryaddrchanged check
+  - 971d8c9b 2025-05-01T20:37:22-07:00 Enable insertion of encap records to existing chassis
+  - fbe5beab 2025-05-01T20:37:22-07:00 Add createorupdatechassis tests
+  - 98a016a8 2025-05-01T20:37:22-07:00 Update IC tests for encap records insertion and deletion
+  - d1bbbab6 2025-05-01T20:37:22-07:00 OVN IC mode should handle user set encapIPs
+  - de538336 2025-05-01T11:33:59-04:00 address review comments on networkqos
+  - 21fd64ab 2025-04-30T17:31:07-04:00 revert to use string key for networkqos
+  - 4dcedbe4 2025-04-30T10:29:58+02:00 ovs client shouldn't be initialized on DPU Hosts
+  - 7f342524 2025-04-30T08:07:48+00:00 refactor networkqos handlers
+  - 0851d4c5 2025-04-29T21:34:58-07:00 detect VF accelerated gateway interface without explicit configuration
+  - 4fb27fe1 2025-04-29T22:37:59+02:00 Dockerfile: Unpin OVS and consume the latest from FDP.
+  - 9577e9f9 2025-04-29T10:31:06-04:00 Set gateway_mtu on rtos-<node> router ports
+  - bc261a14 2025-04-29T10:31:06-04:00 Fixes a nodePort service targeting a pod with hostNetwork e2e
+  - b23bcb06 2025-04-29T10:31:06-04:00 Add PMTUD blocking NFT and OF rules for remote nodes
+  - f8bf30bb 2025-04-29T10:23:31-04:00 Adds e2e tests for triggering icmp needs frag
+  - ef217b1b 2025-04-27T19:27:00+00:00 update crd from update-codegen.sh
+  - 7ec02490 2025-04-27T19:26:54+00:00 NetworkQoS: support multiple ports in one classifier
+  - 4f2f5a17 2025-04-27T19:26:48+00:00 fix lint
+  - a373249a 2025-04-27T19:26:43+00:00 networkqos: use NetworkSelector to match net-attach-defs (#8)
+  - c561de85 2025-04-27T19:26:38+00:00 Update networkqos okep to reflect latest changes from code review
+  - 9770cb18 2025-04-27T19:26:32+00:00 address review comments.
+  - 606206f4 2025-04-27T19:25:55+00:00 gh, actions: Set OVN_NETWORK_QOS_ENABLE in control-plane jobs
+  - 98d4ceb4 2025-04-27T19:24:29+00:00 add e2e tests for networkqos
+  - 1efaf29b 2025-04-25T20:52:31+00:00 Implement NetworkQoS controller
+  - 11c7f0d2 2025-04-25T20:52:31+00:00 Add factory, handlers, clients for Network QoS
+  - 15058e58 2025-04-25T20:52:31+00:00 Add flag to enable the feature
+  - 964c66e7 2025-04-25T20:52:31+00:00 generated crd from update-codegen.sh
+  - 8e5ad2bb 2025-04-25T20:52:31+00:00 update-codegen.sh: be aware of crd version
+  - b07f226b 2025-04-25T20:52:31+00:00 NetworkQoS CRD
+  - 1688916b 2025-04-22T22:56:39+02:00 Add Nadia Pinaeva to maintainer's list
+
+- kubernetes image-amd64 76a7b9964ebe022596bbbabe2e2ca371b02b2752 to 633fd3c14dbbe72d3b56eb0fada5ac66d09f98aa
+  - a3adf3715 2025-05-12T10:56:48-03:00 UPSTREAM: <drop>: make update
+  - d0faa57e4 2025-05-12T10:33:35-03:00 UPSTREAM: <carry>: fix generation of annotations
+  - 24bf6d5c8 2025-05-08T13:47:56-04:00 UPSTREAM: <carry>: revert: NO-JIRA: UPSTREAM: <carry>: Mark admissionregistration.k8s.io/v1beta1 as deprecated.
+  - f4bd47cda 2025-05-08T10:00:17-04:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - 5d8d2630f 2025-05-07T10:06:26-04:00 UPSTREAM: 131495: Handle unsupported node expansion for RWX volumes
+  - f959e468a 2025-05-06T14:07:34-04:00 UPSTREAM: <carry>: Mark admissionregistration.k8s.io/v1beta1 as deprecated.
+  - 7d585bcb1 2025-05-01T12:02:28-04:00 UPSTREAM: 131418: Check for newer fields when deciding expansion recovery feature status
+  - ba07fe126 2025-04-29T14:42:20+02:00 UPSTREAM: 130047: adjusting loopback certificate validity in kube-apiserver
+  - 4d4f642d0 2025-04-28T13:27:57+02:00 UPSTREAM: 131236: RWX tests should create RWX volumes
+  - 162e867f4 2025-04-25T14:03:40-04:00 UPSTREAM: <carry>: use OTE for spec filtering in e2e tests
+  - 59526cd48 2025-04-22T15:56:13+00:00 Release commit for Kubernetes v1.32.4
+  - 7b326a951 2025-04-03T08:46:13+01:00 Fix race for sending errors in watch
+  - b5f6d82ff 2025-04-02T13:20:20+03:00 CHANGELOG-1.32: fix release note about kubeadm upgrade phases
+  - 01b87d211 2025-03-13T09:39:16+00:00 Fix implementation of ContainsCIDR to allow non-equal addresses
+  - a0ad8fb28 2025-03-11T20:15:04+00:00 Update CHANGELOG/CHANGELOG-1.32.md for v1.32.3
+  - e3daed873 2025-03-10T18:59:14+08:00 fix handle terminating pvc when kubelet rebuild dsw
+  - ef4a6f983 2025-03-10T18:59:14+08:00 fix e2e
+  - ad0c8a10e 2025-03-10T18:59:14+08:00 add e2e test to reproduce unexpected unmount after kubelet is restarted
+
+- oc image-arm64 e468aa68e754e22997f526fcdbbd470387ff5e33 to 596e583e459f47dc944211223a13108107a99b44
+  - 06037161 2025-05-07T11:15:20-04:00 make 'oc status' compatible with bare kube
+  - 092229a3 2025-04-09T11:11:02-04:00 Adding sos.conf file for default sos config into the tools image
+
+- ovn-kubernetes image-arm64 f7dd74f4c2b944f85176546839546e505ee96189 to f9ab1db81294cc6dc8953c35f9394f81c037d5ff
+  - a1e4cbae 2025-05-10T11:08:02-04:00 Revert "OCPBUGS-44285, OCPBUGS-37733, OCPBUGS-55824, OCPBUGS-54375: Downstream Merge 7th May 2025"
+  - 936e6214 2025-05-07T12:41:42+02:00 Revert "e2e: connect to host-networked pod from localnet"
+  - ebb73398 2025-05-07T12:41:42+02:00 Revert "Add flow for host -> localnet on same node"
+  - 78a94d4d 2025-05-07T10:31:35+02:00 Refactor routemanager
+  - b0f6d9f2 2025-05-07T08:29:45+08:00 Skip L2 UDN route advertisements tests for LGW mode
+  - d5aa5d52 2025-05-07T08:29:45+08:00 Pass gateway mode parameter to ovn-cluster-manager in ovnkube.sh
+  - a13d977e 2025-05-03T09:36:55-07:00 gateway_mtu should be set on router ports only if node supports it
+  - 508747e1 2025-05-01T20:37:22-07:00 Remove redundant nodeprimaryaddrchanged check
+  - 971d8c9b 2025-05-01T20:37:22-07:00 Enable insertion of encap records to existing chassis
+  - fbe5beab 2025-05-01T20:37:22-07:00 Add createorupdatechassis tests
+  - 98a016a8 2025-05-01T20:37:22-07:00 Update IC tests for encap records insertion and deletion
+  - d1bbbab6 2025-05-01T20:37:22-07:00 OVN IC mode should handle user set encapIPs
+  - de538336 2025-05-01T11:33:59-04:00 address review comments on networkqos
+  - 21fd64ab 2025-04-30T17:31:07-04:00 revert to use string key for networkqos
+  - 4dcedbe4 2025-04-30T10:29:58+02:00 ovs client shouldn't be initialized on DPU Hosts
+  - 7f342524 2025-04-30T08:07:48+00:00 refactor networkqos handlers
+  - 0851d4c5 2025-04-29T21:34:58-07:00 detect VF accelerated gateway interface without explicit configuration
+  - 4fb27fe1 2025-04-29T22:37:59+02:00 Dockerfile: Unpin OVS and consume the latest from FDP.
+  - 9577e9f9 2025-04-29T10:31:06-04:00 Set gateway_mtu on rtos-<node> router ports
+  - bc261a14 2025-04-29T10:31:06-04:00 Fixes a nodePort service targeting a pod with hostNetwork e2e
+  - b23bcb06 2025-04-29T10:31:06-04:00 Add PMTUD blocking NFT and OF rules for remote nodes
+  - f8bf30bb 2025-04-29T10:23:31-04:00 Adds e2e tests for triggering icmp needs frag
+  - ef217b1b 2025-04-27T19:27:00+00:00 update crd from update-codegen.sh
+  - 7ec02490 2025-04-27T19:26:54+00:00 NetworkQoS: support multiple ports in one classifier
+  - 4f2f5a17 2025-04-27T19:26:48+00:00 fix lint
+  - a373249a 2025-04-27T19:26:43+00:00 networkqos: use NetworkSelector to match net-attach-defs (#8)
+  - c561de85 2025-04-27T19:26:38+00:00 Update networkqos okep to reflect latest changes from code review
+  - 9770cb18 2025-04-27T19:26:32+00:00 address review comments.
+  - 606206f4 2025-04-27T19:25:55+00:00 gh, actions: Set OVN_NETWORK_QOS_ENABLE in control-plane jobs
+  - 98d4ceb4 2025-04-27T19:24:29+00:00 add e2e tests for networkqos
+  - 1efaf29b 2025-04-25T20:52:31+00:00 Implement NetworkQoS controller
+  - 11c7f0d2 2025-04-25T20:52:31+00:00 Add factory, handlers, clients for Network QoS
+  - 15058e58 2025-04-25T20:52:31+00:00 Add flag to enable the feature
+  - 964c66e7 2025-04-25T20:52:31+00:00 generated crd from update-codegen.sh
+  - 8e5ad2bb 2025-04-25T20:52:31+00:00 update-codegen.sh: be aware of crd version
+  - b07f226b 2025-04-25T20:52:31+00:00 NetworkQoS CRD
+  - 1688916b 2025-04-22T22:56:39+02:00 Add Nadia Pinaeva to maintainer's list
+
+- kubernetes image-arm64 76a7b9964ebe022596bbbabe2e2ca371b02b2752 to 633fd3c14dbbe72d3b56eb0fada5ac66d09f98aa
+  - a3adf3715 2025-05-12T10:56:48-03:00 UPSTREAM: <drop>: make update
+  - d0faa57e4 2025-05-12T10:33:35-03:00 UPSTREAM: <carry>: fix generation of annotations
+  - 24bf6d5c8 2025-05-08T13:47:56-04:00 UPSTREAM: <carry>: revert: NO-JIRA: UPSTREAM: <carry>: Mark admissionregistration.k8s.io/v1beta1 as deprecated.
+  - f4bd47cda 2025-05-08T10:00:17-04:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - 5d8d2630f 2025-05-07T10:06:26-04:00 UPSTREAM: 131495: Handle unsupported node expansion for RWX volumes
+  - f959e468a 2025-05-06T14:07:34-04:00 UPSTREAM: <carry>: Mark admissionregistration.k8s.io/v1beta1 as deprecated.
+  - 7d585bcb1 2025-05-01T12:02:28-04:00 UPSTREAM: 131418: Check for newer fields when deciding expansion recovery feature status
+  - ba07fe126 2025-04-29T14:42:20+02:00 UPSTREAM: 130047: adjusting loopback certificate validity in kube-apiserver
+  - 4d4f642d0 2025-04-28T13:27:57+02:00 UPSTREAM: 131236: RWX tests should create RWX volumes
+  - 162e867f4 2025-04-25T14:03:40-04:00 UPSTREAM: <carry>: use OTE for spec filtering in e2e tests
+  - 59526cd48 2025-04-22T15:56:13+00:00 Release commit for Kubernetes v1.32.4
+  - 7b326a951 2025-04-03T08:46:13+01:00 Fix race for sending errors in watch
+  - b5f6d82ff 2025-04-02T13:20:20+03:00 CHANGELOG-1.32: fix release note about kubeadm upgrade phases
+  - 01b87d211 2025-03-13T09:39:16+00:00 Fix implementation of ContainsCIDR to allow non-equal addresses
+  - a0ad8fb28 2025-03-11T20:15:04+00:00 Update CHANGELOG/CHANGELOG-1.32.md for v1.32.3
+  - e3daed873 2025-03-10T18:59:14+08:00 fix handle terminating pvc when kubelet rebuild dsw
+  - ef4a6f983 2025-03-10T18:59:14+08:00 fix e2e
+  - ad0c8a10e 2025-03-10T18:59:14+08:00 add e2e test to reproduce unexpected unmount after kubelet is restarted
 
