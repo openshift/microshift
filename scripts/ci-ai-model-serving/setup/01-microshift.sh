@@ -16,3 +16,7 @@ ROOTDIR="${SCRIPTDIR}/../../.."
     "${HOME}/.pull-secret.json"
 
 sudo systemctl enable microshift
+
+mkdir -p "${HOME}/artifacts"
+microshift version -o json | jq -r '.gitVersion' | cut -d'.' -f1-2 > "${HOME}/artifacts/ocp.version"
+git -C "${ROOTDIR}" rev-parse HEAD > "${HOME}/artifacts/ci_artifact.git_version"
