@@ -1,16 +1,7 @@
-- api embedded-component d6c84c55a124ab4bd96b1a18c916d3f314f1a95a to d21e7b9699338d2d989fbe43523acf0bc6a9477c
-  - 951d1e9 2025-05-06T15:11:45-04:00 config: add uid and extra claim mappings for external OIDC configuration
-  - c35e732 2025-03-17T15:38:08-04:00 Allow spaces in AWS resource tags
+- machine-config-operator embedded-component 57836ffd43680785e7a24e794013be9702946c4a to 07d60583be4d6e29772b8490bb2ba3f410e03af9
+  - cde96fc0 2025-04-25T15:33:13+00:00 Leverage shared node.env for both AWS providerID and hostname units
 
-- kubernetes embedded-component af98ede23aa2ef0067fb011b42359e3ca2fb783c to d060f964d37d5ac94a75897551526703286b7ca1
-  - bf06ebef1 2025-05-01T17:53:23-07:00 UPSTREAM: 127757: scheduler Improve CSILimits plugin accuracy by using VolumeAttachments
-
-- route-controller-manager embedded-component 07daee4d2f0b5c7aaca56ee45ff6dfdf97680db0 to ce6ffa24dac3a5f49f70818e1159e40eaf27a6a3
-  - 6f6b467 2025-04-24T13:32:01+00:00 PR adds error handling and event recording for failed Ingress to Route conversion. It ensures that any errors encountered during the conversion process are properly logged and recorded as events, improving the observability and debugging capabilities of the system.
-
-- kubernetes image-amd64 af98ede23aa2ef0067fb011b42359e3ca2fb783c to d060f964d37d5ac94a75897551526703286b7ca1
-  - bf06ebef1 2025-05-01T17:53:23-07:00 UPSTREAM: 127757: scheduler Improve CSILimits plugin accuracy by using VolumeAttachments
-
-- kubernetes image-arm64 af98ede23aa2ef0067fb011b42359e3ca2fb783c to d060f964d37d5ac94a75897551526703286b7ca1
-  - bf06ebef1 2025-05-01T17:53:23-07:00 UPSTREAM: 127757: scheduler Improve CSILimits plugin accuracy by using VolumeAttachments
+- openshift-controller-manager embedded-component eec49c5b91ec801640e973743b46a55689f5eb40 to 214c4c29bacb8260a80cce7a39534a16d92eda42
+  - f7d482f 2025-05-06T18:26:12+05:30 fix: fixed vendor inconsistency by go mod tidy and go mod vendor
+  - cf68626 2025-05-05T17:05:52+05:30 OCPBUGS-54695: Empty proxy variables are causing issues during the build Problem: Irrespective of default proxy settings these proxy variables are set on build containers. If any defaults are set they reflect those setting ,if not set they are set to null on the build container. Having these null variables are causing problems to some customers as its breaking some required apps on container HTTP_PROXY,http_proxy,HTTPS_PROXY,https_proxy,NO_PROXY,no_proxy Fix: Code changed only to add these proxy variables only if they are defined in defaults and if they are not null.
 
