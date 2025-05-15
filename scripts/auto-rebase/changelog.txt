@@ -1,3 +1,3 @@
-- operator-framework-olm embedded-component d3b1715867b6e96a9ee71e158a9f0fd6ab6f792f to b135c38027c7780c4081ab55c5086452d1437470
-  - f71c7319 2025-05-06T14:33:03-04:00 (vendor) pin go-jose/v4@v4.0.5
+- route-controller-manager embedded-component cd4a3dc28ce3a7fe5a65a00df20cfcddb561bf49 to 02bbf80ada3d5acaf36873b1fe69c71badc6d8d7
+  - 7b72f90 2025-05-08T13:03:53+00:00 PR adds error handling and event recording for failed Ingress to Route conversion. It ensures that any errors encountered during the conversion process are properly logged and recorded as events, improving the observability and debugging capabilities of the system.
 
