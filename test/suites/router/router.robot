@@ -249,7 +249,7 @@ Router Verify Access Logging Configuration Container
     Pod Environment Should Match Value    openshift-ingress    ROUTER_SYSLOG_ADDRESS    /var/lib/rsyslog/rsyslog.sock
     Pod Environment Should Match Value    openshift-ingress    ROUTER_LOG_LEVEL    info
     Pod Environment Should Match Value    openshift-ingress    ROUTER_LOG_MAX_LENGTH    2000
-    Pod Environment Should Match Value    openshift-ingress    ROUTER_SYSLOG_FORMAT    some-format
+    Pod Environment Should Match Value    openshift-ingress    ROUTER_SYSLOG_FORMAT    "some-format"
     Pod Environment Should Match Value    openshift-ingress    ROUTER_CAPTURE_HTTP_REQUEST_HEADERS    header1:11
     Pod Environment Should Match Value    openshift-ingress    ROUTER_CAPTURE_HTTP_RESPONSE_HEADERS    header2:12
     Pod Environment Should Match Value    openshift-ingress    ROUTER_CAPTURE_HTTP_COOKIE    cookie=:20
