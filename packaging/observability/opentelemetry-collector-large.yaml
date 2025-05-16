@@ -74,10 +74,11 @@ exporters:
   otlp:
     sending_queue:
       storage: file_storage
-    # Endpoint must point to an ip or hostname and port of an otlp service. Here, the K8S_NODE_NAME is used because it
-    # will be resolved to the local node's hostname automatically. An unreachable endpoint will reported in the logs
-    # of the microshift-observability service.
-    endpoint: ${env:K8S_NODE_NAME}:4317
+    # Endpoint must point an IP or hostname, and port of an OTLP backend service.
+    # Here, the OTEL_BACKEND env var is used. It should be changed to point to the backend.
+    # Unless replaced in config or defined in service file, it'll be empty and OTEL will use 'localhost' instead.
+    # An unreachable endpoint will be reported in the logs of the microshift-observability service.
+    endpoint: ${env:OTEL_BACKEND}:4317
     tls:
       insecure: true
 
@@ -118,8 +119,9 @@ service:
         - periodic:
             exporter:
               otlp:
-                # Endpoint must point to an ip or hostname and port of an otlp service. Here, the K8S_NODE_NAME is used
-                # because it will be resolved to the local node's hostname automatically. An unreachable endpoint will
-                # reported in the logs of the microshift-observability service.
+                # Endpoint must point an IP or hostname, and port of an OTLP backend service.
+                # Here, the OTEL_BACKEND env var is used. It should be changed to point to the backend.
+                # Unless replaced in config or defined in service file, it'll be empty and OTEL will use 'localhost' instead.
+                # An unreachable endpoint will be reported in the logs of the microshift-observability service.
+                endpoint: http://${env:OTEL_BACKEND}:4318
                 protocol: http/protobuf
-                endpoint: http://${env:K8S_NODE_NAME}:4318
