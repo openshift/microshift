@@ -116,7 +116,8 @@ Summary: Networking components for MicroShift
 Requires: microshift = %{version}
 Obsoletes: openvswitch3.1 < 3.3
 Obsoletes: openvswitch3.3 < 3.4
-Requires: (openvswitch3.4 or openvswitch >= 3.4)
+Obsoletes: openvswitch3.4 < 3.5
+Requires: (openvswitch3.5 or openvswitch >= 3.5)
 Requires: NetworkManager
 Requires: NetworkManager-ovs
 Requires: jq
@@ -773,6 +774,9 @@ fi
 # Use Git command to generate the log and replace the VERSION string
 # LANG=C git log --date="format:%a %b %d %Y" --pretty="tformat:* %cd %an <%ae> VERSION%n- %s%n" packaging/rpm/microshift.spec
 %changelog
+* Fri May 16 2025 Evgeny Slutsky <eslutsky@redhat.com> 4.20.0
+- Update openvswitch to 3.5
+
 * Thu May 08 2025 Patryk Matuszak <pmatusza@redhat.com> 4.19.0
 - Include OpenTelemetry configuration examples in the RPM
 
