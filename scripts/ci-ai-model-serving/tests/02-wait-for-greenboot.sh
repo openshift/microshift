@@ -11,4 +11,6 @@ while [ ${retries} -gt 0 ] ; do
     echo "Not ready yet. Waiting 30 seconds... (${retries} retries remaining)"
     sleep 30
 done
+
+sudo journalctl -u greenboot-healthcheck
 exit 1
