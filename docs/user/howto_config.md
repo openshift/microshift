@@ -30,6 +30,15 @@ etcd:
     memoryLimitMB: 0
 ingress:
     accessLogging:
+        destination:
+            container:
+                maxLength: 0
+            syslog:
+                address: ""
+                facility: ""
+                maxLength: 0
+                port: 0
+            type: ""
         httpCaptureCookies:
             - matchType: ""
               maxLength: 0
@@ -144,6 +153,15 @@ etcd:
     memoryLimitMB: 0
 ingress:
     accessLogging:
+        destination:
+            container:
+                maxLength: 1024
+            syslog:
+                address: ""
+                facility: ""
+                maxLength: 1024
+                port: 0
+            type: ""
         httpCaptureCookies:
             - matchType: ""
               maxLength: 0
