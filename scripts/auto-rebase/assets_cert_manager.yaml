@@ -1,0 +1,26 @@
+assets:
+  - dir: optional/cert-manager/controller/
+    src: cert-manager-operator/bindata/cert-manager-deployment/controller/
+    files:
+      - file: cert-manager-cluster-view-cr.yaml
+      - file: cert-manager-configmap.yaml
+      - file: cert-manager-controller-certificates-crb.yaml
+      - file: cert-manager-controller-certificates-cr.yaml
+      - file: cert-manager-controller-challenges-crb.yaml
+      - file: cert-manager-controller-challenges-cr.yaml
+      - file: cert-manager-controller-clusterissuers-crb.yaml
+      - file: cert-manager-controller-clusterissuers-cr.yaml
+      - file: cert-manager-controller-ingress-shim-crb.yaml
+      - file: cert-manager-controller-ingress-shim-cr.yaml
+      - file: cert-manager-controller-issuers-crb.yaml
+      - file: cert-manager-controller-issuers-cr.yaml
+      - file: cert-manager-controller-orders-crb.yaml
+      - file: cert-manager-controller-orders-cr.yaml
+      - file: cert-manager-deployment.yaml
+      - file: cert-manager-edit-cr.yaml
+      - file: cert-manager-leaderelection-rb.yaml
+      - file: cert-manager-leaderelection-role.yaml
+      - file: cert-manager-sa.yaml
+      - file: cert-manager-svc.yaml
+      - file: cert-manager-view-cr.yaml
+
