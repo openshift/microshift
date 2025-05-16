@@ -1,0 +1,25 @@
+- cluster-kube-apiserver-operator embedded-component 23b5175aa2d5b8f7364ef4aed1966745d6735c2a to 81f2234ecda7dddeeef67a2387f58d9d663eda7e
+  - 6030886 2025-05-12T15:09:05+02:00 webhookcontroller: change cert lifetime argument to time.Duration
+  - 250d6d6 2025-05-12T15:08:32+02:00 bump library-go
+
+- kubernetes embedded-component f6cfe0c54a1fa9314c65e30c613df641c7226ed0 to 334610c7bf67d6f432600eab0b5d04fae72f806d
+  - 60a5c4c7c 2025-05-07T14:13:07+00:00 UPSTREAM: 131418: Check for newer fields when deciding expansion recovery feature status
+
+- machine-config-operator embedded-component a9859b62f67382ee2042209f5e98b91cb5c45dff to cdf75d4f496f963960c5243e7f16f90d259f2fee
+  - ae280cb2 2025-05-13T18:46:04+00:00 Compare the osImageURLs for OS validation check
+  - 2b07d56f 2025-05-13T09:54:21-05:00 parsing error to report full-render reconciliation fails vs partial render fails
+  - c6fe4a63 2025-05-12T14:04:43+00:00 OWNERS: update owners file with current MCO team members
+
+- operator-framework-olm embedded-component ec31de865be0c822d967ec8fe563c6eb8c4757e5 to 358b7053a231876cda29cf4d822e3e702389b117
+  - 44bc4d41 2025-05-12T14:18:32+01:00 fix(olm): improve error logging for missing olm.managed label (#3558)
+
+- kubernetes image-amd64 f6cfe0c54a1fa9314c65e30c613df641c7226ed0 to 334610c7bf67d6f432600eab0b5d04fae72f806d
+  - 60a5c4c7c 2025-05-07T14:13:07+00:00 UPSTREAM: 131418: Check for newer fields when deciding expansion recovery feature status
+
+- oc image-arm64 e468aa68e754e22997f526fcdbbd470387ff5e33 to c88fd60ed9c4a349d52770884b3aad828432d01d
+  - 8c8e461c 2025-05-13T17:08:50+00:00 Adding sos.conf file for default sos config into the tools image
+
+- kubernetes image-arm64 f6cfe0c54a1fa9314c65e30c613df641c7226ed0 to 9fe7dfdeb6714effef45be12ec451a0f06893660
+  - ed29f7f4e 2025-05-14T14:00:34+00:00 UPSTREAM: 131236: RWX tests should create RWX volumes
+  - 60a5c4c7c 2025-05-07T14:13:07+00:00 UPSTREAM: 131418: Check for newer fields when deciding expansion recovery feature status
+
