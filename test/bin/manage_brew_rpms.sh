@@ -38,7 +38,7 @@ action_download() {
 
     # Attempt downloading the specified build version
     local package
-    package=$(brew list-builds --quiet --package=microshift --state=COMPLETE | grep "^microshift-${ver}" | sort | tail -1) || true
+    package=$(brew list-builds --quiet --package=microshift --state=COMPLETE | grep "^microshift-${ver}" | tail -1) || true
     if [ -z "${package}" ] ; then
         echo "ERROR: Cannot find MicroShift '${ver}' packages in brew"
         exit 1
