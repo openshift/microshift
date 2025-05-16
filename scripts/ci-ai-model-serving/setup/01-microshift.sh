@@ -12,8 +12,13 @@ ROOTDIR="${SCRIPTDIR}/../../.."
     --no-start \
     --force-firewall \
     --optional-rpms \
+    --pull-images \
     --skip-optional-rpms low-latency \
     "${HOME}/.pull-secret.json"
+
+# Pull kserve and helper images for ai-model-serving, skip serving runtimes
+# shellcheck disable=SC2046
+"${ROOTDIR}/scripts/pull_retry.sh" $(rpm -qa | grep -e  "microshift-ai-model-serving.*-release-info" | xargs rpm -ql | grep $(uname -m).json | xargs jq -r '.images | values[]' | grep -E "kserve|auth-proxy")
 
 sudo systemctl enable microshift
 
