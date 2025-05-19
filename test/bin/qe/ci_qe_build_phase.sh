@@ -38,7 +38,7 @@ else
 
 fi
 
-# Creating VM
+# Step 1: Creating build VM
 if sudo virsh list | grep -q "${VM_NAME}"; then
     log "VM '${VM_NAME}' already exists. Skipping VM creation."
 else
@@ -47,7 +47,7 @@ else
     ./"${HOME}/${REPO_NAME}"/scripts/devenv-builder/manage-vm.sh create -n "${VM_NAME}"
 fi
 
-# Configuring VM
+# Step 2: Configuring build VM
 VM_IPADDR=$("${HOME}/${REPO_NAME}/scripts/devenv-builder/manage-vm.sh" ip -n "${VM_NAME}")
 if ${CONFIG_VM_FLAG}; then
     log "VM '${VM_NAME}' local IP address: ${VM_IPADDR}"
@@ -57,7 +57,7 @@ if ${CONFIG_VM_FLAG}; then
     ssh_build_vm "${HOME}/configure-vm.sh --no-build ${HOME}/.pull-secret.json"
 fi
 
-# Git clone/fetch microshift repo into the build VM
+# Step 3: Git clone/fetch microshift repo into the build VM
 ssh_build_vm "sudo rm -rf ${HOME}/.cache ${HOME}/.local"
 if ( ! ssh_build_vm "test -d ${HOME}/${REPO_NAME}" ); then
     log "Cloning MicroShift repository..."
@@ -69,7 +69,7 @@ else
     ssh_build_vm git -C "${HOME}/${REPO_NAME}" pull
 fi
 
-# Build rpms
+# Step 4: Build rpms
 # if ( ! ssh_build_vm "test -d ${HOME}/${REPO_NAME}/_output/test-images/rpm-repos/" ); then
 if ${BUILD_RPMS_FLAG}; then
     ssh_build_vm "bash -x ${HOME}/${REPO_NAME}/test/bin/build_rpms.sh ${RPM_ORIGIN} ${MICROSHIFT_BREW_VERSION}"
