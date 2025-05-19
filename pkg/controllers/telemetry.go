@@ -25,6 +25,7 @@ import (
 	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/telemetry"
 	"github.com/openshift/microshift/pkg/util"
+	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/klog/v2"
 )
 
@@ -100,8 +101,18 @@ func (t *TelemetryManager) Run(ctx context.Context, ready chan<- struct{}, stopp
 	}
 
 	klog.Infof("MicroShift telemetry starting, sending first metrics collection. Cluster Id: %v", clusterId)
-	if err := collectAndSend(); err != nil {
-		klog.Warningf("Telemetry collection failed: %v", err)
+
+	// The first metrics collection may try too soon after kubelet has been started and no node/node labels are
+	// present yet. Since we dont want to delay collection until the next interval (1h) we poll until success.
+	if err := wait.PollUntilContextCancel(ctx, time.Second, true, func(context.Context) (bool, error) {
+		if err := collectAndSend(); err != nil {
+			klog.Warningf("Telemetry collection failed: %v", err)
+			return false, nil
+		}
+		return true, nil
+	}); err != nil {
+		klog.Warningf("First telemetry collection timed out: %v", err)
+		return fmt.Errorf("failed to collect telemetry data for the first time: %v", err)
 	}
 
 	ticker := time.NewTicker(time.Hour)
