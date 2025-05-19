@@ -81,27 +81,28 @@ func (t *TelemetryManager) Run(ctx context.Context, ready chan<- struct{}, stopp
 
 	client := telemetry.NewTelemetryClient(t.config.Telemetry.Endpoint, clusterId, t.config.Telemetry.Proxy)
 
-	collectAndSend := func() {
+	collectAndSend := func() error {
 		reqCtx, reqCancel := context.WithTimeout(ctx, 10*time.Second)
 		defer reqCancel()
 		pullSecret, err := readPullSecret()
 		if err != nil {
-			klog.Errorf("Unable to get pull secret: %v", err)
-			return
+			return fmt.Errorf("unable to get pull secret: %v", err)
 		}
 		metrics, err := client.Collect(reqCtx, t.config)
 		if err != nil {
-			klog.Errorf("Failed to collect metrics: %v", err)
-			return
+			return fmt.Errorf("failed to collect metrics: %v", err)
 		}
 		klog.Infof("Collected telemetry data: %+v", metrics)
 		if err := client.Send(reqCtx, pullSecret, metrics); err != nil {
-			klog.Errorf("Failed to send metrics: %v", err)
+			return fmt.Errorf("failed to send metrics: %v", err)
 		}
+		return nil
 	}
 
 	klog.Infof("MicroShift telemetry starting, sending first metrics collection. Cluster Id: %v", clusterId)
-	collectAndSend()
+	if err := collectAndSend(); err != nil {
+		klog.Warningf("Telemetry collection failed: %v", err)
+	}
 
 	ticker := time.NewTicker(time.Hour)
 	for {
@@ -111,7 +112,9 @@ func (t *TelemetryManager) Run(ctx context.Context, ready chan<- struct{}, stopp
 			return nil
 		case <-ticker.C:
 			klog.Infof("Collect telemetry data to report back")
-			collectAndSend()
+			if err := collectAndSend(); err != nil {
+				klog.Warningf("Telemetry collection failed: %v", err)
+			}
 		}
 	}
 }
