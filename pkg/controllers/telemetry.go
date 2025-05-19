@@ -47,7 +47,7 @@ func NewTelemetryManager(cfg *config.Config) *TelemetryManager {
 
 func (t *TelemetryManager) Name() string { return "telemetry-manager" }
 func (t *TelemetryManager) Dependencies() []string {
-	return []string{"kube-apiserver", "cluster-id-manager"}
+	return []string{"kube-apiserver", "cluster-id-manager", "kubelet"}
 }
 
 func (t *TelemetryManager) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
