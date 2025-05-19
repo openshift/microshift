@@ -1,7 +1,7 @@
-diff --git a/vendor/k8s.io/kubernetes/openshift-kube-apiserver/openshiftkubeapiserver/patch.go b/vendor/k8s.io/kubernetes/openshift-kube-apiserver/openshiftkubeapiserver/patch.go
+diff --git a/deps/github.com/openshift/kubernetes/openshift-kube-apiserver/openshiftkubeapiserver/patch.go b/deps/github.com/openshift/kubernetes/openshift-kube-apiserver/openshiftkubeapiserver/patch.go
 index 545e1a04..39b266a0 100644
---- a/vendor/k8s.io/kubernetes/openshift-kube-apiserver/openshiftkubeapiserver/patch.go
-+++ b/vendor/k8s.io/kubernetes/openshift-kube-apiserver/openshiftkubeapiserver/patch.go
+--- a/deps/github.com/openshift/kubernetes/openshift-kube-apiserver/openshiftkubeapiserver/patch.go
++++ b/deps/github.com/openshift/kubernetes/openshift-kube-apiserver/openshiftkubeapiserver/patch.go
 @@ -7,8 +7,6 @@ import (
  	"github.com/openshift/apiserver-library-go/pkg/admission/imagepolicy"
  	"github.com/openshift/apiserver-library-go/pkg/admission/imagepolicy/imagereferencemutators"
@@ -69,10 +69,10 @@ index 545e1a04..39b266a0 100644
  	i.OpenshiftUserInformers.Start(stopCh)
 -	i.OpenshiftConfigInformers.Start(stopCh)
  }
-diff --git a/vendor/k8s.io/kubernetes/openshift-kube-apiserver/admission/admissionenablement/register.go b/vendor/k8s.io/kubernetes/openshift-kube-apiserver/admission/admissionenablement/register.go
+diff --git a/deps/github.com/openshift/kubernetes/openshift-kube-apiserver/admission/admissionenablement/register.go b/deps/github.com/openshift/kubernetes/openshift-kube-apiserver/admission/admissionenablement/register.go
 index 2427e502d..a75cdfdde 100644
---- a/vendor/k8s.io/kubernetes/openshift-kube-apiserver/admission/admissionenablement/register.go
-+++ b/vendor/k8s.io/kubernetes/openshift-kube-apiserver/admission/admissionenablement/register.go
+--- a/deps/github.com/openshift/kubernetes/openshift-kube-apiserver/admission/admissionenablement/register.go
++++ b/deps/github.com/openshift/kubernetes/openshift-kube-apiserver/admission/admissionenablement/register.go
 @@ -13,7 +13,6 @@ import (
  	"github.com/openshift/apiserver-library-go/pkg/securitycontextconstraints/sccadmission"
  	authorizationrestrictusers "k8s.io/kubernetes/openshift-kube-apiserver/admission/authorization/restrictusers"
