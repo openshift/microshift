@@ -192,7 +192,6 @@ assets:
     src: release-manifests/
     files:
       - file: 0000_03_config-operator_01_securitycontextconstraints.crd.yaml
-        src: 0000_03_config-operator_01_securitycontextconstraints-Default.crd.yaml
       - file: 0000_03_config-operator_02_rangeallocations.crd.yaml
       - file: storage_version_migration.crd.yaml
         src:  0000_50_cluster-kube-storage-version-migrator-operator_01_storage_migration_crd.yaml
