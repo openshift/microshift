@@ -1,7 +1,7 @@
-diff --git a/vendor/k8s.io/kubernetes/cmd/kube-controller-manager/app/controllermanager.go b/vendor/k8s.io/kubernetes/cmd/kube-controller-manager/app/controllermanager.go
+diff --git a/deps/github.com/openshift/kubernetes/cmd/kube-controller-manager/app/controllermanager.go b/deps/github.com/openshift/kubernetes/cmd/kube-controller-manager/app/controllermanager.go
 index 0356d79d8..0440eff26 100644
---- a/vendor/k8s.io/kubernetes/cmd/kube-controller-manager/app/controllermanager.go
-+++ b/vendor/k8s.io/kubernetes/cmd/kube-controller-manager/app/controllermanager.go
+--- a/deps/github.com/openshift/kubernetes/cmd/kube-controller-manager/app/controllermanager.go
++++ b/deps/github.com/openshift/kubernetes/cmd/kube-controller-manager/app/controllermanager.go
 @@ -38,7 +38,6 @@ import (
  	"k8s.io/apimachinery/pkg/util/sets"
  	"k8s.io/apimachinery/pkg/util/uuid"
