@@ -313,12 +313,15 @@ clean:
 	if [ -d '$(OUTPUT_DIR)' ]; then rm -rf '$(OUTPUT_DIR)'; fi
 .PHONY: clean
 
-vendor:
-	go mod vendor
+patch-deps:
 	for p in $(sort $(wildcard scripts/auto-rebase/rebase_patches/*.patch)); do \
 		echo "Applying patch $$p"; \
 		git mailinfo /dev/null /dev/stderr 2<&1- < $$p | git apply --reject || exit 1; \
 	done
+.PHONY: patch-deps
+
+vendor:
+	go mod vendor
 .PHONY: vendor
 
 # Update the etcd dependencies, including especially MicroShift itself.
