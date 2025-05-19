@@ -1,3 +1,3 @@
-- ovn-kubernetes image-arm64 961bff913e2a04d640941f73d4632452adbaffaf to 2501912454f1c119be5d53416ba7271aaace727d
+- ovn-kubernetes image-amd64 961bff913e2a04d640941f73d4632452adbaffaf to 2501912454f1c119be5d53416ba7271aaace727d
   - 5f58cb36 2025-03-06T19:12:36+00:00 Fixes unexpected mp0 route removal during start up
 
