@@ -36,7 +36,7 @@ assets:
       - file: topolvm-openshift-storage_namespace.yaml
         ignore: "provided by MicroShift"
       # Manual Storage Class instead of automatic LVMCluster creation
-      - file: topolvm_default-storage-class.yaml
+      - file: topolvm_default-storage-class.yaml.template
         ignore: "provided by MicroShift"
       # LVMCluster instead of User-created LVMCluster
       - file: lvms_default-lvmcluster.yaml

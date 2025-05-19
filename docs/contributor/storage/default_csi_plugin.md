@@ -68,7 +68,7 @@ group's capacity is less than 1Gb, the PersistentVolumeClaim will register a `Pr
 
 ### Create Workload Storage
 
-LVMS's [StorageClass](../../../assets/components/lvms/topolvm_default-storage-class.yaml) is deployed with a default
+LVMS's [StorageClass](../../../assets/components/lvms/topolvm_default-storage-class.yaml.template) is deployed with a default
 StorageClass. Any PersistentVolumeClaim without a `.spec.storageClassName` defined will automatically have a
 PersistentVolume provisioned from the default StorageClass.
 
@@ -207,8 +207,8 @@ spec:
     persistentVolumeClaimName: test-claim-thin
 ```
 
-> It is also possible to create a snapshot from an existing snapshot by specifying the 
-VolumeSnapshotContent as the source. See [OKD documentation](https://docs.okd.io/latest/storage/container_storage_interface/persistent-storage-csi-snapshots.html#persistent-storage-csi-snapshots-create_persistent-storage-csi-snapshots) for more information
+> It is also possible to create a snapshot from an existing snapshot by specifying the
+> VolumeSnapshotContent as the source. See [OKD documentation](https://docs.okd.io/latest/storage/container_storage_interface/persistent-storage-csi-snapshots.html#persistent-storage-csi-snapshots-create_persistent-storage-csi-snapshots) for more information
 
 Wait for the storage driver to finish creating the snapshot with the following command:
 

@@ -152,3 +152,29 @@ func LvmPresentOnMachine() error {
 	}
 	return nil
 }
+
+// DefaultDeviceClassName scans []DeviceClasses and returns the name for the default device class per these rules:
+// 1) If the DeviceClass is marked as default, return this name, else
+// 2) If the there is not default DeviceClass and a device named "microshift" exists, return "microshift", else
+// 3) Return the name of the first DeviceClass in the list.
+func DefaultDeviceClassName(l *Lvmd) (string, error) {
+	if l == nil {
+		return "", fmt.Errorf("nil Lvmd")
+	}
+	if l.DeviceClasses == nil || len(l.DeviceClasses) == 0 {
+		return "", fmt.Errorf("no device classes found in Lvmd")
+	}
+	var n string
+	for _, d := range l.DeviceClasses {
+		if d.Default {
+			n = d.Name
+			break
+		} else if d.Name == "microshift" {
+			n = d.Name
+		}
+	}
+	if n == "" {
+		n = l.DeviceClasses[0].Name
+	}
+	return n, nil
+}
