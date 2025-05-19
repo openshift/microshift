@@ -1,7 +1,7 @@
-diff --git a/vendor/k8s.io/kubernetes/openshift-kube-apiserver/openshiftkubeapiserver/patch.go b/vendor/k8s.io/kubernetes/openshift-kube-apiserver/openshiftkubeapiserver/patch.go
+diff --git a/deps/github.com/openshift/kubernetes/openshift-kube-apiserver/openshiftkubeapiserver/patch.go b/deps/github.com/openshift/kubernetes/openshift-kube-apiserver/openshiftkubeapiserver/patch.go
 index d402786d..eb81d0bc 100644
---- a/vendor/k8s.io/kubernetes/openshift-kube-apiserver/openshiftkubeapiserver/patch.go
-+++ b/vendor/k8s.io/kubernetes/openshift-kube-apiserver/openshiftkubeapiserver/patch.go
+--- a/deps/github.com/openshift/kubernetes/openshift-kube-apiserver/openshiftkubeapiserver/patch.go
++++ b/deps/github.com/openshift/kubernetes/openshift-kube-apiserver/openshiftkubeapiserver/patch.go
 @@ -6,25 +6,18 @@
  
  	"github.com/openshift/apiserver-library-go/pkg/admission/imagepolicy"
