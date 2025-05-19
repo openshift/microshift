@@ -38,7 +38,6 @@ import (
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/uuid"
 	"k8s.io/apimachinery/pkg/util/wait"
-	"k8s.io/apiserver/pkg/server"
 	"k8s.io/apiserver/pkg/server/healthz"
 	"k8s.io/apiserver/pkg/server/mux"
 	utilfeature "k8s.io/apiserver/pkg/util/feature"
@@ -154,8 +153,7 @@ controller, and serviceaccounts controller.`,
 			fg := s.ComponentGlobalsRegistry.FeatureGateFor(featuregate.DefaultKubeComponent)
 			fg.(featuregate.MutableFeatureGate).AddMetrics()
 
-			stopCh := server.SetupSignalHandler()
-			return Run(context.Background(), c.Complete(), stopCh)
+			return Run(cmd.Context(), c.Complete(), cmd.Context().Done())
 		},
 		Args: func(cmd *cobra.Command, args []string) error {
 			for _, arg := range args {
