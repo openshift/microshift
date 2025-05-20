@@ -1,0 +1,37 @@
+- cluster-ingress-operator embedded-component 2e6bd66d4ad11f58b8dea2677a94751bb372dca5 to 6d54169d4c6643ae9b6ff81b3a21b929934062fa
+  - d838765 2025-05-14T18:52:16+00:00 Check capabilities before watching OLM resource
+
+- cluster-kube-apiserver-operator embedded-component 23b5175aa2d5b8f7364ef4aed1966745d6735c2a to 446153e4e3cec78da777fef34c51a40ba6e8006b
+  - e53b579 2025-05-15T17:14:34+00:00 SCC: add hostmount-anyuid-v2
+  - 6030886 2025-05-12T15:09:05+02:00 webhookcontroller: change cert lifetime argument to time.Duration
+  - 250d6d6 2025-05-12T15:08:32+02:00 bump library-go
+
+- kubernetes embedded-component f6cfe0c54a1fa9314c65e30c613df641c7226ed0 to 9fe7dfdeb6714effef45be12ec451a0f06893660
+  - ed29f7f4e 2025-05-14T14:00:34+00:00 UPSTREAM: 131236: RWX tests should create RWX volumes
+  - 60a5c4c7c 2025-05-07T14:13:07+00:00 UPSTREAM: 131418: Check for newer fields when deciding expansion recovery feature status
+
+- machine-config-operator embedded-component a9859b62f67382ee2042209f5e98b91cb5c45dff to aae92b4dbfe9b66e29f0c0fe7551173f10e04b61
+  - a172d19f 2025-05-15T16:16:24+00:00 OCPBUGS-55439: scope MCD node listers to current node
+  - 6afdfa18 2025-05-14T11:21:02+00:00 msbic: add hot loop detection
+  - ae280cb2 2025-05-13T18:46:04+00:00 Compare the osImageURLs for OS validation check
+  - 32216875 2025-05-13T15:00:05+00:00 node_controller: implement LayeredNodeState
+  - 2b07d56f 2025-05-13T09:54:21-05:00 parsing error to report full-render reconciliation fails vs partial render fails
+  - c6fe4a63 2025-05-12T14:04:43+00:00 OWNERS: update owners file with current MCO team members
+
+- operator-framework-olm embedded-component ec31de865be0c822d967ec8fe563c6eb8c4757e5 to 358b7053a231876cda29cf4d822e3e702389b117
+  - 44bc4d41 2025-05-12T14:18:32+01:00 fix(olm): improve error logging for missing olm.managed label (#3558)
+
+- oc image-amd64 e468aa68e754e22997f526fcdbbd470387ff5e33 to c88fd60ed9c4a349d52770884b3aad828432d01d
+  - 8c8e461c 2025-05-13T17:08:50+00:00 Adding sos.conf file for default sos config into the tools image
+
+- kubernetes image-amd64 f6cfe0c54a1fa9314c65e30c613df641c7226ed0 to 9fe7dfdeb6714effef45be12ec451a0f06893660
+  - ed29f7f4e 2025-05-14T14:00:34+00:00 UPSTREAM: 131236: RWX tests should create RWX volumes
+  - 60a5c4c7c 2025-05-07T14:13:07+00:00 UPSTREAM: 131418: Check for newer fields when deciding expansion recovery feature status
+
+- oc image-arm64 e468aa68e754e22997f526fcdbbd470387ff5e33 to c88fd60ed9c4a349d52770884b3aad828432d01d
+  - 8c8e461c 2025-05-13T17:08:50+00:00 Adding sos.conf file for default sos config into the tools image
+
+- kubernetes image-arm64 f6cfe0c54a1fa9314c65e30c613df641c7226ed0 to 9fe7dfdeb6714effef45be12ec451a0f06893660
+  - ed29f7f4e 2025-05-14T14:00:34+00:00 UPSTREAM: 131236: RWX tests should create RWX volumes
+  - 60a5c4c7c 2025-05-07T14:13:07+00:00 UPSTREAM: 131418: Check for newer fields when deciding expansion recovery feature status
+
