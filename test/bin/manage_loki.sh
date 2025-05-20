@@ -9,32 +9,43 @@ SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # shellcheck source=test/bin/common.sh
 source "${SCRIPTDIR}/common.sh"
 
+DEFAULT_HOST_PORT="3100"
+
 usage() {
     cat - <<EOF
-${BASH_SOURCE[0]} (start|stop)
+${BASH_SOURCE[0]} (start|stop) [port]
 
   -h           Show this help.
 
-start: Start Loki.
+start [port]: Start Loki.
+             Uses port ${DEFAULT_HOST_PORT} on the host by default.
+             The container name will be loki-<host_port>.
 
-stop: Stop Loki.
+stop [port]: Stop Loki.
+            Uses port ${DEFAULT_HOST_PORT} by default to identify the container.
+            The container name is assumed to be loki-<host_port>.
 
 EOF
 }
 
 action_stop() {
-    echo "Stopping Loki"
-    podman stop loki > /dev/null || true
-    podman rm --force loki > /dev/null || true
+    local host_port="${1:-${DEFAULT_HOST_PORT}}"
+    local container_name="loki-${host_port}"
+    echo "Stopping Loki container ${container_name}"
+    podman stop "${container_name}" > /dev/null || true
+    podman rm --force "${container_name}" > /dev/null || true
 }
 
 action_start() {
-    echo "Stopping previous instance of Loki"
-    action_stop
+    local host_port="${1:-${DEFAULT_HOST_PORT}}"
+    local container_name="loki-${host_port}"
 
-    echo "Starting Loki"
-    podman run -d --rm --name loki \
-        -p 3100:3100 \
+    echo "Stopping previous instance of Loki container ${container_name} (if any)"
+    action_stop "${host_port}"
+
+    echo "Starting Loki container ${container_name} on host port ${host_port}"
+    podman run -d --rm --name "${container_name}" \
+        -p "${host_port}:3100" \
         docker.io/grafana/loki > /dev/null
 }
 
