@@ -87,8 +87,8 @@ Logs Should Not Contain Receiver Errors
 Setup Suite And Prepare Test Host
     [Documentation]    The service starts after MicroShift starts and thus will start generating pertinent log data
     ...    right away. When the suite is executed, immediately get the cursor for the microshift-observability unit.
-    Start Prometheus Server
-    Start Loki Server
+    Start Prometheus Server    ${PROMETHEUS_PORT}
+    Start Loki Server    ${LOKI_PORT}
     Setup Suite
     Check Required Observability Variables
     Set Test OTEL Configuration
@@ -132,8 +132,8 @@ Teardown Suite And Revert Test Host
     [Documentation]    Set back original OTEL config and teardown Suite
     Set Back Original OTEL Configuration
     Teardown Suite
-    Stop Loki Server
-    Stop Prometheus Server
+    Stop Loki Server    ${LOKI_PORT}
+    Stop Prometheus Server    ${PROMETHEUS_PORT}
 
 Set Back Original OTEL Configuration
     [Documentation]    Set Back Original OTEL Configuration
