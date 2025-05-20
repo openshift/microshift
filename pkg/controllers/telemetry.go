@@ -25,6 +25,7 @@ import (
 	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/telemetry"
 	"github.com/openshift/microshift/pkg/util"
+	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/klog/v2"
 )
 
@@ -46,7 +47,7 @@ func NewTelemetryManager(cfg *config.Config) *TelemetryManager {
 
 func (t *TelemetryManager) Name() string { return "telemetry-manager" }
 func (t *TelemetryManager) Dependencies() []string {
-	return []string{"kube-apiserver", "cluster-id-manager"}
+	return []string{"kube-apiserver", "cluster-id-manager", "kubelet"}
 }
 
 func (t *TelemetryManager) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
@@ -81,27 +82,38 @@ func (t *TelemetryManager) Run(ctx context.Context, ready chan<- struct{}, stopp
 
 	client := telemetry.NewTelemetryClient(t.config.Telemetry.Endpoint, clusterId, t.config.Telemetry.Proxy)
 
-	collectAndSend := func() {
+	collectAndSend := func() error {
 		reqCtx, reqCancel := context.WithTimeout(ctx, 10*time.Second)
 		defer reqCancel()
 		pullSecret, err := readPullSecret()
 		if err != nil {
-			klog.Errorf("Unable to get pull secret: %v", err)
-			return
+			return fmt.Errorf("unable to get pull secret: %v", err)
 		}
 		metrics, err := client.Collect(reqCtx, t.config)
 		if err != nil {
-			klog.Errorf("Failed to collect metrics: %v", err)
-			return
+			return fmt.Errorf("failed to collect metrics: %v", err)
 		}
 		klog.Infof("Collected telemetry data: %+v", metrics)
 		if err := client.Send(reqCtx, pullSecret, metrics); err != nil {
-			klog.Errorf("Failed to send metrics: %v", err)
+			return fmt.Errorf("failed to send metrics: %v", err)
 		}
+		return nil
 	}
 
 	klog.Infof("MicroShift telemetry starting, sending first metrics collection. Cluster Id: %v", clusterId)
-	collectAndSend()
+
+	// The first metrics collection may try too soon after kubelet has been started and no node/node labels are
+	// present yet. Since we dont want to delay collection until the next interval (1h) we poll until success.
+	if err := wait.PollUntilContextCancel(ctx, time.Second, true, func(context.Context) (bool, error) {
+		if err := collectAndSend(); err != nil {
+			klog.Warningf("Telemetry collection failed: %v", err)
+			return false, nil
+		}
+		return true, nil
+	}); err != nil {
+		klog.Warningf("First telemetry collection timed out: %v", err)
+		return fmt.Errorf("failed to collect telemetry data for the first time: %v", err)
+	}
 
 	ticker := time.NewTicker(time.Hour)
 	for {
@@ -111,7 +123,9 @@ func (t *TelemetryManager) Run(ctx context.Context, ready chan<- struct{}, stopp
 			return nil
 		case <-ticker.C:
 			klog.Infof("Collect telemetry data to report back")
-			collectAndSend()
+			if err := collectAndSend(); err != nil {
+				klog.Warningf("Telemetry collection failed: %v", err)
+			}
 		}
 	}
 }
