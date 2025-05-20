@@ -161,7 +161,7 @@ func DefaultDeviceClassName(l *Lvmd) (string, error) {
 	if l == nil {
 		return "", fmt.Errorf("nil Lvmd")
 	}
-	if l.DeviceClasses == nil || len(l.DeviceClasses) == 0 {
+	if len(l.DeviceClasses) == 0 {
 		return "", fmt.Errorf("no device classes found in Lvmd")
 	}
 	var n string

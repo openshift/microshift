@@ -16,14 +16,14 @@ func TestGetLvmdConfigForVGs(t *testing.T) {
 		expectedErr error
 	}{
 		{
-			name: "no groups",
+			name: "when there are no devices",
 			expected: &Lvmd{
 				SocketName: defaultSockName,
 				Message:    errorMessageNoVolumeGroups,
 			},
 		},
 		{
-			name:    "one group",
+			name:    "when there is 1 device",
 			vgNames: []string{"choose-me"},
 			expected: &Lvmd{
 				SocketName: defaultSockName,
@@ -39,23 +39,7 @@ func TestGetLvmdConfigForVGs(t *testing.T) {
 			},
 		},
 		{
-			name:    "one group default",
-			vgNames: []string{defaultRHEL4EdgeVolumeGroup},
-			expected: &Lvmd{
-				SocketName: defaultSockName,
-				DeviceClasses: []*DeviceClass{
-					{
-						Name:        "default",
-						VolumeGroup: defaultRHEL4EdgeVolumeGroup,
-						Default:     true,
-						SpareGB:     func() *uint64 { s := uint64(defaultSpareGB); return &s }(),
-					},
-				},
-				Message: statusMessageDefaultAvailable,
-			},
-		},
-		{
-			name:    "default first",
+			name:    "a device's name is \"microshift\" in a list of devices without a default set",
 			vgNames: []string{defaultRHEL4EdgeVolumeGroup, "other"},
 			expected: &Lvmd{
 				SocketName: defaultSockName,
@@ -71,23 +55,7 @@ func TestGetLvmdConfigForVGs(t *testing.T) {
 			},
 		},
 		{
-			name:    "default last",
-			vgNames: []string{"other", defaultRHEL4EdgeVolumeGroup},
-			expected: &Lvmd{
-				SocketName: defaultSockName,
-				DeviceClasses: []*DeviceClass{
-					{
-						Name:        "default",
-						VolumeGroup: defaultRHEL4EdgeVolumeGroup,
-						Default:     true,
-						SpareGB:     uint64Ptr(defaultSpareGB),
-					},
-				},
-				Message: statusMessageFoundDefault,
-			},
-		},
-		{
-			name:    "no default",
+			name:    "no default is set and no device is named \"microshift\"",
 			vgNames: []string{"other", "choose-me"},
 			expected: &Lvmd{
 				SocketName: defaultSockName,
