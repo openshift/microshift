@@ -568,6 +568,7 @@ launch_vm() {
     local vm_vcpus=2
     local vm_disksize=20
     local fips_mode=0
+    local kernel_location="images/pxeboot"
 
     while [ $# -gt 0 ]; do
         case "$1" in
@@ -642,7 +643,7 @@ launch_vm() {
     local vm_network_args
     local vm_extra_args
     local vm_initrd_inject
-    vm_loc_args="--location ${VM_DISK_BASEDIR}/${boot_blueprint}.iso"
+    vm_loc_args="--location ${VM_DISK_BASEDIR}/${boot_blueprint}.iso,initrd=${kernel_location}/initrd.img,kernel=${kernel_location}/vmlinuz"
     vm_network_args=""
     vm_extra_args="fips=${fips_mode}"
     vm_initrd_inject=""
