@@ -2,4 +2,4 @@
 images:
   - name: kube-proxy
     newName: quay.io/openshift-release-dev/ocp-v4.0-art-dev
-    digest: sha256:1a03f9178eb1180f8c4c3a30c63fca982f02591f9f6dda5b8bf192588354bd8a
+    digest: sha256:f745b73b644e668db50d4c1b7dbed57b0f838607a9b2fcf5555bc3a7ce92f165
