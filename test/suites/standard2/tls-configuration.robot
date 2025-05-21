@@ -203,6 +203,6 @@ Check Journal Logs
 Is Cipher Available
     [Documentation]    Check if openssl keywork is available from ssl list
     [Arguments]    ${cipher}
-    ${rc}=    Execute Command    openssl ciphers ${cipher}
-    ...    sudo=True    return_stdout=True    return_stderr=False    return_rc=True
+    ${stdout}    ${stderr}    ${rc}=    Execute Command    openssl ciphers ${cipher}
+    ...    sudo=True    return_stdout=True    return_stderr=True    return_rc=True
     IF    "${rc}" == "0"    RETURN    ${TRUE}    ELSE    RETURN    ${FALSE}
