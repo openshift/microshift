@@ -24,18 +24,18 @@ require (
 	go.etcd.io/etcd/client/v3 v3.5.16
 	golang.org/x/sys v0.31.0
 	gopkg.in/yaml.v3 v3.0.1
-	k8s.io/api v0.32.2
-	k8s.io/apiextensions-apiserver v0.32.2
-	k8s.io/apimachinery v0.32.2
-	k8s.io/apiserver v0.32.2
-	k8s.io/cli-runtime v0.0.0
-	k8s.io/client-go v0.32.2
-	k8s.io/cloud-provider v0.30.1
-	k8s.io/component-base v0.32.2
+	k8s.io/api v1.32.4
+	k8s.io/apiextensions-apiserver v1.32.4
+	k8s.io/apimachinery v1.32.4
+	k8s.io/apiserver v1.32.4
+	k8s.io/cli-runtime v1.32.4
+	k8s.io/client-go v1.32.4
+	k8s.io/cloud-provider v1.32.4
+	k8s.io/component-base v1.32.4
 	k8s.io/klog/v2 v2.130.1
-	k8s.io/kube-aggregator v0.32.1
+	k8s.io/kube-aggregator v1.32.4
 	k8s.io/kube-openapi v0.0.0-20241105132330-32ad38e42d3f
-	k8s.io/kubectl v0.0.0
+	k8s.io/kubectl v1.32.4
 	sigs.k8s.io/yaml v1.4.0
 )
 
@@ -49,7 +49,7 @@ require (
 	github.com/prometheus/common v0.62.0
 	github.com/prometheus/prometheus v0.302.1
 	gopkg.in/yaml.v2 v2.4.0
-	k8s.io/kubernetes v1.32.2
+	k8s.io/kubernetes v1.32.4
 	k8s.io/utils v0.0.0-20241210054802-24370beab758
 	sigs.k8s.io/kube-storage-version-migrator v0.0.6-0.20230721195810-5c8923c5ff96
 	sigs.k8s.io/kustomize/api v0.18.0
@@ -192,23 +192,23 @@ require (
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1 // indirect
 	gopkg.in/square/go-jose.v2 v2.6.0 // indirect
-	k8s.io/cluster-bootstrap v0.0.0 // indirect
-	k8s.io/component-helpers v0.32.2 // indirect
-	k8s.io/controller-manager v0.32.2 // indirect
-	k8s.io/cri-api v0.0.0 // indirect
-	k8s.io/cri-client v0.0.0 // indirect
-	k8s.io/csi-translation-lib v0.0.0 // indirect
-	k8s.io/dynamic-resource-allocation v0.0.0 // indirect
-	k8s.io/endpointslice v0.0.0 // indirect
-	k8s.io/externaljwt v0.0.0 // indirect
+	k8s.io/cluster-bootstrap v1.32.4 // indirect
+	k8s.io/component-helpers v1.32.4 // indirect
+	k8s.io/controller-manager v1.32.4 // indirect
+	k8s.io/cri-api v1.32.4 // indirect
+	k8s.io/cri-client v1.32.4 // indirect
+	k8s.io/csi-translation-lib v1.32.4 // indirect
+	k8s.io/dynamic-resource-allocation v1.32.4 // indirect
+	k8s.io/endpointslice v1.32.4 // indirect
+	k8s.io/externaljwt v1.32.4 // indirect
 	k8s.io/gengo/v2 v2.0.0-20240911193312-2b36238f13e9 // indirect
-	k8s.io/kms v0.32.2 // indirect
-	k8s.io/kube-controller-manager v0.0.0 // indirect
-	k8s.io/kube-scheduler v0.0.0 // indirect
-	k8s.io/kubelet v0.30.1 // indirect
-	k8s.io/metrics v0.0.0 // indirect
-	k8s.io/mount-utils v0.0.0 // indirect
-	k8s.io/pod-security-admission v0.32.2 // indirect
+	k8s.io/kms v1.32.4 // indirect
+	k8s.io/kube-controller-manager v1.32.4 // indirect
+	k8s.io/kube-scheduler v1.32.4 // indirect
+	k8s.io/kubelet v1.32.4 // indirect
+	k8s.io/metrics v1.32.4 // indirect
+	k8s.io/mount-utils v1.32.4 // indirect
+	k8s.io/pod-security-admission v1.32.4 // indirect
 	sigs.k8s.io/apiserver-network-proxy/konnectivity-client v0.31.0 // indirect
 	sigs.k8s.io/json v0.0.0-20241014173422-cfa47c3a1cc8 // indirect
 	sigs.k8s.io/structured-merge-diff/v4 v4.5.0 // indirect
