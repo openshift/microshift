@@ -2,6 +2,7 @@
 export SHELL := $(shell which bash)
 
 PROJECT_DIR := $(shell dirname $(abspath $(lastword $(MAKEFILE_LIST))))
+GO_FILES ?=$(shell find . -name '*.go' -not -path '*/vendor/*' -not -path '*/_output/*' -not -path '*/deps/*' -print)
 
 # Include openshift build-machinery-go libraries
 include $(PROJECT_DIR)/vendor/github.com/openshift/build-machinery-go/make/golang.mk
