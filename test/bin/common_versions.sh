@@ -41,7 +41,7 @@ get_vrel_from_rhsm() {
 
 # The current release minor version (e.g. '17' for '4.17') affects
 # the definition of previous and fake next versions.
-export MINOR_VERSION=19
+export MINOR_VERSION=20
 export PREVIOUS_MINOR_VERSION=$(( "${MINOR_VERSION}" - 1 ))
 export YMINUS2_MINOR_VERSION=$(( "${MINOR_VERSION}" - 2 ))
 export FAKE_NEXT_MINOR_VERSION=$(( "${MINOR_VERSION}" + 1 ))
