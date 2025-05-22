@@ -1,3 +1,3 @@
-- ovn-kubernetes image-amd64 961bff913e2a04d640941f73d4632452adbaffaf to 2501912454f1c119be5d53416ba7271aaace727d
-  - 5f58cb36 2025-03-06T19:12:36+00:00 Fixes unexpected mp0 route removal during start up
+- openshift-controller-manager embedded-component bcf6e58edbcc8e7ce6f7e4d0658635688e0fc114 to 87554a1774e48ab8ce44199976f1aeab2902e346
+  - 98b90ad 2025-05-16T06:34:10+00:00 Empty proxy variables are causing issues during the build Problem: Irrespective of default proxy settings these proxy variables are set on build containers. If any defaults are set they reflect those setting ,if not set they are set to null on the build container. Having these null variables are causing problems to some customers as its breaking some required apps on container HTTP_PROXY,http_proxy,HTTPS_PROXY,https_proxy,NO_PROXY,no_proxy Fix: Code changed only to add these proxy variables only if they are defined in defaults and if they are not null.
 
