@@ -18,7 +18,7 @@ Suite Teardown      Teardown Suite And Revert Test Host
 
 *** Variables ***
 ${JOURNAL_CUR}              ${EMPTY}
-${DEFAULT_CONFIG_PATH}      ../packaging/observability/opentelemetry-collector.yaml
+${DEFAULT_CONFIG_PATH}      /etc/microshift/observability/opentelemetry-collector-large.yaml
 ${OTEL_CONFIG_PATH}         /etc/microshift/observability/opentelemetry-collector.yaml
 ${TEST_CONFIG_PATH}         assets/observability/otel_config.yaml
 
@@ -138,8 +138,7 @@ Teardown Suite And Revert Test Host
 Set Back Original OTEL Configuration
     [Documentation]    Set Back Original OTEL Configuration
 
-    ${def_config_str}    Local Command Should Work    cat ${DEFAULT_CONFIG_PATH}
-    Upload String To File    ${def_config_str}    ${OTEL_CONFIG_PATH}
+    ${def_config_str}    Command Should Work    cp ${DEFAULT_CONFIG_PATH} ${OTEL_CONFIG_PATH}
     Systemctl    restart    microshift-observability
 
 Render Otel Test Config

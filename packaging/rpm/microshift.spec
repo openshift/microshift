@@ -571,6 +571,8 @@ install -p -m644 assets/optional/ai-model-serving/release-ai-model-serving-x86_6
 # observability
 install -d -m755 %{buildroot}/%{_sysconfdir}/microshift/observability
 install -p -m644 packaging/observability/*.yaml -D %{buildroot}%{_sysconfdir}/microshift/observability/
+# Explicit copy of large config as default. Not using symlink to avoid accidental package upgrade overwriting user config if the user edits the config without copying (i.e. edits the target of symlink).
+install -p -m644 packaging/observability/opentelemetry-collector-large.yaml -D %{buildroot}%{_sysconfdir}/microshift/observability/opentelemetry-collector.yaml
 install -p -m644 packaging/observability/microshift-observability.service %{buildroot}%{_unitdir}/
 install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/003-microshift-observability/
 install -p -m644 assets/optional/observability/*.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/003-microshift-observability/
@@ -776,6 +778,9 @@ fi
 %changelog
 * Fri May 16 2025 Evgeny Slutsky <eslutsky@redhat.com> 4.20.0
 - Update openvswitch to 3.5
+
+* Wed May 14 2025 Patryk Matuszak <pmatusza@redhat.com> 4.19.0
+- Observability: use large OTEL config example as default
 
 * Thu May 08 2025 Patryk Matuszak <pmatusza@redhat.com> 4.19.0
 - Include OpenTelemetry configuration examples in the RPM
