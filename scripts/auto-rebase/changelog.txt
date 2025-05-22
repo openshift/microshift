@@ -1,18 +1,3 @@
-- machine-config-operator embedded-component b25916385f6a702a14eed4a45c56c44b389e5468 to 71ba6e6af946163d3711c02859807fe46e6a4096
-  - a0582937 2025-05-14T20:13:29+00:00 use MachineSet API instead of shelling out to oc
-
-- openshift-controller-manager embedded-component 70aa014585cd33fc21f27ba20a722c71faf3c411 to 44216d92545ea1bfdef1bb10fc18ccb7c1bfde05
-  - 84d48bd 2025-05-07T16:16:31+05:30 Empty proxy variables are causing issues during the build Problem: Irrespective of default proxy settings these proxy variables are set on build containers. If any defaults are set they reflect those setting ,if not set they are set to null on the build container. Having these null variables are causing problems to some customers as its breaking some required apps on container HTTP_PROXY,http_proxy,HTTPS_PROXY,https_proxy,NO_PROXY,no_proxy Fix: Code changed only to add these proxy variables only if they are defined in defaults and if they are not null.
-
-- operator-framework-olm embedded-component b135c38027c7780c4081ab55c5086452d1437470 to cd52f1260803e03c8dd8e48aa801492baff09893
-  - 827c6a3f 2025-05-15T10:52:30+00:00 fix(olm): improve error logging for missing olm.managed label (#3558)
-
-- ovn-kubernetes image-amd64 b02d1af7d45ae88c91785ebc83ddec23348596cf to d71a5fea2f9167082b2a5b924d3f5b58f009353a
-  - 96807556 2025-03-06T09:10:59-05:00 Handles unspecified protocol in network policy port
-
-- router image-arm64 a33f2b6ad04f8c39b95c1839340f0e38b5c0662a to 4bc6eed319b87bab1acd3aade46c506f6307dd66
-  - 114647e 2025-02-27T22:34:14+00:00 Make idle-close-on-response configurable in HAProxy template
-
-- ovn-kubernetes image-arm64 b02d1af7d45ae88c91785ebc83ddec23348596cf to d71a5fea2f9167082b2a5b924d3f5b58f009353a
-  - 96807556 2025-03-06T09:10:59-05:00 Handles unspecified protocol in network policy port
+- router image-arm64 4bc6eed319b87bab1acd3aade46c506f6307dd66 to 1e29d8cc87a1c9e6645a4b9aa01197d90e366152
+  - 294d1b8 2025-02-02T08:48:23+00:00 OCPBUGS-45290: Reject All CA-Signed Certs Using SHA1
 
