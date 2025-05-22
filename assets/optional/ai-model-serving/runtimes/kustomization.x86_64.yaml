@@ -2,25 +2,28 @@
 images:
   - name: caikit-tgis-image
     newName: quay.io/modh/caikit-tgis-serving
-    digest: sha256:2c7eef73708b5d73de33153459ac7238fdcf517cdc3544c775981f5814b4b6ed
+    digest: sha256:1d8a9fdd510020ed43ab19f333763257ca8bb1be9dcb330469baa7b110d8a6c8
   - name: caikit-standalone-image
     newName: quay.io/modh/caikit-nlp
-    digest: sha256:ada8949b81e646809101edfc76738eb5aac362f783eb2facc8aeed21c7c1512f
+    digest: sha256:7af5cfa5617723fc9039a01189e6e5e8d8d1d507cd015442588083a386618843
   - name: tgis-image
     newName: quay.io/modh/text-generation-inference
     digest: sha256:aebf545d8048a59174f70334dc90c6b97ead4602a39cb7598ea68c8d199168a2
   - name: ovms-image
     newName: quay.io/modh/openvino_model_server
-    digest: sha256:53b7fcf95de9b81e4c8652d0bf4e84e22d5b696827a5d951d863420c68b9cfe8
+    digest: sha256:428c00232cbf3b38a3929a0d22d0e13c6388ce353e3853cc2956d175eacf6724
   - name: vllm-cuda-image
     newName: quay.io/modh/vllm
-    digest: sha256:4f550996130e7d16cacb24ca9a2865e7cf51eddaab014ceaf31a1ea6ef86d4ec
+    digest: sha256:e3e0f4ba3b78b53b3754bf63baf53bf22d9ec22fdc2974d4f2b5bdf8aeab276b
+  - name: ray-tls-generator-image
+    newName: registry.redhat.io/ubi9/ubi-minimal:latest
+    digest: registry.redhat.io/ubi9/ubi-minimal:latest
   - name: vllm-cpu-image
     newName: quay.io/modh/vllm
-    digest: sha256:881495befb6f807fa6e55f24e820fa67022b57d8ce0022305d89abe799c490fa
+    digest: sha256:9e5f8f4394f599befb9e7f703e30581c4d7f062b8d4974992d6222837977ca5e
   - name: vllm-gaudi-image
     newName: quay.io/modh/vllm
-    digest: sha256:af6a071be36d8a99476f145d1589d7ede97d2760b93335b14ca26de7417e438c
+    digest: sha256:e7cba648377c6fa29fab30481f97d96ccca76498aaf8bcf5162c74dfa4e0100c
   - name: vllm-rocm-image
     newName: quay.io/modh/vllm
-    digest: sha256:7e1d1985b0dd2b5ba2df41fc9c8c3edf13a2d9ed8a4d84db8f00eb6c753bc5c5
+    digest: sha256:de5d71c4fb6add81a01171bbabcd2e65fc2d75f0d6e57ca9ebcad9b4084db420

@@ -198,6 +198,15 @@ EOF
     chmod +x "${last_rebase_script}"
 }
 
+update_rebase_job_entrypoint_sh() {
+    local -r operator_bundle="${1}"
+
+    title "Updating rebase_job_entrypoint.sh"
+    sed -i \
+        "s,^rhoai_release=.*\$,rhoai_release=\"${operator_bundle}\",g" \
+        "${REPOROOT}/scripts/auto-rebase/rebase_job_entrypoint.sh"
+}
+
 rebase_ai_model_serving_to() {
     local -r operator_bundle="${1}"
 
@@ -207,10 +216,11 @@ rebase_ai_model_serving_to() {
     local -r version=$(get_rhoai_bundle_version)
 
     update_last_rebase_ai_model_serving_sh "${operator_bundle}"
+    update_rebase_job_entrypoint_sh "${operator_bundle}"
 
     process_rhoai_manifests
 
-    if [[ -n "$(git status -s assets ./scripts/auto-rebase/last_rebase_ai_model_serving.sh)" ]]; then
+    if [[ -n "$(git status -s ./assets ./scripts/auto-rebase/rebase_job_entrypoint.sh ./scripts/auto-rebase/last_rebase_ai_model_serving.sh)" ]]; then
         title "Detected changes to assets/ or last_rebase_ai_model_serving.sh"
 
         if ! "${NO_BRANCH}"; then
@@ -220,7 +230,7 @@ rebase_ai_model_serving_to() {
         fi
 
         title "Committing changes"
-        git add assets ./scripts/auto-rebase/last_rebase_ai_model_serving.sh
+        git add ./assets ./scripts/auto-rebase/rebase_job_entrypoint.sh ./scripts/auto-rebase/last_rebase_ai_model_serving.sh
         git commit -m "Update AI Model Serving for MicroShift"
     else
         title "No changes to assets/ or last_rebase_ai_model_serving.sh"

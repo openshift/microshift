@@ -19,9 +19,20 @@ ${IP}=              10.44.0.1
 Sanity Test
     [Documentation]    Sanity test for AI Model Serving
 
-    # Warning: Next keyword will fail if the VM was rebooted.
-    # See https://github.com/kserve/kserve/pull/4274
-    # After the issue is fixed and backported: add reboot and retest
+    Model Serving Offline Test
+
+    # Check if ingress exists.
+    # Enabled only for testing purposes to test Kserve's settings override.
+    offline.Run With Kubeconfig    oc    get    ingress    -n    test-ai    openvino-resnet
+
+    offline.Reboot MicroShift Host
+    offline.Wait For Greenboot Health Check To Exit
+    Model Serving Offline Test
+
+
+*** Keywords ***
+Model Serving Offline Test
+    [Documentation]    Waits for the model server and queries it
     Wait For A Deployment    test-ai    openvino-resnet-predictor
     Wait Until Keyword Succeeds    10x    10s
     ...    Check If Model Is Ready
@@ -29,12 +40,6 @@ Sanity Test
     Prepare Request Data
     Query Model Server
 
-    # Check if ingress exists.
-    # Enabled only for testing purposes to test Kserve's settings override.
-    offline.Run With Kubeconfig    oc    get    ingress    -n    test-ai    openvino-resnet
-
-
-*** Keywords ***
 Wait For A Deployment
     [Documentation]    Wait for a deployment on offline VM
     [Arguments]    ${namespace}    ${name}
