@@ -14,99 +14,116 @@ Test Tags           restart    slow
 
 
 *** Variables ***
-${NS_OWNERSHIP_1}                   ${EMPTY}
-${NS_OWNERSHIP_2}                   ${EMPTY}
-${ALTERNATIVE_HTTP_PORT}            8000
-${ALTERNATIVE_HTTPS_PORT}           8001
-${HOSTNAME}                         hello-microshift.cluster.local
-${FAKE_LISTEN_IP}                   99.99.99.99
-${ROUTER_REMOVED}                   SEPARATOR=\n
-...                                 ---
-...                                 ingress:
-...                                 \ \ status: Removed
-${OWNERSHIP_ALLOW}                  SEPARATOR=\n
-...                                 ---
-...                                 ingress:
-...                                 \ \ status: Managed
-...                                 \ \ routeAdmissionPolicy:
-...                                 \ \ \ \ namespaceOwnership: InterNamespaceAllowed
-${OWNERSHIP_STRICT}                 SEPARATOR=\n
-...                                 ---
-...                                 ingress:
-...                                 \ \ status: Managed
-...                                 \ \ routeAdmissionPolicy:
-...                                 \ \ \ \ namespaceOwnership: Strict
-${ROUTER_EXPOSE_FULL}               SEPARATOR=\n
-...                                 ---
-...                                 ingress:
-...                                 \ \ status: Managed
-...                                 \ \ ports:
-...                                 \ \ \ \ http: ${ALTERNATIVE_HTTP_PORT}
-...                                 \ \ \ \ https: ${ALTERNATIVE_HTTPS_PORT}
-...                                 \ \ listenAddress:
-...                                 \ \ - br-ex
-${ROUTER_TUNING_CONFIG}             SEPARATOR=\n
-...                                 ---
-...                                 ingress:
-...                                 \ \ defaultHTTPVersion: 2
-...                                 \ \ forwardedHeaderPolicy: Never
-...                                 \ \ httpEmptyRequestsPolicy: Ignore
-...                                 \ \ logEmptyRequests: Ignore
-...                                 \ \ httpCompression:
-...                                 \ \ \ \ mimeTypes:
-...                                 \ \ \ \ - "text/html"
-...                                 \ \ \ \ - "application/*"
-...                                 \ \ tuningOptions:
-...                                 \ \ \ \ headerBufferBytes: 5556
-...                                 \ \ \ \ headerBufferMaxRewriteBytes: 8000
-...                                 \ \ \ \ healthCheckInterval: 4s
-...                                 \ \ \ \ clientTimeout: 20s
-...                                 \ \ \ \ clientFinTimeout: 1.5s
-...                                 \ \ \ \ serverTimeout: 40s
-...                                 \ \ \ \ serverFinTimeout: 2s
-...                                 \ \ \ \ tunnelTimeout: 1h30m0s
-...                                 \ \ \ \ tlsInspectDelay: 6s
-...                                 \ \ \ \ threadCount: 3
-...                                 \ \ \ \ maxConnections: 60000
-${ROUTER_SECURITY_CONFIG}           SEPARATOR=\n
-...                                 ---
-...                                 ingress:
-...                                 \ \ certificateSecret: router-certs-custom
-...                                 \ \ routeAdmissionPolicy:
-...                                 \ \ \ \ wildcardPolicy: WildcardsAllowed
-...                                 \ \ clientTLS:
-...                                 \ \ \ \ allowedSubjectPatterns: ["route-custom.apps.example.com"]
-...                                 \ \ \ \ clientCertificatePolicy: Required
-...                                 \ \ \ \ clientCA:
-...                                 \ \ \ \ \ \ name: router-ca-certs-custom
-...                                 \ \ tlsSecurityProfile:
-...                                 \ \ \ \ type: Custom
-...                                 \ \ \ \ custom:
-...                                 \ \ \ \ \ \ Ciphers:
-...                                 \ \ \ \ \ \ - ECDHE-RSA-AES256-GCM-SHA384
-...                                 \ \ \ \ \ \ - DHE-RSA-AES256-GCM-SHA384
-...                                 \ \ \ \ \ \ - TLS_CHACHA20_POLY1305_SHA256
-...                                 \ \ \ \ \ \ MinTLSVersion: VersionTLS13
-${ROUTER_ACCESS_LOGGING_CONFIG}     SEPARATOR=\n
-...                                 ---
-...                                 ingress:
-...                                 \ \ accessLogging:
-...                                 \ \ \ \ status: Enabled
-...                                 \ \ \ \ httpCaptureCookies:
-...                                 \ \ \ \ - matchType: Exact
-...                                 \ \ \ \ \ \ maxLength: 20
-...                                 \ \ \ \ \ \ name: cookie
-...                                 \ \ \ \ httpCaptureHeaders:
-...                                 \ \ \ \ \ \ request:
-...                                 \ \ \ \ \ \ - maxLength: 11
-...                                 \ \ \ \ \ \ \ \ name: header1
-...                                 \ \ \ \ \ \ response:
-...                                 \ \ \ \ \ \ - maxLength: 12
-...                                 \ \ \ \ \ \ \ \ name: header2
-...                                 \ \ \ \ httpLogFormat: some-format
-...                                 \ \ httpErrorCodePages:
-...                                 \ \ \ \ name: router-error-pages
-${ROUTER_ERROR_CODE_CONFIGMAP}      assets/network/router-error-configmap.yaml
+${NS_OWNERSHIP_1}                           ${EMPTY}
+${NS_OWNERSHIP_2}                           ${EMPTY}
+${ALTERNATIVE_HTTP_PORT}                    8000
+${ALTERNATIVE_HTTPS_PORT}                   8001
+${HOSTNAME}                                 hello-microshift.cluster.local
+${FAKE_LISTEN_IP}                           99.99.99.99
+${ROUTER_REMOVED}                           SEPARATOR=\n
+...                                         ---
+...                                         ingress:
+...                                         \ \ status: Removed
+${OWNERSHIP_ALLOW}                          SEPARATOR=\n
+...                                         ---
+...                                         ingress:
+...                                         \ \ status: Managed
+...                                         \ \ routeAdmissionPolicy:
+...                                         \ \ \ \ namespaceOwnership: InterNamespaceAllowed
+${OWNERSHIP_STRICT}                         SEPARATOR=\n
+...                                         ---
+...                                         ingress:
+...                                         \ \ status: Managed
+...                                         \ \ routeAdmissionPolicy:
+...                                         \ \ \ \ namespaceOwnership: Strict
+${ROUTER_EXPOSE_FULL}                       SEPARATOR=\n
+...                                         ---
+...                                         ingress:
+...                                         \ \ status: Managed
+...                                         \ \ ports:
+...                                         \ \ \ \ http: ${ALTERNATIVE_HTTP_PORT}
+...                                         \ \ \ \ https: ${ALTERNATIVE_HTTPS_PORT}
+...                                         \ \ listenAddress:
+...                                         \ \ - br-ex
+${ROUTER_TUNING_CONFIG}                     SEPARATOR=\n
+...                                         ---
+...                                         ingress:
+...                                         \ \ defaultHTTPVersion: 2
+...                                         \ \ forwardedHeaderPolicy: Never
+...                                         \ \ httpEmptyRequestsPolicy: Ignore
+...                                         \ \ logEmptyRequests: Ignore
+...                                         \ \ httpCompression:
+...                                         \ \ \ \ mimeTypes:
+...                                         \ \ \ \ - "text/html"
+...                                         \ \ \ \ - "application/*"
+...                                         \ \ tuningOptions:
+...                                         \ \ \ \ headerBufferBytes: 5556
+...                                         \ \ \ \ headerBufferMaxRewriteBytes: 8000
+...                                         \ \ \ \ healthCheckInterval: 4s
+...                                         \ \ \ \ clientTimeout: 20s
+...                                         \ \ \ \ clientFinTimeout: 1.5s
+...                                         \ \ \ \ serverTimeout: 40s
+...                                         \ \ \ \ serverFinTimeout: 2s
+...                                         \ \ \ \ tunnelTimeout: 1h30m0s
+...                                         \ \ \ \ tlsInspectDelay: 6s
+...                                         \ \ \ \ threadCount: 3
+...                                         \ \ \ \ maxConnections: 60000
+${ROUTER_SECURITY_CONFIG}                   SEPARATOR=\n
+...                                         ---
+...                                         ingress:
+...                                         \ \ certificateSecret: router-certs-custom
+...                                         \ \ routeAdmissionPolicy:
+...                                         \ \ \ \ wildcardPolicy: WildcardsAllowed
+...                                         \ \ clientTLS:
+...                                         \ \ \ \ allowedSubjectPatterns: ["route-custom.apps.example.com"]
+...                                         \ \ \ \ clientCertificatePolicy: Required
+...                                         \ \ \ \ clientCA:
+...                                         \ \ \ \ \ \ name: router-ca-certs-custom
+...                                         \ \ tlsSecurityProfile:
+...                                         \ \ \ \ type: Custom
+...                                         \ \ \ \ custom:
+...                                         \ \ \ \ \ \ Ciphers:
+...                                         \ \ \ \ \ \ - ECDHE-RSA-AES256-GCM-SHA384
+...                                         \ \ \ \ \ \ - DHE-RSA-AES256-GCM-SHA384
+...                                         \ \ \ \ \ \ - TLS_CHACHA20_POLY1305_SHA256
+...                                         \ \ \ \ \ \ MinTLSVersion: VersionTLS13
+${ROUTER_ACCESS_LOGGING_CONFIG}             SEPARATOR=\n
+...                                         ---
+...                                         ingress:
+...                                         \ \ accessLogging:
+...                                         \ \ \ \ status: Enabled
+...                                         \ \ \ \ destination:
+...                                         \ \ \ \ \ \ type: Container
+...                                         \ \ \ \ \ \ container:
+...                                         \ \ \ \ \ \ \ \ maxLength: 2000
+...                                         \ \ \ \ httpCaptureCookies:
+...                                         \ \ \ \ - matchType: Exact
+...                                         \ \ \ \ \ \ maxLength: 20
+...                                         \ \ \ \ \ \ name: cookie
+...                                         \ \ \ \ httpCaptureHeaders:
+...                                         \ \ \ \ \ \ request:
+...                                         \ \ \ \ \ \ - maxLength: 11
+...                                         \ \ \ \ \ \ \ \ name: header1
+...                                         \ \ \ \ \ \ response:
+...                                         \ \ \ \ \ \ - maxLength: 12
+...                                         \ \ \ \ \ \ \ \ name: header2
+...                                         \ \ \ \ httpLogFormat: some-format
+...                                         \ \ httpErrorCodePages:
+...                                         \ \ \ \ name: router-error-pages
+${ROUTER_ACCESS_LOGGING_CONFIG_SYSLOG}      SEPARATOR=\n
+...                                         ---
+...                                         ingress:
+...                                         \ \ accessLogging:
+...                                         \ \ \ \ status: Enabled
+...                                         \ \ \ \ destination:
+...                                         \ \ \ \ \ \ type: Syslog
+...                                         \ \ \ \ \ \ syslog:
+...                                         \ \ \ \ \ \ \ \ address: 1.2.3.4
+...                                         \ \ \ \ \ \ \ \ port: 9000
+...                                         \ \ \ \ \ \ \ \ facility: local7
+...                                         \ \ \ \ \ \ \ \ maxLength: 1000
+
+${ROUTER_ERROR_CODE_CONFIGMAP}              assets/network/router-error-configmap.yaml
 
 
 *** Test Cases ***
@@ -216,7 +233,7 @@ Router Verify Security Configuration
 
     [Teardown]    Delete Custom CA Secret
 
-Router Verify Access Logging Configuration
+Router Verify Access Logging Configuration Container
     [Documentation]    Test ingress access logging configuration.
     [Setup]    Run Keywords
     ...    Remove Custom Config
@@ -231,7 +248,8 @@ Router Verify Access Logging Configuration
 
     Pod Environment Should Match Value    openshift-ingress    ROUTER_SYSLOG_ADDRESS    /var/lib/rsyslog/rsyslog.sock
     Pod Environment Should Match Value    openshift-ingress    ROUTER_LOG_LEVEL    info
-    Pod Environment Should Match Value    openshift-ingress    ROUTER_SYSLOG_FORMAT    some-format
+    Pod Environment Should Match Value    openshift-ingress    ROUTER_LOG_MAX_LENGTH    2000
+    Pod Environment Should Match Value    openshift-ingress    ROUTER_SYSLOG_FORMAT    "some-format"
     Pod Environment Should Match Value    openshift-ingress    ROUTER_CAPTURE_HTTP_REQUEST_HEADERS    header1:11
     Pod Environment Should Match Value    openshift-ingress    ROUTER_CAPTURE_HTTP_RESPONSE_HEADERS    header2:12
     Pod Environment Should Match Value    openshift-ingress    ROUTER_CAPTURE_HTTP_COOKIE    cookie=:20
@@ -246,6 +264,18 @@ Router Verify Access Logging Configuration
     Check Access Logs    some-format
 
     [Teardown]    Oc Delete    -f ${ROUTER_ERROR_CODE_CONFIGMAP}
+
+Router Verify Access Logging Configuration Syslog
+    [Documentation]    Test ingress access logging configuration.
+    [Setup]    Run Keywords
+    ...    Setup With Custom Config    ${ROUTER_ACCESS_LOGGING_CONFIG_SYSLOG}
+    ...    AND
+    ...    Wait For Router Ready
+
+    Pod Environment Should Match Value    openshift-ingress    ROUTER_SYSLOG_ADDRESS    1.2.3.4:9000
+    Pod Environment Should Match Value    openshift-ingress    ROUTER_LOG_LEVEL    info
+    Pod Environment Should Match Value    openshift-ingress    ROUTER_LOG_MAX_LENGTH    1000
+    Pod Environment Should Match Value    openshift-ingress    ROUTER_LOG_FACILITY    local7
 
 
 *** Keywords ***
