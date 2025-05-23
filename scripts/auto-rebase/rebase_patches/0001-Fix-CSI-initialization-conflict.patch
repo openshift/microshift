@@ -10,13 +10,13 @@ the node info manager.  It is then possible that the kubelet gets
 the credentials of the kube-controller-manager and that will cause
 CSI to fail.
 ---
- vendor/k8s.io/kubernetes/pkg/volume/csi/csi_plugin.go | 10 +++++++---
+ deps/github.com/openshift/kubernetes/pkg/volume/csi/csi_plugin.go | 10 +++++++---
  1 file changed, 7 insertions(+), 3 deletions(-)
 
-diff --git a/vendor/k8s.io/kubernetes/pkg/volume/csi/csi_plugin.go b/vendor/k8s.io/kubernetes/pkg/volume/csi/csi_plugin.go
+diff --git a/deps/github.com/openshift/kubernetes/pkg/volume/csi/csi_plugin.go b/deps/github.com/openshift/kubernetes/pkg/volume/csi/csi_plugin.go
 index 976292de..5c4c5477 100644
---- a/vendor/k8s.io/kubernetes/pkg/volume/csi/csi_plugin.go
-+++ b/vendor/k8s.io/kubernetes/pkg/volume/csi/csi_plugin.go
+--- a/deps/github.com/openshift/kubernetes/pkg/volume/csi/csi_plugin.go
++++ b/deps/github.com/openshift/kubernetes/pkg/volume/csi/csi_plugin.go
 @@ -243,18 +243,22 @@ func (p *csiPlugin) Init(host volume.VolumeHost) error {
  	}
  
