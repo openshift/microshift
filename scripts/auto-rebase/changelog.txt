@@ -1,6 +1,20 @@
-- oc image-arm64 c88fd60ed9c4a349d52770884b3aad828432d01d to 8f1c8b5768cdff8885ddef28e10de2c1928daf92
+- api embedded-component d22fca85e3b9f77f0cf2b43759a5ff927e605f57 to 3c189e99e0db0277314560deb420e3cb7f8bee5c
+  - 7e6bdf86 2025-05-17T06:23:48+00:00 Fix validation for Resource field in MOSB API
+
+- cluster-kube-apiserver-operator embedded-component 446153e4e3cec78da777fef34c51a40ba6e8006b to 34bd8a7860802d310b4b0c124dc7975b6fa52773
+  - cc77c15 2025-05-14T07:58:32+00:00 Change validity / refresh for some certs which should not be affected by dev cycle rotation change
+  - be9c0f3 2025-05-14T07:58:32+00:00 Always display month/ten month/year
+
+- kubernetes embedded-component 9fe7dfdeb6714effef45be12ec451a0f06893660 to 375cd1b6bcb524243cee2e80eff593e2131906da
+  - f2cf50995 2025-05-15T12:49:42+00:00 UPSTREAM: 131495: Handle unsupported node expansion for RWX volumes
+
+- machine-config-operator embedded-component aae92b4dbfe9b66e29f0c0fe7551173f10e04b61 to e0157446e7e86a579dfcb8db21582735ada0c778
+  - 77ed4c37 2025-05-15T14:59:45+00:00 Fix interrupt state to account for failure correctly
+  - 5a12b01c 2025-05-12T13:31:50+00:00 upgrade monitor: only set curret generation value in pinned image set reference in MCN when the value is valid
+
+- oc image-amd64 c88fd60ed9c4a349d52770884b3aad828432d01d to 8f1c8b5768cdff8885ddef28e10de2c1928daf92
   - 3009b09e 2025-05-20T14:50:23+00:00 Replace colon to hypen in the filename while extracting tar on Windows
 
-- kubernetes image-arm64 9fe7dfdeb6714effef45be12ec451a0f06893660 to 375cd1b6bcb524243cee2e80eff593e2131906da
+- kubernetes image-amd64 9fe7dfdeb6714effef45be12ec451a0f06893660 to 375cd1b6bcb524243cee2e80eff593e2131906da
   - f2cf50995 2025-05-15T12:49:42+00:00 UPSTREAM: 131495: Handle unsupported node expansion for RWX volumes
 
