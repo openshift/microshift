@@ -1,0 +1,6 @@
+- ovn-kubernetes image-amd64 ed1a80e92cc05edff7337160a03eb85b57d54b51 to 53510ff8c81a4120208f8a4b6e220a84cfc8f1ed
+  - d6019e8 2025-05-16T11:04:44+02:00 Update to FDP25.A.1 24.03.5-40.
+
+- ovn-kubernetes image-arm64 ed1a80e92cc05edff7337160a03eb85b57d54b51 to 53510ff8c81a4120208f8a4b6e220a84cfc8f1ed
+  - d6019e8 2025-05-16T11:04:44+02:00 Update to FDP25.A.1 24.03.5-40.
+
