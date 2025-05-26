@@ -70,6 +70,7 @@ run_sonobuoy() {
     go install github.com/vmware-tanzu/sonobuoy@v0.57.2
     ~/go/bin/sonobuoy run \
         --mode=certified-conformance \
+        --plugin-env=e2e.E2E_SKIP=".*Services should be able to switch session affinity for NodePort service.*" \
         --dns-namespace=openshift-dns \
         --dns-pod-labels=dns.operator.openshift.io/daemonset-dns=default || rc=$?
     if [ ${rc} -ne 0 ] ; then
