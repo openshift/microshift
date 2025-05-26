@@ -1,3 +1,6 @@
-- openshift-controller-manager embedded-component bcf6e58edbcc8e7ce6f7e4d0658635688e0fc114 to 87554a1774e48ab8ce44199976f1aeab2902e346
-  - 98b90ad 2025-05-16T06:34:10+00:00 Empty proxy variables are causing issues during the build Problem: Irrespective of default proxy settings these proxy variables are set on build containers. If any defaults are set they reflect those setting ,if not set they are set to null on the build container. Having these null variables are causing problems to some customers as its breaking some required apps on container HTTP_PROXY,http_proxy,HTTPS_PROXY,https_proxy,NO_PROXY,no_proxy Fix: Code changed only to add these proxy variables only if they are defined in defaults and if they are not null.
+- operator-framework-olm embedded-component 174007cb5b9da4307de88a6cd569ffae40cda646 to 650a3cd620865598f97b5a3eaaf88cf044e2ffb3
+  - 1aa0de54 2025-05-16T08:34:02+00:00 fix(olm): improve error logging for missing olm.managed label (#3558)
+
+- route-controller-manager embedded-component 9ff2408eb11efe30253ba6a7e9ad4bf92dcb8fab to 5da234dd58c092cba019807979f9c29664ddb860
+  - e8448ec 2025-05-14T05:01:13+00:00 PR adds error handling and event recording for failed Ingress to Route conversion. It ensures that any errors encountered during the conversion process are properly logged and recorded as events, improving the observability and debugging capabilities of the system.
 
