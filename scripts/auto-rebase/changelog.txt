@@ -1,3 +1,11 @@
-- router image-arm64 4bc6eed319b87bab1acd3aade46c506f6307dd66 to 1e29d8cc87a1c9e6645a4b9aa01197d90e366152
+- cluster-ingress-operator embedded-component cb5306d7f68ba35b9a065d65f46c69a836556cb2 to 66d1b44d81ca87995d5a9eaade5f3e69bbd279b6
+  - 1c0a6eb 2025-04-29T15:25:53+02:00 OCPBUGS-43745: Add support for idle connection termination policy
+  - 4a04a61 2025-04-29T15:25:46+02:00 OCPBUGS-49702: Vendor openshift/api#2186
+
+- machine-config-operator embedded-component 71ba6e6af946163d3711c02859807fe46e6a4096 to 38a0440cd6164bb514a1a8e55f4fbdf104c6e0df
+  - f133aca6 2025-05-16T17:16:33+00:00 parsing error to report full-render reconciliation fails vs partial render fails
+
+- router image-amd64 a33f2b6ad04f8c39b95c1839340f0e38b5c0662a to 1e29d8cc87a1c9e6645a4b9aa01197d90e366152
+  - 114647e 2025-02-27T22:34:14+00:00 Make idle-close-on-response configurable in HAProxy template
   - 294d1b8 2025-02-02T08:48:23+00:00 OCPBUGS-45290: Reject All CA-Signed Certs Using SHA1
 
