@@ -73,7 +73,6 @@ run_sonobuoy() {
         --plugin-env=e2e.E2E_SKIP='Services should be able to switch session affinity for NodePort service' \
         --dns-namespace=openshift-dns \
         --plugin-env=e2e.E2E_EXTRA_GINKGO_ARGS=-v \
-        --kube-conformance-image=quay.io/pmatusza/k8s-conformance:amd64-1.32.3 \
         --dns-pod-labels=dns.operator.openshift.io/daemonset-dns=default || rc=$?
     if [ ${rc} -ne 0 ] ; then
         record_junit "run_sonobuoy" "start_e2e" "FAILED"
