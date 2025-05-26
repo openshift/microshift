@@ -558,8 +558,8 @@ github.com/openshift/kubernetes/staging/src/k8s.io/pod-security-admission v0.0.0
 github.com/openshift/kubernetes/staging/src/k8s.io/pod-security-admission v0.0.0-20250221140612-7cf4c058dab1/go.mod h1:nEqWuQNrBxCIeYnc9zWoV3/SW5Lhtrn7vvugEFVk88o=
 github.com/openshift/library-go v0.0.0-20240513090140-e22d25af5587 h1:eZ79/F6bhtqoY78KRRxp5G5yITTgVatMnj5J/cYDumI=
 github.com/openshift/library-go v0.0.0-20240513090140-e22d25af5587/go.mod h1:lFwyRj0XjUf25Da3Q00y+KuaxCWTJ6YzYPDX1+96nco=
-github.com/openshift/route-controller-manager v0.0.0-20250424030443-9ff2408eb11e h1:GI2uy+AusW8g+cUVkXKh1i/N2VR+xREroj2qF3216kA=
-github.com/openshift/route-controller-manager v0.0.0-20250424030443-9ff2408eb11e/go.mod h1:bKMzHzOveoSMWypzUHrHxf62Oq8BOnNhwjTeDp/lgDg=
+github.com/openshift/route-controller-manager v0.0.0-20250521141417-5da234dd58c0 h1:YBzKz2yobpIRlo3w4X5FdRrPy+0APXJgxpSeYjaWva4=
+github.com/openshift/route-controller-manager v0.0.0-20250521141417-5da234dd58c0/go.mod h1:bKMzHzOveoSMWypzUHrHxf62Oq8BOnNhwjTeDp/lgDg=
 github.com/pelletier/go-toml v1.2.0/go.mod h1:5z9KED0ma1S8pY6P1sdut58dfprrGBbd/94hg7ilaic=
 github.com/peterbourgon/diskv v2.0.1+incompatible h1:UBdAOUP5p4RWqPBg048CAvpKN+vxiaj6gdUUzhl4XmI=
 github.com/peterbourgon/diskv v2.0.1+incompatible/go.mod h1:uqqh8zWWbv1HBMNONnaR/tNboyR3/BZd58JJSHlUSCU=
