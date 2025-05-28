@@ -1,7 +1,7 @@
-diff --git a/vendor/github.com/openshift/route-controller-manager/pkg/cmd/route-controller-manager/cmd.go b/vendor/github.com/openshift/route-controller-manager/pkg/cmd/route-controller-manager/cmd.go
+diff --git a/deps/github.com/openshift/route-controller-manager/pkg/cmd/route-controller-manager/cmd.go b/deps/github.com/openshift/route-controller-manager/pkg/cmd/route-controller-manager/cmd.go
 index afb7dc267..e255d16bd 100644
---- a/vendor/github.com/openshift/route-controller-manager/pkg/cmd/route-controller-manager/cmd.go
-+++ b/vendor/github.com/openshift/route-controller-manager/pkg/cmd/route-controller-manager/cmd.go
+--- a/deps/github.com/openshift/route-controller-manager/pkg/cmd/route-controller-manager/cmd.go
++++ b/deps/github.com/openshift/route-controller-manager/pkg/cmd/route-controller-manager/cmd.go
 @@ -6,6 +6,7 @@ import (
  	"os"
  

@@ -1,8 +1,8 @@
-diff --git a/vendor/k8s.io/klog/v2/goroutine_labels.go b/vendor/k8s.io/klog/v2/goroutine_labels.go
+diff --git a/deps/k8s.io/klog/goroutine_labels.go b/deps/k8s.io/klog/goroutine_labels.go
 new file mode 100644
 index 00000000..50f2235b
 --- /dev/null
-+++ b/vendor/k8s.io/klog/v2/goroutine_labels.go
++++ b/deps/k8s.io/klog/goroutine_labels.go
 @@ -0,0 +1,7 @@
 +package klog
 +
@@ -11,10 +11,10 @@ index 00000000..50f2235b
 +func WithMicroshiftLoggerComponent(c string, f func()) {
 +	buffer.WithMicroshiftLoggerComponent(c, f)
 +}
-diff --git a/vendor/k8s.io/klog/v2/internal/buffer/buffer.go b/vendor/k8s.io/klog/v2/internal/buffer/buffer.go
+diff --git a/deps/k8s.io/klog/internal/buffer/buffer.go b/deps/k8s.io/klog/internal/buffer/buffer.go
 index ac88682a..a29eb626 100644
---- a/vendor/k8s.io/klog/v2/internal/buffer/buffer.go
-+++ b/vendor/k8s.io/klog/v2/internal/buffer/buffer.go
+--- a/deps/k8s.io/klog/internal/buffer/buffer.go
++++ b/deps/k8s.io/klog/internal/buffer/buffer.go
 @@ -149,6 +149,8 @@ func (buf *Buffer) FormatHeader(s severity.Severity, file string, line int, now
  	buf.Tmp[21] = ' '
  	buf.nDigits(7, 22, Pid, ' ') // TODO: should be TID
@@ -24,11 +24,11 @@ index ac88682a..a29eb626 100644
  	buf.Write(buf.Tmp[:30])
  	buf.WriteString(file)
  	buf.Tmp[0] = ':'
-diff --git a/vendor/k8s.io/klog/v2/internal/buffer/goroutine_labels.go b/vendor/k8s.io/klog/v2/internal/buffer/goroutine_labels.go
+diff --git a/deps/k8s.io/klog/internal/buffer/goroutine_labels.go b/deps/k8s.io/klog/internal/buffer/goroutine_labels.go
 new file mode 100644
 index 00000000..6e93bdbd
 --- /dev/null
-+++ b/vendor/k8s.io/klog/v2/internal/buffer/goroutine_labels.go
++++ b/deps/k8s.io/klog/internal/buffer/goroutine_labels.go
 @@ -0,0 +1,30 @@
 +package buffer
 +
