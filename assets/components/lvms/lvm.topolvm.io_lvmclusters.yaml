@@ -2,7 +2,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.15.0
+    controller-gen.kubebuilder.io/version: v0.16.5
   creationTimestamp: null
   name: lvmclusters.lvm.topolvm.io
 spec:
@@ -213,6 +213,26 @@ spec:
                               - Host
                               - Static
                               type: string
+                            metadataSize:
+                              anyOf:
+                              - type: integer
+                              - type: string
+                              description: |-
+                                MetadataSize specifies metadata size for thin pool. It used only when MetadataSizeCalculationPolicy
+                                is set to Static. No MetadataSize with a MetadataSizeCalculationPolicy set to Static will result in
+                                default metadata size of 1Gi. It can be between 2Mi and 16Gi due to the underlying limitations of lvm2.
+                              pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                              x-kubernetes-int-or-string: true
+                            metadataSizeCalculationPolicy:
+                              default: Host
+                              description: |-
+                                MetadataSizeCalculationPolicy specifies the policy to calculate metadata size for the underlying volume.
+                                When set to Host, the metadata size is calculated based on lvm2 default settings
+                                When set to Static, the metadata size is calculated based on the static size attribute provided within MetadataSize
+                              enum:
+                              - Host
+                              - Static
+                              type: string
                             name:
                               description: Name specifies a name for the thin pool.
                               type: string
@@ -286,16 +306,8 @@ spec:
               conditions:
                 description: Conditions describes the state of the resource.
                 items:
-                  description: "Condition contains details for one aspect of the current
-                    state of this API Resource.\n---\nThis struct is intended for
-                    direct use as an array at the field path .status.conditions.  For
-                    example,\n\n\n\ttype FooStatus struct{\n\t    // Represents the
-                    observations of a foo's current state.\n\t    // Known .status.conditions.type
-                    are: \"Available\", \"Progressing\", and \"Degraded\"\n\t    //
-                    +patchMergeKey=type\n\t    // +patchStrategy=merge\n\t    // +listType=map\n\t
-                    \   // +listMapKey=type\n\t    Conditions []metav1.Condition `json:\"conditions,omitempty\"
-                    patchStrategy:\"merge\" patchMergeKey:\"type\" protobuf:\"bytes,1,rep,name=conditions\"`\n\n\n\t
-                    \   // other fields\n\t}"
+                  description: Condition contains details for one aspect of the current
+                    state of this API Resource.
                   properties:
                     lastTransitionTime:
                       description: |-
@@ -336,12 +348,7 @@ spec:
                       - Unknown
                       type: string
                     type:
-                      description: |-
-                        type of condition in CamelCase or in foo.example.com/CamelCase.
-                        ---
-                        Many .condition.type values are consistent across resources like Available, but because arbitrary conditions can be
-                        useful (see .node.status.conditions), the ability to deconflict is important.
-                        The regex it matches is (dns1123SubdomainFmt/)?(qualifiedNameFmt)
+                      description: type of condition in CamelCase or in foo.example.com/CamelCase.
                       maxLength: 316
                       pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$
                       type: string
@@ -421,6 +428,8 @@ spec:
                             description: Status tells if the volume group was created
                               on the node
                             type: string
+                        required:
+                        - deviceDiscoveryPolicy
                         type: object
                       type: array
                   type: object
