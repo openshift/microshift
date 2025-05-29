@@ -125,8 +125,21 @@ echo -e "${USER}\tALL=(ALL)\tNOPASSWD: ALL" | sudo tee "/etc/sudoers.d/${USER}"
 # Check the subscription status and register if necessary
 if ${RHEL_SUBSCRIPTION}; then
     if ! sudo subscription-manager status >&/dev/null; then
-        sudo subscription-manager register --auto-attach
+        register_ok=false
+        for _ in $(seq 3) ; do
+            if sudo subscription-manager register --auto-attach; then
+                register_ok=true
+                break
+            fi
+            sleep 30
+        done
+
+        if ! "${register_ok}"; then
+            echo "Repeatably failed to register"
+            exit 1
+        fi
     fi
+
     sudo subscription-manager config --rhsm.manage_repos=1
 
     # Parse the OS versions and determine if EUS
