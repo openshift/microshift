@@ -1,6 +1,3 @@
-- operator-framework-olm embedded-component 174007cb5b9da4307de88a6cd569ffae40cda646 to 650a3cd620865598f97b5a3eaaf88cf044e2ffb3
-  - 1aa0de54 2025-05-16T08:34:02+00:00 fix(olm): improve error logging for missing olm.managed label (#3558)
-
-- route-controller-manager embedded-component 9ff2408eb11efe30253ba6a7e9ad4bf92dcb8fab to 5da234dd58c092cba019807979f9c29664ddb860
-  - e8448ec 2025-05-14T05:01:13+00:00 PR adds error handling and event recording for failed Ingress to Route conversion. It ensures that any errors encountered during the conversion process are properly logged and recorded as events, improving the observability and debugging capabilities of the system.
+- cluster-network-operator embedded-component db952dd8188afc450be6f8c60d00e9068377c266 to 288260c710e95931366f4b4f8cbd3925ac52d561
+  - 80b7be1 2025-05-20T03:23:49-04:00 Fix live migration with feature migration configured explicitly
 
