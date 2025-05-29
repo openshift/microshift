@@ -3,7 +3,7 @@ kind: StorageClass
 metadata:
   annotations:
     storageclass.kubernetes.io/is-default-class: "true"
-  name: topolvm-provisioner
+  name: {{ .StorageClassName }}
 parameters:
   csi.storage.k8s.io/fstype: xfs
 provisioner: topolvm.io

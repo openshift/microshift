@@ -60,7 +60,7 @@ func startCSIPlugin(ctx context.Context, cfg *config.Config, kubeconfigPath stri
 	// 2. If the configuration file is changed to enable the CSI plugin, the plugin will not be running until the next restart
 	// TODO: Implement a mechanism to reload the configuration file even when enabling or disabling, this requires a mechanism in k8s to delete resources that are no longer wanted
 	// 3. If the plugin is already enabled, the configuration file is changed and the plugin is restarted with hot-reloading.
-	return setupPluginResources(ctx, cfg, kubeconfigPath)
+	return setupPluginResources(ctx, cfg, lvmdCfg, kubeconfigPath)
 }
 
 // deleteLegacyResources deletes the legacy resources of TopoLVM.
@@ -85,7 +85,7 @@ func deleteLegacyResources(ctx context.Context, kubeconfigPath string) error {
 	}, kubeconfigPath)
 }
 
-func setupPluginResources(ctx context.Context, cfg *config.Config, kubeconfigPath string) error {
+func setupPluginResources(ctx context.Context, cfg *config.Config, lcfg *lvmd.Lvmd, kubeconfigPath string) error {
 	var (
 		// CRDS are handled in
 		ns = []string{
@@ -121,7 +121,7 @@ func setupPluginResources(ctx context.Context, cfg *config.Config, kubeconfigPat
 			"components/lvms/lvms_default-lvmcluster.yaml",
 		}
 		sc = []string{
-			"components/lvms/topolvm_default-storage-class.yaml",
+			"components/lvms/topolvm_default-storage-class.yaml.template",
 		}
 		svc = []string{
 			"components/lvms/lvms-webhook-service_v1_service.yaml",
@@ -133,10 +133,15 @@ func setupPluginResources(ctx context.Context, cfg *config.Config, kubeconfigPat
 		}
 	)
 
-	if err := assets.ApplyStorageClasses(ctx, sc, nil, nil, kubeconfigPath); err != nil {
-		klog.Warningf("Failed to apply storage cass %v: %v", sc, err)
+	if name, err := lvmd.DefaultDeviceClassName(lcfg); err != nil {
 		return err
+	} else {
+		if err := assets.ApplyStorageClasses(ctx, sc, nil, assets.RenderParams{"StorageClassName": name}, kubeconfigPath); err != nil {
+			klog.Warningf("Failed to apply storage class %v: %v", sc, err)
+			return err
+		}
 	}
+
 	if err := assets.ApplyNamespaces(ctx, ns, kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply ns %v: %v", ns, err)
 		return err
