@@ -25,47 +25,44 @@ spec:
     spec:
       serviceAccountName: service-ca
       containers:
-        - name: service-ca-controller
-          image: '{{ .ReleaseImage.service_ca_operator }}'
-          imagePullPolicy: IfNotPresent
-          terminationMessagePolicy: FallbackTo
-          command: ["service-ca-operator", "controller"]
-          ports:
-            - containerPort: 8443
-          securityContext:
-            runAsNonRoot: true
-          resources:
-            requests:
-              memory: 120Mi
-              cpu: 10m
-          terminationMessagePolicy: FallbackToLogsOnError
-          volumeMounts:
-            - mountPath: /var/run/secrets/signing-key
-              name: signing-key
-            - mountPath: /var/run/configmaps/signing-cabundle
-              name: signing-cabundle
-          args:
-            - -v=2
+      - name: service-ca-controller
+        image: ${IMAGE}
+        imagePullPolicy: IfNotPresent
+        terminationMessagePolicy: FallbackTo
+        command: ["service-ca-operator", "controller"]
+        ports:
+        - containerPort: 8443
+        securityContext:
+          runAsNonRoot: true
+        resources:
+          requests:
+            memory: 120Mi
+            cpu: 10m
+        terminationMessagePolicy: FallbackToLogsOnError
+        volumeMounts:
+        - mountPath: /var/run/secrets/signing-key
+          name: signing-key
+        - mountPath: /var/run/configmaps/signing-cabundle
+          name: signing-cabundle
       volumes:
-        - name: signing-key
-          secret:
-            secretName: '{{.TLSSecret}}'
-        - name: signing-cabundle
-          configMap:
-            name: '{{.CAConfigMap}}'
+      - name: signing-key
+        secret:
+          secretName: signing-key
+      - name: signing-cabundle
+        configMap:
+          name: signing-cabundle
       nodeSelector:
         node-role.kubernetes.io/master: ""
       priorityClassName: "system-cluster-critical"
       tolerations:
-        - key: node-role.kubernetes.io/master
-          operator: Exists
-          effect: "NoSchedule"
-        - key: "node.kubernetes.io/unreachable"
-          operator: "Exists"
-          effect: "NoExecute"
-          tolerationSeconds: 120
-        - key: "node.kubernetes.io/not-ready"
-          operator: "Exists"
-          effect: "NoExecute"
-          tolerationSeconds: 120
-  replicas: 1
+      - key: node-role.kubernetes.io/master
+        operator: Exists
+        effect: "NoSchedule"
+      - key: "node.kubernetes.io/unreachable"
+        operator: "Exists"
+        effect: "NoExecute"
+        tolerationSeconds: 120
+      - key: "node.kubernetes.io/not-ready"
+        operator: "Exists"
+        effect: "NoExecute"
+        tolerationSeconds: 120

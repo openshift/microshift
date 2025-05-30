@@ -2,44 +2,50 @@ apiVersion: kubecontrolplane.config.openshift.io/v1
 kind: KubeControllerManagerConfig
 extendedArguments:
   enable-dynamic-provisioning:
-    - "true"
+  - "true"
   allocate-node-cidrs:
-    - "false"
+  - "false"
   use-service-account-credentials:
-    - "true"
+  - "true"
+  flex-volume-plugin-dir:
+  - "/etc/kubernetes/kubelet-plugins/volume/exec" # created by machine-config-operator, owned by storage team/hekumar@redhat.com
+  pv-recycler-pod-template-filepath-nfs: # owned by storage team/fbertina@redhat.com
+  - "/etc/kubernetes/static-pod-resources/configmaps/recycler-config/recycler-pod.yaml"
+  pv-recycler-pod-template-filepath-hostpath: # owned by storage team/fbertina@redhat.com
+  - "/etc/kubernetes/static-pod-resources/configmaps/recycler-config/recycler-pod.yaml"
   leader-elect:
-    - "true"
+  - "true"
   leader-elect-retry-period:
-    - "3s"
+  - "3s"
   leader-elect-resource-lock:
-    - "leases"
+  - "leases"
   leader-elect-renew-deadline:
-    - "12s" # Increase api call timeout value from default 5s to 6s, required in case primary dns server fail.
+  - "12s" # Increase api call timeout value from default 5s to 6s, required in case primary dns server fail.
   controllers:
-    - "*"
-    - "-ttl" # TODO: this is excluded in kube-core, but not in #21092
-    - "-bootstrapsigner"
-    - "-tokencleaner"
-    # Most upstream clusters don't care about SELinux, therefore this controller is opt-in. OCP cares.
-    # Owner: OCP storage team, @jsafrane.
-    - "selinux-warning-controller"
+  - "*"
+  - "-ttl" # TODO: this is excluded in kube-core, but not in #21092
+  - "-bootstrapsigner"
+  - "-tokencleaner"
+  # Most upstream clusters don't care about SELinux, therefore this controller is opt-in. OCP cares.
+  # Owner: OCP storage team, @jsafrane.
+  - "selinux-warning-controller"
   cloud-provider:
     - "external"
   cluster-signing-duration:
-    - "720h"
+  - "720h"
   secure-port:
-    - "10257"
+  - "10257"
   cert-dir:
-    - "/var/run/kubernetes"
+  - "/var/run/kubernetes"
   root-ca-file:
-    - "/etc/kubernetes/static-pod-resources/configmaps/serviceaccount-ca/ca-bundle.crt"
+  - "/etc/kubernetes/static-pod-resources/configmaps/serviceaccount-ca/ca-bundle.crt"
   service-account-private-key-file:
-    - "/etc/kubernetes/static-pod-resources/secrets/service-account-private-key/service-account.key"
+  - "/etc/kubernetes/static-pod-resources/secrets/service-account-private-key/service-account.key"
   cluster-signing-cert-file:
-    - "/etc/kubernetes/static-pod-certs/secrets/csr-signer/tls.crt"
+  - "/etc/kubernetes/static-pod-certs/secrets/csr-signer/tls.crt"
   cluster-signing-key-file:
-    - "/etc/kubernetes/static-pod-certs/secrets/csr-signer/tls.key"
+  - "/etc/kubernetes/static-pod-certs/secrets/csr-signer/tls.key"
   kube-api-qps:
-    - "150" # this is a historical values
+  - "150" # this is a historical values
   kube-api-burst:
-    - "300" # this is a historical values
+  - "300" # this is a historical values
