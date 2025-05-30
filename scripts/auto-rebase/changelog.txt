@@ -1,6 +1,4 @@
-- ovn-kubernetes image-amd64 ed1a80e92cc05edff7337160a03eb85b57d54b51 to 53510ff8c81a4120208f8a4b6e220a84cfc8f1ed
-  - d6019e8 2025-05-16T11:04:44+02:00 Update to FDP25.A.1 24.03.5-40.
-
-- ovn-kubernetes image-arm64 ed1a80e92cc05edff7337160a03eb85b57d54b51 to 53510ff8c81a4120208f8a4b6e220a84cfc8f1ed
-  - d6019e8 2025-05-16T11:04:44+02:00 Update to FDP25.A.1 24.03.5-40.
+- cluster-network-operator embedded-component 8ad9fcdadcbc0cae358f7e277349d194b32e8277 to c7f9fb8f2168ce81250bd588624e58bc2f6f36f8
+  - 6facc03 2025-03-20T03:29:25-04:00 Use applyconfigurations for updating network.oprerator status
+  - bc813bb 2025-03-09T23:21:28-04:00 Vendor fake client-go operator client
 
