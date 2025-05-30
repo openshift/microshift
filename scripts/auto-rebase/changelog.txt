@@ -1,16 +1,38 @@
-- cluster-kube-apiserver-operator embedded-component ad0e7bf6fb078047e58a923fa057293c0e5535ac to 383f10176f2509babc9dd49d135fa8bb0c2c277e
-  - 64041a5 2025-05-15T16:54:14+02:00 bump library-go
+- api embedded-component d21e7b9699338d2d989fbe43523acf0bc6a9477c to 9fce26d4cc74cfa6bfa2b9af8891a66a90a3e31f
+  - 23cea44 2025-05-16T10:40:09-04:00 change OCL CRD deployment to v1
+  - f6c354a 2025-05-16T12:07:57+02:00 Remove Never option from IPsec Encapsulation
+  - f774cd0 2025-05-16T12:07:08+02:00 Add encapsulation flag to IPsecConfig struct
 
-- kubernetes embedded-component d060f964d37d5ac94a75897551526703286b7ca1 to 6342c7704072023fd9968c25a43c6938c80f994c
-  - 9b830ef6c 2025-05-14T13:59:51+00:00 UPSTREAM: 131236: RWX tests should create RWX volumes
+- machine-config-operator embedded-component 033e1dc48e10b12b20918e7a7e8a9177a65ae680 to 42bf13fc318f2196428c8f73b8a657c35ea12030
+  - 5c131106 2025-05-22T10:24:28-04:00 Merge pull request #5054 from umohnani8/interruptbug
+  - 6821e8bc 2025-05-22T10:24:28-04:00 Merge pull request #4971 from umohnani8/disconnected-3
+  - 651a6094 2025-05-22T10:24:28-04:00 Merge pull request #4975 from umohnani8/prune-3
+  - b64fc2b8 2025-05-22T10:24:28-04:00 Merge pull request #4924 from cheesesashimi/zzlotnik/fix-mcd-and-node-controller
+  - c0d8a0be 2025-05-22T10:24:27-04:00 Merge pull request #4833 from cheesesashimi/zzlotnik/fix-proxy-restoration
+  - 704f45d7 2025-05-22T10:24:27-04:00 Merge pull request #4807 from umohnani8/rebuild
+  - 47d18300 2025-05-22T10:24:27-04:00 Merge pull request #4941 from cheesesashimi/zzlotnik/fix-e2e-gcp-op-ocl
+  - 075542c3 2025-05-22T10:24:27-04:00 Merge pull request #4825 from cheesesashimi/zzlotnik/OCPBUGS-43896
+  - b4df4fb4 2025-05-22T10:24:27-04:00 Merge pull request #4861 from umohnani8/ownership
+  - 88a2398f 2025-05-22T10:24:27-04:00 Merge pull request #4811 from cheesesashimi/zzlotnik/OCPBUGS-43896-rebase
+  - 2ea5a1c7 2025-05-22T10:24:27-04:00 Merge pull request #4868 from umohnani8/ext-tests
+  - 9986d143 2025-05-22T10:24:26-04:00 Merge pull request #4817 from djoshy/unavail-ocl-debug
+  - ee54d319 2025-05-22T10:24:26-04:00 Merge pull request #4812 from djoshy/remove-entitled-copy
+  - d89cd05d 2025-05-22T10:24:20-04:00 Merge pull request #4756 from djoshy/reconcile-ocl-api
+  - d56c4b61 2025-05-22T10:20:21-04:00 Merge pull request #4741 from umohnani8/make
+  - a3e0753a 2025-05-22T10:20:21-04:00 Merge pull request #4753 from cheesesashimi/zzlotnik/incorporate-changes-to-helpers
+  - 2dc7d9d4 2025-05-22T10:20:21-04:00 Merge pull request #4718 from dkhater-redhat/refactor-zacks-helpers
+  - f1e14052 2025-05-22T10:20:20-04:00 Merge pull request #4750 from isabella-janssen/mco-1416-ocl-e2e-troubleshooting
+  - 15a1198e 2025-05-22T10:20:20-04:00 Merge pull request #4739 from RishabhSaini/failedBuildCascade
+  - b8ebe025 2025-05-22T10:20:20-04:00 Merge pull request #4730 from isabella-janssen/mco-1416-ocl-tests
+  - 3d843dde 2025-05-22T10:20:20-04:00 Merge pull request #4699 from isabella-janssen/mco-1416-e2e-tests
+  - 74b98340 2025-05-22T10:20:11-04:00 Merge pull request #4694 from cheesesashimi/zzlotnik/rebuild-annotation
+  - a68e58b2 2025-05-20T09:26:48-04:00 operator: add admin_ack unit tests
+  - 291018a0 2025-05-16T18:28:28+00:00 msbic: add hot loop detection
+  - ec75d6ed 2025-05-06T15:34:40-04:00 operator: add admin_ack handling
 
-- machine-config-operator embedded-component 07d60583be4d6e29772b8490bb2ba3f410e03af9 to 033e1dc48e10b12b20918e7a7e8a9177a65ae680
-  - e6eacd70 2025-05-14T15:56:48-04:00 Compare the osImageURLs for OS validation check
-  - 02ad0e66 2025-05-14T09:56:01+00:00 parsing error to report full-render reconciliation fails vs partial render fails
+- oc image-amd64 35f7af703663a7459e0bc494e69ed2cc80543d04 to 903a973ce8f8b4509b5158b95bcebe9209e29761
+  - bb32fd31 2025-05-15T07:38:25+00:00 Adding sos.conf file for default sos config into the tools image
 
-- kubernetes image-amd64 d060f964d37d5ac94a75897551526703286b7ca1 to 6342c7704072023fd9968c25a43c6938c80f994c
-  - 9b830ef6c 2025-05-14T13:59:51+00:00 UPSTREAM: 131236: RWX tests should create RWX volumes
-
-- kubernetes image-arm64 d060f964d37d5ac94a75897551526703286b7ca1 to 6342c7704072023fd9968c25a43c6938c80f994c
-  - 9b830ef6c 2025-05-14T13:59:51+00:00 UPSTREAM: 131236: RWX tests should create RWX volumes
+- oc image-arm64 35f7af703663a7459e0bc494e69ed2cc80543d04 to 903a973ce8f8b4509b5158b95bcebe9209e29761
+  - bb32fd31 2025-05-15T07:38:25+00:00 Adding sos.conf file for default sos config into the tools image
 
