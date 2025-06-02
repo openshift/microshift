@@ -1,5 +1,14 @@
 
 images:
+  - name: vllm-cpu-image
+    newName: quay.io/modh/vllm
+    digest: sha256:9e5f8f4394f599befb9e7f703e30581c4d7f062b8d4974992d6222837977ca5e
+  - name: vllm-gaudi-image
+    newName: quay.io/modh/vllm
+    digest: sha256:e7cba648377c6fa29fab30481f97d96ccca76498aaf8bcf5162c74dfa4e0100c
+  - name: vllm-rocm-image
+    newName: quay.io/modh/vllm
+    digest: sha256:de5d71c4fb6add81a01171bbabcd2e65fc2d75f0d6e57ca9ebcad9b4084db420
   - name: caikit-tgis-image
     newName: quay.io/modh/caikit-tgis-serving
     digest: sha256:1d8a9fdd510020ed43ab19f333763257ca8bb1be9dcb330469baa7b110d8a6c8
@@ -18,12 +27,3 @@ images:
   - name: ray-tls-generator-image
     newName: registry.redhat.io/ubi9/ubi-minimal:latest
     digest: registry.redhat.io/ubi9/ubi-minimal:latest
-  - name: vllm-cpu-image
-    newName: quay.io/modh/vllm
-    digest: sha256:9e5f8f4394f599befb9e7f703e30581c4d7f062b8d4974992d6222837977ca5e
-  - name: vllm-gaudi-image
-    newName: quay.io/modh/vllm
-    digest: sha256:e7cba648377c6fa29fab30481f97d96ccca76498aaf8bcf5162c74dfa4e0100c
-  - name: vllm-rocm-image
-    newName: quay.io/modh/vllm
-    digest: sha256:de5d71c4fb6add81a01171bbabcd2e65fc2d75f0d6e57ca9ebcad9b4084db420

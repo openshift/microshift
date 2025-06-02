@@ -1,39 +1,35 @@
-kind: KubeletConfiguration
-apiVersion: kubelet.config.k8s.io/v1beta1
-authentication:
-  anonymous:
-    enabled: false
-  x509:
-    clientCAFile: "{{ .clientCAFile }}"
-cgroupDriver: systemd
-cgroupsPerQOS: true
-clusterDNS:
-  - "{{ .clusterDNSIP }}"
-clusterDomain: cluster.local
-containerLogMaxSize: 50Mi
-containerRuntimeEndpoint: unix:///var/run/crio/crio.sock
-enforceNodeAllocatable: []
-failSwapOn: false
-featureGates:
-  APIPriorityAndFairness: true
-  DownwardAPIHugePages: true
-  PodSecurity: true
-  RotateKubeletServerCertificate: false # TODO
-kubeAPIBurst: 100
-kubeAPIQPS: 50
-maxPods: 250
-nodeStatusReportFrequency: 5m
-rotateCertificates: false # TODO
-serializeImagePulls: false
-serverTLSBootstrap: false # TODO
-tlsCertFile: "{{ .tlsCertFile }}"
-tlsCipherSuites: [{{ .tlsCipherSuites }}]
-tlsMinVersion: "{{ .tlsMinVersion }}"
-tlsPrivateKeyFile: "{{ .tlsPrivateKeyFile }}"
-volumePluginDir: "{{ .volumePluginDir }}"
-{{- if .resolvConf }}
-resolvConf: "{{ .resolvConf }}"
-{{- end }}
-{{ if .userProvidedConfig }}
-{{- .userProvidedConfig -}}
-{{ end }}
+mode: 0644
+path: "/etc/kubernetes/kubelet.conf"
+contents:
+  inline: |
+    kind: KubeletConfiguration
+    apiVersion: kubelet.config.k8s.io/v1beta1
+    authentication:
+      x509:
+        clientCAFile: /etc/kubernetes/kubelet-ca.crt
+      anonymous:
+        enabled: false
+    cgroupDriver: systemd
+    cgroupRoot: /
+    clusterDNS:
+      - {{.ClusterDNSIP}}
+    clusterDomain: cluster.local
+    containerLogMaxSize: 50Mi
+    enableSystemLogQuery: true
+    maxPods: 250
+    kubeAPIQPS: 50
+    kubeAPIBurst: 100
+    podPidsLimit: 4096
+    protectKernelDefaults: true
+    rotateCertificates: true
+    serializeImagePulls: false
+    staticPodPath: /etc/kubernetes/manifests
+    systemCgroups: /system.slice
+    nodeStatusUpdateFrequency: 10s
+    nodeStatusReportFrequency: 5m
+    serverTLSBootstrap: true
+    tlsMinVersion: {{.TLSMinVersion}}
+    tlsCipherSuites:
+      {{- range .TLSCipherSuites }}
+        - {{ . }}
+      {{- end }}

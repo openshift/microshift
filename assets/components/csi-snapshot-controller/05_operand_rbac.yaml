@@ -48,6 +48,7 @@ rules:
   - apiGroups: ["groupsnapshot.storage.k8s.io"]
     resources: ["volumegroupsnapshots/status"]
     verbs: ["update", "patch"]
+
 ---
 kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
@@ -62,16 +63,17 @@ metadata:
 subjects:
   - kind: ServiceAccount
     name: csi-snapshot-controller
-    namespace: kube-system
+    namespace: openshift-cluster-storage-operator
 roleRef:
   kind: ClusterRole
   name: openshift-csi-snapshot-controller-runner
   apiGroup: rbac.authorization.k8s.io
+
 ---
 kind: Role
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  namespace: kube-system
+  namespace: openshift-cluster-storage-operator
   name: csi-snapshot-controller-leaderelection
   annotations:
     include.release.openshift.io/hypershift: "true"
@@ -80,15 +82,16 @@ metadata:
     include.release.openshift.io/single-node-developer: "true"
     capability.openshift.io/name: CSISnapshot
 rules:
-  - apiGroups: ["coordination.k8s.io"]
-    resources: ["leases"]
-    verbs: ["get", "watch", "list", "delete", "update", "create"]
+- apiGroups: ["coordination.k8s.io"]
+  resources: ["leases"]
+  verbs: ["get", "watch", "list", "delete", "update", "create"]
+
 ---
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: csi-snapshot-controller-leaderelection
-  namespace: kube-system
+  namespace: openshift-cluster-storage-operator
   annotations:
     include.release.openshift.io/hypershift: "true"
     include.release.openshift.io/ibm-cloud-managed: "true"
@@ -98,7 +101,7 @@ metadata:
 subjects:
   - kind: ServiceAccount
     name: csi-snapshot-controller
-    namespace: kube-system
+    namespace: openshift-cluster-storage-operator
 roleRef:
   kind: Role
   name: csi-snapshot-controller-leaderelection

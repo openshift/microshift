@@ -14,21 +14,21 @@ admission:
         kind: PodSecurityConfiguration
         apiVersion: pod-security.admission.config.k8s.io/v1
         defaults:
-          enforce: "restricted"
-          enforce-version: "latest"
-          audit: "restricted"
-          audit-version: "latest"
-          warn: "restricted"
-          warn-version: "latest"
+          enforce: "invalid-to-force-substitution"
+          enforce-version: "invalid-to-force-substitution"
+          audit: "invalid-to-force-substitution"
+          audit-version: "invalid-to-force-substitution"
+          warn: "invalid-to-force-substitution"
+          warn-version: "invalid-to-force-substitution"
         exemptions:
           usernames:
-            # The build controller creates pods that are likely to be privileged
-            # based on BuildConfig objects. Access to these build pods is however
-            # still limited by the SCC exec admission and so we can safely add the
-            # build-controller SA here.
-            # This configuration should never be exposed to cluster users as no
-            # such guarantees are made for any other OpenShift SA/user.
-            - system:serviceaccount:openshift-infra:build-controller
+          # The build controller creates pods that are likely to be privileged
+          # based on BuildConfig objects. Access to these build pods is however
+          # still limited by the SCC exec admission and so we can safely add the
+          # build-controller SA here.
+          # This configuration should never be exposed to cluster users as no
+          # such guarantees are made for any other OpenShift SA/user.
+          - system:serviceaccount:openshift-infra:build-controller
 apiServerArguments:
   allow-privileged:
     - "true"
@@ -117,7 +117,7 @@ apiServerArguments:
   goaway-chance:
     - "0"
   http2-max-streams-per-connection:
-    - "2000" # recommended is 1000, but we need to mitigate https://github.com/kubernetes/kubernetes/issues/74412
+    - "2000"  # recommended is 1000, but we need to mitigate https://github.com/kubernetes/kubernetes/issues/74412
   kubelet-certificate-authority:
     - /etc/kubernetes/static-pod-resources/configmaps/kubelet-serving-ca/ca-bundle.crt
   kubelet-client-certificate:
@@ -162,7 +162,7 @@ apiServerArguments:
   shutdown-delay-duration:
     - 70s # give SDN some time to converge: 30s for iptable lock contention, 25s for the second try and some seconds for AWS to update ELBs
   shutdown-send-retry-after:
-    - "true"
+  - "true"
   storage-backend:
     - etcd3
   storage-media-type:
@@ -176,11 +176,6 @@ apiServerArguments:
   # See issue: golang.org/issue/26162
   strict-transport-security-directives:
     - max-age=31536000,includeSubDomains,preload
-  authorization-mode:
-    - Scope
-    - SystemMasters
-    - RBAC
-    - Node
 authConfig:
   oauthMetadataFile: ""
 consolePublicURL: ""

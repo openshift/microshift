@@ -1,154 +1,35 @@
 # Deployment with default values
+# Ingress Controller specific values are applied at runtime.
 kind: Deployment
 apiVersion: apps/v1
+# name and namespace are set at runtime.
 spec:
   progressDeadlineSeconds: 600
   template:
     metadata:
       annotations:
         target.workload.openshift.io/management: '{"effect": "PreferredDuringScheduling"}'
-        openshift.io/required-scc: restricted
-      labels:
-        ingresscontroller.operator.openshift.io/deployment-ingresscontroller: default
     spec:
       serviceAccountName: router
+      # nodeSelector is set at runtime.
       priorityClassName: system-cluster-critical
       containers:
         - name: router
+          # image is set at runtime.
           imagePullPolicy: IfNotPresent
           securityContext:
             # See https://bugzilla.redhat.com/2007246
             allowPrivilegeEscalation: true
             readOnlyRootFilesystem: false
           terminationMessagePolicy: FallbackToLogsOnError
+          # Merged at runtime.
           env:
-            - name: ROUTER_SERVICE_NAMESPACE
-              value: openshift-ingress
-            - name: DEFAULT_CERTIFICATE_DIR
-              value: /etc/pki/tls/private
-            - name: DEFAULT_DESTINATION_CA_PATH
-              value: /var/run/configmaps/service-ca/service-ca.crt
-            - name: STATS_PORT
-              value: "1936"
-            - name: RELOAD_INTERVAL
-              value: 5s
-            - name: ROUTER_ALLOW_WILDCARD_ROUTES
-              value: '{{ .RouterAllowWildcardRoutes }}'
-            - name: ROUTER_CANONICAL_HOSTNAME
-              value: router-default.apps.{{ .BaseDomain }}
-            - name: ROUTER_CIPHERS
-              value: '{{ .RouterCiphers }}'
-            - name: ROUTER_CIPHERSUITES
-              value: '{{ .RouterCiphersSuites }}'
-            - name: ROUTER_DISABLE_HTTP2
-              value: '{{ .RouterDisableHttp2 }}'
-            - name: ROUTER_DISABLE_NAMESPACE_OWNERSHIP_CHECK
-              value: '{{.RouterNamespaceOwnership}}'
-            - name: ROUTER_LOAD_BALANCE_ALGORITHM
-              value: random
-            - name: ROUTER_METRICS_TYPE
-              value: haproxy
-            - name: ROUTER_SERVICE_NAME
-              value: default
-            - name: ROUTER_SET_FORWARDED_HEADERS
-              value: '{{ .ForwardedHeaderPolicy }}'
-            - name: ROUTER_TCP_BALANCE_SCHEME
-              value: source
-            - name: ROUTER_THREADS
-              value: '{{ .ThreadCount }}'
-            - name: SSL_MIN_VERSION
-              value: '{{ .RouterSSLMinVersion }}'
-            - name: ROUTER_USE_PROXY_PROTOCOL
-              value: "false"
-            - name: GRACEFUL_SHUTDOWN_DELAY
-              value: 1s
-            - name: ROUTER_DOMAIN
-              value: apps.{{ .BaseDomain }}
-            - name: ROUTER_IP_V4_V6_MODE
-              value: '{{ .RouterMode }}'
-            - name: ROUTER_BUF_SIZE
-              value: '{{ .RouterBufSize }}'
-            - name: ROUTER_MAX_REWRITE_SIZE
-              value: '{{ .HeaderBufferMaxRewriteBytes }}'
-            - name: ROUTER_BACKEND_CHECK_INTERVAL
-              value: '{{ .HealthCheckInterval }}'
-            - name: ROUTER_DEFAULT_CLIENT_TIMEOUT
-              value: '{{ .ClientTimeout }}'
-            - name: ROUTER_CLIENT_FIN_TIMEOUT
-              value: '{{ .ClientFinTimeout }}'
-            - name: ROUTER_DEFAULT_SERVER_TIMEOUT
-              value: '{{ .ServerTimeout }}'
-            - name: ROUTER_DEFAULT_SERVER_FIN_TIMEOUT
-              value: '{{ .ServerFinTimeout }}'
-            - name: ROUTER_DEFAULT_TUNNEL_TIMEOUT
-              value: '{{ .TunnelTimeout }}'
-            - name: ROUTER_INSPECT_DELAY
-              value: '{{ .TlsInspectDelay }}'
-            - name: ROUTER_MAX_CONNECTIONS
-              value: '{{ .MaxConnections }}'
-            - name: ROUTER_DONT_LOG_NULL
-              value: '{{ .LogEmptyRequests }}'
-            - name: ROUTER_HTTP_IGNORE_PROBES
-              value: '{{ .HTTPEmptyRequestsPolicy }}'
-            - name: ROUTER_ENABLE_COMPRESSION
-              value: '{{ .RouterEnableCompression }}'
-            - name: ROUTER_COMPRESSION_MIME
-              value: '{{ .RouterCompressionMime }}'
-            {{- if .ClientAuthCAPath }}
-            - name: ROUTER_MUTUAL_TLS_AUTH
-              value: '{{ .ClientAuthPolicy }}'
-            - name: ROUTER_MUTUAL_TLS_AUTH_CA
-              value: '{{ .ClientAuthCAPath }}'
-            - name: ROUTER_MUTUAL_TLS_AUTH_FILTER
-              value: '{{ .ClientAuthFilter }}'
-            {{- end }}
-            {{- if .AccessLoggingEnabled }}
-            - name: ROUTER_SYSLOG_ADDRESS
-            {{- if .AccessLoggingSyslogAddress }}
-              value: '{{ .AccessLoggingSyslogAddress }}'
-            {{- else }}
-              value: /var/lib/rsyslog/rsyslog.sock
-            {{- /* AccessLoggingSyslogAddress*/}}
-            {{- end }}
-            - name: ROUTER_LOG_LEVEL
-              value: info
-            {{- if .AccessLoggingMaxLength}}
-            - name: ROUTER_LOG_MAX_LENGTH
-              value: '{{ .AccessLoggingMaxLength }}'
-            {{- /* AccessLoggingMaxLength */}}
-            {{- end }}
-            {{- if .AccessLoggingSyslogFacility }}
-            - name: ROUTER_LOG_FACILITY
-              value: {{ .AccessLoggingSyslogFacility }}
-            {{- end }}
-            {{- if .HttpLogFormat }}
-            - name: ROUTER_SYSLOG_FORMAT
-              value: '"{{ .HttpLogFormat }}"'
-            {{- /* HttpLogFormat */}}
-            {{- end }}
-            {{- if .HttpCaptureHeadersRequest }}
-            - name: ROUTER_CAPTURE_HTTP_REQUEST_HEADERS
-              value: '{{ .HttpCaptureHeadersRequest }}'
-            {{- /* HttpCaptureHeadersRequest */}}
-            {{- end }}
-            {{- if .HttpCaptureHeadersResponse }}
-            - name: ROUTER_CAPTURE_HTTP_RESPONSE_HEADERS
-              value: '{{ .HttpCaptureHeadersResponse }}'
-            {{- /* HttpCaptureHeadersResponse */}}
-            {{- end }}
-            {{- if .HttpCaptureCookies }}
-            - name: ROUTER_CAPTURE_HTTP_COOKIE
-              value: '{{ .HttpCaptureCookies }}'
-            {{- /* HttpCaptureCookies */}}
-            {{- end }}
-            {{- /* AccessLoggingEnabled */}}
-            {{- end }}
-            {{- if .HttpErrorCodePages }}
-            - name: ROUTER_ERRORFILE_503
-              value: /var/lib/haproxy/errorfiles/error-page-503.http
-            - name: ROUTER_ERRORFILE_404
-              value: /var/lib/haproxy/errorfiles/error-page-404.http
-            {{- end }}
+          - name: ROUTER_SERVICE_NAMESPACE
+            value: openshift-ingress
+          - name: DEFAULT_CERTIFICATE_DIR
+            value: /etc/pki/tls/private
+          - name: DEFAULT_DESTINATION_CA_PATH
+            value: /var/run/configmaps/service-ca/service-ca.crt
           livenessProbe:
             failureThreshold: 3
             httpGet:
@@ -182,124 +63,30 @@ spec:
               cpu: 100m
               memory: 256Mi
           volumeMounts:
-            - mountPath: /etc/pki/tls/private
-              name: default-certificate
-              readOnly: true
-            - mountPath: /var/run/configmaps/service-ca
-              name: service-ca-bundle
-              readOnly: true
-            {{- if .ClientCAMapName }}
-            - mountPath: '{{ .ClientCAMountPath }}'
-              name: '{{ .ClientCAMapName}}'
-              readOnly: true
-            {{- end }}
-            {{- if .HttpErrorCodePages }}
-            - mountPath: /var/lib/haproxy/errorfiles
-              name: error-code-pages
-              readOnly: true
-            {{- end }}
-            {{- if and .AccessLoggingEnabled (not .AccessLoggingSyslogAddress) }}
-            - mountPath: /var/lib/rsyslog
-              name: rsyslog-socket
-              readOnly: false
-            {{- end }}
-          image: '{{ .ReleaseImage.haproxy_router }}'
-          ports:
-            - name: http
-              containerPort: 80
-              protocol: TCP
-            - name: https
-              containerPort: 443
-              protocol: TCP
-            - name: metrics
-              containerPort: 1936
-              protocol: TCP
-          args:
-            - -v=4
-        {{- if and .AccessLoggingEnabled (not .AccessLoggingSyslogAddress) }}
-        - name: access-logs
-          imagePullPolicy: IfNotPresent
-          terminationMessagePolicy: FallbackToLogsOnError
-          image: '{{ .ReleaseImage.haproxy_router }}'
-          imagePullPolicy: IfNotPresent
-          command:
-            - /sbin/rsyslogd
-            - -n
-            - -i
-            - /tmp/rsyslogd.pid
-            - -f
-            - /etc/rsyslog/rsyslog.conf
-          resources:
-            requests:
-              cpu: 50m
-              memory: 128Mi
-          volumeMounts:
-            - mountPath: /var/lib/rsyslog
-              name: rsyslog-socket
-            - mountPath: /etc/rsyslog
-              name: rsyslog-config
-        {{- end}}
-      tolerations:
-        # Ensure the pod isn't deleted during serial NoExecuteTaintManager tests.
-        # Remember that NoExecute uses Delete, not Evict, because removing the pod
-        # is non-optional.  This means that PDBs are not honored.
-        - key: "kubernetes.io/e2e-evict-taint-key"
-          operator: "Equal"
-          value: "evictTaintVal"
-          effect: "NoExecute"
-      volumes:
-        - name: default-certificate
-          secret:
-            defaultMode: 420
-            secretName: '{{ .ServingCertificateSecret }}'
-        - name: service-ca-bundle
-          configMap:
-            defaultMode: 420
-            items:
-              - key: service-ca.crt
-                path: service-ca.crt
+          - mountPath: /etc/pki/tls/private
+            name: default-certificate
+            readOnly: true
+          - mountPath: /var/run/configmaps/service-ca
             name: service-ca-bundle
-            optional: false
-        {{- if .ClientCAMapName }}
-        - name: '{{ .ClientCAMapName }}'
-          configMap:
-            defaultMode: 420
-            items:
-            - key: '{{ .ClientCABundleFilename }}'
-              path: '{{ .ClientCABundleFilename }}'
-            name: '{{ .ClientCAMapName }}'
-            optional: false
-        {{- end }}
-        {{- if .HttpErrorCodePages }}
-        - name: error-code-pages
-          configMap:
-            name: {{ .HttpErrorCodePages }}
-        {{- end }}
-        {{- if and .AccessLoggingEnabled (not .AccessLoggingSyslogAddress) }}
-        - name: rsyslog-socket
-          emptyDir: {}
-        - name: rsyslog-config
-          configMap:
-            name: access-logs-rsyslog-config
-            optional: false
-        {{- end }}
-      restartPolicy: Always
-      dnsPolicy: ClusterFirst
-      nodeSelector:
-        kubernetes.io/os: linux
-        node-role.kubernetes.io/worker: ""
-      serviceAccount: router
-      securityContext: {}
-      schedulerName: default-scheduler
-  minReadySeconds: 30
-  selector:
-    matchLabels:
-      ingresscontroller.operator.openshift.io/deployment-ingresscontroller: default
-  replicas: 1
-  strategy:
-    type: Recreate
-metadata:
-  name: router-default
-  namespace: openshift-ingress
-  labels:
-    ingresscontroller.operator.openshift.io/owning-ingresscontroller: default
+            readOnly: true
+      tolerations:
+      # Ensure the pod isn't deleted during serial NoExecuteTaintManager tests.
+      # Remember that NoExecute uses Delete, not Evict, because removing the pod
+      # is non-optional.  This means that PDBs are not honored.
+      - key: "kubernetes.io/e2e-evict-taint-key"
+        operator: "Equal"
+        value: "evictTaintVal"
+        effect: "NoExecute"
+      volumes:
+      - name: default-certificate
+        secret:
+          defaultMode: 420
+          # SecretName is set at run-time.
+      - name: service-ca-bundle
+        configMap:
+          defaultMode: 420
+          items:
+          - key: service-ca.crt
+            path: service-ca.crt
+          name: service-ca-bundle
+          optional: false
