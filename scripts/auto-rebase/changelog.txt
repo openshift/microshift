@@ -1,3 +1,0 @@
-- openshift-controller-manager embedded-component ff69ddfb8f9c752f77e96e867f667e5b8c149935 to 72b43bd9225d97ac727a4cba592132b20be7db75
-  - f70e79d 2025-03-28T13:18:18+00:00 look for image pull secrets in correct field
-
