@@ -1,8 +1,8 @@
-robotframework==6.0.2
-robotframework-requests==0.9.4
+robotframework==7.3
+robotframework-requests==0.9.7
 robotframework-scplibrary==1.2.0
 robotframework-sshlibrary==3.8.0
-pyyaml==6.0.1
-robotframework-robocop==3.1.1
-robotframework-tidy==4.3.0
-packaging==23.2
+pyyaml==6.0.2
+robotframework-robocop==6.3.0
+robotframework-tidy==4.17.0
+packaging==25.0
