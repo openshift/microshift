@@ -53,7 +53,7 @@ scenario_run_tests() {
         exit 0
     fi
     run_tests host1 \
-        --variable "EXPECTED_OS_VERSION:9.4" \
+        --variable "EXPECTED_OS_VERSION:9.6" \
         --variable "IMAGE_SIGSTORE_ENABLED:True" \
         suites/standard1/ suites/selinux/validate-selinux-policy.robot
 }

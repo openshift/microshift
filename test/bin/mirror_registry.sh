@@ -271,7 +271,7 @@ EOF
     # Wait until the Quay instance is started
     for i in $(seq 60) ; do
         sleep 1
-        if curl -sI "${quay_url}" 2>/dev/null | grep -Eq "HTTP.*200 OK" ; then
+        if curl -sI --connect-timeout 5 --max-time 5 "${quay_url}" 2>/dev/null | grep -Eq "HTTP.*200 OK" ; then
             i=0
             break
         fi

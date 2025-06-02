@@ -317,8 +317,9 @@ fi
 if ${BUILD_AND_RUN}; then
     sudo systemctl enable --now crio
     if ${PULL_IMAGES}; then
+        # Skip ai-model-serving images because of the size and not all are needed (HW dependent).
         # shellcheck disable=SC2046
-        "${PULL_RETRY}" $(rpm -qa | grep -e  "microshift.*-release-info" | xargs rpm -ql | grep $(uname -m).json | xargs jq -r '.images | values[]')
+        "${PULL_RETRY}" $(rpm -qa | grep -e  "microshift.*-release-info" | grep -v 'ai-model-serving' | xargs rpm -ql | grep $(uname -m).json | xargs jq -r '.images | values[]')
     fi
     if ${START}; then
         sudo systemctl start microshift

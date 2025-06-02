@@ -17,6 +17,7 @@ set -x
     --exclude 1015 \
     --configure 0504:max_len:40 \
     --configure 0505:max_calls:20 \
-    --configure 0508:line_length:200
+    --configure 0508:line_length:200 \
+    --configure 0506:max_lines:1000
 
 "${RF_VENV}/bin/robotidy" --check --diff .

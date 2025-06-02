@@ -510,10 +510,10 @@ def main():
         logging.warning("Rebase script failed - everything will be committed")
         with open('rebase.log', mode='w', encoding='utf-8') as writer:
             output = ("rebase.sh:\n" +
-                      f"{rebase_result.stdout}" +
+                      f"{rebase_result.output}" +
                       "==================================================\n" +
                       "rebase_ai_model_serving.sh:\n" +
-                      f"{ai_rebase_result.stdout}")
+                      f"{ai_rebase_result.output}")
             writer.write(output)
         if git_repo.active_branch.name == base_branch:
             # rebase.sh didn't reach the step that would create a branch
