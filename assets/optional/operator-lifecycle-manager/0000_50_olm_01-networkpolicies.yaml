@@ -1,0 +1,89 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-all-traffic
+  namespace: openshift-operator-lifecycle-manager
+  annotations:
+    include.release.openshift.io/ibm-cloud-managed: "true"
+    include.release.openshift.io/self-managed-high-availability: "true"
+    capability.openshift.io/name: "OperatorLifecycleManager"
+    include.release.openshift.io/hypershift: "true"
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+    - Egress
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: olm-operator
+  namespace: openshift-operator-lifecycle-manager
+  annotations:
+    include.release.openshift.io/ibm-cloud-managed: "true"
+    include.release.openshift.io/self-managed-high-availability: "true"
+    capability.openshift.io/name: "OperatorLifecycleManager"
+    include.release.openshift.io/hypershift: "true"
+spec:
+  podSelector:
+    matchLabels:
+      app: olm-operator
+  ingress:
+    - ports:
+        - port: metrics
+          protocol: TCP
+  egress:
+    - ports:
+        - port: 6443
+          protocol: TCP
+    - ports:
+        - port: dns-tcp
+          protocol: TCP
+        - port: dns
+          protocol: UDP
+      to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: openshift-dns
+  policyTypes:
+    - Ingress
+    - Egress
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: catalog-operator
+  namespace: openshift-operator-lifecycle-manager
+  annotations:
+    include.release.openshift.io/ibm-cloud-managed: "true"
+    include.release.openshift.io/self-managed-high-availability: "true"
+    capability.openshift.io/name: "OperatorLifecycleManager"
+    include.release.openshift.io/hypershift: "true"
+spec:
+  podSelector:
+    matchLabels:
+      app: catalog-operator
+  ingress:
+    - ports:
+        - port: metrics
+          protocol: TCP
+  egress:
+    - ports:
+        - port: 6443
+          protocol: TCP
+    - ports:
+        - port: dns-tcp
+          protocol: TCP
+        - port: dns
+          protocol: UDP
+      to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: openshift-dns
+    - ports: # This is another distinct rule in the egress list
+        - protocol: TCP
+          port: 50051
+  policyTypes:
+    - Ingress
+    - Egress

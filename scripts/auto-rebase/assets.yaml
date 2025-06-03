@@ -230,9 +230,10 @@ assets:
       - file: 0000_50_olm_00-pprof-rbac.yaml
       - file: 0000_50_olm_00-pprof-secret.yaml
       - file: 0000_50_olm_00-subscriptions.crd.yaml
-      - file: 0000_50_olm_01-olm-operator.serviceaccount.yaml
-      - file: 0000_50_olm_02-olmconfig.yaml
-      - file: 0000_50_olm_02-services.yaml
+      - file: 0000_50_olm_01-networkpolicies.yaml
+      - file: 0000_50_olm_02-olm-operator.serviceaccount.yaml
+      - file: 0000_50_olm_03-olmconfig.yaml
+      - file: 0000_50_olm_03-services.yaml
       - file: 0000_50_olm_07-olm-operator.deployment.yaml
       - file: 0000_50_olm_08-catalog-operator.deployment.yaml
       - file: 0000_50_olm_09-aggregated.clusterrole.yaml
