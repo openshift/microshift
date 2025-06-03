@@ -204,9 +204,14 @@ All Pods Should Be Annotated As Management
     [Documentation]    Obtains list of Deployments created by CSV.
     ${pods_raw}=    Oc Get All Pods
     @{pods}=    Split String    ${pods_raw}
+    Set Test Variable    @{NS_TO_SKIP_LIST}    openshift-gateway-api    redhat-ods-applications
     FOR    ${pod}    IN    @{pods}
         ${ns}    ${pod}=    Split String    ${pod}    \@
-        Pod Must Be Annotated    ${ns}    ${pod}
+        IF    "${ns}" not in "@{NS_TO_SKIP_LIST}"
+            Pod Must Be Annotated    ${ns}    ${pod}
+        ELSE
+            Log    ${ns}@${pod} pod annotation check skipped because is not a MicroShift core pod
+        END
     END
 
 Pod Must Be Annotated
