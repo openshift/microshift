@@ -1,9 +1,4 @@
-# Note:
-# This is a workaround for the problem described in https://issues.redhat.com/browse/USHIFT-5584.
-# Revert to the rhel-9.6 base image when it is in GA.
-#
-# FROM registry.stage.redhat.io/rhel9-eus/rhel-9.6-bootc:9.6
-FROM quay.io/centos-bootc/centos-bootc:stream9
+FROM registry.stage.redhat.io/rhel9-eus/rhel-9.6-bootc:9.6
 
 # Build arguments
 ARG USHIFT_RPM_REPO_NAME=microshift-local
