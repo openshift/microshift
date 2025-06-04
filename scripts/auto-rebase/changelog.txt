@@ -1,33 +1,12 @@
-- api embedded-component 3c189e99e0db0277314560deb420e3cb7f8bee5c to 91e6031afd79cbb5c847614adc7469506862652b
-  - 73536409 2025-05-27T21:18:10+00:00 OCPBUGS-52556: Revert v1alpha1 removal
+- api embedded-component 91e6031afd79cbb5c847614adc7469506862652b to 97812373b6b447ff6b55d3e2625b4f62aff1a16f
+  - 78d10f68 2025-05-28T08:55:50+02:00 features: disable psa
 
-- kubernetes embedded-component 375cd1b6bcb524243cee2e80eff593e2131906da to ca10af6ee1940c7017837950c9054b3c6be78ece
-  - 01fefa369 2025-05-21T11:35:15-04:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
-  - 8ed7d1c09 2025-05-21T11:16:21-04:00 UPSTREAM: <drop>: manually resolve conflicts
-  - 9894294ef 2025-05-15T09:05:02+00:00 Release commit for Kubernetes v1.32.5
-  - 7ba97788a 2025-04-29T11:56:47+02:00 Bump images, dependencies and versions
-  - 5ad726c6e 2025-04-29T10:52:03+08:00 Handle unsupported node expansion for RWX volumes
-  - b23e63796 2025-04-27T21:52:32-07:00 Manually adding fix for failing pull-kubernetes-typecheck tests which had dependency with this commit: https://github.com/kubernetes/kubernetes/commit/61863035803cc105619925a0fa23a779a9578bd4
-  - cdbea02d3 2025-04-24T07:52:17-04:00 Mark NodeExpansion finsihed without featuregate check
-  - 69e0af310 2025-04-24T07:52:17-04:00 Also change final status by removing featuregate check
-  - 0bec23c95 2025-04-24T07:52:17-04:00 Check for newer fields when deciding expansion recovery feature status
-  - 76bf5dbdc 2025-04-23T23:08:44-07:00 Fix for HNS local endpoint was being deleted instead of the remote endpoint.
-  - d5df907c3 2025-04-22T16:22:00+00:00 Update CHANGELOG/CHANGELOG-1.32.md for v1.32.4
+- kubernetes embedded-component ca10af6ee1940c7017837950c9054b3c6be78ece to fadb78e720779ed1b29f32170f3e9dd32584a7e6
+  - 2e8b352f5 2025-05-15T08:34:39+00:00 UPSTREAM: 130047: adjusting loopback certificate validity in kube-apiserver
 
-- machine-config-operator embedded-component e0157446e7e86a579dfcb8db21582735ada0c778 to d7190b4e5d8b9d7a4dca27bb9eb1770939185817
-  - d7bd11c7 2025-05-22T22:46:57+00:00 OCPBUGS-56446: daemon: fix ostree-finalize-staged race workaround for package mode RHEL workers
-  - a496801d 2025-05-19T15:12:11+00:00 msbic: remove golden configmap timeout
+- machine-config-operator embedded-component d7190b4e5d8b9d7a4dca27bb9eb1770939185817 to bccdc7e7382c5958f040769d7ff20ab27ece5bdf
+  - 57321a1f 2025-05-29T01:15:58+00:00 msbic: only update boot disks on GCP
 
-- kubernetes image-amd64 375cd1b6bcb524243cee2e80eff593e2131906da to ca10af6ee1940c7017837950c9054b3c6be78ece
-  - 01fefa369 2025-05-21T11:35:15-04:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
-  - 8ed7d1c09 2025-05-21T11:16:21-04:00 UPSTREAM: <drop>: manually resolve conflicts
-  - 9894294ef 2025-05-15T09:05:02+00:00 Release commit for Kubernetes v1.32.5
-  - 7ba97788a 2025-04-29T11:56:47+02:00 Bump images, dependencies and versions
-  - 5ad726c6e 2025-04-29T10:52:03+08:00 Handle unsupported node expansion for RWX volumes
-  - b23e63796 2025-04-27T21:52:32-07:00 Manually adding fix for failing pull-kubernetes-typecheck tests which had dependency with this commit: https://github.com/kubernetes/kubernetes/commit/61863035803cc105619925a0fa23a779a9578bd4
-  - cdbea02d3 2025-04-24T07:52:17-04:00 Mark NodeExpansion finsihed without featuregate check
-  - 69e0af310 2025-04-24T07:52:17-04:00 Also change final status by removing featuregate check
-  - 0bec23c95 2025-04-24T07:52:17-04:00 Check for newer fields when deciding expansion recovery feature status
-  - 76bf5dbdc 2025-04-23T23:08:44-07:00 Fix for HNS local endpoint was being deleted instead of the remote endpoint.
-  - d5df907c3 2025-04-22T16:22:00+00:00 Update CHANGELOG/CHANGELOG-1.32.md for v1.32.4
+- kubernetes image-amd64 ca10af6ee1940c7017837950c9054b3c6be78ece to fadb78e720779ed1b29f32170f3e9dd32584a7e6
+  - 2e8b352f5 2025-05-15T08:34:39+00:00 UPSTREAM: 130047: adjusting loopback certificate validity in kube-apiserver
 
