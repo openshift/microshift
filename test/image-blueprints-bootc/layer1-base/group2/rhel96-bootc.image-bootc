@@ -1,6 +1,1 @@
-# Note:
-# This is a workaround for the problem described in https://issues.redhat.com/browse/USHIFT-5584.
-# Revert to the rhel-9.6 base image when it is in GA.
-#
-# registry.stage.redhat.io/rhel9-eus/rhel-9.6-bootc:9.6
-quay.io/centos-bootc/centos-bootc:stream9
+registry.stage.redhat.io/rhel9-eus/rhel-9.6-bootc:9.6
