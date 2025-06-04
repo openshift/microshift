@@ -1,4 +1,4 @@
-package healthcheck
+package util
 
 import (
 	"errors"

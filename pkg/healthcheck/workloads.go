@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/openshift/microshift/pkg/config"
+	"github.com/openshift/microshift/pkg/util"
 	appsv1 "k8s.io/api/apps/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -34,7 +35,7 @@ func waitForWorkloads(ctx context.Context, timeout time.Duration, workloads map[
 		return fmt.Errorf("failed to create client: %v", err)
 	}
 
-	aeg := &AllErrGroup{}
+	aeg := &util.AllErrGroup{}
 	for ns, wls := range workloads {
 		for _, deploy := range wls.Deployments {
 			aeg.Go(func() error { return waitForDeployment(ctx, client, timeout, ns, deploy) })
