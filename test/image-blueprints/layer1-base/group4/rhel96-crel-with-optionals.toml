@@ -1,0 +1,70 @@
+{{- if env.Getenv "CURRENT_RELEASE_VERSION" "" -}}
+{{- /*
+
+  We wrap this template in a test so that the body of the output is
+  empty when there is no "current" version release. The output file
+  must end up completely empty, so we need to remove whitespace from
+  around the first and last template instructions.
+
+*/ -}}
+
+name = "rhel-9.6-microshift-crel-optionals"
+description = "A RHEL 9.6 image with already built and released RPMs like EC, RC, or Z-stream release"
+version = "0.0.1"
+modules = []
+groups = []
+distro = "rhel-96"
+
+# Parent specification directive recognized by test/bin/build_images.sh to be
+# used with the '--parent' argument of 'osbuild-composer'
+# parent = "rhel-9.4-microshift-4.{{ .Env.PREVIOUS_MINOR_VERSION }}"
+
+[[packages]]
+name = "microshift"
+version = "{{ .Env.CURRENT_RELEASE_VERSION }}"
+
+[[packages]]
+name = "microshift-greenboot"
+version = "{{ .Env.CURRENT_RELEASE_VERSION }}"
+
+[[packages]]
+name = "microshift-networking"
+version = "{{ .Env.CURRENT_RELEASE_VERSION }}"
+
+[[packages]]
+name = "microshift-selinux"
+version = "{{ .Env.CURRENT_RELEASE_VERSION }}"
+
+[[packages]]
+name = "microshift-olm"
+version = "{{ .Env.CURRENT_RELEASE_VERSION }}"
+
+[[packages]]
+name = "microshift-multus"
+version = "{{ .Env.CURRENT_RELEASE_VERSION }}"
+
+[[packages]]
+name = "microshift-test-agent"
+version = "*"
+
+[customizations.services]
+enabled = ["microshift", "microshift-test-agent"]
+
+[customizations.firewall]
+ports = [
+    "22:tcp",
+    "80:tcp",
+    "443:tcp",
+    "5353:udp",
+    "6443:tcp",
+    "30000-32767:tcp",
+    "30000-32767:udp",
+]
+
+[customizations.firewall.services]
+enabled = ["mdns", "ssh", "http", "https"]
+
+[[customizations.firewall.zones]]
+name = "trusted"
+sources = ["10.42.0.0/16", "169.254.169.1", "fd01::/48"]
+{{- end -}}
