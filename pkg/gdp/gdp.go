@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"path"
 	"strings"
-	"sync"
 
 	"github.com/go-kit/kit/log"
 	"github.com/openshift/microshift/pkg/config"
+	"github.com/openshift/microshift/pkg/util"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/squat/generic-device-plugin/deviceplugin"
 	"k8s.io/klog/v2"
@@ -63,22 +63,23 @@ func (gdp *GenericDevicePlugin) Run(ctx context.Context, ready chan<- struct{}, 
 		return fmt.Errorf("at least one device must be specified")
 	}
 
-	// TODO: WaitGroupErr
-	var wg sync.WaitGroup
-
+	aeg := &util.AllErrGroup{}
 	for i := range deviceSpecs {
-
 		gp := deviceplugin.NewGenericPlugin(&deviceSpecs[i], dp.DevicePluginPath, log.NewJSONLogger(&loggerThingy{}), prometheus.NewRegistry(), false)
-		wg.Add(1)
-		go func() {
+		aeg.Go(func() error {
 			if err := gp.Run(ctx); err != nil {
 				klog.Errorf("Generic Plugin for %s failed: %v", deviceSpecs[i].Name, err)
+				return err
 			}
-		}()
+			return nil
+		})
 	}
 
 	close(ready)
-	wg.Wait()
+	errs := aeg.Wait()
+	if errs != nil {
+		return errs
+	}
 
 	return ctx.Err()
 }
