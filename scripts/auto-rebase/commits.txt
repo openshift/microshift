@@ -4,7 +4,7 @@ https://github.com/openshift/cluster-ingress-operator embedded-component 9e0d092
 https://github.com/openshift/cluster-kube-apiserver-operator embedded-component b5b212e5cecf729bb15248d26edbd55dbe7253a9
 https://github.com/openshift/cluster-kube-controller-manager-operator embedded-component ee8cf52558df0862f9927dbc7275fbe6cc1a1e5f
 https://github.com/openshift/cluster-kube-scheduler-operator embedded-component f054dfaf189b43b262c11ef7f97038c79592c796
-https://github.com/openshift/cluster-network-operator embedded-component e88176de7420cb92099445af4a81d7da48558bfd
+https://github.com/openshift/cluster-network-operator embedded-component c383bbdb87fc915487811e96ba6f38fa0ac9f2ca
 https://github.com/openshift/cluster-openshift-controller-manager-operator embedded-component 1ae0ba75cfdb910990437ab2898690b9e3f8f94a
 https://github.com/openshift/cluster-policy-controller embedded-component cc48f3152213bfe6e42fdd82f760246e862d208f
 https://github.com/openshift/csi-external-snapshotter embedded-component 4f2955c7c90cd150f9dfae782148d0fa8eba7342
@@ -12,7 +12,7 @@ https://github.com/openshift/etcd embedded-component a7005ef1eae85eec6c594118605
 https://github.com/openshift/kubernetes embedded-component 1879980f93f6f3b75a96d941eabf2bfe9df3539b
 https://github.com/openshift/kubernetes-kube-storage-version-migrator embedded-component e8749689edb8e7fea42eca5f2b67c3187192cdeb
 https://github.com/openshift/machine-config-operator embedded-component b23bb29eeffa659058ae6a88969cc0e6a97d82f5
-https://github.com/openshift/openshift-controller-manager embedded-component 72b43bd9225d97ac727a4cba592132b20be7db75
+https://github.com/openshift/openshift-controller-manager embedded-component c6c962fe9fb5cdf743f8e7590670a7d12f7c6f76
 https://github.com/openshift/operator-framework-olm embedded-component 7788801d7846a1f898c0e583583a73e937147164
 https://github.com/openshift/route-controller-manager embedded-component c5cc7a73705e4086759e2a36811b055b7716def4
 https://github.com/openshift/service-ca-operator embedded-component 19f312e96bb4e5b7da9f61ea4cab202b227a60c6
