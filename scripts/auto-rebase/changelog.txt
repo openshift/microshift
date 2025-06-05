@@ -1,36 +1,15 @@
-- kubernetes embedded-component 6342c7704072023fd9968c25a43c6938c80f994c to af5c163bbf76325a799e52957d6055230534be4a
-  - 8f04a3196 2025-05-21T14:12:11+02:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
-  - 8f3800390 2025-05-15T09:10:41+00:00 Release commit for Kubernetes v1.31.9
-  - 46a394766 2025-04-29T22:17:24+02:00 Bump images, dependencies and versions
-  - 92e3993bc 2025-04-27T21:54:22-07:00 Manually adding fix for failing pull-kubernetes-typecheck tests which had dependency with this commit: https://github.com/kubernetes/kubernetes/commit/61863035803cc105619925a0fa23a779a9578bd4
-  - e4e7f313f 2025-04-24T12:45:41-04:00 Mark NodeExpansion finsihed without featuregate check
-  - 4370821c8 2025-04-24T12:38:29-04:00 Also change final status by removing featuregate check
-  - 014728e76 2025-04-24T12:38:22-04:00 Check for newer fields when deciding expansion recovery feature status
-  - a1bb711b8 2025-04-23T23:09:23-07:00 Fix for HNS local endpoint was being deleted instead of the remote endpoint.
-  - 772a0f45d 2025-04-22T16:15:33+00:00 Update CHANGELOG/CHANGELOG-1.31.md for v1.31.8
+- kubernetes embedded-component af5c163bbf76325a799e52957d6055230534be4a to 2f599905a700c497fac737c285adf6827fa0acb0
+  - 61e57488f 2025-05-16T14:30:14+00:00 UPSTREAM: 130422: Propagate error when creating CustomResourceStorage instead of panic'ing
 
-- machine-config-operator embedded-component 42bf13fc318f2196428c8f73b8a657c35ea12030 to 231e9dbdde4cf2530fb61fcf2f01249cd879d711
-  - e81bd65a 2025-05-26T17:57:35+00:00 OCPBUGS-56446: daemon: fix ostree-finalize-staged race workaround for package mode RHEL workers
+- machine-config-operator embedded-component 231e9dbdde4cf2530fb61fcf2f01249cd879d711 to 00143af1a51bedf0290496a6a97e47cf60b18693
+  - d40190a9 2025-05-29T15:06:22+00:00 msbic: only update boot disks on GCP
+  - a5d4e8b4 2025-05-28T15:40:30-04:00 msbic: remove golden configmap timeout
+  - 7a3a7d04 2025-05-21T14:25:16-04:00 OCPBUGS-55439: scope MCD node listers to current node
 
-- kubernetes image-amd64 6342c7704072023fd9968c25a43c6938c80f994c to af5c163bbf76325a799e52957d6055230534be4a
-  - 8f04a3196 2025-05-21T14:12:11+02:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
-  - 8f3800390 2025-05-15T09:10:41+00:00 Release commit for Kubernetes v1.31.9
-  - 46a394766 2025-04-29T22:17:24+02:00 Bump images, dependencies and versions
-  - 92e3993bc 2025-04-27T21:54:22-07:00 Manually adding fix for failing pull-kubernetes-typecheck tests which had dependency with this commit: https://github.com/kubernetes/kubernetes/commit/61863035803cc105619925a0fa23a779a9578bd4
-  - e4e7f313f 2025-04-24T12:45:41-04:00 Mark NodeExpansion finsihed without featuregate check
-  - 4370821c8 2025-04-24T12:38:29-04:00 Also change final status by removing featuregate check
-  - 014728e76 2025-04-24T12:38:22-04:00 Check for newer fields when deciding expansion recovery feature status
-  - a1bb711b8 2025-04-23T23:09:23-07:00 Fix for HNS local endpoint was being deleted instead of the remote endpoint.
-  - 772a0f45d 2025-04-22T16:15:33+00:00 Update CHANGELOG/CHANGELOG-1.31.md for v1.31.8
+- kubernetes image-amd64 af5c163bbf76325a799e52957d6055230534be4a to 2f599905a700c497fac737c285adf6827fa0acb0
+  - 61e57488f 2025-05-16T14:30:14+00:00 UPSTREAM: 130422: Propagate error when creating CustomResourceStorage instead of panic'ing
 
-- kubernetes image-arm64 6342c7704072023fd9968c25a43c6938c80f994c to af5c163bbf76325a799e52957d6055230534be4a
-  - 8f04a3196 2025-05-21T14:12:11+02:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
-  - 8f3800390 2025-05-15T09:10:41+00:00 Release commit for Kubernetes v1.31.9
-  - 46a394766 2025-04-29T22:17:24+02:00 Bump images, dependencies and versions
-  - 92e3993bc 2025-04-27T21:54:22-07:00 Manually adding fix for failing pull-kubernetes-typecheck tests which had dependency with this commit: https://github.com/kubernetes/kubernetes/commit/61863035803cc105619925a0fa23a779a9578bd4
-  - e4e7f313f 2025-04-24T12:45:41-04:00 Mark NodeExpansion finsihed without featuregate check
-  - 4370821c8 2025-04-24T12:38:29-04:00 Also change final status by removing featuregate check
-  - 014728e76 2025-04-24T12:38:22-04:00 Check for newer fields when deciding expansion recovery feature status
-  - a1bb711b8 2025-04-23T23:09:23-07:00 Fix for HNS local endpoint was being deleted instead of the remote endpoint.
-  - 772a0f45d 2025-04-22T16:15:33+00:00 Update CHANGELOG/CHANGELOG-1.31.md for v1.31.8
+- kubernetes image-arm64 af5c163bbf76325a799e52957d6055230534be4a to e6e35d04f5019d8b85207d37cfa2efc0db18925a
+  - cae107a00 2025-05-29T08:32:09+00:00 UPSTREAM: 130047: adjusting loopback certificate validity in kube-apiserver
+  - 61e57488f 2025-05-16T14:30:14+00:00 UPSTREAM: 130422: Propagate error when creating CustomResourceStorage instead of panic'ing
 
