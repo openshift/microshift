@@ -5,5 +5,4 @@ resources:
   - 01-service-account.yaml
   - 02-cluster-role.yaml
   - 03-cluster-role-binding.yaml
-  - 04-configmap.yaml
-  - 05-daemonset.yaml
+  - 04-daemonset.yaml
