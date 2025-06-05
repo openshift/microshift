@@ -161,6 +161,11 @@ Router Disabled
 
     Oc Wait    namespace/openshift-ingress    --for=delete --timeout=300s
 
+    [Teardown]    Run Keywords
+    ...    Remove Custom Config
+    ...    Restart MicroShift
+    ...    Wait For Router Ready
+
 Router Exposure Configuration
     [Documentation]    Test custom ports and custom listening addresses.
     [Setup]    Run Keywords
