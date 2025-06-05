@@ -90,7 +90,7 @@ Get Version Of MicroShift RPM
     ${version_string}=    Strip String    ${version_string_raw}
     RETURN    ${version_string}
 
-Verify MicroShift RPM Install    # robocop: disable=too-many-calls-in-keyword
+Verify MicroShift RPM Install
     [Documentation]    Run 'rpm -V' package verification command
     ...    on all the installed MicroShift RPM packages.
     # The ostree-based file system does not preserve modification
