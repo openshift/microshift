@@ -1,3 +1,3 @@
-- machine-config-operator embedded-component 19d2a0275bf5e566dff786fbc88fe97c69d131d9 to 2b6c914936ed01b0a5a5669d1f7dbaa71f1c8b6a
-  - 5aa4a48e 2025-05-22T18:49:44+00:00 parsing error to report full-render reconciliation fails vs partial render fails
+- machine-config-operator embedded-component 2b6c914936ed01b0a5a5669d1f7dbaa71f1c8b6a to 0964bc8a9f1c8e7d5209cfc3eab4aad9c77549c0
+  - 69c0e807 2025-05-29T15:28:22+00:00 OCPBUGS-56446: daemon: fix ostree-finalize-staged race workaround for package mode RHEL workers
 
