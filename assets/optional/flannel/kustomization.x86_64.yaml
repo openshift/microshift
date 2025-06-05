@@ -1,8 +1,0 @@
-
-images:
-  - name: flannel
-    newName: docker.io/flannel/flannel
-    digest: sha256:9e0e9170ed1f82029ccc4cf20fb20f6325456ab7a00f0544dc23275f11f8bb1c
-  - name: flannel-plugin
-    newName: docker.io/flannel/flannel-cni-plugin
-    digest: sha256:6e700d30d2c9316b4f54f9d0b1423a2d15290bf082f5d1fbd87f9f25173a374c

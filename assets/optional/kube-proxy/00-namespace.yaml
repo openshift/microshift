@@ -3,7 +3,7 @@ kind: Namespace
 metadata:
   name: kube-proxy
   labels:
-    name: kube-flannel
+    name: kindnet
     openshift.io/run-level: "0"
     openshift.io/cluster-monitoring: "true"
     pod-security.kubernetes.io/enforce: privileged
