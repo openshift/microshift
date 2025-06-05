@@ -1,4 +1,3 @@
-- cluster-network-operator embedded-component 8ad9fcdadcbc0cae358f7e277349d194b32e8277 to c7f9fb8f2168ce81250bd588624e58bc2f6f36f8
-  - 6facc03 2025-03-20T03:29:25-04:00 Use applyconfigurations for updating network.oprerator status
-  - bc813bb 2025-03-09T23:21:28-04:00 Vendor fake client-go operator client
+- openshift-controller-manager embedded-component 6e86dee5d30921e84f557ca214022e587c824e88 to 22078f7ead4547d4727f57931ba6e271af342b92
+  - 207915f 2025-06-02T05:26:04+00:00 Empty proxy variables are causing issues during the build
 
