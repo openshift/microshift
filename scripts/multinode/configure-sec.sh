@@ -77,17 +77,17 @@ function configure_kubelet() {
 
     # Checksums can be obtained from https://www.downloadkubernetes.com/
     # or by downloading a "${url}.sha256" file (see below for ${url}). For example:
-    # version=1.32.4; for kube_arch in amd64 arm64; do echo "${kube_arch}: $(curl -L https://dl.k8s.io/release/v${version}/bin/linux/${kube_arch}/kubelet.sha256 2>/dev/null)"; done
-    local -r version="1.32.4"
+    # version=1.32.5; for kube_arch in amd64 arm64; do echo "${kube_arch}: $(curl -L https://dl.k8s.io/release/v${version}/bin/linux/${kube_arch}/kubelet.sha256 2>/dev/null)"; done
+    local -r version="1.32.5"
     local kube_arch="amd64"
-    local kube_hash="3e0c265fe80f3ea1b7271a00879d4dbd5e6ea1e91ecf067670c983e07c33a6f4"
+    local kube_hash="2b2988edd1646bf139dee6956d4283c520ff151a36febd10701ffda4852b8250"
 
     case $(uname -m) in
         x86_64)
             ;;
         aarch64)
             kube_arch="arm64"
-            kube_hash="91117b71eb2bb3dd79ec3ed444e058a347349108bf661838f53ee30d2a0ff168"
+            kube_hash="034753a2e308afeb4ce3cf332d38346c6e660252eac93b268fac0e112a56ff46"
             ;;
         *)
             echo "Unsupported kubelet architecture $(uname -m)"
