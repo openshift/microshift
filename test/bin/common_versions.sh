@@ -82,7 +82,7 @@ export YMINUS2_RELEASE_VERSION
 # If the release version is defined, the repository should be deduced from the
 # CURRENT_RELEASE_REPO setting.
 RHOCP_MINOR_Y=""
-RHOCP_MINOR_Y_BETA="https://mirror.openshift.com/pub/openshift-v4/$(uname -m)/dependencies/rpms/4.19-el9-beta/"
+RHOCP_MINOR_Y_BETA="https://mirror.openshift.com/pub/openshift-v4/$(uname -m)/dependencies/rpms/4.20-el9-beta/"
 export RHOCP_MINOR_Y
 export RHOCP_MINOR_Y_BETA
 
