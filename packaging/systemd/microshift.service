@@ -14,6 +14,7 @@ Before=kubepods.slice
 WorkingDirectory=/usr/bin/
 ExecStart=microshift run
 Restart=always
+RestartSec=10s
 User=root
 Type=notify
 Delegate=yes

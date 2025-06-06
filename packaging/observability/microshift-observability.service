@@ -10,6 +10,7 @@ Environment=K8S_NODE_NAME="%l"
 ExecStartPre=/usr/bin/mkdir -p /var/lib/microshift-observability
 ExecStart=/usr/bin/opentelemetry-collector --config=/etc/microshift/observability/opentelemetry-collector.yaml
 Restart=always
+RestartSec=10s
 User=root
 
 [Install]
