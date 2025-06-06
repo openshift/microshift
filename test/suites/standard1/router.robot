@@ -229,8 +229,17 @@ Wait For Router Ready
     [Documentation]    Wait for the default router to be ready.
     # Wait for the namespace to be ready, as sometimes apiserver may signal readiness before all
     # the manifests have been applied.
-    Oc Wait    namespace/openshift-ingress    --for jsonpath='{.status.phase}=Active' --timeout=5m
-    Named Deployment Should Be Available    router-default    openshift-ingress    5m
+
+    ${fail}=    Set Variable    ${FALSE}
+    TRY
+        Oc Wait    namespace/openshift-ingress    --for jsonpath='{.status.phase}=Active' --timeout=5m
+        Named Deployment Should Be Available    router-default    openshift-ingress    5m
+    EXCEPT
+        ${fail}=    Set Variable    ${TRUE}
+    END
+
+    Oc Logs    deployment/router-default    openshift-ingress
+    IF    ${fail}    Fail    router did not become ready
 
 Setup With Custom Config
     [Documentation]    Install a custom config and restart MicroShift.
