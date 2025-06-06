@@ -1,70 +1,11 @@
-- api embedded-component a463917701ab4506585893739e576ffd1e6b924e to 91245a26b8a831607d981b2a478644d08da6fa1c
-  - c89f0145 2025-05-30T14:00:19+02:00 feat(insights): run generate
-  - de800694 2025-05-30T14:00:03+02:00 fix(insights): remove state print column
-  - 5542026a 2025-05-29T15:04:14-04:00 OCPBUGS-44462: Remove PlatformOperators from feature list
-  - b306abdd 2025-05-29T09:51:50+02:00 Add PreconfiguredUDNAddresses featuregate
+- oc image-arm64 49459b55564a51d3edf64da16d836bd25e0f9917 to 5583faabda15e48cacb2bd1a3ddc6418fd6db675
+  - 59f624ee 2025-06-04T13:06:36-07:00 pkg/cli/admin/upgrade/recommend: Add a --quiet option
+  - 2d7e0042 2025-06-03T10:48:29-07:00 pkg/cli/admin/upgrade/recommend: New, feature-gated --accept [1] is suggesting ClusterVersion API changes to make it easier for cluster administrators to manage many clusters and updates vs. a more limited set of update issues.  One example scenario:
 
-- cluster-ingress-operator embedded-component f0e62c32a097aee705de4ea7d1c4c86b4cf05125 to 21ac32d9862437b5c563540edd721c9cae5f1e8c
-  - 6f42089 2025-05-14T15:28:05-04:00 status: Conditionally add CRDs to relatedObjects
-  - 751bb76 2025-05-14T14:57:41-04:00 getOperatorState: Add context parameter
-  - fb548fc 2025-05-14T14:55:33-04:00 status: Omit gateways namespace in relatedObjects
-  - 1d335e7 2025-05-14T14:55:33-04:00 status: Omit istios namespace in relatedObjects
+- coredns image-arm64 7a1451db77a68161d58af9b6ca2c9388d578310a to a69279e3393b269099dcaae967570741d4c5e469
+  - b184ecd 2025-06-04T15:55:42-04:00 append .0 to go.mod version
 
-- kubernetes embedded-component 4cd5657aac983145c4aa7dff3afc07b026cec014 to 886f7c90e4bd137f91ebfb7d0cb55d476e719643
-  - 8588c3145 2025-05-30T09:12:19-04:00 UPSTREAM: <carry>: Revert "remove annotation rules that don't relate to suites"
-  - 8ef4216b3 2025-05-22T10:30:56-04:00 UPSTREAM: <carry>: remove annotation rules that don't relate to suites
-
-- machine-config-operator embedded-component c38828567a5d3e69efc6ab438313dd111d705023 to af994c8fc8299d78780e90eaba09b20a2ce08983
-  - da51c520 2025-05-31T01:50:35-04:00 Adding updated file with correct error message
-  - 838f31d8 2025-05-28T14:45:34-04:00 msbic: only update boot disks on GCP
-
-- operator-framework-olm embedded-component 082d59a819afc43b24e9ca23c531bdfc35418722 to ebcdb8fb1eb274adbd248fc1f47d56b859c9fe8d
-  - 0ecac248 2025-05-28T00:06:51+00:00 Bump sigs.k8s.io/kind from 0.27.0 to 0.28.0 (#1676)
-  - 2751d195 2025-05-28T00:05:50+00:00 Add NetworkPolicy as a supported kind (#1675)
-  - 31caf740 2025-05-28T00:05:32+00:00 Bump google.golang.org/grpc from 1.72.0 to 1.72.1 (#1670)
-  - 3767cbee 2025-05-28T00:05:16+00:00 OWNER: Add camilamacedo86 and tmshort as approvers (#1669)
-  - 223e5b6e 2025-05-28T00:05:02+00:00 (cleanup): Update Owner Alias - remove inactive maintainers (#1658)
-  - 91f71a9e 2025-05-28T00:04:47+00:00 Bump oras.land/oras-go/v2 from 2.5.0 to 2.6.0 (#1668)
-  - daea7147 2025-05-28T00:04:31+00:00 (ci) - Add stale config to close PRs and issues which are inactivity (#3588)
-  - 563b3f04 2025-05-28T00:04:11+00:00 make cache flags optional for extractContent functionality (#3586)
-  - 959d7756 2025-05-28T00:03:54+00:00 remove superfluous comment from template (#3585)
-  - d0e25087 2025-05-28T00:03:36+00:00 :seedling: Bump github.com/prometheus/common from 0.63.0 to 0.64.0 (#3583)
-  - 29df82b9 2025-05-28T00:03:05+00:00 Bump operator-registry to v1.55.0 (#3584)
-
-- oc image-amd64 46e27e8dc813467425b837bcb9c29cf8fbfd289c to 49459b55564a51d3edf64da16d836bd25e0f9917
-  - fa28686f 2025-05-29T08:43:23-04:00 avoid transfering permissions when copying artifacts from node-joiner pod
-
-- ovn-kubernetes image-amd64 5ae13ef264911a033bbcc9dff5801d75f31cd7a4 to 80ebd7a2be100ceaec14eb3375efb0eb0083b318
-  - 192f575d 2025-05-27T20:31:35+02:00 Fix hybrid overlay node subnets collision with cluster subnets
-  - 682b6030 2025-05-26T17:04:53+00:00 Fix several reasons for flakes in external gateway e2e tests
-  - e1af9e9d 2025-05-26T17:04:53+00:00 Fix panic/race around openflowmanager
-  - 7e0aa608 2025-05-26T17:04:53+00:00 Fix missing mutex lock for updateBridgePMTUDFlowCache
-  - c57e83c9 2025-05-26T17:50:39+02:00 Increase InformerSyncTimeout to 60s
-  - 128cd690 2025-05-22T20:46:06+00:00 network-qos: Expand Network QoS to fully support UDN
-  - 008d105f 2025-05-22T09:16:09-04:00 Trivial perf improvement for checking joinSubnetChanged
-  - af95f53e 2025-05-21T18:07:09+02:00 Fix wrong RA status when giving up retries
-  - b7c353c4 2025-05-21T16:11:51+01:00 Node port watcher sync: ignore ns with no valid network
-  - 712d2812 2025-05-21T16:05:26+01:00 Updates job: add back old IP version env vars in-order for job to succeed
-  - 4650923b 2025-05-20T15:20:12-04:00 Do not retry pods that are not scheduled
-  - aab7ded5 2025-05-17T09:32:15+01:00 E2E: fix static pod func
-  - 05ea4a8a 2025-05-17T09:32:15+01:00 E2E: rename network 'kindexgw' to 'xgw'
-  - 1b76d914 2025-05-17T09:32:14+01:00 E2E: only isolate v6 networks if provider is KinD
-  - 0fd0cc24 2025-05-17T09:32:14+01:00 E2E: add some checks for errors or expected IPs
-  - e32620a7 2025-05-17T09:32:14+01:00 E2E: renaming and using existing tools instead of custom code
-  - 3f446a15 2025-05-17T09:32:14+01:00 E2E: block esvc test until EIP is assigned to aid debug
-  - f1384dc0 2025-05-17T09:32:14+01:00 E2E: remove all static Node selectors
-  - f0b8b76a 2025-05-17T09:32:14+01:00 E2E: refactor e2es to use infra provider API
-  - 201118c3 2025-05-17T09:32:14+01:00 E2E: refactor e2es to implement deployment config API
-  - a403e00c 2025-05-17T09:32:14+01:00 E2E: override docker protection rules for esvc test
-  - 57e92b82 2025-05-17T09:32:14+01:00 E2E: use IP allocator to allocate new Node IPs for EIP
-  - 6e16cd7d 2025-05-17T09:32:14+01:00 E2E: add IP allocation framework
-  - fac499de 2025-05-17T09:32:14+01:00 E2E: centralise images
-  - 7d1d5b19 2025-05-17T09:32:14+01:00 E2E: Rename IPv4 IPv6 support env vars in-order to be platform agnostic
-  - cf36b663 2025-05-17T09:32:14+01:00 E2E: remove exposing runCommand
-  - 9e9c0f52 2025-05-17T09:32:14+01:00 E2E add infra provider, deployment config and container engine api
-  - 4027314c 2025-05-17T05:14:44+01:00 NFT: Do not error when desire no elems and set/map doesnt exist
-
-- kubernetes image-amd64 4cd5657aac983145c4aa7dff3afc07b026cec014 to 886f7c90e4bd137f91ebfb7d0cb55d476e719643
-  - 8588c3145 2025-05-30T09:12:19-04:00 UPSTREAM: <carry>: Revert "remove annotation rules that don't relate to suites"
-  - 8ef4216b3 2025-05-22T10:30:56-04:00 UPSTREAM: <carry>: remove annotation rules that don't relate to suites
+- kubernetes image-arm64 886f7c90e4bd137f91ebfb7d0cb55d476e719643 to e541011ee9752101e2e11bf455ade08da6d1e6fd
+  - 63c212134 2025-06-03T14:50:41-04:00 UPSTREAM: 132035: e2e: fix userns test
+  - aab1bb062 2025-05-29T14:09:03-04:00 UPSTREAM: <carry>: openshift-hack: enable userns e2e tests
 
