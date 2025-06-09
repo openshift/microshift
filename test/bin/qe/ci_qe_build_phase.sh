@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/bin/bash
 
 ########### usage ###########
 #
@@ -29,48 +29,53 @@ function error() {
 function ssh_build_vm() {
     # shellcheck disable=SC2029
     # shellcheck disable=SC2086
-    ssh -o USER=microshift -q "${VM_IPADDR}" "$@"
+    ssh -o "USER=${VM_USER}" -q "${VM_IPADDR}" "$@"
 }
 
 function create_vm() {
-    if sudo virsh list | grep -q "${VM_NAME}"; then
-        log "VM '${VM_NAME}' already exists. Skipping VM creation."
-    else
-        log "Creating VM..."
-        ${EXE_MODE} "${SCRIPTDIR}"/../../../scripts/devenv-builder/manage-vm.sh config
-        ${EXE_MODE} "${SCRIPTDIR}"/../../../scripts/devenv-builder/manage-vm.sh create -n "${VM_NAME}"
+    if [[ -v VM_IPADDR ]]; then
+        log "VM IP address: ${VM_IPADDR}"
+        return
     fi
-    VM_IPADDR=$("${SCRIPTDIR}/../../../scripts/devenv-builder/manage-vm.sh" ip -n "${VM_NAME}")
-    log "VM '${VM_NAME}' IP address: ${VM_IPADDR}"
+
+    # if sudo virsh list | grep -q "${VM_NAME}"; then
+    #     log "VM '${VM_NAME}' already exists. Skipping VM creation."
+    # else
+    #     log "Creating VM..."
+    #     ${EXE_MODE} "${SCRIPTDIR}"/../../../scripts/devenv-builder/manage-vm.sh config
+    #     ${EXE_MODE} "${SCRIPTDIR}"/../../../scripts/devenv-builder/manage-vm.sh create -n "${VM_NAME}"
+    # fi
+    # VM_IPADDR=$("${SCRIPTDIR}/../../../scripts/devenv-builder/manage-vm.sh" ip -n "${VM_NAME}")
+    # log "VM '${VM_NAME}' IP address: ${VM_IPADDR}"
+}
+
+function fetch_microshift() {
+    # ssh_build_vm "sudo rm -rf ${HOME}/microshift"
+    # ssh_build_vm "sudo rm -rf ${HOME}/.cache ${HOME}/.local"
+    # ssh_build_vm "sudo rm -rf /var/cache /var/log"
+    
+    # scp -qr "${LOCAL_REPO_PATH}" "${VM_USER}@${VM_IPADDR}:${REPO_PATH}/"
+    
+    if ( ! ssh_build_vm "test -d ${REPO_PATH}" ); then
+        log "Cloning MicroShift repository inside the build VM..."
+        ssh_build_vm git clone "https://github.com/${MICROSHIFT_REPO_OWNER}/microshift.git" --depth 1 --single-branch --branch "${MICROSHIFT_REPO_BRANCH}" "${REPO_PATH}"
+    else
+        log "Directory ${REPO_PATH} already exists in build VM. Skipping clone."
+        ssh_build_vm git -C "${REPO_PATH}" fetch
+        ssh_build_vm git -C "${REPO_PATH}" checkout "${MICROSHIFT_REPO_BRANCH}"
+        ssh_build_vm git -C "${REPO_PATH}" pull
+    fi
 }
 
 function configure_vm() {
     if ${CONFIG_VM_FLAG}; then
-        ssh-copy-id -f "microshift@${VM_IPADDR}"
-        scp "${REPO_PATH}/scripts/devenv-builder/configure-vm.sh" "microshift@${VM_IPADDR}:~/configure-vm.sh"
-        scp "${HOME}/.pull-secret-microshift-dev.json" "microshift@${VM_IPADDR}:~/.pull-secret.json"
-        ssh_build_vm "${HOME}/configure-vm.sh --no-build ${HOME}/.pull-secret.json"
+        LOCAL_REPO_PATH="$(realpath ${SCRIPTDIR}/../../../)"
+        ssh-copy-id -f "${VM_USER}@${VM_IPADDR}"
+        scp "${LOCAL_REPO_PATH}/test/bin/qe/.pull-secret.json" "${VM_USER}@${VM_IPADDR}:~/.pull-secret.json"
+
+        ssh_build_vm "${EXE_MODE} ${REPO_PATH}/scripts/devenv-builder/configure-vm.sh --no-build .pull-secret.json"
+        ssh_build_vm "${EXE_MODE} ${REPO_PATH}/scripts/devenv-builder/configure-composer.sh"
     fi
-}
-
-function fetch_microshift() {
-    LOCAL_REPO_PATH="$(realpath ${SCRIPTDIR}/../../../)"
-
-    ssh_build_vm "sudo rm -rf ${HOME}/microshift"
-    ssh_build_vm "sudo rm -rf ${HOME}/.cache ${HOME}/.local"
-    ssh_build_vm "sudo rm -rf /var/cache /var/log"
-    
-    scp -qr "${LOCAL_REPO_PATH}" "microshift@${VM_IPADDR}:${REPO_PATH}/"
-    
-    # if ( ! ssh_build_vm "test -d ${REPO_PATH}" ); then
-    #     log "Cloning MicroShift repository inside the build VM..."
-    #     ssh_build_vm git clone "https://github.com/${MICROSHIFT_REPO_OWNER}/microshift.git" --depth 1 --single-branch --branch "${MICROSHIFT_REPO_BRANCH}" "${REPO_PATH}"
-    # else
-    #     log "Directory ${REPO_PATH} already exists in build VM. Skipping clone."
-    #     ssh_build_vm git -C "${REPO_PATH}" fetch
-    #     ssh_build_vm git -C "${REPO_PATH}" checkout "${MICROSHIFT_REPO_BRANCH}"
-    #     ssh_build_vm git -C "${REPO_PATH}" pull
-    # fi
 }
 
 function build_rpms() {
@@ -86,18 +91,18 @@ function build_bootc_images() {
         # ssh_build_vm "${EXE_MODE} ${REPO_PATH}/bin/build_bootc_images.sh -l ./image-blueprints-bootc/layer2-presubmit"
         # ssh_build_vm "${EXE_MODE} ${REPO_PATH}/bin/build_bootc_images.sh -l ./image-blueprints-bootc/layer3-periodic"
 
-        log "BootC images available: ${REPO_PATH}/_output/test-images/______"
+        # log "BootC images available: ${REPO_PATH}/_output/test-images/______"
     else
         log "BootC images available: ${REPO_PATH}/_output/test-images/______"
         # ssh_build_vm "ls -lrth ${REPO_PATH}/_output/test-images/______"
-fi
+    fi
 }
 
 function copy_artifacts() {
     MICROSHIFT_VERSION=$(ssh_build_vm ls "${REPO_PATH}/_output/test-images/rpm-repos/microshift-brew/microshift-4*" | sed -n 's/.*microshift-\(.*\)-.*/\1/p')
     log "MICROSHIFT_VERSION=${MICROSHIFT_VERSION}"
     mkdir -p "${HOME}/libvirt/images/microshift_builds/${MICROSHIFT_VERSION}/"
-    scp -qr "microshift@${VM_IPADDR}:${REPO_PATH}/_output/test-images/rpm-repos/" "${HOME}/libvirt/images/microshift_builds/${MICROSHIFT_VERSION}/"
+    scp -qr "${VM_USER}@${VM_IPADDR}:${REPO_PATH}/_output/test-images/rpm-repos/" "${HOME}/libvirt/images/microshift_builds/${MICROSHIFT_VERSION}/"
     log "Artifacts copied into the hypervisor: ${HOME}/libvirt/images/microshift_builds/${MICROSHIFT_VERSION}/"
 }
 
@@ -105,6 +110,8 @@ function copy_artifacts() {
 # default params
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
 VM_NAME="microshif-build-vm_${TIMESTAMP}"
+VM_IPADDR=""
+VM_USER="microshif"
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 REPO_PATH="microshift"
 EXE_MODE="bash"
@@ -116,8 +123,8 @@ RPM_SOURCE="brew"
 MICROSHIFT_BREW_VERSION="" # By default it will fetch last brew available from this version
 
 # input flags
-CONFIG_VM_FLAG=false
-BUILD_BOOTC_IMAGES_FLAG=false
+CONFIG_VM_FLAG=true
+BUILD_BOOTC_IMAGES_FLAG=true
 
 function usage() {
     echo "Usage: $(basename "$0") [--repo-owner <owner>] [--repo_branch <branch>] [--rpm-source <brew|source|all>] [--microshift-brew-version <version>] [--vm-name <vm_name>]"
@@ -127,6 +134,8 @@ function usage() {
     echo "  --rpm-source                  RPMs packages source. Default: brew. Valid values: brew, source and all"
     echo "  --microshift-brew-version     MicroShift version to fetch from brew. Default is empty, which means latest. Example: 4.19"
     echo "  --vm-name                     Name of the build VM. Default value: "microshif-build-vm_${TIMESTAMP}""
+    echo "  --vm-ip                       IP of the build VM."
+    echo "  --vm-user                     User of the build VM. Default value: microshift"
     echo "  --verbose                     Run bash scripts with -x flag."
 
     [ -n "$1" ] && echo -e "\nERROR: $1"
@@ -155,6 +164,14 @@ while [ $# -gt 0 ]; do
         VM_NAME=$2
         shift 2
         ;;
+    --vm-ip)
+        VM_IPADDR=$2
+        shift 2
+        ;;
+    --vm-user)
+        VM_USER=$2
+        shift 2
+        ;;
     --verbose)
         EXE_MODE="bash -x"
         set -x
@@ -170,8 +187,8 @@ fi
 
 ########### Call functions section ###########
 create_vm
-configure_vm
 fetch_microshift
+configure_vm
 build_rpms
 build_bootc_images
-copy_artifacts
+# copy_artifacts
