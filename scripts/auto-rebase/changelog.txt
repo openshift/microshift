@@ -1,3 +1,6 @@
-- openshift-controller-manager embedded-component 6e86dee5d30921e84f557ca214022e587c824e88 to 22078f7ead4547d4727f57931ba6e271af342b92
-  - 207915f 2025-06-02T05:26:04+00:00 Empty proxy variables are causing issues during the build
+- ovn-kubernetes image-amd64 53510ff8c81a4120208f8a4b6e220a84cfc8f1ed to 8d0a8501d88cbaf78e0cd14882f47c336d5bbbcc
+  - bbc8dd2 2025-05-28T14:14:23+00:00 Updating ose-ovn-kubernetes-container image to be consistent with ART for 4.14 Reconciling with https://github.com/openshift/ocp-build-data/tree/9b241d1d3750e4754580e9c0b67b2d30257489af/images/ose-ovn-kubernetes.yml
+
+- ovn-kubernetes image-arm64 53510ff8c81a4120208f8a4b6e220a84cfc8f1ed to 8d0a8501d88cbaf78e0cd14882f47c336d5bbbcc
+  - bbc8dd2 2025-05-28T14:14:23+00:00 Updating ose-ovn-kubernetes-container image to be consistent with ART for 4.14 Reconciling with https://github.com/openshift/ocp-build-data/tree/9b241d1d3750e4754580e9c0b67b2d30257489af/images/ose-ovn-kubernetes.yml
 
