@@ -1,10 +1,13 @@
+"""
+The generate_common_versions.py generates all variables for the common_versions.sh script and prints them to stdout.
+"""
 import requests
 import subprocess
 import os
 
 ARCH = os.uname().machine
 
-MINOR = 20
+MINOR = 19
 
 
 def get_candidate_repo(minor, dev_preview=False):
@@ -25,35 +28,51 @@ def get_beta_repo(minor):
     :param minor: the minor version, e.g. 19. for 4.19
 
     ``get_beta_repo`` returns the URL of the beta repository for the specified minor version.
+    If the repo for the wanted version does not exist or it does not provide the necessary
+    packages, it looks for previous releases, for up to three previous minor versions.
     """
     for i in range(minor, minor-3, -1):
         url = f"https://mirror.openshift.com/pub/openshift-v4/{ARCH}/dependencies/rpms/4.{i}-el9-beta"
-        if repo_exists(url) and provides_deps(url):
+        if repo_exists(url) and provides_pkg(url, "cri-o"):
             return f'"{url}"'
 
     return None
 
 
-def provides_deps(repo_url):
+def provides_pkg(repo, pkg):
     """
-    :param repo_url: the URL of the repository to check
+    :param repo: the repository to check
+    :param pkg: the package to look for
 
-    ``provides_deps`` checks if the repository provides the cri-o package.
+    ``provides_pkg`` checks if the repository provides the package specified by `pkg`.
     """
-    try:
-        temp = f"this,{repo_url}"
-        _ = subprocess.run(
-                ['dnf', 'repoquery', 'cri-o', '--quiet',
-                 '--queryformat', '%{version}-%{release}', '--disablerepo', '\'*\'', '--repofrompath', temp],
-                capture_output=True,
-                text=True,
-                check=True
+    if repo.startswith("https"):
+        try:
+            temp = f"this,{repo}"
+            _ = subprocess.run(
+                    ['dnf', 'repoquery', pkg, '--quiet',
+                     '--disablerepo', '*', '--repofrompath', temp],
+                    capture_output=True,
+                    check=True
+                )
+
+            return True
+
+        except subprocess.CalledProcessError:
+            return False
+    else:
+        try:
+            _ = subprocess.run(
+                    ['dnf', 'repoquery', pkg, '--quiet',
+                     '--repo', repo],
+                    capture_output=True,
+                    check=True
             )
 
-        return True
+            return True
 
-    except subprocess.CalledProcessError:
-        return False
+        except subprocess.CalledProcessError:
+            return False
 
 
 def dnf_repo_is_enabled(repo_name):
@@ -94,7 +113,7 @@ def get_sub_repo(minor):
     :param minor: the minor version, e.g. 19 for 4.19
 
     ``get_sub_repo`` returns the name of the subscription repository for the specified
-    minor version, if the repository provides the microshift package, otherwise returns None.
+    minor version if the repository provides the microshift package, otherwise returns None.
     """
     try:
         repo = f"rhocp-4.{minor}-for-rhel-9-{ARCH}-rpms"
@@ -116,21 +135,21 @@ def get_release_repo(minor):
     """
     :param minor: the minor version, e.g. 19 for 4.19
 
-    ``get_release_repo`` gets the repository for the specified minor version. It first
-    tries the subscription repository, if it does not provide the microshift package,
-    goes on to try the candidate repositories (EC, then RC). returns the name of the
-    subscription repo, the candidate repo URL, or None.
+    ``get_release_repo`` returns the repository for the specified minor version.
+    It looks for the 'rhocp' stream, release candidate and engineering candidate,
+    in that order. If none of these repositories are available, returns empty
+    double quotes (to be used as empty string in bash).
     """
     repo = get_sub_repo(minor)
-    if repo is not None:
+    if repo is not None and provides_pkg(repo, "microshift"):
         return f'"{repo}"'
 
     rc = get_candidate_repo(minor, dev_preview=False)
-    if repo_exists(rc):
+    if repo_exists(rc) and provides_pkg(rc, "microshift"):
         return f'"{rc}"'
 
     ec = get_candidate_repo(minor, dev_preview=True)
-    if repo_exists(ec):
+    if repo_exists(ec) and provides_pkg(ec, "microshift"):
         return f'"{ec}"'
 
     return '""'
@@ -157,21 +176,37 @@ previous_minor_version = minor_version - 1
 yminus2_minor_version = minor_version - 2
 fake_next_minor_version = minor_version + 1
 
+# The current release repository comes from the 'rhocp' stream for release
+# branches, or the OpenShift mirror if only a RC or EC is available. It can
+# be empty, if no candidate for the current minor has been built yet.
 current_release_repo = get_release_repo(minor_version)
 current_release_version = get_release_version(current_release_repo)
 
+# The previous release repository value should either point to the OpenShift
+# mirror URL or the 'rhocp' repository name.
 previous_release_repo = get_release_repo(previous_minor_version)
 previous_release_version = get_release_version(previous_release_repo)
 
+# The y-2 release repository value should either point to the OpenShift
+# mirror URL or the 'rhocp' repository name. It should always come from
+# the 'rhocp' stream.
 yminus2_release_repo = get_release_repo(yminus2_minor_version)
 yminus2_release_version = get_release_version(yminus2_release_repo)
 
+# The 'rhocp_minor_y' variable should be the minor version number, if the
+# current release is available through the 'rhocp' stream, otherwise empty.
 rhocp_minor_y = minor_version if get_sub_repo(minor_version) is not None else '""'
+
+# The beta repository, containing dependencies, should point to the
+# OpenShift mirror URL. If the repository for current minor is not
+# available yet, it should point to an older release.
 rhocp_minor_y_beta = get_beta_repo(minor_version)
 
+# The 'rhocp_minor_y1' should always be the y-1 minor version number.
 rhocp_minor_y1 = previous_minor_version
 rhocp_minor_y1_beta = get_beta_repo(previous_minor_version)
 
+# The 'rhocp_minor_y2' should always be the y-2 minor version number.
 rhocp_minor_y2 = yminus2_minor_version
 
 cncf_sonobuoy_version = "v0.57.3"
