@@ -1,3 +1,6 @@
-- machine-config-operator embedded-component 2b6c914936ed01b0a5a5669d1f7dbaa71f1c8b6a to 0964bc8a9f1c8e7d5209cfc3eab4aad9c77549c0
-  - 69c0e807 2025-05-29T15:28:22+00:00 OCPBUGS-56446: daemon: fix ostree-finalize-staged race workaround for package mode RHEL workers
+- ovn-kubernetes image-amd64 2501912454f1c119be5d53416ba7271aaace727d to d9fe221573ffabb7b4e4bb26aceeb89796459d85
+  - fe6fb9cc 2025-05-28T10:57:33-04:00 egressfirewall: avoid nil dereference on node delete
+
+- ovn-kubernetes image-arm64 2501912454f1c119be5d53416ba7271aaace727d to d9fe221573ffabb7b4e4bb26aceeb89796459d85
+  - fe6fb9cc 2025-05-28T10:57:33-04:00 egressfirewall: avoid nil dereference on node delete
 
