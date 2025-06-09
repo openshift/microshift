@@ -1,6 +1,0 @@
-- cluster-network-operator embedded-component e88176de7420cb92099445af4a81d7da48558bfd to c383bbdb87fc915487811e96ba6f38fa0ac9f2ca
-  - 5524894 2025-06-03T09:26:16-04:00 Fix live migration with feature migration configured explicitly
-
-- openshift-controller-manager embedded-component 72b43bd9225d97ac727a4cba592132b20be7db75 to c6c962fe9fb5cdf743f8e7590670a7d12f7c6f76
-  - af92bd3 2025-05-20T13:24:07+05:30 Empty proxy variables are causing issues during the build
-
