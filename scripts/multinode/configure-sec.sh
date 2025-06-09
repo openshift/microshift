@@ -74,22 +74,29 @@ function configure_microshift() {
 
 function configure_kubelet() {
     # Download the kubelet executable
+
+    # Checksums can be obtained from https://www.downloadkubernetes.com/
+    # or by downloading a "${url}.sha256" file (see below for ${url}). For example:
+    # version=1.32.5; for kube_arch in amd64 arm64; do echo "${kube_arch}: $(curl -L https://dl.k8s.io/release/v${version}/bin/linux/${kube_arch}/kubelet.sha256 2>/dev/null)"; done
+    local -r version="1.32.5"
     local kube_arch="amd64"
-    local kube_hash="024bb7faffa787c7717a2b37398a8c6df35694a8585a73074b052c3f4c4906ce"
+    local kube_hash="2b2988edd1646bf139dee6956d4283c520ff151a36febd10701ffda4852b8250"
 
     case $(uname -m) in
         x86_64)
             ;;
         aarch64)
             kube_arch="arm64"
-            kube_hash="5c3c98e6e0fa35d209595037e05022597954b8d764482417a9588e15218f0fe2"
+            kube_hash="034753a2e308afeb4ce3cf332d38346c6e660252eac93b268fac0e112a56ff46"
             ;;
         *)
             echo "Unsupported kubelet architecture $(uname -m)"
             exit 1
     esac
 
-    curl -sLO "https://dl.k8s.io/release/v1.32.3/bin/linux/${kube_arch}/kubelet" --output-dir "${KUBELET_HOME}"
+    local -r url="https://dl.k8s.io/release/v${version}/bin/linux/${kube_arch}/kubelet"
+    curl -sLO "${url}" --output-dir "${KUBELET_HOME}"
+
     cat <<EOF > "${KUBELET_HOME}/kubelet.sha256"
 ${kube_hash} ${KUBELET_HOME}/kubelet
 EOF

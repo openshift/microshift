@@ -11,11 +11,20 @@ subscription_manager_register() {
 #!/bin/bash
 set -xeuo pipefail
 
-if ! sudo subscription-manager status >&/dev/null; then
-    sudo subscription-manager register \
-        --org="\$(cat /tmp/subscription-manager-org)" \
-        --activationkey="\$(cat /tmp/subscription-manager-act-key)"
+if ! sudo subscription-manager status; then
+    for try in \$(seq 3) ; do
+        echo "Trying to register the system: attempt #\${try}"
+        if sudo subscription-manager register --force \
+                --org="\$(cat /tmp/subscription-manager-org)" \
+                --activationkey="\$(cat /tmp/subscription-manager-act-key)"; then
+            exit 0
+        fi
+        sleep 5
+    done
 fi
+
+sudo cat /var/log/rhsm/rhsm.log || true
+exit 1
 EOF
         copy_file_to_vm "${vmname}" "${sub_script}" "${sub_script}"
         copy_file_to_vm "${vmname}" /tmp/subscription-manager-org /tmp/subscription-manager-org

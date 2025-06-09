@@ -1,56 +1,9 @@
 rules:
   - apiGroups:
-      - apps
-    resources:
-      - daemonsets
-    verbs:
-      - create
-      - delete
-      - get
-      - list
-      - patch
-      - update
-      - watch
-  - apiGroups:
-      - apps
-    resources:
-      - deployments
-    verbs:
-      - create
-      - delete
-      - get
-      - list
-      - patch
-      - update
-      - watch
-  - apiGroups:
-      - apps
-    resources:
-      - replicasets
-    verbs:
-      - get
-  - apiGroups:
-      - config.openshift.io
-    resources:
-      - infrastructures
-    verbs:
-      - get
-  - apiGroups:
-      - coordination.k8s.io
-    resources:
-      - leases
-    verbs:
-      - create
-      - delete
-      - get
-      - list
-      - patch
-      - update
-      - watch
-  - apiGroups:
       - ""
     resources:
       - configmaps
+      - persistentvolumes
     verbs:
       - create
       - delete
@@ -106,18 +59,6 @@ rules:
   - apiGroups:
       - ""
     resources:
-      - persistentvolumes
-    verbs:
-      - create
-      - delete
-      - get
-      - list
-      - patch
-      - update
-      - watch
-  - apiGroups:
-      - ""
-    resources:
       - pods
     verbs:
       - delete
@@ -125,60 +66,47 @@ rules:
       - list
       - watch
   - apiGroups:
+      - apps
+    resources:
+      - daemonsets
+      - deployments
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  - apiGroups:
+      - apps
+    resources:
+      - replicasets
+    verbs:
+      - get
+  - apiGroups:
+      - config.openshift.io
+    resources:
+      - infrastructures
+    verbs:
+      - get
+  - apiGroups:
+      - coordination.k8s.io
+    resources:
+      - leases
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  - apiGroups:
       - lvm.topolvm.io
     resources:
       - lvmclusters
-    verbs:
-      - create
-      - delete
-      - get
-      - list
-      - patch
-      - update
-      - watch
-  - apiGroups:
-      - lvm.topolvm.io
-    resources:
-      - lvmclusters/finalizers
-    verbs:
-      - update
-  - apiGroups:
-      - lvm.topolvm.io
-    resources:
-      - lvmclusters/status
-    verbs:
-      - get
-      - patch
-      - update
-  - apiGroups:
-      - lvm.topolvm.io
-    resources:
       - lvmvolumegroupnodestatuses
-    verbs:
-      - create
-      - delete
-      - get
-      - list
-      - patch
-      - update
-      - watch
-  - apiGroups:
-      - lvm.topolvm.io
-    resources:
-      - lvmvolumegroupnodestatuses/finalizers
-    verbs:
-      - update
-  - apiGroups:
-      - lvm.topolvm.io
-    resources:
-      - lvmvolumegroupnodestatuses/status
-    verbs:
-      - get
-      - patch
-      - update
-  - apiGroups:
-      - lvm.topolvm.io
-    resources:
       - lvmvolumegroups
     verbs:
       - create
@@ -191,12 +119,16 @@ rules:
   - apiGroups:
       - lvm.topolvm.io
     resources:
+      - lvmclusters/finalizers
+      - lvmvolumegroupnodestatuses/finalizers
       - lvmvolumegroups/finalizers
     verbs:
       - update
   - apiGroups:
       - lvm.topolvm.io
     resources:
+      - lvmclusters/status
+      - lvmvolumegroupnodestatuses/status
       - lvmvolumegroups/status
     verbs:
       - get
@@ -254,37 +186,7 @@ rules:
       - storage.k8s.io
     resources:
       - csidrivers
-    verbs:
-      - create
-      - delete
-      - get
-      - list
-      - patch
-      - update
-      - watch
-  - apiGroups:
-      - storage.k8s.io
-    resources:
-      - csinodes
-    verbs:
-      - get
-      - list
-      - watch
-  - apiGroups:
-      - storage.k8s.io
-    resources:
       - csistoragecapacities
-    verbs:
-      - create
-      - delete
-      - get
-      - list
-      - patch
-      - update
-      - watch
-  - apiGroups:
-      - storage.k8s.io
-    resources:
       - storageclasses
     verbs:
       - create
@@ -297,6 +199,7 @@ rules:
   - apiGroups:
       - storage.k8s.io
     resources:
+      - csinodes
       - volumeattachments
     verbs:
       - get
@@ -306,17 +209,6 @@ rules:
       - topolvm.io
     resources:
       - logicalvolumes
-    verbs:
-      - create
-      - delete
-      - get
-      - list
-      - patch
-      - update
-      - watch
-  - apiGroups:
-      - topolvm.io
-    resources:
       - logicalvolumes/status
     verbs:
       - create

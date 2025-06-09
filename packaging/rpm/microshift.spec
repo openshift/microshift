@@ -67,7 +67,7 @@ BuildRequires: golang
 # DO NOT REMOVE
 
 Requires: cri-o >= 1.32.0, cri-o < 1.33.0
-Requires: cri-tools >= 1.32.0, cri-tools < 1.33.0
+Requires: cri-tools >= 1.33.0, cri-tools < 1.34.0
 Requires: iptables
 Requires: microshift-selinux = %{version}
 Requires: microshift-networking = %{version}

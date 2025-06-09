@@ -1,0 +1,79 @@
+name = "rhel-9.6-microshift-source-isolated"
+description = "A RHEL 9.6 image with the RPMs built from source with embedded container images."
+version = "0.0.1"
+modules = []
+groups = []
+distro = "rhel-96"
+
+[[packages]]
+name = "microshift"
+version = "{{ .Env.SOURCE_VERSION }}"
+
+[[packages]]
+name = "microshift-greenboot"
+version = "{{ .Env.SOURCE_VERSION }}"
+
+[[packages]]
+name = "microshift-networking"
+version = "{{ .Env.SOURCE_VERSION }}"
+
+[[packages]]
+name = "microshift-selinux"
+version = "{{ .Env.SOURCE_VERSION }}"
+
+[[packages]]
+name = "microshift-test-agent"
+version = "*"
+
+[[packages]]
+name = "microshift-release-info"
+version = "*"
+
+[[packages]]
+name = "qemu-guest-agent"
+version = "*"
+
+[[packages]]
+name = "podman"
+version = "*"
+
+[[packages]]
+name = "skopeo"
+version = "*"
+
+[customizations.services]
+enabled = ["microshift", "microshift-test-agent", "qemu-guest-agent"]
+
+[customizations.firewall]
+ports = ["22:tcp", "80:tcp", "443:tcp", "5353:udp", "6443:tcp", "30000-32767:tcp", "30000-32767:udp"]
+
+[customizations.firewall.services]
+enabled = ["mdns", "ssh", "http", "https"]
+
+[[customizations.firewall.zones]]
+name = "trusted"
+sources = ["10.42.0.0/16", "169.254.169.1", "fd01::/48"]
+
+# Override the default qemu-ga service configuration on the guest to allow all RPCs.
+# BLOCK_RPCS is a deny-list of qemu-guest-agent RPCs to block, such as file read/write, process execution, etc. By
+# default, all RPCs are blocked.
+# FREEZE_HOOK_PATHNAME is the dir-path containing hook scripts.  This override does not change the default value.
+# These scripts are executed before or after guest image snapshot ops ("freezing" and "thawing" in libvirt speak).
+# No hooks are installed by default.
+[[customizations.files]]
+path = "/etc/sysconfig/qemu-ga"
+data = """
+# This is a systemd environment file, not a shell script.
+# It provides settings for "/lib/systemd/system/qemu-guest-agent.service".
+BLOCK_RPCS=
+FSFREEZE_HOOK_PATHNAME=/etc/qemu-ga/fsfreeze-hook"""
+
+[[containers]]
+source = "quay.io/microshift/busybox:1.36"
+
+{{- if env.Getenv "SOURCE_IMAGES" "" }}
+{{ range (.Env.SOURCE_IMAGES | strings.Split ",") }}
+[[containers]]
+source = "{{ . }}"
+{{ end }}
+{{- end -}}

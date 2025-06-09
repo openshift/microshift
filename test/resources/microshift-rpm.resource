@@ -102,9 +102,8 @@ Verify MicroShift RPM Install
         ${nomtime}=    Set Variable    ${EMPTY}
     END
 
-    ${stdout}    ${stderr}    ${rc}=    SSHLibrary.Execute Command
-    ...    rpm -qa microshift\* | xargs -I {} bash -c 'echo {}; sudo rpm -V ${nomtime} {}'
-    ...    sudo=True    return_rc=True    return_stdout=True    return_stderr=True
-    Log    ${stdout}
-    Log    ${stderr}
-    Should Be Equal As Integers    0    ${rc}
+    # Checks all files from RPM packages except config files
+    Command Should Work    rpm -qa microshift\* | xargs -I {} bash -c 'echo {}; sudo rpm -V --noconfig ${nomtime} {}'
+
+    # Checks only config files from RPM packages excluding modification time check
+    Command Should Work    rpm -qa microshift\* | xargs -I {} bash -c 'echo {}; sudo rpm -V --configfiles --nomtime {}'

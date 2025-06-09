@@ -14,7 +14,7 @@ for testing upgrades.
 
 |Group |Build Time|Description|
 |------|----------|-----------|
-|group1| Short    | RHEL 9.4 OS-only base layer
+|group1| Short    | RHEL 9.4 and 9.6 OS-only base layer
 |group2| Short    | RHEL 9.4 layer with MicroShift `y-2` packages
 |group3| Short    | RHEL 9.4 layer with MicroShift `y-1` packages
 |group4| Average  | Other artifacts independent of current sources
