@@ -124,8 +124,8 @@ echo -e "${USER}\tALL=(ALL)\tNOPASSWD: ALL" | sudo tee "/etc/sudoers.d/${USER}"
 
 # Check the subscription status and register if necessary
 if ${RHEL_SUBSCRIPTION}; then
-    if ! sudo subscription-manager status >&/dev/null; then
-        sudo subscription-manager register --auto-attach
+    if ! sudo subscription-manager status; then
+        sudo subscription-manager register --auto-attach --force
     fi
     sudo subscription-manager config --rhsm.manage_repos=1
 

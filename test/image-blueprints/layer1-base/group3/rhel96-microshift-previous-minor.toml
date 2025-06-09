@@ -1,0 +1,58 @@
+name = "rhel-9.6-microshift-4.{{ .Env.PREVIOUS_MINOR_VERSION }}"
+description = "RHEL 9.6 with MicroShift from the previous minor version (y-stream) installed."
+version = "0.0.1"
+modules = []
+groups = []
+distro = "rhel-96"
+
+# Parent specification directive recognized by test/bin/build_images.sh to be
+# used with the '--parent' argument of 'osbuild-composer'
+# parent = "rhel-9.4-microshift-4.{{ .Env.YMINUS2_MINOR_VERSION }}"
+
+
+[[packages]]
+name = "microshift"
+version = "{{ .Env.PREVIOUS_RELEASE_VERSION }}*"
+
+[[packages]]
+name = "microshift-greenboot"
+version = "{{ .Env.PREVIOUS_RELEASE_VERSION }}*"
+
+[[packages]]
+name = "microshift-networking"
+version = "{{ .Env.PREVIOUS_RELEASE_VERSION }}*"
+
+[[packages]]
+name = "microshift-selinux"
+version = "{{ .Env.PREVIOUS_RELEASE_VERSION }}*"
+
+[[packages]]
+name = "microshift-test-agent"
+version = "*"
+
+# The bootc, dnf and subscription-manager packages are required for
+# testing upgrades from ostree to bootc images
+[[packages]]
+name = "bootc"
+version = "*"
+
+[[packages]]
+name = "dnf"
+version = "*"
+
+[[packages]]
+name = "subscription-manager"
+version = "*"
+
+[customizations.services]
+enabled = ["microshift", "microshift-test-agent"]
+
+[customizations.firewall]
+ports = ["22:tcp", "80:tcp", "443:tcp", "5353:udp", "6443:tcp", "30000-32767:tcp", "30000-32767:udp"]
+
+[customizations.firewall.services]
+enabled = ["mdns", "ssh", "http", "https"]
+
+[[customizations.firewall.zones]]
+name = "trusted"
+sources = ["10.42.0.0/16", "169.254.169.1", "fd01::/48"]
