@@ -2,6 +2,7 @@
 export SHELL := $(shell which bash)
 
 PROJECT_DIR := $(shell dirname $(abspath $(lastword $(MAKEFILE_LIST))))
+GO_FILES ?=$(shell find . -name '*.go' -not -path '*/vendor/*' -not -path '*/_output/*' -not -path '*/deps/*' -print)
 
 # Include openshift build-machinery-go libraries
 include $(PROJECT_DIR)/vendor/github.com/openshift/build-machinery-go/make/golang.mk
@@ -30,6 +31,7 @@ PATCH := $(shell echo $(SOURCE_GIT_TAG) | awk -F'[._~-]' '{print $$3}')
 SRC_ROOT :=$(shell pwd)
 
 WITH_FLANNEL ?= 0
+WITH_TOPOLVM ?= 0
 OUTPUT_DIR :=_output
 RPM_BUILD_DIR :=$(OUTPUT_DIR)/rpmbuild
 CROSS_BUILD_BINDIR :=$(OUTPUT_DIR)/bin
@@ -268,6 +270,7 @@ rpm:
 	SOURCE_GIT_COMMIT=${SOURCE_GIT_COMMIT} \
 	SOURCE_GIT_TREE_STATE=${SOURCE_GIT_TREE_STATE} \
 	WITH_FLANNEL=${WITH_FLANNEL} \
+	WITH_TOPOLVM=${WITH_TOPOLVM} \
 	./packaging/rpm/make-rpm.sh rpm local
 .PHONY: rpm
 
@@ -278,6 +281,7 @@ srpm:
 	SOURCE_GIT_COMMIT=${SOURCE_GIT_COMMIT} \
 	SOURCE_GIT_TREE_STATE=${SOURCE_GIT_TREE_STATE} \
 	WITH_FLANNEL=${WITH_FLANNEL} \
+	WITH_TOPOLVM=${WITH_TOPOLVM} \
 	./packaging/rpm/make-rpm.sh srpm local
 .PHONY: srpm
 
@@ -295,6 +299,7 @@ rpm-podman:
 		--volume $$(pwd):/opt/microshift:z \
 		--env TARGET_ARCH=$(TARGET_ARCH) \
 		--env WITH_FLANNEL=$(WITH_FLANNEL) \
+		--env WITH_TOPOLVM=$(WITH_TOPOLVM) \
 		microshift-builder:$(RPM_BUILDER_IMAGE_TAG) \
 		bash -ilc 'cd /opt/microshift && make rpm & pid=$$! ; \
 				   trap "echo Killing make PID $${pid}; kill $${pid}" INT ; \
@@ -309,12 +314,15 @@ clean:
 	if [ -d '$(OUTPUT_DIR)' ]; then rm -rf '$(OUTPUT_DIR)'; fi
 .PHONY: clean
 
-vendor:
-	go mod vendor
+patch-deps:
 	for p in $(sort $(wildcard scripts/auto-rebase/rebase_patches/*.patch)); do \
 		echo "Applying patch $$p"; \
 		git mailinfo /dev/null /dev/stderr 2<&1- < $$p | git apply --reject || exit 1; \
 	done
+.PHONY: patch-deps
+
+vendor:
+	go mod vendor
 .PHONY: vendor
 
 # Update the etcd dependencies, including especially MicroShift itself.

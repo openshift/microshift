@@ -3,7 +3,7 @@
 # Sourced from scenario.sh and uses functions defined there.
 
 scenario_create_vms() {
-    prepare_kickstart host1 kickstart-bootc.ks.template cos9-bootc-source
+    prepare_kickstart host1 kickstart-bootc.ks.template cos9-bootc-source-flannel
     launch_vm --boot_blueprint centos9-bootc
 
     # Open the firewall ports. Other scenarios get this behavior by

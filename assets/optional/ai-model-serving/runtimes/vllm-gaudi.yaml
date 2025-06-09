@@ -3,7 +3,7 @@ kind: ServingRuntime
 metadata:
   name: vllm-gaudi-runtime
   annotations:
-    openshift.io/display-name: vLLM ServingRuntime with Gaudi accelerators support for KServe
+    openshift.io/display-name: vLLM Intel Gaudi Accelerator ServingRuntime for KServe
     opendatahub.io/recommended-accelerators: '["habana.ai/gaudi"]'
   labels:
     opendatahub.io/dashboard: 'true'

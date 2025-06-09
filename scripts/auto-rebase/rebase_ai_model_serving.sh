@@ -36,27 +36,7 @@ check_preconditions() {
 
     if ! hash yq; then
         title "Installing yq"
-
-        local YQ_VER=4.26.1
-        # shellcheck disable=SC2034  # appears unused
-        local YQ_HASH_amd64=9e35b817e7cdc358c1fcd8498f3872db169c3303b61645cc1faf972990f37582
-        # shellcheck disable=SC2034  # appears unused
-        local YQ_HASH_arm64=8966f9698a9bc321eae6745ffc5129b5e1b509017d3f710ee0eccec4f5568766
-        local YQ_HASH
-        YQ_HASH="YQ_HASH_$(go env GOARCH)"
-        local YQ_URL
-        YQ_URL="https://github.com/mikefarah/yq/releases/download/v${YQ_VER}/yq_linux_$(go env GOARCH)"
-        local YQ_EXE
-        YQ_EXE=$(mktemp /tmp/yq-exe.XXXXX)
-        local YQ_SUM
-        YQ_SUM=$(mktemp /tmp/yq-sum.XXXXX)
-        echo -n "${!YQ_HASH} -" > "${YQ_SUM}"
-        if ! (curl -Ls "${YQ_URL}" | tee "${YQ_EXE}" | sha256sum -c "${YQ_SUM}" &>/dev/null); then
-            echo "ERROR: Expected file at ${YQ_URL} to have checksum ${!YQ_HASH} but instead got $(sha256sum <"${YQ_EXE}" | cut -d' ' -f1)"
-            exit 1
-        fi
-        chmod +x "${YQ_EXE}" && sudo cp "${YQ_EXE}" /usr/bin/yq
-        rm -f "${YQ_EXE}" "${YQ_SUM}"
+        sudo DEST_DIR=/usr/bin/ "${REPOROOT}/scripts/fetch_tools.sh" yq
     fi
 
     if ! hash python3; then
@@ -218,6 +198,15 @@ EOF
     chmod +x "${last_rebase_script}"
 }
 
+update_rebase_job_entrypoint_sh() {
+    local -r operator_bundle="${1}"
+
+    title "Updating rebase_job_entrypoint.sh"
+    sed -i \
+        "s,^rhoai_release=.*\$,rhoai_release=\"${operator_bundle}\",g" \
+        "${REPOROOT}/scripts/auto-rebase/rebase_job_entrypoint.sh"
+}
+
 rebase_ai_model_serving_to() {
     local -r operator_bundle="${1}"
 
@@ -227,10 +216,11 @@ rebase_ai_model_serving_to() {
     local -r version=$(get_rhoai_bundle_version)
 
     update_last_rebase_ai_model_serving_sh "${operator_bundle}"
+    update_rebase_job_entrypoint_sh "${operator_bundle}"
 
     process_rhoai_manifests
 
-    if [[ -n "$(git status -s assets ./scripts/auto-rebase/last_rebase_ai_model_serving.sh)" ]]; then
+    if [[ -n "$(git status -s ./assets ./scripts/auto-rebase/rebase_job_entrypoint.sh ./scripts/auto-rebase/last_rebase_ai_model_serving.sh)" ]]; then
         title "Detected changes to assets/ or last_rebase_ai_model_serving.sh"
 
         if ! "${NO_BRANCH}"; then
@@ -240,7 +230,7 @@ rebase_ai_model_serving_to() {
         fi
 
         title "Committing changes"
-        git add assets ./scripts/auto-rebase/last_rebase_ai_model_serving.sh
+        git add ./assets ./scripts/auto-rebase/rebase_job_entrypoint.sh ./scripts/auto-rebase/last_rebase_ai_model_serving.sh
         git commit -m "Update AI Model Serving for MicroShift"
     else
         title "No changes to assets/ or last_rebase_ai_model_serving.sh"

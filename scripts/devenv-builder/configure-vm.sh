@@ -110,6 +110,10 @@ fi
 if grep -qE 'Red Hat Enterprise Linux.*Beta' /etc/redhat-release; then
     RHEL_BETA_VERSION=true
 fi
+# If internal repos are in use set RHEL_BETA_VERSION
+if dnf repolist | grep -q download.eng.brq.redhat.com; then
+    RHEL_BETA_VERSION=true
+fi
 
 OCP_PULL_SECRET=$1
 [ ! -e "${OCP_PULL_SECRET}" ] && usage "OpenShift pull secret file '${OCP_PULL_SECRET}' does not exist"
@@ -120,8 +124,8 @@ echo -e "${USER}\tALL=(ALL)\tNOPASSWD: ALL" | sudo tee "/etc/sudoers.d/${USER}"
 
 # Check the subscription status and register if necessary
 if ${RHEL_SUBSCRIPTION}; then
-    if ! sudo subscription-manager status >&/dev/null; then
-        sudo subscription-manager register --auto-attach
+    if ! sudo subscription-manager status; then
+        sudo subscription-manager register --auto-attach --force
     fi
     sudo subscription-manager config --rhsm.manage_repos=1
 
@@ -294,24 +298,6 @@ if [ ! -e "/etc/crio/openshift-pull-secret" ]; then
     sudo chmod 600 /etc/crio/openshift-pull-secret
 fi
 
-# Optionally configure crun runtime for crio, required on CentOS 9
-if [ -e /etc/crio/crio.conf  ] ; then
-    if ! grep -q '\[crio.runtime.runtimes.crun\]' /etc/crio/crio.conf ; then
-        cat <<EOF | sudo tee -a /etc/crio/crio.conf &>/dev/null
-
-[crio.runtime.runtimes.crun]
-runtime_path = ""
-runtime_type = "oci"
-runtime_root = "/run/crun"
-runtime_config_path = ""
-monitor_path = ""
-monitor_cgroup = "system.slice"
-monitor_exec_cgroup = ""
-privileged_without_host_devices = false
-EOF
-    fi
-fi
-
 if ${BUILD_AND_RUN} || ${FORCE_FIREWALL}; then
     "${DNF_RETRY}" "install" "firewalld"
     sudo systemctl enable firewalld --now
@@ -331,8 +317,9 @@ fi
 if ${BUILD_AND_RUN}; then
     sudo systemctl enable --now crio
     if ${PULL_IMAGES}; then
+        # Skip ai-model-serving images because of the size and not all are needed (HW dependent).
         # shellcheck disable=SC2046
-        "${PULL_RETRY}" $(rpm -qa | grep -e  "microshift.*-release-info" | xargs rpm -ql | grep $(uname -m).json | xargs jq -r '.images | values[]')
+        "${PULL_RETRY}" $(rpm -qa | grep -e  "microshift.*-release-info" | grep -v 'ai-model-serving' | xargs rpm -ql | grep $(uname -m).json | xargs jq -r '.images | values[]')
     fi
     if ${START}; then
         sudo systemctl start microshift

@@ -1,0 +1,74 @@
+# Following file contains OpenTelemetry Collector configuration that exports:
+# - Resource usage metrics of MicroShift's Containers, Pods, Volumes, and Node
+# - Kubernetes Events
+# - System journal for MicroShift service, priority < Info
+
+receivers:
+  kubeletstats:
+    auth_type: tls
+    ca_file: /var/lib/microshift/certs/ca-bundle/client-ca.crt
+    key_file: /var/lib/microshift/certs/admin-kubeconfig-signer/openshift-observability-client/client.key
+    cert_file: /var/lib/microshift/certs/admin-kubeconfig-signer/openshift-observability-client/client.crt
+    insecure_skip_verify: true
+    collection_interval: 10s
+    endpoint: "${env:K8S_NODE_NAME}:10250"
+    node: ${env:K8S_NODE_NAME}
+    k8s_api_config:
+      auth_type: kubeConfig
+  k8s_events:
+    auth_type: kubeConfig
+  journald:
+    units:
+      - microshift
+    priority: info
+
+processors:
+  batch:
+  resourcedetection/system:
+    detectors: [ "system" ]
+    system:
+      hostname_sources: [ "os" ]
+
+exporters:
+  otlp:
+    sending_queue:
+      storage: file_storage
+    # Endpoint must point an IP or hostname, and port of an OTLP backend service.
+    # Here, the OTEL_BACKEND env var is used. It should be changed to point to the backend.
+    # Unless replaced in config or defined in service file, it'll be empty and OTEL will use 'localhost' instead.
+    # An unreachable endpoint will be reported in the logs of the microshift-observability service.
+    endpoint: ${env:OTEL_BACKEND}:4317
+    tls:
+      insecure: true
+
+extensions:
+  file_storage:
+    directory: /var/lib/microshift-observability
+
+service:
+  extensions: [ file_storage ]
+  pipelines:
+    metrics/kubeletstats:
+      receivers: [ kubeletstats ]
+      processors: [ batch ]
+      exporters: [ otlp ]
+    logs/kube_events:
+      receivers: [ k8s_events ]
+      processors: [ resourcedetection/system, batch ]
+      exporters: [ otlp ]
+    logs/journald:
+      receivers: [ journald ]
+      processors: [ resourcedetection/system ]
+      exporters: [ otlp ]
+  telemetry:
+    metrics:
+      readers:
+        - periodic:
+            exporter:
+              otlp:
+                # Endpoint must point an IP or hostname, and port of an OTLP backend service.
+                # Here, the OTEL_BACKEND env var is used. It should be changed to point to the backend.
+                # Unless replaced in config or defined in service file, it'll be empty and OTEL will use 'localhost' instead.
+                # An unreachable endpoint will be reported in the logs of the microshift-observability service.
+                endpoint: http://${env:OTEL_BACKEND}:4318
+                protocol: http/protobuf

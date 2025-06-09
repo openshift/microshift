@@ -22,11 +22,14 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"time"
 
 	proto "github.com/gogo/protobuf/proto"
 	"github.com/golang/snappy"
+	"github.com/openshift/microshift/pkg/admin/prerun"
 	"github.com/openshift/microshift/pkg/config"
+	"github.com/openshift/microshift/pkg/util"
 	io_prometheus_client "github.com/prometheus/client_model/go"
 	"github.com/prometheus/prometheus/prompb"
 	"k8s.io/klog/v2"
@@ -43,11 +46,14 @@ const (
 	MetricNameContainersUsage   = "cluster:usage:containers:sum"
 	MetricNameMicroShiftVersion = "microshift_version"
 
-	LabelNameID           = "_id"
-	LabelNameArch         = "label_kubernetes_io_arch"
-	LabelNameOS           = "label_node_openshift_io_os_id"
-	LabelNameInstanceType = "label_beta_kubernetes_io_instance_type"
-	LabelNameResource     = "resource"
+	LabelNameID             = "_id"
+	LabelNameArch           = "label_kubernetes_io_arch"
+	LabelNameOS             = "label_node_openshift_io_os_id"
+	LabelNameInstanceType   = "label_beta_kubernetes_io_instance_type"
+	LabelNameResource       = "resource"
+	LabelNameVersion        = "version"
+	LabelNameDeploymentType = "deployment_type"
+	LabelNameOSVersion      = "os_version_id"
 )
 
 type Metric struct {
@@ -69,14 +75,25 @@ type TelemetryClient struct {
 	// on the cpu seconds we get from kubelet.
 	previousCPUSeconds   float64
 	previousCPUtimestamp int64
+	// For proxy configuration.
+	transport http.RoundTripper
 }
 
-func NewTelemetryClient(baseURL, clusterId string) *TelemetryClient {
+func NewTelemetryClient(endpoint, clusterId, proxy string) *TelemetryClient {
+	transport := http.DefaultTransport
+	if proxy != "" {
+		// Proxy was validated before reaching this point, ignore the error because it cant happen.
+		u, _ := url.Parse(proxy)
+		transport = &http.Transport{
+			Proxy: http.ProxyURL(u),
+		}
+	}
 	return &TelemetryClient{
-		endpoint:             fmt.Sprintf("%s/metrics/v1/receive", baseURL),
+		endpoint:             endpoint,
 		clusterId:            clusterId,
 		previousCPUSeconds:   0,
 		previousCPUtimestamp: 0,
+		transport:            transport,
 	}
 }
 
@@ -106,7 +123,9 @@ func (t *TelemetryClient) Send(ctx context.Context, pullSecret string, metrics [
 	req.Header.Set("Content-Encoding", "snappy")
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", t.encodeAuth(pullSecret)))
 
-	client := &http.Client{}
+	client := &http.Client{
+		Transport: t.transport,
+	}
 	resp, err := client.Do(req)
 	if err != nil {
 		return fmt.Errorf("unable to do the request: %v", err)
@@ -119,7 +138,7 @@ func (t *TelemetryClient) Send(ctx context.Context, pullSecret string, metrics [
 		}
 		resp.Body.Close()
 	}()
-	if resp.StatusCode == http.StatusOK {
+	if resp.StatusCode >= 200 && resp.StatusCode < 300 {
 		klog.Infof("Metrics sent successfully")
 		return nil
 	}
@@ -159,6 +178,12 @@ func (t *TelemetryClient) Collect(ctx context.Context, cfg *config.Config) ([]Me
 	t.previousCPUtimestamp = time.Now().UnixNano() / time.Millisecond.Nanoseconds()
 	metrics = append(metrics, usageMetrics...)
 
+	versionMetric, err := computeMicroShiftVersionMetric()
+	if err != nil {
+		return nil, fmt.Errorf("failed to compute microshift version metric: %v", err)
+	}
+	metrics = append(metrics, versionMetric)
+
 	for i := range metrics {
 		metrics[i].Labels = append(metrics[i].Labels, MetricLabel{Name: LabelNameID, Value: t.clusterId})
 	}
@@ -167,6 +192,10 @@ func (t *TelemetryClient) Collect(ctx context.Context, cfg *config.Config) ([]Me
 }
 
 func computeCapacityMetrics(kubeletMetrics map[string]*io_prometheus_client.MetricFamily, nodeLabels map[string]string) ([]Metric, error) {
+	archValue, ok := nodeLabels["kubernetes.io/arch"]
+	if !ok {
+		return nil, fmt.Errorf("node label kubernetes.io/arch not found")
+	}
 	osIdValue, ok := nodeLabels["node.openshift.io/os_id"]
 	if !ok {
 		return nil, fmt.Errorf("node label node.openshift.io/os_id not found")
@@ -190,6 +219,7 @@ func computeCapacityMetrics(kubeletMetrics map[string]*io_prometheus_client.Metr
 			Labels: []MetricLabel{
 				{Name: LabelNameOS, Value: osIdValue},
 				{Name: LabelNameInstanceType, Value: instanceTypeValue},
+				{Name: LabelNameArch, Value: archValue},
 			},
 			Timestamp: currentTimestamp,
 			Value:     aggregateMetricValues(kubeletCPUCapacity.Metric),
@@ -199,6 +229,7 @@ func computeCapacityMetrics(kubeletMetrics map[string]*io_prometheus_client.Metr
 			Labels: []MetricLabel{
 				{Name: LabelNameOS, Value: osIdValue},
 				{Name: LabelNameInstanceType, Value: instanceTypeValue},
+				{Name: LabelNameArch, Value: archValue},
 			},
 			Timestamp: currentTimestamp,
 			Value:     aggregateMetricValues(kubeletMemoryCapacity.Metric),
@@ -269,6 +300,28 @@ func computeUsageMetrics(kubeletMetrics map[string]*io_prometheus_client.MetricF
 	})
 
 	return resourceMetrics, aggregateMetricValues(kubeletCPUSeconds.Metric), nil
+}
+
+func computeMicroShiftVersionMetric() (Metric, error) {
+	osVersion, err := util.GetOSVersion()
+	if err != nil {
+		return Metric{}, fmt.Errorf("failed to get OS version: %v", err)
+	}
+	currentTimestamp := time.Now().UnixNano() / time.Millisecond.Nanoseconds()
+	version, err := prerun.GetVersionOfExecutable()
+	if err != nil {
+		return Metric{}, fmt.Errorf("failed to get version of executable: %v", err)
+	}
+	return Metric{
+		Name: MetricNameMicroShiftVersion,
+		Labels: []MetricLabel{
+			{Name: LabelNameVersion, Value: version.String()},
+			{Name: LabelNameOSVersion, Value: osVersion},
+			{Name: LabelNameDeploymentType, Value: getDeploymentType()},
+		},
+		Timestamp: currentTimestamp,
+		Value:     float64(currentTimestamp),
+	}, nil
 }
 
 func convertMetricsToWriteRequest(metrics []Metric) *prompb.WriteRequest {

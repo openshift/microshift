@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: openshift-ingress
+  name: access-logs-rsyslog-config
+data:
+  rsyslog.conf: |
+    $ModLoad imuxsock
+    $SystemLogSocketName /var/lib/rsyslog/rsyslog.sock
+    $ModLoad omstdout.so
+    $MaxMessageSize 10k
+    *.* :omstdout:

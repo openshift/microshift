@@ -1,7 +1,7 @@
-diff --git a/vendor/k8s.io/kubernetes/openshift-kube-apiserver/openshiftkubeapiserver/patch.go b/vendor/k8s.io/kubernetes/openshift-kube-apiserver/openshiftkubeapiserver/patch.go
+diff --git a/deps/github.com/openshift/kubernetes/openshift-kube-apiserver/openshiftkubeapiserver/patch.go b/deps/github.com/openshift/kubernetes/openshift-kube-apiserver/openshiftkubeapiserver/patch.go
 index 39b266a0..676fe562 100644
---- a/vendor/k8s.io/kubernetes/openshift-kube-apiserver/openshiftkubeapiserver/patch.go
-+++ b/vendor/k8s.io/kubernetes/openshift-kube-apiserver/openshiftkubeapiserver/patch.go
+--- a/deps/github.com/openshift/kubernetes/openshift-kube-apiserver/openshiftkubeapiserver/patch.go
++++ b/deps/github.com/openshift/kubernetes/openshift-kube-apiserver/openshiftkubeapiserver/patch.go
 @@ -9,17 +9,12 @@ import (
  	"github.com/openshift/apiserver-library-go/pkg/securitycontextconstraints/sccadmission"
  	securityv1client "github.com/openshift/client-go/security/clientset/versioned"

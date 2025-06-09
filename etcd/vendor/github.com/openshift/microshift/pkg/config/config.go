@@ -16,6 +16,7 @@ import (
 	"time"
 
 	configv1 "github.com/openshift/api/config/v1"
+	operatorv1 "github.com/openshift/api/operator/v1"
 	"github.com/openshift/microshift/pkg/config/apiserver"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/sets"
@@ -171,6 +172,12 @@ func (c *Config) fillDefaults() error {
 		TLSSecurityProfile: &configv1.TLSSecurityProfile{
 			Type: configv1.TLSProfileIntermediateType,
 		},
+		AccessLogging: AccessLogging{
+			Status: AccessLoggingDisabled,
+			Destination: operatorv1.LoggingDestination{
+				Type: operatorv1.ContainerLoggingDestinationType,
+			},
+		},
 	}
 	c.MultiNode.Enabled = false
 	c.Kubelet = nil
@@ -213,6 +220,10 @@ func (c *Config) incorporateUserSettings(u *Config) {
 	}
 	if u.Network.DNS != "" {
 		c.Network.DNS = u.Network.DNS
+	}
+
+	if u.Network.Multus.Status != "" {
+		c.Network.Multus.Status = u.Network.Multus.Status
 	}
 
 	if u.Etcd.MemoryLimitMB != 0 {
@@ -358,6 +369,9 @@ func (c *Config) incorporateUserSettings(u *Config) {
 	if u.Telemetry.Endpoint != "" {
 		c.Telemetry.Endpoint = u.Telemetry.Endpoint
 	}
+	if u.Telemetry.Proxy != "" {
+		c.Telemetry.Proxy = u.Telemetry.Proxy
+	}
 	if len(u.Ingress.ServingCertificateSecret) != 0 {
 		c.Ingress.ServingCertificateSecret = u.Ingress.ServingCertificateSecret
 	}
@@ -370,6 +384,33 @@ func (c *Config) incorporateUserSettings(u *Config) {
 	}
 	if len(u.Ingress.ClientTLS.ClientCertificatePolicy) != 0 {
 		c.Ingress.ClientTLS = u.Ingress.ClientTLS
+	}
+	if u.Ingress.HttpErrorCodePages.Name != "" {
+		c.Ingress.HttpErrorCodePages.Name = u.Ingress.HttpErrorCodePages.Name
+	}
+	if u.Ingress.AccessLogging.Status != "" {
+		c.Ingress.AccessLogging.Status = u.Ingress.AccessLogging.Status
+	}
+	if u.Ingress.AccessLogging.Destination.Type != "" {
+		c.Ingress.AccessLogging.Destination.Type = u.Ingress.AccessLogging.Destination.Type
+	}
+	if u.Ingress.AccessLogging.Destination.Container != nil {
+		c.Ingress.AccessLogging.Destination.Container = u.Ingress.AccessLogging.Destination.Container
+	}
+	if u.Ingress.AccessLogging.Destination.Syslog != nil {
+		c.Ingress.AccessLogging.Destination.Syslog = u.Ingress.AccessLogging.Destination.Syslog
+	}
+	if u.Ingress.AccessLogging.HttpLogFormat != "" {
+		c.Ingress.AccessLogging.HttpLogFormat = u.Ingress.AccessLogging.HttpLogFormat
+	}
+	if u.Ingress.AccessLogging.HttpCaptureHeaders.Request != nil {
+		c.Ingress.AccessLogging.HttpCaptureHeaders.Request = u.Ingress.AccessLogging.HttpCaptureHeaders.Request
+	}
+	if u.Ingress.AccessLogging.HttpCaptureHeaders.Response != nil {
+		c.Ingress.AccessLogging.HttpCaptureHeaders.Response = u.Ingress.AccessLogging.HttpCaptureHeaders.Response
+	}
+	if u.Ingress.AccessLogging.HttpCaptureCookies != nil {
+		c.Ingress.AccessLogging.HttpCaptureCookies = u.Ingress.AccessLogging.HttpCaptureCookies
 	}
 }
 
@@ -566,6 +607,11 @@ func (c *Config) validate() error {
 			return fmt.Errorf("error validating ingress.listenAddress: %w", err)
 		}
 	}
+
+	if err := c.Ingress.AccessLogging.Validate(); err != nil {
+		return fmt.Errorf("error validating ingress.accessLogging: %w", err)
+	}
+
 	if err := validateAuditLogConfig(c.ApiServer.AuditLog); err != nil {
 		return fmt.Errorf("error validating apiserver.auditLog:\n%w", err)
 	}

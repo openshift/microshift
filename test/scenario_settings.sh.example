@@ -23,3 +23,7 @@ SSH_PUBLIC_KEY=${SSH_PUBLIC_KEY:-${HOME}/.ssh/id_rsa.pub}
 # `subscription_manager_register`. See
 # `load_subscription_manager_plugin` in scenario.sh for details.
 # SUBSCRIPTION_MANAGER_PLUGIN="${SCRIPTDIR}/subscription_manager_register.sh"
+
+# USHIFT_USER should be set to microshift when running tests on vms created by
+# QE pipelines. Make sure to uncomment this line while doing so.
+#USHIFT_USER=${USHIFT_USER:-microshift}

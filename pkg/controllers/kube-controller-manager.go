@@ -98,6 +98,10 @@ func configure(ctx context.Context, cfg *config.Config) (args []string, applyFn 
 			"v":                                {strconv.Itoa(cfg.GetVerbosity())},
 			"tls-cipher-suites":                {strings.Join(cfg.ApiServer.TLS.CipherSuites, ",")},
 			"tls-min-version":                  {cfg.ApiServer.TLS.MinVersion},
+			// Use the same certificates as the apiserver for localhost communication
+			// to avoid creating new certificates just for this component having the same CN/SAN.
+			"tls-cert-file":        {cryptomaterial.ServingCertPath(cryptomaterial.KubeAPIServerLocalhostServingCertDir(cryptomaterial.CertsDirectory(config.DataDir)))},
+			"tls-private-key-file": {cryptomaterial.ServingKeyPath(cryptomaterial.KubeAPIServerLocalhostServingCertDir(cryptomaterial.CertsDirectory(config.DataDir)))},
 		},
 	}
 
@@ -122,7 +126,7 @@ func (s *KubeControllerManager) Run(ctx context.Context, ready chan<- struct{}, 
 	// run readiness check
 	go func() {
 		// This endpoint uses a self-signed certificate on purpose, we need to skip verification.
-		healthcheckStatus := util.RetryInsecureGet(ctx, "https://localhost:10257/healthz")
+		healthcheckStatus := util.RetryGet(ctx, "https://localhost:10257/healthz", cryptomaterial.CACertPath(cryptomaterial.KubeAPIServerLocalhostSigner(cryptomaterial.CertsDirectory(config.DataDir))))
 		if healthcheckStatus != 200 {
 			klog.Errorf("kube-controller-manager failed to start")
 			errorChannel <- errors.New("kube-controller-manager failed to start")

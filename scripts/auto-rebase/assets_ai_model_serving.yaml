@@ -2,8 +2,6 @@ assets:
   - dir: optional/ai-model-serving/
     no_clean: True
     files:
-      - file: kustomization.yaml
-        ignore: "MicroShift specific overrides"
       - file: release-ai-model-serving-x86_64.json
         ignore: "Release info file"
 

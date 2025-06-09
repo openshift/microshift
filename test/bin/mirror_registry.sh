@@ -5,12 +5,22 @@ SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # shellcheck source=test/bin/common.sh
 source "${SCRIPTDIR}/common.sh"
 
-PULL_SECRET=${PULL_SECRET:-${HOME}/.pull-secret.json}
-
 POSTGRES_IMAGE="docker.io/library/postgres:10.12"
 REDIS_IMAGE="docker.io/library/redis:5.0.7"
 QUAY_IMAGE="quay.io/microshift/quay:v3.11.7-$(uname -m)"
 QUAY_CONFIG_DIR="${MIRROR_REGISTRY_DIR}/config"
+QUAY_STORAGE_DIR="${MIRROR_REGISTRY_DIR}/storage"
+
+PULL_SECRET=${PULL_SECRET:-${HOME}/.pull-secret.json}
+QUAY_PULL_SECRET="${QUAY_CONFIG_DIR}/pull_secret.json"
+
+reset_storage_permissions() {
+    # Ensure that the current user owns the mirror registry directories and files
+    if [ -d "${MIRROR_REGISTRY_DIR}" ] ; then
+        sudo chown -R "$(id -gn)" "${MIRROR_REGISTRY_DIR}"
+        sudo chgrp -R "$(id -gn)" "${MIRROR_REGISTRY_DIR}"
+    fi
+}
 
 setup_prereqs() {
     # Install packages if not yet available locally
@@ -18,9 +28,11 @@ setup_prereqs() {
         "${SCRIPTDIR}/../../scripts/dnf_retry.sh" "install" "podman skopeo jq"
     fi
 
-    # Create registry repository base directory structure
+    # Create registry repository base directory structure and reset permissions
+    # if downloaded from cache
     mkdir -p "${MIRROR_REGISTRY_DIR}"
     mkdir -p "${QUAY_CONFIG_DIR}"
+    reset_storage_permissions
 
     # Create a new pull secret file containing authentication information for both
     # remote (from PULL_SECRET environment) and local registries
@@ -33,10 +45,8 @@ setup_prereqs() {
     }
 }
 EOF
-    jq -s '.[0] * .[1]' "${PULL_SECRET}" "${QUAY_CONFIG_DIR}/microshift_auth.json" > "${QUAY_CONFIG_DIR}/pull_secret.json"
-    chmod 600 "${QUAY_CONFIG_DIR}/pull_secret.json"
-    # Reset the pull secret variable to point to the new file
-    PULL_SECRET="${QUAY_CONFIG_DIR}/pull_secret.json"
+    jq -s '.[0] * .[1]' "${PULL_SECRET}" "${QUAY_CONFIG_DIR}/microshift_auth.json" > "${QUAY_PULL_SECRET}"
+    chmod 600 "${QUAY_PULL_SECRET}"
 
     # TLS authentication is disabled in Quay local registry. The mirror-images.sh
     # helper uses skopeo without TLS options and it defaults to https, so we need
@@ -57,6 +67,13 @@ EOF
 [[registry]]
     prefix = ""
     location = "registry.redhat.io"
+[[registry.mirror]]
+    location = "${MIRROR_REGISTRY_URL}"
+    insecure = true
+
+[[registry]]
+    prefix = ""
+    location = "localhost"
 [[registry.mirror]]
     location = "${MIRROR_REGISTRY_URL}"
     insecure = true
@@ -124,7 +141,6 @@ setup_registry() {
     for i in "${POSTGRES_IMAGE}" "${REDIS_IMAGE}" "${QUAY_IMAGE}" ; do
         echo "Pulling '${i}' image locally"
         sudo skopeo copy \
-            --authfile "${PULL_SECRET}" \
             --quiet \
             --retry-times 3 \
             --preserve-digests \
@@ -135,21 +151,27 @@ setup_registry() {
     wait
 
     # Set up Postgres
+    #
+    # The following changes are implemented on top of the documented procedure:
+    # - The setfacl command is not used because the container is run with the
+    #   current user and group permissions.
+    # - The container is run with the current user and group permissions to avoid
+    #   permission denied issues in the user home directory.
+    # - The number of maximum connections to the database is increased from the
+    #   default of 100 to avoid 'FATAL: sorry, too many clients already' errors.
+    #
     # See https://docs.projectquay.io/deploy_quay.html#poc-configuring-database
     if [ ! -d "${MIRROR_REGISTRY_DIR}/postgres" ] ; then
         mkdir -p "${MIRROR_REGISTRY_DIR}/postgres"
-        setfacl -m u:26:-wx "${MIRROR_REGISTRY_DIR}/postgres"
         new_db=true
     fi
 
-    # The number of maximum connections to the database is increased from the
-    # default of 100 to avoid 'FATAL: sorry, too many clients already' errors.
-    #
     # Note that the container log still shows the default setting of 100. Run
     # the 'echo SHOW max_connections | psql -d quay -U quayuser' query to
     # determine the current setting.
     echo "Running Postgres container"
     sudo podman run -d --rm --name microshift-postgres \
+        --user "$(id -u):$(id -g)" \
         -e POSTGRES_USER=quayuser \
         -e POSTGRES_PASSWORD=quaypass \
         -e POSTGRES_DB=quay \
@@ -184,7 +206,7 @@ setup_registry() {
 
     # Set up Quay
     # See https://docs.projectquay.io/deploy_quay.html#poc-deploying-quay
-
+    #
     # Create the configuration template using the minimal configuration settings.
     # If template is updated, replace hardcoded Postgres, Redis IPs and Quay URL
     # by respective variables.
@@ -221,27 +243,35 @@ EOF
         podman_network="--network=microshift-ipv6-dual-stack"
     fi
 
+    # The following changes are implemented on top of the documented procedure:
+    # - The setfacl command is not used because the container is run with the
+    #   current user and group ID mapping.
     # See https://docs.projectquay.io/deploy_quay.html#preparing-local-storage
-    if [ ! -d "${MIRROR_REGISTRY_DIR}/storage" ] ; then
-        mkdir -p "${MIRROR_REGISTRY_DIR}/storage"
-        setfacl -m u:1001:-wx "${MIRROR_REGISTRY_DIR}/storage"
+    if [ ! -d "${QUAY_STORAGE_DIR}" ] ; then
+        mkdir -p "${QUAY_STORAGE_DIR}"
     fi
 
     # Run Quay container
+    #
+    # The following changes are implemented on top of the documented procedure:
+    # - The current user and group ID is mapped to 1001 in the container
+    #   so that all files on host are owned by the current user
     # See https://docs.projectquay.io/deploy_quay.html#deploy-quay-registry
     echo "Running Quay container"
     sudo podman run -d --name=microshift-quay \
+        --uidmap="0:0:1" --uidmap="1001:$(id -u):1" \
+        --gidmap="0:0:1" --gidmap="1001:$(id -g):1" \
         ${podman_network} \
         -p "${MIRROR_REGISTRY_PORT}:8080" \
         -p "[::]:${MIRROR_REGISTRY_PORT}:8080" \
         -v "${QUAY_CONFIG_DIR}:/conf/stack:Z" \
-        -v "${MIRROR_REGISTRY_DIR}/storage:/datastorage:Z" \
+        -v "${QUAY_STORAGE_DIR}:/datastorage:Z" \
         "${QUAY_IMAGE}" >/dev/null
 
     # Wait until the Quay instance is started
     for i in $(seq 60) ; do
         sleep 1
-        if curl -sI "${quay_url}" 2>/dev/null | grep -Eq "HTTP.*200 OK" ; then
+        if curl -sI --connect-timeout 5 --max-time 5 "${quay_url}" 2>/dev/null | grep -Eq "HTTP.*200 OK" ; then
             i=0
             break
         fi
@@ -263,11 +293,9 @@ EOF
 }
 
 finalize_registry() {
-    # Ensure that permissions are open for the current user on the mirror registry
-    # directories and files. This is necessary to avoid 'find' command errors.
-    sudo chgrp -R "$(id -gn)" "${MIRROR_REGISTRY_DIR}"
-    sudo find "${MIRROR_REGISTRY_DIR}" -type d -exec chmod a+rx '{}' +
-    sudo find "${MIRROR_REGISTRY_DIR}" -type f -exec chmod a+r  '{}' +
+    reset_storage_permissions
+    # Delete the combined pull secret file
+    rm -f "${QUAY_PULL_SECRET}"
 }
 
 mirror_images() {
@@ -285,7 +313,7 @@ mirror_images() {
     done
 
     sort -u "${ifile}" "${ffile}" > "${ofile}"
-    "${ROOTDIR}/scripts/mirror-images.sh" --mirror "${PULL_SECRET}" "${ofile}" "${MIRROR_REGISTRY_URL}"
+    "${ROOTDIR}/scripts/mirror-images.sh" --mirror "${QUAY_PULL_SECRET}" "${ofile}" "${MIRROR_REGISTRY_URL}"
     rm -f "${ofile}" "${ffile}"
 }
 

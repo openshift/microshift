@@ -27,25 +27,26 @@ import json
 import argparse
 from base64 import b64decode, b64encode
 from os.path import basename
+import subprocess
 from time import sleep
+from typing import Iterator, Tuple
 
 from robot.libraries.BuiltIn import BuiltIn, DotDict
-from robot.libraries.Process import Process, ExecutionResult
 from robot.utils.robottime import timestr_to_secs
 
 
-def _execute(vm_name: str, agent_message: dict) -> dict | int:
+def _execute(vm_name: str, agent_message: dict) -> dict:
     virsh_args = f'virsh --connect=qemu:///system qemu-agent-command --domain={vm_name} --cmd='
     msg = json.dumps(agent_message)
     virsh_args += f'\'{msg}\''
 
-    result: ExecutionResult = Process().run_process(virsh_args, shell=True)
+    result = subprocess.run(virsh_args, shell=True, capture_output=True, text=True)
     # Only raise an error if the virsh command itself fails.  The guest-agent may return a non-zero exit code which
     # should be handled by the keyword caller.
-    if result.rc != 0:
+    if result.returncode != 0:
         raise RuntimeError(f'virsh command failed:\nstdout={result.stdout}'
                            f'\nstderr={result.stderr}'
-                           f'\nrc={result.rc}')
+                           f'\nrc={result.returncode}')
     #  qemu-agent-command returns data to stdout as:
     #  {
     #    return: {
@@ -77,7 +78,7 @@ def _do_guest_exec(vm_name: str, cmd: str, *args, env: dict, stdin: str) -> int:
     return content['pid']
 
 
-def _do_guest_exec_status(vm_name: str, pid: int) -> (dict, bool):
+def _do_guest_exec_status(vm_name: str, pid: int) -> Tuple[dict, bool]:
     # _do_guest_exec_status wraps a given Process ID (pid) in a qemu-guest-agent guest-exec-status API call. For more
     # info this API, see https://qemu-project.gitlab.io/qemu/interop/qemu-ga-ref.html#qapidoc-198.  For information on
     # the guest-exec-status return message, see https://qemu-project.gitlab.io/qemu/interop/qemu-ga-ref.html#qapidoc-194
@@ -117,7 +118,7 @@ def _do_kill(vm_name: str, pid: str, signal: str) -> int:
     return _do_guest_exec(vm_name, '/usr/bin/kill', signal, pid)
 
 
-def terminate_guest_process(vm_name: str, pid: str | int, kill: bool = False) -> (int, bool):
+def terminate_guest_process(vm_name: str, pid: str | int, kill: bool = False) -> Tuple[int, bool]:
     """
     :param vm_name:         The name of the VM to execute the command on.
     :type vm_name:          str
@@ -152,7 +153,7 @@ def terminate_guest_process(vm_name: str, pid: str | int, kill: bool = False) ->
     return _do_kill(vm_name, pid, "-15" if not kill else "-9")
 
 
-def get_guest_process_result(vm_name: str, pid: int) -> (DotDict, bool):
+def get_guest_process_result(vm_name: str, pid: int) -> Tuple[DotDict, bool]:
     """
     :param vm_name:        The name of the VM to execute the command on
     :type vm_name:         str
@@ -174,8 +175,7 @@ def get_guest_process_result(vm_name: str, pid: int) -> (DotDict, bool):
     return DotDict(_do_guest_exec_status(vm_name, pid))
 
 
-def wait_for_guest_process(vm_name: str, pid: int, timeout: int = None, on_timeout: str = "continue") -> (
-        DotDict, bool):
+def wait_for_guest_process(vm_name: str, pid: int, timeout: int = None, on_timeout: str = "continue") -> Tuple[DotDict, bool]:
     """
     :param vm_name:         The name of the VM to execute the command on
     :type vm_name:          str
@@ -247,7 +247,7 @@ def wait_for_guest_process(vm_name: str, pid: int, timeout: int = None, on_timeo
 
 
 def run_guest_process(vm_name: str, cmd: str, *args, env: dict = None, stdin: str = None, timeout: int = None,
-                      on_timeout: str = "continue") -> (DotDict, bool):
+                      on_timeout: str = "continue") -> Tuple[DotDict, bool]:
     """
     :param vm_name:     The name of the VM to execute the command on
     :type vm_name:      str
@@ -351,7 +351,7 @@ def _close_file(vm_name, handle):
     _execute(vm_name, agent_cmd_wrapper)
 
 
-def _stream_file(vm_name: str, path: str) -> str:
+def _stream_file(vm_name: str, path: str) -> Iterator[str]:
     handle = _open_file(vm_name, path, 'r')
     try:
         while True:
@@ -359,7 +359,7 @@ def _stream_file(vm_name: str, path: str) -> str:
                 'execute': 'guest-file-read',
                 'arguments': {
                     'handle': handle,
-                    'count': 10240
+                    'count': 100 * 1024
                 }
             })
 

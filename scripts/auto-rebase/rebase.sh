@@ -46,21 +46,7 @@ title() {
 check_preconditions() {
     if ! hash yq; then
         title "Installing yq"
-
-        local YQ_VER=4.26.1
-        local YQ_HASH_amd64=9e35b817e7cdc358c1fcd8498f3872db169c3303b61645cc1faf972990f37582
-        local YQ_HASH_arm64=8966f9698a9bc321eae6745ffc5129b5e1b509017d3f710ee0eccec4f5568766
-        local YQ_HASH="YQ_HASH_$(go env GOARCH)"
-        local YQ_URL=https://github.com/mikefarah/yq/releases/download/v${YQ_VER}/yq_linux_$(go env GOARCH)
-        local YQ_EXE=$(mktemp /tmp/yq-exe.XXXXX)
-        local YQ_SUM=$(mktemp /tmp/yq-sum.XXXXX)
-        echo -n "${!YQ_HASH} -" > ${YQ_SUM}
-        if ! (curl -Ls "${YQ_URL}" | tee ${YQ_EXE} | sha256sum -c ${YQ_SUM} &>/dev/null); then
-            echo "ERROR: Expected file at ${YQ_URL} to have checksum ${!YQ_HASH} but instead got $(sha256sum <${YQ_EXE} | cut -d' ' -f1)"
-            exit 1
-        fi
-        chmod +x ${YQ_EXE} && sudo cp ${YQ_EXE} /usr/bin/yq
-        rm -f ${YQ_EXE} ${YQ_SUM}
+        sudo DEST_DIR=/usr/bin/ "${REPOROOT}/scripts/fetch_tools.sh" yq
     fi
 
     if ! hash python3; then
@@ -291,15 +277,6 @@ update_modulepath_version_from_release() {
     replace_using_component_commit "${modulepath}" "${new_modulepath}" "${component}" "${reponame}"
 }
 
-# Updates the ReplaceDirective for an old ${modulepath} with the new modulepath
-# in the staging directory of openshift/kubernetes at the released version.
-update_modulepath_to_kubernetes_staging() {
-    local modulepath=$1
-
-    new_modulepath="github.com/openshift/kubernetes/staging/src/${modulepath}"
-    replace_using_component_commit "${modulepath}" "${new_modulepath}" "kubernetes" "kubernetes"
-}
-
 # Returns the line (including trailing comment) in the #{gomod_file} containing the ReplaceDirective for ${module_path}
 get_replace_directive() {
     local gomod_file=$1
@@ -408,25 +385,24 @@ list_staging_repos() {
 # and this is driven from keywords added as comments after each line of
 # ReplaceDirectives:
 #   // from ${component}     selects the replacement from the go.mod of ${component}
-#   // staging kubernetes    selects the replacement from the staging dir of openshift/kubernetes
 #   // release ${component}  uses the commit of ${component} as specified in the release image
 #   // override [${reason}]  keep existing replacement
 # Note directives without keyword comment are skipped with a warning.
 update_go_mod() {
     title "# Updating $(basename "$(pwd)")/go.mod"
 
-    # Require updated versions of RCM and CPC
+    # Require updated version of CPC
     require_using_component_commit github.com/openshift/cluster-policy-controller cluster-policy-controller
-    require_using_component_commit github.com/openshift/route-controller-manager route-controller-manager
 
-    # For all repos in o/k staging, ensure a RequireDirective of v0.0.0
-    # and a ReplaceDirective to an absolute modulepath to o/k staging.
+    # Add ./dest/ path replace for all repos in openshift/kubernetes staging (../dest for etcd go.mod)
+    prefix="./deps"
+    if [[ "$(basename "$(pwd)")" == "etcd" ]]; then
+        prefix="../deps"
+    fi
     for repo in $(list_staging_repos); do
-        go mod edit -require "k8s.io/${repo}@v0.0.0"
-        update_modulepath_to_kubernetes_staging "k8s.io/${repo}"
-        if [ -z "$(get_comment "$(get_replace_directive "$(pwd)/go.mod" "k8s.io/${repo}")")" ]; then
-            update_comment "k8s.io/${repo}" "staging kubernetes"
-        fi
+        modulepath="k8s.io/${repo}"
+        new_modulepath="${prefix}/github.com/openshift/kubernetes/staging/src/${modulepath}"
+        go mod edit -replace "${modulepath}=${new_modulepath}"
     done
 
     # Update existing replace directives
@@ -442,9 +418,6 @@ update_go_mod() {
             valid_component_or_exit "${component}"
             update_modulepath_version_from_component "${modulepath}" "${component}"
             ;;
-        staging)
-            update_modulepath_to_kubernetes_staging "${modulepath}"
-            ;;
         release)
             component=${arguments%% *}
             reponame="${component}"
@@ -455,6 +428,9 @@ update_go_mod() {
             valid_component_or_exit "${component}"
             update_modulepath_version_from_release "${modulepath}" "${component}" "${reponame}"
             ;;
+        deps)
+            handle_deps "${modulepath}" "${arguments}"
+            ;;
         override)
             echo "skipping modulepath ${modulepath}: override [${arguments}]"
             ;;
@@ -464,7 +440,83 @@ update_go_mod() {
         esac
     done
 
+    # Update required version of RCM for information purposes only (avoid having zeros as version)
+    require_using_component_commit github.com/openshift/route-controller-manager route-controller-manager
+
+    if grep -q "^patch-deps:" ./Makefile; then
+        # etcd/ does not need to patch the dependencies
+        make patch-deps
+    fi
+
     go mod tidy
+}
+
+# handle_deps handles go.mod's directives starting with 'deps' such as:
+# - deps copy - copy dependency from _output/staging to deps/
+# - deps clone github.com/kubernetes/klog from kubernetes - clone repo to deps/ with reference from another component (from staging)
+# - deps kubernetes-version - update module's required version in go.mod (for information purposes only as they're replaced anyway)
+handle_deps() {
+    local -r modulepath="${1}"
+    local -r deps_args="${2}"
+    IFS=', ' read -r -a args <<< "${deps_args}"
+
+    # replace_path is the ./deps/ORG/REPO path
+    local replace_path
+    replace_path="$(go mod edit -json | jq -r --arg M "${modulepath}" '.Replace[] | select(.Old.Path == $M) | .New.Path')"
+    local -r cmd="${args[0]}"
+
+    case "${cmd}" in
+        copy)
+            local -r dirname="${modulepath##*/}"
+            echo "Handling '${modulepath}' dep: copying ${REPOROOT}/_output/staging/${dirname} -> ${REPOROOT}/${replace_path}"
+
+            # Update version in require so it's accurate even though unused (because replaced).
+            if [[ "${modulepath}" == "k8s.io/kubernetes" ]]; then
+                # k8s.io/kubernetes gets special treatment because it's obtained from release information.
+                # Other module using 'copy' is route-controller-manager and its version is updated elsewhere.
+                go mod edit -require "${modulepath}@v$(get_kubernetes_version)"
+            fi
+
+            rm -rf "${REPOROOT}/${replace_path}"
+            mkdir -p "$(dirname "${REPOROOT}/${replace_path}")"
+            cp -r "${REPOROOT}/_output/staging/${dirname}" "${REPOROOT}/${replace_path}"
+            rm -rf "${REPOROOT}/${replace_path}/.git"
+            find "${REPOROOT}/${replace_path}/" -name "OWNERS" -delete
+        ;;
+        clone)
+            local -r repo="${args[1]}"
+            local -r src="${args[3]}"
+            local ver
+            ver=$(go mod edit -json "${REPOROOT}/_output/staging/${src}/go.mod" | jq -r --arg M "${modulepath}" '.Require[] | select(.Path == $M) | .Version')
+
+            echo "Handling '${modulepath}' dep: cloning 'https://${repo}' @ '${ver}' to ${REPOROOT}/${replace_path}"
+
+            # Update version in require so it's accurate even though unused (because replaced).
+            go mod edit -require "${modulepath}@${ver}"
+
+            rm -fr "${REPOROOT}/${replace_path}"
+            git clone "https://${repo}" --branch "${ver}" "${REPOROOT}/${replace_path}"
+            rm -fr "${REPOROOT}/${replace_path}/.git"
+            find "${REPOROOT}/${replace_path}/" -name "OWNERS" -delete
+        ;;
+        kubernetes-version)
+            local -r ver="$(get_kubernetes_version)"
+            echo "Handling '${modulepath}' dep: updating required version to '${ver}' (for information purposes)"
+            go mod edit -require "${modulepath}@v${ver}"
+        ;;
+    esac
+
+    go mod tidy -e
+}
+
+global_kubernetes_version=""
+get_kubernetes_version() {
+    if [[ "${global_kubernetes_version}" == "" ]]; then
+        global_kubernetes_version=$(jq -j \
+            '.references.spec.tags[] | select(.name == "hyperkube") | .annotations["io.openshift.build.versions"] | split("=") | .[1]' \
+            "${STAGING_DIR}/release_amd64.json")
+    fi
+    echo "${global_kubernetes_version}"
 }
 
 # Updates go.mod file in dirs defined in GO_MOD_DIRS
@@ -816,6 +868,7 @@ EOF
 
     update_olm_images
     update_multus_images
+    update_kubeproxy_images
 
     popd >/dev/null
 }
@@ -975,8 +1028,8 @@ update_multus_images() {
         arch=${GOARCH_TO_UNAME_MAP["${goarch}"]:-noarch}
 
         local release_file="${STAGING_DIR}/release_${goarch}.json"
-        local kustomization_arch_file="${REPOROOT}/assets/optional/multus/kustomization.${arch}.yaml"
-        local multus_release_json="${REPOROOT}/assets/optional/multus/release-multus-${arch}.json"
+        local kustomization_arch_file="${REPOROOT}/assets/components/multus/kustomization.${arch}.yaml"
+        local multus_release_json="${REPOROOT}/assets/components/multus/release-multus-${arch}.json"
 
         local base_release
         base_release=$(jq -r ".metadata.version" "${release_file}")
@@ -1118,6 +1171,44 @@ EOF
     done  # for goarch
 }
 
+update_kubeproxy_images() {
+    title "Rebasing kube-proxy images"
+
+    for goarch in amd64 arm64; do
+        arch=${GOARCH_TO_UNAME_MAP["${goarch}"]:-noarch}
+
+        local release_file="${STAGING_DIR}/release_${goarch}.json"
+        local kustomization_arch_file="${REPOROOT}/assets/optional/kube-proxy/kustomization.${arch}.yaml"
+        local kubeproxy_release_json="${REPOROOT}/assets/optional/kube-proxy/release-kube-proxy-${arch}.json"
+
+        local base_release
+        base_release=$(jq -r ".metadata.version" "${release_file}")
+        jq -n "{\"release\": {\"base\": \"$base_release\"}, \"images\": {}}" > "${kubeproxy_release_json}"
+
+        # Create extra kustomization for each arch in separate file.
+        # Right file (depending on arch) should be appended during rpmbuild to kustomization.yaml.
+        cat <<EOF > "${kustomization_arch_file}"
+
+images:
+EOF
+
+        for container in kube-proxy; do
+            local new_image
+            new_image=$(jq -r ".references.spec.tags[] | select(.name == \"${container}\") | .from.name" "${release_file}")
+            local new_image_name="${new_image%@*}"
+            local new_image_digest="${new_image#*@}"
+
+            cat <<EOF >> "${kustomization_arch_file}"
+  - name: ${container}
+    newName: ${new_image_name}
+    digest: ${new_image_digest}
+EOF
+
+            yq -i -o json ".images += {\"${container}\": \"${new_image}\"}" "${kubeproxy_release_json}"
+        done  # for container
+    done  # for goarch
+}
+
 check_for_manifests_changes() {
     # Changes to ignore:
     # - `release-$ARCH.json` files
@@ -1156,6 +1247,13 @@ rebase_to() {
             title "## Committing changes to ${dirname}/go.mod"
             git add "${dirpath}/go.mod" "${dirpath}/go.sum"
             git commit -m "update ${dirname}/go.mod"
+
+            title "## Updating deps/ directory"
+            if [[ -n "$(git status -s "${dirpath}/deps")" ]]; then
+                title "## Commiting changes to ${dirname}/deps directory"
+                git add "${dirpath}/deps"
+                git commit -m "update ${dirname}/deps"
+            fi
 
             title "## Updating ${dirname}/vendor directory"
             pushd "${dirpath}" && make vendor && popd || exit 1

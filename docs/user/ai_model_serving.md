@@ -198,7 +198,7 @@ to re-create OVMS `ServingRuntime` in the workload's namespace:
 OVMS_IMAGE="$(jq -r '.images | with_entries(select(.key == "ovms-image")) | .[]' /usr/share/microshift/release/release-ai-model-serving-"$(uname -i)".json)"
 
 # Duplicate the original ServingRuntime yaml
-cp /usr/lib/microshift/manifests.d/001-microshift-ai-model-serving/runtimes/ovms-kserve.yaml ./ovms-kserve.yaml
+cp /usr/lib/microshift/manifests.d/050-microshift-ai-model-serving-runtimes/ovms-kserve.yaml ./ovms-kserve.yaml
 
 # Update the image reference
 sed -i "s,image: ovms-image,image: ${OVMS_IMAGE}," ./ovms-kserve.yaml
@@ -442,6 +442,19 @@ ovms_requests_success{api="KServe",interface="REST",method="ModelReady",name="ov
 ovms_requests_success{api="KServe",interface="REST",method="ModelMetadata",name="ovms-resnet50",version="1"} 1
 ```
 
+##### Scraping model server's metrics with microshift-observability (OTEL)
+
+In order to scrape model server's metrics with microshift-observability:
+1. Your OTEL configuration needs to include prometheus receiver (see [opentelemetry-collector-large.yaml](/packaging/observability/opentelemetry-collector-large.yaml) preset of example)
+1. Your InferenceService CR needs to include following annotation which will be passed-through to the Pod:
+   ```yaml
+   apiVersion: serving.kserve.io/v1beta1
+   kind: InferenceService
+   metadata:
+     annotations:
+       prometheus.io/scrape: "true"
+   ```
+
 #### Other Inference Protocol endpoints
 
 To learn more about kserve endpoints see upstream documentation:
@@ -454,10 +467,10 @@ To learn more about kserve endpoints see upstream documentation:
 If you wish to override kserve settings, you need to make a copy of existing ConfigMap, tweak the desired settings, and overwrite the existing ConfigMap.
 
 Settings are stored in a ConfigMap named `inferenceservice-config` in the `redhat-ods-applications` namespace.
-Alternatively, you can copy the ConfigMap from `/usr/lib/microshift/manifests.d/001-microshift-ai-model-serving/kserve/inferenceservice-config-microshift-patch.yaml`.
+Alternatively, you can copy the ConfigMap from `/usr/lib/microshift/manifests.d/010-microshift-ai-model-serving-kserve/inferenceservice-config-microshift-patch.yaml`.
 
 After tweaking it, you must apply the ConfigMap and restart kserve (e.g. by deleting Pod or scaling the Deployment down to 0 and back to 1).
-For RHEL For Edge and RHEL Image Mode systems, create a new manifest making sure it's applied after `/usr/lib/microshift/manifests.d/001-microshift-ai-model-serving`.
+For RHEL For Edge and RHEL Image Mode systems, create a new manifest making sure it's applied after `/usr/lib/microshift/manifests.d/010-microshift-ai-model-serving-kserve`.
 
 ### Limitations
 - AI Model Serving on MicroShift is only available on the x86_64 platform.

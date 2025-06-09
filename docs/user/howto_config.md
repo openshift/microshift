@@ -29,6 +29,30 @@ dns:
 etcd:
     memoryLimitMB: 0
 ingress:
+    accessLogging:
+        destination:
+            container:
+                maxLength: 0
+            syslog:
+                address: ""
+                facility: ""
+                maxLength: 0
+                port: 0
+            type: ""
+        httpCaptureCookies:
+            - matchType: ""
+              maxLength: 0
+              name: ""
+              namePrefix: ""
+        httpCaptureHeaders:
+            request:
+                - maxLength: 0
+                  name: ""
+            response:
+                - maxLength: 0
+                  name: ""
+        httpLogFormat: ""
+        status: ""
     certificateSecret: ""
     clientTLS:
         allowedSubjectPatterns: []
@@ -40,6 +64,8 @@ ingress:
     httpCompression:
         mimeTypes: []
     httpEmptyRequestsPolicy: ""
+    httpErrorCodePages:
+        name: ""
     listenAddress: []
     logEmptyRequests: ""
     ports:
@@ -75,6 +101,8 @@ manifests:
 network:
     clusterNetwork: []
     cniPlugin: ""
+    multus:
+        status: ""
     serviceNetwork: []
     serviceNodePortRange: ""
 node:
@@ -86,6 +114,7 @@ storage:
     optionalCsiComponents: []
 telemetry:
     endpoint: ""
+    proxy: ""
     status: ""
 
 ```
@@ -123,6 +152,30 @@ dns:
 etcd:
     memoryLimitMB: 0
 ingress:
+    accessLogging:
+        destination:
+            container:
+                maxLength: 1024
+            syslog:
+                address: ""
+                facility: ""
+                maxLength: 1024
+                port: 0
+            type: ""
+        httpCaptureCookies:
+            - matchType: ""
+              maxLength: 0
+              name: ""
+              namePrefix: ""
+        httpCaptureHeaders:
+            request:
+                - maxLength: 0
+                  name: ""
+            response:
+                - maxLength: 0
+                  name: ""
+        httpLogFormat: ""
+        status: Disabled
     certificateSecret: router-certs-default
     clientTLS:
         allowedSubjectPatterns: []
@@ -134,6 +187,8 @@ ingress:
     httpCompression:
         mimeTypes: []
     httpEmptyRequestsPolicy: Respond
+    httpErrorCodePages:
+        name: ""
     listenAddress: []
     logEmptyRequests: Log
     ports:
@@ -174,6 +229,8 @@ network:
     clusterNetwork:
         - 10.42.0.0/16
     cniPlugin: ""
+    multus:
+        status: Disabled
     serviceNetwork:
         - 10.43.0.0/16
     serviceNodePortRange: 30000-32767
@@ -185,7 +242,8 @@ storage:
     driver: ""
     optionalCsiComponents: []
 telemetry:
-    endpoint: https://infogw.api.openshift.com
+    endpoint: https://infogw.api.openshift.com/metrics/v1/receive
+    proxy: ""
     status: Enabled
 
 ```

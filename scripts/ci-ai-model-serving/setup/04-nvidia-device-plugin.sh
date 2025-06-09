@@ -18,3 +18,6 @@ kind: Kustomization
 resources:
   - nvidia-device-plugin.yml
 EOF
+
+mkdir -p "${HOME}/artifacts"
+echo "${VER}" > "${HOME}/artifacts/operator.version"

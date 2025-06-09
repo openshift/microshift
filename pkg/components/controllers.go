@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"math"
+	"net"
 	"os"
 	"path/filepath"
 	"regexp/syntax"
@@ -150,6 +151,9 @@ func startIngressController(ctx context.Context, cfg *config.Config, kubeconfigP
 			"components/openshift-router/service-internal.yaml",
 			"components/openshift-router/service-cloud.yaml",
 		}
+		cmAccessLog = []string{
+			"components/openshift-router/configmap-accesslog.yaml",
+		}
 		cm                   = "components/openshift-router/configmap.yaml"
 		servingKeypairSecret = "components/openshift-router/serving-certificate.yaml"
 	)
@@ -205,6 +209,13 @@ func startIngressController(ctx context.Context, cfg *config.Config, kubeconfigP
 	extraParams, err := generateIngressParams(cfg)
 	if err != nil {
 		return err
+	}
+
+	if cfg.Ingress.AccessLogging.Status == config.AccessLoggingEnabled {
+		if err := assets.ApplyConfigMaps(ctx, cmAccessLog, renderTemplate, renderParamsFromConfig(cfg, extraParams), kubeconfigPath); err != nil {
+			klog.Warningf("Failed to apply configMap %v: %v", cmAccessLog, err)
+			return err
+		}
 	}
 
 	if err := assets.ApplyServices(ctx, svc, renderTemplate, renderParamsFromConfig(cfg, extraParams), kubeconfigPath); err != nil {
@@ -474,6 +485,24 @@ func generateIngressParams(cfg *config.Config) (assets.RenderParams, error) {
 		clientAuthCAPath = filepath.Join(clientCAMountPath, clientCABundleFilename)
 	}
 
+	accessLoggingMaxLength := 0
+	if cfg.Ingress.AccessLogging.Status == config.AccessLoggingEnabled {
+		if cfg.Ingress.AccessLogging.Destination.Type == operatorv1.ContainerLoggingDestinationType && cfg.Ingress.AccessLogging.Destination.Container != nil {
+			accessLoggingMaxLength = int(cfg.Ingress.AccessLogging.Destination.Container.MaxLength)
+		} else if cfg.Ingress.AccessLogging.Destination.Type == operatorv1.SyslogLoggingDestinationType && cfg.Ingress.AccessLogging.Destination.Syslog != nil {
+			accessLoggingMaxLength = int(cfg.Ingress.AccessLogging.Destination.Syslog.MaxLength)
+		}
+	}
+	accessLoggingSyslogAddress := ""
+	if cfg.Ingress.AccessLogging.Destination.Syslog != nil {
+		port := fmt.Sprintf("%d", cfg.Ingress.AccessLogging.Destination.Syslog.Port)
+		accessLoggingSyslogAddress = net.JoinHostPort(cfg.Ingress.AccessLogging.Destination.Syslog.Address, port)
+	}
+	accessLoggingSyslogFacility := ""
+	if cfg.Ingress.AccessLogging.Destination.Syslog != nil {
+		accessLoggingSyslogFacility = cfg.Ingress.AccessLogging.Destination.Syslog.Facility
+	}
+
 	extraParams := assets.RenderParams{
 		"RouterNamespaceOwnership":    cfg.Ingress.AdmissionPolicy.NamespaceOwnership == config.NamespaceOwnershipAllowed,
 		"RouterHttpPort":              *cfg.Ingress.Ports.Http,
@@ -507,7 +536,44 @@ func generateIngressParams(cfg *config.Config) (assets.RenderParams, error) {
 		"ClientAuthFilter":            clientAuthFilter,
 		"ClientCABundleFilename":      clientCABundleFilename,
 		"ClientCAMountPath":           clientCAMountPath,
+		"AccessLoggingEnabled":        cfg.Ingress.AccessLogging.Status == config.AccessLoggingEnabled,
+		"AccessLoggingMaxLength":      accessLoggingMaxLength,
+		"AccessLoggingSyslogAddress":  accessLoggingSyslogAddress,
+		"AccessLoggingSyslogFacility": accessLoggingSyslogFacility,
+		"HttpLogFormat":               cfg.Ingress.AccessLogging.HttpLogFormat,
+		"HttpErrorCodePages":          cfg.Ingress.HttpErrorCodePages.Name,
+		"HttpCaptureHeadersRequest":   serializeCaptureHeaders(cfg.Ingress.AccessLogging.HttpCaptureHeaders.Request),
+		"HttpCaptureHeadersResponse":  serializeCaptureHeaders(cfg.Ingress.AccessLogging.HttpCaptureHeaders.Response),
+		"HttpCaptureCookies":          serializeCaptureCookies(cfg.Ingress.AccessLogging.HttpCaptureCookies),
 	}
 
 	return extraParams, nil
+}
+
+func serializeCaptureHeaders(captureHeaders []operatorv1.IngressControllerCaptureHTTPHeader) string {
+	headerSpecs := make([]string, len(captureHeaders))
+	for i, header := range captureHeaders {
+		headerSpecs[i] = fmt.Sprintf("%s:%d", header.Name, header.MaxLength)
+	}
+	return strings.Join(headerSpecs, ",")
+}
+
+func serializeCaptureCookies(captureCookies []operatorv1.IngressControllerCaptureHTTPCookie) string {
+	if len(captureCookies) == 0 {
+		return ""
+	}
+	var (
+		cookieName string
+		maxLength  = captureCookies[0].MaxLength
+	)
+	switch captureCookies[0].MatchType {
+	case operatorv1.CookieMatchTypeExact:
+		cookieName = captureCookies[0].Name + "="
+	case operatorv1.CookieMatchTypePrefix:
+		cookieName = captureCookies[0].NamePrefix
+	}
+	if maxLength == 0 {
+		maxLength = 256
+	}
+	return fmt.Sprintf("%s:%d", cookieName, maxLength)
 }

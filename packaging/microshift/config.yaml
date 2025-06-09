@@ -52,6 +52,134 @@ etcd:
     # memory when it gets to this value. 0 means no limit.
     memoryLimitMB: 0
 ingress:
+    # accessLogging describes how the client requests should be logged.
+    accessLogging:
+        # destination is where access logs go.
+        destination:
+            # container holds parameters for the Container logging destination.
+            # Present only if type is Container.
+            container:
+                # maxLength is the maximum length of the log message.
+
+                # Valid values are integers in the range 480 to 8192, inclusive.
+
+                # When omitted, the default value is 1024.
+                maxLength: 1024
+            # syslog holds parameters for a syslog endpoint.  Present only if
+            # type is Syslog.
+            syslog:
+                # address is the IP address of the syslog endpoint that receives log
+                # messages.
+                address: ""
+                # facility specifies the syslog facility of log messages.
+
+                # If this field is empty, the facility is "local1".
+                facility: ""
+                # maxLength is the maximum length of the log message.
+
+                # Valid values are integers in the range 480 to 4096, inclusive.
+
+                # When omitted, the default value is 1024.
+                maxLength: 1024
+                # port is the UDP port number of the syslog endpoint that receives log
+                # messages.
+                port: 0
+            # type is the type of destination for logs.  It must be one of the
+            # following:
+
+            # * Container
+
+            # The ingress operator configures the sidecar container named "logs" on
+            # the ingress controller pod and configures the ingress controller to
+            # write logs to the sidecar.  The logs are then available as container
+            # logs.  The expectation is that the administrator configures a custom
+            # logging solution that reads logs from this sidecar.  Note that using
+            # container logs means that logs may be dropped if the rate of logs
+            # exceeds the container runtime's or the custom logging solution's
+            # capacity.
+
+            # * Syslog
+
+            # Logs are sent to a syslog endpoint.  The administrator must specify
+            # an endpoint that can receive syslog messages.  The expectation is
+            # that the administrator has configured a custom syslog instance.
+            type: ""
+        # httpCaptureCookies specifies HTTP cookies that should be captured in
+        # access logs.  If this field is empty, no cookies are captured.
+        httpCaptureCookies:
+            - # matchType specifies the type of match to be performed on the cookie
+              # name.  Allowed values are "Exact" for an exact string match and
+              # "Prefix" for a string prefix match.  If "Exact" is specified, a name
+              # must be specified in the name field.  If "Prefix" is provided, a
+              # prefix must be specified in the namePrefix field.  For example,
+              # specifying matchType "Prefix" and namePrefix "foo" will capture a
+              # cookie named "foo" or "foobar" but not one named "bar".  The first
+              # matching cookie is captured.
+              matchType: ""
+              # maxLength specifies a maximum length of the string that will be
+              # logged, which includes the cookie name, cookie value, and
+              # one-character delimiter.  If the log entry exceeds this length, the
+              # value will be truncated in the log message.  Note that the ingress
+              # controller may impose a separate bound on the total length of HTTP
+              # headers in a request.
+              maxLength: 0
+              # name specifies a cookie name.  Its value must be a valid HTTP cookie
+              # name as defined in RFC 6265 section 4.1.
+              name: ""
+              # namePrefix specifies a cookie name prefix.  Its value must be a valid
+              # HTTP cookie name as defined in RFC 6265 section 4.1.
+              namePrefix: ""
+        # httpCaptureHeaders defines HTTP headers that should be captured in
+        # access logs.  If this field is empty, no headers are captured.
+
+        # Note that this option only applies to cleartext HTTP connections
+        # and to secure HTTP connections for which the ingress controller
+        # terminates encryption (that is, edge-terminated or reencrypt
+        # connections).  Headers cannot be captured for TLS passthrough
+        # connections.
+        httpCaptureHeaders:
+            # request specifies which HTTP request headers to capture.
+
+            # If this field is empty, no request headers are captured.
+            request:
+                - # maxLength specifies a maximum length for the header value.  If a
+                  # header value exceeds this length, the value will be truncated in the
+                  # log message.  Note that the ingress controller may impose a separate
+                  # bound on the total length of HTTP headers in a request.
+                  maxLength: 0
+                  # name specifies a header name.  Its value must be a valid HTTP header
+                  # name as defined in RFC 2616 section 4.2.
+                  name: ""
+            # response specifies which HTTP response headers to capture.
+
+            # If this field is empty, no response headers are captured.
+            response:
+                - # maxLength specifies a maximum length for the header value.  If a
+                  # header value exceeds this length, the value will be truncated in the
+                  # log message.  Note that the ingress controller may impose a separate
+                  # bound on the total length of HTTP headers in a request.
+                  maxLength: 0
+                  # name specifies a header name.  Its value must be a valid HTTP header
+                  # name as defined in RFC 2616 section 4.2.
+                  name: ""
+        # httpLogFormat specifies the format of the log message for an HTTP
+        # request.
+
+        # If this field is empty, log messages use the implementation's default
+        # HTTP log format.  For HAProxy's default HTTP log format, see the
+        # HAProxy documentation:
+        # http://cbonte.github.io/haproxy-dconv/2.0/configuration.html#8.2.3
+
+        # Note that this format only applies to cleartext HTTP connections
+        # and to secure HTTP connections for which the ingress controller
+        # terminates encryption (that is, edge-terminated or reencrypt
+        # connections).  It does not affect the log format for TLS passthrough
+        # connections.
+        httpLogFormat: ""
+        # Status of the access logging. If set to "Enabled", the router will
+        # log all requests to the access log. If set to "Disabled", the router
+        # will not log any requests to the access log.
+        status: Disabled
     # ServingCertificateSecret references a kubernetes.io/tls type secret containing the TLS cert info for serving secure traffic.
     # The secret must exist in the openshift-ingress namespace and contain the following required fields:
     # - Secret.Data["tls.key"] - TLS private key.
@@ -136,6 +264,18 @@ ingress:
     # be caused by port scans, in which case logging empty requests may aid
     # in detecting intrusion attempts.
     httpEmptyRequestsPolicy: Respond
+    # httpErrorCodePages specifies a configmap with custom error pages.
+    # The administrator must create this configmap in the openshift-config namespace.
+    # This configmap should have keys in the format "error-page-<error code>.http",
+    # where <error code> is an HTTP error code.
+    # For example, "error-page-503.http" defines an error page for HTTP 503 responses.
+    # Currently only error pages for 503 and 404 responses can be customized.
+    # Each value in the configmap should be the full response, including HTTP headers.
+    # Eg- https://raw.githubusercontent.com/openshift/router/fadab45747a9b30cc3f0a4b41ad2871f95827a93/images/router/haproxy/conf/error-page-503.http
+    # If this field is empty, the ingress controller uses the default error pages.
+    httpErrorCodePages:
+        # name is the metadata.name of the referenced config map
+        name: ""
     # List of IP addresses and NIC names where the router will be listening. The NIC
     # names get translated to all their configured IPs dynamically. Defaults to the
     # configured IPs in the host at MicroShift start.
@@ -521,6 +661,11 @@ network:
     # assumes an empty string to mean the OVN-K should be deployed.
     # Allowed values are: unset or one of ["", "ovnk", "none"]
     cniPlugin: ""
+    multus:
+        # Status controls the deployment of the Multus CNI.
+        # Changing from "Enabled" to "Disabled" will not cause Multus CNI to be deleted.
+        # Allowed values are: unset (disabled), "Enabled", or "Disabled"
+        status: Disabled
     # IP address pool for services.
     # Currently, we only support a single entry here.
     # This field is immutable after installation.
@@ -564,7 +709,10 @@ storage:
     optionalCsiComponents: []
 telemetry:
     # Endpoint where to send telemetry data.
-    endpoint: https://infogw.api.openshift.com
+    endpoint: https://infogw.api.openshift.com/metrics/v1/receive
+    # HTTP proxy to use exclusively for telemetry data. If unset telemetry will
+    # default to use the system configured proxy.
+    proxy: ""
     # Telemetry status, which can be Enabled or Disabled. Defaults to Enabled.
     status: Enabled
 

@@ -19,17 +19,25 @@ from cache locally for all `bootc` test scenarios to execute successfully.
 
 > Note: Total build times are up to 10 minutes.
 
-## Bootc Source Layer
+## Bootc Presubmit layer
 
 Artifacts built in this layer cannot be cached as they depend on the current sources.
 
 |Group |Build Time|Description|
 |------|----------|-----------|
-|group1| Average  | Current source prerequisites (RHEL and CentOS)
-|group2| Average  | Current source artifacts on RHEL
-|group3| Average  | Current source artifacts on CentOS (with 1 exception)
+|group1| Short    | Current source prerequisites (RHEL and CentOS) used in presubmits and periodics
+|group2| Short    | Current source artifacts on RHEL used in presubmits and periodics
 
-One of the isolated source image files is an exception in `group3` as it uses
-RHEL. This helps avoid creation of another group with a single file.
+> Note: Total build times are up to 5 minutes.
 
-> Note: Total build times are up to 10 minutes.
+## Bootc Periodic Layer
+
+Artifacts built in this layer cannot be cached as they depend on the current sources.
+
+|Group |Build Time|Description|
+|------|----------|-----------|
+|group1| Average  | Current source prerequisites (RHEL and CentOS) used only in periodics
+|group2| Average  | Current source artifacts on RHEL used only in periodics
+|group3| Average  | Current source artifacts on CentOS used only in periodics
+
+> Note: Total build times are up to 15 minutes.

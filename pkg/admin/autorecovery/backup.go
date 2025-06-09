@@ -17,7 +17,7 @@ const (
 )
 
 func getVersion() (string, error) {
-	isOstree, err := util.PathExists("/run/ostree-booted")
+	isOstree, err := util.IsOSTree()
 	if err != nil {
 		return "", fmt.Errorf("failed to check if system is ostree: %w", err)
 	}
