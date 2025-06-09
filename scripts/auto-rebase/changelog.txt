@@ -1,14 +1,13 @@
-- kubernetes image-arm64 375cd1b6bcb524243cee2e80eff593e2131906da to fadb78e720779ed1b29f32170f3e9dd32584a7e6
-  - 01fefa369 2025-05-21T11:35:15-04:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
-  - 8ed7d1c09 2025-05-21T11:16:21-04:00 UPSTREAM: <drop>: manually resolve conflicts
-  - 9894294ef 2025-05-15T09:05:02+00:00 Release commit for Kubernetes v1.32.5
-  - 2e8b352f5 2025-05-15T08:34:39+00:00 UPSTREAM: 130047: adjusting loopback certificate validity in kube-apiserver
-  - 7ba97788a 2025-04-29T11:56:47+02:00 Bump images, dependencies and versions
-  - 5ad726c6e 2025-04-29T10:52:03+08:00 Handle unsupported node expansion for RWX volumes
-  - b23e63796 2025-04-27T21:52:32-07:00 Manually adding fix for failing pull-kubernetes-typecheck tests which had dependency with this commit: https://github.com/kubernetes/kubernetes/commit/61863035803cc105619925a0fa23a779a9578bd4
-  - cdbea02d3 2025-04-24T07:52:17-04:00 Mark NodeExpansion finsihed without featuregate check
-  - 69e0af310 2025-04-24T07:52:17-04:00 Also change final status by removing featuregate check
-  - 0bec23c95 2025-04-24T07:52:17-04:00 Check for newer fields when deciding expansion recovery feature status
-  - 76bf5dbdc 2025-04-23T23:08:44-07:00 Fix for HNS local endpoint was being deleted instead of the remote endpoint.
-  - d5df907c3 2025-04-22T16:22:00+00:00 Update CHANGELOG/CHANGELOG-1.32.md for v1.32.4
+- kubernetes-kube-storage-version-migrator embedded-component 4c521b09f4dc55ac69234419e083f3815646f4a9 to 4ab93e07bb7c525990ef21a11caae2122ace63f6
+  - 9530ec7 2025-06-05T13:04:03-04:00 Fix verify job with build-machinery bump
+  - b423aa9 2025-06-05T00:14:41+00:00 append .0 to go.mod version
+
+- machine-config-operator embedded-component bccdc7e7382c5958f040769d7ff20ab27ece5bdf to 70025364a114fc3067b2e82ce47fdb0149630e4b
+  - 88899209 2025-05-30T11:01:13+00:00 Fix `dynamic_node_sizing` when only `true` parameter is used
+
+- coredns image-amd64 7a1451db77a68161d58af9b6ca2c9388d578310a to 74776b850522c912db5fbadf7353f1eab669bd2a
+  - 580829f 2025-06-05T00:14:35+00:00 append .0 to go.mod version
+
+- coredns image-arm64 7a1451db77a68161d58af9b6ca2c9388d578310a to 74776b850522c912db5fbadf7353f1eab669bd2a
+  - 580829f 2025-06-05T00:14:35+00:00 append .0 to go.mod version
 
