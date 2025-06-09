@@ -9,7 +9,6 @@ import (
 	"github.com/go-kit/kit/log"
 	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/util"
-	"github.com/prometheus/client_golang/prometheus"
 	"github.com/squat/generic-device-plugin/deviceplugin"
 	"k8s.io/klog/v2"
 
@@ -39,20 +38,12 @@ func (gdp *GenericDevicePlugin) Run(ctx context.Context, ready chan<- struct{}, 
 	defer close(stopped)
 
 	// From https://github.com/squat/generic-device-plugin/blob/main/main.go
-	// TODO: Add skipped bits
-
 	deviceSpecs := gdp.configuration.Devices
-	for i, dsr := range deviceSpecs {
+	for i := range deviceSpecs {
 		deviceSpecs[i].Default()
 		trim := strings.TrimSpace(deviceSpecs[i].Name)
 		deviceSpecs[i].Name = path.Join(gdp.configuration.Domain, trim)
-		for j, g := range deviceSpecs[i].Groups {
-			if len(g.Paths) > 0 && len(g.USBSpecs) > 0 {
-				return fmt.Errorf(
-					"failed to parse device %q; cannot define both path and usb at the same time",
-					dsr.Name,
-				)
-			}
+		for j := range deviceSpecs[i].Groups {
 			for k := range deviceSpecs[i].Groups[j].Paths {
 				deviceSpecs[i].Groups[j].Paths[k].Path = strings.TrimSpace(deviceSpecs[i].Groups[j].Paths[k].Path)
 				deviceSpecs[i].Groups[j].Paths[k].MountPath = strings.TrimSpace(deviceSpecs[i].Groups[j].Paths[k].MountPath)
@@ -64,8 +55,20 @@ func (gdp *GenericDevicePlugin) Run(ctx context.Context, ready chan<- struct{}, 
 	}
 
 	aeg := &util.AllErrGroup{}
-	for i := range deviceSpecs {
-		gp := deviceplugin.NewGenericPlugin(&deviceSpecs[i], dp.DevicePluginPath, log.NewJSONLogger(&loggerThingy{}), prometheus.NewRegistry(), false)
+	for i, deviceSpec := range deviceSpecs {
+		enableUSBDiscovery := false
+		for _, g := range deviceSpec.Groups {
+			if len(g.USBSpecs) > 0 {
+				enableUSBDiscovery = true
+				break
+			}
+		}
+		gp := deviceplugin.NewGenericPlugin(&deviceSpec,
+			dp.DevicePluginPath,
+			log.NewJSONLogger(&logPassthrough{}),
+			nil,
+			enableUSBDiscovery)
+
 		aeg.Go(func() error {
 			if err := gp.Run(ctx); err != nil {
 				klog.Errorf("Generic Plugin for %s failed: %v", deviceSpecs[i].Name, err)
@@ -84,10 +87,9 @@ func (gdp *GenericDevicePlugin) Run(ctx context.Context, ready chan<- struct{}, 
 	return ctx.Err()
 }
 
-type loggerThingy struct {
-}
+type logPassthrough struct{}
 
-func (lt *loggerThingy) Write(p []byte) (n int, err error) {
+func (lt *logPassthrough) Write(p []byte) (n int, err error) {
 	klog.Infof("%s", string(p))
 	return len(p), nil
 }
