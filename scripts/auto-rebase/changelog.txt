@@ -1,15 +1,57 @@
-- kubernetes embedded-component af5c163bbf76325a799e52957d6055230534be4a to 2f599905a700c497fac737c285adf6827fa0acb0
-  - 61e57488f 2025-05-16T14:30:14+00:00 UPSTREAM: 130422: Propagate error when creating CustomResourceStorage instead of panic'ing
+- cluster-network-operator embedded-component 692029cc58e9facfc31601e13b2d3097f4f37325 to bf1d73069e4905749e2f15f88aa1e7590d489baf
+  - d660f37 2025-05-26T11:11:08+02:00 Implement IPsec NAT-Traversal encapsulation option
+  - 0b64fa8 2025-05-26T11:10:52+02:00 Bump openshift/api for IPsec encapsulation API
 
-- machine-config-operator embedded-component 231e9dbdde4cf2530fb61fcf2f01249cd879d711 to 00143af1a51bedf0290496a6a97e47cf60b18693
-  - d40190a9 2025-05-29T15:06:22+00:00 msbic: only update boot disks on GCP
-  - a5d4e8b4 2025-05-28T15:40:30-04:00 msbic: remove golden configmap timeout
-  - 7a3a7d04 2025-05-21T14:25:16-04:00 OCPBUGS-55439: scope MCD node listers to current node
+- etcd embedded-component 72173bc741f97fa70e52bf9f34df9c23f7612c2d to 416376871d09278b18ae16520363ea6c8b3c71a8
+  - d7372fc3 2025-06-04T11:12:43-04:00 Revert "ETCD-727: Rebase etcd 3.5.21 openshift 4.18"
+  - 6be0f93d 2025-05-30T15:20:14+02:00 DOWNSTREAM: <carry>: CNTRLPLANE-889: use golang 1.23 image
+  - 84ecd596 2025-03-30T07:52:37+02:00 DOWNSTREAM: <carry> fix a compaction induce latency issue
+  - 3b129f0c 2025-03-30T07:52:09+02:00 DOWNSTREAM: <carry>: add tls min/max version to grpc proxy
+  - 3d1a8d1b 2025-03-30T07:52:04+02:00 DOWNSTREAM: <carry>: ETCD-696: Add rev bumping to force-new-cluster
+  - efddbffd 2025-03-30T07:52:00+02:00 Migrate Dockerfile.art for Konflux
+  - 889a1496 2025-03-30T07:51:56+02:00 Add support for cachi2 based deps Konflux is replacing RH's internal build system OSBS. OSBS supported a build-time dependency injection system called "cachito". Konflux replaces this with "cachi2" which works differently. REMOTE_SOURCES no longer need to be copied into place and there is no need to source cachito's environment information (Konflux automatically rewrites the Dockerfile to source cachi2/cachi2.env before running the original RUN commands). Additionally, cachito appears to have provided go.sum dependencies whereas cachi2 requires all build-time dependencies in go.mod. Missing dependencies are added to go.mod as // indirect in this change.
+  - c9a8cbe6 2025-03-30T07:51:49+02:00 DOWNSTREAM <carry>: resolve merge conflicts
+  - af7c1c0f 2025-03-30T07:51:45+02:00 NO-JIRA: use golang 1.22 image
+  - 2e5574c6 2025-03-30T07:51:34+02:00 DOWNSTREAM: <carry>: ETCD-656: Automate datadir move after quorum-restore
+  - a17edfd5 2025-03-27T15:56:36-07:00 version: bump up to 3.5.21
+  - 14b8ce4d 2025-03-27T14:14:12-07:00 dependency: bump golang.org/x/net from v0.36.0 to v0.38.0
+  - 6439620a 2025-03-23T21:11:24-07:00 dependency: bump github.com/golang-jwt/jwt/v4 from 4.5.1 to 4.5.2
+  - ac31c34d 2025-03-21T13:04:31-07:00 version: bump up to 3.5.20
+  - 0a51fc24 2025-03-20T08:32:20+00:00 Add e2e test to verify etcd is able to automatically fix the issue caused by https://github.com/etcd-io/etcd/issues/19557
+  - 341af039 2025-03-14T12:50:59+00:00 Fix the issue that learner promotion command doesn't support json output
+  - 9ae4074b 2025-03-14T10:46:26+00:00 Enhance the e2e teat framework to support adding & promoting learner member
+  - a1cb13b9 2025-03-11T16:53:32+00:00 fix failed test cases
+  - e3cd57aa 2025-03-11T13:56:34+00:00 overwrite the member if already exist
+  - d32c22d3 2025-03-11T13:56:34+00:00 add verification to check whether membership data is in sync between v2store and v3store
+  - b77e4ec5 2025-03-11T11:01:45+00:00 Update server unit test cases to set a backend
+  - 075cbc5c 2025-03-10T09:21:27+00:00 fix: grpcproxy can get stuck in and endless loop causing high cpu usage
+  - 8609552a 2025-03-06T10:52:12-08:00 back port gofail comments to release-3.5
+  - 815eaba0 2025-03-05T11:33:28-08:00 version: bump up to 3.5.19
+  - cda443c8 2025-03-05T19:16:24+00:00 deflakey: TestCompactionHash in integration
+  - 3d2cce61 2025-03-05T17:18:54+00:00 Add verify released binary assets GitHub workflow
+  - 607e5551 2025-03-04T16:51:41-08:00 dependency: bump golang.org/x/net from v0.34.0 to v0.36.0
+  - db3d20d9 2025-03-04T16:34:45-08:00 Bump go toolchain to 1.23.7
+  - 36013010 2025-02-24T16:08:22-08:00 dependency: Bump golang.org/x/crypto from v0.32.0 to v0.35.0
+  - 5245f6fb 2025-02-18T19:25:17+08:00 perf(release3.5): use RLock in Demoted method for read-only access to expiry
+  - a2f96f08 2025-02-18T04:02:37+08:00 bump go to v1.23.6
+  - da930c70 2025-02-12T22:54:54+00:00 fix a compaction induce latency issue
+  - 5d569b11 2025-02-04T19:30:15-03:00 bumping go to version 1.22.12
+  - 1af71f66 2025-02-04T13:20:09+00:00 Add learner id into log when being promoted or removed
+  - da04eae0 2025-02-03T15:23:48+00:00 Bump actions/download-artifact to v4.1.8
+  - 23ee9a63 2025-02-03T15:16:18+00:00 Bump actions/upload-artifact to v4.6.0
+  - 8e338700 2025-02-03T15:11:20+00:00 Bump github.com/golang/glog to v1.2.4 to address CVE-2024-45339
+  - 729fb392 2025-02-03T15:08:38+00:00 Bump go.mongodb.org/mongo-driver to v1.5.4 to address CVE-2021-20329
+  - 62a5010f 2025-01-27T08:39:34+00:00 add learner check to readyz
+  - b9c1ae21 2025-01-25T22:36:33-08:00 tools: add mixed read-write performance evaluation scripts
 
-- kubernetes image-amd64 af5c163bbf76325a799e52957d6055230534be4a to 2f599905a700c497fac737c285adf6827fa0acb0
-  - 61e57488f 2025-05-16T14:30:14+00:00 UPSTREAM: 130422: Propagate error when creating CustomResourceStorage instead of panic'ing
-
-- kubernetes image-arm64 af5c163bbf76325a799e52957d6055230534be4a to e6e35d04f5019d8b85207d37cfa2efc0db18925a
+- kubernetes embedded-component 2f599905a700c497fac737c285adf6827fa0acb0 to e6e35d04f5019d8b85207d37cfa2efc0db18925a
   - cae107a00 2025-05-29T08:32:09+00:00 UPSTREAM: 130047: adjusting loopback certificate validity in kube-apiserver
-  - 61e57488f 2025-05-16T14:30:14+00:00 UPSTREAM: 130422: Propagate error when creating CustomResourceStorage instead of panic'ing
+
+- machine-config-operator embedded-component 00143af1a51bedf0290496a6a97e47cf60b18693 to efe259e04ba98784102ba603941ecbbb75233c6b
+  - 27eb9655 2025-05-30T11:02:10+00:00 Fix `dynamic_node_sizing` when only `true` parameter is used
+  - 69be318f 2025-05-20T10:36:01-07:00 pkg/operator/status: Drop unused 'updating' variable
+  - 20fe0757 2025-05-20T15:51:21+00:00 pkg/operator/status: Drop PoolUpdating as an Upgradeable=False condition
+
+- kubernetes image-amd64 2f599905a700c497fac737c285adf6827fa0acb0 to e6e35d04f5019d8b85207d37cfa2efc0db18925a
+  - cae107a00 2025-05-29T08:32:09+00:00 UPSTREAM: 130047: adjusting loopback certificate validity in kube-apiserver
 
