@@ -35,17 +35,14 @@ func (gdp GenericDevicePlugin) incorporateUserSettings(c *Config) {
 	klog.Info("gdp.incorporateUserSettings")
 
 	if gdp.Status != "" {
-		klog.Info("gdp.incorporateUserSettings - update status")
 		c.GenericDevicePlugin.Status = gdp.Status
 	}
 
 	if gdp.Domain != "" {
-		klog.Info("gdp.incorporateUserSettings - update domain")
 		c.GenericDevicePlugin.Domain = gdp.Domain
 	}
 
 	if len(gdp.Devices) > 0 {
-		klog.Info("gdp.incorporateUserSettings - update devices")
 		c.GenericDevicePlugin.Devices = gdp.Devices
 	}
 
