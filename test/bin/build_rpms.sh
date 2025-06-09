@@ -147,14 +147,14 @@ create_local_repo() {
 }
 
 ACTION="${1:-all}" # Default to "all" if no argument is provided
-MICROSHIFT_VERSION="${2:-"4.${MINOR_VERSION}"}"
+MICROSHIFT_BREW_VERSION="${2:-"4.${MINOR_VERSION}"}"
 if [[ "${ACTION}" == "all" ]]; then
     build_rpms
-    download_brew_rpms "${MICROSHIFT_VERSION}"
+    download_brew_rpms "${MICROSHIFT_BREW_VERSION}"
 elif [[ "${ACTION}" == "source" ]]; then
     build_rpms
 elif [[ "${ACTION}" == "brew" ]]; then
-    download_brew_rpms "${MICROSHIFT_VERSION}"
+    download_brew_rpms "${MICROSHIFT_BREW_VERSION}"
 else
     echo "Invalid action specified: '${ACTION}'." >&2
     echo "Usage: $0 [build|download|all]" >&2
