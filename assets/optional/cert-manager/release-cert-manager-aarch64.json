@@ -1,0 +1,13 @@
+{
+  "release": {
+    "base": "4.19"
+  },
+  "images": {
+    "cert-manager-operator": "registry.redhat.io/cert-manager/cert-manager-operator-rhel9@sha256:41146965b3344b008ff0f6d119c1cb071efa7f02c742ce9af303b896ae43bff7",
+    "cert-manager-webhook": "registry.redhat.io/cert-manager/jetstack-cert-manager-rhel9@sha256:408a5c91e6066d33801456db5b0c214095ab7e47a0af1dcb91b5c88bfbcca4d4",
+    "cert-manager-ca-injector": "registry.redhat.io/cert-manager/jetstack-cert-manager-rhel9@sha256:408a5c91e6066d33801456db5b0c214095ab7e47a0af1dcb91b5c88bfbcca4d4",
+    "cert-manager-controller": "registry.redhat.io/cert-manager/jetstack-cert-manager-rhel9@sha256:408a5c91e6066d33801456db5b0c214095ab7e47a0af1dcb91b5c88bfbcca4d4",
+    "cert-manager-acmesolver": "registry.redhat.io/cert-manager/jetstack-cert-manager-acmesolver-rhel9@sha256:438d487c6b644319094f92250d43e0becf1bd0cc4b7d2864f4de72bacd1b9daf",
+    "cert-manager-istiocsr": "registry.redhat.io/cert-manager/cert-manager-istio-csr-rhel9@sha256:9ea2c29a384b964cef14f853278821df3cd30320f25afab8823897192f67fc7e"
+  }
+}
