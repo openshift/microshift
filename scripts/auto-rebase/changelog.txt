@@ -1,0 +1,52 @@
+- api embedded-component 91245a26b8a831607d981b2a478644d08da6fa1c to 017e9dd0276e4ed0242a759dffd419d728337876
+  - 5a9ea321 2025-06-04T09:57:40-04:00 add fg for azure boot image updates & skew mgmt
+  - 4c65cf1e 2025-06-03T16:39:42-03:00 SPLAT-2137: FG for Service Type LB NLB with Security Group
+  - 6ff8c5bc 2025-05-30T14:25:25+00:00 Lift 4.19 feature gate for RouteAdvertisements
+  - 83157e5f 2025-05-29T17:53:26+02:00 Add max length validation for apiserver namedCertificates
+
+- cluster-ingress-operator embedded-component 21ac32d9862437b5c563540edd721c9cae5f1e8c to be41be00b822b820b03a7190732e3fc983efddf3
+  - 0a96be6 2025-05-22T11:50:08+01:00 Remove PrivateHostedZoneAWS feature gate check
+
+- cluster-network-operator embedded-component fca1273844fb1b968d109f7ca7c3d5e96f234179 to 2bbe72cb352eb55bdaa4da0d75c0d82f6e363ebc
+  - ea2c966 2025-06-03T11:17:01+02:00 Issue shorter certificates when ShortRotation featuregate is enabled
+  - 0cf7aec 2025-05-13T09:16:11-04:00 whereabouts-config is a reserved name for user interaction.
+
+- kubernetes embedded-component 886f7c90e4bd137f91ebfb7d0cb55d476e719643 to e541011ee9752101e2e11bf455ade08da6d1e6fd
+  - 63c212134 2025-06-03T14:50:41-04:00 UPSTREAM: 132035: e2e: fix userns test
+  - aab1bb062 2025-05-29T14:09:03-04:00 UPSTREAM: <carry>: openshift-hack: enable userns e2e tests
+
+- kubernetes-kube-storage-version-migrator embedded-component 4c521b09f4dc55ac69234419e083f3815646f4a9 to 2b36e46ab36a5a7581c9ed763e0a7646f90b94e7
+  - be69609 2025-06-05T12:59:09-04:00 Fix verify job failure with build-machinery bump
+  - 88c7c82 2025-06-04T15:54:40-04:00 append .0 to go.mod version
+
+- machine-config-operator embedded-component af994c8fc8299d78780e90eaba09b20a2ce08983 to c3a875dc58764b6dc05e89c9ab9bc53e2b64b44f
+  - d1488e02 2025-04-10T12:23:48+02:00 Remove trailing dot from hostname
+
+- operator-framework-olm embedded-component ebcdb8fb1eb274adbd248fc1f47d56b859c9fe8d to 917ba603b67fa9d2f348f57e25e035ed7b31913f
+  - 852c85fa 2025-06-03T00:03:46+00:00 only create cachedir if requested, since otherwise opm will error out serving it (#3589)
+
+- oc image-amd64 49459b55564a51d3edf64da16d836bd25e0f9917 to 5583faabda15e48cacb2bd1a3ddc6418fd6db675
+  - 59f624ee 2025-06-04T13:06:36-07:00 pkg/cli/admin/upgrade/recommend: Add a --quiet option
+  - 2d7e0042 2025-06-03T10:48:29-07:00 pkg/cli/admin/upgrade/recommend: New, feature-gated --accept [1] is suggesting ClusterVersion API changes to make it easier for cluster administrators to manage many clusters and updates vs. a more limited set of update issues.  One example scenario:
+
+- coredns image-amd64 7a1451db77a68161d58af9b6ca2c9388d578310a to a69279e3393b269099dcaae967570741d4c5e469
+  - b184ecd 2025-06-04T15:55:42-04:00 append .0 to go.mod version
+
+- kubernetes image-amd64 886f7c90e4bd137f91ebfb7d0cb55d476e719643 to e541011ee9752101e2e11bf455ade08da6d1e6fd
+  - 63c212134 2025-06-03T14:50:41-04:00 UPSTREAM: 132035: e2e: fix userns test
+  - aab1bb062 2025-05-29T14:09:03-04:00 UPSTREAM: <carry>: openshift-hack: enable userns e2e tests
+
+- oc image-arm64 49459b55564a51d3edf64da16d836bd25e0f9917 to 303f33ba3dae6f17572b572fa7ac67dd5d7d4bce
+  - 59f624ee 2025-06-04T13:06:36-07:00 pkg/cli/admin/upgrade/recommend: Add a --quiet option
+  - d3fe7890 2025-06-04T13:36:45+02:00 oc image serve: Remove as deprecated
+  - 2d7e0042 2025-06-03T10:48:29-07:00 pkg/cli/admin/upgrade/recommend: New, feature-gated --accept [1] is suggesting ClusterVersion API changes to make it easier for cluster administrators to manage many clusters and updates vs. a more limited set of update issues.  One example scenario:
+
+- coredns image-arm64 7a1451db77a68161d58af9b6ca2c9388d578310a to a69279e3393b269099dcaae967570741d4c5e469
+  - b184ecd 2025-06-04T15:55:42-04:00 append .0 to go.mod version
+
+- kubernetes image-arm64 886f7c90e4bd137f91ebfb7d0cb55d476e719643 to 883033d468d682d148d091d7dc36ea6d1751ac83
+  - 63c212134 2025-06-03T14:50:41-04:00 UPSTREAM: 132035: e2e: fix userns test
+  - e47629fc3 2025-06-02T10:54:32-04:00 UPSTREAM: <carry>: align Single Replica environment selector topology name with the value origin will pass
+  - 0e92aa414 2025-06-02T10:53:22-04:00 UPSTREAM: <carry>: Revert "Revert "remove annotation rules that don't relate to suites""
+  - aab1bb062 2025-05-29T14:09:03-04:00 UPSTREAM: <carry>: openshift-hack: enable userns e2e tests
+
