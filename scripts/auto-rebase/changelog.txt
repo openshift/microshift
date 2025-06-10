@@ -1,7 +1,0 @@
-- cluster-network-operator embedded-component 5f2fe68003e8f17304d7000f8672a0f6ff2eaf8b to 82191d8f17c6571d0c6416656fb3dc0619cf80ae
-  - 2768387 2025-04-30T19:14:17+00:00 Reorder the steps in iptables-alerter
-  - e05b4b1 2025-04-30T19:14:17+00:00 Simplify the iptables-alerter crictl-reading code
-
-- machine-config-operator embedded-component 1d8b1fc570e55ccf78bb6008502a0db4b6ef13b8 to f54ce415bd59eea1efed071186f701fdf903a81f
-  - 3f873073 2025-06-02T22:24:28+00:00 msbic: only update boot disks on GCP
-
