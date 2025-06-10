@@ -1,0 +1,28 @@
+# This kustomization.yaml is not intended to be run by itself,
+# since it depends on service name and namespace that are out of this kustomize package.
+# It should be run by config/default
+resources:
+- bases/operator.openshift.io_certmanagers.yaml
+- bases/certificaterequests.cert-manager.io-crd.yaml
+- bases/certificates.cert-manager.io-crd.yaml
+- bases/challenges.acme.cert-manager.io-crd.yaml
+- bases/clusterissuers.cert-manager.io-crd.yaml
+- bases/issuers.cert-manager.io-crd.yaml
+- bases/orders.acme.cert-manager.io-crd.yaml
+- bases/operator.openshift.io_istiocsrs.yaml
+#+kubebuilder:scaffold:crdkustomizeresource
+
+patchesStrategicMerge:
+# [WEBHOOK] To enable webhook, uncomment all the sections with [WEBHOOK] prefix.
+# patches here are for enabling the conversion webhook for each CRD
+#- patches/webhook_in_certmanagers.yaml
+#+kubebuilder:scaffold:crdkustomizewebhookpatch
+
+# [CERTMANAGER] To enable cert-manager, uncomment all the sections with [CERTMANAGER] prefix.
+# patches here are for enabling the CA injection for each CRD
+#- patches/cainjection_in_certmanagers.yaml
+#+kubebuilder:scaffold:crdkustomizecainjectionpatch
+
+# the following config is for teaching kustomize how to do kustomization for CRDs.
+configurations:
+- kustomizeconfig.yaml
