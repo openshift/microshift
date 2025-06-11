@@ -26,10 +26,10 @@ index ac88682a..a29eb626 100644
  	buf.Tmp[0] = ':'
 diff --git a/deps/k8s.io/klog/internal/buffer/goroutine_labels.go b/deps/k8s.io/klog/internal/buffer/goroutine_labels.go
 new file mode 100644
-index 00000000..6e93bdbd
+index 0000000..331946d
 --- /dev/null
 +++ b/deps/k8s.io/klog/internal/buffer/goroutine_labels.go
-@@ -0,0 +1,30 @@
+@@ -0,0 +1,41 @@
 +package buffer
 +
 +import (
@@ -41,18 +41,29 @@ index 00000000..6e93bdbd
 +//go:linkname runtime_getProfLabel runtime/pprof.runtime_getProfLabel
 +func runtime_getProfLabel() unsafe.Pointer
 +
++// Definitions of 'label' and 'LabelSet' from /usr/local/go1.24.4/src/runtime/pprof/label.go
++
++type label struct {
++	key   string
++	value string
++}
++type LabelSet struct {
++	list []label
++}
++
 +func getMicroshiftLoggerComponent() string {
-+	labels := (*map[string]string)(runtime_getProfLabel())
++	labels := (*LabelSet)(runtime_getProfLabel())
 +	if labels == nil {
 +		return "???"
 +	}
 +
-+	c, ok := (*labels)["microshift_logger_component"]
-+	if !ok {
-+		return "???"
++	for _, label := range labels.list {
++		if label.key == "microshift_logger_component" {
++			return label.value
++		}
 +	}
 +
-+	return c
++	return "???"
 +}
 +
 +func WithMicroshiftLoggerComponent(c string, f func()) {
