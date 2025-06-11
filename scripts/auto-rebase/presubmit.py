@@ -27,6 +27,7 @@ RECIPE_FILEPATHS = [
     "./scripts/auto-rebase/lvms_assets.yaml",
     "./scripts/auto-rebase/ossm_assets.yaml",
     "./scripts/auto-rebase/assets_ai_model_serving.yaml",
+    "./scripts/auto-rebase/assets_cert_manager.yaml",
 ]
 
 

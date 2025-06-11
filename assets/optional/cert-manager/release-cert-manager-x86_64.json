@@ -1,6 +1,6 @@
 {
   "release": {
-    "base": "4.19"
+    "base": "4.20"
   },
   "images": {
     "cert-manager-operator": "registry.redhat.io/cert-manager/cert-manager-operator-rhel9@sha256:41146965b3344b008ff0f6d119c1cb071efa7f02c742ce9af303b896ae43bff7",
