@@ -188,7 +188,7 @@ fi
 ########### Call functions section ###########
 create_vm
 fetch_microshift
-configure_vm
-build_rpms
+# configure_vm
+# build_rpms
 build_bootc_images
 # copy_artifacts

@@ -57,16 +57,25 @@ download_build_cache() {
 # - Clean up older images, preserving the 'last' and the previous build tag
 # Note that the build and upload are skipped if valid cached data already exists.
 update_build_cache() {
+    local SCENARIO_BUILD_BRANCH="${1}"
+    local SCENARIO_BUILD_TAG="${2}"
     if ./bin/manage_build_cache.sh verify -b "${SCENARIO_BUILD_BRANCH}" -t "${SCENARIO_BUILD_TAG}" ; then
         echo "Valid build cache already exists for the '${SCENARIO_BUILD_BRANCH}' branch and '${SCENARIO_BUILD_TAG}' tag"
         echo "WARNING: Skipping cache build, update and cleanup procedures"
         return
     fi
 
-    # Build the composer-cli base layer to be cached
-    $(dry_run) bash -x ./bin/build_images.sh -l ./image-blueprints/layer1-base
-    # Build the bootc base layer to be cached
-    $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/layer1-base
+    if [ "${SCENARIO_BUILD_BRANCH}" = "final-releases" ]; then
+        # Build the composer-cli release-layer layer to be cached
+        # $(dry_run) bash -x ./bin/build_images.sh -l ./image-blueprints/release-layer
+        # Build the bootc release-layer layer to be cached
+        $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/release-layer
+    else
+        # Build the composer-cli base layer to be cached
+        $(dry_run) bash -x ./bin/build_images.sh -l ./image-blueprints/layer1-base
+        # Build the bootc base layer to be cached
+        $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/layer1-base
+    fi
 
     # Prepare for the cache upload by stopping composer services and cleaning
     # temporary artifacts
@@ -78,7 +87,11 @@ update_build_cache() {
 
     # Cleanup older images in the cache, preserving the previous cache if any
     # The 'last' cache is preserved by default
-    ./bin/manage_build_cache.sh keep -b "${SCENARIO_BUILD_BRANCH}" -t "${SCENARIO_BUILD_TAG_PREV}"
+    if [ "${SCENARIO_BUILD_BRANCH}" = "final-releases" ]; then
+        echo "TODO: keep only the 3 latest"
+    else
+        ./bin/manage_build_cache.sh keep -b "${SCENARIO_BUILD_BRANCH}" -t "${SCENARIO_BUILD_TAG_PREV}"
+    fi
 }
 
 # Run image build, potentially skipping the 'periodic' layer in CI builds.
@@ -159,11 +172,14 @@ if [ $# -gt 0 ] && [ "$1" = "-update_cache" ] ; then
         # build artifacts may be cached
         $(dry_run) bash -x ./bin/build_rpms.sh
 
-        update_build_cache
+        update_build_cache "${SCENARIO_BUILD_BRANCH}" "${SCENARIO_BUILD_TAG}"
     else
         echo "ERROR: Access to the build cache is not available"
         exit 1
     fi
+elif [ $# -gt 0 ] && [ "$1" = "-update_qe_cache" ] ; then
+    final_release=$(ls _output/test-images/brew-rpms/*/microshift-4* | head -n1 | sed 's/.*microshift-\([^-]*\).*/\1/')
+    update_build_cache "final-releases" "${final_release}"
 else
     GOT_CACHED_DATA=false
     if ${HAS_CACHE_ACCESS} ; then

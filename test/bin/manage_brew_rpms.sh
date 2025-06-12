@@ -27,8 +27,9 @@ action_access() {
 }
 
 action_download() {
-    local -r ver=$1
-    local -r dir=$2
+    local -r version=$1
+    local -r version_type=$2
+    local -r dir=$3
 
     if ! action_access ; then
         echo "ERROR: Brew Hub site is not accessible"
@@ -36,11 +37,18 @@ action_download() {
     fi
     "${SCRIPTDIR}/../../scripts/fetch_tools.sh" brew
 
-    # Attempt downloading the specified build version
+    # Attempt downloading the specified build version and release type
     local package
-    package=$(brew list-builds --quiet --package=microshift --state=COMPLETE | grep "^microshift-${ver}" | tail -1) || true
+    local package_list
+    package_list=$(brew list-builds --quiet --package=microshift --state=COMPLETE)
+    if [ "${version_type}" = "zstream" ]; then
+        package=$(echo "${package_list}" | grep "^microshift-${version}" | grep -v "~" | tail -1) || true
+    else
+        package=$(echo "${package_list}" | grep "^microshift-${version}.*${version_type}" | tail -1) || true
+    fi
+
     if [ -z "${package}" ] ; then
-        echo "ERROR: Cannot find MicroShift '${ver}' packages in brew"
+        echo "ERROR: Cannot find MicroShift '${version}' packages in brew"
         exit 1
     fi
 
@@ -75,7 +83,7 @@ case "${action}" in
         "action_${action}"
         ;;
     download)
-        [ $# -ne 3 ] && usage && exit 1
+        [ $# -ne 4 ] && usage && exit 1
         shift
         "action_${action}" "$@"
         ;;
