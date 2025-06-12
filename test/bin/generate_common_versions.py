@@ -28,9 +28,9 @@ def get_dependencies_repo_url(minor, prev=None):
     :param minor: the minor version, e.g. 19. for 4.19
     :param prev: specifies how many previous minor versions to try if current is unavailable
 
-    ``get_dependencies_repo_url`` returns the URL of the beta repository for the specified 
-    minor version. If the repo for the wanted version does not exist or it does not provide 
-    the necessary packages, it looks for previous releases, for up to `prev` previous minors. 
+    ``get_dependencies_repo_url`` returns the URL of the beta repository for the specified
+    minor version. If the repo for the wanted version does not exist or it does not provide
+    the necessary packages, it looks for previous releases, for up to `prev` previous minors.
     If `prev` is not specified, it only checks the current minor.
     """
 
