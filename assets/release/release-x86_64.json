@@ -1,15 +1,15 @@
 {
   "release": {
-    "base": "4.17.0-0.nightly-2025-06-07-023232"
+    "base": "4.17.0-0.nightly-2025-06-11-184010"
   },
   "images": {
     "cli": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:c6add11a548b51240739e25f73cad4757b8253e92624b29b81669704c3c4bd7c",
-    "coredns": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:eff7c67c6ab14420f49abe8bf9d8226c8b58ceb8fd02fafc63c7a8bdcad11472",
+    "coredns": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:7ba704a6582e2d494dccc4a5fdb031400cdce2b9f01b302a88287589e196d058",
     "haproxy-router": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:c740393568611768a442645f421025b9400d23173ead563dad29b308b1de9060",
-    "kube-rbac-proxy": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:68fa6a82718cc4106c7c664700f8134cba0f3408bdfac38582f73196e9e92c5c",
-    "ovn-kubernetes-microshift": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:97e4e2310bb8e96b627a27e1cd0734c1390aaba3c9cae8fc52656da7c921356d",
+    "kube-rbac-proxy": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:4047cd1e8ce05bd6940db4144259973b2f8182c8ddda8802c8d4e146b5d8b516",
+    "ovn-kubernetes-microshift": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:2daf0ef37e9a3bcc57bc481b81f4adbb119f1ef2f2410d9c8c6b70c2cd55c666",
     "pod": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:9bfc749406fee6e176326b41e726eab90c4288baf1240ede244fec0920e4725f",
-    "service-ca-operator": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:7a4203d75f16120dd1ac41d8a193e10a58c0d7b86103f6f5a39a313bcdcc5b32",
+    "service-ca-operator": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:2cb4291a69063bb6bf1392f76c949da7ac7ccd04b03626109159433d7d892bf1",
     "lvms_operator": "registry.redhat.io/lvms4/lvms-rhel9-operator@sha256:bd6dc4d6e90fdbcdb844759e203c9c591abc5ac29a956257a90bda101a37b76e",
     "csi-snapshot-controller": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:000ef6a0f9b529051c13a5a27bdff286b5ee2ab5951e784fba079a20f6957271",
     "csi-snapshot-validation-webhook": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:732ad6819326ab5d044976d050efbae2220e7708188228a2150e123a34b88b48"

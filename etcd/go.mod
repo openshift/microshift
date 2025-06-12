@@ -11,7 +11,7 @@ replace (
 )
 
 require (
-	github.com/openshift/build-machinery-go v0.0.0-20240419090851-af9c868bcf52
+	github.com/openshift/build-machinery-go v0.0.0-20250602125535-1b6d00b8c37c
 	github.com/spf13/cobra v1.7.0
 	go.etcd.io/etcd/server/v3 v3.5.10
 	k8s.io/apimachinery v0.30.1

@@ -8,7 +8,7 @@ require (
 	github.com/google/go-cmp v0.6.0
 	github.com/miekg/dns v1.1.35 // microshift
 	github.com/openshift/api v0.0.0-20240530053948-b01900f1982a
-	github.com/openshift/build-machinery-go v0.0.0-20240419090851-af9c868bcf52
+	github.com/openshift/build-machinery-go v0.0.0-20250602125535-1b6d00b8c37c
 	github.com/openshift/client-go v0.0.0-20240528061634-b054aa794d87
 	github.com/openshift/cluster-policy-controller v0.0.0-20240912153445-7209e90d4205
 	github.com/openshift/library-go v0.0.0-20240528110646-354b673304be
@@ -257,6 +257,6 @@ replace (
 	go.etcd.io/etcd/client/v3 => github.com/openshift/etcd/client/v3 v3.5.1-0.20250325012632-0d9e0a907c4a // from etcd
 )
 
-replace sigs.k8s.io/kube-storage-version-migrator => github.com/openshift/kubernetes-kube-storage-version-migrator v0.0.3-0.20240605171054-34fafc04e5f2 // release kube-storage-version-migrator via kubernetes-kube-storage-version-migrator
+replace sigs.k8s.io/kube-storage-version-migrator => github.com/openshift/kubernetes-kube-storage-version-migrator v0.0.3-0.20250611153038-0b41e7bf19a6 // release kube-storage-version-migrator via kubernetes-kube-storage-version-migrator
 
 replace k8s.io/endpointslice => github.com/openshift/kubernetes/staging/src/k8s.io/endpointslice v0.0.0-20250506153445-1a087a5f1cd7 // staging kubernetes
