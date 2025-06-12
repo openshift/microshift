@@ -1,0 +1,33 @@
+- kubernetes-kube-storage-version-migrator embedded-component 34fafc04e5f2872e282617da31175a7e091ffdb2 to 0b41e7bf19a6bffa060eb26ecd4830634882d4a3
+  - b054be8 2025-06-11T08:36:04+02:00 Bump build-machinery-go to make verify pass
+  - 3641595 2025-06-10T12:56:37+02:00 ART-13124: Update go.mod to include patch version in go directive
+
+- machine-config-operator embedded-component f54ce415bd59eea1efed071186f701fdf903a81f to 5f8e2a122d1d8209da920b493cdca8d026836ea5
+  - 79d012aa 2025-06-05T21:07:30+00:00 pkg/operator/status: Drop PoolUpdating as an Upgradeable=False condition
+  - d827369f 2025-06-02T16:56:37+00:00 msbic: remove golden configmap timeout
+  - 35fd49bb 2025-05-30T11:02:17+00:00 Fix `dynamic_node_sizing` when only `true` parameter is used
+
+- service-ca-operator embedded-component f1b63073aa91cf1c226d0ec46d3dfc2d65c3877f to 6ce6cceb6618a193b7a61b9bfbc7f559187dbb9e
+  - e28d727 2025-06-10T13:46:58-04:00 fix verify
+  - 297dfb9 2025-06-10T11:02:54-04:00 append .0 to go.mod version
+
+- coredns image-amd64 d3b441c150ccbcc0d9ebf03b8c39a730b830ddb1 to dea218b4eeeef8e4ed245389e697c307bcd06552
+  - e783c4c 2025-06-10T11:29:17-04:00 append .0 to go.mod version
+
+- kube-rbac-proxy image-amd64 7718265cc7640f6fa0d75eee366e424911d6f00f to f708b5ecf87b948864e4f68d0724cda5de13a9d9
+  - 124923b 2025-06-10T12:55:01+02:00 ART-13124: Update go.mod to include patch version in go directive
+
+- service-ca-operator image-amd64 f1b63073aa91cf1c226d0ec46d3dfc2d65c3877f to 6ce6cceb6618a193b7a61b9bfbc7f559187dbb9e
+  - e28d727 2025-06-10T13:46:58-04:00 fix verify
+  - 297dfb9 2025-06-10T11:02:54-04:00 append .0 to go.mod version
+
+- coredns image-arm64 d3b441c150ccbcc0d9ebf03b8c39a730b830ddb1 to dea218b4eeeef8e4ed245389e697c307bcd06552
+  - e783c4c 2025-06-10T11:29:17-04:00 append .0 to go.mod version
+
+- kube-rbac-proxy image-arm64 7718265cc7640f6fa0d75eee366e424911d6f00f to f708b5ecf87b948864e4f68d0724cda5de13a9d9
+  - 124923b 2025-06-10T12:55:01+02:00 ART-13124: Update go.mod to include patch version in go directive
+
+- service-ca-operator image-arm64 f1b63073aa91cf1c226d0ec46d3dfc2d65c3877f to 6ce6cceb6618a193b7a61b9bfbc7f559187dbb9e
+  - e28d727 2025-06-10T13:46:58-04:00 fix verify
+  - 297dfb9 2025-06-10T11:02:54-04:00 append .0 to go.mod version
+
