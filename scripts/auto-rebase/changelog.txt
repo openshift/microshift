@@ -1,6 +1,6 @@
-- ovn-kubernetes image-amd64 2501912454f1c119be5d53416ba7271aaace727d to d9fe221573ffabb7b4e4bb26aceeb89796459d85
-  - fe6fb9cc 2025-05-28T10:57:33-04:00 egressfirewall: avoid nil dereference on node delete
+- ovn-kubernetes image-amd64 d9fe221573ffabb7b4e4bb26aceeb89796459d85 to 865f9d57750a44267bd1e7f67006b665df708178
+  - c2c538b6 2025-05-15T08:39:37+00:00 Handles unspecified protocol in network policy port
 
-- ovn-kubernetes image-arm64 2501912454f1c119be5d53416ba7271aaace727d to d9fe221573ffabb7b4e4bb26aceeb89796459d85
-  - fe6fb9cc 2025-05-28T10:57:33-04:00 egressfirewall: avoid nil dereference on node delete
+- ovn-kubernetes image-arm64 d9fe221573ffabb7b4e4bb26aceeb89796459d85 to 865f9d57750a44267bd1e7f67006b665df708178
+  - c2c538b6 2025-05-15T08:39:37+00:00 Handles unspecified protocol in network policy port
 
