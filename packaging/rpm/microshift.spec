@@ -66,7 +66,7 @@ BuildRequires: systemd
 BuildRequires: golang
 # DO NOT REMOVE
 
-Requires: cri-o >= 1.32.0, cri-o < 1.33.0
+Requires: cri-o >= 1.33.0, cri-o < 1.34.0
 Requires: cri-tools >= 1.33.0, cri-tools < 1.34.0
 Requires: iptables
 Requires: microshift-selinux = %{version}
@@ -779,6 +779,9 @@ fi
 # Use Git command to generate the log and replace the VERSION string
 # LANG=C git log --date="format:%a %b %d %Y" --pretty="tformat:* %cd %an <%ae> VERSION%n- %s%n" packaging/rpm/microshift.spec
 %changelog
+* Thu Jun 12 2025 Evgeny Slutsky <eslutsky@redhat.com> 4.20.0
+- Upgrade CRI-O version dependency to 1.33.0
+
 * Thu Jun 5 2025 Praveen Kumar <prkumar@redhat.com> 4.20.0
 - Switch flannel with kindnet as CNI
 
