@@ -42,14 +42,14 @@ action_download() {
     local package
     if [ "${version_type}" = "zstream" ]; then
         package_found=$(brew list-builds --quiet --package=microshift --state=COMPLETE | grep "^microshift-${version}" | grep -v "~" | awk -F - '{print $1"-"$2}' | uniq | tail -n "$(( "${num_versions_back}" + 1))" | head -n1) || true
-        package=$(brew list-builds --quiet --package=microshift --state=COMPLETE | grep "${package_found}-") || true
+        package=$(brew list-builds --quiet --package=microshift --state=COMPLETE | grep "${package_found}-" | tail -1) || true
     else
         package=$(brew list-builds --quiet --package=microshift --state=COMPLETE | grep "^microshift-${version}.*${version_type}" | tail -1) || true
     fi
 
     if [ -z "${package}" ] ; then
-        echo "ERROR: Cannot find MicroShift '${version}' packages in brew"
-        exit 1
+        echo "WARNING: Cannot find MicroShift '${version}' packages in brew"
+        exit 0
     fi
 
     package=$(awk '{print $1}' <<< "${package}")
