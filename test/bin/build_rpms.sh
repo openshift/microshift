@@ -128,8 +128,9 @@ download_brew_rpms() {
         for y in $(seq 14 "${MINOR_VERSION}"); do
             ocpversion="4.${y}"
             bash -x "${SCRIPTDIR}/../../test/bin/manage_brew_rpms.sh" download "${ocpversion}" "nightly" "${BREW_RPM_SOURCE}"
-            if [ "$y" -eq "$MINOR_VERSION" ]; then
+            if [ "$y" -ge "$PREVIOUS_MINOR_VERSION" ]; then
                 bash -x "${SCRIPTDIR}/../../test/bin/manage_brew_rpms.sh" download "${ocpversion}" "rc" "${BREW_RPM_SOURCE}"
+                bash -x "${SCRIPTDIR}/../../test/bin/manage_brew_rpms.sh" download "${ocpversion}" "ec" "${BREW_RPM_SOURCE}"
             else
                 for versions_back in $(seq 0 2); do
                     bash -x "${SCRIPTDIR}/../../test/bin/manage_brew_rpms.sh" download "${ocpversion}" "zstream" "${BREW_RPM_SOURCE}" "${versions_back}"

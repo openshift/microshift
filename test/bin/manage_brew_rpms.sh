@@ -43,6 +43,8 @@ action_download() {
     if [ "${version_type}" = "zstream" ]; then
         package_found=$(brew list-builds --quiet --package=microshift --state=COMPLETE | grep "^microshift-${version}" | grep -v "~" | awk -F - '{print $1"-"$2}' | uniq | tail -n "$(( "${num_versions_back}" + 1))" | head -n1) || true
         package=$(brew list-builds --quiet --package=microshift --state=COMPLETE | grep "${package_found}-" | tail -1) || true
+    elif [ "${version_type}" = "rc" ] || [ "${version_type}" = "ec" ]; then
+        package=$(brew list-builds --quiet --package=microshift --state=COMPLETE | grep "^microshift-${version}.0~${version_type}." | tail -1) || true
     else
         package=$(brew list-builds --quiet --package=microshift --state=COMPLETE | grep "^microshift-${version}.*${version_type}" | tail -1) || true
     fi
