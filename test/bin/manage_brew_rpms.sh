@@ -38,7 +38,7 @@ action_download() {
     fi
     "${SCRIPTDIR}/../../scripts/fetch_tools.sh" brew
 
-    # Attempt downloading the specified build version and release type
+    # Attempt downloading the specified build version
     local package
     if [ "${version_type}" = "zstream" ]; then
         package_found=$(brew list-builds --quiet --package=microshift --state=COMPLETE | grep "^microshift-${version}" | grep -v "~" | awk -F - '{print $1"-"$2}' | uniq | tail -n "$(( "${num_versions_back}" + 1))" | head -n1) || true
@@ -59,7 +59,6 @@ action_download() {
     # cannot be identified easily when running in a CI job
     for arch in x86_64 aarch64 ; do
         local adir
-        pwd
         # shellcheck disable=SC2001
         adir="${dir}/$(echo "${package}" | sed 's/.*microshift-\([^-]*\).*/\1/')/${arch}"
 

@@ -131,7 +131,7 @@ download_brew_rpms() {
             if [ "$y" -eq "$MINOR_VERSION" ]; then
                 bash -x "${SCRIPTDIR}/../../test/bin/manage_brew_rpms.sh" download "${ocpversion}" "rc" "${BREW_RPM_SOURCE}"
             else
-                for versions_back in $(seq 0 5); do
+                for versions_back in $(seq 0 2); do
                     bash -x "${SCRIPTDIR}/../../test/bin/manage_brew_rpms.sh" download "${ocpversion}" "zstream" "${BREW_RPM_SOURCE}" "${versions_back}"
                 done 
             fi
