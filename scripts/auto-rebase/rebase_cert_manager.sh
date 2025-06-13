@@ -27,15 +27,15 @@ shopt -s extglob
 #trap 'echo "#L$LINENO: $BASH_COMMAND" >&2' DEBUG
 #set -xo functrace
 #PS4='+ $LINENO  '
-
 REPOROOT="$(readlink -f "$(dirname "${BASH_SOURCE[0]}")/../..")"
 STAGING_DIR="$REPOROOT/_output/staging"
-PULL_SECRET_FILE="${HOME}/.pull-secret.json"
+export REGISTRY_AUTH_FILE="${HOME}/.pull-secret.json"
+OPERATOR_INDEX="${STAGING_DIR}/redhat-operator-index.yaml"
+OPERATOR_CERT_MANAGER_INDEX="${STAGING_DIR}/redhat-operator-cert-manager-index.yaml"
 GO_MOD_DIRS=("$REPOROOT/" "$REPOROOT/etcd")
 
-EMBEDDED_COMPONENTS="route-controller-manager cluster-policy-controller hyperkube etcd kube-storage-version-migrator cluster-config-api"
-EMBEDDED_COMPONENT_OPERATORS="cluster-kube-apiserver-operator cluster-kube-controller-manager-operator cluster-openshift-controller-manager-operator cluster-kube-scheduler-operator machine-config-operator operator-lifecycle-manager"
-LOADED_COMPONENTS="cluster-dns-operator cluster-ingress-operator service-ca-operator cluster-network-operator cluster-csi-snapshot-controller-operator"
+OPERATOR_COMPONENTS="cert-manager-controller cert-manager-ca-injector cert-manager-webhook cert-manager-acmesolver cert-manager-istiocsr"
+
 declare -a ARCHS=("amd64" "arm64")
 declare -A GOARCH_TO_UNAME_MAP=( ["amd64"]="x86_64" ["arm64"]="aarch64" )
 
@@ -48,6 +48,12 @@ check_preconditions() {
         title "Installing yq"
         sudo DEST_DIR=/usr/bin/ "${REPOROOT}/scripts/fetch_tools.sh" yq
     fi
+
+    if ! hash opm; then
+        title "Installing opm"
+        sudo DEST_DIR=/usr/bin/ "${REPOROOT}/scripts/fetch_tools.sh" opm
+    fi
+
 
     if ! hash python3; then
         echo "ERROR: python3 is not present on the system - please install"
@@ -85,18 +91,86 @@ download_cert_manager(){
     rm -rf "${STAGING_DIR}"
     mkdir -p "${STAGING_DIR}"
     pushd "${STAGING_DIR}" >/dev/null
-    clone_repo "https://github.com/openshift/cert-manager-operator" "v1.13.1" "."
+
+   #  export REGISTRY_AUTH_FILE=${PULL_SECRET_FILE}
+
+   operator_manifest="$1"
+
+    # get the whole operator yaml for 4.19
+    opm render "${operator_manifest}" -o yaml  >${OPERATOR_INDEX}
+
+    # find the latest published cert-manager-operator ie: cert-manager-operator.v1.16.0
+    export operator=$(yq 'select(.package == "openshift-cert-manager-operator" and .name == "stable-v1") | .entries[-1].name' ${OPERATOR_INDEX})
+    yq 'select (.name==env(operator))' ${OPERATOR_INDEX} >"${OPERATOR_CERT_MANAGER_INDEX}"
+ 
+    echo  "found operator version ${operator}"
+
+    # convert from cert-manager-operator.v1.16.0 to cert-manager-x.y
+    branch_name=$(echo ${operator} | awk -F'[^0-9]*' '{print "cert-manager-"$2"."$3}')
+    clone_repo "https://github.com/openshift/cert-manager-operator" "$branch_name" "."
+
 }
 
 # Updates the image digests in pkg/release/release*.go
-update_images() {
-    if [ ! -f "${STAGING_DIR}/release_amd64.json" ] || [ ! -f "${STAGING_DIR}/release_arm64.json" ]; then
-        >&2 echo "No release found in ${STAGING_DIR}, you need to download one first."
-        exit 1
-    fi
-    pushd "${STAGING_DIR}" >/dev/null
+# update_images() {
+#     if [ ! -f "${STAGING_DIR}/release_amd64.json" ] || [ ! -f "${STAGING_DIR}/release_arm64.json" ]; then
+#         >&2 echo "No release found in ${STAGING_DIR}, you need to download one first."
+#         exit 1
+#     fi
+#     pushd "${STAGING_DIR}" >/dev/null
 
    
+# }
+
+
+
+write_cert_manager_images_for_arch() {
+    local arch="$1"
+    title "Updating images for ${arch}"
+    #local csv_manifest="${arch_dir}/servicemeshoperator3.clusterserviceversion.yaml"
+    #local kustomization_arch_file="${REPOROOT}/assets/optional/gateway-api/kustomization.${GOARCH_TO_UNAME_MAP[${arch}]}.yaml"
+    local cert_manager_release_json="${REPOROOT}/assets/optional/cert-manager/release-cert-manager-${GOARCH_TO_UNAME_MAP[${arch}]}.json"
+    local cert_manager_operator_yaml="${REPOROOT}/assets/optional/cert-manager/manager/manager.yaml"
+    local cert_manager_kustomization_yaml="${REPOROOT}/assets/optional/cert-manager/manager/kustomization.yaml"
+
+    local base_release=4.20
+    jq -n "{\"release\": {\"base\": \"${base_release}\"}, \"images\": {}}" > "${cert_manager_release_json}"
+    
+    #containerImage
+    local operatorImage=$(yq '.properties[] | select(.type == "olm.csv.metadata").value.annotations.containerImage' "${OPERATOR_CERT_MANAGER_INDEX}")
+    
+    yq -i -o json ".images += {\"cert-manager-operator\": \"${operatorImage}\"}" "${cert_manager_release_json}"
+    sed -i "s#newName:.*openshift.io\/cert-manager-operator.*#newName: ${operatorImage}#g" "${cert_manager_kustomization_yaml}"
+
+    #relatedImages
+    for index in $(yq '.relatedImages.[] | path | .[-1] ' "${OPERATOR_CERT_MANAGER_INDEX}"); do
+     local image=$(yq ".relatedImages.${index}.image" "${OPERATOR_CERT_MANAGER_INDEX}" )
+     local component=$(yq ".relatedImages.${index}.name" "${OPERATOR_CERT_MANAGER_INDEX}")
+    if [[  -n "${component}" && "${OPERATOR_COMPONENTS}" == *"${component}"* ]]; then
+        yq -i -o json ".images += {\"${component}\": \"${image}\"}" "${cert_manager_release_json}"
+        sed -i "s#value:.*${component}.*#value: ${image}#g" "${cert_manager_operator_yaml}"
+
+        # handle special case istiocsr v istio-csr mismatch 
+        if [[ "${component}" == "cert-manager-istiocsr" ]]; then
+            sed -i "s#value:.*cert-manager-istio-csr.*#value: ${image}#g" "${cert_manager_operator_yaml}"
+        fi
+    fi
+       
+
+    done
+
+}
+
+update_cert_manager_images() {
+    title "Updating cert_manager images"
+    local workdir="${STAGING_DIR}/cert-manager-operator"
+    [ -d "${workdir}" ] || {
+        >&2 echo 'cert_manager staging dir not found, aborting image update'
+        return 1
+    }
+    for arch in "${ARCHS[@]}"; do
+        write_cert_manager_images_for_arch "${arch}"
+    done
 }
 
 
@@ -116,6 +190,20 @@ update_cert_manager_manifests() {
     pushd "${STAGING_DIR}" >/dev/null
 
     title "Modifying OpenShift manifests"
+    
+    for index in $(yq '.[] | path | .[-1] ' "${OPERATOR_CERT_MANAGER_INDEX}")
+    do
+     image=$(yq ".${index}.image" "${OPERATOR_CERT_MANAGER_INDEX}")
+     component=$(yq ".${index}.name" "${OPERATOR_CERT_MANAGER_INDEX}")
+
+    if [[  -n "${component}" && "${OPERATOR_COMPONENTS}" == *"${component}"* ]]; then
+        #clone_repo "${repo}" "${commit}" "."
+        #echo "${repo} embedded-component ${commit}" >> "${new_commits_file}"
+        echo "${image} ${component}"
+    fi
+    done
+
+
     popd >/dev/null
 }
 
@@ -133,18 +221,16 @@ check_preconditions
 command=${1:-help}
 case "$command" in
     to)
-        # FIXME: Allow more than 3 arguments until pipelines stop passing LVMS value.
         [[ $# -lt 3 ]] && usage
         rebase_to "$2" "$3"
         ;;
     download)
-        # FIXME: Allow more than 3 arguments until pipelines stop passing LVMS value.
         #[[ $# -lt 3 ]] && usage
         # download_release "$2" "$3"
-        download_cert_manager
+        download_cert_manager "$2"
         ;;
     images)
-        update_images
+        update_cert_manager_images
         ;;
 
     manifests)
