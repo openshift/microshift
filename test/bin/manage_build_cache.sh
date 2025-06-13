@@ -6,6 +6,7 @@ set -euo pipefail
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # shellcheck source=test/bin/common.sh
 source "${SCRIPTDIR}/common.sh"
+source "${SCRIPTDIR}/common_versions.sh"
 
 AWS_BUCKET_NAME="${AWS_BUCKET_NAME:-microshift-build-cache}"
 BCH_SUBDIR=
@@ -102,7 +103,10 @@ action_upload() {
     run_aws_cli s3 sync --quiet --include '*.iso' "${iso_base}" "${iso_dest}"
 
     # Upload mirror-registry, brew-rpms and repo archives
-    for dir in mirror-registry brew-rpms repo ; do
+    pushd "${src_base}"
+    brew_rpms_dirs="$(find "${BREW_RPM_SOURCE}" -maxdepth 1 -type d)"
+    popd
+    for dir in mirror-registry ${brew_rpms_dirs} repo ; do
         local pkg_src="${src_base}/${dir}.tar"
         local pkg_dst="${dst_base}/${dir}.tar"
 

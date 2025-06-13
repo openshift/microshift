@@ -13,6 +13,7 @@ WITH_TOPOLVM=${WITH_TOPOLVM:-1}
 
 # shellcheck source=test/bin/common.sh
 source "${SCRIPTDIR}/common.sh"
+source "${SCRIPTDIR}/common_versions.sh"
 
 build_rpms() {
     cd "${ROOTDIR}"
@@ -119,13 +120,23 @@ download_brew_rpms() {
     mkdir -p "${BREW_RPM_SOURCE}"
     if "${SCRIPTDIR}/manage_brew_rpms.sh" access ; then
         # shellcheck source=test/bin/common_versions.sh
-        source "${SCRIPTDIR}/common_versions.sh"
         # Delete the old RPMs before the download
         echo "Cleaning up old brew downloads"
         rm -rf "${BREW_RPM_SOURCE}"
         # Run the download procedure
         bash -x "${SCRIPTDIR}/../../scripts/fetch_tools.sh" brew
-        bash -x "${SCRIPTDIR}/manage_brew_rpms.sh" download "4.${MINOR_VERSION}" "${BREW_RPM_SOURCE}"
+        for y in $(seq 14 "${MINOR_VERSION}"); do
+            ocpversion="4.${y}"
+            bash -x "${SCRIPTDIR}/../../test/bin/manage_brew_rpms.sh" download "${ocpversion}" "nightly" "${BREW_RPM_SOURCE}"
+            if [ "$y" -ge "$PREVIOUS_MINOR_VERSION" ]; then
+                bash -x "${SCRIPTDIR}/../../test/bin/manage_brew_rpms.sh" download "${ocpversion}" "rc" "${BREW_RPM_SOURCE}"
+                bash -x "${SCRIPTDIR}/../../test/bin/manage_brew_rpms.sh" download "${ocpversion}" "ec" "${BREW_RPM_SOURCE}"
+            else
+                for versions_back in $(seq 0 2); do
+                    bash -x "${SCRIPTDIR}/../../test/bin/manage_brew_rpms.sh" download "${ocpversion}" "zstream" "${BREW_RPM_SOURCE}" "${versions_back}"
+                done 
+            fi
+        done
     else
         echo "WARNING: The Brew Hub site is not accessible, skipping the download"
     fi
@@ -138,7 +149,7 @@ create_local_repo() {
     make_repo "${LOCAL_REPO}" "${RPM_SOURCE}"
     make_repo "${NEXT_REPO}" "${NEXT_RPM_SOURCE}"
     make_repo "${BASE_REPO}" "${BASE_RPM_SOURCE}"
-    make_repo "${BREW_REPO}" "${BREW_RPM_SOURCE}/${UNAME_M}"
+    make_repo "${BREW_REPO}" "${BREW_RPM_SOURCE}/4.${MINOR_VERSION}*nightly*/${UNAME_M}"
 
     # Force recreation of dnf caches after rebuilding the repositories
     sudo dnf clean all
