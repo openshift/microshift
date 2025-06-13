@@ -30,6 +30,7 @@ action_download() {
     local -r version=$1
     local -r version_type=$2
     local -r dir=$3
+    local -r num_versions_back=${4:-0}
 
     if ! action_access ; then
         echo "ERROR: Brew Hub site is not accessible"
@@ -39,12 +40,11 @@ action_download() {
 
     # Attempt downloading the specified build version and release type
     local package
-    local package_list
-    package_list=$(brew list-builds --quiet --package=microshift --state=COMPLETE)
     if [ "${version_type}" = "zstream" ]; then
-        package=$(echo "${package_list}" | grep "^microshift-${version}" | grep -v "~" | tail -1) || true
+        package_found=$(brew list-builds --quiet --package=microshift --state=COMPLETE | grep "^microshift-${version}" | grep -v "~" | awk -F - '{print $1"-"$2}' | uniq | tail -n "$(( "${num_versions_back}" + 1))" | head -n1) || true
+        package=$(brew list-builds --quiet --package=microshift --state=COMPLETE | grep "${package_found}-") || true
     else
-        package=$(echo "${package_list}" | grep "^microshift-${version}.*${version_type}" | tail -1) || true
+        package=$(brew list-builds --quiet --package=microshift --state=COMPLETE | grep "^microshift-${version}.*${version_type}" | tail -1) || true
     fi
 
     if [ -z "${package}" ] ; then
@@ -59,7 +59,9 @@ action_download() {
     # cannot be identified easily when running in a CI job
     for arch in x86_64 aarch64 ; do
         local adir
-        adir="${dir}/${arch}"
+        pwd
+        # shellcheck disable=SC2001
+        adir="${dir}/$(echo "${package}" | sed 's/.*microshift-\([^-]*\).*/\1/')/${arch}"
 
         mkdir -p "${adir}"
         pushd "${adir}" &>/dev/null
@@ -83,7 +85,7 @@ case "${action}" in
         "action_${action}"
         ;;
     download)
-        [ $# -ne 4 ] && usage && exit 1
+        [ $# -gt 5 ] && usage && exit 1
         shift
         "action_${action}" "$@"
         ;;
