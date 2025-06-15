@@ -23,15 +23,17 @@ make [rhocp | repourl | repobase | <build_ver> | run | clean]
    clean:       delete all 'localhost/microshift-*' container images
 
 Available build versions:
-   4.16-el94
-   4.17-rc-el94
-   4.18-ec-cos9
-   4.18-ec-el94
+   4.18-el94
+   4.18-rc-cos9
+   4.18-rc-el94
+   4.19-el96
+   4.19-rc-cos9
+   4.19-rc-el96
 ```
 
 ## Build Image Mode Containers
 
-Log into the `RHEL 9.4 host` using the user credentials that have SUDO permissions
+Log into the `RHEL 9.6 host` using the user credentials that have SUDO permissions
 configured.
 
 The `rhocp`, `repourl` and `repobase` targets can be used for building `bootc`
@@ -46,18 +48,18 @@ The target requires the `USHIFT_VER=value` argument, which defines the version
 of the `rhocp` repository to be used when building the image.
 
 For example, run the following command to build an image including the latest
-released MicroShift 4.16 version.
+released MicroShift 4.19 version.
 
 ```bash
-make rhocp USHIFT_VER=4.16
+make rhocp USHIFT_VER=4.19
 ```
 
-The resulting image will be named `microshift-4.16.z` where `z` is the latest
+The resulting image will be named `microshift-4.19.z` where `z` is the latest
 available MicroShift package version in the repository.
 
 ```bash
-$ sudo podman images --format "{{.Repository}}" | grep ^localhost/microshift-4.16
-localhost/microshift-4.16.8
+$ sudo podman images --format "{{.Repository}}" | grep ^localhost/microshift-4.19
+localhost/microshift-4.19.0
 ```
 
 ### Build from Custom URL Repository
@@ -71,21 +73,21 @@ which define the URL of repositories containing MicroShift RPM packages and
 OpenShift dependency RPM packages.
 
 For example, run the following command to build an image including the MicroShift
-4.17 Release Candidate version from `mirror.openshift.com` site.
+4.19 Release Candidate version from `mirror.openshift.com` site.
 
 ```bash
 BASE_URL="https://mirror.openshift.com/pub/openshift-v4"
 make repourl \
-    USHIFT_URL="${BASE_URL}/$(uname -m)/microshift/ocp/latest-4.17/el9/os/" \
-    OCPDEP_URL="${BASE_URL}/$(uname -m)/dependencies/rpms/4.17-el9-beta/"
+    USHIFT_URL="${BASE_URL}/$(uname -m)/microshift/ocp/latest-4.19/el9/os/" \
+    OCPDEP_URL="${BASE_URL}/$(uname -m)/dependencies/rpms/4.19-el9-beta/"
 ```
 
-The resulting image will be named `microshift-4.17.z` where `z` is the latest
+The resulting image will be named `microshift-4.19.z` where `z` is the latest
 available MicroShift package version in the repository.
 
 ```bash
-$ sudo podman images --format "{{.Repository}}" | grep ^localhost/microshift-4.17
-localhost/microshift-4.17.0-rc.0
+$ sudo podman images --format "{{.Repository}}" | grep ^localhost/microshift-4.19
+localhost/microshift-4.19.0-rc.0
 ```
 
 ### Build from Custom Base Image Repository
@@ -100,16 +102,16 @@ local MicroShift `bootc` container image (i.e. `microshift-${IMAGE_VER}`). All
 the required RPM repository configuration is assumed to be part of the base image.
 
 For example, run the following command to build an image using the local MicroShift
-4.16 image with `rhocp` repositories built in the previous step.
+4.19 image with `rhocp` repositories built in the previous step.
 
 > This example is superficial for the sake of simplicity. The typical use of the
 > `repobase` target would be to decouple the repository configuration and MicroShift
 > image build steps.
 
 ```bash
-BASE_IMAGE_URL="localhost/microshift-4.16.9"
+BASE_IMAGE_URL="localhost/microshift-4.19.0"
 BASE_IMAGE_TAG="latest"
-IMAGE_VER="4.16.9-update"
+IMAGE_VER="4.19.0-update"
 
 make repobase \
     BASE_IMAGE_URL="${BASE_IMAGE_URL}" \
@@ -117,12 +119,12 @@ make repobase \
     IMAGE_VER="${IMAGE_VER}"
 ```
 
-The resulting image will be named `microshift-4.16.9-update` as defined by the
+The resulting image will be named `microshift-4.19.0-update` as defined by the
 `IMAGE_VER` argument.
 
 ```bash
 $ sudo podman images --format "{{.Repository}}" | grep ^localhost/microshift-"${IMAGE_VER}"
-localhost/microshift-4.16.9-update
+localhost/microshift-4.19.0-update
 ```
 
 ### Predefined Build Targets
@@ -133,19 +135,22 @@ MicroShift versions and configurations.
 ```bash
 $ make | grep -A10 'Available build versions'
 Available build versions:
-   4.16-el94
-   4.17-rc-el94
-   4.18-ec-el94
+   4.18-el94
+   4.18-rc-cos9
+   4.18-rc-el94
+   4.19-el96
+   4.19-rc-cos9
+   4.19-rc-el96
 ```
 
 These builds use `rhocp` and `repourl` targets with hardcoded parameters to simplify
 `make` command invocation.
 
 For example, run the following command to build an image including the MicroShift
-4.17 Release Candidate version from `mirror.openshift.com` site.
+4.19 Release Candidate version from `mirror.openshift.com` site.
 
 ```bash
-make 4.17-rc-el94
+make 4.19-rc-el96
 ```
 
 ### Override Build Variables
@@ -156,15 +161,15 @@ default values used in `Containerfile` for `rhocp` and `repourl` targets.
 | Parameter Name | Default Value | Comment |
 |----------------|---------------|---------|
 | PULL_SECRET    | `~/.pull-secret.json` | Used for accessing base `bootc` images |
-| BASE_IMAGE_URL | `registry.redhat.io/rhel9-eus/rhel-9.4-bootc` | Base `bootc` image URL |
-| BASE_IMAGE_TAG | `9.4` | Base `bootc` image tag |
+| BASE_IMAGE_URL | `registry.redhat.io/rhel9-eus/rhel-9.6-bootc` | Base `bootc` image URL |
+| BASE_IMAGE_TAG | `9.6` | Base `bootc` image tag |
 | DNF_OPTIONS    | none | Additional options to be passed to the `dnf` command |
 
 For example, run the following command to override the base `bootc` image default
 tag when building the container image.
 
 ```bash
-make rhocp USHIFT_VER=4.16 \
+make rhocp USHIFT_VER=4.19 \
     BASE_IMAGE_TAG=latest
 ```
 
@@ -181,7 +186,7 @@ make clean
 > The purpose of this section is to demonstrate how to test generated MicroShift
 > image mode containers.
 
-Log into the `RHEL 9.4 host` using the user credentials that have SUDO permissions
+Log into the `RHEL 9.6 host` using the user credentials that have SUDO permissions
 configured.
 
 The `run` target allows for running the specified `localhost/microshift-*` container
@@ -193,10 +198,10 @@ one of them.
 
 ```bash
 $ sudo podman images --format "{{.Repository}}" | grep ^localhost/microshift-
-localhost/microshift-4.17.0-rc.0
-localhost/microshift-4.16.8
+localhost/microshift-4.19.0-rc.0
+localhost/microshift-4.18.0
 
-$ make run IMAGE_VER=4.16.8
+$ make run IMAGE_VER=4.18.0
 ...
 ...
 sudo podman exec -it 65339346b957c7b02353bf859b07d75a2127398266d6d3f3b2708b692745609f bash
@@ -213,7 +218,7 @@ For example, run the following command to stop all the running MicroShift contai
 $ make stop
 ...
 ...
-microshift-4.16.8
+microshift-4.18.0
 ```
 
 ## Appendix B: Boot RHEL Using Image Mode Containers
@@ -339,7 +344,7 @@ Log into a Linux host (e.g. `Fedora`, `CentOS` or `RHEL`) using the user credent
 that have SUDO permissions configured.
 
 For example, run the following command to build a CentOS Stream 9 image using the
-MicroShift 4.17 Release Candidate version from `mirror.openshift.com` site.
+MicroShift 4.19 Release Candidate version from `mirror.openshift.com` site.
 
 ```bash
 BASE_IMAGE_URL=quay.io/centos-bootc/centos-bootc
@@ -349,8 +354,8 @@ BASE_URL="https://mirror.openshift.com/pub/openshift-v4"
 make repourl \
     BASE_IMAGE_URL="${BASE_IMAGE_URL}" \
     BASE_IMAGE_TAG="${BASE_IMAGE_TAG}" \
-    USHIFT_URL="${BASE_URL}/$(uname -m)/microshift/ocp/latest-4.17/el9/os/" \
-    OCPDEP_URL="${BASE_URL}/$(uname -m)/dependencies/rpms/4.17-el9-beta/"
+    USHIFT_URL="${BASE_URL}/$(uname -m)/microshift/ocp/latest-4.19/el9/os/" \
+    OCPDEP_URL="${BASE_URL}/$(uname -m)/dependencies/rpms/4.19-el9-beta/"
 ```
 
 Note that RPM packages referenced by the `USHIFT_URL` and `OCPDEP_URL` may conflict
