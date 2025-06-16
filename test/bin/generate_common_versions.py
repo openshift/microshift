@@ -228,7 +228,7 @@ rhocp_minor_y = minor_version if repo_provides_pkg(f"rhocp-4.{minor_version}-for
 logging.info("Getting RHOCP_MINOR_Y_BETA")
 rhocp_minor_y_beta = get_dependencies_repo_url(minor_version, 3)
 
-# The 'rhocp_minor_y' variable should be the previous minor version number, if 
+# The 'rhocp_minor_y' variable should be the previous minor version number, if
 # the previous release is available through the 'rhocp' stream, otherwise empty.
 rhocp_minor_y1 = previous_minor_version if repo_provides_pkg(f"rhocp-4.{previous_minor_version}-for-rhel-9-{ARCH}-rpms", "cri-o") else '""'
 
