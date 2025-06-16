@@ -98,9 +98,6 @@ YMINUS2_RELEASE_VERSION="$(get_vrel_from_rhsm "${YMINUS2_RELEASE_REPO}")"
 export YMINUS2_RELEASE_REPO
 export YMINUS2_RELEASE_VERSION
 
-# Define either a release version or the OpenShift mirror beta repository URL.
-# If the release version is defined, the repository should be deduced from the
-# CURRENT_RELEASE_REPO setting.
 RHOCP_MINOR_Y=""
 RHOCP_MINOR_Y_BETA="https://mirror.openshift.com/pub/openshift-v4/$(uname -m)/dependencies/rpms/4.21-el9-beta/"
 export RHOCP_MINOR_Y
@@ -119,8 +116,6 @@ export RHOCP_MINOR_Y1_BETA
 # for the y-2 release.
 export RHOCP_MINOR_Y2=19
 
-# The version of Sonobuoy package used in CNCF tests.
-# See https://github.com/vmware-tanzu/sonobuoy/releases.
 export CNCF_SONOBUOY_VERSION=v0.57.3
 
 # The version of systemd-logs image included in the sonobuoy release.
