@@ -1,0 +1,3 @@
+- operator-framework-olm embedded-component 7788801d7846a1f898c0e583583a73e937147164 to b1fb5e0e4aebbfa3cee1a18930882947ee1b2966
+  - 37d2ac6c 2025-05-20T02:46:32+00:00 fix(olm): improve error logging for missing olm.managed label (#3558)
+
