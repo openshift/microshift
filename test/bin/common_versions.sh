@@ -92,17 +92,13 @@ PREVIOUS_RELEASE_VERSION="$(get_vrel_from_rhsm "${PREVIOUS_RELEASE_REPO}")"
 export PREVIOUS_RELEASE_REPO
 export PREVIOUS_RELEASE_VERSION
 
-# The y-2 release repository value should always contain the 'rhocp' repository name.
 YMINUS2_RELEASE_REPO="rhocp-4.18-for-rhel-9-$(uname -m)-rpms"
 YMINUS2_RELEASE_VERSION="$(get_vrel_from_rhsm "${YMINUS2_RELEASE_REPO}")"
 export YMINUS2_RELEASE_REPO
 export YMINUS2_RELEASE_VERSION
 
-# Define either a release version or the OpenShift mirror beta repository URL.
-# If the release version is defined, the repository should be deduced from the
-# CURRENT_RELEASE_REPO setting.
 RHOCP_MINOR_Y=""
-RHOCP_MINOR_Y_BETA="https://mirror.openshift.com/pub/openshift-v4/$(uname -m)/dependencies/rpms/4.20-el9-beta/"
+RHOCP_MINOR_Y_BETA="https://mirror.openshift.com/pub/openshift-v4/$(uname -m)/dependencies/rpms/4.20-el9-beta"
 export RHOCP_MINOR_Y
 export RHOCP_MINOR_Y_BETA
 
@@ -115,12 +111,8 @@ RHOCP_MINOR_Y1_BETA="https://mirror.openshift.com/pub/openshift-v4/$(uname -m)/d
 export RHOCP_MINOR_Y1
 export RHOCP_MINOR_Y1_BETA
 
-# Define a release version as it is not expected to use the OpenShift mirror
-# for the y-2 release.
 export RHOCP_MINOR_Y2=18
 
-# The version of Sonobuoy package used in CNCF tests.
-# See https://github.com/vmware-tanzu/sonobuoy/releases.
 export CNCF_SONOBUOY_VERSION=v0.57.3
 
 # The current version of the microshift-gitops package.
