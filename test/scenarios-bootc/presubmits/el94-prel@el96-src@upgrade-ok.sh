@@ -2,7 +2,7 @@
 
 # Sourced from scenario.sh and uses functions defined there.
 
-start_image=rhel96-bootc-prel
+start_image=rhel94-bootc-prel
 
 scenario_create_vms() {
     if ! does_image_exist "${start_image}"; then
@@ -10,7 +10,7 @@ scenario_create_vms() {
         return 0
     fi
     prepare_kickstart host1 kickstart-bootc.ks.template "${start_image}"
-    launch_vm --boot_blueprint rhel96-bootc
+    launch_vm --boot_blueprint rhel94-bootc
 }
 
 scenario_remove_vms() {
