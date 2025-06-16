@@ -1,18 +1,3 @@
-- kubernetes embedded-component e6e35d04f5019d8b85207d37cfa2efc0db18925a to db4023c383e559c6310710cd16a441912fc9c06f
-  - 151e2cdba 2025-06-02T15:22:13-04:00 UPSTREAM: <carry>: kubelet: fix a stall on startup from waiting too long for a stat call
-
-- kubernetes-kube-storage-version-migrator embedded-component 50d17147f15d8b216e7c41f91d1bd7d307ca8c73 to 8dec42d36f9e26487112aeac870767a5fedb8021
-  - 5468ab7 2025-06-09T17:20:26-04:00  append .0 to go.mod version
-
-- coredns image-amd64 cb1abfaeb7b0c5df4f0c56b0a009b439db1d0949 to eb75d9b4f41a5ce0258d6f245c6206715ecb283b
-  - c85c7d4 2025-06-09T11:17:59-04:00 append .0 to go.mod version
-
-- kubernetes image-amd64 e6e35d04f5019d8b85207d37cfa2efc0db18925a to db4023c383e559c6310710cd16a441912fc9c06f
-  - 151e2cdba 2025-06-02T15:22:13-04:00 UPSTREAM: <carry>: kubelet: fix a stall on startup from waiting too long for a stat call
-
-- coredns image-arm64 cb1abfaeb7b0c5df4f0c56b0a009b439db1d0949 to eb75d9b4f41a5ce0258d6f245c6206715ecb283b
-  - c85c7d4 2025-06-09T11:17:59-04:00 append .0 to go.mod version
-
-- kubernetes image-arm64 e6e35d04f5019d8b85207d37cfa2efc0db18925a to db4023c383e559c6310710cd16a441912fc9c06f
-  - 151e2cdba 2025-06-02T15:22:13-04:00 UPSTREAM: <carry>: kubelet: fix a stall on startup from waiting too long for a stat call
+- operator-framework-olm embedded-component d83b7565606cc984396860212bb60bdfd1ed578a to 969a7e031a97a7e12424b5d292f345a168b73e38
+  - 97113876 2025-06-11T07:03:04+00:00 operatorgroup: ensure clusterroleselectors in clusterrole aggregation rules are sorted (#3593)
 
