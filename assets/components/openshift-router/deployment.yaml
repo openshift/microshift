@@ -102,6 +102,53 @@ spec:
             - name: ROUTER_MUTUAL_TLS_AUTH_FILTER
               value: '{{ .ClientAuthFilter }}'
             {{- end }}
+            {{- if .AccessLoggingEnabled }}
+            - name: ROUTER_SYSLOG_ADDRESS
+            {{- if .AccessLoggingSyslogAddress }}
+              value: '{{ .AccessLoggingSyslogAddress }}'
+            {{- else }}
+              value: /var/lib/rsyslog/rsyslog.sock
+            {{- /* AccessLoggingSyslogAddress*/}}
+            {{- end }}
+            - name: ROUTER_LOG_LEVEL
+              value: info
+            {{- if .AccessLoggingMaxLength}}
+            - name: ROUTER_LOG_MAX_LENGTH
+              value: '{{ .AccessLoggingMaxLength }}'
+            {{- /* AccessLoggingMaxLength */}}
+            {{- end }}
+            {{- if .AccessLoggingSyslogFacility }}
+            - name: ROUTER_LOG_FACILITY
+              value: {{ .AccessLoggingSyslogFacility }}
+            {{- end }}
+            {{- if .HttpLogFormat }}
+            - name: ROUTER_SYSLOG_FORMAT
+              value: '"{{ .HttpLogFormat }}"'
+            {{- /* HttpLogFormat */}}
+            {{- end }}
+            {{- if .HttpCaptureHeadersRequest }}
+            - name: ROUTER_CAPTURE_HTTP_REQUEST_HEADERS
+              value: '{{ .HttpCaptureHeadersRequest }}'
+            {{- /* HttpCaptureHeadersRequest */}}
+            {{- end }}
+            {{- if .HttpCaptureHeadersResponse }}
+            - name: ROUTER_CAPTURE_HTTP_RESPONSE_HEADERS
+              value: '{{ .HttpCaptureHeadersResponse }}'
+            {{- /* HttpCaptureHeadersResponse */}}
+            {{- end }}
+            {{- if .HttpCaptureCookies }}
+            - name: ROUTER_CAPTURE_HTTP_COOKIE
+              value: '{{ .HttpCaptureCookies }}'
+            {{- /* HttpCaptureCookies */}}
+            {{- end }}
+            {{- /* AccessLoggingEnabled */}}
+            {{- end }}
+            {{- if .HttpErrorCodePages }}
+            - name: ROUTER_ERRORFILE_503
+              value: /var/lib/haproxy/errorfiles/error-page-503.http
+            - name: ROUTER_ERRORFILE_404
+              value: /var/lib/haproxy/errorfiles/error-page-404.http
+            {{- end }}
           livenessProbe:
             failureThreshold: 3
             httpGet:
@@ -146,8 +193,16 @@ spec:
               name: '{{ .ClientCAMapName}}'
               readOnly: true
             {{- end }}
-
-
+            {{- if .HttpErrorCodePages }}
+            - mountPath: /var/lib/haproxy/errorfiles
+              name: error-code-pages
+              readOnly: true
+            {{- end }}
+            {{- if and .AccessLoggingEnabled (not .AccessLoggingSyslogAddress) }}
+            - mountPath: /var/lib/rsyslog
+              name: rsyslog-socket
+              readOnly: false
+            {{- end }}
           image: '{{ .ReleaseImage.haproxy_router }}'
           ports:
             - name: http
@@ -161,6 +216,29 @@ spec:
               protocol: TCP
           args:
             - -v=4
+        {{- if and .AccessLoggingEnabled (not .AccessLoggingSyslogAddress) }}
+        - name: access-logs
+          imagePullPolicy: IfNotPresent
+          terminationMessagePolicy: FallbackToLogsOnError
+          image: '{{ .ReleaseImage.haproxy_router }}'
+          imagePullPolicy: IfNotPresent
+          command:
+            - /sbin/rsyslogd
+            - -n
+            - -i
+            - /tmp/rsyslogd.pid
+            - -f
+            - /etc/rsyslog/rsyslog.conf
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+          volumeMounts:
+            - mountPath: /var/lib/rsyslog
+              name: rsyslog-socket
+            - mountPath: /etc/rsyslog
+              name: rsyslog-config
+        {{- end}}
       tolerations:
         # Ensure the pod isn't deleted during serial NoExecuteTaintManager tests.
         # Remember that NoExecute uses Delete, not Evict, because removing the pod
@@ -190,6 +268,19 @@ spec:
             - key: '{{ .ClientCABundleFilename }}'
               path: '{{ .ClientCABundleFilename }}'
             name: '{{ .ClientCAMapName }}'
+            optional: false
+        {{- end }}
+        {{- if .HttpErrorCodePages }}
+        - name: error-code-pages
+          configMap:
+            name: {{ .HttpErrorCodePages }}
+        {{- end }}
+        {{- if and .AccessLoggingEnabled (not .AccessLoggingSyslogAddress) }}
+        - name: rsyslog-socket
+          emptyDir: {}
+        - name: rsyslog-config
+          configMap:
+            name: access-logs-rsyslog-config
             optional: false
         {{- end }}
       restartPolicy: Always

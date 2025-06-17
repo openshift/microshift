@@ -124,8 +124,8 @@ echo -e "${USER}\tALL=(ALL)\tNOPASSWD: ALL" | sudo tee "/etc/sudoers.d/${USER}"
 
 # Check the subscription status and register if necessary
 if ${RHEL_SUBSCRIPTION}; then
-    if ! sudo subscription-manager status >&/dev/null; then
-        sudo subscription-manager register --auto-attach
+    if ! sudo subscription-manager status; then
+        sudo subscription-manager register --auto-attach --force
     fi
     sudo subscription-manager config --rhsm.manage_repos=1
 
@@ -317,8 +317,9 @@ fi
 if ${BUILD_AND_RUN}; then
     sudo systemctl enable --now crio
     if ${PULL_IMAGES}; then
+        # Skip ai-model-serving images because of the size and not all are needed (HW dependent).
         # shellcheck disable=SC2046
-        "${PULL_RETRY}" $(rpm -qa | grep -e  "microshift.*-release-info" | xargs rpm -ql | grep $(uname -m).json | xargs jq -r '.images | values[]')
+        "${PULL_RETRY}" $(rpm -qa | grep -e  "microshift.*-release-info" | grep -v 'ai-model-serving' | xargs rpm -ql | grep $(uname -m).json | xargs jq -r '.images | values[]')
     fi
     if ${START}; then
         sudo systemctl start microshift

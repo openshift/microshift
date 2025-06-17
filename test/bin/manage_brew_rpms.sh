@@ -6,7 +6,7 @@ SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # its execution in a containerized environment with limited set of tools.
 
 usage() {
-    echo "Usage: $(basename "$0") [access | download <version> <path>]"
+    echo "Usage: $(basename "$0") [access | download <version> <path> <version_type>]"
     echo "  download:   Download the RPM version to the path as specified"
     echo "  access:     Exit with non-zero status if brew cannot be accessed"
 }
@@ -29,6 +29,7 @@ action_access() {
 action_download() {
     local -r ver=$1
     local -r dir=$2
+    local -r ver_type=${3:-}
 
     if ! action_access ; then
         echo "ERROR: Brew Hub site is not accessible"
@@ -38,10 +39,17 @@ action_download() {
 
     # Attempt downloading the specified build version
     local package
-    package=$(brew list-builds --quiet --package=microshift --state=COMPLETE | grep "^microshift-${ver}" | sort | tail -1) || true
+    if [ "${ver_type}" = "zstream" ]; then
+        package=$(brew list-builds --quiet --package=microshift --state=COMPLETE | grep "^microshift-${ver}" | grep -v "~" | uniq | tail -n1) || true
+    elif [ "${ver_type}" = "rc" ] || [ "${ver_type}" = "ec" ]; then
+        package=$(brew list-builds --quiet --package=microshift --state=COMPLETE | grep "^microshift-${ver}.0~${ver_type}." | tail -1) || true
+    else
+        package=$(brew list-builds --quiet --package=microshift --state=COMPLETE | grep "^microshift-${ver}.*${ver_type}" | tail -1) || true
+    fi
+
     if [ -z "${package}" ] ; then
-        echo "ERROR: Cannot find MicroShift '${ver}' packages in brew"
-        exit 1
+        echo "WARNING: Cannot find MicroShift '${ver}' packages in brew"
+        exit 0
     fi
 
     package=$(awk '{print $1}' <<< "${package}")
@@ -51,7 +59,12 @@ action_download() {
     # cannot be identified easily when running in a CI job
     for arch in x86_64 aarch64 ; do
         local adir
-        adir="${dir}/${arch}"
+        # shellcheck disable=SC2001
+        if [ -z "${ver_type}" ] ; then
+            adir="${dir}/${arch}"
+        else
+            adir="${dir}/$(echo "${package}" | sed 's/.*microshift-\([^-]*\).*/\1/')/${arch}"
+        fi
 
         mkdir -p "${adir}"
         pushd "${adir}" &>/dev/null
@@ -75,7 +88,7 @@ case "${action}" in
         "action_${action}"
         ;;
     download)
-        [ $# -ne 3 ] && usage && exit 1
+        [ $# -gt 4 ] && usage && exit 1
         shift
         "action_${action}" "$@"
         ;;

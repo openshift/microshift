@@ -153,10 +153,10 @@ Verify Hello MicroShift NodePort
     [Documentation]    Run Hello MicroShift NodePort verification
     [Arguments]    ${ip}
     Create Hello MicroShift Pod
-    Expose Hello MicroShift Pod Via NodePort
+    ${port}=    Expose Hello MicroShift Pod Via NodePort
 
     Wait Until Keyword Succeeds    30x    10s
-    ...    Access Hello Microshift Success    ${NP_PORT}    ${ip}
+    ...    Access Hello Microshift Success    ${port}    ${ip}
 
     [Teardown]    Run Keywords
     ...    Delete Hello MicroShift Pod And Service

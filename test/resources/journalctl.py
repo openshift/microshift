@@ -32,9 +32,10 @@ def get_log_output_with_pattern(cursor: str, pattern: str, unit="microshift") ->
     Get the logs since the cursor matching the pattern and return the log content and exit code.
     Optional argument `unit` may be used to specify a systemd unit other than microshift,
     for example microshift-observability.service.
+    Note that this function ignores case when matching the pattern.
     """
     stdout, rc = libostree.remote_sudo_rc(
-        f"journalctl -u {unit} --cursor='{cursor}' --no-pager --grep '{pattern}'"
+        f"journalctl -u {unit} --cursor='{cursor}' --no-pager --case-sensitive=false --grep '{pattern}'"
     )
     BuiltIn().log(f"log lines matching '{pattern}':\n{stdout}")
     return stdout, rc

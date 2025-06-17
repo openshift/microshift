@@ -10,40 +10,51 @@ SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 source "${SCRIPTDIR}/common.sh"
 
 PROMETHEUS_DIR="${IMAGEDIR}/prometheus"
+DEFAULT_HOST_PORT="9092"
 
 usage() {
     cat - <<EOF
-${BASH_SOURCE[0]} (start|stop)
+${BASH_SOURCE[0]} (start|stop) [port]
 
   -h           Show this help.
 
-start: Start Prometheus.
+start [port]: Start Prometheus.
+             Uses port ${DEFAULT_HOST_PORT} on the host by default.
+             The container name will be prometheus-<host_port>.
 
-stop: Stop Prometheus.
+stop [port]: Stop Prometheus.
+            Uses port ${DEFAULT_HOST_PORT} by default to identify the container.
+            The container name is assumed to be prometheus-<host_port>.
 
 EOF
 }
 
 action_stop() {
-    echo "Stopping Prometheus"
-    podman stop prometheus > /dev/null || true
-    podman rm --force prometheus > /dev/null || true
+    local host_port="${1:-${DEFAULT_HOST_PORT}}"
+    local container_name="prometheus-${host_port}"
+
+    echo "Stopping Prometheus container ${container_name}"
+    podman stop "${container_name}" > /dev/null || true
+    podman rm --force "${container_name}" > /dev/null || true
 }
 
 action_start() {
-    mkdir -p "${PROMETHEUS_DIR}"
+    local host_port="${1:-${DEFAULT_HOST_PORT}}"
+    local container_name="prometheus-${host_port}"
 
+    mkdir -p "${PROMETHEUS_DIR}"
     PROM_CONFIG="${PROMETHEUS_DIR}/prometheus.yml"
     # Empty configuration file will take all defaults.
     # A config file is required to add remote-write enabling.
+    # This file may be shared across any number of prometheus instances.
     touch "${PROM_CONFIG}"
 
-    echo "Stopping previous instance of Prometheus"
-    action_stop
+    echo "Stopping previous instance of Prometheus container ${container_name} (if any)"
+    action_stop "${host_port}"
 
-    echo "Starting Prometheus"
-    podman run -d --rm --name prometheus \
-        -p 9092:9090 \
+    echo "Starting Prometheus container ${container_name} on host port ${host_port}"
+    podman run -d --rm --name "${container_name}" \
+        -p "${host_port}:9090" \
         -v "${PROMETHEUS_DIR}:/etc/prometheus:Z" \
         quay.io/prometheus/prometheus \
         --config.file=/etc/prometheus/prometheus.yml \

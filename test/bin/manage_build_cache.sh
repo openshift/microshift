@@ -117,6 +117,26 @@ action_upload() {
         run_aws_cli s3 cp --quiet "${pkg_src}" "${pkg_dst}"
         rm -f "${pkg_src}"
     done
+
+    # Upload released RPM from brew
+    pushd "${src_base}"
+    released_brew_rpms_dirs="$(find "released-brew-rpms" -maxdepth 1 -type d | tail -n +2)"
+    popd
+    for dir in ${released_brew_rpms_dirs} ; do
+        local pkg_src="${src_base}/${dir}.tar"
+        local pkg_dst="s3://${AWS_BUCKET_NAME}/${dir}.tar"
+
+        # Archive the files before the upload
+        rm -f "${pkg_src}"
+        tar cf "${pkg_src}" -C "${src_base}" "${dir}"
+
+        local repo_size
+        repo_size="$(du -csh "${pkg_src}" | awk 'END{print $1}')"
+
+        echo "Uploading ${repo_size} of data to '${pkg_dst}'"
+        run_aws_cli s3 cp --quiet "${pkg_src}" "${pkg_dst}"
+        rm -f "${pkg_src}"
+    done
 }
 
 action_download() {

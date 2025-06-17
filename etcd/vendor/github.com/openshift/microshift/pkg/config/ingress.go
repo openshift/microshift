@@ -1,6 +1,11 @@
 package config
 
 import (
+	"fmt"
+	"net"
+	"regexp"
+	"slices"
+
 	configv1 "github.com/openshift/api/config/v1"
 	operatorv1 "github.com/openshift/api/operator/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -15,7 +20,22 @@ const (
 	DefaultHttpVersionV2      DefaultHttpVersionPolicy = 2
 	WildcardPolicyAllowed     WildcardPolicy           = "WildcardsAllowed"
 	WildcardPolicyDisallowed  WildcardPolicy           = "WildcardsDisallowed"
+
+	AccessLoggingEnabled  AccessLoggingStatusEnum = "Enabled"
+	AccessLoggingDisabled AccessLoggingStatusEnum = "Disabled"
 )
+
+var (
+	headerNamePattern = regexp.MustCompile(`^[-!#$%&'*+.0-9A-Z^_` + "`" + `a-z|~]+$`)
+	allowedFacilities = []string{
+		"kern", "user", "mail", "daemon", "auth", "syslog", "lpr", "news",
+		"uucp", "cron", "auth2", "ftp", "ntp", "audit", "alert", "cron2",
+		"local0", "local1", "local2", "local3", "local4", "local5", "local6",
+		"local7",
+	}
+)
+
+type AccessLoggingStatusEnum string
 
 type NamespaceOwnershipEnum string
 type IngressStatusEnum string
@@ -136,6 +156,21 @@ type IngressConfig struct {
 	//
 	// +optional
 	ClientTLS operatorv1.ClientTLS `json:"clientTLS,omitempty"`
+
+	// httpErrorCodePages specifies a configmap with custom error pages.
+	// The administrator must create this configmap in the openshift-config namespace.
+	// This configmap should have keys in the format "error-page-<error code>.http",
+	// where <error code> is an HTTP error code.
+	// For example, "error-page-503.http" defines an error page for HTTP 503 responses.
+	// Currently only error pages for 503 and 404 responses can be customized.
+	// Each value in the configmap should be the full response, including HTTP headers.
+	// Eg- https://raw.githubusercontent.com/openshift/router/fadab45747a9b30cc3f0a4b41ad2871f95827a93/images/router/haproxy/conf/error-page-503.http
+	// If this field is empty, the ingress controller uses the default error pages.
+	// +kubebuilder:validation:Optional
+	HttpErrorCodePages configv1.ConfigMapNameReference `json:"httpErrorCodePages,omitempty"`
+
+	// accessLogging describes how the client requests should be logged.
+	AccessLogging AccessLogging `json:"accessLogging,omitempty"`
 }
 
 // IngressControllerTuningOptions specifies options for tuning the performance
@@ -376,4 +411,182 @@ type IngressPortsConfig struct {
 	// Default router https port. Must be in range 1-65535.
 	// +kubebuilder:default=443
 	Https *int `json:"https"`
+}
+
+type AccessLogging struct {
+	// Status of the access logging. If set to "Enabled", the router will
+	// log all requests to the access log. If set to "Disabled", the router
+	// will not log any requests to the access log.
+	//+kubebuilder:default=Disabled
+	//+kubebuilder:validation:Enum=Disabled;Enabled
+	Status AccessLoggingStatusEnum `json:"status"`
+
+	// destination is where access logs go.
+	//
+	// +required
+	Destination operatorv1.LoggingDestination `json:"destination"`
+
+	// httpLogFormat specifies the format of the log message for an HTTP
+	// request.
+	//
+	// If this field is empty, log messages use the implementation's default
+	// HTTP log format.  For HAProxy's default HTTP log format, see the
+	// HAProxy documentation:
+	// http://cbonte.github.io/haproxy-dconv/2.0/configuration.html#8.2.3
+	//
+	// Note that this format only applies to cleartext HTTP connections
+	// and to secure HTTP connections for which the ingress controller
+	// terminates encryption (that is, edge-terminated or reencrypt
+	// connections).  It does not affect the log format for TLS passthrough
+	// connections.
+	//
+	// +kubebuilder:validation:Optional
+	// +kubebuilder:validation:Type:=string
+	// +kubebuilder:default:=""
+	// +optional
+	HttpLogFormat string `json:"httpLogFormat,omitempty"`
+
+	// httpCaptureHeaders defines HTTP headers that should be captured in
+	// access logs.  If this field is empty, no headers are captured.
+	//
+	// Note that this option only applies to cleartext HTTP connections
+	// and to secure HTTP connections for which the ingress controller
+	// terminates encryption (that is, edge-terminated or reencrypt
+	// connections).  Headers cannot be captured for TLS passthrough
+	// connections.
+	//
+	// +optional
+	HttpCaptureHeaders operatorv1.IngressControllerCaptureHTTPHeaders `json:"httpCaptureHeaders,omitempty"`
+
+	// httpCaptureCookies specifies HTTP cookies that should be captured in
+	// access logs.  If this field is empty, no cookies are captured.
+	//
+	// +nullable
+	// +optional
+	// +kubebuilder:validation:MaxItems=1
+	// +listType=atomic
+	HttpCaptureCookies []operatorv1.IngressControllerCaptureHTTPCookie `json:"httpCaptureCookies,omitempty"`
+}
+
+func (a *AccessLogging) Validate() error {
+	if a.Status != AccessLoggingEnabled && a.Status != AccessLoggingDisabled {
+		return fmt.Errorf("invalid access logging status: %s", a.Status)
+	}
+
+	if a.Status == AccessLoggingDisabled {
+		return nil
+	}
+
+	switch a.Destination.Type {
+	case operatorv1.ContainerLoggingDestinationType:
+		if a.Destination.Container != nil {
+			if a.Destination.Container.MaxLength > 0 && (a.Destination.Container.MaxLength < 480 || a.Destination.Container.MaxLength > 8192) {
+				return fmt.Errorf("invalid container maxLength: %d. Must be between 480 and 8192", a.Destination.Container.MaxLength)
+			}
+		}
+	case operatorv1.SyslogLoggingDestinationType:
+		if a.Destination.Syslog == nil {
+			return fmt.Errorf("destination syslog is required")
+		}
+		if a.Destination.Syslog.Address == "" {
+			return fmt.Errorf("destination syslog address is required")
+		}
+		if net.ParseIP(a.Destination.Syslog.Address) == nil {
+			return fmt.Errorf("invalid syslog address: %s. Must be a valid IPv4 or IPv6 address", a.Destination.Syslog.Address)
+		}
+		if a.Destination.Syslog.Port < 1 || a.Destination.Syslog.Port > 65535 {
+			return fmt.Errorf("invalid syslog port: %d. Must be between 1 and 65535", a.Destination.Syslog.Port)
+		}
+		if a.Destination.Syslog.Facility != "" && !slices.Contains(allowedFacilities, a.Destination.Syslog.Facility) {
+			return fmt.Errorf("invalid syslog facility: %s. Must be one of %v", a.Destination.Syslog.Facility, allowedFacilities)
+		}
+		if a.Destination.Syslog.MaxLength > 0 && (a.Destination.Syslog.MaxLength < 480 || a.Destination.Syslog.MaxLength > 8192) {
+			return fmt.Errorf("invalid syslog maxLength: %d. Must be between 480 and 8192", a.Destination.Syslog.MaxLength)
+		}
+	default:
+		return fmt.Errorf("invalid access logging destination type: %s", a.Destination.Type)
+	}
+
+	if len(a.HttpCaptureCookies) > 1 {
+		return fmt.Errorf("invalid number of capture cookies: %d. Must be 1 at most", len(a.HttpCaptureCookies))
+	}
+	if len(a.HttpCaptureCookies) == 1 {
+		cookie := a.HttpCaptureCookies[0]
+		if isDefaultCookie(&cookie) {
+			a.HttpCaptureCookies = nil
+		} else if err := validateCookie(&cookie); err != nil {
+			return err
+		}
+	}
+	if len(a.HttpCaptureHeaders.Request) > 0 {
+		filteredList := make([]operatorv1.IngressControllerCaptureHTTPHeader, 0)
+		for _, h := range a.HttpCaptureHeaders.Request {
+			if isDefaultHeader(&h) {
+				continue
+			} else if err := validateHeader(&h); err != nil {
+				return fmt.Errorf("invalid request header: %s", err)
+			}
+			filteredList = append(filteredList, h)
+		}
+		a.HttpCaptureHeaders.Request = filteredList
+	}
+	if len(a.HttpCaptureHeaders.Response) > 0 {
+		filteredList := make([]operatorv1.IngressControllerCaptureHTTPHeader, 0)
+		for _, h := range a.HttpCaptureHeaders.Response {
+			if isDefaultHeader(&h) {
+				continue
+			} else if err := validateHeader(&h); err != nil {
+				return fmt.Errorf("invalid response header: %s", err)
+			}
+			filteredList = append(filteredList, h)
+		}
+		a.HttpCaptureHeaders.Response = filteredList
+	}
+	return nil
+}
+
+func isDefaultHeader(h *operatorv1.IngressControllerCaptureHTTPHeader) bool {
+	return h.MaxLength == 0 && h.Name == ""
+}
+
+func validateHeader(h *operatorv1.IngressControllerCaptureHTTPHeader) error {
+	if h.Name == "" {
+		return fmt.Errorf("header name is required")
+	}
+	if !headerNamePattern.MatchString(h.Name) {
+		return fmt.Errorf("header name '%s' contains invalid characters", h.Name)
+	}
+	if h.MaxLength < 1 {
+		return fmt.Errorf("header '%s' maxLength must be at least 1", h.Name)
+	}
+	return nil
+}
+
+func isDefaultCookie(c *operatorv1.IngressControllerCaptureHTTPCookie) bool {
+	return c.MatchType == "" && c.MaxLength == 0 && c.Name == "" && c.NamePrefix == ""
+}
+
+func validateCookie(c *operatorv1.IngressControllerCaptureHTTPCookie) error {
+	if c.MatchType != "Exact" && c.MatchType != "Prefix" {
+		return fmt.Errorf("invalid cookie match type: %s. Must be `Exact` or `Prefix`", c.MatchType)
+	}
+	if c.MaxLength < 1 || c.MaxLength > 1024 {
+		return fmt.Errorf("invalid cookie maxLength: %d. Must be between 1 and 1024", c.MaxLength)
+	}
+	if c.MatchType == "Exact" {
+		if len(c.Name) > 1024 {
+			return fmt.Errorf("invalid cookie name length: %d. Must be less than 1024", len(c.Name))
+		}
+		if !headerNamePattern.MatchString(c.Name) {
+			return fmt.Errorf("cookie name '%s' contains invalid characters", c.Name)
+		}
+		return nil
+	}
+	if len(c.NamePrefix) > 1024 {
+		return fmt.Errorf("invalid cookie namePrefix length: %d. Must be less than 1024", len(c.NamePrefix))
+	}
+	if !headerNamePattern.MatchString(c.NamePrefix) {
+		return fmt.Errorf("cookie namePrefix '%s' contains invalid characters", c.NamePrefix)
+	}
+	return nil
 }
