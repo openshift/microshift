@@ -9,7 +9,7 @@ scenario_create_vms() {
         echo "Image '${dest_image}' not found - skipping test"
         return 0
     fi
-    prepare_kickstart host1 kickstart-bootc.ks.template rhel96-bootc-prel
+    prepare_kickstart host1 kickstart-bootc.ks.template rhel94-bootc-prel
     launch_vm --boot_blueprint rhel94-bootc
 }
 
