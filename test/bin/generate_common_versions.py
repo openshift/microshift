@@ -171,7 +171,7 @@ def get_release_version_string(repo, var_name):
 
     This function returns a string suitable for use as a Bash variable assignment,
     calling either `get_vrel_from_rhsm` or `get_vrel_from_beta` depending on whether
-    the `repo` parameter is a repository name or a URL. If `repo` is neither,
+    the `repo` parameter is a repository name or a URL. If `repo` is empty,
     it returns an empty string.
 
     Args:
@@ -186,8 +186,11 @@ def get_release_version_string(repo, var_name):
         return f'$(get_vrel_from_rhsm "${{{var_name}}}")'
     elif repo.startswith("https"):
         return f'$(get_vrel_from_beta "${{{var_name}}}")'
-    else:
+    elif repo == "":
         return ""
+    else:
+        logging.warning(f"Received unexpected {repo=}")
+        return None
 
 
 parser = argparse.ArgumentParser(description="Generate common_versions.sh variables.")
