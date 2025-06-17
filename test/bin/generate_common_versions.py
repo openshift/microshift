@@ -55,14 +55,14 @@ def get_dependencies_repo_url(minor, steps_back=0):
     Returns:
         str or None: The URL of a valid beta repository, or None if none are found.
     """
-    logging.info(f"Getting beta repository for 4.{minor}, max. {steps_back} previous minors")
+    logging.info(f"Getting beta dependencies repository for 4.{minor}, max. {steps_back} previous minors")
 
     for i in range(minor, minor-steps_back-1, -1):
         url = f"https://mirror.openshift.com/pub/openshift-v4/{ARCH}/dependencies/rpms/4.{i}-el9-beta"
         if mirror_exists(url) and repo_provides_pkg(url, "cri-o"):
-            logging.info(f"Beta repository found for 4.{i}")
+            logging.info(f"Beta dependencies repository found for 4.{i}")
             return url
-        logging.info(f"Beta repository for 4.{i} not found{', trying older minor' if i>minor-steps_back else ''}")
+        logging.info(f"Beta dependencies repository for 4.{i} not found{', trying older minor' if i>minor-steps_back else ''}")
     return None
 
 
@@ -85,6 +85,7 @@ def repo_provides_pkg(repo, pkg):
         args += ['--repo', repo]
 
     try:
+        logging.info(f"Running command: {' '.join(args)}")
         subprocess.run(args, stdout=sys.stderr, check=True)
         return True
     except subprocess.CalledProcessError:
@@ -137,13 +138,13 @@ def get_microshift_repo(minor):
     This function searches for a repository that provides the microshift package
     for the given minor version. It checks the 'rhocp' stream, then release
     candidate (RC), and finally engineering candidate (EC) repositories—in that
-    order. If none are available, it returns an empty string.
+    order. If none are available, it returns None.
 
     Args:
         minor (int): The minor version, e.g., 19 for 4.19.
 
     Returns:
-        str: The repository name or URL if found, otherwise an empty string.
+        str: The repository name or URL if found, otherwise None.
     """
     repo = get_subscription_repo_name_if_exists(minor)
     if repo is not None:
@@ -161,7 +162,7 @@ def get_microshift_repo(minor):
         return ec
 
     logging.info(f"No repository found for 4.{minor}")
-    return ""
+    return None
 
 
 def get_release_version_string(repo, var_name):
@@ -202,20 +203,20 @@ yminus2_minor_version = minor_version - 2
 # branches, or the OpenShift mirror if only a RC or EC is available. It can
 # be empty, if no candidate for the current minor has been built yet.
 logging.info("Getting CURRENT_RELEASE_REPO")
-current_release_repo = get_microshift_repo(minor_version)
+current_release_repo = get_microshift_repo(minor_version) or ""
 current_release_version = get_release_version_string(current_release_repo, "CURRENT_RELEASE_REPO")
 
 # The previous release repository value should either point to the OpenShift
 # mirror URL or the 'rhocp' repository name.
 logging.info("Getting PREVIOUS_RELEASE_REPO")
-previous_release_repo = get_microshift_repo(previous_minor_version)
+previous_release_repo = get_microshift_repo(previous_minor_version) or ""
 previous_release_version = get_release_version_string(previous_release_repo, "PREVIOUS_RELEASE_REPO")
 
 # The y-2 release repository value should either point to the OpenShift
 # mirror URL or the 'rhocp' repository name. It should always come from
 # the 'rhocp' stream.
 logging.info("Getting YMINUS2_RELEASE_REPO")
-yminus2_release_repo = get_microshift_repo(yminus2_minor_version)
+yminus2_release_repo = get_microshift_repo(yminus2_minor_version) or ""
 yminus2_release_version = get_release_version_string(yminus2_release_repo, "YMINUS2_RELEASE_REPO")
 
 # The 'rhocp_minor_y' variable should be the minor version number, if the
@@ -243,6 +244,9 @@ rhocp_minor_y2 = yminus2_minor_version
 
 output = f"""#!/bin/bash
 set -euo pipefail
+
+# Following file is auto-generated using generate_common_versions.py.
+# It should not be edited manually.manually
 
 if [[ "${{BASH_SOURCE[0]}}" == "${{0}}" ]]; then
     echo "This script must be sourced, not executed."
