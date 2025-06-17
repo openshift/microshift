@@ -1,7 +1,3 @@
-- openshift-controller-manager embedded-component 8be524d728d03e61ee029ad2f7229ca97c93f87f to af43fe68a7d862959a797b66307a1277fffbc9df
-  - dabcff4 2025-06-10T11:00:27+02:00 Set node-pullsecrets volume to read-only to protect image pull credentials
-
-- operator-framework-olm embedded-component 358b7053a231876cda29cf4d822e3e702389b117 to 4a6530a4cf4e8e81d8f04923f36dd36023f45902
-  - 4bbf010a 2025-06-11T14:11:48-05:00 reduce cache expiriry frequency (#3591)
-  - e4efee43 2025-06-10T08:05:31-04:00 operatorgroup: ensure clusterroleselectors in clusterrole aggregation rules are sorted (#3593)
+- kubernetes image-arm64 fadb78e720779ed1b29f32170f3e9dd32584a7e6 to a36c41df567e20318d8141b629b31418572f8968
+  - fe91d2887 2025-05-07T23:41:20+00:00 UPSTREAM: <carry>: Mark admissionregistration.k8s.io/v1beta1 as deprecated.
 
