@@ -538,6 +538,19 @@ update_go_mods() {
     go mod edit -toolchain=none "${REPOROOT}/etcd/go.mod"
  }
 
+ update_deps_fmt() {
+    # The verify-gofmt targets belong to build-machinery-go makefiles and we can not override
+    # the files that are checked. `vendor` is automatically excluded from checks, but deps is
+    # something that only exists in MicroShift and we can not override it. Running gofmt over
+    # this directory will ensure the verify target works while still not changing functionality.
+    make update-gofmt
+    if [[ -n "$(git status -s deps)" ]]; then
+        title "## Commiting gofmt changes to deps directory"
+        git add deps
+        git commit -m "update deps gofmt"
+    fi
+ }
+
 # Regenerates OpenAPIs after patching the vendor directory
 regenerate_openapi() {
     pushd "${STAGING_DIR}/kubernetes" >/dev/null
@@ -1266,6 +1279,8 @@ rebase_to() {
             echo "No changes in ${dirname}/go.mod."
         fi
     done
+
+    update_deps_fmt
 
     update_images
     if [[ -n "$(git status -s pkg/release packaging/crio.conf.d)" ]]; then
