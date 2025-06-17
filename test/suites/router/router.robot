@@ -216,6 +216,8 @@ Router Verify Security Configuration
     ...    Setup With Custom Config    ${ROUTER_SECURITY_CONFIG}
     ...    AND
     ...    Wait For Router Ready
+    ...    AND
+    ...    Create Custom Resources
 
     Pod Environment Should Match Value    openshift-ingress    ROUTER_ALLOW_WILDCARD_ROUTES    true
     Pod Environment Should Match Value    openshift-ingress    ROUTER_MUTUAL_TLS_AUTH    required
