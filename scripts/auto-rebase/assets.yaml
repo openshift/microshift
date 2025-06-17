@@ -30,6 +30,8 @@ assets:
         git_restore: True
       - file: configmap.yaml
         git_restore: True
+      - file: configmap-accesslog.yaml
+        git_restore: True
       - file: deployment.yaml
       - file: namespace.yaml
       - file: service-account.yaml
@@ -190,7 +192,6 @@ assets:
     src: release-manifests/
     files:
       - file: 0000_03_config-operator_01_securitycontextconstraints.crd.yaml
-        src: 0000_03_config-operator_01_securitycontextconstraints-Default.crd.yaml
       - file: 0000_03_config-operator_02_rangeallocations.crd.yaml
       - file: storage_version_migration.crd.yaml
         src:  0000_50_cluster-kube-storage-version-migrator-operator_01_storage_migration_crd.yaml
@@ -229,9 +230,10 @@ assets:
       - file: 0000_50_olm_00-pprof-rbac.yaml
       - file: 0000_50_olm_00-pprof-secret.yaml
       - file: 0000_50_olm_00-subscriptions.crd.yaml
-      - file: 0000_50_olm_01-olm-operator.serviceaccount.yaml
-      - file: 0000_50_olm_02-olmconfig.yaml
-      - file: 0000_50_olm_02-services.yaml
+      - file: 0000_50_olm_01-networkpolicies.yaml
+      - file: 0000_50_olm_02-olm-operator.serviceaccount.yaml
+      - file: 0000_50_olm_03-olmconfig.yaml
+      - file: 0000_50_olm_03-services.yaml
       - file: 0000_50_olm_07-olm-operator.deployment.yaml
       - file: 0000_50_olm_08-catalog-operator.deployment.yaml
       - file: 0000_50_olm_09-aggregated.clusterrole.yaml
@@ -265,7 +267,7 @@ assets:
       - file: release-multus-aarch64.json
       - file: release-multus-x86_64.json
 
-  - dir: optional/flannel/
+  - dir: optional/kindnet/
     ignore: "they don't exist in upstream repository - only in microshift"
     files:
       - file: kustomization.yaml
@@ -275,10 +277,9 @@ assets:
       - file: 01-service-account.yaml
       - file: 02-cluster-role.yaml
       - file: 03-cluster-role-binding.yaml
-      - file: 04-configmap.yaml
-      - file: 05-daemonset.yaml
-      - file: release-flannel-aarch64.json
-      - file: release-flannel-x86_64.json
+      - file: 04-daemonset.yaml
+      - file: release-kindnet-aarch64.json
+      - file: release-kindnet-x86_64.json
 
   - dir: optional/topolvm/
     ignore: "they don't exist in upstream repository - only in microshift"

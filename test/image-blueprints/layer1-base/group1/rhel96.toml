@@ -1,0 +1,23 @@
+name = "rhel-9.6"
+description = "Basic RHEL 9.6 edge image without MicroShift."
+version = "0.0.1"
+distro = "rhel-96"
+modules = []
+groups = []
+
+[[packages]]
+name = "microshift-test-agent"
+version = "*"
+
+[[packages]]
+name = "iproute-tc"
+version = "*"
+
+[customizations.services]
+enabled = ["microshift-test-agent"]
+
+[customizations.firewall]
+ports = ["22:tcp"]
+
+[customizations.firewall.services]
+enabled = ["ssh"]

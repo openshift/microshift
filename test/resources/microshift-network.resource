@@ -11,7 +11,6 @@ Resource            common.resource
 *** Variables ***
 ${HELLO_USHIFT}     ./assets/hello/hello-microshift.yaml
 ${LB_PORT}          5678
-${NP_PORT}          32222
 ${HTTP_PORT}        80
 ${HTTPS_PORT}       443
 
@@ -33,9 +32,13 @@ Expose Hello MicroShift Pod Via LB
     Run With Kubeconfig    oc create service loadbalancer hello-microshift --tcp=${LB_PORT}:8080 -n ${NAMESPACE}
 
 Expose Hello MicroShift Pod Via NodePort
-    [Documentation]    Expose the "hello microshift" application through the NodePort
+    [Documentation]    Expose the "hello microshift" application through the NodePort.
+    ...    Returns the allocated port
     Run With Kubeconfig
-    ...    oc create service nodeport hello-microshift --node-port=${NP_PORT} --tcp=8080 -n ${NAMESPACE}
+    ...    oc create service nodeport hello-microshift --tcp=8080 -n ${NAMESPACE}
+    ${output}=    Run With Kubeconfig
+    ...    oc get service hello-microshift -o jsonpath="{.spec.ports[0].nodePort}" -n ${NAMESPACE}
+    RETURN    ${output}
 
 Access Hello Microshift
     [Documentation]    Use curl to make a GET request to the specified scheme, host, port and path.

@@ -3,7 +3,7 @@ import requests
 import libipv6
 
 
-def check_prometheus_query(host: str, port: int, query: str) -> None:
+def _run_prometheus_query(host: str, port: int, query: str) -> requests.Response:
     """Executes the given query against the prometheus instance.
     Fails if the response is empty."""
     base_url = f"http://{host}:{port}/api/v1/query"
@@ -16,8 +16,21 @@ def check_prometheus_query(host: str, port: int, query: str) -> None:
         raise Exception(f"Prometheus query failed with status code {response.status_code}")
     if response.json().get("status") != "success":
         raise Exception(f"Prometheus query failed with status: {response.json().get('status')}")
-    if not response.json().get("data", {}).get("result") or len(response.json().get("data", {}).get("result")) == 0:
+    return response
+
+
+def check_prometheus_query(host: str, port: int, query: str) -> None:
+    response = _run_prometheus_query(host, port, query)
+    data_result_list: list = response.json().get("data", {}).get("result")
+    if not data_result_list or len(data_result_list) == 0:
         raise Exception("Prometheus query returned no results")
+
+
+def check_prometheus_query_is_missing(host: str, port: int, query: str) -> None:
+    response = _run_prometheus_query(host, port, query)
+    data_result_list: list = response.json().get("data", {}).get("result")
+    if data_result_list and len(data_result_list) > 0:
+        raise Exception("Prometheus query returned results")
 
 
 def check_prometheus_exporter(host: str, port: int, query: str) -> None:

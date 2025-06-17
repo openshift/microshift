@@ -1,0 +1,86 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  labels:
+    app: kindnet
+    k8s-app: kindnet
+    tier: node
+  name: kube-kindnet-ds
+  namespace: kube-kindnet
+spec:
+  selector:
+    matchLabels:
+      app: kindnet
+      k8s-app: kindnet
+  template:
+    metadata:
+      labels:
+        app: kindnet
+        k8s-app: kindnet
+        tier: node
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: kubernetes.io/os
+                    operator: In
+                    values:
+                      - linux
+      containers:
+        - name: kube-kindnet
+          image: kindnet
+          imagePullPolicy: IfNotPresent
+          env:
+          - name: HOST_IP
+            valueFrom:
+              fieldRef:
+                fieldPath: status.hostIP
+          - name: POD_IP
+            valueFrom:
+              fieldRef:
+                fieldPath: status.podIP
+          - name: POD_SUBNET
+            value: 10.244.0.0/16
+          resources:
+            requests:
+              cpu: 100m
+              memory: 50Mi
+          securityContext:
+            capabilities:
+              add:
+                - NET_ADMIN
+                - NET_RAW
+            privileged: false
+          volumeMounts:
+            - name: cni
+              mountPath: /etc/cni/net.d
+            - name: xtables-lock
+              mountPath: /run/xtables.lock
+              readOnly: false
+            - name: lib-modules
+              mountPath: /lib/modules
+              readOnly: true
+            - name: nri-plugin
+              mountPath: /var/run/nri
+      hostNetwork: true
+      priorityClassName: system-node-critical
+      serviceAccountName: kindnet
+      tolerations:
+        - effect: NoSchedule
+          operator: Exists
+      volumes:
+        - hostPath:
+            path: /etc/cni/net.d
+          name: cni
+        - hostPath:
+            path: /run/xtables.lock
+            type: FileOrCreate
+          name: xtables-lock
+        - name: lib-modules
+          hostPath:
+            path: /lib/modules
+        - name: nri-plugin
+          hostPath:
+            path: /var/run/nri

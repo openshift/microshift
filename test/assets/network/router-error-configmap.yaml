@@ -1,0 +1,128 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: router-error-pages
+  namespace: openshift-ingress
+data:
+  error-page-503.http: |
+    HTTP/1.1 503 Service Unavailable
+    Cache-Control: no-cache, no-store, must-revalidate
+    Pragma: no-cache
+    Expires: 0
+    Connection: close
+    Content-Type: text/html; charset=utf-8
+    Retry-After: 300 # Optional: Suggests retrying after 5 minutes (300 seconds)
+
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>503 - Service Unavailable</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                background-color: #f4f4f4;
+                color: #333;
+                text-align: center;
+                padding: 50px;
+                margin: 0;
+            }
+            .container {
+                background-color: #fff;
+                padding: 30px;
+                border-radius: 8px;
+                box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+                display: inline-block;
+            }
+            h1 {
+                font-size: 72px;
+                margin-bottom: 10px;
+                color: #f39c12; /* Orange for service issues */
+            }
+            p {
+                font-size: 18px;
+                margin-bottom: 20px;
+            }
+            .footer {
+                margin-top: 30px;
+                font-size: 12px;
+                color: #777;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>503</h1>
+            <p>Our service is temporarily unavailable.</p>
+            <p>We are working to restore service as quickly as possible. Please try again shortly.</p>
+            <div class="footer">
+                <p>We apologize for any inconvenience.</p>
+            </div>
+        </div>
+    </body>
+    </html>
+  error-page-404.http: |
+    HTTP/1.1 404 Not Found
+    Cache-Control: no-cache
+    Connection: close
+    Content-Type: text/html; charset=utf-8
+
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>404 - Page Not Found</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                background-color: #f4f4f4;
+                color: #333;
+                text-align: center;
+                padding: 50px;
+                margin: 0;
+            }
+            .container {
+                background-color: #fff;
+                padding: 30px;
+                border-radius: 8px;
+                box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+                display: inline-block;
+            }
+            h1 {
+                font-size: 72px;
+                margin-bottom: 10px;
+                color: #e74c3c; /* Red for errors */
+            }
+            p {
+                font-size: 18px;
+                margin-bottom: 20px;
+            }
+            a {
+                color: #3498db;
+                text-decoration: none;
+                font-weight: bold;
+            }
+            a:hover {
+                text-decoration: underline;
+            }
+            .footer {
+                margin-top: 30px;
+                font-size: 12px;
+                color: #777;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>404</h1>
+            <p>Oops! The page you are looking for does not exist.</p>
+            <p>It might have been moved, deleted, or maybe you just mistyped the URL.</p>
+            <p>Let's get you back on track: <a href="/">Go to Homepage</a></p>
+            <div class="footer">
+                <p>If you believe this is an error, please contact support.</p>
+            </div>
+        </div>
+    </body>
+    </html>

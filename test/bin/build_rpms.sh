@@ -6,8 +6,8 @@
 set -euo pipefail
 
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-# Build the flannel RPM unless overridden explicitly
-WITH_FLANNEL=${WITH_FLANNEL:-1}
+# Build the kindnet RPM unless overridden explicitly
+WITH_KINDNET=${WITH_KINDNET:-1}
 # Build the upstream TopoLVM RPM unless overridden explicitly
 WITH_TOPOLVM=${WITH_TOPOLVM:-1}
 
@@ -20,11 +20,11 @@ build_rpms() {
     rm -rf _output/rpmbuild*
 
     # Normal build of current branch from source
-    local build_cmds=("make WITH_FLANNEL=${WITH_FLANNEL} WITH_TOPOLVM=${WITH_TOPOLVM} rpm")
+    local build_cmds=("make WITH_KINDNET=${WITH_KINDNET} WITH_TOPOLVM=${WITH_TOPOLVM} rpm")
 
     # In CI, build the current branch from source with the build tools using used by OCP
     if [ -v CI_JOB_NAME ]; then
-        build_cmds=("make WITH_FLANNEL=${WITH_FLANNEL} WITH_TOPOLVM=${WITH_TOPOLVM} rpm-podman")
+        build_cmds=("make WITH_KINDNET=${WITH_KINDNET} WITH_TOPOLVM=${WITH_TOPOLVM} rpm-podman")
     fi
 
     build_cmds+=(
@@ -126,6 +126,14 @@ download_brew_rpms() {
         # Run the download procedure
         bash -x "${SCRIPTDIR}/../../scripts/fetch_tools.sh" brew
         bash -x "${SCRIPTDIR}/manage_brew_rpms.sh" download "4.${MINOR_VERSION}" "${BREW_RPM_SOURCE}"
+
+        out_path="${IMAGEDIR}/released-brew-rpms"
+        bash -x "${SCRIPTDIR}/manage_brew_rpms.sh" download "4.${MINOR_VERSION}" "${out_path}" "zstream"
+        bash -x "${SCRIPTDIR}/manage_brew_rpms.sh" download "4.${PREVIOUS_MINOR_VERSION}" "${out_path}" "zstream" 
+        bash -x "${SCRIPTDIR}/manage_brew_rpms.sh" download "4.${YMINUS2_MINOR_VERSION}" "${out_path}" "zstream" 
+        bash -x "${SCRIPTDIR}/manage_brew_rpms.sh" download "4.${MINOR_VERSION}" "${out_path}" "nightly"
+        bash -x "${SCRIPTDIR}/manage_brew_rpms.sh" download "4.${MINOR_VERSION}" "${out_path}" "rc"
+        bash -x "${SCRIPTDIR}/manage_brew_rpms.sh" download "4.${MINOR_VERSION}" "${out_path}" "ec"
     else
         echo "WARNING: The Brew Hub site is not accessible, skipping the download"
     fi

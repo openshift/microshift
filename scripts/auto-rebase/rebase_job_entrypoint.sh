@@ -75,7 +75,7 @@ pullspec_release_arm64="registry.ci.openshift.org/ocp-arm64/release-arm64:${rele
 #
 # New references can be obtained from:
 # https://catalog.redhat.com/software/containers/rhoai/odh-operator-bundle/659803ca929f3c931af06f28
-rhoai_release="registry.redhat.io/rhoai/odh-operator-bundle:v2.19"
+rhoai_release="registry.redhat.io/rhoai/odh-operator-bundle:v2.20"
 
 APP_ID=$(cat /secrets/pr-creds/app_id) \
 KEY=/secrets/pr-creds/key.pem \

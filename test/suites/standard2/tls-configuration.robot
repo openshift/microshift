@@ -155,15 +155,20 @@ Restore Valid TLS Configuration
 
 Openssl Connect Command
     [Documentation]    Run Openssl Connect Command in the remote server
-    [Arguments]    ${host_and_port}    ${args}
+    [Arguments]    ${host_and_port}    ${args}    ${expected_rc}    ${expected_str}
     ${stdout}    ${rc}=    Execute Command
     ...    openssl s_client -connect ${host_and_port} ${args} <<< "Q"
     ...    sudo=True    return_stdout=True    return_stderr=False    return_rc=True
-    RETURN    ${stdout}    ${rc}
+    Should Be Equal As Integers    ${rc}    ${expected_rc}
+    IF    "${rc}" == "0"    Should Contain    ${stdout}    ${expected_str}
 
 Check TLS Endpoints
     [Documentation]    Run Openssl Connect Command to check k8s internal endpoints
     [Arguments]    ${return_code}    ${tls_version}    ${cipher}
+
+    ${cipher_available}=    Is Cipher Available    ${cipher}
+    IF    ${cipher_available} == ${FALSE}    RETURN
+
     IF    "${tls_version}" == "TLSv1.2"
         Set Test Variable    ${TLS_AND_CIPHER_ARGS}    -tls1_2 -cipher ${cipher}
     ELSE IF    "${tls_version}" == "TLSv1.3"
@@ -172,18 +177,21 @@ Check TLS Endpoints
 
     # api server, kubelet, kube controller manager and kube scheduler endpoint ports
     FOR    ${port}    IN    6443    10250    10257    10259
-        ${stdout}    ${rc}=    Openssl Connect Command    ${USHIFT_HOST}:${port}    ${TLS_AND_CIPHER_ARGS}
-        Should Be Equal As Integers    ${return_code}    ${rc}
-        IF    "${rc}" == "0"
-            Should Contain    ${stdout}    ${tls_version}, Cipher is ${cipher}
-        END
+        ${stdout}=    Wait Until Keyword Succeeds    10x    10s
+        ...    Openssl Connect Command    localhost:${port}
+        ...        ${TLS_AND_CIPHER_ARGS}
+        ...        ${return_code}
+        ...        ${tls_version}, Cipher is ${cipher}
     END
 
     # etcd endpoint, need to use cert and key because etcd requires mTLS
     Set Test Variable    ${CERT_ARG}    -cert ${APISERVER_ETCD_CLIENT_CERT}/client.crt
     Set Test Variable    ${KEY_ARG}    -key ${APISERVER_ETCD_CLIENT_CERT}/client.key
-    ${stdout}    ${rc}=    Openssl Connect Command    localhost:2379    ${TLS_AND_CIPHER_ARGS} ${CERT_ARG} ${KEY_ARG}
-    Should Be Equal As Integers    ${return_code}    ${rc}
+    Wait Until Keyword Succeeds    10x    2s
+    ...    Openssl Connect Command    localhost:2379
+    ...        ${TLS_AND_CIPHER_ARGS} ${CERT_ARG} ${KEY_ARG}
+    ...        ${return_code}
+    ...        CONNECTED
 
 Check Journal Logs
     [Documentation]    Verify system logs contain expected error messages for configuration errors
@@ -191,3 +199,10 @@ Check Journal Logs
     ${output}    ${rc}=    Get Log Output With Pattern    ${CURSOR}    apiServer.tls
     @{expected_lines}=    Get Expected Fault Messages    ${error_type}    ${error_case}
     Compare Output Logs    ${output}    @{expected_lines}
+
+Is Cipher Available
+    [Documentation]    Check if openssl keywork is available from ssl list
+    [Arguments]    ${cipher}
+    ${stdout}    ${stderr}    ${rc}=    Execute Command    openssl ciphers ${cipher}
+    ...    sudo=True    return_stdout=True    return_stderr=True    return_rc=True
+    IF    "${rc}" == "0"    RETURN    ${TRUE}    ELSE    RETURN    ${FALSE}
