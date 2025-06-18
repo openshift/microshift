@@ -89,7 +89,7 @@ case "${action}" in
         "action_${action}"
         ;;
     download)
-        [ $# -gt 4 ] && usage && exit 1
+        [ $# -ne 3 ] && [ $# -ne 4 ] && usage && exit 1
         shift
         "action_${action}" "$@"
         ;;
