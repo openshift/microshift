@@ -31,12 +31,15 @@ require (
 	github.com/coreos/go-systemd/v22 v22.5.0
 	github.com/evanphx/json-patch v4.12.0+incompatible
 	github.com/fsnotify/fsnotify v1.8.0
+	github.com/go-kit/kit v0.9.0
 	github.com/gogo/protobuf v1.3.2
 	github.com/golang/snappy v0.0.4
 	github.com/openshift/route-controller-manager v0.0.0-20241218160919-bc97534a12a7
+	github.com/prometheus/client_golang v1.21.0-rc.0
 	github.com/prometheus/client_model v0.6.1
 	github.com/prometheus/common v0.62.0
 	github.com/prometheus/prometheus v0.302.1
+	github.com/squat/generic-device-plugin v0.0.0-20250313105706-6475ff5d0927
 	gopkg.in/yaml.v2 v2.4.0
 	k8s.io/api v1.32.5
 	k8s.io/apiextensions-apiserver v1.32.5
@@ -85,8 +88,15 @@ require (
 	github.com/fxamacker/cbor/v2 v2.7.0 // indirect
 	github.com/go-asn1-ber/asn1-ber v1.5.4 // indirect
 	github.com/go-ldap/ldap/v3 v3.4.3 // indirect
+	github.com/go-logfmt/logfmt v0.5.1 // indirect
 	github.com/go-logr/logr v1.4.2 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
+	github.com/go-openapi/jsonpointer v0.21.0 // indirect
+	github.com/go-openapi/jsonreference v0.21.0 // indirect
+	github.com/go-openapi/swag v0.23.0 // indirect
+	github.com/go-stack/stack v1.8.1 // indirect
+	github.com/godbus/dbus/v5 v5.1.0 // indirect
+	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/google/btree v1.0.1 // indirect
 	github.com/google/cadvisor v0.51.0 // indirect
 	github.com/google/cel-go v0.22.0 // indirect
@@ -112,6 +122,7 @@ require (
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826 // indirect
 	github.com/monochromegane/go-gitignore v0.0.0-20200626010858-205db1a8cc00 // indirect
 	github.com/mxk/go-flowrate v0.0.0-20140419014527-cca7078d478f // indirect
+	github.com/oklog/run v1.1.0 // indirect
 	github.com/opencontainers/go-digest v1.0.0 // indirect
 	github.com/opencontainers/runc v1.2.1 // indirect
 	github.com/opencontainers/runtime-spec v1.2.0 // indirect
@@ -119,6 +130,8 @@ require (
 	github.com/openshift/apiserver-library-go v0.0.0-20250127121756-dc9a973f14ce // indirect
 	github.com/peterbourgon/diskv v2.0.1+incompatible // indirect
 	github.com/pquerna/cachecontrol v0.1.0 // indirect
+	github.com/prometheus/procfs v0.15.1 // indirect
+	github.com/robfig/cron v1.2.0 // indirect
 	github.com/robfig/cron/v3 v3.0.1 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/stoewer/go-strcase v1.3.0 // indirect
@@ -174,11 +187,6 @@ require (
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/emicklei/go-restful/v3 v3.11.0 // indirect
 	github.com/go-errors/errors v1.4.2 // indirect
-	github.com/go-openapi/jsonpointer v0.21.0 // indirect
-	github.com/go-openapi/jsonreference v0.21.0 // indirect
-	github.com/go-openapi/swag v0.23.0 // indirect
-	github.com/godbus/dbus/v5 v5.1.0 // indirect
-	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/google/gnostic-models v0.6.8 // indirect
 	github.com/google/gofuzz v1.2.0 // indirect
 	github.com/grafana/regexp v0.0.0-20240518133315-a468a5bfb3bc // indirect
@@ -191,9 +199,6 @@ require (
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
 	github.com/pkg/profile v1.7.0 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
-	github.com/prometheus/client_golang v1.21.0-rc.0 // indirect
-	github.com/prometheus/procfs v0.15.1 // indirect
-	github.com/robfig/cron v1.2.0 // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
 	github.com/vishvananda/netns v0.0.4 // indirect
 	go.etcd.io/etcd/api/v3 v3.5.21 // indirect
