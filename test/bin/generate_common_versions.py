@@ -138,7 +138,7 @@ def get_microshift_repo(minor):
     This function searches for a repository that provides the microshift package
     for the given minor version. It checks the 'rhocp' stream, then release
     candidate (RC), and finally engineering candidate (EC) repositories—in that
-    order. If none are available, it returns None.
+    order. If none are available, it returns empty string.
 
     Args:
         minor (int): The minor version, e.g., 19 for 4.19.
@@ -162,7 +162,7 @@ def get_microshift_repo(minor):
         return ec
 
     logging.info(f"No repository found for 4.{minor}")
-    return None
+    return ""
 
 
 def get_release_version_string(repo, var_name):
@@ -206,20 +206,20 @@ yminus2_minor_version = minor_version - 2
 # branches, or the OpenShift mirror if only a RC or EC is available. It can
 # be empty, if no candidate for the current minor has been built yet.
 logging.info("Getting CURRENT_RELEASE_REPO")
-current_release_repo = get_microshift_repo(minor_version) or ""
+current_release_repo = get_microshift_repo(minor_version)
 current_release_version = get_release_version_string(current_release_repo, "CURRENT_RELEASE_REPO")
 
 # The previous release repository value should either point to the OpenShift
 # mirror URL or the 'rhocp' repository name.
 logging.info("Getting PREVIOUS_RELEASE_REPO")
-previous_release_repo = get_microshift_repo(previous_minor_version) or ""
+previous_release_repo = get_microshift_repo(previous_minor_version)
 previous_release_version = get_release_version_string(previous_release_repo, "PREVIOUS_RELEASE_REPO")
 
 # The y-2 release repository value should either point to the OpenShift
 # mirror URL or the 'rhocp' repository name. It should always come from
 # the 'rhocp' stream.
 logging.info("Getting YMINUS2_RELEASE_REPO")
-yminus2_release_repo = get_microshift_repo(yminus2_minor_version) or ""
+yminus2_release_repo = get_microshift_repo(yminus2_minor_version)
 yminus2_release_version = get_release_version_string(yminus2_release_repo, "YMINUS2_RELEASE_REPO")
 
 # The 'rhocp_minor_y' variable should be the minor version number, if the
@@ -249,7 +249,7 @@ output = f"""#!/bin/bash
 set -euo pipefail
 
 # Following file is auto-generated using generate_common_versions.py.
-# It should not be edited manually.manually
+# It should not be edited manually.
 
 if [[ "${{BASH_SOURCE[0]}}" == "${{0}}" ]]; then
     echo "This script must be sourced, not executed."
