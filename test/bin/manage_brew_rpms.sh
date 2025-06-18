@@ -42,13 +42,11 @@ action_download() {
 
     # Attempt downloading the specified build version
     local package
-    if [ "${ver_type}" = "zstream" ]; then
-        package=$(brew list-builds --quiet --package=microshift --state=COMPLETE | grep "^microshift-${ver}" | grep -v "~" | uniq | tail -n1) || true
-    elif [ "${ver_type}" = "rc" ] || [ "${ver_type}" = "ec" ]; then
-        package=$(brew list-builds --quiet --package=microshift --state=COMPLETE | grep "^microshift-${ver}.0~${ver_type}." | tail -1) || true
-    else
-        package=$(brew list-builds --quiet --package=microshift --state=COMPLETE | grep "^microshift-${ver}.*${ver_type}" | tail -1) || true
-    fi
+    case ${ver_type} in 
+        zstream) package=$(brew list-builds --quiet --package=microshift --state=COMPLETE | grep "^microshift-${ver}" | grep -v "~" | uniq | tail -n1) || true;;
+        rc|ec)   package=$(brew list-builds --quiet --package=microshift --state=COMPLETE | grep "^microshift-${ver}.0~${ver_type}." | tail -1) || true;;
+        *)       package=$(brew list-builds --quiet --package=microshift --state=COMPLETE | grep "^microshift-${ver}.*${ver_type}" | tail -1) || true;;
+    esac
 
     if [ -z "${package}" ] ; then
         echo "WARNING: Cannot find MicroShift '${ver}' packages in brew"
