@@ -127,7 +127,7 @@ download_brew_rpms() {
         bash -x "${SCRIPTDIR}/../../scripts/fetch_tools.sh" brew
         bash -x "${SCRIPTDIR}/manage_brew_rpms.sh" download "4.${MINOR_VERSION}" "${BREW_RPM_SOURCE}"
 
-        out_path="${IMAGEDIR}/released-brew-rpms"
+        out_path="${IMAGEDIR}/brew-rpms-released"
         bash -x "${SCRIPTDIR}/manage_brew_rpms.sh" download "4.${MINOR_VERSION}" "${out_path}" "zstream"
         bash -x "${SCRIPTDIR}/manage_brew_rpms.sh" download "4.${PREVIOUS_MINOR_VERSION}" "${out_path}" "zstream" 
         bash -x "${SCRIPTDIR}/manage_brew_rpms.sh" download "4.${YMINUS2_MINOR_VERSION}" "${out_path}" "zstream" 

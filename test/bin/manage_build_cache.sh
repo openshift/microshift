@@ -120,7 +120,7 @@ action_upload() {
 
     # Upload released RPM from brew
     pushd "${src_base}"
-    released_brew_rpms_dirs="$(find "released-brew-rpms" -maxdepth 1 -type d | tail -n +2)"
+    released_brew_rpms_dirs="$(find "brew-rpms-released" -maxdepth 1 -type d | tail -n +2)"
     popd
     for dir in ${released_brew_rpms_dirs} ; do
         local pkg_src="${src_base}/${dir}.tar"
