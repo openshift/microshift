@@ -3,8 +3,8 @@
 # using NAME=value make arguments
 #
 PULL_SECRET ?= $(HOME)/.pull-secret.json
-BASE_IMAGE_URL ?= registry.redhat.io/rhel9-eus/rhel-9.4-bootc
-BASE_IMAGE_TAG ?= 9.4
+BASE_IMAGE_URL ?= registry.redhat.io/rhel9-eus/rhel-9.6-bootc
+BASE_IMAGE_TAG ?= 9.6
 DNF_OPTIONS ?=
 
 #
@@ -137,54 +137,40 @@ clean:
 #
 # Predefined container image builds
 #
-.PHONY: 4.16-el94
-4.16-el94:
-	@$(MAKE) rhocp USHIFT_VER=4.16
+.PHONY: 4.18-el94
+4.18-el94:
+	@$(MAKE) rhocp USHIFT_VER=4.18 BASE_IMAGE_URL=registry.redhat.io/rhel9-eus/rhel-9.4-bootc BASE_IMAGE_TAG=9.4
 
-.PHONY: 4.17-el94
-4.17-el94:
-	@$(MAKE) rhocp USHIFT_VER=4.17
+.PHONY: 4.19-el96
+4.19-el96:
+	@$(MAKE) rhocp USHIFT_VER=4.19
 
-.PHONY: 4.18-ec-cos9
-4.18-ec-cos9:
+.PHONY: 4.18-rc-cos9
+4.18-rc-cos9:
 	@$(MAKE) repourl \
 		BASE_IMAGE_URL=quay.io/centos-bootc/centos-bootc \
 		BASE_IMAGE_TAG=stream9 \
 		DNF_OPTIONS="--allowerasing --nobest" \
-		USHIFT_URL=https://mirror.openshift.com/pub/openshift-v4/$$(uname -m)/microshift/ocp-dev-preview/latest-4.18/el9/os/ \
+		USHIFT_URL=https://mirror.openshift.com/pub/openshift-v4/$$(uname -m)/microshift/ocp/latest-4.18/el9/os/ \
 		OCPDEP_URL=https://mirror.openshift.com/pub/openshift-v4/$$(uname -m)/dependencies/rpms/4.18-el9-beta/ \
 
-.PHONY: 4.18-ec-el94
-4.18-ec-el94:
+.PHONY: 4.18-rc-el94
+4.18-rc-el94:
 	@$(MAKE) repourl \
-		USHIFT_URL=https://mirror.openshift.com/pub/openshift-v4/$$(uname -m)/microshift/ocp-dev-preview/latest-4.18/el9/os/ \
+		USHIFT_URL=https://mirror.openshift.com/pub/openshift-v4/$$(uname -m)/microshift/ocp/latest-4.18/el9/os/ \
 		OCPDEP_URL=https://mirror.openshift.com/pub/openshift-v4/$$(uname -m)/dependencies/rpms/4.18-el9-beta/
 
-#
-# ISO builds are named 'microshift-<make_target>' (the '.iso' suffix is part of
-# the make target name) and stored at the ${BIB_OUTBASE} directory.
-# Each build uses 'localhost/microshift-<make-target>' container image as input.
-#
-# BIB_IMAGE_URL ?= registry.redhat.io/rhel9/bootc-image-builder
-# BIB_IMAGE_TAG ?= latest
-# BIB_OUTBASE ?= $(HOME)/imagemode
-# .PHONY: 4.16-el94.iso
-# 4.16-el94.iso: 4.16-el94
-# 	IMAGE_NAME="microshift-$$(echo $@ | sed 's/\.iso$$//')" ; \
-# 	ISO_FNAME="microshift-$@" ; \
-# 	BIB_OUTDIR="${BIB_OUTBASE}/$@" ; \
-# 	sudo podman pull \
-# 		--authfile "${PULL_SECRET}" \
-# 		"${BIB_IMAGE_URL}:${BIB_IMAGE_TAG}" && \
-# 	sudo mkdir -p "$${BIB_OUTDIR}" && \
-# 	sudo podman run \
-# 		--rm -i --privileged \
-# 		--pull=never \
-# 		--security-opt "label=type:unconfined_t" \
-# 		-v "$${BIB_OUTDIR}:/output" \
-# 		-v "/var/lib/containers/storage:/var/lib/containers/storage" \
-# 		"${BIB_IMAGE_URL}:${BIB_IMAGE_TAG}" \
-# 		--type anaconda-iso \
-# 		--local \
-# 		"localhost/$${IMAGE_NAME_URL}" && \
-# 	sudo mv -f "$${BIB_OUTDIR}/bootiso/install.iso" "${BIB_OUTBASE}/$${ISO_FNAME}"
+.PHONY: 4.19-rc-cos9
+4.19-rc-cos9:
+	@$(MAKE) repourl \
+		BASE_IMAGE_URL=quay.io/centos-bootc/centos-bootc \
+		BASE_IMAGE_TAG=stream9 \
+		DNF_OPTIONS="--allowerasing --nobest" \
+		USHIFT_URL=https://mirror.openshift.com/pub/openshift-v4/$$(uname -m)/microshift/ocp/latest-4.19/el9/os/ \
+		OCPDEP_URL=https://mirror.openshift.com/pub/openshift-v4/$$(uname -m)/dependencies/rpms/4.19-el9-beta/ \
+
+.PHONY: 4.19-rc-el96
+4.19-rc-el96:
+	@$(MAKE) repourl \
+		USHIFT_URL=https://mirror.openshift.com/pub/openshift-v4/$$(uname -m)/microshift/ocp/latest-4.19/el9/os/ \
+		OCPDEP_URL=https://mirror.openshift.com/pub/openshift-v4/$$(uname -m)/dependencies/rpms/4.19-el9-beta/
