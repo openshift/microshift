@@ -6,8 +6,11 @@ SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # its execution in a containerized environment with limited set of tools.
 
 usage() {
-    echo "Usage: $(basename "$0") [access | download <version> <path> <version_type>]"
+    echo "Usage: $(basename "$0") [access | download <version> <path> [version_type]]"
     echo "  download:   Download the RPM version to the path as specified"
+    echo "    - version: the X.Y version. Example: 4.19"
+    echo "    - path: the output directory. Example: /_output/test-images/brew-rpms"
+    echo "    - version_type: this is an optional parameter to specify the version type. Valid values: rc, ec, zstream and nightly."
     echo "  access:     Exit with non-zero status if brew cannot be accessed"
 }
 
