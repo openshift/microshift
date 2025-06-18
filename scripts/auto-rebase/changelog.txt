@@ -1,3 +1,12 @@
-- kubernetes image-arm64 fadb78e720779ed1b29f32170f3e9dd32584a7e6 to a36c41df567e20318d8141b629b31418572f8968
+- kubernetes embedded-component fadb78e720779ed1b29f32170f3e9dd32584a7e6 to a36c41df567e20318d8141b629b31418572f8968
   - fe91d2887 2025-05-07T23:41:20+00:00 UPSTREAM: <carry>: Mark admissionregistration.k8s.io/v1beta1 as deprecated.
+
+- oc image-amd64 8f1c8b5768cdff8885ddef28e10de2c1928daf92 to fa1fd955cefab1204764bc98d754ed855ba6dca4
+  - 9252626e 2025-05-30T11:56:47+00:00 avoid transfering permissions when copying artifacts from node-joiner pod
+
+- kubernetes image-amd64 fadb78e720779ed1b29f32170f3e9dd32584a7e6 to a36c41df567e20318d8141b629b31418572f8968
+  - fe91d2887 2025-05-07T23:41:20+00:00 UPSTREAM: <carry>: Mark admissionregistration.k8s.io/v1beta1 as deprecated.
+
+- oc image-arm64 8f1c8b5768cdff8885ddef28e10de2c1928daf92 to fa1fd955cefab1204764bc98d754ed855ba6dca4
+  - 9252626e 2025-05-30T11:56:47+00:00 avoid transfering permissions when copying artifacts from node-joiner pod
 
