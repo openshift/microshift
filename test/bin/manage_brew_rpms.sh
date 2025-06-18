@@ -43,15 +43,15 @@ action_download() {
     # Attempt downloading the specified build version
     local package
     case ${ver_type} in 
-    zstream)
-        package=$(brew list-builds --quiet --package=microshift --state=COMPLETE | grep "^microshift-${ver}" | grep -v "~" | uniq | tail -n1) || true
-        ;;
-    rc|ec)
-        package=$(brew list-builds --quiet --package=microshift --state=COMPLETE | grep "^microshift-${ver}.0~${ver_type}." | tail -1) || true
-        ;;
-    *)
-    package=$(brew list-builds --quiet --package=microshift --state=COMPLETE | grep "^microshift-${ver}.*${ver_type}" | tail -1) || true
-    ;;
+        zstream)
+            package=$(brew list-builds --quiet --package=microshift --state=COMPLETE | grep "^microshift-${ver}" | grep -v "~" | uniq | tail -n1) || true
+            ;;
+        rc|ec)
+            package=$(brew list-builds --quiet --package=microshift --state=COMPLETE | grep "^microshift-${ver}.0~${ver_type}." | tail -1) || true
+            ;;
+        *)
+            package=$(brew list-builds --quiet --package=microshift --state=COMPLETE | grep "^microshift-${ver}.*${ver_type}" | tail -1) || true
+            ;;
     esac
 
     if [ -z "${package}" ] ; then
