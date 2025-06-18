@@ -64,7 +64,9 @@ action_download() {
         if [ -z "${ver_type}" ] ; then
             adir="${dir}/${arch}"
         else
-            adir="${dir}/$(echo "${package}" | sed 's/.*microshift-\([^-]*\).*/\1/')/${arch}"
+            # remove date and commit id from package name and use it in dir name
+            version=$(echo "${package}" | sed 's/.*microshift-\([^-]*\).*/\1/')
+            adir="${dir}/${version}/${arch}"
         fi
 
         mkdir -p "${adir}"
