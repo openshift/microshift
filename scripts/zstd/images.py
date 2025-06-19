@@ -185,7 +185,13 @@ def main():
         description="""A script to simulate an upgrade using zstd:chunked compressed pulls using Podman.
         The script takes two JSON files as input, one representing the source and the other the target images.
         It pulls all images, re-tagging them to push them to another repo using zstd:chunked compression.
-        Afterwards, each image is pulled again to verify the reduced network usage. Also shows storage size changes.""",
+        Afterwards, each image is pulled again to verify the reduced network usage. Also shows storage size changes.
+
+        Keep in mind that you need specific configuration in storage.conf to take full advantage of zstd:chunked.
+        You need to configure:
+        enable_partial_images=true
+        use_hard_links=true
+        """,
         formatter_class=argparse.RawTextHelpFormatter
     )
     parser.add_argument(
