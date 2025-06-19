@@ -79,6 +79,29 @@ EOF
     insecure = true
 EOF
 
+# Skip signature verification for all images by default.
+# Tests that support signature verification will have their own file and enable
+# it for selected Red Hat registries.
+if [ -e /etc/containers/policy.json ] && [ ! -e /etc/containers/policy.json.orig ]; then
+    sudo mv /etc/containers/policy.json /etc/containers/policy.json.orig
+fi
+sudo bash -c 'cat > /etc/containers/policy.json' <<'EOF'
+{
+    "default": [
+        {
+            "type": "insecureAcceptAnything"
+        }
+    ],
+    "transports":
+        {
+            "docker-daemon":
+                {
+                    "": [{"type":"insecureAcceptAnything"}]
+                }
+        }
+}
+EOF
+
 # Complete the source registry configuration to use sigstore attachments.
 # Note that registry.redhat.io.yaml file already exists, but it is missing the
 # sigstore attachment enablement setting.
