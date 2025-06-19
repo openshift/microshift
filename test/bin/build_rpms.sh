@@ -128,12 +128,12 @@ download_brew_rpms() {
         bash -x "${SCRIPTDIR}/manage_brew_rpms.sh" download "4.${MINOR_VERSION}" "${BREW_RPM_SOURCE}"
 
         out_path="${IMAGEDIR}/brew-rpms-released"
-        bash -x "${SCRIPTDIR}/manage_brew_rpms.sh" download "4.${MINOR_VERSION}" "${out_path}" "zstream"
-        bash -x "${SCRIPTDIR}/manage_brew_rpms.sh" download "4.${PREVIOUS_MINOR_VERSION}" "${out_path}" "zstream" 
-        bash -x "${SCRIPTDIR}/manage_brew_rpms.sh" download "4.${YMINUS2_MINOR_VERSION}" "${out_path}" "zstream" 
-        bash -x "${SCRIPTDIR}/manage_brew_rpms.sh" download "4.${MINOR_VERSION}" "${out_path}" "nightly"
-        bash -x "${SCRIPTDIR}/manage_brew_rpms.sh" download "4.${MINOR_VERSION}" "${out_path}" "rc"
-        bash -x "${SCRIPTDIR}/manage_brew_rpms.sh" download "4.${MINOR_VERSION}" "${out_path}" "ec"
+        bash -x "${SCRIPTDIR}/manage_brew_rpms.sh" download "4.${MINOR_VERSION}" "${out_path}" "zstream" || true
+        bash -x "${SCRIPTDIR}/manage_brew_rpms.sh" download "4.${PREVIOUS_MINOR_VERSION}" "${out_path}" "zstream" || true
+        bash -x "${SCRIPTDIR}/manage_brew_rpms.sh" download "4.${YMINUS2_MINOR_VERSION}" "${out_path}" "zstream" || true
+        bash -x "${SCRIPTDIR}/manage_brew_rpms.sh" download "4.${MINOR_VERSION}" "${out_path}" "nightly" || true
+        bash -x "${SCRIPTDIR}/manage_brew_rpms.sh" download "4.${MINOR_VERSION}" "${out_path}" "rc" || true
+        bash -x "${SCRIPTDIR}/manage_brew_rpms.sh" download "4.${MINOR_VERSION}" "${out_path}" "ec" || true
     else
         echo "WARNING: The Brew Hub site is not accessible, skipping the download"
     fi
