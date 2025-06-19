@@ -55,8 +55,8 @@ action_download() {
     esac
 
     if [ -z "${package}" ] ; then
-        echo "WARNING: Cannot find MicroShift '${ver}' packages in brew"
-        exit 0
+        echo "ERROR: Cannot find MicroShift '${ver}' packages in brew"
+        exit 1
     fi
 
     package=$(awk '{print $1}' <<< "${package}")
@@ -77,7 +77,10 @@ action_download() {
 
         mkdir -p "${adir}"
         pushd "${adir}" &>/dev/null
-        brew download-build --arch="${arch}" --arch="noarch" "${package}"
+        if ! brew download-build --arch="${arch}" --arch="noarch" "${package}" ; then
+            echo "ERROR: Failed to download '${package}' packages from brew"
+            exit 1
+        fi
         popd &>/dev/null
     done
 }
