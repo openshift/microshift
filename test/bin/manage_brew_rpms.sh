@@ -76,6 +76,7 @@ action_download() {
     for arch in x86_64 aarch64 ; do
         local adir
         adir="${dir}/${ver}-${ver_type}/${arch}"
+
         mkdir -p "${adir}"
         pushd "${adir}" &>/dev/null
         if ! brew download-build --arch="${arch}" --arch="noarch" "${package}" ; then
