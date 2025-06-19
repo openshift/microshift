@@ -1,6 +1,7 @@
-- ovn-kubernetes image-amd64 668e8f7bee476fbefe3fbad40eec7d6a03847943 to 90e42f21caa95ab5238670ef5bb88c00e19d9052
-  - a82d16c8 2025-05-19T16:43:31+02:00 Fix predicate for cluster subnet route to gateway router
+- api embedded-component ace59d6ad5ceb98ff1d0760da329654f68b39d66 to db4fa2d6cce43c412a816c239a564c6f860218f5
+  - a5c102a 2025-06-10T16:48:07+02:00 Remove Never option from IPsec Encapsulation
+  - 4eb9e00 2025-06-10T16:28:33+02:00 Add encapsulation flag to IPsecConfig struct
 
-- ovn-kubernetes image-arm64 668e8f7bee476fbefe3fbad40eec7d6a03847943 to 90e42f21caa95ab5238670ef5bb88c00e19d9052
-  - a82d16c8 2025-05-19T16:43:31+02:00 Fix predicate for cluster subnet route to gateway router
+- openshift-controller-manager embedded-component 44216d92545ea1bfdef1bb10fc18ccb7c1bfde05 to a1438e643feb6dc992e2c723618b5f4e81bb31c7
+  - b9a5d99 2025-06-16T12:14:27+00:00 Set node-pullsecrets volume to read-only to protect image pull credentials
 
