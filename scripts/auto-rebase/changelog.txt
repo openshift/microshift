@@ -1,0 +1,6 @@
+- router image-amd64 4d9b8c4afa6cd89b41f4bd5e7c09ccddd8679bc6 to ad86f4628092d3287e8a71e8ead030f5cd878768
+  - 04dd456 2025-02-02T08:49:02+00:00 OCPBUGS-45290: Reject All CA-Signed Certs Using SHA1
+
+- router image-arm64 4d9b8c4afa6cd89b41f4bd5e7c09ccddd8679bc6 to ad86f4628092d3287e8a71e8ead030f5cd878768
+  - 04dd456 2025-02-02T08:49:02+00:00 OCPBUGS-45290: Reject All CA-Signed Certs Using SHA1
+
