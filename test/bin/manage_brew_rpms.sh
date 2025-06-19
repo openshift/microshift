@@ -52,10 +52,14 @@ action_download() {
             package=$(brew list-builds --quiet --package=microshift --state=COMPLETE | grep "^microshift-${ver}" | grep -v "~" | uniq | tail -n1) || true
             ;;
         rc|ec)
-            package=$(brew list-builds --quiet --package=microshift --state=COMPLETE | grep "^microshift-${ver}.0~${ver_type}." | tail -1) || true
+            package=$(brew list-builds --quiet --package=microshift --state=COMPLETE | grep "^microshift-${ver}.0~${ver_type}." | tail -n1) || true
+            ;;
+        nightly)
+            package=$(brew list-builds --quiet --package=microshift --state=COMPLETE | grep "^microshift-${ver}.0~.*nightly" | tail -n1) || true
             ;;
         *)
-            package=$(brew list-builds --quiet --package=microshift --state=COMPLETE | grep "^microshift-${ver}.*${ver_type}" | tail -1) || true
+            echo "ERROR: Invalid version_type '${ver_type}'. Valid values are: rc, ec, zstream and nightly"
+            exit 1
             ;;
     esac
 
