@@ -225,6 +225,14 @@ EOF
     fi
 }
 
+gettool_tar-diff() {
+    # See https://github.com/containers/tar-diff
+    local ver="v0.1.2"
+    for pkg in tar-diff tar-patch ; do
+        GOBIN=${DEST_DIR} GOFLAGS="" go install -mod=mod github.com/containers/tar-diff/cmd/${pkg}@${ver}
+    done
+}
+
 tool_getters=$(declare -F | awk '$3 ~ /^gettool_/ {print $3}' | sed 's/^gettool_//g')
 
 usage() {
