@@ -6,11 +6,11 @@ SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # its execution in a containerized environment with limited set of tools.
 
 usage() {
-    echo "Usage: $(basename "$0") [access | download <version> <path> <version_type>]"
+    echo "Usage: $(basename "$0") [access | download <version> <path> [version_type]]"
     echo "  download:   Download the RPM version to the path as specified"
     echo "    - version: the X.Y version. Example: 4.19"
     echo "    - path: the output directory. Example: /_output/test-images/brew-rpms"
-    echo "    - version_type: Valid values: rc, ec, zstream and nightly."
+    echo "    - version_type: Optional. Valid values: rc, ec, zstream and nightly. Default: nightly"
     echo "  access:     Exit with non-zero status if brew cannot be accessed"
 }
 
@@ -32,10 +32,10 @@ action_access() {
 action_download() {
     local -r ver=$1
     local -r dir=$2
-    local -r ver_type=${3}
+    local -r ver_type=${3:-nightly}
 
-    if [ -z "${ver}" ] || [ -z "${dir}" ] || [ -z "${ver_type}" ] ; then
-        echo "ERROR: All three parameters (version, path, version_type) are required"
+    if [ -z "${ver}" ] || [ -z "${dir}" ] ; then
+        echo "ERROR: At least two parameters (version and path) are required"
         exit 1
     fi
 
@@ -97,7 +97,7 @@ case "${action}" in
         "action_${action}"
         ;;
     download)
-        [ $# -ne 4 ] && usage && exit 1
+        [ $# -ne 3 ] && [ $# -ne 4 ] && usage && exit 1
         shift
         "action_${action}" "$@"
         ;;
