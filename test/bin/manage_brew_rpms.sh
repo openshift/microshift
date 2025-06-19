@@ -10,7 +10,7 @@ usage() {
     echo "  download:   Download the RPM version to the path as specified"
     echo "    - version: the X.Y version. Example: 4.19"
     echo "    - path: the output directory. Example: /_output/test-images/brew-rpms"
-    echo "    - version_type: optional version type. Valid values: rc, ec, zstream and nightly."
+    echo "    - version_type: Valid values: rc, ec, zstream and nightly."
     echo "  access:     Exit with non-zero status if brew cannot be accessed"
 }
 
@@ -32,7 +32,12 @@ action_access() {
 action_download() {
     local -r ver=$1
     local -r dir=$2
-    local -r ver_type=${3:-}
+    local -r ver_type=${3}
+
+    if [ -z "${ver}" ] || [ -z "${dir}" ] || [ -z "${ver_type}" ] ; then
+        echo "ERROR: All three parameters (version, path, version_type) are required"
+        exit 1
+    fi
 
     if ! action_access ; then
         echo "ERROR: Brew Hub site is not accessible"
@@ -66,15 +71,7 @@ action_download() {
     # cannot be identified easily when running in a CI job
     for arch in x86_64 aarch64 ; do
         local adir
-        # shellcheck disable=SC2001
-        if [ -z "${ver_type}" ] ; then
-            adir="${dir}/${arch}"
-        else
-            # remove date and commit id from package name and use it in dir name
-            version=$(echo "${package}" | sed 's/.*microshift-\([^-]*\).*/\1/')
-            adir="${dir}/${version}/${arch}"
-        fi
-
+        adir="${dir}/${ver}-${ver_type}/${arch}"
         mkdir -p "${adir}"
         pushd "${adir}" &>/dev/null
         if ! brew download-build --arch="${arch}" --arch="noarch" "${package}" ; then

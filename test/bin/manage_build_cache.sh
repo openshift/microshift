@@ -102,29 +102,12 @@ action_upload() {
     run_aws_cli s3 sync --quiet --include '*.iso' "${iso_base}" "${iso_dest}"
 
     # Upload mirror-registry, brew-rpms and repo archives
-    for dir in mirror-registry brew-rpms repo ; do
+    pushd "${src_base}"
+    brew_rpms_dirs="$(find "brew-rpms" -maxdepth 1 -type d | grep '4..[0-9]-')"
+    popd
+    for dir in mirror-registry ${brew_rpms_dirs} repo ; do
         local pkg_src="${src_base}/${dir}.tar"
         local pkg_dst="${dst_base}/${dir}.tar"
-
-        # Archive the files before the upload
-        rm -f "${pkg_src}"
-        tar cf "${pkg_src}" -C "${src_base}" "${dir}"
-
-        local repo_size
-        repo_size="$(du -csh "${pkg_src}" | awk 'END{print $1}')"
-
-        echo "Uploading ${repo_size} of data to '${pkg_dst}'"
-        run_aws_cli s3 cp --quiet "${pkg_src}" "${pkg_dst}"
-        rm -f "${pkg_src}"
-    done
-
-    # Upload released RPM from brew
-    pushd "${src_base}"
-    released_brew_rpms_dirs="$(find "brew-rpms-released" -maxdepth 1 -type d | tail -n +2)"
-    popd
-    for dir in ${released_brew_rpms_dirs} ; do
-        local pkg_src="${src_base}/${dir}.tar"
-        local pkg_dst="s3://${AWS_BUCKET_NAME}/${dir}.tar"
 
         # Archive the files before the upload
         rm -f "${pkg_src}"
@@ -153,8 +136,18 @@ action_download() {
     local -r iso_size="$(du -csh "${iso_dest}" | awk 'END{print $1}')"
     echo "Downloaded ${iso_size} of ISO images"
 
-    # Download mirror-registry, brew-rpms and repo archives
-    for dir in mirror-registry brew-rpms repo ; do
+    # Download brew-rpms
+    local -r brew_rpms_base="${src_base}/brew-rpms"
+    local -r brew_rpms_dest="${dst_base}/brew-rpms"
+
+    echo "Downloading brew-rpms from '${brew_rpms_base}'"
+    run_aws_cli s3 sync --quiet "${brew_rpms_base}" "${brew_rpms_dest}"
+
+    local -r brew_rpms_size="$(du -csh "${brew_rpms_dest}" | awk 'END{print $1}')"
+    echo "Downloaded ${brew_rpms_size} of RPMs from brew"
+
+    # Download mirror-registry and repo archives
+    for dir in mirror-registry repo ; do
         local pkg_src="${src_base}/${dir}.tar"
         local pkg_dst="${dst_base}/${dir}.tar"
         local pkg_dir="${dst_base}/${dir}"
