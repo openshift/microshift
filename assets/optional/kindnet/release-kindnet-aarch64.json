@@ -1,0 +1,8 @@
+{
+  "release": {
+    "base": "4.20.0-0.nightly-arm64-2025-06-03-221556"
+  },
+  "images": {
+    "kindnet": "docker.io/kindest/kindnetd@sha256:2bdc3188f2ddc8e54841f69ef900a8dde1280057c97500f966a7ef31364021f1"
+  }
+}

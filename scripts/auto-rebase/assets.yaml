@@ -265,7 +265,7 @@ assets:
       - file: release-multus-aarch64.json
       - file: release-multus-x86_64.json
 
-  - dir: optional/flannel/
+  - dir: optional/kindnet/
     ignore: "they don't exist in upstream repository - only in microshift"
     files:
       - file: kustomization.yaml
@@ -275,10 +275,9 @@ assets:
       - file: 01-service-account.yaml
       - file: 02-cluster-role.yaml
       - file: 03-cluster-role-binding.yaml
-      - file: 04-configmap.yaml
-      - file: 05-daemonset.yaml
-      - file: release-flannel-aarch64.json
-      - file: release-flannel-x86_64.json
+      - file: 04-daemonset.yaml
+      - file: release-kindnet-aarch64.json
+      - file: release-kindnet-x86_64.json
 
   - dir: optional/topolvm/
     ignore: "they don't exist in upstream repository - only in microshift"

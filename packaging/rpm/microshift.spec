@@ -35,8 +35,8 @@
 # Git related details
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 
-# Don't build flannel subpackage by default
-%{!?with_flannel: %global with_flannel 0}
+# Don't build kindnet subpackage by default
+%{!?with_kindnet: %global with_kindnet 0}
 # Don't build topolvm subpackage by default
 %{!?with_topolvm: %global with_topolvm 0}
 
@@ -173,24 +173,24 @@ release. These files contain the list of container image references used by
 the Multus CNI for MicroShift and can be used to embed those images into
 osbuilder blueprints or bootc containerfiles.
 
-%if %{with_flannel}
-%package flannel
-Summary: flannel CNI for MicroShift
+%if %{with_kindnet}
+%package kindnet
+Summary: kindnet CNI for MicroShift
 ExclusiveArch: x86_64 aarch64
 Requires: microshift = %{version}
 
-%description flannel
-The microshift-flannel package provides the required manifests for the flannel CNI and the dependent
+%description kindnet
+The microshift-kindnet package provides the required manifests for the kindnet CNI and the dependent
 kube-proxy to be installed on MicroShift.
 
-%package flannel-release-info
-Summary: Release information for flannel CNI for MicroShift
+%package kindnet-release-info
+Summary: Release information for kindnet CNI for MicroShift
 BuildArch: noarch
 Requires: microshift-release-info = %{version}
 
-%description flannel-release-info
-The microshift-flannel-release-info package provides release information files for this
-release. These files contain the list of container image references used by the flannel CNI
+%description kindnet-release-info
+The microshift-kindnet-release-info package provides release information files for this
+release. These files contain the list of container image references used by the kindnet CNI
 with the dependent kube-proxy for MicroShift and can be used to embed those images
 into osbuilder blueprints or bootc containerfiles.
 %endif
@@ -434,7 +434,7 @@ install -p -m755 packaging/crio.conf.d/12-microshift-multus.conf %{buildroot}%{_
 mkdir -p -m755 %{buildroot}%{_datadir}/microshift/release
 install -p -m644 assets/components/multus/release-multus-{x86_64,aarch64}.json %{buildroot}%{_datadir}/microshift/release/
 
-%if %{with_flannel}
+%if %{with_kindnet}
 # kube-proxy
 install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/000-microshift-kube-proxy
 # Copy all the manifests except the arch specific ones
@@ -453,26 +453,28 @@ cat assets/optional/kube-proxy/kustomization.x86_64.yaml >> %{buildroot}/%{_pref
 mkdir -p -m755 %{buildroot}%{_datadir}/microshift/release
 install -p -m644 assets/optional/kube-proxy/release-kube-proxy-{x86_64,aarch64}.json %{buildroot}%{_datadir}/microshift/release/
 
-# flannel
-install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/000-microshift-flannel
+# kindnet
+install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/000-microshift-kindnet
 install -d -m755 %{buildroot}%{_sysconfdir}/systemd/system
 # Copy all the manifests except the arch specific ones
-install -p -m644 assets/optional/flannel/0* %{buildroot}/%{_prefix}/lib/microshift/manifests.d/000-microshift-flannel
-install -p -m644 assets/optional/flannel/kustomization.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/000-microshift-flannel
-install -p -m644 packaging/flannel/00-disableDefaultCNI.yaml %{buildroot}%{_sysconfdir}/microshift/config.d/00-disableDefaultCNI.yaml
-install -p -m644 packaging/flannel/microshift-flannel.service %{buildroot}%{_sysconfdir}/systemd/system/microshift.service
+install -p -m644 assets/optional/kindnet/0* %{buildroot}/%{_prefix}/lib/microshift/manifests.d/000-microshift-kindnet
+install -p -m644 assets/optional/kindnet/kustomization.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/000-microshift-kindnet
+install -p -m644 packaging/kindnet/00-disableDefaultCNI.yaml %{buildroot}%{_sysconfdir}/microshift/config.d/00-disableDefaultCNI.yaml
+install -p -m644 packaging/kindnet/microshift-kindnet.service %{buildroot}%{_sysconfdir}/systemd/system/microshift.service
+install -p -m644 packaging/crio.conf.d/13-microshift-kindnet.conf %{buildroot}%{_sysconfdir}/crio/crio.conf.d/13-microshift-kindnet.conf
+
 
 %ifarch %{arm} aarch64
-cat assets/optional/flannel/kustomization.aarch64.yaml >> %{buildroot}/%{_prefix}/lib/microshift/manifests.d/000-microshift-flannel/kustomization.yaml
+cat assets/optional/kindnet/kustomization.aarch64.yaml >> %{buildroot}/%{_prefix}/lib/microshift/manifests.d/000-microshift-kindnet/kustomization.yaml
 %endif
 
 %ifarch x86_64
-cat assets/optional/flannel/kustomization.x86_64.yaml >> %{buildroot}/%{_prefix}/lib/microshift/manifests.d/000-microshift-flannel/kustomization.yaml
+cat assets/optional/kindnet/kustomization.x86_64.yaml >> %{buildroot}/%{_prefix}/lib/microshift/manifests.d/000-microshift-kindnet/kustomization.yaml
 %endif
 
-# flannel-release-info
+# kindnet-release-info
 mkdir -p -m755 %{buildroot}%{_datadir}/microshift/release
-install -p -m644 assets/optional/flannel/release-flannel-{x86_64,aarch64}.json %{buildroot}%{_datadir}/microshift/release/
+install -p -m644 assets/optional/kindnet/release-kindnet-{x86_64,aarch64}.json %{buildroot}%{_datadir}/microshift/release/
 %endif
 
 %if %{with_topolvm}
@@ -714,17 +716,18 @@ fi
 %files multus-release-info
 %{_datadir}/microshift/release/release-multus-{x86_64,aarch64}.json
 
-%if %{with_flannel}
-%files flannel
-%dir %{_prefix}/lib/microshift/manifests.d/000-microshift-flannel
+%if %{with_kindnet}
+%files kindnet
+%dir %{_prefix}/lib/microshift/manifests.d/000-microshift-kindnet
 %dir %{_prefix}/lib/microshift/manifests.d/000-microshift-kube-proxy
-%{_prefix}/lib/microshift/manifests.d/000-microshift-flannel/*
+%{_prefix}/lib/microshift/manifests.d/000-microshift-kindnet/*
 %{_prefix}/lib/microshift/manifests.d/000-microshift-kube-proxy/*
 %config(noreplace) %{_sysconfdir}/microshift/config.d/00-disableDefaultCNI.yaml
 %{_sysconfdir}/systemd/system/microshift.service
+%{_sysconfdir}/crio/crio.conf.d/13-microshift-kindnet.conf
 
-%files flannel-release-info
-%{_datadir}/microshift/release/release-flannel-{x86_64,aarch64}.json
+%files kindnet-release-info
+%{_datadir}/microshift/release/release-kindnet-{x86_64,aarch64}.json
 %{_datadir}/microshift/release/release-kube-proxy-{x86_64,aarch64}.json
 %endif
 
@@ -776,6 +779,9 @@ fi
 # Use Git command to generate the log and replace the VERSION string
 # LANG=C git log --date="format:%a %b %d %Y" --pretty="tformat:* %cd %an <%ae> VERSION%n- %s%n" packaging/rpm/microshift.spec
 %changelog
+* Thu Jun 5 2025 Praveen Kumar <prkumar@redhat.com> 4.20.0
+- Switch flannel with kindnet as CNI
+
 * Fri May 16 2025 Evgeny Slutsky <eslutsky@redhat.com> 4.20.0
 - Update openvswitch to 3.5
 
