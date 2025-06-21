@@ -160,7 +160,7 @@ verify-go: verify-gofmt verify-golangci
 .PHONY: verify-golangci
 verify-golangci:
 	./scripts/fetch_tools.sh golangci-lint && \
-	./_output/bin/golangci-lint run --verbose --timeout 20m0s
+	./_output/bin/golangci-lint run --verbose --timeout 20m0s --exclude-dirs deps/
 
 .PHONY: verify-sh
 verify-sh:
