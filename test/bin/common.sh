@@ -84,6 +84,9 @@ export BOOTC_IMAGE_DIR="${IMAGEDIR}/bootc-images"
 # Location of images produced by bootc ISO build procedure
 export BOOTC_ISO_DIR="${IMAGEDIR}/bootc-iso-images"
 
+# Location of static delta images for bootc
+export BOOTC_STATIC_DELTA="${IMAGEDIR}/bootc-static-delta"
+
 # Location of data files created by the tools for managing scenarios
 # as they are run.
 #
@@ -267,4 +270,96 @@ get_scenario_type_from_path() {
         ;;
     esac
     echo "${type}"
+}
+
+# Prepare a static delta file between two container images specified in the
+# function arguments. The images are copied from the mirror registry to a local
+# directory and compared using the 'tar-diff' command.
+#
+# The result is stored in the '${BOOTC_STATIC_DELTA}/${src}@${dst}.tardiff' file.
+#
+# Arguments:
+#   src - Source container image name
+#   dst - Destination container image name
+# Return:
+#   '${src}@${dst}.tardiff' file stored in the '${BOOTC_STATIC_DELTA}' directory
+prepare_static_delta() {
+    local -r src=$1
+    local -r dst=$2
+    local -r tardiff="${src}@${dst}.tardiff"
+
+    local -r workdir="$(mktemp -d /tmp/bootc-delta-prepare.XXXXXXXX)"
+    # shellcheck disable=SC2164
+    pushd "${workdir}" &>/dev/null
+
+    "${ROOTDIR}/scripts/fetch_tools.sh" tar-diff
+
+    # Export the images and archive them
+    for i in "${src}" "${dst}" ; do
+        skopeo copy --all --preserve-digests \
+            --authfile "${MIRROR_REGISTRY_DIR}/config/microshift_auth.json" \
+            docker://"${MIRROR_REGISTRY_URL}/${i}:latest" \
+            dir:"${i}"
+        tar cf "${i}.tar" -C "${i}" .
+    done
+
+    # Create a tar-diff file and list tar sizes
+    "${ROOTDIR}/_output/bin/tar-diff" "${src}.tar" "${dst}.tar" "${tardiff}"
+    ls -lh ./*.tar*
+
+    # Store the tar-diff file in the static delta directory
+    mkdir -p "${BOOTC_STATIC_DELTA}"
+    mv -f "${tardiff}" "${BOOTC_STATIC_DELTA}/"
+
+    # shellcheck disable=SC2164
+    popd &>/dev/null
+    rm -rf "${workdir}"
+}
+
+# Consume a static delta file created by the 'prepare_static_delta' function.
+# The '${src}' image is copied from the mirror registry to a local directory
+# and merged with the '${BOOTC_STATIC_DELTA}/${src}@${dst}.tardiff' file.
+#
+# The result of the merge is uploaded to the mirror registry and stored under
+# the '${dst}-patched' name.
+#
+# Arguments:
+#   src - Source container image name
+#   dst - Destination container image name
+# Return:
+#   '${dst}-patched' image stored in the mirror registry
+consume_static_delta() {
+    local -r src=$1
+    local -r dst=$2
+    local -r tardiff="${src}@${dst}.tardiff"
+
+    local -r workdir="$(mktemp -d /tmp/bootc-delta-consume.XXXXXXXX)"
+    # shellcheck disable=SC2164
+    pushd "${workdir}" &>/dev/null
+
+    "${ROOTDIR}/scripts/fetch_tools.sh" tar-diff
+
+    # Export the source image to be patched
+    skopeo copy --all --preserve-digests \
+        --authfile "${MIRROR_REGISTRY_DIR}/config/microshift_auth.json" \
+        docker://"${MIRROR_REGISTRY_URL}/${src}:latest" \
+        dir:"${src}"
+
+    # Upgrade the source image to the destination using tar-patch and list tar sizes
+    cp "${BOOTC_STATIC_DELTA}/${tardiff}" .
+    "${ROOTDIR}/_output/bin/tar-patch" "${tardiff}" "${src}/" "${dst}-patched.tar"
+    ls -lh ./*.tar*
+
+    # Extract the patched image and copy it into the registry
+    mkdir -p "${dst}-patched"
+    tar xf "${dst}-patched.tar" -C "${dst}-patched"
+
+    skopeo copy --all --preserve-digests \
+        --authfile "${MIRROR_REGISTRY_DIR}/config/microshift_auth.json" \
+        dir:"${dst}-patched" \
+        docker://"${MIRROR_REGISTRY_URL}/${dst}-patched:latest"
+
+    # shellcheck disable=SC2164
+    popd &>/dev/null
+    rm -rf "${workdir}"
 }
