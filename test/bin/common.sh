@@ -295,12 +295,12 @@ prepare_static_delta() {
     "${ROOTDIR}/scripts/fetch_tools.sh" tar-diff
 
     # Export the images and archive them
+    # Note: Cannot use 'docker-archive' because it only supports Docker Schema 2 manifests
     for i in "${src}" "${dst}" ; do
         skopeo copy --all --preserve-digests \
             --authfile "${MIRROR_REGISTRY_DIR}/config/microshift_auth.json" \
             docker://"${MIRROR_REGISTRY_URL}/${i}:latest" \
-            dir:"${i}"
-        tar cf "${i}.tar" -C "${i}" .
+            oci-archive:"${i}.tar"
     done
 
     # Create a tar-diff file and list tar sizes
@@ -343,20 +343,17 @@ consume_static_delta() {
     skopeo copy --all --preserve-digests \
         --authfile "${MIRROR_REGISTRY_DIR}/config/microshift_auth.json" \
         docker://"${MIRROR_REGISTRY_URL}/${src}:latest" \
-        dir:"${src}"
+        oci:"${src}"
 
     # Upgrade the source image to the destination using tar-patch and list tar sizes
     cp "${BOOTC_STATIC_DELTA}/${tardiff}" .
     "${ROOTDIR}/_output/bin/tar-patch" "${tardiff}" "${src}/" "${dst}-patched.tar"
     ls -lh ./*.tar*
 
-    # Extract the patched image and copy it into the registry
-    mkdir -p "${dst}-patched"
-    tar xf "${dst}-patched.tar" -C "${dst}-patched"
-
+    # Copy the patched image into the registry
     skopeo copy --all --preserve-digests \
         --authfile "${MIRROR_REGISTRY_DIR}/config/microshift_auth.json" \
-        dir:"${dst}-patched" \
+        oci-archive:"${dst}-patched.tar" \
         docker://"${MIRROR_REGISTRY_URL}/${dst}-patched:latest"
 
     # shellcheck disable=SC2164
