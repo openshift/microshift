@@ -19,7 +19,6 @@ type certificateChains struct {
 	fileBundles map[string][][]string
 }
 
-//nolint:ireturn
 func NewCertificateChains(signers ...CertificateSignerBuilder) CertificateChainsBuilder {
 	return &certificateChains{
 		signers: signers,
@@ -28,19 +27,16 @@ func NewCertificateChains(signers ...CertificateSignerBuilder) CertificateChains
 	}
 }
 
-//nolint:ireturn
 func (cs *certificateChains) WithSigners(signers ...CertificateSignerBuilder) CertificateChainsBuilder {
 	cs.signers = append(cs.signers, signers...)
 	return cs
 }
 
-//nolint:ireturn
 func (cs *certificateChains) WithCABundle(bundlePath string, signerNames ...[]string) CertificateChainsBuilder {
 	cs.fileBundles[bundlePath] = signerNames
 	return cs
 }
 
-//nolint:ireturn
 func (cs *certificateChains) Complete() (*CertificateChains, error) {
 	completeChains := &CertificateChains{
 		signers: make(map[string]*CertificateSigner),

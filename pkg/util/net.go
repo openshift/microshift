@@ -117,7 +117,7 @@ func RetryGet(ctx context.Context, url, additionalCAPath string) int {
 		}
 		resp, err := c.Get(url)
 		if err != nil {
-			return false, nil //nolint:nilerr
+			return false, nil
 		}
 		defer resp.Body.Close()
 		status = resp.StatusCode

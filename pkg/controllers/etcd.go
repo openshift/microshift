@@ -155,7 +155,7 @@ func stopMicroshiftEtcdScopeIfExists() error {
 	// just check for active (existing) to simplify procedure.
 	statusCmd := exec.Command("systemctl", "status", "microshift-etcd.scope")
 	if err := statusCmd.Run(); err != nil {
-		// nolint:nilerr
+		//nolint:nilerr
 		return nil
 	}
 
