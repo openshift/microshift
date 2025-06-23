@@ -1,3 +1,17 @@
-- openshift-controller-manager embedded-component 214c4c29bacb8260a80cce7a39534a16d92eda42 to 1f76c23407c6cc95902a4b4d8f679181df538d9d
-  - 94d7c28 2025-06-11T15:23:16+00:00 Set node-pullsecrets volume to read-only to protect image pull credentials
+- kubernetes embedded-component db4023c383e559c6310710cd16a441912fc9c06f to 84b31a33f3dd1a585589e8031ab29b0ed9276518
+  - c9d88fc68 2025-06-13T10:57:18-03:00 UPSTREAM: <carry>: Bump cadvisor version to fix container_fs metrics
+
+- ovn-kubernetes image-amd64 b5e32a0f733ccdc59ce0012d768dc3edb6caf013 to aeea3396792eb20e7caa8e7f67d19a1be7889512
+  - 812a0ca3 2025-06-19T11:57:24+00:00 Increase InformerSyncTimeout to 60s
+  - 13fb9bf5 2025-06-19T11:56:27+00:00 Fix hybrid overlay node subnets collision with cluster subnets
+
+- kubernetes image-amd64 db4023c383e559c6310710cd16a441912fc9c06f to 84b31a33f3dd1a585589e8031ab29b0ed9276518
+  - c9d88fc68 2025-06-13T10:57:18-03:00 UPSTREAM: <carry>: Bump cadvisor version to fix container_fs metrics
+
+- ovn-kubernetes image-arm64 b5e32a0f733ccdc59ce0012d768dc3edb6caf013 to aeea3396792eb20e7caa8e7f67d19a1be7889512
+  - 812a0ca3 2025-06-19T11:57:24+00:00 Increase InformerSyncTimeout to 60s
+  - 13fb9bf5 2025-06-19T11:56:27+00:00 Fix hybrid overlay node subnets collision with cluster subnets
+
+- kubernetes image-arm64 db4023c383e559c6310710cd16a441912fc9c06f to 84b31a33f3dd1a585589e8031ab29b0ed9276518
+  - c9d88fc68 2025-06-13T10:57:18-03:00 UPSTREAM: <carry>: Bump cadvisor version to fix container_fs metrics
 
