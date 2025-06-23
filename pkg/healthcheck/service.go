@@ -39,6 +39,10 @@ func microshiftServiceShouldBeOk(ctx context.Context, timeout time.Duration) (bo
 	return true, nil
 }
 
+type Systemd struct {
+	connection *dbus.Conn
+}
+
 func NewSystemd(ctx context.Context) (*Systemd, error) {
 	conn, err := dbus.NewWithContext(ctx)
 	if err != nil {
@@ -46,10 +50,6 @@ func NewSystemd(ctx context.Context) (*Systemd, error) {
 		return nil, err
 	}
 	return &Systemd{connection: conn}, nil
-}
-
-type Systemd struct {
-	connection *dbus.Conn
 }
 
 func (s *Systemd) Close() {

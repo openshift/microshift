@@ -23,6 +23,13 @@ type state struct {
 	intermediatePath string          `json:"-"`
 }
 
+func NewState(storagePath data.StoragePath, lastBackup data.BackupName) *state {
+	return &state{
+		LastBackup:  lastBackup,
+		storagePath: string(storagePath),
+	}
+}
+
 func (s *state) Serialize() ([]byte, error) {
 	return json.Marshal(s)
 }
@@ -49,13 +56,6 @@ func (s *state) MoveToFinal() error {
 	path := filepath.Join(s.storagePath, stateFilename)
 	klog.InfoS("Moving state file to final path", "intermediatePath", s.intermediatePath, "finalPath", path)
 	return os.Rename(s.intermediatePath, path)
-}
-
-func NewState(storagePath data.StoragePath, lastBackup data.BackupName) *state {
-	return &state{
-		LastBackup:  lastBackup,
-		storagePath: string(storagePath),
-	}
 }
 
 type fsConstraint interface {
