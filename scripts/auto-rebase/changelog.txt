@@ -1,6 +1,3 @@
-- router image-amd64 4d9b8c4afa6cd89b41f4bd5e7c09ccddd8679bc6 to ad86f4628092d3287e8a71e8ead030f5cd878768
-  - 04dd456 2025-02-02T08:49:02+00:00 OCPBUGS-45290: Reject All CA-Signed Certs Using SHA1
-
-- router image-arm64 4d9b8c4afa6cd89b41f4bd5e7c09ccddd8679bc6 to ad86f4628092d3287e8a71e8ead030f5cd878768
-  - 04dd456 2025-02-02T08:49:02+00:00 OCPBUGS-45290: Reject All CA-Signed Certs Using SHA1
+- openshift-controller-manager embedded-component 87554a1774e48ab8ce44199976f1aeab2902e346 to 18c8021a36cb0963a46ea45313913400404214ad
+  - 5dca2c3 2025-06-17T12:09:18+00:00 Set node-pullsecrets volume to read-only to protect image pull credentials
 
