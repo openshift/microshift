@@ -4,13 +4,37 @@ run:
   timeout: 5m
   modules-download-mode: vendor
 
-exclusions:
-  rules:
-    - path: deps/
-
 linters:
+  default: fast
+  disable:
+    # We do not prevent the use of any dependency at the moment.
+    - depguard
+    # Some long functions are acceptable in the codebase as they come from long ago.
+    # This will need addressing in the future, disabling for now.
+    - funlen
+    # Some packages require init functions as of today, so we disable this linter.
+    - gochecknoinits
+    # We do not enforce cognitive complexity in the codebase.
+    - gocognit
+    # Superseded by cyclop.
+    - gocyclo
+    # We do not enforce comments ending with a dot.
+    - godot
+    # There are many TODOs in the codebase that come from long ago. Disable until addressed.
+    - godox
+    # Gomod is heavily modified with custom directives, so we disable the linter.
+    - gomoddirectives
+    # Line length checks, no need to verify this one as we do not enforce it.
+    - lll
+    # Replaced by cyclop.
+    - maintidx
+    # Magic number, need to address this one with constants all across the codebase.
+    - mnd
+    # We do not enforce new line returns in our code style.
+    - nlreturn
+    # Replaced by whitespace.
+    - wsl
   # https://golangci-lint.run/usage/linters/
-  # Extra linters on top of default
   enable:
   - asasalint
   - asciicheck
@@ -18,34 +42,103 @@ linters:
   - bodyclose
   - containedctx
   - contextcheck
-  - decorder
+  - errcheck
   - exhaustive
-  - exportloopref
-  - gocheckcompilerdirectives
   - goconst
   - gosec
+  - govet
   - importas
   - ireturn
   - loggercheck
-  - misspell
   - nestif
   - nilerr
   - nilnil
   - nosprintfhostport
-  - prealloc
-  - predeclared
   - reassign
   - unconvert
   - unparam
   - usestdlibvars
   - wastedassign
   - whitespace
-
-linters-settings:
-  ireturn:
-    allow:
-      - anon
-      - error
-      - empty
-      - stdlib
-      - generic
+  exclusions:
+    presets:
+      - common-false-positives
+    rules:
+      - path: '_test\.go'
+        linters:
+          - bodyclose
+          - dupl
+          - errcheck
+          - goconst
+          - gosec
+      - path: 'pkg/cmd/init\.go'
+        text: 'calculated cyclomatic complexity for function initKubeconfigs is'
+      - path: 'pkg/config/config\.go'
+        text: 'calculated cyclomatic complexity for function incorporateUserSettings is'
+      - path: 'pkg/config/config\.go'
+        text: 'calculated cyclomatic complexity for function validate is'
+      - path: 'pkg/config/ingress\.go'
+        text: 'calculated cyclomatic complexity for function Validate is'
+      - path: 'pkg/admin/autorecovery/restore\.go'
+        text: 'calculated cyclomatic complexity for function PerformRestore is'
+      - path: 'pkg/components/controllers\.go'
+        text: 'calculated cyclomatic complexity for function generateIngressParams is'
+      - path: 'pkg/util/cryptomaterial/certchains/chainsbuilder\.go'
+        text: 'NewCertificateChains returns interface'
+      - path: 'pkg/util/cryptomaterial/certchains/chainsbuilder\.go'
+        text: 'WithSigners returns interface'
+      - path: 'pkg/util/cryptomaterial/certchains/chainsbuilder\.go'
+        text: 'WithCABundle returns interface'
+      - path: 'pkg/util/cryptomaterial/certchains/signerbuilder\.go'
+        text: 'NewCertificateSigner returns interface'
+      - path: 'pkg/util/cryptomaterial/certchains/signerbuilder\.go'
+        text: 'WithSignerConfig returns interface'
+      - path: 'pkg/util/cryptomaterial/certchains/signerbuilder\.go'
+        text: 'WithCABundlePaths returns interface'
+      - path: 'pkg/util/cryptomaterial/certchains/signerbuilder\.go'
+        text: 'WithClientCertificates returns interface'
+      - path: 'pkg/util/cryptomaterial/certchains/signerbuilder\.go'
+        text: 'WithServingCertificates returns interface'
+      - path: 'pkg/util/cryptomaterial/certchains/signerbuilder\.go'
+        text: 'WithPeerCertificiates returns interface'
+      - path: 'cmd/generate-config/opts\.go'
+        text: 'G302: Expect file permissions to be 0600 or less'
+      - path: 'pkg/components/storage\.go'
+        text: 'G301: Expect directory permissions to be 0750 or less'
+      - path: 'pkg/components/storage\.go'
+        text: 'G302: Expect file permissions to be 0600 or less'
+  settings:
+    cyclop:
+      max-complexity: 20
+    funcorder:
+      struct-method: false
+    inamedparam:
+      skip-single-param: true
+    ireturn:
+      allow:
+        - anon
+        - error
+        - empty
+        - stdlib
+        - generic
+    testpackage:
+      allow-packages:
+        - autorecovery
+        - apiserver
+        - certchains
+        - cmd
+        - components
+        - config
+        - controllers
+        - data
+        - healthcheck
+        - lvmd
+        - mdns
+        - node
+        - ovn
+        - prerun
+        - server
+        - servicemanager
+        - sigchannel
+        - telemetry
+        - util
