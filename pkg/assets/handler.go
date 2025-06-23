@@ -44,13 +44,13 @@ func ToRenderFuncV2(f RenderFunc) RenderFuncV2 {
 // DEPRECATED: resourceHandler is deprecated and should not be used.
 // TODO: Remove resourceHandler once all assets are migrated
 type resourceHandler interface {
-	Read([]byte, RenderFunc, RenderParams)
-	Handle(ctx context.Context) error
+	Read(resource []byte, function RenderFunc, params RenderParams)
+	Handle(context.Context) error
 }
 
 // resourceHandlerV2 is a better version of resourceHandler, using
 // io.Reader instead of []byte for Read method and returning error instead of panicking.
 type resourceHandlerV2 interface {
-	Read(io.Reader, RenderFuncV2, RenderParams) error
-	Handle(ctx context.Context) error
+	Read(reader io.Reader, function RenderFuncV2, params RenderParams) error
+	Handle(context.Context) error
 }
