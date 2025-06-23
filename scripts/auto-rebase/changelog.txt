@@ -1,16 +1,4 @@
-- kubernetes embedded-component fadb78e720779ed1b29f32170f3e9dd32584a7e6 to a36c41df567e20318d8141b629b31418572f8968
-  - fe91d2887 2025-05-07T23:41:20+00:00 UPSTREAM: <carry>: Mark admissionregistration.k8s.io/v1beta1 as deprecated.
-
-- oc image-amd64 8f1c8b5768cdff8885ddef28e10de2c1928daf92 to fa1fd955cefab1204764bc98d754ed855ba6dca4
-  - 9252626e 2025-05-30T11:56:47+00:00 avoid transfering permissions when copying artifacts from node-joiner pod
-
-- kubernetes image-amd64 fadb78e720779ed1b29f32170f3e9dd32584a7e6 to a36c41df567e20318d8141b629b31418572f8968
-  - fe91d2887 2025-05-07T23:41:20+00:00 UPSTREAM: <carry>: Mark admissionregistration.k8s.io/v1beta1 as deprecated.
-
-- oc image-arm64 8f1c8b5768cdff8885ddef28e10de2c1928daf92 to fa1fd955cefab1204764bc98d754ed855ba6dca4
-  - 9252626e 2025-05-30T11:56:47+00:00 avoid transfering permissions when copying artifacts from node-joiner pod
-
-- ovn-kubernetes image-arm64 bfd593c2783b8ab720f19e62e4dcfa9b8b2881fb to 0c8cdc93873c06b07973d147fc704d2224ac2faf
+- ovn-kubernetes image-amd64 bfd593c2783b8ab720f19e62e4dcfa9b8b2881fb to 0c8cdc93873c06b07973d147fc704d2224ac2faf
   - 192f575d 2025-05-27T20:31:35+02:00 Fix hybrid overlay node subnets collision with cluster subnets
   - 682b6030 2025-05-26T17:04:53+00:00 Fix several reasons for flakes in external gateway e2e tests
   - e1af9e9d 2025-05-26T17:04:53+00:00 Fix panic/race around openflowmanager
