@@ -59,7 +59,6 @@ func (cs *certificateChains) Complete() (*CertificateChains, error) {
 	}
 
 	for _, signer := range cs.signers {
-		signer := signer
 		if _, ok := completeChains.signers[signer.Name()]; ok {
 			return nil, fmt.Errorf("signer name clash: %s", signer.Name())
 		}

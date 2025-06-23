@@ -2,6 +2,7 @@ package certchains
 
 import (
 	"fmt"
+
 	"k8s.io/apimachinery/pkg/util/sets"
 
 	"github.com/openshift/library-go/pkg/crypto"
@@ -125,14 +126,12 @@ func (s *certificateSigner) Complete() (*CertificateSigner, error) {
 	}
 
 	for _, subCA := range s.subCAs {
-		subCA := subCA
 		if err := signerCompleted.SignSubCA(subCA); err != nil {
 			return nil, err
 		}
 	}
 
 	for _, si := range s.certificatesToSign {
-		si := si
 		if err := signerCompleted.SignCertificate(si); err != nil {
 			return nil, err
 		}
