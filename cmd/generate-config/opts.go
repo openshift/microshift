@@ -63,7 +63,7 @@ func (opt configGenOpts) Run() error {
 			return err
 		}
 		dataReader = f
-		defer dataReader.Close()
+		defer func() { _ = dataReader.Close() }()
 	default:
 		dataReader = os.Stdin
 	}
@@ -88,7 +88,7 @@ func (opt configGenOpts) Run() error {
 		if err != nil {
 			return err
 		}
-		file.Close()
+		_ = file.Close()
 	}
 
 	var dataWriter io.WriteCloser
@@ -98,7 +98,7 @@ func (opt configGenOpts) Run() error {
 			return err
 		}
 		dataWriter = file
-		defer dataWriter.Close()
+		defer func() { _ = dataWriter.Close() }()
 	} else {
 		dataWriter = os.Stdout
 	}

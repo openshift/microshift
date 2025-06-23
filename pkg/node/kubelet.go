@@ -239,7 +239,7 @@ func loadOSID() (string, error) {
 		}
 		return "", err
 	}
-	defer readFile.Close()
+	defer func() { _ = readFile.Close() }()
 	fileScanner := bufio.NewScanner(readFile)
 	fileScanner.Split(bufio.ScanLines)
 	for fileScanner.Scan() {

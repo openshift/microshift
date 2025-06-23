@@ -43,7 +43,7 @@ func (s *state) SaveToIntermediate() error {
 	if err != nil {
 		return err
 	}
-	defer file.Close()
+	defer func() { _ = file.Close() }()
 	path := file.Name()
 	s.intermediatePath = path
 	klog.InfoS("Saving intermediate state", "state", contents, "path", path)

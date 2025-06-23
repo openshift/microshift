@@ -52,7 +52,7 @@ func (cs *certificateChains) Complete() (*CertificateChains, error) {
 	if err == nil {
 		originalStderr := os.Stderr
 		os.Stderr = newstderr
-		defer newstderr.Close()
+		defer func() { _ = newstderr.Close() }()
 		defer func() {
 			os.Stderr = originalStderr
 		}()

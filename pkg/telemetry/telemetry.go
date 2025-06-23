@@ -136,7 +136,7 @@ func (t *TelemetryClient) Send(ctx context.Context, pullSecret string, metrics [
 		if _, err := io.Copy(io.Discard, resp.Body); err != nil {
 			klog.Error(err, "error discarding body")
 		}
-		resp.Body.Close()
+		_ = resp.Body.Close()
 	}()
 	if resp.StatusCode >= 200 && resp.StatusCode < 300 {
 		klog.Infof("Metrics sent successfully")
