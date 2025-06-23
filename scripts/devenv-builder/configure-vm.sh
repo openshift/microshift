@@ -192,6 +192,7 @@ if ${INSTALL_BUILD_DEPS} && [ ! -d "${GO_INSTALL_DIR}" ]; then
     sudo rm -rfv /usr/local/bin/{go,gofmt}
     sudo ln --symbolic /usr/local/go${GO_VER}/bin/{go,gofmt} /usr/local/bin/
     rm -rfv "go${GO_VER}.linux-${GO_ARCH}.tar.gz"
+    echo "Installed go version: $(go version)"
 fi
 
 if ${BUILD_AND_RUN}; then
