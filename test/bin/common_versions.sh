@@ -1,6 +1,9 @@
 #!/bin/bash
 set -euo pipefail
 
+# Following file is auto-generated using generate_common_versions.py.
+# It should not be edited manually.
+
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
     echo "This script must be sourced, not executed."
     exit 1
@@ -44,13 +47,13 @@ export PREVIOUS_MINOR_VERSION=$(( "${MINOR_VERSION}" - 1 ))
 export YMINUS2_MINOR_VERSION=$(( "${MINOR_VERSION}" - 2 ))
 export FAKE_NEXT_MINOR_VERSION=$(( "${MINOR_VERSION}" + 1 ))
 
-CURRENT_RELEASE_REPO=""
-CURRENT_RELEASE_VERSION=""
+CURRENT_RELEASE_REPO="https://mirror.openshift.com/pub/openshift-v4/$(uname -m)/microshift/ocp-dev-preview/latest-4.20/el9/os"
+CURRENT_RELEASE_VERSION="$(get_vrel_from_beta "${CURRENT_RELEASE_REPO}")"
 export CURRENT_RELEASE_REPO
 export CURRENT_RELEASE_VERSION
 
-PREVIOUS_RELEASE_REPO="https://mirror.openshift.com/pub/openshift-v4/$(uname -m)/microshift/ocp/latest-4.19/el9/os"
-PREVIOUS_RELEASE_VERSION="$(get_vrel_from_beta "${PREVIOUS_RELEASE_REPO}")"
+PREVIOUS_RELEASE_REPO="rhocp-4.19-for-rhel-9-$(uname -m)-rpms"
+PREVIOUS_RELEASE_VERSION="$(get_vrel_from_rhsm "${PREVIOUS_RELEASE_REPO}")"
 export PREVIOUS_RELEASE_REPO
 export PREVIOUS_RELEASE_VERSION
 
@@ -64,7 +67,7 @@ RHOCP_MINOR_Y_BETA="https://mirror.openshift.com/pub/openshift-v4/$(uname -m)/de
 export RHOCP_MINOR_Y
 export RHOCP_MINOR_Y_BETA
 
-RHOCP_MINOR_Y1=""
+RHOCP_MINOR_Y1=19
 RHOCP_MINOR_Y1_BETA="https://mirror.openshift.com/pub/openshift-v4/$(uname -m)/dependencies/rpms/4.19-el9-beta"
 export RHOCP_MINOR_Y1
 export RHOCP_MINOR_Y1_BETA
