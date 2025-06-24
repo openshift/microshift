@@ -2,6 +2,7 @@ package certchains
 
 import (
 	"fmt"
+
 	"k8s.io/apimachinery/pkg/util/sets"
 
 	"github.com/openshift/library-go/pkg/crypto"
@@ -42,8 +43,6 @@ type certificateSigner struct {
 }
 
 // NewCertificateSigner returns a builder object for a certificate chain for the given signer
-//
-//nolint:ireturn
 func NewCertificateSigner(signerName, signerDir string, validityDays int) CertificateSignerBuilder {
 	return &certificateSigner{
 		signerName:         signerName,
@@ -59,20 +58,16 @@ func (s *certificateSigner) ValidityDays() int { return s.signerValidityDays }
 // WithSignerConfig uses the provided configuration in `config` to sign its
 // direct certificates.
 // This is useful when creating intermediate signers.
-//
-//nolint:ireturn
 func (s *certificateSigner) WithSignerConfig(config *crypto.CA) CertificateSignerBuilder {
 	s.signerConfig = config
 	return s
 }
 
-//nolint:ireturn
 func (s *certificateSigner) WithCABundlePaths(bundlePaths ...string) CertificateSignerBuilder {
 	s.caBundlePaths = append(s.caBundlePaths, bundlePaths...)
 	return s
 }
 
-//nolint:ireturn
 func (s *certificateSigner) WithClientCertificates(signInfos ...*ClientCertificateSigningRequestInfo) CertificateSignerBuilder {
 	for _, signInfo := range signInfos {
 		s.certificatesToSign = append(s.certificatesToSign, signInfo)
@@ -80,7 +75,6 @@ func (s *certificateSigner) WithClientCertificates(signInfos ...*ClientCertifica
 	return s
 }
 
-//nolint:ireturn
 func (s *certificateSigner) WithServingCertificates(signInfos ...*ServingCertificateSigningRequestInfo) CertificateSignerBuilder {
 	for _, signInfo := range signInfos {
 		s.certificatesToSign = append(s.certificatesToSign, signInfo)
@@ -88,7 +82,6 @@ func (s *certificateSigner) WithServingCertificates(signInfos ...*ServingCertifi
 	return s
 }
 
-//nolint:ireturn
 func (s *certificateSigner) WithPeerCertificiates(signInfos ...*PeerCertificateSigningRequestInfo) CertificateSignerBuilder {
 	for _, signInfo := range signInfos {
 		s.certificatesToSign = append(s.certificatesToSign, signInfo)
@@ -133,14 +126,12 @@ func (s *certificateSigner) Complete() (*CertificateSigner, error) {
 	}
 
 	for _, subCA := range s.subCAs {
-		subCA := subCA
 		if err := signerCompleted.SignSubCA(subCA); err != nil {
 			return nil, err
 		}
 	}
 
 	for _, si := range s.certificatesToSign {
-		si := si
 		if err := signerCompleted.SignCertificate(si); err != nil {
 			return nil, err
 		}

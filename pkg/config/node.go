@@ -65,7 +65,7 @@ func (c *Config) createNodeNameFile(nodeName, filePath, dataDir string) error {
 	if err != nil {
 		return fmt.Errorf("failed to generate temp path for %s: %w", filePath, err)
 	}
-	defer file.Close()
+	defer func() { _ = file.Close() }()
 	tmpPath := file.Name()
 	if _, err := file.Write([]byte(nodeName)); err != nil {
 		return fmt.Errorf("failed to write nodename file %q: %v", tmpPath, err)

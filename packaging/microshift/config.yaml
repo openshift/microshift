@@ -584,7 +584,7 @@ ingress:
 
         # If you choose a discrete value (e.g., 750000) and the
         # router pod is migrated to a new node, there's no guarantee
-        # that that new node has identical ulimits configured. In
+        # that new node has identical ulimits configured. In
         # such a scenario the pod would fail to start. If you have
         # nodes with different ulimits configured (e.g., different
         # tuned profiles) and you choose a discrete value then the

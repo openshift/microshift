@@ -178,7 +178,7 @@ if ${INSTALL_BUILD_DEPS} || ${BUILD_AND_RUN}; then
     [[ -d /run/systemd/system ]] &&  sudo systemctl enable --now cockpit.socket
 fi
 
-GO_VER=1.23.6
+GO_VER=1.24.3
 GO_ARCH=$([ "$(uname -m)" == "x86_64" ] && echo "amd64" || echo "arm64")
 GO_INSTALL_DIR="/usr/local/go${GO_VER}"
 if ${INSTALL_BUILD_DEPS} && [ ! -d "${GO_INSTALL_DIR}" ]; then
@@ -192,6 +192,7 @@ if ${INSTALL_BUILD_DEPS} && [ ! -d "${GO_INSTALL_DIR}" ]; then
     sudo rm -rfv /usr/local/bin/{go,gofmt}
     sudo ln --symbolic /usr/local/go${GO_VER}/bin/{go,gofmt} /usr/local/bin/
     rm -rfv "go${GO_VER}.linux-${GO_ARCH}.tar.gz"
+    echo "Installed go version: $(go version)"
 fi
 
 if ${BUILD_AND_RUN}; then

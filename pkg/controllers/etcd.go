@@ -155,7 +155,7 @@ func stopMicroshiftEtcdScopeIfExists() error {
 	// just check for active (existing) to simplify procedure.
 	statusCmd := exec.Command("systemctl", "status", "microshift-etcd.scope")
 	if err := statusCmd.Run(); err != nil {
-		// nolint:nilerr
+		//nolint:nilerr
 		return nil
 	}
 
@@ -173,7 +173,7 @@ func checkIfEtcdIsReady(ctx context.Context) error {
 	if err != nil {
 		return fmt.Errorf("failed to obtain etcd client: %v", err)
 	}
-	defer client.Close()
+	defer func() { _ = client.Close() }()
 
 	for i := 0; i < HealthCheckRetries; i++ {
 		time.Sleep(HealthCheckWait)

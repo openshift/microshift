@@ -195,7 +195,7 @@ func applyGeneric(ctx context.Context, resources []string, handler resourceHandl
 		}
 		// call within IIFE to ensure asset is closed without leak with defer
 		if err := func() error {
-			defer asset.Close()
+			defer func() { _ = asset.Close() }()
 			if err := handler.Read(asset, render, params); err != nil {
 				return fmt.Errorf("failed to read resource %s: %w", resource, err)
 			}

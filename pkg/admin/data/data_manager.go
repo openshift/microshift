@@ -23,17 +23,17 @@ var (
 	)
 )
 
+var _ Manager = (*manager)(nil)
+
+type manager struct {
+	storage StoragePath
+}
+
 func NewManager(storage StoragePath) (*manager, error) {
 	if storage == "" {
 		return nil, &EmptyArgErr{argName: "storage"}
 	}
 	return &manager{storage: storage}, nil
-}
-
-var _ Manager = (*manager)(nil)
-
-type manager struct {
-	storage StoragePath
 }
 
 func (dm *manager) GetBackupPath(name BackupName) string {

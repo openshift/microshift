@@ -117,9 +117,9 @@ func RetryGet(ctx context.Context, url, additionalCAPath string) int {
 		}
 		resp, err := c.Get(url)
 		if err != nil {
-			return false, nil //nolint:nilerr
+			return false, nil
 		}
-		defer resp.Body.Close()
+		defer func() { _ = resp.Body.Close() }()
 		status = resp.StatusCode
 		return true, nil
 	})
@@ -163,7 +163,7 @@ func AddToNoProxyEnv(additionalEntries ...string) error {
 	noProxyEnv := strings.Join(mapKeys(entries), ",")
 
 	// unset the lower-case one, and keep only upper-case
-	os.Unsetenv("no_proxy")
+	_ = os.Unsetenv("no_proxy")
 	if err := os.Setenv("NO_PROXY", noProxyEnv); err != nil {
 		return fmt.Errorf("failed to update NO_PROXY: %w", err)
 	}

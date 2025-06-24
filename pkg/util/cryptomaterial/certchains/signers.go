@@ -212,7 +212,7 @@ func (s *CertificateSigner) AddToBundles(bundlePaths ...string) error {
 		if err != nil {
 			return err
 		}
-		defer certFileWriter.Close()
+		defer func() { _ = certFileWriter.Close() }()
 
 		bytes, err := crypto.EncodeCertificates(certs...)
 		if err != nil {

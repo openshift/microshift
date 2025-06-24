@@ -9,18 +9,29 @@ import (
 //go:linkname runtime_getProfLabel runtime/pprof.runtime_getProfLabel
 func runtime_getProfLabel() unsafe.Pointer
 
+// Definitions of 'label' and 'LabelSet' from /usr/local/go1.24.4/src/runtime/pprof/label.go
+
+type label struct {
+	key   string
+	value string
+}
+type LabelSet struct {
+	list []label
+}
+
 func getMicroshiftLoggerComponent() string {
-	labels := (*map[string]string)(runtime_getProfLabel())
+	labels := (*LabelSet)(runtime_getProfLabel())
 	if labels == nil {
 		return "???"
 	}
 
-	c, ok := (*labels)["microshift_logger_component"]
-	if !ok {
-		return "???"
+	for _, label := range labels.list {
+		if label.key == "microshift_logger_component" {
+			return label.value
+		}
 	}
 
-	return c
+	return "???"
 }
 
 func WithMicroshiftLoggerComponent(c string, f func()) {

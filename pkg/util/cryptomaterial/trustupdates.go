@@ -16,7 +16,7 @@ func AppendCertsToFile(bundlePath string, certs ...[]byte) error {
 	if err != nil {
 		return fmt.Errorf("failed to open %q for writing: %w", bundlePath, err)
 	}
-	defer f.Close()
+	defer func() { _ = f.Close() }()
 
 	for _, c := range certs {
 		if _, err = f.WriteString("\n"); err != nil {

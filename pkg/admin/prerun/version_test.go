@@ -53,7 +53,6 @@ func TestCheckVersionDiff(t *testing.T) {
 	}
 
 	for _, td := range testData {
-		td := td
 		t.Run(td.name, func(t *testing.T) {
 			err := checkVersionCompatibility(td.execVer, td.dataVer)
 

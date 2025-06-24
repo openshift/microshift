@@ -55,7 +55,7 @@ func New(iface *net.Interface, responder Responder, stopCh chan struct{}) (*Serv
 
 			go func() {
 				<-stopCh
-				listener.Close()
+				_ = listener.Close()
 			}()
 
 			go srv.listenerLoop(listener)

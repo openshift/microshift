@@ -47,20 +47,20 @@ func (o *VersionOptions) Run() error {
 
 	switch o.Output {
 	case "":
-		fmt.Fprintf(o.Out, "MicroShift Version: %s\n", versionInfo.String())
-		fmt.Fprintf(o.Out, "Base OCP Version: %s\n", release.Base)
+		_, _ = fmt.Fprintf(o.Out, "MicroShift Version: %s\n", versionInfo.String())
+		_, _ = fmt.Fprintf(o.Out, "Base OCP Version: %s\n", release.Base)
 	case "yaml":
 		marshalled, err := yaml.Marshal(&versionInfo)
 		if err != nil {
 			return err
 		}
-		fmt.Fprintln(o.Out, string(marshalled))
+		_, _ = fmt.Fprintln(o.Out, string(marshalled))
 	case "json":
 		marshalled, err := json.MarshalIndent(&versionInfo, "", "  ")
 		if err != nil {
 			return err
 		}
-		fmt.Fprintln(o.Out, string(marshalled))
+		_, _ = fmt.Fprintln(o.Out, string(marshalled))
 	default:
 		// There is a bug in the program if we hit this case.
 		// However, we follow a policy of never panicking.

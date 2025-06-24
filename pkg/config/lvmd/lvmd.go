@@ -30,6 +30,24 @@ type Lvmd struct {
 	Message       string         `json:"-"`
 }
 
+func NewLvmdConfigFromFile(p string) (*Lvmd, error) {
+	l := new(Lvmd)
+	buf, err := os.ReadFile(p)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read lvmd file: %w", err)
+	}
+
+	err = yaml.Unmarshal(buf, &l)
+	if err != nil {
+		return nil, fmt.Errorf("unmarshalling lvmd file: %w", err)
+	}
+	if l.SocketName == "" {
+		l.SocketName = defaultSockName
+	}
+	l.Message = fmt.Sprintf("Read from %s", p)
+	return l, nil
+}
+
 // IsEnabled returns a boolean indicating whether the CSI driver
 // should be enabled for this host.
 func (l *Lvmd) IsEnabled() bool {
@@ -114,24 +132,6 @@ func getVolumeGroups() ([]string, error) {
 		}
 	}
 	return names, nil
-}
-
-func NewLvmdConfigFromFile(p string) (*Lvmd, error) {
-	l := new(Lvmd)
-	buf, err := os.ReadFile(p)
-	if err != nil {
-		return nil, fmt.Errorf("failed to read lvmd file: %w", err)
-	}
-
-	err = yaml.Unmarshal(buf, &l)
-	if err != nil {
-		return nil, fmt.Errorf("unmarshalling lvmd file: %w", err)
-	}
-	if l.SocketName == "" {
-		l.SocketName = defaultSockName
-	}
-	l.Message = fmt.Sprintf("Read from %s", p)
-	return l, nil
 }
 
 func SaveLvmdConfigToFile(l *Lvmd, p string) error {

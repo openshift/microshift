@@ -36,6 +36,23 @@ type OVNKubernetesConfig struct {
 	MTU int `json:"mtu,omitempty"`
 }
 
+func NewOVNKubernetesConfigFromFileOrDefault(dir string, multinode bool, ipFamily int) (*OVNKubernetesConfig, error) {
+	path := filepath.Join(dir, ovnConfigFileName)
+	if _, err := os.Stat(path); err != nil {
+		if errors.Is(err, os.ErrNotExist) {
+			klog.Infof("OVNKubernetes config file not found, assuming default values")
+			return new(OVNKubernetesConfig).withDefaults(multinode, ipFamily), nil
+		}
+		return nil, fmt.Errorf("failed to get OVNKubernetes config file: %v", err)
+	}
+
+	o, err := newOVNKubernetesConfigFromFile(path, multinode, ipFamily)
+	if err == nil {
+		return o, nil
+	}
+	return nil, fmt.Errorf("getting OVNKubernetes config: %v", err)
+}
+
 func (o *OVNKubernetesConfig) Validate() error {
 	// br-ex is required to run ovn-kubernetes
 	err := o.validateOVSBridge()
@@ -108,23 +125,6 @@ func newOVNKubernetesConfigFromFile(path string, multinode bool, ipFamily int) (
 	klog.Infof("parsed OVNKubernetes config from file %q: %+v", path, o)
 
 	return o, nil
-}
-
-func NewOVNKubernetesConfigFromFileOrDefault(dir string, multinode bool, ipFamily int) (*OVNKubernetesConfig, error) {
-	path := filepath.Join(dir, ovnConfigFileName)
-	if _, err := os.Stat(path); err != nil {
-		if errors.Is(err, os.ErrNotExist) {
-			klog.Infof("OVNKubernetes config file not found, assuming default values")
-			return new(OVNKubernetesConfig).withDefaults(multinode, ipFamily), nil
-		}
-		return nil, fmt.Errorf("failed to get OVNKubernetes config file: %v", err)
-	}
-
-	o, err := newOVNKubernetesConfigFromFile(path, multinode, ipFamily)
-	if err == nil {
-		return o, nil
-	}
-	return nil, fmt.Errorf("getting OVNKubernetes config: %v", err)
 }
 
 func ExcludeOVNKubernetesMasqueradeIPs(addrs []net.Addr) []net.Addr {

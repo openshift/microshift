@@ -367,7 +367,7 @@ func (s *KubeAPIServer) Run(ctx context.Context, ready chan<- struct{}, stopped 
 	}()
 
 	err = func() error {
-		defer fd.Close()
+		defer func() { _ = fd.Close() }()
 		_, err = io.Copy(fd, bytes.NewBuffer(s.kasConfigBytes))
 		return err
 	}()

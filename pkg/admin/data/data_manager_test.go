@@ -41,7 +41,6 @@ func Test_checkDirectoryContents(t *testing.T) {
 	}
 
 	for _, td := range testData {
-		td := td
 		t.Run(td.name, func(t *testing.T) {
 			err := checkDirectoryContents(td.input)
 			if td.isValid {
