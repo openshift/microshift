@@ -70,8 +70,6 @@ apiServerArguments:
     - TaintNodesByCondition
     - ValidatingAdmissionWebhook
     - ValidatingAdmissionPolicy
-    - authorization.openshift.io/RestrictSubjectBindings
-    - authorization.openshift.io/ValidateRoleBindingRestriction
     - config.openshift.io/DenyDeleteClusterConfiguration
     - config.openshift.io/ValidateAPIServer
     - config.openshift.io/ValidateAuthentication
