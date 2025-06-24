@@ -94,7 +94,7 @@ func HealthCheckServer(ctx context.Context, path, port string) (start func() err
 	}
 	livenessMux := http.NewServeMux()
 	livenessMux.HandleFunc(path, func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, "ok")
+		_, _ = fmt.Fprintf(w, "ok")
 	})
 
 	server := http.Server{
