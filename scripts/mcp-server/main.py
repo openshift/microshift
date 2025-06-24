@@ -2,7 +2,8 @@ import os
 from typing import Any
 import httpx
 import subprocess
-from mcp.server.fastmcp import FastMCP
+from fastmcp import FastMCP
+import json,yaml
 
 # Initialize FastMCP server
 mcp = FastMCP("microshift")
@@ -12,32 +13,71 @@ SSH_USER = os.getenv('SSH_USER')
 SSH_CONFIG_FILE = os.getenv('SSH_CONFIG_FILE')
 KUBECONFIG_PATH = os.getenv('KUBECONFIG_PATH')
 
+# MCP resources
+@mcp.resource(uri='microshift:available_commands')
+def get_microshift_available_commands() -> str:
+    """Get the available commands for the Microshift cluster"""
+    return _run_ssh_command(['sudo', 'microshift', 'help'])
+
 # MCP tools
 @mcp.tool()
-async def get_microshift_service_status() -> str:
-    """Get the status of the Microshift systemd service running on the remote server"""
-    return await _run_ssh_command('sudo systemctl status microshift')
+def run_systemctl_microshift_commands(action: str) -> str:
+    """Run a systemctl command on the Microshift cluster to start, stop, restart, etc."""
+    return _run_ssh_command(['sudo', 'systemctl', action, 'microshift'])
 
 @mcp.tool()
-async def get_running_pods() -> str:
-    """Get the running pods in the Microshift cluster"""
-    return await _run_oc_command('get pods --all-namespaces')
+def get_latest_microshift_service_logs(number_of_lines: int = 100) -> str:
+    """Get the latest logs from the Microshift cluster"""
+    return _run_ssh_command(['sudo', 'journalctl', '-u', 'microshift', '-n', f'{number_of_lines}'])
 
 @mcp.tool()
-async def summarize_microshift_cluster_config() -> str:
-    """Summarize the Microshift cluster configuration"""
-    return await _run_ssh_command('sudo microshift show-config')
+def get_pods(namespace: str = 'all') -> str:
+    """Get the pods in the Microshift cluster, by default all namespaces are returned"""
+    if namespace == 'all':
+        return _run_oc_command(['get', 'pods', '--all-namespaces', '-ojson'])
+    else:
+        return _run_oc_command(['get', 'pods', '-n', namespace, '-ojson'])
+
+@mcp.tool()
+def run_microshift_commands(action: str) -> str:
+    """Run a microshift command on the Microshift cluster"""
+    return _run_ssh_command(['sudo', 'microshift', action])
+
+@mcp.tool()
+def get_config_yaml_default() -> str:
+    """Get the default config.yaml file for the Microshift cluster"""
+    return _run_ssh_command(['sudo', 'cat', '/etc/microshift/config.yaml.default'])
+
+@mcp.tool()
+def override_microshift_config(override_config: str) -> str:
+    """Override the Microshift cluster configuration on config.yaml"""
+    config = yaml.safe_load(override_config)
+    # Create a temporary file with the config content
+    import tempfile
+    with tempfile.NamedTemporaryFile(mode='w', suffix='.yaml', delete=False) as temp_file:
+        yaml.dump(config, temp_file, default_flow_style=False)
+        temp_config_path = temp_file.name
+    
+    # Copy the temp file to the remote server and then to the config location
+    _run_command('scp', ['-F', SSH_CONFIG_FILE, temp_config_path, f'{SSH_USER}@{SSH_IP_ADDR}:/tmp/config.yaml'])
+    result = _run_ssh_command(['sudo', 'cp', '/tmp/config.yaml', '/etc/microshift/config.yaml'])
+    
+    # Clean up the temporary file
+    os.unlink(temp_config_path)
+
+    final_config = _run_ssh_command(['sudo', 'cat', '/etc/microshift/config.yaml'])
+    return f"{final_config}"
 
 # Private functions
-async def _run_oc_command(command: str) -> str:
+def _run_oc_command(command: list[str]) -> str:
     """Run an oc command on the Microshift cluster"""
-    return await _run_command('oc', [f'--kubeconfig={KUBECONFIG_PATH}', command])
+    return _run_command('oc', [f'--kubeconfig={KUBECONFIG_PATH}', *command])
 
-async def _run_ssh_command(command: str) -> str:
+def _run_ssh_command(command: list[str]) -> str:
     """Run a command on the remote server"""
-    return await _run_command('ssh', ['-F', f'{SSH_CONFIG_FILE}', f'{SSH_USER}@{SSH_IP_ADDR}', command])
+    return _run_command('ssh', ['-F', f'{SSH_CONFIG_FILE}', f'{SSH_USER}@{SSH_IP_ADDR}', *command])
 
-async def _run_command(command: str, args: list[str]) -> str:
+def _run_command(command: str, args: list[str]) -> str:
     """Run a command"""
     try:
         result = subprocess.run([
@@ -48,7 +88,7 @@ async def _run_command(command: str, args: list[str]) -> str:
         if result.returncode == 0:
             return f"command output:\n{result.stdout}"
         else:
-            return f"command output:\n{result.stderr}"
+            return f"Failed to execute command: :\n{result.stderr}"
 
     except subprocess.TimeoutExpired:
         return "command timed out"

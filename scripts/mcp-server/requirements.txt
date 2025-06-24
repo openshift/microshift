@@ -1,2 +1,5 @@
 httpx>=0.28.1
 mcp[cli]>=1.9.4
+
+agno
+google-genai
