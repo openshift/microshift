@@ -1,0 +1,199 @@
+- api embedded-component 91245a26b8a831607d981b2a478644d08da6fa1c to a8cbc218cd2ce740bad87e5e16d92ef598f19107
+  - 71716254 2025-06-19T09:26:55-04:00 features: Lift feature gate for PIS
+  - 9b95e85e 2025-06-18T10:46:01-04:00 Adding feature gate for image mode status reporting
+  - 942a21bf 2025-06-17T17:23:19-04:00 make update
+  - 555d7528 2025-06-17T17:22:57-04:00 NO-JIRA: Fix typos in the doc about clusterversion.spec.channel
+  - 00034b10 2025-06-16T13:35:24-04:00 Upgrade ClusterImagePolicy and ImagePolicy to v1
+  - a65e80be 2025-06-11T13:19:36+01:00 Enable MutatingAdmissionPolicy in tech preview
+  - f5a5920b 2025-06-11T11:00:40+02:00 OCM config: Remove obsolete fields
+  - 2d9ca3e5 2025-06-09T10:46:23-04:00 remove NodeDisruptionPolicy feature gate
+  - c3a69ded 2025-06-06T15:56:50-04:00 promote MachineConfigNode feature gate to default
+  - c6e2d733 2025-06-06T10:03:15-04:00 authentication: oidc: make username claim mapping required
+  - 183d7c65 2025-06-06T18:37:39+08:00 Update Dockerfile.ocp
+  - 8d996d52 2025-06-06T09:19:49+08:00 Update Dockerfile.ocp
+  - 72dedcf0 2025-06-06T09:18:58+08:00 Delete manifests directory
+  - 5a9ea321 2025-06-04T09:57:40-04:00 add fg for azure boot image updates & skew mgmt
+  - 4c65cf1e 2025-06-03T16:39:42-03:00 SPLAT-2137: FG for Service Type LB NLB with Security Group
+  - 6ff8c5bc 2025-05-30T14:25:25Z Lift 4.19 feature gate for RouteAdvertisements
+  - 83157e5f 2025-05-29T17:53:26+02:00 Add max length validation for apiserver namedCertificates
+  - b2a79c2e 2025-05-22T15:39:17+01:00 Remove PrivateHostedZoneAWS feature gate
+
+- cluster-csi-snapshot-controller-operator embedded-component cf99de974354133f853928cff9e19ad19c5347d9 to 8a596ec94c65dbcf667447d6ce16c14416c8497d
+  - 8588645 2025-06-18T16:06:06Z Updating ose-cluster-csi-snapshot-controller-operator-container image to be consistent with ART for 4.20 Reconciling with https://github.com/openshift/ocp-build-data/tree/dfb5c7d531490cfdc61a3b88bc533702b9624997/images/ose-cluster-csi-snapshot-controller-operator.yml
+
+- cluster-ingress-operator embedded-component 21ac32d9862437b5c563540edd721c9cae5f1e8c to be41be00b822b820b03a7190732e3fc983efddf3
+  - 0a96be6 2025-05-22T11:50:08+01:00 Remove PrivateHostedZoneAWS feature gate check
+
+- cluster-kube-apiserver-operator embedded-component 2b7b1f2d934441c88ee96e7ecb7595ce567e297b to 5cc2e26769521c6da40bc41f3838da1f38f063d4
+  - 0bdba4f 2025-06-16T09:32:23-04:00 Stop serving admissionregistration.k8s.io/v1beta1.
+  - 1e716fd 2025-06-13T09:14:44+08:00 remove unused yaml
+  - cc485c3 2025-06-10T11:20:33+01:00 Enable MutatingAdmissionPolicy group version
+  - f3f25d4 2025-06-06T13:50:17+02:00 bindata/config: remove RoleBindingRestriction related plugins from the default config
+  - 2e71784 2025-06-06T13:50:17+02:00 targetconfigcontroller: add special merges for admission plugins
+  - a62af2f 2025-06-05T16:53:32+02:00 configobservation/apiserver: add config observer for admission plugins
+
+- cluster-network-operator embedded-component fca1273844fb1b968d109f7ca7c3d5e96f234179 to 0a42f1a1e52724ecdd37755c9babed9eb5146deb
+  - acdd043 2025-06-18T14:03:36+02:00 FRRK8s webhook: webhook liveness / readiness from metrics to webhook
+  - 5bb6872 2025-06-18T09:23:39+08:00 cleanup unsed clusterrolebinding default-account-cluster-network-operator
+  - 4f947e4 2025-06-09T11:00:36+02:00 Run update-codegen
+  - 8b6d1df 2025-06-09T10:58:19+02:00 Bump openshift/api to commit where RA was GA-ed
+  - 0dae0a0 2025-06-05T14:45:58Z Validate NAD name and spec only in multus admission controller
+  - ea2c966 2025-06-03T11:17:01+02:00 Issue shorter certificates when ShortRotation featuregate is enabled
+  - 0cf7aec 2025-05-13T09:16:11-04:00 whereabouts-config is a reserved name for user interaction.
+
+- cluster-openshift-controller-manager-operator embedded-component 0a0b2ce5b7217083ecbe09d53bba86cd03d48c3e to 8781f7247e9442428a4b1971b90a9c31fcccdce9
+  - 601b1ef 2025-06-11T15:17:21+02:00 sync: Use more descriptive variable name
+  - 5af7d1d 2025-05-21T17:46:00+02:00 pkg/operator: Split OCM/RCM status conditions
+
+- csi-external-snapshotter embedded-component ac82cafc95b301f67f46ee0db93720d55177a19b to 1b2240dca48840103558b499281effaea072b162
+  - 9ff4f34 2025-06-19T10:05:19Z UPSTREAM: <carry>: Updating ose-csi-snapshot-controller-container image to be consistent with ART for 4.20 Reconciling with https://github.com/openshift/ocp-build-data/tree/dfb5c7d531490cfdc61a3b88bc533702b9624997/images/ose-csi-snapshot-controller.yml
+  - fc1dc99 2025-06-18T00:02:02Z UPSTREAM: <carry>: Updating ose-csi-external-snapshotter-container image to be consistent with ART for 4.20 Reconciling with https://github.com/openshift/ocp-build-data/tree/dfb5c7d531490cfdc61a3b88bc533702b9624997/images/ose-csi-external-snapshotter.yml
+
+- kubernetes embedded-component 886f7c90e4bd137f91ebfb7d0cb55d476e719643 to d92880b14300b76b867a83ec887e280a5b77b52e
+  - 4ca508f36 2025-06-10T11:25:31-04:00 UPSTREAM: <carry>: Fix up kube test suite definitions for OTE
+  - 123a75071 2025-06-09T19:10:20-04:00 UPSTREAM: <carry>: Revert "TRT-2068: Reintroduce removal of non-suite annotation rules, and fix topology selector"
+  - 9e85f53ce 2025-06-09T19:10:05-04:00 UPSTREAM: <carry>: Revert "UPSTREAM: <carry>: Revert "Revert "remove annotation rules that don't relate to suites"""
+  - 63c212134 2025-06-03T14:50:41-04:00 UPSTREAM: 132035: e2e: fix userns test
+  - e47629fc3 2025-06-02T10:54:32-04:00 UPSTREAM: <carry>: align Single Replica environment selector topology name with the value origin will pass
+  - 0e92aa414 2025-06-02T10:53:22-04:00 UPSTREAM: <carry>: Revert "Revert "remove annotation rules that don't relate to suites""
+  - aab1bb062 2025-05-29T14:09:03-04:00 UPSTREAM: <carry>: openshift-hack: enable userns e2e tests
+
+- kubernetes-kube-storage-version-migrator embedded-component 4c521b09f4dc55ac69234419e083f3815646f4a9 to 2b36e46ab36a5a7581c9ed763e0a7646f90b94e7
+  - be69609 2025-06-05T12:59:09-04:00 Fix verify job failure with build-machinery bump
+  - 88c7c82 2025-06-04T15:54:40-04:00 append .0 to go.mod version
+
+- machine-config-operator embedded-component af994c8fc8299d78780e90eaba09b20a2ce08983 to a4ec776a829dbb473a2091180a0e9537a6721a9e
+  - 97cecaed 2025-06-17T14:07:37-05:00 unify update paths for non-OCL and OCL and avoid reboots by recreating and reusing MOSB's with updated rendered spec
+  - c5e9ab0d 2025-06-13T08:54:48-04:00 daemon: improve extension mgmt using rpm-ostree
+  - 99bee800 2025-06-11T17:03:21+02:00 Add Jetbrains IDEs files to .gitignore
+  - 3b58bc2a 2025-06-05T15:09:13-04:00 Ensure the build controller restarts on upgrade
+  - 46938653 2025-06-02T15:53:53-04:00 remove FeatureGateNodeDisruptionPolicy refs
+  - 10f431d8 2025-05-13T13:52:02-04:00 Do not set cpu system reserve below the default value
+  - d1488e02 2025-04-10T12:23:48+02:00 Remove trailing dot from hostname
+
+- openshift-controller-manager embedded-component 597799c02ce53c7294f557d21fc1a1e6407f9e62 to 42665fbed9780635a01d0205bf6ab1892f2da96b
+  - 1da3ef8 2025-06-13T11:05:29+02:00 go mod vendor
+  - c6ef409 2025-06-13T11:05:29+02:00 cmd: Refactor to use NewControllerCommand
+  - 50d04e3 2025-06-03T12:08:54-04:00 Make the pull secrets volume mounts in build containers read-only.
+
+- operator-framework-olm embedded-component ebcdb8fb1eb274adbd248fc1f47d56b859c9fe8d to d5a91adaeab7e45176928f057a9913830564c323
+  - f36c9d9a 2025-06-13T00:04:09Z Set ImagePullPolicy ifNotPresent for server container (#3599)
+  - ceebe45b 2025-06-11T00:05:22Z :seedling: Bump golang.org/x/time from 0.11.0 to 0.12.0 (#3595)
+  - f052e7dd 2025-06-11T00:04:21Z :seedling: Bump golang.org/x/net from 0.40.0 to 0.41.0 (#3596)
+  - 573ee883 2025-06-11T00:04:03Z :seedling: Bump github.com/go-logr/logr from 1.4.2 to 1.4.3 (#3590)
+  - d4c0bee6 2025-06-10T00:04:48Z operatorgroup: ensure clusterroleselectors in clusterrole aggregation rules are sorted (#3593)
+  - 9a83545f 2025-06-10T00:03:45Z Allow override of go-verdiff result via label (#3592)
+  - 6547a9c3 2025-06-10T00:03:29Z reduce cache expiriry frequency (#3591)
+  - 852c85fa 2025-06-03T00:03:46Z only create cachedir if requested, since otherwise opm will error out serving it (#3589)
+
+- oc image-amd64 49459b55564a51d3edf64da16d836bd25e0f9917 to 3c2c13b30c04c481423b1798e113596bf3fec279
+  - d93b7a24 2025-06-19T19:15:36+02:00 deps: Upgrade openshift/build-machinery-go
+  - f1967b03 2025-06-19T19:14:36+02:00 Fix go vet issues
+  - 1a7922b7 2025-06-19T11:02:59+02:00 Update to go 1.24 and OCP 4.20
+  - 9e345093 2025-06-18T17:02:20+03:00 Revert "OCPBUGS-56691: Rely on overall available disk space of the mounted volume"
+  - 96d7d7bd 2025-06-11T15:53:28+02:00 image: Remove support for schema1
+  - 59f624ee 2025-06-04T13:06:36-07:00 pkg/cli/admin/upgrade/recommend: Add a --quiet option
+  - d3fe7890 2025-06-04T13:36:45+02:00 oc image serve: Remove as deprecated
+  - 2d7e0042 2025-06-03T10:48:29-07:00 pkg/cli/admin/upgrade/recommend: New, feature-gated --accept [1] is suggesting ClusterVersion API changes to make it easier for cluster administrators to manage many clusters and updates vs. a more limited set of update issues.  One example scenario:
+  - 1e410d6a 2025-05-28T11:55:48+03:00 Increase default volume-percentage value to 50%
+  - 027f4a81 2025-05-28T09:54:30+03:00 Use control-plane in node selector instead of deprecated master
+  - b910bb6f 2025-05-28T09:51:49+03:00 Rely on overall available disk space of the mounted volume
+
+- coredns image-amd64 7a1451db77a68161d58af9b6ca2c9388d578310a to a69279e3393b269099dcaae967570741d4c5e469
+  - b184ecd 2025-06-04T15:55:42-04:00 append .0 to go.mod version
+
+- csi-external-snapshotter image-amd64 ac82cafc95b301f67f46ee0db93720d55177a19b to 1b2240dca48840103558b499281effaea072b162
+  - 9ff4f34 2025-06-19T10:05:19Z UPSTREAM: <carry>: Updating ose-csi-snapshot-controller-container image to be consistent with ART for 4.20 Reconciling with https://github.com/openshift/ocp-build-data/tree/dfb5c7d531490cfdc61a3b88bc533702b9624997/images/ose-csi-snapshot-controller.yml
+  - fc1dc99 2025-06-18T00:02:02Z UPSTREAM: <carry>: Updating ose-csi-external-snapshotter-container image to be consistent with ART for 4.20 Reconciling with https://github.com/openshift/ocp-build-data/tree/dfb5c7d531490cfdc61a3b88bc533702b9624997/images/ose-csi-external-snapshotter.yml
+
+- ovn-kubernetes image-amd64 80ebd7a2be100ceaec14eb3375efb0eb0083b318 to 31d2803e5f38207bf2137ba2ec15a95cee1d0802
+  - 5308cbf6 2025-06-10T11:33:44-04:00 CreateDefaultRouteToExternal should use node GR IP annotations
+  - a0083457 2025-06-10T11:33:44-04:00 L2 and L3 UDN should reconfigure reroute policies when join IP changes
+  - bf5b8d41 2025-06-10T11:33:44-04:00 Stop calling CreateDefaultRouteToExternal for UDNs by default
+  - 188309de 2025-06-10T11:33:44-04:00 Perf optimization: Stop every node event from triggering EIP Node update
+  - cb326569 2025-06-10T14:28:08+01:00 chore: update footer with new LF trademark disclaimer
+  - 182ba9c2 2025-06-10T13:31:31+03:00 Unit tests for node ingress snat exclude annotation
+  - 70777652 2025-06-10T13:31:31+03:00 Configure mgmtport-no-snat-subnets sets elements
+  - 9554ba6e 2025-06-10T13:31:31+03:00 Add dontSNAT subnets rules to mgmtport-snat
+  - f84d3f34 2025-06-09T11:06:09Z Fix HO test flake
+  - 90b88fab 2025-06-09T11:06:09Z Run almost all control plane tests in BGP lanes
+  - 19f39c2c 2025-06-09T11:06:09Z Change BGP e2e lane config
+  - b5bc88df 2025-06-09T11:06:09Z Bump priority of egress ClusterIP traffic drop
+  - 575f3c01 2025-06-09T11:06:09Z Align e2e test timeouts
+  - 399915a6 2025-06-08T18:17:24Z workflow: Add fix missing and apt update before trying to install VRF module
+  - 4fa8bf00 2025-06-04T12:07:52+02:00 udn: Fix NAD template for join subnets field
+  - 98518eaa 2025-06-03T16:15:05-04:00 Minor improvement to route add for remote zone nodes
+  - edc159d0 2025-06-03T16:13:18-04:00 Optimize ic handler a little for UDN
+  - b56df725 2025-06-03T13:34:03-04:00 Some quality of life improvements for layer 3 controllers node handling
+  - 2b812dd7 2025-05-29T20:49:58-04:00 Change NeedsNodeAllocation to a positive check
+  - 81ab5952 2025-05-29T18:32:42-04:00 Fix node update check for network cluster controller
+  - 8cf444c9 2025-05-29T14:36:51-04:00 Removes as much kubeclient Get methods as possible
+  - 7a30735f 2025-05-28T12:30:20-04:00 Use watchFactory instead of kclient for gateway snat cleanup
+  - d31d1717 2025-05-21T19:43:06-04:00 Configures ephemeral port range for OVN SNAT'ing
+  - 3d104e66 2025-05-20T16:06:34-04:00 Retry all pods smarter
+
+- kubernetes image-amd64 886f7c90e4bd137f91ebfb7d0cb55d476e719643 to d92880b14300b76b867a83ec887e280a5b77b52e
+  - 4ca508f36 2025-06-10T11:25:31-04:00 UPSTREAM: <carry>: Fix up kube test suite definitions for OTE
+  - 123a75071 2025-06-09T19:10:20-04:00 UPSTREAM: <carry>: Revert "TRT-2068: Reintroduce removal of non-suite annotation rules, and fix topology selector"
+  - 9e85f53ce 2025-06-09T19:10:05-04:00 UPSTREAM: <carry>: Revert "UPSTREAM: <carry>: Revert "Revert "remove annotation rules that don't relate to suites"""
+  - 63c212134 2025-06-03T14:50:41-04:00 UPSTREAM: 132035: e2e: fix userns test
+  - e47629fc3 2025-06-02T10:54:32-04:00 UPSTREAM: <carry>: align Single Replica environment selector topology name with the value origin will pass
+  - 0e92aa414 2025-06-02T10:53:22-04:00 UPSTREAM: <carry>: Revert "Revert "remove annotation rules that don't relate to suites""
+  - aab1bb062 2025-05-29T14:09:03-04:00 UPSTREAM: <carry>: openshift-hack: enable userns e2e tests
+
+- oc image-arm64 49459b55564a51d3edf64da16d836bd25e0f9917 to d6d8c4b4cbae0c73d2a3f78568136a494cac16a4
+  - 09f1645b 2025-06-20T15:03:54-04:00 OCPBUGS-55048: Return error in case of error
+  - d93b7a24 2025-06-19T19:15:36+02:00 deps: Upgrade openshift/build-machinery-go
+  - f1967b03 2025-06-19T19:14:36+02:00 Fix go vet issues
+  - 1a7922b7 2025-06-19T11:02:59+02:00 Update to go 1.24 and OCP 4.20
+  - 9e345093 2025-06-18T17:02:20+03:00 Revert "OCPBUGS-56691: Rely on overall available disk space of the mounted volume"
+  - 96d7d7bd 2025-06-11T15:53:28+02:00 image: Remove support for schema1
+  - 59f624ee 2025-06-04T13:06:36-07:00 pkg/cli/admin/upgrade/recommend: Add a --quiet option
+  - d3fe7890 2025-06-04T13:36:45+02:00 oc image serve: Remove as deprecated
+  - 2d7e0042 2025-06-03T10:48:29-07:00 pkg/cli/admin/upgrade/recommend: New, feature-gated --accept [1] is suggesting ClusterVersion API changes to make it easier for cluster administrators to manage many clusters and updates vs. a more limited set of update issues.  One example scenario:
+  - 1e410d6a 2025-05-28T11:55:48+03:00 Increase default volume-percentage value to 50%
+  - 027f4a81 2025-05-28T09:54:30+03:00 Use control-plane in node selector instead of deprecated master
+  - b910bb6f 2025-05-28T09:51:49+03:00 Rely on overall available disk space of the mounted volume
+
+- coredns image-arm64 7a1451db77a68161d58af9b6ca2c9388d578310a to a69279e3393b269099dcaae967570741d4c5e469
+  - b184ecd 2025-06-04T15:55:42-04:00 append .0 to go.mod version
+
+- csi-external-snapshotter image-arm64 ac82cafc95b301f67f46ee0db93720d55177a19b to 1b2240dca48840103558b499281effaea072b162
+  - 9ff4f34 2025-06-19T10:05:19Z UPSTREAM: <carry>: Updating ose-csi-snapshot-controller-container image to be consistent with ART for 4.20 Reconciling with https://github.com/openshift/ocp-build-data/tree/dfb5c7d531490cfdc61a3b88bc533702b9624997/images/ose-csi-snapshot-controller.yml
+  - fc1dc99 2025-06-18T00:02:02Z UPSTREAM: <carry>: Updating ose-csi-external-snapshotter-container image to be consistent with ART for 4.20 Reconciling with https://github.com/openshift/ocp-build-data/tree/dfb5c7d531490cfdc61a3b88bc533702b9624997/images/ose-csi-external-snapshotter.yml
+
+- ovn-kubernetes image-arm64 80ebd7a2be100ceaec14eb3375efb0eb0083b318 to 31d2803e5f38207bf2137ba2ec15a95cee1d0802
+  - 5308cbf6 2025-06-10T11:33:44-04:00 CreateDefaultRouteToExternal should use node GR IP annotations
+  - a0083457 2025-06-10T11:33:44-04:00 L2 and L3 UDN should reconfigure reroute policies when join IP changes
+  - bf5b8d41 2025-06-10T11:33:44-04:00 Stop calling CreateDefaultRouteToExternal for UDNs by default
+  - 188309de 2025-06-10T11:33:44-04:00 Perf optimization: Stop every node event from triggering EIP Node update
+  - cb326569 2025-06-10T14:28:08+01:00 chore: update footer with new LF trademark disclaimer
+  - 182ba9c2 2025-06-10T13:31:31+03:00 Unit tests for node ingress snat exclude annotation
+  - 70777652 2025-06-10T13:31:31+03:00 Configure mgmtport-no-snat-subnets sets elements
+  - 9554ba6e 2025-06-10T13:31:31+03:00 Add dontSNAT subnets rules to mgmtport-snat
+  - f84d3f34 2025-06-09T11:06:09Z Fix HO test flake
+  - 90b88fab 2025-06-09T11:06:09Z Run almost all control plane tests in BGP lanes
+  - 19f39c2c 2025-06-09T11:06:09Z Change BGP e2e lane config
+  - b5bc88df 2025-06-09T11:06:09Z Bump priority of egress ClusterIP traffic drop
+  - 575f3c01 2025-06-09T11:06:09Z Align e2e test timeouts
+  - 399915a6 2025-06-08T18:17:24Z workflow: Add fix missing and apt update before trying to install VRF module
+  - 4fa8bf00 2025-06-04T12:07:52+02:00 udn: Fix NAD template for join subnets field
+  - 98518eaa 2025-06-03T16:15:05-04:00 Minor improvement to route add for remote zone nodes
+  - edc159d0 2025-06-03T16:13:18-04:00 Optimize ic handler a little for UDN
+  - b56df725 2025-06-03T13:34:03-04:00 Some quality of life improvements for layer 3 controllers node handling
+  - 2b812dd7 2025-05-29T20:49:58-04:00 Change NeedsNodeAllocation to a positive check
+  - 81ab5952 2025-05-29T18:32:42-04:00 Fix node update check for network cluster controller
+  - 8cf444c9 2025-05-29T14:36:51-04:00 Removes as much kubeclient Get methods as possible
+  - 7a30735f 2025-05-28T12:30:20-04:00 Use watchFactory instead of kclient for gateway snat cleanup
+  - d31d1717 2025-05-21T19:43:06-04:00 Configures ephemeral port range for OVN SNAT'ing
+  - 3d104e66 2025-05-20T16:06:34-04:00 Retry all pods smarter
+
+- kubernetes image-arm64 886f7c90e4bd137f91ebfb7d0cb55d476e719643 to d92880b14300b76b867a83ec887e280a5b77b52e
+  - 4ca508f36 2025-06-10T11:25:31-04:00 UPSTREAM: <carry>: Fix up kube test suite definitions for OTE
+  - 123a75071 2025-06-09T19:10:20-04:00 UPSTREAM: <carry>: Revert "TRT-2068: Reintroduce removal of non-suite annotation rules, and fix topology selector"
+  - 9e85f53ce 2025-06-09T19:10:05-04:00 UPSTREAM: <carry>: Revert "UPSTREAM: <carry>: Revert "Revert "remove annotation rules that don't relate to suites"""
+  - 63c212134 2025-06-03T14:50:41-04:00 UPSTREAM: 132035: e2e: fix userns test
+  - e47629fc3 2025-06-02T10:54:32-04:00 UPSTREAM: <carry>: align Single Replica environment selector topology name with the value origin will pass
+  - 0e92aa414 2025-06-02T10:53:22-04:00 UPSTREAM: <carry>: Revert "Revert "remove annotation rules that don't relate to suites""
+  - aab1bb062 2025-05-29T14:09:03-04:00 UPSTREAM: <carry>: openshift-hack: enable userns e2e tests
+
