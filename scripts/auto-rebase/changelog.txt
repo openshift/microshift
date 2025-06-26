@@ -1,17 +1,13 @@
-- kubernetes embedded-component db4023c383e559c6310710cd16a441912fc9c06f to 84b31a33f3dd1a585589e8031ab29b0ed9276518
-  - c9d88fc68 2025-06-13T10:57:18-03:00 UPSTREAM: <carry>: Bump cadvisor version to fix container_fs metrics
+- cluster-network-operator embedded-component bf1d73069e4905749e2f15f88aa1e7590d489baf to 90a296e513cdad4d1708fee1d1975de0baf3d777
+  - 32af001 2025-06-10T13:45:10-04:00 Add cert-rotation script into cno
 
-- ovn-kubernetes image-amd64 b5e32a0f733ccdc59ce0012d768dc3edb6caf013 to aeea3396792eb20e7caa8e7f67d19a1be7889512
-  - 812a0ca3 2025-06-19T11:57:24+00:00 Increase InformerSyncTimeout to 60s
-  - 13fb9bf5 2025-06-19T11:56:27+00:00 Fix hybrid overlay node subnets collision with cluster subnets
+- machine-config-operator embedded-component efe259e04ba98784102ba603941ecbbb75233c6b to 74df36f0fd48147136a4fe5ed77685f588f05930
+  - 89439158 2025-06-20T13:21:36-04:00 daemon: update desired config version in MCN spec on OCL update
+  - 52db96b7 2025-06-20T13:41:21+00:00 controller: use OCL specific informer factory
 
-- kubernetes image-amd64 db4023c383e559c6310710cd16a441912fc9c06f to 84b31a33f3dd1a585589e8031ab29b0ed9276518
-  - c9d88fc68 2025-06-13T10:57:18-03:00 UPSTREAM: <carry>: Bump cadvisor version to fix container_fs metrics
+- oc image-amd64 903a973ce8f8b4509b5158b95bcebe9209e29761 to 04e91ac526244524a03fbd516d36682462af7566
+  - 282084c9 2025-06-17T08:06:51+00:00 avoid transfering permissions when copying artifacts from node-joiner pod
 
-- ovn-kubernetes image-arm64 b5e32a0f733ccdc59ce0012d768dc3edb6caf013 to aeea3396792eb20e7caa8e7f67d19a1be7889512
-  - 812a0ca3 2025-06-19T11:57:24+00:00 Increase InformerSyncTimeout to 60s
-  - 13fb9bf5 2025-06-19T11:56:27+00:00 Fix hybrid overlay node subnets collision with cluster subnets
-
-- kubernetes image-arm64 db4023c383e559c6310710cd16a441912fc9c06f to 84b31a33f3dd1a585589e8031ab29b0ed9276518
-  - c9d88fc68 2025-06-13T10:57:18-03:00 UPSTREAM: <carry>: Bump cadvisor version to fix container_fs metrics
+- oc image-arm64 903a973ce8f8b4509b5158b95bcebe9209e29761 to 04e91ac526244524a03fbd516d36682462af7566
+  - 282084c9 2025-06-17T08:06:51+00:00 avoid transfering permissions when copying artifacts from node-joiner pod
 
