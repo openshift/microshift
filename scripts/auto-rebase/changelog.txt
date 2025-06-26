@@ -1,7 +1,26 @@
-- api embedded-component ace59d6ad5ceb98ff1d0760da329654f68b39d66 to db4fa2d6cce43c412a816c239a564c6f860218f5
-  - a5c102a 2025-06-10T16:48:07+02:00 Remove Never option from IPsec Encapsulation
-  - 4eb9e00 2025-06-10T16:28:33+02:00 Add encapsulation flag to IPsecConfig struct
+- kubernetes embedded-component 1a087a5f1cd7e495b2433236f92b2dc351b457d3 to a5f4f8936f3df828973cf00299f26bb441a9244b
+  - 31d3dee7c 2025-06-09T06:55:52+00:00 UPSTREAM: 130047: adjusting loopback certificate validity in kube-apiserver
+  - ab024031e 2025-02-26T09:20:11-05:00 UPSTREAM: <carry>: cherry-pick https://github.com/openshift/google-cadvisor/pull/29/ to fix OCPBUGS-48834
 
-- openshift-controller-manager embedded-component 44216d92545ea1bfdef1bb10fc18ccb7c1bfde05 to a1438e643feb6dc992e2c723618b5f4e81bb31c7
-  - b9a5d99 2025-06-16T12:14:27+00:00 Set node-pullsecrets volume to read-only to protect image pull credentials
+- oc image-amd64 0000b3ef257d07f423dfdf9b6d274214d1b0c846 to 8e6159575521884952b083cd2ffdcc07111ad150
+  - 876d400e 2025-06-13T11:50:37+00:00 Use fedora image in unit tests instead of centos
+
+- ovn-kubernetes image-amd64 90e42f21caa95ab5238670ef5bb88c00e19d9052 to b1ade2c724cbe47aa637e16bf2df0bfda1fa165d
+  - b5210698 2025-06-23T08:57:28+00:00 Fix hybrid overlay node subnets collision with cluster subnets
+  - 0b9e5ab9 2025-06-23T08:56:22+00:00 Increase InformerSyncTimeout to 60s
+
+- kubernetes image-amd64 1a087a5f1cd7e495b2433236f92b2dc351b457d3 to a5f4f8936f3df828973cf00299f26bb441a9244b
+  - 31d3dee7c 2025-06-09T06:55:52+00:00 UPSTREAM: 130047: adjusting loopback certificate validity in kube-apiserver
+  - ab024031e 2025-02-26T09:20:11-05:00 UPSTREAM: <carry>: cherry-pick https://github.com/openshift/google-cadvisor/pull/29/ to fix OCPBUGS-48834
+
+- oc image-arm64 0000b3ef257d07f423dfdf9b6d274214d1b0c846 to 8e6159575521884952b083cd2ffdcc07111ad150
+  - 876d400e 2025-06-13T11:50:37+00:00 Use fedora image in unit tests instead of centos
+
+- ovn-kubernetes image-arm64 90e42f21caa95ab5238670ef5bb88c00e19d9052 to b1ade2c724cbe47aa637e16bf2df0bfda1fa165d
+  - b5210698 2025-06-23T08:57:28+00:00 Fix hybrid overlay node subnets collision with cluster subnets
+  - 0b9e5ab9 2025-06-23T08:56:22+00:00 Increase InformerSyncTimeout to 60s
+
+- kubernetes image-arm64 1a087a5f1cd7e495b2433236f92b2dc351b457d3 to a5f4f8936f3df828973cf00299f26bb441a9244b
+  - 31d3dee7c 2025-06-09T06:55:52+00:00 UPSTREAM: 130047: adjusting loopback certificate validity in kube-apiserver
+  - ab024031e 2025-02-26T09:20:11-05:00 UPSTREAM: <carry>: cherry-pick https://github.com/openshift/google-cadvisor/pull/29/ to fix OCPBUGS-48834
 
