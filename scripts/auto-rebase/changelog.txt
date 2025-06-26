@@ -1,3 +1,9 @@
-- openshift-controller-manager embedded-component 87554a1774e48ab8ce44199976f1aeab2902e346 to 18c8021a36cb0963a46ea45313913400404214ad
-  - 5dca2c3 2025-06-17T12:09:18+00:00 Set node-pullsecrets volume to read-only to protect image pull credentials
+- machine-config-operator embedded-component 0964bc8a9f1c8e7d5209cfc3eab4aad9c77549c0 to b07226a887f8dfb5c5f13726f3bb6187843a008a
+  - 9ac7c462 2025-01-10T15:35:42+00:00 OPNET-569: Do not run resolv-prepender from NM dispatcher
+
+- ovn-kubernetes image-amd64 865f9d57750a44267bd1e7f67006b665df708178 to d47da85eece1933f37e4151e0e1123aeccd97ec6
+  - b8efa726 2025-06-23T09:03:15+00:00 Increase InformerSyncTimeout to 60s
+
+- ovn-kubernetes image-arm64 865f9d57750a44267bd1e7f67006b665df708178 to d47da85eece1933f37e4151e0e1123aeccd97ec6
+  - b8efa726 2025-06-23T09:03:15+00:00 Increase InformerSyncTimeout to 60s
 
