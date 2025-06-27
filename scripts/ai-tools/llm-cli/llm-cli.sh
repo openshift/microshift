@@ -7,7 +7,8 @@ ENVDIR="${SCRIPT_DIR}/.venv"
 
 if [ ! -d "${ENVDIR}" ]; then
     echo "Setting up required tools..."
-    python3 -m venv "${ENVDIR}"
+    python3.11 -m venv "${ENVDIR}"
+    "${ENVDIR}/bin/pip3" install --upgrade pip
     "${ENVDIR}/bin/pip3" install --quiet -r "${SCRIPT_DIR}/requirements.txt"
 fi
 

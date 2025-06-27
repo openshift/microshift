@@ -1,6 +1,5 @@
 import os
 import subprocess
-import socket
 from fastmcp import FastMCP
 import yaml
 import tempfile
@@ -14,68 +13,24 @@ SSH_CONFIG_FILE = os.getenv('SSH_CONFIG_FILE')
 KUBECONFIG_PATH = os.getenv('KUBECONFIG_PATH')
 
 
-def _is_local_host() -> bool:
-    """Check if we're running on the same host as MicroShift"""
-    if not SSH_IP_ADDR:
-        return True
-
-    # Check if SSH_IP_ADDR is localhost, 127.0.0.1, or the current machine's IP
-    local_ips = ['localhost', '127.0.0.1', '::1']
-
-    # Add the current machine's hostname and IP addresses
-    try:
-        hostname = socket.gethostname()
-        local_ips.append(hostname)
-        local_ips.extend([ip for ip in socket.gethostbyname_ex(hostname)[2]])
-    except Exception:
-        pass
-
-    # Check if SSH_IP_ADDR matches any local identifier
-    if SSH_IP_ADDR.lower() in [ip.lower() for ip in local_ips]:
-        return True
-
-    # Try to resolve SSH_IP_ADDR and compare with local IPs
-    try:
-        resolved_ip = socket.gethostbyname(SSH_IP_ADDR)
-        if resolved_ip in local_ips:
-            return True
-    except Exception:
-        pass
-
-    return False
-
-
-def _run_local_command(command: list[str]) -> str:
-    """Run a command locally (with sudo if needed)"""
-    return _run_command_direct(command)
-
-
-def _run_ssh_command_smart(command: list[str]) -> str:
-    """Run a command on the MicroShift host, using local execution if possible"""
-    if _is_local_host():
-        return _run_local_command(command)
-    else:
-        return _run_ssh_command(command)
-
-
 # MCP resources
 @mcp.resource(uri='microshift://available_commands')
 def get_microshift_available_commands() -> str:
     """Get the available commands for the Microshift cluster"""
-    return _run_ssh_command_smart(['sudo', 'microshift', 'help'])
+    return _run_command_smart(['sudo', 'microshift', 'help'])
 
 
 # MCP tools
 @mcp.tool()
 def microshift_systemctl_commands(action: str) -> str:
     """Run a systemctl command on the Microshift cluster to get status, start, stop, restart, etc."""
-    return _run_ssh_command_smart(['sudo', 'systemctl', action, 'microshift'])
+    return _run_command_smart(['sudo', 'systemctl', action, 'microshift'])
 
 
 @mcp.tool()
 def get_latest_microshift_service_logs(number_of_lines: int = 100) -> str:
     """Get the latest logs from the Microshift cluster"""
-    return _run_ssh_command_smart(['sudo', 'journalctl', '-u', 'microshift', '-n', f'{number_of_lines}'])
+    return _run_command_smart(['sudo', 'journalctl', '-u', 'microshift', '-n', f'{number_of_lines}'])
 
 
 @mcp.tool()
@@ -90,36 +45,36 @@ def get_pods(namespace: str = 'all') -> str:
 @mcp.tool()
 def run_microshift_commands(action: str) -> str:
     """Run a microshift command on the Microshift cluster"""
-    return _run_ssh_command_smart(['sudo', 'microshift', action])
+    return _run_command_smart(['sudo', 'microshift', action])
 
 
 @mcp.tool()
 def get_default_config_yaml(component: str = 'microshift') -> str:
     """Get the default config.yaml file for microshift, lvmd, lvms, ovn"""
     if component == 'microshift':
-        return _run_ssh_command_smart(['sudo', 'cat', '/etc/microshift/config.yaml.default'])
+        return _run_command_smart(['sudo', 'cat', '/etc/microshift/config.yaml.default'])
     elif component == 'lvmd' or component == 'lvms':
-        return _run_ssh_command_smart(['sudo', 'cat', '/etc/microshift/lvmd.yaml.default'])
+        return _run_command_smart(['sudo', 'cat', '/etc/microshift/lvmd.yaml.default'])
     elif component == 'ovn':
-        return _run_ssh_command_smart(['sudo', 'cat', '/etc/microshift/ovn.yaml.default'])
+        return _run_command_smart(['sudo', 'cat', '/etc/microshift/ovn.yaml.default'])
 
 
 @mcp.tool()
 def get_current_observability_config() -> str:
     """Get the current observability config for the Microshift cluster"""
-    return _run_ssh_command_smart(['sudo', 'cat', '/etc/microshift/observability/opentelemetry-collector.yaml'])
+    return _run_command_smart(['sudo', 'cat', '/etc/microshift/observability/opentelemetry-collector.yaml'])
 
 
 @mcp.tool()
 def get_current_custom_microshift_config() -> str:
     """Get the current custom microshift from /etc/microshift/config.d/*"""
-    return _run_ssh_command_smart(['sudo', 'cat', '/etc/microshift/config.d/*'])
+    return _run_command_smart(['sudo', 'cat', '/etc/microshift/config.d/*'])
 
 
 @mcp.tool()
 def get_current_custom_manifests() -> str:
     """Get the current custom manifests from /etc/microshift/manifests.d/* and /etc/microshift/manifests/*"""
-    return _run_ssh_command_smart(['sudo', 'cat', '/etc/microshift/manifests.d/*', '/etc/microshift/manifests/*'])
+    return _run_command_smart(['sudo', 'cat', '/etc/microshift/manifests.d/*', '/etc/microshift/manifests/*'])
 
 
 @mcp.tool()
@@ -152,7 +107,7 @@ def override_microshift_config(component: str, override_config: str) -> str:
     # Clean up the temporary file
     os.unlink(temp_config_path)
 
-    return _run_ssh_command_smart(['sudo', 'cat', config_file])
+    return _run_command_smart(['sudo', 'cat', config_file])
 
 
 # Private functions
@@ -205,6 +160,27 @@ def _run_ssh_command(command: list[str]) -> str:
         return "command timed out"
     except Exception as e:
         return f"Failed to execute command: {str(e)}"
+
+
+def _is_local_host() -> bool:
+    """Check if we're running on the same host as MicroShift"""
+    if _run_command_direct(['sudo', 'microshift', 'help']):
+        return True
+
+    return False
+
+
+def _run_local_command(command: list[str]) -> str:
+    """Run a command locally (with sudo if needed)"""
+    return _run_command_direct(command)
+
+
+def _run_command_smart(command: list[str]) -> str:
+    """Run a command on the MicroShift host, using local execution if possible"""
+    if _is_local_host():
+        return _run_local_command(command)
+    else:
+        return _run_ssh_command(command)
 
 
 if __name__ == "__main__":
