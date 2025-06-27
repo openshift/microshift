@@ -49,6 +49,12 @@ def run_microshift_commands(action: str) -> str:
 
 
 @mcp.tool()
+def get_microshift_current_config() -> str:
+    """Get the current microshift config"""
+    return _run_command_smart(['sudo', 'microshift', 'show-config'])
+
+
+@mcp.tool()
 def get_default_config_yaml(component: str = 'microshift') -> str:
     """Get the default config.yaml file for microshift, lvmd, lvms, ovn"""
     if component == 'microshift':
@@ -60,19 +66,19 @@ def get_default_config_yaml(component: str = 'microshift') -> str:
 
 
 @mcp.tool()
-def get_current_observability_config() -> str:
+def get_microshift_observability_config() -> str:
     """Get the current observability config for the Microshift cluster"""
     return _run_command_smart(['sudo', 'cat', '/etc/microshift/observability/opentelemetry-collector.yaml'])
 
 
 @mcp.tool()
-def get_current_custom_microshift_config() -> str:
+def get_microshift_custom_config() -> str:
     """Get the current custom microshift from /etc/microshift/config.d/*"""
     return _run_command_smart(['sudo', 'cat', '/etc/microshift/config.d/*'])
 
 
 @mcp.tool()
-def get_current_custom_manifests() -> str:
+def get_microshift_custom_manifests() -> str:
     """Get the current custom manifests from /etc/microshift/manifests.d/* and /etc/microshift/manifests/*"""
     return _run_command_smart(['sudo', 'cat', '/etc/microshift/manifests.d/*', '/etc/microshift/manifests/*'])
 
@@ -164,10 +170,16 @@ def _run_ssh_command(command: list[str]) -> str:
 
 def _is_local_host() -> bool:
     """Check if we're running on the same host as MicroShift"""
-    if _run_command_direct(['sudo', 'microshift', 'help']):
-        return True
-
-    return False
+    try:
+        result = subprocess.run(
+            ['microshift', 'help'],
+            capture_output=True,
+            text=True,
+            timeout=10
+        )
+        return result.returncode == 0
+    except (subprocess.TimeoutExpired, FileNotFoundError, Exception):
+        return False
 
 
 def _run_local_command(command: list[str]) -> str:
