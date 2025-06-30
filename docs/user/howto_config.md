@@ -28,6 +28,10 @@ dns:
     baseDomain: ""
 etcd:
     memoryLimitMB: 0
+genericDevicePlugin:
+    devices:
+    domain: ""
+    status: ""
 ingress:
     accessLogging:
         destination:
@@ -151,6 +155,10 @@ dns:
     baseDomain: example.com
 etcd:
     memoryLimitMB: 0
+genericDevicePlugin:
+    devices:
+    domain: device.microshift.io
+    status: Disabled
 ingress:
     accessLogging:
         destination:

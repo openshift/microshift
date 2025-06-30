@@ -60,6 +60,8 @@ type Config struct {
 	// +kubebuilder:validation:Schemaless
 	Kubelet map[string]any `json:"kubelet"`
 
+	GenericDevicePlugin GenericDevicePlugin `json:"genericDevicePlugin"`
+
 	// Internal-only fields
 	userSettings *Config `json:"-"` // the values read from the config file
 
@@ -181,6 +183,7 @@ func (c *Config) fillDefaults() error {
 	}
 	c.MultiNode.Enabled = false
 	c.Kubelet = nil
+	c.GenericDevicePlugin = genericDevicePluginDefaults()
 	c.Telemetry = telemetryDefaults()
 
 	return nil
@@ -313,6 +316,8 @@ func (c *Config) incorporateUserSettings(u *Config) {
 	if u.Kubelet != nil {
 		c.Kubelet = u.Kubelet
 	}
+
+	u.GenericDevicePlugin.incorporateUserSettings(c)
 
 	if u.Ingress.TuningOptions.HeaderBufferBytes > 0 {
 		c.Ingress.TuningOptions.HeaderBufferBytes = u.Ingress.TuningOptions.HeaderBufferBytes
@@ -630,6 +635,10 @@ func (c *Config) validate() error {
 
 	if err := c.Telemetry.validate(); err != nil {
 		return fmt.Errorf("error validating telemetry: %v", err)
+	}
+
+	if err := c.GenericDevicePlugin.validate(); err != nil {
+		return fmt.Errorf("error validating Generic Device Plugin configuration: %v", err)
 	}
 
 	return nil
