@@ -1,7 +1,0 @@
-- machine-config-operator embedded-component 555364e98951e9e316aaf91d021b61fe17340bda to 00b2e0b1cc83e119995bbbe2ae06665c3d1655d7
-  - df074124 2025-06-11T14:23:22+00:00 OCPBUGS-39222: Do not enable on-prem-resolv-prepender.path for UPI
-  - 21bc3c4e 2024-10-26T05:20:13+00:00 OCPBUGS-43428: Soften haproxy timeout for kubeapi probe
-
-- openshift-controller-manager embedded-component 22078f7ead4547d4727f57931ba6e271af342b92 to 1c76570bb6ca3b55faa0461f085e43097cc06c50
-  - 95ed6eb 2025-06-23T08:45:34+00:00 Set node-pullsecrets volume to read-only to protect image pull credentials
-
