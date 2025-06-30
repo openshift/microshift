@@ -6,11 +6,17 @@ import (
 	"regexp"
 	"strings"
 
-	"k8s.io/klog/v2"
-
 	"github.com/squat/generic-device-plugin/deviceplugin"
 
 	"k8s.io/apimachinery/pkg/util/validation"
+)
+
+const (
+	deviceTypeFmt = "[a-z0-9][-a-z0-9]*[a-z0-9]"
+)
+
+var (
+	deviceTypeRegexp = regexp.MustCompile("^" + deviceTypeFmt + "$")
 )
 
 type GenericDevicePlugin struct {
@@ -32,8 +38,6 @@ type GenericDevicePlugin struct {
 }
 
 func (gdp GenericDevicePlugin) incorporateUserSettings(c *Config) {
-	klog.Info("gdp.incorporateUserSettings")
-
 	if gdp.Status != "" {
 		c.GenericDevicePlugin.Status = gdp.Status
 	}
@@ -45,8 +49,6 @@ func (gdp GenericDevicePlugin) incorporateUserSettings(c *Config) {
 	if len(gdp.Devices) > 0 {
 		c.GenericDevicePlugin.Devices = gdp.Devices
 	}
-
-	klog.Info("gdp.incorporateUserSettings - end")
 }
 
 func (gdp GenericDevicePlugin) validate() error {
@@ -68,9 +70,6 @@ func (gdp GenericDevicePlugin) validate() error {
 	if len(gdp.Devices) == 0 {
 		errs = append(errs, fmt.Errorf("genericDevicePlugin.Devices is empty - at least one device must be specified"))
 	}
-
-	deviceTypeFmt := "[a-z0-9][-a-z0-9]*[a-z0-9]"
-	deviceTypeRegexp := regexp.MustCompile("^" + deviceTypeFmt + "$")
 
 	for _, deviceSpec := range gdp.Devices {
 		if !deviceTypeRegexp.MatchString(strings.TrimSpace(deviceSpec.Name)) {
