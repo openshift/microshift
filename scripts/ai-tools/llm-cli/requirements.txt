@@ -1,3 +1,0 @@
-mcp[cli]==1.9.4
-agno>=1.6.4
-google-genai>=1.22.0
