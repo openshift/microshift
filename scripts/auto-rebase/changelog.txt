@@ -1,7 +1,0 @@
-- machine-config-operator embedded-component 70025364a114fc3067b2e82ce47fdb0149630e4b to 70a5c8efdbb569b47d4752352f8a75c0c4658225
-  - 46132bb4 2025-06-23T12:47:15+00:00 msbic: only update from a known boot image
-  - 15b1072f 2025-06-21T13:44:04+00:00 add MachineConfiguration to related objects
-  - 6748422a 2025-06-18T21:21:27+00:00 Ensure the build controller restarts on upgrade
-  - 896ae43f 2025-06-04T13:39:52+00:00 Adding updated file with correct error message
-  - d55dedf4 2025-05-22T18:39:03+00:00 OCPBUGS-55681: Give keepalived container chroot cap
-
