@@ -185,10 +185,6 @@
                 "items": {
                   "description": "Group represents a set of devices that should be grouped and mounted into a container together as one single meta-device.",
                   "type": "object",
-                  "required": [
-                    "paths",
-                    "usb"
-                  ],
                   "properties": {
                     "count": {
                       "description": "Count specifies how many times this group can be mounted concurrently.\nWhen unspecified, Count defaults to 1.",
@@ -201,8 +197,7 @@
                         "description": "Path represents a file path that should be discovered.",
                         "type": "object",
                         "required": [
-                          "path",
-                          "type"
+                          "path"
                         ],
                         "properties": {
                           "limit": {
