@@ -1,3 +1,67 @@
-- kubernetes image-arm64 62bb9f355bf8568bf1f70b33de574e27e6b446f2 to 02b9b7e65987d5aa4559c318725354713838b5a2
+- api embedded-component a8cbc218cd2ce740bad87e5e16d92ef598f19107 to 41708f6123394c18afbb4bef1bac526f46960769
+  - ef76696b 2025-06-24T21:41:16+05:30 Modify api description for masquerade subnet
+  - ee7fb834 2025-06-24T21:21:44+05:30 Modify api description for join and transit subnets
+  - d681228a 2025-06-20T03:47:44+00:00 Updating ose-cluster-config-api-container image to be consistent with ART for 4.20 Reconciling with https://github.com/openshift/ocp-build-data/tree/8f77fc475c95f9d98c348deb2feb88f5952d7357/images/ose-cluster-config-api.yml
+  - af4c63cf 2025-06-17T13:30:20-04:00 fixup! fix botched rebase
+  - eda0c6af 2025-06-17T09:23:36-04:00 remove rolebindingrestriction CRD from payload
+
+- cluster-csi-snapshot-controller-operator embedded-component 8a596ec94c65dbcf667447d6ce16c14416c8497d to ef2152f52b992addcbe24b402f1ddbf180049d85
+  - ec4a366 2025-06-25T16:15:51-06:00 STOR-2340: Subscribe to Network Policies for csi-snapshot-controller
+
+- cluster-kube-apiserver-operator embedded-component 5cc2e26769521c6da40bc41f3838da1f38f063d4 to aab4c503b665c958a743517f7381692912c1915b
+  - 88aca46 2025-06-26T10:45:08-03:00 Revert "NO-JIRA: Enable watch termination grace period"
+  - c1a309a 2025-06-25T13:13:20+02:00 certregenerationcontroller: start configInformers again
+  - 81ecf24 2025-06-24T14:03:04-04:00 Enable watch termination grace period.
+
+- cluster-kube-controller-manager-operator embedded-component 07401428d6188f3e2209f61dc84602c035721c08 to e9a24940d18e4a1b0f2f8367a4e4a0909b819a2b
+  - 9b47ce4 2025-06-25T12:42:55+02:00 recoverycontroller: fix informers startup
+  - 53764bf 2025-06-21T16:45:42+02:00 Revert "Revert "CNTRLPLANE-343: certrotationcontroller: use minutes instead of days when FeatureShortCertRotation is enabled""
+  - ae48293 2025-06-21T13:37:51+02:00 Revert "CNTRLPLANE-343: certrotationcontroller: use minutes instead of days when FeatureShortCertRotation is enabled"
+  - 50e9fe2 2025-06-20T06:54:01+02:00 certrotationcontroller: use minutes instead of days when FeatureShortCertRotation is enabled
+  - a259355 2025-06-18T09:26:46+02:00 Bump library-go
+
+- cluster-kube-scheduler-operator embedded-component 0d060e4b9cfbe1bdbc5991dde5424161ff44c932 to e68b158bb4c0bf56876b4d09d0344979592c7b3c
+  - fc94308 2025-06-24T17:46:36+02:00 bump(k8s): fitting
+  - d3bf78a 2025-06-24T16:56:47+02:00 bump(go)=1.24.0
+  - 36c0f07 2025-06-20T08:47:54+00:00 Updating ose-cluster-kube-scheduler-operator-container image to be consistent with ART for 4.20 Reconciling with https://github.com/openshift/ocp-build-data/tree/8f77fc475c95f9d98c348deb2feb88f5952d7357/images/ose-cluster-kube-scheduler-operator.yml
+
+- cluster-network-operator embedded-component 0a42f1a1e52724ecdd37755c9babed9eb5146deb to bd863a88a0b2fbd25c51fd967ba4fbe92bf911fd
+  - 5cc28c6 2025-06-26T08:54:12+02:00 FRR-K8s webhook: promote to priviledged
+  - 7056e67 2025-06-25T07:57:23+02:00 FRRK8s CRDs: align to upstream
+  - 0b29885 2025-06-25T07:51:39+02:00 FRRK8s webhook: align to upstream
+
+- kubernetes embedded-component d92880b14300b76b867a83ec887e280a5b77b52e to 02b9b7e65987d5aa4559c318725354713838b5a2
   - 9b547a64e 2025-06-26T09:35:55-03:00 UPSTREAM: 132502: Fix flake caused by invalid detection of active policies in VAP integration tests
+  - 25a5bda9d 2025-06-20T10:56:32-04:00 UPSTREAM: <carry>: Update rebase.sh to handle go versions major.minor.patch instead of just major.minor
+
+- machine-config-operator embedded-component a4ec776a829dbb473a2091180a0e9537a6721a9e to a08d5ec38c4f037766b4114dff5831b1c59a0772
+  - db096c0b 2025-06-27T15:58:37-05:00 Add control-plane label for master nodes on legacy clusters
+  - 32f97677 2025-06-23T10:19:10-06:00 Remove all code related to the Image Registry workaround Config Map
+  - 57cf4385 2025-06-23T16:22:28+02:00 Fix dependencies
+  - a0d42d89 2025-06-23T16:22:28+02:00 Fill test provider with origin info
+  - 26679ccf 2025-06-23T16:22:27+02:00 Cleanup for MVP
+  - 63ba68f3 2025-06-18T13:17:29+02:00 PoC to port the internal MCO test suite
+  - 5e332d5b 2025-06-17T16:22:41-04:00 msbic: only update from a known boot image
+  - 3e5a13a1 2025-06-16T09:48:48-04:00 add MachineConfiguration to related objects
+  - 15e7e5e6 2025-06-04T10:59:35-04:00 OCPBUGS-57072: configure-ovs: don't escape `:` in nmcli output
+  - 84e407b7 2025-05-12T18:07:30+02:00 Improve Ignition conversions handling
+
+- openshift-controller-manager embedded-component 42665fbed9780635a01d0205bf6ab1892f2da96b to bef75e9ea2df7cf2d417299c353da4c360f22d02
+  - eb82c8c 2025-06-20T15:24:06-04:00 OCPBUGS-57918: handle secret not found more gracefully
+
+- operator-framework-olm embedded-component d5a91adaeab7e45176928f057a9913830564c323 to 3b01b7b18a17f38952f7155d719bc7de23f6ff16
+  - 25a49599 2025-06-25T00:04:05+00:00 Upgrade bingo deps (#3601)
+  - a6980f04 2025-06-25T00:03:22+00:00 :seedling: Bump github.com/prometheus/common from 0.64.0 to 0.65.0 (#3604)
+  - bc111a9c 2025-06-25T00:03:03+00:00 :bug: OCPBUGS-37982: Reduce Frequency of Update Requests for Copied CSVs (#3597)
+  - 7b6943d1 2025-06-18T08:12:23+00:00 Updating operator-registry-container image to be consistent with ART for 4.20 Reconciling with https://github.com/openshift/ocp-build-data/tree/dfb5c7d531490cfdc61a3b88bc533702b9624997/images/operator-registry.yml
+  - 1a281510 2025-06-18T03:08:39+00:00 Updating operator-lifecycle-manager-container image to be consistent with ART for 4.20 Reconciling with https://github.com/openshift/ocp-build-data/tree/dfb5c7d531490cfdc61a3b88bc533702b9624997/images/operator-lifecycle-manager.yml
+  - 5a207dee 2025-06-18T00:16:29+00:00 Updating ose-operator-framework-tools-container image to be consistent with ART for 4.20 Reconciling with https://github.com/openshift/ocp-build-data/tree/dfb5c7d531490cfdc61a3b88bc533702b9624997/images/ose-operator-framework-tools.yml
+
+- oc image-amd64 3c2c13b30c04c481423b1798e113596bf3fec279 to ea5c72052233361761ba371b7c39518d443422be
+  - 09f1645b 2025-06-20T15:03:54-04:00 OCPBUGS-55048: Return error in case of error
+  - 305aa891 2025-06-20T01:16:15-04:00 Simplify TarEntryCallback
+
+- kubernetes image-amd64 d92880b14300b76b867a83ec887e280a5b77b52e to 02b9b7e65987d5aa4559c318725354713838b5a2
+  - 9b547a64e 2025-06-26T09:35:55-03:00 UPSTREAM: 132502: Fix flake caused by invalid detection of active policies in VAP integration tests
+  - 25a5bda9d 2025-06-20T10:56:32-04:00 UPSTREAM: <carry>: Update rebase.sh to handle go versions major.minor.patch instead of just major.minor
 
