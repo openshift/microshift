@@ -23,6 +23,8 @@ spec:
         openshift.io/required-scc: restricted-v2
       labels:
         app: csi-snapshot-controller
+        openshift.storage.network-policy.dns: allow
+        openshift.storage.network-policy.api-server: allow
     spec:
       securityContext:
         runAsNonRoot: true
