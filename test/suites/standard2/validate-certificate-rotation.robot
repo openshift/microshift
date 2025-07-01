@@ -60,7 +60,15 @@ Change System Date To
     ${ushift_pid}=    MicroShift Process ID
     Systemctl    stop    chronyd
     Command Should Work    TZ=UTC timedatectl set-time "${future_date}"
+    
+    Sleep    5s
     Wait Until MicroShift Process ID Changes    ${ushift_pid}
+    
+    Wait For Multiple Certificates Regeneration
+    Wait Until Keyword Succeeds    30x    5s
+    ...    Kubeconfig Should Be Updated    ${USHIFT_HOST}
+    Setup Kubeconfig
+    
     Wait For MicroShift
 
 Compute Date After Days
@@ -76,3 +84,40 @@ Certs Should Expire On
     ${expiration_date}=    Command Should Work
     ...    ${OSSL_CMD} ${cert_file} | grep notAfter | cut -f2 -d'=' | awk '{printf ("%s %02d %d",$1,$2,$4)}'
     Should Be Equal As Strings    ${cert_expected_date}    ${expiration_date}
+
+Wait For Multiple Certificates Regeneration
+    [Documentation]    Wait for multiple certificate files to be regenerated and valid
+    
+    @{cert_files}=    Create List
+    ...    /var/lib/microshift/certs/kube-control-plane-signer/kube-scheduler/client.crt
+    ...    /var/lib/microshift/certs/kube-control-plane-signer/kube-controller-manager/client.crt
+    ...    /var/lib/microshift/certs/admin-kubeconfig-signer/admin-kubeconfig-client/client.crt
+    FOR    ${cert_file}    IN    @{cert_files}
+        Wait Until Keyword Succeeds    30x    5s
+        ...    Certificate Should Be Valid For Current Time    ${cert_file}
+    END
+
+Certificate Should Be Valid For Current Time
+    [Documentation]    Verify that certificate is valid for the current system time
+    [Arguments]    ${cert_file}
+    
+    ${cert_not_before}=    Command Should Work
+    ...    ${OSSL_CMD} ${cert_file} | grep notBefore | cut -f2 -d'=' | xargs -I {} date -d "{}" +%s
+    ${current_time}=    Command Should Work    date +%s
+    Should Be True    ${cert_not_before} <= ${current_time}
+    ...    msg=Certificate NotBefore (${cert_not_before}) is after current time (${current_time})
+
+Kubeconfig Should Be Updated
+    [Documentation]    Verify that kubeconfig contains valid certificates for current time
+    [Arguments]    ${host}
+    
+    ${kubeconfig}=    Get Kubeconfig    ${host}
+    ${cert_data}=    Command Should Work
+    ...    echo '${kubeconfig}' | grep client-certificate-data | cut -d: -f2 | tr -d ' ' | base64 -d | openssl x509 -noout -dates
+    ${cert_not_before}=    Command Should Work
+    ...    echo '${cert_data}' | grep notBefore | cut -f2 -d'=' | xargs -I {} date -d "{}" +%s
+    
+    ${current_time}=    Command Should Work    date +%s
+
+    Should Be True    ${cert_not_before} <= ${current_time}
+    ...    msg=Kubeconfig client certificate NotBefore (${cert_not_before}) is after current time (${current_time})
