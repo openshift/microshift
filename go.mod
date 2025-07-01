@@ -35,7 +35,6 @@ require (
 	github.com/gogo/protobuf v1.3.2
 	github.com/golang/snappy v0.0.4
 	github.com/openshift/route-controller-manager v0.0.0-20241218160919-bc97534a12a7
-	github.com/prometheus/client_golang v1.21.0-rc.0
 	github.com/prometheus/client_model v0.6.1
 	github.com/prometheus/common v0.62.0
 	github.com/prometheus/prometheus v0.302.1
@@ -51,6 +50,7 @@ require (
 	k8s.io/component-base v1.32.5
 	k8s.io/kube-aggregator v1.32.5
 	k8s.io/kubectl v1.32.5
+	k8s.io/kubelet v1.32.5
 	k8s.io/utils v0.0.0-20241210054802-24370beab758
 	sigs.k8s.io/kube-storage-version-migrator v0.0.6-0.20230721195810-5c8923c5ff96
 	sigs.k8s.io/kustomize/api v0.18.0
@@ -130,6 +130,7 @@ require (
 	github.com/openshift/apiserver-library-go v0.0.0-20250127121756-dc9a973f14ce // indirect
 	github.com/peterbourgon/diskv v2.0.1+incompatible // indirect
 	github.com/pquerna/cachecontrol v0.1.0 // indirect
+	github.com/prometheus/client_golang v1.21.0-rc.0 // indirect
 	github.com/prometheus/procfs v0.15.1 // indirect
 	github.com/robfig/cron v1.2.0 // indirect
 	github.com/robfig/cron/v3 v3.0.1 // indirect
@@ -171,7 +172,6 @@ require (
 	k8s.io/kms v1.32.5 // indirect
 	k8s.io/kube-controller-manager v1.32.5 // indirect
 	k8s.io/kube-scheduler v1.32.5 // indirect
-	k8s.io/kubelet v1.32.5 // indirect
 	k8s.io/metrics v1.32.5 // indirect
 	k8s.io/mount-utils v1.32.5 // indirect
 	k8s.io/pod-security-admission v1.32.5 // indirect
