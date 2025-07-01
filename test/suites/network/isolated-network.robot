@@ -63,7 +63,7 @@ Teardown
 Verify No Internet Access
     [Documentation]    Verifies that Internet is not accessible
     ${rc}=    Execute Command
-    ...    curl -I redhat.com quay.io registry.redhat.io
+    ...    curl -I --connect-timeout 60 --max-time 60 redhat.com quay.io registry.redhat.io
     ...    return_stdout=False    return_stderr=False    return_rc=True
     Should Not Be Equal As Integers    ${rc}    0
 
@@ -83,7 +83,7 @@ Verify No Registry Access
     # Note that it is important to try accessing the image by digest because the
     # mirror registry may be configured with 'mirror-by-digest-only=true' option.
     ${stdout}    ${stderr}    ${rc}=    Execute Command
-    ...    skopeo copy docker://${imageref} containers-storage:copy-should-fail
+    ...    skopeo --command-timeout 60s copy docker://${imageref} containers-storage:copy-should-fail
     ...    return_stdout=True    return_stderr=True    return_rc=True
     Should Not Be Equal As Integers    ${rc}    0
 
