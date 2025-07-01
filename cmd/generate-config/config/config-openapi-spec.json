@@ -169,7 +169,105 @@
       ],
       "properties": {
         "devices": {
-          "description": "Devices configuration"
+          "description": "Devices configuration",
+          "type": "array",
+          "items": {
+            "description": "DeviceSpec defines a device that should be discovered and scheduled.\nDeviceSpec allows multiple host devices to be selected and scheduled fungibly under the same name.\nFurthermore, host devices can be composed into groups of device nodes that should be scheduled\nas an atomic unit.",
+            "type": "object",
+            "required": [
+              "groups",
+              "name"
+            ],
+            "properties": {
+              "groups": {
+                "description": "Groups is a list of groups of devices that should be scheduled under the same name.",
+                "type": "array",
+                "items": {
+                  "description": "Group represents a set of devices that should be grouped and mounted into a container together as one single meta-device.",
+                  "type": "object",
+                  "required": [
+                    "paths",
+                    "usb"
+                  ],
+                  "properties": {
+                    "count": {
+                      "description": "Count specifies how many times this group can be mounted concurrently.\nWhen unspecified, Count defaults to 1.",
+                      "type": "integer"
+                    },
+                    "paths": {
+                      "description": "Paths is the list of devices of which the device group consists.\nPaths can be globs, in which case each device matched by the path will be schedulable `Count` times.\nWhen the paths have differing cardinalities, that is, the globs match different numbers of devices,\nthe cardinality of each path is capped at the lowest cardinality.",
+                      "type": "array",
+                      "items": {
+                        "description": "Path represents a file path that should be discovered.",
+                        "type": "object",
+                        "required": [
+                          "path",
+                          "type"
+                        ],
+                        "properties": {
+                          "limit": {
+                            "description": "Limit specifies up to how many times this device can be used in the group concurrently when other devices\nin the group yield more matches.\nFor example, if one path in the group matches 5 devices and another matches 1 device but has a limit of 10,\nthen the group will provide 5 pairs of devices.\nWhen unspecified, Limit defaults to 1.",
+                            "type": "integer"
+                          },
+                          "mountPath": {
+                            "description": "MountPath is the file path at which the host device should be mounted within the container.\nWhen unspecified, MountPath defaults to the Path.",
+                            "type": "string"
+                          },
+                          "path": {
+                            "description": "Path is the file path of a device in the host.",
+                            "type": "string"
+                          },
+                          "permissions": {
+                            "description": "Permissions is the file-system permissions given to the mounted device.\nPermissions apply only to mounts of type `Device`.\nThis can be one or more of:\n* r - allows the container to read from the specified device.\n* w - allows the container to write to the specified device.\n* m - allows the container to create device files that do not yet exist.\nWhen unspecified, Permissions defaults to mrw.",
+                            "type": "string"
+                          },
+                          "readOnly": {
+                            "description": "ReadOnly specifies whether the path should be mounted read-only.\nReadOnly applies only to mounts of type `Mount`.",
+                            "type": "boolean"
+                          },
+                          "type": {
+                            "description": "Type describes what type of file-system node this Path represents and thus how it should be mounted.\nWhen unspecified, Type defaults to Device.",
+                            "type": "string"
+                          }
+                        }
+                      }
+                    },
+                    "usb": {
+                      "description": "USBSpecs is the list of USB specifications that this device group consists of.",
+                      "type": "array",
+                      "items": {
+                        "description": "USBSpec represents a USB device specification that should be discovered.\nA USB device must match exactly on all the given attributes to pass.",
+                        "type": "object",
+                        "required": [
+                          "product",
+                          "serial",
+                          "vendor"
+                        ],
+                        "properties": {
+                          "product": {
+                            "description": "Product is the USB Product ID of the device to match on.",
+                            "type": "integer"
+                          },
+                          "serial": {
+                            "description": "Serial is the serial number of the device to match on.",
+                            "type": "string"
+                          },
+                          "vendor": {
+                            "description": "Vendor is the USB Vendor ID of the device to match on.\n(Both of these get mangled to uint16 for processing - but you should use the hexadecimal representation.)",
+                            "type": "integer"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "name": {
+                "description": "Name is a unique string representing the kind of device this specification describes.",
+                "type": "string"
+              }
+            }
+          }
         },
         "domain": {
           "description": "Domain with which devices will be present in the cluster,\ne.g. device.microshift.io/serial.",

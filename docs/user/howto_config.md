@@ -30,6 +30,20 @@ etcd:
     memoryLimitMB: 0
 genericDevicePlugin:
     devices:
+        - groups:
+            - count: 0
+              paths:
+                - limit: 0
+                  mountPath: ""
+                  path: ""
+                  permissions: ""
+                  readOnly:
+                  type: ""
+              usb:
+                - product: 0
+                  serial: ""
+                  vendor: 0
+          name: ""
     domain: ""
     status: ""
 ingress:
@@ -157,6 +171,20 @@ etcd:
     memoryLimitMB: 0
 genericDevicePlugin:
     devices:
+        - groups:
+            - count: 0
+              paths:
+                - limit: 0
+                  mountPath: ""
+                  path: ""
+                  permissions: ""
+                  readOnly:
+                  type: ""
+              usb:
+                - product: 0
+                  serial: ""
+                  vendor: 0
+          name: ""
     domain: device.microshift.io
     status: Disabled
 ingress:

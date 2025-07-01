@@ -30,10 +30,7 @@ type GenericDevicePlugin struct {
 	// +kubebuilder:default=device.microshift.io
 	Domain string `json:"domain"`
 
-	// TODO: Fix schemaless - multiple nested slices do not play nicely with example configs and produce invalid default yaml config
-
 	// Devices configuration
-	// +kubebuilder:validation:Schemaless
 	Devices []deviceplugin.DeviceSpec `json:"devices"`
 }
 
