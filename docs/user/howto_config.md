@@ -172,19 +172,19 @@ etcd:
 genericDevicePlugin:
     devices:
         - groups:
-            - count: 0
+            - count: 1
               paths:
-                - limit: 0
-                  mountPath: ""
-                  path: ""
-                  permissions: ""
-                  readOnly:
-                  type: ""
+                - limit: 1
+                  mountPath: /dev/ttyACM0
+                  path: /dev/ttyACM0
+                  permissions: mrw
+                  readOnly: false
+                  type: Device
               usb:
                 - product: 0
                   serial: ""
                   vendor: 0
-          name: ""
+          name: serial
     domain: device.microshift.io
     status: Disabled
 ingress:
