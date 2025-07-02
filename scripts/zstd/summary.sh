@@ -2,7 +2,7 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PYTHON_SCRIPT="$SCRIPT_DIR/images.py"
+PYTHON_SCRIPT="${SCRIPT_DIR}/images.py"
 
 # Default values
 SOURCE_JSON=""
@@ -89,8 +89,8 @@ check_requirements() {
     fi
 
     # Check if Python script exists
-    if [[ ! -f "$PYTHON_SCRIPT" ]]; then
-        error "Python script not found at: $PYTHON_SCRIPT"
+    if [[ ! -f "${PYTHON_SCRIPT}" ]]; then
+        error "Python script not found at: ${PYTHON_SCRIPT}"
         exit 1
     fi
 
@@ -106,14 +106,14 @@ check_requirements() {
 check_podman_config() {
     log "Checking Podman storage configuration..."
 
-    local storage_conf="$HOME/.config/containers/storage.conf"
+    local -r storage_conf="${HOME}/.config/containers/storage.conf"
     local issues=()
 
-    if [[ -f "$storage_conf" ]]; then
-        if ! grep -q "enable_partial_images.*=.*true" "$storage_conf" 2>/dev/null; then
+    if [[ -f "${storage_conf}" ]]; then
+        if ! grep -q "enable_partial_images.*=.*true" "${storage_conf}" 2>/dev/null; then
             issues+=("enable_partial_images=true not found")
         fi
-        if ! grep -q "use_hard_links.*=.*true" "$storage_conf" 2>/dev/null; then
+        if ! grep -q "use_hard_links.*=.*true" "${storage_conf}" 2>/dev/null; then
             issues+=("use_hard_links=true not found")
         fi
     else
@@ -123,7 +123,7 @@ check_podman_config() {
     if [[ ${#issues[@]} -gt 0 ]]; then
         warn "Podman storage configuration issues detected:"
         for issue in "${issues[@]}"; do
-            warn "  - $issue"
+            warn "  - ${issue}"
         done
         warn "For optimal zstd:chunked performance, ensure your storage.conf includes:"
         warn "  enable_partial_images=true"
@@ -138,15 +138,15 @@ run_images() {
     log "Starting zstd:chunked compression simulation..."
     echo
 
-    local cmd=(script -c "python3 $PYTHON_SCRIPT $SOURCE_JSON $TARGET_JSON $REPO" $OUTPUT_FILE)
+    local cmd=(script -c "python3 ${PYTHON_SCRIPT} ${SOURCE_JSON} ${TARGET_JSON} ${REPO}" "${OUTPUT_FILE}")
 
-    log "Output will be saved to: $OUTPUT_FILE"
+    log "Output will be saved to: ${OUTPUT_FILE}"
     "${cmd[@]}"
 
     echo
 
-    if [[ -n "$OUTPUT_FILE" ]]; then
-        log "Detailed output saved to: $OUTPUT_FILE"
+    if [[ -n "${OUTPUT_FILE}" ]]; then
+        log "Detailed output saved to: ${OUTPUT_FILE}"
     fi
 }
 
@@ -154,8 +154,8 @@ run_summary() {
     log "Analyzing output..."
     echo
 
-    if [[ ! -f "$OUTPUT_FILE" ]]; then
-        warn "Output file not found: $OUTPUT_FILE"
+    if [[ ! -f "${OUTPUT_FILE}" ]]; then
+        warn "Output file not found: ${OUTPUT_FILE}"
         return 1
     fi
 
@@ -163,9 +163,9 @@ run_summary() {
         local size="$1"
         local unit="$2"
 
-        case "$unit" in
+        case "${unit}" in
             "B")
-                echo "$size"
+                echo "${size}"
                 ;;
             "KiB")
                 echo "$((size * 1024))"
@@ -192,24 +192,26 @@ run_summary() {
         elif ((bytes >= 1024)); then
             echo "$((bytes / 1024)) KiB"
         else
-            echo "$bytes B"
+            echo "${bytes} B"
         fi
     }
 
-    local total_downloaded_bytes=0
     local total_skipped_bytes=0
     local total_original_bytes=0
 
     log "Parsing zstd:chunked compression results..."
 
+    # shellcheck disable=SC2002
     while IFS= read -r line; do
-        if [[ "$line" =~ Copying\ blob\ [a-f0-9]+\ done[\ \t]+([0-9]+(\.[0-9]+)?)(MiB|KiB|GiB|B)\ \/\ ([0-9]+(\.[0-9]+)?)(MiB|KiB|GiB|B)\ \(skipped:\ ([0-9]+(\.[0-9]+)?)(MiB|KiB|GiB|B)\ =.*\) ]]; then
+        if [[ "${line}" =~ Copying\ blob\ [a-f0-9]+\ done[\ \t]+([0-9]+(\.[0-9]+)?)(MiB|KiB|GiB|B)\ \/\ ([0-9]+(\.[0-9]+)?)(MiB|KiB|GiB|B)\ \(skipped:\ ([0-9]+(\.[0-9]+)?)(MiB|KiB|GiB|B)\ =.*\) ]]; then
             local total_size="${BASH_REMATCH[4]}"
             local total_unit="${BASH_REMATCH[6]}"
             local skipped_size="${BASH_REMATCH[7]}"
             local skipped_unit="${BASH_REMATCH[9]}"
-            local total_bytes=$(convert_to_bytes "${total_size%.*}" "$total_unit")
-            local skipped_bytes=$(convert_to_bytes "${skipped_size%.*}" "$skipped_unit")
+            local total_bytes
+            total_bytes=$(convert_to_bytes "${total_size%.*}" "${total_unit}")
+            local skipped_bytes
+            skipped_bytes=$(convert_to_bytes "${skipped_size%.*}" "${skipped_unit}")
             total_skipped_bytes=$((total_skipped_bytes + skipped_bytes))
             total_original_bytes=$((total_original_bytes + total_bytes))
         fi
@@ -219,8 +221,8 @@ run_summary() {
 
     echo
     success "zstd:chunked Compression Summary:"
-    echo "  📥 Total original size: $(bytes_to_human $total_original_bytes)"
-    echo "  ⏭️  Total skipped: $(bytes_to_human $total_skipped_bytes) ($savings_percentage%)"
+    echo "  📥 Total original size: $(bytes_to_human ${total_original_bytes})"
+    echo "  ⏭️  Total skipped: $(bytes_to_human ${total_skipped_bytes}) (${savings_percentage}%)"
     echo
 }
 
@@ -245,11 +247,11 @@ parse_args() {
                 exit 1
                 ;;
             *)
-                if [[ -z "$SOURCE_JSON" ]]; then
+                if [[ -z "${SOURCE_JSON}" ]]; then
                     SOURCE_JSON="$1"
-                elif [[ -z "$TARGET_JSON" ]]; then
+                elif [[ -z "${TARGET_JSON}" ]]; then
                     TARGET_JSON="$1"
-                elif [[ -z "$REPO" ]]; then
+                elif [[ -z "${REPO}" ]]; then
                     REPO="$1"
                 else
                     error "Too many arguments"
@@ -261,7 +263,7 @@ parse_args() {
         esac
     done
 
-    if [[ -z "$SOURCE_JSON" || -z "$TARGET_JSON" || -z "$REPO" ]]; then
+    if [[ -z "${SOURCE_JSON}" || -z "${TARGET_JSON}" || -z "${REPO}" ]]; then
         error "Missing required arguments"
         usage
         exit 1
@@ -276,7 +278,7 @@ main() {
 
     parse_args "$@"
 
-    if [[ "$VERBOSE" == "true" ]]; then
+    if [[ "${VERBOSE}" == "true" ]]; then
         set -x
     fi
 
@@ -285,10 +287,10 @@ main() {
 
     echo
     log "Configuration:"
-    log "  Source: $SOURCE_JSON"
-    log "  Target: $TARGET_JSON"
-    log "  Repository: $REPO"
-    log "  Output File: $OUTPUT_FILE"
+    log "  Source: ${SOURCE_JSON}"
+    log "  Target: ${TARGET_JSON}"
+    log "  Repository: ${REPO}"
+    log "  Output File: ${OUTPUT_FILE}"
     echo
 
     run_images
