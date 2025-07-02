@@ -222,6 +222,7 @@ run_summary() {
     echo
     success "zstd:chunked Compression Summary:"
     echo "  📥 Total original size: $(bytes_to_human ${total_original_bytes})"
+    echo "  📦 Total downloaded: $(bytes_to_human $((total_original_bytes - total_skipped_bytes)))"
     echo "  ⏭️  Total skipped: $(bytes_to_human ${total_skipped_bytes}) (${savings_percentage}%)"
     echo
 }
