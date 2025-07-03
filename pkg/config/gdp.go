@@ -83,7 +83,7 @@ func (gdp GenericDevicePlugin) validate() error {
 		}
 
 		for j, g := range deviceSpec.Groups {
-			validUSBs := make([]*deviceplugin.USBSpec, 0, len(g.USBSpecs))
+			validUSBs := make([]*USBSpec, 0, len(g.USBSpecs))
 			for _, usb := range g.USBSpecs {
 				// If USBSpec exists but is empty (e.g., comes from the config.yaml.default),
 				// we treat it like nonexistent.
@@ -169,7 +169,7 @@ type Group struct {
 	Paths []*Path `json:"paths,omitempty"`
 	// USBSpecs is the list of USB specifications that this device group consists of.
 	// usb is exclusive with paths.
-	USBSpecs []*deviceplugin.USBSpec `json:"usb,omitempty"`
+	USBSpecs []*USBSpec `json:"usb,omitempty"`
 	// Count specifies how many times this group can be mounted concurrently.
 	// When unspecified, Count defaults to 1.
 	// +kubebuilder:default=1
@@ -181,9 +181,13 @@ func (g *Group) toGDP() *deviceplugin.Group {
 	for _, path := range g.Paths {
 		paths = append(paths, path.toGDP())
 	}
+	usbSpecs := make([]*deviceplugin.USBSpec, 0, len(g.USBSpecs))
+	for _, usb := range g.USBSpecs {
+		usbSpecs = append(usbSpecs, usb.toGDP())
+	}
 	return &deviceplugin.Group{
 		Paths:    paths,
-		USBSpecs: g.USBSpecs,
+		USBSpecs: usbSpecs,
 		Count:    g.Count,
 	}
 }
@@ -231,5 +235,26 @@ func (p *Path) toGDP() *deviceplugin.Path {
 		ReadOnly:    p.ReadOnly,
 		Type:        p.Type,
 		Limit:       p.Limit,
+	}
+}
+
+// USBSpec represents a USB device specification that should be discovered.
+// A USB device must match exactly on all the given attributes to pass.
+type USBSpec struct {
+	// Vendor is the USB Vendor ID of the device to match on.
+	// It gets mangled to uint16 at runtime, but you should use the hexadecimal representation.
+	Vendor deviceplugin.USBID `json:"vendor"`
+	// Product is the USB Product ID of the device to match on.
+	// It gets mangled to uint16 at runtime, but you should use the hexadecimal representation.
+	Product deviceplugin.USBID `json:"product"`
+	// Serial is the serial number of the device to match on.
+	Serial string `json:"serial"`
+}
+
+func (usb *USBSpec) toGDP() *deviceplugin.USBSpec {
+	return &deviceplugin.USBSpec{
+		Vendor:  usb.Vendor,
+		Product: usb.Product,
+		Serial:  usb.Serial,
 	}
 }

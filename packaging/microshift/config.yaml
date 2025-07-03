@@ -94,11 +94,12 @@ genericDevicePlugin:
               # usb is exclusive with paths.
               usb:
                 - # Product is the USB Product ID of the device to match on.
+                  # It gets mangled to uint16 at runtime, but you should use the hexadecimal representation.
                   product: 0
                   # Serial is the serial number of the device to match on.
                   serial: ""
                   # Vendor is the USB Vendor ID of the device to match on.
-                  # (Both of these get mangled to uint16 for processing - but you should use the hexadecimal representation.)
+                  # It gets mangled to uint16 at runtime, but you should use the hexadecimal representation.
                   vendor: 0
           # Name is a unique string representing the kind of device this specification describes.
           name: serial

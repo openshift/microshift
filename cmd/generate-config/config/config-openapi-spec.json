@@ -247,7 +247,7 @@
                         ],
                         "properties": {
                           "product": {
-                            "description": "Product is the USB Product ID of the device to match on.",
+                            "description": "Product is the USB Product ID of the device to match on.\nIt gets mangled to uint16 at runtime, but you should use the hexadecimal representation.",
                             "type": "integer"
                           },
                           "serial": {
@@ -255,7 +255,7 @@
                             "type": "string"
                           },
                           "vendor": {
-                            "description": "Vendor is the USB Vendor ID of the device to match on.\n(Both of these get mangled to uint16 for processing - but you should use the hexadecimal representation.)",
+                            "description": "Vendor is the USB Vendor ID of the device to match on.\nIt gets mangled to uint16 at runtime, but you should use the hexadecimal representation.",
                             "type": "integer"
                           }
                         }
