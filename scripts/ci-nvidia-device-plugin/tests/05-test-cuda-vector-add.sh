@@ -44,3 +44,5 @@ if ! grep -q -E '^Test PASSED$' "${logfile}"; then
     echo "CUDA vector-add test failed"
     exit 1
 fi
+
+echo "OK"
