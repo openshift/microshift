@@ -1,0 +1,3 @@
+- oc image-arm64 8e6159575521884952b083cd2ffdcc07111ad150 to f39295cb74b7d3d5571f38b88f55475fe13bf007
+  - e916377b 2025-06-25T10:29:54+00:00 avoid transfering permissions when copying artifacts from node-joiner pod
+
