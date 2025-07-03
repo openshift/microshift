@@ -161,15 +161,16 @@ func (d DeviceSpec) toGDP() deviceplugin.DeviceSpec {
 
 // Group represents a set of devices that should be grouped and mounted into a container together as one single meta-device.
 type Group struct {
-	// Paths is the list of devices of which the device group consists.
+	// 'paths' is the list of devices of which the device group consists.
 	// Paths can be globs, in which case each device matched by the path will be schedulable `Count` times.
 	// When the paths have differing cardinalities, that is, the globs match different numbers of devices,
 	// the cardinality of each path is capped at the lowest cardinality.
-	// paths is exclusive with USBSpecs.
+	// 'paths' is exclusive with 'usbs'.
 	Paths []*Path `json:"paths,omitempty"`
-	// USBSpecs is the list of USB specifications that this device group consists of.
-	// usb is exclusive with paths.
-	USBSpecs []*USBSpec `json:"usb,omitempty"`
+	// 'usbs' is the list of USB specifications that this device group consists of.
+	// A USB device must match exactly on all the given attributes to pass.
+	// 'usbs' is exclusive with 'paths'.
+	USBSpecs []*USBSpec `json:"usbs,omitempty"`
 	// Count specifies how many times this group can be mounted concurrently.
 	// When unspecified, Count defaults to 1.
 	// +kubebuilder:default=1

@@ -192,7 +192,7 @@
                       "default": 1
                     },
                     "paths": {
-                      "description": "Paths is the list of devices of which the device group consists.\nPaths can be globs, in which case each device matched by the path will be schedulable `Count` times.\nWhen the paths have differing cardinalities, that is, the globs match different numbers of devices,\nthe cardinality of each path is capped at the lowest cardinality.\npaths is exclusive with USBSpecs.",
+                      "description": "'paths' is the list of devices of which the device group consists.\nPaths can be globs, in which case each device matched by the path will be schedulable `Count` times.\nWhen the paths have differing cardinalities, that is, the globs match different numbers of devices,\nthe cardinality of each path is capped at the lowest cardinality.\n'paths' is exclusive with 'usbs'.",
                       "type": "array",
                       "items": {
                         "description": "Path represents a file path that should be discovered.",
@@ -234,8 +234,8 @@
                         }
                       }
                     },
-                    "usb": {
-                      "description": "USBSpecs is the list of USB specifications that this device group consists of.\nusb is exclusive with paths.",
+                    "usbs": {
+                      "description": "'usbs' is the list of USB specifications that this device group consists of.\nA USB device must match exactly on all the given attributes to pass.\n'usbs' is exclusive with 'paths'.",
                       "type": "array",
                       "items": {
                         "description": "USBSpec represents a USB device specification that should be discovered.\nA USB device must match exactly on all the given attributes to pass.",

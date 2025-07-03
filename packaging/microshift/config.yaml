@@ -59,11 +59,11 @@ genericDevicePlugin:
             - # Count specifies how many times this group can be mounted concurrently.
               # When unspecified, Count defaults to 1.
               count: 1
-              # Paths is the list of devices of which the device group consists.
+              # 'paths' is the list of devices of which the device group consists.
               # Paths can be globs, in which case each device matched by the path will be schedulable `Count` times.
               # When the paths have differing cardinalities, that is, the globs match different numbers of devices,
               # the cardinality of each path is capped at the lowest cardinality.
-              # paths is exclusive with USBSpecs.
+              # 'paths' is exclusive with 'usbs'.
               paths:
                 - # Limit specifies up to how many times this device can be used in the group concurrently when other devices
                   # in the group yield more matches.
@@ -90,9 +90,10 @@ genericDevicePlugin:
                   # Type describes what type of file-system node this Path represents and thus how it should be mounted.
                   # When unspecified, Type defaults to Device.
                   type: Device
-              # USBSpecs is the list of USB specifications that this device group consists of.
-              # usb is exclusive with paths.
-              usb:
+              # 'usbs' is the list of USB specifications that this device group consists of.
+              # A USB device must match exactly on all the given attributes to pass.
+              # 'usbs' is exclusive with 'paths'.
+              usbs:
                 - # Product is the USB Product ID of the device to match on.
                   # It gets mangled to uint16 at runtime, but you should use the hexadecimal representation.
                   product: 0

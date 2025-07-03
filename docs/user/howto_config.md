@@ -39,7 +39,7 @@ genericDevicePlugin:
                   permissions: ""
                   readOnly:
                   type: ""
-              usb:
+              usbs:
                 - product: 0
                   serial: ""
                   vendor: 0
@@ -180,7 +180,7 @@ genericDevicePlugin:
                   permissions: mrw
                   readOnly: false
                   type: Device
-              usb:
+              usbs:
                 - product: 0
                   serial: ""
                   vendor: 0
