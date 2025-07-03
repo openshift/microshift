@@ -60,7 +60,10 @@ Change System Date To
     ${ushift_pid}=    MicroShift Process ID
     Systemctl    stop    chronyd
     Command Should Work    TZ=UTC timedatectl set-time "${future_date}"
+    Sleep    5s
     Wait Until MicroShift Process ID Changes    ${ushift_pid}
+    All Certificates Should Be Valid For Current Time
+    Setup Kubeconfig
     Wait For MicroShift
 
 Compute Date After Days
@@ -76,3 +79,31 @@ Certs Should Expire On
     ${expiration_date}=    Command Should Work
     ...    ${OSSL_CMD} ${cert_file} | grep notAfter | cut -f2 -d'=' | awk '{printf ("%s %02d %d",$1,$2,$4)}'
     Should Be Equal As Strings    ${cert_expected_date}    ${expiration_date}
+
+All Certificates Should Be Valid For Current Time
+    [Documentation]    Wait for multiple certificate files to be regenerated and valid
+
+    ${kubeconfig}=    Get Kubeconfig    ${USHIFT_HOST}
+    ${kubeconfig_cert_file}=    Create Random Temp File
+    Command Should Work
+    ...    echo '${kubeconfig}' | grep client-certificate-data | cut -d: -f2 | tr -d ' ' | base64 -d > ${kubeconfig_cert_file}
+
+    @{cert_files}=    Create List
+    ...    /var/lib/microshift/certs/kube-control-plane-signer/kube-scheduler/client.crt
+    ...    /var/lib/microshift/certs/kube-control-plane-signer/kube-controller-manager/client.crt
+    ...    /var/lib/microshift/certs/admin-kubeconfig-signer/admin-kubeconfig-client/client.crt
+    ...    ${kubeconfig_cert_file}
+    FOR    ${cert_file}    IN    @{cert_files}
+        Wait Until Keyword Succeeds    30x    5s
+        ...    Certificate Should Be Valid For Current Time    ${cert_file}
+    END
+
+Certificate Should Be Valid For Current Time
+    [Documentation]    Verify that certificate is valid for the current system time
+    [Arguments]    ${cert_file}
+
+    ${cert_not_before}=    Command Should Work
+    ...    ${OSSL_CMD} ${cert_file} | grep notBefore | cut -f2 -d'=' | xargs -I {} date -d "{}" +%s
+    ${current_time}=    Command Should Work    date +%s
+    Should Be True    ${cert_not_before} <= ${current_time}
+    ...    msg=Certificate NotBefore (${cert_not_before}) is after current time (${current_time})
