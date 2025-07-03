@@ -1,3 +1,0 @@
-- machine-config-operator embedded-component bb6afe43a0ddd597e4bec8a3d86419ea46a86a21 to de7e29747d3d38b2a2a4dd796dea61995781daea
-  - 90ef05c3 2025-01-10T15:35:02+00:00 OPNET-569: Do not run resolv-prepender from NM dispatcher
-
