@@ -2,19 +2,19 @@
 images:
   - name: vllm-cpu-image
     newName: quay.io/modh/vllm
-    digest: sha256:881495befb6f807fa6e55f24e820fa67022b57d8ce0022305d89abe799c490fa
+    digest: sha256:4642b4337883ee6f768096829529e69e42689ef082f3b7e1439199fb20b7dc6a
   - name: vllm-gaudi-image
     newName: quay.io/modh/vllm
-    digest: sha256:af6a071be36d8a99476f145d1589d7ede97d2760b93335b14ca26de7417e438c
+    digest: sha256:f2d69a8c2ab85e5da0daa4ec42902599b7de0a24526ee2a970e23405718def8a
   - name: vllm-rocm-image
     newName: quay.io/modh/vllm
-    digest: sha256:7e1d1985b0dd2b5ba2df41fc9c8c3edf13a2d9ed8a4d84db8f00eb6c753bc5c5
+    digest: sha256:51d79c688db3652143b954cca41f56ab775cf6456386681c60bcf4c2a1541e5c
   - name: caikit-tgis-image
     newName: quay.io/modh/caikit-tgis-serving
     digest: sha256:2c7eef73708b5d73de33153459ac7238fdcf517cdc3544c775981f5814b4b6ed
   - name: caikit-standalone-image
     newName: quay.io/modh/caikit-nlp
-    digest: sha256:ada8949b81e646809101edfc76738eb5aac362f783eb2facc8aeed21c7c1512f
+    digest: sha256:24d74898dc50ebdd3526f6cb8a028a521e79adf5bfe52559afd3734900da975e
   - name: tgis-image
     newName: quay.io/modh/text-generation-inference
     digest: sha256:aebf545d8048a59174f70334dc90c6b97ead4602a39cb7598ea68c8d199168a2
@@ -23,4 +23,4 @@ images:
     digest: sha256:53b7fcf95de9b81e4c8652d0bf4e84e22d5b696827a5d951d863420c68b9cfe8
   - name: vllm-cuda-image
     newName: quay.io/modh/vllm
-    digest: sha256:4f550996130e7d16cacb24ca9a2865e7cf51eddaab014ceaf31a1ea6ef86d4ec
+    digest: sha256:79e1f24bba1d3e694f47f66ba9f8184e70310a10b77bf11c0febd0c926234950
