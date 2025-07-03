@@ -77,13 +77,24 @@ func (gdp GenericDevicePlugin) validate() error {
 		errs = append(errs, fmt.Errorf("genericDevicePlugin.Devices is empty - at least one device must be specified"))
 	}
 
-	for _, deviceSpec := range gdp.Devices {
+	for i, deviceSpec := range gdp.Devices {
 		if !deviceTypeRegexp.MatchString(strings.TrimSpace(deviceSpec.Name)) {
 			errs = append(errs, fmt.Errorf("failed to parse device %q; device name must match the regular expression %q", deviceSpec.Name, deviceTypeFmt))
 		}
 
-		for _, g := range deviceSpec.Groups {
-			if len(g.Paths) > 0 && len(g.USBSpecs) > 0 {
+		for j, g := range deviceSpec.Groups {
+			validUSBs := make([]*deviceplugin.USBSpec, 0, len(g.USBSpecs))
+			for _, usb := range g.USBSpecs {
+				// If USBSpec exists but is empty (e.g., comes from the config.yaml.default),
+				// we treat it like nonexistent.
+				if usb == nil || (usb.Vendor == 0 && usb.Product == 0 && usb.Serial == "") {
+					continue
+				}
+				validUSBs = append(validUSBs, usb)
+			}
+			gdp.Devices[i].Groups[j].USBSpecs = validUSBs
+
+			if len(g.Paths) > 0 && len(gdp.Devices[i].Groups[j].USBSpecs) > 0 {
 				errs = append(errs, fmt.Errorf(
 					"failed to parse device %q; cannot define both path and usb at the same time",
 					deviceSpec.Name))
