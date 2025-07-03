@@ -1,0 +1,1 @@
+../../ci-nvidia-device-plugin/tests/03-get-kubeconfig.sh

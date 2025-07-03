@@ -1,0 +1,1 @@
+../../ci-nvidia-device-plugin/tests/02-wait-for-greenboot.sh

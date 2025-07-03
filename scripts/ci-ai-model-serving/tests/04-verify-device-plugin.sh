@@ -1,0 +1,1 @@
+../../ci-nvidia-device-plugin/tests/04-verify-device-plugin.sh

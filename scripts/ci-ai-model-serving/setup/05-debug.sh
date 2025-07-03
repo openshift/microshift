@@ -1,0 +1,1 @@
+../../ci-nvidia-device-plugin/setup/05-debug.sh

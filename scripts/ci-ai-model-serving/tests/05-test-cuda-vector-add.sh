@@ -1,0 +1,1 @@
+../../ci-nvidia-device-plugin/tests/05-test-cuda-vector-add.sh

@@ -1,0 +1,1 @@
+../../ci-nvidia-device-plugin/tests/01-verify-nvidia-gpu.sh

@@ -1,0 +1,1 @@
+../../ci-nvidia-device-plugin/setup/04-nvidia-device-plugin.sh
