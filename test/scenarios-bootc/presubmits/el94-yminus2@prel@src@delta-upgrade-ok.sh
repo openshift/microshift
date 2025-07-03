@@ -13,12 +13,12 @@ scenario_remove_vms() {
 
 scenario_run_tests() {
     prepare_static_delta rhel94-bootc-yminus2 rhel96-bootc-prel
-    consume_static_delta rhel94-bootc-yminus2 rhel96-bootc-prel
+    apply_static_delta   rhel94-bootc-yminus2 rhel96-bootc-prel
 
     prepare_static_delta rhel96-bootc-prel rhel96-bootc-source
-    consume_static_delta rhel96-bootc-prel rhel96-bootc-source
+    apply_static_delta   rhel96-bootc-prel rhel96-bootc-source
     
-    for ref in rhel96-bootc-prel-patched rhel96-bootc-source-patched ; do
+    for ref in rhel96-bootc-prel-from-sdelta rhel96-bootc-source-from-sdelta ; do
         run_tests host1 \
             --variable "TARGET_REF:${ref}" \
             --variable "BOOTC_REGISTRY:${MIRROR_REGISTRY_URL}" \

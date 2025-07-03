@@ -316,7 +316,7 @@ prepare_static_delta() {
     rm -rf "${workdir}"
 }
 
-# Consume a static delta file created by the 'prepare_static_delta' function.
+# Apply a static delta file created by the 'prepare_static_delta' function.
 # The '${src}' image is copied from the mirror registry to a local directory
 # and merged with the '${BOOTC_STATIC_DELTA}/${src}@${dst}.tardiff' file.
 #
@@ -327,13 +327,13 @@ prepare_static_delta() {
 #   src - Source container image name
 #   dst - Destination container image name
 # Return:
-#   '${dst}-patched' image stored in the mirror registry
-consume_static_delta() {
+#   '${dst}-from-sdelta' image stored in the mirror registry
+apply_static_delta() {
     local -r src=$1
     local -r dst=$2
     local -r tardiff="${src}@${dst}.tardiff"
 
-    local -r workdir="$(mktemp -d /tmp/bootc-delta-consume.XXXXXXXX)"
+    local -r workdir="$(mktemp -d /tmp/bootc-delta-apply.XXXXXXXX)"
     # shellcheck disable=SC2164
     pushd "${workdir}" &>/dev/null
 
@@ -347,14 +347,14 @@ consume_static_delta() {
 
     # Upgrade the source image to the destination using tar-patch and list tar sizes
     cp "${BOOTC_STATIC_DELTA}/${tardiff}" .
-    "${ROOTDIR}/_output/bin/tar-patch" "${tardiff}" "${src}/" "${dst}-patched.tar"
+    "${ROOTDIR}/_output/bin/tar-patch" "${tardiff}" "${src}/" "${dst}-from-sdelta.tar"
     ls -lh ./*.tar*
 
     # Copy the patched image into the registry
     skopeo copy --all --preserve-digests \
         --authfile "${MIRROR_REGISTRY_DIR}/config/microshift_auth.json" \
-        oci-archive:"${dst}-patched.tar" \
-        docker://"${MIRROR_REGISTRY_URL}/${dst}-patched:latest"
+        oci-archive:"${dst}-from-sdelta.tar" \
+        docker://"${MIRROR_REGISTRY_URL}/${dst}-from-sdelta:latest"
 
     # shellcheck disable=SC2164
     popd &>/dev/null
