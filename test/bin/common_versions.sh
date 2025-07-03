@@ -39,6 +39,19 @@ get_vrel_from_rhsm() {
     echo ""
 }
 
+get_vrel_from_rpm() {
+    local -r rpm_file="$1"
+    local -r rpm_vrel=$(\
+        rpm -qp --queryformat '%{version}-%{release}' \
+            -p "${rpm_file}" 2>/dev/null \
+        )
+    if [ -n "${rpm_vrel}" ]; then
+        echo "${rpm_vrel}"
+        return
+    fi
+    echo ""
+}
+
 # The current release minor version (e.g. '17' for '4.17') affects
 # the definition of previous and fake next versions.
 export MINOR_VERSION=20
