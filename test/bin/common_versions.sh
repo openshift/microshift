@@ -117,9 +117,15 @@ export RHOCP_MINOR_Y2=18
 export CNCF_SONOBUOY_VERSION=v0.57.3
 
 # The brew release versions needed for release regression testing
-export BREW_Y0_RELEASE_VERSION="$(get_vrel_from_rpm "${BREW_REPO}/4.${MINOR_VERSION}-zstream/${UNAME_M}/microshift-release-info-*.rpm")"
-export BREW_Y1_RELEASE_VERSION="$(get_vrel_from_rpm "${BREW_REPO}/4.${PREVIOUS_MINOR_VERSION}-zstream/${UNAME_M}/microshift-release-info-*.rpm")"
-export BREW_Y2_RELEASE_VERSION="$(get_vrel_from_rpm "${BREW_REPO}/4.${YMINUS2_MINOR_VERSION}-zstream/${UNAME_M}/microshift-release-info-*.rpm")"
-export BREW_RC_RELEASE_VERSION="$(get_vrel_from_rpm "${BREW_REPO}/4.${MINOR_VERSION}-rc/${UNAME_M}/microshift-release-info-*.rpm")"
-export BREW_EC_RELEASE_VERSION="$(get_vrel_from_rpm "${BREW_REPO}/4.${MINOR_VERSION}-ec/${UNAME_M}/microshift-release-info-*.rpm")"
-export BREW_NIGHTLY_RELEASE_VERSION="$(get_vrel_from_rpm "${BREW_REPO}/4.${MINOR_VERSION}-nightly/${UNAME_M}/microshift-release-info-*.rpm")"
+BREW_Y0_RELEASE_VERSION="$(get_vrel_from_rpm "${BREW_REPO}/4.${MINOR_VERSION}-zstream/${UNAME_M}/microshift-release-info-*.rpm")"
+BREW_Y1_RELEASE_VERSION="$(get_vrel_from_rpm "${BREW_REPO}/4.${PREVIOUS_MINOR_VERSION}-zstream/${UNAME_M}/microshift-release-info-*.rpm")"
+BREW_Y2_RELEASE_VERSION="$(get_vrel_from_rpm "${BREW_REPO}/4.${YMINUS2_MINOR_VERSION}-zstream/${UNAME_M}/microshift-release-info-*.rpm")"
+BREW_RC_RELEASE_VERSION="$(get_vrel_from_rpm "${BREW_REPO}/4.${MINOR_VERSION}-rc/${UNAME_M}/microshift-release-info-*.rpm")"
+BREW_EC_RELEASE_VERSION="$(get_vrel_from_rpm "${BREW_REPO}/4.${MINOR_VERSION}-ec/${UNAME_M}/microshift-release-info-*.rpm")"
+BREW_NIGHTLY_RELEASE_VERSION="$(get_vrel_from_rpm "${BREW_REPO}/4.${MINOR_VERSION}-nightly/${UNAME_M}/microshift-release-info-*.rpm")"
+export BREW_Y0_RELEASE_VERSION
+export BREW_Y1_RELEASE_VERSION
+export BREW_Y2_RELEASE_VERSION
+export BREW_RC_RELEASE_VERSION
+export BREW_EC_RELEASE_VERSION
+export BREW_NIGHTLY_RELEASE_VERSION
