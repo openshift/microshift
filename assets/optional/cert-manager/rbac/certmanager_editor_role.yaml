@@ -1,0 +1,31 @@
+# permissions for end users to edit certmanagers.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/name: clusterrole
+    app.kubernetes.io/instance: certmanager-editor-role
+    app.kubernetes.io/component: rbac
+    app.kubernetes.io/created-by: cert-manager-operator
+    app.kubernetes.io/part-of: cert-manager-operator
+    app.kubernetes.io/managed-by: kustomize
+  name: certmanager-editor-role
+rules:
+- apiGroups:
+  - operator.openshift.io.openshift.io
+  resources:
+  - certmanagers
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - operator.openshift.io.openshift.io
+  resources:
+  - certmanagers/status
+  verbs:
+  - get

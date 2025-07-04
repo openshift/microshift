@@ -264,6 +264,24 @@ Deploys the Red Hat build of OpenTelemetry-Collector as a systemd service on hos
 certificates to permit access to the kube-apiserver metrics endpoints. If a user-defined OpenTelemetry-Collector exists
 at /etc/microshift/opentelemetry-collector.yaml, this config is used. Otherwise, a default config is provided.
 
+%package cert-manager
+Summary: Cert Manager for MicroShift
+ExclusiveArch: x86_64 aarch64
+Requires: microshift = %{version}
+
+%description cert-manager
+The microshift-cert-manager package provides the required manifests for the Cert Manager to be installed on MicroShift.
+
+%package cert-manager-release-info
+Summary: Release information for Cert Manager for MicroShift
+BuildArch: noarch
+Requires: microshift = %{version}
+
+%description cert-manager-release-info
+The microshift-cert-manager-release-info package provides release information files for this
+release. These files contain the list of container image references used by Cert Manager
+and can be used to embed those images into osbuilder blueprints or bootc containerfiles.
+
 %prep
 # Dynamic detection of the available golang version also works for non-RPM golang packages
 golang_detected=$(go version | awk '{print $3}' | tr -d '[a-z]' | cut -f1-2 -d.)
@@ -579,6 +597,26 @@ install -p -m644 packaging/observability/microshift-observability.service %{buil
 install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/003-microshift-observability/
 install -p -m644 assets/optional/observability/*.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/003-microshift-observability/
 
+
+# cert-manager
+install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/060-microshift-cert-manager
+install -p -m644 assets/optional/cert-manager/kustomization.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/060-microshift-cert-manager
+install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/060-microshift-cert-manager/crd
+install -p -m644 assets/optional/cert-manager/crd/*.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/060-microshift-cert-manager/crd
+install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/060-microshift-cert-manager/crd/bases
+install -p -m644 assets/optional/cert-manager/crd/bases/*.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/060-microshift-cert-manager/crd/bases
+install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/060-microshift-cert-manager/crd/patches
+install -p -m644 assets/optional/cert-manager/crd/patches/*.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/060-microshift-cert-manager/crd/patches
+install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/060-microshift-cert-manager/manager
+install -p -m644 assets/optional/cert-manager/manager/*.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/060-microshift-cert-manager/manager
+install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/060-microshift-cert-manager/rbac
+install -p -m644 assets/optional/cert-manager/rbac/*.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/060-microshift-cert-manager/rbac
+install -p -m644 assets/optional/cert-manager/kustomization.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/060-microshift-cert-manager
+
+# cert-manager-release-info
+mkdir -p -m755 %{buildroot}%{_datadir}/microshift/release
+install -p -m644 assets/optional/cert-manager/release-cert-manager-{x86_64,aarch64}.json %{buildroot}%{_datadir}/microshift/release/
+
 %pre networking
 
 getent group hugetlbfs >/dev/null || groupadd -r hugetlbfs
@@ -775,10 +813,20 @@ fi
 %{_sysconfdir}/microshift/observability/opentelemetry-collector-*.yaml
 %{_prefix}/lib/microshift/manifests.d/003-microshift-observability/*
 
+%files cert-manager
+%dir %{_prefix}/lib/microshift/manifests.d/060-microshift-cert-manager
+%{_prefix}/lib/microshift/manifests.d/060-microshift-cert-manager/*
+
+%files cert-manager-release-info
+%{_datadir}/microshift/release/release-cert-manager-{x86_64,aarch64}.json
+
 
 # Use Git command to generate the log and replace the VERSION string
 # LANG=C git log --date="format:%a %b %d %Y" --pretty="tformat:* %cd %an <%ae> VERSION%n- %s%n" packaging/rpm/microshift.spec
 %changelog
+* Thu Jul 2 2025 Evgeny Slutsky <eslutsky@redhat.com> 4.20.0
+- Add an optional microshift-cert-manager RPM
+
 * Thu Jun 12 2025 Evgeny Slutsky <eslutsky@redhat.com> 4.20.0
 - Upgrade CRI-O version dependency to 1.33.0
 
