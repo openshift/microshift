@@ -60,7 +60,7 @@ name = "microshift-olm-release-info"
 version = "{{ .Env.BREW_EC_RELEASE_VERSION }}"
 
 [[packages]]
-name = " microshift-multus-release-info"
+name = "microshift-multus-release-info"
 version = "{{ .Env.BREW_EC_RELEASE_VERSION }}"
 
 [[packages]]
