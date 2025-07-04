@@ -60,20 +60,36 @@ cp /secrets/import-secret/.dockercfg "$HOME/.pull-secret.json" || {
     echo "WARN: Could not copy registry secret file"
 }
 
-# log in into cluster's registry
-oc registry login --to=/tmp/registry.json
-release_amd64="$(oc image info --registry-config=/tmp/registry.json $OPENSHIFT_RELEASE_IMAGE -o json | jq -r '.config.config.Labels."io.openshift.release"')"
-release_arm64="$(oc image info --registry-config=/tmp/registry.json $OPENSHIFT_RELEASE_IMAGE_ARM -o json | jq -r '.config.config.Labels."io.openshift.release"')"
+# Check if pullspec variables are already set, otherwise calculate them
+if [[ -z "${PULLSPEC_RELEASE_AMD64:-}" ]]; then
+    echo "INFO: PULLSPEC_RELEASE_AMD64 not set, calculating from release image"
+    # log in into cluster's registry
+    oc registry login --to=/tmp/registry.json
+    release_amd64="$(oc image info --registry-config=/tmp/registry.json $OPENSHIFT_RELEASE_IMAGE -o json | jq -r '.config.config.Labels."io.openshift.release"')"
 
-pullspec_release_amd64="registry.ci.openshift.org/ocp/release:${release_amd64}"
-pullspec_release_arm64="registry.ci.openshift.org/ocp-arm64/release-arm64:${release_arm64}"
+    PULLSPEC_RELEASE_AMD64="registry.ci.openshift.org/ocp/release:${release_amd64}"
+else
+    echo "INFO: Using provided PULLSPEC_RELEASE_AMD64: ${PULLSPEC_RELEASE_AMD64}"
+fi
+
+if [[ -z "${PULLSPEC_RELEASE_ARM64:-}" ]]; then
+    echo "INFO: PULLSPEC_RELEASE_ARM64 not set, calculating from release image"
+
+    # log in into cluster's registry
+    oc registry login --to=/tmp/registry.json
+    release_arm64="$(oc image info --registry-config=/tmp/registry.json $OPENSHIFT_RELEASE_IMAGE_ARM -o json | jq -r '.config.config.Labels."io.openshift.release"')"
+
+    PULLSPEC_RELEASE_ARM64="registry.ci.openshift.org/ocp-arm64/release-arm64:${release_arm64}"
+else
+    echo "INFO: Using provided PULLSPEC_RELEASE_ARM64: ${PULLSPEC_RELEASE_ARM64}"
+fi
 
 APP_ID=$(cat /secrets/pr-creds/app_id) \
 KEY=/secrets/pr-creds/key.pem \
 ORG=${ORG:-openshift} \
 REPO=${REPO:-microshift} \
-AMD64_RELEASE=${pullspec_release_amd64} \
-ARM64_RELEASE=${pullspec_release_arm64} \
+AMD64_RELEASE=${PULLSPEC_RELEASE_AMD64} \
+ARM64_RELEASE=${PULLSPEC_RELEASE_ARM64} \
 ./scripts/auto-rebase/rebase.py
 
 # LVMS is not tracked in the OCP release image.  Instead, rely on the
