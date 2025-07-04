@@ -1,9 +1,3 @@
-- cluster-network-operator embedded-component bd863a88a0b2fbd25c51fd967ba4fbe92bf911fd to 1294454f9d29d66e7d15a1ce1821cc3e6483f0c2
-  - 401f7b4 2025-05-14T10:05:20+02:00 frr-k8s: stop listening for incoming connection in the bgp daemon
-
-- machine-config-operator embedded-component a08d5ec38c4f037766b4114dff5831b1c59a0772 to d4e611fd709e777240045df8a7c2d8b9c13d7408
-  - 0cda7f1c 2025-06-27T10:35:57+02:00 Add cloud providers to the kubernetes vendor
-  - 75a4864e 2025-06-25T10:23:04-04:00 bump(api & client-go): go mod vendor
-  - 0a63559d 2025-06-25T10:22:26-04:00 bump(api & client-go): update api dependency to commit a8cbc21 and client-go dependency to commit 7b20078
-  - 0fa2e3e3 2025-05-19T12:07:31-04:00 move mcn e2e tests from /test/e2e-techpreview/ to test/e2e/ to be part of the blocking test suite
+- oc image-arm64 ea5c72052233361761ba371b7c39518d443422be to f0e10516c2bab32e797240b7bd4a2c6563138709
+  - 83321f44 2025-07-02T21:44:54+05:30 Introduce a dedicated Pod label for the purpose of identifying debug pods
 
