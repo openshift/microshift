@@ -6,7 +6,7 @@ set -xeuo pipefail
 # https://github.com/NVIDIA/k8s-device-plugin?tab=readme-ov-file#enabling-gpu-support-in-kubernetes
 
 DEST="/etc/microshift/manifests.d/10-nvidia-device-plugin"
-VER="v0.17.0"
+VER="v0.17.2"
 URL="https://raw.githubusercontent.com/NVIDIA/k8s-device-plugin/refs/tags/${VER}/deployments/static/nvidia-device-plugin-privileged-with-service-account.yml"
 
 sudo mkdir -p "${DEST}"
