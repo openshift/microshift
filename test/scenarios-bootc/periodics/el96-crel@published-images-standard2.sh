@@ -52,10 +52,7 @@ scenario_run_tests() {
         # Empty string means there's no EC build yet, so the test needs to be skipped.
         exit 0
     fi
-    # Until 4.19 EC starts including correct default config,
-    # the test 'MicroShift Starts Using Default Config' needs to be skipped.
     run_tests host1 \
-        --exclude defaultcfg \
         --variable "IMAGE_SIGSTORE_ENABLED:True" \
         suites/standard2/
 }
