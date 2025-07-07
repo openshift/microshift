@@ -8,7 +8,7 @@
 
 */ -}}
 
-name = "rhel-9.6-microshift-brew-optionals-{{ .Env.BREW_EC_RELEASE_VERSION | replace "~" "-" }}"
+name = "rhel-9.6-microshift-brew-optionals-{{ .Env.BREW_EC_RELEASE_VERSION | strings.ReplaceAll "~" "-" }}"
 description = "A RHEL 9.6 image with already built and released RPMs like EC, RC, or Z-stream release"
 version = "0.0.1"
 modules = []
