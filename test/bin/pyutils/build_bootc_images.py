@@ -619,6 +619,13 @@ def main():
             extract_container_images(f"4.{FAKE_NEXT_MINOR_VERSION}.*", NEXT_REPO, CONTAINER_LIST, args.dry_run)
             extract_container_images(PREVIOUS_RELEASE_VERSION, PREVIOUS_RELEASE_REPO, CONTAINER_LIST, args.dry_run)
             extract_container_images(YMINUS2_RELEASE_VERSION, YMINUS2_RELEASE_REPO, CONTAINER_LIST, args.dry_run)
+            # The following images are specific to the brew release versions
+            if BREW_Y0_RELEASE_VERSION: extract_container_images(BREW_Y0_RELEASE_VERSION, BREW_REPO, CONTAINER_LIST, args.dry_run)
+            if BREW_Y1_RELEASE_VERSION: extract_container_images(BREW_Y1_RELEASE_VERSION, BREW_REPO, CONTAINER_LIST, args.dry_run)
+            if BREW_Y2_RELEASE_VERSION: extract_container_images(BREW_Y2_RELEASE_VERSION, BREW_REPO, CONTAINER_LIST, args.dry_run)
+            if BREW_RC_RELEASE_VERSION: extract_container_images(BREW_RC_RELEASE_VERSION, BREW_REPO, CONTAINER_LIST, args.dry_run)
+            if BREW_EC_RELEASE_VERSION: extract_container_images(BREW_EC_RELEASE_VERSION, BREW_REPO, CONTAINER_LIST, args.dry_run)
+            if BREW_NIGHTLY_RELEASE_VERSION: extract_container_images(BREW_NIGHTLY_RELEASE_VERSION, BREW_REPO, CONTAINER_LIST, args.dry_run)
         # Sort the images list, only leaving unique entries
         common.sort_uniq_file(CONTAINER_LIST)
 
