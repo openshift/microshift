@@ -108,12 +108,24 @@ def set_rpm_version_info_vars():
     global PREVIOUS_RELEASE_VERSION
     global YMINUS2_RELEASE_REPO
     global YMINUS2_RELEASE_VERSION
+    global BREW_Y0_RELEASE_VERSION
+    global BREW_Y1_RELEASE_VERSION
+    global BREW_Y2_RELEASE_VERSION
+    global BREW_RC_RELEASE_VERSION
+    global BREW_EC_RELEASE_VERSION
+    global BREW_NIGHTLY_RELEASE_VERSION
 
     FAKE_NEXT_MINOR_VERSION = common.get_env_var('FAKE_NEXT_MINOR_VERSION')
     PREVIOUS_RELEASE_REPO = common.get_env_var('PREVIOUS_RELEASE_REPO')
     PREVIOUS_RELEASE_VERSION = common.get_env_var('PREVIOUS_RELEASE_VERSION')
     YMINUS2_RELEASE_REPO = common.get_env_var('YMINUS2_RELEASE_REPO')
     YMINUS2_RELEASE_VERSION = common.get_env_var('YMINUS2_RELEASE_VERSION')
+    BREW_Y0_RELEASE_VERSION = common.get_env_var('BREW_Y0_RELEASE_VERSION')
+    BREW_Y1_RELEASE_VERSION = common.get_env_var('BREW_Y1_RELEASE_VERSION')
+    BREW_Y2_RELEASE_VERSION = common.get_env_var('BREW_Y2_RELEASE_VERSION')
+    BREW_RC_RELEASE_VERSION = common.get_env_var('BREW_RC_RELEASE_VERSION')
+    BREW_EC_RELEASE_VERSION = common.get_env_var('BREW_EC_RELEASE_VERSION')
+    BREW_NIGHTLY_RELEASE_VERSION = common.get_env_var('BREW_NIGHTLY_RELEASE_VERSION')
 
     # The source versions are deduced from the locally built RPMs
     global SOURCE_VERSION
