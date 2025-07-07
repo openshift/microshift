@@ -1,20 +1,3 @@
-- kubernetes embedded-component 7cf4c058dab19556d71e98c02bed1798cb0a4a9c to 29b5494d107f1b6f3bd4cd9e2fdf6fc5914e32c9
-  - 9bb1d4ee2 2025-06-02T17:44:09-03:00 UPSTREAM: <carry>: Bump cadvisor version to fix kubelet
-
-- machine-config-operator embedded-component b07226a887f8dfb5c5f13726f3bb6187843a008a to ccc42e8a2b41175d24cd83f8b510b8f8e50f5136
-  - 538c2290 2025-03-25T17:01:53-04:00 add missing vendors
-
-- ovn-kubernetes image-amd64 d47da85eece1933f37e4151e0e1123aeccd97ec6 to f3de6bbc5be547ebe1cb8af493abbe60f16e5f32
-  - ccbcadcb 2025-06-25T10:41:45+02:00 Fix predicate for cluster subnet route to gateway router
-  - 065fccb5 2025-06-23T09:02:38+00:00 Fix hybrid overlay node subnets collision with cluster subnets
-
-- kubernetes image-amd64 7cf4c058dab19556d71e98c02bed1798cb0a4a9c to 29b5494d107f1b6f3bd4cd9e2fdf6fc5914e32c9
-  - 9bb1d4ee2 2025-06-02T17:44:09-03:00 UPSTREAM: <carry>: Bump cadvisor version to fix kubelet
-
-- ovn-kubernetes image-arm64 d47da85eece1933f37e4151e0e1123aeccd97ec6 to f3de6bbc5be547ebe1cb8af493abbe60f16e5f32
-  - ccbcadcb 2025-06-25T10:41:45+02:00 Fix predicate for cluster subnet route to gateway router
-  - 065fccb5 2025-06-23T09:02:38+00:00 Fix hybrid overlay node subnets collision with cluster subnets
-
-- kubernetes image-arm64 7cf4c058dab19556d71e98c02bed1798cb0a4a9c to 29b5494d107f1b6f3bd4cd9e2fdf6fc5914e32c9
-  - 9bb1d4ee2 2025-06-02T17:44:09-03:00 UPSTREAM: <carry>: Bump cadvisor version to fix kubelet
+- router image-arm64 ad86f4628092d3287e8a71e8ead030f5cd878768 to 7c4b47201b75421631739feb42e7ae86ae047739
+  - 55216f9 2025-05-19T09:23:27+00:00 Make idle-close-on-response configurable in HAProxy template
 
