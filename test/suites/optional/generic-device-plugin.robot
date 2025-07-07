@@ -24,7 +24,7 @@ Sanity Test
 
     Wait Until Device Is Allocatable
 
-    Command Should Work    crictl pull quay.io/fedora/python-311
+    Command Should Work    crictl pull registry.access.redhat.com/ubi9/ubi:9.6
     Start Script On Host
     Create Test Job
 

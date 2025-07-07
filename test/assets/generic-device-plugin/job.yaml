@@ -8,7 +8,7 @@ spec:
       restartPolicy: Never
       containers:
       - name: gdp-test
-        image: quay.io/fedora/python-311
+        image: registry.access.redhat.com/ubi9/ubi:9.6
         command: ["/bin/bash"]
         args: ["/script/entrypoint.sh", "pod"]
         resources:

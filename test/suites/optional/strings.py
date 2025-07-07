@@ -16,8 +16,10 @@ metadata:
 data:
   entrypoint.sh: |
     #!/usr/bin/env bash
-    pip install pyserial
-    /script/fake-serial-communication.py pod
+    # Fake user homedir for installing pip and pyserial.
+    HOME=/tmp python3 -m ensurepip --upgrade
+    HOME=/tmp python3 -m pip install pyserial
+    HOME=/tmp /script/fake-serial-communication.py pod
 
   fake-serial-communication.py: |
 '''
