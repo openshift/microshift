@@ -2,9 +2,15 @@
 
 set -xeuo pipefail
 
-sudo microshift healthcheck \
-    --namespace nvidia-device-plugin \
-    --daemonsets nvidia-device-plugin-daemonset
+if microshift --help | grep -q "healthcheck"; then
+    sudo microshift healthcheck \
+        --namespace nvidia-device-plugin \
+        --daemonsets nvidia-device-plugin-daemonset
+else
+    oc rollout status \
+        --timeout=180s \
+        -n nvidia-device-plugin daemonset/nvidia-device-plugin-daemonset
+fi
 
 retries=20
 while [ ${retries} -gt 0 ] ; do
