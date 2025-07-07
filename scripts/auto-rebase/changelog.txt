@@ -1,3 +1,53 @@
-- operator-framework-olm embedded-component 969a7e031a97a7e12424b5d292f345a168b73e38 to fc45750531908c70a18556439b5147d8cae6a93f
-  - 63168ab2 2025-06-12T21:03:24+00:00 reduce cache expiriry frequency (#3591)
+- kubernetes embedded-component 84b31a33f3dd1a585589e8031ab29b0ed9276518 to 817e6dd5e0cb98b70cfc7407e94c2c125e4ce424
+  - c0e67777c 2025-06-26T20:28:11+02:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - 61183587c 2025-06-17T18:33:34+00:00 Release commit for Kubernetes v1.31.10
+  - 262df1aac 2025-06-11T08:30:46+02:00 Bump images, dependencies and versions to go 1.23.10 and distroless iptables
+  - d67d7edfa 2025-05-23T09:30:56-04:00 Bump images, dependencies and versions to go 1.23.9 and distroless iptables
+  - c9dbae7d0 2025-05-15T12:34:54+02:00 pkg/kubelet/userns: Remove skip on windows
+  - 2e0622bf2 2025-05-15T12:34:54+02:00 pkg/kubelet/userns: Wrap error to get mappings
+  - 4c652757a 2025-05-15T12:34:54+02:00 pkg/kubelet/userns: Provide stub implementation for windows
+  - 156c80a61 2025-05-15T12:34:54+02:00 pkg/kubelet: Fix userns tests on Windows
+  - 1e53e59c3 2025-05-15T12:27:10+02:00 Revert "Enforce the Minimum Kernel Version 6.3 for UserNamespacesSupport feature"
+  - c88aef2d6 2025-05-15T12:27:10+02:00 Revert "Switch hard error to a WARNING for kernel version check"
+  - e88598639 2025-05-15T12:23:17+02:00 userns: Wrap more errors
+  - c0eb9e343 2025-05-15T12:23:17+02:00 userns: Improve error returned if userns is not supported
+  - e983d3f57 2025-05-15T12:23:17+02:00 userns: Use len to handle empty non-nil slices
+  - 16dd861db 2025-05-15T09:32:00+00:00 Update CHANGELOG/CHANGELOG-1.31.md for v1.31.9
+
+- machine-config-operator embedded-component 42e953adc94db23f0d10d057ec6046e23ed900a6 to d4462a19e3abc8ce2e7da9d26518ddcaee6ea9e9
+  - 7e5d0a49 2025-06-30T21:33:15+00:00 Do not set cpu system reserve below the default value
+  - 0d92bb6c 2025-06-24T20:07:23+00:00 Ensure the build controller restarts on upgrade
+  - 9d29b694 2025-05-22T18:38:24+00:00 OCPBUGS-55681: Give keepalived container chroot cap
+
+- kubernetes image-amd64 84b31a33f3dd1a585589e8031ab29b0ed9276518 to 817e6dd5e0cb98b70cfc7407e94c2c125e4ce424
+  - c0e67777c 2025-06-26T20:28:11+02:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - 61183587c 2025-06-17T18:33:34+00:00 Release commit for Kubernetes v1.31.10
+  - 262df1aac 2025-06-11T08:30:46+02:00 Bump images, dependencies and versions to go 1.23.10 and distroless iptables
+  - d67d7edfa 2025-05-23T09:30:56-04:00 Bump images, dependencies and versions to go 1.23.9 and distroless iptables
+  - c9dbae7d0 2025-05-15T12:34:54+02:00 pkg/kubelet/userns: Remove skip on windows
+  - 2e0622bf2 2025-05-15T12:34:54+02:00 pkg/kubelet/userns: Wrap error to get mappings
+  - 4c652757a 2025-05-15T12:34:54+02:00 pkg/kubelet/userns: Provide stub implementation for windows
+  - 156c80a61 2025-05-15T12:34:54+02:00 pkg/kubelet: Fix userns tests on Windows
+  - 1e53e59c3 2025-05-15T12:27:10+02:00 Revert "Enforce the Minimum Kernel Version 6.3 for UserNamespacesSupport feature"
+  - c88aef2d6 2025-05-15T12:27:10+02:00 Revert "Switch hard error to a WARNING for kernel version check"
+  - e88598639 2025-05-15T12:23:17+02:00 userns: Wrap more errors
+  - c0eb9e343 2025-05-15T12:23:17+02:00 userns: Improve error returned if userns is not supported
+  - e983d3f57 2025-05-15T12:23:17+02:00 userns: Use len to handle empty non-nil slices
+  - 16dd861db 2025-05-15T09:32:00+00:00 Update CHANGELOG/CHANGELOG-1.31.md for v1.31.9
+
+- kubernetes image-arm64 84b31a33f3dd1a585589e8031ab29b0ed9276518 to 817e6dd5e0cb98b70cfc7407e94c2c125e4ce424
+  - c0e67777c 2025-06-26T20:28:11+02:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - 61183587c 2025-06-17T18:33:34+00:00 Release commit for Kubernetes v1.31.10
+  - 262df1aac 2025-06-11T08:30:46+02:00 Bump images, dependencies and versions to go 1.23.10 and distroless iptables
+  - d67d7edfa 2025-05-23T09:30:56-04:00 Bump images, dependencies and versions to go 1.23.9 and distroless iptables
+  - c9dbae7d0 2025-05-15T12:34:54+02:00 pkg/kubelet/userns: Remove skip on windows
+  - 2e0622bf2 2025-05-15T12:34:54+02:00 pkg/kubelet/userns: Wrap error to get mappings
+  - 4c652757a 2025-05-15T12:34:54+02:00 pkg/kubelet/userns: Provide stub implementation for windows
+  - 156c80a61 2025-05-15T12:34:54+02:00 pkg/kubelet: Fix userns tests on Windows
+  - 1e53e59c3 2025-05-15T12:27:10+02:00 Revert "Enforce the Minimum Kernel Version 6.3 for UserNamespacesSupport feature"
+  - c88aef2d6 2025-05-15T12:27:10+02:00 Revert "Switch hard error to a WARNING for kernel version check"
+  - e88598639 2025-05-15T12:23:17+02:00 userns: Wrap more errors
+  - c0eb9e343 2025-05-15T12:23:17+02:00 userns: Improve error returned if userns is not supported
+  - e983d3f57 2025-05-15T12:23:17+02:00 userns: Use len to handle empty non-nil slices
+  - 16dd861db 2025-05-15T09:32:00+00:00 Update CHANGELOG/CHANGELOG-1.31.md for v1.31.9
 
