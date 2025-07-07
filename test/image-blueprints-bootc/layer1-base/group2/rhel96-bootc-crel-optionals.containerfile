@@ -10,8 +10,22 @@ COPY ./bootc-images/microshift-fast-datapath-rhel9.repo ./bootc-images/microshif
 # Install MicroShift with optional components and cleanup.
 RUN dnf repoinfo --enabled && \
     dnf install -y firewalld \
-        "microshift-{{ .Env.CURRENT_RELEASE_VERSION }}" "microshift-release-info-{{ .Env.CURRENT_RELEASE_VERSION }}" \
-        "microshift-olm-{{ .Env.CURRENT_RELEASE_VERSION }}" "microshift-multus-{{ .Env.CURRENT_RELEASE_VERSION }}"  && \
+        "microshift-{{ .Env.CURRENT_RELEASE_VERSION }}" \
+        "microshift-greenboot-{{ .Env.CURRENT_RELEASE_VERSION }}" \
+        "microshift-networking-{{ .Env.CURRENT_RELEASE_VERSION }}" \
+        "microshift-selinux-{{ .Env.CURRENT_RELEASE_VERSION }}" \
+        "microshift-olm-{{ .Env.CURRENT_RELEASE_VERSION }}" \
+        "microshift-multus-{{ .Env.CURRENT_RELEASE_VERSION }}" \
+        "microshift-gateway-api-{{ .Env.CURRENT_RELEASE_VERSION }}" \
+        "microshift-observability-{{ .Env.CURRENT_RELEASE_VERSION }}" \
+        "microshift-release-info-{{ .Env.CURRENT_RELEASE_VERSION }}" \
+        "microshift-olm-release-info-{{ .Env.CURRENT_RELEASE_VERSION }}" \
+        "microshift-multus-release-info-{{ .Env.CURRENT_RELEASE_VERSION }}" \
+        # {{- if and (env.Getenv "UNAME_M" "") (eq "x86_64" .Env.UNAME_M) }}
+        "microshift-ai-model-serving-{{ .Env.CURRENT_RELEASE_VERSION }}" \
+        "microshift-ai-model-serving-release-info-{{ .Env.CURRENT_RELEASE_VERSION }}" \
+        # {{- end }}
+        "microshift-gateway-api-release-info-{{ .Env.CURRENT_RELEASE_VERSION }}" && \
     systemctl enable microshift && \
     rm -vf /etc/yum.repos.d/microshift-*.repo && \
     dnf clean all

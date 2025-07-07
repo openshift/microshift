@@ -44,6 +44,40 @@ name = "microshift-multus"
 version = "{{ .Env.CURRENT_RELEASE_VERSION }}"
 
 [[packages]]
+name = "microshift-gateway-api"
+version = "{{ .Env.CURRENT_RELEASE_VERSION }}"
+
+[[packages]]
+name = "microshift-observability"
+version = "{{ .Env.CURRENT_RELEASE_VERSION }}"
+
+[[packages]]
+name = "microshift-release-info"
+version = "{{ .Env.CURRENT_RELEASE_VERSION }}"
+
+[[packages]]
+name = "microshift-olm-release-info"
+version = "{{ .Env.CURRENT_RELEASE_VERSION }}"
+
+[[packages]]
+name = "microshift-multus-release-info"
+version = "{{ .Env.CURRENT_RELEASE_VERSION }}"
+
+[[packages]]
+name = "microshift-gateway-api-release-info"
+version = "{{ .Env.CURRENT_RELEASE_VERSION }}"
+
+{{- if and (env.Getenv "UNAME_M" "") (eq "x86_64" .Env.UNAME_M) }}
+[[packages]]
+name = "microshift-ai-model-serving"
+version = "{{ .Env.CURRENT_RELEASE_VERSION }}"
+
+[[packages]]
+name = "microshift-ai-model-serving-release-info"
+version = "{{ .Env.CURRENT_RELEASE_VERSION }}"
+{{- end }}
+
+[[packages]]
 name = "microshift-test-agent"
 version = "*"
 
