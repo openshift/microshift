@@ -19,6 +19,8 @@ sudo nvidia-ctk runtime configure --runtime=crio --set-as-default --config=/etc/
 # Update runtimes from ["docker-runc", "runc", "crun"] to ["crun", "docker-runc", "runc"]
 sudo sed -i 's/^runtimes =.*$/runtimes = ["crun", "docker-runc", "runc"]/g' /etc/nvidia-container-runtime/config.toml
 
+# ci-nvidia-device-plugin scripts are used by many branches, not only the main branch.
+# Therefore the scripts include workarounds for older MicroShift versions.
 # MicroShift 4.14 and 4.15 don't use numerical prefixes.
 # Rename the files, so the 99-nvidia.conf overwrites them.
 if [ -f /etc/crio/crio.conf.d/microshift.conf ]; then

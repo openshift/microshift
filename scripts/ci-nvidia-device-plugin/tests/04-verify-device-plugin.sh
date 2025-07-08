@@ -2,6 +2,10 @@
 
 set -xeuo pipefail
 
+# ci-nvidia-device-plugin scripts are used by many branches, not only the main branch.
+# Therefore the scripts include workarounds for older MicroShift versions.
+# For the versions that do not have the healthcheck command, the script uses oc rollout status.
+
 if microshift --help | grep -q "healthcheck"; then
     sudo microshift healthcheck \
         --namespace nvidia-device-plugin \
