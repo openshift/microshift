@@ -49,7 +49,6 @@ processors:
         value: kube_events
 
 exporters:
-  debug: # exports metrics only in journalctl log
   prometheus:
     endpoint: "[{{NODE_IP}}]:{{PROM_EXPORTER_PORT}}"
     send_timestamps: true
@@ -69,15 +68,15 @@ service:
     metrics/hostmetrics:
       receivers: [ hostmetrics ]
       processors: [ resourcedetection/system ]
-      exporters: [ debug, prometheus, prometheusremotewrite ]
+      exporters: [ prometheus, prometheusremotewrite ]
     metrics/kubeletstats:
       receivers: [ kubeletstats ]
-      exporters: [ debug, prometheus, prometheusremotewrite ]
+      exporters: [ prometheus, prometheusremotewrite ]
     logs/journald:
       receivers: [ journald ]
       processors: [ batch, resource/journald ]
-      exporters: [ debug, loki ]
+      exporters: [ loki ]
     logs/kube_events:
       receivers: [ k8s_events ]
       processors: [ batch, resource/kube_events ]
-      exporters: [ debug, loki ]
+      exporters: [ loki ]
