@@ -34,16 +34,19 @@ func waitForWorkloads(ctx context.Context, timeout time.Duration, workloads map[
 		return fmt.Errorf("failed to create client: %v", err)
 	}
 
+	interval := max(timeout/30, 1*time.Second)
+	klog.Infof("API Server will be queried every %v", interval)
+
 	aeg := &util.AllErrGroup{}
 	for ns, wls := range workloads {
 		for _, deploy := range wls.Deployments {
-			aeg.Go(func() error { return waitForDeployment(ctx, client, timeout, ns, deploy) })
+			aeg.Go(func() error { return waitForDeployment(ctx, client, timeout, interval, ns, deploy) })
 		}
 		for _, ds := range wls.DaemonSets {
-			aeg.Go(func() error { return waitForDaemonSet(ctx, client, timeout, ns, ds) })
+			aeg.Go(func() error { return waitForDaemonSet(ctx, client, timeout, interval, ns, ds) })
 		}
 		for _, sts := range wls.StatefulSets {
-			aeg.Go(func() error { return waitForStatefulSet(ctx, client, timeout, ns, sts) })
+			aeg.Go(func() error { return waitForStatefulSet(ctx, client, timeout, interval, ns, sts) })
 		}
 	}
 	errs := aeg.Wait()
@@ -54,9 +57,9 @@ func waitForWorkloads(ctx context.Context, timeout time.Duration, workloads map[
 	return nil
 }
 
-func waitForDaemonSet(ctx context.Context, client *appsclientv1.AppsV1Client, timeout time.Duration, namespace, name string) error {
+func waitForDaemonSet(ctx context.Context, client *appsclientv1.AppsV1Client, timeout, interval time.Duration, namespace, name string) error {
 	klog.Infof("Waiting %v for daemonset/%s in %s", timeout, name, namespace)
-	err := wait.PollUntilContextTimeout(ctx, 10*time.Second, timeout, true, func(ctx context.Context) (done bool, err error) {
+	err := wait.PollUntilContextTimeout(ctx, interval, timeout, true, func(ctx context.Context) (done bool, err error) {
 		ds, err := client.DaemonSets(namespace).Get(ctx, name, v1.GetOptions{})
 		if err != nil {
 			if apierrors.IsNotFound(err) {
@@ -90,10 +93,10 @@ func waitForDaemonSet(ctx context.Context, client *appsclientv1.AppsV1Client, ti
 	return nil
 }
 
-func waitForDeployment(ctx context.Context, client *appsclientv1.AppsV1Client, timeout time.Duration, namespace, name string) error {
+func waitForDeployment(ctx context.Context, client *appsclientv1.AppsV1Client, timeout, interval time.Duration, namespace, name string) error {
 	klog.Infof("Waiting %v for deployment/%s in %s", timeout, name, namespace)
-	err := wait.PollUntilContextTimeout(ctx, 10*time.Second, timeout, true, func(ctx context.Context) (done bool, err error) {
 		deployment, err := client.Deployments(namespace).Get(ctx, name, v1.GetOptions{})
+	err := wait.PollUntilContextTimeout(ctx, interval, timeout, true, func(ctx context.Context) (done bool, err error) {
 		if err != nil {
 			if apierrors.IsNotFound(err) {
 				// Resources created by an operator might not exist yet.
@@ -135,9 +138,9 @@ func waitForDeployment(ctx context.Context, client *appsclientv1.AppsV1Client, t
 	return nil
 }
 
-func waitForStatefulSet(ctx context.Context, client *appsclientv1.AppsV1Client, timeout time.Duration, namespace, name string) error {
+func waitForStatefulSet(ctx context.Context, client *appsclientv1.AppsV1Client, timeout, interval time.Duration, namespace, name string) error {
 	klog.Infof("Waiting %v for statefulset/%s in %s", timeout, name, namespace)
-	err := wait.PollUntilContextTimeout(ctx, 10*time.Second, timeout, true, func(ctx context.Context) (done bool, err error) {
+	err := wait.PollUntilContextTimeout(ctx, interval, timeout, true, func(ctx context.Context) (done bool, err error) {
 		sts, err := client.StatefulSets(namespace).Get(ctx, name, v1.GetOptions{})
 		if err != nil {
 			if apierrors.IsNotFound(err) {
