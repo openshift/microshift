@@ -824,7 +824,7 @@ fi
 # Use Git command to generate the log and replace the VERSION string
 # LANG=C git log --date="format:%a %b %d %Y" --pretty="tformat:* %cd %an <%ae> VERSION%n- %s%n" packaging/rpm/microshift.spec
 %changelog
-* Thu Jul 2 2025 Evgeny Slutsky <eslutsky@redhat.com> 4.20.0
+* Wed Jul 02 2025 Evgeny Slutsky <eslutsky@redhat.com> 4.20.0
 - Add an optional microshift-cert-manager RPM
 
 * Thu Jun 12 2025 Evgeny Slutsky <eslutsky@redhat.com> 4.20.0
