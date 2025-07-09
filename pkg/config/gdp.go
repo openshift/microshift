@@ -77,6 +77,8 @@ func (gdp GenericDevicePlugin) validate() error {
 		errs = append(errs, fmt.Errorf("genericDevicePlugin.Devices is empty - at least one device must be specified"))
 	}
 
+	paths := make(map[string][]string)
+
 	for i, deviceSpec := range gdp.Devices {
 		if !deviceTypeRegexp.MatchString(strings.TrimSpace(deviceSpec.Name)) {
 			errs = append(errs, fmt.Errorf("failed to parse device %q; device name must match the regular expression %q", deviceSpec.Name, deviceTypeFmt))
@@ -101,8 +103,15 @@ func (gdp GenericDevicePlugin) validate() error {
 			}
 
 			for _, path := range g.Paths {
+				paths[path.Path] = append(paths[path.Path], deviceSpec.Name)
 				errs = append(errs, path.validate()...)
 			}
+		}
+	}
+
+	for path, devices := range paths {
+		if len(devices) > 1 {
+			errs = append(errs, fmt.Errorf("path '%s' is specified multiple times for devices: %s", path, strings.Join(devices, ", ")))
 		}
 	}
 

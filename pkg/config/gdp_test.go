@@ -121,6 +121,46 @@ func Test_GDP_Validate(t *testing.T) {
 		assert.Equal(t, "/dev/ttyUSB*", cfg.Devices[0].Groups[0].Paths[0].Path)
 		assert.Equal(t, 0, len(cfg.Devices[0].Groups[0].USBSpecs))
 	})
+
+	t.Run("path cannot be specified multiple times - single group", func(t *testing.T) {
+		cfg := GenericDevicePlugin{
+			Status: "Enabled",
+			Domain: "valid-domain.io",
+			Devices: []DeviceSpec{
+				{Name: "serial",
+					Groups: []*Group{
+						{Paths: []*Path{{Path: "/dev/ttyUSB*"}}},
+						{Paths: []*Path{{Path: "/dev/ttyUSB*"}}},
+					},
+				},
+			},
+		}
+		err := cfg.validate()
+		assert.Error(t, err)
+		assert.ErrorContains(t, err, "path '/dev/ttyUSB*' is specified multiple times for devices: serial, serial")
+	})
+
+	t.Run("path cannot be specified multiple times - multiple groups", func(t *testing.T) {
+		cfg := GenericDevicePlugin{
+			Status: "Enabled",
+			Domain: "valid-domain.io",
+			Devices: []DeviceSpec{
+				{Name: "serial",
+					Groups: []*Group{
+						{Paths: []*Path{{Path: "/dev/ttyACM*"}}},
+					},
+				},
+				{Name: "zigbee",
+					Groups: []*Group{
+						{Paths: []*Path{{Path: "/dev/ttyACM*"}}},
+					},
+				},
+			},
+		}
+		err := cfg.validate()
+		assert.Error(t, err)
+		assert.ErrorContains(t, err, "path '/dev/ttyACM*' is specified multiple times for devices: serial, zigbee")
+	})
 }
 
 func Test_GDP_Path_Validate(t *testing.T) {
