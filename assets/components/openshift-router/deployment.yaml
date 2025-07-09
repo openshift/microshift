@@ -149,6 +149,8 @@ spec:
             - name: ROUTER_ERRORFILE_404
               value: /var/lib/haproxy/errorfiles/error-page-404.http
             {{- end }}
+            - name: ROUTER_ENABLE_EXTERNAL_CERTIFICATE
+              value: "true"
           livenessProbe:
             failureThreshold: 3
             httpGet:
