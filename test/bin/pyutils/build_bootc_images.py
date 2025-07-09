@@ -206,7 +206,7 @@ def extract_container_images(version, repo_spec, outfile, dry_run=False):
     common.popd()
 
 
-def run_template_cmd(ifile, ofile, dry_run, template_datasource = None):
+def run_template_cmd(ifile, ofile, dry_run, template_datasource=None):
     # Run the templating command
     gomplate_args = [
         GOMPLATE,
