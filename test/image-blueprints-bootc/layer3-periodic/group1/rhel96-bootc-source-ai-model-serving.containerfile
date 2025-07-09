@@ -19,9 +19,12 @@ COPY ./bootc-images/$USHIFT_RPM_REPO_NAME.repo ./bootc-images/microshift-fast-da
 # vim-common for xxd utility
 RUN dnf repoinfo --enabled && \
     dnf install -y \
-        "microshift-release-info-{{ .Env.SOURCE_VERSION }}" \
-        "microshift-ai-model-serving-{{ .Env.SOURCE_VERSION }}" \
-        "microshift-ai-model-serving-release-info-{{ .Env.SOURCE_VERSION }}" \
+        {{ range (datasource "packages").optional_rpms -}}
+        "{{ . }}-{{ env.Getenv "SOURCE_VERSION" }}" \
+        {{ end -}}
+        {{ range (datasource "packages").x86_64_rpms -}}
+        "{{ . }}-{{ env.Getenv "SOURCE_VERSION" }}" \
+        {{ end -}}
         vim-common \
         qemu-guest-agent && \
     rm -vf /etc/yum.repos.d/microshift-*.repo && \

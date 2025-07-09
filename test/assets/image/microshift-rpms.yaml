@@ -1,0 +1,18 @@
+mandatory_rpms:
+  - microshift
+  - microshift-release-info
+  - microshift-greenboot
+  - microshift-networking
+  - microshift-selinux
+optional_rpms:
+  - microshift-olm
+  - microshift-olm-release-info
+  - microshift-multus
+  - microshift-multus-release-info
+  - microshift-gateway-api
+  - microshift-gateway-api-release-info
+  - microshift-observability
+  - microshift-low-latency
+x86_64_rpms:
+  - microshift-ai-model-serving
+  - microshift-ai-model-serving-release-info

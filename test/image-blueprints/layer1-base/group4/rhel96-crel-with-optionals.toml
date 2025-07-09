@@ -19,62 +19,24 @@ distro = "rhel-96"
 # used with the '--parent' argument of 'osbuild-composer'
 # parent = "rhel-9.6-microshift-4.{{ .Env.PREVIOUS_MINOR_VERSION }}"
 
+{{ range (datasource "packages").mandatory_rpms }}
 [[packages]]
-name = "microshift"
-version = "{{ .Env.CURRENT_RELEASE_VERSION }}"
+name = "{{ . }}"
+version = "{{ env.Getenv "CURRENT_RELEASE_VERSION" }}"
+{{ end }}
 
+{{- range (datasource "packages").optional_rpms }}
 [[packages]]
-name = "microshift-greenboot"
-version = "{{ .Env.CURRENT_RELEASE_VERSION }}"
-
-[[packages]]
-name = "microshift-networking"
-version = "{{ .Env.CURRENT_RELEASE_VERSION }}"
-
-[[packages]]
-name = "microshift-selinux"
-version = "{{ .Env.CURRENT_RELEASE_VERSION }}"
-
-[[packages]]
-name = "microshift-olm"
-version = "{{ .Env.CURRENT_RELEASE_VERSION }}"
-
-[[packages]]
-name = "microshift-multus"
-version = "{{ .Env.CURRENT_RELEASE_VERSION }}"
-
-[[packages]]
-name = "microshift-gateway-api"
-version = "{{ .Env.CURRENT_RELEASE_VERSION }}"
-
-[[packages]]
-name = "microshift-observability"
-version = "{{ .Env.CURRENT_RELEASE_VERSION }}"
-
-[[packages]]
-name = "microshift-release-info"
-version = "{{ .Env.CURRENT_RELEASE_VERSION }}"
-
-[[packages]]
-name = "microshift-olm-release-info"
-version = "{{ .Env.CURRENT_RELEASE_VERSION }}"
-
-[[packages]]
-name = "microshift-multus-release-info"
-version = "{{ .Env.CURRENT_RELEASE_VERSION }}"
-
-[[packages]]
-name = "microshift-gateway-api-release-info"
-version = "{{ .Env.CURRENT_RELEASE_VERSION }}"
+name = "{{ . }}"
+version = "{{ env.Getenv "CURRENT_RELEASE_VERSION" }}"
+{{ end }}
 
 {{- if and (env.Getenv "UNAME_M" "") (eq "x86_64" .Env.UNAME_M) }}
+{{ range (datasource "packages").x86_64_rpms }}
 [[packages]]
-name = "microshift-ai-model-serving"
-version = "{{ .Env.CURRENT_RELEASE_VERSION }}"
-
-[[packages]]
-name = "microshift-ai-model-serving-release-info"
-version = "{{ .Env.CURRENT_RELEASE_VERSION }}"
+name = "{{ . }}"
+version = "{{ env.Getenv "CURRENT_RELEASE_VERSION" }}"
+{{ end }}
 {{- end }}
 
 [[packages]]
