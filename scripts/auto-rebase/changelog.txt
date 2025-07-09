@@ -1,4 +1,23 @@
-- kubernetes image-arm64 02b9b7e65987d5aa4559c318725354713838b5a2 to e52b13b59e910bfa409eaa1e5280c4160b687bf8
+- api embedded-component 41708f6123394c18afbb4bef1bac526f46960769 to ad766c4e6d8e5adc72537d145bd4f24365e3e560
+  - 03e897d1 2025-07-02T07:58:29-04:00 FeatureGate - MultiDiskSetup
+  - 712062c2 2025-07-01T20:22:02-04:00 Revert "CNTRLPLANE-72: remove RoleBindingRestriction CRD from payload"
+  - 390e6548 2025-07-01T10:10:02+01:00 Drop on-by-default ValidatingAdmissionPolicy featuregate
+  - 11fb92b0 2025-06-24T11:38:52-04:00 Add featuregates for storage performant security policies
+
+- cluster-ingress-operator embedded-component be41be00b822b820b03a7190732e3fc983efddf3 to cbc0b217b655f1f0ce0becc9145c2a6042beabea
+  - 0651846 2025-07-03T11:16:00-04:00 desiredIstio: Do not enable a default PDB
+  - 09797dc 2025-06-19T05:32:08+00:00 Updating ose-cluster-ingress-operator-container image to be consistent with ART for 4.20 Reconciling with https://github.com/openshift/ocp-build-data/tree/dfb5c7d531490cfdc61a3b88bc533702b9624997/images/ose-cluster-ingress-operator.yml
+
+- cluster-kube-apiserver-operator embedded-component aab4c503b665c958a743517f7381692912c1915b to add2db9de136758cac8c45184b7ba7812de0893b
+  - f9a4389 2025-07-04T14:07:21+08:00 Fix make verify error 'non-constant format string in call to (*testing.common).Errorf'
+  - f9a9503 2025-07-04T13:37:29+08:00 fix error 'non-constant format string in call to (*testing.common).Logf' of unit test
+  - 51afed7 2025-07-04T13:35:29+08:00 Update go 1.24 in go.mod and go mod tidy&&vendor
+  - 76484ad 2025-07-04T12:55:48+08:00 Update go and ocp versions
+
+- cluster-network-operator embedded-component 1294454f9d29d66e7d15a1ce1821cc3e6483f0c2 to 29122af3abbecc793638e6a9fe846d7bdf3c295f
+  - edc4890 2025-06-18T16:10:45+02:00 Add release version annotation to whereabouts-controller and whereabouts-token-watcher
+
+- kubernetes embedded-component 02b9b7e65987d5aa4559c318725354713838b5a2 to e52b13b59e910bfa409eaa1e5280c4160b687bf8
   - 00da85e50 2025-07-01T11:29:23-04:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
   - 2cf0e2078 2025-07-01T11:12:23-04:00 UPSTREAM: <drop>: manually resolve conflicts
   - 036f7ed3f 2025-06-17T21:01:12+00:00 Release commit for Kubernetes v1.32.6
@@ -18,4 +37,44 @@
   - fd5862185 2025-05-15T12:21:30+02:00 userns: Use len to handle empty non-nil slices
   - 95c119b50 2025-05-15T09:27:49+00:00 Update CHANGELOG/CHANGELOG-1.32.md for v1.32.5
   - 9a57de0ec 2025-05-07T09:48:49-07:00 Update hnslib version in Windows KubeProxy.
+
+- machine-config-operator embedded-component d4e611fd709e777240045df8a7c2d8b9c13d7408 to 433fd83ae10b547a586135353bff7cf108fc8f5b
+  - bb4e1a74 2025-07-02T20:35:57+02:00 MCO-1741: Bump OTE framework to add skip reason
+  - 5413e01e 2025-07-02T16:52:41+02:00 MCO-1741: Fix missing OTE logs
+  - 76d451d0 2025-07-02T14:38:43+00:00 Update ImageMode tests Polarion ID
+  - fd844a1f 2025-06-30T21:48:29+02:00 [TNF] Remove podman-etcd machine config source
+  - 079a3d4e 2025-06-27T12:00:28-04:00 Update images to be consistent with ART
+  - 80c05c5f 2025-06-25T16:45:47+02:00 MCO-1661: Introduce FeatureGatesHandler across MCO
+  - 007aede3 2025-06-25T16:37:28+02:00 MCO-1661: Add a centralized FeatureGate handler
+  - f2945436 2025-06-09T11:05:35+03:00 MGMT-20810: pass control plane topology to keepalived-monitor
+
+- operator-framework-olm embedded-component 3b01b7b18a17f38952f7155d719bc7de23f6ff16 to 53e474a396266c54f0276c8b9e28f2541849b981
+  - a2fd5115 2025-07-01T12:22:54+02:00 Fix networkpolicy filter for microshift manifests
+
+- oc image-amd64 ea5c72052233361761ba371b7c39518d443422be to f0e10516c2bab32e797240b7bd4a2c6563138709
+  - 83321f44 2025-07-02T21:44:54+05:30 Introduce a dedicated Pod label for the purpose of identifying debug pods
+
+- kubernetes image-amd64 02b9b7e65987d5aa4559c318725354713838b5a2 to e52b13b59e910bfa409eaa1e5280c4160b687bf8
+  - 00da85e50 2025-07-01T11:29:23-04:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - 2cf0e2078 2025-07-01T11:12:23-04:00 UPSTREAM: <drop>: manually resolve conflicts
+  - 036f7ed3f 2025-06-17T21:01:12+00:00 Release commit for Kubernetes v1.32.6
+  - 7246ec90c 2025-06-11T08:32:50+02:00 Bump images, dependencies and versions to go 1.23.10 and distroless iptables
+  - de8292ad6 2025-06-04T11:36:02-04:00 Remove warning about resizing failed for unknown reason
+  - ec4c71b70 2025-05-28T22:22:54-04:00 Add tests that validate the return value of resize operation
+  - 40849d37e 2025-05-23T09:17:51-04:00 Bump images, dependencies and versions to go 1.23.9 and distroless iptables
+  - 9a67ee4a7 2025-05-21T08:40:28+02:00 DRA node: reject static pods which reference ResourceClaims
+  - 07011c05b 2025-05-15T12:30:21+02:00 pkg/kubelet/userns: Remove skip on windows
+  - 1d923fbc7 2025-05-15T12:30:21+02:00 pkg/kubelet/userns: Wrap error to get mappings
+  - 3755f8e2f 2025-05-15T12:30:21+02:00 pkg/kubelet/userns: Provide stub implementation for windows
+  - b5d6f06fe 2025-05-15T12:30:21+02:00 pkg/kubelet: Fix userns tests on Windows
+  - 5e7201df6 2025-05-15T12:26:08+02:00 Revert "Enforce the Minimum Kernel Version 6.3 for UserNamespacesSupport feature"
+  - a35311c35 2025-05-15T12:26:08+02:00 Revert "Switch hard error to a WARNING for kernel version check"
+  - 54889f053 2025-05-15T12:21:30+02:00 userns: Wrap more errors
+  - 9326fc309 2025-05-15T12:21:30+02:00 userns: Improve error returned if userns is not supported
+  - fd5862185 2025-05-15T12:21:30+02:00 userns: Use len to handle empty non-nil slices
+  - 95c119b50 2025-05-15T09:27:49+00:00 Update CHANGELOG/CHANGELOG-1.32.md for v1.32.5
+  - 9a57de0ec 2025-05-07T09:48:49-07:00 Update hnslib version in Windows KubeProxy.
+
+- csi-external-snapshotter image-arm64 1b2240dca48840103558b499281effaea072b162 to b5725afc9e3dfbc9614e4e62a62e8bc5897527f9
+  - e418a63 2025-06-30T15:43:22+02:00 UPSTREAM: 1303: Fix requeueing snapshot content after deletion error
 
