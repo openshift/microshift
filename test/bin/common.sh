@@ -9,7 +9,7 @@ UNAME_M=$(uname -m)
 export UNAME_M
 
 # The location of the test directory, relative to the script.
-TESTDIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+export TESTDIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 # The location of the root of the git repo, relative to the script.
 ROOTDIR="$(cd "${TESTDIR}/.." && pwd)"
@@ -180,7 +180,7 @@ get_vm_bridge_ip() {
 
 # The IP address of the current host on the bridge used for the
 # default network for libvirt VMs.
-VM_BRIDGE_IP="$(get_vm_bridge_ip "default")"
+VM_BRIDGE_IP=""
 
 # Web server port number
 WEB_SERVER_PORT=8080
