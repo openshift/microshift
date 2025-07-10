@@ -9,7 +9,8 @@ UNAME_M=$(uname -m)
 export UNAME_M
 
 # The location of the test directory, relative to the script.
-export TESTDIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+TESTDIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+export TESTDIR
 
 # The location of the root of the git repo, relative to the script.
 ROOTDIR="$(cd "${TESTDIR}/.." && pwd)"
