@@ -14,11 +14,7 @@ COPY ./bootc-images/$USHIFT_RPM_REPO_NAME.repo ./bootc-images/microshift-fast-da
 # Print repository configuration contents.
 # Install MicroShift, test agent and cleanup.
 RUN dnf repoinfo --enabled && \
-    dnf install -y \
-    {{ range (datasource "packages").mandatory_rpms -}}
-    "{{ . }}-{{ env.Getenv "FAKE_NEXT_MINOR_VERSION" }}" \
-    {{ end -}}
-    && \
+    dnf install -y "microshift-4.{{ env.Getenv "FAKE_NEXT_MINOR_VERSION" }}.*" && \
     rm -vf /etc/yum.repos.d/microshift-*.repo && \
     rm -rvf $USHIFT_RPM_REPO_PATH && \
     dnf clean all
