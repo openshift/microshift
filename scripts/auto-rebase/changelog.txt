@@ -1,0 +1,78 @@
+- cluster-ingress-operator embedded-component 6d54169d4c6643ae9b6ff81b3a21b929934062fa to 137807b212e6c24b59073a43fb10ccf6fed2a250
+  - d1bae98 2025-07-04T13:33:49+00:00 desiredIstio: Do not enable a default PDB
+
+- cluster-kube-apiserver-operator embedded-component 34bd8a7860802d310b4b0c124dc7975b6fa52773 to 4986945df44e4288cdd76f1f437bc3ba81e5700c
+  - 44369de 2025-07-03T19:20:35+00:00 certregenerationcontroller: start configInformers again
+
+- kubernetes embedded-component 106d0409dd6b36020d8a12ea5ca00ce97ac986ed to 38c60a516ecb061270b0f0f05239b8fe2ce4bf0e
+  - b1689fcb1 2025-07-01T17:03:27-04:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - b8c23df4a 2025-07-01T16:40:20-04:00 UPSTREAM: <drop>: manually resolve conflicts
+  - 2804ee3d8 2025-06-24T13:45:24+00:00 UPSTREAM: <carry>: Update rebase.sh to handle go versions major.minor.patch instead of just major.minor
+  - 036f7ed3f 2025-06-17T21:01:12+00:00 Release commit for Kubernetes v1.32.6
+  - 7246ec90c 2025-06-11T08:32:50+02:00 Bump images, dependencies and versions to go 1.23.10 and distroless iptables
+  - de8292ad6 2025-06-04T11:36:02-04:00 Remove warning about resizing failed for unknown reason
+  - ec4c71b70 2025-05-28T22:22:54-04:00 Add tests that validate the return value of resize operation
+  - 40849d37e 2025-05-23T09:17:51-04:00 Bump images, dependencies and versions to go 1.23.9 and distroless iptables
+  - 9a67ee4a7 2025-05-21T08:40:28+02:00 DRA node: reject static pods which reference ResourceClaims
+  - 07011c05b 2025-05-15T12:30:21+02:00 pkg/kubelet/userns: Remove skip on windows
+  - 1d923fbc7 2025-05-15T12:30:21+02:00 pkg/kubelet/userns: Wrap error to get mappings
+  - 3755f8e2f 2025-05-15T12:30:21+02:00 pkg/kubelet/userns: Provide stub implementation for windows
+  - b5d6f06fe 2025-05-15T12:30:21+02:00 pkg/kubelet: Fix userns tests on Windows
+  - 5e7201df6 2025-05-15T12:26:08+02:00 Revert "Enforce the Minimum Kernel Version 6.3 for UserNamespacesSupport feature"
+  - a35311c35 2025-05-15T12:26:08+02:00 Revert "Switch hard error to a WARNING for kernel version check"
+  - 54889f053 2025-05-15T12:21:30+02:00 userns: Wrap more errors
+  - 9326fc309 2025-05-15T12:21:30+02:00 userns: Improve error returned if userns is not supported
+  - fd5862185 2025-05-15T12:21:30+02:00 userns: Use len to handle empty non-nil slices
+  - 95c119b50 2025-05-15T09:27:49+00:00 Update CHANGELOG/CHANGELOG-1.32.md for v1.32.5
+  - 9a57de0ec 2025-05-07T09:48:49-07:00 Update hnslib version in Windows KubeProxy.
+
+- machine-config-operator embedded-component 7df542080017dcd0e57c007ac25af47fd7c800c2 to 023231898840e2a9173899da72639556397917df
+  - ed4a9a2a 2025-07-08T12:53:42+00:00 Add control-plane label for master nodes on legacy clusters
+
+- operator-framework-olm embedded-component 4a6530a4cf4e8e81d8f04923f36dd36023f45902 to 0e4e456e8183103a071b57bf19e989eda5162f8c
+  - 00d6504d 2025-06-30T13:47:15-04:00 :bug: OCPBUGS-37982: Reduce Frequency of Update Requests for Copied CSVs (#3597)
+
+- kubernetes image-amd64 106d0409dd6b36020d8a12ea5ca00ce97ac986ed to 38c60a516ecb061270b0f0f05239b8fe2ce4bf0e
+  - b1689fcb1 2025-07-01T17:03:27-04:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - b8c23df4a 2025-07-01T16:40:20-04:00 UPSTREAM: <drop>: manually resolve conflicts
+  - 2804ee3d8 2025-06-24T13:45:24+00:00 UPSTREAM: <carry>: Update rebase.sh to handle go versions major.minor.patch instead of just major.minor
+  - 036f7ed3f 2025-06-17T21:01:12+00:00 Release commit for Kubernetes v1.32.6
+  - 7246ec90c 2025-06-11T08:32:50+02:00 Bump images, dependencies and versions to go 1.23.10 and distroless iptables
+  - de8292ad6 2025-06-04T11:36:02-04:00 Remove warning about resizing failed for unknown reason
+  - ec4c71b70 2025-05-28T22:22:54-04:00 Add tests that validate the return value of resize operation
+  - 40849d37e 2025-05-23T09:17:51-04:00 Bump images, dependencies and versions to go 1.23.9 and distroless iptables
+  - 9a67ee4a7 2025-05-21T08:40:28+02:00 DRA node: reject static pods which reference ResourceClaims
+  - 07011c05b 2025-05-15T12:30:21+02:00 pkg/kubelet/userns: Remove skip on windows
+  - 1d923fbc7 2025-05-15T12:30:21+02:00 pkg/kubelet/userns: Wrap error to get mappings
+  - 3755f8e2f 2025-05-15T12:30:21+02:00 pkg/kubelet/userns: Provide stub implementation for windows
+  - b5d6f06fe 2025-05-15T12:30:21+02:00 pkg/kubelet: Fix userns tests on Windows
+  - 5e7201df6 2025-05-15T12:26:08+02:00 Revert "Enforce the Minimum Kernel Version 6.3 for UserNamespacesSupport feature"
+  - a35311c35 2025-05-15T12:26:08+02:00 Revert "Switch hard error to a WARNING for kernel version check"
+  - 54889f053 2025-05-15T12:21:30+02:00 userns: Wrap more errors
+  - 9326fc309 2025-05-15T12:21:30+02:00 userns: Improve error returned if userns is not supported
+  - fd5862185 2025-05-15T12:21:30+02:00 userns: Use len to handle empty non-nil slices
+  - 95c119b50 2025-05-15T09:27:49+00:00 Update CHANGELOG/CHANGELOG-1.32.md for v1.32.5
+  - 9a57de0ec 2025-05-07T09:48:49-07:00 Update hnslib version in Windows KubeProxy.
+
+- kubernetes image-arm64 106d0409dd6b36020d8a12ea5ca00ce97ac986ed to 38c60a516ecb061270b0f0f05239b8fe2ce4bf0e
+  - b1689fcb1 2025-07-01T17:03:27-04:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - b8c23df4a 2025-07-01T16:40:20-04:00 UPSTREAM: <drop>: manually resolve conflicts
+  - 2804ee3d8 2025-06-24T13:45:24+00:00 UPSTREAM: <carry>: Update rebase.sh to handle go versions major.minor.patch instead of just major.minor
+  - 036f7ed3f 2025-06-17T21:01:12+00:00 Release commit for Kubernetes v1.32.6
+  - 7246ec90c 2025-06-11T08:32:50+02:00 Bump images, dependencies and versions to go 1.23.10 and distroless iptables
+  - de8292ad6 2025-06-04T11:36:02-04:00 Remove warning about resizing failed for unknown reason
+  - ec4c71b70 2025-05-28T22:22:54-04:00 Add tests that validate the return value of resize operation
+  - 40849d37e 2025-05-23T09:17:51-04:00 Bump images, dependencies and versions to go 1.23.9 and distroless iptables
+  - 9a67ee4a7 2025-05-21T08:40:28+02:00 DRA node: reject static pods which reference ResourceClaims
+  - 07011c05b 2025-05-15T12:30:21+02:00 pkg/kubelet/userns: Remove skip on windows
+  - 1d923fbc7 2025-05-15T12:30:21+02:00 pkg/kubelet/userns: Wrap error to get mappings
+  - 3755f8e2f 2025-05-15T12:30:21+02:00 pkg/kubelet/userns: Provide stub implementation for windows
+  - b5d6f06fe 2025-05-15T12:30:21+02:00 pkg/kubelet: Fix userns tests on Windows
+  - 5e7201df6 2025-05-15T12:26:08+02:00 Revert "Enforce the Minimum Kernel Version 6.3 for UserNamespacesSupport feature"
+  - a35311c35 2025-05-15T12:26:08+02:00 Revert "Switch hard error to a WARNING for kernel version check"
+  - 54889f053 2025-05-15T12:21:30+02:00 userns: Wrap more errors
+  - 9326fc309 2025-05-15T12:21:30+02:00 userns: Improve error returned if userns is not supported
+  - fd5862185 2025-05-15T12:21:30+02:00 userns: Use len to handle empty non-nil slices
+  - 95c119b50 2025-05-15T09:27:49+00:00 Update CHANGELOG/CHANGELOG-1.32.md for v1.32.5
+  - 9a57de0ec 2025-05-07T09:48:49-07:00 Update hnslib version in Windows KubeProxy.
+
