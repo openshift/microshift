@@ -28,8 +28,13 @@ RUN dnf repoinfo --enabled && \
     dnf clean all
 
 # Prepare system for testing Generic Device Plugin.
+# Upgrade the kernel to keep the same procedure with RHEL and CentOS.
+# CentOS requires upgrade because of a different package retention policy
+# which means that the kernel in the base bootc image might no longer
+# be available in the repositories.
 # hadolint ignore=DL3003
-RUN KERNEL_VER=$(rpm -q --qf "%{VERSION}-%{RELEASE}" kernel); \
+RUN dnf upgrade kernel -y && \
+    KERNEL_VER=$(rpm -q --qf "%{VERSION}-%{RELEASE}" kernel); \
     KERNEL_VER_ARCH="${KERNEL_VER}.$(uname -m)"; \
     dnf install -y git make "kernel-devel-${KERNEL_VER}" python3-pyserial && \
     dnf clean all && \
