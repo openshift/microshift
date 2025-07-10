@@ -15,11 +15,21 @@ distro = "rhel-96"
 {{- end -}}
 {{- "\n" -}}
 
-{{ range (datasource "packages").mandatory_rpms }}
 [[packages]]
-name = "{{ . }}"
-version = "{{ env.Getenv "FAKE_NEXT_MINOR_VERSION" }}"
-{{ end }}
+name = "microshift"
+version = "4.{{ .Env.FAKE_NEXT_MINOR_VERSION }}.*"
+
+[[packages]]
+name = "microshift-greenboot"
+version = "4.{{ .Env.FAKE_NEXT_MINOR_VERSION }}.*"
+
+[[packages]]
+name = "microshift-networking"
+version = "4.{{ .Env.FAKE_NEXT_MINOR_VERSION }}.*"
+
+[[packages]]
+name = "microshift-selinux"
+version = "4.{{ .Env.FAKE_NEXT_MINOR_VERSION }}.*"
 
 [[packages]]
 name = "microshift-test-agent"
