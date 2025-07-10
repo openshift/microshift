@@ -38,7 +38,7 @@ func (gdp *GenericDevicePlugin) Run(ctx context.Context, ready chan<- struct{}, 
 	defer close(stopped)
 
 	// From https://github.com/squat/generic-device-plugin/blob/main/main.go
-	deviceSpecs := gdp.configuration.Devices
+	deviceSpecs := gdp.configuration.GetGDPDevices()
 	for i := range deviceSpecs {
 		deviceSpecs[i].Default()
 		trim := strings.TrimSpace(deviceSpecs[i].Name)

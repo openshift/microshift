@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/squat/generic-device-plugin/deviceplugin"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -13,7 +12,7 @@ func Test_GDP_Validate(t *testing.T) {
 		cfg := GenericDevicePlugin{
 			Status:  "Disabled",
 			Domain:  "invalid_domain_bacause_of_the_underscores",
-			Devices: []deviceplugin.DeviceSpec{}, // empty devices
+			Devices: []DeviceSpec{}, // empty devices
 		}
 		assert.NoError(t, cfg.validate())
 	})
@@ -21,7 +20,7 @@ func Test_GDP_Validate(t *testing.T) {
 	t.Run("Devices cannot be empty", func(t *testing.T) {
 		cfg := GenericDevicePlugin{
 			Status:  "Enabled",
-			Devices: []deviceplugin.DeviceSpec{},
+			Devices: []DeviceSpec{},
 		}
 		err := cfg.validate()
 		assert.Error(t, err)
@@ -42,7 +41,7 @@ func Test_GDP_Validate(t *testing.T) {
 			cfg := GenericDevicePlugin{
 				Status: "Enabled",
 				Domain: "valid-domain.io",
-				Devices: []deviceplugin.DeviceSpec{
+				Devices: []DeviceSpec{
 					{Name: dn},
 				},
 			}
@@ -59,7 +58,7 @@ func Test_GDP_Validate(t *testing.T) {
 				cfg := GenericDevicePlugin{
 					Status: "Enabled",
 					Domain: "valid-domain.io",
-					Devices: []deviceplugin.DeviceSpec{
+					Devices: []DeviceSpec{
 						{Name: "ok" + string(char) + "ok"},
 					},
 				}
@@ -74,14 +73,14 @@ func Test_GDP_Validate(t *testing.T) {
 		cfg := GenericDevicePlugin{
 			Status: "Enabled",
 			Domain: "valid-domain.io",
-			Devices: []deviceplugin.DeviceSpec{
+			Devices: []DeviceSpec{
 				{Name: "serial",
-					Groups: []*deviceplugin.Group{
+					Groups: []*Group{
 						{
-							Paths: []*deviceplugin.Path{
+							Paths: []*Path{
 								{Path: "/dev/ttyUSB*"},
 							},
-							USBSpecs: []*deviceplugin.USBSpec{
+							USBSpecs: []*USBSpec{
 								{Vendor: 1, Product: 1, Serial: "s"},
 							},
 						},
