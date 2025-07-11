@@ -252,16 +252,16 @@
                         ],
                         "properties": {
                           "product": {
-                            "description": "Product is the USB Product ID of the device to match on.\nIt gets mangled to uint16 at runtime, but you should use the hexadecimal representation.",
-                            "type": "integer"
+                            "description": "Product is the USB Product ID of the device to match on.\nIt should have the format \"0x0123\" or \"0123\".",
+                            "type": "string"
                           },
                           "serial": {
-                            "description": "Serial is the serial number of the device to match on.",
+                            "description": "Serial is the serial number of the device to match on.\nIf specified, it must match exactly.",
                             "type": "string"
                           },
                           "vendor": {
-                            "description": "Vendor is the USB Vendor ID of the device to match on.\nIt gets mangled to uint16 at runtime, but you should use the hexadecimal representation.",
-                            "type": "integer"
+                            "description": "Vendor is the USB Vendor ID of the device to match on.\nIt should have the format \"0x0123\" or \"0123\".",
+                            "type": "string"
                           }
                         }
                       }

@@ -87,7 +87,7 @@ func (gdp GenericDevicePlugin) validate() error {
 			for _, usb := range g.USBSpecs {
 				// If USBSpec exists but is empty (e.g., comes from the config.yaml.default),
 				// we treat it like nonexistent.
-				if usb == nil || (usb.Vendor == 0 && usb.Product == 0 && usb.Serial == "") {
+				if usb == nil || (usb.Vendor == "" && usb.Product == "" && usb.Serial == "") {
 					continue
 				}
 				validUSBs = append(validUSBs, usb)
@@ -102,6 +102,10 @@ func (gdp GenericDevicePlugin) validate() error {
 
 			for _, path := range g.Paths {
 				errs = append(errs, path.validate()...)
+			}
+
+			for _, usb := range g.USBSpecs {
+				errs = append(errs, usb.validate()...)
 			}
 		}
 	}
@@ -139,6 +143,9 @@ func genericDevicePluginDefaults() GenericDevicePlugin {
 // Changes:
 // - 'omitempty' tag was added to Group's Paths and USBSpecs
 // - 'omitempty' tag was added to Path's Type
+//
+// Also USBSpec's Vendor and Product are strings instead of uint16 to avoid YAML unmarshalling problems
+// (0451 is interpreted as octal instead of hexadecimal because of the leading 0 which led to USB devices being not exposed)
 
 // DeviceSpec defines a device that should be discovered and scheduled.
 // DeviceSpec allows multiple host devices to be selected and scheduled fungibly under the same name.
@@ -288,19 +295,34 @@ func (p *Path) validate() []error {
 // A USB device must match exactly on all the given attributes to pass.
 type USBSpec struct {
 	// Vendor is the USB Vendor ID of the device to match on.
-	// It gets mangled to uint16 at runtime, but you should use the hexadecimal representation.
-	Vendor deviceplugin.USBID `json:"vendor"`
+	// It should have the format "0x0123" or "0123".
+	Vendor string `json:"vendor"`
 	// Product is the USB Product ID of the device to match on.
-	// It gets mangled to uint16 at runtime, but you should use the hexadecimal representation.
-	Product deviceplugin.USBID `json:"product"`
+	// It should have the format "0x0123" or "0123".
+	Product string `json:"product"`
 	// Serial is the serial number of the device to match on.
+	// If specified, it must match exactly.
 	Serial string `json:"serial"`
 }
 
 func (usb *USBSpec) toGDP() *deviceplugin.USBSpec {
-	return &deviceplugin.USBSpec{
-		Vendor:  usb.Vendor,
-		Product: usb.Product,
-		Serial:  usb.Serial,
+	spec := &deviceplugin.USBSpec{
+		Serial: usb.Serial,
 	}
+	// Ignoring errors because unmarshalling is checked in validate() during config validation.
+	_ = spec.Vendor.UnmarshalJSON([]byte(strings.TrimPrefix(usb.Vendor, "0x")))
+	_ = spec.Product.UnmarshalJSON([]byte(strings.TrimPrefix(usb.Product, "0x")))
+	return spec
+}
+
+func (usb *USBSpec) validate() []error {
+	errs := []error{}
+	spec := &deviceplugin.USBSpec{}
+	if err := spec.Vendor.UnmarshalJSON([]byte(strings.TrimPrefix(usb.Vendor, "0x"))); err != nil {
+		errs = append(errs, fmt.Errorf("failed to parse USB Vendor ID %q: %v", usb.Vendor, err))
+	}
+	if err := spec.Product.UnmarshalJSON([]byte(strings.TrimPrefix(usb.Product, "0x"))); err != nil {
+		errs = append(errs, fmt.Errorf("failed to parse USB Product ID %q: %v", usb.Product, err))
+	}
+	return errs
 }
