@@ -104,7 +104,7 @@ func (t *TelemetryManager) Run(ctx context.Context, ready chan<- struct{}, stopp
 
 	// The first metrics collection may try too soon after kubelet has been started and no node/node labels are
 	// present yet. Since we dont want to delay collection until the next interval (1h) we poll until success.
-	if err := wait.PollUntilContextCancel(ctx, time.Second, true, func(context.Context) (bool, error) {
+	if err := wait.PollUntilContextCancel(ctx, 30*time.Second, true, func(context.Context) (bool, error) {
 		if err := collectAndSend(); err != nil {
 			klog.Warningf("Telemetry collection failed: %v", err)
 			return false, nil
