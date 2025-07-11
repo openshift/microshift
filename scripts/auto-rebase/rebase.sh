@@ -792,6 +792,7 @@ EOF
     yq -i '.spec.template.spec.containers[0].env += {"name": "ROUTER_HTTP_IGNORE_PROBES", "value": "{{ .HTTPEmptyRequestsPolicy }}"}' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
     yq -i '.spec.template.spec.containers[0].env += {"name": "ROUTER_ENABLE_COMPRESSION", "value": "{{ .RouterEnableCompression }}"}' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
     yq -i '.spec.template.spec.containers[0].env += {"name": "ROUTER_COMPRESSION_MIME", "value": "{{ .RouterCompressionMime }}"}' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
+    yq -i '.spec.template.spec.containers[0].env += {"name": "ROUTER_ENABLE_EXTERNAL_CERTIFICATE", "value": "true"}' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
 
     # TODO: Generate and volume mount the router-stats-default secret
     # yq -i '.spec.template.spec.containers[0].env += {"name": "STATS_PASSWORD_FILE", "value": "/var/lib/haproxy/conf/metrics-auth/statsPassword"}' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
