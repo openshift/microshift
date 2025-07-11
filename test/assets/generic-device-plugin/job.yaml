@@ -1,0 +1,31 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: gdp-test
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: gdp-test
+        image: registry.access.redhat.com/ubi9/ubi:9.6
+        command: ["/bin/bash"]
+        args: ["/script/entrypoint.sh", "pod"]
+        resources:
+          limits:
+            device.microshift.io/fakeserial: 1
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: ["ALL"]
+          runAsNonRoot: true
+          seccompProfile:
+            type: "RuntimeDefault"
+        volumeMounts:
+        - name: script-volume
+          mountPath: /script/
+      volumes:
+      - name: script-volume
+        configMap:
+          name: gdp-script
+          defaultMode: 0755

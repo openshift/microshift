@@ -25,11 +25,19 @@ scenario_remove_vms() {
 }
 
 scenario_run_tests() {
+        # Generic Device Plugin suite is excluded because getting serialsim for ostree would require:
+        # - getting the version of the kernel of ostree image,
+        # - installing kernel-devel of that version on the hypervisor,
+        # - building serialsim
+        # - packaging serialsim as an RPM
+        # - including the RPM in the ostree blueprint
+        # GDP suite is tested with bootc images instead.
         run_tests host1 \
         --variable "PROMETHEUS_HOST:$(hostname)" \
         --variable "PROMETHEUS_PORT:9092" \
         --variable "LOKI_HOST:$(hostname)" \
         --variable "LOKI_PORT:3200" \
         --variable "PROM_EXPORTER_PORT:8889" \
+        --exclude generic-device-plugin \
         suites/optional/
 }

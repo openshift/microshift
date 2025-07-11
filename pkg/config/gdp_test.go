@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/squat/generic-device-plugin/deviceplugin"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -91,5 +92,85 @@ func Test_GDP_Validate(t *testing.T) {
 		err := cfg.validate()
 		assert.Error(t, err)
 		assert.ErrorContains(t, err, "cannot define both path and usb at the same time")
+	})
+
+	t.Run("empty usb is ignored and removed during validation", func(t *testing.T) {
+		cfg := GenericDevicePlugin{
+			Status: "Enabled",
+			Domain: "valid-domain.io",
+			Devices: []DeviceSpec{
+				{Name: "serial",
+					Groups: []*Group{
+						{
+							Paths: []*Path{
+								{Path: "/dev/ttyUSB*"},
+							},
+							USBSpecs: []*USBSpec{
+								{Vendor: 0, Product: 0, Serial: ""},
+							},
+						},
+					},
+				},
+			},
+		}
+		err := cfg.validate()
+		assert.NoError(t, err)
+
+		// validate() also removes empty usb specs
+		assert.Equal(t, 1, len(cfg.Devices[0].Groups[0].Paths))
+		assert.Equal(t, "/dev/ttyUSB*", cfg.Devices[0].Groups[0].Paths[0].Path)
+		assert.Equal(t, 0, len(cfg.Devices[0].Groups[0].USBSpecs))
+	})
+}
+
+func Test_GDP_Path_Validate(t *testing.T) {
+	t.Run("lower case type is invalid", func(t *testing.T) {
+		for _, invalidType := range []string{"device", "mount"} {
+			path := &Path{
+				Type: deviceplugin.PathType(invalidType),
+			}
+			errs := path.validate()
+			assert.Error(t, errs[0])
+			assert.ErrorContains(t, errs[0], "invalid type for path")
+		}
+	})
+
+	t.Run("readOnly is only allowed for paths of type Mount", func(t *testing.T) {
+		path := &Path{
+			Type:     deviceplugin.DevicePathType,
+			ReadOnly: true,
+		}
+		errs := path.validate()
+		assert.Error(t, errs[0])
+		assert.ErrorContains(t, errs[0], "readOnly is only allowed for paths of type Mount")
+	})
+
+	t.Run("permissions are not allowed for paths of type Mount", func(t *testing.T) {
+		path := &Path{
+			Type:        deviceplugin.MountPathType,
+			Permissions: "mrw",
+		}
+		errs := path.validate()
+		assert.Error(t, errs[0])
+		assert.ErrorContains(t, errs[0], "permissions are not allowed for paths of type Mount")
+	})
+
+	t.Run("only mrw permissions are allowed", func(t *testing.T) {
+		path := &Path{
+			Type:        deviceplugin.DevicePathType,
+			Permissions: "qetyuiopasdfghjklzxcvbn",
+		}
+		errs := path.validate()
+		assert.Error(t, errs[0])
+		assert.ErrorContains(t, errs[0], "invalid characters 'q, e, t, y, u, i, o, p, a, s, d, f, g, h, j, k, l, z, x, c, v, b, n'")
+	})
+
+	t.Run("empty permissions are ok", func(t *testing.T) {
+		path := &Path{
+			Type:        deviceplugin.DevicePathType,
+			Permissions: "",
+		}
+		errs := path.validate()
+		assert.Len(t, errs, 0)
 	})
 }
