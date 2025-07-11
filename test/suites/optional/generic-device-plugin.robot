@@ -9,6 +9,8 @@ Library             strings.py
 Suite Setup         Setup Suite With Namespace
 Suite Teardown      Teardown Suite With Namespace
 
+Test Tags           generic-device-plugin
+
 
 *** Variables ***
 ${NAMESPACE}    ${EMPTY}

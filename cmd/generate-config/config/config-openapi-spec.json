@@ -227,9 +227,14 @@
                             "default": false
                           },
                           "type": {
-                            "description": "Type describes what type of file-system node this Path represents and thus how it should be mounted.\nWhen unspecified, Type defaults to Device.",
+                            "description": "Type describes what type of file-system node this Path represents and thus how it should be mounted.\nAllowed values: \"Device\", \"Mount\". When unspecified, type defaults to Device.",
                             "type": "string",
-                            "default": "Device"
+                            "default": "Device",
+                            "enum": [
+                              "Device",
+                              "Mount",
+                              ""
+                            ]
                           }
                         }
                       }
