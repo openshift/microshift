@@ -18,6 +18,7 @@ import common
 # Note: Global variables for RPM versions and repos are
 # initialized in set_rpm_version_info_vars function
 SCRIPTDIR = common.get_env_var('SCRIPTDIR')
+TESTDIR = common.get_env_var('TESTDIR')
 BOOTC_IMAGE_DIR = common.get_env_var('BOOTC_IMAGE_DIR')
 BOOTC_ISO_DIR = common.get_env_var('BOOTC_ISO_DIR')
 IMAGEDIR = common.get_env_var('IMAGEDIR')
@@ -205,13 +206,15 @@ def extract_container_images(version, repo_spec, outfile, dry_run=False):
     common.popd()
 
 
-def run_template_cmd(ifile, ofile, dry_run):
+def run_template_cmd(ifile, ofile, dry_run, template_datasource=None):
     # Run the templating command
     gomplate_args = [
         GOMPLATE,
         "--file", ifile,
         "--out", ofile
     ]
+    if template_datasource:
+        gomplate_args.extend(["--datasource", f"{template_datasource}"])
     common.run_command_in_shell(gomplate_args, dry_run)
 
 
@@ -229,7 +232,8 @@ def process_containerfile(groupdir, containerfile, dry_run):
 
     # Run template command on the input file
     cf_outfile = os.path.join(BOOTC_IMAGE_DIR, containerfile)
-    run_template_cmd(cf_path, cf_outfile, dry_run)
+    template_datasource = f"packages={TESTDIR}/assets/image/microshift-rpms.yaml"
+    run_template_cmd(cf_path, cf_outfile, dry_run, template_datasource)
     # Templating may generate an empty file
     if not dry_run:
         if not common.file_has_valid_lines(cf_outfile):

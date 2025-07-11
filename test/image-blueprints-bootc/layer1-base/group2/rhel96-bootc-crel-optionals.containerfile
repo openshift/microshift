@@ -10,8 +10,18 @@ COPY ./bootc-images/microshift-fast-datapath-rhel9.repo ./bootc-images/microshif
 # Install MicroShift with optional components and cleanup.
 RUN dnf repoinfo --enabled && \
     dnf install -y firewalld \
-        "microshift-{{ .Env.CURRENT_RELEASE_VERSION }}" "microshift-release-info-{{ .Env.CURRENT_RELEASE_VERSION }}" \
-        "microshift-olm-{{ .Env.CURRENT_RELEASE_VERSION }}" "microshift-multus-{{ .Env.CURRENT_RELEASE_VERSION }}"  && \
+        {{ range (datasource "packages").mandatory_rpms -}}
+        "{{ . }}-{{ env.Getenv "CURRENT_RELEASE_VERSION" }}" \
+        {{ end -}}
+        {{ range (datasource "packages").optional_rpms -}}
+        "{{ . }}-{{ env.Getenv "CURRENT_RELEASE_VERSION" }}" \
+        {{ end -}}
+        {{ if and (env.Getenv "UNAME_M" "") (eq "x86_64" .Env.UNAME_M) -}}
+        {{ range (datasource "packages").x86_64_rpms -}}
+        "{{ . }}-{{ env.Getenv "CURRENT_RELEASE_VERSION" }}" \
+        {{ end -}}
+        {{ end -}}
+        && \
     systemctl enable microshift && \
     rm -vf /etc/yum.repos.d/microshift-*.repo && \
     dnf clean all

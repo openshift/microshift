@@ -290,7 +290,7 @@ do_group() {
         fi
 
         echo "Rendering ${template} to ${blueprint_file}"
-        ${GOMPLATE} --file "${template}" >"${blueprint_file}"
+        ${GOMPLATE} --datasource "packages=${TESTDIR}/assets/image/microshift-rpms.yaml" --file "${template}" >"${blueprint_file}"
         if [[ "$(wc -l "${blueprint_file}" | cut -d ' ' -f1)" -eq 0 ]]; then
             echo "WARNING: Templating '${template}' resulted in empty file! - SKIPPING"
             record_junit "${groupdir}" "${template}" "compose" "SKIPPED"
