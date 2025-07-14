@@ -334,59 +334,76 @@ def process_images(source, target, base_repo, monitor_interval):
         image_parts = target_image.split("/")
         chunked_target_image = f"{base_repo}/{re.sub(r'@sha256', '', image_parts[-1])}"
 
-        # Step 1: Pull, re-tag, push source image
-        run_command(["podman", "rmi", "-f", source_image], f"Clean up source image")
-        run_command(["podman", "rmi", "-f", chunked_source_image], f"Clean up chunked source image")
-        result = run_command(["podman", "pull", source_image], f"Pull source image {source_image}")
+        run_command(["podman", "rmi", "-f", source_image], f"Remove source image",
+                   enable_live_monitoring=False)
+        run_command(["podman", "rmi", "-f", chunked_source_image], f"Remove chunked source image",
+                   enable_live_monitoring=False)
+        result, monitor = run_command(["podman", "pull", source_image], f"Pull source image",
+                            monitor_interval=monitor_interval)
         if not result:
             print(f"  ❌ Failed to pull source image. Continuing with next image")
             continue
-        result = run_command(["podman", "tag", source_image, chunked_source_image], f"Tag source image as {chunked_source_image}")
+        print_monitor_results("  Successfully pulled source image", monitor)
+
+        result, _ = run_command(["podman", "tag", source_image, chunked_source_image], f"Tag source image",
+                            enable_live_monitoring=False)
         if not result:
             print(f"  ❌ Failed to tag source image. Continuing with next image")
             continue
-        result = run_command(["podman", "push", "--compression-format", "zstd:chunked", chunked_source_image], f"Push chunked source image {chunked_source_image}")
+        result, _ = run_command(["podman", "push", "--compression-format", "zstd:chunked", chunked_source_image],
+                            f"Push chunked source image",
+                            monitor_interval=monitor_interval)
         if not result:
             print(f"  ❌ Failed to push chunked source image. Continuing with next image")
             continue
 
-        # Step 2: Pull, re-tag, push, clean target image.
-        run_command(["podman", "rmi", "-f", target_image], f"Clean up target image")
-        run_command(["podman", "rmi", "-f", chunked_target_image], f"Clean up chunked target image")
-        prev_size = get_podman_storage_size()
-        result = run_command(["podman", "pull", target_image], f"Pull target image {target_image}")
+        run_command(["podman", "rmi", "-f", target_image], f"Remove target image",
+                   enable_live_monitoring=False)
+        run_command(["podman", "rmi", "-f", chunked_target_image], f"Remove chunked target image",
+                   enable_live_monitoring=False)
+        result, monitor = run_command(["podman", "pull", target_image], f"Pull target image",
+                            monitor_interval=monitor_interval)
         if not result:
             print(f"  ❌ Failed to pull target image. Continuing with next image")
             continue
-        new_size = get_podman_storage_size()
-        print(f"  💾 Successfully pulled target image. Added size: {new_size-prev_size:.2f} MB")
-        result = run_command(["podman", "tag", target_image, chunked_target_image], f"Tag target image as {chunked_target_image}")
+        print_monitor_results("  Successfully pulled target image", monitor)
+
+        result, _ = run_command(["podman", "tag", target_image, chunked_target_image], f"Tag target image",
+                            enable_live_monitoring=False)
         if not result:
             print(f"  ❌ Failed to tag target image. Continuing with next image")
             continue
-        result = run_command(["podman", "push", "--compression-format", "zstd:chunked", chunked_target_image], f"Push chunked target image {chunked_target_image}")
+        result, _ = run_command(["podman", "push", "--compression-format", "zstd:chunked", chunked_target_image],
+                            f"Push chunked target image",
+                            monitor_interval=monitor_interval)
         if not result:
             print(f"  ❌ Failed to push chunked target image. Continuing with next image")
             continue
-        run_command(["podman", "rmi", "-f", source_image], f"Clean up source image")
-        run_command(["podman", "rmi", "-f", chunked_source_image], f"Clean up chunked source image")
-        run_command(["podman", "rmi", "-f", target_image], f"Clean up target image")
-        run_command(["podman", "rmi", "-f", chunked_target_image], f"Clean up chunked target image")
+        run_command(["podman", "rmi", "-f", source_image], f"Remove source image",
+                   enable_live_monitoring=False)
+        run_command(["podman", "rmi", "-f", chunked_source_image], f"Remove chunked source image",
+                   enable_live_monitoring=False)
+        run_command(["podman", "rmi", "-f", target_image], f"Remove target image",
+                   enable_live_monitoring=False)
+        run_command(["podman", "rmi", "-f", chunked_target_image], f"Remove chunked target image",
+                   enable_live_monitoring=False)
 
-        # Step 3: Pull chunked source and target images.
-        result = run_command(["podman", "pull", chunked_source_image], f"Pull chunked source image")
+        result, monitor = run_command(["podman", "pull", chunked_source_image], f"Pull chunked source image",
+                            monitor_interval=monitor_interval)
         if not result:
             print(f"  ❌ Failed to pull chunked source image. Continuing with next image")
             continue
-        prev_size = get_podman_storage_size()
-        result = run_command(["podman", "pull", chunked_target_image], f"Pull chunked target image", stream_output=True)
+        print_monitor_results("  Successfully pulled chunked source image", monitor)
+        result, monitor = run_command(["podman", "pull", chunked_target_image], f"Pull chunked target image",
+                            stream_output=True, monitor_interval=monitor_interval)
         if not result:
             print(f"  ❌ Failed to pull chunked target image. Continuing with next image")
             continue
-        new_size = get_podman_storage_size()
-        print(f"  💾 Successfully pulled chunked target image. Added size: {new_size-prev_size:.2f} MB")
+        print_monitor_results("  Successfully pulled chunked target image", monitor)
+
 
     print("=" * 50)
+    print(f"🎉 Completed processing {processed_images} images!")
 
 def main():
     """
