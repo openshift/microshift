@@ -243,8 +243,8 @@ run_summary_time() {
         fi
     done < <(cat "${OUTPUT_FILE}" | sed 's/\x1b\[[0-9;]*[a-zA-Z]//g' | grep -E "(Successfully pulled target image|Successfully pulled chunked target image)")
 
-        local time_difference=$(echo "scale=2; ${total_target_time} - ${total_chunked_target_time}" | bc -l)
-        local percentage_improvement=$(echo "scale=2; (${time_difference} * 100) / ${total_target_time}" | bc -l)
+    local -r time_difference=$(echo "scale=2; ${total_target_time} - ${total_chunked_target_time}" | bc -l)
+    local -r percentage_improvement=$(echo "scale=2; (${time_difference} * 100) / ${total_target_time}" | bc -l)
 
     echo "  ⏱️  Image Pull Times:"
     echo "    • Non-chunked: ${total_target_time}s"
@@ -278,15 +278,15 @@ run_summary_memory() {
     done < <(cat "${OUTPUT_FILE}" | sed 's/\x1b\[[0-9;]*[a-zA-Z]//g' | grep -E "(Successfully pulled target image|Successfully pulled chunked target image)")
 
     if [[ ${target_count} -gt 0 && ${chunked_target_count} -gt 0 ]]; then
-        local avg_target_memory_avg=$(echo "scale=1; ${total_target_memory_avg} / ${target_count}" | bc -l)
-        local avg_target_memory_peak=$(echo "scale=1; ${total_target_memory_peak} / ${target_count}" | bc -l)
-        local avg_chunked_target_memory_avg=$(echo "scale=1; ${total_chunked_target_memory_avg} / ${chunked_target_count}" | bc -l)
-        local avg_chunked_target_memory_peak=$(echo "scale=1; ${total_chunked_target_memory_peak} / ${chunked_target_count}" | bc -l)
+        local -r avg_target_memory_avg=$(echo "scale=1; ${total_target_memory_avg} / ${target_count}" | bc -l)
+        local -r avg_target_memory_peak=$(echo "scale=1; ${total_target_memory_peak} / ${target_count}" | bc -l)
+        local -r avg_chunked_target_memory_avg=$(echo "scale=1; ${total_chunked_target_memory_avg} / ${chunked_target_count}" | bc -l)
+        local -r avg_chunked_target_memory_peak=$(echo "scale=1; ${total_chunked_target_memory_peak} / ${chunked_target_count}" | bc -l)
 
-        local memory_avg_difference=$(echo "scale=1; ${avg_target_memory_avg} - ${avg_chunked_target_memory_avg}" | bc -l)
-        local memory_peak_difference=$(echo "scale=1; ${avg_target_memory_peak} - ${avg_chunked_target_memory_peak}" | bc -l)
-        local avg_percentage_improvement=$(echo "scale=2; (${memory_avg_difference} * 100) / ${avg_target_memory_avg}" | bc -l)
-        local peak_percentage_improvement=$(echo "scale=2; (${memory_peak_difference} * 100) / ${avg_target_memory_peak}" | bc -l)
+        local -r memory_avg_difference=$(echo "scale=1; ${avg_target_memory_avg} - ${avg_chunked_target_memory_avg}" | bc -l)
+        local -r memory_peak_difference=$(echo "scale=1; ${avg_target_memory_peak} - ${avg_chunked_target_memory_peak}" | bc -l)
+        local -r avg_percentage_improvement=$(echo "scale=2; (${memory_avg_difference} * 100) / ${avg_target_memory_avg}" | bc -l)
+        local -r peak_percentage_improvement=$(echo "scale=2; (${memory_peak_difference} * 100) / ${avg_target_memory_peak}" | bc -l)
 
         echo "  🧠 Image Memory Usage:"
         echo "    • Non-chunked avg: ${avg_target_memory_avg}MB | peak: ${avg_target_memory_peak}MB"
@@ -322,15 +322,15 @@ run_summary_cpu() {
     done < <(cat "${OUTPUT_FILE}" | sed 's/\x1b\[[0-9;]*[a-zA-Z]//g' | grep -E "(Successfully pulled target image|Successfully pulled chunked target image)")
 
     if [[ ${target_count} -gt 0 && ${chunked_target_count} -gt 0 ]]; then
-        local avg_target_cpu_avg=$(echo "scale=1; ${total_target_cpu_avg} / ${target_count}" | bc -l)
-        local avg_target_cpu_peak=$(echo "scale=1; ${total_target_cpu_peak} / ${target_count}" | bc -l)
-        local avg_chunked_target_cpu_avg=$(echo "scale=1; ${total_chunked_target_cpu_avg} / ${chunked_target_count}" | bc -l)
-        local avg_chunked_target_cpu_peak=$(echo "scale=1; ${total_chunked_target_cpu_peak} / ${chunked_target_count}" | bc -l)
+        local -r avg_target_cpu_avg=$(echo "scale=1; ${total_target_cpu_avg} / ${target_count}" | bc -l)
+        local -r avg_target_cpu_peak=$(echo "scale=1; ${total_target_cpu_peak} / ${target_count}" | bc -l)
+        local -r avg_chunked_target_cpu_avg=$(echo "scale=1; ${total_chunked_target_cpu_avg} / ${chunked_target_count}" | bc -l)
+        local -r avg_chunked_target_cpu_peak=$(echo "scale=1; ${total_chunked_target_cpu_peak} / ${chunked_target_count}" | bc -l)
 
-        local cpu_avg_difference=$(echo "scale=1; ${avg_target_cpu_avg} - ${avg_chunked_target_cpu_avg}" | bc -l)
-        local cpu_peak_difference=$(echo "scale=1; ${avg_target_cpu_peak} - ${avg_chunked_target_cpu_peak}" | bc -l)
-        local avg_percentage_improvement=$(echo "scale=2; (${cpu_avg_difference} * 100) / ${avg_target_cpu_avg}" | bc -l)
-        local peak_percentage_improvement=$(echo "scale=2; (${cpu_peak_difference} * 100) / ${avg_target_cpu_peak}" | bc -l)
+        local -r cpu_avg_difference=$(echo "scale=1; ${avg_target_cpu_avg} - ${avg_chunked_target_cpu_avg}" | bc -l)
+        local -r cpu_peak_difference=$(echo "scale=1; ${avg_target_cpu_peak} - ${avg_chunked_target_cpu_peak}" | bc -l)
+        local -r avg_percentage_improvement=$(echo "scale=2; (${cpu_avg_difference} * 100) / ${avg_target_cpu_avg}" | bc -l)
+        local -r peak_percentage_improvement=$(echo "scale=2; (${cpu_peak_difference} * 100) / ${avg_target_cpu_peak}" | bc -l)
 
         echo "  🔥 Image CPU Usage:"
         echo "    • Non-chunked avg: ${avg_target_cpu_avg}% | peak: ${avg_target_cpu_peak}%"
@@ -377,8 +377,8 @@ run_summary_storage() {
         fi
     done < <(cat "${OUTPUT_FILE}" | sed 's/\x1b\[[0-9;]*[a-zA-Z]//g' | grep -E "(Successfully pulled target image|Successfully pulled chunked target image)")
 
-    local storage_difference=$(echo "scale=2; ${total_target_storage} - ${total_chunked_target_storage}" | bc -l)
-    local percentage_improvement=$(echo "scale=2; (${storage_difference} * 100) / ${total_target_storage}" | bc -l)
+    local -r storage_difference=$(echo "scale=2; ${total_target_storage} - ${total_chunked_target_storage}" | bc -l)
+    local -r percentage_improvement=$(echo "scale=2; (${storage_difference} * 100) / ${total_target_storage}" | bc -l)
 
     echo "  💾 Image Storage Usage:"
     echo "    • Non-chunked: ${total_target_storage}MB"
@@ -386,19 +386,19 @@ run_summary_storage() {
     echo "    • Difference:  ${storage_difference}MB (${percentage_improvement}% improvement)"
 
     if [[ ${target_count} -gt 0 && ${chunked_target_count} -gt 0 ]]; then
-        local avg_target_read_iops=$(echo "scale=1; ${total_target_read_iops} / ${target_count}" | bc -l)
-        local avg_target_write_iops=$(echo "scale=1; ${total_target_write_iops} / ${target_count}" | bc -l)
-        local avg_target_peak_iops=$(echo "scale=1; ${total_target_peak_iops} / ${target_count}" | bc -l)
-        local avg_chunked_target_read_iops=$(echo "scale=1; ${total_chunked_target_read_iops} / ${chunked_target_count}" | bc -l)
-        local avg_chunked_target_write_iops=$(echo "scale=1; ${total_chunked_target_write_iops} / ${chunked_target_count}" | bc -l)
-        local avg_chunked_target_peak_iops=$(echo "scale=1; ${total_chunked_target_peak_iops} / ${chunked_target_count}" | bc -l)
+        local -r avg_target_read_iops=$(echo "scale=1; ${total_target_read_iops} / ${target_count}" | bc -l)
+        local -r avg_target_write_iops=$(echo "scale=1; ${total_target_write_iops} / ${target_count}" | bc -l)
+        local -r avg_target_peak_iops=$(echo "scale=1; ${total_target_peak_iops} / ${target_count}" | bc -l)
+        local -r avg_chunked_target_read_iops=$(echo "scale=1; ${total_chunked_target_read_iops} / ${chunked_target_count}" | bc -l)
+        local -r avg_chunked_target_write_iops=$(echo "scale=1; ${total_chunked_target_write_iops} / ${chunked_target_count}" | bc -l)
+        local -r avg_chunked_target_peak_iops=$(echo "scale=1; ${total_chunked_target_peak_iops} / ${chunked_target_count}" | bc -l)
 
-        local read_iops_difference=$(echo "scale=1; ${avg_target_read_iops} - ${avg_chunked_target_read_iops}" | bc -l)
-        local write_iops_difference=$(echo "scale=1; ${avg_target_write_iops} - ${avg_chunked_target_write_iops}" | bc -l)
-        local peak_iops_difference=$(echo "scale=1; ${avg_target_peak_iops} - ${avg_chunked_target_peak_iops}" | bc -l)
-        local read_percentage_improvement=$(echo "scale=2; (${read_iops_difference} * 100) / ${avg_target_read_iops}" | bc -l)
-        local write_percentage_improvement=$(echo "scale=2; (${write_iops_difference} * 100) / ${avg_target_write_iops}" | bc -l)
-        local peak_percentage_improvement=$(echo "scale=2; (${peak_iops_difference} * 100) / ${avg_target_peak_iops}" | bc -l)
+        local -r read_iops_difference=$(echo "scale=1; ${avg_target_read_iops} - ${avg_chunked_target_read_iops}" | bc -l)
+        local -r write_iops_difference=$(echo "scale=1; ${avg_target_write_iops} - ${avg_chunked_target_write_iops}" | bc -l)
+        local -r peak_iops_difference=$(echo "scale=1; ${avg_target_peak_iops} - ${avg_chunked_target_peak_iops}" | bc -l)
+        local -r read_percentage_improvement=$(echo "scale=2; (${read_iops_difference} * 100) / ${avg_target_read_iops}" | bc -l)
+        local -r write_percentage_improvement=$(echo "scale=2; (${write_iops_difference} * 100) / ${avg_target_write_iops}" | bc -l)
+        local -r peak_percentage_improvement=$(echo "scale=2; (${peak_iops_difference} * 100) / ${avg_target_peak_iops}" | bc -l)
 
         echo "  📊 Image IOPS Usage:"
         echo "    • Non-chunked R:${avg_target_read_iops} W:${avg_target_write_iops} Peak:${avg_target_peak_iops} IOPS"
