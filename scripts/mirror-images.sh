@@ -73,6 +73,7 @@ function mirror_registry() {
             --preserve-digests \
             --authfile "${img_pull_file}" \
             --additional-tag "${dst_img_no_tag}:latest" \
+            --dest-compress-format zstd:chunked \
             docker://"${src_img}" docker://"${dst_img}"
     }
 
