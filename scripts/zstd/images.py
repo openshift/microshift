@@ -113,8 +113,12 @@ def process_images(source, target, base_repo):
     print(f"\n🚀 Starting image processing")
     print("-" * 50)
 
+    total_images = len(intersection)
+    processed_images = 0
+
     for name in intersection:
-        print(f"\nProcessing image '{name}'")
+        processed_images += 1
+        print(f"\nProcessing image '{name}' ({processed_images}/{total_images})")
         source_image = data_from[name]
         target_image = data_to[name]
 
