@@ -1,16 +1,23 @@
-- cluster-ingress-operator embedded-component 57f9674e75908ca11b24792fb9f077233cd7bcf1 to 218159f7b060760c7e910b57429beea2f3eb3146
-  - b4431f3 2025-07-03T18:20:49+02:00 OCPBUGS-43745: Add e2e tests for for IdleConnectionTerminationPolicy
-  - 9164a7d 2025-07-02T18:48:34+02:00 e2e: Add helper to get address of service publishing IngressController
-  - 71f4783 2025-07-02T18:48:34+02:00 e2e: Add helper to retry route updates on conflict
-  - 7d6ffd8 2025-07-02T18:48:34+02:00 test/http2: enhance response handlers
-  - 7a48d86 2025-07-02T10:45:26+02:00 OCPBUGS-43745: Add support for idle connection termination policy
-  - 324a4ee 2025-07-02T10:45:26+02:00 OCPBUGS-56424: Migrate feature gate usage to openshift/api/features package
-  - 9954960 2025-07-02T10:45:19+02:00 OCPBUGS-56424: Vendor openshift/api#2330
+- kubernetes embedded-component 29b5494d107f1b6f3bd4cd9e2fdf6fc5914e32c9 to a6b193cd9c260cd0159d66a35b5654de32efde1f
+  - c99778574 2025-07-01T17:26:35+02:00 UPSTREAM: <carry>: disable some legacy cloud provider tests
+  - ee35b5fc1 2025-06-24T14:53:33+00:00 UPSTREAM: 130047: adjusting loopback certificate validity in kube-apiserver
 
-- cluster-network-operator embedded-component 288260c710e95931366f4b4f8cbd3925ac52d561 to 5e51d1d51ce0e791c46009fa4e2e6f65a17853bc
-  - be22150 2025-06-03T01:20:55+00:00 Reorder the steps in iptables-alerter
-  - 4ad2dee 2025-06-03T01:20:53+00:00 Simplify the iptables-alerter crictl-reading code
+- machine-config-operator embedded-component ccc42e8a2b41175d24cd83f8b510b8f8e50f5136 to 4aeec11792b124a0eaa15e36b35750d25cc4be81
+  - cee78ae5 2025-07-07T20:04:18+05:30 Do not set cpu system reserve below the default value of 500 millicore
 
-- router image-amd64 ad86f4628092d3287e8a71e8ead030f5cd878768 to 7c4b47201b75421631739feb42e7ae86ae047739
-  - 55216f9 2025-05-19T09:23:27+00:00 Make idle-close-on-response configurable in HAProxy template
+- ovn-kubernetes image-amd64 f3de6bbc5be547ebe1cb8af493abbe60f16e5f32 to 72502ee080b31a1e019c2ce6c74747f31728803e
+  - dcf09d64 2025-06-26T10:50:50-04:00 Dockerfile: Unpin OVS and consume the latest from FDP.
+  - e3dffa6f 2025-06-26T10:48:42-04:00 make dnf get through repo troubles faster
+
+- kubernetes image-amd64 29b5494d107f1b6f3bd4cd9e2fdf6fc5914e32c9 to a6b193cd9c260cd0159d66a35b5654de32efde1f
+  - c99778574 2025-07-01T17:26:35+02:00 UPSTREAM: <carry>: disable some legacy cloud provider tests
+  - ee35b5fc1 2025-06-24T14:53:33+00:00 UPSTREAM: 130047: adjusting loopback certificate validity in kube-apiserver
+
+- ovn-kubernetes image-arm64 f3de6bbc5be547ebe1cb8af493abbe60f16e5f32 to 72502ee080b31a1e019c2ce6c74747f31728803e
+  - dcf09d64 2025-06-26T10:50:50-04:00 Dockerfile: Unpin OVS and consume the latest from FDP.
+  - e3dffa6f 2025-06-26T10:48:42-04:00 make dnf get through repo troubles faster
+
+- kubernetes image-arm64 29b5494d107f1b6f3bd4cd9e2fdf6fc5914e32c9 to a6b193cd9c260cd0159d66a35b5654de32efde1f
+  - c99778574 2025-07-01T17:26:35+02:00 UPSTREAM: <carry>: disable some legacy cloud provider tests
+  - ee35b5fc1 2025-06-24T14:53:33+00:00 UPSTREAM: 130047: adjusting loopback certificate validity in kube-apiserver
 
