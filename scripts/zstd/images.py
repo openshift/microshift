@@ -293,7 +293,21 @@ def get_podman_storage_size():
         print(f"  ⚠️ Warning: Could not parse size of path '{path}'. Error: {e}", file=sys.stdout)
         return None
 
-def process_images(source, target, base_repo):
+def print_monitor_results(message, monitor):
+    disk_info = ""
+    if monitor.get("disk"):
+        disk = monitor["disk"]
+        read_iops = disk.get("read_iops_avg", 0)
+        write_iops = disk.get("write_iops_avg", 0)
+        total_iops = disk.get("total_iops_avg", 0)
+        peak_iops = disk.get("total_iops_peak", 0)
+
+        if total_iops > 0.1 or peak_iops > 0.1:
+            disk_info = f" | R:{read_iops:.1f} W:{write_iops:.1f} Peak:{peak_iops:.1f} IOPS"
+
+    print(f"{message}. {monitor['duration']:.2f}s | {monitor['memory']['avg']:.1f}MB | {monitor['memory']['peak']:.1f}MB | {monitor['cpu']['avg']:.1f}% | {monitor['cpu']['peak']:.1f}% | {monitor['storage']:.2f} MB{disk_info}")
+
+def process_images(source, target, base_repo, monitor_interval):
     data_from = get_image_data(source).get("images", {})
     data_to = get_image_data(target).get("images", {})
 
@@ -402,8 +416,16 @@ def main():
         "repo",
         help="The base repository to use for the images (e.g., quay.io/username)."
     )
+    parser.add_argument(
+        "--monitor-interval",
+        type=float,
+        default=1.0,
+        help="Interval in seconds between monitoring updates (default: 1.0)."
+    )
     args = parser.parse_args()
-    process_images(args.source, args.target, args.repo)
+
+    print("🚀 Starting MicroShift Image Processing")
+    process_images(args.source, args.target, args.repo, args.monitor_interval)
 
 if __name__ == "__main__":
     main()
