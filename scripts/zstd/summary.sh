@@ -52,7 +52,6 @@ REQUIREMENTS:
     - Access to push to the specified repository
     - Storage configuration for zstd:chunked support:
       * enable_partial_images=true
-      * use_hard_links=true
 
 The simulation will:
 1. Pull source images and push them with zstd:chunked compression
@@ -113,9 +112,6 @@ check_podman_config() {
         if ! grep -q "enable_partial_images.*=.*true" "${storage_conf}" 2>/dev/null; then
             issues+=("enable_partial_images=true not found")
         fi
-        if ! grep -q "use_hard_links.*=.*true" "${storage_conf}" 2>/dev/null; then
-            issues+=("use_hard_links=true not found")
-        fi
     else
         issues+=("Local storage configuration file not found, using default")
     fi
@@ -127,7 +123,6 @@ check_podman_config() {
         done
         warn "For optimal zstd:chunked performance, ensure your storage.conf includes:"
         warn "  enable_partial_images=true"
-        warn "  use_hard_links=true"
         echo
     else
         success "Podman storage configuration looks good"
