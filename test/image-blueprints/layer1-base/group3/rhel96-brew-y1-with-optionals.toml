@@ -24,18 +24,6 @@ name = "microshift"
 version = "{{ .Env.BREW_Y1_RELEASE_VERSION }}"
 
 [[packages]]
-name = "microshift-greenboot"
-version = "{{ .Env.BREW_Y1_RELEASE_VERSION }}"
-
-[[packages]]
-name = "microshift-networking"
-version = "{{ .Env.BREW_Y1_RELEASE_VERSION }}"
-
-[[packages]]
-name = "microshift-selinux"
-version = "{{ .Env.BREW_Y1_RELEASE_VERSION }}"
-
-[[packages]]
 name = "microshift-olm"
 version = "{{ .Env.BREW_Y1_RELEASE_VERSION }}"
 

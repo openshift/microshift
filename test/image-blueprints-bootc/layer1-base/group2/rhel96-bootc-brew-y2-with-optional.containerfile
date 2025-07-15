@@ -18,9 +18,6 @@ COPY ./bootc-images/$USHIFT_RPM_REPO_NAME.repo ./bootc-images/microshift-fast-da
 RUN dnf repoinfo --enabled && \
     dnf install -y firewalld systemd-resolved \
         "microshift-{{ .Env.BREW_Y2_RELEASE_VERSION }}" \
-        "microshift-greenboot-{{ .Env.BREW_Y2_RELEASE_VERSION }}" \
-        "microshift-networking-{{ .Env.BREW_Y2_RELEASE_VERSION }}" \
-        "microshift-selinux-{{ .Env.BREW_Y2_RELEASE_VERSION }}" \
         "microshift-olm-{{ .Env.BREW_Y2_RELEASE_VERSION }}" \
         "microshift-multus-{{ .Env.BREW_Y2_RELEASE_VERSION }}" \
         "microshift-gateway-api-{{ .Env.BREW_Y2_RELEASE_VERSION }}" \
