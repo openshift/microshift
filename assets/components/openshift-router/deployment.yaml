@@ -94,6 +94,8 @@ spec:
               value: '{{ .RouterEnableCompression }}'
             - name: ROUTER_COMPRESSION_MIME
               value: '{{ .RouterCompressionMime }}'
+            - name: ROUTER_ENABLE_EXTERNAL_CERTIFICATE
+              value: "true"
             {{- if .ClientAuthCAPath }}
             - name: ROUTER_MUTUAL_TLS_AUTH
               value: '{{ .ClientAuthPolicy }}'

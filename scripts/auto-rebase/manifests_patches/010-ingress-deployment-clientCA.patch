@@ -2,10 +2,10 @@ diff --git a/assets/components/openshift-router/deployment.yaml b/assets/compone
 index a63157f21..596be2aa0 100644
 --- a/assets/components/openshift-router/deployment.yaml
 +++ b/assets/components/openshift-router/deployment.yaml
-@@ -93,6 +93,14 @@ spec:
-               value: '{{ .RouterEnableCompression }}'
-             - name: ROUTER_COMPRESSION_MIME
+@@ -95,6 +95,14 @@ spec:
                value: '{{ .RouterCompressionMime }}'
+             - name: ROUTER_ENABLE_EXTERNAL_CERTIFICATE
+               value: "true"
 +            {{- if .ClientAuthCAPath }}
 +            - name: ROUTER_MUTUAL_TLS_AUTH
 +              value: '{{ .ClientAuthPolicy }}'
@@ -17,7 +17,7 @@ index a63157f21..596be2aa0 100644
            livenessProbe:
              failureThreshold: 3
              httpGet:
-@@ -132,6 +140,11 @@ spec:
+@@ -134,6 +142,11 @@ spec:
              - mountPath: /var/run/configmaps/service-ca
                name: service-ca-bundle
                readOnly: true
@@ -29,7 +29,7 @@ index a63157f21..596be2aa0 100644
            image: '{{ .ReleaseImage.haproxy_router }}'
            ports:
              - name: http
-@@ -166,6 +179,16 @@ spec:
+@@ -168,6 +181,16 @@ spec:
                  path: service-ca.crt
              name: service-ca-bundle
              optional: false

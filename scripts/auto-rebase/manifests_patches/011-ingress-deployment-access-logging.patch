@@ -2,7 +2,7 @@ diff --git a/assets/components/openshift-router/deployment.yaml b/assets/compone
 index 916e4b601..9261e3700 100644
 --- a/assets/components/openshift-router/deployment.yaml
 +++ b/assets/components/openshift-router/deployment.yaml
-@@ -102,6 +102,53 @@ spec:
+@@ -104,6 +104,53 @@ spec:
              - name: ROUTER_MUTUAL_TLS_AUTH_FILTER
                value: '{{ .ClientAuthFilter }}'
              {{- end }}
@@ -56,7 +56,7 @@ index 916e4b601..9261e3700 100644
            livenessProbe:
              failureThreshold: 3
              httpGet:
-@@ -146,6 +193,16 @@ spec:
+@@ -148,6 +195,16 @@ spec:
                name: '{{ .ClientCAMapName}}'
                readOnly: true
              {{- end }}
@@ -73,7 +73,7 @@ index 916e4b601..9261e3700 100644
            image: '{{ .ReleaseImage.haproxy_router }}'
            ports:
              - name: http
-@@ -161,6 +216,29 @@ spec:
+@@ -163,6 +218,29 @@ spec:
                protocol: TCP
            args:
              - -v=4
@@ -103,7 +103,7 @@ index 916e4b601..9261e3700 100644
        tolerations:
          # Ensure the pod isn't deleted during serial NoExecuteTaintManager tests.
          # Remember that NoExecute uses Delete, not Evict, because removing the pod
-@@ -192,6 +270,19 @@ spec:
+@@ -194,6 +272,19 @@ spec:
              name: '{{ .ClientCAMapName }}'
              optional: false
          {{- end }}

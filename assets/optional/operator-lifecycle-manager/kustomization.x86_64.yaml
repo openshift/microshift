@@ -15,12 +15,12 @@ patches:
      - op: add
        path: /spec/template/spec/containers/0/env/-
        value:
-         name: OPERATOR_REGISTRY_IMAGE 
+         name: OPERATOR_REGISTRY_IMAGE
          value: quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:fc3c3ca15e473360cb0c0fadaf3b3d7316ff3559362b494a039e4dfcc397cb4b
      - op: add
        path: /spec/template/spec/containers/0/env/-
        value:
-         name: OLM_IMAGE 
+         name: OLM_IMAGE
          value: quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:20f088c569c42c5171fd47443fa5111f9a45f88806b439184f74076153089b43
     target:
       kind: Deployment
