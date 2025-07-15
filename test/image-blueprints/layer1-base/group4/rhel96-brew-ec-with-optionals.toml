@@ -9,7 +9,7 @@
 */ -}}
 
 name = "rhel-9.6-microshift-brew-optionals-4.{{ .Env.MINOR_VERSION}}-ec"
-description = "A RHEL 9.6 image with already built and released RPMs like EC, RC, or Z-stream release"
+description = "A RHEL 9.6 image with already built and released RPMs like EC, RC, or Z-stream release: {{ .Env.BREW_EC_RELEASE_VERSION }}"
 version = "0.0.1"
 modules = []
 groups = []
