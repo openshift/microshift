@@ -42,3 +42,4 @@ fi
 sudo systemctl enable microshift
 
 mkdir -p "${HOME}/artifacts"
+microshift version -o json | jq -r '.gitVersion' | sed 's,-dirty,,g' > "${HOME}/artifacts/microshift-version.txt"
