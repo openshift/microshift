@@ -38,7 +38,7 @@ require (
 	github.com/prometheus/client_model v0.6.1
 	github.com/prometheus/common v0.62.0
 	github.com/prometheus/prometheus v0.302.1
-	github.com/squat/generic-device-plugin v0.0.0-20250313105706-6475ff5d0927
+	github.com/squat/generic-device-plugin v0.0.0-20250710162141-0f7fddf166f1
 	gopkg.in/yaml.v2 v2.4.0
 	k8s.io/api v1.32.6
 	k8s.io/apiextensions-apiserver v1.32.6
