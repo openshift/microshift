@@ -1,0 +1,10 @@
+# AI Model Serving's Triton test depends on a Densenet-121 model in ONNX format packaged as OCI image.
+# To build and push simply:
+# podman build -t quay.io/microshift/ai-testing-model:onnx-densenet-121 .
+# podman push quay.io/microshift/ai-testing-model:onnx-densenet-121
+FROM registry.access.redhat.com/ubi9/ubi-minimal:9.6
+RUN mkdir -p /models/densenet_onnx/1 && chmod -R 755 /models/densenet_onnx
+RUN curl -L \
+   -o /models/densenet_onnx/1/model.onnx \
+   https://github.com/onnx/models/raw/refs/heads/main/validated/vision/classification/densenet-121/model/densenet-12.onnx
+COPY config.pbtxt /models/densenet_onnx/config.pbtxt

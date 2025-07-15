@@ -1,0 +1,3 @@
+name: "densenet_onnx"
+backend: "openvino"
+default_model_filename: "model.onnx"
