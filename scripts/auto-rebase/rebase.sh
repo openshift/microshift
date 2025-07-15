@@ -543,6 +543,7 @@ update_go_mods() {
     # the files that are checked. `vendor` is automatically excluded from checks, but deps is
     # something that only exists in MicroShift and we can not override it. Running gofmt over
     # this directory will ensure the verify target works while still not changing functionality.
+    title "Ensuring gofmt"
     make update-gofmt
     if [[ -n "$(git status -s deps)" ]]; then
         title "## Commiting gofmt changes to deps directory"
@@ -832,8 +833,8 @@ EOF
     # Must use sed instead of yq because unquoted {{ .RouterHttpPort }} is interpreted as yaml object and yq has no option to not interpret it (like provide is as quoted string but produce unquoted output).
     # It needs to be last manipulation of the file, otherwise yq commands after this one would expand the {{ .RouterHttpPort }}.
     sed -i 's/port: 80/port: {{ .RouterHttpPort }}/g; s/port: 443/port: {{ .RouterHttpsPort }}/g' "${REPOROOT}"/assets/components/openshift-router/service-cloud.yaml
-   
-    # patch the manifests 
+
+    # patch the manifests
     # patch can be created using git:
     #    git diff HEAD~1 assets/components/openshift-router/deployment.yaml > scripts/auto-rebase/manifests_patches/010-ingress-deployment-clientCA.patch
     pushd  ${REPOROOT}
@@ -1171,12 +1172,12 @@ patches:
      - op: add
        path: /spec/template/spec/containers/0/env/-
        value:
-         name: OPERATOR_REGISTRY_IMAGE 
+         name: OPERATOR_REGISTRY_IMAGE
          value: ${registry_image}
      - op: add
        path: /spec/template/spec/containers/0/env/-
        value:
-         name: OLM_IMAGE 
+         name: OLM_IMAGE
          value: ${olm_image}
     target:
       kind: Deployment
