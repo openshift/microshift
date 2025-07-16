@@ -15,7 +15,6 @@ import (
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/klog/v2"
-	deploymentutil "k8s.io/kubectl/pkg/util/deployment"
 )
 
 type NamespaceWorkloads struct {
@@ -110,10 +109,12 @@ func waitForDeployment(ctx context.Context, client *appsclientv1.AppsV1Client, t
 		if deployment.Generation > deployment.Status.ObservedGeneration {
 			return false, nil
 		}
-		cond := deploymentutil.GetDeploymentCondition(deployment.Status, appsv1.DeploymentProgressing)
-		if cond != nil && cond.Reason == deploymentutil.TimedOutReason {
-			return false, fmt.Errorf("deployment %q exceeded its progress deadline", deployment.Name)
-		}
+		// 'rollout status' command would check the 'Progressing' condition and if the reason is 'ProgressDeadlineExceeded',
+		// it would return an error. We skip it here because:
+		// - a false positive error can happen if the node was offline for more than the Deployment's progress deadline
+		//   and the healthcheck runs before the controller has started progressing the Deployment again.
+		// - we want to give full timeout duration for the Deployment to become ready, no early exits.
+
 		if deployment.Spec.Replicas != nil && deployment.Status.UpdatedReplicas < *deployment.Spec.Replicas {
 			return false, nil
 		}
