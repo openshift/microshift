@@ -37,7 +37,7 @@ require (
 	github.com/oklog/run v1.1.0 // indirect
 	github.com/openshift/library-go v0.0.0-20250217144305-c917e6d528b2 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
-	github.com/squat/generic-device-plugin v0.0.0-20250313105706-6475ff5d0927 // indirect
+	github.com/squat/generic-device-plugin v0.0.0-20250710162141-0f7fddf166f1 // indirect
 	github.com/vishvananda/netlink v1.3.1-0.20250206174618-62fb240731fa // indirect
 	github.com/vishvananda/netns v0.0.4 // indirect
 	github.com/x448/float16 v0.8.4 // indirect
