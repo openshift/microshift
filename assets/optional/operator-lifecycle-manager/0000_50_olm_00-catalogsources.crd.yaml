@@ -2,7 +2,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.17.2
+    controller-gen.kubebuilder.io/version: v0.18.0
     include.release.openshift.io/ibm-cloud-managed: "true"
     include.release.openshift.io/self-managed-high-availability: "true"
     capability.openshift.io/name: "OperatorLifecycleManager"
@@ -367,7 +367,6 @@ spec:
                                           pod labels will be ignored. The default value is empty.
                                           The same key is forbidden to exist in both matchLabelKeys and labelSelector.
                                           Also, matchLabelKeys cannot be set when labelSelector isn't set.
-                                          This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                         type: array
                                         items:
                                           type: string
@@ -382,7 +381,6 @@ spec:
                                           pod labels will be ignored. The default value is empty.
                                           The same key is forbidden to exist in both mismatchLabelKeys and labelSelector.
                                           Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
-                                          This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                         type: array
                                         items:
                                           type: string
@@ -539,7 +537,6 @@ spec:
                                       pod labels will be ignored. The default value is empty.
                                       The same key is forbidden to exist in both matchLabelKeys and labelSelector.
                                       Also, matchLabelKeys cannot be set when labelSelector isn't set.
-                                      This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                     type: array
                                     items:
                                       type: string
@@ -554,7 +551,6 @@ spec:
                                       pod labels will be ignored. The default value is empty.
                                       The same key is forbidden to exist in both mismatchLabelKeys and labelSelector.
                                       Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
-                                      This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                     type: array
                                     items:
                                       type: string
@@ -712,7 +708,6 @@ spec:
                                           pod labels will be ignored. The default value is empty.
                                           The same key is forbidden to exist in both matchLabelKeys and labelSelector.
                                           Also, matchLabelKeys cannot be set when labelSelector isn't set.
-                                          This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                         type: array
                                         items:
                                           type: string
@@ -727,7 +722,6 @@ spec:
                                           pod labels will be ignored. The default value is empty.
                                           The same key is forbidden to exist in both mismatchLabelKeys and labelSelector.
                                           Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
-                                          This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                         type: array
                                         items:
                                           type: string
@@ -884,7 +878,6 @@ spec:
                                       pod labels will be ignored. The default value is empty.
                                       The same key is forbidden to exist in both matchLabelKeys and labelSelector.
                                       Also, matchLabelKeys cannot be set when labelSelector isn't set.
-                                      This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                     type: array
                                     items:
                                       type: string
@@ -899,7 +892,6 @@ spec:
                                       pod labels will be ignored. The default value is empty.
                                       The same key is forbidden to exist in both mismatchLabelKeys and labelSelector.
                                       Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
-                                      This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                     type: array
                                     items:
                                       type: string

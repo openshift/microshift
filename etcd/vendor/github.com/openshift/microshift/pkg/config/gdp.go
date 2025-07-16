@@ -99,6 +99,10 @@ func (gdp GenericDevicePlugin) validate() error {
 					"failed to parse device %q; cannot define both path and usb at the same time",
 					deviceSpec.Name))
 			}
+
+			for _, path := range g.Paths {
+				errs = append(errs, path.validate()...)
+			}
 		}
 	}
 
@@ -216,8 +220,9 @@ type Path struct {
 	// +kubebuilder:default=false
 	ReadOnly bool `json:"readOnly,omitempty"`
 	// Type describes what type of file-system node this Path represents and thus how it should be mounted.
-	// When unspecified, Type defaults to Device.
+	// Allowed values: "Device", "Mount". When unspecified, type defaults to Device.
 	// +kubebuilder:default=Device
+	// +kubebuilder:validation:Enum:=Device;Mount;""
 	Type deviceplugin.PathType `json:"type,omitempty"`
 	// Limit specifies up to how many times this device can be used in the group concurrently when other devices
 	// in the group yield more matches.
@@ -237,6 +242,46 @@ func (p *Path) toGDP() *deviceplugin.Path {
 		Type:        p.Type,
 		Limit:       p.Limit,
 	}
+}
+
+func (p *Path) validate() []error {
+	errs := []error{}
+
+	if p.Type != "" &&
+		p.Type != deviceplugin.DevicePathType &&
+		p.Type != deviceplugin.MountPathType {
+		errs = append(errs, fmt.Errorf(
+			"invalid type for path '%s': '%s' - accepted values are '' (will default to %s), %s, or %s",
+			p.Path, p.Type, deviceplugin.DevicePathType, deviceplugin.DevicePathType, deviceplugin.MountPathType))
+	}
+
+	if p.ReadOnly && p.Type != deviceplugin.MountPathType {
+		errs = append(errs, fmt.Errorf(
+			"invalid readOnly value for path '%s': readOnly is only allowed for paths of type Mount",
+			p.Path))
+	}
+
+	if p.Type == deviceplugin.MountPathType && p.Permissions != "" {
+		errs = append(errs, fmt.Errorf(
+			"invalid permissions for path '%s': permissions are not allowed for paths of type Mount",
+			p.Path))
+	}
+
+	// Although Permissions are only for 'Device' type, we can always check them
+	// and offer as many error messages as possible in case the type was mistyped.
+	invalidChars := []string{}
+	for _, c := range p.Permissions {
+		if c != 'm' && c != 'r' && c != 'w' {
+			invalidChars = append(invalidChars, string(c))
+		}
+	}
+	if len(invalidChars) > 0 {
+		errs = append(errs, fmt.Errorf(
+			"invalid permissions for path %q: invalid characters '%s' in permissions string '%s' (only 'm', 'r', and 'w' are allowed)",
+			p.Path, strings.Join(invalidChars, ", "), p.Permissions))
+	}
+
+	return errs
 }
 
 // USBSpec represents a USB device specification that should be discovered.
