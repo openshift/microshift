@@ -1,0 +1,7 @@
+id = "microshift-brew"
+name = "MicroShift {{ .Env.BREW_REPO }} Repo"
+type = "yum-baseurl"
+url = "file://{{ .Env.BREW_REPO }}/"
+check_gpg = false
+check_ssl = false
+system = false 

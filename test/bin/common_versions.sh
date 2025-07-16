@@ -39,6 +39,26 @@ get_vrel_from_rhsm() {
     echo ""
 }
 
+get_vrel_from_rpm() {
+    local -r rpm_dir="$1"
+
+    local -r rpm_release_info_file=$(find "${rpm_dir}" -name "microshift-release-info-*.rpm" | sort | tail -n1)
+    if [ -z "${rpm_release_info_file}" ]; then
+        echo ""
+        return
+    fi
+
+    local -r rpm_vrel=$(\
+        rpm -qp --queryformat '%{version}-%{release}' \
+            -p "${rpm_release_info_file}" 2>/dev/null \
+        )
+    if [ -n "${rpm_vrel}" ]; then
+        echo "${rpm_vrel}"
+        return
+    fi
+    echo ""
+}
+
 # The current release minor version (e.g. '17' for '4.17') affects
 # the definition of previous and fake next versions.
 export MINOR_VERSION=20
@@ -102,3 +122,17 @@ export RHOCP_MINOR_Y2=18
 # The version of Sonobuoy package used in CNCF tests.
 # See https://github.com/vmware-tanzu/sonobuoy/releases.
 export CNCF_SONOBUOY_VERSION=v0.57.3
+
+# The brew release versions needed for release regression testing
+BREW_Y0_RELEASE_VERSION="$(get_vrel_from_rpm "${BREW_RPM_SOURCE}/4.${MINOR_VERSION}-zstream/${UNAME_M}/")"
+BREW_Y1_RELEASE_VERSION="$(get_vrel_from_rpm "${BREW_RPM_SOURCE}/4.${PREVIOUS_MINOR_VERSION}-zstream/${UNAME_M}/")"
+BREW_Y2_RELEASE_VERSION="$(get_vrel_from_rpm "${BREW_RPM_SOURCE}/4.${YMINUS2_MINOR_VERSION}-zstream/${UNAME_M}/")"
+BREW_RC_RELEASE_VERSION="$(get_vrel_from_rpm "${BREW_RPM_SOURCE}/4.${MINOR_VERSION}-rc/${UNAME_M}/")"
+BREW_EC_RELEASE_VERSION="$(get_vrel_from_rpm "${BREW_RPM_SOURCE}/4.${MINOR_VERSION}-ec/${UNAME_M}/")"
+BREW_NIGHTLY_RELEASE_VERSION="$(get_vrel_from_rpm "${BREW_RPM_SOURCE}/4.${MINOR_VERSION}-nightly/${UNAME_M}/")"
+export BREW_Y0_RELEASE_VERSION
+export BREW_Y1_RELEASE_VERSION
+export BREW_Y2_RELEASE_VERSION
+export BREW_RC_RELEASE_VERSION
+export BREW_EC_RELEASE_VERSION
+export BREW_NIGHTLY_RELEASE_VERSION
