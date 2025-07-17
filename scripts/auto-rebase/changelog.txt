@@ -1,77 +1,31 @@
-- api embedded-component ad766c4e6d8e5adc72537d145bd4f24365e3e560 to 674ad74beffcbdf6aa7a577bf23a269c24f92fe8
-  - fd43ac5c 2025-07-09T10:29:23-03:00 bump(k8s): tools: go mod vendor
-  - f0c4cde4 2025-07-09T10:28:47-03:00 bump(k8s): tools: update k8s.io/* dependencies to v1.33.2
-  - 071eb859 2025-07-09T10:26:21-03:00 bump(k8s): make update
-  - 35a7ea05 2025-07-09T10:17:35-03:00 bump(k8s): update go to 1.24
-  - 3077a211 2025-07-09T10:17:06-03:00 bump(k8s): go mod vendor
-  - c8a59d3d 2025-07-09T10:16:53-03:00 bump(k8s): update k8s.io/* dependencies to v1.33.2
-  - 4dc1caf0 2025-07-09T11:14:39+01:00 Disable schema checker overlap with KAL
-  - e76f3059 2025-07-08T10:32:18+02:00 remove AWSEFSDriverVolumeMetrics featuregate
-  - 8f9e6cac 2025-07-07T13:36:38-04:00 register v1 (cluster)imagepolicy
-  - 648ab9a6 2025-07-07T10:15:41+01:00 Enable MutatingAdmissionPolicy in Dev/TechPreview
-  - 636ec894 2025-07-04T15:56:18+01:00 Add config for uniquemarkers
-  - f62903b3 2025-07-04T15:46:57+01:00 Update generated content
-  - 10ae908d 2025-07-04T15:46:55+01:00 Apply partial fixes
-  - 92dede72 2025-07-04T15:46:54+01:00 Configure optionalfields linter
-  - 040724b5 2025-07-04T15:46:53+01:00 Move kube-api-linter to a go-plugin integration
-  - fdb699f8 2025-07-04T15:46:52+01:00 Update KAL vendor
-  - 97fd04f6 2025-07-04T15:46:51+01:00 Update configuration to move to golangci-lint v2
-  - e9242d50 2025-07-04T15:46:50+01:00 Move go mod golangci-lint to v2
-  - 8fa54b5e 2025-06-18T17:32:37+05:30 OAPE-232: Remove GCPLabelsTags featuregate
+- csi-external-snapshotter image-arm64 b5725afc9e3dfbc9614e4e62a62e8bc5897527f9 to 42604822c25eb2aa0ecb017c24e328221b238eb9
+  - 4279ab8 2025-06-30T16:33:23+02:00 UPSTREAM: <carry>: Add OpenShift files
+  - e1565cb 2025-06-17T23:31:59-04:00 Add changelog for v8.3
+  - 9941656 2025-06-17T23:14:22-04:00 update to go1.24.4
+  - d6349a2 2025-05-22T18:07:50+02:00 Add `-automaxprocs` flag for configuring `GOMAXPROCS`
+  - df101f7 2025-05-22T12:44:33+02:00 Refactor updateContentInInformerCache
+  - 9cf863f 2025-05-22T12:44:30+02:00 Fix requeueing snapshot content after deletion error
+  - a555af7 2025-05-20T19:08:03+00:00 Queue resyncs in ShouldEnqueueContentChange
+  - 7bcd6cd 2025-05-15T14:41:38+05:30 Change from fmt.Errorf() to errors.New() for non-constant format string
+  - 78bbdbf 2025-05-14T20:23:26+05:30 sidecar: Get credentials from annotation for snapshots
+  - 6de71bf 2025-05-13T13:21:00+05:30 Squashed 'release-tools/' changes from 90efb2ca5..0a435bf98
+  - d685fab 2025-05-13T11:43:28+05:30 Squashed 'release-tools/' changes from 90efb2ca5..0a435bf98
+  - 508abdd 2025-05-13T01:27:43+00:00 use voluegroupsnapshot uid to make snapshotname
+  - 15205f8 2025-05-12T12:59:05+05:30 Upgrade K8s dependencies to v1.33.0
+  - 2292670 2025-05-02T21:30:56-07:00 Update controller deployment to latest version
+  - 0cf7c7e 2025-04-24T13:30:50+00:00 test: fix trivy action failure
+  - c15a766 2025-04-24T13:29:53+00:00 fix: CVE-2025-22872
+  - 1cfebb0 2025-03-14T02:59:10+00:00 fix: CVE-2025-22870
+  - 35f9c2b 2025-02-27T14:56:33+08:00 Support json logging format
+  - fe8de84 2025-02-25T20:33:58-05:00 Fix CVEs by bumping go & x/net
+  - 977a406 2025-02-25T20:31:43-05:00 Squashed 'release-tools/' changes from 049659326..90efb2ca5
+  - 982889b 2025-02-25T20:22:03-05:00 Fix spelling error flagged by codespell
+  - eabdae2 2025-02-25T16:39:33+00:00 Add leader election, work-queue, process, and Go runtime metrics
+  - e8bc200 2024-12-17T16:51:27+01:00 update kubernetes to 1.32
+  - 9722c1a 2024-12-17T13:01:44+01:00 Squashed 'release-tools/' changes from e31de525..04965932
+  - 2d6e908 2024-12-10T18:42:20+00:00 Update deployment to v8.2.0
+  - 546950f 2024-09-23T10:43:35-06:00 docs: update install commands for CRDs + snapshotter
 
-- cluster-dns-operator embedded-component 659813065170f4e52f80b7a29bbab64bfa9aa172 to 48ebc1269caad1e9ec7f422b24f3bccbe134d0c4
-  - 4d7d11c 2025-06-19T00:30:31+00:00 Updating ose-cluster-dns-operator-container image to be consistent with ART for 4.20 Reconciling with https://github.com/openshift/ocp-build-data/tree/dfb5c7d531490cfdc61a3b88bc533702b9624997/images/ose-cluster-dns-operator.yml
-
-- cluster-kube-apiserver-operator embedded-component add2db9de136758cac8c45184b7ba7812de0893b to 04595ca2622f5a6bc3b3facfec0ef876b6acaa2e
-  - 38109ca 2025-07-10T10:16:39-03:00 bump(k8s): stop trying to patch CRDs
-  - a4c281c 2025-07-10T10:15:07-03:00 bump(k8s): go mod vendor
-  - 333807b 2025-07-10T10:14:42-03:00 bump(k8s): tools: update k8s.io/* dependencies to v1.33.2
-
-- csi-external-snapshotter embedded-component 1b2240dca48840103558b499281effaea072b162 to b5725afc9e3dfbc9614e4e62a62e8bc5897527f9
-  - e418a63 2025-06-30T15:43:22+02:00 UPSTREAM: 1303: Fix requeueing snapshot content after deletion error
-
-- machine-config-operator embedded-component 433fd83ae10b547a586135353bff7cf108fc8f5b to 3fa701ea9238cd911220d9a0da347a0bea2dcbfc
-  - 8e4b9682 2025-07-08T13:58:33+02:00 MCO-1739: Set OTE suite as disruptive and timeout
-  - 1d7c8e80 2025-07-07T15:25:46-05:00 Add emy to baremetal-reviewers
-  - dc7fd14f 2025-07-03T11:50:54-04:00 node controller: update MCP degrade status by using MCN NodeDegrade condition status
-  - edc881df 2025-07-03T11:11:33-04:00 platform_helpers: Add support for vSphere vsphere_helpers: add helper functions for vSphere cache: Caches bootimages in the MCC Pod featuregates: Add vsphere in TP fg
-  - 0c962f30 2025-07-03T11:11:33-04:00 go.mod: vendor govmomi
-  - ab3d5bcd 2025-06-13T15:10:22-04:00 ensure that build pod shuts down quickly after being terminated
-  - 48004bf4 2025-06-13T15:10:21-04:00 makes build object deletion optional
-  - dced9d52 2025-06-13T15:10:09-04:00 adds shutdowndelayhandler to buildcontroller
-  - f3b92432 2025-06-13T11:30:31-04:00 use channel to signal controller shutdown
-
-- operator-framework-olm embedded-component 53e474a396266c54f0276c8b9e28f2541849b981 to e449ed463d889d2d3b79c3fe098d42199a4ba4dc
-  - 9e461a9b 2025-07-12T00:03:48+00:00 :seedling: Bump the k8s-dependencies group with 11 updates (#3600)
-  - 7455339c 2025-07-11T00:04:05+00:00 add oceanc to approvers (#3609)
-  - fea9ac77 2025-07-11T00:03:23+00:00 🐛 add catalog-operator control-plane-specific tolerations to unpack jobs (#3606)
-
-- route-controller-manager embedded-component bc97534a12a7a6bac096e4ed488b29535c8d4f33 to e148fabc13f735d5f59a94714031d8765abb9895
-  - 6a19aca 2025-06-18T12:01:48+00:00 Updating ose-route-controller-manager-container image to be consistent with ART for 4.20 Reconciling with https://github.com/openshift/ocp-build-data/tree/dfb5c7d531490cfdc61a3b88bc533702b9624997/images/ose-route-controller-manager.yml
-
-- csi-external-snapshotter image-amd64 1b2240dca48840103558b499281effaea072b162 to b5725afc9e3dfbc9614e4e62a62e8bc5897527f9
-  - e418a63 2025-06-30T15:43:22+02:00 UPSTREAM: 1303: Fix requeueing snapshot content after deletion error
-
-- ovn-kubernetes image-amd64 31d2803e5f38207bf2137ba2ec15a95cee1d0802 to 0f86580a4e6057f8bc1e09abd6f36625f076b23d
-  - 1ea27391 2025-07-02T14:39:25-07:00 Revert "Add the IP rule for a UDN only when it is advertised to the default VRF"
-  - db87df1d 2025-07-01T09:31:06+01:00 Layer 2 EIP: remove stale LRP if pod is remote
-  - 8a70c81d 2025-07-01T09:31:03+01:00 EIP OVN controller: stop pod config flap
-  - a1d47314 2025-07-01T10:39:46+03:00 contrib,kind: Use skopeo to get the actual ovnkube-image digest
-  - 5ea894c8 2025-07-01T10:39:45+03:00 contrib, kind.sh: Fix local registry when using podman
-  - 05f8d8f0 2025-06-25T14:15:44+00:00 Add short doc update with the ovn-ic components on the DPU
-  - 116ba522 2025-06-24T23:15:41+00:00 ovnkube.sh: Add new overwriting options for the gateway options and kubernetes node name
-  - ff1b163c 2025-06-24T04:47:39+00:00 Bump the go_modules group across 3 directories with 4 updates
-  - 21e4f0eb 2025-06-23T14:58:33+02:00 Fix the host drop rules to match on new state
-  - 19be786c 2025-06-19T22:35:32+03:00 use slash as path separator for some sysctl commands
-  - 70fe56c6 2025-06-19T07:23:52+02:00 Add labels to filter e2e tests
-  - 1fb89831 2025-06-16T10:33:02+02:00 [e2e] kubevirt: generate test name that is compatible with file path.
-  - deff5e64 2025-06-12T14:58:27+02:00 Add the IP rule for a UDN only when it is advertised to the default VRF
-  - 228d4440 2025-06-12T13:41:43+01:00 GH VM: remove more items after disk space limit reached
-  - 2412b506 2025-06-11T20:53:11+03:00 stop adding events to NAD if the network type is not ovn-k
-  - 10be5961 2025-06-11T15:35:32+00:00 Bump golang.org/x/crypto
-  - d14d8483 2025-06-11T16:58:56+02:00 remote node deletion failure due to libovsdb integrity violation error
-  - 61f57e2a 2025-06-11T16:58:56+02:00 Delete logical static routes only if they belong to the spefified router
-  - 304975a0 2025-06-11T16:58:56+02:00 Add node deletion unit testing case for zone_ic_handler
-  - 07973c38 2025-06-03T12:59:20+02:00 Add custom_fences config to mkdocs.yml
-  - c68299e5 2025-06-03T12:02:01+02:00 Add mermaid mkdocs plugin
+- ovn-kubernetes image-arm64 0f86580a4e6057f8bc1e09abd6f36625f076b23d to d5f06a9b7f8ce1fc428fef7a8ace8e595346ab95
+  - 93a8828f 2025-07-15T11:39:19+02:00 Update OWNERS file: Add Patryk/Martin as approvers
 
