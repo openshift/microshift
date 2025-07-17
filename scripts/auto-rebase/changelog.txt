@@ -1,0 +1,9 @@
+- kubernetes embedded-component 1879980f93f6f3b75a96d941eabf2bfe9df3539b to d4983da31757e301ccbc050e8dfc7e5e0ec2c183
+  - 702e9d631 2025-07-09T17:29:16+00:00 UPSTREAM: <carry>: disable some legacy cloud provider tests
+
+- kubernetes image-amd64 1879980f93f6f3b75a96d941eabf2bfe9df3539b to d4983da31757e301ccbc050e8dfc7e5e0ec2c183
+  - 702e9d631 2025-07-09T17:29:16+00:00 UPSTREAM: <carry>: disable some legacy cloud provider tests
+
+- kubernetes image-arm64 1879980f93f6f3b75a96d941eabf2bfe9df3539b to d4983da31757e301ccbc050e8dfc7e5e0ec2c183
+  - 702e9d631 2025-07-09T17:29:16+00:00 UPSTREAM: <carry>: disable some legacy cloud provider tests
+
