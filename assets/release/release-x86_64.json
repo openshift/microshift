@@ -1,15 +1,15 @@
 {
   "release": {
-    "base": "4.15.0-0.nightly-2025-07-07-184900"
+    "base": "4.15.0-0.nightly-2025-07-16-084201"
   },
   "images": {
-    "cli": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:756dc941a55dd74071bf4747c144ef527dd6544a2f50c03fa46bc8088d2388c8",
+    "cli": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:91446b42492a0e56293226bb6b7f6d5e5445980c094bf4d06b830d1f4bdadd99",
     "coredns": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:b8fd614cae328ced938ed27c85f74a82886fdfc8e59dfd4f4a0bb392ae580917",
-    "haproxy-router": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:966ef8d830d479ba706463335dcf8890f42d601a7bcf6c41557820f4f65ca7a9",
-    "kube-rbac-proxy": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:2c6e45f3972a974df7bd29e27e290f185d3a62b8a2619b19672ad417bac00dc6",
+    "haproxy-router": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:96d19b8371d18c09c6b44899648e2c0f7e5447630dee74dac79a8e00f7409d7c",
+    "kube-rbac-proxy": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:778d6062e1bea1405ccc5ccfe99354e2284cd99a4d60160c67c3e12006b9610f",
     "openssl": "registry.access.redhat.com/ubi8/openssl@sha256:9e743d947be073808f7f1750a791a3dbd81e694e37161e8c6c6057c2c342d671",
     "ovn-kubernetes-microshift": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:9bb4507c6a4262a2339f53b84211f20d3a5ad38de617ee89aedb9b189cb12ce9",
-    "pod": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:cae41139ff826e2a6ae25283e92258176bc9e67604c84cfdd251c543b53dcf7c",
+    "pod": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:f2d62f76041a6998c6992414f2d954ae80c42270302a50408b2a177f5f35cde5",
     "service-ca-operator": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:108431c75e9f6a2560e441d946c844f3cba9e96b87a1db887de5e7271695016a",
     "topolvm_csi": "registry.redhat.io/lvms4/topolvm-rhel9@sha256:ce0c78c2867fb0b73c4911ae6afd5aaf9a413480cfcf4f31f46f2387c3df97e0",
     "topolvm_csi_registrar": "registry.redhat.io/openshift4/ose-csi-node-driver-registrar@sha256:95691c21198e20d11777d592806fa00c018c17443d9b3aee853891dac6090470",
