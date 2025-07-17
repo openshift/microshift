@@ -1,55 +1,57 @@
-- cluster-kube-apiserver-operator embedded-component 4986945df44e4288cdd76f1f437bc3ba81e5700c to cd86a6772107b5213da2e649530b1a64eb6c2781
-  - 99492fc 2025-07-09T13:30:34-04:00 Revert "[release-4.19] OCPBUGS-58116: certregenerationcontroller: start configInformers again"
+- machine-config-operator embedded-component 023231898840e2a9173899da72639556397917df to e5bb80c194b2d707e16e737dbed61c8ab33e3d57
+  - 1832dab7 2025-07-09T17:49:31+02:00 Update dependencies
+  - 83d5a085 2025-07-09T17:49:30+02:00 Base port of QE repo
+  - d02b2593 2025-07-08T16:24:49+00:00 Remove podman-etcd machine config source
 
-- ovn-kubernetes image-amd64 0c8cdc93873c06b07973d147fc704d2224ac2faf to 0b613e37a01ed51b5c890a43cf034480bb68241c
-  - 5308cbf6 2025-06-10T11:33:44-04:00 CreateDefaultRouteToExternal should use node GR IP annotations
-  - a0083457 2025-06-10T11:33:44-04:00 L2 and L3 UDN should reconfigure reroute policies when join IP changes
-  - bf5b8d41 2025-06-10T11:33:44-04:00 Stop calling CreateDefaultRouteToExternal for UDNs by default
-  - 188309de 2025-06-10T11:33:44-04:00 Perf optimization: Stop every node event from triggering EIP Node update
-  - cb326569 2025-06-10T14:28:08+01:00 chore: update footer with new LF trademark disclaimer
-  - 182ba9c2 2025-06-10T13:31:31+03:00 Unit tests for node ingress snat exclude annotation
-  - 70777652 2025-06-10T13:31:31+03:00 Configure mgmtport-no-snat-subnets sets elements
-  - 9554ba6e 2025-06-10T13:31:31+03:00 Add dontSNAT subnets rules to mgmtport-snat
-  - f84d3f34 2025-06-09T11:06:09+00:00 Fix HO test flake
-  - 90b88fab 2025-06-09T11:06:09+00:00 Run almost all control plane tests in BGP lanes
-  - 19f39c2c 2025-06-09T11:06:09+00:00 Change BGP e2e lane config
-  - b5bc88df 2025-06-09T11:06:09+00:00 Bump priority of egress ClusterIP traffic drop
-  - 575f3c01 2025-06-09T11:06:09+00:00 Align e2e test timeouts
-  - 399915a6 2025-06-08T18:17:24+00:00 workflow: Add fix missing and apt update before trying to install VRF module
-  - 4fa8bf00 2025-06-04T12:07:52+02:00 udn: Fix NAD template for join subnets field
-  - 98518eaa 2025-06-03T16:15:05-04:00 Minor improvement to route add for remote zone nodes
-  - edc159d0 2025-06-03T16:13:18-04:00 Optimize ic handler a little for UDN
-  - b56df725 2025-06-03T13:34:03-04:00 Some quality of life improvements for layer 3 controllers node handling
-  - 2b812dd7 2025-05-29T20:49:58-04:00 Change NeedsNodeAllocation to a positive check
-  - 81ab5952 2025-05-29T18:32:42-04:00 Fix node update check for network cluster controller
-  - 8cf444c9 2025-05-29T14:36:51-04:00 Removes as much kubeclient Get methods as possible
-  - 7a30735f 2025-05-28T12:30:20-04:00 Use watchFactory instead of kclient for gateway snat cleanup
-  - d31d1717 2025-05-21T19:43:06-04:00 Configures ephemeral port range for OVN SNAT'ing
-  - 3d104e66 2025-05-20T16:06:34-04:00 Retry all pods smarter
+- openshift-controller-manager embedded-component af43fe68a7d862959a797b66307a1277fffbc9df to a672407574befa9faf6a56078d6852229701f8c6
+  - 3e35700 2025-06-23T12:39:31+00:00 OCPBUGS-57918: handle secret not found more gracefully
 
-- ovn-kubernetes image-arm64 0c8cdc93873c06b07973d147fc704d2224ac2faf to 0b613e37a01ed51b5c890a43cf034480bb68241c
-  - 5308cbf6 2025-06-10T11:33:44-04:00 CreateDefaultRouteToExternal should use node GR IP annotations
-  - a0083457 2025-06-10T11:33:44-04:00 L2 and L3 UDN should reconfigure reroute policies when join IP changes
-  - bf5b8d41 2025-06-10T11:33:44-04:00 Stop calling CreateDefaultRouteToExternal for UDNs by default
-  - 188309de 2025-06-10T11:33:44-04:00 Perf optimization: Stop every node event from triggering EIP Node update
-  - cb326569 2025-06-10T14:28:08+01:00 chore: update footer with new LF trademark disclaimer
-  - 182ba9c2 2025-06-10T13:31:31+03:00 Unit tests for node ingress snat exclude annotation
-  - 70777652 2025-06-10T13:31:31+03:00 Configure mgmtport-no-snat-subnets sets elements
-  - 9554ba6e 2025-06-10T13:31:31+03:00 Add dontSNAT subnets rules to mgmtport-snat
-  - f84d3f34 2025-06-09T11:06:09+00:00 Fix HO test flake
-  - 90b88fab 2025-06-09T11:06:09+00:00 Run almost all control plane tests in BGP lanes
-  - 19f39c2c 2025-06-09T11:06:09+00:00 Change BGP e2e lane config
-  - b5bc88df 2025-06-09T11:06:09+00:00 Bump priority of egress ClusterIP traffic drop
-  - 575f3c01 2025-06-09T11:06:09+00:00 Align e2e test timeouts
-  - 399915a6 2025-06-08T18:17:24+00:00 workflow: Add fix missing and apt update before trying to install VRF module
-  - 4fa8bf00 2025-06-04T12:07:52+02:00 udn: Fix NAD template for join subnets field
-  - 98518eaa 2025-06-03T16:15:05-04:00 Minor improvement to route add for remote zone nodes
-  - edc159d0 2025-06-03T16:13:18-04:00 Optimize ic handler a little for UDN
-  - b56df725 2025-06-03T13:34:03-04:00 Some quality of life improvements for layer 3 controllers node handling
-  - 2b812dd7 2025-05-29T20:49:58-04:00 Change NeedsNodeAllocation to a positive check
-  - 81ab5952 2025-05-29T18:32:42-04:00 Fix node update check for network cluster controller
-  - 8cf444c9 2025-05-29T14:36:51-04:00 Removes as much kubeclient Get methods as possible
-  - 7a30735f 2025-05-28T12:30:20-04:00 Use watchFactory instead of kclient for gateway snat cleanup
-  - d31d1717 2025-05-21T19:43:06-04:00 Configures ephemeral port range for OVN SNAT'ing
-  - 3d104e66 2025-05-20T16:06:34-04:00 Retry all pods smarter
+- operator-framework-olm embedded-component 0e4e456e8183103a071b57bf19e989eda5162f8c to 8bcf1556a550efa7bb380ec315c077cf29438695
+  - 81f63f7d 2025-07-11T10:45:29-05:00 🐛 add catalog-operator control-plane-specific tolerations to unpack jobs (#3606)
+
+- ovn-kubernetes image-amd64 0b613e37a01ed51b5c890a43cf034480bb68241c to 0ea52bffeb97945c818e3bad8edbb12865c7b93c
+  - 1ea27391 2025-07-02T14:39:25-07:00 Revert "Add the IP rule for a UDN only when it is advertised to the default VRF"
+  - db87df1d 2025-07-01T09:31:06+01:00 Layer 2 EIP: remove stale LRP if pod is remote
+  - 8a70c81d 2025-07-01T09:31:03+01:00 EIP OVN controller: stop pod config flap
+  - a1d47314 2025-07-01T10:39:46+03:00 contrib,kind: Use skopeo to get the actual ovnkube-image digest
+  - 5ea894c8 2025-07-01T10:39:45+03:00 contrib, kind.sh: Fix local registry when using podman
+  - 05f8d8f0 2025-06-25T14:15:44+00:00 Add short doc update with the ovn-ic components on the DPU
+  - 116ba522 2025-06-24T23:15:41+00:00 ovnkube.sh: Add new overwriting options for the gateway options and kubernetes node name
+  - ff1b163c 2025-06-24T04:47:39+00:00 Bump the go_modules group across 3 directories with 4 updates
+  - 21e4f0eb 2025-06-23T14:58:33+02:00 Fix the host drop rules to match on new state
+  - 19be786c 2025-06-19T22:35:32+03:00 use slash as path separator for some sysctl commands
+  - 70fe56c6 2025-06-19T07:23:52+02:00 Add labels to filter e2e tests
+  - 1fb89831 2025-06-16T10:33:02+02:00 [e2e] kubevirt: generate test name that is compatible with file path.
+  - deff5e64 2025-06-12T14:58:27+02:00 Add the IP rule for a UDN only when it is advertised to the default VRF
+  - 228d4440 2025-06-12T13:41:43+01:00 GH VM: remove more items after disk space limit reached
+  - 2412b506 2025-06-11T20:53:11+03:00 stop adding events to NAD if the network type is not ovn-k
+  - 10be5961 2025-06-11T15:35:32+00:00 Bump golang.org/x/crypto
+  - d14d8483 2025-06-11T16:58:56+02:00 remote node deletion failure due to libovsdb integrity violation error
+  - 61f57e2a 2025-06-11T16:58:56+02:00 Delete logical static routes only if they belong to the spefified router
+  - 304975a0 2025-06-11T16:58:56+02:00 Add node deletion unit testing case for zone_ic_handler
+  - 07973c38 2025-06-03T12:59:20+02:00 Add custom_fences config to mkdocs.yml
+  - c68299e5 2025-06-03T12:02:01+02:00 Add mermaid mkdocs plugin
+
+- ovn-kubernetes image-arm64 0b613e37a01ed51b5c890a43cf034480bb68241c to 0ea52bffeb97945c818e3bad8edbb12865c7b93c
+  - 1ea27391 2025-07-02T14:39:25-07:00 Revert "Add the IP rule for a UDN only when it is advertised to the default VRF"
+  - db87df1d 2025-07-01T09:31:06+01:00 Layer 2 EIP: remove stale LRP if pod is remote
+  - 8a70c81d 2025-07-01T09:31:03+01:00 EIP OVN controller: stop pod config flap
+  - a1d47314 2025-07-01T10:39:46+03:00 contrib,kind: Use skopeo to get the actual ovnkube-image digest
+  - 5ea894c8 2025-07-01T10:39:45+03:00 contrib, kind.sh: Fix local registry when using podman
+  - 05f8d8f0 2025-06-25T14:15:44+00:00 Add short doc update with the ovn-ic components on the DPU
+  - 116ba522 2025-06-24T23:15:41+00:00 ovnkube.sh: Add new overwriting options for the gateway options and kubernetes node name
+  - ff1b163c 2025-06-24T04:47:39+00:00 Bump the go_modules group across 3 directories with 4 updates
+  - 21e4f0eb 2025-06-23T14:58:33+02:00 Fix the host drop rules to match on new state
+  - 19be786c 2025-06-19T22:35:32+03:00 use slash as path separator for some sysctl commands
+  - 70fe56c6 2025-06-19T07:23:52+02:00 Add labels to filter e2e tests
+  - 1fb89831 2025-06-16T10:33:02+02:00 [e2e] kubevirt: generate test name that is compatible with file path.
+  - deff5e64 2025-06-12T14:58:27+02:00 Add the IP rule for a UDN only when it is advertised to the default VRF
+  - 228d4440 2025-06-12T13:41:43+01:00 GH VM: remove more items after disk space limit reached
+  - 2412b506 2025-06-11T20:53:11+03:00 stop adding events to NAD if the network type is not ovn-k
+  - 10be5961 2025-06-11T15:35:32+00:00 Bump golang.org/x/crypto
+  - d14d8483 2025-06-11T16:58:56+02:00 remote node deletion failure due to libovsdb integrity violation error
+  - 61f57e2a 2025-06-11T16:58:56+02:00 Delete logical static routes only if they belong to the spefified router
+  - 304975a0 2025-06-11T16:58:56+02:00 Add node deletion unit testing case for zone_ic_handler
+  - 07973c38 2025-06-03T12:59:20+02:00 Add custom_fences config to mkdocs.yml
+  - c68299e5 2025-06-03T12:02:01+02:00 Add mermaid mkdocs plugin
 
