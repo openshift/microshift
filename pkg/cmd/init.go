@@ -597,24 +597,31 @@ func cleanupStaleKubeconfigs(cfg *config.Config, path string) error {
 	for _, name := range append(cfg.ApiServer.SubjectAltNames, cfg.Node.HostnameOverride) {
 		currentKubeconfigs[name] = struct{}{}
 	}
-	files, err := os.ReadDir(path)
+	dirs, err := os.ReadDir(path)
 	if err != nil {
 		return err
 	}
-	deleteDirs := make([]string, 0)
-	for _, file := range files {
-		if !file.IsDir() {
+	for _, dir := range dirs {
+		if !dir.IsDir() {
 			continue
 		}
-		if _, ok := currentKubeconfigs[file.Name()]; !ok {
-			deleteDirs = append(deleteDirs, filepath.Join(path, file.Name()))
+
+		originalName := dir.Name()
+		cleanName := filepath.Base(originalName)
+
+		if cleanName != originalName || cleanName == ".." {
+			klog.Warningf("Skipping directory with potentially malicious name: %s", originalName)
+			continue
 		}
-	}
-	for _, deletePath := range deleteDirs {
-		if err := os.RemoveAll(filepath.Clean(deletePath)); err != nil {
-			klog.Warningf("Unable to remove %s: %v", deletePath, err)
+
+		if _, ok := currentKubeconfigs[cleanName]; !ok {
+			kubeConfigPath := filepath.Join(path, cleanName)
+			if err := os.RemoveAll(kubeConfigPath); err != nil {
+				klog.Warningf("Unable to remove %s: %v", kubeConfigPath, err)
+			} else {
+				klog.Infof("Removed stale kubeconfig %s", kubeConfigPath)
+			}
 		}
-		klog.Infof("Removed stale kubeconfig %s", deletePath)
 	}
 	return nil
 }
