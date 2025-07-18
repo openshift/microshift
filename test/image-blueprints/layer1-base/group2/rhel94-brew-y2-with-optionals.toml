@@ -15,37 +15,18 @@ modules = []
 groups = []
 distro = "rhel-94"
 
+{{ range (env.Getenv "MICROSHIFT_MANDATORY_RPMS" | strings.Split " ") }}
 [[packages]]
-name = "microshift"
-version = "{{ .Env.BREW_Y2_RELEASE_VERSION }}"
+name = "{{ . }}"
+version = "{{ env.Getenv "BREW_Y2_RELEASE_VERSION" }}"
+{{ end }}
 
+{{ range (env.Getenv "MICROSHIFT_Y2_OPTIONAL_RPMS" | strings.Split " ") }}
 [[packages]]
-name = "microshift-olm"
-version = "{{ .Env.BREW_Y2_RELEASE_VERSION }}"
+name = "{{ . }}"
+version = "{{ env.Getenv "BREW_Y2_RELEASE_VERSION" }}"
+{{ end }}
 
-[[packages]]
-name = "microshift-multus"
-version = "{{ .Env.BREW_Y2_RELEASE_VERSION }}"
-
-[[packages]]
-name = "microshift-gateway-api"
-version = "{{ .Env.BREW_Y2_RELEASE_VERSION }}"
-
-[[packages]]
-name = "microshift-release-info"
-version = "{{ .Env.BREW_Y2_RELEASE_VERSION }}"
-
-[[packages]]
-name = "microshift-olm-release-info"
-version = "{{ .Env.BREW_Y2_RELEASE_VERSION }}"
-
-[[packages]]
-name = "microshift-multus-release-info"
-version = "{{ .Env.BREW_Y2_RELEASE_VERSION }}"
-
-[[packages]]
-name = "microshift-gateway-api-release-info"
-version = "{{ .Env.BREW_Y2_RELEASE_VERSION }}"
 
 [[packages]]
 name = "microshift-test-agent"

@@ -19,29 +19,25 @@ distro = "rhel-96"
 # used with the '--parent' argument of 'osbuild-composer'
 # parent = "rhel-9.6-microshift-4.{{ .Env.PREVIOUS_MINOR_VERSION }}"
 
+{{ range (env.Getenv "MICROSHIFT_MANDATORY_RPMS" | strings.Split " ") }}
 [[packages]]
-name = "microshift"
-version = "{{ .Env.CURRENT_RELEASE_VERSION }}"
+name = "{{ . }}"
+version = "{{ env.Getenv "CURRENT_RELEASE_VERSION" }}"
+{{ end }}
 
+{{ range (env.Getenv "MICROSHIFT_OPTIONAL_RPMS" | strings.Split " ") }}
 [[packages]]
-name = "microshift-greenboot"
-version = "{{ .Env.CURRENT_RELEASE_VERSION }}"
+name = "{{ . }}"
+version = "{{ env.Getenv "CURRENT_RELEASE_VERSION" }}"
+{{ end }}
 
+{{- if and (env.Getenv "UNAME_M" "") (eq "x86_64" .Env.UNAME_M) }}
+{{ range (env.Getenv "MICROSHIFT_X86_64_RPMS" | strings.Split " ") }}
 [[packages]]
-name = "microshift-networking"
-version = "{{ .Env.CURRENT_RELEASE_VERSION }}"
-
-[[packages]]
-name = "microshift-selinux"
-version = "{{ .Env.CURRENT_RELEASE_VERSION }}"
-
-[[packages]]
-name = "microshift-olm"
-version = "{{ .Env.CURRENT_RELEASE_VERSION }}"
-
-[[packages]]
-name = "microshift-multus"
-version = "{{ .Env.CURRENT_RELEASE_VERSION }}"
+name = "{{ . }}"
+version = "{{ env.Getenv "CURRENT_RELEASE_VERSION" }}"
+{{ end }}
+{{- end }}
 
 [[packages]]
 name = "microshift-test-agent"

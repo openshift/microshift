@@ -19,50 +19,24 @@ distro = "rhel-96"
 # used with the '--parent' argument of 'osbuild-composer'
 # parent = "rhel-9.6-microshift-brew-optionals-4.{{ .Env.PREVIOUS_MINOR_VERSION }}-zstream"
 
+{{ range (env.Getenv "MICROSHIFT_MANDATORY_RPMS" | strings.Split " ") }}
 [[packages]]
-name = "microshift"
-version = "{{ .Env.BREW_RC_RELEASE_VERSION }}"
+name = "{{ . }}"
+version = "{{ env.Getenv "BREW_RC_RELEASE_VERSION" }}"
+{{ end }}
 
+{{ range (env.Getenv "MICROSHIFT_OPTIONAL_RPMS" | strings.Split " ") }}
 [[packages]]
-name = "microshift-olm"
-version = "{{ .Env.BREW_RC_RELEASE_VERSION }}"
-
-[[packages]]
-name = "microshift-multus"
-version = "{{ .Env.BREW_RC_RELEASE_VERSION }}"
-
-[[packages]]
-name = "microshift-gateway-api"
-version = "{{ .Env.BREW_RC_RELEASE_VERSION }}"
-
-[[packages]]
-name = "microshift-observability"
-version = "{{ .Env.BREW_RC_RELEASE_VERSION }}"
-
-[[packages]]
-name = "microshift-release-info"
-version = "{{ .Env.BREW_RC_RELEASE_VERSION }}"
-
-[[packages]]
-name = "microshift-olm-release-info"
-version = "{{ .Env.BREW_RC_RELEASE_VERSION }}"
-
-[[packages]]
-name = "microshift-multus-release-info"
-version = "{{ .Env.BREW_RC_RELEASE_VERSION }}"
-
-[[packages]]
-name = "microshift-gateway-api-release-info"
-version = "{{ .Env.BREW_RC_RELEASE_VERSION }}"
+name = "{{ . }}"
+version = "{{ env.Getenv "BREW_RC_RELEASE_VERSION" }}"
+{{ end }}
 
 {{- if and (env.Getenv "UNAME_M" "") (eq "x86_64" .Env.UNAME_M) }}
+{{ range (env.Getenv "MICROSHIFT_X86_64_RPMS" | strings.Split " ") }}
 [[packages]]
-name = "microshift-ai-model-serving"
-version = "{{ .Env.BREW_RC_RELEASE_VERSION }}"
-
-[[packages]]
-name = "microshift-ai-model-serving-release-info"
-version = "{{ .Env.BREW_RC_RELEASE_VERSION }}"
+name = "{{ . }}"
+version = "{{ env.Getenv "BREW_RC_RELEASE_VERSION" }}"
+{{ end }}
 {{- end }}
 
 [[packages]]

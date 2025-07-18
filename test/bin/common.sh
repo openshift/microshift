@@ -360,3 +360,41 @@ apply_static_delta() {
     popd &>/dev/null
     rm -rf "${workdir}"
 }
+
+# Lists of RPMs packages to build ostree and bootc images
+MICROSHIFT_MANDATORY_RPMS_LIST=(
+    microshift
+    microshift-release-info
+)
+
+MICROSHIFT_Y2_OPTIONAL_RPMS_LIST=(
+    microshift-olm
+    microshift-olm-release-info
+    microshift-multus
+    microshift-multus-release-info
+    microshift-gateway-api
+    microshift-gateway-api-release-info
+    microshift-low-latency
+)
+MICROSHIFT_Y1_OPTIONAL_RPMS_LIST=(
+    "${MICROSHIFT_Y2_OPTIONAL_RPMS_LIST[@]}"
+    microshift-observability
+)
+MICROSHIFT_OPTIONAL_RPMS_LIST=(
+    "${MICROSHIFT_Y1_OPTIONAL_RPMS_LIST[@]}"
+)
+
+MICROSHIFT_Y1_X86_64_RPMS_LIST=(
+    microshift-ai-model-serving
+    microshift-ai-model-serving-release-info
+)
+MICROSHIFT_X86_64_RPMS_LIST=(
+    "${MICROSHIFT_Y1_X86_64_RPMS_LIST[@]}"
+)
+
+export MICROSHIFT_MANDATORY_RPMS="${MICROSHIFT_MANDATORY_RPMS_LIST[*]}"
+export MICROSHIFT_Y2_OPTIONAL_RPMS="${MICROSHIFT_Y2_OPTIONAL_RPMS_LIST[*]}"
+export MICROSHIFT_Y1_OPTIONAL_RPMS="${MICROSHIFT_Y1_OPTIONAL_RPMS_LIST[*]}"
+export MICROSHIFT_OPTIONAL_RPMS="${MICROSHIFT_OPTIONAL_RPMS_LIST[*]}"
+export MICROSHIFT_Y1_X86_64_RPMS="${MICROSHIFT_Y1_X86_64_RPMS_LIST[*]}"
+export MICROSHIFT_X86_64_RPMS="${MICROSHIFT_X86_64_RPMS_LIST[*]}"
