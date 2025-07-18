@@ -1,0 +1,6 @@
+apiVersion: networking.k8s.io/v1
+kind: IngressClass
+metadata:
+  name: openshift-ingress
+spec:
+  controller: openshift.io/ingress-to-route
