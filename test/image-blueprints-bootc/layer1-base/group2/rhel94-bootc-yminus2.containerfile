@@ -7,7 +7,11 @@ COPY ./bootc-images/microshift-fast-datapath-rhel9.repo /bootc-images/microshift
 # Print repository configuration contents.
 # Install MicroShift and cleanup.
 RUN dnf repoinfo --enabled && \
-    dnf install -y firewalld "microshift-{{ .Env.YMINUS2_RELEASE_VERSION }}" "microshift-release-info-{{ .Env.YMINUS2_RELEASE_VERSION }}" && \
+    dnf install -y firewalld \
+        {{ range (env.Getenv "MICROSHIFT_MANDATORY_RPMS" | strings.Split " ") -}}
+        "{{ . }}-{{ env.Getenv "YMINUS2_RELEASE_VERSION" }}" \
+        {{ end -}}
+        && \
     systemctl enable microshift && \
     rm -vf /etc/yum.repos.d/microshift-*.repo && \
     dnf clean all

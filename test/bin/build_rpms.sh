@@ -143,7 +143,7 @@ create_local_repo() {
     make_repo "${LOCAL_REPO}" "${RPM_SOURCE}"
     make_repo "${NEXT_REPO}" "${NEXT_RPM_SOURCE}"
     make_repo "${BASE_REPO}" "${BASE_RPM_SOURCE}"
-    make_repo "${BREW_REPO}" "${BREW_RPM_SOURCE}/${UNAME_M}"
+    make_repo "${BREW_REPO}" "${BREW_RPM_SOURCE}"
 
     # Force recreation of dnf caches after rebuilding the repositories
     sudo dnf clean all

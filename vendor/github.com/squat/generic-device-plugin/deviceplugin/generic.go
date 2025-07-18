@@ -168,7 +168,7 @@ func (gp *GenericPlugin) refreshDevices() (bool, error) {
 	old := gp.devices
 	gp.devices = make(map[string]device)
 
-	var equal bool
+	equal := true
 	// Add the new devices to the map and check
 	// if they were in the old map.
 	for _, d := range devices {

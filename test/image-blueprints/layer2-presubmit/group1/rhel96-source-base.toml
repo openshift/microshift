@@ -15,21 +15,11 @@ distro = "rhel-96"
 {{- end -}}
 {{- "\n" -}}
 
+{{ range (env.Getenv "MICROSHIFT_MANDATORY_RPMS" | strings.Split " ") }}
 [[packages]]
-name = "microshift"
-version = "{{ .Env.SOURCE_VERSION_BASE }}"
-
-[[packages]]
-name = "microshift-greenboot"
-version = "{{ .Env.SOURCE_VERSION_BASE }}"
-
-[[packages]]
-name = "microshift-networking"
-version = "{{ .Env.SOURCE_VERSION_BASE }}"
-
-[[packages]]
-name = "microshift-selinux"
-version = "{{ .Env.SOURCE_VERSION_BASE }}"
+name = "{{ . }}"
+version = "{{ env.Getenv "SOURCE_VERSION_BASE" }}"
+{{ end }}
 
 [[packages]]
 name = "microshift-test-agent"

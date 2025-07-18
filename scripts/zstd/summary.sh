@@ -52,7 +52,6 @@ REQUIREMENTS:
     - Access to push to the specified repository
     - Storage configuration for zstd:chunked support:
       * enable_partial_images=true
-      * use_hard_links=true
 
 The simulation will:
 1. Pull source images and push them with zstd:chunked compression
@@ -113,9 +112,6 @@ check_podman_config() {
         if ! grep -q "enable_partial_images.*=.*true" "${storage_conf}" 2>/dev/null; then
             issues+=("enable_partial_images=true not found")
         fi
-        if ! grep -q "use_hard_links.*=.*true" "${storage_conf}" 2>/dev/null; then
-            issues+=("use_hard_links=true not found")
-        fi
     else
         issues+=("Local storage configuration file not found, using default")
     fi
@@ -127,7 +123,6 @@ check_podman_config() {
         done
         warn "For optimal zstd:chunked performance, ensure your storage.conf includes:"
         warn "  enable_partial_images=true"
-        warn "  use_hard_links=true"
         echo
     else
         success "Podman storage configuration looks good"
@@ -150,6 +145,43 @@ run_images() {
     fi
 }
 
+convert_to_bytes() {
+    local size="$1"
+    local unit="$2"
+
+    case "${unit}" in
+        "B")
+            echo "${size}"
+            ;;
+        "KiB")
+            echo "$((size * 1024))"
+            ;;
+        "MiB")
+            echo "$((size * 1024 * 1024))"
+            ;;
+        "GiB")
+            echo "$((size * 1024 * 1024 * 1024))"
+            ;;
+        *)
+            echo "0"
+            ;;
+    esac
+}
+
+bytes_to_human() {
+    local bytes="$1"
+
+    if ((bytes >= 1024*1024*1024)); then
+        echo "$((bytes / (1024*1024*1024))) GiB"
+    elif ((bytes >= 1024*1024)); then
+        echo "$((bytes / (1024*1024))) MiB"
+    elif ((bytes >= 1024)); then
+        echo "$((bytes / 1024)) KiB"
+    else
+        echo "${bytes} B"
+    fi
+}
+
 run_summary() {
     log "Analyzing output..."
     echo
@@ -159,48 +191,19 @@ run_summary() {
         return 1
     fi
 
-    convert_to_bytes() {
-        local size="$1"
-        local unit="$2"
+    log "Parsing zstd:chunked compression results..."
+    echo
+    success "zstd:chunked Compression Summary:"
+    run_summary_skipped
+    run_summary_time
+    run_summary_memory
+    run_summary_cpu
+    run_summary_storage
+}
 
-        case "${unit}" in
-            "B")
-                echo "${size}"
-                ;;
-            "KiB")
-                echo "$((size * 1024))"
-                ;;
-            "MiB")
-                echo "$((size * 1024 * 1024))"
-                ;;
-            "GiB")
-                echo "$((size * 1024 * 1024 * 1024))"
-                ;;
-            *)
-                echo "0"
-                ;;
-        esac
-    }
-
-    bytes_to_human() {
-        local bytes="$1"
-
-        if ((bytes >= 1024*1024*1024)); then
-            echo "$((bytes / (1024*1024*1024))) GiB"
-        elif ((bytes >= 1024*1024)); then
-            echo "$((bytes / (1024*1024))) MiB"
-        elif ((bytes >= 1024)); then
-            echo "$((bytes / 1024)) KiB"
-        else
-            echo "${bytes} B"
-        fi
-    }
-
+run_summary_skipped() {
     local total_skipped_bytes=0
     local total_original_bytes=0
-
-    log "Parsing zstd:chunked compression results..."
-
     # shellcheck disable=SC2002
     while IFS= read -r line; do
         if [[ "${line}" =~ Copying\ blob\ [a-f0-9]+\ done[\ \t]+([0-9]+(\.[0-9]+)?)(MiB|KiB|GiB|B)\ \/\ ([0-9]+(\.[0-9]+)?)(MiB|KiB|GiB|B)\ \(skipped:\ ([0-9]+(\.[0-9]+)?)(MiB|KiB|GiB|B)\ =.*\) ]]; then
@@ -215,16 +218,193 @@ run_summary() {
             total_skipped_bytes=$((total_skipped_bytes + skipped_bytes))
             total_original_bytes=$((total_original_bytes + total_bytes))
         fi
-    done < <(cat /tmp/output.txt | sed 's/\x1b\[[0-9;]*[a-zA-Z]//g' | grep '(skipped:' | sort | uniq)
+    done < <(cat "${OUTPUT_FILE}" | sed 's/\x1b\[[0-9;]*[a-zA-Z]//g' | grep '(skipped:' | sort | uniq)
 
     local savings_percentage=$(((total_skipped_bytes * 100) / total_original_bytes))
 
-    echo
-    success "zstd:chunked Compression Summary:"
-    echo "  📥 Total original size: $(bytes_to_human ${total_original_bytes})"
-    echo "  📦 Total downloaded: $(bytes_to_human $((total_original_bytes - total_skipped_bytes)))"
-    echo "  ⏭️  Total skipped: $(bytes_to_human ${total_skipped_bytes}) (${savings_percentage}%)"
-    echo
+    echo "  📥 Image network usage:"
+    echo "     • Non-chunked: $(bytes_to_human ${total_original_bytes})"
+    echo "     • Chunked: $(bytes_to_human $((total_original_bytes - total_skipped_bytes)))"
+    echo "     • Difference: $(bytes_to_human ${total_skipped_bytes}) (${savings_percentage}% improvement)"
+}
+
+run_summary_time() {
+    local total_target_time=0
+    local total_chunked_target_time=0
+
+    # shellcheck disable=SC2002
+    while IFS= read -r line; do
+        if [[ "${line}" =~ Successfully\ pulled\ target\ image\.\ ([0-9]+(\.[0-9]+)?)s\ \| ]]; then
+            local duration="${BASH_REMATCH[1]}"
+            total_target_time=$(echo "${total_target_time} + ${duration}" | bc -l)
+        elif [[ "${line}" =~ Successfully\ pulled\ chunked\ target\ image\.\ ([0-9]+(\.[0-9]+)?)s\ \| ]]; then
+            local duration="${BASH_REMATCH[1]}"
+            total_chunked_target_time=$(echo "${total_chunked_target_time} + ${duration}" | bc -l)
+        fi
+    done < <(cat "${OUTPUT_FILE}" | sed 's/\x1b\[[0-9;]*[a-zA-Z]//g' | grep -E "(Successfully pulled target image|Successfully pulled chunked target image)")
+
+    local -r time_difference=$(echo "scale=2; ${total_target_time} - ${total_chunked_target_time}" | bc -l)
+    local -r percentage_improvement=$(echo "scale=2; (${time_difference} * 100) / ${total_target_time}" | bc -l)
+
+    echo "  ⏱️  Image Pull Times:"
+    echo "    • Non-chunked: ${total_target_time}s"
+    echo "    • Chunked:     ${total_chunked_target_time}s"
+    echo "    • Difference:  ${time_difference}s (${percentage_improvement}% improvement)"
+}
+
+run_summary_memory() {
+    local total_target_memory_avg=0
+    local total_target_memory_peak=0
+    local total_chunked_target_memory_avg=0
+    local total_chunked_target_memory_peak=0
+    local target_count=0
+    local chunked_target_count=0
+
+    # shellcheck disable=SC2002
+    while IFS= read -r line; do
+        if [[ "${line}" =~ Successfully\ pulled\ target\ image\.\ [0-9]+(\.[0-9]+)?s\ \|\ ([0-9]+(\.[0-9]+)?)MB\ \|\ ([0-9]+(\.[0-9]+)?)MB\ \| ]]; then
+            local memory_avg="${BASH_REMATCH[2]}"
+            local memory_peak="${BASH_REMATCH[4]}"
+            total_target_memory_avg=$(echo "${total_target_memory_avg} + ${memory_avg}" | bc -l)
+            total_target_memory_peak=$(echo "${total_target_memory_peak} + ${memory_peak}" | bc -l)
+            target_count=$((target_count + 1))
+        elif [[ "${line}" =~ Successfully\ pulled\ chunked\ target\ image\.\ [0-9]+(\.[0-9]+)?s\ \|\ ([0-9]+(\.[0-9]+)?)MB\ \|\ ([0-9]+(\.[0-9]+)?)MB\ \| ]]; then
+            local memory_avg="${BASH_REMATCH[2]}"
+            local memory_peak="${BASH_REMATCH[4]}"
+            total_chunked_target_memory_avg=$(echo "${total_chunked_target_memory_avg} + ${memory_avg}" | bc -l)
+            total_chunked_target_memory_peak=$(echo "${total_chunked_target_memory_peak} + ${memory_peak}" | bc -l)
+            chunked_target_count=$((chunked_target_count + 1))
+        fi
+    done < <(cat "${OUTPUT_FILE}" | sed 's/\x1b\[[0-9;]*[a-zA-Z]//g' | grep -E "(Successfully pulled target image|Successfully pulled chunked target image)")
+
+    if [[ ${target_count} -gt 0 && ${chunked_target_count} -gt 0 ]]; then
+        local -r avg_target_memory_avg=$(echo "scale=1; ${total_target_memory_avg} / ${target_count}" | bc -l)
+        local -r avg_target_memory_peak=$(echo "scale=1; ${total_target_memory_peak} / ${target_count}" | bc -l)
+        local -r avg_chunked_target_memory_avg=$(echo "scale=1; ${total_chunked_target_memory_avg} / ${chunked_target_count}" | bc -l)
+        local -r avg_chunked_target_memory_peak=$(echo "scale=1; ${total_chunked_target_memory_peak} / ${chunked_target_count}" | bc -l)
+
+        local -r memory_avg_difference=$(echo "scale=1; ${avg_target_memory_avg} - ${avg_chunked_target_memory_avg}" | bc -l)
+        local -r memory_peak_difference=$(echo "scale=1; ${avg_target_memory_peak} - ${avg_chunked_target_memory_peak}" | bc -l)
+        local -r avg_percentage_improvement=$(echo "scale=2; (${memory_avg_difference} * 100) / ${avg_target_memory_avg}" | bc -l)
+        local -r peak_percentage_improvement=$(echo "scale=2; (${memory_peak_difference} * 100) / ${avg_target_memory_peak}" | bc -l)
+
+        echo "  🧠 Image Memory Usage:"
+        echo "    • Non-chunked avg: ${avg_target_memory_avg}MB | peak: ${avg_target_memory_peak}MB"
+        echo "    • Chunked avg:     ${avg_chunked_target_memory_avg}MB | peak: ${avg_chunked_target_memory_peak}MB"
+        echo "    • Difference avg:  ${memory_avg_difference}MB (${avg_percentage_improvement}% improvement)"
+        echo "    • Difference peak: ${memory_peak_difference}MB (${peak_percentage_improvement}% improvement)"
+    fi
+}
+
+run_summary_cpu() {
+    local total_target_cpu_avg=0
+    local total_target_cpu_peak=0
+    local total_chunked_target_cpu_avg=0
+    local total_chunked_target_cpu_peak=0
+    local target_count=0
+    local chunked_target_count=0
+
+    # shellcheck disable=SC2002
+    while IFS= read -r line; do
+        if [[ "${line}" =~ Successfully\ pulled\ target\ image\.\ [0-9]+(\.[0-9]+)?s\ \|\ [0-9]+(\.[0-9]+)?MB\ \|\ [0-9]+(\.[0-9]+)?MB\ \|\ ([0-9]+(\.[0-9]+)?)%\ \|\ ([0-9]+(\.[0-9]+)?)%\ \| ]]; then
+            local cpu_avg="${BASH_REMATCH[4]}"
+            local cpu_peak="${BASH_REMATCH[6]}"
+            total_target_cpu_avg=$(echo "${total_target_cpu_avg} + ${cpu_avg}" | bc -l)
+            total_target_cpu_peak=$(echo "${total_target_cpu_peak} + ${cpu_peak}" | bc -l)
+            target_count=$((target_count + 1))
+        elif [[ "${line}" =~ Successfully\ pulled\ chunked\ target\ image\.\ [0-9]+(\.[0-9]+)?s\ \|\ [0-9]+(\.[0-9]+)?MB\ \|\ [0-9]+(\.[0-9]+)?MB\ \|\ ([0-9]+(\.[0-9]+)?)%\ \|\ ([0-9]+(\.[0-9]+)?)%\ \| ]]; then
+            local cpu_avg="${BASH_REMATCH[4]}"
+            local cpu_peak="${BASH_REMATCH[6]}"
+            total_chunked_target_cpu_avg=$(echo "${total_chunked_target_cpu_avg} + ${cpu_avg}" | bc -l)
+            total_chunked_target_cpu_peak=$(echo "${total_chunked_target_cpu_peak} + ${cpu_peak}" | bc -l)
+            chunked_target_count=$((chunked_target_count + 1))
+        fi
+    done < <(cat "${OUTPUT_FILE}" | sed 's/\x1b\[[0-9;]*[a-zA-Z]//g' | grep -E "(Successfully pulled target image|Successfully pulled chunked target image)")
+
+    if [[ ${target_count} -gt 0 && ${chunked_target_count} -gt 0 ]]; then
+        local -r avg_target_cpu_avg=$(echo "scale=1; ${total_target_cpu_avg} / ${target_count}" | bc -l)
+        local -r avg_target_cpu_peak=$(echo "scale=1; ${total_target_cpu_peak} / ${target_count}" | bc -l)
+        local -r avg_chunked_target_cpu_avg=$(echo "scale=1; ${total_chunked_target_cpu_avg} / ${chunked_target_count}" | bc -l)
+        local -r avg_chunked_target_cpu_peak=$(echo "scale=1; ${total_chunked_target_cpu_peak} / ${chunked_target_count}" | bc -l)
+
+        local -r cpu_avg_difference=$(echo "scale=1; ${avg_target_cpu_avg} - ${avg_chunked_target_cpu_avg}" | bc -l)
+        local -r cpu_peak_difference=$(echo "scale=1; ${avg_target_cpu_peak} - ${avg_chunked_target_cpu_peak}" | bc -l)
+        local -r avg_percentage_improvement=$(echo "scale=2; (${cpu_avg_difference} * 100) / ${avg_target_cpu_avg}" | bc -l)
+        local -r peak_percentage_improvement=$(echo "scale=2; (${cpu_peak_difference} * 100) / ${avg_target_cpu_peak}" | bc -l)
+
+        echo "  🔥 Image CPU Usage:"
+        echo "    • Non-chunked avg: ${avg_target_cpu_avg}% | peak: ${avg_target_cpu_peak}%"
+        echo "    • Chunked avg:     ${avg_chunked_target_cpu_avg}% | peak: ${avg_chunked_target_cpu_peak}%"
+        echo "    • Difference avg:  ${cpu_avg_difference}% (${avg_percentage_improvement}% improvement)"
+        echo "    • Difference peak: ${cpu_peak_difference}% (${peak_percentage_improvement}% improvement)"
+    fi
+}
+
+run_summary_storage() {
+    local total_target_storage=0
+    local total_chunked_target_storage=0
+    local total_target_read_iops=0
+    local total_target_write_iops=0
+    local total_target_peak_iops=0
+    local total_chunked_target_read_iops=0
+    local total_chunked_target_write_iops=0
+    local total_chunked_target_peak_iops=0
+    local target_count=0
+    local chunked_target_count=0
+
+    # shellcheck disable=SC2002
+    while IFS= read -r line; do
+        if [[ "${line}" =~ Successfully\ pulled\ target\ image\.\ [0-9]+(\.[0-9]+)?s\ \|\ [0-9]+(\.[0-9]+)?MB\ \|\ [0-9]+(\.[0-9]+)?MB\ \|\ [0-9]+(\.[0-9]+)?%\ \|\ [0-9]+(\.[0-9]+)?%\ \|\ ([0-9]+(\.[0-9]+)?)\ MB\ \|\ R:([0-9]+(\.[0-9]+)?)\ W:([0-9]+(\.[0-9]+)?)\ Peak:([0-9]+(\.[0-9]+)?)\ IOPS ]]; then
+            local storage="${BASH_REMATCH[6]}"
+            local read_iops="${BASH_REMATCH[8]}"
+            local write_iops="${BASH_REMATCH[10]}"
+            local peak_iops="${BASH_REMATCH[12]}"
+            total_target_storage=$(echo "${total_target_storage} + ${storage}" | bc -l)
+            total_target_read_iops=$(echo "${total_target_read_iops} + ${read_iops}" | bc -l)
+            total_target_write_iops=$(echo "${total_target_write_iops} + ${write_iops}" | bc -l)
+            total_target_peak_iops=$(echo "${total_target_peak_iops} + ${peak_iops}" | bc -l)
+            target_count=$((target_count + 1))
+        elif [[ "${line}" =~ Successfully\ pulled\ chunked\ target\ image\.\ [0-9]+(\.[0-9]+)?s\ \|\ [0-9]+(\.[0-9]+)?MB\ \|\ [0-9]+(\.[0-9]+)?MB\ \|\ [0-9]+(\.[0-9]+)?%\ \|\ [0-9]+(\.[0-9]+)?%\ \|\ ([0-9]+(\.[0-9]+)?)\ MB\ \|\ R:([0-9]+(\.[0-9]+)?)\ W:([0-9]+(\.[0-9]+)?)\ Peak:([0-9]+(\.[0-9]+)?)\ IOPS ]]; then
+            local storage="${BASH_REMATCH[6]}"
+            local read_iops="${BASH_REMATCH[8]}"
+            local write_iops="${BASH_REMATCH[10]}"
+            local peak_iops="${BASH_REMATCH[12]}"
+            total_chunked_target_storage=$(echo "${total_chunked_target_storage} + ${storage}" | bc -l)
+            total_chunked_target_read_iops=$(echo "${total_chunked_target_read_iops} + ${read_iops}" | bc -l)
+            total_chunked_target_write_iops=$(echo "${total_chunked_target_write_iops} + ${write_iops}" | bc -l)
+            total_chunked_target_peak_iops=$(echo "${total_chunked_target_peak_iops} + ${peak_iops}" | bc -l)
+            chunked_target_count=$((chunked_target_count + 1))
+        fi
+    done < <(cat "${OUTPUT_FILE}" | sed 's/\x1b\[[0-9;]*[a-zA-Z]//g' | grep -E "(Successfully pulled target image|Successfully pulled chunked target image)")
+
+    local -r storage_difference=$(echo "scale=2; ${total_target_storage} - ${total_chunked_target_storage}" | bc -l)
+    local -r percentage_improvement=$(echo "scale=2; (${storage_difference} * 100) / ${total_target_storage}" | bc -l)
+
+    echo "  💾 Image Storage Usage:"
+    echo "    • Non-chunked: ${total_target_storage}MB"
+    echo "    • Chunked:     ${total_chunked_target_storage}MB"
+    echo "    • Difference:  ${storage_difference}MB (${percentage_improvement}% improvement)"
+
+    if [[ ${target_count} -gt 0 && ${chunked_target_count} -gt 0 ]]; then
+        local -r avg_target_read_iops=$(echo "scale=1; ${total_target_read_iops} / ${target_count}" | bc -l)
+        local -r avg_target_write_iops=$(echo "scale=1; ${total_target_write_iops} / ${target_count}" | bc -l)
+        local -r avg_target_peak_iops=$(echo "scale=1; ${total_target_peak_iops} / ${target_count}" | bc -l)
+        local -r avg_chunked_target_read_iops=$(echo "scale=1; ${total_chunked_target_read_iops} / ${chunked_target_count}" | bc -l)
+        local -r avg_chunked_target_write_iops=$(echo "scale=1; ${total_chunked_target_write_iops} / ${chunked_target_count}" | bc -l)
+        local -r avg_chunked_target_peak_iops=$(echo "scale=1; ${total_chunked_target_peak_iops} / ${chunked_target_count}" | bc -l)
+
+        local -r read_iops_difference=$(echo "scale=1; ${avg_target_read_iops} - ${avg_chunked_target_read_iops}" | bc -l)
+        local -r write_iops_difference=$(echo "scale=1; ${avg_target_write_iops} - ${avg_chunked_target_write_iops}" | bc -l)
+        local -r peak_iops_difference=$(echo "scale=1; ${avg_target_peak_iops} - ${avg_chunked_target_peak_iops}" | bc -l)
+        local -r read_percentage_improvement=$(echo "scale=2; (${read_iops_difference} * 100) / ${avg_target_read_iops}" | bc -l)
+        local -r write_percentage_improvement=$(echo "scale=2; (${write_iops_difference} * 100) / ${avg_target_write_iops}" | bc -l)
+        local -r peak_percentage_improvement=$(echo "scale=2; (${peak_iops_difference} * 100) / ${avg_target_peak_iops}" | bc -l)
+
+        echo "  📊 Image IOPS Usage:"
+        echo "    • Non-chunked R:${avg_target_read_iops} W:${avg_target_write_iops} Peak:${avg_target_peak_iops} IOPS"
+        echo "    • Chunked     R:${avg_chunked_target_read_iops} W:${avg_chunked_target_write_iops} Peak:${avg_chunked_target_peak_iops} IOPS"
+        echo "    • Difference  R:${read_iops_difference} (${read_percentage_improvement}%) W:${write_iops_difference} (${write_percentage_improvement}%) Peak:${peak_iops_difference} (${peak_percentage_improvement}%) IOPS"
+    fi
 }
 
 parse_args() {
