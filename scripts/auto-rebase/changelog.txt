@@ -1,9 +1,0 @@
-- api embedded-component 9fce26d4cc74cfa6bfa2b9af8891a66a90a3e31f to c86d80652a9ed6a3a6b35d9d81c06aaeb723f8e1
-  - 34bde19 2025-06-12T15:40:57-04:00 add OnClusterBuilds to default config
-
-- openshift-controller-manager embedded-component 1f76c23407c6cc95902a4b4d8f679181df538d9d to c87671821e6b05173e5bdc0aab1f80f29438e192
-  - 957ba45 2025-06-23T12:38:12+00:00 OCPBUGS-57918: handle secret not found more gracefully
-
-- operator-framework-olm embedded-component fc45750531908c70a18556439b5147d8cae6a93f to 4a26a7efa70c754cae0ccafbd7730daa18afc151
-  - 882eb216 2025-07-08T14:58:42+00:00 bug: OCPBUGS-37982: Reduce Frequency of Update Requests for Copied CSVs (#3597)
-
