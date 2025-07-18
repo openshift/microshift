@@ -40,6 +40,10 @@ name = "microshift-multus"
 version = "{{ .Env.SOURCE_VERSION }}"
 
 [[packages]]
+name = "microshift-cert-manager"
+version = "{{ .Env.CURRENT_RELEASE_VERSION }}"
+
+[[packages]]
 name = "microshift-gateway-api"
 version = "{{ .Env.SOURCE_VERSION }}"
 
