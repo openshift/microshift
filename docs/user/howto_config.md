@@ -40,9 +40,9 @@ genericDevicePlugin:
                   readOnly:
                   type: ""
               usbs:
-                - product: 0
+                - product: ""
                   serial: ""
-                  vendor: 0
+                  vendor: ""
           name: ""
     domain: ""
     status: ""
@@ -181,9 +181,9 @@ genericDevicePlugin:
                   readOnly: false
                   type: Device
               usbs:
-                - product: 0
+                - product: ""
                   serial: ""
-                  vendor: 0
+                  vendor: ""
           name: serial
     domain: device.microshift.io
     status: Disabled
