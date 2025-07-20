@@ -136,7 +136,12 @@ Crio Uses Crun Runtime
     [Documentation]    Verify that crio uses crun as its default runtime
 
     ${runtime}=    Command Should Work    crictl info | jq -r '.runtimeHandlers[].name | select(. != null)'
-    Should Be Equal As Strings    ${runtime}    crun
+    ${stdout}    ${stderr}    ${rc}=    Command Execution    rpm -q microshift-low-latency
+    IF    ${rc} == 0
+        Should Match Regexp    ${runtime}    ^crun\\nhigh-performance$
+    ELSE
+        Should Match Regexp    ${runtime}    ^crun$
+    END
 
 
 *** Keywords ***
