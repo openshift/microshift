@@ -23,11 +23,6 @@ RUN dnf repoinfo --enabled && \
         {{ range (env.Getenv "MICROSHIFT_Y2_OPTIONAL_RPMS" | strings.Split " ") -}}
         "{{ . }}-{{ env.Getenv "BREW_Y2_RELEASE_VERSION" }}" \
         {{ end -}}
-        {{ if and (env.Getenv "UNAME_M" "") (eq "x86_64" .Env.UNAME_M) -}}
-        {{ range (env.Getenv "MICROSHIFT_Y2_X86_64_RPMS" | strings.Split " ") -}}
-        "{{ . }}-{{ env.Getenv "BREW_Y2_RELEASE_VERSION" }}" \
-        {{ end -}}
-        {{ end -}}
         && \
     systemctl enable microshift microshift-test-agent && \
     rm -vf /etc/yum.repos.d/microshift-*.repo && \
