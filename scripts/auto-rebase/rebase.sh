@@ -440,8 +440,9 @@ update_go_mod() {
         esac
     done
 
-    # Update required version of RCM for information purposes only (avoid having zeros as version)
+    # Update required version of RCM and CPC for information purposes only (avoid having zeros as version)
     require_using_component_commit github.com/openshift/route-controller-manager route-controller-manager
+    require_using_component_commit github.com/openshift/cluster-policy-controller cluster-policy-controller
 
     if grep -q "^patch-deps:" ./Makefile; then
         # etcd/ does not need to patch the dependencies

@@ -19,3 +19,16 @@ index afb7dc267..e255d16bd 100644
  		WithComponentOwnerReference(&corev1.ObjectReference{
  			Kind:      "Pod",
  			Name:      os.Getenv(podNameEnv),
+diff --git a/deps/github.com/openshift/route-controller-manager/pkg/cmd/route-controller-manager/openshiftcontrolplane_config.go b/deps/github.com/openshift/route-controller-manager/pkg/cmd/route-controller-manager/openshiftcontrolplane_config.go
+index 20c839a9a..606c98d6f 100644
+--- a/deps/github.com/openshift/route-controller-manager/pkg/cmd/route-controller-manager/openshiftcontrolplane_config.go
++++ b/deps/github.com/openshift/route-controller-manager/pkg/cmd/route-controller-manager/openshiftcontrolplane_config.go
+@@ -28,8 +28,6 @@ func asOpenshiftControllerManagerConfig(config *unstructured.Unstructured) (*ope
+ }
+ 
+ func setRecommendedOpenShiftControllerConfigDefaults(config *openshiftcontrolplanev1.OpenShiftControllerManagerConfig) {
+-	configdefaults.SetRecommendedKubeClientConfigDefaults(&config.KubeClientConfig)
+-
+ 	configdefaults.DefaultStringSlice(&config.Controllers, []string{"*"})
+ 
+ 	if config.ResourceQuota.MinResyncPeriod.Duration == 0 {
