@@ -1,6 +1,6 @@
 {
   "release": {
-    "base": "2.19.1"
+    "base": "2.19.2"
   },
   "images": {
     "vllm-cpu-image": "quay.io/modh/vllm@sha256:4642b4337883ee6f768096829529e69e42689ef082f3b7e1439199fb20b7dc6a",
