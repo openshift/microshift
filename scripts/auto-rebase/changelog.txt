@@ -1,9 +1,9 @@
-- kubernetes embedded-component 1879980f93f6f3b75a96d941eabf2bfe9df3539b to d4983da31757e301ccbc050e8dfc7e5e0ec2c183
-  - 702e9d631 2025-07-09T17:29:16+00:00 UPSTREAM: <carry>: disable some legacy cloud provider tests
+- kubernetes embedded-component d4983da31757e301ccbc050e8dfc7e5e0ec2c183 to d227d652fda9e7a56895a879ca225be9372d0a88
+  - 1c7001b78 2025-07-09T16:11:56+00:00 UPSTREAM: 130047: adjusting loopback certificate validity in kube-apiserver
 
-- kubernetes image-amd64 1879980f93f6f3b75a96d941eabf2bfe9df3539b to d4983da31757e301ccbc050e8dfc7e5e0ec2c183
-  - 702e9d631 2025-07-09T17:29:16+00:00 UPSTREAM: <carry>: disable some legacy cloud provider tests
+- kubernetes image-amd64 d4983da31757e301ccbc050e8dfc7e5e0ec2c183 to d227d652fda9e7a56895a879ca225be9372d0a88
+  - 1c7001b78 2025-07-09T16:11:56+00:00 UPSTREAM: 130047: adjusting loopback certificate validity in kube-apiserver
 
-- kubernetes image-arm64 1879980f93f6f3b75a96d941eabf2bfe9df3539b to d4983da31757e301ccbc050e8dfc7e5e0ec2c183
-  - 702e9d631 2025-07-09T17:29:16+00:00 UPSTREAM: <carry>: disable some legacy cloud provider tests
+- kubernetes image-arm64 d4983da31757e301ccbc050e8dfc7e5e0ec2c183 to d227d652fda9e7a56895a879ca225be9372d0a88
+  - 1c7001b78 2025-07-09T16:11:56+00:00 UPSTREAM: 130047: adjusting loopback certificate validity in kube-apiserver
 
