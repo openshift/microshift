@@ -17,14 +17,13 @@ COPY ./bootc-images/$USHIFT_RPM_REPO_NAME.repo ./bootc-images/microshift-fast-da
 # Install MicroShift, test agent and cleanup.
 RUN dnf repoinfo --enabled && \
     dnf install -y firewalld systemd-resolved \
-        "microshift-{{ .Env.BREW_Y2_RELEASE_VERSION }}" \
-        "microshift-olm-{{ .Env.BREW_Y2_RELEASE_VERSION }}" \
-        "microshift-multus-{{ .Env.BREW_Y2_RELEASE_VERSION }}" \
-        "microshift-gateway-api-{{ .Env.BREW_Y2_RELEASE_VERSION }}" \
-        "microshift-release-info-{{ .Env.BREW_Y2_RELEASE_VERSION }}" \
-        "microshift-olm-release-info-{{ .Env.BREW_Y2_RELEASE_VERSION }}" \
-        "microshift-multus-release-info-{{ .Env.BREW_Y2_RELEASE_VERSION }}" \
-        "microshift-gateway-api-release-info-{{ .Env.BREW_Y2_RELEASE_VERSION }}" && \
+        {{ range (env.Getenv "MICROSHIFT_MANDATORY_RPMS" | strings.Split " ") -}}
+        "{{ . }}-{{ env.Getenv "BREW_Y2_RELEASE_VERSION" }}" \
+        {{ end -}}
+        {{ range (env.Getenv "MICROSHIFT_Y2_OPTIONAL_RPMS" | strings.Split " ") -}}
+        "{{ . }}-{{ env.Getenv "BREW_Y2_RELEASE_VERSION" }}" \
+        {{ end -}}
+        && \
     systemctl enable microshift microshift-test-agent && \
     rm -vf /etc/yum.repos.d/microshift-*.repo && \
     rm -rvf $USHIFT_RPM_REPO_PATH && \

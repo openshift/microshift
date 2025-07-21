@@ -14,15 +14,16 @@ COPY ./bootc-images/$USHIFT_RPM_REPO_NAME.repo ./bootc-images/microshift-fast-da
 # Print repository configuration contents.
 # Install MicroShift optional packages and cleanup.
 RUN dnf repoinfo --enabled && \
-    dnf install -y "microshift-olm-{{ .Env.SOURCE_VERSION }}" \
-        "microshift-multus-{{ .Env.SOURCE_VERSION }}" \
-# {{- if and (env.Getenv "UNAME_M" "") (eq "x86_64" .Env.UNAME_M) }}
-# Currently, RHOAI is only available for x86_64
-        "microshift-ai-model-serving-{{ .Env.SOURCE_VERSION }}" \
-        "microshift-ai-model-serving-release-info-{{ .Env.SOURCE_VERSION }}" \
-# {{- end }}
-        "microshift-gateway-api-{{ .Env.SOURCE_VERSION }}" \
-        "microshift-observability-{{ .Env.SOURCE_VERSION }}" && \
+    dnf install -y \
+        {{ range (env.Getenv "MICROSHIFT_OPTIONAL_RPMS" | strings.Split " ") -}}
+        "{{ . }}-{{ env.Getenv "SOURCE_VERSION" }}" \
+        {{ end -}}
+        {{ if and (env.Getenv "UNAME_M" "") (eq "x86_64" .Env.UNAME_M) -}}
+        {{ range (env.Getenv "MICROSHIFT_X86_64_RPMS" | strings.Split " ") -}}
+        "{{ . }}-{{ env.Getenv "SOURCE_VERSION" }}" \
+        {{ end -}}
+        {{ end -}}
+        && \
     rm -vf /etc/yum.repos.d/microshift-*.repo && \
     rm -rvf $USHIFT_RPM_REPO_PATH && \
     dnf clean all

@@ -19,21 +19,11 @@ distro = "rhel-96"
 # used with the '--parent' argument of 'osbuild-composer'
 # parent = "rhel-9.6-microshift-4.{{ .Env.PREVIOUS_MINOR_VERSION }}"
 
+{{ range (env.Getenv "MICROSHIFT_MANDATORY_RPMS" | strings.Split " ") }}
 [[packages]]
-name = "microshift"
-version = "{{ .Env.CURRENT_RELEASE_VERSION }}"
-
-[[packages]]
-name = "microshift-greenboot"
-version = "{{ .Env.CURRENT_RELEASE_VERSION }}"
-
-[[packages]]
-name = "microshift-networking"
-version = "{{ .Env.CURRENT_RELEASE_VERSION }}"
-
-[[packages]]
-name = "microshift-selinux"
-version = "{{ .Env.CURRENT_RELEASE_VERSION }}"
+name = "{{ . }}"
+version = "{{ env.Getenv "CURRENT_RELEASE_VERSION" }}"
+{{ end }}
 
 [[packages]]
 name = "microshift-test-agent"

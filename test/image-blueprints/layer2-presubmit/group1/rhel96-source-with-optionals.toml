@@ -15,37 +15,25 @@ distro = "rhel-96"
 {{- end -}}
 {{- "\n" -}}
 
+{{ range (env.Getenv "MICROSHIFT_MANDATORY_RPMS" | strings.Split " ") }}
 [[packages]]
-name = "microshift"
-version = "{{ .Env.SOURCE_VERSION }}"
+name = "{{ . }}"
+version = "{{ env.Getenv "SOURCE_VERSION" }}"
+{{ end }}
 
+{{ range (env.Getenv "MICROSHIFT_OPTIONAL_RPMS" | strings.Split " ") }}
 [[packages]]
-name = "microshift-greenboot"
-version = "{{ .Env.SOURCE_VERSION }}"
+name = "{{ . }}"
+version = "{{ env.Getenv "SOURCE_VERSION" }}"
+{{ end }}
 
+{{- if and (env.Getenv "UNAME_M" "") (eq "x86_64" .Env.UNAME_M) }}
+{{ range (env.Getenv "MICROSHIFT_X86_64_RPMS" | strings.Split " ") }}
 [[packages]]
-name = "microshift-networking"
-version = "{{ .Env.SOURCE_VERSION }}"
-
-[[packages]]
-name = "microshift-selinux"
-version = "{{ .Env.SOURCE_VERSION }}"
-
-[[packages]]
-name = "microshift-olm"
-version = "{{ .Env.SOURCE_VERSION }}"
-
-[[packages]]
-name = "microshift-multus"
-version = "{{ .Env.SOURCE_VERSION }}"
-
-[[packages]]
-name = "microshift-gateway-api"
-version = "{{ .Env.SOURCE_VERSION }}"
-
-[[packages]]
-name = "microshift-observability"
-version = "{{ .Env.SOURCE_VERSION }}"
+name = "{{ . }}"
+version = "{{ env.Getenv "SOURCE_VERSION" }}"
+{{ end }}
+{{- end }}
 
 [[packages]]
 name = "microshift-test-agent"

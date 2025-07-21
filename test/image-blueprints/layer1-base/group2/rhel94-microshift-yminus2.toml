@@ -5,21 +5,11 @@ modules = []
 groups = []
 distro = "rhel-94"
 
+{{ range (env.Getenv "MICROSHIFT_MANDATORY_RPMS" | strings.Split " ") }}
 [[packages]]
-name = "microshift"
-version = "{{ .Env.YMINUS2_RELEASE_VERSION }}*"
-
-[[packages]]
-name = "microshift-greenboot"
-version = "{{ .Env.YMINUS2_RELEASE_VERSION }}*"
-
-[[packages]]
-name = "microshift-networking"
-version = "{{ .Env.YMINUS2_RELEASE_VERSION }}*"
-
-[[packages]]
-name = "microshift-selinux"
-version = "{{ .Env.YMINUS2_RELEASE_VERSION }}*"
+name = "{{ . }}"
+version = "{{ env.Getenv "YMINUS2_RELEASE_VERSION" }}"
+{{ end }}
 
 [[packages]]
 name = "microshift-test-agent"
