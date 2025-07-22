@@ -1,0 +1,718 @@
+rebase.sh:
+[34m# Rebasing to registry.ci.openshift.org/ocp/release:4.20.0-0.nightly-2025-07-20-021531 and registry.ci.openshift.org/ocp-arm64/release-arm64:4.20.0-0.nightly-arm64-2025-07-20-202529[00m
+[34m# Fetching release info for registry.ci.openshift.org/ocp/release:4.20.0-0.nightly-2025-07-20-021531 (amd64)[00m
+[34m# Fetching release info for registry.ci.openshift.org/ocp-arm64/release-arm64:4.20.0-0.nightly-arm64-2025-07-20-202529 (arm64)[00m
+[34m# Extracting registry.ci.openshift.org/ocp/release:4.20.0-0.nightly-2025-07-20-021531 manifest content[00m
+[34m# Cloning registry.ci.openshift.org/ocp/release:4.20.0-0.nightly-2025-07-20-021531 component repos[00m
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/api/.git/
+HEAD is now at 3333746e Merge pull request #2398 from everettraven/revert-2389-revert-2138-remove-rbr-crd-from-payload
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/cluster-csi-snapshot-controller-operator/.git/
+HEAD is now at ef2152f Merge pull request #238 from dobsonj/STOR-2340
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/cluster-dns-operator/.git/
+HEAD is now at 48ebc12 Merge pull request #438 from openshift-bot/art-consistency-openshift-4.20-ose-cluster-dns-operator
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/cluster-ingress-operator/.git/
+HEAD is now at cbc0b21 Merge pull request #1240 from Miciah/OCPBUGS-58358-desiredIstio-do-not-enable-a-default-PDB
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/cluster-kube-apiserver-operator/.git/
+HEAD is now at bac08ba Merge pull request #1863 from vrutkovs/goaway-chance-0-001
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/cluster-kube-controller-manager-operator/.git/
+HEAD is now at 404585e Merge pull request #840 from bertinatto/bump-v1.33
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/cluster-kube-scheduler-operator/.git/
+HEAD is now at f720327 Merge pull request #564 from ShazaAldawamneh/OCPSTRAT-2001
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/cluster-network-operator/.git/
+HEAD is now at d751ce5 Merge pull request #2737 from maiqueb/drop-persistent-ips-for-virt-fg
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/cluster-openshift-controller-manager-operator/.git/
+HEAD is now at dfaeb8d Merge pull request #392 from dusk125/rofs
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/cluster-policy-controller/.git/
+HEAD is now at 7485247 Merge pull request #161 from kramaranya/add-psa-annotation
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/csi-external-snapshotter/.git/
+HEAD is now at 4260482 Merge pull request #181 from dfajmon/rebase-v8.3.0
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/etcd/.git/
+HEAD is now at a5421dfe Merge pull request #324 from Elbehery/rebase-etcd-3.5.21-openshift-4.19
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/kubernetes/.git/
+HEAD is now at b94367cab Merge pull request #2314 from bertinatto/bump-v1.33
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/kubernetes-kube-storage-version-migrator/.git/
+HEAD is now at caf7985 Merge pull request #211 from jacobsee/reduce-page-size-for-resource-lists
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/machine-config-operator/.git/
+HEAD is now at daf8f203 Merge pull request #5179 from pablintino/move-ote-testuite-to-global-scope
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/openshift-controller-manager/.git/
+HEAD is now at bd60afc Merge pull request #405 from ardaguclu/bump-k8s
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/operator-framework-olm/.git/
+HEAD is now at c94eaba0 Merge pull request #1039 from grokspawn/k8s-bump
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/route-controller-manager/.git/
+HEAD is now at e148fab Merge pull request #62 from openshift-bot/art-consistency-openshift-4.20-ose-route-controller-manager
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/service-ca-operator/.git/
+HEAD is now at 4dfa691 Merge pull request #263 from vrutkovs/microshift-featuregates
+
+[34m# Cloning registry.ci.openshift.org/ocp/release:4.20.0-0.nightly-2025-07-20-021531 image repos[00m
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/amd64/oc/.git/
+HEAD is now at 68a8590c Merge pull request #2059 from ardaguclu/revert-2037-remove-schema1
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/amd64/coredns/.git/
+HEAD is now at a69279e Merge pull request #132 from ashwindasr/patch-1
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/amd64/csi-external-snapshotter/.git/
+HEAD is now at 4260482 Merge pull request #181 from dfajmon/rebase-v8.3.0
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/amd64/router/.git/
+HEAD is now at b41f9d0 Merge pull request #644 from openshift-bot/art-consistency-openshift-4.19-openshift-enterprise-haproxy-router
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/amd64/kube-rbac-proxy/.git/
+HEAD is now at bc1ca29 Merge pull request #119 from ibihim/ibihim/2025-05-16_v0.19.1-downstream-v2
+
+lvms_operator not from release payload, skipping
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/amd64/ovn-kubernetes/.git/
+HEAD is now at 86953f3b Merge pull request #2640 from openshift-bot/art-consistency-openshift-4.20-ovn-kubernetes-base
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/amd64/kubernetes/.git/
+HEAD is now at b94367cab Merge pull request #2314 from bertinatto/bump-v1.33
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/amd64/service-ca-operator/.git/
+HEAD is now at 4dfa691 Merge pull request #263 from vrutkovs/microshift-featuregates
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/arm64/oc/.git/
+HEAD is now at 68a8590c Merge pull request #2059 from ardaguclu/revert-2037-remove-schema1
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/arm64/coredns/.git/
+HEAD is now at a69279e Merge pull request #132 from ashwindasr/patch-1
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/arm64/csi-external-snapshotter/.git/
+HEAD is now at 4260482 Merge pull request #181 from dfajmon/rebase-v8.3.0
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/arm64/router/.git/
+HEAD is now at b41f9d0 Merge pull request #644 from openshift-bot/art-consistency-openshift-4.19-openshift-enterprise-haproxy-router
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/arm64/kube-rbac-proxy/.git/
+HEAD is now at bc1ca29 Merge pull request #119 from ibihim/ibihim/2025-05-16_v0.19.1-downstream-v2
+
+lvms_operator not from release payload, skipping
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/arm64/ovn-kubernetes/.git/
+HEAD is now at 86953f3b Merge pull request #2640 from openshift-bot/art-consistency-openshift-4.20-ovn-kubernetes-base
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/arm64/kubernetes/.git/
+HEAD is now at b94367cab Merge pull request #2314 from bertinatto/bump-v1.33
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/arm64/service-ca-operator/.git/
+HEAD is now at 4dfa691 Merge pull request #263 from vrutkovs/microshift-featuregates
+
+Warning: env var PULL_BASE_REF not found or empty, falling back to local active branch.
+error: branch 'rebase-release-4.20-4.20.0-0.nightly-2025-07-20-021531_amd64-2025-07-20_arm64-2025-07-20' not found
+Switched to a new branch 'rebase-release-4.20-4.20.0-0.nightly-2025-07-20-021531_amd64-2025-07-20_arm64-2025-07-20'
+[34m## Updating last_rebase.sh[00m
+[34m## Committing changes to last_rebase.sh[00m
+[rebase-release-4.20-4.20.0-0.nightly-2025-07-20-021531_amd64-2025-07-20_arm64-2025-07-20 67c08cd9a] update last_rebase.sh
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+cluster-csi-snapshot-controller-operator embedded-component no change
+
+cluster-dns-operator embedded-component no change
+
+cluster-ingress-operator embedded-component no change
+
+cluster-policy-controller embedded-component no change
+
+etcd embedded-component no change
+
+route-controller-manager embedded-component no change
+
+service-ca-operator embedded-component no change
+
+coredns image-amd64 no change
+
+router image-amd64 no change
+
+kube-rbac-proxy image-amd64 no change
+
+service-ca-operator image-amd64 no change
+
+coredns image-arm64 no change
+
+csi-external-snapshotter image-arm64 no change
+
+router image-arm64 no change
+
+kube-rbac-proxy image-arm64 no change
+
+kubernetes image-arm64 no change
+
+service-ca-operator image-arm64 no change
+
+[34m## Committing changes to changelog[00m
+[rebase-release-4.20-4.20.0-0.nightly-2025-07-20-021531_amd64-2025-07-20_arm64-2025-07-20 0894cf105] update changelog
+ 2 files changed, 1769 insertions(+), 19 deletions(-)
+[34m# Updating microshift/go.mod[00m
+go mod edit -require github.com/openshift/cluster-policy-controller@748524784686a5f397490563882cbfb88f9acd01
+go: downloading github.com/stretchr/testify v1.10.0
+go: downloading github.com/openshift/api v0.0.0-20250213010142-f5b09d13c01f
+go: downloading github.com/openshift/client-go v0.0.0-20250131180035-f7ec47e2d87a
+go: downloading github.com/openshift/library-go v0.0.0-20250217144305-c917e6d528b2
+go: downloading k8s.io/utils v0.0.0-20241210054802-24370beab758
+go: downloading sigs.k8s.io/yaml v1.4.0
+go: downloading github.com/fsnotify/fsnotify v1.8.0
+go: downloading github.com/vishvananda/netlink v1.3.1-0.20250206174618-62fb240731fa
+go: downloading github.com/coreos/go-systemd v0.0.0-20190321100706-95778dfbb74e
+go: downloading github.com/spf13/cobra v1.8.1
+go: downloading sigs.k8s.io/kustomize/kyaml v0.18.1
+go: downloading github.com/spf13/pflag v1.0.5
+go: downloading github.com/apparentlymart/go-cidr v1.1.0
+go: downloading gopkg.in/yaml.v3 v3.0.1
+go: downloading github.com/evanphx/json-patch v4.12.0+incompatible
+go: downloading github.com/go-kit/kit v0.9.0
+go: downloading github.com/coreos/go-systemd/v22 v22.5.0
+go: downloading github.com/openshift/build-machinery-go v0.0.0-20250602125535-1b6d00b8c37c
+go: downloading github.com/squat/generic-device-plugin v0.0.0-20250710162141-0f7fddf166f1
+go: downloading github.com/openshift/cluster-policy-controller v0.0.0-20250310152427-748524784686
+go: downloading github.com/miekg/dns v1.1.63
+go: downloading sigs.k8s.io/kustomize/api v0.18.0
+go: downloading gopkg.in/yaml.v2 v2.4.0
+go: downloading github.com/openshift/etcd/client/pkg/v3 v3.5.1-0.20250411172207-a5421dfe551a
+go: downloading golang.org/x/sys v0.31.0
+go: downloading github.com/openshift/etcd/client/v3 v3.5.1-0.20250411172207-a5421dfe551a
+go: downloading github.com/gogo/protobuf v1.3.2
+go: downloading k8s.io/kube-openapi v0.0.0-20241105132330-32ad38e42d3f
+go: downloading github.com/golang/snappy v0.0.4
+go: downloading github.com/prometheus/client_model v0.6.1
+go: downloading github.com/prometheus/common v0.62.0
+go: downloading github.com/openshift/kubernetes-kube-storage-version-migrator v0.0.3-0.20250606130742-2b36e46ab36a
+go: downloading github.com/prometheus/prometheus v0.302.1
+go: downloading github.com/google/go-cmp v0.6.0
+go: downloading github.com/go-logr/logr v1.4.2
+go: downloading github.com/fxamacker/cbor/v2 v2.7.0
+go: downloading github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc
+go: downloading github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2
+go: downloading github.com/google/gofuzz v1.2.0
+go: downloading sigs.k8s.io/structured-merge-diff/v4 v4.5.0
+go: downloading github.com/golang/protobuf v1.5.4
+go: downloading github.com/google/gnostic-models v0.6.8
+go: downloading google.golang.org/protobuf v1.36.4
+go: downloading github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822
+go: downloading golang.org/x/net v0.38.0
+go: downloading golang.org/x/term v0.30.0
+go: downloading github.com/vishvananda/netns v0.0.4
+go: downloading gopkg.in/evanphx/json-patch.v4 v4.12.0
+go: downloading github.com/google/uuid v1.6.0
+go: downloading github.com/inconshreveable/mousetrap v1.1.0
+go: downloading sigs.k8s.io/json v0.0.0-20241014173422-cfa47c3a1cc8
+go: downloading github.com/pkg/errors v0.9.1
+go: downloading go.opentelemetry.io/otel/trace v1.34.0
+go: downloading go.opentelemetry.io/otel v1.34.0
+go: downloading github.com/godbus/dbus/v5 v5.1.0
+go: downloading github.com/liggitt/tabwriter v0.0.0-20181228230101-89fcab3d43de
+go: downloading github.com/moby/term v0.5.0
+go: downloading github.com/go-logfmt/logfmt v0.5.1
+go: downloading github.com/go-stack/stack v1.8.1
+go: downloading google.golang.org/grpc v1.70.0
+go: downloading github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring v0.74.0
+go: downloading gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c
+go: downloading github.com/jonboulle/clockwork v0.4.0
+go: downloading github.com/MakeNowJust/heredoc v1.0.0
+go: downloading github.com/mitchellh/go-wordwrap v1.0.1
+go: downloading github.com/russross/blackfriday/v2 v2.1.0
+go: downloading golang.org/x/time v0.9.0
+go: downloading golang.org/x/tools v0.29.0
+go: downloading golang.org/x/sync v0.12.0
+go: downloading github.com/google/cadvisor v0.51.0
+go: downloading go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.34.0
+go: downloading go.opentelemetry.io/otel/metric v1.34.0
+go: downloading go.opentelemetry.io/otel/sdk v1.34.0
+go: downloading go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.34.0
+go: downloading github.com/blang/semver/v4 v4.0.0
+go: downloading github.com/Microsoft/go-winio v0.6.2
+go: downloading go.uber.org/zap v1.27.0
+go: downloading github.com/openshift/etcd/api/v3 v3.5.1-0.20250411172207-a5421dfe551a
+go: downloading github.com/oklog/run v1.1.0
+go: downloading github.com/prometheus/client_golang v1.21.0-rc.0
+go: downloading k8s.io/gengo/v2 v2.0.0-20240911193312-2b36238f13e9
+go: downloading gopkg.in/inf.v0 v0.9.1
+go: downloading github.com/x448/float16 v0.8.4
+go: downloading github.com/go-openapi/swag v0.23.0
+go: downloading github.com/json-iterator/go v1.1.12
+go: downloading golang.org/x/oauth2 v0.25.0
+go: downloading go.uber.org/goleak v1.3.0
+go: downloading github.com/prometheus/procfs v0.15.1
+go: downloading golang.org/x/text v0.23.0
+go: downloading github.com/gregjones/httpcache v0.0.0-20190611155906-901d90724c79
+go: downloading github.com/peterbourgon/diskv v2.0.1+incompatible
+go: downloading github.com/chai2010/gettext-go v1.0.2
+go: downloading github.com/openshift/onsi-ginkgo/v2 v2.6.1-0.20241205171354-8006f302fd12
+go: downloading github.com/onsi/gomega v1.35.1
+go: downloading github.com/exponent-io/jsonpath v0.0.0-20210407135951-1de76d718b3f
+go: downloading gopkg.in/natefinch/lumberjack.v2 v2.2.1
+go: downloading gopkg.in/square/go-jose.v2 v2.6.0
+go: downloading github.com/emicklei/go-restful/v3 v3.11.0
+go: downloading go.etcd.io/etcd/server/v3 v3.5.16
+go: downloading github.com/go-openapi/jsonreference v0.21.0
+go: downloading github.com/go-errors/errors v1.4.2
+go: downloading github.com/creack/pty v1.1.18
+go: downloading github.com/kr/pretty v0.3.1
+go: downloading github.com/pkg/profile v1.7.0
+go: downloading github.com/sirupsen/logrus v1.9.3
+go: downloading go.uber.org/atomic v1.11.0
+go: downloading golang.org/x/crypto v0.36.0
+go: downloading github.com/onsi/ginkgo v1.16.5
+go: downloading github.com/go-logr/stdr v1.2.2
+go: downloading go.opentelemetry.io/proto/otlp v1.5.0
+go: downloading google.golang.org/genproto/googleapis/rpc v0.0.0-20250115164207-1a7da9e5054f
+go: downloading go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.59.0
+go: downloading github.com/cyphar/filepath-securejoin v0.3.4
+go: downloading github.com/moby/sys/userns v0.1.0
+go: downloading github.com/opencontainers/selinux v1.11.1
+go: downloading github.com/opencontainers/runc v1.2.1
+go: downloading github.com/docker/go-units v0.5.0
+go: downloading go.opentelemetry.io/contrib/instrumentation/github.com/emicklei/go-restful/otelrestful v0.42.0
+go: downloading github.com/container-storage-interface/spec v1.9.0
+go: downloading github.com/libopenstorage/openstorage v1.0.0
+go: downloading github.com/moby/sys/mountinfo v0.7.2
+go: downloading golang.org/x/exp v0.0.0-20240719175910-8a7402abbf56
+go: downloading sigs.k8s.io/apiserver-network-proxy/konnectivity-client v0.31.0
+go: downloading github.com/openshift/apiserver-library-go v0.0.0-20250127121756-dc9a973f14ce
+go: downloading github.com/karrick/godirwalk v1.17.0
+go: downloading github.com/containerd/containerd/api v1.7.19
+go: downloading github.com/containerd/errdefs v0.1.0
+go: downloading github.com/opencontainers/runtime-spec v1.2.0
+go: downloading github.com/containerd/typeurl/v2 v2.2.0
+go: downloading github.com/google/cel-go v0.22.0
+go: downloading github.com/robfig/cron/v3 v3.0.1
+go: downloading github.com/robfig/cron v1.2.0
+go: downloading go.uber.org/multierr v1.11.0
+go: downloading google.golang.org/genproto/googleapis/api v0.0.0-20250115164207-1a7da9e5054f
+go: downloading github.com/coreos/go-semver v0.3.1
+go: downloading github.com/mailru/easyjson v0.7.7
+go: downloading github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd
+go: downloading github.com/modern-go/reflect2 v1.0.2
+go: downloading github.com/beorn7/perks v1.0.1
+go: downloading github.com/cespare/xxhash/v2 v2.3.0
+go: downloading github.com/kylelemons/godebug v1.1.0
+go: downloading github.com/klauspost/compress v1.17.11
+go: downloading github.com/google/btree v1.0.1
+go: downloading github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0
+go: downloading go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.53.0
+go: downloading github.com/coreos/go-oidc v2.2.1+incompatible
+go: downloading github.com/go-openapi/jsonpointer v0.21.0
+go: downloading github.com/Azure/go-ansiterm v0.0.0-20230124172434-306776ec8161
+go: downloading github.com/kr/text v0.2.0
+go: downloading github.com/rogpeppe/go-internal v1.13.1
+go: downloading github.com/felixge/fgprof v0.9.4
+go: downloading github.com/NYTimes/gziphandler v1.1.1
+go: downloading github.com/grafana/regexp v0.0.0-20240518133315-a468a5bfb3bc
+go: downloading github.com/go-logr/zapr v1.3.0
+go: downloading github.com/gorilla/websocket v1.5.0
+go: downloading github.com/cenkalti/backoff/v4 v4.3.0
+go: downloading go.opentelemetry.io/auto/sdk v1.1.0
+go: downloading github.com/grpc-ecosystem/grpc-gateway v1.16.0
+go: downloading github.com/soheilhy/cmux v0.1.5
+go: downloading github.com/tmc/grpc-websocket-proxy v0.0.0-20220101234140-673ab2c3ae75
+go: downloading go.etcd.io/bbolt v1.3.11
+go: downloading go.etcd.io/etcd/pkg/v3 v3.5.16
+go: downloading github.com/grpc-ecosystem/grpc-gateway/v2 v2.25.1
+go: downloading github.com/felixge/httpsnoop v1.0.4
+go: downloading github.com/armon/circbuf v0.0.0-20190214190532-5111143e8da2
+go: downloading github.com/Microsoft/hnslib v0.1.1
+go: downloading github.com/JeffAshton/win_pdh v0.0.0-20161109143554-76bb4ee9f0ab
+go: downloading github.com/lithammer/dedent v1.1.0
+go: downloading github.com/mistifyio/go-zfs v2.1.2-0.20190413222219-f784269be439+incompatible
+go: downloading github.com/stretchr/objx v0.5.2
+go: downloading go.opentelemetry.io/contrib/propagators/b3 v1.17.0
+go: downloading github.com/mxk/go-flowrate v0.0.0-20140419014527-cca7078d478f
+go: downloading github.com/moby/spdystream v0.5.0
+go: downloading github.com/armon/go-socks5 v0.0.0-20160902184237-e75332964ef5
+go: downloading github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
+go: downloading github.com/containerd/ttrpc v1.2.5
+go: downloading github.com/euank/go-kmsg-parser v2.0.0+incompatible
+go: downloading golang.org/x/mod v0.22.0
+go: downloading github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2
+go: downloading cel.dev/expr v0.19.0
+go: downloading github.com/stoewer/go-strcase v1.3.0
+go: downloading github.com/sergi/go-diff v1.2.0
+go: downloading github.com/josharian/intern v1.0.0
+go: downloading github.com/pquerna/cachecontrol v0.1.0
+go: downloading github.com/fatih/camelcase v1.0.0
+go: downloading github.com/google/pprof v0.0.0-20241210010833-40e02aabc2ad
+go: downloading github.com/dustin/go-humanize v1.0.1
+go: downloading go.etcd.io/etcd/raft/v3 v3.5.16
+go: downloading github.com/xiang90/probing v0.0.0-20221125231312-a49e3df8f510
+go: downloading github.com/grpc-ecosystem/go-grpc-middleware v1.3.0
+go: downloading google.golang.org/genproto v0.0.0-20240123012728-ef4313101c80
+go: downloading github.com/distribution/reference v0.6.0
+go: downloading go.opentelemetry.io/otel/sdk/metric v1.32.0
+go: downloading github.com/docker/docker v27.4.1+incompatible
+go: downloading github.com/docker/go-connections v0.5.0
+go: downloading github.com/containerd/log v0.1.0
+go: downloading github.com/antlr4-go/antlr/v4 v4.13.0
+go: downloading github.com/monochromegane/go-gitignore v0.0.0-20200626010858-205db1a8cc00
+go: downloading github.com/xlab/treeprint v1.2.0
+go: downloading github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510
+go: downloading github.com/golang-jwt/jwt/v4 v4.5.0
+go: downloading go.etcd.io/etcd/client/v2 v2.305.16
+go: downloading github.com/opencontainers/go-digest v1.0.0
+go: downloading github.com/go-task/slim-sprig/v3 v3.0.0
+go: downloading github.com/go-ldap/ldap/v3 v3.4.3
+go: downloading github.com/Azure/go-ntlmssp v0.0.0-20211209120228-48547f28849e
+go: downloading github.com/go-asn1-ber/asn1-ber v1.5.4
+go: downloading github.com/opencontainers/image-spec v1.1.0
+go: downloading github.com/moby/docker-image-spec v1.3.1
+go mod edit -replace github.com/onsi/ginkgo/v2=github.com/openshift/onsi-ginkgo/v2@v2.6.1-0.20250416174521-4eb003743b54
+Handling 'github.com/openshift/route-controller-manager' dep: copying /go/src/github.com/openshift/microshift/_output/staging/route-controller-manager -> /go/src/github.com/openshift/microshift/./deps/github.com/openshift/route-controller-manager
+go: downloading github.com/openshift/onsi-ginkgo/v2 v2.6.1-0.20250416174521-4eb003743b54
+Handling 'k8s.io/klog/v2' dep: cloning 'https://github.com/kubernetes/klog' @ 'v2.130.1' to /go/src/github.com/openshift/microshift/./deps/k8s.io/klog
+Cloning into '/go/src/github.com/openshift/microshift/./deps/k8s.io/klog'...
+Handling 'k8s.io/kubernetes' dep: copying /go/src/github.com/openshift/microshift/_output/staging/kubernetes -> /go/src/github.com/openshift/microshift/./deps/github.com/openshift/kubernetes
+go: downloading sigs.k8s.io/randfill v1.0.0
+go: downloading gopkg.in/go-jose/go-jose.v2 v2.6.3
+go: downloading go.etcd.io/etcd/server/v3 v3.5.21
+go: downloading github.com/containerd/typeurl/v2 v2.2.2
+go: downloading github.com/opencontainers/cgroups v0.0.1
+go: downloading go.etcd.io/etcd/pkg/v3 v3.5.21
+go: downloading go.etcd.io/etcd/raft/v3 v3.5.21
+go: downloading github.com/opencontainers/image-spec v1.1.1
+go: downloading github.com/golang-jwt/jwt/v4 v4.5.2
+go: downloading go.etcd.io/etcd/client/v2 v2.305.21
+go: downloading github.com/openshift/api v0.0.0-20250710004639-926605d3338b
+go: downloading github.com/openshift/client-go v0.0.0-20250710075018-396b36f983ee
+go: downloading github.com/openshift/library-go v0.0.0-20250710130336-73c7662bc565
+go: downloading sigs.k8s.io/kustomize/kyaml v0.19.0
+go: downloading sigs.k8s.io/kustomize/api v0.19.0
+go: downloading k8s.io/kube-openapi v0.0.0-20250318190949-c8a335a9a2ff
+go: downloading github.com/google/go-cmp v0.7.0
+go: downloading sigs.k8s.io/structured-merge-diff/v4 v4.6.0
+go: downloading github.com/prometheus/client_golang v1.22.0
+go: downloading github.com/google/gnostic-models v0.6.9
+go: downloading google.golang.org/protobuf v1.36.5
+go: downloading github.com/google/cadvisor v0.52.1
+go: downloading golang.org/x/oauth2 v0.27.0
+go: downloading k8s.io/gengo/v2 v2.0.0-20250207200755-1244d31929d7
+go: downloading sigs.k8s.io/apiserver-network-proxy/konnectivity-client v0.31.2
+go: downloading github.com/openshift/apiserver-library-go v0.0.0-20250710132015-f0d44ef6e53b
+go: downloading github.com/google/cel-go v0.23.2
+go: downloading github.com/cyphar/filepath-securejoin v0.4.1
+go: downloading github.com/opencontainers/runc v1.2.5
+go: downloading github.com/google/btree v1.1.3
+go: downloading github.com/klauspost/compress v1.18.0
+go: downloading go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.58.0
+go: downloading github.com/coreos/go-oidc v2.3.0+incompatible
+go: downloading github.com/gorilla/websocket v1.5.4-0.20250319132907-e064f32e3674
+go: downloading github.com/containerd/containerd/api v1.8.0
+go: downloading github.com/containerd/errdefs v1.0.0
+go: downloading github.com/containerd/errdefs/pkg v0.3.0
+go: downloading cel.dev/expr v0.19.1
+go: downloading github.com/containerd/ttrpc v1.2.6
+go mod edit -replace sigs.k8s.io/kube-storage-version-migrator=github.com/openshift/kubernetes-kube-storage-version-migrator@caf798560ad386b4a254e855ace3e3f2d7db6d8d
+go: downloading github.com/openshift/kubernetes-kube-storage-version-migrator v0.0.3-0.20250719041745-caf798560ad3
+Handling 'k8s.io/api' dep: updating required version to '1.33.2' (for information purposes)
+Handling 'k8s.io/apiextensions-apiserver' dep: updating required version to '1.33.2' (for information purposes)
+Handling 'k8s.io/apimachinery' dep: updating required version to '1.33.2' (for information purposes)
+Handling 'k8s.io/apiserver' dep: updating required version to '1.33.2' (for information purposes)
+Handling 'k8s.io/cli-runtime' dep: updating required version to '1.33.2' (for information purposes)
+Handling 'k8s.io/client-go' dep: updating required version to '1.33.2' (for information purposes)
+Handling 'k8s.io/cloud-provider' dep: updating required version to '1.33.2' (for information purposes)
+Handling 'k8s.io/cluster-bootstrap' dep: updating required version to '1.33.2' (for information purposes)
+Handling 'k8s.io/code-generator' dep: updating required version to '1.33.2' (for information purposes)
+Handling 'k8s.io/component-base' dep: updating required version to '1.33.2' (for information purposes)
+Handling 'k8s.io/component-helpers' dep: updating required version to '1.33.2' (for information purposes)
+Handling 'k8s.io/controller-manager' dep: updating required version to '1.33.2' (for information purposes)
+Handling 'k8s.io/cri-api' dep: updating required version to '1.33.2' (for information purposes)
+Handling 'k8s.io/cri-client' dep: updating required version to '1.33.2' (for information purposes)
+Handling 'k8s.io/csi-translation-lib' dep: updating required version to '1.33.2' (for information purposes)
+Handling 'k8s.io/dynamic-resource-allocation' dep: updating required version to '1.33.2' (for information purposes)
+Handling 'k8s.io/endpointslice' dep: updating required version to '1.33.2' (for information purposes)
+Handling 'k8s.io/externaljwt' dep: updating required version to '1.33.2' (for information purposes)
+Handling 'k8s.io/kms' dep: updating required version to '1.33.2' (for information purposes)
+Handling 'k8s.io/kube-aggregator' dep: updating required version to '1.33.2' (for information purposes)
+Handling 'k8s.io/kube-controller-manager' dep: updating required version to '1.33.2' (for information purposes)
+Handling 'k8s.io/kube-proxy' dep: updating required version to '1.33.2' (for information purposes)
+Handling 'k8s.io/kube-scheduler' dep: updating required version to '1.33.2' (for information purposes)
+Handling 'k8s.io/kubectl' dep: updating required version to '1.33.2' (for information purposes)
+Handling 'k8s.io/kubelet' dep: updating required version to '1.33.2' (for information purposes)
+Handling 'k8s.io/metrics' dep: updating required version to '1.33.2' (for information purposes)
+Handling 'k8s.io/mount-utils' dep: updating required version to '1.33.2' (for information purposes)
+Handling 'k8s.io/pod-security-admission' dep: updating required version to '1.33.2' (for information purposes)
+Handling 'k8s.io/sample-apiserver' dep: updating required version to '1.33.2' (for information purposes)
+Handling 'k8s.io/sample-cli-plugin' dep: updating required version to '1.33.2' (for information purposes)
+Handling 'k8s.io/sample-controller' dep: updating required version to '1.33.2' (for information purposes)
+go mod edit -replace go.etcd.io/etcd/api/v3=github.com/openshift/etcd/api/v3@a5421dfe551a2e9c911a75062a4cdeb7473f5c26
+go mod edit -replace go.etcd.io/etcd/client/pkg/v3=github.com/openshift/etcd/client/pkg/v3@v3.5.1-0.20250411172207-a5421dfe551a
+go mod edit -replace go.etcd.io/etcd/client/v3=github.com/openshift/etcd/client/v3@v3.5.1-0.20250411172207-a5421dfe551a
+go mod edit -require github.com/openshift/route-controller-manager@e148fabc13f735d5f59a94714031d8765abb9895
+go: inconsistent vendoring in /go/src/github.com/openshift/microshift:
+	github.com/google/go-cmp@v0.7.0: is explicitly required in go.mod, but not marked as explicit in vendor/modules.txt
+	github.com/openshift/api@v0.0.0-20250710004639-926605d3338b: is explicitly required in go.mod, but not marked as explicit in vendor/modules.txt
+	github.com/openshift/client-go@v0.0.0-20250710075018-396b36f983ee: is explicitly required in go.mod, but not marked as explicit in vendor/modules.txt
+	github.com/openshift/library-go@v0.0.0-20250710130336-73c7662bc565: is explicitly required in go.mod, but not marked as explicit in vendor/modules.txt
+	go.etcd.io/etcd/client/v3@v3.5.21: is explicitly required in go.mod, but not marked as explicit in vendor/modules.txt
+	k8s.io/kube-openapi@v0.0.0-20250318190949-c8a335a9a2ff: is explicitly required in go.mod, but not marked as explicit in vendor/modules.txt
+	k8s.io/api@v1.33.2: is explicitly required in go.mod, but not marked as explicit in vendor/modules.txt
+	k8s.io/apiextensions-apiserver@v1.33.2: is explicitly required in go.mod, but not marked as explicit in vendor/modules.txt
+	k8s.io/apimachinery@v1.33.2: is explicitly required in go.mod, but not marked as explicit in vendor/modules.txt
+	k8s.io/apiserver@v1.33.2: is explicitly required in go.mod, but not marked as explicit in vendor/modules.txt
+	k8s.io/cli-runtime@v1.33.2: is explicitly required in go.mod, but not marked as explicit in vendor/modules.txt
+	k8s.io/client-go@v1.33.2: is explicitly required in go.mod, but not marked as explicit in vendor/modules.txt
+	k8s.io/cloud-provider@v1.33.2: is explicitly required in go.mod, but not marked as explicit in vendor/modules.txt
+	k8s.io/component-base@v1.33.2: is explicitly required in go.mod, but not marked as explicit in vendor/modules.txt
+	k8s.io/kube-aggregator@v1.33.2: is explicitly required in go.mod, but not marked as explicit in vendor/modules.txt
+	k8s.io/kubectl@v1.33.2: is explicitly required in go.mod, but not marked as explicit in vendor/modules.txt
+	k8s.io/kubelet@v1.33.2: is explicitly required in go.mod, but not marked as explicit in vendor/modules.txt
+	sigs.k8s.io/kustomize/api@v0.19.0: is explicitly required in go.mod, but not marked as explicit in vendor/modules.txt
+	sigs.k8s.io/kustomize/kyaml@v0.19.0: is explicitly required in go.mod, but not marked as explicit in vendor/modules.txt
+	cel.dev/expr@v0.19.1: is explicitly required in go.mod, but not marked as explicit in vendor/modules.txt
+	github.com/containerd/containerd/api@v1.8.0: is explicitly required in go.mod, but not marked as explicit in vendor/modules.txt
+	github.com/containerd/errdefs@v1.0.0: is explicitly required in go.mod, but not marked as explicit in vendor/modules.txt
+	github.com/containerd/errdefs/pkg@v0.3.0: is explicitly required in go.mod, but not marked as explicit in vendor/modules.txt
+	github.com/containerd/ttrpc@v1.2.6: is explicitly required in go.mod, but not marked as explicit in vendor/modules.txt
+	github.com/containerd/typeurl/v2@v2.2.2: is explicitly required in go.mod, but not marked as explicit in vendor/modules.txt
+	github.com/coreos/go-oidc@v2.3.0+incompatible: is explicitly required in go.mod, but not marked as explicit in vendor/modules.txt
+	github.com/cyphar/filepath-securejoin@v0.4.1: is explicitly required in go.mod, but not marked as explicit in vendor/modules.txt
+	github.com/google/btree@v1.1.3: is explicitly required in go.mod, but not marked as explicit in vendor/modules.txt
+	github.com/google/cadvisor@v0.52.1: is explicitly required in go.mod, but not marked as explicit in vendor/modules.txt
+	github.com/google/cel-go@v0.23.2: is explicitly required in go.mod, but not marked as explicit in vendor/modules.txt
+	github.com/gorilla/websocket@v1.5.4-0.20250319132907-e064f32e3674: is explicitly required in go.mod, but not marked as explicit in vendor/modules.txt
+	github.com/opencontainers/cgroups@v0.0.1: is explicitly required in go.mod, but not marked as explicit in vendor/modules.txt
+	github.com/opencontainers/image-spec@v1.1.1: is explicitly required in go.mod, but not marked as explicit in vendor/modules.txt
+	github.com/opencontainers/runc@v1.2.5: is explicitly required in go.mod, but not marked as explicit in vendor/modules.txt
+	github.com/openshift/apiserver-library-go@v0.0.0-20250710132015-f0d44ef6e53b: is explicitly required in go.mod, but not marked as explicit in vendor/modules.txt
+	github.com/prometheus/client_golang@v1.22.0: is explicitly required in go.mod, but not marked as explicit in vendor/modules.txt
+	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc@v0.58.0: is explicitly required in go.mod, but not marked as explicit in vendor/modules.txt
+	golang.org/x/oauth2@v0.27.0: is explicitly required in go.mod, but not marked as explicit in vendor/modules.txt
+	gopkg.in/go-jose/go-jose.v2@v2.6.3: is explicitly required in go.mod, but not marked as explicit in vendor/modules.txt
+	k8s.io/cluster-bootstrap@v1.33.2: is explicitly required in go.mod, but not marked as explicit in vendor/modules.txt
+	k8s.io/component-helpers@v1.33.2: is explicitly required in go.mod, but not marked as explicit in vendor/modules.txt
+	k8s.io/controller-manager@v1.33.2: is explicitly required in go.mod, but not marked as explicit in vendor/modules.txt
+	k8s.io/cri-api@v1.33.2: is explicitly required in go.mod, but not marked as explicit in vendor/modules.txt
+	k8s.io/cri-client@v1.33.2: is explicitly required in go.mod, but not marked as explicit in vendor/modules.txt
+	k8s.io/csi-translation-lib@v1.33.2: is explicitly required in go.mod, but not marked as explicit in vendor/modules.txt
+	k8s.io/dynamic-resource-allocation@v1.33.2: is explicitly required in go.mod, but not marked as explicit in vendor/modules.txt
+	k8s.io/endpointslice@v1.33.2: is explicitly required in go.mod, but not marked as explicit in vendor/modules.txt
+	k8s.io/externaljwt@v1.33.2: is explicitly required in go.mod, but not marked as explicit in vendor/modules.txt
+	k8s.io/kms@v1.33.2: is explicitly required in go.mod, but not marked as explicit in vendor/modules.txt
+	k8s.io/kube-controller-manager@v1.33.2: is explicitly required in go.mod, but not marked as explicit in vendor/modules.txt
+	k8s.io/kube-scheduler@v1.33.2: is explicitly required in go.mod, but not marked as explicit in vendor/modules.txt
+	k8s.io/metrics@v1.33.2: is explicitly required in go.mod, but not marked as explicit in vendor/modules.txt
+	k8s.io/mount-utils@v1.33.2: is explicitly required in go.mod, but not marked as explicit in vendor/modules.txt
+	k8s.io/pod-security-admission@v1.33.2: is explicitly required in go.mod, but not marked as explicit in vendor/modules.txt
+	sigs.k8s.io/apiserver-network-proxy/konnectivity-client@v0.31.2: is explicitly required in go.mod, but not marked as explicit in vendor/modules.txt
+	sigs.k8s.io/randfill@v1.0.0: is explicitly required in go.mod, but not marked as explicit in vendor/modules.txt
+	github.com/google/gnostic-models@v0.6.9: is explicitly required in go.mod, but not marked as explicit in vendor/modules.txt
+	google.golang.org/protobuf@v1.36.5: is explicitly required in go.mod, but not marked as explicit in vendor/modules.txt
+	k8s.io/gengo/v2@v2.0.0-20250207200755-1244d31929d7: is explicitly required in go.mod, but not marked as explicit in vendor/modules.txt
+	k8s.io/kubernetes@v1.33.2: is explicitly required in go.mod, but not marked as explicit in vendor/modules.txt
+	sigs.k8s.io/structured-merge-diff/v4@v4.6.0: is explicitly required in go.mod, but not marked as explicit in vendor/modules.txt
+	github.com/onsi/ginkgo/v2: is replaced by github.com/openshift/onsi-ginkgo/v2@v2.6.1-0.20250416174521-4eb003743b54 in go.mod, but marked as replaced by github.com/openshift/onsi-ginkgo/v2@v2.6.1-0.20241205171354-8006f302fd12 in vendor/modules.txt
+	sigs.k8s.io/kube-storage-version-migrator: is replaced by github.com/openshift/kubernetes-kube-storage-version-migrator@v0.0.3-0.20250719041745-caf798560ad3 in go.mod, but marked as replaced by github.com/openshift/kubernetes-kube-storage-version-migrator@v0.0.3-0.20250606130742-2b36e46ab36a in vendor/modules.txt
+	cel.dev/expr@v0.19.0: is marked as explicit in vendor/modules.txt, but not explicitly required in go.mod
+	github.com/asaskevich/govalidator@v0.0.0-20230301143203-a9d515a09cc2: is marked as explicit in vendor/modules.txt, but not explicitly required in go.mod
+	github.com/containerd/containerd/api@v1.7.19: is marked as explicit in vendor/modules.txt, but not explicitly required in go.mod
+	github.com/containerd/errdefs@v0.1.0: is marked as explicit in vendor/modules.txt, but not explicitly required in go.mod
+	github.com/containerd/ttrpc@v1.2.5: is marked as explicit in vendor/modules.txt, but not explicitly required in go.mod
+	github.com/coreos/go-oidc@v2.2.1+incompatible: is marked as explicit in vendor/modules.txt, but not explicitly required in go.mod
+	github.com/cyphar/filepath-securejoin@v0.3.4: is marked as explicit in vendor/modules.txt, but not explicitly required in go.mod
+	github.com/google/btree@v1.0.1: is marked as explicit in vendor/modules.txt, but not explicitly required in go.mod
+	github.com/google/cadvisor@v0.51.0: is marked as explicit in vendor/modules.txt, but not explicitly required in go.mod
+	github.com/google/cel-go@v0.22.0: is marked as explicit in vendor/modules.txt, but not explicitly required in go.mod
+	github.com/google/gnostic-models@v0.6.8: is marked as explicit in vendor/modules.txt, but not explicitly required in go.mod
+	github.com/google/go-cmp@v0.6.0: is marked as explicit in vendor/modules.txt, but not explicitly required in go.mod
+	github.com/google/gofuzz@v1.2.0: is marked as explicit in vendor/modules.txt, but not explicitly required in go.mod
+	github.com/gorilla/websocket@v1.5.0: is marked as explicit in vendor/modules.txt, but not explicitly required in go.mod
+	github.com/klauspost/compress@v1.17.11: is marked as explicit in vendor/modules.txt, but not explicitly required in go.mod
+	github.com/opencontainers/runc@v1.2.1: is marked as explicit in vendor/modules.txt, but not explicitly required in go.mod
+	github.com/openshift/api@v0.0.0-20250213010142-f5b09d13c01f: is marked as explicit in vendor/modules.txt, but not explicitly required in go.mod
+	github.com/openshift/apiserver-library-go@v0.0.0-20250127121756-dc9a973f14ce: is marked as explicit in vendor/modules.txt, but not explicitly required in go.mod
+	github.com/openshift/client-go@v0.0.0-20250131180035-f7ec47e2d87a: is marked as explicit in vendor/modules.txt, but not explicitly required in go.mod
+	github.com/openshift/library-go@v0.0.0-20250217144305-c917e6d528b2: is marked as explicit in vendor/modules.txt, but not explicitly required in go.mod
+	github.com/prometheus/client_golang@v1.21.0-rc.0: is marked as explicit in vendor/modules.txt, but not explicitly required in go.mod
+	go.etcd.io/etcd/client/v3@v3.5.16: is marked as explicit in vendor/modules.txt, but not explicitly required in go.mod
+	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc@v0.53.0: is marked as explicit in vendor/modules.txt, but not explicitly required in go.mod
+	golang.org/x/oauth2@v0.25.0: is marked as explicit in vendor/modules.txt, but not explicitly required in go.mod
+	google.golang.org/protobuf@v1.36.4: is marked as explicit in vendor/modules.txt, but not explicitly required in go.mod
+	gopkg.in/square/go-jose.v2@v2.6.0: is marked as explicit in vendor/modules.txt, but not explicitly required in go.mod
+	k8s.io/api@v1.32.6: is marked as explicit in vendor/modules.txt, but not explicitly required in go.mod
+	k8s.io/apiextensions-apiserver@v1.32.6: is marked as explicit in vendor/modules.txt, but not explicitly required in go.mod
+	k8s.io/apimachinery@v1.32.6: is marked as explicit in vendor/modules.txt, but not explicitly required in go.mod
+	k8s.io/apiserver@v1.32.6: is marked as explicit in vendor/modules.txt, but not explicitly required in go.mod
+	k8s.io/cli-runtime@v1.32.6: is marked as explicit in vendor/modules.txt, but not explicitly required in go.mod
+	k8s.io/client-go@v1.32.6: is marked as explicit in vendor/modules.txt, but not explicitly required in go.mod
+	k8s.io/cloud-provider@v1.32.6: is marked as explicit in vendor/modules.txt, but not explicitly required in go.mod
+	k8s.io/cluster-bootstrap@v1.32.6: is marked as explicit in vendor/modules.txt, but not explicitly required in go.mod
+	k8s.io/component-base@v1.32.6: is marked as explicit in vendor/modules.txt, but not explicitly required in go.mod
+	k8s.io/component-helpers@v1.32.6: is marked as explicit in vendor/modules.txt, but not explicitly required in go.mod
+	k8s.io/controller-manager@v1.32.6: is marked as explicit in vendor/modules.txt, but not explicitly required in go.mod
+	k8s.io/cri-api@v1.32.6: is marked as explicit in vendor/modules.txt, but not explicitly required in go.mod
+	k8s.io/cri-client@v1.32.6: is marked as explicit in vendor/modules.txt, but not explicitly required in go.mod
+	k8s.io/csi-translation-lib@v1.32.6: is marked as explicit in vendor/modules.txt, but not explicitly required in go.mod
+	k8s.io/dynamic-resource-allocation@v1.32.6: is marked as explicit in vendor/modules.txt, but not explicitly required in go.mod
+	k8s.io/endpointslice@v1.32.6: is marked as explicit in vendor/modules.txt, but not explicitly required in go.mod
+	k8s.io/externaljwt@v1.32.6: is marked as explicit in vendor/modules.txt, but not explicitly required in go.mod
+	k8s.io/gengo/v2@v2.0.0-20240911193312-2b36238f13e9: is marked as explicit in vendor/modules.txt, but not explicitly required in go.mod
+	k8s.io/kms@v1.32.6: is marked as explicit in vendor/modules.txt, but not explicitly required in go.mod
+	k8s.io/kube-aggregator@v1.32.6: is marked as explicit in vendor/modules.txt, but not explicitly required in go.mod
+	k8s.io/kube-controller-manager@v1.32.6: is marked as explicit in vendor/modules.txt, but not explicitly required in go.mod
+	k8s.io/kube-openapi@v0.0.0-20241105132330-32ad38e42d3f: is marked as explicit in vendor/modules.txt, but not explicitly required in go.mod
+	k8s.io/kube-scheduler@v1.32.6: is marked as explicit in vendor/modules.txt, but not explicitly required in go.mod
+	k8s.io/kubectl@v1.32.6: is marked as explicit in vendor/modules.txt, but not explicitly required in go.mod
+	k8s.io/kubelet@v1.32.6: is marked as explicit in vendor/modules.txt, but not explicitly required in go.mod
+	k8s.io/kubernetes@v1.32.6: is marked as explicit in vendor/modules.txt, but not explicitly required in go.mod
+	k8s.io/metrics@v1.32.6: is marked as explicit in vendor/modules.txt, but not explicitly required in go.mod
+	k8s.io/mount-utils@v1.32.6: is marked as explicit in vendor/modules.txt, but not explicitly required in go.mod
+	k8s.io/pod-security-admission@v1.32.6: is marked as explicit in vendor/modules.txt, but not explicitly required in go.mod
+	sigs.k8s.io/apiserver-network-proxy/konnectivity-client@v0.31.0: is marked as explicit in vendor/modules.txt, but not explicitly required in go.mod
+	sigs.k8s.io/kustomize/api@v0.18.0: is marked as explicit in vendor/modules.txt, but not explicitly required in go.mod
+	sigs.k8s.io/kustomize/kyaml@v0.18.1: is marked as explicit in vendor/modules.txt, but not explicitly required in go.mod
+	sigs.k8s.io/structured-merge-diff/v4@v4.5.0: is marked as explicit in vendor/modules.txt, but not explicitly required in go.mod
+
+	To ignore the vendor directory, use -mod=readonly or -mod=mod.
+	To sync the vendor directory, run:
+		go mod vendor
+panic: runtime error: invalid memory address or nil pointer dereference
+[signal SIGSEGV: segmentation violation code=0x1 addr=0x10 pc=0x5696c8]
+
+goroutine 1 [running]:
+main.findCodeRoots()
+	cmd/doc/dirs.go:234 +0x7a8
+main.codeRoots.func1()
+	cmd/doc/dirs.go:175 +0xf
+sync.(*Once).doSlow(0x5a1e40?, 0x5cb101?)
+	sync/once.go:78 +0xab
+sync.(*Once).Do(...)
+	sync/once.go:69
+main.codeRoots()
+	cmd/doc/dirs.go:174 +0x2c
+main.dirsInit({0x0, 0x0, 0x68?})
+	cmd/doc/dirs.go:58 +0x325
+main.main()
+	cmd/doc/main.go:91 +0x67
+exit status 2
+for p in scripts/auto-rebase/rebase_patches/0001-Fix-CSI-initialization-conflict.patch scripts/auto-rebase/rebase_patches/0002-disable-APIrequestcount-controller.patch scripts/auto-rebase/rebase_patches/0003-disable-clusterQuotaMapping-controller.patch scripts/auto-rebase/rebase_patches/0004-remove-config-informer-and-cpu-partitioning-admission-plugin.patch scripts/auto-rebase/rebase_patches/0005-remove-user-informer.patch scripts/auto-rebase/rebase_patches/0020-klog-component-names.patch scripts/auto-rebase/rebase_patches/0030-kube-controller-manager-command-context.patch scripts/auto-rebase/rebase_patches/0040-route-controller-manager.patch; do \
+	echo "Applying patch $p"; \
+	git mailinfo /dev/null /dev/stderr 2<&1- < $p | git apply --reject || exit 1; \
+done
+Applying patch scripts/auto-rebase/rebase_patches/0001-Fix-CSI-initialization-conflict.patch
+Checking patch deps/github.com/openshift/kubernetes/pkg/volume/csi/csi_plugin.go...
+error: while searching for:
+	}
+
+	// Initializing the label management channels
+	nim = nodeinfomanager.NewNodeInfoManager(host.GetNodeName(), host, migratedPlugins)
+
+	// This function prevents Kubelet from posting Ready status until CSINode
+	// is both installed and initialized
+	if err := initializeCSINode(host); err != nil {
+		return errors.New(log("failed to initialize CSINode: %v", err))
+	}
+
+	return nil
+}
+
+func initializeCSINode(host volume.VolumeHost) error {
+	kvh, ok := host.(volume.KubeletVolumeHost)
+	if !ok {
+		klog.V(4).Info("Cast from VolumeHost to KubeletVolumeHost failed. Skipping CSINode initialization, not running on kubelet")
+
+error: patch failed: deps/github.com/openshift/kubernetes/pkg/volume/csi/csi_plugin.go:243
+Applying patch deps/github.com/openshift/kubernetes/pkg/volume/csi/csi_plugin.go with 1 reject...
+Rejected hunk #1.
+make: *** [Makefile:318: patch-deps] Error 1
+==================================================
+rebase_ai_model_serving.sh:
+[34mRebasing AI Model Serving for MicroShift to registry.redhat.io/rhoai/odh-operator-bundle:v2.20[00m
+[34mFetching RHOAI CSV[00m
+[34mFetching RHOAI manifests[00m
+[34mUpdating last_rebase_ai_model_serving.sh[00m
+[34mUpdating rebase_job_entrypoint.sh[00m
+[34mCopying manifests from staging dir to assets/[00m
+2025-07-22 04:28:30,052     INFO       Not clearing dir optional/ai-model-serving/
+2025-07-22 04:28:30,052     WARNING    Ignoring optional/ai-model-serving/release-ai-model-serving-x86_64.json because Release info file
+2025-07-22 04:28:30,052     INFO       Not clearing dir optional/ai-model-serving/kserve/
+2025-07-22 04:28:30,052     WARNING    Ignoring optional/ai-model-serving/kserve/kustomization.yaml because MicroShift specific overrides
+2025-07-22 04:28:30,052     WARNING    Ignoring optional/ai-model-serving/kserve/inferenceservice-config-microshift-patch.yaml because MicroShift specific overrides
+2025-07-22 04:28:30,052     WARNING    Ignoring optional/ai-model-serving/kserve/namespace.yaml because MicroShift specific overrides
+2025-07-22 04:28:30,052     INFO       Clearing directory assets/optional/ai-model-serving/kserve/overlays/odh/
+2025-07-22 04:28:30,053     DEBUG      Copying assets/optional/ai-model-serving/kserve/overlays/odh/inferenceservice-config-patch.yaml <- _output/staging/rhoai/operator/kserve/overlays/odh/inferenceservice-config-patch.yaml
+2025-07-22 04:28:30,053     DEBUG      Copying assets/optional/ai-model-serving/kserve/overlays/odh/kustomization.yaml <- _output/staging/rhoai/operator/kserve/overlays/odh/kustomization.yaml
+2025-07-22 04:28:30,053     DEBUG      Copying assets/optional/ai-model-serving/kserve/overlays/odh/params.env <- _output/staging/rhoai/operator/kserve/overlays/odh/params.env
+2025-07-22 04:28:30,053     DEBUG      Copying assets/optional/ai-model-serving/kserve/overlays/odh/params.yaml <- _output/staging/rhoai/operator/kserve/overlays/odh/params.yaml
+2025-07-22 04:28:30,053     DEBUG      Copying assets/optional/ai-model-serving/kserve/overlays/odh/remove-namespace.yaml <- _output/staging/rhoai/operator/kserve/overlays/odh/remove-namespace.yaml
+2025-07-22 04:28:30,054     DEBUG      Copying assets/optional/ai-model-serving/kserve/overlays/odh/set-resources-manager-patch.yaml <- _output/staging/rhoai/operator/kserve/overlays/odh/set-resources-manager-patch.yaml
+2025-07-22 04:28:30,054     DEBUG      Copying assets/optional/ai-model-serving/kserve/overlays/odh/user-cluster-roles.yaml <- _output/staging/rhoai/operator/kserve/overlays/odh/user-cluster-roles.yaml
+2025-07-22 04:28:30,054     INFO       Clearing directory assets/optional/ai-model-serving/kserve/default/
+2025-07-22 04:28:30,055     DEBUG      Copying assets/optional/ai-model-serving/kserve/default/cainjection_conversion_webhook.yaml <- _output/staging/rhoai/operator/kserve/default/cainjection_conversion_webhook.yaml
+2025-07-22 04:28:30,055     DEBUG      Copying assets/optional/ai-model-serving/kserve/default/clusterservingruntime_validatingwebhook_cainjection_patch.yaml <- _output/staging/rhoai/operator/kserve/default/clusterservingruntime_validatingwebhook_cainjection_patch.yaml
+2025-07-22 04:28:30,056     DEBUG      Copying assets/optional/ai-model-serving/kserve/default/inferencegraph_validatingwebhook_cainjection_patch.yaml <- _output/staging/rhoai/operator/kserve/default/inferencegraph_validatingwebhook_cainjection_patch.yaml
+2025-07-22 04:28:30,056     DEBUG      Copying assets/optional/ai-model-serving/kserve/default/isvc_mutatingwebhook_cainjection_patch.yaml <- _output/staging/rhoai/operator/kserve/default/isvc_mutatingwebhook_cainjection_patch.yaml
+2025-07-22 04:28:30,056     DEBUG      Copying assets/optional/ai-model-serving/kserve/default/isvc_validatingwebhook_cainjection_patch.yaml <- _output/staging/rhoai/operator/kserve/default/isvc_validatingwebhook_cainjection_patch.yaml
+2025-07-22 04:28:30,056     DEBUG      Copying assets/optional/ai-model-serving/kserve/default/kustomization.yaml <- _output/staging/rhoai/operator/kserve/default/kustomization.yaml
+2025-07-22 04:28:30,056     DEBUG      Copying assets/optional/ai-model-serving/kserve/default/localmodel_manager_image_patch.yaml <- _output/staging/rhoai/operator/kserve/default/localmodel_manager_image_patch.yaml
+2025-07-22 04:28:30,056     DEBUG      Copying assets/optional/ai-model-serving/kserve/default/manager_auth_proxy_patch.yaml <- _output/staging/rhoai/operator/kserve/default/manager_auth_proxy_patch.yaml
+2025-07-22 04:28:30,057     DEBUG      Copying assets/optional/ai-model-serving/kserve/default/manager_image_patch.yaml <- _output/staging/rhoai/operator/kserve/default/manager_image_patch.yaml
+2025-07-22 04:28:30,057     DEBUG      Copying assets/optional/ai-model-serving/kserve/default/manager_prometheus_metrics_patch.yaml <- _output/staging/rhoai/operator/kserve/default/manager_prometheus_metrics_patch.yaml
+2025-07-22 04:28:30,057     DEBUG      Copying assets/optional/ai-model-serving/kserve/default/manager_resources_patch.yaml <- _output/staging/rhoai/operator/kserve/default/manager_resources_patch.yaml
+2025-07-22 04:28:30,057     DEBUG      Copying assets/optional/ai-model-serving/kserve/default/network-policies.yaml <- _output/staging/rhoai/operator/kserve/default/network-policies.yaml
+2025-07-22 04:28:30,058     DEBUG      Copying assets/optional/ai-model-serving/kserve/default/servingruntime_validationwebhook_cainjection_patch.yaml <- _output/staging/rhoai/operator/kserve/default/servingruntime_validationwebhook_cainjection_patch.yaml
+2025-07-22 04:28:30,058     DEBUG      Copying assets/optional/ai-model-serving/kserve/default/svc_webhook_cainjection_patch.yaml <- _output/staging/rhoai/operator/kserve/default/svc_webhook_cainjection_patch.yaml
+2025-07-22 04:28:30,058     DEBUG      Copying assets/optional/ai-model-serving/kserve/default/trainedmodel_validatingwebhook_cainjection_patch.yaml <- _output/staging/rhoai/operator/kserve/default/trainedmodel_validatingwebhook_cainjection_patch.yaml
+2025-07-22 04:28:30,058     INFO       Clearing directory assets/optional/ai-model-serving/kserve/crd/
+2025-07-22 04:28:30,059     DEBUG      Copying assets/optional/ai-model-serving/kserve/crd/kustomization.yaml <- _output/staging/rhoai/operator/kserve/crd/kustomization.yaml
+2025-07-22 04:28:30,059     DEBUG      Copying assets/optional/ai-model-serving/kserve/crd/full/serving.kserve.io_clusterlocalmodels.yaml <- _output/staging/rhoai/operator/kserve/crd/full/serving.kserve.io_clusterlocalmodels.yaml
+2025-07-22 04:28:30,060     DEBUG      Copying assets/optional/ai-model-serving/kserve/crd/full/serving.kserve.io_clusterservingruntimes.yaml <- _output/staging/rhoai/operator/kserve/crd/full/serving.kserve.io_clusterservingruntimes.yaml
+2025-07-22 04:28:30,060     DEBUG      Copying assets/optional/ai-model-serving/kserve/crd/full/serving.kserve.io_clusterstoragecontainers.yaml <- _output/staging/rhoai/operator/kserve/crd/full/serving.kserve.io_clusterstoragecontainers.yaml
+2025-07-22 04:28:30,060     DEBUG      Copying assets/optional/ai-model-serving/kserve/crd/full/serving.kserve.io_inferencegraphs.yaml <- _output/staging/rhoai/operator/kserve/crd/full/serving.kserve.io_inferencegraphs.yaml
+2025-07-22 04:28:30,060     DEBUG      Copying assets/optional/ai-model-serving/kserve/crd/full/serving.kserve.io_inferenceservices.yaml <- _output/staging/rhoai/operator/kserve/crd/full/serving.kserve.io_inferenceservices.yaml
+2025-07-22 04:28:30,061     DEBUG      Copying assets/optional/ai-model-serving/kserve/crd/full/serving.kserve.io_localmodelnodegroups.yaml <- _output/staging/rhoai/operator/kserve/crd/full/serving.kserve.io_localmodelnodegroups.yaml
+2025-07-22 04:28:30,061     DEBUG      Copying assets/optional/ai-model-serving/kserve/crd/full/serving.kserve.io_servingruntimes.yaml <- _output/staging/rhoai/operator/kserve/crd/full/serving.kserve.io_servingruntimes.yaml
+2025-07-22 04:28:30,062     DEBUG      Copying assets/optional/ai-model-serving/kserve/crd/full/serving.kserve.io_trainedmodels.yaml <- _output/staging/rhoai/operator/kserve/crd/full/serving.kserve.io_trainedmodels.yaml
+2025-07-22 04:28:30,062     DEBUG      Copying assets/optional/ai-model-serving/kserve/crd/patches/protocol.yaml <- _output/staging/rhoai/operator/kserve/crd/patches/protocol.yaml
+2025-07-22 04:28:30,062     INFO       Clearing directory assets/optional/ai-model-serving/kserve/configmap/
+2025-07-22 04:28:30,063     DEBUG      Copying assets/optional/ai-model-serving/kserve/configmap/kustomization.yaml <- _output/staging/rhoai/operator/kserve/configmap/kustomization.yaml
+2025-07-22 04:28:30,063     DEBUG      Copying assets/optional/ai-model-serving/kserve/configmap/inferenceservice.yaml <- _output/staging/rhoai/operator/kserve/configmap/inferenceservice.yaml
+2025-07-22 04:28:30,063     INFO       Clearing directory assets/optional/ai-model-serving/kserve/rbac/
+2025-07-22 04:28:30,064     DEBUG      Copying assets/optional/ai-model-serving/kserve/rbac/auth_proxy_role_binding.yaml <- _output/staging/rhoai/operator/kserve/rbac/auth_proxy_role_binding.yaml
+2025-07-22 04:28:30,064     DEBUG      Copying assets/optional/ai-model-serving/kserve/rbac/auth_proxy_role.yaml <- _output/staging/rhoai/operator/kserve/rbac/auth_proxy_role.yaml
+2025-07-22 04:28:30,064     DEBUG      Copying assets/optional/ai-model-serving/kserve/rbac/auth_proxy_service.yaml <- _output/staging/rhoai/operator/kserve/rbac/auth_proxy_service.yaml
+2025-07-22 04:28:30,064     DEBUG      Copying assets/optional/ai-model-serving/kserve/rbac/kustomization.yaml <- _output/staging/rhoai/operator/kserve/rbac/kustomization.yaml
+2025-07-22 04:28:30,065     DEBUG      Copying assets/optional/ai-model-serving/kserve/rbac/leader_election_role_binding.yaml <- _output/staging/rhoai/operator/kserve/rbac/leader_election_role_binding.yaml
+2025-07-22 04:28:30,065     DEBUG      Copying assets/optional/ai-model-serving/kserve/rbac/leader_election_role.yaml <- _output/staging/rhoai/operator/kserve/rbac/leader_election_role.yaml
+2025-07-22 04:28:30,065     DEBUG      Copying assets/optional/ai-model-serving/kserve/rbac/role_binding.yaml <- _output/staging/rhoai/operator/kserve/rbac/role_binding.yaml
+2025-07-22 04:28:30,065     DEBUG      Copying assets/optional/ai-model-serving/kserve/rbac/role.yaml <- _output/staging/rhoai/operator/kserve/rbac/role.yaml
+2025-07-22 04:28:30,065     DEBUG      Copying assets/optional/ai-model-serving/kserve/rbac/service_account.yaml <- _output/staging/rhoai/operator/kserve/rbac/service_account.yaml
+2025-07-22 04:28:30,066     DEBUG      Copying assets/optional/ai-model-serving/kserve/rbac/localmodel/role_binding.yaml <- _output/staging/rhoai/operator/kserve/rbac/localmodel/role_binding.yaml
+2025-07-22 04:28:30,066     DEBUG      Copying assets/optional/ai-model-serving/kserve/rbac/localmodel/role.yaml <- _output/staging/rhoai/operator/kserve/rbac/localmodel/role.yaml
+2025-07-22 04:28:30,066     DEBUG      Copying assets/optional/ai-model-serving/kserve/rbac/localmodel/service_account.yaml <- _output/staging/rhoai/operator/kserve/rbac/localmodel/service_account.yaml
+2025-07-22 04:28:30,066     INFO       Clearing directory assets/optional/ai-model-serving/kserve/manager/
+2025-07-22 04:28:30,067     DEBUG      Copying assets/optional/ai-model-serving/kserve/manager/kustomization.yaml <- _output/staging/rhoai/operator/kserve/manager/kustomization.yaml
+2025-07-22 04:28:30,067     DEBUG      Copying assets/optional/ai-model-serving/kserve/manager/manager.yaml <- _output/staging/rhoai/operator/kserve/manager/manager.yaml
+2025-07-22 04:28:30,067     DEBUG      Copying assets/optional/ai-model-serving/kserve/manager/service.yaml <- _output/staging/rhoai/operator/kserve/manager/service.yaml
+2025-07-22 04:28:30,067     INFO       Clearing directory assets/optional/ai-model-serving/kserve/webhook/
+2025-07-22 04:28:30,068     DEBUG      Copying assets/optional/ai-model-serving/kserve/webhook/kustomization.yaml <- _output/staging/rhoai/operator/kserve/webhook/kustomization.yaml
+2025-07-22 04:28:30,068     DEBUG      Copying assets/optional/ai-model-serving/kserve/webhook/manifests.yaml <- _output/staging/rhoai/operator/kserve/webhook/manifests.yaml
+2025-07-22 04:28:30,068     DEBUG      Copying assets/optional/ai-model-serving/kserve/webhook/service.yaml <- _output/staging/rhoai/operator/kserve/webhook/service.yaml
+2025-07-22 04:28:30,068     INFO       Clearing directory assets/optional/ai-model-serving/runtimes/
+2025-07-22 04:28:30,069     INFO       Restoring assets/optional/ai-model-serving/runtimes/kustomization.yaml
+2025-07-22 04:28:30,069     DEBUG      Executing 'git restore assets/optional/ai-model-serving/runtimes/kustomization.yaml'
+2025-07-22 04:28:30,114     WARNING    Ignoring optional/ai-model-serving/runtimes/kustomization.x86_64.yaml because Generated during rebase
+2025-07-22 04:28:30,114     DEBUG      Copying assets/optional/ai-model-serving/runtimes/caikit-standalone.yaml <- _output/staging/rhoai/operator/modelcontroller/runtimes/caikit-standalone-template.yaml
+2025-07-22 04:28:30,115     DEBUG      Copying assets/optional/ai-model-serving/runtimes/caikit-tgis.yaml <- _output/staging/rhoai/operator/modelcontroller/runtimes/caikit-tgis-template.yaml
+2025-07-22 04:28:30,115     DEBUG      Copying assets/optional/ai-model-serving/runtimes/ovms-kserve.yaml <- _output/staging/rhoai/operator/modelcontroller/runtimes/ovms-kserve-template.yaml
+2025-07-22 04:28:30,115     DEBUG      Copying assets/optional/ai-model-serving/runtimes/tgis.yaml <- _output/staging/rhoai/operator/modelcontroller/runtimes/tgis-template.yaml
+2025-07-22 04:28:30,115     DEBUG      Copying assets/optional/ai-model-serving/runtimes/vllm-gaudi.yaml <- _output/staging/rhoai/operator/modelcontroller/runtimes/vllm-gaudi-template.yaml
+2025-07-22 04:28:30,115     DEBUG      Copying assets/optional/ai-model-serving/runtimes/vllm-rocm.yaml <- _output/staging/rhoai/operator/modelcontroller/runtimes/vllm-rocm-template.yaml
+2025-07-22 04:28:30,115     DEBUG      Copying assets/optional/ai-model-serving/runtimes/vllm.yaml <- _output/staging/rhoai/operator/modelcontroller/runtimes/vllm-template.yaml
+[34mInitializing release.json file[00m
+[34mDropping template containers from ServingRuntimes and changing them to ClusterServingRuntimes[00m
+[34mCreating ClusterServingRuntimes images kustomization[00m
+[34mNo changes to assets/ or last_rebase_ai_model_serving.sh[00m
+[34mRemoving staging directory[00m
