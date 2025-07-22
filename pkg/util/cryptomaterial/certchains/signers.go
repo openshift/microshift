@@ -20,8 +20,8 @@ import (
 type CSRInfo interface{ GetMeta() CSRMeta }
 
 type CSRMeta struct {
-	Name         string
-	ValidityDays int
+	Name     string
+	Validity time.Duration
 }
 
 type ClientCertificateSigningRequestInfo struct {
@@ -50,10 +50,10 @@ type PeerCertificateSigningRequestInfo struct {
 func (i *PeerCertificateSigningRequestInfo) GetMeta() CSRMeta { return i.CSRMeta }
 
 type CertificateSigner struct {
-	signerName         string
-	signerConfig       *crypto.CA
-	signerDir          string
-	signerValidityDays int
+	signerName     string
+	signerConfig   *crypto.CA
+	signerDir      string
+	signerValidity time.Duration
 
 	subCAs             map[string]*CertificateSigner
 	signedCertificates map[string]*signedCertificateInfo
@@ -119,7 +119,7 @@ func (s *CertificateSigner) regenerateSelf() error {
 		cryptomaterial.CAKeyPath(s.signerDir),
 		cryptomaterial.CASerialsPath(s.signerDir),
 		s.signerName,
-		s.signerValidityDays,
+		s.signerValidity,
 	)
 
 	if err != nil {
@@ -229,7 +229,7 @@ func (s *CertificateSigner) AddToBundles(bundlePaths ...string) error {
 }
 
 func (s *CertificateSigner) toBuilder() CertificateSignerBuilder { //nolint:ireturn
-	signer := NewCertificateSigner(s.signerName, s.signerDir, s.signerValidityDays)
+	signer := NewCertificateSigner(s.signerName, s.signerDir, s.signerValidity)
 
 	for _, subCA := range s.subCAs {
 		signer = signer.WithSubCAs(subCA.toBuilder())
@@ -276,7 +276,7 @@ func (s *CertificateSigner) SignSubCA(subSignerInfo CertificateSignerBuilder) er
 		cryptomaterial.CAKeyPath(subSignerDir),
 		cryptomaterial.CASerialsPath(subSignerDir),
 		subSignerName,
-		subSignerInfo.ValidityDays(),
+		subSignerInfo.Validity(),
 	)
 	if err != nil {
 		return fmt.Errorf("failed to generate sub-CA %q: %w", subSignerName, err)
@@ -314,7 +314,7 @@ func (s *CertificateSigner) SignClientCertificate(signInfo *ClientCertificateSig
 		cryptomaterial.ClientCertPath(certDir),
 		cryptomaterial.ClientKeyPath(certDir),
 		signInfo.UserInfo,
-		signInfo.ValidityDays,
+		signInfo.Validity,
 	)
 
 	if err != nil {
@@ -335,7 +335,7 @@ func (s *CertificateSigner) SignServingCertificate(signInfo *ServingCertificateS
 		cryptomaterial.ServingCertPath(certDir),
 		cryptomaterial.ServingKeyPath(certDir),
 		sets.New[string](signInfo.Hostnames...),
-		signInfo.ValidityDays,
+		signInfo.Validity,
 	)
 
 	if err != nil {
@@ -363,7 +363,7 @@ func (s *CertificateSigner) SignPeerCertificate(signInfo *PeerCertificateSigning
 
 	tlsConfig, err := s.signerConfig.MakeServerCertForDuration(
 		hostnameSet,
-		time.Duration(signInfo.ValidityDays)*24*time.Hour,
+		signInfo.Validity,
 		func(certTemplate *x509.Certificate) error {
 			certTemplate.Subject = userToSubject(signInfo.UserInfo)
 			certTemplate.ExtKeyUsage = []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth, x509.ExtKeyUsageServerAuth}
@@ -433,19 +433,19 @@ func signedCertificateInfoMapKeysOrdered(stringMap map[string]*signedCertificate
 }
 
 // libraryGoEnsureSubCA comes from lib-go 4.12, use (ca *CA) EnsureSubCA from there once we get the updated lib-go
-func libraryGoEnsureSubCA(ca *crypto.CA, certFile, keyFile, serialFile, name string, expireDays int) (*crypto.CA, bool, error) {
+func libraryGoEnsureSubCA(ca *crypto.CA, certFile, keyFile, serialFile, name string, expire time.Duration) (*crypto.CA, bool, error) {
 	if subCA, err := crypto.GetCA(certFile, keyFile, serialFile); err == nil {
 		return subCA, false, nil
 	}
-	subCA, err := libraryGoMakeAndWriteSubCA(ca, certFile, keyFile, serialFile, name, expireDays)
+	subCA, err := libraryGoMakeAndWriteSubCA(ca, certFile, keyFile, serialFile, name, expire)
 	return subCA, true, err
 }
 
 // lilibraryGoMakeAndWriteSubCA comes from lib-go 4.12, use (ca *CA) MakeAndWriteSubCA from there once we get the updated lib-go
-func libraryGoMakeAndWriteSubCA(ca *crypto.CA, certFile, keyFile, serialFile, name string, expireDays int) (*crypto.CA, error) {
+func libraryGoMakeAndWriteSubCA(ca *crypto.CA, certFile, keyFile, serialFile, name string, expire time.Duration) (*crypto.CA, error) {
 	klog.V(4).Infof("Generating sub-CA certificate in %s, key in %s, serial in %s", certFile, keyFile, serialFile)
 
-	subCAConfig, err := crypto.MakeCAConfigForDuration(name, time.Duration(expireDays)*time.Hour*24, ca)
+	subCAConfig, err := crypto.MakeCAConfigForDuration(name, expire, ca)
 	if err != nil {
 		return nil, err
 	}

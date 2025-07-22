@@ -15,14 +15,6 @@ import (
 )
 
 const (
-	// CertificateNotBeforeAnnotation contains the certificate expiration date in RFC3339 format.
-	CertificateNotBeforeAnnotation = "auth.openshift.io/certificate-not-before"
-	// CertificateNotAfterAnnotation contains the certificate expiration date in RFC3339 format.
-	CertificateNotAfterAnnotation = "auth.openshift.io/certificate-not-after"
-	// CertificateIssuer contains the common name of the certificate that signed another certificate.
-	CertificateIssuer = "auth.openshift.io/certificate-issuer"
-	// CertificateHostnames contains the hostnames used by a signer.
-	CertificateHostnames = "auth.openshift.io/certificate-hostnames"
 	// RunOnceContextKey is a context value key that can be used to call the controller Sync() and make it only run the syncWorker once and report error.
 	RunOnceContextKey = "cert-rotation-controller.openshift.io/run-once"
 )
@@ -130,7 +122,7 @@ func (c CertRotationController) getSigningCertKeyPairLocation() string {
 
 func (c CertRotationController) SyncWorker(ctx context.Context) error {
 	signingCertKeyPair, _, err := c.RotatedSigningCASecret.EnsureSigningCertKeyPair(ctx)
-	if err != nil {
+	if err != nil || signingCertKeyPair == nil {
 		return err
 	}
 

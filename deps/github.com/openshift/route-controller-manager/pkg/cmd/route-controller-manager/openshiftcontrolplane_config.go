@@ -28,8 +28,6 @@ func asOpenshiftControllerManagerConfig(config *unstructured.Unstructured) (*ope
 }
 
 func setRecommendedOpenShiftControllerConfigDefaults(config *openshiftcontrolplanev1.OpenShiftControllerManagerConfig) {
-	configdefaults.SetRecommendedKubeClientConfigDefaults(&config.KubeClientConfig)
-
 	configdefaults.DefaultStringSlice(&config.Controllers, []string{"*"})
 
 	if config.ResourceQuota.MinResyncPeriod.Duration == 0 {

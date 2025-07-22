@@ -20,6 +20,7 @@ import (
 	"path/filepath"
 	"reflect"
 	"testing"
+	"time"
 
 	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/util/cryptomaterial/certchains"
@@ -43,11 +44,11 @@ func Test_certsToRegenerate(t *testing.T) {
 		{
 			name: "no cert to regenerate",
 			chains: mustComplete(t,
-				certchains.NewCertificateChains(certchains.NewCertificateSigner("signer", t.TempDir(), 365).
+				certchains.NewCertificateChains(certchains.NewCertificateSigner("signer", t.TempDir(), 365*24*time.Hour).
 					WithClientCertificates(&certchains.ClientCertificateSigningRequestInfo{
 						CSRMeta: certchains.CSRMeta{
-							Name:         "somename",
-							ValidityDays: 280,
+							Name:     "somename",
+							Validity: 280 * 24 * time.Hour,
 						},
 						UserInfo: &user.DefaultInfo{Name: "someclient"},
 					}),
@@ -57,11 +58,11 @@ func Test_certsToRegenerate(t *testing.T) {
 		{
 			name: "signer needs regen",
 			chains: mustComplete(t,
-				certchains.NewCertificateChains(certchains.NewCertificateSigner("signer", t.TempDir(), 140).
+				certchains.NewCertificateChains(certchains.NewCertificateSigner("signer", t.TempDir(), 140*24*time.Hour).
 					WithClientCertificates(&certchains.ClientCertificateSigningRequestInfo{
 						CSRMeta: certchains.CSRMeta{
-							Name:         "somename",
-							ValidityDays: 270,
+							Name:     "somename",
+							Validity: 270 * 24 * time.Hour,
 						},
 						UserInfo: &user.DefaultInfo{Name: "someclient"},
 					}),
@@ -71,11 +72,11 @@ func Test_certsToRegenerate(t *testing.T) {
 		{
 			name: "leaf cert needs regen",
 			chains: mustComplete(t,
-				certchains.NewCertificateChains(certchains.NewCertificateSigner("signer", t.TempDir(), 270).
+				certchains.NewCertificateChains(certchains.NewCertificateSigner("signer", t.TempDir(), 270*24*time.Hour).
 					WithClientCertificates(&certchains.ClientCertificateSigningRequestInfo{
 						CSRMeta: certchains.CSRMeta{
-							Name:         "somename",
-							ValidityDays: 150,
+							Name:     "somename",
+							Validity: 150 * 24 * time.Hour,
 						},
 						UserInfo: &user.DefaultInfo{Name: "someclient"},
 					}),
@@ -86,11 +87,11 @@ func Test_certsToRegenerate(t *testing.T) {
 		{
 			name: "leaf cert needs regen",
 			chains: mustComplete(t,
-				certchains.NewCertificateChains(certchains.NewCertificateSigner("signer", t.TempDir(), 270).
+				certchains.NewCertificateChains(certchains.NewCertificateSigner("signer", t.TempDir(), 270*24*time.Hour).
 					WithClientCertificates(&certchains.ClientCertificateSigningRequestInfo{
 						CSRMeta: certchains.CSRMeta{
-							Name:         "somename",
-							ValidityDays: 150,
+							Name:     "somename",
+							Validity: 150 * 24 * time.Hour,
 						},
 						UserInfo: &user.DefaultInfo{Name: "someclient"},
 					}),
@@ -101,11 +102,11 @@ func Test_certsToRegenerate(t *testing.T) {
 		{
 			name: "both need regen",
 			chains: mustComplete(t,
-				certchains.NewCertificateChains(certchains.NewCertificateSigner("signer", t.TempDir(), 160).
+				certchains.NewCertificateChains(certchains.NewCertificateSigner("signer", t.TempDir(), 160*24*time.Hour).
 					WithClientCertificates(&certchains.ClientCertificateSigningRequestInfo{
 						CSRMeta: certchains.CSRMeta{
-							Name:         "somename",
-							ValidityDays: 150,
+							Name:     "somename",
+							Validity: 150 * 24 * time.Hour,
 						},
 						UserInfo: &user.DefaultInfo{Name: "someclient"},
 					}),

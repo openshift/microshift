@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"reflect"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
 
@@ -27,32 +28,32 @@ func Test_certificateSigner_Complete(t *testing.T) {
 	}{
 		{
 			name: "general test",
-			testSigner: NewCertificateSigner("test-signer-signer", filepath.Join(tmpDir, "generalTest"), 1).
+			testSigner: NewCertificateSigner("test-signer-signer", filepath.Join(tmpDir, "generalTest"), 1*24*time.Hour).
 				WithClientCertificates(
 					&ClientCertificateSigningRequestInfo{
 						CSRMeta: CSRMeta{
-							Name:         "test-client",
-							ValidityDays: 1,
+							Name:     "test-client",
+							Validity: 1 * 24 * time.Hour,
 						},
 						UserInfo: &user.DefaultInfo{Name: "test-user", Groups: []string{"test-group1", "test-group2"}},
 					},
 					&ClientCertificateSigningRequestInfo{
 						CSRMeta: CSRMeta{
-							Name:         "test-client2",
-							ValidityDays: 1,
+							Name:     "test-client2",
+							Validity: 1 * 24 * time.Hour,
 						},
 						UserInfo: &user.DefaultInfo{Name: "test-user", Groups: []string{"test-group1", "test-group2"}},
 					},
 				).WithServingCertificates(
 				&ServingCertificateSigningRequestInfo{
 					CSRMeta: CSRMeta{
-						Name:         "test-server",
-						ValidityDays: 1,
+						Name:     "test-server",
+						Validity: 1 * 24 * time.Hour,
 					},
 					Hostnames: []string{"localhost", "127.0.0.1"},
 				},
 			).
-				WithSubCAs(NewCertificateSigner("test-signer", filepath.Join(tmpDir, "test-signer"), 1)),
+				WithSubCAs(NewCertificateSigner("test-signer", filepath.Join(tmpDir, "test-signer"), 1*24*time.Hour)),
 			wantCerts:  []string{"test-client", "test-client2", "test-server"},
 			wantSubCAs: []string{"test-signer"},
 		},
@@ -89,38 +90,38 @@ func TestCertificateSigner_Regenerate(t *testing.T) {
 	}
 
 	testSigner := mustCompleteSigner(t,
-		NewCertificateSigner("test-signer-signer", filepath.Join(tmpDir, "root"), 1).
+		NewCertificateSigner("test-signer-signer", filepath.Join(tmpDir, "root"), 1*24*time.Hour).
 			WithClientCertificates(
 				&ClientCertificateSigningRequestInfo{
 					CSRMeta: CSRMeta{
-						Name:         "test-client",
-						ValidityDays: 1,
+						Name:     "test-client",
+						Validity: 1 * 24 * time.Hour,
 					},
 					UserInfo: &user.DefaultInfo{Name: "test-user", Groups: []string{"test-group1", "test-group2"}},
 				},
 				&ClientCertificateSigningRequestInfo{
 					CSRMeta: CSRMeta{
-						Name:         "test-client2",
-						ValidityDays: 1,
+						Name:     "test-client2",
+						Validity: 1 * 24 * time.Hour,
 					},
 					UserInfo: &user.DefaultInfo{Name: "test-user", Groups: []string{"test-group1", "test-group2"}},
 				},
 			).WithServingCertificates(
 			&ServingCertificateSigningRequestInfo{
 				CSRMeta: CSRMeta{
-					Name:         "test-server",
-					ValidityDays: 1,
+					Name:     "test-server",
+					Validity: 1 * 24 * time.Hour,
 				},
 				Hostnames: []string{"localhost", "127.0.0.1"},
 			},
 		).WithSubCAs(
-			NewCertificateSigner("test-signer", filepath.Join(tmpDir, "test-signer"), 1).
+			NewCertificateSigner("test-signer", filepath.Join(tmpDir, "test-signer"), 1*24*time.Hour).
 				WithSubCAs(
-					NewCertificateSigner("test-signer-sub", filepath.Join(tmpDir, "test-signer", "test-signer-sub"), 1).
+					NewCertificateSigner("test-signer-sub", filepath.Join(tmpDir, "test-signer", "test-signer-sub"), 1*24*time.Hour).
 						WithPeerCertificiates(&PeerCertificateSigningRequestInfo{
 							CSRMeta: CSRMeta{
-								Name:         "sub-peer",
-								ValidityDays: 1,
+								Name:     "sub-peer",
+								Validity: 1 * 24 * time.Hour,
 							},
 							UserInfo:  &user.DefaultInfo{Name: "test-peer"},
 							Hostnames: []string{"some.hostname.yay"},

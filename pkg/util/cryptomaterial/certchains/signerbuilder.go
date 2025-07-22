@@ -2,6 +2,7 @@ package certchains
 
 import (
 	"fmt"
+	"time"
 
 	"k8s.io/apimachinery/pkg/util/sets"
 
@@ -12,7 +13,7 @@ import (
 type SignerInfo interface {
 	Name() string
 	Directory() string
-	ValidityDays() int
+	Validity() time.Duration
 }
 
 type CertificateSignerBuilder interface {
@@ -28,9 +29,9 @@ type CertificateSignerBuilder interface {
 }
 
 type certificateSigner struct {
-	signerName         string
-	signerDir          string
-	signerValidityDays int
+	signerName     string
+	signerDir      string
+	signerValidity time.Duration
 
 	// signerConfig should only be used in case this is a sub-ca signer
 	// It should be populated during CertificateSigner.SignSubCA()
@@ -43,17 +44,17 @@ type certificateSigner struct {
 }
 
 // NewCertificateSigner returns a builder object for a certificate chain for the given signer
-func NewCertificateSigner(signerName, signerDir string, validityDays int) CertificateSignerBuilder {
+func NewCertificateSigner(signerName, signerDir string, validity time.Duration) CertificateSignerBuilder {
 	return &certificateSigner{
-		signerName:         signerName,
-		signerDir:          signerDir,
-		signerValidityDays: validityDays,
+		signerName:     signerName,
+		signerDir:      signerDir,
+		signerValidity: validity,
 	}
 }
 
-func (s *certificateSigner) Name() string      { return s.signerName }
-func (s *certificateSigner) Directory() string { return s.signerDir }
-func (s *certificateSigner) ValidityDays() int { return s.signerValidityDays }
+func (s *certificateSigner) Name() string            { return s.signerName }
+func (s *certificateSigner) Directory() string       { return s.signerDir }
+func (s *certificateSigner) Validity() time.Duration { return s.signerValidity }
 
 // WithSignerConfig uses the provided configuration in `config` to sign its
 // direct certificates.
@@ -105,7 +106,7 @@ func (s *certificateSigner) Complete() (*CertificateSigner, error) {
 			cryptomaterial.CAKeyPath(s.signerDir),
 			cryptomaterial.CASerialsPath(s.signerDir),
 			s.signerName,
-			s.signerValidityDays,
+			s.signerValidity,
 		)
 
 		if err != nil {
@@ -114,10 +115,10 @@ func (s *certificateSigner) Complete() (*CertificateSigner, error) {
 	}
 
 	signerCompleted := &CertificateSigner{
-		signerName:         s.signerName,
-		signerDir:          s.signerDir,
-		signerValidityDays: s.signerValidityDays,
-		signerConfig:       signerConfig,
+		signerName:     s.signerName,
+		signerDir:      s.signerDir,
+		signerValidity: s.signerValidity,
+		signerConfig:   signerConfig,
 
 		subCAs:             make(map[string]*CertificateSigner),
 		signedCertificates: make(map[string]*signedCertificateInfo),

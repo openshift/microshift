@@ -18,8 +18,8 @@ const (
 	PeerCertFileName   = "peer.crt"
 	PeerKeyFileName    = "peer.key"
 
-	LongLivedCertificateValidityDays  = 365 * 10
-	ShortLivedCertificateValidityDays = 365
+	ShortLivedCertificateValidity = 365 * 24 * time.Hour
+	LongLivedCertificateValidity  = 10 * ShortLivedCertificateValidity
 )
 
 func IsCertShortLived(c *x509.Certificate) bool {
