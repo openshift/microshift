@@ -1,0 +1,276 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: manager-role
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  - events
+  - namespaces
+  - pods
+  - secrets
+  - serviceaccounts
+  - services
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - serviceaccounts/token
+  verbs:
+  - create
+- apiGroups:
+  - acme.cert-manager.io
+  resources:
+  - challenges
+  - challenges/finalizers
+  - challenges/status
+  - orders
+  - orders/finalizers
+  - orders/status
+  verbs:
+  - create
+  - delete
+  - deletecollection
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - admissionregistration.k8s.io
+  resources:
+  - mutatingwebhookconfigurations
+  - validatingwebhookconfigurations
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - apiextensions.k8s.io
+  resources:
+  - customresourcedefinitions
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - apiregistration.k8s.io
+  resources:
+  - apiservices
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - apps
+  resources:
+  - deployments
+  - replicasets
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - cert-manager.io
+  resources:
+  - certificaterequests
+  - certificaterequests/finalizers
+  - certificaterequests/status
+  - certificates
+  - certificates/finalizers
+  - certificates/status
+  - clusterissuers
+  - clusterissuers/status
+  - issuers
+  - issuers/status
+  verbs:
+  - create
+  - delete
+  - deletecollection
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - cert-manager.io
+  resourceNames:
+  - clusterissuers.cert-manager.io/*
+  - issuers.cert-manager.io/*
+  resources:
+  - signers
+  verbs:
+  - approve
+- apiGroups:
+  - certificates.k8s.io
+  resources:
+  - certificatesigningrequests
+  - certificatesigningrequests/status
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - certificates.k8s.io
+  resources:
+  - signers
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - sign
+  - update
+  - watch
+- apiGroups:
+  - config.openshift.io
+  resources:
+  - certmanagers
+  - clusteroperators
+  - clusteroperators/status
+  - infrastructures
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - coordination.k8s.io
+  resources:
+  - leases
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - gateway.networking.k8s.io
+  resources:
+  - gateways
+  - gateways/finalizers
+  - httproutes
+  - httproutes/finalizers
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - networking.k8s.io
+  resources:
+  - ingresses
+  - ingresses/finalizers
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - operator.openshift.io
+  resources:
+  - certmanagers
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - operator.openshift.io
+  resources:
+  - certmanagers/finalizers
+  - istiocsrs/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - operator.openshift.io
+  resources:
+  - certmanagers/status
+  - istiocsrs/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - operator.openshift.io
+  resources:
+  - istiocsrs
+  verbs:
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - rbac.authorization.k8s.io
+  resources:
+  - clusterrolebindings
+  - clusterroles
+  - rolebindings
+  - roles
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - route.openshift.io
+  resources:
+  - routes
+  - routes/custom-host
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch

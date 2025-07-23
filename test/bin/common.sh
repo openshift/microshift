@@ -382,8 +382,8 @@ MICROSHIFT_Y1_OPTIONAL_RPMS_LIST=(
 )
 MICROSHIFT_OPTIONAL_RPMS_LIST=(
     "${MICROSHIFT_Y1_OPTIONAL_RPMS_LIST[@]}"
+    microshift-cert-manager
 )
-
 MICROSHIFT_Y1_X86_64_RPMS_LIST=(
     microshift-ai-model-serving
     microshift-ai-model-serving-release-info
