@@ -43,6 +43,10 @@ assets:
         git_restore: True
       - file: cluster-role-aggregate-admin-route.yaml
         git_restore: True
+      - file: ingress-class.yaml
+        ignore: "gets generated during image rebase"
+        git_restore: True
+
 
   - dir: components/ovn/
     ignore: "it's not covered by rebase script yet"
