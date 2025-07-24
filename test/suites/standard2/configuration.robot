@@ -139,9 +139,7 @@ Crio Uses Crun Runtime
     Should Contain    ${runtime}    crun
 
     ${stdout}    ${stderr}    ${rc}=    Command Execution    rpm -q microshift-low-latency
-    IF    ${rc} == 0
-        Should Contain    ${runtime}    high-performance
-    END
+    IF    ${rc} == 0    Should Contain    ${runtime}    high-performance
 
 
 *** Keywords ***
