@@ -28,9 +28,9 @@ pull_image "${VLLM_IMAGE}"
 pull_image quay.io/microshift/ai-testing-model:vllm-granite-3b-code-base-2k
 
 # Create ServingRuntime
-cp /usr/lib/microshift/manifests.d/050-microshift-ai-model-serving-runtimes/vllm.yaml /tmp/vllm.yaml
-sed -i "s,image: vllm-image,image: ${VLLM_IMAGE}," /tmp/vllm.yaml
-oc apply -n test-vllm -f /tmp/vllm.yaml
+cp /usr/lib/microshift/manifests.d/050-microshift-ai-model-serving-runtimes/vllm-cuda.yaml /tmp/vllm-cuda.yaml
+sed -i "s,image: vllm-image,image: ${VLLM_IMAGE}," /tmp/vllm-cuda.yaml
+oc apply -n test-vllm -f /tmp/vllm-cuda.yaml
 
 # Create InferenceService
 # --dtype=half will be passed through to the deployment and to the vLLM model server.
