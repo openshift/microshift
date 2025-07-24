@@ -1,9 +1,6 @@
-- kubernetes embedded-component d4983da31757e301ccbc050e8dfc7e5e0ec2c183 to d227d652fda9e7a56895a879ca225be9372d0a88
-  - 1c7001b78 2025-07-09T16:11:56+00:00 UPSTREAM: 130047: adjusting loopback certificate validity in kube-apiserver
+- ovn-kubernetes image-amd64 7141c6e7c9e304b7ae2607826420abe23d518a3e to 8fbb5635f96ed60cf0df5aabedfc6ee9698dbceb
+  - 92125ca 2025-07-07T17:24:53-04:00 Dockerfile: Remove ovs version pinning
 
-- kubernetes image-amd64 d4983da31757e301ccbc050e8dfc7e5e0ec2c183 to d227d652fda9e7a56895a879ca225be9372d0a88
-  - 1c7001b78 2025-07-09T16:11:56+00:00 UPSTREAM: 130047: adjusting loopback certificate validity in kube-apiserver
-
-- kubernetes image-arm64 d4983da31757e301ccbc050e8dfc7e5e0ec2c183 to d227d652fda9e7a56895a879ca225be9372d0a88
-  - 1c7001b78 2025-07-09T16:11:56+00:00 UPSTREAM: 130047: adjusting loopback certificate validity in kube-apiserver
+- ovn-kubernetes image-arm64 7141c6e7c9e304b7ae2607826420abe23d518a3e to 8fbb5635f96ed60cf0df5aabedfc6ee9698dbceb
+  - 92125ca 2025-07-07T17:24:53-04:00 Dockerfile: Remove ovs version pinning
 
