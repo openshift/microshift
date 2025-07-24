@@ -1313,8 +1313,31 @@ rebase_to() {
         echo "No changes to buildfiles."
     fi
 
+    update_cncf_kubelet_version
+    if [[ -n "$(git status -s scripts/multinode/configure-sec.sh)" ]]; then
+        title "## Committing changes to scripts/multinode/configure-sec.sh"
+        git add scripts/multinode/configure-sec.sh
+        git commit -m "update kubernetes version in CNCF scripts"
+    else
+        echo "No changes to Kubernetes version."
+    fi
+
     title "# Removing staging directory"
     rm -rf "${STAGING_DIR}"
+}
+
+update_cncf_kubelet_version() {
+    title "Updating Kubernetes version in CNCF scripts"
+
+    source "${REPOROOT}/Makefile.kube_git.var"
+    local -r kube_hash_amd64="$(curl -L https://dl.k8s.io/release/${KUBE_GIT_VERSION}/bin/linux/amd64/kubelet.sha256 2>/dev/null)"
+    local -r kube_hash_arm64="$(curl -L https://dl.k8s.io/release/${KUBE_GIT_VERSION}/bin/linux/arm64/kubelet.sha256 2>/dev/null)"
+
+    local -r target="${REPOROOT}/scripts/multinode/configure-sec.sh"
+    sed -i "s,# version=v1\.[0-9]*\.[0-9]*;,# version=${KUBE_GIT_VERSION};,g" "${target}"
+    sed -i "s,local -r version=.*,local -r version=\"${KUBE_GIT_VERSION}\",g" "${target}"
+    sed -i "s,local -r kube_hash_amd64=.*,local -r kube_hash_amd64=\"${kube_hash_amd64}\",g" "${target}"
+    sed -i "s,local -r kube_hash_arm64=.*,local -r kube_hash_arm64=\"${kube_hash_arm64}\",g" "${target}"
 }
 
 to_just_images() {
@@ -1354,6 +1377,7 @@ usage() {
     echo "$(basename "$0") generated-apis                                   Regenerates OpenAPIs"
     echo "$(basename "$0") images                                           Rebases the component images to the downloaded release"
     echo "$(basename "$0") manifests                                        Rebases the component manifests to the downloaded release"
+    echo "$(basename "$0") cncf-kube-version                                Updates kubelet version in configure-sec.sh to match version in Makefile.kube_git.var"
     exit 1
 }
 
@@ -1384,6 +1408,9 @@ case "$command" in
     manifests)
         copy_manifests
         update_openshift_manifests
+        ;;
+    cncf-kube-version)
+        update_cncf_kubelet_version
         ;;
     *) usage;;
 esac
