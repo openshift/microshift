@@ -612,6 +612,7 @@ install -p -m644 assets/optional/cert-manager/manager/*.yaml %{buildroot}/%{_pre
 install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/060-microshift-cert-manager/rbac
 install -p -m644 assets/optional/cert-manager/rbac/*.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/060-microshift-cert-manager/rbac
 install -p -m644 assets/optional/cert-manager/kustomization.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/060-microshift-cert-manager
+install -p -m755 packaging/greenboot/microshift-running-check-cert-manager.sh %{buildroot}%{_sysconfdir}/greenboot/check/required.d/60_microshift_running_check_cert_manager.sh
 
 # cert-manager-release-info
 mkdir -p -m755 %{buildroot}%{_datadir}/microshift/release
@@ -816,6 +817,7 @@ fi
 %files cert-manager
 %dir %{_prefix}/lib/microshift/manifests.d/060-microshift-cert-manager
 %{_prefix}/lib/microshift/manifests.d/060-microshift-cert-manager/*
+%{_sysconfdir}/greenboot/check/required.d/60_microshift_running_check_cert_manager.sh
 
 %files cert-manager-release-info
 %{_datadir}/microshift/release/release-cert-manager-{x86_64,aarch64}.json
@@ -824,6 +826,9 @@ fi
 # Use Git command to generate the log and replace the VERSION string
 # LANG=C git log --date="format:%a %b %d %Y" --pretty="tformat:* %cd %an <%ae> VERSION%n- %s%n" packaging/rpm/microshift.spec
 %changelog
+* Thu Jul 24 2025 Evgeny Slutsky <eslutsky@redhat.com> 4.20.0
+- Update microshift-cert-manager with greenboot script
+
 * Wed Jul 02 2025 Evgeny Slutsky <eslutsky@redhat.com> 4.20.0
 - Add an optional microshift-cert-manager RPM
 
