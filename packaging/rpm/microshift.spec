@@ -346,12 +346,14 @@ install -p -m755 scripts/microshift-sos-report.sh %{buildroot}%{_bindir}/microsh
 
 install -d -m755 %{buildroot}%{_sysconfdir}/crio/crio.conf.d
 
+install -p -m644 packaging/crio.conf.d/10-microshift_base.conf %{buildroot}%{_sysconfdir}/crio/crio.conf.d/10-microshift.conf
+
 %ifarch %{arm} aarch64
-install -p -m644 packaging/crio.conf.d/10-microshift_arm64.conf %{buildroot}%{_sysconfdir}/crio/crio.conf.d/10-microshift.conf
+cat packaging/crio.conf.d/10-microshift_arm64.conf >> %{buildroot}%{_sysconfdir}/crio/crio.conf.d/10-microshift.conf
 %endif
 
 %ifarch x86_64
-install -p -m644 packaging/crio.conf.d/10-microshift_amd64.conf %{buildroot}%{_sysconfdir}/crio/crio.conf.d/10-microshift.conf
+cat packaging/crio.conf.d/10-microshift_amd64.conf >> %{buildroot}%{_sysconfdir}/crio/crio.conf.d/10-microshift.conf
 %endif
 
 install -p -m644 packaging/crio.conf.d/11-microshift-ovn.conf %{buildroot}%{_sysconfdir}/crio/crio.conf.d/11-microshift-ovn.conf
