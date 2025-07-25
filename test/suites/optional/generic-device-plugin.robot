@@ -3,6 +3,7 @@ Documentation       Generic Device Plugin
 
 Resource            ../../resources/microshift-config.resource
 Resource            ../../resources/microshift-process.resource
+Resource            ../../resources/ostree-health.resource
 Variables           strings.py
 Library             strings.py
 
@@ -47,6 +48,7 @@ Disable GDP
     [Documentation]    Removes GDP configuration drop-in
     Remove Drop In MicroShift Config    10-gdp
     Restart MicroShift
+    Restart Greenboot And Wait For Success
 
 Enable Serialsim
     [Documentation]    Enables the serialsim kernel module.

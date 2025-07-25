@@ -21,7 +21,13 @@ Test Simple HTTP Route
     [Setup]    Run Keywords
     ...    Setup Namespace
     ...    Deploy Hello MicroShift
-    Create Gateway    ${GATEWAY_HOSTNAME}    ${GATEWAY_PORT}    ${NS_GATEWAY}
+    TRY
+        Create Gateway    ${GATEWAY_HOSTNAME}    ${GATEWAY_PORT}    ${NS_GATEWAY}
+    EXCEPT
+        Oc Logs    deploy/istiod-openshift-gateway-api    openshift-gateway-api
+        Oc Logs    deploy/servicemesh-operator3    openshift-gateway-api
+        Fail    Failed to create gateway
+    END
     Create HTTP Route    ${GATEWAY_HOSTNAME}    ${NS_GATEWAY}
     Access Hello MicroShift Success    ushift_port=${GATEWAY_PORT}    hostname=${GATEWAY_HOSTNAME}
     [Teardown]    Run Keywords
