@@ -1,0 +1,9 @@
+# AI Model Serving test depends on a OpenVino's resnet example model packaged as OCI image.
+# To build and push simply:
+# podman build -t quay.io/pmatusza/ai-testing-model:onnx-triton . && podman push quay.io/pmatusza/ai-testing-model:onnx-triton
+FROM quay.io/microshift/busybox:1.37
+RUN mkdir -p /models/densenet_onnx/1 && chmod -R 755 /models/densenet_onnx
+RUN wget -P -O /models/densenet_onnx/1/model.onnx \
+   https://github.com/onnx/models/raw/refs/heads/main/validated/vision/classification/densenet-121/model/densenet-12.onnx
+
+COPY config.pbtxt /models/densenet_onnx/config.pbtxt
