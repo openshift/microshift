@@ -92,7 +92,7 @@ fi
 #
 # New references can be obtained from:
 # https://catalog.redhat.com/software/containers/rhoai/odh-operator-bundle/659803ca929f3c931af06f28
-rhoai_release="registry.redhat.io/rhoai/odh-operator-bundle:v2.20"
+rhoai_release="registry.redhat.io/rhoai/odh-operator-bundle:v2.22"
 
 APP_ID=$(cat /secrets/pr-creds/app_id) \
 KEY=/secrets/pr-creds/key.pem \
