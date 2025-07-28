@@ -1,4 +1,8 @@
-- operator-framework-olm embedded-component 9fbe7d715495e7ac15081a475faa3b8bf526f799 to 14f5ca00370ba75eaae689caba5ee86aa411ea74
-  - e4bc847b 2025-07-11T10:45:51-04:00 OCPBUGS-37982: Reduce Frequency of Update Requests for Copied CSVs (#3597)
-  - aaa6cc12 2025-06-12T21:04:05+00:00 reduce cache expiriry frequency (#3591)
+- ovn-kubernetes image-amd64 3b4486bca363f366b28953f1bb5c1e64d84ceca4 to 399bcfd7e0225bd8eecf2afb58eef1ed37274a54
+  - e9cafcd5 2025-07-15T20:56:50+02:00 Pass hostSubnets to commonFlows to fix default network -> localnet
+  - e3a9624a 2025-07-15T20:56:46+02:00 Rename hostSubnets->subnets in newLocalGateway
+
+- ovn-kubernetes image-arm64 3b4486bca363f366b28953f1bb5c1e64d84ceca4 to 399bcfd7e0225bd8eecf2afb58eef1ed37274a54
+  - e9cafcd5 2025-07-15T20:56:50+02:00 Pass hostSubnets to commonFlows to fix default network -> localnet
+  - e3a9624a 2025-07-15T20:56:46+02:00 Rename hostSubnets->subnets in newLocalGateway
 
