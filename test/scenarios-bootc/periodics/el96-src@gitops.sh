@@ -13,6 +13,5 @@ scenario_remove_vms() {
 
 scenario_run_tests() {
     run_tests host1 \
-        --variable "EXPECTED_OS_VERSION:9.6" \
         suites/gitops/
 }

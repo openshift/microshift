@@ -8,16 +8,16 @@ Suite Teardown       Teardown
 
 
 *** Test Cases ***
-Verify GitOps Pods Start Correctly After Restart
+Verify GitOps Pods Start Correctly
     [Documentation]    Restarts MicroShift and waits for pods to enter a running state.
 
-    # Define the pods we need to check
+    # The pods we need to check
     @{expected_pods}=    Create List
     ...    argocd-application-controller
     ...    argocd-redis
     ...    argocd-repo-server
 
-    # Restart the service
+    # Restart the service to deploy GitOps pods
     Restart MicroShift
 
     Wait Until Keyword Succeeds    2min    10s
@@ -43,7 +43,7 @@ Verify Pods Are Running
     ${stdout}    ${rc}=    Run With Kubeconfig    oc get pods -n ${namespace}    return_rc=${True}
     Should Be Equal As Integers    ${rc}    0    Failed to run "oc get pods".
 
-    # Loop through each pod name and check its specific line for "Running"
+    # Loop through pod names and check if they're running
     FOR    ${pod_name}    IN    @{pod_names}
         ${pod_line}=    Get Lines Containing String    ${stdout}    ${pod_name}
         ${line_count}=    Get Line Count    ${pod_line}
