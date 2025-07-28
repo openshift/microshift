@@ -20,7 +20,6 @@ Verify GitOps Pods Start Correctly After Restart
     # Restart the service
     Restart MicroShift
 
-    # Wait up to 2 minutes for our verification keyword to pass, retrying every 10s
     Wait Until Keyword Succeeds    2min    10s
     ...    Verify Pods Are Running    openshift-gitops    @{expected_pods}
 
