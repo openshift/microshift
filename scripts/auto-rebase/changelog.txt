@@ -1,9 +1,3 @@
-- operator-framework-olm embedded-component 4a26a7efa70c754cae0ccafbd7730daa18afc151 to 583538413e0032f33ce2236e9ea503b85226554e
-  - c7732f01 2025-07-16T20:49:22+00:00 🐛 add catalog-operator control-plane-specific tolerations to unpack jobs (#3606)
-
-- ovn-kubernetes image-amd64 5a7022b60d2de3d368cfeb940e586feaf359172f to 4370f4637ce9adc94d7bd5fd01e587b471ee3284
-  - 82f3ae76 2025-07-21T21:15:39-07:00 Revert "unpin libreswan version"
-
-- ovn-kubernetes image-arm64 5a7022b60d2de3d368cfeb940e586feaf359172f to 4370f4637ce9adc94d7bd5fd01e587b471ee3284
-  - 82f3ae76 2025-07-21T21:15:39-07:00 Revert "unpin libreswan version"
+- machine-config-operator embedded-component a91d9a82cbd8c019986c9ce0ea01e513e6fdd6b1 to b80d590e99b9ea3d7c8d4126ce2f801c05856d1e
+  - 1c625a25 2025-05-27T16:55:36+00:00 OCPBUGS-36859: Support NODEIP_HINT in IPI deployments too
 
