@@ -1,6 +1,0 @@
-- ovn-kubernetes image-amd64 7141c6e7c9e304b7ae2607826420abe23d518a3e to 8fbb5635f96ed60cf0df5aabedfc6ee9698dbceb
-  - 92125ca 2025-07-07T17:24:53-04:00 Dockerfile: Remove ovs version pinning
-
-- ovn-kubernetes image-arm64 7141c6e7c9e304b7ae2607826420abe23d518a3e to 8fbb5635f96ed60cf0df5aabedfc6ee9698dbceb
-  - 92125ca 2025-07-07T17:24:53-04:00 Dockerfile: Remove ovs version pinning
-
