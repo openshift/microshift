@@ -1,0 +1,3 @@
+- operator-framework-olm embedded-component 650a3cd620865598f97b5a3eaaf88cf044e2ffb3 to 922674d862d36ec848a7cf364d669731edc9c038
+  - c4f53464 2025-06-12T21:04:47+00:00 reduce cache expiriry frequency (#3591)
+
