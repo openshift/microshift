@@ -1,42 +1,104 @@
-- api embedded-component 3333746edfbf7433025f29a387402e865800e75a to 0528f2f3e210684f361c3b3e1014edccde932bae
-  - 4e994703 2025-07-21T09:52:06-04:00 Revert "Merge pull request #2398 from everettraven/revert-2389-revert-2138-remove-rbr-crd-from-payload"
-  - 8fb1a5e5 2025-07-21T09:12:35-04:00 feat: promote tnf from devpreview to techpreview
-  - 1045a60a 2025-07-07T11:40:29+01:00 ipam, virt: remove the PersistentIPsForVirt FG
-  - 11cdf024 2025-06-23T14:05:02-06:00 Add ExternalSnapshotMetadata FeatureGate
+- api embedded-component 0528f2f3e210684f361c3b3e1014edccde932bae to 92b1455121e199fa2f3eb937ce9b68f910cb14e2
+  - 6ab9ce4b 2025-07-24T13:49:23-04:00 Remove "techpreview" filter on verify job
+  - 5ef34e93 2025-07-24T15:43:05+01:00 Update KAL to latest
+  - 60ac3d5f 2025-07-23T17:08:51-04:00 Drop SigstoreImageVerification from all sets for multi PR merge
+  - d1ee0517 2025-07-23T16:51:10-04:00 Add clusterimgepolicy/imagepolicy to payload
+  - 3043152c 2025-07-23T13:08:07-04:00 amended feature cluster profile just for SelfManaged
+  - 5e4827e7 2025-07-23T06:31:13-04:00 add NoRegistryClusterOperations feature gate
+  - 2bed99f5 2025-07-23T10:03:17+02:00 OCPBUGS-55661: Remove HardwareSpeed featuregate
+  - affbfc1c 2025-07-15T12:00:04Z Enable FeatureGateImageVolume by default.
 
-- cluster-kube-apiserver-operator embedded-component bac08ba99c07db702805339b41bcd6c5766fde22 to 2a82fec138d1d868e4bfa6f4ded847032b2bfc24
-  - d738a31 2025-07-14T14:19:51+03:00 OCPBUGS-58232: Don't wait for 2 etcd members when the cluster is TNF installed with assisted-installer
+- cluster-ingress-operator embedded-component cbc0b217b655f1f0ce0becc9145c2a6042beabea to 4f1ed7fc112e57a1f45c9b5948c3d14d017ddabc
+  - f1e445d 2025-07-09T08:38:37-04:00 testGatewayAPIManualDeployment: Increase timeout
+  - 2f7da77 2025-07-09T08:38:37-04:00 assertDNSRecord: Increase timeout to 10m
+  - e05309e 2025-07-09T08:38:37-04:00 desiredIstio: Delete old controller-mode setting
+  - 05417af 2025-07-09T08:38:37-04:00 desiredIstio: Don't copy labels or annotations
+  - 41d7add 2025-07-09T08:38:21-04:00 Enable Gateway only CA Bundles and custom CA CM name
+  - 47d4152 2025-07-09T08:32:37-04:00 Bump to OSSM 3.0.1 and Istio 1.24.4
 
-- cluster-kube-scheduler-operator embedded-component f720327a8f1030fb7b788d35de1de45d1756a9f1 to f9b5b31943f2be768af6373def4c8946a30d0ed6
-  - be3e288 2025-07-19T14:40:55+05:30 OCPSTRAT-2001: Add readOnlyRootFilesystem to kube-scheduler-operator
+- cluster-kube-controller-manager-operator embedded-component 404585e8f8165938341ba9a7dea640a7bdb171e1 to 1fe366437ec22945f63739ec9b914191c6e98ecf
+  - 7912a66 2025-07-23T16:26:37-04:00 Fix readonly filesystem error when kcm trying to mkdir on /etc/kubernetes/kubelet-plugins
+  - 376f401 2025-07-23T14:32:17Z RFE-4154: add read only filesystem (#845)
 
-- cluster-network-operator embedded-component d751ce56ad3cf8c48ea5df1a86d7b35fc611ef47 to 5b682383db2b132985354172cfaa3a033ad058e0
-  - 942c9c2 2025-07-04T13:57:43+02:00 Configure use_ct_inv_match=false in nbdb when route advertisement is enabled
+- cluster-network-operator embedded-component 5b682383db2b132985354172cfaa3a033ad058e0 to bf88d53a057607fb16db6641d49a6f2285b965d4
+  - e991b6c 2025-07-22T19:15:19+08:00 deprecate exportloopref
+  - 34aa4b4 2025-07-21T16:34:26-04:00 Annotate whereabouts-controller
 
-- etcd embedded-component a5421dfe551a2e9c911a75062a4cdeb7473f5c26 to b5ad268120ccd50185b9ec00ff1c4e5aca379f84
-  - 5366efc2 2025-06-18T18:15:06+00:00 Updating ose-etcd-container image to be consistent with ART for 4.20 Reconciling with https://github.com/openshift/ocp-build-data/tree/dfb5c7d531490cfdc61a3b88bc533702b9624997/images/ose-etcd.yml
+- cluster-policy-controller embedded-component 748524784686a5f397490563882cbfb88f9acd01 to 3e7538547c8f209c72083097a4ebaada6e9c46c5
+  - 4d67b92 2025-07-24T16:49:27+02:00 Ping ocp and go version to 4.20/1.24
+  - 51f5b02 2025-07-24T16:12:49+02:00 Adjust the code
+  - a197175 2025-07-14T12:47:58+02:00 go mod vendor
+  - d859b90 2025-07-14T12:46:44+02:00 bump(go.mod)=k8s v1.33.2,openshift release-4.20
 
-- machine-config-operator embedded-component daf8f203100f185853f4c54514ca34531e4670e6 to 0c1eb63e5fb8d8857856515399ba065836b9b9fe
-  - 39c15917 2025-07-22T10:56:28-04:00 e2e: add cleanup for custom MCP MCN test
-  - 35bc4a2b 2025-07-17T12:47:27-05:00 moved delete mosb until we create a new mosb
+- machine-config-operator embedded-component 0c1eb63e5fb8d8857856515399ba065836b9b9fe to 859a75c3a7af428966cca82b991d7046f9962cee
+  - ea648439 2025-07-25T14:13:16-04:00 e2e: split gcp-op make target into two
+  - f72efc07 2025-07-24T10:45:03-04:00 Revert "OCPBUGS-52302: Fix timing of `Spec.ConfigVersion.Desired` update in MCN"
+  - 19b34bbf 2025-07-23T11:12:31-04:00 vsphere_helpers: Find existing VM Template in vsphere with a known name rather than using the value mentioned in providerSpec template. This prevents breaking reconciliation logic when the template in the providerSpec diverges from the name of the VM in vsphere. If the names have diverged, correct it
+  - fdc192eb 2025-07-17T09:43:36-04:00 adds secretconverter devex helper
+  - 02c02e47 2025-07-17T09:43:18-04:00 adds ImagePruner and ImageRegistrySecret
+  - bd2acd1f 2025-07-11T11:10:56-04:00 remove empty keys from PolicySignature JSON blob
+  - a9e6a2f9 2025-07-11T09:55:08-04:00 updates containers/image dependency
+  - 4b3ea82b 2025-07-02T21:13:14-04:00 node controller: set desired config in MCN spec on node annotation update
+  - 583cdff0 2025-05-12T15:58:14-05:00 OCPBUGS-55971: Enable debug logging for nodeip-configuration
 
-- operator-framework-olm embedded-component c94eaba0d4bfb7e453eed539915ed2bf67683f26 to 3a0bba161e46cf82ed1a571541972130a782f067
-  - b2a1b657 2025-07-20T00:04:07+00:00 :seedling: Bump golang.org/x/net from 0.41.0 to 0.42.0 (#3611)
+- operator-framework-olm embedded-component 3a0bba161e46cf82ed1a571541972130a782f067 to 45b91529be7117e7445c6e411e5f86ac8f8feb29
+  - de04e4b9 2025-07-25T00:04:22Z Preserve ServiceAccount annotations during CSV update (#3610)
 
-- oc image-amd64 68a8590c1c7dc6d01911e38ad2af624012c99dcd to ea45cd5d407a1fc9805d051f3946e8a8fc1ca4da
-  - e4210011 2025-07-21T11:06:48+03:00 Update k8s 1.33.3
-  - ef2cd0ac 2025-07-21T10:42:41+03:00 resolve merge conflict
-  - de8fe41b 2025-07-21T10:36:37+03:00 Update oidc packages
-  - 3f64ee7d 2025-07-21T10:36:34+03:00 Update containers/storage and joelanford/ignore
-  - b9bd60a5 2025-07-21T10:35:12+03:00 Use mknod functions from containers/storage
-  - f30cece3 2025-07-21T10:35:12+03:00 Run make update and implement missing remoteExec for fakeclient
-  - a5a4cd4f 2025-07-21T10:35:12+03:00 Wire kuberc
-  - 6858398e 2025-07-21T10:35:12+03:00 Update the labels with 1.33.2 k8s
-  - c9d048eb 2025-07-21T10:35:12+03:00 Update golang/x and spf13 packages to latest
-  - 0581cf2c 2025-07-21T10:35:02+03:00 Add custom reflector store to detect the DeltaFIFO is empty or not
-  - 31be4dba 2025-07-21T10:34:30+03:00 Move insights describer to v1alpha2 versions
-  - e3466ab3 2025-07-21T10:34:30+03:00 Run go mod vendor
-  - 40fc6f08 2025-07-21T10:34:29+03:00 Update go.mod dependencies
-  - b50b11f7 2025-07-19T11:41:51+02:00 Prefer ready and reachable control plane nodes
-  - f7e4e7c4 2025-07-15T17:11:00+02:00 Filter out unreachable taints from tolerations
+- route-controller-manager embedded-component e148fabc13f735d5f59a94714031d8765abb9895 to bf2fa662f57f233d8541f94c4953e0dcd7a5ab20
+  - 120b6d6 2025-07-22T23:12:48+02:00 go mod vendor
+  - f7436be 2025-07-22T23:12:47+02:00 Update all dependencies and fix relevant issues
+
+- ovn-kubernetes image-amd64 86953f3b2f20530d084b924189cee23319f5435a to 1fde61ad03a950ba2236c29e9d00cb6166c9fe9b
+  - dcc403c1 2025-07-17T17:08:39+02:00 Fix UDN to alien ClusterIP looping issue
+  - 82850ed2 2025-07-17T17:08:37+02:00 Enable Layer2 route advertisements on LGW
+  - 9e356ba5 2025-07-17T09:08:57Z doc: Remove OKEP template from the list of rendered pages
+  - a6cac97a 2025-07-16T18:56:12+02:00 ovnkube in dpu host mode: advanced gateway detection
+  - b1816506 2025-07-16T15:49:12+01:00 E2Es: remove additional references to KinD setup
+  - 6018f47f 2025-07-16T13:29:23+01:00 E2E: lookup support for IP families instead of using env var
+  - ab8d4733 2025-07-16T14:23:38+02:00 virt: Delete LSP at external process killing VM
+  - 6b01b29b 2025-07-16T08:55:29+02:00 [e2e] Change node ip replacement commands to work on ubuntu 24.
+  - 99a7b111 2025-07-16T08:55:29+02:00 Update CI runners to use ubuntu 24.04
+  - f09eca1c 2025-07-16T08:55:29+02:00 Revert "Add option to disable udn-host-isolation."
+  - 1c559bb9 2025-07-15T16:15:52-07:00 fix ovspinning test error
+  - 26107809 2025-07-15T19:13:32-04:00 *.sh: use /usr/bin/env to locate bash
+  - c55d6577 2025-07-15T19:02:14+02:00 OKEP: Pre-assigned network configuration for primary user defined networks workloads
+  - 00542735 2025-07-15T09:45:20-07:00 VF gateway trigger errors message in updateServiceFlowCache
+  - 6395072d 2025-07-15T18:31:51+02:00 [gateway] rename GatewayConfig config to annoConfig
+  - 0473203b 2025-07-15T18:31:50+02:00 [gateway] pass gateway args for all controllers using GatewayConfig.
+  - e427103f 2025-07-15T18:31:35+02:00 [gateway] rename public and private interfaces.
+  - 02c2c185 2025-07-15T18:31:35+02:00 [gateway] update syncNodeGateway to reduce nesting
+  - cc8e9c83 2025-07-15T18:31:35+02:00 [master] reuse SecondaryL3GatewayConfig for master gateway configuration
+  - 1d9b4cf0 2025-07-15T18:31:35+02:00 [pod SNAT] reuse code around pod SNAT creation.
+  - 4834e3de 2025-07-15T18:31:35+02:00 Fix log, reuse existing function in GetNetworkScopedSwitchName.
+  - 77124b84 2025-07-15T18:31:35+02:00 [libovsdb/ops] Start adding option constants for ovn.
+  - 414e2962 2025-07-15T18:31:35+02:00 [lint] add make lint-fix command to fix lint issues
+  - f392ef0e 2025-07-15T18:31:29+02:00 [gateway] split GatewayInit into more methods.
+  - f54436cd 2025-07-15T18:31:13+02:00 [gateway] move gw router and its port creation to functions.
+  - 6e38032c 2025-07-15T18:31:13+02:00 [gateway] create createGWRouter function from GatewayInit
+  - ab24f255 2025-07-15T18:31:13+02:00 [gateway] cleanup: do some equivalent changes to simplify the code.
+  - 10f14edb 2025-07-15T14:47:32+02:00 update jinjanate install to use pipx and mention pipx and skopeo as dependencies
+  - 465e00a0 2025-07-15T15:02:29+03:00 images: Use Quay instead docker.io
+  - 1272c122 2025-07-14T10:40:59-07:00 cluster-manager clbs if udn requests PersistentIPs but it is not enabled
+  - 7b1b7dd7 2025-07-14T13:33:20+02:00 [OVN build] Fetch ovs version from the ovn submodule by default.
+  - 2edfdaf9 2025-07-11T15:27:59-07:00 always() run the diags
+  - 6902456a 2025-07-11T10:13:07-03:00 fix broken TOC links
+  - 2e888476 2025-07-09T16:02:36+03:00 Add flag for preconfigured UDN addresses feature
+  - f07c0551 2025-07-09T12:28:52+01:00 chore: Update artwork
+  - 84ed9949 2025-07-08T12:58:52+02:00 [openflow manager] allow patch port ofport change for UDNs.
+  - 2626e8d5 2025-07-08T10:24:03+02:00 Reapply "e2e: connect to host-networked pod from localnet"
+  - 3de7eade 2025-07-08T10:24:03+02:00 Reapply "Add flow for host -> localnet on same node"
+  - 1448d5ab 2025-07-08T10:24:03+02:00 Drop in_port from ip dispatch OF rule
+  - 44b77196 2025-07-06T17:02:42+03:00 e2e: Enable testing BGP using podman
+  - 7d199918 2025-07-06T17:02:42+03:00 kind-common, k8s-frr, bgp: Avoid hard coding container runtime binary
+  - 6ec1a448 2025-07-06T17:02:42+03:00 kind-common, metallb: Avoid hard coding container runtime binary
+  - 0e00ae6d 2025-07-06T17:02:42+03:00 contrib,kind: Init container runtime binary on cluster deletion
+  - c58c193e 2025-07-01T16:13:56+02:00 Disable Layer2 IGMP test as it is broken now.
+  - fa83c31b 2025-06-30T15:27:04Z Add network QoS guide to docs navigation
+  - 0b38e623 2025-06-30T13:50:32+02:00 [svc controller] Stop handlers on shutdown.
+  - ee962e5c 2025-06-26T22:03:29+02:00 update documentation on deploying OVN K8s with KIND
+  - abd8e0fd 2025-06-23T16:22:40+02:00 Modified line 277 to let kind-helm.sh run also behind a proxy
+  - 424a653f 2025-06-13T11:24:28+02:00 NodeTracker: Only update the node if the subnet changed for the specific network
+  - 150775e1 2025-06-12T12:07:14+02:00 [UDN isolation] Fix ACLs tier: move to the highest-prio Primary tier.
+  - 23c3b5a8 2025-06-12T10:28:53+02:00 [ACL tier] Rename BuildACL to BuildACLWithDefaultTier
+  - f559df11 2025-04-24T15:02:21+02:00 [docs] update ovn-observability with some more details
 
