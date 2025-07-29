@@ -6,8 +6,8 @@ namespace: redhat-ods-applications
 resources:
 - caikit-standalone.yaml
 - caikit-tgis.yaml
+- hf-detector.yaml
 - ovms-kserve.yaml
-- tgis.yaml
+- vllm-cuda.yaml
 - vllm-gaudi.yaml
 - vllm-rocm.yaml
-- vllm.yaml
