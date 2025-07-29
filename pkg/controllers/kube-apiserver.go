@@ -217,7 +217,7 @@ func (s *KubeAPIServer) configure(cfg *config.Config) error {
 			"enable-admission-plugins":              {},
 			"send-retry-after-while-not-ready-once": {"true"},
 			"shutdown-delay-duration":               {"5s"},
-			"feature-gates":                         {"UserNamespacesSupport=true", "UserNamespacesPodSecurityStandards=true"},
+			"feature-gates":                         {"UserNamespacesSupport=true", "UserNamespacesPodSecurityStandards=true", "InPlacePodVerticalScaling=true"},
 		},
 		GenericAPIServerConfig: configv1.GenericAPIServerConfig{
 			AdmissionConfig: configv1.AdmissionConfig{
