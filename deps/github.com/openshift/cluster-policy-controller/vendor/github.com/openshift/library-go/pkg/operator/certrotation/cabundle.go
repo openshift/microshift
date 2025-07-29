@@ -30,6 +30,10 @@ type CABundleConfigMap struct {
 	Namespace string
 	// Name is the name of the ConfigMap to maintain.
 	Name string
+	// RefreshOnlyWhenExpired set to true means to ignore 80% of validity and the Refresh duration for rotation,
+	// but only rotate when the certificate expires. This is useful for auto-recovery when we want to enforce
+	// rotation on expiration only, but not interfere with the ordinary rotation controller.
+	RefreshOnlyWhenExpired bool
 	// Owner is an optional reference to add to the secret that this rotator creates.
 	Owner *metav1.OwnerReference
 	// AdditionalAnnotations is a collection of annotations set for the secret
@@ -62,12 +66,15 @@ func (c CABundleConfigMap) EnsureConfigMapCABundle(ctx context.Context, signingC
 		creationRequired = true
 	}
 
-	needsOwnerUpdate := false
-	if c.Owner != nil {
-		needsOwnerUpdate = ensureOwnerReference(&caBundleConfigMap.ObjectMeta, c.Owner)
+	// run Update if metadata needs changing unless running in RefreshOnlyWhenExpired mode
+	if !c.RefreshOnlyWhenExpired {
+		needsOwnerUpdate := false
+		if c.Owner != nil {
+			needsOwnerUpdate = ensureOwnerReference(&caBundleConfigMap.ObjectMeta, c.Owner)
+		}
+		needsMetadataUpdate := c.AdditionalAnnotations.EnsureTLSMetadataUpdate(&caBundleConfigMap.ObjectMeta)
+		updateRequired = needsOwnerUpdate || needsMetadataUpdate
 	}
-	needsMetadataUpdate := c.AdditionalAnnotations.EnsureTLSMetadataUpdate(&caBundleConfigMap.ObjectMeta)
-	updateRequired = needsOwnerUpdate || needsMetadataUpdate
 
 	updatedCerts, err := manageCABundleConfigMap(caBundleConfigMap, signingCertKeyPair.Config.Certs[0])
 	if err != nil {
@@ -98,6 +105,10 @@ func (c CABundleConfigMap) EnsureConfigMapCABundle(ctx context.Context, signingC
 		caBundleConfigMap = actualCABundleConfigMap
 	} else if updateRequired {
 		actualCABundleConfigMap, err := c.Client.ConfigMaps(c.Namespace).Update(ctx, caBundleConfigMap, metav1.UpdateOptions{})
+		if apierrors.IsConflict(err) {
+			// ignore error if its attempting to update outdated version of the configmap
+			return nil, nil
+		}
 		resourcehelper.ReportUpdateEvent(c.EventRecorder, actualCABundleConfigMap, err)
 		if err != nil {
 			return nil, err

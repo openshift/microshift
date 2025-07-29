@@ -3,7 +3,9 @@ package csr
 import (
 	"context"
 	"crypto/tls"
+	"crypto/x509"
 	"crypto/x509/pkix"
+	"encoding/pem"
 	"fmt"
 	"math/rand"
 	"time"
@@ -166,7 +168,7 @@ func (c *clientCertificateController) sync(ctx context.Context, syncCtx factory.
 
 	// reconcile pending csr if exists
 	if len(c.csrName) > 0 {
-		newSecretConfig, err := c.syncCSR(secret)
+		newSecretConfig, leaf, err := c.syncCSR(secret)
 		if err != nil {
 			c.reset()
 			return err
@@ -179,6 +181,12 @@ func (c *clientCertificateController) sync(ctx context.Context, syncCtx factory.
 			newSecretConfig[k] = v
 		}
 		secret.Data = newSecretConfig
+
+		// Update not-before/not-after annotations
+		c.AdditionalAnnotations.NotBefore = leaf.NotBefore.Format(time.RFC3339)
+		c.AdditionalAnnotations.NotAfter = leaf.NotAfter.Format(time.RFC3339)
+		_ = c.AdditionalAnnotations.EnsureTLSMetadataUpdate(&secret.ObjectMeta)
+
 		// save the changes into secret
 		if err := c.saveSecret(secret); err != nil {
 			return err
@@ -231,10 +239,10 @@ func (c *clientCertificateController) sync(ctx context.Context, syncCtx factory.
 	return nil
 }
 
-func (c *clientCertificateController) syncCSR(secret *corev1.Secret) (map[string][]byte, error) {
+func (c *clientCertificateController) syncCSR(secret *corev1.Secret) (map[string][]byte, *x509.Certificate, error) {
 	// skip if there is no ongoing csr
 	if len(c.csrName) == 0 {
-		return nil, fmt.Errorf("no ongoing csr")
+		return nil, nil, fmt.Errorf("no ongoing csr")
 	}
 
 	// skip if csr no longer exists
@@ -244,38 +252,48 @@ func (c *clientCertificateController) syncCSR(secret *corev1.Secret) (map[string
 		// fallback to fetching csr from hub apiserver in case it is not cached by informer yet
 		csr, err = c.hubCSRClient.Get(context.Background(), c.csrName, metav1.GetOptions{})
 		if errors.IsNotFound(err) {
-			return nil, fmt.Errorf("unable to get csr %q. It might have already been deleted.", c.csrName)
+			return nil, nil, fmt.Errorf("unable to get csr %q. It might have already been deleted.", c.csrName)
 		}
 	case err != nil:
-		return nil, err
+		return nil, nil, err
 	}
 
 	// skip if csr is not approved yet
 	if !isCSRApproved(csr) {
-		return nil, nil
+		return nil, nil, nil
 	}
 
 	// skip if csr has no certificate in its status yet
 	if len(csr.Status.Certificate) == 0 {
-		return nil, nil
+		return nil, nil, nil
 	}
 
 	klog.V(4).Infof("Sync csr %v", c.csrName)
 	// check if cert in csr status matches with the corresponding private key
 	if c.keyData == nil {
-		return nil, fmt.Errorf("No private key found for certificate in csr: %s", c.csrName)
+		return nil, nil, fmt.Errorf("No private key found for certificate in csr: %s", c.csrName)
 	}
 	_, err = tls.X509KeyPair(csr.Status.Certificate, c.keyData)
 	if err != nil {
-		return nil, fmt.Errorf("Private key does not match with the certificate in csr: %s", c.csrName)
+		return nil, nil, fmt.Errorf("Private key does not match with the certificate in csr: %s", c.csrName)
 	}
+	// verify that the recieved data is a valid x509 certificate
+	var block *pem.Block
+	block, _ = pem.Decode(csr.Status.Certificate)
+	if block == nil || block.Type != "CERTIFICATE" || len(block.Headers) != 0 {
+		return nil, nil, fmt.Errorf("invalid first block found for certificate in csr: %s", c.csrName)
+	}
+	certBytes := block.Bytes
+	parsedCert, err := x509.ParseCertificate(certBytes)
 
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to parse the certificate in csr %s: %v", c.csrName, err)
+	}
 	data := map[string][]byte{
 		TLSCertFile: csr.Status.Certificate,
 		TLSKeyFile:  c.keyData,
 	}
-
-	return data, nil
+	return data, parsedCert, nil
 }
 
 func (c *clientCertificateController) createCSR(ctx context.Context) (string, error) {

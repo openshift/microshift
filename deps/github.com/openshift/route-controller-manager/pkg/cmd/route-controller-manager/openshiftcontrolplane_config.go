@@ -23,7 +23,6 @@ func asOpenshiftControllerManagerConfig(config *unstructured.Unstructured) (*ope
 	}
 
 	setRecommendedOpenShiftControllerConfigDefaults(result)
-
 	return result, nil
 }
 
