@@ -15,7 +15,7 @@ Verify GitOps Pods Start Correctly
     Restart MicroShift
 
     Wait Until Keyword Succeeds    2min    10s
-    ...  All Pods Should Be Running    openshift-gitops
+    ...    All Pods Should Be Running    openshift-gitops
 
 
 *** Keywords ***
