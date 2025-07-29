@@ -3,6 +3,7 @@ package openshift_controller_manager
 import (
 	"context"
 	"github.com/spf13/cobra"
+	"k8s.io/utils/clock"
 	"os"
 
 	corev1 "k8s.io/api/core/v1"

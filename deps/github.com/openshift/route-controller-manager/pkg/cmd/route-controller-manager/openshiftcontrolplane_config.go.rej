@@ -1,0 +1,10 @@
+diff a/deps/github.com/openshift/route-controller-manager/pkg/cmd/route-controller-manager/openshiftcontrolplane_config.go b/deps/github.com/openshift/route-controller-manager/pkg/cmd/route-controller-manager/openshiftcontrolplane_config.go	(rejected hunks)
+@@ -28,8 +28,6 @@ func asOpenshiftControllerManagerConfig(config *unstructured.Unstructured) (*ope
+ }
+ 
+ func setRecommendedOpenShiftControllerConfigDefaults(config *openshiftcontrolplanev1.OpenShiftControllerManagerConfig) {
+-	configdefaults.SetRecommendedKubeClientConfigDefaults(&config.KubeClientConfig)
+-
+ 	configdefaults.DefaultStringSlice(&config.Controllers, []string{"*"})
+ 
+ 	if config.ResourceQuota.MinResyncPeriod.Duration == 0 {

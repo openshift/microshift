@@ -2,6 +2,7 @@ package ingressip
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net"
 	"sort"
@@ -579,7 +580,7 @@ func (ic *IngressIPController) clearPersistedAllocation(service *v1.Service, key
 	// Assume it is safe to modify the service without worrying about changing the local cache
 
 	if len(errMessage) > 0 {
-		utilruntime.HandleError(fmt.Errorf(errMessage))
+		utilruntime.HandleError(errors.New(errMessage))
 	} else {
 		klog.V(5).Infof("Attempting to clear persisted allocation for service: %v", key)
 	}

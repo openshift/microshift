@@ -83,6 +83,16 @@ const (
 	// The number of batches is given by:
 	//      1+floor(log_2(ceil(N/SlowStartInitialBatchSize)))
 	SlowStartInitialBatchSize = 1
+
+	// PodNodeNameKeyIndex is the name of the index used by PodInformer to index pods by their node name.
+	PodNodeNameKeyIndex = "spec.nodeName"
+
+	// OrphanPodIndexKey is used to index all Orphan pods to this key
+	OrphanPodIndexKey = "_ORPHAN_POD"
+
+	// podControllerUIDIndex is the name for the Pod store's index function,
+	// which is to index by pods's controllerUID.
+	PodControllerUIDIndex = "podControllerUID"
 )
 
 var UpdateTaintBackoff = wait.Backoff{
@@ -713,8 +723,8 @@ func (s ByLogging) Less(i, j int) bool {
 		}
 	}
 	// 5. Pods with containers with higher restart counts < lower restart counts
-	if maxContainerRestarts(s[i]) != maxContainerRestarts(s[j]) {
-		return maxContainerRestarts(s[i]) > maxContainerRestarts(s[j])
+	if res := compareMaxContainerRestarts(s[i], s[j]); res != nil {
+		return *res
 	}
 	// 6. older pods < newer pods < empty timestamp pods
 	if !s[i].CreationTimestamp.Equal(&s[j].CreationTimestamp) {
@@ -756,8 +766,8 @@ func (s ActivePods) Less(i, j int) bool {
 		}
 	}
 	// 5. Pods with containers with higher restart counts < lower restart counts
-	if maxContainerRestarts(s[i]) != maxContainerRestarts(s[j]) {
-		return maxContainerRestarts(s[i]) > maxContainerRestarts(s[j])
+	if res := compareMaxContainerRestarts(s[i], s[j]); res != nil {
+		return *res
 	}
 	// 6. Empty creation time pods < newer pods < older pods
 	if !s[i].CreationTimestamp.Equal(&s[j].CreationTimestamp) {
@@ -878,8 +888,8 @@ func (s ActivePodsWithRanks) Less(i, j int) bool {
 		}
 	}
 	// 7. Pods with containers with higher restart counts < lower restart counts
-	if maxContainerRestarts(s.Pods[i]) != maxContainerRestarts(s.Pods[j]) {
-		return maxContainerRestarts(s.Pods[i]) > maxContainerRestarts(s.Pods[j])
+	if res := compareMaxContainerRestarts(s.Pods[i], s.Pods[j]); res != nil {
+		return *res
 	}
 	// 8. Empty creation time pods < newer pods < older pods
 	if !s.Pods[i].CreationTimestamp.Equal(&s.Pods[j].CreationTimestamp) {
@@ -936,12 +946,56 @@ func podReadyTime(pod *v1.Pod) *metav1.Time {
 	return &metav1.Time{}
 }
 
-func maxContainerRestarts(pod *v1.Pod) int {
-	maxRestarts := 0
+func maxContainerRestarts(pod *v1.Pod) (regularRestarts, sidecarRestarts int) {
 	for _, c := range pod.Status.ContainerStatuses {
-		maxRestarts = max(maxRestarts, int(c.RestartCount))
+		regularRestarts = max(regularRestarts, int(c.RestartCount))
 	}
-	return maxRestarts
+	names := sets.New[string]()
+	for _, c := range pod.Spec.InitContainers {
+		if c.RestartPolicy != nil && *c.RestartPolicy == v1.ContainerRestartPolicyAlways {
+			names.Insert(c.Name)
+		}
+	}
+	for _, c := range pod.Status.InitContainerStatuses {
+		if names.Has(c.Name) {
+			sidecarRestarts = max(sidecarRestarts, int(c.RestartCount))
+		}
+	}
+	return
+}
+
+// We use *bool here to determine equality:
+// true: pi has a higher container restart count.
+// false: pj has a higher container restart count.
+// nil: Both have the same container restart count.
+func compareMaxContainerRestarts(pi *v1.Pod, pj *v1.Pod) *bool {
+	regularRestartsI, sidecarRestartsI := maxContainerRestarts(pi)
+	regularRestartsJ, sidecarRestartsJ := maxContainerRestarts(pj)
+	if regularRestartsI != regularRestartsJ {
+		res := regularRestartsI > regularRestartsJ
+		return &res
+	}
+	// If pods have the same restart count, an attempt is made to compare the restart counts of sidecar containers.
+	if sidecarRestartsI != sidecarRestartsJ {
+		res := sidecarRestartsI > sidecarRestartsJ
+		return &res
+	}
+	return nil
+}
+
+// FilterClaimedPods returns pods that are controlled by the controller and match the selector.
+func FilterClaimedPods(controller metav1.Object, selector labels.Selector, pods []*v1.Pod) []*v1.Pod {
+	var result []*v1.Pod
+	for _, pod := range pods {
+		if !metav1.IsControlledBy(pod, controller) {
+			// It's an orphan or owned by someone else.
+			continue
+		}
+		if selector.Matches(labels.Set(pod.Labels)) {
+			result = append(result, pod)
+		}
+	}
+	return result
 }
 
 // FilterActivePods returns pods that have not terminated.
@@ -950,8 +1004,6 @@ func FilterActivePods(logger klog.Logger, pods []*v1.Pod) []*v1.Pod {
 	for _, p := range pods {
 		if IsPodActive(p) {
 			result = append(result, p)
-		} else {
-			logger.V(4).Info("Ignoring inactive pod", "pod", klog.KObj(p), "phase", p.Status.Phase, "deletionTime", klog.SafePtr(p.DeletionTimestamp))
 		}
 	}
 	return result
@@ -1007,6 +1059,52 @@ func FilterReplicaSets(RSes []*apps.ReplicaSet, filterFn filterRS) []*apps.Repli
 		}
 	}
 	return filtered
+}
+
+// AddPodNodeNameIndexer adds an indexer for Pod's nodeName to the given PodInformer.
+// This indexer is used to efficiently look up pods by their node name.
+func AddPodNodeNameIndexer(podInformer cache.SharedIndexInformer) error {
+	if _, exists := podInformer.GetIndexer().GetIndexers()[PodNodeNameKeyIndex]; exists {
+		// indexer already exists, do nothing
+		return nil
+	}
+
+	return podInformer.AddIndexers(cache.Indexers{
+		PodNodeNameKeyIndex: func(obj interface{}) ([]string, error) {
+			pod, ok := obj.(*v1.Pod)
+			if !ok {
+				return []string{}, nil
+			}
+			if len(pod.Spec.NodeName) == 0 {
+				return []string{}, nil
+			}
+			return []string{pod.Spec.NodeName}, nil
+		},
+	})
+}
+
+// AddPodControllerUIDIndexer adds an indexer for Pod's controllerRef.UID to the given PodInformer.
+// This indexer is used to efficiently look up pods by their ControllerRef.UID
+func AddPodControllerUIDIndexer(podInformer cache.SharedIndexInformer) error {
+	if _, exists := podInformer.GetIndexer().GetIndexers()[PodControllerUIDIndex]; exists {
+		// indexer already exists, do nothing
+		return nil
+	}
+	return podInformer.AddIndexers(cache.Indexers{
+		PodControllerUIDIndex: func(obj interface{}) ([]string, error) {
+			pod, ok := obj.(*v1.Pod)
+			if !ok {
+				return nil, nil
+			}
+			// Get the ControllerRef of the Pod to check if it's managed by a controller
+			if ref := metav1.GetControllerOf(pod); ref != nil {
+				return []string{string(ref.UID)}, nil
+			}
+			// If the Pod has no controller (i.e., it's orphaned), index it with the OrphanPodIndexKey
+			// This helps identify orphan pods for reconciliation and adoption by controllers
+			return []string{OrphanPodIndexKey}, nil
+		},
+	})
 }
 
 // PodKey returns a key unique to the given pod within a cluster.

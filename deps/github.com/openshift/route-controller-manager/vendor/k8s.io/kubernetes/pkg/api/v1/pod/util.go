@@ -23,6 +23,8 @@ import (
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
+	utilfeature "k8s.io/apiserver/pkg/util/feature"
+	"k8s.io/kubernetes/pkg/features"
 )
 
 // FindPort locates the container port for the given pod and portName.  If the
@@ -35,6 +37,17 @@ func FindPort(pod *v1.Pod, svcPort *v1.ServicePort) (int, error) {
 	case intstr.String:
 		name := portName.StrVal
 		for _, container := range pod.Spec.Containers {
+			for _, port := range container.Ports {
+				if port.Name == name && port.Protocol == svcPort.Protocol {
+					return int(port.ContainerPort), nil
+				}
+			}
+		}
+		// also support sidecar container (initContainer with restartPolicy=Always)
+		for _, container := range pod.Spec.InitContainers {
+			if container.RestartPolicy == nil || *container.RestartPolicy != v1.ContainerRestartPolicyAlways {
+				continue
+			}
 			for _, port := range container.Ports {
 				if port.Name == name && port.Protocol == svcPort.Protocol {
 					return int(port.ContainerPort), nil
@@ -394,4 +407,42 @@ func UpdatePodCondition(status *v1.PodStatus, condition *v1.PodCondition) bool {
 	status.Conditions[conditionIndex] = *condition
 	// Return true if one of the fields have changed.
 	return !isEqual
+}
+
+// IsRestartableInitContainer returns true if the container has ContainerRestartPolicyAlways.
+// This function is not checking if the container passed to it is indeed an init container.
+// It is just checking if the container restart policy has been set to always.
+func IsRestartableInitContainer(initContainer *v1.Container) bool {
+	if initContainer == nil || initContainer.RestartPolicy == nil {
+		return false
+	}
+	return *initContainer.RestartPolicy == v1.ContainerRestartPolicyAlways
+}
+
+// We will emit status.observedGeneration if the feature is enabled OR if status.observedGeneration is already set.
+// This protects against an infinite loop of kubelet trying to clear the value after the FG is turned off, and
+// the API server preserving existing values when an incoming update tries to clear it.
+func GetPodObservedGenerationIfEnabled(pod *v1.Pod) int64 {
+	if pod.Status.ObservedGeneration != 0 || utilfeature.DefaultFeatureGate.Enabled(features.PodObservedGenerationTracking) {
+		return pod.Generation
+	}
+	return 0
+}
+
+// We will emit condition.observedGeneration if the feature is enabled OR if condition.observedGeneration is already set.
+// This protects against an infinite loop of kubelet trying to clear the value after the FG is turned off, and
+// the API server preserving existing values when an incoming update tries to clear it.
+func GetPodObservedGenerationIfEnabledOnCondition(podStatus *v1.PodStatus, generation int64, conditionType v1.PodConditionType) int64 {
+	if podStatus == nil {
+		return 0
+	}
+	if utilfeature.DefaultFeatureGate.Enabled(features.PodObservedGenerationTracking) {
+		return generation
+	}
+	for _, condition := range podStatus.Conditions {
+		if condition.Type == conditionType && condition.ObservedGeneration != 0 {
+			return generation
+		}
+	}
+	return 0
 }
