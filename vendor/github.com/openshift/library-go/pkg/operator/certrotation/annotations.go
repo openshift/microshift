@@ -42,19 +42,19 @@ func (a AdditionalAnnotations) EnsureTLSMetadataUpdate(meta *metav1.ObjectMeta) 
 	}
 	if len(a.JiraComponent) > 0 && meta.Annotations[annotations.OpenShiftComponent] != a.JiraComponent {
 		diff := cmp.Diff(meta.Annotations[annotations.OpenShiftComponent], a.JiraComponent)
-		klog.V(2).Infof("Updating %q annotation for %s/%s, diff: %s", annotations.OpenShiftComponent, meta.Name, meta.Namespace, diff)
+		klog.V(2).Infof("Updating %q annotation for %s/%s, diff: %s", annotations.OpenShiftComponent, meta.Namespace, meta.Name, diff)
 		meta.Annotations[annotations.OpenShiftComponent] = a.JiraComponent
 		modified = true
 	}
 	if len(a.Description) > 0 && meta.Annotations[annotations.OpenShiftDescription] != a.Description {
 		diff := cmp.Diff(meta.Annotations[annotations.OpenShiftDescription], a.Description)
-		klog.V(2).Infof("Updating %q annotation for %s/%s, diff: %s", annotations.OpenShiftDescription, meta.Name, meta.Namespace, diff)
+		klog.V(2).Infof("Updating %q annotation for %s/%s, diff: %s", annotations.OpenShiftDescription, meta.Namespace, meta.Name, diff)
 		meta.Annotations[annotations.OpenShiftDescription] = a.Description
 		modified = true
 	}
 	if len(a.AutoRegenerateAfterOfflineExpiry) > 0 && meta.Annotations[AutoRegenerateAfterOfflineExpiryAnnotation] != a.AutoRegenerateAfterOfflineExpiry {
 		diff := cmp.Diff(meta.Annotations[AutoRegenerateAfterOfflineExpiryAnnotation], a.AutoRegenerateAfterOfflineExpiry)
-		klog.V(2).Infof("Updating %q annotation for %s/%s, diff: %s", AutoRegenerateAfterOfflineExpiryAnnotation, meta.Name, meta.Namespace, diff)
+		klog.V(2).Infof("Updating %q annotation for %s/%s, diff: %s", AutoRegenerateAfterOfflineExpiryAnnotation, meta.Namespace, meta.Name, diff)
 		meta.Annotations[AutoRegenerateAfterOfflineExpiryAnnotation] = a.AutoRegenerateAfterOfflineExpiry
 		modified = true
 	}
