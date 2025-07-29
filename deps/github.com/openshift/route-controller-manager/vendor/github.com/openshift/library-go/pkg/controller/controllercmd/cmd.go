@@ -3,6 +3,7 @@ package controllercmd
 import (
 	"context"
 	"fmt"
+	"k8s.io/utils/clock"
 	"math/rand"
 	"os"
 	"path/filepath"
@@ -13,12 +14,15 @@ import (
 
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/version"
 	"k8s.io/apiserver/pkg/server"
+	"k8s.io/client-go/tools/record"
 	"k8s.io/component-base/logs"
+
 	"k8s.io/klog/v2"
 
 	operatorv1alpha1 "github.com/openshift/api/operator/v1alpha1"
@@ -38,6 +42,7 @@ type ControllerCommandConfig struct {
 	componentName string
 	startFunc     StartFunc
 	version       version.Info
+	clock         clock.Clock
 
 	basicFlags *ControllerFlags
 
@@ -68,20 +73,23 @@ type ControllerCommandConfig struct {
 
 	ComponentOwnerReference *corev1.ObjectReference
 	healthChecks            []healthz.HealthChecker
+	eventRecorderOptions    record.CorrelatorOptions
 }
 
 // NewControllerConfig returns a new ControllerCommandConfig which can be used to wire up all the boiler plate of a controller
 // TODO add more methods around wiring health checks and the like
-func NewControllerCommandConfig(componentName string, version version.Info, startFunc StartFunc) *ControllerCommandConfig {
+func NewControllerCommandConfig(componentName string, version version.Info, startFunc StartFunc, clock clock.Clock) *ControllerCommandConfig {
 	return &ControllerCommandConfig{
 		startFunc:     startFunc,
 		componentName: componentName,
 		version:       version,
+		clock:         clock,
 
 		basicFlags: NewControllerFlags(),
 
 		DisableServing:        false,
 		DisableLeaderElection: false,
+		eventRecorderOptions:  events.RecommendedClusterSingletonCorrelatorOptions(),
 	}
 }
 
@@ -98,6 +106,11 @@ func (c *ControllerCommandConfig) WithHealthChecks(healthChecks ...healthz.Healt
 
 func (c *ControllerCommandConfig) WithTopologyDetector(topologyDetector TopologyDetector) *ControllerCommandConfig {
 	c.TopologyDetector = topologyDetector
+	return c
+}
+
+func (c *ControllerCommandConfig) WithEventRecorderOptions(eventRecorderOptions record.CorrelatorOptions) *ControllerCommandConfig {
+	c.eventRecorderOptions = eventRecorderOptions
 	return c
 }
 
@@ -312,13 +325,13 @@ func (c *ControllerCommandConfig) StartController(ctx context.Context) error {
 	config.LeaderElection.RenewDeadline = c.RenewDeadline
 	config.LeaderElection.RetryPeriod = c.RetryPeriod
 
-	builder := NewController(c.componentName, c.startFunc).
+	builder := NewController(c.componentName, c.startFunc, c.clock).
 		WithKubeConfigFile(c.basicFlags.KubeConfigFile, nil).
 		WithComponentNamespace(c.basicFlags.Namespace).
 		WithLeaderElection(config.LeaderElection, c.basicFlags.Namespace, c.componentName+"-lock").
 		WithVersion(c.version).
 		WithHealthChecks(c.healthChecks...).
-		WithEventRecorderOptions(events.RecommendedClusterSingletonCorrelatorOptions()).
+		WithEventRecorderOptions(c.eventRecorderOptions).
 		WithRestartOnChange(exitOnChangeReactorCh, startingFileContent, observedFiles...).
 		WithComponentOwnerReference(c.ComponentOwnerReference)
 

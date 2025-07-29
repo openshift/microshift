@@ -1,0 +1,10 @@
+diff a/deps/github.com/openshift/route-controller-manager/pkg/cmd/route-controller-manager/cmd.go b/deps/github.com/openshift/route-controller-manager/pkg/cmd/route-controller-manager/cmd.go	(rejected hunks)
+@@ -18,7 +19,7 @@ const (
+ )
+ 
+ func NewRouteControllerManagerCommand(name string) *cobra.Command {
+-	cmd := controllercmd.NewControllerCommandConfig("route-controller-manager", rcmversion.Get(), RunRouteControllerManager).
++	cmd := controllercmd.NewControllerCommandConfig("route-controller-manager", rcmversion.Get(), RunRouteControllerManager, clock.RealClock{}).
+ 		WithComponentOwnerReference(&corev1.ObjectReference{
+ 			Kind:      "Pod",
+ 			Name:      os.Getenv(podNameEnv),

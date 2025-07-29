@@ -25,9 +25,8 @@ type Authentication struct {
 	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	// +kubebuilder:validation:Required
 	// +required
-	Spec AuthenticationSpec `json:"spec,omitempty"`
+	Spec AuthenticationSpec `json:"spec"`
 	// +optional
 	Status AuthenticationStatus `json:"status,omitempty"`
 }
@@ -37,7 +36,7 @@ type AuthenticationSpec struct {
 }
 
 type AuthenticationStatus struct {
-	// OAuthAPIServer holds status specific only to oauth-apiserver
+	// oauthAPIServer holds status specific only to oauth-apiserver
 	// +optional
 	OAuthAPIServer OAuthAPIServerStatus `json:"oauthAPIServer,omitempty"`
 
@@ -45,7 +44,7 @@ type AuthenticationStatus struct {
 }
 
 type OAuthAPIServerStatus struct {
-	// LatestAvailableRevision is the latest revision used as suffix of revisioned
+	// latestAvailableRevision is the latest revision used as suffix of revisioned
 	// secrets like encryption-config. A new revision causes a new deployment of pods.
 	// +optional
 	// +kubebuilder:validation:Minimum=0

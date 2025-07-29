@@ -9,18 +9,21 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/serializer"
+	utilversion "k8s.io/apimachinery/pkg/util/version"
 	"k8s.io/apimachinery/pkg/util/wait"
+	"k8s.io/apimachinery/pkg/version"
 	genericapiserver "k8s.io/apiserver/pkg/server"
 	genericapiserveroptions "k8s.io/apiserver/pkg/server/options"
+	"k8s.io/apiserver/pkg/util/compatibility"
 	"k8s.io/client-go/kubernetes"
+	basecompatibility "k8s.io/component-base/compatibility"
 	"k8s.io/klog/v2"
 
 	configv1 "github.com/openshift/api/config/v1"
 	operatorv1alpha1 "github.com/openshift/api/operator/v1alpha1"
 )
 
-func ToServerConfig(ctx context.Context, servingInfo configv1.HTTPServingInfo, authenticationConfig operatorv1alpha1.DelegatedAuthentication, authorizationConfig operatorv1alpha1.DelegatedAuthorization,
-	kubeConfigFile string, kubeClient *kubernetes.Clientset, le *configv1.LeaderElection, enableHTTP2 bool) (*genericapiserver.Config, error) {
+func ToServerConfig(ctx context.Context, servingInfo configv1.HTTPServingInfo, authenticationConfig operatorv1alpha1.DelegatedAuthentication, authorizationConfig operatorv1alpha1.DelegatedAuthorization, kubeConfigFile string, kubeClient *kubernetes.Clientset, le *configv1.LeaderElection, enableHTTP2 bool, versionInfo *version.Info) (*genericapiserver.Config, error) {
 	scheme := runtime.NewScheme()
 	metav1.AddToGroupVersion(scheme, metav1.SchemeGroupVersion)
 	config := genericapiserver.NewConfig(serializer.NewCodecFactory(scheme))
@@ -83,6 +86,7 @@ func ToServerConfig(ctx context.Context, servingInfo configv1.HTTPServingInfo, a
 	}
 
 	config.SecureServing.DisableHTTP2 = !enableHTTP2
+	config.EffectiveVersion = defaultBuildEffectiveVersion(versionInfo)
 
 	return config, nil
 }
@@ -102,4 +106,18 @@ func assertAPIConnection(ctx context.Context, kubeClient *kubernetes.Clientset, 
 	}
 
 	return nil
+}
+
+// DefaultBuildEffectiveVersion returns the MutableEffectiveVersion based on the
+// current build information.
+// Similar to version.DefaultBuildEffectiveVersion
+func defaultBuildEffectiveVersion(versionInfo *version.Info) basecompatibility.MutableEffectiveVersion {
+	if versionInfo != nil {
+		// major.minor passed through gitVersion
+		parsedVersion, err := utilversion.Parse(versionInfo.String())
+		if err == nil && (parsedVersion.Major() != 0 || parsedVersion.Minor() != 0) {
+			return basecompatibility.NewEffectiveVersionFromString(versionInfo.String(), "", "")
+		}
+	}
+	return compatibility.DefaultBuildEffectiveVersion()
 }

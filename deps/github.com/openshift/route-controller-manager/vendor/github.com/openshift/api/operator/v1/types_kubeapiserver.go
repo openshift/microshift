@@ -17,7 +17,6 @@ import (
 //
 // Compatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).
 // +openshift:compatibility-gen:level=1
-// +openshift:compatibility-gen:level=1
 type KubeAPIServer struct {
 	metav1.TypeMeta `json:",inline"`
 
@@ -26,7 +25,6 @@ type KubeAPIServer struct {
 	metav1.ObjectMeta `json:"metadata"`
 
 	// spec is the specification of the desired behavior of the Kubernetes API Server
-	// +kubebuilder:validation:Required
 	// +required
 	Spec KubeAPIServerSpec `json:"spec"`
 
@@ -78,6 +76,6 @@ type KubeAPIServerList struct {
 	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
 	metav1.ListMeta `json:"metadata"`
 
-	// Items contains the items
+	// items contains the items
 	Items []KubeAPIServer `json:"items"`
 }

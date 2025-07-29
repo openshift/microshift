@@ -117,6 +117,23 @@ type RoutingConfig struct {
 	Subdomain string `json:"subdomain"`
 }
 
+// ImportModeType describes how to import an image manifest.
+// +enum
+// +kubebuilder:validation:Enum:="";Legacy;PreserveOriginal
+type ImportModeType string
+
+const (
+	// ImportModeLegacy indicates that the legacy behaviour should be used.
+	// For manifest lists, the legacy behaviour will discard the manifest list and import a single
+	// sub-manifest. In this case, the platform is chosen in the following order of priority:
+	// 1. tag annotations; 2. control plane arch/os; 3. linux/amd64; 4. the first manifest in the list.
+	// This mode is the default.
+	ImportModeLegacy ImportModeType = "Legacy"
+	// ImportModePreserveOriginal indicates that the original manifest will be preserved.
+	// For manifest lists, the manifest list and all its sub-manifests will be imported.
+	ImportModePreserveOriginal ImportModeType = "PreserveOriginal"
+)
+
 type ImagePolicyConfig struct {
 	// maxImagesBulkImportedPerRepository controls the number of images that are imported when a user
 	// does a bulk import of a container repository. This number is set low to prevent users from
@@ -142,6 +159,19 @@ type ImagePolicyConfig struct {
 	// additionalTrustedCA is a path to a pem bundle file containing additional CAs that
 	// should be trusted during imagestream import.
 	AdditionalTrustedCA string `json:"additionalTrustedCA"`
+
+	// imageStreamImportMode provides the import mode value for  imagestreams.
+	// It can be `Legacy` or `PreserveOriginal`. `Legacy` indicates that the legacy behaviour
+	// should be used. For manifest lists, the legacy behaviour will discard the manifest list
+	// and import a single sub-manifest. In this case, the platform is chosen in the following
+	// order of priority: 1. tag annotations; 2. control plane arch/os; 3. linux/amd64; 4. the first
+	// manifest in the list. `PreserveOriginal` indicates that the original manifest will be preserved.
+	// For manifest lists, the manifest list and all its sub-manifests will be imported.If this value
+	// is specified, this setting is applied to all newly created imagestreams which do not have the
+	// value set.
+	// +openshift:enable:FeatureGate=ImageStreamImportMode
+	// +optional
+	ImageStreamImportMode ImportModeType `json:"imageStreamImportMode"`
 }
 
 // AllowedRegistries represents a list of registries allowed for the image import.
@@ -150,11 +180,11 @@ type AllowedRegistries []RegistryLocation
 // RegistryLocation contains a location of the registry specified by the registry domain
 // name. The domain name might include wildcards, like '*' or '??'.
 type RegistryLocation struct {
-	// DomainName specifies a domain name for the registry
+	// domainName specifies a domain name for the registry
 	// In case the registry use non-standard (80 or 443) port, the port should be included
 	// in the domain name as well.
 	DomainName string `json:"domainName"`
-	// Insecure indicates whether the registry is secure (https) or insecure (http)
+	// insecure indicates whether the registry is secure (https) or insecure (http)
 	// By default (if not specified) the registry is assumed as secure.
 	Insecure bool `json:"insecure,omitempty"`
 }
@@ -228,7 +258,10 @@ const (
 type OpenShiftControllerManagerConfig struct {
 	metav1.TypeMeta `json:",inline"`
 
-	KubeClientConfig configv1.KubeClientConfig `json:"kubeClientConfig"`
+	// KubeClientConfig is no longer being used.
+	// The field is being ignored by OCM.
+	//
+	// KubeClientConfig configv1.KubeClientConfig `json:"kubeClientConfig"`
 
 	// servingInfo describes how to start serving
 	ServingInfo *configv1.HTTPServingInfo `json:"servingInfo"`
@@ -410,36 +443,36 @@ type BuildOverridesConfig struct {
 
 // ImageConfig holds the necessary configuration options for building image names for system components
 type ImageConfig struct {
-	// Format is the format of the name to be built for the system component
+	// format is the format of the name to be built for the system component
 	Format string `json:"format"`
-	// Latest determines if the latest tag will be pulled from the registry
+	// latest determines if the latest tag will be pulled from the registry
 	Latest bool `json:"latest"`
 }
 
 // ServiceServingCert holds configuration for service serving cert signer which creates cert/key pairs for
 // pods fulfilling a service to serve with.
 type ServiceServingCert struct {
-	// Signer holds the signing information used to automatically sign serving certificates.
+	// signer holds the signing information used to automatically sign serving certificates.
 	// If this value is nil, then certs are not signed automatically.
 	Signer *configv1.CertInfo `json:"signer"`
 }
 
 // ClusterNetworkEntry defines an individual cluster network. The CIDRs cannot overlap with other cluster network CIDRs, CIDRs reserved for external ips, CIDRs reserved for service networks, and CIDRs reserved for ingress ips.
 type ClusterNetworkEntry struct {
-	// CIDR defines the total range of a cluster networks address space.
+	// cidr defines the total range of a cluster networks address space.
 	CIDR string `json:"cidr"`
-	// HostSubnetLength is the number of bits of the accompanying CIDR address to allocate to each node. eg, 8 would mean that each node would have a /24 slice of the overlay network for its pod.
+	// hostSubnetLength is the number of bits of the accompanying CIDR address to allocate to each node. eg, 8 would mean that each node would have a /24 slice of the overlay network for its pod.
 	HostSubnetLength uint32 `json:"hostSubnetLength"`
 }
 
 // SecurityAllocator controls the automatic allocation of UIDs and MCS labels to a project. If nil, allocation is disabled.
 type SecurityAllocator struct {
-	// UIDAllocatorRange defines the total set of Unix user IDs (UIDs) that will be allocated to projects automatically, and the size of the
+	// uidAllocatorRange defines the total set of Unix user IDs (UIDs) that will be allocated to projects automatically, and the size of the
 	// block each namespace gets. For example, 1000-1999/10 will allocate ten UIDs per namespace, and will be able to allocate up to 100 blocks
 	// before running out of space. The default is to allocate from 1 billion to 2 billion in 10k blocks (which is the expected size of the
 	// ranges container images will use once user namespaces are started).
 	UIDAllocatorRange string `json:"uidAllocatorRange"`
-	// MCSAllocatorRange defines the range of MCS categories that will be assigned to namespaces. The format is
+	// mcsAllocatorRange defines the range of MCS categories that will be assigned to namespaces. The format is
 	// "<prefix>/<numberOfLabels>[,<maxCategory>]". The default is "s0/2" and will allocate from c0 -> c1023, which means a total of 535k labels
 	// are available (1024 choose 2 ~ 535k). If this value is changed after startup, new projects may receive labels that are already allocated
 	// to other projects. Prefix may be any valid SELinux set of terms (including user, role, and type), although leaving them as the default
@@ -450,7 +483,7 @@ type SecurityAllocator struct {
 	// * s0:/2,512 - Allocate labels from s0:c0,c0,c0 to s0:c511,c511,511
 	//
 	MCSAllocatorRange string `json:"mcsAllocatorRange"`
-	// MCSLabelsPerProject defines the number of labels that should be reserved per project. The default is 5 to match the default UID and MCS
+	// mcsLabelsPerProject defines the number of labels that should be reserved per project. The default is 5 to match the default UID and MCS
 	// ranges (100k namespaces, 535k/5 labels).
 	MCSLabelsPerProject int `json:"mcsLabelsPerProject"`
 }
