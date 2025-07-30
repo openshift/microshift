@@ -134,17 +134,17 @@ sudo microshift healthcheck \
     --namespace "${NS}" \
     --deployments onnx-triton-predictor
 
-# Following verification procedure is based on https://github.com/triton-inference-server/tutorials/tree/main/Quick_Deploy/OpenVINO#deploying-an-onnx-model
+# Following verification procedure is based on https://github.com/triton-inference-server/tutorials/tree/17331012af74eab68ad7c86d8a4ae494272ca4f7/Quick_Deploy/OpenVINO#deploying-an-onnx-model
 temp_dir=$(mktemp -d /tmp/triton-test-XXXXXX)
 pushd "${temp_dir}"
 
-curl -o client.py "https://raw.githubusercontent.com/triton-inference-server/tutorials/main/Quick_Deploy/ONNX/client.py"
+curl -o client.py "https://raw.githubusercontent.com/triton-inference-server/tutorials/17331012af74eab68ad7c86d8a4ae494272ca4f7/Quick_Deploy/ONNX/client.py"
 sed -i 's,url="localhost:8000",url="onnx-triton.apps.example.com",' ./client.py
 
 curl -o img1.jpg "https://www.hakaimagazine.com/wp-content/uploads/header-gulf-birds.jpg"
 
 python3 -m venv ./venv/
-./venv/bin/python -m pip install 'tritonclient[all]' torchvision
+./venv/bin/python -m pip install 'tritonclient[all]==2.59' torchvision==0.22
 
 hosts="$(hostname -i) onnx-triton.apps.example.com"
 if ! sudo grep -q "${hosts}" /etc/hosts; then

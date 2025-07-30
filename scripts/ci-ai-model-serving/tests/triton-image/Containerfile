@@ -6,5 +6,5 @@ FROM registry.access.redhat.com/ubi9/ubi-minimal:9.6
 RUN mkdir -p /models/densenet_onnx/1 && chmod -R 755 /models/densenet_onnx
 RUN curl -L \
    -o /models/densenet_onnx/1/model.onnx \
-   https://github.com/onnx/models/raw/refs/heads/main/validated/vision/classification/densenet-121/model/densenet-12.onnx
+   https://github.com/onnx/models/raw/b1eeaa1ac722dcc1cd1a8284bde34393dab61c3d/validated/vision/classification/densenet-121/model/densenet-12.onnx
 COPY config.pbtxt /models/densenet_onnx/config.pbtxt
