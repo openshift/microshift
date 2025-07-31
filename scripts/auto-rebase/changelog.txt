@@ -1,33 +1,11 @@
-- machine-config-operator embedded-component ae1506cbf8cc9566243ca0319e46d51ace7ba807 to dbaf702e511f029805e9aa3ec3245008dda45a02
-  - b30cc58b 2025-07-23T13:55:34+00:00 e2e: add cleanup for custom MCP MCN test
-
-- ovn-kubernetes image-amd64 0ea52bffeb97945c818e3bad8edbb12865c7b93c to a71aaf8dcf01858874c05c677d8a52b6b715ac57
-  - 93a8828f 2025-07-15T11:39:19+02:00 Update OWNERS file: Add Patryk/Martin as approvers
-  - 053585e9 2025-07-07T14:06:17+01:00 OVN EIP startup syncer: add UTs for pod / node deleted
-  - 41a91515 2025-07-07T11:53:43+01:00 EIP OVN controller: remove possibility of crash, improve logging and readability
-  - 68db55eb 2025-07-07T11:53:43+01:00 EIP OVN startup syncer: fix processing of ovn constructs
-  - 7588fd3a 2025-07-07T11:53:43+01:00 EgressIP: fix startup sync to add metadata
-  - 0b513c63 2025-07-04T17:10:44+01:00 chore: bump libovsdb to v0.8.0
-  - f792af55 2025-07-04T13:17:14+02:00 Use namespace reconcilation loop for syncing network policies
-  - 96db6fd1 2025-07-04T13:17:14+02:00 Use Handler FilterFunc to filter out np peer namespace
-  - 2d2e4454 2025-07-04T13:17:14+02:00 Reconcile namespace for network change
-  - b0b32b37 2025-07-03T16:22:24+03:00 kind: Rm push_args variable quotes
-  - 3735ec2d 2025-06-27T12:53:05-04:00 Remove physical port from l2 flow
-  - 813e2800 2025-06-26T18:27:38-04:00 Fixes FDB learning
-  - f1a31ed3 2025-06-26T17:58:19-04:00 Add static FDB entry to OVS for shared MAC
-
-- ovn-kubernetes image-arm64 0ea52bffeb97945c818e3bad8edbb12865c7b93c to a71aaf8dcf01858874c05c677d8a52b6b715ac57
-  - 93a8828f 2025-07-15T11:39:19+02:00 Update OWNERS file: Add Patryk/Martin as approvers
-  - 053585e9 2025-07-07T14:06:17+01:00 OVN EIP startup syncer: add UTs for pod / node deleted
-  - 41a91515 2025-07-07T11:53:43+01:00 EIP OVN controller: remove possibility of crash, improve logging and readability
-  - 68db55eb 2025-07-07T11:53:43+01:00 EIP OVN startup syncer: fix processing of ovn constructs
-  - 7588fd3a 2025-07-07T11:53:43+01:00 EgressIP: fix startup sync to add metadata
-  - 0b513c63 2025-07-04T17:10:44+01:00 chore: bump libovsdb to v0.8.0
-  - f792af55 2025-07-04T13:17:14+02:00 Use namespace reconcilation loop for syncing network policies
-  - 96db6fd1 2025-07-04T13:17:14+02:00 Use Handler FilterFunc to filter out np peer namespace
-  - 2d2e4454 2025-07-04T13:17:14+02:00 Reconcile namespace for network change
-  - b0b32b37 2025-07-03T16:22:24+03:00 kind: Rm push_args variable quotes
-  - 3735ec2d 2025-06-27T12:53:05-04:00 Remove physical port from l2 flow
-  - 813e2800 2025-06-26T18:27:38-04:00 Fixes FDB learning
-  - f1a31ed3 2025-06-26T17:58:19-04:00 Add static FDB entry to OVS for shared MAC
+- cluster-network-operator embedded-component 2a1d6159a44bf8aa26bba9981f144006a1d99990 to fd80a4aa660c66c93ba01749e23af2c9ea45d5b2
+  - 8b72568 2025-07-22T13:56:34+00:00 Configure use_ct_inv_match=false in nbdb when route advertisement is enabled
+  - 27f5906 2025-07-18T09:53:18+00:00 CARRY: frr-k8s: disable metrics wehbhook port
+  - 28d53ad 2025-07-17T16:02:44+00:00 FRR-K8s webhook: promote to priviledged
+  - 246cbe1 2025-07-17T16:02:44+00:00 FRRK8s CRDs: align to upstream
+  - b583bf8 2025-07-17T16:02:44+00:00 FRRK8s webhook: align to upstream
+  - 33417d5 2025-07-17T16:02:44+00:00 FRRK8s webhook: webhook liveness / readiness from metrics to webhook
+  - 1e571ff 2025-07-17T11:56:18+00:00 Validate NAD name and spec only in multus admission controller
+  - 2e42e27 2025-07-17T11:56:18+00:00 frr-k8s: stop listening for incoming connection in the bgp daemon
+  - c076fe7 2025-07-17T11:56:18+00:00 Pass '--gateway-mode' flag for ovnkube-cluster-manager
 
