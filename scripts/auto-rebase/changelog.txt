@@ -1,10 +1,40 @@
-- cluster-ingress-operator embedded-component 4f1ed7fc112e57a1f45c9b5948c3d14d017ddabc to 5bfbb600998c9882e70546de8d2b846e61472d64
-  - c10b831 2025-07-25T15:53:49-04:00 desiredIstio: Delete trustBundleName
+- api embedded-component 92b1455121e199fa2f3eb937ce9b68f910cb14e2 to 4c1f9af7fc7878998b415129b7723db6deac3ef9
+  - a7ca5c60 2025-07-29T10:30:45-04:00 Moving VSphereMultiDisk to GA
+  - 4f089eac 2025-07-24T22:23:56-04:00 fixup! features: add installer replacement feature gates
+  - 0339e56b 2025-07-24T14:24:54-04:00 features: add installer replacement feature gates
 
-- cluster-network-operator embedded-component bf88d53a057607fb16db6641d49a6f2285b965d4 to c19d5a6399e4aad7f627a7fa569caabe46ce94ac
-  - 676b19c 2025-07-28T20:57:26+03:00 ovn-k: Enable OVN-K feature when PreconfiguredUDNAddresses is enabled
+- cluster-csi-snapshot-controller-operator embedded-component ef2152f52b992addcbe24b402f1ddbf180049d85 to e3a691335bf8984295374737ffaaa79908723652
+  - 2086da6 2025-07-18T10:18:08+02:00 Bump all deps for 4.20
 
-- machine-config-operator embedded-component 859a75c3a7af428966cca82b991d7046f9962cee to f98561da636d624cd95629b2c2d1f45c6db84ebf
-  - e2598804 2025-07-22T09:30:07-04:00 msbic: use generics to simplify reconciliation
-  - a1988d16 2025-07-22T09:29:31-04:00 msbic: clean up helper functions
+- cluster-kube-apiserver-operator embedded-component 2a82fec138d1d868e4bfa6f4ded847032b2bfc24 to 7e89682034fad31f14db2be7d92eb7f89b6d093e
+  - 0952d63 2025-07-28T12:17:57+03:00 OCPBUGS-50489: Add missing service ports to apiserver service
+
+- kubernetes embedded-component b94367cabf3edea99cfd7ecf7e8bafdc908d83ca to c42ba29ac01d4ee90cae6a6e3e0b5baefec0f862
+  - 969900910 2025-07-21T12:19:08-04:00 UPSTREAM: <drop>: generate annotations
+  - 4e77d9d31 2025-07-21T12:19:03-04:00 UPSTREAM: <carry>: reintroduce non-suite annotation removal, with fix for missed disabled tests
+
+- kubernetes-kube-storage-version-migrator embedded-component caf798560ad386b4a254e855ace3e3f2d7db6d8d to 0f8a4eb84ace9b746cf25d51d80dacf34ca5f953
+  - fa39ded 2025-07-29T15:09:41+08:00 UPSTREAM: <carry>: Update Go to 1.24 and OCP to 4.20
+
+- machine-config-operator embedded-component f98561da636d624cd95629b2c2d1f45c6db84ebf to 7895ca3183bfb9fa64e38a626bc31e84d62bf68e
+  - 540d7ede 2025-07-25T14:21:27-05:00 added comments and an error if we are not authenticated in the registry
+  - b4366b7d 2025-07-22T20:03:44-04:00 Add workaround fix for static pod race
+  - fec01915 2025-07-08T15:11:55-04:00 Bump openshift/api, client-go
+  - 653dc594 2025-07-08T15:11:52-04:00 Migrate (Cluster)ImagePolicy to v1
+  - 12878e47 2025-07-01T11:19:42-05:00 OCPBUGS-57484: Handle migration from OpenShift SDN
+  - 37f5d312 2025-07-01T11:19:12-05:00 OPNET-681: Support migration from configure-ovs to NMState
+
+- router image-amd64 b41f9d05467fb7b3f6c2dafa6ac4b5e25164c0b6 to 6723dce855196c4554c9bee5581f4fbdf479eb80
+  - ad95b1f 2025-07-14T10:53:57-05:00 OCPBUGS-55506: Prevent startup failures due to name resolution
+
+- kubernetes image-amd64 b94367cabf3edea99cfd7ecf7e8bafdc908d83ca to c42ba29ac01d4ee90cae6a6e3e0b5baefec0f862
+  - 969900910 2025-07-21T12:19:08-04:00 UPSTREAM: <drop>: generate annotations
+  - 4e77d9d31 2025-07-21T12:19:03-04:00 UPSTREAM: <carry>: reintroduce non-suite annotation removal, with fix for missed disabled tests
+
+- router image-arm64 b41f9d05467fb7b3f6c2dafa6ac4b5e25164c0b6 to 6723dce855196c4554c9bee5581f4fbdf479eb80
+  - ad95b1f 2025-07-14T10:53:57-05:00 OCPBUGS-55506: Prevent startup failures due to name resolution
+
+- kubernetes image-arm64 b94367cabf3edea99cfd7ecf7e8bafdc908d83ca to c42ba29ac01d4ee90cae6a6e3e0b5baefec0f862
+  - 969900910 2025-07-21T12:19:08-04:00 UPSTREAM: <drop>: generate annotations
+  - 4e77d9d31 2025-07-21T12:19:03-04:00 UPSTREAM: <carry>: reintroduce non-suite annotation removal, with fix for missed disabled tests
 
