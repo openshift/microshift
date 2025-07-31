@@ -1,3 +1,0 @@
-- machine-config-operator embedded-component a91d9a82cbd8c019986c9ce0ea01e513e6fdd6b1 to b80d590e99b9ea3d7c8d4126ce2f801c05856d1e
-  - 1c625a25 2025-05-27T16:55:36+00:00 OCPBUGS-36859: Support NODEIP_HINT in IPI deployments too
-
