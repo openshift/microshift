@@ -269,8 +269,8 @@ github.com/openshift/etcd/client/pkg/v3 v3.5.1-0.20250722140445-b5ad268120cc h1:
 github.com/openshift/etcd/client/pkg/v3 v3.5.1-0.20250722140445-b5ad268120cc/go.mod h1:BgqT/IXPjK9NkeSDjbzwsHySX3yIle2+ndz28nVsjUs=
 github.com/openshift/etcd/client/v3 v3.5.1-0.20250722140445-b5ad268120cc h1:710Y8IQ8Y4uIF/UBvRWKqQ5QLllXhlD7rpsJ4DWQmoY=
 github.com/openshift/etcd/client/v3 v3.5.1-0.20250722140445-b5ad268120cc/go.mod h1:mFYy67IOqmbRf/kRUvsHixzo3iG+1OF2W2+jVIQRAnU=
-github.com/openshift/kubernetes-kube-storage-version-migrator v0.0.3-0.20250719041745-caf798560ad3 h1:aSFEQw7J5q1mzWYqeW6vm3ixOhhBWJkNepNxb57XUXo=
-github.com/openshift/kubernetes-kube-storage-version-migrator v0.0.3-0.20250719041745-caf798560ad3/go.mod h1:X3tzGhATM+qhiiIRdoBW/rDhXylEM0IltBRRDUG8AWk=
+github.com/openshift/kubernetes-kube-storage-version-migrator v0.0.3-0.20250729145742-0f8a4eb84ace h1:Y2Hi+vtF5uBy+UjQTV4w59HNCRKb4JYsJGMjXlpDgDw=
+github.com/openshift/kubernetes-kube-storage-version-migrator v0.0.3-0.20250729145742-0f8a4eb84ace/go.mod h1:o5cKv/pQ+exEYKq97WapNa5cxSPxuwBezHZHNW5RNRo=
 github.com/openshift/library-go v0.0.0-20250711143941-47604345e7ea h1:0BNis5UGo5Z7J9GtRY1nw/pt8hWxIZqvfqnqH3eV5cs=
 github.com/openshift/library-go v0.0.0-20250711143941-47604345e7ea/go.mod h1:tptKNust9MdRI0p90DoBSPHIrBa9oh+Rok59tF0vT8c=
 github.com/openshift/onsi-ginkgo/v2 v2.6.1-0.20250416174521-4eb003743b54 h1:ehXndVZfIk/fo18YJCMJ+6b8HL8tzqjP7yWgchMnfCc=
