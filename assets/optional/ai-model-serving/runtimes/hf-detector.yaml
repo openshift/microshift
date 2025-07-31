@@ -1,9 +1,9 @@
 apiVersion: serving.kserve.io/v1alpha1
 kind: ServingRuntime
 metadata:
-  name: vllm-runtime
+  name: guardrails-detector-huggingface-runtime
   annotations:
-    openshift.io/display-name: vLLM ServingRuntime for KServe
+    openshift.io/display-name: Hugging Face Detector ServingRuntime for KServe
     opendatahub.io/recommended-accelerators: '["nvidia.com/gpu"]'
   labels:
     opendatahub.io/dashboard: 'true'
@@ -14,21 +14,23 @@ spec:
   multiModel: false
   supportedModelFormats:
     - autoSelect: true
-      name: vLLM
+      name: guardrails-detector-hf-runtime
   containers:
     - name: kserve-container
-      image: vllm-image
+      image: guardrails-detector-huggingface-runtime-image
       command:
-        - python
-        - -m
-        - vllm.entrypoints.openai.api_server
+        - uvicorn
+        - app:app
       args:
-        - "--port=8080"
-        - "--model=/mnt/models"
-        - "--served-model-name={{.Name}}"
+        - "--workers=1"
+        - "--host=0.0.0.0"
+        - "--port=8000"
+        - "--log-config=/common/log_conf.yaml"
       env:
+        - name: MODEL_DIR
+          value: /mnt/models
         - name: HF_HOME
           value: /tmp/hf_home
       ports:
-        - containerPort: 8080
+        - containerPort: 8000
           protocol: TCP

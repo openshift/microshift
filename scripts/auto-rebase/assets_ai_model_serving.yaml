@@ -120,13 +120,13 @@ assets:
         src: caikit-standalone-template.yaml
       - file: caikit-tgis.yaml
         src: caikit-tgis-template.yaml
+      - file: hf-detector.yaml
+        src: hf-detector-template.yaml
       - file: ovms-kserve.yaml
         src: ovms-kserve-template.yaml
-      - file: tgis.yaml
-        src: tgis-template.yaml
+      - file: vllm-cuda.yaml
+        src: vllm-cuda-template.yaml
       - file: vllm-gaudi.yaml
         src: vllm-gaudi-template.yaml
       - file: vllm-rocm.yaml
         src: vllm-rocm-template.yaml
-      - file: vllm.yaml
-        src: vllm-template.yaml

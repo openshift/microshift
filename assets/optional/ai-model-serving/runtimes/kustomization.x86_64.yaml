@@ -1,26 +1,38 @@
 
 images:
-  - name: vllm-cpu-image
-    newName: quay.io/modh/vllm
-    digest: sha256:4642b4337883ee6f768096829529e69e42689ef082f3b7e1439199fb20b7dc6a
-  - name: vllm-gaudi-image
-    newName: quay.io/modh/vllm
-    digest: sha256:f2d69a8c2ab85e5da0daa4ec42902599b7de0a24526ee2a970e23405718def8a
-  - name: vllm-rocm-image
-    newName: quay.io/modh/vllm
-    digest: sha256:51d79c688db3652143b954cca41f56ab775cf6456386681c60bcf4c2a1541e5c
   - name: caikit-tgis-image
     newName: quay.io/modh/caikit-tgis-serving
-    digest: sha256:2c7eef73708b5d73de33153459ac7238fdcf517cdc3544c775981f5814b4b6ed
+    digest: sha256:d8294f446afefc6cbba0df882bba12cdad142f79b29bda46227a6328128d7fb6
   - name: caikit-standalone-image
     newName: quay.io/modh/caikit-nlp
-    digest: sha256:24d74898dc50ebdd3526f6cb8a028a521e79adf5bfe52559afd3734900da975e
+    digest: sha256:c867652a543eacd8288d08e9d38d8d25468c04fb838eebf450906293890b040d
   - name: tgis-image
     newName: quay.io/modh/text-generation-inference
-    digest: sha256:aebf545d8048a59174f70334dc90c6b97ead4602a39cb7598ea68c8d199168a2
+    digest: sha256:e923ebb8e6b8bbc28144d3f143c8453a4c526bc1852952209976cc27a311883b
   - name: ovms-image
     newName: quay.io/modh/openvino_model_server
-    digest: sha256:53b7fcf95de9b81e4c8652d0bf4e84e22d5b696827a5d951d863420c68b9cfe8
+    digest: sha256:eee2857ddd5cc2df9ea7373ae7c6ae814d77bd631db5c52b91edad18ac6c73c8
   - name: vllm-cuda-image
     newName: quay.io/modh/vllm
-    digest: sha256:79e1f24bba1d3e694f47f66ba9f8184e70310a10b77bf11c0febd0c926234950
+    digest: sha256:56aa86c6ed6ba6cc9557a8583ff9d4ee535193f6cda030bd1268064bc70120e3
+  - name: guardrails-detector-huggingface-runtime-image
+    newName: quay.io/modh/odh-trustyai-hf-detector-runtime-rhel9
+    digest: sha256:86316078a2d70ed2d754d683f0daedb76e632dd2b0588afa7713ce2a2a593e2f
+  - name: vllm-cpu-image
+    newName: quay.io/modh/vllm
+    digest: sha256:40e3b271035a750fb185cedb241a108ba0c11de90793d88983aaf805e5357f45
+  - name: vllm-gaudi-image
+    newName: quay.io/modh/vllm
+    digest: sha256:6025bfb31163b7db86d7f0a844da068c88babf4e970c5244492e82bdbaf8dcbe
+  - name: vllm-ppc64le-image
+    newName: quay.io/opendatahub/vllm:fast-ppc64le
+    digest: quay.io/opendatahub/vllm:fast-ppc64le
+  - name: vllm-rocm-image
+    newName: quay.io/modh/vllm
+    digest: sha256:2a90ded5cab4c03d4937c81cf0587cb0109c589e37058a50099139ab62a0666c
+  - name: vllm-s390x-image
+    newName: quay.io/opendatahub/vllm:fast-s390x
+    digest: quay.io/opendatahub/vllm:fast-s390x
+  - name: ray-tls-generator-image
+    newName: registry.redhat.io/ubi9/ubi-minimal:latest
+    digest: registry.redhat.io/ubi9/ubi-minimal:latest

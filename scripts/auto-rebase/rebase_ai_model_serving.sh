@@ -85,7 +85,7 @@ download_rhoai_manifests() {
         "${bundle_ref}" \
         --filter-by-os amd64 || return 1
 
-    local -r operator_ref=$(yq '.spec.relatedImages[] | select(.name == "odh-rhel8-operator-*") | .image' "${STAGING_BUNDLE}/${CSV_FILENAME}")
+    local -r operator_ref=$(yq '.spec.relatedImages[] | select(.name == "odh-rhel9-operator-*") | .image' "${STAGING_BUNDLE}/${CSV_FILENAME}")
     title "Fetching RHOAI manifests"
     # shellcheck disable=SC2086
     oc image extract \
@@ -163,7 +163,8 @@ update_runtimes() {
 images:
 EOF
 
-    local -r images=$(cat "${STAGING_OPERATOR}"/modelcontroller/base/*.env | grep "\-image")
+    # shellcheck disable=SC2046
+    local -r images=$(grep --no-filename "\-image" $(find "${STAGING_OPERATOR}"/modelcontroller/base -iname '*.env'))
     for image in ${images}; do
         local image_name="${image%=*}"
         local image_ref="${image#*=}"
