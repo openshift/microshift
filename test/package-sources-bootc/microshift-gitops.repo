@@ -1,0 +1,10 @@
+[microshift-gitops]
+name = Red Hat OpenShift GitOps 1.16 for RHEL 9 x86_64 (RPMs)
+baseurl = https://cdn.redhat.com/content/dist/layered/rhel9/{{ .Env.UNAME_M }}/gitops/1.16/os
+enabled = 1
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+sslverify = 1
+sslcacert = /etc/rhsm/ca/redhat-uep.pem
+sslclientkey = {{ .Env.SSL_CLIENT_KEY_FILE }}
+sslclientcert = {{ .Env.SSL_CLIENT_CERT_FILE }}
