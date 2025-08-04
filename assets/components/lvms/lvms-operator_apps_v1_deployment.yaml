@@ -66,6 +66,9 @@ spec:
               memory: 50Mi
           securityContext:
             allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - NET_RAW
           terminationMessagePolicy: FallbackToLogsOnError
           volumeMounts:
             - mountPath: /tmp/k8s-webhook-server/serving-certs
