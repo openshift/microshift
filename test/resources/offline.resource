@@ -80,7 +80,7 @@ Run With Kubeconfig
     ...    ${command}    The command to run. Should but `oc` or `kubectl` but this is not enforced
     ...    @{args}    The arguments to pass to the command. See ../../resources/qemu-guest-agent.py for syntax
     [Arguments]    ${command}    @{args}
-    ${env}=    Create Dictionary    KUBECONFIG=/var/lib/microshift/resources/kubeadmin/kubeconfig
+    VAR    &{env}    KUBECONFIG=/var/lib/microshift/resources/kubeadmin/kubeconfig
     ${result}    ${ignore}=    Wait Until Keyword Succeeds    5x    2s
     ...    Run Guest Process    ${GUEST_NAME}    ${command}    @{args}    env=&{env}
     Log Many    ${result["stdout"]}    ${result["stderr"]}

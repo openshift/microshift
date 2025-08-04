@@ -57,9 +57,9 @@ Systemctl
     Should Be True    "${verb}" in {"restart", "start", "stop", "enable", "disable"}
 
     IF    "${verb}" in {"restart", "start"}
-        ${state}=    Set Variable    running
+        VAR    ${state}    running
     ELSE IF    "${verb}" in {"stop"}
-        ${state}=    Set Variable    dead
+        VAR    ${state}    dead
     END
 
     ${stdout}    ${stderr}    ${rc}=    Execute Command

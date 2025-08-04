@@ -20,6 +20,6 @@ Get Expected Fault Messages
     [Arguments]    ${action}    ${resource}
     ${yaml_file}=    OperatingSystem.Get File    resources/fault-test-messages.yaml
     ${messages_dict}=    yaml.Safe Load    ${yaml_file}
-    ${messages}=    Set Variable    ${messages_dict}[${action}][${resource}]
+    VAR    ${messages}    ${messages_dict}[${action}][${resource}]
     @{message_lines}=    Split To Lines    ${messages}
     RETURN    @{message_lines}

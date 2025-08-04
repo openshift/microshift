@@ -25,7 +25,7 @@ Connect To Pod Over Local Interface
     [Arguments]    ${pod}    ${ns}    ${if}
 
     ${networks}=    Get And Verify Pod Networks    ${pod}    ${ns}    ${NAMESPACE}/bridge*-conf
-    ${extra_ip}=    Set Variable    ${networks}[1][ips][0]
+    VAR    ${extra_ip}    ${networks}[1][ips][0]
 
     ${stdout}=    Command Should Work    curl -v --interface ${if} ${extra_ip}:8080
     Should Contain    ${stdout}    Hello MicroShift
