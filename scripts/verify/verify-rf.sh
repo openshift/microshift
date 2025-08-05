@@ -15,4 +15,4 @@ cd "${ROOTDIR}/test"
 set -x
 "${RF_VENV}/bin/robocop" check
 
-"${RF_VENV}/bin/robocop" format --diff
+"${RF_VENV}/bin/robocop" format --diff --no-overwrite
