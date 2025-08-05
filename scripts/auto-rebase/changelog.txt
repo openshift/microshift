@@ -1,3 +1,7 @@
-- operator-framework-olm embedded-component 650a3cd620865598f97b5a3eaaf88cf044e2ffb3 to 922674d862d36ec848a7cf364d669731edc9c038
-  - c4f53464 2025-06-12T21:04:47+00:00 reduce cache expiriry frequency (#3591)
+- cluster-network-operator embedded-component 5e51d1d51ce0e791c46009fa4e2e6f65a17853bc to 45b0ba681e5b2ff88b75c61e17a375fe301b2bb6
+  - 61aa597 2025-07-08T09:43:58+02:00 Implement IPsec NAT-Traversal encapsulation option
+  - 2c5236c 2025-07-08T09:42:40+02:00 Bump openshift/api for IPsec encapsulation API
+
+- machine-config-operator embedded-component 4aeec11792b124a0eaa15e36b35750d25cc4be81 to cf0e2b441679f08c69083ab32dd1a4d083de0f5b
+  - 92b758b7 2025-07-22T15:53:18-04:00 container_runtime_config_controller: log MC deletion helpers: log MC deletion
 
