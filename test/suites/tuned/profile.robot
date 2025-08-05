@@ -88,7 +88,7 @@ Teardown
 Setup Namespace
     [Documentation]    Setup unique namespace with elevated privileges
     ${ns}=    Create Unique Namespace
-    Set Suite Variable    \${NAMESPACE}    ${ns}
+    VAR    ${NAMESPACE}=    ${ns}    scope=SUITE
     Run With Kubeconfig    oc label ns ${ns} --overwrite pod-security.kubernetes.io/audit=privileged
     Run With Kubeconfig    oc label ns ${ns} --overwrite pod-security.kubernetes.io/enforce=privileged
     Run With Kubeconfig    oc label ns ${ns} --overwrite pod-security.kubernetes.io/warn=privileged

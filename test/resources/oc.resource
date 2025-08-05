@@ -30,9 +30,9 @@ Oc Get JsonPath
     [Arguments]    ${type}    ${namespace}    ${resource}    ${jsonpath}
 
     IF    "${namespace}"=="${EMPTY}"
-        VAR    ${namespace_arg}    -A
+        VAR    ${namespace_arg}=    -A
     ELSE
-        VAR    ${namespace_arg}    -n ${namespace}
+        VAR    ${namespace_arg}=    -n ${namespace}
     END
 
     ${text}=    Run With Kubeconfig    oc get ${namespace_arg} -o=jsonpath='{ ${jsonpath} }' ${type} ${resource}

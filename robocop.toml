@@ -8,7 +8,10 @@ ignore = [
     "misaligned-continuation-row",
     "unused-variable",
     "expression-can-be-simplified",
-    "no-suite-variable"
+    "no-suite-variable",
+    "no-global-variable",
+    "no-test-variable",
+    "variable-overwritten-before-usage"
 ]
 
 configure = [

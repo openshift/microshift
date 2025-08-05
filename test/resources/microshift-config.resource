@@ -10,7 +10,7 @@ Resource            common.resource
 
 
 *** Variables ***
-${LVMD_VG_OVERRIDE}=    ${EMPTY}
+${LVMD_VG_OVERRIDE}     ${EMPTY}
 
 
 *** Keywords ***
@@ -26,9 +26,9 @@ Save Default MicroShift Config
     ...    cat /etc/microshift/config.yaml
     ...    sudo=True    return_rc=True
     IF    ${rc} == 0
-        VAR    ${DEFAULT_MICROSHIFT_CONFIG}    ${stdout}    scope=SUITE
+        VAR    ${DEFAULT_MICROSHIFT_CONFIG}=    ${stdout}    scope=SUITE
     ELSE
-        VAR    ${DEFAULT_MICROSHIFT_CONFIG}    ${EMPTY}    scope=SUITE
+        VAR    ${DEFAULT_MICROSHIFT_CONFIG}=    ${EMPTY}    scope=SUITE
     END
 
 Restore Default MicroShift Config
@@ -89,9 +89,9 @@ Save Lvmd Config
     ...    cat /etc/microshift/lvmd.yaml
     ...    sudo=True    return_rc=True
     IF    ${rc} == 0
-        VAR    ${DEFAULT_LVMD_CONFIG}    ${stdout}    scope=SUITE
+        VAR    ${DEFAULT_LVMD_CONFIG}=    ${stdout}    scope=SUITE
     ELSE
-        VAR    ${DEFAULT_LVMD_CONFIG}    ${EMPTY}    scope=SUITE
+        VAR    ${DEFAULT_LVMD_CONFIG}=    ${EMPTY}    scope=SUITE
     END
 
 Extend Lvmd Config

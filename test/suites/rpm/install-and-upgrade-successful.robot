@@ -138,10 +138,10 @@ Verify Service Active Timestamps
     Should Not Be Empty    ${cts2}
     Should Not Be Empty    ${mts2}
     # Verify that timestamps exist (services were active)
-    Should Not Be Equal As Strings    ${cts1}    ActiveEnterTimestamp=
-    Should Not Be Equal As Strings    ${mts1}    ActiveEnterTimestamp=
-    Should Not Be Equal As Strings    ${cts2}    ActiveEnterTimestamp=
-    Should Not Be Equal As Strings    ${mts2}    ActiveEnterTimestamp=
+    Should Not Be Equal As Strings    ${cts1}    "ActiveEnterTimestamp="
+    Should Not Be Equal As Strings    ${mts1}    "ActiveEnterTimestamp="
+    Should Not Be Equal As Strings    ${cts2}    "ActiveEnterTimestamp="
+    Should Not Be Equal As Strings    ${mts2}    "ActiveEnterTimestamp="
     # Verify that timestamps changed (services restarted)
     Should Not Be Equal As Strings    ${cts1}    ${cts2}
     Should Not Be Equal As Strings    ${mts1}    ${mts2}

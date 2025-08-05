@@ -117,8 +117,8 @@ Setup
     @{enps}=    String.Split To Lines    ${out}
     ${len}=    Get Length    ${enps}
     Should Be True    ${len}>=2
-    Set Suite Variable    ${MACVLAN_MASTER}    ${enps[0]}
-    Set Suite Variable    ${IPVLAN_MASTER}    ${enps[1]}
+    VAR    ${MACVLAN_MASTER}=    ${enps[0]}    scope=SUITE
+    VAR    ${IPVLAN_MASTER}=    ${enps[1]}    scope=SUITE
     Verify MicroShift RPM Install
 
 Template And Create NAD And Pod
@@ -144,7 +144,7 @@ Connect To Pod From The Hypervisor
     [Arguments]    ${pod}    ${ns}    ${extra_cni_name}
 
     ${networks}=    Get And Verify Pod Networks    ${pod}    ${ns}    ${extra_cni_name}
-    ${extra_ip}=    Set Variable    ${networks}[1][ips][0]
+    VAR    ${extra_ip}=    ${networks}[1][ips][0]
     Should Contain    ${extra_ip}    192.168.112
 
     ${result}=    Process.Run Process    curl    -v    ${extra_ip}:8080

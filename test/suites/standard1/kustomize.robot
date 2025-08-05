@@ -77,7 +77,7 @@ No Extension
 
 
 *** Keywords ***
-Setup Suite    # robocop: disable=too-long-keyword
+Setup Suite    # robocop: off=too-long-keyword
     [Documentation]    Set up all of the tests in this suite
     Check Required Env Variables
     Login MicroShift Host
@@ -86,55 +86,55 @@ Setup Suite    # robocop: disable=too-long-keyword
 
     # Used by "Load From /etc/microshift/manifests"
     ${ns}=    Generate Manifests    /etc/microshift/manifests
-    Set Suite Variable    \${ETC_NAMESPACE}    ${ns}
+    VAR    ${ETC_NAMESPACE}=    ${ns}    scope=SUITE
 
     # Used by "Load From /etc/microshift/manifestsd"
     ${rand}=    Generate Random String
-    Set Suite Variable    \${ETC_SUBDIR}    /etc/microshift/manifests.d/${rand}
+    VAR    ${ETC_SUBDIR}=    /etc/microshift/manifests.d/${rand}    scope=SUITE
     ${ns}=    Generate Manifests    ${ETC_SUBDIR}
-    Set Suite Variable    \${ETC_SUBDIR_NAMESPACE}    ${ns}
+    VAR    ${ETC_SUBDIR_NAMESPACE}=    ${ns}    scope=SUITE
 
     # Used by "Delete from /etc/microshift/manifestsd"
     ${rand}=    Generate Random String
-    Set Suite Variable    \${DELETE_ETC_SUBDIR}    /etc/microshift/manifests.d/${rand}
+    VAR    ${DELETE_ETC_SUBDIR}=    /etc/microshift/manifests.d/${rand}    scope=SUITE
     ${ns}=    Generate Manifests    ${DELETE_ETC_SUBDIR}
-    Set Suite Variable    \${DELETE_ETC_SUBDIR_NAMESPACE}    ${ns}
+    VAR    ${DELETE_ETC_SUBDIR_NAMESPACE}=    ${ns}    scope=SUITE
 
     # Used by "Load From /usr/lib/microshift/manifests"
     ${ns}=    Generate Manifests    /usr/lib/microshift/manifests
-    Set Suite Variable    \${USR_NAMESPACE}    ${ns}
+    VAR    ${USR_NAMESPACE}=    ${ns}    scope=SUITE
 
     # Used by "Load From /usr/lib/microshift/manifestsd"
     ${rand}=    Generate Random String
-    Set Suite Variable    \${USR_SUBDIR}    /usr/lib/microshift/manifests.d/${rand}
+    VAR    ${USR_SUBDIR}=    /usr/lib/microshift/manifests.d/${rand}    scope=SUITE
     ${ns}=    Generate Manifests    ${USR_SUBDIR}
-    Set Suite Variable    \${USR_SUBDIR_NAMESPACE}    ${ns}
+    VAR    ${USR_SUBDIR_NAMESPACE}=    ${ns}    scope=SUITE
 
     # Used by "Delete from /usr/lib/microshift/manifestsd"
     ${rand}=    Generate Random String
-    Set Suite Variable    \${DELETE_USR_SUBDIR}    /usr/lib/microshift/manifests.d/${rand}
+    VAR    ${DELETE_USR_SUBDIR}=    /usr/lib/microshift/manifests.d/${rand}    scope=SUITE
     ${ns}=    Generate Manifests    ${DELETE_USR_SUBDIR}
-    Set Suite Variable    \${DELETE_USR_SUBDIR_NAMESPACE}    ${ns}
+    VAR    ${DELETE_USR_SUBDIR_NAMESPACE}=    ${ns}    scope=SUITE
 
     # Used by "Load From Configured Dir"
     ${ns}=    Generate Manifests    ${NON_DEFAULT_DIR}
-    Set Suite Variable    \${NON_DEFAULT_NAMESPACE}    ${ns}
+    VAR    ${NON_DEFAULT_NAMESPACE}=    ${ns}    scope=SUITE
 
     # Used by "Do Not Load From Unconfigured Dir"
     ${ns}=    Generate Manifests    ${UNCONFIGURED_DIR}
-    Set Suite Variable    \${UNCONFIGURED_NAMESPACE}    ${ns}
+    VAR    ${UNCONFIGURED_NAMESPACE}=    ${ns}    scope=SUITE
 
     # Used by "Yaml Extension"
     ${ns}=    Generate Manifests    ${YAML_PATH}    kustomization.yaml
-    Set Suite Variable    \${YAML_NAMESPACE}    ${ns}
+    VAR    ${YAML_NAMESPACE}=    ${ns}    scope=SUITE
 
     # Used by "Yml Extension"
     ${ns}=    Generate Manifests    ${YML_PATH}    kustomization.yml
-    Set Suite Variable    \${YML_NAMESPACE}    ${ns}
+    VAR    ${YML_NAMESPACE}=    ${ns}    scope=SUITE
 
     # Used by "No Extension"
     ${ns}=    Generate Manifests    ${NOEXT_PATH}    Kustomization
-    Set Suite Variable    \${NOEXT_NAMESPACE}    ${ns}
+    VAR    ${NOEXT_NAMESPACE}=    ${ns}    scope=SUITE
 
     # Extend the configuration setting to add the unique path to the defaults
     ${config_content}=    Catenate    SEPARATOR=\n
@@ -151,7 +151,7 @@ Setup Suite    # robocop: disable=too-long-keyword
 
     Restart MicroShift
 
-Teardown Suite    # robocop: disable=too-many-calls-in-keyword
+Teardown Suite    # robocop: off=too-many-calls-in-keyword
     [Documentation]    Clean up all of the tests in this suite
 
     Clear Manifest Directory    /etc/microshift/manifests
@@ -288,7 +288,7 @@ Get Manifest Deletion Paths
     [Documentation]    For given manifest path, get path to 'delete' subdir and destination dir for manifest to be deleted.
     [Arguments]    ${manifest_path}
     ${path_list}=    Split String    ${manifest_path}    /
-    ${manifest_dirname}=    Set Variable    ${path_list}[-1]
+    VAR    ${manifest_dirname}=    ${path_list}[-1]
     ${delete_base_dir}=    Evaluate    "/".join(${path_list}[:-1]+["delete"])
     ${delete_manifest_path}=    Catenate    SEPARATOR=/    ${delete_base_dir}    ${manifest_dirname}
     RETURN    ${delete_base_dir}    ${delete_manifest_path}

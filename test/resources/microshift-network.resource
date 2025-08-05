@@ -53,8 +53,8 @@ Access Hello Microshift
 
     ${ip}=    Add Brackets If Ipv6    ${ushift_ip}
 
-    VAR    ${connect_to}    "${hostname}::${ip}:"
-    VAR    ${url_path}    "${scheme}://${hostname}:${ushift_port}${path}"
+    VAR    ${connect_to}=    "${hostname}::${ip}:"
+    VAR    ${url_path}=    "${scheme}://${hostname}:${ushift_port}${path}"
 
     ${result}=    Run Process
     ...    curl -k -i ${url_path} --connect-to ${connect_to}

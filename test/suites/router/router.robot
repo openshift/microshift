@@ -334,8 +334,8 @@ Setup With Custom Config
 
 Setup Namespaces
     [Documentation]    Configure the required namespaces for namespace ownership tests.
-    Set Suite Variable    \${NS_OWNERSHIP_1}    ${NAMESPACE}-ownership-1
-    Set Suite Variable    \${NS_OWNERSHIP_2}    ${NAMESPACE}-ownership-2
+    VAR    ${NS_OWNERSHIP_1}=    ${NAMESPACE}-ownership-1    scope=SUITE
+    VAR    ${NS_OWNERSHIP_2}=    ${NAMESPACE}-ownership-2    scope=SUITE
     Create Namespace    ${NS_OWNERSHIP_1}
     Create Namespace    ${NS_OWNERSHIP_2}
 

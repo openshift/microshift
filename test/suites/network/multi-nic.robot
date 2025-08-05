@@ -122,13 +122,13 @@ Initialize Nmcli Variables
     ...    ${NMCLI_CMD} | sed -n 1p | xargs
     ...    return_stdout=True    return_stderr=True    return_rc=True
     Should Be Equal As Integers    ${rc}    0
-    Set Suite Variable    \${NIC1_NAME}    ${stdout}
+    VAR    ${NIC1_NAME}=    ${stdout}    scope=SUITE
 
     ${stdout}    ${stderr}    ${rc}=    Execute Command
     ...    ${NMCLI_CMD} | sed -n 2p | xargs
     ...    return_stdout=True    return_stderr=True    return_rc=True
     Should Be Equal As Integers    ${rc}    0
-    Set Suite Variable    \${NIC2_NAME}    ${stdout}
+    VAR    ${NIC2_NAME}=    ${stdout}    scope=SUITE
 
 Disable Interface
     [Documentation]    Disable NIC given in ${conn_name}. Change is not persistent. On
@@ -145,7 +145,7 @@ Login Switch To IP
 
     IF    '${USHIFT_HOST}'!='${new_ip}'
         Logout MicroShift Host
-        Set Global Variable    \${USHIFT_HOST}    ${new_ip}
+        VAR    ${USHIFT_HOST}=    ${new_ip}    scope=GLOBAL
         Login MicroShift Host
     END
 

@@ -86,7 +86,7 @@ Validate Migration
 
 Delete Migration Resources
     [Documentation]    Remove the CRD and Storage State and Version Migration resources
-    ${query}=    Set Variable    {.items[?(@.spec.resource.group=='test.resource')].metadata.name}
+    VAR    ${query}=    {.items[?(@.spec.resource.group=='test.resource')].metadata.name}
     ${migration_resource_name}=    Run With Kubeconfig
     ...    oc get storageversionmigration -o jsonpath="${query}"
 

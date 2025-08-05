@@ -130,9 +130,9 @@ Create Usr Directory Overlay
 
     ${is_bootc}=    Is System Bootc
     IF    ${is_bootc}
-        VAR    ${cmd}    bootc usr-overlay
+        VAR    ${cmd}=    bootc usr-overlay
     ELSE
-        VAR    ${cmd}    rpm-ostree usroverlay
+        VAR    ${cmd}=    rpm-ostree usroverlay
     END
 
     ${stdout}    ${stderr}    ${rc}=    Execute Command

@@ -97,9 +97,9 @@ Verify MicroShift RPM Install
     # times of the installed files
     ${is_ostree}=    Is System OSTree
     IF    ${is_ostree}
-        VAR    ${nomtime}    --nomtime
+        VAR    ${nomtime}=    --nomtime
     ELSE
-        VAR    ${nomtime}    ${EMPTY}
+        VAR    ${nomtime}=    ${EMPTY}
     END
 
     # Checks all files from RPM packages except config files

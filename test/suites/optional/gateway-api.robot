@@ -43,7 +43,7 @@ Deploy Hello MicroShift
 
 Setup Namespace
     [Documentation]    Configure a namespace where to create all resources for later cleanup.
-    Set Suite Variable    \${NS_GATEWAY}    ${NAMESPACE}-gw-1
+    VAR    ${NS_GATEWAY}    ${NAMESPACE}-gw-1    scope=SUITE
     Create Namespace    ${NS_GATEWAY}
 
 Delete Namespace
@@ -53,9 +53,9 @@ Delete Namespace
 Create Gateway
     [Documentation]    Create a gateway using given hostname and port. Waits for readiness
     [Arguments]    ${hostname}    ${port}    ${namespace}
-    ${tmp}=    Set Variable    /tmp/gateway.yaml
-    Set Test Variable    ${HOSTNAME}    ${hostname}
-    Set Test Variable    ${PORT}    ${port}
+    VAR    ${tmp}    /tmp/gateway.yaml
+    VAR    ${HOSTNAME}    ${hostname}    scope=TEST
+    VAR    ${PORT}    ${port}    scope=TEST
     Run Keyword And Ignore Error
     ...    Remove File    ${tmp}
     Generate File From Template    ${GATEWAY_MANIFEST_TMPL}    ${tmp}
@@ -67,9 +67,9 @@ Create Gateway
 Create HTTP Route
     [Documentation]    Create an HTTP route using the given hostname and namespace. Waits for acceptance in a gateway.
     [Arguments]    ${hostname}    ${namespace}
-    ${tmp}=    Set Variable    /tmp/route.yaml
-    Set Test Variable    ${HOSTNAME}    ${hostname}
-    Set Test Variable    ${NS}    ${namespace}
+    VAR    ${tmp}    /tmp/route.yaml
+    VAR    ${HOSTNAME}    ${hostname}    scope=TEST
+    VAR    ${NS}    ${namespace}    scope=TEST
     Run Keyword And Ignore Error
     ...    Remove File    ${tmp}
     Generate File From Template    ${HTTP_ROUTE_MANIFEST_TMPL}    ${tmp}
@@ -83,7 +83,7 @@ Create HTTP Route
 
 Generate File From Template
     [Documentation]    Generate file from template
-    [Arguments]    ${template_file}    ${output_file}
-    ${template}=    OperatingSystem.Get File    ${template_file}
-    ${message}=    Replace Variables    ${template}
-    OperatingSystem.Append To File    ${output_file}    ${message}
+    [Arguments]    ${template_file}    ${out_file}
+    ${template}    OperatingSystem.Get File    ${template_file}
+    ${message}    Replace Variables    ${template}
+    OperatingSystem.Append To File    ${out_file}    ${message}

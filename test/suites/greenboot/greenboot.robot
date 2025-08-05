@@ -97,7 +97,7 @@ Disrupt Service
     ${stdout}    ${rc}=    Execute Command
     ...    which hostname
     ...    sudo=False    return_rc=True
-    IF    ${rc} == 0    Set Suite Variable    \${HOSTNAME_BIN_PATH}    ${stdout}
+    IF    ${rc} == 0    VAR    ${HOSTNAME_BIN_PATH}=    ${stdout}    scope=SUITE
 
     # This covers both ostree and bootc systems
     ${is_ostree}=    Is System OSTree

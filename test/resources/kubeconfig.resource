@@ -39,7 +39,7 @@ Setup Kubeconfig
         ...    https://${ip}:${API_PORT}
     END
     ${path}=    Create Random Temp File    ${kubeconfig}
-    VAR    ${KUBECONFIG}    ${path}    scope=SUITE
+    VAR    ${KUBECONFIG}=    ${path}    scope=SUITE
 
 Setup Custom Kubeconfig
     [Documentation]    Get the kubeconfig file from the path,
@@ -47,7 +47,7 @@ Setup Custom Kubeconfig
     [Arguments]    ${custom_path}
     ${kubeconfig}=    Get Kubeconfig    ${custom_path}
     ${path}=    Create Random Temp File    ${kubeconfig}
-    VAR    ${KUBECONFIG}    ${path}    scope=SUITE
+    VAR    ${KUBECONFIG}=    ${path}    scope=SUITE
 
 Remove Kubeconfig
     [Documentation]    Remove kubeconfig ${KUBECONFIG} file.

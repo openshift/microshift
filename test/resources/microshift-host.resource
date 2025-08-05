@@ -85,7 +85,7 @@ Is System Bootc
     IF    ${rc} != 0    RETURN    ${FALSE}
 
     ${json_status}=    Json Parse    ${stdout}
-    VAR    ${bootc_type}    ${json_status}[status][type]
+    VAR    ${bootc_type}=    ${json_status}[status][type]
     IF    '${bootc_type}' == 'bootcHost'
         RETURN    ${TRUE}
     ELSE

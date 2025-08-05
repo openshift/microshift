@@ -84,7 +84,7 @@ Run Container Access Check On File
     ...    returns a list of errors if access was granted
     [Arguments]    ${file_path}    ${cmd}=cat
 
-    VAR    @{cmd_list}    ${cmd}
-    VAR    &{file_paths_map}    ${file_path}=${cmd_list}
+    VAR    @{cmd_list}=    ${cmd}
+    VAR    &{file_paths_map}=    ${file_path}=${cmd_list}
     ${err_list}=    Run Access Check    ${file_paths_map}
     RETURN    ${err_list}
