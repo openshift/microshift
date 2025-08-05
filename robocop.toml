@@ -19,5 +19,4 @@ configure = [
     "too-many-calls-in-test-case.max_calls=20",
     "line-too-long.line_length=200",
     "file-too-long.max_lines=1000"
-
 ]

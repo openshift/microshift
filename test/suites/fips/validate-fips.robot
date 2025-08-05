@@ -71,7 +71,7 @@ Check Payload Tool Must Pass
     VAR    ${podman_args}=    --authfile /etc/crio/openshift-pull-secret --privileged -i -v /:/myroot
     VAR    ${scan_command}=    scan node --root /myroot
     ${path}=    Create Random Temp File
-    VAR    ${CHECK_PAYLOAD_OUTPUT_FILE}=    ${path}    scope=GLOBAL    # robocop: off=no-global-variable
+    VAR    ${CHECK_PAYLOAD_OUTPUT_FILE}=    ${path}    scope=GLOBAL
     ${rc}=    Execute Command    rpm -qi microshift >${CHECK_PAYLOAD_OUTPUT_FILE} 2>&1
     ...    sudo=True    return_rc=True    return_stdout=False    return_stderr=False
     Should Be Equal As Integers    0    ${rc}
@@ -86,7 +86,7 @@ Check Container Images In Release Must Pass
     VAR    ${podman_mounts}=    -v ${PULL_SECRET_PATH}:${podman_pull_secret}
     VAR    ${podman_args}=    --rm --authfile ${PULL_SECRET_PATH} --privileged ${podman_mounts}
     ${path}=    Create Random Temp File
-    VAR    ${CHECK_PAYLOAD_REL_OUTPUT_FILE}=    ${path}    scope=GLOBAL    # robocop: off=no-global-variable
+    VAR    ${CHECK_PAYLOAD_REL_OUTPUT_FILE}=    ${path}    scope=GLOBAL
     @{images}=    Get Images From Release File
     FOR    ${image}    IN    @{images}
         VAR    ${scan_command}=    scan operator --spec ${image}
