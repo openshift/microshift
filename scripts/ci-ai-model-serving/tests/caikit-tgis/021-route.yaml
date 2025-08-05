@@ -1,0 +1,13 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: flan-t5
+spec:
+  host: flan-t5-predictor.apps.example.com
+  port:
+    targetPort: 8080
+  to:
+    kind: Service
+    name: flan-t5-predictor
+    weight: 100
+  wildcardPolicy: None
