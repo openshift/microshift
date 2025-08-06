@@ -3,6 +3,5 @@ robotframework-requests==0.9.7
 robotframework-scplibrary==1.2.0
 robotframework-sshlibrary==3.8.0
 pyyaml==6.0.2
-robotframework-robocop==6.3.0
-robotframework-tidy==4.17.0
+robotframework-robocop==6.5.2
 packaging==25.0 
