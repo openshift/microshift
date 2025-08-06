@@ -16,8 +16,9 @@ image in a remote registry and use it for installing a new RHEL operating system
 for more information.
 
 The procedures described below require the following setup:
-* A `RHEL 9.4 host` with an active Red Hat subscription for building MicroShift `bootc`
-images. For development purposes, you can use the [Red Hat Developer subscription](https://developers.redhat.com/products/rhel/download), which is free of charge.
+* A `RHEL 9.6 host` with an active Red Hat subscription for building MicroShift `bootc`
+images. For development purposes, you can use the [Red Hat Developer subscription](https://developers.redhat.com/products/rhel/download),
+which is free of charge.
 * A `hypervisor host` with a virtualization technology that supports RHEL. In
 this documentation, [libvirt](https://libvirt.org/) virtualization is used as
 an example.
@@ -25,7 +26,7 @@ an example.
 
 ## Build MicroShift Bootc Image
 
-Log into the `RHEL 9.4 host` using the user credentials that have SUDO
+Log into the `RHEL 9.6 host` using the user credentials that have SUDO
 permissions configured.
 
 ### Build Image
@@ -74,7 +75,7 @@ sudo podman build --authfile "${PULL_SECRET}" -t "${IMAGE_NAME}" \
 
 > **Important:**<br>
 > If `dnf upgrade` command is used in the container image build procedure, it
-> may cause unintended operating system version upgrade (e.g. from `9.4` to
+> may cause unintended operating system version upgrade (e.g. from `9.6` to
 > `9.6`). To prevent this from happening, use the following command instead.
 > ```
 > RUN . /etc/os-release && dnf upgrade -y --releasever="${VERSION_ID}"
@@ -215,7 +216,7 @@ sudo virt-install \
     --disk path=/var/lib/libvirt/images/${VMNAME}.qcow2,size=20 \
     --network network=${NETNAME},model=virtio \
     --events on_reboot=restart \
-    --location /var/lib/libvirt/images/rhel-9.4-$(uname -m)-boot.iso \
+    --location /var/lib/libvirt/images/rhel-9.6-$(uname -m)-boot.iso \
     --initrd-inject kickstart.ks \
     --extra-args "inst.ks=file://kickstart.ks" \
     --wait
@@ -237,23 +238,8 @@ containerized tool to create disk images from bootc images. You can use the tool
 to generate various image artifacts and deploy them in different environments,
 such as the edge, server, and clouds.
 
-### Create ISO image using BIB
-
-```bash
-PULL_SECRET=~/.pull-secret.json
-IMAGE_NAME=microshift-4.18-bootc
-
-mkdir ./output
-sudo podman run --authfile ${PULL_SECRET} --rm -it \
-    --privileged \
-    --security-opt label=type:unconfined_t \
-    -v /var/lib/containers/storage:/var/lib/containers/storage \
-    -v ./output:/output \
-    registry.redhat.io/rhel9/bootc-image-builder:latest \
-    --local \
-    --type iso \
-    localhost/${IMAGE_NAME}:latest
-```
+Log into the `RHEL 9.6 host` using the user credentials that have SUDO
+permissions configured.
 
 ### Prepare Kickstart File
 
@@ -268,7 +254,7 @@ PULL_SECRET=~/.pull-secret.json
 
 Run the following command to create the `kickstart.ks` file to be used during
 the virtual machine installation. If you want to embed the kickstart file directly
-to iso using BIB please refer to [upstream docs](https://osbuild.org/docs/bootc/#anaconda-iso-installer-options-installer-mapping)
+to ISO using BIB refer to [upstream docs](https://osbuild.org/docs/bootc/#anaconda-iso-installer-options-installer-mapping).
 
 ```bash
 cat > kickstart.ks <<EOFKS
@@ -307,6 +293,28 @@ chmod 600 /etc/crio/openshift-pull-secret
 %end
 EOFKS
 ```
+
+### Create ISO image using BIB
+
+```bash
+PULL_SECRET=~/.pull-secret.json
+IMAGE_NAME=microshift-4.18-bootc
+
+mkdir ./output
+sudo podman run --authfile ${PULL_SECRET} --rm -it \
+    --privileged \
+    --security-opt label=type:unconfined_t \
+    -v /var/lib/containers/storage:/var/lib/containers/storage \
+    -v ./output:/output \
+    registry.redhat.io/rhel9/bootc-image-builder:latest \
+    --local \
+    --type iso \
+    localhost/${IMAGE_NAME}:latest
+```
+
+> **NOTE**:<br>
+> Use `--config` argument to optionally specify additional BIB build-time customizations
+> as described in [Build config](https://osbuild.org/docs/bootc/#-build-config).
 
 ### Create Virtual Machine
 

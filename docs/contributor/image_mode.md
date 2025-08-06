@@ -11,13 +11,13 @@ This document demonstrates how to run a `bootc` image using `podman`.
 > the fast turnaround times it allows. Do not use it for production use cases.
 
 The procedures described below require the following setup:
-* A `RHEL 9.4 host` with an active Red Hat subscription for building MicroShift `bootc`
+* A `RHEL 9.6 host` with an active Red Hat subscription for building MicroShift `bootc`
 images and running containers
 * A `remote registry` (e.g. `quay.io`) for storing and accessing `bootc` images
 
 ## Run MicroShift Bootc Image
 
-Log into the `RHEL 9.4 host` using the user credentials that have SUDO
+Log into the `RHEL 9.6 host` using the user credentials that have SUDO
 permissions configured.
 
 ### Configure CNI
@@ -178,7 +178,7 @@ the platform-specific `amd64` and `arm64` images to the remote registry as descr
 in the [Publish Image](#publish-image) section.
 
 > Cross-platform `podman` builds are not in the scope of this document. Log into
-> the RHEL 9.4 host running on the appropriate architecture to perform the container
+> the RHEL 9.6 host running on the appropriate architecture to perform the container
 > image builds and publish the platform-specific image to the remote registry.
 
 Finally, create a manifest containing the platform-specific image references
