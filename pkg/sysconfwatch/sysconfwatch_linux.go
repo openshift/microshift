@@ -94,7 +94,7 @@ func getSysMonTimes() (int64, int64) {
 
 func sendSigterm() {
 	pid := os.Getpid()
-	klog.Infof("Sending SIGTERM to self to initiate graceful shutdown. PID: %d", pid)
+	klog.Infof("Sending SIGTERM to self (pid %d) to initiate graceful shutdown", pid)
 	p, _ := os.FindProcess(pid)
 	err := p.Signal(syscall.SIGTERM)
 	if err != nil {
@@ -122,12 +122,12 @@ func (c *SysConfWatchController) Run(ctx context.Context, ready chan<- struct{},
 			// Check the IP change
 			currentIP, err := util.GetHostIP(c.userNodeIP)
 			if err != nil {
-				klog.Warningf("cannot find an host IP: %v", err)
+				klog.Warningf("Restarting MicroShift. Cannot find a host IP: %v", err)
 				go sendSigterm()
 				return nil
 			}
 			if c.NodeIP != currentIP {
-				klog.Warningf("IP address has changed from %q to %q, restarting MicroShift", c.NodeIP, currentIP)
+				klog.Warningf("Restarting MicroShift. IP address has changed from %q to %q", c.NodeIP, currentIP)
 				go sendSigterm()
 				return nil
 			}
@@ -135,12 +135,12 @@ func (c *SysConfWatchController) Run(ctx context.Context, ready chan<- struct{},
 			if c.NodeIPv6 != "" {
 				currentIP, err = util.GetHostIPv6(c.userNodeIPv6)
 				if err != nil {
-					klog.Warningf("cannot find an host IP: %v", err)
+					klog.Warningf("Restarting MicroShift. Cannot find a host IPv6: %v", err)
 					go sendSigterm()
 					return nil
 				}
 				if c.NodeIPv6 != currentIP {
-					klog.Warningf("IP address has changed from %q to %q, restarting MicroShift", c.NodeIPv6, currentIP)
+					klog.Warningf("Restarting MicroShift. IP address has changed from %q to %q", c.NodeIPv6, currentIP)
 					go sendSigterm()
 					return nil
 				}
