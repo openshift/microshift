@@ -96,7 +96,11 @@ func sendSigterm() {
 	pid := os.Getpid()
 	klog.Infof("Sending SIGTERM to self to initiate graceful shutdown. PID: %d", pid)
 	p, _ := os.FindProcess(pid)
-	p.Signal(syscall.SIGTERM) // This will be caught by the signal handler below.
+	err := p.Signal(syscall.SIGTERM)
+	if err != nil {
+		klog.Errorf("failed to send SIGTERM to self. Forcing shutdown: %v", err)
+		os.Exit(1)
+	}
 }
 
 func (c *SysConfWatchController) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
