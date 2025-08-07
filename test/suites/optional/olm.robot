@@ -98,7 +98,7 @@ Subscription Should Be AtLatestKnown
 
 Get CSV Name From Subscription
     [Documentation]    Obtains Subscription's CSV name.
-    [Arguments]    ${namespace}    ${name}
+    [Arguments]    ${namespace}    ${name}    # robocop: off=unused-argument
     ${sub}=    Oc Get    subscriptions.operators.coreos.com    ${OPERATORS_NAMESPACE}    ${SUBSCRIPTION_NAME}
     RETURN    ${sub.status.currentCSV}
 

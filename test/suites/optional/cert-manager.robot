@@ -133,5 +133,5 @@ Apply YAML Manifest
 
 Setup Namespace
     [Documentation]    Setup namespace for cert-manager tests
-    Set Suite Variable    \${NAMESPACE}    ${CERTS_NAMESPACE}
+    VAR    ${NAMESPACE}=    ${CERTS_NAMESPACE}    scope=SUITE
     Create Namespace    ${CERTS_NAMESPACE}

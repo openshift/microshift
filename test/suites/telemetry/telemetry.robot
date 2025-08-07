@@ -151,7 +151,7 @@ Setup Telemetry Configuration
     Drop In MicroShift Config    ${config}    10-telemetry
     Stop MicroShift
     ${cursor}=    Get Journal Cursor
-    Set Test Variable    \${CURSOR}    ${cursor}
+    VAR    ${CURSOR}=    ${cursor}    scope=TEST
     Restart MicroShift
 
 Remove Telemetry Configuration
@@ -201,10 +201,10 @@ Get List Prometheus Metrics To Check
     ${os_id}=    Get Host OS Id
     ${os_version}=    Get Host OS Version
     ${microshift_ver}=    MicroShift Version
-    ${microshift_version}=    Set Variable    ${microshift_ver.major}.${microshift_ver.minor}.${microshift_ver.patch}
+    VAR    ${microshift_version}=    ${microshift_ver.major}.${microshift_ver.minor}.${microshift_ver.patch}
 
-    Set Local Variable
-    ...    @{METRICS_TO_CHECK}
+    VAR
+    ...    @{METRICS_TO_CHECK}=
     ...    cluster:capacity_cpu_cores:sum{_id="${cluster_id}",label_beta_kubernetes_io_instance_type="rhde",label_node_openshift_io_os_id="${os_id}",label_kubernetes_io_arch="${arch}"}
     ...    cluster:capacity_memory_bytes:sum{_id="${cluster_id}",label_beta_kubernetes_io_instance_type="rhde",label_node_openshift_io_os_id="${os_id}",label_kubernetes_io_arch="${arch}"}
     ...    cluster:cpu_usage_cores:sum{_id="${cluster_id}"}
@@ -217,5 +217,6 @@ Get List Prometheus Metrics To Check
     ...    cluster:usage:resources:sum{_id="${cluster_id}",resource="customresourcedefinitions.apiextensions.k8s.io"}
     ...    cluster:usage:containers:sum{_id="${cluster_id}"}
     ...    microshift_version{_id="${cluster_id}",deployment_type="${deployment_type}",os_version_id="${os_version}",version="${microshift_version}"}
+    ...    scope=LOCAL
 
     RETURN    @{METRICS_TO_CHECK}

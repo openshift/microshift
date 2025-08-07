@@ -52,10 +52,10 @@ Metadata File Contents
 
     ${is_ostree}=    Is System OSTree
     IF    ${is_ostree}
-        ${expected}=    Set Variable
+        VAR    ${expected}=
         ...    {"version":"${MAJOR_VERSION}.${MINOR_VERSION}.${PATCH_VERSION}","deployment_id":"*","boot_id":"*"}
     ELSE
-        ${expected}=    Set Variable
+        VAR    ${expected}=
         ...    {"version":"${MAJOR_VERSION}.${MINOR_VERSION}.${PATCH_VERSION}","boot_id":"*"}
     END
 
@@ -91,16 +91,16 @@ Read Expected Versions    # robocop: disable=too-many-calls-in-keyword
     ...    the content.
     # This returns a string like 4.14.0-0.nightly-arm64-2023-05-04-012046
     ${version_full}=    Get Version Of MicroShift RPM
-    Set Suite Variable    \${FULL_VERSION}    ${version_full}
+    VAR    ${FULL_VERSION}=    ${version_full}    scope=SUITE
     # 4.14.0
     ${version_short_matches}=    Get Regexp Matches    ${version_full}    ^(\\d+.\\d+.\\d+)
     ${version_short_parts}=    Split String    ${version_short_matches}[0]    .
     # 4
-    Set Suite Variable    \${MAJOR_VERSION}    ${version_short_parts}[0]
+    VAR    ${MAJOR_VERSION}=    ${version_short_parts}[0]    scope=SUITE
     # 14
-    Set Suite Variable    \${MINOR_VERSION}    ${version_short_parts}[1]
+    VAR    ${MINOR_VERSION}=    ${version_short_parts}[1]    scope=SUITE
     # 0
-    Set Suite Variable    \${PATCH_VERSION}    ${version_short_parts}[2]
+    VAR    ${PATCH_VERSION}=    ${version_short_parts}[2]    scope=SUITE
     # 4.14
     ${ystream}=    Format String    {}.{}    ${MAJOR_VERSION}    ${MINOR_VERSION}
-    Set Suite Variable    \${Y_STREAM}    ${ystream}
+    VAR    ${Y_STREAM}=    ${ystream}    scope=SUITE

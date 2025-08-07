@@ -163,7 +163,7 @@ Save Journal Cursor
     ...    Save the journal cursor then restart MicroShift so we capture the
     ...    shutdown messages and startup messages.
     ${cursor}=    Get Journal Cursor
-    Set Suite Variable    \${CURSOR}    ${cursor}
+    VAR    ${CURSOR}=    ${cursor}    scope=SUITE
 
 Setup With Bad Log Level
     [Documentation]    Set log level to an unknown value and restart

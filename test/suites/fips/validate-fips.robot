@@ -68,10 +68,10 @@ Teardown
 
 Check Payload Tool Must Pass
     [Documentation]    Run check-paylod Tool
-    ${podman_args}=    Set Variable    --authfile /etc/crio/openshift-pull-secret --privileged -i -v /:/myroot
-    ${scan_command}=    Set Variable    scan node --root /myroot
+    VAR    ${podman_args}=    --authfile /etc/crio/openshift-pull-secret --privileged -i -v /:/myroot
+    VAR    ${scan_command}=    scan node --root /myroot
     ${path}=    Create Random Temp File
-    Set Global Variable    ${CHECK_PAYLOAD_OUTPUT_FILE}    ${path}
+    VAR    ${CHECK_PAYLOAD_OUTPUT_FILE}=    ${path}    scope=GLOBAL
     ${rc}=    Execute Command    rpm -qi microshift >${CHECK_PAYLOAD_OUTPUT_FILE} 2>&1
     ...    sudo=True    return_rc=True    return_stdout=False    return_stderr=False
     Should Be Equal As Integers    0    ${rc}
@@ -82,14 +82,14 @@ Check Payload Tool Must Pass
 
 Check Container Images In Release Must Pass
     [Documentation]    Run check-paylod Tool for Release containers
-    ${podman_pull_secret}=    Set Variable    /root/.config/containers/auth.json
-    ${podman_mounts}=    Set Variable    -v ${PULL_SECRET_PATH}:${podman_pull_secret}
-    ${podman_args}=    Set Variable    --rm --authfile ${PULL_SECRET_PATH} --privileged ${podman_mounts}
+    VAR    ${podman_pull_secret}=    /root/.config/containers/auth.json
+    VAR    ${podman_mounts}=    -v ${PULL_SECRET_PATH}:${podman_pull_secret}
+    VAR    ${podman_args}=    --rm --authfile ${PULL_SECRET_PATH} --privileged ${podman_mounts}
     ${path}=    Create Random Temp File
-    Set Global Variable    ${CHECK_PAYLOAD_REL_OUTPUT_FILE}    ${path}
+    VAR    ${CHECK_PAYLOAD_REL_OUTPUT_FILE}=    ${path}    scope=GLOBAL
     @{images}=    Get Images From Release File
     FOR    ${image}    IN    @{images}
-        ${scan_command}=    Set Variable    scan operator --spec ${image}
+        VAR    ${scan_command}=    scan operator --spec ${image}
         ${rc}=    Execute Command
         ...    podman run ${podman_args} ${CHECK_PAYLOAD_IMAGE} ${scan_command} >>${CHECK_PAYLOAD_REL_OUTPUT_FILE} 2>&1
         ...    sudo=True    return_rc=True    return_stdout=False    return_stderr=False

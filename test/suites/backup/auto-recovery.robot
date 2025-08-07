@@ -39,7 +39,7 @@ Restore Fails When There Are No Suitable Backups
     FOR    ${counter}    IN RANGE    1    4
         ${backup_path}=    Command Should Work    microshift backup --auto-recovery ${WORKDIR}
         Command Should Work    bash -c "echo ${counter} > ${backup_path}/marker"
-        ${new_path}=    Set Variable    ${{ "${backup_path}[:-1]" + str(int("${backup_path}[-1]")+1) }}
+        VAR    ${new_path}=    ${{ "${backup_path}[:-1]" + str(int("${backup_path}[-1]")+1) }}
         Command Should Work    sudo mv ${backup_path} ${new_path}
         Sleep    2s
     END
@@ -56,7 +56,7 @@ Restore Selects Right Backup
 
     # Rename the last backup to different deployment ID. When restoring it should be skipped.
     # Incrementing the last character is enough and works for both ostree/bootc and rpm systems.
-    ${new_path}=    Set Variable    ${{ "${last_backup}[:-1]" + str(int("${last_backup}[-1]")+1) }}
+    VAR    ${new_path}=    ${{ "${last_backup}[:-1]" + str(int("${last_backup}[-1]")+1) }}
     Command Should Work    sudo mv ${last_backup} ${new_path}
 
     Command Should Work    microshift restore --dont-save-failed --auto-recovery ${WORKDIR}
@@ -74,7 +74,7 @@ Previously Restored Backup Is Moved To Special Subdirectory
     ...    moving previously restored backup to a "restored" subdir.
 
     ${last_backup}=    Create Backups    3
-    ${expected_path}=    Set Variable
+    VAR    ${expected_path}=
     ...    ${{ "/".join( "${last_backup}".split("/")[:-1] + ["restored"] + [ "${last_backup}".split("/")[-1] ] ) }}
     Log    ${expected_path}
     Command Should Work    microshift restore --dont-save-failed --auto-recovery ${WORKDIR}

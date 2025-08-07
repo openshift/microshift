@@ -1,0 +1,22 @@
+[tool.robocop]
+language = [
+    "en",
+]
+
+[tool.robocop.lint]
+ignore = [
+    "misaligned-continuation-row",
+    "unused-variable",
+    "expression-can-be-simplified",
+    "no-suite-variable",
+    "no-global-variable",
+    "no-test-variable",
+    "variable-overwritten-before-usage"
+]
+
+configure = [
+    "too-long-test-case.max_len=40",
+    "too-many-calls-in-test-case.max_calls=20",
+    "line-too-long.line_length=200",
+    "file-too-long.max_lines=1000"
+]

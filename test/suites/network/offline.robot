@@ -44,7 +44,7 @@ Setup Test
     offline.Run With Kubeconfig    oc    create    -n\=${ns}    -f\=/tmp/hello-microshift.yaml
     # Set this last, it's not available within this scope anyway
     offline.Run With Kubeconfig    oc    wait    -n\=${ns}    --for\=condition=Ready    pod/hello-microshift
-    Set Test Variable    ${TEST_NS}    ${ns}
+    VAR    ${TEST_NS}=    ${ns}    scope=TEST
 
 Teardown Test
     [Documentation]    Test teardown
@@ -58,9 +58,9 @@ Pod Should Be Reachable Via Ingress
     ...    subshell.
     ${result}    ${ignore}=    Wait Until Keyword Succeeds    5x    1s
     ...    Run Guest Process    ${GUEST_NAME}
-    ...        bash
-    ...        -c
-    ...        curl --fail -I --max-time 15 -H \"Host: hello-microshift.cluster.local\" ${NODE_IP}:80/principal
+    ...    bash
+    ...    -c
+    ...    curl --fail -I --max-time 15 -H \"Host: hello-microshift.cluster.local\" ${NODE_IP}:80/principal
     Log Many    ${result["stdout"]}    ${result["stderr"]}
     Should Be Equal As Integers    ${result["rc"]}    0
 
@@ -69,7 +69,7 @@ Create Test Namespace
 
     ${rand}=    Generate Random String
     ${rand}=    Convert To Lower Case    ${rand}
-    ${ns}=    Set Variable    test-${rand}
+    VAR    ${ns}=    test-${rand}
     Wait Until Keyword Succeeds    5m    10s
     ...    offline.Run With Kubeconfig    oc    create    namespace    ${ns}
     RETURN    ${ns}

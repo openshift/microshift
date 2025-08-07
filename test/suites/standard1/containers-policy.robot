@@ -2,8 +2,8 @@
 Documentation       Container policy verification
 
 Resource            ../../resources/microshift-process.resource
-Library             OperatingSystem
 Library             Collections
+Library             OperatingSystem
 
 Suite Setup         Setup
 Suite Teardown      Teardown
@@ -36,7 +36,7 @@ Teardown
     [Documentation]    Test suite teardown
     Logout MicroShift Host
 
-Verify Sigstore Signing Enabled    # robocop: disable=too-many-calls-in-keyword
+Verify Sigstore Signing Enabled    # robocop: off=too-many-calls-in-keyword
     [Documentation]    Verify the policy file contents when sigstore signing
     ...    verification is enabled
     [Arguments]    ${policy}

@@ -29,7 +29,7 @@ Rebooting Healthy System Should Keep Functional PVC
 Test Case Setup
     [Documentation]    Prepare the cluster env and test pod workload.
     ${ns}=    Create Unique Namespace
-    Set Test Variable    \${NAMESPACE}    ${ns}
+    VAR    ${NAMESPACE}=    ${ns}    scope=SUITE
     Oc Create    -f ${SOURCE_POD} -n ${NAMESPACE}
     Named Pod Should Be Ready    ${POD_NAME_STATIC}
 
