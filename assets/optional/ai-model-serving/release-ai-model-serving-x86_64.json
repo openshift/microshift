@@ -1,6 +1,6 @@
 {
   "release": {
-    "base": "2.22.0"
+    "base": "2.22.1"
   },
   "images": {
     "caikit-tgis-image": "quay.io/modh/caikit-tgis-serving@sha256:d8294f446afefc6cbba0df882bba12cdad142f79b29bda46227a6328128d7fb6",
