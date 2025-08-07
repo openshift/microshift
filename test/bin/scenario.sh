@@ -965,6 +965,7 @@ run_tests() {
         }
     fi
     record_junit "${vmname}" "robot_framework_environment" "OK"
+
     local rf_binary="${RF_VENV}/bin/robot"
     if [ ! -f "${rf_binary}" ]; then
         error "robot is not installed to ${rf_binary}"
@@ -972,6 +973,17 @@ run_tests() {
         exit 1
     fi
     record_junit "${vmname}" "robot_framework_installed" "OK"
+
+    local -r rf_version_installed=$("${RF_VENV}/bin/pip" list --format json | jq -r '.[] | select(.name == "robotframework") | .version')
+    local -r rf_version_expected=$(grep 'robotframework==' "${ROOTDIR}/test/requirements.txt" | cut -d'=' -f3)
+    if [ "${rf_version_installed}" != "${rf_version_expected}" ]; then
+        echo "RF version mismatch: installed ${rf_version_installed}, expected ${rf_version_expected} - reinstalling"
+        rm -r "${RF_VENV}"
+        "${ROOTDIR}/scripts/fetch_tools.sh" "robotframework" || {
+            record_junit "${vmname}" "robot_framework_upgrade" "FAILED"
+            exit 1
+        }
+    fi
 
     # Make sure oc command is available
     if ! command -v oc &> /dev/null ; then
