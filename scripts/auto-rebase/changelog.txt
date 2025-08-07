@@ -1,0 +1,131 @@
+- cluster-ingress-operator embedded-component 137807b212e6c24b59073a43fb10ccf6fed2a250 to cee87b619fed55a2fcf7e5f74bc72fa486d8e4ec
+  - 89c2139 2025-08-02T09:54:54+00:00 Add OSSM and Istio version override annotations
+  - 27e2eac 2025-08-02T09:54:54+00:00 Add --gateway-api-operator-catalog
+  - 647e422 2025-08-02T09:54:53+00:00 Add --istio-version flag and ISTIO_VERSION env var
+  - 5bd21ff 2025-08-02T09:54:53+00:00 Add unit test for gatewayclass Reconcile method
+  - b4e21d0 2025-07-31T23:48:56+00:00 desiredIstio: Enable GIE if InferencePool found
+  - d30beca 2025-07-25T16:01:38-04:00 testGatewayAPIManualDeployment: Increase timeout
+  - fe3dd8a 2025-07-25T16:01:38-04:00 assertDNSRecord: Increase timeout to 10m
+  - 6ec264f 2025-07-25T16:01:38-04:00 desiredIstio: Delete old controller-mode setting
+  - 39c0861 2025-07-25T16:01:38-04:00 desiredIstio: Don't copy labels or annotations
+  - 7408cea 2025-07-25T16:01:24-04:00 Enable Gateway only CA Bundles
+  - ccb5d93 2025-07-25T15:12:56-04:00 Bump to OSSM 3.0.1 and Istio 1.24.4
+
+- machine-config-operator embedded-component dbaf702e511f029805e9aa3ec3245008dda45a02 to a297a545c9f6dc811723ee94390a2c130cc167a3
+  - 2a5e3729 2025-07-31T10:00:30-04:00 add unit test for ARO tls case
+  - f0dac1f1 2025-07-31T10:00:30-04:00 use ARO API for tls cert rotation
+  - 2ee424d2 2025-07-31T10:00:30-04:00 vendor bump for ARO API
+  - 53a9e68b 2025-07-29T14:48:17+00:00 OCPBUGS-57484: Handle migration from OpenShift SDN
+  - d9d508b8 2025-07-29T14:48:17+00:00 OPNET-681: Support migration from configure-ovs to NMState
+  - 0de5ff8d 2025-07-29T04:35:23+00:00 Add workaround fix for static pod race
+
+- ovn-kubernetes image-amd64 a71aaf8dcf01858874c05c677d8a52b6b715ac57 to e24389403dd961a14b6512e40cda7e3e5d0a4b20
+  - dcc403c1 2025-07-17T17:08:39+02:00 Fix UDN to alien ClusterIP looping issue
+  - 82850ed2 2025-07-17T17:08:37+02:00 Enable Layer2 route advertisements on LGW
+  - 9e356ba5 2025-07-17T09:08:57+00:00 doc: Remove OKEP template from the list of rendered pages
+  - a6cac97a 2025-07-16T18:56:12+02:00 ovnkube in dpu host mode: advanced gateway detection
+  - b1816506 2025-07-16T15:49:12+01:00 E2Es: remove additional references to KinD setup
+  - 6018f47f 2025-07-16T13:29:23+01:00 E2E: lookup support for IP families instead of using env var
+  - ab8d4733 2025-07-16T14:23:38+02:00 virt: Delete LSP at external process killing VM
+  - 6b01b29b 2025-07-16T08:55:29+02:00 [e2e] Change node ip replacement commands to work on ubuntu 24.
+  - 99a7b111 2025-07-16T08:55:29+02:00 Update CI runners to use ubuntu 24.04
+  - f09eca1c 2025-07-16T08:55:29+02:00 Revert "Add option to disable udn-host-isolation."
+  - 1c559bb9 2025-07-15T16:15:52-07:00 fix ovspinning test error
+  - 26107809 2025-07-15T19:13:32-04:00 *.sh: use /usr/bin/env to locate bash
+  - c55d6577 2025-07-15T19:02:14+02:00 OKEP: Pre-assigned network configuration for primary user defined networks workloads
+  - 00542735 2025-07-15T09:45:20-07:00 VF gateway trigger errors message in updateServiceFlowCache
+  - 6395072d 2025-07-15T18:31:51+02:00 [gateway] rename GatewayConfig config to annoConfig
+  - 0473203b 2025-07-15T18:31:50+02:00 [gateway] pass gateway args for all controllers using GatewayConfig.
+  - e427103f 2025-07-15T18:31:35+02:00 [gateway] rename public and private interfaces.
+  - 02c2c185 2025-07-15T18:31:35+02:00 [gateway] update syncNodeGateway to reduce nesting
+  - cc8e9c83 2025-07-15T18:31:35+02:00 [master] reuse SecondaryL3GatewayConfig for master gateway configuration
+  - 1d9b4cf0 2025-07-15T18:31:35+02:00 [pod SNAT] reuse code around pod SNAT creation.
+  - 4834e3de 2025-07-15T18:31:35+02:00 Fix log, reuse existing function in GetNetworkScopedSwitchName.
+  - 77124b84 2025-07-15T18:31:35+02:00 [libovsdb/ops] Start adding option constants for ovn.
+  - 414e2962 2025-07-15T18:31:35+02:00 [lint] add make lint-fix command to fix lint issues
+  - f392ef0e 2025-07-15T18:31:29+02:00 [gateway] split GatewayInit into more methods.
+  - f54436cd 2025-07-15T18:31:13+02:00 [gateway] move gw router and its port creation to functions.
+  - 6e38032c 2025-07-15T18:31:13+02:00 [gateway] create createGWRouter function from GatewayInit
+  - ab24f255 2025-07-15T18:31:13+02:00 [gateway] cleanup: do some equivalent changes to simplify the code.
+  - 10f14edb 2025-07-15T14:47:32+02:00 update jinjanate install to use pipx and mention pipx and skopeo as dependencies
+  - 465e00a0 2025-07-15T15:02:29+03:00 images: Use Quay instead docker.io
+  - 1272c122 2025-07-14T10:40:59-07:00 cluster-manager clbs if udn requests PersistentIPs but it is not enabled
+  - 7b1b7dd7 2025-07-14T13:33:20+02:00 [OVN build] Fetch ovs version from the ovn submodule by default.
+  - 2edfdaf9 2025-07-11T15:27:59-07:00 always() run the diags
+  - 6902456a 2025-07-11T10:13:07-03:00 fix broken TOC links
+  - 2e888476 2025-07-09T16:02:36+03:00 Add flag for preconfigured UDN addresses feature
+  - f07c0551 2025-07-09T12:28:52+01:00 chore: Update artwork
+  - 84ed9949 2025-07-08T12:58:52+02:00 [openflow manager] allow patch port ofport change for UDNs.
+  - 2626e8d5 2025-07-08T10:24:03+02:00 Reapply "e2e: connect to host-networked pod from localnet"
+  - 3de7eade 2025-07-08T10:24:03+02:00 Reapply "Add flow for host -> localnet on same node"
+  - 1448d5ab 2025-07-08T10:24:03+02:00 Drop in_port from ip dispatch OF rule
+  - 44b77196 2025-07-06T17:02:42+03:00 e2e: Enable testing BGP using podman
+  - 7d199918 2025-07-06T17:02:42+03:00 kind-common, k8s-frr, bgp: Avoid hard coding container runtime binary
+  - 6ec1a448 2025-07-06T17:02:42+03:00 kind-common, metallb: Avoid hard coding container runtime binary
+  - 0e00ae6d 2025-07-06T17:02:42+03:00 contrib,kind: Init container runtime binary on cluster deletion
+  - c58c193e 2025-07-01T16:13:56+02:00 Disable Layer2 IGMP test as it is broken now.
+  - fa83c31b 2025-06-30T15:27:04+00:00 Add network QoS guide to docs navigation
+  - 0b38e623 2025-06-30T13:50:32+02:00 [svc controller] Stop handlers on shutdown.
+  - ee962e5c 2025-06-26T22:03:29+02:00 update documentation on deploying OVN K8s with KIND
+  - abd8e0fd 2025-06-23T16:22:40+02:00 Modified line 277 to let kind-helm.sh run also behind a proxy
+  - 337cc559 2025-06-18T05:46:22+00:00 Updating ose-ovn-kubernetes-base-container image to be consistent with ART for 4.20 Reconciling with https://github.com/openshift/ocp-build-data/tree/dfb5c7d531490cfdc61a3b88bc533702b9624997/images/ovn-kubernetes-base.yml
+  - 424a653f 2025-06-13T11:24:28+02:00 NodeTracker: Only update the node if the subnet changed for the specific network
+  - 150775e1 2025-06-12T12:07:14+02:00 [UDN isolation] Fix ACLs tier: move to the highest-prio Primary tier.
+  - 23c3b5a8 2025-06-12T10:28:53+02:00 [ACL tier] Rename BuildACL to BuildACLWithDefaultTier
+  - f559df11 2025-04-24T15:02:21+02:00 [docs] update ovn-observability with some more details
+
+- ovn-kubernetes image-arm64 a71aaf8dcf01858874c05c677d8a52b6b715ac57 to e24389403dd961a14b6512e40cda7e3e5d0a4b20
+  - dcc403c1 2025-07-17T17:08:39+02:00 Fix UDN to alien ClusterIP looping issue
+  - 82850ed2 2025-07-17T17:08:37+02:00 Enable Layer2 route advertisements on LGW
+  - 9e356ba5 2025-07-17T09:08:57+00:00 doc: Remove OKEP template from the list of rendered pages
+  - a6cac97a 2025-07-16T18:56:12+02:00 ovnkube in dpu host mode: advanced gateway detection
+  - b1816506 2025-07-16T15:49:12+01:00 E2Es: remove additional references to KinD setup
+  - 6018f47f 2025-07-16T13:29:23+01:00 E2E: lookup support for IP families instead of using env var
+  - ab8d4733 2025-07-16T14:23:38+02:00 virt: Delete LSP at external process killing VM
+  - 6b01b29b 2025-07-16T08:55:29+02:00 [e2e] Change node ip replacement commands to work on ubuntu 24.
+  - 99a7b111 2025-07-16T08:55:29+02:00 Update CI runners to use ubuntu 24.04
+  - f09eca1c 2025-07-16T08:55:29+02:00 Revert "Add option to disable udn-host-isolation."
+  - 1c559bb9 2025-07-15T16:15:52-07:00 fix ovspinning test error
+  - 26107809 2025-07-15T19:13:32-04:00 *.sh: use /usr/bin/env to locate bash
+  - c55d6577 2025-07-15T19:02:14+02:00 OKEP: Pre-assigned network configuration for primary user defined networks workloads
+  - 00542735 2025-07-15T09:45:20-07:00 VF gateway trigger errors message in updateServiceFlowCache
+  - 6395072d 2025-07-15T18:31:51+02:00 [gateway] rename GatewayConfig config to annoConfig
+  - 0473203b 2025-07-15T18:31:50+02:00 [gateway] pass gateway args for all controllers using GatewayConfig.
+  - e427103f 2025-07-15T18:31:35+02:00 [gateway] rename public and private interfaces.
+  - 02c2c185 2025-07-15T18:31:35+02:00 [gateway] update syncNodeGateway to reduce nesting
+  - cc8e9c83 2025-07-15T18:31:35+02:00 [master] reuse SecondaryL3GatewayConfig for master gateway configuration
+  - 1d9b4cf0 2025-07-15T18:31:35+02:00 [pod SNAT] reuse code around pod SNAT creation.
+  - 4834e3de 2025-07-15T18:31:35+02:00 Fix log, reuse existing function in GetNetworkScopedSwitchName.
+  - 77124b84 2025-07-15T18:31:35+02:00 [libovsdb/ops] Start adding option constants for ovn.
+  - 414e2962 2025-07-15T18:31:35+02:00 [lint] add make lint-fix command to fix lint issues
+  - f392ef0e 2025-07-15T18:31:29+02:00 [gateway] split GatewayInit into more methods.
+  - f54436cd 2025-07-15T18:31:13+02:00 [gateway] move gw router and its port creation to functions.
+  - 6e38032c 2025-07-15T18:31:13+02:00 [gateway] create createGWRouter function from GatewayInit
+  - ab24f255 2025-07-15T18:31:13+02:00 [gateway] cleanup: do some equivalent changes to simplify the code.
+  - 10f14edb 2025-07-15T14:47:32+02:00 update jinjanate install to use pipx and mention pipx and skopeo as dependencies
+  - 465e00a0 2025-07-15T15:02:29+03:00 images: Use Quay instead docker.io
+  - 1272c122 2025-07-14T10:40:59-07:00 cluster-manager clbs if udn requests PersistentIPs but it is not enabled
+  - 7b1b7dd7 2025-07-14T13:33:20+02:00 [OVN build] Fetch ovs version from the ovn submodule by default.
+  - 2edfdaf9 2025-07-11T15:27:59-07:00 always() run the diags
+  - 6902456a 2025-07-11T10:13:07-03:00 fix broken TOC links
+  - 2e888476 2025-07-09T16:02:36+03:00 Add flag for preconfigured UDN addresses feature
+  - f07c0551 2025-07-09T12:28:52+01:00 chore: Update artwork
+  - 84ed9949 2025-07-08T12:58:52+02:00 [openflow manager] allow patch port ofport change for UDNs.
+  - 2626e8d5 2025-07-08T10:24:03+02:00 Reapply "e2e: connect to host-networked pod from localnet"
+  - 3de7eade 2025-07-08T10:24:03+02:00 Reapply "Add flow for host -> localnet on same node"
+  - 1448d5ab 2025-07-08T10:24:03+02:00 Drop in_port from ip dispatch OF rule
+  - 44b77196 2025-07-06T17:02:42+03:00 e2e: Enable testing BGP using podman
+  - 7d199918 2025-07-06T17:02:42+03:00 kind-common, k8s-frr, bgp: Avoid hard coding container runtime binary
+  - 6ec1a448 2025-07-06T17:02:42+03:00 kind-common, metallb: Avoid hard coding container runtime binary
+  - 0e00ae6d 2025-07-06T17:02:42+03:00 contrib,kind: Init container runtime binary on cluster deletion
+  - c58c193e 2025-07-01T16:13:56+02:00 Disable Layer2 IGMP test as it is broken now.
+  - fa83c31b 2025-06-30T15:27:04+00:00 Add network QoS guide to docs navigation
+  - 0b38e623 2025-06-30T13:50:32+02:00 [svc controller] Stop handlers on shutdown.
+  - ee962e5c 2025-06-26T22:03:29+02:00 update documentation on deploying OVN K8s with KIND
+  - abd8e0fd 2025-06-23T16:22:40+02:00 Modified line 277 to let kind-helm.sh run also behind a proxy
+  - 337cc559 2025-06-18T05:46:22+00:00 Updating ose-ovn-kubernetes-base-container image to be consistent with ART for 4.20 Reconciling with https://github.com/openshift/ocp-build-data/tree/dfb5c7d531490cfdc61a3b88bc533702b9624997/images/ovn-kubernetes-base.yml
+  - 424a653f 2025-06-13T11:24:28+02:00 NodeTracker: Only update the node if the subnet changed for the specific network
+  - 150775e1 2025-06-12T12:07:14+02:00 [UDN isolation] Fix ACLs tier: move to the highest-prio Primary tier.
+  - 23c3b5a8 2025-06-12T10:28:53+02:00 [ACL tier] Rename BuildACL to BuildACLWithDefaultTier
+  - f559df11 2025-04-24T15:02:21+02:00 [docs] update ovn-observability with some more details
+
