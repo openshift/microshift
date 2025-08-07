@@ -29,6 +29,39 @@ genericDevicePlugin:
              - path: /dev/ttyUSB*
 '''
 
+GDP_CONFIG_FUSE_COUNT = '''
+genericDevicePlugin:
+  status: Enabled
+  devices:
+     - name: fuse
+       groups:
+         - count: 10
+           paths:
+             - path: /dev/fuse
+'''
+
+POD_FUSE_DEVICE = '''
+apiVersion: v1
+kind: Pod
+metadata:
+  name: fuse-test-pod
+spec:
+  containers:
+  - name: fuse-app-container
+    image: registry.access.redhat.com/ubi9/ubi:9.6
+    command: ["sleep", "infinity"]
+    resources:
+      limits:
+        device.microshift.io/fuse: "4"
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop: ["ALL"]
+      runAsNonRoot: true
+      seccompProfile:
+        type: "RuntimeDefault"
+'''
+
 CONFIGMAP_PREAMBLE = '''
 apiVersion: v1
 kind: ConfigMap
