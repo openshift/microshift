@@ -400,16 +400,6 @@ install -p -m644 packaging/systemd/microshift-ovs-init.service %{buildroot}%{_un
 install -p -m755 packaging/systemd/configure-ovs.sh %{buildroot}%{_bindir}/configure-ovs.sh
 install -p -m755 packaging/systemd/configure-ovs-microshift.sh %{buildroot}%{_bindir}/configure-ovs-microshift.sh
 
-# Avoid firewalld manipulation and flushing of iptable rules,
-# this is a workaround for https://issues.redhat.com/browse/NP-641
-# It will trigger some warnings on the selinux audit log when restarting firewalld.
-# In the future firewalld should stop flushing iptables unless we use any firewalld rule with direct
-# iptables rules, once that's available in RHEL we can remove this workaround
-# see https://github.com/firewalld/firewalld/issues/863#issuecomment-1407059938
-
-mkdir -p -m755 %{buildroot}%{_sysconfdir}/systemd/system/firewalld.service.d
-install -p -m644 packaging/systemd/firewalld-no-iptables.conf %{buildroot}%{_sysconfdir}/systemd/system/firewalld.service.d/firewalld-no-iptables.conf
-
 mkdir -p -m755 %{buildroot}/var/lib/kubelet/pods
 
 install -d %{buildroot}%{_datadir}/selinux/packages/%{selinuxtype}
@@ -727,7 +717,6 @@ fi
 %{_sysconfdir}/crio/crio.conf.d/11-microshift-ovn.conf
 %{_sysconfdir}/systemd/system/ovs-vswitchd.service.d/microshift-cpuaffinity.conf
 %{_sysconfdir}/systemd/system/ovsdb-server.service.d/microshift-cpuaffinity.conf
-%{_sysconfdir}/systemd/system/firewalld.service.d/firewalld-no-iptables.conf
 
 # OpensvSwitch oneshot configuration script which handles ovn-k8s gateway mode setup
 %{_unitdir}/microshift-ovs-init.service
@@ -828,6 +817,9 @@ fi
 # Use Git command to generate the log and replace the VERSION string
 # LANG=C git log --date="format:%a %b %d %Y" --pretty="tformat:* %cd %an <%ae> VERSION%n- %s%n" packaging/rpm/microshift.spec
 %changelog
+* Wed Aug 06 2025 Evgeny Slutsky <eslutsky@rehat.com> 4.20.0
+- Remove firewalld service override configuration to avoid flushing of iptables
+
 * Thu Jul 24 2025 Evgeny Slutsky <eslutsky@redhat.com> 4.20.0
 - Update microshift-cert-manager with greenboot script
 
