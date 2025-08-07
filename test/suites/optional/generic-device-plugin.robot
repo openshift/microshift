@@ -49,6 +49,31 @@ Verify ttyUSB glob pattern device discovery and allocation
 
     [Teardown]    TtyUSB Glob Test Teardown
 
+Verify FUSE device allocation and accessibility
+    [Documentation]    Verifies FUSE device configuration, allocation, and accessibility in pods
+    [Tags]    fuse-device
+    [Setup]    Enable And Configure GDP    ${GDP_CONFIG_FUSE_COUNT}
+    Wait Until Device Is Allocatable    10    fuse
+    Oc Create    -f ./assets/generic-device-plugin/fuse-test-pod.yaml -n ${NAMESPACE}
+
+    Oc Wait    -n ${NAMESPACE} pod/fuse-test-pod    --for=condition=Ready --timeout=120s
+
+    # Verify /dev/fuse is accessible in the pod
+    ${fuse_device}=    Oc Exec    fuse-test-pod    ls -l /dev/fuse
+    Should Contain    ${fuse_device}    /dev/fuse
+
+    # Verify node allocation shows 4 FUSE devices allocated
+    ${node}=    Run With Kubeconfig    oc get node -o=name
+    ${node_name}=    Remove String    ${node}    node/
+    ${describe_output}=    Run With Kubeconfig    oc describe node ${node_name}
+    ${allocated_line}=    Get Lines Containing String    ${describe_output}    device.microshift.io/fuse
+    ${allocation_matches}=    Get Regexp Matches
+    ...    ${allocated_line}
+    ...    device\\.microshift\\.io/fuse\\s+(\\d+)\\s+(\\d+)
+    ...    1    2
+    Should Be Equal As Integers    ${allocation_matches}[0][0]    4
+    Should Be Equal As Integers    ${allocation_matches}[0][1]    4
+
 
 *** Keywords ***
 GDP Test Setup
@@ -132,20 +157,20 @@ Create Test Job With Modified Script
 
 Wait Until Device Is Allocatable
     [Documentation]    Waits until device device.microshift.io/fakeserial is allocatable
-    [Arguments]    ${expected_count}=1
+    [Arguments]    ${expected_count}=1    ${device_type}=fakeserial
     ${node}=    Run With Kubeconfig    oc get node -o=name
     ${node_name}=    Remove String    ${node}    node/
     Wait Until Keyword Succeeds    60s    5s
-    ...    Device Should Be Allocatable    ${node_name}    ${expected_count}
+    ...    Device Should Be Allocatable    ${node_name}    ${expected_count}    ${device_type}
 
 Device Should Be Allocatable
-    [Documentation]    Checks if device device.microshift.io/fakeserial is allocatable
-    [Arguments]    ${node_name}    ${expected_count}=1
+    [Documentation]    Checks if specified device is allocatable
+    [Arguments]    ${node_name}    ${expected_count}=1    ${device_type}=fakeserial
     ${device_amount}=    Oc Get JsonPath
     ...    node
     ...    ${EMPTY}
     ...    ${node_name}
-    ...    .status.allocatable.device\\.microshift\\.io/fakeserial
+    ...    .status.allocatable.device\\.microshift\\.io/${device_type}
     Should Be Equal As Integers    ${device_amount}    ${expected_count}
 
 Wait For Job Completion And Check Logs
