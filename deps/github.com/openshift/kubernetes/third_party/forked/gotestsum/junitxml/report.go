@@ -8,7 +8,7 @@ import (
 
 // JUnitTestSuites is a collection of JUnit test suites.
 type JUnitTestSuites struct {
-	XMLName xml.Name `xml:"testsuites"`
+	XMLName xml.Name         `xml:"testsuites"`
 	Suites  []JUnitTestSuite `xml:"testsuite,omitempty"`
 }
 
@@ -22,7 +22,7 @@ type JUnitTestSuite struct {
 	Name       string          `xml:"name,attr"`
 	Properties []JUnitProperty `xml:"properties>property,omitempty"`
 	TestCases  []JUnitTestCase `xml:"testcase,omitempty"`
-	Timestamp  string `xml:"timestamp,attr"`
+	Timestamp  string          `xml:"timestamp,attr"`
 }
 
 // JUnitTestCase is a single test case with its result.
