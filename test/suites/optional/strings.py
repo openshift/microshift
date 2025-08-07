@@ -8,17 +8,6 @@ genericDevicePlugin:
              - path: /dev/ttyPipeB0
 '''
 
-GDP_CONFIG_DROPIN_WITH_MOUNT = '''
-genericDevicePlugin:
-  status: Enabled
-  devices:
-     - name: fakeserial
-       groups:
-         - paths:
-             - path: /dev/ttyPipeB0
-               mountPath: /dev/myrenamedserial
-'''
-
 CONFIGMAP_PREAMBLE = '''
 apiVersion: v1
 kind: ConfigMap

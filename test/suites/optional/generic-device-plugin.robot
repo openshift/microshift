@@ -20,21 +20,31 @@ ${NAMESPACE}    ${EMPTY}
 *** Test Cases ***
 Sanity Test
     [Documentation]    Performs a simple test of Generic Device Plugin
-    [Setup]    GDP Test Setup    ${GDP_CONFIG_DROPIN}
+    [Setup]    Run Keywords
+    ...    Enable And Configure GDP
+    ...    Enable Serialsim
+    ...    Copy Script To Host
 
+    Wait Until Device Is Allocatable
+
+    Command Should Work    crictl pull registry.access.redhat.com/ubi9/ubi:9.6
+    Start Script On Host
     Create Test Job
+
     Wait For Job Completion And Check Logs
 
-    [Teardown]    GDP Test Teardown
+    [Teardown]    Run Keywords
+    ...    Stop Script On Host
+    ...    Disable GDP
 
-Verify that mountPath correctly renames the device within the container
-    [Documentation]    Performs a test of Generic Device Plugin with custom mountPath configuration
-    [Setup]    GDP Test Setup    ${GDP_CONFIG_DROPIN_WITH_MOUNT}
+Verify GDP handles hot plugging of Devices
+    [Documentation]    Verify that GDP reacts to devices being added or removed after MicroShift has started
+    [Tags]    hot-plug
+    Enable And Configure GDP
+    Wait Until Device Is Allocatable    0
 
-    Create Test Job With Modified Script
-    Wait For Job Completion And Check Logs
-
-    [Teardown]    GDP Test Teardown
+    Enable Serialsim
+    Wait Until Device Is Allocatable    1
 
 
 *** Keywords ***
@@ -106,35 +116,23 @@ Create Test Job
     Oc Create    -f ${path} -n ${NAMESPACE}
     Oc Create    -f ./assets/generic-device-plugin/job.yaml -n ${NAMESPACE}
 
-Create Test Job With Modified Script
-    [Documentation]    Creates Job that spawns test Pod running to completion with modified script.
-    ${script}=    OperatingSystem.Get File    ./assets/generic-device-plugin/fake-serial-communication.py
-    ${modified_script}=    Replace String
-    ...    ${script}
-    ...    DEVICE_POD = "/dev/ttyPipeB0"
-    ...    DEVICE_POD = "/dev/myrenamedserial"
-    ${configmap}=    Append To Preamble    ${modified_script}
-    Log    ${configmap}
-    ${path}=    Create Random Temp File    ${configmap}
-    Oc Create    -f ${path} -n ${NAMESPACE}
-    Oc Create    -f ./assets/generic-device-plugin/job.yaml -n ${NAMESPACE}
-
 Wait Until Device Is Allocatable
     [Documentation]    Waits until device device.microshift.io/fakeserial is allocatable
+    [Arguments]    ${expected_count}=1
     ${node}=    Run With Kubeconfig    oc get node -o=name
     ${node_name}=    Remove String    ${node}    node/
     Wait Until Keyword Succeeds    60s    5s
-    ...    Device Should Be Allocatable    ${node_name}
+    ...    Device Should Be Allocatable    ${node_name}    ${expected_count}
 
 Device Should Be Allocatable
     [Documentation]    Checks if device device.microshift.io/fakeserial is allocatable
-    [Arguments]    ${node_name}
+    [Arguments]    ${node_name}    ${expected_count}=1
     ${device_amount}=    Oc Get JsonPath
     ...    node
     ...    ${EMPTY}
     ...    ${node_name}
     ...    .status.allocatable.device\\.microshift\\.io/fakeserial
-    Should Be Equal As Integers    ${device_amount}    1
+    Should Be Equal As Integers    ${device_amount}    ${expected_count}
 
 Wait For Job Completion And Check Logs
     [Documentation]    Waits for Job completion and checks Pod logs looking for 'Test successful' message
