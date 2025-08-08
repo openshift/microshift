@@ -1,0 +1,75 @@
+- oc image-arm64 1073b975a85824a68503e7ecb933f7c48edbc393 to 0f09f6e9cc7fdaab8942ad118d0717a6d527746b
+  - c78080d3 2025-08-01T12:43:02+03:00 Update containers/image and docker versions
+
+- ovn-kubernetes image-arm64 1fde61ad03a950ba2236c29e9d00cb6166c9fe9b to dca1e7d7311a2a4a92808f965efbd268091a7bc3
+  - b90abc54 2025-07-23T13:24:08+02:00 fix: skip gw IP check for DPU and improve gateway initialization readability
+  - 6c4bc78b 2025-07-23T08:56:24+00:00 e2e: label RouteAdvertisement test cases & skip extended ones
+  - 45bf0b39 2025-07-23T10:53:18+02:00 Revert "e2e: Use ovnk allocator and reserve IPs"
+  - 5b5bc069 2025-07-22T19:06:40+02:00 gateway: Refactor gateway initialization and DPU host handling
+  - d127877f 2025-07-22T15:53:32+01:00 build, vendor: consume ipamclaims v0.5.0-alpha
+  - 34b5a46c 2025-07-22T13:52:53+00:00 e2e: test against L2 networks in VRF-Lite test cases
+  - e72e62b3 2025-07-22T13:12:33+00:00 Remove unused portbinding code
+  - dfc14b4e 2025-07-22T10:22:05+00:00 e2e: refactor podIPOfFamilyOnPrimaryNetwork into more reusable code
+  - 5ece8463 2025-07-22T10:22:05+00:00 e2e: add VRF-Lite test cases
+  - edb05ca1 2025-07-22T10:22:05+00:00 kind.sh: Use FRRConfiguration label when advertising default network
+  - 926ba1ad 2025-07-22T10:22:05+00:00 e2e: use index in kind infra inspect templates to allow special characters
+  - acef39f4 2025-07-22T10:22:05+00:00 e2e: make ExtPort not required in container infra provider API
+  - 3dea4f52 2025-07-22T10:22:05+00:00 e2e: add RuntimeArgs to container infra provider API
+  - 90e56b92 2025-07-22T10:22:05+00:00 e2e: rename testdata package to testscenario
+  - dc437b63 2025-07-22T10:22:05+00:00 RouteAdvertisements: appropriately update status even if no updates
+  - b4eabd9c 2025-07-21T19:04:23+00:00 Bump the go_modules group across 2 directories with 1 update
+  - fa12bb26 2025-07-21T12:09:59-04:00 Bump fedora from 41 -> 42
+  - d565fd86 2025-07-21T14:41:46+05:30 Add e2e tests for ex gw pods in terminating or not ready state
+  - d942a7d8 2025-07-21T14:41:46+05:30 Add unit tests for ex gw pods in terminating or not ready state
+  - 3d32558b 2025-07-21T14:41:44+05:30 Remove routes of ex gw pods in terminating or not ready state
+  - ec378a7b 2025-07-18T17:56:44+00:00 Bump golang.org/x/oauth2
+  - 293f6dda 2025-07-18T16:57:43+00:00 ci: run tests only if files other than docs are changed
+  - 527c19fc 2025-07-18T18:08:55+02:00 Add support for --disable-requestedchassis flag in ovnkube controller
+  - 290eb038 2025-07-18T09:42:17-04:00 Add metrics for UDN
+  - 33e20b83 2025-07-18T11:16:38+02:00 [bridgeconfig] AI suggested fixes.
+  - f531e3d3 2025-07-18T11:16:38+02:00 [node/gateway] make PatchedNetConfigs internal, remove locking
+  - fd5e7915 2025-07-18T11:16:38+02:00 [node/gateway] nodePortWatcher should use its own bridgeConfiguration.
+  - a0c90f26 2025-07-18T11:16:38+02:00 [bridgeconfig] make mutex internal.
+  - fa6076bc 2025-07-18T11:16:38+02:00 [bridgeconfig] move nextHops to the gateway where it is used.
+  - 4ad1727c 2025-07-18T11:16:38+02:00 [bridgeconfig] make most members internal, ensure correct locking.
+  - 5a5e3b6d 2025-07-18T11:16:38+02:00 [bridgeconfig] move flow generation locking into methods.
+  - 28f9c1ec 2025-07-18T11:16:38+02:00 [bridgeconfig] move bridge flows generation functions to the pkg.
+  - b607e93d 2025-07-18T11:16:38+02:00 [bridgeconfig] add some getters/setters with lock to the pkg.
+  - 836e0f64 2025-07-18T11:16:38+02:00 [bridgeconfig] move setBridgeOfPorts to the package.
+  - cf93ef30 2025-07-18T11:16:38+02:00 [bridgeconfig] start moving methods that use internal mutex to the pkg
+  - a4d421a3 2025-07-18T11:16:37+02:00 [bridgeconfig] simply move functions around, no change
+  - 3b073327 2025-07-18T11:16:37+02:00 [bridgeconfig] only create BridgeConfigurations inside the package.
+  - 420d9f1c 2025-07-18T11:16:37+02:00 [bridgeconfig] make mutex a public field to turn it into internal later
+  - b65a01ef 2025-07-18T11:16:37+02:00 [node/bridgeconfig] move [udn]bridgeconfig to ite own package.
+  - f1a4b4b0 2025-07-18T11:16:24+02:00 [node/egressipgw] Move egressIP functionality to its own package.
+  - 956981a0 2025-07-18T10:24:09+02:00 kv, e2e: Use PrimaryNetwork()
+  - 115b25a3 2025-07-18T10:24:09+02:00 e2e: Move http servers to external container
+  - ae5b6387 2025-07-18T10:24:09+02:00 e2e: Move underlay setup to providers
+  - 1870116b 2025-07-18T10:24:09+02:00 e2e, kv: Use bgpnet for external container network
+  - 9fed90c7 2025-07-18T10:24:09+02:00 e2e: Use ovnk allocator and reserve IPs
+  - f1c76a61 2025-07-18T10:24:09+02:00 e2e, kv: Increase network status timeout
+  - 7c1de13e 2025-07-18T10:24:09+02:00 e2e: Remove harcoded breth0
+  - 318782be 2025-07-18T10:24:09+02:00 kv, e2e: Use the ExternalContainer struct instead of name
+  - b60dbcd9 2025-07-18T10:24:09+02:00 kv, e2e: ensure there is no dots at podtest name
+  - a0101b56 2025-07-18T10:24:07+02:00 kv, e2e: Download virtctl at tests
+  - 098a3aa7 2025-06-27T14:15:27+02:00 Fix UDN nftables mark chain cleanup
+
+- kubernetes image-arm64 9c2642ea7167e203db9f473422f4f9aa4501a51f to 3e4371f7d32c8d83621ead0f736baeea6edc4144
+  - 353c6afa9 2025-08-05T15:44:04+08:00 UPSTREAM: 133117: Bump external snapshotter for vgs tests
+  - 47f547e0c 2025-07-30T16:06:51-04:00 UPSTREAM: <carry>: update test metadata
+  - b79f6c2b7 2025-07-30T11:47:10-04:00 UPSTREAM: 128642: using finalizer
+  - 13ccb0a4c 2025-07-30T11:47:10-04:00 UPSTREAM: 128642: adjust durations for sleepAction
+  - dd5e29946 2025-07-21T11:02:13-04:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - 4fc6781e4 2025-07-21T10:14:57-04:00 UPSTREAM: <drop>: manually resolve conflicts
+  - 80779bd6f 2025-07-15T17:59:41+00:00 Release commit for Kubernetes v1.33.3
+  - 053e244ef 2025-07-10T11:30:20+02:00 Skip linter validation to allow cherrypick
+  - 6a9319c52 2025-07-10T10:12:40+02:00 Use per-policy marker names for VAP integration tests.
+  - 068079fb7 2025-07-04T11:28:46+02:00 Review remarks
+  - 385125330 2025-07-04T11:28:46+02:00 Fix validation for Job with suspend=true,completions=0 to set Complete condition
+  - f208b6c73 2025-06-17T19:04:01+00:00 Update CHANGELOG/CHANGELOG-1.33.md for v1.33.2
+  - d4a4a1d88 2025-06-16T17:48:00+00:00 Fix -Consistent paginated lists serve from cache
+  - cb130042b 2025-06-13T10:04:18+03:00 Add check to see if promote worked within the retry loop
+  - 4c8c88d4c 2025-06-12T20:43:01+03:00 reduce logspam when calculating sandbox resources
+  - d2be12ab7 2025-06-06T20:45:35+00:00 Clean backoff record earlier
+  - ba345a494 2025-05-01T21:54:52-07:00 fix(kubelet): acquire imageRecordsLock when removing image
+
