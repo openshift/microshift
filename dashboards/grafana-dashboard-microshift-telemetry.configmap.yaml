@@ -1,0 +1,1425 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-dashboard-microshift-telemetry
+  labels:
+    grafana_dashboard: "true"
+  annotations:
+    grafana-folder: /grafana-dashboard-definitions/MicroShift
+data:
+  microshift-telemetry.json: |
+    {
+      "annotations": {
+        "list": [
+          {
+            "builtIn": 1,
+            "datasource": {
+              "type": "datasource",
+              "uid": "grafana"
+            },
+            "enable": true,
+            "hide": true,
+            "iconColor": "rgba(0, 211, 255, 1)",
+            "name": "Annotations & Alerts",
+            "type": "dashboard"
+          }
+        ]
+      },
+      "editable": true,
+      "fiscalYearStartMonth": 0,
+      "graphTooltip": 0,
+      "id": 886246,
+      "links": [],
+      "panels": [
+        {
+          "fieldConfig": {
+            "defaults": {},
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 6,
+            "w": 21,
+            "x": 0,
+            "y": 0
+          },
+          "id": 29,
+          "options": {
+            "code": {
+              "language": "plaintext",
+              "showLineNumbers": false,
+              "showMiniMap": false
+            },
+            "content": "* The majority of MicroShift use cases is disconnected environments. Data below represents a small fraction of clusters.\n* Telemetry feature was introduced in 4.19. There is no data prior to that version.\n* A cluster is considered to be offline when it stops reporting metrics.\n  * `Offline period threshold` is a configurable option to establish how long a cluster can stop reporting metrics until it is considered to be offline.\n* Short lived clusters (<1h uptime) are explicitly excluded from production info.\n  * CI and QE run some tests on production servers for quality assurance. These clusters are short lived.\n* Non-production clusters belong to CI and QE.",
+            "mode": "markdown"
+          },
+          "pluginVersion": "11.6.3",
+          "title": "About this dashboard",
+          "type": "text"
+        },
+        {
+          "collapsed": false,
+          "gridPos": {
+            "h": 1,
+            "w": 24,
+            "x": 0,
+            "y": 6
+          },
+          "id": 22,
+          "panels": [],
+          "title": "Production clusters",
+          "type": "row"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "mappings": [
+                {
+                  "options": {
+                    "match": "null",
+                    "result": {
+                      "text": "N/A"
+                    }
+                  },
+                  "type": "special"
+                }
+              ],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green"
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "none"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 7,
+            "w": 5,
+            "x": 0,
+            "y": 7
+          },
+          "id": 30,
+          "maxDataPoints": 100,
+          "options": {
+            "colorMode": "none",
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "orientation": "horizontal",
+            "percentChangeColorMode": "standard",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showPercentChange": false,
+            "textMode": "auto",
+            "wideLayout": true
+          },
+          "pluginVersion": "11.6.3",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "editorMode": "code",
+              "expr": "count (\n  max by (_id, version) (\n    count_over_time(microshift_version[$offline_threshold]) > 0\n  )\n  and on(_id)\n  (\n    max by (_id) (\n      count_over_time(microshift_version[$offline_threshold]) > 0\n    )\n    unless on (_id)\n    (\n      (\n        max by(_id) (max_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n        -\n        min by(_id) (min_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n      ) < 3600\n    )\n  )\n)",
+              "legendFormat": "__auto",
+              "range": true,
+              "refId": "A"
+            }
+          ],
+          "title": "Active clusters",
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green"
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "short"
+            },
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byFrameRefID",
+                  "options": "A"
+                },
+                "properties": [
+                  {
+                    "id": "displayName",
+                    "value": "Clusters"
+                  }
+                ]
+              }
+            ]
+          },
+          "gridPos": {
+            "h": 7,
+            "w": 6,
+            "x": 5,
+            "y": 7
+          },
+          "id": 31,
+          "options": {
+            "dataLinks": [],
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": false
+            },
+            "tooltip": {
+              "hideZeros": false,
+              "mode": "multi",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "11.6.3",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "editorMode": "code",
+              "expr": "count (\n  max by (_id, version) (\n    count_over_time(microshift_version[$offline_threshold]) > 0\n  )\n  and on(_id)\n  (\n    max by (_id) (\n      count_over_time(microshift_version[$offline_threshold]) > 0\n    )\n    unless on (_id)\n    (\n      (\n        max by(_id) (max_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n        -\n        min by(_id) (min_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n      ) < 3600\n    )\n  )\n)",
+              "legendFormat": "__auto",
+              "range": true,
+              "refId": "A"
+            }
+          ],
+          "title": "Active clusters",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green"
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "short"
+            },
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byFrameRefID",
+                  "options": "A"
+                },
+                "properties": [
+                  {
+                    "id": "displayName",
+                    "value": "1-4 CPUs"
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byFrameRefID",
+                  "options": "B"
+                },
+                "properties": [
+                  {
+                    "id": "displayName",
+                    "value": "4-8 CPUs"
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byFrameRefID",
+                  "options": "C"
+                },
+                "properties": [
+                  {
+                    "id": "displayName",
+                    "value": "8-16 CPUs"
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byFrameRefID",
+                  "options": "D"
+                },
+                "properties": [
+                  {
+                    "id": "displayName",
+                    "value": "+16 CPUs"
+                  }
+                ]
+              }
+            ]
+          },
+          "gridPos": {
+            "h": 7,
+            "w": 6,
+            "x": 11,
+            "y": 7
+          },
+          "id": 32,
+          "options": {
+            "displayMode": "gradient",
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": false
+            },
+            "maxVizHeight": 300,
+            "minVizHeight": 16,
+            "minVizWidth": 8,
+            "namePlacement": "auto",
+            "orientation": "horizontal",
+            "reduceOptions": {
+              "calcs": [],
+              "fields": "",
+              "values": false
+            },
+            "showUnfilled": true,
+            "sizing": "auto",
+            "valueMode": "color"
+          },
+          "pluginVersion": "11.6.3",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "editorMode": "code",
+              "expr": "count(\n  (\n    sum by (_id) (cluster:capacity_cpu_cores:sum{label_beta_kubernetes_io_instance_type=\"rhde\"})\n    unless on (_id)\n    (\n      (\n        max by(_id) (max_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n        - \n        min by(_id) (min_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n      ) < 3600\n    )\n  ) <= 4\n)",
+              "legendFormat": "__auto",
+              "range": true,
+              "refId": "A"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "editorMode": "code",
+              "expr": "count(\n  (\n    (\n      sum by (_id) (cluster:capacity_cpu_cores:sum{label_beta_kubernetes_io_instance_type=\"rhde\"})\n      and on(_id)\n  (\n    max by (_id) (\n      count_over_time(microshift_version[$offline_threshold]) > 0\n    )\n    unless on (_id)\n    (\n      (\n        max by(_id) (max_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n        -\n        min by(_id) (min_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n      ) < 3600\n    )\n  )\n    ) > 4\n    and\n    (\n      sum by (_id) (cluster:capacity_cpu_cores:sum{label_beta_kubernetes_io_instance_type=\"rhde\"})\n      and on(_id)\n  (\n    max by (_id) (\n      count_over_time(microshift_version[$offline_threshold]) > 0\n    )\n    unless on (_id)\n    (\n      (\n        max by(_id) (max_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n        -\n        min by(_id) (min_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n      ) < 3600\n    )\n  )\n    ) <= 8\n  )\n)\n",
+              "hide": false,
+              "instant": false,
+              "legendFormat": "__auto",
+              "range": true,
+              "refId": "B"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "editorMode": "code",
+              "expr": "count(\n  (\n    (\n      sum by (_id) (cluster:capacity_cpu_cores:sum{label_beta_kubernetes_io_instance_type=\"rhde\"})\n      and on(_id)\n      (\n        max by (_id) (\n          count_over_time(microshift_version[$offline_threshold]) > 0\n        )\n        unless on (_id)\n        (\n          (\n            max by(_id) (max_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n            -\n            min by(_id) (min_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n          ) < 3600\n        )\n      )\n    ) > 8\n    and\n    (\n      sum by (_id) (cluster:capacity_cpu_cores:sum{label_beta_kubernetes_io_instance_type=\"rhde\"})\n      and on(_id)\n      (\n        max by (_id) (\n          count_over_time(microshift_version[$offline_threshold]) > 0\n        )\n        unless on (_id)\n        (\n          (\n            max by(_id) (max_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n            -\n            min by(_id) (min_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n          ) < 3600\n        )\n      )\n    ) <= 16\n  )\n)\n",
+              "hide": false,
+              "instant": false,
+              "legendFormat": "__auto",
+              "range": true,
+              "refId": "C"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "editorMode": "code",
+              "expr": "count(\n  (\n    (\n      sum by (_id) (cluster:capacity_cpu_cores:sum{label_beta_kubernetes_io_instance_type=\"rhde\"})\n      and on(_id)\n  (\n    max by (_id) (\n      count_over_time(microshift_version[$offline_threshold]) > 0\n    )\n    and on(_id)\n    (\n      max by (_id) (\n        count_over_time(microshift_version[$offline_threshold]) > 0\n      )\n      unless on (_id)\n      (\n        (\n          max by(_id) (max_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n          -\n          min by(_id) (min_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n        ) < 3600\n      )\n    )\n  )\n    ) > 16\n  )\n)\n",
+              "hide": false,
+              "instant": false,
+              "legendFormat": "__auto",
+              "range": true,
+              "refId": "D"
+            }
+          ],
+          "title": "Active clusters",
+          "type": "bargauge"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green"
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "short"
+            },
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byFrameRefID",
+                  "options": "A"
+                },
+                "properties": [
+                  {
+                    "id": "displayName",
+                    "value": "0-1 day"
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byFrameRefID",
+                  "options": "B"
+                },
+                "properties": [
+                  {
+                    "id": "displayName",
+                    "value": "1-7 days"
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byFrameRefID",
+                  "options": "C"
+                },
+                "properties": [
+                  {
+                    "id": "displayName",
+                    "value": "7-30 days"
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byFrameRefID",
+                  "options": "D"
+                },
+                "properties": [
+                  {
+                    "id": "displayName",
+                    "value": "30-180 days"
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byFrameRefID",
+                  "options": "E"
+                },
+                "properties": [
+                  {
+                    "id": "displayName",
+                    "value": "180+ days"
+                  }
+                ]
+              }
+            ]
+          },
+          "gridPos": {
+            "h": 14,
+            "w": 4,
+            "x": 17,
+            "y": 7
+          },
+          "id": 33,
+          "options": {
+            "displayMode": "gradient",
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": false
+            },
+            "maxVizHeight": 300,
+            "minVizHeight": 16,
+            "minVizWidth": 8,
+            "namePlacement": "top",
+            "orientation": "horizontal",
+            "reduceOptions": {
+              "calcs": [],
+              "fields": "",
+              "values": false
+            },
+            "showUnfilled": true,
+            "sizing": "auto",
+            "valueMode": "color"
+          },
+          "pluginVersion": "11.6.3",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "editorMode": "code",
+              "expr": "count(\n  (\n    (\n      max by(_id) (max_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n      - \n      min by(_id) (min_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n    ) > 3600\n    and\n    (\n      max by(_id) (max_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n      - \n      min by(_id) (min_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n    ) <= 86400 # <1 day uptime.\n  )\n)\n",
+              "legendFormat": "__auto",
+              "range": true,
+              "refId": "A"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "editorMode": "code",
+              "expr": "count(\n  (\n    (\n      max by(_id) (max_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n      - \n      min by(_id) (min_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n    ) > 86400\n    and\n    (\n      max by(_id) (max_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n      - \n      min by(_id) (min_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n    ) <= 604800 # <1 week uptime.\n  )\n)\n",
+              "hide": false,
+              "instant": false,
+              "legendFormat": "__auto",
+              "range": true,
+              "refId": "B"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "editorMode": "code",
+              "expr": "count(\n  (\n    (\n      max by(_id) (max_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n      - \n      min by(_id) (min_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n    ) > 604800\n    and\n    (\n      max by(_id) (max_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n      - \n      min by(_id) (min_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n    ) <= 2592000 # < 1 month uptime.\n  )\n)\n",
+              "hide": false,
+              "instant": false,
+              "legendFormat": "__auto",
+              "range": true,
+              "refId": "C"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "editorMode": "code",
+              "expr": "count(\n  (\n    (\n      max by(_id) (max_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n      - \n      min by(_id) (min_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n    ) > 2592000\n    and\n    (\n      max by(_id) (max_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n      - \n      min by(_id) (min_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n    ) <= 15552000 # < 6 month uptime.\n  )\n)\n",
+              "hide": false,
+              "instant": false,
+              "legendFormat": "__auto",
+              "range": true,
+              "refId": "D"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "editorMode": "code",
+              "expr": "count(\n  (\n    (\n      max by(_id) (max_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n      - \n      min by(_id) (min_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n    ) > 15552000\n  )\n)\n",
+              "hide": false,
+              "instant": false,
+              "legendFormat": "__auto",
+              "range": true,
+              "refId": "E"
+            }
+          ],
+          "title": "Cluster uptime",
+          "type": "bargauge"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "mappings": [
+                {
+                  "options": {
+                    "match": "null",
+                    "result": {
+                      "text": "N/A"
+                    }
+                  },
+                  "type": "special"
+                }
+              ],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green"
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "none"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 7,
+            "w": 5,
+            "x": 0,
+            "y": 14
+          },
+          "id": 34,
+          "maxDataPoints": 100,
+          "options": {
+            "colorMode": "none",
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "orientation": "horizontal",
+            "percentChangeColorMode": "standard",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showPercentChange": false,
+            "textMode": "auto",
+            "wideLayout": true
+          },
+          "pluginVersion": "11.6.3",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "editorMode": "code",
+              "expr": "sum(\n  sum by (_id) (cluster:capacity_cpu_cores:sum{label_beta_kubernetes_io_instance_type=\"rhde\"})\n  and on(_id)\n  (\n    max by (_id) (\n      count_over_time(microshift_version[$offline_threshold]) > 0\n    )\n    unless on (_id)\n    (\n      (\n        max by(_id) (max_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n        -\n        min by(_id) (min_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n      ) < 3600\n    )\n  )\n)",
+              "legendFormat": "__auto",
+              "range": true,
+              "refId": "A"
+            }
+          ],
+          "title": "Active CPUs",
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green"
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "short"
+            },
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byFrameRefID",
+                  "options": "A"
+                },
+                "properties": [
+                  {
+                    "id": "displayName",
+                    "value": "CPUs"
+                  }
+                ]
+              }
+            ]
+          },
+          "gridPos": {
+            "h": 7,
+            "w": 6,
+            "x": 5,
+            "y": 14
+          },
+          "id": 35,
+          "options": {
+            "dataLinks": [],
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": false
+            },
+            "tooltip": {
+              "hideZeros": false,
+              "mode": "multi",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "11.6.3",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "editorMode": "code",
+              "expr": "sum(\n  sum by (_id) (cluster:capacity_cpu_cores:sum{label_beta_kubernetes_io_instance_type=\"rhde\"})\n  and on(_id)\n  (\n    max by (_id) (\n      count_over_time(microshift_version[$offline_threshold]) > 0\n    )\n    unless on (_id)\n    (\n      (\n        max by(_id) (max_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n        -\n        min by(_id) (min_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n      ) < 3600\n    )\n  )\n)",
+              "legendFormat": "__auto",
+              "range": true,
+              "refId": "A"
+            }
+          ],
+          "title": "Active CPUs",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green"
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "short"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 7,
+            "w": 6,
+            "x": 11,
+            "y": 14
+          },
+          "id": 36,
+          "options": {
+            "dataLinks": [],
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "hideZeros": false,
+              "mode": "multi",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "11.6.3",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "editorMode": "code",
+              "expr": "sum by (label_kubernetes_io_arch) (\n  sum by (_id, label_kubernetes_io_arch) (cluster:capacity_cpu_cores:sum{label_beta_kubernetes_io_instance_type=\"rhde\"})\n  and on(_id)\n  (\n    max by (_id) (\n      count_over_time(microshift_version[$offline_threshold]) > 0\n    )\n    unless on (_id)\n    (\n      (\n        max by(_id) (max_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n        -\n        min by(_id) (min_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n      ) < 3600\n    )\n  )\n)",
+              "legendFormat": "__auto",
+              "range": true,
+              "refId": "A"
+            }
+          ],
+          "title": "CPUs by architecture",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                }
+              },
+              "mappings": [],
+              "unit": "short"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 14,
+            "w": 7,
+            "x": 0,
+            "y": 21
+          },
+          "id": 37,
+          "options": {
+            "legend": {
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "pieType": "pie",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "tooltip": {
+              "hideZeros": false,
+              "mode": "multi",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "11.6.3",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "editorMode": "code",
+              "expr": "count by (deployment_type, version) (\n  (\n    count_over_time(microshift_version[$offline_threshold]) > 0\n  )\n  and on(_id)\n  (\n    max by (_id) (\n      count_over_time(microshift_version[$offline_threshold]) > 0\n    )\n    unless on (_id)\n    (\n      (\n        max by(_id) (max_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n        -\n        min by(_id) (min_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n      ) < 3600\n    )\n  )\n)\n",
+              "legendFormat": "__auto",
+              "range": true,
+              "refId": "A"
+            }
+          ],
+          "title": "Clusters by version and type",
+          "type": "piechart"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green"
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "short"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 7,
+            "w": 14,
+            "x": 7,
+            "y": 21
+          },
+          "id": 39,
+          "options": {
+            "dataLinks": [],
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "hideZeros": false,
+              "mode": "multi",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "11.6.3",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "editorMode": "code",
+              "expr": "count by (deployment_type) (\n  (\n    count_over_time(microshift_version[$offline_threshold]) > 0\n  )\n  and on(_id)\n  (\n    max by (_id) (\n      count_over_time(microshift_version[$offline_threshold]) > 0\n    )\n    unless on (_id)\n    (\n      (\n        max by(_id) (max_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n        -\n        min by(_id) (min_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n      ) < 3600\n    )\n  )\n)\n",
+              "legendFormat": "__auto",
+              "range": true,
+              "refId": "A"
+            }
+          ],
+          "title": "Cluster deployment types",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green"
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "short"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 7,
+            "w": 14,
+            "x": 7,
+            "y": 28
+          },
+          "id": 40,
+          "options": {
+            "dataLinks": [],
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "hideZeros": false,
+              "mode": "multi",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "11.6.3",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "editorMode": "code",
+              "expr": "count by (version) (\n  (\n    count_over_time(microshift_version[$offline_threshold]) > 0\n  )\n  and on(_id)\n  (\n    max by (_id) (\n      count_over_time(microshift_version[$offline_threshold]) > 0\n    )\n    unless on (_id)\n    (\n      (\n        max by(_id) (max_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n        -\n        min by(_id) (min_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n      ) < 3600\n    )\n  )\n)\n",
+              "legendFormat": "__auto",
+              "range": true,
+              "refId": "A"
+            }
+          ],
+          "title": "Cluster versions",
+          "type": "timeseries"
+        },
+        {
+          "collapsed": false,
+          "gridPos": {
+            "h": 1,
+            "w": 24,
+            "x": 0,
+            "y": 35
+          },
+          "id": 24,
+          "panels": [],
+          "title": "Non-production clusters",
+          "type": "row"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "mappings": [
+                {
+                  "options": {
+                    "match": "null",
+                    "result": {
+                      "text": "N/A"
+                    }
+                  },
+                  "type": "special"
+                }
+              ],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green"
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "none"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 6,
+            "x": 0,
+            "y": 36
+          },
+          "id": 38,
+          "maxDataPoints": 100,
+          "options": {
+            "colorMode": "none",
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "orientation": "horizontal",
+            "percentChangeColorMode": "standard",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showPercentChange": false,
+            "textMode": "auto",
+            "wideLayout": true
+          },
+          "pluginVersion": "11.6.3",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "editorMode": "code",
+              "expr": "count(\n  (\n    count_over_time(microshift_version[$offline_threshold]) > 0\n  )\n  and on(_id)\n  (\n    max by (_id) (\n      count_over_time(microshift_version[$offline_threshold]) > 0\n    )\n    unless on (_id)\n    (\n      (\n        max by(_id) (max_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n        -\n        min by(_id) (min_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n      ) >= 3600\n    )\n  )\n)",
+              "legendFormat": "__auto",
+              "range": true,
+              "refId": "A"
+            }
+          ],
+          "title": "Created clusters",
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "displayName": "Active clusters",
+              "fieldMinMax": false,
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green"
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "short"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 15,
+            "x": 6,
+            "y": 36
+          },
+          "id": 42,
+          "options": {
+            "dataLinks": [],
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "hideZeros": false,
+              "mode": "multi",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "11.6.3",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "editorMode": "code",
+              "expr": "count(\n  (\n    count_over_time(microshift_version[$offline_threshold]) > 0\n  )\n  and on(_id)\n  (\n    max by (_id) (\n      count_over_time(microshift_version[$offline_threshold]) > 0\n    )\n    unless on (_id)\n    (\n      (\n        max by(_id) (max_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n        -\n        min by(_id) (min_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n      ) >= 3600\n    )\n  )\n)",
+              "legendFormat": "__auto",
+              "range": true,
+              "refId": "A"
+            }
+          ],
+          "title": "Active clusters",
+          "type": "timeseries"
+        }
+      ],
+      "preload": false,
+      "refresh": "",
+      "schemaVersion": 41,
+      "tags": [],
+      "templating": {
+        "list": [
+          {
+            "current": {
+              "text": "telemeter-recent-production",
+              "value": "PD776AFABBE26000A"
+            },
+            "includeAll": false,
+            "name": "datasource",
+            "options": [],
+            "query": "prometheus",
+            "refresh": 1,
+            "regex": "telemeter-.*",
+            "type": "datasource"
+          },
+          {
+            "auto": false,
+            "auto_count": 30,
+            "auto_min": "10s",
+            "current": {
+              "text": "7d",
+              "value": "7d"
+            },
+            "description": "Period that a cluster can go without reporting any metrics before considering it is offline.",
+            "label": "Offline period threshold",
+            "name": "offline_threshold",
+            "options": [
+              {
+                "selected": false,
+                "text": "2h",
+                "value": "2h"
+              },
+              {
+                "selected": false,
+                "text": "6h",
+                "value": "6h"
+              },
+              {
+                "selected": false,
+                "text": "12h",
+                "value": "12h"
+              },
+              {
+                "selected": false,
+                "text": "1d",
+                "value": "1d"
+              },
+              {
+                "selected": true,
+                "text": "7d",
+                "value": "7d"
+              },
+              {
+                "selected": false,
+                "text": "14d",
+                "value": "14d"
+              },
+              {
+                "selected": false,
+                "text": "30d",
+                "value": "30d"
+              }
+            ],
+            "query": "2h,6h,12h,1d,7d,14d,30d",
+            "refresh": 2,
+            "type": "interval"
+          }
+        ]
+      },
+      "time": {
+        "from": "now-30d",
+        "to": "now"
+      },
+      "timepicker": {},
+      "timezone": "",
+      "title": "MicroShift Telemetry",
+      "uid": "sK7hN2pXf",
+      "version": 1
+    }
