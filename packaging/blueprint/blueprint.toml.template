@@ -15,9 +15,6 @@ version = "${REPLACE_USHIFT_VERSION}"
 [customizations.services]
 enabled = ["microshift"]
 
-[customizations.firewall]
-ports = ["22:tcp"]
-
 [customizations.firewall.services]
 enabled = ["ssh"]
 
