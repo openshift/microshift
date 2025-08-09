@@ -1,8 +1,9 @@
-- ovn-kubernetes image-amd64 3b4486bca363f366b28953f1bb5c1e64d84ceca4 to 399bcfd7e0225bd8eecf2afb58eef1ed37274a54
-  - e9cafcd5 2025-07-15T20:56:50+02:00 Pass hostSubnets to commonFlows to fix default network -> localnet
-  - e3a9624a 2025-07-15T20:56:46+02:00 Rename hostSubnets->subnets in newLocalGateway
+- kubernetes-kube-storage-version-migrator embedded-component 0b41e7bf19a6bffa060eb26ecd4830634882d4a3 to 69b07ae04918806079f1a4fbc2f110453bc8db19
+  - 886f811 2025-08-05T13:58:26+00:00 UPSTREAM: <carry>: Add DOWNSTREAM_OWNERS.
 
-- ovn-kubernetes image-arm64 3b4486bca363f366b28953f1bb5c1e64d84ceca4 to 399bcfd7e0225bd8eecf2afb58eef1ed37274a54
-  - e9cafcd5 2025-07-15T20:56:50+02:00 Pass hostSubnets to commonFlows to fix default network -> localnet
-  - e3a9624a 2025-07-15T20:56:46+02:00 Rename hostSubnets->subnets in newLocalGateway
+- oc image-amd64 f39295cb74b7d3d5571f38b88f55475fe13bf007 to fd2be5da398d8287664836e4838b68082a9f1bb8
+  - 0f21fa60 2025-05-27T13:35:54+00:00 Adding sos.conf file for default sos config into the tools image
+
+- oc image-arm64 f39295cb74b7d3d5571f38b88f55475fe13bf007 to fd2be5da398d8287664836e4838b68082a9f1bb8
+  - 0f21fa60 2025-05-27T13:35:54+00:00 Adding sos.conf file for default sos config into the tools image
 
