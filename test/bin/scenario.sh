@@ -1052,6 +1052,8 @@ EOF
         --name "${SCENARIO}" \
         --randomize "${TEST_RANDOMIZATION}" \
         --loglevel TRACE \
+        --listener "${TESTDIR}/resources/sos-on-failure-listener.py" \
+        --pythonpath "${TESTDIR}/resources" \
         --outputdir "${SCENARIO_INFO_DIR}/${SCENARIO}" \
         --debugfile "${SCENARIO_INFO_DIR}/${SCENARIO}/rf-debug.log" \
         -x junit.xml \
