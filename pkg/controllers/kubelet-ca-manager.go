@@ -83,7 +83,7 @@ func (s *KubeletCAManager) loadCACertData() error {
 }
 
 func (s *KubeletCAManager) ensureConfigMap(ctx context.Context) error {
-	var cm = "core/kubelet-ca-bundle.yaml"
+	var cm = "core/kubelet-client-ca.yaml"
 	kubeConfigPath := s.cfg.KubeConfigPath(config.KubeAdmin)
 
 	if err := assets.ApplyConfigMapWithData(ctx, cm, s.caCertData, kubeConfigPath); err != nil {
