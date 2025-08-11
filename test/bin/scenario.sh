@@ -1047,6 +1047,8 @@ EOF
         timeout_robot="${rf_binary}"
     fi
 
+    export SKIP_SOS # For sos-on-failure-listener.py
+
     # shellcheck disable=SC2086
     if ! ${timeout_robot} \
         --name "${SCENARIO}" \

@@ -13,6 +13,7 @@ because cluster objects might be already deleted (like suite or test teardown re
 or long running Pods (like MicroShift core Pods) might've been restarted couple times and the relevant logs are lost.
 """
 
+import os
 import re
 from robot import result, running
 from robot.libraries.BuiltIn import BuiltIn
@@ -41,6 +42,10 @@ def end_keyword(data: running.model.Keyword, res: result.model.Keyword):
     # If a test case level keyword failed, collect SOS report.
     # If the keyword failed on different level (like inside Wait Until Keyword Succeeds), it's ignored.
     if res.status == "FAIL" and isinstance(res.parent, result.model.TestCase):
+        value = os.getenv("SKIP_SOS")
+        if value == "true":
+            BuiltIn().log("sos-on-failure-listener.py: SKIP_SOS is set to true, skipping SOS report collection")
+            return
         BuiltIn().log("sos-on-failure-listener.py: Failure was detected, collecting SOS report")
         BuiltIn().import_resource('microshift-host.resource')
         cmd = "microshift-sos-report --profiles microshift --plugins ''"
