@@ -16,6 +16,7 @@ import (
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/wait"
 	appsclientv1 "k8s.io/client-go/kubernetes/typed/apps/v1"
+	coreclientv1 "k8s.io/client-go/kubernetes/typed/core/v1"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/klog/v2"
@@ -58,6 +59,11 @@ func waitForWorkloads(ctx context.Context, timeout time.Duration, workloads map[
 		return fmt.Errorf("unable to create Kubernetes client: %v", err)
 	}
 
+	coreClient, err := coreclientv1.NewForConfig(rest.AddUserAgent(restConfig, "healthcheck"))
+	if err != nil {
+		return fmt.Errorf("unable to create Kubernetes core client: %v", err)
+	}
+
 	interval := max(timeout/30, 1*time.Second)
 	klog.Infof("API Server will be queried every %v", interval)
 
@@ -75,7 +81,7 @@ func waitForWorkloads(ctx context.Context, timeout time.Duration, workloads map[
 	}
 	errs := aeg.Wait()
 	if errs != nil {
-		logPodsAndEvents()
+		printPostFailureDebugInfo(ctx, coreClient)
 		return errs
 	}
 	return nil
