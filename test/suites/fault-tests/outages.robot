@@ -81,7 +81,7 @@ Delete Pod ${pod_name} In ${namespace}
 
     ${actual_str}    ${rc}=    Get Log Output With Pattern    ${cursor}    kubelet.go.*${namespace}
     @{expected_lines}=    Get Expected Fault Messages    delete    pod
-    VAR    ${expected_lines_replaced}=    ${EMPTY}
+    VAR    @{expected_lines_replaced}=    @{EMPTY}
     FOR    ${line}    IN    @{expected_lines}
         ${line_with_vars}=    Replace Variables    ${line}
         Append To List    ${expected_lines_replaced}    ${line_with_vars}
