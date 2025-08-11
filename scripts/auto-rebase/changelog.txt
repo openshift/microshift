@@ -1,45 +1,15 @@
-- cluster-network-operator embedded-component 90a296e513cdad4d1708fee1d1975de0baf3d777 to c1a702897dc2ca3dc4cdc04f4984a718960ea46a
-  - 03037e8 2025-01-21T11:23:40+00:00 Re-disable metrics server
+- kubernetes embedded-component 0c9395f92e970f64d40ad338e9ed8918d6ab10ea to 45be6afa71817681e9d19fa129884fb81ba9439b
+  - 205d84ada 2025-08-05T16:10:02-04:00 UPSTREAM: <carry>: Update Node Monitor Grace Period default duration to 50s
+  - 8dbd3381d 2025-08-05T10:44:15-04:00 UPSTREAM: 131579: fix(kubelet): acquire imageRecordsLock when removing image
 
-- etcd embedded-component 416376871d09278b18ae16520363ea6c8b3c71a8 to b5a4f8d079fbb04200251d5a6bc7c56f79d9d1e3
-  - be43b864 2025-06-05T06:09:04+00:00 Updating ose-etcd-container image to be consistent with ART for 4.18 Reconciling with https://github.com/openshift/ocp-build-data/tree/eae95b7543f33b601ee37740e3920797e11baff5/images/ose-etcd.yml
+- machine-config-operator embedded-component b80d590e99b9ea3d7c8d4126ce2f801c05856d1e to 240e315c241bf702f9dc7fb201922793c6be147e
+  - 763a46d6 2025-08-01T02:56:58+00:00 Add workaround fix for static pod race
 
-- kubernetes embedded-component 817e6dd5e0cb98b70cfc7407e94c2c125e4ce424 to 0c9395f92e970f64d40ad338e9ed8918d6ab10ea
-  - 14ddfb48c 2025-07-24T12:57:47-04:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
-  - 7e94e1ce5 2025-07-15T18:05:31+00:00 Release commit for Kubernetes v1.31.11
-  - fc02d1eaf 2025-07-10T10:13:27+02:00 Use per-policy marker names for VAP integration tests.
-  - ef4a037da 2025-06-17T18:55:04+00:00 Update CHANGELOG/CHANGELOG-1.31.md for v1.31.10
-  - 152efa926 2025-06-13T10:05:33+03:00 Add check to see if promote worked within the retry loop
-  - a4ac2e3b6 2025-06-06T20:58:34+00:00 Clean backoff record earlier
+- kubernetes image-amd64 0c9395f92e970f64d40ad338e9ed8918d6ab10ea to 45be6afa71817681e9d19fa129884fb81ba9439b
+  - 205d84ada 2025-08-05T16:10:02-04:00 UPSTREAM: <carry>: Update Node Monitor Grace Period default duration to 50s
+  - 8dbd3381d 2025-08-05T10:44:15-04:00 UPSTREAM: 131579: fix(kubelet): acquire imageRecordsLock when removing image
 
-- kubernetes-kube-storage-version-migrator embedded-component 8dec42d36f9e26487112aeac870767a5fedb8021 to c0f1886ab08d8c2ed84c9ea648b3f65cd82dc5f5
-  - 2bedd9b 2025-08-05T11:51:00+00:00 UPSTREAM: <carry>: Add DOWNSTREAM_OWNERS.
-
-- ovn-kubernetes image-amd64 4370f4637ce9adc94d7bd5fd01e587b471ee3284 to 5236895f6c35e2f4b16c0fad78a05126aa2ddbd2
-  - b8bccdc7 2025-07-24T11:08:12-07:00 OVN EIP startup syncer: add UTs for pod / node deleted
-  - 73c54154 2025-07-24T11:08:07-07:00 EIP OVN controller: remove possibility of crash, improve logging and readability
-  - b644521c 2025-07-24T11:08:03-07:00 EIP OVN startup syncer: fix processing of ovn constructs
-  - cc37ddda 2025-07-24T11:07:58-07:00 EgressIP: fix startup sync to add metadata
-
-- kubernetes image-amd64 817e6dd5e0cb98b70cfc7407e94c2c125e4ce424 to 0c9395f92e970f64d40ad338e9ed8918d6ab10ea
-  - 14ddfb48c 2025-07-24T12:57:47-04:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
-  - 7e94e1ce5 2025-07-15T18:05:31+00:00 Release commit for Kubernetes v1.31.11
-  - fc02d1eaf 2025-07-10T10:13:27+02:00 Use per-policy marker names for VAP integration tests.
-  - ef4a037da 2025-06-17T18:55:04+00:00 Update CHANGELOG/CHANGELOG-1.31.md for v1.31.10
-  - 152efa926 2025-06-13T10:05:33+03:00 Add check to see if promote worked within the retry loop
-  - a4ac2e3b6 2025-06-06T20:58:34+00:00 Clean backoff record earlier
-
-- ovn-kubernetes image-arm64 4370f4637ce9adc94d7bd5fd01e587b471ee3284 to 5236895f6c35e2f4b16c0fad78a05126aa2ddbd2
-  - b8bccdc7 2025-07-24T11:08:12-07:00 OVN EIP startup syncer: add UTs for pod / node deleted
-  - 73c54154 2025-07-24T11:08:07-07:00 EIP OVN controller: remove possibility of crash, improve logging and readability
-  - b644521c 2025-07-24T11:08:03-07:00 EIP OVN startup syncer: fix processing of ovn constructs
-  - cc37ddda 2025-07-24T11:07:58-07:00 EgressIP: fix startup sync to add metadata
-
-- kubernetes image-arm64 817e6dd5e0cb98b70cfc7407e94c2c125e4ce424 to 0c9395f92e970f64d40ad338e9ed8918d6ab10ea
-  - 14ddfb48c 2025-07-24T12:57:47-04:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
-  - 7e94e1ce5 2025-07-15T18:05:31+00:00 Release commit for Kubernetes v1.31.11
-  - fc02d1eaf 2025-07-10T10:13:27+02:00 Use per-policy marker names for VAP integration tests.
-  - ef4a037da 2025-06-17T18:55:04+00:00 Update CHANGELOG/CHANGELOG-1.31.md for v1.31.10
-  - 152efa926 2025-06-13T10:05:33+03:00 Add check to see if promote worked within the retry loop
-  - a4ac2e3b6 2025-06-06T20:58:34+00:00 Clean backoff record earlier
+- kubernetes image-arm64 0c9395f92e970f64d40ad338e9ed8918d6ab10ea to 45be6afa71817681e9d19fa129884fb81ba9439b
+  - 205d84ada 2025-08-05T16:10:02-04:00 UPSTREAM: <carry>: Update Node Monitor Grace Period default duration to 50s
+  - 8dbd3381d 2025-08-05T10:44:15-04:00 UPSTREAM: 131579: fix(kubelet): acquire imageRecordsLock when removing image
 
