@@ -257,6 +257,6 @@ replace (
 	go.etcd.io/etcd/client/v3 => github.com/openshift/etcd/client/v3 v3.5.1-0.20250325012632-0d9e0a907c4a // from etcd
 )
 
-replace sigs.k8s.io/kube-storage-version-migrator => github.com/openshift/kubernetes-kube-storage-version-migrator v0.0.3-0.20250611153038-0b41e7bf19a6 // release kube-storage-version-migrator via kubernetes-kube-storage-version-migrator
+replace sigs.k8s.io/kube-storage-version-migrator => github.com/openshift/kubernetes-kube-storage-version-migrator v0.0.3-0.20250805164133-69b07ae04918 // release kube-storage-version-migrator via kubernetes-kube-storage-version-migrator
 
 replace k8s.io/endpointslice => github.com/openshift/kubernetes/staging/src/k8s.io/endpointslice v0.0.0-20250708171801-ce407c5220d0 // staging kubernetes
