@@ -13,6 +13,7 @@ because cluster objects might be already deleted (like suite or test teardown re
 or long running Pods (like MicroShift core Pods) might've been restarted couple times and the relevant logs are lost.
 """
 
+import re
 from robot import result, running
 from robot.libraries.BuiltIn import BuiltIn
 
@@ -45,7 +46,10 @@ def end_keyword(data: running.model.Keyword, res: result.model.Keyword):
         cmd = "microshift-sos-report --profiles microshift --plugins ''"
         if len(suite_namespaces) > 0 or len(test_namespaces) > 0:
             cmd += f" --namespaces {','.join(suite_namespaces + test_namespaces)}"
-        BuiltIn().run_keyword("Command Execution", cmd)
+        stdout, _, _ = BuiltIn().run_keyword("Command Execution", cmd)
+        m = re.search(r'(\/\S+\/sosreport\S+.tar.xz)', stdout)
+        if m:
+            BuiltIn().log(f"sos-on-failure-listener.py: SOS report collected to {m.group(1)}")
 
 
 def start_var(data: running.model.Var, res: result.model.Var):
