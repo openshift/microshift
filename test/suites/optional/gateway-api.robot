@@ -55,7 +55,9 @@ Create Gateway
     Generate File From Template    ${GATEWAY_MANIFEST_TMPL}    ${tmp}
     Oc Apply    -n ${namespace} -f ${tmp}
     Oc Wait    -n ${namespace} gateway/test-gateway    --for="condition=Accepted" --timeout=120s
-    Oc Wait    -n ${namespace} deploy test-gateway-openshift-gateway-api    --for=condition=Available --timeout=120s
+    # Run healthcheck command to avoid premature wait returns if the object does not yet exist
+    Command Should Work
+    ...    sudo microshift healthcheck --namespace ${namespace} --deployments test-gateway-openshift-gateway-api --timeout 120s
     Oc Wait    -n ${namespace} gateway/test-gateway    --for="condition=Programmed" --timeout=120s
 
 Create HTTP Route
