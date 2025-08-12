@@ -9,8 +9,8 @@ Suite Teardown      Teardown
 
 
 *** Variables ***
-${TMPDIR}    ${EMPTY}
-${URL}        https://raw.githubusercontent.com/argoproj/argocd-example-apps/refs/heads/master/guestbook/guestbook-ui-deployment.yaml
+${TMPDIR}       ${EMPTY}
+${URL}          https://raw.githubusercontent.com/argoproj/argocd-example-apps/refs/heads/master/guestbook/guestbook-ui-deployment.yaml
 
 
 *** Test Cases ***
@@ -32,7 +32,7 @@ Setup
     Setup Kubeconfig
     Restart MicroShift
     ${tmp}=    Create Random Temp Directory
-    Set Global Variable    ${TMPDIR}    ${tmp}
+    VAR    ${TMPDIR}=    ${tmp}    scope=GLOBAL
 
 Teardown
     [Documentation]    Test suite teardown
@@ -42,7 +42,7 @@ Teardown
 
 Deploy Guestbook
     [Documentation]    Deploys Guestbook app as test workload
-    ${file_path}=    Set Variable    ${TMPDIR}/guestbook-ui-deployment.yaml
+    VAR    ${file_path}=    ${TMPDIR}/guestbook-ui-deployment.yaml
     Download File    ${URL}    ${file_path}
     Oc Apply    -f ${file_path}
     Wait Until Keyword Succeeds    2min    10s
