@@ -1,5 +1,5 @@
 [microshift-gitops]
-name = Red Hat OpenShift GitOps {{ .Env.GITOPS_VERSION }}.16 for RHEL 9 {{ .Env.UNAME_M }} (RPMs)
+name = Red Hat OpenShift GitOps {{ .Env.GITOPS_VERSION }} for RHEL 9 {{ .Env.UNAME_M }} (RPMs)
 baseurl = https://cdn.redhat.com/content/dist/layered/rhel9/{{ .Env.UNAME_M }}/gitops/{{ .Env.GITOPS_VERSION }}/os
 enabled = 1
 gpgcheck = 1
