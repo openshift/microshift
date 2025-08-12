@@ -27,6 +27,26 @@ type NamespaceWorkloads struct {
 	StatefulSets []string `json:"statefulsets"`
 }
 
+func (nw NamespaceWorkloads) String() string {
+	var parts []string
+
+	if len(nw.Deployments) > 0 {
+		parts = append(parts, fmt.Sprintf("Deployments: [%s]", strings.Join(nw.Deployments, ", ")))
+	}
+	if len(nw.DaemonSets) > 0 {
+		parts = append(parts, fmt.Sprintf("DaemonSets: [%s]", strings.Join(nw.DaemonSets, ", ")))
+	}
+	if len(nw.StatefulSets) > 0 {
+		parts = append(parts, fmt.Sprintf("StatefulSets: [%s]", strings.Join(nw.StatefulSets, ", ")))
+	}
+
+	if len(parts) == 0 {
+		return ""
+	}
+
+	return strings.Join(parts, ", ")
+}
+
 func waitForWorkloads(ctx context.Context, timeout time.Duration, workloads map[string]NamespaceWorkloads) error {
 	kubeconfigPath := filepath.Join(config.DataDir, "resources", string(config.KubeAdmin), "kubeconfig")
 	restConfig, err := clientcmd.BuildConfigFromFlags("", kubeconfigPath)

@@ -119,6 +119,13 @@ func fillOptionalWorkloadsIfApplicable(cfg *config.Config, workloads map[string]
 			Deployments: comps,
 		}
 	}
+
+	if cfg.Network.Multus.IsEnabled() {
+		workloads["openshift-multus"] = NamespaceWorkloads{
+			DaemonSets: []string{"multus", "dhcp-daemon"},
+		}
+	}
+
 	return nil
 }
 
