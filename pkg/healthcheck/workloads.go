@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"os"
 	"path/filepath"
 	"strings"
 	"syscall"
@@ -47,8 +48,23 @@ func (nw NamespaceWorkloads) String() string {
 	return strings.Join(parts, ", ")
 }
 
+func getKubeconfigPath() string {
+	if os.Geteuid() == 0 {
+		return filepath.Join(config.DataDir, "resources", string(config.KubeAdmin), "kubeconfig")
+	}
+
+	kubeconfigPath, ok := os.LookupEnv("KUBECONFIG")
+	if ok {
+		klog.Warningf("WARNING: running healthcheck as non-root user, using KUBECONFIG environment variable: %s", kubeconfigPath)
+		return kubeconfigPath
+	}
+
+	klog.Warningf("WARNING: running healthcheck as non-root user, using ~/.kube/config")
+	return fmt.Sprintf("%s/.kube/config", os.Getenv("HOME"))
+}
+
 func waitForWorkloads(ctx context.Context, timeout time.Duration, workloads map[string]NamespaceWorkloads) error {
-	kubeconfigPath := filepath.Join(config.DataDir, "resources", string(config.KubeAdmin), "kubeconfig")
+	kubeconfigPath := getKubeconfigPath()
 	restConfig, err := clientcmd.BuildConfigFromFlags("", kubeconfigPath)
 	if err != nil {
 		return fmt.Errorf("failed to load kubeconfig from %s: %v", kubeconfigPath, err)
