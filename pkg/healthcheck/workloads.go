@@ -53,18 +53,62 @@ func getKubeconfigPath() string {
 		return filepath.Join(config.DataDir, "resources", string(config.KubeAdmin), "kubeconfig")
 	}
 
-	kubeconfigPath, ok := os.LookupEnv("KUBECONFIG")
-	if ok {
-		klog.Warningf("WARNING: running healthcheck as non-root user, using KUBECONFIG environment variable: %s", kubeconfigPath)
+	getKubeconfigFromEnv := func() string {
+		kubeconfigPath, ok := os.LookupEnv("KUBECONFIG")
+		if !ok {
+			return ""
+		}
+		if kubeconfigPath == "" {
+			klog.Warning("KUBECONFIG env var is defined but empty")
+			return ""
+		}
+		ok, err := util.PathExists(kubeconfigPath)
+		if err != nil {
+			klog.Errorf("Failed to verify access to file (%s) defined by KUBECONFIG env var: %v", kubeconfigPath, err)
+			return ""
+		}
+		if !ok {
+			klog.Errorf("File (%s) defined by KUBECONFIG env var does not exist", kubeconfigPath)
+			return ""
+		}
+
 		return kubeconfigPath
 	}
 
-	klog.Warningf("WARNING: running healthcheck as non-root user, using ~/.kube/config")
-	return fmt.Sprintf("%s/.kube/config", os.Getenv("HOME"))
+	getKubeconfigFromDefaultPath := func() string {
+		defaultUserKubeconfig := fmt.Sprintf("%s/.kube/config", os.Getenv("HOME"))
+		ok, err := util.PathExists(defaultUserKubeconfig)
+		if err != nil {
+			klog.Errorf("Failed to verify access to ~/.kube/config: %v", err)
+			return ""
+		}
+		if !ok {
+			klog.Errorf("~/.kube/config does not exist")
+			return ""
+		}
+		return defaultUserKubeconfig
+	}
+
+	if kubeconfigPath := getKubeconfigFromEnv(); kubeconfigPath != "" {
+		klog.Warningf("WARNING: Running healthcheck as non-root user, using KUBECONFIG environment variable: %s", kubeconfigPath)
+		return kubeconfigPath
+	}
+
+	if kubeconfigPath := getKubeconfigFromDefaultPath(); kubeconfigPath != "" {
+		klog.Warningf("WARNING: Running healthcheck as non-root user, using ~/.kube/config")
+		return kubeconfigPath
+	}
+
+	klog.Errorf("ERROR: Could not find suitable kubeconfig")
+	return ""
 }
 
 func waitForWorkloads(ctx context.Context, timeout time.Duration, workloads map[string]NamespaceWorkloads) error {
 	kubeconfigPath := getKubeconfigPath()
+	if kubeconfigPath == "" {
+		return fmt.Errorf("could not find existing kubeconfig file")
+	}
+
 	restConfig, err := clientcmd.BuildConfigFromFlags("", kubeconfigPath)
 	if err != nil {
 		return fmt.Errorf("failed to load kubeconfig from %s: %v", kubeconfigPath, err)
