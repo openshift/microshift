@@ -25,9 +25,14 @@ def send_msg(ser, msg):
 
 def recv_msg(ser, expected_msg):
     print(f"Listening for a message. Expecting: {expected_msg}")
-    line = ser.readline()
-    print(f"Received message: {line}")
-    if expected_msg != line:
+    while True:
+        line = ser.readline()
+        print(f"Received message: {line}")
+        if len(line) == 0:
+            print("Received empty message - ignoring")
+            continue
+        if expected_msg == line:
+            break
         print("Received message does not match expected one")
         sys.exit(1)
 
