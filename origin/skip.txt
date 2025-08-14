@@ -94,3 +94,4 @@
 "[sig-network][Feature:Whereabouts] should assign unique IP addresses to each pod in the event of a race condition case [apigroup:k8s.cni.cncf.io] [Suite:openshift/conformance/parallel]"
 "[sig-network][Feature:bond] should create a pod with bond interface [apigroup:k8s.cni.cncf.io] [Suite:openshift/conformance/parallel]"
 "[sig-network][Feature:tuning] pod should not start for sysctls not on whitelist [apigroup:k8s.cni.cncf.io] net.ipv4.conf.IFNAME.arp_filter [Suite:openshift/conformance/parallel]"
+"[sig-node] [Feature:PodLifecycleSleepAction] when create a pod with lifecycle hook using sleep action ignore terminated container [Suite:openshift/conformance/parallel] [Suite:k8s]"
