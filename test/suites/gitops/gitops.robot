@@ -9,7 +9,7 @@ Suite Teardown      Teardown
 
 
 *** Variables ***
-${URL}          https://raw.githubusercontent.com/argoproj/argocd-example-apps/refs/heads/master/guestbook/guestbook-ui-deployment.yaml
+${URL}      https://raw.githubusercontent.com/argoproj/argocd-example-apps/refs/heads/master/guestbook/guestbook-ui-deployment.yaml
 
 
 *** Test Cases ***
