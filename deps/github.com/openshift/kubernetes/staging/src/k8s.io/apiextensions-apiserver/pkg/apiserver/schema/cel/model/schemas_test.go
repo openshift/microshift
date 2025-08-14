@@ -34,8 +34,8 @@ func TestSchemaDeclType(t *testing.T) {
 	if cust.TypeName() != "object" {
 		t.Errorf("incorrect type name, got %v, wanted object", cust.TypeName())
 	}
-	if len(cust.Fields) != 4 {
-		t.Errorf("incorrect number of fields, got %d, wanted 4", len(cust.Fields))
+	if len(cust.Fields) != 5 {
+		t.Errorf("incorrect number of fields, got %d, wanted 5", len(cust.Fields))
 	}
 	for _, f := range cust.Fields {
 		prop, found := ts.Properties[f.Name]
@@ -68,6 +68,13 @@ func TestSchemaDeclType(t *testing.T) {
 						"could not find field enum value in property definition. field: %s, enum: %v",
 						f.Name, fev)
 				}
+			}
+		}
+		if prop.ValueValidation != nil && prop.ValueValidation.MaxLength != nil {
+			if f.Type.MaxElements != 4*(*prop.ValueValidation.MaxLength) {
+				// When converting maxLength to maxElements, it's based on the number of bytes.]
+				// Worst case is that one rune is 4 bytes, so maxElements should be 4x maxLength.
+				t.Errorf("field maxElements does not match property 4x maxLength. field: %s, maxElements: %d, maxLength: %d", f.Name, f.Type.MaxElements, *prop.ValueValidation.MaxLength)
 			}
 		}
 	}
@@ -137,6 +144,7 @@ func testSchema() *schema.Structural {
 	//   properties:
 	//     name:
 	//       type: string
+	//       maxLength: 256
 	//     nested:
 	//       type: object
 	//       properties:
@@ -166,6 +174,12 @@ func testSchema() *schema.Structural {
 	//       format: int64
 	//       default: 1
 	//       enum: [1,2,3]
+	//     intOrString:
+	//       x-kubernetes-int-or-string: true
+	//       anyOf:
+	//       - type: "integer"
+	//		 - type: "string"
+	//       maxLength: 20
 	ts := &schema.Structural{
 		Generic: schema.Generic{
 			Type: "object",
@@ -174,6 +188,9 @@ func testSchema() *schema.Structural {
 			"name": {
 				Generic: schema.Generic{
 					Type: "string",
+				},
+				ValueValidation: &schema.ValueValidation{
+					MaxLength: maxPtr(256),
 				},
 			},
 			"value": {
@@ -239,6 +256,26 @@ func testSchema() *schema.Structural {
 						},
 						Items: &schema.Structural{
 							Generic: schema.Generic{
+								Type: "string",
+							},
+						},
+					},
+				},
+			},
+			"intOrString": {
+				Extensions: schema.Extensions{
+					XIntOrString: true,
+				},
+				ValueValidation: &schema.ValueValidation{
+					MaxLength: maxPtr(20),
+					AnyOf: []schema.NestedValueValidation{
+						{
+							ForbiddenGenerics: schema.Generic{
+								Type: "integer",
+							},
+						},
+						{
+							ForbiddenGenerics: schema.Generic{
 								Type: "string",
 							},
 						},
