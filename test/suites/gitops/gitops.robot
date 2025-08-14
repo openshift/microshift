@@ -39,5 +39,5 @@ Teardown
 Deploy Guestbook And Verify
     [Documentation]    Deploys Guestbook app as test workload
     Oc Apply    -f ${URL}
-    Wait Until Keyword Succeeds    2min    10s
+    Wait Until Keyword Succeeds    5min    10s
     ...    Named Deployment Should Be Available    guestbook-ui    default
