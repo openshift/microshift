@@ -1,15 +1,10 @@
-- kubernetes embedded-component 0c9395f92e970f64d40ad338e9ed8918d6ab10ea to 45be6afa71817681e9d19fa129884fb81ba9439b
-  - 205d84ada 2025-08-05T16:10:02-04:00 UPSTREAM: <carry>: Update Node Monitor Grace Period default duration to 50s
-  - 8dbd3381d 2025-08-05T10:44:15-04:00 UPSTREAM: 131579: fix(kubelet): acquire imageRecordsLock when removing image
+- cluster-kube-apiserver-operator embedded-component 383f10176f2509babc9dd49d135fa8bb0c2c277e to b46a20724df762e2df17956d9eb341252e73fccb
+  - 5d51824 2025-08-06T08:02:46+00:00 OCPBUGS-50489: Add missing service ports to apiserver service
 
-- machine-config-operator embedded-component b80d590e99b9ea3d7c8d4126ce2f801c05856d1e to 240e315c241bf702f9dc7fb201922793c6be147e
-  - 763a46d6 2025-08-01T02:56:58+00:00 Add workaround fix for static pod race
+- cluster-kube-controller-manager-operator embedded-component 0fac9aa9a20b3c843e0e832a2849db6a7e3441c1 to a2cbb5725fe5e560ba40d884cfd079b3f8391f03
+  - c26009e 2025-08-05T11:40:32+00:00 OCPBUGS-53290: Missing endpoint slices for open ports the operator uses
 
-- kubernetes image-amd64 0c9395f92e970f64d40ad338e9ed8918d6ab10ea to 45be6afa71817681e9d19fa129884fb81ba9439b
-  - 205d84ada 2025-08-05T16:10:02-04:00 UPSTREAM: <carry>: Update Node Monitor Grace Period default duration to 50s
-  - 8dbd3381d 2025-08-05T10:44:15-04:00 UPSTREAM: 131579: fix(kubelet): acquire imageRecordsLock when removing image
-
-- kubernetes image-arm64 0c9395f92e970f64d40ad338e9ed8918d6ab10ea to 45be6afa71817681e9d19fa129884fb81ba9439b
-  - 205d84ada 2025-08-05T16:10:02-04:00 UPSTREAM: <carry>: Update Node Monitor Grace Period default duration to 50s
-  - 8dbd3381d 2025-08-05T10:44:15-04:00 UPSTREAM: 131579: fix(kubelet): acquire imageRecordsLock when removing image
+- ovn-kubernetes image-arm64 5236895f6c35e2f4b16c0fad78a05126aa2ddbd2 to 88e3cdc4e3a627d9484818f72925c0f73a6be797
+  - e753188a 2025-08-06T12:42:35-07:00 Layer 2 EIP: remove stale LRP if pod is remote
+  - 526ef440 2025-08-06T12:42:31-07:00 EIP OVN controller: stop pod config flap
 
