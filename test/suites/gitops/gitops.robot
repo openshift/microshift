@@ -9,7 +9,6 @@ Suite Teardown      Teardown
 
 
 *** Variables ***
-${TMPDIR}       ${EMPTY}
 ${URL}          https://raw.githubusercontent.com/argoproj/argocd-example-apps/refs/heads/master/guestbook/guestbook-ui-deployment.yaml
 
 
@@ -22,7 +21,7 @@ Verify GitOps Pods Start Correctly
 
 Verify Workload Deployed Correctly
     [Documentation]    Deploys workload and waits for ready status
-    Deploy Guestbook
+    Deploy Guestbook And Verify
 
 
 *** Keywords ***
@@ -31,27 +30,14 @@ Setup
     Login MicroShift Host
     Setup Kubeconfig
     Restart MicroShift
-    ${tmp}=    Create Random Temp Directory
-    VAR    ${TMPDIR}=    ${tmp}    scope=GLOBAL
 
 Teardown
     [Documentation]    Test suite teardown
     Logout MicroShift Host
     Remove Kubeconfig
-    Remove Directory    ${TMPDIR}    recursive=${True}
 
-Deploy Guestbook
+Deploy Guestbook And Verify
     [Documentation]    Deploys Guestbook app as test workload
-    VAR    ${file_path}=    ${TMPDIR}/guestbook-ui-deployment.yaml
-    Download File    ${URL}    ${file_path}
-    Oc Apply    -f ${file_path}
+    Oc Apply    -f ${URL}
     Wait Until Keyword Succeeds    2min    10s
     ...    Named Deployment Should Be Available    guestbook-ui    default
-
-Download File
-    [Documentation]    Downloads and saves a file
-    [Arguments]    ${url}    ${save_path}
-    ${response}=    GET    ${url}
-    Status Should Be    200    ${response}
-    Create Binary File    ${save_path}    ${response.content}
-    OperatingSystem.File Should Exist    ${save_path}
