@@ -1,55 +1,11 @@
-- cluster-ingress-operator embedded-component cee87b619fed55a2fcf7e5f74bc72fa486d8e4ec to beb84efd63f1600ac6c475decc979c63dbdaeb12
-  - 69db125 2025-08-06T20:20:20+00:00 Update GatewayAPI test to check if deployment has 1 or more pod
-  - b7876ae 2025-08-04T20:07:00+00:00 NE-2108: docs - correct Istio version format in ossm-overrides.md
+- cluster-ingress-operator embedded-component beb84efd63f1600ac6c475decc979c63dbdaeb12 to ddd78734833eb45f2cd5fba677fe50e4ae9f063b
+  - 9fc3658 2025-08-11T17:09:39+00:00 Bump to OSSM 3.1.0 and Istio 1.26.2
 
-- cluster-kube-apiserver-operator embedded-component cd86a6772107b5213da2e649530b1a64eb6c2781 to e2ad6c193a3a0ee71a2bd128d5a4692ad8a6776a
-  - 6585b35 2025-07-30T11:53:52+00:00 OCPBUGS-50489: Add missing service ports to apiserver service
+- machine-config-operator embedded-component 1b3ce4ea5b1943283ed703f55800a8f08d26e4a8 to 103a451c288a119552a9ffeb2c5d0ad4c5ebc6d3
+  - 8a9b26f3 2025-08-07T06:49:29-04:00 msbic: fix arch annotation check
 
-- cluster-kube-controller-manager-operator embedded-component cec410b7f877a6eef57968889a644b848bdb540a to 3dfbb67635ce056fd55c360937be9868a3cf8ad5
-  - aa859ef 2025-08-05T11:41:11+00:00 OCPBUGS-53290: Missing endpoint slices for open ports the operator uses
-
-- cluster-network-operator embedded-component fd80a4aa660c66c93ba01749e23af2c9ea45d5b2 to f17bb7a589e7a9516c35aa0a3bd1bbc55f071ebd
-  - bea487d 2025-08-04T14:15:52+00:00 Add release version annotation to whereabouts-controller and whereabouts-token-watcher
-
-- kubernetes embedded-component 38c60a516ecb061270b0f0f05239b8fe2ce4bf0e to 138db5223eea57e4408598a32320896c216724e1
-  - 4c3192d09 2025-07-18T10:41:13-04:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
-  - 158eee9fa 2025-07-15T18:00:32+00:00 Release commit for Kubernetes v1.32.7
-  - bb2ad5a64 2025-07-10T10:12:56+02:00 Use per-policy marker names for VAP integration tests.
-  - 339ead430 2025-07-04T11:28:24+02:00 Review remarks
-  - 4c58a9d19 2025-07-04T11:28:24+02:00 Fix validation for Job with suspend=true,completions=0 to set Complete condition
-  - c14c5722a 2025-06-17T21:22:48+00:00 Update CHANGELOG/CHANGELOG-1.32.md for v1.32.6
-  - 355302eec 2025-06-13T10:05:15+03:00 Add check to see if promote worked within the retry loop
-  - 62eb11dd5 2025-06-06T20:51:06+00:00 Clean backoff record earlier
-  - 22e84c9ab 2025-05-01T21:55:23-07:00 fix(kubelet): acquire imageRecordsLock when removing image
-
-- kubernetes-kube-storage-version-migrator embedded-component 4ab93e07bb7c525990ef21a11caae2122ace63f6 to fdef30c84b3d45ede364500984221c3f492b1415
-  - 1ed388b 2025-07-29T13:12:09+00:00 UPSTREAM: <carry>: Add DOWNSTREAM_OWNERS.
-
-- machine-config-operator embedded-component a297a545c9f6dc811723ee94390a2c130cc167a3 to 1b3ce4ea5b1943283ed703f55800a8f08d26e4a8
-  - 7c245567 2025-08-04T09:17:17+00:00 ensure that build pod shuts down quickly after being terminated
-  - ac1c7825 2025-08-04T09:17:17+00:00 makes build object deletion optional
-  - e145a300 2025-08-04T09:17:17+00:00 adds shutdowndelayhandler to buildcontroller
-  - 7a5dac31 2025-08-04T09:17:17+00:00 use channel to signal controller shutdown
-
-- kubernetes image-amd64 38c60a516ecb061270b0f0f05239b8fe2ce4bf0e to 138db5223eea57e4408598a32320896c216724e1
-  - 4c3192d09 2025-07-18T10:41:13-04:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
-  - 158eee9fa 2025-07-15T18:00:32+00:00 Release commit for Kubernetes v1.32.7
-  - bb2ad5a64 2025-07-10T10:12:56+02:00 Use per-policy marker names for VAP integration tests.
-  - 339ead430 2025-07-04T11:28:24+02:00 Review remarks
-  - 4c58a9d19 2025-07-04T11:28:24+02:00 Fix validation for Job with suspend=true,completions=0 to set Complete condition
-  - c14c5722a 2025-06-17T21:22:48+00:00 Update CHANGELOG/CHANGELOG-1.32.md for v1.32.6
-  - 355302eec 2025-06-13T10:05:15+03:00 Add check to see if promote worked within the retry loop
-  - 62eb11dd5 2025-06-06T20:51:06+00:00 Clean backoff record earlier
-  - 22e84c9ab 2025-05-01T21:55:23-07:00 fix(kubelet): acquire imageRecordsLock when removing image
-
-- kubernetes image-arm64 38c60a516ecb061270b0f0f05239b8fe2ce4bf0e to 138db5223eea57e4408598a32320896c216724e1
-  - 4c3192d09 2025-07-18T10:41:13-04:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
-  - 158eee9fa 2025-07-15T18:00:32+00:00 Release commit for Kubernetes v1.32.7
-  - bb2ad5a64 2025-07-10T10:12:56+02:00 Use per-policy marker names for VAP integration tests.
-  - 339ead430 2025-07-04T11:28:24+02:00 Review remarks
-  - 4c58a9d19 2025-07-04T11:28:24+02:00 Fix validation for Job with suspend=true,completions=0 to set Complete condition
-  - c14c5722a 2025-06-17T21:22:48+00:00 Update CHANGELOG/CHANGELOG-1.32.md for v1.32.6
-  - 355302eec 2025-06-13T10:05:15+03:00 Add check to see if promote worked within the retry loop
-  - 62eb11dd5 2025-06-06T20:51:06+00:00 Clean backoff record earlier
-  - 22e84c9ab 2025-05-01T21:55:23-07:00 fix(kubelet): acquire imageRecordsLock when removing image
+- coredns image-arm64 74776b850522c912db5fbadf7353f1eab669bd2a to 4f64931403bf747b78bccb40ad877b08da534e23
+  - cae4a43 2025-08-08T08:04:29+00:00 UPSTREAM <carry>: Modify .gitignore to not exclude vendor build folders
+  - 4eb9fa0 2025-08-08T08:04:29+00:00 UPSTREAM: 6836: Bump .go-version
+  - a8bc321 2025-08-08T08:04:29+00:00 UPSTREAM: 7083: Fix unit test TestZoneExternalCNAMELookupWithProxy
 

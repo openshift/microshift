@@ -1,9 +1,9 @@
 {
   "release": {
-    "base": "4.19.0-0.nightly-2025-08-10-045658"
+    "base": "4.19.0-0.nightly-2025-08-13-120509"
   },
   "images": {
-    "multus-cni-microshift": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:19c37ebe2c789030e892a5a0f4b22c72d9579dc8af4e92b3a2fdc4c01d6fc7cb",
-    "containernetworking-plugins-microshift": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:0b18feaf17032443d274034131428a6acf9fbd2c2ce640a27ff40e01cf8fc593"
+    "multus-cni-microshift": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:0828da90a54d7b044c4aef9636ff54e96b5522c98cb38c6b5eb23b92f5efd215",
+    "containernetworking-plugins-microshift": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:b47d1a251e2f8e82f9c09ac3406b44a2e3e065ddf3ac97a06de9a1e23055b234"
   }
 }
