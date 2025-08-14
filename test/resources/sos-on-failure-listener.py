@@ -50,7 +50,7 @@ def end_keyword(data: running.model.Keyword, res: result.model.Keyword):
         BuiltIn().import_resource('microshift-host.resource')
         cmd = "microshift-sos-report --profiles microshift --plugins ''"
         if len(suite_namespaces) > 0 or len(test_namespaces) > 0:
-            cmd += f" --namespaces {','.join(suite_namespaces + test_namespaces)}"
+            cmd += f" --plugin-option microshift.add-namespaces={','.join(suite_namespaces + test_namespaces)}"
         stdout, _, _ = BuiltIn().run_keyword("Command Execution", cmd)
         m = re.search(r'(\/\S+\/sosreport\S+.tar.xz)', stdout)
         if m:
