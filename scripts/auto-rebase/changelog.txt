@@ -1,11 +1,228 @@
-- coredns image-arm64 a69279e3393b269099dcaae967570741d4c5e469 to 96ffa45b5bd7188054bafef5d8ab7ae617dd812d
+- api embedded-component 4a5da13889c1d8724e938521f739202ac7f304b0 to cc869c87a7f0dcf943cd7e51d9ffabb8a420436f
+  - 5fd3adf6 2025-08-11T12:23:14+02:00 MCO-1744: Add knobs to allow irreconcilable changes
+  - 96c90e07 2025-08-08T13:47:33+01:00 Switch optional fields to require omitempty
+  - 69b4e2c4 2025-08-08T13:45:35+01:00 Update KAL to enable new required fields policy
+  - b15c027c 2025-08-06T11:01:59-04:00 Add new ImageBuildDegraded status option for MCO
+  - 2cfc9210 2025-08-06T09:26:52-04:00 config/authentication: improve issuerURL validations
+  - 34b24270 2025-08-05T16:01:31-04:00 Remove OnClusterBuild fg
+  - b010437c 2025-08-04T16:52:36+01:00 Update crd-schema.json to release 1.33 branch
+  - ca3cee65 2025-07-31T18:56:04+01:00 Update KAL to include omitzero functionality on optional fields
+  - 2a511b48 2025-07-31T13:52:46+02:00 MCO-1759: Add NonReconcilableMC Feature Gate
+  - 3ae73f9b 2025-07-30T10:24:17+05:30 OCPNODE-3372: Re-add omitempty for defaultRuntime as its handled in MCO with additional test cases
+  - 07651b39 2025-07-30T10:24:17+05:30 OCPNODE-3372: Readd omitempty for defaultRuntime as its handled in MCO with additional test cases
+  - 07574ba6 2025-07-30T10:24:17+05:30 OCPNODE-3372: Readd omitempty for defaultRuntime as its handled in MCO with additional test cases
+  - 989d3ccd 2025-07-30T10:24:16+05:30 OCPNODE-3372: Remove omitempty from defaultRuntime as its handled in MCO with additional test cases
+  - a2633479 2025-07-30T10:24:16+05:30 OCPNODE-3372: Remove omitempty from defaultRuntime as its handled in MCO with additional test cases
+  - 3cc10b28 2025-07-30T10:24:16+05:30 OCPNODE-3372: Remove omitempty from defaultRuntime as its handled in MCO with additional test cases
+  - f52b842d 2025-07-30T10:24:16+05:30 OCPNODE-3372: Revert omitempty from defaultRuntime. Empty string and ommitted value handled in MCO
+  - e48450d7 2025-07-30T10:24:16+05:30 OCPNODE-3372: Remove omitempty from defaultRuntime as its handled in MCO
+  - c724f4a7 2025-07-30T10:24:16+05:30 OCPNODE-3372: Add ratcheting validation tests for defaultRuntime
+  - bc21d327 2025-07-30T10:24:16+05:30 OCPNODE-3372: Update defaultRuntime doc to show options available and set default to crun
+  - cc8f48a4 2025-07-29T13:02:15-04:00 feat: add two node support to featuregate analyzer
+  - 2b09f87e 2025-07-29T13:02:15-04:00 upkeep: updated integration tests for DualReplica and Arbiter
+  - dfa0503a 2025-07-29T13:02:13-04:00 feat: promote HighlyAvailableArbiter feature to default
+  - dd675cd7 2025-07-29T11:30:08+02:00 Promote SELinuxMount to TechPreviewNoUpgrade
+  - 399d65a9 2025-07-28T17:02:28-04:00 add back SigstoreImageVerification to techPreview
+  - ff3355db 2025-07-17T16:00:53-04:00 config/authentication: oidc: tighten validation on CEL expression fields
+
+- cluster-csi-snapshot-controller-operator embedded-component e3a691335bf8984295374737ffaaa79908723652 to 4c1ee7bae69aecce6893b4f5e8f8c74117c884d5
+  - 88588bf 2025-07-30T09:15:05-06:00 Add ExternalSnapshotMetadata CRD
+  - 06cd079 2024-10-23T10:25:38+02:00 Use protobuf when connecting to kube client
+
+- cluster-ingress-operator embedded-component 5bfbb600998c9882e70546de8d2b846e61472d64 to 211a843aac42e3bc2fcf383805919efba988af13
+  - b56b8c7 2025-08-06T09:35:14-03:00 Add rikatz to OWNERS
+  - c236d0c 2025-08-05T15:16:45-04:00 Bump to OSSM 3.1.0 and Istio 1.26.2
+  - 69c53ad 2025-08-04T11:16:25+02:00 NE-2108: docs - correct Istio version format in ossm-overrides.md
+  - 866db0f 2025-07-31T14:58:59-04:00 Add OSSM and Istio version override annotations
+  - 1ba6d6b 2025-07-31T14:56:47-04:00 Add --gateway-api-operator-catalog
+  - 2adffee 2025-07-31T14:55:09-04:00 Add --istio-version flag and ISTIO_VERSION env var
+  - 0708da6 2025-07-31T14:54:16-04:00 Add unit test for gatewayclass Reconcile method
+  - 5a507ba 2025-07-31T13:29:18-04:00 Update GatewayAPI test to check if deployment has 1 or more pod
+  - 35c0143 2025-07-30T17:56:21-04:00 desiredIstio: Enable GIE if InferencePool found
+
+- cluster-kube-apiserver-operator embedded-component a08323ddd81bf18447df1d0f083501d86412819d to 05014cac9adcd5fa20db6d3ff4d084be18d8ef64
+  - ef3173e 2025-08-08T19:51:38+08:00 set up openshift-tests-extension and add a sanity test
+  - 4163755 2025-08-06T18:13:25+02:00 Revert "Revert "OCPBUGS-56551: certregenerationcontroller: start configInformers again""
+  - 508860f 2025-08-05T22:40:45+02:00 Optimistically update Kube Server and Client CA bundles
+  - a0618f7 2025-08-04T09:26:28+02:00 operator: don't watch all namespaces
+  - fd0b1d9 2025-08-04T09:26:24+02:00 Bump library-go to latest master
+  - 218c97c 2025-08-01T15:53:52-04:00 scc: create nested-container
+  - d4b0b38 2025-07-31T16:39:40+08:00 Add negative tests of GOAWAY-chance
+  - 3f93ada 2025-07-18T10:56:58+02:00 certrotationcontroller: extend node-system-admin-signer lifetime
+  - f460dc8 2025-05-29T12:35:44-04:00 scc: add restricted-v3
+
+- cluster-kube-controller-manager-operator embedded-component daadfa3c25be30d49168be7d30c10386f53e3ef6 to 604d31c26346b4d44bda63f50aeb376c91f9a31e
+  - aaf35e4 2025-08-08T10:12:19-04:00 Remove readOnlyRootFilesystem from KCM container
+  - 923d1db 2025-08-04T09:51:54+02:00 targetconfigcontroller: set description for csr-controller-ca
+
+- cluster-network-operator embedded-component c19d5a6399e4aad7f627a7fa569caabe46ce94ac to 26e8dc53a799aa1fb20a8b26634c4edc96c3e959
+  - 0cc5579 2025-08-05T21:54:55+00:00 If RunAsUser is set, also set runAsNonRoot and seccompProfile
+  - a9565a5 2025-08-05T21:40:35+00:00 Apply this to all providers and simplify
+  - c26d985 2025-08-05T21:40:35+00:00 feat(ibmcloud): Set runAsUser for OVN on IBMCloud
+  - 4469d88 2025-08-01T14:06:13+08:00 NO-JIRA: remove PersistentIPsForVirt FG This PR is to quickly remove FeatureGatePersistentIPsForVirtualization
+  - 69cd700 2025-08-01T09:04:38+08:00 CORENET-5957:Rebase k8s to 1.33 go get -u github.com/openshift/build-machinery-go go get -u k8s.io/api go get -u k8s.io/apimachinery go get -u k8s.io/code-generator go get -u k8s.io/component-base go get -u k8s.io/klog/v2 go get -u k8s.io/kube-proxy go get -u k8s.io/utils go get -u sigs.k8s.io/controller-runtime go get -u github.com/openshift/api go get -u github.com/openshift/client-go go get github.com/openshift/library-go@release-4.20 go get github.com/openshift/machine-config-operator@release-4.20 go get -u k8s.io/apiextensions-apiserver go get -u k8s.io/client-go go get -u sigs.k8s.io/controller-tools go mod tidy go mod vendor
+  - 1704438 2025-07-29T17:23:13+00:00 Update CNO reviwers/approvers
+  - 097d054 2025-07-29T06:48:03+00:00 Allow network-node-identity to be enabled for IBMCloud PlatformType
+
+- kubernetes embedded-component 80b82ba5ae030c3e2b7d7752a204ddf71139842c to 4ad924fd1a4ecd620cd51e6859fb9fe5d639b892
+  - d75c38bf5 2025-08-06T01:14:16-04:00 UPSTREAM: <carry>: Disable ServiceCIDR tests
+  - 862dc9031 2025-08-05T13:15:48+01:00 UPSTREAM: 132837: Add test case to prove MaxElements correctly set on IntOrString
+  - 003c91c54 2025-08-05T13:14:04+01:00 UPSTREAM: 132837: Fix IntOrString cost estimation when schema has a MaxLength constraint
+  - 353c6afa9 2025-08-05T15:44:04+08:00 UPSTREAM: 133117: Bump external snapshotter for vgs tests
+  - 7acdd542d 2025-08-01T10:35:41-04:00 UPSTREAM: <carry>: disable slow and flaky tests rather than labeling them
+  - b00ecad1f 2025-08-01T09:44:53+02:00 UPSTREAM: <carry>: Fail SELinuxMount check on rebase
+  - 1522eb9d4 2025-08-01T09:38:09+02:00 UPSTREAM: <carry>: Skip SELinux test with Feature:SELinuxMountReadWriteOncePodOnly
+  - c1bf9e69a 2025-07-31T22:28:40-04:00 UPSTREAM: <carry>: Add plugin for storage performant security policy
+  - 3d2b1afbe 2025-07-31T09:26:33-04:00 UPSTREAM: <drop>: Revert "Bump external snapshotter for vgs tests"
+  - 47f547e0c 2025-07-30T16:06:51-04:00 UPSTREAM: <carry>: update test metadata
+  - 2c5cdefb4 2025-07-30T14:55:41-04:00 UPSTREAM: <carry>: admission: authentication: validate CEL expressions compilation
+  - b79f6c2b7 2025-07-30T11:47:10-04:00 UPSTREAM: 128642: using finalizer
+  - 13ccb0a4c 2025-07-30T11:47:10-04:00 UPSTREAM: 128642: adjust durations for sleepAction
+  - 6fc37f1db 2025-07-24T08:39:26+08:00 UPSTREAM: 133117: Bump external snapshotter for vgs tests
+  - 43760bfa6 2025-07-23T11:43:05+02:00 UPSTREAM: <carry>: remove the backward compat featuregate for 132028
+  - dd5e29946 2025-07-21T11:02:13-04:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - 4fc6781e4 2025-07-21T10:14:57-04:00 UPSTREAM: <drop>: manually resolve conflicts
+  - 3e8789d5d 2025-07-16T15:16:04+02:00 UPSTREAM: 132028: podresources: list: use active pods in list
+  - 80779bd6f 2025-07-15T17:59:41+00:00 Release commit for Kubernetes v1.33.3
+  - 053e244ef 2025-07-10T11:30:20+02:00 Skip linter validation to allow cherrypick
+  - 6a9319c52 2025-07-10T10:12:40+02:00 Use per-policy marker names for VAP integration tests.
+  - 068079fb7 2025-07-04T11:28:46+02:00 Review remarks
+  - 385125330 2025-07-04T11:28:46+02:00 Fix validation for Job with suspend=true,completions=0 to set Complete condition
+  - f208b6c73 2025-06-17T19:04:01+00:00 Update CHANGELOG/CHANGELOG-1.33.md for v1.33.2
+  - d4a4a1d88 2025-06-16T17:48:00+00:00 Fix -Consistent paginated lists serve from cache
+  - cb130042b 2025-06-13T10:04:18+03:00 Add check to see if promote worked within the retry loop
+  - 4c8c88d4c 2025-06-12T20:43:01+03:00 reduce logspam when calculating sandbox resources
+  - d2be12ab7 2025-06-06T20:45:35+00:00 Clean backoff record earlier
+  - ba345a494 2025-05-01T21:54:52-07:00 fix(kubelet): acquire imageRecordsLock when removing image
+
+- machine-config-operator embedded-component 3a09b61ed8cee97153f865970f93c39e0ec7d85f to 1b20021e15e2252573d2369f63de846c588222ae
+  - e167c3ad 2025-08-11T09:20:18-04:00 Remove references to OnClusterBuild FG
+  - 0005e52f 2025-08-11T07:52:27-04:00 Vendor latest API and Client-go
+  - ca8cce49 2025-08-10T09:29:32-04:00 Revert "OCPBUGS-59723: Add mechanism to delete MCN v1alpha1 CRD in 4.16+ clusters"
+  - 5211065a 2025-08-07T09:15:53-04:00 Containerfile: Remove existing kernel packages and add new buildrequest: Set the template variables for kernel packages buildrequestopts: validate a kernel switch and get packages helpers: retrieve packages for each supported kernel type onclusterlayering_test: Test from default->every supported type helpers: Move CanonicalizeKernelType from update.go
+  - 34d00bb0 2025-08-07T06:37:51-04:00 install: add v1alpha1 MCN CRD cleanup job
+  - c30e765a 2025-08-05T09:36:09-04:00 Run build as an init container for OCL
+  - 6a40c61b 2025-08-05T06:28:35-04:00 msbic: fix arch annotation check
+  - 2c16fda0 2025-08-01T11:52:29-06:00 add MachineConfigControllerPoolAlert runbook to alert
+  - ea59abee 2025-08-01T06:13:45-04:00 Revert "Merge pull request #5148 from RishabhSaini/unitDiff"
+  - 0ff3bd35 2025-07-30T15:39:09-04:00 Generate deterministic namespacedPolicyJSON
+  - 12d45a0f 2025-07-30T14:13:09-04:00 e2e: run test packages sequentially with -p 1
+  - 6965cf22 2025-07-29T13:18:55-04:00 e2e: remove e2e-gcp-op
+  - fd9f7a79 2025-07-29T12:53:48-04:00 e2e: rebalance sharded suites
+  - 4512ec46 2025-07-22T14:12:36-04:00 helpers: Compute systemdUnits that added and changed between Ign configs update: Only write added or updated systemd units on_disk_validation: Check if systemd units in config enabled correctly
+  - 1b816a80 2025-07-11T17:42:22+00:00 Remove containernetworking-plugins directory from crio.conf
+
+- operator-framework-olm embedded-component 45b91529be7117e7445c6e411e5f86ac8f8feb29 to 8db3912433fa9eb33bd0f20b30c79a1da8967824
+  - af60b15f 2025-08-06T00:04:29+00:00 :seedling: Bump github.com/docker/docker
+  - 37b75292 2025-08-06T00:03:45+00:00 :seedling: bump the k8s-dependencies group with 8 updates
+  - b4aa74f7 2025-08-06T00:03:25+00:00 :seedling: bump github.com/spf13/pflag from 1.0.6 to 1.0.7
+  - bbcbbbb1 2025-08-06T00:03:02+00:00 :seedling: bump github.com/onsi/gomega from 1.37.0 to 1.38.0
+
+- service-ca-operator embedded-component 4dfa6916f984d0fd7188380edc88b250738f07f7 to a6346e9d7cfd9e7243742ede7c795b5ac93498a4
+  - 5701388 2025-07-29T16:11:21+08:00 Update Go to 1.24 and OCP to 4.20
+
+- oc image-amd64 ea45cd5d407a1fc9805d051f3946e8a8fc1ca4da to 0f09f6e9cc7fdaab8942ad118d0717a6d527746b
+  - b74a1297 2025-08-03T08:52:58-07:00 pkg/cli/admin/upgrade/recommend: Don't error on unaccepted issues when the feature gate is off
+  - c78080d3 2025-08-01T12:43:02+03:00 Update containers/image and docker versions
+
+- coredns image-amd64 a69279e3393b269099dcaae967570741d4c5e469 to 96ffa45b5bd7188054bafef5d8ab7ae617dd812d
   - 86be9b7 2025-08-07T20:52:09-03:00 Add rikatz to OWNERS
   - 35edb50 2025-08-05T17:31:06+02:00 UPSTREAM <carry>: Modify .gitignore to not exclude vendor build folders
   - f269701 2025-08-05T17:20:22+02:00 UPSTREAM: 6836: Bump .go-version
   - c48716d 2025-08-05T17:20:17+02:00 UPSTREAM: 7083: Fix unit test TestZoneExternalCNAMELookupWithProxy
 
-- kubernetes image-arm64 3e4371f7d32c8d83621ead0f736baeea6edc4144 to 24677bbf1492592d3707c2887173849155f594e6
+- ovn-kubernetes image-amd64 1fde61ad03a950ba2236c29e9d00cb6166c9fe9b to c1ecb1a09313e8c0b67f3e037a796c2b68afce80
+  - 0a387dcb 2025-08-06T16:07:04+02:00 Bump OVN to 25.03.0-73.el9fdp for OCP and 25.03.1-36.el9s for OKD
+  - b90abc54 2025-07-23T13:24:08+02:00 fix: skip gw IP check for DPU and improve gateway initialization readability
+  - 6c4bc78b 2025-07-23T08:56:24+00:00 e2e: label RouteAdvertisement test cases & skip extended ones
+  - 45bf0b39 2025-07-23T10:53:18+02:00 Revert "e2e: Use ovnk allocator and reserve IPs"
+  - 5b5bc069 2025-07-22T19:06:40+02:00 gateway: Refactor gateway initialization and DPU host handling
+  - d127877f 2025-07-22T15:53:32+01:00 build, vendor: consume ipamclaims v0.5.0-alpha
+  - 34b5a46c 2025-07-22T13:52:53+00:00 e2e: test against L2 networks in VRF-Lite test cases
+  - e72e62b3 2025-07-22T13:12:33+00:00 Remove unused portbinding code
+  - dfc14b4e 2025-07-22T10:22:05+00:00 e2e: refactor podIPOfFamilyOnPrimaryNetwork into more reusable code
+  - 5ece8463 2025-07-22T10:22:05+00:00 e2e: add VRF-Lite test cases
+  - edb05ca1 2025-07-22T10:22:05+00:00 kind.sh: Use FRRConfiguration label when advertising default network
+  - 926ba1ad 2025-07-22T10:22:05+00:00 e2e: use index in kind infra inspect templates to allow special characters
+  - acef39f4 2025-07-22T10:22:05+00:00 e2e: make ExtPort not required in container infra provider API
+  - 3dea4f52 2025-07-22T10:22:05+00:00 e2e: add RuntimeArgs to container infra provider API
+  - 90e56b92 2025-07-22T10:22:05+00:00 e2e: rename testdata package to testscenario
+  - dc437b63 2025-07-22T10:22:05+00:00 RouteAdvertisements: appropriately update status even if no updates
+  - b4eabd9c 2025-07-21T19:04:23+00:00 Bump the go_modules group across 2 directories with 1 update
+  - fa12bb26 2025-07-21T12:09:59-04:00 Bump fedora from 41 -> 42
+  - d565fd86 2025-07-21T14:41:46+05:30 Add e2e tests for ex gw pods in terminating or not ready state
+  - d942a7d8 2025-07-21T14:41:46+05:30 Add unit tests for ex gw pods in terminating or not ready state
+  - 3d32558b 2025-07-21T14:41:44+05:30 Remove routes of ex gw pods in terminating or not ready state
+  - ec378a7b 2025-07-18T17:56:44+00:00 Bump golang.org/x/oauth2
+  - 293f6dda 2025-07-18T16:57:43+00:00 ci: run tests only if files other than docs are changed
+  - 527c19fc 2025-07-18T18:08:55+02:00 Add support for --disable-requestedchassis flag in ovnkube controller
+  - 290eb038 2025-07-18T09:42:17-04:00 Add metrics for UDN
+  - 33e20b83 2025-07-18T11:16:38+02:00 [bridgeconfig] AI suggested fixes.
+  - f531e3d3 2025-07-18T11:16:38+02:00 [node/gateway] make PatchedNetConfigs internal, remove locking
+  - fd5e7915 2025-07-18T11:16:38+02:00 [node/gateway] nodePortWatcher should use its own bridgeConfiguration.
+  - a0c90f26 2025-07-18T11:16:38+02:00 [bridgeconfig] make mutex internal.
+  - fa6076bc 2025-07-18T11:16:38+02:00 [bridgeconfig] move nextHops to the gateway where it is used.
+  - 4ad1727c 2025-07-18T11:16:38+02:00 [bridgeconfig] make most members internal, ensure correct locking.
+  - 5a5e3b6d 2025-07-18T11:16:38+02:00 [bridgeconfig] move flow generation locking into methods.
+  - 28f9c1ec 2025-07-18T11:16:38+02:00 [bridgeconfig] move bridge flows generation functions to the pkg.
+  - b607e93d 2025-07-18T11:16:38+02:00 [bridgeconfig] add some getters/setters with lock to the pkg.
+  - 836e0f64 2025-07-18T11:16:38+02:00 [bridgeconfig] move setBridgeOfPorts to the package.
+  - cf93ef30 2025-07-18T11:16:38+02:00 [bridgeconfig] start moving methods that use internal mutex to the pkg
+  - a4d421a3 2025-07-18T11:16:37+02:00 [bridgeconfig] simply move functions around, no change
+  - 3b073327 2025-07-18T11:16:37+02:00 [bridgeconfig] only create BridgeConfigurations inside the package.
+  - 420d9f1c 2025-07-18T11:16:37+02:00 [bridgeconfig] make mutex a public field to turn it into internal later
+  - b65a01ef 2025-07-18T11:16:37+02:00 [node/bridgeconfig] move [udn]bridgeconfig to ite own package.
+  - f1a4b4b0 2025-07-18T11:16:24+02:00 [node/egressipgw] Move egressIP functionality to its own package.
+  - 956981a0 2025-07-18T10:24:09+02:00 kv, e2e: Use PrimaryNetwork()
+  - 115b25a3 2025-07-18T10:24:09+02:00 e2e: Move http servers to external container
+  - ae5b6387 2025-07-18T10:24:09+02:00 e2e: Move underlay setup to providers
+  - 1870116b 2025-07-18T10:24:09+02:00 e2e, kv: Use bgpnet for external container network
+  - 9fed90c7 2025-07-18T10:24:09+02:00 e2e: Use ovnk allocator and reserve IPs
+  - f1c76a61 2025-07-18T10:24:09+02:00 e2e, kv: Increase network status timeout
+  - 7c1de13e 2025-07-18T10:24:09+02:00 e2e: Remove harcoded breth0
+  - 318782be 2025-07-18T10:24:09+02:00 kv, e2e: Use the ExternalContainer struct instead of name
+  - b60dbcd9 2025-07-18T10:24:09+02:00 kv, e2e: ensure there is no dots at podtest name
+  - a0101b56 2025-07-18T10:24:07+02:00 kv, e2e: Download virtctl at tests
+  - 098a3aa7 2025-06-27T14:15:27+02:00 Fix UDN nftables mark chain cleanup
+
+- kubernetes image-amd64 80b82ba5ae030c3e2b7d7752a204ddf71139842c to 4ad924fd1a4ecd620cd51e6859fb9fe5d639b892
   - d75c38bf5 2025-08-06T01:14:16-04:00 UPSTREAM: <carry>: Disable ServiceCIDR tests
+  - 862dc9031 2025-08-05T13:15:48+01:00 UPSTREAM: 132837: Add test case to prove MaxElements correctly set on IntOrString
+  - 003c91c54 2025-08-05T13:14:04+01:00 UPSTREAM: 132837: Fix IntOrString cost estimation when schema has a MaxLength constraint
+  - 353c6afa9 2025-08-05T15:44:04+08:00 UPSTREAM: 133117: Bump external snapshotter for vgs tests
+  - 7acdd542d 2025-08-01T10:35:41-04:00 UPSTREAM: <carry>: disable slow and flaky tests rather than labeling them
+  - b00ecad1f 2025-08-01T09:44:53+02:00 UPSTREAM: <carry>: Fail SELinuxMount check on rebase
+  - 1522eb9d4 2025-08-01T09:38:09+02:00 UPSTREAM: <carry>: Skip SELinux test with Feature:SELinuxMountReadWriteOncePodOnly
   - c1bf9e69a 2025-07-31T22:28:40-04:00 UPSTREAM: <carry>: Add plugin for storage performant security policy
+  - 3d2b1afbe 2025-07-31T09:26:33-04:00 UPSTREAM: <drop>: Revert "Bump external snapshotter for vgs tests"
+  - 47f547e0c 2025-07-30T16:06:51-04:00 UPSTREAM: <carry>: update test metadata
   - 2c5cdefb4 2025-07-30T14:55:41-04:00 UPSTREAM: <carry>: admission: authentication: validate CEL expressions compilation
+  - b79f6c2b7 2025-07-30T11:47:10-04:00 UPSTREAM: 128642: using finalizer
+  - 13ccb0a4c 2025-07-30T11:47:10-04:00 UPSTREAM: 128642: adjust durations for sleepAction
+  - 6fc37f1db 2025-07-24T08:39:26+08:00 UPSTREAM: 133117: Bump external snapshotter for vgs tests
+  - 43760bfa6 2025-07-23T11:43:05+02:00 UPSTREAM: <carry>: remove the backward compat featuregate for 132028
+  - dd5e29946 2025-07-21T11:02:13-04:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - 4fc6781e4 2025-07-21T10:14:57-04:00 UPSTREAM: <drop>: manually resolve conflicts
+  - 3e8789d5d 2025-07-16T15:16:04+02:00 UPSTREAM: 132028: podresources: list: use active pods in list
+  - 80779bd6f 2025-07-15T17:59:41+00:00 Release commit for Kubernetes v1.33.3
+  - 053e244ef 2025-07-10T11:30:20+02:00 Skip linter validation to allow cherrypick
+  - 6a9319c52 2025-07-10T10:12:40+02:00 Use per-policy marker names for VAP integration tests.
+  - 068079fb7 2025-07-04T11:28:46+02:00 Review remarks
+  - 385125330 2025-07-04T11:28:46+02:00 Fix validation for Job with suspend=true,completions=0 to set Complete condition
+  - f208b6c73 2025-06-17T19:04:01+00:00 Update CHANGELOG/CHANGELOG-1.33.md for v1.33.2
+  - d4a4a1d88 2025-06-16T17:48:00+00:00 Fix -Consistent paginated lists serve from cache
+  - cb130042b 2025-06-13T10:04:18+03:00 Add check to see if promote worked within the retry loop
+  - 4c8c88d4c 2025-06-12T20:43:01+03:00 reduce logspam when calculating sandbox resources
+  - d2be12ab7 2025-06-06T20:45:35+00:00 Clean backoff record earlier
+  - ba345a494 2025-05-01T21:54:52-07:00 fix(kubelet): acquire imageRecordsLock when removing image
+
+- service-ca-operator image-amd64 4dfa6916f984d0fd7188380edc88b250738f07f7 to a6346e9d7cfd9e7243742ede7c795b5ac93498a4
+  - 5701388 2025-07-29T16:11:21+08:00 Update Go to 1.24 and OCP to 4.20
+
+- ovn-kubernetes image-arm64 dca1e7d7311a2a4a92808f965efbd268091a7bc3 to c1ecb1a09313e8c0b67f3e037a796c2b68afce80
+  - 0a387dcb 2025-08-06T16:07:04+02:00 Bump OVN to 25.03.0-73.el9fdp for OCP and 25.03.1-36.el9s for OKD
+
+- kubernetes image-arm64 24677bbf1492592d3707c2887173849155f594e6 to 4ad924fd1a4ecd620cd51e6859fb9fe5d639b892
+  - 862dc9031 2025-08-05T13:15:48+01:00 UPSTREAM: 132837: Add test case to prove MaxElements correctly set on IntOrString
+  - 003c91c54 2025-08-05T13:14:04+01:00 UPSTREAM: 132837: Fix IntOrString cost estimation when schema has a MaxLength constraint
 
