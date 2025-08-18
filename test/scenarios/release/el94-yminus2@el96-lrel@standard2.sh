@@ -12,7 +12,8 @@ scenario_remove_vms() {
 }
 
 scenario_run_tests() {
-    run_tests host1 \
-              --variable "TARGET_REF:rhel-9.6-microshift-brew-optionals-4.${MINOR_VERSION}-${LATEST_RELEASE_VERSION}" \
-              suites/upgrade/upgrade-successful.robot
+        run_tests host1 \
+        --variable "TARGET_REF:rhel-9.6-microshift-brew-optionals-4.${MINOR_VERSION}-${LATEST_RELEASE_VERSION}" \
+        suites/upgrade/upgrade-successful.robot \
+        suites/standard2/
 }

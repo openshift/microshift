@@ -29,5 +29,6 @@ scenario_run_tests() {
     run_tests host1 \
         --variable "TARGET_REF:${dest_image}" \
         --variable "BOOTC_REGISTRY:${MIRROR_REGISTRY_URL}" \
-        suites/upgrade/upgrade-successful.robot
+        suites/upgrade/upgrade-successful.robot \
+        suites/standard2
 }
