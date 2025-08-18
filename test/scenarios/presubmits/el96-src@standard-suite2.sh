@@ -12,5 +12,6 @@ scenario_remove_vms() {
 }
 
 scenario_run_tests() {
+    # TODO copejon: the test is killed by the scenario.sh script during the suite teardown. Increasing the timeout to 35m is a workaround.
     run_tests host1 suites/standard2/
 }
