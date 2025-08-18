@@ -1,0 +1,3 @@
+releases:
+  - name: 4.20.0-ec.5
+    brew: microshift-4.20.0~ec.5-202507311047.p0.g774f47d.assembly.ec.5.el9
