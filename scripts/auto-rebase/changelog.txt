@@ -1,11 +1,21 @@
-- cluster-ingress-operator embedded-component beb84efd63f1600ac6c475decc979c63dbdaeb12 to ddd78734833eb45f2cd5fba677fe50e4ae9f063b
-  - 9fc3658 2025-08-11T17:09:39+00:00 Bump to OSSM 3.1.0 and Istio 1.26.2
+- kubernetes embedded-component 138db5223eea57e4408598a32320896c216724e1 to 97b7f2e2ecbbf844812a7158086030bfff2bd324
+  - 223cf89f8 2025-08-04T08:29:39+02:00 UPSTREAM: <carry>: remove the backward compat featuregate for 132028
+  - 4aa7318f7 2025-08-04T08:29:03+02:00 UPSTREAM: 132028: podresources: list: use active pods in list
 
-- machine-config-operator embedded-component 1b3ce4ea5b1943283ed703f55800a8f08d26e4a8 to 103a451c288a119552a9ffeb2c5d0ad4c5ebc6d3
-  - 8a9b26f3 2025-08-07T06:49:29-04:00 msbic: fix arch annotation check
+- machine-config-operator embedded-component 103a451c288a119552a9ffeb2c5d0ad4c5ebc6d3 to 366ecc0d61006b46a8e05cddb8dfffd5e347a09b
+  - 1e8e1535 2025-08-12T06:06:50+00:00 exclude mcn crd cleanup on hypershift
+  - c7625d72 2025-08-12T06:06:50+00:00 Revert "NO-ISSUE: Revert "OCPBUGS-59723: Add mechanism to delete MCN v1alpha1 CRD in 4.16+ clusters""
 
-- coredns image-arm64 74776b850522c912db5fbadf7353f1eab669bd2a to 4f64931403bf747b78bccb40ad877b08da534e23
+- coredns image-amd64 74776b850522c912db5fbadf7353f1eab669bd2a to 4f64931403bf747b78bccb40ad877b08da534e23
   - cae4a43 2025-08-08T08:04:29+00:00 UPSTREAM <carry>: Modify .gitignore to not exclude vendor build folders
   - 4eb9fa0 2025-08-08T08:04:29+00:00 UPSTREAM: 6836: Bump .go-version
   - a8bc321 2025-08-08T08:04:29+00:00 UPSTREAM: 7083: Fix unit test TestZoneExternalCNAMELookupWithProxy
+
+- kubernetes image-amd64 138db5223eea57e4408598a32320896c216724e1 to 97b7f2e2ecbbf844812a7158086030bfff2bd324
+  - 223cf89f8 2025-08-04T08:29:39+02:00 UPSTREAM: <carry>: remove the backward compat featuregate for 132028
+  - 4aa7318f7 2025-08-04T08:29:03+02:00 UPSTREAM: 132028: podresources: list: use active pods in list
+
+- kubernetes image-arm64 138db5223eea57e4408598a32320896c216724e1 to 97b7f2e2ecbbf844812a7158086030bfff2bd324
+  - 223cf89f8 2025-08-04T08:29:39+02:00 UPSTREAM: <carry>: remove the backward compat featuregate for 132028
+  - 4aa7318f7 2025-08-04T08:29:03+02:00 UPSTREAM: 132028: podresources: list: use active pods in list
 
