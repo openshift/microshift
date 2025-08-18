@@ -1,10 +1,11 @@
-- cluster-kube-apiserver-operator embedded-component 383f10176f2509babc9dd49d135fa8bb0c2c277e to b46a20724df762e2df17956d9eb341252e73fccb
-  - 5d51824 2025-08-06T08:02:46+00:00 OCPBUGS-50489: Add missing service ports to apiserver service
-
-- cluster-kube-controller-manager-operator embedded-component 0fac9aa9a20b3c843e0e832a2849db6a7e3441c1 to a2cbb5725fe5e560ba40d884cfd079b3f8391f03
-  - c26009e 2025-08-05T11:40:32+00:00 OCPBUGS-53290: Missing endpoint slices for open ports the operator uses
-
-- ovn-kubernetes image-arm64 5236895f6c35e2f4b16c0fad78a05126aa2ddbd2 to 88e3cdc4e3a627d9484818f72925c0f73a6be797
+- ovn-kubernetes image-amd64 5236895f6c35e2f4b16c0fad78a05126aa2ddbd2 to 2cbd05df74c6ab851fc644a8614417f104d5a494
   - e753188a 2025-08-06T12:42:35-07:00 Layer 2 EIP: remove stale LRP if pod is remote
   - 526ef440 2025-08-06T12:42:31-07:00 EIP OVN controller: stop pod config flap
+  - 90a2d34f 2025-08-04T12:14:11-07:00 Update OWNERS file: Add Patryk/Martin as approvers
+
+- ovn-kubernetes image-arm64 88e3cdc4e3a627d9484818f72925c0f73a6be797 to 2cbd05df74c6ab851fc644a8614417f104d5a494
+  - 90a2d34f 2025-08-04T12:14:11-07:00 Update OWNERS file: Add Patryk/Martin as approvers
+
+- kubernetes image-arm64 45be6afa71817681e9d19fa129884fb81ba9439b to d3330e0a45923552fac5a5ef94aab8f10047f967
+  - 1d9e321d1 2025-06-16T13:36:55+00:00 UPSTREAM: <carry>: Mark admissionregistration.k8s.io/v1beta1 as deprecated.
 
