@@ -1,6 +1,11 @@
 ---
 # common microshift boot start time script
 
+# Include shared microshift version configuration
+- name: Include shared microshift version configuration
+  include_vars:
+    file: "{{ playbook_dir }}/vars/microshift_versions.yml"
+
 - block:
   - name: find microshift cleanup script
     ansible.builtin.find:
@@ -16,13 +21,13 @@
       microshift_cleanup_bin: "{{ find_cleanup.files[0].path if find_cleanup.files }}"
 
   - name: cleanup microshift data
-    become: yes
+    become: true
     ansible.builtin.shell: echo 1 | {{ microshift_cleanup_bin }} --all
   when: cleanup_microshift | default('false') | bool
 
 - block:
   - name: reboot machine
-    become: yes
+    become: true
     ansible.builtin.reboot:
       reboot_timeout: 600
   
@@ -31,9 +36,26 @@
       seconds: 60
   when: reboot | default('false') | bool
 
+- name: Extract major version for pod counts
+  set_fact:
+    microshift_major_version: "{{ microshift_version.split('.')[:2] | join('.') }}"
+
+- name: Validate that version exists in config
+  fail:
+    msg: "Error: MicroShift version {{ microshift_major_version }} not found in microshift_versions dictionary. Please update the defaults/main.yml file."
+  when: microshift_major_version not in microshift_versions
+
+- name: Set expected pod counts
+  set_fact:
+    expected_pods: "{{ microshift_versions[microshift_major_version].expected_pods }}"
+    all_pods: "{{ microshift_versions[microshift_major_version].all_pods }}"
+
 - name: run the microshift boot script
   ansible.builtin.script:
-    cmd: ready.sh
+    cmd: >
+      ready.sh
+      {{ expected_pods }}
+      {{ all_pods }}
   register: script_output
 
 - name: display script output
