@@ -25,9 +25,8 @@ Sanity Test
     # Enabled only for testing purposes to test Kserve's settings override.
     offline.Run With Kubeconfig    oc    get    ingress    -n    test-ai    openvino-resnet
 
-    offline.Reboot MicroShift Host
-    offline.Wait For Greenboot Health Check To Exit
-    Model Serving Offline Test
+    # Right now, there's a problem with OVMS Pod failing to start after reboot.
+    Run Keyword And Continue On Failure    Reboot And Retest
 
 
 *** Keywords ***
@@ -39,6 +38,12 @@ Model Serving Offline Test
     Query Model Metrics
     Prepare Request Data
     Query Model Server
+
+Reboot And Retest
+    [Documentation]    Reboot the VM and retest to verify that everything works as intended after reboot.
+    offline.Reboot MicroShift Host
+    offline.Wait For Greenboot Health Check To Exit
+    Model Serving Offline Test
 
 Wait For A Deployment
     [Documentation]    Wait for a deployment on offline VM
