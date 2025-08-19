@@ -1,14 +1,15 @@
 #!/bin/bash
 set -euo pipefail
 
-# Release versions MicroShift 4.20
-# This script maintains arrays of release versions and executes other scripts
-# when new versions are added.
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    echo "This script must be sourced, not executed."
+    exit 1
+fi
+export LATEST_RELEASE_TYPE="ec"
 
-LATEST_RELEASE=4.20.0-ec.5
-LATEST_RELEASE_TYPE=ec
-LATEST_RPM_RELEASE=microshift-4.20.0~ec.5-202507311047.p0.g774f47d.assembly.ec.5.el9
-LATEST_IMAGE_RELEASE=
+export LATEST_RELEASE="4.20.0-ec.5"
+export LATEST_RPM_RELEASE="microshift-4.20.0~ec.5-202507311047.p0.g774f47d.assembly.ec.5.el9"
+export LATEST_IMAGE_RELEASE="microshift-bootc-container-v4.19.0-202508070648.p2.g5726919.assembly.4.19.7.el9"
 
 declare -a PREV_RELEASES=(
     "4.20.0-ec.4"

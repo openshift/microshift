@@ -6,6 +6,8 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
     exit 1
 fi
 
+SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
 get_vrel_from_beta() {
     local -r beta_repo="$1"
     local -r beta_vrel=$(\
@@ -137,4 +139,5 @@ export BREW_RC_RELEASE_VERSION
 export BREW_EC_RELEASE_VERSION
 export BREW_NIGHTLY_RELEASE_VERSION
 
-export LATEST_RELEASE_TYPE="ec"
+# shellcheck source=test/bin/release_versions.sh
+source "${SCRIPTDIR}/release_versions.sh"
