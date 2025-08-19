@@ -2,6 +2,10 @@
 
 # Sourced from scenario.sh and uses functions defined there.
 
+# NOTE: Unlike most suites, these tests rely on being run IN ORDER to
+# ensure MicroShift is upgraded before running standard suite tests
+export TEST_RANDOMIZATION=none
+
 dest_image="rhel96-bootc-brew-${LATEST_RELEASE_TYPE}-with-optional"
 
 scenario_create_vms() {
