@@ -16,7 +16,7 @@ MIRROR_REGISTRY_URL="$(hostname):${MIRROR_REGISTRY_PORT}/microshift"
 
 scenario_create_vms() {
     # Enable IPv6 single stack in kickstart
-    prepare_kickstart host1 kickstart-bootc.ks.template "rhel96-bootc-brew-${LATEST_RELEASE_VERSION}-with-optional" false true
+    prepare_kickstart host1 kickstart-bootc.ks.template "rhel96-bootc-brew-${LATEST_RELEASE_BOOTC_TYPE}-with-optional" false true
     launch_vm --boot_blueprint rhel96-bootc --network "${VM_IPV6_NETWORK}"
 }
 

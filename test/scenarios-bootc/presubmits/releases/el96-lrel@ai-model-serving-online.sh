@@ -18,7 +18,7 @@ scenario_create_vms() {
     check_platform true
 
     # Increased disk size because of the additional embedded images (especially OVMS which is ~3.5GiB)
-    LVM_SYSROOT_SIZE=20480 prepare_kickstart host1 kickstart-bootc.ks.template "rhel96-bootc-brew-${LATEST_RELEASE_VERSION}-with-optional"
+    LVM_SYSROOT_SIZE=20480 prepare_kickstart host1 kickstart-bootc.ks.template "rhel96-bootc-brew-${LATEST_RELEASE_BOOTC_TYPE}-with-optional"
     launch_vm --boot_blueprint rhel96-bootc --vm_disksize 30
 }
 

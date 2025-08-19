@@ -2,15 +2,15 @@
 
 # Sourced from scenario.sh and uses functions defined there.
 
-dest_image="rhel96-bootc-brew-${LATEST_RELEASE_VERSION}-with-optional"
+dest_image="rhel96-bootc-brew-${LATEST_RELEASE_BOOTC_TYPE}-with-optional"
 
 scenario_create_vms() {
     if ! does_image_exist "${dest_image}"; then
         echo "Image '${dest_image}' not found - skipping test"
         return 0
     fi
-    prepare_kickstart host1 kickstart-bootc.ks.template rhel94-bootc-brew-y2-with-optional
-    launch_vm --boot_blueprint rhel94-bootc
+    prepare_kickstart host1 kickstart-bootc.ks.template rhel96-bootc-brew-y1-with-optional
+    launch_vm --boot_blueprint rhel96-bootc
 }
 
 scenario_remove_vms() {
