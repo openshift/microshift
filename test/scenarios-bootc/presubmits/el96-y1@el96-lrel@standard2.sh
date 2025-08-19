@@ -2,7 +2,7 @@
 
 # Sourced from scenario.sh and uses functions defined there.
 
-dest_image="rhel96-bootc-brew-${LATEST_RELEASE_BOOTC_TYPE}-with-optional"
+dest_image="rhel96-bootc-brew-${LATEST_RELEASE_TYPE}-with-optional"
 
 scenario_create_vms() {
     if ! does_image_exist "${dest_image}"; then

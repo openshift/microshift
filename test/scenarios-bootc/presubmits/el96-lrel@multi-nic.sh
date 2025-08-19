@@ -3,7 +3,7 @@
 # Sourced from scenario.sh and uses functions defined there.
 
 scenario_create_vms() {
-    prepare_kickstart host1 kickstart-bootc.ks.template "rhel96-bootc-brew-${LATEST_RELEASE_BOOTC_TYPE}-with-optional"
+    prepare_kickstart host1 kickstart-bootc.ks.template "rhel96-bootc-brew-${LATEST_RELEASE_TYPE}-with-optional"
     # Using multus as secondary network to have 2 nics in different networks.
     launch_vm --boot_blueprint rhel96-bootc --network default,"${VM_MULTUS_NETWORK}"
 }
