@@ -8,7 +8,7 @@ VM_BRIDGE_IP="$(get_vm_bridge_ip "${VM_MULTUS_NETWORK}")"
 WEB_SERVER_URL="http://${VM_BRIDGE_IP}:${WEB_SERVER_PORT}"
 
 scenario_create_vms() {
-    prepare_kickstart host1 kickstart.ks.template "rhel-9.6-microshift-brew-optionals-4.${MINOR_VERSION}-${LATEST_RELEASE_VERSION}"
+    prepare_kickstart host1 kickstart.ks.template "rhel-9.6-microshift-brew-optionals-4.${MINOR_VERSION}-${LATEST_RELEASE_TYPE}"
     # Two nics - one for macvlan, another for ipvlan (they cannot enslave the same interface)
     launch_vm  --network "${VM_MULTUS_NETWORK},${VM_MULTUS_NETWORK}"
 
