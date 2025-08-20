@@ -7,7 +7,7 @@
 export TEST_RANDOMIZATION=none
 
 scenario_create_vms() {
-    prepare_kickstart host1 kickstart.ks.template "rhel-9.6-microshift-brew-optionals-4.${YMINUS1_MINOR_VERSION}-zstream"
+    prepare_kickstart host1 kickstart.ks.template "rhel-9.6-microshift-brew-optionals-4.${PREVIOUS_MINOR_VERSION}-zstream"
     launch_vm 
 }
 
