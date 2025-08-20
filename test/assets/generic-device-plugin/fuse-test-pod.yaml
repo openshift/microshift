@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: fuse-test-pod
+spec:
+  containers:
+  - name: fuse-app-container
+    image: registry.access.redhat.com/ubi9/ubi:9.6
+    command: ["sleep", "infinity"]
+    resources:
+      limits:
+        device.microshift.io/fuse: "4"
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop: ["ALL"]
+      runAsNonRoot: true
+      seccompProfile:
+        type: "RuntimeDefault"
