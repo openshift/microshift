@@ -140,5 +140,5 @@ export BREW_EC_RELEASE_VERSION
 export BREW_NIGHTLY_RELEASE_VERSION
 
 # Get the release type from most recent release in test/releases.yaml to be used in ostree commit names and bootc image names
-LATEST_RELEASE_TYPE="$(yq eval '.releases | to_entries | .[0].value.release_type' "${SCRIPTDIR}/../releases.yaml")"
+LATEST_RELEASE_TYPE="$(awk '/^  [^[:space:]]/{f=1;next} f&&/release_type:/{print $2;exit}' "${SCRIPTDIR}/../releases.yaml")"
 export LATEST_RELEASE_TYPE
