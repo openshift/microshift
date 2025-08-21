@@ -22,6 +22,8 @@ spec:
             - name: config-volume
               mountPath: /etc/coredns
               readOnly: true
+            - mountPath: /tmp
+              name: tmp-dir
           ports:
             - containerPort: 5353
               name: dns
@@ -52,6 +54,8 @@ spec:
             requests:
               cpu: 50m
               memory: 70Mi
+          securityContext:
+            readOnlyRootFilesystem: true
           image: '{{ .ReleaseImage.coredns }}'
         - name: kube-rbac-proxy
           args:
@@ -73,6 +77,8 @@ spec:
             - mountPath: /etc/tls/private
               name: metrics-tls
               readOnly: true
+            - mountPath: /tmp
+              name: tmp-dir
           image: '{{ .ReleaseImage.kube_rbac_proxy }}'
           imagePullPolicy: IfNotPresent
       dnsPolicy: Default
@@ -87,6 +93,8 @@ spec:
           secret:
             defaultMode: 420
             secretName: dns-default-metrics-tls
+        - name: tmp-dir
+          emptyDir: {}
       nodeSelector:
         kubernetes.io/os: linux
       tolerations:

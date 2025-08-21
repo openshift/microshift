@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	et "github.com/openshift-eng/openshift-tests-extension/pkg/extension/extensiontests"
+	"k8s.io/kubernetes/pkg/features"
 )
 
 // addEnvironmentSelectors adds the environmentSelector field to appropriate specs to facilitate including or excluding
@@ -25,6 +26,13 @@ func addEnvironmentSelectors(specs et.ExtensionTestSpecs) {
 	specs.SelectAny([]et.SelectFunction{ // Since these must use "NameContainsAll" they cannot be included in filterByNetwork
 		et.NameContainsAll("NetworkPolicy", "named port"),
 	}).Exclude(et.NetworkEquals("OVNKubernetes")).AddLabel("[Skipped:Network/OVNKubernetes]")
+
+	// SELinux tests marked with [Feature:SELinuxMountReadWriteOncePodOnly] require SELinuxMount
+	// feature gate **disabled**.
+	// REBASE NOTE: this will intentionally fail to compile when the feature gate is removed upstream.
+	// Just remove this check + notify the OCP storage team.
+	specs.Select(et.NameContains("[Feature:SELinuxMountReadWriteOncePodOnly]")).
+		Exclude(et.FeatureGateEnabled(string(features.SELinuxMount)))
 }
 
 // filterByPlatform is a helper function to do, simple, "NameContains" filtering on tests by platform
@@ -119,6 +127,12 @@ func filterByPlatform(specs et.ExtensionTestSpecs) {
 			"[Feature:LoadBalancer]",
 		},
 		"external": {
+			// LoadBalancer tests in 1.31 require explicit platform-specific skips
+			// https://issues.redhat.com/browse/OCPBUGS-53249
+			"[sig-network] LoadBalancers [Feature:LoadBalancer] should be able to preserve UDP traffic when server pod cycles for a LoadBalancer service on",
+		},
+		// MicroShift identifies itself as "none"
+		"none": {
 			// LoadBalancer tests in 1.31 require explicit platform-specific skips
 			// https://issues.redhat.com/browse/OCPBUGS-53249
 			"[sig-network] LoadBalancers [Feature:LoadBalancer] should be able to preserve UDP traffic when server pod cycles for a LoadBalancer service on",
