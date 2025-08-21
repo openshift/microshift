@@ -1,7 +1,7 @@
 ---
 # manage-repos default vars
 
-microshift_version: 4.18.0-rc.3
+microshift_version: 4.19
 ocp_version: "{{ microshift_version.split('.')[0] }}.{{ microshift_version.split('.')[1] }}"
 repo_list:
   - { repo_name: 'microshift-{{ ocp_version }}-for-rhel-{{ ansible_distribution_major_version }}-mirrorbeta-{{ ansible_architecture }}-rpms', repo_url: "https://mirror.openshift.com/pub/openshift-v4/{{ ansible_architecture }}/microshift/ocp/{{ microshift_version }}/el9/os/"}

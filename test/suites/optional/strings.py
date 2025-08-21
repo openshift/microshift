@@ -29,6 +29,18 @@ genericDevicePlugin:
              - path: /dev/ttyUSB*
 '''
 
+GDP_CONFIG_FUSE_COUNT = '''
+genericDevicePlugin:
+  status: Enabled
+  devices:
+     - name: fuse
+       groups:
+         - count: 10
+           paths:
+             - path: /dev/fuse
+'''
+
+
 CONFIGMAP_PREAMBLE = '''
 apiVersion: v1
 kind: ConfigMap

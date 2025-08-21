@@ -5,62 +5,62 @@
   block:
   - name: subscription-manager tasks
     block:
-      - name: check if we have subscription-manager installed
+      - name: Check if we have subscription-manager installed
         ansible.builtin.command: which subscription-manager
         register: sm_present
         ignore_errors: true
 
-      - name: install subscription-manager
+      - name: Install subscription-manager
         ansible.builtin.dnf:
           name:
           - subscription-manager
         when: sm_present.rc != 0
 
-      - name: register host with subscription manager
+      - name: Register host with subscription manager
         community.general.redhat_subscription:
           state: present
           username: "{{ rhel_username }}"
           password: "{{ rhel_password }}"
 
-      - name: enable repo management from subscription-manager
+      - name: Enable repo management from subscription-manager
         ansible.builtin.command: subscription-manager config --rhsm.manage_repos=1
     when: manage_subscription
 
-  - name: slurp redhat-release
+  - name: Slurp redhat-release
     ansible.builtin.slurp:
       src: /etc/redhat-release
     register: redhat_release_slurp
 
-  - name: set beta release of RHEL
+  - name: Set beta release of RHEL
     ansible.builtin.set_fact:
       rhel_beta: beta-
     when: "'Beta' in (redhat_release_slurp['content'] | b64decode)"
 
-  - name: set microshift_prerelease if microshift_version is a prerelease
+  - name: Set microshift_prerelease if microshift_version is a prerelease
     ansible.builtin.set_fact:
       microshift_prerelease: "{{ 'rc' in microshift_version or 'ec' in microshift_version }}"
 
-  - name: create microshift prerelease mirrors
+  - name: Create microshift prerelease mirrors
     include_tasks: roles/manage-repos/tasks/create-mirrors.yaml
     loop: "{{ repo_list }}"
     when:
       - microshift_prerelease
       - not build_microshift
 
-  - name: enable required repos for microshift
+  - name: Enable required repos for microshift
     community.general.rhsm_repository:
       name: "{{ rhel_repos }}"
     when:
       - not microshift_prerelease
 
-  - name: install EPEL repo
+  - name: Install EPEL repo
     ansible.builtin.dnf:
       name: "https://dl.fedoraproject.org/pub/epel/epel-release-latest-{{ ansible_distribution_major_version }}.noarch.rpm"
       disable_gpg_check: true
       state: present
   when: ansible_distribution == "RedHat"
 
-- name: gather the package facts
+- name: Gather the package facts
   ansible.builtin.package_facts:
     manager: auto
 

@@ -1,11 +1,7 @@
-- coredns image-arm64 a69279e3393b269099dcaae967570741d4c5e469 to 96ffa45b5bd7188054bafef5d8ab7ae617dd812d
-  - 86be9b7 2025-08-07T20:52:09-03:00 Add rikatz to OWNERS
-  - 35edb50 2025-08-05T17:31:06+02:00 UPSTREAM <carry>: Modify .gitignore to not exclude vendor build folders
-  - f269701 2025-08-05T17:20:22+02:00 UPSTREAM: 6836: Bump .go-version
-  - c48716d 2025-08-05T17:20:17+02:00 UPSTREAM: 7083: Fix unit test TestZoneExternalCNAMELookupWithProxy
+- ovn-kubernetes image-arm64 dca1e7d7311a2a4a92808f965efbd268091a7bc3 to c1ecb1a09313e8c0b67f3e037a796c2b68afce80
+  - 0a387dcb 2025-08-06T16:07:04+02:00 Bump OVN to 25.03.0-73.el9fdp for OCP and 25.03.1-36.el9s for OKD
 
-- kubernetes image-arm64 3e4371f7d32c8d83621ead0f736baeea6edc4144 to 24677bbf1492592d3707c2887173849155f594e6
-  - d75c38bf5 2025-08-06T01:14:16-04:00 UPSTREAM: <carry>: Disable ServiceCIDR tests
-  - c1bf9e69a 2025-07-31T22:28:40-04:00 UPSTREAM: <carry>: Add plugin for storage performant security policy
-  - 2c5cdefb4 2025-07-30T14:55:41-04:00 UPSTREAM: <carry>: admission: authentication: validate CEL expressions compilation
+- kubernetes image-arm64 24677bbf1492592d3707c2887173849155f594e6 to 4ad924fd1a4ecd620cd51e6859fb9fe5d639b892
+  - 862dc9031 2025-08-05T13:15:48+01:00 UPSTREAM: 132837: Add test case to prove MaxElements correctly set on IntOrString
+  - 003c91c54 2025-08-05T13:14:04+01:00 UPSTREAM: 132837: Fix IntOrString cost estimation when schema has a MaxLength constraint
 

@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"os"
 	"path/filepath"
 	"strings"
 	"syscall"
@@ -16,6 +17,7 @@ import (
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/wait"
 	appsclientv1 "k8s.io/client-go/kubernetes/typed/apps/v1"
+	coreclientv1 "k8s.io/client-go/kubernetes/typed/core/v1"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/klog/v2"
@@ -47,8 +49,67 @@ func (nw NamespaceWorkloads) String() string {
 	return strings.Join(parts, ", ")
 }
 
+func getKubeconfigPath() string {
+	if os.Geteuid() == 0 {
+		return filepath.Join(config.DataDir, "resources", string(config.KubeAdmin), "kubeconfig")
+	}
+
+	getKubeconfigFromEnv := func() string {
+		kubeconfigPath, ok := os.LookupEnv("KUBECONFIG")
+		if !ok {
+			return ""
+		}
+		if kubeconfigPath == "" {
+			klog.Warning("KUBECONFIG env var is defined but empty")
+			return ""
+		}
+		ok, err := util.PathExists(kubeconfigPath)
+		if err != nil {
+			klog.Errorf("Failed to verify access to file (%s) defined by KUBECONFIG env var: %v", kubeconfigPath, err)
+			return ""
+		}
+		if !ok {
+			klog.Errorf("File (%s) defined by KUBECONFIG env var does not exist", kubeconfigPath)
+			return ""
+		}
+
+		return kubeconfigPath
+	}
+
+	getKubeconfigFromDefaultPath := func() string {
+		defaultUserKubeconfig := fmt.Sprintf("%s/.kube/config", os.Getenv("HOME"))
+		ok, err := util.PathExists(defaultUserKubeconfig)
+		if err != nil {
+			klog.Errorf("Failed to verify access to ~/.kube/config: %v", err)
+			return ""
+		}
+		if !ok {
+			klog.Errorf("~/.kube/config does not exist")
+			return ""
+		}
+		return defaultUserKubeconfig
+	}
+
+	if kubeconfigPath := getKubeconfigFromEnv(); kubeconfigPath != "" {
+		klog.Warningf("WARNING: Running healthcheck as non-root user, using KUBECONFIG environment variable: %s", kubeconfigPath)
+		return kubeconfigPath
+	}
+
+	if kubeconfigPath := getKubeconfigFromDefaultPath(); kubeconfigPath != "" {
+		klog.Warningf("WARNING: Running healthcheck as non-root user, using ~/.kube/config")
+		return kubeconfigPath
+	}
+
+	klog.Errorf("ERROR: Could not find suitable kubeconfig")
+	return ""
+}
+
 func waitForWorkloads(ctx context.Context, timeout time.Duration, workloads map[string]NamespaceWorkloads) error {
-	kubeconfigPath := filepath.Join(config.DataDir, "resources", string(config.KubeAdmin), "kubeconfig")
+	kubeconfigPath := getKubeconfigPath()
+	if kubeconfigPath == "" {
+		return fmt.Errorf("could not find existing kubeconfig file")
+	}
+
 	restConfig, err := clientcmd.BuildConfigFromFlags("", kubeconfigPath)
 	if err != nil {
 		return fmt.Errorf("failed to load kubeconfig from %s: %v", kubeconfigPath, err)
@@ -56,6 +117,11 @@ func waitForWorkloads(ctx context.Context, timeout time.Duration, workloads map[
 	client, err := appsclientv1.NewForConfig(rest.AddUserAgent(restConfig, "healthcheck"))
 	if err != nil {
 		return fmt.Errorf("unable to create Kubernetes client: %v", err)
+	}
+
+	coreClient, err := coreclientv1.NewForConfig(rest.AddUserAgent(restConfig, "healthcheck"))
+	if err != nil {
+		return fmt.Errorf("unable to create Kubernetes core client: %v", err)
 	}
 
 	interval := max(timeout/30, 1*time.Second)
@@ -75,7 +141,7 @@ func waitForWorkloads(ctx context.Context, timeout time.Duration, workloads map[
 	}
 	errs := aeg.Wait()
 	if errs != nil {
-		logPodsAndEvents()
+		printPostFailureDebugInfo(ctx, coreClient)
 		return errs
 	}
 	return nil

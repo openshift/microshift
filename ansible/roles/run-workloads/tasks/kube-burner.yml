@@ -1,16 +1,20 @@
 ---
 # kube-burner tasks
 
-- name: "run kube-kube burner workload {{ kube_burner_workload }}"
+- name: "run kube-burner workload {{ kube_burner_workload.name }} with QPS={{ kube_burner_workload.qps }}"
   ansible.builtin.command:
     cmd: ./run.sh
     chdir: "{{ e2e_path }}/workloads/kube-burner"
   environment:
-    BURST: "{{ kube_burner_burst }}"
+    BURST: "{{ kube_burner_workload.burst }}"
     INDEXING: "{{ kube_burner_indexing }}"
     POD_READY_THRESHOLD: "{{ kube_burner_pod_ready }}"
-    QPS: "{{ kube_burner_qps }}"
-    WORKLOAD: "{{ kube_burner_workload }}"
+    QPS: "{{ kube_burner_workload.qps }}"
+    WORKLOAD: "{{ kube_burner_workload.name }}"
+
+- name: "log workload execution details"
+  ansible.builtin.debug:
+    msg: "Completed {{ kube_burner_workload.name }} with QPS={{ kube_burner_workload.qps }}, BURST={{ kube_burner_workload.burst }}"
 
 - ansible.builtin.pause:
     seconds: "{{ pre_delete_pause_duration }}"
