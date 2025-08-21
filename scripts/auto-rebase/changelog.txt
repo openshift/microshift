@@ -1,21 +1,9 @@
-- kubernetes embedded-component 138db5223eea57e4408598a32320896c216724e1 to 97b7f2e2ecbbf844812a7158086030bfff2bd324
-  - 223cf89f8 2025-08-04T08:29:39+02:00 UPSTREAM: <carry>: remove the backward compat featuregate for 132028
-  - 4aa7318f7 2025-08-04T08:29:03+02:00 UPSTREAM: 132028: podresources: list: use active pods in list
+- api embedded-component 97812373b6b447ff6b55d3e2625b4f62aff1a16f to f45379cbd8d136ca98aad3267c62571a3668d995
+  - 108cd61b 2025-08-12T14:07:14+00:00 Update crd-schema.json to release 1.33 branch
 
-- machine-config-operator embedded-component 103a451c288a119552a9ffeb2c5d0ad4c5ebc6d3 to 366ecc0d61006b46a8e05cddb8dfffd5e347a09b
-  - 1e8e1535 2025-08-12T06:06:50+00:00 exclude mcn crd cleanup on hypershift
-  - c7625d72 2025-08-12T06:06:50+00:00 Revert "NO-ISSUE: Revert "OCPBUGS-59723: Add mechanism to delete MCN v1alpha1 CRD in 4.16+ clusters""
-
-- coredns image-amd64 74776b850522c912db5fbadf7353f1eab669bd2a to 4f64931403bf747b78bccb40ad877b08da534e23
-  - cae4a43 2025-08-08T08:04:29+00:00 UPSTREAM <carry>: Modify .gitignore to not exclude vendor build folders
-  - 4eb9fa0 2025-08-08T08:04:29+00:00 UPSTREAM: 6836: Bump .go-version
-  - a8bc321 2025-08-08T08:04:29+00:00 UPSTREAM: 7083: Fix unit test TestZoneExternalCNAMELookupWithProxy
-
-- kubernetes image-amd64 138db5223eea57e4408598a32320896c216724e1 to 97b7f2e2ecbbf844812a7158086030bfff2bd324
-  - 223cf89f8 2025-08-04T08:29:39+02:00 UPSTREAM: <carry>: remove the backward compat featuregate for 132028
-  - 4aa7318f7 2025-08-04T08:29:03+02:00 UPSTREAM: 132028: podresources: list: use active pods in list
-
-- kubernetes image-arm64 138db5223eea57e4408598a32320896c216724e1 to 97b7f2e2ecbbf844812a7158086030bfff2bd324
-  - 223cf89f8 2025-08-04T08:29:39+02:00 UPSTREAM: <carry>: remove the backward compat featuregate for 132028
-  - 4aa7318f7 2025-08-04T08:29:03+02:00 UPSTREAM: 132028: podresources: list: use active pods in list
+- operator-framework-olm embedded-component 8bcf1556a550efa7bb380ec315c077cf29438695 to 5c83a8adfd3fb0a5b3f2f8a26d3d05eefd5ba9d0
+  - cd2a2af8 2025-08-18T14:39:30-04:00 Upstream: <carry>: regenerate manifests
+  - 1b5a100e 2025-08-15T15:45:46-04:00 Upstream: 3580: add NetworkPolicy as a supported kind
+  - 1aa6bb51 2025-08-14T13:53:32-04:00 Upstream: <carry>: Add allow-all networkpolicy for openshift-operators namespace
+  - 36252801 2025-08-14T10:50:59-04:00 Upstream: 1675: Add NetworkPolicy as a supported kind
 
