@@ -24,8 +24,8 @@ prepare_scenario_sources() {
 
     ############# temp change to test release scenarios #############
     # cp "${SCENARIO_SOURCES}"/*.sh "${SCENARIOS_TO_RUN}"/
-    cp "${TESTDIR}/scenarios/releases"/*.sh "${SCENARIOS_TO_RUN}"/
-    cp "${TESTDIR}/scenarios-bootc/releases"/*.sh "${SCENARIOS_TO_RUN}"/
+    rel_scenarios=$(echo "${SCENARIO_SOURCES}" | sed -e 's,presubmits\|periodics,releases,g')
+    cp "${rel_scenarios}"/*.sh "${SCENARIOS_TO_RUN}"/
     ############# temp change to test release scenarios #############
 
     if ${EXCLUDE_CNCF_CONFORMANCE}; then
