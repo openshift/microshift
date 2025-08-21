@@ -250,8 +250,8 @@ usage() {
     exit 1
 }
 
-# [[ "$(uname -o)" == "GNU/Linux" ]] || { echo "Script only runs on Linux"; exit 1; }
-# [[ "${ARCH}" =~ x86_64|aarch64 ]] || { echo "Only x86_64 and aarch64 architectures are supported"; exit 1; }
+[[ "$(uname -o)" == "GNU/Linux" ]] || { echo "Script only runs on Linux"; exit 1; }
+[[ "${ARCH}" =~ x86_64|aarch64 ]] || { echo "Only x86_64 and aarch64 architectures are supported"; exit 1; }
 
 [ $# -eq 0 ] && usage "Expected at least one argument"
 
