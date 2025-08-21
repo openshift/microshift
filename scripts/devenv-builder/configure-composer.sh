@@ -29,6 +29,10 @@ install_and_configure_composer() {
 auth_file_path = "/etc/osbuild-worker/pull-secret.json"
 EOF
     fi
+    # Install yq
+    export DEST_DIR="/usr/bin"
+    "${SCRIPTDIR}/../fetch_tools.sh" yq
+    unset DEST_DIR
 }
 
 enable_or_restart_composer_services() {
