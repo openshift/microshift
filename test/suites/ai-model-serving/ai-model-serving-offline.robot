@@ -48,7 +48,14 @@ Reboot And Retest
 Wait For A Deployment
     [Documentation]    Wait for a deployment on offline VM
     [Arguments]    ${namespace}    ${name}
-    offline.Run With Kubeconfig    oc    rollout    status    -n\=${namespace}    deployment    ${name}
+    offline.Run With Kubeconfig
+    ...    oc
+    ...    rollout
+    ...    status
+    ...    --timeout\=300s
+    ...    -n\=${namespace}
+    ...    deployment
+    ...    ${name}
 
 Check If Model Is Ready
     [Documentation]    Ask model server is model is ready for inference.
