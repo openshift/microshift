@@ -31,8 +31,8 @@ EOF
     fi
 
     # Install yq
-    "${SCRIPTDIR}/../fetch_tools.sh" yq
-    export PATH="${SCRIPTDIR}/../../_output/bin:${PATH}"
+    export DEST_DIR="/usr/bin"
+    sudo -E "${SCRIPTDIR}/../fetch_tools.sh" yq
 }
 
 enable_or_restart_composer_services() {
