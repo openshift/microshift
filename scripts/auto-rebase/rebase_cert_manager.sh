@@ -111,36 +111,44 @@ download_cert_manager(){
 
 }
 
-# Updates the image digests in pkg/release/release*.go
-# update_images() {
-#     if [ ! -f "${STAGING_DIR}/release_amd64.json" ] || [ ! -f "${STAGING_DIR}/release_arm64.json" ]; then
-#         >&2 echo "No release found in ${STAGING_DIR}, you need to download one first."
-#         exit 1
-#     fi
-#     pushd "${STAGING_DIR}" >/dev/null
-
-   
-# }
-
-
+# helper to append an image mapping to kustomization.yaml, supporting digest or tag
+add_image_to_kustomize() {
+    local alias_name="$1"
+    local full_image_ref="$2"
+    if [[ "${full_image_ref}" == *@sha256:* ]]; then
+        local image_name_no_digest="${full_image_ref%@*}"
+        local image_digest="${full_image_ref#*@}"
+        yq -i ".images += [{\"name\": \"${alias_name}\", \"newName\": \"${image_name_no_digest}\", \"digest\": \"${image_digest}\"}]" "${cert_manager_kustomization_yaml}"
+    else
+        local image_name_no_tag="${full_image_ref%:*}"
+        local image_tag="${full_image_ref##*:}"
+        yq -i ".images += [{\"name\": \"${alias_name}\", \"newName\": \"${image_name_no_tag}\", \"newTag\": \"${image_tag}\"}]" "${cert_manager_kustomization_yaml}"
+    fi
+}
 
 write_cert_manager_images_for_arch() {
     local arch="$1"
     title "Updating images for ${arch}"
-    #local csv_manifest="${arch_dir}/servicemeshoperator3.clusterserviceversion.yaml"
-    #local kustomization_arch_file="${REPOROOT}/assets/optional/gateway-api/kustomization.${GOARCH_TO_UNAME_MAP[${arch}]}.yaml"
     local cert_manager_release_json="${REPOROOT}/assets/optional/cert-manager/release-cert-manager-${GOARCH_TO_UNAME_MAP[${arch}]}.json"
     local cert_manager_operator_yaml="${REPOROOT}/assets/optional/cert-manager/manager/manager.yaml"
     local cert_manager_kustomization_yaml="${REPOROOT}/assets/optional/cert-manager/manager/kustomization.yaml"
 
-    local base_release=4.20
-    jq -n "{\"release\": {\"base\": \"${base_release}\"}, \"images\": {}}" > "${cert_manager_release_json}"
+    local operatorVersion=$(yq '.properties[] | select(.type == "olm.package").value.version' "${OPERATOR_CERT_MANAGER_INDEX}")
+
+    jq -n "{\"release\": {\"base\": \"${operatorVersion}\"}, \"images\": {}}" > "${cert_manager_release_json}"
     
     #containerImage
-    local operatorImage=$(yq '.properties[] | select(.type == "olm.csv.metadata").value.annotations.containerImage' "${OPERATOR_CERT_MANAGER_INDEX}")
-    
-    yq -i -o json ".images += {\"cert-manager-operator\": \"${operatorImage}\"}" "${cert_manager_release_json}"
-    sed -i "s#newName:.*openshift.io\/cert-manager-operator.*#newName: ${operatorImage}#g" "${cert_manager_kustomization_yaml}"
+    local operatorImageFull=$(yq '.properties[] | select(.type == "olm.csv.metadata").value.annotations.containerImage' "${OPERATOR_CERT_MANAGER_INDEX}")
+    local operatorImage="${operatorImageFull%:*}"
+    local operatorTag="${operatorImageFull#*:}"
+  
+    yq -i -o json ".images += {\"cert-manager-operator\": \"${operatorImageFull}\"}" "${cert_manager_release_json}"
+
+    # reset and rebuild the images list in kustomization.yaml from opm output
+    yq -i 'del(.images) | .images = []' "${cert_manager_kustomization_yaml}"
+
+    # add operator image to kustomization images (named 'controller')
+    add_image_to_kustomize "controller" "${operatorImageFull}"
 
     #relatedImages
     for index in $(yq '.relatedImages.[] | path | .[-1] ' "${OPERATOR_CERT_MANAGER_INDEX}"); do
@@ -148,6 +156,7 @@ write_cert_manager_images_for_arch() {
      local component=$(yq ".relatedImages.${index}.name" "${OPERATOR_CERT_MANAGER_INDEX}")
     if [[  -n "${component}" && "${OPERATOR_COMPONENTS}" == *"${component}"* ]]; then
         yq -i -o json ".images += {\"${component}\": \"${image}\"}" "${cert_manager_release_json}"
+        add_image_to_kustomize "${component}" "${image}"
         sed -i "s#value:.*${component}.*#value: ${image}#g" "${cert_manager_operator_yaml}"
 
         # handle special case istiocsr v istio-csr mismatch 
@@ -183,30 +192,6 @@ copy_manifests() {
     "$REPOROOT/scripts/auto-rebase/handle_assets.py" "./scripts/auto-rebase/assets_cert_manager.yaml"
 }
 
-
-# Updates embedded component manifests by gathering these from various places
-# in the staged repos and copying them into the asset directorcay.
-update_cert_manager_manifests() {
-    pushd "${STAGING_DIR}" >/dev/null
-
-    title "Modifying OpenShift manifests"
-    
-    for index in $(yq '.[] | path | .[-1] ' "${OPERATOR_CERT_MANAGER_INDEX}")
-    do
-     image=$(yq ".${index}.image" "${OPERATOR_CERT_MANAGER_INDEX}")
-     component=$(yq ".${index}.name" "${OPERATOR_CERT_MANAGER_INDEX}")
-
-    if [[  -n "${component}" && "${OPERATOR_COMPONENTS}" == *"${component}"* ]]; then
-        #clone_repo "${repo}" "${commit}" "."
-        #echo "${repo} embedded-component ${commit}" >> "${new_commits_file}"
-        echo "${image} ${component}"
-    fi
-    done
-
-
-    popd >/dev/null
-}
-
 usage() {
     echo "Usage:"
     echo "$(basename "$0") to RELEASE_IMAGE_INTEL RELEASE_IMAGE_ARM         Performs all the steps to rebase to a release image. Specify both amd64 and arm64 OCP releases."
@@ -235,7 +220,6 @@ case "$command" in
 
     manifests)
         copy_manifests
-        update_cert_manager_manifests
         ;;
     *) usage;;
 esac
