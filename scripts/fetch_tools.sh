@@ -46,7 +46,7 @@ _install() {
 
     chmod +x "${WORK_DIR}/${initial_filename}"
     mkdir -p "$(dirname "${dest}")"
-    sudo mv "${WORK_DIR}/${initial_filename}" "${dest}"
+    mv "${WORK_DIR}/${initial_filename}" "${dest}"
 }
 
 gettool_golangci-lint() {

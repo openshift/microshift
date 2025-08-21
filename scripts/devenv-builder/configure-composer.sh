@@ -29,10 +29,10 @@ install_and_configure_composer() {
 auth_file_path = "/etc/osbuild-worker/pull-secret.json"
 EOF
     fi
+
     # Install yq
-    export DEST_DIR="/usr/bin"
     "${SCRIPTDIR}/../fetch_tools.sh" yq
-    unset DEST_DIR
+    export PATH="${SCRIPTDIR}/../../_output/bin:${PATH}"
 }
 
 enable_or_restart_composer_services() {
@@ -77,9 +77,8 @@ enable_rt_repositories() {
     # Enable RT repository by duplicating the 'baseos' repository, changing its name,
     # and replacing 'baseos' with 'rt'.
     # Note that kernel-rt is only available for x86_64.
-    "${SCRIPTDIR}/../fetch_tools.sh" yq
     sudo mkdir -p /etc/osbuild-composer/repositories/
-    "${SCRIPTDIR}/../../_output/bin/yq" \
+    yq \
         '.["x86_64"] += (.["x86_64"][0] | .name = "kernel-rt" | .baseurl |= sub("baseos", "rt"))' \
         "/usr/share/osbuild-composer/repositories/rhel-${version_id}.json" | jq | sudo tee "${composer_config}" >/dev/null
 }
