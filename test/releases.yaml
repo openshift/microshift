@@ -1,7 +1,0 @@
-releases:
-  ec.5:
-    release_type: ec
-    shipment_url: https://gitlab.cee.redhat.com/hybrid-platforms/art/ocp-shipment-data/-/merge_requests/44
-    brew:
-      nvr: microshift-4.20.0~ec.5-202507311047.p0.g774f47d.assembly.ec.5.el9
-      url: https://brewweb.engineering.redhat.com/brew/buildinfo?buildID=3779104
