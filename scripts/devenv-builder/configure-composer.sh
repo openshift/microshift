@@ -31,8 +31,7 @@ EOF
     fi
 
     # Install yq
-    export DEST_DIR="/usr/bin"
-    sudo -E "${SCRIPTDIR}/../fetch_tools.sh" yq
+    DEST_DIR="/usr/bin" sudo --preserve-env=DEST_DIR "${SCRIPTDIR}/../fetch_tools.sh" yq
 }
 
 enable_or_restart_composer_services() {
