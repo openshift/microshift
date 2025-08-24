@@ -195,6 +195,15 @@ def get_advisories(ocp_version: str) -> dict[str, str]:
     if not advisories_found:
         raise KeyError(f"{ocp_version} OCP version advisory data not found in any YAML files from the merge request")
 
+    # Check if RPM advisory type is missing and log warning
+    if 'rpm' not in advisories_found:
+        warning_msg = (
+            f"\033[93mWARNING: RPMS are still being released via errata, please run "
+            f"\033[1m`sh advisory_publication_report.sh {ocp_version}`\033[0m\033[93m "
+            f"from 4.19 branch to see if there are any CVES that effects microshift\033[0m"
+        )
+        print(warning_msg)
+
     return advisories_found
 
 
