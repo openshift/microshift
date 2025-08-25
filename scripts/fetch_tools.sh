@@ -5,6 +5,10 @@ IFS=$'\n\t'
 
 ARCH="$(uname -m)"
 
+# Set GitHub token for private repository access
+GITHUB_TOKEN="$(cat /tmp/token-git 2>/dev/null || echo '')"
+export GITHUB_TOKEN
+
 SCRIPT_DIR="$(readlink -f "$(dirname "${BASH_SOURCE[0]}")")"
 ROOT_DIR=$(realpath "${SCRIPT_DIR}/..")
 DEFAULT_DEST_DIR="${ROOT_DIR}/_output/bin"
@@ -231,6 +235,59 @@ gettool_tar-diff() {
     for pkg in tar-diff tar-patch ; do
         GOBIN=${DEST_DIR} GOFLAGS="" go install -mod=mod github.com/containers/tar-diff/cmd/${pkg}@${ver}
     done
+}
+
+gettool_ginkgo() {
+    # shellcheck source=test/bin/common.sh
+    source "${SCRIPT_DIR}/../test/bin/common.sh"
+    # shellcheck source=test/bin/common_versions.sh
+    source "${SCRIPT_DIR}/../test/bin/common_versions.sh"
+
+    local -r repo_url="https://${GITHUB_TOKEN}@github.com/openshift/openshift-tests-private.git"
+    local -r binary_path="${GINKGO_TEST_BINARY}"
+    local -r release_branch="release-4.${MINOR_VERSION}"
+
+    # Skip if binary already exists
+    [[ -f "${binary_path}" ]] && return 0
+
+    # Check if Go is available
+    if ! command -v go &> /dev/null; then
+        echo "Error: Go is required to build openshift-tests-private binary"
+        return 1
+    fi
+
+    # Ensure binary directory exists
+    mkdir -p "$(dirname "${binary_path}")"
+
+    # Use global WORK_DIR for cloning
+    local clone_dir="${WORK_DIR}/openshift-tests-private"
+
+    # Clone repository with release branch preference
+    if ! git clone --depth 1 --branch "${release_branch}" "${repo_url}" "${clone_dir}" 2>/dev/null; then
+        echo "Branch ${release_branch} not found, cloning default branch..."
+        if ! git clone --depth 1 "${repo_url}" "${clone_dir}"; then
+            echo "Error: Failed to clone repository"
+            return 1
+        fi
+    fi
+
+    # Build the binary
+    pushd "${clone_dir}" &>/dev/null
+
+    local test_binary="./bin/extended-platform-tests"
+    go build -o "${test_binary}" ./cmd/extended-platform-tests
+
+    # Copy binary to centralized location
+    if [[ -f "${test_binary}" ]]; then
+        cp "${test_binary}" "${binary_path}"
+        chmod +x "${binary_path}"
+        echo "Binary installed to ${binary_path}"
+        popd &>/dev/null
+    else
+        echo "Error: Test binary not found after build"
+        popd &>/dev/null
+        return 1
+    fi
 }
 
 tool_getters=$(declare -F | awk '$3 ~ /^gettool_/ {print $3}' | sed 's/^gettool_//g')
