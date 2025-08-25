@@ -1,7 +1,27 @@
-- cluster-network-operator embedded-component 5e51d1d51ce0e791c46009fa4e2e6f65a17853bc to 45b0ba681e5b2ff88b75c61e17a375fe301b2bb6
-  - 61aa597 2025-07-08T09:43:58+02:00 Implement IPsec NAT-Traversal encapsulation option
-  - 2c5236c 2025-07-08T09:42:40+02:00 Bump openshift/api for IPsec encapsulation API
+- kubernetes embedded-component a6b193cd9c260cd0159d66a35b5654de32efde1f to c68a6637efaef7f3bb6f3cf4d6f2ac223c12703d
+  - 5d8fe2bc3 2025-08-06T15:50:29-04:00 UPSTREAM: 123364: Use new 1.4 NFS image
+  - 70a5bbf4f 2025-08-06T15:50:10-04:00 UPSTREAM: 123381: bump nfs-provisioner-to-v4.0.8
 
-- machine-config-operator embedded-component 4aeec11792b124a0eaa15e36b35750d25cc4be81 to cf0e2b441679f08c69083ab32dd1a4d083de0f5b
-  - 92b758b7 2025-07-22T15:53:18-04:00 container_runtime_config_controller: log MC deletion helpers: log MC deletion
+- kubernetes-kube-storage-version-migrator embedded-component 969a60e9e2466c44f5b3ffd43fe3ecab11bf1e51 to 6f2133209d90d822e79d679ed483eeb755ceaaf8
+  - 61fee14 2025-08-05T16:42:19+00:00 UPSTREAM: <carry>: Add DOWNSTREAM_OWNERS.
+
+- machine-config-operator embedded-component cf0e2b441679f08c69083ab32dd1a4d083de0f5b to cbd3b1f2d4ff551425658cca30ecf8cfc5fe3277
+  - 5751b11e 2025-08-18T18:46:08-04:00 Add workaround fix for static pod race
+
+- openshift-controller-manager embedded-component 18c8021a36cb0963a46ea45313913400404214ad to 326317ac51b73267300ff3262887dd5326ada0ac
+  - c7b1f04 2025-08-07T14:23:18+00:00 OCPBUGS-57918: handle secret not found more gracefully
+
+- ovn-kubernetes image-amd64 72502ee080b31a1e019c2ce6c74747f31728803e to 4ddb31314bc3e6372317e4b8f16982d9594e197f
+  - b667d218 2025-08-14T03:28:13+00:00 Update OWNERS file: Add Patryk/Martin as approvers
+
+- kubernetes image-amd64 a6b193cd9c260cd0159d66a35b5654de32efde1f to c68a6637efaef7f3bb6f3cf4d6f2ac223c12703d
+  - 5d8fe2bc3 2025-08-06T15:50:29-04:00 UPSTREAM: 123364: Use new 1.4 NFS image
+  - 70a5bbf4f 2025-08-06T15:50:10-04:00 UPSTREAM: 123381: bump nfs-provisioner-to-v4.0.8
+
+- ovn-kubernetes image-arm64 72502ee080b31a1e019c2ce6c74747f31728803e to 4ddb31314bc3e6372317e4b8f16982d9594e197f
+  - b667d218 2025-08-14T03:28:13+00:00 Update OWNERS file: Add Patryk/Martin as approvers
+
+- kubernetes image-arm64 a6b193cd9c260cd0159d66a35b5654de32efde1f to c68a6637efaef7f3bb6f3cf4d6f2ac223c12703d
+  - 5d8fe2bc3 2025-08-06T15:50:29-04:00 UPSTREAM: 123364: Use new 1.4 NFS image
+  - 70a5bbf4f 2025-08-06T15:50:10-04:00 UPSTREAM: 123381: bump nfs-provisioner-to-v4.0.8
 
