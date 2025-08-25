@@ -6,6 +6,8 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
     exit 1
 fi
 
+SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
 get_vrel_from_beta() {
     local -r beta_repo="$1"
     local -r beta_vrel=$(\
@@ -136,3 +138,7 @@ export BREW_Y2_RELEASE_VERSION
 export BREW_RC_RELEASE_VERSION
 export BREW_EC_RELEASE_VERSION
 export BREW_NIGHTLY_RELEASE_VERSION
+
+# Get the release type from most recent release in test/releases.yaml to be used in ostree commit names and bootc image names
+LATEST_RELEASE_TYPE="$(yq '.releases | to_entries | .[0].value.release_type' "${SCRIPTDIR}/../releases.yaml")"
+export LATEST_RELEASE_TYPE
