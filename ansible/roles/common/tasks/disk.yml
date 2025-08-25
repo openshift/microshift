@@ -13,10 +13,12 @@
     - name: Add disk info to local file
       lineinfile:
         path: "{{ filename }}"
-        line: "{{ item }}"
+        line: "{{ disk_item }}"
         create: yes
       delegate_to: localhost
       with_items:
         - "{{ item }}:"
         - "{{ disk_usage.stdout_lines }}"
+      loop_control:
+        loop_var: disk_item
 

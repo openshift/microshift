@@ -32,22 +32,49 @@
     state: link
   with_items: "{{ go_files }}"
 
+- name: check firewalld service status
+  ansible.builtin.systemd:
+    name: firewalld
+  register: firewalld_status
+  ignore_errors: true
+
 - name: start and enable firewalld
   ansible.builtin.systemd:
     name: firewalld
     state: started
     enabled: yes
+  when: firewalld_status.status.UnitFileState is not defined or firewalld_status.status.UnitFileState != 'masked'
 
 - name: check if rhel vg exists
   ansible.builtin.command: vgdisplay -s {{ vg_name }}
   register: rhel_vg_present
   ignore_errors: true
 
+- name: check if lvm disk exists
+  ansible.builtin.stat:
+    path: "{{ lvm_disk }}"
+  register: lvm_disk_stat
+  when: rhel_vg_present.rc != 0
+
 - name: create a volume group on top of secondary disk for topolvm
   community.general.lvg:
     vg: "{{ vg_name }}"
     pvs: "{{ lvm_disk }}"
-  when: rhel_vg_present.rc != 0
+  when:
+    - rhel_vg_present.rc != 0
+    - lvm_disk_stat.stat.exists
+
+- name: notify about missing lvm disk
+  ansible.builtin.debug:
+    msg: "LVM disk {{ lvm_disk }} not found, skipping TopoLVM volume group creation"
+  when:
+    - rhel_vg_present.rc != 0
+    - lvm_disk_stat is defined
+    - not lvm_disk_stat.stat.exists
+
+- name: Configure TopoLVM storage
+  include_tasks: storage.yml
+  when: rhel_vg_present.rc == 0 or (lvm_disk_stat is defined and lvm_disk_stat.stat.exists)
 
 - name: upgrade all packages
   ansible.builtin.dnf:
