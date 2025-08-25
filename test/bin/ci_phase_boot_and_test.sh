@@ -63,7 +63,7 @@ BOOT_TEST_JOB_LOG="${IMAGEDIR}/boot_test_jobs.txt"
 cd "${TESTDIR}"
 
 if [ ! -d "${RF_VENV}" ]; then
-    "${ROOTDIR}/scripts/fetch_tools.sh" robotframework
+    "${ROOTDIR}/scripts/fetch_tools.sh" robotframework ginkgo
 fi
 
 # Tell scenario.sh to merge stderr into stdout
