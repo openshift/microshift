@@ -76,7 +76,7 @@ Network APIs With Test Label Are Gone
     ...    "No resources found in <namespace> namespace." Fail if not.
     ${match_string}=    Catenate    No resources found in    ${NAMESPACE}    namespace.
     ${match_string}=    Remove String    ${match_string}    "
-    ${response}=    Run With Kubeconfig    oc get svc,ep -l app\=hello-microshift -n ${NAMESPACE}
+    ${response}=    Run With Kubeconfig    oc get svc,endpointslices -l app\=hello-microshift -n ${NAMESPACE}
     Should Be Equal As Strings    ${match_string}    ${response}    strip_spaces=True
 
 DNS Entry For Route Should Resolve

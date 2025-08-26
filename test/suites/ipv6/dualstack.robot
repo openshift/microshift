@@ -38,12 +38,12 @@ Verify New Pod Works With IPv6
 
     Wait Until Keyword Succeeds    10x    6s
     ...    Access Hello Microshift Success    ushift_ip=${USHIFT_HOST_IP1}
-    ...        ushift_port=${HTTP_PORT}
-    ...        hostname=${HOSTNAME}
+    ...    ushift_port=${HTTP_PORT}
+    ...    hostname=${HOSTNAME}
     Wait Until Keyword Succeeds    10x    6s
     ...    Access Hello Microshift Success    ushift_ip=${USHIFT_HOST_IP2}
-    ...        ushift_port=${HTTP_PORT}
-    ...        hostname=${HOSTNAME}
+    ...    ushift_port=${HTTP_PORT}
+    ...    hostname=${HOSTNAME}
 
     [Teardown]    Run Keywords
     ...    Delete Hello MicroShift Route
@@ -69,12 +69,12 @@ Verify New Pod Works With IPv4
 
     Wait Until Keyword Succeeds    10x    6s
     ...    Access Hello Microshift Success    ushift_ip=${USHIFT_HOST_IP1}
-    ...        ushift_port=${HTTP_PORT}
-    ...        hostname=${HOSTNAME}
+    ...    ushift_port=${HTTP_PORT}
+    ...    hostname=${HOSTNAME}
     Wait Until Keyword Succeeds    10x    6s
     ...    Access Hello Microshift Success    ushift_ip=${USHIFT_HOST_IP2}
-    ...        ushift_port=${HTTP_PORT}
-    ...        hostname=${HOSTNAME}
+    ...    ushift_port=${HTTP_PORT}
+    ...    hostname=${HOSTNAME}
 
     [Teardown]    Run Keywords
     ...    Delete Hello MicroShift Route
@@ -162,7 +162,7 @@ Network APIs With Test Label Are Gone
     ...    "No resources found in <namespace> namespace." Fail if not.
     ${match_string}=    Catenate    No resources found in    ${NAMESPACE}    namespace.
     ${match_string}=    Remove String    ${match_string}    "
-    ${response}=    Run With Kubeconfig    oc get svc,ep -l app\=hello-microshift -n ${NAMESPACE}
+    ${response}=    Run With Kubeconfig    oc get svc,endpointslices -l app\=hello-microshift -n ${NAMESPACE}
     Should Be Equal As Strings    ${match_string}    ${response}    strip_spaces=True
 
 Restart Router

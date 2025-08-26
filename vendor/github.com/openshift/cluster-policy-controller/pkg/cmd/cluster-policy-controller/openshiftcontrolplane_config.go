@@ -28,8 +28,6 @@ func asOpenshiftControllerManagerConfig(config *unstructured.Unstructured) (*ope
 }
 
 func setRecommendedOpenShiftControllerConfigDefaults(config *openshiftcontrolplanev1.OpenShiftControllerManagerConfig) {
-	configdefaults.SetRecommendedKubeClientConfigDefaults(&config.KubeClientConfig)
-
 	configdefaults.DefaultStringSlice(&config.Controllers, []string{"*"})
 
 	configdefaults.DefaultString(&config.SecurityAllocator.UIDAllocatorRange, "1000000000-1999999999/10000")

@@ -43,7 +43,7 @@ Teardown
 Configure New Hostname
     [Documentation]    Configures ${NEW_HOSTNAME} in the MicroShift host.
     ${old}=    Setup Hostname    ${NEW_HOSTNAME}
-    Set Suite Variable    \${OLD_HOSTNAME}    ${old}
+    VAR    ${OLD_HOSTNAME}=    ${old}    scope=SUITE
 
 Restore Old Hostname
     [Documentation]    Configure old hostname again in the MicroShift host.

@@ -10,9 +10,9 @@ Test Tags           offline
 
 
 *** Variables ***
-${MODEL_NAME}=      openvino-resnet
-${DOMAIN}=          ${MODEL_NAME}-predictor-test-ai.apps.example.com
-${IP}=              10.44.0.1
+${MODEL_NAME}       openvino-resnet
+${DOMAIN}           ${MODEL_NAME}-predictor-test-ai.apps.example.com
+${IP}               10.44.0.1
 
 
 *** Test Cases ***
@@ -79,7 +79,7 @@ Query Model Server
     ...    --connect-to "${DOMAIN}::${IP}:"
     ${output}=    Guest Process Should Succeed    ${cmd}
     ${result}=    Json Parse    ${output}
-    ${data}=    Set Variable    ${result["outputs"][0]["data"]}
+    VAR    ${data}=    ${result["outputs"][0]["data"]}
     # Following expression can be referred to as 'argmax': index of the highest element.
     ${argmax}=    Evaluate    ${data}.index(max(${data}))
 

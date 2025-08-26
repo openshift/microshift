@@ -20,6 +20,7 @@ import (
 	"context"
 	"math"
 	"os"
+	"syscall"
 	"time"
 
 	"github.com/openshift/microshift/pkg/config"
@@ -91,6 +92,17 @@ func getSysMonTimes() (int64, int64) {
 	return stm.Sec, mtm.Sec
 }
 
+func sendSigterm() {
+	pid := os.Getpid()
+	klog.Infof("Sending SIGTERM to self (pid %d) to initiate graceful shutdown", pid)
+	p, _ := os.FindProcess(pid)
+	err := p.Signal(syscall.SIGTERM)
+	if err != nil {
+		klog.Errorf("failed to send SIGTERM to self. Forcing shutdown: %v", err)
+		os.Exit(1)
+	}
+}
+
 func (c *SysConfWatchController) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
 	defer close(stopped)
 	ticker := time.NewTicker(sysConfigCheckInterval)
@@ -110,26 +122,26 @@ func (c *SysConfWatchController) Run(ctx context.Context, ready chan<- struct{},
 			// Check the IP change
 			currentIP, err := util.GetHostIP(c.userNodeIP)
 			if err != nil {
-				klog.Warningf("cannot find an host IP: %v", err)
-				os.Exit(1)
+				klog.Warningf("Restarting MicroShift. Cannot find a host IP: %v", err)
+				go sendSigterm()
 				return nil
 			}
 			if c.NodeIP != currentIP {
-				klog.Warningf("IP address has changed from %q to %q, restarting MicroShift", c.NodeIP, currentIP)
-				os.Exit(1)
+				klog.Warningf("Restarting MicroShift. IP address has changed from %q to %q", c.NodeIP, currentIP)
+				go sendSigterm()
 				return nil
 			}
 			// Dual stack case
 			if c.NodeIPv6 != "" {
 				currentIP, err = util.GetHostIPv6(c.userNodeIPv6)
 				if err != nil {
-					klog.Warningf("cannot find an host IP: %v", err)
-					os.Exit(1)
+					klog.Warningf("Restarting MicroShift. Cannot find a host IPv6: %v", err)
+					go sendSigterm()
 					return nil
 				}
 				if c.NodeIPv6 != currentIP {
-					klog.Warningf("IP address has changed from %q to %q, restarting MicroShift", c.NodeIPv6, currentIP)
-					os.Exit(1)
+					klog.Warningf("Restarting MicroShift. IP address has changed from %q to %q", c.NodeIPv6, currentIP)
+					go sendSigterm()
 					return nil
 				}
 			}
@@ -155,7 +167,7 @@ func (c *SysConfWatchController) Run(ctx context.Context, ready chan<- struct{},
 					mtimeRef = mtimeCur
 				} else {
 					klog.Warningf("realtime clock change detected, time drifted %v seconds, restarting MicroShift", smtDiffDrift)
-					os.Exit(0)
+					go sendSigterm()
 					return nil
 				}
 			}

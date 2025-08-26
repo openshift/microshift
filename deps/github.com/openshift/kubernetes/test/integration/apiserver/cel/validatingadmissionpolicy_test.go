@@ -20,7 +20,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"k8s.io/apimachinery/pkg/util/version"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -2237,9 +2236,9 @@ func Test_CostLimitForValidation(t *testing.T) {
 func Test_CostLimitForValidationWithFeatureDisabled(t *testing.T) {
 	resetPolicyRefreshInterval := generic.SetPolicyRefreshIntervalForTests(policyRefreshInterval)
 	defer resetPolicyRefreshInterval()
-	featuregatetesting.SetFeatureGateEmulationVersionDuringTest(t, utilfeature.DefaultFeatureGate, version.MustParse("1.31"))
-	featuregatetesting.SetFeatureGateDuringTest(t, utilfeature.DefaultFeatureGate, genericfeatures.StrictCostEnforcementForVAP, false)
-	server, err := apiservertesting.StartTestServer(t, &apiservertesting.TestServerInstanceOptions{EmulationVersion: "1.31"}, []string{
+	server, err := apiservertesting.StartTestServer(t, nil, []string{
+		"--emulated-version", "1.31",
+		"--feature-gates", "StrictCostEnforcementForVAP=false",
 		"--enable-admission-plugins", "ValidatingAdmissionPolicy",
 	}, framework.SharedEtcd())
 	if err != nil {
@@ -3060,6 +3059,7 @@ func createAndWaitReadyNamespacedWithWarnHandler(t *testing.T, client clientset.
 		testMarkerName = testMarkerNameAnnotation
 	}
 
+	//nolint:staticcheck // SA1019 skip linter to allow cherrypick.
 	marker := &v1.Endpoints{ObjectMeta: metav1.ObjectMeta{Name: testMarkerName, Namespace: ns, Labels: matchLabels}}
 	defer func() {
 		err := client.CoreV1().Endpoints(ns).Delete(context.TODO(), marker.Name, metav1.DeleteOptions{})

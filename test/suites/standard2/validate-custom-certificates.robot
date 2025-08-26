@@ -25,7 +25,7 @@ Test Missing File
     [Documentation]    Missing certificate files should be ignored with a warning
     [Setup]    Setup Test
     ${cursor}=    Get Journal Cursor
-    Set Suite Variable    \${CURSOR}    ${cursor}
+    VAR    ${CURSOR}=    ${cursor}    scope=SUITE
     Configure Named Certificates    ${TMPDIR}/server.crt    ${TMPDIR}/server.key
     Restart MicroShift
     Pattern Should Appear In Log Output    ${CURSOR}    unparsable certificates are ignored
@@ -51,7 +51,7 @@ Test Local Cert
     [Documentation]    localhost certs should be ignored with a warning
     [Setup]    Setup Test
     ${cursor}=    Get Journal Cursor
-    Set Suite Variable    \${CURSOR}    ${cursor}
+    VAR    ${CURSOR}=    ${cursor}    scope=SUITE
     Create Keys
     Create Cert    TestCN    localhost
     Upload Certificates
@@ -118,7 +118,7 @@ Setup
 Setup Test
     [Documentation]    Test suite setup
     ${tmp}=    Create Random Temp Directory
-    Set Global Variable    ${TMPDIR}    ${tmp}
+    VAR    ${TMPDIR}=    ${tmp}    scope=GLOBAL
 
 Teardown
     [Documentation]    Test suite teardown
@@ -133,29 +133,20 @@ Create Keys
     Openssl    req -x509 -new -nodes -key ${TMPDIR}/ca.key -subj "/CN\=${MASTER_IP}"
     ...    -days 10000 -out ${TMPDIR}/ca.crt
 
-Create Cert No San
-    [Documentation]    Create a certificate
-    [Arguments]    ${cert_cn}
-    Set Global Variable    ${CERT_CN}
-    Generate CSR Config    ${CSR_NOSAN_CONFIG}    ${TMPDIR}/csr.conf
-    Openssl    req -new -key ${TMPDIR}/server.key -out ${TMPDIR}/server.csr -config ${TMPDIR}/csr.conf
-    Openssl    x509 -req -in ${TMPDIR}/server.csr -CA ${TMPDIR}/ca.crt -CAkey ${TMPDIR}/ca.key -CAcreateserial
-    ...    -out ${TMPDIR}/server.crt -days 10000 -extensions v3_ext -extfile ${TMPDIR}/csr.conf -sha256
-
 Create Cert
     [Documentation]    Create a certificate
     [Arguments]    ${cert_cn}    ${cert_san_dns}=${EMPTY}    ${cert_san_ip}=${EMPTY}    ${expiry_days}=1000
-    Set Global Variable    ${CERT_CN}
+    VAR    ${CERT_CN}=    ${cert_cn}    scope=GLOBAL
     IF    "${cert_san_dns}"!="${EMPTY}"
-        Set Global Variable    ${CERT_SAN_DNS}    DNS.1 = ${cert_san_dns}
+        VAR    ${CERT_SAN_DNS}=    DNS.1 = ${cert_san_dns}    scope=GLOBAL
     ELSE
-        Set Global Variable    ${CERT_SAN_DNS}
+        VAR    ${CERT_SAN_DNS}=    ${EMPTY}    scope=GLOBAL
     END
 
     IF    "${cert_san_ip}"!="${EMPTY}"
-        Set Global Variable    ${CERT_SAN_IP}    IP.1 = ${cert_san_ip}
+        VAR    ${CERT_SAN_IP}=    IP.1 = ${cert_san_ip}    scope=GLOBAL
     ELSE
-        Set Global Variable    ${CERT_SAN_IP}
+        VAR    ${CERT_SAN_IP}=    ${EMPTY}    scope=GLOBAL
     END
     Generate CSR Config    ${CSR_CONFIG}    ${TMPDIR}/csr.conf
     Openssl    req -new -key ${TMPDIR}/server.key -out ${TMPDIR}/server.csr -config ${TMPDIR}/csr.conf
@@ -194,7 +185,7 @@ Generate Random HostName
 Add Entry To Hosts
     [Documentation]    Add new entry to local /etc/hosts
     [Arguments]    ${ip}    ${host}
-    ${ttt}=    Set Variable    ${ip}\t${host} # RF test marker\n
+    VAR    ${ttt}=    ${ip}\t${host} # RF test marker\n
     ${result}=    Run Process    sudo tee -a /etc/hosts    shell=True    stdin=${ttt}
     Should Be Equal As Integers    ${result.rc}    0
 

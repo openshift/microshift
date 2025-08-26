@@ -112,9 +112,12 @@ func (c RotatedSelfSignedCertKeySecret) EnsureTargetCertKeyPair(ctx context.Cont
 		creationRequired = true
 	}
 
-	needsMetadataUpdate := ensureMetadataUpdate(targetCertKeyPairSecret, c.Owner, c.AdditionalAnnotations)
-	needsTypeChange := ensureSecretTLSTypeSet(targetCertKeyPairSecret)
-	updateRequired = needsMetadataUpdate || needsTypeChange
+	// run Update if metadata needs changing unless we're in RefreshOnlyWhenExpired mode
+	if !c.RefreshOnlyWhenExpired {
+		needsMetadataUpdate := ensureMetadataUpdate(targetCertKeyPairSecret, c.Owner, c.AdditionalAnnotations)
+		needsTypeChange := ensureSecretTLSTypeSet(targetCertKeyPairSecret)
+		updateRequired = needsMetadataUpdate || needsTypeChange
+	}
 
 	if reason := c.CertCreator.NeedNewTargetCertKeyPair(targetCertKeyPairSecret, signingCertKeyPair, caBundleCerts, c.Refresh, c.RefreshOnlyWhenExpired, creationRequired); len(reason) > 0 {
 		c.EventRecorder.Eventf("TargetUpdateRequired", "%q in %q requires a new target cert/key pair: %v", c.Name, c.Namespace, reason)
@@ -136,6 +139,10 @@ func (c RotatedSelfSignedCertKeySecret) EnsureTargetCertKeyPair(ctx context.Cont
 		targetCertKeyPairSecret = actualTargetCertKeyPairSecret
 	} else if updateRequired {
 		actualTargetCertKeyPairSecret, err := c.Client.Secrets(c.Namespace).Update(ctx, targetCertKeyPairSecret, metav1.UpdateOptions{})
+		if apierrors.IsConflict(err) {
+			// ignore error if its attempting to update outdated version of the secret
+			return nil, nil
+		}
 		resourcehelper.ReportUpdateEvent(c.EventRecorder, actualTargetCertKeyPairSecret, err)
 		if err != nil {
 			return nil, err
@@ -251,8 +258,8 @@ func setTargetCertKeyPairSecret(targetCertKeyPairSecret *corev1.Secret, validity
 	if err != nil {
 		return err
 	}
-	targetCertKeyPairSecret.Annotations[CertificateNotAfterAnnotation] = certKeyPair.Certs[0].NotAfter.Format(time.RFC3339)
-	targetCertKeyPairSecret.Annotations[CertificateNotBeforeAnnotation] = certKeyPair.Certs[0].NotBefore.Format(time.RFC3339)
+	annotations.NotBefore = certKeyPair.Certs[0].NotBefore.Format(time.RFC3339)
+	annotations.NotAfter = certKeyPair.Certs[0].NotAfter.Format(time.RFC3339)
 	targetCertKeyPairSecret.Annotations[CertificateIssuer] = certKeyPair.Certs[0].Issuer.CommonName
 
 	_ = annotations.EnsureTLSMetadataUpdate(&targetCertKeyPairSecret.ObjectMeta)

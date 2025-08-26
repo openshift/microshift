@@ -1,0 +1,8 @@
+resources:
+- manager.yaml
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+images:
+- name: controller
+  newName: registry.redhat.io/cert-manager/cert-manager-operator-rhel9@sha256
+  newTag: 4d5e238300ce6f427a1045d51d6b37a4e5c5633985208ebb44f91e7dd53897d9

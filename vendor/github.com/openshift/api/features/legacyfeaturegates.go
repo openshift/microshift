@@ -17,8 +17,6 @@ var legacyFeatureGates = sets.New(
 	// never add to this list, if you think you have an exception ask @deads2k
 	"AzureWorkloadIdentity",
 	// never add to this list, if you think you have an exception ask @deads2k
-	"BareMetalLoadBalancer",
-	// never add to this list, if you think you have an exception ask @deads2k
 	"BootcNodeManagement",
 	// never add to this list, if you think you have an exception ask @deads2k
 	"BuildCSIVolumes",
@@ -40,8 +38,6 @@ var legacyFeatureGates = sets.New(
 	"Example2",
 	// never add to this list, if you think you have an exception ask @deads2k
 	"GCPClusterHostedDNS",
-	// never add to this list, if you think you have an exception ask @deads2k
-	"GCPLabelsTags",
 	// never add to this list, if you think you have an exception ask @deads2k
 	"GatewayAPI",
 	// never add to this list, if you think you have an exception ask @deads2k
@@ -93,8 +89,6 @@ var legacyFeatureGates = sets.New(
 	// never add to this list, if you think you have an exception ask @deads2k
 	"NewOLM",
 	// never add to this list, if you think you have an exception ask @deads2k
-	"NodeDisruptionPolicy",
-	// never add to this list, if you think you have an exception ask @deads2k
 	"OVNObservability",
 	// never add to this list, if you think you have an exception ask @deads2k
 	"OnClusterBuild",
@@ -102,8 +96,6 @@ var legacyFeatureGates = sets.New(
 	"PersistentIPsForVirtualization",
 	// never add to this list, if you think you have an exception ask @deads2k
 	"PinnedImages",
-	// never add to this list, if you think you have an exception ask @deads2k
-	"PlatformOperators",
 	// never add to this list, if you think you have an exception ask @deads2k
 	"PrivateHostedZoneAWS",
 	// never add to this list, if you think you have an exception ask @deads2k

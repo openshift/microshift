@@ -20,7 +20,7 @@ Setup Suite With Namespace
     Login MicroShift Host
     Setup Kubeconfig
     ${ns}=    Create Unique Namespace
-    Set Suite Variable    \${NAMESPACE}    ${ns}
+    VAR    ${NAMESPACE}=    ${ns}    scope=SUITE
 
 Create Unique Namespace
     [Documentation]    Creates a namespace with a unique suffix
@@ -58,7 +58,7 @@ Create Random Temp File
     Create File    ${path}    ${content}
     RETURN    ${path}
 
-Upload String To File    # robocop: disable=too-many-calls-in-keyword
+Upload String To File    # robocop: off=too-many-calls-in-keyword
     [Documentation]    Write the string to a remote file
     [Arguments]    ${content}    ${remote_filename}
     ${rand}=    Generate Random String

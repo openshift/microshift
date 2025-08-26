@@ -1,9 +1,9 @@
 *** Settings ***
 Documentation       Keywords for running the microshift command line.
 
+Library             OperatingSystem
 Library             Process
 Library             String
-Library             OperatingSystem
 Library             SSHLibrary
 Resource            oc.resource
 Resource            systemd.resource

@@ -25,17 +25,6 @@ func TestModifyStaticPodForPinnedManagementErrorStates(t *testing.T) {
 					Name:  "nginx",
 					Image: "test/image",
 					Resources: v1.ResourceRequirements{
-						Requests: nil,
-					},
-				}),
-			expectedError: fmt.Errorf("managed container nginx does not have Resource.Requests"),
-		},
-		{
-			pod: createPod(workloadAnnotations, nil,
-				&v1.Container{
-					Name:  "nginx",
-					Image: "test/image",
-					Resources: v1.ResourceRequirements{
 						Requests: v1.ResourceList{
 							v1.ResourceName(v1.ResourceMemory): resource.MustParse("100m"),
 						},
@@ -129,6 +118,7 @@ func TestStaticPodManaged(t *testing.T) {
 		pod                 *v1.Pod
 		expectedAnnotations map[string]string
 		isGuaranteed        bool
+		isBestEffort        bool
 	}{
 		{
 			pod: &v1.Pod{
@@ -152,6 +142,47 @@ func TestStaticPodManaged(t *testing.T) {
 							Resources: v1.ResourceRequirements{
 								Requests: v1.ResourceList{
 									v1.ResourceName(v1.ResourceCPU):    resource.MustParse("100m"),
+									v1.ResourceName(v1.ResourceMemory): resource.MustParse("100m"),
+								},
+							},
+						},
+					},
+					SecurityContext: &v1.PodSecurityContext{},
+				},
+				Status: v1.PodStatus{
+					Phase: v1.PodPending,
+				},
+			},
+			expectedAnnotations: map[string]string{
+				"target.workload.openshift.io/management": `{"effect": "PreferredDuringScheduling"}`,
+				"resources.workload.openshift.io/nginx":   `{"cpushares":102}`,
+			},
+		},
+		{
+			pod: &v1.Pod{
+				TypeMeta: metav1.TypeMeta{
+					Kind:       "Pod",
+					APIVersion: "",
+				},
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "test",
+					UID:       "12345",
+					Namespace: "mynamespace",
+					Annotations: map[string]string{
+						"target.workload.openshift.io/management": `{"effect": "PreferredDuringScheduling"}`,
+					},
+				},
+				Spec: v1.PodSpec{
+					Containers: []v1.Container{
+						{
+							Name:  "nginx",
+							Image: "test/image",
+							Resources: v1.ResourceRequirements{
+								Requests: v1.ResourceList{
+									v1.ResourceName(v1.ResourceMemory): resource.MustParse("100m"),
+									v1.ResourceName(v1.ResourceCPU):    resource.MustParse("100m"),
+								},
+								Limits: v1.ResourceList{
 									v1.ResourceName(v1.ResourceMemory): resource.MustParse("100m"),
 								},
 							},
@@ -269,6 +300,164 @@ func TestStaticPodManaged(t *testing.T) {
 				"target.workload.openshift.io/management": `{"effect": "PreferredDuringScheduling"}`,
 				"resources.workload.openshift.io/c1":      `{"cpushares":20,"cpulimit":100}`,
 			},
+		},
+		{
+			pod: &v1.Pod{
+				TypeMeta: metav1.TypeMeta{
+					Kind:       "Pod",
+					APIVersion: "",
+				},
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "test",
+					UID:       "12345",
+					Namespace: "mynamespace",
+					Annotations: map[string]string{
+						"target.workload.openshift.io/management": `{"effect": "PreferredDuringScheduling"}`,
+					},
+				},
+				Spec: v1.PodSpec{
+					Containers: []v1.Container{
+						{
+							Name:      "c1",
+							Image:     "test/nginx",
+							Resources: v1.ResourceRequirements{},
+						},
+					},
+					SecurityContext: &v1.PodSecurityContext{},
+				},
+				Status: v1.PodStatus{
+					Phase: v1.PodPending,
+				},
+			},
+			expectedAnnotations: map[string]string{
+				"target.workload.openshift.io/management": `{"effect": "PreferredDuringScheduling"}`,
+			},
+			isBestEffort: true,
+		},
+		{
+			pod: &v1.Pod{
+				TypeMeta: metav1.TypeMeta{
+					Kind:       "Pod",
+					APIVersion: "",
+				},
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "test",
+					UID:       "12345",
+					Namespace: "mynamespace",
+					Annotations: map[string]string{
+						"target.workload.openshift.io/management": `{"effect": "PreferredDuringScheduling"}`,
+					},
+				},
+				Spec: v1.PodSpec{
+					Containers: []v1.Container{
+						{
+							Name:  "c1",
+							Image: "test/nginx",
+							Resources: v1.ResourceRequirements{
+								Requests: v1.ResourceList{
+									v1.ResourceName("dummy"): resource.MustParse("20m"),
+								},
+							},
+						},
+					},
+					SecurityContext: &v1.PodSecurityContext{},
+				},
+				Status: v1.PodStatus{
+					Phase: v1.PodPending,
+				},
+			},
+			expectedAnnotations: map[string]string{
+				"target.workload.openshift.io/management": `{"effect": "PreferredDuringScheduling"}`,
+			},
+			isBestEffort: true,
+		},
+		{
+			pod: &v1.Pod{
+				TypeMeta: metav1.TypeMeta{
+					Kind:       "Pod",
+					APIVersion: "",
+				},
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "test",
+					UID:       "12345",
+					Namespace: "mynamespace",
+					Annotations: map[string]string{
+						"target.workload.openshift.io/management": `{"effect": "PreferredDuringScheduling"}`,
+					},
+				},
+				Spec: v1.PodSpec{
+					Containers: []v1.Container{
+						{
+							Name:      "c1",
+							Image:     "test/nginx",
+							Resources: v1.ResourceRequirements{},
+						},
+					},
+					InitContainers: []v1.Container{
+						{
+							Name:      "ic1",
+							Image:     "test/nginx",
+							Resources: v1.ResourceRequirements{},
+						},
+					},
+					SecurityContext: &v1.PodSecurityContext{},
+				},
+				Status: v1.PodStatus{
+					Phase: v1.PodPending,
+				},
+			},
+			expectedAnnotations: map[string]string{
+				"target.workload.openshift.io/management": `{"effect": "PreferredDuringScheduling"}`,
+			},
+			isBestEffort: true,
+		},
+		{
+			pod: &v1.Pod{
+				TypeMeta: metav1.TypeMeta{
+					Kind:       "Pod",
+					APIVersion: "",
+				},
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "test",
+					UID:       "12345",
+					Namespace: "mynamespace",
+					Annotations: map[string]string{
+						"target.workload.openshift.io/management": `{"effect": "PreferredDuringScheduling"}`,
+					},
+				},
+				Spec: v1.PodSpec{
+					Containers: []v1.Container{
+						{
+							Name:  "c1",
+							Image: "test/nginx",
+							Resources: v1.ResourceRequirements{
+								Requests: v1.ResourceList{
+									v1.ResourceName("dummy"): resource.MustParse("20m"),
+								},
+							},
+						},
+					},
+					InitContainers: []v1.Container{
+						{
+							Name:  "ic1",
+							Image: "test/nginx",
+							Resources: v1.ResourceRequirements{
+								Requests: v1.ResourceList{
+									v1.ResourceName("dummy"): resource.MustParse("20m"),
+								},
+							},
+						},
+					},
+					SecurityContext: &v1.PodSecurityContext{},
+				},
+				Status: v1.PodStatus{
+					Phase: v1.PodPending,
+				},
+			},
+			expectedAnnotations: map[string]string{
+				"target.workload.openshift.io/management": `{"effect": "PreferredDuringScheduling"}`,
+			},
+			isBestEffort: true,
 		},
 		{
 			pod: &v1.Pod{
@@ -481,14 +670,23 @@ func TestStaticPodManaged(t *testing.T) {
 			if container.Resources.Requests.Cpu().String() != "0" && !tc.isGuaranteed {
 				t.Errorf("cpu requests should be 0 got %v", container.Resources.Requests.Cpu().String())
 			}
-			if container.Resources.Requests.Memory().String() == "0" && !tc.isGuaranteed {
-				t.Errorf("memory requests were %v but should be %v", container.Resources.Requests.Memory().String(), container.Resources.Requests.Memory().String())
+			if container.Resources.Requests.Memory().String() == "0" && !tc.isGuaranteed && !tc.isBestEffort {
+				t.Errorf("memory requests were %v but should be %v in container %v", container.Resources.Requests.Memory().String(), container.Resources.Requests.Memory().String(), container.Name)
 			}
-			if _, exists := container.Resources.Requests[GenerateResourceName(workloadName)]; !exists && !tc.isGuaranteed {
+			if container.Resources.Requests.Memory().String() != "0" && !tc.isGuaranteed && tc.isBestEffort {
+				t.Errorf("memory requests should be 0 got %v", container.Resources.Requests.Memory().String())
+			}
+			if _, exists := container.Resources.Requests[GenerateResourceName(workloadName)]; !exists && !tc.isGuaranteed && !tc.isBestEffort {
 				t.Errorf("managed capacity label missing from pod %v and container %v", tc.pod.Name, container.Name)
 			}
-			if _, exists := container.Resources.Limits[GenerateResourceName(workloadName)]; !exists && !tc.isGuaranteed {
+			if _, exists := container.Resources.Limits[GenerateResourceName(workloadName)]; !exists && !tc.isGuaranteed && !tc.isBestEffort {
 				t.Errorf("managed capacity label missing from pod %v and container %v limits", tc.pod.Name, container.Name)
+			}
+			if _, exists := container.Resources.Requests[GenerateResourceName(workloadName)]; exists && tc.isBestEffort {
+				t.Errorf("managed capacity label present in best-effort pod %v and container %v requests", tc.pod.Name, container.Name)
+			}
+			if _, exists := container.Resources.Limits[GenerateResourceName(workloadName)]; exists && tc.isBestEffort {
+				t.Errorf("managed capacity label present in best-effort pod %v and container %v limits", tc.pod.Name, container.Name)
 			}
 		}
 	}

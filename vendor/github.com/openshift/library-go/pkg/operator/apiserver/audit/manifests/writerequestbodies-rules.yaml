@@ -8,6 +8,8 @@
     resources: ["tokenreviews", "tokenrequests"]
   - group: "oauth.openshift.io"
     resources: ["oauthclients", "tokenreviews"]
+  - group: "machineconfiguration.openshift.io"
+    resource: ["machineconfig", "controllerconfig"]
 # log request and response payloads for all write requests
 - level: RequestResponse
   verbs:

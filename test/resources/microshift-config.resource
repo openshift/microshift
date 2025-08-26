@@ -1,16 +1,16 @@
 *** Settings ***
 Documentation       Keywords for running the microshift command line.
 
+Library             OperatingSystem
 Library             Process
 Library             String
-Library             OperatingSystem
 Library             SSHLibrary
 Library             DataFormats.py
 Resource            common.resource
 
 
 *** Variables ***
-${LVMD_VG_OVERRIDE}=    ${EMPTY}
+${LVMD_VG_OVERRIDE}     ${EMPTY}
 
 
 *** Keywords ***
@@ -26,9 +26,9 @@ Save Default MicroShift Config
     ...    cat /etc/microshift/config.yaml
     ...    sudo=True    return_rc=True
     IF    ${rc} == 0
-        Set Suite Variable    \${DEFAULT_MICROSHIFT_CONFIG}    ${stdout}
+        VAR    ${DEFAULT_MICROSHIFT_CONFIG}=    ${stdout}    scope=SUITE
     ELSE
-        Set Suite Variable    \${DEFAULT_MICROSHIFT_CONFIG}    ${EMPTY}
+        VAR    ${DEFAULT_MICROSHIFT_CONFIG}=    ${EMPTY}    scope=SUITE
     END
 
 Restore Default MicroShift Config
@@ -89,9 +89,9 @@ Save Lvmd Config
     ...    cat /etc/microshift/lvmd.yaml
     ...    sudo=True    return_rc=True
     IF    ${rc} == 0
-        Set Suite Variable    \${DEFAULT_LVMD_CONFIG}    ${stdout}
+        VAR    ${DEFAULT_LVMD_CONFIG}=    ${stdout}    scope=SUITE
     ELSE
-        Set Suite Variable    \${DEFAULT_LVMD_CONFIG}    ${EMPTY}
+        VAR    ${DEFAULT_LVMD_CONFIG}=    ${EMPTY}    scope=SUITE
     END
 
 Extend Lvmd Config

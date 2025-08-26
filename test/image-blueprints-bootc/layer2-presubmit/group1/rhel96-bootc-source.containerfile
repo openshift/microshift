@@ -15,7 +15,10 @@ COPY ./bootc-images/$USHIFT_RPM_REPO_NAME.repo ./bootc-images/microshift-fast-da
 # Install MicroShift, test agent and cleanup.
 RUN dnf repoinfo --enabled && \
     dnf install -y firewalld systemd-resolved \
-        "microshift-{{ .Env.SOURCE_VERSION }}" "microshift-release-info-{{ .Env.SOURCE_VERSION }}" && \
+        {{ range (env.Getenv "MICROSHIFT_MANDATORY_RPMS" | strings.Split " ") -}}
+        "{{ . }}-{{ env.Getenv "SOURCE_VERSION" }}" \
+        {{ end -}}
+        && \
     systemctl enable microshift microshift-test-agent && \
     rm -vf /etc/yum.repos.d/microshift-*.repo && \
     rm -rvf $USHIFT_RPM_REPO_PATH && \

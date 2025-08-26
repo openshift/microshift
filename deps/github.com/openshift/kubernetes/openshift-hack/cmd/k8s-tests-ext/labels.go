@@ -6,21 +6,6 @@ import (
 
 func addLabelsToSpecs(specs et.ExtensionTestSpecs) {
 	var namesByLabel = map[string][]string{
-		// tests too slow to be part of conformance
-		"[Slow]": {
-			"[sig-scalability]",                            // disable from the default set for now
-			"should create and stop a working application", // Inordinately slow tests
-
-			"[Feature:PerformanceDNS]", // very slow
-
-			"validates that there exists conflict between pods with same hostPort and protocol but one using 0.0.0.0 hostIP", // 5m, really?
-		},
-		// tests that are known flaky
-		"[Flaky]": {
-			"Job should run a job to completion when tasks sometimes fail and are not locally restarted", // seems flaky, also may require too many resources
-			// TODO(node): test works when run alone, but not in the suite in CI
-			"[Feature:HPA] Horizontal pod autoscaling (scale resource: CPU) [sig-autoscaling] ReplicationController light Should scale from 1 pod to 2 pods",
-		},
 		// tests that must be run without competition
 		"[Serial]": {
 			"[Disruptive]",
@@ -37,6 +22,29 @@ func addLabelsToSpecs(specs et.ExtensionTestSpecs) {
 			"should prevent Ingress creation if more than 1 IngressClass marked as default", // https://bugzilla.redhat.com/show_bug.cgi?id=1822286
 
 			"[sig-network] IngressClass [Feature:Ingress] should set default value on new IngressClass", //https://bugzilla.redhat.com/show_bug.cgi?id=1833583
+		},
+		"[sig-node]": {
+			"[NodeConformance]",
+			"NodeLease",
+			"lease API",
+			"[NodeFeature",
+			"[NodeAlphaFeature",
+			"Probing container",
+			"Security Context When creating a",
+			"Downward API should create a pod that prints his name and namespace",
+			"Liveness liveness pods should be automatically restarted",
+			"Secret should create a pod that reads a secret",
+			"Pods should delete a collection of pods",
+			"Pods should run through the lifecycle of Pods and PodStatus",
+		},
+		"[sig-cluster-lifecycle]": {
+			"Feature:ClusterAutoscalerScalability",
+			"recreate nodes and ensure they function",
+		},
+		"[sig-arch]": {
+			// not run, assigned to arch as catch-all
+			"[Feature:GKELocalSSD]",
+			"[Feature:GKENodePool]",
 		},
 	}
 

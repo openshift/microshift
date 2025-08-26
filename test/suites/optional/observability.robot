@@ -27,18 +27,18 @@ ${TEST_CONFIG_PATH}         assets/observability/otel_config.yaml
 Host Metrics Are Exported
     [Documentation]    The opentelemetry-collector should be able to export host metrics.
 
-    Set Test Variable    ${METRIC}    system_cpu_time_seconds_total{cpu="cpu0",state="idle"}
+    VAR    ${METRIC}    system_cpu_time_seconds_total{cpu="cpu0",state="idle"}    scope=TEST
     Check Prometheus Query    ${PROMETHEUS_HOST}    ${PROMETHEUS_PORT}    ${METRIC}
     Check Prometheus Exporter    ${USHIFT_HOST}    ${PROM_EXPORTER_PORT}    ${METRIC}
 
 Kube Metrics Are Exported
     [Documentation]    The opentelemetry-collector should be able to export kube metrics.
 
-    Set Test Variable    ${METRIC}    container_cpu_time_seconds_total
+    VAR    ${METRIC}    container_cpu_time_seconds_total    scope=TEST
     Check Prometheus Query    ${PROMETHEUS_HOST}    ${PROMETHEUS_PORT}    ${METRIC}
     Check Prometheus Exporter    ${USHIFT_HOST}    ${PROM_EXPORTER_PORT}    ${METRIC}
 
-    Set Test Variable    ${METRIC}    k8s_pod_cpu_time_seconds_total
+    VAR    ${METRIC}    k8s_pod_cpu_time_seconds_total    scope=TEST
     Check Prometheus Query    ${PROMETHEUS_HOST}    ${PROMETHEUS_PORT}    ${METRIC}
     Check Prometheus Exporter    ${USHIFT_HOST}    ${PROM_EXPORTER_PORT}    ${METRIC}
 
@@ -56,7 +56,7 @@ Logs Should Not Contain Receiver Errors
     [Documentation]    Internal receiver errors are not treated as fatal. Typically these are due to a misconfiguration
     ...    and thus indicate the provided default config should be reviewed.
 
-    ${pattern}    Catenate    SEPARATOR=
+    ${pattern}    Catenate    SEPARATOR=${EMPTY}
     ...    \\s+\\{"error":.*\\}
     Pattern Should Not Appear In Log Output    ${JOURNAL_CUR}    ${pattern}    unit="microshift-observability"
 
@@ -71,7 +71,7 @@ Setup Suite And Prepare Test Host
     Check Required Observability Variables
     Set Test OTEL Configuration
     ${cur}    Get Journal Cursor    unit=microshift-observability
-    Set Suite Variable    ${JOURNAL_CUR}    ${cur}
+    VAR    ${JOURNAL_CUR}    ${cur}    scope=SUITE
 
 Check Required Observability Variables
     [Documentation]    Check if the required proxy variables are set

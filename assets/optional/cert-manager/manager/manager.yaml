@@ -1,0 +1,119 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  labels:
+    app.kubernetes.io/name: namespace
+    app.kubernetes.io/instance: system
+    app.kubernetes.io/component: manager
+    app.kubernetes.io/created-by: cert-manager-operator
+    app.kubernetes.io/part-of: cert-manager-operator
+    app.kubernetes.io/managed-by: kustomize
+  name: system
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: controller-manager
+  namespace: system
+  labels:
+    app.kubernetes.io/name: deployment
+    app.kubernetes.io/instance: controller-manager
+    app.kubernetes.io/component: manager
+    app.kubernetes.io/created-by: cert-manager-operator
+    app.kubernetes.io/part-of: cert-manager-operator
+    app.kubernetes.io/managed-by: kustomize
+spec:
+  selector:
+    matchLabels:
+      name: cert-manager-operator
+  replicas: 1
+  template:
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/default-container: cert-manager-operator
+      labels:
+        name: cert-manager-operator
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                - key: kubernetes.io/arch
+                  operator: In
+                  values:
+                    - amd64
+                    - arm64
+                    - ppc64le
+                    - s390x
+                - key: kubernetes.io/os
+                  operator: In
+                  values:
+                    - linux
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - command:
+            - /usr/bin/cert-manager-operator
+          args:
+            - start
+            - '--v=$(OPERATOR_LOG_LEVEL)'
+            - '--trusted-ca-configmap=$(TRUSTED_CA_CONFIGMAP_NAME)'
+            - '--cloud-credentials-secret=$(CLOUD_CREDENTIALS_SECRET_NAME)'
+            - '--unsupported-addon-features=$(UNSUPPORTED_ADDON_FEATURES)'
+          env:
+            - name: WATCH_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.annotations['olm.targetNamespaces']
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: OPERATOR_NAME
+              value: cert-manager-operator
+            - name: RELATED_IMAGE_CERT_MANAGER_WEBHOOK
+              value: registry.redhat.io/cert-manager/jetstack-cert-manager-rhel9@sha256:96d51e3a64bf30cbd92836c7cbd82f06edca16eef78ab1432757d34c16628659
+            - name: RELATED_IMAGE_CERT_MANAGER_CA_INJECTOR
+              value: registry.redhat.io/cert-manager/jetstack-cert-manager-rhel9@sha256:96d51e3a64bf30cbd92836c7cbd82f06edca16eef78ab1432757d34c16628659
+            - name: RELATED_IMAGE_CERT_MANAGER_CONTROLLER
+              value: registry.redhat.io/cert-manager/jetstack-cert-manager-rhel9@sha256:96d51e3a64bf30cbd92836c7cbd82f06edca16eef78ab1432757d34c16628659
+            - name: RELATED_IMAGE_CERT_MANAGER_ACMESOLVER
+              value: registry.redhat.io/cert-manager/jetstack-cert-manager-acmesolver-rhel9@sha256:4f7c045819c39e176a6090efdaba6ec736edf772d88fc87dd1c6fb33d3b5b26b
+            - name: RELATED_IMAGE_CERT_MANAGER_ISTIOCSR
+              value: registry.redhat.io/cert-manager/cert-manager-istio-csr-rhel9@sha256:9ea2c29a384b964cef14f853278821df3cd30320f25afab8823897192f67fc7e
+            - name: OPERAND_IMAGE_VERSION
+              value: 1.17.0
+            - name: ISTIOCSR_OPERAND_IMAGE_VERSION
+              value: 0.14.0
+            - name: OPERATOR_IMAGE_VERSION
+              value: 1.17.0
+            - name: OPERATOR_LOG_LEVEL
+              value: '2'
+            - name: TRUSTED_CA_CONFIGMAP_NAME
+            - name: CLOUD_CREDENTIALS_SECRET_NAME
+            - name: UNSUPPORTED_ADDON_FEATURES
+          image: controller:latest
+          imagePullPolicy: IfNotPresent
+          name: cert-manager-operator
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - 'ALL'
+            privileged: false
+            runAsNonRoot: true
+            seccompProfile:
+              type: 'RuntimeDefault'
+          ports:
+          - containerPort: 8443
+            name: https
+            protocol: TCP
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+      serviceAccountName: controller-manager
+      terminationGracePeriodSeconds: 10

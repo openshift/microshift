@@ -12,6 +12,7 @@ logging_services:
 grafana_setup: false
 grafana_username: admin
 grafana_password: admin
+grafana_host_address: "192.168.1.100"
 grafana_port: 3000
 
 prometheus_port: 9091

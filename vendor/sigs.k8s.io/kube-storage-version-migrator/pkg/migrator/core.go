@@ -39,7 +39,7 @@ import (
 var metadataAccessor = meta.NewAccessor()
 
 const (
-	defaultChunkLimit  = 500
+	defaultChunkLimit  = 100
 	defaultConcurrency = 1
 )
 

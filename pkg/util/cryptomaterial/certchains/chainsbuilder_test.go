@@ -7,6 +7,7 @@ import (
 	"reflect"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
 
@@ -31,27 +32,27 @@ func Test_certificateChains_Complete(t *testing.T) {
 		{
 			name: "general test",
 			testChains: NewCertificateChains(
-				NewCertificateSigner("test-signer1", filepath.Join(tmpDir, "test-signer1"), 1).
+				NewCertificateSigner("test-signer1", filepath.Join(tmpDir, "test-signer1"), 1*24*time.Hour).
 					WithClientCertificates(&ClientCertificateSigningRequestInfo{
 						CSRMeta: CSRMeta{
-							Name:         "test-client1",
-							ValidityDays: 1,
+							Name:     "test-client1",
+							Validity: 1 * 24 * time.Hour,
 						},
 						UserInfo: &user.DefaultInfo{Name: "test-user", Groups: []string{"test-group1", "test-group2"}},
 					},
 						&ClientCertificateSigningRequestInfo{
 							CSRMeta: CSRMeta{
-								Name:         "test-client2",
-								ValidityDays: 1,
+								Name:     "test-client2",
+								Validity: 1 * 24 * time.Hour,
 							},
 							UserInfo: &user.DefaultInfo{Name: "test-user2"},
 						},
 					),
-				NewCertificateSigner("test-signer2", filepath.Join(tmpDir, "test-signer2"), 1).
+				NewCertificateSigner("test-signer2", filepath.Join(tmpDir, "test-signer2"), 1*24*time.Hour).
 					WithServingCertificates(&ServingCertificateSigningRequestInfo{
 						CSRMeta: CSRMeta{
-							Name:         "test-server1",
-							ValidityDays: 1,
+							Name:     "test-server1",
+							Validity: 1 * 24 * time.Hour,
 						},
 						Hostnames: []string{"somewhere.over.the.rainbow", "bluebirds.fly"},
 					}),

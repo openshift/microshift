@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	et "github.com/openshift-eng/openshift-tests-extension/pkg/extension/extensiontests"
+	"k8s.io/kubernetes/pkg/features"
 )
 
 // addEnvironmentSelectors adds the environmentSelector field to appropriate specs to facilitate including or excluding
@@ -25,6 +26,13 @@ func addEnvironmentSelectors(specs et.ExtensionTestSpecs) {
 	specs.SelectAny([]et.SelectFunction{ // Since these must use "NameContainsAll" they cannot be included in filterByNetwork
 		et.NameContainsAll("NetworkPolicy", "named port"),
 	}).Exclude(et.NetworkEquals("OVNKubernetes")).AddLabel("[Skipped:Network/OVNKubernetes]")
+
+	// SELinux tests marked with [Feature:SELinuxMountReadWriteOncePodOnly] require SELinuxMount
+	// feature gate **disabled**.
+	// REBASE NOTE: this will intentionally fail to compile when the feature gate is removed upstream.
+	// Just remove this check + notify the OCP storage team.
+	specs.Select(et.NameContains("[Feature:SELinuxMountReadWriteOncePodOnly]")).
+		Exclude(et.FeatureGateEnabled(string(features.SELinuxMount)))
 }
 
 // filterByPlatform is a helper function to do, simple, "NameContains" filtering on tests by platform
@@ -123,6 +131,12 @@ func filterByPlatform(specs et.ExtensionTestSpecs) {
 			// https://issues.redhat.com/browse/OCPBUGS-53249
 			"[sig-network] LoadBalancers [Feature:LoadBalancer] should be able to preserve UDP traffic when server pod cycles for a LoadBalancer service on",
 		},
+		// MicroShift identifies itself as "none"
+		"none": {
+			// LoadBalancer tests in 1.31 require explicit platform-specific skips
+			// https://issues.redhat.com/browse/OCPBUGS-53249
+			"[sig-network] LoadBalancers [Feature:LoadBalancer] should be able to preserve UDP traffic when server pod cycles for a LoadBalancer service on",
+		},
 	}
 
 	for platform, exclusions := range platformExclusions {
@@ -145,11 +159,23 @@ func filterByExternalConnectivity(specs et.ExtensionTestSpecs) {
 		// because of pullthrough not supporting ICSP (https://bugzilla.redhat.com/show_bug.cgi?id=1918376)
 		"Disconnected": {
 			"[sig-network] Networking should provide Internet connection for containers",
+			// The following tests are all duplicated from the Proxied list as the concepts of Disconnected and Proxied
+			// have gotten muddied. The following tests should all be skipped when accessing the cluster via a proxy,
+			// this is a separate concept from external connectivity that will later be formalized with a new environment
+			// flag in https://issues.redhat.com/browse/TRT-1854.
+			// TODO(sgoeddel): remove the following, duplicated, tests once this is complete
+			"[sig-cli] Kubectl client Simple pod should support exec through an HTTP proxy",
+			"[sig-cli] Kubectl client Simple pod should support exec through kubectl proxy",
+			"[sig-node] Pods should support retrieving logs from the container over websockets",
+			"[sig-node] Pods should support retrieving logs from the container over websockets",
+			"[sig-cli] Kubectl Port forwarding With a server listening on localhost should support forwarding over websockets",
+			"[sig-cli] Kubectl Port forwarding With a server listening on 0.0.0.0 should support forwarding over websockets",
+			"[sig-node] Pods should support remote command execution over websockets",
 		},
 		// These tests are skipped when openshift-tests needs to use a proxy to reach the
 		// cluster -- either because the test won't work while proxied, or because the test
 		// itself is testing a functionality using it's own proxy.
-		"Proxy": {
+		"Proxied": {
 			// These tests setup their own proxy, which won't work when we need to access the
 			// cluster through a proxy.
 			"[sig-cli] Kubectl client Simple pod should support exec through an HTTP proxy",
@@ -160,7 +186,7 @@ func filterByExternalConnectivity(specs et.ExtensionTestSpecs) {
 			"[sig-cli] Kubectl Port forwarding With a server listening on localhost should support forwarding over websockets",
 			"[sig-cli] Kubectl Port forwarding With a server listening on 0.0.0.0 should support forwarding over websockets",
 			"[sig-node] Pods should support remote command execution over websockets",
-			// These tests are flacky and require internet access
+			// These tests are flaky and require internet access
 			// See https://bugzilla.redhat.com/show_bug.cgi?id=2019375
 			"[sig-network] DNS should resolve DNS of partial qualified names for services",
 			"[sig-network] DNS should provide DNS for the cluster",
@@ -184,7 +210,7 @@ func filterByExternalConnectivity(specs et.ExtensionTestSpecs) {
 // filterByTopology is a helper function to do, simple, "NameContains" filtering on tests by topology
 func filterByTopology(specs et.ExtensionTestSpecs) {
 	var topologyExclusions = map[string][]string{
-		"SingleReplicaTopology": {
+		"SingleReplica": {
 			"[sig-apps] Daemon set [Serial] should rollback without unnecessary restarts [Conformance]",
 			"[sig-node] NoExecuteTaintManager Single Pod [Serial] doesn't evict pod with tolerations from tainted nodes",
 			"[sig-node] NoExecuteTaintManager Single Pod [Serial] eventually evict pod with finite tolerations from tainted nodes",

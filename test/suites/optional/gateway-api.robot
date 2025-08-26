@@ -37,7 +37,7 @@ Deploy Hello MicroShift
 
 Setup Namespace
     [Documentation]    Configure a namespace where to create all resources for later cleanup.
-    Set Suite Variable    \${NS_GATEWAY}    ${NAMESPACE}-gw-1
+    VAR    ${NS_GATEWAY}    ${NAMESPACE}-gw-1    scope=SUITE
     Create Namespace    ${NS_GATEWAY}
 
 Delete Namespace
@@ -47,23 +47,25 @@ Delete Namespace
 Create Gateway
     [Documentation]    Create a gateway using given hostname and port. Waits for readiness
     [Arguments]    ${hostname}    ${port}    ${namespace}
-    ${tmp}=    Set Variable    /tmp/gateway.yaml
-    Set Test Variable    ${HOSTNAME}    ${hostname}
-    Set Test Variable    ${PORT}    ${port}
+    VAR    ${tmp}    /tmp/gateway.yaml
+    VAR    ${HOSTNAME}    ${hostname}    scope=TEST
+    VAR    ${PORT}    ${port}    scope=TEST
     Run Keyword And Ignore Error
     ...    Remove File    ${tmp}
     Generate File From Template    ${GATEWAY_MANIFEST_TMPL}    ${tmp}
     Oc Apply    -n ${namespace} -f ${tmp}
     Oc Wait    -n ${namespace} gateway/test-gateway    --for="condition=Accepted" --timeout=120s
-    Oc Wait    -n ${namespace} deploy test-gateway-openshift-gateway-api    --for=condition=Available --timeout=120s
+    # Run healthcheck command to avoid premature wait returns if the object does not yet exist
+    Command Should Work
+    ...    sudo microshift healthcheck --namespace ${namespace} --deployments test-gateway-openshift-gateway-api --timeout 120s
     Oc Wait    -n ${namespace} gateway/test-gateway    --for="condition=Programmed" --timeout=120s
 
 Create HTTP Route
     [Documentation]    Create an HTTP route using the given hostname and namespace. Waits for acceptance in a gateway.
     [Arguments]    ${hostname}    ${namespace}
-    ${tmp}=    Set Variable    /tmp/route.yaml
-    Set Test Variable    ${HOSTNAME}    ${hostname}
-    Set Test Variable    ${NS}    ${namespace}
+    VAR    ${tmp}    /tmp/route.yaml
+    VAR    ${HOSTNAME}    ${hostname}    scope=TEST
+    VAR    ${NS}    ${namespace}    scope=TEST
     Run Keyword And Ignore Error
     ...    Remove File    ${tmp}
     Generate File From Template    ${HTTP_ROUTE_MANIFEST_TMPL}    ${tmp}
@@ -77,7 +79,7 @@ Create HTTP Route
 
 Generate File From Template
     [Documentation]    Generate file from template
-    [Arguments]    ${template_file}    ${output_file}
-    ${template}=    OperatingSystem.Get File    ${template_file}
-    ${message}=    Replace Variables    ${template}
-    OperatingSystem.Append To File    ${output_file}    ${message}
+    [Arguments]    ${template_file}    ${out_file}
+    ${template}    OperatingSystem.Get File    ${template_file}
+    ${message}    Replace Variables    ${template}
+    OperatingSystem.Append To File    ${out_file}    ${message}

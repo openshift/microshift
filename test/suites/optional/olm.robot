@@ -20,10 +20,7 @@ ${OPERATORS_NAMESPACE}      openshift-operators
 *** Test Cases ***
 Deploy AmqBroker From Red Hat Operators catalog
     [Documentation]    Deploy AMQ Broker from Red Hat Operators catalog.
-    [Setup]    Run Keywords
-    ...    OLM Should Be Ready
-    ...    Create CatalogSource
-    ...    Create Subscription
+    [Setup]    Setup Test
 
     ${csv}=    Get CSV Name From Subscription    ${OPERATORS_NAMESPACE}    ${SUBSCRIPTION_NAME}
     Wait For CSV    ${OPERATORS_NAMESPACE}    ${csv}
@@ -47,6 +44,18 @@ Setup
     Login MicroShift Host
     Setup Kubeconfig
     Verify MicroShift RPM Install
+
+Setup Test
+    [Documentation]    Test setup
+    TRY
+        OLM Should Be Ready
+        Create CatalogSource
+        Create Subscription
+    EXCEPT
+        Oc Logs    deploy/catalog-operator    openshift-operator-lifecycle-manager
+        Oc Logs    deploy/olm-operator    openshift-operator-lifecycle-manager
+        Fail    Setup failed
+    END
 
 Teardown
     [Documentation]    Test suite teardown
@@ -89,7 +98,7 @@ Subscription Should Be AtLatestKnown
 
 Get CSV Name From Subscription
     [Documentation]    Obtains Subscription's CSV name.
-    [Arguments]    ${namespace}    ${name}
+    [Arguments]    ${namespace}    ${name}    # robocop: off=unused-argument
     ${sub}=    Oc Get    subscriptions.operators.coreos.com    ${OPERATORS_NAMESPACE}    ${SUBSCRIPTION_NAME}
     RETURN    ${sub.status.currentCSV}
 

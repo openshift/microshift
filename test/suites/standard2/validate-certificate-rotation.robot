@@ -5,8 +5,8 @@ Resource            ../../resources/common.resource
 Resource            ../../resources/microshift-process.resource
 Resource            ../../resources/microshift-host.resource
 Resource            ../../resources/ostree-health.resource
-Library             DateTime
 Library             Collections
+Library             DateTime
 
 Suite Setup         Setup
 Suite Teardown      Teardown
@@ -88,7 +88,7 @@ All Certificates Should Be Valid For Current Time
     Command Should Work
     ...    echo '${kubeconfig}' | grep client-certificate-data | cut -d: -f2 | tr -d ' ' | base64 -d > ${kubeconfig_cert_file}
 
-    @{cert_files}=    Create List
+    VAR    @{cert_files}=
     ...    /var/lib/microshift/certs/kube-control-plane-signer/kube-scheduler/client.crt
     ...    /var/lib/microshift/certs/kube-control-plane-signer/kube-controller-manager/client.crt
     ...    /var/lib/microshift/certs/admin-kubeconfig-signer/admin-kubeconfig-client/client.crt

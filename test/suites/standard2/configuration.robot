@@ -136,7 +136,10 @@ Crio Uses Crun Runtime
     [Documentation]    Verify that crio uses crun as its default runtime
 
     ${runtime}=    Command Should Work    crictl info | jq -r '.runtimeHandlers[].name | select(. != null)'
-    Should Be Equal As Strings    ${runtime}    crun
+    Should Contain    ${runtime}    crun
+
+    ${stdout}    ${stderr}    ${rc}=    Command Execution    rpm -q microshift-low-latency
+    IF    ${rc} == 0    Should Contain    ${runtime}    high-performance
 
 
 *** Keywords ***
@@ -160,7 +163,7 @@ Save Journal Cursor
     ...    Save the journal cursor then restart MicroShift so we capture the
     ...    shutdown messages and startup messages.
     ${cursor}=    Get Journal Cursor
-    Set Suite Variable    \${CURSOR}    ${cursor}
+    VAR    ${CURSOR}=    ${cursor}    scope=SUITE
 
 Setup With Bad Log Level
     [Documentation]    Set log level to an unknown value and restart

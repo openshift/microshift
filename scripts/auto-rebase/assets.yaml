@@ -43,6 +43,10 @@ assets:
         git_restore: True
       - file: cluster-role-aggregate-admin-route.yaml
         git_restore: True
+      - file: ingress-class.yaml
+        ignore: "gets generated during image rebase"
+        git_restore: True
+
 
   - dir: components/ovn/
     ignore: "it's not covered by rebase script yet"
@@ -187,6 +191,8 @@ assets:
         ignore: "it's a local API service for security API group, needed if OpenShift API server is not present"
       - file: kubelet.yaml
         src: /machine-config-operator/templates/master/01-master-kubelet/_base/files/kubelet.yaml
+      - file: kubelet-client-ca.yaml
+        ignore: "it's a template for ConfigMap processed during runtime"
 
   - dir: crd/
     src: release-manifests/

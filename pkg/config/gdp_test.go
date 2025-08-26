@@ -82,7 +82,7 @@ func Test_GDP_Validate(t *testing.T) {
 								{Path: "/dev/ttyUSB*"},
 							},
 							USBSpecs: []*USBSpec{
-								{Vendor: 1, Product: 1, Serial: "s"},
+								{Vendor: "1", Product: "1", Serial: "s"},
 							},
 						},
 					},
@@ -106,7 +106,7 @@ func Test_GDP_Validate(t *testing.T) {
 								{Path: "/dev/ttyUSB*"},
 							},
 							USBSpecs: []*USBSpec{
-								{Vendor: 0, Product: 0, Serial: ""},
+								{Vendor: "", Product: "", Serial: ""},
 							},
 						},
 					},
@@ -212,5 +212,60 @@ func Test_GDP_Path_Validate(t *testing.T) {
 		}
 		errs := path.validate()
 		assert.Len(t, errs, 0)
+	})
+}
+
+func Test_USBSpec_toGDP(t *testing.T) {
+	t.Run("hexadecimals are converted properly", func(t *testing.T) {
+		spec := USBSpec{
+			Vendor:  "0x0451",
+			Product: "0x16a8",
+		}
+		gdp := spec.toGDP()
+		assert.Equal(t, deviceplugin.USBID(0x0451), gdp.Vendor)
+		assert.Equal(t, deviceplugin.USBID(0x16a8), gdp.Product)
+	})
+
+	t.Run("hexadecimals without leading 0x are converted properly", func(t *testing.T) {
+		spec := USBSpec{
+			Vendor:  "0451",
+			Product: "16a8",
+		}
+		gdp := spec.toGDP()
+		assert.Equal(t, deviceplugin.USBID(0x0451), gdp.Vendor)
+		assert.Equal(t, deviceplugin.USBID(0x16a8), gdp.Product)
+	})
+
+	t.Run("decimals are converted properly", func(t *testing.T) {
+		spec := USBSpec{
+			Vendor:  "451",
+			Product: "781",
+		}
+		gdp := spec.toGDP()
+		assert.Equal(t, deviceplugin.USBID(0x0451), gdp.Vendor)
+		assert.Equal(t, deviceplugin.USBID(0x0781), gdp.Product)
+	})
+
+	t.Run("decimals with leading zeros are converted properly", func(t *testing.T) {
+		spec := USBSpec{
+			Vendor:  "0451",
+			Product: "0781",
+		}
+		gdp := spec.toGDP()
+		assert.Equal(t, deviceplugin.USBID(0x0451), gdp.Vendor)
+		assert.Equal(t, deviceplugin.USBID(0x0781), gdp.Product)
+	})
+
+	t.Run("serial number is copied as-is", func(t *testing.T) {
+		{
+			spec := USBSpec{Serial: "s"}
+			gdp := spec.toGDP()
+			assert.Equal(t, "s", gdp.Serial)
+		}
+		{
+			spec := USBSpec{Serial: ""}
+			gdp := spec.toGDP()
+			assert.Equal(t, "", gdp.Serial)
+		}
 	})
 }
