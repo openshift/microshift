@@ -2,7 +2,7 @@
 This document describes the basic workflow and changes to deploy [metrics-server](https://github.com/kubernetes-sigs/metrics-server) in MicroShift.
 
 ## Create MicroShift cluster
-Use the instructions in the [Install MicroShift on RHEL for Edge](../contributor/rhel4edge_iso.md) document to configure a virtual machine running MicroShift.
+Use the instructions in the [Getting Started with MicroShift](getting_started.md) document to configure a virtual machine running MicroShift.
 
 Log into the virtual machine and run the following commands to configure the MicroShift access and check if the PODs are up and running.
 
