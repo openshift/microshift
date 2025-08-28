@@ -1,0 +1,30 @@
+- kubernetes embedded-component 45be6afa71817681e9d19fa129884fb81ba9439b to 3c7968e741684de8dc08ebc8aef1890b099eccae
+  - f50d9d53e 2025-08-25T10:42:52-04:00 UPSTREAM: <carry>: remove the backward compat featuregate for 132028
+  - 683924808 2025-08-21T15:01:43-04:00 Revert "[release-4.18] OCPBUGS-57488: UPSTREAM: <carry>: Mark admissionregistration.k8s.io/v1beta1 as deprecated."
+  - 4795ccdc4 2025-08-21T12:06:08-04:00 UPSTREAM: 132028: podresources: list: use active pods in list
+  - 1d9e321d1 2025-06-16T13:36:55Z UPSTREAM: <carry>: Mark admissionregistration.k8s.io/v1beta1 as deprecated.
+
+- machine-config-operator embedded-component 240e315c241bf702f9dc7fb201922793c6be147e to 6cabdc1467e3bcc9961544e148530a9c88789856
+  - 20902bd9 2025-07-29T14:47:35Z OCPBUGS-57484: Handle migration from OpenShift SDN
+  - 089ce4ca 2025-07-29T14:47:35Z OPNET-681: Support migration from configure-ovs to NMState
+  - 22ed2775 2025-06-11T21:20:17Z Give bonding slaves time to implicitly activate.
+  - faa0ec93 2025-06-11T21:20:17Z Revert "Race in configure-ovs.sh affects bonding interface configuration."
+  - 5b601a0e 2025-06-11T21:20:17Z Race in configure-ovs.sh affects bonding interface configuration.
+
+- operator-framework-olm embedded-component 583538413e0032f33ce2236e9ea503b85226554e to a62bebb1c75e41da8b01024f01a9b1e8a1fe3f8f
+  - 408a886d 2025-08-19T12:53:58Z Upstream: <carry>: regenerate manifests
+  - 1bc8f331 2025-08-19T12:53:58Z Upstream: 3580: add NetworkPolicy as a supported kind
+  - 81831462 2025-08-19T12:53:58Z Upstream: <carry>: Add allow-all networkpolicy for openshift-operators namespace
+  - 818f0d8c 2025-08-19T12:53:58Z Upstream: 1675: Add NetworkPolicy as a supported kind
+
+- kubernetes image-amd64 45be6afa71817681e9d19fa129884fb81ba9439b to 3c7968e741684de8dc08ebc8aef1890b099eccae
+  - f50d9d53e 2025-08-25T10:42:52-04:00 UPSTREAM: <carry>: remove the backward compat featuregate for 132028
+  - 683924808 2025-08-21T15:01:43-04:00 Revert "[release-4.18] OCPBUGS-57488: UPSTREAM: <carry>: Mark admissionregistration.k8s.io/v1beta1 as deprecated."
+  - 4795ccdc4 2025-08-21T12:06:08-04:00 UPSTREAM: 132028: podresources: list: use active pods in list
+  - 1d9e321d1 2025-06-16T13:36:55Z UPSTREAM: <carry>: Mark admissionregistration.k8s.io/v1beta1 as deprecated.
+
+- kubernetes image-arm64 d3330e0a45923552fac5a5ef94aab8f10047f967 to 3c7968e741684de8dc08ebc8aef1890b099eccae
+  - f50d9d53e 2025-08-25T10:42:52-04:00 UPSTREAM: <carry>: remove the backward compat featuregate for 132028
+  - 683924808 2025-08-21T15:01:43-04:00 Revert "[release-4.18] OCPBUGS-57488: UPSTREAM: <carry>: Mark admissionregistration.k8s.io/v1beta1 as deprecated."
+  - 4795ccdc4 2025-08-21T12:06:08-04:00 UPSTREAM: 132028: podresources: list: use active pods in list
+
