@@ -1,9 +1,33 @@
-- kubernetes-kube-storage-version-migrator embedded-component 0b41e7bf19a6bffa060eb26ecd4830634882d4a3 to 69b07ae04918806079f1a4fbc2f110453bc8db19
-  - 886f811 2025-08-05T13:58:26+00:00 UPSTREAM: <carry>: Add DOWNSTREAM_OWNERS.
+- cluster-kube-apiserver-operator embedded-component 4fae6738a9ffd1c108cd9ab3ac6c1382c5eece42 to 51ed2ebfcfd3e177c45d9243b25bdfd36c6a5b1f
+  - bda5521 2025-08-12T08:26:47+00:00 OCPBUGS-50489: Add missing service ports to apiserver service
 
-- oc image-amd64 f39295cb74b7d3d5571f38b88f55475fe13bf007 to fd2be5da398d8287664836e4838b68082a9f1bb8
-  - 0f21fa60 2025-05-27T13:35:54+00:00 Adding sos.conf file for default sos config into the tools image
+- cluster-kube-controller-manager-operator embedded-component 0a9ed573e35751455bfb24842fd2de0b05379ed0 to d68b3764db78ad5ca2e61af75f0bc8bcdcf3e644
+  - 875c708 2025-08-08T11:54:22+00:00 OCPBUGS-53290: Missing endpoint slices for open ports the operator uses
 
-- oc image-arm64 f39295cb74b7d3d5571f38b88f55475fe13bf007 to fd2be5da398d8287664836e4838b68082a9f1bb8
-  - 0f21fa60 2025-05-27T13:35:54+00:00 Adding sos.conf file for default sos config into the tools image
+- csi-external-snapshotter embedded-component aa558ca4bc55238e1909119f94eaf33872a76dec to 080f6bdb8ffdbfe2556370ce5bc95ac973e1ad95
+  - b38c9a9 2025-08-12T17:34:29+02:00 UPSTREAM: 1238: Snapshot Controller startup should not LIST all volumesnapshots
+
+- machine-config-operator embedded-component 6728dcc85e006d75d39d653d42daac2c91af8127 to b7c4291575a0de49d5951cd72f5425f49738463f
+  - 4c52db99 2025-08-21T11:42:23-04:00 operator: switch out VAP v1beta1 to v1
+  - 5f1a6944 2025-08-21T11:42:23-04:00 Bump openshift/library-go to v0.0.0-20250821150749-08d89313a9b1
+  - 52feae03 2025-08-07T20:37:08+00:00 Add workaround fix for static pod race
+  - 6a78f997 2025-06-04T17:26:13+00:00 OCPBUGS-55439: scope MCD node listers to current node
+
+- csi-external-snapshotter image-amd64 aa558ca4bc55238e1909119f94eaf33872a76dec to 080f6bdb8ffdbfe2556370ce5bc95ac973e1ad95
+  - b38c9a9 2025-08-12T17:34:29+02:00 UPSTREAM: 1238: Snapshot Controller startup should not LIST all volumesnapshots
+
+- csi-external-snapshotter image-amd64 aa558ca4bc55238e1909119f94eaf33872a76dec to 080f6bdb8ffdbfe2556370ce5bc95ac973e1ad95
+  - b38c9a9 2025-08-12T17:34:29+02:00 UPSTREAM: 1238: Snapshot Controller startup should not LIST all volumesnapshots
+
+- ovn-kubernetes image-amd64 399bcfd7e0225bd8eecf2afb58eef1ed37274a54 to 82ce0167fce4994b6b9286b509f8cbdd2c65f253
+  - fc83f35a 2025-08-14T03:18:20+00:00 Update OWNERS file: Add Patryk/Martin as approvers
+
+- csi-external-snapshotter image-arm64 aa558ca4bc55238e1909119f94eaf33872a76dec to 080f6bdb8ffdbfe2556370ce5bc95ac973e1ad95
+  - b38c9a9 2025-08-12T17:34:29+02:00 UPSTREAM: 1238: Snapshot Controller startup should not LIST all volumesnapshots
+
+- csi-external-snapshotter image-arm64 aa558ca4bc55238e1909119f94eaf33872a76dec to 080f6bdb8ffdbfe2556370ce5bc95ac973e1ad95
+  - b38c9a9 2025-08-12T17:34:29+02:00 UPSTREAM: 1238: Snapshot Controller startup should not LIST all volumesnapshots
+
+- ovn-kubernetes image-arm64 399bcfd7e0225bd8eecf2afb58eef1ed37274a54 to 82ce0167fce4994b6b9286b509f8cbdd2c65f253
+  - fc83f35a 2025-08-14T03:18:20+00:00 Update OWNERS file: Add Patryk/Martin as approvers
 
