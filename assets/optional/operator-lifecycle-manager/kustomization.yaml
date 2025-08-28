@@ -14,6 +14,7 @@ resources:
   - 0000_50_olm_00-pprof-rbac.yaml
   - 0000_50_olm_00-pprof-secret.yaml
   - 0000_50_olm_00-subscriptions.crd.yaml
+  - 0000_50_olm_01-networkpolicies.yaml
   - 0000_50_olm_01-olm-operator.serviceaccount.yaml
   - 0000_50_olm_02-olmconfig.yaml
   - 0000_50_olm_02-services.yaml
