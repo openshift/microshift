@@ -1,30 +1,44 @@
 ---
 # configure-firewall tasks
 
-- name: permit traffic in trusted zone from CIDR
-  ansible.posix.firewalld:
-    source: "{{ item }}"
-    state: enabled
-    immediate: yes
-    permanent: yes
-    zone: trusted
-  with_items: "{{ firewall_trusted_cidr }}"
+- name: check firewalld service status
+  ansible.builtin.systemd:
+    name: firewalld
+  register: firewalld_status
+  ignore_errors: true
 
-- name: permit traffic in public zone for services
-  ansible.posix.firewalld:
-    service: "{{ item }}"
-    state: enabled
-    immediate: yes
-    permanent: yes
-    zone: public
-  with_items: "{{ firewall_services }}"
+- name: Configure firewall rules
+  when: firewalld_status.status.UnitFileState is not defined or firewalld_status.status.UnitFileState != 'masked'
+  block:
+    - name: permit traffic in trusted zone from CIDR
+      ansible.posix.firewalld:
+        source: "{{ item }}"
+        state: enabled
+        immediate: yes
+        permanent: yes
+        zone: trusted
+      with_items: "{{ firewall_trusted_cidr }}"
 
-- name: permit traffic in public zone for ports
-  ansible.posix.firewalld:
-    port: "{{ item }}"
-    state: enabled
-    immediate: yes
-    permanent: yes
-    zone: public
-  with_items: "{{ firewall_ports }}"
+    - name: permit traffic in public zone for services
+      ansible.posix.firewalld:
+        service: "{{ item }}"
+        state: enabled
+        immediate: yes
+        permanent: yes
+        zone: public
+      with_items: "{{ firewall_services }}"
+
+    - name: permit traffic in public zone for ports
+      ansible.posix.firewalld:
+        port: "{{ item }}"
+        state: enabled
+        immediate: yes
+        permanent: yes
+        zone: public
+      with_items: "{{ firewall_ports }}"
+
+- name: skip firewall configuration if masked
+  ansible.builtin.debug:
+    msg: "Firewalld is masked, skipping firewall configuration"
+  when: firewalld_status.status.UnitFileState is defined and firewalld_status.status.UnitFileState == 'masked'
 

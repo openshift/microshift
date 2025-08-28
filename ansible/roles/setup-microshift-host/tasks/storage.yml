@@ -1,0 +1,29 @@
+---
+# Configure TopoLVM storage for MicroShift
+
+- name: Detect largest volume group for TopoLVM
+  ansible.builtin.shell: |
+    vgs --noheadings --units g -o vg_name,vg_size --sort -vg_size | head -1 | awk '{print $1}'
+  register: largest_vg
+  changed_when: false
+  failed_when: false
+
+- name: Configure TopoLVM with detected volume group
+  when: 
+    - largest_vg.rc == 0
+    - largest_vg.stdout | length > 0
+  block:
+    - name: Display detected volume group
+      ansible.builtin.debug:
+        msg: "Configuring TopoLVM to use volume group: {{ largest_vg.stdout }}"
+
+    - name: Deploy lvmd.yaml configuration
+      ansible.builtin.template:
+        src: lvmd.yaml.j2
+        dest: /etc/microshift/lvmd.yaml
+        owner: root
+        group: root
+        mode: '0644'
+        backup: yes
+      vars:
+        topolvm_vg: "{{ largest_vg.stdout }}"

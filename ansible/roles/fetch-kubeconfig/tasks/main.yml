@@ -1,39 +1,78 @@
 ---
 # fetch-kubeconfig tasks
 
-- name: set local kubeconfig path
+- name: Set local kubeconfig path
   ansible.builtin.set_fact:
-    local_home: "{{ lookup('env', 'HOME') }}"
+    kubeconfig_dest_file: "{{ kubeconfig_directory }}/kubeconfig.{{ inventory_hostname }}"
 
-- name: check if kubeconfig directory exists on local machine
+- name: Check if kubeconfig directory exists on local machine
   ansible.builtin.stat:
     path: "{{ kubeconfig_directory }}"
   delegate_to: localhost
   register: kubeconfig_directory_check
 
-- name: create .kube folder in home directory if missing
+- name: Create .kube folder in home directory if missing
   ansible.builtin.file:
     path: "{{ kubeconfig_directory }}"
     state: directory
   delegate_to: localhost
   when: not kubeconfig_directory_check.stat.exists
 
-- name: check a kubeconfig file exists on local machine
+- name: Fetch remote kubeconfig to a host-specific file (always overwrites)
+  become: yes
+  ansible.builtin.fetch:
+    src: "{{ kubeconfig_remote_file }}"
+    dest: "{{ kubeconfig_dest_file }}"
+    flat: yes
+    force: yes
+
+- name: Check if a default kubeconfig file exists on local machine
   ansible.builtin.stat:
     path: "{{ kubeconfig_local_file }}"
   delegate_to: localhost
   register: kubeconfig_local_file_check
 
-- name: backup existing kubeconfig_local_file
-  ansible.builtin.copy:
-    src: "{{ kubeconfig_local_file }}"
-    dest: "{{ kubeconfig_local_file }}.old"
-  delegate_to: localhost
-  when: kubeconfig_local_file_check.stat.exists
-
-- name: try to fetch remote kubeconfig to local
-  become: yes
-  ansible.builtin.fetch:
-    src: "{{ kubeconfig_remote_file }}"
+- name: Create/overwrite symbolic link if default is not a regular file
+  ansible.builtin.file:
+    src: "{{ kubeconfig_dest_file }}"
     dest: "{{ kubeconfig_local_file }}"
-    flat: yes
+    state: link
+    force: yes
+  delegate_to: localhost
+  when: not kubeconfig_local_file_check.stat.exists or (kubeconfig_local_file_check.stat.islnk | default(false))
+
+- name: Notify user if default kubeconfig is a regular file and was not overwritten
+  ansible.builtin.debug:
+    msg: |
+      The default kubeconfig at '{{ kubeconfig_local_file }}' is a regular file and was not overwritten.
+      A new kubeconfig has been saved to '{{ kubeconfig_dest_file }}'.
+      Please update your KUBECONFIG environment variable or switch contexts manually.
+  delegate_to: localhost
+  when: kubeconfig_local_file_check.stat.exists and (kubeconfig_local_file_check.stat.isreg | default(false))
+
+- name: Verify connectivity to MicroShift cluster
+  block:
+    - name: Test cluster connectivity with oc
+      ansible.builtin.command: oc get nodes --kubeconfig={{ kubeconfig_dest_file }}
+      delegate_to: localhost
+      register: oc_test
+      changed_when: false
+      failed_when: false
+
+    - name: Display cluster connectivity status
+      ansible.builtin.debug:
+        msg: "Successfully connected to MicroShift cluster - Node is ready"
+      delegate_to: localhost
+      when: oc_test.rc == 0
+
+    - name: Fail if cluster is not accessible
+      ansible.builtin.fail:
+        msg: |
+          Failed to connect to MicroShift cluster!
+          Error: {{ oc_test.stderr | default('Unknown error') }}
+          
+          Please check:
+          1. Port 6443 is accessible from this host (firewall/iptables rules)
+          2. MicroShift service is running on the remote host
+          3. The kubeconfig file is valid
+      when: oc_test.rc != 0

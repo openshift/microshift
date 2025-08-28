@@ -149,8 +149,8 @@
       register: vnstat
 
     - name: record network usage to file
-      local_action:
-        module: copy
+      ansible.builtin.copy:
         content: "{{ vnstat.stdout }}"
         dest: network.txt
+      delegate_to: localhost
   when: vnstat_check.rc == 0
