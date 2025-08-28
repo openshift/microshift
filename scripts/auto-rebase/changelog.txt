@@ -1,0 +1,39 @@
+- oc image-arm64 f114b178fe5f5674ce5f59249745df00ad5a7594 to 559c67e11e5e73bc575a06d235ad694fc7bbcfb3
+  - b98b2e15 2025-08-26T07:42:22-07:00 pkg/cli/admin/inspectalerts: Pass through --certificate-authority, etc.
+  - ffe752e7 2025-08-26T08:18:33+03:00 Remove mentioning about IRC channel from README
+
+- ovn-kubernetes image-arm64 b9dab27375ce950fa883704222106bdcb85ea977 to 9741174157381d7b87e2d21559cbe06b8f2b5ebf
+  - a4925460 2025-08-25T16:20:27+02:00 Fix getHostNamespaceAddressesForNode error wrapping
+  - 0e52a994 2025-08-21T09:11:31-07:00 incorrect CNI result for primary UDN is returned in the unprivileged mode
+  - d074c6c9 2025-08-20T16:21:53-04:00 Ensure that UDN updates update NAD annotations correctly
+  - 0a2536b1 2025-08-20T20:59:54+02:00 fix: gw accelerated interface - use gwInterfaceRep instead of bridge(LOCAL)
+  - d5e0632b 2025-08-20T13:39:16+02:00 Enable CEL validation for subnet overlaps for Layer2 (C)UDN
+  - fa6f7d29 2025-08-20T13:39:16+02:00 Allow for allocating all valid host IPs from ReservedSubnets
+  - 10338ca7 2025-08-20T13:39:16+02:00 Fix excludeSubnets bug found by rabbitai
+  - 49ae5139 2025-08-20T13:39:16+02:00 Refactor ipallocator.AddOrUpdateSubnet to take a struct
+  - ad5bb221 2025-08-20T13:39:16+02:00 Refactor parseSubnets in multi_network.go
+  - 9e3eb36b 2025-08-20T13:39:16+02:00 Guard new API fields support  with feature flag
+  - 3c6b2e35 2025-08-20T13:39:16+02:00 E2E: Add tests for custom primary L2 UDNs
+  - b8f61b06 2025-08-20T13:39:16+02:00 E2E: Add a test variant for the newly added API fields
+  - eb6032d6 2025-08-20T13:39:16+02:00 E2E: Refactor network creation to always filter the supported networks
+  - 0988d273 2025-08-20T13:39:16+02:00 E2E: Rename joinCIDRs to joinStrings
+  - f1406815 2025-08-20T13:39:12+02:00 Layer2 UDN: Add support for InfrastructureSubnets
+  - 64540ab2 2025-08-20T13:31:19+02:00 Layer2 UDN: Add support for DefaultGatewayIPs
+  - 841d398c 2025-08-20T13:31:19+02:00 Layer2 UDN: Add support for ReservedSubnets
+  - 6d46691f 2025-08-20T13:31:19+02:00 Extract static IP allocator into a separate interface
+  - 15223486 2025-08-20T13:31:18+02:00 Add Layer2 (Cluster) UDN API fields
+  - 742041be 2025-08-19T17:51:08+02:00 Refactor: Rename config flag routed-udn-isolation to advertised-udn-isolation-mode
+  - 28c67eac 2025-08-19T17:51:08+02:00 node: refactor MEG/Advertised UDN ingress and egress flows
+  - 01fccb76 2025-08-19T17:51:08+02:00 Set nodes default gateway to the external FRR router for isolation loose mode
+  - b1c9b281 2025-08-19T17:51:08+02:00 Add CI lane and E2E to test loosly isolated advertised UDNs
+  - 636eaeb8 2025-08-19T17:51:08+02:00 Skip adding drop ACLs when Routed UDN Isolation is disabled
+  - e1ac3994 2025-08-19T17:51:08+02:00 Provide global routed udn isolation option
+  - 3c082359 2025-08-19T08:47:48+02:00 Revert "Skip session affinity conformance test"
+  - bf174d67 2025-08-15T22:54:55-07:00 support unprivileged mode CNI for plumbing the UDN primary interface
+  - d0e0e285 2025-08-15T22:54:55-07:00 Add VF device support for primary UDN Pod interface
+  - b05875b1 2025-08-15T21:18:52-07:00 SDN-3674 Copy annotations from UDN to NAD
+  - 13291aef 2025-08-14T18:30:20-04:00 kind.sh: Allow to override duration to sleep at the end
+
+- kubernetes image-arm64 42c7d00914adca7b516027fe5a886e9d2bc1e3d6 to a237dcbeee8bbe1440c94349399cc6eac8870910
+  - 05a24c593 2025-08-26T06:47:03-04:00 UPSTREAM: <carry>: Revert "OCPBUGS-60507: Bump 1.33.4"
+
