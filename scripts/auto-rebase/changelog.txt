@@ -1,0 +1,13 @@
+- cluster-ingress-operator embedded-component 9e0d092565a4589dbcbafb7b1212651afa6d36fa to 815632b1ddb29f55ddc7a8fdba63292b4797b3ae
+  - b457c4a 2025-01-30T14:22:59-05:00 OCPBUGS-49392: Add Upgrade Blocker for DSA SHA1 Default Certificates
+  - e0e1ce8 2025-01-30T14:22:41-05:00 OCPBUGS-45290: Block Upgrades for CA-Signed Certs Using SHA1
+
+- kubernetes-kube-storage-version-migrator embedded-component e8749689edb8e7fea42eca5f2b67c3187192cdeb to a6a9ab1a765ea5bf5815e6b15a5a39840a03bb3e
+  - 6f90aa0 2025-08-06T09:43:12+00:00 UPSTREAM: <carry>: Add DOWNSTREAM_OWNERS.
+
+- machine-config-operator embedded-component de7e29747d3d38b2a2a4dd796dea61995781daea to 2c9b09413049bf837ad0bab1496a26e44c2f7be8
+  - 832669b3 2025-07-24T16:11:15-04:00 manifests: remove MachineConfigNode CRD from manifests
+
+- operator-framework-olm embedded-component b1fb5e0e4aebbfa3cee1a18930882947ee1b2966 to d793adddeb546f561c99955a5f133b343d929419
+  - 98387bd8 2025-06-12T21:05:27+00:00 reduce cache expiriry frequency (#3591)
+
