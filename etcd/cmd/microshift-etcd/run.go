@@ -22,6 +22,12 @@ import (
 	"k8s.io/klog/v2"
 )
 
+const (
+	// MaxLearners determines the maximum number of etcd learners in the cluster. This is
+	// needed to support topology transitions without losing high availability.
+	MaxLearners = 2
+)
+
 func NewRunEtcdCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use: "run",
@@ -95,6 +101,8 @@ func (s *EtcdService) configure(cfg *config.Config) {
 	s.etcdCfg.PeerTLSInfo.CertFile = cryptomaterial.PeerCertPath(etcdPeerCertDir)
 	s.etcdCfg.PeerTLSInfo.KeyFile = cryptomaterial.PeerKeyPath(etcdPeerCertDir)
 	s.etcdCfg.PeerTLSInfo.TrustedCAFile = etcdSignerCertPath
+
+	s.etcdCfg.ExperimentalMaxLearners = MaxLearners
 }
 
 func (s *EtcdService) Run() error {
