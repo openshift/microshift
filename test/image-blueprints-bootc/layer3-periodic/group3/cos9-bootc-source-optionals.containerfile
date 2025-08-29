@@ -30,15 +30,13 @@ RUN dnf repoinfo --enabled && \
 
 # Prepare system for testing Generic Device Plugin.
 # CentOS' package retention policy is different from RHEL's.
-# It's possible that kernel-devel for kernel already installed in the centos9 bootc image
-# is no longer available, therefore we upgrade the kernel and install matching kernel-devel.
+# Install 'kernel-devel-matched' even if that means downgrading the kernel:
+# it's possible that most recent CentOS kernel doesn't have the devels available yet.
 # hadolint ignore=DL3003
-RUN dnf upgrade kernel -y && \
-    KERNEL_VER=$(rpm -q --qf "%{VERSION}-%{RELEASE}" kernel); \
-    KERNEL_VER_ARCH="${KERNEL_VER}.$(uname -m)"; \
-    dnf install -y git make "kernel-devel-${KERNEL_VER}" python3-pyserial && \
+RUN dnf install -y git make kernel-devel-matched python3-pyserial && \
     dnf clean all && \
     git clone https://github.com/pmtk/serialsim.git /tmp/serialsim && \
     cd /tmp/serialsim && \
+    KERNEL_VER_ARCH="$(rpm -q --qf "%{VERSION}-%{RELEASE}" kernel).$(uname -m)"; \
     make KERNEL="${KERNEL_VER_ARCH}" all install && \
     rm -rf /tmp/serialsim
