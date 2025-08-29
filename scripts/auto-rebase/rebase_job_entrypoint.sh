@@ -93,7 +93,7 @@ fi
 # New references can be obtained from:
 # https://catalog.redhat.com/software/containers/rhoai/odh-operator-bundle/659803ca929f3c931af06f28
 rhoai_release="registry.redhat.io/rhoai/odh-operator-bundle:v2.22"
-
+opm_release="registry.redhat.io/redhat/redhat-operator-index:v4.20"
 APP_ID=$(cat /secrets/pr-creds/app_id) \
 KEY=/secrets/pr-creds/key.pem \
 ORG=${ORG:-openshift} \
@@ -101,6 +101,7 @@ REPO=${REPO:-microshift} \
 AMD64_RELEASE=${PULLSPEC_RELEASE_AMD64} \
 ARM64_RELEASE=${PULLSPEC_RELEASE_ARM64} \
 RHOAI_RELEASE=${rhoai_release} \
+OPM_RELEASE=${opm_release} \
 ./scripts/auto-rebase/rebase.py
 
 # LVMS is not tracked in the OCP release image.  Instead, rely on the
