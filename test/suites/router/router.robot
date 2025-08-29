@@ -431,5 +431,5 @@ Delete Custom CA Secret
 Check Access Logs
     [Documentation]    Retrieve and check if a pattern appears in the router's access logs.
     [Arguments]    ${pattern}
-    ${logs}=    Oc Logs    deployment/router-default -c access-logs    openshift-ingress
+    ${logs}=    Oc Logs    deployment/router-default -c logs    openshift-ingress
     Should Contain    ${logs}    ${pattern}
