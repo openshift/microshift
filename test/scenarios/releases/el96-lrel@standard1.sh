@@ -10,8 +10,8 @@ scenario_create_vms() {
         return 0
     fi
 
-    prepare_kickstart host1 kickstart.ks.template "${start_image}"
-    launch_vm
+    prepare_kickstart host1 kickstart-liveimg.ks.template ""
+    launch_vm --boot_blueprint "${start_image}"
 }
 
 scenario_remove_vms() {
