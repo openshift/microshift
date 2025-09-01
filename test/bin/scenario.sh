@@ -893,13 +893,14 @@ configure_vm_firewall() {
 
 # Function to report the full version of locally built RPMs, e.g. "4.17.0"
 local_rpm_version() {
-    if [ ! -d "${LOCAL_REPO}" ]; then
+    REPO="${$1:-LOCAL_REPO}"
+    if [ ! -d "${REPO}" ]; then
         "${TESTDIR}/bin/build_rpms.sh"
     fi
 
-    local -r release_info_rpm=$(find "${LOCAL_REPO}" -name 'microshift-release-info-*.rpm' | sort | tail -n 1)
+    local -r release_info_rpm=$(find "${REPO}" -name 'microshift-release-info-*.rpm' | sort | tail -n 1)
     if [ -z "${release_info_rpm}" ]; then
-        error "Failed to find microshift-release-info RPM in ${LOCAL_REPO}"
+        error "Failed to find microshift-release-info RPM in ${REPO}"
         exit 1
     fi
     rpm -q --queryformat '%{version}-%{release}' "${release_info_rpm}" 2>/dev/null

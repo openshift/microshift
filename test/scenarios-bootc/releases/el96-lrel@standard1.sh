@@ -4,7 +4,7 @@
 
 scenario_create_vms() {
     prepare_kickstart host1 kickstart-bootc.ks.template "rhel96-bootc-brew-${LATEST_RELEASE_TYPE}-with-optional"
-    launch_vm --boot_blueprint rhel96-bootc
+    launch_vm --boot_blueprint "rhel96-bootc-brew-${LATEST_RELEASE_TYPE}-with-optional"
 }
 
 scenario_remove_vms() {
