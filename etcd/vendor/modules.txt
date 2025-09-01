@@ -631,7 +631,7 @@ gopkg.in/natefinch/lumberjack.v2
 # gopkg.in/yaml.v3 v3.0.1
 ## explicit
 gopkg.in/yaml.v3
-# k8s.io/api v1.32.7 => ../deps/github.com/openshift/kubernetes/staging/src/k8s.io/api
+# k8s.io/api v1.32.8 => ../deps/github.com/openshift/kubernetes/staging/src/k8s.io/api
 ## explicit; go 1.23.0
 k8s.io/api/admission/v1
 k8s.io/api/admission/v1beta1
@@ -692,7 +692,7 @@ k8s.io/api/storage/v1
 k8s.io/api/storage/v1alpha1
 k8s.io/api/storage/v1beta1
 k8s.io/api/storagemigration/v1alpha1
-# k8s.io/apimachinery v1.32.7 => ../deps/github.com/openshift/kubernetes/staging/src/k8s.io/apimachinery
+# k8s.io/apimachinery v1.32.8 => ../deps/github.com/openshift/kubernetes/staging/src/k8s.io/apimachinery
 ## explicit; go 1.23.0
 k8s.io/apimachinery/pkg/api/equality
 k8s.io/apimachinery/pkg/api/errors
@@ -754,18 +754,18 @@ k8s.io/apimachinery/pkg/watch
 k8s.io/apimachinery/third_party/forked/golang/json
 k8s.io/apimachinery/third_party/forked/golang/netutil
 k8s.io/apimachinery/third_party/forked/golang/reflect
-# k8s.io/apiserver v1.32.7 => ../deps/github.com/openshift/kubernetes/staging/src/k8s.io/apiserver
+# k8s.io/apiserver v1.32.8 => ../deps/github.com/openshift/kubernetes/staging/src/k8s.io/apiserver
 ## explicit; go 1.23.0
 k8s.io/apiserver/pkg/apis/audit
 k8s.io/apiserver/pkg/apis/audit/v1
 k8s.io/apiserver/pkg/authentication/user
-# k8s.io/cli-runtime v1.32.7 => ../deps/github.com/openshift/kubernetes/staging/src/k8s.io/cli-runtime
+# k8s.io/cli-runtime v1.32.8 => ../deps/github.com/openshift/kubernetes/staging/src/k8s.io/cli-runtime
 ## explicit; go 1.23.0
 k8s.io/cli-runtime/pkg/genericclioptions
 k8s.io/cli-runtime/pkg/genericiooptions
 k8s.io/cli-runtime/pkg/printers
 k8s.io/cli-runtime/pkg/resource
-# k8s.io/client-go v1.32.7 => ../deps/github.com/openshift/kubernetes/staging/src/k8s.io/client-go
+# k8s.io/client-go v1.32.8 => ../deps/github.com/openshift/kubernetes/staging/src/k8s.io/client-go
 ## explicit; go 1.23.0
 k8s.io/client-go/applyconfigurations/admissionregistration/v1
 k8s.io/client-go/applyconfigurations/admissionregistration/v1alpha1
@@ -924,7 +924,7 @@ k8s.io/client-go/util/jsonpath
 k8s.io/client-go/util/keyutil
 k8s.io/client-go/util/watchlist
 k8s.io/client-go/util/workqueue
-# k8s.io/component-base v1.32.7 => ../deps/github.com/openshift/kubernetes/staging/src/k8s.io/component-base
+# k8s.io/component-base v1.32.8 => ../deps/github.com/openshift/kubernetes/staging/src/k8s.io/component-base
 ## explicit; go 1.23.0
 k8s.io/component-base/cli
 k8s.io/component-base/cli/flag
@@ -961,7 +961,7 @@ k8s.io/kube-openapi/pkg/spec3
 k8s.io/kube-openapi/pkg/util/proto
 k8s.io/kube-openapi/pkg/util/proto/validation
 k8s.io/kube-openapi/pkg/validation/spec
-# k8s.io/kubectl v1.32.7 => ../deps/github.com/openshift/kubernetes/staging/src/k8s.io/kubectl
+# k8s.io/kubectl v1.32.8 => ../deps/github.com/openshift/kubernetes/staging/src/k8s.io/kubectl
 ## explicit; go 1.23.0
 k8s.io/kubectl/pkg/cmd/util
 k8s.io/kubectl/pkg/scheme
