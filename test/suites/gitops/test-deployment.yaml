@@ -12,20 +12,8 @@ spec:
       labels:
         app: test-app
     spec:
-      securityContext:
-        runAsNonRoot: true
-        seccompProfile:
-          type: RuntimeDefault
       containers:
         - name: test-app
           image: registry.redhat.io/ubi8/httpd-24:latest
           ports:
             - containerPort: 8080
-          securityContext:
-            runAsNonRoot: true
-            allowPrivilegeEscalation: false
-            capabilities:
-              drop:
-                - ALL
-            seccompProfile:
-              type: RuntimeDefault
