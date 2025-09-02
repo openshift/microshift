@@ -204,7 +204,7 @@ All Pods Should Be Annotated As Management
     [Documentation]    Obtains list of Deployments created by CSV.
     ${pods_raw}=    Oc Get All Pods
     @{pods}=    Split String    ${pods_raw}
-    VAR    @{NS_TO_SKIP_LIST}=    openshift-gateway-api    redhat-ods-applications    scope=TEST
+    VAR    @{NS_TO_SKIP_LIST}=    openshift-gateway-api    redhat-ods-applications    cert-manager-operator    scope=TEST
     FOR    ${pod}    IN    @{pods}
         ${ns}    ${pod}=    Split String    ${pod}    \@
         IF    "${ns}" not in "@{NS_TO_SKIP_LIST}"
