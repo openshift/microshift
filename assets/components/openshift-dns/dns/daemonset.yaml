@@ -79,6 +79,8 @@ spec:
               readOnly: true
             - mountPath: /tmp
               name: tmp-dir
+          securityContext:
+            readOnlyRootFilesystem: true
           image: '{{ .ReleaseImage.kube_rbac_proxy }}'
           imagePullPolicy: IfNotPresent
       dnsPolicy: Default
