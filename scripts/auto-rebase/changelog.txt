@@ -1,130 +1,20 @@
-- api embedded-component 97812373b6b447ff6b55d3e2625b4f62aff1a16f to 1c614f54419fa23266ae2f6660b9034893749079
-  - bcdc61a8 2025-08-19T11:17:14-04:00 MachineOSConfig name should match MachineConfigPool
-  - 108cd61b 2025-08-12T14:07:14Z Update crd-schema.json to release 1.33 branch
+- cluster-kube-apiserver-operator embedded-component e2ad6c193a3a0ee71a2bd128d5a4692ad8a6776a to f9683e5669a03f0b93cf555d2942a04f3a2c5912
+  - 47fb4aa 2025-08-20T09:34:13+00:00 certrotation: ensure that all rotated secrets/configmaps have RefreshOnlyWhenExpired set
+  - 7f8eb29 2025-08-14T05:28:52+00:00 certrotationcontroller: extend node-system-admin-signer lifetime
 
-- cluster-network-operator embedded-component f17bb7a589e7a9516c35aa0a3bd1bbc55f071ebd to bc62016ccc39a66406caf5110ac7140f285fb264
-  - e2ba945 2025-08-21T11:19:06Z Allow overriding OVN-Kubernetes configuration
-  - fd0e7e9 2025-08-14T20:44:23Z Fix multus webhook match condition for spec changes
-
-- operator-framework-olm embedded-component 8bcf1556a550efa7bb380ec315c077cf29438695 to 5c83a8adfd3fb0a5b3f2f8a26d3d05eefd5ba9d0
-  - cd2a2af8 2025-08-18T14:39:30-04:00 Upstream: <carry>: regenerate manifests
-  - 1b5a100e 2025-08-15T15:45:46-04:00 Upstream: 3580: add NetworkPolicy as a supported kind
-  - 1aa6bb51 2025-08-14T13:53:32-04:00 Upstream: <carry>: Add allow-all networkpolicy for openshift-operators namespace
-  - 36252801 2025-08-14T10:50:59-04:00 Upstream: 1675: Add NetworkPolicy as a supported kind
-
-- ovn-kubernetes image-amd64 e24389403dd961a14b6512e40cda7e3e5d0a4b20 to 1e27e7a22ddb5a30fe5ae7ccb8e1d3967bc645ec
-  - 2784783b 2025-08-18T14:02:52-07:00 add back the removed OCP hack from d/s merge
-  - b90abc54 2025-07-23T13:24:08+02:00 fix: skip gw IP check for DPU and improve gateway initialization readability
-  - 6c4bc78b 2025-07-23T08:56:24Z e2e: label RouteAdvertisement test cases & skip extended ones
-  - 45bf0b39 2025-07-23T10:53:18+02:00 Revert "e2e: Use ovnk allocator and reserve IPs"
-  - 5b5bc069 2025-07-22T19:06:40+02:00 gateway: Refactor gateway initialization and DPU host handling
-  - d127877f 2025-07-22T15:53:32+01:00 build, vendor: consume ipamclaims v0.5.0-alpha
-  - 34b5a46c 2025-07-22T13:52:53Z e2e: test against L2 networks in VRF-Lite test cases
-  - e72e62b3 2025-07-22T13:12:33Z Remove unused portbinding code
-  - dfc14b4e 2025-07-22T10:22:05Z e2e: refactor podIPOfFamilyOnPrimaryNetwork into more reusable code
-  - 5ece8463 2025-07-22T10:22:05Z e2e: add VRF-Lite test cases
-  - edb05ca1 2025-07-22T10:22:05Z kind.sh: Use FRRConfiguration label when advertising default network
-  - 926ba1ad 2025-07-22T10:22:05Z e2e: use index in kind infra inspect templates to allow special characters
-  - acef39f4 2025-07-22T10:22:05Z e2e: make ExtPort not required in container infra provider API
-  - 3dea4f52 2025-07-22T10:22:05Z e2e: add RuntimeArgs to container infra provider API
-  - 90e56b92 2025-07-22T10:22:05Z e2e: rename testdata package to testscenario
-  - dc437b63 2025-07-22T10:22:05Z RouteAdvertisements: appropriately update status even if no updates
-  - b4eabd9c 2025-07-21T19:04:23Z Bump the go_modules group across 2 directories with 1 update
-  - fa12bb26 2025-07-21T12:09:59-04:00 Bump fedora from 41 -> 42
-  - d565fd86 2025-07-21T14:41:46+05:30 Add e2e tests for ex gw pods in terminating or not ready state
-  - d942a7d8 2025-07-21T14:41:46+05:30 Add unit tests for ex gw pods in terminating or not ready state
-  - 3d32558b 2025-07-21T14:41:44+05:30 Remove routes of ex gw pods in terminating or not ready state
-  - ec378a7b 2025-07-18T17:56:44Z Bump golang.org/x/oauth2
-  - 293f6dda 2025-07-18T16:57:43Z ci: run tests only if files other than docs are changed
-  - 527c19fc 2025-07-18T18:08:55+02:00 Add support for --disable-requestedchassis flag in ovnkube controller
-  - 290eb038 2025-07-18T09:42:17-04:00 Add metrics for UDN
-  - 33e20b83 2025-07-18T11:16:38+02:00 [bridgeconfig] AI suggested fixes.
-  - f531e3d3 2025-07-18T11:16:38+02:00 [node/gateway] make PatchedNetConfigs internal, remove locking
-  - fd5e7915 2025-07-18T11:16:38+02:00 [node/gateway] nodePortWatcher should use its own bridgeConfiguration.
-  - a0c90f26 2025-07-18T11:16:38+02:00 [bridgeconfig] make mutex internal.
-  - fa6076bc 2025-07-18T11:16:38+02:00 [bridgeconfig] move nextHops to the gateway where it is used.
-  - 4ad1727c 2025-07-18T11:16:38+02:00 [bridgeconfig] make most members internal, ensure correct locking.
-  - 5a5e3b6d 2025-07-18T11:16:38+02:00 [bridgeconfig] move flow generation locking into methods.
-  - 28f9c1ec 2025-07-18T11:16:38+02:00 [bridgeconfig] move bridge flows generation functions to the pkg.
-  - b607e93d 2025-07-18T11:16:38+02:00 [bridgeconfig] add some getters/setters with lock to the pkg.
-  - 836e0f64 2025-07-18T11:16:38+02:00 [bridgeconfig] move setBridgeOfPorts to the package.
-  - cf93ef30 2025-07-18T11:16:38+02:00 [bridgeconfig] start moving methods that use internal mutex to the pkg
-  - a4d421a3 2025-07-18T11:16:37+02:00 [bridgeconfig] simply move functions around, no change
-  - 3b073327 2025-07-18T11:16:37+02:00 [bridgeconfig] only create BridgeConfigurations inside the package.
-  - 420d9f1c 2025-07-18T11:16:37+02:00 [bridgeconfig] make mutex a public field to turn it into internal later
-  - b65a01ef 2025-07-18T11:16:37+02:00 [node/bridgeconfig] move [udn]bridgeconfig to ite own package.
-  - f1a4b4b0 2025-07-18T11:16:24+02:00 [node/egressipgw] Move egressIP functionality to its own package.
-  - 956981a0 2025-07-18T10:24:09+02:00 kv, e2e: Use PrimaryNetwork()
-  - 115b25a3 2025-07-18T10:24:09+02:00 e2e: Move http servers to external container
-  - ae5b6387 2025-07-18T10:24:09+02:00 e2e: Move underlay setup to providers
-  - 1870116b 2025-07-18T10:24:09+02:00 e2e, kv: Use bgpnet for external container network
-  - 9fed90c7 2025-07-18T10:24:09+02:00 e2e: Use ovnk allocator and reserve IPs
-  - f1c76a61 2025-07-18T10:24:09+02:00 e2e, kv: Increase network status timeout
-  - 7c1de13e 2025-07-18T10:24:09+02:00 e2e: Remove harcoded breth0
-  - 318782be 2025-07-18T10:24:09+02:00 kv, e2e: Use the ExternalContainer struct instead of name
-  - b60dbcd9 2025-07-18T10:24:09+02:00 kv, e2e: ensure there is no dots at podtest name
-  - a0101b56 2025-07-18T10:24:07+02:00 kv, e2e: Download virtctl at tests
-  - 098a3aa7 2025-06-27T14:15:27+02:00 Fix UDN nftables mark chain cleanup
-
-- ovn-kubernetes image-arm64 e24389403dd961a14b6512e40cda7e3e5d0a4b20 to 1e27e7a22ddb5a30fe5ae7ccb8e1d3967bc645ec
-  - 2784783b 2025-08-18T14:02:52-07:00 add back the removed OCP hack from d/s merge
-  - b90abc54 2025-07-23T13:24:08+02:00 fix: skip gw IP check for DPU and improve gateway initialization readability
-  - 6c4bc78b 2025-07-23T08:56:24Z e2e: label RouteAdvertisement test cases & skip extended ones
-  - 45bf0b39 2025-07-23T10:53:18+02:00 Revert "e2e: Use ovnk allocator and reserve IPs"
-  - 5b5bc069 2025-07-22T19:06:40+02:00 gateway: Refactor gateway initialization and DPU host handling
-  - d127877f 2025-07-22T15:53:32+01:00 build, vendor: consume ipamclaims v0.5.0-alpha
-  - 34b5a46c 2025-07-22T13:52:53Z e2e: test against L2 networks in VRF-Lite test cases
-  - e72e62b3 2025-07-22T13:12:33Z Remove unused portbinding code
-  - dfc14b4e 2025-07-22T10:22:05Z e2e: refactor podIPOfFamilyOnPrimaryNetwork into more reusable code
-  - 5ece8463 2025-07-22T10:22:05Z e2e: add VRF-Lite test cases
-  - edb05ca1 2025-07-22T10:22:05Z kind.sh: Use FRRConfiguration label when advertising default network
-  - 926ba1ad 2025-07-22T10:22:05Z e2e: use index in kind infra inspect templates to allow special characters
-  - acef39f4 2025-07-22T10:22:05Z e2e: make ExtPort not required in container infra provider API
-  - 3dea4f52 2025-07-22T10:22:05Z e2e: add RuntimeArgs to container infra provider API
-  - 90e56b92 2025-07-22T10:22:05Z e2e: rename testdata package to testscenario
-  - dc437b63 2025-07-22T10:22:05Z RouteAdvertisements: appropriately update status even if no updates
-  - b4eabd9c 2025-07-21T19:04:23Z Bump the go_modules group across 2 directories with 1 update
-  - fa12bb26 2025-07-21T12:09:59-04:00 Bump fedora from 41 -> 42
-  - d565fd86 2025-07-21T14:41:46+05:30 Add e2e tests for ex gw pods in terminating or not ready state
-  - d942a7d8 2025-07-21T14:41:46+05:30 Add unit tests for ex gw pods in terminating or not ready state
-  - 3d32558b 2025-07-21T14:41:44+05:30 Remove routes of ex gw pods in terminating or not ready state
-  - ec378a7b 2025-07-18T17:56:44Z Bump golang.org/x/oauth2
-  - 293f6dda 2025-07-18T16:57:43Z ci: run tests only if files other than docs are changed
-  - 527c19fc 2025-07-18T18:08:55+02:00 Add support for --disable-requestedchassis flag in ovnkube controller
-  - 290eb038 2025-07-18T09:42:17-04:00 Add metrics for UDN
-  - 33e20b83 2025-07-18T11:16:38+02:00 [bridgeconfig] AI suggested fixes.
-  - f531e3d3 2025-07-18T11:16:38+02:00 [node/gateway] make PatchedNetConfigs internal, remove locking
-  - fd5e7915 2025-07-18T11:16:38+02:00 [node/gateway] nodePortWatcher should use its own bridgeConfiguration.
-  - a0c90f26 2025-07-18T11:16:38+02:00 [bridgeconfig] make mutex internal.
-  - fa6076bc 2025-07-18T11:16:38+02:00 [bridgeconfig] move nextHops to the gateway where it is used.
-  - 4ad1727c 2025-07-18T11:16:38+02:00 [bridgeconfig] make most members internal, ensure correct locking.
-  - 5a5e3b6d 2025-07-18T11:16:38+02:00 [bridgeconfig] move flow generation locking into methods.
-  - 28f9c1ec 2025-07-18T11:16:38+02:00 [bridgeconfig] move bridge flows generation functions to the pkg.
-  - b607e93d 2025-07-18T11:16:38+02:00 [bridgeconfig] add some getters/setters with lock to the pkg.
-  - 836e0f64 2025-07-18T11:16:38+02:00 [bridgeconfig] move setBridgeOfPorts to the package.
-  - cf93ef30 2025-07-18T11:16:38+02:00 [bridgeconfig] start moving methods that use internal mutex to the pkg
-  - a4d421a3 2025-07-18T11:16:37+02:00 [bridgeconfig] simply move functions around, no change
-  - 3b073327 2025-07-18T11:16:37+02:00 [bridgeconfig] only create BridgeConfigurations inside the package.
-  - 420d9f1c 2025-07-18T11:16:37+02:00 [bridgeconfig] make mutex a public field to turn it into internal later
-  - b65a01ef 2025-07-18T11:16:37+02:00 [node/bridgeconfig] move [udn]bridgeconfig to ite own package.
-  - f1a4b4b0 2025-07-18T11:16:24+02:00 [node/egressipgw] Move egressIP functionality to its own package.
-  - 956981a0 2025-07-18T10:24:09+02:00 kv, e2e: Use PrimaryNetwork()
-  - 115b25a3 2025-07-18T10:24:09+02:00 e2e: Move http servers to external container
-  - ae5b6387 2025-07-18T10:24:09+02:00 e2e: Move underlay setup to providers
-  - 1870116b 2025-07-18T10:24:09+02:00 e2e, kv: Use bgpnet for external container network
-  - 9fed90c7 2025-07-18T10:24:09+02:00 e2e: Use ovnk allocator and reserve IPs
-  - f1c76a61 2025-07-18T10:24:09+02:00 e2e, kv: Increase network status timeout
-  - 7c1de13e 2025-07-18T10:24:09+02:00 e2e: Remove harcoded breth0
-  - 318782be 2025-07-18T10:24:09+02:00 kv, e2e: Use the ExternalContainer struct instead of name
-  - b60dbcd9 2025-07-18T10:24:09+02:00 kv, e2e: ensure there is no dots at podtest name
-  - a0101b56 2025-07-18T10:24:07+02:00 kv, e2e: Download virtctl at tests
-  - 098a3aa7 2025-06-27T14:15:27+02:00 Fix UDN nftables mark chain cleanup
-
-- kubernetes image-arm64 97b7f2e2ecbbf844812a7158086030bfff2bd324 to 2f14046818a7ff3ae3e9da76376991698d7188f1
+- kubernetes embedded-component 97b7f2e2ecbbf844812a7158086030bfff2bd324 to 2f14046818a7ff3ae3e9da76376991698d7188f1
   - 558b4826c 2025-08-25T09:51:25-04:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
-  - 2e83bc4bf 2025-08-13T14:21:20Z Release commit for Kubernetes v1.32.8
+  - 2e83bc4bf 2025-08-13T14:21:20+00:00 Release commit for Kubernetes v1.32.8
   - 21b02fabc 2025-08-10T15:09:08-07:00 do not allow the node to update it's owner reference
   - e497bc6fe 2025-07-28T16:35:24-07:00 remove failing test that depends on expired credential, remove credential, add TODOs
-  - a1bc55e31 2025-07-15T18:23:11Z Update CHANGELOG/CHANGELOG-1.32.md for v1.32.7
+  - a1bc55e31 2025-07-15T18:23:11+00:00 Update CHANGELOG/CHANGELOG-1.32.md for v1.32.7
+  - cb4682131 2025-07-11T20:39:18+02:00 Bump images, dependencies and versions to go 1.23.11 and distroless iptables
+
+- kubernetes image-amd64 97b7f2e2ecbbf844812a7158086030bfff2bd324 to 2f14046818a7ff3ae3e9da76376991698d7188f1
+  - 558b4826c 2025-08-25T09:51:25-04:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - 2e83bc4bf 2025-08-13T14:21:20+00:00 Release commit for Kubernetes v1.32.8
+  - 21b02fabc 2025-08-10T15:09:08-07:00 do not allow the node to update it's owner reference
+  - e497bc6fe 2025-07-28T16:35:24-07:00 remove failing test that depends on expired credential, remove credential, add TODOs
+  - a1bc55e31 2025-07-15T18:23:11+00:00 Update CHANGELOG/CHANGELOG-1.32.md for v1.32.7
   - cb4682131 2025-07-11T20:39:18+02:00 Bump images, dependencies and versions to go 1.23.11 and distroless iptables
 
