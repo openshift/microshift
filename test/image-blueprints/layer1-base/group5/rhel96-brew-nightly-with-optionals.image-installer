@@ -1,3 +1,0 @@
-{{- if env.Getenv "BREW_NIGHTLY_RELEASE_VERSION" "" -}}
-rhel-9.6-microshift-brew-optionals-4.{{ .Env.MINOR_VERSION}}-nightly
-{{- end -}}
