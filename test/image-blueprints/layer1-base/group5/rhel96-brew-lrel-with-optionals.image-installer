@@ -1,0 +1,1 @@
+rhel-9.6-microshift-brew-optionals-4.{{ .Env.MINOR_VERSION}}-{{ .Env.LATEST_RELEASE_TYPE}}
