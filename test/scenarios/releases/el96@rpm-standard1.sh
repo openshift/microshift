@@ -65,7 +65,6 @@ scenario_remove_vms() {
 scenario_run_tests() {
     local -r reponame=$(basename "${BREW_REPO}")
     local -r repo_url="${WEB_SERVER_URL}/rpm-repos/${reponame}"
-    local -r target_version=$(local_rpm_version "${BREW_REPO}")
 
     # Enable the rhocp and dependency repositories.
     #
@@ -79,7 +78,7 @@ scenario_run_tests() {
     run_tests host1 \
         --exitonfailure \
         --variable "SOURCE_REPO_URL:${repo_url}" \
-        --variable "TARGET_VERSION:${target_version}" \
+        --variable "TARGET_VERSION:${BREW_LREL_RELEASE_VERSION}" \
         --variable "EXPECTED_OS_VERSION:9.6" \
         suites/rpm/install.robot \
         suites/standard1/ suites/selinux/validate-selinux-policy.robot
