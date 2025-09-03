@@ -16,6 +16,9 @@ ARCH = os.uname().machine
 # See https://github.com/vmware-tanzu/sonobuoy/releases.
 CNCF_SONOBUOY_VERSION = "v0.57.3"
 
+# The current version of the microshift-gitops package.
+GITOPS_VERSION = "1.16"
+
 logging.basicConfig(
     level=logging.INFO,
     format='%(levelname)s: %(message)s',
@@ -289,6 +292,26 @@ get_vrel_from_rhsm() {{
     echo ""
 }}
 
+get_vrel_from_rpm() {{
+    local -r rpm_dir="$1"
+
+    local -r rpm_release_info_file=$(find "${{rpm_dir}}" -name "microshift-release-info-*.rpm" | sort | tail -n1)
+    if [ -z "${{rpm_release_info_file}}" ]; then
+        echo ""
+        return
+    fi
+
+    local -r rpm_vrel=$(\\
+        rpm -qp --queryformat '%{{version}}-%{{release}}' \\
+            -p "${{rpm_release_info_file}}" 2>/dev/null \\
+        )
+    if [ -n "${{rpm_vrel}}" ]; then
+        echo "${{rpm_vrel}}"
+        return
+    fi
+    echo ""
+}}
+
 export MINOR_VERSION={minor_version}
 export PREVIOUS_MINOR_VERSION=$(( "${{MINOR_VERSION}}" - 1 ))
 export YMINUS2_MINOR_VERSION=$(( "${{MINOR_VERSION}}" - 2 ))
@@ -322,7 +345,24 @@ export RHOCP_MINOR_Y1_BETA
 export RHOCP_MINOR_Y2={rhocp_minor_y2}
 
 export CNCF_SONOBUOY_VERSION={CNCF_SONOBUOY_VERSION}
-"""
+
+export GITOPS_VERSION={GITOPS_VERSION}
+
+BREW_Y0_RELEASE_VERSION="$(get_vrel_from_rpm "${{BREW_RPM_SOURCE}}/4.${{MINOR_VERSION}}-zstream/${{UNAME_M}}/")"
+BREW_Y1_RELEASE_VERSION="$(get_vrel_from_rpm "${{BREW_RPM_SOURCE}}/4.${{PREVIOUS_MINOR_VERSION}}-zstream/${{UNAME_M}}/")"
+BREW_Y2_RELEASE_VERSION="$(get_vrel_from_rpm "${{BREW_RPM_SOURCE}}/4.${{YMINUS2_MINOR_VERSION}}-zstream/${{UNAME_M}}/")"
+BREW_RC_RELEASE_VERSION="$(get_vrel_from_rpm "${{BREW_RPM_SOURCE}}/4.${{MINOR_VERSION}}-rc/${{UNAME_M}}/")"
+BREW_EC_RELEASE_VERSION="$(get_vrel_from_rpm "${{BREW_RPM_SOURCE}}/4.${{MINOR_VERSION}}-ec/${{UNAME_M}}/")"
+BREW_NIGHTLY_RELEASE_VERSION="$(get_vrel_from_rpm "${{BREW_RPM_SOURCE}}/4.${{MINOR_VERSION}}-nightly/${{UNAME_M}}/")"
+export BREW_Y0_RELEASE_VERSION
+export BREW_Y1_RELEASE_VERSION
+export BREW_Y2_RELEASE_VERSION
+export BREW_RC_RELEASE_VERSION
+export BREW_EC_RELEASE_VERSION
+export BREW_NIGHTLY_RELEASE_VERSION
+
+LATEST_RELEASE_TYPE="ec"
+export LATEST_RELEASE_TYPE"""
 
 output_noarch = output.replace(ARCH, '$(uname -m)')
 
