@@ -42,28 +42,6 @@ get_vrel_from_rhsm() {
     echo ""
 }
 
-get_vrel_from_rpm() {
-    local -r rpm_dir="$1"
-
-    local -r rpm_release_info_file=$(find "${rpm_dir}" -name "microshift-release-info-*.rpm" | sort | tail -n1)
-    if [ -z "${rpm_release_info_file}" ]; then
-        echo ""
-        return
-    fi
-
-    local -r rpm_vrel=$(\
-        rpm -qp --queryformat '%{version}-%{release}' \
-            -p "${rpm_release_info_file}" 2>/dev/null \
-        )
-    if [ -n "${rpm_vrel}" ]; then
-        echo "${rpm_vrel}"
-        return
-    fi
-    echo ""
-}
-
-# The current release minor version (e.g. '17' for '4.17') affects
-# the definition of previous and fake next versions.
 export MINOR_VERSION=20
 export PREVIOUS_MINOR_VERSION=$(( "${MINOR_VERSION}" - 1 ))
 export YMINUS2_MINOR_VERSION=$(( "${MINOR_VERSION}" - 2 ))
