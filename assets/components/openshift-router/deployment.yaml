@@ -219,7 +219,7 @@ spec:
           args:
             - -v=4
         {{- if and .AccessLoggingEnabled (not .AccessLoggingSyslogAddress) }}
-        - name: access-logs
+        - name: logs
           imagePullPolicy: IfNotPresent
           terminationMessagePolicy: FallbackToLogsOnError
           image: '{{ .ReleaseImage.haproxy_router }}'
