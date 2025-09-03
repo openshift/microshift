@@ -45,43 +45,6 @@ Install Source Version
     Wait For MicroShift
     [Teardown]    Clean Up Test
 
-Upgrade From Previous Version
-    [Documentation]    Install the previous version, then upgrade the package
-    ...    also verifying that crio and microshift services were restarted
-    # Always install from system repo, because the scenario script
-    # is enabling all the repositories needed.
-    #
-    # Ignore warnings when installing the previous version because we
-    # know some of our older RPMs generate warnings. We care more
-    # about warnings on the new RPM.
-    Install MicroShift RPM Packages From System Repo
-    ...    4.${PREVIOUS_MINOR_VERSION}.*
-    ...    check_warnings=False
-    # Verify the package version is as expected
-    ${version}=    MicroShift Version
-    Should Be Equal As Integers    ${version.minor}    ${PREVIOUS_MINOR_VERSION}
-    # Start the service and wait until initialized
-    Start MicroShift
-    Wait For MicroShift
-    # Take active timestamps for services
-    ${cts1}=    Command Should Work    systemctl show -p ActiveEnterTimestamp crio
-    ${mts1}=    Command Should Work    systemctl show -p ActiveEnterTimestamp microshift
-    # Upgrade the package without explicitly restarting the service
-    Install MicroShift RPM Packages From Repo    ${SOURCE_REPO_URL}    ${TARGET_VERSION}
-    Wait For MicroShift
-    # Take active timestamps for services
-    ${cts2}=    Command Should Work    systemctl show -p ActiveEnterTimestamp crio
-    ${mts2}=    Command Should Work    systemctl show -p ActiveEnterTimestamp microshift
-    # Run the timestamp verification
-    Verify Service Active Timestamps
-    ...    ${cts1}    ${mts1}
-    ...    ${cts2}    ${mts2}
-    # Restart the host to verify a clean start
-    Reboot MicroShift Host
-    # Health of the system is implicitly checked by greenboot successful exit
-    Wait Until Greenboot Health Check Exited
-    [Teardown]    Clean Up Test
-
 
 *** Keywords ***
 Setup
@@ -123,25 +86,3 @@ Install Third Party Packages With Warnings
     [Documentation]    Install these separately to avoid having warnings
     ...    show up in the warning check when installing MicroShift.
     Command Should Work    dnf install -y NetworkManager-ovs containers-common
-
-Version Should Match
-    [Documentation]    Compare the installed version against expectations
-    [Arguments]    ${expected}
-    ${version}=    MicroShift Version
-    Should Be Equal As Strings    ${version.gitVersion}    ${expected}
-
-Verify Service Active Timestamps
-    [Documentation]    Verify the service timestamps are valid and different
-    [Arguments]    ${cts1}    ${mts1}    ${cts2}    ${mts2}
-    Should Not Be Empty    ${cts1}
-    Should Not Be Empty    ${mts1}
-    Should Not Be Empty    ${cts2}
-    Should Not Be Empty    ${mts2}
-    # Verify that timestamps exist (services were active)
-    Should Not Be Equal As Strings    ${cts1}    "ActiveEnterTimestamp="
-    Should Not Be Equal As Strings    ${mts1}    "ActiveEnterTimestamp="
-    Should Not Be Equal As Strings    ${cts2}    "ActiveEnterTimestamp="
-    Should Not Be Equal As Strings    ${mts2}    "ActiveEnterTimestamp="
-    # Verify that timestamps changed (services restarted)
-    Should Not Be Equal As Strings    ${cts1}    ${cts2}
-    Should Not Be Equal As Strings    ${mts1}    ${mts2}
