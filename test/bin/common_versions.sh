@@ -62,9 +62,7 @@ get_vrel_from_rpm() {
     echo ""
 }
 
-# The current release minor version (e.g. '17' for '4.17') affects
-# the definition of previous and fake next versions.
-export MINOR_VERSION=21
+export MINOR_VERSION=20
 export PREVIOUS_MINOR_VERSION=$(( "${MINOR_VERSION}" - 1 ))
 export YMINUS2_MINOR_VERSION=$(( "${MINOR_VERSION}" - 2 ))
 export FAKE_NEXT_MINOR_VERSION=$(( "${MINOR_VERSION}" + 1 ))
@@ -139,7 +137,6 @@ export BREW_Y2_RELEASE_VERSION
 export BREW_RC_RELEASE_VERSION
 export BREW_EC_RELEASE_VERSION
 
-# Set the release type to ec, rc or zstream
 LATEST_RELEASE_TYPE="ec"
 export LATEST_RELEASE_TYPE
 

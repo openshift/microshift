@@ -19,6 +19,9 @@ CNCF_SONOBUOY_VERSION = "v0.57.3"
 # The current version of the microshift-gitops package.
 GITOPS_VERSION = "1.16"
 
+# Set the release type to ec, rc or zstream
+LATEST_RELEASE_TYPE = "ec"
+
 logging.basicConfig(
     level=logging.INFO,
     format='%(levelname)s: %(message)s',
@@ -348,6 +351,7 @@ export CNCF_SONOBUOY_VERSION={CNCF_SONOBUOY_VERSION}
 
 export GITOPS_VERSION={GITOPS_VERSION}
 
+# The brew release versions needed for release regression testing
 BREW_Y0_RELEASE_VERSION="$(get_vrel_from_rpm "${{BREW_RPM_SOURCE}}/4.${{MINOR_VERSION}}-zstream/${{UNAME_M}}/")"
 BREW_Y1_RELEASE_VERSION="$(get_vrel_from_rpm "${{BREW_RPM_SOURCE}}/4.${{PREVIOUS_MINOR_VERSION}}-zstream/${{UNAME_M}}/")"
 BREW_Y2_RELEASE_VERSION="$(get_vrel_from_rpm "${{BREW_RPM_SOURCE}}/4.${{YMINUS2_MINOR_VERSION}}-zstream/${{UNAME_M}}/")"
@@ -361,7 +365,7 @@ export BREW_RC_RELEASE_VERSION
 export BREW_EC_RELEASE_VERSION
 export BREW_NIGHTLY_RELEASE_VERSION
 
-LATEST_RELEASE_TYPE="ec"
+LATEST_RELEASE_TYPE="{LATEST_RELEASE_TYPE}"
 export LATEST_RELEASE_TYPE"""
 
 output_noarch = output.replace(ARCH, '$(uname -m)')
