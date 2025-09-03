@@ -44,8 +44,7 @@ EOF
 
 scenario_create_vms() {
     prepare_kickstart host1 kickstart-liveimg.ks.template ""
-    launch_vm 
-
+    launch_vm --boot_blueprint rhel-9.6
     # Open the firewall ports. Other scenarios get this behavior by
     # embedding settings in the blueprint, but there is no blueprint
     # for this scenario. We need do this step before running the RF
