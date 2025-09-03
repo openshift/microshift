@@ -892,7 +892,6 @@ configure_vm_firewall() {
 }
 
 # Function to report the full version of locally built RPMs, e.g. "4.17.0"
-
 local_rpm_version() {
     if [ ! -d "${LOCAL_REPO}" ]; then
         "${TESTDIR}/bin/build_rpms.sh"
