@@ -1,3 +1,7 @@
+
+- machine-config-operator embedded-component cc2f713fa75afd493d1abc24cfa965a242ab07bc to 7a56cf0048a05d576e746c3e992ce586e07c97e8
+  - e516665e 2025-08-28T17:36:33+02:00 OCPBUGS-61016: Fix wait failure on MCO pods
+
 - oc image-arm64 31597edbaedc6d8d206deda350cfc93e89fa24bf to a43428189603f12ae190703cb725f66f742fbe52
   - ea3cacdc 2025-08-29T13:21:45+02:00 must-gather: Fix usage checker for custom commands
 
