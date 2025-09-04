@@ -18,7 +18,7 @@ RUN --mount=type=secret,id=pullsecret,dst=/run/secrets/pull-secret.json \
         skopeo copy --all --preserve-digests \
             --authfile /run/secrets/pull-secret.json \
             "docker://${img}" "dir:$IMAGE_STORAGE_DIR/${sha}" \
-            || { echo '!!! skopeo copy failed' ; exit 1; } ; \
+            || { echo "ERROR: skopeo copy failed for ${img}" ; exit 1; } ; \
         echo "${img},${sha}" >> "${IMAGE_LIST_FILE}" ; \
     done
 
