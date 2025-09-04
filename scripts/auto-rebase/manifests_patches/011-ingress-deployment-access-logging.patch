@@ -78,7 +78,7 @@ index 916e4b601..9261e3700 100644
            args:
              - -v=4
 +        {{- if and .AccessLoggingEnabled (not .AccessLoggingSyslogAddress) }}
-+        - name: access-logs
++        - name: logs
 +          imagePullPolicy: IfNotPresent
 +          terminationMessagePolicy: FallbackToLogsOnError
 +          image: '{{ .ReleaseImage.haproxy_router }}'
