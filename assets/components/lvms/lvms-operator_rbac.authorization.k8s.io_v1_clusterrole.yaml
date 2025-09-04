@@ -66,6 +66,13 @@ rules:
       - list
       - watch
   - apiGroups:
+      - apiextensions.k8s.io
+    resources:
+      - customresourcedefinitions
+    verbs:
+      - get
+      - list
+  - apiGroups:
       - apps
     resources:
       - daemonsets
@@ -134,6 +141,18 @@ rules:
       - get
       - patch
       - update
+  - apiGroups:
+      - monitoring.coreos.com
+    resources:
+      - servicemonitors
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
   - apiGroups:
       - security.openshift.io
     resources:
