@@ -141,6 +141,25 @@ Crio Uses Crun Runtime
     ${stdout}    ${stderr}    ${rc}=    Command Execution    rpm -q microshift-low-latency
     IF    ${rc} == 0    Should Contain    ${runtime}    high-performance
 
+Http Proxy Not Defined In Bootc Image
+    [Documentation]    Verify that the http proxy environment variables are not defined
+    ...    in the bootc image used to install the system.
+
+    # Return if not a bootc image
+    ${is_bootc}=    Is System Bootc
+    IF    ${is_bootc} == ${FALSE}
+        RETURN
+    END
+
+    # Obtain the current bootc image reference
+    ${bootc_image}=    Command Should Work    bootc status --json | jq -r .spec.image.image
+    # Inspect the bootc image environment variables
+    ${env_vars}=    Command Should Work    skopeo inspect --authfile /etc/crio/openshift-pull-secret --config docker://${bootc_image} | jq -r '.config.Env'
+    # Verify that the environment variables are not defined
+    Should Not Contain    ${env_vars}    HTTP_PROXY=
+    Should Not Contain    ${env_vars}    HTTPS_PROXY=
+    Should Not Contain    ${env_vars}    NO_PROXY=
+
 
 *** Keywords ***
 Setup
