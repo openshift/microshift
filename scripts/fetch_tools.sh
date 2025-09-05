@@ -214,7 +214,8 @@ gettool_opm() {
 
     curl -s -f "https://mirror.openshift.com/pub/openshift-v4/${arch}/clients/ocp/latest/opm-linux-rhel9.tar.gz" -L -o "opm-linux-rhel9.tar.gz"
     tar xvzf opm-linux-rhel9.tar.gz
-    sudo cp opm-rhel9 /usr/bin/opm
+    #sudo cp opm-rhel9 /usr/bin/opm
+    cp opm-rhel9 /tmp/opm
 
     popd &>/dev/null
 }

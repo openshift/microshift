@@ -97,7 +97,7 @@ download_cert_manager(){
    operator_manifest="$1"
 
     # get the whole operator yaml for 4.19
-    opm render "${operator_manifest}" -o yaml  >${OPERATOR_INDEX}
+    /tmp/opm render "${operator_manifest}" -o yaml  >${OPERATOR_INDEX}
 
     # find the latest published cert-manager-operator ie: cert-manager-operator.v1.16.0
     export operator=$(yq 'select(.package == "openshift-cert-manager-operator" and .name == "stable-v1") | .entries[-1].name' ${OPERATOR_INDEX})

@@ -102,6 +102,7 @@ def run_rebase_ai_model_serving_sh(release):
     logging.info(f"Script returned code: {result.returncode}. It ran for {end/60:.0f}m{end%60:.0f}s.")
     return RebaseScriptResult(success=result.returncode == 0, output=result.stdout)
 
+
 def run_rebase_cert_manager_sh(release):
     """Run the 'rebase_cert_manager.sh' script with the given release version and return the script's output."""
     script_dir = os.path.abspath(os.path.dirname(__file__))
@@ -120,6 +121,7 @@ def run_rebase_cert_manager_sh(release):
     end = timer() - start
     logging.info(f"Script returned code: {result.returncode}. It ran for {end/60:.0f}m{end%60:.0f}s.")
     return RebaseScriptResult(success=result.returncode == 0, output=result.stdout)
+
 
 def commit_str(commit):
     """Returns the first 8 characters of the commit's SHA hash and the commit summary."""
