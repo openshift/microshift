@@ -115,7 +115,7 @@ apiServerArguments:
   event-ttl:
     - 3h
   goaway-chance:
-    - "0"
+    - "0.001"
   http2-max-streams-per-connection:
     - "2000" # recommended is 1000, but we need to mitigate https://github.com/kubernetes/kubernetes/issues/74412
   kubelet-certificate-authority:
