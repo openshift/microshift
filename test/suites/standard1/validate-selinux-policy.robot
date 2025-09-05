@@ -17,6 +17,7 @@ ${USHIFT_USER}      ${EMPTY}
 *** Test Cases ***
 Standard SELinux Validation
     [Documentation]    Performs a standard SELinux validation against the host
+    [Tags]    standard-selinux-policy
     Validate SELinux
 
 

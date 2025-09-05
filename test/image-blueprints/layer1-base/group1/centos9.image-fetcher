@@ -1,1 +1,0 @@
-https://mirrors.centos.org/mirrorlist?path=/9-stream/BaseOS/{{ .Env.UNAME_M }}/iso/CentOS-Stream-9-latest-{{ .Env.UNAME_M }}-dvd1.iso&redirect=1&protocol=https
