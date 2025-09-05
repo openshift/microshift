@@ -5,22 +5,19 @@ set -o errexit
 set -o pipefail
 set -x
 
-check_semver_suffix() {
+check_semver_no_suffix() {
     local version=$1
 
     # Check if the version is not empty
     if [[ -z "$version" ]]; then
-        echo "false"
-        return 1
+        return 0
     fi
 
     # Check if the version string contains a numeric suffix of the form -xx
     if [[ $version =~ -[0-9]+$ ]]; then
-        echo "true"
-        return 0
-    else
-        echo "false"
         return 1
+    else
+        return 0
     fi
 }
 
@@ -121,8 +118,7 @@ pullspec_release_lvms="registry.redhat.io/lvms4/lvms-operator-bundle:${release_l
 # the latest lvms release candidate replicated from CPaaS into quay
 pullspec_release_lvms_fallback="quay.io/lvms_dev/lvms4-lvms-operator-bundle:${release_lvms}"
 
-lvms_is_candidate_build=$(check_semver_suffix "${release_lvms}")
-if [ "$lvms_is_candidate_build" == "false" ]; then
+if check_semver_no_suffix "${release_lvms}"; then
     ./scripts/auto-rebase/rebase-lvms.sh to "${pullspec_release_lvms}"
 else
     ./scripts/auto-rebase/rebase-lvms.sh to "${pullspec_release_lvms_fallback}"
