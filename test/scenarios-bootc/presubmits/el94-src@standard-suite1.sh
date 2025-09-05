@@ -11,6 +11,10 @@ scenario_remove_vms() {
     remove_vm host1
 }
 
+# Skip SELinux policy validation as it is only supported
+# for bootc images in later releases
 scenario_run_tests() {
-    run_tests host1 suites/standard1
+    run_tests host1 \
+        --exclude standard-selinux-policy \
+        suites/standard1
 }
