@@ -239,6 +239,7 @@ Router Verify Security Configuration
 
 Router Verify Access Logging Configuration Container
     [Documentation]    Test ingress access logging configuration.
+    [Tags]    ushift-6085
     [Setup]    Run Keywords
     ...    Remove Custom Config
     ...    AND

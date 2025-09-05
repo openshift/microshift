@@ -1,7 +1,5 @@
 #!/bin/bash
 
-export TEST_EXCLUDES="ushift-6085"
-
 # Sourced from scenario.sh and uses functions defined there.
 
 scenario_create_vms() {
@@ -15,5 +13,6 @@ scenario_remove_vms() {
 
 scenario_run_tests() {
     run_tests host1 \
-        suites/router
+        suites/osconfig/clusterid.robot \
+        suites/osconfig/systemd-resolved.robot
 }

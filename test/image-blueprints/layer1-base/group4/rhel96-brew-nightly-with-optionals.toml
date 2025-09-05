@@ -1,4 +1,4 @@
-{{- if env.Getenv "BREW_Y1_RELEASE_VERSION" "" -}}
+{{- if env.Getenv "BREW_NIGHTLY_RELEASE_VERSION" "" -}}
 {{- /*
 
   We wrap this template in a test so that the body of the output is
@@ -8,8 +8,8 @@
 
 */ -}}
 
-name = "rhel-9.6-microshift-brew-optionals-4.{{ .Env.PREVIOUS_MINOR_VERSION }}-zstream"
-description = "A RHEL 9.6 image with already built and released RPMs like EC, RC, or Z-stream release: {{ .Env.BREW_Y1_RELEASE_VERSION }}"
+name = "rhel-9.6-microshift-brew-optionals-4.{{ .Env.MINOR_VERSION}}-nightly"
+description = "A RHEL 9.6 image with already built and released RPMs like EC, RC, or Z-stream release: {{ .Env.BREW_NIGHTLY_RELEASE_VERSION }}"
 version = "0.0.1"
 modules = []
 groups = []
@@ -17,30 +17,34 @@ distro = "rhel-96"
 
 # Parent specification directive recognized by test/bin/build_images.sh to be
 # used with the '--parent' argument of 'osbuild-composer'
-# parent = "rhel-9.4-microshift-brew-optionals-4.{{ .Env.YMINUS2_MINOR_VERSION }}-zstream"
+# parent = "rhel-9.6-microshift-brew-optionals-4.{{ .Env.PREVIOUS_MINOR_VERSION }}-zstream"
 
 {{ range (env.Getenv "MICROSHIFT_MANDATORY_RPMS" | strings.Split " ") }}
 [[packages]]
 name = "{{ . }}"
-version = "{{ env.Getenv "BREW_Y1_RELEASE_VERSION" }}"
+version = "{{ env.Getenv "BREW_NIGHTLY_RELEASE_VERSION" }}"
 {{ end }}
 
-{{ range (env.Getenv "MICROSHIFT_Y1_OPTIONAL_RPMS" | strings.Split " ") }}
+{{ range (env.Getenv "MICROSHIFT_OPTIONAL_RPMS" | strings.Split " ") }}
 [[packages]]
 name = "{{ . }}"
-version = "{{ env.Getenv "BREW_Y1_RELEASE_VERSION" }}"
+version = "{{ env.Getenv "BREW_NIGHTLY_RELEASE_VERSION" }}"
 {{ end }}
 
 {{- if and (env.Getenv "UNAME_M" "") (eq "x86_64" .Env.UNAME_M) }}
-{{ range (env.Getenv "MICROSHIFT_Y1_X86_64_RPMS" | strings.Split " ") }}
+{{ range (env.Getenv "MICROSHIFT_X86_64_RPMS" | strings.Split " ") }}
 [[packages]]
 name = "{{ . }}"
-version = "{{ env.Getenv "BREW_Y1_RELEASE_VERSION" }}"
+version = "{{ env.Getenv "BREW_NIGHTLY_RELEASE_VERSION" }}"
 {{ end }}
 {{- end }}
 
 [[packages]]
 name = "microshift-test-agent"
+version = "*"
+
+[[packages]]
+name = "systemd-resolved"
 version = "*"
 
 [customizations.services]

@@ -6,7 +6,7 @@ export TEST_RANDOMIZATION=none
 # Sourced from scenario.sh and uses functions defined there.
 
 scenario_create_vms() {
-    prepare_kickstart host1 kickstart.ks.template rhel-9.6-microshift-source-tuned
+    prepare_kickstart host1 kickstart.ks.template "rhel-9.6-microshift-brew-tuned-4.${MINOR_VERSION}-${LATEST_RELEASE_TYPE}"
     launch_vm  --vm_vcpus 6
 }
 
