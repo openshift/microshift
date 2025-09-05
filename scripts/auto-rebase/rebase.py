@@ -266,7 +266,6 @@ def generate_pr_description(amd_tag, arm_tag, prow_job_url, rebase_script_succed
     {changelog}
 
     /label tide/merge-method-squash
-    /label cherry-pick-approved
     /label backport-risk-assessed
     /label jira/valid-bug
     """)
