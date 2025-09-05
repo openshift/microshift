@@ -1,6 +1,9 @@
-- machine-config-operator embedded-component cc2f713fa75afd493d1abc24cfa965a242ab07bc to 7a56cf0048a05d576e746c3e992ce586e07c97e8
-  - e516665e 2025-08-28T17:36:33+02:00 OCPBUGS-61016: Fix wait failure on MCO pods
+- api embedded-component 4a165b214722ff53fbdac1d250f62d4b0bb2bd3d to a638ff2e96fb9fb41192e85268fdcb07c0b1ed93
+  - e0349455 2025-09-01T11:30:26+02:00 Add default value for MachineHealthCheck's maxUnhealthy to the description
 
-- oc image-arm64 31597edbaedc6d8d206deda350cfc93e89fa24bf to a43428189603f12ae190703cb725f66f742fbe52
+- cluster-network-operator embedded-component 746b8fb86171dfc75011a7b8db29de5c2355d848 to 7bbd2653092fc383803ba98169f6ffc5be2a64d5
+  - fb3f46d 2025-08-20T14:43:26-05:00 Set RunAsUser for network-node-identity
+
+- oc image-amd64 31597edbaedc6d8d206deda350cfc93e89fa24bf to a43428189603f12ae190703cb725f66f742fbe52
   - ea3cacdc 2025-08-29T13:21:45+02:00 must-gather: Fix usage checker for custom commands
 
