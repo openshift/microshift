@@ -25,7 +25,7 @@ Artifacts built in this layer cannot be cached as they depend on the current sou
 
 |Group |Build Time|Description|
 |------|----------|-----------|
-|group1| Short    | Current source prerequisites (RHEL and CentOS) used in presubmits and periodics
+|group1| Short    | Current source prerequisites on RHEL used in presubmits and periodics
 |group2| Short    | Current source artifacts on RHEL used in presubmits and periodics
 
 > Note: Total build times are up to 5 minutes.
@@ -36,8 +36,18 @@ Artifacts built in this layer cannot be cached as they depend on the current sou
 
 |Group |Build Time|Description|
 |------|----------|-----------|
-|group1| Average  | Current source prerequisites (RHEL and CentOS) used only in periodics
+|group1| Average  | Current source prerequisites on RHEL used only in periodics
 |group2| Average  | Current source artifacts on RHEL used only in periodics
-|group3| Average  | Current source artifacts on CentOS used only in periodics
+
+> Note: Total build times are up to 15 minutes.
+
+## Bootc Upstream Layer
+
+Artifacts built in this layer cannot be cached as they depend on the current sources.
+
+|Group |Build Time|Description|
+|------|----------|-----------|
+|group1| Average  | Current source prerequisites on CentOS used only in upstream
+|group2| Average  | Current source artifacts on CentOS used only in upstream
 
 > Note: Total build times are up to 15 minutes.
