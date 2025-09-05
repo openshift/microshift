@@ -63,7 +63,7 @@ Test Suite Teardown
 Test Case Setup
     [Documentation]    Prepare the cluster-level APIs and a data-volume with some simple text
     ${ns}=    Create Unique Namespace
-    Set Test Variable    \${NAMESPACE}    ${ns}
+    VAR    ${NAMESPACE}=    ${ns}    scope=TEST
     Oc Apply    -k ${SOURCE_KUSTOMIZE} -n ${NAMESPACE}
     Named Pod Should Be Ready    ${POD_NAME_STATIC}
     Write To Volume    ${POD_NAME_STATIC}    ${TEST_DATA}

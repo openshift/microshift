@@ -59,7 +59,6 @@ Verify Multus Embedded Manifests
     [Documentation]    Delete Multus' DHCP Daemon and reboot host to make sure
     ...    it comes back even though the manifests do not exist anymore.
 
-    SSHLibrary.File Should Exist    /etc/greenboot/check/required.d/41_microshift_running_check_multus.sh
     SSHLibrary.File Should Exist    /etc/crio/crio.conf.d/12-microshift-multus.conf
     SSHLibrary.Directory Should Not Exist    /usr/lib/microshift/manifests.d/000-microshift-multus/
 

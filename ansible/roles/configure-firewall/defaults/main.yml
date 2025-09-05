@@ -27,4 +27,5 @@ firewall_ports:
 firewall_trusted_cidr:
   - 10.42.0.0/16
   - 169.254.169.1/32
+  - fd01::/48
 

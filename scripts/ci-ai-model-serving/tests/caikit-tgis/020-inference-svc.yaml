@@ -1,0 +1,16 @@
+apiVersion: serving.kserve.io/v1beta1
+kind: InferenceService
+metadata:
+  name: flan-t5
+spec:
+  predictor:
+    serviceAccountName: sa
+    model:
+      modelFormat:
+        name: caikit
+      storageUri: "s3://modelmesh-example-models/llm/models/flan-t5-small-caikit"
+      resources:
+        limits:
+          nvidia.com/gpu: 1
+        requests:
+          nvidia.com/gpu: 1

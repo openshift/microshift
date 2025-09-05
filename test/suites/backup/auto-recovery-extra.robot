@@ -84,7 +84,7 @@ Create Backup With Marker
     ${backup_path}=    Command Should Work    microshift backup --auto-recovery ${WORKDIR}
     Command Should Work    touch ${backup_path}/marker
 
-Set Up MicroShift Auto Recovery Unit    # robocop: disable=too-many-calls-in-keyword
+Set Up MicroShift Auto Recovery Unit    # robocop: off=too-many-calls-in-keyword
     [Documentation]    Sets up drop-in and service to run on MicroShift's failure.
 
     Command Should Work    mkdir -p /etc/systemd/system/microshift.service.d

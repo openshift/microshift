@@ -5,7 +5,7 @@ trap 'jobs -p | xargs kill || true; wait; exit 0' TERM
 
 OPENSHIFT_MARKER="openshift-generated-node-resolver"
 HOSTS_FILE="/etc/hosts"
-TEMP_FILE="/etc/hosts.tmp"
+TEMP_FILE="/tmp/hosts.tmp"
 
 IFS=', ' read -r -a services <<< "${SERVICES}"
 

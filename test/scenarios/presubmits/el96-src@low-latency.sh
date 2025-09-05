@@ -15,7 +15,7 @@ scenario_remove_vms() {
 }
 
 scenario_run_tests() {
-    # Should not be ran immediately after creating VM because of
+    # Should not be run immediately after creating VM because of
     # microshift-tuned rebooting the node to activate the profile.
     local -r start_time=$(date +%s)
     while true; do

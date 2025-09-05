@@ -143,7 +143,7 @@ Construct Pod Info
     ${pod_pid}=    Evaluate    "${pod_json}[info][pid]"
     ${pod_id}=    Evaluate    "${pod_json}[status][id]"
     ${namespace}=    Evaluate    "${pod_json}[info][runtimeSpec][annotations][io.kubernetes.pod.namespace]"
-    ${pod_info}=    Catenate    SEPARATOR=
+    ${pod_info}=    Catenate    SEPARATOR=${EMPTY}
     ...    container: ${container_name}
     ...    ${EMPTY} pod: ${pod_name}
     ...    ${EMPTY} pid: ${pod_pid}
@@ -153,9 +153,9 @@ Construct Pod Info
 Get Json From Crio Output
     [Documentation]    get json from the crio command
     [Arguments]    ${is_workloads}
-    Set Global Variable    ${NOT_WORKLOADS}    ${EMPTY}
+    VAR    ${NOT_WORKLOADS}=    ${EMPTY}    scope=GLOBAL
     IF    "${is_workloads}"!="${EMPTY}"
-        Set Global Variable    ${NOT_WORKLOADS}    | not
+        VAR    ${NOT_WORKLOADS}=    | not    scope=GLOBAL
     END
 
     ${stdout}    ${stderr}    ${rc}=    Execute Command
@@ -171,7 +171,7 @@ Crio Save Pod Manifest
     [Documentation]    Saves running pod manifest using crio inspect
     [Arguments]    ${pod_id}
     ${path}=    Create Random Temp File
-    Set Global Variable    ${DEBUG_OUTPUT_FILE}    ${path}
+    VAR    ${DEBUG_OUTPUT_FILE}=    ${path}    scope=GLOBAL
     ${stdout}    ${stderr}    ${rc}=    Execute Command
     ...    crictl ps -q | xargs sudo crictl inspect | jq -rs '[.[][] | select(.status.id=="${pod_id}")]' >${DEBUG_OUTPUT_FILE} 2>&1
     ...    sudo=True
@@ -204,7 +204,11 @@ All Pods Should Be Annotated As Management
     [Documentation]    Obtains list of Deployments created by CSV.
     ${pods_raw}=    Oc Get All Pods
     @{pods}=    Split String    ${pods_raw}
-    Set Test Variable    @{NS_TO_SKIP_LIST}    openshift-gateway-api    redhat-ods-applications
+    VAR    @{NS_TO_SKIP_LIST}=
+    ...    openshift-gateway-api
+    ...    redhat-ods-applications
+    ...    cert-manager-operator
+    ...    scope=TEST
     FOR    ${pod}    IN    @{pods}
         ${ns}    ${pod}=    Split String    ${pod}    \@
         IF    "${ns}" not in "@{NS_TO_SKIP_LIST}"
@@ -259,7 +263,7 @@ Cleanup And Create NS
     Remove Files    ${KUBELET_CPU_STATE_FILE}
     Restart MicroShift
     ${ns}=    Create Unique Namespace
-    Set Suite Variable    \${NAMESPACE}    ${ns}
+    VAR    ${NAMESPACE}=    ${ns}    scope=SUITE
 
 Setup Suite And Wait For Greenboot
     [Documentation]    Run setup suit and wait for greenboot to become ready

@@ -23,7 +23,7 @@ Check Logs After Clean Start
 
     Cleanup MicroShift    --all    --keep-images
     ${cursor}=    Get Journal Cursor
-    Set Suite Variable    \${CURSOR}    ${cursor}
+    VAR    ${CURSOR}=    ${cursor}    scope=SUITE
 
     Enable MicroShift
     Start MicroShift
@@ -44,7 +44,7 @@ Check Logs After Restart
     ...    stop and check for errors.
 
     ${cursor}=    Get Journal Cursor
-    Set Suite Variable    \${CURSOR}    ${cursor}
+    VAR    ${CURSOR}=    ${cursor}    scope=SUITE
 
     Start MicroShift
     Restart Greenboot And Wait For Success

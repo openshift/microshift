@@ -45,8 +45,7 @@ Access Hello Microshift
     ...    Use hello-microshift as authority and swap it with --connect-to option.
     ...    Returns all output and return code.
     ...    Times out after 15s.
-    [Arguments]
-    ...    ${ushift_port}
+    [Arguments]    ${ushift_port}
     ...    ${ushift_ip}=${USHIFT_HOST}
     ...    ${path}=${EMPTY}
     ...    ${scheme}=http
@@ -54,8 +53,8 @@ Access Hello Microshift
 
     ${ip}=    Add Brackets If Ipv6    ${ushift_ip}
 
-    ${connect_to}=    Set Variable    "${hostname}::${ip}:"
-    ${url_path}=    Set Variable    "${scheme}://${hostname}:${ushift_port}${path}"
+    VAR    ${connect_to}=    "${hostname}::${ip}:"
+    VAR    ${url_path}=    "${scheme}://${hostname}:${ushift_port}${path}"
 
     ${result}=    Run Process
     ...    curl -k -i ${url_path} --connect-to ${connect_to}
@@ -65,8 +64,7 @@ Access Hello Microshift
 
 Access Hello MicroShift Success
     [Documentation]    Expect 200 OK when accessing "hello microshift" through the router.
-    [Arguments]
-    ...    ${ushift_port}
+    [Arguments]    ${ushift_port}
     ...    ${ushift_ip}=${USHIFT_HOST}
     ...    ${path}=${EMPTY}
     ...    ${scheme}=http
@@ -84,8 +82,7 @@ Access Hello MicroShift Success
 
 Access Hello MicroShift No Route
     [Documentation]    Expect 503 Service Unavailable when accessing "hello microshift" through the router.
-    [Arguments]
-    ...    ${ushift_port}
+    [Arguments]    ${ushift_port}
     ...    ${ushift_ip}=${USHIFT_HOST}
     ...    ${path}=${EMPTY}
     ...    ${scheme}=http

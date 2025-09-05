@@ -5,10 +5,11 @@ go_arch: arm64
 go_files:
   - go
   - gofmt
-go_version: 1.20.3
+go_version: 1.24.4
 go_install_dir: /usr/local/go{{ go_version }}
 
 install_packages:
+  - avahi-tools
   - bash-completion
   - firewalld
   - git

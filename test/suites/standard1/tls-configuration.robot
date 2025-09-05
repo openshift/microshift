@@ -122,7 +122,7 @@ Save Journal Cursor
     ...    Save the journal cursor then restart MicroShift so we capture the
     ...    shutdown messages and startup messages.
     ${cursor}=    Get Journal Cursor
-    Set Test Variable    \${CURSOR}    ${cursor}
+    VAR    ${CURSOR}=    ${cursor}    scope=TEST
 
 Setup TLS Configuration
     [Documentation]    Apply the TLS configuration in the argument
@@ -170,28 +170,28 @@ Check TLS Endpoints
     IF    ${cipher_available} == ${FALSE}    RETURN
 
     IF    "${tls_version}" == "TLSv1.2"
-        Set Test Variable    ${TLS_AND_CIPHER_ARGS}    -tls1_2 -cipher ${cipher}
+        VAR    ${TLS_AND_CIPHER_ARGS}=    -tls1_2 -cipher ${cipher}    scope=TEST
     ELSE IF    "${tls_version}" == "TLSv1.3"
-        Set Test Variable    ${TLS_AND_CIPHER_ARGS}    -tls1_3 -ciphersuites ${cipher}
+        VAR    ${TLS_AND_CIPHER_ARGS}=    -tls1_3 -ciphersuites ${cipher}    scope=TEST
     END
 
     # api server, kubelet, kube controller manager and kube scheduler endpoint ports
     FOR    ${port}    IN    6443    10250    10257    10259
         ${stdout}=    Wait Until Keyword Succeeds    10x    10s
         ...    Openssl Connect Command    localhost:${port}
-        ...        ${TLS_AND_CIPHER_ARGS}
-        ...        ${return_code}
-        ...        ${tls_version}, Cipher is ${cipher}
+        ...    ${TLS_AND_CIPHER_ARGS}
+        ...    ${return_code}
+        ...    ${tls_version}, Cipher is ${cipher}
     END
 
     # etcd endpoint, need to use cert and key because etcd requires mTLS
-    Set Test Variable    ${CERT_ARG}    -cert ${APISERVER_ETCD_CLIENT_CERT}/client.crt
-    Set Test Variable    ${KEY_ARG}    -key ${APISERVER_ETCD_CLIENT_CERT}/client.key
+    VAR    ${CERT_ARG}=    -cert ${APISERVER_ETCD_CLIENT_CERT}/client.crt    scope=TEST
+    VAR    ${KEY_ARG}=    -key ${APISERVER_ETCD_CLIENT_CERT}/client.key    scope=TEST
     Wait Until Keyword Succeeds    10x    2s
     ...    Openssl Connect Command    localhost:2379
-    ...        ${TLS_AND_CIPHER_ARGS} ${CERT_ARG} ${KEY_ARG}
-    ...        ${return_code}
-    ...        CONNECTED
+    ...    ${TLS_AND_CIPHER_ARGS} ${CERT_ARG} ${KEY_ARG}
+    ...    ${return_code}
+    ...    CONNECTED
 
 Check Journal Logs
     [Documentation]    Verify system logs contain expected error messages for configuration errors

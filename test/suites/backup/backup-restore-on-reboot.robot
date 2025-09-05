@@ -62,7 +62,7 @@ Make Masquerading Backup
     Systemctl    stop    microshift.service
 
     ${deploy_id}=    Get Booted Deployment ID
-    ${backup_name}=    Set Variable    ${deploy_id}_manual
+    VAR    ${backup_name}=    ${deploy_id}_manual
 
     Create Backup    ${backup_name}    ${TRUE}
 

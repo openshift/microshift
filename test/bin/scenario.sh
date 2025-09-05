@@ -31,6 +31,7 @@ SKIP_GREENBOOT=${SKIP_GREENBOOT:-false}  # may be overridden in scenario file
 IMAGE_SIGSTORE_ENABLED=false # may be overridden in scenario file
 VNC_CONSOLE=${VNC_CONSOLE:-false}  # may be overridden in global settings file
 TEST_RANDOMIZATION="all"  # may be overridden in scenario file
+TEST_EXCLUDES="none"  # may be overridden in scenario file
 TEST_EXECUTION_TIMEOUT="30m" # may be overriden in scenario file
 SUBSCRIPTION_MANAGER_PLUGIN="${SUBSCRIPTION_MANAGER_PLUGIN:-${SCRIPTDIR}/subscription_manager_register.sh}"  # may be overridden in global settings file
 RUN_HOST_OVERRIDE=""  # target any given VM for running scenarios
@@ -1047,11 +1048,16 @@ EOF
         timeout_robot="${rf_binary}"
     fi
 
+    export SKIP_SOS # For sos-on-failure-listener.py
+
     # shellcheck disable=SC2086
     if ! ${timeout_robot} \
         --name "${SCENARIO}" \
         --randomize "${TEST_RANDOMIZATION}" \
+        --exclude "${TEST_EXCLUDES}" \
         --loglevel TRACE \
+        --listener "${TESTDIR}/resources/sos-on-failure-listener.py" \
+        --pythonpath "${TESTDIR}/resources" \
         --outputdir "${SCENARIO_INFO_DIR}/${SCENARIO}" \
         --debugfile "${SCENARIO_INFO_DIR}/${SCENARIO}/rf-debug.log" \
         -x junit.xml \

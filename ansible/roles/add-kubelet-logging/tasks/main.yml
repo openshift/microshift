@@ -1,45 +1,48 @@
 ---
 # add-kubelet-logging tasks
 
-- name: check to ensure promdir target exists
+- name: Check to ensure promdir target exists
   ansible.builtin.stat:
     path: "{{ prometheus_dir }}"
   register: promdir
 
-- name: check if the file exists
+- name: Check if the file exists
   ansible.builtin.stat:
     path: "{{ sa_token_file }}"
   register: token_file
 
-- block:
-  - name: load sa-token file from localhost
-    ansible.builtin.slurp:
-      src: "{{ sa_token_file }}"
-    register: bearer_token_slurp
-    delegate_to: localhost
-
-  - name: decode bearer token
-    set_fact:
-      bearer_token: "{{ bearer_token_slurp.content | b64decode }}"
-
-  - name: create metrics service account token file in prometheus folder
-    ansible.builtin.copy:
-      content: "{{ bearer_token }}"
-      dest: "{{ kubelet_auth_token_file }}"
-    when: promdir.stat.exists
-
-  - name: remove the sa-token file
-    ansible.builtin.file:
-      path: "{{ sa_token_file }}"
-      state: absent
+- name: Deal with metrics service account token file
   when: token_file.stat.exists
+  block:
+    - name: Load sa-token file from localhost
+      ansible.builtin.slurp:
+        src: "{{ sa_token_file }}"
+      register: bearer_token_slurp
+      delegate_to: localhost
 
-- name: append kubelet scrape config target to prometheus config
+    - name: Decode bearer token
+      ansible.builtin.set_fact:
+        bearer_token: "{{ bearer_token_slurp.content | b64decode }}"
+
+    - name: Create metrics service account token file in prometheus folder
+      ansible.builtin.copy:
+        content: "{{ bearer_token }}"
+        dest: "{{ kubelet_auth_token_file }}"
+        mode: '0644'
+      when: promdir.stat.exists
+
+    - name: Remove the sa-token file
+      ansible.builtin.file:
+        path: "{{ sa_token_file }}"
+        state: absent
+
+- name: Append kubelet scrape config target to prometheus config
   ansible.builtin.blockinfile:
     path: "{{ prometheus_config }}"
     block: |
       # kubelet targets
-        - job_name: kubelet
+      {% for host in groups['microshift'] %}
+        - job_name: kubelet-{{ host }}
           scheme: https
           authorization:
             credentials_file: "{{ kubelet_auth_token_file }}"
@@ -47,9 +50,9 @@
             insecure_skip_verify: true
           static_configs:
             - targets:
-              - microshift-dev:10250
+              - {{ hostvars[host].ansible_host }}:10250
 
-        - job_name: kubelet cadvisor
+        - job_name: kubelet-{{ host }}-cadvisor
           scheme: https
           authorization:
             credentials_file: "{{ kubelet_auth_token_file }}"
@@ -58,9 +61,10 @@
           metrics_path: /metrics/cadvisor
           static_configs:
             - targets:
-              - microshift-dev:10250
+              - {{ hostvars[host].ansible_host }}:10250
+      {% endfor %}
 
-- name: restart prometheus to pick up new target
+- name: Restart prometheus to pick up new target
   ansible.builtin.systemd:
     state: restarted
     name: prometheus

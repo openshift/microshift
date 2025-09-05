@@ -38,11 +38,11 @@ Greenboot Health Check Exited
     [Documentation]    Check that the Greenboot Health Check systemd service has state "exited"
     ${result}    ${exited}=    Wait Until Keyword Succeeds    5x    5s
     ...    Run Guest Process    ${GUEST_NAME}
-    ...        systemctl
-    ...        show
-    ...        --property\=SubState
-    ...        --value
-    ...        greenboot-healthcheck.service
+    ...    systemctl
+    ...    show
+    ...    --property\=SubState
+    ...    --value
+    ...    greenboot-healthcheck.service
     Should Be Equal As Integers    ${result["rc"]}    0
     Should Be Equal As Strings    ${result["stdout"]}    exited
 
@@ -80,7 +80,7 @@ Run With Kubeconfig
     ...    ${command}    The command to run. Should but `oc` or `kubectl` but this is not enforced
     ...    @{args}    The arguments to pass to the command. See ../../resources/qemu-guest-agent.py for syntax
     [Arguments]    ${command}    @{args}
-    ${env}=    Create Dictionary    KUBECONFIG=/var/lib/microshift/resources/kubeadmin/kubeconfig
+    VAR    &{env}=    KUBECONFIG=/var/lib/microshift/resources/kubeadmin/kubeconfig
     ${result}    ${ignore}=    Wait Until Keyword Succeeds    5x    2s
     ...    Run Guest Process    ${GUEST_NAME}    ${command}    @{args}    env=&{env}
     Log Many    ${result["stdout"]}    ${result["stderr"]}

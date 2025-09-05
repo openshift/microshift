@@ -1,0 +1,8 @@
+# Kubelet client CA bundle - populated at runtime by the KubeletCAManager
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kubelet-client-ca
+  namespace: kube-system
+data:
+  ca.crt: ""

@@ -239,6 +239,7 @@ Router Verify Security Configuration
 
 Router Verify Access Logging Configuration Container
     [Documentation]    Test ingress access logging configuration.
+    [Tags]    ushift-6085
     [Setup]    Run Keywords
     ...    Remove Custom Config
     ...    AND
@@ -334,8 +335,8 @@ Setup With Custom Config
 
 Setup Namespaces
     [Documentation]    Configure the required namespaces for namespace ownership tests.
-    Set Suite Variable    \${NS_OWNERSHIP_1}    ${NAMESPACE}-ownership-1
-    Set Suite Variable    \${NS_OWNERSHIP_2}    ${NAMESPACE}-ownership-2
+    VAR    ${NS_OWNERSHIP_1}=    ${NAMESPACE}-ownership-1    scope=SUITE
+    VAR    ${NS_OWNERSHIP_2}=    ${NAMESPACE}-ownership-2    scope=SUITE
     Create Namespace    ${NS_OWNERSHIP_1}
     Create Namespace    ${NS_OWNERSHIP_2}
 
@@ -431,5 +432,5 @@ Delete Custom CA Secret
 Check Access Logs
     [Documentation]    Retrieve and check if a pattern appears in the router's access logs.
     [Arguments]    ${pattern}
-    ${logs}=    Oc Logs    deployment/router-default -c access-logs    openshift-ingress
+    ${logs}=    Oc Logs    deployment/router-default -c logs    openshift-ingress
     Should Contain    ${logs}    ${pattern}

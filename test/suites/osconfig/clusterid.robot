@@ -96,7 +96,7 @@ Create Sos Report
     [Documentation]    Create a MicroShift Sos Report and return the tar file path
 
     ${rand_str}=    Generate Random String    4    [NUMBERS]
-    ${sos_report_dir}=    Catenate    SEPARATOR=    /tmp/rf-test/sos-report_    ${rand_str}
+    ${sos_report_dir}=    Catenate    SEPARATOR=${EMPTY}    /tmp/rf-test/sos-report_    ${rand_str}
 
     Command Should Work    mkdir -p ${sos_report_dir}
     Command Should Work    sos report --batch --all-logs --tmp-dir ${sos_report_dir} -p microshift -o logs

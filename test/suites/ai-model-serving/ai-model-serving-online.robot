@@ -10,19 +10,19 @@ Suite Teardown      Teardown Suite
 
 
 *** Variables ***
-${USHIFT_HOST}=             ${EMPTY}
-${OVMS_KSERVE_MANIFEST}=    /tmp/ovms-kserve.yaml
-${OVMS_REQUEST}=            /tmp/ovms-request.json
+${USHIFT_HOST}              ${EMPTY}
+${OVMS_KSERVE_MANIFEST}     /tmp/ovms-kserve.yaml
+${OVMS_REQUEST}             /tmp/ovms-request.json
 
 
 *** Test Cases ***
 Test OpenVINO model
     [Documentation]    Sanity test for AI OpenVino Model Serving
 
-    Set Test Variable    ${MODEL_NAME}    openvino-resnet
-    Set Test Variable    ${DOMAIN}    ${MODEL_NAME}-predictor-test-ai.apps.example.com
+    VAR    ${MODEL_NAME}=    openvino-resnet    scope=TEST
+    VAR    ${DOMAIN}=    ${MODEL_NAME}-predictor-test-ai.apps.example.com    scope=TEST
     ${ns}=    Create Unique Namespace
-    Set Test Variable    ${NAMESPACE}    ${ns}
+    VAR    ${NAMESPACE}=    ${ns}    scope=TEST
 
     Deploy OpenVINO Serving Runtime
     Deploy OpenVINO Resnet Model
@@ -105,7 +105,7 @@ Query Model Infer Endpoint
     ...    --connect-to "${DOMAIN}::${USHIFT_HOST}:"
     ${output}=    Local Command Should Work    ${cmd}
     ${result}=    Json Parse    ${output}
-    ${data}=    Set Variable    ${result["outputs"][0]["data"]}
+    VAR    ${data}=    ${result["outputs"][0]["data"]}
     # Following expression can be referred to as 'argmax': index of the highest element.
     ${argmax}=    Evaluate    ${data}.index(max(${data}))
 

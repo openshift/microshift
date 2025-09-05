@@ -475,8 +475,8 @@ $ ./test/bin/scenario.sh run \
 
 ### Scenario Definitions
 
-Scenarios are saved as shell scripts under `./test/scenarios` and
-`./test/scenarios-periodics`.
+Scenarios are saved as shell scripts under `./test/scenarios`,
+`./test/scenarios-bootc` and `./test/scenarios-bootc-containers`.
 Each scenario includes several functions that are combined
 with the framework scripts to take the specific actions for the
 combination of images and tests that make up the scenario.
@@ -511,6 +511,8 @@ Scenarios utilize following distinct MicroShift sources:
 - `crel`: current MicroShift minor release (already built and released
    RPMs like ECs, RCs, Z-stream). It is optional meaning that shortly after
    branch cut, before first EC is released, it will be skipped.
+- `lrel`: latest available release (EC, RC or zstream) available from internal
+   Red Hat repositories (staging).
 
 | Starting ref | End ref | Successful upgrade scenario | Failed upgrade scenario |
 |--------------|---------|-----------------------------|-------------------------|
@@ -518,6 +520,7 @@ Scenarios utilize following distinct MicroShift sources:
 | `prel` | `src` |`el92-prel@upgrade-ok.sh` | **MISSING** |
 | `src` | `src` | **MISSING** | `el92-src@upgrade-failing-cannot-backup.sh` |
 | `crel` | `src` | `el92-crel@upgrade-ok.sh` | `el92-crel@upgrade-fails.sh` |
+| `y1` | `lrel` | `el96-y1@el96-lrel@standard1.sh` | **MISSING** |
 
 #### scenario_create_vms
 

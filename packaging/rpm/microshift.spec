@@ -400,16 +400,6 @@ install -p -m644 packaging/systemd/microshift-ovs-init.service %{buildroot}%{_un
 install -p -m755 packaging/systemd/configure-ovs.sh %{buildroot}%{_bindir}/configure-ovs.sh
 install -p -m755 packaging/systemd/configure-ovs-microshift.sh %{buildroot}%{_bindir}/configure-ovs-microshift.sh
 
-# Avoid firewalld manipulation and flushing of iptable rules,
-# this is a workaround for https://issues.redhat.com/browse/NP-641
-# It will trigger some warnings on the selinux audit log when restarting firewalld.
-# In the future firewalld should stop flushing iptables unless we use any firewalld rule with direct
-# iptables rules, once that's available in RHEL we can remove this workaround
-# see https://github.com/firewalld/firewalld/issues/863#issuecomment-1407059938
-
-mkdir -p -m755 %{buildroot}%{_sysconfdir}/systemd/system/firewalld.service.d
-install -p -m644 packaging/systemd/firewalld-no-iptables.conf %{buildroot}%{_sysconfdir}/systemd/system/firewalld.service.d/firewalld-no-iptables.conf
-
 mkdir -p -m755 %{buildroot}/var/lib/kubelet/pods
 
 install -d %{buildroot}%{_datadir}/selinux/packages/%{selinuxtype}
@@ -430,7 +420,6 @@ install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/001-microshi
 # Copy all the OLM manifests except the arch specific ones
 install -p -m644 assets/optional/operator-lifecycle-manager/0000* %{buildroot}/%{_prefix}/lib/microshift/manifests.d/001-microshift-olm
 install -p -m644 assets/optional/operator-lifecycle-manager/kustomization.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/001-microshift-olm
-install -p -m755 packaging/greenboot/microshift-running-check-olm.sh %{buildroot}%{_sysconfdir}/greenboot/check/required.d/50_microshift_running_check_olm.sh
 
 %ifarch %{arm} aarch64
 cat assets/optional/operator-lifecycle-manager/kustomization.aarch64.yaml >> %{buildroot}/%{_prefix}/lib/microshift/manifests.d/001-microshift-olm/kustomization.yaml
@@ -447,7 +436,6 @@ install -p -m644 assets/optional/operator-lifecycle-manager/release-olm-{x86_64,
 # multus
 install -d -m755 %{buildroot}%{_sysconfdir}/microshift/config.d
 install -p -m644 packaging/microshift/dropins/enable-multus.yaml %{buildroot}%{_sysconfdir}/microshift/config.d/00-enable-multus.yaml
-install -p -m755 packaging/greenboot/microshift-running-check-multus.sh %{buildroot}%{_sysconfdir}/greenboot/check/required.d/41_microshift_running_check_multus.sh
 install -p -m755 packaging/crio.conf.d/12-microshift-multus.conf %{buildroot}%{_sysconfdir}/crio/crio.conf.d/12-microshift-multus.conf
 
 # multus-release-info
@@ -528,7 +516,6 @@ install -p -m755 packaging/tuned/microshift-tuned.py %{buildroot}%{_bindir}/micr
 install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/000-microshift-gateway-api
 install -p -m644 assets/optional/gateway-api/0* %{buildroot}/%{_prefix}/lib/microshift/manifests.d/000-microshift-gateway-api
 install -p -m644 assets/optional/gateway-api/kustomization.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/000-microshift-gateway-api
-install -p -m755 packaging/greenboot/microshift-running-check-gateway-api.sh %{buildroot}%{_sysconfdir}/greenboot/check/required.d/41_microshift_running_check_gateway_api.sh
 
 %ifarch %{arm} aarch64
 cat assets/optional/gateway-api/kustomization.aarch64.yaml >> %{buildroot}/%{_prefix}/lib/microshift/manifests.d/000-microshift-gateway-api/kustomization.yaml
@@ -581,7 +568,6 @@ install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/050-microshi
 install -p -m644 assets/optional/ai-model-serving/runtimes/*.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/050-microshift-ai-model-serving-runtimes
 rm -v %{buildroot}/%{_prefix}/lib/microshift/manifests.d/050-microshift-ai-model-serving-runtimes/kustomization.x86_64.yaml
 
-install -p -m755 packaging/greenboot/microshift-running-check-ai-model-serving.sh %{buildroot}%{_sysconfdir}/greenboot/check/required.d/41_microshift_running_check_ai_model_serving.sh
 
 cat assets/optional/ai-model-serving/runtimes/kustomization.x86_64.yaml >> %{buildroot}/%{_prefix}/lib/microshift/manifests.d/050-microshift-ai-model-serving-runtimes/kustomization.yaml
 %endif
@@ -614,7 +600,6 @@ install -p -m644 assets/optional/cert-manager/manager/*.yaml %{buildroot}/%{_pre
 install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/060-microshift-cert-manager/rbac
 install -p -m644 assets/optional/cert-manager/rbac/*.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/060-microshift-cert-manager/rbac
 install -p -m644 assets/optional/cert-manager/kustomization.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/060-microshift-cert-manager
-install -p -m755 packaging/greenboot/microshift-running-check-cert-manager.sh %{buildroot}%{_sysconfdir}/greenboot/check/required.d/60_microshift_running_check_cert_manager.sh
 
 # cert-manager-release-info
 mkdir -p -m755 %{buildroot}%{_datadir}/microshift/release
@@ -727,7 +712,6 @@ fi
 %{_sysconfdir}/crio/crio.conf.d/11-microshift-ovn.conf
 %{_sysconfdir}/systemd/system/ovs-vswitchd.service.d/microshift-cpuaffinity.conf
 %{_sysconfdir}/systemd/system/ovsdb-server.service.d/microshift-cpuaffinity.conf
-%{_sysconfdir}/systemd/system/firewalld.service.d/firewalld-no-iptables.conf
 
 # OpensvSwitch oneshot configuration script which handles ovn-k8s gateway mode setup
 %{_unitdir}/microshift-ovs-init.service
@@ -744,14 +728,12 @@ fi
 %files olm
 %dir %{_prefix}/lib/microshift/manifests.d/001-microshift-olm
 %{_prefix}/lib/microshift/manifests.d/001-microshift-olm/*
-%{_sysconfdir}/greenboot/check/required.d/50_microshift_running_check_olm.sh
 
 %files olm-release-info
 %{_datadir}/microshift/release/release-olm-{x86_64,aarch64}.json
 
 %files multus
 %{_sysconfdir}/microshift/config.d/00-enable-multus.yaml
-%{_sysconfdir}/greenboot/check/required.d/41_microshift_running_check_multus.sh
 %{_sysconfdir}/crio/crio.conf.d/12-microshift-multus.conf
 
 %files multus-release-info
@@ -790,7 +772,6 @@ fi
 %files gateway-api
 %dir %{_prefix}/lib/microshift/manifests.d/000-microshift-gateway-api
 %{_prefix}/lib/microshift/manifests.d/000-microshift-gateway-api/*
-%{_sysconfdir}/greenboot/check/required.d/41_microshift_running_check_gateway_api.sh
 
 %files gateway-api-release-info
 %{_datadir}/microshift/release/release-gateway-api-{x86_64,aarch64}.json
@@ -802,7 +783,6 @@ fi
 %dir %{_prefix}/lib/microshift/manifests.d/050-microshift-ai-model-serving-runtimes
 %{_prefix}/lib/microshift/manifests.d/010-microshift-ai-model-serving-kserve/*
 %{_prefix}/lib/microshift/manifests.d/050-microshift-ai-model-serving-runtimes/*
-%{_sysconfdir}/greenboot/check/required.d/41_microshift_running_check_ai_model_serving.sh
 %endif
 
 %files ai-model-serving-release-info
@@ -819,7 +799,6 @@ fi
 %files cert-manager
 %dir %{_prefix}/lib/microshift/manifests.d/060-microshift-cert-manager
 %{_prefix}/lib/microshift/manifests.d/060-microshift-cert-manager/*
-%{_sysconfdir}/greenboot/check/required.d/60_microshift_running_check_cert_manager.sh
 
 %files cert-manager-release-info
 %{_datadir}/microshift/release/release-cert-manager-{x86_64,aarch64}.json
@@ -828,6 +807,12 @@ fi
 # Use Git command to generate the log and replace the VERSION string
 # LANG=C git log --date="format:%a %b %d %Y" --pretty="tformat:* %cd %an <%ae> VERSION%n- %s%n" packaging/rpm/microshift.spec
 %changelog
+* Mon Aug 11 2025 Patryk Matuszak <pmatusza@redhat.com> 4.20.0
+- Remove healthcheck scripts: optional MicroShift workloads are now part of healthcheck command
+
+* Wed Aug 06 2025 Evgeny Slutsky <eslutsky@rehat.com> 4.20.0
+- Remove firewalld service override configuration to avoid flushing of iptables
+
 * Thu Jul 24 2025 Evgeny Slutsky <eslutsky@redhat.com> 4.20.0
 - Update microshift-cert-manager with greenboot script
 

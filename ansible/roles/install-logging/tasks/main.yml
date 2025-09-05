@@ -1,73 +1,75 @@
 ---
 # install-logging tasks
 
-- name: rpm tasks
+- name: RPM tasks
+  when: (ansible_distribution == "CentOS") or (ansible_distribution == "RedHat") or (ansible_distribution == "Fedora")
   block:
-    - name: install prometheus & grafana
+    - name: Install prometheus & grafana
       ansible.builtin.dnf:
         name: "{{ logging_packages }}"
         state: present
         update_cache: true
 
-    - name: check that the prometheus cli vars file exists
+    - name: Check that the prometheus cli vars file exists
       ansible.builtin.stat:
         path: "{{ prometheus_vars_file }}"
       register: prometheus_vars
 
-    - name: set prometheus args to change listen port
+    - name: Set prometheus args to change listen port
       ansible.builtin.replace:
         path: "{{ prometheus_vars_file }}"
         regexp: "ARGS=''"
         replace: "ARGS='--web.listen-address=0.0.0.0:{{ prometheus_port }}'"
       when: prometheus_vars.stat.exists
-  when: (ansible_distribution == "CentOS") or (ansible_distribution == "RedHat") or (ansible_distribution == "Fedora")
 
-- name: copy prometheus config
+- name: Copy prometheus config
   ansible.builtin.template:
     src: prometheus.yml.j2
     dest: /etc/prometheus/prometheus.yml
+    mode: '0640'
     backup: true
 
-- name: start and enable prometheus & grafana service(s)
+- name: Start and enable prometheus & grafana service(s)
   ansible.builtin.systemd:
     name: "{{ item }}"
     state: restarted
-    enabled: yes
+    enabled: true
   loop: "{{ logging_services }}"
 
-- block:
-  - name: get content of microshift grafana dashboard
-    ansible.builtin.set_fact:
-      microshift_dashboard: "{{ lookup('ansible.builtin.file', 'microshift_perf.json') }}"
-
-  # The following URI commands fail without accessing some external network
-  - name: wake up network access
-    ansible.builtin.command: curl github.com
-
-  - name: create prometheus datasource in grafana
-    ansible.builtin.uri:
-      url: http://{{ ansible_default_ipv4.address }}:{{ grafana_port }}/api/datasources
-      url_username: "{{ grafana_username }}"
-      url_password: "{{ grafana_password }}"
-      status_code: [200, 409]
-      force_basic_auth: yes
-      method: POST
-      body_format: json
-      headers:
-        Accept: application/json
-        Content-Type: application/json
-      body: "{{ lookup('ansible.builtin.template', 'prometheus_datasource.json.j2') }}"
-
-  - name: create microshift perf dashboard in grafana
-    ansible.builtin.uri:
-      url: http://{{ ansible_default_ipv4.address }}:{{ grafana_port }}/api/dashboards/db
-      url_username: "{{ grafana_username }}"
-      url_password: "{{ grafana_password }}"
-      force_basic_auth: yes
-      method: POST
-      body_format: json
-      headers:
-        Accept: application/json
-        Content-Type: application/json
-      body: "{{ lookup('ansible.builtin.template', 'grafana_dashboard.json.j2') }}"
+- name: Configure Grafana dashboards and datasources
   when: grafana_setup
+  block:
+    - name: Get content of microshift grafana dashboard
+      ansible.builtin.set_fact:
+        microshift_dashboard: "{{ lookup('ansible.builtin.file', 'microshift_perf.json') }}"
+
+    # The following URI commands fail without accessing some external network
+    - name: Wake up network access
+      ansible.builtin.command: curl github.com
+
+    - name: Create prometheus datasource in grafana
+      ansible.builtin.uri:
+        url: http://{{ grafana_host_address | default(ansible_default_ipv4.address) }}:{{ grafana_port }}/api/datasources
+        url_username: "{{ grafana_username }}"
+        url_password: "{{ grafana_password }}"
+        status_code: [200, 409]
+        force_basic_auth: true
+        method: POST
+        body_format: json
+        headers:
+          Accept: application/json
+          Content-Type: application/json
+        body: "{{ lookup('ansible.builtin.template', 'prometheus_datasource.json.j2') }}"
+
+    - name: Create microshift perf dashboard in grafana
+      ansible.builtin.uri:
+        url: http://{{ grafana_host_address | default(ansible_default_ipv4.address) }}:{{ grafana_port }}/api/dashboards/db
+        url_username: "{{ grafana_username }}"
+        url_password: "{{ grafana_password }}"
+        force_basic_auth: true
+        method: POST
+        body_format: json
+        headers:
+          Accept: application/json
+          Content-Type: application/json
+        body: "{{ lookup('ansible.builtin.template', 'grafana_dashboard.json.j2') }}"

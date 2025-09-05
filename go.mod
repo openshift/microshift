@@ -38,17 +38,17 @@ require (
 	github.com/prometheus/prometheus v0.302.1
 	github.com/squat/generic-device-plugin v0.0.0-20250710162141-0f7fddf166f1
 	gopkg.in/yaml.v2 v2.4.0
-	k8s.io/api v1.33.2
-	k8s.io/apiextensions-apiserver v1.33.2
-	k8s.io/apimachinery v1.33.2
-	k8s.io/apiserver v1.33.2
-	k8s.io/cli-runtime v1.33.2
-	k8s.io/client-go v1.33.2
-	k8s.io/cloud-provider v1.33.2
-	k8s.io/component-base v1.33.2
-	k8s.io/kube-aggregator v1.33.2
-	k8s.io/kubectl v1.33.2
-	k8s.io/kubelet v1.33.2
+	k8s.io/api v1.33.3
+	k8s.io/apiextensions-apiserver v1.33.3
+	k8s.io/apimachinery v1.33.3
+	k8s.io/apiserver v1.33.3
+	k8s.io/cli-runtime v1.33.3
+	k8s.io/client-go v1.33.3
+	k8s.io/cloud-provider v1.33.3
+	k8s.io/component-base v1.33.3
+	k8s.io/kube-aggregator v1.33.3
+	k8s.io/kubectl v1.33.3
+	k8s.io/kubelet v1.33.3
 	k8s.io/utils v0.0.0-20250604170112-4c0f3b243397
 	sigs.k8s.io/kube-storage-version-migrator v0.0.6-0.20230721195810-5c8923c5ff96
 	sigs.k8s.io/kustomize/api v0.19.0
@@ -162,21 +162,21 @@ require (
 	gopkg.in/go-jose/go-jose.v2 v2.6.3 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1 // indirect
-	k8s.io/cluster-bootstrap v1.33.2 // indirect
-	k8s.io/component-helpers v1.33.2 // indirect
-	k8s.io/controller-manager v1.33.2 // indirect
-	k8s.io/cri-api v1.33.2 // indirect
-	k8s.io/cri-client v1.33.2 // indirect
-	k8s.io/csi-translation-lib v1.33.2 // indirect
-	k8s.io/dynamic-resource-allocation v1.33.2 // indirect
-	k8s.io/endpointslice v1.33.2 // indirect
-	k8s.io/externaljwt v1.33.2 // indirect
-	k8s.io/kms v1.33.2 // indirect
-	k8s.io/kube-controller-manager v1.33.2 // indirect
-	k8s.io/kube-scheduler v1.33.2 // indirect
-	k8s.io/metrics v1.33.2 // indirect
-	k8s.io/mount-utils v1.33.2 // indirect
-	k8s.io/pod-security-admission v1.33.2 // indirect
+	k8s.io/cluster-bootstrap v1.33.3 // indirect
+	k8s.io/component-helpers v1.33.3 // indirect
+	k8s.io/controller-manager v1.33.3 // indirect
+	k8s.io/cri-api v1.33.3 // indirect
+	k8s.io/cri-client v1.33.3 // indirect
+	k8s.io/csi-translation-lib v1.33.3 // indirect
+	k8s.io/dynamic-resource-allocation v1.33.3 // indirect
+	k8s.io/endpointslice v1.33.3 // indirect
+	k8s.io/externaljwt v1.33.3 // indirect
+	k8s.io/kms v1.33.3 // indirect
+	k8s.io/kube-controller-manager v1.33.3 // indirect
+	k8s.io/kube-scheduler v1.33.3 // indirect
+	k8s.io/metrics v1.33.3 // indirect
+	k8s.io/mount-utils v1.33.3 // indirect
+	k8s.io/pod-security-admission v1.33.3 // indirect
 	sigs.k8s.io/apiserver-network-proxy/konnectivity-client v0.31.2 // indirect
 	sigs.k8s.io/json v0.0.0-20241014173422-cfa47c3a1cc8 // indirect
 	sigs.k8s.io/randfill v1.0.0 // indirect
@@ -263,7 +263,7 @@ replace (
 )
 
 replace (
-	go.etcd.io/etcd/api/v3 => github.com/openshift/etcd/api/v3 v3.5.1-0.20250722140445-b5ad268120cc // from etcd
-	go.etcd.io/etcd/client/pkg/v3 => github.com/openshift/etcd/client/pkg/v3 v3.5.1-0.20250722140445-b5ad268120cc // from etcd
-	go.etcd.io/etcd/client/v3 => github.com/openshift/etcd/client/v3 v3.5.1-0.20250722140445-b5ad268120cc // from etcd
+	go.etcd.io/etcd/api/v3 => github.com/openshift/etcd/api/v3 v3.5.1-0.20250829062802-9c065d4d842c // from etcd
+	go.etcd.io/etcd/client/pkg/v3 => github.com/openshift/etcd/client/pkg/v3 v3.5.1-0.20250829062802-9c065d4d842c // from etcd
+	go.etcd.io/etcd/client/v3 => github.com/openshift/etcd/client/v3 v3.5.1-0.20250829062802-9c065d4d842c // from etcd
 )

@@ -28,7 +28,7 @@ spec:
           NAMESERVER=${DNS_DEFAULT_SERVICE_HOST}
           OPENSHIFT_MARKER="openshift-generated-node-resolver"
           HOSTS_FILE="/etc/hosts"
-          TEMP_FILE="/etc/hosts.tmp"
+          TEMP_FILE="/tmp/hosts.tmp"
 
           IFS=', ' read -r -a services <<< "${SERVICES}"
 

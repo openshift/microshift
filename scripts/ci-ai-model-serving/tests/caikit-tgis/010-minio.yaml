@@ -1,0 +1,39 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: minio
+spec:
+  ports:
+    - name: minio-client-port
+      port: 9000
+      protocol: TCP
+      targetPort: 9000
+  selector:
+    app: minio
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    app: minio
+  name: minio
+spec:
+  containers:
+    - args:
+        - server
+        - /data1
+      env:
+        - name: MINIO_ACCESS_KEY
+          value:  admin
+        - name: MINIO_SECRET_KEY
+          value: password
+      image: quay.io/opendatahub/modelmesh-minio-examples:caikit-flan-t5
+      imagePullPolicy: IfNotPresent
+      name: minio
+      securityContext:
+        allowPrivilegeEscalation: false
+        capabilities:
+          drop: ["ALL"]
+        runAsNonRoot: true
+        seccompProfile:
+          type: "RuntimeDefault"

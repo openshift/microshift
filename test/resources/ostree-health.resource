@@ -21,13 +21,13 @@ Greenboot Health Check Exited
 Restart Greenboot And Wait For Success
     [Documentation]    Restart the greenboot-healthcheck service and check its status
 
-    ${unit_name}=    Set Variable    greenboot-healthcheck.service
+    VAR    ${unit_name}    greenboot-healthcheck.service
 
     # Note that the Systemctl keyword from systemd.resource cannot be used to
     # restart the greenboot-healthcheck service due to the keyword expecting
     # the 'running' state after the restart. This condition does not apply on
     # services like greenboot that exit after their startup finishes.
-    ${stdout}    ${stderr}    ${rc}=    Execute Command
+    ${stdout}    ${stderr}    ${rc}    Execute Command
     ...    systemctl restart ${unit_name}
     ...    sudo=True    return_stdout=True    return_stderr=True    return_rc=True
     IF    ${rc} != 0    Systemctl Print Service Status And Logs    ${unit_name}
