@@ -5,22 +5,19 @@ set -o errexit
 set -o pipefail
 set -x
 
-check_semver_suffix() {
+check_semver_no_suffix() {
     local version=$1
 
     # Check if the version is not empty
     if [[ -z "$version" ]]; then
-        echo "false"
-        return 1
+        return 0
     fi
 
     # Check if the version string contains a numeric suffix of the form -xx
     if [[ $version =~ -[0-9]+$ ]]; then
-        echo "true"
-        return 0
-    else
-        echo "false"
         return 1
+    else
+        return 0
     fi
 }
 
@@ -111,7 +108,7 @@ RHOAI_RELEASE=${rhoai_release} \
 #  For example, ocp-release at 4.13 will more often than not
 #  correspond to 4.12 LVMS, until the official 4.13 release when both
 #  components will be 4.13.
-release_lvms="v4.17.0-43"
+release_lvms="v4.19.1"
 
 # Since LVMS is not part of the release payload, it is not kept in
 # CI. Use the latest z-stream that coincides with the release
@@ -121,8 +118,7 @@ pullspec_release_lvms="registry.redhat.io/lvms4/lvms-operator-bundle:${release_l
 # the latest lvms release candidate replicated from CPaaS into quay
 pullspec_release_lvms_fallback="quay.io/lvms_dev/lvms4-lvms-operator-bundle:${release_lvms}"
 
-lvms_is_candidate_build=$(check_semver_suffix "${release_lvms}")
-if [ "$lvms_is_candidate_build" == "false" ]; then
+if check_semver_no_suffix "${release_lvms}"; then
     ./scripts/auto-rebase/rebase-lvms.sh to "${pullspec_release_lvms}"
 else
     ./scripts/auto-rebase/rebase-lvms.sh to "${pullspec_release_lvms_fallback}"
