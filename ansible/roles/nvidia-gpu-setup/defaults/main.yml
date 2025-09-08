@@ -1,0 +1,47 @@
+---
+# nvidia-gpu-setup default vars
+
+# NVIDIA driver version
+# Use a specific version number (e.g., "525", "535") or "latest" to auto-detect
+# Use open versions (e.g., "575-open") for open-source kernel modules
+nvidia_driver_version: "575-open"
+nvidia_driver_module: "nvidia-driver:{{ nvidia_driver_version }}"
+
+# RHEL version for repositories
+rhel_version: "{{ ansible_distribution_major_version }}"
+
+# CUDA repository URL
+cuda_repo_base_url: "https://developer.download.nvidia.com/compute/cuda/repos"
+cuda_repo_url: "{{ cuda_repo_base_url }}/rhel{{ rhel_version }}/{{ ansible_architecture }}/cuda-rhel{{ rhel_version }}.repo"
+
+# Container toolkit repository (stable)
+container_toolkit_repo_url: "https://nvidia.github.io/libnvidia-container/stable/rpm/nvidia-container-toolkit.repo"
+
+# Device plugin configuration (from official NVIDIA docs)
+# Using GitHub repo as GitLab repo is archived
+device_plugin_manifest_url: "https://raw.githubusercontent.com/NVIDIA/k8s-device-plugin/refs/heads/main/deployments/static/nvidia-device-plugin-privileged-with-service-account.yml"
+# Use manifests.d with a subdirectory as per MicroShift documentation
+device_plugin_manifest_dir: "/etc/microshift/manifests.d/nvidia-gpu"
+device_plugin_manifest_file: "{{ device_plugin_manifest_dir }}/nvidia-device-plugin.yml"
+
+# Services to enable
+nvidia_services:
+  - nvidia-fabricmanager
+  - nvidia-persistenced
+
+# Base packages to install (fabric manager is always needed)
+nvidia_base_packages:
+  - nvidia-fabric-manager
+
+container_toolkit_packages:
+  - nvidia-container-toolkit
+  - container-selinux
+
+# SELinux settings
+selinux_booleans:
+  - name: container_use_devices
+    state: true
+    persistent: true
+
+# Validation settings
+validate_gpu: true

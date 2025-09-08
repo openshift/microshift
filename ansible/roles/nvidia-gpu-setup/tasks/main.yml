@@ -1,0 +1,389 @@
+---
+# nvidia-gpu-setup tasks
+
+- name: Check if NVIDIA GPU is present
+  ansible.builtin.shell: |
+    set -o pipefail
+    lspci -nnv | grep -i nvidia
+  args:
+    executable: /bin/bash
+  register: nvidia_gpu_check
+  failed_when: false
+  changed_when: false
+
+- name: Fail if no NVIDIA GPU detected
+  ansible.builtin.fail:
+    msg: "No NVIDIA GPU detected on this system"
+  when: nvidia_gpu_check.rc != 0
+
+- name: Display detected NVIDIA GPU
+  ansible.builtin.debug:
+    msg: "NVIDIA GPU detected: {{ nvidia_gpu_check.stdout_lines }}"
+
+- name: NVIDIA GPU Driver Installation
+  block:
+    - name: Add CUDA repository
+      ansible.builtin.get_url:
+        url: "{{ cuda_repo_url }}"
+        dest: /etc/yum.repos.d/cuda-rhel{{ rhel_version }}.repo
+        mode: '0644'
+
+    - name: Check latest available NVIDIA driver version
+      when: nvidia_driver_version in ["latest", "latest-dkms", "open-dkms"]
+      block:
+        - name: Query available NVIDIA driver versions
+          ansible.builtin.shell: |
+            set -o pipefail
+            if [[ "{{ nvidia_driver_version }}" == "open-dkms" ]]; then
+              echo "open-dkms"
+            elif [[ "{{ nvidia_driver_version }}" == "latest-dkms" ]]; then
+              dnf module list nvidia-driver --quiet | grep -E '^nvidia-driver' | awk '{print $2}' | \
+                grep -E '^[0-9]+-dkms$' | sort -V | tail -1
+            else
+              # Get latest numeric version (non-DKMS)
+              dnf module list nvidia-driver --quiet | grep -E '^nvidia-driver' | awk '{print $2}' | \
+                grep -E '^[0-9]+$' | sort -V | tail -1
+            fi
+          args:
+            executable: /bin/bash
+          register: latest_driver_query
+          changed_when: false
+
+        - name: Set driver version to detected version
+          ansible.builtin.set_fact:
+            nvidia_driver_version: "{{ latest_driver_query.stdout | trim }}"
+          when: latest_driver_query.stdout | trim | length > 0
+
+    - name: Display driver version to be installed
+      ansible.builtin.debug:
+        msg: >
+          Installing NVIDIA driver version: {{ nvidia_driver_version }}
+          {{ ' (auto-detected latest)' if (latest_driver_query is defined and latest_driver_query.stdout is defined) else '' }}
+
+    - name: Install NVIDIA driver module
+      ansible.builtin.dnf:
+        name: "@{{ nvidia_driver_module }}"
+        state: present
+      register: driver_install
+
+    - name: Install additional NVIDIA packages
+      ansible.builtin.dnf:
+        name: "{{ nvidia_base_packages }}"
+        state: present
+
+    - name: Install NSCQ library for non-DKMS drivers
+      ansible.builtin.dnf:
+        name: "libnvidia-nscq-{{ nvidia_driver_version }}"
+        state: present
+      when: 
+        - "'dkms' not in nvidia_driver_version"
+        - "'open' not in nvidia_driver_version"
+
+    - name: Blacklist nouveau driver
+      ansible.builtin.copy:
+        content: |
+          # Disable nouveau driver for NVIDIA GPU
+          blacklist nouveau
+          options nouveau modeset=0
+        dest: /etc/modprobe.d/nouveau-blacklist.conf
+        mode: '0644'
+      register: nouveau_blacklist
+
+    - name: Rebuild initramfs
+      ansible.builtin.command: dracut --force
+      when: nouveau_blacklist.changed or driver_install.changed
+
+    - name: Enable NVIDIA services
+      ansible.builtin.systemd:
+        name: "{{ item }}"
+        enabled: true
+        daemon_reload: true
+      loop: "{{ nvidia_services }}"
+
+- name: NVIDIA Container Toolkit Installation
+  block:
+    - name: Add NVIDIA Container Toolkit repository
+      ansible.builtin.get_url:
+        url: "{{ container_toolkit_repo_url }}"
+        dest: /etc/yum.repos.d/libnvidia-container.repo
+        mode: '0644'
+
+    - name: Install NVIDIA Container Toolkit packages
+      ansible.builtin.dnf:
+        name: "{{ container_toolkit_packages }}"
+        state: present
+        update_cache: true
+
+    - name: Configure SELinux for container device access
+      ansible.posix.seboolean:
+        name: "{{ item.name }}"
+        state: "{{ item.state }}"
+        persistent: "{{ item.persistent }}"
+      loop: "{{ selinux_booleans }}"
+
+    - name: Create temporary directory for SELinux policy
+      ansible.builtin.tempfile:
+        state: directory
+        suffix: nvidia-selinux
+      register: selinux_temp_dir
+
+    - name: Create SELinux policy module for NVIDIA containers
+      ansible.builtin.copy:
+        content: |
+          module nvidia-container-microshift 1.0;
+
+          require {
+              type xserver_misc_device_t;
+              type container_t;
+              class chr_file { map read write };
+          }
+
+          allow container_t xserver_misc_device_t:chr_file map;
+        dest: "{{ selinux_temp_dir.path }}/nvidia-container-microshift.te"
+        mode: '0644'
+      register: selinux_policy_file
+
+    - name: Compile SELinux policy module
+      ansible.builtin.shell: |
+        checkmodule -m -M -o {{ selinux_temp_dir.path }}/nvidia-container-microshift.mod {{ selinux_temp_dir.path }}/nvidia-container-microshift.te
+        semodule_package -o {{ selinux_temp_dir.path }}/nvidia-container-microshift.pp -m {{ selinux_temp_dir.path }}/nvidia-container-microshift.mod
+      when: selinux_policy_file.changed
+
+    - name: Install SELinux policy module
+      ansible.builtin.command: semodule -i {{ selinux_temp_dir.path }}/nvidia-container-microshift.pp
+      when: selinux_policy_file.changed
+
+    - name: Clean up SELinux temporary directory
+      ansible.builtin.file:
+        path: "{{ selinux_temp_dir.path }}"
+        state: absent
+      when: selinux_temp_dir.path is defined
+
+    - name: Ensure CDI directory exists
+      ansible.builtin.file:
+        path: /var/run/cdi
+        state: directory
+        mode: '0755'
+
+    - name: Generate CDI specification for NVIDIA GPUs
+      ansible.builtin.command: nvidia-ctk cdi generate --output=/var/run/cdi/nvidia.yaml
+      register: nvidia_cdi_config
+      changed_when: true
+
+    - name: Configure nvidia-container-toolkit for CRI-O
+      ansible.builtin.command: nvidia-ctk runtime configure --runtime=crio --enable-cdi --nvidia-set-as-default
+      register: nvidia_ctk_config
+      changed_when: "'Wrote updated config' in nvidia_ctk_config.stdout"
+
+    - name: Configure nvidia-container-runtime settings
+      block:
+        - name: Set CDI mode in nvidia-container-runtime config
+          ansible.builtin.lineinfile:
+            path: /etc/nvidia-container-runtime/config.toml
+            regexp: '^mode = '
+            line: 'mode = "cdi"'
+            state: present
+            backup: yes
+        
+        - name: Set runtimes in nvidia-container-runtime config
+          ansible.builtin.lineinfile:
+            path: /etc/nvidia-container-runtime/config.toml
+            regexp: '^runtimes = '
+            line: 'runtimes = ["crun", "docker-runc", "runc"]'
+            state: present
+
+- name: NVIDIA Device Plugin Installation
+  block:
+    - name: Ensure MicroShift manifests directory exists
+      ansible.builtin.file:
+        path: "{{ device_plugin_manifest_dir }}"
+        state: directory
+        mode: '0755'
+
+    - name: Download NVIDIA Device Plugin manifest
+      ansible.builtin.get_url:
+        url: "{{ device_plugin_manifest_url }}"
+        dest: "{{ device_plugin_manifest_file }}"
+        mode: '0644'
+
+    - name: Get latest NVIDIA Device Plugin version
+      ansible.builtin.uri:
+        url: https://api.github.com/repos/NVIDIA/k8s-device-plugin/releases/latest
+        method: GET
+        headers:
+          Accept: application/vnd.github.v3+json
+      register: latest_release
+      changed_when: false
+      failed_when: false
+
+    - name: Display detected versions
+      ansible.builtin.debug:
+        msg: 
+          - "Latest Device Plugin version: {{ latest_release.json.tag_name | default('unknown') }}"
+          - "Updating manifest to use this version..."
+      when: latest_release.json.tag_name is defined
+
+    - name: Update Device Plugin manifest with latest version
+      ansible.builtin.replace:
+        path: "{{ device_plugin_manifest_file }}"
+        regexp: 'image: nvcr.io/nvidia/k8s-device-plugin:v[0-9]+\.[0-9]+\.[0-9]+'
+        replace: "image: nvcr.io/nvidia/k8s-device-plugin:{{ latest_release.json.tag_name }}"
+      when: latest_release.json.tag_name is defined
+
+    - name: Create kustomization.yaml for Device Plugin
+      ansible.builtin.copy:
+        content: |
+          ---
+          apiVersion: kustomize.config.k8s.io/v1beta1
+          kind: Kustomization
+          resources:
+            - nvidia-device-plugin.yml
+        dest: "{{ device_plugin_manifest_dir }}/kustomization.yaml"
+        mode: '0644'
+
+    - name: Restart CRI-O to apply NVIDIA configuration
+      ansible.builtin.systemd:
+        name: crio
+        state: restarted
+        daemon_reload: true
+      when: nvidia_cdi_config.changed or nvidia_ctk_config.changed
+
+    - name: Restart MicroShift to deploy manifests
+      ansible.builtin.systemd:
+        name: microshift
+        state: restarted
+
+    - name: Wait for MicroShift API to be ready
+      ansible.builtin.wait_for:
+        port: 6443
+        host: "{{ ansible_default_ipv4.address }}"
+        delay: 10
+        timeout: 300
+
+- name: Check if reboot is required
+  ansible.builtin.stat:
+    path: /var/run/reboot-required
+  register: reboot_required
+  changed_when: false
+  failed_when: false
+
+- name: Reboot system if required
+  when: driver_install.changed or nouveau_blacklist.changed
+  block:
+    - name: Reboot the system
+      ansible.builtin.reboot:
+        msg: "Rebooting to load NVIDIA drivers"
+        connect_timeout: 5
+        reboot_timeout: 600
+        pre_reboot_delay: 5
+        post_reboot_delay: 30
+        test_command: uptime
+
+    - name: Wait for MicroShift to be ready
+      ansible.builtin.wait_for:
+        port: 6443
+        host: "{{ ansible_default_ipv4.address }}"
+        delay: 30
+        timeout: 300
+
+- name: Validate NVIDIA GPU Setup
+  when: validate_gpu
+  block:
+    - name: Check nvidia-smi command
+      ansible.builtin.command: nvidia-smi
+      register: nvidia_smi_output
+      changed_when: false
+
+    - name: Display nvidia-smi output
+      ansible.builtin.debug:
+        msg: "{{ nvidia_smi_output.stdout_lines }}"
+
+    - name: Check NVIDIA runtime in CRI-O
+      ansible.builtin.command: crictl info
+      register: crio_status
+      changed_when: false
+      failed_when: false
+
+    - name: Wait for Device Plugin pods
+      ansible.builtin.shell: |
+        set -o pipefail
+        export KUBECONFIG=/var/lib/microshift/resources/kubeadmin/kubeconfig
+        oc get pods -n nvidia-device-plugin -l name=nvidia-device-plugin-ds -o jsonpath='{.items[0].status.phase}'
+      args:
+        executable: /bin/bash
+      register: device_plugin_pods
+      until: device_plugin_pods.stdout == "Running"
+      retries: 30
+      delay: 10
+      changed_when: false
+
+    - name: Display Device Plugin status
+      ansible.builtin.debug:
+        msg: "{{ device_plugin_pods.stdout_lines }}"
+
+    - name: Check GPU resource availability
+      ansible.builtin.shell: |
+        set -o pipefail
+        export KUBECONFIG=/var/lib/microshift/resources/kubeadmin/kubeconfig
+        oc get nodes -o json | jq '.items[0].status.capacity."nvidia.com/gpu"'
+      args:
+        executable: /bin/bash
+      register: gpu_resources
+      changed_when: false
+
+    - name: Display GPU resources
+      ansible.builtin.debug:
+        msg: "GPU resources available: {{ gpu_resources.stdout }}"
+
+- name: Final Cleanup
+  block:
+    - name: Clean up SELinux temporary directory if it still exists
+      ansible.builtin.file:
+        path: "{{ selinux_temp_dir.path }}"
+        state: absent
+      when: selinux_temp_dir.path is defined
+      failed_when: false
+
+    - name: Clean up any orphaned temporary directories
+      ansible.builtin.shell: |
+        find /tmp /var/tmp -maxdepth 1 -type d -name "*nvidia-selinux*" -mtime +1 -exec rm -rf {} \; 2>/dev/null || true
+      changed_when: false
+      failed_when: false
+
+    - name: Clean up old NVIDIA installer logs
+      ansible.builtin.find:
+        paths: /var/log
+        patterns: "nvidia-installer*.log"
+        age: 7d
+      register: old_installer_logs
+      failed_when: false
+
+    - name: Remove old installer logs
+      ansible.builtin.file:
+        path: "{{ item.path }}"
+        state: absent
+      loop: "{{ old_installer_logs.files | default([]) }}"
+      when: old_installer_logs.files is defined
+      failed_when: false
+  always:
+    - name: Ensure no orphaned NVIDIA temp files remain
+      ansible.builtin.find:
+        paths: 
+          - /tmp
+          - /var/tmp
+        patterns: 
+          - "nvidia-*.te"
+          - "nvidia-*.mod"
+          - "nvidia-*.pp"
+          - "*nvidia-selinux*"
+        age: 1h
+      register: old_nvidia_files
+      failed_when: false
+
+    - name: Remove old NVIDIA temporary files
+      ansible.builtin.file:
+        path: "{{ item.path }}"
+        state: absent
+      loop: "{{ old_nvidia_files.files | default([]) }}"
+      when: old_nvidia_files.files is defined
+      failed_when: false

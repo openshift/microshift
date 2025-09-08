@@ -1,0 +1,58 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{ gpu_test_namespace }}
+  labels:
+    pod-security.kubernetes.io/enforce: privileged
+    pod-security.kubernetes.io/audit: privileged
+    pod-security.kubernetes.io/warn: privileged
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nvidia-smi-all-gpus
+  namespace: {{ gpu_test_namespace }}
+spec:
+  restartPolicy: OnFailure
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 1000
+    seccompProfile:
+      type: RuntimeDefault
+  containers:
+  - name: nvidia-smi
+    image: "{{ cuda_base_image }}"
+    command: ["nvidia-smi"]
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+    resources:
+      limits:
+        nvidia.com/gpu: {{ gpu_count.stdout | trim }}  # Request all detected GPUs
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: cuda-vector-add
+  namespace: {{ gpu_test_namespace }}
+spec:
+  restartPolicy: OnFailure
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 1000
+    seccompProfile:
+      type: RuntimeDefault
+  containers:
+  - name: cuda-vector-add
+    image: "{{ cuda_sample_image }}"
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+    resources:
+      limits:
+        nvidia.com/gpu: 1  # Single GPU for compute test
