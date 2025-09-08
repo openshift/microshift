@@ -1128,8 +1128,32 @@ run_gingko_tests() {
     export KUBECONFIG="${kubeconfig}"
     record_junit "${vmname}" "setup_kubeconfig" "OK"
 
+    # Create case selection file
+    local case_selected="${test_results_dir}/case_selected"
+
+    # Get all MicroShift tests using dry-run
+    "${GINKGO_TEST_BINARY}" run all --dry-run | grep -E "MicroShift" > "${case_selected}"
+
+    # Apply filters if provided
+    if [[ $# -gt 0 ]]; then
+        local -r filter_pattern="$1"
+        echo "Applying filter: ${filter_pattern}"
+        if [[ "${filter_pattern}" == ~* ]]; then
+            sed -i "/${filter_pattern#~}/d" "${case_selected}"
+        else
+            sed -i -n "/${filter_pattern}/p" "${case_selected}"
+        fi
+        echo "Running Ginkgo tests with MicroShift filter and additional filter: ${filter_pattern}..."
+    else
+        echo "Running Ginkgo tests with MicroShift filter..."
+    fi
+
+    echo "------------------Selected test cases------------------"
+    cat "${case_selected}"
+    echo "-----------------------------------------------------"
+
     # Run the tests and capture output
-    if ! "${GINKGO_TEST_BINARY}" run all --dry-run | grep "MicroShift" | "${GINKGO_TEST_BINARY}" run -f - --timeout 60m 2>&1 | tee "${test_results_dir}/test-output.log"; then
+    if ! "${GINKGO_TEST_BINARY}" run --timeout 60m --junit-dir="${test_results_dir}" -f "${case_selected}" 2>&1 | tee "${test_results_dir}/test-output.log"; then
         record_junit "${vmname}" "run_gingko_tests" "FAILED"
         return 1
     fi
