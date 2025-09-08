@@ -268,7 +268,6 @@ def generate_pr_description(amd_tag, arm_tag, prow_job_url, rebase_script_succed
     /label tide/merge-method-squash
     /label backport-risk-assessed
     /label jira/valid-bug
-    /verified by automatic-rebase
     """)
     base = template.format(**locals())
     return (base if rebase_script_succeded
@@ -519,6 +518,8 @@ def main():
     if base_branch == "main":
         cleanup_branches(gh_repo)
     post_comment(pull_req, comment)
+
+    post_comment(pull_req, '/verified by automatic-rebase')
 
     git_remote.remove(git_repo, BOT_REMOTE_NAME)
     sys.exit(0 if rebase_result.success else 1)
