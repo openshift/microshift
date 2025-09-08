@@ -44,7 +44,7 @@ func StartComponents(cfg *config.Config, ctx context.Context) error {
 		return err
 	}
 
-	if err := startEtcdController(ctx, cfg, kubeAdminConfig); err != nil {
+	if err := startEtcdController(ctx, kubeAdminConfig); err != nil {
 		klog.Warningf("Failed to start etcd controller: %v", err)
 		return err
 	}

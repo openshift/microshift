@@ -18,13 +18,13 @@ import (
 )
 
 const (
-	// Secret name for etcd CA certificate
-	etcdCASecretName = "microshift-etcd-ca"
-	// Secret namespace
-	etcdCASecretNamespace = "kube-system"
+	// Resource name for etcd CA certificate
+	etcdCAResourceName = "microshift-etcd-ca"
+	// Resource namespace
+	etcdCAResourceNamespace = "kube-system"
 )
 
-func startEtcdController(ctx context.Context, cfg *config.Config, kubeconfigPath string) error {
+func startEtcdController(ctx context.Context, kubeconfigPath string) error {
 	client, err := getKubernetesClient(kubeconfigPath)
 	if err != nil {
 		return fmt.Errorf("failed to get Kubernetes client: %w", err)
@@ -40,7 +40,7 @@ func startEtcdController(ctx context.Context, cfg *config.Config, kubeconfigPath
 	return nil
 }
 
-func getKubernetesClient(kubeconfigPath string) (kubernetes.Interface, error) {
+func getKubernetesClient(kubeconfigPath string) (*kubernetes.Clientset, error) {
 	restConfig, err := clientcmd.BuildConfigFromFlags("", kubeconfigPath)
 	if err != nil {
 		return nil, err
@@ -52,19 +52,19 @@ func createClusterRole(ctx context.Context, client kubernetes.Interface) error {
 	role := &rbacv1.Role{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "microshift-etcd-ca-admin",
-			Namespace: etcdCASecretNamespace,
+			Namespace: etcdCAResourceNamespace,
 		},
 		Rules: []rbacv1.PolicyRule{
 			{
 				APIGroups:     []string{""},
 				Resources:     []string{"secrets"},
-				ResourceNames: []string{etcdCASecretName},
+				ResourceNames: []string{etcdCAResourceName},
 				Verbs:         []string{"*"},
 			},
 		},
 	}
 
-	_, err := client.RbacV1().Roles(etcdCASecretNamespace).Create(ctx, role, metav1.CreateOptions{})
+	_, err := client.RbacV1().Roles(etcdCAResourceNamespace).Create(ctx, role, metav1.CreateOptions{})
 	if err != nil && !apierrors.IsAlreadyExists(err) {
 		return fmt.Errorf("failed to create etcd CA admin Role: %w", err)
 	}
@@ -72,7 +72,7 @@ func createClusterRole(ctx context.Context, client kubernetes.Interface) error {
 	roleBinding := &rbacv1.RoleBinding{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "microshift-etcd-ca-admin-binding",
-			Namespace: etcdCASecretNamespace,
+			Namespace: etcdCAResourceNamespace,
 		},
 		Subjects: []rbacv1.Subject{
 			{
@@ -88,7 +88,7 @@ func createClusterRole(ctx context.Context, client kubernetes.Interface) error {
 		},
 	}
 
-	_, err = client.RbacV1().RoleBindings(etcdCASecretNamespace).Create(ctx, roleBinding, metav1.CreateOptions{})
+	_, err = client.RbacV1().RoleBindings(etcdCAResourceNamespace).Create(ctx, roleBinding, metav1.CreateOptions{})
 	if err != nil && !apierrors.IsAlreadyExists(err) {
 		return fmt.Errorf("failed to create etcd CA admin RoleBinding: %w", err)
 	}
@@ -119,8 +119,8 @@ func exposeEtcdCA(ctx context.Context, client kubernetes.Interface) error {
 
 	secret := &corev1.Secret{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      etcdCASecretName,
-			Namespace: etcdCASecretNamespace,
+			Name:      etcdCAResourceName,
+			Namespace: etcdCAResourceNamespace,
 		},
 		Type: corev1.SecretTypeOpaque,
 		Data: map[string][]byte{
@@ -130,7 +130,7 @@ func exposeEtcdCA(ctx context.Context, client kubernetes.Interface) error {
 		},
 	}
 
-	_, err = client.CoreV1().Secrets(etcdCASecretNamespace).Create(ctx, secret, metav1.CreateOptions{})
+	_, err = client.CoreV1().Secrets(etcdCAResourceNamespace).Create(ctx, secret, metav1.CreateOptions{})
 	if err != nil {
 		return fmt.Errorf("failed to create etcd CA secret: %w", err)
 	}
