@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"path/filepath"
 
 	corev1 "k8s.io/api/core/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
@@ -111,6 +112,11 @@ func exposeEtcdCA(ctx context.Context, client kubernetes.Interface) error {
 		return fmt.Errorf("failed to read etcd CA key from %s: %w", etcdCAKeyPath, err)
 	}
 
+	serial, err := os.ReadFile(filepath.Join(etcdSignerDir, "serial.txt"))
+	if err != nil {
+		return fmt.Errorf("failed to read CA serial: %w", err)
+	}
+
 	secret := &corev1.Secret{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      etcdCASecretName,
@@ -118,8 +124,9 @@ func exposeEtcdCA(ctx context.Context, client kubernetes.Interface) error {
 		},
 		Type: corev1.SecretTypeOpaque,
 		Data: map[string][]byte{
-			"ca.crt": caCert,
-			"ca.key": caKey,
+			"ca.crt":     caCert,
+			"ca.key":     caKey,
+			"serial.txt": serial,
 		},
 	}
 
