@@ -131,6 +131,14 @@ Deploy MicroShift Without CSI Snapshotter
     ...    Remove Storage Drop In Config
     ...    Restart MicroShift
 
+Http Proxy Not Defined In Bootc Image
+    [Documentation]    Verify that the http proxy environment variables are not defined
+    ...    in the bootc image used to install the system.
+
+    # Only run the check if the system is a bootc image
+    ${is_bootc}=    Is System Bootc
+    IF    ${is_bootc}    Check HTTP Proxy Env In Bootc Image
+
 
 *** Keywords ***
 Setup
@@ -198,3 +206,16 @@ LVMS Is Deployed
 CSI Snapshot Controller Is Deployed
     [Documentation]    Wait for CSI snapshot controller to be deployed
     Named Deployment Should Be Available    csi-snapshot-controller    kube-system    120s
+
+Check HTTP Proxy Env In Bootc Image
+    [Documentation]    Check that the HTTP proxy environment variables are not defined
+    ...    in the bootc image used to install the system.
+    # Obtain the current bootc image reference
+    ${bootc_image}=    Command Should Work    bootc status --json | jq -r .spec.image.image
+    # Inspect the bootc image environment variables
+    ${env_vars}=    Command Should Work
+    ...    skopeo inspect --authfile /etc/crio/openshift-pull-secret --config docker://${bootc_image} | jq -r '.config.Env'
+    # Verify that the environment variables are not defined
+    Should Not Contain    ${env_vars}    HTTP_PROXY
+    Should Not Contain    ${env_vars}    HTTPS_PROXY
+    Should Not Contain    ${env_vars}    NO_PROXY
