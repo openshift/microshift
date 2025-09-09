@@ -11,6 +11,7 @@ setup_microshift_host: false
 install_microshift: "{{ install_microshift_arg | default('false') }}"
 build_etcd_binary: false
 build_microshift: false
+microshift_version: "4.19"
 
 sa_token_file: sa-token
 
@@ -19,3 +20,7 @@ pbench_configuration_environment: ec2
 pbench_key_url:
 pbench_config_url:
 pbench_record_duration: 360
+
+# NVIDIA GPU support
+enable_gpu: "{{ enable_gpu_arg | default('false') }}"
+deploy_gpu_test: "{{ deploy_gpu_test_arg | default('true') }}"

@@ -12,6 +12,20 @@ It is necessary to have two hosts configured for running the benchmarks:
 * Ansible control node used to start the automation scripts
 * MicroShift server used to execute the performance tests
 
+### GPU Support Requirements
+
+For GPU-enabled workloads, the MicroShift server must have:
+* NVIDIA GPU hardware
+* RHEL 9.x operating system
+* Sufficient disk space for NVIDIA drivers and CUDA toolkit (~2GB)
+
+The GPU support roles will automatically:
+* Install NVIDIA drivers (defaults to version 575-open)
+* Install NVIDIA Container Toolkit for container GPU access
+* Deploy the NVIDIA device plugin for Kubernetes
+* Configure SELinux policies for GPU container access
+* Optionally deploy a test workload to validate GPU functionality
+
 Run the following command on the Ansible control node to install the Ansible package.
 ```
 sudo dnf install -y ansible
@@ -70,6 +84,35 @@ time ansible-playbook -v \
     -i inventory/inventory run-perf.yml
 ```
 
+### GPU-Enabled Host
+
+For hosts with NVIDIA GPUs, you can enable GPU support and optionally deploy a test workload to validate GPU functionality.
+
+#### Setup with GPU Support
+
+Run the playbook with GPU support enabled:
+```bash
+USHIFT_HOST=microshift-gpu
+USHIFT_USER=microshift
+
+ssh-copy-id ${USHIFT_USER}@${USHIFT_HOST}
+time ansible-playbook -v \
+    -e ansible_host_var=${USHIFT_HOST} -e ansible_user_var=${USHIFT_USER} \
+    -e enable_gpu_arg=true \
+    -i inventory/inventory setup-node.yml
+```
+
+#### GPU Support Without Test Workload
+
+To install GPU support without running the test workload:
+```bash
+time ansible-playbook -v \
+    -e ansible_host_var=${USHIFT_HOST} -e ansible_user_var=${USHIFT_USER} \
+    -e enable_gpu_arg=true \
+    -e deploy_gpu_test_arg=false \
+    -i inventory/inventory setup-node.yml
+```
+
 ## Output
 
 The following text files will be created on the Ansible control node running the playbook:
@@ -99,6 +142,8 @@ The following variables found in `vars/all.yml` may need user configuration.
 | `prometheus_logging` | Set up logging and exporters on the nodes | `true` |
 | `install_microshift` | Build and install MicroShift from git | `false` |
 | `build_etcd_binary` | Build and deploy a separate etcd process | `false` |
+| `enable_gpu` | Install NVIDIA GPU drivers and container toolkit for GPU workloads | `false` |
+| `deploy_gpu_test` | Deploy a test GPU workload to validate GPU functionality | `true` |
 
 ### Inventory Configuration
 
@@ -128,6 +173,8 @@ The global variables file is located at `vars/all.yml`.
 > The following Ansible command line options can be used instead of editing the `vars/all.yml` file.
 > - `-e install_microshift_arg=<true | false>`
 > - `-e prometheus_logging_arg=<true | false>`
+> - `-e enable_gpu_arg=<true | false>`
+> - `-e deploy_gpu_test_arg=<true | false>`
 
 #### Clean Host Example Variables
 
@@ -192,4 +239,28 @@ setup_microshift_host: false
 prometheus_logging: false
 install_microshift: false
 build_etcd_binary: false
+```
+
+#### GPU-Enabled Host Example Variables
+
+For hosts with NVIDIA GPUs that require GPU workload support, enable the GPU-specific variables.
+
+The `enable_gpu` variable installs NVIDIA drivers, CUDA toolkit, and the container toolkit. The `deploy_gpu_test` variable (defaults to `true` when GPU is enabled) deploys a test workload to validate GPU functionality.
+
+**Sample vars/all.yml File**
+```
+manage_subscription: true
+rhel_username: <subscription manager username>
+rhel_password: <subscription manager password>
+rhel_pool_id: <subscription manager pool-id>
+manage_repos: true
+
+setup_microshift_host: true
+prometheus_logging: true
+install_microshift: true
+build_etcd_binary: false
+
+# NVIDIA GPU support
+enable_gpu: true
+deploy_gpu_test: true  # Optional, defaults to true when enable_gpu is true
 ```

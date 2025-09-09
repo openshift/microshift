@@ -1,0 +1,22 @@
+---
+# nvidia-gpu-test default vars
+
+# Test workload settings
+gpu_test_namespace: gpu-test
+gpu_test_retries: 30
+gpu_test_delay: 10
+
+# Container images for GPU testing
+# CUDA base image for nvidia-smi test
+cuda_base_image: "nvcr.io/nvidia/cuda:12.8.1-base-ubi9"
+
+# CUDA sample image for vectoradd test
+# Note: vectoradd samples are currently only available for UBI8
+cuda_sample_image: "nvcr.io/nvidia/k8s/cuda-sample:vectoradd-cuda12.5.0-ubi8"
+
+# Cleanup settings
+gpu_test_cleanup: true  # Set to false to keep test resources for debugging
+
+# Logging settings
+gpu_test_save_logs: true  # Save test logs to files
+gpu_test_logs_dir: "./gpu-test-logs"  # Directory to save test logs
