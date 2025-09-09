@@ -1,33 +1,20 @@
-- cluster-kube-apiserver-operator embedded-component 4fae6738a9ffd1c108cd9ab3ac6c1382c5eece42 to 51ed2ebfcfd3e177c45d9243b25bdfd36c6a5b1f
-  - bda5521 2025-08-12T08:26:47+00:00 OCPBUGS-50489: Add missing service ports to apiserver service
+- kubernetes embedded-component ce407c5220d03860b36d8640286ae48521a0dc18 to 025ecb69829d3460be23445db21f17dceef31dbd
+  - 17d4a6bad 2025-08-28T13:35:36+02:00 UPSTREAM: 127757: scheduler: Improve CSILimits plugin accuracy by using VolumeAttachments
 
-- cluster-kube-controller-manager-operator embedded-component 0a9ed573e35751455bfb24842fd2de0b05379ed0 to d68b3764db78ad5ca2e61af75f0bc8bcdcf3e644
-  - 875c708 2025-08-08T11:54:22+00:00 OCPBUGS-53290: Missing endpoint slices for open ports the operator uses
+- machine-config-operator embedded-component b7c4291575a0de49d5951cd72f5425f49738463f to d683459eff679a5d133bdf2d86cf90a3e781a752
+  - 94f00780 2025-07-29T14:46:54+00:00 OCPBUGS-57484: Handle migration from OpenShift SDN
+  - 8a250775 2025-07-29T14:46:54+00:00 OPNET-681: Support migration from configure-ovs to NMState
+  - c57a4924 2025-05-27T16:54:55+00:00 OCPBUGS-36859: Support NODEIP_HINT in IPI deployments too
 
-- csi-external-snapshotter embedded-component aa558ca4bc55238e1909119f94eaf33872a76dec to 080f6bdb8ffdbfe2556370ce5bc95ac973e1ad95
-  - b38c9a9 2025-08-12T17:34:29+02:00 UPSTREAM: 1238: Snapshot Controller startup should not LIST all volumesnapshots
+- operator-framework-olm embedded-component 14f5ca00370ba75eaae689caba5ee86aa411ea74 to 062eb821df5ca4b5d52a0614a46da3c02aaa4dae
+  - da1a2aff 2025-08-22T01:58:34+00:00 Upstream: <carry>: regenerate manifests
+  - ac1296a7 2025-08-22T01:58:34+00:00 Upstream: 3580: add NetworkPolicy as a supported kind
+  - f9600cd4 2025-08-22T01:58:34+00:00 Upstream: <carry>: Add allow-all networkpolicy for openshift-operators namespace
+  - b78fe802 2025-08-22T01:58:34+00:00 Upstream: 1675: Add NetworkPolicy as a supported kind
 
-- machine-config-operator embedded-component 6728dcc85e006d75d39d653d42daac2c91af8127 to b7c4291575a0de49d5951cd72f5425f49738463f
-  - 4c52db99 2025-08-21T11:42:23-04:00 operator: switch out VAP v1beta1 to v1
-  - 5f1a6944 2025-08-21T11:42:23-04:00 Bump openshift/library-go to v0.0.0-20250821150749-08d89313a9b1
-  - 52feae03 2025-08-07T20:37:08+00:00 Add workaround fix for static pod race
-  - 6a78f997 2025-06-04T17:26:13+00:00 OCPBUGS-55439: scope MCD node listers to current node
+- kubernetes image-amd64 ce407c5220d03860b36d8640286ae48521a0dc18 to 025ecb69829d3460be23445db21f17dceef31dbd
+  - 17d4a6bad 2025-08-28T13:35:36+02:00 UPSTREAM: 127757: scheduler: Improve CSILimits plugin accuracy by using VolumeAttachments
 
-- csi-external-snapshotter image-amd64 aa558ca4bc55238e1909119f94eaf33872a76dec to 080f6bdb8ffdbfe2556370ce5bc95ac973e1ad95
-  - b38c9a9 2025-08-12T17:34:29+02:00 UPSTREAM: 1238: Snapshot Controller startup should not LIST all volumesnapshots
-
-- csi-external-snapshotter image-amd64 aa558ca4bc55238e1909119f94eaf33872a76dec to 080f6bdb8ffdbfe2556370ce5bc95ac973e1ad95
-  - b38c9a9 2025-08-12T17:34:29+02:00 UPSTREAM: 1238: Snapshot Controller startup should not LIST all volumesnapshots
-
-- ovn-kubernetes image-amd64 399bcfd7e0225bd8eecf2afb58eef1ed37274a54 to 82ce0167fce4994b6b9286b509f8cbdd2c65f253
-  - fc83f35a 2025-08-14T03:18:20+00:00 Update OWNERS file: Add Patryk/Martin as approvers
-
-- csi-external-snapshotter image-arm64 aa558ca4bc55238e1909119f94eaf33872a76dec to 080f6bdb8ffdbfe2556370ce5bc95ac973e1ad95
-  - b38c9a9 2025-08-12T17:34:29+02:00 UPSTREAM: 1238: Snapshot Controller startup should not LIST all volumesnapshots
-
-- csi-external-snapshotter image-arm64 aa558ca4bc55238e1909119f94eaf33872a76dec to 080f6bdb8ffdbfe2556370ce5bc95ac973e1ad95
-  - b38c9a9 2025-08-12T17:34:29+02:00 UPSTREAM: 1238: Snapshot Controller startup should not LIST all volumesnapshots
-
-- ovn-kubernetes image-arm64 399bcfd7e0225bd8eecf2afb58eef1ed37274a54 to 82ce0167fce4994b6b9286b509f8cbdd2c65f253
-  - fc83f35a 2025-08-14T03:18:20+00:00 Update OWNERS file: Add Patryk/Martin as approvers
+- kubernetes image-arm64 ce407c5220d03860b36d8640286ae48521a0dc18 to 025ecb69829d3460be23445db21f17dceef31dbd
+  - 17d4a6bad 2025-08-28T13:35:36+02:00 UPSTREAM: 127757: scheduler: Improve CSILimits plugin accuracy by using VolumeAttachments
 
