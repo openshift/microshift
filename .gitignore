@@ -6,8 +6,6 @@ _output/*
 _output
 sshfile
 ansible/*.txt
-ansible/gpu-test-logs/
-ansible/results/
 test/variables.yaml
 test/scenario_settings.sh
 __pycache__
