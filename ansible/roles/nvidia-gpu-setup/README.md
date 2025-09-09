@@ -12,10 +12,10 @@ This Ansible role configures NVIDIA GPU support for MicroShift on Red Hat Enterp
 
 ## Requirements
 
-- RHEL 8.7+ or RHEL 9.x with MicroShift installed
+- RHEL 9.x with MicroShift installed
 - NVIDIA GPU hardware present on the system
 - Internet connectivity for downloading packages and container images
-- SELinux in enforcing or permissive mode
+- SELinux in enforcing mode (fully supported)
 
 ## Role Variables
 
@@ -208,8 +208,10 @@ sudo dnf remove nvidia-* libnvidia-*
 # Remove configuration files
 sudo rm -f /etc/modprobe.d/nouveau-blacklist.conf
 sudo rm -f /etc/crio/crio.conf.d/99-nvidia-runtime.conf
-sudo rm -f /etc/microshift/manifests.d/nvidia-gpu/nvidia-device-plugin.yml
-sudo rm -f /etc/microshift/manifests.d/nvidia-gpu/kustomization.yaml
+sudo rm -rf /etc/microshift/manifests.d/nvidia-gpu/
+
+# Delete NVIDIA device plugin namespace and all its resources
+kubectl delete namespace nvidia-device-plugin
 
 # Rebuild initramfs
 sudo dracut --force
