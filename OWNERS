@@ -6,7 +6,7 @@ approvers:
 - jerpeter1
 - jogeo
 - eslutsky
-- dhensel-rh
+- kasturinarra
 - agullon
 reviewers:
 - copejon
@@ -16,7 +16,7 @@ reviewers:
 - jerpeter1
 - jogeo
 - eslutsky
-- dhensel-rh
+- kasturinarra
 - agullon
 - vanhalenar
 emeritus_approvers:
@@ -33,3 +33,4 @@ emeritus_approvers:
 - zshi-redhat
 - pliurh
 - eggfoobar
+- dhensel-rh
