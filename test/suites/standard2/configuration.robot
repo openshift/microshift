@@ -215,7 +215,9 @@ Check HTTP Proxy Env In Bootc Image
     # Inspect the bootc image environment variables
     ${env_vars}=    Command Should Work
     ...    skopeo inspect --authfile /etc/crio/openshift-pull-secret --config docker://${bootc_image} | jq -r '.config.Env'
+
     # Verify that the environment variables are not defined
-    Should Not Contain    ${env_vars}    HTTP_PROXY
-    Should Not Contain    ${env_vars}    HTTPS_PROXY
-    Should Not Contain    ${env_vars}    NO_PROXY
+    ${env_var_lc}=    Convert To Lower Case    ${env_vars}
+    Should Not Contain    ${env_var_lc}    http_proxy\=
+    Should Not Contain    ${env_var_lc}    https_proxy\=
+    Should Not Contain    ${env_var_lc}    no_proxy\=
