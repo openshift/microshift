@@ -550,6 +550,9 @@ def main():
         cleanup_branches(gh_repo)
     post_comment(pull_req, comment)
 
+    # /verified needs to be in its own comment or else the bot will not
+    # pick it up.
+    _extra_msgs.clear()
     post_comment(pull_req, '/verified by automatic-rebase')
 
     git_remote.remove(git_repo, BOT_REMOTE_NAME)
