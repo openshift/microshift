@@ -331,6 +331,7 @@ Is Cipher Available
     ${stdout}    ${stderr}    ${rc}=    Execute Command    openssl ciphers ${cipher}
     ...    sudo=True    return_stdout=True    return_stderr=True    return_rc=True
     IF    "${rc}" == "0"    RETURN    ${TRUE}    ELSE    RETURN    ${FALSE}
+
 Check HTTP Proxy Env In Bootc Image
     [Documentation]    Check that the HTTP proxy environment variables are not defined
     ...    in the bootc image used to install the system.
