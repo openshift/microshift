@@ -39,6 +39,8 @@
 %{!?with_kindnet: %global with_kindnet 0}
 # Don't build topolvm subpackage by default
 %{!?with_topolvm: %global with_topolvm 0}
+# Don't build observability subpackage by default
+%{!?with_observability: %global with_observability 0}
 
 Name: microshift
 Version: %{version}
@@ -253,6 +255,7 @@ The microshift-ai-model-serving-release-info package provides release informatio
 release. These files contain the list of container image references used by Model Serving
 and can be used to embed those images into osbuilder blueprints or bootc containerfiles.
 
+%if %{with_observability}
 %package observability
 Summary: OpenTelemetry-Collector configured for MicroShift
 BuildArch: noarch
@@ -263,6 +266,7 @@ Requires: opentelemetry-collector
 Deploys the Red Hat build of OpenTelemetry-Collector as a systemd service on host. MicroShift provides client
 certificates to permit access to the kube-apiserver metrics endpoints. If a user-defined OpenTelemetry-Collector exists
 at /etc/microshift/opentelemetry-collector.yaml, this config is used. Otherwise, a default config is provided.
+%endif
 
 %package cert-manager
 Summary: Cert Manager for MicroShift
@@ -577,6 +581,7 @@ mkdir -p -m755 %{buildroot}%{_datadir}/microshift/release
 install -p -m644 assets/optional/ai-model-serving/release-ai-model-serving-x86_64.json %{buildroot}%{_datadir}/microshift/release/
 
 # observability
+%if %{with_observability}
 install -d -m755 %{buildroot}/%{_sysconfdir}/microshift/observability
 install -p -m644 packaging/observability/*.yaml -D %{buildroot}%{_sysconfdir}/microshift/observability/
 # Explicit copy of large config as default. Not using symlink to avoid accidental package upgrade overwriting user config if the user edits the config without copying (i.e. edits the target of symlink).
@@ -584,7 +589,7 @@ install -p -m644 packaging/observability/opentelemetry-collector-large.yaml -D %
 install -p -m644 packaging/observability/microshift-observability.service %{buildroot}%{_unitdir}/
 install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/003-microshift-observability/
 install -p -m644 assets/optional/observability/*.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/003-microshift-observability/
-
+%endif
 
 # cert-manager
 install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/060-microshift-cert-manager
@@ -662,11 +667,13 @@ if [ $1 -eq 1 ]; then
 	systemctl is-active --quiet crio && systemctl restart --quiet crio || true
 fi
 
+%if %{with_observability}
 %post observability
 %systemd_post microshift-observability.service
 
 %preun observability
 %systemd_preun microshift-observability.service
+%endif
 
 %files
 %license LICENSE
@@ -788,6 +795,7 @@ fi
 %files ai-model-serving-release-info
 %{_datadir}/microshift/release/release-ai-model-serving-x86_64.json
 
+%if %{with_observability}
 %files observability
 %dir %{_prefix}/lib/microshift/manifests.d/003-microshift-observability
 %dir %{_sysconfdir}/microshift/observability/
@@ -795,6 +803,7 @@ fi
 %config(noreplace) %{_sysconfdir}/microshift/observability/opentelemetry-collector.yaml
 %{_sysconfdir}/microshift/observability/opentelemetry-collector-*.yaml
 %{_prefix}/lib/microshift/manifests.d/003-microshift-observability/*
+%endif
 
 %files cert-manager
 %dir %{_prefix}/lib/microshift/manifests.d/060-microshift-cert-manager
