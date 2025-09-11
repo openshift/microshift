@@ -1,19 +1,13 @@
-- api embedded-component 4a165b214722ff53fbdac1d250f62d4b0bb2bd3d to a638ff2e96fb9fb41192e85268fdcb07c0b1ed93
-  - e0349455 2025-09-01T11:30:26+02:00 Add default value for MachineHealthCheck's maxUnhealthy to the description
+- kubernetes embedded-component a237dcbeee8bbe1440c94349399cc6eac8870910 to 72a1beec012d2552d27d250025c832d7794a7cf1
+  - a38f5e1b3 2025-09-07T14:10:57+00:00 UPSTREAM: revert: 133264: Revert "remove failing test that depends on expired credential, remove credential, add TODOs"
+  - 998bc5e17 2025-09-07T14:10:57+00:00 UPSTREAM: <carry>: Revert "UPSTREAM: <carry>: Revert "OCPBUGS-60507: Bump 1.33.4""
 
-- cluster-kube-apiserver-operator embedded-component 0bec046c8c10682390e2a20ae4f416a2d8589f40 to cae310f190fccb3f0fa613de50c484afb039c098
-  - 6c2d992 2025-08-25T18:29:46+02:00 revert dev cert rotation
+- operator-framework-olm embedded-component e53cf3090214284bf913bd2d7165a0a9422635a0 to 10d327b38876b2fbc654ddc54eee6199ea0dbbb8
+  - e8cb2905 2025-09-06T17:49:49+02:00 UPSTREAM: <carry>: make downstream csv namespace labeler plugin e2e more resilient to race conditions
+  - be283bad 2025-09-06T17:49:40+02:00 Make PSA catalog tests more resilient (#3645)
+  - 85780936 2025-09-06T17:49:16+02:00 refactor ensure job to remove named parameters (#3644)
 
-- cluster-kube-controller-manager-operator embedded-component 7030e7353408e83096a285404700c573273c25c8 to 90dc670123652d73f3fd8e5f40096bb665a917d5
-  - d7381fb 2025-09-05T18:02:18+05:30 Fixing arch issue
-
-- cluster-network-operator embedded-component 746b8fb86171dfc75011a7b8db29de5c2355d848 to 7bbd2653092fc383803ba98169f6ffc5be2a64d5
-  - fb3f46d 2025-08-20T14:43:26-05:00 Set RunAsUser for network-node-identity
-
-- oc image-amd64 31597edbaedc6d8d206deda350cfc93e89fa24bf to a43428189603f12ae190703cb725f66f742fbe52
-  - ea3cacdc 2025-08-29T13:21:45+02:00 must-gather: Fix usage checker for custom commands
-
-- kubernetes image-arm64 a237dcbeee8bbe1440c94349399cc6eac8870910 to 72a1beec012d2552d27d250025c832d7794a7cf1
+- kubernetes image-amd64 a237dcbeee8bbe1440c94349399cc6eac8870910 to 72a1beec012d2552d27d250025c832d7794a7cf1
   - a38f5e1b3 2025-09-07T14:10:57+00:00 UPSTREAM: revert: 133264: Revert "remove failing test that depends on expired credential, remove credential, add TODOs"
   - 998bc5e17 2025-09-07T14:10:57+00:00 UPSTREAM: <carry>: Revert "UPSTREAM: <carry>: Revert "OCPBUGS-60507: Bump 1.33.4""
 
