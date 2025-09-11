@@ -1,11 +1,20 @@
-- api embedded-component c9f500dc7ca317fcb4028b172a8c638305976e7f to 5b2b8cafdd825e60f37a3ce6f8dac0ad1732293e
-  - d37c9b38 2025-09-03T13:07:09-04:00 features: Lift feature gate for PIS in 4.19
-  - 75435dd9 2025-06-20T08:37:27-04:00 promote MachineConfigNode feature gate to default
+- api embedded-component 5b2b8cafdd825e60f37a3ce6f8dac0ad1732293e to 93b8cc2cf247366771a42d967d836f1968418540
+  - a9096507 2025-09-01T12:33:45+00:00 Add default value for MachineHealthCheck's maxUnhealthy to the description
 
-- cluster-network-operator embedded-component bc27b42976486bd395fdbb0f4fbc9a5a8499be2c to bb6470c3cfbb1ecdaf78acac340e6a307bcd5231
-  - 5ef1741 2025-09-03T11:03:54+02:00 Ran make update-codegen
-  - e24845b 2025-09-03T10:48:21+02:00 Bump openshift/api to commit where RA was GA-ed
+- kubernetes embedded-component 169f654a6b0bc3dcca620eda17240b86c578cb10 to b5229e8311fe15cd8e9a70de2279868726b19f84
+  - a3f04653a 2025-09-05T13:09:58-03:00 UPSTREAM: revert: 133264: Revert "remove failing test that depends on expired credential, remove credential, add TODOs"
+  - 6774035b9 2025-09-01T09:24:31-03:00 UPSTREAM: <carry>: Unrevert "Merge pull request #2412 from dusk125/rebase-v1.32.8""
 
-- machine-config-operator embedded-component 1cc3b020cb2d5cdcb9135de39ddbd0ddd494495f to 1a3a559a1c78f664e9812812c14e1b02687a96bc
-  - 5e0c91f2 2025-08-04T20:59:17+00:00 OCPBUGS-55971: Enable debug logging for nodeip-configuration
+- operator-framework-olm embedded-component 5c83a8adfd3fb0a5b3f2f8a26d3d05eefd5ba9d0 to e42f5c26092b9dea5856807d314f57e1886d31d7
+  - 73f0b4d2 2025-09-06T17:59:56+02:00 UPSTREAM: <carry>: make downstream csv namespace labeler plugin e2e more resilient to race conditions
+  - 75dd5ea6 2025-09-06T17:56:04+02:00 Make PSA catalog tests more resilient (#3645)
+  - 15b1211b 2025-09-06T17:55:56+02:00 refactor ensure job to remove named parameters (#3644)
+
+- kubernetes image-amd64 169f654a6b0bc3dcca620eda17240b86c578cb10 to b5229e8311fe15cd8e9a70de2279868726b19f84
+  - a3f04653a 2025-09-05T13:09:58-03:00 UPSTREAM: revert: 133264: Revert "remove failing test that depends on expired credential, remove credential, add TODOs"
+  - 6774035b9 2025-09-01T09:24:31-03:00 UPSTREAM: <carry>: Unrevert "Merge pull request #2412 from dusk125/rebase-v1.32.8""
+
+- kubernetes image-arm64 169f654a6b0bc3dcca620eda17240b86c578cb10 to b5229e8311fe15cd8e9a70de2279868726b19f84
+  - a3f04653a 2025-09-05T13:09:58-03:00 UPSTREAM: revert: 133264: Revert "remove failing test that depends on expired credential, remove credential, add TODOs"
+  - 6774035b9 2025-09-01T09:24:31-03:00 UPSTREAM: <carry>: Unrevert "Merge pull request #2412 from dusk125/rebase-v1.32.8""
 
