@@ -17,6 +17,8 @@ import (
 	"github.com/openshift/microshift/pkg/assets"
 	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/util/cryptomaterial"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/klog/v2"
 )
@@ -154,6 +156,9 @@ func startIngressController(ctx context.Context, cfg *config.Config, kubeconfigP
 		cmAccessLog = []string{
 			"components/openshift-router/configmap-accesslog.yaml",
 		}
+		ingressClass = []string{
+			"components/openshift-router/ingress-class.yaml",
+		}
 		cm                   = "components/openshift-router/configmap.yaml"
 		servingKeypairSecret = "components/openshift-router/serving-certificate.yaml"
 	)
@@ -167,6 +172,21 @@ func startIngressController(ctx context.Context, cfg *config.Config, kubeconfigP
 			klog.Warningf("Failed to delete cluster roles %v: %v", clusterRole, err)
 			return err
 		}
+		// Delete ingress class (cluster-scoped resource)
+		if err := assets.DeleteGeneric(ctx, []runtime.Object{
+			&unstructured.Unstructured{
+				Object: map[string]interface{}{
+					"apiVersion": "networking.k8s.io/v1",
+					"kind":       "IngressClass",
+					"metadata": map[string]interface{}{
+						"name": "openshift-ingress",
+					},
+				},
+			},
+		}, kubeconfigPath); err != nil {
+			klog.Warningf("Failed to delete ingress class: %v", err)
+			return err
+		}
 		if err := assets.DeleteNamespaces(ctx, ns, kubeconfigPath); err != nil {
 			klog.Warningf("Failed to delete namespaces %v: %v", ns, err)
 			return err
@@ -176,6 +196,10 @@ func startIngressController(ctx context.Context, cfg *config.Config, kubeconfigP
 
 	if err := assets.ApplyNamespaces(ctx, ns, kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply namespaces %v: %v", ns, err)
+		return err
+	}
+	if err := assets.ApplyGeneric(ctx, ingressClass, nil, nil, nil, kubeconfigPath); err != nil {
+		klog.Warningf("Failed to apply ingress class %v: %v", ingressClass, err)
 		return err
 	}
 	if err := assets.ApplyClusterRoles(ctx, clusterRole, kubeconfigPath); err != nil {
