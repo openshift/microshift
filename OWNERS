@@ -8,6 +8,7 @@ approvers:
 - eslutsky
 - kasturinarra
 - agullon
+- microshift-rebase-script[bot]
 reviewers:
 - copejon
 - ggiguash
@@ -19,6 +20,7 @@ reviewers:
 - kasturinarra
 - agullon
 - vanhalenar
+- microshift-rebase-script[bot]
 emeritus_approvers:
 - cooktheryan
 - husky-parul
