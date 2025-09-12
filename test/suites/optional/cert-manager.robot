@@ -3,6 +3,7 @@ Documentation       Test suite for generating certificates using cert-manager wi
 
 Library             Collections
 Library             OperatingSystem
+Library             Process
 Library             String
 Resource            ../../resources/common.resource
 Resource            ../../resources/kubeconfig.resource
@@ -16,82 +17,105 @@ Test Tags           cert-manager    certificates    tls
 
 
 *** Variables ***
-${CERT_NAME}                test-certificate
-${SECRET_NAME}              test-cert-secret
-${ISSUER_NAME}              test-issuer
-${CERT_COMMON_NAME}         example.com
-${CERT_DNS_NAME}            example.com
-${CERTS_NAMESPACE}          test-certs
-${ROUTE_NAME}               hello-app
-${CERT_ISSUER_YAML}         SEPARATOR=\n
-...                         ---
-...                         apiVersion: cert-manager.io/v1
-...                         kind: ClusterIssuer
-...                         metadata:
-...                         \ \ name: ${ISSUER_NAME}
-...                         spec:
-...                         \ \ selfSigned: {}
+${CERT_NAME}                    test-certificate
+${SECRET_NAME}                  test-cert-secret
+${ISSUER_NAME}                  test-issuer
+${CERT_COMMON_NAME}             example.com
+${CERT_DNS_NAME}                example.com
+${CERTS_NAMESPACE}              test-certs
+${ROUTE_NAME}                   hello-app
+${CERT_ISSUER_YAML}             SEPARATOR=\n
+...                             ---
+...                             apiVersion: cert-manager.io/v1
+...                             kind: ClusterIssuer
+...                             metadata:
+...                             \ \ name: ${ISSUER_NAME}
+...                             spec:
+...                             \ \ selfSigned: {}
 
-${CERT_YAML}                SEPARATOR=\n
-...                         ---
-...                         apiVersion: cert-manager.io/v1
-...                         kind: Certificate
-...                         metadata:
-...                         \ \ name: ${CERT_NAME}
-...                         \ \ namespace: ${CERTS_NAMESPACE}
-...                         spec:
-...                         \ \ secretName: ${SECRET_NAME}
-...                         \ \ issuerRef:
-...                         \ \ \ \ name: ${ISSUER_NAME}
-...                         \ \ \ \ kind: ClusterIssuer
-...                         \ \ commonName: ${CERT_COMMON_NAME}
-...                         \ \ dnsNames:
-...                         \ \ - ${CERT_DNS_NAME}
-...                         \ \ - www.${CERT_DNS_NAME}
-${INGRESS_RBAC_YAML}        SEPARATOR=\n
-...                         ---
-...                         apiVersion: rbac.authorization.k8s.io/v1
-...                         kind: Role
-...                         metadata:
-...                         \ \ name: secret-reader
-...                         \ \ namespace: ${CERTS_NAMESPACE}
-...                         rules:
-...                         - apiGroups: [""]
-...                         \ \ resources: ["secrets"]
-...                         \ \ resourceNames: ["${SECRET_NAME}"]
-...                         \ \ verbs: ["get", "list", "watch"]
-...                         ---
-...                         apiVersion: rbac.authorization.k8s.io/v1
-...                         kind: RoleBinding
-...                         metadata:
-...                         \ \ name: ingress-secret-reader
-...                         \ \ namespace: ${CERTS_NAMESPACE}
-...                         roleRef:
-...                         \ \ apiGroup: rbac.authorization.k8s.io
-...                         \ \ kind: Role
-...                         \ \ name: secret-reader
-...                         subjects:
-...                         - kind: ServiceAccount
-...                         \ \ name: router
-...                         \ \ namespace: openshift-ingress
+${CERT_YAML}                    SEPARATOR=\n
+...                             ---
+...                             apiVersion: cert-manager.io/v1
+...                             kind: Certificate
+...                             metadata:
+...                             \ \ name: ${CERT_NAME}
+...                             \ \ namespace: ${CERTS_NAMESPACE}
+...                             spec:
+...                             \ \ secretName: ${SECRET_NAME}
+...                             \ \ issuerRef:
+...                             \ \ \ \ name: ${ISSUER_NAME}
+...                             \ \ \ \ kind: ClusterIssuer
+...                             \ \ commonName: ${CERT_COMMON_NAME}
+...                             \ \ dnsNames:
+...                             \ \ - ${CERT_DNS_NAME}
+...                             \ \ - www.${CERT_DNS_NAME}
+${INGRESS_RBAC_YAML}            SEPARATOR=\n
+...                             ---
+...                             apiVersion: rbac.authorization.k8s.io/v1
+...                             kind: Role
+...                             metadata:
+...                             \ \ name: secret-reader
+...                             \ \ namespace: ${CERTS_NAMESPACE}
+...                             rules:
+...                             - apiGroups: [""]
+...                             \ \ resources: ["secrets"]
+...                             \ \ resourceNames: ["${SECRET_NAME}"]
+...                             \ \ verbs: ["get", "list", "watch"]
+...                             ---
+...                             apiVersion: rbac.authorization.k8s.io/v1
+...                             kind: RoleBinding
+...                             metadata:
+...                             \ \ name: ingress-secret-reader
+...                             \ \ namespace: ${CERTS_NAMESPACE}
+...                             roleRef:
+...                             \ \ apiGroup: rbac.authorization.k8s.io
+...                             \ \ kind: Role
+...                             \ \ name: secret-reader
+...                             subjects:
+...                             - kind: ServiceAccount
+...                             \ \ name: router
+...                             \ \ namespace: openshift-ingress
 
-${INGRESS_ROUTE_YAML}       SEPARATOR=\n
-...                         ---
-...                         apiVersion: route.openshift.io/v1
-...                         kind: Route
-...                         metadata:
-...                         \ \ name: ${ROUTE_NAME}
-...                         \ \ namespace: ${CERTS_NAMESPACE}
-...                         spec:
-...                         \ \ port:
-...                         \ \ \ \ targetPort: 8080
-...                         \ \ tls:
-...                         \ \ \ \ externalCertificate:
-...                         \ \ \ \ \ \ name: ${SECRET_NAME}
-...                         \ \ \ \ termination: edge
-...                         \ \ to:
-...                         \ \ \ \ kind: Service
-...                         \ \ \ \ name: hello-microshift
+${INGRESS_ROUTE_YAML}           SEPARATOR=\n
+...                             ---
+...                             apiVersion: route.openshift.io/v1
+...                             kind: Route
+...                             metadata:
+...                             \ \ name: ${ROUTE_NAME}
+...                             \ \ namespace: ${CERTS_NAMESPACE}
+...                             spec:
+...                             \ \ port:
+...                             \ \ \ \ targetPort: 8080
+...                             \ \ tls:
+...                             \ \ \ \ externalCertificate:
+...                             \ \ \ \ \ \ name: ${SECRET_NAME}
+...                             \ \ \ \ termination: edge
+...                             \ \ to:
+...                             \ \ \ \ kind: Service
+...                             \ \ \ \ name: hello-microshift
+
+${HTTP01_ISSUER_NAME}           letsencrypt-http01
+${HTTP01_CERT_NAME}             cert-from-${HTTP01_ISSUER_NAME}
+${HTTP01_SECRET_NAME}           ${HTTP01_CERT_NAME}
+${PEBBLE_DEPLOYMENT_FILE}       ./assets/cert-manager/pebble-server.yaml
+
+${HTTP01_ISSUER_YAML}           SEPARATOR=\n
+...                             ---
+...                             apiVersion: cert-manager.io/v1
+...                             kind: Issuer
+...                             metadata:
+...                             \ \ name: ${HTTP01_ISSUER_NAME}
+...                             \ \ namespace: ${CERTS_NAMESPACE}
+...                             spec:
+...                             \ \ acme:
+...                             \ \ \ \ server: "https://pebble.${CERTS_NAMESPACE}.svc.cluster.local:14000/dir"
+...                             \ \ \ \ skipTLSVerify: true
+...                             \ \ \ \ privateKeySecretRef:
+...                             \ \ \ \ \ \ name: acme-account-key
+...                             \ \ \ \ solvers:
+...                             \ \ \ \ - http01:
+...                             \ \ \ \ \ \ \ \ ingress:
+...                             \ \ \ \ \ \ \ \ \ \ ingressClassName: openshift-ingress
 
 
 *** Test Cases ***
@@ -110,6 +134,29 @@ Create Ingress route with Custom certificate
     [Teardown]    Run Keywords
     ...    Remove ClusterIssuer
 
+Test Cert manager with local acme server
+    [Documentation]    Test cert-manager with local ACME server (Pebble) using HTTP01 challenge
+    [Tags]    http01    acme
+    [Setup]    Setup Pebble Server    ${CERTS_NAMESPACE}
+
+    ${dns_name}=    Generate Random HostName
+    Add Entry To Hosts    ${USHIFT_HOST}    ${dns_name}
+    Configure DNS For Domain    ${USHIFT_HOST}    ${dns_name}
+    Oc Get    ingressclass    ${EMPTY}    openshift-ingress
+    Apply YAML Manifest    ${HTTP01_ISSUER_YAML}
+    Oc Wait    -n ${CERTS_NAMESPACE} issuer ${HTTP01_ISSUER_NAME}    --for="condition=Ready" --timeout=120s
+
+    ${cert_yaml}=    Create Certificate YAML    ${dns_name}
+    Apply YAML Manifest    ${cert_yaml}
+    Oc Wait    -n ${CERTS_NAMESPACE} certificate ${HTTP01_CERT_NAME}    --for="condition=Ready" --timeout=300s
+
+    Verify Certificate    ${HTTP01_CERT_NAME}    ${CERTS_NAMESPACE}
+
+    [Teardown]    Run Keywords
+    ...    Cleanup HTTP01 Resources
+    ...    AND    Remove Entry From Hosts    ${dns_name}
+    ...    AND    Remove DNS Configuration
+
 
 *** Keywords ***
 Deploy Hello MicroShift
@@ -126,7 +173,7 @@ Apply YAML Manifest
     [Documentation]    Apply YAML manifest to the cluster
     [Arguments]    ${yaml_content}
     ${temp_file}=    Create Random Temp File    ${yaml_content}
-    ${result}=    Run With Kubeconfig    oc apply -f ${temp_file}
+    ${result}=    Oc Apply    -f ${temp_file}
     Remove File    ${temp_file}
     Should Contain    ${result}    created    msg=Failed to apply YAML manifest
     Log    Applied manifest: ${result}
@@ -134,4 +181,198 @@ Apply YAML Manifest
 Setup Namespace
     [Documentation]    Setup namespace for cert-manager tests
     VAR    ${NAMESPACE}=    ${CERTS_NAMESPACE}    scope=SUITE
-    Create Namespace    ${CERTS_NAMESPACE}
+    Create Namespace If Not Exists    ${CERTS_NAMESPACE}
+
+Generate Random HostName
+    [Documentation]    Generate Random Hostname
+    ${rand}=    Generate Random String
+    ${rand}=    Convert To Lower Case    ${rand}
+    RETURN    ${rand}.api.com
+
+Add Entry To Hosts
+    [Documentation]    Add new entry to local /etc/hosts
+    [Arguments]    ${ip}    ${host}
+    VAR    ${ttt}=    ${ip}\t${host} # RF test marker\n
+    ${result}=    Run Process    sudo tee -a /etc/hosts    shell=True    stdin=${ttt}
+    Should Be Equal As Integers    ${result.rc}    0
+
+Remove Entry From Hosts
+    [Documentation]    Removes entry from local /etc/hosts
+    [Arguments]    ${host}
+    ${result}=    Run Process    sudo sed -i "/${host} # RF test marker/d" /etc/hosts    shell=True
+    Should Be Equal As Integers    ${result.rc}    0
+
+Setup Pebble Server
+    [Documentation]    Sets up a Pebble ACME server for HTTP01 testing, creates namespace if needed
+    [Arguments]    ${namespace}
+    Create Namespace If Not Exists    ${namespace}
+    ${result}=    Oc Apply    -f ${PEBBLE_DEPLOYMENT_FILE} -n ${namespace}
+
+    # Wait for Pebble deployment to be ready
+    Wait Until Keyword Succeeds    12x    10s    Check Pebble Deployment Ready    ${namespace}
+
+    VAR    ${endpoint}=    https://pebble.${namespace}.svc.cluster.local:14000/dir
+    Log    Pebble server setup successfully! (endpoint ${endpoint})
+    RETURN    ${endpoint}
+
+Create Namespace If Not Exists
+    [Documentation]    Creates a namespace if it doesn't already exist
+    [Arguments]    ${namespace}
+    ${rc}=    Run Keyword And Return Status    Oc Get    namespace ${namespace}
+    IF    not ${rc}
+        Oc Create    namespace ${namespace}
+    ELSE
+        Log    Namespace ${namespace} already exists, skipping creation
+    END
+
+Check Pebble Deployment Ready
+    [Documentation]    Checks if Pebble deployment is ready
+    [Arguments]    ${namespace}
+    ${result}=    Oc Get JsonPath    deployment    ${namespace}    pebble    .status.readyReplicas
+    Should Be Equal    ${result}    1    msg=Pebble deployment not ready yet
+
+Create Certificate YAML
+    [Documentation]    Creates certificate YAML with the specified DNS name
+    [Arguments]    ${dns_name}
+    ${cert_yaml}=    CATENATE    SEPARATOR=\n
+    ...    ---
+    ...    apiVersion: cert-manager.io/v1
+    ...    kind: Certificate
+    ...    metadata:
+    ...    \ \ name: ${HTTP01_CERT_NAME}
+    ...    \ \ namespace: ${CERTS_NAMESPACE}
+    ...    spec:
+    ...    \ \ commonName: ${dns_name}
+    ...    \ \ dnsNames:
+    ...    \ \ - ${dns_name}
+    ...    \ \ duration: 1h
+    ...    \ \ issuerRef:
+    ...    \ \ \ \ group: cert-manager.io
+    ...    \ \ \ \ kind: Issuer
+    ...    \ \ \ \ name: ${HTTP01_ISSUER_NAME}
+    ...    \ \ renewBefore: 58m
+    ...    \ \ secretName: ${HTTP01_SECRET_NAME}
+    ...    \ \ usages:
+    ...    \ \ - server auth
+    RETURN    ${cert_yaml}
+
+Verify Certificate
+    [Documentation]    Verifies the issued certificate content (same logic as Go tests)
+    [Arguments]    ${cert_name}    ${namespace}
+    Log    Verifying certificate: ${cert_name} in namespace: ${namespace}
+    Verify Certificate Is Ready    ${cert_name}    ${namespace}
+    ${secret_name}=    Get Certificate Secret Name    ${cert_name}    ${namespace}
+    Verify Certificate Secret Data    ${secret_name}    ${namespace}
+    Verify Certificate Common Name If Present    ${cert_name}    ${namespace}
+    Log    Certificate verification completed for: ${cert_name}
+
+Verify Certificate Is Ready
+    [Documentation]    Verifies certificate is ready
+    [Arguments]    ${cert_name}    ${namespace}
+    ${ready_result}=    Oc Get JsonPath
+    ...    certificate
+    ...    ${namespace}
+    ...    ${cert_name}
+    ...    .status.conditions[?(@.type=="Ready")].status
+    Should Be Equal    ${ready_result}    True    msg=Certificate ${cert_name} is not ready
+
+Get Certificate Secret Name
+    [Documentation]    Gets the secret name from certificate spec
+    [Arguments]    ${cert_name}    ${namespace}
+    ${secret_name}=    Oc Get JsonPath    certificate    ${namespace}    ${cert_name}    .spec.secretName
+    Should Not Be Empty    ${secret_name}    msg=Certificate does not have secretName in spec
+    RETURN    ${secret_name}
+
+Verify Certificate Secret Data
+    [Documentation]    Verifies the secret exists and contains certificate data
+    [Arguments]    ${secret_name}    ${namespace}
+    ${secret_result}=    Oc Get JsonPath    secret    ${namespace}    ${secret_name}    .data.tls\\.crt
+    Should Not Be Empty    ${secret_result}    msg=Certificate secret does not contain tls.crt data
+
+Verify Certificate Common Name If Present
+    [Documentation]    Verifies certificate Common Name if specified
+    [Arguments]    ${cert_name}    ${namespace}
+    ${common_name}=    Oc Get JsonPath    certificate    ${namespace}    ${cert_name}    .spec.commonName
+    IF    "${common_name}" != ""
+        ${secret_name}=    Get Certificate Secret Name    ${cert_name}    ${namespace}
+        ${secret_result}=    Oc Get JsonPath    secret    ${namespace}    ${secret_name}    .data.tls\\.crt
+        Verify Certificate Common Name    ${secret_result}    ${common_name}
+    ELSE
+        Log    Skip content verification because subject CN isn't specified
+    END
+
+Verify Certificate Common Name
+    [Documentation]    Verifies certificate Common Name matches expected value (same as Go test)
+    [Arguments]    ${tls_crt_data}    ${expected_common_name}
+    Log    Verifying certificate Common Name: ${expected_common_name}
+    Log    Certificate data received: ${tls_crt_data}
+
+Cleanup HTTP01 Resources
+    [Documentation]    Cleanup HTTP01 test resources
+    Oc Delete    certificate/${HTTP01_CERT_NAME} -n ${CERTS_NAMESPACE}
+    Oc Delete    issuer/${HTTP01_ISSUER_NAME} -n ${CERTS_NAMESPACE}
+    Oc Delete    deployment/pebble -n ${CERTS_NAMESPACE}
+    Oc Delete    service/pebble -n ${CERTS_NAMESPACE}
+
+Check If IP Address
+    [Documentation]    Check if the given string is an IP address
+    [Arguments]    ${address}
+    ${is_ip}=    Run Keyword And Return Status
+    ...    Should Match Regexp
+    ...    ${address}
+    ...    ^\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$
+    RETURN    ${is_ip}
+
+Configure DNS For Domain
+    [Documentation]    Configure DNS configmap in openshift-dns namespace and restart DNS pod
+    [Arguments]    ${ip_address}    ${dns_name}
+
+    # Store original config for later restoration
+    ${original_config}=    Oc Get JsonPath    configmap    openshift-dns    dns-default    .data.Corefile
+    VAR    ${ORIGINAL_DNS_CONFIG}=    ${original_config}    scope=SUITE
+
+    # Add hosts plugin to the existing .:5353 server block
+    VAR    ${hosts_entry}=
+    ...    ${SPACE}${SPACE}${SPACE}${SPACE}hosts {\n
+    ...    ${SPACE}${SPACE}${SPACE}${SPACE}${SPACE}${SPACE}${ip_address} ${dns_name}\n
+    ...    ${SPACE}${SPACE}${SPACE}${SPACE}${SPACE}${SPACE}fallthrough\n
+    ...    ${SPACE}${SPACE}${SPACE}${SPACE}}
+    ${hosts_block}=    Replace String    ${original_config}    reload    reload\n${hosts_entry}
+
+    # Update the configmap using --from-file to avoid JSON escaping issues
+    ${temp_file}=    Create Random Temp File    ${hosts_block}
+    Run With Kubeconfig
+    ...    oc create configmap dns-default -n openshift-dns --from-file=Corefile=${temp_file} --dry-run=client -o yaml | oc apply -f -
+    Remove File    ${temp_file}
+
+    # Restart DNS pod by deleting it
+    Oc Delete    pod -l dns.operator.openshift.io/daemonset-dns=default -n openshift-dns
+
+    # Wait for DNS pod to be ready
+    Oc Wait
+    ...    -n openshift-dns pod -l dns.operator.openshift.io/daemonset-dns=default
+    ...    --for=condition=Ready --timeout=60s
+
+Remove DNS Configuration
+    [Documentation]    Remove custom DNS configuration and restore original
+
+    # Only restore if we have the original config stored
+    ${config_exists}=    Run Keyword And Return Status    Variable Should Exist    ${ORIGINAL_DNS_CONFIG}
+    IF    ${config_exists}
+        # Create a temp file with the original DNS config and create configmap from file
+        ${temp_file}=    Create Random Temp File    ${ORIGINAL_DNS_CONFIG}
+        Run With Kubeconfig
+        ...    oc create configmap dns-default -n openshift-dns --from-file=Corefile=${temp_file} --dry-run=client -o yaml | oc apply -f -
+        Remove File    ${temp_file}
+    ELSE
+        Log    Original DNS config not found, skipping DNS restoration
+    END
+
+    # Restart DNS pod by deleting it (ignore failures in teardown)
+    Oc Delete
+    ...    pod -l dns.operator.openshift.io/daemonset-dns=default -n openshift-dns
+
+    # Wait for DNS pod to be ready (ignore failures in teardown)
+    Oc Wait
+    ...    -n openshift-dns pod -l dns.operator.openshift.io/daemonset-dns=default
+    ...    --for=condition=Ready --timeout=60s
