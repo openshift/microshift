@@ -1,13 +1,7 @@
-- kubernetes embedded-component a237dcbeee8bbe1440c94349399cc6eac8870910 to 72a1beec012d2552d27d250025c832d7794a7cf1
-  - a38f5e1b3 2025-09-07T14:10:57+00:00 UPSTREAM: revert: 133264: Revert "remove failing test that depends on expired credential, remove credential, add TODOs"
-  - 998bc5e17 2025-09-07T14:10:57+00:00 UPSTREAM: <carry>: Revert "UPSTREAM: <carry>: Revert "OCPBUGS-60507: Bump 1.33.4""
-
-- operator-framework-olm embedded-component e53cf3090214284bf913bd2d7165a0a9422635a0 to 10d327b38876b2fbc654ddc54eee6199ea0dbbb8
-  - e8cb2905 2025-09-06T17:49:49+02:00 UPSTREAM: <carry>: make downstream csv namespace labeler plugin e2e more resilient to race conditions
-  - be283bad 2025-09-06T17:49:40+02:00 Make PSA catalog tests more resilient (#3645)
-  - 85780936 2025-09-06T17:49:16+02:00 refactor ensure job to remove named parameters (#3644)
-
-- kubernetes image-amd64 a237dcbeee8bbe1440c94349399cc6eac8870910 to 72a1beec012d2552d27d250025c832d7794a7cf1
-  - a38f5e1b3 2025-09-07T14:10:57+00:00 UPSTREAM: revert: 133264: Revert "remove failing test that depends on expired credential, remove credential, add TODOs"
-  - 998bc5e17 2025-09-07T14:10:57+00:00 UPSTREAM: <carry>: Revert "UPSTREAM: <carry>: Revert "OCPBUGS-60507: Bump 1.33.4""
+- kubernetes image-arm64 72a1beec012d2552d27d250025c832d7794a7cf1 to 633ffc1ea74728b2a5bbc07c450b5a4a90d5790e
+  - 5bbb52f79 2025-09-08T09:27:58+00:00 UPSTREAM: <carry>: Fix tests after backport
+  - 6d25edd11 2025-09-08T09:27:58+00:00 UPSTREAM: 131725: Avoid encoding in LogResponseObject when we are not going to use it
+  - af0f4fb5e 2025-09-08T09:27:58+00:00 UPSTREAM: 131694: Eliminate AuditContext`s SetEventLevel
+  - 1e78392a3 2025-09-08T09:27:58+00:00 UPSTREAM: 129472: Fix API server crash on concurrent map iteration and write
+  - 8ed402a9c 2025-09-03T13:41:37+00:00 UPSTREAM: 133425: Fix SELinux label comparison
 
