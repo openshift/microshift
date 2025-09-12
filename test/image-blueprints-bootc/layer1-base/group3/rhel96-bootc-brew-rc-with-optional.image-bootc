@@ -1,0 +1,3 @@
+{{- if env.Getenv "BREW_RC_RELEASE_VERSION" "" -}}
+localhost/rhel96-bootc-brew-rc-with-optional:latest
+{{- end }}
