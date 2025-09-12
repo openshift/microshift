@@ -72,8 +72,8 @@ export FAKE_NEXT_MINOR_VERSION=$(( "${MINOR_VERSION}" + 1 ))
 #
 # For a release branch, the current release repository should come from the
 # official 'rhocp' stream.
-CURRENT_RELEASE_REPO="https://mirror.openshift.com/pub/openshift-v4/$(uname -m)/microshift/ocp/latest-4.20/el9/os"
-CURRENT_RELEASE_VERSION="$(get_vrel_from_beta "${CURRENT_RELEASE_REPO}")"
+CURRENT_RELEASE_REPO="" # "https://mirror.openshift.com/pub/openshift-v4/$(uname -m)/microshift/ocp/latest-4.21/el9/os"
+CURRENT_RELEASE_VERSION="" # "$(get_vrel_from_beta "${CURRENT_RELEASE_REPO}")"
 export CURRENT_RELEASE_REPO
 export CURRENT_RELEASE_VERSION
 
@@ -87,13 +87,13 @@ export CURRENT_RELEASE_VERSION
 #
 # For a release branch, the previous release repository should come from the
 # official 'rhocp' stream.
-PREVIOUS_RELEASE_REPO="rhocp-4.19-for-rhel-9-$(uname -m)-rpms"
-PREVIOUS_RELEASE_VERSION="$(get_vrel_from_rhsm "${PREVIOUS_RELEASE_REPO}")"
+PREVIOUS_RELEASE_REPO="https://mirror.openshift.com/pub/openshift-v4/$(uname -m)/microshift/ocp/latest-4.20/el9/os"
+PREVIOUS_RELEASE_VERSION="$(get_vrel_from_beta "${PREVIOUS_RELEASE_REPO}")"
 export PREVIOUS_RELEASE_REPO
 export PREVIOUS_RELEASE_VERSION
 
 # The y-2 release repository value should always contain the 'rhocp' repository name.
-YMINUS2_RELEASE_REPO="rhocp-4.18-for-rhel-9-$(uname -m)-rpms"
+YMINUS2_RELEASE_REPO="rhocp-4.19-for-rhel-9-$(uname -m)-rpms"
 YMINUS2_RELEASE_VERSION="$(get_vrel_from_rhsm "${YMINUS2_RELEASE_REPO}")"
 export YMINUS2_RELEASE_REPO
 export YMINUS2_RELEASE_VERSION
