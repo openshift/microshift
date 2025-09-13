@@ -257,9 +257,7 @@ func TestWithStartupEarlyAnnotation(t *testing.T) {
 			if ac == nil {
 				t.Fatalf("expected audit context inside the request context")
 			}
-			ac.Event = auditinternal.Event{
-				Level: auditinternal.LevelMetadata,
-			}
+			ac.Init(audit.RequestAuditConfig{Level: auditinternal.LevelMetadata}, nil)
 
 			w := httptest.NewRecorder()
 			w.Code = 0
@@ -275,11 +273,11 @@ func TestWithStartupEarlyAnnotation(t *testing.T) {
 			key := "apiserver.k8s.io/startup"
 			switch {
 			case len(test.annotationExpected) == 0:
-				if valueGot, ok := ac.Event.Annotations[key]; ok {
+				if valueGot, ok := ac.GetEventAnnotation(key); ok {
 					t.Errorf("did not expect annotation to be added, but got: %s", valueGot)
 				}
 			default:
-				if valueGot, ok := ac.Event.Annotations[key]; !ok || test.annotationExpected != valueGot {
+				if valueGot, ok := ac.GetEventAnnotation(key); !ok || test.annotationExpected != valueGot {
 					t.Errorf("expected annotation: %s, but got: %s", test.annotationExpected, valueGot)
 				}
 			}
