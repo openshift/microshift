@@ -4,7 +4,7 @@
 
 scenario_create_vms() {
     prepare_kickstart host1 kickstart.ks.template "rhel-9.6-microshift-brew-optionals-4.${MINOR_VERSION}-${LATEST_RELEASE_TYPE}"
-    launch_vm
+    launch_vm --vm_disksize 30
 }
 
 scenario_remove_vms() {
