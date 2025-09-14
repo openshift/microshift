@@ -1,9 +1,9 @@
-name = "rhel-9.4-microshift-4.{{ .Env.YMINUS2_MINOR_VERSION }}"
-description = "RHEL 9.4 with MicroShift from two minor versions back installed."
+name = "rhel-9.6-microshift-4.{{ .Env.YMINUS2_MINOR_VERSION }}"
+description = "RHEL 9.6 with MicroShift from two minor versions back installed."
 version = "0.0.1"
 modules = []
 groups = []
-distro = "rhel-94"
+distro = "rhel-96"
 
 {{ range (env.Getenv "MICROSHIFT_MANDATORY_RPMS" | strings.Split " ") }}
 [[packages]]
