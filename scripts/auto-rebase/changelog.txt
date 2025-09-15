@@ -1,52 +1,6 @@
-- api embedded-component 97c9a2259ba103d79e2b7d777337464621b08499 to e16f6cc860949caf863e79bd838491cdcb6e9641
-  - 28dddb3 2025-08-26T14:45:42+00:00 MachineOSConfig name should match MachineConfigPool
-  - 0e88dc1 2025-03-05T10:11:08+00:00 Add CEL validation for RegistrySources in Image API
+- kubernetes embedded-component a4cad449903ebc0483194289514d09f1deac1b66 to a06f3261941734178f3c43db62a80cc5fc97f7ad
+  - 15cb57ce5 2025-09-07T00:03:19-04:00 Revert "UPSTREAM: revert<carry>: Mark admissionregistration.k8s.io/v1beta1 as deprecated.""
 
-- cluster-kube-apiserver-operator embedded-component b46a20724df762e2df17956d9eb341252e73fccb to b6ad4b065b9f9677f0b33d625f9ae9dc36ccc3fc
-  - 7de8bb4 2025-08-29T03:13:33+00:00 Set goaway chance to 0.001
-
-- cluster-network-operator embedded-component 7aecd65a845e22325931cc7bee85a7554d204382 to b3b281c37120b57834417e1399ea27969e33b2ea
-  - f10907d 2025-08-06T13:54:32+00:00 Update CNO reviwers/approvers
-
-- kubernetes embedded-component 3c7968e741684de8dc08ebc8aef1890b099eccae to a4cad449903ebc0483194289514d09f1deac1b66
-  - f8af2469b 2025-09-05T13:10:19-03:00 UPSTREAM: revert: 133264: Revert "remove failing test that depends on expired credential, remove credential, add TODOs"
-  - 4f965d8cf 2025-08-26T15:38:26-04:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
-  - c1e5f4a23 2025-08-13T14:22:03+00:00 Release commit for Kubernetes v1.31.12
-  - 2e6eaa1fb 2025-08-10T15:11:14-07:00 do not allow the node to update it's owner reference
-  - f662eeba8 2025-07-28T16:38:29-07:00 remove failing test that depends on expired credential, remove credential, add TODOs
-  - 569122914 2025-07-15T18:33:31+00:00 Update CHANGELOG/CHANGELOG-1.31.md for v1.31.11
-  - 42be76d78 2025-07-11T20:45:36+02:00 Bump images, dependencies and versions to go 1.23.11 and distroless iptables
-  - 3691b1d98 2025-05-01T21:56:29-07:00 fix(kubelet): acquire imageRecordsLock when removing image
-
-- operator-framework-olm embedded-component a62bebb1c75e41da8b01024f01a9b1e8a1fe3f8f to f295d320d98493b70a105fa22ca79fab546a2e52
-  - f4b5d52e 2025-09-06T18:04:33+02:00 UPSTREAM: <carry>: make downstream csv namespace labeler plugin e2e more resilient to race conditions
-  - 16a8043b 2025-09-06T18:04:33+02:00 Make PSA catalog tests more resilient (#3645)
-  - d82c79f1 2025-09-06T18:04:33+02:00 refactor ensure job to remove named parameters (#3644)
-  - 20569cec 2025-09-06T18:04:33+02:00 Disable FailForward bad resource e2e (#3572)
-
-- kube-rbac-proxy image-amd64 526498ab32996a0f67a96530ad7173f955e3fbe2 to 5a14ea9d338b2582c7c2a8f89f351a0c30f56371
-  - c4999f9 2025-08-29T13:56:14+02:00 fix(go.mod): bump golang.org/x/crypto/ssh to 0.31.0
-
-- kubernetes image-amd64 3c7968e741684de8dc08ebc8aef1890b099eccae to a4cad449903ebc0483194289514d09f1deac1b66
-  - f8af2469b 2025-09-05T13:10:19-03:00 UPSTREAM: revert: 133264: Revert "remove failing test that depends on expired credential, remove credential, add TODOs"
-  - 4f965d8cf 2025-08-26T15:38:26-04:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
-  - c1e5f4a23 2025-08-13T14:22:03+00:00 Release commit for Kubernetes v1.31.12
-  - 2e6eaa1fb 2025-08-10T15:11:14-07:00 do not allow the node to update it's owner reference
-  - f662eeba8 2025-07-28T16:38:29-07:00 remove failing test that depends on expired credential, remove credential, add TODOs
-  - 569122914 2025-07-15T18:33:31+00:00 Update CHANGELOG/CHANGELOG-1.31.md for v1.31.11
-  - 42be76d78 2025-07-11T20:45:36+02:00 Bump images, dependencies and versions to go 1.23.11 and distroless iptables
-  - 3691b1d98 2025-05-01T21:56:29-07:00 fix(kubelet): acquire imageRecordsLock when removing image
-
-- kube-rbac-proxy image-arm64 526498ab32996a0f67a96530ad7173f955e3fbe2 to 5a14ea9d338b2582c7c2a8f89f351a0c30f56371
-  - c4999f9 2025-08-29T13:56:14+02:00 fix(go.mod): bump golang.org/x/crypto/ssh to 0.31.0
-
-- kubernetes image-arm64 3c7968e741684de8dc08ebc8aef1890b099eccae to a4cad449903ebc0483194289514d09f1deac1b66
-  - f8af2469b 2025-09-05T13:10:19-03:00 UPSTREAM: revert: 133264: Revert "remove failing test that depends on expired credential, remove credential, add TODOs"
-  - 4f965d8cf 2025-08-26T15:38:26-04:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
-  - c1e5f4a23 2025-08-13T14:22:03+00:00 Release commit for Kubernetes v1.31.12
-  - 2e6eaa1fb 2025-08-10T15:11:14-07:00 do not allow the node to update it's owner reference
-  - f662eeba8 2025-07-28T16:38:29-07:00 remove failing test that depends on expired credential, remove credential, add TODOs
-  - 569122914 2025-07-15T18:33:31+00:00 Update CHANGELOG/CHANGELOG-1.31.md for v1.31.11
-  - 42be76d78 2025-07-11T20:45:36+02:00 Bump images, dependencies and versions to go 1.23.11 and distroless iptables
-  - 3691b1d98 2025-05-01T21:56:29-07:00 fix(kubelet): acquire imageRecordsLock when removing image
+- kubernetes image-amd64 a4cad449903ebc0483194289514d09f1deac1b66 to a06f3261941734178f3c43db62a80cc5fc97f7ad
+  - 15cb57ce5 2025-09-07T00:03:19-04:00 Revert "UPSTREAM: revert<carry>: Mark admissionregistration.k8s.io/v1beta1 as deprecated.""
 
