@@ -3,7 +3,7 @@
 # Sourced from scenario.sh and uses functions defined there.
 
 scenario_create_vms() {
-    prepare_kickstart host1 kickstart.ks.template "rhel-9.4-microshift-4.${YMINUS2_MINOR_VERSION}"
+    prepare_kickstart host1 kickstart.ks.template "rhel-9.6-microshift-4.${YMINUS2_MINOR_VERSION}"
     launch_vm 
 }
 

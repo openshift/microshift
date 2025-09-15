@@ -13,8 +13,8 @@ scenario_create_vms() {
         echo "Image '${dest_image}' not found - skipping test"
         return 0
     fi
-    prepare_kickstart host1 kickstart-bootc.ks.template rhel94-bootc-brew-y2-with-optional
-    launch_vm --boot_blueprint rhel94-bootc
+    prepare_kickstart host1 kickstart-bootc.ks.template rhel96-bootc-brew-y2-with-optional
+    launch_vm --boot_blueprint rhel96-bootc
 }
 
 scenario_remove_vms() {
@@ -33,7 +33,6 @@ scenario_run_tests() {
     run_tests host1 \
         --variable "TARGET_REF:${dest_image}" \
         --variable "BOOTC_REGISTRY:${MIRROR_REGISTRY_URL}" \
-        --variable "EXPECTED_OS_VERSION:9.6" \
         suites/upgrade/upgrade-successful.robot \
-        suites/standard1/
+        suites/standard2
 }

@@ -3,8 +3,8 @@
 # Sourced from scenario.sh and uses functions defined there.
 
 scenario_create_vms() {
-    prepare_kickstart host1 kickstart-bootc.ks.template rhel94-bootc-yminus2
-    launch_vm --boot_blueprint rhel94-bootc
+    prepare_kickstart host1 kickstart-bootc.ks.template rhel96-bootc-yminus2
+    launch_vm --boot_blueprint rhel96-bootc
 }
 
 scenario_remove_vms() {
@@ -12,8 +12,8 @@ scenario_remove_vms() {
 }
 
 scenario_run_tests() {
-    prepare_static_delta rhel94-bootc-yminus2 rhel96-bootc-prel
-    apply_static_delta   rhel94-bootc-yminus2 rhel96-bootc-prel
+    prepare_static_delta rhel96-bootc-yminus2 rhel96-bootc-prel
+    apply_static_delta   rhel96-bootc-yminus2 rhel96-bootc-prel
 
     prepare_static_delta rhel96-bootc-prel rhel96-bootc-source
     apply_static_delta   rhel96-bootc-prel rhel96-bootc-source

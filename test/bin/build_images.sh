@@ -124,7 +124,7 @@ get_blueprint_name() {
 # rhel92-microshift-source -> rhel-9.2
 #
 # The function also supports an explicit parent override directive in the
-# blueprint in the following format: '# parent = rhel-9.4-microshift-4.17'.
+# blueprint in the following format: '# parent = rhel-9.6-microshift-4.17'.
 # Note that the directive must be commented out in the blueprint to avoid
 # composer syntax errors.
 #
