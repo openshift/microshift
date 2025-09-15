@@ -1,20 +1,18 @@
-- api embedded-component 5b2b8cafdd825e60f37a3ce6f8dac0ad1732293e to 93b8cc2cf247366771a42d967d836f1968418540
-  - a9096507 2025-09-01T12:33:45+00:00 Add default value for MachineHealthCheck's maxUnhealthy to the description
+- cluster-network-operator embedded-component bb6470c3cfbb1ecdaf78acac340e6a307bcd5231 to 9d49a4beb3693a53833a7af29e54567a97c2de2f
+  - 31df163 2025-09-09T16:22:06+00:00 Set maxUnavailable 10% on MultiNetworkPolicy DS
 
-- kubernetes embedded-component 169f654a6b0bc3dcca620eda17240b86c578cb10 to b5229e8311fe15cd8e9a70de2279868726b19f84
-  - a3f04653a 2025-09-05T13:09:58-03:00 UPSTREAM: revert: 133264: Revert "remove failing test that depends on expired credential, remove credential, add TODOs"
-  - 6774035b9 2025-09-01T09:24:31-03:00 UPSTREAM: <carry>: Unrevert "Merge pull request #2412 from dusk125/rebase-v1.32.8""
+- kubernetes embedded-component b5229e8311fe15cd8e9a70de2279868726b19f84 to 335be3a93cc6f48d84e5e6cd515ef748efb9664b
+  - 1d12f380f 2025-09-10T08:02:47+00:00 UPSTREAM: <carry>: Fix tests after backport
+  - 1cbed1808 2025-09-10T08:02:47+00:00 UPSTREAM: 131725: Avoid encoding in LogResponseObject when we are not going to use it
+  - ad91dd2ca 2025-09-10T08:02:47+00:00 UPSTREAM: 131694: Eliminate AuditContext`s SetEventLevel
+  - 4d0bfe23b 2025-09-10T08:02:47+00:00 UPSTREAM: 129472: Fix API server crash on concurrent map iteration and write
 
-- operator-framework-olm embedded-component 5c83a8adfd3fb0a5b3f2f8a26d3d05eefd5ba9d0 to e42f5c26092b9dea5856807d314f57e1886d31d7
-  - 73f0b4d2 2025-09-06T17:59:56+02:00 UPSTREAM: <carry>: make downstream csv namespace labeler plugin e2e more resilient to race conditions
-  - 75dd5ea6 2025-09-06T17:56:04+02:00 Make PSA catalog tests more resilient (#3645)
-  - 15b1211b 2025-09-06T17:55:56+02:00 refactor ensure job to remove named parameters (#3644)
+- machine-config-operator embedded-component 1a3a559a1c78f664e9812812c14e1b02687a96bc to 37499cebe4e30aea812eb2a0e0cb5ed9ee961c5f
+  - c4c77b67 2025-09-04T12:37:47-04:00 move mcn e2e tests from /test/e2e-techpreview/ to test/e2e/ to be part of the blocking test suite
 
-- kubernetes image-amd64 169f654a6b0bc3dcca620eda17240b86c578cb10 to b5229e8311fe15cd8e9a70de2279868726b19f84
-  - a3f04653a 2025-09-05T13:09:58-03:00 UPSTREAM: revert: 133264: Revert "remove failing test that depends on expired credential, remove credential, add TODOs"
-  - 6774035b9 2025-09-01T09:24:31-03:00 UPSTREAM: <carry>: Unrevert "Merge pull request #2412 from dusk125/rebase-v1.32.8""
-
-- kubernetes image-arm64 169f654a6b0bc3dcca620eda17240b86c578cb10 to b5229e8311fe15cd8e9a70de2279868726b19f84
-  - a3f04653a 2025-09-05T13:09:58-03:00 UPSTREAM: revert: 133264: Revert "remove failing test that depends on expired credential, remove credential, add TODOs"
-  - 6774035b9 2025-09-01T09:24:31-03:00 UPSTREAM: <carry>: Unrevert "Merge pull request #2412 from dusk125/rebase-v1.32.8""
+- kubernetes image-amd64 b5229e8311fe15cd8e9a70de2279868726b19f84 to 335be3a93cc6f48d84e5e6cd515ef748efb9664b
+  - 1d12f380f 2025-09-10T08:02:47+00:00 UPSTREAM: <carry>: Fix tests after backport
+  - 1cbed1808 2025-09-10T08:02:47+00:00 UPSTREAM: 131725: Avoid encoding in LogResponseObject when we are not going to use it
+  - ad91dd2ca 2025-09-10T08:02:47+00:00 UPSTREAM: 131694: Eliminate AuditContext`s SetEventLevel
+  - 4d0bfe23b 2025-09-10T08:02:47+00:00 UPSTREAM: 129472: Fix API server crash on concurrent map iteration and write
 
