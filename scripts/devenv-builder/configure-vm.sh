@@ -212,26 +212,10 @@ EOF
         if [[ "${PREVIOUS_RHOCP}" =~ ^[0-9]{2} ]]; then
             sudo subscription-manager repos --enable "rhocp-4.${PREVIOUS_RHOCP}-for-rhel-9-$(uname -m)-rpms"
         else
-            # When its early in the new release cycle the previous release may not have a repo yet, use the beta.
-            PREVIOUS_RHOCP_BETA=$("${RHOCP_REPO}" $((ver-1)))
-            if [[ "${PREVIOUS_RHOCP_BETA}" =~ ^http ]]; then
-                prev_url=$(echo "${PREVIOUS_RHOCP_BETA}" | cut -d, -f1)
-                prev_ver=$(echo "${PREVIOUS_RHOCP_BETA}" | cut -d, -f2)
-                PREV_OCP_REPO_NAME="rhocp-4.${prev_ver}-for-rhel-9-mirrorbeta-$(uname -i)-rpms"
-                sudo tee "/etc/yum.repos.d/${PREV_OCP_REPO_NAME}.repo" >/dev/null <<EOF
-[${PREV_OCP_REPO_NAME}]
-name=Beta rhocp-4.${prev_ver} RPMs for RHEL 9
-baseurl=${prev_url}
-enabled=1
-gpgcheck=0
-skip_if_unavailable=0
-EOF
-            else
-                # If RHOCP Y-1 is not available, try RHOCP Y-2.
-                Y2_RHOCP=$("${RHOCP_REPO}" $((ver-2)))
-                if [[ "${Y2_RHOCP}" =~ ^[0-9]{2} ]]; then
-                    sudo subscription-manager repos --enable "rhocp-4.${Y2_RHOCP}-for-rhel-9-$(uname -m)-rpms"
-                fi
+            # If RHOCP Y-1 is not available, try RHOCP Y-2.
+            Y2_RHOCP=$("${RHOCP_REPO}" $((ver-2)))
+            if [[ "${Y2_RHOCP}" =~ ^[0-9]{2} ]]; then
+                sudo subscription-manager repos --enable "rhocp-4.${Y2_RHOCP}-for-rhel-9-$(uname -m)-rpms"
             fi
         fi
     fi
@@ -320,9 +304,9 @@ function build_and_install_microshift_rpms() {
         else
             SKIPPED_RPMS="gateway-api"
         fi
-
+        
         # shellcheck disable=SC2046,SC2086
-        "${DNF_RETRY}" "localinstall" "$(find ~/microshift/_output/rpmbuild/RPMS -type f -name "*.rpm" $(printf ' -not -name *%s* ' ${SKIPPED_RPMS}))"
+        "${DNF_RETRY}" "localinstall" "$(find ~/microshift/_output/rpmbuild/RPMS -type f -name "*.rpm" $(printf ' -not -name *%s* ' ${SKIPPED_RPMS}))" 
     else
         createrepo "${HOME}/microshift/_output/rpmbuild"
         "${DNF_RETRY}" "install" \
