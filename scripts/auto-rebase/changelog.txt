@@ -1,23 +1,6 @@
-- cluster-network-operator embedded-component 7bbd2653092fc383803ba98169f6ffc5be2a64d5 to 6a287ae0e3a52b664ac6dc5dfc4f2913d1d1ef2a
-  - 5bfd0ce 2025-09-08T18:58:15+00:00 Set maxUnavailable 10% on MultiNetworkPolicy DS
+- api embedded-component a638ff2e96fb9fb41192e85268fdcb07c0b1ed93 to a2b450eb67b5b71cb2cfc1735b824167e56c0318
+  - f8e850c4 2025-09-12T12:28:50-04:00 features: disable psa
 
-- kubernetes embedded-component 72a1beec012d2552d27d250025c832d7794a7cf1 to 633ffc1ea74728b2a5bbc07c450b5a4a90d5790e
-  - 5bbb52f79 2025-09-08T09:27:58+00:00 UPSTREAM: <carry>: Fix tests after backport
-  - 6d25edd11 2025-09-08T09:27:58+00:00 UPSTREAM: 131725: Avoid encoding in LogResponseObject when we are not going to use it
-  - af0f4fb5e 2025-09-08T09:27:58+00:00 UPSTREAM: 131694: Eliminate AuditContext`s SetEventLevel
-  - 1e78392a3 2025-09-08T09:27:58+00:00 UPSTREAM: 129472: Fix API server crash on concurrent map iteration and write
-  - 8ed402a9c 2025-09-03T13:41:37+00:00 UPSTREAM: 133425: Fix SELinux label comparison
-
-- machine-config-operator embedded-component 7a56cf0048a05d576e746c3e992ce586e07c97e8 to 0984b6ae32507aed50e799d1f8d5d4427a240926
-  - 2e4525eb 2025-09-03T20:44:27+00:00 crc & kcc: Before deleting a degraded MC, ensure that the annotations have not been updated since the last check
-
-- router image-amd64 7c50294cfbc9a7c0d3c715de56fb92dadeefb8e6 to 96bfd2164c7885df9019ce9eeb79d506bd7e871b
+- router image-arm64 7c50294cfbc9a7c0d3c715de56fb92dadeefb8e6 to 96bfd2164c7885df9019ce9eeb79d506bd7e871b
   - 4dd4ffd 2025-09-11T13:10:29+00:00 Revert "OCPBUGS-55506: Prevent startup failures due to name resolution"
-
-- kubernetes image-amd64 72a1beec012d2552d27d250025c832d7794a7cf1 to 633ffc1ea74728b2a5bbc07c450b5a4a90d5790e
-  - 5bbb52f79 2025-09-08T09:27:58+00:00 UPSTREAM: <carry>: Fix tests after backport
-  - 6d25edd11 2025-09-08T09:27:58+00:00 UPSTREAM: 131725: Avoid encoding in LogResponseObject when we are not going to use it
-  - af0f4fb5e 2025-09-08T09:27:58+00:00 UPSTREAM: 131694: Eliminate AuditContext`s SetEventLevel
-  - 1e78392a3 2025-09-08T09:27:58+00:00 UPSTREAM: 129472: Fix API server crash on concurrent map iteration and write
-  - 8ed402a9c 2025-09-03T13:41:37+00:00 UPSTREAM: 133425: Fix SELinux label comparison
 
