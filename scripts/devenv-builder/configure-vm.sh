@@ -304,9 +304,9 @@ function build_and_install_microshift_rpms() {
         else
             SKIPPED_RPMS="gateway-api"
         fi
-        
+
         # shellcheck disable=SC2046,SC2086
-        "${DNF_RETRY}" "localinstall" "$(find ~/microshift/_output/rpmbuild/RPMS -type f -name "*.rpm" $(printf ' -not -name *%s* ' ${SKIPPED_RPMS}))" 
+        "${DNF_RETRY}" "localinstall" "$(find ~/microshift/_output/rpmbuild/RPMS -type f -name "*.rpm" $(printf ' -not -name *%s* ' ${SKIPPED_RPMS}))"
     else
         createrepo "${HOME}/microshift/_output/rpmbuild"
         "${DNF_RETRY}" "install" \
