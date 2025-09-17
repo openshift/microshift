@@ -110,7 +110,7 @@ run_bootc_image_build() {
     if [ -v CI_JOB_NAME ] ; then
         $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/layer1-base
         $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/layer2-presubmit
-    
+
         if [[ "${CI_JOB_NAME}" =~ .*periodic.* ]]; then
             $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/layer3-periodic
         fi
