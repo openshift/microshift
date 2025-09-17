@@ -1,4 +1,4 @@
-{{- if env.Getenv "BREW_Y0_RELEASE_VERSION" "" -}}
+{{- if and (env.Getenv "BREW_Y0_RELEASE_VERSION" "") (env.Getenv "BREW_Y1_RELEASE_VERSION" "") -}}
 {{- /*
 
   We wrap this template in a test so that the body of the output is
