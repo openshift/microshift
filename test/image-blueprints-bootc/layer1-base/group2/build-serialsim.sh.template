@@ -1,0 +1,32 @@
+#!/bin/bash
+set -euo pipefail
+
+function get_kernel_ver() {
+    KERNEL_VER=$(rpm -q --qf "%{VERSION}-%{RELEASE}\n" kernel | sort | tail -1)
+    KERNEL_VER_ARCH="${KERNEL_VER}.$(uname -m)"
+    export KERNEL_VER
+    export KERNEL_VER_ARCH
+}
+
+# Upgrade the kernel only if necessary to align the procedure with both RHEL and CentOS.
+#
+# On CentOS, a kernel upgrade may be required due to its different package
+# retention policy, which can cause the kernel in the base bootc image to be
+# unavailable in the repositories.
+get_kernel_ver
+if ! dnf --quiet list available "kernel-devel-${KERNEL_VER}" >/dev/null 2>&1; then
+    dnf install -y kernel-devel-matched
+    get_kernel_ver
+else
+    dnf install -y "kernel-devel-${KERNEL_VER}"
+fi
+
+# Install the necessary dependencies and clean up.
+dnf install -y git make python3-pyserial
+dnf clean all
+
+# Clone the serialsim repository and build the serialsim module.
+git clone https://github.com/pmtk/serialsim.git /tmp/serialsim
+cd /tmp/serialsim
+make KERNEL="${KERNEL_VER_ARCH}" all install
+rm -rf /tmp/serialsim
