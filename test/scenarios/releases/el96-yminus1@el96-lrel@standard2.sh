@@ -6,17 +6,34 @@
 # ensure MicroShift is upgraded before running standard suite tests
 export TEST_RANDOMIZATION=none
 
+start_image="rhel-9.6-microshift-brew-optionals-4.${PREVIOUS_MINOR_VERSION}-zstream"
+
 scenario_create_vms() {
-    prepare_kickstart host1 kickstart.ks.template "rhel-9.6-microshift-brew-optionals-4.${PREVIOUS_MINOR_VERSION}-zstream"
-    launch_vm 
+    if ! does_image_exist "${start_image}"; then
+        echo "Image '${start_image}' not found - skipping test"
+        return 0
+    fi
+
+    prepare_kickstart host1 kickstart.ks.template "${start_image}"
+    launch_vm
 }
 
 scenario_remove_vms() {
+    if ! does_image_exist "${start_image}"; then
+        echo "Image '${start_image}' not found - skipping test"
+        return 0
+    fi
+
     remove_vm host1
 }
 
 scenario_run_tests() {
-        run_tests host1 \
+    if ! does_image_exist "${start_image}"; then
+        echo "Image '${start_image}' not found - skipping test"
+        return 0
+    fi
+
+    run_tests host1 \
         --variable "TARGET_REF:rhel-9.6-microshift-brew-optionals-4.${MINOR_VERSION}-${LATEST_RELEASE_TYPE}" \
         suites/upgrade/upgrade-successful.robot \
         suites/standard2/
