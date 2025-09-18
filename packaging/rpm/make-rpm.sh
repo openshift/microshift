@@ -73,7 +73,6 @@ EOF
    --define "_binary_payload w19T8.zstdio" \
    --define "with_kindnet ${WITH_KINDNET}" \
    --define "with_topolvm ${WITH_TOPOLVM}" \
-   --define "with_observability ${WITH_OBSERVABILITY}" \
    "${RPMBUILD_DIR}"SPECS/microshift.spec
 }
 
