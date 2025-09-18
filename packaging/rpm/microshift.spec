@@ -39,8 +39,8 @@
 %{!?with_kindnet: %global with_kindnet 0}
 # Don't build topolvm subpackage by default
 %{!?with_topolvm: %global with_topolvm 0}
-# Don't build observability subpackage by default
-%{!?with_observability: %global with_observability 0}
+# Optionally allow to disable observability build
+%{!?with_observability: %global with_observability 1}
 
 Name: microshift
 Version: %{version}
@@ -816,6 +816,9 @@ fi
 # Use Git command to generate the log and replace the VERSION string
 # LANG=C git log --date="format:%a %b %d %Y" --pretty="tformat:* %cd %an <%ae> VERSION%n- %s%n" packaging/rpm/microshift.spec
 %changelog
+* Thu Sep 18 2025 Gregory Giguashvili <ggiguash@redhat.com> 4.21.0
+- Observability RPM package must be built by default
+
 * Mon Aug 11 2025 Patryk Matuszak <pmatusza@redhat.com> 4.20.0
 - Remove healthcheck scripts: optional MicroShift workloads are now part of healthcheck command
 
