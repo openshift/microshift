@@ -12,5 +12,5 @@ scenario_remove_vms() {
 }
 
 scenario_run_tests() {
-    run_gingko_tests host1
+    run_gingko_tests host1 Apiserver
 }
