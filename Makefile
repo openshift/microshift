@@ -32,7 +32,6 @@ SRC_ROOT :=$(shell pwd)
 
 WITH_KINDNET ?= 0
 WITH_TOPOLVM ?= 0
-WITH_OBSERVABILITY ?= 0
 OUTPUT_DIR :=_output
 RPM_BUILD_DIR :=$(OUTPUT_DIR)/rpmbuild
 CROSS_BUILD_BINDIR :=$(OUTPUT_DIR)/bin
@@ -272,7 +271,6 @@ rpm:
 	SOURCE_GIT_TREE_STATE=${SOURCE_GIT_TREE_STATE} \
 	WITH_KINDNET=${WITH_KINDNET} \
 	WITH_TOPOLVM=${WITH_TOPOLVM} \
-	WITH_OBSERVABILITY=${WITH_OBSERVABILITY} \
 	./packaging/rpm/make-rpm.sh rpm local
 .PHONY: rpm
 
@@ -284,7 +282,6 @@ srpm:
 	SOURCE_GIT_TREE_STATE=${SOURCE_GIT_TREE_STATE} \
 	WITH_KINDNET=${WITH_KINDNET} \
 	WITH_TOPOLVM=${WITH_TOPOLVM} \
-	WITH_OBSERVABILITY=${WITH_OBSERVABILITY} \
 	./packaging/rpm/make-rpm.sh srpm local
 .PHONY: srpm
 
@@ -303,7 +300,6 @@ rpm-podman:
 		--env TARGET_ARCH=$(TARGET_ARCH) \
 		--env WITH_KINDNET=$(WITH_KINDNET) \
 		--env WITH_TOPOLVM=$(WITH_TOPOLVM) \
-		--env WITH_OBSERVABILITY=$(WITH_OBSERVABILITY) \
 		microshift-builder:$(RPM_BUILDER_IMAGE_TAG) \
 		bash -ilc 'cd /opt/microshift && make rpm & pid=$$! ; \
 				   trap "echo Killing make PID $${pid}; kill $${pid}" INT ; \
