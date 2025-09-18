@@ -124,6 +124,7 @@ func (c *Config) fillDefaults() error {
 	}
 	c.DNS = DNS{
 		BaseDomain: "example.com",
+		HostsPath:  "/etc/hosts",
 	}
 	c.Network = Network{
 		ServiceNodePortRange: "30000-32767",
@@ -416,6 +417,10 @@ func (c *Config) incorporateUserSettings(u *Config) {
 	}
 	if u.Ingress.AccessLogging.HttpCaptureCookies != nil {
 		c.Ingress.AccessLogging.HttpCaptureCookies = u.Ingress.AccessLogging.HttpCaptureCookies
+	}
+
+	if u.DNS.HostsPath != "" {
+		c.DNS.HostsPath = u.DNS.HostsPath
 	}
 }
 

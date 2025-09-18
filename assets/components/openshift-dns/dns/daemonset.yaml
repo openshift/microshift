@@ -24,6 +24,11 @@ spec:
               readOnly: true
             - mountPath: /tmp
               name: tmp-dir
+            - mountPath: /tmp/hosts
+              name: hosts
+              mountPropagation: HostToContainer
+              readOnly: true
+
           ports:
             - containerPort: 5353
               name: dns
@@ -95,6 +100,10 @@ spec:
           secret:
             defaultMode: 420
             secretName: dns-default-metrics-tls
+        - name: hosts
+          hostPath:
+            path: '{{ .HostsPath }}'
+            type: File
         - name: tmp-dir
           emptyDir: {}
       nodeSelector:

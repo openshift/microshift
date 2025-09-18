@@ -13,4 +13,13 @@ type DNS struct {
 	// +kubebuilder:default=example.com
 	// +kubebuilder:example=microshift.example.com
 	BaseDomain string `json:"baseDomain"`
+
+	// HostsPath is the path to the hosts file.
+	// This file will be mounted as a volume to the coreDNS pod.
+	// will be used by coreDNS hosts plugin
+	// This is useful for adding custom entries to the hosts file.
+	//
+	// +kubebuilder:default=/etc/hosts
+	// +kubebuilder:example=/etc/hosts
+	HostsPath string `json:"hostsPath"`
 }
