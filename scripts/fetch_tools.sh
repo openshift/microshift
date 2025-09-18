@@ -207,6 +207,22 @@ gettool_oc() {
     popd &>/dev/null
 }
 
+gettool_opm() {
+    declare -A arch_map=(
+        ["x86_64"]="x86_64"
+        ["aarch64"]="arm64")
+
+    local arch="${arch_map[${ARCH}]}"
+
+    pushd "${WORK_DIR}" &>/dev/null
+
+    curl -s -f "https://mirror.openshift.com/pub/openshift-v4/${arch}/clients/ocp/latest/opm-linux-rhel9.tar.gz" -L -o "opm-linux-rhel9.tar.gz"
+    tar xvzf opm-linux-rhel9.tar.gz 
+    mv opm-rhel9 "${DEST_DIR}"/opm
+
+    popd &>/dev/null
+}
+
 gettool_brew() {
     # See https://spaces.redhat.com/display/Brew/Using+the+Brew+Prod+environment#UsingtheBrewProdenvironment-Fedora
     if ! command -v koji &>/dev/null ; then
