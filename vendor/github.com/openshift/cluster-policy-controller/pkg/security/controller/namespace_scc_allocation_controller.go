@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/openshift/library-go/pkg/operator/events"
 	"math/big"
 	"reflect"
 	"time"
@@ -13,19 +12,17 @@ import (
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
-	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/apimachinery/pkg/runtime/serializer"
-	runtimejson "k8s.io/apimachinery/pkg/runtime/serializer/json"
-	"k8s.io/apimachinery/pkg/types"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
-	"k8s.io/apimachinery/pkg/util/strategicpatch"
 	"k8s.io/apimachinery/pkg/util/wait"
+	applycorev1 "k8s.io/client-go/applyconfigurations/core/v1"
+	applymetav1 "k8s.io/client-go/applyconfigurations/meta/v1"
 	corev1informers "k8s.io/client-go/informers/core/v1"
 	corev1client "k8s.io/client-go/kubernetes/typed/core/v1"
 	corev1listers "k8s.io/client-go/listers/core/v1"
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/klog/v2"
 	coreapi "k8s.io/kubernetes/pkg/apis/core"
+	"k8s.io/utils/ptr"
 
 	securityv1 "github.com/openshift/api/security/v1"
 	securityinternalv1 "github.com/openshift/api/securityinternal/v1"
@@ -33,11 +30,14 @@ import (
 	"github.com/openshift/cluster-policy-controller/pkg/security/mcs"
 	"github.com/openshift/cluster-policy-controller/pkg/security/uidallocator"
 	"github.com/openshift/library-go/pkg/controller/factory"
+	"github.com/openshift/library-go/pkg/operator/events"
 	"github.com/openshift/library-go/pkg/security/uid"
 )
 
 const (
-	controllerName   = "namespace-security-allocation-controller"
+	controllerName = "namespace-security-allocation-controller"
+	fieldManager   = "cluster-policy-controller"
+
 	rangeName        = "scc-uid"
 	initialRepairKey = "__internal/initialRepair"
 
@@ -56,24 +56,15 @@ type NamespaceSCCAllocationController struct {
 
 	namespaceClient       corev1client.NamespaceInterface
 	rangeAllocationClient securityv1client.RangeAllocationsGetter
-
-	encoder runtime.Encoder
 }
 
 func NewNamespaceSCCAllocationController(namespaceInformer corev1informers.NamespaceInformer, client corev1client.NamespaceInterface, rangeAllocationClient securityv1client.RangeAllocationsGetter, requiredUIDRange *uid.Range, mcs MCSAllocationFunc, eventRecorder events.Recorder) factory.Controller {
-	scheme := runtime.NewScheme()
-	utilruntime.Must(corev1.AddToScheme(scheme))
-	codecs := serializer.NewCodecFactory(scheme)
-	jsonSerializer := runtimejson.NewSerializer(runtimejson.DefaultMetaFactory, scheme, scheme, false)
-	encoder := codecs.WithoutConversion().EncoderForVersion(jsonSerializer, corev1.SchemeGroupVersion)
-
 	c := &NamespaceSCCAllocationController{
 		requiredUIDRange:      requiredUIDRange,
 		mcsAllocator:          mcs,
 		namespaceClient:       client,
 		rangeAllocationClient: rangeAllocationClient,
 		nsLister:              namespaceInformer.Lister(),
-		encoder:               encoder,
 	}
 
 	eventRecorderWithSuffix := eventRecorder.WithComponentSuffix(controllerName)
@@ -142,7 +133,11 @@ func (c *NamespaceSCCAllocationController) syncNamespace(ctx context.Context, sy
 		return nil
 	}
 
-	return c.allocate(ctx, syncCtx, ns)
+	err = c.allocate(ctx, syncCtx, ns)
+	if apierrors.IsConflict(err) {
+		return factory.SyntheticRequeueError
+	}
+	return err
 }
 
 func (c *NamespaceSCCAllocationController) allocate(ctx context.Context, syncCtx factory.SyncContext, ns *corev1.Namespace) error {
@@ -194,40 +189,40 @@ func (c *NamespaceSCCAllocationController) allocate(ctx context.Context, syncCtx
 		return fmt.Errorf("%d not in range", bitIndex)
 	}
 
-	// Now modify the namespace
-	nsCopy := ns.DeepCopy()
-	if nsCopy.Annotations == nil {
-		nsCopy.Annotations = make(map[string]string)
+	// Update the namespace using server-side apply.
+	patch := &applycorev1.NamespaceApplyConfiguration{
+		TypeMetaApplyConfiguration: applymetav1.TypeMetaApplyConfiguration{
+			Kind:       ptr.To("Namespace"),
+			APIVersion: ptr.To("v1"),
+		},
+		ObjectMetaApplyConfiguration: &applymetav1.ObjectMetaApplyConfiguration{
+			Name:            ptr.To(ns.Name),
+			ResourceVersion: ptr.To(ns.ResourceVersion),
+			Annotations: map[string]string{
+				securityv1.UIDRangeAnnotation:           block.String(),
+				securityv1.SupplementalGroupsAnnotation: block.String(),
+			},
+		},
 	}
-	nsCopy.Annotations[securityv1.UIDRangeAnnotation] = block.String()
-	nsCopy.Annotations[securityv1.SupplementalGroupsAnnotation] = block.String()
-	if _, ok := nsCopy.Annotations[securityv1.MCSAnnotation]; !ok {
+	// We need to make sure all annotations are always set for server-side apply, otherwise some would get removed.
+	// The following code actually makes sure the annotation is always set once it is set, which is ok regarding SSA.
+	if v, ok := ns.Annotations[securityv1.MCSAnnotation]; ok {
+		patch.ObjectMetaApplyConfiguration.Annotations[securityv1.MCSAnnotation] = v
+	} else {
 		if label := c.mcsAllocator(block); label != nil {
-			nsCopy.Annotations[securityv1.MCSAnnotation] = label.String()
+			patch.ObjectMetaApplyConfiguration.Annotations[securityv1.MCSAnnotation] = label.String()
 		}
 	}
-	nsCopyBytes, err := runtime.Encode(c.encoder, nsCopy)
-	if err != nil {
+
+	if _, err := c.namespaceClient.Apply(context.TODO(), patch, metav1.ApplyOptions{FieldManager: fieldManager}); err != nil {
+		if apierrors.IsNotFound(err) {
+			return nil
+		}
 		return err
 	}
-	nsBytes, err := runtime.Encode(c.encoder, ns)
-	if err != nil {
-		return err
-	}
-	patchBytes, err := strategicpatch.CreateTwoWayMergePatch(nsBytes, nsCopyBytes, &corev1.Namespace{})
-	if err != nil {
-		return err
-	}
-	// use patch here not to conflict with other actors
-	_, err = c.namespaceClient.Patch(context.TODO(), ns.Name, types.StrategicMergePatchType, patchBytes, metav1.PatchOptions{})
-	if apierrors.IsNotFound(err) {
-		return nil
-	}
-	if err != nil {
-		return err
-	}
-	// emit event once per namespace.  There aren't many of these, but it will let us know how long it takes from namespace creation
-	// until the SCC ranges are created.  There is a suspicion that this takes a while.
+
+	// Emit event once per namespace. There aren't many of these, but it will let us know how long it takes from namespace creation
+	// until the SCC ranges are created. There is a suspicion that this takes a while.
 	syncCtx.Recorder().Eventf("CreatedSCCRanges", "created SCC ranges for %v namespace", ns.Name)
 
 	success = true
