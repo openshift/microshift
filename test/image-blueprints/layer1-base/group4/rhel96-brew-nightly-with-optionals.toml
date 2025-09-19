@@ -43,6 +43,10 @@ version = "{{ env.Getenv "BREW_NIGHTLY_RELEASE_VERSION" }}"
 name = "microshift-test-agent"
 version = "*"
 
+[[packages]]
+name = "dnsmasq"
+version = "*"
+
 [customizations.services]
 enabled = ["microshift", "microshift-test-agent"]
 
