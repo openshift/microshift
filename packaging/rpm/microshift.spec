@@ -68,6 +68,7 @@ BuildRequires: golang
 
 Requires: cri-o >= 1.34.0, cri-o < 1.35.0
 Requires: cri-tools >= 1.34.0, cri-tools < 1.35.0
+Requires: containernetworking-plugins
 Requires: iptables
 Requires: microshift-selinux = %{version}
 Requires: microshift-networking = %{version}
@@ -808,7 +809,7 @@ fi
 # LANG=C git log --date="format:%a %b %d %Y" --pretty="tformat:* %cd %an <%ae> VERSION%n- %s%n" packaging/rpm/microshift.spec
 %changelog
 * Thu Sep 18 2025 Gregory Giguashvili <ggiguash@redhat.com> 4.21.0
-- Upgrade cri-o and cri-tools to v1.34
+- Upgrade cri-o and cri-tools to v1.34 and add containernetworking-plugins dependency
 
 * Mon Aug 11 2025 Patryk Matuszak <pmatusza@redhat.com> 4.20.0
 - Remove healthcheck scripts: optional MicroShift workloads are now part of healthcheck command
