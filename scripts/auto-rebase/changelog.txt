@@ -1,32 +1,33 @@
-- cluster-kube-controller-manager-operator embedded-component 0338b3be6912024d03def2c26f0fa10218fc2c25 to b3faac1f48914e94fa9af074f387c871dad84a9c
-  - 6e19189 2025-08-25T09:35:56+00:00 OCPBUGS-53290: Missing endpoint slices for open ports the operator uses
+- cluster-kube-apiserver-operator embedded-component f47238554feb2fa6dbce3333adc7e26ffe2d8424 to 511bc434f628cf364966b53a5d350908e51d4b9c
+  - eee9449 2025-08-13T14:59:21+00:00 OCPBUGS-50489: Add missing service ports to apiserver service
 
-- csi-external-snapshotter embedded-component 5315d37a1e5415e8b6870f23e50238681979cc28 to ee32ba01e1f89bac057611ad4580589652f250a3
-  - 2db434c 2025-08-15T11:55:48+00:00 UPSTREAM: 1238: Snapshot Controller startup should not LIST all volumesnapshots
+- cluster-network-operator embedded-component 45b0ba681e5b2ff88b75c61e17a375fe301b2bb6 to e75d8fa7a0c30a4ad7500b3253f303e051f9ce0b
+  - acbdfcf 2025-09-04T14:14:04+00:00 HOSTEDCP-1981: Add controlplane cli image envar for use with hypershift
 
-- oc image-amd64 ee354f66de43b037ef8b0ed55ce65c6c42aa7b9c to 4c7883ffc539da930d1334421b170322864375d8
-  - fd30eacd 2025-08-20T09:14:14+00:00 Use fedora image in unit tests instead of centos
-  - 6c29db13 2025-07-29T20:30:10+00:00 Adding sos.conf file for default sos config into the tools image
+- kubernetes embedded-component c68a6637efaef7f3bb6f3cf4d6f2ac223c12703d to f3d912311b7c3537def4501ef8e15fda821078e5
+  - df551dc6b 2025-09-10T08:15:03-04:00 UPSTREAM: <carry>: remove the backward compat featuregate for 132028
+  - 63ee8430d 2025-09-09T11:59:40-04:00 UPSTREAM: 132028: podresources: list: use active pods in list
+  - 757c39582 2025-08-28T14:26:20+02:00 UPSTREAM: 127757: scheduler: Improve CSILimits plugin accuracy by using VolumeAttachments
 
-- csi-external-snapshotter image-amd64 5315d37a1e5415e8b6870f23e50238681979cc28 to ee32ba01e1f89bac057611ad4580589652f250a3
-  - 2db434c 2025-08-15T11:55:48+00:00 UPSTREAM: 1238: Snapshot Controller startup should not LIST all volumesnapshots
+- operator-framework-olm embedded-component 922674d862d36ec848a7cf364d669731edc9c038 to e48ec38c748a5cb90cdaf2fe017fb161301886ae
+  - 25d15cb6 2025-09-10T09:09:05+02:00 operatorgroup: ensure clusterroleselectors in clusterrole aggregation rules are sorted (#3593)
+  - 4c172ef7 2025-09-06T18:05:40+02:00 UPSTREAM: <carry>: make downstream csv namespace labeler plugin e2e more resilient to race conditions
+  - 0c09d1e6 2025-09-06T18:05:35+02:00 Make PSA catalog tests more resilient (#3645)
+  - dfdcdc3c 2025-09-06T18:05:30+02:00 refactor ensure job to remove named parameters (#3644)
+  - d1cf1763 2025-09-06T18:05:25+02:00 Disable FailForward bad resource e2e (#3572)
+  - 5fa22132 2025-08-20T14:18:34-04:00 Upstream: <carry>: regenerate manifests
+  - 532583c0 2025-08-20T13:22:01-04:00 Upstream: <carry>: Add allow-all networkpolicy for openshift-operators namespace
+  - 1b90107a 2025-08-20T13:21:53-04:00 Upstream: 3580: add NetworkPolicy as a supported kind
+  - 85058364 2025-08-20T13:21:44-04:00 Upstream: 1675: Add NetworkPolicy as a supported kind
+  - c2fb6b2b 2025-07-22T15:42:53-04:00 OCPBUGS-37982: Reduce Frequency of Update Requests for Copied CSVs (#3597)
 
-- csi-external-snapshotter image-amd64 5315d37a1e5415e8b6870f23e50238681979cc28 to ee32ba01e1f89bac057611ad4580589652f250a3
-  - 2db434c 2025-08-15T11:55:48+00:00 UPSTREAM: 1238: Snapshot Controller startup should not LIST all volumesnapshots
+- kubernetes image-amd64 c68a6637efaef7f3bb6f3cf4d6f2ac223c12703d to f3d912311b7c3537def4501ef8e15fda821078e5
+  - df551dc6b 2025-09-10T08:15:03-04:00 UPSTREAM: <carry>: remove the backward compat featuregate for 132028
+  - 63ee8430d 2025-09-09T11:59:40-04:00 UPSTREAM: 132028: podresources: list: use active pods in list
+  - 757c39582 2025-08-28T14:26:20+02:00 UPSTREAM: 127757: scheduler: Improve CSILimits plugin accuracy by using VolumeAttachments
 
-- csi-external-snapshotter image-amd64 5315d37a1e5415e8b6870f23e50238681979cc28 to ee32ba01e1f89bac057611ad4580589652f250a3
-  - 2db434c 2025-08-15T11:55:48+00:00 UPSTREAM: 1238: Snapshot Controller startup should not LIST all volumesnapshots
-
-- oc image-arm64 ee354f66de43b037ef8b0ed55ce65c6c42aa7b9c to 4c7883ffc539da930d1334421b170322864375d8
-  - fd30eacd 2025-08-20T09:14:14+00:00 Use fedora image in unit tests instead of centos
-  - 6c29db13 2025-07-29T20:30:10+00:00 Adding sos.conf file for default sos config into the tools image
-
-- csi-external-snapshotter image-arm64 5315d37a1e5415e8b6870f23e50238681979cc28 to ee32ba01e1f89bac057611ad4580589652f250a3
-  - 2db434c 2025-08-15T11:55:48+00:00 UPSTREAM: 1238: Snapshot Controller startup should not LIST all volumesnapshots
-
-- csi-external-snapshotter image-arm64 5315d37a1e5415e8b6870f23e50238681979cc28 to ee32ba01e1f89bac057611ad4580589652f250a3
-  - 2db434c 2025-08-15T11:55:48+00:00 UPSTREAM: 1238: Snapshot Controller startup should not LIST all volumesnapshots
-
-- csi-external-snapshotter image-arm64 5315d37a1e5415e8b6870f23e50238681979cc28 to ee32ba01e1f89bac057611ad4580589652f250a3
-  - 2db434c 2025-08-15T11:55:48+00:00 UPSTREAM: 1238: Snapshot Controller startup should not LIST all volumesnapshots
+- kubernetes image-arm64 c68a6637efaef7f3bb6f3cf4d6f2ac223c12703d to f3d912311b7c3537def4501ef8e15fda821078e5
+  - df551dc6b 2025-09-10T08:15:03-04:00 UPSTREAM: <carry>: remove the backward compat featuregate for 132028
+  - 63ee8430d 2025-09-09T11:59:40-04:00 UPSTREAM: 132028: podresources: list: use active pods in list
+  - 757c39582 2025-08-28T14:26:20+02:00 UPSTREAM: 127757: scheduler: Improve CSILimits plugin accuracy by using VolumeAttachments
 
