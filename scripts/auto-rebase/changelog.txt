@@ -1,209 +1,162 @@
-- api embedded-component 4a165b214722ff53fbdac1d250f62d4b0bb2bd3d to 61248d910ff74aef020492922d14e6dadaba598b
-  - 0aed54e6 2025-09-09T13:06:31-04:00 Add more details about the Progressing condition
-  - 5d8d667e 2025-09-09T09:12:41-04:00 A New rule about CO's update duration
-  - 75e8efa1 2025-09-09T09:12:41-04:00 NO-JIRA: New rules about CO's Degraded and Available conditions
-  - 5c209c35 2025-09-08T10:21:44+01:00 Update schema checker to avoid incorrect new required fields checks
-  - c9031253 2025-09-06T18:40:40-05:00 Update NodeSwap with owner and doc blurb.
-  - 06a725ad 2025-09-05T09:45:51-05:00 Adjust typos
-  - 1780521e 2025-09-05T10:12:26-03:00 make update
-  - 8557d385 2025-09-05T10:03:36-03:00 Introduce CBORServingAndStorage feature gates
-  - 23717968 2025-09-04T12:34:18-04:00 apiservers.config.openshift.io: remove spec.tlsSecurityProfile GoDoc caveats
-  - 5f5acf37 2025-09-03T15:47:56-04:00 Add Featuregates for Dual Stack support on AWS, Azure and GCP
-  - fc52f6ed 2025-09-03T14:54:23-04:00 create new featuregate for ClusterAPIMachineManagementVSphere
-  - e0349455 2025-09-01T11:30:26+02:00 Add default value for MachineHealthCheck's maxUnhealthy to the description
-  - daaca27e 2025-08-12T09:14:01-04:00 update DesiredImage tag to include 'omitempty'
-  - 9439983b 2025-08-06T16:07:28-04:00 fixing generated files
-  - 9d44d1af 2025-08-06T08:28:52-04:00 updates to documentation
-  - 6aec27bc 2025-08-05T23:34:03-04:00 added extra line in test file
-  - b10cf04d 2025-08-05T23:24:22-04:00 fixing comments
-  - 36982cdd 2025-08-05T08:23:55-04:00 Updating API for ImageModeStatusReporting needs
-  - 677781c5 2025-07-29T14:49:37-04:00 Promote GCPClusterHostedDNSInstall to Default
-  - e65fd12f 2025-05-27T17:01:57+02:00 config/v1/cluster_operator improve documentation
+- api embedded-component 61248d910ff74aef020492922d14e6dadaba598b to 83b017b06367bf8564bf94f5c6c1ad8aed5d3ab9
+  - b6f0e27a 2025-09-16T10:45:31+01:00 Update controller-tools
+  - 881674e4 2025-09-01T15:03:56+02:00 Add metric server API
 
-- cluster-dns-operator embedded-component 82578923164636746e0d74d594ab32d83a660c0b to 63a93b05b131a3f7ee8b482a5cb4f0c1eac8660e
-  - dbd776a 2025-09-05T16:42:57+02:00 Add davidesalerno to OWNERS
+- cluster-dns-operator embedded-component 63a93b05b131a3f7ee8b482a5cb4f0c1eac8660e to 1272aef21dd5dcdbefbf4888c7b0a4a427683fd7
+  - 6f21905 2025-09-15T15:07:12-04:00 Add bentito (btofel@redhat.com) to OWNERS
 
-- cluster-ingress-operator embedded-component 2371120eedb27049160c70859ef9972a7599c7e3 to 60b4279f91f6fbc135d8f15bda96a5ae664e252a
-  - d87b5e6 2025-09-10T13:32:39-03:00 NE-2139: Bump Kubernetes libraries to 1.33.4 and controller-runtime to 0.21 - vendor
-  - 66485b8 2025-09-10T13:32:31-03:00 NE-2139: Bump Kubernetes libraries to 1.33.4 and controller-runtime to 0.21
-  - 31aafe2 2025-09-05T16:38:34+02:00 Add davidesalerno to OWNERS
-  - 3c912f0 2025-09-03T13:58:34-03:00 Adjust some logs and comments per review
-  - 2502380 2025-08-26T14:25:58-03:00 OCPBUGS-60859: e2e: Improve resilience of helper functions when managing gw api resourecs
-  - a42ecfe 2025-08-26T11:33:37-03:00 OCPBUGS-60859: Fix logic on gatewayapi test cleanup
+- cluster-ingress-operator embedded-component 60b4279f91f6fbc135d8f15bda96a5ae664e252a to c968596268df58ed8747a8f88ebb8c501824bbb2
+  - c5c5c85 2025-09-15T14:55:09-04:00 Add bentito (btofel@redhat.com) to OWNERS
+  - cc00436 2025-08-20T17:16:07+01:00 OCPBUGS-55673: Remove IngressControllerLBSubnetsAWS featuregate
 
-- cluster-kube-controller-manager-operator embedded-component 7030e7353408e83096a285404700c573273c25c8 to 3b20c534b1b92d46055147c4f82f69b2ad3044c9
-  - 1088b7f 2025-09-05T14:35:22+05:30 Fixing arch issue
+- cluster-kube-apiserver-operator embedded-component 0bec046c8c10682390e2a20ae4f416a2d8589f40 to 25092d8447b0186402dcf2a6564f6ac2ebf55c9b
+  - f127598 2025-09-15T09:51:28-07:00 bump(k8s): promote MutatingAdmissionPolicy to v1beta1 for > 1.34.0
 
-- cluster-network-operator embedded-component 746b8fb86171dfc75011a7b8db29de5c2355d848 to 09a4accb5ee420155d19fbf78c6be058be50ee0e
-  - 50bac1d 2025-09-12T11:35:43-07:00 Revert "OCPBUGS-61196: Add a ValidatingAdmissionPolicy blocking ServiceCIDR changes"
-  - a795c90 2025-09-05T09:20:50-04:00 Add a ValidatingAdmissionPolicy blocking ServiceCIDR changes
-  - fc890bc 2025-08-26T12:55:33+02:00 Set maxUnavailable 10% on MultiNetworkPolicy DS
-  - ee2829b 2025-08-25T16:59:11-04:00 Correct context refs in test
-  - 1548405 2025-08-25T16:49:29-04:00 replace deprecated golang-cli linters
-  - fb3f46d 2025-08-20T14:43:26-05:00 Set RunAsUser for network-node-identity
+- cluster-kube-controller-manager-operator embedded-component 3b20c534b1b92d46055147c4f82f69b2ad3044c9 to a92da07ac1f335c148411c838dd2982c9ca90988
+  - 1e279cb 2025-08-20T17:37:46+02:00 Remove --cloud-provider=external from KCM
 
-- cluster-openshift-controller-manager-operator embedded-component dfaeb8d5fdf1f43df37916ec3d70f57ddebb1028 to da1e14c45093c19bc79e2055c9f4a55efc1cc1a8
-  - a4b4a9a 2025-09-10T12:37:03+05:30 CNTRLPLANE-1257: set up openshift-tests-extension for cluster-openshift-controller-manager-operator and add a sanity test
+- cluster-kube-scheduler-operator embedded-component f9b5b31943f2be768af6373def4c8946a30d0ed6 to 2345371abed5896006ac4a60c7d555fc25502c0a
+  - 4339305 2025-09-05T13:59:33+02:00 adding ROFS
+  - 9d6fe98 2025-09-05T10:17:36+02:00 adding ROFS
 
-- csi-external-snapshotter embedded-component 42604822c25eb2aa0ecb017c24e328221b238eb9 to ba8194d5920973069bc56a8bf5844afeedc66bbd
-  - 8b132ec 2025-09-06T20:57:06Z UPSTREAM: <carry>: Updating ose-csi-external-snapshotter-container image to be consistent with ART for 4.21 Reconciling with https://github.com/openshift/ocp-build-data/tree/5c68d71385f72cd67a199bc4590068053a833c7d/images/ose-csi-external-snapshotter.yml
+- cluster-network-operator embedded-component 09a4accb5ee420155d19fbf78c6be058be50ee0e to c069f36d58d9d8ad4a9cd23a410fb263a5e689ed
+  - 7e8f8cc 2025-09-11T15:41:54-04:00 Add validation check for labels and test
+  - 97b68b8 2025-09-11T15:40:31-04:00 Add documentation surrounding the Smart-NIC/DPU Host/DPU mode labels
+  - 842c48c 2025-09-11T15:39:37-04:00 Relax label req. of DPU/DPU Host/Smart NIC
 
-- kubernetes embedded-component a237dcbeee8bbe1440c94349399cc6eac8870910 to 679fad59c6fcb6cd86bccb25ac702ec10d5ea15b
-  - fe0fab6a7 2025-09-11T12:12:16-04:00 UPSTREAM: <drop>: bump apiserver-library-go for adding missing safe sysctls
-  - 7f377252f 2025-09-05T13:09:39-03:00 UPSTREAM: revert: 133264: Revert "remove failing test that depends on expired credential, remove credential, add TODOs"
-  - f96a1512d 2025-09-03T18:33:25+02:00 UPSTREAM: <carry>: Fix tests after backport
-  - 1be80ebbd 2025-09-03T18:25:42+02:00 UPSTREAM: 131725: Avoid encoding in LogResponseObject when we are not going to use it
-  - bc53e37c1 2025-09-03T18:25:42+02:00 UPSTREAM: 131694: Eliminate AuditContext`s SetEventLevel
-  - 76f5a22c1 2025-09-03T18:20:01+02:00 UPSTREAM: 129472: Fix API server crash on concurrent map iteration and write
-  - 5356b2a1a 2025-09-03T09:14:32-04:00 UPSTREAM: 133625: Remove patch/update from ServiceCIDR API conformance test
-  - b991326d9 2025-08-29T08:23:42+03:00 UPSTREAM: 133682: Increase port-forward broken connection detection client timeout
-  - fe93594a7 2025-08-28T12:26:22+02:00 UPSTREAM: 133425: Fix SELinux label comparison
-  - 589943de5 2025-08-27T15:56:17-04:00 UPSTREAM: <carry>: Revert "UPSTREAM: <carry>: Revert "OCPBUGS-60507: Bump 1.33.4""
+- cluster-policy-controller embedded-component 3e7538547c8f209c72083097a4ebaada6e9c46c5 to 0e2948510331ff9351c5eb6d7f2f440afc7aa17a
+  - f281462 2025-08-19T14:18:12+02:00 scc allocation controller: Use server-side apply
 
-- machine-config-operator embedded-component 7a56cf0048a05d576e746c3e992ce586e07c97e8 to cd9b709c16ad9d8b32701d13af2d068eb4ca9c49
-  - e2bd1c04 2025-09-04T16:17:36-04:00 drain: re-cordon nodes if needed
-  - c2c1b708 2025-08-28T15:59:44-04:00 crc & kcc: Before deleting a degraded MC, ensure that the annotations have not been updated since the last check
-  - 4d7ad609 2025-08-19T12:40:18-04:00 Azure: Update services that run on control plane nodes
-  - 9533431d 2025-08-19T12:40:18-04:00 Start in-cluster CoreDNS pod for Azure on the control-plane
-  - 62ee24c2 2025-08-13T12:51:17-04:00 Start in-cluster CoreDNS pod on bootstrap node for Azure
+- kubernetes embedded-component 679fad59c6fcb6cd86bccb25ac702ec10d5ea15b to 95b8140e3a53ffc6aab114c39e07a439dfdf7f9e
+  - bd238e196 2025-09-17T10:47:16-04:00 UPSTREAM: <carry>: Add retries for GetCurrentResourceVersion.
+  - 87b26c865 2025-09-09T13:36:27+02:00 UPSTREAM: 133959: Do not remove PVC ClaimRef to fix flaky VAC test
 
-- operator-framework-olm embedded-component e53cf3090214284bf913bd2d7165a0a9422635a0 to 52b69a5bc151303c21268007009c0300f3170bc2
-  - ecfa3e3f 2025-09-12T00:04:17Z :seedling: Bump github.com/maxbrunsfeld/counterfeiter/v6 (#3646)
-  - a2ef2515 2025-09-10T00:03:50Z Test NetworkPolicy support in e2es (#3630)
-  - 334ca436 2025-09-09T10:31:00Z Updating ose-operator-framework-tools-container image to be consistent with ART for 4.21 Reconciling with https://github.com/openshift/ocp-build-data/tree/5c68d71385f72cd67a199bc4590068053a833c7d/images/ose-operator-framework-tools.yml
-  - c18d94a2 2025-09-09T03:38:36Z Updating operator-lifecycle-manager-container image to be consistent with ART for 4.21 Reconciling with https://github.com/openshift/ocp-build-data/tree/5c68d71385f72cd67a199bc4590068053a833c7d/images/operator-lifecycle-manager.yml
-  - ea4354d7 2025-09-08T10:00:00+02:00 UPSTREAM: <carry>: make downstream csv namespace labeler plugin e2e more resilient to race conditions
-  - 8b092cd3 2025-09-07T00:17:10Z Bump github.com/stretchr/testify from 1.10.0 to 1.11.0 (#444)
-  - fd330ff6 2025-09-07T00:16:32Z Bump the k8s-dependencies group with 4 updates (#442)
-  - 70560289 2025-09-07T00:16:19Z Bump actions/checkout from 4 to 5 (#441)
-  - d7be82e9 2025-09-07T00:16:07Z Bump the k8s-dependencies group with 5 updates (#440)
-  - 07329cd7 2025-09-07T00:15:54Z bump api to v0.34.0 (#1773)
-  - 6add5c7c 2025-09-07T00:15:40Z Bump github.com/onsi/ginkgo/v2 from 2.25.1 to 2.25.2 (#1771)
-  - 0259430c 2025-09-07T00:15:26Z Bump github.com/stretchr/testify from 1.11.0 to 1.11.1 (#1770)
-  - 576a2b34 2025-09-07T00:15:11Z Bump github.com/onsi/gomega from 1.38.1 to 1.38.2 (#1768)
-  - c2f8fb46 2025-09-07T00:14:57Z Bump github.com/stretchr/testify from 1.10.0 to 1.11.0 (#1765)
-  - b737ed49 2025-09-07T00:14:43Z Bump github.com/onsi/gomega from 1.38.0 to 1.38.1 (#1764)
-  - deb21689 2025-09-07T00:14:29Z Add sort to linkChannels output before diff check (#1767)
-  - f0ef0eea 2025-09-07T00:14:14Z initial working viz of ignored v0 edges (#1744)
-  - 052575ce 2025-09-07T00:14:00Z eliminate skipping same-Y.maxZ, which should only replace (#1749)
-  - 05ec0d60 2025-09-07T00:13:46Z Bump google.golang.org/protobuf from 1.36.7 to 1.36.8 (#1761)
-  - 89010427 2025-09-07T00:13:32Z Bump golang from 1.24-alpine to 1.25-alpine (#1760)
-  - 4a8998f2 2025-09-07T00:13:18Z Bump k8s.io/apiextensions-apiserver from 0.33.3 to 0.33.4 (#1756)
-  - 775261cc 2025-09-07T00:13:04Z Fix typo in dependabot config (#1759)
-  - 0f6dc285 2025-09-07T00:12:50Z Bump google.golang.org/protobuf from 1.36.6 to 1.36.7 (#1758)
-  - 2aeb32f0 2025-09-07T00:12:35Z Bump google.golang.org/grpc from 1.74.2 to 1.75.0 (#1755)
-  - bda3165e 2025-09-07T00:12:20Z Bump go.etcd.io/bbolt from 1.4.2 to 1.4.3 (#1753)
-  - 8d82f96f 2025-09-07T00:12:06Z Bump k8s.io/client-go from 0.33.3 to 0.33.4 (#1752)
-  - 39977861 2025-09-07T00:11:52Z Bump github.com/grpc-ecosystem/grpc-health-probe from 0.4.39 to 0.4.40 (#1751)
-  - 75b46ba3 2025-09-07T00:11:37Z Bump github.com/onsi/ginkgo/v2 from 2.23.4 to 2.24.0 (#1748)
-  - 660b7319 2025-09-07T00:11:23Z Bump golang.org/x/net from 0.42.0 to 0.43.0 (#1746)
-  - ea3f4c21 2025-09-07T00:11:09Z Bump github.com/mattn/go-sqlite3 from 1.14.30 to 1.14.32 (#1745)
-  - c4ee5876 2025-09-07T00:10:55Z Bump actions/checkout from 4 to 5 (#1743)
-  - 14f4cf27 2025-09-07T00:10:41Z Bump github.com/containers/common from 0.64.0 to 0.64.1 (#1737)
-  - 8594cda8 2025-09-07T00:10:26Z Fix invalid ConfigMap key translation (#1742)
-  - e581bb2f 2025-09-07T00:10:12Z Bump golang.org/x/mod from 0.26.0 to 0.27.0 (#1740)
-  - 1ca42f6b 2025-09-07T00:09:58Z Bump golang.org/x/sys from 0.34.0 to 0.35.0 (#1739)
-  - 1fd1ad0f 2025-09-07T00:09:44Z Bump github.com/tidwall/btree from 1.8.0 to 1.8.1 (#1738)
-  - ca44b13d 2025-09-07T00:09:30Z Bump actions/download-artifact from 4 to 5 (#1736)
-  - 939a58be 2025-09-07T00:09:16Z Bump github.com/containers/image/v5 from 5.36.0 to 5.36.1 (#1735)
-  - 3ee086c6 2025-09-07T00:09:01Z Bump github.com/containerd/containerd from 1.7.27 to 1.7.28 (#1732)
-  - d298f21d 2025-09-07T00:08:47Z Bump github.com/docker/cli (#1734)
-  - c45965d0 2025-09-07T00:08:33Z Bump github.com/mattn/go-sqlite3 from 1.14.28 to 1.14.30 (#1733)
-  - 1e754e94 2025-09-07T00:08:19Z Bump sigs.k8s.io/yaml from 1.5.0 to 1.6.0 (#1730)
-  - 18830aa6 2025-09-07T00:08:05Z Bump github.com/onsi/gomega from 1.37.0 to 1.38.0 (#1729)
-  - 90bde1f8 2025-09-07T00:07:51Z Bump github.com/containers/common from 0.63.1 to 0.64.0 (#1728)
-  - c5aab87d 2025-09-07T00:07:36Z Bump github.com/operator-framework/api from 0.32.0 to 0.33.0 (#1725)
-  - 7cc41a2f 2025-09-07T00:07:21Z Bump google.golang.org/grpc from 1.73.0 to 1.74.2 (#1727)
-  - ede09d18 2025-09-07T00:07:07Z Bump k8s.io/apiextensions-apiserver from 0.33.2 to 0.33.3 (#1722)
-  - 37e846f0 2025-09-07T00:06:49Z Bump github.com/spf13/pflag from 1.0.6 to 1.0.7 (#1723)
-  - 7c37111f 2025-09-07T00:06:35Z Bump k8s.io/apimachinery from 0.33.2 to 0.33.3 (#1721)
-  - eb276a54 2025-09-07T00:06:21Z Bump github.com/containers/image/v5 from 5.35.0 to 5.36.0 (#1720)
-  - 42da0bc5 2025-09-07T00:06:05Z Bump github.com/maxbrunsfeld/counterfeiter/v6 from 6.11.2 to 6.11.3 (#1719)
-  - d1bac153 2025-09-07T00:05:50Z Bump golang.org/x/net from 0.41.0 to 0.42.0 (#1717)
-  - 7a329b0e 2025-09-07T00:05:35Z Bump golang.org/x/mod from 0.25.0 to 0.26.0 (#1712)
-  - 25c25c4a 2025-09-07T00:05:21Z Bump golang.org/x/text from 0.26.0 to 0.27.0 (#1715)
-  - 4c8208dc 2025-09-07T00:05:06Z Bump golang.org/x/sync from 0.15.0 to 0.16.0 (#1714)
-  - 2b2ce479 2025-09-07T00:04:51Z Bump github.com/docker/cli (#1713)
-  - fb136a03 2025-09-07T00:04:37Z Bump github.com/tidwall/btree from 1.7.0 to 1.8.0 (#1711)
-  - a6a90e86 2025-09-07T00:04:15Z Make PSA catalog tests more resilient (#3645)
-  - 7119af05 2025-09-07T00:04:00Z refactor ensure job to remove named parameters (#3644)
-  - 8fc22306 2025-09-07T00:03:46Z rorfs for cacheless lacks write access to /tmp/ to generate cache (#3640)
-  - 05ab3721 2025-09-07T00:03:23Z switch kindest/node version to fix linux (#3643)
-  - c76c5a56 2025-09-07T00:03:08Z :seedling: Bump github.com/spf13/cobra from 1.9.1 to 1.10.1 (#3639)
-  - 9c13d90a 2025-09-07T00:02:52Z bumps for api, operator-registry prepping for release (#3636)
+- machine-config-operator embedded-component cd9b709c16ad9d8b32701d13af2d068eb4ca9c49 to 223bed017865d085a6fda3a41050627be96ed340
+  - 139dd0c2 2025-09-15T16:27:15-05:00 OCPBUGS-61695: Override NMState service definition
+  - fd87e53a 2025-09-15T15:52:14-04:00 units: add delays to TestOSBuildController
+  - c6f988c0 2025-09-15T10:48:16-05:00 add new recording rule for unsuported packages
+  - 1889a793 2025-08-27T10:00:56-04:00 msbic: add unit tests
+  - 55a0cc80 2025-08-27T10:00:56-04:00 msbic: add azure platform support
+  - 0c077d64 2025-08-25T11:59:59-04:00 operator: add azure boot image update gates
+  - ae39bd1b 2025-08-25T11:59:59-04:00 vendor bump for Azure stream updates
+  - 3f274443 2025-08-19T09:13:17-04:00 Add nil/null checks to image registry secret decode
+  - 715f38dd 2025-08-12T09:02:58-04:00 install: remove mcn crd cleanup cronjob
 
-- oc image-amd64 31597edbaedc6d8d206deda350cfc93e89fa24bf to f7c9fc36fbaa85b3cbf0c2e85dd4a42e20f6952d
-  - e2784fcc 2025-09-11T09:23:15+03:00 Add unit tests to verify the behavior
-  - c550a52b 2025-09-09T11:05:35-07:00 pkg/cli/admin/upgrade/recommend/examples/4.19.0-okd-scos.16: Add OKD example
-  - 24209697 2025-09-09T12:48:19+03:00 Add some warnings into excluded list
-  - 5d053a4d 2025-09-09T10:35:05+03:00 oc adm policy: Only initialize UserClient if built-in OAuth is enabled
-  - af08082d 2025-09-08T12:50:51+03:00 Introduce auto-open-browser flag for external OIDC issuer login
-  - effd73ed 2025-09-04T09:18:42+02:00 oc adm must-gather: Wrap gather in a session
-  - 8bdac163 2025-09-03T16:28:10-07:00 pkg/cli/admin/upgrade/recommend: Enable precheck and accept gates
-  - 24d5b0a8 2025-09-01T16:49:27+03:00 Rely on overall available disk space of the mounted volume
-  - ea3cacdc 2025-08-29T13:21:45+02:00 must-gather: Fix usage checker for custom commands
+- openshift-controller-manager embedded-component 49aaf599fb9024f36359f55bac6b3bb1482e24b8 to 15fc552a73e47ae715f0cf59e3f535e26b43477a
+  - ce067c2 2025-09-18T14:00:16+05:30 Fix Dockerfile.rhel: Add OTE binary build and packaging
+  - 6c2059d 2025-09-15T14:20:48+05:30 set up openshift-tests-extension for cluster-openshift-controller-manager-operator and add a sanity test
 
-- csi-external-snapshotter image-amd64 42604822c25eb2aa0ecb017c24e328221b238eb9 to ba8194d5920973069bc56a8bf5844afeedc66bbd
-  - 8b132ec 2025-09-06T20:57:06Z UPSTREAM: <carry>: Updating ose-csi-external-snapshotter-container image to be consistent with ART for 4.21 Reconciling with https://github.com/openshift/ocp-build-data/tree/5c68d71385f72cd67a199bc4590068053a833c7d/images/ose-csi-external-snapshotter.yml
+- operator-framework-olm embedded-component 52b69a5bc151303c21268007009c0300f3170bc2 to 44c993131781ff5bfb8665b0e6cc1d2a3bf23839
+  - fd5119fc 2025-09-18T14:07:22+08:00 move golangci-lint and go-bindata to new location to fix sync
+  - 62ce21ab 2025-09-17T14:07:14+08:00 add OTE into olmv0 with new location
+  - 57aa443f 2025-09-16T18:32:25+00:00 migrate containers libs to new mono-repo (#1799)
+  - cdba3e50 2025-09-16T18:31:45+00:00 set an exception for migrate file permissions (#1798)
+  - 8bc227c4 2025-09-16T18:31:21+00:00 Bump the golang-x-deps group across 1 directory with 2 updates (#1797)
+  - f1e8858f 2025-09-16T18:30:35+00:00 Bump google.golang.org/grpc from 1.75.0 to 1.75.1 (#1796)
+  - 9e6853ab 2025-09-16T18:30:21+00:00 Bump github.com/maxbrunsfeld/counterfeiter/v6 from 6.11.3 to 6.12.0 (#1791)
+  - f1d6e13b 2025-09-16T18:30:07+00:00 Bump google.golang.org/protobuf from 1.36.8 to 1.36.9 (#1793)
+  - abfd941b 2025-09-16T18:29:53+00:00 switch tactics (#1750)
+  - eba479a4 2025-09-16T18:29:39+00:00 Bump the golang-x-deps group with 2 updates (#1789)
+  - 872ca763 2025-09-16T18:29:25+00:00 Bump actions/setup-go from 5 to 6 (#1788)
+  - 7de9f98d 2025-09-16T18:29:11+00:00 Bump actions/stale from 9 to 10 (#1787)
+  - 269b972a 2025-09-16T18:28:57+00:00 Bump github.com/onsi/ginkgo/v2 from 2.25.2 to 2.25.3 (#1786)
+  - d6aa1ba3 2025-09-16T18:28:43+00:00 Bump github.com/containers/common from 0.64.1 to 0.64.2 (#1785)
+  - 57264134 2025-09-16T18:28:27+00:00 Bump github.com/docker/cli (#1784)
+  - af9d1f73 2025-09-16T18:28:13+00:00 Bump github.com/containers/image/v5 from 5.36.1 to 5.36.2 (#1783)
+  - 8633b4bc 2025-09-16T18:27:59+00:00 Bump github.com/spf13/pflag from 1.0.9 to 1.0.10 (#1782)
+  - 0ff2fb3d 2025-09-16T18:27:45+00:00 Bump github.com/ulikunitz/xz from 0.5.12 to 0.5.14 (#1781)
+  - eb1a07e9 2025-09-16T18:27:31+00:00 Bump github.com/spf13/cobra from 1.9.1 to 1.10.1 (#1779)
+  - 301f97f5 2025-09-16T18:27:16+00:00 Bump github.com/spf13/cobra from 1.9.1 to 1.10.1 (#1776)
+  - b5926636 2025-09-16T18:27:01+00:00 Add key ordering for mermaid graph output (#1778)
+  - e3b314e5 2025-09-16T18:26:47+00:00 Bump github.com/spf13/pflag from 1.0.7 to 1.0.8 (#1775)
+  - 93fa5af0 2025-09-16T18:26:32+00:00 Bump github.com/golang-migrate/migrate/v4 from 4.18.3 to 4.19.0 (#1774)
+  - 74e7824b 2025-09-16T18:26:10+00:00 OPRUN-4119: migrate containers libs to new mono repo (#3657)
+  - 15c068ae 2025-09-16T18:25:53+00:00 :seedling: Bump github.com/containers/image/v5 from 5.36.1 to 5.36.2 (#3655)
+  - b3909aea 2025-09-16T18:25:36+00:00 :seedling: Bump golang.org/x/time from 0.12.0 to 0.13.0 (#3654)
+  - 0dd890f4 2025-09-16T18:25:19+00:00 :seedling: Bump github.com/operator-framework/operator-registry (#3656)
+  - 6b718ac6 2025-09-16T18:24:57+00:00 :seedling: Bump golang.org/x/net from 0.43.0 to 0.44.0 (#3653)
+  - 57b4385b 2025-09-16T18:24:37+00:00 :seedling: Bump github.com/prometheus/client_golang from 1.23.0 to 1.23.2 (#3649)
+  - 9f255f70 2025-09-16T18:24:17+00:00 Bump actions/stale from 9 to 10 (#3651)
+  - 28fa15aa 2025-09-16T18:23:58+00:00 Bump actions/setup-go from 5 to 6 (#3650)
+  - c240bda3 2025-09-16T18:23:28+00:00 :seedling: Bump github.com/prometheus/common from 0.65.0 to 0.66.1 (#3648)
+  - b65ec3fb 2025-09-16T14:05:25+08:00 UPSTREAM: <carry>: add jiazha to approvers
+  - 22a2cb72 2025-09-16T10:41:32+08:00 Revert "OCPQE-29415: UPSTREAM: <carry>: add OTE into olmv0"
+  - ec6e19a6 2025-09-12T20:31:11+00:00 Updating operator-registry-container image to be consistent with ART for 4.21 Reconciling with https://github.com/openshift/ocp-build-data/tree/1097a63a576d216981abbff7a60c4c5da67d1644/images/operator-registry.yml
+  - a3ba3ae2 2025-09-12T13:42:21+08:00 UPSTREAM: <carry>: add OTE into olmv0
+  - 825dc7b2 2025-09-12T09:30:09+08:00 set package-server-manager as default container
 
-- router image-amd64 7c50294cfbc9a7c0d3c715de56fb92dadeefb8e6 to 2bc8169c87ccd69cceeeab7552bedb6f16a34c84
-  - ac22e22 2025-09-09T08:48:01-04:00 Revert "OCPBUGS-55506: Prevent startup failures due to name resolution"
-  - 2f97b4d 2025-09-05T16:46:08+02:00 Add davidesalerno to OWNERS
+- service-ca-operator embedded-component b0fe556a981964728306f803864af9d2881db967 to a40d9a8ec60e0c6c1578300c372b6104130f2ecc
+  - dc11bc4 2025-09-15T11:18:02+02:00 secret_creating_controller: improve hotloop tests
+  - ae08731 2025-09-12T14:56:47+02:00 secret_creating_controller: fix hotloop on create secret error
+  - 9052e26 2025-09-12T14:41:46+02:00 secret_creating_controller_test: cover failure with invalid name
+  - 8a83a3f 2025-09-11T17:24:11+02:00 secret_creating_controller_test: add secretName to test struct
+  - 9e0422c 2025-09-11T17:22:42+02:00 secret_creating_controller_test: fix typo in test struct field name
 
-- ovn-kubernetes image-amd64 9741174157381d7b87e2d21559cbe06b8f2b5ebf to 8567f11fa93e164b6eb424ce2f831c608e1094f4
-  - 962f7070 2025-08-26T16:38:32+02:00 [kind] Fix kubevirt/ipam-extensions version to the latest v0.3.0
-  - 08dd5ed8 2025-08-25T09:54:51-04:00 Fixes proper per-test initialization of prInterfaceOpsStub
-  - 9f75d19f 2025-08-22T17:01:26-04:00 Enable unprivileged CNI mode in some e2es
-  - 1a5f4102 2025-08-22T16:53:14-04:00 Adds CNI Shim unit testing
-  - 402b187d 2025-08-22T11:24:38-04:00 Adds missing CNI server tests for unprivileged mode
-  - 809edf44 2025-08-19T17:17:19+01:00 Improve ACL logging file metrics monitor
+- oc image-amd64 f7c9fc36fbaa85b3cbf0c2e85dd4a42e20f6952d to 0e4fabc98dc46c9fca79544297783053a49370ce
+  - 4e6421d1 2025-09-17T14:26:04+02:00 pkg/.../inspect: Add support for context
+  - 08ec7194 2025-09-17T13:08:45+02:00 must-gather: Align cleanup order
+  - 19c0d4b7 2025-09-17T12:59:07+03:00 Add tchap as reviewer in oc
+  - 582a8bdc 2025-09-11T14:31:15+02:00 vendor: Update library-go and go-ldap
+  - 21b0e7cb 2025-09-11T14:31:15+02:00 oc adm groups sync: Use client.Unbind
 
-- kubernetes image-amd64 a237dcbeee8bbe1440c94349399cc6eac8870910 to 679fad59c6fcb6cd86bccb25ac702ec10d5ea15b
-  - fe0fab6a7 2025-09-11T12:12:16-04:00 UPSTREAM: <drop>: bump apiserver-library-go for adding missing safe sysctls
-  - 7f377252f 2025-09-05T13:09:39-03:00 UPSTREAM: revert: 133264: Revert "remove failing test that depends on expired credential, remove credential, add TODOs"
-  - f96a1512d 2025-09-03T18:33:25+02:00 UPSTREAM: <carry>: Fix tests after backport
-  - 1be80ebbd 2025-09-03T18:25:42+02:00 UPSTREAM: 131725: Avoid encoding in LogResponseObject when we are not going to use it
-  - bc53e37c1 2025-09-03T18:25:42+02:00 UPSTREAM: 131694: Eliminate AuditContext`s SetEventLevel
-  - 76f5a22c1 2025-09-03T18:20:01+02:00 UPSTREAM: 129472: Fix API server crash on concurrent map iteration and write
-  - 5356b2a1a 2025-09-03T09:14:32-04:00 UPSTREAM: 133625: Remove patch/update from ServiceCIDR API conformance test
-  - b991326d9 2025-08-29T08:23:42+03:00 UPSTREAM: 133682: Increase port-forward broken connection detection client timeout
-  - fe93594a7 2025-08-28T12:26:22+02:00 UPSTREAM: 133425: Fix SELinux label comparison
-  - 589943de5 2025-08-27T15:56:17-04:00 UPSTREAM: <carry>: Revert "UPSTREAM: <carry>: Revert "OCPBUGS-60507: Bump 1.33.4""
+- coredns image-amd64 6f39336e6da9dc77b2db140a96773c413d50a665 to 42e2cf1e46dfd9dd11669b06fb1d619cd9335e17
+  - 6e38175 2025-09-15T16:48:48-04:00 Add bentito (btofel@redhat.com) to OWNERS
 
-- oc image-arm64 a43428189603f12ae190703cb725f66f742fbe52 to f7c9fc36fbaa85b3cbf0c2e85dd4a42e20f6952d
-  - e2784fcc 2025-09-11T09:23:15+03:00 Add unit tests to verify the behavior
-  - c550a52b 2025-09-09T11:05:35-07:00 pkg/cli/admin/upgrade/recommend/examples/4.19.0-okd-scos.16: Add OKD example
-  - 24209697 2025-09-09T12:48:19+03:00 Add some warnings into excluded list
-  - 5d053a4d 2025-09-09T10:35:05+03:00 oc adm policy: Only initialize UserClient if built-in OAuth is enabled
-  - af08082d 2025-09-08T12:50:51+03:00 Introduce auto-open-browser flag for external OIDC issuer login
-  - effd73ed 2025-09-04T09:18:42+02:00 oc adm must-gather: Wrap gather in a session
-  - 8bdac163 2025-09-03T16:28:10-07:00 pkg/cli/admin/upgrade/recommend: Enable precheck and accept gates
-  - 24d5b0a8 2025-09-01T16:49:27+03:00 Rely on overall available disk space of the mounted volume
+- router image-amd64 2bc8169c87ccd69cceeeab7552bedb6f16a34c84 to 2c1a6790a4208cea7b8809ebdba3d2a8223827a8
+  - c153dfe 2025-09-15T16:49:10-04:00 Add bentito (btofel@redhat.com) to OWNERS
+  - 2add7ea 2025-06-20T06:39:20+00:00 Updating ose-haproxy-router-base-container image to be consistent with ART for 4.20 Reconciling with https://github.com/openshift/ocp-build-data/tree/8f77fc475c95f9d98c348deb2feb88f5952d7357/images/ose-haproxy-router-base.yml
 
-- csi-external-snapshotter image-arm64 42604822c25eb2aa0ecb017c24e328221b238eb9 to ba8194d5920973069bc56a8bf5844afeedc66bbd
-  - 8b132ec 2025-09-06T20:57:06Z UPSTREAM: <carry>: Updating ose-csi-external-snapshotter-container image to be consistent with ART for 4.21 Reconciling with https://github.com/openshift/ocp-build-data/tree/5c68d71385f72cd67a199bc4590068053a833c7d/images/ose-csi-external-snapshotter.yml
+- ovn-kubernetes image-amd64 8567f11fa93e164b6eb424ce2f831c608e1094f4 to 5ad762f86466c2e11b94da2cee211cec97e16a3a
+  - b36bb31d 2025-08-29T13:27:35-04:00 OCPBUGS-61065: As part of DPF installation we are required to use OCP downstream image for dpu service. Dpu service uses upstream ovnkube.sh script that requires ovndb-raft-functions.sh as a dependency. This change copies it into the image as part of Dockerfile.base
 
-- router image-arm64 7c50294cfbc9a7c0d3c715de56fb92dadeefb8e6 to 2bc8169c87ccd69cceeeab7552bedb6f16a34c84
-  - ac22e22 2025-09-09T08:48:01-04:00 Revert "OCPBUGS-55506: Prevent startup failures due to name resolution"
-  - 2f97b4d 2025-09-05T16:46:08+02:00 Add davidesalerno to OWNERS
+- kubernetes image-amd64 679fad59c6fcb6cd86bccb25ac702ec10d5ea15b to 95b8140e3a53ffc6aab114c39e07a439dfdf7f9e
+  - bd238e196 2025-09-17T10:47:16-04:00 UPSTREAM: <carry>: Add retries for GetCurrentResourceVersion.
+  - 87b26c865 2025-09-09T13:36:27+02:00 UPSTREAM: 133959: Do not remove PVC ClaimRef to fix flaky VAC test
 
-- ovn-kubernetes image-arm64 9741174157381d7b87e2d21559cbe06b8f2b5ebf to 8567f11fa93e164b6eb424ce2f831c608e1094f4
-  - 962f7070 2025-08-26T16:38:32+02:00 [kind] Fix kubevirt/ipam-extensions version to the latest v0.3.0
-  - 08dd5ed8 2025-08-25T09:54:51-04:00 Fixes proper per-test initialization of prInterfaceOpsStub
-  - 9f75d19f 2025-08-22T17:01:26-04:00 Enable unprivileged CNI mode in some e2es
-  - 1a5f4102 2025-08-22T16:53:14-04:00 Adds CNI Shim unit testing
-  - 402b187d 2025-08-22T11:24:38-04:00 Adds missing CNI server tests for unprivileged mode
-  - 809edf44 2025-08-19T17:17:19+01:00 Improve ACL logging file metrics monitor
+- service-ca-operator image-amd64 b0fe556a981964728306f803864af9d2881db967 to a40d9a8ec60e0c6c1578300c372b6104130f2ecc
+  - dc11bc4 2025-09-15T11:18:02+02:00 secret_creating_controller: improve hotloop tests
+  - ae08731 2025-09-12T14:56:47+02:00 secret_creating_controller: fix hotloop on create secret error
+  - 9052e26 2025-09-12T14:41:46+02:00 secret_creating_controller_test: cover failure with invalid name
+  - 8a83a3f 2025-09-11T17:24:11+02:00 secret_creating_controller_test: add secretName to test struct
+  - 9e0422c 2025-09-11T17:22:42+02:00 secret_creating_controller_test: fix typo in test struct field name
 
-- kubernetes image-arm64 a237dcbeee8bbe1440c94349399cc6eac8870910 to 679fad59c6fcb6cd86bccb25ac702ec10d5ea15b
-  - fe0fab6a7 2025-09-11T12:12:16-04:00 UPSTREAM: <drop>: bump apiserver-library-go for adding missing safe sysctls
-  - 7f377252f 2025-09-05T13:09:39-03:00 UPSTREAM: revert: 133264: Revert "remove failing test that depends on expired credential, remove credential, add TODOs"
-  - f96a1512d 2025-09-03T18:33:25+02:00 UPSTREAM: <carry>: Fix tests after backport
-  - 1be80ebbd 2025-09-03T18:25:42+02:00 UPSTREAM: 131725: Avoid encoding in LogResponseObject when we are not going to use it
-  - bc53e37c1 2025-09-03T18:25:42+02:00 UPSTREAM: 131694: Eliminate AuditContext`s SetEventLevel
-  - 76f5a22c1 2025-09-03T18:20:01+02:00 UPSTREAM: 129472: Fix API server crash on concurrent map iteration and write
-  - 5356b2a1a 2025-09-03T09:14:32-04:00 UPSTREAM: 133625: Remove patch/update from ServiceCIDR API conformance test
-  - b991326d9 2025-08-29T08:23:42+03:00 UPSTREAM: 133682: Increase port-forward broken connection detection client timeout
-  - fe93594a7 2025-08-28T12:26:22+02:00 UPSTREAM: 133425: Fix SELinux label comparison
-  - 589943de5 2025-08-27T15:56:17-04:00 UPSTREAM: <carry>: Revert "UPSTREAM: <carry>: Revert "OCPBUGS-60507: Bump 1.33.4""
+- oc image-arm64 f7c9fc36fbaa85b3cbf0c2e85dd4a42e20f6952d to 0e4fabc98dc46c9fca79544297783053a49370ce
+  - 4e6421d1 2025-09-17T14:26:04+02:00 pkg/.../inspect: Add support for context
+  - 08ec7194 2025-09-17T13:08:45+02:00 must-gather: Align cleanup order
+  - 19c0d4b7 2025-09-17T12:59:07+03:00 Add tchap as reviewer in oc
+  - 582a8bdc 2025-09-11T14:31:15+02:00 vendor: Update library-go and go-ldap
+  - 21b0e7cb 2025-09-11T14:31:15+02:00 oc adm groups sync: Use client.Unbind
+
+- coredns image-arm64 6f39336e6da9dc77b2db140a96773c413d50a665 to 42e2cf1e46dfd9dd11669b06fb1d619cd9335e17
+  - 6e38175 2025-09-15T16:48:48-04:00 Add bentito (btofel@redhat.com) to OWNERS
+
+- router image-arm64 2bc8169c87ccd69cceeeab7552bedb6f16a34c84 to 846c6ca6d4222fd0fcd7891edb66dcf226f61c45
+  - c153dfe 2025-09-15T16:49:10-04:00 Add bentito (btofel@redhat.com) to OWNERS
+  - 088afb0 2025-06-20T13:08:14+00:00 Updating openshift-enterprise-haproxy-router-container image to be consistent with ART for 4.20 Reconciling with https://github.com/openshift/ocp-build-data/tree/8f77fc475c95f9d98c348deb2feb88f5952d7357/images/openshift-enterprise-haproxy-router.yml
+  - 2add7ea 2025-06-20T06:39:20+00:00 Updating ose-haproxy-router-base-container image to be consistent with ART for 4.20 Reconciling with https://github.com/openshift/ocp-build-data/tree/8f77fc475c95f9d98c348deb2feb88f5952d7357/images/ose-haproxy-router-base.yml
+
+- ovn-kubernetes image-arm64 8567f11fa93e164b6eb424ce2f831c608e1094f4 to 5ad762f86466c2e11b94da2cee211cec97e16a3a
+  - b36bb31d 2025-08-29T13:27:35-04:00 OCPBUGS-61065: As part of DPF installation we are required to use OCP downstream image for dpu service. Dpu service uses upstream ovnkube.sh script that requires ovndb-raft-functions.sh as a dependency. This change copies it into the image as part of Dockerfile.base
+
+- kubernetes image-arm64 679fad59c6fcb6cd86bccb25ac702ec10d5ea15b to 5c9df339496a7595967e06682ece7d0b2145411c
+  - bd238e196 2025-09-17T10:47:16-04:00 UPSTREAM: <carry>: Add retries for GetCurrentResourceVersion.
+  - 61a5f42bd 2025-09-11T17:26:59-04:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - 03e764d03 2025-09-09T19:43:57+00:00 Release commit for Kubernetes v1.33.5
+  - 87b26c865 2025-09-09T13:36:27+02:00 UPSTREAM: 133959: Do not remove PVC ClaimRef to fix flaky VAC test
+  - b246955af 2025-08-28T22:57:01+08:00 Fix missing control plane health check timeout
+  - c1a0f959a 2025-08-28T10:31:15+02:00 Add a note about Conflicts return value
+  - 2d6c21edd 2025-08-28T10:31:15+02:00 Fix SELinux label comparison
+  - fe2d1b268 2025-08-28T10:31:15+02:00 Add missing cases to SELinuxMount tests
+  - 9d0999731 2025-08-21T09:09:11-04:00 Remove patch/update from ServiceCIDR API conformance test
+  - 98b3daba8 2025-08-14T13:31:05+02:00 Bump dependencies, images and versions used to Go 1.24.6 and distroless iptables
+  - 0ae9d1d16 2025-08-13T14:40:41+00:00 Update CHANGELOG/CHANGELOG-1.33.md for v1.33.4
+  - d8676a24c 2025-07-22T08:21:08-04:00 Added NodeSelectors field to DriverDefinition
+  - b5fa540b2 2025-07-16T11:07:06+02:00 Mask Linux thermal interrupt info in /proc and /sys.
+
+- service-ca-operator image-arm64 b0fe556a981964728306f803864af9d2881db967 to a40d9a8ec60e0c6c1578300c372b6104130f2ecc
+  - dc11bc4 2025-09-15T11:18:02+02:00 secret_creating_controller: improve hotloop tests
+  - ae08731 2025-09-12T14:56:47+02:00 secret_creating_controller: fix hotloop on create secret error
+  - 9052e26 2025-09-12T14:41:46+02:00 secret_creating_controller_test: cover failure with invalid name
+  - 8a83a3f 2025-09-11T17:24:11+02:00 secret_creating_controller_test: add secretName to test struct
+  - 9e0422c 2025-09-11T17:22:42+02:00 secret_creating_controller_test: fix typo in test struct field name
 
