@@ -1,6 +1,0 @@
-- machine-config-operator embedded-component 6cabdc1467e3bcc9961544e148530a9c88789856 to 4929be38a15cf61a9f9ddeaf1ba89d185aa72611
-  - 566be9bf 2025-09-17T03:31:37+00:00 OCPBUGS-61695: Override NMState service definition
-
-- kubernetes image-arm64 a4cad449903ebc0483194289514d09f1deac1b66 to a06f3261941734178f3c43db62a80cc5fc97f7ad
-  - 15cb57ce5 2025-09-07T00:03:19-04:00 Revert "UPSTREAM: revert<carry>: Mark admissionregistration.k8s.io/v1beta1 as deprecated.""
-
