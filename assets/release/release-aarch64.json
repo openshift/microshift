@@ -1,14 +1,14 @@
 {
   "release": {
-    "base": "4.18.0-0.nightly-arm64-2025-09-17-224816"
+    "base": "4.18.0-0.nightly-arm64-2025-09-21-213011"
   },
   "images": {
     "cli": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:5f7f08d8dc27e9e161f130a1a893dbb63b12b3f115edb9df263a4a1db9b02c9b",
     "coredns": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:7f6462c2e07ea781f43fac5a05ef6478c2c2a3d66e7c8d60f36b4f7d72545404",
-    "haproxy-router": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:6d45cfc4e071173292b93536c4b93bef60169b2ab32050a8ece17657c627cca4",
-    "kube-rbac-proxy": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:06cc98d73c3dea39ee7482c5b905c6888b14506f707d0ed8bb1669da4ed010b9",
-    "ovn-kubernetes-microshift": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:8b541b8ea7536917f348cdcba1379871b72dfc945b47178106e577fc64247523",
-    "pod": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:cb295e2c7ee1be22663b730a9a8e38b9bcc3abe0584a117634195598ac23094d",
+    "haproxy-router": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:46e7528985eaa903f1d0203e5cbf3042476a847f75190c447083ff86e4dcf557",
+    "kube-rbac-proxy": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:391db4dd49f848d03372676a8cabe5cfd31b01520c94c3f5f8d880c4f7dd9bd1",
+    "ovn-kubernetes-microshift": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:6369b627ab8ea6cb6674881f82b73d42dbbdaf5119585f9d2d9b720d53b401c2",
+    "pod": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:35db8c47103bc2043a337b5fc923424b7eab6a94586a6b0348e45571ff2d34c0",
     "service-ca-operator": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:02ea3ef7bd5867e0191dd204d2341481d34b9d1a2ceebff229a811d9f9bdab94",
     "lvms_operator": "registry.redhat.io/lvms4/lvms-rhel9-operator@sha256:bd6dc4d6e90fdbcdb844759e203c9c591abc5ac29a956257a90bda101a37b76e",
     "csi-snapshot-controller": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:98d947fa1e37d9daa0c2bb872f31ae387340846621467f11d3b86d73604e1d4a"
