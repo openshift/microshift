@@ -1,0 +1,227 @@
+---
+# nvidia-gpu-test tasks
+# This role runs on the microshift host but delegates oc commands to localhost
+
+- name: Get host nvidia-smi output
+  ansible.builtin.command: nvidia-smi
+  register: host_nvidia_smi
+  changed_when: false
+
+- name: Count GPUs on host
+  ansible.builtin.shell: |
+    nvidia-smi | grep -c -E "^\| +[0-9]+ +"
+  register: gpu_count
+  changed_when: false
+
+- name: Display detected GPU count
+  ansible.builtin.debug:
+    msg: "Detected {{ gpu_count.stdout | trim }} GPUs on the host"
+
+- name: Create dynamic GPU test workload manifest
+  ansible.builtin.template:
+    src: gpu-test-workload.yaml.j2
+    dest: /tmp/gpu-test-workload-dynamic.yaml
+    mode: '0644'
+  delegate_to: localhost
+  become: no
+
+- name: Apply GPU test workload
+  ansible.builtin.shell: |
+    set -o pipefail
+    oc apply -f /tmp/gpu-test-workload-dynamic.yaml
+  args:
+    executable: /bin/bash
+  delegate_to: localhost
+  become: no
+  register: gpu_workload_deploy
+
+- name: Wait for GPU test pods to complete
+  ansible.builtin.shell: |
+    set -o pipefail
+    oc get pods -n {{ gpu_test_namespace }} --no-headers | grep -E 'Completed|Succeeded'
+  args:
+    executable: /bin/bash
+  delegate_to: localhost
+  become: no
+  register: gpu_test_status
+  until: gpu_test_status.stdout_lines | length >= 2
+  retries: "{{ gpu_test_retries }}"
+  delay: "{{ gpu_test_delay }}"
+  changed_when: false
+
+- name: Get nvidia-smi pod logs
+  ansible.builtin.shell: |
+    oc logs -n {{ gpu_test_namespace }} nvidia-smi-all-gpus
+  delegate_to: localhost
+  become: no
+  register: pod_nvidia_smi_logs
+  changed_when: false
+
+- name: Display host nvidia-smi output
+  ansible.builtin.debug:
+    msg: |
+      ========================================
+      Host NVIDIA-SMI Output:
+      ========================================
+      {{ host_nvidia_smi.stdout }}
+
+- name: Display pod nvidia-smi output
+  ansible.builtin.debug:
+    msg: |
+      ========================================
+      Pod NVIDIA-SMI Output (All GPUs):
+      ========================================
+      {{ pod_nvidia_smi_logs.stdout }}
+
+- name: Compare GPU visibility
+  ansible.builtin.shell: |
+    host_gpus=$(echo "{{ host_nvidia_smi.stdout }}" | grep -c -E "^\| +[0-9]+ +")
+    pod_gpus=$(echo "{{ pod_nvidia_smi_logs.stdout }}" | grep -c -E "^\| +[0-9]+ +")
+    echo "Host GPUs: $host_gpus, Pod GPUs: $pod_gpus"
+    if [ "$host_gpus" = "$pod_gpus" ]; then
+      echo "SUCCESS: Pod can see all host GPUs"
+    else
+      echo "WARNING: GPU count mismatch"
+      exit 1
+    fi
+  delegate_to: localhost
+  become: no
+  register: gpu_comparison
+  changed_when: false
+
+- name: Display GPU comparison result
+  ansible.builtin.debug:
+    msg: "{{ gpu_comparison.stdout }}"
+
+- name: Get cuda-vector-add pod logs
+  ansible.builtin.shell: |
+    oc logs -n {{ gpu_test_namespace }} cuda-vector-add
+  delegate_to: localhost
+  become: no
+  register: cuda_vector_add_logs
+  changed_when: false
+
+- name: Display cuda-vector-add output
+  ansible.builtin.debug:
+    msg: |
+      ========================================
+      CUDA Vector Add Test Output:
+      ========================================
+      {{ cuda_vector_add_logs.stdout }}
+
+- name: Summary of GPU test results
+  ansible.builtin.debug:
+    msg: |
+      ========================================
+      GPU Test Summary:
+      ========================================
+      Host GPUs Detected: {{ gpu_count.stdout | trim }}
+      Pod GPUs Visible: {{ pod_nvidia_smi_logs.stdout | regex_findall('^\| +[0-9]+ +', multiline=True) | length }}
+      GPU Visibility: {{ 'PASSED - All GPUs visible in pod' if gpu_comparison.rc == 0 else 'FAILED - GPU count mismatch' }}
+      
+      nvidia-smi Status: {{ 'PASSED' if pod_nvidia_smi_logs.rc == 0 else 'FAILED' }}
+      cuda-vector-add Status: {{ 'PASSED' if 'Test PASSED' in cuda_vector_add_logs.stdout else 'FAILED' }}
+      CUDA Test Result: {{ 'Success' if 'Test PASSED' in cuda_vector_add_logs.stdout else 'Failed' }}
+
+- name: Save GPU test logs to files
+  when: gpu_test_save_logs | default(true) | bool
+  block:
+    - name: Create logs directory
+      ansible.builtin.file:
+        path: "{{ gpu_test_logs_dir | default('./gpu-test-logs') }}"
+        state: directory
+        mode: '0755'
+      delegate_to: localhost
+      become: no
+
+    - name: Save host nvidia-smi output to file
+      ansible.builtin.copy:
+        content: "{{ host_nvidia_smi.stdout }}"
+        dest: "{{ gpu_test_logs_dir | default('./gpu-test-logs') }}/host-nvidia-smi-{{ ansible_date_time.epoch }}.log"
+        mode: '0644'
+      delegate_to: localhost
+      become: no
+
+    - name: Save pod nvidia-smi output to file
+      ansible.builtin.copy:
+        content: "{{ pod_nvidia_smi_logs.stdout }}"
+        dest: "{{ gpu_test_logs_dir | default('./gpu-test-logs') }}/pod-nvidia-smi-{{ ansible_date_time.epoch }}.log"
+        mode: '0644'
+      delegate_to: localhost
+      become: no
+
+    - name: Save cuda-vector-add output to file
+      ansible.builtin.copy:
+        content: "{{ cuda_vector_add_logs.stdout }}"
+        dest: "{{ gpu_test_logs_dir | default('./gpu-test-logs') }}/cuda-vector-add-{{ ansible_date_time.epoch }}.log"
+        mode: '0644'
+      delegate_to: localhost
+      become: no
+
+    - name: Save test summary to file
+      ansible.builtin.copy:
+        content: |
+          GPU Test Summary - {{ ansible_date_time.iso8601 }}
+          ========================================
+          Host: {{ hostvars[groups['microshift'][0]]['ansible_host'] }}
+          Host GPUs Detected: {{ gpu_count.stdout | trim }}
+          Pod GPUs Visible: {{ pod_nvidia_smi_logs.stdout | regex_findall('^\| +[0-9]+ +', multiline=True) | length }}
+          GPU Visibility: {{ 'PASSED - All GPUs visible in pod' if gpu_comparison.rc == 0 else 'FAILED - GPU count mismatch' }}
+          nvidia-smi Status: {{ 'PASSED' if pod_nvidia_smi_logs.rc == 0 else 'FAILED' }}
+          cuda-vector-add Status: {{ 'PASSED' if 'Test PASSED' in cuda_vector_add_logs.stdout else 'FAILED' }}
+          CUDA Test Result: {{ 'Success' if 'Test PASSED' in cuda_vector_add_logs.stdout else 'Failed' }}
+        dest: "{{ gpu_test_logs_dir | default('./gpu-test-logs') }}/test-summary-{{ ansible_date_time.epoch }}.log"
+        mode: '0644'
+      delegate_to: localhost
+      become: no
+
+    - name: Inform about saved logs
+      ansible.builtin.debug:
+        msg: "GPU test logs saved to {{ gpu_test_logs_dir | default('./gpu-test-logs') }}/"
+
+- name: Check if tests passed
+  ansible.builtin.shell: |
+    set -o pipefail
+    oc get pods -n {{ gpu_test_namespace }} -o json | \
+      jq -r '.items[] | select(.status.phase == "Succeeded") | .metadata.name' | \
+      wc -l
+  args:
+    executable: /bin/bash
+  delegate_to: localhost
+  become: no
+  register: successful_pods
+  changed_when: false
+
+- name: Verify all GPU tests passed
+  ansible.builtin.assert:
+    that:
+      - successful_pods.stdout | int >= 2
+    fail_msg: "GPU tests failed - not all pods completed successfully"
+    success_msg: "All GPU tests passed successfully"
+
+- name: Clean up GPU test resources
+  when: gpu_test_cleanup | bool
+  block:
+    - name: Delete GPU test namespace
+      ansible.builtin.shell: |
+        oc delete namespace {{ gpu_test_namespace }} --ignore-not-found=true
+      delegate_to: localhost
+      become: no
+      register: cleanup_result
+      changed_when: "'deleted' in cleanup_result.stdout"
+
+    - name: Wait for namespace deletion to complete
+      ansible.builtin.shell: |
+        oc get namespace {{ gpu_test_namespace }} --no-headers 2>/dev/null || echo "deleted"
+      delegate_to: localhost
+      become: no
+      register: namespace_check
+      until: namespace_check.stdout == "deleted"
+      retries: 30
+      delay: 5
+      changed_when: false
+
+- name: Inform about keeping test resources
+  ansible.builtin.debug:
+    msg: "GPU test resources kept in namespace {{ gpu_test_namespace }} for debugging"
+  when: not (gpu_test_cleanup | bool)

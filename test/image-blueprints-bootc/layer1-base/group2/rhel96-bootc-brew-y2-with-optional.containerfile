@@ -1,6 +1,6 @@
 # {{- if env.Getenv "BREW_Y2_RELEASE_VERSION" "" -}}
 # Note: This comment makes templating add a new line before the code
-FROM localhost/rhel94-test-agent:latest
+FROM localhost/rhel96-test-agent:latest
 
 # Build arguments
 ARG USHIFT_RPM_REPO_NAME=microshift-brew
@@ -38,6 +38,7 @@ RUN firewall-offline-cmd --zone=public --add-port=22/tcp && \
     firewall-offline-cmd --zone=public --add-port=443/tcp && \
     firewall-offline-cmd --zone=public --add-port=5353/udp && \
     firewall-offline-cmd --zone=public --add-port=6443/tcp && \
+    firewall-offline-cmd --zone=public --add-port=8889/tcp && \
     firewall-offline-cmd --zone=public --add-port=30000-32767/tcp && \
     firewall-offline-cmd --zone=public --add-port=30000-32767/udp
 # {{- end -}}

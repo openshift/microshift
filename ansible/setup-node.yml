@@ -6,7 +6,7 @@
 # ansible-playbook -i inventory/inventory setup-node.yml
 #
 
-- name: create vm and set up localhost
+- name: Create vm and set up localhost
   hosts: localhost
   vars:
     become: no
@@ -18,7 +18,7 @@
       when: (create_devenv | bool)
     - role: setup-localhost
 
-- name: set up logging node
+- name: Set up logging node
   hosts: logging
   become: yes
   vars_files:
@@ -27,7 +27,7 @@
     - role: install-logging
       when: (prometheus_logging | bool)
 
-- name: entitle host and manage repos
+- name: Entitle host and manage repos
   hosts: microshift
   become: yes
   vars_files:
@@ -36,7 +36,7 @@
     - role: manage-repos
       when: (manage_repos | bool)
 
-- name: install packages, configure services & firewall
+- name: Install packages, configure services & firewall
   hosts: microshift
   become: yes
   vars_files:
@@ -49,7 +49,7 @@
     - role: install-logging-exporters
       when: (prometheus_logging | bool)
 
-- name: install microshift
+- name: Install microshift
   hosts: microshift
   vars_files:
     - vars/all.yml
@@ -57,30 +57,56 @@
     - role: install-microshift
       when: (install_microshift | bool)
 
-- name: capture microshift metrics
+- name: Capture microshift metrics
   hosts: microshift
   vars_files:
     - vars/all.yml
   roles:
     - role: microshift-start
 
-- name: add kubelet endpoint to prometheus
+- name: Add kubelet endpoint to prometheus
   hosts: logging
-  become: yes
-  gather_facts: no
+  become: true
+  gather_facts: false
   vars_files:
     - vars/all.yml
   roles:
     - role: add-kubelet-logging
+      when: (prometheus_logging | bool)
 
-- name: pull kubeconfig from microshift host
+- name: Capture microshift metrics (warm)
+  hosts: microshift
+  vars_files:
+    - vars/all.yml
+  roles:
+    - role: quick-microshift-boot
+
+- name: Setup NVIDIA GPU support
+  hosts: microshift
+  become: yes
+  vars_files:
+    - vars/all.yml
+  roles:
+    - role: nvidia-gpu-setup
+      when: (enable_gpu | bool)
+
+- name: Pull kubeconfig from microshift host
   hosts: microshift
   vars_files:
     - vars/all.yml
   roles:
     - role: fetch-kubeconfig
 
-- name: run performance workloads
+- name: Deploy GPU test workload
+  hosts: microshift
+  become: yes
+  vars_files:
+    - vars/all.yml
+  roles:
+    - role: nvidia-gpu-test
+      when: (enable_gpu | bool) and (deploy_gpu_test | bool)
+
+- name: Run performance workloads
   hosts: localhost
   vars:
     ansible_become: no

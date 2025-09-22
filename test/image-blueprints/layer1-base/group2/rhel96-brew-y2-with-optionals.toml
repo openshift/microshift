@@ -8,12 +8,12 @@
 
 */ -}}
 
-name = "rhel-9.4-microshift-brew-optionals-4.{{ .Env.YMINUS2_MINOR_VERSION }}-zstream"
-description = "A RHEL 9.4 image with already built and released RPMs like EC, RC, or Z-stream release: {{ .Env.BREW_Y2_RELEASE_VERSION }}"
+name = "rhel-9.6-microshift-brew-optionals-4.{{ .Env.YMINUS2_MINOR_VERSION }}-zstream"
+description = "A RHEL 9.6 image with already built and released RPMs like EC, RC, or Z-stream release: {{ .Env.BREW_Y2_RELEASE_VERSION }}"
 version = "0.0.1"
 modules = []
 groups = []
-distro = "rhel-94"
+distro = "rhel-96"
 
 {{ range (env.Getenv "MICROSHIFT_MANDATORY_RPMS" | strings.Split " ") }}
 [[packages]]
@@ -42,6 +42,7 @@ ports = [
     "443:tcp",
     "5353:udp",
     "6443:tcp",
+    "8889:tcp",
     "30000-32767:tcp",
     "30000-32767:udp",
 ]

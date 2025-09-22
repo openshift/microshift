@@ -1,4 +1,4 @@
-{{- if env.Getenv "BREW_NIGHTLY_RELEASE_VERSION" "" -}}
+{{- if and (env.Getenv "BREW_NIGHTLY_RELEASE_VERSION" "") (env.Getenv "BREW_Y1_RELEASE_VERSION" "") -}}
 {{- /*
 
   We wrap this template in a test so that the body of the output is
@@ -43,6 +43,10 @@ version = "{{ env.Getenv "BREW_NIGHTLY_RELEASE_VERSION" }}"
 name = "microshift-test-agent"
 version = "*"
 
+[[packages]]
+name = "systemd-resolved"
+version = "*"
+
 [customizations.services]
 enabled = ["microshift", "microshift-test-agent"]
 
@@ -53,6 +57,7 @@ ports = [
     "443:tcp",
     "5353:udp",
     "6443:tcp",
+    "8889:tcp",
     "30000-32767:tcp",
     "30000-32767:udp",
 ]

@@ -6,8 +6,9 @@ approvers:
 - jerpeter1
 - jogeo
 - eslutsky
-- dhensel-rh
+- kasturinarra
 - agullon
+- microshift-rebase-script[bot]
 reviewers:
 - copejon
 - ggiguash
@@ -16,9 +17,10 @@ reviewers:
 - jerpeter1
 - jogeo
 - eslutsky
-- dhensel-rh
+- kasturinarra
 - agullon
 - vanhalenar
+- microshift-rebase-script[bot]
 emeritus_approvers:
 - cooktheryan
 - husky-parul
@@ -33,3 +35,4 @@ emeritus_approvers:
 - zshi-redhat
 - pliurh
 - eggfoobar
+- dhensel-rh

@@ -17,7 +17,7 @@ distro = "rhel-96"
 
 # Parent specification directive recognized by test/bin/build_images.sh to be
 # used with the '--parent' argument of 'osbuild-composer'
-# parent = "rhel-9.4-microshift-brew-optionals-4.{{ .Env.YMINUS2_MINOR_VERSION }}-zstream"
+# parent = "rhel-9.6-microshift-brew-optionals-4.{{ .Env.YMINUS2_MINOR_VERSION }}-zstream"
 
 {{ range (env.Getenv "MICROSHIFT_MANDATORY_RPMS" | strings.Split " ") }}
 [[packages]]
@@ -53,6 +53,7 @@ ports = [
     "443:tcp",
     "5353:udp",
     "6443:tcp",
+    "8889:tcp",
     "30000-32767:tcp",
     "30000-32767:udp",
 ]

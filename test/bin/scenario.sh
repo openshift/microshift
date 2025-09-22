@@ -18,7 +18,7 @@ source "${SCRIPTDIR}/common_versions.sh"
 # shellcheck source=test/bin/scenario_container.sh
 source "${SCRIPTDIR}/scenario_container.sh"
 
-DEFAULT_BOOT_BLUEPRINT="rhel-9.4"
+DEFAULT_BOOT_BLUEPRINT="rhel-9.6"
 LVM_SYSROOT_SIZE="15360"
 PULL_SECRET="${PULL_SECRET:-${HOME}/.pull-secret.json}"
 PULL_SECRET_CONTENT="$(jq -c . "${PULL_SECRET}")"
@@ -31,6 +31,7 @@ SKIP_GREENBOOT=${SKIP_GREENBOOT:-false}  # may be overridden in scenario file
 IMAGE_SIGSTORE_ENABLED=false # may be overridden in scenario file
 VNC_CONSOLE=${VNC_CONSOLE:-false}  # may be overridden in global settings file
 TEST_RANDOMIZATION="all"  # may be overridden in scenario file
+TEST_EXCLUDES="none"  # may be overridden in scenario file
 TEST_EXECUTION_TIMEOUT="30m" # may be overriden in scenario file
 SUBSCRIPTION_MANAGER_PLUGIN="${SUBSCRIPTION_MANAGER_PLUGIN:-${SCRIPTDIR}/subscription_manager_register.sh}"  # may be overridden in global settings file
 RUN_HOST_OVERRIDE=""  # target any given VM for running scenarios
@@ -939,23 +940,33 @@ stress_testing() {
     fi
 }
 
-# Run the tests for the current scenario
-run_tests() {
-    local vmname="${1}"
-    local full_vmname
-    full_vmname="$(full_vm_name "${vmname}")"
+# Apply RUN_HOST_OVERRIDE logic if needed
+apply_host_override() {
+    local -r original_vmname="$1"
+    local vmname="${original_vmname}"
+
     if [[ -n "${RUN_HOST_OVERRIDE}" ]]; then
-	vmname="${RUN_HOST_OVERRIDE}"
-	full_vmname="$(full_vm_name "${vmname}")"
+        vmname="${RUN_HOST_OVERRIDE}"
+        local full_vmname
+        local ip
+        full_vmname="$(full_vm_name "${vmname}")"
         ip=$(get_vm_ip "${full_vmname}")
-	set_vm_property "${vmname}" "ip" "${ip}"
+        set_vm_property "${vmname}" "ip" "${ip}"
         set_vm_property "${vmname}" "ssh_port" "22"
         set_vm_property "${vmname}" "api_port" "6443"
         set_vm_property "${vmname}" "lb_port" "5678"
     fi
 
-    shift
+    echo "${vmname}"
+}
 
+# Run the tests for the current scenario
+run_tests() {
+    local vmname="${1}"
+    # Handle RUN_HOST_OVERRIDE
+    vmname=$(apply_host_override "${vmname}")
+
+    shift
     echo "Running tests with $# args" "$@"
 
     if [ ! -d "${RF_VENV}" ]; then
@@ -1016,6 +1027,7 @@ run_tests() {
         local -r api_port=$(get_vm_property "${vmname}" "api_port")
         local -r lb_port=$(get_vm_property "${vmname}" "lb_port")
         local -r vm_ip=$(get_vm_property "${vmname}" "ip")
+        local -r full_vmname="$(full_vm_name "${vmname}")"
 
         local variable_file="${SCENARIO_INFO_DIR}/${SCENARIO}/variables.yaml"
         echo "Writing variables to ${variable_file}"
@@ -1053,6 +1065,7 @@ EOF
     if ! ${timeout_robot} \
         --name "${SCENARIO}" \
         --randomize "${TEST_RANDOMIZATION}" \
+        --exclude "${TEST_EXCLUDES}" \
         --loglevel TRACE \
         --listener "${TESTDIR}/resources/sos-on-failure-listener.py" \
         --pythonpath "${TESTDIR}/resources" \
@@ -1066,6 +1079,93 @@ EOF
             record_junit "${vmname}" "run_test_timed_out_${TEST_EXECUTION_TIMEOUT}" "FAILED"
         fi
         return 1
+    fi
+}
+
+# Implementation of Gingko tests
+run_gingko_tests() {
+    local vmname="${1}"
+    shift
+
+    # Handle RUN_HOST_OVERRIDE
+    vmname=$(apply_host_override "${vmname}")
+
+    # Save current directory
+    pushd . &>/dev/null
+
+    # Check/install oc
+    "${ROOTDIR}/scripts/fetch_tools.sh" "oc" || {
+        record_junit "${vmname}" "oc_installed" "FAILED"
+        exit 1
+    }
+
+    # Check/get openshift-tests-binary
+    if ! "${ROOTDIR}/scripts/fetch_tools.sh" "ginkgo"; then
+        record_junit "${vmname}" "build_test_binary" "FAILED"
+        exit 1
+    fi
+    record_junit "${vmname}" "build_test_binary" "OK"
+
+    # Set up test environment variables
+    local kubeconfig="${SCENARIO_INFO_DIR}/${SCENARIO}/kubeconfig"
+    local -r test_results_dir="${SCENARIO_INFO_DIR}/${SCENARIO}/gingko-results"
+    mkdir -p "${test_results_dir}"
+
+    # Set up kubeconfig for tests
+    local -r vm_ip=$(get_vm_property "${vmname}" "ip")
+    local -r full_vmname="$(full_vm_name "${vmname}")"
+
+    # Wait for MicroShift to be ready
+    if ! wait_for_greenboot "${full_vmname}" "${vm_ip}"; then
+        record_junit "${vmname}" "pre_test_greenboot_check" "FAILED"
+        popd &>/dev/null
+        exit 1
+    fi
+    record_junit "${vmname}" "pre_test_greenboot_check" "OK"
+
+    # Get kubeconfig from VM
+    run_command_on_vm "${vmname}" "sudo cat /var/lib/microshift/resources/kubeadmin/${vm_ip}/kubeconfig" > "${kubeconfig}"
+    export KUBECONFIG="${kubeconfig}"
+    record_junit "${vmname}" "setup_kubeconfig" "OK"
+
+    # Create case selection file
+    local case_selected="${test_results_dir}/case_selected"
+
+    # Get all MicroShift tests using dry-run
+    "${GINKGO_TEST_BINARY}" run all --dry-run | grep -E "MicroShift" > "${case_selected}"
+
+    # Apply filters if provided
+    if [[ $# -gt 0 ]]; then
+        local -r filter_pattern="$1"
+        echo "Applying filter: ${filter_pattern}"
+        if [[ "${filter_pattern}" == ~* ]]; then
+            sed -i "/${filter_pattern#~}/d" "${case_selected}"
+        else
+            sed -i -n "/${filter_pattern}/p" "${case_selected}"
+        fi
+        echo "Running Ginkgo tests with MicroShift filter and additional filter: ${filter_pattern}..."
+    else
+        echo "Running Ginkgo tests with MicroShift filter..."
+    fi
+
+    echo "------------------Selected test cases------------------"
+    cat "${case_selected}"
+    echo "-----------------------------------------------------"
+
+    # Run the tests and capture output
+    if ! "${GINKGO_TEST_BINARY}" run --timeout 60m --junit-dir="${test_results_dir}" -f "${case_selected}" 2>&1 | tee "${test_results_dir}/test-output.log"; then
+        record_junit "${vmname}" "run_gingko_tests" "FAILED"
+        return 1
+    fi
+
+    record_junit "${vmname}" "run_gingko_tests" "OK"
+    popd &>/dev/null
+
+    # Display results summary
+    echo "Gingko test execution completed"
+    echo "Results are available in: ${test_results_dir}"
+    if [[ -f "${test_results_dir}/test-output.log" ]]; then
+        echo "Test output log: ${test_results_dir}/test-output.log"
     fi
 }
 
@@ -1224,11 +1324,10 @@ action_run() {
 
     if [ $# -eq 0 ]; then
         RUN_HOST_OVERRIDE=""
-	check_dependencies
+        check_dependencies
     else
         RUN_HOST_OVERRIDE="$1"
     fi
-
     scenario_run_tests
     record_junit "run" "scenario_run_tests" "OK"
 }
