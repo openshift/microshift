@@ -1,9 +1,3 @@
-- cluster-kube-controller-manager-operator embedded-component 3dfbb67635ce056fd55c360937be9868a3cf8ad5 to 5bc489fc5aebb89eb7990ae5a3a316d265afa78b
-  - 6841675 2025-08-20T14:02:50+02:00 certrotationcontroller: set RefreshOnlyWhenExpired for CA bundle
-
-- kubernetes image-arm64 b5229e8311fe15cd8e9a70de2279868726b19f84 to 335be3a93cc6f48d84e5e6cd515ef748efb9664b
-  - 1d12f380f 2025-09-10T08:02:47+00:00 UPSTREAM: <carry>: Fix tests after backport
-  - 1cbed1808 2025-09-10T08:02:47+00:00 UPSTREAM: 131725: Avoid encoding in LogResponseObject when we are not going to use it
-  - ad91dd2ca 2025-09-10T08:02:47+00:00 UPSTREAM: 131694: Eliminate AuditContext`s SetEventLevel
-  - 4d0bfe23b 2025-09-10T08:02:47+00:00 UPSTREAM: 129472: Fix API server crash on concurrent map iteration and write
+- machine-config-operator embedded-component 37499cebe4e30aea812eb2a0e0cb5ed9ee961c5f to 9c2ef56a15a271c5e2332d648f012f867bd1c147
+  - 157956c5 2025-09-16T20:33:23+00:00 OCPBUGS-61695: Override NMState service definition
 
