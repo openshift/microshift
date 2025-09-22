@@ -26,6 +26,7 @@ import (
 
 	"github.com/apparentlymart/go-cidr/cidr"
 	"github.com/openshift/microshift/pkg/util"
+	"github.com/openshift/microshift/pkg/version"
 	"github.com/vishvananda/netlink"
 )
 
@@ -497,6 +498,11 @@ func (c *Config) updateComputedValues() error {
 	c.ApiServer.TLS.UpdateValues()
 
 	c.computeLoggingSetting()
+
+	versionInfo := version.Get()
+	if versionInfo.Variant == version.VariantCommunity {
+		c.Telemetry = Telemetry{Status: StatusDisabled}
+	}
 
 	return nil
 }

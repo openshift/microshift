@@ -31,10 +31,7 @@ var (
 	variant string
 )
 
-const (
-	VariantOkd = "community"
-	VariantOcp = "enterprise"
-)
+const VariantCommunity = "community"
 
 type Info struct {
 	version.Info

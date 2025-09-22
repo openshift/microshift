@@ -60,7 +60,7 @@ func (t *TelemetryManager) Run(ctx context.Context, ready chan<- struct{}, stopp
 	// to stop gracefully.
 	defer close(stopped)
 	if t.config.Telemetry.Status == config.StatusDisabled {
-		if info := version.Get(); info.Variant == version.VariantOkd {
+		if info := version.Get(); info.Variant == version.VariantCommunity {
 			klog.Info("Telemetry is disabled in community build")
 		} else {
 			klog.Info("Telemetry is disabled")
