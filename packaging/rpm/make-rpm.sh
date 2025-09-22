@@ -2,7 +2,7 @@
 set -e -o pipefail
 
 # must be passed down to this script from Makefile
-ENV_VARS="MICROSHIFT_VERSION RPM_RELEASE SOURCE_GIT_TAG SOURCE_GIT_TREE_STATE WITH_KINDNET"
+ENV_VARS="MICROSHIFT_VERSION RPM_RELEASE SOURCE_GIT_TAG SOURCE_GIT_TREE_STATE WITH_KINDNET "
 for env in ${ENV_VARS} ; do
   if [[ -z "${!env}" ]] ; then
     echo "Error: Mandatory environment variable '${env}' is missing"

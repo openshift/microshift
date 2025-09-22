@@ -27,11 +27,19 @@ var (
 	buildDate string
 	// state of git tree, either "clean" or "dirty"
 	gitTreeState string
+	// releaseStream specifies whether microshift is compiled from OCP or OKD
+	variant string
+)
+
+const (
+	VariantOkd = "community"
+	VariantOcp = "enterprise"
 )
 
 type Info struct {
 	version.Info
-	Patch string `json:"patch"`
+	Variant string
+	Patch   string `json:"patch"`
 }
 
 // Get returns the overall codebase version. It's for detecting
@@ -49,7 +57,8 @@ func Get() Info {
 			Compiler:     runtime.Compiler,
 			Platform:     fmt.Sprintf("%s/%s", runtime.GOOS, runtime.GOARCH),
 		},
-		Patch: patchFromGit,
+		Patch:   patchFromGit,
+		Variant: variant,
 	}
 }
 

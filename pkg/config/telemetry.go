@@ -3,6 +3,8 @@ package config
 import (
 	"fmt"
 	"net/url"
+
+	"github.com/openshift/microshift/pkg/version"
 )
 
 const (
@@ -28,6 +30,11 @@ type Telemetry struct {
 }
 
 func telemetryDefaults() Telemetry {
+	if statusPreemptedByBuildVariant() {
+		return Telemetry{
+			Status: StatusDisabled,
+		}
+	}
 	return Telemetry{
 		Status:   StatusEnabled,
 		Endpoint: defaultEndpoint,
@@ -44,4 +51,9 @@ func (t *Telemetry) validate() error {
 		}
 	}
 	return nil
+}
+
+func statusPreemptedByBuildVariant() bool {
+	buildInfo := version.Get()
+	return buildInfo.Variant == version.VariantOkd
 }
