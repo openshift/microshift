@@ -7,7 +7,7 @@ SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # shellcheck source=test/bin/common.sh
 source "${SCRIPTDIR}/common.sh"
 
-AWS_BUCKET_NAME="${AWS_BUCKET_NAME:-microshift-build-cache}"
+AWS_BUCKET_NAME="microshift-ushift-6155-cache-us-west-2"
 BCH_SUBDIR=
 TAG_SUBDIR=
 
