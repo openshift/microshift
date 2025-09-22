@@ -43,6 +43,7 @@ RUN firewall-offline-cmd --zone=public --add-port=22/tcp && \
     firewall-offline-cmd --zone=public --add-port=443/tcp && \
     firewall-offline-cmd --zone=public --add-port=5353/udp && \
     firewall-offline-cmd --zone=public --add-port=6443/tcp && \
+    firewall-offline-cmd --zone=public --add-port=8889/tcp && \
     firewall-offline-cmd --zone=public --add-port=30000-32767/tcp && \
     firewall-offline-cmd --zone=public --add-port=30000-32767/udp
 
