@@ -138,5 +138,5 @@ export BREW_EC_RELEASE_VERSION
 export BREW_NIGHTLY_RELEASE_VERSION
 
 # Set the release type to ec, rc or zstream
-LATEST_RELEASE_TYPE="ec"
+LATEST_RELEASE_TYPE="rc"
 export LATEST_RELEASE_TYPE
