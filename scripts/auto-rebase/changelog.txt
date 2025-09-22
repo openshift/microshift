@@ -1,20 +1,28 @@
-- kubernetes embedded-component ce407c5220d03860b36d8640286ae48521a0dc18 to 025ecb69829d3460be23445db21f17dceef31dbd
-  - 17d4a6bad 2025-08-28T13:35:36+02:00 UPSTREAM: 127757: scheduler: Improve CSILimits plugin accuracy by using VolumeAttachments
+- cluster-network-operator embedded-component 28b6eb3392f935ccc63d77ba307dbda7695b6adf to c766c4635a43a0e8eede94b6782e9b6b35ddcb27
+  - d4fd19f 2025-09-03T20:19:37-04:00 Manual feature backport of cert rotation for whereabouts
 
-- machine-config-operator embedded-component b7c4291575a0de49d5951cd72f5425f49738463f to d683459eff679a5d133bdf2d86cf90a3e781a752
-  - 94f00780 2025-07-29T14:46:54+00:00 OCPBUGS-57484: Handle migration from OpenShift SDN
-  - 8a250775 2025-07-29T14:46:54+00:00 OPNET-681: Support migration from configure-ovs to NMState
-  - c57a4924 2025-05-27T16:54:55+00:00 OCPBUGS-36859: Support NODEIP_HINT in IPI deployments too
+- kubernetes embedded-component 025ecb69829d3460be23445db21f17dceef31dbd to c3b3eee783f6d6636cc65d3553b9802f2138e19e
+  - 8e70b6276 2025-08-26T11:35:33-04:00 UPSTREAM: <carry>: remove the backward compat featuregate for 132028
+  - 22692b9e8 2025-08-26T09:18:39-04:00 UPSTREAM: 132028: podresources: list: use active pods in list
 
-- operator-framework-olm embedded-component 14f5ca00370ba75eaae689caba5ee86aa411ea74 to 062eb821df5ca4b5d52a0614a46da3c02aaa4dae
-  - da1a2aff 2025-08-22T01:58:34+00:00 Upstream: <carry>: regenerate manifests
-  - ac1296a7 2025-08-22T01:58:34+00:00 Upstream: 3580: add NetworkPolicy as a supported kind
-  - f9600cd4 2025-08-22T01:58:34+00:00 Upstream: <carry>: Add allow-all networkpolicy for openshift-operators namespace
-  - b78fe802 2025-08-22T01:58:34+00:00 Upstream: 1675: Add NetworkPolicy as a supported kind
+- machine-config-operator embedded-component d683459eff679a5d133bdf2d86cf90a3e781a752 to 3dd385cc383a380e85ed258b738b089981e02df5
+  - 3c7c8c00 2025-09-17T13:45:00+00:00 OCPBUGS-61695: Override NMState service definition
 
-- kubernetes image-amd64 ce407c5220d03860b36d8640286ae48521a0dc18 to 025ecb69829d3460be23445db21f17dceef31dbd
-  - 17d4a6bad 2025-08-28T13:35:36+02:00 UPSTREAM: 127757: scheduler: Improve CSILimits plugin accuracy by using VolumeAttachments
+- openshift-controller-manager embedded-component 47841f6ebaedab0ac83ee904793273377daf0894 to 967faa66125ae77148df87d8394d07112c4c0b8c
+  - 6513286 2025-09-03T14:02:35+00:00 legacy image pull secret rollback controller
+  - 9c1da85 2025-09-03T14:02:35+00:00 introduce rollback controllers
 
-- kubernetes image-arm64 ce407c5220d03860b36d8640286ae48521a0dc18 to 025ecb69829d3460be23445db21f17dceef31dbd
-  - 17d4a6bad 2025-08-28T13:35:36+02:00 UPSTREAM: 127757: scheduler: Improve CSILimits plugin accuracy by using VolumeAttachments
+- operator-framework-olm embedded-component 062eb821df5ca4b5d52a0614a46da3c02aaa4dae to 12fbe1b70635c5c100a6a5fc5734280a17a95c3d
+  - ca3d423c 2025-09-06T18:04:53+02:00 UPSTREAM: <carry>: make downstream csv namespace labeler plugin e2e more resilient to race conditions
+  - 14004cfb 2025-09-06T18:04:53+02:00 Make PSA catalog tests more resilient (#3645)
+  - 458af641 2025-09-06T18:04:53+02:00 refactor ensure job to remove named parameters (#3644)
+  - aeb5d64b 2025-09-06T18:04:53+02:00 Disable FailForward bad resource e2e (#3572)
+
+- kubernetes image-amd64 025ecb69829d3460be23445db21f17dceef31dbd to c3b3eee783f6d6636cc65d3553b9802f2138e19e
+  - 8e70b6276 2025-08-26T11:35:33-04:00 UPSTREAM: <carry>: remove the backward compat featuregate for 132028
+  - 22692b9e8 2025-08-26T09:18:39-04:00 UPSTREAM: 132028: podresources: list: use active pods in list
+
+- kubernetes image-arm64 025ecb69829d3460be23445db21f17dceef31dbd to c3b3eee783f6d6636cc65d3553b9802f2138e19e
+  - 8e70b6276 2025-08-26T11:35:33-04:00 UPSTREAM: <carry>: remove the backward compat featuregate for 132028
+  - 22692b9e8 2025-08-26T09:18:39-04:00 UPSTREAM: 132028: podresources: list: use active pods in list
 
