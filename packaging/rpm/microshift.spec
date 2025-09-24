@@ -39,8 +39,8 @@
 %{!?with_kindnet: %global with_kindnet 0}
 # Don't build topolvm subpackage by default
 %{!?with_topolvm: %global with_topolvm 0}
-# Enable OCP telemetry by default. Disabled when variant==community
-%{!?variant: %global variant enterprise}
+# Enable OCP telemetry by default. Disabled when microshift_variant==community
+%{!?microshift_variant: %global microshift_variant enterprise}
 
 Name: microshift
 Version: %{version}
@@ -309,9 +309,9 @@ GOARCH=amd64
 
 # if we have git commit/tag/state to be embedded in the binary pass it down to the makefile
 %if %{defined embedded_git_commit}
-make _build_local GOOS=${GOOS} GOARCH=${GOARCH} EMBEDDED_GIT_COMMIT=%{commit} EMBEDDED_GIT_TAG=%{embedded_git_tag} EMBEDDED_GIT_TREE_STATE=%{embedded_git_tree_state} MICROSHIFT_VERSION=%{version} VARIANT=%{variant}
+make _build_local GOOS=${GOOS} GOARCH=${GOARCH} EMBEDDED_GIT_COMMIT=%{commit} EMBEDDED_GIT_TAG=%{embedded_git_tag} EMBEDDED_GIT_TREE_STATE=%{embedded_git_tree_state} MICROSHIFT_VERSION=%{version} MICROSHIFT_VARIANT=%{microshift_variant}
 %else
-make _build_local GOOS=${GOOS} GOARCH=${GOARCH} MICROSHIFT_VERSION=%{version} EMBEDDED_GIT_COMMIT=%{commit} VARIANT=%{variant}
+make _build_local GOOS=${GOOS} GOARCH=${GOARCH} MICROSHIFT_VERSION=%{version} EMBEDDED_GIT_COMMIT=%{commit} MICROSHIFT_VARIANT=%{microshift_variant}
 %endif
 
 cp ./_output/bin/${GOOS}_${GOARCH}/microshift ./_output/microshift

@@ -500,7 +500,7 @@ func (c *Config) updateComputedValues() error {
 	c.computeLoggingSetting()
 
 	versionInfo := version.Get()
-	if versionInfo.Variant == version.VariantCommunity {
+	if versionInfo.BuildVariant == version.BuildVariantCommunity {
 		c.Telemetry = Telemetry{Status: StatusDisabled}
 	}
 

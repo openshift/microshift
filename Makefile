@@ -32,10 +32,10 @@ SRC_ROOT :=$(shell pwd)
 
 WITH_KINDNET ?= 0
 WITH_TOPOLVM ?= 0
-# VARIANT: specify this make variable to build microshift with community feature set.
-# If VARIANT is unset or != community, build MicroShift with enterprise feature set, which requires openshift pull-secret.
+# MICROSHIFT_VARIANT: specify this make variable to build microshift with community feature set.
+# If MICROSHIFT_VARIANT is unset or != community, build MicroShift with enterprise feature set, which requires openshift pull-secret.
 # OCP telemetry is disabled in community version.
-VARIANT ?= enterprise
+MICROSHIFT_VARIANT ?= enterprise
 
 OUTPUT_DIR :=_output
 RPM_BUILD_DIR :=$(OUTPUT_DIR)/rpmbuild
@@ -84,7 +84,7 @@ GO_LD_FLAGS := $(GC_FLAGS) -ldflags " \
                    -X github.com/openshift/microshift/pkg/version.commitFromGit=$(EMBEDDED_GIT_COMMIT) \
                    -X github.com/openshift/microshift/pkg/version.gitTreeState=$(EMBEDDED_GIT_TREE_STATE) \
                    -X github.com/openshift/microshift/pkg/version.buildDate=$(BIN_TIMESTAMP) \
-				   -X github.com/openshift/microshift/pkg/version.variant=$(VARIANT) \
+				   -X github.com/openshift/microshift/pkg/version.buildVariant=$(MICROSHIFT_VARIANT) \
                    $(LD_FLAGS)"
 
 debug:
@@ -277,7 +277,7 @@ rpm:
 	SOURCE_GIT_TREE_STATE=${SOURCE_GIT_TREE_STATE} \
 	WITH_KINDNET=${WITH_KINDNET} \
 	WITH_TOPOLVM=${WITH_TOPOLVM} \
-	VARIANT=${VARIANT} \
+	MICROSHIFT_VARIANT=${MICROSHIFT_VARIANT} \
 	./packaging/rpm/make-rpm.sh rpm local
 .PHONY: rpm
 
@@ -289,7 +289,7 @@ srpm:
 	SOURCE_GIT_TREE_STATE=${SOURCE_GIT_TREE_STATE} \
 	WITH_KINDNET=${WITH_KINDNET} \
 	WITH_TOPOLVM=${WITH_TOPOLVM} \
-	VARIANT=${VARIANT} \
+	MICROSHIFT_VARIANT=${MICROSHIFT_VARIANT} \
 	./packaging/rpm/make-rpm.sh srpm local
 .PHONY: srpm
 
