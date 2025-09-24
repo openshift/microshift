@@ -1152,8 +1152,21 @@ run_gingko_tests() {
     cat "${case_selected}"
     echo "-----------------------------------------------------"
 
-    # Run the tests and capture output
-    if ! "${GINKGO_TEST_BINARY}" run --timeout 60m --junit-dir="${test_results_dir}" -f "${case_selected}" 2>&1 | tee "${test_results_dir}/test-output.log"; then
+    # Make sure the test execution times out after a predefined period.
+    # The 'timeout' command sends the HUP signal and, if the test does not
+    # exit after 5m, it sends the KILL signal to terminate the process.
+    local timeout_ginkgo="timeout -v --kill-after=5m ${TEST_EXECUTION_TIMEOUT} ${GINKGO_TEST_BINARY}"
+    if [ -t 0 ]; then
+        # Disable timeout for interactive mode when stdin is a terminal.
+        # This is necessary for proper handling of test interruption by user.
+        timeout_ginkgo="${GINKGO_TEST_BINARY}"
+    fi
+
+    # Run the tests and capture output with 10m timeout for every test case
+    if ! "${timeout_ginkgo}" run --timeout 10m --junit-dir="${test_results_dir}" -f "${case_selected}" 2>&1 | tee "${test_results_dir}/test-output.log"; then
+        if [ $? -ge 124 ] ; then
+            record_junit "${vmname}" "run_test_timed_out_${TEST_EXECUTION_TIMEOUT}" "FAILED"
+        fi
         record_junit "${vmname}" "run_gingko_tests" "FAILED"
         return 1
     fi
