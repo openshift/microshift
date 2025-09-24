@@ -113,7 +113,6 @@ def set_rpm_version_info_vars():
     global BREW_Y2_RELEASE_VERSION
     global BREW_RC_RELEASE_VERSION
     global BREW_EC_RELEASE_VERSION
-    global BREW_NIGHTLY_RELEASE_VERSION
 
     FAKE_NEXT_MINOR_VERSION = common.get_env_var('FAKE_NEXT_MINOR_VERSION')
     PREVIOUS_RELEASE_REPO = common.get_env_var('PREVIOUS_RELEASE_REPO')
@@ -125,7 +124,6 @@ def set_rpm_version_info_vars():
     BREW_Y2_RELEASE_VERSION = common.get_env_var('BREW_Y2_RELEASE_VERSION')
     BREW_RC_RELEASE_VERSION = common.get_env_var('BREW_RC_RELEASE_VERSION')
     BREW_EC_RELEASE_VERSION = common.get_env_var('BREW_EC_RELEASE_VERSION')
-    BREW_NIGHTLY_RELEASE_VERSION = common.get_env_var('BREW_NIGHTLY_RELEASE_VERSION')
 
     # The source versions are deduced from the locally built RPMs
     global SOURCE_VERSION
@@ -642,8 +640,6 @@ def main():
                 extract_container_images(BREW_RC_RELEASE_VERSION, BREW_REPO, CONTAINER_LIST, args.dry_run)
             if BREW_EC_RELEASE_VERSION:
                 extract_container_images(BREW_EC_RELEASE_VERSION, BREW_REPO, CONTAINER_LIST, args.dry_run)
-            if BREW_NIGHTLY_RELEASE_VERSION:
-                extract_container_images(BREW_NIGHTLY_RELEASE_VERSION, BREW_REPO, CONTAINER_LIST, args.dry_run)
         # Sort the images list, only leaving unique entries
         common.sort_uniq_file(CONTAINER_LIST)
 
