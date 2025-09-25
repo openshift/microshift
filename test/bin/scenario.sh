@@ -1159,11 +1159,12 @@ run_gingko_tests() {
     if [ -t 0 ]; then
         # Disable timeout for interactive mode when stdin is a terminal.
         # This is necessary for proper handling of test interruption by user.
+        # shellcheck disable=SC2034
         timeout_ginkgo="${GINKGO_TEST_BINARY}"
     fi
 
     # Run the tests and capture output with 10m timeout for every test case
-    if ! "${timeout_ginkgo} run --timeout 10m --junit-dir=${test_results_dir} -f ${case_selected}" 2>&1 | tee "${test_results_dir}/test-output.log"; then
+    if ! eval '"${timeout_ginkgo}" run --timeout 10m --junit-dir="${test_results_dir}" -f "${case_selected}"' 2>&1 | tee "${test_results_dir}/test-output.log"; then
         if [ $? -ge 124 ] ; then
             record_junit "${vmname}" "run_test_timed_out_${TEST_EXECUTION_TIMEOUT}" "FAILED"
         fi
