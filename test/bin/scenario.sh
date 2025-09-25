@@ -1163,7 +1163,7 @@ run_gingko_tests() {
     fi
 
     # Run the tests and capture output with 10m timeout for every test case
-    if ! "${timeout_ginkgo}" run --timeout 10m --junit-dir="${test_results_dir}" -f "${case_selected}" 2>&1 | tee "${test_results_dir}/test-output.log"; then
+    if ! "${timeout_ginkgo} run --timeout 10m --junit-dir=${test_results_dir} -f ${case_selected}" 2>&1 | tee "${test_results_dir}/test-output.log"; then
         if [ $? -ge 124 ] ; then
             record_junit "${vmname}" "run_test_timed_out_${TEST_EXECUTION_TIMEOUT}" "FAILED"
         fi
