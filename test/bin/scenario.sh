@@ -1139,7 +1139,7 @@ run_gingko_tests() {
         local -r filter_pattern="$1"
         echo "Applying filter: ${filter_pattern}"
         if [[ "${filter_pattern}" == ~* ]]; then
-            sed -i "/${filter_pattern#~}/d" "${case_selected}"
+            sed -i "/${filter_pattern#\~}/d" "${case_selected}"
         else
             sed -i -n "/${filter_pattern}/p" "${case_selected}"
         fi
