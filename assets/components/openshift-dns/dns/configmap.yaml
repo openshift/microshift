@@ -22,6 +22,11 @@ data:
         cache 900 {
             denial 9984 30
         }
+
+        hosts /tmp/hosts {
+            fallthrough
+        }
+
         reload
     }
     hostname.bind:5353 {

@@ -299,6 +299,7 @@ func startDNSController(ctx context.Context, cfg *config.Config, kubeconfigPath 
 
 	extraParams := assets.RenderParams{
 		"ClusterIP": cfg.Network.DNS,
+		"HostsPath": cfg.DNS.HostsPath,
 	}
 	if err := assets.ApplyServices(ctx, svc, renderTemplate, renderParamsFromConfig(cfg, extraParams), kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply service %v %v", svc, err)
