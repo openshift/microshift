@@ -1,3 +1,0 @@
-- machine-config-operator embedded-component 37499cebe4e30aea812eb2a0e0cb5ed9ee961c5f to 9c2ef56a15a271c5e2332d648f012f867bd1c147
-  - 157956c5 2025-09-16T20:33:23+00:00 OCPBUGS-61695: Override NMState service definition
-
