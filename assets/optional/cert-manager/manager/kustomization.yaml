@@ -1,8 +1,75 @@
-resources:
-- manager.yaml
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
+resources:
+  - manager.yaml
+  - images.yaml
+replacements:
+  - source:
+      kind: Pod
+      name: cert-manager-images
+      fieldPath: spec.containers.[name=cert-manager-webhook].image
+    targets:
+      - select:
+          kind: Deployment
+          name: controller-manager
+        fieldPaths:
+          - spec.template.spec.containers.[name=cert-manager-operator].env.[name=RELATED_IMAGE_CERT_MANAGER_WEBHOOK].value
+  - source:
+      kind: Pod
+      name: cert-manager-images
+      fieldPath: spec.containers.[name=cert-manager-ca-injector].image
+    targets:
+      - select:
+          kind: Deployment
+          name: controller-manager
+        fieldPaths:
+          - spec.template.spec.containers.[name=cert-manager-operator].env.[name=RELATED_IMAGE_CERT_MANAGER_CA_INJECTOR].value
+  - source:
+      kind: Pod
+      name: cert-manager-images
+      fieldPath: spec.containers.[name=cert-manager-controller].image
+    targets:
+      - select:
+          kind: Deployment
+          name: controller-manager
+        fieldPaths:
+          - spec.template.spec.containers.[name=cert-manager-operator].env.[name=RELATED_IMAGE_CERT_MANAGER_CONTROLLER].value
+  - source:
+      kind: Pod
+      name: cert-manager-images
+      fieldPath: spec.containers.[name=cert-manager-acmesolver].image
+    targets:
+      - select:
+          kind: Deployment
+          name: controller-manager
+        fieldPaths:
+          - spec.template.spec.containers.[name=cert-manager-operator].env.[name=RELATED_IMAGE_CERT_MANAGER_ACMESOLVER].value
+  - source:
+      kind: Pod
+      name: cert-manager-images
+      fieldPath: spec.containers.[name=cert-manager-istiocsr].image
+    targets:
+      - select:
+          kind: Deployment
+          name: controller-manager
+        fieldPaths:
+          - spec.template.spec.containers.[name=cert-manager-operator].env.[name=RELATED_IMAGE_CERT_MANAGER_ISTIOCSR].value
 images:
-- name: controller
-  newName: registry.redhat.io/cert-manager/cert-manager-operator-rhel9@sha256
-  newTag: 4d5e238300ce6f427a1045d51d6b37a4e5c5633985208ebb44f91e7dd53897d9
+  - name: controller
+    newName: registry.redhat.io/cert-manager/cert-manager-operator-rhel9
+    digest: sha256:4d5e238300ce6f427a1045d51d6b37a4e5c5633985208ebb44f91e7dd53897d9
+  - name: cert-manager-istiocsr
+    newName: registry.redhat.io/cert-manager/cert-manager-istio-csr-rhel9
+    digest: sha256:9ea2c29a384b964cef14f853278821df3cd30320f25afab8823897192f67fc7e
+  - name: cert-manager-acmesolver
+    newName: registry.redhat.io/cert-manager/jetstack-cert-manager-acmesolver-rhel9
+    digest: sha256:4f7c045819c39e176a6090efdaba6ec736edf772d88fc87dd1c6fb33d3b5b26b
+  - name: cert-manager-webhook
+    newName: registry.redhat.io/cert-manager/jetstack-cert-manager-rhel9
+    digest: sha256:96d51e3a64bf30cbd92836c7cbd82f06edca16eef78ab1432757d34c16628659
+  - name: cert-manager-ca-injector
+    newName: registry.redhat.io/cert-manager/jetstack-cert-manager-rhel9
+    digest: sha256:96d51e3a64bf30cbd92836c7cbd82f06edca16eef78ab1432757d34c16628659
+  - name: cert-manager-controller
+    newName: registry.redhat.io/cert-manager/jetstack-cert-manager-rhel9
+    digest: sha256:96d51e3a64bf30cbd92836c7cbd82f06edca16eef78ab1432757d34c16628659
