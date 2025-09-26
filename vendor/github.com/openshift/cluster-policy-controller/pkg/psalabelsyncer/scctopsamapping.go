@@ -43,7 +43,15 @@ func convertSCCToPSALevel(namespace *corev1.Namespace, scc *securityv1.SecurityC
 		convert_allowPrivilegedContainer(scc.AllowPrivilegedContainer),
 		convert_allowedCapabilities(scc.AllowedCapabilities, scc.RequiredDropCapabilities),
 		convert_unsafeSysctls(scc.AllowedUnsafeSysctls),
-		convert_volumes(scc.Volumes),
+	)
+
+	if restrictivness, err := convert_volumes(scc.Volumes); err != nil {
+		return privileged, fmt.Errorf("failed to convert SCC %q in namespace %q: %w", scc.Name, namespace.Name, err)
+	} else {
+		sccRestrictivness = append(sccRestrictivness, restrictivness)
+	}
+
+	sccRestrictivness = append(sccRestrictivness,
 		convert_seLinuxOptions(&scc.SELinuxContext),
 		convert_seccompProfile(scc.SeccompProfiles),
 	)
@@ -252,7 +260,7 @@ func convert_runAsUser(
 
 }
 
-func convert_volumes(volumes []securityv1.FSType) uint8 {
+func convert_volumes(volumes []securityv1.FSType) (uint8, error) {
 	// upstream: check_restrictedVolumes
 	// restricted:
 	//   requires:
@@ -297,7 +305,7 @@ func convert_volumes(volumes []securityv1.FSType) uint8 {
 		switch v {
 		case securityv1.FSTypeAll,
 			securityv1.FSTypeHostPath:
-			return privileged
+			return privileged, nil
 		case securityv1.FSTypeConfigMap,
 			securityv1.FSTypeDownwardAPI,
 			securityv1.FSTypeEmptyDir,
@@ -335,12 +343,12 @@ func convert_volumes(volumes []securityv1.FSType) uint8 {
 				currentLevel = baseline
 			}
 		default:
-			panic(fmt.Errorf("unknown volume type: %s", v))
+			return unknown, fmt.Errorf("unknown volume type: %s", v)
 		}
 	}
 
 	// likely no volumes were configured -> defaults to none allowed
-	return currentLevel
+	return currentLevel, nil
 }
 
 func convert_seLinuxOptions(opts *securityv1.SELinuxContextStrategyOptions) uint8 {
