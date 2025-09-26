@@ -30,6 +30,6 @@ https://github.com/openshift/coredns image-arm64 6f39336e6da9dc77b2db140a96773c4
 https://github.com/openshift/csi-external-snapshotter image-arm64 42604822c25eb2aa0ecb017c24e328221b238eb9
 https://github.com/openshift/router image-arm64 96bfd2164c7885df9019ce9eeb79d506bd7e871b
 https://github.com/openshift/kube-rbac-proxy image-arm64 b9134351be37c43408334047d8eb85d0ac01fe4e
-https://github.com/openshift/ovn-kubernetes image-arm64 9741174157381d7b87e2d21559cbe06b8f2b5ebf
-https://github.com/openshift/kubernetes image-arm64 4dd0b884bb2c262877a3d2a5dc22604cef34fab1
-https://github.com/openshift/service-ca-operator image-arm64 b0fe556a981964728306f803864af9d2881db967
+https://github.com/openshift/ovn-kubernetes image-arm64 b0cdeab2f8c1100f6321adbd140944b6556cea3c
+https://github.com/openshift/kubernetes image-arm64 e0d42164c84ee27644b85a1d2c9bbb062066056d
+https://github.com/openshift/service-ca-operator image-arm64 37e0c31790b6a954214817974a56c9a699d0cf78

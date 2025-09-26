@@ -1,0 +1,23 @@
+- ovn-kubernetes image-arm64 9741174157381d7b87e2d21559cbe06b8f2b5ebf to b0cdeab2f8c1100f6321adbd140944b6556cea3c
+  - 77fe97ad 2025-09-16T12:16:32+00:00 OCPBUGS-61065: As part of DPF installation we are required to use OCP downstream image for dpu service. Dpu service uses upstream ovnkube.sh script that requires ovndb-raft-functions.sh as a dependency. This change copies it into the image as part of Dockerfile.base
+
+- kubernetes image-arm64 4dd0b884bb2c262877a3d2a5dc22604cef34fab1 to e0d42164c84ee27644b85a1d2c9bbb062066056d
+  - 97faade04 2025-09-12T10:21:48-04:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - 03e764d03 2025-09-09T19:43:57+00:00 Release commit for Kubernetes v1.33.5
+  - b246955af 2025-08-28T22:57:01+08:00 Fix missing control plane health check timeout
+  - c1a0f959a 2025-08-28T10:31:15+02:00 Add a note about Conflicts return value
+  - 2d6c21edd 2025-08-28T10:31:15+02:00 Fix SELinux label comparison
+  - fe2d1b268 2025-08-28T10:31:15+02:00 Add missing cases to SELinuxMount tests
+  - 9d0999731 2025-08-21T09:09:11-04:00 Remove patch/update from ServiceCIDR API conformance test
+  - 98b3daba8 2025-08-14T13:31:05+02:00 Bump dependencies, images and versions used to Go 1.24.6 and distroless iptables
+  - 0ae9d1d16 2025-08-13T14:40:41+00:00 Update CHANGELOG/CHANGELOG-1.33.md for v1.33.4
+  - d8676a24c 2025-07-22T08:21:08-04:00 Added NodeSelectors field to DriverDefinition
+  - b5fa540b2 2025-07-16T11:07:06+02:00 Mask Linux thermal interrupt info in /proc and /sys.
+
+- service-ca-operator image-arm64 b0fe556a981964728306f803864af9d2881db967 to 37e0c31790b6a954214817974a56c9a699d0cf78
+  - 48d03fa 2025-09-19T08:00:14+00:00 secret_creating_controller: improve hotloop tests
+  - a706ada 2025-09-19T08:00:14+00:00 secret_creating_controller: fix hotloop on create secret error
+  - d1c5846 2025-09-19T08:00:14+00:00 secret_creating_controller_test: cover failure with invalid name
+  - 7a0c5b5 2025-09-19T08:00:14+00:00 secret_creating_controller_test: add secretName to test struct
+  - b73098c 2025-09-19T08:00:14+00:00 secret_creating_controller_test: fix typo in test struct field name
+
