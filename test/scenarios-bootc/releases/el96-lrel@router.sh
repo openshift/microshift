@@ -1,7 +1,5 @@
 #!/bin/bash
 
-export TEST_EXCLUDES="ushift-6085"
-
 # Sourced from scenario.sh and uses functions defined there.
 
 scenario_create_vms() {
