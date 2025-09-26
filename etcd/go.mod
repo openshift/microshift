@@ -15,11 +15,11 @@ require (
 	github.com/openshift/build-machinery-go v0.0.0-20250602125535-1b6d00b8c37c
 	github.com/spf13/cobra v1.9.1
 	go.etcd.io/etcd/server/v3 v3.5.21
-	k8s.io/apimachinery v1.33.4
-	k8s.io/cli-runtime v1.33.4
-	k8s.io/component-base v1.33.4
+	k8s.io/apimachinery v1.33.5
+	k8s.io/cli-runtime v1.33.5
+	k8s.io/component-base v1.33.5
 	k8s.io/klog/v2 v2.130.1
-	k8s.io/kubectl v1.33.4
+	k8s.io/kubectl v1.33.5
 	sigs.k8s.io/yaml v1.5.0
 )
 
@@ -48,8 +48,8 @@ require (
 	google.golang.org/genproto/googleapis/api v0.0.0-20250115164207-1a7da9e5054f // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250115164207-1a7da9e5054f // indirect
 	gopkg.in/evanphx/json-patch.v4 v4.12.0 // indirect
-	k8s.io/apiserver v1.33.4 // indirect
-	k8s.io/kubelet v1.33.4 // indirect
+	k8s.io/apiserver v1.33.5 // indirect
+	k8s.io/kubelet v1.33.5 // indirect
 	sigs.k8s.io/randfill v1.0.0 // indirect
 )
 
@@ -138,8 +138,8 @@ require (
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
-	k8s.io/api v1.33.4 // indirect
-	k8s.io/client-go v1.33.4 // indirect
+	k8s.io/api v1.33.5 // indirect
+	k8s.io/client-go v1.33.5 // indirect
 	k8s.io/kube-openapi v0.0.0-20250318190949-c8a335a9a2ff // indirect
 	k8s.io/utils v0.0.0-20250604170112-4c0f3b243397 // indirect
 	sigs.k8s.io/json v0.0.0-20241014173422-cfa47c3a1cc8 // indirect
