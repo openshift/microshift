@@ -657,6 +657,10 @@ systemctl enable --now --quiet openvswitch || true
 
 %systemd_preun microshift.service
 
+%post greenboot
+# Make sure that the greenboot-healthcheck service is enabled
+systemctl is-enabled --quiet greenboot-healthcheck || systemctl enable --now --quiet greenboot-healthcheck
+
 %post multus
 # only for install, not on upgrades
 if [ $1 -eq 1 ]; then
@@ -809,6 +813,9 @@ fi
 # Use Git command to generate the log and replace the VERSION string
 # LANG=C git log --date="format:%a %b %d %Y" --pretty="tformat:* %cd %an <%ae> VERSION%n- %s%n" packaging/rpm/microshift.spec
 %changelog
+* Sun Sep 28 2025 Gregory Giguashvili <ggiguash@redhat.com> 4.21.0
+- Ensure greenboot-healthcheck service is enabled
+
 * Thu Sep 18 2025 Gregory Giguashvili <ggiguash@redhat.com> 4.21.0
 - Upgrade cri-o and cri-tools to v1.34
 
