@@ -1164,7 +1164,7 @@ run_gingko_tests() {
     fi
 
     # Run the tests and capture output with 10m timeout for every test case
-    echo "Gingko test execution started"
+    echo "Gingko test execution started..."
     ginkgo_result_success=true
     if ! eval '${timeout_ginkgo} run --timeout 10m --junit-dir=${test_results_dir} -f ${case_selected}' 2>&1 | tee "${test_results_dir}/test-output.log"; then
         if [ $? -ge 124 ] ; then
@@ -1173,6 +1173,9 @@ run_gingko_tests() {
         ginkgo_result_success=false
     fi
     echo "Gingko test execution completed"
+    if [[ -f "${test_results_dir}/test-output.log" ]]; then
+        echo "Test output log: ${test_results_dir}/test-output.log"
+    fi
 
     popd &>/dev/null
 
@@ -1186,15 +1189,19 @@ run_gingko_tests() {
             if [[ -f "${junit_file}" ]]; then
                 filename=$(basename "${junit_file}")
                 echo "Processing: ${filename}"
+
+                # Create backup
                 cp "${junit_file}" "${junit_file}.backup"
+
+                # Clean the XML
                 temp_file="${junit_file}.tmp"
-                if "${RF_VENV}"/bin/python3 "${HANDLERESULT_SCRIPT}" -a replace -i "${junit_file}" -o "${temp_file}" 2>/dev/null; then
+                if python3 "${HANDLERESULT_SCRIPT}" -a replace -i "${junit_file}" -o "${temp_file}" 2>/dev/null; then
                     mv "${temp_file}" "${junit_file}"
-                    echo "Cleaned: ${filename}"
-                    rm "${junit_file}.backup"
+                    echo "✓ Cleaned: ${filename}"
+                    rm "${junit_file}.backup"  # Remove backup on success
                 else
-                    echo "Failed to clean: ${filename} (restored from backup)"
-                    mv "${junit_file}.backup" "${junit_file}"
+                    echo "✗ Failed to clean: ${filename} (restored from backup)"
+                    mv "${junit_file}.backup" "${junit_file}"  # Restore from backup
                     cleanup_success=false
                 fi
             fi
@@ -1205,11 +1212,10 @@ run_gingko_tests() {
     echo "Results are available in: ${test_results_dir}"
     if [[ "${cleanup_success}" == "true" ]]; then
         echo "Unit XML files have been cleaned ('Monitor cluster while tests execute' test case removed)"
+        record_junit "${vmname}" "clean_junit_xml_files" "OK"
     else
         echo "Some XML files could not be cleaned (originals preserved)"
-    fi
-    if [[ -f "${test_results_dir}/test-output.log" ]]; then
-        echo "Test output log: ${test_results_dir}/test-output.log"
+        record_junit "${vmname}" "clean_junit_xml_files" "FAILED"
     fi
 
     # Record the junit result of the ginkgo tests
@@ -1217,6 +1223,7 @@ run_gingko_tests() {
         record_junit "${vmname}" "run_gingko_tests" "OK"
     else
         record_junit "${vmname}" "run_gingko_tests" "FAILED"
+        exit 1
     fi
 }
 
