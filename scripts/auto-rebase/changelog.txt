@@ -1,0 +1,11 @@
+- machine-config-operator embedded-component 9c2ef56a15a271c5e2332d648f012f867bd1c147 to ff3c19a3d01465a92be5045c25ebe94b41577785
+  - 2b5b7ce2 2025-09-23T13:37:19+00:00 install: improve CRD clean-up erroring
+
+- kubernetes image-arm64 335be3a93cc6f48d84e5e6cd515ef748efb9664b to 9fa6215ec67894ee1303a01eaf2fe833877d6e5a
+  - f3b550782 2025-09-15T10:18:58-04:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - cea7087b3 2025-09-09T19:37:58+00:00 Release commit for Kubernetes v1.32.9
+  - e181f9398 2025-08-28T22:57:52+08:00 Fix missing control plane health check timeout
+  - ac8c68b0e 2025-08-14T13:28:10+02:00 Bump images, dependencies and versions to go 1.23.12 and distroless iptables
+  - 00788a3a7 2025-08-13T14:49:52+00:00 Update CHANGELOG/CHANGELOG-1.32.md for v1.32.8
+  - 194b14475 2025-07-16T11:07:17+02:00 Mask Linux thermal interrupt info in /proc and /sys.
+
