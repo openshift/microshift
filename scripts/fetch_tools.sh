@@ -299,7 +299,7 @@ gettool_ginkgo() {
         chmod +x "${binary_path}"
         echo "Binary installed to ${binary_path}"
 
-	# Copy handleresult.py to the tools directory
+	    # Copy handleresult.py to the tools directory
         if [[ -f "${clone_dir}/pipeline/handleresult.py" ]] && [[ -f "${HANDLERESULT_SCRIPT}" ]]; then
             cp "${clone_dir}/pipeline/handleresult.py" "${HANDLERESULT_SCRIPT}"
             chmod +x "${HANDLERESULT_SCRIPT}"
