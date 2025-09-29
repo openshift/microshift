@@ -132,15 +132,25 @@ BREW_Y1_RELEASE_VERSION="$(get_vrel_from_rpm "${BREW_RPM_SOURCE}/4.${PREVIOUS_MI
 BREW_Y2_RELEASE_VERSION="$(get_vrel_from_rpm "${BREW_RPM_SOURCE}/4.${YMINUS2_MINOR_VERSION}-zstream/${UNAME_M}/")"
 BREW_RC_RELEASE_VERSION="$(get_vrel_from_rpm "${BREW_RPM_SOURCE}/4.${MINOR_VERSION}-rc/${UNAME_M}/")"
 BREW_EC_RELEASE_VERSION="$(get_vrel_from_rpm "${BREW_RPM_SOURCE}/4.${MINOR_VERSION}-ec/${UNAME_M}/")"
+
+# Set the release type to ec, rc or zstream
+LATEST_RELEASE_TYPE="ec"
+BREW_LREL_RELEASE_VERSION="${BREW_EC_RELEASE_VERSION}"
+
+# Fallback mechanism for the Y1 and Y2 versions: they must be set to be able to build the images
+# because the parent images for EC, RC or zstream versions are Y1 and Y2
+if [[ -z "${BREW_Y1_RELEASE_VERSION}" ]]; then
+    BREW_Y1_RELEASE_VERSION="${BREW_LREL_RELEASE_VERSION}"
+fi
+if [[ -z "${BREW_Y2_RELEASE_VERSION}" ]]; then
+    BREW_Y2_RELEASE_VERSION="${BREW_Y1_RELEASE_VERSION}"
+fi
+
+export LATEST_RELEASE_TYPE
+export BREW_LREL_RELEASE_VERSION
+
 export BREW_Y0_RELEASE_VERSION
 export BREW_Y1_RELEASE_VERSION
 export BREW_Y2_RELEASE_VERSION
 export BREW_RC_RELEASE_VERSION
 export BREW_EC_RELEASE_VERSION
-
-# Set the release type to ec, rc or zstream
-LATEST_RELEASE_TYPE="ec"
-export LATEST_RELEASE_TYPE
-
-BREW_LREL_RELEASE_VERSION="${BREW_EC_RELEASE_VERSION}"
-export BREW_LREL_RELEASE_VERSION
