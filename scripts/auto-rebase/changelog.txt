@@ -1,28 +1,19 @@
-- cluster-network-operator embedded-component 28b6eb3392f935ccc63d77ba307dbda7695b6adf to c766c4635a43a0e8eede94b6782e9b6b35ddcb27
-  - d4fd19f 2025-09-03T20:19:37-04:00 Manual feature backport of cert rotation for whereabouts
+- cluster-network-operator embedded-component c766c4635a43a0e8eede94b6782e9b6b35ddcb27 to 8894d2fd20ca1b3148d5283fe547e62282719eb2
+  - 4b6e118 2025-09-16T03:33:39-04:00 Remove fepan from the OWNERS_ALIASES file
+  - d866b5f 2025-09-16T03:13:39-04:00 Update CNO reviwers/approvers
+  - 6bfb3c3 2025-09-16T03:13:22-04:00 Owners: use aliases for core approvers / reviewers
 
-- kubernetes embedded-component 025ecb69829d3460be23445db21f17dceef31dbd to c3b3eee783f6d6636cc65d3553b9802f2138e19e
-  - 8e70b6276 2025-08-26T11:35:33-04:00 UPSTREAM: <carry>: remove the backward compat featuregate for 132028
-  - 22692b9e8 2025-08-26T09:18:39-04:00 UPSTREAM: 132028: podresources: list: use active pods in list
+- kubernetes embedded-component c3b3eee783f6d6636cc65d3553b9802f2138e19e to e7452e1231c1d182a9e47214e5363949d8807f77
+  - 475416520 2025-09-11T16:07:33-04:00 UPSTREAM: <carry>: Don't retry storage calls with side effects.
 
-- machine-config-operator embedded-component d683459eff679a5d133bdf2d86cf90a3e781a752 to 3dd385cc383a380e85ed258b738b089981e02df5
-  - 3c7c8c00 2025-09-17T13:45:00+00:00 OCPBUGS-61695: Override NMState service definition
+- machine-config-operator embedded-component 3dd385cc383a380e85ed258b738b089981e02df5 to 8b78e352d3f757404c75881d32278e7216fa85ed
+  - cb5faf3b 2025-08-26T13:47:09+00:00 Give bonding slaves time to implicitly activate.
+  - 5dccc609 2025-08-26T13:47:09+00:00 Revert "Race in configure-ovs.sh affects bonding interface configuration."
+  - 28ceb6ea 2025-08-26T13:47:09+00:00 Race in configure-ovs.sh affects bonding interface configuration.
 
-- openshift-controller-manager embedded-component 47841f6ebaedab0ac83ee904793273377daf0894 to 967faa66125ae77148df87d8394d07112c4c0b8c
-  - 6513286 2025-09-03T14:02:35+00:00 legacy image pull secret rollback controller
-  - 9c1da85 2025-09-03T14:02:35+00:00 introduce rollback controllers
+- kubernetes image-amd64 c3b3eee783f6d6636cc65d3553b9802f2138e19e to e7452e1231c1d182a9e47214e5363949d8807f77
+  - 475416520 2025-09-11T16:07:33-04:00 UPSTREAM: <carry>: Don't retry storage calls with side effects.
 
-- operator-framework-olm embedded-component 062eb821df5ca4b5d52a0614a46da3c02aaa4dae to 12fbe1b70635c5c100a6a5fc5734280a17a95c3d
-  - ca3d423c 2025-09-06T18:04:53+02:00 UPSTREAM: <carry>: make downstream csv namespace labeler plugin e2e more resilient to race conditions
-  - 14004cfb 2025-09-06T18:04:53+02:00 Make PSA catalog tests more resilient (#3645)
-  - 458af641 2025-09-06T18:04:53+02:00 refactor ensure job to remove named parameters (#3644)
-  - aeb5d64b 2025-09-06T18:04:53+02:00 Disable FailForward bad resource e2e (#3572)
-
-- kubernetes image-amd64 025ecb69829d3460be23445db21f17dceef31dbd to c3b3eee783f6d6636cc65d3553b9802f2138e19e
-  - 8e70b6276 2025-08-26T11:35:33-04:00 UPSTREAM: <carry>: remove the backward compat featuregate for 132028
-  - 22692b9e8 2025-08-26T09:18:39-04:00 UPSTREAM: 132028: podresources: list: use active pods in list
-
-- kubernetes image-arm64 025ecb69829d3460be23445db21f17dceef31dbd to c3b3eee783f6d6636cc65d3553b9802f2138e19e
-  - 8e70b6276 2025-08-26T11:35:33-04:00 UPSTREAM: <carry>: remove the backward compat featuregate for 132028
-  - 22692b9e8 2025-08-26T09:18:39-04:00 UPSTREAM: 132028: podresources: list: use active pods in list
+- kubernetes image-arm64 c3b3eee783f6d6636cc65d3553b9802f2138e19e to e7452e1231c1d182a9e47214e5363949d8807f77
+  - 475416520 2025-09-11T16:07:33-04:00 UPSTREAM: <carry>: Don't retry storage calls with side effects.
 
