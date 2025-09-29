@@ -288,6 +288,15 @@ gettool_ginkgo() {
         popd &>/dev/null
         return 1
     fi
+
+    # Copy handleresult.py to centralized location
+    if [[ -f "${clone_dir}/pipeline/handleresult.py" ]] && [[ -f "${HANDLERESULT_SCRIPT}" ]]; then
+        cp "${clone_dir}/pipeline/handleresult.py" "${HANDLERESULT_SCRIPT}"
+        chmod +x "${HANDLERESULT_SCRIPT}"
+        echo "handleresult.py installed to ${HANDLERESULT_SCRIPT}"
+    else
+        echo "Warning: pipeline/handleresult.py not found in repository"
+    fi
 }
 
 tool_getters=$(declare -F | awk '$3 ~ /^gettool_/ {print $3}' | sed 's/^gettool_//g')
