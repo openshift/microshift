@@ -207,6 +207,22 @@ gettool_oc() {
     popd &>/dev/null
 }
 
+gettool_opm() {
+    declare -A arch_map=(
+        ["x86_64"]="x86_64"
+        ["aarch64"]="arm64")
+
+    local arch="${arch_map[${ARCH}]}"
+
+    pushd "${WORK_DIR}" &>/dev/null
+
+    curl -s -f "https://mirror.openshift.com/pub/openshift-v4/${arch}/clients/ocp/latest/opm-linux-rhel9.tar.gz" -L -o "opm-linux-rhel9.tar.gz"
+    tar xvzf opm-linux-rhel9.tar.gz 
+    mv opm-rhel9 "${DEST_DIR}"/opm
+
+    popd &>/dev/null
+}
+
 gettool_brew() {
     # See https://spaces.redhat.com/display/Brew/Using+the+Brew+Prod+environment#UsingtheBrewProdenvironment-Fedora
     if ! command -v koji &>/dev/null ; then
@@ -275,13 +291,23 @@ gettool_ginkgo() {
     pushd "${clone_dir}" &>/dev/null
 
     local test_binary="./bin/extended-platform-tests"
-    go build -o "${test_binary}" ./cmd/extended-platform-tests
+    make build
 
     # Copy binary to centralized location
     if [[ -f "${test_binary}" ]]; then
         cp "${test_binary}" "${binary_path}"
         chmod +x "${binary_path}"
         echo "Binary installed to ${binary_path}"
+
+	    # Copy handleresult.py to the tools directory
+        if [[ -f "${clone_dir}/pipeline/handleresult.py" ]] && [[ -f "${HANDLERESULT_SCRIPT}" ]]; then
+            cp "${clone_dir}/pipeline/handleresult.py" "${HANDLERESULT_SCRIPT}"
+            chmod +x "${HANDLERESULT_SCRIPT}"
+            echo "handleresult.py installed to ${HANDLERESULT_SCRIPT}"
+        else
+            echo "Warning: pipeline/handleresult.py not found in repository"
+        fi
+
         popd &>/dev/null
     else
         echo "Error: Test binary not found after build"

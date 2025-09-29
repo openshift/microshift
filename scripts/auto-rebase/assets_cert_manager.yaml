@@ -31,9 +31,13 @@ assets:
       - file: cainjection_in_certmanagers.yaml
       - file: webhook_in_certmanagers.yaml
   - dir: optional/cert-manager/manager/
+    no_clean: True
     src: cert-manager-operator/config/manager/
     files:
       - file: kustomization.yaml
+        ignore: "Provided by MicroShift"      
+      - file: images.yaml
+        ignore: "Provided by MicroShift"      
       - file: manager.yaml
   - dir: optional/cert-manager/rbac/
     src: cert-manager-operator/config/rbac/

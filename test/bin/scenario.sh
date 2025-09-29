@@ -1139,7 +1139,7 @@ run_gingko_tests() {
         local -r filter_pattern="$1"
         echo "Applying filter: ${filter_pattern}"
         if [[ "${filter_pattern}" == ~* ]]; then
-            sed -i "/${filter_pattern#~}/d" "${case_selected}"
+            sed -i "/${filter_pattern#\~}/d" "${case_selected}"
         else
             sed -i -n "/${filter_pattern}/p" "${case_selected}"
         fi
@@ -1161,9 +1161,46 @@ run_gingko_tests() {
     record_junit "${vmname}" "run_gingko_tests" "OK"
     popd &>/dev/null
 
+    # Clean the JUnit XML files
+    echo "Cleaning JUnit XML files..."
+    cleanup_success=true
+
+    if [[ ! -f "${HANDLERESULT_SCRIPT}" ]]; then
+        echo "Warning: pipeline/handleresult.py not found. Skipping XML cleanup."
+    else
+        for junit_file in "${test_results_dir}"/junit_e2e_*.xml; do
+            if [[ -f "${junit_file}" ]]; then
+                filename=$(basename "${junit_file}")
+                echo "Processing: ${filename}"
+
+                # Create backup
+                cp "${junit_file}" "${junit_file}.backup"
+
+                # Clean the XML
+                temp_file="${junit_file}.tmp"
+                if python3 "${HANDLERESULT_SCRIPT}" -a replace -i "${junit_file}" -o "${temp_file}" 2>/dev/null; then
+                    mv "${temp_file}" "${junit_file}"
+
+                    echo "✓ Cleaned: ${filename}"
+                    rm "${junit_file}.backup"  # Remove backup on success
+                else
+                    echo "✗ Failed to clean: ${filename} (restored from backup)"
+                    mv "${junit_file}.backup" "${junit_file}"  # Restore from backup
+                    cleanup_success=false
+                fi
+            fi
+        done
+    fi
+
     # Display results summary
     echo "Gingko test execution completed"
     echo "Results are available in: ${test_results_dir}"
+    if [[ "${cleanup_success}" == "true" ]]; then
+      echo "✓ JUnit XML files have been cleaned (Monitor test cases removed)"
+    else
+      echo "⚠ Some XML files could not be cleaned (originals preserved)"
+    fi
+
     if [[ -f "${test_results_dir}/test-output.log" ]]; then
         echo "Test output log: ${test_results_dir}/test-output.log"
     fi
