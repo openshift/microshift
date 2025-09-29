@@ -25,6 +25,7 @@ import (
 	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/telemetry"
 	"github.com/openshift/microshift/pkg/util"
+	"github.com/openshift/microshift/pkg/version"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/klog/v2"
 )
@@ -60,6 +61,11 @@ func (t *TelemetryManager) Run(ctx context.Context, ready chan<- struct{}, stopp
 	defer close(stopped)
 	if t.config.Telemetry.Status == config.StatusDisabled {
 		klog.Info("Telemetry is disabled")
+		close(ready)
+		return nil
+	}
+	if info := version.Get(); info.BuildVariant == version.BuildVariantCommunity {
+		klog.Info("Telemetry is disabled in community build")
 		close(ready)
 		return nil
 	}
