@@ -275,7 +275,7 @@ gettool_ginkgo() {
     pushd "${clone_dir}" &>/dev/null
 
     local test_binary="./bin/extended-platform-tests"
-    go build -o "${test_binary}" ./cmd/extended-platform-tests
+    make build
 
     # Copy binary to centralized location
     if [[ -f "${test_binary}" ]]; then
