@@ -1,4 +1,12 @@
-- kubernetes image-arm64 a06f3261941734178f3c43db62a80cc5fc97f7ad to e2e5d628ce43695982002737a4d1f1c6eb30eb11
+- kubernetes embedded-component a06f3261941734178f3c43db62a80cc5fc97f7ad to e2e5d628ce43695982002737a4d1f1c6eb30eb11
+  - 2f8bedf06 2025-09-15T15:19:19-04:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - c601ba40f 2025-09-09T22:51:56+00:00 Release commit for Kubernetes v1.31.13
+  - 2ac4b0da7 2025-08-29T16:28:13+08:00 Fix missing control plane health check timeout
+  - 42d4a6111 2025-08-14T09:50:17+02:00 Bump images, dependencies and versions to go 1.23.12 and distroless iptables
+  - 877e6eab0 2025-08-13T14:48:00+00:00 Update CHANGELOG/CHANGELOG-1.31.md for v1.31.12
+  - c7b1b1f29 2025-07-16T11:07:28+02:00 Mask Linux thermal interrupt info in /proc and /sys.
+
+- kubernetes image-amd64 a06f3261941734178f3c43db62a80cc5fc97f7ad to e2e5d628ce43695982002737a4d1f1c6eb30eb11
   - 2f8bedf06 2025-09-15T15:19:19-04:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
   - c601ba40f 2025-09-09T22:51:56+00:00 Release commit for Kubernetes v1.31.13
   - 2ac4b0da7 2025-08-29T16:28:13+08:00 Fix missing control plane health check timeout
