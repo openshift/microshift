@@ -1164,21 +1164,21 @@ run_gingko_tests() {
     fi
 
     # Run the tests and capture output with 10m timeout for every test case
+    echo "Gingko test execution started"
+    ginkgo_result_success=true
     if ! eval '${timeout_ginkgo} run --timeout 10m --junit-dir=${test_results_dir} -f ${case_selected}' 2>&1 | tee "${test_results_dir}/test-output.log"; then
         if [ $? -ge 124 ] ; then
             record_junit "${vmname}" "run_test_timed_out_${TEST_EXECUTION_TIMEOUT}" "FAILED"
         fi
-        record_junit "${vmname}" "run_gingko_tests" "FAILED"
-        return 1
+        ginkgo_result_success=false
     fi
+    echo "Gingko test execution completed"
 
-    record_junit "${vmname}" "run_gingko_tests" "OK"
     popd &>/dev/null
 
     # Clean the JUnit XML files
     echo "Cleaning JUnit XML files to remove 'Monitor cluster while tests execute' test case"
     cleanup_success=true
-
     if [[ ! -f "${HANDLERESULT_SCRIPT}" ]]; then
         echo "Warning: ${HANDLERESULT_SCRIPT} not found. Skipping XML cleanup."
     else
@@ -1202,7 +1202,6 @@ run_gingko_tests() {
     fi
 
     # Display results summary
-    echo "Gingko test execution completed"
     echo "Results are available in: ${test_results_dir}"
     if [[ "${cleanup_success}" == "true" ]]; then
         echo "Unit XML files have been cleaned ('Monitor cluster while tests execute' test case removed)"
@@ -1211,6 +1210,13 @@ run_gingko_tests() {
     fi
     if [[ -f "${test_results_dir}/test-output.log" ]]; then
         echo "Test output log: ${test_results_dir}/test-output.log"
+    fi
+
+    # Record the junit result of the ginkgo tests
+    if [[ "${ginkgo_result_success}" == "true" ]]; then
+        record_junit "${vmname}" "run_gingko_tests" "OK"
+    else
+        record_junit "${vmname}" "run_gingko_tests" "FAILED"
     fi
 }
 
