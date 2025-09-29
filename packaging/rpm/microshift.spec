@@ -70,6 +70,11 @@ BuildRequires: golang
 
 Requires: cri-o >= 1.34.0, cri-o < 1.35.0
 Requires: cri-tools >= 1.34.0, cri-tools < 1.35.0
+# The container networking plugins package has been removed from RHEL 10 and
+# cri-o no longer has an explicit dependency on it.
+# Ensure that the package is installed on RHEL 9 as a weak dependency, skipping
+# the missing package when it is not available.
+Recommends: containernetworking-plugins
 Requires: iptables
 Requires: microshift-selinux = %{version}
 Requires: microshift-networking = %{version}
@@ -813,6 +818,9 @@ fi
 # Use Git command to generate the log and replace the VERSION string
 # LANG=C git log --date="format:%a %b %d %Y" --pretty="tformat:* %cd %an <%ae> VERSION%n- %s%n" packaging/rpm/microshift.spec
 %changelog
+* Mon Sep 29 2025 Gregory Giguashvili <ggiguash@redhat.com> 4.21.0
+- Ensure containernetworking-plugins package is installed on RHEL 9 as a weak dependency
+
 * Sun Sep 28 2025 Gregory Giguashvili <ggiguash@redhat.com> 4.21.0
 - Ensure greenboot-healthcheck service is enabled
 
