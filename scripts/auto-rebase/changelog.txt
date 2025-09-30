@@ -1,0 +1,86 @@
+- api embedded-component a2b450eb67b5b71cb2cfc1735b824167e56c0318 to 491784f55cb31c550e9a82f13166d7e08d800ae9
+  - 580e0168 2025-09-23T09:37:54-04:00 MachineConfigNode: add 'AGE' print column
+
+- cluster-csi-snapshot-controller-operator embedded-component 3880c9659829c9904e58a943050e8dfd4c9a79cb to 019abe0c7671962829eb91269e1d76916966320e
+  - 43329f9 2025-09-25T20:00:30+00:00 OCPBUGS-62247: add all-egress label to deployments on HCP and IBM
+
+- cluster-kube-controller-manager-operator embedded-component 90dc670123652d73f3fd8e5f40096bb665a917d5 to 5a7da72ce2d21fc0900b428334865d97f39f6037
+  - 53b575b 2025-09-25T12:52:37-04:00 Throttle resourcesynccontroller on pairs with dual writers.
+
+- cluster-policy-controller embedded-component 3e7538547c8f209c72083097a4ebaada6e9c46c5 to 47c783103216aa5e1242632127a5d8f98b8b7455
+  - 96c9a82 2025-09-22T12:56:29+00:00 fix(psalabelsyncer): return an error instead of panic when converting an unknown volume
+
+- kubernetes embedded-component 4dd0b884bb2c262877a3d2a5dc22604cef34fab1 to e0d42164c84ee27644b85a1d2c9bbb062066056d
+  - 97faade04 2025-09-12T10:21:48-04:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - 03e764d03 2025-09-09T19:43:57+00:00 Release commit for Kubernetes v1.33.5
+  - b246955af 2025-08-28T22:57:01+08:00 Fix missing control plane health check timeout
+  - c1a0f959a 2025-08-28T10:31:15+02:00 Add a note about Conflicts return value
+  - 2d6c21edd 2025-08-28T10:31:15+02:00 Fix SELinux label comparison
+  - fe2d1b268 2025-08-28T10:31:15+02:00 Add missing cases to SELinuxMount tests
+  - 9d0999731 2025-08-21T09:09:11-04:00 Remove patch/update from ServiceCIDR API conformance test
+  - 98b3daba8 2025-08-14T13:31:05+02:00 Bump dependencies, images and versions used to Go 1.24.6 and distroless iptables
+  - 0ae9d1d16 2025-08-13T14:40:41+00:00 Update CHANGELOG/CHANGELOG-1.33.md for v1.33.4
+  - d8676a24c 2025-07-22T08:21:08-04:00 Added NodeSelectors field to DriverDefinition
+  - b5fa540b2 2025-07-16T11:07:06+02:00 Mask Linux thermal interrupt info in /proc and /sys.
+
+- machine-config-operator embedded-component 73c8ce43d06e5ded0091e825cdea82d62ecbaec7 to c258b4ed3a457081e001c234ab289c5526572c64
+  - 1b779931 2025-09-22T15:04:19-04:00 install: improve CRD clean-up erroring
+  - 6924417f 2025-09-22T18:51:38+00:00 add new recording rule for unsuported packages
+  - b12cccf2 2025-09-18T00:39:30+00:00 Add nil/null checks to image registry secret decode
+  - 7a01da0b 2025-09-10T18:40:34+00:00 drain: re-cordon nodes if needed
+
+- service-ca-operator embedded-component b0fe556a981964728306f803864af9d2881db967 to 37e0c31790b6a954214817974a56c9a699d0cf78
+  - 48d03fa 2025-09-19T08:00:14+00:00 secret_creating_controller: improve hotloop tests
+  - a706ada 2025-09-19T08:00:14+00:00 secret_creating_controller: fix hotloop on create secret error
+  - d1c5846 2025-09-19T08:00:14+00:00 secret_creating_controller_test: cover failure with invalid name
+  - 7a0c5b5 2025-09-19T08:00:14+00:00 secret_creating_controller_test: add secretName to test struct
+  - b73098c 2025-09-19T08:00:14+00:00 secret_creating_controller_test: fix typo in test struct field name
+
+- ovn-kubernetes image-amd64 9741174157381d7b87e2d21559cbe06b8f2b5ebf to 74b1c90eb97bea68bf708d47f28fce7de9adc7b9
+  - 0b161878 2025-09-23T17:41:45-04:00 [release-4.20] OCPBUGS-61239: Skip node-encap-ips annotation in DPU host mode
+  - 77fe97ad 2025-09-16T12:16:32+00:00 OCPBUGS-61065: As part of DPF installation we are required to use OCP downstream image for dpu service. Dpu service uses upstream ovnkube.sh script that requires ovndb-raft-functions.sh as a dependency. This change copies it into the image as part of Dockerfile.base
+
+- kubernetes image-amd64 4dd0b884bb2c262877a3d2a5dc22604cef34fab1 to e0d42164c84ee27644b85a1d2c9bbb062066056d
+  - 97faade04 2025-09-12T10:21:48-04:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - 03e764d03 2025-09-09T19:43:57+00:00 Release commit for Kubernetes v1.33.5
+  - b246955af 2025-08-28T22:57:01+08:00 Fix missing control plane health check timeout
+  - c1a0f959a 2025-08-28T10:31:15+02:00 Add a note about Conflicts return value
+  - 2d6c21edd 2025-08-28T10:31:15+02:00 Fix SELinux label comparison
+  - fe2d1b268 2025-08-28T10:31:15+02:00 Add missing cases to SELinuxMount tests
+  - 9d0999731 2025-08-21T09:09:11-04:00 Remove patch/update from ServiceCIDR API conformance test
+  - 98b3daba8 2025-08-14T13:31:05+02:00 Bump dependencies, images and versions used to Go 1.24.6 and distroless iptables
+  - 0ae9d1d16 2025-08-13T14:40:41+00:00 Update CHANGELOG/CHANGELOG-1.33.md for v1.33.4
+  - d8676a24c 2025-07-22T08:21:08-04:00 Added NodeSelectors field to DriverDefinition
+  - b5fa540b2 2025-07-16T11:07:06+02:00 Mask Linux thermal interrupt info in /proc and /sys.
+
+- service-ca-operator image-amd64 b0fe556a981964728306f803864af9d2881db967 to 37e0c31790b6a954214817974a56c9a699d0cf78
+  - 48d03fa 2025-09-19T08:00:14+00:00 secret_creating_controller: improve hotloop tests
+  - a706ada 2025-09-19T08:00:14+00:00 secret_creating_controller: fix hotloop on create secret error
+  - d1c5846 2025-09-19T08:00:14+00:00 secret_creating_controller_test: cover failure with invalid name
+  - 7a0c5b5 2025-09-19T08:00:14+00:00 secret_creating_controller_test: add secretName to test struct
+  - b73098c 2025-09-19T08:00:14+00:00 secret_creating_controller_test: fix typo in test struct field name
+
+- ovn-kubernetes image-arm64 9741174157381d7b87e2d21559cbe06b8f2b5ebf to 74b1c90eb97bea68bf708d47f28fce7de9adc7b9
+  - 0b161878 2025-09-23T17:41:45-04:00 [release-4.20] OCPBUGS-61239: Skip node-encap-ips annotation in DPU host mode
+  - 77fe97ad 2025-09-16T12:16:32+00:00 OCPBUGS-61065: As part of DPF installation we are required to use OCP downstream image for dpu service. Dpu service uses upstream ovnkube.sh script that requires ovndb-raft-functions.sh as a dependency. This change copies it into the image as part of Dockerfile.base
+
+- kubernetes image-arm64 4dd0b884bb2c262877a3d2a5dc22604cef34fab1 to e0d42164c84ee27644b85a1d2c9bbb062066056d
+  - 97faade04 2025-09-12T10:21:48-04:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - 03e764d03 2025-09-09T19:43:57+00:00 Release commit for Kubernetes v1.33.5
+  - b246955af 2025-08-28T22:57:01+08:00 Fix missing control plane health check timeout
+  - c1a0f959a 2025-08-28T10:31:15+02:00 Add a note about Conflicts return value
+  - 2d6c21edd 2025-08-28T10:31:15+02:00 Fix SELinux label comparison
+  - fe2d1b268 2025-08-28T10:31:15+02:00 Add missing cases to SELinuxMount tests
+  - 9d0999731 2025-08-21T09:09:11-04:00 Remove patch/update from ServiceCIDR API conformance test
+  - 98b3daba8 2025-08-14T13:31:05+02:00 Bump dependencies, images and versions used to Go 1.24.6 and distroless iptables
+  - 0ae9d1d16 2025-08-13T14:40:41+00:00 Update CHANGELOG/CHANGELOG-1.33.md for v1.33.4
+  - d8676a24c 2025-07-22T08:21:08-04:00 Added NodeSelectors field to DriverDefinition
+  - b5fa540b2 2025-07-16T11:07:06+02:00 Mask Linux thermal interrupt info in /proc and /sys.
+
+- service-ca-operator image-arm64 b0fe556a981964728306f803864af9d2881db967 to 37e0c31790b6a954214817974a56c9a699d0cf78
+  - 48d03fa 2025-09-19T08:00:14+00:00 secret_creating_controller: improve hotloop tests
+  - a706ada 2025-09-19T08:00:14+00:00 secret_creating_controller: fix hotloop on create secret error
+  - d1c5846 2025-09-19T08:00:14+00:00 secret_creating_controller_test: cover failure with invalid name
+  - 7a0c5b5 2025-09-19T08:00:14+00:00 secret_creating_controller_test: add secretName to test struct
+  - b73098c 2025-09-19T08:00:14+00:00 secret_creating_controller_test: fix typo in test struct field name
+
