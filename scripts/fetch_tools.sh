@@ -298,6 +298,16 @@ gettool_ginkgo() {
         cp "${test_binary}" "${binary_path}"
         chmod +x "${binary_path}"
         echo "Binary installed to ${binary_path}"
+
+	    # Copy handleresult.py to the tools directory
+        if [[ -f "${clone_dir}/pipeline/handleresult.py" ]] && [[ -f "${HANDLERESULT_SCRIPT}" ]]; then
+            cp "${clone_dir}/pipeline/handleresult.py" "${HANDLERESULT_SCRIPT}"
+            chmod +x "${HANDLERESULT_SCRIPT}"
+            echo "handleresult.py installed to ${HANDLERESULT_SCRIPT}"
+        else
+            echo "Warning: pipeline/handleresult.py not found in repository"
+        fi
+
         popd &>/dev/null
     else
         echo "Error: Test binary not found after build"

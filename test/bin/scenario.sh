@@ -1173,10 +1173,6 @@ run_gingko_tests() {
         ginkgo_result_success=false
     fi
     echo "Gingko test execution completed"
-    if [[ -f "${test_results_dir}/test-output.log" ]]; then
-        echo "Test output log: ${test_results_dir}/test-output.log"
-    fi
-
     popd &>/dev/null
 
     # Clean the JUnit XML files
