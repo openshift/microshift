@@ -261,10 +261,12 @@ gettool_ginkgo() {
 
     local -r repo_url="https://${GITHUB_TOKEN}@github.com/openshift/openshift-tests-private.git"
     local -r binary_path="${GINKGO_TEST_BINARY}"
-    local -r release_branch="release-4.${MINOR_VERSION}"
+    local -r release_branch="${SCENARIO_BUILD_BRANCH}"
+    
+    local -r handleresult_script="${HANDLERESULT_SCRIPT}"
 
     # Skip if binary already exists
-    [[ -f "${binary_path}" ]] && return 0
+    [[ -f "${binary_path}" ]] && [[ -f "${handleresult_script}" ]] && return 0
 
     # Check if Go is available
     if ! command -v go &> /dev/null; then
@@ -289,40 +291,30 @@ gettool_ginkgo() {
 
     # Build the binary
     pushd "${clone_dir}" &>/dev/null
-
-    local test_binary="./bin/extended-platform-tests"
     make build
 
     # Copy binary to centralized location
+    local test_binary="./bin/extended-platform-tests"
     if [[ -f "${test_binary}" ]]; then
         cp "${test_binary}" "${binary_path}"
         chmod +x "${binary_path}"
         echo "Binary installed to ${binary_path}"
-
-	    # Copy handleresult.py to the tools directory
-        if [[ -f "${clone_dir}/pipeline/handleresult.py" ]] && [[ -f "${HANDLERESULT_SCRIPT}" ]]; then
-            cp "${clone_dir}/pipeline/handleresult.py" "${HANDLERESULT_SCRIPT}"
-            chmod +x "${HANDLERESULT_SCRIPT}"
-            echo "handleresult.py installed to ${HANDLERESULT_SCRIPT}"
-        else
-            echo "Warning: pipeline/handleresult.py not found in repository"
-        fi
-
-        popd &>/dev/null
     else
         echo "Error: Test binary not found after build"
-        popd &>/dev/null
         return 1
     fi
 
     # Copy handleresult.py to the tools directory
-    if [[ -f "${clone_dir}/pipeline/handleresult.py" ]] && [[ -f "${HANDLERESULT_SCRIPT}" ]]; then
-        cp "${clone_dir}/pipeline/handleresult.py" "${HANDLERESULT_SCRIPT}"
-        chmod +x "${HANDLERESULT_SCRIPT}"
-        echo "handleresult.py installed to ${HANDLERESULT_SCRIPT}"
+    local handleresult_script_local="./pipeline/handleresult.py"
+    if [[ -f "${handleresult_script_local}" ]] && [[ ! -f "${handleresult_script}" ]]; then
+        cp "${handleresult_script_local}" "${handleresult_script}"
+        chmod +x "${handleresult_script}"
+        echo "handleresult.py installed to ${handleresult_script}"
     else
-        echo "Warning: pipeline/handleresult.py not found in repository"
+        echo "Error: pipeline/handleresult.py not found in repository"
+        return 1
     fi
+    popd &>/dev/null
 }
 
 tool_getters=$(declare -F | awk '$3 ~ /^gettool_/ {print $3}' | sed 's/^gettool_//g')
