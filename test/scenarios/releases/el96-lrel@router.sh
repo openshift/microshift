@@ -1,7 +1,5 @@
 #!/bin/bash
 
-export TEST_EXCLUDES="ushift-6085"
-
 # Sourced from scenario.sh and uses functions defined there.
 
 start_image="rhel-9.6-microshift-brew-optionals-4.${MINOR_VERSION}-${LATEST_RELEASE_TYPE}"
