@@ -261,7 +261,7 @@ gettool_ginkgo() {
 
     local -r repo_url="https://${GITHUB_TOKEN}@github.com/openshift/openshift-tests-private.git"
     local -r binary_path="${GINKGO_TEST_BINARY}"
-    local -r release_branch="${SCENARIO_BUILD_BRANCH}"
+    local -r release_branch="release-4.${MINOR_VERSION}"
     
     local -r handleresult_script="${HANDLERESULT_SCRIPT}"
 
@@ -291,7 +291,7 @@ gettool_ginkgo() {
 
     # Build the binary
     pushd "${clone_dir}" &>/dev/null
-    make build
+    make all
 
     # Copy binary to centralized location
     local test_binary="./bin/extended-platform-tests"
