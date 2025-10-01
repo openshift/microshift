@@ -260,13 +260,12 @@ gettool_ginkgo() {
     source "${SCRIPT_DIR}/../test/bin/common_versions.sh"
 
     local -r repo_url="https://${GITHUB_TOKEN}@github.com/openshift/openshift-tests-private.git"
-    local -r binary_path="${GINKGO_TEST_BINARY}"
-    local -r release_branch="release-4.${MINOR_VERSION}"
+    local -r repo_branch="${OPENSHIFT_TESTS_PRIVATE_REPO_BRANCH}"
+    local -r repo_commit="${OPENSHIFT_TESTS_PRIVATE_REPO_COMMIT}"
+    local clone_dir="${WORK_DIR}/openshift-tests-private"
     
+    local -r binary_path="${GINKGO_TEST_BINARY}"
     local -r handleresult_script="${HANDLERESULT_SCRIPT}"
-
-    # Skip if binary already exists
-    [[ -f "${binary_path}" ]] && [[ -f "${handleresult_script}" ]] && return 0
 
     # Check if Go is available
     if ! command -v go &> /dev/null; then
@@ -274,23 +273,25 @@ gettool_ginkgo() {
         return 1
     fi
 
-    # Ensure binary directory exists
+    # Check if binary and handleresult.py already exist
+    [[ -f "${binary_path}" ]] && [[ -f "${handleresult_script}" ]] && return 0
     mkdir -p "$(dirname "${binary_path}")"
 
-    # Use global WORK_DIR for cloning
-    local clone_dir="${WORK_DIR}/openshift-tests-private"
-
     # Clone repository with release branch preference
-    if ! git clone --depth 1 --branch "${release_branch}" "${repo_url}" "${clone_dir}" 2>/dev/null; then
-        echo "Branch ${release_branch} not found, cloning default branch..."
-        if ! git clone --depth 1 "${repo_url}" "${clone_dir}"; then
-            echo "Error: Failed to clone repository"
-            return 1
-        fi
+    if ! git clone --depth 1000 --branch "${repo_branch}" "${repo_url}" "${clone_dir}" 2>/dev/null; then
+        echo "Error: Failed to clone repository"
+        return 1
+    fi
+
+    pushd "${clone_dir}" &>/dev/null
+
+    # Checkout a valid commit to be sure ginkgo tests are working
+    if ! (git checkout --quiet "${repo_commit}"); then
+        echo "Error: Failed to checkout specific commit"
+        return 1
     fi
 
     # Build the binary
-    pushd "${clone_dir}" &>/dev/null
     make all
 
     # Copy binary to centralized location
