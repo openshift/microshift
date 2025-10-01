@@ -29,5 +29,5 @@ scenario_run_tests() {
         return 0
     fi
 
-    run_gingko_tests host1
+    run_gingko_tests host1 "~Disruptive"
 }

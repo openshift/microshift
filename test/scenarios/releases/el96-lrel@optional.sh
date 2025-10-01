@@ -10,7 +10,7 @@ WEB_SERVER_URL="http://${VM_BRIDGE_IP}:${WEB_SERVER_PORT}"
 start_image="rhel-9.6-microshift-brew-optionals-4.${MINOR_VERSION}-${LATEST_RELEASE_TYPE}"
 
 scenario_create_vms() {
-    if ! does_image_exist "${start_image}"; then
+    if ! does_commit_exist "${start_image}"; then
         echo "Image '${start_image}' not found - skipping test"
         return 0
     fi
@@ -21,7 +21,7 @@ scenario_create_vms() {
 }
 
 scenario_remove_vms() {
-    if ! does_image_exist "${start_image}"; then
+    if ! does_commit_exist "${start_image}"; then
         echo "Image '${start_image}' not found - skipping test"
         return 0
     fi
@@ -30,7 +30,7 @@ scenario_remove_vms() {
 }
 
 scenario_run_tests() {
-    if ! does_image_exist "${start_image}"; then
+    if ! does_commit_exist "${start_image}"; then
         echo "Image '${start_image}' not found - skipping test"
         return 0
     fi
