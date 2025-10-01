@@ -1,0 +1,7 @@
+[nfv-sig]
+name = CentOS Stream 10 - SIG NFV
+baseurl = http://mirror.stream.centos.org/SIGs/10-stream/nfv/{{ .Env.UNAME_M }}/openvswitch-2/
+enabled = 1
+gpgcheck = 0
+sslverify = 1
+skip_if_unavailable = 0
