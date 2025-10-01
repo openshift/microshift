@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "Bash(gh pr view:*)"
+      "Bash(gh pr view:*)",
+      "Bash(git cherry-pick:*)"
     ],
     "deny": [],
     "ask": []
