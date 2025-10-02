@@ -90,6 +90,8 @@ run_sonobuoy() {
     done
     if [ ${rc} -ne 0 ] ; then
         echo "Failed to start tests after 5m"
+        # Retrieve pod's description in case the tests have not started yet. This covers scheduling/container creation issues
+        oc describe pod -n sonobuoy
         ~/go/bin/sonobuoy status --json
         record_junit "run_sonobuoy" "wait_e2e_running" "FAILED"
         return ${rc}
