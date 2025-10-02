@@ -124,8 +124,8 @@ func (c *Config) fillDefaults() error {
 	}
 	c.DNS = DNS{
 		BaseDomain: "example.com",
-		HostsPath:  "/etc/hosts",
 	}
+
 	c.Network = Network{
 		ServiceNodePortRange: "30000-32767",
 	}
@@ -419,8 +419,23 @@ func (c *Config) incorporateUserSettings(u *Config) {
 		c.Ingress.AccessLogging.HttpCaptureCookies = u.Ingress.AccessLogging.HttpCaptureCookies
 	}
 
-	if u.DNS.HostsPath != "" {
-		c.DNS.HostsPath = u.DNS.HostsPath
+	// HostsWatcher configuration - only set if user provided it
+	if u.DNS.HostsWatcher != nil {
+		c.DNS.HostsWatcher = &HostsWatcher{
+			HostsPath:        "/etc/hosts",
+			TargetNamespaces: []string{"openshift-dns"},
+			ConfigMapName:    "hosts-file",
+		}
+
+		if u.DNS.HostsWatcher.HostsPath != "" {
+			c.DNS.HostsWatcher.HostsPath = u.DNS.HostsWatcher.HostsPath
+		}
+		if len(u.DNS.HostsWatcher.TargetNamespaces) > 0 {
+			c.DNS.HostsWatcher.TargetNamespaces = u.DNS.HostsWatcher.TargetNamespaces
+		}
+		if u.DNS.HostsWatcher.ConfigMapName != "" {
+			c.DNS.HostsWatcher.ConfigMapName = u.DNS.HostsWatcher.ConfigMapName
+		}
 	}
 }
 
