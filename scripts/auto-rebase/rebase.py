@@ -27,6 +27,7 @@ REPO_ENV = "REPO"
 AMD64_RELEASE_ENV = "AMD64_RELEASE"
 ARM64_RELEASE_ENV = "ARM64_RELEASE"
 RHOAI_RELEASE_ENV = "RHOAI_RELEASE"
+OPM_VERSION_ENV = "OPM_RELEASE"
 JOB_NAME_ENV = "JOB_NAME"
 BUILD_ID_ENV = "BUILD_ID"
 DRY_RUN_ENV = "DRY_RUN"
@@ -86,6 +87,26 @@ def run_rebase_ai_model_serving_sh(release):
     """Run the 'rebase_ai_model_serving.sh' script with the given release version and return the script's output."""
     script_dir = os.path.abspath(os.path.dirname(__file__))
     args = [f"{script_dir}/rebase_ai_model_serving.sh", "to", release]
+    env = os.environ.copy()
+    env["NO_BRANCH"] = "true"
+    logging.info(f"Running: '{' '.join(args)}'")
+    start = timer()
+    result = subprocess.run(
+        args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True, check=False,
+        env=env)
+    logging.info(f"Return code: {result.returncode}. Output:\n" +
+                 "==================================================\n" +
+                 f"{result.stdout}" +
+                 "==================================================\n")
+    end = timer() - start
+    logging.info(f"Script returned code: {result.returncode}. It ran for {end/60:.0f}m{end%60:.0f}s.")
+    return RebaseScriptResult(success=result.returncode == 0, output=result.stdout)
+
+
+def run_rebase_cert_manager_sh(release):
+    """Run the 'rebase_cert_manager.sh' script with the given release version and return the script's output."""
+    script_dir = os.path.abspath(os.path.dirname(__file__))
+    args = [f"{script_dir}/rebase_cert_manager.sh", "to", release]
     env = os.environ.copy()
     env["NO_BRANCH"] = "true"
     logging.info(f"Running: '{' '.join(args)}'")
@@ -420,6 +441,26 @@ def get_expected_branch_name(amd, arm):
     return f"rebase-{match_amd['version_stream']}_amd64-{match_amd['date']}_arm64-{match_arm['date']}"
 
 
+def get_base_branch_name(gh_repo, base_branch):
+    """
+    Given a branch name, determine if the rebase branch should be the same
+    or it should target main, depending on the current stage in the dev cycle.
+    """
+    issues = gh_repo.get_issues(state="open")
+    for issue in issues:
+        title = issue.title
+        if title.startswith("Future Release Branches Frozen For Merging"):
+            try:
+                branches_part = title.split('|', 1)[1].strip()
+                branch_tokens = branches_part.split()
+                if f"branch:{base_branch}" in branch_tokens:
+                    return "main"
+            except Exception as e:
+                logging.warning(f"Failed to parse freeze issue title: {title} ({e})")
+                continue
+    return base_branch
+
+
 def cleanup_branches(gh_repo):
     """
     Deletes branches with names in the format "rebase-4*" that are
@@ -476,6 +517,7 @@ def main():
     release_amd = try_get_env(AMD64_RELEASE_ENV)
     release_arm = try_get_env(ARM64_RELEASE_ENV)
     rhoai_release = try_get_env(RHOAI_RELEASE_ENV)
+    opm_version = try_get_env(OPM_VERSION_ENV)
     base_branch_override = try_get_env(BASE_BRANCH_ENV, die=False)
 
     global REMOTE_DRY_RUN
@@ -494,8 +536,9 @@ def main():
 
     rebase_result = run_rebase_sh(release_amd, release_arm)
     ai_rebase_result = run_rebase_ai_model_serving_sh(rhoai_release)
+    cert_manager_rebase_result = run_rebase_cert_manager_sh(opm_version)
 
-    rebases_succeeded = rebase_result.success and ai_rebase_result.success
+    rebases_succeeded = all([rebase_result.success, ai_rebase_result.success, cert_manager_rebase_result.success])
 
     if rebases_succeeded:
         # TODO How can we inform team that rebase job ran successfully just there was nothing new?
@@ -523,13 +566,15 @@ def main():
         git_repo.index.commit("rebase.sh failure artifacts")
 
     rebase_branch_name = git_repo.active_branch.name
+    adjusted_base_branch = get_base_branch_name(gh_repo, base_branch)
+    logging.info(f"Adjusted base branch: {adjusted_base_branch}")
     git_remote = get_remote_with_token(git_repo, token, org, repo)
     remote_branch = try_get_rebase_branch_ref_from_remote(git_remote, rebase_branch_name)  # {BOT_REMOTE_NAME}/{rebase_branch_name}
 
     rbranch_does_not_exists = remote_branch is None
     rbranch_exists_and_needs_update = (
         remote_branch is not None and
-        is_local_branch_based_on_newer_base_branch_commit(git_repo, base_branch, remote_branch.name, rebase_branch_name)
+        is_local_branch_based_on_newer_base_branch_commit(git_repo, adjusted_base_branch, remote_branch.name, rebase_branch_name)
     )
     if rbranch_does_not_exists or rbranch_exists_and_needs_update:
         push_branch_or_die(git_remote, rebase_branch_name)
@@ -539,14 +584,14 @@ def main():
     desc = generate_pr_description(get_release_tag(release_amd), get_release_tag(release_arm), prow_job_url, rebase_result.success)
 
     comment = ""
-    pull_req = try_get_pr(gh_repo, org, base_branch, rebase_branch_name)
+    pull_req = try_get_pr(gh_repo, org, adjusted_base_branch, rebase_branch_name)
     if pull_req is None:
-        pull_req = create_pr(gh_repo, base_branch, rebase_branch_name, pr_title, desc)
+        pull_req = create_pr(gh_repo, adjusted_base_branch, rebase_branch_name, pr_title, desc)
     else:
         update_pr(pull_req, pr_title, desc)
         comment = f"Rebase job updated the branch\n{desc}"
 
-    if base_branch == "main":
+    if adjusted_base_branch == "main":
         cleanup_branches(gh_repo)
     post_comment(pull_req, comment)
 

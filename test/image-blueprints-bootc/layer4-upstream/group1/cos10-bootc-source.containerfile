@@ -1,35 +1,25 @@
-# {{- if env.Getenv "BREW_NIGHTLY_RELEASE_VERSION" "" -}}
-# Note: This comment makes templating add a new line before the code
-FROM localhost/rhel96-test-agent:latest
+FROM quay.io/centos-bootc/centos-bootc:stream10
 
 # Build arguments
-ARG USHIFT_RPM_REPO_NAME=microshift-brew
+ARG USHIFT_RPM_REPO_NAME=microshift-local
 ARG USHIFT_RPM_REPO_PATH=/tmp/$USHIFT_RPM_REPO_NAME
 
 # Copy the MicroShift repository contents
 COPY ./rpm-repos/$USHIFT_RPM_REPO_NAME $USHIFT_RPM_REPO_PATH
 
 # Copy repository configuration
-COPY ./bootc-images/$USHIFT_RPM_REPO_NAME.repo ./bootc-images/microshift-fast-datapath-rhel9.repo ./bootc-images/microshift-rhocp-y.repo \
+COPY ./bootc-images/$USHIFT_RPM_REPO_NAME.repo ./bootc-images/microshift-centos10-nfv.repo ./bootc-images/microshift-rhocp-y.repo \
     /etc/yum.repos.d/
 
 # Print repository configuration contents.
-# Install MicroShift, test agent and cleanup.
+# Install MicroShift and cleanup.
 RUN dnf repoinfo --enabled && \
     dnf install -y firewalld systemd-resolved \
         {{ range (env.Getenv "MICROSHIFT_MANDATORY_RPMS" | strings.Split " ") -}}
-        "{{ . }}-{{ env.Getenv "BREW_NIGHTLY_RELEASE_VERSION" }}" \
-        {{ end -}}
-        {{ range (env.Getenv "MICROSHIFT_OPTIONAL_RPMS" | strings.Split " ") -}}
-        "{{ . }}-{{ env.Getenv "BREW_NIGHTLY_RELEASE_VERSION" }}" \
-        {{ end -}}
-        {{ if and (env.Getenv "UNAME_M" "") (eq "x86_64" .Env.UNAME_M) -}}
-        {{ range (env.Getenv "MICROSHIFT_X86_64_RPMS" | strings.Split " ") -}}
-        "{{ . }}-{{ env.Getenv "BREW_NIGHTLY_RELEASE_VERSION" }}" \
-        {{ end -}}
+        "{{ . }}-{{ env.Getenv "SOURCE_VERSION" }}" \
         {{ end -}}
         && \
-    systemctl enable microshift microshift-test-agent && \
+    systemctl enable microshift && \
     rm -vf /etc/yum.repos.d/microshift-*.repo && \
     rm -rvf $USHIFT_RPM_REPO_PATH && \
     dnf clean all
@@ -43,11 +33,5 @@ RUN firewall-offline-cmd --zone=public --add-port=22/tcp && \
     firewall-offline-cmd --zone=public --add-port=443/tcp && \
     firewall-offline-cmd --zone=public --add-port=5353/udp && \
     firewall-offline-cmd --zone=public --add-port=6443/tcp && \
-    firewall-offline-cmd --zone=public --add-port=8889/tcp && \
     firewall-offline-cmd --zone=public --add-port=30000-32767/tcp && \
     firewall-offline-cmd --zone=public --add-port=30000-32767/udp
-
-# Prepare system for testing Generic Device Plugin
-COPY --chmod=755 ./bootc-images/build-serialsim.sh /tmp/build-serialsim.sh
-RUN /tmp/build-serialsim.sh && rm -f /tmp/build-serialsim.sh
-# {{- end -}}

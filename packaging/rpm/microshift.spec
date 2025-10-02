@@ -39,6 +39,8 @@
 %{!?with_kindnet: %global with_kindnet 0}
 # Don't build topolvm subpackage by default
 %{!?with_topolvm: %global with_topolvm 0}
+# Enable OCP telemetry by default. Disabled when microshift_variant==community
+%{!?microshift_variant: %global microshift_variant enterprise}
 
 Name: microshift
 Version: %{version}
@@ -68,6 +70,11 @@ BuildRequires: golang
 
 Requires: cri-o >= 1.34.0, cri-o < 1.35.0
 Requires: cri-tools >= 1.34.0, cri-tools < 1.35.0
+# The container networking plugins package has been removed from RHEL 10 and
+# cri-o no longer has an explicit dependency on it.
+# Ensure that the package is installed on RHEL 9 as a weak dependency, skipping
+# the missing package when it is not available.
+Recommends: containernetworking-plugins
 Requires: iptables
 Requires: microshift-selinux = %{version}
 Requires: microshift-networking = %{version}
@@ -307,9 +314,9 @@ GOARCH=amd64
 
 # if we have git commit/tag/state to be embedded in the binary pass it down to the makefile
 %if %{defined embedded_git_commit}
-make _build_local GOOS=${GOOS} GOARCH=${GOARCH} EMBEDDED_GIT_COMMIT=%{commit} EMBEDDED_GIT_TAG=%{embedded_git_tag} EMBEDDED_GIT_TREE_STATE=%{embedded_git_tree_state} MICROSHIFT_VERSION=%{version}
+make _build_local GOOS=${GOOS} GOARCH=${GOARCH} EMBEDDED_GIT_COMMIT=%{commit} EMBEDDED_GIT_TAG=%{embedded_git_tag} EMBEDDED_GIT_TREE_STATE=%{embedded_git_tree_state} MICROSHIFT_VERSION=%{version} MICROSHIFT_VARIANT=%{microshift_variant}
 %else
-make _build_local GOOS=${GOOS} GOARCH=${GOARCH} MICROSHIFT_VERSION=%{version} EMBEDDED_GIT_COMMIT=%{commit}
+make _build_local GOOS=${GOOS} GOARCH=${GOARCH} MICROSHIFT_VERSION=%{version} EMBEDDED_GIT_COMMIT=%{commit} MICROSHIFT_VARIANT=%{microshift_variant}
 %endif
 
 cp ./_output/bin/${GOOS}_${GOARCH}/microshift ./_output/microshift
@@ -655,6 +662,10 @@ systemctl enable --now --quiet openvswitch || true
 
 %systemd_preun microshift.service
 
+%post greenboot
+# Make sure that the greenboot-healthcheck service is enabled
+systemctl is-enabled --quiet greenboot-healthcheck || systemctl enable --now --quiet greenboot-healthcheck
+
 %post multus
 # only for install, not on upgrades
 if [ $1 -eq 1 ]; then
@@ -807,6 +818,12 @@ fi
 # Use Git command to generate the log and replace the VERSION string
 # LANG=C git log --date="format:%a %b %d %Y" --pretty="tformat:* %cd %an <%ae> VERSION%n- %s%n" packaging/rpm/microshift.spec
 %changelog
+* Mon Sep 29 2025 Gregory Giguashvili <ggiguash@redhat.com> 4.21.0
+- Ensure containernetworking-plugins package is installed on RHEL 9 as a weak dependency
+
+* Sun Sep 28 2025 Gregory Giguashvili <ggiguash@redhat.com> 4.21.0
+- Ensure greenboot-healthcheck service is enabled
+
 * Thu Sep 18 2025 Gregory Giguashvili <ggiguash@redhat.com> 4.21.0
 - Upgrade cri-o and cri-tools to v1.34
 

@@ -51,7 +51,6 @@ func TestConfigure(t *testing.T) {
 		fmt.Sprintf("--authentication-kubeconfig=%s", cfg.KubeConfigPath(config.KubeControllerManager)),
 		fmt.Sprintf("--authorization-kubeconfig=%s", cfg.KubeConfigPath(config.KubeControllerManager)),
 		"--cert-dir=/var/run/kubernetes",
-		"--cloud-provider=external",
 		"--cluster-cidr=10.42.0.0/16",
 		fmt.Sprintf("--cluster-signing-cert-file=%s", clusterSigningCert),
 		"--cluster-signing-duration=720h",
