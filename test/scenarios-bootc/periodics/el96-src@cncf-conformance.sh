@@ -69,6 +69,7 @@ run_sonobuoy() {
     # Initiate test startup
     go install "github.com/vmware-tanzu/sonobuoy@${CNCF_SONOBUOY_VERSION}"
     ~/go/bin/sonobuoy run \
+	--sonobuoy-image docker.io/sonobuoy/sonobuoy:${CNCF_SONOBUOY_VERSION} \
         --mode=certified-conformance \
         --plugin-env=e2e.E2E_SKIP=".*Services should be able to switch session affinity for NodePort service.*" \
         --dns-namespace=openshift-dns \
