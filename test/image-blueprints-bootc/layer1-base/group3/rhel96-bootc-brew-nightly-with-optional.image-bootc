@@ -1,3 +1,0 @@
-{{- if env.Getenv "BREW_NIGHTLY_RELEASE_VERSION" "" -}}
-localhost/rhel96-bootc-brew-nightly-with-optional:latest
-{{- end }}
