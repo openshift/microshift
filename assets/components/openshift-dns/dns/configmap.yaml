@@ -23,9 +23,11 @@ data:
             denial 9984 30
         }
 
-        hosts /tmp/hosts {
+        {{- if .HostsEnabled }}
+        hosts /tmp/hosts/hosts {
             fallthrough
         }
+        {{- end }}        
 
         reload
     }
