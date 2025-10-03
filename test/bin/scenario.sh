@@ -31,6 +31,7 @@ SKIP_GREENBOOT=${SKIP_GREENBOOT:-false}  # may be overridden in scenario file
 IMAGE_SIGSTORE_ENABLED=false # may be overridden in scenario file
 VNC_CONSOLE=${VNC_CONSOLE:-false}  # may be overridden in global settings file
 TEST_RANDOMIZATION="all"  # may be overridden in scenario file
+TEST_EXCLUDES="none"  # may be overridden in scenario file
 TEST_EXECUTION_TIMEOUT="30m" # may be overriden in scenario file
 SUBSCRIPTION_MANAGER_PLUGIN="${SUBSCRIPTION_MANAGER_PLUGIN:-${SCRIPTDIR}/subscription_manager_register.sh}"  # may be overridden in global settings file
 RUN_HOST_OVERRIDE=""  # target any given VM for running scenarios
@@ -1064,6 +1065,7 @@ EOF
     if ! ${timeout_robot} \
         --name "${SCENARIO}" \
         --randomize "${TEST_RANDOMIZATION}" \
+        --exclude "${TEST_EXCLUDES}" \
         --loglevel TRACE \
         --listener "${TESTDIR}/resources/sos-on-failure-listener.py" \
         --pythonpath "${TESTDIR}/resources" \
@@ -1137,7 +1139,7 @@ run_gingko_tests() {
         local -r filter_pattern="$1"
         echo "Applying filter: ${filter_pattern}"
         if [[ "${filter_pattern}" == ~* ]]; then
-            sed -i "/${filter_pattern#~}/d" "${case_selected}"
+            sed -i "/${filter_pattern#\~}/d" "${case_selected}"
         else
             sed -i -n "/${filter_pattern}/p" "${case_selected}"
         fi
@@ -1150,20 +1152,74 @@ run_gingko_tests() {
     cat "${case_selected}"
     echo "-----------------------------------------------------"
 
-    # Run the tests and capture output
-    if ! "${GINKGO_TEST_BINARY}" run --timeout 60m --junit-dir="${test_results_dir}" -f "${case_selected}" 2>&1 | tee "${test_results_dir}/test-output.log"; then
-        record_junit "${vmname}" "run_gingko_tests" "FAILED"
-        return 1
+    # Make sure the test execution times out after a predefined period.
+    # The 'timeout' command sends the HUP signal and, if the test does not
+    # exit after 5m, it sends the KILL signal to terminate the process.
+    local timeout_ginkgo="timeout -v --kill-after=5m ${TEST_EXECUTION_TIMEOUT} ${GINKGO_TEST_BINARY}"
+    if [ -t 0 ]; then
+        # Disable timeout for interactive mode when stdin is a terminal.
+        # This is necessary for proper handling of test interruption by user.
+        # shellcheck disable=SC2034
+        timeout_ginkgo="${GINKGO_TEST_BINARY}"
     fi
 
-    record_junit "${vmname}" "run_gingko_tests" "OK"
+    # Run the tests and capture output with 10m timeout for every test case
+    echo "Gingko test execution started..."
+    ginkgo_result_success=true
+    if ! eval '${timeout_ginkgo} run --timeout 10m --junit-dir=${test_results_dir} -f ${case_selected}' 2>&1 | tee "${test_results_dir}/test-output.log"; then
+        if [ $? -ge 124 ] ; then
+            record_junit "${vmname}" "run_test_timed_out_${TEST_EXECUTION_TIMEOUT}" "FAILED"
+        fi
+        ginkgo_result_success=false
+    fi
+    echo "Gingko test execution completed"
     popd &>/dev/null
 
+    # Clean the JUnit XML files
+    echo "Cleaning JUnit XML files to remove 'Monitor cluster while tests execute' test case"
+    cleanup_success=true
+    if [[ ! -f "${HANDLERESULT_SCRIPT}" ]]; then
+        echo "Warning: ${HANDLERESULT_SCRIPT} not found. Skipping XML cleanup."
+    else
+        for junit_file in "${test_results_dir}"/junit_e2e_*.xml; do
+            if [[ -f "${junit_file}" ]]; then
+                filename=$(basename "${junit_file}")
+                echo "Processing: ${filename}"
+
+                # Create backup
+                cp "${junit_file}" "${junit_file}.backup"
+
+                # Clean the XML
+                temp_file="${junit_file}.tmp"
+                if python3 "${HANDLERESULT_SCRIPT}" -a replace -i "${junit_file}" -o "${temp_file}" 2>/dev/null; then
+                    mv "${temp_file}" "${junit_file}"
+                    echo "✓ Cleaned: ${filename}"
+                    rm "${junit_file}.backup"  # Remove backup on success
+                else
+                    echo "✗ Failed to clean: ${filename} (restored from backup)"
+                    mv "${junit_file}.backup" "${junit_file}"  # Restore from backup
+                    cleanup_success=false
+                fi
+            fi
+        done
+    fi
+
     # Display results summary
-    echo "Gingko test execution completed"
     echo "Results are available in: ${test_results_dir}"
-    if [[ -f "${test_results_dir}/test-output.log" ]]; then
-        echo "Test output log: ${test_results_dir}/test-output.log"
+    if [[ "${cleanup_success}" == "true" ]]; then
+        echo "Unit XML files have been cleaned ('Monitor cluster while tests execute' test case removed)"
+        record_junit "${vmname}" "clean_junit_xml_files" "OK"
+    else
+        echo "Some XML files could not be cleaned (originals preserved)"
+        record_junit "${vmname}" "clean_junit_xml_files" "FAILED"
+    fi
+
+    # Record the junit result of the ginkgo tests
+    if [[ "${ginkgo_result_success}" == "true" ]]; then
+        record_junit "${vmname}" "run_gingko_tests" "OK"
+    else
+        record_junit "${vmname}" "run_gingko_tests" "FAILED"
+        exit 1
     fi
 }
 

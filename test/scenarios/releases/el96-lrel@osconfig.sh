@@ -30,6 +30,6 @@ scenario_run_tests() {
     fi
 
     run_tests host1 \
-        --variable "EXPECTED_OS_VERSION:9.6" \
-        suites/standard1/ suites/selinux/validate-selinux-policy.robot
+        suites/osconfig/clusterid.robot \
+        suites/osconfig/systemd-resolved.robot
 }
