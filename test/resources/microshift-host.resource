@@ -99,6 +99,11 @@ Is System OSTree
     ...    sudo=True    return_stderr=False    return_stdout=False    return_rc=True
     IF    ${rc} == 0    RETURN    ${TRUE}    ELSE    RETURN    ${FALSE}
 
+System Should Not Be Ostree
+    [Documentation]    Make sure we run on a non-ostree system
+    ${is_ostree}=    Is System OSTree
+    Should Not Be True    ${is_ostree}
+
 System Should Be Rebooted
     [Documentation]    Assert if the system rebooted comparing the current and provided boot identifier
     [Arguments]    ${old_bootid}
