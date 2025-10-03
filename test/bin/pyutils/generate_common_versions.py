@@ -9,6 +9,7 @@ import os
 import sys
 import argparse
 import logging
+import pathlib
 
 ARCH = os.uname().machine
 
@@ -251,120 +252,29 @@ rhocp_minor_y1_beta = get_dependencies_repo_url(previous_minor_version)
 # The 'rhocp_minor_y2' should always be the y-2 minor version number.
 rhocp_minor_y2 = yminus2_minor_version
 
-output = f"""#!/bin/bash
-set -euo pipefail
+template_path = pathlib.Path(__file__).resolve().parent / '../../assets/common_versions.sh.template'
 
-# Following file is auto-generated using generate_common_versions.py.
-# It should not be edited manually.
+with open(template_path, 'r') as f:
+    template_string = f.read()
 
-if [[ "${{BASH_SOURCE[0]}}" == "${{0}}" ]]; then
-    echo "This script must be sourced, not executed."
-    exit 1
-fi
-
-get_vrel_from_beta() {{
-    local -r beta_repo="$1"
-    local -r beta_vrel=$(\\
-        dnf repoquery microshift \\
-            --quiet \\
-            --queryformat '%{{version}}-%{{release}}' \\
-            --disablerepo '*' \\
-            --repofrompath "this,${{beta_repo}}" \\
-            --latest-limit 1 2>/dev/null \\
-        )
-    if [ -n "${{beta_vrel}}" ]; then
-        echo "${{beta_vrel}}"
-        return
-    fi
-    echo ""
-}}
-
-get_vrel_from_rhsm() {{
-    local -r rhsm_repo="$1"
-    local -r rhsm_vrel=$(\\
-        dnf repoquery microshift \\
-            --quiet \\
-            --queryformat '%{{version}}-%{{release}}' \\
-            --repo "${{rhsm_repo}}" \\
-            --latest-limit 1 2>/dev/null \\
-        )
-    if [ -n "${{rhsm_vrel}}" ]; then
-        echo "${{rhsm_vrel}}"
-        return
-    fi
-    echo ""
-}}
-
-get_vrel_from_rpm() {{
-    local -r rpm_dir="$1"
-
-    local -r rpm_release_info_file=$(find "${{rpm_dir}}" -name "microshift-release-info-*.rpm" | sort | tail -n1)
-    if [ -z "${{rpm_release_info_file}}" ]; then
-        echo ""
-        return
-    fi
-
-    local -r rpm_vrel=$(\\
-        rpm -qp --queryformat '%{{version}}-%{{release}}' \\
-            -p "${{rpm_release_info_file}}" 2>/dev/null \\
-        )
-    if [ -n "${{rpm_vrel}}" ]; then
-        echo "${{rpm_vrel}}"
-        return
-    fi
-    echo ""
-}}
-
-export MINOR_VERSION={minor_version}
-export PREVIOUS_MINOR_VERSION=$(( "${{MINOR_VERSION}}" - 1 ))
-export YMINUS2_MINOR_VERSION=$(( "${{MINOR_VERSION}}" - 2 ))
-export FAKE_NEXT_MINOR_VERSION=$(( "${{MINOR_VERSION}}" + 1 ))
-
-CURRENT_RELEASE_REPO="{current_release_repo}"
-CURRENT_RELEASE_VERSION="{current_release_version}"
-export CURRENT_RELEASE_REPO
-export CURRENT_RELEASE_VERSION
-
-PREVIOUS_RELEASE_REPO="{previous_release_repo}"
-PREVIOUS_RELEASE_VERSION="{previous_release_version}"
-export PREVIOUS_RELEASE_REPO
-export PREVIOUS_RELEASE_VERSION
-
-YMINUS2_RELEASE_REPO="{yminus2_release_repo}"
-YMINUS2_RELEASE_VERSION="{yminus2_release_version}"
-export YMINUS2_RELEASE_REPO
-export YMINUS2_RELEASE_VERSION
-
-RHOCP_MINOR_Y={rhocp_minor_y}
-RHOCP_MINOR_Y_BETA="{rhocp_minor_y_beta}"
-export RHOCP_MINOR_Y
-export RHOCP_MINOR_Y_BETA
-
-RHOCP_MINOR_Y1={rhocp_minor_y1}
-RHOCP_MINOR_Y1_BETA="{rhocp_minor_y1_beta}"
-export RHOCP_MINOR_Y1
-export RHOCP_MINOR_Y1_BETA
-
-export RHOCP_MINOR_Y2={rhocp_minor_y2}
-
-export CNCF_SONOBUOY_VERSION={CNCF_SONOBUOY_VERSION}
-
-export GITOPS_VERSION={GITOPS_VERSION}
-
-# The brew release versions needed for release regression testing
-BREW_Y0_RELEASE_VERSION="$(get_vrel_from_rpm "${{BREW_RPM_SOURCE}}/4.${{MINOR_VERSION}}-zstream/${{UNAME_M}}/")"
-BREW_Y1_RELEASE_VERSION="$(get_vrel_from_rpm "${{BREW_RPM_SOURCE}}/4.${{PREVIOUS_MINOR_VERSION}}-zstream/${{UNAME_M}}/")"
-BREW_Y2_RELEASE_VERSION="$(get_vrel_from_rpm "${{BREW_RPM_SOURCE}}/4.${{YMINUS2_MINOR_VERSION}}-zstream/${{UNAME_M}}/")"
-BREW_RC_RELEASE_VERSION="$(get_vrel_from_rpm "${{BREW_RPM_SOURCE}}/4.${{MINOR_VERSION}}-rc/${{UNAME_M}}/")"
-BREW_EC_RELEASE_VERSION="$(get_vrel_from_rpm "${{BREW_RPM_SOURCE}}/4.${{MINOR_VERSION}}-ec/${{UNAME_M}}/")"
-export BREW_Y0_RELEASE_VERSION
-export BREW_Y1_RELEASE_VERSION
-export BREW_Y2_RELEASE_VERSION
-export BREW_RC_RELEASE_VERSION
-export BREW_EC_RELEASE_VERSION
-
-LATEST_RELEASE_TYPE="{LATEST_RELEASE_TYPE}"
-export LATEST_RELEASE_TYPE"""
+output = template_string.format(
+    minor_version=minor_version,
+    current_release_repo=current_release_repo,
+    current_release_version=current_release_version,
+    previous_release_repo=previous_release_repo,
+    previous_release_version=previous_release_version,
+    yminus2_release_repo=yminus2_release_repo,
+    yminus2_release_version=yminus2_release_version,
+    rhocp_minor_y=rhocp_minor_y,
+    rhocp_minor_y_beta=rhocp_minor_y_beta,
+    rhocp_minor_y1=rhocp_minor_y1,
+    rhocp_minor_y1_beta=rhocp_minor_y1_beta,
+    rhocp_minor_y2=rhocp_minor_y2,
+    CNCF_SONOBUOY_VERSION=CNCF_SONOBUOY_VERSION,
+    GITOPS_VERSION=GITOPS_VERSION,
+    LATEST_RELEASE_TYPE=LATEST_RELEASE_TYPE,
+    ARCH=ARCH
+)
 
 output_noarch = output.replace(ARCH, '$(uname -m)')
 
