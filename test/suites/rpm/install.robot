@@ -55,23 +55,6 @@ Setup
     System Should Not Be Ostree
     Pull Secret Should Be Installed
 
-System Should Not Be Ostree
-    [Documentation]    Make sure we run on a non-ostree system
-    ${is_ostree}=    Is System OSTree
-    Should Not Be True    ${is_ostree}
-
-Pull Secret Should Be Installed
-    [Documentation]    Check that the kickstart file installed a pull secret for us
-    # Check that the file exists without actually saving the output so
-    # we don't have to clean the logs with the secret.
-    ${rc}=    SSHLibrary.Execute Command
-    ...    cat /etc/crio/openshift-pull-secret
-    ...    sudo=True
-    ...    return_rc=True
-    ...    return_stdout=False
-    ...    return_stderr=False
-    Should Be Equal As Integers    0    ${rc}
-
 Teardown
     [Documentation]    Test suite teardown
     Logout MicroShift Host
