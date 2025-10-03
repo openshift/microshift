@@ -107,3 +107,11 @@ Verify MicroShift RPM Install
 
     # Checks only config files from RPM packages excluding modification time check
     Command Should Work    rpm -qa microshift\* | xargs -I {} bash -c 'echo {}; sudo rpm -V --configfiles --nomtime {}'
+
+Pull Secret Should Be Installed
+    [Documentation]    Check that the kickstart file installed a pull secret for us
+    ${stdout}    ${stderr}    ${rc}=    SSHLibrary.Execute Command
+    ...    stat /etc/crio/openshift-pull-secret
+    ...    sudo=True    return_rc=True    return_stderr=True    return_stdout=True
+    Log Many    ${stdout}    ${stderr}
+    Should Be Equal As Integers    0    ${rc}

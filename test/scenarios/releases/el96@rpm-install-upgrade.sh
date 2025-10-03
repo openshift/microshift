@@ -91,9 +91,8 @@ scenario_remove_vms() {
 }
 
 scenario_run_tests() {
-    local -r source_reponame=$(basename "${LOCAL_REPO}")
-    local -r source_repo_url="${WEB_SERVER_URL}/rpm-repos/${source_reponame}"
-    local -r target_version=$(local_rpm_version)
+    local -r reponame=$(basename "${BREW_REPO}")
+    local -r repo_url="${WEB_SERVER_URL}/rpm-repos/${reponame}"
 
     # Enable the rhocp and dependency repositories.
     #
@@ -109,8 +108,8 @@ scenario_run_tests() {
 
     run_tests host1 \
         --exitonfailure \
-        --variable "SOURCE_REPO_URL:${source_repo_url}" \
-        --variable "TARGET_VERSION:${target_version}" \
+        --variable "SOURCE_REPO_URL:${repo_url}" \
+        --variable "TARGET_VERSION:${BREW_LREL_RELEASE_VERSION}" \
         --variable "PREVIOUS_MINOR_VERSION:${PREVIOUS_MINOR_VERSION}" \
         suites/rpm/install.robot \
         suites/rpm/remove.robot \
