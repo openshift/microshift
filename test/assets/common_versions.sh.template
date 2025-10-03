@@ -1,0 +1,114 @@
+#!/bin/bash
+set -euo pipefail
+
+# Following file is auto-generated using generate_common_versions.py.
+# It should not be edited manually.
+
+if [[ "${{BASH_SOURCE[0]}}" == "${{0}}" ]]; then
+    echo "This script must be sourced, not executed."
+    exit 1
+fi
+
+get_vrel_from_beta() {{
+    local -r beta_repo="$1"
+    local -r beta_vrel=$(\
+        dnf repoquery microshift \
+            --quiet \
+            --queryformat '%{{version}}-%{{release}}' \
+            --disablerepo '*' \
+            --repofrompath "this,${{beta_repo}}" \
+            --latest-limit 1 2>/dev/null \
+        )
+    if [ -n "${{beta_vrel}}" ]; then
+        echo "${{beta_vrel}}"
+        return
+    fi
+    echo ""
+}}
+
+get_vrel_from_rhsm() {{
+    local -r rhsm_repo="$1"
+    local -r rhsm_vrel=$(\
+        dnf repoquery microshift \
+            --quiet \
+            --queryformat '%{{version}}-%{{release}}' \
+            --repo "${{rhsm_repo}}" \
+            --latest-limit 1 2>/dev/null \
+        )
+    if [ -n "${{rhsm_vrel}}" ]; then
+        echo "${{rhsm_vrel}}"
+        return
+    fi
+    echo ""
+}}
+
+get_vrel_from_rpm() {{
+    local -r rpm_dir="$1"
+
+    local -r rpm_release_info_file=$(find "${{rpm_dir}}" -name "microshift-release-info-*.rpm" | sort | tail -n1)
+    if [ -z "${{rpm_release_info_file}}" ]; then
+        echo ""
+        return
+    fi
+
+    local -r rpm_vrel=$(\
+        rpm -qp --queryformat '%{{version}}-%{{release}}' \
+            -p "${{rpm_release_info_file}}" 2>/dev/null \
+        )
+    if [ -n "${{rpm_vrel}}" ]; then
+        echo "${{rpm_vrel}}"
+        return
+    fi
+    echo ""
+}}
+
+export MINOR_VERSION={minor_version}
+export PREVIOUS_MINOR_VERSION=$(( "${{MINOR_VERSION}}" - 1 ))
+export YMINUS2_MINOR_VERSION=$(( "${{MINOR_VERSION}}" - 2 ))
+export FAKE_NEXT_MINOR_VERSION=$(( "${{MINOR_VERSION}}" + 1 ))
+
+CURRENT_RELEASE_REPO="{current_release_repo}"
+CURRENT_RELEASE_VERSION="{current_release_version}"
+export CURRENT_RELEASE_REPO
+export CURRENT_RELEASE_VERSION
+
+PREVIOUS_RELEASE_REPO="{previous_release_repo}"
+PREVIOUS_RELEASE_VERSION="{previous_release_version}"
+export PREVIOUS_RELEASE_REPO
+export PREVIOUS_RELEASE_VERSION
+
+YMINUS2_RELEASE_REPO="{yminus2_release_repo}"
+YMINUS2_RELEASE_VERSION="{yminus2_release_version}"
+export YMINUS2_RELEASE_REPO
+export YMINUS2_RELEASE_VERSION
+
+RHOCP_MINOR_Y={rhocp_minor_y}
+RHOCP_MINOR_Y_BETA="{rhocp_minor_y_beta}"
+export RHOCP_MINOR_Y
+export RHOCP_MINOR_Y_BETA
+
+RHOCP_MINOR_Y1={rhocp_minor_y1}
+RHOCP_MINOR_Y1_BETA="{rhocp_minor_y1_beta}"
+export RHOCP_MINOR_Y1
+export RHOCP_MINOR_Y1_BETA
+
+export RHOCP_MINOR_Y2={rhocp_minor_y2}
+
+export CNCF_SONOBUOY_VERSION={CNCF_SONOBUOY_VERSION}
+
+export GITOPS_VERSION={GITOPS_VERSION}
+
+# The brew release versions needed for release regression testing
+BREW_Y0_RELEASE_VERSION="$(get_vrel_from_rpm "${{BREW_RPM_SOURCE}}/4.${{MINOR_VERSION}}-zstream/{ARCH}/")"
+BREW_Y1_RELEASE_VERSION="$(get_vrel_from_rpm "${{BREW_RPM_SOURCE}}/4.${{PREVIOUS_MINOR_VERSION}}-zstream/{ARCH}/")"
+BREW_Y2_RELEASE_VERSION="$(get_vrel_from_rpm "${{BREW_RPM_SOURCE}}/4.${{YMINUS2_MINOR_VERSION}}-zstream/{ARCH}/")"
+BREW_RC_RELEASE_VERSION="$(get_vrel_from_rpm "${{BREW_RPM_SOURCE}}/4.${{MINOR_VERSION}}-rc/{ARCH}/")"
+BREW_EC_RELEASE_VERSION="$(get_vrel_from_rpm "${{BREW_RPM_SOURCE}}/4.${{MINOR_VERSION}}-ec/{ARCH}/")"
+export BREW_Y0_RELEASE_VERSION
+export BREW_Y1_RELEASE_VERSION
+export BREW_Y2_RELEASE_VERSION
+export BREW_RC_RELEASE_VERSION
+export BREW_EC_RELEASE_VERSION
+
+LATEST_RELEASE_TYPE="{LATEST_RELEASE_TYPE}"
+export LATEST_RELEASE_TYPE
