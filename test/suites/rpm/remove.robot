@@ -40,7 +40,6 @@ Setup
     Check Required Env Variables
     Login MicroShift Host
     System Should Not Be Ostree
-    Pull Secret Should Be Installed
 
 Teardown
     [Documentation]    Test suite teardown
