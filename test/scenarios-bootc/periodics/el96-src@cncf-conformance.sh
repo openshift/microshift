@@ -113,6 +113,11 @@ run_sonobuoy() {
         if [ $(( now - start )) -ge ${TIMEOUT_TEST} ]; then
             rc=1
             echo "Tests running for ${TIMEOUT_TEST}s. Timing out"
+            # Obtain all resources in the sonobuoy namespace with the highest possible detail
+            ~/go/bin/sonobuoy logs > "${SCENARIO_INFO_DIR}/${SCENARIO}/sonobuoy-logs.txt" || true
+            oc get all -n sonobuoy -o wide > "${SCENARIO_INFO_DIR}/${SCENARIO}/sonobuoy-resources.txt" || true
+            oc describe all -n sonobuoy > "${SCENARIO_INFO_DIR}/${SCENARIO}/sonobuoy-resources-describe.txt" || true
+            oc get events -n sonobuoy --sort-by=.metadata.creationTimestamp > "${SCENARIO_INFO_DIR}/${SCENARIO}/sonobuoy-events.txt" || true
             record_junit "run_sonobuoy" "wait_e2e_finished" "FAILED"
             break
         fi
