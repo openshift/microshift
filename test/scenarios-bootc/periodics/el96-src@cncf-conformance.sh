@@ -77,8 +77,8 @@ run_sonobuoy() {
     go install "github.com/vmware-tanzu/sonobuoy@${CNCF_SONOBUOY_VERSION}"
     # Force the images to include the registry, as default values may introduce ambiguity (e.g. sonobuoy/sonobuoy:v0.57.3)
     ~/go/bin/sonobuoy run \
-	    --sonobuoy-image docker.io/sonobuoy/sonobuoy:${CNCF_SONOBUOY_VERSION} \
-        --systemd-logs-image docker.io/sonobuoy/systemd-logs:${CNCF_SYSTEMD_LOGS_VERSION} \
+	    --sonobuoy-image "docker.io/sonobuoy/sonobuoy:${CNCF_SONOBUOY_VERSION}" \
+        --systemd-logs-image "docker.io/sonobuoy/systemd-logs:${CNCF_SYSTEMD_LOGS_VERSION}" \
         --mode=certified-conformance \
         --plugin-env=e2e.E2E_SKIP=".*Services should be able to switch session affinity for NodePort service.*" \
         --dns-namespace=openshift-dns \
