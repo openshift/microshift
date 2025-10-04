@@ -57,6 +57,8 @@ function configure_microshift() {
     cat <<EOF | sudo tee /etc/microshift/config.yaml &>/dev/null
 apiServer:
   advertiseAddress: ${PRI_NODE_ADDR}
+telemetry:
+  status: Disabled
 EOF
 }
 

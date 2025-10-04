@@ -123,6 +123,9 @@ export RHOCP_MINOR_Y2=19
 # See https://github.com/vmware-tanzu/sonobuoy/releases.
 export CNCF_SONOBUOY_VERSION=v0.57.3
 
+# The version of systemd-logs image included in the sonobuoy release.
+export CNCF_SYSTEMD_LOGS_VERSION=v0.4
+
 # The current version of the microshift-gitops package.
 export GITOPS_VERSION=1.16
 
