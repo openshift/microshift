@@ -1,33 +1,26 @@
-- cluster-kube-apiserver-operator embedded-component f47238554feb2fa6dbce3333adc7e26ffe2d8424 to 511bc434f628cf364966b53a5d350908e51d4b9c
-  - eee9449 2025-08-13T14:59:21+00:00 OCPBUGS-50489: Add missing service ports to apiserver service
+- kubernetes embedded-component f3d912311b7c3537def4501ef8e15fda821078e5 to d1618535bbc641daee580987e2ccb5fa09f59def
+  - c8bc9ba3d 2025-09-18T12:02:30+00:00 UPSTREAM: <carry>: Don't retry storage calls with side effects.
 
-- cluster-network-operator embedded-component 45b0ba681e5b2ff88b75c61e17a375fe301b2bb6 to e75d8fa7a0c30a4ad7500b3253f303e051f9ce0b
-  - acbdfcf 2025-09-04T14:14:04+00:00 HOSTEDCP-1981: Add controlplane cli image envar for use with hypershift
+- machine-config-operator embedded-component cbd3b1f2d4ff551425658cca30ecf8cfc5fe3277 to dc686507c125fa853ace72d932c43134779e4540
+  - 35bf306e 2025-10-02T22:38:03+00:00 add new recording rule for unsuported packages
+  - 2ecdc272 2025-09-17T14:56:50+00:00 OCPBUGS-61695: Override NMState service definition
+  - 46e8215f 2025-07-29T14:46:11+00:00 OCPBUGS-57484: Handle migration from OpenShift SDN
+  - 3ff3a657 2025-07-29T14:46:11+00:00 OPNET-681: Support migration from configure-ovs to NMState
+  - fcd3adc3 2025-05-27T16:54:12+00:00 OCPBUGS-36859: Support NODEIP_HINT in IPI deployments too
 
-- kubernetes embedded-component c68a6637efaef7f3bb6f3cf4d6f2ac223c12703d to f3d912311b7c3537def4501ef8e15fda821078e5
-  - df551dc6b 2025-09-10T08:15:03-04:00 UPSTREAM: <carry>: remove the backward compat featuregate for 132028
-  - 63ee8430d 2025-09-09T11:59:40-04:00 UPSTREAM: 132028: podresources: list: use active pods in list
-  - 757c39582 2025-08-28T14:26:20+02:00 UPSTREAM: 127757: scheduler: Improve CSILimits plugin accuracy by using VolumeAttachments
+- openshift-controller-manager embedded-component 326317ac51b73267300ff3262887dd5326ada0ac to 90f73f7ea939b221b79684ebe6d2feb843fc1f83
+  - acb2fae 2025-09-15T05:31:48+00:00 legacy image pull secret rollback controller
+  - e68c3d9 2025-09-15T05:31:48+00:00 introduce rollback controllers
 
-- operator-framework-olm embedded-component 922674d862d36ec848a7cf364d669731edc9c038 to e48ec38c748a5cb90cdaf2fe017fb161301886ae
-  - 25d15cb6 2025-09-10T09:09:05+02:00 operatorgroup: ensure clusterroleselectors in clusterrole aggregation rules are sorted (#3593)
-  - 4c172ef7 2025-09-06T18:05:40+02:00 UPSTREAM: <carry>: make downstream csv namespace labeler plugin e2e more resilient to race conditions
-  - 0c09d1e6 2025-09-06T18:05:35+02:00 Make PSA catalog tests more resilient (#3645)
-  - dfdcdc3c 2025-09-06T18:05:30+02:00 refactor ensure job to remove named parameters (#3644)
-  - d1cf1763 2025-09-06T18:05:25+02:00 Disable FailForward bad resource e2e (#3572)
-  - 5fa22132 2025-08-20T14:18:34-04:00 Upstream: <carry>: regenerate manifests
-  - 532583c0 2025-08-20T13:22:01-04:00 Upstream: <carry>: Add allow-all networkpolicy for openshift-operators namespace
-  - 1b90107a 2025-08-20T13:21:53-04:00 Upstream: 3580: add NetworkPolicy as a supported kind
-  - 85058364 2025-08-20T13:21:44-04:00 Upstream: 1675: Add NetworkPolicy as a supported kind
-  - c2fb6b2b 2025-07-22T15:42:53-04:00 OCPBUGS-37982: Reduce Frequency of Update Requests for Copied CSVs (#3597)
+- ovn-kubernetes image-amd64 4ddb31314bc3e6372317e4b8f16982d9594e197f to 698c76385e3eed0cbeeee5207bc5023d34b82e1b
+  - e954f008 2025-09-03T12:41:07+02:00 Always enable global IPv6 forwarding
 
-- kubernetes image-amd64 c68a6637efaef7f3bb6f3cf4d6f2ac223c12703d to f3d912311b7c3537def4501ef8e15fda821078e5
-  - df551dc6b 2025-09-10T08:15:03-04:00 UPSTREAM: <carry>: remove the backward compat featuregate for 132028
-  - 63ee8430d 2025-09-09T11:59:40-04:00 UPSTREAM: 132028: podresources: list: use active pods in list
-  - 757c39582 2025-08-28T14:26:20+02:00 UPSTREAM: 127757: scheduler: Improve CSILimits plugin accuracy by using VolumeAttachments
+- kubernetes image-amd64 f3d912311b7c3537def4501ef8e15fda821078e5 to d1618535bbc641daee580987e2ccb5fa09f59def
+  - c8bc9ba3d 2025-09-18T12:02:30+00:00 UPSTREAM: <carry>: Don't retry storage calls with side effects.
 
-- kubernetes image-arm64 c68a6637efaef7f3bb6f3cf4d6f2ac223c12703d to f3d912311b7c3537def4501ef8e15fda821078e5
-  - df551dc6b 2025-09-10T08:15:03-04:00 UPSTREAM: <carry>: remove the backward compat featuregate for 132028
-  - 63ee8430d 2025-09-09T11:59:40-04:00 UPSTREAM: 132028: podresources: list: use active pods in list
-  - 757c39582 2025-08-28T14:26:20+02:00 UPSTREAM: 127757: scheduler: Improve CSILimits plugin accuracy by using VolumeAttachments
+- ovn-kubernetes image-arm64 4ddb31314bc3e6372317e4b8f16982d9594e197f to 698c76385e3eed0cbeeee5207bc5023d34b82e1b
+  - e954f008 2025-09-03T12:41:07+02:00 Always enable global IPv6 forwarding
+
+- kubernetes image-arm64 f3d912311b7c3537def4501ef8e15fda821078e5 to d1618535bbc641daee580987e2ccb5fa09f59def
+  - c8bc9ba3d 2025-09-18T12:02:30+00:00 UPSTREAM: <carry>: Don't retry storage calls with side effects.
 
