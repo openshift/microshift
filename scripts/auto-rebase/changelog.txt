@@ -1,12 +1,5 @@
-- api embedded-component 491784f55cb31c550e9a82f13166d7e08d800ae9 to 41627d81e9c18fbcc3f7ff6de2ba50e0b98435c4
-  - 81c24c86 2025-09-26T14:28:39+00:00 Fix: Updated the printer column entry
-  - b3496f18 2025-09-25T19:08:54+00:00 Updated column type from string to date
-
-- cluster-network-operator embedded-component 6a287ae0e3a52b664ac6dc5dfc4f2913d1d1ef2a to 222905435d8186385608b8bdb864e2a5c73406e0
-  - 2c65e91 2025-09-16T12:17:15+00:00 Add validation check for labels and test
-  - 2db750e 2025-09-16T12:17:15+00:00 Add documentation surrounding the Smart-NIC/DPU Host/DPU mode labels
-  - 0dc7fcc 2025-09-16T12:17:15+00:00 Relax label req. of DPU/DPU Host/Smart NIC
-
-- machine-config-operator embedded-component c258b4ed3a457081e001c234ab289c5526572c64 to d707114bc07c40c63084de0f91748b2efda91739
-  - 9120a52f 2025-10-01T06:24:15+00:00 OCPBUGS-60805: configure-ovs: work around a Cisco switch issue
+- machine-config-operator embedded-component d707114bc07c40c63084de0f91748b2efda91739 to 58f14fc5d33718cc2c6c38e51e05147a8303aba1
+  - 941c3279 2025-10-02T13:57:21+00:00 certcontroller: update unit tests
+  - 1203a83c 2025-10-02T13:57:21+00:00 certcontroller: resync on infra object
+  - b9b69935 2025-09-24T17:26:15+00:00 controller: update is node done check to handle image mode disabling case & add unit test cases for scenario
 
