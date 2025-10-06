@@ -1,15 +1,15 @@
 {
   "release": {
-    "base": "4.19.0-0.nightly-arm64-2025-09-28-023732"
+    "base": "4.19.0-0.nightly-arm64-2025-10-05-204005"
   },
   "images": {
     "cli": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:370ba26588bbc7b3d1b0bdd6004110c136970801f4bba260acf7249ce77ce512",
-    "coredns": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:ab7e986a88d06135080cebd361fd5ca4869846345c50add0b053e73d5a361dcd",
-    "haproxy-router": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:d5709e436550d7f9b6ea9edd34df750aa339f7e128258e6e111aba9d8e67c72c",
-    "kube-rbac-proxy": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:085771f27cef08b50fc9a1fa2465f6e559f9c96bf592825b09aba5182300b55d",
+    "coredns": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:0da40c6fdbb38831ad39146a38d1ab7bf4e2d2a318eace9a0adce3bae9c99cb4",
+    "haproxy-router": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:61430c0afe3740d02c308bf3231a404e54f5a630754e988602675c4e4762988b",
+    "kube-rbac-proxy": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:0517587346574e30fea8e9417ef803c0a5999960dae442ddb6380953241a0255",
     "ovn-kubernetes-microshift": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:76faa005e82d045c5ad799c192bda1b9c5c914480b1a11bf51c80f8fc8a08d94",
     "pod": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:1bfc6350de7f21281eab195e2d72feedbb949680541bae9a97e0a80e7ab2fc8f",
-    "service-ca-operator": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:bae6fc9c3d75050ccbe34780d5045e081d7ce4958b942cbde4af32a492eb04ff",
+    "service-ca-operator": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:762b5ad0a26ee1f657aa5f43f2594469570948554ce11fece78e3a5d01e2fb3d",
     "lvms_operator": "registry.redhat.io/lvms4/lvms-rhel9-operator@sha256:03771d66c0ed8a422c012ffaf6f390d8c3191e02330ef9b9dee00af518928d6e",
     "csi-snapshot-controller": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:8f8be9a3be7ebc665cb7ecb495b926277ec7a784d51f4848ed9d8efd12363000"
   }
