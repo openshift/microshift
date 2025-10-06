@@ -718,12 +718,13 @@ github.com/openshift/library-go/pkg/route/validation
 github.com/openshift/library-go/pkg/security/ldaputil
 github.com/openshift/library-go/pkg/security/uid
 github.com/openshift/library-go/pkg/serviceability
-# github.com/openshift/route-controller-manager v0.0.0-20250923162243-9f4b06c555c1
+# github.com/openshift/route-controller-manager v0.0.0-20251003152740-a099b46f80ef
 ## explicit; go 1.24.0
 github.com/openshift/route-controller-manager/pkg/cmd/controller
 github.com/openshift/route-controller-manager/pkg/cmd/route-controller-manager
 github.com/openshift/route-controller-manager/pkg/route/ingress
 github.com/openshift/route-controller-manager/pkg/route/ingressip
+github.com/openshift/route-controller-manager/pkg/routecontroller
 github.com/openshift/route-controller-manager/pkg/version
 # github.com/peterbourgon/diskv v2.0.1+incompatible
 ## explicit

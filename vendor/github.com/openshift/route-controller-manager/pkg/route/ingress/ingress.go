@@ -40,6 +40,7 @@ import (
 	routeclient "github.com/openshift/client-go/route/clientset/versioned/typed/route/v1"
 	routeinformers "github.com/openshift/client-go/route/informers/externalversions/route/v1"
 	routelisters "github.com/openshift/client-go/route/listers/route/v1"
+	"github.com/openshift/route-controller-manager/pkg/routecontroller"
 )
 
 // Controller ensures that zero or more routes exist to match any supported ingress. The
@@ -607,7 +608,7 @@ func (c *Controller) ingressManaged(ingress *networkingv1.Ingress) (bool, error)
 	// not specify openshift.io/ingress-to-route as its controller, ignore
 	// the ingress.
 	var ingressClassName *string
-	if v, ok := ingress.Annotations["kubernetes.io/ingress.class"]; ok {
+	if v, ok := ingress.Annotations[routecontroller.IngressClassAnnotation]; ok {
 		ingressClassName = &v
 	} else {
 		ingressClassName = ingress.Spec.IngressClassName
@@ -692,7 +693,7 @@ func preserveRouteAttributesFromExisting(r, existing *routev1.Route) {
 		r.Spec.TLS.CACertificate = existing.Spec.TLS.CACertificate
 		r.Spec.TLS.InsecureEdgeTerminationPolicy = existing.Spec.TLS.InsecureEdgeTerminationPolicy
 		if r.Spec.TLS.Termination == routev1.TLSTerminationReencrypt {
-			if _, ok := r.Annotations[destinationCACertificateAnnotationKey]; !ok {
+			if _, ok := r.Annotations[routecontroller.DestinationCACertificateAnnotationKey]; !ok {
 				r.Spec.TLS.DestinationCACertificate = existing.Spec.TLS.DestinationCACertificate
 			}
 		}
@@ -745,7 +746,7 @@ func routeMatchesIngress(
 
 	if route.Spec.TLS != nil && tlsConfig != nil {
 		tlsConfig.InsecureEdgeTerminationPolicy = route.Spec.TLS.InsecureEdgeTerminationPolicy
-		if _, ok := ingress.Annotations[destinationCACertificateAnnotationKey]; !ok {
+		if _, ok := ingress.Annotations[routecontroller.DestinationCACertificateAnnotationKey]; !ok {
 			tlsConfig.DestinationCACertificate = route.Spec.TLS.DestinationCACertificate
 		}
 	}
@@ -906,7 +907,7 @@ func tlsConfigForIngress(
 var emptyTLS = networkingv1.IngressTLS{}
 
 func tlsEnabled(ingress *networkingv1.Ingress, rule *networkingv1.IngressRule, potentiallyNilTLSSecret *corev1.Secret) bool {
-	switch ingress.Annotations[terminationPolicyAnnotationKey] {
+	switch ingress.Annotations[routecontroller.TerminationPolicyAnnotationKey] {
 	case string(routev1.TLSTerminationPassthrough), string(routev1.TLSTerminationReencrypt), string(routev1.TLSTerminationEdge):
 		return true
 	}
@@ -944,23 +945,19 @@ func tlsSecretIfValid(ingress *networkingv1.Ingress, rule *networkingv1.IngressR
 	return secret, false
 }
 
-var terminationPolicyAnnotationKey = routev1.GroupName + "/termination"
-
 func terminationPolicyForIngress(ingress *networkingv1.Ingress) routev1.TLSTerminationType {
 	switch {
-	case ingress.Annotations[terminationPolicyAnnotationKey] == string(routev1.TLSTerminationPassthrough):
+	case ingress.Annotations[routecontroller.TerminationPolicyAnnotationKey] == string(routev1.TLSTerminationPassthrough):
 		return routev1.TLSTerminationPassthrough
-	case ingress.Annotations[terminationPolicyAnnotationKey] == string(routev1.TLSTerminationReencrypt):
+	case ingress.Annotations[routecontroller.TerminationPolicyAnnotationKey] == string(routev1.TLSTerminationReencrypt):
 		return routev1.TLSTerminationReencrypt
 	default:
 		return routev1.TLSTerminationEdge
 	}
 }
 
-var destinationCACertificateAnnotationKey = routev1.GroupName + "/destination-ca-certificate-secret"
-
 func destinationCACertificateForIngress(ingress *networkingv1.Ingress, secretLister corelisters.SecretLister) *string {
-	name := ingress.Annotations[destinationCACertificateAnnotationKey]
+	name := ingress.Annotations[routecontroller.DestinationCACertificateAnnotationKey]
 	secret, err := secretLister.Secrets(ingress.Namespace).Get(name)
 	if err != nil {
 		return nil

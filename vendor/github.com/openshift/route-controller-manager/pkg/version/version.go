@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"runtime"
 
+	routecontrollermanager "github.com/openshift/route-controller-manager/pkg/routecontroller"
 	"k8s.io/component-base/metrics"
 	"k8s.io/component-base/metrics/legacyregistry"
 
@@ -62,7 +63,7 @@ func Get() version.Info {
 func init() {
 	buildInfo := metrics.NewGaugeVec(
 		&metrics.GaugeOpts{
-			Name: "openshift_build_info",
+			Name: routecontrollermanager.MetricOpenshiftBuildInfo,
 			Help: "A metric with a constant '1' value labeled by major, minor, git commit & git version from which OpenShift was built.",
 		},
 		[]string{"major", "minor", "gitCommit", "gitVersion"},
