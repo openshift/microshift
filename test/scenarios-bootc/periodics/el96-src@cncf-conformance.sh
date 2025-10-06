@@ -7,6 +7,13 @@ KUBECONFIG="${SCENARIO_INFO_DIR}/${SCENARIO}/kubeconfig"
 TIMEOUT_TEST=7400
 TIMEOUT_RESULTS=600
 
+collect_sonobuoy_debug_info() {
+    ~/go/bin/sonobuoy logs > "${SCENARIO_INFO_DIR}/${SCENARIO}/sonobuoy-logs.txt" || true
+    oc get all -n sonobuoy -o wide > "${SCENARIO_INFO_DIR}/${SCENARIO}/sonobuoy-resources.txt" || true
+    oc describe all -n sonobuoy > "${SCENARIO_INFO_DIR}/${SCENARIO}/sonobuoy-resources-describe.txt" || true
+    oc get events -n sonobuoy --sort-by=.metadata.creationTimestamp > "${SCENARIO_INFO_DIR}/${SCENARIO}/sonobuoy-events.txt" || true
+}
+
 prepare_hosts() {
     local -r primary_host_ip=$(cat "${SCENARIO_INFO_DIR}/${SCENARIO}/vms/host1/ip")
     local -r secondary_host_ip=$(cat "${SCENARIO_INFO_DIR}/${SCENARIO}/vms/host2/ip")
@@ -90,6 +97,8 @@ run_sonobuoy() {
     done
     if [ ${rc} -ne 0 ] ; then
         echo "Failed to start tests after 5m"
+        # Retrieve sonobuoy info in case the tests have not started yet. This covers scheduling/container creation issues.
+        collect_sonobuoy_debug_info
         ~/go/bin/sonobuoy status --json
         record_junit "run_sonobuoy" "wait_e2e_running" "FAILED"
         return ${rc}
@@ -110,6 +119,7 @@ run_sonobuoy() {
         if [ $(( now - start )) -ge ${TIMEOUT_TEST} ]; then
             rc=1
             echo "Tests running for ${TIMEOUT_TEST}s. Timing out"
+            collect_sonobuoy_debug_info
             record_junit "run_sonobuoy" "wait_e2e_finished" "FAILED"
             break
         fi
