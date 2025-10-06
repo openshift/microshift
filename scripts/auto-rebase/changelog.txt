@@ -1,16 +1,337 @@
-- kubernetes embedded-component a06f3261941734178f3c43db62a80cc5fc97f7ad to e2e5d628ce43695982002737a4d1f1c6eb30eb11
-  - 2f8bedf06 2025-09-15T15:19:19-04:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
-  - c601ba40f 2025-09-09T22:51:56+00:00 Release commit for Kubernetes v1.31.13
-  - 2ac4b0da7 2025-08-29T16:28:13+08:00 Fix missing control plane health check timeout
-  - 42d4a6111 2025-08-14T09:50:17+02:00 Bump images, dependencies and versions to go 1.23.12 and distroless iptables
-  - 877e6eab0 2025-08-13T14:48:00+00:00 Update CHANGELOG/CHANGELOG-1.31.md for v1.31.12
-  - c7b1b1f29 2025-07-16T11:07:28+02:00 Mask Linux thermal interrupt info in /proc and /sys.
+- machine-config-operator embedded-component 4929be38a15cf61a9f9ddeaf1ba89d185aa72611 to 8ed189ee8ff035b3a6b0248a61aa7e9e403739eb
+  - eb17591e 2025-10-01T10:35:44-04:00 drain: re-cordon nodes if needed
+  - 125e9615 2025-09-29T17:26:02+00:00 add new recording rule for unsuported packages
+  - 2474310f 2025-09-29T11:06:56+00:00 Add control-plane label for master nodes on legacy clusters
 
-- kubernetes image-amd64 a06f3261941734178f3c43db62a80cc5fc97f7ad to e2e5d628ce43695982002737a4d1f1c6eb30eb11
-  - 2f8bedf06 2025-09-15T15:19:19-04:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
-  - c601ba40f 2025-09-09T22:51:56+00:00 Release commit for Kubernetes v1.31.13
-  - 2ac4b0da7 2025-08-29T16:28:13+08:00 Fix missing control plane health check timeout
-  - 42d4a6111 2025-08-14T09:50:17+02:00 Bump images, dependencies and versions to go 1.23.12 and distroless iptables
-  - 877e6eab0 2025-08-13T14:48:00+00:00 Update CHANGELOG/CHANGELOG-1.31.md for v1.31.12
-  - c7b1b1f29 2025-07-16T11:07:28+02:00 Mask Linux thermal interrupt info in /proc and /sys.
+- ovn-kubernetes image-amd64 2cbd05df74c6ab851fc644a8614417f104d5a494 to 82307afacee498abba40ce7f8909a1db4277445a
+  - 50ba8767 2025-09-29T14:26:30+02:00 Remove NetworkUnavailable condition from node
+  - 2784783b 2025-08-18T14:02:52-07:00 add back the removed OCP hack from d/s merge
+  - b90abc54 2025-07-23T13:24:08+02:00 fix: skip gw IP check for DPU and improve gateway initialization readability
+  - 6c4bc78b 2025-07-23T08:56:24+00:00 e2e: label RouteAdvertisement test cases & skip extended ones
+  - 45bf0b39 2025-07-23T10:53:18+02:00 Revert "e2e: Use ovnk allocator and reserve IPs"
+  - 5b5bc069 2025-07-22T19:06:40+02:00 gateway: Refactor gateway initialization and DPU host handling
+  - d127877f 2025-07-22T15:53:32+01:00 build, vendor: consume ipamclaims v0.5.0-alpha
+  - 34b5a46c 2025-07-22T13:52:53+00:00 e2e: test against L2 networks in VRF-Lite test cases
+  - e72e62b3 2025-07-22T13:12:33+00:00 Remove unused portbinding code
+  - dfc14b4e 2025-07-22T10:22:05+00:00 e2e: refactor podIPOfFamilyOnPrimaryNetwork into more reusable code
+  - 5ece8463 2025-07-22T10:22:05+00:00 e2e: add VRF-Lite test cases
+  - edb05ca1 2025-07-22T10:22:05+00:00 kind.sh: Use FRRConfiguration label when advertising default network
+  - 926ba1ad 2025-07-22T10:22:05+00:00 e2e: use index in kind infra inspect templates to allow special characters
+  - acef39f4 2025-07-22T10:22:05+00:00 e2e: make ExtPort not required in container infra provider API
+  - 3dea4f52 2025-07-22T10:22:05+00:00 e2e: add RuntimeArgs to container infra provider API
+  - 90e56b92 2025-07-22T10:22:05+00:00 e2e: rename testdata package to testscenario
+  - dc437b63 2025-07-22T10:22:05+00:00 RouteAdvertisements: appropriately update status even if no updates
+  - b4eabd9c 2025-07-21T19:04:23+00:00 Bump the go_modules group across 2 directories with 1 update
+  - fa12bb26 2025-07-21T12:09:59-04:00 Bump fedora from 41 -> 42
+  - d565fd86 2025-07-21T14:41:46+05:30 Add e2e tests for ex gw pods in terminating or not ready state
+  - d942a7d8 2025-07-21T14:41:46+05:30 Add unit tests for ex gw pods in terminating or not ready state
+  - 3d32558b 2025-07-21T14:41:44+05:30 Remove routes of ex gw pods in terminating or not ready state
+  - ec378a7b 2025-07-18T17:56:44+00:00 Bump golang.org/x/oauth2
+  - 293f6dda 2025-07-18T16:57:43+00:00 ci: run tests only if files other than docs are changed
+  - 527c19fc 2025-07-18T18:08:55+02:00 Add support for --disable-requestedchassis flag in ovnkube controller
+  - 290eb038 2025-07-18T09:42:17-04:00 Add metrics for UDN
+  - 33e20b83 2025-07-18T11:16:38+02:00 [bridgeconfig] AI suggested fixes.
+  - f531e3d3 2025-07-18T11:16:38+02:00 [node/gateway] make PatchedNetConfigs internal, remove locking
+  - fd5e7915 2025-07-18T11:16:38+02:00 [node/gateway] nodePortWatcher should use its own bridgeConfiguration.
+  - a0c90f26 2025-07-18T11:16:38+02:00 [bridgeconfig] make mutex internal.
+  - fa6076bc 2025-07-18T11:16:38+02:00 [bridgeconfig] move nextHops to the gateway where it is used.
+  - 4ad1727c 2025-07-18T11:16:38+02:00 [bridgeconfig] make most members internal, ensure correct locking.
+  - 5a5e3b6d 2025-07-18T11:16:38+02:00 [bridgeconfig] move flow generation locking into methods.
+  - 28f9c1ec 2025-07-18T11:16:38+02:00 [bridgeconfig] move bridge flows generation functions to the pkg.
+  - b607e93d 2025-07-18T11:16:38+02:00 [bridgeconfig] add some getters/setters with lock to the pkg.
+  - 836e0f64 2025-07-18T11:16:38+02:00 [bridgeconfig] move setBridgeOfPorts to the package.
+  - cf93ef30 2025-07-18T11:16:38+02:00 [bridgeconfig] start moving methods that use internal mutex to the pkg
+  - a4d421a3 2025-07-18T11:16:37+02:00 [bridgeconfig] simply move functions around, no change
+  - 3b073327 2025-07-18T11:16:37+02:00 [bridgeconfig] only create BridgeConfigurations inside the package.
+  - 420d9f1c 2025-07-18T11:16:37+02:00 [bridgeconfig] make mutex a public field to turn it into internal later
+  - b65a01ef 2025-07-18T11:16:37+02:00 [node/bridgeconfig] move [udn]bridgeconfig to ite own package.
+  - f1a4b4b0 2025-07-18T11:16:24+02:00 [node/egressipgw] Move egressIP functionality to its own package.
+  - 956981a0 2025-07-18T10:24:09+02:00 kv, e2e: Use PrimaryNetwork()
+  - 115b25a3 2025-07-18T10:24:09+02:00 e2e: Move http servers to external container
+  - ae5b6387 2025-07-18T10:24:09+02:00 e2e: Move underlay setup to providers
+  - 1870116b 2025-07-18T10:24:09+02:00 e2e, kv: Use bgpnet for external container network
+  - 9fed90c7 2025-07-18T10:24:09+02:00 e2e: Use ovnk allocator and reserve IPs
+  - f1c76a61 2025-07-18T10:24:09+02:00 e2e, kv: Increase network status timeout
+  - 7c1de13e 2025-07-18T10:24:09+02:00 e2e: Remove harcoded breth0
+  - 318782be 2025-07-18T10:24:09+02:00 kv, e2e: Use the ExternalContainer struct instead of name
+  - b60dbcd9 2025-07-18T10:24:09+02:00 kv, e2e: ensure there is no dots at podtest name
+  - a0101b56 2025-07-18T10:24:07+02:00 kv, e2e: Download virtctl at tests
+  - dcc403c1 2025-07-17T17:08:39+02:00 Fix UDN to alien ClusterIP looping issue
+  - 82850ed2 2025-07-17T17:08:37+02:00 Enable Layer2 route advertisements on LGW
+  - 9e356ba5 2025-07-17T09:08:57+00:00 doc: Remove OKEP template from the list of rendered pages
+  - a6cac97a 2025-07-16T18:56:12+02:00 ovnkube in dpu host mode: advanced gateway detection
+  - b1816506 2025-07-16T15:49:12+01:00 E2Es: remove additional references to KinD setup
+  - 6018f47f 2025-07-16T13:29:23+01:00 E2E: lookup support for IP families instead of using env var
+  - ab8d4733 2025-07-16T14:23:38+02:00 virt: Delete LSP at external process killing VM
+  - 6b01b29b 2025-07-16T08:55:29+02:00 [e2e] Change node ip replacement commands to work on ubuntu 24.
+  - 99a7b111 2025-07-16T08:55:29+02:00 Update CI runners to use ubuntu 24.04
+  - f09eca1c 2025-07-16T08:55:29+02:00 Revert "Add option to disable udn-host-isolation."
+  - 1c559bb9 2025-07-15T16:15:52-07:00 fix ovspinning test error
+  - 26107809 2025-07-15T19:13:32-04:00 *.sh: use /usr/bin/env to locate bash
+  - c55d6577 2025-07-15T19:02:14+02:00 OKEP: Pre-assigned network configuration for primary user defined networks workloads
+  - 00542735 2025-07-15T09:45:20-07:00 VF gateway trigger errors message in updateServiceFlowCache
+  - 6395072d 2025-07-15T18:31:51+02:00 [gateway] rename GatewayConfig config to annoConfig
+  - 0473203b 2025-07-15T18:31:50+02:00 [gateway] pass gateway args for all controllers using GatewayConfig.
+  - e427103f 2025-07-15T18:31:35+02:00 [gateway] rename public and private interfaces.
+  - 02c2c185 2025-07-15T18:31:35+02:00 [gateway] update syncNodeGateway to reduce nesting
+  - cc8e9c83 2025-07-15T18:31:35+02:00 [master] reuse SecondaryL3GatewayConfig for master gateway configuration
+  - 1d9b4cf0 2025-07-15T18:31:35+02:00 [pod SNAT] reuse code around pod SNAT creation.
+  - 4834e3de 2025-07-15T18:31:35+02:00 Fix log, reuse existing function in GetNetworkScopedSwitchName.
+  - 77124b84 2025-07-15T18:31:35+02:00 [libovsdb/ops] Start adding option constants for ovn.
+  - 414e2962 2025-07-15T18:31:35+02:00 [lint] add make lint-fix command to fix lint issues
+  - f392ef0e 2025-07-15T18:31:29+02:00 [gateway] split GatewayInit into more methods.
+  - f54436cd 2025-07-15T18:31:13+02:00 [gateway] move gw router and its port creation to functions.
+  - 6e38032c 2025-07-15T18:31:13+02:00 [gateway] create createGWRouter function from GatewayInit
+  - ab24f255 2025-07-15T18:31:13+02:00 [gateway] cleanup: do some equivalent changes to simplify the code.
+  - 10f14edb 2025-07-15T14:47:32+02:00 update jinjanate install to use pipx and mention pipx and skopeo as dependencies
+  - 465e00a0 2025-07-15T15:02:29+03:00 images: Use Quay instead docker.io
+  - 93a8828f 2025-07-15T11:39:19+02:00 Update OWNERS file: Add Patryk/Martin as approvers
+  - 1272c122 2025-07-14T10:40:59-07:00 cluster-manager clbs if udn requests PersistentIPs but it is not enabled
+  - 7b1b7dd7 2025-07-14T13:33:20+02:00 [OVN build] Fetch ovs version from the ovn submodule by default.
+  - 2edfdaf9 2025-07-11T15:27:59-07:00 always() run the diags
+  - 6902456a 2025-07-11T10:13:07-03:00 fix broken TOC links
+  - 2e888476 2025-07-09T16:02:36+03:00 Add flag for preconfigured UDN addresses feature
+  - f07c0551 2025-07-09T12:28:52+01:00 chore: Update artwork
+  - 84ed9949 2025-07-08T12:58:52+02:00 [openflow manager] allow patch port ofport change for UDNs.
+  - 2626e8d5 2025-07-08T10:24:03+02:00 Reapply "e2e: connect to host-networked pod from localnet"
+  - 3de7eade 2025-07-08T10:24:03+02:00 Reapply "Add flow for host -> localnet on same node"
+  - 1448d5ab 2025-07-08T10:24:03+02:00 Drop in_port from ip dispatch OF rule
+  - 053585e9 2025-07-07T14:06:17+01:00 OVN EIP startup syncer: add UTs for pod / node deleted
+  - 41a91515 2025-07-07T11:53:43+01:00 EIP OVN controller: remove possibility of crash, improve logging and readability
+  - 68db55eb 2025-07-07T11:53:43+01:00 EIP OVN startup syncer: fix processing of ovn constructs
+  - 7588fd3a 2025-07-07T11:53:43+01:00 EgressIP: fix startup sync to add metadata
+  - 44b77196 2025-07-06T17:02:42+03:00 e2e: Enable testing BGP using podman
+  - 7d199918 2025-07-06T17:02:42+03:00 kind-common, k8s-frr, bgp: Avoid hard coding container runtime binary
+  - 6ec1a448 2025-07-06T17:02:42+03:00 kind-common, metallb: Avoid hard coding container runtime binary
+  - 0e00ae6d 2025-07-06T17:02:42+03:00 contrib,kind: Init container runtime binary on cluster deletion
+  - 0b513c63 2025-07-04T17:10:44+01:00 chore: bump libovsdb to v0.8.0
+  - f792af55 2025-07-04T13:17:14+02:00 Use namespace reconcilation loop for syncing network policies
+  - 96db6fd1 2025-07-04T13:17:14+02:00 Use Handler FilterFunc to filter out np peer namespace
+  - 2d2e4454 2025-07-04T13:17:14+02:00 Reconcile namespace for network change
+  - b0b32b37 2025-07-03T16:22:24+03:00 kind: Rm push_args variable quotes
+  - 1ea27391 2025-07-02T14:39:25-07:00 Revert "Add the IP rule for a UDN only when it is advertised to the default VRF"
+  - c58c193e 2025-07-01T16:13:56+02:00 Disable Layer2 IGMP test as it is broken now.
+  - db87df1d 2025-07-01T09:31:06+01:00 Layer 2 EIP: remove stale LRP if pod is remote
+  - 8a70c81d 2025-07-01T09:31:03+01:00 EIP OVN controller: stop pod config flap
+  - a1d47314 2025-07-01T10:39:46+03:00 contrib,kind: Use skopeo to get the actual ovnkube-image digest
+  - 5ea894c8 2025-07-01T10:39:45+03:00 contrib, kind.sh: Fix local registry when using podman
+  - fa83c31b 2025-06-30T15:27:04+00:00 Add network QoS guide to docs navigation
+  - 0b38e623 2025-06-30T13:50:32+02:00 [svc controller] Stop handlers on shutdown.
+  - 3735ec2d 2025-06-27T12:53:05-04:00 Remove physical port from l2 flow
+  - 098a3aa7 2025-06-27T14:15:27+02:00 Fix UDN nftables mark chain cleanup
+  - 813e2800 2025-06-26T18:27:38-04:00 Fixes FDB learning
+  - f1a31ed3 2025-06-26T17:58:19-04:00 Add static FDB entry to OVS for shared MAC
+  - ee962e5c 2025-06-26T22:03:29+02:00 update documentation on deploying OVN K8s with KIND
+  - 05f8d8f0 2025-06-25T14:15:44+00:00 Add short doc update with the ovn-ic components on the DPU
+  - 116ba522 2025-06-24T23:15:41+00:00 ovnkube.sh: Add new overwriting options for the gateway options and kubernetes node name
+  - ff1b163c 2025-06-24T04:47:39+00:00 Bump the go_modules group across 3 directories with 4 updates
+  - abd8e0fd 2025-06-23T16:22:40+02:00 Modified line 277 to let kind-helm.sh run also behind a proxy
+  - 21e4f0eb 2025-06-23T14:58:33+02:00 Fix the host drop rules to match on new state
+  - 19be786c 2025-06-19T22:35:32+03:00 use slash as path separator for some sysctl commands
+  - 70fe56c6 2025-06-19T07:23:52+02:00 Add labels to filter e2e tests
+  - 337cc559 2025-06-18T05:46:22+00:00 Updating ose-ovn-kubernetes-base-container image to be consistent with ART for 4.20 Reconciling with https://github.com/openshift/ocp-build-data/tree/dfb5c7d531490cfdc61a3b88bc533702b9624997/images/ovn-kubernetes-base.yml
+  - 1fb89831 2025-06-16T10:33:02+02:00 [e2e] kubevirt: generate test name that is compatible with file path.
+  - 424a653f 2025-06-13T11:24:28+02:00 NodeTracker: Only update the node if the subnet changed for the specific network
+  - deff5e64 2025-06-12T14:58:27+02:00 Add the IP rule for a UDN only when it is advertised to the default VRF
+  - 228d4440 2025-06-12T13:41:43+01:00 GH VM: remove more items after disk space limit reached
+  - 150775e1 2025-06-12T12:07:14+02:00 [UDN isolation] Fix ACLs tier: move to the highest-prio Primary tier.
+  - 23c3b5a8 2025-06-12T10:28:53+02:00 [ACL tier] Rename BuildACL to BuildACLWithDefaultTier
+  - 2412b506 2025-06-11T20:53:11+03:00 stop adding events to NAD if the network type is not ovn-k
+  - 10be5961 2025-06-11T15:35:32+00:00 Bump golang.org/x/crypto
+  - d14d8483 2025-06-11T16:58:56+02:00 remote node deletion failure due to libovsdb integrity violation error
+  - 61f57e2a 2025-06-11T16:58:56+02:00 Delete logical static routes only if they belong to the spefified router
+  - 304975a0 2025-06-11T16:58:56+02:00 Add node deletion unit testing case for zone_ic_handler
+  - 5308cbf6 2025-06-10T11:33:44-04:00 CreateDefaultRouteToExternal should use node GR IP annotations
+  - a0083457 2025-06-10T11:33:44-04:00 L2 and L3 UDN should reconfigure reroute policies when join IP changes
+  - bf5b8d41 2025-06-10T11:33:44-04:00 Stop calling CreateDefaultRouteToExternal for UDNs by default
+  - 188309de 2025-06-10T11:33:44-04:00 Perf optimization: Stop every node event from triggering EIP Node update
+  - cb326569 2025-06-10T14:28:08+01:00 chore: update footer with new LF trademark disclaimer
+  - 182ba9c2 2025-06-10T13:31:31+03:00 Unit tests for node ingress snat exclude annotation
+  - 70777652 2025-06-10T13:31:31+03:00 Configure mgmtport-no-snat-subnets sets elements
+  - 9554ba6e 2025-06-10T13:31:31+03:00 Add dontSNAT subnets rules to mgmtport-snat
+  - f84d3f34 2025-06-09T11:06:09+00:00 Fix HO test flake
+  - 90b88fab 2025-06-09T11:06:09+00:00 Run almost all control plane tests in BGP lanes
+  - 19f39c2c 2025-06-09T11:06:09+00:00 Change BGP e2e lane config
+  - b5bc88df 2025-06-09T11:06:09+00:00 Bump priority of egress ClusterIP traffic drop
+  - 575f3c01 2025-06-09T11:06:09+00:00 Align e2e test timeouts
+  - 399915a6 2025-06-08T18:17:24+00:00 workflow: Add fix missing and apt update before trying to install VRF module
+  - 4fa8bf00 2025-06-04T12:07:52+02:00 udn: Fix NAD template for join subnets field
+  - 98518eaa 2025-06-03T16:15:05-04:00 Minor improvement to route add for remote zone nodes
+  - edc159d0 2025-06-03T16:13:18-04:00 Optimize ic handler a little for UDN
+  - b56df725 2025-06-03T13:34:03-04:00 Some quality of life improvements for layer 3 controllers node handling
+  - 07973c38 2025-06-03T12:59:20+02:00 Add custom_fences config to mkdocs.yml
+  - c68299e5 2025-06-03T12:02:01+02:00 Add mermaid mkdocs plugin
+  - 2b812dd7 2025-05-29T20:49:58-04:00 Change NeedsNodeAllocation to a positive check
+  - 81ab5952 2025-05-29T18:32:42-04:00 Fix node update check for network cluster controller
+  - 8cf444c9 2025-05-29T14:36:51-04:00 Removes as much kubeclient Get methods as possible
+  - 7a30735f 2025-05-28T12:30:20-04:00 Use watchFactory instead of kclient for gateway snat cleanup
+  - d31d1717 2025-05-21T19:43:06-04:00 Configures ephemeral port range for OVN SNAT'ing
+  - 3d104e66 2025-05-20T16:06:34-04:00 Retry all pods smarter
+  - f559df11 2025-04-24T15:02:21+02:00 [docs] update ovn-observability with some more details
+
+- ovn-kubernetes image-arm64 2cbd05df74c6ab851fc644a8614417f104d5a494 to 82307afacee498abba40ce7f8909a1db4277445a
+  - 50ba8767 2025-09-29T14:26:30+02:00 Remove NetworkUnavailable condition from node
+  - 2784783b 2025-08-18T14:02:52-07:00 add back the removed OCP hack from d/s merge
+  - b90abc54 2025-07-23T13:24:08+02:00 fix: skip gw IP check for DPU and improve gateway initialization readability
+  - 6c4bc78b 2025-07-23T08:56:24+00:00 e2e: label RouteAdvertisement test cases & skip extended ones
+  - 45bf0b39 2025-07-23T10:53:18+02:00 Revert "e2e: Use ovnk allocator and reserve IPs"
+  - 5b5bc069 2025-07-22T19:06:40+02:00 gateway: Refactor gateway initialization and DPU host handling
+  - d127877f 2025-07-22T15:53:32+01:00 build, vendor: consume ipamclaims v0.5.0-alpha
+  - 34b5a46c 2025-07-22T13:52:53+00:00 e2e: test against L2 networks in VRF-Lite test cases
+  - e72e62b3 2025-07-22T13:12:33+00:00 Remove unused portbinding code
+  - dfc14b4e 2025-07-22T10:22:05+00:00 e2e: refactor podIPOfFamilyOnPrimaryNetwork into more reusable code
+  - 5ece8463 2025-07-22T10:22:05+00:00 e2e: add VRF-Lite test cases
+  - edb05ca1 2025-07-22T10:22:05+00:00 kind.sh: Use FRRConfiguration label when advertising default network
+  - 926ba1ad 2025-07-22T10:22:05+00:00 e2e: use index in kind infra inspect templates to allow special characters
+  - acef39f4 2025-07-22T10:22:05+00:00 e2e: make ExtPort not required in container infra provider API
+  - 3dea4f52 2025-07-22T10:22:05+00:00 e2e: add RuntimeArgs to container infra provider API
+  - 90e56b92 2025-07-22T10:22:05+00:00 e2e: rename testdata package to testscenario
+  - dc437b63 2025-07-22T10:22:05+00:00 RouteAdvertisements: appropriately update status even if no updates
+  - b4eabd9c 2025-07-21T19:04:23+00:00 Bump the go_modules group across 2 directories with 1 update
+  - fa12bb26 2025-07-21T12:09:59-04:00 Bump fedora from 41 -> 42
+  - d565fd86 2025-07-21T14:41:46+05:30 Add e2e tests for ex gw pods in terminating or not ready state
+  - d942a7d8 2025-07-21T14:41:46+05:30 Add unit tests for ex gw pods in terminating or not ready state
+  - 3d32558b 2025-07-21T14:41:44+05:30 Remove routes of ex gw pods in terminating or not ready state
+  - ec378a7b 2025-07-18T17:56:44+00:00 Bump golang.org/x/oauth2
+  - 293f6dda 2025-07-18T16:57:43+00:00 ci: run tests only if files other than docs are changed
+  - 527c19fc 2025-07-18T18:08:55+02:00 Add support for --disable-requestedchassis flag in ovnkube controller
+  - 290eb038 2025-07-18T09:42:17-04:00 Add metrics for UDN
+  - 33e20b83 2025-07-18T11:16:38+02:00 [bridgeconfig] AI suggested fixes.
+  - f531e3d3 2025-07-18T11:16:38+02:00 [node/gateway] make PatchedNetConfigs internal, remove locking
+  - fd5e7915 2025-07-18T11:16:38+02:00 [node/gateway] nodePortWatcher should use its own bridgeConfiguration.
+  - a0c90f26 2025-07-18T11:16:38+02:00 [bridgeconfig] make mutex internal.
+  - fa6076bc 2025-07-18T11:16:38+02:00 [bridgeconfig] move nextHops to the gateway where it is used.
+  - 4ad1727c 2025-07-18T11:16:38+02:00 [bridgeconfig] make most members internal, ensure correct locking.
+  - 5a5e3b6d 2025-07-18T11:16:38+02:00 [bridgeconfig] move flow generation locking into methods.
+  - 28f9c1ec 2025-07-18T11:16:38+02:00 [bridgeconfig] move bridge flows generation functions to the pkg.
+  - b607e93d 2025-07-18T11:16:38+02:00 [bridgeconfig] add some getters/setters with lock to the pkg.
+  - 836e0f64 2025-07-18T11:16:38+02:00 [bridgeconfig] move setBridgeOfPorts to the package.
+  - cf93ef30 2025-07-18T11:16:38+02:00 [bridgeconfig] start moving methods that use internal mutex to the pkg
+  - a4d421a3 2025-07-18T11:16:37+02:00 [bridgeconfig] simply move functions around, no change
+  - 3b073327 2025-07-18T11:16:37+02:00 [bridgeconfig] only create BridgeConfigurations inside the package.
+  - 420d9f1c 2025-07-18T11:16:37+02:00 [bridgeconfig] make mutex a public field to turn it into internal later
+  - b65a01ef 2025-07-18T11:16:37+02:00 [node/bridgeconfig] move [udn]bridgeconfig to ite own package.
+  - f1a4b4b0 2025-07-18T11:16:24+02:00 [node/egressipgw] Move egressIP functionality to its own package.
+  - 956981a0 2025-07-18T10:24:09+02:00 kv, e2e: Use PrimaryNetwork()
+  - 115b25a3 2025-07-18T10:24:09+02:00 e2e: Move http servers to external container
+  - ae5b6387 2025-07-18T10:24:09+02:00 e2e: Move underlay setup to providers
+  - 1870116b 2025-07-18T10:24:09+02:00 e2e, kv: Use bgpnet for external container network
+  - 9fed90c7 2025-07-18T10:24:09+02:00 e2e: Use ovnk allocator and reserve IPs
+  - f1c76a61 2025-07-18T10:24:09+02:00 e2e, kv: Increase network status timeout
+  - 7c1de13e 2025-07-18T10:24:09+02:00 e2e: Remove harcoded breth0
+  - 318782be 2025-07-18T10:24:09+02:00 kv, e2e: Use the ExternalContainer struct instead of name
+  - b60dbcd9 2025-07-18T10:24:09+02:00 kv, e2e: ensure there is no dots at podtest name
+  - a0101b56 2025-07-18T10:24:07+02:00 kv, e2e: Download virtctl at tests
+  - dcc403c1 2025-07-17T17:08:39+02:00 Fix UDN to alien ClusterIP looping issue
+  - 82850ed2 2025-07-17T17:08:37+02:00 Enable Layer2 route advertisements on LGW
+  - 9e356ba5 2025-07-17T09:08:57+00:00 doc: Remove OKEP template from the list of rendered pages
+  - a6cac97a 2025-07-16T18:56:12+02:00 ovnkube in dpu host mode: advanced gateway detection
+  - b1816506 2025-07-16T15:49:12+01:00 E2Es: remove additional references to KinD setup
+  - 6018f47f 2025-07-16T13:29:23+01:00 E2E: lookup support for IP families instead of using env var
+  - ab8d4733 2025-07-16T14:23:38+02:00 virt: Delete LSP at external process killing VM
+  - 6b01b29b 2025-07-16T08:55:29+02:00 [e2e] Change node ip replacement commands to work on ubuntu 24.
+  - 99a7b111 2025-07-16T08:55:29+02:00 Update CI runners to use ubuntu 24.04
+  - f09eca1c 2025-07-16T08:55:29+02:00 Revert "Add option to disable udn-host-isolation."
+  - 1c559bb9 2025-07-15T16:15:52-07:00 fix ovspinning test error
+  - 26107809 2025-07-15T19:13:32-04:00 *.sh: use /usr/bin/env to locate bash
+  - c55d6577 2025-07-15T19:02:14+02:00 OKEP: Pre-assigned network configuration for primary user defined networks workloads
+  - 00542735 2025-07-15T09:45:20-07:00 VF gateway trigger errors message in updateServiceFlowCache
+  - 6395072d 2025-07-15T18:31:51+02:00 [gateway] rename GatewayConfig config to annoConfig
+  - 0473203b 2025-07-15T18:31:50+02:00 [gateway] pass gateway args for all controllers using GatewayConfig.
+  - e427103f 2025-07-15T18:31:35+02:00 [gateway] rename public and private interfaces.
+  - 02c2c185 2025-07-15T18:31:35+02:00 [gateway] update syncNodeGateway to reduce nesting
+  - cc8e9c83 2025-07-15T18:31:35+02:00 [master] reuse SecondaryL3GatewayConfig for master gateway configuration
+  - 1d9b4cf0 2025-07-15T18:31:35+02:00 [pod SNAT] reuse code around pod SNAT creation.
+  - 4834e3de 2025-07-15T18:31:35+02:00 Fix log, reuse existing function in GetNetworkScopedSwitchName.
+  - 77124b84 2025-07-15T18:31:35+02:00 [libovsdb/ops] Start adding option constants for ovn.
+  - 414e2962 2025-07-15T18:31:35+02:00 [lint] add make lint-fix command to fix lint issues
+  - f392ef0e 2025-07-15T18:31:29+02:00 [gateway] split GatewayInit into more methods.
+  - f54436cd 2025-07-15T18:31:13+02:00 [gateway] move gw router and its port creation to functions.
+  - 6e38032c 2025-07-15T18:31:13+02:00 [gateway] create createGWRouter function from GatewayInit
+  - ab24f255 2025-07-15T18:31:13+02:00 [gateway] cleanup: do some equivalent changes to simplify the code.
+  - 10f14edb 2025-07-15T14:47:32+02:00 update jinjanate install to use pipx and mention pipx and skopeo as dependencies
+  - 465e00a0 2025-07-15T15:02:29+03:00 images: Use Quay instead docker.io
+  - 93a8828f 2025-07-15T11:39:19+02:00 Update OWNERS file: Add Patryk/Martin as approvers
+  - 1272c122 2025-07-14T10:40:59-07:00 cluster-manager clbs if udn requests PersistentIPs but it is not enabled
+  - 7b1b7dd7 2025-07-14T13:33:20+02:00 [OVN build] Fetch ovs version from the ovn submodule by default.
+  - 2edfdaf9 2025-07-11T15:27:59-07:00 always() run the diags
+  - 6902456a 2025-07-11T10:13:07-03:00 fix broken TOC links
+  - 2e888476 2025-07-09T16:02:36+03:00 Add flag for preconfigured UDN addresses feature
+  - f07c0551 2025-07-09T12:28:52+01:00 chore: Update artwork
+  - 84ed9949 2025-07-08T12:58:52+02:00 [openflow manager] allow patch port ofport change for UDNs.
+  - 2626e8d5 2025-07-08T10:24:03+02:00 Reapply "e2e: connect to host-networked pod from localnet"
+  - 3de7eade 2025-07-08T10:24:03+02:00 Reapply "Add flow for host -> localnet on same node"
+  - 1448d5ab 2025-07-08T10:24:03+02:00 Drop in_port from ip dispatch OF rule
+  - 053585e9 2025-07-07T14:06:17+01:00 OVN EIP startup syncer: add UTs for pod / node deleted
+  - 41a91515 2025-07-07T11:53:43+01:00 EIP OVN controller: remove possibility of crash, improve logging and readability
+  - 68db55eb 2025-07-07T11:53:43+01:00 EIP OVN startup syncer: fix processing of ovn constructs
+  - 7588fd3a 2025-07-07T11:53:43+01:00 EgressIP: fix startup sync to add metadata
+  - 44b77196 2025-07-06T17:02:42+03:00 e2e: Enable testing BGP using podman
+  - 7d199918 2025-07-06T17:02:42+03:00 kind-common, k8s-frr, bgp: Avoid hard coding container runtime binary
+  - 6ec1a448 2025-07-06T17:02:42+03:00 kind-common, metallb: Avoid hard coding container runtime binary
+  - 0e00ae6d 2025-07-06T17:02:42+03:00 contrib,kind: Init container runtime binary on cluster deletion
+  - 0b513c63 2025-07-04T17:10:44+01:00 chore: bump libovsdb to v0.8.0
+  - f792af55 2025-07-04T13:17:14+02:00 Use namespace reconcilation loop for syncing network policies
+  - 96db6fd1 2025-07-04T13:17:14+02:00 Use Handler FilterFunc to filter out np peer namespace
+  - 2d2e4454 2025-07-04T13:17:14+02:00 Reconcile namespace for network change
+  - b0b32b37 2025-07-03T16:22:24+03:00 kind: Rm push_args variable quotes
+  - 1ea27391 2025-07-02T14:39:25-07:00 Revert "Add the IP rule for a UDN only when it is advertised to the default VRF"
+  - c58c193e 2025-07-01T16:13:56+02:00 Disable Layer2 IGMP test as it is broken now.
+  - db87df1d 2025-07-01T09:31:06+01:00 Layer 2 EIP: remove stale LRP if pod is remote
+  - 8a70c81d 2025-07-01T09:31:03+01:00 EIP OVN controller: stop pod config flap
+  - a1d47314 2025-07-01T10:39:46+03:00 contrib,kind: Use skopeo to get the actual ovnkube-image digest
+  - 5ea894c8 2025-07-01T10:39:45+03:00 contrib, kind.sh: Fix local registry when using podman
+  - fa83c31b 2025-06-30T15:27:04+00:00 Add network QoS guide to docs navigation
+  - 0b38e623 2025-06-30T13:50:32+02:00 [svc controller] Stop handlers on shutdown.
+  - 3735ec2d 2025-06-27T12:53:05-04:00 Remove physical port from l2 flow
+  - 098a3aa7 2025-06-27T14:15:27+02:00 Fix UDN nftables mark chain cleanup
+  - 813e2800 2025-06-26T18:27:38-04:00 Fixes FDB learning
+  - f1a31ed3 2025-06-26T17:58:19-04:00 Add static FDB entry to OVS for shared MAC
+  - ee962e5c 2025-06-26T22:03:29+02:00 update documentation on deploying OVN K8s with KIND
+  - 05f8d8f0 2025-06-25T14:15:44+00:00 Add short doc update with the ovn-ic components on the DPU
+  - 116ba522 2025-06-24T23:15:41+00:00 ovnkube.sh: Add new overwriting options for the gateway options and kubernetes node name
+  - ff1b163c 2025-06-24T04:47:39+00:00 Bump the go_modules group across 3 directories with 4 updates
+  - abd8e0fd 2025-06-23T16:22:40+02:00 Modified line 277 to let kind-helm.sh run also behind a proxy
+  - 21e4f0eb 2025-06-23T14:58:33+02:00 Fix the host drop rules to match on new state
+  - 19be786c 2025-06-19T22:35:32+03:00 use slash as path separator for some sysctl commands
+  - 70fe56c6 2025-06-19T07:23:52+02:00 Add labels to filter e2e tests
+  - 337cc559 2025-06-18T05:46:22+00:00 Updating ose-ovn-kubernetes-base-container image to be consistent with ART for 4.20 Reconciling with https://github.com/openshift/ocp-build-data/tree/dfb5c7d531490cfdc61a3b88bc533702b9624997/images/ovn-kubernetes-base.yml
+  - 1fb89831 2025-06-16T10:33:02+02:00 [e2e] kubevirt: generate test name that is compatible with file path.
+  - 424a653f 2025-06-13T11:24:28+02:00 NodeTracker: Only update the node if the subnet changed for the specific network
+  - deff5e64 2025-06-12T14:58:27+02:00 Add the IP rule for a UDN only when it is advertised to the default VRF
+  - 228d4440 2025-06-12T13:41:43+01:00 GH VM: remove more items after disk space limit reached
+  - 150775e1 2025-06-12T12:07:14+02:00 [UDN isolation] Fix ACLs tier: move to the highest-prio Primary tier.
+  - 23c3b5a8 2025-06-12T10:28:53+02:00 [ACL tier] Rename BuildACL to BuildACLWithDefaultTier
+  - 2412b506 2025-06-11T20:53:11+03:00 stop adding events to NAD if the network type is not ovn-k
+  - 10be5961 2025-06-11T15:35:32+00:00 Bump golang.org/x/crypto
+  - d14d8483 2025-06-11T16:58:56+02:00 remote node deletion failure due to libovsdb integrity violation error
+  - 61f57e2a 2025-06-11T16:58:56+02:00 Delete logical static routes only if they belong to the spefified router
+  - 304975a0 2025-06-11T16:58:56+02:00 Add node deletion unit testing case for zone_ic_handler
+  - 5308cbf6 2025-06-10T11:33:44-04:00 CreateDefaultRouteToExternal should use node GR IP annotations
+  - a0083457 2025-06-10T11:33:44-04:00 L2 and L3 UDN should reconfigure reroute policies when join IP changes
+  - bf5b8d41 2025-06-10T11:33:44-04:00 Stop calling CreateDefaultRouteToExternal for UDNs by default
+  - 188309de 2025-06-10T11:33:44-04:00 Perf optimization: Stop every node event from triggering EIP Node update
+  - cb326569 2025-06-10T14:28:08+01:00 chore: update footer with new LF trademark disclaimer
+  - 182ba9c2 2025-06-10T13:31:31+03:00 Unit tests for node ingress snat exclude annotation
+  - 70777652 2025-06-10T13:31:31+03:00 Configure mgmtport-no-snat-subnets sets elements
+  - 9554ba6e 2025-06-10T13:31:31+03:00 Add dontSNAT subnets rules to mgmtport-snat
+  - f84d3f34 2025-06-09T11:06:09+00:00 Fix HO test flake
+  - 90b88fab 2025-06-09T11:06:09+00:00 Run almost all control plane tests in BGP lanes
+  - 19f39c2c 2025-06-09T11:06:09+00:00 Change BGP e2e lane config
+  - b5bc88df 2025-06-09T11:06:09+00:00 Bump priority of egress ClusterIP traffic drop
+  - 575f3c01 2025-06-09T11:06:09+00:00 Align e2e test timeouts
+  - 399915a6 2025-06-08T18:17:24+00:00 workflow: Add fix missing and apt update before trying to install VRF module
+  - 4fa8bf00 2025-06-04T12:07:52+02:00 udn: Fix NAD template for join subnets field
+  - 98518eaa 2025-06-03T16:15:05-04:00 Minor improvement to route add for remote zone nodes
+  - edc159d0 2025-06-03T16:13:18-04:00 Optimize ic handler a little for UDN
+  - b56df725 2025-06-03T13:34:03-04:00 Some quality of life improvements for layer 3 controllers node handling
+  - 07973c38 2025-06-03T12:59:20+02:00 Add custom_fences config to mkdocs.yml
+  - c68299e5 2025-06-03T12:02:01+02:00 Add mermaid mkdocs plugin
+  - 2b812dd7 2025-05-29T20:49:58-04:00 Change NeedsNodeAllocation to a positive check
+  - 81ab5952 2025-05-29T18:32:42-04:00 Fix node update check for network cluster controller
+  - 8cf444c9 2025-05-29T14:36:51-04:00 Removes as much kubeclient Get methods as possible
+  - 7a30735f 2025-05-28T12:30:20-04:00 Use watchFactory instead of kclient for gateway snat cleanup
+  - d31d1717 2025-05-21T19:43:06-04:00 Configures ephemeral port range for OVN SNAT'ing
+  - 3d104e66 2025-05-20T16:06:34-04:00 Retry all pods smarter
+  - f559df11 2025-04-24T15:02:21+02:00 [docs] update ovn-observability with some more details
 
