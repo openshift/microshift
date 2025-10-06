@@ -1,7 +1,23 @@
-- machine-config-operator embedded-component 9c2ef56a15a271c5e2332d648f012f867bd1c147 to ff3c19a3d01465a92be5045c25ebe94b41577785
-  - 2b5b7ce2 2025-09-23T13:37:19+00:00 install: improve CRD clean-up erroring
+- api embedded-component 93b8cc2cf247366771a42d967d836f1968418540 to 079ac08331d3021f9b7495857677ba59fdc4b25a
+  - e4ab6368 2025-09-24T09:40:21-04:00 MachineConfigNode: add 'AGE' print column
 
-- kubernetes image-arm64 335be3a93cc6f48d84e5e6cd515ef748efb9664b to 9fa6215ec67894ee1303a01eaf2fe833877d6e5a
+- cluster-kube-controller-manager-operator embedded-component 5bc489fc5aebb89eb7990ae5a3a316d265afa78b to dcdeb36169153b44f58c9829b9699517338e065b
+  - 095a90c 2025-09-26T01:11:30+00:00 Throttle resourcesynccontroller on pairs with dual writers.
+
+- kubernetes embedded-component 335be3a93cc6f48d84e5e6cd515ef748efb9664b to 9fa6215ec67894ee1303a01eaf2fe833877d6e5a
+  - f3b550782 2025-09-15T10:18:58-04:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - cea7087b3 2025-09-09T19:37:58+00:00 Release commit for Kubernetes v1.32.9
+  - e181f9398 2025-08-28T22:57:52+08:00 Fix missing control plane health check timeout
+  - ac8c68b0e 2025-08-14T13:28:10+02:00 Bump images, dependencies and versions to go 1.23.12 and distroless iptables
+  - 00788a3a7 2025-08-13T14:49:52+00:00 Update CHANGELOG/CHANGELOG-1.32.md for v1.32.8
+  - 194b14475 2025-07-16T11:07:17+02:00 Mask Linux thermal interrupt info in /proc and /sys.
+
+- machine-config-operator embedded-component ff3c19a3d01465a92be5045c25ebe94b41577785 to 7f7769181710cfcd7418194a181f9c24f92b9c47
+  - 4fed2afd 2025-10-01T19:42:06+00:00 OCPBUGS-60805: configure-ovs: work around a Cisco switch issue
+  - cc2ede23 2025-09-24T15:21:40+00:00 add new recording rule for unsuported packages
+  - 2e999edc 2025-09-23T10:12:35-04:00 drain: re-cordon nodes if needed
+
+- kubernetes image-amd64 335be3a93cc6f48d84e5e6cd515ef748efb9664b to 9fa6215ec67894ee1303a01eaf2fe833877d6e5a
   - f3b550782 2025-09-15T10:18:58-04:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
   - cea7087b3 2025-09-09T19:37:58+00:00 Release commit for Kubernetes v1.32.9
   - e181f9398 2025-08-28T22:57:52+08:00 Fix missing control plane health check timeout
