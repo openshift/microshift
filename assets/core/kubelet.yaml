@@ -18,14 +18,14 @@ featureGates:
   APIPriorityAndFairness: true
   DownwardAPIHugePages: true
   PodSecurity: true
-  RotateKubeletServerCertificate: false # TODO
+  RotateKubeletServerCertificate: false
 kubeAPIBurst: 100
 kubeAPIQPS: 50
 maxPods: 250
 nodeStatusReportFrequency: 5m
-rotateCertificates: false # TODO
+rotateCertificates: false
 serializeImagePulls: false
-serverTLSBootstrap: false # TODO
+serverTLSBootstrap: false
 tlsCertFile: "{{ .tlsCertFile }}"
 tlsCipherSuites: [{{ .tlsCipherSuites }}]
 tlsMinVersion: "{{ .tlsMinVersion }}"
