@@ -1,4 +1,4 @@
-FROM localhost/cos9-bootc-source:latest
+FROM localhost/cos10-bootc-source:latest
 
 # Build arguments
 ARG USHIFT_RPM_REPO_NAME=microshift-local
@@ -8,7 +8,7 @@ ARG USHIFT_RPM_REPO_PATH=/tmp/$USHIFT_RPM_REPO_NAME
 COPY ./rpm-repos/$USHIFT_RPM_REPO_NAME $USHIFT_RPM_REPO_PATH
 
 # Copy repository configuration
-COPY ./bootc-images/$USHIFT_RPM_REPO_NAME.repo ./bootc-images/microshift-centos9-nfv.repo ./bootc-images/microshift-rhocp-y.repo \
+COPY ./bootc-images/$USHIFT_RPM_REPO_NAME.repo ./bootc-images/microshift-centos10-nfv.repo ./bootc-images/microshift-rhocp-y.repo \
     /etc/yum.repos.d/
 
 # Print repository configuration contents.
