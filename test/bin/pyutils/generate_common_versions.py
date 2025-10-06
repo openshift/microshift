@@ -17,6 +17,9 @@ ARCH = os.uname().machine
 # See https://github.com/vmware-tanzu/sonobuoy/releases.
 CNCF_SONOBUOY_VERSION = "v0.57.3"
 
+# The version of systemd-logs image included in the sonobuoy release.
+CNCF_SYSTEMD_LOGS_VERSION = "v0.4"
+
 # The current version of the microshift-gitops package.
 GITOPS_VERSION = "1.16"
 
@@ -271,6 +274,7 @@ output = template_string.format(
     rhocp_minor_y1_beta=rhocp_minor_y1_beta,
     rhocp_minor_y2=rhocp_minor_y2,
     CNCF_SONOBUOY_VERSION=CNCF_SONOBUOY_VERSION,
+    CNCF_SYSTEMD_LOGS_VERSION=CNCF_SYSTEMD_LOGS_VERSION,
     GITOPS_VERSION=GITOPS_VERSION,
     LATEST_RELEASE_TYPE=LATEST_RELEASE_TYPE,
     ARCH=ARCH
