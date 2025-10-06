@@ -280,6 +280,6 @@ output = template_string.format(
     ARCH=ARCH
 )
 
-output_noarch = output.replace(ARCH, '$(uname -m)')
+output_noarch = output.replace(ARCH, '${UNAME_M}')
 
 print(output_noarch)
