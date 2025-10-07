@@ -53,7 +53,7 @@ func NewJoinClusterCommand() *cobra.Command {
 		Short: "Join a node to an existing MicroShift cluster",
 		Long: `This command joins a node to an existing MicroShift cluster by:
 1. Loading the MicroShift configuration for current node.
-2. Fetching etcd CA certificate and key from the cluster using provided kubeconfig to generate etcd certificates.
+2. Fetch Certificate Authorities from the cluster using provided kubeconfig.
 4. Configuring etcd cluster to add the new member.
 5. Configuring kubelet to bootstrap into the cluster.
 6. Restarting the MicroShift systemd unit.
@@ -106,6 +106,7 @@ func runJoinCluster(ctx context.Context, opts *JoinClusterOptions) error {
 	if err := cleanupMicroShiftData(cfg); err != nil {
 		return fmt.Errorf("failed to cleanup MicroShift data directories: %w", err)
 	}
+	klog.Info("MicroShift data directories cleaned up successfully")
 
 	for _, resource := range components.CertificateAuthorityResources {
 		if err := fetchCertificateAuthority(ctx, client, resource.Name, resource.Dir); err != nil {
@@ -119,11 +120,10 @@ func runJoinCluster(ctx context.Context, opts *JoinClusterOptions) error {
 	}
 	klog.Info("Etcd certificates generated successfully")
 
-	nodeCount, clusterMembers, err := getClusterInfo(ctx, client)
+	clusterMembers, err := getClusterInfo(ctx, client)
 	if err != nil {
 		return fmt.Errorf("failed to get cluster information: %w", err)
 	}
-	klog.Infof("Found %d nodes in cluster", nodeCount)
 
 	if err := configureEtcdForCluster(cfg, clusterMembers, opts.Learner); err != nil {
 		return fmt.Errorf("failed to configure etcd for cluster: %w", err)
@@ -142,7 +142,7 @@ func runJoinCluster(ctx context.Context, opts *JoinClusterOptions) error {
 		return fmt.Errorf("node failed to become ready: %w", err)
 	}
 
-	klog.Info("Node successfully joined the cluster and is ready!")
+	klog.Info("Node successfully joined the cluster")
 	return nil
 }
 
@@ -338,17 +338,15 @@ func generateEtcdCertificates(cfg *config.Config) error {
 	return nil
 }
 
-func getClusterInfo(ctx context.Context, client kubernetes.Interface) (int, []string, error) {
+func getClusterInfo(ctx context.Context, client kubernetes.Interface) ([]string, error) {
 	nodes, err := client.CoreV1().Nodes().List(ctx, metav1.ListOptions{})
 	if err != nil {
-		return 0, nil, fmt.Errorf("failed to list nodes: %w", err)
+		return nil, fmt.Errorf("failed to list nodes: %w", err)
 	}
 
-	readyCount := 0
 	var members []string
 	for _, node := range nodes.Items {
 		if isJoinNodeReady(&node) {
-			readyCount++
 			nodeIP := ""
 			for _, addr := range node.Status.Addresses {
 				if addr.Type == corev1.NodeInternalIP {
@@ -362,7 +360,7 @@ func getClusterInfo(ctx context.Context, client kubernetes.Interface) (int, []st
 		}
 	}
 
-	return readyCount, members, nil
+	return members, nil
 }
 
 func isJoinNodeReady(node *corev1.Node) bool {
@@ -444,8 +442,8 @@ func configureEtcdForCluster(cfg *config.Config, clusterMembers []string, isLear
 		}
 		initialCluster = fmt.Sprintf("%s,%s=%s", initialCluster, member.Name, member.PeerURLs[0])
 	}
-	klog.Infof("initial cluster: %v", initialCluster)
-	klog.Infof("filtered endpoints: %v", filteredEndpoints)
+
+	klog.Infof("initial cluster: %v. Member endpoints: %v", initialCluster, filteredEndpoints)
 
 	client, err = clientv3.New(clientv3.Config{
 		Endpoints:   filteredEndpoints,
@@ -553,6 +551,5 @@ func cleanupMicroShiftData(cfg *config.Config) error {
 			return fmt.Errorf("failed to remove directory %s: %w", dir, err)
 		}
 	}
-	klog.Info("MicroShift data directories cleaned up successfully")
 	return nil
 }
