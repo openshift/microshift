@@ -1,5 +1,0 @@
-- machine-config-operator embedded-component d707114bc07c40c63084de0f91748b2efda91739 to 58f14fc5d33718cc2c6c38e51e05147a8303aba1
-  - 941c3279 2025-10-02T13:57:21+00:00 certcontroller: update unit tests
-  - 1203a83c 2025-10-02T13:57:21+00:00 certcontroller: resync on infra object
-  - b9b69935 2025-09-24T17:26:15+00:00 controller: update is node done check to handle image mode disabling case & add unit test cases for scenario
-
