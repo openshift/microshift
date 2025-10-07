@@ -94,6 +94,12 @@ func runJoinCluster(ctx context.Context, opts *JoinClusterOptions) error {
 		return fmt.Errorf("failed to create Kubernetes client: %w", err)
 	}
 
+	nodeName := cfg.CanonicalNodeName()
+	if isNodeAlreadyInCluster(ctx, client, nodeName) {
+		klog.Infof("Node %s is already part of the cluster. Skipping join process.", nodeName)
+		return nil
+	}
+
 	for _, resource := range components.CertificateAuthorityResources {
 		if err := fetchCertificateAuthority(ctx, client, resource.Name, resource.Dir); err != nil {
 			return fmt.Errorf("failed to fetch certificate authority %s: %w", resource.Name, err)
@@ -252,8 +258,6 @@ func generateEtcdCertificates(cfg *config.Config) error {
 			ips = append(ips, ip)
 		}
 	}
-
-	//TODO something is wrong with serial numbers. investigate.
 
 	// Generate serving certificate
 	servingTLS, err := caConfig.MakeServerCertForDuration(
@@ -498,6 +502,19 @@ func restartMicroShift() error {
 		return fmt.Errorf("failed to restart microshift service: %w", err)
 	}
 	return nil
+}
+
+func isNodeAlreadyInCluster(ctx context.Context, client kubernetes.Interface, nodeName string) bool {
+	nodes, err := client.CoreV1().Nodes().List(ctx, metav1.ListOptions{})
+	if err != nil {
+		return false
+	}
+	for _, node := range nodes.Items {
+		if node.Name == nodeName {
+			return true
+		}
+	}
+	return false
 }
 
 func waitForNodeReady(ctx context.Context, client kubernetes.Interface, nodeName string) error {
