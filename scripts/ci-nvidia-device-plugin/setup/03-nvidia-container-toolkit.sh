@@ -14,7 +14,7 @@ sudo dnf config-manager --enable nvidia-container-toolkit-experimental
 sudo dnf install nvidia-container-toolkit -y
 sudo setsebool -P container_use_devices on
 
-sudo nvidia-ctk runtime configure --runtime=crio --set-as-default --config=/etc/crio/crio.conf.d/99-nvidia.conf
+sudo nvidia-ctk runtime configure --runtime=crio --set-as-default --drop-in-config=/etc/crio/crio.conf.d/99-nvidia.conf
 
 # Update runtimes from ["docker-runc", "runc", "crun"] to ["crun", "docker-runc", "runc"]
 sudo sed -i 's/^runtimes =.*$/runtimes = ["crun", "docker-runc", "runc"]/g' /etc/nvidia-container-runtime/config.toml
