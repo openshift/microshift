@@ -75,7 +75,7 @@ func init() {
 type KubeAPIServer struct {
 	kasConfigBytes []byte
 	verbosity      int
-	configureErr   error // todo: report configuration errors immediately
+	configuration  *config.Config
 
 	masterURL        string
 	servingCAPath    string
@@ -83,9 +83,8 @@ type KubeAPIServer struct {
 }
 
 func NewKubeAPIServer(cfg *config.Config) *KubeAPIServer {
-	s := &KubeAPIServer{}
-	if err := s.configure(cfg); err != nil {
-		s.configureErr = err
+	s := &KubeAPIServer{
+		configuration: cfg,
 	}
 	return s
 }
@@ -309,8 +308,8 @@ func (s *KubeAPIServer) configureAuditPolicy(cfg *config.Config) error {
 }
 
 func (s *KubeAPIServer) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
-	if s.configureErr != nil {
-		return fmt.Errorf("configuration failed: %w", s.configureErr)
+	if err := s.configure(s.configuration); err != nil {
+		return fmt.Errorf("configuration failed: %w", err)
 	}
 
 	defer close(stopped)
