@@ -9,6 +9,7 @@ import (
 	"os"
 	"os/signal"
 	"path/filepath"
+	"strings"
 	"syscall"
 	"time"
 
@@ -100,6 +101,8 @@ func (s *EtcdService) configure(cfg *config.Config) {
 	s.etcdCfg.PeerTLSInfo.TrustedCAFile = etcdSignerCertPath
 
 	s.etcdCfg.ExperimentalMaxLearners = MaxLearners
+
+	updateConfigFromFile(s.etcdCfg, getConfigFilePath())
 }
 
 func (s *EtcdService) Run() error {
@@ -213,4 +216,36 @@ func checkFragmentationPercentage(ondisk, inuse int64) float64 {
 	diff := float64(ondisk - inuse)
 	fragmentedPercentage := (diff / float64(ondisk)) * 100
 	return math.Round(fragmentedPercentage*100) / 100
+}
+
+func getConfigFilePath() string {
+	return filepath.Join(config.DataDir, "etcd", "config")
+}
+
+func updateConfigFromFile(etcdCfg *etcd.Config, configPath string) {
+	data, err := os.ReadFile(configPath)
+	if err != nil {
+		klog.Errorf("failed to read config file: %v", err)
+		return
+	}
+	lines := strings.Split(string(data), "\n")
+	for _, line := range lines {
+		line = strings.TrimSpace(line)
+		if line == "" || strings.HasPrefix(line, "#") {
+			continue
+		}
+		eqIdx := strings.Index(line, "=")
+		if eqIdx == -1 {
+			continue
+		}
+		parts := []string{line[:eqIdx], line[eqIdx+1:]}
+		key := strings.TrimSpace(parts[0])
+		val := strings.TrimSpace(parts[1])
+		switch key {
+		case "ETCD_INITIAL_CLUSTER":
+			etcdCfg.InitialCluster = val
+		case "ETCD_INITIAL_CLUSTER_STATE":
+			etcdCfg.ClusterState = val
+		}
+	}
 }
