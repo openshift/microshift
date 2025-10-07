@@ -75,20 +75,17 @@ func (s *EtcdService) configure(cfg *config.Config) {
 	// based on https://github.com/openshift/cluster-etcd-operator/blob/master/bindata/bootkube/bootstrap-manifests/etcd-member-pod.yaml#L19
 	s.etcdCfg = etcd.NewConfig()
 	s.etcdCfg.ClusterState = "new"
-	//s.etcdCfg.ForceNewCluster = true //TODO
 	s.etcdCfg.Logger = "zap"
 	s.etcdCfg.Dir = dataDir
 	s.etcdCfg.QuotaBackendBytes = cfg.Etcd.QuotaBackendBytes
-	url2380 := setURL([]string{"localhost"}, "2380")
-	url2379 := setURL([]string{"localhost"}, "2379")
-	s.etcdCfg.AdvertisePeerUrls = url2380
-	s.etcdCfg.ListenPeerUrls = url2380
-	s.etcdCfg.AdvertiseClientUrls = url2379
-	s.etcdCfg.ListenClientUrls = url2379
-	s.etcdCfg.ListenMetricsUrls = setURL([]string{"localhost"}, "2381")
+	s.etcdCfg.AdvertisePeerUrls = setURL([]string{cfg.Node.NodeIP}, "2380")
+	s.etcdCfg.ListenPeerUrls = setURL([]string{"0.0.0.0"}, "2380")
+	s.etcdCfg.AdvertiseClientUrls = setURL([]string{cfg.Node.NodeIP}, "2379")
+	s.etcdCfg.ListenClientUrls = setURL([]string{"0.0.0.0"}, "2379")
+	s.etcdCfg.ListenMetricsUrls = setURL([]string{cfg.Node.NodeIP}, "2381")
 
 	s.etcdCfg.Name = cfg.Node.HostnameOverride
-	s.etcdCfg.InitialCluster = fmt.Sprintf("%s=https://%s:2380", cfg.Node.HostnameOverride, "localhost")
+	s.etcdCfg.InitialCluster = fmt.Sprintf("%s=https://%s:2380", cfg.Node.HostnameOverride, cfg.Node.NodeIP)
 
 	s.etcdCfg.TlsMinVersion = getTLSMinVersion(cfg.ApiServer.TLS.MinVersion)
 	if cfg.ApiServer.TLS.MinVersion != string(configv1.VersionTLS13) {
