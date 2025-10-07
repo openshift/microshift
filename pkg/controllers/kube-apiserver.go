@@ -94,7 +94,7 @@ func NewKubeAPIServer(cfg *config.Config) *KubeAPIServer {
 func (s *KubeAPIServer) Name() string           { return "kube-apiserver" }
 func (s *KubeAPIServer) Dependencies() []string { return []string{"etcd", "network-configuration"} }
 
-func (s *KubeAPIServer) configure(cfg *config.Config) error {
+func (s *KubeAPIServer) configure(ctx context.Context, cfg *config.Config) error {
 	s.verbosity = cfg.GetVerbosity()
 
 	certsDir := cryptomaterial.CertsDirectory(config.DataDir)
@@ -164,7 +164,7 @@ func (s *KubeAPIServer) configure(cfg *config.Config) error {
 		}
 	}
 
-	etcdServers, err := discoverEtcdServers(s.configuration.Node.HostnameOverride, s.configuration.BootstrapKubeConfigPath())
+	etcdServers, err := discoverEtcdServers(ctx, s.configuration.Node.HostnameOverride, s.configuration.BootstrapKubeConfigPath())
 	if err != nil {
 		return fmt.Errorf("failed to discover etcd servers: %w", err)
 	}
@@ -313,7 +313,7 @@ func (s *KubeAPIServer) configureAuditPolicy(cfg *config.Config) error {
 }
 
 func (s *KubeAPIServer) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
-	if err := s.configure(s.configuration); err != nil {
+	if err := s.configure(ctx, s.configuration); err != nil {
 		return fmt.Errorf("configuration failed: %w", err)
 	}
 
@@ -412,7 +412,7 @@ func (s *KubeAPIServer) Run(ctx context.Context, ready chan<- struct{}, stopped 
 	}
 }
 
-func discoverEtcdServers(hostname, kubeconfigPath string) ([]string, error) {
+func discoverEtcdServers(ctx context.Context, hostname, kubeconfigPath string) ([]string, error) {
 	certsDir := cryptomaterial.CertsDirectory(config.DataDir)
 	etcdPeerCertDir := cryptomaterial.EtcdPeerCertDir(certsDir)
 
@@ -430,13 +430,14 @@ func discoverEtcdServers(hostname, kubeconfigPath string) ([]string, error) {
 		DialTimeout: 5 * time.Second,
 		Endpoints:   []string{"https://localhost:2379"},
 		TLS:         tlsConfig,
+		Context:     ctx,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("failed to create etcd client: %w", err)
 	}
-	defer client.Close()
+	defer func() { _ = client.Close() }()
 
-	st, err := client.Status(context.Background(), "localhost:2379")
+	st, err := client.Status(ctx, "localhost:2379")
 	if err != nil {
 		return nil, fmt.Errorf("failed to get etcd status: %w", err)
 	}
@@ -468,13 +469,14 @@ func discoverEtcdServers(hostname, kubeconfigPath string) ([]string, error) {
 			DialTimeout: 5 * time.Second,
 			Endpoints:   []string{etcdHost},
 			TLS:         tlsConfig,
+			Context:     ctx,
 		})
 		if err != nil {
 			return nil, fmt.Errorf("failed to create etcd client: %w", err)
 		}
 	}
 
-	resp, err := client.MemberList(context.Background())
+	resp, err := client.MemberList(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("failed to retrieve etcd member list: %w", err)
 	}

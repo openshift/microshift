@@ -125,7 +125,7 @@ func runJoinCluster(ctx context.Context, opts *JoinClusterOptions) error {
 		return fmt.Errorf("failed to get cluster information: %w", err)
 	}
 
-	if err := configureEtcdForCluster(cfg, clusterMembers, opts.Learner); err != nil {
+	if err := configureEtcdForCluster(ctx, cfg, clusterMembers, opts.Learner); err != nil {
 		return fmt.Errorf("failed to configure etcd for cluster: %w", err)
 	}
 
@@ -146,7 +146,7 @@ func runJoinCluster(ctx context.Context, opts *JoinClusterOptions) error {
 	return nil
 }
 
-func createKubernetesClient(kubeconfigPath string) (kubernetes.Interface, error) {
+func createKubernetesClient(kubeconfigPath string) (*kubernetes.Clientset, error) {
 	if _, err := os.Stat(kubeconfigPath); os.IsNotExist(err) {
 		return nil, fmt.Errorf("kubeconfig file does not exist at %s", kubeconfigPath)
 	}
@@ -187,11 +187,11 @@ func fetchCertificateAuthority(ctx context.Context, client kubernetes.Interface,
 
 	caBundle, caBundleExists := secret.Data["ca-bundle.crt"]
 
-	if err := os.MkdirAll(dir, 0755); err != nil {
+	if err := os.MkdirAll(dir, 0750); err != nil {
 		return fmt.Errorf("failed to create destination directory: %w", err)
 	}
 
-	if err := os.WriteFile(cryptomaterial.CACertPath(dir), caCert, 0644); err != nil {
+	if err := os.WriteFile(cryptomaterial.CACertPath(dir), caCert, 0600); err != nil {
 		return fmt.Errorf("failed to write ca.crt: %w", err)
 	}
 
@@ -199,12 +199,12 @@ func fetchCertificateAuthority(ctx context.Context, client kubernetes.Interface,
 		return fmt.Errorf("failed to write ca.key: %w", err)
 	}
 
-	if err := os.WriteFile(cryptomaterial.CASerialsPath(dir), serial, 0644); err != nil {
+	if err := os.WriteFile(cryptomaterial.CASerialsPath(dir), serial, 0600); err != nil {
 		return fmt.Errorf("failed to write serial.txt: %w", err)
 	}
 
 	if caBundleExists {
-		if err := os.WriteFile(cryptomaterial.CABundlePath(dir), caBundle, 0644); err != nil {
+		if err := os.WriteFile(cryptomaterial.CABundlePath(dir), caBundle, 0600); err != nil {
 			return fmt.Errorf("failed to write ca-bundle.crt: %w", err)
 		}
 	}
@@ -242,17 +242,17 @@ func generateEtcdCertificates(cfg *config.Config) error {
 
 	// Create directories for etcd certificates
 	servingCertDir := cryptomaterial.EtcdServingCertDir(certsDir)
-	if err := os.MkdirAll(servingCertDir, 0755); err != nil {
+	if err := os.MkdirAll(servingCertDir, 0750); err != nil {
 		return fmt.Errorf("failed to create serving cert directory: %w", err)
 	}
 
 	peerCertDir := cryptomaterial.EtcdPeerCertDir(certsDir)
-	if err := os.MkdirAll(peerCertDir, 0755); err != nil {
+	if err := os.MkdirAll(peerCertDir, 0750); err != nil {
 		return fmt.Errorf("failed to create peer cert directory: %w", err)
 	}
 
 	clientCertDir := cryptomaterial.EtcdAPIServerClientCertDir(certsDir)
-	if err := os.MkdirAll(clientCertDir, 0755); err != nil {
+	if err := os.MkdirAll(clientCertDir, 0750); err != nil {
 		return fmt.Errorf("failed to create client cert directory: %w", err)
 	}
 
@@ -268,7 +268,7 @@ func generateEtcdCertificates(cfg *config.Config) error {
 	// Generate serving certificate
 	servingTLS, err := caConfig.MakeServerCertForDuration(
 		sets.New[string](hostnames...),
-		time.Duration(cryptomaterial.ShortLivedCertificateValidity),
+		cryptomaterial.ShortLivedCertificateValidity,
 		func(certTemplate *x509.Certificate) error {
 			certTemplate.Subject.CommonName = "system:etcd-server:etcd-client"
 			certTemplate.Subject.Organization = []string{"system:etcd-servers"}
@@ -276,7 +276,7 @@ func generateEtcdCertificates(cfg *config.Config) error {
 			certTemplate.IPAddresses = ips
 			certTemplate.SerialNumber = big.NewInt(4)
 			serialNumberPath := filepath.Join(servingCertDir, "serial.txt")
-			if err := os.WriteFile(serialNumberPath, []byte(certTemplate.SerialNumber.String()), 0644); err != nil {
+			if err := os.WriteFile(serialNumberPath, []byte(certTemplate.SerialNumber.String()), 0600); err != nil {
 				return fmt.Errorf("failed to write serial number to disk: %w", err)
 			}
 			return nil
@@ -294,7 +294,7 @@ func generateEtcdCertificates(cfg *config.Config) error {
 
 	peerTLS, err := caConfig.MakeServerCertForDuration(
 		sets.New[string](hostnames...),
-		time.Duration(cryptomaterial.ShortLivedCertificateValidity),
+		cryptomaterial.ShortLivedCertificateValidity,
 		func(certTemplate *x509.Certificate) error {
 			certTemplate.Subject.CommonName = "system:etcd-peer:etcd-client"
 			certTemplate.Subject.Organization = []string{"system:etcd-peers"}
@@ -302,7 +302,7 @@ func generateEtcdCertificates(cfg *config.Config) error {
 			certTemplate.IPAddresses = ips
 			certTemplate.SerialNumber = big.NewInt(4)
 			serialNumberPath := filepath.Join(peerCertDir, "serial.txt")
-			if err := os.WriteFile(serialNumberPath, []byte(certTemplate.SerialNumber.String()), 0644); err != nil {
+			if err := os.WriteFile(serialNumberPath, []byte(certTemplate.SerialNumber.String()), 0600); err != nil {
 				return fmt.Errorf("failed to write serial number to disk: %w", err)
 			}
 			return nil
@@ -322,7 +322,7 @@ func generateEtcdCertificates(cfg *config.Config) error {
 	clientUserInfo := &user.DefaultInfo{Name: "etcd", Groups: []string{"etcd"}}
 	clientTLS, err := caConfig.MakeClientCertificateForDuration(
 		clientUserInfo,
-		time.Duration(cryptomaterial.ShortLivedCertificateValidity),
+		cryptomaterial.ShortLivedCertificateValidity,
 	)
 	if err != nil {
 		return fmt.Errorf("failed to generate client certificate: %w", err)
@@ -372,9 +372,9 @@ func isJoinNodeReady(node *corev1.Node) bool {
 	return false
 }
 
-func configureEtcdForCluster(cfg *config.Config, clusterMembers []string, isLearner bool) error {
+func configureEtcdForCluster(ctx context.Context, cfg *config.Config, clusterMembers []string, isLearner bool) error {
 	dataDir := filepath.Dir(cfg.EtcdConfigPath())
-	if err := os.MkdirAll(dataDir, 0755); err != nil {
+	if err := os.MkdirAll(dataDir, 0750); err != nil {
 		return fmt.Errorf("failed to create etcd data directory: %w", err)
 	}
 
@@ -387,7 +387,7 @@ func configureEtcdForCluster(cfg *config.Config, clusterMembers []string, isLear
 
 	clusterConfig := fmt.Sprintf("ETCD_INITIAL_CLUSTER=%s\nETCD_INITIAL_CLUSTER_STATE=existing", strings.Join(cfgInitialCluster, ","))
 
-	if err := os.WriteFile(cfg.EtcdConfigPath(), []byte(clusterConfig), 0644); err != nil {
+	if err := os.WriteFile(cfg.EtcdConfigPath(), []byte(clusterConfig), 0600); err != nil {
 		return fmt.Errorf("failed to write etcd cluster configuration: %w", err)
 	}
 
@@ -419,13 +419,13 @@ func configureEtcdForCluster(cfg *config.Config, clusterMembers []string, isLear
 		Endpoints:   endpoints,
 		DialTimeout: 5 * time.Second,
 		TLS:         tlsConfig,
-		Context:     context.Background(),
+		Context:     ctx,
 	})
 	if err != nil {
 		return fmt.Errorf("failed to create etcd client: %v", err)
 	}
 
-	memberResponse, err := client.MemberList(context.Background())
+	memberResponse, err := client.MemberList(ctx)
 	if err != nil {
 		return fmt.Errorf("failed to list etcd members: %v", err)
 	}
@@ -449,7 +449,7 @@ func configureEtcdForCluster(cfg *config.Config, clusterMembers []string, isLear
 		Endpoints:   filteredEndpoints,
 		DialTimeout: 5 * time.Second,
 		TLS:         tlsConfig,
-		Context:     context.Background(),
+		Context:     ctx,
 	})
 	if err != nil {
 		return fmt.Errorf("failed to create etcd client with filtered endpoints: %v", err)
@@ -459,7 +459,7 @@ func configureEtcdForCluster(cfg *config.Config, clusterMembers []string, isLear
 	if isLearner {
 		addFunction = client.MemberAddAsLearner
 	}
-	response, err := addFunction(context.Background(), []string{fmt.Sprintf("https://%s:2380", cfg.Node.NodeIP)})
+	response, err := addFunction(ctx, []string{fmt.Sprintf("https://%s", net.JoinHostPort(cfg.Node.NodeIP, "2380"))})
 	if err != nil {
 		return fmt.Errorf("failed to add etcd node: %v", err)
 	}
@@ -469,7 +469,7 @@ func configureEtcdForCluster(cfg *config.Config, clusterMembers []string, isLear
 
 func configureBootstrapKubeconfig(cfg *config.Config, kubeconfigPath string) error {
 	bootstrapKubeConfigPath := cfg.BootstrapKubeConfigPath()
-	if err := os.MkdirAll(filepath.Dir(bootstrapKubeConfigPath), 0755); err != nil {
+	if err := os.MkdirAll(filepath.Dir(bootstrapKubeConfigPath), 0750); err != nil {
 		return fmt.Errorf("failed to create kubelet directory: %w", err)
 	}
 
@@ -484,7 +484,7 @@ func copyFile(src, dst string) error {
 	if err != nil {
 		return err
 	}
-	return os.WriteFile(dst, data, 0644)
+	return os.WriteFile(dst, data, 0600)
 }
 
 func restartMicroShift() error {
