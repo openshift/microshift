@@ -86,7 +86,7 @@ func (s *EtcdService) configure(cfg *config.Config) {
 	s.etcdCfg.ListenMetricsUrls = setURL([]string{cfg.Node.NodeIP}, "2381")
 
 	s.etcdCfg.Name = cfg.Node.HostnameOverride
-	s.etcdCfg.InitialCluster = fmt.Sprintf("%s=https://%s:2380", cfg.Node.HostnameOverride, cfg.Node.NodeIP)
+	s.etcdCfg.InitialCluster = fmt.Sprintf("%s=https://%s", cfg.Node.HostnameOverride, net.JoinHostPort(cfg.Node.NodeIP, "2380"))
 
 	s.etcdCfg.TlsMinVersion = getTLSMinVersion(cfg.ApiServer.TLS.MinVersion)
 	if cfg.ApiServer.TLS.MinVersion != string(configv1.VersionTLS13) {
