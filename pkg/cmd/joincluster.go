@@ -16,6 +16,7 @@ import (
 	"github.com/openshift/microshift/pkg/components"
 	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/util/cryptomaterial"
+	"github.com/openshift/microshift/pkg/version"
 	"github.com/spf13/cobra"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apiserver/pkg/authentication/user"
@@ -68,6 +69,10 @@ func NewJoinClusterCommand() *cobra.Command {
 		"Timeout for cluster join operations")
 	cmd.Flags().BoolVar(&opts.Learner, "learner", true,
 		"Join the cluster as a learner node (default is to join as a member)")
+
+	if version.Get().BuildVariant != version.BuildVariantCommunity {
+		cmd.Hidden = true
+	}
 
 	return cmd
 }
