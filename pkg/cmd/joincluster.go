@@ -73,8 +73,6 @@ func NewJoinClusterCommand() *cobra.Command {
 }
 
 func runJoinCluster(ctx context.Context, opts *JoinClusterOptions) error {
-	//TODO I need to cleanup certain directories first. etcd, certs and kubeconfigs, plus /var/lib/kubelet.
-	// I should detect if I am already in another cluster too. if not, perform the above. if i am then do nothing.
 	ctx, cancel := context.WithTimeout(ctx, opts.Timeout)
 	defer cancel()
 
@@ -98,6 +96,10 @@ func runJoinCluster(ctx context.Context, opts *JoinClusterOptions) error {
 	if isNodeAlreadyInCluster(ctx, client, nodeName) {
 		klog.Infof("Node %s is already part of the cluster. Skipping join process.", nodeName)
 		return nil
+	}
+
+	if err := cleanupMicroShiftData(cfg); err != nil {
+		return fmt.Errorf("failed to cleanup MicroShift data directories: %w", err)
 	}
 
 	for _, resource := range components.CertificateAuthorityResources {
@@ -401,7 +403,6 @@ func configureEtcdForCluster(cfg *config.Config, clusterMembers []string, isLear
 		return fmt.Errorf("failed to create etcd client TLS config: %v", err)
 	}
 
-	//TODO replace this with the bootstrap server.
 	var endpoints []string
 	for _, member := range clusterMembers {
 		parts := strings.SplitN(member, "=", 2)
@@ -532,4 +533,21 @@ func waitForNodeReady(ctx context.Context, client kubernetes.Interface, nodeName
 			klog.Infof("Node %s is not ready yet, waiting...", nodeName)
 		}
 	}
+}
+
+func cleanupMicroShiftData(cfg *config.Config) error {
+	directoriesToClean := []string{
+		filepath.Dir(cfg.EtcdConfigPath()),
+		cryptomaterial.CertsDirectory(config.DataDir),
+		filepath.Join(config.DataDir, "resources"),
+		filepath.Join(config.DataDir, "bootstrap"),
+	}
+
+	for _, dir := range directoriesToClean {
+		if err := os.RemoveAll(dir); err != nil {
+			return fmt.Errorf("failed to remove directory %s: %w", dir, err)
+		}
+	}
+	klog.Info("MicroShift data directories cleaned up successfully")
+	return nil
 }
