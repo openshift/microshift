@@ -28,6 +28,8 @@ import (
 	"strings"
 	"time"
 
+	"go.etcd.io/etcd/client/pkg/v3/transport"
+	clientv3 "go.etcd.io/etcd/client/v3"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/serializer"
@@ -162,20 +164,23 @@ func (s *KubeAPIServer) configure(cfg *config.Config) error {
 		}
 	}
 
+	etcdServers, err := discoverEtcdServers(s.configuration.Node.HostnameOverride, s.configuration.BootstrapKubeConfigPath())
+	if err != nil {
+		return fmt.Errorf("failed to discover etcd servers: %w", err)
+	}
+
 	overrides := &kubecontrolplanev1.KubeAPIServerConfig{
 		APIServerArguments: map[string]kubecontrolplanev1.Arguments{
-			"advertise-address":   {s.advertiseAddress},
-			"audit-policy-file":   {filepath.Join(config.DataDir, "/resources/kube-apiserver-audit-policies/default.yaml")},
-			"audit-log-maxage":    {strconv.Itoa(cfg.ApiServer.AuditLog.MaxFileAge)},
-			"audit-log-maxbackup": {strconv.Itoa(cfg.ApiServer.AuditLog.MaxFiles)},
-			"audit-log-maxsize":   {strconv.Itoa(cfg.ApiServer.AuditLog.MaxFileSize)},
-			"client-ca-file":      {clientCABundlePath},
-			"etcd-cafile":         {cryptomaterial.CACertPath(cryptomaterial.EtcdSignerDir(certsDir))},
-			"etcd-certfile":       {cryptomaterial.ClientCertPath(etcdClientCertDir)},
-			"etcd-keyfile":        {cryptomaterial.ClientKeyPath(etcdClientCertDir)},
-			"etcd-servers": {
-				"https://localhost:2379",
-			},
+			"advertise-address":             {s.advertiseAddress},
+			"audit-policy-file":             {filepath.Join(config.DataDir, "/resources/kube-apiserver-audit-policies/default.yaml")},
+			"audit-log-maxage":              {strconv.Itoa(cfg.ApiServer.AuditLog.MaxFileAge)},
+			"audit-log-maxbackup":           {strconv.Itoa(cfg.ApiServer.AuditLog.MaxFiles)},
+			"audit-log-maxsize":             {strconv.Itoa(cfg.ApiServer.AuditLog.MaxFileSize)},
+			"client-ca-file":                {clientCABundlePath},
+			"etcd-cafile":                   {cryptomaterial.CACertPath(cryptomaterial.EtcdSignerDir(certsDir))},
+			"etcd-certfile":                 {cryptomaterial.ClientCertPath(etcdClientCertDir)},
+			"etcd-keyfile":                  {cryptomaterial.ClientKeyPath(etcdClientCertDir)},
+			"etcd-servers":                  etcdServers,
 			"kubelet-certificate-authority": {cryptomaterial.CABundlePath(kubeCSRSignerDir)},
 			"kubelet-client-certificate":    {cryptomaterial.ClientCertPath(kubeletClientDir)},
 			"kubelet-client-key":            {cryptomaterial.ClientKeyPath(kubeletClientDir)},
@@ -405,4 +410,90 @@ func (s *KubeAPIServer) Run(ctx context.Context, ready chan<- struct{}, stopped 
 	case perr := <-panicChannel:
 		panic(perr)
 	}
+}
+
+func discoverEtcdServers(hostname, kubeconfigPath string) ([]string, error) {
+	certsDir := cryptomaterial.CertsDirectory(config.DataDir)
+	etcdPeerCertDir := cryptomaterial.EtcdPeerCertDir(certsDir)
+
+	tlsInfo := transport.TLSInfo{
+		CertFile:      cryptomaterial.PeerCertPath(etcdPeerCertDir),
+		KeyFile:       cryptomaterial.PeerKeyPath(etcdPeerCertDir),
+		TrustedCAFile: cryptomaterial.CACertPath(cryptomaterial.EtcdSignerDir(certsDir)),
+	}
+	tlsConfig, err := tlsInfo.ClientConfig()
+	if err != nil {
+		return nil, fmt.Errorf("failed to create etcd client TLS config: %v", err)
+	}
+
+	client, err := clientv3.New(clientv3.Config{
+		DialTimeout: 5 * time.Second,
+		Endpoints:   []string{"https://localhost:2379"},
+		TLS:         tlsConfig,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to create etcd client: %w", err)
+	}
+	defer client.Close()
+
+	st, err := client.Status(context.Background(), "localhost:2379")
+	if err != nil {
+		return nil, fmt.Errorf("failed to get etcd status: %w", err)
+	}
+	if st.IsLearner {
+		//TODO if its a learner I need to take the server from the current non-learner members. Use the bootstrap for that.
+		kubeconfig, err := clientcmd.LoadFromFile(kubeconfigPath)
+		if err != nil {
+			return nil, fmt.Errorf("failed to load bootstrap kubeconfig: %w", err)
+		}
+
+		if kubeconfig == nil || kubeconfig.Clusters == nil || len(kubeconfig.Clusters) == 0 {
+			return nil, fmt.Errorf("invalid bootstrap kubeconfig: no clusters found")
+		}
+
+		var etcdHost string
+		for _, cluster := range kubeconfig.Clusters {
+			etcdHost = cluster.Server
+			break
+		}
+
+		if etcdHost == "" {
+			return nil, fmt.Errorf("failed to extract etcd hostname from bootstrap kubeconfig")
+		}
+
+		etcdHost = strings.TrimPrefix(etcdHost, "https://")
+		etcdHost, _, _ = net.SplitHostPort(etcdHost)
+		etcdHost = fmt.Sprintf("https://%s", net.JoinHostPort(etcdHost, "2379"))
+		client, err = clientv3.New(clientv3.Config{
+			DialTimeout: 5 * time.Second,
+			Endpoints:   []string{etcdHost},
+			TLS:         tlsConfig,
+		})
+		if err != nil {
+			return nil, fmt.Errorf("failed to create etcd client: %w", err)
+		}
+	}
+
+	resp, err := client.MemberList(context.Background())
+	if err != nil {
+		return nil, fmt.Errorf("failed to retrieve etcd member list: %w", err)
+	}
+
+	//TODO I already know if I am a learner, I had to do this before.
+	iAmLearner := false
+	var members []string
+	for _, member := range resp.Members {
+		if member.Name == hostname && member.IsLearner {
+			iAmLearner = true
+			continue
+		}
+		if !member.IsLearner {
+			members = append(members, member.ClientURLs...)
+		}
+	}
+	if iAmLearner {
+		return members, nil
+	}
+
+	return []string{"https://localhost:2379"}, nil
 }
