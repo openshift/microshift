@@ -107,7 +107,6 @@ func runJoinCluster(ctx context.Context, opts *JoinClusterOptions) error {
 	}
 	klog.Info("Certificate authorities fetched and written successfully")
 
-	//TODO generate it using paths.
 	if err := generateEtcdCertificates(cfg); err != nil {
 		return fmt.Errorf("failed to generate etcd certificates: %w", err)
 	}
@@ -369,14 +368,11 @@ func isJoinNodeReady(node *corev1.Node) bool {
 }
 
 func configureEtcdForCluster(cfg *config.Config, clusterMembers []string, isLearner bool) error {
-	// Create etcd configuration for joining cluster
-	//TODO need to do something with paths. constants or something.
-	dataDir := filepath.Join(config.DataDir, "etcd")
+	dataDir := filepath.Dir(cfg.EtcdConfigPath())
 	if err := os.MkdirAll(dataDir, 0755); err != nil {
 		return fmt.Errorf("failed to create etcd data directory: %w", err)
 	}
 
-	// Add current node to the cluster members list
 	nodeIP := cfg.Node.NodeIP
 	if nodeIP == "" {
 		nodeIP = "127.0.0.1" // fallback
@@ -386,19 +382,11 @@ func configureEtcdForCluster(cfg *config.Config, clusterMembers []string, isLear
 
 	clusterConfig := fmt.Sprintf("ETCD_INITIAL_CLUSTER=%s\nETCD_INITIAL_CLUSTER_STATE=existing", strings.Join(cfgInitialCluster, ","))
 
-	configDir := "/var/lib/microshift/etcd"
-	if err := os.MkdirAll(configDir, 0755); err != nil {
-		return fmt.Errorf("failed to create configuration directory: %w", err)
-	}
-
-	//TODO rework this. not good anymore.
-	configFilePath := filepath.Join(configDir, "config")
-	if err := os.WriteFile(configFilePath, []byte(clusterConfig), 0644); err != nil {
+	if err := os.WriteFile(cfg.EtcdConfigPath(), []byte(clusterConfig), 0644); err != nil {
 		return fmt.Errorf("failed to write etcd cluster configuration: %w", err)
 	}
 
-	//TODO not a yaml now
-	klog.Infof("Etcd YAML configuration written to %s", configFilePath)
+	klog.Infof("Etcd configuration written to %s", cfg.EtcdConfigPath())
 
 	certsDir := cryptomaterial.CertsDirectory(config.DataDir)
 	etcdPeerClientCertDir := cryptomaterial.EtcdPeerCertDir(certsDir)
@@ -413,6 +401,7 @@ func configureEtcdForCluster(cfg *config.Config, clusterMembers []string, isLear
 		return fmt.Errorf("failed to create etcd client TLS config: %v", err)
 	}
 
+	//TODO replace this with the bootstrap server.
 	var endpoints []string
 	for _, member := range clusterMembers {
 		parts := strings.SplitN(member, "=", 2)
@@ -421,7 +410,7 @@ func configureEtcdForCluster(cfg *config.Config, clusterMembers []string, isLear
 			endpoints = append(endpoints, endpoint)
 		}
 	}
-	//TODO this could be even easier. just target the bootstrap server.
+
 	client, err := clientv3.New(clientv3.Config{
 		Endpoints:   endpoints,
 		DialTimeout: 5 * time.Second,
@@ -437,8 +426,6 @@ func configureEtcdForCluster(cfg *config.Config, clusterMembers []string, isLear
 		return fmt.Errorf("failed to list etcd members: %v", err)
 	}
 
-	//TODO can i skip all of this if I am already in the cluster? this is pointless.
-	// what i need is to get all the non-learner members and add myself to them.
 	var filteredEndpoints []string
 	initialCluster := fmt.Sprintf("%s=https://%s:2380", cfg.Node.HostnameOverride, cfg.Node.NodeIP)
 	for _, member := range memberResponse.Members {
