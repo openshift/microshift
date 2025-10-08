@@ -2,16 +2,13 @@
 
 set -eux
 
-# Set KUBECONFIG path - use dynamic IP-based path
-KUBECONFIG=${KUBECONFIG:-/var/lib/microshift/resources/kubeadmin/kubeconfig}
-
 ns="test-lvms"
 appLabel="app-lvms"
 
 echo "INFO:" "Create Namespace, PVC and Deployment resources......"
-sudo oc --kubeconfig "${KUBECONFIG}" create ns ${ns}
+oc create ns ${ns}
 
-cat <<EOF | sudo oc --kubeconfig "${KUBECONFIG}" -n ${ns} apply -f -
+cat <<EOF | oc -n ${ns} apply -f -
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
@@ -61,7 +58,7 @@ podName=""
 set +e
 while [[ "${podName=}" == "" && ${iter} -gt 0 ]]; do
   sleep ${period}
-  podName=$(sudo oc --kubeconfig "${KUBECONFIG}" get pod -n ${ns} -l app=${appLabel} --no-headers | awk '{print $1}')
+  podName=$(oc get pod -n ${ns} -l app=${appLabel} --no-headers | awk '{print $1}')
   (( iter -- ))
 done
 if [ "${podName}" == "" ]; then
@@ -73,7 +70,7 @@ iter=48
 result=""
 while [[ "${result}" != "Running" && ${iter} -gt 0 ]]; do
   #shellcheck disable=SC1083
-  result=$(sudo oc --kubeconfig "${KUBECONFIG}" get pod "${podName}" -n ${ns} -o=jsonpath={.status.phase})
+  result=$(oc get pod "${podName}" -n ${ns} -o=jsonpath={.status.phase})
   (( iter -- ))
   sleep ${period}
 done
@@ -82,14 +79,14 @@ if [ "${result}" == "Running" ]; then
   echo "INFO:" "Deployment Pod is Running."
 else
   echo "ERROR:" "Deployment Pod creation Failed."
-  sudo oc --kubeconfig "${KUBECONFIG}" -n ${ns} describe pod "${podName}"
+  oc -n ${ns} describe pod "${podName}"
   exit 1
 fi
 
 echo "INFO:" "Check if data can be read/write into Pod mounted volume......."
 #shellcheck disable=SC2016
-sudo oc --kubeconfig "${KUBECONFIG}" exec -n ${ns} "${podName}" -- /bin/sh -c 'echo Storage_Test $(date) > /mnt/storage/testfile'
-data=$(sudo oc --kubeconfig "${KUBECONFIG}" exec -n ${ns} "${podName}" -- /bin/sh -c 'cat /mnt/storage/testfile')
+oc exec -n ${ns} "${podName}" -- /bin/sh -c 'echo Storage_Test $(date) > /mnt/storage/testfile'
+data=$(oc exec -n ${ns} "${podName}" -- /bin/sh -c 'cat /mnt/storage/testfile')
 if [[ ${data} =~ "Storage_Test" ]]; then
   echo "SUCCESS:" "Data successfully written into Pod"
 else
