@@ -44,9 +44,11 @@ func StartComponents(cfg *config.Config, ctx context.Context) error {
 		return err
 	}
 
-	if err := startCertificateAuthorityController(ctx, kubeAdminConfig); err != nil {
-		klog.Warningf("Failed to start certificate authority controller: %v", err)
-		return err
+	if cfg.MultiNode.Enabled {
+		if err := startCertificateAuthorityController(ctx, kubeAdminConfig); err != nil {
+			klog.Warningf("Failed to start certificate authority controller: %v", err)
+			return err
+		}
 	}
 
 	return nil
