@@ -36,21 +36,21 @@ const (
 	joinDefaultTimeout = 10 * time.Minute
 )
 
-type JoinClusterOptions struct {
+type AddNodeOptions struct {
 	KubeconfigPath string
 	Timeout        time.Duration
 	Learner        bool
 }
 
-func NewJoinClusterCommand() *cobra.Command {
-	opts := &JoinClusterOptions{
+func NewAddNodeCommand() *cobra.Command {
+	opts := &AddNodeOptions{
 		KubeconfigPath: "/var/lib/microshift/resources/kubeadmin/bootstrap/kubeconfig",
 		Timeout:        joinDefaultTimeout,
 	}
 
 	cmd := &cobra.Command{
-		Use:   "join-cluster",
-		Short: "Join a node to an existing MicroShift cluster",
+		Use:   "add-node",
+		Short: "Adds a new node to an existing MicroShift cluster",
 		Long: `This command joins a node to an existing MicroShift cluster by:
 1. Loading the MicroShift configuration for current node.
 2. Fetch Certificate Authorities from the cluster using provided kubeconfig.
@@ -59,7 +59,7 @@ func NewJoinClusterCommand() *cobra.Command {
 6. Restarting the MicroShift systemd unit.
 7. Verifying the node is ready in the cluster.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return runJoinCluster(cmd.Context(), opts)
+			return runAddNode(cmd.Context(), opts)
 		},
 	}
 
@@ -68,7 +68,7 @@ func NewJoinClusterCommand() *cobra.Command {
 	cmd.Flags().DurationVar(&opts.Timeout, "timeout", opts.Timeout,
 		"Timeout for cluster join operations")
 	cmd.Flags().BoolVar(&opts.Learner, "learner", true,
-		"Join the cluster as a learner node (default is to join as a member)")
+		"Join the cluster as a learner node")
 
 	if version.Get().BuildVariant != version.BuildVariantCommunity {
 		cmd.Hidden = true
@@ -77,7 +77,7 @@ func NewJoinClusterCommand() *cobra.Command {
 	return cmd
 }
 
-func runJoinCluster(ctx context.Context, opts *JoinClusterOptions) error {
+func runAddNode(ctx context.Context, opts *AddNodeOptions) error {
 	ctx, cancel := context.WithTimeout(ctx, opts.Timeout)
 	defer cancel()
 
