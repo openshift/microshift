@@ -87,7 +87,7 @@ function get_node_ip_from_config() {
 
 function copy_kubeconfig() {
     local kubeconfig_source="/var/lib/microshift/resources/kubeadmin/${NODE_ADDR}/kubeconfig"
-    local kubeconfig_dest="${KUBELET_HOME}/kubeconfig-bootstrap"
+    local kubeconfig_dest="${HOME}/kubeconfig-bootstrap"
 
     if ! sudo test -f "${kubeconfig_source}"; then
         echo "Error: Kubeconfig file not found at ${kubeconfig_source}"
@@ -138,13 +138,6 @@ EOF
 #
 # Main function
 #
-
-KUBELET_HOME="${HOME}"
-if [ ! -w "${KUBELET_HOME}" ] ; then
-    echo "The ${KUBELET_HOME} directory is not writable"
-    exit 1
-fi
-
 if [ -n "${BOOTSTRAP_KUBECONFIG}" ]; then
     if [ ! -f "${BOOTSTRAP_KUBECONFIG}" ]; then
         echo "Error: BOOTSTRAP_KUBECONFIG is set to '${BOOTSTRAP_KUBECONFIG}' but the file does not exist"
@@ -167,7 +160,7 @@ if [ ! -n "${BOOTSTRAP_KUBECONFIG}" ]; then
     copy_kubeconfig
     echo
     echo "To add other nodes to this cluster, copy the following kubeconfig file to other nodes:"
-    echo "  ${KUBELET_HOME}/kubeconfig-bootstrap"
+    echo "  ${HOME}/kubeconfig-bootstrap"
     echo
     echo "Then run the following command on each node you want to add:"
     echo "  BOOTSTRAP_KUBECONFIG=/path/to/kubeconfig $(basename "$0")"
