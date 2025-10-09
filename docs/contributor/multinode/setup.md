@@ -34,18 +34,17 @@ and run it remotely.
 ```
 git clone https://github.com/openshift/microshift.git ~/microshift
 cd ~/microshift/
-scp -o StrictHostKeyChecking=no ./scripts/multinode/configure-pri.sh redhat@${PRI_ADDR}:
-ssh redhat@${PRI_ADDR} ./configure-pri.sh "${PRI_HOST}" "${PRI_ADDR}" "${SEC_HOST}" "${SEC_ADDR}"
+scp -o StrictHostKeyChecking=no ./scripts/multinode/configure-node.sh redhat@${PRI_ADDR}:
+ssh redhat@${PRI_ADDR} ./configure-node.sh
 ```
 
-If the configuration script runs successfully, it prints the list of the
-`kubelet` configuration files that need to be copied to the secondary host.
+If the configuration script runs successfully, it prints the location of a
+bootstrap kubeconfig that will be used in the secondary host.
 
-Copy the `kubelet` configuration files from the primary to the secondary host.
+Copy the kubeconfig configuration file from the primary to the secondary host.
 ```
-scp -3 -o StrictHostKeyChecking=no \
-    redhat@${PRI_ADDR}:/home/redhat/kubelet-${SEC_HOST}.{key,crt} \
-    redhat@${PRI_ADDR}:/home/redhat/kubeconfig-${PRI_HOST} \
+scp -o StrictHostKeyChecking=no \
+    redhat@${PRI_ADDR}:/home/redhat/kubeconfig-bootstrap \
     redhat@${SEC_ADDR}:
 ```
 
@@ -53,18 +52,18 @@ Run the following commands to copy the configuration script to the secondary hos
 and run it remotely.
 ```
 cd ~/microshift/
-scp -o StrictHostKeyChecking=no ./scripts/multinode/configure-sec.sh redhat@${SEC_ADDR}:
-ssh redhat@${SEC_ADDR} ./configure-sec.sh "${PRI_HOST}" "${PRI_ADDR}" "${SEC_HOST}" "${SEC_ADDR}"
+scp -o StrictHostKeyChecking=no ./scripts/multinode/configure-node.sh redhat@${SEC_ADDR}:
+ssh redhat@${SEC_ADDR} "BOOTSTRAP_KUBECONFIG=~/kubeconfig-bootstrap ./configure-node.sh"
 ```
 
 ## Run Tests
-Before running tests, make sure that the `microshift-pri` host name is resolved
-and accessible from the `hypervisor host`.
+Before running tests, make sure that the `microshift-pri` host is accessible
+from the `hypervisor host`.
 
 Set the `KUBECONFIG` variable using the configuration file from the primary host.
 ```
 export KUBECONFIG=$(mktemp /tmp/microshift-kubeconfig.XXXXXXXXXX)
-scp redhat@${PRI_ADDR}:/home/redhat/kubeconfig-${PRI_HOST} ${KUBECONFIG}
+scp redhat@${PRI_ADDR}:/home/redhat/kubeconfig-bootstrap ${KUBECONFIG}
 ```
 
 Verify that the cluster has **two** nodes in the `Ready` status and wait until
