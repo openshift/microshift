@@ -42,6 +42,12 @@ get_vrel_from_rhsm() {
 get_vrel_from_rpm() {
     local -r rpm_dir="$1"
 
+    # exit if rpm_dir directory does not exist
+    if [ ! -d "${rpm_dir}" ]; then
+        echo ""
+        return
+    fi
+
     local -r rpm_release_info_file=$(find "${rpm_dir}" -name "microshift-release-info-*.rpm" | sort | tail -n1)
     if [ -z "${rpm_release_info_file}" ]; then
         echo ""
