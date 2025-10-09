@@ -1,19 +1,15 @@
-- cluster-kube-apiserver-operator embedded-component 51e09bc2da1fbda30e84ea836a429205d51901fa to 23fcbc3b52bce04badf48b3d82264ae89ac477e5
-  - 6c0fab8 2025-09-30T12:03:49+00:00 Updating ose-cluster-kube-apiserver-operator-container image to be consistent with ART for 4.21 Reconciling with https://github.com/openshift/ocp-build-data/tree/4fbe3fab45239dc4be6f5d9d98a0bf36e0274ec9/images/ose-cluster-kube-apiserver-operator.yml
-
-- cluster-policy-controller embedded-component 5c0dd7a1b366d314aa9c929fe775ee3041b348cb to ef703966fe6e82f5f255b06bc5c758f105bf8b28
-  - 5c7408d 2025-09-30T10:22:16+00:00 Updating ose-cluster-policy-controller-container image to be consistent with ART for 4.21 Reconciling with https://github.com/openshift/ocp-build-data/tree/4fbe3fab45239dc4be6f5d9d98a0bf36e0274ec9/images/cluster-policy-controller.yml
-
-- machine-config-operator embedded-component b6edf8e9963693fee23235617b145dcd644471e8 to 7bd71c9e5f3ea63478830a0db57190191d318da9
-  - 705c4e05 2025-10-01T16:08:22-06:00 Remove MissingMachineConfig Alert
-
-- oc image-amd64 a25e854ffddffcf2f8c1bc99b10afd1b34b8e0ca to 229ead6648df4cda637c46c4fe88f28079b6d4b5
+- oc image-arm64 a25e854ffddffcf2f8c1bc99b10afd1b34b8e0ca to 229ead6648df4cda637c46c4fe88f28079b6d4b5
   - 5bb9e8ca 2025-10-06T10:33:46+03:00 Update sspi library to newer
   - 2a9db469 2025-10-06T10:11:52+03:00 Migrate shellescape to new domain
   - bd888e52 2025-09-30T13:19:10+02:00 fix(node-image): prevent crash when rootDeviceHints format is invalid
 
-- ovn-kubernetes image-amd64 e71219323b38af7afff0710a815a539260832550 to 902c52a1e47c2c9447a926ad9fc277bbce728157
+- ovn-kubernetes image-arm64 e71219323b38af7afff0710a815a539260832550 to 26631052db2a4ca5b2474e7611bcb85f9cbdf847
   - b54c7b31 2025-09-22T17:17:49+02:00 Fix MarkIPsCache replaceAll
   - b8286809 2025-09-22T17:17:49+02:00 Configure sec nic EIPv6 address with NODAD and maximum lifetime
+  - f98873a1 2025-09-16T07:55:38+00:00 Updating ose-ovn-kubernetes-base-container image to be consistent with ART for 4.21 Reconciling with https://github.com/openshift/ocp-build-data/tree/deae6f3ff2f49f30dd509b502837629ffd828d4e/images/ovn-kubernetes-base.yml
   - ac16b5e8 2025-09-01T09:30:02+09:00 Fix incorrect comment for podNetwork in Helm values
+
+- kubernetes image-arm64 ecfa8cc3c4315d0a007fc19747e798c622a320d9 to 00e7ec7a0db0b7e03c5ed2bc5b8b776fdc34f72a
+  - 56b59cf47 2025-09-30T11:49:25+00:00 UPSTREAM: <carry>: Updating openshift-enterprise-pod-container image to be consistent with ART for 4.21 Reconciling with https://github.com/openshift/ocp-build-data/tree/4fbe3fab45239dc4be6f5d9d98a0bf36e0274ec9/images/openshift-enterprise-pod.yml
+  - 6a8be42b8 2025-09-24T16:25:08+05:30 UPSTREAM: 134199: Promote regression-issue-74839 to 1.4
 
