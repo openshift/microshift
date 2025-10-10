@@ -272,6 +272,52 @@ $ cat ./test/image-blueprints/layer1-base/group1/rhel92.image-installer
 rhel-9.2
 ```
 
+
+### Bootc Images
+
+#### Bootc Image Customization
+
+Bootc images are defined by templated `containerfile` definitions. 
+These files are written with [golang templating syntx](https://pkg.go.dev/text/template)
+and executed during the image build process.
+
+> Refer to `./test/bin/build_bootc_images.py` for a set of known variables that
+> can be expanded.
+
+#### Creating BootC Images
+
+See [Creating Images](#creating-images) to configure the system for building images. Creating workers is optional.
+
+Use `./test/bin/build_bootc_images.sh` to build bootc images from all available blueprints in
+`./test/image-blueprints-bootc`.
+
+Run `./test/bin/build_bootc_images.sh -h` to see the full list of options and their uses.
+
+#### Bootc Containerfile Naming
+
+Filename conventions are the same as [Blueprint Naming](#blueprint-naming) conventions.
+
+Containerfile filenames will become the image's name. Images built from other images in the pipeline
+may use the parent images's filename in the child's `FROM` declaration.
+
+**Recognized Filename Extensions**
+
+The build process recognizes these filename extensions:
+
+- `.containerfile`: A standard Containerfile definition. May be templated.
+- `.container-encapsulate`: Single-line text file specifying the name an existing rpm-ostree layer.
+- `.image-bootc`: Single-line text file specifying the name of a container image.
+- `.<EXT>.template`: Arbitrary text to be injected into a template. It is convention to use `<EXT>` to
+indicate the filetype of the content.
+
+#### Creating Bootc Images of a Certain Type
+
+Build artifact types are detemined by filename extensions. By default, all files are processed. (Optional) File types can be targeted by running `./test/bin/build_bootc_images.sh {-b <TYPE>, --build-type <TYPE>}`, where `<TYPE>` is one of:
+
+- `containerfile`: Build images only for .containerfile 
+- `container-encapsulate`: Convert an OSTree commit to an OCI image.
+- `image-bootc`: Convert a bootc image to a disk image using the RHEL 10 Bootc Image Builder Image
+
 ### Downloaded ISO Images
 
 To download a pre-built ISO image from the Internet, create a file with
@@ -324,6 +370,8 @@ $ ./test/bin/manage_composer_config.sh create-workers
 > This setting is optional and not necessarily recommended for configurations
 > with small number of CPUs and limited disk performance.
 
+##### Creating RPM-OSTree Images
+
 Use `./test/bin/build_images.sh` to build all of the images for all of the
 blueprints available.
 
@@ -334,6 +382,16 @@ images that use RPMs created from source (not already published releases).
 ```
 ./test/bin/build_images.sh -s
 ```
+
+##### Creating BootC Images
+
+Use `./test/bin/build_bootc_images.sh` to build all of the images for all of the
+blueprints available.
+
+Run `./test/bin/build_bootc_images.sh -h` to see all the supported modes for
+building images.
+
+Local RPM repos are built only if they do not exist.
 
 ### Configuring Test Scenarios
 
