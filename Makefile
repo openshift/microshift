@@ -31,7 +31,11 @@ PATCH := $(shell echo $(SOURCE_GIT_TAG) | awk -F'[._~-]' '{print $$3}')
 SRC_ROOT :=$(shell pwd)
 
 WITH_KINDNET ?= 0
-WITH_TOPOLVM ?= 0
+# MICROSHIFT_VARIANT: specify this make variable to build microshift with community feature set.
+# If MICROSHIFT_VARIANT is unset or != community, build MicroShift with enterprise feature set, which requires openshift pull-secret.
+# OCP telemetry is disabled in community version.
+MICROSHIFT_VARIANT ?= enterprise
+
 OUTPUT_DIR :=_output
 RPM_BUILD_DIR :=$(OUTPUT_DIR)/rpmbuild
 CROSS_BUILD_BINDIR :=$(OUTPUT_DIR)/bin
@@ -270,7 +274,7 @@ rpm:
 	SOURCE_GIT_COMMIT=${SOURCE_GIT_COMMIT} \
 	SOURCE_GIT_TREE_STATE=${SOURCE_GIT_TREE_STATE} \
 	WITH_KINDNET=${WITH_KINDNET} \
-	WITH_TOPOLVM=${WITH_TOPOLVM} \
+	MICROSHIFT_VARIANT=${MICROSHIFT_VARIANT} \
 	./packaging/rpm/make-rpm.sh rpm local
 .PHONY: rpm
 
@@ -281,7 +285,7 @@ srpm:
 	SOURCE_GIT_COMMIT=${SOURCE_GIT_COMMIT} \
 	SOURCE_GIT_TREE_STATE=${SOURCE_GIT_TREE_STATE} \
 	WITH_KINDNET=${WITH_KINDNET} \
-	WITH_TOPOLVM=${WITH_TOPOLVM} \
+	MICROSHIFT_VARIANT=${MICROSHIFT_VARIANT} \
 	./packaging/rpm/make-rpm.sh srpm local
 .PHONY: srpm
 
@@ -299,7 +303,6 @@ rpm-podman:
 		--volume $$(pwd):/opt/microshift:z \
 		--env TARGET_ARCH=$(TARGET_ARCH) \
 		--env WITH_KINDNET=$(WITH_KINDNET) \
-		--env WITH_TOPOLVM=$(WITH_TOPOLVM) \
 		microshift-builder:$(RPM_BUILDER_IMAGE_TAG) \
 		bash -ilc 'cd /opt/microshift && make rpm & pid=$$! ; \
 				   trap "echo Killing make PID $${pid}; kill $${pid}" INT ; \

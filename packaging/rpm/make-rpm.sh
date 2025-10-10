@@ -72,7 +72,7 @@ EOF
    --define "_topdir ${RPMBUILD_DIR}" \
    --define "_binary_payload w19T8.zstdio" \
    --define "with_kindnet ${WITH_KINDNET}" \
-   --define "with_topolvm ${WITH_TOPOLVM}" \
+   --define "microshift_variant ${MICROSHIFT_VARIANT}" \
    "${RPMBUILD_DIR}"SPECS/microshift.spec
 }
 
