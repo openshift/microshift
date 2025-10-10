@@ -113,6 +113,11 @@ func runAddNode(ctx context.Context, opts *AddNodeOptions) error {
 			return fmt.Errorf("failed to fetch certificate authority %s: %w", resource.Name, err)
 		}
 	}
+	for _, resource := range components.ServiceAccountKeyResources {
+		if err := fetchServiceAccountKey(ctx, client, resource.Name, resource.Dir); err != nil {
+			return fmt.Errorf("failed to fetch service account key %s: %w", resource.Name, err)
+		}
+	}
 	klog.Info("Certificate authorities fetched and written successfully")
 
 	if err := generateEtcdCertificates(cfg); err != nil {
@@ -207,6 +212,37 @@ func fetchCertificateAuthority(ctx context.Context, client kubernetes.Interface,
 		if err := os.WriteFile(cryptomaterial.CABundlePath(dir), caBundle, 0600); err != nil {
 			return fmt.Errorf("failed to write ca-bundle.crt: %w", err)
 		}
+	}
+
+	return nil
+}
+
+func fetchServiceAccountKey(ctx context.Context, client kubernetes.Interface, name, dir string) error {
+	secret, err := client.CoreV1().Secrets("kube-system").Get(ctx, name, metav1.GetOptions{})
+	if err != nil {
+		return fmt.Errorf("failed to get %s secret: %w", name, err)
+	}
+
+	serviceAccountKey, exists := secret.Data["service-account.key"]
+	if !exists {
+		return fmt.Errorf("service-account.key not found in secret")
+	}
+
+	serviceAccountPubKey, exists := secret.Data["service-account.pub"]
+	if !exists {
+		return fmt.Errorf("service-account.pub not found in secret")
+	}
+
+	if err := os.MkdirAll(dir, 0750); err != nil {
+		return fmt.Errorf("failed to create destination directory: %w", err)
+	}
+
+	if err := os.WriteFile(filepath.Join(dir, "service-account.key"), serviceAccountKey, 0600); err != nil {
+		return fmt.Errorf("failed to write service-account.key: %w", err)
+	}
+
+	if err := os.WriteFile(filepath.Join(dir, "service-account.pub"), serviceAccountPubKey, 0400); err != nil {
+		return fmt.Errorf("failed to write service-account.pub: %w", err)
 	}
 
 	return nil

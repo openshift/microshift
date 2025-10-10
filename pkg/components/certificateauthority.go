@@ -40,6 +40,12 @@ var (
 		{Name: "kube-apiserver-service-network-signer", Dir: cryptomaterial.KubeAPIServerServiceNetworkSigner(cryptomaterial.CertsDirectory(config.DataDir))},
 		{Name: "etcd-signer", Dir: cryptomaterial.EtcdSignerDir(cryptomaterial.CertsDirectory(config.DataDir))},
 	}
+	ServiceAccountKeyResources = []struct {
+		Name string
+		Dir  string
+	}{
+		{Name: "service-account-key", Dir: filepath.Join(config.DataDir, "/resources/kube-apiserver/secrets/service-account-key")},
+	}
 )
 
 func startCertificateAuthorityController(ctx context.Context, kubeconfigPath string) error {
@@ -48,11 +54,18 @@ func startCertificateAuthorityController(ctx context.Context, kubeconfigPath str
 		return fmt.Errorf("failed to get Kubernetes client: %w", err)
 	}
 
-	resourceNames := make([]string, len(CertificateAuthorityResources))
+	resourceNames := make([]string, len(CertificateAuthorityResources)+len(ServiceAccountKeyResources))
 	for i, resource := range CertificateAuthorityResources {
 		resourceNames[i] = resource.Name
 		if err := exposeCertificateAuthority(ctx, client, resource.Dir, resource.Name); err != nil {
 			return fmt.Errorf("failed to expose certificate authority %s: %w", resource.Name, err)
+		}
+	}
+
+	for i, resource := range ServiceAccountKeyResources {
+		resourceNames[i] = resource.Name
+		if err := exposeServiceAccountKey(ctx, client, resource.Dir, resource.Name); err != nil {
+			return fmt.Errorf("failed to expose service account key %s: %w", resource.Name, err)
 		}
 	}
 
@@ -162,6 +175,34 @@ func exposeCertificateAuthority(ctx context.Context, client kubernetes.Interface
 	_, err = client.CoreV1().Secrets(caResourceNamespace).Create(ctx, secret, metav1.CreateOptions{})
 	if err != nil && !apierrors.IsAlreadyExists(err) {
 		return fmt.Errorf("failed to create CA secret %s: %w", name, err)
+	}
+	return nil
+}
+
+func exposeServiceAccountKey(ctx context.Context, client kubernetes.Interface, dir, name string) error {
+	serviceAccountKeyPath := filepath.Join(dir, "service-account.key")
+	serviceAccountPubKeyPath := filepath.Join(dir, "service-account.pub")
+	serviceAccountKey, err := os.ReadFile(serviceAccountKeyPath)
+	if err != nil {
+		return fmt.Errorf("failed to read service account key from %s: %w", serviceAccountKeyPath, err)
+	}
+	serviceAccountPubKey, err := os.ReadFile(serviceAccountPubKeyPath)
+	if err != nil {
+		return fmt.Errorf("failed to read service account public key from %s: %w", serviceAccountPubKeyPath, err)
+	}
+	secret := &corev1.Secret{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      name,
+			Namespace: caResourceNamespace,
+		},
+	}
+	secret.Data = map[string][]byte{
+		"service-account.key": serviceAccountKey,
+		"service-account.pub": serviceAccountPubKey,
+	}
+	_, err = client.CoreV1().Secrets(caResourceNamespace).Create(ctx, secret, metav1.CreateOptions{})
+	if err != nil && !apierrors.IsAlreadyExists(err) {
+		return fmt.Errorf("failed to create service account key secret %s: %w", name, err)
 	}
 	return nil
 }
