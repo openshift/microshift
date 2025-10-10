@@ -37,14 +37,6 @@ ${TARGET_VERSION}       ${EMPTY}
 
 
 *** Test Cases ***
-Install Source Version
-    [Documentation]    Install the version built from source
-    Install Third Party Packages With Warnings
-    Install MicroShift RPM Packages From Repo    ${SOURCE_REPO_URL}    ${TARGET_VERSION}
-    Start MicroShift
-    Wait For MicroShift
-    [Teardown]    Clean Up Test
-
 Upgrade From Previous Version
     [Documentation]    Install the previous version, then upgrade the package
     ...    also verifying that crio and microshift services were restarted
@@ -93,23 +85,6 @@ Setup
     System Should Not Be Ostree
     Pull Secret Should Be Installed
 
-System Should Not Be Ostree
-    [Documentation]    Make sure we run on a non-ostree system
-    ${is_ostree}=    Is System OSTree
-    Should Not Be True    ${is_ostree}
-
-Pull Secret Should Be Installed
-    [Documentation]    Check that the kickstart file installed a pull secret for us
-    # Check that the file exists without actually saving the output so
-    # we don't have to clean the logs with the secret.
-    ${rc}=    SSHLibrary.Execute Command
-    ...    cat /etc/crio/openshift-pull-secret
-    ...    sudo=True
-    ...    return_rc=True
-    ...    return_stdout=False
-    ...    return_stderr=False
-    Should Be Equal As Integers    0    ${rc}
-
 Teardown
     [Documentation]    Test suite teardown
     Logout MicroShift Host
@@ -118,11 +93,6 @@ Clean Up Test
     [Documentation]    Clean up an installed MicroShift instance
     Cleanup MicroShift
     Uninstall MicroShift RPM Packages
-
-Install Third Party Packages With Warnings
-    [Documentation]    Install these separately to avoid having warnings
-    ...    show up in the warning check when installing MicroShift.
-    Command Should Work    dnf install -y NetworkManager-ovs containers-common
 
 Version Should Match
     [Documentation]    Compare the installed version against expectations
