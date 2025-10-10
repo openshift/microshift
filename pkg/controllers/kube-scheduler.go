@@ -64,12 +64,16 @@ func (s *KubeScheduler) configure(cfg *config.Config) {
 }
 
 func (s *KubeScheduler) writeConfig(cfg *config.Config) error {
+	leaderElect := "false"
+	if cfg.MultiNode.Enabled {
+		leaderElect = "true"
+	}
 	data := []byte(`apiVersion: kubescheduler.config.k8s.io/v1
 kind: KubeSchedulerConfiguration
 clientConnection:
   kubeconfig: ` + cfg.KubeConfigPath(config.KubeScheduler) + `
 leaderElection:
-  leaderElect: false`)
+  leaderElect: ` + leaderElect)
 
 	path := filepath.Join(config.DataDir, "resources", "kube-scheduler", "config", "config.yaml")
 	if err := os.MkdirAll(filepath.Dir(path), os.FileMode(0700)); err != nil {
