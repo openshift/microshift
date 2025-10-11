@@ -14,12 +14,5 @@ func ConfigMultiNode(c *Config, enabled bool) *Config {
 	}
 	c.MultiNode.Enabled = enabled
 	c.MultiNode.Controlplane = c.Node.NodeIP
-
-	// Use controlplane node IP as APIServer backend (instead of next available
-	// IP from service network)
-	c.ApiServer.AdvertiseAddress = c.Node.NodeIP
-	// Don't configure the advertise address on the device
-	c.ApiServer.SkipInterface = true
-
 	return c
 }

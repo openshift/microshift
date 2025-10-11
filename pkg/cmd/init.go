@@ -324,7 +324,7 @@ func certSetup(cfg *config.Config) (*certchains.CertificateChains, error) {
 					Validity: cryptomaterial.LongLivedCertificateValidity,
 				},
 				UserInfo:  &user.DefaultInfo{Name: "system:etcd-peer:etcd-client", Groups: []string{"system:etcd-peers"}},
-				Hostnames: []string{"localhost", cfg.Node.HostnameOverride},
+				Hostnames: []string{"localhost", cfg.Node.HostnameOverride, cfg.Node.NodeIP},
 			},
 			&certchains.PeerCertificateSigningRequestInfo{
 				CSRMeta: certchains.CSRMeta{
@@ -332,7 +332,7 @@ func certSetup(cfg *config.Config) (*certchains.CertificateChains, error) {
 					Validity: cryptomaterial.LongLivedCertificateValidity,
 				},
 				UserInfo:  &user.DefaultInfo{Name: "system:etcd-server:etcd-client", Groups: []string{"system:etcd-servers"}},
-				Hostnames: []string{"localhost", cfg.Node.HostnameOverride},
+				Hostnames: []string{"localhost", cfg.Node.HostnameOverride, cfg.Node.NodeIP},
 			},
 		),
 	).WithCABundle(

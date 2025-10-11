@@ -19,15 +19,11 @@ prepare_hosts() {
     local -r secondary_host_ip=$(cat "${SCENARIO_INFO_DIR}/${SCENARIO}/vms/host2/ip")
     local -r primary_host_ssh_port=$(cat "${SCENARIO_INFO_DIR}/${SCENARIO}/vms/host1/ssh_port")
     local -r secondary_host_ssh_port=$(cat "${SCENARIO_INFO_DIR}/${SCENARIO}/vms/host2/ssh_port")
-    local -r primary_host_name="$(full_vm_name host1)"
-    local -r secondary_host_name="$(full_vm_name host2)"
     local rc=0
 
     # Configure primary host
-    scp -P "${primary_host_ssh_port}" "${ROOTDIR}/scripts/multinode/configure-pri.sh" "redhat@${primary_host_ip}":
-    ssh -p "${primary_host_ssh_port}" "redhat@${primary_host_ip}" ./configure-pri.sh \
-        "${primary_host_name}" "${primary_host_ip}" \
-        "${secondary_host_name}" "${secondary_host_ip}" || rc=$?
+    scp -P "${primary_host_ssh_port}" "${ROOTDIR}/scripts/multinode/configure-node.sh" "redhat@${primary_host_ip}":
+    ssh -p "${primary_host_ssh_port}" "redhat@${primary_host_ip}" ./configure-node.sh || rc=$?
     if [ ${rc} -ne 0 ] ; then
         record_junit "prepare_hosts" "configure_primary" "FAILED"
         return ${rc}
@@ -35,27 +31,20 @@ prepare_hosts() {
     record_junit "prepare_hosts" "configure_primary" "OK"
 
     # Configure secondary host
-    scp -3 -P "${primary_host_ssh_port}" \
-        "redhat@${primary_host_ip}:/home/redhat/kubelet-${secondary_host_name}.key" \
-        "redhat@${primary_host_ip}:/home/redhat/kubelet-${secondary_host_name}.crt" \
-        "redhat@${primary_host_ip}:/home/redhat/kubeconfig-${primary_host_name}" \
-        "redhat@${primary_host_ip}:/home/redhat/lvmd-${primary_host_name}.yaml" \
+    scp -P "${primary_host_ssh_port}" \
+        "redhat@${primary_host_ip}:/home/redhat/kubeconfig-bootstrap" \
         "redhat@${secondary_host_ip}":
 
-    scp -P "${secondary_host_ssh_port}" "${ROOTDIR}/scripts/multinode/configure-sec.sh" "redhat@${secondary_host_ip}":
-    ssh -p "${secondary_host_ssh_port}" "redhat@${secondary_host_ip}" ./configure-sec.sh \
-        "${primary_host_name}" "${primary_host_ip}" \
-        "${secondary_host_name}" "${secondary_host_ip}" || rc=$?
+    scp -P "${secondary_host_ssh_port}" "${ROOTDIR}/scripts/multinode/configure-node.sh" "redhat@${secondary_host_ip}":
+    ssh -p "${secondary_host_ssh_port}" "redhat@${secondary_host_ip}" "./configure-node.sh --bootstrap-kubeconfig /home/redhat/kubeconfig-bootstrap" || rc=$?
     if [ ${rc} -ne 0 ] ; then
         record_junit "prepare_hosts" "configure_secondary" "FAILED"
         return ${rc}
     fi
     record_junit "prepare_hosts" "configure_secondary" "OK"
 
-    # Configure kubeconfig and host name resolution
-    scp -P "${primary_host_ssh_port}" "redhat@${primary_host_ip}:/home/redhat/kubeconfig-${primary_host_name}" "${KUBECONFIG}"
+    scp -P "${primary_host_ssh_port}" "redhat@${primary_host_ip}:/home/redhat/kubeconfig-bootstrap" "${KUBECONFIG}"
     export KUBECONFIG="${KUBECONFIG}"
-    echo "${primary_host_ip} ${primary_host_name}" | sudo tee -a /etc/hosts &>/dev/null
 
     return ${rc}
 }

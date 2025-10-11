@@ -175,6 +175,14 @@ func checkIfEtcdIsReady(ctx context.Context) error {
 	}
 	defer func() { _ = client.Close() }()
 
+	s, err := client.Status(ctx, "localhost:2379")
+	if err != nil {
+		return fmt.Errorf("failed to get etcd status: %v", err)
+	}
+	if s.IsLearner {
+		return nil
+	}
+
 	for i := 0; i < HealthCheckRetries; i++ {
 		time.Sleep(HealthCheckWait)
 		if _, err = client.Get(ctx, "health"); err == nil {
