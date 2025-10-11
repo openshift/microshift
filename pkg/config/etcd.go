@@ -1,6 +1,9 @@
 package config
 
-import "time"
+import (
+	"path/filepath"
+	"time"
+)
 
 const (
 	// Etcd performance degrades significantly if the memory available
@@ -26,4 +29,8 @@ type EtcdConfig struct {
 	// How often to check the conditions for defragging (0 means no
 	// defrags, except for a single on startup).
 	DefragCheckFreq time.Duration `json:"-"`
+}
+
+func (cfg *Config) EtcdConfigPath() string {
+	return filepath.Join(DataDir, "etcd", "config")
 }

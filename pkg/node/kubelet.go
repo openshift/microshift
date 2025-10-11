@@ -77,6 +77,9 @@ func (s *KubeletServer) configure(cfg *config.Config) {
 	}
 	kubeletFlags := kubeletoptions.NewKubeletFlags()
 	kubeletFlags.BootstrapKubeconfig = cfg.KubeConfigPath(config.Kubelet)
+	if cfg.BootstrapKubeConfigExists() {
+		kubeletFlags.BootstrapKubeconfig = cfg.BootstrapKubeConfigPath()
+	}
 	kubeletFlags.KubeConfig = cfg.KubeConfigPath(config.Kubelet)
 	kubeletFlags.RuntimeCgroups = "/system.slice/crio.service"
 	kubeletFlags.HostnameOverride = cfg.Node.HostnameOverride
