@@ -36,7 +36,7 @@ prepare_hosts() {
         "redhat@${secondary_host_ip}":
 
     scp -P "${secondary_host_ssh_port}" "${ROOTDIR}/scripts/multinode/configure-node.sh" "redhat@${secondary_host_ip}":
-    ssh -p "${secondary_host_ssh_port}" "redhat@${secondary_host_ip}" "BOOTSTRAP_KUBECONFIG=/home/redhat/kubeconfig-bootstrap ./configure-node.sh" || rc=$?
+    ssh -p "${secondary_host_ssh_port}" "redhat@${secondary_host_ip}" "./configure-node.sh --bootstrap-kubeconfig /home/redhat/kubeconfig-bootstrap" || rc=$?
     if [ ${rc} -ne 0 ] ; then
         record_junit "prepare_hosts" "configure_secondary" "FAILED"
         return ${rc}
