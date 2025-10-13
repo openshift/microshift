@@ -1,0 +1,109 @@
+- api embedded-component 230d0e045316bf1c679f3be8ad4cb5c501ca899b to 1f788b8d634ddc6c958548ca36ae7b68755239b1
+  - 3e3fbceb 2025-10-09T12:23:46+02:00 CNTRLPLANE-1614: add event-ttl feature gate
+  - d5e334db 2025-10-09T10:45:01+01:00 Switch to slices stable sort on manifest merging
+  - b0dd8fdb 2025-10-08T14:26:35+01:00 Update api-review to add local review capability
+  - 46535f00 2025-10-08T13:19:32+01:00 Use separate serialization linting config for Machine API provider types
+  - 7b1a802c 2025-10-03T17:25:27+01:00 Update AGENTS.md
+  - 1e4b0e61 2025-10-03T10:16:13-03:00 OCPBUGS-55649: Remove SetEIPForNLBIngressController feature gate
+  - 610b8c6e 2025-10-02T10:20:09+02:00 feat: update hack/update-payload-crds.sh
+  - 0db3b8cc 2025-10-02T10:20:09+02:00 fix: typos and linting of godoc
+  - f22282c7 2025-10-02T10:20:09+02:00 feat: address review comments
+  - 365cb906 2025-10-02T10:20:08+02:00 fix: totalRisk and group fields
+  - e33544ae 2025-10-02T10:20:08+02:00 fix: dataPolicy linter error
+  - 8c04b14d 2025-10-02T10:20:08+02:00 fix: integration tests
+  - c56dc76e 2025-10-02T10:20:08+02:00 fix: linter errors
+  - 079d98ee 2025-10-02T10:20:08+02:00 feat(config): add v1 version for insights config
+  - 4d9ecbb8 2025-10-02T10:20:08+02:00 feat(insights): add v1 version
+  - 75a13976 2025-09-30T15:06:28-04:00 make update
+  - 8360db8f 2025-09-30T15:06:28-04:00 add CPMS type to MachineConfiguration API
+  - 6e37ab0c 2025-09-30T15:06:28-04:00 add CPMS boot image feature gate
+  - 0729905e 2025-09-30T15:26:53+00:00 Updating ose-cluster-config-api-container image to be consistent with ART for 4.21 Reconciling with https://github.com/openshift/ocp-build-data/tree/4fbe3fab45239dc4be6f5d9d98a0bf36e0274ec9/images/ose-cluster-config-api.yml
+  - 5f658819 2025-09-26T07:41:48-04:00 Support AMD SEV-SNP on AWS
+  - cd2724a4 2025-09-19T17:49:59+01:00 Add initial AI api-review configuration
+
+- cluster-kube-apiserver-operator embedded-component 23fcbc3b52bce04badf48b3d82264ae89ac477e5 to 3e3b6f604ac3c9089f1d2ff311c586e93f08ff62
+  - d948cb5 2025-10-03T15:31:24-04:00 temporarily enable v1beta2
+  - 9893cb8 2025-09-22T16:56:42+02:00 Bump library-go to latest master
+
+- cluster-kube-scheduler-operator embedded-component 778e1e25a45e4aa9dca7b1e05f406889810bde52 to 7b1ae2372ac30529ca39f4440958882ee230dc6f
+  - b2974d5 2025-10-07T15:24:23+02:00 manifests: Enable user namespace for the operator
+  - cba5f5d 2025-09-30T20:28:47+00:00 Updating ose-cluster-kube-scheduler-operator-container image to be consistent with ART for 4.21 Reconciling with https://github.com/openshift/ocp-build-data/tree/4fbe3fab45239dc4be6f5d9d98a0bf36e0274ec9/images/ose-cluster-kube-scheduler-operator.yml
+
+- cluster-network-operator embedded-component 339bfc9eca71b483da790f5aa81c23a54a62dbf3 to 5ce4b3ccb8a882983b9599623bb5937699c07d8a
+  - bc82c7d 2025-04-29T13:32:49-04:00 Add recording rules for UDN telemetry
+
+- kubernetes embedded-component ecfa8cc3c4315d0a007fc19747e798c622a320d9 to 00e7ec7a0db0b7e03c5ed2bc5b8b776fdc34f72a
+  - 56b59cf47 2025-09-30T11:49:25+00:00 UPSTREAM: <carry>: Updating openshift-enterprise-pod-container image to be consistent with ART for 4.21 Reconciling with https://github.com/openshift/ocp-build-data/tree/4fbe3fab45239dc4be6f5d9d98a0bf36e0274ec9/images/openshift-enterprise-pod.yml
+  - 6a8be42b8 2025-09-24T16:25:08+05:30 UPSTREAM: 134199: Promote regression-issue-74839 to 1.4
+
+- kubernetes-kube-storage-version-migrator embedded-component 0f8a4eb84ace9b746cf25d51d80dacf34ca5f953 to ce5ff17e9a81ce754567e6dd5053d13409c251e9
+  - 0d823b9 2025-09-07T08:20:11+00:00 UPSTREAM: <carry>: Updating ose-kube-storage-version-migrator-container image to be consistent with ART for 4.21 Reconciling with https://github.com/openshift/ocp-build-data/tree/5c68d71385f72cd67a199bc4590068053a833c7d/images/ose-kube-storage-version-migrator.yml
+
+- machine-config-operator embedded-component 7bd71c9e5f3ea63478830a0db57190191d318da9 to c6faace50b71d89f694e9f3a8ee7a6635ac36f7c
+  - fc21115e 2025-10-06T22:30:58+05:30 OCPNODE-3747:Disable Swap mode for Kubelet and add config-dir
+  - fa72a92e 2025-10-06T14:06:36+02:00 shiftstack: Update OWNERS
+  - 5adf083b 2025-10-06T11:47:15+02:00 OCPBUGS-62510: Skip rpm-ostree local rebase if no PIS
+  - dd6b9cad 2025-10-05T10:30:02+03:00 update following requested changes
+  - 8988ae4b 2025-10-01T23:08:44-04:00 OCPBUGS-62493: Only fire OSImageURLOverridden event on render changes
+  - 7f5c2530 2025-09-30T09:33:59+03:00 format + jq instead of regex and awk parsing
+  - 70babece 2025-09-29T15:54:18+03:00 update requested changes
+  - 9457394d 2025-09-21T16:12:51+03:00 remove {{ which is causing rendering issues
+  - f284a2bb 2025-09-21T10:03:23+03:00 apply requested changes
+  - 9a33dea8 2025-09-16T14:16:49+03:00 embed fencing validator into TNF MCO
+
+- route-controller-manager embedded-component a099b46f80efe2de5a21e8869b278f3f2afc28bf to c337cf413bbbfc2154dc1d3c1bf8007ea1edfbc8
+  - effb084 2025-09-26T14:35:45+00:00 Updating ose-route-controller-manager-container image to be consistent with ART for 4.21 Reconciling with https://github.com/openshift/ocp-build-data/tree/e779ef6069ef7455537d901b18579612fec288b3/images/ose-route-controller-manager.yml
+
+- oc image-amd64 229ead6648df4cda637c46c4fe88f28079b6d4b5 to 672ff624b7d2523487d4f06565099949c625d43c
+  - 3d3b1e2c 2025-08-21T15:14:20+02:00 `adm upgrade status`: capture testcase for OCPBUGS-60768
+
+- ovn-kubernetes image-amd64 902c52a1e47c2c9447a926ad9fc277bbce728157 to 627ddba0310e1916784bdc1e00ee1e0c41e45302
+  - 3b5da01c 2025-10-07T20:43:19+01:00 [IC][EIP] OCPBUGS-42303: Fix race between SB DB and OVN-Controller
+  - d8059b70 2025-10-07T21:07:26+02:00 E2E: Wait for service until its serving and ready
+  - c133656e 2025-10-07T21:02:00+02:00 Add default network toggle test for  pod to external agnhost server and  pod to second node
+  - ef92f782 2025-10-06T17:00:48+02:00 kubevirt: test with per-pod SNATs
+  - c1b02b57 2025-10-06T17:00:48+02:00 kubevirt: test OVN DB after completion of source pod
+  - 0dc8f275 2025-10-06T17:00:48+02:00 kubevirt: fix search of colliding pods for migrated pods
+  - 7a155cc8 2025-10-06T17:00:48+02:00 kubevirt: prevent error log on IP release
+  - 4c349822 2025-10-06T17:00:48+02:00 kubevirt: fix bad release of IPs of live migratable pods
+  - 434b48f2 2025-10-06T17:00:48+02:00 kubevirt e2e: use a value for vm nodeselector
+  - a9964420 2025-10-02T14:07:41-07:00 make primary UDN node mode aware
+  - 82209bc8 2025-10-02T16:50:09+01:00 api, l2 udn, tests: add e2e tests to assert API errors are caught
+  - 47ed714f 2025-10-02T01:35:25+02:00 Fix EgressIP unit test to verify cache-based allocation stability
+  - 60404e5a 2025-09-30T18:22:11-07:00 udn host->ovn flows needs to be vlan aware
+  - 3450b352 2025-09-30T08:52:04+01:00 api, l2 udn, tests: mask the subnet of the preconfigured UDN
+  - 090d4d85 2025-09-29T15:32:09+01:00 api, udn: subnets must be masked
+  - 3b22f413 2025-09-29T09:15:14-04:00 OKEP-5552: Add support for UDN node selector
+  - 026546fc 2025-09-24T09:16:54+02:00 Add OKEP to website
+  - e384b373 2025-09-23T16:20:01+02:00 Add OKEP for ovn-kubernetes-mcp repo
+  - f98873a1 2025-09-16T07:55:38+00:00 Updating ose-ovn-kubernetes-base-container image to be consistent with ART for 4.21 Reconciling with https://github.com/openshift/ocp-build-data/tree/deae6f3ff2f49f30dd509b502837629ffd828d4e/images/ovn-kubernetes-base.yml
+  - fa282e7d 2025-09-15T15:35:58-04:00 Enhances EIP status validation
+
+- kubernetes image-amd64 ecfa8cc3c4315d0a007fc19747e798c622a320d9 to 00e7ec7a0db0b7e03c5ed2bc5b8b776fdc34f72a
+  - 56b59cf47 2025-09-30T11:49:25+00:00 UPSTREAM: <carry>: Updating openshift-enterprise-pod-container image to be consistent with ART for 4.21 Reconciling with https://github.com/openshift/ocp-build-data/tree/4fbe3fab45239dc4be6f5d9d98a0bf36e0274ec9/images/openshift-enterprise-pod.yml
+  - 6a8be42b8 2025-09-24T16:25:08+05:30 UPSTREAM: 134199: Promote regression-issue-74839 to 1.4
+
+- oc image-arm64 229ead6648df4cda637c46c4fe88f28079b6d4b5 to 672ff624b7d2523487d4f06565099949c625d43c
+  - 3d3b1e2c 2025-08-21T15:14:20+02:00 `adm upgrade status`: capture testcase for OCPBUGS-60768
+
+- ovn-kubernetes image-arm64 26631052db2a4ca5b2474e7611bcb85f9cbdf847 to 627ddba0310e1916784bdc1e00ee1e0c41e45302
+  - 3b5da01c 2025-10-07T20:43:19+01:00 [IC][EIP] OCPBUGS-42303: Fix race between SB DB and OVN-Controller
+  - d8059b70 2025-10-07T21:07:26+02:00 E2E: Wait for service until its serving and ready
+  - c133656e 2025-10-07T21:02:00+02:00 Add default network toggle test for  pod to external agnhost server and  pod to second node
+  - ef92f782 2025-10-06T17:00:48+02:00 kubevirt: test with per-pod SNATs
+  - c1b02b57 2025-10-06T17:00:48+02:00 kubevirt: test OVN DB after completion of source pod
+  - 0dc8f275 2025-10-06T17:00:48+02:00 kubevirt: fix search of colliding pods for migrated pods
+  - 7a155cc8 2025-10-06T17:00:48+02:00 kubevirt: prevent error log on IP release
+  - 4c349822 2025-10-06T17:00:48+02:00 kubevirt: fix bad release of IPs of live migratable pods
+  - 434b48f2 2025-10-06T17:00:48+02:00 kubevirt e2e: use a value for vm nodeselector
+  - a9964420 2025-10-02T14:07:41-07:00 make primary UDN node mode aware
+  - 82209bc8 2025-10-02T16:50:09+01:00 api, l2 udn, tests: add e2e tests to assert API errors are caught
+  - 47ed714f 2025-10-02T01:35:25+02:00 Fix EgressIP unit test to verify cache-based allocation stability
+  - 60404e5a 2025-09-30T18:22:11-07:00 udn host->ovn flows needs to be vlan aware
+  - 3450b352 2025-09-30T08:52:04+01:00 api, l2 udn, tests: mask the subnet of the preconfigured UDN
+  - 090d4d85 2025-09-29T15:32:09+01:00 api, udn: subnets must be masked
+  - 3b22f413 2025-09-29T09:15:14-04:00 OKEP-5552: Add support for UDN node selector
+  - 026546fc 2025-09-24T09:16:54+02:00 Add OKEP to website
+  - e384b373 2025-09-23T16:20:01+02:00 Add OKEP for ovn-kubernetes-mcp repo
+  - fa282e7d 2025-09-15T15:35:58-04:00 Enhances EIP status validation
+
