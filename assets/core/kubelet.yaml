@@ -22,6 +22,8 @@ featureGates:
 kubeAPIBurst: 100
 kubeAPIQPS: 50
 maxPods: 250
+memorySwap:
+  swapBehavior: NoSwap
 nodeStatusReportFrequency: 5m
 rotateCertificates: false # TODO
 serializeImagePulls: false

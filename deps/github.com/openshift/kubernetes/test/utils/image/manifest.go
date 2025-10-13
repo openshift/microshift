@@ -244,7 +244,7 @@ func initImageConfigs(list RegistryList) (map[ImageID]Config, map[ImageID]Config
 	configs[Pause] = Config{list.GcRegistry, "pause", "3.10"}
 	configs[Perl] = Config{list.PromoterE2eRegistry, "perl", "5.26"}
 	configs[Redis] = Config{list.PromoterE2eRegistry, "redis", "5.0.5-3"}
-	configs[RegressionIssue74839] = Config{list.PromoterE2eRegistry, "regression-issue-74839", "1.2"}
+	configs[RegressionIssue74839] = Config{list.PromoterE2eRegistry, "regression-issue-74839", "1.4"}
 	configs[ResourceConsumer] = Config{list.PromoterE2eRegistry, "resource-consumer", "1.13"}
 	configs[VolumeNFSServer] = Config{list.PromoterE2eRegistry, "volume/nfs", "1.4"}
 	configs[VolumeISCSIServer] = Config{list.PromoterE2eRegistry, "volume/iscsi", "2.6"}

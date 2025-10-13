@@ -718,7 +718,7 @@ github.com/openshift/library-go/pkg/route/validation
 github.com/openshift/library-go/pkg/security/ldaputil
 github.com/openshift/library-go/pkg/security/uid
 github.com/openshift/library-go/pkg/serviceability
-# github.com/openshift/route-controller-manager v0.0.0-20251003152740-a099b46f80ef
+# github.com/openshift/route-controller-manager v0.0.0-20251008111043-c337cf413bbb
 ## explicit; go 1.24.0
 github.com/openshift/route-controller-manager/pkg/cmd/controller
 github.com/openshift/route-controller-manager/pkg/cmd/route-controller-manager
@@ -3105,7 +3105,7 @@ sigs.k8s.io/apiserver-network-proxy/konnectivity-client/proto/client
 ## explicit; go 1.23
 sigs.k8s.io/json
 sigs.k8s.io/json/internal/golang/encoding/json
-# sigs.k8s.io/kube-storage-version-migrator v0.0.6-0.20230721195810-5c8923c5ff96 => github.com/openshift/kubernetes-kube-storage-version-migrator v0.0.3-0.20250729145742-0f8a4eb84ace
+# sigs.k8s.io/kube-storage-version-migrator v0.0.6-0.20230721195810-5c8923c5ff96 => github.com/openshift/kubernetes-kube-storage-version-migrator v0.0.3-0.20251007192956-ce5ff17e9a81
 ## explicit; go 1.24.0
 sigs.k8s.io/kube-storage-version-migrator/pkg/apis/migration/v1alpha1
 sigs.k8s.io/kube-storage-version-migrator/pkg/clients/clientset
@@ -3214,7 +3214,7 @@ sigs.k8s.io/yaml/goyaml.v3
 # github.com/onsi/ginkgo/v2 => github.com/openshift/onsi-ginkgo/v2 v2.6.1-0.20250416174521-4eb003743b54
 # k8s.io/klog/v2 => ./deps/k8s.io/klog
 # k8s.io/kubernetes => ./deps/github.com/openshift/kubernetes
-# sigs.k8s.io/kube-storage-version-migrator => github.com/openshift/kubernetes-kube-storage-version-migrator v0.0.3-0.20250729145742-0f8a4eb84ace
+# sigs.k8s.io/kube-storage-version-migrator => github.com/openshift/kubernetes-kube-storage-version-migrator v0.0.3-0.20251007192956-ce5ff17e9a81
 # k8s.io/api => ./deps/github.com/openshift/kubernetes/staging/src/k8s.io/api
 # k8s.io/apiextensions-apiserver => ./deps/github.com/openshift/kubernetes/staging/src/k8s.io/apiextensions-apiserver
 # k8s.io/apimachinery => ./deps/github.com/openshift/kubernetes/staging/src/k8s.io/apimachinery
