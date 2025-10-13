@@ -24,13 +24,13 @@ scenario_create_vms() {
 }
 
 scenario_remove_vms() {
-    does_vm_exists host1
+    check_vm_exists host1
 
     remove_vm host1
 }
 
 scenario_run_tests() {
-    does_vm_exists host1
+    check_vm_exists host1
 
     run_tests host1 \
         --variable "EXPECTED_OS_VERSION:9.6" \
