@@ -860,6 +860,17 @@ remove_vm() {
     fi
 }
 
+# Check if the VM exists
+# Returns ERROR if the VM does not exist
+check_vm_exists() {
+    local -r vmname="$1"
+    local -r full_vmname="$(full_vm_name "${vmname}")"
+    if ! sudo virsh dominfo "${full_vmname}" >/dev/null 2>&1; then
+        echo "ERROR: VM '${vmname}' does not exist"
+        exit 1
+    fi
+}
+
 # Configure the firewall in the VM based on the instructions in the documentation.
 configure_vm_firewall() {
     local -r vmname="$1"

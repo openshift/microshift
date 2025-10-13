@@ -8,11 +8,6 @@
 IMAGE_SIGSTORE_ENABLED=true
 
 scenario_create_vms() {
-    if [[ "${KONFLUX_LREL_RELEASE_IMAGE_URL}" == "" ]] ; then
-        # Empty string means there's no bootc image build yet, so the test needs to be skipped.
-        exit 0
-    fi
-
     local -r bootc_spec="$(curl -s "${KONFLUX_LREL_RELEASE_IMAGE_URL}")"
     if [ -z "${bootc_spec}" ] || [[ "${bootc_spec}" != quay.io/openshift* ]] ; then
         echo "ERROR: Failed to retrieve a bootc pull spec from '${KONFLUX_LREL_RELEASE_IMAGE_URL}'"
@@ -29,18 +24,14 @@ scenario_create_vms() {
 }
 
 scenario_remove_vms() {
-    if [[ "${CURRENT_RELEASE_REPO}" == "" ]] ; then
-        # Empty string means there's no EC build yet, so the test needs to be skipped.
-        exit 0
-    fi
+    does_vm_exists host1
+
     remove_vm host1
 }
 
 scenario_run_tests() {
-    if [[ "${CURRENT_RELEASE_REPO}" == "" ]] ; then
-        # Empty string means there's no EC build yet, so the test needs to be skipped.
-        exit 0
-    fi
+    does_vm_exists host1
+
     run_tests host1 \
         --variable "EXPECTED_OS_VERSION:9.6" \
         --variable "IMAGE_SIGSTORE_ENABLED:True" \
