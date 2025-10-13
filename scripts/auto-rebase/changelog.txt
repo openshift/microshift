@@ -1,9 +1,7 @@
-- machine-config-operator embedded-component 7f7769181710cfcd7418194a181f9c24f92b9c47 to 3e08c8dfb72e80f3817c147b4efcfdc02b6f43b7
-  - b2e3e12e 2025-10-03T13:27:50+00:00 certcontroller: update unit tests
-  - 8e35de3a 2025-10-03T13:27:50+00:00 certcontroller: resync on infra object
-  - 4d584ee5 2025-09-15T09:30:09-04:00 crc & kcc: Before deleting a degraded MC, ensure that the annotations have not been updated since the last check
+- machine-config-operator embedded-component 3e08c8dfb72e80f3817c147b4efcfdc02b6f43b7 to 673c0bd6bbedd1cffdc59547c7d42e95ad7f4dd4
+  - 1645b2fb 2025-10-07T10:25:26+02:00 OCPBUGS-62788: Skip rpm-ostree local rebase if no PIS
 
-- ovn-kubernetes image-arm64 6ff66743c4fbd0c413cf4bb9933a1eb510aa42e4 to 48ed8433a1408ca744dc81dd95d70b9fd1424d2f
+- ovn-kubernetes image-amd64 6ff66743c4fbd0c413cf4bb9933a1eb510aa42e4 to 48ed8433a1408ca744dc81dd95d70b9fd1424d2f
   - ba90f223 2025-09-29T17:47:06+02:00 Fix EgressIP controller deadlock by sorting node locks lexicographically
   - 0b161878 2025-09-23T17:41:45-04:00 [release-4.20] OCPBUGS-61239: Skip node-encap-ips annotation in DPU host mode
   - 77fe97ad 2025-09-16T12:16:32+00:00 OCPBUGS-61065: As part of DPF installation we are required to use OCP downstream image for dpu service. Dpu service uses upstream ovnkube.sh script that requires ovndb-raft-functions.sh as a dependency. This change copies it into the image as part of Dockerfile.base
@@ -21,4 +19,14 @@
   - 53c3e110 2025-09-09T16:41:27+02:00 Openflow: lookup conntrack & table=1 when breth0 is next hop (IPv6)
   - 2c3d0274 2025-09-09T16:41:27+02:00 Openflow: drop in_port from IPv6 dispatch OF rule at prio=50
   - cc65df72 2025-09-09T16:41:27+02:00 Openflow: lookup conntrack & table=1 only when breth0 is next hop
+
+- kubernetes image-arm64 9fa6215ec67894ee1303a01eaf2fe833877d6e5a to f94ad893331edbc7eaab8d919339984a497695aa
+  - cfbb77298 2025-10-08T12:58:02-07:00 UPSTREAM: <carry>: Make streaming collection encoding off by default
+  - 04467b1fb 2025-10-08T12:37:35-07:00 UPSTREAM: <carry>: Use switch test to gofuzz
+  - f9d90d78a 2025-10-08T12:36:59-07:00 UPSTREAM: 129407: Implement streaming proto encoding
+  - f9a4bd0a9 2025-10-08T12:36:27-07:00 UPSTREAM: 130511: Implement tests for encoding collections in Proto
+  - c1f8b1f08 2025-10-08T12:35:50-07:00 UPSTREAM: 129334: Streaming JSON encoder for List
+  - 805f25ca1 2025-10-08T12:34:51-07:00 UPSTREAM: 130220: Add tests for encoding collections in JSON for KEP-5116
+  - a2c40955f 2025-10-08T12:33:55-07:00 UPSTREAM: 130281: Implement chunking for gzip encoder in deferredResponseWriter
+  - e3767efba 2025-10-08T12:30:08-07:00 UPSTREAM: 130190: Add a test to validate deferredResponseWriteron multiple write calls
 
