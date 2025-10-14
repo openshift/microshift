@@ -13,7 +13,7 @@ ROOTDIR="${SCRIPTDIR}/../../.."
     --force-firewall \
     --optional-rpms \
     --pull-images \
-    --skip-optional-rpms low-latency \
+    --skip-optional-rpms low-latency,cert-manager \
     "${HOME}/.pull-secret.json"
 
 # Pull kserve and helper images for ai-model-serving, skip serving runtimes
