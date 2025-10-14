@@ -35,8 +35,6 @@
 # Git related details
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 
-# Don't build kindnet subpackage by default
-%{!?with_kindnet: %global with_kindnet 0}
 # Enable OCP telemetry by default. Disabled when microshift_variant==community
 %{!?microshift_variant: %global microshift_variant enterprise}
 
@@ -177,28 +175,6 @@ The microshift-multus-release-info package provides release information files fo
 release. These files contain the list of container image references used by
 the Multus CNI for MicroShift and can be used to embed those images into
 osbuilder blueprints or bootc containerfiles.
-
-%if %{with_kindnet}
-%package kindnet
-Summary: kindnet CNI for MicroShift
-ExclusiveArch: x86_64 aarch64
-Requires: microshift = %{version}
-
-%description kindnet
-The microshift-kindnet package provides the required manifests for the kindnet CNI and the dependent
-kube-proxy to be installed on MicroShift.
-
-%package kindnet-release-info
-Summary: Release information for kindnet CNI for MicroShift
-BuildArch: noarch
-Requires: microshift-release-info = %{version}
-
-%description kindnet-release-info
-The microshift-kindnet-release-info package provides release information files for this
-release. These files contain the list of container image references used by the kindnet CNI
-with the dependent kube-proxy for MicroShift and can be used to embed those images
-into osbuilder blueprints or bootc containerfiles.
-%endif
 
 %package low-latency
 Summary: Baseline configuration for running low latency workload on MicroShift
@@ -435,49 +411,6 @@ install -p -m755 packaging/crio.conf.d/12-microshift-multus.conf %{buildroot}%{_
 # multus-release-info
 mkdir -p -m755 %{buildroot}%{_datadir}/microshift/release
 install -p -m644 assets/components/multus/release-multus-{x86_64,aarch64}.json %{buildroot}%{_datadir}/microshift/release/
-
-%if %{with_kindnet}
-# kube-proxy
-install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/000-microshift-kube-proxy
-# Copy all the manifests except the arch specific ones
-install -p -m644 assets/optional/kube-proxy/0* %{buildroot}/%{_prefix}/lib/microshift/manifests.d/000-microshift-kube-proxy
-install -p -m644 assets/optional/kube-proxy/kustomization.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/000-microshift-kube-proxy
-
-%ifarch %{arm} aarch64
-cat assets/optional/kube-proxy/kustomization.aarch64.yaml >> %{buildroot}/%{_prefix}/lib/microshift/manifests.d/000-microshift-kube-proxy/kustomization.yaml
-%endif
-
-%ifarch x86_64
-cat assets/optional/kube-proxy/kustomization.x86_64.yaml >> %{buildroot}/%{_prefix}/lib/microshift/manifests.d/000-microshift-kube-proxy/kustomization.yaml
-%endif
-
-# kube-proxy-release-info
-mkdir -p -m755 %{buildroot}%{_datadir}/microshift/release
-install -p -m644 assets/optional/kube-proxy/release-kube-proxy-{x86_64,aarch64}.json %{buildroot}%{_datadir}/microshift/release/
-
-# kindnet
-install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/000-microshift-kindnet
-install -d -m755 %{buildroot}%{_sysconfdir}/systemd/system
-# Copy all the manifests except the arch specific ones
-install -p -m644 assets/optional/kindnet/0* %{buildroot}/%{_prefix}/lib/microshift/manifests.d/000-microshift-kindnet
-install -p -m644 assets/optional/kindnet/kustomization.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/000-microshift-kindnet
-install -p -m644 packaging/kindnet/00-disableDefaultCNI.yaml %{buildroot}%{_sysconfdir}/microshift/config.d/00-disableDefaultCNI.yaml
-install -p -m644 packaging/kindnet/microshift-kindnet.service %{buildroot}%{_sysconfdir}/systemd/system/microshift.service
-install -p -m644 packaging/crio.conf.d/13-microshift-kindnet.conf %{buildroot}%{_sysconfdir}/crio/crio.conf.d/13-microshift-kindnet.conf
-
-
-%ifarch %{arm} aarch64
-cat assets/optional/kindnet/kustomization.aarch64.yaml >> %{buildroot}/%{_prefix}/lib/microshift/manifests.d/000-microshift-kindnet/kustomization.yaml
-%endif
-
-%ifarch x86_64
-cat assets/optional/kindnet/kustomization.x86_64.yaml >> %{buildroot}/%{_prefix}/lib/microshift/manifests.d/000-microshift-kindnet/kustomization.yaml
-%endif
-
-# kindnet-release-info
-mkdir -p -m755 %{buildroot}%{_datadir}/microshift/release
-install -p -m644 assets/optional/kindnet/release-kindnet-{x86_64,aarch64}.json %{buildroot}%{_datadir}/microshift/release/
-%endif
 
 # cleanup kubelet
 install -p -m644 packaging/tuned/microshift-cleanup-kubelet.service %{buildroot}%{_unitdir}/microshift-cleanup-kubelet.service
@@ -729,21 +662,6 @@ fi
 
 %files multus-release-info
 %{_datadir}/microshift/release/release-multus-{x86_64,aarch64}.json
-
-%if %{with_kindnet}
-%files kindnet
-%dir %{_prefix}/lib/microshift/manifests.d/000-microshift-kindnet
-%dir %{_prefix}/lib/microshift/manifests.d/000-microshift-kube-proxy
-%{_prefix}/lib/microshift/manifests.d/000-microshift-kindnet/*
-%{_prefix}/lib/microshift/manifests.d/000-microshift-kube-proxy/*
-%config(noreplace) %{_sysconfdir}/microshift/config.d/00-disableDefaultCNI.yaml
-%{_sysconfdir}/systemd/system/microshift.service
-%{_sysconfdir}/crio/crio.conf.d/13-microshift-kindnet.conf
-
-%files kindnet-release-info
-%{_datadir}/microshift/release/release-kindnet-{x86_64,aarch64}.json
-%{_datadir}/microshift/release/release-kube-proxy-{x86_64,aarch64}.json
-%endif
 
 %files low-latency
 %{_prefix}/lib/tuned/microshift-baseline
