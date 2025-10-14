@@ -30,7 +30,6 @@ PATCH := $(shell echo $(SOURCE_GIT_TAG) | awk -F'[._~-]' '{print $$3}')
 
 SRC_ROOT :=$(shell pwd)
 
-WITH_FLANNEL ?= 0
 OUTPUT_DIR :=_output
 RPM_BUILD_DIR :=$(OUTPUT_DIR)/rpmbuild
 CROSS_BUILD_BINDIR :=$(OUTPUT_DIR)/bin
@@ -274,7 +273,6 @@ rpm:
 	SOURCE_GIT_TAG=${SOURCE_GIT_TAG} \
 	SOURCE_GIT_COMMIT=${SOURCE_GIT_COMMIT} \
 	SOURCE_GIT_TREE_STATE=${SOURCE_GIT_TREE_STATE} \
-	WITH_FLANNEL=${WITH_FLANNEL} \
 	./packaging/rpm/make-rpm.sh rpm local
 .PHONY: rpm
 
@@ -284,7 +282,6 @@ srpm:
 	SOURCE_GIT_TAG=${SOURCE_GIT_TAG} \
 	SOURCE_GIT_COMMIT=${SOURCE_GIT_COMMIT} \
 	SOURCE_GIT_TREE_STATE=${SOURCE_GIT_TREE_STATE} \
-	WITH_FLANNEL=${WITH_FLANNEL} \
 	./packaging/rpm/make-rpm.sh srpm local
 .PHONY: srpm
 
@@ -301,7 +298,6 @@ rpm-podman:
 		--rm -i \
 		--volume $$(pwd):/opt/microshift:z \
 		--env TARGET_ARCH=$(TARGET_ARCH) \
-		--env WITH_FLANNEL=$(WITH_FLANNEL) \
 		microshift-builder:$(RPM_BUILDER_IMAGE_TAG) \
 		bash -ilc 'cd /opt/microshift && make rpm & pid=$$! ; \
 				   trap "echo Killing make PID $${pid}; kill $${pid}" INT ; \

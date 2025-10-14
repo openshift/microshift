@@ -2,7 +2,7 @@
 set -e -o pipefail
 
 # must be passed down to this script from Makefile
-ENV_VARS="MICROSHIFT_VERSION RPM_RELEASE SOURCE_GIT_TAG SOURCE_GIT_TREE_STATE WITH_FLANNEL"
+ENV_VARS="MICROSHIFT_VERSION RPM_RELEASE SOURCE_GIT_TAG SOURCE_GIT_TREE_STATE"
 for env in ${ENV_VARS} ; do
   if [[ -z "${!env}" ]] ; then
     echo "Error: Mandatory environment variable '${env}' is missing"
@@ -68,7 +68,7 @@ EOF
   # algorithm.
   # shellcheck disable=SC2086
   # We want word splitting to happen with RPMBUILD_OPT for flags to be interpreted correctly
-  rpmbuild --quiet ${RPMBUILD_OPT} --define "_topdir ${RPMBUILD_DIR}" --define "_binary_payload w19T8.zstdio" --define "with_flannel ${WITH_FLANNEL}" "${RPMBUILD_DIR}"SPECS/microshift.spec
+  rpmbuild --quiet ${RPMBUILD_OPT} --define "_topdir ${RPMBUILD_DIR}" --define "_binary_payload w19T8.zstdio" "${RPMBUILD_DIR}"SPECS/microshift.spec
 }
 
 print_info() {
