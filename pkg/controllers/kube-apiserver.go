@@ -164,7 +164,7 @@ func (s *KubeAPIServer) configure(ctx context.Context, cfg *config.Config) error
 		}
 	}
 
-	etcdServers, err := discoverEtcdServers(ctx, s.configuration.Node.HostnameOverride, s.configuration.BootstrapKubeConfigPath())
+	etcdServers, err := discoverEtcdServers(ctx, s.configuration.BootstrapKubeConfigPath())
 	if err != nil {
 		return fmt.Errorf("failed to discover etcd servers: %w", err)
 	}
@@ -412,7 +412,7 @@ func (s *KubeAPIServer) Run(ctx context.Context, ready chan<- struct{}, stopped 
 	}
 }
 
-func discoverEtcdServers(ctx context.Context, hostname, kubeconfigPath string) ([]string, error) {
+func discoverEtcdServers(ctx context.Context, kubeconfigPath string) ([]string, error) {
 	certsDir := cryptomaterial.CertsDirectory(config.DataDir)
 	etcdPeerCertDir := cryptomaterial.EtcdPeerCertDir(certsDir)
 
@@ -441,39 +441,49 @@ func discoverEtcdServers(ctx context.Context, hostname, kubeconfigPath string) (
 	if err != nil {
 		return nil, fmt.Errorf("failed to get etcd status: %w", err)
 	}
-	if st.IsLearner {
-		//TODO if its a learner I need to take the server from the current non-learner members. Use the bootstrap for that.
-		kubeconfig, err := clientcmd.LoadFromFile(kubeconfigPath)
-		if err != nil {
-			return nil, fmt.Errorf("failed to load bootstrap kubeconfig: %w", err)
-		}
 
-		if kubeconfig == nil || kubeconfig.Clusters == nil || len(kubeconfig.Clusters) == 0 {
-			return nil, fmt.Errorf("invalid bootstrap kubeconfig: no clusters found")
-		}
+	// If I am not a learner it means I am a voting member, so connecting to my own etcd instance
+	// is fine because everything is synced.
+	if !st.IsLearner {
+		return []string{"https://localhost:2379"}, nil
+	}
 
-		var etcdHost string
-		for _, cluster := range kubeconfig.Clusters {
-			etcdHost = cluster.Server
-			break
-		}
+	// If I am a learner I need to connect to a member, retrieve the list of voting
+	// members and connect to all of them.
+	kubeconfig, err := clientcmd.LoadFromFile(kubeconfigPath)
+	if err != nil {
+		return nil, fmt.Errorf("failed to load bootstrap kubeconfig: %w", err)
+	}
 
-		if etcdHost == "" {
-			return nil, fmt.Errorf("failed to extract etcd hostname from bootstrap kubeconfig")
-		}
+	if kubeconfig == nil || kubeconfig.Clusters == nil || len(kubeconfig.Clusters) == 0 {
+		return nil, fmt.Errorf("invalid bootstrap kubeconfig: no clusters found")
+	}
 
-		etcdHost = strings.TrimPrefix(etcdHost, "https://")
-		etcdHost, _, _ = net.SplitHostPort(etcdHost)
-		etcdHost = fmt.Sprintf("https://%s", net.JoinHostPort(etcdHost, "2379"))
-		client, err = clientv3.New(clientv3.Config{
-			DialTimeout: 5 * time.Second,
-			Endpoints:   []string{etcdHost},
-			TLS:         tlsConfig,
-			Context:     ctx,
-		})
-		if err != nil {
-			return nil, fmt.Errorf("failed to create etcd client: %w", err)
-		}
+	if len(kubeconfig.Clusters) > 1 {
+		return nil, fmt.Errorf("invalid bootstrap kubeconfig: multiple clusters found")
+	}
+
+	var etcdHost string
+	for _, cluster := range kubeconfig.Clusters {
+		etcdHost = cluster.Server
+		break
+	}
+
+	if etcdHost == "" {
+		return nil, fmt.Errorf("failed to extract etcd hostname from bootstrap kubeconfig")
+	}
+
+	etcdHost = strings.TrimPrefix(etcdHost, "https://")
+	etcdHost, _, _ = net.SplitHostPort(etcdHost)
+	etcdHost = fmt.Sprintf("https://%s", net.JoinHostPort(etcdHost, "2379"))
+	client, err = clientv3.New(clientv3.Config{
+		DialTimeout: 5 * time.Second,
+		Endpoints:   []string{etcdHost},
+		TLS:         tlsConfig,
+		Context:     ctx,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to create etcd client: %w", err)
 	}
 
 	resp, err := client.MemberList(ctx)
@@ -481,21 +491,11 @@ func discoverEtcdServers(ctx context.Context, hostname, kubeconfigPath string) (
 		return nil, fmt.Errorf("failed to retrieve etcd member list: %w", err)
 	}
 
-	//TODO I already know if I am a learner, I had to do this before.
-	iAmLearner := false
 	var members []string
 	for _, member := range resp.Members {
-		if member.Name == hostname && member.IsLearner {
-			iAmLearner = true
-			continue
-		}
 		if !member.IsLearner {
 			members = append(members, member.ClientURLs...)
 		}
 	}
-	if iAmLearner {
-		return members, nil
-	}
-
-	return []string{"https://localhost:2379"}, nil
+	return members, nil
 }
