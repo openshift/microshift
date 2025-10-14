@@ -2,7 +2,7 @@
 
 # Sourced from scenario.sh and uses functions defined there.
 
-start_image=rhel96-bootc-brew
+start_image=rhel96-bootc-brew-nightly-with-optional
 
 scenario_create_vms() {
     if ! does_image_exist "${start_image}"; then
@@ -26,5 +26,7 @@ scenario_run_tests() {
         echo "Image '${start_image}' not found - skipping test"
         return 0
     fi
-    run_tests host1 suites/standard2
+    run_tests host1 \
+        --variable "EXPECTED_OS_VERSION:9.6" \
+        suites/standard1/ suites/selinux/validate-selinux-policy.robot
 }

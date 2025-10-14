@@ -113,6 +113,7 @@ def set_rpm_version_info_vars():
     global BREW_Y2_RELEASE_VERSION
     global BREW_RC_RELEASE_VERSION
     global BREW_EC_RELEASE_VERSION
+    global BREW_NIGHTLY_RELEASE_VERSION
 
     FAKE_NEXT_MINOR_VERSION = common.get_env_var('FAKE_NEXT_MINOR_VERSION')
     PREVIOUS_RELEASE_REPO = common.get_env_var('PREVIOUS_RELEASE_REPO')
@@ -124,6 +125,7 @@ def set_rpm_version_info_vars():
     BREW_Y2_RELEASE_VERSION = common.get_env_var('BREW_Y2_RELEASE_VERSION')
     BREW_RC_RELEASE_VERSION = common.get_env_var('BREW_RC_RELEASE_VERSION')
     BREW_EC_RELEASE_VERSION = common.get_env_var('BREW_EC_RELEASE_VERSION')
+    BREW_NIGHTLY_RELEASE_VERSION = common.get_env_var('BREW_NIGHTLY_RELEASE_VERSION')
 
     # The source versions are deduced from the locally built RPMs
     global SOURCE_VERSION
@@ -134,15 +136,6 @@ def set_rpm_version_info_vars():
 
     SOURCE_VERSION = common.run_command_in_shell(f"rpm -q --queryformat '%{{version}}-%{{release}}' {release_info_rpm}")
     SOURCE_VERSION_BASE = common.run_command_in_shell(f"rpm -q --queryformat '%{{version}}-%{{release}}' {release_info_rpm_base}")
-
-    # The brew versions are deduced from the locally downloaded RPMs.
-    # If RPMs are missing, the version is empty and builds are skipped.
-    global BREW_VERSION
-    try:
-        release_info_rpm_brew = find_latest_rpm(BREW_REPO)
-        BREW_VERSION = common.run_command_in_shell(f"rpm -q --queryformat '%{{version}}-%{{release}}' {release_info_rpm_brew}")
-    except Exception:
-        BREW_VERSION = ""
 
     global SSL_CLIENT_KEY_FILE
     global SSL_CLIENT_CERT_FILE
@@ -157,8 +150,7 @@ def set_rpm_version_info_vars():
     # Update selected environment variables based on the global variables.
     # These are used for templating container files and images.
     rpmver_globals_vars = [
-        'SOURCE_VERSION', 'SOURCE_VERSION_BASE', 'BREW_VERSION',
-        'SSL_CLIENT_KEY_FILE', 'SSL_CLIENT_CERT_FILE'
+        'SOURCE_VERSION', 'SOURCE_VERSION_BASE', 'SSL_CLIENT_KEY_FILE', 'SSL_CLIENT_CERT_FILE'
     ]
     for var in rpmver_globals_vars:
         value = globals().get(var)
@@ -640,6 +632,8 @@ def main():
                 extract_container_images(BREW_RC_RELEASE_VERSION, BREW_REPO, CONTAINER_LIST, args.dry_run)
             if BREW_EC_RELEASE_VERSION:
                 extract_container_images(BREW_EC_RELEASE_VERSION, BREW_REPO, CONTAINER_LIST, args.dry_run)
+            if BREW_NIGHTLY_RELEASE_VERSION:
+                extract_container_images(BREW_NIGHTLY_RELEASE_VERSION, BREW_REPO, CONTAINER_LIST, args.dry_run)
         # Sort the images list, only leaving unique entries
         common.sort_uniq_file(CONTAINER_LIST)
 
