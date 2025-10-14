@@ -15,6 +15,7 @@ import (
 	librarycrypto "github.com/openshift/library-go/pkg/crypto"
 	"github.com/openshift/microshift/pkg/components"
 	"github.com/openshift/microshift/pkg/config"
+	"github.com/openshift/microshift/pkg/util"
 	"github.com/openshift/microshift/pkg/util/cryptomaterial"
 	"github.com/openshift/microshift/pkg/version"
 	"github.com/spf13/cobra"
@@ -44,7 +45,7 @@ type AddNodeOptions struct {
 
 func NewAddNodeCommand() *cobra.Command {
 	opts := &AddNodeOptions{
-		KubeconfigPath: "/var/lib/microshift/resources/kubeadmin/bootstrap/kubeconfig",
+		KubeconfigPath: "",
 		Timeout:        joinDefaultTimeout,
 	}
 
@@ -125,7 +126,7 @@ func runAddNode(ctx context.Context, opts *AddNodeOptions) error {
 	}
 	klog.Info("Etcd certificates generated successfully")
 
-	clusterMembers, err := getClusterInfo(ctx, client)
+	clusterMembers, err := getClusterNodes(ctx, client)
 	if err != nil {
 		return fmt.Errorf("failed to get cluster information: %w", err)
 	}
@@ -152,13 +153,12 @@ func runAddNode(ctx context.Context, opts *AddNodeOptions) error {
 }
 
 func createKubernetesClient(kubeconfigPath string) (*kubernetes.Clientset, error) {
-	if _, err := os.Stat(kubeconfigPath); os.IsNotExist(err) {
-		return nil, fmt.Errorf("kubeconfig file does not exist at %s", kubeconfigPath)
-	}
-
-	_, err := clientcmd.LoadFromFile(kubeconfigPath)
+	exists, err := util.PathExists(kubeconfigPath)
 	if err != nil {
-		return nil, fmt.Errorf("invalid kubeconfig file: %w", err)
+		return nil, fmt.Errorf("failed to check if kubeconfig file exists: %w", err)
+	}
+	if !exists {
+		return nil, fmt.Errorf("kubeconfig file %s does not exist", kubeconfigPath)
 	}
 
 	restConfig, err := clientcmd.BuildConfigFromFlags("", kubeconfigPath)
@@ -374,7 +374,7 @@ func generateEtcdCertificates(cfg *config.Config) error {
 	return nil
 }
 
-func getClusterInfo(ctx context.Context, client kubernetes.Interface) ([]string, error) {
+func getClusterNodes(ctx context.Context, client kubernetes.Interface) ([]string, error) {
 	nodes, err := client.CoreV1().Nodes().List(ctx, metav1.ListOptions{})
 	if err != nil {
 		return nil, fmt.Errorf("failed to list nodes: %w", err)
@@ -382,24 +382,25 @@ func getClusterInfo(ctx context.Context, client kubernetes.Interface) ([]string,
 
 	var members []string
 	for _, node := range nodes.Items {
-		if isJoinNodeReady(&node) {
-			nodeIP := ""
-			for _, addr := range node.Status.Addresses {
-				if addr.Type == corev1.NodeInternalIP {
-					nodeIP = addr.Address
-					break
-				}
+		if !isNodeReady(&node) {
+			continue
+		}
+		nodeIP := ""
+		for _, addr := range node.Status.Addresses {
+			if addr.Type == corev1.NodeInternalIP {
+				nodeIP = addr.Address
+				break
 			}
-			if nodeIP != "" {
-				members = append(members, fmt.Sprintf("%s=https://%s:2380", node.Name, nodeIP))
-			}
+		}
+		if nodeIP != "" {
+			members = append(members, fmt.Sprintf("%s=https://%s:2380", node.Name, nodeIP))
 		}
 	}
 
 	return members, nil
 }
 
-func isJoinNodeReady(node *corev1.Node) bool {
+func isNodeReady(node *corev1.Node) bool {
 	for _, condition := range node.Status.Conditions {
 		if condition.Type == corev1.NodeReady {
 			return condition.Status == corev1.ConditionTrue
@@ -532,16 +533,11 @@ func restartMicroShift() error {
 }
 
 func isNodeAlreadyInCluster(ctx context.Context, client kubernetes.Interface, nodeName string) bool {
-	nodes, err := client.CoreV1().Nodes().List(ctx, metav1.ListOptions{})
+	_, err := client.CoreV1().Nodes().Get(ctx, nodeName, metav1.GetOptions{})
 	if err != nil {
 		return false
 	}
-	for _, node := range nodes.Items {
-		if node.Name == nodeName {
-			return true
-		}
-	}
-	return false
+	return true
 }
 
 func waitForNodeReady(ctx context.Context, client kubernetes.Interface, nodeName string) error {
@@ -564,7 +560,7 @@ func waitForNodeReady(ctx context.Context, client kubernetes.Interface, nodeName
 				continue
 			}
 
-			if isJoinNodeReady(node) {
+			if isNodeReady(node) {
 				klog.Infof("Node %s is ready!", nodeName)
 				return nil
 			}
