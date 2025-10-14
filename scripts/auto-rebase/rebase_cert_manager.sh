@@ -113,19 +113,12 @@ download_cert_manager(){
 
 }
 
-# helper to append an image mapping to kustomization.yaml, supporting digest or tag
-add_image_to_kustomize() {
-    local alias_name="$1"
+# helper to update ConfigMap with image references
+update_configmap_image() {
+    local component_name="$1"
     local full_image_ref="$2"
-    if [[ "${full_image_ref}" == *@sha256:* ]]; then
-        local image_name_no_digest="${full_image_ref%@*}"
-        local image_digest="${full_image_ref#*@}"
-        yq -i ".images += [{\"name\": \"${alias_name}\", \"newName\": \"${image_name_no_digest}\", \"digest\": \"${image_digest}\"}]" "${cert_manager_kustomization_yaml}"
-    else
-        local image_name_no_tag="${full_image_ref%:*}"
-        local image_tag="${full_image_ref##*:}"
-        yq -i ".images += [{\"name\": \"${alias_name}\", \"newName\": \"${image_name_no_tag}\", \"newTag\": \"${image_tag}\"}]" "${cert_manager_kustomization_yaml}"
-    fi
+    local configmap_file="$3"
+    yq -i ".data.\"${component_name}\" = \"${full_image_ref}\"" "${configmap_file}"
 }
 
 write_cert_manager_images_for_arch() {
@@ -133,7 +126,7 @@ write_cert_manager_images_for_arch() {
     title "Updating images for ${arch}"
     local cert_manager_release_json="${REPOROOT}/assets/optional/cert-manager/release-cert-manager-${GOARCH_TO_UNAME_MAP[${arch}]}.json"
     local cert_manager_operator_yaml="${REPOROOT}/assets/optional/cert-manager/manager/manager.yaml"
-    local cert_manager_kustomization_yaml="${REPOROOT}/assets/optional/cert-manager/manager/kustomization.yaml"
+    local cert_manager_images_yaml="${REPOROOT}/assets/optional/cert-manager/manager/images.yaml"
 
     local operatorVersion=$(yq '.properties[] | select(.type == "olm.package").value.version' "${OPERATOR_CERT_MANAGER_INDEX}")
 
@@ -146,11 +139,8 @@ write_cert_manager_images_for_arch() {
   
     yq -i -o json ".images += {\"cert-manager-operator\": \"${operatorImageFull}\"}" "${cert_manager_release_json}"
 
-    # reset and rebuild the images list in kustomization.yaml from opm output
-    yq -i 'del(.images) | .images = []' "${cert_manager_kustomization_yaml}"
-
-    # add operator image to kustomization images (named 'controller')
-    add_image_to_kustomize "controller" "${operatorImageFull}"
+    # update controller image in ConfigMap
+    update_configmap_image "controller" "${operatorImageFull}" "${cert_manager_images_yaml}"
 
     #relatedImages
     for index in $(yq '.relatedImages.[] | path | .[-1] ' "${OPERATOR_CERT_MANAGER_INDEX}"); do
@@ -158,7 +148,11 @@ write_cert_manager_images_for_arch() {
      local component=$(yq ".relatedImages.${index}.name" "${OPERATOR_CERT_MANAGER_INDEX}")
     if [[  -n "${component}" && "${OPERATOR_COMPONENTS}" == *"${component}"* ]]; then
         yq -i -o json ".images += {\"${component}\": \"${image}\"}" "${cert_manager_release_json}"
-        add_image_to_kustomize "${component}" "${image}"
+        
+        # update component image in ConfigMap
+        update_configmap_image "${component}" "${image}" "${cert_manager_images_yaml}"
+        
+        # update environment variables in manager.yaml
         sed -i "s#value:.*${component}.*#value: ${image}#g" "${cert_manager_operator_yaml}"
 
         # handle special case istiocsr v istio-csr mismatch 
