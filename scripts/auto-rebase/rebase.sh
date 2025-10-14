@@ -33,6 +33,8 @@ STAGING_DIR="$REPOROOT/_output/staging"
 PULL_SECRET_FILE="${HOME}/.pull-secret.json"
 GO_MOD_DIRS=("$REPOROOT/" "$REPOROOT/etcd")
 
+REBASE_USE_SSH="${REBASE_USE_SSH:-false}"
+
 EMBEDDED_COMPONENTS="route-controller-manager cluster-policy-controller hyperkube etcd kube-storage-version-migrator cluster-config-api"
 EMBEDDED_COMPONENT_OPERATORS="cluster-kube-apiserver-operator cluster-kube-controller-manager-operator cluster-openshift-controller-manager-operator cluster-kube-scheduler-operator machine-config-operator operator-lifecycle-manager"
 LOADED_COMPONENTS="cluster-dns-operator cluster-ingress-operator service-ca-operator cluster-network-operator cluster-csi-snapshot-controller-operator"
@@ -71,6 +73,10 @@ clone_repo() {
     if [[ -d "${repodir}" ]]
     then
         return
+    fi
+
+    if "${REBASE_USE_SSH}"; then
+        repo="git@github.com:${repo#https://github.com/}"
     fi
 
     git init "${repodir}"
@@ -490,13 +496,19 @@ handle_deps() {
             local ver
             ver=$(go mod edit -json "${REPOROOT}/_output/staging/${src}/go.mod" | jq -r --arg M "${modulepath}" '.Require[] | select(.Path == $M) | .Version')
 
-            echo "Handling '${modulepath}' dep: cloning 'https://${repo}' @ '${ver}' to ${REPOROOT}/${replace_path}"
+            repo_url="https://${repo}"
+            if "${REBASE_USE_SSH}"; then
+                # If there's ever a `deps clone` in go.mod for host other than github.com, then this will need to be updated.
+                repo_url="git@github.com:${repo#https://github.com/}"
+            fi
+
+            echo "Handling '${modulepath}' dep: cloning '${repo_url}' @ '${ver}' to ${REPOROOT}/${replace_path}"
 
             # Update version in require so it's accurate even though unused (because replaced).
             go mod edit -require "${modulepath}@${ver}"
 
             rm -fr "${REPOROOT}/${replace_path}"
-            git clone "https://${repo}" --branch "${ver}" "${REPOROOT}/${replace_path}"
+            git clone "${repo_url}" --branch "${ver}" "${REPOROOT}/${replace_path}"
             rm -fr "${REPOROOT}/${replace_path}/.git"
             find "${REPOROOT}/${replace_path}/" -name "OWNERS" -delete
         ;;
