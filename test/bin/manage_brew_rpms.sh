@@ -49,7 +49,7 @@ action_download() {
     local package
     case ${ver_type} in
         nightly)
-            package=$(brew list-builds --quiet --package=microshift --state=COMPLETE | grep "^microshift-${ver}" | grep -v "nightly" | uniq | tail -n1) || true
+            package=$(brew list-builds --quiet --package=microshift --state=COMPLETE | grep "^microshift-${ver}" | grep "nightly" | uniq | tail -n1) || true
             ;;
         zstream)
             package=$(brew list-builds --quiet --package=microshift --state=COMPLETE | grep "^microshift-${ver}" | grep -v "~" | uniq | tail -n1) || true
