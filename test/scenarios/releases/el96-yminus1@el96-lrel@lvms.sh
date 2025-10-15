@@ -15,8 +15,8 @@ scenario_create_vms() {
         return 0
     fi
     if ! does_commit_exist "${dest_image}"; then
-	echo "Image '${dest_image}' not found - skipping test"
-	return 0
+	    echo "Image '${dest_image}' not found - skipping test"
+	    return 0
     fi
 
     prepare_kickstart host1 kickstart.ks.template "${start_image}"
