@@ -9,7 +9,7 @@ Library             ../../resources/journalctl.py
 Suite Setup         Setup
 Suite Teardown      Teardown
 
-Test Tags           restart    slow
+Test Tags           restart    slow    tls-configuration
 
 
 *** Variables ***
