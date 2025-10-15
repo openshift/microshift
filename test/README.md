@@ -278,13 +278,13 @@ rhel-9.2
 #### Bootc Image Customization
 
 Bootc images are defined by templated `containerfile` definitions. 
-These files are written with [golang templating syntx](https://pkg.go.dev/text/template)
+These files are written with [golang templating syntax](https://pkg.go.dev/text/template)
 and executed during the image build process.
 
 > Refer to `./test/bin/build_bootc_images.py` for a set of known variables that
 > can be expanded.
 
-#### Creating BootC Images
+#### Creating Bootc Images
 
 See [Creating Images](#creating-images) to configure the system for building images. Creating workers is optional.
 
@@ -316,7 +316,7 @@ Build artifact types are detemined by filename extensions. By default, all files
 
 - `containerfile`: Build images only for .containerfile 
 - `container-encapsulate`: Convert an OSTree commit to an OCI image.
-- `image-bootc`: Convert a bootc image to a disk image using the RHEL 10 Bootc Image Builder Image
+- `image-bootc`: Convert a bootc image to an ISO using the  Bootc Image Builder
 
 ### Downloaded ISO Images
 
