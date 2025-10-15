@@ -1,13 +1,13 @@
 #!/bin/bash
 set -euo pipefail
 
-OC_CMD="sudo -i oc --kubeconfig /var/lib/microshift/resources/kubeadmin/kubeconfig"
-
 # Variables for node configuration
 NODE_ADDR=""
 BOOTSTRAP_KUBECONFIG=""
 
 function usage() {
+    echo "This script configures a node to run a MicroShift cluster."
+    echo "Optionally, it can also be used to configure MicroShift to join an existing cluster."
     echo "Usage: $(basename "$0") [OPTIONS]"
     echo "Options:"
     echo "  --bootstrap-kubeconfig PATH    Path to kubeconfig file for joining existing cluster (optional)"
@@ -78,7 +78,7 @@ function get_node_ip_from_config() {
     NODE_ADDR="${node_ip}"
 }
 
-function copy_kubeconfig() {
+function copy_bootstrap_kubeconfig() {
     local kubeconfig_source="/var/lib/microshift/resources/kubeadmin/${NODE_ADDR}/kubeconfig"
     local kubeconfig_dest="${HOME}/kubeconfig-bootstrap"
 
@@ -150,7 +150,7 @@ fi
 echo
 echo "Node configuration completed"
 if [ ! -n "${BOOTSTRAP_KUBECONFIG}" ]; then
-    copy_kubeconfig
+    copy_bootstrap_kubeconfig
     echo
     echo "To add other nodes to this cluster, copy the following kubeconfig file to other nodes:"
     echo "  ${HOME}/kubeconfig-bootstrap"
