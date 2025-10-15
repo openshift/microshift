@@ -1,5 +1,0 @@
-
-images:
-  - name: kindnet
-    newName: docker.io/kindest/kindnetd
-    digest: sha256:7a9c9fa59dd517cdc2c82eef1e51392524dd285e9cf7cb5a851c49f294d6cd11
