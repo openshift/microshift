@@ -670,7 +670,7 @@ data:
                 "uid": "${datasource}"
               },
               "editorMode": "code",
-              "expr": "sum(\n  sum by (_id) (cluster:capacity_cpu_cores:sum{label_beta_kubernetes_io_instance_type=\"rhde\"})\n  and on(_id)\n  (\n    max by (_id) (\n      count_over_time(microshift_version[$offline_threshold]) > 0\n    )\n    unless on (_id)\n    (\n      (\n        max by(_id) (max_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n        -\n        min by(_id) (min_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n      ) < 3600\n    )\n  )\n)",
+              "expr": "sum(\n  max by (_id) (\n    max_over_time(cluster:capacity_cpu_cores:sum{label_beta_kubernetes_io_instance_type=\"rhde\"}[$offline_threshold:5m])\n  )\n  and on(_id)\n  (\n    max by (_id) (\n      count_over_time(microshift_version[$offline_threshold]) > 0\n    )\n    unless on (_id)\n    (\n      (\n        max by(_id) (max_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n        -\n        min by(_id) (min_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n      ) < 3600\n    )\n  )\n)",
               "legendFormat": "__auto",
               "range": true,
               "refId": "A"
@@ -781,7 +781,7 @@ data:
                 "uid": "${datasource}"
               },
               "editorMode": "code",
-              "expr": "sum(\n  sum by (_id) (cluster:capacity_cpu_cores:sum{label_beta_kubernetes_io_instance_type=\"rhde\"})\n  and on(_id)\n  (\n    max by (_id) (\n      count_over_time(microshift_version[$offline_threshold]) > 0\n    )\n    unless on (_id)\n    (\n      (\n        max by(_id) (max_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n        -\n        min by(_id) (min_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n      ) < 3600\n    )\n  )\n)",
+              "expr": "sum(\n  max by (_id) (\n    max_over_time(cluster:capacity_cpu_cores:sum{label_beta_kubernetes_io_instance_type=\"rhde\"}[$offline_threshold:5m])\n  )\n  and on(_id)\n  (\n    max by (_id) (\n      count_over_time(microshift_version[$offline_threshold]) > 0\n    )\n    unless on (_id)\n    (\n      (\n        max by(_id) (max_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n        -\n        min by(_id) (min_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n      ) < 3600\n    )\n  )\n)",
               "legendFormat": "__auto",
               "range": true,
               "refId": "A"
@@ -879,7 +879,7 @@ data:
                 "uid": "${datasource}"
               },
               "editorMode": "code",
-              "expr": "sum by (label_kubernetes_io_arch) (\n  sum by (_id, label_kubernetes_io_arch) (cluster:capacity_cpu_cores:sum{label_beta_kubernetes_io_instance_type=\"rhde\"})\n  and on(_id)\n  (\n    max by (_id) (\n      count_over_time(microshift_version[$offline_threshold]) > 0\n    )\n    unless on (_id)\n    (\n      (\n        max by(_id) (max_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n        -\n        min by(_id) (min_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n      ) < 3600\n    )\n  )\n)",
+              "expr": "sum by (label_kubernetes_io_arch) (\n  max by (_id, label_kubernetes_io_arch) (\n    max_over_time(cluster:capacity_cpu_cores:sum{label_beta_kubernetes_io_instance_type=\"rhde\"}[$offline_threshold:5m])\n  )\n  and on(_id)\n  (\n    max by (_id) (\n      count_over_time(microshift_version[$offline_threshold]) > 0\n    )\n    unless on (_id)\n    (\n      (\n        max by(_id) (max_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n        -\n        min by(_id) (min_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n      ) < 3600\n    )\n  )\n)",
               "legendFormat": "__auto",
               "range": true,
               "refId": "A"
