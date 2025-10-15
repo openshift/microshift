@@ -1,19 +1,18 @@
-- machine-config-operator embedded-component 6fbc376641c5c8a6aef0b6307bc09c4fa51f4e52 to 9f4ddbde3733d8fd48e2f10259bb0e998b491113
-  - 54f014f3 2025-10-07T14:38:15+00:00 OCPBUGS-62510: Skip rpm-ostree local rebase if no PIS
+- cluster-network-operator embedded-component 222905435d8186385608b8bdb864e2a5c73406e0 to e59626d01b36b15380d528d37396e66995fa001d
+  - 303f1e7 2025-09-29T12:32:23+01:00 Add drop flows for GARPs
 
-- ovn-kubernetes image-amd64 7b3e4fbdea6c5a384a82ceb3ca56b2074afca3cc to 92bb5ee88ec3fa492d2dde06357baae9a6ccc822
-  - 5611e7be 2025-09-09T16:36:01+02:00 E2E localnet: send three pings instead of just one
-  - 63bb48fd 2025-09-09T16:36:01+02:00 E2E localnet: localnet -> host network on VLAN with external router
-  - 164d9f8f 2025-09-09T16:36:01+02:00 E2E localnet: host network -> localnet on VLAN with external router
-  - 51f5fde0 2025-09-09T16:36:01+02:00 E2E localnet: default network->localnet on VLAN with external router
-  - 2118ba6a 2025-09-09T16:36:01+02:00 E2E localnet: Fix requirement on number of schedulable nodes
-  - 35faf853 2025-09-09T16:36:01+02:00 E2E localnet: make IP request for localnet pod extensible
-  - 878d5409 2025-09-09T16:36:01+02:00 E2E localnet: specify that the localnet uses IPs from host subnet
-  - c317be25 2025-09-09T16:36:01+02:00 E2E localnet: remove references to downstream bugs and stories
-  - ca0c7135 2025-09-09T16:35:53+02:00 Configure existing multihoming CI lane as IC-enabled and shared gw
-  - d50d5040 2025-09-09T16:32:51+02:00 E2E: add test host -> localnet with IP in host subnet
-  - 1bf08b96 2025-09-09T16:32:51+02:00 E2E localnet: remove double import of ginkgo
-  - a7476f22 2025-09-09T16:32:51+02:00 Openflow: lookup conntrack & table=1 when breth0 is next hop (IPv6)
-  - 79ef2916 2025-09-09T16:32:51+02:00 Openflow: drop in_port from IPv6 dispatch OF rule at prio=50
-  - d2127e40 2025-09-09T16:32:51+02:00 Openflow: lookup conntrack & table=1 only when breth0 is next hop
+- machine-config-operator embedded-component 9f4ddbde3733d8fd48e2f10259bb0e998b491113 to 8d409e0fb33ac40d95f0d6e436edfc144e29cd82
+  - 567a191e 2025-09-30T03:30:00+00:00 Networking: reset ovn-remote config and allow ovnkube controller to set it
+
+- ovn-kubernetes image-amd64 92bb5ee88ec3fa492d2dde06357baae9a6ccc822 to 84cdb994dc894b557f800d74766da0455f87a193
+  - a4776fb3 2025-10-08T12:49:44+01:00 [IC][EIP] OCPBUGS-42303: Fix race between SB DB and OVN-Controller
+  - a7869b2c 2025-09-29T12:16:43+01:00 Node controller shutdown: do not ref gateway if not set
+  - 50a94e1e 2025-09-29T12:16:01+01:00 ovn-controller: block GARP during startup
+  - d65ec5c8 2025-09-29T12:15:22+01:00 Fix ovnkube-controller-with-node shutdown sequence
+
+- ovn-kubernetes image-arm64 92bb5ee88ec3fa492d2dde06357baae9a6ccc822 to 84cdb994dc894b557f800d74766da0455f87a193
+  - a4776fb3 2025-10-08T12:49:44+01:00 [IC][EIP] OCPBUGS-42303: Fix race between SB DB and OVN-Controller
+  - a7869b2c 2025-09-29T12:16:43+01:00 Node controller shutdown: do not ref gateway if not set
+  - 50a94e1e 2025-09-29T12:16:01+01:00 ovn-controller: block GARP during startup
+  - d65ec5c8 2025-09-29T12:15:22+01:00 Fix ovnkube-controller-with-node shutdown sequence
 
