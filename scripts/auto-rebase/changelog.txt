@@ -1,0 +1,16 @@
+- api embedded-component 1f788b8d634ddc6c958548ca36ae7b68755239b1 to fe48e8fd548bede3d7a38cc2dd1a9543b93e8a5e
+  - 956fa8a8 2025-10-13T11:51:09+02:00 NO-JIRA: add atomic list type to ServiceAccountIssuers
+  - 817e971b 2025-10-13T08:58:29+02:00 CNTRLPLANE-1576: add event-ttl configuration to kube-apiserver
+
+- cluster-kube-scheduler-operator embedded-component 7b1ae2372ac30529ca39f4440958882ee230dc6f to 6007b0f720169db57bc7bbabcdf6c7e0a532ea1d
+  - 0137fa9 2025-10-13T12:53:14+02:00 manifests: Align user namespaces for the operator
+
+- cluster-network-operator embedded-component 5ce4b3ccb8a882983b9599623bb5937699c07d8a to ee3d4cce8e1bc2b61eaa313dd7634f71b9911787
+  - 6b0e43f 2025-09-30T13:01:58+00:00 Updating cluster-network-operator-container image to be consistent with ART for 4.21 Reconciling with https://github.com/openshift/ocp-build-data/tree/4fbe3fab45239dc4be6f5d9d98a0bf36e0274ec9/images/cluster-network-operator.yml
+
+- ovn-kubernetes image-amd64 627ddba0310e1916784bdc1e00ee1e0c41e45302 to 53c8c29ad581831ace5ba3a3812f295bff080ab4
+  - 8aa4fb74 2025-08-14T20:30:53+02:00 Dockerfile: Unpin OVN and consume the latest from FDP.
+
+- ovn-kubernetes image-arm64 627ddba0310e1916784bdc1e00ee1e0c41e45302 to 53c8c29ad581831ace5ba3a3812f295bff080ab4
+  - 8aa4fb74 2025-08-14T20:30:53+02:00 Dockerfile: Unpin OVN and consume the latest from FDP.
+
