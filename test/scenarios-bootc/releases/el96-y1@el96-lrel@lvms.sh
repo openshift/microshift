@@ -49,8 +49,8 @@ scenario_run_tests() {
     local -r full_vmname="$(full_vm_name "${vmname}")"
     local -r vm_ip="$(get_vm_property "${vmname}" ip)"
     if ! wait_for_greenboot "${full_vmname}" "${vm_ip}"; then
-            record_junit "${vmname}" "pre_test_greenboot_check" "FAILED"
-            return 1
+        record_junit "${vmname}" "pre_test_greenboot_check" "FAILED"
+        return 1
     fi
     record_junit "${vmname}" "pre_test_greenboot_check" "OK"
 
