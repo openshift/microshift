@@ -11,8 +11,8 @@ dest_image="rhel-9.6-microshift-brew-optionals-4.${MINOR_VERSION}-${LATEST_RELEA
 
 scenario_create_vms() {
     if ! does_commit_exist "${start_image}"; then
-	echo "Image '${start_image}' not found - skipping test"
-	return 0
+    	echo "Image '${start_image}' not found - skipping test"
+	    return 0
     fi
     if ! does_commit_exist "${dest_image}"; then
         echo "Image '${dest_image}' not found - skipping test"
