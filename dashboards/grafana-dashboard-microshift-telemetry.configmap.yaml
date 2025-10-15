@@ -28,7 +28,7 @@ data:
       "editable": true,
       "fiscalYearStartMonth": 0,
       "graphTooltip": 0,
-      "id": 886246,
+      "id": 1056746,
       "links": [],
       "panels": [
         {
@@ -369,7 +369,7 @@ data:
                 "uid": "${datasource}"
               },
               "editorMode": "code",
-              "expr": "count(\n  (\n    sum by (_id) (cluster:capacity_cpu_cores:sum{label_beta_kubernetes_io_instance_type=\"rhde\"})\n    unless on (_id)\n    (\n      (\n        max by(_id) (max_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n        - \n        min by(_id) (min_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n      ) < 3600\n    )\n  ) <= 4\n)",
+              "expr": "count(\n  (\n    max by (_id) (max_over_time(cluster:capacity_cpu_cores:sum{label_beta_kubernetes_io_instance_type=\"rhde\"}[$offline_threshold:5m]))\n    unless on (_id)\n    (\n      (\n        max by(_id) (max_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n        - \n        min by(_id) (min_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n      ) < 3600\n    )\n  ) <= 4\n)",
               "legendFormat": "__auto",
               "range": true,
               "refId": "A"
@@ -380,7 +380,7 @@ data:
                 "uid": "${datasource}"
               },
               "editorMode": "code",
-              "expr": "count(\n  (\n    (\n      sum by (_id) (cluster:capacity_cpu_cores:sum{label_beta_kubernetes_io_instance_type=\"rhde\"})\n      and on(_id)\n  (\n    max by (_id) (\n      count_over_time(microshift_version[$offline_threshold]) > 0\n    )\n    unless on (_id)\n    (\n      (\n        max by(_id) (max_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n        -\n        min by(_id) (min_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n      ) < 3600\n    )\n  )\n    ) > 4\n    and\n    (\n      sum by (_id) (cluster:capacity_cpu_cores:sum{label_beta_kubernetes_io_instance_type=\"rhde\"})\n      and on(_id)\n  (\n    max by (_id) (\n      count_over_time(microshift_version[$offline_threshold]) > 0\n    )\n    unless on (_id)\n    (\n      (\n        max by(_id) (max_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n        -\n        min by(_id) (min_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n      ) < 3600\n    )\n  )\n    ) <= 8\n  )\n)\n",
+              "expr": "count(\n  (\n    (\n      max by (_id) (max_over_time(cluster:capacity_cpu_cores:sum{label_beta_kubernetes_io_instance_type=\"rhde\"}[$offline_threshold:5m]))\n      and on(_id)\n  (\n    max by (_id) (\n      count_over_time(microshift_version[$offline_threshold]) > 0\n    )\n    unless on (_id)\n    (\n      (\n        max by(_id) (max_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n        -\n        min by(_id) (min_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n      ) < 3600\n    )\n  )\n    ) > 4\n    and\n    (\n      max by (_id) (max_over_time(cluster:capacity_cpu_cores:sum{label_beta_kubernetes_io_instance_type=\"rhde\"}[$offline_threshold:5m]))\n      and on(_id)\n  (\n    max by (_id) (\n      count_over_time(microshift_version[$offline_threshold]) > 0\n    )\n    unless on (_id)\n    (\n      (\n        max by(_id) (max_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n        -\n        min by(_id) (min_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n      ) < 3600\n    )\n  )\n    ) <= 8\n  )\n)\n",
               "hide": false,
               "instant": false,
               "legendFormat": "__auto",
@@ -393,7 +393,7 @@ data:
                 "uid": "${datasource}"
               },
               "editorMode": "code",
-              "expr": "count(\n  (\n    (\n      sum by (_id) (cluster:capacity_cpu_cores:sum{label_beta_kubernetes_io_instance_type=\"rhde\"})\n      and on(_id)\n      (\n        max by (_id) (\n          count_over_time(microshift_version[$offline_threshold]) > 0\n        )\n        unless on (_id)\n        (\n          (\n            max by(_id) (max_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n            -\n            min by(_id) (min_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n          ) < 3600\n        )\n      )\n    ) > 8\n    and\n    (\n      sum by (_id) (cluster:capacity_cpu_cores:sum{label_beta_kubernetes_io_instance_type=\"rhde\"})\n      and on(_id)\n      (\n        max by (_id) (\n          count_over_time(microshift_version[$offline_threshold]) > 0\n        )\n        unless on (_id)\n        (\n          (\n            max by(_id) (max_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n            -\n            min by(_id) (min_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n          ) < 3600\n        )\n      )\n    ) <= 16\n  )\n)\n",
+              "expr": "count(\n  (\n    (\n      max by (_id) (max_over_time(cluster:capacity_cpu_cores:sum{label_beta_kubernetes_io_instance_type=\"rhde\"}[$offline_threshold:5m]))\n      and on(_id)\n      (\n        max by (_id) (\n          count_over_time(microshift_version[$offline_threshold]) > 0\n        )\n        unless on (_id)\n        (\n          (\n            max by(_id) (max_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n            -\n            min by(_id) (min_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n          ) < 3600\n        )\n      )\n    ) > 8\n    and\n    (\n      max by (_id) (max_over_time(cluster:capacity_cpu_cores:sum{label_beta_kubernetes_io_instance_type=\"rhde\"}[$offline_threshold:5m]))\n      and on(_id)\n      (\n        max by (_id) (\n          count_over_time(microshift_version[$offline_threshold]) > 0\n        )\n        unless on (_id)\n        (\n          (\n            max by(_id) (max_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n            -\n            min by(_id) (min_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n          ) < 3600\n        )\n      )\n    ) <= 16\n  )\n)\n",
               "hide": false,
               "instant": false,
               "legendFormat": "__auto",
@@ -406,7 +406,7 @@ data:
                 "uid": "${datasource}"
               },
               "editorMode": "code",
-              "expr": "count(\n  (\n    (\n      sum by (_id) (cluster:capacity_cpu_cores:sum{label_beta_kubernetes_io_instance_type=\"rhde\"})\n      and on(_id)\n  (\n    max by (_id) (\n      count_over_time(microshift_version[$offline_threshold]) > 0\n    )\n    and on(_id)\n    (\n      max by (_id) (\n        count_over_time(microshift_version[$offline_threshold]) > 0\n      )\n      unless on (_id)\n      (\n        (\n          max by(_id) (max_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n          -\n          min by(_id) (min_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n        ) < 3600\n      )\n    )\n  )\n    ) > 16\n  )\n)\n",
+              "expr": "count(\n  (\n    (\n      max by (_id) (max_over_time(cluster:capacity_cpu_cores:sum{label_beta_kubernetes_io_instance_type=\"rhde\"}[$offline_threshold:5m]))\n      and on(_id)\n  (\n    max by (_id) (\n      count_over_time(microshift_version[$offline_threshold]) > 0\n    )\n    and on(_id)\n    (\n      max by (_id) (\n        count_over_time(microshift_version[$offline_threshold]) > 0\n      )\n      unless on (_id)\n      (\n        (\n          max by(_id) (max_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n          -\n          min by(_id) (min_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n        ) < 3600\n      )\n    )\n  )\n    ) > 16\n  )\n)\n",
               "hide": false,
               "instant": false,
               "legendFormat": "__auto",
