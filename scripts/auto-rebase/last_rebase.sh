@@ -1,2 +1,2 @@
 #!/bin/bash -x
-./scripts/auto-rebase/rebase.sh to "registry.ci.openshift.org/ocp/release:4.20.0-0.nightly-2025-10-13-053645" "registry.ci.openshift.org/ocp-arm64/release-arm64:4.20.0-0.nightly-arm64-2025-10-13-214108"
+./scripts/auto-rebase/rebase.sh to "registry.ci.openshift.org/ocp/release:4.20.0-0.nightly-2025-10-14-022129" "registry.ci.openshift.org/ocp-arm64/release-arm64:4.20.0-0.nightly-arm64-2025-10-14-170037"
