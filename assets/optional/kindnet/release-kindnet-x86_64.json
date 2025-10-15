@@ -1,8 +1,0 @@
-{
-  "release": {
-    "base": "4.20.0-0.nightly-2025-06-02-175911"
-  },
-  "images": {
-    "kindnet": "docker.io/kindest/kindnetd@sha256:7a9c9fa59dd517cdc2c82eef1e51392524dd285e9cf7cb5a851c49f294d6cd11"
-  }
-}
