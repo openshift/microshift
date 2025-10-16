@@ -937,7 +937,7 @@ data:
                 "uid": "${datasource}"
               },
               "editorMode": "code",
-              "expr": "count by (deployment_type) (\n  (\n    count_over_time(microshift_version[$offline_threshold]) > 0\n  )\n  and on(_id)\n  (\n    max by (_id) (\n      count_over_time(microshift_version[$offline_threshold]) > 0\n    )\n    unless on (_id)\n    (\n      (\n        max by(_id) (max_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n        -\n        min by(_id) (min_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n      ) < 3600\n    )\n  )\n)\n",
+              "expr": "count by (deployment_type) (\n  (\n    count_over_time(microshift_version[$offline_threshold]) > 0\n  )\n  and on(_id)\n  (\n    max by (_id) (\n      count_over_time(microshift_version[$offline_threshold]) > 0\n    )\n    unless on (_id)\n    (\n      (\n        max by(_id) (max_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n        -\n        min by(_id) (min_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n      ) < $short_lived_threshold\n    )\n  )\n)\n",
               "legendFormat": "__auto",
               "range": true,
               "refId": "A"
@@ -1035,7 +1035,7 @@ data:
                 "uid": "${datasource}"
               },
               "editorMode": "code",
-              "expr": "count by (deployment_type) (\n  (\n    count_over_time(microshift_version[$offline_threshold]) > 0\n  )\n  and on(_id)\n  (\n    max by (_id) (\n      count_over_time(microshift_version[$offline_threshold]) > 0\n    )\n    unless on (_id)\n    (\n      (\n        max by(_id) (max_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n        -\n        min by(_id) (min_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n      ) < 3600\n    )\n  )\n)\n",
+              "expr": "count by (deployment_type) (\n  (\n    count_over_time(microshift_version[$offline_threshold]) > 0\n  )\n  and on(_id)\n  (\n    max by (_id) (\n      count_over_time(microshift_version[$offline_threshold]) > 0\n    )\n    unless on (_id)\n    (\n      (\n        max by(_id) (max_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n        -\n        min by(_id) (min_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n      ) < $short_lived_threshold\n    )\n  )\n)\n",
               "legendFormat": "__auto",
               "range": true,
               "refId": "A"
@@ -1101,7 +1101,7 @@ data:
                 "uid": "${datasource}"
               },
               "editorMode": "code",
-              "expr": "count by (deployment_type, version) (\n  (\n    count_over_time(microshift_version[$offline_threshold]) > 0\n  )\n  and on(_id)\n  (\n    max by (_id) (\n      count_over_time(microshift_version[$offline_threshold]) > 0\n    )\n    unless on (_id)\n    (\n      (\n        max by(_id) (max_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n        -\n        min by(_id) (min_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n      ) < 3600\n    )\n  )\n)\n",
+              "expr": "count by (deployment_type, version) (\n  (\n    count_over_time(microshift_version[$offline_threshold]) > 0\n  )\n  and on(_id)\n  (\n    max by (_id) (\n      count_over_time(microshift_version[$offline_threshold]) > 0\n    )\n    unless on (_id)\n    (\n      (\n        max by(_id) (max_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n        -\n        min by(_id) (min_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n      ) < $short_lived_threshold\n    )\n  )\n)\n",
               "legendFormat": "__auto",
               "range": true,
               "refId": "A"
@@ -1169,7 +1169,7 @@ data:
                 "uid": "${datasource}"
               },
               "editorMode": "code",
-              "expr": "sum by (short_version) (\n  label_replace(\n    count by (version) (\n      (\n        count_over_time(microshift_version[$offline_threshold]) > 0\n      )\n      and on(_id)\n      (\n        max by (_id) (\n          count_over_time(microshift_version[$offline_threshold]) > 0\n        )\n        unless on (_id)\n        (\n          (\n            max by(_id) (max_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n            -\n            min by(_id) (min_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n          ) < 3600\n        )\n      )\n    ),\n    \"short_version\", \"$1\", \"version\", \"(\\\\d+\\\\.\\\\d+).*\"\n  )\n)",
+              "expr": "sum by (short_version) (\n  label_replace(\n    count by (version) (\n      (\n        count_over_time(microshift_version[$offline_threshold]) > 0\n      )\n      and on(_id)\n      (\n        max by (_id) (\n          count_over_time(microshift_version[$offline_threshold]) > 0\n        )\n        unless on (_id)\n        (\n          (\n            max by(_id) (max_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n            -\n            min by(_id) (min_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n          ) < $short_lived_threshold\n        )\n      )\n    ),\n    \"short_version\", \"$1\", \"version\", \"(\\\\d+\\\\.\\\\d+).*\"\n  )\n)",
               "legendFormat": "__auto",
               "range": true,
               "refId": "A"
@@ -1267,7 +1267,7 @@ data:
                 "uid": "${datasource}"
               },
               "editorMode": "code",
-              "expr": "count by (version) (\n  (\n    count_over_time(microshift_version[$offline_threshold]) > 0\n  )\n  and on(_id)\n  (\n    max by (_id) (\n      count_over_time(microshift_version[$offline_threshold]) > 0\n    )\n    unless on (_id)\n    (\n      (\n        max by(_id) (max_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n        -\n        min by(_id) (min_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n      ) < 3600\n    )\n  )\n)\n",
+              "expr": "count by (version) (\n  (\n    count_over_time(microshift_version[$offline_threshold]) > 0\n  )\n  and on(_id)\n  (\n    max by (_id) (\n      count_over_time(microshift_version[$offline_threshold]) > 0\n    )\n    unless on (_id)\n    (\n      (\n        max by(_id) (max_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n        -\n        min by(_id) (min_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n      ) < $short_lived_threshold\n    )\n  )\n)\n",
               "legendFormat": "__auto",
               "range": true,
               "refId": "A"
