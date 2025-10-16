@@ -286,10 +286,17 @@ and executed during the image build process.
 
 #### Creating Bootc Images
 
-See [Creating Images](#creating-images) to configure the system for building images. Creating workers is optional.
+Run `./test/bin/manage_composer_config.sh create` to set up the system before building
+images.
 
 Use `./test/bin/build_bootc_images.sh` to build bootc images from all available blueprints in
 `./test/image-blueprints-bootc`.
+
+For example, to build all image from `layer1-base` blueprints, run:
+
+```shell
+./test/bin/build_bootc_images.sh -l ./test/image-blueprints-bootc/layer1-base/
+```
 
 Run `./test/bin/build_bootc_images.sh -h` to see the full list of options and their uses.
 
@@ -305,18 +312,21 @@ may use the parent images's filename in the child's `FROM` declaration.
 The build process recognizes these filename extensions:
 
 - `.containerfile`: A standard Containerfile definition. May be templated.
+The build process will generate a bootc image from this container file.
 - `.container-encapsulate`: Single-line text file specifying the name an existing rpm-ostree layer.
+The build process will generate a bootc image from the given rpm-ostree layer.
 - `.image-bootc`: Single-line text file specifying the name of a container image.
-- `.<EXT>.template`: Arbitrary text to be injected into a template. It is convention to use `<EXT>` to
-indicate the filetype of the content.
+The build process will generate an installer iso from the given container image.
+- `.<EXT>.template`: Arbitrary files processed through `gomplate` and output as `${BOOTC_IMAGE_DIR}/*.<EXT>`. Containersfiles
+reference processed `.template` files as `./*.<EXT>`.
 
 #### Creating Bootc Images of a Certain Type
 
 Build artifact types are detemined by filename extensions. By default, all files are processed. (Optional) File types can be targeted by running `./test/bin/build_bootc_images.sh {-b <TYPE>, --build-type <TYPE>}`, where `<TYPE>` is one of:
 
-- `containerfile`: Build images only for .containerfile 
-- `container-encapsulate`: Convert an OSTree commit to an OCI image.
-- `image-bootc`: Convert a bootc image to an ISO using the  Bootc Image Builder
+- `containerfile`: Only Generate bootc images for each `*.containerfile` file
+- `container-encapsulate`: Only convert OSTree commits to bootc image for each `*.container-encapsulate` file
+- `image-bootc`: Only convert bootc container images to installer ISOs using the Bootc Image Builder for each `*.image-bootc` file
 
 ### Downloaded ISO Images
 
@@ -385,11 +395,13 @@ images that use RPMs created from source (not already published releases).
 
 ##### Creating BootC Images
 
-Use `./test/bin/build_bootc_images.sh` to build all of the images for all of the
-blueprints available.
+The `./test/bin/build_bootc_images.sh` script is used to build images from blueprints under
+ `./test/image-blueprints-bootc`.
 
 Run `./test/bin/build_bootc_images.sh -h` to see all the supported modes for
 building images.
+
+For example, to build layer1-base images, run `$ ./test/bin/build_bootc_images.sh -l ./test/image-blueprints-bootc/layer1-base`.
 
 Local RPM repos are built only if they do not exist.
 
