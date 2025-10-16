@@ -272,10 +272,6 @@ data:
                 "steps": [
                   {
                     "color": "green"
-                  },
-                  {
-                    "color": "red",
-                    "value": 80
                   }
                 ]
               },
@@ -433,10 +429,6 @@ data:
                 "steps": [
                   {
                     "color": "green"
-                  },
-                  {
-                    "color": "red",
-                    "value": 80
                   }
                 ]
               },
@@ -1460,5 +1452,5 @@ data:
       "timezone": "",
       "title": "MicroShift Telemetry",
       "uid": "sK7hN2pXf",
-      "version": 1
+      "version": 2
     }
