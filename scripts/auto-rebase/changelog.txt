@@ -1,8 +1,0 @@
-- machine-config-operator embedded-component 101eac01df8263d2b8d084bce69919594037785c to f367312c9951268ea8355e5ebb854af05cb4256f
-  - 461fca8c 2025-10-06T13:39:25+00:00 Add /etc/docker/certs.d to template
-
-- coredns image-amd64 dea218b4eeeef8e4ed245389e697c307bcd06552 to fe89d27d6f2b27baf686c89c4c1c1ceb88fe3567
-  - 7ab4a63 2025-10-08T07:15:07+00:00 UPSTREAM <carry>: Modify .gitignore to not exclude vendor build folders
-  - a039bb3 2025-10-08T07:15:07+00:00 UPSTREAM: <carry>: Bump .go-version
-  - e83ee3a 2025-10-08T07:15:07+00:00 UPSTREAM: 7083: Fix unit test TestZoneExternalCNAMELookupWithProxy
-
