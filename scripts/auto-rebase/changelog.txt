@@ -1,17 +1,3 @@
-- ovn-kubernetes image-amd64 be3099d5c807ac1d643fe0a195b235414b67f39d to 03fb01368e68a94b949cf0a16f5bd5d34f853d0b
-  - 63b14002 2025-10-07T18:53:30+02:00 E2E localnet: send three pings instead of just one
-  - 469dfdf3 2025-10-07T18:53:30+02:00 E2E localnet: localnet -> host network on VLAN with external router
-  - a39ecd57 2025-10-07T18:53:30+02:00 E2E localnet: host network -> localnet on VLAN with external router
-  - 1d275c18 2025-10-07T18:53:30+02:00 E2E localnet: default network->localnet on VLAN with external router
-  - 3a16f999 2025-10-07T18:53:30+02:00 E2E localnet: Fix requirement on number of schedulable nodes
-  - ebec29d9 2025-10-07T18:53:30+02:00 E2E localnet: make IP request for localnet pod extensible
-  - bddcf1e6 2025-10-07T18:53:30+02:00 E2E localnet: specify that the localnet uses IPs from host subnet
-  - 40b80b8a 2025-10-07T18:53:30+02:00 E2E localnet: remove references to downstream bugs and stories
-  - 1c6f8872 2025-10-07T18:53:30+02:00 Configure existing multihoming CI lane as IC-enabled and shared gw
-  - f46c728a 2025-10-07T18:53:30+02:00 E2E: add test host -> localnet with IP in host subnet
-  - eba8a1f0 2025-10-07T18:53:30+02:00 E2E localnet: remove double import of ginkgo
-  - 4104975e 2025-10-07T18:53:30+02:00 Openflow: lookup conntrack & table=1 when breth0 is next hop (IPv6)
-  - ceeddb1a 2025-10-07T18:53:30+02:00 Openflow: drop in_port from IPv6 dispatch OF rule at prio=50
-  - 4e7c5fe0 2025-10-07T18:53:30+02:00 Openflow: lookup conntrack & table=1 only when breth0 is next hop
-  - 93c7afcd 2025-10-07T18:53:30+02:00 Fix EgressIP controller deadlock by sorting node locks lexicographically
+- machine-config-operator embedded-component fcf8f254943cbcba1400ba55f3978cc292b6460b to 0f7ca82c30f45e9c7d26279e920b63bbf233e130
+  - e9445424 2025-10-08T14:16:11+00:00 crc & kcc: Before deleting a degraded MC, ensure that the annotations have not been updated since the last check
 
