@@ -46,17 +46,17 @@ var (
 )
 
 type Config struct {
-	DNS       DNS           `json:"dns"`
-	Network   Network       `json:"network"`
-	Node      Node          `json:"node"`
-	ApiServer ApiServer     `json:"apiServer"`
-	Etcd      EtcdConfig    `json:"etcd"`
-	Debugging Debugging     `json:"debugging"`
-	Manifests Manifests     `json:"manifests"`
-	Ingress   IngressConfig `json:"ingress"`
-	Storage   Storage       `json:"storage"`
-	Telemetry Telemetry     `json:"telemetry"`
-
+	DNS          DNS           `json:"dns"`
+	Network      Network       `json:"network"`
+	Node         Node          `json:"node"`
+	ApiServer    ApiServer     `json:"apiServer"`
+	Etcd         EtcdConfig    `json:"etcd"`
+	Debugging    Debugging     `json:"debugging"`
+	Manifests    Manifests     `json:"manifests"`
+	Ingress      IngressConfig `json:"ingress"`
+	Storage      Storage       `json:"storage"`
+	Telemetry    Telemetry     `json:"telemetry"`
+	FeatureGates FeatureGates  `json:"featureGates"`
 	// Settings specified in this section are transferred as-is into the Kubelet config.
 	// +kubebuilder:validation:Schemaless
 	Kubelet map[string]any `json:"kubelet"`
@@ -645,6 +645,10 @@ func (c *Config) validate() error {
 
 	if err := c.GenericDevicePlugin.validate(); err != nil {
 		return fmt.Errorf("error validating Generic Device Plugin configuration: %v", err)
+	}
+
+	if err := validateFeatureGates(c); err != nil {
+		return fmt.Errorf("error validating feature gates: %v", err)
 	}
 
 	return nil
