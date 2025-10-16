@@ -272,10 +272,6 @@ data:
                 "steps": [
                   {
                     "color": "green"
-                  },
-                  {
-                    "color": "red",
-                    "value": 80
                   }
                 ]
               },
@@ -433,10 +429,6 @@ data:
                 "steps": [
                   {
                     "color": "green"
-                  },
-                  {
-                    "color": "red",
-                    "value": 80
                   }
                 ]
               },
@@ -507,7 +499,7 @@ data:
           },
           "gridPos": {
             "h": 14,
-            "w": 4,
+            "w": 7,
             "x": 17,
             "y": 7
           },
@@ -911,17 +903,17 @@ data:
             "overrides": []
           },
           "gridPos": {
-            "h": 14,
-            "w": 7,
+            "h": 7,
+            "w": 5,
             "x": 0,
             "y": 21
           },
-          "id": 37,
+          "id": 43,
           "options": {
             "legend": {
               "displayMode": "list",
               "placement": "bottom",
-              "showLegend": true
+              "showLegend": false
             },
             "pieType": "pie",
             "reduceOptions": {
@@ -945,13 +937,13 @@ data:
                 "uid": "${datasource}"
               },
               "editorMode": "code",
-              "expr": "count by (deployment_type, version) (\n  (\n    count_over_time(microshift_version[$offline_threshold]) > 0\n  )\n  and on(_id)\n  (\n    max by (_id) (\n      count_over_time(microshift_version[$offline_threshold]) > 0\n    )\n    unless on (_id)\n    (\n      (\n        max by(_id) (max_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n        -\n        min by(_id) (min_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n      ) < 3600\n    )\n  )\n)\n",
+              "expr": "count by (deployment_type) (\n  (\n    count_over_time(microshift_version[$offline_threshold]) > 0\n  )\n  and on(_id)\n  (\n    max by (_id) (\n      count_over_time(microshift_version[$offline_threshold]) > 0\n    )\n    unless on (_id)\n    (\n      (\n        max by(_id) (max_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n        -\n        min by(_id) (min_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n      ) < $short_lived_threshold\n    )\n  )\n)\n",
               "legendFormat": "__auto",
               "range": true,
               "refId": "A"
             }
           ],
-          "title": "Clusters by version and type",
+          "title": "Clusters by deployment type",
           "type": "piechart"
         },
         {
@@ -1016,8 +1008,8 @@ data:
           },
           "gridPos": {
             "h": 7,
-            "w": 14,
-            "x": 7,
+            "w": 12,
+            "x": 5,
             "y": 21
           },
           "id": 39,
@@ -1043,7 +1035,7 @@ data:
                 "uid": "${datasource}"
               },
               "editorMode": "code",
-              "expr": "count by (deployment_type) (\n  (\n    count_over_time(microshift_version[$offline_threshold]) > 0\n  )\n  and on(_id)\n  (\n    max by (_id) (\n      count_over_time(microshift_version[$offline_threshold]) > 0\n    )\n    unless on (_id)\n    (\n      (\n        max by(_id) (max_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n        -\n        min by(_id) (min_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n      ) < 3600\n    )\n  )\n)\n",
+              "expr": "count by (deployment_type) (\n  (\n    count_over_time(microshift_version[$offline_threshold]) > 0\n  )\n  and on(_id)\n  (\n    max by (_id) (\n      count_over_time(microshift_version[$offline_threshold]) > 0\n    )\n    unless on (_id)\n    (\n      (\n        max by(_id) (max_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n        -\n        min by(_id) (min_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n      ) < $short_lived_threshold\n    )\n  )\n)\n",
               "legendFormat": "__auto",
               "range": true,
               "refId": "A"
@@ -1051,6 +1043,140 @@ data:
           ],
           "title": "Cluster deployment types",
           "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                }
+              },
+              "mappings": [],
+              "unit": "short"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 14,
+            "w": 7,
+            "x": 17,
+            "y": 21
+          },
+          "id": 37,
+          "options": {
+            "legend": {
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": false
+            },
+            "pieType": "pie",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "tooltip": {
+              "hideZeros": false,
+              "mode": "multi",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "11.6.3",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "editorMode": "code",
+              "expr": "count by (deployment_type, version) (\n  (\n    count_over_time(microshift_version[$offline_threshold]) > 0\n  )\n  and on(_id)\n  (\n    max by (_id) (\n      count_over_time(microshift_version[$offline_threshold]) > 0\n    )\n    unless on (_id)\n    (\n      (\n        max by(_id) (max_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n        -\n        min by(_id) (min_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n      ) < $short_lived_threshold\n    )\n  )\n)\n",
+              "legendFormat": "__auto",
+              "range": true,
+              "refId": "A"
+            }
+          ],
+          "title": "Clusters by version and type",
+          "type": "piechart"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                }
+              },
+              "mappings": [],
+              "unit": "short"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 7,
+            "w": 5,
+            "x": 0,
+            "y": 28
+          },
+          "id": 44,
+          "options": {
+            "displayLabels": [],
+            "legend": {
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": false,
+              "values": []
+            },
+            "pieType": "pie",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "tooltip": {
+              "hideZeros": false,
+              "mode": "multi",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "11.6.3",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "editorMode": "code",
+              "expr": "sum by (short_version) (\n  label_replace(\n    count by (version) (\n      (\n        count_over_time(microshift_version[$offline_threshold]) > 0\n      )\n      and on(_id)\n      (\n        max by (_id) (\n          count_over_time(microshift_version[$offline_threshold]) > 0\n        )\n        unless on (_id)\n        (\n          (\n            max by(_id) (max_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n            -\n            min by(_id) (min_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n          ) < $short_lived_threshold\n        )\n      )\n    ),\n    \"short_version\", \"$1\", \"version\", \"(\\\\d+\\\\.\\\\d+).*\"\n  )\n)",
+              "legendFormat": "__auto",
+              "range": true,
+              "refId": "A"
+            }
+          ],
+          "title": "Clusters by version",
+          "type": "piechart"
         },
         {
           "datasource": {
@@ -1114,8 +1240,8 @@ data:
           },
           "gridPos": {
             "h": 7,
-            "w": 14,
-            "x": 7,
+            "w": 12,
+            "x": 5,
             "y": 28
           },
           "id": 40,
@@ -1141,7 +1267,7 @@ data:
                 "uid": "${datasource}"
               },
               "editorMode": "code",
-              "expr": "count by (version) (\n  (\n    count_over_time(microshift_version[$offline_threshold]) > 0\n  )\n  and on(_id)\n  (\n    max by (_id) (\n      count_over_time(microshift_version[$offline_threshold]) > 0\n    )\n    unless on (_id)\n    (\n      (\n        max by(_id) (max_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n        -\n        min by(_id) (min_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n      ) < 3600\n    )\n  )\n)\n",
+              "expr": "count by (version) (\n  (\n    count_over_time(microshift_version[$offline_threshold]) > 0\n  )\n  and on(_id)\n  (\n    max by (_id) (\n      count_over_time(microshift_version[$offline_threshold]) > 0\n    )\n    unless on (_id)\n    (\n      (\n        max by(_id) (max_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n        -\n        min by(_id) (min_over_time(timestamp(microshift_version)[$offline_threshold:5m]))\n      ) < $short_lived_threshold\n    )\n  )\n)\n",
               "legendFormat": "__auto",
               "range": true,
               "refId": "A"
@@ -1460,5 +1586,5 @@ data:
       "timezone": "",
       "title": "MicroShift Telemetry",
       "uid": "sK7hN2pXf",
-      "version": 1
+      "version": 2
     }
