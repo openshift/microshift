@@ -187,13 +187,14 @@ def publish_release(new_release, preamble, take_action):
 
 
 def github_release_create(tag, notes):
+    prerelease = 'rc' in tag or 'ec' in tag
     results = github_api(
         f'/repos/{GITHUB_ORG}/{GITHUB_REPO}/releases',
         tag_name=tag,
         name=tag,
         body=notes,
         draft=False,
-        prerelease=True,
+        prerelease=prerelease,
     )
     logging.info(f'Created new release {tag}:{ {"url":results["html_url"], "body": results["body"]} }')
 
