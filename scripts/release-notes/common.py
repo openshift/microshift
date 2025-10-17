@@ -84,7 +84,7 @@ def run_process(cmd: list[str], env={}):
 def tag_exists(release_name):
     "Checks if a given tag exists in the local repository."
     try:
-        run_process(["git", "show", release_name])
+        run_process(["git", "show", "--quiet", release_name])
         return True
     except subprocess.CalledProcessError:
         return False
