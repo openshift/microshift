@@ -1094,10 +1094,13 @@ run_gingko_tests() {
     pushd . &>/dev/null
 
     # Check/install oc
-    "${ROOTDIR}/scripts/fetch_tools.sh" "oc" || {
-        record_junit "${vmname}" "oc_installed" "FAILED"
-        exit 1
-    }
+    if ! command -v oc &> /dev/null ; then
+        "${ROOTDIR}/scripts/fetch_tools.sh" "oc" || {
+            record_junit "${vmname}" "oc_installed" "FAILED"
+            exit 1
+        }
+    fi
+    record_junit "${vmname}" "oc_installed" "OK"
 
     # Check/get openshift-tests-binary
     if ! "${ROOTDIR}/scripts/fetch_tools.sh" "ginkgo"; then
