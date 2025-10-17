@@ -12,7 +12,7 @@ DEST_DIR="${DEST_DIR:-${DEFAULT_DEST_DIR}}"
 
 if [ ! -d "${DEST_DIR}" ]; then
     echo "Setting up virtualenv in ${DEST_DIR}"
-    python3 -m venv "${DEST_DIR}"
+    python3 -m venv --system-site-packages "${DEST_DIR}"
     "${DEST_DIR}/bin/python3" -m pip install --upgrade pip
     "${DEST_DIR}/bin/python3" -m pip install -r "${SCRIPT_DIR}/requirements.txt"
 fi
