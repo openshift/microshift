@@ -103,8 +103,8 @@ function run_healthcheck() {
     fi
 
     greenboot_status=$(systemctl show -p Result --value greenboot-healthcheck)
-    if [ "$greenboot_status" != "success" ]; then
-        echo "Error: greenboot-healthcheck did not complete successfully (Result: $greenboot_status)"
+    if [ "${greenboot_status}" != "success" ]; then
+        echo "Error: greenboot-healthcheck did not complete successfully (Result: ${greenboot_status})"
         exit 1
     fi
 }
@@ -149,7 +149,7 @@ else
 fi
 echo
 echo "Node configuration completed"
-if [ ! -n "${BOOTSTRAP_KUBECONFIG}" ]; then
+if [ -z "${BOOTSTRAP_KUBECONFIG}" ]; then
     copy_bootstrap_kubeconfig
     echo
     echo "To add other nodes to this cluster, copy the following kubeconfig file to other nodes:"
