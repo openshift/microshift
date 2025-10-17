@@ -18,4 +18,9 @@ if [ ! -d "${DEST_DIR}" ]; then
 fi
 source "${DEST_DIR}/bin/activate"
 
-python3 "${SCRIPT_DIR}/gen_ec_release_notes.py" "$@"
+if [ "$#" -ne 0 ] && [ "$1" == "--rhocp" ]; then
+    shift
+    python3 "${SCRIPT_DIR}/gen_release_notes.py" "$@"
+else
+    python3 "${SCRIPT_DIR}/gen_ec_release_notes.py" "$@"
+fi
