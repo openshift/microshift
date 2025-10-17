@@ -169,21 +169,58 @@ func stopMicroshiftEtcdScopeIfExists() error {
 }
 
 func checkIfEtcdIsReady(ctx context.Context) error {
-	client, err := getEtcdClient(ctx)
-	if err != nil {
-		return fmt.Errorf("failed to obtain etcd client: %v", err)
-	}
-	defer func() { _ = client.Close() }()
+	var client *clientv3.Client
+	defer func() {
+		if client != nil {
+			_ = client.Close()
+		}
+	}()
 
-	for i := 0; i < HealthCheckRetries; i++ {
-		time.Sleep(HealthCheckWait)
+	for attempt := 0; attempt < HealthCheckRetries; attempt++ {
+		if client == nil {
+			var err error
+			client, err = getEtcdClient(ctx)
+			if err != nil {
+				klog.Infof("failed to obtain etcd client: %v", err)
+				if attempt < HealthCheckRetries-1 {
+					time.Sleep(HealthCheckWait)
+					continue
+				}
+				return fmt.Errorf("failed to obtain etcd client after %d attempts: %v", HealthCheckRetries, err)
+			}
+		}
+
+		s, err := client.Status(ctx, "localhost:2379")
+		if err != nil {
+			_ = client.Close()
+			client = nil
+			klog.Infof("failed to get etcd status: %v", err)
+			if attempt < HealthCheckRetries-1 {
+				time.Sleep(HealthCheckWait)
+				continue
+			}
+			return fmt.Errorf("failed to get etcd status after %d attempts: %v", HealthCheckRetries, err)
+		}
+
+		// If my own instance is a learner I dont need to check readiness because apiserver is going
+		// to connect to other voting members in the cluster.
+		if s.IsLearner {
+			return nil
+		}
+
 		if _, err = client.Get(ctx, "health"); err == nil {
 			return nil
 		} else {
+			_ = client.Close()
+			client = nil
 			klog.Infof("etcd not ready yet: %v", err)
 			if err == context.Canceled {
 				return err
 			}
+		}
+
+		if attempt < HealthCheckRetries-1 {
+			time.Sleep(HealthCheckWait)
 		}
 	}
 	return fmt.Errorf("etcd still not healthy after checking %d times", HealthCheckRetries)

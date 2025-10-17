@@ -28,6 +28,8 @@ import (
 	"strings"
 	"time"
 
+	"go.etcd.io/etcd/client/pkg/v3/transport"
+	clientv3 "go.etcd.io/etcd/client/v3"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/serializer"
@@ -75,7 +77,7 @@ func init() {
 type KubeAPIServer struct {
 	kasConfigBytes []byte
 	verbosity      int
-	configureErr   error // todo: report configuration errors immediately
+	configuration  *config.Config
 
 	masterURL        string
 	servingCAPath    string
@@ -83,9 +85,8 @@ type KubeAPIServer struct {
 }
 
 func NewKubeAPIServer(cfg *config.Config) *KubeAPIServer {
-	s := &KubeAPIServer{}
-	if err := s.configure(cfg); err != nil {
-		s.configureErr = err
+	s := &KubeAPIServer{
+		configuration: cfg,
 	}
 	return s
 }
@@ -93,7 +94,7 @@ func NewKubeAPIServer(cfg *config.Config) *KubeAPIServer {
 func (s *KubeAPIServer) Name() string           { return "kube-apiserver" }
 func (s *KubeAPIServer) Dependencies() []string { return []string{"etcd", "network-configuration"} }
 
-func (s *KubeAPIServer) configure(cfg *config.Config) error {
+func (s *KubeAPIServer) configure(ctx context.Context, cfg *config.Config) error {
 	s.verbosity = cfg.GetVerbosity()
 
 	certsDir := cryptomaterial.CertsDirectory(config.DataDir)
@@ -163,20 +164,23 @@ func (s *KubeAPIServer) configure(cfg *config.Config) error {
 		}
 	}
 
+	etcdServers, err := discoverEtcdServers(ctx, s.configuration.BootstrapKubeConfigPath())
+	if err != nil {
+		return fmt.Errorf("failed to discover etcd servers: %w", err)
+	}
+
 	overrides := &kubecontrolplanev1.KubeAPIServerConfig{
 		APIServerArguments: map[string]kubecontrolplanev1.Arguments{
-			"advertise-address":   {s.advertiseAddress},
-			"audit-policy-file":   {filepath.Join(config.DataDir, "/resources/kube-apiserver-audit-policies/default.yaml")},
-			"audit-log-maxage":    {strconv.Itoa(cfg.ApiServer.AuditLog.MaxFileAge)},
-			"audit-log-maxbackup": {strconv.Itoa(cfg.ApiServer.AuditLog.MaxFiles)},
-			"audit-log-maxsize":   {strconv.Itoa(cfg.ApiServer.AuditLog.MaxFileSize)},
-			"client-ca-file":      {clientCABundlePath},
-			"etcd-cafile":         {cryptomaterial.CACertPath(cryptomaterial.EtcdSignerDir(certsDir))},
-			"etcd-certfile":       {cryptomaterial.ClientCertPath(etcdClientCertDir)},
-			"etcd-keyfile":        {cryptomaterial.ClientKeyPath(etcdClientCertDir)},
-			"etcd-servers": {
-				"https://localhost:2379",
-			},
+			"advertise-address":             {s.advertiseAddress},
+			"audit-policy-file":             {filepath.Join(config.DataDir, "/resources/kube-apiserver-audit-policies/default.yaml")},
+			"audit-log-maxage":              {strconv.Itoa(cfg.ApiServer.AuditLog.MaxFileAge)},
+			"audit-log-maxbackup":           {strconv.Itoa(cfg.ApiServer.AuditLog.MaxFiles)},
+			"audit-log-maxsize":             {strconv.Itoa(cfg.ApiServer.AuditLog.MaxFileSize)},
+			"client-ca-file":                {clientCABundlePath},
+			"etcd-cafile":                   {cryptomaterial.CACertPath(cryptomaterial.EtcdSignerDir(certsDir))},
+			"etcd-certfile":                 {cryptomaterial.ClientCertPath(etcdClientCertDir)},
+			"etcd-keyfile":                  {cryptomaterial.ClientKeyPath(etcdClientCertDir)},
+			"etcd-servers":                  etcdServers,
 			"kubelet-certificate-authority": {cryptomaterial.CABundlePath(kubeCSRSignerDir)},
 			"kubelet-client-certificate":    {cryptomaterial.ClientCertPath(kubeletClientDir)},
 			"kubelet-client-key":            {cryptomaterial.ClientKeyPath(kubeletClientDir)},
@@ -309,8 +313,8 @@ func (s *KubeAPIServer) configureAuditPolicy(cfg *config.Config) error {
 }
 
 func (s *KubeAPIServer) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
-	if s.configureErr != nil {
-		return fmt.Errorf("configuration failed: %w", s.configureErr)
+	if err := s.configure(ctx, s.configuration); err != nil {
+		return fmt.Errorf("configuration failed: %w", err)
 	}
 
 	defer close(stopped)
@@ -406,4 +410,92 @@ func (s *KubeAPIServer) Run(ctx context.Context, ready chan<- struct{}, stopped 
 	case perr := <-panicChannel:
 		panic(perr)
 	}
+}
+
+func discoverEtcdServers(ctx context.Context, kubeconfigPath string) ([]string, error) {
+	certsDir := cryptomaterial.CertsDirectory(config.DataDir)
+	etcdPeerCertDir := cryptomaterial.EtcdPeerCertDir(certsDir)
+
+	tlsInfo := transport.TLSInfo{
+		CertFile:      cryptomaterial.PeerCertPath(etcdPeerCertDir),
+		KeyFile:       cryptomaterial.PeerKeyPath(etcdPeerCertDir),
+		TrustedCAFile: cryptomaterial.CACertPath(cryptomaterial.EtcdSignerDir(certsDir)),
+	}
+	tlsConfig, err := tlsInfo.ClientConfig()
+	if err != nil {
+		return nil, fmt.Errorf("failed to create etcd client TLS config: %v", err)
+	}
+
+	client, err := clientv3.New(clientv3.Config{
+		DialTimeout: 5 * time.Second,
+		Endpoints:   []string{"https://localhost:2379"},
+		TLS:         tlsConfig,
+		Context:     ctx,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to create etcd client: %w", err)
+	}
+	defer func() { _ = client.Close() }()
+
+	st, err := client.Status(ctx, "localhost:2379")
+	if err != nil {
+		return nil, fmt.Errorf("failed to get etcd status: %w", err)
+	}
+
+	// If I am not a learner it means I am a voting member, so connecting to my own etcd instance
+	// is fine because everything is synced.
+	if !st.IsLearner {
+		return []string{"https://localhost:2379"}, nil
+	}
+
+	// If I am a learner I need to connect to a member, retrieve the list of voting
+	// members and connect to all of them.
+	kubeconfig, err := clientcmd.LoadFromFile(kubeconfigPath)
+	if err != nil {
+		return nil, fmt.Errorf("failed to load bootstrap kubeconfig: %w", err)
+	}
+
+	if kubeconfig == nil || kubeconfig.Clusters == nil || len(kubeconfig.Clusters) == 0 {
+		return nil, fmt.Errorf("invalid bootstrap kubeconfig: no clusters found")
+	}
+
+	if len(kubeconfig.Clusters) > 1 {
+		return nil, fmt.Errorf("invalid bootstrap kubeconfig: multiple clusters found")
+	}
+
+	var etcdHost string
+	for _, cluster := range kubeconfig.Clusters {
+		etcdHost = cluster.Server
+		break
+	}
+
+	if etcdHost == "" {
+		return nil, fmt.Errorf("failed to extract etcd hostname from bootstrap kubeconfig")
+	}
+
+	etcdHost = strings.TrimPrefix(etcdHost, "https://")
+	etcdHost, _, _ = net.SplitHostPort(etcdHost)
+	etcdHost = fmt.Sprintf("https://%s", net.JoinHostPort(etcdHost, "2379"))
+	client, err = clientv3.New(clientv3.Config{
+		DialTimeout: 5 * time.Second,
+		Endpoints:   []string{etcdHost},
+		TLS:         tlsConfig,
+		Context:     ctx,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to create etcd client: %w", err)
+	}
+
+	resp, err := client.MemberList(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("failed to retrieve etcd member list: %w", err)
+	}
+
+	var members []string
+	for _, member := range resp.Members {
+		if !member.IsLearner {
+			members = append(members, member.ClientURLs...)
+		}
+	}
+	return members, nil
 }

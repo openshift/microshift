@@ -105,6 +105,10 @@ func configure(ctx context.Context, cfg *config.Config) (args []string, applyFn 
 		},
 	}
 
+	if cfg.MultiNode.Enabled {
+		overrides.ExtendedArguments["leader-elect"] = []string{"true"}
+	}
+
 	args, err = mergeAndConvertToArgs(overrides)
 	applyFn = func() error {
 		return assets.ApplyNamespaces(ctx, []string{
