@@ -1,0 +1,35 @@
+- api embedded-component 1f788b8d634ddc6c958548ca36ae7b68755239b1 to fe48e8fd548bede3d7a38cc2dd1a9543b93e8a5e
+  - 956fa8a8 2025-10-13T11:51:09+02:00 NO-JIRA: add atomic list type to ServiceAccountIssuers
+  - 817e971b 2025-10-13T08:58:29+02:00 CNTRLPLANE-1576: add event-ttl configuration to kube-apiserver
+
+- cluster-kube-controller-manager-operator embedded-component 0003cd9850370d9c12f5437aaa168dcad773207b to 52b7857076db0b649f8bede0018691466a19cbe6
+  - d56a3e4 2025-10-13T13:34:34+02:00 Enable user namespaces for the operator
+  - a8fd579 2025-08-29T13:16:07-04:00 Add priority field to prevent early shutdown
+
+- cluster-kube-scheduler-operator embedded-component 7b1ae2372ac30529ca39f4440958882ee230dc6f to 75b90c6295999ac9e707532a0d77bbf257c77561
+  - fe7d9e8 2025-10-14T10:50:16-04:00 Update ks_pod_scenario_3.yaml
+  - de62c2d 2025-10-14T10:50:04-04:00 Update ks_pod_scenario_2.yaml
+  - 9209bc1 2025-10-14T10:49:53-04:00 Update ks_pod_scenario_1.yaml
+  - 0137fa9 2025-10-13T12:53:14+02:00 manifests: Align user namespaces for the operator
+  - 48e3986 2025-08-29T13:16:11-04:00 Add priority field to prevent early shutdown
+
+- cluster-network-operator embedded-component 5ce4b3ccb8a882983b9599623bb5937699c07d8a to 37d65252fe3e76946573da6ab6ddc7502e1c76fc
+  - 6b0e43f 2025-09-30T13:01:58+00:00 Updating cluster-network-operator-container image to be consistent with ART for 4.21 Reconciling with https://github.com/openshift/ocp-build-data/tree/4fbe3fab45239dc4be6f5d9d98a0bf36e0274ec9/images/cluster-network-operator.yml
+  - 53dbf9b 2025-09-23T10:25:45+02:00 Skip _stackmanager execution for libreswan 5.3+
+
+- ovn-kubernetes image-amd64 627ddba0310e1916784bdc1e00ee1e0c41e45302 to 53c8c29ad581831ace5ba3a3812f295bff080ab4
+  - 8aa4fb74 2025-08-14T20:30:53+02:00 Dockerfile: Unpin OVN and consume the latest from FDP.
+
+- ovn-kubernetes image-arm64 627ddba0310e1916784bdc1e00ee1e0c41e45302 to a7a531f167aa3e8ef14b7c258debf0c709ddcd09
+  - 845ec2d1 2025-09-30T23:21:58+00:00 Updating ose-ovn-kubernetes-container image to be consistent with ART for 4.21 Reconciling with https://github.com/openshift/ocp-build-data/tree/4fbe3fab45239dc4be6f5d9d98a0bf36e0274ec9/images/ose-ovn-kubernetes.yml
+  - 8aa4fb74 2025-08-14T20:30:53+02:00 Dockerfile: Unpin OVN and consume the latest from FDP.
+
+- service-ca-operator image-arm64 a40d9a8ec60e0c6c1578300c372b6104130f2ecc to e5d65c6f6b1446b77e0e915d64825d97be9c06de
+  - 46bab7e 2025-10-15T03:03:14+08:00 Fix gofmt formatting after CA rotation logic fix
+  - 5edc600 2025-10-15T02:45:32+08:00 Fix CA rotation polling logic
+  - 5031339 2025-10-14T21:23:53+08:00 Fix gofmt formatting in e2e_test.go
+  - 911d3da 2025-10-14T19:08:52+08:00 Fix connection test in checkClientPodRcvdUpdatedServerCert
+  - c9f6900 2025-10-14T17:14:30+08:00 Merge fixes from commit 41d9ed12
+  - 667d9c7 2025-10-14T16:32:54+08:00 Fix e2e test failures due to SCC UID range validation
+  - 6e9d853 2025-09-29T22:19:56+00:00 Updating ose-service-ca-operator-container image to be consistent with ART for 4.21 Reconciling with https://github.com/openshift/ocp-build-data/tree/4fbe3fab45239dc4be6f5d9d98a0bf36e0274ec9/images/ose-service-ca-operator.yml
+
