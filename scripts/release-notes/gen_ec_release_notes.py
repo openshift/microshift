@@ -97,20 +97,7 @@ def main():
     """
     common.load_github_token()
 
-    # The script runs as
-    # .../microshift/scripts/release-notes/gen_ec_release_notes.py
-    # and we want the path to
-    # .../microshift
-    root_dir = pathlib.Path(__file__).parent.parent.parent
-    version_makefile = root_dir / 'Makefile.version.aarch64.var'
-    # Makefile contains something like
-    #   OCP_VERSION := 4.16.0-0.nightly-arm64-2024-03-13-041907
-    # and we want this ^^^^
-    #
-    # We get it as ['4', '16'] to make the next part of the process of
-    # building the list of versions to scan easier.
-    _full_version = version_makefile.read_text('utf8').split('=')[-1].strip()
-    major, minor = _full_version.split('.')[:2]
+    major, minor = common.get_version_from_makefile()
 
     # We build a default list of versions to scan using the current
     # version and the previous version. This assumes the script is run
