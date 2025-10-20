@@ -23,7 +23,6 @@ import (
 )
 
 func TestShortenFileName(t *testing.T) {
-	const hashLength = 10
 	tests := []struct {
 		name     string
 		filename string
