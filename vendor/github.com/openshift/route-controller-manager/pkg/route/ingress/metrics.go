@@ -3,25 +3,20 @@ package ingress
 import (
 	"github.com/blang/semver/v4"
 	"github.com/prometheus/client_golang/prometheus"
-
 	"k8s.io/apimachinery/pkg/labels"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
-)
 
-const (
-	routeController               = "openshift_ingress_to_route_controller"
-	metricRouteWithUnmanagedOwner = routeController + "_route_with_unmanaged_owner"
-	metricIngressWithoutClassName = routeController + "_ingress_without_class_name"
+	"github.com/openshift/route-controller-manager/pkg/routecontroller"
 )
 
 var (
 	unmanagedRoutes = prometheus.NewGaugeVec(prometheus.GaugeOpts{
-		Name: metricRouteWithUnmanagedOwner,
+		Name: routecontroller.MetricRouteWithUnmanagedOwner,
 		Help: "Report the number of routes owned by unmanaged ingresses.",
 	}, []string{"name", "namespace", "host"})
 
 	ingressesWithoutClassName = prometheus.NewGaugeVec(prometheus.GaugeOpts{
-		Name: metricIngressWithoutClassName,
+		Name: routecontroller.MetricIngressWithoutClassName,
 		Help: "Report the number of ingresses that do not specify ingressClassName.",
 	}, []string{"name", "namespace"})
 )
@@ -47,7 +42,7 @@ func (c *Controller) ClearState() {
 
 // FQName returns the fully-qualified metric name of the collector.
 func (c *Controller) FQName() string {
-	return routeController
+	return routecontroller.MetricRouteController
 }
 
 func (c *Controller) Describe(ch chan<- *prometheus.Desc) {

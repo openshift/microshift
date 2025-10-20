@@ -1,57 +1,35 @@
-- api embedded-component 1517fca97fe327e076bcff90accb86d1f4e804ed to bfcb56b390563c584d132ee0728f6ffc660e8e15
-  - cb33f9f6 2025-09-24T08:40:26+05:30 Remove NodeSwap Flag from OpenShift API
-  - b5a5dbee 2025-09-23T09:06:51+05:30 Disable Swap mode
-  - bee65eb7 2025-09-11T07:41:45-04:00 promote BYO OIDC features
-  - 314f4178 2025-08-25T18:00:51+01:00 OCPBUGS-55673: Remove IngressControllerLBSubnetsAWS featuregate
+- api embedded-component 1f788b8d634ddc6c958548ca36ae7b68755239b1 to fe48e8fd548bede3d7a38cc2dd1a9543b93e8a5e
+  - 956fa8a8 2025-10-13T11:51:09+02:00 NO-JIRA: add atomic list type to ServiceAccountIssuers
+  - 817e971b 2025-10-13T08:58:29+02:00 CNTRLPLANE-1576: add event-ttl configuration to kube-apiserver
 
-- cluster-csi-snapshot-controller-operator embedded-component 4fc005e0450a90473def2a18414ef4e5f6e7a374 to b022cf72ba3b4e982626d6d0b80bd53064bbe6ee
-  - 284428e 2025-09-29T04:30:39+00:00 Updating ose-cluster-csi-snapshot-controller-operator-container image to be consistent with ART for 4.21 Reconciling with https://github.com/openshift/ocp-build-data/tree/2bb084cbeea78d508257d4127febe7d8b5bc09eb/images/ose-cluster-csi-snapshot-controller-operator.yml
+- cluster-kube-controller-manager-operator embedded-component 0003cd9850370d9c12f5437aaa168dcad773207b to 52b7857076db0b649f8bede0018691466a19cbe6
+  - d56a3e4 2025-10-13T13:34:34+02:00 Enable user namespaces for the operator
+  - a8fd579 2025-08-29T13:16:07-04:00 Add priority field to prevent early shutdown
 
-- cluster-dns-operator embedded-component 1272aef21dd5dcdbefbf4888c7b0a4a427683fd7 to 2ec8a3de79d73760abbccdbcbbf9951fc93097cd
-  - 84d742b 2025-09-24T17:45:42+02:00 NE-2138: Bump cluster-dns-operator to Kubernetes 1.33 for 4.21
-  - 48966e1 2025-09-24T17:45:42+02:00 NE-2138: Bump cluster-dns-operator to Kubernetes 1.33 for 4.21 - vendor
+- cluster-kube-scheduler-operator embedded-component 7b1ae2372ac30529ca39f4440958882ee230dc6f to 75b90c6295999ac9e707532a0d77bbf257c77561
+  - fe7d9e8 2025-10-14T10:50:16-04:00 Update ks_pod_scenario_3.yaml
+  - de62c2d 2025-10-14T10:50:04-04:00 Update ks_pod_scenario_2.yaml
+  - 9209bc1 2025-10-14T10:49:53-04:00 Update ks_pod_scenario_1.yaml
+  - 0137fa9 2025-10-13T12:53:14+02:00 manifests: Align user namespaces for the operator
+  - 48e3986 2025-08-29T13:16:11-04:00 Add priority field to prevent early shutdown
 
-- cluster-ingress-operator embedded-component 69ba323f05c84f72f11a0d086836b3f3412512d4 to e43265b33c2209b26a2f4566313098d4b429c6a3
-  - 6db72c1 2025-09-29T14:32:41-04:00 Script to get OSSM FBC and run GWAPI e2e tests
+- cluster-network-operator embedded-component 5ce4b3ccb8a882983b9599623bb5937699c07d8a to 37d65252fe3e76946573da6ab6ddc7502e1c76fc
+  - 6b0e43f 2025-09-30T13:01:58+00:00 Updating cluster-network-operator-container image to be consistent with ART for 4.21 Reconciling with https://github.com/openshift/ocp-build-data/tree/4fbe3fab45239dc4be6f5d9d98a0bf36e0274ec9/images/cluster-network-operator.yml
+  - 53dbf9b 2025-09-23T10:25:45+02:00 Skip _stackmanager execution for libreswan 5.3+
 
-- cluster-kube-apiserver-operator embedded-component 6333489fd7d8d3494372cb830efba40eb28e45c1 to 1a57475f49e83284d95d9387eba5bf5c5feb1d3a
-  - a341600 2025-09-29T09:49:17+02:00 Use scrapeClass for service monitors
-  - 03b528d 2025-09-22T17:11:50-03:00 MutatingAdmissionPolicy v1alpha1 started being served in OCP 4.20
+- ovn-kubernetes image-amd64 627ddba0310e1916784bdc1e00ee1e0c41e45302 to 53c8c29ad581831ace5ba3a3812f295bff080ab4
+  - 8aa4fb74 2025-08-14T20:30:53+02:00 Dockerfile: Unpin OVN and consume the latest from FDP.
 
-- csi-external-snapshotter embedded-component ba8194d5920973069bc56a8bf5844afeedc66bbd to 15313fb28f5c42e4b896928478652768225692a6
-  - 7bdcd9c 2025-09-30T08:12:07+00:00 UPSTREAM: <carry>: Updating ose-csi-snapshot-controller-container image to be consistent with ART for 4.21 Reconciling with https://github.com/openshift/ocp-build-data/tree/4fbe3fab45239dc4be6f5d9d98a0bf36e0274ec9/images/ose-csi-snapshot-controller.yml
+- ovn-kubernetes image-arm64 627ddba0310e1916784bdc1e00ee1e0c41e45302 to a7a531f167aa3e8ef14b7c258debf0c709ddcd09
+  - 845ec2d1 2025-09-30T23:21:58+00:00 Updating ose-ovn-kubernetes-container image to be consistent with ART for 4.21 Reconciling with https://github.com/openshift/ocp-build-data/tree/4fbe3fab45239dc4be6f5d9d98a0bf36e0274ec9/images/ose-ovn-kubernetes.yml
+  - 8aa4fb74 2025-08-14T20:30:53+02:00 Dockerfile: Unpin OVN and consume the latest from FDP.
 
-- etcd embedded-component 9c065d4d842c8de57806426c13201413b4d595e2 to e2b3dfdf037938f7f0c489438eaa1138fd3fadba
-  - 41abdef3 2025-09-29T16:05:52+00:00 Updating ose-etcd-container image to be consistent with ART for 4.21 Reconciling with https://github.com/openshift/ocp-build-data/tree/4fbe3fab45239dc4be6f5d9d98a0bf36e0274ec9/images/ose-etcd.yml
-
-- kubernetes embedded-component 5c9df339496a7595967e06682ece7d0b2145411c to ecfa8cc3c4315d0a007fc19747e798c622a320d9
-  - f6d00c98d 2025-09-30T15:43:12+02:00 UPSTREAM: <carry>: kube-apiserver: wire through isTerminating into handler chain
-
-- machine-config-operator embedded-component 4f149432701861a0e577a4f457f99d94b9914cfe to 1c25a903079d538460b52d6b618a02177ceb28f9
-  - 0c647cc7 2025-09-30T00:33:27+08:00 OCPBUGS-62341: Ensure node's Unschedulable state stays in sync
-  - c2a27844 2025-09-18T09:12:33-04:00 operator: render loglevel into manifests
-  - 769e346c 2025-09-18T09:12:33-04:00 operator: set operatorLogLevel from API
-  - 1f4ebabe 2025-09-18T09:12:33-04:00 vendor bump for library-go loglevel helpers
-  - 4d91920e 2025-09-09T18:32:55+01:00 Networking: reset ovn-remote config and allow ovnkube controller to set it
-  - 327d9fc4 2025-09-04T09:50:17-04:00 OCPBUGS-60805: configure-ovs: work around a Cisco switch issue
-
-- operator-framework-olm embedded-component 0b07ab92a28d0377c6600d0b40c5486b4b942ca1 to 2c539ec14ba778ae4085be9af77231e32ff4005b
-  - a2744367 2025-09-30T13:11:33+08:00 support hypershift binary
-  - f54d2a8f 2025-09-29T15:09:16+08:00 migrate more cases from tests-private
-  - c610e423 2025-09-28T12:04:35+08:00 correct suite name
-  - b4b2caa2 2025-09-26T09:19:02+08:00 enhance filters to add more suites
-
-- oc image-amd64 abe2393074469d1ecbd42694442e43b129f63a84 to 5add6c3f0df36635993c72893370203ea2cd12fa
-  - 79169abe 2025-10-01T00:05:15+00:00 Updating openshift-enterprise-deployer-container image to be consistent with ART for 4.21 Reconciling with https://github.com/openshift/ocp-build-data/tree/4fbe3fab45239dc4be6f5d9d98a0bf36e0274ec9/images/openshift-enterprise-deployer.yml
-  - feebaaf3 2025-09-29T19:26:58+00:00 Updating ose-tools-container image to be consistent with ART for 4.21 Reconciling with https://github.com/openshift/ocp-build-data/tree/4fbe3fab45239dc4be6f5d9d98a0bf36e0274ec9/images/ose-tools.yml
-  - 9933cba1 2025-09-27T19:10:35+00:00 Updating openshift-enterprise-cli-container image to be consistent with ART for 4.21 Reconciling with https://github.com/openshift/ocp-build-data/tree/2bb084cbeea78d508257d4127febe7d8b5bc09eb/images/openshift-enterprise-cli.yml
-
-- coredns image-amd64 42e2cf1e46dfd9dd11669b06fb1d619cd9335e17 to 91ae57f91e0bba5fc4fdb816e1f1cea633b3a8b5
-  - 10e3a1c 2025-09-28T19:34:08+00:00 Updating coredns-container image to be consistent with ART for 4.21 Reconciling with https://github.com/openshift/ocp-build-data/tree/2bb084cbeea78d508257d4127febe7d8b5bc09eb/images/coredns.yml
-
-- csi-external-snapshotter image-amd64 ba8194d5920973069bc56a8bf5844afeedc66bbd to 15313fb28f5c42e4b896928478652768225692a6
-  - 7bdcd9c 2025-09-30T08:12:07+00:00 UPSTREAM: <carry>: Updating ose-csi-snapshot-controller-container image to be consistent with ART for 4.21 Reconciling with https://github.com/openshift/ocp-build-data/tree/4fbe3fab45239dc4be6f5d9d98a0bf36e0274ec9/images/ose-csi-snapshot-controller.yml
-
-- kubernetes image-amd64 5c9df339496a7595967e06682ece7d0b2145411c to ecfa8cc3c4315d0a007fc19747e798c622a320d9
-  - f6d00c98d 2025-09-30T15:43:12+02:00 UPSTREAM: <carry>: kube-apiserver: wire through isTerminating into handler chain
+- service-ca-operator image-arm64 a40d9a8ec60e0c6c1578300c372b6104130f2ecc to e5d65c6f6b1446b77e0e915d64825d97be9c06de
+  - 46bab7e 2025-10-15T03:03:14+08:00 Fix gofmt formatting after CA rotation logic fix
+  - 5edc600 2025-10-15T02:45:32+08:00 Fix CA rotation polling logic
+  - 5031339 2025-10-14T21:23:53+08:00 Fix gofmt formatting in e2e_test.go
+  - 911d3da 2025-10-14T19:08:52+08:00 Fix connection test in checkClientPodRcvdUpdatedServerCert
+  - c9f6900 2025-10-14T17:14:30+08:00 Merge fixes from commit 41d9ed12
+  - 667d9c7 2025-10-14T16:32:54+08:00 Fix e2e test failures due to SCC UID range validation
+  - 6e9d853 2025-09-29T22:19:56+00:00 Updating ose-service-ca-operator-container image to be consistent with ART for 4.21 Reconciling with https://github.com/openshift/ocp-build-data/tree/4fbe3fab45239dc4be6f5d9d98a0bf36e0274ec9/images/ose-service-ca-operator.yml
 

@@ -109,24 +109,9 @@ func getVersions() (versions, error) {
 		// error is something else than "file does not exist", like permissions
 		return versions{}, fmt.Errorf("failed to get version of existing MicroShift data: %w", err)
 	}
-
-	// Ignoring .nodename to not get false positives from mere existence of the path
-	dataExists, err := util.PathExistsAndIsNotEmpty(config.DataDir, ".nodename")
-	if err != nil {
-		return versions{}, err
-	}
-
-	if !dataExists {
-		// Data directory does not exist so it's first run of MicroShift
-		klog.InfoS("Version file does not exist yet - assuming first run of MicroShift")
-		vs.data = nil // repeated for clarity
-		return vs, nil
-	}
-
-	// Data exists but without version file, let's assume 4.13 and compare versions
-	klog.InfoS("MicroShift data directory exists, but doesn't contain version file" +
-		" - assuming 4.13.0 and proceeding with version compatibility checks")
-	vs.data = &versionMetadata{Major: 4, Minor: 13, Patch: 0}
+	// Data directory or version does not exist
+	klog.InfoS("Version file does not exist yet - assuming first run of MicroShift")
+	vs.data = nil // repeated for clarity
 	return vs, nil
 }
 

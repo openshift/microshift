@@ -1,8 +1,0 @@
-{
-  "release": {
-    "base": "4.21.0-0.nightly-arm64-2025-09-20-145748"
-  },
-  "images": {
-    "kube-proxy": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:fd3f282e344a62e8e50c656c8eeffd94ad1994d6ee6d1b499ef573b3a1105d68"
-  }
-}

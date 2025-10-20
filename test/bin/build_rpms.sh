@@ -6,10 +6,6 @@
 set -euo pipefail
 
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-# Build the kindnet RPM unless overridden explicitly
-WITH_KINDNET=${WITH_KINDNET:-1}
-# Build the upstream TopoLVM RPM unless overridden explicitly
-WITH_TOPOLVM=${WITH_TOPOLVM:-1}
 
 # shellcheck source=test/bin/common.sh
 source "${SCRIPTDIR}/common.sh"
@@ -20,11 +16,11 @@ build_rpms() {
     rm -rf _output/rpmbuild*
 
     # Normal build of current branch from source
-    local build_cmds=("make WITH_KINDNET=${WITH_KINDNET} WITH_TOPOLVM=${WITH_TOPOLVM} rpm")
+    local build_cmds=("make rpm")
 
     # In CI, build the current branch from source with the build tools using used by OCP
     if [ -v CI_JOB_NAME ]; then
-        build_cmds=("make WITH_KINDNET=${WITH_KINDNET} WITH_TOPOLVM=${WITH_TOPOLVM} rpm-podman")
+        build_cmds=("make rpm-podman")
     fi
 
     build_cmds+=(

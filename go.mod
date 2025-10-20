@@ -31,8 +31,8 @@ require (
 	github.com/go-kit/kit v0.9.0
 	github.com/gogo/protobuf v1.3.2
 	github.com/golang/snappy v0.0.4
-	github.com/openshift/cluster-policy-controller v0.0.0-20250922125535-5c0dd7a1b366
-	github.com/openshift/route-controller-manager v0.0.0-20250923162243-9f4b06c555c1
+	github.com/openshift/cluster-policy-controller v0.0.0-20251007100337-ef703966fe6e
+	github.com/openshift/route-controller-manager v0.0.0-20251008111043-c337cf413bbb
 	github.com/prometheus/client_model v0.6.1
 	github.com/prometheus/common v0.62.0
 	github.com/prometheus/prometheus v0.302.1
@@ -225,7 +225,7 @@ replace (
 	github.com/onsi/ginkgo/v2 => github.com/openshift/onsi-ginkgo/v2 v2.6.1-0.20250416174521-4eb003743b54 // from kubernetes
 	k8s.io/klog/v2 => ./deps/k8s.io/klog // deps clone github.com/kubernetes/klog from kubernetes
 	k8s.io/kubernetes => ./deps/github.com/openshift/kubernetes // deps copy
-	sigs.k8s.io/kube-storage-version-migrator => github.com/openshift/kubernetes-kube-storage-version-migrator v0.0.3-0.20250729145742-0f8a4eb84ace // release kube-storage-version-migrator via kubernetes-kube-storage-version-migrator
+	sigs.k8s.io/kube-storage-version-migrator => github.com/openshift/kubernetes-kube-storage-version-migrator v0.0.3-0.20251007192956-ce5ff17e9a81 // release kube-storage-version-migrator via kubernetes-kube-storage-version-migrator
 )
 
 replace (

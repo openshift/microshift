@@ -2,7 +2,7 @@
 set -e -o pipefail
 
 # must be passed down to this script from Makefile
-ENV_VARS="MICROSHIFT_VERSION RPM_RELEASE SOURCE_GIT_TAG SOURCE_GIT_TREE_STATE WITH_KINDNET MICROSHIFT_VARIANT"
+ENV_VARS="MICROSHIFT_VERSION RPM_RELEASE SOURCE_GIT_TAG SOURCE_GIT_TREE_STATE MICROSHIFT_VARIANT"
 for env in ${ENV_VARS} ; do
   if [[ -z "${!env}" ]] ; then
     echo "Error: Mandatory environment variable '${env}' is missing"
@@ -71,8 +71,6 @@ EOF
   rpmbuild --quiet ${RPMBUILD_OPT} \
    --define "_topdir ${RPMBUILD_DIR}" \
    --define "_binary_payload w19T8.zstdio" \
-   --define "with_kindnet ${WITH_KINDNET}" \
-   --define "with_topolvm ${WITH_TOPOLVM}" \
    --define "microshift_variant ${MICROSHIFT_VARIANT}" \
    "${RPMBUILD_DIR}"SPECS/microshift.spec
 }
