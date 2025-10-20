@@ -16,6 +16,7 @@ TRUNCATED_MESSAGE = '\n\n(release notes were truncated)\n\n'
 
 GITHUB_TOKEN = ""
 
+
 def load_github_token():
     global GITHUB_TOKEN
     GITHUB_TOKEN = os.environ.get('GITHUB_TOKEN')

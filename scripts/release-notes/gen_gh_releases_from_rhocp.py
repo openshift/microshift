@@ -47,7 +47,7 @@ def get_rpm_releases():
         except dnf.exceptions.RepoError as e:
             if 'All mirrors were tried' in str(e):
                 # Not a real error, ignore
-                logging.info(f'Repo is not up yet, skipping')
+                logging.info('Repo is not up yet, skipping')
             else:
                 raise e
         except Exception as e:
