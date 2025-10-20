@@ -1,0 +1,8 @@
+- ovn-kubernetes image-amd64 82ce0167fce4994b6b9286b509f8cbdd2c65f253 to 041b2edeb54b1416c0f842b45a73c1e131adb86a
+  - 8f0fca03 2025-10-09T17:10:48+05:30 dnsnameresolver: add unit test for DNSNameResolver resource update
+  - d5a781f6 2025-10-09T17:10:01+05:30 dnsnameresolver: fix ever growing address set
+
+- ovn-kubernetes image-arm64 82ce0167fce4994b6b9286b509f8cbdd2c65f253 to 041b2edeb54b1416c0f842b45a73c1e131adb86a
+  - 8f0fca03 2025-10-09T17:10:48+05:30 dnsnameresolver: add unit test for DNSNameResolver resource update
+  - d5a781f6 2025-10-09T17:10:01+05:30 dnsnameresolver: fix ever growing address set
+
