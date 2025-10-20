@@ -1,3 +1,6 @@
-- ovn-kubernetes image-arm64 84cdb994dc894b557f800d74766da0455f87a193 to 050ed2c215b55aef456c73c5217427600756ae75
+- machine-config-operator embedded-component 8d409e0fb33ac40d95f0d6e436edfc144e29cd82 to 763fec8e23466979e726503537ce0eb7879b99e6
+  - e63ae2a6 2025-10-07T13:56:08+00:00 OCPBUGS-62493: Only fire OSImageURLOverridden event on render changes
+
+- ovn-kubernetes image-amd64 84cdb994dc894b557f800d74766da0455f87a193 to 050ed2c215b55aef456c73c5217427600756ae75
   - 0e9f3c71 2025-10-09T14:57:44+00:00 Configure sec nic EIPv6 address with NODAD and maximum lifetime
 
