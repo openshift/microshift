@@ -31,7 +31,9 @@ func (l *jsonLogger) Log(keyvals ...interface{}) error {
 		}
 		merge(m, k, v)
 	}
-	return json.NewEncoder(l.Writer).Encode(m)
+	enc := json.NewEncoder(l.Writer)
+	enc.SetEscapeHTML(false)
+	return enc.Encode(m)
 }
 
 func merge(dst map[string]interface{}, k, v interface{}) {
@@ -66,7 +68,7 @@ func safeString(str fmt.Stringer) (s string) {
 			if v := reflect.ValueOf(str); v.Kind() == reflect.Ptr && v.IsNil() {
 				s = "NULL"
 			} else {
-				panic(panicVal)
+				s = fmt.Sprintf("PANIC in String method: %v", panicVal)
 			}
 		}
 	}()
@@ -80,7 +82,7 @@ func safeError(err error) (s interface{}) {
 			if v := reflect.ValueOf(err); v.Kind() == reflect.Ptr && v.IsNil() {
 				s = nil
 			} else {
-				panic(panicVal)
+				s = fmt.Sprintf("PANIC in Error method: %v", panicVal)
 			}
 		}
 	}()
