@@ -16,7 +16,7 @@ import platform
 
 from github import Github  # pygithub
 
-from gen_ec_release_notes import Release
+from gen_gh_releases_from_mirror import Release
 import common
 
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(levelname)-8s [%(filename)s:%(lineno)d] %(message)s')
