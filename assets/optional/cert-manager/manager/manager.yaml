@@ -77,7 +77,7 @@ spec:
             - name: RELATED_IMAGE_CERT_MANAGER_WEBHOOK
               value: registry.redhat.io/cert-manager/jetstack-cert-manager-rhel9@sha256:96d51e3a64bf30cbd92836c7cbd82f06edca16eef78ab1432757d34c16628659
             - name: RELATED_IMAGE_CERT_MANAGER_CA_INJECTOR
-              value: registry.redhat.io/cert-manager/jetstack-cert-manager-rhel9@sha256:96d51e3a64bf30cbd92836c7cbd82f06edca16eef78ab1432757d34c16628659
+              value: quay.io/jetstack/cert-manager-cainjector:latest
             - name: RELATED_IMAGE_CERT_MANAGER_CONTROLLER
               value: registry.redhat.io/cert-manager/jetstack-cert-manager-rhel9@sha256:96d51e3a64bf30cbd92836c7cbd82f06edca16eef78ab1432757d34c16628659
             - name: RELATED_IMAGE_CERT_MANAGER_ACMESOLVER
@@ -85,7 +85,7 @@ spec:
             - name: RELATED_IMAGE_CERT_MANAGER_ISTIOCSR
               value: registry.redhat.io/cert-manager/cert-manager-istio-csr-rhel9@sha256:9ea2c29a384b964cef14f853278821df3cd30320f25afab8823897192f67fc7e
             - name: OPERAND_IMAGE_VERSION
-              value: 1.17.0
+              value: 1.17.4
             - name: ISTIOCSR_OPERAND_IMAGE_VERSION
               value: 0.14.0
             - name: OPERATOR_IMAGE_VERSION

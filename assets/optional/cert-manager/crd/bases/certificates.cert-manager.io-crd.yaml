@@ -8,7 +8,7 @@ metadata:
     app: cert-manager
     app.kubernetes.io/instance: cert-manager
     app.kubernetes.io/name: cert-manager
-    app.kubernetes.io/version: v1.16.4
+    app.kubernetes.io/version: v1.17.4
   name: certificates.cert-manager.io
 spec:
   group: cert-manager.io
@@ -191,17 +191,25 @@ spec:
                             Create enables JKS keystore creation for the Certificate.
                             If true, a file named `keystore.jks` will be created in the target
                             Secret resource, encrypted using the password stored in
-                            `passwordSecretRef`.
+                            `passwordSecretRef` or `password`.
                             The keystore file will be updated immediately.
                             If the issuer provided a CA certificate, a file named `truststore.jks`
                             will also be created in the target Secret resource, encrypted using the
                             password stored in `passwordSecretRef`
                             containing the issuing Certificate Authority
                           type: boolean
+                        password:
+                          description: |-
+                            Password provides a literal password used to encrypt the JKS keystore.
+                            Mutually exclusive with passwordSecretRef.
+                            One of password or passwordSecretRef must provide a password with a non-zero length.
+                          type: string
                         passwordSecretRef:
                           description: |-
-                            PasswordSecretRef is a reference to a key in a Secret resource
+                            PasswordSecretRef is a reference to a non-empty key in a Secret resource
                             containing the password used to encrypt the JKS keystore.
+                            Mutually exclusive with password.
+                            One of password or passwordSecretRef must provide a password with a non-zero length.
                           properties:
                             key:
                               description: |-
@@ -219,7 +227,6 @@ spec:
                           type: object
                       required:
                         - create
-                        - passwordSecretRef
                       type: object
                     pkcs12:
                       description: |-
@@ -231,17 +238,25 @@ spec:
                             Create enables PKCS12 keystore creation for the Certificate.
                             If true, a file named `keystore.p12` will be created in the target
                             Secret resource, encrypted using the password stored in
-                            `passwordSecretRef`.
+                            `passwordSecretRef` or in `password`.
                             The keystore file will be updated immediately.
                             If the issuer provided a CA certificate, a file named `truststore.p12` will
                             also be created in the target Secret resource, encrypted using the
                             password stored in `passwordSecretRef` containing the issuing Certificate
                             Authority
                           type: boolean
+                        password:
+                          description: |-
+                            Password provides a literal password used to encrypt the PKCS#12 keystore.
+                            Mutually exclusive with passwordSecretRef.
+                            One of password or passwordSecretRef must provide a password with a non-zero length.
+                          type: string
                         passwordSecretRef:
                           description: |-
-                            PasswordSecretRef is a reference to a key in a Secret resource
-                            containing the password used to encrypt the PKCS12 keystore.
+                            PasswordSecretRef is a reference to a non-empty key in a Secret resource
+                            containing the password used to encrypt the PKCS#12 keystore.
+                            Mutually exclusive with password.
+                            One of password or passwordSecretRef must provide a password with a non-zero length.
                           properties:
                             key:
                               description: |-
@@ -275,7 +290,6 @@ spec:
                           type: string
                       required:
                         - create
-                        - passwordSecretRef
                       type: object
                   type: object
                 literalSubject:
