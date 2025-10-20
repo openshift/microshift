@@ -98,7 +98,7 @@ func (gp *GenericPlugin) discoverPath() ([]device, error) {
 				h := sha1.New()
 				h.Write([]byte(strconv.FormatUint(uint64(j), 10)))
 				d := device{
-					Device: v1beta1.Device{
+					Device: &v1beta1.Device{
 						Health: v1beta1.Healthy,
 					},
 				}
