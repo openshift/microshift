@@ -68,6 +68,8 @@ def get_version_from_makefile():
 
 
 def redact(input):
+    if GITHUB_TOKEN == "":
+        return input
     return str.replace(input, GITHUB_TOKEN, '~~REDACTED~~')
 
 

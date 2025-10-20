@@ -148,8 +148,6 @@ def get_args_parser():
 
 
 def main():
-    common.load_github_token()  # Must be first thing in order for common.redact() to work properly.
-
     parser = get_args_parser()
     args = parser.parse_args()
 
@@ -173,6 +171,8 @@ def main():
             logging.info(f"Saved {len(rpm_releases)} releases to {args.output}")
 
     elif args.command == "publish":
+        common.load_github_token()
+
         if os.getuid() == 0:
             logging.warning("Running 'publish' as root is not recommended to avoid potential local git repo issues.")
             exit(0)
