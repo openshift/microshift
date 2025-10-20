@@ -1,42 +1,12 @@
-- api embedded-component 079ac08331d3021f9b7495857677ba59fdc4b25a to fc302ea26b0bcefa11673b4b64e4a1479e42a8cb
-  - 23c9220b 2025-10-02T12:42:03-07:00 generated output
-  - 0affae91 2025-10-02T12:27:09-07:00 OCPSTRAT-2467: Add feature gate for StreamingCollectionEncoding
+- csi-external-snapshotter embedded-component ac82cafc95b301f67f46ee0db93720d55177a19b to 580c6960cd665dfdc3d77538bb7744b8754aca26
+  - e8a25c1 2025-07-08T02:59:16+00:00 UPSTREAM: 1303: Fix requeueing snapshot content after deletion error
 
-- cluster-network-operator embedded-component 9d49a4beb3693a53833a7af29e54567a97c2de2f to d0e8a5c78bf0204a35620587d277727661482e75
-  - 22ff5c1 2025-10-02T12:53:09+01:00 Add drop flows for GARPs
+- machine-config-operator embedded-component 21f507d532303d9536e8c387801ca1399515d844 to 49dbecf4b3c74d7311ad1a89a0236c0d84b80a63
+  - 98291f7d 2025-10-02T12:45:53+01:00 Networking: reset ovn-remote config and allow ovnkube controller to set it
 
-- kubernetes embedded-component 9fa6215ec67894ee1303a01eaf2fe833877d6e5a to f94ad893331edbc7eaab8d919339984a497695aa
-  - cfbb77298 2025-10-08T12:58:02-07:00 UPSTREAM: <carry>: Make streaming collection encoding off by default
-  - 04467b1fb 2025-10-08T12:37:35-07:00 UPSTREAM: <carry>: Use switch test to gofuzz
-  - f9d90d78a 2025-10-08T12:36:59-07:00 UPSTREAM: 129407: Implement streaming proto encoding
-  - f9a4bd0a9 2025-10-08T12:36:27-07:00 UPSTREAM: 130511: Implement tests for encoding collections in Proto
-  - c1f8b1f08 2025-10-08T12:35:50-07:00 UPSTREAM: 129334: Streaming JSON encoder for List
-  - 805f25ca1 2025-10-08T12:34:51-07:00 UPSTREAM: 130220: Add tests for encoding collections in JSON for KEP-5116
-  - a2c40955f 2025-10-08T12:33:55-07:00 UPSTREAM: 130281: Implement chunking for gzip encoder in deferredResponseWriter
-  - e3767efba 2025-10-08T12:30:08-07:00 UPSTREAM: 130190: Add a test to validate deferredResponseWriteron multiple write calls
+- csi-external-snapshotter image-amd64 ac82cafc95b301f67f46ee0db93720d55177a19b to 580c6960cd665dfdc3d77538bb7744b8754aca26
+  - e8a25c1 2025-07-08T02:59:16+00:00 UPSTREAM: 1303: Fix requeueing snapshot content after deletion error
 
-- machine-config-operator embedded-component 673c0bd6bbedd1cffdc59547c7d42e95ad7f4dd4 to 21f507d532303d9536e8c387801ca1399515d844
-  - 9a7c8377 2025-10-06T14:19:14+00:00 controller: update is node done check to handle image mode disabling case & add unit test cases for scenario
-
-- ovn-kubernetes image-amd64 48ed8433a1408ca744dc81dd95d70b9fd1424d2f to 1c04cc35c4c32624124dff8ec660ab83972f30e5
-  - f7c67b7f 2025-10-08T12:54:42+01:00 [IC][EIP] OCPBUGS-42303: Fix race between SB DB and OVN-Controller
-  - 2ac68e4c 2025-10-02T13:04:35+01:00 Node controller shutdown: do not ref gateway if not set
-  - 37dd4e2a 2025-10-02T13:04:27+01:00 ovn-controller: block GARP during startup
-  - d3ae338d 2025-10-02T13:04:20+01:00 Fix ovnkube-controller-with-node shutdown sequence
-
-- kubernetes image-amd64 9fa6215ec67894ee1303a01eaf2fe833877d6e5a to f94ad893331edbc7eaab8d919339984a497695aa
-  - cfbb77298 2025-10-08T12:58:02-07:00 UPSTREAM: <carry>: Make streaming collection encoding off by default
-  - 04467b1fb 2025-10-08T12:37:35-07:00 UPSTREAM: <carry>: Use switch test to gofuzz
-  - f9d90d78a 2025-10-08T12:36:59-07:00 UPSTREAM: 129407: Implement streaming proto encoding
-  - f9a4bd0a9 2025-10-08T12:36:27-07:00 UPSTREAM: 130511: Implement tests for encoding collections in Proto
-  - c1f8b1f08 2025-10-08T12:35:50-07:00 UPSTREAM: 129334: Streaming JSON encoder for List
-  - 805f25ca1 2025-10-08T12:34:51-07:00 UPSTREAM: 130220: Add tests for encoding collections in JSON for KEP-5116
-  - a2c40955f 2025-10-08T12:33:55-07:00 UPSTREAM: 130281: Implement chunking for gzip encoder in deferredResponseWriter
-  - e3767efba 2025-10-08T12:30:08-07:00 UPSTREAM: 130190: Add a test to validate deferredResponseWriteron multiple write calls
-
-- ovn-kubernetes image-arm64 48ed8433a1408ca744dc81dd95d70b9fd1424d2f to 1c04cc35c4c32624124dff8ec660ab83972f30e5
-  - f7c67b7f 2025-10-08T12:54:42+01:00 [IC][EIP] OCPBUGS-42303: Fix race between SB DB and OVN-Controller
-  - 2ac68e4c 2025-10-02T13:04:35+01:00 Node controller shutdown: do not ref gateway if not set
-  - 37dd4e2a 2025-10-02T13:04:27+01:00 ovn-controller: block GARP during startup
-  - d3ae338d 2025-10-02T13:04:20+01:00 Fix ovnkube-controller-with-node shutdown sequence
+- csi-external-snapshotter image-arm64 ac82cafc95b301f67f46ee0db93720d55177a19b to 580c6960cd665dfdc3d77538bb7744b8754aca26
+  - e8a25c1 2025-07-08T02:59:16+00:00 UPSTREAM: 1303: Fix requeueing snapshot content after deletion error
 
