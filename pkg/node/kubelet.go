@@ -173,7 +173,7 @@ func (s *KubeletServer) Run(ctx context.Context, ready chan<- struct{}, stopped 
 		KubeletConfiguration: *s.kubeconfig,
 	}
 
-	kubeletDeps, err := kubelet.UnsecuredDependencies(kubeletServer, utilfeature.DefaultFeatureGate)
+	kubeletDeps, err := kubelet.UnsecuredDependencies(ctx, kubeletServer, utilfeature.DefaultFeatureGate)
 	if err != nil {
 		return fmt.Errorf("error fetching dependencies: %w", err)
 	}
@@ -227,7 +227,7 @@ func loadConfigFile(name string) (*kubeletconfig.KubeletConfiguration, error) {
 	if err != nil {
 		return nil, fmt.Errorf(errFmt, name, err)
 	}
-	kc, err := loader.Load()
+	kc, err := loader.Load(context.TODO())
 	if err != nil {
 		return nil, fmt.Errorf(errFmt, name, err)
 	}
