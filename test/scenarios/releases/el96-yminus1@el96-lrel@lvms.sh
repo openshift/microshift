@@ -7,7 +7,7 @@
 export TEST_RANDOMIZATION=none
 
 start_image="rhel-9.6-microshift-brew-optionals-4.${PREVIOUS_MINOR_VERSION}-zstream"
-dest_image="rhel-9.6-microshift-brew-4.${MINOR_VERSION}-${LATEST_RELEASE_TYPE}"
+dest_image="rhel-9.6-microshift-brew-optionals-4.${MINOR_VERSION}-${LATEST_RELEASE_TYPE}"
 
 scenario_create_vms() {
     if ! does_commit_exist "${start_image}"; then
