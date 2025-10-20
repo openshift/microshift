@@ -33,19 +33,21 @@ def get_rpm_releases():
 
         # Disable all repos (in the memory, not on the host) to just query RHOCP repos and make operation faster.
         base.repos.all().disable()
-        for version in range(14, int(minor)+1):
-            name = f'rhocp-4.{version}-for-rhel-9-{arch}-rpms'
-            repo = base.repos.get(name)
-            if repo:
-                repo.enable()
-                logging.info(f'Enabled repo: {name} - {repo.name}')
+        repos = base.repos.get_matching(f'rhocp-4.*-{arch}-rpms')
+
+        for r in repos:
+            if any("mirror.openshift.com" in baseurl for baseurl in r.baseurl):
+                logging.info(f"Skipping locally configured mirror registry repository: {r.id} - {r.name}")
+                continue
+            r.enable()
+            logging.info(f'Enabled repo: {r.id} - {r.name}')
 
         try:
             base.fill_sack()
         except dnf.exceptions.RepoError as e:
             if 'All mirrors were tried' in str(e):
                 # Not a real error, ignore
-                logging.info(f'Repo {name} is not up yet, skipping')
+                logging.info(f'Repo is not up yet, skipping')
             else:
                 raise e
         except Exception as e:
