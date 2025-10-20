@@ -1,3 +1,19 @@
-- machine-config-operator embedded-component fcf8f254943cbcba1400ba55f3978cc292b6460b to 0f7ca82c30f45e9c7d26279e920b63bbf233e130
-  - e9445424 2025-10-08T14:16:11+00:00 crc & kcc: Before deleting a degraded MC, ensure that the annotations have not been updated since the last check
+- cluster-network-operator embedded-component b3b281c37120b57834417e1399ea27969e33b2ea to eec368f2985d93c136785b6f37bdd39559a1cf4c
+  - c5aacca 2025-10-02T12:56:11+01:00 Add drop flows for GARPs
+
+- machine-config-operator embedded-component 0f7ca82c30f45e9c7d26279e920b63bbf233e130 to ca2de0f716f1917c85ec78c09d61e0d0c01cdad0
+  - ca678bdf 2025-10-02T12:49:27+01:00 Networking: reset ovn-remote config and allow ovnkube controller to set it
+  - eb95e7a5 2025-08-04T20:58:37+00:00 OCPBUGS-55971: Enable debug logging for nodeip-configuration
+
+- ovn-kubernetes image-amd64 03fb01368e68a94b949cf0a16f5bd5d34f853d0b to 0466cfde84ccfe8595b7be427aaf4fb47d8078a5
+  - 23961305 2025-10-08T13:03:10+01:00 [IC][EIP] OCPBUGS-42303: Fix race between SB DB and OVN-Controller
+  - 3b039fea 2025-10-08T13:03:05+01:00 Node controller shutdown: do not ref gateway if not set
+  - 5b538031 2025-10-08T13:03:01+01:00 ovn-controller: block GARP during startup
+  - 70579484 2025-10-08T13:02:52+01:00 Fix ovnkube-controller-with-node shutdown sequence
+
+- ovn-kubernetes image-arm64 03fb01368e68a94b949cf0a16f5bd5d34f853d0b to 0466cfde84ccfe8595b7be427aaf4fb47d8078a5
+  - 23961305 2025-10-08T13:03:10+01:00 [IC][EIP] OCPBUGS-42303: Fix race between SB DB and OVN-Controller
+  - 3b039fea 2025-10-08T13:03:05+01:00 Node controller shutdown: do not ref gateway if not set
+  - 5b538031 2025-10-08T13:03:01+01:00 ovn-controller: block GARP during startup
+  - 70579484 2025-10-08T13:02:52+01:00 Fix ovnkube-controller-with-node shutdown sequence
 
