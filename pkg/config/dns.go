@@ -25,11 +25,11 @@ type DNS struct {
 	// +kubebuilder:example=microshift.example.com
 	BaseDomain string `json:"baseDomain"`
 
-	// Hosts contains configuration for the hosts file watcher service.
+	// Hosts contains configuration for the hosts file.
 	Hosts HostsConfig `json:"hosts,omitempty"`
 }
 
-// HostsConfig contains configuration for the hosts file watcher service.
+// HostsConfig contains configuration for the hosts file .
 type HostsConfig struct {
 	// File is the path to the hosts file to monitor.
 	// If not specified, defaults to "/etc/hosts".
@@ -37,7 +37,7 @@ type HostsConfig struct {
 	// +kubebuilder:example="/etc/hosts"
 	File string `json:"file,omitempty"`
 
-	// Status controls whether the hosts file watcher service is enabled or disabled.
+	// Status controls whether the hosts file is enabled or disabled.
 	// Allowed values are "Enabled" and "Disabled".
 	// If not specified, defaults to "Disabled".
 	// +kubebuilder:default="Disabled"
@@ -57,7 +57,6 @@ func dnsDefaults() DNS {
 }
 
 func (t *DNS) validate() error {
-
 	if t.Hosts.Status != HostsStatusEnabled && t.Hosts.Status != HostsStatusDisabled {
 		return fmt.Errorf("invalid hosts status: %s", t.Hosts.Status)
 	}

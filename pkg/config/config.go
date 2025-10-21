@@ -423,7 +423,6 @@ func (c *Config) incorporateUserSettings(u *Config) {
 		if u.DNS.Hosts.File != "" {
 			c.DNS.Hosts.File = u.DNS.Hosts.File
 		}
-
 	}
 }
 

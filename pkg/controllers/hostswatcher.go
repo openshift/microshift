@@ -51,50 +51,64 @@ func (s *HostsWatcherManager) Run(ctx context.Context, ready chan<- struct{}, st
 	klog.Infof("%s starting to monitor hosts file: %s", s.Name(), s.cfg.DNS.Hosts.File)
 	close(ready)
 
-	// Create Kubernetes client
 	kubeClient, err := s.createKubeClient()
 	if err != nil {
 		klog.Errorf("%s failed to create Kubernetes client: %v", s.Name(), err)
 		return err
 	}
 
-	// Create initial ConfigMaps
 	if err := s.updateConfigMaps(ctx, kubeClient); err != nil {
 		klog.Errorf("%s failed to create initial ConfigMaps: %v", s.Name(), err)
 		return err
 	}
 
-	// Set up file watcher
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
 		klog.Errorf("%s failed to create file watcher: %v", s.Name(), err)
 		return err
 	}
-	defer watcher.Close()
+	defer func() {
+		if cerr := watcher.Close(); cerr != nil {
+			klog.Errorf("%s failed to close file watcher: %v", s.Name(), cerr)
+		}
+	}()
 
-	// Add the hosts file to the watcher
-	err = watcher.Add(s.cfg.DNS.Hosts.File)
-	if err != nil {
-		klog.Errorf("%s failed to watch hosts file %s: %v", s.Name(), s.cfg.DNS.Hosts.File, err)
+	if err := s.setupWatches(watcher); err != nil {
 		return err
-	}
-
-	// Also watch the directory to catch file replacements (common with atomic writes)
-	hostsDir := filepath.Dir(s.cfg.DNS.Hosts.File)
-	err = watcher.Add(hostsDir)
-	if err != nil {
-		klog.Warningf("%s failed to watch hosts directory %s: %v", s.Name(), hostsDir, err)
 	}
 
 	klog.Infof("%s ready and watching for changes", s.Name())
 
-	// Track last known content hash to avoid duplicate updates
 	lastHash, err := s.getFileHash(s.cfg.DNS.Hosts.File)
 	if err != nil {
 		klog.Warningf("%s failed to get initial file hash: %v", s.Name(), err)
 	}
 
 	klog.Infof("%s is ready", s.Name())
+
+	return s.eventLoop(ctx, watcher, kubeClient, lastHash)
+}
+
+func (s *HostsWatcherManager) setupWatches(watcher *fsnotify.Watcher) error {
+	filesToWatch := []string{
+		s.cfg.DNS.Hosts.File,
+		filepath.Dir(s.cfg.DNS.Hosts.File),
+	}
+	for i, file := range filesToWatch {
+		if err := watcher.Add(file); err != nil {
+			// Warn if directory, error out if file
+			if i == 0 {
+				klog.Errorf("%s failed to watch hosts file %s: %v", s.Name(), s.cfg.DNS.Hosts.File, err)
+				return err
+			}
+			klog.Warningf("%s failed to watch hosts directory %s: %v", s.Name(), file, err)
+		}
+	}
+	return nil
+}
+
+func (s *HostsWatcherManager) eventLoop(ctx context.Context, watcher *fsnotify.Watcher, kubeClient kubernetes.Interface, initHash string) error {
+	lastHash := initHash
 
 	for {
 		select {
@@ -106,34 +120,14 @@ func (s *HostsWatcherManager) Run(ctx context.Context, ready chan<- struct{}, st
 			if !ok {
 				return fmt.Errorf("%s watcher channel closed", s.Name())
 			}
-
-			// Check if this event is for our hosts file
-			if event.Name != s.cfg.DNS.Hosts.File {
-				continue
-			}
-
-			if event.Op&fsnotify.Write == fsnotify.Write || event.Op&fsnotify.Create == fsnotify.Create {
-				klog.V(2).Infof("%s detected change in hosts file: %s", s.Name(), event.Name)
-
-				// Check if content actually changed
-				currentHash, err := s.getFileHash(s.cfg.DNS.Hosts.File)
-				if err != nil {
-					klog.Warningf("%s failed to get file hash after change: %v", s.Name(), err)
+			if s.isRelevantHostsEvent(event) {
+				updated, newHash, updateErr := s.handleHostsChange(ctx, kubeClient, lastHash)
+				if updateErr != nil {
+					klog.Errorf("%s failed to process hosts file change: %v", s.Name(), updateErr)
 					continue
 				}
-
-				if currentHash == lastHash {
-					klog.V(2).Infof("%s file hash unchanged, skipping update", s.Name())
-					continue
-				}
-
-				lastHash = currentHash
-
-				// Update ConfigMaps in all target namespaces
-				if err := s.updateConfigMaps(ctx, kubeClient); err != nil {
-					klog.Errorf("%s failed to update ConfigMaps: %v", s.Name(), err)
-				} else {
-					klog.Infof("%s successfully updated ConfigMaps in namespaces: %v", s.Name(), targetNameSpace)
+				if updated {
+					lastHash = newHash
 				}
 			}
 
@@ -146,7 +140,34 @@ func (s *HostsWatcherManager) Run(ctx context.Context, ready chan<- struct{}, st
 	}
 }
 
-func (s *HostsWatcherManager) createKubeClient() (kubernetes.Interface, error) {
+func (s *HostsWatcherManager) isRelevantHostsEvent(event fsnotify.Event) bool {
+	if event.Name != s.cfg.DNS.Hosts.File {
+		return false
+	}
+	return event.Op&fsnotify.Write == fsnotify.Write || event.Op&fsnotify.Create == fsnotify.Create
+}
+
+func (s *HostsWatcherManager) handleHostsChange(ctx context.Context, kubeClient kubernetes.Interface, lastHash string) (bool, string, error) {
+	klog.V(2).Infof("%s detected change in hosts file: %s", s.Name(), s.cfg.DNS.Hosts.File)
+	currentHash, err := s.getFileHash(s.cfg.DNS.Hosts.File)
+	if err != nil {
+		klog.Warningf("%s failed to get file hash after change: %v", s.Name(), err)
+		return false, lastHash, err
+	}
+	if currentHash == lastHash {
+		klog.V(2).Infof("%s file hash unchanged, skipping update", s.Name())
+		return false, lastHash, nil
+	}
+	if err := s.updateConfigMaps(ctx, kubeClient); err != nil {
+		klog.Errorf("%s failed to update ConfigMaps: %v", s.Name(), err)
+		return false, currentHash, err
+	} else {
+		klog.Infof("%s successfully updated ConfigMaps in namespaces: %v", s.Name(), targetNameSpace)
+	}
+	return true, currentHash, nil
+}
+
+func (s *HostsWatcherManager) createKubeClient() (*kubernetes.Clientset, error) {
 	kubeConfigPath := s.cfg.KubeConfigPath(config.KubeAdmin)
 
 	config, err := clientcmd.BuildConfigFromFlags("", kubeConfigPath)
