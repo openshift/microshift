@@ -46,6 +46,7 @@ import (
 	"k8s.io/component-base/metrics"
 	"k8s.io/component-base/zpages/flagz"
 	cmoptions "k8s.io/controller-manager/options"
+	"k8s.io/klog/v2"
 	kubectrlmgrconfigv1alpha1 "k8s.io/kube-controller-manager/config/v1alpha1"
 	kubecontrollerconfig "k8s.io/kubernetes/cmd/kube-controller-manager/app/config"
 	"k8s.io/kubernetes/cmd/kube-controller-manager/names"
@@ -305,7 +306,7 @@ func (s *KubeControllerManagerOptions) Flags(allControllers []string, disabledBy
 	if !utilfeature.DefaultFeatureGate.Enabled(featuregate.Feature(clientgofeaturegate.WatchListClient)) {
 		ver := version.MustParse("1.34")
 		if err := utilfeature.DefaultMutableFeatureGate.OverrideDefaultAtVersion(featuregate.Feature(clientgofeaturegate.WatchListClient), true, ver); err != nil {
-			panic(fmt.Sprintf("unable to set %s feature gate, err: %v", clientgofeaturegate.WatchListClient, err))
+			klog.Warning(fmt.Sprintf("unable to set %s feature gate, err: %v", clientgofeaturegate.WatchListClient, err))
 		}
 	}
 
