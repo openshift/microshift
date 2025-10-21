@@ -1,7 +1,0 @@
-network:
-  # CNIPlugin is a user defined string value matching one of the above CNI values. MicroShift uses this
-  # value to decide whether to deploy the OVN-K as default CNI. An unset field defaults to "" during yaml parsing, and thus
-  # could mean that the cluster has been upgraded. In order to support the existing out-of-box behavior, MicroShift
-  # assumes an empty string to mean the OVN-K should be deployed.
-  # Allowed values are: unset or one of ["", "ovnk", "none"]
-  cniPlugin: "none"

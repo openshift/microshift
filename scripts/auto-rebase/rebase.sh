@@ -33,6 +33,8 @@ STAGING_DIR="$REPOROOT/_output/staging"
 PULL_SECRET_FILE="${HOME}/.pull-secret.json"
 GO_MOD_DIRS=("$REPOROOT/" "$REPOROOT/etcd")
 
+REBASE_USE_SSH="${REBASE_USE_SSH:-false}"
+
 EMBEDDED_COMPONENTS="route-controller-manager cluster-policy-controller hyperkube etcd kube-storage-version-migrator cluster-config-api"
 EMBEDDED_COMPONENT_OPERATORS="cluster-kube-apiserver-operator cluster-kube-controller-manager-operator cluster-openshift-controller-manager-operator cluster-kube-scheduler-operator machine-config-operator operator-lifecycle-manager"
 LOADED_COMPONENTS="cluster-dns-operator cluster-ingress-operator service-ca-operator cluster-network-operator cluster-csi-snapshot-controller-operator"
@@ -71,6 +73,10 @@ clone_repo() {
     if [[ -d "${repodir}" ]]
     then
         return
+    fi
+
+    if "${REBASE_USE_SSH}"; then
+        repo="git@github.com:${repo#https://github.com/}"
     fi
 
     git init "${repodir}"
@@ -490,13 +496,19 @@ handle_deps() {
             local ver
             ver=$(go mod edit -json "${REPOROOT}/_output/staging/${src}/go.mod" | jq -r --arg M "${modulepath}" '.Require[] | select(.Path == $M) | .Version')
 
-            echo "Handling '${modulepath}' dep: cloning 'https://${repo}' @ '${ver}' to ${REPOROOT}/${replace_path}"
+            repo_url="https://${repo}"
+            if "${REBASE_USE_SSH}"; then
+                # If there's ever a `deps clone` in go.mod for host other than github.com, then this will need to be updated.
+                repo_url="git@github.com:${repo#https://github.com/}"
+            fi
+
+            echo "Handling '${modulepath}' dep: cloning '${repo_url}' @ '${ver}' to ${REPOROOT}/${replace_path}"
 
             # Update version in require so it's accurate even though unused (because replaced).
             go mod edit -require "${modulepath}@${ver}"
 
             rm -fr "${REPOROOT}/${replace_path}"
-            git clone "https://${repo}" --branch "${ver}" "${REPOROOT}/${replace_path}"
+            git clone "${repo_url}" --branch "${ver}" "${REPOROOT}/${replace_path}"
             rm -fr "${REPOROOT}/${replace_path}/.git"
             find "${REPOROOT}/${replace_path}/" -name "OWNERS" -delete
         ;;
@@ -884,7 +896,6 @@ EOF
 
     update_olm_images
     update_multus_images
-    update_kubeproxy_images
 
     popd >/dev/null
 }
@@ -1187,44 +1198,6 @@ EOF
     done  # for goarch
 }
 
-update_kubeproxy_images() {
-    title "Rebasing kube-proxy images"
-
-    for goarch in amd64 arm64; do
-        arch=${GOARCH_TO_UNAME_MAP["${goarch}"]:-noarch}
-
-        local release_file="${STAGING_DIR}/release_${goarch}.json"
-        local kustomization_arch_file="${REPOROOT}/assets/optional/kube-proxy/kustomization.${arch}.yaml"
-        local kubeproxy_release_json="${REPOROOT}/assets/optional/kube-proxy/release-kube-proxy-${arch}.json"
-
-        local base_release
-        base_release=$(jq -r ".metadata.version" "${release_file}")
-        jq -n "{\"release\": {\"base\": \"$base_release\"}, \"images\": {}}" > "${kubeproxy_release_json}"
-
-        # Create extra kustomization for each arch in separate file.
-        # Right file (depending on arch) should be appended during rpmbuild to kustomization.yaml.
-        cat <<EOF > "${kustomization_arch_file}"
-
-images:
-EOF
-
-        for container in kube-proxy; do
-            local new_image
-            new_image=$(jq -r ".references.spec.tags[] | select(.name == \"${container}\") | .from.name" "${release_file}")
-            local new_image_name="${new_image%@*}"
-            local new_image_digest="${new_image#*@}"
-
-            cat <<EOF >> "${kustomization_arch_file}"
-  - name: ${container}
-    newName: ${new_image_name}
-    digest: ${new_image_digest}
-EOF
-
-            yq -i -o json ".images += {\"${container}\": \"${new_image}\"}" "${kubeproxy_release_json}"
-        done  # for container
-    done  # for goarch
-}
-
 check_for_manifests_changes() {
     # Changes to ignore:
     # - `release-$ARCH.json` files
@@ -1316,31 +1289,8 @@ rebase_to() {
         echo "No changes to buildfiles."
     fi
 
-    update_cncf_kubelet_version
-    if [[ -n "$(git status -s scripts/multinode/configure-sec.sh)" ]]; then
-        title "## Committing changes to scripts/multinode/configure-sec.sh"
-        git add scripts/multinode/configure-sec.sh
-        git commit -m "update kubernetes version in CNCF scripts"
-    else
-        echo "No changes to Kubernetes version."
-    fi
-
     title "# Removing staging directory"
     rm -rf "${STAGING_DIR}"
-}
-
-update_cncf_kubelet_version() {
-    title "Updating Kubernetes version in CNCF scripts"
-
-    source "${REPOROOT}/Makefile.kube_git.var"
-    local -r kube_hash_amd64="$(curl -L https://dl.k8s.io/release/${KUBE_GIT_VERSION}/bin/linux/amd64/kubelet.sha256 2>/dev/null)"
-    local -r kube_hash_arm64="$(curl -L https://dl.k8s.io/release/${KUBE_GIT_VERSION}/bin/linux/arm64/kubelet.sha256 2>/dev/null)"
-
-    local -r target="${REPOROOT}/scripts/multinode/configure-sec.sh"
-    sed -i "s,# version=v1\.[0-9]*\.[0-9]*;,# version=${KUBE_GIT_VERSION};,g" "${target}"
-    sed -i "s,local -r version=.*,local -r version=\"${KUBE_GIT_VERSION}\",g" "${target}"
-    sed -i "s,local -r kube_hash_amd64=.*,local -r kube_hash_amd64=\"${kube_hash_amd64}\",g" "${target}"
-    sed -i "s,local -r kube_hash_arm64=.*,local -r kube_hash_arm64=\"${kube_hash_arm64}\",g" "${target}"
 }
 
 to_just_images() {
@@ -1380,7 +1330,6 @@ usage() {
     echo "$(basename "$0") generated-apis                                   Regenerates OpenAPIs"
     echo "$(basename "$0") images                                           Rebases the component images to the downloaded release"
     echo "$(basename "$0") manifests                                        Rebases the component manifests to the downloaded release"
-    echo "$(basename "$0") cncf-kube-version                                Updates kubelet version in configure-sec.sh to match version in Makefile.kube_git.var"
     exit 1
 }
 
@@ -1411,9 +1360,6 @@ case "$command" in
     manifests)
         copy_manifests
         update_openshift_manifests
-        ;;
-    cncf-kube-version)
-        update_cncf_kubelet_version
         ;;
     *) usage;;
 esac
