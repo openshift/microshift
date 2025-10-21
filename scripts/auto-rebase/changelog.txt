@@ -1,26 +1,6 @@
-- kubernetes embedded-component f3d912311b7c3537def4501ef8e15fda821078e5 to d1618535bbc641daee580987e2ccb5fa09f59def
-  - c8bc9ba3d 2025-09-18T12:02:30+00:00 UPSTREAM: <carry>: Don't retry storage calls with side effects.
-
-- machine-config-operator embedded-component cbd3b1f2d4ff551425658cca30ecf8cfc5fe3277 to dc686507c125fa853ace72d932c43134779e4540
-  - 35bf306e 2025-10-02T22:38:03+00:00 add new recording rule for unsuported packages
-  - 2ecdc272 2025-09-17T14:56:50+00:00 OCPBUGS-61695: Override NMState service definition
-  - 46e8215f 2025-07-29T14:46:11+00:00 OCPBUGS-57484: Handle migration from OpenShift SDN
-  - 3ff3a657 2025-07-29T14:46:11+00:00 OPNET-681: Support migration from configure-ovs to NMState
-  - fcd3adc3 2025-05-27T16:54:12+00:00 OCPBUGS-36859: Support NODEIP_HINT in IPI deployments too
-
-- openshift-controller-manager embedded-component 326317ac51b73267300ff3262887dd5326ada0ac to 90f73f7ea939b221b79684ebe6d2feb843fc1f83
-  - acb2fae 2025-09-15T05:31:48+00:00 legacy image pull secret rollback controller
-  - e68c3d9 2025-09-15T05:31:48+00:00 introduce rollback controllers
-
-- ovn-kubernetes image-amd64 4ddb31314bc3e6372317e4b8f16982d9594e197f to 698c76385e3eed0cbeeee5207bc5023d34b82e1b
-  - e954f008 2025-09-03T12:41:07+02:00 Always enable global IPv6 forwarding
-
-- kubernetes image-amd64 f3d912311b7c3537def4501ef8e15fda821078e5 to d1618535bbc641daee580987e2ccb5fa09f59def
-  - c8bc9ba3d 2025-09-18T12:02:30+00:00 UPSTREAM: <carry>: Don't retry storage calls with side effects.
-
-- ovn-kubernetes image-arm64 4ddb31314bc3e6372317e4b8f16982d9594e197f to 698c76385e3eed0cbeeee5207bc5023d34b82e1b
-  - e954f008 2025-09-03T12:41:07+02:00 Always enable global IPv6 forwarding
-
-- kubernetes image-arm64 f3d912311b7c3537def4501ef8e15fda821078e5 to d1618535bbc641daee580987e2ccb5fa09f59def
-  - c8bc9ba3d 2025-09-18T12:02:30+00:00 UPSTREAM: <carry>: Don't retry storage calls with side effects.
+- cluster-network-operator embedded-component e75d8fa7a0c30a4ad7500b3253f303e051f9ce0b to 800b6ad61dfc6655d8ba9b131fca8fbb54773f71
+  - b1d50df 2025-09-26T14:10:28-07:00 block upgrade if a CNI migration is in progress
+  - 0c7ea27 2025-09-22T13:25:52+00:00 Remove fepan from the OWNERS_ALIASES file
+  - 6d599ba 2025-09-22T13:25:52+00:00 Update CNO reviwers/approvers
+  - de2010c 2025-09-22T13:25:52+00:00 Owners: use aliases for core approvers / reviewers
 
