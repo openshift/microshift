@@ -118,17 +118,17 @@ def get_args_parser():
         description=__doc__,
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
-    subparsers = parser.add_subparsers(dest="command")
-
-    parser_query = subparsers.add_parser(
-        "query", help="Query the RHOCP repositories for all MicroShift RPMs. It's recommended to run this command as root to update the DNF cache.")
-    parser_query.add_argument(
+    parser.add_argument(
         '--ci-job-branch',
         action='store',
         default="",
         dest='ci_job_branch',
         help='The branch the CI job is running against - unnecessary if running the script locally',
     )
+
+    subparsers = parser.add_subparsers(dest="command")
+    parser_query = subparsers.add_parser(
+        "query", help="Query the RHOCP repositories for all MicroShift RPMs. It's recommended to run this command as root to update the DNF cache.")
     parser_query.add_argument(
         '--keep-existing-tags',
         action='store_true',
@@ -153,11 +153,11 @@ def main():
     parser = get_args_parser()
     args = parser.parse_args()
 
-    if args.command == "query":
-        if args.ci_job_branch and not is_branch_synced_with_main(args.ci_job_branch):
-            logging.warning(f"The CI job is running against a branch that is not synced with main: {args.ci_job_branch}")
-            exit(0)
+    if args.ci_job_branch and not is_branch_synced_with_main(args.ci_job_branch):
+        logging.warning(f"The CI job is running against a branch that is not synced with main: {args.ci_job_branch}")
+        exit(0)
 
+    if args.command == "query":
         if os.getuid() != 0:
             logging.warning("Script is not running as root - dnf cache will not be updated.")
 
