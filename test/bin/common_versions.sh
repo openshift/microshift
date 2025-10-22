@@ -98,7 +98,7 @@ export CURRENT_RELEASE_VERSION
 # official 'rhocp' stream.# The previous release repository value should either
 # point to the OpenShift mirror URL or the 'rhocp' repository name.
 PREVIOUS_RELEASE_REPO="rhocp-4.20-for-rhel-9-${UNAME_M}-rpms"
-PREVIOUS_RELEASE_VERSION="$(get_vrel_from_beta "${PREVIOUS_RELEASE_REPO}")"
+PREVIOUS_RELEASE_VERSION="$(get_vrel_from_rhsm "${PREVIOUS_RELEASE_REPO}")"
 export PREVIOUS_RELEASE_REPO
 export PREVIOUS_RELEASE_VERSION
 
