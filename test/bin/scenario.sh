@@ -1127,8 +1127,6 @@ setup_oc_and_kubeconfig_tests() {
 
     # Set up test environment variables
     local kubeconfig="${SCENARIO_INFO_DIR}/${SCENARIO}/kubeconfig"
-    local -r test_results_dir="${SCENARIO_INFO_DIR}/${SCENARIO}/gingko-results"
-    mkdir -p "${test_results_dir}"
 
     # Set up kubeconfig for tests
     local -r vm_ip=$(get_vm_property "${vmname}" "ip")
@@ -1160,6 +1158,8 @@ run_gingko_tests() {
     wait_for_microshift_to_be_ready "${vmname}"
 
     # Create case selection file
+    local -r test_results_dir="${SCENARIO_INFO_DIR}/${SCENARIO}/gingko-results"
+    mkdir -p "${test_results_dir}"
     local case_selected="${test_results_dir}/case_selected"
 
     # Get all MicroShift tests using dry-run
