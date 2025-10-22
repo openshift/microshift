@@ -53,7 +53,7 @@ func TestDefaults(t *testing.T) {
 			t.FailNow()
 		}
 		if !reflect.DeepEqual(got, expected) {
-			t.Errorf("got different than expected:\nA:\t%#v\nB:\t%#v\n\nDiff:\n%s\n\n%s", got, expected, diff.ObjectDiff(expected, got), diff.ObjectGoPrintSideBySide(expected, got))
+			t.Errorf("got different than expected:\nA:\t%#v\nB:\t%#v\n\nDiff:\n%s\n\n%s", got, expected, diff.Diff(expected, got), diff.ObjectGoPrintSideBySide(expected, got))
 		}
 	}
 }

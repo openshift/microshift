@@ -308,15 +308,15 @@ hack/update-vendor-licenses.sh
 kube::log::status "vendor: creating OWNERS file" >&11
 rm -f "vendor/OWNERS"
 cat <<__EOF__ > "vendor/OWNERS"
-See the OWNERS docs at https://go.k8s.io/owners
+# See the OWNERS docs at https://go.k8s.io/owners
 
 options:
   # make root approval non-recursive
   no_parent_owners: true
 approvers:
-- dep-approvers
+  - dep-approvers
 reviewers:
-- dep-reviewers
+  - dep-reviewers
 __EOF__
 
 # === Disallow transitive dependencies on k8s.io/kubernetes

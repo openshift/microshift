@@ -1,6 +1,10 @@
 package config
 
-import "path/filepath"
+import (
+	"path/filepath"
+
+	"github.com/openshift/microshift/pkg/util"
+)
 
 // KubeConfigID identifies the different kubeconfigs managed in the DataDir
 type KubeConfigID string
@@ -26,4 +30,16 @@ func (cfg *Config) KubeConfigAdminPath(id string) string {
 
 func (cfg *Config) KubeConfigRootAdminPath() string {
 	return filepath.Join(DataDir, "resources", string(KubeAdmin))
+}
+
+func (cfg *Config) BootstrapKubeConfigPath() string {
+	return filepath.Join(DataDir, "bootstrap", "kubeconfig")
+}
+
+func (cfg *Config) BootstrapKubeConfigExists() bool {
+	exists, err := util.PathExists(cfg.BootstrapKubeConfigPath())
+	if err != nil {
+		return false
+	}
+	return exists
 }

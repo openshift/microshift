@@ -2842,6 +2842,29 @@ func TestPrintJob(t *testing.T) {
 			// Columns: Name, Status, Completions, Duration, Age
 			expected: []metav1.TableRow{{Cells: []interface{}{"job9", "Terminating", "0/1", "", "0s"}}},
 		},
+		{
+			job: batch.Job{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:              "job10",
+					CreationTimestamp: metav1.Time{Time: time.Now().Add(1.9e9)},
+				},
+				Spec: batch.JobSpec{
+					Completions: nil,
+				},
+				Status: batch.JobStatus{
+					Succeeded: 0,
+					Conditions: []batch.JobCondition{
+						{
+							Type:   batch.JobSuccessCriteriaMet,
+							Status: api.ConditionTrue,
+						},
+					},
+				},
+			},
+			options: printers.GenerateOptions{},
+			// Columns: Name, Status, Completions, Duration, Age
+			expected: []metav1.TableRow{{Cells: []interface{}{"job10", "SuccessCriteriaMet", "0/1", "", "0s"}}},
+		},
 	}
 
 	for i, test := range tests {
@@ -4084,7 +4107,7 @@ func TestPrintControllerRevision(t *testing.T) {
 					CreationTimestamp: metav1.Time{Time: time.Now().Add(1.9e9)},
 					OwnerReferences: []metav1.OwnerReference{
 						{
-							Controller: boolP(true),
+							Controller: ptr.To(true),
 							APIVersion: "apps/v1",
 							Kind:       "DaemonSet",
 							Name:       "foo",
@@ -4102,7 +4125,7 @@ func TestPrintControllerRevision(t *testing.T) {
 					CreationTimestamp: metav1.Time{Time: time.Now().Add(1.9e9)},
 					OwnerReferences: []metav1.OwnerReference{
 						{
-							Controller: boolP(false),
+							Controller: ptr.To(false),
 							Kind:       "ABC",
 							Name:       "foo",
 						},
@@ -4148,10 +4171,6 @@ func TestPrintControllerRevision(t *testing.T) {
 			t.Errorf("%d mismatch: %s", i, cmp.Diff(test.expected, rows))
 		}
 	}
-}
-
-func boolP(b bool) *bool {
-	return &b
 }
 
 func TestPrintConfigMap(t *testing.T) {
@@ -5652,7 +5671,7 @@ func TestPrintStorageClass(t *testing.T) {
 				},
 				Provisioner:          "kubernetes.io/nfs",
 				ReclaimPolicy:        &policyRetain,
-				AllowVolumeExpansion: boolP(true),
+				AllowVolumeExpansion: ptr.To(true),
 				VolumeBindingMode:    &bindModeWait,
 			},
 			expected: []metav1.TableRow{{Cells: []interface{}{"sc6", "kubernetes.io/nfs", "Retain",
