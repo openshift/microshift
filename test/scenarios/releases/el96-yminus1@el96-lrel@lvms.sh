@@ -46,6 +46,9 @@ scenario_run_tests() {
         return 0
     fi
 
+    # Setup oc client and kubeconfig for gingko tests
+    setup_oc_and_kubeconfig_tests host1
+
     # Pre-upgrade: Create LVMS workloads and validate LVMS is working
     echo "INFO: Creating LVMS workloads before upgrade..."
     run_command_on_vm host1 'bash -s' < "${TESTDIR}/../scripts/lvms-helpers/createWorkloads.sh"

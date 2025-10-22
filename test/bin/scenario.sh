@@ -440,6 +440,26 @@ wait_for_ssh() {
     return 1
 }
 
+wait_for_microshift_to_be_ready() {
+    local vmname="${1}"
+    shift
+
+    # Handle RUN_HOST_OVERRIDE
+    vmname=$(apply_host_override "${vmname}")
+
+    # Set up kubeconfig for tests
+    local -r vm_ip=$(get_vm_property "${vmname}" "ip")
+    local -r full_vmname="$(full_vm_name "${vmname}")"
+
+    # Wait for MicroShift to be ready
+    if ! wait_for_greenboot "${full_vmname}" "${vm_ip}"; then
+        record_junit "${vmname}" "pre_test_greenboot_check" "FAILED"
+        popd &>/dev/null
+        exit 1
+    fi
+    record_junit "${vmname}" "pre_test_greenboot_check" "OK"
+}
+
 # Wait for greenboot health check to complete, without checking the results
 wait_for_greenboot() {
     local -r vmname="${1}"
@@ -1041,11 +1061,7 @@ USHIFT_USER: "${USHIFT_USER:-redhat}"
 SSH_PRIV_KEY: "${SSH_PRIVATE_KEY:-}"
 SSH_PORT: ${ssh_port}
 EOF
-        if ! wait_for_greenboot "${full_vmname}" "${vm_ip}"; then
-            record_junit "${vmname}" "pre_test_greenboot_check" "FAILED"
-            return 1
-        fi
-        record_junit "${vmname}" "pre_test_greenboot_check" "OK"
+        wait_for_microshift_to_be_ready "${vmname}"
     fi
 
     # Make sure the test execution times out after a predefined period.
@@ -1082,8 +1098,8 @@ EOF
     fi
 }
 
-# Implementation of Gingko tests
-run_gingko_tests() {
+# Setup oc client and kubeconfig for gingko tests
+setup_oc_and_kubeconfig_tests() {
     local vmname="${1}"
     shift
 
@@ -1118,18 +1134,30 @@ run_gingko_tests() {
     local -r vm_ip=$(get_vm_property "${vmname}" "ip")
     local -r full_vmname="$(full_vm_name "${vmname}")"
 
-    # Wait for MicroShift to be ready
-    if ! wait_for_greenboot "${full_vmname}" "${vm_ip}"; then
-        record_junit "${vmname}" "pre_test_greenboot_check" "FAILED"
-        popd &>/dev/null
-        exit 1
-    fi
-    record_junit "${vmname}" "pre_test_greenboot_check" "OK"
-
     # Get kubeconfig from VM
     run_command_on_vm "${vmname}" "sudo cat /var/lib/microshift/resources/kubeadmin/${vm_ip}/kubeconfig" > "${kubeconfig}"
     export KUBECONFIG="${kubeconfig}"
     record_junit "${vmname}" "setup_kubeconfig" "OK"
+    
+    popd &>/dev/null
+}
+
+# Implementation of Gingko tests
+run_gingko_tests() {
+    local vmname="${1}"
+    shift
+
+    # Handle RUN_HOST_OVERRIDE
+    vmname=$(apply_host_override "${vmname}")
+
+    # Save current directory
+    pushd . &>/dev/null
+
+    # Setup oc client and kubeconfig for gingko tests
+    setup_oc_and_kubeconfig_tests "${vmname}"
+
+    # Wait for MicroShift to be ready
+    wait_for_microshift_to_be_ready "${vmname}"
 
     # Create case selection file
     local case_selected="${test_results_dir}/case_selected"
