@@ -79,7 +79,7 @@ export FAKE_NEXT_MINOR_VERSION=$(( "${MINOR_VERSION}" + 1 ))
 # For a release branch, the current release repository should come from the
 # official 'rhocp' stream.
 CURRENT_RELEASE_REPO="rhocp-4.20-for-rhel-9-$(uname -m)-rpms"
-CURRENT_RELEASE_VERSION="$(get_vrel_from_beta "${CURRENT_RELEASE_REPO}")"
+CURRENT_RELEASE_VERSION="$(get_vrel_from_rhsm "${CURRENT_RELEASE_REPO}")"
 export CURRENT_RELEASE_REPO
 export CURRENT_RELEASE_VERSION
 
