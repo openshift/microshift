@@ -283,11 +283,18 @@ def generate_common_versions(minor_version):
 def main():
     parser = argparse.ArgumentParser(description="Generate common_versions.sh variables.")
     parser.add_argument("minor", type=int, help="The minor version number.")
-
+    parser.add_argument("--update-file", default=False, action="store_true", help="Update test/bin/common_versions.sh file.")
     args = parser.parse_args()
 
     output = generate_common_versions(args.minor)
-    print(output)
+
+    if args.update_file:
+        logging.info("Updating test/bin/common_versions.sh file")
+        dest_file = pathlib.Path(__file__).resolve().parent / '../common_versions.sh'
+        with open(dest_file, 'w') as f:
+            f.write(output)
+    else:
+        print(output)
 
 
 if __name__ == "__main__":
