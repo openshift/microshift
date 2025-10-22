@@ -203,83 +203,92 @@ def get_release_version_string(repo, var_name):
         return None
 
 
-parser = argparse.ArgumentParser(description="Generate common_versions.sh variables.")
-parser.add_argument("minor", type=int, help="The minor version number.")
+def generate_common_versions(minor_version):
+    previous_minor_version = minor_version - 1
+    yminus2_minor_version = minor_version - 2
 
-args = parser.parse_args()
+    # The current release repository comes from the 'rhocp' stream for release
+    # branches, or the OpenShift mirror if only a RC or EC is available. It can
+    # be empty, if no candidate for the current minor has been built yet.
+    logging.info("Getting CURRENT_RELEASE_REPO")
+    current_release_repo = get_microshift_repo(minor_version)
+    current_release_version = get_release_version_string(current_release_repo, "CURRENT_RELEASE_REPO")
 
-minor_version = args.minor
-previous_minor_version = minor_version - 1
-yminus2_minor_version = minor_version - 2
+    # The previous release repository value should either point to the OpenShift
+    # mirror URL or the 'rhocp' repository name.
+    logging.info("Getting PREVIOUS_RELEASE_REPO")
+    previous_release_repo = get_microshift_repo(previous_minor_version)
+    previous_release_version = get_release_version_string(previous_release_repo, "PREVIOUS_RELEASE_REPO")
 
-# The current release repository comes from the 'rhocp' stream for release
-# branches, or the OpenShift mirror if only a RC or EC is available. It can
-# be empty, if no candidate for the current minor has been built yet.
-logging.info("Getting CURRENT_RELEASE_REPO")
-current_release_repo = get_microshift_repo(minor_version)
-current_release_version = get_release_version_string(current_release_repo, "CURRENT_RELEASE_REPO")
+    # The y-2 release repository value should either point to the OpenShift
+    # mirror URL or the 'rhocp' repository name. It should always come from
+    # the 'rhocp' stream.
+    logging.info("Getting YMINUS2_RELEASE_REPO")
+    yminus2_release_repo = get_microshift_repo(yminus2_minor_version)
+    yminus2_release_version = get_release_version_string(yminus2_release_repo, "YMINUS2_RELEASE_REPO")
 
-# The previous release repository value should either point to the OpenShift
-# mirror URL or the 'rhocp' repository name.
-logging.info("Getting PREVIOUS_RELEASE_REPO")
-previous_release_repo = get_microshift_repo(previous_minor_version)
-previous_release_version = get_release_version_string(previous_release_repo, "PREVIOUS_RELEASE_REPO")
+    # The 'rhocp_minor_y' variable should be the minor version number, if the
+    # current release is available through the 'rhocp' stream, otherwise empty.
+    rhocp_minor_y = minor_version if repo_provides_pkg(f"rhocp-4.{minor_version}-for-rhel-9-{ARCH}-rpms", "cri-o") else '""'
 
-# The y-2 release repository value should either point to the OpenShift
-# mirror URL or the 'rhocp' repository name. It should always come from
-# the 'rhocp' stream.
-logging.info("Getting YMINUS2_RELEASE_REPO")
-yminus2_release_repo = get_microshift_repo(yminus2_minor_version)
-yminus2_release_version = get_release_version_string(yminus2_release_repo, "YMINUS2_RELEASE_REPO")
+    # The beta repository, containing dependencies, should point to the
+    # OpenShift mirror URL. If the mirror for current minor is not
+    # available yet, it should point to an older release.
+    logging.info("Getting RHOCP_MINOR_Y_BETA")
+    rhocp_minor_y_beta = get_dependencies_repo_url(minor_version, 3)
 
-# The 'rhocp_minor_y' variable should be the minor version number, if the
-# current release is available through the 'rhocp' stream, otherwise empty.
-rhocp_minor_y = minor_version if repo_provides_pkg(f"rhocp-4.{minor_version}-for-rhel-9-{ARCH}-rpms", "cri-o") else '""'
+    # The 'rhocp_minor_y' variable should be the previous minor version number, if
+    # the previous release is available through the 'rhocp' stream, otherwise empty.
+    rhocp_minor_y1 = previous_minor_version if repo_provides_pkg(f"rhocp-4.{previous_minor_version}-for-rhel-9-{ARCH}-rpms", "cri-o") else '""'
 
-# The beta repository, containing dependencies, should point to the
-# OpenShift mirror URL. If the mirror for current minor is not
-# available yet, it should point to an older release.
-logging.info("Getting RHOCP_MINOR_Y_BETA")
-rhocp_minor_y_beta = get_dependencies_repo_url(minor_version, 3)
+    # The beta repository, containing dependencies, should point to the
+    # OpenShift mirror URL. The mirror for previous release should always
+    # be available.
+    logging.info("Getting RHOCP_MINOR_Y1_BETA")
+    rhocp_minor_y1_beta = get_dependencies_repo_url(previous_minor_version)
 
-# The 'rhocp_minor_y' variable should be the previous minor version number, if
-# the previous release is available through the 'rhocp' stream, otherwise empty.
-rhocp_minor_y1 = previous_minor_version if repo_provides_pkg(f"rhocp-4.{previous_minor_version}-for-rhel-9-{ARCH}-rpms", "cri-o") else '""'
+    # The 'rhocp_minor_y2' should always be the y-2 minor version number.
+    rhocp_minor_y2 = yminus2_minor_version
 
-# The beta repository, containing dependencies, should point to the
-# OpenShift mirror URL. The mirror for previous release should always
-# be available.
-logging.info("Getting RHOCP_MINOR_Y1_BETA")
-rhocp_minor_y1_beta = get_dependencies_repo_url(previous_minor_version)
+    template_path = pathlib.Path(__file__).resolve().parent / '../../assets/common_versions.sh.template'
 
-# The 'rhocp_minor_y2' should always be the y-2 minor version number.
-rhocp_minor_y2 = yminus2_minor_version
+    with open(template_path, 'r') as f:
+        template_string = f.read()
 
-template_path = pathlib.Path(__file__).resolve().parent / '../../assets/common_versions.sh.template'
+    output = template_string.format(
+        minor_version=minor_version,
+        current_release_repo=current_release_repo,
+        current_release_version=current_release_version,
+        previous_release_repo=previous_release_repo,
+        previous_release_version=previous_release_version,
+        yminus2_release_repo=yminus2_release_repo,
+        yminus2_release_version=yminus2_release_version,
+        rhocp_minor_y=rhocp_minor_y,
+        rhocp_minor_y_beta=rhocp_minor_y_beta,
+        rhocp_minor_y1=rhocp_minor_y1,
+        rhocp_minor_y1_beta=rhocp_minor_y1_beta,
+        rhocp_minor_y2=rhocp_minor_y2,
+        CNCF_SONOBUOY_VERSION=CNCF_SONOBUOY_VERSION,
+        CNCF_SYSTEMD_LOGS_VERSION=CNCF_SYSTEMD_LOGS_VERSION,
+        GITOPS_VERSION=GITOPS_VERSION,
+        LATEST_RELEASE_TYPE=LATEST_RELEASE_TYPE,
+        ARCH=ARCH
+    )
 
-with open(template_path, 'r') as f:
-    template_string = f.read()
+    output_noarch = output.replace(ARCH, '${UNAME_M}')
 
-output = template_string.format(
-    minor_version=minor_version,
-    current_release_repo=current_release_repo,
-    current_release_version=current_release_version,
-    previous_release_repo=previous_release_repo,
-    previous_release_version=previous_release_version,
-    yminus2_release_repo=yminus2_release_repo,
-    yminus2_release_version=yminus2_release_version,
-    rhocp_minor_y=rhocp_minor_y,
-    rhocp_minor_y_beta=rhocp_minor_y_beta,
-    rhocp_minor_y1=rhocp_minor_y1,
-    rhocp_minor_y1_beta=rhocp_minor_y1_beta,
-    rhocp_minor_y2=rhocp_minor_y2,
-    CNCF_SONOBUOY_VERSION=CNCF_SONOBUOY_VERSION,
-    CNCF_SYSTEMD_LOGS_VERSION=CNCF_SYSTEMD_LOGS_VERSION,
-    GITOPS_VERSION=GITOPS_VERSION,
-    LATEST_RELEASE_TYPE=LATEST_RELEASE_TYPE,
-    ARCH=ARCH
-)
+    return output_noarch
 
-output_noarch = output.replace(ARCH, '${UNAME_M}')
 
-print(output_noarch)
+def main():
+    parser = argparse.ArgumentParser(description="Generate common_versions.sh variables.")
+    parser.add_argument("minor", type=int, help="The minor version number.")
+
+    args = parser.parse_args()
+
+    output = generate_common_versions(args.minor)
+    print(output)
+
+
+if __name__ == "__main__":
+    main()
