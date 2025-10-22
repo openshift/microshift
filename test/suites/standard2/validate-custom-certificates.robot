@@ -4,6 +4,7 @@ Documentation       Tests custom certificates functionality
 Resource            ../../resources/microshift-config.resource
 Resource            ../../resources/microshift-process.resource
 Resource            ../../resources/openssl.resource
+Resource            ../../resources/hosts.resource
 Library             ../../resources/journalctl.py
 
 Suite Setup         Setup
@@ -175,25 +176,6 @@ Configure Named Certificates
         ...    \ \ \ \ - ${sni}
     END
     Drop In MicroShift Config    ${subject_alt_names}    10-subjectAltNames
-
-Generate Random HostName
-    [Documentation]    Generate Random Hostname
-    ${rand}=    Generate Random String
-    ${rand}=    Convert To Lower Case    ${rand}
-    RETURN    ${rand}.api.com
-
-Add Entry To Hosts
-    [Documentation]    Add new entry to local /etc/hosts
-    [Arguments]    ${ip}    ${host}
-    VAR    ${ttt}=    ${ip}\t${host} # RF test marker\n
-    ${result}=    Run Process    sudo tee -a /etc/hosts    shell=True    stdin=${ttt}
-    Should Be Equal As Integers    ${result.rc}    0
-
-Remove Entry From Hosts
-    [Documentation]    Removes entry from local /etc/hosts
-    [Arguments]    ${host}
-    ${result}=    Run Process    sudo sed -i "/${host} # RF test marker/d" /etc/hosts    shell=True
-    Should Be Equal As Integers    ${result.rc}    0
 
 Replace Server In Kubeconfig
     [Documentation]    replace the server part of kubeconfig
