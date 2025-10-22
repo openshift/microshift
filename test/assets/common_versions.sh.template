@@ -46,7 +46,7 @@ get_vrel_from_rpm() {{
     local -r rpm_dir="$1"
 
     # exit if rpm_dir directory does not exist
-    if [ ! -d "${rpm_dir}" ]; then
+    if [ ! -d "${{rpm_dir}}" ]; then
         echo ""
         return
     fi
