@@ -365,8 +365,6 @@ def main():
 
     gh.post_comment(pull_req, comment, _extra_msgs)
 
-    gh.post_comment(pull_req, '/verified by automatic-rebase')
-
     g.remove_remote_with_token()
     sys.exit(0 if rebase_result.success else 1)
 
