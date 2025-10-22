@@ -97,7 +97,7 @@ export CURRENT_RELEASE_VERSION
 # For a release branch, the previous release repository should come from the
 # official 'rhocp' stream.# The previous release repository value should either
 # point to the OpenShift mirror URL or the 'rhocp' repository name.
-PREVIOUS_RELEASE_REPO="https://mirror.openshift.com/pub/openshift-v4/${UNAME_M}/microshift/ocp/latest-4.20/el9/os"
+PREVIOUS_RELEASE_REPO="rhocp-4.20-for-rhel-9-${UNAME_M}-rpms"
 PREVIOUS_RELEASE_VERSION="$(get_vrel_from_beta "${PREVIOUS_RELEASE_REPO}")"
 export PREVIOUS_RELEASE_REPO
 export PREVIOUS_RELEASE_VERSION
@@ -122,7 +122,7 @@ export RHOCP_MINOR_Y_BETA
 
 # The 'rhocp_minor_y' variable should be the previous minor version number, if
 # the previous release is available through the 'rhocp' stream, otherwise empty.
-RHOCP_MINOR_Y1=""
+RHOCP_MINOR_Y1="20"
 # The beta repository, containing dependencies, should point to the
 # OpenShift mirror URL. The mirror for previous release should always
 # be available.
