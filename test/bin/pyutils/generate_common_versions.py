@@ -323,9 +323,11 @@ def main():
         g.commit("Update common_versions.sh")
         g.push(new_branch_name)
 
-        # Assuming the script always runs against `release-4.y` branch for the value in brackets.
-        pr_title = f"[{base_branch}] NO-ISSUE: Update common_versions.sh"
-        gh.create_pr(base_branch, new_branch_name, pr_title, "")
+        pull_req = gh.get_existing_pr_for_a_branch(base_branch, new_branch_name)
+        if pull_req is None:
+            # Assuming the script always runs against `release-4.y` branch for the value in brackets.
+            pr_title = f"[{base_branch}] NO-ISSUE: Update common_versions.sh"
+            gh.create_pr(base_branch, new_branch_name, pr_title, "")
 
 
 if __name__ == "__main__":
