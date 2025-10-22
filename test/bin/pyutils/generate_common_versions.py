@@ -28,7 +28,7 @@ LATEST_RELEASE_TYPE = "ec"
 
 logging.basicConfig(
     level=logging.INFO,
-    format='%(levelname)s: %(message)s',
+    format='%(asctime)s %(levelname)-8s [%(filename)s:%(lineno)d] %(message)s',
     stream=sys.stderr
 )
 
