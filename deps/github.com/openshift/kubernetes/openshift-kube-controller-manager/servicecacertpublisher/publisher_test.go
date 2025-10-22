@@ -141,7 +141,7 @@ func TestConfigMapCreation(t *testing.T) {
 
 			actions := client.Actions()
 			if reflect.DeepEqual(actions, tc.ExpectActions) {
-				t.Errorf("Unexpected actions:\n%s", diff.ObjectGoPrintDiff(actions, tc.ExpectActions))
+				t.Errorf("Unexpected actions:\n%s", diff.Diff(actions, tc.ExpectActions))
 			}
 		})
 	}

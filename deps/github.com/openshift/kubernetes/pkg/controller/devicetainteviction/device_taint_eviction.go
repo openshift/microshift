@@ -27,19 +27,19 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/google/go-cmp/cmp" //nolint:depguard // Discouraged for production use (https://github.com/kubernetes/kubernetes/issues/104821) but has no good alternative for logging.
-
 	v1 "k8s.io/api/core/v1"
-	resourceapi "k8s.io/api/resource/v1beta1"
+	resourceapi "k8s.io/api/resource/v1"
 	apiequality "k8s.io/apimachinery/pkg/api/equality"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/apimachinery/pkg/util/diff"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/apimachinery/pkg/util/sets"
+	utilfeature "k8s.io/apiserver/pkg/util/feature"
 	coreinformers "k8s.io/client-go/informers/core/v1"
+	resourceinformers "k8s.io/client-go/informers/resource/v1"
 	resourcealphainformers "k8s.io/client-go/informers/resource/v1alpha3"
-	resourceinformers "k8s.io/client-go/informers/resource/v1beta1"
 	clientset "k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/kubernetes/scheme"
 	v1core "k8s.io/client-go/kubernetes/typed/core/v1"
@@ -52,6 +52,7 @@ import (
 	apipod "k8s.io/kubernetes/pkg/api/v1/pod"
 	"k8s.io/kubernetes/pkg/controller/devicetainteviction/metrics"
 	"k8s.io/kubernetes/pkg/controller/tainteviction"
+	"k8s.io/kubernetes/pkg/features"
 	utilpod "k8s.io/kubernetes/pkg/util/pod"
 )
 
@@ -166,11 +167,7 @@ func (p pool) getTaintedDevices() []taintedDevice {
 			continue
 		}
 		for _, device := range slice.Spec.Devices {
-			if device.Basic == nil {
-				// Unknown device type, not supported.
-				continue
-			}
-			for _, taint := range device.Basic.Taints {
+			for _, taint := range device.Taints {
 				if taint.Effect != resourceapi.DeviceTaintEffectNoExecute {
 					continue
 				}
@@ -187,18 +184,14 @@ func (p pool) getTaintedDevices() []taintedDevice {
 }
 
 // getDevice looks up one device by name. Out-dated slices are ignored.
-func (p pool) getDevice(deviceName string) *resourceapi.BasicDevice {
+func (p pool) getDevice(deviceName string) *resourceapi.Device {
 	for slice := range p.slices {
 		if slice.Spec.Pool.Generation != p.maxGeneration {
 			continue
 		}
-		for _, device := range slice.Spec.Devices {
-			if device.Basic == nil {
-				// Unknown device type, not supported.
-				continue
-			}
-			if device.Name == deviceName {
-				return device.Basic
+		for i := range slice.Spec.Devices {
+			if slice.Spec.Devices[i].Name == deviceName {
+				return &slice.Spec.Devices[i]
 			}
 		}
 	}
@@ -467,11 +460,12 @@ func (tc *Controller) Run(ctx context.Context) error {
 	tc.haveSynced = append(tc.haveSynced, podHandler.HasSynced)
 
 	opts := resourceslicetracker.Options{
-		EnableDeviceTaints: true,
-		SliceInformer:      tc.sliceInformer,
-		TaintInformer:      tc.taintInformer,
-		ClassInformer:      tc.classInformer,
-		KubeClient:         tc.client,
+		EnableDeviceTaints:       true,
+		EnableConsumableCapacity: utilfeature.DefaultFeatureGate.Enabled(features.DRAConsumableCapacity),
+		SliceInformer:            tc.sliceInformer,
+		TaintInformer:            tc.taintInformer,
+		ClassInformer:            tc.classInformer,
+		KubeClient:               tc.client,
 	}
 	sliceTracker, err := resourceslicetracker.StartTracker(ctx, opts)
 	if err != nil {
@@ -546,7 +540,7 @@ func (tc *Controller) handleClaimChange(oldClaim, newClaim *resourceapi.Resource
 	name := newNamespacedName(claim)
 	if tc.eventLogger != nil {
 		// This is intentionally very verbose for debugging.
-		tc.eventLogger.Info("ResourceClaim changed", "claimObject", name, "oldClaim", klog.Format(oldClaim), "newClaim", klog.Format(newClaim), "diff", cmp.Diff(oldClaim, newClaim))
+		tc.eventLogger.Info("ResourceClaim changed", "claimObject", name, "oldClaim", klog.Format(oldClaim), "newClaim", klog.Format(newClaim), "diff", diff.Diff(oldClaim, newClaim))
 	}
 
 	// Deleted?
@@ -686,7 +680,7 @@ func (tc *Controller) handleSliceChange(oldSlice, newSlice *resourceapi.Resource
 	}
 	if tc.eventLogger != nil {
 		// This is intentionally very verbose for debugging.
-		tc.eventLogger.Info("ResourceSlice changed", "pool", poolID, "oldSlice", klog.Format(oldSlice), "newSlice", klog.Format(newSlice), "diff", cmp.Diff(oldSlice, newSlice))
+		tc.eventLogger.Info("ResourceSlice changed", "pool", poolID, "oldSlice", klog.Format(oldSlice), "newSlice", klog.Format(newSlice), "diff", diff.Diff(oldSlice, newSlice))
 	}
 
 	// Determine old and new device taints. Only devices
@@ -784,7 +778,7 @@ func (tc *Controller) handlePodChange(oldPod, newPod *v1.Pod) {
 	}
 	if tc.eventLogger != nil {
 		// This is intentionally very verbose for debugging.
-		tc.eventLogger.Info("Pod changed", "pod", klog.KObj(pod), "oldPod", klog.Format(oldPod), "newPod", klog.Format(newPod), "diff", cmp.Diff(oldPod, newPod))
+		tc.eventLogger.Info("Pod changed", "pod", klog.KObj(pod), "oldPod", klog.Format(oldPod), "newPod", klog.Format(newPod), "diff", diff.Diff(oldPod, newPod))
 	}
 	if newPod == nil {
 		// Nothing left to do for it. No need to emit an event here, it's gone.
