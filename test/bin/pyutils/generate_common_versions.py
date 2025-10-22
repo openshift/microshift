@@ -11,6 +11,10 @@ import argparse
 import logging
 import pathlib
 
+sys.path.append(str(pathlib.Path(__file__).resolve().parent / '../../../scripts/pyutils'))
+import gitutils  # noqa: E402
+import ghutils   # noqa: E402
+
 ARCH = os.uname().machine
 
 # The version of Sonobuoy package used in CNCF tests.
@@ -284,17 +288,44 @@ def main():
     parser = argparse.ArgumentParser(description="Generate common_versions.sh variables.")
     parser.add_argument("minor", type=int, help="The minor version number.")
     parser.add_argument("--update-file", default=False, action="store_true", help="Update test/bin/common_versions.sh file.")
+    parser.add_argument("--create-pr", default=False, action="store_true",
+                        help=("Commit the changes to a new branch, push it to the openshift/microshift, and create a pull request." +
+                              "Implies --update-file. Expects following env vars to be set: ORG, REPO, GH_TOKEN or APP_ID and KEY"))
+    parser.add_argument("--dry-run", default=False, action="store_true", help="Dry run")
     args = parser.parse_args()
 
     output = generate_common_versions(args.minor)
 
-    if args.update_file:
+    if args.update_file or args.create_pr:
         logging.info("Updating test/bin/common_versions.sh file")
         dest_file = pathlib.Path(__file__).resolve().parent / '../common_versions.sh'
         with open(dest_file, 'w') as f:
             f.write(output)
     else:
         print(output)
+
+    if args.create_pr:
+        g = gitutils.GitUtils(dry_run=args.dry_run)
+        if not g.file_changed("test/bin/common_versions.sh"):
+            logging.info("No changes to test/bin/common_versions.sh")
+            exit(0)
+
+        base_branch = g.git_repo.active_branch.name
+        if not base_branch.startswith("release-4"):
+            logging.error(f"Script is expected to be executed on branch starting with 'release-4', but it's {base_branch}")
+            exit(1)
+
+        gh = ghutils.GithubUtils(dry_run=args.dry_run)
+        g.setup_remote_with_token(gh.token, gh.org, gh.repo)
+        new_branch_name = f"{base_branch}-common-versions-update"
+        g.checkout_branch(new_branch_name)
+        g.add_file_to_staging_area("test/bin/common_versions.sh")
+        g.commit("Update common_versions.sh")
+        g.push(new_branch_name)
+
+        # Assuming the script always runs against `release-4.y` branch for the value in brackets.
+        pr_title = f"[{base_branch}] NO-ISSUE: Update common_versions.sh"
+        gh.create_pr(base_branch, new_branch_name, pr_title, "")
 
 
 if __name__ == "__main__":
