@@ -319,7 +319,7 @@ def main():
         g.setup_remote_with_token(gh.token, gh.org, gh.repo)
         new_branch_name = f"{base_branch}-common-versions-update"
         g.checkout_branch(new_branch_name)
-        g.add_file_to_staging_area("test/bin/common_versions.sh")
+        g.add_files_to_staging_area(["test/bin/common_versions.sh"])
         g.commit("Update common_versions.sh")
         g.push(new_branch_name)
 
