@@ -5,10 +5,12 @@ Library             Collections
 Library             OperatingSystem
 Library             Process
 Library             String
+Library             ../../resources/journalctl.py
 Resource            ../../resources/common.resource
 Resource            ../../resources/kubeconfig.resource
 Resource            ../../resources/oc.resource
 Resource            ../../resources/microshift-network.resource
+Resource            ../../resources/microshift-process.resource
 
 Suite Setup         Setup Suite With Namespace
 Suite Teardown      Teardown Suite With Namespace
@@ -42,6 +44,7 @@ ${PEBBLE_DEPLOYMENT_FILE}       ./assets/cert-manager/pebble-server.yaml
 Create Ingress route with Custom certificate
     [Documentation]    Create route with a custom certificate
     [Setup]    Run Keywords
+    Verify Cert Manager Kustomization Success
     ${cert_issuer_yaml}=    Create Cert Issuer YAML
     Apply YAML Manifest    ${cert_issuer_yaml}
     Oc Wait    -n ${NAMESPACE} clusterissuer ${ISSUER_NAME}    --for="condition=Ready" --timeout=120s
@@ -364,3 +367,14 @@ Remove DNS Configuration
     Oc Wait
     ...    -n openshift-dns pod -l dns.operator.openshift.io/daemonset-dns=default
     ...    --for=condition=Ready --timeout=60s
+
+Verify Cert Manager Kustomization Success
+    [Documentation]    Verify that cert-manager kustomization was successfully applied by checking journalctl logs
+    ${cursor}=    Get Journal Cursor
+    Restart MicroShift
+    Pattern Should Appear In Log Output
+    ...    ${cursor}
+    ...    Applying kustomization at /usr/lib/microshift/manifests.d/060-microshift-cert-manager was successful
+    ...    unit=microshift
+    ...    retries=6
+    ...    wait=5
