@@ -576,7 +576,7 @@ def main():
     post_comment(pull_req, '/verified by automatic-rebase')
 
     git_remote.remove(git_repo, BOT_REMOTE_NAME)
-    sys.exit(0 if rebase_result.success else 1)
+    sys.exit(0 if rebases_succeeded else 1)
 
 
 if __name__ == "__main__":
