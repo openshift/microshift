@@ -1,19 +1,33 @@
-- cluster-network-operator embedded-component b3b281c37120b57834417e1399ea27969e33b2ea to eec368f2985d93c136785b6f37bdd39559a1cf4c
-  - c5aacca 2025-10-02T12:56:11+01:00 Add drop flows for GARPs
+- kubernetes embedded-component e2e5d628ce43695982002737a4d1f1c6eb30eb11 to 0ee04c7e38c5c04c6ca854ce4a095d58d3ea6c53
+  - 2c61e8e79 2025-10-13T14:52:29-07:00 UPSTREAM: <carry>: Make streaming collection encoding off by default
+  - 1b3519c72 2025-10-13T14:51:43-07:00 UPSTREAM: <carry>: Switch test to gofuzz
+  - f346c26c0 2025-10-13T14:51:37-07:00 UPSTREAM: 129407: Implement streaming proto encoding
+  - dbe6d7fd0 2025-10-13T14:51:12-07:00 UPSTREAM: 130511: Implement tests for encoding collections in Proto
+  - b00d3d6fb 2025-10-13T14:51:07-07:00 UPSTREAM: 129334: Streaming JSON encoder for List
+  - 64d5177d5 2025-10-08T13:39:59-07:00 UPSTREAM: 130220: Add tests for encoding collections in JSON for KEP-5116
+  - c51558694 2025-10-08T13:39:39-07:00 UPSTREAM: 130281: Implement chunking for gzip encoder in deferredResponseWriter
+  - d7c6a6a75 2025-10-08T13:39:09-07:00 UPSTREAM: 130190: Add a test to validate deferredResponseWriteron multiple write calls
 
-- machine-config-operator embedded-component 0f7ca82c30f45e9c7d26279e920b63bbf233e130 to ca2de0f716f1917c85ec78c09d61e0d0c01cdad0
-  - ca678bdf 2025-10-02T12:49:27+01:00 Networking: reset ovn-remote config and allow ovnkube controller to set it
-  - eb95e7a5 2025-08-04T20:58:37+00:00 OCPBUGS-55971: Enable debug logging for nodeip-configuration
+- machine-config-operator embedded-component ca2de0f716f1917c85ec78c09d61e0d0c01cdad0 to 6027b8f9bec4175d8a4059c1f8a86569731ddafb
+  - 4afc12ea 2025-10-21T09:25:26+00:00 msbic: fix arch annotation check
 
-- ovn-kubernetes image-amd64 03fb01368e68a94b949cf0a16f5bd5d34f853d0b to 0466cfde84ccfe8595b7be427aaf4fb47d8078a5
-  - 23961305 2025-10-08T13:03:10+01:00 [IC][EIP] OCPBUGS-42303: Fix race between SB DB and OVN-Controller
-  - 3b039fea 2025-10-08T13:03:05+01:00 Node controller shutdown: do not ref gateway if not set
-  - 5b538031 2025-10-08T13:03:01+01:00 ovn-controller: block GARP during startup
-  - 70579484 2025-10-08T13:02:52+01:00 Fix ovnkube-controller-with-node shutdown sequence
+- kubernetes image-amd64 e2e5d628ce43695982002737a4d1f1c6eb30eb11 to 0ee04c7e38c5c04c6ca854ce4a095d58d3ea6c53
+  - 2c61e8e79 2025-10-13T14:52:29-07:00 UPSTREAM: <carry>: Make streaming collection encoding off by default
+  - 1b3519c72 2025-10-13T14:51:43-07:00 UPSTREAM: <carry>: Switch test to gofuzz
+  - f346c26c0 2025-10-13T14:51:37-07:00 UPSTREAM: 129407: Implement streaming proto encoding
+  - dbe6d7fd0 2025-10-13T14:51:12-07:00 UPSTREAM: 130511: Implement tests for encoding collections in Proto
+  - b00d3d6fb 2025-10-13T14:51:07-07:00 UPSTREAM: 129334: Streaming JSON encoder for List
+  - 64d5177d5 2025-10-08T13:39:59-07:00 UPSTREAM: 130220: Add tests for encoding collections in JSON for KEP-5116
+  - c51558694 2025-10-08T13:39:39-07:00 UPSTREAM: 130281: Implement chunking for gzip encoder in deferredResponseWriter
+  - d7c6a6a75 2025-10-08T13:39:09-07:00 UPSTREAM: 130190: Add a test to validate deferredResponseWriteron multiple write calls
 
-- ovn-kubernetes image-arm64 03fb01368e68a94b949cf0a16f5bd5d34f853d0b to 0466cfde84ccfe8595b7be427aaf4fb47d8078a5
-  - 23961305 2025-10-08T13:03:10+01:00 [IC][EIP] OCPBUGS-42303: Fix race between SB DB and OVN-Controller
-  - 3b039fea 2025-10-08T13:03:05+01:00 Node controller shutdown: do not ref gateway if not set
-  - 5b538031 2025-10-08T13:03:01+01:00 ovn-controller: block GARP during startup
-  - 70579484 2025-10-08T13:02:52+01:00 Fix ovnkube-controller-with-node shutdown sequence
+- kubernetes image-arm64 e2e5d628ce43695982002737a4d1f1c6eb30eb11 to 0ee04c7e38c5c04c6ca854ce4a095d58d3ea6c53
+  - 2c61e8e79 2025-10-13T14:52:29-07:00 UPSTREAM: <carry>: Make streaming collection encoding off by default
+  - 1b3519c72 2025-10-13T14:51:43-07:00 UPSTREAM: <carry>: Switch test to gofuzz
+  - f346c26c0 2025-10-13T14:51:37-07:00 UPSTREAM: 129407: Implement streaming proto encoding
+  - dbe6d7fd0 2025-10-13T14:51:12-07:00 UPSTREAM: 130511: Implement tests for encoding collections in Proto
+  - b00d3d6fb 2025-10-13T14:51:07-07:00 UPSTREAM: 129334: Streaming JSON encoder for List
+  - 64d5177d5 2025-10-08T13:39:59-07:00 UPSTREAM: 130220: Add tests for encoding collections in JSON for KEP-5116
+  - c51558694 2025-10-08T13:39:39-07:00 UPSTREAM: 130281: Implement chunking for gzip encoder in deferredResponseWriter
+  - d7c6a6a75 2025-10-08T13:39:09-07:00 UPSTREAM: 130190: Add a test to validate deferredResponseWriteron multiple write calls
 
