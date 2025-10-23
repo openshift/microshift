@@ -1,8 +1,13 @@
-- ovn-kubernetes image-amd64 82ce0167fce4994b6b9286b509f8cbdd2c65f253 to 041b2edeb54b1416c0f842b45a73c1e131adb86a
-  - 8f0fca03 2025-10-09T17:10:48+05:30 dnsnameresolver: add unit test for DNSNameResolver resource update
-  - d5a781f6 2025-10-09T17:10:01+05:30 dnsnameresolver: fix ever growing address set
+- machine-config-operator embedded-component f367312c9951268ea8355e5ebb854af05cb4256f to ba7a2ae01487bd1aef1ae83e7c2e8a36d486cd96
+  - 2f19d4c1 2025-10-14T15:06:04+00:00 crc & kcc: Before deleting a degraded MC, ensure that the annotations have not been updated since the last check
 
-- ovn-kubernetes image-arm64 82ce0167fce4994b6b9286b509f8cbdd2c65f253 to 041b2edeb54b1416c0f842b45a73c1e131adb86a
-  - 8f0fca03 2025-10-09T17:10:48+05:30 dnsnameresolver: add unit test for DNSNameResolver resource update
-  - d5a781f6 2025-10-09T17:10:01+05:30 dnsnameresolver: fix ever growing address set
+- kubernetes image-arm64 e7452e1231c1d182a9e47214e5363949d8807f77 to ff6c884c3d829c5e8e0d26eb8088b976c908cef1
+  - a94a78e8b 2025-10-10T13:31:20-07:00 UPSTREAM: <carry>: Make streaming collection encoding off by default
+  - fa910ed92 2025-10-10T13:28:57-07:00 UPSTREAM: <carry>: Switch test to gofuzz
+  - 9e1fc3f4e 2025-10-10T13:28:52-07:00 UPSTREAM: 129407: Implement streaming proto encoding
+  - 3658eacdc 2025-10-10T13:28:29-07:00 UPSTREAM: 130511: Implement tests for encoding collections in Proto
+  - 0e5b5e8da 2025-10-10T13:28:19-07:00 UPSTREAM: 129334: Streaming JSON encoder for List
+  - e41d50f35 2025-10-08T14:47:43-07:00 UPSTREAM: 130220: Add tests for encoding collections in JSON for KEP-5116
+  - 116aee84e 2025-10-08T14:45:22-07:00 UPSTREAM: 130281: Implement chunking for gzip encoder in deferredResponseWriter
+  - e24b655e1 2025-10-08T14:44:52-07:00 UPSTREAM: 130190: Add a test to validate deferredResponseWriteron multiple write calls
 
