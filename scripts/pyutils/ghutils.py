@@ -43,7 +43,7 @@ class GithubUtils:
         app_id = try_get_env(APP_ID_ENV, die=True)
         key_path = try_get_env(KEY_ENV, die=True)
         integration = GithubIntegration(app_id, Path(key_path).read_text(encoding='utf-8'))
-        app_installation = integration.get_installation(self.org, self.repo)
+        app_installation = integration.get_repo_installation(self.org, self.repo)
         if app_installation is None:
             sys.exit(f"Failed to get app_installation for {self.org}/{self.repo}. " +
                      f"Response: {app_installation.raw_data}")
