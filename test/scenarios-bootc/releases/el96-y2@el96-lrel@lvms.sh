@@ -19,7 +19,7 @@ scenario_create_vms() {
         return 0
     fi
     prepare_kickstart host1 kickstart-bootc.ks.template "${start_image}"
-    launch_vm --boot_blueprint rhel96-bootc --vm_disksize 50
+    launch_vm --boot_blueprint rhel96-bootc
 }
 
 scenario_remove_vms() {

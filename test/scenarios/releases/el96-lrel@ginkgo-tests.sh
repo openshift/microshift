@@ -11,7 +11,7 @@ scenario_create_vms() {
     fi
 
     prepare_kickstart host1 kickstart.ks.template "${start_image}"
-    launch_vm --vm_disksize 30
+    launch_vm
 }
 
 scenario_remove_vms() {

@@ -283,7 +283,6 @@ gettool_ginkgo() {
         return 1
     fi
 
-    set -x
     pushd "${clone_dir}" &>/dev/null
 
     # Checkout a valid commit to be sure ginkgo tests are working
@@ -317,7 +316,6 @@ gettool_ginkgo() {
         return 1
     fi
     popd &>/dev/null
-    set +x
 }
 
 tool_getters=$(declare -F | awk '$3 ~ /^gettool_/ {print $3}' | sed 's/^gettool_//g')
