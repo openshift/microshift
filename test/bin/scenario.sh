@@ -1099,7 +1099,7 @@ EOF
 }
 
 # Setup oc client and kubeconfig for gingko tests
-setup_oc_and_kubeconfig_tests() {
+setup_oc_and_kubeconfig() {
     local vmname="${1}"
     shift
 
@@ -1109,7 +1109,7 @@ setup_oc_and_kubeconfig_tests() {
     # Save current directory
     pushd . &>/dev/null
 
-    # Check/install oc
+    # Install oc
     if ! command -v oc &> /dev/null ; then
         "${ROOTDIR}/scripts/fetch_tools.sh" "oc" || {
             record_junit "${vmname}" "oc_installed" "FAILED"
@@ -1118,22 +1118,16 @@ setup_oc_and_kubeconfig_tests() {
     fi
     record_junit "${vmname}" "oc_installed" "OK"
 
-    # Build ginkgo binary
-    if ! "${ROOTDIR}/scripts/fetch_tools.sh" "ginkgo"; then
-        record_junit "${vmname}" "build_ginkgo_binary" "FAILED"
-        exit 1
-    fi
-    record_junit "${vmname}" "build_ginkgo_binary" "OK"
-
-    # Set up test environment variables
-    local kubeconfig="${SCENARIO_INFO_DIR}/${SCENARIO}/kubeconfig"
-
-    # Set up kubeconfig for tests
-    local -r vm_ip=$(get_vm_property "${vmname}" "ip")
-    local -r full_vmname="$(full_vm_name "${vmname}")"
+    # Wait for MicroShift to be ready
+    wait_for_microshift_to_be_ready "${vmname}"
 
     # Get kubeconfig from VM
-    run_command_on_vm "${vmname}" "sudo cat /var/lib/microshift/resources/kubeadmin/${vm_ip}/kubeconfig" > "${kubeconfig}"
+    local -r vm_ip=$(get_vm_property "${vmname}" "ip")
+    local kubeconfig="${SCENARIO_INFO_DIR}/${SCENARIO}/kubeconfig"
+    if ! run_command_on_vm "${vmname}" "sudo cat /var/lib/microshift/resources/kubeadmin/${vm_ip}/kubeconfig" > "${kubeconfig}"; then
+        record_junit "${vmname}" "setup_kubeconfig" "FAILED"
+        exit 1
+    fi
     export KUBECONFIG="${kubeconfig}"
     record_junit "${vmname}" "setup_kubeconfig" "OK"
     
@@ -1151,11 +1145,15 @@ run_gingko_tests() {
     # Save current directory
     pushd . &>/dev/null
 
-    # Wait for MicroShift to be ready
-    wait_for_microshift_to_be_ready "${vmname}"
-
     # Setup oc client and kubeconfig for gingko tests
-    setup_oc_and_kubeconfig_tests "${vmname}"
+    setup_oc_and_kubeconfig "${vmname}"
+
+    # Build ginkgo binary
+    if ! "${ROOTDIR}/scripts/fetch_tools.sh" "ginkgo"; then
+        record_junit "${vmname}" "build_ginkgo_binary" "FAILED"
+        exit 1
+    fi
+    record_junit "${vmname}" "build_ginkgo_binary" "OK"
 
     # Create case selection file
     local -r test_results_dir="${SCENARIO_INFO_DIR}/${SCENARIO}/gingko-results"

@@ -20,7 +20,7 @@ scenario_create_vms() {
     fi
 
     prepare_kickstart host1 kickstart.ks.template "${start_image}"
-    launch_vm
+    launch_vm --vm_disksize 30
 }
 
 scenario_remove_vms() {
@@ -46,11 +46,8 @@ scenario_run_tests() {
         return 0
     fi
 
-    # Wait for MicroShift to be ready
-    wait_for_microshift_to_be_ready host1
-
     # Setup oc client and kubeconfig for gingko tests
-    setup_oc_and_kubeconfig_tests host1
+    setup_oc_and_kubeconfig host1
 
     # Pre-upgrade: Create LVMS workloads and validate LVMS is working
     echo "INFO: Creating LVMS workloads before upgrade..."
