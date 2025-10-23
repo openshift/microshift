@@ -138,8 +138,6 @@ github.com/fsnotify/fsnotify/internal
 # github.com/fxamacker/cbor/v2 v2.9.0
 ## explicit; go 1.20
 github.com/fxamacker/cbor/v2
-# github.com/ghodss/yaml v1.0.0
-## explicit
 # github.com/go-asn1-ber/asn1-ber v1.5.8-0.20250403174932-29230038a667
 ## explicit; go 1.13
 github.com/go-asn1-ber/asn1-ber
@@ -178,8 +176,6 @@ github.com/go-openapi/jsonreference/internal
 github.com/go-openapi/swag
 # github.com/go-stack/stack v1.8.1
 ## explicit; go 1.17
-# github.com/go-viper/mapstructure/v2 v2.4.0
-## explicit; go 1.18
 # github.com/godbus/dbus/v5 v5.1.0
 ## explicit; go 1.12
 github.com/godbus/dbus/v5
@@ -351,8 +347,6 @@ github.com/mistifyio/go-zfs
 # github.com/mitchellh/go-wordwrap v1.0.1
 ## explicit; go 1.14
 github.com/mitchellh/go-wordwrap
-# github.com/mitchellh/mapstructure v1.5.0
-## explicit; go 1.14
 # github.com/moby/spdystream v0.5.0
 ## explicit; go 1.13
 github.com/moby/spdystream
@@ -734,8 +728,6 @@ github.com/openshift/route-controller-manager/pkg/route/ingress
 github.com/openshift/route-controller-manager/pkg/route/ingressip
 github.com/openshift/route-controller-manager/pkg/routecontroller
 github.com/openshift/route-controller-manager/pkg/version
-# github.com/pelletier/go-toml/v2 v2.2.4
-## explicit; go 1.21.0
 # github.com/peterbourgon/diskv v2.0.1+incompatible
 ## explicit
 github.com/peterbourgon/diskv
@@ -791,25 +783,15 @@ github.com/robfig/cron/v3
 # github.com/russross/blackfriday/v2 v2.1.0
 ## explicit
 github.com/russross/blackfriday/v2
-# github.com/sagikazarmark/locafero v0.11.0
-## explicit; go 1.23.0
 # github.com/sirupsen/logrus v1.9.3
 ## explicit; go 1.13
 github.com/sirupsen/logrus
-# github.com/sourcegraph/conc v0.3.1-0.20240121214520-5f936abd7ae8
-## explicit; go 1.20
-# github.com/spf13/afero v1.15.0
-## explicit; go 1.23.0
-# github.com/spf13/cast v1.10.0
-## explicit; go 1.21.0
 # github.com/spf13/cobra v1.9.1
 ## explicit; go 1.15
 github.com/spf13/cobra
 # github.com/spf13/pflag v1.0.10
 ## explicit; go 1.12
 github.com/spf13/pflag
-# github.com/spf13/viper v1.21.0
-## explicit; go 1.23.0
 # github.com/squat/generic-device-plugin v0.0.0-20251019101956-043a51e18f31
 ## explicit; go 1.24.0
 github.com/squat/generic-device-plugin/absolute
@@ -822,8 +804,6 @@ github.com/stoewer/go-strcase
 github.com/stretchr/testify/assert
 github.com/stretchr/testify/assert/yaml
 github.com/stretchr/testify/require
-# github.com/subosito/gotenv v1.6.0
-## explicit; go 1.18
 # github.com/vishvananda/netlink v1.3.1
 ## explicit; go 1.12
 github.com/vishvananda/netlink
