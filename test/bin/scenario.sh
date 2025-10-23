@@ -1118,12 +1118,12 @@ setup_oc_and_kubeconfig_tests() {
     fi
     record_junit "${vmname}" "oc_installed" "OK"
 
-    # Check/get openshift-tests-binary
+    # Build ginkgo binary
     if ! "${ROOTDIR}/scripts/fetch_tools.sh" "ginkgo"; then
-        record_junit "${vmname}" "build_test_binary" "FAILED"
+        record_junit "${vmname}" "build_ginkgo_binary" "FAILED"
         exit 1
     fi
-    record_junit "${vmname}" "build_test_binary" "OK"
+    record_junit "${vmname}" "build_ginkgo_binary" "OK"
 
     # Set up test environment variables
     local kubeconfig="${SCENARIO_INFO_DIR}/${SCENARIO}/kubeconfig"
@@ -1151,11 +1151,11 @@ run_gingko_tests() {
     # Save current directory
     pushd . &>/dev/null
 
-    # Setup oc client and kubeconfig for gingko tests
-    setup_oc_and_kubeconfig_tests "${vmname}"
-
     # Wait for MicroShift to be ready
     wait_for_microshift_to_be_ready "${vmname}"
+
+    # Setup oc client and kubeconfig for gingko tests
+    setup_oc_and_kubeconfig_tests "${vmname}"
 
     # Create case selection file
     local -r test_results_dir="${SCENARIO_INFO_DIR}/${SCENARIO}/gingko-results"
