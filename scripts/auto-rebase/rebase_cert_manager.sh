@@ -55,6 +55,29 @@ check_preconditions() {
         DEST_DIR="${BIN_DIR}" "${REPOROOT}/scripts/fetch_tools.sh" opm
     fi
 
+    if [[ ! -f "${HOME}/.config/containers/policy.json" && ! -f /etc/containers/policy.json ]]; then
+        echo "Could not find ${HOME}/.config/containers/policy.json or /etc/containers/policy.json - creating"
+        # If these two files do not exist, we assume the script is running within the CI container.
+        # These are required for the `opm` command to work correctly.
+        #
+        mkdir -p "${HOME}/.config/containers/"
+        cat << EOF > "${HOME}/.config/containers/policy.json"
+{
+    "default": [
+        {
+            "type": "insecureAcceptAnything"
+        }
+    ],
+    "transports":
+        {
+            "docker-daemon":
+                {
+                    "": [{"type":"insecureAcceptAnything"}]
+                }
+        }
+}
+EOF
+    fi
 
     if ! hash python3; then
         echo "ERROR: python3 is not present on the system - please install"
