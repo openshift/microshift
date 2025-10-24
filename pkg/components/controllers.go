@@ -298,8 +298,10 @@ func startDNSController(ctx context.Context, cfg *config.Config, kubeconfigPath 
 	}
 
 	extraParams := assets.RenderParams{
-		"ClusterIP": cfg.Network.DNS,
+		"ClusterIP":    cfg.Network.DNS,
+		"HostsEnabled": cfg.DNS.Hosts.Status == "Enabled",
 	}
+
 	if err := assets.ApplyServices(ctx, svc, renderTemplate, renderParamsFromConfig(cfg, extraParams), kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply service %v %v", svc, err)
 		// service already created by coreDNS, not re-create it.

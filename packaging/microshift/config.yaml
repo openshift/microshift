@@ -47,6 +47,19 @@ dns:
     # example:
     #   microshift.example.com
     baseDomain: example.com
+    # Hosts contains configuration for the hosts file.
+    hosts:
+        # File is the path to the hosts file to monitor.
+        # If not specified, defaults to "/etc/hosts".
+        # example:
+        #   /etc/hosts
+        file: /etc/hosts
+        # Status controls whether the hosts file is enabled or disabled.
+        # Allowed values are "Enabled" and "Disabled".
+        # If not specified, defaults to "Disabled".
+        # example:
+        #   Enabled
+        status: Disabled
 etcd:
     # Set a memory limit on the etcd process; etcd will begin paging
     # memory when it gets to this value. 0 means no limit.
