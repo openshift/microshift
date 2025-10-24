@@ -2,10 +2,10 @@ https://github.com/openshift/api embedded-component 8c9accafe91dd14148940fa3f3a7
 https://github.com/openshift/cluster-csi-snapshot-controller-operator embedded-component b022cf72ba3b4e982626d6d0b80bd53064bbe6ee
 https://github.com/openshift/cluster-dns-operator embedded-component 2ec8a3de79d73760abbccdbcbbf9951fc93097cd
 https://github.com/openshift/cluster-ingress-operator embedded-component 0cac97af560a68a5f5c0390a529726eb43556d51
-https://github.com/openshift/cluster-kube-apiserver-operator embedded-component adc82f6188f4037a515eeeaa686ce1c1a80894da
+https://github.com/openshift/cluster-kube-apiserver-operator embedded-component c37deb4fd9963663562f8d6c19a8100f204fea87
 https://github.com/openshift/cluster-kube-controller-manager-operator embedded-component ffe5113eb88f384981fdeff599f22599e11a9d7c
 https://github.com/openshift/cluster-kube-scheduler-operator embedded-component 10d89b53f7ddcf0ee45f838c1a43e408074343e6
-https://github.com/openshift/cluster-network-operator embedded-component a5879759fb042f6c4b26931fa7ef8540244c8660
+https://github.com/openshift/cluster-network-operator embedded-component c563eb4e4e99f708e6b56da1c3da2c9e797b49fc
 https://github.com/openshift/cluster-openshift-controller-manager-operator embedded-component f90be06b151168ff43d53cb5e5ff0c2d2df80186
 https://github.com/openshift/cluster-policy-controller embedded-component ef703966fe6e82f5f255b06bc5c758f105bf8b28
 https://github.com/openshift/csi-external-snapshotter embedded-component 15313fb28f5c42e4b896928478652768225692a6
@@ -32,4 +32,4 @@ https://github.com/openshift/router image-arm64 526b4d0ad4cd9d44b43e2585b3415e51
 https://github.com/openshift/kube-rbac-proxy image-arm64 cd636680e06a55395c26570dff0cb37277014388
 https://github.com/openshift/ovn-kubernetes image-arm64 a573f44ea6bb5f3eb3c507a628cddc55039be303
 https://github.com/openshift/kubernetes image-arm64 96593f323733d9ffc0fc70257ecad44a56df0ce3
-https://github.com/openshift/service-ca-operator image-arm64 e5d65c6f6b1446b77e0e915d64825d97be9c06de
+https://github.com/openshift/service-ca-operator image-arm64 b4fbf5e3cbf4455343a6682b9e3792244120454d
