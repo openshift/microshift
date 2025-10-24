@@ -1,35 +1,68 @@
-- api embedded-component 1f788b8d634ddc6c958548ca36ae7b68755239b1 to fe48e8fd548bede3d7a38cc2dd1a9543b93e8a5e
-  - 956fa8a8 2025-10-13T11:51:09+02:00 NO-JIRA: add atomic list type to ServiceAccountIssuers
-  - 817e971b 2025-10-13T08:58:29+02:00 CNTRLPLANE-1576: add event-ttl configuration to kube-apiserver
+- api embedded-component 5050707b5937d28133772a29825169e578310d2c to 8c9accafe91dd14148940fa3f3a71293184f0ab7
+  - d96bf861 2025-10-21T11:29:27+02:00 Add MutableCSINodeAllocatableCount to Dev- and TechPreview
+  - d573f822 2025-10-19T20:35:36+02:00 Switch to invoking codegen once in general updates
+  - aea1b9ac 2025-10-16T10:41:07+02:00 `route`: improve `.spec.tls.termination` doc
+  - 63691f42 2025-10-14T15:09:48+01:00 Add IngressController .spec.domain API validation
+  - f28546a1 2025-09-22T13:30:42+02:00 Promote OLMv1 Webhook support to GA
 
-- cluster-kube-controller-manager-operator embedded-component 0003cd9850370d9c12f5437aaa168dcad773207b to 52b7857076db0b649f8bede0018691466a19cbe6
-  - d56a3e4 2025-10-13T13:34:34+02:00 Enable user namespaces for the operator
-  - a8fd579 2025-08-29T13:16:07-04:00 Add priority field to prevent early shutdown
+- cluster-openshift-controller-manager-operator embedded-component da1e14c45093c19bc79e2055c9f4a55efc1cc1a8 to f90be06b151168ff43d53cb5e5ff0c2d2df80186
+  - a7b78c8 2025-09-30T17:07:43+00:00 Updating ose-cluster-openshift-controller-manager-operator-container image to be consistent with ART for 4.21 Reconciling with https://github.com/openshift/ocp-build-data/tree/4fbe3fab45239dc4be6f5d9d98a0bf36e0274ec9/images/ose-cluster-openshift-controller-manager-operator.yml
 
-- cluster-kube-scheduler-operator embedded-component 7b1ae2372ac30529ca39f4440958882ee230dc6f to 75b90c6295999ac9e707532a0d77bbf257c77561
-  - fe7d9e8 2025-10-14T10:50:16-04:00 Update ks_pod_scenario_3.yaml
-  - de62c2d 2025-10-14T10:50:04-04:00 Update ks_pod_scenario_2.yaml
-  - 9209bc1 2025-10-14T10:49:53-04:00 Update ks_pod_scenario_1.yaml
-  - 0137fa9 2025-10-13T12:53:14+02:00 manifests: Align user namespaces for the operator
-  - 48e3986 2025-08-29T13:16:11-04:00 Add priority field to prevent early shutdown
+- machine-config-operator embedded-component 7007a56217125f6b5ea358a520c080c4ac002575 to 06e7b70adfb1e932ebf88cdb225472997b39d367
+  - 09b15282 2025-10-17T13:59:19-04:00 msbic: implement CPMS support
+  - 5e37bd7b 2025-10-17T13:59:19-04:00 vendor: o/api bump
+  - 6e6477a5 2025-10-17T16:31:10+02:00 OCPBUGS-62925: RHEL10 RT kernel packages filtering
+  - 8e33af8f 2025-10-17T09:23:04+05:30 OCPNODE-3806: Do not set kernel PSI parameter from MCO
+  - f3c5ff22 2025-10-17T08:42:21+05:30 OCPNODE-3806: Do not set kernel PSI parameter from MCO
+  - 108dae43 2025-10-15T10:44:32-04:00 hack: add AMI update automation script
 
-- cluster-network-operator embedded-component 5ce4b3ccb8a882983b9599623bb5937699c07d8a to 37d65252fe3e76946573da6ab6ddc7502e1c76fc
-  - 6b0e43f 2025-09-30T13:01:58+00:00 Updating cluster-network-operator-container image to be consistent with ART for 4.21 Reconciling with https://github.com/openshift/ocp-build-data/tree/4fbe3fab45239dc4be6f5d9d98a0bf36e0274ec9/images/cluster-network-operator.yml
-  - 53dbf9b 2025-09-23T10:25:45+02:00 Skip _stackmanager execution for libreswan 5.3+
+- openshift-controller-manager embedded-component 15fc552a73e47ae715f0cf59e3f535e26b43477a to 433bd500afb879dd82e27336359cd4e3051245b0
+  - 9fc2342 2025-09-18T19:29:31+00:00 Updating ose-openshift-controller-manager-container image to be consistent with ART for 4.21 Reconciling with https://github.com/openshift/ocp-build-data/tree/22bf27a3a0b8820aa8d338d6be20972a7c5109ca/images/ose-openshift-controller-manager.yml
 
-- ovn-kubernetes image-amd64 627ddba0310e1916784bdc1e00ee1e0c41e45302 to 53c8c29ad581831ace5ba3a3812f295bff080ab4
-  - 8aa4fb74 2025-08-14T20:30:53+02:00 Dockerfile: Unpin OVN and consume the latest from FDP.
+- operator-framework-olm embedded-component bdc0d750909a7cea17b087f53bcaa01d449638f1 to a0b88f9ab6a32f679336a7b974b03895f7af8c19
+  - 2257debf 2025-10-17T11:22:40+08:00 migrate opm cases to OTE
 
-- ovn-kubernetes image-arm64 627ddba0310e1916784bdc1e00ee1e0c41e45302 to a7a531f167aa3e8ef14b7c258debf0c709ddcd09
-  - 845ec2d1 2025-09-30T23:21:58+00:00 Updating ose-ovn-kubernetes-container image to be consistent with ART for 4.21 Reconciling with https://github.com/openshift/ocp-build-data/tree/4fbe3fab45239dc4be6f5d9d98a0bf36e0274ec9/images/ose-ovn-kubernetes.yml
-  - 8aa4fb74 2025-08-14T20:30:53+02:00 Dockerfile: Unpin OVN and consume the latest from FDP.
+- oc image-amd64 672ff624b7d2523487d4f06565099949c625d43c to 8836b6630483cfa28ad2e092dbcf9cf7f241f064
+  - bf9e2d9d 2025-10-20T18:33:31+03:00 Update version tags to 1.34.1
+  - 6976ded4 2025-10-20T18:33:31+03:00 Use renamed ObjectGoPrintSideBySide function
+  - 42cd2fae 2025-10-20T18:33:25+03:00 React to upstream changes
+  - fbd00148 2025-10-20T17:37:07+03:00 Update openshift library depedencies to latest
+  - f8052d09 2025-10-20T17:33:36+03:00 Update golang.org/x dependencies to latest
+  - 36326dae 2025-10-20T17:31:36+03:00 Update k8s dependencies to 1.34.1
+  - b89c9f92 2025-10-16T16:25:06+02:00 Pass dry-run option to all create API calls
+  - 9e4292b2 2025-10-15T12:13:44+03:00 Escape characters in url
+  - 9bb4d77d 2025-10-15T11:42:24+03:00 Adjust logs per verbosity
+  - 7c0e97b4 2025-10-15T11:42:23+03:00 Use aws native user-agent assignment
+  - ba1a7d1f 2025-10-15T11:42:23+03:00 Update to newer versions of aws-sdk-go-v2
+  - c9ca4065 2025-10-15T11:42:23+03:00 Make respective changes for the new sdk
+  - 4ad945c9 2025-10-15T11:42:23+03:00 Migrate to aws-sdk-go-v2
+  - cb28d277 2025-10-02T15:13:31-07:00 pkg/cli/admin/upgrade/recommend: Drop obsolete precheckEnabled knob
 
-- service-ca-operator image-arm64 a40d9a8ec60e0c6c1578300c372b6104130f2ecc to e5d65c6f6b1446b77e0e915d64825d97be9c06de
-  - 46bab7e 2025-10-15T03:03:14+08:00 Fix gofmt formatting after CA rotation logic fix
-  - 5edc600 2025-10-15T02:45:32+08:00 Fix CA rotation polling logic
-  - 5031339 2025-10-14T21:23:53+08:00 Fix gofmt formatting in e2e_test.go
-  - 911d3da 2025-10-14T19:08:52+08:00 Fix connection test in checkClientPodRcvdUpdatedServerCert
-  - c9f6900 2025-10-14T17:14:30+08:00 Merge fixes from commit 41d9ed12
-  - 667d9c7 2025-10-14T16:32:54+08:00 Fix e2e test failures due to SCC UID range validation
-  - 6e9d853 2025-09-29T22:19:56+00:00 Updating ose-service-ca-operator-container image to be consistent with ART for 4.21 Reconciling with https://github.com/openshift/ocp-build-data/tree/4fbe3fab45239dc4be6f5d9d98a0bf36e0274ec9/images/ose-service-ca-operator.yml
+- kube-rbac-proxy image-amd64 b9134351be37c43408334047d8eb85d0ac01fe4e to cd636680e06a55395c26570dff0cb37277014388
+  - 93afe4a 2025-09-06T05:04:06+00:00 Updating kube-rbac-proxy-container image to be consistent with ART for 4.21 Reconciling with https://github.com/openshift/ocp-build-data/tree/5c68d71385f72cd67a199bc4590068053a833c7d/images/kube-rbac-proxy.yml
+
+- ovn-kubernetes image-amd64 3f971b1c061a775aedee0e9a06ab2a2a31bc64cc to a573f44ea6bb5f3eb3c507a628cddc55039be303
+  - c0a8426b 2025-09-30T23:36:23+00:00 Updating ovn-kubernetes-microshift-container image to be consistent with ART for 4.21 Reconciling with https://github.com/openshift/ocp-build-data/tree/4fbe3fab45239dc4be6f5d9d98a0bf36e0274ec9/images/ovn-kubernetes-microshift.yml
+
+- oc image-arm64 672ff624b7d2523487d4f06565099949c625d43c to 8836b6630483cfa28ad2e092dbcf9cf7f241f064
+  - bf9e2d9d 2025-10-20T18:33:31+03:00 Update version tags to 1.34.1
+  - 6976ded4 2025-10-20T18:33:31+03:00 Use renamed ObjectGoPrintSideBySide function
+  - 42cd2fae 2025-10-20T18:33:25+03:00 React to upstream changes
+  - fbd00148 2025-10-20T17:37:07+03:00 Update openshift library depedencies to latest
+  - f8052d09 2025-10-20T17:33:36+03:00 Update golang.org/x dependencies to latest
+  - 36326dae 2025-10-20T17:31:36+03:00 Update k8s dependencies to 1.34.1
+  - b89c9f92 2025-10-16T16:25:06+02:00 Pass dry-run option to all create API calls
+  - 9e4292b2 2025-10-15T12:13:44+03:00 Escape characters in url
+  - 9bb4d77d 2025-10-15T11:42:24+03:00 Adjust logs per verbosity
+  - 7c0e97b4 2025-10-15T11:42:23+03:00 Use aws native user-agent assignment
+  - ba1a7d1f 2025-10-15T11:42:23+03:00 Update to newer versions of aws-sdk-go-v2
+  - c9ca4065 2025-10-15T11:42:23+03:00 Make respective changes for the new sdk
+  - 4ad945c9 2025-10-15T11:42:23+03:00 Migrate to aws-sdk-go-v2
+  - cb28d277 2025-10-02T15:13:31-07:00 pkg/cli/admin/upgrade/recommend: Drop obsolete precheckEnabled knob
+
+- kube-rbac-proxy image-arm64 b9134351be37c43408334047d8eb85d0ac01fe4e to cd636680e06a55395c26570dff0cb37277014388
+  - 93afe4a 2025-09-06T05:04:06+00:00 Updating kube-rbac-proxy-container image to be consistent with ART for 4.21 Reconciling with https://github.com/openshift/ocp-build-data/tree/5c68d71385f72cd67a199bc4590068053a833c7d/images/kube-rbac-proxy.yml
+
+- ovn-kubernetes image-arm64 3f971b1c061a775aedee0e9a06ab2a2a31bc64cc to a573f44ea6bb5f3eb3c507a628cddc55039be303
+  - c0a8426b 2025-09-30T23:36:23+00:00 Updating ovn-kubernetes-microshift-container image to be consistent with ART for 4.21 Reconciling with https://github.com/openshift/ocp-build-data/tree/4fbe3fab45239dc4be6f5d9d98a0bf36e0274ec9/images/ovn-kubernetes-microshift.yml
 

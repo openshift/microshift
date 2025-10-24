@@ -1235,7 +1235,7 @@ func Test_removePersistedRequestCounts(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			removePersistedRequestCounts(tt.args.nodeName, tt.args.currentHour, tt.args.persistedStatus, tt.args.localResourceCount)
 			if !tt.expected.Equals(tt.args.localResourceCount) {
-				t.Error(diff.StringDiff(tt.expected.String(), tt.args.localResourceCount.String()))
+				t.Error(diff.Diff(tt.expected.String(), tt.args.localResourceCount.String()))
 			}
 		})
 	}

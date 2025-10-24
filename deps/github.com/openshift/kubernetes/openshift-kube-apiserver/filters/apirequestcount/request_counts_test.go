@@ -86,7 +86,7 @@ func TestAPIRequestCounts_IncrementRequestCount(t *testing.T) {
 	}
 
 	if !actual.Equals(expected) {
-		t.Error(diff.StringDiff(expected.String(), actual.String()))
+		t.Error(diff.Diff(expected.String(), actual.String()))
 	}
 }
 
@@ -283,7 +283,7 @@ func TestAPIRequestCounts_IncrementRequestCounts(t *testing.T) {
 			tc.existing.Add(tc.additional)
 
 			if !tc.existing.Equals(tc.expected) {
-				t.Error(diff.StringDiff(tc.expected.String(), tc.existing.String()))
+				t.Error(diff.Diff(tc.expected.String(), tc.existing.String()))
 			}
 		})
 	}

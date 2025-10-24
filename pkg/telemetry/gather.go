@@ -32,6 +32,7 @@ import (
 	"github.com/openshift/microshift/pkg/util/cryptomaterial"
 	io_prometheus_client "github.com/prometheus/client_model/go"
 	"github.com/prometheus/common/expfmt"
+	"github.com/prometheus/common/model"
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/dynamic"
@@ -139,7 +140,7 @@ func fetchKubeletMetrics(cfg *config.Config) (map[string]*io_prometheus_client.M
 		if err != nil {
 			return nil, fmt.Errorf("error fetching kubelet metrics from endpoint %v: %v", endpoint, err)
 		}
-		parser := expfmt.TextParser{}
+		parser := expfmt.NewTextParser(model.UTF8Validation)
 		families, err := parser.TextToMetricFamilies(bytes.NewReader(data))
 		if err != nil {
 			return nil, fmt.Errorf("error parsing metrics from %v: %v", endpoint, err)

@@ -27,6 +27,7 @@ import (
 	"testing"
 
 	"github.com/Microsoft/hnslib/hcn"
+	"github.com/stretchr/testify/assert"
 
 	v1 "k8s.io/api/core/v1"
 	discovery "k8s.io/api/discovery/v1"
@@ -1306,6 +1307,74 @@ func TestClusterIPLBInCreateDsrLoadBalancer(t *testing.T) {
 	}
 }
 
+func TestEndpointSliceWithInternalPortDifferentFromServicePort(t *testing.T) {
+	proxier := NewFakeProxier(t, testNodeName, netutils.ParseIPSloppy("10.0.0.1"), NETWORK_TYPE_OVERLAY, true)
+	assert.NotNil(t, proxier, "Failed to create proxier")
+
+	proxier.servicesSynced = true
+	proxier.endpointSlicesSynced = true
+
+	svcPortName := proxy.ServicePortName{
+		NamespacedName: makeNSN("ns1", "svc1"),
+		Port:           "p80",
+		Protocol:       v1.ProtocolTCP,
+	}
+
+	svcSpec := v1.ServiceSpec{
+		ClusterIP: "172.20.1.1",
+		Selector:  map[string]string{"foo": "bar"},
+		Ports: []v1.ServicePort{
+			{Name: svcPortName.Port, Port: 80, TargetPort: intstr.FromInt32(80), Protocol: v1.ProtocolTCP}, // Mocking TargetPort as to same as service port (80)
+		},
+	}
+
+	proxier.OnServiceAdd(&v1.Service{
+		ObjectMeta: metav1.ObjectMeta{Name: svcPortName.Name, Namespace: svcPortName.Namespace},
+		Spec:       svcSpec,
+	})
+
+	// Add initial endpoint slice
+	endpointSlice := &discovery.EndpointSlice{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      fmt.Sprintf("%s-1", svcPortName.Name),
+			Namespace: svcPortName.Namespace,
+			Labels:    map[string]string{discovery.LabelServiceName: svcPortName.Name},
+		},
+		Ports: []discovery.EndpointPort{{
+			Name:     &svcPortName.Port,
+			Port:     ptr.To[int32](8080), // Using container port 8080 which is different from service port 80
+			Protocol: ptr.To(v1.ProtocolTCP),
+		}},
+		AddressType: discovery.AddressTypeIPv4,
+		Endpoints: []discovery.Endpoint{{
+			Addresses:  []string{"192.168.2.3"},
+			Conditions: discovery.EndpointConditions{Ready: ptr.To(true)},
+			NodeName:   ptr.To("testhost2"),
+		}},
+	}
+
+	proxier.OnEndpointSliceAdd(endpointSlice)
+	proxier.setInitialized(true)
+	proxier.syncProxyRules()
+
+	svc := proxier.svcPortMap[svcPortName]
+	svcInfo, ok := svc.(*serviceInfo)
+	assert.True(t, ok, "Failed to cast serviceInfo %q", svcPortName.String())
+	assert.Equal(t, svcInfo.hnsID, loadbalancerGuid1, "The Hns Loadbalancer Id %v does not match %v. ServicePortName %q", svcInfo.hnsID, loadbalancerGuid1, svcPortName.String())
+
+	lb, err := proxier.hcn.GetLoadBalancerByID(svcInfo.hnsID)
+	assert.Equal(t, nil, err, "Failed to fetch loadbalancer: %v", err)
+	assert.NotEqual(t, nil, lb, "Loadbalancer object should not be nil")
+	assert.Equal(t, len(lb.PortMappings), 1, "PortMappings should have one and only one entry")
+	assert.Equal(t, lb.PortMappings[0].InternalPort, uint16(8080), "InternalPort should be 8080")
+	assert.Equal(t, lb.PortMappings[0].ExternalPort, uint16(80), "ExternalPort should be 80")
+
+	ep := proxier.endpointsMap[svcPortName][0]
+	epInfo, ok := ep.(*endpointInfo)
+	assert.True(t, ok, "Failed to cast endpointInfo %q", svcPortName.String())
+	assert.Equal(t, epInfo.hnsID, "EPID-3", "Hns EndpointId %v does not match %v. ServicePortName %q", epInfo.hnsID, endpointGuid1, svcPortName.String())
+}
+
 func TestEndpointSlice(t *testing.T) {
 	proxier := NewFakeProxier(t, testNodeName, netutils.ParseIPSloppy("10.0.0.1"), NETWORK_TYPE_OVERLAY, true)
 	if proxier == nil {
@@ -1452,74 +1521,6 @@ func TestWinDSRWithOverlayEnabled(t *testing.T) {
 
 	if !svcInfo.localTrafficDSR {
 		t.Errorf("Expected localTrafficDSR to be enabled but got false")
-	}
-}
-
-func TestDSRFeatureGateValidation(t *testing.T) {
-	testCases := []struct {
-		name          string
-		enableDSR     bool
-		featureGate   bool
-		expectFailure bool
-	}{
-		{
-			name:          "DSR enabled but feature gate disabled",
-			enableDSR:     true,
-			featureGate:   false,
-			expectFailure: true,
-		},
-		{
-			name:          "DSR enabled and feature gate enabled",
-			enableDSR:     true,
-			featureGate:   true,
-			expectFailure: false,
-		},
-		{
-			name:          "DSR disabled, feature gate does not matter",
-			enableDSR:     false,
-			featureGate:   false,
-			expectFailure: false,
-		},
-	}
-
-	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
-			// Mock feature gate
-			featuregatetesting.SetFeatureGateDuringTest(t, utilfeature.DefaultFeatureGate, kubefeatures.WinDSR, tc.featureGate)
-
-			config := config.KubeProxyWinkernelConfiguration{
-				EnableDSR:   tc.enableDSR,
-				NetworkName: testNetwork,
-				SourceVip:   serviceVip,
-			}
-
-			hostMacProvider := &testHostMacProvider{macAddress: macAddress}
-
-			hcnMock := getHcnMock(NETWORK_TYPE_OVERLAY)
-
-			_, err := newProxierInternal(
-				v1.IPv4Protocol,                       // ipFamily
-				testNodeName,                          // nodeName
-				netutils.ParseIPSloppy("192.168.1.1"), // nodeIP
-				nil,                                   // serviceHealthServer (not needed in this unit test)
-				nil,                                   // healthzServer (not needed in this unit test)
-				0,                                     // healthzPort
-				hcnMock,                               // hcnImpl
-				hostMacProvider,                       // hostMacProvider
-				config,                                // kube-proxy config
-				false,                                 // waitForHNSOverlay
-			)
-
-			if tc.expectFailure {
-				if err == nil {
-					t.Errorf("Expected failure for case %q, but got success", tc.name)
-				}
-			} else {
-				if err != nil {
-					t.Errorf("Expected success for case %q, but got error: %v", tc.name, err)
-				}
-			}
-		})
 	}
 }
 
