@@ -46,6 +46,9 @@ scenario_run_tests() {
         return 0
     fi
 
+    # Wait for MicroShift to be ready
+    wait_for_microshift_to_be_ready host1
+
     # Setup oc client and kubeconfig for gingko tests
     setup_oc_and_kubeconfig host1
 

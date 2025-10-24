@@ -1118,9 +1118,6 @@ setup_oc_and_kubeconfig() {
     fi
     record_junit "${vmname}" "oc_installed" "OK"
 
-    # Wait for MicroShift to be ready
-    wait_for_microshift_to_be_ready "${vmname}"
-
     # Get kubeconfig from VM
     local -r vm_ip=$(get_vm_property "${vmname}" "ip")
     local kubeconfig="${SCENARIO_INFO_DIR}/${SCENARIO}/kubeconfig"
