@@ -35,6 +35,8 @@ OPERATOR_INDEX="${STAGING_DIR}/redhat-operator-index.yaml"
 OPERATOR_CERT_MANAGER_INDEX="${STAGING_DIR}/redhat-operator-cert-manager-index.yaml"
 GO_MOD_DIRS=("$REPOROOT/" "$REPOROOT/etcd")
 
+PULL_SECRET_FILE="${HOME}/.pull-secret.json"
+
 OPERATOR_COMPONENTS="cert-manager-controller cert-manager-ca-injector cert-manager-webhook cert-manager-acmesolver cert-manager-istiocsr"
 
 declare -a ARCHS=("amd64" "arm64")
@@ -116,17 +118,27 @@ download_cert_manager(){
     mkdir -p "${STAGING_DIR}"
     pushd "${STAGING_DIR}" >/dev/null
 
-   #  export REGISTRY_AUTH_FILE=${PULL_SECRET_FILE}
+    operator_manifest="$1"
 
-   operator_manifest="$1"
+    # opm needs credentials to pull the image, but there's no flag like -a or --authfile to provide our ~/.pull-secret.json
+    clear_docker_config=false
+    if [[ -f "${PULL_SECRET_FILE}" && ! -f "${HOME}/.docker/config.json" ]]; then
+        mkdir -p "${HOME}/.docker/"
+        ln -s "${PULL_SECRET_FILE}" "${HOME}/.docker/config.json"
+        clear_docker_config=true
+    fi
 
-    # get the whole operator yaml for 4.19
+    # get the whole operator yaml
     ${BIN_DIR}/opm render "${operator_manifest}" -o yaml  >${OPERATOR_INDEX}
+
+    if "${clear_docker_config}"; then
+        rm "${HOME}/.docker/config.json"
+    fi
 
     # find the latest published cert-manager-operator ie: cert-manager-operator.v1.16.0
     export operator=$(yq 'select(.package == "openshift-cert-manager-operator" and .name == "stable-v1") | .entries[-1].name' ${OPERATOR_INDEX})
     yq 'select (.name==env(operator))' ${OPERATOR_INDEX} >"${OPERATOR_CERT_MANAGER_INDEX}"
- 
+
     echo  "found operator version ${operator}"
 
     # convert from cert-manager-operator.v1.16.0 to cert-manager-x.y
@@ -154,12 +166,12 @@ write_cert_manager_images_for_arch() {
     local operatorVersion=$(yq '.properties[] | select(.type == "olm.package").value.version' "${OPERATOR_CERT_MANAGER_INDEX}")
 
     jq -n "{\"release\": {\"base\": \"${operatorVersion}\"}, \"images\": {}}" > "${cert_manager_release_json}"
-    
+
     #containerImage
     local operatorImageFull=$(yq '.properties[] | select(.type == "olm.csv.metadata").value.annotations.containerImage' "${OPERATOR_CERT_MANAGER_INDEX}")
     local operatorImage="${operatorImageFull%:*}"
     local operatorTag="${operatorImageFull#*:}"
-  
+
     yq -i -o json ".images += {\"cert-manager-operator\": \"${operatorImageFull}\"}" "${cert_manager_release_json}"
 
     # update controller image in ConfigMap
@@ -171,19 +183,19 @@ write_cert_manager_images_for_arch() {
      local component=$(yq ".relatedImages.${index}.name" "${OPERATOR_CERT_MANAGER_INDEX}")
     if [[  -n "${component}" && "${OPERATOR_COMPONENTS}" == *"${component}"* ]]; then
         yq -i -o json ".images += {\"${component}\": \"${image}\"}" "${cert_manager_release_json}"
-        
+
         # update component image in ConfigMap
         update_configmap_image "${component}" "${image}" "${cert_manager_images_yaml}"
-        
+
         # update environment variables in manager.yaml
         sed -i "s#value:.*${component}.*#value: ${image}#g" "${cert_manager_operator_yaml}"
 
-        # handle special case istiocsr v istio-csr mismatch 
+        # handle special case istiocsr v istio-csr mismatch
         if [[ "${component}" == "cert-manager-istiocsr" ]]; then
             sed -i "s#value:.*cert-manager-istio-csr.*#value: ${image}#g" "${cert_manager_operator_yaml}"
         fi
     fi
-       
+
 
     done
 
