@@ -28,6 +28,9 @@ scenario_run_tests() {
         echo "Image '${start_image}' not found - skipping test"
         return 0
     fi
+    
+    # Wait for MicroShift to be ready
+    wait_for_microshift_to_be_ready host1
 
     run_gingko_tests host1 "~Disruptive"
 }
