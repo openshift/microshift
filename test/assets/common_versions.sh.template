@@ -45,6 +45,12 @@ get_vrel_from_rhsm() {{
 get_vrel_from_rpm() {{
     local -r rpm_dir="$1"
 
+    # exit if rpm_dir directory does not exist
+    if [ ! -d "${rpm_dir}" ]; then
+        echo ""
+        return
+    fi
+
     local -r rpm_release_info_file=$(find "${{rpm_dir}}" -name "microshift-release-info-*.rpm" | sort | tail -n1)
     if [ -z "${{rpm_release_info_file}}" ]; then
         echo ""
@@ -141,11 +147,13 @@ BREW_Y1_RELEASE_VERSION="$(get_vrel_from_rpm "${{BREW_RPM_SOURCE}}/4.${{PREVIOUS
 BREW_Y2_RELEASE_VERSION="$(get_vrel_from_rpm "${{BREW_RPM_SOURCE}}/4.${{YMINUS2_MINOR_VERSION}}-zstream/{ARCH}/")"
 BREW_RC_RELEASE_VERSION="$(get_vrel_from_rpm "${{BREW_RPM_SOURCE}}/4.${{MINOR_VERSION}}-rc/{ARCH}/")"
 BREW_EC_RELEASE_VERSION="$(get_vrel_from_rpm "${{BREW_RPM_SOURCE}}/4.${{MINOR_VERSION}}-ec/{ARCH}/")"
+BREW_NIGHTLY_RELEASE_VERSION="$(get_vrel_from_rpm "${BREW_RPM_SOURCE}/4.${MINOR_VERSION}-nightly/${UNAME_M}/")"
 export BREW_Y0_RELEASE_VERSION
 export BREW_Y1_RELEASE_VERSION
 export BREW_Y2_RELEASE_VERSION
 export BREW_RC_RELEASE_VERSION
 export BREW_EC_RELEASE_VERSION
+export BREW_NIGHTLY_RELEASE_VERSION
 
 # Set the release type to ec, rc or zstream
 LATEST_RELEASE_TYPE="{LATEST_RELEASE_TYPE}"
