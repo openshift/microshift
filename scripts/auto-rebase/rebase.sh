@@ -1219,6 +1219,7 @@ rebase_to() {
     update_changelog
     update_go_mods
     for dirpath in "${GO_MOD_DIRS[@]}"; do
+        update_deps_fmt
         dirname=$(basename "${dirpath}")
         if [[ -n "$(git status -s "${dirpath}/go.mod" "${dirpath}/go.sum")" ]]; then
             title "## Committing changes to ${dirname}/go.mod"
@@ -1239,7 +1240,6 @@ rebase_to() {
                 git add "${dirpath}/vendor"
                 git commit -m "update ${dirname}/vendor"
             fi
-            update_deps_fmt
         else
             echo "No changes in ${dirname}/go.mod."
         fi
