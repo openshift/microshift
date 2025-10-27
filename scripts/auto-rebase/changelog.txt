@@ -1,33 +1,68 @@
-- kubernetes embedded-component e2e5d628ce43695982002737a4d1f1c6eb30eb11 to 0ee04c7e38c5c04c6ca854ce4a095d58d3ea6c53
-  - 2c61e8e79 2025-10-13T14:52:29-07:00 UPSTREAM: <carry>: Make streaming collection encoding off by default
-  - 1b3519c72 2025-10-13T14:51:43-07:00 UPSTREAM: <carry>: Switch test to gofuzz
-  - f346c26c0 2025-10-13T14:51:37-07:00 UPSTREAM: 129407: Implement streaming proto encoding
-  - dbe6d7fd0 2025-10-13T14:51:12-07:00 UPSTREAM: 130511: Implement tests for encoding collections in Proto
-  - b00d3d6fb 2025-10-13T14:51:07-07:00 UPSTREAM: 129334: Streaming JSON encoder for List
-  - 64d5177d5 2025-10-08T13:39:59-07:00 UPSTREAM: 130220: Add tests for encoding collections in JSON for KEP-5116
-  - c51558694 2025-10-08T13:39:39-07:00 UPSTREAM: 130281: Implement chunking for gzip encoder in deferredResponseWriter
-  - d7c6a6a75 2025-10-08T13:39:09-07:00 UPSTREAM: 130190: Add a test to validate deferredResponseWriteron multiple write calls
+- api embedded-component e16f6cc860949caf863e79bd838491cdcb6e9641 to 98e18dae8c7a82a4075c65ca0d357c9bf31cfb7c
+  - 6d071af 2025-10-13T15:19:00-07:00 generated output
+  - 68c134f 2025-10-13T15:18:15-07:00 OCPSTRAT-2467: Add feature gate for StreamingCollectionEncoding
 
-- machine-config-operator embedded-component ca2de0f716f1917c85ec78c09d61e0d0c01cdad0 to 6027b8f9bec4175d8a4059c1f8a86569731ddafb
-  - 4afc12ea 2025-10-21T09:25:26+00:00 msbic: fix arch annotation check
+- kubernetes embedded-component 0ee04c7e38c5c04c6ca854ce4a095d58d3ea6c53 to 56747b62f392bf1b0da64649aa2285f6a524c435
+  - fe126dd93 2025-09-29T09:43:01+02:00 UPSTREAM: <carry>: Fix tests after backport
+  - 17140b991 2025-09-29T09:42:56+02:00 UPSTREAM: 131725: Avoid encoding in LogResponseObject when we are not going to use it
+  - 81ac17abe 2025-09-29T09:42:33+02:00 UPSTREAM: 131694: Eliminate AuditContext`s SetEventLevel
+  - f8cdcc556 2025-09-29T09:16:54+02:00 UPSTREAM: 129472: Fix API server crash on concurrent map iteration and write
 
-- kubernetes image-amd64 e2e5d628ce43695982002737a4d1f1c6eb30eb11 to 0ee04c7e38c5c04c6ca854ce4a095d58d3ea6c53
-  - 2c61e8e79 2025-10-13T14:52:29-07:00 UPSTREAM: <carry>: Make streaming collection encoding off by default
-  - 1b3519c72 2025-10-13T14:51:43-07:00 UPSTREAM: <carry>: Switch test to gofuzz
-  - f346c26c0 2025-10-13T14:51:37-07:00 UPSTREAM: 129407: Implement streaming proto encoding
-  - dbe6d7fd0 2025-10-13T14:51:12-07:00 UPSTREAM: 130511: Implement tests for encoding collections in Proto
-  - b00d3d6fb 2025-10-13T14:51:07-07:00 UPSTREAM: 129334: Streaming JSON encoder for List
-  - 64d5177d5 2025-10-08T13:39:59-07:00 UPSTREAM: 130220: Add tests for encoding collections in JSON for KEP-5116
-  - c51558694 2025-10-08T13:39:39-07:00 UPSTREAM: 130281: Implement chunking for gzip encoder in deferredResponseWriter
-  - d7c6a6a75 2025-10-08T13:39:09-07:00 UPSTREAM: 130190: Add a test to validate deferredResponseWriteron multiple write calls
+- ovn-kubernetes image-amd64 0466cfde84ccfe8595b7be427aaf4fb47d8078a5 to 7bb7a9e71737d4d2d7e00f693080df3fc4d735db
+  - f7c67b7f 2025-10-08T12:54:42+01:00 [IC][EIP] OCPBUGS-42303: Fix race between SB DB and OVN-Controller
+  - 2ac68e4c 2025-10-02T13:04:35+01:00 Node controller shutdown: do not ref gateway if not set
+  - 37dd4e2a 2025-10-02T13:04:27+01:00 ovn-controller: block GARP during startup
+  - d3ae338d 2025-10-02T13:04:20+01:00 Fix ovnkube-controller-with-node shutdown sequence
+  - ba90f223 2025-09-29T17:47:06+02:00 Fix EgressIP controller deadlock by sorting node locks lexicographically
+  - 0b161878 2025-09-23T17:41:45-04:00 [release-4.20] OCPBUGS-61239: Skip node-encap-ips annotation in DPU host mode
+  - 77fe97ad 2025-09-16T12:16:32+00:00 OCPBUGS-61065: As part of DPF installation we are required to use OCP downstream image for dpu service. Dpu service uses upstream ovnkube.sh script that requires ovndb-raft-functions.sh as a dependency. This change copies it into the image as part of Dockerfile.base
+  - fe444a75 2025-09-09T16:41:27+02:00 E2E localnet: send three pings instead of just one
+  - 90e8e0ab 2025-09-09T16:41:27+02:00 E2E localnet: localnet -> host network on VLAN with external router
+  - 44182f55 2025-09-09T16:41:27+02:00 E2E localnet: host network -> localnet on VLAN with external router
+  - 3000947b 2025-09-09T16:41:27+02:00 E2E localnet: default network->localnet on VLAN with external router
+  - 43854789 2025-09-09T16:41:27+02:00 E2E localnet: Fix requirement on number of schedulable nodes
+  - 6e4588a3 2025-09-09T16:41:27+02:00 E2E localnet: make IP request for localnet pod extensible
+  - ece915da 2025-09-09T16:41:27+02:00 E2E localnet: specify that the localnet uses IPs from host subnet
+  - 2a91e405 2025-09-09T16:41:27+02:00 E2E localnet: remove references to downstream bugs and stories
+  - 9ff5050e 2025-09-09T16:41:27+02:00 Configure existing multihoming CI lane as IC-enabled and shared gw
+  - 5041ae2f 2025-09-09T16:41:27+02:00 E2E: add test host -> localnet with IP in host subnet
+  - 11e4a9c3 2025-09-09T16:41:27+02:00 E2E localnet: remove double import of ginkgo
+  - 53c3e110 2025-09-09T16:41:27+02:00 Openflow: lookup conntrack & table=1 when breth0 is next hop (IPv6)
+  - 2c3d0274 2025-09-09T16:41:27+02:00 Openflow: drop in_port from IPv6 dispatch OF rule at prio=50
+  - cc65df72 2025-09-09T16:41:27+02:00 Openflow: lookup conntrack & table=1 only when breth0 is next hop
 
-- kubernetes image-arm64 e2e5d628ce43695982002737a4d1f1c6eb30eb11 to 0ee04c7e38c5c04c6ca854ce4a095d58d3ea6c53
-  - 2c61e8e79 2025-10-13T14:52:29-07:00 UPSTREAM: <carry>: Make streaming collection encoding off by default
-  - 1b3519c72 2025-10-13T14:51:43-07:00 UPSTREAM: <carry>: Switch test to gofuzz
-  - f346c26c0 2025-10-13T14:51:37-07:00 UPSTREAM: 129407: Implement streaming proto encoding
-  - dbe6d7fd0 2025-10-13T14:51:12-07:00 UPSTREAM: 130511: Implement tests for encoding collections in Proto
-  - b00d3d6fb 2025-10-13T14:51:07-07:00 UPSTREAM: 129334: Streaming JSON encoder for List
-  - 64d5177d5 2025-10-08T13:39:59-07:00 UPSTREAM: 130220: Add tests for encoding collections in JSON for KEP-5116
-  - c51558694 2025-10-08T13:39:39-07:00 UPSTREAM: 130281: Implement chunking for gzip encoder in deferredResponseWriter
-  - d7c6a6a75 2025-10-08T13:39:09-07:00 UPSTREAM: 130190: Add a test to validate deferredResponseWriteron multiple write calls
+- kubernetes image-amd64 0ee04c7e38c5c04c6ca854ce4a095d58d3ea6c53 to 56747b62f392bf1b0da64649aa2285f6a524c435
+  - fe126dd93 2025-09-29T09:43:01+02:00 UPSTREAM: <carry>: Fix tests after backport
+  - 17140b991 2025-09-29T09:42:56+02:00 UPSTREAM: 131725: Avoid encoding in LogResponseObject when we are not going to use it
+  - 81ac17abe 2025-09-29T09:42:33+02:00 UPSTREAM: 131694: Eliminate AuditContext`s SetEventLevel
+  - f8cdcc556 2025-09-29T09:16:54+02:00 UPSTREAM: 129472: Fix API server crash on concurrent map iteration and write
+
+- ovn-kubernetes image-arm64 0466cfde84ccfe8595b7be427aaf4fb47d8078a5 to 7bb7a9e71737d4d2d7e00f693080df3fc4d735db
+  - f7c67b7f 2025-10-08T12:54:42+01:00 [IC][EIP] OCPBUGS-42303: Fix race between SB DB and OVN-Controller
+  - 2ac68e4c 2025-10-02T13:04:35+01:00 Node controller shutdown: do not ref gateway if not set
+  - 37dd4e2a 2025-10-02T13:04:27+01:00 ovn-controller: block GARP during startup
+  - d3ae338d 2025-10-02T13:04:20+01:00 Fix ovnkube-controller-with-node shutdown sequence
+  - ba90f223 2025-09-29T17:47:06+02:00 Fix EgressIP controller deadlock by sorting node locks lexicographically
+  - 0b161878 2025-09-23T17:41:45-04:00 [release-4.20] OCPBUGS-61239: Skip node-encap-ips annotation in DPU host mode
+  - 77fe97ad 2025-09-16T12:16:32+00:00 OCPBUGS-61065: As part of DPF installation we are required to use OCP downstream image for dpu service. Dpu service uses upstream ovnkube.sh script that requires ovndb-raft-functions.sh as a dependency. This change copies it into the image as part of Dockerfile.base
+  - fe444a75 2025-09-09T16:41:27+02:00 E2E localnet: send three pings instead of just one
+  - 90e8e0ab 2025-09-09T16:41:27+02:00 E2E localnet: localnet -> host network on VLAN with external router
+  - 44182f55 2025-09-09T16:41:27+02:00 E2E localnet: host network -> localnet on VLAN with external router
+  - 3000947b 2025-09-09T16:41:27+02:00 E2E localnet: default network->localnet on VLAN with external router
+  - 43854789 2025-09-09T16:41:27+02:00 E2E localnet: Fix requirement on number of schedulable nodes
+  - 6e4588a3 2025-09-09T16:41:27+02:00 E2E localnet: make IP request for localnet pod extensible
+  - ece915da 2025-09-09T16:41:27+02:00 E2E localnet: specify that the localnet uses IPs from host subnet
+  - 2a91e405 2025-09-09T16:41:27+02:00 E2E localnet: remove references to downstream bugs and stories
+  - 9ff5050e 2025-09-09T16:41:27+02:00 Configure existing multihoming CI lane as IC-enabled and shared gw
+  - 5041ae2f 2025-09-09T16:41:27+02:00 E2E: add test host -> localnet with IP in host subnet
+  - 11e4a9c3 2025-09-09T16:41:27+02:00 E2E localnet: remove double import of ginkgo
+  - 53c3e110 2025-09-09T16:41:27+02:00 Openflow: lookup conntrack & table=1 when breth0 is next hop (IPv6)
+  - 2c3d0274 2025-09-09T16:41:27+02:00 Openflow: drop in_port from IPv6 dispatch OF rule at prio=50
+  - cc65df72 2025-09-09T16:41:27+02:00 Openflow: lookup conntrack & table=1 only when breth0 is next hop
+
+- kubernetes image-arm64 0ee04c7e38c5c04c6ca854ce4a095d58d3ea6c53 to 56747b62f392bf1b0da64649aa2285f6a524c435
+  - fe126dd93 2025-09-29T09:43:01+02:00 UPSTREAM: <carry>: Fix tests after backport
+  - 17140b991 2025-09-29T09:42:56+02:00 UPSTREAM: 131725: Avoid encoding in LogResponseObject when we are not going to use it
+  - 81ac17abe 2025-09-29T09:42:33+02:00 UPSTREAM: 131694: Eliminate AuditContext`s SetEventLevel
+  - f8cdcc556 2025-09-29T09:16:54+02:00 UPSTREAM: 129472: Fix API server crash on concurrent map iteration and write
 
