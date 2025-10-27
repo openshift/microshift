@@ -299,7 +299,7 @@ func startDNSController(ctx context.Context, cfg *config.Config, kubeconfigPath 
 
 	extraParams := assets.RenderParams{
 		"ClusterIP":    cfg.Network.DNS,
-		"HostsEnabled": cfg.DNS.Hosts.Status == "Enabled",
+		"HostsEnabled": cfg.DNS.Hosts.Status == config.HostsStatusEnabled,
 	}
 
 	if err := assets.ApplyServices(ctx, svc, renderTemplate, renderParamsFromConfig(cfg, extraParams), kubeconfigPath); err != nil {

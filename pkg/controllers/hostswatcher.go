@@ -17,39 +17,36 @@ import (
 	"k8s.io/klog/v2"
 )
 
-var (
+const (
 	targetNameSpace = "openshift-dns"
 	configMapName   = "hosts-file"
 )
 
 type HostsWatcherManager struct {
-	name         string
-	dependencies []string
-	cfg          *config.Config
+	file       string
+	status     config.HostsStatusEnum
+	kubeconfig string
 }
 
 func NewHostsWatcherManager(cfg *config.Config) *HostsWatcherManager {
 	return &HostsWatcherManager{
-		name:         "hosts-watcher-manager",
-		dependencies: []string{"kube-apiserver"},
-		cfg:          cfg,
+		file:       cfg.DNS.Hosts.File,
+		status:     cfg.DNS.Hosts.Status,
+		kubeconfig: cfg.KubeConfigPath(config.KubeAdmin),
 	}
 }
 
-func (s *HostsWatcherManager) Name() string           { return s.name }
-func (s *HostsWatcherManager) Dependencies() []string { return s.dependencies }
+func (s *HostsWatcherManager) Name() string           { return "hosts-watcher-manager" }
+func (s *HostsWatcherManager) Dependencies() []string { return []string{"kube-apiserver"} }
 
 func (s *HostsWatcherManager) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
 	defer close(stopped)
 
-	if s.cfg.DNS.Hosts.Status != config.HostsStatusEnabled {
+	if s.status != config.HostsStatusEnabled {
 		klog.Infof("%s is disabled (not configured)", s.Name())
 		defer close(ready)
 		return ctx.Err()
 	}
-
-	klog.Infof("%s starting to monitor hosts file: %s", s.Name(), s.cfg.DNS.Hosts.File)
-	close(ready)
 
 	kubeClient, err := s.createKubeClient()
 	if err != nil {
@@ -76,10 +73,10 @@ func (s *HostsWatcherManager) Run(ctx context.Context, ready chan<- struct{}, st
 	if err := s.setupWatches(watcher); err != nil {
 		return err
 	}
-
+	close(ready)
 	klog.Infof("%s ready and watching for changes", s.Name())
 
-	lastHash, err := s.getFileHash(s.cfg.DNS.Hosts.File)
+	lastHash, err := s.getFileHash(s.file)
 	if err != nil {
 		klog.Warningf("%s failed to get initial file hash: %v", s.Name(), err)
 	}
@@ -91,14 +88,14 @@ func (s *HostsWatcherManager) Run(ctx context.Context, ready chan<- struct{}, st
 
 func (s *HostsWatcherManager) setupWatches(watcher *fsnotify.Watcher) error {
 	filesToWatch := []string{
-		s.cfg.DNS.Hosts.File,
-		filepath.Dir(s.cfg.DNS.Hosts.File),
+		s.file,
+		filepath.Dir(s.file),
 	}
 	for i, file := range filesToWatch {
 		if err := watcher.Add(file); err != nil {
 			// Warn if directory, error out if file
 			if i == 0 {
-				klog.Errorf("%s failed to watch hosts file %s: %v", s.Name(), s.cfg.DNS.Hosts.File, err)
+				klog.Errorf("%s failed to watch hosts file %s: %v", s.Name(), s.file, err)
 				return err
 			}
 			klog.Warningf("%s failed to watch hosts directory %s: %v", s.Name(), file, err)
@@ -114,7 +111,7 @@ func (s *HostsWatcherManager) eventLoop(ctx context.Context, watcher *fsnotify.W
 		select {
 		case <-ctx.Done():
 			klog.Infof("%s stopping", s.Name())
-			return nil
+			return watcher.Close()
 
 		case event, ok := <-watcher.Events:
 			if !ok {
@@ -141,15 +138,15 @@ func (s *HostsWatcherManager) eventLoop(ctx context.Context, watcher *fsnotify.W
 }
 
 func (s *HostsWatcherManager) isRelevantHostsEvent(event fsnotify.Event) bool {
-	if event.Name != s.cfg.DNS.Hosts.File {
+	if event.Name != s.file {
 		return false
 	}
 	return event.Op&fsnotify.Write == fsnotify.Write || event.Op&fsnotify.Create == fsnotify.Create
 }
 
 func (s *HostsWatcherManager) handleHostsChange(ctx context.Context, kubeClient kubernetes.Interface, lastHash string) (bool, string, error) {
-	klog.V(2).Infof("%s detected change in hosts file: %s", s.Name(), s.cfg.DNS.Hosts.File)
-	currentHash, err := s.getFileHash(s.cfg.DNS.Hosts.File)
+	klog.Infof("%s detected change in hosts file: %s", s.Name(), s.file)
+	currentHash, err := s.getFileHash(s.file)
 	if err != nil {
 		klog.Warningf("%s failed to get file hash after change: %v", s.Name(), err)
 		return false, lastHash, err
@@ -168,9 +165,7 @@ func (s *HostsWatcherManager) handleHostsChange(ctx context.Context, kubeClient 
 }
 
 func (s *HostsWatcherManager) createKubeClient() (*kubernetes.Clientset, error) {
-	kubeConfigPath := s.cfg.KubeConfigPath(config.KubeAdmin)
-
-	config, err := clientcmd.BuildConfigFromFlags("", kubeConfigPath)
+	config, err := clientcmd.BuildConfigFromFlags("", s.kubeconfig)
 	if err != nil {
 		return nil, fmt.Errorf("failed to build kubeconfig: %w", err)
 	}
@@ -207,7 +202,7 @@ func (s *HostsWatcherManager) createOrUpdateConfigMap(ctx context.Context, clien
 				"app.kubernetes.io/managed-by": "microshift",
 			},
 			Annotations: map[string]string{
-				"microshift.io/hosts-file-path": s.cfg.DNS.Hosts.File,
+				"microshift.io/hosts-file-path": s.file,
 				"microshift.io/last-updated":    time.Now().Format(time.RFC3339),
 			},
 		},
@@ -242,9 +237,9 @@ func (s *HostsWatcherManager) createOrUpdateConfigMap(ctx context.Context, clien
 }
 
 func (s *HostsWatcherManager) readHostsFile() (string, error) {
-	content, err := os.ReadFile(s.cfg.DNS.Hosts.File)
+	content, err := os.ReadFile(s.file)
 	if err != nil {
-		return "", fmt.Errorf("failed to read hosts file %s: %w", s.cfg.DNS.Hosts.File, err)
+		return "", fmt.Errorf("failed to read hosts file %s: %w", s.file, err)
 	}
 	return string(content), nil
 }
