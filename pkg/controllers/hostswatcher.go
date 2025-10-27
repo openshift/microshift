@@ -200,6 +200,8 @@ func (s *HostsWatcherManager) createOrUpdateConfigMap(ctx context.Context, clien
 				"app.kubernetes.io/name":       "microshift-hosts-watcher",
 				"app.kubernetes.io/component":  "hosts-file-sync",
 				"app.kubernetes.io/managed-by": "microshift",
+				// Restrict access to only CoreDNS pods
+				"microshift.io/access-restricted": "coredns-only",
 			},
 			Annotations: map[string]string{
 				"microshift.io/hosts-file-path": s.file,
