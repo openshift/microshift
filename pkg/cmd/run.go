@@ -54,11 +54,19 @@ func NewRunMicroshiftCommand() *cobra.Command {
 
 	var multinode bool
 
+	multinodeDefault := true
+	if version.Get().BuildVariant != version.BuildVariantCommunity {
+		multinodeDefault = false
+	}
+
 	flags := cmd.Flags()
-	flags.BoolVar(&multinode, "multinode", false, "enable multinode mode")
-	err := flags.MarkHidden("multinode")
-	if err != nil {
-		panic(err)
+	flags.BoolVar(&multinode, "multinode", multinodeDefault, "enable multinode mode")
+
+	if version.Get().BuildVariant != version.BuildVariantCommunity {
+		err := flags.MarkHidden("multinode")
+		if err != nil {
+			panic(err)
+		}
 	}
 
 	cmd.RunE = func(cmd *cobra.Command, args []string) error {
