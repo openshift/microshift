@@ -122,3 +122,5 @@
 "[sig-network][Feature:Whereabouts] should assign unique IP addresses to each pod in the event of a race condition case [apigroup:k8s.cni.cncf.io] [Suite:openshift/conformance/parallel]"
 "[sig-network][Feature:bond] should create a pod with bond interface [apigroup:k8s.cni.cncf.io] [Suite:openshift/conformance/parallel]"
 "[sig-network][Feature:tuning] pod should not start for sysctls not on whitelist [apigroup:k8s.cni.cncf.io] net.ipv4.conf.IFNAME.arp_filter [Suite:openshift/conformance/parallel]"
+"[Jira:service-ca][sig-api-machinery] Service CA Operator should have a running operator and managed resources [Suite:openshift/service-ca-operator/conformance/parallel]"
+
