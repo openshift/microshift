@@ -65,7 +65,7 @@ cd "${TESTDIR}"
 if [ ! -d "${RF_VENV}" ]; then
     "${ROOTDIR}/scripts/fetch_tools.sh" robotframework
 fi
-if [[ "${SCENARIO_TYPE:-}" =~ .*releases.* ]]; then
+if [[ "${SCENARIO_SOURCES:-}" =~ .*releases.* ]]; then
     "${ROOTDIR}/scripts/fetch_tools.sh" ginkgo
 fi
 
