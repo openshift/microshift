@@ -1,28 +1,18 @@
-- api embedded-component db4fa2d6cce43c412a816c239a564c6f860218f5 to b410df2482246a6b9c1797d6a58ebcbbbe14e4db
-  - 427307a 2025-10-17T14:46:36-07:00 generated output
-  - ba3c383 2025-10-17T14:44:22-07:00 [release-4.17] CNTRLPLANE-1611: Add feature gates for StreamingCollectionEncoding
+- kubernetes embedded-component ff6c884c3d829c5e8e0d26eb8088b976c908cef1 to ac453edd5ce7d88cf916149399627c93ab30cf16
+  - 6731aa77d 2025-10-23T10:25:58+00:00 UPSTREAM: <carry>: Fix tests after backport
+  - 72e90abce 2025-10-23T10:25:58+00:00 UPSTREAM: 131725: Avoid encoding in LogResponseObject when we are not going to use it
+  - c31c9c6fb 2025-10-23T10:25:58+00:00 UPSTREAM: 131694: Eliminate AuditContext`s SetEventLevel
+  - 31c5ea0a3 2025-10-23T10:25:58+00:00 UPSTREAM: 129472: Fix API server crash on concurrent map iteration and write
 
-- kubernetes embedded-component e7452e1231c1d182a9e47214e5363949d8807f77 to ff6c884c3d829c5e8e0d26eb8088b976c908cef1
-  - a94a78e8b 2025-10-10T13:31:20-07:00 UPSTREAM: <carry>: Make streaming collection encoding off by default
-  - fa910ed92 2025-10-10T13:28:57-07:00 UPSTREAM: <carry>: Switch test to gofuzz
-  - 9e1fc3f4e 2025-10-10T13:28:52-07:00 UPSTREAM: 129407: Implement streaming proto encoding
-  - 3658eacdc 2025-10-10T13:28:29-07:00 UPSTREAM: 130511: Implement tests for encoding collections in Proto
-  - 0e5b5e8da 2025-10-10T13:28:19-07:00 UPSTREAM: 129334: Streaming JSON encoder for List
-  - e41d50f35 2025-10-08T14:47:43-07:00 UPSTREAM: 130220: Add tests for encoding collections in JSON for KEP-5116
-  - 116aee84e 2025-10-08T14:45:22-07:00 UPSTREAM: 130281: Implement chunking for gzip encoder in deferredResponseWriter
-  - e24b655e1 2025-10-08T14:44:52-07:00 UPSTREAM: 130190: Add a test to validate deferredResponseWriteron multiple write calls
+- kubernetes image-amd64 ff6c884c3d829c5e8e0d26eb8088b976c908cef1 to ac453edd5ce7d88cf916149399627c93ab30cf16
+  - 6731aa77d 2025-10-23T10:25:58+00:00 UPSTREAM: <carry>: Fix tests after backport
+  - 72e90abce 2025-10-23T10:25:58+00:00 UPSTREAM: 131725: Avoid encoding in LogResponseObject when we are not going to use it
+  - c31c9c6fb 2025-10-23T10:25:58+00:00 UPSTREAM: 131694: Eliminate AuditContext`s SetEventLevel
+  - 31c5ea0a3 2025-10-23T10:25:58+00:00 UPSTREAM: 129472: Fix API server crash on concurrent map iteration and write
 
-- machine-config-operator embedded-component ba7a2ae01487bd1aef1ae83e7c2e8a36d486cd96 to 6c210e2c3bc6d4fc02156a10e1cda7eb897c4f4c
-  - 7eec986b 2025-10-24T19:12:45+00:00 Add control-plane label for master nodes on legacy clusters
-  - bd19d120 2025-10-21T16:03:02+00:00 msbic: fix arch annotation check
-
-- kubernetes image-amd64 e7452e1231c1d182a9e47214e5363949d8807f77 to ff6c884c3d829c5e8e0d26eb8088b976c908cef1
-  - a94a78e8b 2025-10-10T13:31:20-07:00 UPSTREAM: <carry>: Make streaming collection encoding off by default
-  - fa910ed92 2025-10-10T13:28:57-07:00 UPSTREAM: <carry>: Switch test to gofuzz
-  - 9e1fc3f4e 2025-10-10T13:28:52-07:00 UPSTREAM: 129407: Implement streaming proto encoding
-  - 3658eacdc 2025-10-10T13:28:29-07:00 UPSTREAM: 130511: Implement tests for encoding collections in Proto
-  - 0e5b5e8da 2025-10-10T13:28:19-07:00 UPSTREAM: 129334: Streaming JSON encoder for List
-  - e41d50f35 2025-10-08T14:47:43-07:00 UPSTREAM: 130220: Add tests for encoding collections in JSON for KEP-5116
-  - 116aee84e 2025-10-08T14:45:22-07:00 UPSTREAM: 130281: Implement chunking for gzip encoder in deferredResponseWriter
-  - e24b655e1 2025-10-08T14:44:52-07:00 UPSTREAM: 130190: Add a test to validate deferredResponseWriteron multiple write calls
+- kubernetes image-arm64 ff6c884c3d829c5e8e0d26eb8088b976c908cef1 to ac453edd5ce7d88cf916149399627c93ab30cf16
+  - 6731aa77d 2025-10-23T10:25:58+00:00 UPSTREAM: <carry>: Fix tests after backport
+  - 72e90abce 2025-10-23T10:25:58+00:00 UPSTREAM: 131725: Avoid encoding in LogResponseObject when we are not going to use it
+  - c31c9c6fb 2025-10-23T10:25:58+00:00 UPSTREAM: 131694: Eliminate AuditContext`s SetEventLevel
+  - 31c5ea0a3 2025-10-23T10:25:58+00:00 UPSTREAM: 129472: Fix API server crash on concurrent map iteration and write
 
