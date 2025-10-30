@@ -49,26 +49,82 @@ const (
 )
 
 type KubeletServer struct {
-	kubeletflags *kubeletoptions.KubeletFlags
-	kubeconfig   *kubeletconfig.KubeletConfiguration
+	cfg *config.Config
 }
 
 func NewKubeletServer(cfg *config.Config) *KubeletServer {
-	s := &KubeletServer{}
-	s.configure(cfg)
-	return s
+	return &KubeletServer{
+		cfg: cfg,
+	}
 }
 
 func (s *KubeletServer) Name() string           { return componentKubelet }
 func (s *KubeletServer) Dependencies() []string { return []string{"kube-apiserver"} }
 
-func (s *KubeletServer) configure(cfg *config.Config) {
-	if err := s.writeConfig(cfg); err != nil {
-		klog.Fatalf("Failed to write kubelet config %v", err)
+func (s *KubeletServer) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
+	defer close(stopped)
+
+	kubeletFlags, kubeletConfiguration, err := configure(ctx, s.cfg)
+	if err != nil {
+		return fmt.Errorf("failed to configure kubelet: %w", err)
+	}
+
+	// construct a KubeletServer from kubeletFlags and kubeletConfig
+	kubeletServer := &kubeletoptions.KubeletServer{
+		KubeletFlags:         *kubeletFlags,
+		KubeletConfiguration: *kubeletConfiguration,
+	}
+
+	kubeletDeps, err := kubelet.UnsecuredDependencies(ctx, kubeletServer, utilfeature.DefaultFeatureGate)
+	if err != nil {
+		return fmt.Errorf("error fetching dependencies: %w", err)
+	}
+
+	errc := make(chan error)
+
+	// Run healthcheck probe and kubelet in parallel.
+	// No matter which ends first - if it ends with an error,
+	// it'll cause ServiceManager to trigger graceful shutdown.
+
+	// run readiness check
+	go func() {
+		// This endpoint does not use TLS, but reusing the same function without verification.
+		healthcheckStatus := util.RetryInsecureGet(ctx, "http://localhost:10248/healthz")
+		if healthcheckStatus != 200 {
+			e := fmt.Errorf("%s failed to start", s.Name())
+			klog.Error(e)
+			errc <- e
+			return
+		}
+		klog.Infof("%s is ready", s.Name())
+		close(ready)
+	}()
+
+	panicChannel := make(chan any, 1)
+	go func() {
+		defer func() {
+			if r := recover(); r != nil {
+				panicChannel <- r
+			}
+		}()
+		errc <- kubelet.Run(ctx, kubeletServer, kubeletDeps, utilfeature.DefaultFeatureGate)
+	}()
+
+	select {
+	case err := <-errc:
+		return err
+	case perr := <-panicChannel:
+		panic(perr)
+	}
+}
+
+func configure(ctx context.Context, cfg *config.Config) (*kubeletoptions.KubeletFlags, *kubeletconfig.KubeletConfiguration, error) {
+	if err := writeConfig(cfg); err != nil {
+		return nil, nil, fmt.Errorf("failed to write kubelet config %v", err)
 	}
 	osID, err := loadOSID()
 	if err != nil {
-		klog.Fatalf("Failed to read OS ID %v", err)
+		return nil, nil, fmt.Errorf("failed to read OS ID %v", err)
 	}
 
 	nodeIP := cfg.Node.NodeIP
@@ -90,18 +146,17 @@ func (s *KubeletServer) configure(cfg *config.Config) {
 	kubeletFlags.NodeLabels["node.openshift.io/os_id"] = osID
 	kubeletFlags.NodeLabels["node.kubernetes.io/instance-type"] = "rhde"
 
-	kubeletConfig, err := loadConfigFile(filepath.Join(config.DataDir, "/resources/kubelet/config/config.yaml"))
+	kubeletConfig, err := loadConfigFile(ctx, filepath.Join(config.DataDir, "/resources/kubelet/config/config.yaml"))
 
 	if err != nil {
-		klog.Fatalf("Failed to load Kubelet Configuration %v", err)
+		return nil, nil, fmt.Errorf("failed to load Kubelet configuration %v", err)
 	}
 
-	s.kubeconfig = kubeletConfig
-	s.kubeletflags = kubeletFlags
+	return kubeletFlags, kubeletConfig, nil
 }
 
-func (s *KubeletServer) writeConfig(cfg *config.Config) error {
-	data, err := s.generateConfig(cfg)
+func writeConfig(cfg *config.Config) error {
+	data, err := generateConfig(cfg)
 	if err != nil {
 		return err
 	}
@@ -114,7 +169,7 @@ func (s *KubeletServer) writeConfig(cfg *config.Config) error {
 	return os.WriteFile(path, data, 0400)
 }
 
-func (s *KubeletServer) generateConfig(cfg *config.Config) ([]byte, error) {
+func generateConfig(cfg *config.Config) ([]byte, error) {
 	certsDir := cryptomaterial.CertsDirectory(config.DataDir)
 	servingCertDir := cryptomaterial.KubeletServingCertDir(certsDir)
 
@@ -164,59 +219,7 @@ func (s *KubeletServer) generateConfig(cfg *config.Config) ([]byte, error) {
 	return data.Bytes(), nil
 }
 
-func (s *KubeletServer) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
-	defer close(stopped)
-
-	// construct a KubeletServer from kubeletFlags and kubeletConfig
-	kubeletServer := &kubeletoptions.KubeletServer{
-		KubeletFlags:         *s.kubeletflags,
-		KubeletConfiguration: *s.kubeconfig,
-	}
-
-	kubeletDeps, err := kubelet.UnsecuredDependencies(ctx, kubeletServer, utilfeature.DefaultFeatureGate)
-	if err != nil {
-		return fmt.Errorf("error fetching dependencies: %w", err)
-	}
-
-	errc := make(chan error)
-
-	// Run healthcheck probe and kubelet in parallel.
-	// No matter which ends first - if it ends with an error,
-	// it'll cause ServiceManager to trigger graceful shutdown.
-
-	// run readiness check
-	go func() {
-		// This endpoint does not use TLS, but reusing the same function without verification.
-		healthcheckStatus := util.RetryInsecureGet(ctx, "http://localhost:10248/healthz")
-		if healthcheckStatus != 200 {
-			e := fmt.Errorf("%s failed to start", s.Name())
-			klog.Error(e)
-			errc <- e
-			return
-		}
-		klog.Infof("%s is ready", s.Name())
-		close(ready)
-	}()
-
-	panicChannel := make(chan any, 1)
-	go func() {
-		defer func() {
-			if r := recover(); r != nil {
-				panicChannel <- r
-			}
-		}()
-		errc <- kubelet.Run(ctx, kubeletServer, kubeletDeps, utilfeature.DefaultFeatureGate)
-	}()
-
-	select {
-	case err := <-errc:
-		return err
-	case perr := <-panicChannel:
-		panic(perr)
-	}
-}
-
-func loadConfigFile(name string) (*kubeletconfig.KubeletConfiguration, error) {
+func loadConfigFile(ctx context.Context, name string) (*kubeletconfig.KubeletConfiguration, error) {
 	const errFmt = "failed to load Kubelet config file %s, error %v"
 	// compute absolute path based on current working dir
 	kubeletConfigFile, err := filepath.Abs(name)
@@ -227,7 +230,7 @@ func loadConfigFile(name string) (*kubeletconfig.KubeletConfiguration, error) {
 	if err != nil {
 		return nil, fmt.Errorf(errFmt, name, err)
 	}
-	kc, err := loader.Load(context.TODO())
+	kc, err := loader.Load(ctx)
 	if err != nil {
 		return nil, fmt.Errorf(errFmt, name, err)
 	}
