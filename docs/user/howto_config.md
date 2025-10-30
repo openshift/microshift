@@ -26,6 +26,9 @@ debugging:
     logLevel: ""
 dns:
     baseDomain: ""
+    hosts:
+        file: ""
+        status: ""
 etcd:
     memoryLimitMB: 0
 genericDevicePlugin:
@@ -167,6 +170,9 @@ debugging:
     logLevel: Normal
 dns:
     baseDomain: example.com
+    hosts:
+        file: /etc/hosts
+        status: Disabled
 etcd:
     memoryLimitMB: 0
 genericDevicePlugin:
