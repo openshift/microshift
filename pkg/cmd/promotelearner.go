@@ -54,7 +54,7 @@ func runPromoteLearner(ctx context.Context) error {
 	}
 
 	klog.Info("Promoting etcd learner to member")
-	if err := promoteEtcdLearner(etcdMembers, cfg); err != nil {
+	if err := promoteEtcdLearner(ctx, etcdMembers, cfg); err != nil {
 		return fmt.Errorf("failed to promote etcd learner: %w", err)
 	}
 
@@ -66,7 +66,7 @@ func runPromoteLearner(ctx context.Context) error {
 	return nil
 }
 
-func promoteEtcdLearner(clusterMembers []string, cfg *config.Config) error {
+func promoteEtcdLearner(ctx context.Context, clusterMembers []string, cfg *config.Config) error {
 	certsDir := cryptomaterial.CertsDirectory(config.DataDir)
 	etcdPeerClientCertDir := cryptomaterial.EtcdPeerCertDir(certsDir)
 
@@ -92,14 +92,14 @@ func promoteEtcdLearner(clusterMembers []string, cfg *config.Config) error {
 		Endpoints:   endpoints,
 		DialTimeout: 5 * time.Second,
 		TLS:         tlsConfig,
-		Context:     context.Background(),
+		Context:     ctx,
 	})
 	if err != nil {
 		return fmt.Errorf("failed to create etcd client: %v", err)
 	}
 	defer client.Close()
 
-	memberResponse, err := client.MemberList(context.Background())
+	memberResponse, err := client.MemberList(ctx)
 	if err != nil {
 		return fmt.Errorf("failed to list etcd members: %v", err)
 	}
@@ -124,7 +124,7 @@ func promoteEtcdLearner(clusterMembers []string, cfg *config.Config) error {
 		return fmt.Errorf("node %s is not a learner", cfg.CanonicalNodeName())
 	}
 
-	response, err := client.MemberPromote(context.Background(), id)
+	response, err := client.MemberPromote(ctx, id)
 	if err != nil {
 		return fmt.Errorf("failed to promote etcd learner: %v", err)
 	}
