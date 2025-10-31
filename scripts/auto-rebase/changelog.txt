@@ -1,68 +1,16 @@
-- api embedded-component e16f6cc860949caf863e79bd838491cdcb6e9641 to 98e18dae8c7a82a4075c65ca0d357c9bf31cfb7c
-  - 6d071af 2025-10-13T15:19:00-07:00 generated output
-  - 68c134f 2025-10-13T15:18:15-07:00 OCPSTRAT-2467: Add feature gate for StreamingCollectionEncoding
+- cluster-kube-apiserver-operator embedded-component b6ad4b065b9f9677f0b33d625f9ae9dc36ccc3fc to bac8a7c99c2e8562a05b784c8fe4f8ecd91eecdf
+  - b8bbcfe 2025-10-15T00:35:24+00:00 SCC: add hostmount-anyuid-v2
 
-- kubernetes embedded-component 0ee04c7e38c5c04c6ca854ce4a095d58d3ea6c53 to 56747b62f392bf1b0da64649aa2285f6a524c435
-  - fe126dd93 2025-09-29T09:43:01+02:00 UPSTREAM: <carry>: Fix tests after backport
-  - 17140b991 2025-09-29T09:42:56+02:00 UPSTREAM: 131725: Avoid encoding in LogResponseObject when we are not going to use it
-  - 81ac17abe 2025-09-29T09:42:33+02:00 UPSTREAM: 131694: Eliminate AuditContext`s SetEventLevel
-  - f8cdcc556 2025-09-29T09:16:54+02:00 UPSTREAM: 129472: Fix API server crash on concurrent map iteration and write
+- csi-external-snapshotter embedded-component 838d2484157f076bbb81f1b584898aec6f051c2f to 8ddbcd381bf5317c1d1a93db3b5760681a33cb27
+  - a316b06 2025-10-27T09:36:20+00:00 UPSTREAM: 1303: Fix requeueing snapshot content after deletion error
 
-- ovn-kubernetes image-amd64 0466cfde84ccfe8595b7be427aaf4fb47d8078a5 to 7bb7a9e71737d4d2d7e00f693080df3fc4d735db
-  - f7c67b7f 2025-10-08T12:54:42+01:00 [IC][EIP] OCPBUGS-42303: Fix race between SB DB and OVN-Controller
-  - 2ac68e4c 2025-10-02T13:04:35+01:00 Node controller shutdown: do not ref gateway if not set
-  - 37dd4e2a 2025-10-02T13:04:27+01:00 ovn-controller: block GARP during startup
-  - d3ae338d 2025-10-02T13:04:20+01:00 Fix ovnkube-controller-with-node shutdown sequence
-  - ba90f223 2025-09-29T17:47:06+02:00 Fix EgressIP controller deadlock by sorting node locks lexicographically
-  - 0b161878 2025-09-23T17:41:45-04:00 [release-4.20] OCPBUGS-61239: Skip node-encap-ips annotation in DPU host mode
-  - 77fe97ad 2025-09-16T12:16:32+00:00 OCPBUGS-61065: As part of DPF installation we are required to use OCP downstream image for dpu service. Dpu service uses upstream ovnkube.sh script that requires ovndb-raft-functions.sh as a dependency. This change copies it into the image as part of Dockerfile.base
-  - fe444a75 2025-09-09T16:41:27+02:00 E2E localnet: send three pings instead of just one
-  - 90e8e0ab 2025-09-09T16:41:27+02:00 E2E localnet: localnet -> host network on VLAN with external router
-  - 44182f55 2025-09-09T16:41:27+02:00 E2E localnet: host network -> localnet on VLAN with external router
-  - 3000947b 2025-09-09T16:41:27+02:00 E2E localnet: default network->localnet on VLAN with external router
-  - 43854789 2025-09-09T16:41:27+02:00 E2E localnet: Fix requirement on number of schedulable nodes
-  - 6e4588a3 2025-09-09T16:41:27+02:00 E2E localnet: make IP request for localnet pod extensible
-  - ece915da 2025-09-09T16:41:27+02:00 E2E localnet: specify that the localnet uses IPs from host subnet
-  - 2a91e405 2025-09-09T16:41:27+02:00 E2E localnet: remove references to downstream bugs and stories
-  - 9ff5050e 2025-09-09T16:41:27+02:00 Configure existing multihoming CI lane as IC-enabled and shared gw
-  - 5041ae2f 2025-09-09T16:41:27+02:00 E2E: add test host -> localnet with IP in host subnet
-  - 11e4a9c3 2025-09-09T16:41:27+02:00 E2E localnet: remove double import of ginkgo
-  - 53c3e110 2025-09-09T16:41:27+02:00 Openflow: lookup conntrack & table=1 when breth0 is next hop (IPv6)
-  - 2c3d0274 2025-09-09T16:41:27+02:00 Openflow: drop in_port from IPv6 dispatch OF rule at prio=50
-  - cc65df72 2025-09-09T16:41:27+02:00 Openflow: lookup conntrack & table=1 only when breth0 is next hop
+- machine-config-operator embedded-component 6027b8f9bec4175d8a4059c1f8a86569731ddafb to bb2aa85171d93b2df952ed802a8cb200164e666f
+  - 284a69ab 2025-09-26T14:43:46-05:00 OCPBUGS-57072: configure-ovs: don't escape `:` in nmcli output
+  - 16b2a13f 2025-09-26T14:43:35-05:00 OCPBUGS-44732: Support for br-ex with DHCP and static DNS
 
-- kubernetes image-amd64 0ee04c7e38c5c04c6ca854ce4a095d58d3ea6c53 to 56747b62f392bf1b0da64649aa2285f6a524c435
-  - fe126dd93 2025-09-29T09:43:01+02:00 UPSTREAM: <carry>: Fix tests after backport
-  - 17140b991 2025-09-29T09:42:56+02:00 UPSTREAM: 131725: Avoid encoding in LogResponseObject when we are not going to use it
-  - 81ac17abe 2025-09-29T09:42:33+02:00 UPSTREAM: 131694: Eliminate AuditContext`s SetEventLevel
-  - f8cdcc556 2025-09-29T09:16:54+02:00 UPSTREAM: 129472: Fix API server crash on concurrent map iteration and write
+- csi-external-snapshotter image-amd64 838d2484157f076bbb81f1b584898aec6f051c2f to 8ddbcd381bf5317c1d1a93db3b5760681a33cb27
+  - a316b06 2025-10-27T09:36:20+00:00 UPSTREAM: 1303: Fix requeueing snapshot content after deletion error
 
-- ovn-kubernetes image-arm64 0466cfde84ccfe8595b7be427aaf4fb47d8078a5 to 7bb7a9e71737d4d2d7e00f693080df3fc4d735db
-  - f7c67b7f 2025-10-08T12:54:42+01:00 [IC][EIP] OCPBUGS-42303: Fix race between SB DB and OVN-Controller
-  - 2ac68e4c 2025-10-02T13:04:35+01:00 Node controller shutdown: do not ref gateway if not set
-  - 37dd4e2a 2025-10-02T13:04:27+01:00 ovn-controller: block GARP during startup
-  - d3ae338d 2025-10-02T13:04:20+01:00 Fix ovnkube-controller-with-node shutdown sequence
-  - ba90f223 2025-09-29T17:47:06+02:00 Fix EgressIP controller deadlock by sorting node locks lexicographically
-  - 0b161878 2025-09-23T17:41:45-04:00 [release-4.20] OCPBUGS-61239: Skip node-encap-ips annotation in DPU host mode
-  - 77fe97ad 2025-09-16T12:16:32+00:00 OCPBUGS-61065: As part of DPF installation we are required to use OCP downstream image for dpu service. Dpu service uses upstream ovnkube.sh script that requires ovndb-raft-functions.sh as a dependency. This change copies it into the image as part of Dockerfile.base
-  - fe444a75 2025-09-09T16:41:27+02:00 E2E localnet: send three pings instead of just one
-  - 90e8e0ab 2025-09-09T16:41:27+02:00 E2E localnet: localnet -> host network on VLAN with external router
-  - 44182f55 2025-09-09T16:41:27+02:00 E2E localnet: host network -> localnet on VLAN with external router
-  - 3000947b 2025-09-09T16:41:27+02:00 E2E localnet: default network->localnet on VLAN with external router
-  - 43854789 2025-09-09T16:41:27+02:00 E2E localnet: Fix requirement on number of schedulable nodes
-  - 6e4588a3 2025-09-09T16:41:27+02:00 E2E localnet: make IP request for localnet pod extensible
-  - ece915da 2025-09-09T16:41:27+02:00 E2E localnet: specify that the localnet uses IPs from host subnet
-  - 2a91e405 2025-09-09T16:41:27+02:00 E2E localnet: remove references to downstream bugs and stories
-  - 9ff5050e 2025-09-09T16:41:27+02:00 Configure existing multihoming CI lane as IC-enabled and shared gw
-  - 5041ae2f 2025-09-09T16:41:27+02:00 E2E: add test host -> localnet with IP in host subnet
-  - 11e4a9c3 2025-09-09T16:41:27+02:00 E2E localnet: remove double import of ginkgo
-  - 53c3e110 2025-09-09T16:41:27+02:00 Openflow: lookup conntrack & table=1 when breth0 is next hop (IPv6)
-  - 2c3d0274 2025-09-09T16:41:27+02:00 Openflow: drop in_port from IPv6 dispatch OF rule at prio=50
-  - cc65df72 2025-09-09T16:41:27+02:00 Openflow: lookup conntrack & table=1 only when breth0 is next hop
-
-- kubernetes image-arm64 0ee04c7e38c5c04c6ca854ce4a095d58d3ea6c53 to 56747b62f392bf1b0da64649aa2285f6a524c435
-  - fe126dd93 2025-09-29T09:43:01+02:00 UPSTREAM: <carry>: Fix tests after backport
-  - 17140b991 2025-09-29T09:42:56+02:00 UPSTREAM: 131725: Avoid encoding in LogResponseObject when we are not going to use it
-  - 81ac17abe 2025-09-29T09:42:33+02:00 UPSTREAM: 131694: Eliminate AuditContext`s SetEventLevel
-  - f8cdcc556 2025-09-29T09:16:54+02:00 UPSTREAM: 129472: Fix API server crash on concurrent map iteration and write
+- csi-external-snapshotter image-arm64 838d2484157f076bbb81f1b584898aec6f051c2f to 8ddbcd381bf5317c1d1a93db3b5760681a33cb27
+  - a316b06 2025-10-27T09:36:20+00:00 UPSTREAM: 1303: Fix requeueing snapshot content after deletion error
 
