@@ -1,0 +1,15 @@
+- kubernetes embedded-component e0d42164c84ee27644b85a1d2c9bbb062066056d to debdebd535dc3f5d0ab3557aa79172ff92344d97
+  - 87e4cfbe4 2025-10-28T17:17:49-04:00 UPSTREAM: <carry>: Skip CPU resource status for workload-pinned pods
+
+- ovn-kubernetes image-amd64 050ed2c215b55aef456c73c5217427600756ae75 to 73fbb3d0bb633723932a2930053360720a4f0f6c
+  - 90fa4bb9 2025-10-28T13:41:43+01:00 Skip Pending pods in EgressIP status updates
+
+- kubernetes image-amd64 e0d42164c84ee27644b85a1d2c9bbb062066056d to debdebd535dc3f5d0ab3557aa79172ff92344d97
+  - 87e4cfbe4 2025-10-28T17:17:49-04:00 UPSTREAM: <carry>: Skip CPU resource status for workload-pinned pods
+
+- ovn-kubernetes image-arm64 050ed2c215b55aef456c73c5217427600756ae75 to 73fbb3d0bb633723932a2930053360720a4f0f6c
+  - 90fa4bb9 2025-10-28T13:41:43+01:00 Skip Pending pods in EgressIP status updates
+
+- kubernetes image-arm64 e0d42164c84ee27644b85a1d2c9bbb062066056d to debdebd535dc3f5d0ab3557aa79172ff92344d97
+  - 87e4cfbe4 2025-10-28T17:17:49-04:00 UPSTREAM: <carry>: Skip CPU resource status for workload-pinned pods
+
