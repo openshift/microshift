@@ -1,0 +1,67 @@
+[34m# Rebasing to registry.ci.openshift.org/ocp/release:4.18.0-0.nightly-2025-10-30-063717 and registry.ci.openshift.org/ocp-arm64/release-arm64:4.18.0-0.nightly-arm64-2025-10-30-134423[00m
+[34m# Fetching release info for registry.ci.openshift.org/ocp/release:4.18.0-0.nightly-2025-10-30-063717 (amd64)[00m
+[34m# Fetching release info for registry.ci.openshift.org/ocp-arm64/release-arm64:4.18.0-0.nightly-arm64-2025-10-30-134423 (arm64)[00m
+[34m# Extracting registry.ci.openshift.org/ocp/release:4.18.0-0.nightly-2025-10-30-063717 manifest content[00m
+[34m# Cloning registry.ci.openshift.org/ocp/release:4.18.0-0.nightly-2025-10-30-063717 component repos[00m
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/api/.git/
+HEAD is now at 98e18da Merge pull request #2528 from rh-roman/test-streaming-collection-encoding-4.18
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/cluster-csi-snapshot-controller-operator/.git/
+HEAD is now at 6fe7000 Merge pull request #227 from openshift-cherrypick-robot/cherry-pick-223-to-release-4.18
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/cluster-dns-operator/.git/
+HEAD is now at 7cafd0c Merge pull request #429 from khalid-lemghari/add-runbook-url-for-CoreDNSErrorsHigh-release-4.18
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/cluster-ingress-operator/.git/
+HEAD is now at d967a73 Merge pull request #1196 from Thealisyed/gwapi-admingate-4.18
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/cluster-kube-apiserver-operator/.git/
+HEAD is now at bac8a7c Merge pull request #1937 from openshift-cherrypick-robot/cherry-pick-1844-to-release-4.18
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/cluster-kube-controller-manager-operator/.git/
+HEAD is now at a2cbb57 Merge pull request #852 from openshift-cherrypick-robot/cherry-pick-848-to-release-4.18
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/cluster-kube-scheduler-operator/.git/
+HEAD is now at 6182930 Merge pull request #559 from benluddy/release-4.18-library-go-staticpod-bump
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/cluster-network-operator/.git/
+HEAD is now at eec368f Merge pull request #2810 from martinkennelly/418-garp
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/cluster-openshift-controller-manager-operator/.git/
+HEAD is now at f1711cf Merge pull request #374 from openshift-cherrypick-robot/cherry-pick-373-to-release-4.18
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/cluster-policy-controller/.git/
+HEAD is now at 5fd8525 Merge pull request #157 from stbenjam/image-vol-type
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/csi-external-snapshotter/.git/
+HEAD is now at 8ddbcd3 Merge pull request #190 from openshift-cherrypick-robot/cherry-pick-182-to-release-4.18
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/etcd/.git/
+HEAD is now at b5a4f8d0 Merge pull request #333 from openshift-bot/art-consistency-openshift-4.18-ose-etcd
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/kubernetes/.git/
+HEAD is now at 56747b62f Merge pull request #2475 from tjungblu/OCPBUGS-61773
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/kubernetes-kube-storage-version-migrator/.git/
+HEAD is now at c0f1886 Merge pull request #225 from openshift-cherrypick-robot/cherry-pick-223-to-release-4.18
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/machine-config-operator/.git/
+HEAD is now at bb2aa851 Merge pull request #5311 from cybertron/4.18-static-dns-dhcp
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/openshift-controller-manager/.git/
+HEAD is now at 8ee7440 Merge pull request #411 from openshift-cherrypick-robot/cherry-pick-384-to-release-4.18
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/operator-framework-olm/.git/
+HEAD is now at f295d320 Merge pull request #1080 from perdasilva/e2e-stability-418
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/route-controller-manager/.git/
+HEAD is now at ce6ffa2 Merge pull request #59 from openshift-cherrypick-robot/cherry-pick-48-to-release-4.18
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/service-ca-operator/.git/
+HEAD is now at 30efb52 Merge pull request #253 from vrutkovs/4.18-go1.22
+
+[34m# Cloning registry.ci.openshift.org/ocp/release:4.18.0-0.nightly-2025-10-30-063717 image repos[00m
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/amd64/oc/.git/
+error: RPC failed; curl 16 Error in the HTTP2 framing layer
+fatal: expected 'packfile'
+fatal: could not fetch 64887a08b41833d920841c59de2b2c968d2db962 from promisor remote
