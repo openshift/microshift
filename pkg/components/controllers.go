@@ -274,6 +274,12 @@ func startDNSController(ctx context.Context, cfg *config.Config, kubeconfigPath 
 		clusterRole = []string{
 			"components/openshift-dns/dns/cluster-role.yaml",
 		}
+		roleBinding = []string{
+			"components/openshift-dns/dns/hosts-configmap-rolebinding.yaml",
+		}
+		role = []string{
+			"components/openshift-dns/dns/hosts-configmap-role.yaml",
+		}
 		apps = []string{
 			"components/openshift-dns/dns/daemonset.yaml",
 			"components/openshift-dns/node-resolver/daemonset.yaml",
@@ -313,6 +319,14 @@ func startDNSController(ctx context.Context, cfg *config.Config, kubeconfigPath 
 	}
 	if err := assets.ApplyClusterRoleBindings(ctx, clusterRoleBinding, kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply clusterRoleBinding %v %v", clusterRoleBinding, err)
+		return err
+	}
+	if err := assets.ApplyRoleBindings(ctx, roleBinding, kubeconfigPath); err != nil {
+		klog.Warningf("Failed to apply rolebinding %v: %v", roleBinding, err)
+		return err
+	}
+	if err := assets.ApplyRoles(ctx, role, kubeconfigPath); err != nil {
+		klog.Warningf("Failed to apply role %v: %v", role, err)
 		return err
 	}
 	if err := assets.ApplyServiceAccounts(ctx, sa, kubeconfigPath); err != nil {

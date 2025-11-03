@@ -2,6 +2,8 @@ package config
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
 )
 
 const (
@@ -57,7 +59,39 @@ func dnsDefaults() DNS {
 }
 
 func (t *DNS) validate() error {
-	if t.Hosts.Status != HostsStatusEnabled && t.Hosts.Status != HostsStatusDisabled {
+	switch t.Hosts.Status {
+	case HostsStatusEnabled:
+		if t.Hosts.File == "" {
+			break
+		}
+
+		cleanPath := filepath.Clean(t.Hosts.File)
+
+		fi, err := os.Stat(cleanPath)
+		// Enforce ConfigMap requirement: the file must not exceed 1MiB, as it will be mounted into a ConfigMap.
+		if err == nil && fi.Size() > 1048576 {
+			return fmt.Errorf("hosts file %s exceeds 1MiB ConfigMap (and internal buffer) size limit (got %d bytes)", t.Hosts.File, fi.Size())
+		}
+		if !filepath.IsAbs(cleanPath) {
+			return fmt.Errorf("hosts file path must be absolute: got %s", t.Hosts.File)
+		}
+
+		_, err = os.Stat(cleanPath)
+		if os.IsNotExist(err) {
+			return fmt.Errorf("hosts file %s does not exist", t.Hosts.File)
+		} else if err != nil {
+			return fmt.Errorf("error checking hosts file %s: %v", t.Hosts.File, err)
+		}
+
+		file, err := os.Open(t.Hosts.File)
+		if err != nil {
+			return fmt.Errorf("hosts file %s is not readable: %v", t.Hosts.File, err)
+		}
+		return file.Close()
+
+	case HostsStatusDisabled:
+		return nil
+	default:
 		return fmt.Errorf("invalid hosts status: %s", t.Hosts.Status)
 	}
 	return nil
