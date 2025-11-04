@@ -125,6 +125,8 @@ else
     ./scripts/auto-rebase/rebase-lvms.sh to "${pullspec_release_lvms_fallback}"
 fi
 
+# SR-IOV Operator is available through OLM and is not part of the OCP release.
+sriov_release="registry.redhat.io/openshift4/ose-sriov-network-operator-bundle:v4.20"
 
 if [[ "${JOB_TYPE}" == "presubmit" ]]; then
     # Verify the assets after the rebase to make sure

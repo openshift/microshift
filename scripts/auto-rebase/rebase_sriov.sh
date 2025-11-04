@@ -81,8 +81,8 @@ append_if_exists() {
 }
 
 # download_rhoai_manifests() fetches the RHOAI's kserve and runtime manifests.
-# First, it downloads the RHOAI Operator bundle CSV and extracts image ref to the RHOAI Operator image.
-# Then, it extracts the manifests from the RHOAI Operator image to the staging dir.
+# First, it downloads the SR-IOV Operator bundle CSV and extracts image ref to the SR-IOV Operator image.
+# Then, it extracts the manifests from the SR-IOV Operator image to the staging dir.
 # No processing is done in this functions.
 download_sriov_manifests() {
     local -r bundle_ref="${1}"
@@ -141,10 +141,6 @@ extract_sriov_rbac_from_cluster_service_version() {
     extract_sriov_service_account_from_csv_by_service_account_name "${service_account_name}" "${namespace}" "${service_account}"
     
   done
-
-  local operator="${dest}/${OPERATOR_FILENAME}"
-  echo "generating ${operator}"
-  extract_operator_from_csv "${csv}" "${operator}"
 
 }
 
@@ -254,12 +250,6 @@ EOL
     echo "${serviceAccount}" > "${target}"
 }
 
-extract_configmap_from_bundle() {
-  local configmap="${STAGING_DOWNLOAD}/${CONFIGMAP_FILENAME}"
-
-  cp "${configmap}" "${STAGING_EXTRACTED}/"
-}
-
 extract_operator_from_csv() {
   local csv="$1"
   local target="$2"
@@ -267,12 +257,28 @@ extract_operator_from_csv() {
   yq eval '.spec.install.spec.deployments[] | select(.name == "sriov-network-operator")' "${csv}" > "${target}"
 }
 
-process_manifests() {
-  rm -rf "${FINAL_DEPLOY}" && mkdir -p "${FINAL_DEPLOY}"
+extract_sriov_manifests() {
+  # extract service_account, role, role_binding, clusterrole, clusterrole_binding
+  extract_sriov_rbac_from_cluster_service_version "${STAGING_EXTRACTED}" "${STAGING_DOWNLOAD}/${CSV_FILENAME}" "sriov-network-operator"
+
+  # extract configmap
+  local configmap="${STAGING_DOWNLOAD}/${CONFIGMAP_FILENAME}"
+  echo "generating ${configmap}"
+  cp "${configmap}" "${STAGING_EXTRACTED}/"
+
+  # extract operator
+  local operator="${dest}/${OPERATOR_FILENAME}"
+  echo "generating ${operator}"
+  extract_operator_from_csv "${csv}" "${operator}"
+}
+
+process_sriov_manifests() {
+  rm -rf "${FINAL_ROOT}" && mkdir -p "${FINAL_DEPLOY}" "${FINAL_CRD}"
   local namespace="$1"
   local operatorfile="${STAGING_EXTRACTED}/${OPERATOR_FILENAME}"
   local configmap="${STAGING_EXTRACTED}/${CONFIGMAP_FILENAME}"
 
+  # copy extracted manifests to final destination
   cp -a "${STAGING_EXTRACTED}/." "${FINAL_DEPLOY}/" 
 
   # add apiVersion, Kind and namespace to operator.yaml
@@ -280,23 +286,93 @@ process_manifests() {
 
   # add the nic we use in testing to supported nics list
   yq eval ".data.Intel_ixgbe_82576 = \"8086 10c9 10ca\"" "${configmap}" > "${FINAL_DEPLOY}/configmap.yaml"
-}
-
-process_crds() {
-  rm -rf "${FINAL_CRD}" && mkdir -p "${FINAL_CRD}"
-
+  
+  # copy CRDs to final destination
   cp -a "${STAGING_DOWNLOAD}/sriovnetwork.openshift.io_"* "${FINAL_CRD}/"
 }
 
+get_sriov_bundle_version() {
+    yq '.spec.version' "${STAGING_DOWNLOAD}/${CSV_FILENAME}"
+}
+
+update_last_rebase_sriov_sh() {
+    local -r operator_bundle="${1}"
+
+    title "Updating last_rebase_sriov.sh"
+    local -r last_rebase_script="${REPOROOT}/scripts/auto-rebase/last_rebase_sriov.sh"
+
+    rm -f "${last_rebase_script}"
+    cat - >"${last_rebase_script}" <<EOF
+#!/bin/bash -x
+./scripts/auto-rebase/rebase_sriov.sh to "${operator_bundle}"
+EOF
+    chmod +x "${last_rebase_script}"
+}
+
+update_rebase_job_entrypoint_sh() {
+    local -r operator_bundle="${1}"
+
+    title "Updating rebase_job_entrypoint.sh"
+    sed -i \
+        "s,^sriov_release=.*\$,sriov_release=\"${operator_bundle}\",g" \
+        "${REPOROOT}/scripts/auto-rebase/rebase_job_entrypoint.sh"
+}
+
+rebase_sriov_to() {
+    local -r operator_bundle="${1}"
+
+    title "Rebasing SR-IOV for MicroShift to ${operator_bundle}"
+
+    download_sriov_manifests "${operator_bundle}"
+    local -r version=$(get_sriov_bundle_version)
+
+    update_last_rebase_sriov_sh "${operator_bundle}"
+    update_rebase_job_entrypoint_sh "${operator_bundle}"
+
+    process_sriov_manifests
+
+    if [[ -n "$(git status -s ./assets ./scripts/auto-rebase/rebase_job_entrypoint.sh ./scripts/auto-rebase/last_rebase_sriov.sh)" ]]; then
+        title "Detected changes to assets/ or last_rebase_sriov.sh"
+
+        if ! "${NO_BRANCH}"; then
+            branch="rebase-sriov-${version}"
+            title "Creating branch ${branch}"
+            git branch -D "${branch}" 2>/dev/null || true && git checkout -b "${branch}"
+        fi
+
+        title "Committing changes"
+        git add ./assets ./scripts/auto-rebase/rebase_job_entrypoint.sh ./scripts/auto-rebase/last_rebase_sriov.sh
+        git commit -m "Update SR-IOV for MicroShift"
+    else
+        title "No changes to assets/ or last_rebase_sriov.sh"
+    fi
+
+    if ! "${KEEP_STAGING}"; then
+        title "Removing staging directory"
+        rm -rf "${STAGING_RHOAI}"
+    fi
+}
+
+usage() {
+    echo "Usage:"
+    echo "$(basename "$0") to SRIOV_BUNDLE                    Performs all the steps to rebase SR-IOV for MicroShift"
+    echo "$(basename "$0") download SRIOV_BUNDLE              Downloads the contents of the SR-IOV Operator (Bundle) to disk in preparation for rebasing"
+    echo "$(basename "$0") process                            Process already downloaded SR-IOV Operator (Bundle) artifacts to update SR-IOV for MicroShift"
+    exit 1
+}
 
 check_preconditions
 
-download_sriov_manifests "registry.redhat.io/openshift4/ose-sriov-network-operator-bundle:latest"
-
-extract_sriov_rbac_from_cluster_service_version "${STAGING_EXTRACTED}" "${STAGING_DOWNLOAD}/${CSV_FILENAME}" "sriov-network-operator"
-
-extract_configmap_from_bundle
-
-process_manifests "sriov-network-operator"
-
-process_crds
+command=${1:-help}
+case "${command}" in
+    to)
+        rebase_sriov_serving_to "$2"
+        ;;
+    download)
+        download_sriov_manifests "$2"
+        ;;
+    process)
+        process_sriov_manifests
+        ;;
+    *) usage;;
+esac
