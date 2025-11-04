@@ -76,8 +76,7 @@ func TestDefaultingHappens(t *testing.T) {
 		"annotations": {
 			"kubernetes.io/description": "node-exporter scc is used for the Prometheus node exporter"
 		},
-		"name": "node-exporter",
-		"creationTimestamp":null
+		"name": "node-exporter"
 	},
 	"priority": null,
 	"readOnlyRootFilesystem": false,
@@ -102,7 +101,7 @@ func TestDefaultingHappens(t *testing.T) {
 	}
 
 	if !reflect.DeepEqual(expectedUnstructured.Object, inputUnstructured.Object) {
-		t.Fatal(diff.ObjectDiff(expectedUnstructured.Object, inputUnstructured.Object))
+		t.Fatal(diff.Diff(expectedUnstructured.Object, inputUnstructured.Object))
 	}
 }
 

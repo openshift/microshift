@@ -25,7 +25,6 @@ import (
 	pkgfeatures "k8s.io/kubernetes/pkg/features"
 	"k8s.io/kubernetes/pkg/kubelet/cm/cpumanager/topology"
 	"k8s.io/kubernetes/pkg/kubelet/cm/topologymanager"
-	"k8s.io/kubernetes/pkg/kubelet/llcalign"
 )
 
 type optionAvailTest struct {
@@ -115,6 +114,18 @@ func TestPolicyOptionsAvailable(t *testing.T) {
 		},
 		{
 			option:            StrictCPUReservationOption,
+			featureGate:       pkgfeatures.CPUManagerPolicyBetaOptions,
+			featureGateEnable: true,
+			expectedAvailable: true,
+		},
+		{
+			option:            PreferAlignByUnCoreCacheOption,
+			featureGate:       pkgfeatures.CPUManagerPolicyBetaOptions,
+			featureGateEnable: false,
+			expectedAvailable: false,
+		},
+		{
+			option:            PreferAlignByUnCoreCacheOption,
 			featureGate:       pkgfeatures.CPUManagerPolicyBetaOptions,
 			featureGateEnable: true,
 			expectedAvailable: true,
@@ -242,11 +253,56 @@ func TestPolicyOptionsCompatibility(t *testing.T) {
 			expectedErr: false,
 		},
 		{
+			description: "PreferAlignByUnCoreCache and StrictCPUReservation set to true",
+			featureGate: pkgfeatures.CPUManagerPolicyAlphaOptions,
+			policyOptions: map[string]string{
+				PreferAlignByUnCoreCacheOption: "true",
+				StrictCPUReservationOption:     "true",
+			},
+			expectedErr: false,
+		},
+		{
+			description: "PreferAlignByUnCoreCache and FullPCPUsOnly set to true",
+			featureGate: pkgfeatures.CPUManagerPolicyAlphaOptions,
+			policyOptions: map[string]string{
+				PreferAlignByUnCoreCacheOption: "true",
+				FullPCPUsOnlyOption:            "true",
+			},
+			expectedErr: false,
+		},
+		{
+			description: "PreferAlignByUnCoreCache and AlignBySocket set to true",
+			featureGate: pkgfeatures.CPUManagerPolicyAlphaOptions,
+			policyOptions: map[string]string{
+				PreferAlignByUnCoreCacheOption: "true",
+				AlignBySocketOption:            "true",
+			},
+			expectedErr: false,
+		},
+		{
 			description: "FullPhysicalCPUsOnly and DistributeCPUsAcrossCores options can not coexist",
 			featureGate: pkgfeatures.CPUManagerPolicyAlphaOptions,
 			policyOptions: map[string]string{
 				FullPCPUsOnlyOption:             "true",
 				DistributeCPUsAcrossCoresOption: "true",
+			},
+			expectedErr: true,
+		},
+		{
+			description: "PreferAlignByUnCoreCache and DistributeCPUsAcrossCores options can not coexist",
+			featureGate: pkgfeatures.CPUManagerPolicyAlphaOptions,
+			policyOptions: map[string]string{
+				PreferAlignByUnCoreCacheOption:  "true",
+				DistributeCPUsAcrossCoresOption: "true",
+			},
+			expectedErr: true,
+		},
+		{
+			description: "PreferAlignByUnCoreCache and DistributeCPUsAcrossNUMA options can not coexist",
+			featureGate: pkgfeatures.CPUManagerPolicyAlphaOptions,
+			policyOptions: map[string]string{
+				PreferAlignByUnCoreCacheOption: "true",
+				DistributeCPUsAcrossNUMAOption: "true",
 			},
 			expectedErr: true,
 		},
@@ -258,68 +314,6 @@ func TestPolicyOptionsCompatibility(t *testing.T) {
 			gotError := err != nil
 			if gotError != testCase.expectedErr {
 				t.Errorf("testCase %q failed, got %v expected %v", testCase.description, gotError, testCase.expectedErr)
-			}
-		})
-	}
-}
-
-func TestPolicyOptionsAvailableWithEnablement(t *testing.T) {
-
-	type optionAvailEnabTest struct {
-		name                  string
-		option                string
-		featureGate           featuregate.Feature
-		featureGateEnable     bool
-		featureEnablementFlag bool
-		expectedAvailable     bool
-	}
-
-	testCases := []optionAvailEnabTest{
-		{
-			name:                  "all disabled",
-			option:                PreferAlignByUnCoreCacheOption,
-			featureGate:           pkgfeatures.CPUManagerPolicyAlphaOptions,
-			featureGateEnable:     false, // expected standard case
-			featureEnablementFlag: false,
-			expectedAvailable:     false,
-		},
-		{
-			name:                  "all enabled",
-			option:                PreferAlignByUnCoreCacheOption,
-			featureGate:           pkgfeatures.CPUManagerPolicyAlphaOptions,
-			featureGateEnable:     true, // this should not be allowed by OCP profiles
-			featureEnablementFlag: true,
-			expectedAvailable:     true,
-		},
-		{
-			name:                  "enabled by feature gate",
-			option:                PreferAlignByUnCoreCacheOption,
-			featureGate:           pkgfeatures.CPUManagerPolicyAlphaOptions,
-			featureGateEnable:     true, // this should not be allowed by OCP profiles, makes no sense either
-			featureEnablementFlag: false,
-			expectedAvailable:     true,
-		},
-		{
-			name:                  "enabled by enablement file",
-			option:                PreferAlignByUnCoreCacheOption,
-			featureGate:           pkgfeatures.CPUManagerPolicyAlphaOptions,
-			featureGateEnable:     false,
-			featureEnablementFlag: true,
-			expectedAvailable:     true,
-		},
-	}
-	for _, testCase := range testCases {
-		t.Run(testCase.name, func(t *testing.T) {
-			featuregatetesting.SetFeatureGateDuringTest(t, utilfeature.DefaultFeatureGate, testCase.featureGate, testCase.featureGateEnable)
-			oldEnablementFlag := llcalign.TestOnlySetEnabled(testCase.featureEnablementFlag)
-
-			err := CheckPolicyOptionAvailable(testCase.option)
-
-			_ = llcalign.TestOnlySetEnabled(oldEnablementFlag)
-
-			isEnabled := (err == nil)
-			if isEnabled != testCase.expectedAvailable {
-				t.Errorf("option %q available got=%v expected=%v", testCase.option, isEnabled, testCase.expectedAvailable)
 			}
 		})
 	}

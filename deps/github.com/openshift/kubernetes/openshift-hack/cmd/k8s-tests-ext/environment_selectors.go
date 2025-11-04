@@ -35,6 +35,13 @@ func addEnvironmentSelectors(specs et.ExtensionTestSpecs) {
 	// Just remove this check + notify the OCP storage team.
 	specs.Select(et.NameContains("[Feature:SELinuxMountReadWriteOncePodOnly]")).
 		Exclude(et.FeatureGateEnabled(string(features.SELinuxMount)))
+
+	// DynamicResourceAllocation is only enabled in Technology Preview clusters as of 1.34 rebase,
+	// see https://issues.redhat.com/browse/OCPBUGS-61381 for context
+	specs.Select(et.NameContains("[FeatureGate:DynamicResourceAllocation]")).
+		Exclude(et.FeatureGateDisabled(string(features.DynamicResourceAllocation)))
+	specs.Select(et.NameContains("[sig-node] [DRA]")).
+		Exclude(et.FeatureGateDisabled(string(features.DynamicResourceAllocation)))
 }
 
 // filterByPlatform is a helper function to do, simple, "NameContains" filtering on tests by platform

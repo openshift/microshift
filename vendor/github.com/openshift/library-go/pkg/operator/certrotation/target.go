@@ -114,14 +114,14 @@ func (c RotatedSelfSignedCertKeySecret) EnsureTargetCertKeyPair(ctx context.Cont
 
 	// run Update if metadata needs changing unless we're in RefreshOnlyWhenExpired mode
 	if !c.RefreshOnlyWhenExpired {
-		needsMetadataUpdate := ensureMetadataUpdate(targetCertKeyPairSecret, c.Owner, c.AdditionalAnnotations)
+		needsMetadataUpdate := ensureOwnerRefAndTLSAnnotations(targetCertKeyPairSecret, c.Owner, c.AdditionalAnnotations)
 		needsTypeChange := ensureSecretTLSTypeSet(targetCertKeyPairSecret)
 		updateRequired = needsMetadataUpdate || needsTypeChange
 	}
 
 	if reason := c.CertCreator.NeedNewTargetCertKeyPair(targetCertKeyPairSecret, signingCertKeyPair, caBundleCerts, c.Refresh, c.RefreshOnlyWhenExpired, creationRequired); len(reason) > 0 {
 		c.EventRecorder.Eventf("TargetUpdateRequired", "%q in %q requires a new target cert/key pair: %v", c.Name, c.Namespace, reason)
-		if err := setTargetCertKeyPairSecret(targetCertKeyPairSecret, c.Validity, signingCertKeyPair, c.CertCreator, c.AdditionalAnnotations); err != nil {
+		if err = setTargetCertKeyPairSecretAndTLSAnnotations(targetCertKeyPairSecret, c.Validity, c.Refresh, signingCertKeyPair, c.CertCreator, c.AdditionalAnnotations); err != nil {
 			return nil, err
 		}
 
@@ -162,6 +162,11 @@ func needNewTargetCertKeyPair(secret *corev1.Secret, signer *crypto.CA, caBundle
 	annotations := secret.Annotations
 	if reason := needNewTargetCertKeyPairForTime(annotations, signer, refresh, refreshOnlyWhenExpired); len(reason) > 0 {
 		return reason
+	}
+
+	// Exit early if we're only refreshing when expired and the certificate does not need an update
+	if refreshOnlyWhenExpired {
+		return ""
 	}
 
 	// check the signer common name against all the common names in our ca bundle so we don't refresh early
@@ -232,9 +237,21 @@ func needNewTargetCertKeyPairForTime(annotations map[string]string, signer *cryp
 	return ""
 }
 
+// setTargetCertKeyPairSecretAndTLSAnnotations generates a new cert/key pair,
+// stores them in the specified secret, and adds predefined TLS annotations to that secret.
+func setTargetCertKeyPairSecretAndTLSAnnotations(targetCertKeyPairSecret *corev1.Secret, validity, refresh time.Duration, signer *crypto.CA, certCreator TargetCertCreator, tlsAnnotations AdditionalAnnotations) error {
+	certKeyPair, err := setTargetCertKeyPairSecret(targetCertKeyPairSecret, validity, signer, certCreator)
+	if err != nil {
+		return err
+	}
+
+	setTLSAnnotationsOnTargetCertKeyPairSecret(targetCertKeyPairSecret, certKeyPair, certCreator, refresh, tlsAnnotations)
+	return nil
+}
+
 // setTargetCertKeyPairSecret creates a new cert/key pair and sets them in the secret.  Only one of client, serving, or signer rotation may be specified.
 // TODO refactor with an interface for actually signing and move the one-of check higher in the stack.
-func setTargetCertKeyPairSecret(targetCertKeyPairSecret *corev1.Secret, validity time.Duration, signer *crypto.CA, certCreator TargetCertCreator, annotations AdditionalAnnotations) error {
+func setTargetCertKeyPairSecret(targetCertKeyPairSecret *corev1.Secret, validity time.Duration, signer *crypto.CA, certCreator TargetCertCreator) (*crypto.TLSCertificateConfig, error) {
 	if targetCertKeyPairSecret.Annotations == nil {
 		targetCertKeyPairSecret.Annotations = map[string]string{}
 	}
@@ -251,21 +268,29 @@ func setTargetCertKeyPairSecret(targetCertKeyPairSecret *corev1.Secret, validity
 
 	certKeyPair, err := certCreator.NewCertificate(signer, targetValidity)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	targetCertKeyPairSecret.Data["tls.crt"], targetCertKeyPairSecret.Data["tls.key"], err = certKeyPair.GetPEMBytes()
-	if err != nil {
-		return err
-	}
-	annotations.NotBefore = certKeyPair.Certs[0].NotBefore.Format(time.RFC3339)
-	annotations.NotAfter = certKeyPair.Certs[0].NotAfter.Format(time.RFC3339)
+	return certKeyPair, err
+}
+
+// setTLSAnnotationsOnTargetCertKeyPairSecret applies predefined TLS annotations to the given secret.
+//
+// This function does not perform nil checks on its parameters and assumes that the
+// secret's Annotations field has already been initialized.
+//
+// These assumptions are safe because this function is only called after the secret
+// has been initialized in setTargetCertKeyPairSecret.
+func setTLSAnnotationsOnTargetCertKeyPairSecret(targetCertKeyPairSecret *corev1.Secret, certKeyPair *crypto.TLSCertificateConfig, certCreator TargetCertCreator, refresh time.Duration, tlsAnnotations AdditionalAnnotations) {
 	targetCertKeyPairSecret.Annotations[CertificateIssuer] = certKeyPair.Certs[0].Issuer.CommonName
 
-	_ = annotations.EnsureTLSMetadataUpdate(&targetCertKeyPairSecret.ObjectMeta)
-	certCreator.SetAnnotations(certKeyPair, targetCertKeyPairSecret.Annotations)
+	tlsAnnotations.NotBefore = certKeyPair.Certs[0].NotBefore.Format(time.RFC3339)
+	tlsAnnotations.NotAfter = certKeyPair.Certs[0].NotAfter.Format(time.RFC3339)
+	tlsAnnotations.RefreshPeriod = refresh.String()
+	_ = tlsAnnotations.EnsureTLSMetadataUpdate(&targetCertKeyPairSecret.ObjectMeta)
 
-	return nil
+	certCreator.SetAnnotations(certKeyPair, targetCertKeyPairSecret.Annotations)
 }
 
 type ClientRotation struct {

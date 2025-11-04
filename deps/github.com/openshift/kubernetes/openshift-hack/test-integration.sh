@@ -12,7 +12,13 @@ mkdir -p "${ARTIFACTS}"
 export KUBERNETES_SERVICE_HOST=
 export KUBE_JUNIT_REPORT_DIR="${ARTIFACTS}"
 export KUBE_KEEP_VERBOSE_TEST_OUTPUT=y
-export KUBE_RACE=-race
+# The KUBE_RACE variable has existed for ~5 years but does not appear to have
+# functioned prior to https://github.com/kubernetes/kubernetes/pull/132053
+# (about three months before the time of writing). Upstream has marked it as an
+# optional test in a separate job due to known failures
+# (https://github.com/kubernetes/test-infra/pull/34908), so temporarily disabling
+# here as well.
+# export KUBE_RACE=-race
 export KUBE_TEST_ARGS='-p 8'
 export LOG_LEVEL=4
 export PATH

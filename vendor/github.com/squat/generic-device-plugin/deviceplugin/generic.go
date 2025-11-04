@@ -22,8 +22,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/go-kit/kit/log"
-	"github.com/go-kit/kit/log/level"
+	"github.com/go-kit/log"
+	"github.com/go-kit/log/level"
 	"github.com/prometheus/client_golang/prometheus"
 	"k8s.io/kubelet/pkg/apis/deviceplugin/v1beta1"
 
@@ -82,7 +82,7 @@ type Group struct {
 // device wraps the v1.beta1.Device type to add context about
 // the device needed by the GenericPlugin.
 type device struct {
-	v1beta1.Device
+	*v1beta1.Device
 	deviceSpecs []*v1beta1.DeviceSpec
 	mounts      []*v1beta1.Mount
 }
@@ -91,6 +91,7 @@ type device struct {
 // * be found using either a file path or a USB identifier; and
 // * mounted and used without special logic.
 type GenericPlugin struct {
+	v1beta1.UnimplementedDevicePluginServer
 	ds                 *DeviceSpec
 	devices            map[string]device
 	logger             log.Logger
@@ -205,7 +206,7 @@ func (gp *GenericPlugin) Allocate(_ context.Context, req *v1beta1.AllocateReques
 	for _, r := range req.ContainerRequests {
 		resp := new(v1beta1.ContainerAllocateResponse)
 		// Add all requested devices to to response.
-		for _, id := range r.DevicesIDs {
+		for _, id := range r.DevicesIds {
 			d, ok := gp.devices[id]
 			if !ok {
 				return nil, fmt.Errorf("requested device does not exist %q", id)
@@ -229,7 +230,7 @@ func (gp *GenericPlugin) GetDevicePluginOptions(_ context.Context, _ *v1beta1.Em
 
 // ListAndWatch lists all devices and then refreshes every deviceCheckInterval.
 func (gp *GenericPlugin) ListAndWatch(_ *v1beta1.Empty, stream v1beta1.DevicePlugin_ListAndWatchServer) error {
-	level.Info(gp.logger).Log("msg", "starting listwatch")
+	_ = level.Info(gp.logger).Log("msg", "starting listwatch")
 	if _, err := gp.refreshDevices(); err != nil {
 		return err
 	}
