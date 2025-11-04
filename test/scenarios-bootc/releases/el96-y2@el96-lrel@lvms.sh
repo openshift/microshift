@@ -77,7 +77,7 @@ scenario_run_tests() {
     run_command_on_vm host1 'bash -s' < "${TESTDIR}/../scripts/lvms-helpers/checkLvmsResources.sh"
 
     # Run ginkgo tests to validate functionality
-    run_gingko_tests host1 "~Disruptive"
+    run_ginkgo_tests host1 "~Disruptive"
 
     # Cleanup LVMS workloads
     echo "INFO: Cleaning up LVMS workloads..."
