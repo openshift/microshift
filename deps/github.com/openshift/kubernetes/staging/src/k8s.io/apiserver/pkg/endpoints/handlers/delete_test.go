@@ -31,7 +31,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/runtime/serializer"
-	auditapis "k8s.io/apiserver/pkg/apis/audit"
+	auditinternal "k8s.io/apiserver/pkg/apis/audit"
 	"k8s.io/apiserver/pkg/audit"
 	"k8s.io/apiserver/pkg/endpoints/handlers/negotiation"
 	"k8s.io/apiserver/pkg/registry/rest"
@@ -66,7 +66,9 @@ func TestDeleteResourceAuditLogRequestObject(t *testing.T) {
 
 	ctx := audit.WithAuditContext(context.TODO())
 	ac := audit.AuditContextFrom(ctx)
-	ac.Event.Level = auditapis.LevelRequestResponse
+	if err := ac.Init(audit.RequestAuditConfig{Level: auditinternal.LevelRequestResponse}, nil); err != nil {
+		t.Fatal(err)
+	}
 
 	policy := metav1.DeletePropagationBackground
 	deleteOption := &metav1.DeleteOptions{
