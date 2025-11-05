@@ -49,7 +49,7 @@ scenario_run_tests() {
     # Wait for MicroShift to be ready
     wait_for_microshift_to_be_ready host1
 
-    # Setup oc client and kubeconfig for gingko tests
+    # Setup oc client and kubeconfig for ginkgo tests
     setup_oc_and_kubeconfig host1
 
     # Pre-upgrade: Create LVMS workloads and validate LVMS is working
