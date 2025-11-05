@@ -208,7 +208,7 @@ CN=test-signer3
 				t.Errorf("CertificateChains.WalkChains() error = %v, wantErr %v", err, tt.wantErr)
 			}
 
-			require.Equal(t, tt.expectedSubjects, subjects, "diff %s", diff.StringDiff(subjects, tt.expectedSubjects))
+			require.Equal(t, tt.expectedSubjects, subjects, "diff %s", diff.Diff(subjects, tt.expectedSubjects))
 		})
 	}
 }

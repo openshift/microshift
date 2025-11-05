@@ -135,7 +135,7 @@ cd "${ROOTDIR}"
 
 # Get firewalld and repos in place. Use scripts to get the right repos
 # for each branch.
-$(dry_run) bash -x ./scripts/devenv-builder/configure-vm.sh --no-build --force-firewall "${PULL_SECRET}"
+$(dry_run) bash -x ./scripts/devenv-builder/configure-vm.sh --skip-dnf-update --no-build --force-firewall "${PULL_SECRET}"
 $(dry_run) bash -x ./test/bin/manage_composer_config.sh create
 
 cd "${ROOTDIR}/test/"

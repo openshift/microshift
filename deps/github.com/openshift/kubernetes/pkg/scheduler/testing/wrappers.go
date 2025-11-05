@@ -23,7 +23,7 @@ import (
 
 	v1 "k8s.io/api/core/v1"
 	policy "k8s.io/api/policy/v1"
-	resourceapi "k8s.io/api/resource/v1beta1"
+	resourceapi "k8s.io/api/resource/v1"
 	storagev1 "k8s.io/api/storage/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -340,6 +340,14 @@ func (p *PodWrapper) Resources(resources v1.ResourceRequirements) *PodWrapper {
 	return p
 }
 
+func (p *PodWrapper) NodeAffinity(nodeAffinity *v1.NodeAffinity) *PodWrapper {
+	if p.Spec.Affinity == nil {
+		p.Spec.Affinity = &v1.Affinity{}
+	}
+	p.Spec.Affinity.NodeAffinity = nodeAffinity
+	return p
+}
+
 // OwnerReference updates the owning controller of the pod.
 func (p *PodWrapper) OwnerReference(name string, gvk schema.GroupVersionKind) *PodWrapper {
 	p.OwnerReferences = []metav1.OwnerReference{
@@ -372,9 +380,15 @@ func (p *PodWrapper) PodResourceClaims(podResourceClaims ...v1.PodResourceClaim)
 	return p
 }
 
-// PodResourceClaims appends claim statuses into PodSpec of the inner pod.
+// ResourceClaimStatuses appends claim statuses into PodStatus of the inner pod.
 func (p *PodWrapper) ResourceClaimStatuses(resourceClaimStatuses ...v1.PodResourceClaimStatus) *PodWrapper {
 	p.Status.ResourceClaimStatuses = append(p.Status.ResourceClaimStatuses, resourceClaimStatuses...)
+	return p
+}
+
+// ExendedResourceClaimStatus sets ExtendedResourceClaimStatus in PodStatus of the inner pod.
+func (p *PodWrapper) ExtendedResourceClaimStatus(extendedResourceClaimStatus *v1.PodExtendedResourceClaimStatus) *PodWrapper {
+	p.Status.ExtendedResourceClaimStatus = extendedResourceClaimStatus
 	return p
 }
 
@@ -500,6 +514,20 @@ func (p *PodWrapper) HostPort(port int32) *PodWrapper {
 // and injects into the inner pod.
 func (p *PodWrapper) ContainerPort(ports []v1.ContainerPort) *PodWrapper {
 	p.Spec.Containers = append(p.Spec.Containers, MakeContainer().Name("container").Image("pause").ContainerPort(ports).Obj())
+	return p
+}
+
+// InitContainerPort creates an initContainer with ports valued `ports`,
+// and injects into the inner pod.
+func (p *PodWrapper) InitContainerPort(sidecar bool, ports []v1.ContainerPort) *PodWrapper {
+	c := MakeContainer().
+		Name("init-container").
+		Image("pause").
+		ContainerPort(ports)
+	if sidecar {
+		c.RestartPolicy(v1.ContainerRestartPolicyAlways)
+	}
+	p.Spec.InitContainers = append(p.Spec.InitContainers, c.Obj())
 	return p
 }
 
@@ -1070,6 +1098,18 @@ func (wrapper *ResourceClaimWrapper) Name(s string) *ResourceClaimWrapper {
 	return wrapper
 }
 
+// GenerateName sets `s` as the GenerateName of the inner object.
+func (wrapper *ResourceClaimWrapper) GenerateName(s string) *ResourceClaimWrapper {
+	wrapper.SetGenerateName(s)
+	return wrapper
+}
+
+// Annotations sets `s` as the annotations of the inner object.
+func (wrapper *ResourceClaimWrapper) Annotations(s map[string]string) *ResourceClaimWrapper {
+	wrapper.SetAnnotations(s)
+	return wrapper
+}
+
 // UID sets `s` as the UID of the inner object.
 func (wrapper *ResourceClaimWrapper) UID(s string) *ResourceClaimWrapper {
 	wrapper.SetUID(types.UID(s))
@@ -1096,17 +1136,40 @@ func (wrapper *ResourceClaimWrapper) OwnerReference(name, uid string, gvk schema
 	return wrapper
 }
 
+// OwnerRef sets `ref` as the owner reference of the object.
+func (wrapper *ResourceClaimWrapper) OwnerRef(ref metav1.OwnerReference) *ResourceClaimWrapper {
+	wrapper.OwnerReferences = []metav1.OwnerReference{ref}
+	return wrapper
+}
+
 // Request adds one device request for the given device class.
 func (wrapper *ResourceClaimWrapper) Request(deviceClassName string) *ResourceClaimWrapper {
 	wrapper.Spec.Devices.Requests = append(wrapper.Spec.Devices.Requests,
 		resourceapi.DeviceRequest{
 			Name: fmt.Sprintf("req-%d", len(wrapper.Spec.Devices.Requests)+1),
-			// Cannot rely on defaulting here, this is used in unit tests.
-			AllocationMode:  resourceapi.DeviceAllocationModeExactCount,
-			Count:           1,
-			DeviceClassName: deviceClassName,
+			Exactly: &resourceapi.ExactDeviceRequest{
+				// Cannot rely on defaulting here, this is used in unit tests.
+				AllocationMode:  resourceapi.DeviceAllocationModeExactCount,
+				Count:           1,
+				DeviceClassName: deviceClassName,
+			},
 		},
 	)
+	return wrapper
+}
+
+// RequestWithName adds one device request for the given device class with given request name.
+func (wrapper *ResourceClaimWrapper) RequestWithName(name, deviceClassName string) *ResourceClaimWrapper {
+	wrapper.Spec.Devices.Requests = append(wrapper.Spec.Devices.Requests,
+		resourceapi.DeviceRequest{
+			Name: name,
+			Exactly: &resourceapi.ExactDeviceRequest{
+				// Cannot rely on defaulting here, this is used in unit tests.
+				AllocationMode:  resourceapi.DeviceAllocationModeExactCount,
+				Count:           1,
+				DeviceClassName: deviceClassName,
+			},
+		})
 	return wrapper
 }
 
@@ -1141,6 +1204,12 @@ func (wrapper *ResourceClaimWrapper) Allocation(allocation *resourceapi.Allocati
 	return wrapper
 }
 
+// AllocatedDeviceStatuses sets the AllocatedDeviceStatuses of the inner object.
+func (wrapper *ResourceClaimWrapper) AllocatedDeviceStatuses(ads []resourceapi.AllocatedDeviceStatus) *ResourceClaimWrapper {
+	wrapper.Status.Devices = ads
+	return wrapper
+}
+
 // Deleting sets the deletion timestamp of the inner object.
 func (wrapper *ResourceClaimWrapper) Deleting(time metav1.Time) *ResourceClaimWrapper {
 	wrapper.ResourceClaim.DeletionTimestamp = &time
@@ -1165,8 +1234,9 @@ type ResourceSliceWrapper struct {
 func MakeResourceSlice(nodeName, driverName string) *ResourceSliceWrapper {
 	wrapper := new(ResourceSliceWrapper)
 	wrapper.Name = nodeName + "-" + driverName
-	wrapper.Spec.NodeName = nodeName
+	wrapper.Spec.NodeName = &nodeName
 	wrapper.Spec.Pool.Name = nodeName
+	wrapper.Spec.Pool.ResourceSliceCount = 1
 	wrapper.Spec.Driver = driverName
 	return wrapper
 }
@@ -1191,20 +1261,25 @@ func (wrapper *ResourceSliceWrapper) Devices(names ...string) *ResourceSliceWrap
 // Device extends the devices field of the inner object.
 // The device must have a name and may have arbitrary additional fields.
 func (wrapper *ResourceSliceWrapper) Device(name string, otherFields ...any) *ResourceSliceWrapper {
-	device := resourceapi.Device{Name: name, Basic: &resourceapi.BasicDevice{}}
+	device := resourceapi.Device{Name: name}
 	for _, field := range otherFields {
 		switch typedField := field.(type) {
 		case map[resourceapi.QualifiedName]resourceapi.DeviceAttribute:
-			device.Basic.Attributes = typedField
+			device.Attributes = typedField
 		case map[resourceapi.QualifiedName]resourceapi.DeviceCapacity:
-			device.Basic.Capacity = typedField
+			device.Capacity = typedField
 		case resourceapi.DeviceTaint:
-			device.Basic.Taints = append(device.Basic.Taints, typedField)
+			device.Taints = append(device.Taints, typedField)
 		default:
 			panic(fmt.Sprintf("expected a type which matches a field in BasicDevice, got %T", field))
 		}
 	}
 	wrapper.Spec.Devices = append(wrapper.Spec.Devices, device)
+	return wrapper
+}
+
+func (wrapper *ResourceSliceWrapper) ResourceSliceCount(count int) *ResourceSliceWrapper {
+	wrapper.Spec.Pool.ResourceSliceCount = int64(count)
 	return wrapper
 }
 

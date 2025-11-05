@@ -511,6 +511,7 @@ handle_deps() {
             git clone "${repo_url}" --branch "${ver}" "${REPOROOT}/${replace_path}"
             rm -fr "${REPOROOT}/${replace_path}/.git"
             find "${REPOROOT}/${replace_path}/" -name "OWNERS" -delete
+            make update-gofmt
         ;;
         kubernetes-version)
             local -r ver="$(get_kubernetes_version)"
@@ -518,6 +519,11 @@ handle_deps() {
             go mod edit -require "${modulepath}@v${ver}"
         ;;
     esac
+
+    make update-gofmt
+    # Following file is always generating a diff because it has CRLF line endings, but `git add` updates it to LF and the diff is gone.
+    # Remove the problematic file once for all.
+    rm -f deps/github.com/openshift/kubernetes/vendor/github.com/MakeNowJust/heredoc/README.md || true
 
     go mod tidy -e
 }
@@ -549,20 +555,6 @@ update_go_mods() {
     # Remove the toolchain to avoid downloading a different golang version when building with
     # ART images.
     go mod edit -toolchain=none "${REPOROOT}/etcd/go.mod"
- }
-
- update_deps_fmt() {
-    # The verify-gofmt targets belong to build-machinery-go makefiles and we can not override
-    # the files that are checked. `vendor` is automatically excluded from checks, but deps is
-    # something that only exists in MicroShift and we can not override it. Running gofmt over
-    # this directory will ensure the verify target works while still not changing functionality.
-    title "Ensuring gofmt"
-    make update-gofmt
-    if [[ -n "$(git status -s deps)" ]]; then
-        title "## Commiting gofmt changes to deps directory"
-        git add deps
-        git commit -m "update deps gofmt"
-    fi
  }
 
 # Regenerates OpenAPIs after patching the vendor directory
@@ -1251,7 +1243,6 @@ rebase_to() {
                 git add "${dirpath}/vendor"
                 git commit -m "update ${dirname}/vendor"
             fi
-            update_deps_fmt
         else
             echo "No changes in ${dirname}/go.mod."
         fi

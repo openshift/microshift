@@ -55,13 +55,13 @@ var legacySafeSysctls = []string{
 var newerSysctls = []sysctl{
 	{
 		name:   "net.ipv4.ip_local_reserved_ports",
-		kernel: "3.16",
+		kernel: utilkernel.IPLocalReservedPortsNamespacedKernelVersion,
 	}, {
 		name:   "net.ipv4.tcp_rmem",
-		kernel: "4.15",
+		kernel: utilkernel.TCPReceiveMemoryNamespacedKernelVersion,
 	}, {
 		name:   "net.ipv4.tcp_wmem",
-		kernel: "4.15",
+		kernel: utilkernel.TCPTransmitMemoryNamespacedKernelVersion,
 	},
 }
 

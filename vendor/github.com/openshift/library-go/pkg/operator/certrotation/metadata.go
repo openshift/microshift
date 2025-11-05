@@ -5,7 +5,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-func ensureMetadataUpdate(secret *corev1.Secret, owner *metav1.OwnerReference, additionalAnnotations AdditionalAnnotations) bool {
+func ensureOwnerRefAndTLSAnnotations(secret *corev1.Secret, owner *metav1.OwnerReference, additionalAnnotations AdditionalAnnotations) bool {
 	needsMetadataUpdate := false
 	// no ownerReference set
 	if owner != nil {
