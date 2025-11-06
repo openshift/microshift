@@ -1,56 +1,14 @@
-- cluster-kube-apiserver-operator embedded-component 80c1fc3d81e3392ef7b056c8833185c8bdf6f599 to 781be83e0f3dcccb5f1c97e00b5eef938c6c017b
-  - 3b153b9 2025-10-21T04:59:50+00:00 Revert "Revert "OCPBUGS-56551: certregenerationcontroller: start configInformers again""
-  - b58e40d 2025-09-12T11:36:46-04:00 Optimistically update Kube Server and Client CA bundles
-  - aa97831 2025-09-12T11:28:15-04:00 proof: bump library-go
+- oc image-amd64 168e32ecf12af2d2ea4cb1e117355916da8cb4a6 to b61226dacc6e9eeadcc6103cbfc3c6b47fea5e99
+  - 8c528bd8 2025-11-03T10:54:04+00:00 Prefer ready and reachable control plane nodes
+  - d74c9909 2025-11-03T10:54:04+00:00 Filter out unreachable taints from tolerations
 
-- machine-config-operator embedded-component 49dbecf4b3c74d7311ad1a89a0236c0d84b80a63 to 999097f92cb20f5bce7f71fada45b9bfc6035b97
-  - c90d027f 2025-10-15T09:18:55+00:00 OCPBUGS-62341: Ensure node's Unschedulable state stays in sync
+- ovn-kubernetes image-amd64 f573d533b7b6e830cb3fd0de15e9d89fb9191726 to 6c9428e481149bce786ee2ab3f8342d43f950030
+  - a1871a08 2025-10-29T09:54:12+00:00 Skip Pending pods in EgressIP status updates
 
-- oc image-amd64 298429ba9831d1d72b89edd9beb82a6ee665c3b7 to 168e32ecf12af2d2ea4cb1e117355916da8cb4a6
-  - 4774b0eb 2025-07-17T11:05:43+00:00 adm, inspect, ns: Collect UserDefinedNetwork CRs
+- oc image-arm64 168e32ecf12af2d2ea4cb1e117355916da8cb4a6 to b61226dacc6e9eeadcc6103cbfc3c6b47fea5e99
+  - 8c528bd8 2025-11-03T10:54:04+00:00 Prefer ready and reachable control plane nodes
+  - d74c9909 2025-11-03T10:54:04+00:00 Filter out unreachable taints from tolerations
 
-- ovn-kubernetes image-amd64 1c04cc35c4c32624124dff8ec660ab83972f30e5 to f573d533b7b6e830cb3fd0de15e9d89fb9191726
-  - 0e9f3c71 2025-10-09T14:57:44+00:00 Configure sec nic EIPv6 address with NODAD and maximum lifetime
-  - a4776fb3 2025-10-08T12:49:44+01:00 [IC][EIP] OCPBUGS-42303: Fix race between SB DB and OVN-Controller
-  - a7869b2c 2025-09-29T12:16:43+01:00 Node controller shutdown: do not ref gateway if not set
-  - 50a94e1e 2025-09-29T12:16:01+01:00 ovn-controller: block GARP during startup
-  - d65ec5c8 2025-09-29T12:15:22+01:00 Fix ovnkube-controller-with-node shutdown sequence
-  - 5611e7be 2025-09-09T16:36:01+02:00 E2E localnet: send three pings instead of just one
-  - 63bb48fd 2025-09-09T16:36:01+02:00 E2E localnet: localnet -> host network on VLAN with external router
-  - 164d9f8f 2025-09-09T16:36:01+02:00 E2E localnet: host network -> localnet on VLAN with external router
-  - 51f5fde0 2025-09-09T16:36:01+02:00 E2E localnet: default network->localnet on VLAN with external router
-  - 2118ba6a 2025-09-09T16:36:01+02:00 E2E localnet: Fix requirement on number of schedulable nodes
-  - 35faf853 2025-09-09T16:36:01+02:00 E2E localnet: make IP request for localnet pod extensible
-  - 878d5409 2025-09-09T16:36:01+02:00 E2E localnet: specify that the localnet uses IPs from host subnet
-  - c317be25 2025-09-09T16:36:01+02:00 E2E localnet: remove references to downstream bugs and stories
-  - ca0c7135 2025-09-09T16:35:53+02:00 Configure existing multihoming CI lane as IC-enabled and shared gw
-  - d50d5040 2025-09-09T16:32:51+02:00 E2E: add test host -> localnet with IP in host subnet
-  - 1bf08b96 2025-09-09T16:32:51+02:00 E2E localnet: remove double import of ginkgo
-  - a7476f22 2025-09-09T16:32:51+02:00 Openflow: lookup conntrack & table=1 when breth0 is next hop (IPv6)
-  - 79ef2916 2025-09-09T16:32:51+02:00 Openflow: drop in_port from IPv6 dispatch OF rule at prio=50
-  - d2127e40 2025-09-09T16:32:51+02:00 Openflow: lookup conntrack & table=1 only when breth0 is next hop
-
-- oc image-arm64 298429ba9831d1d72b89edd9beb82a6ee665c3b7 to 168e32ecf12af2d2ea4cb1e117355916da8cb4a6
-  - 4774b0eb 2025-07-17T11:05:43+00:00 adm, inspect, ns: Collect UserDefinedNetwork CRs
-
-- ovn-kubernetes image-arm64 1c04cc35c4c32624124dff8ec660ab83972f30e5 to f573d533b7b6e830cb3fd0de15e9d89fb9191726
-  - 0e9f3c71 2025-10-09T14:57:44+00:00 Configure sec nic EIPv6 address with NODAD and maximum lifetime
-  - a4776fb3 2025-10-08T12:49:44+01:00 [IC][EIP] OCPBUGS-42303: Fix race between SB DB and OVN-Controller
-  - a7869b2c 2025-09-29T12:16:43+01:00 Node controller shutdown: do not ref gateway if not set
-  - 50a94e1e 2025-09-29T12:16:01+01:00 ovn-controller: block GARP during startup
-  - d65ec5c8 2025-09-29T12:15:22+01:00 Fix ovnkube-controller-with-node shutdown sequence
-  - 5611e7be 2025-09-09T16:36:01+02:00 E2E localnet: send three pings instead of just one
-  - 63bb48fd 2025-09-09T16:36:01+02:00 E2E localnet: localnet -> host network on VLAN with external router
-  - 164d9f8f 2025-09-09T16:36:01+02:00 E2E localnet: host network -> localnet on VLAN with external router
-  - 51f5fde0 2025-09-09T16:36:01+02:00 E2E localnet: default network->localnet on VLAN with external router
-  - 2118ba6a 2025-09-09T16:36:01+02:00 E2E localnet: Fix requirement on number of schedulable nodes
-  - 35faf853 2025-09-09T16:36:01+02:00 E2E localnet: make IP request for localnet pod extensible
-  - 878d5409 2025-09-09T16:36:01+02:00 E2E localnet: specify that the localnet uses IPs from host subnet
-  - c317be25 2025-09-09T16:36:01+02:00 E2E localnet: remove references to downstream bugs and stories
-  - ca0c7135 2025-09-09T16:35:53+02:00 Configure existing multihoming CI lane as IC-enabled and shared gw
-  - d50d5040 2025-09-09T16:32:51+02:00 E2E: add test host -> localnet with IP in host subnet
-  - 1bf08b96 2025-09-09T16:32:51+02:00 E2E localnet: remove double import of ginkgo
-  - a7476f22 2025-09-09T16:32:51+02:00 Openflow: lookup conntrack & table=1 when breth0 is next hop (IPv6)
-  - 79ef2916 2025-09-09T16:32:51+02:00 Openflow: drop in_port from IPv6 dispatch OF rule at prio=50
-  - d2127e40 2025-09-09T16:32:51+02:00 Openflow: lookup conntrack & table=1 only when breth0 is next hop
+- ovn-kubernetes image-arm64 f573d533b7b6e830cb3fd0de15e9d89fb9191726 to 6c9428e481149bce786ee2ab3f8342d43f950030
+  - a1871a08 2025-10-29T09:54:12+00:00 Skip Pending pods in EgressIP status updates
 
