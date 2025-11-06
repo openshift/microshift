@@ -19,6 +19,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -26,6 +27,10 @@ import (
 
 	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/util/cryptomaterial"
+	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/tools/clientcmd"
 	klog "k8s.io/klog/v2"
 
 	"go.etcd.io/etcd/client/pkg/v3/transport"
@@ -250,4 +255,83 @@ func getEtcdClient(ctx context.Context) (*clientv3.Client, error) {
 		return nil, err
 	}
 	return cli, nil
+}
+
+// GetClusterEtcdClient creates a new etcd client for the cluster.
+// It uses the kubeconfig to list the nodes in the cluster to test which ones are learners
+// and then creates a new client with voting members only.
+func GetClusterEtcdClient(ctx context.Context, kubeConfigPath string) (*clientv3.Client, error) {
+	certsDir := cryptomaterial.CertsDirectory(config.DataDir)
+	etcdAPIServerClientCertDir := cryptomaterial.EtcdAPIServerClientCertDir(certsDir)
+
+	tlsInfo := transport.TLSInfo{
+		CertFile:      cryptomaterial.ClientCertPath(etcdAPIServerClientCertDir),
+		KeyFile:       cryptomaterial.ClientKeyPath(etcdAPIServerClientCertDir),
+		TrustedCAFile: cryptomaterial.CACertPath(cryptomaterial.EtcdSignerDir(certsDir)),
+	}
+	tlsConfig, err := tlsInfo.ClientConfig()
+	if err != nil {
+		return nil, err
+	}
+
+	client, err := clientv3.New(clientv3.Config{
+		Endpoints:   []string{"https://localhost:2379"},
+		DialTimeout: 5 * time.Second,
+		TLS:         tlsConfig,
+		Context:     ctx,
+	})
+	if err != nil {
+		return nil, err
+	}
+	defer func() { _ = client.Close() }()
+
+	restConfig, err := clientcmd.BuildConfigFromFlags("", kubeConfigPath)
+	if err != nil {
+		return nil, fmt.Errorf("failed to load kubeconfig from %s: %v", kubeConfigPath, err)
+	}
+	adminClient, err := kubernetes.NewForConfig(restConfig)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create admin kubernetes client: %w", err)
+	}
+
+	nodes, err := adminClient.CoreV1().Nodes().List(ctx, metav1.ListOptions{})
+	if err != nil {
+		return nil, fmt.Errorf("failed to list nodes: %w", err)
+	}
+
+	var memberEndpoints []string
+	for _, node := range nodes.Items {
+		var nodeIP string
+		for _, addr := range node.Status.Addresses {
+			if addr.Type == corev1.NodeInternalIP {
+				nodeIP = addr.Address
+				break
+			}
+		}
+		if nodeIP == "" {
+			continue
+		}
+		endpoint := net.JoinHostPort(nodeIP, "2379")
+		status, err := client.Status(ctx, endpoint)
+		if err != nil {
+			continue
+		}
+		if status != nil && !status.IsLearner {
+			memberEndpoints = append(memberEndpoints, fmt.Sprintf("https://%s", endpoint))
+		}
+	}
+	if len(memberEndpoints) == 0 {
+		memberEndpoints = []string{"https://localhost:2379"}
+	}
+
+	clusterClient, err := clientv3.New(clientv3.Config{
+		Endpoints:   memberEndpoints,
+		DialTimeout: 5 * time.Second,
+		TLS:         tlsConfig,
+		Context:     ctx,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return clusterClient, nil
 }
