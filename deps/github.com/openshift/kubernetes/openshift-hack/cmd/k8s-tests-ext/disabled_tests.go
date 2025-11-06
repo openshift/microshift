@@ -16,8 +16,6 @@ func filterOutDisabledSpecs(specs et.ExtensionTestSpecs) et.ExtensionTestSpecs {
 			// 4.19
 			"[Feature:PodLevelResources]",
 			"[Feature:PodLogsQuerySplitStreams]",
-			// 4.20
-			"[Feature:CBOR]",
 		},
 		// tests for features that are not implemented in openshift
 		"Unimplemented": {
