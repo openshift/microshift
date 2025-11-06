@@ -34,7 +34,7 @@ spec:
             secretName: olm-operator-serving-cert
         - name: profile-collector-cert
           secret:
-            secretName: pprof-cert
+            secretName: olm-operator-serving-cert
         - name: tmpfs
           emptyDir: {}
       containers:
