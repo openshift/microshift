@@ -3,14 +3,10 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"strings"
-	"time"
 
 	"github.com/openshift/microshift/pkg/config"
-	"github.com/openshift/microshift/pkg/util/cryptomaterial"
+	"github.com/openshift/microshift/pkg/controllers"
 	"github.com/spf13/cobra"
-	"go.etcd.io/etcd/client/pkg/v3/transport"
-	clientv3 "go.etcd.io/etcd/client/v3"
 
 	"k8s.io/klog/v2"
 )
@@ -42,19 +38,8 @@ func runPromoteLearner(ctx context.Context) error {
 		return fmt.Errorf("failed to load MicroShift configuration: %w", err)
 	}
 
-	klog.Infof("Creating Kubernetes client from %s", cfg.KubeConfigPath(config.KubeAdmin))
-	client, err := createKubernetesClient(cfg.KubeConfigPath(config.KubeAdmin))
-	if err != nil {
-		return fmt.Errorf("failed to create Kubernetes client: %w", err)
-	}
-
-	etcdMembers, err := getEtcdClusterNodes(ctx, client)
-	if err != nil {
-		return fmt.Errorf("failed to get cluster information: %w", err)
-	}
-
 	klog.Info("Promoting etcd learner to member")
-	if err := promoteEtcdLearner(ctx, etcdMembers, cfg); err != nil {
+	if err := promoteEtcdLearner(ctx, cfg); err != nil {
 		return fmt.Errorf("failed to promote etcd learner: %w", err)
 	}
 
@@ -63,38 +48,12 @@ func runPromoteLearner(ctx context.Context) error {
 	return nil
 }
 
-func promoteEtcdLearner(ctx context.Context, clusterMembers []string, cfg *config.Config) error {
-	certsDir := cryptomaterial.CertsDirectory(config.DataDir)
-	etcdPeerClientCertDir := cryptomaterial.EtcdPeerCertDir(certsDir)
-
-	tlsInfo := transport.TLSInfo{
-		CertFile:      cryptomaterial.PeerCertPath(etcdPeerClientCertDir),
-		KeyFile:       cryptomaterial.PeerKeyPath(etcdPeerClientCertDir),
-		TrustedCAFile: cryptomaterial.CACertPath(cryptomaterial.EtcdSignerDir(certsDir)),
-	}
-	tlsConfig, err := tlsInfo.ClientConfig()
-	if err != nil {
-		return fmt.Errorf("failed to create etcd client TLS config: %v", err)
-	}
-	var endpoints []string
-	for _, member := range clusterMembers {
-		parts := strings.SplitN(member, "=", 2)
-		if len(parts) == 2 {
-			endpoint := strings.Replace(parts[1], ":2380", ":2379", 1)
-			endpoints = append(endpoints, endpoint)
-		}
-	}
-
-	client, err := clientv3.New(clientv3.Config{
-		Endpoints:   endpoints,
-		DialTimeout: 5 * time.Second,
-		TLS:         tlsConfig,
-		Context:     ctx,
-	})
+func promoteEtcdLearner(ctx context.Context, cfg *config.Config) error {
+	client, err := controllers.GetClusterEtcdClient(ctx, cfg.KubeConfigPath(config.KubeAdmin))
 	if err != nil {
 		return fmt.Errorf("failed to create etcd client: %v", err)
 	}
-	defer client.Close()
+	defer func() { _ = client.Close() }()
 
 	memberResponse, err := client.MemberList(ctx)
 	if err != nil {
@@ -126,6 +85,5 @@ func promoteEtcdLearner(ctx context.Context, clusterMembers []string, cfg *confi
 		return fmt.Errorf("failed to promote etcd learner: %v", err)
 	}
 	klog.Infof("Successfully promoted etcd learner %s with response: %v", cfg.CanonicalNodeName(), response)
-
 	return nil
 }
