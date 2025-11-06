@@ -7,7 +7,7 @@
 export TEST_RANDOMIZATION=none
 
 start_image="rhel-9.6-microshift-brew-optionals-4.${PREVIOUS_MINOR_VERSION}-zstream"
-dest_image="rhel-9.6-microshift-brew-4.${MINOR_VERSION}-${LATEST_RELEASE_TYPE}"
+dest_image="rhel-9.6-microshift-brew-optionals-4.${MINOR_VERSION}-${LATEST_RELEASE_TYPE}"
 
 scenario_create_vms() {
     if ! does_commit_exist "${start_image}"; then
@@ -45,6 +45,12 @@ scenario_run_tests() {
         echo "Image '${dest_image}' not found - skipping test"
         return 0
     fi
+
+    # Wait for MicroShift to be ready
+    wait_for_microshift_to_be_ready host1
+
+    # Setup oc client and kubeconfig for ginkgo tests
+    setup_oc_and_kubeconfig host1
 
     # Pre-upgrade: Create LVMS workloads and validate LVMS is working
     echo "INFO: Creating LVMS workloads before upgrade..."
