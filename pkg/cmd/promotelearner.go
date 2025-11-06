@@ -58,11 +58,8 @@ func runPromoteLearner(ctx context.Context) error {
 		return fmt.Errorf("failed to promote etcd learner: %w", err)
 	}
 
-	klog.Info("Restarting MicroShift service")
-	if err := restartMicroShift(); err != nil {
-		return fmt.Errorf("failed to restart MicroShift service: %w", err)
-	}
-	klog.Info("Learner promotion process completed successfully")
+	klog.Info("etcd node successfully promoted to member. Restart MicroShift service")
+
 	return nil
 }
 
