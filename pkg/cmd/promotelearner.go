@@ -6,6 +6,7 @@ import (
 
 	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/controllers"
+	"github.com/openshift/microshift/pkg/version"
 	"github.com/spf13/cobra"
 
 	"k8s.io/klog/v2"
@@ -27,6 +28,11 @@ Use this command only after the learner node has fully caught up with the cluste
 			return runPromoteLearner(cmd.Context())
 		},
 	}
+
+	if version.Get().BuildVariant != version.BuildVariantCommunity {
+		cmd.Hidden = true
+	}
+
 	return cmd
 }
 
