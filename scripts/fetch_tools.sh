@@ -307,13 +307,18 @@ gettool_ginkgo() {
 
     # Copy handleresult.py to the tools directory
     local handleresult_script_local="./pipeline/handleresult.py"
-    if [[ -f "${handleresult_script_local}" ]] && [[ ! -f "${handleresult_script}" ]]; then
+
+    # Check if source file exists in the cloned repository
+    if [[ ! -f "${handleresult_script_local}" ]]; then
+        echo "Error: pipeline/handleresult.py not found in repository"
+        return 1
+    fi
+
+    # Copy to destination if it doesn't already exist
+    if [[ ! -f "${handleresult_script}" ]]; then
         cp "${handleresult_script_local}" "${handleresult_script}"
         chmod +x "${handleresult_script}"
         echo "handleresult.py installed to ${handleresult_script}"
-    else
-        echo "Error: pipeline/handleresult.py not found in repository"
-        return 1
     fi
     popd &>/dev/null
 }
