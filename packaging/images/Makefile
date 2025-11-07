@@ -2,7 +2,7 @@ ARCH ?= $$(uname -m | sed -e 's/x86_64/amd64/' -e 's/aarch64/arm64/')
 BASE_IMAGE_URL ?= quay.io/centos/centos
 BASE_IMAGE_TAG ?= stream9
 DEST_IMAGE_REPO ?= quay.io/microshift/microshift-ci
-RHIT_CERT_FILE ?= /etc/pki/ca-trust/source/anchors/2015-RH-IT-Root-CA.pem
+RHIT_CERT_FILE ?= /etc/pki/ca-trust/source/anchors/2022-IT-Root-CA.pem
 
 .PHONY: all build publish manifest
 all:
