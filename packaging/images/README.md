@@ -19,7 +19,7 @@ Usage: make <build | publish | manifest>
 
 > **Important:**<p>
 > Run the build on a Red Hat CSB machine to get access to the Red Hat IT Root
-> Certificate at `/etc/pki/ca-trust/source/anchors/2015-RH-IT-Root-CA.pem`.
+> Certificate at `/etc/pki/ca-trust/source/anchors/2022-IT-Root-CA.pem`.
 > Otherwise, download the certificate to your build host and specify its path
 > using `RHIT_CERT_FILE=/path/to/file` build option.
 
@@ -32,7 +32,7 @@ Run the following commands to build and publish the container images.
 
 ```bash
 $ make build \
-    RHIT_CERT_FILE=/etc/pki/ca-trust/source/anchors/2015-RH-IT-Root-CA.pem
+    RHIT_CERT_FILE=/etc/pki/ca-trust/source/anchors/2022-IT-Root-CA.pem
 
 $ make publish
 ```
