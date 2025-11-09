@@ -1082,8 +1082,8 @@ EOF
     fi
 }
 
-# Implementation of Gingko tests
-run_gingko_tests() {
+# Implementation of ginkgo tests
+run_ginkgo_tests() {
     local vmname="${1}"
     shift
 
@@ -1108,7 +1108,7 @@ run_gingko_tests() {
 
     # Set up test environment variables
     local kubeconfig="${SCENARIO_INFO_DIR}/${SCENARIO}/kubeconfig"
-    local -r test_results_dir="${SCENARIO_INFO_DIR}/${SCENARIO}/gingko-results"
+    local -r test_results_dir="${SCENARIO_INFO_DIR}/${SCENARIO}/ginkgo-results"
     mkdir -p "${test_results_dir}"
 
     # Set up kubeconfig for tests
@@ -1164,7 +1164,7 @@ run_gingko_tests() {
     fi
 
     # Run the tests and capture output with 10m timeout for every test case
-    echo "Gingko test execution started..."
+    echo "ginkgo test execution started..."
     ginkgo_result_success=true
     if ! eval '${timeout_ginkgo} run --timeout 10m --junit-dir=${test_results_dir} -f ${case_selected}' 2>&1 | tee "${test_results_dir}/test-output.log"; then
         if [ $? -ge 124 ] ; then
@@ -1172,7 +1172,7 @@ run_gingko_tests() {
         fi
         ginkgo_result_success=false
     fi
-    echo "Gingko test execution completed"
+    echo "ginkgo test execution completed"
     popd &>/dev/null
 
     # Clean the JUnit XML files
@@ -1216,9 +1216,9 @@ run_gingko_tests() {
 
     # Record the junit result of the ginkgo tests
     if [[ "${ginkgo_result_success}" == "true" ]]; then
-        record_junit "${vmname}" "run_gingko_tests" "OK"
+        record_junit "${vmname}" "run_ginkgo_tests" "OK"
     else
-        record_junit "${vmname}" "run_gingko_tests" "FAILED"
+        record_junit "${vmname}" "run_ginkgo_tests" "FAILED"
         exit 1
     fi
 }
