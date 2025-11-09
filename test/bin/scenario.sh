@@ -1115,7 +1115,6 @@ setup_oc_and_kubeconfig() {
         exit 1
     }
 
-
     # Get kubeconfig from VM
     local -r vm_ip=$(get_vm_property "${vmname}" "ip")
     local kubeconfig="${SCENARIO_INFO_DIR}/${SCENARIO}/kubeconfig"
@@ -1189,7 +1188,7 @@ run_ginkgo_tests() {
     fi
 
     # Run the tests and capture output with 10m timeout for every test case
-    echo "Gingko test execution started..."
+    echo "ginkgo test execution started..."
     ginkgo_result_success=true
     if ! eval '${timeout_ginkgo} run --timeout 10m --junit-dir=${test_results_dir} -f ${case_selected}' 2>&1 | tee "${test_results_dir}/test-output.log"; then
         if [ $? -ge 124 ] ; then
@@ -1197,7 +1196,7 @@ run_ginkgo_tests() {
         fi
         ginkgo_result_success=false
     fi
-    echo "Gingko test execution completed"
+    echo "ginkgo test execution completed"
     popd &>/dev/null
 
     # Clean the JUnit XML files
@@ -1241,9 +1240,9 @@ run_ginkgo_tests() {
 
     # Record the junit result of the ginkgo tests
     if [[ "${ginkgo_result_success}" == "true" ]]; then
-        record_junit "${vmname}" "run_gingko_tests" "OK"
+        record_junit "${vmname}" "run_ginkgo_tests" "OK"
     else
-        record_junit "${vmname}" "run_gingko_tests" "FAILED"
+        record_junit "${vmname}" "run_ginkgo_tests" "FAILED"
         exit 1
     fi
 }
