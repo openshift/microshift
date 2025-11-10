@@ -1,9 +1,3 @@
-apiVersion: v1
-kind: Deployment
-namespace: sriov-network-operator
-label:
-  control-plane: controller-manager
-name: sriov-network-operator
 spec:
   replicas: 1
   selector:
@@ -46,7 +40,7 @@ spec:
             - name: RESOURCE_PREFIX
               value: openshift.io
             - name: ADMISSION_CONTROLLERS_ENABLED
-              value: 'true'
+              value: 'false'
             - name: ADMISSION_CONTROLLERS_CERTIFICATES_OPERATOR_SECRET_NAME
               value: operator-webhook-service
             - name: ADMISSION_CONTROLLERS_CERTIFICATES_INJECTOR_SECRET_NAME
@@ -58,7 +52,7 @@ spec:
             - name: METRICS_EXPORTER_SECRET_NAME
               value: metrics-exporter-cert
             - name: METRICS_EXPORTER_PROMETHEUS_OPERATOR_ENABLED
-              value: 'true'
+              value: 'false'
             - name: METRICS_EXPORTER_PROMETHEUS_DEPLOY_RULES
               value: 'true'
             - name: METRICS_EXPORTER_PROMETHEUS_OPERATOR_NAMESPACE
@@ -81,6 +75,8 @@ spec:
                   fieldPath: metadata.name
             - name: RELEASE_VERSION
               value: 4.20.0
+            - name: CLUSTER_TYPE
+              value: kubernetes
           image: registry.redhat.io/openshift4/ose-sriov-network-rhel9-operator@sha256:32c64998a00465b135fea56a7cb1f77a99ce57406a2e8baa538db68728b204c0
           imagePullPolicy: IfNotPresent
           livenessProbe:
@@ -107,3 +103,8 @@ spec:
         - effect: NoSchedule
           key: node-role.kubernetes.io/master
           operator: Exists
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sriov-network-operator
+  namespace: sriov-network-operator

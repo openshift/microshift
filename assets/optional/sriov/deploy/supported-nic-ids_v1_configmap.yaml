@@ -49,3 +49,4 @@ data:
 kind: ConfigMap
 metadata:
   name: supported-nic-ids
+  namespace: sriov-network-operator

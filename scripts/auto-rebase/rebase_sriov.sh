@@ -136,10 +136,6 @@ extract_sriov_rbac_from_cluster_service_version() {
     local rolebinding="${dest}/rolebinding.yaml"
     echo "generating ${rolebinding}"
     extract_sriov_rolebinding_from_csv_by_service_account_name "${service_account_name}" "${namespace}" "${rolebinding}"
-
-    local service_account="${dest}/serviceaccount.yaml"
-    echo "generating ${service_account}"
-    extract_sriov_service_account_from_csv_by_service_account_name "${service_account_name}" "${namespace}" "${service_account}"
   done
 }
 
@@ -200,7 +196,7 @@ subjects:
   namespace: ${namespace}
 EOL
 )
-  echo "${crb}" > "${target}"
+  echo "${crb}" >> "${target}"
 }
 
 extract_sriov_rolebinding_from_csv_by_service_account_name() {
@@ -227,7 +223,7 @@ subjects:
   namespace: ${namespace}
 EOL
 )
-  echo "${crb}" > "${target}"
+  echo "${crb}" >> "${target}"
 }
 
 extract_sriov_service_account_from_csv_by_service_account_name() {
@@ -246,7 +242,7 @@ metadata:
   namespace: ${namespace}
 EOL
 )
-  echo "${serviceAccount}" > "${target}"
+  echo "${serviceAccount}" >> "${target}"
 }
 
 # extract_operator_from_csv() extracts the operator manifest from cluster
@@ -261,12 +257,21 @@ extract_operator_from_csv() {
   #  select(.name == "sriov-network-operator") | 
   #  {"apiVersion": "v1", "kind": "Deployment", "namespace": \"${namespace}\"} * .
   #  " "${csv}" > "${target}"
+  #yq eval "
+  #  .spec.install.spec.deployments[]
+  #  | select(.name == \"sriov-network-operator\")
+  #  | {\"apiVersion\": \"apps/v1\", \"kind\": \"Deployment\", \"namespace\": \"${namespace}\"} * .
+  #" "${csv}" > "${target}"
   yq eval "
     .spec.install.spec.deployments[]
     | select(.name == \"sriov-network-operator\")
-    | {\"apiVersion\": \"v1\", \"kind\": \"Deployment\", \"namespace\": \"${namespace}\"} * .
+    | .apiVersion = \"apps/v1\"
+    | .kind = \"Deployment\"
+    | .metadata.name = .name
+    | .metadata.namespace = \"${namespace}\"
+    | del(.name)
+    | del(.label)
   " "${csv}" > "${target}"
-
 }
 
 create_namespace_yaml () {
@@ -286,6 +291,28 @@ metadata:
 EOL
 )
   echo "${namespace}" > "${target}"
+}
+
+create_default_sriov_operator_config() {
+  local namespace="$1"
+  local target="$2"
+
+  sriovoperatorconfig=$(cat <<EOL
+apiVersion: sriovnetwork.openshift.io/v1
+kind: SriovOperatorConfig
+metadata:
+  name: default
+  namespace: ${namespace}
+spec:
+  configDaemonNodeSelector: {}
+  logLevel: 2
+  disableDrain: false
+  configurationMode: daemon
+EOL
+)
+
+  echo "${sriovoperatorconfig}" > "${target}"
+
 }
 # extract_sriov_manifests() extracts the RBAC, operator and configmap from
 # cluster service version and saves the manifests in the STAGING_EXTRACTED
@@ -309,6 +336,10 @@ extract_sriov_manifests() {
   local namespace="${STAGING_EXTRACTED}/namespace.yaml"
   echo "generating ${namespace}"
   create_namespace_yaml "sriov-network-operator" "${namespace}"
+
+  local sriovoperatorconfig="${STAGING_EXTRACTED}/sriovoperatorconfig.yaml"
+  echo "generating ${sriovoperatorconfig}"
+  create_default_sriov_operator_config "sriov-network-operator" "${sriovoperatorconfig}"
 }
 
 # process_sriov_manifests() copies the extracted manifests and CRDs to their
@@ -317,6 +348,7 @@ extract_sriov_manifests() {
 process_sriov_manifests() {
   rm -rf "${FINAL_ROOT}" && mkdir -p "${FINAL_DEPLOY}" "${FINAL_CRD}"
   local configmap="${STAGING_EXTRACTED}/${CONFIGMAP_FILENAME}"
+  local operator="${STAGING_EXTRACTED}/${OPERATOR_FILENAME}"
 
   # copy extracted manifests to final destination
   cp -a "${STAGING_EXTRACTED}/." "${FINAL_DEPLOY}/" 
@@ -325,7 +357,26 @@ process_sriov_manifests() {
   cp -a "${STAGING_DOWNLOAD}/sriovnetwork.openshift.io_"* "${FINAL_CRD}/"
 
   # add the nic we use in testing to supported nics list
-  yq eval ".data.Intel_ixgbe_82576 = \"8086 10c9 10ca\"" "${configmap}" > "${FINAL_DEPLOY}/${CONFIGMAP_FILENAME}"
+  yq eval "
+  .data.Intel_ixgbe_82576 = \"8086 10c9 10ca\"
+  | .metadata.namespace = \"sriov-network-operator\"
+  " "${configmap}" > "${FINAL_DEPLOY}/${CONFIGMAP_FILENAME}"
+
+  yq eval "
+  (
+    .spec.template.spec.containers[0].env[] |
+    select(.name == \"ADMISSION_CONTROLLERS_ENABLED\")
+  ).value = \"false\"
+  |
+  (
+    .spec.template.spec.containers[0].env[] |
+    select(.name == \"METRICS_EXPORTER_PROMETHEUS_OPERATOR_ENABLED\")
+  ).value = \"false\"
+  |
+  .spec.template.spec.containers[0].env += [
+    {\"name\": \"CLUSTER_TYPE\", \"value\": \"kubernetes\"}
+  ]
+  " "${operator}" > "${FINAL_DEPLOY}/${OPERATOR_FILENAME}"
 }
 
 get_sriov_bundle_version() {
