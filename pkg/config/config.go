@@ -46,17 +46,16 @@ var (
 )
 
 type Config struct {
-	DNS          DNS           `json:"dns"`
-	Network      Network       `json:"network"`
-	Node         Node          `json:"node"`
-	ApiServer    ApiServer     `json:"apiServer"`
-	Etcd         EtcdConfig    `json:"etcd"`
-	Debugging    Debugging     `json:"debugging"`
-	Manifests    Manifests     `json:"manifests"`
-	Ingress      IngressConfig `json:"ingress"`
-	Storage      Storage       `json:"storage"`
-	Telemetry    Telemetry     `json:"telemetry"`
-	FeatureGates FeatureGates  `json:"featureGates"`
+	DNS       DNS           `json:"dns"`
+	Network   Network       `json:"network"`
+	Node      Node          `json:"node"`
+	ApiServer ApiServer     `json:"apiServer"`
+	Etcd      EtcdConfig    `json:"etcd"`
+	Debugging Debugging     `json:"debugging"`
+	Manifests Manifests     `json:"manifests"`
+	Ingress   IngressConfig `json:"ingress"`
+	Storage   Storage       `json:"storage"`
+	Telemetry Telemetry     `json:"telemetry"`
 	// Settings specified in this section are transferred as-is into the Kubelet config.
 	// +kubebuilder:validation:Schemaless
 	Kubelet map[string]any `json:"kubelet"`
@@ -417,6 +416,15 @@ func (c *Config) incorporateUserSettings(u *Config) {
 	}
 	if u.Ingress.AccessLogging.HttpCaptureCookies != nil {
 		c.Ingress.AccessLogging.HttpCaptureCookies = u.Ingress.AccessLogging.HttpCaptureCookies
+	}
+	if u.ApiServer.FeatureGates.FeatureSet != "" {
+		c.ApiServer.FeatureGates.FeatureSet = u.ApiServer.FeatureGates.FeatureSet
+	}
+	if len(u.ApiServer.FeatureGates.CustomNoUpgrade.Enabled) > 0 {
+		c.ApiServer.FeatureGates.CustomNoUpgrade.Enabled = u.ApiServer.FeatureGates.CustomNoUpgrade.Enabled
+	}
+	if len(u.ApiServer.FeatureGates.CustomNoUpgrade.Disabled) > 0 {
+		c.ApiServer.FeatureGates.CustomNoUpgrade.Disabled = u.ApiServer.FeatureGates.CustomNoUpgrade.Disabled
 	}
 }
 
