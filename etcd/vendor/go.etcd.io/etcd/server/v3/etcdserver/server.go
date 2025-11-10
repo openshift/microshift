@@ -540,7 +540,7 @@ func NewServer(cfg config.ServerConfig) (srv *EtcdServer, err error) {
 		if !cfg.ForceNewCluster {
 			id, cl, n, s, w = restartNode(cfg, snapshot)
 		} else {
-			id, cl, n, s, w = restartAsStandaloneNode(cfg, snapshot, be)
+			id, cl, n, s, w = restartAsStandaloneNode(cfg, snapshot, ci, be)
 		}
 
 		cl.SetStore(st)
@@ -1343,10 +1343,35 @@ func (s *EtcdServer) applySnapshot(ep *etcdProgress, apply *apply) {
 	// wait for raftNode to persist snapshot onto the disk
 	<-apply.notifyc
 
+	bemuUnlocked := false
+	s.bemu.Lock()
+	defer func() {
+		if !bemuUnlocked {
+			s.bemu.Unlock()
+		}
+	}()
+
 	// gofail: var applyBeforeOpenSnapshot struct{}
 	newbe, err := openSnapshotBackend(s.Cfg, s.snapshotter, apply.snapshot, s.beHooks)
 	if err != nil {
 		lg.Panic("failed to open snapshot backend", zap.Error(err))
+	}
+	lg.Info("applySnapshot: opened snapshot backend")
+	// gofail: var applyAfterOpenSnapshot struct{}
+
+	lg.Info("restoring v2 store")
+	if err := s.v2store.Recovery(apply.snapshot.Data); err != nil {
+		lg.Panic("failed to restore v2 store", zap.Error(err))
+	}
+
+	if err := assertNoV2StoreContent(lg, s.v2store, s.Cfg.V2Deprecation); err != nil {
+		lg.Panic("illegal v2store content", zap.Error(err))
+	}
+
+	lg.Info("restored v2 store")
+
+	if err = membership.SyncLearnerPromotionIfNeeded(lg, newbe, s.v2store); err != nil {
+		lg.Error("Failed to sync learner promotion for v3store", zap.Error(err))
 	}
 
 	// We need to set the backend to consistIndex before recovering the lessor,
@@ -1375,11 +1400,14 @@ func (s *EtcdServer) applySnapshot(ep *etcdProgress, apply *apply) {
 	newbe.SetTxPostLockInsideApplyHook(s.getTxPostLockInsideApplyHook())
 	lg.Info("restored mvcc store", zap.Uint64("consistent-index", s.consistIndex.ConsistentIndex()))
 
+	oldbe := s.be
+	s.be = newbe
+	s.bemu.Unlock()
+	bemuUnlocked = true
+
 	// Closing old backend might block until all the txns
 	// on the backend are finished.
 	// We do not want to wait on closing the old backend.
-	s.bemu.Lock()
-	oldbe := s.be
 	go func() {
 		lg.Info("closing old backend file")
 		defer func() {
@@ -1389,9 +1417,6 @@ func (s *EtcdServer) applySnapshot(ep *etcdProgress, apply *apply) {
 			lg.Panic("failed to close old backend", zap.Error(err))
 		}
 	}()
-
-	s.be = newbe
-	s.bemu.Unlock()
 
 	lg.Info("restoring alarm store")
 
@@ -1408,17 +1433,6 @@ func (s *EtcdServer) applySnapshot(ep *etcdProgress, apply *apply) {
 
 		lg.Info("restored auth store")
 	}
-
-	lg.Info("restoring v2 store")
-	if err := s.v2store.Recovery(apply.snapshot.Data); err != nil {
-		lg.Panic("failed to restore v2 store", zap.Error(err))
-	}
-
-	if err := assertNoV2StoreContent(lg, s.v2store, s.Cfg.V2Deprecation); err != nil {
-		lg.Panic("illegal v2store content", zap.Error(err))
-	}
-
-	lg.Info("restored v2 store")
 
 	s.cluster.SetBackend(newbe)
 
@@ -2939,4 +2953,10 @@ func maybeDefragBackend(cfg config.ServerConfig, be backend.Backend) error {
 
 func (s *EtcdServer) CorruptionChecker() CorruptionChecker {
 	return s.corruptionChecker
+}
+
+func (s *EtcdServer) Defragment() error {
+	s.bemu.Lock()
+	defer s.bemu.Unlock()
+	return s.be.Defrag()
 }
