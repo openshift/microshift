@@ -259,7 +259,7 @@ extract_operator_from_csv() {
   yq eval "
     .spec.install.spec.deployments[] | 
     select(.name == "sriov-network-operator") | 
-    {"apiVersion": "v1", "kind": "Deployment", "namespace": \"${namespace}\"} * .
+    {"apiVersion": "v1", "kind": "Deployment", "namespace": ${namespace}} * .
     " "${csv}" > "${target}"
 }
 
