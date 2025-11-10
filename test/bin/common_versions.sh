@@ -142,14 +142,24 @@ export CNCF_SYSTEMD_LOGS_VERSION=v0.4
 export GITOPS_VERSION=1.16
 
 # The brew release versions needed for release regression testing
-BREW_Y0_RELEASE_VERSION="$(get_vrel_from_rpm "${BREW_RPM_SOURCE}/4.${MINOR_VERSION}-zstream/${UNAME_M}/")"
-BREW_Y1_RELEASE_VERSION="$(get_vrel_from_rpm "${BREW_RPM_SOURCE}/4.${PREVIOUS_MINOR_VERSION}-zstream/${UNAME_M}/")"
-BREW_Y2_RELEASE_VERSION="$(get_vrel_from_rpm "${BREW_RPM_SOURCE}/4.${YMINUS2_MINOR_VERSION}-zstream/${UNAME_M}/")"
-BREW_RC_RELEASE_VERSION="$(get_vrel_from_rpm "${BREW_RPM_SOURCE}/4.${MINOR_VERSION}-rc/${UNAME_M}/")"
-BREW_EC_RELEASE_VERSION="$(get_vrel_from_rpm "${BREW_RPM_SOURCE}/4.${MINOR_VERSION}-ec/${UNAME_M}/")"
+BREW_Y0_VERSION=$(./test/bin/manage_brew_rpms.sh find_package "4.${MINOR_VERSION}" "zstream" "0" "0" | cut -d'-' -f2)
+BREW_Y1_VERSION=$(./test/bin/manage_brew_rpms.sh find_package "4.${MINOR_VERSION}" "zstream" "1" "0" | cut -d'-' -f2)
+BREW_Y2_VERSION=$(./test/bin/manage_brew_rpms.sh find_package "4.${MINOR_VERSION}" "zstream" "2" "0" | cut -d'-' -f2)
+BREW_Z1_VERSION=$(./test/bin/manage_brew_rpms.sh find_package "4.${MINOR_VERSION}" "zstream" "0" "1" | cut -d'-' -f2)
+BREW_RC_VERSION=$(./test/bin/manage_brew_rpms.sh find_package "4.${MINOR_VERSION}" "rc" "0" "0" | cut -d'-' -f2)
+BREW_EC_VERSION=$(./test/bin/manage_brew_rpms.sh find_package "4.${MINOR_VERSION}" "ec" "0" "0" | cut -d'-' -f2)
+
+BREW_Y0_RELEASE_VERSION="$(get_vrel_from_rpm "${BREW_RPM_SOURCE}/${BREW_Y0_VERSION}/${UNAME_M}/")"
+BREW_Y1_RELEASE_VERSION="$(get_vrel_from_rpm "${BREW_RPM_SOURCE}/${BREW_Y1_VERSION}/${UNAME_M}/")"
+BREW_Y2_RELEASE_VERSION="$(get_vrel_from_rpm "${BREW_RPM_SOURCE}/${BREW_Y2_VERSION}/${UNAME_M}/")"
+BREW_Z1_RELEASE_VERSION="$(get_vrel_from_rpm "${BREW_RPM_SOURCE}/${BREW_Z1_VERSION}/${UNAME_M}/")"
+BREW_RC_RELEASE_VERSION="$(get_vrel_from_rpm "${BREW_RPM_SOURCE}/${BREW_RC_VERSION}/${UNAME_M}/")"
+BREW_EC_RELEASE_VERSION="$(get_vrel_from_rpm "${BREW_RPM_SOURCE}/${BREW_EC_VERSION}/${UNAME_M}/")"
+
 export BREW_Y0_RELEASE_VERSION
 export BREW_Y1_RELEASE_VERSION
 export BREW_Y2_RELEASE_VERSION
+export BREW_Z1_RELEASE_VERSION
 export BREW_RC_RELEASE_VERSION
 export BREW_EC_RELEASE_VERSION
 
