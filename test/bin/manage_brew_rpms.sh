@@ -58,7 +58,7 @@ action_download() {
             package=$(brew list-builds --quiet --package=microshift --state=COMPLETE | grep "^microshift-${ver}.0~${ver_type}." | tail -n1) || true
             ;;
         *)
-            echo "ERROR: Invalid version_type '${ver_type}'. Valid values are: rc, ec and zstream"
+            echo "ERROR: Invalid version_type '${ver_type}'. Valid values are: nightly, rc, ec and zstream"
             exit 1
             ;;
     esac
