@@ -1,14 +1,20 @@
-- oc image-amd64 168e32ecf12af2d2ea4cb1e117355916da8cb4a6 to b61226dacc6e9eeadcc6103cbfc3c6b47fea5e99
-  - 8c528bd8 2025-11-03T10:54:04+00:00 Prefer ready and reachable control plane nodes
-  - d74c9909 2025-11-03T10:54:04+00:00 Filter out unreachable taints from tolerations
+- ovn-kubernetes image-amd64 6c9428e481149bce786ee2ab3f8342d43f950030 to ece958397ed4368e14c711f7e2df4d504bdf53cc
+  - d687b252 2025-11-04T16:19:32+00:00 Reintroduce completed pod check in shouldReleaseDeletedPod
+  - 8a31820f 2025-11-04T16:19:32+00:00 kubevirt: test with per-pod SNATs
+  - 14b97fe3 2025-11-04T16:19:32+00:00 kubevirt: test OVN DB after completion of source pod
+  - c2d4e502 2025-11-04T16:19:32+00:00 kubevirt: fix search of colliding pods for migrated pods
+  - 26a2114f 2025-11-04T16:19:32+00:00 kubevirt: prevent error log on IP release
+  - 48c117a0 2025-11-04T16:19:32+00:00 kubevirt: fix bad release of IPs of live migratable pods
+  - 1011a33f 2025-11-04T16:19:32+00:00 kubevirt e2e: use a value for vm nodeselector
+  - 16b7e676 2025-11-04T16:19:32+00:00 Fix naming of "Secondary" to be "User-Defined"
 
-- ovn-kubernetes image-amd64 f573d533b7b6e830cb3fd0de15e9d89fb9191726 to 6c9428e481149bce786ee2ab3f8342d43f950030
-  - a1871a08 2025-10-29T09:54:12+00:00 Skip Pending pods in EgressIP status updates
-
-- oc image-arm64 168e32ecf12af2d2ea4cb1e117355916da8cb4a6 to b61226dacc6e9eeadcc6103cbfc3c6b47fea5e99
-  - 8c528bd8 2025-11-03T10:54:04+00:00 Prefer ready and reachable control plane nodes
-  - d74c9909 2025-11-03T10:54:04+00:00 Filter out unreachable taints from tolerations
-
-- ovn-kubernetes image-arm64 f573d533b7b6e830cb3fd0de15e9d89fb9191726 to 6c9428e481149bce786ee2ab3f8342d43f950030
-  - a1871a08 2025-10-29T09:54:12+00:00 Skip Pending pods in EgressIP status updates
+- ovn-kubernetes image-arm64 6c9428e481149bce786ee2ab3f8342d43f950030 to ece958397ed4368e14c711f7e2df4d504bdf53cc
+  - d687b252 2025-11-04T16:19:32+00:00 Reintroduce completed pod check in shouldReleaseDeletedPod
+  - 8a31820f 2025-11-04T16:19:32+00:00 kubevirt: test with per-pod SNATs
+  - 14b97fe3 2025-11-04T16:19:32+00:00 kubevirt: test OVN DB after completion of source pod
+  - c2d4e502 2025-11-04T16:19:32+00:00 kubevirt: fix search of colliding pods for migrated pods
+  - 26a2114f 2025-11-04T16:19:32+00:00 kubevirt: prevent error log on IP release
+  - 48c117a0 2025-11-04T16:19:32+00:00 kubevirt: fix bad release of IPs of live migratable pods
+  - 1011a33f 2025-11-04T16:19:32+00:00 kubevirt e2e: use a value for vm nodeselector
+  - 16b7e676 2025-11-04T16:19:32+00:00 Fix naming of "Secondary" to be "User-Defined"
 
