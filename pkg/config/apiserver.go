@@ -2,7 +2,9 @@ package config
 
 import (
 	"fmt"
+	"reflect"
 	"slices"
+	"strings"
 
 	configv1 "github.com/openshift/api/config/v1"
 	"github.com/openshift/library-go/pkg/crypto"
@@ -26,6 +28,8 @@ type ApiServer struct {
 	AuditLog AuditLog `json:"auditLog"`
 
 	TLS TLSConfig `json:"tls"`
+
+	FeatureGates FeatureGates `json:"featureGates"`
 
 	// The URL and Port of the API server cannot be changed by the user.
 	URL  string `json:"-"`
@@ -126,4 +130,46 @@ func (t *TLSConfig) Validate() error {
 
 func getIANACipherSuites(suites []string) []string {
 	return crypto.OpenSSLToIANACipherSuites(suites)
+}
+
+const (
+	FeatureSetCustomNoUpgrade      = "CustomNoUpgrade"
+	FeatureSetTechPreviewNoUpgrade = "TechPreviewNoUpgrade"
+	FeatureSetDevPreviewNoUpgrade  = "DevPreviewNoUpgrade"
+)
+
+type FeatureGates struct {
+	FeatureSet      string          `json:"featureSet"`
+	CustomNoUpgrade CustomNoUpgrade `json:"customNoUpgrade"`
+}
+
+type CustomNoUpgrade struct {
+	Enabled  []string `json:"enabled"`
+	Disabled []string `json:"disabled"`
+}
+
+func validateFeatureGates(c *Config) error {
+	fg := &c.ApiServer.FeatureGates
+	if reflect.DeepEqual(c.ApiServer.FeatureGates, FeatureGates{}) {
+		return nil
+	}
+	// Must use a recognized feature set, or else empty
+	if fg.FeatureSet != FeatureSetCustomNoUpgrade && fg.FeatureSet != FeatureSetTechPreviewNoUpgrade && fg.FeatureSet != FeatureSetDevPreviewNoUpgrade {
+		return fmt.Errorf("invalid feature set: %s", fg.FeatureSet)
+	}
+	// Must set FeatureSet to CustomNoUpgrade to use custom feature gates
+	if fg.FeatureSet != FeatureSetCustomNoUpgrade && (len(fg.CustomNoUpgrade.Enabled) > 0 || len(fg.CustomNoUpgrade.Disabled) > 0) {
+		return fmt.Errorf("CustomNoUpgrade must be empty when FeatureSet is empty")
+	}
+	// Must not have any feature gates that are enabled and disabled at the same time
+	var illegalFeatures []string
+	for _, enabledFeature := range fg.CustomNoUpgrade.Enabled {
+		if slices.Contains(fg.CustomNoUpgrade.Disabled, enabledFeature) {
+			illegalFeatures = append(illegalFeatures, enabledFeature)
+		}
+	}
+	if len(illegalFeatures) > 0 {
+		return fmt.Errorf("featuregates cannot be enabled and disabled at the same time: %s", strings.Join(illegalFeatures, ", "))
+	}
+	return nil
 }
