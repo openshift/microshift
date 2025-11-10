@@ -80,10 +80,10 @@ append_if_exists() {
   fi
 }
 
-# download_rhoai_manifests() fetches the RHOAI's kserve and runtime manifests.
+# download_sriov_manifests() fetches the SR-IOV manifests.
 # First, it downloads the SR-IOV Operator bundle CSV and extracts image ref to the SR-IOV Operator image.
 # Then, it extracts the manifests from the SR-IOV Operator image to the staging dir.
-# No processing is done in this functions.
+# No processing is done in this function.
 download_sriov_manifests() {
     local -r bundle_ref="${1}"
 
@@ -98,6 +98,9 @@ download_sriov_manifests() {
         "${bundle_ref}" || return 1
 }
 
+# extract_sriov_rbac_from_cluster_service_version() extract the RBAC from the
+# CSV and saves the manifests in the STAGING_EXTRACTED directory. It is called
+# by extract_sriov_manifests().
 extract_sriov_rbac_from_cluster_service_version() {
   local dest="$1"
   local csv="$2"
@@ -109,9 +112,7 @@ extract_sriov_rbac_from_cluster_service_version() {
   for service_account_name in "${clusterPermissions[@]}"; do
     echo "extracting bundle .spec.install.spec.clusterPermissions by serviceAccountName ${service_account_name}"
 
-    # local clusterrole="${dest}/${service_account_name}_clusterrole.yaml"
     local clusterrole="${dest}/clusterrole.yaml"
-
     echo "generating ${clusterrole}"
     extract_sriov_clusterrole_from_csv_by_service_account_name "${service_account_name}" "${csv}" "${clusterrole}"
 
@@ -139,9 +140,7 @@ extract_sriov_rbac_from_cluster_service_version() {
     local service_account="${dest}/serviceaccount.yaml"
     echo "generating ${service_account}"
     extract_sriov_service_account_from_csv_by_service_account_name "${service_account_name}" "${namespace}" "${service_account}"
-    
   done
-
 }
 
 extract_sriov_clusterrole_from_csv_by_service_account_name() {
@@ -250,13 +249,23 @@ EOL
     echo "${serviceAccount}" > "${target}"
 }
 
+# extract_operator_from_csv() extracts the operator manifest from cluster
+# service version.
 extract_operator_from_csv() {
   local csv="$1"
-  local target="$2"
+  local namespace="$2"
+  local target="$3"
 
-  yq eval '.spec.install.spec.deployments[] | select(.name == "sriov-network-operator")' "${csv}" > "${target}"
+  yq eval "
+    .spec.install.spec.deployments[] | 
+    select(.name == "sriov-network-operator") | 
+    {"apiVersion": "v1", "kind": "Deployment", "namespace": \"${namespace}\"} * .
+    " "${csv}" > "${target}"
 }
 
+# extract_sriov_manifests() extracts the RBAC, operator and configmap from
+# cluster service version and saves the manifests in the STAGING_EXTRACTED
+# directory.
 extract_sriov_manifests() {
   # extract service_account, role, role_binding, clusterrole, clusterrole_binding
   extract_sriov_rbac_from_cluster_service_version "${STAGING_EXTRACTED}" "${STAGING_DOWNLOAD}/${CSV_FILENAME}" "sriov-network-operator"
@@ -267,28 +276,26 @@ extract_sriov_manifests() {
   cp "${configmap}" "${STAGING_EXTRACTED}/"
 
   # extract operator
-  local operator="${dest}/${OPERATOR_FILENAME}"
+  local operator="${STAGING_EXTRACTED}/${OPERATOR_FILENAME}"
   echo "generating ${operator}"
-  extract_operator_from_csv "${csv}" "${operator}"
+  extract_operator_from_csv "${STAGING_DOWNLOAD}/${CSV_FILENAME}" "sriov-network-operator" "${operator}"
 }
 
+# process_sriov_manifests() copies the extracted manifests and CRDs to their
+# corresponding directory in assets/. Any additional processing is done in this
+# function.
 process_sriov_manifests() {
   rm -rf "${FINAL_ROOT}" && mkdir -p "${FINAL_DEPLOY}" "${FINAL_CRD}"
-  local namespace="$1"
-  local operatorfile="${STAGING_EXTRACTED}/${OPERATOR_FILENAME}"
   local configmap="${STAGING_EXTRACTED}/${CONFIGMAP_FILENAME}"
 
   # copy extracted manifests to final destination
   cp -a "${STAGING_EXTRACTED}/." "${FINAL_DEPLOY}/" 
 
-  # add apiVersion, Kind and namespace to operator.yaml
-  yq eval ".apiVersion = \"v1\" | .kind = \"Deployment\" | .namespace = \"${namespace}\"" ${operatorfile} > "${FINAL_DEPLOY}/operator.yaml"
-
-  # add the nic we use in testing to supported nics list
-  yq eval ".data.Intel_ixgbe_82576 = \"8086 10c9 10ca\"" "${configmap}" > "${FINAL_DEPLOY}/configmap.yaml"
-  
   # copy CRDs to final destination
   cp -a "${STAGING_DOWNLOAD}/sriovnetwork.openshift.io_"* "${FINAL_CRD}/"
+
+  # add the nic we use in testing to supported nics list
+  yq eval ".data.Intel_ixgbe_82576 = \"8086 10c9 10ca\"" "${configmap}" > "${FINAL_DEPLOY}/${CONFIGMAP_FILENAME}"
 }
 
 get_sriov_bundle_version() {
@@ -366,12 +373,13 @@ check_preconditions
 command=${1:-help}
 case "${command}" in
     to)
-        rebase_sriov_serving_to "$2"
+        rebase_sriov_to "$2"
         ;;
     download)
         download_sriov_manifests "$2"
         ;;
     process)
+        extract_sriov_manifests
         process_sriov_manifests
         ;;
     *) usage;;
