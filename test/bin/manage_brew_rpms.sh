@@ -57,7 +57,6 @@ action_find_package() {
     # Extract version components
     ver_x=$(echo "${ver}" | cut -d'.' -f1)
     ver_y=$(echo "${ver}" | cut -d'.' -f2)
-    ver_z=$(echo "${ver}" | cut -d'.' -f3)
 
     # Calculate previous X.Y version
     ver_y=$((ver_y - ver_prev_y))
