@@ -14,6 +14,11 @@ apiServer:
         maxFileSize: 0
         maxFiles: 0
         profile: ""
+    featureGates:
+        customNoUpgrade:
+            disabled: []
+            enabled: []
+        featureSet: ""
     namedCertificates:
         - certPath: ""
           keyPath: ""
@@ -158,6 +163,11 @@ apiServer:
         maxFileSize: 200
         maxFiles: 10
         profile: Default
+    featureGates:
+        customNoUpgrade:
+            disabled: []
+            enabled: []
+        featureSet: ""
     namedCertificates:
         - certPath: ""
           keyPath: ""

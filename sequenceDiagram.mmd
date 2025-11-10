@@ -1,0 +1,73 @@
+sequenceDiagram
+    participant ConfigFile as config.yaml
+    participant ActiveConfig as config.ActiveConfig()
+    participant FillDefaults as config.fillDefaults()
+    participant IncorporateSettings as config.incorporateUserSettings()
+    participant UpdateComputed as config.updateComputedValues()
+    participant KASRun as KubeAPIServer.Run()
+    participant KASConfigure as KubeAPIServer.configure()
+    participant Merge as resourcemerge.MergePrunedProcessConfig()
+    participant TempFile as Create Temp File
+    participant NewCmd as kubeapiserver.NewAPIServerCommand()
+    participant Execute as cmd.ExecuteContext()
+    participant GetOpenshiftConfig as enablement.GetOpenshiftConfig()
+    participant ConfigToFlags as openshiftkubeapiserver.ConfigToFlags()
+    participant ParseFlags as cmd.ParseFlags()
+    participant KASMain as Run() [kube-apiserver]
+
+    Note over ConfigFile: User configuration in<br/>/etc/microshift/config.yaml<br/><br/>apiServer:<br/>  advertiseAddress: "10.43.0.2"<br/>  port: 6443<br/>  auditLog:<br/>    profile: "Default"<br/>  tls:<br/>    minVersion: "VersionTLS12"<br/>    cipherSuites: [...]<br/>  featureGates:<br/>    featureSet: "CustomNoUpgrade"<br/>    customNoUpgrade:<br/>      enabled: ["UserNamespacesSupport"]
+
+    ConfigFile->>+ActiveConfig: Read config.yaml<br/>[files.go:120]
+    
+    ActiveConfig->>+FillDefaults: Set default values<br/>[config.go:92]
+    Note right of FillDefaults: Sets default ApiServer values:<br/>- Port: 6443<br/>- URL: "https://localhost:6443"<br/>- AuditLog defaults<br/>- SubjectAltNames
+    FillDefaults-->>-ActiveConfig: Config with defaults
+    
+    ActiveConfig->>+IncorporateSettings: Merge user settings<br/>[config.go:195]
+    Note right of IncorporateSettings: Merges user-provided values:<br/>- ApiServer.AdvertiseAddress<br/>- ApiServer.AuditLog.*<br/>- ApiServer.TLS.*<br/>- ApiServer.NamedCertificates<br/>- ApiServer.FeatureGates.*
+    IncorporateSettings-->>-ActiveConfig: Config with user settings
+    
+    ActiveConfig->>+UpdateComputed: Compute derived values<br/>[config.go:434]
+    Note right of UpdateComputed: Computes:<br/>- AdvertiseAddresses (from ServiceNetwork)<br/>- TLS.UpdateValues() - cipher suites<br/>- SkipInterface flag
+    UpdateComputed-->>-ActiveConfig: Final Config
+    
+    ActiveConfig-->>-ConfigFile: *config.Config
+
+    Note over KASRun: MicroShift creates and starts<br/>kube-apiserver controller
+
+    KASRun->>+KASConfigure: configure(ctx, cfg)<br/>[kube-apiserver.go:97]
+    
+    Note right of KASConfigure: Uses cfg.ApiServer fields to build<br/>KubeAPIServerConfig overrides:<br/><br/>- advertise-address<br/>- audit-policy-file<br/>- audit-log-*<br/>- tls-cert-file<br/>- tls-private-key-file<br/>- tls-min-version<br/>- tls-cipher-suites<br/>- feature-gates<br/>- service-cluster-ip-range<br/>- disable-admission-plugins<br/>- enable-admission-plugins
+    
+    KASConfigure->>+Merge: Merge config layers<br/>[kube-apiserver.go:267]
+    Note right of Merge: Merges 3 layers:<br/>1. defaultconfig.yaml (embedded)<br/>2. config-overrides.yaml (embedded)<br/>3. Runtime overrides from cfg.ApiServer<br/><br/>Creates KubeAPIServerConfig struct<br/>with all settings merged
+    Merge-->>-KASConfigure: kasConfigBytes (marshaled YAML)
+    
+    KASConfigure-->>-KASRun: Configuration complete
+
+    KASRun->>TempFile: Create temp config file<br/>[kube-apiserver.go:363]
+    Note right of TempFile: Write kasConfigBytes to:<br/>/tmp/kube-apiserver-config-*.yaml
+
+    KASRun->>+NewCmd: NewAPIServerCommand()<br/>[kube-apiserver.go:391]
+    Note right of NewCmd: Initialize kube-apiserver command<br/>from kubernetes/cmd/kube-apiserver
+    NewCmd-->>-KASRun: cmd *cobra.Command
+
+    KASRun->>+Execute: cmd.ExecuteContext(ctx)<br/>[kube-apiserver.go:404]
+    Note right of Execute: Args:<br/>--openshift-config /tmp/kube-apiserver-config-*.yaml<br/>-v [verbosity]
+    
+    Execute->>+GetOpenshiftConfig: Read config file<br/>[intialization.go:27]
+    Note right of GetOpenshiftConfig: Reads temp config file and<br/>deserializes into<br/>KubeAPIServerConfig struct<br/><br/>Resolves file paths<br/>Sets recommended defaults
+    GetOpenshiftConfig-->>-Execute: *KubeAPIServerConfig
+    
+    Execute->>+ConfigToFlags: Convert to CLI flags<br/>[flags.go:18]
+    Note right of ConfigToFlags: Converts KubeAPIServerConfig.APIServerArguments<br/>to command-line flags:<br/><br/>Map[string][]string -> []string<br/><br/>Examples:<br/>"advertise-address": ["10.43.0.2"]<br/>  -> --advertise-address=10.43.0.2<br/><br/>"feature-gates": ["UserNamespacesSupport=true"]<br/>  -> --feature-gates=UserNamespacesSupport=true<br/><br/>Also converts:<br/>- ServingInfo -> tls-* flags<br/>- AuditConfig -> audit-* flags<br/>- AdmissionConfig -> admission-* flags
+    ConfigToFlags-->>-Execute: []string (CLI flags)
+    
+    Execute->>+ParseFlags: Parse merged flags<br/>[server.go:122]
+    Note right of ParseFlags: Re-parses command flags with<br/>values from OpenShift config<br/><br/>This updates the ServerRunOptions<br/>with all the ApiServer settings
+    ParseFlags-->>-Execute: Updated options
+    
+    Execute->>+KASMain: Run(ctx, completedOptions)<br/>[server.go:153]
+    Note right of KASMain: Kube-apiserver starts with<br/>all configuration applied:<br/><br/>- TLS settings<br/>- Audit logging<br/>- Feature gates<br/>- Admission plugins<br/>- Serving configuration
+    
+    Note over KASMain: Kube-apiserver running with<br/>all config.ApiServer values<br/>applied via command-line flags
