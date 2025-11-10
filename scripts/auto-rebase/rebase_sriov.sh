@@ -333,6 +333,8 @@ rebase_sriov_to() {
     download_sriov_manifests "${operator_bundle}"
     local -r version=$(get_sriov_bundle_version)
 
+    extract_sriov_manifests
+
     update_last_rebase_sriov_sh "${operator_bundle}"
     update_rebase_job_entrypoint_sh "${operator_bundle}"
 
