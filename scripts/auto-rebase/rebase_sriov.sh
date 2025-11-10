@@ -256,11 +256,17 @@ extract_operator_from_csv() {
   local namespace="$2"
   local target="$3"
 
+  #yq eval "
+  #  .spec.install.spec.deployments[] | 
+  #  select(.name == "sriov-network-operator") | 
+  #  {"apiVersion": "v1", "kind": "Deployment", "namespace": \"${namespace}\"} * .
+  #  " "${csv}" > "${target}"
   yq eval "
-    .spec.install.spec.deployments[] | 
-    select(.name == "sriov-network-operator") | 
-    {"apiVersion": "v1", "kind": "Deployment", "namespace": ${namespace}} * .
-    " "${csv}" > "${target}"
+    .spec.install.spec.deployments[]
+    | select(.name == \"sriov-network-operator\")
+    | {\"apiVersion\": \"v1\", \"kind\": \"Deployment\", \"namespace\": \"${namespace}\"} * .
+  " "${csv}" > "${target}"
+
 }
 
 # extract_sriov_manifests() extracts the RBAC, operator and configmap from
@@ -358,7 +364,7 @@ rebase_sriov_to() {
 
     if ! "${KEEP_STAGING}"; then
         title "Removing staging directory"
-        rm -rf "${STAGING_RHOAI}"
+        rm -rf "${STAGING_SRIOV}"
     fi
 }
 
