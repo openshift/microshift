@@ -87,7 +87,7 @@ append_if_exists() {
 download_sriov_manifests() {
     local -r bundle_ref="${1}"
 
-    rm -rf "${STAGING_SRIOV}" && mkdir -p "${STAGING_DOWNLOAD}" "${STAGING_EXTRACTED}"
+    rm -rf "${STAGING_SRIOV}" && mkdir -p "${STAGING_DOWNLOAD}"
     local -r authentication="$(get_auth)"
 
     title "Fetching SR-IOV manifests"
@@ -246,7 +246,7 @@ metadata:
   namespace: ${namespace}
 EOL
 )
-    echo "${serviceAccount}" > "${target}"
+  echo "${serviceAccount}" > "${target}"
 }
 
 # extract_operator_from_csv() extracts the operator manifest from cluster
@@ -269,10 +269,30 @@ extract_operator_from_csv() {
 
 }
 
+create_namespace_yaml () {
+  local namespace="$1"
+  local target="$2"
+
+  namespace=$(cat <<EOL
+apiVersion: v1
+kind: Namespace
+metadata: 
+  name: ${namespace}
+  labels:
+    name: ${namespace}
+    pod-security.kubernetes.io/enforce: privileged
+    pod-security.kubernetes.io/audit: privileged
+    pod-security.kubernetes.io/warn: privileged
+EOL
+)
+  echo "${namespace}" > "${target}"
+}
 # extract_sriov_manifests() extracts the RBAC, operator and configmap from
 # cluster service version and saves the manifests in the STAGING_EXTRACTED
 # directory.
 extract_sriov_manifests() {
+  rm -rf "${STAGING_EXTRACTED}" && mkdir -p "${STAGING_EXTRACTED}"
+
   # extract service_account, role, role_binding, clusterrole, clusterrole_binding
   extract_sriov_rbac_from_cluster_service_version "${STAGING_EXTRACTED}" "${STAGING_DOWNLOAD}/${CSV_FILENAME}" "sriov-network-operator"
 
@@ -285,6 +305,10 @@ extract_sriov_manifests() {
   local operator="${STAGING_EXTRACTED}/${OPERATOR_FILENAME}"
   echo "generating ${operator}"
   extract_operator_from_csv "${STAGING_DOWNLOAD}/${CSV_FILENAME}" "sriov-network-operator" "${operator}"
+
+  local namespace="${STAGING_EXTRACTED}/namespace.yaml"
+  echo "generating ${namespace}"
+  create_namespace_yaml "sriov-network-operator" "${namespace}"
 }
 
 # process_sriov_manifests() copies the extracted manifests and CRDs to their
