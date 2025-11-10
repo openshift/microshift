@@ -46,6 +46,12 @@ scenario_run_tests() {
         return 0
     fi
 
+    # Wait for MicroShift to be ready
+    wait_for_microshift_to_be_ready host1
+
+    # Setup oc client and kubeconfig for ginkgo tests
+    setup_oc_and_kubeconfig host1
+
     # Pre-upgrade: Create LVMS workloads and validate LVMS is working
     echo "INFO: Creating LVMS workloads before upgrade..."
     run_command_on_vm host1 'bash -s' < "${TESTDIR}/../scripts/lvms-helpers/createWorkloads.sh"
@@ -67,7 +73,7 @@ scenario_run_tests() {
     run_command_on_vm host1 'bash -s' < "${TESTDIR}/../scripts/lvms-helpers/checkLvmsResources.sh"
 
     # Run ginkgo tests to validate functionality
-    run_gingko_tests host1 "~Disruptive"
+    run_ginkgo_tests host1 "~Disruptive"
 
     # Cleanup LVMS workloads
     echo "INFO: Cleaning up LVMS workloads..."

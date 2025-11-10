@@ -26,28 +26,37 @@ def get_rpm_releases():
     """Gets the releases from the released MicroShift RPMs in the RHOCP repositories.
     """
     arch = platform.machine()
-    _, minor = common.get_version_from_makefile()
+    _, current_minor = common.get_version_from_makefile()
 
     with dnf.Base() as base:
         base.read_all_repos()
 
         # Disable all repos (in the memory, not on the host) to just query RHOCP repos and make operation faster.
         base.repos.all().disable()
-        repos = base.repos.get_matching(f'rhocp-4.*-{arch}-rpms')
 
-        for r in repos:
-            if any("mirror.openshift.com" in baseurl for baseurl in r.baseurl):
-                logging.info(f"Skipping locally configured mirror registry repository: {r.id} - {r.name}")
-                continue
+        # Enable RHOCP repos starting from 4.14 to the current-2 (inclusive; range() stops before the second argument).
+        # E.g., for 4.21 it's 4.14-4.19 because when 4.21 development started, the 4.20 wasn't released yet.
+        for minor in range(14, int(current_minor)-1):
+            repo_id = f"rhocp-4.{minor}-for-rhel-9-{arch}-rpms"
+            r = base.repos.get_matching(repo_id)
             r.enable()
             logging.info(f'Enabled repo: {r.id} - {r.name}')
 
+        # It's faster to enable bunch of repos at once and fill the sack once rather than filling it after enabling each repo.
+        base.fill_sack()
+
+        # Try to add current-1 (continuing example from above, it'd be 4.20).
+        # This is separate because DNF does not query remote repos in order, so enabling not active repo can derail whole cache update.
         try:
+            r = base.repos.get(f"rhocp-4.{int(current_minor)-1}-for-rhel-9-{arch}-rpms")
+            r.enable()
+            logging.info(f'Enabled repo: {r.id} - {r.name}')
             base.fill_sack()
         except dnf.exceptions.RepoError as e:
             if 'All mirrors were tried' in str(e):
-                # Not a real error, ignore
                 logging.info('Repo is not up yet, skipping')
+                r.disable()
+                logging.info(f'Disabled repo: {r.id} - {r.name}')
             else:
                 raise e
         except Exception as e:
