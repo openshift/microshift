@@ -90,6 +90,8 @@ fi
 # New references can be obtained from:
 # https://catalog.redhat.com/software/containers/rhoai/odh-operator-bundle/659803ca929f3c931af06f28
 rhoai_release="registry.redhat.io/rhoai/odh-operator-bundle:v2.22"
+# SR-IOV Operator is available through OLM and is not part of the OCP release.
+sriov_release="registry.redhat.io/openshift4/ose-sriov-network-operator-bundle:v4.20"
 opm_release="registry.redhat.io/redhat/redhat-operator-index:v4.20"
 APP_ID=$(cat /secrets/pr-creds/app_id) \
 KEY=/secrets/pr-creds/key.pem \
@@ -98,6 +100,7 @@ REPO=${REPO:-microshift} \
 AMD64_RELEASE=${PULLSPEC_RELEASE_AMD64} \
 ARM64_RELEASE=${PULLSPEC_RELEASE_ARM64} \
 RHOAI_RELEASE=${rhoai_release} \
+SRIOV_RELEASE=${sriov_release} \
 OPM_RELEASE=${opm_release} \
 ./scripts/auto-rebase/rebase.py
 
@@ -124,9 +127,6 @@ if check_semver_no_suffix "${release_lvms}"; then
 else
     ./scripts/auto-rebase/rebase-lvms.sh to "${pullspec_release_lvms_fallback}"
 fi
-
-# SR-IOV Operator is available through OLM and is not part of the OCP release.
-sriov_release="registry.redhat.io/openshift4/ose-sriov-network-operator-bundle:v4.20"
 
 if [[ "${JOB_TYPE}" == "presubmit" ]]; then
     # Verify the assets after the rebase to make sure
