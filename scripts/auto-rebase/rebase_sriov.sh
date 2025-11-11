@@ -25,6 +25,8 @@ CONFIGMAP_FILENAME="supported-nic-ids_v1_configmap.yaml"
 OPERATOR_FILENAME="operator.yaml"
 PULL_SECRET_FILE="${HOME}/.pull-secret.json"
 
+RELEASE_JSON_x86_64="${REPOROOT}/assets/optional/sriov/release-sriov-x86_64.json"
+RELEASE_JSON_aarch64="${REPOROOT}/assets/optional/sriov/release-sriov-aarch64.json"
 NAMESPACE="sriov-network-operator"
 KEEP_STAGING="${KEEP_STAGING:-false}"
 NO_BRANCH=${NO_BRANCH:-false}
@@ -336,6 +338,28 @@ extract_sriov_manifests() {
   create_default_sriov_operator_config "${NAMESPACE}" "${sriovoperatorconfig}"
 }
 
+extract_images_from_operator() {
+  local operator="$1"
+  local release_version="$2"
+  local target="$3"
+  
+  # extract images and format
+  # sed replaces undescores with dashes
+  yq "
+    (
+      [.spec.template.spec.containers[].env[] |
+      select(.name | test(\"_IMAGE$\")) |
+      {\"key\": (.name | downcase), \"value\": .value}] |
+      from_entries
+    ) as \$env_images |
+    (
+      .spec.template.spec.containers[] |
+      {(.name): .image}
+    ) as \$main_images |
+    {\"release\": {\"base\": \"${release_version}\"}, \"images\": (\$env_images + \$main_images)}
+  " "${operator}" -o json | sed 's/"sriov_\([^"]*\)_\([^"]*\)"/"sriov-\1-\2"/g; s/_/-/g' > "${target}"
+}
+
 # process_sriov_manifests() copies the extracted manifests and CRDs to their
 # corresponding directory in assets/ and performs additional processing to align
 # with MicroShift needs.
@@ -349,6 +373,13 @@ process_sriov_manifests() {
 
   # copy CRDs to final destination
   cp -a "${STAGING_DOWNLOAD}/sriovnetwork.openshift.io_"* "${FINAL_CRD}/"
+
+  title "Initializing release.json file"
+  local -r version=$(get_sriov_bundle_version)
+  # echo "{ \"release\": {\"base\": \"${version}\"}, \"images\": {}}" | yq -o json > "${RELEASE_JSON_aarch64}"
+  
+  extract_images_from_operator "${operator}" "${version}" "${RELEASE_JSON_aarch64}"
+  cat "${RELEASE_JSON_aarch64}" > "${RELEASE_JSON_x86_64}"
 
   # add the nic we use in testing to supported nics list
   yq eval "
