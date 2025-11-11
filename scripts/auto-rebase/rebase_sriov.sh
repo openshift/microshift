@@ -25,8 +25,7 @@ CONFIGMAP_FILENAME="supported-nic-ids_v1_configmap.yaml"
 OPERATOR_FILENAME="operator.yaml"
 PULL_SECRET_FILE="${HOME}/.pull-secret.json"
 
-RELEASE_JSON="${REPOROOT}/assets/optional/sriov/release-sriov-x86_64.json" # ??? TODO fix later when figured out what this is for
-
+NAMESPACE="sriov-network-operator"
 KEEP_STAGING="${KEEP_STAGING:-false}"
 NO_BRANCH=${NO_BRANCH:-false}
 
@@ -252,16 +251,6 @@ extract_operator_from_csv() {
   local namespace="$2"
   local target="$3"
 
-  #yq eval "
-  #  .spec.install.spec.deployments[] | 
-  #  select(.name == "sriov-network-operator") | 
-  #  {"apiVersion": "v1", "kind": "Deployment", "namespace": \"${namespace}\"} * .
-  #  " "${csv}" > "${target}"
-  #yq eval "
-  #  .spec.install.spec.deployments[]
-  #  | select(.name == \"sriov-network-operator\")
-  #  | {\"apiVersion\": \"apps/v1\", \"kind\": \"Deployment\", \"namespace\": \"${namespace}\"} * .
-  #" "${csv}" > "${target}"
   yq eval "
     .spec.install.spec.deployments[]
     | select(.name == \"sriov-network-operator\")
@@ -274,7 +263,8 @@ extract_operator_from_csv() {
   " "${csv}" > "${target}"
 }
 
-create_namespace_yaml () {
+# create_namespace_yaml() creates a namespace manifest.
+create_namespace_yaml() {
   local namespace="$1"
   local target="$2"
 
@@ -293,6 +283,9 @@ EOL
   echo "${namespace}" > "${target}"
 }
 
+# create_default_sriov_operator_config() creates the SriovOperatorConfig CR that
+# the operator expects. This is not included in the csv, so I'm having to do it
+# this way.
 create_default_sriov_operator_config() {
   local namespace="$1"
   local target="$2"
@@ -310,9 +303,7 @@ spec:
   configurationMode: daemon
 EOL
 )
-
   echo "${sriovoperatorconfig}" > "${target}"
-
 }
 # extract_sriov_manifests() extracts the RBAC, operator and configmap from
 # cluster service version and saves the manifests in the STAGING_EXTRACTED
@@ -320,10 +311,10 @@ EOL
 extract_sriov_manifests() {
   rm -rf "${STAGING_EXTRACTED}" && mkdir -p "${STAGING_EXTRACTED}"
 
-  # extract service_account, role, role_binding, clusterrole, clusterrole_binding
-  extract_sriov_rbac_from_cluster_service_version "${STAGING_EXTRACTED}" "${STAGING_DOWNLOAD}/${CSV_FILENAME}" "sriov-network-operator"
+  # extract service_account, role, rolebinding, clusterrole, clusterrolebinding
+  extract_sriov_rbac_from_cluster_service_version "${STAGING_EXTRACTED}" "${STAGING_DOWNLOAD}/${CSV_FILENAME}" "${NAMESPACE}"
 
-  # extract configmap
+  # extract supported nics configmap
   local configmap="${STAGING_DOWNLOAD}/${CONFIGMAP_FILENAME}"
   echo "generating ${configmap}"
   cp "${configmap}" "${STAGING_EXTRACTED}/"
@@ -331,20 +322,22 @@ extract_sriov_manifests() {
   # extract operator
   local operator="${STAGING_EXTRACTED}/${OPERATOR_FILENAME}"
   echo "generating ${operator}"
-  extract_operator_from_csv "${STAGING_DOWNLOAD}/${CSV_FILENAME}" "sriov-network-operator" "${operator}"
+  extract_operator_from_csv "${STAGING_DOWNLOAD}/${CSV_FILENAME}" "${NAMESPACE}" "${operator}"
 
+  # create namespace
   local namespace="${STAGING_EXTRACTED}/namespace.yaml"
   echo "generating ${namespace}"
-  create_namespace_yaml "sriov-network-operator" "${namespace}"
+  create_namespace_yaml "${NAMESPACE}" "${namespace}"
 
+  # create sriovoperatorconfig
   local sriovoperatorconfig="${STAGING_EXTRACTED}/sriovoperatorconfig.yaml"
   echo "generating ${sriovoperatorconfig}"
-  create_default_sriov_operator_config "sriov-network-operator" "${sriovoperatorconfig}"
+  create_default_sriov_operator_config "${NAMESPACE}" "${sriovoperatorconfig}"
 }
 
 # process_sriov_manifests() copies the extracted manifests and CRDs to their
-# corresponding directory in assets/. Any additional processing is done in this
-# function.
+# corresponding directory in assets/ and performs additional processing to align
+# with MicroShift needs.
 process_sriov_manifests() {
   rm -rf "${FINAL_ROOT}" && mkdir -p "${FINAL_DEPLOY}" "${FINAL_CRD}"
   local configmap="${STAGING_EXTRACTED}/${CONFIGMAP_FILENAME}"
@@ -359,9 +352,10 @@ process_sriov_manifests() {
   # add the nic we use in testing to supported nics list
   yq eval "
   .data.Intel_ixgbe_82576 = \"8086 10c9 10ca\"
-  | .metadata.namespace = \"sriov-network-operator\"
+  | .metadata.namespace = \"${NAMESPACE}\"
   " "${configmap}" > "${FINAL_DEPLOY}/${CONFIGMAP_FILENAME}"
 
+  # turn off webhook and metrics exporter, change cluster type to k8s
   yq eval "
   (
     .spec.template.spec.containers[0].env[] |
