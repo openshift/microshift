@@ -145,6 +145,7 @@ assets:
       - file: 0000_20_kube-apiserver-operator_00_cr-scc-nonroot.yaml
       - file: 0000_20_kube-apiserver-operator_00_cr-scc-privileged.yaml
       - file: 0000_20_kube-apiserver-operator_00_cr-scc-restricted-v2.yaml
+      - file: 0000_20_kube-apiserver-operator_00_cr-scc-restricted-v3.yaml
       - file: 0000_20_kube-apiserver-operator_00_cr-scc-restricted.yaml
       - file: 0000_20_kube-apiserver-operator_00_crb-systemauthenticated-scc-restricted-v2.yaml
       - file: 0000_20_kube-apiserver-operator_00_scc-anyuid.yaml
@@ -156,6 +157,7 @@ assets:
       - file: 0000_20_kube-apiserver-operator_00_scc-nonroot.yaml
       - file: 0000_20_kube-apiserver-operator_00_scc-privileged.yaml
       - file: 0000_20_kube-apiserver-operator_00_scc-restricted-v2.yaml
+      - file: 0000_20_kube-apiserver-operator_00_scc-restricted-v3.yaml
       - file: 0000_20_kube-apiserver-operator_00_scc-restricted.yaml
 
   - dir: controllers/route-controller-manager/

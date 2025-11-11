@@ -14,8 +14,6 @@ func filterOutDisabledSpecs(specs et.ExtensionTestSpecs) et.ExtensionTestSpecs {
 			"[sig-cli] Kubectl client Kubectl prune with applyset should apply and prune objects", // Alpha feature since k8s 1.27
 			// 4.19
 			"[Feature:PodLogsQuerySplitStreams]",
-			// 4.20
-			"[Feature:CBOR]",
 		},
 		// tests for features that are not implemented in openshift
 		"Unimplemented": {
@@ -171,10 +169,6 @@ func filterOutDisabledSpecs(specs et.ExtensionTestSpecs) et.ExtensionTestSpecs {
 		"RebaseInProgress": {
 			// https://issues.redhat.com/browse/OCPBUGS-61515
 			"[sig-scheduling] SchedulerPreemption [Serial] validates various priority Pods preempt expectedly with the async preemption [Feature:SchedulerAsyncPreemption] [FeatureGate:SchedulerAsyncPreemption] [Beta]",
-
-			// https://issues.redhat.com/browse/OCPBUGS-61377
-			"[sig-cli] kubectl kuberc given preferences should be applied",
-			"[sig-cli] kubectl kuberc given preferences should be ignored when flags are explicitly passed",
 
 			// https://issues.redhat.com/browse/OCPBUGS-61378
 			"[sig-network] Conntrack should be able to cleanup conntrack entries when UDP service target port changes for a NodePort service",

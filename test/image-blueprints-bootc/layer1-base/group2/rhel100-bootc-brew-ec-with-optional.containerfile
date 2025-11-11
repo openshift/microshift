@@ -15,8 +15,11 @@ COPY ./bootc-images/$USHIFT_RPM_REPO_NAME.repo ./bootc-images/microshift-fast-da
 
 # Print repository configuration contents.
 # Install MicroShift, test agent and cleanup.
+# OpenSSL is added as a temporary workaround. Systemd-resolved will bump systemd to a newer
+# version that requires openssl 3.4 or higher, but package is kept at 3.2.2. By installing
+# it we force an upgrade so that everything works.
 RUN dnf repoinfo --enabled && \
-    dnf install -y firewalld systemd-resolved \
+    dnf install -y firewalld systemd-resolved openssl \
         {{ range (env.Getenv "MICROSHIFT_MANDATORY_RPMS" | strings.Split " ") -}}
         "{{ . }}-{{ env.Getenv "BREW_EC_RELEASE_VERSION" }}" \
         {{ end -}}
