@@ -14,6 +14,11 @@ apiServer:
         maxFiles: 10
         # profile is the OpenShift profile specifying a specific logging policy
         profile: Default
+    featureGates:
+        customNoUpgrade:
+            disabled: []
+            enabled: []
+        featureSet: ""
     # List of custom certificates used to secure requests to specific host names
     namedCertificates:
         - certPath: ""
