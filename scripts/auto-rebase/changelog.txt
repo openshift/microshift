@@ -1,68 +1,323 @@
-- api embedded-component 5050707b5937d28133772a29825169e578310d2c to 8c9accafe91dd14148940fa3f3a71293184f0ab7
-  - d96bf861 2025-10-21T11:29:27+02:00 Add MutableCSINodeAllocatableCount to Dev- and TechPreview
-  - d573f822 2025-10-19T20:35:36+02:00 Switch to invoking codegen once in general updates
-  - aea1b9ac 2025-10-16T10:41:07+02:00 `route`: improve `.spec.tls.termination` doc
-  - 63691f42 2025-10-14T15:09:48+01:00 Add IngressController .spec.domain API validation
-  - f28546a1 2025-09-22T13:30:42+02:00 Promote OLMv1 Webhook support to GA
+- api embedded-component 8c9accafe91dd14148940fa3f3a71293184f0ab7 to d13e8c65d30fe912d63e05e92d60f0b0f856d2de
+  - ace527e5 2025-11-03T14:09:13-05:00 move skew management fg to TechPreview
+  - 3fdc9386 2025-11-03T08:36:16-08:00 config/v1/types_cluster_version: Fix "images that comes" typo
+  - 151f6dfe 2025-10-28T17:05:29+00:00 Update KAL configuration for latest linter rules
+  - bc539ed0 2025-10-28T15:10:39+00:00 Update KAL
+  - 93e97856 2025-10-28T12:07:35+01:00 envtest-releases: add 1.34.1 to index
+  - 25db151b 2025-10-28T10:40:42+01:00 OCPBUGS-62987: Move DynamicConfigurationManager back to DevPreview
+  - e675e0d7 2025-10-27T10:18:33+01:00 hack: switch to `/usr/bin/env bash`
+  - 4646bbb8 2025-10-24T16:55:02+02:00 MCO-1941: Add OSStream FeatureGate
+  - 58a36590 2025-10-21T20:19:42+01:00 port emptypartialschemas from gengo v1 to v2
+  - 0d6a3676 2025-10-21T20:03:00+01:00 codegen: reduce invocations of packages.Load()
+  - bf909fb9 2025-10-20T09:31:27+01:00 Rename API_GROUP_VERSIONS to API_GROUP_VERSION_PATHS and fix codegen integration
+  - fca93aff 2025-10-14T17:55:31-04:00 AWS, Azure: Add IPFamily to the PlatformStatus within Infra CR
 
-- cluster-openshift-controller-manager-operator embedded-component da1e14c45093c19bc79e2055c9f4a55efc1cc1a8 to f90be06b151168ff43d53cb5e5ff0c2d2df80186
-  - a7b78c8 2025-09-30T17:07:43+00:00 Updating ose-cluster-openshift-controller-manager-operator-container image to be consistent with ART for 4.21 Reconciling with https://github.com/openshift/ocp-build-data/tree/4fbe3fab45239dc4be6f5d9d98a0bf36e0274ec9/images/ose-cluster-openshift-controller-manager-operator.yml
+- cluster-kube-apiserver-operator embedded-component adc82f6188f4037a515eeeaa686ce1c1a80894da to 151f2be4e47cc3826b266b16066829f3f4e16a98
+  - 439a7b5 2025-10-23T15:56:30+02:00 CNTRLPLANE-1616: add event-ttl config observer
+  - 3be0d2b 2025-10-22T15:02:55+02:00 scc: restricted-v3: Fix runAsUser range
+  - 579b31e 2025-10-22T13:03:55+02:00 Update the deprecated API usage alerts for 1.34
+  - c434346 2025-10-21T17:58:18+02:00 manifests: Enable user namespace for the operator
+  - 3d6b08b 2025-10-20T14:31:37+02:00 scc: Grant authenticated users use of restricted-v3
 
-- machine-config-operator embedded-component 7007a56217125f6b5ea358a520c080c4ac002575 to 06e7b70adfb1e932ebf88cdb225472997b39d367
-  - 09b15282 2025-10-17T13:59:19-04:00 msbic: implement CPMS support
-  - 5e37bd7b 2025-10-17T13:59:19-04:00 vendor: o/api bump
-  - 6e6477a5 2025-10-17T16:31:10+02:00 OCPBUGS-62925: RHEL10 RT kernel packages filtering
-  - 8e33af8f 2025-10-17T09:23:04+05:30 OCPNODE-3806: Do not set kernel PSI parameter from MCO
-  - f3c5ff22 2025-10-17T08:42:21+05:30 OCPNODE-3806: Do not set kernel PSI parameter from MCO
-  - 108dae43 2025-10-15T10:44:32-04:00 hack: add AMI update automation script
+- cluster-network-operator embedded-component a5879759fb042f6c4b26931fa7ef8540244c8660 to 05d6f46ffb2cd54b72aa4c864a0a5fb82d3fa7c2
+  - dc7acee 2025-11-03T14:40:30+01:00 Rename transit subnet flags
+  - c9875f5 2025-10-24T10:23:02-07:00 add wiki link for using ./hack/run-locally.sh
+  - f8a4b09 2025-09-11T14:46:24-04:00 Fixed "null" value for vSphere api and ingress VIP in UPI scenario
+  - 269365e 2025-08-28T23:44:58+10:00 Configure CVO to delete default-account role binding
 
-- openshift-controller-manager embedded-component 15fc552a73e47ae715f0cf59e3f535e26b43477a to 433bd500afb879dd82e27336359cd4e3051245b0
-  - 9fc2342 2025-09-18T19:29:31+00:00 Updating ose-openshift-controller-manager-container image to be consistent with ART for 4.21 Reconciling with https://github.com/openshift/ocp-build-data/tree/22bf27a3a0b8820aa8d338d6be20972a7c5109ca/images/ose-openshift-controller-manager.yml
+- cluster-openshift-controller-manager-operator embedded-component f90be06b151168ff43d53cb5e5ff0c2d2df80186 to 8f2a66a7509925c2f1f97f6376d7fadfed0df5c5
+  - ff9d9c1 2025-10-09T15:56:41+02:00 Enable user namespaces for the operands
 
-- operator-framework-olm embedded-component bdc0d750909a7cea17b087f53bcaa01d449638f1 to a0b88f9ab6a32f679336a7b974b03895f7af8c19
-  - 2257debf 2025-10-17T11:22:40+08:00 migrate opm cases to OTE
+- etcd embedded-component e2b3dfdf037938f7f0c489438eaa1138fd3fadba to 239c469ebe0bb90864de458d0ce8fc384c7f22b8
+  - 12a86797 2025-10-23T11:03:36-04:00 UPSTREAM: <drop>: Update docker images to use correct versions for 4.20
+  - 74f6d588 2025-10-22T21:44:02-04:00 UPSTREAM: <drop>: go mod tidy
+  - d3c245aa 2025-10-22T21:43:48-04:00 UPSTREAM: <drop>: manually resolve conflicts
+  - e72f3c2a 2025-10-21T11:12:54-07:00 version: bump up to 3.5.24
+  - 52b77727 2025-10-16T10:14:33+08:00 Bump go to 1.24.9
+  - b3ffb7b5 2025-10-14T14:42:34+01:00 Fix Learner promotion not being persisted into v3store may be propagated across multiple upgrades
+  - a8fee100 2025-10-02T09:22:19+01:00 server/embed: Log EOF on DEBUG in TLS handshake
+  - eb7ef2e2 2025-09-24T10:09:50+02:00 Reject watch request with -1 revision
+  - 1cf4bc40 2025-09-19T12:22:53-07:00 version: bump up to 3.5.23
+  - 68f41261 2025-09-13T23:40:02-07:00 Bump go to 1.24.7
+  - 41d4324a 2025-09-12T19:57:02+08:00 [backport #20553] protect backend usage from concurrent applySnapshot and defrag
+  - 6747caed 2025-09-06T13:55:10+01:00 Re-check that the lease still exists during the renew process
+  - 7b3d5431 2025-09-06T13:54:24+01:00 Add an e2e test to reproduce lease Renew returns a wrong response
+  - ce2273bd 2025-08-29T23:36:37+05:30 [release-3.5]: Bump Go to 1.24.6
+  - 9147ea4e 2025-08-21T07:41:47-04:00 tests: skip TestCorruptedBackupFileCheck test on big endian platforms
+  - e21a5539 2025-08-19T20:41:21+01:00 Bump bbolt to v1.3.12
+  - 5cb16a69 2025-08-10T20:24:16+08:00 Bump Go to 1.23.12
+  - 7862c85b 2025-07-23T06:15:45+12:00 version: bump up to 3.5.22
+  - fdd20ed7 2025-07-22T08:07:12+00:00 ref: update help for --quota-backend-bytes
+  - d512fe42 2025-07-21T15:15:38+01:00 Add tools into .gitignore
+  - 30e95811 2025-07-21T11:17:26+01:00 Fix flaky TestCtlV2CustomContentWithAuthData
+  - 4ea36ac3 2025-07-18T12:10:23+01:00 Fix v2store check returning wrong result even there isn't any auth data
+  - 13b8561e 2025-07-18T12:01:10+01:00 Add an e2e test to reproduce the custom content in v2store without auth data
+  - ccf66456 2025-07-17T17:05:18+01:00 Initialize commit index = max(consistent_index, CommitIndex) on bootstrap if --force-new-cluster set
+  - 91bc9174 2025-07-15T12:18:12+01:00 Add an e2e test to reproduce the issue that --force-new-cluster can't remove all members in a corner case
+  - 48e20bbb 2025-07-10T15:53:42+08:00 chore(release-3.5): Bump Go to 1.23.11
+  - 2320f54f 2025-07-09T16:37:18+08:00 .github/workflows: remove migrated workflow files
+  - 73684511 2025-07-07T17:31:28+08:00 Change IMAGE to TEST_IMAGE
+  - fe30a6e4 2025-07-07T10:49:59+02:00 Avoid lowering revision of watchers in the future after restore
+  - a4c309bb 2025-07-04T10:11:00+01:00 Add verification to verify the watch response have a bigger revision than startRev
+  - 2d5a9b98 2025-06-30T14:00:05+02:00 Skip sending progress notification for watch with starting revision in the future
+  - fe15cf7b 2025-06-28T02:27:16+08:00 .github/workflows: Remove grpcproxy tests github actions workflow
+  - 8457a9af 2025-06-26T13:48:44+08:00 add Makefile target for grpcproxy integration and grpcproxy e2e tests
+  - b9350f46 2025-06-26T06:07:12+05:00 Add test-release makefile target
+  - 018f3705 2025-06-23T17:33:51+08:00 Remove raftexample from integration test
+  - d7eba7fc 2025-06-13T23:01:18+05:00 Add makefile target for run-govuluncheck
+  - 703a8e30 2025-06-12T16:15:15+08:00 Bump Go to 1.23.10
+  - 03ce5bae 2025-06-02T16:01:39+05:00 remove static-workflow from release-3.5
+  - a42a0cf5 2025-05-31T00:27:35+05:00 makefile: Split fmt into separate verify commands
+  - 441e0be4 2025-05-30T10:52:56+01:00 mvcc: avoid double decrement of watcher gauge on close/cancel race
+  - 9fafc78b 2025-05-15T19:55:51+00:00 Update release script to exactly match the target tag
+  - b0469a76 2025-05-15T16:25:15+00:00 [release-3.5][Integration Test]: Add test for panic-free removal of non-existent members
+  - 266b7630 2025-05-08T22:11:59+00:00 Fix the tar unzip command, adding the --no-same-owner option to avoid permissions issues
+  - 4e59b74e 2025-05-07T12:23:57+02:00 Bump Go to 1.23.9
+  - 812c608d 2025-04-30T21:27:11+00:00 chore(client/v3/naming): deprecate Metadata field in Endpoint struct
+  - 6f9611d0 2025-04-23T11:16:34+01:00 Ensure google.golang.org/protobuf version consistent
+  - 0ecf99d3 2025-04-23T11:16:34+01:00 Ensure google.golang.org/genproto/googleapis/api version consistent
+  - ecc7c175 2025-04-23T11:16:14+01:00 Ensure github.com/stretchr/testify version consistent
+  - 65d1b1a9 2025-04-23T11:08:13+01:00 Bump google.golang.org/grpc to v1.71.1
+  - 13cc209b 2025-04-23T09:11:31+00:00 Replace resolver.State.Addresses with resolver.State.Endpoint.Addresses
+  - 3aca164c 2025-04-21T08:21:46+00:00 emit compaction pause duration metric in every compaction batch
+  - b4b70b49 2025-04-07T22:24:58+02:00 [release-3.5] Bump Go to 1.23.8
 
-- oc image-amd64 672ff624b7d2523487d4f06565099949c625d43c to 8836b6630483cfa28ad2e092dbcf9cf7f241f064
-  - bf9e2d9d 2025-10-20T18:33:31+03:00 Update version tags to 1.34.1
-  - 6976ded4 2025-10-20T18:33:31+03:00 Use renamed ObjectGoPrintSideBySide function
-  - 42cd2fae 2025-10-20T18:33:25+03:00 React to upstream changes
-  - fbd00148 2025-10-20T17:37:07+03:00 Update openshift library depedencies to latest
-  - f8052d09 2025-10-20T17:33:36+03:00 Update golang.org/x dependencies to latest
-  - 36326dae 2025-10-20T17:31:36+03:00 Update k8s dependencies to 1.34.1
-  - b89c9f92 2025-10-16T16:25:06+02:00 Pass dry-run option to all create API calls
-  - 9e4292b2 2025-10-15T12:13:44+03:00 Escape characters in url
-  - 9bb4d77d 2025-10-15T11:42:24+03:00 Adjust logs per verbosity
-  - 7c0e97b4 2025-10-15T11:42:23+03:00 Use aws native user-agent assignment
-  - ba1a7d1f 2025-10-15T11:42:23+03:00 Update to newer versions of aws-sdk-go-v2
-  - c9ca4065 2025-10-15T11:42:23+03:00 Make respective changes for the new sdk
-  - 4ad945c9 2025-10-15T11:42:23+03:00 Migrate to aws-sdk-go-v2
-  - cb28d277 2025-10-02T15:13:31-07:00 pkg/cli/admin/upgrade/recommend: Drop obsolete precheckEnabled knob
+- kubernetes embedded-component 96593f323733d9ffc0fc70257ecad44a56df0ce3 to 9ca60866127994f08fe5ce2b237ef0f3357986de
+  - 745fd2c15 2025-10-28T12:10:32+03:00 UPSTREAM: <carry>: Re-enable temporarily disabled kuberc tests
+  - 4e0347881 2025-10-27T17:52:55-03:00 UPSTREAM: <carry>: do not skip CBOR tests
+  - 9e371eff8 2025-10-21T14:13:47-04:00 UPSTREAM: <carry>: Skip CPU resource status for workload-pinned pods
 
-- kube-rbac-proxy image-amd64 b9134351be37c43408334047d8eb85d0ac01fe4e to cd636680e06a55395c26570dff0cb37277014388
-  - 93afe4a 2025-09-06T05:04:06+00:00 Updating kube-rbac-proxy-container image to be consistent with ART for 4.21 Reconciling with https://github.com/openshift/ocp-build-data/tree/5c68d71385f72cd67a199bc4590068053a833c7d/images/kube-rbac-proxy.yml
+- machine-config-operator embedded-component 06e7b70adfb1e932ebf88cdb225472997b39d367 to a1ac2178be57bd6ea11cb9e0ecb4019f66c5dc29
+  - b677e897 2025-11-04T09:26:36-05:00 daemon: minor log level changes
+  - 7545c3c4 2025-11-04T09:26:36-05:00 bump(k8s): update Dockerfile
+  - 2e1166be 2025-11-04T09:26:36-05:00 bump(k8s): react to Kubernetes bump
+  - d19dc88b 2025-11-04T09:26:33-05:00 bump(k8s): update k8s.io/* dependencies to v1.34.1 and github.com/openshift* dependencies to latest
+  - 8bcac83c 2025-10-28T14:42:05+00:00 MCO-1911: Migrate the mco_password test suite from the private repository to the MCO repository
+  - 4083ba95 2025-10-27T10:25:59-04:00 unit tests: add tests for newly created helper functions
+  - 08b368c7 2025-10-23T16:14:17-04:00 controller: populate MCP updated machine count from MCN conditions
+  - 6b4d1a4d 2025-10-23T14:44:34-05:00 minimizing reboot for scaling image mode enabled node
+  - b938d417 2025-10-23T15:21:15+02:00 OCPBUGS-61714: Create temporal allow policy
+  - ae580ee4 2025-10-23T15:18:03+03:00 MCO-1886: add the missing service to the expose ports 22623 and 22624
 
-- ovn-kubernetes image-amd64 3f971b1c061a775aedee0e9a06ab2a2a31bc64cc to a573f44ea6bb5f3eb3c507a628cddc55039be303
-  - c0a8426b 2025-09-30T23:36:23+00:00 Updating ovn-kubernetes-microshift-container image to be consistent with ART for 4.21 Reconciling with https://github.com/openshift/ocp-build-data/tree/4fbe3fab45239dc4be6f5d9d98a0bf36e0274ec9/images/ovn-kubernetes-microshift.yml
+- operator-framework-olm embedded-component a0b88f9ab6a32f679336a7b974b03895f7af8c19 to 2d3fe1047067ae5f26be87d2d0096ecfa4dd6feb
+  - 3071726a 2025-11-04T00:04:27+00:00 Fix: OLM should not report Progressing=True during pod disruption from cluster upgrades (#3692)
+  - 93a105e7 2025-11-04T00:03:39+00:00 gitignore temp files in .claude folder (#3691)
+  - c00245c7 2025-10-29T00:03:58+00:00 Bump actions/download-artifact from 5 to 6 (#3689)
+  - 05561132 2025-10-29T00:03:15+00:00 Bump actions/upload-artifact from 4 to 5 (#3688)
+  - 0654dd67 2025-10-29T00:02:55+00:00 :seedling: Bump github.com/onsi/ginkgo/v2 from 2.26.0 to 2.27.2 (#3690)
+  - 6e79ccc1 2025-10-24T10:10:22-04:00 OCPBUGS-59768: Enable authenticated metrics endpoints with OpenShift service-ca
+  - b7cbf38a 2025-10-24T10:10:22-04:00 NO-ISSUE: update openshift/* dependencies
+  - 8c4b0696 2025-10-24T10:10:22-04:00 OPRUN-4202: remove google.golang.org/grpc pin
+  - 433213c3 2025-10-24T13:29:35+00:00 Bump the k8s-dependencies group with 5 updates (#451)
+  - 3f189fb0 2025-10-24T13:28:53+00:00 Bump the k8s-dependencies group with 5 updates (#447)
+  - 712ddb62 2025-10-24T13:28:39+00:00 Bump actions/stale from 9 to 10 (#450)
+  - c7240f3c 2025-10-24T13:28:25+00:00 Bump actions/setup-go from 5 to 6 (#449)
+  - df5257ab 2025-10-24T13:28:12+00:00 Bump github.com/google/cel-go from 0.26.0 to 0.26.1 (#448)
+  - e6d7c219 2025-10-24T13:27:58+00:00 Bump github.com/stretchr/testify from 1.11.0 to 1.11.1 (#446)
+  - c63647b6 2025-10-24T13:27:45+00:00 Bump github.com/spf13/cobra from 1.9.1 to 1.10.1 (#445)
+  - 3eb94ae8 2025-10-24T13:27:29+00:00 update o-f/api as prep for release (#1806)
+  - 8c20d32c 2025-10-24T13:27:14+00:00 release/goreleaser.opm.Dockerfile: parameterize grpc-health-probe version (#1801)
+  - 8ae79272 2025-10-24T13:26:59+00:00 Add PodMonitor to supported resources (#1795)
+  - 09804a8b 2025-10-24T13:26:44+00:00 Bump the k8s-dependencies group across 1 directory with 6 updates (#1772)
+  - 98efe7a9 2025-10-24T13:26:28+00:00 fix: Use rest.HTTPClientFor to create TLS-configured client for metrics authentication (#3686)
+  - c79dcb6c 2025-10-24T13:26:13+00:00 Fix ServiceMonitor RBAC for authenticated metrics endpoints (#3681)
+  - 8f75c797 2025-10-24T13:25:57+00:00 Fix container image short names for OpenShift compatibility (#3685)
+  - d79ced4a 2025-10-24T13:25:42+00:00 Fix TOCTOU race condition in ensureInstallPlan (#3682)
+  - be32bfc9 2025-10-24T13:25:25+00:00 :seedling: Bump go.podman.io/image/v5 from 5.37.0 to 5.38.0 (#3680)
+  - 677ca76e 2025-10-24T13:25:07+00:00 Add OpenShift service-ca support for authenticated metrics endpoints (#3677)
+  - c0fb4d50 2025-10-24T13:24:50+00:00 Add AGENTS.md (#3678)
+  - 723f39e3 2025-10-24T13:24:34+00:00 Remove use of retracted o/api version (#3679)
+  - 6411902b 2025-10-24T13:24:19+00:00 :seedling: Bump golang.org/x/time from 0.13.0 to 0.14.0 (#3674)
+  - c848db3a 2025-10-24T13:24:03+00:00 :seedling: Bump github.com/prometheus/common from 0.66.1 to 0.67.1 (#3673)
+  - 833e7a8e 2025-10-24T13:23:47+00:00 :seedling: Bump sigs.k8s.io/controller-runtime (#3672)
+  - 51a9332d 2025-10-24T13:23:30+00:00 bump o-f deps (#3662)
+  - f1f68cb4 2025-10-24T13:23:14+00:00 Secure metrics endpoint with cntrlr-runtime metrics authz mechanics (#3660)
+  - 8f7b95ad 2025-10-24T13:22:59+00:00 :seedling: Bump the k8s-dependencies group across 1 directory with 2 updates (#3671)
+  - 9ed1f2a3 2025-10-24T13:22:43+00:00 🌱 Bump github.com/operator-framework/api from 0.34.0 to 0.35.0 (#3670)
+  - 486a9d59 2025-10-24T13:22:20+00:00 :seedling: Bump github.com/onsi/ginkgo/v2 from 2.25.3 to 2.26.0 (#3667)
+  - c915edad 2025-10-24T13:22:04+00:00 :seedling: Bump google.golang.org/grpc from 1.75.1 to 1.76.0 (#3665)
+  - 0b58c050 2025-10-24T13:21:47+00:00 :seedling: Bump the k8s-dependencies group with 10 updates (#3638)
+  - a63e791a 2025-10-21T17:04:30+08:00 Define AI Guide for OLMv0 QE cases
+  - dd297420 2025-10-17T12:13:10-04:00 Update verify_commits.sh to use main branch
 
-- oc image-arm64 672ff624b7d2523487d4f06565099949c625d43c to 8836b6630483cfa28ad2e092dbcf9cf7f241f064
-  - bf9e2d9d 2025-10-20T18:33:31+03:00 Update version tags to 1.34.1
-  - 6976ded4 2025-10-20T18:33:31+03:00 Use renamed ObjectGoPrintSideBySide function
-  - 42cd2fae 2025-10-20T18:33:25+03:00 React to upstream changes
-  - fbd00148 2025-10-20T17:37:07+03:00 Update openshift library depedencies to latest
-  - f8052d09 2025-10-20T17:33:36+03:00 Update golang.org/x dependencies to latest
-  - 36326dae 2025-10-20T17:31:36+03:00 Update k8s dependencies to 1.34.1
-  - b89c9f92 2025-10-16T16:25:06+02:00 Pass dry-run option to all create API calls
-  - 9e4292b2 2025-10-15T12:13:44+03:00 Escape characters in url
-  - 9bb4d77d 2025-10-15T11:42:24+03:00 Adjust logs per verbosity
-  - 7c0e97b4 2025-10-15T11:42:23+03:00 Use aws native user-agent assignment
-  - ba1a7d1f 2025-10-15T11:42:23+03:00 Update to newer versions of aws-sdk-go-v2
-  - c9ca4065 2025-10-15T11:42:23+03:00 Make respective changes for the new sdk
-  - 4ad945c9 2025-10-15T11:42:23+03:00 Migrate to aws-sdk-go-v2
-  - cb28d277 2025-10-02T15:13:31-07:00 pkg/cli/admin/upgrade/recommend: Drop obsolete precheckEnabled knob
+- service-ca-operator embedded-component e5d65c6f6b1446b77e0e915d64825d97be9c06de to 87df21ba56cebef9c3ead023ceb8a5b5e4e277d6
+  - be251a9 2025-10-29T21:32:41+08:00 Remove all tests and add fake test that always passes
+  - 508510c 2025-10-28T01:47:44+08:00 go mod tidy && go mod vendor
+  - 1cf97b8 2025-10-28T01:41:16+08:00 add run-suite target of root, delegate to test/tests-extension/Makefile
+  - 7ec409e 2025-10-28T01:40:51+08:00 Add OTE scaffold for service-ca-operator
+  - d495e68 2025-10-24T21:13:16+08:00 Update with coderabbitai feedback
+  - bcb4a40 2025-10-24T20:18:48+08:00 go mod tidy and go mod vendor
+  - 7a560c2 2025-10-24T20:15:46+08:00 Add Service CA Operator Tests Extension
+  - 95535a2 2025-10-23T19:26:56+08:00 Created an OWNERS file for the tests-extension directory
 
-- kube-rbac-proxy image-arm64 b9134351be37c43408334047d8eb85d0ac01fe4e to cd636680e06a55395c26570dff0cb37277014388
-  - 93afe4a 2025-09-06T05:04:06+00:00 Updating kube-rbac-proxy-container image to be consistent with ART for 4.21 Reconciling with https://github.com/openshift/ocp-build-data/tree/5c68d71385f72cd67a199bc4590068053a833c7d/images/kube-rbac-proxy.yml
+- oc image-amd64 8836b6630483cfa28ad2e092dbcf9cf7f241f064 to 1c5f490b7997ec08b07b0a0cf16a10757622732c
+  - a46ebc22 2025-11-03T08:34:50-08:00 pkg/cli/admin/upgrade: Tighten force warnings
+  - ed74d761 2025-10-31T14:12:56+03:00 test(git): Replace IPv4-mapped IPv6 addresses with valid IPv6 in tests
+  - 68cf5594 2025-10-23T20:46:54+03:00 Add pr-review Claude command and effective-go skills
 
-- ovn-kubernetes image-arm64 3f971b1c061a775aedee0e9a06ab2a2a31bc64cc to a573f44ea6bb5f3eb3c507a628cddc55039be303
-  - c0a8426b 2025-09-30T23:36:23+00:00 Updating ovn-kubernetes-microshift-container image to be consistent with ART for 4.21 Reconciling with https://github.com/openshift/ocp-build-data/tree/4fbe3fab45239dc4be6f5d9d98a0bf36e0274ec9/images/ovn-kubernetes-microshift.yml
+- ovn-kubernetes image-amd64 a573f44ea6bb5f3eb3c507a628cddc55039be303 to f16540770027ce1480bce084b5b916c07677df82
+  - 1667a51d 2025-10-28T10:10:01+01:00 EgressIP: fix failover and restart stale SNAT/LRP; ensure status sync
+  - ab082bda 2025-10-24T17:59:35+02:00 OVN EIP: fix printing of stale next hops value
+  - 2735d6ba 2025-10-24T17:59:35+02:00 OVN EIP: add UT for syncing next hops for v4/v6
+  - a46e0e77 2025-10-24T17:59:35+02:00 EIP: do not skip generating potential valid next hops if LSP not found
+  - d2b7cbe7 2025-10-24T17:59:35+02:00 EIP: when checking for stale LRP next hops on startup, restrict to enodes
+  - c3dc2459 2025-10-24T10:39:27+02:00 UT: set up fake OVS pid file for appctl commands in UDN controller tests
+  - 2f5036d6 2025-10-23T11:22:57-07:00 Properly clean up OVSDB clients in both shutdown and error paths
+  - 6e450641 2025-10-22T10:47:31-04:00 Add management port cleanup at start up
+  - 1ceaa4bc 2025-10-22T09:52:18-04:00 Make gateway cleanup more robust
+  - cd821ab9 2025-10-22T09:35:01-04:00 Ensure UDN mgmt port is removed
+  - e2cd8262 2025-10-22T14:15:01+02:00 [layer2] Add tunnel key for local port connecting TR with L2 switch.
+  - 95bfa38e 2025-10-21T18:57:41+02:00 MultiNetPol: Process update only when spec fields and/or related annotations are updated
+  - 9f269e7d 2025-10-21T18:57:41+02:00 NetPol: Process update only when spec fields and/or related annotation are updated
+  - 7e59c3cc 2025-10-21T00:45:36+02:00 EIP: Change capacity storage to pointers
+  - fed12251 2025-10-20T14:45:07+02:00 Resolve merge conflicts
+  - c74e67eb 2025-10-17T17:29:35+02:00 [okep: layer2 router topology] Add clarification for joinIP routes.
+  - 9ec93404 2025-10-17T16:35:23+02:00 Add transit subnet conflict handling for Layer2 networks.
+  - 8e8a0467 2025-10-17T16:35:23+02:00 kv: Add join subnet ipv6 pio with lifetime 0
+  - 3e072369 2025-10-17T16:35:23+02:00 kv: Reconcile transit router as gateway after LM
+  - 0f69bd4b 2025-10-17T16:35:22+02:00 [kind] Add ovnkube-identity to the deployed pods list
+  - a7615852 2025-10-17T16:35:22+02:00 [layer2-router] set Layer2UsesTransitRouter to true for unit tests
+  - 810226bb 2025-10-17T16:35:22+02:00 [mockery] Update version to be compatible with go1.24
+  - de2b7bf8 2025-10-17T16:35:22+02:00 [layer2-router] Update kubevirt tests to use default GW IP.
+  - c6d3c980 2025-10-17T16:35:22+02:00 [e2e] BGP test: Layer2 UDN behaviour is not similar to Layer3.
+  - 0c7459f1 2025-10-17T16:35:22+02:00 [podAnnotation] Use transit router port LLA for pod annotation
+  - 7b33cfc4 2025-10-17T16:35:22+02:00 Upgrade: add cleanup when all nodes are upgraded.
+  - 0a2da740 2025-10-17T16:35:22+02:00 Upgrade: handle remote node upgrades to the new topology type.
+  - 62c8e990 2025-10-17T16:35:22+02:00 Upgrade: add cleanup and upgrade topology for local node.
+  - e48bb671 2025-10-17T16:35:22+02:00 [layer2-router] add egressIP for new topology.
+  - ee49f8c8 2025-10-17T16:35:22+02:00 [layer2-router] Services: put service routes on the transit router
+  - e8cbe684 2025-10-17T16:35:22+02:00 [layer2-router] Add secondary_layer2_controller side
+  - 40d21f0e 2025-10-17T16:35:22+02:00 [layer2-router] Add gateway side
+  - 5657fd09 2025-10-17T16:35:22+02:00 [layer2-router] Set and parse tunnel-keys for layer2 networks
+  - a04d9c87 2025-10-17T16:35:22+02:00 [tunnel-keys] Add tunnel keys allocator to cluster manager.
+  - 38d92e3c 2025-10-17T16:35:22+02:00 [layer2-router] add logic to define current layer2 topology.
+  - e14c4edf 2025-10-17T16:35:22+02:00 [config] Rename TransitSwitchSUbnet to TransitSubnet
+  - 7a5bb422 2025-10-17T16:35:22+02:00 [GatewayConfig] Rename gwLRPJoinIPs to gwRouterJoinCIDRs
+  - 37da384b 2025-10-17T16:35:22+02:00 [gateway] Pass GatewayConfig to functions to simplify function calls.
+  - 2afbaf6a 2025-10-17T11:09:26+02:00 Skip Pending pods in EgressIP status updates
+  - 76f6439d 2025-10-15T18:02:45+02:00 Reintroduce completed pod check in shouldReleaseDeletedPod
+  - cd708300 2025-10-15T11:04:57+02:00 E2E service: Add test for named port handling with ETP=Local services
+  - 8e7b2c6f 2025-10-15T08:24:46+02:00 traffic-flow-tests: update to latest version of k8s-tft
+  - 628c3c4a 2025-10-14T18:32:55-04:00 Fixes BFD timeout for external gateway E2E
+  - 2871cdae 2025-10-14T14:05:57-07:00 RunOVSAppctl() doesn't work when ovs is run on host and hostPID is false
+  - b39031c0 2025-10-14T11:43:54-04:00 Increase single target attempts
+  - 1ed9749f 2025-10-14T16:20:44+01:00 chore: Remove SetTaintOnNode
+  - 2fff3669 2025-10-13T22:35:55+02:00 E2E service: Fix potential flake in conn to an ext IP using src port
+  - 651759c5 2025-10-13T22:35:55+02:00 E2E service: Move checkNumberOf.. to util.go
+  - 282b01ec 2025-10-13T22:35:55+02:00 Extends unit test coverage for named port handling in ETP local
+  - 06515935 2025-10-13T22:35:54+02:00 Fix named port handling in externalTrafficPolicy Local services
+  - cde88f27 2025-10-13T03:23:35+00:00 The expect expectedEndpointsNum should be 2 times endpoints for dualstack cluster
+  - 65e44a73 2025-10-11T09:27:16+00:00 unskip cases as bug is verified
+  - 317bdd67 2025-10-09T10:14:09+02:00 Enable ovn-ci workflow on release branches
+  - d4136ccf 2025-09-30T23:00:39+00:00 fix: list allowed values for --platform-type option
+  - a9d76d66 2025-09-30T20:45:30+00:00 fix: --logfile-maxsize is in megabytes, not bytes
+  - d3850302 2025-09-30T18:03:17+00:00 chore: Remove --pod-ip option
+  - dec64dad 2025-08-27T14:28:00+03:00 kind,kubevirt: Combine CR patches
+  - cb24e1ad 2025-08-27T13:25:01+03:00 kind,kubevirt: Rm redundent URL call
+
+- kubernetes image-amd64 96593f323733d9ffc0fc70257ecad44a56df0ce3 to 9ca60866127994f08fe5ce2b237ef0f3357986de
+  - 745fd2c15 2025-10-28T12:10:32+03:00 UPSTREAM: <carry>: Re-enable temporarily disabled kuberc tests
+  - 4e0347881 2025-10-27T17:52:55-03:00 UPSTREAM: <carry>: do not skip CBOR tests
+  - 9e371eff8 2025-10-21T14:13:47-04:00 UPSTREAM: <carry>: Skip CPU resource status for workload-pinned pods
+
+- service-ca-operator image-amd64 e5d65c6f6b1446b77e0e915d64825d97be9c06de to 87df21ba56cebef9c3ead023ceb8a5b5e4e277d6
+  - be251a9 2025-10-29T21:32:41+08:00 Remove all tests and add fake test that always passes
+  - 508510c 2025-10-28T01:47:44+08:00 go mod tidy && go mod vendor
+  - 1cf97b8 2025-10-28T01:41:16+08:00 add run-suite target of root, delegate to test/tests-extension/Makefile
+  - 7ec409e 2025-10-28T01:40:51+08:00 Add OTE scaffold for service-ca-operator
+  - d495e68 2025-10-24T21:13:16+08:00 Update with coderabbitai feedback
+  - bcb4a40 2025-10-24T20:18:48+08:00 go mod tidy and go mod vendor
+  - 7a560c2 2025-10-24T20:15:46+08:00 Add Service CA Operator Tests Extension
+  - 95535a2 2025-10-23T19:26:56+08:00 Created an OWNERS file for the tests-extension directory
+
+- oc image-arm64 8836b6630483cfa28ad2e092dbcf9cf7f241f064 to 1c5f490b7997ec08b07b0a0cf16a10757622732c
+  - a46ebc22 2025-11-03T08:34:50-08:00 pkg/cli/admin/upgrade: Tighten force warnings
+  - ed74d761 2025-10-31T14:12:56+03:00 test(git): Replace IPv4-mapped IPv6 addresses with valid IPv6 in tests
+  - 68cf5594 2025-10-23T20:46:54+03:00 Add pr-review Claude command and effective-go skills
+
+- ovn-kubernetes image-arm64 a573f44ea6bb5f3eb3c507a628cddc55039be303 to 07964833fe982d95f6376b7877b0e69279060f82
+  - d5e643cb 2025-10-29T12:30:09-04:00 Remove NetworkSegmentation + non-IC lane
+  - b66a1d5c 2025-10-29T04:23:45+01:00 TunnelKey static allocator details
+  - 6cbe251d 2025-10-29T03:56:02+01:00 Add connecting UDNs OKEP
+  - 4b944aa3 2025-10-29T03:55:56+01:00 Add images for the enhancement
+  - 1667a51d 2025-10-28T10:10:01+01:00 EgressIP: fix failover and restart stale SNAT/LRP; ensure status sync
+  - ab082bda 2025-10-24T17:59:35+02:00 OVN EIP: fix printing of stale next hops value
+  - 2735d6ba 2025-10-24T17:59:35+02:00 OVN EIP: add UT for syncing next hops for v4/v6
+  - a46e0e77 2025-10-24T17:59:35+02:00 EIP: do not skip generating potential valid next hops if LSP not found
+  - d2b7cbe7 2025-10-24T17:59:35+02:00 EIP: when checking for stale LRP next hops on startup, restrict to enodes
+  - c3dc2459 2025-10-24T10:39:27+02:00 UT: set up fake OVS pid file for appctl commands in UDN controller tests
+  - 2f5036d6 2025-10-23T11:22:57-07:00 Properly clean up OVSDB clients in both shutdown and error paths
+  - 6e450641 2025-10-22T10:47:31-04:00 Add management port cleanup at start up
+  - 1ceaa4bc 2025-10-22T09:52:18-04:00 Make gateway cleanup more robust
+  - cd821ab9 2025-10-22T09:35:01-04:00 Ensure UDN mgmt port is removed
+  - e2cd8262 2025-10-22T14:15:01+02:00 [layer2] Add tunnel key for local port connecting TR with L2 switch.
+  - 95bfa38e 2025-10-21T18:57:41+02:00 MultiNetPol: Process update only when spec fields and/or related annotations are updated
+  - 9f269e7d 2025-10-21T18:57:41+02:00 NetPol: Process update only when spec fields and/or related annotation are updated
+  - 7e59c3cc 2025-10-21T00:45:36+02:00 EIP: Change capacity storage to pointers
+  - e284143f 2025-10-20T10:34:19-07:00 test: improve error checks in Zone Interconnect Operations test case
+  - fed12251 2025-10-20T14:45:07+02:00 Resolve merge conflicts
+  - c74e67eb 2025-10-17T17:29:35+02:00 [okep: layer2 router topology] Add clarification for joinIP routes.
+  - fb00cbc3 2025-10-17T17:26:32+02:00 [mockery] Document make mocskgen as the way to generate mocks
+  - 9ec93404 2025-10-17T16:35:23+02:00 Add transit subnet conflict handling for Layer2 networks.
+  - 8e8a0467 2025-10-17T16:35:23+02:00 kv: Add join subnet ipv6 pio with lifetime 0
+  - 3e072369 2025-10-17T16:35:23+02:00 kv: Reconcile transit router as gateway after LM
+  - 0f69bd4b 2025-10-17T16:35:22+02:00 [kind] Add ovnkube-identity to the deployed pods list
+  - a7615852 2025-10-17T16:35:22+02:00 [layer2-router] set Layer2UsesTransitRouter to true for unit tests
+  - 810226bb 2025-10-17T16:35:22+02:00 [mockery] Update version to be compatible with go1.24
+  - de2b7bf8 2025-10-17T16:35:22+02:00 [layer2-router] Update kubevirt tests to use default GW IP.
+  - c6d3c980 2025-10-17T16:35:22+02:00 [e2e] BGP test: Layer2 UDN behaviour is not similar to Layer3.
+  - 0c7459f1 2025-10-17T16:35:22+02:00 [podAnnotation] Use transit router port LLA for pod annotation
+  - 7b33cfc4 2025-10-17T16:35:22+02:00 Upgrade: add cleanup when all nodes are upgraded.
+  - 0a2da740 2025-10-17T16:35:22+02:00 Upgrade: handle remote node upgrades to the new topology type.
+  - 62c8e990 2025-10-17T16:35:22+02:00 Upgrade: add cleanup and upgrade topology for local node.
+  - e48bb671 2025-10-17T16:35:22+02:00 [layer2-router] add egressIP for new topology.
+  - ee49f8c8 2025-10-17T16:35:22+02:00 [layer2-router] Services: put service routes on the transit router
+  - e8cbe684 2025-10-17T16:35:22+02:00 [layer2-router] Add secondary_layer2_controller side
+  - 40d21f0e 2025-10-17T16:35:22+02:00 [layer2-router] Add gateway side
+  - 5657fd09 2025-10-17T16:35:22+02:00 [layer2-router] Set and parse tunnel-keys for layer2 networks
+  - a04d9c87 2025-10-17T16:35:22+02:00 [tunnel-keys] Add tunnel keys allocator to cluster manager.
+  - 38d92e3c 2025-10-17T16:35:22+02:00 [layer2-router] add logic to define current layer2 topology.
+  - e14c4edf 2025-10-17T16:35:22+02:00 [config] Rename TransitSwitchSUbnet to TransitSubnet
+  - 7a5bb422 2025-10-17T16:35:22+02:00 [GatewayConfig] Rename gwLRPJoinIPs to gwRouterJoinCIDRs
+  - 37da384b 2025-10-17T16:35:22+02:00 [gateway] Pass GatewayConfig to functions to simplify function calls.
+  - 2afbaf6a 2025-10-17T11:09:26+02:00 Skip Pending pods in EgressIP status updates
+  - 76f6439d 2025-10-15T18:02:45+02:00 Reintroduce completed pod check in shouldReleaseDeletedPod
+  - cd708300 2025-10-15T11:04:57+02:00 E2E service: Add test for named port handling with ETP=Local services
+  - 8e7b2c6f 2025-10-15T08:24:46+02:00 traffic-flow-tests: update to latest version of k8s-tft
+  - 628c3c4a 2025-10-14T18:32:55-04:00 Fixes BFD timeout for external gateway E2E
+  - 2871cdae 2025-10-14T14:05:57-07:00 RunOVSAppctl() doesn't work when ovs is run on host and hostPID is false
+  - b39031c0 2025-10-14T11:43:54-04:00 Increase single target attempts
+  - 1ed9749f 2025-10-14T16:20:44+01:00 chore: Remove SetTaintOnNode
+  - 2fff3669 2025-10-13T22:35:55+02:00 E2E service: Fix potential flake in conn to an ext IP using src port
+  - 651759c5 2025-10-13T22:35:55+02:00 E2E service: Move checkNumberOf.. to util.go
+  - 282b01ec 2025-10-13T22:35:55+02:00 Extends unit test coverage for named port handling in ETP local
+  - 06515935 2025-10-13T22:35:54+02:00 Fix named port handling in externalTrafficPolicy Local services
+  - cde88f27 2025-10-13T03:23:35+00:00 The expect expectedEndpointsNum should be 2 times endpoints for dualstack cluster
+  - 65e44a73 2025-10-11T09:27:16+00:00 unskip cases as bug is verified
+  - 317bdd67 2025-10-09T10:14:09+02:00 Enable ovn-ci workflow on release branches
+  - d4136ccf 2025-09-30T23:00:39+00:00 fix: list allowed values for --platform-type option
+  - a9d76d66 2025-09-30T20:45:30+00:00 fix: --logfile-maxsize is in megabytes, not bytes
+  - d3850302 2025-09-30T18:03:17+00:00 chore: Remove --pod-ip option
+  - dec64dad 2025-08-27T14:28:00+03:00 kind,kubevirt: Combine CR patches
+  - cb24e1ad 2025-08-27T13:25:01+03:00 kind,kubevirt: Rm redundent URL call
+
+- kubernetes image-arm64 96593f323733d9ffc0fc70257ecad44a56df0ce3 to 891f5bb0306166d5625b89fc8dc86bbc8c85f549
+  - cd7a7f172 2025-11-06T10:47:49-06:00 UPSTREAM: 133392: add retry to getMetricsFromNode
+  - 118d4c31e 2025-11-06T13:28:41+01:00 UPSTREAM: <drop>: Disable volume group snapshot tests
+  - c84411657 2025-11-04T10:54:15-05:00 UPSTREAM: <carry>: remove annotation framework in favor of environment selectors
+  - 745fd2c15 2025-10-28T12:10:32+03:00 UPSTREAM: <carry>: Re-enable temporarily disabled kuberc tests
+  - 4e0347881 2025-10-27T17:52:55-03:00 UPSTREAM: <carry>: do not skip CBOR tests
+  - 9e371eff8 2025-10-21T14:13:47-04:00 UPSTREAM: <carry>: Skip CPU resource status for workload-pinned pods
+
+- service-ca-operator image-arm64 e5d65c6f6b1446b77e0e915d64825d97be9c06de to c5e7cf4a92ca76778c20defc14a823e097d0f15d
+  - c36699d 2025-11-07T09:42:37+01:00 controller deployment: Use user namespace
+  - 7f239cc 2025-11-04T14:47:21+01:00 manifests: Use user namespace for the deployment
+  - be251a9 2025-10-29T21:32:41+08:00 Remove all tests and add fake test that always passes
+  - 508510c 2025-10-28T01:47:44+08:00 go mod tidy && go mod vendor
+  - 1cf97b8 2025-10-28T01:41:16+08:00 add run-suite target of root, delegate to test/tests-extension/Makefile
+  - 7ec409e 2025-10-28T01:40:51+08:00 Add OTE scaffold for service-ca-operator
+  - d495e68 2025-10-24T21:13:16+08:00 Update with coderabbitai feedback
+  - bcb4a40 2025-10-24T20:18:48+08:00 go mod tidy and go mod vendor
+  - 7a560c2 2025-10-24T20:15:46+08:00 Add Service CA Operator Tests Extension
+  - 95535a2 2025-10-23T19:26:56+08:00 Created an OWNERS file for the tests-extension directory
 
