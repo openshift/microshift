@@ -100,6 +100,7 @@ download_sriov_manifests() {
 # extract_sriov_rbac_from_cluster_service_version() extract the RBAC from the
 # CSV and saves the manifests in the STAGING_EXTRACTED directory. It is called
 # by extract_sriov_manifests().
+# shellcheck disable=SC2207
 extract_sriov_rbac_from_cluster_service_version() {
   local dest="$1"
   local csv="$2"
