@@ -34,7 +34,7 @@ spec:
             secretName: catalog-operator-serving-cert
         - name: profile-collector-cert
           secret:
-            secretName: catalog-operator-serving-cert
+            secretName: pprof-cert
         - name: tmpfs
           emptyDir: {}
       containers:
