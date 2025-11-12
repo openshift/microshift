@@ -55,8 +55,8 @@ exporters:
     metric_expiration: 30m
   prometheusremotewrite:
     endpoint: "http://[{{PROMETHEUS_HOST}}]:{{PROMETHEUS_PORT}}/api/v1/write"
-  loki: # only for logs, exports the logs in the loki server
-    endpoint: "http://[{{LOKI_HOST}}]:{{LOKI_PORT}}/loki/api/v1/push"
+  otlphttp/loki: # only for logs, exports the logs in the loki server
+    endpoint: "http://[{{LOKI_HOST}}]:{{LOKI_PORT}}/otlp"
 
 extensions:
   file_storage:
@@ -75,8 +75,8 @@ service:
     logs/journald:
       receivers: [ journald ]
       processors: [ batch, resource/journald ]
-      exporters: [ loki ]
+      exporters: [ otlphttp/loki ]
     logs/kube_events:
       receivers: [ k8s_events ]
       processors: [ batch, resource/kube_events ]
-      exporters: [ loki ]
+      exporters: [ otlphttp/loki ]
