@@ -70,6 +70,7 @@ func ApplyDefaultSCCs(ctx context.Context, cfg *config.Config) error {
 		}
 		clusterRoleBinding = []string{
 			"controllers/openshift-default-scc-manager/0000_20_kube-apiserver-operator_00_crb-systemauthenticated-scc-restricted-v2.yaml",
+			"controllers/openshift-default-scc-manager/0000_20_kube-apiserver-operator_00_crb-systemauthenticated-scc-restricted-v3.yaml",
 		}
 		sccs = []string{
 			"controllers/openshift-default-scc-manager/0000_20_kube-apiserver-operator_00_scc-anyuid.yaml",

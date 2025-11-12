@@ -148,6 +148,7 @@ assets:
       - file: 0000_20_kube-apiserver-operator_00_cr-scc-restricted-v3.yaml
       - file: 0000_20_kube-apiserver-operator_00_cr-scc-restricted.yaml
       - file: 0000_20_kube-apiserver-operator_00_crb-systemauthenticated-scc-restricted-v2.yaml
+      - file: 0000_20_kube-apiserver-operator_00_crb-systemauthenticated-scc-restricted-v3.yaml
       - file: 0000_20_kube-apiserver-operator_00_scc-anyuid.yaml
       - file: 0000_20_kube-apiserver-operator_00_scc-hostaccess.yaml
       - file: 0000_20_kube-apiserver-operator_00_scc-hostmount-anyuid.yaml
