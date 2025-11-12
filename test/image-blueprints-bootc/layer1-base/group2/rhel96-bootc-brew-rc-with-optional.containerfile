@@ -53,13 +53,13 @@ RUN firewall-offline-cmd --zone=public --add-port=22/tcp && \
 # which means that the kernel in the base bootc image might no longer
 # be available in the repositories.
 # hadolint ignore=DL3003
-RUN dnf upgrade kernel -y && \
-    KERNEL_VER=$(rpm -q --qf "%{VERSION}-%{RELEASE}" kernel); \
-    KERNEL_VER_ARCH="${KERNEL_VER}.$(uname -m)"; \
-    dnf install -y git make "kernel-devel-${KERNEL_VER}" python3-pyserial && \
-    dnf clean all && \
-    git clone https://github.com/pmtk/serialsim.git /tmp/serialsim && \
-    cd /tmp/serialsim && \
-    make KERNEL="${KERNEL_VER_ARCH}" all install && \
-    rm -rf /tmp/serialsim
+# RUN dnf upgrade kernel -y && \
+#     KERNEL_VER=$(rpm -q --qf "%{VERSION}-%{RELEASE}" kernel); \
+#     KERNEL_VER_ARCH="${KERNEL_VER}.$(uname -m)"; \
+#     dnf install -y git make "kernel-devel-${KERNEL_VER}" python3-pyserial && \
+#     dnf clean all && \
+#     git clone https://github.com/pmtk/serialsim.git /tmp/serialsim && \
+#     cd /tmp/serialsim && \
+#     make KERNEL="${KERNEL_VER_ARCH}" all install && \
+#     rm -rf /tmp/serialsim
 # {{- end -}}
