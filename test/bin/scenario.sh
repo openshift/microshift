@@ -1115,7 +1115,6 @@ setup_oc_and_kubeconfig() {
         exit 1
     }
 
-
     # Get kubeconfig from VM
     local -r vm_ip=$(get_vm_property "${vmname}" "ip")
     local kubeconfig="${SCENARIO_INFO_DIR}/${SCENARIO}/kubeconfig"
