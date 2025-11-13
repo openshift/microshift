@@ -1098,7 +1098,7 @@ EOF
     fi
 }
 
-# Setup oc client and kubeconfig for Gingko tests
+# Setup oc client and kubeconfig for ginkgo tests
 setup_oc_and_kubeconfig() {
     local vmname="${1}"
     shift
@@ -1110,10 +1110,13 @@ setup_oc_and_kubeconfig() {
     pushd . &>/dev/null
 
     # Install oc
-    "${ROOTDIR}/scripts/fetch_tools.sh" "oc" || {
-        record_junit "${vmname}" "oc_installed" "FAILED"
-        exit 1
-    }
+    if ! command -v oc &> /dev/null ; then
+        "${ROOTDIR}/scripts/fetch_tools.sh" "oc" || {
+            record_junit "${vmname}" "oc_installed" "FAILED"
+            exit 1
+        }
+    fi
+    record_junit "${vmname}" "oc_installed" "OK"
 
     # Get kubeconfig from VM
     local -r vm_ip=$(get_vm_property "${vmname}" "ip")
@@ -1122,14 +1125,13 @@ setup_oc_and_kubeconfig() {
         record_junit "${vmname}" "setup_kubeconfig" "FAILED"
         exit 1
     fi
-
     export KUBECONFIG="${kubeconfig}"
     record_junit "${vmname}" "setup_kubeconfig" "OK"
-    
+
     popd &>/dev/null
 }
 
-# Implementation of gingko tests
+# Implementation of ginkgo tests
 run_ginkgo_tests() {
     local vmname="${1}"
     shift
