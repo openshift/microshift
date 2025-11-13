@@ -27,7 +27,7 @@ ${TEST_CONFIG_PATH}         assets/observability/otel_config.yaml
 Host Metrics Are Exported
     [Documentation]    The opentelemetry-collector should be able to export host metrics.
 
-    VAR    ${METRIC}    system_cpu_time_seconds_total    scope=TEST
+    Set Test Variable    ${METRIC}    system_cpu_time_seconds_total
     Check Prometheus Query    ${PROMETHEUS_HOST}    ${PROMETHEUS_PORT}    ${METRIC}
     Check Prometheus Exporter    ${USHIFT_HOST}    ${PROM_EXPORTER_PORT}    ${METRIC}
 
