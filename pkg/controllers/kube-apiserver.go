@@ -63,7 +63,6 @@ var (
 		embedded.MustAsset("controllers/kube-apiserver/config-overrides.yaml"),
 	}
 )
-
 var fixedTLSProfile *configv1.TLSProfileSpec
 
 func init() {
@@ -169,6 +168,11 @@ func (s *KubeAPIServer) configure(ctx context.Context, cfg *config.Config) error
 		return fmt.Errorf("failed to discover etcd servers: %w", err)
 	}
 
+	featureGateArgs, err := cfg.ApiServer.FeatureGates.ConvertToCLIFlags()
+	if err != nil {
+		return fmt.Errorf("failed to convert feature gates to CLI flags: %w", err)
+	}
+
 	overrides := &kubecontrolplanev1.KubeAPIServerConfig{
 		APIServerArguments: map[string]kubecontrolplanev1.Arguments{
 			"advertise-address":             {s.advertiseAddress},
@@ -221,7 +225,7 @@ func (s *KubeAPIServer) configure(ctx context.Context, cfg *config.Config) error
 			"enable-admission-plugins":              {},
 			"send-retry-after-while-not-ready-once": {"true"},
 			"shutdown-delay-duration":               {"5s"},
-			"feature-gates":                         {"UserNamespacesSupport=true", "UserNamespacesPodSecurityStandards=true"},
+			"feature-gates":                         append(featureGateArgs, "UserNamespacesSupport=true", "UserNamespacesPodSecurityStandards=true"),
 		},
 		GenericAPIServerConfig: configv1.GenericAPIServerConfig{
 			AdmissionConfig: configv1.AdmissionConfig{
