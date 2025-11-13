@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	configv1 "github.com/openshift/api/config/v1"
+	featuresUtils "github.com/openshift/api/features"
 	"github.com/openshift/library-go/pkg/crypto"
 )
 
@@ -138,23 +139,54 @@ const (
 	FeatureSetDevPreviewNoUpgrade  = "DevPreviewNoUpgrade"
 )
 
-type FeatureGates struct {
-	FeatureSet      string          `json:"featureSet"`
-	CustomNoUpgrade CustomNoUpgrade `json:"customNoUpgrade"`
-}
-
 type CustomNoUpgrade struct {
 	Enabled  []string `json:"enabled"`
 	Disabled []string `json:"disabled"`
 }
 
-func validateFeatureGates(c *Config) error {
-	fg := &c.ApiServer.FeatureGates
-	if reflect.DeepEqual(c.ApiServer.FeatureGates, FeatureGates{}) {
+type FeatureGates struct {
+	FeatureSet      string          `json:"featureSet"`
+	CustomNoUpgrade CustomNoUpgrade `json:"customNoUpgrade"`
+}
+
+func (fg FeatureGates) ConvertToCLIFlags() ([]string, error) {
+	ret := []string{}
+
+	switch fg.FeatureSet {
+	case FeatureSetCustomNoUpgrade:
+		for _, feature := range fg.CustomNoUpgrade.Enabled {
+			ret = append(ret, fmt.Sprintf("%s=true", feature))
+		}
+		for _, feature := range fg.CustomNoUpgrade.Disabled {
+			ret = append(ret, fmt.Sprintf("%s=false", feature))
+		}
+	case FeatureSetDevPreviewNoUpgrade, FeatureSetTechPreviewNoUpgrade:
+		fgEnabledDisabled, err := featuresUtils.FeatureSets(featuresUtils.SelfManaged, configv1.FeatureSet(fg.FeatureSet))
+		if err != nil {
+			return nil, fmt.Errorf("failed to get feature set gates: %w", err)
+		}
+		for _, f := range fgEnabledDisabled.Enabled {
+			ret = append(ret, fmt.Sprintf("%s=true", f.FeatureGateAttributes.Name))
+		}
+		for _, f := range fgEnabledDisabled.Disabled {
+			ret = append(ret, fmt.Sprintf("%s=false", f.FeatureGateAttributes.Name))
+		}
+	}
+	return ret, nil
+}
+
+// Implement the GoStringer interface for better %#v printing
+func (fg FeatureGates) GoString() string {
+	return fmt.Sprintf("FeatureGates{FeatureSet: %q, CustomNoUpgrade: %#v}", fg.FeatureSet, fg.CustomNoUpgrade)
+}
+
+func (fg *FeatureGates) validateFeatureGates() error {
+	// FG is unset
+	if fg == nil || reflect.DeepEqual(*fg, FeatureGates{}) {
 		return nil
 	}
 	// Must use a recognized feature set, or else empty
-	if fg.FeatureSet != FeatureSetCustomNoUpgrade && fg.FeatureSet != FeatureSetTechPreviewNoUpgrade && fg.FeatureSet != FeatureSetDevPreviewNoUpgrade {
+	if fg.FeatureSet != "" && fg.FeatureSet != FeatureSetCustomNoUpgrade && fg.FeatureSet != FeatureSetTechPreviewNoUpgrade && fg.FeatureSet != FeatureSetDevPreviewNoUpgrade {
 		return fmt.Errorf("invalid feature set: %s", fg.FeatureSet)
 	}
 	// Must set FeatureSet to CustomNoUpgrade to use custom feature gates

@@ -655,7 +655,7 @@ func (c *Config) validate() error {
 		return fmt.Errorf("error validating Generic Device Plugin configuration: %v", err)
 	}
 
-	if err := validateFeatureGates(c); err != nil {
+	if err := c.ApiServer.FeatureGates.validateFeatureGates(); err != nil {
 		return fmt.Errorf("error validating feature gates: %v", err)
 	}
 
