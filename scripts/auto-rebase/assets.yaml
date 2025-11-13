@@ -10,6 +10,12 @@ assets:
       - file: namespace.yaml
       - file: service-account.yaml
       - file: service.yaml
+      - file: hosts-configmap-rolebinding.yaml
+        ignore: "RBAC rules for hosts customization"
+        git_restore: True
+      - file: hosts-configmap-role.yaml
+        ignore: "RBAC rules for hosts customization"
+        git_restore: True
 
   - dir: components/openshift-dns/node-resolver
     src: cluster-dns-operator/pkg/manifests/assets/node-resolver/

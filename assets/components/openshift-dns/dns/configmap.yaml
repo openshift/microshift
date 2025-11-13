@@ -22,6 +22,13 @@ data:
         cache 900 {
             denial 9984 30
         }
+
+        {{- if .HostsEnabled }}
+        hosts /tmp/hosts/hosts {
+            fallthrough
+        }
+        {{- end }}        
+
         reload
     }
     hostname.bind:5353 {

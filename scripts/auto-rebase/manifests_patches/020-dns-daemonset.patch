@@ -1,0 +1,31 @@
+diff --git a/assets/components/openshift-dns/dns/daemonset.yaml b/assets/components/openshift-dns/dns/daemonset.yaml
+index 630fa3f93..590fc3daa 100644
+--- a/assets/components/openshift-dns/dns/daemonset.yaml
++++ b/assets/components/openshift-dns/dns/daemonset.yaml
+@@ -24,6 +24,11 @@ spec:
+               readOnly: true
+             - mountPath: /tmp
+               name: tmp-dir
++            {{- if .HostsEnabled }}  
++            - mountPath: /tmp/hosts
++              name: hosts
++              readOnly: true
++            {{- end }}
+           ports:
+             - containerPort: 5353
+               name: dns
+@@ -95,6 +100,14 @@ spec:
+           secret:
+             defaultMode: 420
+             secretName: dns-default-metrics-tls
++        {{- if .HostsEnabled }}
++        - name: hosts
++          configMap:
++            name: hosts-file
++            items:
++              - key: hosts
++                path: hosts
++        {{- end }}
+         - name: tmp-dir
+           emptyDir: {}
+       nodeSelector:
