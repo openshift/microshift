@@ -801,6 +801,15 @@ func TestValidate(t *testing.T) {
 			expectErr: true,
 		},
 		{
+			name: "feature-gates-unset",
+			config: func() *Config {
+				c := mkDefaultConfig()
+				c.ApiServer.FeatureGates = FeatureGates{}
+				return c
+			}(),
+			expectErr: false,
+		},
+		{
 			name: "feature-gates-invalid-feature-set",
 			config: func() *Config {
 				c := mkDefaultConfig()
@@ -823,7 +832,7 @@ func TestValidate(t *testing.T) {
 			name: "feature-gates-custom-no-upgrade-with-feature-set-empty",
 			config: func() *Config {
 				c := mkDefaultConfig()
-				c.ApiServer.FeatureGates.FeatureSet = "CustomNoUpgrade"
+				c.ApiServer.FeatureGates.FeatureSet = ""
 				c.ApiServer.FeatureGates.CustomNoUpgrade.Enabled = []string{"feature1"}
 				c.ApiServer.FeatureGates.CustomNoUpgrade.Disabled = []string{"feature2"}
 				return c
