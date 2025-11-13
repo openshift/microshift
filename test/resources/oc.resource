@@ -193,7 +193,7 @@ All Pods Should Be Running
     [Documentation]    Check if all pods are running in the given namespace
     [Arguments]    ${ns}=-A    ${timeout}=${DEFAULT_WAIT_TIMEOUT}
     IF    "${ns}"=="-A"
-        Oc Wait    pods --all -A    --for="condition=Ready" --timeout=${timeout}
+        Oc Wait    pods -A    --all --for="condition=Ready" --timeout=${timeout}
     ELSE
-        Oc Wait    pods --all -n ${ns}    --for="condition=Ready" --timeout=${timeout}
+        Oc Wait    pods -n ${ns}    --all --for="condition=Ready" --timeout=${timeout}
     END
