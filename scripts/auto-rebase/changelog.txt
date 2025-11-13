@@ -1,0 +1,6 @@
+- oc image-arm64 1c5f490b7997ec08b07b0a0cf16a10757622732c to 4d35590b0747f8c6ae009e20243bda0b6c328890
+  - 6c04d0a2 2025-10-27T10:06:04+01:00 Increase Node ISO creation timeout from 15 to 30 minutes
+
+- service-ca-operator image-arm64 604991eb2172a8a3c4951af8c776c4f845c99ac6 to c5e7cf4a92ca76778c20defc14a823e097d0f15d
+  - 7f239cc 2025-11-04T14:47:21+01:00 manifests: Use user namespace for the deployment
+
