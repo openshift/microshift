@@ -1,0 +1,23 @@
+- api embedded-component b410df2482246a6b9c1797d6a58ebcbbbe14e4db to b315b8f7268a44367e6ab34880093564d0923ef0
+  - be345ab 2025-11-05T11:42:21-05:00 Promote streaming list encoding to Default on Hypershift.
+
+- cluster-network-operator embedded-component 8894d2fd20ca1b3148d5283fe547e62282719eb2 to 45379d9f5db177cc97f6e856a97e8b24c8f7a23c
+  - be07292 2025-10-16T11:24:13+01:00 Add drop flows for GARPs
+
+- machine-config-operator embedded-component 6c210e2c3bc6d4fc02156a10e1cda7eb897c4f4c to b1322e4881a5957b6eabe97fd850e8b6d2ae84e7
+  - 9f7d5245 2025-10-16T11:15:54+01:00 Networking: reset ovn-remote config and allow ovnkube controller to set it
+
+- ovn-kubernetes image-amd64 041b2edeb54b1416c0f842b45a73c1e131adb86a to b0bc3476ab82e7cdec6d989223e2ba3b3219c79c
+  - f22003cf 2025-10-15T16:39:42+01:00 [IC][EIP] OCPBUGS-42303: Fix race between SB DB and OVN-Controller
+  - 547aaca0 2025-10-15T16:37:37+01:00 Node controller shutdown: do not ref gateway if not set PR 5373 to drop the GARP flows didnt consider that we set the default network controller and later we set the gateway obj. In-between this period, ovnkube node may receive a stop signal and we do not guard against accessing the gateway if its not yet set.
+  - 7da434d5 2025-10-15T16:35:26+01:00 ovn-controller: block GARP during startup
+  - e86fca4e 2025-10-15T13:36:43+01:00 Fix ovnkube-controller-with-node shutdown sequence
+
+- ovn-kubernetes image-arm64 041b2edeb54b1416c0f842b45a73c1e131adb86a to e088f8925a37e2b32708ba36fbe1be75df8feaed
+  - 43b2d93c 2025-11-05T11:31:05+00:00 Fix egressip_test.go compilation errors due to previous bogus backports
+  - e82ead26 2025-11-05T11:28:13+00:00 Configure sec nic EIPv6 address with NODAD and maximum lifetime
+  - f22003cf 2025-10-15T16:39:42+01:00 [IC][EIP] OCPBUGS-42303: Fix race between SB DB and OVN-Controller
+  - 547aaca0 2025-10-15T16:37:37+01:00 Node controller shutdown: do not ref gateway if not set PR 5373 to drop the GARP flows didnt consider that we set the default network controller and later we set the gateway obj. In-between this period, ovnkube node may receive a stop signal and we do not guard against accessing the gateway if its not yet set.
+  - 7da434d5 2025-10-15T16:35:26+01:00 ovn-controller: block GARP during startup
+  - e86fca4e 2025-10-15T13:36:43+01:00 Fix ovnkube-controller-with-node shutdown sequence
+
