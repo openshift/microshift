@@ -1,0 +1,122 @@
+rules:
+  - apiGroups:
+      - ''
+    resources:
+      - nodes
+    verbs:
+      - get
+      - list
+      - watch
+      - patch
+      - update
+  - apiGroups:
+      - ''
+    resources:
+      - pods
+    verbs:
+      - '*'
+  - apiGroups:
+      - apps
+    resources:
+      - daemonsets
+    verbs:
+      - get
+  - apiGroups:
+      - machineconfiguration.openshift.io
+    resources:
+      - '*'
+    verbs:
+      - '*'
+  - apiGroups:
+      - config.openshift.io
+    resources:
+      - infrastructures
+    verbs:
+      - get
+      - list
+      - watch
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: sriov-network-config-daemon
+---
+rules:
+  - apiGroups:
+      - ''
+    resources:
+      - nodes
+    verbs:
+      - get
+      - list
+      - watch
+      - patch
+      - update
+  - apiGroups:
+      - ''
+    resources:
+      - pods
+    verbs:
+      - '*'
+  - apiGroups:
+      - ''
+    resources:
+      - pods/eviction
+    verbs:
+      - create
+  - apiGroups:
+      - apps
+    resources:
+      - daemonsets
+    verbs:
+      - get
+  - apiGroups:
+      - ''
+    resources:
+      - namespaces
+      - serviceaccounts
+    verbs:
+      - '*'
+  - apiGroups:
+      - k8s.cni.cncf.io
+    resources:
+      - network-attachment-definitions
+    verbs:
+      - '*'
+  - apiGroups:
+      - rbac.authorization.k8s.io
+    resources:
+      - clusterroles
+      - clusterrolebindings
+    verbs:
+      - '*'
+  - apiGroups:
+      - admissionregistration.k8s.io
+    resources:
+      - mutatingwebhookconfigurations
+      - validatingwebhookconfigurations
+    verbs:
+      - '*'
+  - apiGroups:
+      - sriovnetwork.openshift.io
+    resources:
+      - '*'
+    verbs:
+      - '*'
+  - apiGroups:
+      - machineconfiguration.openshift.io
+    resources:
+      - '*'
+    verbs:
+      - '*'
+  - apiGroups:
+      - config.openshift.io
+    resources:
+      - infrastructures
+    verbs:
+      - get
+      - list
+      - watch
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: sriov-network-operator
