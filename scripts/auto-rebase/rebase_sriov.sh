@@ -11,10 +11,8 @@ shopt -s extglob
 export PS4='+ $(date "+%T.%N") ${BASH_SOURCE#$HOME/}:$LINENO \011'
 
 REPOROOT="$(readlink -f "$(dirname "${BASH_SOURCE[0]}")/../..")"
-STAGING_ROOT="${REPOROOT}/_output/staging"
-STAGING_SRIOV="${STAGING_ROOT}/sriov"
-STAGING_DOWNLOAD="${STAGING_SRIOV}/download"
-STAGING_EXTRACTED="${STAGING_SRIOV}/extracted"
+STAGING_DIR="${REPOROOT}/_output/staging"
+STAGING_SRIOV="${STAGING_DIR}/sriov"
 
 FINAL_ROOT="${REPOROOT}/assets/optional/sriov"
 FINAL_DEPLOY="${FINAL_ROOT}/deploy"
@@ -75,28 +73,28 @@ get_auth() {
 # "---" to it, so another manifest can be included in the same file
 append_if_exists() {
   local target="$1"
-  
+
   if [[ -s "${target}" ]]; then
     echo "---" >> "${target}"
   fi
 }
 
-# download_sriov_manifests() fetches the SR-IOV manifests.
-# First, it downloads the SR-IOV Operator bundle CSV and extracts image ref to the SR-IOV Operator image.
-# Then, it extracts the manifests from the SR-IOV Operator image to the staging dir.
-# No processing is done in this function.
-download_sriov_manifests() {
+download_sriov_bundle_manifests() {
     local -r bundle_ref="${1}"
 
-    rm -rf "${STAGING_SRIOV}" && mkdir -p "${STAGING_DOWNLOAD}"
-    local -r authentication="$(get_auth)"
+    title "downloading SRIOV bundle ${bundle_ref}"
+    rm -rf "${STAGING_SRIOV}"
+    mkdir -p "${STAGING_SRIOV}"
 
-    title "Fetching SR-IOV manifests"
+    local -r authentication="$(get_auth)"
     # shellcheck disable=SC2086
     oc image extract \
         ${authentication} \
-        --path "/manifests/:${STAGING_DOWNLOAD}" \
+        --path "/manifests/:${STAGING_SRIOV}" \
         "${bundle_ref}" || return 1
+
+    extract_sriov_manifests
+    patch_sriov_manifests
 }
 
 # extract_sriov_rbac_from_cluster_service_version() extract the RBAC from the
@@ -205,7 +203,7 @@ extract_sriov_rolebinding_from_csv_by_service_account_name() {
   local service_account_name="$1"
   local namespace="$2"
   local target="$3"
- 
+
   append_if_exists "${target}"
 
   crb=$(cat <<EOL
@@ -274,7 +272,7 @@ create_namespace_yaml() {
   namespace=$(cat <<EOL
 apiVersion: v1
 kind: Namespace
-metadata: 
+metadata:
   name: ${namespace}
   labels:
     name: ${namespace}
@@ -308,41 +306,51 @@ EOL
 )
   echo "${sriovoperatorconfig}" > "${target}"
 }
-# extract_sriov_manifests() extracts the RBAC, operator and configmap from
-# cluster service version and saves the manifests in the STAGING_EXTRACTED
-# directory.
+
 extract_sriov_manifests() {
-  rm -rf "${STAGING_EXTRACTED}" && mkdir -p "${STAGING_EXTRACTED}"
+  extract_sriov_rbac_from_cluster_service_version "${STAGING_SRIOV}" "${STAGING_SRIOV}/${CSV_FILENAME}" "${NAMESPACE}"
 
-  # extract service_account, role, rolebinding, clusterrole, clusterrolebinding
-  extract_sriov_rbac_from_cluster_service_version "${STAGING_EXTRACTED}" "${STAGING_DOWNLOAD}/${CSV_FILENAME}" "${NAMESPACE}"
-
-  # extract supported nics configmap
-  local configmap="${STAGING_DOWNLOAD}/${CONFIGMAP_FILENAME}"
-  echo "generating ${configmap}"
-  cp "${configmap}" "${STAGING_EXTRACTED}/"
-
-  # extract operator
-  local operator="${STAGING_EXTRACTED}/${OPERATOR_FILENAME}"
+  local operator="${STAGING_SRIOV}/${OPERATOR_FILENAME}"
   echo "generating ${operator}"
-  extract_operator_from_csv "${STAGING_DOWNLOAD}/${CSV_FILENAME}" "${NAMESPACE}" "${operator}"
+  extract_operator_from_csv "${STAGING_SRIOV}/${CSV_FILENAME}" "${NAMESPACE}" "${operator}"
 
-  # create namespace
-  local namespace="${STAGING_EXTRACTED}/namespace.yaml"
+  local namespace="${STAGING_SRIOV}/namespace.yaml"
   echo "generating ${namespace}"
   create_namespace_yaml "${NAMESPACE}" "${namespace}"
 
-  # create sriovoperatorconfig
-  local sriovoperatorconfig="${STAGING_EXTRACTED}/sriovoperatorconfig.yaml"
+  local sriovoperatorconfig="${STAGING_SRIOV}/sriovoperatorconfig.yaml"
   echo "generating ${sriovoperatorconfig}"
   create_default_sriov_operator_config "${NAMESPACE}" "${sriovoperatorconfig}"
+}
+
+patch_sriov_manifests() {
+  yq eval -i "
+  .data.Intel_ixgbe_82576 = \"8086 10c9 10ca\"
+  | .metadata.namespace = \"${NAMESPACE}\"
+  " "${STAGING_SRIOV}/${CONFIGMAP_FILENAME}"
+
+  yq eval -i "
+  (
+    .spec.template.spec.containers[0].env[] |
+    select(.name == \"ADMISSION_CONTROLLERS_ENABLED\")
+  ).value = \"false\"
+  |
+  (
+    .spec.template.spec.containers[0].env[] |
+    select(.name == \"METRICS_EXPORTER_PROMETHEUS_OPERATOR_ENABLED\")
+  ).value = \"false\"
+  |
+  .spec.template.spec.containers[0].env += [
+    {\"name\": \"CLUSTER_TYPE\", \"value\": \"kubernetes\"}
+  ]
+  " "${STAGING_SRIOV}/${OPERATOR_FILENAME}"
 }
 
 extract_images_from_operator() {
   local operator="$1"
   local release_version="$2"
   local target="$3"
-  
+
   # extract images and format
   # sed replaces undescores with dashes
   yq "
@@ -369,7 +377,7 @@ process_sriov_manifests() {
   local operator="${STAGING_EXTRACTED}/${OPERATOR_FILENAME}"
 
   # copy extracted manifests to final destination
-  cp -a "${STAGING_EXTRACTED}/." "${FINAL_DEPLOY}/" 
+  cp -a "${STAGING_EXTRACTED}/." "${FINAL_DEPLOY}/"
 
   # copy CRDs to final destination
   cp -a "${STAGING_DOWNLOAD}/sriovnetwork.openshift.io_"* "${FINAL_CRD}/"
@@ -377,32 +385,10 @@ process_sriov_manifests() {
   title "Initializing release.json file"
   local -r version=$(get_sriov_bundle_version)
   # echo "{ \"release\": {\"base\": \"${version}\"}, \"images\": {}}" | yq -o json > "${RELEASE_JSON_aarch64}"
-  
+
   extract_images_from_operator "${operator}" "${version}" "${RELEASE_JSON_aarch64}"
   cat "${RELEASE_JSON_aarch64}" > "${RELEASE_JSON_x86_64}"
 
-  # add the nic we use in testing to supported nics list
-  yq eval "
-  .data.Intel_ixgbe_82576 = \"8086 10c9 10ca\"
-  | .metadata.namespace = \"${NAMESPACE}\"
-  " "${configmap}" > "${FINAL_DEPLOY}/${CONFIGMAP_FILENAME}"
-
-  # turn off webhook and metrics exporter, change cluster type to k8s
-  yq eval "
-  (
-    .spec.template.spec.containers[0].env[] |
-    select(.name == \"ADMISSION_CONTROLLERS_ENABLED\")
-  ).value = \"false\"
-  |
-  (
-    .spec.template.spec.containers[0].env[] |
-    select(.name == \"METRICS_EXPORTER_PROMETHEUS_OPERATOR_ENABLED\")
-  ).value = \"false\"
-  |
-  .spec.template.spec.containers[0].env += [
-    {\"name\": \"CLUSTER_TYPE\", \"value\": \"kubernetes\"}
-  ]
-  " "${operator}" > "${FINAL_DEPLOY}/${OPERATOR_FILENAME}"
 }
 
 get_sriov_bundle_version() {
@@ -432,12 +418,17 @@ update_rebase_job_entrypoint_sh() {
         "${REPOROOT}/scripts/auto-rebase/rebase_job_entrypoint.sh"
 }
 
+update_sriov_manifests() {
+    title "Copying manifests"
+    "$REPOROOT/scripts/auto-rebase/handle_assets.py" "./scripts/auto-rebase/assets_sriov.yaml"
+}
+
 rebase_sriov_to() {
     local -r operator_bundle="${1}"
 
     title "Rebasing SR-IOV for MicroShift to ${operator_bundle}"
 
-    download_sriov_manifests "${operator_bundle}"
+    download_sriov_bundle_manifests "${operator_bundle}"
     local -r version=$(get_sriov_bundle_version)
 
     extract_sriov_manifests
@@ -472,8 +463,9 @@ rebase_sriov_to() {
 usage() {
     echo "Usage:"
     echo "$(basename "$0") to SRIOV_BUNDLE                    Performs all the steps to rebase SR-IOV for MicroShift"
-    echo "$(basename "$0") download SRIOV_BUNDLE              Downloads the contents of the SR-IOV Operator (Bundle) to disk in preparation for rebasing"
-    echo "$(basename "$0") process                            Process already downloaded SR-IOV Operator (Bundle) artifacts to update SR-IOV for MicroShift"
+    echo "$(basename "$0") download SRIOV_BUNDLE              Downloads the content of a SR-IOV bundle image to disk in preparation for rebasing."
+    echo "$(basename "$0") images                             Rebases the component images to the downloaded release"
+    echo "$(basename "$0") manifests                          Rebases the component manifests to the downloaded release"
     exit 1
 }
 
@@ -485,11 +477,13 @@ case "${command}" in
         rebase_sriov_to "$2"
         ;;
     download)
-        download_sriov_manifests "$2"
+        download_sriov_bundle_manifests "$2"
         ;;
-    process)
-        extract_sriov_manifests
-        process_sriov_manifests
+    images)
+        update_sriov_images
+        ;;
+    manifests)
+        update_sriov_manifests
         ;;
     *) usage;;
 esac
