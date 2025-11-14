@@ -56,8 +56,8 @@ Oc Delete
 Oc Exec
     [Documentation]    Run 'oc exec' on a specific pod in the curret test namespace
     ...    Returns the command's combined STDOUT/STDER
-    [Arguments]    ${pod}    ${cmd}    ${ns}=${NAMESPACE}
-    ${output}=    Run With Kubeconfig    oc exec -n ${ns} pod/${pod} -- /bin/bash -c '${cmd}'
+    [Arguments]    ${pod}    ${cmd}    ${ns}=${NAMESPACE}    ${shell}=/bin/bash
+    ${output}=    Run With Kubeconfig    oc exec -n ${ns} pod/${pod} -- ${shell} -c '${cmd}'
     RETURN    ${output}
 
 Oc Wait
