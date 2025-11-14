@@ -173,6 +173,10 @@ func (s *KubeAPIServer) configure(ctx context.Context, cfg *config.Config) error
 		return fmt.Errorf("failed to convert feature gates to CLI flags: %w", err)
 	}
 
+	// Build the final feature gates list
+	hardcodedFeatureGates := []string{"UserNamespacesSupport=true", "UserNamespacesPodSecurityStandards=true"}
+	featureGateArgs = append(featureGateArgs, hardcodedFeatureGates...)
+
 	overrides := &kubecontrolplanev1.KubeAPIServerConfig{
 		APIServerArguments: map[string]kubecontrolplanev1.Arguments{
 			"advertise-address":             {s.advertiseAddress},
@@ -225,7 +229,7 @@ func (s *KubeAPIServer) configure(ctx context.Context, cfg *config.Config) error
 			"enable-admission-plugins":              {},
 			"send-retry-after-while-not-ready-once": {"true"},
 			"shutdown-delay-duration":               {"5s"},
-			"feature-gates":                         append(featureGateArgs, "UserNamespacesSupport=true", "UserNamespacesPodSecurityStandards=true"),
+			"feature-gates":                         featureGateArgs,
 		},
 		GenericAPIServerConfig: configv1.GenericAPIServerConfig{
 			AdmissionConfig: configv1.AdmissionConfig{
