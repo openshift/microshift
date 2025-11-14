@@ -11,8 +11,7 @@ shopt -s extglob
 export PS4='+ $(date "+%T.%N") ${BASH_SOURCE#$HOME/}:$LINENO \011'
 
 REPOROOT="$(readlink -f "$(dirname "${BASH_SOURCE[0]}")/../..")"
-STAGING_DIR="${REPOROOT}/_output/staging"
-STAGING_SRIOV="${STAGING_DIR}/sriov"
+STAGING_SRIOV="${REPOROOT}/_output/staging/sriov"
 
 FINAL_ROOT="${REPOROOT}/assets/optional/sriov"
 FINAL_DEPLOY="${FINAL_ROOT}/deploy"
@@ -23,10 +22,9 @@ CONFIGMAP_FILENAME="supported-nic-ids_v1_configmap.yaml"
 OPERATOR_FILENAME="operator.yaml"
 PULL_SECRET_FILE="${HOME}/.pull-secret.json"
 
-RELEASE_JSON_x86_64="${REPOROOT}/assets/optional/sriov/release-sriov-x86_64.json"
-RELEASE_JSON_aarch64="${REPOROOT}/assets/optional/sriov/release-sriov-aarch64.json"
+RELEASE_JSON_X86="${REPOROOT}/assets/optional/sriov/release-sriov-x86_64.json"
+RELEASE_JSON_ARM="${REPOROOT}/assets/optional/sriov/release-sriov-aarch64.json"
 NAMESPACE="sriov-network-operator"
-KEEP_STAGING="${KEEP_STAGING:-false}"
 NO_BRANCH=${NO_BRANCH:-false}
 
 title() {
@@ -346,53 +344,8 @@ patch_sriov_manifests() {
   " "${STAGING_SRIOV}/${OPERATOR_FILENAME}"
 }
 
-extract_images_from_operator() {
-  local operator="$1"
-  local release_version="$2"
-  local target="$3"
-
-  # extract images and format
-  # sed replaces undescores with dashes
-  yq "
-    (
-      [.spec.template.spec.containers[].env[] |
-      select(.name | test(\"_IMAGE$\")) |
-      {\"key\": (.name | downcase), \"value\": .value}] |
-      from_entries
-    ) as \$env_images |
-    (
-      .spec.template.spec.containers[] |
-      {(.name): .image}
-    ) as \$main_images |
-    {\"release\": {\"base\": \"${release_version}\"}, \"images\": (\$env_images + \$main_images)}
-  " "${operator}" -o json | sed 's/"sriov_\([^"]*\)_\([^"]*\)"/"sriov-\1-\2"/g; s/_/-/g' > "${target}"
-}
-
-# process_sriov_manifests() copies the extracted manifests and CRDs to their
-# corresponding directory in assets/ and performs additional processing to align
-# with MicroShift needs.
-process_sriov_manifests() {
-  rm -rf "${FINAL_ROOT}" && mkdir -p "${FINAL_DEPLOY}" "${FINAL_CRD}"
-  local configmap="${STAGING_EXTRACTED}/${CONFIGMAP_FILENAME}"
-  local operator="${STAGING_EXTRACTED}/${OPERATOR_FILENAME}"
-
-  # copy extracted manifests to final destination
-  cp -a "${STAGING_EXTRACTED}/." "${FINAL_DEPLOY}/"
-
-  # copy CRDs to final destination
-  cp -a "${STAGING_DOWNLOAD}/sriovnetwork.openshift.io_"* "${FINAL_CRD}/"
-
-  title "Initializing release.json file"
-  local -r version=$(get_sriov_bundle_version)
-  # echo "{ \"release\": {\"base\": \"${version}\"}, \"images\": {}}" | yq -o json > "${RELEASE_JSON_aarch64}"
-
-  extract_images_from_operator "${operator}" "${version}" "${RELEASE_JSON_aarch64}"
-  cat "${RELEASE_JSON_aarch64}" > "${RELEASE_JSON_x86_64}"
-
-}
-
 get_sriov_bundle_version() {
-    yq '.spec.version' "${STAGING_DOWNLOAD}/${CSV_FILENAME}"
+    yq '.spec.version' "${STAGING_SRIOV}/${CSV_FILENAME}"
 }
 
 update_last_rebase_sriov_sh() {
@@ -423,20 +376,41 @@ update_sriov_manifests() {
     "$REPOROOT/scripts/auto-rebase/handle_assets.py" "./scripts/auto-rebase/assets_sriov.yaml"
 }
 
+update_sriov_images() {
+    title "Updating SR-IOV images"
+    [ -d "${STAGING_SRIOV}" ] || {
+        >&2 echo 'sriov staging dir not found, aborting image update'
+        return 1
+    }
+
+    yq "
+      (
+        [.spec.template.spec.containers[].env[] |
+        select(.name | test(\"_IMAGE$\")) |
+        {\"key\": (.name | downcase), \"value\": .value}] |
+        from_entries
+      ) as \$env_images |
+      (
+        .spec.template.spec.containers[] |
+        {(.name): .image}
+      ) as \$main_images |
+      {\"release\": {\"base\": \"$(get_sriov_bundle_version)\"}, \"images\": (\$env_images + \$main_images)}
+    " "${STAGING_SRIOV}/${OPERATOR_FILENAME}" -o json | sed 's/"sriov_\([^"]*\)_\([^"]*\)"/"sriov-\1-\2"/g; s/_/-/g' > "${RELEASE_JSON_X86}"
+    cp "${RELEASE_JSON_X86}" "${RELEASE_JSON_ARM}"
+}
+
 rebase_sriov_to() {
     local -r operator_bundle="${1}"
 
     title "Rebasing SR-IOV for MicroShift to ${operator_bundle}"
 
     download_sriov_bundle_manifests "${operator_bundle}"
-    local -r version=$(get_sriov_bundle_version)
 
-    extract_sriov_manifests
+    update_sriov_manifests
+    update_sriov_images
 
     update_last_rebase_sriov_sh "${operator_bundle}"
     update_rebase_job_entrypoint_sh "${operator_bundle}"
-
-    process_sriov_manifests
 
     if [[ -n "$(git status -s ./assets ./scripts/auto-rebase/rebase_job_entrypoint.sh ./scripts/auto-rebase/last_rebase_sriov.sh)" ]]; then
         title "Detected changes to assets/ or last_rebase_sriov.sh"
