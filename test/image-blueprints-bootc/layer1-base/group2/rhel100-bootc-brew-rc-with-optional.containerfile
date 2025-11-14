@@ -51,6 +51,6 @@ RUN firewall-offline-cmd --zone=public --add-port=22/tcp && \
     firewall-offline-cmd --zone=public --add-port=30000-32767/udp
 
 # Prepare system for testing Generic Device Plugin
-#COPY --chmod=755 ./bootc-images/build-serialsim.sh /tmp/build-serialsim.sh
-#RUN /tmp/build-serialsim.sh && rm -f /tmp/build-serialsim.sh
+COPY --chmod=755 ./bootc-images/build-serialsim.sh /tmp/build-serialsim.sh
+RUN /tmp/build-serialsim.sh && rm -f /tmp/build-serialsim.sh
 # {{- end -}}
