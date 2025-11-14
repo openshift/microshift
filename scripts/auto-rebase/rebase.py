@@ -27,6 +27,7 @@ REPO_ENV = "REPO"
 AMD64_RELEASE_ENV = "AMD64_RELEASE"
 ARM64_RELEASE_ENV = "ARM64_RELEASE"
 RHOAI_RELEASE_ENV = "RHOAI_RELEASE"
+SRIOV_RELEASE_ENV = "SRIOV_RELEASE"
 OPM_VERSION_ENV = "OPM_RELEASE"
 JOB_NAME_ENV = "JOB_NAME"
 BUILD_ID_ENV = "BUILD_ID"
@@ -87,6 +88,26 @@ def run_rebase_ai_model_serving_sh(release):
     """Run the 'rebase_ai_model_serving.sh' script with the given release version and return the script's output."""
     script_dir = os.path.abspath(os.path.dirname(__file__))
     args = [f"{script_dir}/rebase_ai_model_serving.sh", "to", release]
+    env = os.environ.copy()
+    env["NO_BRANCH"] = "true"
+    logging.info(f"Running: '{' '.join(args)}'")
+    start = timer()
+    result = subprocess.run(
+        args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True, check=False,
+        env=env)
+    logging.info(f"Return code: {result.returncode}. Output:\n" +
+                 "==================================================\n" +
+                 f"{result.stdout}" +
+                 "==================================================\n")
+    end = timer() - start
+    logging.info(f"Script returned code: {result.returncode}. It ran for {end/60:.0f}m{end%60:.0f}s.")
+    return RebaseScriptResult(success=result.returncode == 0, output=result.stdout)
+
+
+def run_rebase_sriov_sh(release):
+    """Run the 'rebase_sriov.sh' script with the given release version and return the script's output."""
+    script_dir = os.path.abspath(os.path.dirname(__file__))
+    args = [f"{script_dir}/rebase_sriov.sh", "to", release]
     env = os.environ.copy()
     env["NO_BRANCH"] = "true"
     logging.info(f"Running: '{' '.join(args)}'")
@@ -517,6 +538,7 @@ def main():
     release_amd = try_get_env(AMD64_RELEASE_ENV)
     release_arm = try_get_env(ARM64_RELEASE_ENV)
     rhoai_release = try_get_env(RHOAI_RELEASE_ENV)
+    sriov_release = try_get_env(SRIOV_RELEASE_ENV)
     opm_version = try_get_env(OPM_VERSION_ENV)
     base_branch_override = try_get_env(BASE_BRANCH_ENV, die=False)
 
@@ -536,9 +558,10 @@ def main():
 
     rebase_result = run_rebase_sh(release_amd, release_arm)
     ai_rebase_result = run_rebase_ai_model_serving_sh(rhoai_release)
+    sriov_rebase_result = run_rebase_sriov_sh(sriov_release)
     cert_manager_rebase_result = run_rebase_cert_manager_sh(opm_version)
 
-    rebases_succeeded = all([rebase_result.success, ai_rebase_result.success, cert_manager_rebase_result.success])
+    rebases_succeeded = all([rebase_result.success, ai_rebase_result.success, sriov_rebase_result.success, cert_manager_rebase_result.success])
 
     if rebases_succeeded:
         # TODO How can we inform team that rebase job ran successfully just there was nothing new?

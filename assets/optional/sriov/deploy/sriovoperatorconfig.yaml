@@ -1,0 +1,10 @@
+apiVersion: sriovnetwork.openshift.io/v1
+kind: SriovOperatorConfig
+metadata:
+  name: default
+  namespace: sriov-network-operator
+spec:
+  configDaemonNodeSelector: {}
+  logLevel: 2
+  disableDrain: false
+  configurationMode: daemon

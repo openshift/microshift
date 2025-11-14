@@ -1,0 +1,375 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.14.0
+  creationTimestamp: null
+  name: sriovnetworknodestates.sriovnetwork.openshift.io
+spec:
+  group: sriovnetwork.openshift.io
+  names:
+    kind: SriovNetworkNodeState
+    listKind: SriovNetworkNodeStateList
+    plural: sriovnetworknodestates
+    singular: sriovnetworknodestate
+  scope: Namespaced
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: .status.syncStatus
+      name: Sync Status
+      type: string
+    - jsonPath: .metadata.annotations.sriovnetwork\.openshift\.io/desired-state
+      name: Desired Sync State
+      type: string
+    - jsonPath: .metadata.annotations.sriovnetwork\.openshift\.io/current-state
+      name: Current Sync State
+      type: string
+    - jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+    name: v1
+    schema:
+      openAPIV3Schema:
+        description: SriovNetworkNodeState is the Schema for the sriovnetworknodestates
+          API
+        properties:
+          apiVersion:
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+            type: string
+          kind:
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: SriovNetworkNodeStateSpec defines the desired state of SriovNetworkNodeState
+            properties:
+              bridges:
+                description: Bridges contains list of bridges
+                properties:
+                  ovs:
+                    items:
+                      description: OVSConfigExt contains configuration for the concrete
+                        OVS bridge
+                      properties:
+                        bridge:
+                          description: bridge-level configuration for the bridge
+                          properties:
+                            datapathType:
+                              description: configure datapath_type field in the Bridge
+                                table in OVSDB
+                              type: string
+                            externalIDs:
+                              additionalProperties:
+                                type: string
+                              description: IDs to inject to external_ids field in
+                                the Bridge table in OVSDB
+                              type: object
+                            otherConfig:
+                              additionalProperties:
+                                type: string
+                              description: additional options to inject to other_config
+                                field in the bridge table in OVSDB
+                              type: object
+                          type: object
+                        name:
+                          description: name of the bridge
+                          type: string
+                        uplinks:
+                          description: |-
+                            uplink-level bridge configuration for each uplink(PF).
+                            currently must contain only one element
+                          items:
+                            description: OVSUplinkConfigExt contains configuration
+                              for the concrete OVS uplink(PF)
+                            properties:
+                              interface:
+                                description: configuration from the Interface OVS
+                                  table for the PF
+                                properties:
+                                  externalIDs:
+                                    additionalProperties:
+                                      type: string
+                                    description: external_ids field in the Interface
+                                      table in OVSDB
+                                    type: object
+                                  mtuRequest:
+                                    description: mtu_request field in the Interface
+                                      table in OVSDB
+                                    type: integer
+                                  options:
+                                    additionalProperties:
+                                      type: string
+                                    description: options field in the Interface table
+                                      in OVSDB
+                                    type: object
+                                  otherConfig:
+                                    additionalProperties:
+                                      type: string
+                                    description: other_config field in the Interface
+                                      table in OVSDB
+                                    type: object
+                                  type:
+                                    description: type field in the Interface table
+                                      in OVSDB
+                                    type: string
+                                type: object
+                              name:
+                                description: name of the PF interface
+                                type: string
+                              pciAddress:
+                                description: pci address of the PF
+                                type: string
+                            required:
+                            - pciAddress
+                            type: object
+                          type: array
+                      required:
+                      - name
+                      type: object
+                    type: array
+                type: object
+              interfaces:
+                items:
+                  properties:
+                    eSwitchMode:
+                      type: string
+                    externallyManaged:
+                      type: boolean
+                    linkType:
+                      type: string
+                    mtu:
+                      type: integer
+                    name:
+                      type: string
+                    numVfs:
+                      type: integer
+                    pciAddress:
+                      type: string
+                    vfGroups:
+                      items:
+                        properties:
+                          deviceType:
+                            type: string
+                          isRdma:
+                            type: boolean
+                          mtu:
+                            type: integer
+                          policyName:
+                            type: string
+                          resourceName:
+                            type: string
+                          vdpaType:
+                            type: string
+                          vfRange:
+                            type: string
+                        type: object
+                      type: array
+                  required:
+                  - pciAddress
+                  type: object
+                type: array
+              system:
+                properties:
+                  rdmaMode:
+                    description: RDMA subsystem. Allowed value "shared", "exclusive".
+                    enum:
+                    - shared
+                    - exclusive
+                    type: string
+                type: object
+            type: object
+          status:
+            description: SriovNetworkNodeStateStatus defines the observed state of
+              SriovNetworkNodeState
+            properties:
+              bridges:
+                description: Bridges contains list of bridges
+                properties:
+                  ovs:
+                    items:
+                      description: OVSConfigExt contains configuration for the concrete
+                        OVS bridge
+                      properties:
+                        bridge:
+                          description: bridge-level configuration for the bridge
+                          properties:
+                            datapathType:
+                              description: configure datapath_type field in the Bridge
+                                table in OVSDB
+                              type: string
+                            externalIDs:
+                              additionalProperties:
+                                type: string
+                              description: IDs to inject to external_ids field in
+                                the Bridge table in OVSDB
+                              type: object
+                            otherConfig:
+                              additionalProperties:
+                                type: string
+                              description: additional options to inject to other_config
+                                field in the bridge table in OVSDB
+                              type: object
+                          type: object
+                        name:
+                          description: name of the bridge
+                          type: string
+                        uplinks:
+                          description: |-
+                            uplink-level bridge configuration for each uplink(PF).
+                            currently must contain only one element
+                          items:
+                            description: OVSUplinkConfigExt contains configuration
+                              for the concrete OVS uplink(PF)
+                            properties:
+                              interface:
+                                description: configuration from the Interface OVS
+                                  table for the PF
+                                properties:
+                                  externalIDs:
+                                    additionalProperties:
+                                      type: string
+                                    description: external_ids field in the Interface
+                                      table in OVSDB
+                                    type: object
+                                  mtuRequest:
+                                    description: mtu_request field in the Interface
+                                      table in OVSDB
+                                    type: integer
+                                  options:
+                                    additionalProperties:
+                                      type: string
+                                    description: options field in the Interface table
+                                      in OVSDB
+                                    type: object
+                                  otherConfig:
+                                    additionalProperties:
+                                      type: string
+                                    description: other_config field in the Interface
+                                      table in OVSDB
+                                    type: object
+                                  type:
+                                    description: type field in the Interface table
+                                      in OVSDB
+                                    type: string
+                                type: object
+                              name:
+                                description: name of the PF interface
+                                type: string
+                              pciAddress:
+                                description: pci address of the PF
+                                type: string
+                            required:
+                            - pciAddress
+                            type: object
+                          type: array
+                      required:
+                      - name
+                      type: object
+                    type: array
+                type: object
+              interfaces:
+                items:
+                  properties:
+                    Vfs:
+                      items:
+                        properties:
+                          Vlan:
+                            type: integer
+                          assigned:
+                            type: string
+                          deviceID:
+                            type: string
+                          driver:
+                            type: string
+                          guid:
+                            type: string
+                          mac:
+                            type: string
+                          mtu:
+                            type: integer
+                          name:
+                            type: string
+                          pciAddress:
+                            type: string
+                          representorName:
+                            type: string
+                          vdpaType:
+                            type: string
+                          vendor:
+                            type: string
+                          vfID:
+                            type: integer
+                        required:
+                        - pciAddress
+                        - vfID
+                        type: object
+                      type: array
+                    deviceID:
+                      type: string
+                    driver:
+                      type: string
+                    eSwitchMode:
+                      type: string
+                    externallyManaged:
+                      type: boolean
+                    linkAdminState:
+                      type: string
+                    linkSpeed:
+                      type: string
+                    linkType:
+                      type: string
+                    mac:
+                      type: string
+                    mtu:
+                      type: integer
+                    name:
+                      type: string
+                    netFilter:
+                      type: string
+                    numVfs:
+                      type: integer
+                    pciAddress:
+                      type: string
+                    totalvfs:
+                      type: integer
+                    vendor:
+                      type: string
+                  required:
+                  - pciAddress
+                  type: object
+                type: array
+              lastSyncError:
+                type: string
+              syncStatus:
+                type: string
+              system:
+                properties:
+                  rdmaMode:
+                    description: RDMA subsystem. Allowed value "shared", "exclusive".
+                    enum:
+                    - shared
+                    - exclusive
+                    type: string
+                type: object
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: null
+  storedVersions: null
