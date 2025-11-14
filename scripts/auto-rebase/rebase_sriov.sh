@@ -416,7 +416,7 @@ rebase_sriov_to() {
         title "Detected changes to assets/ or last_rebase_sriov.sh"
 
         if ! "${NO_BRANCH}"; then
-            branch="rebase-sriov-${version}"
+            branch="rebase-sriov-$(get_sriov_bundle_version)"
             title "Creating branch ${branch}"
             git branch -D "${branch}" 2>/dev/null || true && git checkout -b "${branch}"
         fi
@@ -426,11 +426,6 @@ rebase_sriov_to() {
         git commit -m "Update SR-IOV for MicroShift"
     else
         title "No changes to assets/ or last_rebase_sriov.sh"
-    fi
-
-    if ! "${KEEP_STAGING}"; then
-        title "Removing staging directory"
-        rm -rf "${STAGING_SRIOV}"
     fi
 }
 
