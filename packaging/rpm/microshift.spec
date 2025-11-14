@@ -577,7 +577,7 @@ systemctl enable --now --quiet openvswitch || true
 
 %post greenboot
 # Make sure that the greenboot-healthcheck service is enabled
-systemctl is-enabled --quiet greenboot-healthcheck || systemctl enable --now --quiet greenboot-healthcheck
+systemctl is-enabled --quiet greenboot-healthcheck || systemctl enable --quiet greenboot-healthcheck
 
 %post multus
 # only for install, not on upgrades
