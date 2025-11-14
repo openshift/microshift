@@ -13,10 +13,6 @@ export PS4='+ $(date "+%T.%N") ${BASH_SOURCE#$HOME/}:$LINENO \011'
 REPOROOT="$(readlink -f "$(dirname "${BASH_SOURCE[0]}")/../..")"
 STAGING_SRIOV="${REPOROOT}/_output/staging/sriov"
 
-FINAL_ROOT="${REPOROOT}/assets/optional/sriov"
-FINAL_DEPLOY="${FINAL_ROOT}/deploy"
-FINAL_CRD="${FINAL_ROOT}/crd"
-
 CSV_FILENAME="sriov-network-operator.clusterserviceversion.yaml"
 CONFIGMAP_FILENAME="supported-nic-ids_v1_configmap.yaml"
 OPERATOR_FILENAME="operator.yaml"
@@ -373,7 +369,7 @@ update_rebase_job_entrypoint_sh() {
 
 update_sriov_manifests() {
     title "Copying manifests"
-    "$REPOROOT/scripts/auto-rebase/handle_assets.py" "./scripts/auto-rebase/assets_sriov.yaml"
+    "${REPOROOT}/scripts/auto-rebase/handle_assets.py" "./scripts/auto-rebase/assets_sriov.yaml"
 }
 
 update_sriov_images() {
