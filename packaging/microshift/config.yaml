@@ -35,11 +35,6 @@ apiServer:
         # to serve from the API server. Allowed values: VersionTLS12, VersionTLS13.
         # Defaults to VersionTLS12.
         minVersion: VersionTLS12
-    featureGates:
-        featureSet: ""
-        customNoUpgrade:
-            enabled: []
-            disabled: []
 debugging:
     # Valid values are: "Normal", "Debug", "Trace", "TraceAll".
     # Defaults to "Normal".
