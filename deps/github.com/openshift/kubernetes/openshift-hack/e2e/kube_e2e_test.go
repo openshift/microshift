@@ -1,7 +1,5 @@
 package e2e
 
-//go:generate go run -mod vendor ./annotate/cmd -- ./annotate/generated/zz_generated.annotations.go
-
 // This file duplicates most of test/e2e/e2e_test.go but limits the included
 // tests (via include.go) to tests that are relevant to openshift.
 
@@ -112,9 +110,6 @@ func TestE2E(t *testing.T) {
 	// In order to properly skip tests, we must add the labels that the OTE external binary supplies to the test name
 	// This will then be used by Ginkgo to skip specific tests
 	oteCmd := exec.Command("k8s-tests-ext", "list", "tests")
-	// We can't have OTE also add annotations to the spec names to map to labels, or they won't match the actual spec names
-	//TODO(sgoeddel): once annotation logic is removed, this can be as well
-	oteCmd.Env = append(oteCmd.Env, "OMIT_ANNOTATIONS=true")
 	oteCmd.Stderr = os.Stderr
 	output, err := oteCmd.Output()
 	if err != nil {
@@ -140,7 +135,7 @@ func TestE2E(t *testing.T) {
 			}
 		} else {
 			// If the name isn't found in the mapping, it is because the test has been disabled via OTE
-			node.AppendText(" [Disabled:missing]")
+			node.AppendText(" [Disabled:removed]")
 		}
 		if strings.Contains(name, "Kubectl client Kubectl prune with applyset should apply and prune objects") {
 			fmt.Printf("Trying to annotate %q\n", name)
