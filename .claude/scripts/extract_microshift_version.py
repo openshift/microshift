@@ -9,8 +9,10 @@ Usage:
     python3 extract_microshift_version.py <prow_url> <scenario>
 
 Arguments:
-    prow_url: The Prow CI job URL (e.g., "https://prow.ci.openshift.org/view/gs/test-platform-results/pr-logs/pull/openshift_microshift/5703/pull-ci-openshift-microshift-release-4.20-e2e-aws-tests-bootc-release-arm/1990417342856695808")
-    scenario: Scenario name (e.g., "el96-lrel@backups")
+    prow_url: The Prow CI job URL
+        e.g.: "https://prow.ci.openshift.org/view/gs/test-platform-results/pr-logs/pull/openshift_microshift/5703/pull-ci-openshift-microshift-main-e2e-aws-tests-bootc-release/1990417342856695808"
+    scenario: Scenario name
+        e.g.: "el96-lrel@backups"
 
 Output:
     JSON object with:
@@ -69,7 +71,7 @@ def fetch_url(url):
     try:
         # Validate URL scheme
         if not url.startswith('https://'):
-            return None, f"Invalid URL scheme. Only HTTPS URLs are supported."
+            return None, "Invalid URL scheme. Only HTTPS URLs are supported."
 
         # Create SSL context that doesn't verify certificates
         ssl_context = ssl.create_default_context()
