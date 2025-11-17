@@ -29,3 +29,16 @@ Remove Entry From Hosts
     ...    sed -i "/${host} # RF test marker/d" ${hostsfile}
     ...    sudo=True    return_rc=True    return_stderr=True    return_stdout=True
     Should Be Equal As Integers    ${rc}    0
+
+Add Entry To Local Hosts
+    [Documentation]    Add new entry to local /etc/hosts
+    [Arguments]    ${ip}    ${host}
+    VAR    ${ttt}=    ${ip}\t${host} # RF test marker\n
+    ${result}=    Run Process    sudo tee -a /etc/hosts    shell=True    stdin=${ttt}
+    Should Be Equal As Integers    ${result.rc}    0
+
+Remove Entry From Local Hosts
+    [Documentation]    Removes entry from local /etc/hosts
+    [Arguments]    ${host}
+    ${result}=    Run Process    sudo sed -i "/${host} # RF test marker/d" /etc/hosts    shell=True
+    Should Be Equal As Integers    ${result.rc}    0

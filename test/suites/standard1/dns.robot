@@ -47,30 +47,16 @@ Resolve Host from Non-Default Hosts File
 
 
 *** Keywords ***
-Wait For DNS Updated With Hostname
-    [Documentation]    Wait for the file to be updated
-    [Arguments]    ${hostname}
-    Wait Until Keyword Succeeds    2m    2s
-    ...    DNS Pod Contain Hosts    ${hostname}
-
-DNS Pod Contain Hosts
-    [Documentation]    Check if the hosts file contains the given hostname
-    [Arguments]    ${hostname}
-
-    # Find the dns-default-.* pod name in openshift-dns namespace, e.g., dns-default-dqp9n
-    ${dns_pod}=    Run With Kubeconfig
-    ...    oc get pod -n openshift-dns -o jsonpath='{.items[*].metadata.name}' | grep '^dns-default-'
-    ${fuse_device}=    Oc Exec    ${dns_pod}    cat ${PODS_HOSTS_FILE}    openshift-dns
-    Should Contain    ${fuse_device}    ${hostname}
-
 Resolve Host From Pod
     [Documentation]    Resolve host from pod
     [Arguments]    ${hostname}
-    Create Hello MicroShift Pod
-    Expose Hello MicroShift
-    Wait For DNS Updated With Hostname    ${hostname}
-    Sleep    5 seconds
-    ${fuse_device}=    Oc Exec    hello-microshift    nslookup ${hostname}    ${NAMESPACE}    /bin/sh
+    Wait Until Keyword Succeeds    40x    2s
+    ...    Router Should Resolve Hostname    ${hostname}
+
+Router Should Resolve Hostname
+    [Documentation]    Check if the router pod resolves the given hostname
+    [Arguments]    ${hostname}
+    ${fuse_device}=    Oc Exec    router-default    nslookup ${hostname}    openshift-ingress    deployment
     Should Contain    ${fuse_device}    Name:    ${hostname}
 
 Setup With Custom Config
@@ -87,8 +73,6 @@ Teardown Hosts File
     [Documentation]    Teardown the hosts file
     [Arguments]    ${hostname}
     Run Keywords
-    ...    Delete Hello MicroShift Pod And Service
-    ...    AND
     ...    Remove Entry From Hosts    ${hostname}
     ...    AND
     ...    Remove Fake IP From NIC    ${FAKE_LISTEN_IP}
