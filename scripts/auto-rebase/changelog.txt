@@ -1,4 +1,11 @@
-- ovn-kubernetes image-arm64 2fe096327a6da6602c509d108ea0ed4a599a7eb3 to 672e10d79b520bee9a715ff07d46702e56ede51b
+- ovn-kubernetes image-amd64 2fe096327a6da6602c509d108ea0ed4a599a7eb3 to 9f04906c9822218d53f51b1e4311f6590eca1db8
+  - 3a524b55 2025-11-07T13:27:01+01:00 Fix cleanup of LRP for deleted pods
+  - 6cd0f090 2025-11-07T13:27:01+01:00 Handle missing pod delete event in EIP controller
+  - 75f0b7e9 2025-11-07T13:27:01+01:00 EgressIP: fix failover and restart stale SNAT/LRP; ensure status sync
+  - 947941b7 2025-11-07T13:27:01+01:00 OVN EIP: fix printing of stale next hops value
+  - 7b12cc64 2025-11-07T13:27:01+01:00 OVN EIP: add UT for syncing next hops for v4/v6
+  - b7d8695b 2025-11-07T13:27:01+01:00 EIP: do not skip generating potential valid next hops if LSP not found
+  - 87005cd4 2025-11-07T13:27:01+01:00 EIP: when checking for stale LRP next hops on startup, restrict to enodes
   - d5490685 2025-11-07T09:07:14+00:00 Reintroduce completed pod check in shouldReleaseDeletedPod
   - b170a2f2 2025-11-07T09:07:14+00:00 kubevirt: test with per-pod SNATs
   - d16ed585 2025-11-07T09:07:14+00:00 kubevirt: test OVN DB after completion of source pod
@@ -7,4 +14,13 @@
   - d077b268 2025-11-07T09:07:13+00:00 kubevirt: fix bad release of IPs of live migratable pods
   - e7bf7330 2025-11-07T09:07:13+00:00 kubevirt e2e: use a value for vm nodeselector
   - bc5438ca 2025-11-07T09:07:13+00:00 Fix naming of "Secondary" to be "User-Defined"
+
+- ovn-kubernetes image-arm64 672e10d79b520bee9a715ff07d46702e56ede51b to 9f04906c9822218d53f51b1e4311f6590eca1db8
+  - 3a524b55 2025-11-07T13:27:01+01:00 Fix cleanup of LRP for deleted pods
+  - 6cd0f090 2025-11-07T13:27:01+01:00 Handle missing pod delete event in EIP controller
+  - 75f0b7e9 2025-11-07T13:27:01+01:00 EgressIP: fix failover and restart stale SNAT/LRP; ensure status sync
+  - 947941b7 2025-11-07T13:27:01+01:00 OVN EIP: fix printing of stale next hops value
+  - 7b12cc64 2025-11-07T13:27:01+01:00 OVN EIP: add UT for syncing next hops for v4/v6
+  - b7d8695b 2025-11-07T13:27:01+01:00 EIP: do not skip generating potential valid next hops if LSP not found
+  - 87005cd4 2025-11-07T13:27:01+01:00 EIP: when checking for stale LRP next hops on startup, restrict to enodes
 
