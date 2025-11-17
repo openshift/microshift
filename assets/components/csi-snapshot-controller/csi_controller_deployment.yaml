@@ -3,6 +3,8 @@ apiVersion: apps/v1
 metadata:
   name: csi-snapshot-controller
   namespace: kube-system
+  labels:
+    hypershift.openshift.io/managed-by: csi-snapshot-controller-operator
 spec:
   serviceName: "csi-snapshot-controller"
   # Replicas for HyperShift. On standalone OCP it will be adjusted according to nr. of master nodes.
