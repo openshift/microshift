@@ -191,6 +191,11 @@ func RunMicroshift(cfg *config.Config) error {
 		return err
 	}
 
+	if err := prerun.FeatureGateLockManagement(cfg); err != nil {
+		writeLogFileError(preRunFailedLogPath, err)
+		return err
+	}
+
 	// TODO: change to only initialize what is strictly necessary for the selected role(s)
 	certChains, err := initCerts(cfg)
 	if err != nil {
