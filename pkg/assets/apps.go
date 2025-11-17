@@ -52,7 +52,10 @@ func (d *dpApplier) Read(objBytes []byte, render RenderFunc, params RenderParams
 }
 
 func (d *dpApplier) Handle(ctx context.Context) error {
-	_, _, err := resourceapply.ApplyDeployment(ctx, d.Client, assetsEventRecorder, d.dp, 0)
+	obj, _, err := resourceapply.ApplyDeployment(ctx, d.Client, assetsEventRecorder, d.dp, 0)
+	if err != nil {
+		klog.Infof("+++PMTK DEBUG: Error applying deployment: %v object: %+v", err, obj)
+	}
 	return err
 }
 
