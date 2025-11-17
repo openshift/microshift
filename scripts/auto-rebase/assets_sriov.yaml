@@ -6,6 +6,8 @@ assets:
         ignore: "Provided by MicroShift"
       - file: release-sriov-x86_64.json
         ignore: "Provided by MicroShift"
+      - file: kustomization.yaml
+        ignore: "Provided by MicroShift"
 
   - dir: optional/sriov/crd/
     src: sriov
