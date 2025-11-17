@@ -1,6 +1,180 @@
-- oc image-arm64 1c5f490b7997ec08b07b0a0cf16a10757622732c to 4d35590b0747f8c6ae009e20243bda0b6c328890
+- api embedded-component d13e8c65d30fe912d63e05e92d60f0b0f856d2de to 50e2ece149d768a1b1eadae3a5f07134dda7b2ce
+  - 0598ae66 2025-11-10T14:17:53-05:00 Added AWS dedicated host support
+  - b69d477b 2025-11-10T11:16:12+00:00 Add test cases for all supported format markers
+  - 727ac5c1 2025-11-05T13:44:12+01:00 add ProvisioningModel to enable gcp spot instances
+  - e84a8a79 2025-11-04T17:41:33+00:00 Add ClusterAPIMachineManagement feature gate
+  - 56368603 2025-11-04T17:34:08+00:00 Add CRDCompatibilityRequirementOperator feature gate
+  - cc4cfe60 2025-11-04T12:44:02+00:00 Update files
+  - e97ad6a8 2025-10-31T18:03:05+00:00 Create global gengo parser for openapi
+  - 0478efd9 2025-10-31T15:12:23+00:00 Shared gengo parser at API group version level
+  - d2453445 2025-10-16T14:53:10+02:00 CONSOLE-4666: ConsolePlugin v1alpha1 removal: Remove deprecated CRD version
+  - 3a83ba57 2025-10-07T14:19:11+02:00 remove oVirt from ClusterCSIDriver API
+
+- cluster-csi-snapshot-controller-operator embedded-component b022cf72ba3b4e982626d6d0b80bd53064bbe6ee to 5ed05a14763717ccd1e3a1073a9e3b59bfe157e0
+  - ef58417 2025-11-06T14:14:35+01:00 Update CRDs from external-snapshotter 8.4.0
+  - 74e5b8e 2025-10-16T18:13:02-07:00 STOR-2523: Add hypershift managed-by labels for `csi-snapshot-controller` operand
+
+- cluster-ingress-operator embedded-component 0cac97af560a68a5f5c0390a529726eb43556d51 to 072c1cd7726d1efc9bc05982ae3fd6022b097f17
+  - 389ab58 2025-11-07T12:05:58-05:00 Enhancement to add operator channel when creating gatewayclass
+
+- cluster-kube-controller-manager-operator embedded-component ffe5113eb88f384981fdeff599f22599e11a9d7c to e1cdb251d9ef7e74265bb7c8884a47cc0803068b
+  - f306823 2025-11-05T12:30:29+01:00 deps: Update library-go to update staticpod pkg
+
+- cluster-openshift-controller-manager-operator embedded-component 8f2a66a7509925c2f1f97f6376d7fadfed0df5c5 to 12b7668d70bdb07d5d05304a7bcaeb6a5cc5ef3b
+  - bbaad74 2025-11-04T15:16:12+01:00 manifests: Use user namespace for the operator
+
+- kubernetes embedded-component 9ca60866127994f08fe5ce2b237ef0f3357986de to 891f5bb0306166d5625b89fc8dc86bbc8c85f549
+  - cd7a7f172 2025-11-06T10:47:49-06:00 UPSTREAM: 133392: add retry to getMetricsFromNode
+  - 118d4c31e 2025-11-06T13:28:41+01:00 UPSTREAM: <drop>: Disable volume group snapshot tests
+  - c84411657 2025-11-04T10:54:15-05:00 UPSTREAM: <carry>: remove annotation framework in favor of environment selectors
+
+- machine-config-operator embedded-component a1ac2178be57bd6ea11cb9e0ecb4019f66c5dc29 to 5c30302c9194aea91f2dec09f5620548809f1a74
+  - 6b1ad295 2025-11-11T09:38:14+00:00 MCO-1911: Use the right naming in migrated test cases
+  - b4d95f08 2025-11-05T15:58:08+00:00 Split extended directory
+  - f3c388b4 2025-11-02T16:14:59-05:00 daemon: update error handling for MCN update in failed image pull case
+  - 859a273e 2025-10-30T14:38:51-04:00 consider UID when determining MOSB existence
+  - c283a8ed 2025-10-30T14:38:51-04:00 adds additional checks to annotation test
+  - 2d84da89 2025-10-30T14:38:51-04:00 speed up e2e-ocl by deleting build pods
+  - 8896b77d 2025-10-30T14:38:51-04:00 install skopeo from source, when missing
+  - 6bb500ee 2025-10-30T14:38:50-04:00 move kernel type test into rollout test
+  - 0d1c2a34 2025-10-30T14:38:50-04:00 e2e test should check for init container status instead of overall pod status
+  - 26751afc 2025-10-30T14:38:50-04:00 check whether the image exists before trying to reuse it for MachineConfigPools
+  - 9e82f368 2025-10-30T14:38:45-04:00 detect if image exists or access is denied
+  - 83606bb0 2025-07-21T10:50:02+02:00 OCPBUGS-59543: Wath openshift-config CMs
+
+- operator-framework-olm embedded-component 2d3fe1047067ae5f26be87d2d0096ecfa4dd6feb to db55b14f1376e5620ccb846a32e18b46a5efa123
+  - ae7681ea 2025-11-12T00:11:37+00:00 Bump github.com/docker/cli (#1830)
+  - f7a2fb12 2025-11-12T00:10:52+00:00 Bump the golang-x-deps group with 2 updates (#1829)
+  - 036c4395 2025-11-12T00:10:37+00:00 Bump github.com/containerd/containerd from 1.7.28 to 1.7.29 (#1828)
+  - 4daf095d 2025-11-12T00:10:22+00:00 Bump github.com/docker/cli (#1827)
+  - 6e54d540 2025-11-12T00:10:06+00:00 Bump github.com/grpc-ecosystem/go-grpc-middleware/v2 from 2.3.2 to 2.3.3 (#1825)
+  - ce3d45c0 2025-11-12T00:09:51+00:00 Bump sigs.k8s.io/controller-runtime in the k8s-dependencies group (#1824)
+  - ca9e6c25 2025-11-12T00:09:34+00:00 bump go version to fix https://pkg.go.dev/vuln/GO-2025-3956 (#1820)
+  - a84a5435 2025-11-12T00:09:16+00:00 Bump github.com/onsi/ginkgo/v2 from 2.27.1 to 2.27.2 (#1823)
+  - ff2378e9 2025-11-12T00:09:01+00:00 Bump actions/upload-artifact from 4 to 5 (#1821)
+  - 7fd007cb 2025-11-12T00:08:44+00:00 Bump github.com/onsi/ginkgo/v2 from 2.26.0 to 2.27.1 (#1819)
+  - 7d996589 2025-11-12T00:08:28+00:00 Bump actions/download-artifact from 5 to 6 (#1822)
+  - 99a078e3 2025-11-12T00:08:13+00:00 add AGENTS.md for LLM agents interfacing with this repository (#1817)
+  - c378896c 2025-11-12T00:07:58+00:00 Bump go.podman.io/common from 0.65.0 to 0.66.0 (#1816)
+  - c5c5b71f 2025-11-12T00:07:38+00:00 Bump the golang-x-deps group across 1 directory with 2 updates (#1818)
+  - 417a7122 2025-11-12T00:07:22+00:00 Bump go.podman.io/image/v5 from 5.37.0 to 5.38.0 (#1815)
+  - 90aaed7f 2025-11-12T00:07:06+00:00 revert channel-scoped semver template expansion to edge-scoped (#1813)
+  - dbdf4770 2025-11-12T00:06:51+00:00 Bump sigs.k8s.io/controller-runtime in the k8s-dependencies group (#1812)
+  - c56d97ab 2025-11-12T00:06:36+00:00 Bump github.com/grpc-ecosystem/grpc-health-probe from 0.4.40 to 0.4.41 (#1811)
+  - 4fcb7156 2025-11-12T00:06:20+00:00 Bump github.com/docker/cli (#1809)
+  - 388d8842 2025-11-12T00:06:05+00:00 Bump google.golang.org/grpc from 1.75.1 to 1.76.0 (#1808)
+  - 161afa0a 2025-11-12T00:05:49+00:00 Bump sigs.k8s.io/controller-runtime in the k8s-dependencies group (#1807)
+  - 4d06c5c4 2025-11-12T00:05:30+00:00 Bump github.com/onsi/ginkgo/v2 from 2.25.3 to 2.26.0 (#1805)
+  - 78241403 2025-11-12T00:05:13+00:00 Bump google.golang.org/protobuf from 1.36.9 to 1.36.10 (#1803)
+  - d54bd319 2025-11-12T00:04:51+00:00 fix: Make cert-manager optional for secured metrics endpoints (#3706)
+  - b6169cb2 2025-11-12T00:04:35+00:00 Upgrade github.com/operator-framework/operator-registry v1.60.0 => v1.61.0 (#3705)
+  - f4417b47 2025-11-12T00:04:11+00:00 :seedling: Bump golang.org/x/sync from 0.17.0 to 0.18.0 (#3704)
+  - 3788cf22 2025-11-08T07:37:43+00:00 Remove no longer required replaces
+  - 3cb424a2 2025-11-08T00:06:15+00:00 bump go version to fix GO-2025-3956 (#455)
+  - 93d83513 2025-11-08T00:05:38+00:00 Bump sigs.k8s.io/controller-runtime in the k8s-dependencies group (#453)
+  - f78ab8da 2025-11-08T00:05:26+00:00 Bump sigs.k8s.io/controller-runtime in the k8s-dependencies group (#452)
+  - e6938ad2 2025-11-08T00:05:11+00:00 Increase test coverage to cover proxy-backed grpc catalogs (#3702)
+  - 64691158 2025-11-08T00:04:57+00:00 :seedling: Bump github.com/containerd/containerd from 1.7.28 to 1.7.29 (#3701)
+  - 284f95ea 2025-11-08T00:04:43+00:00 :seedling: Bump github.com/operator-framework/api from 0.35.0 to 0.36.0 (#3697)
+  - 59314ceb 2025-11-08T00:04:27+00:00 :seedling: Bump github.com/prometheus/common from 0.67.1 to 0.67.2 (#3696)
+  - eb7e1bca 2025-11-08T00:03:58+00:00 :seedling: Bump sigs.k8s.io/controller-runtime (#3695)
+  - 04ebdcce 2025-11-07T15:05:00+08:00 add Label OTP per ERT required
+  - c7d49472 2025-11-07T00:03:34+00:00 fix(grpc): Use passthrough resolver when proxy is detected (#3700)
+  - 7cddac0c 2025-11-05T15:35:23+08:00 continue to migrate cases
+
+- route-controller-manager embedded-component c337cf413bbbfc2154dc1d3c1bf8007ea1edfbc8 to 8a69194a461dc33d2ed67a220bca91d384d34df4
+  - 7a7c000 2025-11-05T12:20:58-03:00 [NE-2186] Add better error message and bool parsing
+  - faa78e5 2025-10-22T10:26:55-03:00 [NE-2186] Add event recording test
+  - 82ac109 2025-10-22T10:11:54-03:00 [NE-2186] Fix reviews on shouldPropagateLabelsToRoute
+  - 0f46372 2025-10-22T09:46:06-03:00 [NE-2186] Emit event on invalid annotation value
+  - 7a4ded7 2025-10-22T09:45:51-03:00 [NE-2186] Add a test case on deleting labels from route
+  - 260b747 2025-10-22T09:45:49-03:00 [NE-2186] Structure patch to be applied
+  - 7d91acb 2025-10-16T10:01:35-03:00 [NE-2186] Propagate ingress labels to routes
+
+- service-ca-operator embedded-component 87df21ba56cebef9c3ead023ceb8a5b5e4e277d6 to c5e7cf4a92ca76778c20defc14a823e097d0f15d
+  - c36699d 2025-11-07T09:42:37+01:00 controller deployment: Use user namespace
+  - 7f239cc 2025-11-04T14:47:21+01:00 manifests: Use user namespace for the deployment
+
+- oc image-amd64 1c5f490b7997ec08b07b0a0cf16a10757622732c to 0c09391d89b24f45dc606eee749e67d9b52c9f70
+  - 49b0706e 2025-11-12T11:09:06+01:00 fix(must-gather): do not set node affinity if nodename is set
   - 6c04d0a2 2025-10-27T10:06:04+01:00 Increase Node ISO creation timeout from 15 to 30 minutes
 
-- service-ca-operator image-arm64 604991eb2172a8a3c4951af8c776c4f845c99ac6 to c5e7cf4a92ca76778c20defc14a823e097d0f15d
+- ovn-kubernetes image-amd64 f16540770027ce1480bce084b5b916c07677df82 to 07964833fe982d95f6376b7877b0e69279060f82
+  - d5e643cb 2025-10-29T12:30:09-04:00 Remove NetworkSegmentation + non-IC lane
+  - b66a1d5c 2025-10-29T04:23:45+01:00 TunnelKey static allocator details
+  - 6cbe251d 2025-10-29T03:56:02+01:00 Add connecting UDNs OKEP
+  - 4b944aa3 2025-10-29T03:55:56+01:00 Add images for the enhancement
+  - e284143f 2025-10-20T10:34:19-07:00 test: improve error checks in Zone Interconnect Operations test case
+  - fb00cbc3 2025-10-17T17:26:32+02:00 [mockery] Document make mocskgen as the way to generate mocks
+
+- kubernetes image-amd64 9ca60866127994f08fe5ce2b237ef0f3357986de to 891f5bb0306166d5625b89fc8dc86bbc8c85f549
+  - cd7a7f172 2025-11-06T10:47:49-06:00 UPSTREAM: 133392: add retry to getMetricsFromNode
+  - 118d4c31e 2025-11-06T13:28:41+01:00 UPSTREAM: <drop>: Disable volume group snapshot tests
+  - c84411657 2025-11-04T10:54:15-05:00 UPSTREAM: <carry>: remove annotation framework in favor of environment selectors
+
+- service-ca-operator image-amd64 87df21ba56cebef9c3ead023ceb8a5b5e4e277d6 to c5e7cf4a92ca76778c20defc14a823e097d0f15d
+  - c36699d 2025-11-07T09:42:37+01:00 controller deployment: Use user namespace
   - 7f239cc 2025-11-04T14:47:21+01:00 manifests: Use user namespace for the deployment
+
+- oc image-arm64 4d35590b0747f8c6ae009e20243bda0b6c328890 to 0c09391d89b24f45dc606eee749e67d9b52c9f70
+  - 49b0706e 2025-11-12T11:09:06+01:00 fix(must-gather): do not set node affinity if nodename is set
+
+- csi-external-snapshotter image-arm64 15313fb28f5c42e4b896928478652768225692a6 to 9098db0e434e0d986eeadd2ebe69119540a550d1
+  - 581c458 2025-11-10T13:46:26+01:00 UPSTREAM: <carry>: Add OpenShift files
+  - ff86d39 2025-10-23T11:23:04-04:00 Add changelog for v8.4
+  - 2573990 2025-10-22T13:34:27-04:00 Update CSI spec to 1.12
+  - b3dcf6b 2025-10-21T20:54:34-07:00 Squashed 'release-tools/' changes from 5f38a9075..74502e544
+  - 0d9a187 2025-10-21T11:41:09+02:00 Add CEL test cases
+  - 5af2237 2025-10-14T15:01:03+02:00 Enforce immutability of VolumeGroupSnapshotContentSpec once set
+  - 3107987 2025-10-14T13:58:01+02:00 feat: use controller-gen deprecatedversion marker
+  - 6f22bc3 2025-10-08T10:52:03+02:00 fix: remove unused help functions
+  - 119cfa7 2025-10-08T09:04:45+02:00 Address API review comments
+  - 5521566 2025-09-25T13:45:26+00:00 Bump actions/checkout from 4 to 5
+  - 84447be 2025-09-25T11:49:24+00:00 Bump actions/setup-go from 5 to 6
+  - ce8ac62 2025-09-05T12:02:52-06:00 Replace diff.ObjectDiff (removed) with cmp.Diff
+  - 3a84f71 2025-09-04T15:47:38-06:00 Bump toolchain to go1.24.6 in go.mod
+  - 604a9ae 2025-09-04T15:14:37-06:00 Bump k8s dependencies to v1.34.0
+  - e0348f9 2025-09-04T15:07:46-06:00 Squashed 'release-tools/' changes from 0a435bf98..5f38a9075
+  - 389d076 2025-09-03T11:28:10+02:00 Add FG for restarting external-snapshotter faster by releasing leader election lease on sigterm
+  - 7935bd4 2025-09-01T10:25:06+02:00 go get k8s.io/apiserver/pkg/server@v0.33.2 && go mod tidy && go mod vendor
+  - 3dd71b2 2025-08-27T21:48:33+02:00 Clarify API comments
+  - d32f6e9 2025-08-27T09:37:33+00:00 test: fix CVE-2025-47907 error in trivy action
+  - 1c9ffa5 2025-08-12T11:00:43+02:00 Remove reference to banzaicloud/admission-webhook-example
+  - 7cf9ba0 2025-08-08T13:27:21+02:00 Update CEL tests
+  - 4870d73 2025-08-08T13:20:40+02:00 Conversion webhook review
+  - ba5e7fa 2025-08-06T10:08:45+02:00 Drop support for v1beta1 ConversionReview requests
+  - 6815d03 2025-08-06T09:15:32+02:00 Remove stale validation webhook documentation, add paragraph about the conversion webhook
+  - 9ad300a 2025-08-05T15:20:59+02:00 Conversion webhook review
+  - d1f9f39 2025-08-05T14:09:33+02:00 Rename snapshot-webhook to snapshot-conversion-webhook
+  - c0c4750 2025-07-29T08:59:29+02:00 Conversion webhook
+  - c0e647a 2025-07-28T22:41:20+02:00 Set new fields in VolumeGroupSnapshotContent objects
+  - faf832b 2025-07-28T22:41:20+02:00 Use v1beta2 VolumeGroupSnapshot API instead of v1beta1
+  - 67d2939 2025-07-28T22:40:11+02:00 Enable conversion webhook on CRDs
+  - 2c24dc7 2025-07-28T17:38:19+02:00 Introduce v1beta2 VolumeGroupSnapshot API
+
+- ovn-kubernetes image-arm64 07964833fe982d95f6376b7877b0e69279060f82 to 9a9b8929d7040ab7d8cf574c48c96d58991bf6f6
+  - cfbc62e0 2025-11-06T14:16:47-05:00 Register EF with a network event handler
+  - 4c602aae 2025-11-06T13:50:30-05:00 Add ability in NetworkManager to register callbacks
+  - e18e1d20 2025-11-06T13:08:02+01:00 add lint target to run golanci natively
+  - 42668512 2025-11-05T18:56:24-05:00 Use a syncmap to store a cache of configured egress firewall
+  - 1122cdea 2025-11-05T18:56:24-05:00 Remove stale unit test
+  - ddf5a9d6 2025-11-05T18:56:24-05:00 Enable cluster exclusion for UDN with egress firewall
+  - 7def2dca 2025-11-05T18:56:24-05:00 Adds E2E test to make sure Egress FW works with UDN
+  - ecabc89d 2025-11-05T18:56:20-05:00 Refactor egress firewall into its own controller
+  - 16dedd15 2025-11-05T18:43:55+01:00 Fix cleanup of LRP for deleted pods
+  - 8975b00e 2025-11-05T18:43:55+01:00 Handle missing pod delete event in EIP controller
+  - 0a004f3b 2025-11-05T17:09:33+01:00 Status manager: add startup cleanup for ANP/BANP
+  - 5597bf8d 2025-11-05T16:54:09+01:00 Status manager: add startup cleanup for stale managedFields
+  - d9ae8733 2025-11-05T14:44:08+01:00 Status manager: fix cleanup for EgressQoS and NetworkQoS
+  - e3863d93 2025-11-05T12:21:42+01:00 Status manager: remove managedFields upon node deletion
+  - e3d9429b 2025-11-04T14:33:21-08:00 VF backed management port for primary udn
+  - 0284deaf 2025-11-04T13:26:22-08:00 provide uitity functions for management port creation/deletion
+  - 46c59ce7 2025-11-04T16:16:06+01:00 NetPol: Add more unit test coverage
+  - a75d853f 2025-11-04T16:16:06+01:00 MultiNetPol: Add more unit test coverage
+  - 8af6338b 2025-11-03T13:51:14+01:00 Bump OVN to 25.09.
+  - 460c8b19 2025-11-02T15:28:22+01:00 fix: add nil checks for probe interval fields for OVN 24.09 compatibility
+  - d24c6de8 2025-11-02T15:28:08+01:00 refactor: decouple OVN metrics from Kubernetes dependencies
+  - c4ec4752 2025-11-02T15:09:17+01:00 refactor: make OVN/OVS paths configurable via CLI and config file
+  - 1b3b3f6f 2025-10-27T16:21:23-07:00 no nft/ipt operation on dpu node
+  - b8e28eb4 2025-10-23T13:51:49+02:00 [okep] Add note on local-port tunnel keys.
 
