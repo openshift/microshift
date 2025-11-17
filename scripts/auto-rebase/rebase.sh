@@ -232,8 +232,15 @@ replace_using_component_commit() {
         # edit and tidy commands, allow errors. A final tidy runs without -e to ensure all dependencies
         # are ok.
         go mod tidy -e
-        pseudoversion=$(grep_pseudoversion "$(get_replace_directive "$(pwd)/go.mod" "${modulepath}")")
-        pseudoversions["${component}"]="${pseudoversion}"
+
+        if [[ "${modulepath}" =~ ^go.etcd.io/etcd/ ]]; then
+            # For some reason, pseudo-version created for one etcd package might not be working with another, despite being in the same repository.
+            # So for etcd, don't cache the pseudo-version.
+            :
+        else
+            pseudoversion=$(grep_pseudoversion "$(get_replace_directive "$(pwd)/go.mod" "${modulepath}")")
+            pseudoversions["${component}"]="${pseudoversion}"
+        fi
     fi
 }
 
