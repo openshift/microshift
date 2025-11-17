@@ -1,30 +1,51 @@
-- cluster-kube-apiserver-operator embedded-component 263f18b6c9eb82e4aabf586093b2cc711e674e77 to a3414ab9e446c5511cc8bc1011a859ecfcf5c610
-  - 73738df 2025-11-10T15:09:47-05:00 bump library-go
+- api embedded-component 41627d81e9c18fbcc3f7ff6de2ba50e0b98435c4 to 1886180ef4300f41168c2d498e0acecd02fa2a48
+  - b63356e5 2025-11-10T08:11:28+00:00 payload-command: remove authentication CR from hypershift payload
+  - 88a5beb6 2025-10-02T14:03:34+02:00 promote BYO OIDC features
 
-- cluster-network-operator embedded-component b0393aa3e67302d89e91b8f7b1013b6d2e317f04 to 1666a71c205071b6d44bfa57c0ebd3f0054fa1cd
-  - 3acdce7 2025-10-23T09:42:56+00:00 api, l2udn: subnets must be masked
+- machine-config-operator embedded-component 0c58628362f7471071da6d0263fa65766691f28c to 1f11aef23bd1a7d89fba38480451e2404e00f3a3
+  - 716253bd 2025-11-13T08:54:48-05:00 remove check for conflicting ClusterImagePolicy in syncUpgradeableStatus
+  - 1d87d4d6 2025-11-11T17:16:10-05:00 consider UID when determining MOSB existence
+  - 71b2a93a 2025-11-11T17:16:10-05:00 adds additional checks to annotation test
+  - 8087d190 2025-11-11T17:16:10-05:00 speed up e2e-ocl by deleting build pods
+  - bf110c42 2025-11-11T17:16:10-05:00 install skopeo from source, when missing
+  - a8836dfc 2025-11-11T17:16:10-05:00 move kernel type test into rollout test
+  - d68415fb 2025-11-11T17:16:09-05:00 e2e test should check for init container status instead of overall pod status
+  - faff3862 2025-11-11T17:16:09-05:00 check whether the image exists before trying to reuse it for MachineConfigPools
+  - 377bd216 2025-11-11T17:16:03-05:00 detect if image exists or access is denied
+  - 87bdf1fe 2025-11-07T12:08:34-05:00 Implement upgrade blocking for conflicting ClusterImagePolicy named "openshift"
+  - 4e665d9f 2025-11-07T11:24:53+05:30 units: add delays to TestOSBuildController
 
-- machine-config-operator embedded-component b9dbf396412a463e6828332ce28a2ff514424e9e to 0c58628362f7471071da6d0263fa65766691f28c
-  - bab06221 2025-10-21T10:39:08-04:00 node controller & upgrade monitor: move MCN desired config spec update to node controller to align with annotation setting timing
+- oc image-amd64 0581d703b56b153b941022bca4ce3c34de576f3c to 0808e14637d72c01a3cb50e41617576836e84524
+  - ee2ffd6b 2025-11-12T14:05:01+00:00 fix(must-gather): do not set node affinity if nodename is set
 
-- operator-framework-olm embedded-component 10d327b38876b2fbc654ddc54eee6199ea0dbbb8 to dd6d22bd02554c039e7bbec4bf39c6e97ebf0b9b
-  - b42b1b38 2025-11-07T11:17:30+08:00 Fix TOCTOU race condition in ensureInstallPlan (#3682)
+- ovn-kubernetes image-amd64 c7e12ae3e00d8fdc6744815370e450bcc68c0dac to 798404b42c0fd11b62973803dbc53810fd4f7fee
+  - f4e2c179 2025-11-07T13:01:19+01:00 Fix cleanup of LRP for deleted pods
+  - b8303a2a 2025-11-07T13:01:08+01:00 Handle missing pod delete event in EIP controller
+  - 7060af6c 2025-11-07T12:59:46+01:00 EgressIP: fix failover and restart stale SNAT/LRP; ensure status sync
+  - c337b162 2025-11-07T12:59:46+01:00 OVN EIP: fix printing of stale next hops value
+  - 562c7495 2025-11-07T12:59:46+01:00 OVN EIP: add UT for syncing next hops for v4/v6
+  - 6f6edf31 2025-11-07T12:59:46+01:00 EIP: do not skip generating potential valid next hops if LSP not found
+  - 688885f1 2025-11-07T12:59:46+01:00 EIP: when checking for stale LRP next hops on startup, restrict to enodes
+  - a3a48276 2025-11-05T19:33:25+01:00 E2E service: Add test for named port handling with ETP=Local services
+  - b2b17a22 2025-11-05T19:32:14+01:00 E2E service: Fix potential flake in conn to an ext IP using src port
+  - 87b946bf 2025-11-05T19:32:14+01:00 E2E service: Move checkNumberOf.. to util.go
+  - 9bab81f3 2025-11-05T19:32:14+01:00 Extends unit test coverage for named port handling in ETP local
+  - 8c50a8dc 2025-11-05T19:32:11+01:00 Fix named port handling in externalTrafficPolicy Local services
 
-- oc image-amd64 7f1d6f88cb0c8ed5c877fc0ae2bd99298c6339f2 to 0581d703b56b153b941022bca4ce3c34de576f3c
-  - b3e36f6a 2025-11-07T11:36:25+00:00 Rely on overall available disk space of the mounted volume
-  - eb72a67c 2025-11-07T05:55:07+00:00 oc adm must-gather: Wrap gather in a session
+- oc image-arm64 0581d703b56b153b941022bca4ce3c34de576f3c to 0808e14637d72c01a3cb50e41617576836e84524
+  - ee2ffd6b 2025-11-12T14:05:01+00:00 fix(must-gather): do not set node affinity if nodename is set
 
-- ovn-kubernetes image-amd64 8a02fda7f45172bf487a0c613cf47caaf1116d36 to c7e12ae3e00d8fdc6744815370e450bcc68c0dac
-  - 6d5a5c44 2025-11-05T15:29:41+05:30 MultiNetPol: Process update only when spec fields and/or related annotations are updated
-  - 54115325 2025-11-05T15:27:58+05:30 NetPol: Process update only when spec fields and/or related annotation are updated
-  - f8ad9567 2025-10-30T13:48:08-04:00 udn host->ovn flows needs to be vlan aware
-  - 53338510 2025-10-30T13:48:08-04:00 make primary UDN node mode aware
-
-- oc image-arm64 7f1d6f88cb0c8ed5c877fc0ae2bd99298c6339f2 to 0581d703b56b153b941022bca4ce3c34de576f3c
-  - b3e36f6a 2025-11-07T11:36:25+00:00 Rely on overall available disk space of the mounted volume
-  - eb72a67c 2025-11-07T05:55:07+00:00 oc adm must-gather: Wrap gather in a session
-
-- ovn-kubernetes image-arm64 7f3be35e75d93743f3af6c028774f850759a561e to c7e12ae3e00d8fdc6744815370e450bcc68c0dac
-  - 6d5a5c44 2025-11-05T15:29:41+05:30 MultiNetPol: Process update only when spec fields and/or related annotations are updated
-  - 54115325 2025-11-05T15:27:58+05:30 NetPol: Process update only when spec fields and/or related annotation are updated
+- ovn-kubernetes image-arm64 c7e12ae3e00d8fdc6744815370e450bcc68c0dac to 798404b42c0fd11b62973803dbc53810fd4f7fee
+  - f4e2c179 2025-11-07T13:01:19+01:00 Fix cleanup of LRP for deleted pods
+  - b8303a2a 2025-11-07T13:01:08+01:00 Handle missing pod delete event in EIP controller
+  - 7060af6c 2025-11-07T12:59:46+01:00 EgressIP: fix failover and restart stale SNAT/LRP; ensure status sync
+  - c337b162 2025-11-07T12:59:46+01:00 OVN EIP: fix printing of stale next hops value
+  - 562c7495 2025-11-07T12:59:46+01:00 OVN EIP: add UT for syncing next hops for v4/v6
+  - 6f6edf31 2025-11-07T12:59:46+01:00 EIP: do not skip generating potential valid next hops if LSP not found
+  - 688885f1 2025-11-07T12:59:46+01:00 EIP: when checking for stale LRP next hops on startup, restrict to enodes
+  - a3a48276 2025-11-05T19:33:25+01:00 E2E service: Add test for named port handling with ETP=Local services
+  - b2b17a22 2025-11-05T19:32:14+01:00 E2E service: Fix potential flake in conn to an ext IP using src port
+  - 87b946bf 2025-11-05T19:32:14+01:00 E2E service: Move checkNumberOf.. to util.go
+  - 9bab81f3 2025-11-05T19:32:14+01:00 Extends unit test coverage for named port handling in ETP local
+  - 8c50a8dc 2025-11-05T19:32:11+01:00 Fix named port handling in externalTrafficPolicy Local services
 
