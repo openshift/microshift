@@ -193,6 +193,10 @@ func (fg *FeatureGates) validateFeatureGates() error {
 	if fg.FeatureSet != FeatureSetCustomNoUpgrade && (len(fg.CustomNoUpgrade.Enabled) > 0 || len(fg.CustomNoUpgrade.Disabled) > 0) {
 		return fmt.Errorf("CustomNoUpgrade must be empty when FeatureSet is empty")
 	}
+	// Must set CustomNoUpgrade enabled or disabled lists when FeatureSet is CustomNoUpgrade
+	if fg.FeatureSet == FeatureSetCustomNoUpgrade && len(fg.CustomNoUpgrade.Enabled) == 0 && len(fg.CustomNoUpgrade.Disabled) == 0 {
+		return fmt.Errorf("CustomNoUpgrade enabled or disabled lists must be set when FeatureSet is CustomNoUpgrade")
+	}
 	// Must not have any feature gates that are enabled and disabled at the same time
 	var illegalFeatures []string
 	for _, enabledFeature := range fg.CustomNoUpgrade.Enabled {
