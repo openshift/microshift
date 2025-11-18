@@ -2,7 +2,7 @@
 
 # Sourced from scenario.sh and uses functions defined there.
 
-start_image="rhel-9.6-microshift-brew-4.${MINOR_VERSION}-${LATEST_RELEASE_TYPE}"
+start_image="rhel-9.6-microshift-brew-optionals-4.${MINOR_VERSION}-${LATEST_RELEASE_TYPE}"
 
 scenario_create_vms() {
     if ! does_commit_exist "${start_image}"; then

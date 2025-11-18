@@ -29,5 +29,8 @@ scenario_run_tests() {
         return 0
     fi
 
+    # Wait for MicroShift to be ready
+    wait_for_microshift_to_be_ready host1
+
     run_ginkgo_tests host1 "~Disruptive"
 }
