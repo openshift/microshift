@@ -46,6 +46,7 @@ action_start() {
     echo "Starting Loki container ${container_name} on host port ${host_port}"
     podman run -d --rm --name "${container_name}" \
         -p "${host_port}:3100" \
+        --user root \
         docker.io/grafana/loki > /dev/null
 }
 
