@@ -98,7 +98,7 @@ brew_curl_download() {
     local pkg_release="${version_and_release#*-}"
 
     for current_arch in ${arch} noarch; do
-        local base_url="https://download-01.beak-001.prod.iad2.dc.redhat.com/rhel-9/brew/packages/microshift/${pkg_version}/${pkg_release}/${current_arch}/"
+        local base_url="http://download.devel.redhat.com/rhel-9/brew/packages/microshift/${pkg_version}/${pkg_release}/${current_arch}/"
 
         local rpm_files
         rpm_files=$(curl -k -s "${base_url}" | sed -n 's/.*href="\([^"]*\.rpm\)".*/\1/p') || true
@@ -110,7 +110,7 @@ brew_curl_download() {
         echo "Downloading from: ${base_url}"
         for rpm_file in ${rpm_files}; do
             echo "Downloading: ${rpm_file}"
-            if ! curl -k -s -O "${base_url}${rpm_file}"; then
+            if ! curl -s -O "${base_url}${rpm_file}"; then
                 echo "ERROR: Failed to download ${rpm_file}"
                 return 1
             fi
