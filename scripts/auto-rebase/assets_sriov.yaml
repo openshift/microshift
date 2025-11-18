@@ -1,0 +1,34 @@
+assets:
+  - dir: optional/sriov/
+    no_clean: True
+    files:
+      - file: release-sriov-aarch64.json
+        ignore: "Provided by MicroShift"
+      - file: release-sriov-x86_64.json
+        ignore: "Provided by MicroShift"
+      - file: kustomization.yaml
+        ignore: "Provided by MicroShift"
+
+  - dir: optional/sriov/crd/
+    src: sriov
+    files:
+      - file: sriovnetwork.openshift.io_ovsnetworks.yaml
+      - file: sriovnetwork.openshift.io_sriovibnetworks.yaml
+      - file: sriovnetwork.openshift.io_sriovnetworknodepolicies.yaml
+      - file: sriovnetwork.openshift.io_sriovnetworknodestates.yaml
+      - file: sriovnetwork.openshift.io_sriovnetworkpoolconfigs.yaml
+      - file: sriovnetwork.openshift.io_sriovnetworks.yaml
+      - file: sriovnetwork.openshift.io_sriovoperatorconfigs.yaml
+
+  - dir: optional/sriov/deploy/
+    src: sriov
+    files:
+      - file: clusterrolebinding.yaml
+      - file: clusterrole.yaml
+      - file: namespace.yaml
+      - file: operator.yaml
+      - file: role.yaml
+      - file: rolebinding.yaml
+      - file: serviceaccount.yaml
+      - file: sriovoperatorconfig.yaml
+      - file: supported-nic-ids_v1_configmap.yaml

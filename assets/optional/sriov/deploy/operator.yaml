@@ -1,0 +1,110 @@
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: sriov-network-operator
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        openshift.io/required-scc: restricted-v2
+        target.workload.openshift.io/management: '{"effect": "PreferredDuringScheduling"}'
+      labels:
+        name: sriov-network-operator
+    spec:
+      containers:
+        - command:
+            - sriov-network-operator
+          env:
+            - name: WATCH_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.annotations['olm.targetNamespaces']
+            - name: SRIOV_CNI_IMAGE
+              value: registry.redhat.io/openshift4/sriov-cni-rhel9@sha256:df980a59a7c2b522c489b848987055697efe5ff9adfa6d280c245b05eca86df0
+            - name: SRIOV_DEVICE_PLUGIN_IMAGE
+              value: registry.redhat.io/openshift4/ose-sriov-network-device-plugin-rhel9@sha256:6b0bab13ff2c5152ce8730ab5d166d259aceb1319b5ec883706fb604b8744e74
+            - name: NETWORK_RESOURCES_INJECTOR_IMAGE
+              value: registry.redhat.io/openshift4/ose-sriov-dp-admission-controller-rhel9@sha256:523b049f9a55f15bf3bc683c06eda78e955dd4500d3edc15d99c66170f5c0d4c
+            - name: OPERATOR_NAME
+              value: sriov-network-operator
+            - name: SRIOV_NETWORK_CONFIG_DAEMON_IMAGE
+              value: registry.redhat.io/openshift4/ose-sriov-network-config-daemon-rhel9@sha256:0cb0fdba5d99facde4cf0c7bb2b02e6d856a731c202dc26a4acae7469131bef5
+            - name: SRIOV_NETWORK_WEBHOOK_IMAGE
+              value: registry.redhat.io/openshift4/ose-sriov-network-webhook-rhel9@sha256:958f080590fff38909f309860f7387b7a5ee2b8de3a1c8d1a375f68fb5c0c350
+            - name: SRIOV_INFINIBAND_CNI_IMAGE
+              value: registry.redhat.io/openshift4/ose-sriov-infiniband-cni-rhel9@sha256:1d2afb78f381c55033ac92dce43f26767433e9f965b57f81b9d5d36c106cbf4e
+            - name: RDMA_CNI_IMAGE
+              value: registry.redhat.io/openshift4/ose-sriov-rdma-cni-rhel9@sha256:5b49ca4846aa187bb292c1b043975c5c4f821adccad243c1317b7b195ebd0f12
+            - name: RESOURCE_PREFIX
+              value: openshift.io
+            - name: ADMISSION_CONTROLLERS_ENABLED
+              value: 'false'
+            - name: ADMISSION_CONTROLLERS_CERTIFICATES_OPERATOR_SECRET_NAME
+              value: operator-webhook-service
+            - name: ADMISSION_CONTROLLERS_CERTIFICATES_INJECTOR_SECRET_NAME
+              value: network-resources-injector-secret
+            - name: METRICS_EXPORTER_IMAGE
+              value: registry.redhat.io/openshift4/ose-sriov-network-metrics-exporter-rhel9@sha256:4754024aba1f91186e0b2948c6e7354a2904f58b5b328d4b66396b2488b35ae3
+            - name: METRICS_EXPORTER_KUBE_RBAC_PROXY_IMAGE
+              value: registry.redhat.io/openshift4/ose-kube-rbac-proxy-rhel9@sha256:fdfc454254a63d317a01a4689e1856df23fd40b5dc955bd7ef65574817e874a7
+            - name: METRICS_EXPORTER_SECRET_NAME
+              value: metrics-exporter-cert
+            - name: METRICS_EXPORTER_PROMETHEUS_OPERATOR_ENABLED
+              value: 'false'
+            - name: METRICS_EXPORTER_PROMETHEUS_DEPLOY_RULES
+              value: 'true'
+            - name: METRICS_EXPORTER_PROMETHEUS_OPERATOR_NAMESPACE
+              value: openshift-monitoring
+            - name: METRICS_EXPORTER_PROMETHEUS_OPERATOR_SERVICE_ACCOUNT
+              value: prometheus-k8s
+            - name: METRICS_EXPORTER_PORT
+              value: '9110'
+            - name: NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: RELEASE_VERSION
+              value: 4.20.0
+            - name: CLUSTER_TYPE
+              value: kubernetes
+          image: registry.redhat.io/openshift4/ose-sriov-network-rhel9-operator@sha256:5ac9b3127d3399051a84fc89796cd3c191c3a2982db2975962a82ff8b2fc205f
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8081
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          name: sriov-network-operator
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: 8081
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          resources: {}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+      nodeSelector:
+        node-role.kubernetes.io/master: ''
+      serviceAccountName: sriov-network-operator
+      tolerations:
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/master
+          operator: Exists
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sriov-network-operator
+  namespace: sriov-network-operator
