@@ -66,11 +66,11 @@ get_auth() {
 # append_if_exists() checks if the target file is non-empty, and if so, appends
 # "---" to it, so another manifest can be included in the same file
 append_if_exists() {
-  local target="$1"
+    local target="$1"
 
-  if [[ -s "${target}" ]]; then
-    echo "---" >> "${target}"
-  fi
+    if [[ -s "${target}" ]]; then
+        echo "---" >> "${target}"
+    fi
 }
 
 download_sriov_bundle_manifests() {
@@ -96,86 +96,86 @@ download_sriov_bundle_manifests() {
 # by extract_sriov_manifests().
 # shellcheck disable=SC2207
 extract_sriov_rbac_from_cluster_service_version() {
-  local dest="$1"
-  local csv="$2"
-  local namespace="$3"
+    local dest="$1"
+    local csv="$2"
+    local namespace="$3"
 
-  title "extracting sriov clusterserviceversion.yaml into separate RBAC"
+    title "extracting sriov clusterserviceversion.yaml into separate RBAC"
 
-  local clusterPermissions=($(yq eval '.spec.install.spec.clusterPermissions[].serviceAccountName' < "${csv}"))
-  for service_account_name in "${clusterPermissions[@]}"; do
-    echo "extracting bundle .spec.install.spec.clusterPermissions by serviceAccountName ${service_account_name}"
+    local clusterPermissions=($(yq eval '.spec.install.spec.clusterPermissions[].serviceAccountName' < "${csv}"))
+    for service_account_name in "${clusterPermissions[@]}"; do
+        echo "extracting bundle .spec.install.spec.clusterPermissions by serviceAccountName ${service_account_name}"
 
-    local clusterrole="${dest}/clusterrole.yaml"
-    echo "generating ${clusterrole}"
-    extract_sriov_clusterrole_from_csv_by_service_account_name "${service_account_name}" "${csv}" "${clusterrole}"
+        local clusterrole="${dest}/clusterrole.yaml"
+        echo "generating ${clusterrole}"
+        extract_sriov_clusterrole_from_csv_by_service_account_name "${service_account_name}" "${csv}" "${clusterrole}"
 
-    local clusterrolebinding="${dest}/clusterrolebinding.yaml"
-    echo "generating ${clusterrolebinding}"
-    extract_sriov_clusterrolebinding_from_csv_by_service_account_name "${service_account_name}" "${namespace}" "${clusterrolebinding}"
+        local clusterrolebinding="${dest}/clusterrolebinding.yaml"
+        echo "generating ${clusterrolebinding}"
+        extract_sriov_clusterrolebinding_from_csv_by_service_account_name "${service_account_name}" "${namespace}" "${clusterrolebinding}"
 
-    local service_account="${dest}/serviceaccount.yaml"
-    echo "generating ${service_account}"
-    extract_sriov_service_account_from_csv_by_service_account_name "${service_account_name}" "${namespace}" "${service_account}"
-  done
+        local service_account="${dest}/serviceaccount.yaml"
+        echo "generating ${service_account}"
+        extract_sriov_service_account_from_csv_by_service_account_name "${service_account_name}" "${namespace}" "${service_account}"
+    done
 
-  local permissions=($(yq eval '.spec.install.spec.permissions[].serviceAccountName' < "${csv}"))
-  for service_account_name in "${permissions[@]}"; do
-    echo "extracting bundle .spec.install.spec.permissions by serviceAccountName ${service_account_name}"
+    local permissions=($(yq eval '.spec.install.spec.permissions[].serviceAccountName' < "${csv}"))
+    for service_account_name in "${permissions[@]}"; do
+        echo "extracting bundle .spec.install.spec.permissions by serviceAccountName ${service_account_name}"
 
-    local role="${dest}/role.yaml"
-    echo "generating ${role}"
-    extract_sriov_role_from_csv_by_service_account_name "${service_account_name}" "${namespace}" "${csv}" "${role}"
+        local role="${dest}/role.yaml"
+        echo "generating ${role}"
+        extract_sriov_role_from_csv_by_service_account_name "${service_account_name}" "${namespace}" "${csv}" "${role}"
 
-    local rolebinding="${dest}/rolebinding.yaml"
-    echo "generating ${rolebinding}"
-    extract_sriov_rolebinding_from_csv_by_service_account_name "${service_account_name}" "${namespace}" "${rolebinding}"
-  done
+        local rolebinding="${dest}/rolebinding.yaml"
+        echo "generating ${rolebinding}"
+        extract_sriov_rolebinding_from_csv_by_service_account_name "${service_account_name}" "${namespace}" "${rolebinding}"
+    done
 }
 
 extract_sriov_clusterrole_from_csv_by_service_account_name() {
-  local service_account_name="$1"
-  local csv="$2"
-  local target="$3"
+    local service_account_name="$1"
+    local csv="$2"
+    local target="$3"
 
-  append_if_exists "${target}"
+    append_if_exists "${target}"
 
-  yq eval "
-    .spec.install.spec.clusterPermissions[] |
-    select(.serviceAccountName == \"${service_account_name}\") |
-    .apiVersion = \"rbac.authorization.k8s.io/v1\" |
-    .kind = \"ClusterRole\" |
-    .metadata.name = \"${service_account_name}\" |
-    del(.serviceAccountName)
-    " "${csv}" >> "${target}"
+    yq eval "
+        .spec.install.spec.clusterPermissions[] |
+        select(.serviceAccountName == \"${service_account_name}\") |
+        .apiVersion = \"rbac.authorization.k8s.io/v1\" |
+        .kind = \"ClusterRole\" |
+        .metadata.name = \"${service_account_name}\" |
+        del(.serviceAccountName)
+        " "${csv}" >> "${target}"
 }
 
 extract_sriov_role_from_csv_by_service_account_name() {
-  local service_account_name="$1"
-  local namespace="$2"
-  local csv="$3"
-  local target="$4"
+    local service_account_name="$1"
+    local namespace="$2"
+    local csv="$3"
+    local target="$4"
 
-  append_if_exists "${target}"
+    append_if_exists "${target}"
 
-  yq eval "
-    .spec.install.spec.permissions[] |
-    select(.serviceAccountName == \"${service_account_name}\") |
-    .apiVersion = \"rbac.authorization.k8s.io/v1\" |
-    .kind = \"Role\" |
-    .metadata.name = \"${service_account_name}\" |
-    .metadata.namespace = \"${namespace}\" |
-    del(.serviceAccountName)
-    " "${csv}" >> "${target}"
+    yq eval "
+        .spec.install.spec.permissions[] |
+        select(.serviceAccountName == \"${service_account_name}\") |
+        .apiVersion = \"rbac.authorization.k8s.io/v1\" |
+        .kind = \"Role\" |
+        .metadata.name = \"${service_account_name}\" |
+        .metadata.namespace = \"${namespace}\" |
+        del(.serviceAccountName)
+        " "${csv}" >> "${target}"
 }
 extract_sriov_clusterrolebinding_from_csv_by_service_account_name() {
-  local service_account_name="$1"
-  local namespace="$2"
-  local target="$3"
+    local service_account_name="$1"
+    local namespace="$2"
+    local target="$3"
 
-  append_if_exists "${target}"
+    append_if_exists "${target}"
 
-  crb=$(cat <<EOL
+    crb=$(cat <<EOL
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
@@ -189,18 +189,18 @@ subjects:
   name: ${service_account_name}
   namespace: ${namespace}
 EOL
-)
-  echo "${crb}" >> "${target}"
+    )
+    echo "${crb}" >> "${target}"
 }
 
 extract_sriov_rolebinding_from_csv_by_service_account_name() {
-  local service_account_name="$1"
-  local namespace="$2"
-  local target="$3"
+    local service_account_name="$1"
+    local namespace="$2"
+    local target="$3"
 
-  append_if_exists "${target}"
+    append_if_exists "${target}"
 
-  crb=$(cat <<EOL
+    crb=$(cat <<EOL
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
@@ -214,18 +214,18 @@ subjects:
 - kind: ServiceAccount
   name: ${service_account_name}
 EOL
-)
-  echo "${crb}" >> "${target}"
+    )
+    echo "${crb}" > "${target}"
 }
 
 extract_sriov_service_account_from_csv_by_service_account_name() {
-  local service_account_name="$1"
-  local namespace="$2"
-  local target="$3"
+    local service_account_name="$1"
+    local namespace="$2"
+    local target="$3"
 
-  append_if_exists "${target}"
+    append_if_exists "${target}"
 
-  serviceAccount=$(cat <<EOL
+    serviceAccount=$(cat <<EOL
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -233,35 +233,35 @@ metadata:
   name: ${service_account_name}
   namespace: ${namespace}
 EOL
-)
-  echo "${serviceAccount}" >> "${target}"
+    )
+    echo "${serviceAccount}" > "${target}"
 }
 
 # extract_operator_from_csv() extracts the operator manifest from cluster
 # service version.
 extract_operator_from_csv() {
-  local csv="$1"
-  local namespace="$2"
-  local target="$3"
+    local csv="$1"
+    local namespace="$2"
+    local target="$3"
 
-  yq eval "
-    .spec.install.spec.deployments[]
-    | select(.name == \"sriov-network-operator\")
-    | .apiVersion = \"apps/v1\"
-    | .kind = \"Deployment\"
-    | .metadata.name = .name
-    | .metadata.namespace = \"${namespace}\"
-    | del(.name)
-    | del(.label)
-  " "${csv}" > "${target}"
+    yq eval "
+        .spec.install.spec.deployments[]
+        | select(.name == \"sriov-network-operator\")
+        | .apiVersion = \"apps/v1\"
+        | .kind = \"Deployment\"
+        | .metadata.name = .name
+        | .metadata.namespace = \"${namespace}\"
+        | del(.name)
+        | del(.label)
+      " "${csv}" > "${target}"
 }
 
 # create_namespace_yaml() creates a namespace manifest.
 create_namespace_yaml() {
-  local namespace="$1"
-  local target="$2"
+    local namespace="$1"
+    local target="$2"
 
-  namespace=$(cat <<EOL
+    namespace=$(cat <<EOL
 apiVersion: v1
 kind: Namespace
 metadata:
@@ -272,18 +272,18 @@ metadata:
     pod-security.kubernetes.io/audit: privileged
     pod-security.kubernetes.io/warn: privileged
 EOL
-)
-  echo "${namespace}" > "${target}"
+    )
+    echo "${namespace}" > "${target}"
 }
 
 # create_default_sriov_operator_config() creates the SriovOperatorConfig CR that
 # the operator expects. This is not included in the csv, so I'm having to do it
 # this way.
 create_default_sriov_operator_config() {
-  local namespace="$1"
-  local target="$2"
+    local namespace="$1"
+    local target="$2"
 
-  sriovoperatorconfig=$(cat <<EOL
+    sriovoperatorconfig=$(cat <<EOL
 apiVersion: sriovnetwork.openshift.io/v1
 kind: SriovOperatorConfig
 metadata:
@@ -295,47 +295,47 @@ spec:
   disableDrain: false
   configurationMode: daemon
 EOL
-)
-  echo "${sriovoperatorconfig}" > "${target}"
+    )
+    echo "${sriovoperatorconfig}" > "${target}"
 }
 
 extract_sriov_manifests() {
-  extract_sriov_rbac_from_cluster_service_version "${STAGING_SRIOV}" "${STAGING_SRIOV}/${CSV_FILENAME}" "${NAMESPACE}"
+    extract_sriov_rbac_from_cluster_service_version "${STAGING_SRIOV}" "${STAGING_SRIOV}/${CSV_FILENAME}" "${NAMESPACE}"
 
-  local operator="${STAGING_SRIOV}/${OPERATOR_FILENAME}"
-  echo "generating ${operator}"
-  extract_operator_from_csv "${STAGING_SRIOV}/${CSV_FILENAME}" "${NAMESPACE}" "${operator}"
+    local operator="${STAGING_SRIOV}/${OPERATOR_FILENAME}"
+    echo "generating ${operator}"
+    extract_operator_from_csv "${STAGING_SRIOV}/${CSV_FILENAME}" "${NAMESPACE}" "${operator}"
 
-  local namespace="${STAGING_SRIOV}/namespace.yaml"
-  echo "generating ${namespace}"
-  create_namespace_yaml "${NAMESPACE}" "${namespace}"
+    local namespace="${STAGING_SRIOV}/namespace.yaml"
+    echo "generating ${namespace}"
+    create_namespace_yaml "${NAMESPACE}" "${namespace}"
 
-  local sriovoperatorconfig="${STAGING_SRIOV}/sriovoperatorconfig.yaml"
-  echo "generating ${sriovoperatorconfig}"
-  create_default_sriov_operator_config "${NAMESPACE}" "${sriovoperatorconfig}"
+    local sriovoperatorconfig="${STAGING_SRIOV}/sriovoperatorconfig.yaml"
+    echo "generating ${sriovoperatorconfig}"
+    create_default_sriov_operator_config "${NAMESPACE}" "${sriovoperatorconfig}"
 }
 
 patch_sriov_manifests() {
-  yq eval -i "
-  .data.Intel_ixgbe_82576 = \"8086 10c9 10ca\"
-  | .metadata.namespace = \"${NAMESPACE}\"
-  " "${STAGING_SRIOV}/${CONFIGMAP_FILENAME}"
+    yq eval -i "
+        .data.Intel_ixgbe_82576 = \"8086 10c9 10ca\"
+        | .metadata.namespace = \"${NAMESPACE}\"
+        " "${STAGING_SRIOV}/${CONFIGMAP_FILENAME}"
 
-  yq eval -i "
-  (
-    .spec.template.spec.containers[0].env[] |
-    select(.name == \"ADMISSION_CONTROLLERS_ENABLED\")
-  ).value = \"false\"
-  |
-  (
-    .spec.template.spec.containers[0].env[] |
-    select(.name == \"METRICS_EXPORTER_PROMETHEUS_OPERATOR_ENABLED\")
-  ).value = \"false\"
-  |
-  .spec.template.spec.containers[0].env += [
-    {\"name\": \"CLUSTER_TYPE\", \"value\": \"kubernetes\"}
-  ]
-  " "${STAGING_SRIOV}/${OPERATOR_FILENAME}"
+    yq eval -i "
+        (
+            .spec.template.spec.containers[0].env[] |
+            select(.name == \"ADMISSION_CONTROLLERS_ENABLED\")
+        ).value = \"false\"
+        |
+        (
+            .spec.template.spec.containers[0].env[] |
+            select(.name == \"METRICS_EXPORTER_PROMETHEUS_OPERATOR_ENABLED\")
+        ).value = \"false\"
+        |
+            .spec.template.spec.containers[0].env += [
+                {\"name\": \"CLUSTER_TYPE\", \"value\": \"kubernetes\"}
+            ]
+        " "${STAGING_SRIOV}/${OPERATOR_FILENAME}"
 }
 
 get_sriov_bundle_version() {
