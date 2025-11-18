@@ -253,21 +253,21 @@ release. These files contain the list of container image references used by Cert
 and can be used to embed those images into osbuilder blueprints or bootc containerfiles.
 
 %package sriov
-Summary: SRIOV Network Operator for MicroShift
+Summary: SR-IOV Network Operator for MicroShift
 ExclusiveArch: x86_64 aarch64
 Requires: microshift = %{version}
 
 %description sriov
-The microshift-sriov package provides the required manifests for the SRIOV Network Operator to be installed on MicroShift.
+The microshift-sriov package provides the required manifests for the SR-IOV Network Operator to be installed on MicroShift.
 
 %package sriov-release-info
-Summary: Release information for SRIOV Network Operator for MicroShift
+Summary: Release information for SR-IOV Network Operator for MicroShift
 BuildArch: noarch
 Requires: microshift = %{version}
 
 %description sriov-release-info
 The microshift-sriov-release-info package provides release information files for this
-release. These files contain the list of container image references used by SRIOV Network Operator
+release. These files contain the list of container image references used by SR-IOV Network Operator
 and can be used to embed those images into osbuilder blueprints or bootc containerfiles.
 
 %prep
