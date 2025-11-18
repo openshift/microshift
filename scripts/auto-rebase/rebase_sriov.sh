@@ -210,11 +210,9 @@ roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
   name: ${service_account_name}
-  namespace: ${namespace}
 subjects:
 - kind: ServiceAccount
   name: ${service_account_name}
-  namespace: ${namespace}
 EOL
 )
   echo "${crb}" >> "${target}"
