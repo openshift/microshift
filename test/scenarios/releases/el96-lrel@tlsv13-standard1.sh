@@ -5,29 +5,20 @@
 start_image="rhel-9.6-microshift-brew-optionals-4.${MINOR_VERSION}-${LATEST_RELEASE_TYPE}"
 
 scenario_create_vms() {
-    if ! does_commit_exist "${start_image}"; then
-        echo "Image '${start_image}' not found - skipping test"
-        return 0
-    fi
+    exit_if_commit_not_found "${start_image}"
 
     prepare_kickstart host1 kickstart.ks.template "${start_image}"
     launch_vm
 }
 
 scenario_remove_vms() {
-    if ! does_commit_exist "${start_image}"; then
-        echo "Image '${start_image}' not found - skipping test"
-        return 0
-    fi
+    exit_if_commit_not_found "${start_image}"
 
     remove_vm host1
 }
 
 scenario_run_tests() {
-    if ! does_commit_exist "${start_image}"; then
-        echo "Image '${start_image}' not found - skipping test"
-        return 0
-    fi
+    exit_if_commit_not_found "${start_image}"
 
     # Apply TLS v1.3 configuration via drop-in config
     run_command_on_vm host1 "sudo mkdir -p /etc/microshift/config.d"
