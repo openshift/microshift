@@ -7,11 +7,9 @@ roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
   name: sriov-network-config-daemon
-  namespace: sriov-network-operator
 subjects:
 - kind: ServiceAccount
   name: sriov-network-config-daemon
-  namespace: sriov-network-operator
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
@@ -22,8 +20,6 @@ roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
   name: sriov-network-operator
-  namespace: sriov-network-operator
 subjects:
 - kind: ServiceAccount
   name: sriov-network-operator
-  namespace: sriov-network-operator
