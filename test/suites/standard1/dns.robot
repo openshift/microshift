@@ -8,7 +8,9 @@ Resource            ../../resources/microshift-config.resource
 Resource            ../../resources/microshift-process.resource
 Resource            ../../resources/hosts.resource
 
-Suite Setup         Setup Suite With Namespace
+Suite Setup         Run Keywords
+...                     Setup Suite With Namespace
+...                     AND    Check CoreDNS Hosts Feature
 Suite Teardown      Teardown Suite With Namespace
 
 Test Tags           slow
@@ -96,3 +98,12 @@ Remove Fake IP From NIC
     ...    sudo=True    return_rc=True    return_stderr=True    return_stdout=True
     Log Many    ${stdout}    ${stderr}
     Should Be Equal As Integers    0    ${rc}
+
+Check CoreDNS Hosts Feature
+    [Documentation]    Skip suite if CoreDNS hosts feature is not available
+    ${config}=    Show Config    default
+    TRY
+        VAR    ${hosts}=    ${config}[dns][hosts]
+    EXCEPT
+        Skip    CoreDNS hosts feature not available in this MicroShift version
+    END
