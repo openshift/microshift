@@ -12,12 +12,11 @@ check_platform() {
 }
 
 scenario_create_vms() {
-    if ! does_commit_exist "${start_image}"; then
+    check_platform
+    if ! does_image_exist "${start_image}"; then
         echo "Image '${start_image}' not found - skipping test"
         return 0
     fi
-
-    check_platform
 
     prepare_kickstart host1 kickstart-bootc.ks.template "${start_image}"
     launch_vm --boot_blueprint rhel96-bootc --fips
@@ -25,12 +24,20 @@ scenario_create_vms() {
 
 scenario_remove_vms() {
     check_platform
+    if ! does_image_exist "${start_image}"; then
+        echo "Image '${start_image}' not found - skipping test"
+        return 0
+    fi
 
     remove_vm host1
 }
 
 scenario_run_tests() {
     check_platform
+    if ! does_image_exist "${start_image}"; then
+        echo "Image '${start_image}' not found - skipping test"
+        return 0
+    fi
 
     run_tests host1 suites/fips/
 }
