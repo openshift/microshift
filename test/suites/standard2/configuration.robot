@@ -36,6 +36,23 @@ ${AUDIT_FLAGS}                      SEPARATOR=\n
 ...                                 \ \ \ \ maxFileSize: 1000
 ...                                 \ \ \ \ maxFiles: 1000
 ...                                 \ \ \ \ maxFileAge: 1000
+${CUSTOM_FEATURE_GATES}             SEPARATOR=\n
+...                                 apiServer:
+...                                 \ \ featureGates:
+...                                 \ \ \ \ featureSet: CustomNoUpgrade
+...                                 \ \ \ \ customNoUpgrade:
+...                                 \ \ \ \ \ \ enabled:
+...                                 \ \ \ \ \ \ \ \ - TestFeatureEnabled
+...                                 \ \ \ \ \ \ disabled:
+...                                 \ \ \ \ \ \ \ \ - TestFeatureDisabled
+${DIFFERENT_FEATURE_GATES}          SEPARATOR=\n
+...                                 apiServer:
+...                                 \ \ featureGates:
+...                                 \ \ \ \ featureSet: CustomNoUpgrade
+...                                 \ \ \ \ customNoUpgrade:
+...                                 \ \ \ \ \ \ enabled:
+...                                 \ \ \ \ \ \ \ \ - DifferentTestFeature
+${FEATURE_GATE_LOCK_FILE}           /var/lib/microshift/no-upgrade
 ${LVMS_DEFAULT}                     SEPARATOR=\n
 ...                                 storage: {}
 ${LVMS_DISABLED}                    SEPARATOR=\n
@@ -100,6 +117,90 @@ Config Flags Are Logged in Audit Flags
     Pattern Should Appear In Log Output    ${CURSOR}    FLAG: --audit-log-maxbackup=\"1000\"
     Pattern Should Appear In Log Output    ${CURSOR}    FLAG: --audit-log-maxage=\"1000\"
 
+Custom Feature Gates Are Passed To Kube APIServer
+    [Documentation]    Check that custom feature gates specified in the MicroShift config are passed to and logged by the
+    ...    kube-apiserver. This test verifies that arbitrary feature gate values are correctly propagated from the
+    ...    MicroShift configuration to the kube-apiserver, regardless of whether the feature gates are valid or have any effect.
+    Setup Custom Feature Gates
+    Pattern Should Appear In Log Output    ${CURSOR}    FLAG: --feature-gates=\"TestFeatureEnabled=true\"
+    Pattern Should Appear In Log Output    ${CURSOR}    FLAG: --feature-gates=\"TestFeatureDisabled=false\"
+
+Feature Gate Lock File Created With Custom Feature Gates
+    [Documentation]    Verify that feature gate lock file is created when custom feature gates are configured.
+    ...    The lock file prevents upgrades and configuration changes when CustomNoUpgrade feature set is used.
+    [Setup]    Run Keywords
+    ...    Stop MicroShift
+    ...    AND
+    ...    Remove Feature Gate Lock File If Exists
+
+    Drop In MicroShift Config    ${CUSTOM_FEATURE_GATES}    10-featuregates
+    Start MicroShift
+    Wait Until Keyword Succeeds    2 min    5 sec    Feature Gate Lock File Should Exist
+    Feature Gate Lock File Should Contain Feature Gates    CustomNoUpgrade    TestFeatureEnabled
+
+    [Teardown]    Run Keywords
+    ...    Stop MicroShift
+    ...    AND
+    ...    Remove Drop In MicroShift Config    10-featuregates
+    ...    AND
+    ...    Remove Feature Gate Lock File If Exists
+    ...    AND
+    ...    Start MicroShift
+
+Feature Gate Config Change Blocked After Lock Created
+    [Documentation]    Verify that changing feature gate config is blocked after lock file exists.
+    ...    MicroShift must refuse to start if feature gates change after CustomNoUpgrade is set.
+    [Setup]    Run Keywords
+    ...    Stop MicroShift
+    ...    AND
+    ...    Remove Feature Gate Lock File If Exists
+    ...    AND
+    ...    Drop In MicroShift Config    ${CUSTOM_FEATURE_GATES}    10-featuregates
+    ...    AND
+    ...    Start MicroShift
+
+    Wait Until Keyword Succeeds    2 min    5 sec    Feature Gate Lock File Should Exist
+
+    Stop MicroShift
+    Drop In MicroShift Config    ${DIFFERENT_FEATURE_GATES}    10-featuregates
+    MicroShift Should Fail To Start Due To Feature Gate Change
+
+    [Teardown]    Run Keywords
+    ...    Stop MicroShift
+    ...    AND
+    ...    Remove Drop In MicroShift Config    10-featuregates
+    ...    AND
+    ...    Remove Feature Gate Lock File If Exists
+    ...    AND
+    ...    Start MicroShift
+
+Feature Gate Lock File Persists Across Restarts With Same Config
+    [Documentation]    Verify that feature gate lock file persists and validation succeeds across restarts
+    ...    when the same feature gate configuration is maintained.
+    [Setup]    Run Keywords
+    ...    Stop MicroShift
+    ...    AND
+    ...    Remove Feature Gate Lock File If Exists
+    ...    AND
+    ...    Drop In MicroShift Config    ${CUSTOM_FEATURE_GATES}    10-featuregates
+    ...    AND
+    ...    Start MicroShift
+
+    Wait Until Keyword Succeeds    2 min    5 sec    Feature Gate Lock File Should Exist
+
+    # Restart with same config - should succeed
+    Restart MicroShift
+    Feature Gate Lock File Should Exist
+
+    [Teardown]    Run Keywords
+    ...    Stop MicroShift
+    ...    AND
+    ...    Remove Drop In MicroShift Config    10-featuregates
+    ...    AND
+    ...    Remove Feature Gate Lock File If Exists
+    ...    AND
+    ...    Start MicroShift
+
 Deploy MicroShift With LVMS By Default
     [Documentation]    Verify that LVMS and CSI snapshotting are deployed when config fields are null.
     [Setup]    Deploy Storage Config    ${LVMS_DEFAULT}
@@ -163,6 +264,7 @@ Teardown
     [Documentation]    Test suite teardown
     Remove Drop In MicroShift Config    10-loglevel
     Remove Drop In MicroShift Config    10-audit
+    Remove Drop In MicroShift Config    10-featuregates
     Restart MicroShift
     Logout MicroShift Host
     Remove Kubeconfig
@@ -193,6 +295,36 @@ Setup Audit Flags
     [Documentation]    Apply the audit config values set in ${AUDIT_FLAGS}
     Drop In MicroShift Config    ${AUDIT_FLAGS}    10-audit
     Restart MicroShift
+
+Setup Custom Feature Gates
+    [Documentation]    Apply the custom feature gates config values set in ${CUSTOM_FEATURE_GATES}
+    Drop In MicroShift Config    ${CUSTOM_FEATURE_GATES}    10-featuregates
+    Restart MicroShift
+
+Remove Feature Gate Lock File If Exists
+    [Documentation]    Remove the feature gate lock file if it exists, for test cleanup
+    Command Should Work    rm -f ${FEATURE_GATE_LOCK_FILE}
+
+Feature Gate Lock File Should Exist
+    [Documentation]    Verify that the feature gate lock file exists
+    Command Should Work    test -f ${FEATURE_GATE_LOCK_FILE}
+
+Feature Gate Lock File Should Contain Feature Gates
+    [Documentation]    Verify that feature gate lock file contains the expected feature gate configuration
+    [Arguments]    ${feature_set}    ${feature_name}
+    ${contents}=    Command Should Work    cat ${FEATURE_GATE_LOCK_FILE}
+    Should Contain    ${contents}    ${feature_set}
+    Should Contain    ${contents}    ${feature_name}
+
+MicroShift Should Fail To Start Due To Feature Gate Change
+    [Documentation]    Verify that MicroShift fails to start when feature gate config changes
+    ${stdout}    ${stderr}    ${rc}=    Command Execution    systemctl start microshift
+    Should Not Be Equal As Integers    ${rc}    0    MicroShift should fail to start
+
+    # Check journal for the expected error message
+    ${journal}=    Command Should Work    journalctl -u microshift -n 100 --no-pager
+    Should Contain    ${journal}    feature gate configuration has changed
+    Should Contain    ${journal}    microshift-cleanup-data
 
 Deploy Storage Config
     [Documentation]    Applies a storage ${config} to the exist MicroShift config, pushes it to the MicroShift host,
