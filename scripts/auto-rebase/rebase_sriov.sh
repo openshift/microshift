@@ -200,7 +200,7 @@ extract_sriov_rolebinding_from_csv_by_service_account_name() {
 
     append_if_exists "${target}"
 
-    crb=$(cat <<EOL
+    rb=$(cat <<EOL
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
@@ -215,7 +215,7 @@ subjects:
   name: ${service_account_name}
 EOL
     )
-    echo "${crb}" > "${target}"
+    echo "${rb}" >> "${target}"
 }
 
 extract_sriov_service_account_from_csv_by_service_account_name() {
