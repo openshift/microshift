@@ -10,7 +10,7 @@ SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 source "${SCRIPTDIR}/common.sh"
 
 PROMETHEUS_DIR="${IMAGEDIR}/prometheus"
-DEFAULT_HOST_PORT="9092"
+DEFAULT_HOST_PORT="9090"
 
 usage() {
     cat - <<EOF
@@ -20,18 +20,16 @@ ${BASH_SOURCE[0]} (start|stop) [port]
 
 start [port]: Start Prometheus.
              Uses port ${DEFAULT_HOST_PORT} on the host by default.
-             The container name will be prometheus-<host_port>.
+             The container name will be prometheus.
 
-stop [port]: Stop Prometheus.
-            Uses port ${DEFAULT_HOST_PORT} by default to identify the container.
-            The container name is assumed to be prometheus-<host_port>.
+stop: Stop Prometheus.
+            The container name is assumed to be prometheus.
 
 EOF
 }
 
 action_stop() {
-    local host_port="${1:-${DEFAULT_HOST_PORT}}"
-    local container_name="prometheus-${host_port}"
+    local container_name="prometheus"
 
     echo "Stopping Prometheus container ${container_name}"
     podman stop "${container_name}" > /dev/null || true
@@ -40,7 +38,7 @@ action_stop() {
 
 action_start() {
     local host_port="${1:-${DEFAULT_HOST_PORT}}"
-    local container_name="prometheus-${host_port}"
+    local container_name="prometheus"
 
     mkdir -p "${PROMETHEUS_DIR}"
     PROM_CONFIG="${PROMETHEUS_DIR}/prometheus.yml"
