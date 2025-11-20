@@ -36,7 +36,7 @@ scenario_run_tests() {
         --variable "PROMETHEUS_HOST:$(hostname)" \
         --variable "PROMETHEUS_PORT:9092" \
         --variable "LOKI_HOST:$(hostname)" \
-        --variable "LOKI_PORT:3200" \
+        --variable "LOKI_PORT:3201" \
         --variable "PROM_EXPORTER_PORT:8889" \
         --exclude generic-device-plugin \
         suites/optional/
