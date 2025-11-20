@@ -125,7 +125,7 @@ func TestIsCustomFeatureGatesConfigured(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := isCustomFeatureGatesConfigured(tt.fg)
+			got := hasCustomFeatureGates(tt.fg)
 			if got != tt.want {
 				t.Errorf("isCustomFeatureGatesConfigured() = %v, want %v", got, tt.want)
 			}

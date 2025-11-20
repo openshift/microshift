@@ -46,15 +46,13 @@ func featureGateLockManagement(cfg *config.Config) error {
 		return fmt.Errorf("failed to check if lock file exists: %w", err)
 	}
 
-	hasCustomFeatureGates := isCustomFeatureGatesConfigured(cfg.ApiServer.FeatureGates)
-
 	// Lock file exists - validate configuration
 	if lockExists {
 		return validateFeatureGateLockFile(cfg)
 	}
 
 	// No lock file exists yet and custom feature gates are configured, so this is the first time configuring custom feature gates
-	if hasCustomFeatureGates {
+	if hasCustomFeatureGates(cfg.ApiServer.FeatureGates) {
 		klog.InfoS("Custom feature gates detected", "featureSet", cfg.ApiServer.FeatureGates.FeatureSet)
 		return createFeatureGateLockFile(cfg)
 	}
@@ -64,8 +62,8 @@ func featureGateLockManagement(cfg *config.Config) error {
 	return nil
 }
 
-// isCustomFeatureGatesConfigured checks if any custom feature gates are configured
-func isCustomFeatureGatesConfigured(fg config.FeatureGates) bool {
+// hasCustomFeatureGates checks if any custom feature gates are configured
+func hasCustomFeatureGates(fg config.FeatureGates) bool {
 	// Empty feature set means no custom feature gates
 	if fg.FeatureSet == "" {
 		return false
@@ -175,11 +173,7 @@ func compareFeatureGates(lockFile featureGateLockFile, current config.FeatureGat
 			lockFile.CustomNoUpgrade, current.CustomNoUpgrade))
 	}
 
-	if len(errs) > 0 {
-		return errors.Join(errs...)
-	}
-
-	return nil
+	return errors.Join(errs...)
 }
 
 // writeFeatureGateLockFile writes the lock file to disk in YAML format
