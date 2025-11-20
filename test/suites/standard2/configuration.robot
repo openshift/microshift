@@ -55,6 +55,7 @@ ${APISERVER_ETCD_CLIENT_CERT}       /var/lib/microshift/certs/etcd-signer/apiser
 MicroShift Starts Using Default Config
     [Documentation]    Default (example) config should not fail to be parsed
     ...    and prevent MicroShift from starting.
+    [Tags]    default-config
     # Copy existing config.yaml as a drop-in because it has subjectAltNames
     # required by the `Restart MicroShift` keyword (sets up required kubeconfig).
     [Setup]    Run Keywords
