@@ -1,5 +1,5 @@
 diff --git a/etcd/cmd/microshift-etcd/run.go b/etcd/cmd/microshift-etcd/run.go
-index 018b129a7..b36bf4a06 100644
+index 018b129a7..a573a5c01 100644
 --- a/etcd/cmd/microshift-etcd/run.go
 +++ b/etcd/cmd/microshift-etcd/run.go
 @@ -19,7 +19,7 @@ import (
@@ -11,6 +11,15 @@ index 018b129a7..b36bf4a06 100644
  	"k8s.io/klog/v2"
  )
  
+@@ -100,7 +100,7 @@ func (s *EtcdService) configure(cfg *config.Config) {
+ 	s.etcdCfg.PeerTLSInfo.KeyFile = cryptomaterial.PeerKeyPath(etcdPeerCertDir)
+ 	s.etcdCfg.PeerTLSInfo.TrustedCAFile = etcdSignerCertPath
+ 
+-	s.etcdCfg.ExperimentalMaxLearners = MaxLearners
++	s.etcdCfg.MaxLearners = MaxLearners
+ 
+ 	updateConfigFromFile(s.etcdCfg, getConfigFilePath())
+ }
 diff --git a/etcd/go.mod b/etcd/go.mod
 index b1c7f1fea..d1d486f02 100644
 --- a/etcd/go.mod
