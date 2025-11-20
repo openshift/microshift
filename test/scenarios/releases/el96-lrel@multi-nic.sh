@@ -5,10 +5,7 @@
 start_image="rhel-9.6-microshift-brew-optionals-4.${MINOR_VERSION}-${LATEST_RELEASE_TYPE}"
 
 scenario_create_vms() {
-    if ! does_commit_exist "${start_image}"; then
-        echo "Image '${start_image}' not found - skipping test"
-        return 0
-    fi
+    exit_if_commit_not_found "${start_image}"
 
     prepare_kickstart host1 kickstart.ks.template "${start_image}"
     # Using multus as secondary network to have 2 nics in different networks.
@@ -16,19 +13,13 @@ scenario_create_vms() {
 }
 
 scenario_remove_vms() {
-    if ! does_commit_exist "${start_image}"; then
-        echo "Image '${start_image}' not found - skipping test"
-        return 0
-    fi
+    exit_if_commit_not_found "${start_image}"
 
     remove_vm host1
 }
 
 scenario_run_tests() {
-    if ! does_commit_exist "${start_image}"; then
-        echo "Image '${start_image}' not found - skipping test"
-        return 0
-    fi
+    exit_if_commit_not_found "${start_image}"
 
     local -r vmname=$(full_vm_name host1)
     local -r vm_ip1=$("${ROOTDIR}/scripts/devenv-builder/manage-vm.sh" ip -n "${vmname}" | head -1)

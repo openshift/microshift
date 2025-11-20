@@ -11,27 +11,21 @@ IMAGE_SIGSTORE_ENABLED=true
 start_image=rhel96-bootc-crel-optionals
 
 scenario_create_vms() {
-    if ! does_image_exist "${start_image}"; then
-        echo "Image '${start_image}' not found - skipping test"
-        return 0
-    fi
+    exit_if_image_not_found "${start_image}"
+
     prepare_kickstart host1 kickstart-bootc.ks.template "${start_image}"
     launch_vm --boot_blueprint rhel96-bootc
 }
 
 scenario_remove_vms() {
-    if ! does_image_exist "${start_image}"; then
-        echo "Image '${start_image}' not found - skipping test"
-        return 0
-    fi
+    exit_if_image_not_found "${start_image}"
+
 	remove_vm host1
 }
 
 scenario_run_tests() {
-    if ! does_image_exist "${start_image}"; then
-        echo "Image '${start_image}' not found - skipping test"
-        return 0
-    fi
+    exit_if_image_not_found "${start_image}"
+
     # Run a minimal test for this scenario as its main functionality is
     # to verify container image signature check is enabled
 	run_tests host1 \

@@ -395,6 +395,24 @@ does_image_exist() {
     fi
 }
 
+# Exit the script if the commit is not found in the ostree repository.
+exit_if_commit_not_found() {
+    local -r commit="${1}"
+    if ! does_commit_exist "${commit}"; then
+        echo "Commit '${commit}' not found in ostree repo - skipping test"
+        exit 0
+    fi
+}
+
+# Exit the script if the image is not found in the mirror registry.
+exit_if_image_not_found() {
+    local -r image="${1}"
+    if ! does_image_exist "${image}"; then
+        echo "Image '${image}' not found in mirror registry - skipping test"
+        exit 0
+    fi
+}
+
 # Show the IP address of the VM
 function get_vm_ip {
     local -r vmname="${1}"
