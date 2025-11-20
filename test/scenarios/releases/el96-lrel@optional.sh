@@ -10,30 +10,21 @@ WEB_SERVER_URL="http://${VM_BRIDGE_IP}:${WEB_SERVER_PORT}"
 start_image="rhel-9.6-microshift-brew-optionals-4.${MINOR_VERSION}-${LATEST_RELEASE_TYPE}"
 
 scenario_create_vms() {
-    if ! does_commit_exist "${start_image}"; then
-        echo "Image '${start_image}' not found - skipping test"
-        return 0
-    fi
+    exit_if_commit_not_found "${start_image}"
 
-    prepare_kickstart host1 kickstart.ks.template "${start_image}"
     # Two nics - one for macvlan, another for ipvlan (they cannot enslave the same interface)
+    prepare_kickstart host1 kickstart.ks.template "${start_image}"
     launch_vm  --network "${VM_MULTUS_NETWORK},${VM_MULTUS_NETWORK}"
 }
 
 scenario_remove_vms() {
-    if ! does_commit_exist "${start_image}"; then
-        echo "Image '${start_image}' not found - skipping test"
-        return 0
-    fi
+    exit_if_commit_not_found "${start_image}"
 
     remove_vm host1
 }
 
 scenario_run_tests() {
-    if ! does_commit_exist "${start_image}"; then
-        echo "Image '${start_image}' not found - skipping test"
-        return 0
-    fi
+    exit_if_commit_not_found "${start_image}"
 
     # Generic Device Plugin suite is excluded because getting serialsim for ostree would require:
     # - getting the version of the kernel of ostree image,
@@ -43,11 +34,11 @@ scenario_run_tests() {
     # - including the RPM in the ostree blueprint
     # GDP suite is tested with bootc images instead.
     run_tests host1 \
-    --variable "PROMETHEUS_HOST:$(hostname)" \
-    --variable "PROMETHEUS_PORT:9092" \
-    --variable "LOKI_HOST:$(hostname)" \
-    --variable "LOKI_PORT:3200" \
-    --variable "PROM_EXPORTER_PORT:8889" \
-    --exclude generic-device-plugin \
-    suites/optional/
+        --variable "PROMETHEUS_HOST:$(hostname)" \
+        --variable "PROMETHEUS_PORT:9092" \
+        --variable "LOKI_HOST:$(hostname)" \
+        --variable "LOKI_PORT:3200" \
+        --variable "PROM_EXPORTER_PORT:8889" \
+        --exclude generic-device-plugin \
+        suites/optional/
 }

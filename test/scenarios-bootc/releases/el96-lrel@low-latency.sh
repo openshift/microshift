@@ -8,29 +8,21 @@ export TEST_RANDOMIZATION=none
 start_image="rhel96-bootc-brew-${LATEST_RELEASE_TYPE}-with-optional-tuned"
 
 scenario_create_vms() {
-    if ! does_image_exist "${start_image}"; then
-        echo "Image '${start_image}' not found - skipping test"
-        return 0
-    fi
+    exit_if_image_not_found "${start_image}"
 
     prepare_kickstart host1 kickstart-bootc.ks.template "${start_image}" true
     launch_vm --boot_blueprint rhel96-bootc --vm_vcpus 6
 }
 
 scenario_remove_vms() {
-    if ! does_image_exist "${start_image}"; then
-        echo "Image '${start_image}' not found - skipping test"
-        return 0
-    fi
+    exit_if_image_not_found "${start_image}"
 
     remove_vm host1
 }
 
 scenario_run_tests() {
-    if ! does_image_exist "${start_image}"; then
-        echo "Image '${start_image}' not found - skipping test"
-        return 0
-    fi
+    exit_if_image_not_found "${start_image}"
+
     # Should not be run immediately after creating VM because of
     # microshift-tuned rebooting the node to activate the profile.
     local -r start_time=$(date +%s)
