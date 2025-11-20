@@ -1,5 +1,5 @@
 *** Settings ***
-Documentation       Networking smoke tests
+Documentation       Core DNS smoke tests
 
 Resource            ../../resources/common.resource
 Resource            ../../resources/oc.resource
@@ -32,6 +32,11 @@ ${HOSTS_CONFIG_CUSTOM}      SEPARATOR=\n
 ...                         \ \ hosts:
 ...                         \ \ \ status: Enabled
 ...                         \ \ \ file: ${CUSTOM_HOSTS_FILE}
+${HOSTSFILE_DISABLED}       SEPARATOR=\n
+...                         ---
+...                         dns:
+...                         \ \ hosts:
+...                         \ \ \ status: Disabled
 
 
 *** Test Cases ***
@@ -47,6 +52,33 @@ Resolve Host from Non-Default Hosts File
     Resolve Host From Pod    ${HOSTNAME}
     [Teardown]    Teardown Hosts File    ${HOSTNAME}
 
+Dynamic Hosts File Update Without Restart
+    [Documentation]    Verify hosts file changes are reflected without MicroShift or pod restarts
+    [Setup]    Setup With Custom Config    ${HOSTS_CONFIG_CUSTOM}    ${CUSTOM_HOSTS_FILE}
+    Resolve Host From Pod    ${HOSTNAME}
+    ${updated_hostname}=    Generate Random HostName
+    Add Entry To Hosts    ${FAKE_LISTEN_IP}    ${updated_hostname}    ${CUSTOM_HOSTS_FILE}
+    Resolve Host From Pod    ${updated_hostname}
+    [Teardown]    Run Keywords
+    ...    Remove Entry From Hosts    ${updated_hostname}    ${CUSTOM_HOSTS_FILE}
+    ...    AND    Teardown Hosts File    ${HOSTNAME}
+
+Service DNS Takes Precedence Over Hosts File
+    [Documentation]    Verify that Kubernetes service DNS resolution takes precedence over hosts file entries
+    [Setup]    Setup Service DNS Precedence
+    VAR    ${service_fqdn}=    myservice.${NAMESPACE}.svc.cluster.local
+    Wait Until Keyword Succeeds    40x    2s
+    ...    Router Should Resolve Hostname    ${service_fqdn}    ${SERVICE_CLUSTER_IP}
+    [Teardown]    Teardown Service DNS Precedence Test
+
+Disable CoreDNS Hosts And Verify ConfigMap Removed
+    [Documentation]    Enable CoreDNS hosts, then disable it and verify hosts-file configmap is removed
+    [Setup]    Setup With Custom Config    ${HOSTSFILE_ENABLED}    /etc/hosts
+    Disable CoreDNS Hosts
+    Run Keyword And Expect Error    *NotFound*
+    ...    Oc Get    configmap/hosts-file -n openshift-dns
+    [Teardown]    Teardown Hosts File    ${HOSTNAME}
+
 
 *** Keywords ***
 Resolve Host From Pod
@@ -57,9 +89,13 @@ Resolve Host From Pod
 
 Router Should Resolve Hostname
     [Documentation]    Check if the router pod resolves the given hostname
-    [Arguments]    ${hostname}
+    [Arguments]    ${hostname}    ${expected_ip}=${EMPTY}
     ${fuse_device}=    Oc Exec    router-default    nslookup ${hostname}    openshift-ingress    deployment
     Should Contain    ${fuse_device}    Name:    ${hostname}
+    IF    "${expected_ip}" != ""
+        Should Contain    ${fuse_device}    ${expected_ip}
+        ...    msg=Hostname should resolve to ${expected_ip}
+    END
 
 Setup With Custom Config
     [Documentation]    Install a custom config and restart MicroShift
@@ -107,3 +143,34 @@ Check CoreDNS Hosts Feature
     EXCEPT
         Skip    CoreDNS hosts feature not available in this MicroShift version
     END
+
+Setup Service DNS Precedence
+    [Documentation]    Setup to verify service DNS takes precedence over hosts file
+    # Create a service named "myservice"
+    Create Hello MicroShift Pod    ${NAMESPACE}
+    Expose Hello MicroShift    ${NAMESPACE}
+    Labeled Pod Should Be Ready    app\=hello-microshift    timeout=120s    ns=${NAMESPACE}
+    # Get the actual service cluster IP
+    ${service_ip}=    Oc Get JsonPath    service    ${NAMESPACE}    hello-microshift    .spec.clusterIP
+    VAR    ${SERVICE_CLUSTER_IP}=    ${service_ip}    scope=TEST
+    # Add conflicting entry to hosts file with a different IP
+    VAR    ${service_fqdn}=    myservice.${NAMESPACE}.svc.cluster.local
+    Add Entry To Hosts    ${FAKE_LISTEN_IP}    ${service_fqdn}    /etc/hosts
+    Drop In MicroShift Config    ${HOSTSFILE_ENABLED}    20-dns
+    Restart MicroShift
+
+Teardown Service DNS Precedence Test
+    [Documentation]    Cleanup service DNS precedence test resources
+    Run Keywords
+    ...    Remove Entry From Hosts    myservice.${NAMESPACE}.svc.cluster.local
+    ...    AND
+    ...    Remove Drop In MicroShift Config    20-dns
+    ...    AND
+    ...    Restart MicroShift
+    ...    AND
+    ...    Delete Hello MicroShift Pod And Service    ${NAMESPACE}
+
+Disable CoreDNS Hosts
+    [Documentation]    Disable CoreDNS hosts feature
+    Drop In MicroShift Config    ${HOSTSFILE_DISABLED}    20-dns
+    Restart MicroShift
