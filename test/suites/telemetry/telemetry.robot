@@ -100,7 +100,7 @@ MicroShift Reports Metrics To Prometheus Server
 
     @{metrics_to_check}=    Get List Prometheus Metrics To Check
     FOR    ${metric}    IN    @{metrics_to_check}
-        Check Prometheus Query    ${PROMETHEUS_HOST}    ${PROMETHEUS_PORT}    ${metric}
+        Check Prometheus Query    ${PROMETHEUS_HOST}    ${PROMETHEUS_PORT}    ${metric}    add_hostname_filter=${False}
     END
 
     [Teardown]    Run Keywords
