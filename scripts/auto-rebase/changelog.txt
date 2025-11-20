@@ -1,26 +1,12 @@
-- ovn-kubernetes image-amd64 2fe096327a6da6602c509d108ea0ed4a599a7eb3 to 9f04906c9822218d53f51b1e4311f6590eca1db8
-  - 3a524b55 2025-11-07T13:27:01+01:00 Fix cleanup of LRP for deleted pods
-  - 6cd0f090 2025-11-07T13:27:01+01:00 Handle missing pod delete event in EIP controller
-  - 75f0b7e9 2025-11-07T13:27:01+01:00 EgressIP: fix failover and restart stale SNAT/LRP; ensure status sync
-  - 947941b7 2025-11-07T13:27:01+01:00 OVN EIP: fix printing of stale next hops value
-  - 7b12cc64 2025-11-07T13:27:01+01:00 OVN EIP: add UT for syncing next hops for v4/v6
-  - b7d8695b 2025-11-07T13:27:01+01:00 EIP: do not skip generating potential valid next hops if LSP not found
-  - 87005cd4 2025-11-07T13:27:01+01:00 EIP: when checking for stale LRP next hops on startup, restrict to enodes
-  - d5490685 2025-11-07T09:07:14+00:00 Reintroduce completed pod check in shouldReleaseDeletedPod
-  - b170a2f2 2025-11-07T09:07:14+00:00 kubevirt: test with per-pod SNATs
-  - d16ed585 2025-11-07T09:07:14+00:00 kubevirt: test OVN DB after completion of source pod
-  - 9319b6d7 2025-11-07T09:07:14+00:00 kubevirt: fix search of colliding pods for migrated pods
-  - 1b1515cc 2025-11-07T09:07:14+00:00 kubevirt: prevent error log on IP release
-  - d077b268 2025-11-07T09:07:13+00:00 kubevirt: fix bad release of IPs of live migratable pods
-  - e7bf7330 2025-11-07T09:07:13+00:00 kubevirt e2e: use a value for vm nodeselector
-  - bc5438ca 2025-11-07T09:07:13+00:00 Fix naming of "Secondary" to be "User-Defined"
+- kubernetes embedded-component 56747b62f392bf1b0da64649aa2285f6a524c435 to 337fc64fb1915348588ddee22a04fee0dc6aa083
+  - cdc5d836e 2025-11-11T23:43:24+00:00 UPSTREAM: 133227: Concurrentmap Iteration
 
-- ovn-kubernetes image-arm64 672e10d79b520bee9a715ff07d46702e56ede51b to 9f04906c9822218d53f51b1e4311f6590eca1db8
-  - 3a524b55 2025-11-07T13:27:01+01:00 Fix cleanup of LRP for deleted pods
-  - 6cd0f090 2025-11-07T13:27:01+01:00 Handle missing pod delete event in EIP controller
-  - 75f0b7e9 2025-11-07T13:27:01+01:00 EgressIP: fix failover and restart stale SNAT/LRP; ensure status sync
-  - 947941b7 2025-11-07T13:27:01+01:00 OVN EIP: fix printing of stale next hops value
-  - 7b12cc64 2025-11-07T13:27:01+01:00 OVN EIP: add UT for syncing next hops for v4/v6
-  - b7d8695b 2025-11-07T13:27:01+01:00 EIP: do not skip generating potential valid next hops if LSP not found
-  - 87005cd4 2025-11-07T13:27:01+01:00 EIP: when checking for stale LRP next hops on startup, restrict to enodes
+- operator-framework-olm embedded-component f295d320d98493b70a105fa22ca79fab546a2e52 to 357bb130e6149ef87afbaadd6677ab1f71876d53
+  - 1c0d5e87 2025-11-18T10:46:08+08:00 Fix TOCTOU race condition in ensureInstallPlan (#3682)
+
+- kubernetes image-amd64 56747b62f392bf1b0da64649aa2285f6a524c435 to 337fc64fb1915348588ddee22a04fee0dc6aa083
+  - cdc5d836e 2025-11-11T23:43:24+00:00 UPSTREAM: 133227: Concurrentmap Iteration
+
+- kubernetes image-arm64 56747b62f392bf1b0da64649aa2285f6a524c435 to 337fc64fb1915348588ddee22a04fee0dc6aa083
+  - cdc5d836e 2025-11-11T23:43:24+00:00 UPSTREAM: 133227: Concurrentmap Iteration
 
