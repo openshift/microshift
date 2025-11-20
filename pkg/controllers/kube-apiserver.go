@@ -33,6 +33,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/serializer"
+	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
@@ -168,14 +169,16 @@ func (s *KubeAPIServer) configure(ctx context.Context, cfg *config.Config) error
 		return fmt.Errorf("failed to discover etcd servers: %w", err)
 	}
 
-	featureGateArgs, err := cfg.ApiServer.FeatureGates.ConvertToCLIFlags()
+	featureGateArgs, err := cfg.ApiServer.FeatureGates.ToApiserverArgs()
 	if err != nil {
 		return fmt.Errorf("failed to convert feature gates to CLI flags: %w", err)
 	}
-
-	// Build the final feature gates list
-	hardcodedFeatureGates := []string{"UserNamespacesSupport=true", "UserNamespacesPodSecurityStandards=true"}
-	featureGateArgs = append(featureGateArgs, hardcodedFeatureGates...)
+	// Inject required feature gates into the feature-gates argument.
+	enabledRequiredFGs := make(sets.Set[string], 0)
+	for _, fg := range config.RequiredFeatureGates {
+		enabledRequiredFGs.Insert(fg + "=true")
+	}
+	featureGateArgs = sets.New(featureGateArgs...).Union(enabledRequiredFGs).UnsortedList()
 
 	overrides := &kubecontrolplanev1.KubeAPIServerConfig{
 		APIServerArguments: map[string]kubecontrolplanev1.Arguments{

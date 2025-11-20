@@ -39,27 +39,29 @@ func FeatureGateLockManagement(cfg *config.Config) error {
 }
 
 func featureGateLockManagement(cfg *config.Config) error {
-	// Check if custom feature gates are configured
-	if !isCustomFeatureGatesConfigured(cfg.ApiServer.FeatureGates) {
-		klog.InfoS("No custom feature gates configured - skipping lock file management")
-		return nil
-	}
-
-	klog.InfoS("Custom feature gates detected", "featureSet", cfg.ApiServer.FeatureGates.FeatureSet)
-
-	// Check if lock file exists
+	// If a lock file exists, it must be validated regardless of current config
+	// This prevents users from removing feature gates from config in order to block upgrades and configuration changes
 	lockExists, err := util.PathExists(featureGateLockFilePath)
 	if err != nil {
 		return fmt.Errorf("failed to check if lock file exists: %w", err)
 	}
 
-	if !lockExists {
-		// First time configuring custom feature gates - create lock file
+	hasCustomFeatureGates := isCustomFeatureGatesConfigured(cfg.ApiServer.FeatureGates)
+
+	// Lock file exists - validate configuration
+	if lockExists {
+		return validateFeatureGateLockFile(cfg)
+	}
+
+	// No lock file exists yet and custom feature gates are configured, so this is the first time configuring custom feature gates
+	if hasCustomFeatureGates {
+		klog.InfoS("Custom feature gates detected", "featureSet", cfg.ApiServer.FeatureGates.FeatureSet)
 		return createFeatureGateLockFile(cfg)
 	}
 
-	// Lock file exists - validate configuration hasn't changed
-	return validateFeatureGateLockFile(cfg)
+	// No lock file and no custom feature gates - normal operation
+	klog.InfoS("No custom feature gates configured - skipping lock file management")
+	return nil
 }
 
 // isCustomFeatureGatesConfigured checks if any custom feature gates are configured
@@ -161,14 +163,20 @@ func validateFeatureGateLockFile(cfg *config.Config) error {
 
 // compareFeatureGates compares the lock file with current configuration
 func compareFeatureGates(lockFile featureGateLockFile, current config.FeatureGates) error {
+	var errs []error
+
 	if lockFile.FeatureSet != current.FeatureSet {
-		return fmt.Errorf("feature set changed: locked config has %q, current config has %q",
-			lockFile.FeatureSet, current.FeatureSet)
+		errs = append(errs, fmt.Errorf("feature set changed: locked config has %q, current config has %q",
+			lockFile.FeatureSet, current.FeatureSet))
 	}
 
 	if !reflect.DeepEqual(lockFile.CustomNoUpgrade, current.CustomNoUpgrade) {
-		return fmt.Errorf("custom feature gates changed: locked config has %#v, current config has %#v",
-			lockFile.CustomNoUpgrade, current.CustomNoUpgrade)
+		errs = append(errs, fmt.Errorf("custom feature gates changed: locked config has %#v, current config has %#v",
+			lockFile.CustomNoUpgrade, current.CustomNoUpgrade))
+	}
+
+	if len(errs) > 0 {
+		return errors.Join(errs...)
 	}
 
 	return nil
