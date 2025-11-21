@@ -163,10 +163,7 @@ BREW_LREL_RELEASE_VERSION="${BREW_EC_RELEASE_VERSION}"
 export BREW_LREL_RELEASE_VERSION
 
 # Branch and commit for the openshift-tests-private repository
-# Temporaly set to master instead of "release-4.${MINOR_VERSION}"
-# because openshift-tests-private repo branch is frozen:
-# https://github.com/openshift/openshift-tests-private/issues/42
-OPENSHIFT_TESTS_PRIVATE_REPO_BRANCH="master"
-OPENSHIFT_TESTS_PRIVATE_REPO_COMMIT="4eb15e1d79c0ca89706a51775b8bdb0d2cef10c9"
+OPENSHIFT_TESTS_PRIVATE_REPO_BRANCH="release-4.${MINOR_VERSION}"
+OPENSHIFT_TESTS_PRIVATE_REPO_COMMIT="000000000000000000000"
 export OPENSHIFT_TESTS_PRIVATE_REPO_BRANCH
 export OPENSHIFT_TESTS_PRIVATE_REPO_COMMIT
