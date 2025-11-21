@@ -1,26 +1,76 @@
-- kubernetes embedded-component f3d912311b7c3537def4501ef8e15fda821078e5 to d1618535bbc641daee580987e2ccb5fa09f59def
-  - c8bc9ba3d 2025-09-18T12:02:30+00:00 UPSTREAM: <carry>: Don't retry storage calls with side effects.
+- cluster-network-operator embedded-component e75d8fa7a0c30a4ad7500b3253f303e051f9ce0b to e83d7d8449cff5fe79978f2e19971aad5aff5edc
+  - 1aa77b6 2025-10-16T11:27:36+01:00 Add drop flows for GARPs
+  - b1d50df 2025-09-26T14:10:28-07:00 block upgrade if a CNI migration is in progress
+  - 0c7ea27 2025-09-22T13:25:52+00:00 Remove fepan from the OWNERS_ALIASES file
+  - 6d599ba 2025-09-22T13:25:52+00:00 Update CNO reviwers/approvers
+  - de2010c 2025-09-22T13:25:52+00:00 Owners: use aliases for core approvers / reviewers
 
-- machine-config-operator embedded-component cbd3b1f2d4ff551425658cca30ecf8cfc5fe3277 to dc686507c125fa853ace72d932c43134779e4540
-  - 35bf306e 2025-10-02T22:38:03+00:00 add new recording rule for unsuported packages
-  - 2ecdc272 2025-09-17T14:56:50+00:00 OCPBUGS-61695: Override NMState service definition
-  - 46e8215f 2025-07-29T14:46:11+00:00 OCPBUGS-57484: Handle migration from OpenShift SDN
-  - 3ff3a657 2025-07-29T14:46:11+00:00 OPNET-681: Support migration from configure-ovs to NMState
-  - fcd3adc3 2025-05-27T16:54:12+00:00 OCPBUGS-36859: Support NODEIP_HINT in IPI deployments too
+- kubernetes embedded-component d1618535bbc641daee580987e2ccb5fa09f59def to f3cb5c11ed5964553a01210bd88333fd3e1d8fa6
+  - 036271b97 2025-10-10T13:36:38-07:00 UPSTREAM: <carry>: Make streaming collection encoding off by default
+  - ac00da393 2025-10-10T13:36:03-07:00 UPSTREAM: <carry>: Use switch test to gofuzz
+  - 795e21305 2025-10-10T13:35:52-07:00 UPSTREAM: 129407: Implement streaming proto encoding
+  - d97dfcd30 2025-10-10T13:33:11-07:00 UPSTREAM: 130511: Implement tests for encoding collections in Proto
+  - 91c44f36c 2025-10-10T13:33:06-07:00 UPSTREAM: 129334: Streaming JSON encoder for List
+  - 0d49aa999 2025-10-09T08:55:59-07:00 UPSTREAM: 130220: Add tests for encoding collections in JSON for KEP-5116
+  - 9812c8ff5 2025-10-09T08:55:44-07:00 UPSTREAM: 130281: Implement chunking for gzip encoder in deferredResponseWriter
+  - d1e0d01f9 2025-10-09T08:54:30-07:00 UPSTREAM: 130190: Add a test to validate deferredResponseWriteron multiple write calls
 
-- openshift-controller-manager embedded-component 326317ac51b73267300ff3262887dd5326ada0ac to 90f73f7ea939b221b79684ebe6d2feb843fc1f83
-  - acb2fae 2025-09-15T05:31:48+00:00 legacy image pull secret rollback controller
-  - e68c3d9 2025-09-15T05:31:48+00:00 introduce rollback controllers
+- machine-config-operator embedded-component dc686507c125fa853ace72d932c43134779e4540 to 67c9ad546b13e9f04f96524c8bbbb405725b7d61
+  - c8520eb8 2025-10-25T04:59:34+00:00 Add control-plane label for master nodes on legacy clusters
+  - cc647281 2025-10-20T10:04:17-04:00 crc & kcc: Before deleting a degraded MC, ensure that the annotations have not been updated since the last check
+  - a6816b79 2025-10-16T11:20:44+01:00 Networking: reset ovn-remote config and allow ovnkube controller to set it
+  - 933ba740 2025-08-21T15:33:41+00:00 OCPBUGS-55439: scope MCD node listers to current node
+  - 6bf0d713 2025-06-12T10:35:27-07:00 pkg/operator/status: Drop PoolUpdating as an Upgradeable=False condition
 
-- ovn-kubernetes image-amd64 4ddb31314bc3e6372317e4b8f16982d9594e197f to 698c76385e3eed0cbeeee5207bc5023d34b82e1b
-  - e954f008 2025-09-03T12:41:07+02:00 Always enable global IPv6 forwarding
+- oc image-amd64 4c7883ffc539da930d1334421b170322864375d8 to a4cccd44f3d90136140d0ce8e90f5fc932ab8d72
+  - a9ac22ab 2025-11-17T11:28:53+03:00 Update go-jose, x/crypto, x/net
 
-- kubernetes image-amd64 f3d912311b7c3537def4501ef8e15fda821078e5 to d1618535bbc641daee580987e2ccb5fa09f59def
-  - c8bc9ba3d 2025-09-18T12:02:30+00:00 UPSTREAM: <carry>: Don't retry storage calls with side effects.
+- ovn-kubernetes image-amd64 698c76385e3eed0cbeeee5207bc5023d34b82e1b to b1144476cf7e585d3ab765a5a9e0367e7b9801c5
+  - f5ffbe1e 2025-11-12T15:07:37+01:00 Fix cleanup of LRP for deleted pods
+  - 97afe663 2025-11-12T15:07:18+01:00 Handle missing pod delete event in EIP controller
+  - 55c4ecc3 2025-11-12T15:06:49+01:00 EgressIP: fix failover and restart stale SNAT/LRP; ensure status sync
+  - 1a813fa6 2025-11-12T14:13:44+01:00 OVN EIP: add UT for syncing next hops for v4/v6
+  - 1cfcbcbe 2025-11-11T14:52:46+00:00 Configure sec nic EIPv6 address with NODAD and maximum lifetime
+  - fd281752 2025-10-17T06:44:06+00:00 dnsnameresolver: add unit test for DNSNameResolver resource update
+  - 7b847582 2025-10-17T06:44:06+00:00 dnsnameresolver: fix ever growing address set
+  - cde420a3 2025-10-16T11:55:27+01:00 [IC][EIP] OCPBUGS-42303: Fix race between SB DB and OVN-Controller
+  - ca8a771f 2025-10-16T11:55:20+01:00 Node controller shutdown: do not ref gateway if not set PR 5373 to drop the GARP flows didnt consider that we set the default network controller and later we set the gateway obj. In-between this period, ovnkube node may receive a stop signal and we do not guard against accessing the gateway if its not yet set.
+  - c21dd2c0 2025-10-16T11:51:53+01:00 ovn-controller: block GARP during startup
+  - ee0118df 2025-10-16T11:50:25+01:00 Fix ovnkube-controller-with-node shutdown sequence
 
-- ovn-kubernetes image-arm64 4ddb31314bc3e6372317e4b8f16982d9594e197f to 698c76385e3eed0cbeeee5207bc5023d34b82e1b
-  - e954f008 2025-09-03T12:41:07+02:00 Always enable global IPv6 forwarding
+- kubernetes image-amd64 d1618535bbc641daee580987e2ccb5fa09f59def to f3cb5c11ed5964553a01210bd88333fd3e1d8fa6
+  - 036271b97 2025-10-10T13:36:38-07:00 UPSTREAM: <carry>: Make streaming collection encoding off by default
+  - ac00da393 2025-10-10T13:36:03-07:00 UPSTREAM: <carry>: Use switch test to gofuzz
+  - 795e21305 2025-10-10T13:35:52-07:00 UPSTREAM: 129407: Implement streaming proto encoding
+  - d97dfcd30 2025-10-10T13:33:11-07:00 UPSTREAM: 130511: Implement tests for encoding collections in Proto
+  - 91c44f36c 2025-10-10T13:33:06-07:00 UPSTREAM: 129334: Streaming JSON encoder for List
+  - 0d49aa999 2025-10-09T08:55:59-07:00 UPSTREAM: 130220: Add tests for encoding collections in JSON for KEP-5116
+  - 9812c8ff5 2025-10-09T08:55:44-07:00 UPSTREAM: 130281: Implement chunking for gzip encoder in deferredResponseWriter
+  - d1e0d01f9 2025-10-09T08:54:30-07:00 UPSTREAM: 130190: Add a test to validate deferredResponseWriteron multiple write calls
 
-- kubernetes image-arm64 f3d912311b7c3537def4501ef8e15fda821078e5 to d1618535bbc641daee580987e2ccb5fa09f59def
-  - c8bc9ba3d 2025-09-18T12:02:30+00:00 UPSTREAM: <carry>: Don't retry storage calls with side effects.
+- oc image-arm64 4c7883ffc539da930d1334421b170322864375d8 to a4cccd44f3d90136140d0ce8e90f5fc932ab8d72
+  - a9ac22ab 2025-11-17T11:28:53+03:00 Update go-jose, x/crypto, x/net
+
+- ovn-kubernetes image-arm64 698c76385e3eed0cbeeee5207bc5023d34b82e1b to b1144476cf7e585d3ab765a5a9e0367e7b9801c5
+  - f5ffbe1e 2025-11-12T15:07:37+01:00 Fix cleanup of LRP for deleted pods
+  - 97afe663 2025-11-12T15:07:18+01:00 Handle missing pod delete event in EIP controller
+  - 55c4ecc3 2025-11-12T15:06:49+01:00 EgressIP: fix failover and restart stale SNAT/LRP; ensure status sync
+  - 1a813fa6 2025-11-12T14:13:44+01:00 OVN EIP: add UT for syncing next hops for v4/v6
+  - 1cfcbcbe 2025-11-11T14:52:46+00:00 Configure sec nic EIPv6 address with NODAD and maximum lifetime
+  - fd281752 2025-10-17T06:44:06+00:00 dnsnameresolver: add unit test for DNSNameResolver resource update
+  - 7b847582 2025-10-17T06:44:06+00:00 dnsnameresolver: fix ever growing address set
+  - cde420a3 2025-10-16T11:55:27+01:00 [IC][EIP] OCPBUGS-42303: Fix race between SB DB and OVN-Controller
+  - ca8a771f 2025-10-16T11:55:20+01:00 Node controller shutdown: do not ref gateway if not set PR 5373 to drop the GARP flows didnt consider that we set the default network controller and later we set the gateway obj. In-between this period, ovnkube node may receive a stop signal and we do not guard against accessing the gateway if its not yet set.
+  - c21dd2c0 2025-10-16T11:51:53+01:00 ovn-controller: block GARP during startup
+  - ee0118df 2025-10-16T11:50:25+01:00 Fix ovnkube-controller-with-node shutdown sequence
+
+- kubernetes image-arm64 d1618535bbc641daee580987e2ccb5fa09f59def to f3cb5c11ed5964553a01210bd88333fd3e1d8fa6
+  - 036271b97 2025-10-10T13:36:38-07:00 UPSTREAM: <carry>: Make streaming collection encoding off by default
+  - ac00da393 2025-10-10T13:36:03-07:00 UPSTREAM: <carry>: Use switch test to gofuzz
+  - 795e21305 2025-10-10T13:35:52-07:00 UPSTREAM: 129407: Implement streaming proto encoding
+  - d97dfcd30 2025-10-10T13:33:11-07:00 UPSTREAM: 130511: Implement tests for encoding collections in Proto
+  - 91c44f36c 2025-10-10T13:33:06-07:00 UPSTREAM: 129334: Streaming JSON encoder for List
+  - 0d49aa999 2025-10-09T08:55:59-07:00 UPSTREAM: 130220: Add tests for encoding collections in JSON for KEP-5116
+  - 9812c8ff5 2025-10-09T08:55:44-07:00 UPSTREAM: 130281: Implement chunking for gzip encoder in deferredResponseWriter
+  - d1e0d01f9 2025-10-09T08:54:30-07:00 UPSTREAM: 130190: Add a test to validate deferredResponseWriteron multiple write calls
 
