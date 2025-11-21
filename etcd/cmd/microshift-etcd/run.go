@@ -19,7 +19,7 @@ import (
 
 	"github.com/spf13/cobra"
 	etcd "go.etcd.io/etcd/server/v3/embed"
-	"go.etcd.io/etcd/server/v3/mvcc/backend"
+	"go.etcd.io/etcd/server/v3/storage/backend"
 	"k8s.io/klog/v2"
 )
 
