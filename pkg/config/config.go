@@ -56,7 +56,6 @@ type Config struct {
 	Ingress   IngressConfig `json:"ingress"`
 	Storage   Storage       `json:"storage"`
 	Telemetry Telemetry     `json:"telemetry"`
-
 	// Settings specified in this section are transferred as-is into the Kubelet config.
 	// +kubebuilder:validation:Schemaless
 	Kubelet map[string]any `json:"kubelet"`
@@ -424,6 +423,15 @@ func (c *Config) incorporateUserSettings(u *Config) {
 			c.DNS.Hosts.File = u.DNS.Hosts.File
 		}
 	}
+	if u.ApiServer.FeatureGates.FeatureSet != "" {
+		c.ApiServer.FeatureGates.FeatureSet = u.ApiServer.FeatureGates.FeatureSet
+	}
+	if len(u.ApiServer.FeatureGates.CustomNoUpgrade.Enabled) > 0 {
+		c.ApiServer.FeatureGates.CustomNoUpgrade.Enabled = u.ApiServer.FeatureGates.CustomNoUpgrade.Enabled
+	}
+	if len(u.ApiServer.FeatureGates.CustomNoUpgrade.Disabled) > 0 {
+		c.ApiServer.FeatureGates.CustomNoUpgrade.Disabled = u.ApiServer.FeatureGates.CustomNoUpgrade.Disabled
+	}
 }
 
 // updateComputedValues examins the existing settings and converts any
@@ -651,6 +659,10 @@ func (c *Config) validate() error {
 
 	if err := c.GenericDevicePlugin.validate(); err != nil {
 		return fmt.Errorf("error validating Generic Device Plugin configuration: %v", err)
+	}
+
+	if err := c.ApiServer.FeatureGates.validateFeatureGates(); err != nil {
+		return fmt.Errorf("error validating feature gates: %v", err)
 	}
 
 	if err := c.DNS.validate(); err != nil {
