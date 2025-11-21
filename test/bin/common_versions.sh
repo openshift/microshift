@@ -155,12 +155,19 @@ export BREW_RC_RELEASE_VERSION
 export BREW_EC_RELEASE_VERSION
 export BREW_NIGHTLY_RELEASE_VERSION
 
-# Set the release type to ec, rc or zstream
-LATEST_RELEASE_TYPE="ec"
+# Latest Release info
+LATEST_RELEASE_TYPE="ec" # ec, rc or zstream
+BREW_LREL_RELEASE_VERSION="${BREW_EC_RELEASE_VERSION}" # BREW_EC_RELEASE_VERSION, BREW_RC_RELEASE_VERSION or BREW_Y0_RELEASE_VERSION
+LATEST_RELEASE_VERSION="$(echo "${BREW_LREL_RELEASE_VERSION}" | sed -E 's/(.*)-.*/\1/' | sed -E 's/(.*)~(.*)/\1-\2/')" # example: 4.19.7 or 4.20.0-rc.3
+if [[ "${LATEST_RELEASE_TYPE}" == "ec" ]]; then
+    KONFLUX_LREL_RELEASE_IMAGE_URL="https://mirror.openshift.com/pub/openshift-v4/$(uname -m)/microshift/ocp-dev-preview/${LATEST_RELEASE_VERSION}/el9/bootc-pullspec.txt"
+else
+    KONFLUX_LREL_RELEASE_IMAGE_URL="https://mirror.openshift.com/pub/openshift-v4/$(uname -m)/microshift/ocp/${LATEST_RELEASE_VERSION}/el9/bootc-pullspec.txt"
+fi
 export LATEST_RELEASE_TYPE
-
-BREW_LREL_RELEASE_VERSION="${BREW_EC_RELEASE_VERSION}"
 export BREW_LREL_RELEASE_VERSION
+export LATEST_RELEASE_VERSION
+export KONFLUX_LREL_RELEASE_IMAGE_URL
 
 # Branch and commit for the openshift-tests-private repository
 OPENSHIFT_TESTS_PRIVATE_REPO_BRANCH="release-4.${MINOR_VERSION}"
