@@ -100,7 +100,7 @@ func (s *EtcdService) configure(cfg *config.Config) {
 	s.etcdCfg.PeerTLSInfo.KeyFile = cryptomaterial.PeerKeyPath(etcdPeerCertDir)
 	s.etcdCfg.PeerTLSInfo.TrustedCAFile = etcdSignerCertPath
 
-	s.etcdCfg.ExperimentalMaxLearners = MaxLearners
+	s.etcdCfg.MaxLearners = MaxLearners
 
 	updateConfigFromFile(s.etcdCfg, getConfigFilePath())
 }
