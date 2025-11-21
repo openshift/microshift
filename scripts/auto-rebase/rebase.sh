@@ -1223,17 +1223,6 @@ check_for_manifests_changes() {
     return 1
 }
 
-etcd_migration_to_3_6() {
-    if grep -E 'Version\s+= "3.5' "${REPOROOT}/etcd/vendor/go.etcd.io/etcd/api/v3/version/version.go" && grep -E 'Version\s+= "3.6' "${REPOROOT}/_output/staging/etcd/api/version/version.go"; then
-        title "Detected etcd 3.5 -> 3.6 migration - patching"
-        git apply --reject "${REPOROOT}/scripts/auto-rebase/rebase_migration_patches/etcd-3.5-to-3.6.patch" || exit 1
-        pushd "${REPOROOT}" >/dev/null
-        git add etcd/cmd/microshift-etcd/run.go etcd/go.mod
-        git commit -m "apply etcd 3.5 -> 3.6 migration patch"
-        popd >/dev/null
-    fi
-}
-
 # Runs each OCP rebase step in sequence, commiting the step's output to git
 rebase_to() {
     local release_image_amd64=$1
@@ -1247,9 +1236,6 @@ rebase_to() {
     update_last_rebase "${release_image_amd64}" "${release_image_arm64}"
 
     update_changelog
-
-    etcd_migration_to_3_6
-
     update_go_mods
     for dirpath in "${GO_MOD_DIRS[@]}"; do
         dirname=$(basename "${dirpath}")
