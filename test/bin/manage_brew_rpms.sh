@@ -10,7 +10,7 @@ usage() {
     echo "  download:   Download the RPM version to the path as specified"
     echo "    - version: the X.Y version. Example: 4.19"
     echo "    - path: the output directory. Example: /_output/test-images/brew-rpms"
-    echo "    - version_type: Optional. Valid values: rc, ec and zstream. Default: ec"
+    echo "    - version_type: Optional. Valid values: rc, ec, zstream and nightly. Default: nightly"
     echo "  access:     Exit with non-zero status if brew cannot be accessed"
 }
 
@@ -58,7 +58,7 @@ action_download() {
             package=$(brew list-builds --quiet --package=microshift --state=COMPLETE | grep "^microshift-${ver}.0~${ver_type}." | tail -n1) || true
             ;;
         *)
-            echo "ERROR: Invalid version_type '${ver_type}'. Valid values are: nightly, rc, ec and zstream"
+            echo "ERROR: Invalid version_type '${ver_type}'. Valid values are: rc, ec, zstream and nightly"
             exit 1
             ;;
     esac
