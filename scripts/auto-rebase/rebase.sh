@@ -1257,23 +1257,21 @@ rebase_to() {
             title "## Committing changes to ${dirname}/go.mod"
             git add "${dirpath}/go.mod" "${dirpath}/go.sum"
             git commit -m "update ${dirname}/go.mod"
+        fi
 
-            title "## Updating deps/ directory"
-            if [[ -n "$(git status -s "${dirpath}/deps")" ]]; then
-                title "## Commiting changes to ${dirname}/deps directory"
-                git add "${dirpath}/deps"
-                git commit -m "update ${dirname}/deps"
-            fi
+        title "## Updating deps/ directory"
+        if [[ -n "$(git status -s "${dirpath}/deps")" ]]; then
+            title "## Commiting changes to ${dirname}/deps directory"
+            git add "${dirpath}/deps"
+            git commit -m "update ${dirname}/deps"
+        fi
 
-            title "## Updating ${dirname}/vendor directory"
-            pushd "${dirpath}" && make vendor && popd || exit 1
-            if [[ -n "$(git status -s "${dirpath}/vendor")" ]]; then
-                title "## Commiting changes to ${dirname}/vendor directory"
-                git add "${dirpath}/vendor"
-                git commit -m "update ${dirname}/vendor"
-            fi
-        else
-            echo "No changes in ${dirname}/go.mod."
+        title "## Updating ${dirname}/vendor directory"
+        pushd "${dirpath}" && make vendor && popd || exit 1
+        if [[ -n "$(git status -s "${dirpath}/vendor")" ]]; then
+            title "## Commiting changes to ${dirname}/vendor directory"
+            git add "${dirpath}/vendor"
+            git commit -m "update ${dirname}/vendor"
         fi
     done
 
