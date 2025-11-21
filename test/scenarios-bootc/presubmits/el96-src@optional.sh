@@ -25,7 +25,7 @@ scenario_remove_vms() {
 }
 
 scenario_run_tests() {
-        run_tests host1 \
+    run_tests host1 \
         --variable "PROMETHEUS_HOST:$(hostname)" \
         --variable "PROMETHEUS_PORT:9092" \
         --variable "LOKI_HOST:$(hostname)" \
