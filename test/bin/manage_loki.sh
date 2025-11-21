@@ -19,18 +19,16 @@ ${BASH_SOURCE[0]} (start|stop) [port]
 
 start [port]: Start Loki.
              Uses port ${DEFAULT_HOST_PORT} on the host by default.
-             The container name will be loki-<host_port>.
+             The container name will be loki.
 
-stop [port]: Stop Loki.
-            Uses port ${DEFAULT_HOST_PORT} by default to identify the container.
-            The container name is assumed to be loki-<host_port>.
+stop: Stop Loki.
+            The container name is assumed to be loki.
 
 EOF
 }
 
 action_stop() {
-    local host_port="${1:-${DEFAULT_HOST_PORT}}"
-    local container_name="loki-${host_port}"
+    local container_name="loki"
     echo "Stopping Loki container ${container_name}"
     podman stop "${container_name}" > /dev/null || true
     podman rm --force "${container_name}" > /dev/null || true
@@ -38,7 +36,7 @@ action_stop() {
 
 action_start() {
     local host_port="${1:-${DEFAULT_HOST_PORT}}"
-    local container_name="loki-${host_port}"
+    local container_name="loki"
 
     echo "Stopping previous instance of Loki container ${container_name} (if any)"
     action_stop "${host_port}"
