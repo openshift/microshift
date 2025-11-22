@@ -241,8 +241,9 @@ func getEtcdClient(ctx context.Context) (*clientv3.Client, error) {
 	}
 
 	cli, err := clientv3.New(clientv3.Config{
-		Endpoints:   []string{"https://localhost:2379"},
-		DialTimeout: 5 * time.Second,
+		Endpoints: []string{"https://localhost:2379"},
+		// Connecting to localhost allows for a really short timeout to bail out quickly and retry again.
+		DialTimeout: 100 * time.Millisecond,
 		TLS:         tlsConfig,
 		Context:     ctx,
 	})

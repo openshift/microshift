@@ -333,24 +333,24 @@ func (s *KubeAPIServer) Run(ctx context.Context, ready chan<- struct{}, stopped 
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
+	restConfig, err := clientcmd.BuildConfigFromFlags(s.masterURL, "")
+	if err != nil {
+		return err
+	}
+	if err := rest.SetKubernetesDefaults(restConfig); err != nil {
+		return err
+	}
+	restConfig.NegotiatedSerializer = serializer.NewCodecFactory(runtime.NewScheme())
+	restConfig.CAFile = s.servingCAPath
+
+	restClient, err := rest.UnversionedRESTClientFor(restConfig)
+	if err != nil {
+		return err
+	}
+
 	// run readiness check
 	go func() {
 		err := wait.PollUntilContextTimeout(ctx, time.Second, kubeAPIStartupTimeout*time.Second, true, func(ctx context.Context) (bool, error) {
-			restConfig, err := clientcmd.BuildConfigFromFlags(s.masterURL, "")
-			if err != nil {
-				return false, err
-			}
-			if err := rest.SetKubernetesDefaults(restConfig); err != nil {
-				return false, err
-			}
-			restConfig.NegotiatedSerializer = serializer.NewCodecFactory(runtime.NewScheme())
-			restConfig.CAFile = s.servingCAPath
-
-			restClient, err := rest.UnversionedRESTClientFor(restConfig)
-			if err != nil {
-				return false, err
-			}
-
 			var status int
 			if err := restClient.Get().AbsPath("/readyz").Do(ctx).StatusCode(&status).Error(); err != nil {
 				klog.Infof("%q not yet ready: %v", s.Name(), err)
