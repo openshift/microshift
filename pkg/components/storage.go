@@ -19,9 +19,17 @@ import (
 	"github.com/openshift/microshift/pkg/assets"
 	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/config/lvmd"
+	"github.com/openshift/microshift/pkg/version"
 )
 
 func startCSIPlugin(ctx context.Context, cfg *config.Config, kubeconfigPath string) error {
+	// Community builds should deploy upstream CSI drivers, e.g. TopoLVM, etc.
+	// LVMS is not available without pull-secret access.
+	if version.Get().BuildVariant == version.BuildVariantCommunity {
+		klog.Warningf("CSI driver deployment is disabled for community builds")
+		return nil
+	}
+
 	if !cfg.Storage.IsEnabled() {
 		klog.Warningf("CSI driver deployment disabled, persistent storage will not be available")
 		return nil
