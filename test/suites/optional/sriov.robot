@@ -1,5 +1,5 @@
 *** Settings ***
-Documentation       MicroShift GitOps tests
+Documentation       MicroShift SR-IOV tests
 
 Resource            ../../resources/microshift-process.resource
 
@@ -8,7 +8,7 @@ Suite Teardown      Teardown Suite With Namespace
 
 
 *** Test Cases ***
-Verify GitOps Pods Start Correctly
+Verify SR-IOV Pods Start Correctly
     [Documentation]    Waits for pods to enter a running state
 
     Wait Until Keyword Succeeds    2min    10s
