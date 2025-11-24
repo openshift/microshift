@@ -1,16 +1,9 @@
-- ovn-kubernetes image-amd64 7aa44156591b7066bcd287cc32bf669d8faaff07 to fc191daee22d736f094ea55adad36c5e0c48bdb9
-  - 136e391f 2025-11-13T10:40:08+00:00 Reintroduce completed pod check in shouldReleaseDeletedPod
-  - 88d604d1 2025-11-13T10:40:08+00:00 kubevirt: test with per-pod SNATs
-  - 4481173d 2025-11-13T10:33:57+00:00 kubevirt: test OVN DB after completion of source pod
-  - 0a2abc94 2025-11-13T10:33:57+00:00 kubevirt: fix search of colliding pods for migrated pods
-  - 0de11bc0 2025-11-13T10:33:57+00:00 kubevirt: prevent error log on IP release
-  - a7ed840e 2025-11-13T10:33:57+00:00 kubevirt: fix bad release of IPs of live migratable pods
+- kubernetes embedded-component ac453edd5ce7d88cf916149399627c93ab30cf16 to ef8f548afe29ceeb65b386ed968bf33d17e4b7c2
+  - d6237da00 2025-11-17T22:36:46+00:00 UPSTREAM: 133227: Concurrentmap Iteration
 
-- ovn-kubernetes image-arm64 7aa44156591b7066bcd287cc32bf669d8faaff07 to fc191daee22d736f094ea55adad36c5e0c48bdb9
-  - 136e391f 2025-11-13T10:40:08+00:00 Reintroduce completed pod check in shouldReleaseDeletedPod
-  - 88d604d1 2025-11-13T10:40:08+00:00 kubevirt: test with per-pod SNATs
-  - 4481173d 2025-11-13T10:33:57+00:00 kubevirt: test OVN DB after completion of source pod
-  - 0a2abc94 2025-11-13T10:33:57+00:00 kubevirt: fix search of colliding pods for migrated pods
-  - 0de11bc0 2025-11-13T10:33:57+00:00 kubevirt: prevent error log on IP release
-  - a7ed840e 2025-11-13T10:33:57+00:00 kubevirt: fix bad release of IPs of live migratable pods
+- kubernetes image-amd64 ac453edd5ce7d88cf916149399627c93ab30cf16 to ef8f548afe29ceeb65b386ed968bf33d17e4b7c2
+  - d6237da00 2025-11-17T22:36:46+00:00 UPSTREAM: 133227: Concurrentmap Iteration
+
+- kubernetes image-arm64 ac453edd5ce7d88cf916149399627c93ab30cf16 to ef8f548afe29ceeb65b386ed968bf33d17e4b7c2
+  - d6237da00 2025-11-17T22:36:46+00:00 UPSTREAM: 133227: Concurrentmap Iteration
 
