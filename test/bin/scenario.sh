@@ -732,7 +732,7 @@ launch_vm() {
     done
     if [ -z "${vm_network_args}" ] ; then
         vm_network_args="--network none"
-    fi  
+    fi
 
     # Inject the kickstart file and all its includes into the image
     local -r kickstart_file=$(mktemp /tmp/kickstart.XXXXXXXX.ks)
