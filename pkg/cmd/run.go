@@ -44,6 +44,7 @@ var (
 	}
 )
 
+// dummy comment
 func NewRunMicroshiftCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "run",
