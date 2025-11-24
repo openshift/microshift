@@ -20,6 +20,7 @@ package storage
 
 import (
 	"k8s.io/kubernetes/test/e2e/framework"
+	"k8s.io/kubernetes/test/e2e/storage/drivers"
 	storageframework "k8s.io/kubernetes/test/e2e/storage/framework"
 	"k8s.io/kubernetes/test/e2e/storage/testsuites"
 	"k8s.io/kubernetes/test/e2e/storage/utils"
@@ -27,11 +28,7 @@ import (
 
 // List of testDrivers to be executed in below loop
 var ocpCSITestDrivers = []func() storageframework.TestDriver{
-	// STOR-2534: temporarily disable the volume group snapshot test driver
-	// for external-snapshotter rebase that changes the group snapshot API.
-	// VolumeGroupSnapshots and its API are a TechPreview in OCP,
-	// it can't affect any user.
-	// drivers.InitGroupSnapshotHostpathCSIDriver,
+	drivers.InitGroupSnapshotHostpathCSIDriver,
 }
 
 // This executes testSuites for csi volumes.
