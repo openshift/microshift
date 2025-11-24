@@ -1,12 +1,6 @@
-- kubernetes embedded-component 56747b62f392bf1b0da64649aa2285f6a524c435 to 337fc64fb1915348588ddee22a04fee0dc6aa083
-  - cdc5d836e 2025-11-11T23:43:24+00:00 UPSTREAM: 133227: Concurrentmap Iteration
+- oc image-amd64 03e97ec079064c4f451b15510622caac316fb517 to 3a48fc2998a051a77a97cc3393b5d189c22635e0
+  - de8b3dda 2025-11-18T08:05:10+00:00 fix(must-gather): do not set node affinity if nodename is set
 
-- operator-framework-olm embedded-component f295d320d98493b70a105fa22ca79fab546a2e52 to 357bb130e6149ef87afbaadd6677ab1f71876d53
-  - 1c0d5e87 2025-11-18T10:46:08+08:00 Fix TOCTOU race condition in ensureInstallPlan (#3682)
-
-- kubernetes image-amd64 56747b62f392bf1b0da64649aa2285f6a524c435 to 337fc64fb1915348588ddee22a04fee0dc6aa083
-  - cdc5d836e 2025-11-11T23:43:24+00:00 UPSTREAM: 133227: Concurrentmap Iteration
-
-- kubernetes image-arm64 56747b62f392bf1b0da64649aa2285f6a524c435 to 337fc64fb1915348588ddee22a04fee0dc6aa083
-  - cdc5d836e 2025-11-11T23:43:24+00:00 UPSTREAM: 133227: Concurrentmap Iteration
+- oc image-arm64 03e97ec079064c4f451b15510622caac316fb517 to 3a48fc2998a051a77a97cc3393b5d189c22635e0
+  - de8b3dda 2025-11-18T08:05:10+00:00 fix(must-gather): do not set node affinity if nodename is set
 
