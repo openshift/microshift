@@ -3,7 +3,7 @@
 # Sourced from scenario.sh and uses functions defined there.
 
 scenario_create_vms() {
-    prepare_kickstart host1 kickstart-bootc.ks.template rhel96-bootc-source
+    prepare_kickstart host1 kickstart-bootc.ks.template rhel96-bootc-source-gitops
     launch_vm --boot_blueprint rhel96-bootc
 }
 
@@ -17,5 +17,8 @@ scenario_run_tests() {
         --variable "PROXY_PORT:9001" \
         --variable "PROMETHEUS_HOST:$(hostname)" \
         --variable "PROMETHEUS_PORT:9093" \
-        suites/telemetry/telemetry.robot
+        suites/gitops/ \
+        suites/telemetry/telemetry.robot \
+        suites/osconfig/clusterid.robot \
+        suites/osconfig/systemd-resolved.robot
 }
