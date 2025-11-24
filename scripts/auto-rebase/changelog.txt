@@ -1,27 +1,4 @@
-- cluster-kube-apiserver-operator embedded-component a3414ab9e446c5511cc8bc1011a859ecfcf5c610 to 974542ae2ef86a631546b3a48fd0da3c2e3b74dd
-  - 93fb829 2025-09-29T16:33:57-04:00 enable resource v1beta2 api if DynamicResourceAllocation is enabled
-
-- cluster-network-operator embedded-component 1666a71c205071b6d44bfa57c0ebd3f0054fa1cd to 45843d223ceaea458879da3ee58d89ce1863230b
-  - a984a49 2025-10-28T10:34:52-04:00 Add a ValidatingAdmissionPolicy blocking ServiceCIDR changes
-
-- kubernetes embedded-component cf396bff09dcb68a96f718b5e0e80b50e874afb5 to 4c392f99fc20a9a5407d8e640c557a47efc7dae2
-  - 82b56a1e2 2025-09-03T09:10:23-04:00 UPSTREAM: 133625: Remove patch/update from ServiceCIDR API conformance test
-
-- oc image-amd64 0808e14637d72c01a3cb50e41617576836e84524 to 0963a015e8051f256030f1af5895d5640530fa23
-  - c792deb4 2025-11-11T20:07:21+00:00 pkg/cli/admin/upgrade: Tighten force warnings
-
-- ovn-kubernetes image-amd64 798404b42c0fd11b62973803dbc53810fd4f7fee to 0f330d1959be2f19f88a0df27889a7cdac0224b0
-  - 860cc8dc 2025-11-12T15:30:03-08:00 add lint target to run golanci natively
-
-- kubernetes image-amd64 cf396bff09dcb68a96f718b5e0e80b50e874afb5 to 4c392f99fc20a9a5407d8e640c557a47efc7dae2
-  - 82b56a1e2 2025-09-03T09:10:23-04:00 UPSTREAM: 133625: Remove patch/update from ServiceCIDR API conformance test
-
-- oc image-arm64 0808e14637d72c01a3cb50e41617576836e84524 to 0963a015e8051f256030f1af5895d5640530fa23
-  - c792deb4 2025-11-11T20:07:21+00:00 pkg/cli/admin/upgrade: Tighten force warnings
-
-- ovn-kubernetes image-arm64 798404b42c0fd11b62973803dbc53810fd4f7fee to 0f330d1959be2f19f88a0df27889a7cdac0224b0
-  - 860cc8dc 2025-11-12T15:30:03-08:00 add lint target to run golanci natively
-
-- kubernetes image-arm64 cf396bff09dcb68a96f718b5e0e80b50e874afb5 to 4c392f99fc20a9a5407d8e640c557a47efc7dae2
-  - 82b56a1e2 2025-09-03T09:10:23-04:00 UPSTREAM: 133625: Remove patch/update from ServiceCIDR API conformance test
+- machine-config-operator embedded-component 1f11aef23bd1a7d89fba38480451e2404e00f3a3 to 0a8e1230d454fb7d72f54bf9065db3a4769b9a86
+  - e09a8aad 2025-11-19T15:59:17+00:00 remove --mount directives
+  - 8f0b0a8a 2025-11-18T13:53:52+05:30 OCPNODE-3722: OCP 4.20 and earlier cluster should have AutoSizingReserved disable by default
 
