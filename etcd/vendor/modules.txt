@@ -177,11 +177,12 @@ github.com/mxk/go-flowrate/flowrate
 # github.com/oklog/run v1.2.0
 ## explicit; go 1.20
 github.com/oklog/run
-# github.com/openshift/api v0.0.0-20251015095338-264e80a2b6e7
+# github.com/openshift/api v0.0.0-20251117165054-348370f055bf
 ## explicit; go 1.24.0
 github.com/openshift/api/config/v1
+github.com/openshift/api/features
 github.com/openshift/api/operator/v1
-# github.com/openshift/build-machinery-go v0.0.0-20250602125535-1b6d00b8c37c
+# github.com/openshift/build-machinery-go v0.0.0-20251023084048-5d77c1a5e5af
 ## explicit; go 1.22.0
 github.com/openshift/build-machinery-go
 github.com/openshift/build-machinery-go/make
@@ -191,7 +192,7 @@ github.com/openshift/build-machinery-go/make/targets/golang
 github.com/openshift/build-machinery-go/make/targets/openshift
 github.com/openshift/build-machinery-go/make/targets/openshift/operator
 github.com/openshift/build-machinery-go/scripts
-# github.com/openshift/library-go v0.0.0-20251015151611-6fc7a74b67c5
+# github.com/openshift/library-go v0.0.0-20251112091634-ab97ebb73f0f
 ## explicit; go 1.24.0
 github.com/openshift/library-go/pkg/crypto
 github.com/openshift/library-go/pkg/operator/apiserver/audit
@@ -988,7 +989,7 @@ k8s.io/kubectl/pkg/validation
 # k8s.io/kubelet v1.34.1 => ../deps/github.com/openshift/kubernetes/staging/src/k8s.io/kubelet
 ## explicit; go 1.24.0
 k8s.io/kubelet/pkg/apis/deviceplugin/v1beta1
-# k8s.io/utils v0.0.0-20250604170112-4c0f3b243397
+# k8s.io/utils v0.0.0-20251002143259-bc988d571ff4
 ## explicit; go 1.18
 k8s.io/utils/clock
 k8s.io/utils/exec

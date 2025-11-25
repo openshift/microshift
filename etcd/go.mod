@@ -11,8 +11,8 @@ replace (
 )
 
 require (
-	github.com/openshift/api v0.0.0-20251015095338-264e80a2b6e7
-	github.com/openshift/build-machinery-go v0.0.0-20250602125535-1b6d00b8c37c
+	github.com/openshift/api v0.0.0-20251117165054-348370f055bf
+	github.com/openshift/build-machinery-go v0.0.0-20251023084048-5d77c1a5e5af
 	github.com/spf13/cobra v1.9.1
 	go.etcd.io/etcd/server/v3 v3.6.4
 	k8s.io/apimachinery v1.34.1
@@ -37,7 +37,7 @@ require (
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.26.3 // indirect
 	github.com/mxk/go-flowrate v0.0.0-20140419014527-cca7078d478f // indirect
 	github.com/oklog/run v1.2.0 // indirect
-	github.com/openshift/library-go v0.0.0-20251015151611-6fc7a74b67c5 // indirect
+	github.com/openshift/library-go v0.0.0-20251112091634-ab97ebb73f0f // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/squat/generic-device-plugin v0.0.0-20251019101956-043a51e18f31 // indirect
@@ -139,7 +139,7 @@ require (
 	k8s.io/api v1.34.1 // indirect
 	k8s.io/client-go v1.34.1 // indirect
 	k8s.io/kube-openapi v0.0.0-20250710124328-f3f2b991d03b // indirect
-	k8s.io/utils v0.0.0-20250604170112-4c0f3b243397 // indirect
+	k8s.io/utils v0.0.0-20251002143259-bc988d571ff4 // indirect
 	sigs.k8s.io/json v0.0.0-20241014173422-cfa47c3a1cc8 // indirect
 	sigs.k8s.io/kustomize/api v0.20.1 // indirect
 	sigs.k8s.io/kustomize/kyaml v0.20.1 // indirect
