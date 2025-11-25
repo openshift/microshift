@@ -19,7 +19,7 @@ import (
 
 	"github.com/spf13/cobra"
 	etcd "go.etcd.io/etcd/server/v3/embed"
-	"go.etcd.io/etcd/server/v3/mvcc/backend"
+	"go.etcd.io/etcd/server/v3/storage/backend"
 	"k8s.io/klog/v2"
 )
 
@@ -100,7 +100,7 @@ func (s *EtcdService) configure(cfg *config.Config) {
 	s.etcdCfg.PeerTLSInfo.KeyFile = cryptomaterial.PeerKeyPath(etcdPeerCertDir)
 	s.etcdCfg.PeerTLSInfo.TrustedCAFile = etcdSignerCertPath
 
-	s.etcdCfg.ExperimentalMaxLearners = MaxLearners
+	s.etcdCfg.MaxLearners = MaxLearners
 
 	updateConfigFromFile(s.etcdCfg, getConfigFilePath())
 }

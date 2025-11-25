@@ -106,7 +106,7 @@ func RetryGet(ctx context.Context, url, additionalCAPath string) int {
 		}
 	}
 	status := 0
-	err = wait.PollUntilContextTimeout(ctx, 5*time.Second, 120*time.Second, false, func(ctx context.Context) (bool, error) {
+	err = wait.PollUntilContextTimeout(ctx, time.Second, 120*time.Second, true, func(ctx context.Context) (bool, error) {
 		c := http.Client{
 			Transport: &http.Transport{
 				TLSClientConfig: &tls.Config{
@@ -133,8 +133,8 @@ func RetryGet(ctx context.Context, url, additionalCAPath string) int {
 
 func RetryTCPConnection(ctx context.Context, host string, port string) bool {
 	status := false
-	err := wait.PollUntilContextTimeout(ctx, 5*time.Second, 120*time.Second, false, func(ctx context.Context) (bool, error) {
-		timeout := 30 * time.Second
+	err := wait.PollUntilContextTimeout(ctx, time.Second, 120*time.Second, true, func(ctx context.Context) (bool, error) {
+		timeout := time.Second
 		_, err := tcpnet.DialTimeout("tcp", tcpnet.JoinHostPort(host, port), timeout)
 
 		if err == nil {
