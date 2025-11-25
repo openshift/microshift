@@ -11,6 +11,7 @@ import (
 	"github.com/fsnotify/fsnotify"
 	"github.com/openshift/microshift/pkg/config"
 	corev1 "k8s.io/api/core/v1"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
@@ -44,6 +45,14 @@ func (s *HostsWatcherManager) Run(ctx context.Context, ready chan<- struct{}, st
 
 	if s.status != config.HostsStatusEnabled {
 		klog.Infof("%s is disabled (not configured)", s.Name())
+		// Delete ConfigMap if it exists when service is disabled
+		if kubeClient, err := s.createKubeClient(); err == nil {
+			if err := s.deleteConfigMap(ctx, kubeClient); err != nil {
+				klog.Warningf("%s failed to delete ConfigMap when disabled: %v", s.Name(), err)
+			}
+		} else {
+			klog.Warningf("%s could not create Kubernetes client to delete ConfigMap: %v", s.Name(), err)
+		}
 		defer close(ready)
 		return ctx.Err()
 	}
@@ -253,4 +262,19 @@ func (s *HostsWatcherManager) getFileHash(filePath string) (string, error) {
 	}
 	hash := sha256.Sum256(content)
 	return fmt.Sprintf("%x", hash), nil
+}
+
+func (s *HostsWatcherManager) deleteConfigMap(ctx context.Context, client kubernetes.Interface) error {
+	configMapsClient := client.CoreV1().ConfigMaps(targetNameSpace)
+	err := configMapsClient.Delete(ctx, configMapName, metav1.DeleteOptions{})
+	if err != nil {
+		// If ConfigMap doesn't exist, that's fine - it's already deleted
+		if apierrors.IsNotFound(err) {
+			klog.V(2).Infof("%s ConfigMap %s in namespace %s does not exist, nothing to delete", s.Name(), configMapName, targetNameSpace)
+			return nil
+		}
+		return fmt.Errorf("failed to delete ConfigMap: %w", err)
+	}
+	klog.Infof("%s deleted ConfigMap %s in namespace %s", s.Name(), configMapName, targetNameSpace)
+	return nil
 }
