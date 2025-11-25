@@ -40,7 +40,7 @@ export VM_DISK_BASEDIR="${IMAGEDIR}/${VM_POOL_BASENAME}"
 export VM_ISOLATED_NETWORK="isolated"
 
 # Libvirt network for Multus tests
-export VM_MULTUS_NETWORK="multus" 
+export VM_MULTUS_NETWORK="multus"
 
 # Libvirt network for IPv6 tests
 export VM_IPV6_NETWORK="ipv6"
@@ -388,6 +388,7 @@ MICROSHIFT_OPTIONAL_RPMS_LIST=(
     "${MICROSHIFT_Y1_OPTIONAL_RPMS_LIST[@]}"
     microshift-cert-manager
     microshift-sriov
+    microshift-sriov-release-info
 )
 MICROSHIFT_Y1_X86_64_RPMS_LIST=(
     microshift-ai-model-serving
