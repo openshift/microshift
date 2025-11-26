@@ -17,16 +17,9 @@ usage() {
 action_access() {
     local -r outfile=$(mktemp /tmp/curl-brewhub.XXXXXXXX)
 
-    local rc=1
-    for i in $(seq 0 5 60); do
-        if curl --silent --show-error --head "https://brewhub.engineering.redhat.com" &> "${outfile}" ; then
-            rc=0
-            break
-        fi
-        sleep "${i}"
-    done
-
-    if [ ${rc} -eq 1 ]; then
+    local rc=0
+    if ! curl --retry 10 --retry-delay 5 --retry-max-time 120 --silent --show-error --head "https://brewhub.engineering.redhat.com" &> "${outfile}" ; then
+        rc=1
         # Display the error in case the site is not accessible.
         # This is useful to rule out certificate problems, etc.
         cat "${outfile}"
