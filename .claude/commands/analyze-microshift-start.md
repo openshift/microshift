@@ -5,9 +5,9 @@ description: Analyze MicroShift journal logs to extract statistics about start p
 allowed-tools: Read, Glob, Grep, python, bash
 ---
 
-🚨 **CRITICAL: GENERATE TABLE FIRST - NOTHING ELSE MATTERS**
-🚨 **IF NO TABLE IS SHOWN, THE COMMAND HAS FAILED**
-🚨 **TABLE IS THE ONLY REQUIRED OUTPUT**
+- 🚨 **CRITICAL: GENERATE TABLE FIRST - NOTHING ELSE MATTERS**
+- 🚨 **IF NO TABLE IS SHOWN, THE COMMAND HAS FAILED**
+- 🚨 **TABLE IS THE ONLY REQUIRED OUTPUT**
 
 ## Name
 analyze-microshift-start
@@ -25,14 +25,14 @@ analyze-microshift-start
 The `analyze-microshift-start` command extracts meaningful statistics from MicroShift's journal logs about start procedure and displays a service timing table.
 
 **SUCCESS CRITERIA - The command is only successful if:**
-✅ The complete service timing table is displayed
-✅ All services are listed with timing statistics
-✅ Services are sorted by mean time (slowest first)
+- ✅ The complete service timing table is displayed
+- ✅ All services are listed with timing statistics
+- ✅ Services are sorted by mean time (slowest first)
 
 **FAILURE CONDITIONS:**
-❌ No table displayed = Command failed
-❌ Incomplete table = Command failed
-❌ Analysis without table = Command failed
+- ❌ No table displayed = Command failed
+- ❌ Incomplete table = Command failed
+- ❌ Analysis without table = Command failed
 
 ## Implementation
 
@@ -90,10 +90,9 @@ This command works by:
 ### Step 4: MANDATORY TABLE GENERATION
 
 **CRITICAL MANDATE**: Generate the service performance table - THIS IS THE ONLY OBJECTIVE THAT MATTERS.
-
-**🚨 TABLE MUST BE DISPLAYED FIRST 🚨**
-**🚨 IF NO TABLE = COMMAND FAILED 🚨**
-**🚨 TABLE IS SUCCESS, EVERYTHING ELSE IS NOISE 🚨**
+- **🚨 TABLE MUST BE DISPLAYED FIRST 🚨**
+- **🚨 IF NO TABLE = COMMAND FAILED 🚨**
+- **🚨 TABLE IS SUCCESS, EVERYTHING ELSE IS NOISE 🚨**
 
 **REQUIRED TABLE FORMAT** (MUST BE EXACT):
 ```
