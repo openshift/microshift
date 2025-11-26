@@ -100,7 +100,11 @@ def repo_provides_pkg(repo, pkg):
 
     try:
         logging.info(f"Running command: {' '.join(args)}")
-        subprocess.run(args, stdout=sys.stderr, check=True)
+        result = subprocess.run(args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, check=True)
+        output = result.stdout.strip()
+        logging.info(f"Command's output:\n{output}")
+        if "Usable URL not found" in output:
+            return False
         return True
     except subprocess.CalledProcessError:
         return False
