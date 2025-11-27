@@ -1,6 +1,3 @@
-- oc image-amd64 03e97ec079064c4f451b15510622caac316fb517 to 3a48fc2998a051a77a97cc3393b5d189c22635e0
-  - de8b3dda 2025-11-18T08:05:10+00:00 fix(must-gather): do not set node affinity if nodename is set
-
-- oc image-arm64 03e97ec079064c4f451b15510622caac316fb517 to 3a48fc2998a051a77a97cc3393b5d189c22635e0
-  - de8b3dda 2025-11-18T08:05:10+00:00 fix(must-gather): do not set node affinity if nodename is set
+- machine-config-operator embedded-component bb2aa85171d93b2df952ed802a8cb200164e666f to 42fb22473a59c95ff7e89eadb5c701c7621f7b9e
+  - 1b2d0a45 2025-11-20T19:23:52+00:00 remove --mount directives
 
