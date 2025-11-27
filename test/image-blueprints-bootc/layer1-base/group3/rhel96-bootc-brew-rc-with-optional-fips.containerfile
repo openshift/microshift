@@ -10,7 +10,10 @@ match-architectures = ["x86_64"]
 EOF
 
 # Enable the FIPS crypto policy
-RUN dnf install -y crypto-policies-scripts && \
+#
+# Note: CNI plugins are required for podman to operate normally on RHEL 9.x.
+# This package is no longer installed as cri-o dependency.
+RUN dnf install -y crypto-policies-scripts containernetworking-plugins && \
     update-crypto-policies --no-reload --set FIPS && \
     dnf clean all
 # {{- end -}}
