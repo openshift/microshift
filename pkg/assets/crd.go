@@ -25,7 +25,7 @@ import (
 )
 
 const (
-	customResourceReadyInterval = 5 * time.Second
+	customResourceReadyInterval = time.Second
 	customResourceReadyTimeout  = 10 * time.Minute
 )
 

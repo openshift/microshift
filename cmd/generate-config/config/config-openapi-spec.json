@@ -19,6 +19,7 @@
       "type": "object",
       "required": [
         "auditLog",
+        "featureGates",
         "namedCertificates",
         "subjectAltNames",
         "tls"
@@ -56,6 +57,39 @@
               "description": "profile is the OpenShift profile specifying a specific logging policy",
               "type": "string",
               "default": "Default"
+            }
+          }
+        },
+        "featureGates": {
+          "type": "object",
+          "required": [
+            "customNoUpgrade",
+            "featureSet"
+          ],
+          "properties": {
+            "customNoUpgrade": {
+              "type": "object",
+              "required": [
+                "disabled",
+                "enabled"
+              ],
+              "properties": {
+                "disabled": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "enabled": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "featureSet": {
+              "type": "string"
             }
           }
         },

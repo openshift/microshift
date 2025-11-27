@@ -7,8 +7,10 @@ Library             Process
 Library             String
 Library             ../../resources/journalctl.py
 Resource            ../../resources/common.resource
+Resource            ../../resources/hosts.resource
 Resource            ../../resources/kubeconfig.resource
 Resource            ../../resources/oc.resource
+Resource            ../../resources/microshift-config.resource
 Resource            ../../resources/microshift-network.resource
 Resource            ../../resources/microshift-process.resource
 
@@ -38,6 +40,11 @@ ${HTTP01_ISSUER_NAME}           letsencrypt-http01
 ${HTTP01_CERT_NAME}             cert-from-${HTTP01_ISSUER_NAME}
 ${HTTP01_SECRET_NAME}           ${HTTP01_CERT_NAME}
 ${PEBBLE_DEPLOYMENT_FILE}       ./assets/cert-manager/pebble-server.yaml
+${HOSTSFILE_ENABLED}            SEPARATOR=\n
+...                             ---
+...                             dns:
+...                             \ \ hosts:
+...                             \ \ \ \ status: Enabled
 
 
 *** Test Cases ***
@@ -66,7 +73,7 @@ Test Cert manager with local acme server
     [Setup]    Setup Pebble Server    ${NAMESPACE}
 
     ${dns_name}=    Generate Random HostName
-    Configure DNS For Domain    ${USHIFT_HOST}    ${dns_name}
+    Setup DNS For Test    ${USHIFT_HOST}    ${dns_name}
     Oc Get JsonPath    ingressclass    ${EMPTY}    openshift-ingress    .metadata.name
     ${http01_issuer_yaml}=    Create HTTP01 Issuer YAML
     Apply YAML Manifest    ${http01_issuer_yaml}
@@ -80,7 +87,7 @@ Test Cert manager with local acme server
 
     [Teardown]    Run Keywords
     ...    Cleanup HTTP01 Resources
-    ...    AND    Remove DNS Configuration
+    ...    AND    Cleanup DNS For Test    ${dns_name}
 
 
 *** Keywords ***
@@ -376,5 +383,43 @@ Verify Cert Manager Kustomization Success
     ...    ${cursor}
     ...    Applying kustomization at /usr/lib/microshift/manifests.d/060-microshift-cert-manager was successful
     ...    unit=microshift
-    ...    retries=6
-    ...    wait=5
+    ...    retries=30
+    ...    wait=10
+
+Resolve Host From Pod
+    [Documentation]    Resolve host from pod
+    [Arguments]    ${hostname}
+    Wait Until Keyword Succeeds    40x    2s
+    ...    Router Should Resolve Hostname    ${hostname}
+
+Router Should Resolve Hostname
+    [Documentation]    Check if the router pod resolves the given hostname
+    [Arguments]    ${hostname}
+    ${fuse_device}=    Oc Exec    router-default    nslookup ${hostname}    openshift-ingress    deployment
+    Should Contain    ${fuse_device}    Name:    ${hostname}
+
+Setup DNS For Test
+    [Documentation]    Setup DNS using CoreDNS hosts feature if available, otherwise use legacy method
+    [Arguments]    ${ip_address}    ${dns_name}
+    ${config}=    Show Config    default
+    TRY
+        VAR    ${hosts}=    ${config}[dns][hosts]
+        Add Entry To Hosts    ${ip_address}    ${dns_name}    /etc/hosts
+        Drop In MicroShift Config    ${HOSTSFILE_ENABLED}    20-dns
+        Restart MicroShift
+    EXCEPT
+        Configure DNS For Domain    ${ip_address}    ${dns_name}
+    END
+
+Cleanup DNS For Test
+    [Documentation]    Cleanup DNS configuration based on method used
+    [Arguments]    ${dns_name}
+    ${config}=    Show Config    default
+    TRY
+        VAR    ${hosts}=    ${config}[dns][hosts]
+        Remove Entry From Hosts    ${dns_name}
+        Remove Drop In MicroShift Config    20-dns
+        Restart MicroShift
+    EXCEPT
+        Remove DNS Configuration
+    END

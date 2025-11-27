@@ -2,10 +2,14 @@ package config
 
 import (
 	"fmt"
+	"reflect"
 	"slices"
 
 	configv1 "github.com/openshift/api/config/v1"
+	featuresUtils "github.com/openshift/api/features"
 	"github.com/openshift/library-go/pkg/crypto"
+
+	"k8s.io/apimachinery/pkg/util/sets"
 )
 
 type ApiServer struct {
@@ -26,6 +30,8 @@ type ApiServer struct {
 	AuditLog AuditLog `json:"auditLog"`
 
 	TLS TLSConfig `json:"tls"`
+
+	FeatureGates FeatureGates `json:"featureGates"`
 
 	// The URL and Port of the API server cannot be changed by the user.
 	URL  string `json:"-"`
@@ -126,4 +132,100 @@ func (t *TLSConfig) Validate() error {
 
 func getIANACipherSuites(suites []string) []string {
 	return crypto.OpenSSLToIANACipherSuites(suites)
+}
+
+const (
+	FeatureSetCustomNoUpgrade      = "CustomNoUpgrade"
+	FeatureSetTechPreviewNoUpgrade = "TechPreviewNoUpgrade"
+	FeatureSetDevPreviewNoUpgrade  = "DevPreviewNoUpgrade"
+)
+
+type CustomNoUpgrade struct {
+	Enabled  []string `json:"enabled"`
+	Disabled []string `json:"disabled"`
+}
+
+// RequiredFeatureGates are the feature gates that are always enabled by MicroShift. They are defined here to enable config validation.
+// They are injected into the feature-gates field later by the microshift kube-apiserver controller.
+var RequiredFeatureGates = []string{"UserNamespacesSupport", "UserNamespacesPodSecurityStandards"}
+
+type FeatureGates struct {
+	FeatureSet      string          `json:"featureSet"`
+	CustomNoUpgrade CustomNoUpgrade `json:"customNoUpgrade"`
+}
+
+func (fg FeatureGates) ToApiserverArgs() ([]string, error) {
+	ret := sets.NewString()
+
+	switch fg.FeatureSet {
+	case FeatureSetCustomNoUpgrade:
+		for _, feature := range fg.CustomNoUpgrade.Enabled {
+			ret.Insert(fmt.Sprintf("%s=true", feature))
+		}
+		for _, feature := range fg.CustomNoUpgrade.Disabled {
+			ret.Insert(fmt.Sprintf("%s=false", feature))
+		}
+	case FeatureSetDevPreviewNoUpgrade, FeatureSetTechPreviewNoUpgrade:
+		fgEnabledDisabled, err := featuresUtils.FeatureSets(featuresUtils.SelfManaged, configv1.FeatureSet(fg.FeatureSet))
+		if err != nil {
+			return nil, fmt.Errorf("failed to get feature set gates: %w", err)
+		}
+		for _, f := range fgEnabledDisabled.Enabled {
+			ret.Insert(fmt.Sprintf("%s=true", f.FeatureGateAttributes.Name))
+		}
+		for _, f := range fgEnabledDisabled.Disabled {
+			ret.Insert(fmt.Sprintf("%s=false", f.FeatureGateAttributes.Name))
+		}
+	}
+	return ret.List(), nil
+}
+
+// Implement the GoStringer interface for better %#v printing
+func (fg FeatureGates) GoString() string {
+	return fmt.Sprintf("FeatureGates{FeatureSet: %q, CustomNoUpgrade: %#v}", fg.FeatureSet, fg.CustomNoUpgrade)
+}
+
+func (fg *FeatureGates) validateFeatureGates() error {
+	// FG is unset
+	if fg == nil || reflect.DeepEqual(*fg, FeatureGates{}) {
+		return nil
+	}
+	// Must use a recognized feature set, or else empty
+	if fg.FeatureSet != "" && fg.FeatureSet != FeatureSetCustomNoUpgrade && fg.FeatureSet != FeatureSetTechPreviewNoUpgrade && fg.FeatureSet != FeatureSetDevPreviewNoUpgrade {
+		return fmt.Errorf("invalid feature set: %s", fg.FeatureSet)
+	}
+	// Must set FeatureSet to CustomNoUpgrade to use custom feature gates
+	if fg.FeatureSet != FeatureSetCustomNoUpgrade && (len(fg.CustomNoUpgrade.Enabled) > 0 || len(fg.CustomNoUpgrade.Disabled) > 0) {
+		return fmt.Errorf("CustomNoUpgrade must be empty when FeatureSet is empty")
+	}
+	// Must set CustomNoUpgrade enabled or disabled lists when FeatureSet is CustomNoUpgrade
+	if fg.FeatureSet == FeatureSetCustomNoUpgrade && len(fg.CustomNoUpgrade.Enabled) == 0 && len(fg.CustomNoUpgrade.Disabled) == 0 {
+		return fmt.Errorf("CustomNoUpgrade enabled or disabled lists must be set when FeatureSet is CustomNoUpgrade")
+	}
+
+	var errs = make(sets.Set[error], 0)
+	for _, requiredFG := range RequiredFeatureGates {
+		// Edge case: Users must not be allowed to explicitly disable required feature gates.
+		if sets.NewString(fg.CustomNoUpgrade.Disabled...).Has(requiredFG) {
+			errs.Insert(fmt.Errorf("required feature gate %s cannot be disabled: %s", requiredFG, fg.CustomNoUpgrade.Disabled))
+		}
+		// Edge case: Users must not be allowed to explicitly enable required feature gates or else the config would be locked and the cluster
+		// would not be able to be upgraded.
+		if sets.New(fg.CustomNoUpgrade.Enabled...).Has(requiredFG) {
+			errs.Insert(fmt.Errorf("feature gate %s is explicitly enabled and cannot be enabled by the user", requiredFG))
+		}
+	}
+	if errs.Len() > 0 {
+		return fmt.Errorf("invalid feature gates: %s", errs.UnsortedList())
+	}
+
+	// Must not have any feature gates that are enabled and disabled at the same time
+	enabledSet := sets.New(fg.CustomNoUpgrade.Enabled...)
+	disabledSet := sets.New(fg.CustomNoUpgrade.Disabled...)
+	inBothSets := enabledSet.Intersection(disabledSet)
+	if inBothSets.Len() > 0 {
+		return fmt.Errorf("featuregates cannot be enabled and disabled at the same time: %s", inBothSets.UnsortedList())
+	}
+
+	return nil
 }

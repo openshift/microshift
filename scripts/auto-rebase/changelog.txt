@@ -1,0 +1,6 @@
+- router image-arm64 61979f48e686cdccdf61a2825d0c558a5a391df1 to 0e388de223c63d7ea8e735c9bfaa05be2cc01717
+  - 2ddcb5d 2025-11-24T16:19:18+01:00 Bump openshift/api to 4.21, and k8s.io to v0.34.1
+
+- service-ca-operator image-arm64 f5a143a6e0d2110f8c0fc8b50dc8fa62ec26b291 to e9622ba18c86bf24aceab0c19fdcb87339c14f44
+  - 0de6ddb 2025-11-25T11:24:38+01:00 Revert "manifests: Use user namespace for the deployment"
+
