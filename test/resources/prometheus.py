@@ -26,13 +26,6 @@ def check_prometheus_query(host: str, port: int, query: str) -> None:
         raise Exception("Prometheus query returned no results")
 
 
-def check_prometheus_query_is_missing(host: str, port: int, query: str) -> None:
-    response = _run_prometheus_query(host, port, query)
-    data_result_list: list = response.json().get("data", {}).get("result")
-    if data_result_list and len(data_result_list) > 0:
-        raise Exception("Prometheus query returned results")
-
-
 def check_prometheus_exporter(host: str, port: int, query: str) -> None:
     """Check the metric is available int Prometheus Exporter
     Fails if the response is empty."""
