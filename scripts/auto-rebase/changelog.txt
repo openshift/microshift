@@ -1,9 +1,10 @@
-- kubernetes embedded-component ac453edd5ce7d88cf916149399627c93ab30cf16 to ef8f548afe29ceeb65b386ed968bf33d17e4b7c2
-  - d6237da00 2025-11-17T22:36:46+00:00 UPSTREAM: 133227: Concurrentmap Iteration
+- oc image-amd64 fd2be5da398d8287664836e4838b68082a9f1bb8 to d76df14ea3d7ff9916ea576b6335cd3a220cd1bf
+  - ea432340 2025-11-24T12:17:33+01:00 fix(must-gather): do not set node affinity if nodename is set
+  - 6025017d 2025-11-03T19:39:57+00:00 Prefer ready and reachable control plane nodes
+  - c2c829ba 2025-11-03T19:39:57+00:00 Filter out unreachable taints from tolerations
 
-- kubernetes image-amd64 ac453edd5ce7d88cf916149399627c93ab30cf16 to ef8f548afe29ceeb65b386ed968bf33d17e4b7c2
-  - d6237da00 2025-11-17T22:36:46+00:00 UPSTREAM: 133227: Concurrentmap Iteration
-
-- kubernetes image-arm64 ac453edd5ce7d88cf916149399627c93ab30cf16 to ef8f548afe29ceeb65b386ed968bf33d17e4b7c2
-  - d6237da00 2025-11-17T22:36:46+00:00 UPSTREAM: 133227: Concurrentmap Iteration
+- oc image-arm64 fd2be5da398d8287664836e4838b68082a9f1bb8 to d76df14ea3d7ff9916ea576b6335cd3a220cd1bf
+  - ea432340 2025-11-24T12:17:33+01:00 fix(must-gather): do not set node affinity if nodename is set
+  - 6025017d 2025-11-03T19:39:57+00:00 Prefer ready and reachable control plane nodes
+  - c2c829ba 2025-11-03T19:39:57+00:00 Filter out unreachable taints from tolerations
 
