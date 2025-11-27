@@ -1,4 +1,10 @@
-- machine-config-operator embedded-component 1f11aef23bd1a7d89fba38480451e2404e00f3a3 to 0a8e1230d454fb7d72f54bf9065db3a4769b9a86
-  - e09a8aad 2025-11-19T15:59:17+00:00 remove --mount directives
-  - 8f0b0a8a 2025-11-18T13:53:52+05:30 OCPNODE-3722: OCP 4.20 and earlier cluster should have AutoSizingReserved disable by default
+- ovn-kubernetes image-amd64 0f330d1959be2f19f88a0df27889a7cdac0224b0 to ecb7aac7dfd79120937d8a51806c6a8ea633b07a
+  - 85fa1bb0 2025-11-20T20:45:53+02:00 CARRY: Fix linter issues
+  - 6ea54c78 2025-11-19T14:50:39+01:00 Send Unsolicited Neighbor Advertisement for IPv6 EgressIPs
+  - 39f8bd73 2025-11-19T14:50:39+01:00 Fix GARP sending 0.0.0.0 due to incorrect IPv4 byte extraction
+
+- ovn-kubernetes image-arm64 0f330d1959be2f19f88a0df27889a7cdac0224b0 to ecb7aac7dfd79120937d8a51806c6a8ea633b07a
+  - 85fa1bb0 2025-11-20T20:45:53+02:00 CARRY: Fix linter issues
+  - 6ea54c78 2025-11-19T14:50:39+01:00 Send Unsolicited Neighbor Advertisement for IPv6 EgressIPs
+  - 39f8bd73 2025-11-19T14:50:39+01:00 Fix GARP sending 0.0.0.0 due to incorrect IPv4 byte extraction
 
