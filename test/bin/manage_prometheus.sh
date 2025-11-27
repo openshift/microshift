@@ -10,7 +10,7 @@ SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 source "${SCRIPTDIR}/common.sh"
 
 PROMETHEUS_DIR="${IMAGEDIR}/prometheus"
-DEFAULT_HOST_PORT="9090"
+DEFAULT_HOST_PORT="9091"
 
 usage() {
     cat - <<EOF
