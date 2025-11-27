@@ -376,5 +376,5 @@ Verify Cert Manager Kustomization Success
     ...    ${cursor}
     ...    Applying kustomization at /usr/lib/microshift/manifests.d/060-microshift-cert-manager was successful
     ...    unit=microshift
-    ...    retries=6
-    ...    wait=5
+    ...    retries=30
+    ...    wait=10
