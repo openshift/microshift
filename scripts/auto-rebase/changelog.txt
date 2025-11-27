@@ -1,6 +1,0 @@
-- cluster-kube-apiserver-operator embedded-component c2453d7f18315cedb6f897c763acaf399267b068 to 8ce34d695b2ee3a93e748cd039db7c238ffc9f12
-  - f2e3e99 2025-11-14T15:25:13-05:00 bump: pickup library-go updates
-
-- machine-config-operator embedded-component 0144964ada660525a42f13abad41bbf24de079ef to 8917be0090ce3a745b1a56449b185863a9a112e2
-  - 95ef710f 2025-11-20T14:48:14+00:00 remove --mount directives
-
