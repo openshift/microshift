@@ -457,6 +457,7 @@ update_go_mod() {
     # Update required version of RCM for information purposes only (avoid having zeros as version)
     require_using_component_commit github.com/openshift/route-controller-manager route-controller-manager
 
+    make update-gofmt
     if grep -q "^patch-deps:" ./Makefile; then
         # etcd/ does not need to patch the dependencies
         make patch-deps
@@ -520,6 +521,10 @@ handle_deps() {
         ;;
     esac
 
+    # Following file is always generating a diff because it has CRLF line endings, but `git add` updates it to LF and the diff is gone.
+    # Remove the problematic file once for all.
+    rm -f deps/github.com/openshift/kubernetes/vendor/github.com/MakeNowJust/heredoc/README.md || true
+
     go mod tidy -e
 }
 
@@ -550,19 +555,6 @@ update_go_mods() {
     # Remove the toolchain to avoid downloading a different golang version when building with
     # ART images.
     go mod edit -toolchain=none "${REPOROOT}/etcd/go.mod"
- }
-
- update_deps_fmt() {
-    # The verify-gofmt targets belong to build-machinery-go makefiles and we can not override
-    # the files that are checked. `vendor` is automatically excluded from checks, but deps is
-    # something that only exists in MicroShift and we can not override it. Running gofmt over
-    # this directory will ensure the verify target works while still not changing functionality.
-    make update-gofmt
-    if [[ -n "$(git status -s deps)" ]]; then
-        title "## Commiting gofmt changes to deps directory"
-        git add deps
-        git commit -m "update deps gofmt"
-    fi
  }
 
 # Regenerates OpenAPIs after patching the vendor directory
@@ -1218,24 +1210,20 @@ rebase_to() {
             title "## Committing changes to ${dirname}/go.mod"
             git add "${dirpath}/go.mod" "${dirpath}/go.sum"
             git commit -m "update ${dirname}/go.mod"
+        fi
 
-            title "## Updating deps/ directory"
-            if [[ -n "$(git status -s "${dirpath}/deps")" ]]; then
-                title "## Commiting changes to ${dirname}/deps directory"
-                git add "${dirpath}/deps"
-                git commit -m "update ${dirname}/deps"
-            fi
+        if [[ -n "$(git status -s "${dirpath}/deps")" ]]; then
+            title "## Commiting changes to ${dirname}/deps directory"
+            git add "${dirpath}/deps"
+            git commit -m "update ${dirname}/deps"
+        fi
 
-            title "## Updating ${dirname}/vendor directory"
-            pushd "${dirpath}" && make vendor && popd || exit 1
-            if [[ -n "$(git status -s "${dirpath}/vendor")" ]]; then
-                title "## Commiting changes to ${dirname}/vendor directory"
-                git add "${dirpath}/vendor"
-                git commit -m "update ${dirname}/vendor"
-            fi
-            update_deps_fmt
-        else
-            echo "No changes in ${dirname}/go.mod."
+        title "## Updating ${dirname}/vendor directory"
+        pushd "${dirpath}" && make vendor && popd || exit 1
+        if [[ -n "$(git status -s "${dirpath}/vendor")" ]]; then
+            title "## Commiting changes to ${dirname}/vendor directory"
+            git add "${dirpath}/vendor"
+            git commit -m "update ${dirname}/vendor"
         fi
     done
 
