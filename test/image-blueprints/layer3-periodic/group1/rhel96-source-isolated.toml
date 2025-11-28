@@ -23,6 +23,12 @@ version = "*"
 name = "podman"
 version = "*"
 
+# CNI plugins are required for podman to operate normally on RHEL 9.x.
+# This package is no longer installed as cri-o dependency.
+[[packages]]
+name = "containernetworking-plugins"
+version = "*"
+
 [[packages]]
 name = "skopeo"
 version = "*"
