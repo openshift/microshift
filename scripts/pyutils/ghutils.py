@@ -81,7 +81,7 @@ class GithubUtils:
             return None
 
         if (self.org == _DEFAULT_ORG and self.repo == _DEFAULT_REPO and
-                self.is_branch_under_active_development(branch_name)):
+                self.is_branch_under_active_development(base_branch)):
             base_branch = "main"
 
         pull_req = self.gh_repo.create_pull(
