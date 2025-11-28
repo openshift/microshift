@@ -144,6 +144,9 @@ cd "${ROOTDIR}/test/"
 # shellcheck source=test/bin/common.sh
 source "${SCRIPTDIR}/common.sh"
 
+# shellcheck source=test/bin/common_versions_verify.sh
+source "${SCRIPTDIR}/common_versions_verify.sh"
+
 if ${COMPOSER_CLI_BUILDS} ; then
     # Determine and create the ideal number of workers
     $(dry_run) bash -x ./bin/manage_composer_config.sh create-workers

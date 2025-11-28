@@ -46,7 +46,7 @@ get_vrel_from_rpm() {{
     local -r rpm_dir="$1"
 
     # exit if rpm_dir directory does not exist
-    if [ ! -d "${rpm_dir}" ]; then
+    if [ ! -d "${{rpm_dir}}" ]; then
         echo ""
         return
     fi
@@ -147,7 +147,7 @@ BREW_Y1_RELEASE_VERSION="$(get_vrel_from_rpm "${{BREW_RPM_SOURCE}}/4.${{PREVIOUS
 BREW_Y2_RELEASE_VERSION="$(get_vrel_from_rpm "${{BREW_RPM_SOURCE}}/4.${{YMINUS2_MINOR_VERSION}}-zstream/{ARCH}/")"
 BREW_RC_RELEASE_VERSION="$(get_vrel_from_rpm "${{BREW_RPM_SOURCE}}/4.${{MINOR_VERSION}}-rc/{ARCH}/")"
 BREW_EC_RELEASE_VERSION="$(get_vrel_from_rpm "${{BREW_RPM_SOURCE}}/4.${{MINOR_VERSION}}-ec/{ARCH}/")"
-BREW_NIGHTLY_RELEASE_VERSION="$(get_vrel_from_rpm "${BREW_RPM_SOURCE}/4.${MINOR_VERSION}-nightly/${UNAME_M}/")"
+BREW_NIGHTLY_RELEASE_VERSION="$(get_vrel_from_rpm "${{BREW_RPM_SOURCE}}/4.${{MINOR_VERSION}}-nightly/{ARCH}/")"
 export BREW_Y0_RELEASE_VERSION
 export BREW_Y1_RELEASE_VERSION
 export BREW_Y2_RELEASE_VERSION
