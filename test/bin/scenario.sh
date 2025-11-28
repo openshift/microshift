@@ -721,7 +721,7 @@ launch_vm() {
         # If there is a filter with the same name as the network, attach it to the NIC
         if [ "${n}" = "sriov" ] ; then
             vm_network_args+="--network network=default,model=igb"
-        else 
+        else
             vm_network_args+="--network network=${n},model=virtio"
         fi
 

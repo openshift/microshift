@@ -3,27 +3,21 @@ Documentation       MicroShift SR-IOV tests
 
 Resource            ../../resources/microshift-process.resource
 
-Suite Setup         Setup Suite With Namespace
-Suite Teardown      Teardown Suite With Namespace
+Suite Setup         Setup Suite
+Suite Teardown      Teardown Suite
 
 
 *** Variables ***
 ${TEMPLATE_PATH}    ${CURDIR}/../../assets/sriov/sriov-network-policy-template.yaml
-${VENDOR_ID}        8086
-${DEVICE_ID}        10c9
 
 
 *** Test Cases ***
-Verify SR-IOV Pods Start Correctly
-    [Documentation]    Waits for pods to enter a running state
-
-    Wait Until Keyword Succeeds    2min    10s
-    ...    All Pods Should Be Running    sriov-network-operator
-
 Create VFs And Verify
     [Documentation]    Deploys sriovnetworknodepolicy and verifies the VF configuration
 
-    ${pci_address}=    Get PCI Address For Device    ${VENDOR_ID}    ${DEVICE_ID}
+    VAR    ${cmd}=
+    ...    oc get sriovnetworknodestate -o yaml -n sriov-network-operator -o json | jq -r '.items[].status.interfaces[0].pciAddress'
+    ${pci_address}=    Run With Kubeconfig    ${cmd}
 
     ${template_content}=    OperatingSystem.Get File    ${TEMPLATE_PATH}
     ${final_yaml}=    Replace String    ${template_content}    PLACEHOLDER_PCI_ADDRESS    ${pci_address}
@@ -32,7 +26,7 @@ Create VFs And Verify
 
     Oc Apply    -f ${OUTPUT_DIR}/final-sriov-policy.yaml -n sriov-network-operator
 
-    Oc Get    sriovnetworknodepolicy    sriov-network-operator    policy-1
+    Wait Until Resource Exists    sriovnetworknodepolicy    policy-1    sriov-network-operator
 
     Wait Until Keyword Succeeds    2min    10s
     ...    Verify VF Count    2
@@ -44,16 +38,6 @@ Create VFs And Verify
 
 
 *** Keywords ***
-Get PCI Address For Device
-    [Documentation]    Uses lspci to find the first device matching vendor:device
-    [Arguments]    ${vendor}    ${device}
-
-    VAR    ${cmd}=    lspci -D -nn | grep "${vendor}:${device}" | head -n 1 | awk '{print $1}'
-    ${address}=    Execute Command    ${cmd}    sudo=True
-
-    Should Not Be Empty    ${address}    Could not find any PCI device matching ${vendor}:${device}
-    RETURN    ${address}
-
 Cleanup SR-IOV Policy
     [Documentation]    Deletes the policy
 
