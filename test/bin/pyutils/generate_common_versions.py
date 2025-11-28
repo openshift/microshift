@@ -321,7 +321,7 @@ def main():
 
         gh = ghutils.GithubUtils(dry_run=args.dry_run)
         g.setup_remote_with_token(gh.token, gh.org, gh.repo)
-        new_branch_name = f"{base_branch}-common-versions-update"
+        new_branch_name = f"common-versions-update-{base_branch}"
         g.checkout_branch(new_branch_name)
         g.add_files_to_staging_area(["test/bin/common_versions.sh"])
         g.commit("Update common_versions.sh")
