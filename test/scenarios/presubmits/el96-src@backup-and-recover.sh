@@ -12,5 +12,9 @@ scenario_remove_vms() {
 }
 
 scenario_run_tests() {
-    run_tests host1 suites/backup/auto-recovery.robot suites/backup/auto-recovery-extra.robot
+    run_tests host1 \
+        suites/backup/auto-recovery.robot \
+        suites/backup/auto-recovery-extra.robot \
+        suites/backup/backup-restore-on-reboot.robot \
+        suites/backup/backups.robot
 }
