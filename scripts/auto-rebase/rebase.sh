@@ -457,6 +457,7 @@ update_go_mod() {
     require_using_component_commit github.com/openshift/route-controller-manager route-controller-manager
     require_using_component_commit github.com/openshift/cluster-policy-controller cluster-policy-controller
 
+    make update-gofmt
     if grep -q "^patch-deps:" ./Makefile; then
         # etcd/ does not need to patch the dependencies
         make patch-deps
@@ -518,7 +519,6 @@ handle_deps() {
             git clone "${repo_url}" --branch "${ver}" "${REPOROOT}/${replace_path}"
             rm -fr "${REPOROOT}/${replace_path}/.git"
             find "${REPOROOT}/${replace_path}/" -name "OWNERS" -delete
-            make update-gofmt
         ;;
         kubernetes-version)
             local -r ver="$(get_kubernetes_version)"
@@ -527,7 +527,6 @@ handle_deps() {
         ;;
     esac
 
-    make update-gofmt
     # Following file is always generating a diff because it has CRLF line endings, but `git add` updates it to LF and the diff is gone.
     # Remove the problematic file once for all.
     rm -f deps/github.com/openshift/kubernetes/vendor/github.com/MakeNowJust/heredoc/README.md || true
@@ -1243,23 +1242,20 @@ rebase_to() {
             title "## Committing changes to ${dirname}/go.mod"
             git add "${dirpath}/go.mod" "${dirpath}/go.sum"
             git commit -m "update ${dirname}/go.mod"
+        fi
 
-            title "## Updating deps/ directory"
-            if [[ -n "$(git status -s "${dirpath}/deps")" ]]; then
-                title "## Commiting changes to ${dirname}/deps directory"
-                git add "${dirpath}/deps"
-                git commit -m "update ${dirname}/deps"
-            fi
+        if [[ -n "$(git status -s "${dirpath}/deps")" ]]; then
+            title "## Commiting changes to ${dirname}/deps directory"
+            git add "${dirpath}/deps"
+            git commit -m "update ${dirname}/deps"
+        fi
 
-            title "## Updating ${dirname}/vendor directory"
-            pushd "${dirpath}" && make vendor && popd || exit 1
-            if [[ -n "$(git status -s "${dirpath}/vendor")" ]]; then
-                title "## Commiting changes to ${dirname}/vendor directory"
-                git add "${dirpath}/vendor"
-                git commit -m "update ${dirname}/vendor"
-            fi
-        else
-            echo "No changes in ${dirname}/go.mod."
+        title "## Updating ${dirname}/vendor directory"
+        pushd "${dirpath}" && make vendor && popd || exit 1
+        if [[ -n "$(git status -s "${dirpath}/vendor")" ]]; then
+            title "## Commiting changes to ${dirname}/vendor directory"
+            git add "${dirpath}/vendor"
+            git commit -m "update ${dirname}/vendor"
         fi
     done
 
