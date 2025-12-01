@@ -201,7 +201,7 @@ action_keep() {
     sub_dirs=$(run_aws_cli s3 ls "${top_dir}/" | grep '/$' | awk '{print $NF}')
 
     # Skip if only one sub-directory exists
-    if [ $(echo "${sub_dirs}" | wc -w) -eq 1 ] ; then
+    if [ "$(echo "${sub_dirs}" | wc -w)" -eq 1 ] ; then
         echo "Only one sub-directory found in '${top_dir}', keeping it"
         return 0
     fi
