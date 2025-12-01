@@ -357,7 +357,7 @@ def main():
     gh = ghutils.GithubUtils(dry_run=REMOTE_DRY_RUN)
 
     rebase_branch_name = g.git_repo.active_branch.name
-    adjusted_base_branch = "main" if gh.is_branch_under_active_development(rebase_branch_name) else rebase_branch_name
+    adjusted_base_branch = "main" if gh.is_branch_under_active_development(base_branch) else base_branch
     logging.info(f"Adjusted base branch: {adjusted_base_branch}")
 
     g.setup_remote_with_token(gh.token, gh.org, gh.repo)
