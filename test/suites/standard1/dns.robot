@@ -1,5 +1,5 @@
 *** Settings ***
-Documentation       Networking smoke tests
+Documentation       Core DNS smoke tests
 
 Resource            ../../resources/common.resource
 Resource            ../../resources/oc.resource
@@ -32,6 +32,11 @@ ${HOSTS_CONFIG_CUSTOM}      SEPARATOR=\n
 ...                         \ \ hosts:
 ...                         \ \ \ status: Enabled
 ...                         \ \ \ file: ${CUSTOM_HOSTS_FILE}
+${HOSTSFILE_DISABLED}       SEPARATOR=\n
+...                         ---
+...                         dns:
+...                         \ \ hosts:
+...                         \ \ \ status: Disabled
 
 
 *** Test Cases ***
@@ -45,6 +50,25 @@ Resolve Host from Non-Default Hosts File
     [Documentation]    Resolve host from default hosts file
     [Setup]    Setup With Custom Config    ${HOSTS_CONFIG_CUSTOM}    ${CUSTOM_HOSTS_FILE}
     Resolve Host From Pod    ${HOSTNAME}
+    [Teardown]    Teardown Hosts File    ${HOSTNAME}
+
+Dynamic Hosts File Update Without Restart
+    [Documentation]    Verify hosts file changes are reflected without MicroShift or pod restarts
+    [Setup]    Setup With Custom Config    ${HOSTS_CONFIG_CUSTOM}    ${CUSTOM_HOSTS_FILE}
+    Resolve Host From Pod    ${HOSTNAME}
+    ${updated_hostname}=    Generate Random HostName
+    Add Entry To Hosts    ${FAKE_LISTEN_IP}    ${updated_hostname}    ${CUSTOM_HOSTS_FILE}
+    Resolve Host From Pod    ${updated_hostname}
+    [Teardown]    Run Keywords
+    ...    Remove Entry From Hosts    ${updated_hostname}    ${CUSTOM_HOSTS_FILE}
+    ...    AND    Teardown Hosts File    ${HOSTNAME}
+
+Disable CoreDNS Hosts And Verify ConfigMap Removed
+    [Documentation]    Enable CoreDNS hosts, then disable it and verify hosts-file configmap is removed
+    [Setup]    Setup With Custom Config    ${HOSTSFILE_ENABLED}    /etc/hosts
+    Disable CoreDNS Hosts
+    Run Keyword And Expect Error    1 != 0
+    ...    Oc Get    configmap    openshift-dns    hosts-file
     [Teardown]    Teardown Hosts File    ${HOSTNAME}
 
 
@@ -107,3 +131,8 @@ Check CoreDNS Hosts Feature
     EXCEPT
         Skip    CoreDNS hosts feature not available in this MicroShift version
     END
+
+Disable CoreDNS Hosts
+    [Documentation]    Disable CoreDNS hosts feature
+    Drop In MicroShift Config    ${HOSTSFILE_DISABLED}    20-dns
+    Restart MicroShift
