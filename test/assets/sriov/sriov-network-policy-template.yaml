@@ -5,7 +5,7 @@ metadata:
   namespace: sriov-network-operator
 spec:
   nodeSelector:
-    feature.node.kubernetes.io/network-sriov.capable: "true"
+    node.kubernetes.io/instance-type=rhde 
   resourceName: intelnics
   priority: 99
   mtu: 9000
