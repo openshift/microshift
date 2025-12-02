@@ -11,6 +11,7 @@ Resource            ../../resources/kubeconfig.resource
 Resource            ../../resources/common.resource
 Resource            ../../resources/systemd.resource
 Resource            ../../resources/observability.resource
+Resource            ../../resources/microshift-network.resource
 
 Suite Setup         Setup Suite And Prepare Test Host
 Suite Teardown      Teardown Suite And Revert Test Host
@@ -65,9 +66,12 @@ Logs Should Not Contain Receiver Errors
 Setup Suite And Prepare Test Host
     [Documentation]    The service starts after MicroShift starts and thus will start generating pertinent log data
     ...    right away. When the suite is executed, immediately get the cursor for the microshift-observability unit.
-    Setup Suite
+    Setup Suite With Namespace
     Check Required Observability Variables
     Set Test OTEL Configuration
+    # We need to do something to the cluster to generate new kube events.
+    Create Hello MicroShift Pod
+    Expose Hello MicroShift
     ${cur}    Get Journal Cursor    unit=microshift-observability
     VAR    ${JOURNAL_CUR}    ${cur}    scope=SUITE
 
@@ -93,7 +97,7 @@ Set Test OTEL Configuration
 Teardown Suite And Revert Test Host
     [Documentation]    Set back original OTEL config and teardown Suite
     Set Back Original OTEL Configuration
-    Teardown Suite
+    Teardown Suite With Namespace
 
 Set Back Original OTEL Configuration
     [Documentation]    Set Back Original OTEL Configuration
