@@ -10,7 +10,7 @@
 # Because the top commit is Merge Commit of PR branch into base branch (e.g. main), we need to check against the earlier commit (i.e. ^1).
 if ! git diff --exit-code "${SCENARIO_BUILD_BRANCH}^1...HEAD" "${ROOTDIR}/test/bin/common_versions.sh"; then
     # If the file was changed, regenerate it and compare - diff means that most likely the file was updated manually.
-    ./scripts/pyutils/create-venv.sh
+    "${ROOTDIR}/scripts/pyutils/create-venv.sh"
     "${ROOTDIR}/_output/pyutils/bin/python" "${ROOTDIR}/test/bin/pyutils/generate_common_versions.py" --update-file
     if ! git diff --exit-code "${ROOTDIR}/test/bin/common_versions.sh"; then
         echo "ERROR: Discovered that common_versions.sh was updated on the branch under test, but the regenerated version is different"
