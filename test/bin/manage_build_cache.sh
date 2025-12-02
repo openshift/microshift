@@ -25,33 +25,33 @@ The cache directory structure is '${AWS_BUCKET_NAME}/<branch>/<arch>/<tag>'.
   -h        Show this help.
 
   upload:   Upload build artifacts from the local disk to the specified
-            '${AWS_BUCKET_NAME}/<branch>/<uname>/<tag>' AWS S3 bucket.
+            '${AWS_BUCKET_NAME}/<branch>/<arch>/<tag>' AWS S3 bucket.
             The 'verify' operation is run before the upload attempt. If
             data already exists at the destination, the upload is skipped
             and the script exits with 0 status.
 
   download: Download build artifacts from the specified
-            '${AWS_BUCKET_NAME}/<branch>/<uname>/<tag>' AWS S3 bucket
+            '${AWS_BUCKET_NAME}/<branch>/<arch>/<tag>' AWS S3 bucket
             to the local disk.
 
   verify:   Exit with 0 status if the specified
-            '${AWS_BUCKET_NAME}/<branch>/<uname>/<tag>' sub-directory
+            '${AWS_BUCKET_NAME}/<branch>/<arch>/<tag>' sub-directory
             exists and contains files, 1 otherwise.
 
-  setlast:  Update the '${AWS_BUCKET_NAME}/<branch>/<uname>/last' file
+  setlast:  Update the '${AWS_BUCKET_NAME}/<branch>/<arch>/last' file
             contents in the AWS S3 bucket with the specified '<tag>'.
 
-  getlast:  Retrieve the '${AWS_BUCKET_NAME}/<branch>/<uname>/last'
+  getlast:  Retrieve the '${AWS_BUCKET_NAME}/<branch>/<arch>/last'
             file contents from the AWS S3 bucket. The output format is
             "LAST: <tag>" for easy parsing. The script returns the
             specified '<tag>' as a fallback if the bucket file does
             not exist.
 
-  dellast:  Delete the data pointed by the '${AWS_BUCKET_NAME}/<branch>/<uname>/last'
+  dellast:  Delete the data pointed by the '${AWS_BUCKET_NAME}/<branch>/<arch>/last'
             file contents and update the 'last' file contents in the AWS S3 bucket
             with the specified '<tag>'
 
-  keep:     Delete all data from the '${AWS_BUCKET_NAME}/<branch>/<uname>'
+  keep:     Delete all data from the '${AWS_BUCKET_NAME}/<branch>/<arch>'
             AWS S3 bucket, only keeping the 'last' and the specified
             '<tag>' sub-directories.
 
