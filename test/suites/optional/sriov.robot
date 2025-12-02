@@ -15,10 +15,8 @@ ${TEMPLATE_PATH}    ${CURDIR}/../../assets/sriov/sriov-network-policy-template.y
 Create VFs And Verify
     [Documentation]    Deploys sriovnetworknodepolicy and verifies the VF configuration
 
-    VAR    ${testcmd}=    oc get sriovnetworknodestate -o yaml -n sriov-network-operator -o json
-    Run With Kubeconfig    ${testcmd}
     VAR    ${cmd}=
-    ...    oc get sriovnetworknodestate -o yaml -n sriov-network-operator -o json | jq -r '.items[].status.interfaces[0].pciAddress'
+    ...    oc get sriovnetworknodestate -n sriov-network-operator -o json | jq -r '.items[].status.interfaces[0].pciAddress'
     ${pci_address}=    Run With Kubeconfig    ${cmd}
 
     ${template_content}=    OperatingSystem.Get File    ${TEMPLATE_PATH}
