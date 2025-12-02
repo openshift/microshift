@@ -229,7 +229,15 @@ action_keep() {
     # Get the last contents with the ${TAG_SUBDIR} default
     local -r last_dir="$(action_getlast | awk '/LAST:/ {print $NF}')"
 
-    for sub_dir in $(run_aws_cli s3 ls "${top_dir}/" | awk '{print $NF}'); do
+    # Get all sub-directories in the top directory
+    local -r sub_dirs=$(run_aws_cli s3 ls "${top_dir}/" | grep '/$' | awk '{print $NF}')
+    # Skip if only one sub-directory exists
+    if [ "$(echo "${sub_dirs}" | wc -w)" -eq 1 ] ; then
+        echo "Only one sub-directory found in '${top_dir}', keeping it"
+        return 0
+    fi
+
+    for sub_dir in ${sub_dirs}; do
         if [ "${sub_dir}" = "last" ] ; then
             continue
         fi
