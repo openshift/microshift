@@ -47,6 +47,10 @@ The cache directory structure is '${AWS_BUCKET_NAME}/<branch>/<arch>/<tag>'.
             specified '<tag>' as a fallback if the bucket file does
             not exist.
 
+  dellast:  Delete the data pointed by the '${AWS_BUCKET_NAME}/<branch>/<uname>/last'
+            file contents and update the 'last' file contents in the AWS S3 bucket
+            with the specified '<tag>'
+
   keep:     Delete all data from the '${AWS_BUCKET_NAME}/<branch>/<uname>'
             AWS S3 bucket, only keeping the 'last' and the specified
             '<tag>' sub-directories.
@@ -195,6 +199,31 @@ action_getlast() {
     rm -f "${dst_file}"
 }
 
+action_dellast() {
+    local -r top_dir="s3://${AWS_BUCKET_NAME}/${BCH_SUBDIR}/${ARCH_SUBDIR}"
+    # Get the last contents with the ${TAG_SUBDIR} default
+    local -r last_dir="$(action_getlast | awk '/LAST:/ {print $NF}')"
+
+    if [ -z "${last_dir}" ] ; then
+        echo "ERROR: Cannot delete 'last' tag because it is not set or empty"
+        exit 1
+    fi
+    if [ "${last_dir}" = "${TAG_SUBDIR}" ] ; then
+        echo "ERROR: Cannot delete 'last' tag because it is the same as the new '${TAG_SUBDIR}' tag"
+        exit 1
+    fi
+
+    # Verify that the new tag exists
+    if ! check_contents ; then
+        echo "ERROR: Cannot reset 'last' tag to a non-existent '${TAG_SUBDIR}' tag"
+        exit 1
+    fi
+
+    # Reset the last tag and delete the old contents
+    action_setlast
+    run_aws_cli s3 rm --recursive "${top_dir}/${last_dir}"
+}
+
 action_keep() {
     local -r top_dir="s3://${AWS_BUCKET_NAME}/${BCH_SUBDIR}/${ARCH_SUBDIR}"
     # Get the last contents with the ${TAG_SUBDIR} default
@@ -267,7 +296,7 @@ fi
 
 # Run actions
 case "${action}" in
-    upload|download|verify|setlast|getlast|keep)
+    upload|download|verify|setlast|getlast|dellast|keep)
         "action_${action}" "$@"
         ;;
     -h|help)
