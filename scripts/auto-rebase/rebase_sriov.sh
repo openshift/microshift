@@ -234,7 +234,7 @@ metadata:
   namespace: ${namespace}
 EOL
     )
-    echo "${serviceAccount}" > "${target}"
+    echo "${serviceAccount}" >> "${target}"
 }
 
 # extract_operator_from_csv() extracts the operator manifest from cluster
