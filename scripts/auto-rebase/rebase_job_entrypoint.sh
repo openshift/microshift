@@ -27,7 +27,7 @@ printenv
 
 if [[ "$JOB_NAME" == rehearse* ]]; then
     echo "INFO: \$JOB_NAME starts with rehearse - running in DRY RUN mode"
-    export DRY_RUN=y
+    export DRY_RUN=
 fi
 
 # This file is executed by the rebase jobs.
