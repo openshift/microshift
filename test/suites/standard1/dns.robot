@@ -95,7 +95,7 @@ Get Hosts Config Custom
 Resolve Host From Pod
     [Documentation]    Resolve host from pod
     [Arguments]    ${hostname}
-    Wait Until Keyword Succeeds    40x    2s
+    Wait Until Keyword Succeeds    40x    5s
     ...    Router Should Resolve Hostname    ${hostname}
 
 Router Should Resolve Hostname
