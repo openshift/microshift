@@ -253,6 +253,7 @@ extract_operator_from_csv() {
         | .metadata.namespace = \"${namespace}\"
         | del(.name)
         | del(.label)
+        | .spec.template.spec.containers[0].env += [{\"name\": \"SRIOV_CNI_BIN_PATH\", \"value\": \"/run/cni/bin\"}]
       " "${csv}" > "${target}"
 }
 
