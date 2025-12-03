@@ -99,7 +99,7 @@ func runAddNode(ctx context.Context, opts *AddNodeOptions) error {
 	}
 
 	nodeName := cfg.CanonicalNodeName()
-	if isNodeAlreadyInCluster(ctx, client, nodeName) {
+	if isNodeInKubernetesCluster(ctx, client, nodeName) {
 		klog.Infof("Node %s is already part of the cluster. Skipping join process.", nodeName)
 		return nil
 	}
@@ -126,12 +126,12 @@ func runAddNode(ctx context.Context, opts *AddNodeOptions) error {
 	}
 	klog.Info("Etcd certificates generated successfully")
 
-	clusterMembers, err := getClusterNodes(ctx, client)
+	etcdMembers, err := getEtcdClusterNodes(ctx, client)
 	if err != nil {
 		return fmt.Errorf("failed to get cluster information: %w", err)
 	}
 
-	if err := configureEtcdForCluster(ctx, cfg, clusterMembers, opts.Learner); err != nil {
+	if err := configureEtcdForCluster(ctx, cfg, etcdMembers, opts.Learner); err != nil {
 		return fmt.Errorf("failed to configure etcd for cluster: %w", err)
 	}
 
@@ -374,7 +374,7 @@ func generateEtcdCertificates(cfg *config.Config) error {
 	return nil
 }
 
-func getClusterNodes(ctx context.Context, client kubernetes.Interface) ([]string, error) {
+func getEtcdClusterNodes(ctx context.Context, client kubernetes.Interface) ([]string, error) {
 	nodes, err := client.CoreV1().Nodes().List(ctx, metav1.ListOptions{})
 	if err != nil {
 		return nil, fmt.Errorf("failed to list nodes: %w", err)
@@ -382,9 +382,6 @@ func getClusterNodes(ctx context.Context, client kubernetes.Interface) ([]string
 
 	var members []string
 	for _, node := range nodes.Items {
-		if !isNodeReady(&node) {
-			continue
-		}
 		nodeIP := ""
 		for _, addr := range node.Status.Addresses {
 			if addr.Type == corev1.NodeInternalIP {
@@ -393,6 +390,7 @@ func getClusterNodes(ctx context.Context, client kubernetes.Interface) ([]string
 			}
 		}
 		if nodeIP != "" {
+			//TODO net.JoinHostPort
 			members = append(members, fmt.Sprintf("%s=https://%s:2380", node.Name, nodeIP))
 		}
 	}
@@ -532,7 +530,7 @@ func restartMicroShift() error {
 	return nil
 }
 
-func isNodeAlreadyInCluster(ctx context.Context, client kubernetes.Interface, nodeName string) bool {
+func isNodeInKubernetesCluster(ctx context.Context, client kubernetes.Interface, nodeName string) bool {
 	_, err := client.CoreV1().Nodes().Get(ctx, nodeName, metav1.GetOptions{})
 	if err != nil {
 		return false
