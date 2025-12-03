@@ -4,7 +4,10 @@ FROM localhost/rhel96-bootc-brew-zstream-with-optional:latest
 
 # Install low-latency packages
 RUN dnf install -y microshift-low-latency-{{env.Getenv "BREW_Y0_RELEASE_VERSION"}} && \
-    dnf clean all
+# {{- if and (env.Getenv "UNAME_M" "") (eq "x86_64" .Env.UNAME_M) }}
+dnf install -y kernel-rt && \
+# {{- end }}
+dnf clean all
 
 # Enable microshift-tuned service
 RUN systemctl enable microshift-tuned
