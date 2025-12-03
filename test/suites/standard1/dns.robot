@@ -26,8 +26,11 @@ ${HOSTSFILE_ENABLED}        SEPARATOR=\n
 ...                         dns:
 ...                         \ \ hosts:
 ...                         \ \ \ status: Enabled
+# Lower sync frequency to speed up tests.
 ${HOSTS_CONFIG_CUSTOM}      SEPARATOR=\n
 ...                         ---
+...                         kubelet:
+...                         \ \ syncFrequency: 5s
 ...                         dns:
 ...                         \ \ hosts:
 ...                         \ \ \ status: Enabled
