@@ -43,15 +43,13 @@ Resolve Host from Default Hosts File
 
 Resolve Host from Non-Default Hosts File
     [Documentation]    Resolve host from default hosts file
-    ${config}=    Get Hosts Config Custom
-    [Setup]    Setup With Custom Config    ${config}    ${CUSTOM_HOSTS_FILE}
+    [Setup]    Setup With Custom Hosts File
     Resolve Host From Pod    ${HOSTNAME}
     [Teardown]    Teardown Hosts File    ${HOSTNAME}
 
 Dynamic Hosts File Update Without Restart
     [Documentation]    Verify hosts file changes are reflected without MicroShift or pod restarts
-    ${config}=    Get Hosts Config Custom
-    [Setup]    Setup With Custom Config    ${config}    ${CUSTOM_HOSTS_FILE}
+    [Setup]    Setup With Custom Hosts File
     Resolve Host From Pod    ${HOSTNAME}
     ${updated_hostname}=    Generate Random HostName
     Add Entry To Hosts    ${FAKE_LISTEN_IP}    ${updated_hostname}    ${CUSTOM_HOSTS_FILE}
@@ -72,8 +70,8 @@ Disable CoreDNS Hosts And Verify ConfigMap Removed
 *** Keywords ***
 Get Hosts Config Custom
     [Documentation]    Build hosts config with optional syncFrequency
-    ...                Lower sync frequency to speed up tests if SYNC_FREQUENCY is set
-    IF    '${SYNC_FREQUENCY}' != '${EMPTY}'
+    ...    Lower sync frequency to speed up tests if SYNC_FREQUENCY is set
+    IF    "${SYNC_FREQUENCY}" != "${EMPTY}"
         ${config}=    Catenate    SEPARATOR=\n
         ...    ---
         ...    kubelet:
@@ -90,7 +88,7 @@ Get Hosts Config Custom
         ...    \ \ \ status: Enabled
         ...    \ \ \ file: ${CUSTOM_HOSTS_FILE}
     END
-    [Return]    ${config}
+    RETURN    ${config}
 
 Resolve Host From Pod
     [Documentation]    Resolve host from pod
@@ -113,6 +111,11 @@ Setup With Custom Config
     Add Entry To Hosts    ${FAKE_LISTEN_IP}    ${HOSTNAME}    ${hostsFile}
     Drop In MicroShift Config    ${config_content}    20-dns
     Restart MicroShift
+
+Setup With Custom Hosts File
+    [Documentation]    Get custom hosts config and setup with it
+    ${config}=    Get Hosts Config Custom
+    Setup With Custom Config    ${config}    ${CUSTOM_HOSTS_FILE}
 
 Teardown Hosts File
     [Documentation]    Teardown the hosts file
