@@ -663,7 +663,10 @@ func fetchInitConfigurationFromJoinConfiguration(cfg *kubeadmapi.JoinConfigurati
 	}
 
 	// Create the final KubeConfig file with the cluster name discovered after fetching the cluster configuration
-	_, clusterinfo := kubeconfigutil.GetClusterFromKubeConfig(tlsBootstrapCfg)
+	_, clusterinfo, err := kubeconfigutil.GetClusterFromKubeConfig(tlsBootstrapCfg)
+	if err != nil {
+		return nil, errors.Wrap(err, "the TLS bootstrap kubeconfig is malformed")
+	}
 	tlsBootstrapCfg.Clusters = map[string]*clientcmdapi.Cluster{
 		initConfiguration.ClusterName: clusterinfo,
 	}
@@ -680,7 +683,10 @@ func fetchInitConfigurationFromJoinConfiguration(cfg *kubeadmapi.JoinConfigurati
 
 // fetchInitConfiguration reads the cluster configuration from the kubeadm-admin configMap
 func fetchInitConfiguration(client clientset.Interface) (*kubeadmapi.InitConfiguration, error) {
-	initConfiguration, err := configutil.FetchInitConfigurationFromCluster(client, nil, "preflight", true, false)
+	getNodeRegistration := false
+	getAPIEndpoint := false
+	getComponentConfigs := true
+	initConfiguration, err := configutil.FetchInitConfigurationFromCluster(client, nil, "preflight", getNodeRegistration, getAPIEndpoint, getComponentConfigs)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to fetch the kubeadm-config ConfigMap")
 	}
