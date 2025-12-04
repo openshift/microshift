@@ -12,6 +12,8 @@ scenario_remove_vms() {
 }
 
 scenario_run_tests() {
+    # The SYNC_FREQUENCY is set to a shorter-than-default value to speed up
+    # pre-submit scenario completion time in DNS tests.
     run_tests host1 \
         --variable "EXPECTED_OS_VERSION:9.6" \
         --variable "SYNC_FREQUENCY:5s" \

@@ -70,7 +70,8 @@ Disable CoreDNS Hosts And Verify ConfigMap Removed
 *** Keywords ***
 Get Hosts Config Custom
     [Documentation]    Build hosts config with optional syncFrequency
-    ...    Lower sync frequency to speed up tests if SYNC_FREQUENCY is set
+    ...    syncFrequency is configurable in order to speed up the ConfigMap synchronization time
+    ...    for the pods that mount it.
     IF    "${SYNC_FREQUENCY}" != "${EMPTY}"
         ${config}=    Catenate    SEPARATOR=\n
         ...    ---
