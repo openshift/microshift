@@ -55,6 +55,8 @@ exporters:
     metric_expiration: 30m
   prometheusremotewrite:
     endpoint: "http://[{{PROMETHEUS_HOST}}]:{{PROMETHEUS_PORT}}/api/v1/write"
+    resource_to_telemetry_conversion:
+      enabled: true
   otlphttp/loki: # only for logs, exports the logs in the loki server
     endpoint: "http://[{{LOKI_HOST}}]:{{LOKI_PORT}}/otlp"
 
@@ -71,12 +73,13 @@ service:
       exporters: [ prometheus, prometheusremotewrite ]
     metrics/kubeletstats:
       receivers: [ kubeletstats ]
+      processors: [ resourcedetection/system ]
       exporters: [ prometheus, prometheusremotewrite ]
     logs/journald:
       receivers: [ journald ]
-      processors: [ batch, resource/journald ]
+      processors: [ resourcedetection/system, batch, resource/journald ]
       exporters: [ otlphttp/loki ]
     logs/kube_events:
       receivers: [ k8s_events ]
-      processors: [ batch, resource/kube_events ]
+      processors: [ resourcedetection/system, batch, resource/kube_events ]
       exporters: [ otlphttp/loki ]

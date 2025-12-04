@@ -48,7 +48,7 @@ bash -x ./scripts/devenv-builder/cleanup-composer.sh -full
 
 cd "${ROOTDIR}/test"
 
-# Set up the hypervisor configuration for the tests and start webserver
+# Set up the hypervisor configuration for the tests and start webserver, prometheus and loki
 bash -x ./bin/manage_hypervisor_config.sh create
 
 # Setup a container registry and mirror images.
