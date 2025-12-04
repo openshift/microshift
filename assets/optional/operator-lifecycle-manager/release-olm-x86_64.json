@@ -1,6 +1,6 @@
 {
   "release": {
-    "base": "4.18.0-0.nightly-2025-11-30-172840"
+    "base": "4.18.0-0.nightly-2025-12-03-213720"
   },
   "images": {
     "operator-lifecycle-manager": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:7430023781b2028ab450fb4f805228e25c62df1930d3e2fc1edd9304bc7b5ed1",
