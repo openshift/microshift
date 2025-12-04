@@ -1,9 +1,0 @@
-- machine-config-operator embedded-component b1322e4881a5957b6eabe97fd850e8b6d2ae84e7 to ddfedfcc8fa48e7826db17ed06c19a6e1b4b5e18
-  - 88fc3dae 2025-11-25T17:56:18+00:00 remove --mount directives
-
-- ovn-kubernetes image-amd64 fc191daee22d736f094ea55adad36c5e0c48bdb9 to 187ee3d355dc5e2b5ed8e2cfbd2d3342e66c14be
-  - 9753a913 2025-11-26T17:14:26+01:00 Skip Pending pods in EgressIP status updates
-
-- ovn-kubernetes image-arm64 fc191daee22d736f094ea55adad36c5e0c48bdb9 to 187ee3d355dc5e2b5ed8e2cfbd2d3342e66c14be
-  - 9753a913 2025-11-26T17:14:26+01:00 Skip Pending pods in EgressIP status updates
-
