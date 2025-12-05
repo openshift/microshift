@@ -335,6 +335,11 @@ mirror_images() {
         echo "${src_img}" >> "${ffile}"
     done
 
+    # Add test assets images.
+    find "${SCRIPTDIR}/../assets/" -type f -exec grep -hPo "(?<=image: ).*\..*" {} \; | while read -r img; do
+        echo "${img}" >> "${ffile}"
+    done
+
     sort -u "${ifile}" "${ffile}" > "${ofile}"
     "${ROOTDIR}/scripts/mirror-images.sh" --mirror "${QUAY_PULL_SECRET}" "${ofile}" "${MIRROR_REGISTRY_URL}"
     rm -f "${ofile}" "${ffile}"
