@@ -46,11 +46,17 @@ EOF
 
 mirror_images() {
     local -r ifile=$1
+    local -r afile=$(mktemp /tmp/asset-image-list.XXXXXXXX)
     local -r ofile=$(mktemp /tmp/container-list.XXXXXXXX)
 
-    sort -u "${ifile}" > "${ofile}"
+    # Add test assets images.
+    find "${SCRIPTDIR}/../assets/" -type f -exec grep -hPo "(?<=image: ).*\..*" {} \; | while read -r img; do
+        echo "${img}" >> "${afile}"
+    done
+
+    sort -u "${ifile}" "${afile}" > "${ofile}"
     "${ROOTDIR}/scripts/image-builder/mirror-images.sh" --mirror "${PULL_SECRET}" "${ofile}" "${REGISTRY_HOST}"
-    rm -f "${ofile}"
+    rm -f "${afile}" "${ofile}"
 }
 
 mirror_bootc_images() {
