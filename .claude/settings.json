@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//tmp/**)",
+      "Bash(mktemp:*)",
+      "Bash(curl:*)",
+      "Bash(gcloud storage cp:*)",
+      "Bash(gh pr view:*)",
+      "Bash(gh pr diff:*)",
+      "Bash(tar:*)",
+      "Bash(gh pr checks:*)",
+      "WebFetch(domain:prow.ci.openshift.org)",
+      "Bash(gh issue list:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
