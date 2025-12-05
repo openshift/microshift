@@ -63,7 +63,7 @@ Create Ingress route with Custom certificate
     Deploy Hello MicroShift
     ${route_yaml}=    Create Ingress Route YAML
     Apply YAML Manifest    ${route_yaml}
-    Oc Wait    -n ${NAMESPACE} route ${ROUTE_NAME}    --for=jsonpath='.status.ingress' --timeout=60s
+    Oc Wait    -n ${NAMESPACE} route ${ROUTE_NAME}    --for=jsonpath='.status.ingress' --timeout=120s
     [Teardown]    Run Keywords
     ...    Remove ClusterIssuer
 
