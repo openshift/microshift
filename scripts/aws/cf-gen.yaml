@@ -290,6 +290,15 @@ Resources:
           #!/bin/bash -xe
           echo "====== Authorizing public key ======" | tee -a /tmp/init_output.txt
           echo "${PublicKeyString}" >> /home/ec2-user/.ssh/authorized_keys
+          # Mount /tmp on root partition to avoid tmpfs RAM usage
+          echo "====== Mounting /tmp on root partition ======" | tee -a /tmp/init_output.txt
+          mkdir -p /var/tmp-disk
+          # Preserve existing /tmp contents before mounting
+          cp -a /tmp/. /var/tmp-disk/
+          mount --bind /var/tmp-disk /tmp
+          chmod 1777 /tmp
+          echo "/var/tmp-disk /tmp none bind 0 0" >> /etc/fstab
+          echo "====== /tmp successfully mounted on /var/tmp-disk ======" | tee -a /tmp/init_output.txt
           # Use the same defaults as OCP to avoid failing requests to apiserver, such as
           # requesting logs.
           echo "====== Updating inotify =====" | tee -a /tmp/init_output.txt

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export SKIP_GREENBOOT=true
+#export SKIP_GREENBOOT=true
 export TEST_RANDOMIZATION=none
 
 # Sourced from scenario.sh and uses functions defined there.
