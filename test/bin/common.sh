@@ -387,6 +387,8 @@ MICROSHIFT_Y1_OPTIONAL_RPMS_LIST=(
 )
 MICROSHIFT_OPTIONAL_RPMS_LIST=(
     "${MICROSHIFT_Y1_OPTIONAL_RPMS_LIST[@]}"
+    microshift-sriov
+    microshift-sriov-release-info
 )
 MICROSHIFT_Y2_X86_64_RPMS_LIST=(
     microshift-ai-model-serving
