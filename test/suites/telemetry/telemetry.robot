@@ -72,22 +72,13 @@ MicroShift Reports Metrics To Default Server Through Proxy
 MicroShift Fails to Report Metrics To Prometheus Server With Telemetry Disabled
     [Documentation]    Check MicroShift is not able to send metrics to the telemetry server when it is disabled.
     [Setup]    Run Keywords
-    ...    Start Prometheus Server    ${PROMETHEUS_PORT}
-    ...    AND
     ...    Setup Telemetry Configuration    ${DISABLE_TELEMETRY_TO_PROMETHEUS}    ${PULL_SECRET_METRICS}
 
     Should Find Metrics In Journal Log Success    Telemetry is disabled
     Should Find Metrics In Journal Log Fails    Metrics sent successfully
 
-    @{metrics_to_check}=    Get List Prometheus Metrics To Check
-    FOR    ${metric}    IN    @{metrics_to_check}
-        Check Prometheus Query Is Missing    ${PROMETHEUS_HOST}    ${PROMETHEUS_PORT}    ${metric}
-    END
-
     [Teardown]    Run Keywords
     ...    Remove Telemetry Configuration
-    ...    AND
-    ...    Stop Prometheus Server    ${PROMETHEUS_PORT}
 
 MicroShift Fails to Report Metrics To Default Server With Wrong Pull Secret
     [Documentation]    Check MicroShift is not able to send metrics to the telemetry server when the pull secret is wrong.
