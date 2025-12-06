@@ -9,6 +9,8 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
     exit 1
 fi
 
+SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
 get_vrel_from_beta() {
     local -r beta_repo="$1"
     local -r beta_vrel=$(\
@@ -122,7 +124,7 @@ export RHOCP_MINOR_Y_BETA
 
 # The 'rhocp_minor_y' variable should be the previous minor version number, if
 # the previous release is available through the 'rhocp' stream, otherwise empty.
-RHOCP_MINOR_Y1="20"
+RHOCP_MINOR_Y1=20
 # The beta repository, containing dependencies, should point to the
 # OpenShift mirror URL. The mirror for previous release should always
 # be available.
@@ -142,15 +144,26 @@ export CNCF_SYSTEMD_LOGS_VERSION=v0.4
 export GITOPS_VERSION=1.16
 
 # The brew release versions needed for release regression testing
-BREW_Y0_RELEASE_VERSION="$(get_vrel_from_rpm "${BREW_RPM_SOURCE}/4.${MINOR_VERSION}-zstream/${UNAME_M}/")"
-BREW_Y1_RELEASE_VERSION="$(get_vrel_from_rpm "${BREW_RPM_SOURCE}/4.${PREVIOUS_MINOR_VERSION}-zstream/${UNAME_M}/")"
-BREW_Y2_RELEASE_VERSION="$(get_vrel_from_rpm "${BREW_RPM_SOURCE}/4.${YMINUS2_MINOR_VERSION}-zstream/${UNAME_M}/")"
-BREW_RC_RELEASE_VERSION="$(get_vrel_from_rpm "${BREW_RPM_SOURCE}/4.${MINOR_VERSION}-rc/${UNAME_M}/")"
-BREW_EC_RELEASE_VERSION="$(get_vrel_from_rpm "${BREW_RPM_SOURCE}/4.${MINOR_VERSION}-ec/${UNAME_M}/")"
-BREW_NIGHTLY_RELEASE_VERSION="$(get_vrel_from_rpm "${BREW_RPM_SOURCE}/4.${MINOR_VERSION}-nightly/${UNAME_M}/")"
+Y0_VERSION="$("${SCRIPTDIR}/manage_brew_rpms.sh" find_package "4.${MINOR_VERSION}" "zstream" "0" "0" | cut -d'-' -f2)"
+Y1_VERSION="$("${SCRIPTDIR}/manage_brew_rpms.sh" find_package "4.${MINOR_VERSION}" "zstream" "1" "0" | cut -d'-' -f2)"
+Y2_VERSION="$("${SCRIPTDIR}/manage_brew_rpms.sh" find_package "4.${MINOR_VERSION}" "zstream" "2" "0" | cut -d'-' -f2)"
+Z1_VERSION="$("${SCRIPTDIR}/manage_brew_rpms.sh" find_package "4.${MINOR_VERSION}" "zstream" "0" "1" | cut -d'-' -f2)"
+RC_VERSION="$("${SCRIPTDIR}/manage_brew_rpms.sh" find_package "4.${MINOR_VERSION}" "rc" "0" "0" | cut -d'-' -f2)"
+EC_VERSION="$("${SCRIPTDIR}/manage_brew_rpms.sh" find_package "4.${MINOR_VERSION}" "ec" "0" "0" | cut -d'-' -f2)"
+NIGHTLY_VERSION="$("${SCRIPTDIR}/manage_brew_rpms.sh" find_package "4.${MINOR_VERSION}" "nightly" "0" "0" | cut -d'-' -f2)"
+
+BREW_Y0_RELEASE_VERSION="$(get_vrel_from_rpm "${BREW_RPM_SOURCE}/${Y0_VERSION}/${UNAME_M}/")"
+BREW_Y1_RELEASE_VERSION="$(get_vrel_from_rpm "${BREW_RPM_SOURCE}/${Y1_VERSION}/${UNAME_M}/")"
+BREW_Y2_RELEASE_VERSION="$(get_vrel_from_rpm "${BREW_RPM_SOURCE}/${Y2_VERSION}/${UNAME_M}/")"
+BREW_Z1_RELEASE_VERSION="$(get_vrel_from_rpm "${BREW_RPM_SOURCE}/${Z1_VERSION}/${UNAME_M}/")"
+BREW_RC_RELEASE_VERSION="$(get_vrel_from_rpm "${BREW_RPM_SOURCE}/${RC_VERSION}/${UNAME_M}/")"
+BREW_EC_RELEASE_VERSION="$(get_vrel_from_rpm "${BREW_RPM_SOURCE}/${EC_VERSION}/${UNAME_M}/")"
+BREW_NIGHTLY_RELEASE_VERSION="$(get_vrel_from_rpm "${BREW_RPM_SOURCE}/${NIGHTLY_VERSION}/${UNAME_M}/")"
+
 export BREW_Y0_RELEASE_VERSION
 export BREW_Y1_RELEASE_VERSION
 export BREW_Y2_RELEASE_VERSION
+export BREW_Z1_RELEASE_VERSION
 export BREW_RC_RELEASE_VERSION
 export BREW_EC_RELEASE_VERSION
 export BREW_NIGHTLY_RELEASE_VERSION

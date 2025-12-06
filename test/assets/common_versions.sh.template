@@ -9,6 +9,8 @@ if [[ "${{BASH_SOURCE[0]}}" == "${{0}}" ]]; then
     exit 1
 fi
 
+SCRIPTDIR="$( cd "$( dirname "${{BASH_SOURCE[0]}}" )" && pwd )"
+
 get_vrel_from_beta() {{
     local -r beta_repo="$1"
     local -r beta_vrel=$(\
@@ -142,15 +144,26 @@ export CNCF_SYSTEMD_LOGS_VERSION={CNCF_SYSTEMD_LOGS_VERSION}
 export GITOPS_VERSION={GITOPS_VERSION}
 
 # The brew release versions needed for release regression testing
-BREW_Y0_RELEASE_VERSION="$(get_vrel_from_rpm "${{BREW_RPM_SOURCE}}/4.${{MINOR_VERSION}}-zstream/{ARCH}/")"
-BREW_Y1_RELEASE_VERSION="$(get_vrel_from_rpm "${{BREW_RPM_SOURCE}}/4.${{PREVIOUS_MINOR_VERSION}}-zstream/{ARCH}/")"
-BREW_Y2_RELEASE_VERSION="$(get_vrel_from_rpm "${{BREW_RPM_SOURCE}}/4.${{YMINUS2_MINOR_VERSION}}-zstream/{ARCH}/")"
-BREW_RC_RELEASE_VERSION="$(get_vrel_from_rpm "${{BREW_RPM_SOURCE}}/4.${{MINOR_VERSION}}-rc/{ARCH}/")"
-BREW_EC_RELEASE_VERSION="$(get_vrel_from_rpm "${{BREW_RPM_SOURCE}}/4.${{MINOR_VERSION}}-ec/{ARCH}/")"
-BREW_NIGHTLY_RELEASE_VERSION="$(get_vrel_from_rpm "${{BREW_RPM_SOURCE}}/4.${{MINOR_VERSION}}-nightly/{ARCH}/")"
+Y0_VERSION="$("${{SCRIPTDIR}}/manage_brew_rpms.sh" find_package "4.${{MINOR_VERSION}}" "zstream" "0" "0" | cut -d'-' -f2)"
+Y1_VERSION="$("${{SCRIPTDIR}}/manage_brew_rpms.sh" find_package "4.${{MINOR_VERSION}}" "zstream" "1" "0" | cut -d'-' -f2)"
+Y2_VERSION="$("${{SCRIPTDIR}}/manage_brew_rpms.sh" find_package "4.${{MINOR_VERSION}}" "zstream" "2" "0" | cut -d'-' -f2)"
+Z1_VERSION="$("${{SCRIPTDIR}}/manage_brew_rpms.sh" find_package "4.${{MINOR_VERSION}}" "zstream" "0" "1" | cut -d'-' -f2)"
+RC_VERSION="$("${{SCRIPTDIR}}/manage_brew_rpms.sh" find_package "4.${{MINOR_VERSION}}" "rc" "0" "0" | cut -d'-' -f2)"
+EC_VERSION="$("${{SCRIPTDIR}}/manage_brew_rpms.sh" find_package "4.${{MINOR_VERSION}}" "ec" "0" "0" | cut -d'-' -f2)"
+NIGHTLY_VERSION="$("${{SCRIPTDIR}}/manage_brew_rpms.sh" find_package "4.${{MINOR_VERSION}}" "nightly" "0" "0" | cut -d'-' -f2)"
+
+BREW_Y0_RELEASE_VERSION="$(get_vrel_from_rpm "${{BREW_RPM_SOURCE}}/${{Y0_VERSION}}/{ARCH}/")"
+BREW_Y1_RELEASE_VERSION="$(get_vrel_from_rpm "${{BREW_RPM_SOURCE}}/${{Y1_VERSION}}/{ARCH}/")"
+BREW_Y2_RELEASE_VERSION="$(get_vrel_from_rpm "${{BREW_RPM_SOURCE}}/${{Y2_VERSION}}/{ARCH}/")"
+BREW_Z1_RELEASE_VERSION="$(get_vrel_from_rpm "${{BREW_RPM_SOURCE}}/${{Z1_VERSION}}/{ARCH}/")"
+BREW_RC_RELEASE_VERSION="$(get_vrel_from_rpm "${{BREW_RPM_SOURCE}}/${{RC_VERSION}}/{ARCH}/")"
+BREW_EC_RELEASE_VERSION="$(get_vrel_from_rpm "${{BREW_RPM_SOURCE}}/${{EC_VERSION}}/{ARCH}/")"
+BREW_NIGHTLY_RELEASE_VERSION="$(get_vrel_from_rpm "${{BREW_RPM_SOURCE}}/${{NIGHTLY_VERSION}}/{ARCH}/")"
+
 export BREW_Y0_RELEASE_VERSION
 export BREW_Y1_RELEASE_VERSION
 export BREW_Y2_RELEASE_VERSION
+export BREW_Z1_RELEASE_VERSION
 export BREW_RC_RELEASE_VERSION
 export BREW_EC_RELEASE_VERSION
 export BREW_NIGHTLY_RELEASE_VERSION
