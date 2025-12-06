@@ -26,7 +26,7 @@ X86 64 Should Run RT Kernel
 
     ${arch}=    Command Should Work    uname -m
     IF    "${arch}" == "x86_64"
-        ${kernel}=    Command Should Work    sudo grubby --default-kernel
+        ${kernel}=    Command Should Work    uname -r
         Should End With    ${kernel}    +rt
     END
 
