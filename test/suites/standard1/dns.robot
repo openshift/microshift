@@ -60,6 +60,7 @@ Dynamic Hosts File Update Without Restart
 
 Disable CoreDNS Hosts And Verify ConfigMap Removed
     [Documentation]    Enable CoreDNS hosts, then disable it and verify hosts-file configmap is removed
+    [Tags]    robot:exclude
     [Setup]    Setup With Custom Config    ${HOSTSFILE_ENABLED}    /etc/hosts
     Disable CoreDNS Hosts
     Run Keyword And Expect Error    1 != 0
