@@ -1,6 +1,4 @@
-- cluster-network-operator embedded-component 45843d223ceaea458879da3ee58d89ce1863230b to 8f216c0de0807e9a256aef6020d9f0a39cfff817
-  - 23e7363 2025-11-13T11:01:09+00:00 Preserve custom resource requests on ovn-control-plane pods
-
-- machine-config-operator embedded-component 0a8e1230d454fb7d72f54bf9065db3a4769b9a86 to 5fe9249e195b76d4e2482cbd5d3e50b848b9a3f5
-  - aa13e2db 2025-11-21T15:53:16-05:00 check ClusterImagePolicy conflicts only on default clusters
+- api embedded-component 1886180ef4300f41168c2d498e0acecd02fa2a48 to 1cb53e34ca33d020c765093c21c9b7f4502cbea7
+  - 6461e395 2025-12-02T19:18:11+01:00 OCPBUGS-60885: Introduce ClosedClientConnectionPolicy to IngressController API
+  - cb64c7d3 2025-11-27T21:09:46+01:00 OCPBUGS-61858: Add HTTPKeepAliveTimeout to IngressController API
 
