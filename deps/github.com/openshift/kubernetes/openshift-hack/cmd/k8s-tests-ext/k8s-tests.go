@@ -84,6 +84,12 @@ func main() {
 		Qualifiers: []string{withExcludedTestsFilter(`(name.contains('[Serial]') || labels.exists(l, l == '[Serial]'))`)},
 	})
 
+	kubeTestsExtension.AddSuite(e.Suite{
+		Name:        "kubernetes/autoscaling/hpa",
+		Qualifiers:  []string{"name.contains('[Feature:HPA]')"}, // Note that this does not use withExcludedTestsFilter to be able to run DedicatedJob labelled tests.
+		Parallelism: 3,                                          // HPA tests have high CPU + memory usage, so we cannot have a high level of parallelism here.
+	})
+
 	for k, v := range image.GetOriginalImageConfigs() {
 		image := convertToImage(v)
 		image.Index = int(k)
@@ -160,6 +166,7 @@ func withExcludedTestsFilter(baseExpr string) string {
 		"[Slow]",
 		"[Flaky]",
 		"[Local]",
+		"[DedicatedJob]",
 	}
 
 	filter := ""
@@ -167,7 +174,7 @@ func withExcludedTestsFilter(baseExpr string) string {
 		if i > 0 {
 			filter += " && "
 		}
-		filter += fmt.Sprintf("!name.contains('%s')", s)
+		filter += fmt.Sprintf("!name.contains('%s') && !labels.exists(l, l == '%s')", s, s)
 	}
 
 	if baseExpr != "" {
