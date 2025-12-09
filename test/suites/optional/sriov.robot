@@ -15,9 +15,6 @@ ${TEMPLATE_PATH}    ${CURDIR}/../../assets/sriov/sriov-network-policy-template.y
 Create VFs And Verify
     [Documentation]    Deploys sriovnetworknodepolicy and verifies the VF configuration
 
-    ${stdout}=    Execute Command    sudo ls -l /run/cni/bin
-    Should Contain    ${stdout}    sriov
-
     VAR    ${cmd_pci_address}=
     ...    oc get sriovnetworknodestate -n sriov-network-operator -o json | jq -r '.items[].status.interfaces[0].pciAddress'
     ${pci_address}=    Run With Kubeconfig    ${cmd_pci_address}
@@ -34,6 +31,9 @@ Create VFs And Verify
     Oc Apply    -f ${OUTPUT_DIR}/final-sriov-policy.yaml -n sriov-network-operator
 
     Wait Until Resource Exists    sriovnetworknodepolicy    policy-1    sriov-network-operator
+
+    ${stdout}=    Execute Command    sudo ls -l /run/cni/bin
+    Should Contain    ${stdout}    sriov
 
     Wait Until Keyword Succeeds    1min    5s
     ...    Verify VF Count    2
