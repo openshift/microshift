@@ -128,36 +128,17 @@ Custom Feature Gates Are Passed To Kube APIServer
 Feature Gate Lock File Created With Custom Feature Gates
     [Documentation]    Verify that feature gate lock file is created when custom feature gates are configured.
     ...    The lock file prevents upgrades and configuration changes when CustomNoUpgrade feature set is used.
-    [Setup]    Run Keywords
-    ...    Stop MicroShift
-    ...    AND
-    ...    Remove Feature Gate Lock File If Exists
+    [Setup]    Setup MicroShift With Custom Feature Gates
 
-    Drop In MicroShift Config    ${CUSTOM_FEATURE_GATES}    10-featuregates
-    Start MicroShift
     Wait Until Keyword Succeeds    2 min    5 sec    Feature Gate Lock File Should Exist
     Feature Gate Lock File Should Contain Feature Gates    CustomNoUpgrade    TestFeatureEnabled
 
-    [Teardown]    Run Keywords
-    ...    Stop MicroShift
-    ...    AND
-    ...    Remove Drop In MicroShift Config    10-featuregates
-    ...    AND
-    ...    Remove Feature Gate Lock File If Exists
-    ...    AND
-    ...    Start MicroShift
+    [Teardown]    Teardown MicroShift After Custom Feature Gates Test
 
 Feature Gate Config Change Blocked After Lock Created
     [Documentation]    Verify that changing feature gate config is blocked after lock file exists.
     ...    MicroShift must refuse to start if feature gates change after CustomNoUpgrade is set.
-    [Setup]    Run Keywords
-    ...    Stop MicroShift
-    ...    AND
-    ...    Remove Feature Gate Lock File If Exists
-    ...    AND
-    ...    Drop In MicroShift Config    ${CUSTOM_FEATURE_GATES}    10-featuregates
-    ...    AND
-    ...    Start MicroShift
+    [Setup]    Setup MicroShift With Custom Feature Gates
 
     Wait Until Keyword Succeeds    2 min    5 sec    Feature Gate Lock File Should Exist
 
@@ -165,26 +146,12 @@ Feature Gate Config Change Blocked After Lock Created
     Drop In MicroShift Config    ${DIFFERENT_FEATURE_GATES}    10-featuregates
     MicroShift Should Fail To Start Due To Feature Gate Change
 
-    [Teardown]    Run Keywords
-    ...    Stop MicroShift
-    ...    AND
-    ...    Remove Drop In MicroShift Config    10-featuregates
-    ...    AND
-    ...    Remove Feature Gate Lock File If Exists
-    ...    AND
-    ...    Start MicroShift
+    [Teardown]    Teardown MicroShift After Custom Feature Gates Test
 
 Feature Gate Lock File Persists Across Restarts With Same Config
     [Documentation]    Verify that feature gate lock file persists and validation succeeds across restarts
     ...    when the same feature gate configuration is maintained.
-    [Setup]    Run Keywords
-    ...    Stop MicroShift
-    ...    AND
-    ...    Remove Feature Gate Lock File If Exists
-    ...    AND
-    ...    Drop In MicroShift Config    ${CUSTOM_FEATURE_GATES}    10-featuregates
-    ...    AND
-    ...    Start MicroShift
+    [Setup]    Setup MicroShift With Custom Feature Gates
 
     Wait Until Keyword Succeeds    2 min    5 sec    Feature Gate Lock File Should Exist
 
@@ -192,14 +159,7 @@ Feature Gate Lock File Persists Across Restarts With Same Config
     Restart MicroShift
     Feature Gate Lock File Should Exist
 
-    [Teardown]    Run Keywords
-    ...    Stop MicroShift
-    ...    AND
-    ...    Remove Drop In MicroShift Config    10-featuregates
-    ...    AND
-    ...    Remove Feature Gate Lock File If Exists
-    ...    AND
-    ...    Start MicroShift
+    [Teardown]    Teardown MicroShift After Custom Feature Gates Test
 
 Deploy MicroShift With LVMS By Default
     [Documentation]    Verify that LVMS and CSI snapshotting are deployed when config fields are null.
@@ -298,8 +258,10 @@ Setup Audit Flags
 
 Setup Custom Feature Gates
     [Documentation]    Apply the custom feature gates config values set in ${CUSTOM_FEATURE_GATES}
+    Stop MicroShift
+    Remove Feature Gate Lock File If Exists
     Drop In MicroShift Config    ${CUSTOM_FEATURE_GATES}    10-featuregates
-    Restart MicroShift
+    Start MicroShift
 
 Remove Feature Gate Lock File If Exists
     [Documentation]    Remove the feature gate lock file if it exists, for test cleanup
@@ -325,6 +287,20 @@ MicroShift Should Fail To Start Due To Feature Gate Change
     ${journal}=    Command Should Work    journalctl -u microshift -n 100 --no-pager
     Should Contain    ${journal}    feature gate configuration has changed
     Should Contain    ${journal}    microshift-cleanup-data
+
+Setup MicroShift With Custom Feature Gates
+    [Documentation]    Stop MicroShift, remove lock file, and start with custom feature gates
+    Stop MicroShift
+    Remove Feature Gate Lock File If Exists
+    Drop In MicroShift Config    ${CUSTOM_FEATURE_GATES}    10-featuregates
+    Start MicroShift
+
+Teardown MicroShift After Custom Feature Gates Test
+    [Documentation]    Clean up after a feature gate test
+    Stop MicroShift
+    Remove Drop In MicroShift Config    10-featuregates
+    Remove Feature Gate Lock File If Exists
+    Start MicroShift
 
 Deploy Storage Config
     [Documentation]    Applies a storage ${config} to the exist MicroShift config, pushes it to the MicroShift host,
