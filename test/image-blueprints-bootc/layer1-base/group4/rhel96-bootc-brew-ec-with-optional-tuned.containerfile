@@ -3,7 +3,7 @@
 FROM localhost/rhel96-bootc-brew-ec-with-optional:latest
 
 # Install low-latency packages
-RUN dnf install -y microshift-low-latency-{{env.Getenv "BREW_Y0_RELEASE_VERSION"}} && \
+RUN dnf install -y microshift-low-latency-{{env.Getenv "BREW_EC_RELEASE_VERSION"}} && \
 # {{- if and (env.Getenv "UNAME_M" "") (eq "x86_64" .Env.UNAME_M) }}
 dnf install -y kernel-rt && \
 # {{- end }}
