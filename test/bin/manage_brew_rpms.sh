@@ -64,6 +64,7 @@ action_find_package() {
     ver_y=$((ver_y - ver_prev_y))
 
     local package=""
+    set +x
     case ${ver_type} in
         zstream)
             package_list=$(sudo dnf repoquery --quiet --repo "rhocp-${ver_x}.${ver_y}-for-rhel-9-${UNAME_M}-rpms" 2>/dev/null) || true
@@ -89,7 +90,7 @@ action_find_package() {
             exit 1
             ;;
     esac
-
+    set -x
     echo "${package}"
 }
 
@@ -146,14 +147,16 @@ brew_cli_download() {
 
     # Format sub_dir for EC, RC and nightly
     if [ "${ver_type}" = "ec" ] || [ "${ver_type}" = "rc" ] || [ "${ver_type}" = "nightly" ] ; then
-        sub_dir=$(echo "${sub_dir}" | sed -E 's/(.*)(\.0~)(rc|ec|nightly)(.*)/\1-\3/g')
+        final_sub_dir=$(echo "${sub_dir}" | sed -E 's/(.*)(~)(.*)(rc|ec|nightly)(.*)/\1-\4/g')
+    elif [ "${ver_type}" = "zstream" ] ; then
+        final_sub_dir="${sub_dir}"
     fi
 
     # Download all the supported architectures as the required architecture
     # cannot be identified easily when running in a CI job
     for arch in x86_64 aarch64 ; do
         local adir
-        adir="${main_dir}/${sub_dir}/${arch}"
+        adir="${main_dir}/${final_sub_dir}/${arch}"
 
         if ! mkdir -p "${adir}" ; then
             echo "ERROR: Failed to create directory '${adir}'"
