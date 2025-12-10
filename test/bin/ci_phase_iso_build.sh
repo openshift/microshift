@@ -98,7 +98,7 @@ run_image_build() {
             $(dry_run) bash -x ./bin/build_images.sh -l ./image-blueprints/layer3-periodic
         fi
         if [[ "${CI_JOB_NAME}" =~ .*release.* ]]; then
-            $(dry_run) bash -x ./bin/build_images.sh -l ./image-blueprints/layer4-brew
+            $(dry_run) bash -x ./bin/build_images.sh -l ./image-blueprints/layer4-release
         fi
     else
         # Fall back to full build when not running in CI
