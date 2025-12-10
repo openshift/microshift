@@ -11,6 +11,7 @@ COPY ./bootc-images/microshift-rt.repo /etc/yum.repos.d/
 RUN dnf install -y microshift-low-latency-{{env.Getenv "BREW_EC_RELEASE_VERSION"}} && \
 # {{- if and (env.Getenv "UNAME_M" "") (eq "x86_64" .Env.UNAME_M) }}
 dnf install -y kernel-rt && \
+dnf remove -y kernel kernel-core kernel-modules && \
 rm -vf /etc/yum.repos.d/microshift-rt.repo && \
 # {{- end }}
 dnf clean all
