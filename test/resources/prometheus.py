@@ -19,7 +19,24 @@ def _run_prometheus_query(host: str, port: int, query: str) -> requests.Response
     return response
 
 
-def check_prometheus_query(host: str, port: int, query: str) -> None:
+def _add_hostname_filter(query: str, add_hostname_filter: bool = True) -> str:
+    if not add_hostname_filter:
+        return query
+
+    try:
+        from robot.libraries.BuiltIn import BuiltIn
+        # Running within RF
+        stdout, _, _ = BuiltIn().run_keyword("Command Execution", "hostname")
+        if stdout:
+            query = f"{query}{{host_name=\"{stdout}\"}}"
+            _log(f"Added hostname to query: {query}")
+    except Exception:
+        None
+    return query
+
+
+def check_prometheus_query(host: str, port: int, query: str, add_hostname_filter: bool = True) -> None:
+    query = _add_hostname_filter(query, add_hostname_filter)
     response = _run_prometheus_query(host, port, query)
     data_result_list: list = response.json().get("data", {}).get("result")
     if not data_result_list or len(data_result_list) == 0:

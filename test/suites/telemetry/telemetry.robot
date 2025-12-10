@@ -20,7 +20,6 @@ Test Tags           restart    slow
 ${PROXY_HOST}                           ${EMPTY}
 ${PROXY_PORT}                           ${EMPTY}
 ${PROMETHEUS_HOST}                      ${EMPTY}
-${PROMETHEUS_PORT}                      ${EMPTY}
 ${TELEMETRY_WRITE_ENDPOINT}             https://infogw.api.openshift.com/metrics/v1/receive
 ${PROXY_ENDPOINT}                       http://${PROXY_HOST}:${PROXY_PORT}/api/v1/write
 ${ENABLE_TELEMETRY}                     SEPARATOR=\n
@@ -89,22 +88,16 @@ MicroShift Fails to Report Metrics To Default Server With Wrong Pull Secret
 
 MicroShift Reports Metrics To Prometheus Server
     [Documentation]    Check the expected metrics are sent to the local server.
-    [Setup]    Run Keywords
-    ...    Start Prometheus Server    ${PROMETHEUS_PORT}
-    ...    AND
-    ...    Setup Telemetry Configuration    ${ENABLE_TELEMETRY_TO_PROMETHUS}    ${PULL_SECRET_METRICS}
+    [Setup]    Setup Telemetry Configuration    ${ENABLE_TELEMETRY_TO_PROMETHUS}    ${PULL_SECRET_METRICS}
 
     Should Find Metrics In Journal Log Success    Metrics sent successfully
 
     @{metrics_to_check}=    Get List Prometheus Metrics To Check
     FOR    ${metric}    IN    @{metrics_to_check}
-        Check Prometheus Query    ${PROMETHEUS_HOST}    ${PROMETHEUS_PORT}    ${metric}
+        Check Prometheus Query    ${PROMETHEUS_HOST}    ${PROMETHEUS_PORT}    ${metric}    add_hostname_filter=${False}
     END
 
-    [Teardown]    Run Keywords
-    ...    Remove Telemetry Configuration
-    ...    AND
-    ...    Stop Prometheus Server    ${PROMETHEUS_PORT}
+    [Teardown]    Remove Telemetry Configuration
 
 
 *** Keywords ***
@@ -128,7 +121,7 @@ Check Required Telemetry Variables
     Should Not Be Empty    ${PROMETHEUS_HOST}    PROMETHEUS_HOST variable is required
     ${string_value}=    Convert To String    ${PROMETHEUS_PORT}
     Should Not Be Empty    ${string_value}    PROMETHEUS_PORT variable is required
-    Should Not Be Empty    ${PROXY_HOST}    PROXY_HOST variable is required
+    Should Not Be Empty    ${PROXY_PORT}    PROXY_PORT variable is required
     ${string_value}=    Convert To String    ${PROXY_PORT}
     Should Not Be Empty    ${string_value}    PROXY_PORT variable is required
 
