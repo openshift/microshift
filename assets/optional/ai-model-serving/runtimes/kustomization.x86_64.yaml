@@ -2,34 +2,34 @@
 images:
   - name: caikit-tgis-image
     newName: quay.io/modh/caikit-tgis-serving
-    digest: sha256:d8294f446afefc6cbba0df882bba12cdad142f79b29bda46227a6328128d7fb6
+    digest: sha256:8c7ae765024ecd5ef27d4c4590a9fb1f9682ed18d116fc08b95cc8ca583272e7
   - name: caikit-standalone-image
     newName: quay.io/modh/caikit-nlp
-    digest: sha256:c867652a543eacd8288d08e9d38d8d25468c04fb838eebf450906293890b040d
+    digest: sha256:e16c35fe2cfef7820591bd88ab1aab42ac5f90bfe0cfd165f6b3c2b1e6801891
   - name: tgis-image
     newName: quay.io/modh/text-generation-inference
-    digest: sha256:e923ebb8e6b8bbc28144d3f143c8453a4c526bc1852952209976cc27a311883b
+    digest: sha256:7573fb6fa22fe259654d8be7d648b79b081fb565b34772f09cba0501e5005d73
   - name: ovms-image
     newName: quay.io/modh/openvino_model_server
     digest: sha256:eee2857ddd5cc2df9ea7373ae7c6ae814d77bd631db5c52b91edad18ac6c73c8
   - name: vllm-cuda-image
     newName: quay.io/modh/vllm
-    digest: sha256:56aa86c6ed6ba6cc9557a8583ff9d4ee535193f6cda030bd1268064bc70120e3
+    digest: sha256:d75db59ecfe38287f51b8342851005cdbd879c5c6e8ec75a961a257adf66f9f2
   - name: guardrails-detector-huggingface-runtime-image
     newName: quay.io/modh/odh-trustyai-hf-detector-runtime-rhel9
-    digest: sha256:86316078a2d70ed2d754d683f0daedb76e632dd2b0588afa7713ce2a2a593e2f
+    digest: sha256:9081ffe45a8de4a9d80f5cad1c749c43ddad9bed12760a7efb67a7abd64ac38b
   - name: vllm-cpu-image
     newName: quay.io/modh/vllm
-    digest: sha256:40e3b271035a750fb185cedb241a108ba0c11de90793d88983aaf805e5357f45
+    digest: sha256:ea905e759f0ad29d8a13af57996dbf6bbb013e7907bb555a49ebc8e4157f08ae
   - name: vllm-gaudi-image
     newName: quay.io/modh/vllm
-    digest: sha256:6025bfb31163b7db86d7f0a844da068c88babf4e970c5244492e82bdbaf8dcbe
+    digest: sha256:50bbe007f3e5c88977a5d5399e13d98f05b7542cee3455113a9028e699ccfdc9
   - name: vllm-ppc64le-image
     newName: quay.io/opendatahub/vllm:fast-ppc64le
     digest: quay.io/opendatahub/vllm:fast-ppc64le
   - name: vllm-rocm-image
     newName: quay.io/modh/vllm
-    digest: sha256:2a90ded5cab4c03d4937c81cf0587cb0109c589e37058a50099139ab62a0666c
+    digest: sha256:7b9bd716efd34fae634e2f986bca2841ea240b113104cf73f68223e16c9ac3ff
   - name: vllm-s390x-image
     newName: quay.io/opendatahub/vllm:fast-s390x
     digest: quay.io/opendatahub/vllm:fast-s390x

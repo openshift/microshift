@@ -21,17 +21,12 @@ ${FAKE_LISTEN_IP}           99.99.99.99
 ${CUSTOM_HOSTS_FILE}        /tmp/hosts23
 ${PODS_HOSTS_FILE}          /tmp/hosts/hosts
 ${HOSTNAME}                 ${EMPTY}
+${SYNC_FREQUENCY}           ${EMPTY}
 ${HOSTSFILE_ENABLED}        SEPARATOR=\n
 ...                         ---
 ...                         dns:
 ...                         \ \ hosts:
 ...                         \ \ \ status: Enabled
-${HOSTS_CONFIG_CUSTOM}      SEPARATOR=\n
-...                         ---
-...                         dns:
-...                         \ \ hosts:
-...                         \ \ \ status: Enabled
-...                         \ \ \ file: ${CUSTOM_HOSTS_FILE}
 ${HOSTSFILE_DISABLED}       SEPARATOR=\n
 ...                         ---
 ...                         dns:
@@ -48,13 +43,13 @@ Resolve Host from Default Hosts File
 
 Resolve Host from Non-Default Hosts File
     [Documentation]    Resolve host from default hosts file
-    [Setup]    Setup With Custom Config    ${HOSTS_CONFIG_CUSTOM}    ${CUSTOM_HOSTS_FILE}
+    [Setup]    Setup With Custom Hosts File
     Resolve Host From Pod    ${HOSTNAME}
     [Teardown]    Teardown Hosts File    ${HOSTNAME}
 
 Dynamic Hosts File Update Without Restart
     [Documentation]    Verify hosts file changes are reflected without MicroShift or pod restarts
-    [Setup]    Setup With Custom Config    ${HOSTS_CONFIG_CUSTOM}    ${CUSTOM_HOSTS_FILE}
+    [Setup]    Setup With Custom Hosts File
     Resolve Host From Pod    ${HOSTNAME}
     ${updated_hostname}=    Generate Random HostName
     Add Entry To Hosts    ${FAKE_LISTEN_IP}    ${updated_hostname}    ${CUSTOM_HOSTS_FILE}
@@ -73,10 +68,33 @@ Disable CoreDNS Hosts And Verify ConfigMap Removed
 
 
 *** Keywords ***
+Get Hosts Config Custom
+    [Documentation]    Build hosts config with optional syncFrequency
+    ...    syncFrequency is configurable in order to speed up the ConfigMap synchronization time
+    ...    for the pods that mount it.
+    IF    "${SYNC_FREQUENCY}" != "${EMPTY}"
+        ${config}=    Catenate    SEPARATOR=\n
+        ...    ---
+        ...    kubelet:
+        ...    \ \ syncFrequency: ${SYNC_FREQUENCY}
+        ...    dns:
+        ...    \ \ hosts:
+        ...    \ \ \ status: Enabled
+        ...    \ \ \ file: ${CUSTOM_HOSTS_FILE}
+    ELSE
+        ${config}=    Catenate    SEPARATOR=\n
+        ...    ---
+        ...    dns:
+        ...    \ \ hosts:
+        ...    \ \ \ status: Enabled
+        ...    \ \ \ file: ${CUSTOM_HOSTS_FILE}
+    END
+    RETURN    ${config}
+
 Resolve Host From Pod
     [Documentation]    Resolve host from pod
     [Arguments]    ${hostname}
-    Wait Until Keyword Succeeds    40x    2s
+    Wait Until Keyword Succeeds    40x    5s
     ...    Router Should Resolve Hostname    ${hostname}
 
 Router Should Resolve Hostname
@@ -94,6 +112,11 @@ Setup With Custom Config
     Add Entry To Hosts    ${FAKE_LISTEN_IP}    ${HOSTNAME}    ${hostsFile}
     Drop In MicroShift Config    ${config_content}    20-dns
     Restart MicroShift
+
+Setup With Custom Hosts File
+    [Documentation]    Get custom hosts config and setup with it
+    ${config}=    Get Hosts Config Custom
+    Setup With Custom Config    ${config}    ${CUSTOM_HOSTS_FILE}
 
 Teardown Hosts File
     [Documentation]    Teardown the hosts file

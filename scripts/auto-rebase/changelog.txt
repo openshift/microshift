@@ -1,8 +1,209 @@
-- oc image-arm64 8642d882f16de34a033ac4ac19dfde866c7a523f to 02aba637a54c5d1317b5c284e213d7a85d64d6bb
+- api embedded-component 1ef028d1e4ba105d95d9c8a0307adef2e4f55775 to c2a41ea924bd8227622363c3d12f456cd2186924
+  - 9be6a099 2025-12-04T15:07:42-05:00 Added AWS dedicated host support
+  - 21f35f5f 2025-12-04T08:09:25+01:00 MCO-2005: Include missing OSImageStream TP CRDs
+  - 85216507 2025-12-03T08:38:30-05:00 internalreleaseimage: add missing status fields
+  - 6127c8dd 2025-12-02T21:21:08+05:30 make update, update-codegen-crds
+  - 4cb8a5ef 2025-12-02T21:16:43+05:30 Enable DRA(DynamicResourceAllocation) by default from OCP 4.21
+  - 2a692fb7 2025-12-02T09:41:34+01:00 feat: keep insights CRDs into a payload
+  - 0bbaea9d 2025-12-01T14:07:12+01:00 Revert "Merge pull request #2448 from opokornyy/CCXDEV-15259-io-v1"
+  - 6718b87d 2025-11-24T14:49:20-05:00 CORS-4281: Remove the GCP Service Endpoints
+  - 42f44585 2025-11-24T08:09:01-08:00 MULTIARCH-5190: Promote ImageStremImportMode to default
+  - 7a0d9464 2025-11-24T05:58:40-05:00 fix
+  - a7690be7 2025-11-24T05:58:40-05:00 modified v1alpha1 internalreleaseimage status to use the same structure adopted for the MCN status field
+  - dda85c36 2025-11-24T05:58:35-05:00 machineconfiguration/v1alpha1: add InternalReleaseImage
+  - 724606f5 2025-11-24T11:31:43+01:00 Disable OLMv1 Boxcutter FeatureGate
+  - 3089262e 2025-11-21T15:21:40+01:00 MCO-1927: Add OSImageStream v1alpha1 API
+  - 975f5658 2025-11-19T15:31:20+01:00 config/v1alpha1: fix ClusterMonitoring CRD plural name
+  - bfbc84f6 2025-11-18T23:08:08-05:00 Promote SigstoreImageVerificationPKI feature to default
+  - d6c1f0f3 2025-11-10T11:17:06+00:00 AGENTS: Using API_GROUP_VERSIONS generates incorrect openapi
+  - 8f511933 2025-11-07T11:29:55-05:00 (OLMv1) Update EP link for SingleOwnNamespace feature
+
+- cluster-csi-snapshot-controller-operator embedded-component 40c913a6a7745310e443592ba8d4cddd76176e09 to 0dd541084bee8885dbd14dcd6eb2f826ba779883
+  - f048285 2025-12-01T16:43:55-08:00 Add ClusterRole and other related objects to ClusterOperator relatedObjects
+
+- cluster-ingress-operator embedded-component efab5661851e5fe5a37b62456ecac4284c4b15bc to b62dd27c901d495e6e78b11968872c002cc2416f
+  - 92625c1 2025-11-07T08:54:39-05:00 CORS-4229: Revert "dns/gcp: Allow configuring custom endpoints"
+
+- cluster-kube-apiserver-operator embedded-component 151f2be4e47cc3826b266b16066829f3f4e16a98 to eecc8a9b87afa5ba882564cc4a352c93a555d7ab
+  - effc2a2 2025-11-27T18:38:16+05:30 Bump dependencies
+  - a9b4703 2025-11-27T18:37:54+05:30 Adds openshift/cluster-kube-apiserver-operator/operator/serial suite to the test ext binary
+  - 1d98eee 2025-11-19T22:13:59+01:00 podsecurityreadinesscontroller: address code rabbit remarks
+  - e6568d5 2025-11-19T12:20:27+01:00 podsecurityreadinesscontroller: adjust unit tests to reflect change
+  - ce62a0a 2025-11-19T12:20:26+01:00 podsecurityreadinesscontroller: return err on no violating pod
+  - 51baf5f 2025-11-19T12:20:25+01:00 podsecurityreadinesscontroller: remove tautological condition
+  - 17c811b 2025-11-19T12:20:25+01:00 podsecurityreadinesscontroller: fix tests to match new logic
+  - 21a70a7 2025-11-19T12:20:24+01:00 podsecurityreadinesscontroller: add fine-grained classification
+  - ad13227 2025-11-19T12:20:23+01:00 podsecurityreadinesscontroller: fix tests after renaming
+  - fdbd2d5 2025-11-19T12:20:22+01:00 podsecurityreadinesscontroller: change actual CFE name
+  - c5cee71 2025-11-19T12:20:21+01:00 podsecurityreadinesscontroller: change type from cu to unclassified
+  - 646f3ea 2025-11-19T12:20:20+01:00 podsecurityreadinesscontroller: create filter without side-effects
+  - 00f3a50 2025-11-19T12:20:19+01:00 podsecurityreadinesscontroller: wire down psapi.ParseLevel to classific
+  - e9c63ee 2025-11-19T12:20:14+01:00 go mod vendor
+  - 24ccc18 2025-11-18T14:55:32-03:00 Stop serving VolumeAttributesClass v1beta1
+  - c7f9f35 2025-11-18T17:35:15+05:30 Removing dependency on tests-suit.mk
+  - d4fe73e 2025-11-18T12:41:38+01:00 podsecurityreadinesscontroller: ignore restricted SCCs, drop debugging logs
+  - 385f8c1 2025-11-18T12:41:37+01:00 podsecurityreadinesscontroller: wire classification, simplify conditions
+  - cb43e0c 2025-11-18T12:41:36+01:00 podsecurityreadinesscontroller: create classification, add README
+  - 400cead 2025-11-18T12:41:35+01:00 podsecurityreadinesscontroller: refactor, return test PSS, fix err ret
+  - 1a89d03 2025-11-18T11:48:41+05:30 Updating vendor
+  - 4b87445 2025-11-18T09:55:35+05:30 Update dockerfile
+  - e01e18c 2025-11-17T22:08:35+05:30 Update main.go
+  - 878aba8 2025-11-17T21:05:48+05:30 Updated binary main.go simple as suggested
+  - 96d0633 2025-11-17T17:10:13+05:30 Vendor build-machinery-go PR #112: Add reusable test extension targets
+  - e8f02fe 2025-11-17T16:30:41+05:30 Removed suites
+  - 830b39a 2025-11-17T10:06:33+05:30 Simplify test infrastructure by reusing existing build target
+  - 99e19e8 2025-11-14T18:12:26+05:30 Simplify Makefile and add basic test documentation
+  - 99c28de 2025-11-14T16:16:23+05:30 Add openshift-tests-extension dependency and vendor upstream code
+  - b1886e5 2025-11-14T16:15:46+05:30 Add OpenShift Tests Extension infrastructure
+  - e340297 2025-11-07T08:46:40+01:00 deps: Update library-go to update staticpod pkg
+  - 5af83d1 2025-11-05T10:54:20+05:30 Update README with dependency isolation details and corrected paths
+  - 7f7a64d 2025-11-03T08:52:46-05:00 remove beta apis enablement for the resource group
+  - 84f6caa 2025-10-28T09:56:22+05:30 Fix run-suite target and suite name typos
+  - 9933826 2025-10-28T09:45:17+05:30 Add tests-ext-clean and run-suite targets to root Makefile
+  - 2bfe7d9 2025-10-28T09:39:27+05:30 Add run-suite target to test extension Makefile
+  - f4707ba 2025-10-28T09:26:59+05:30 Create separate Go module for test extension
+
+- cluster-kube-controller-manager-operator embedded-component e1cdb251d9ef7e74265bb7c8884a47cc0803068b to 395de96705749de9c6a5f25747b9d5c3d5f65a8f
+  - b982b29 2025-11-24T15:45:56-06:00 Migrate away from deprecated ioutil
+  - 4f0d3b3 2025-11-24T14:29:20+05:30 Create separate Go module for test extension
+  - 2ab1905 2025-11-21T08:59:20+01:00 manifests: Expand related objects in clusteroperator
+  - f7a23c8 2025-11-05T13:00:11+05:30 Fixing arch issue
+
+- cluster-kube-scheduler-operator embedded-component 04cb35e0397a3261e783a311b3b8590b8839ea2d to 4f59ea50a588e9afa714e30e7502eca8b570751b
+  - 2b5b514 2025-11-21T09:02:29+01:00 manifests: Expand related objects in clusteroperator
+  - a25ac88 2025-10-16T20:29:22+05:30 CNTRLPLANE-1309: set up openshift-tests-extension for cluster-kube-scheduler-operator and add a sanity test
+  - 97bb432 2025-08-17T07:14:07+08:00 fix: use BoundServceAccountTokenVolume de default
+
+- cluster-network-operator embedded-component fda7a9f07ab6f78d032d310cdd77f21d04f1289a to 8bd3f1c3ea6055a49c14ece00a5b8779a100fc5d
+  - fdff55f 2025-12-01T11:58:43+01:00 Add readOnlyRootFilesystem=true to containers missing it
+  - 8cfb17e 2025-12-01T11:58:43+01:00 Align to upstream: add a status cleaner pod
+  - b243714 2025-11-27T09:20:43+01:00 OCPBUGS-35387: rbac: Add network resources to cluster-reader role
+  - 1e4bacb 2025-11-19T22:33:07-05:00 Fix: whereabouts-token-watcher DaemonSet improvements
+  - b8cdede 2025-11-10T12:26:18-08:00 rebase k8s to 1.34.1
+
+- cluster-openshift-controller-manager-operator embedded-component 12b7668d70bdb07d5d05304a7bcaeb6a5cc5ef3b to 2617a201bb3607192a9f82faa18384676f611e3c
+  - 9e30da4 2025-12-04T14:09:47+05:30 updatye go.mod vendor nad dependecies
+  - 87d1938 2025-12-04T12:50:25+05:30 Refactor OTE to single-module architecture
+  - 03c4cf0 2025-11-27T13:20:36+00:00 doc: Add rebase checklist to readme
+  - 8e726aa 2025-11-27T13:00:09+00:00 fix: Add missing `VersionGetter` interface method to `operator.versionGetter`
+  - d1a08da 2025-11-27T12:59:48+00:00 chore: go mod vendor
+  - 277b0bf 2025-11-27T12:56:06+00:00 chore: Update deps for k8s 1.34.2
+  - 8731c0b 2025-11-27T12:55:17+00:00 chore: Switch from k8s.io/apimachinery/pkg/util/diff to github.com/google/go-cmp/cmp
+
+- kubernetes embedded-component 737c81eb7539786ccefc91ab54080c674c3ad78c to 05182efbe79b0f9893cdffc9f76589cfd7419b39
+  - c939878e6 2025-12-04T13:13:39-08:00 UPSTREAM: <carry>: Extend HPA test timeout
+  - 850445a7f 2025-12-02T15:01:27-08:00 UPSTREAM: <carry>: Add HPA specific OTE suite
+  - ce2ef9665 2025-11-26T13:47:28-08:00 UPSTREAM: <carry>: move disabled HPA tests from Broken to DedicatedJob
+  - df4ec5c73 2025-11-25T10:17:52-08:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - a27da674b 2025-11-25T10:17:52-08:00 UPSTREAM: <carry>: Remove update-test-annotations target
+  - b03745483 2025-11-25T10:17:45-08:00 UPSTREAM: <drop>: manually resolve conflicts
+  - 8cc511e39 2025-11-11T19:00:37+00:00 Release commit for Kubernetes v1.34.2
+  - 97650c1c4 2025-11-06T18:48:24+00:00 Clean up event messages for errors in Portworx in-tree driver
+  - f4fd1e3a6 2025-11-06T07:53:57+00:00 kube-proxy/winkernel: fix stale RemoteEndpoints due to premature clearing of terminatedEndpoints map.
+  - fd812c5b0 2025-11-05T10:00:22+01:00 fix: allow job startTime updates on resume from suspended state
+  - b13733a65 2025-11-04T14:09:08+01:00 DRA allocator: Add the requests corresponding to the config FromClass
+  - aade7b8e8 2025-11-03T21:18:35-05:00 Fix spurious workload rollout due to null creationTimestamp in controller revisions
+  - 7c5ec38d1 2025-11-03T21:18:34-05:00 Remove unused and fragile revision hash comparisons
+  - d5ffe8903 2025-11-03T21:18:34-05:00 Add unit test detecting spurious statefulset rollout
+  - 50096b40c 2025-10-31T16:56:42-07:00 Do not log untolerated taint in pod status updates.
+  - 79ed9ffaa 2025-10-29T16:09:56+05:30 E2E volume: fix restarting of watch
+  - 011338f9e 2025-10-27T13:46:41-03:00 Return error in case of discovery client failure
+  - e1e4e2eb4 2025-10-25T01:20:04+08:00 etcd: bump etcd to v3.5.24 for k8s v1.31, v1.32, v1.33
+  - d3c4628d8 2025-10-24T07:15:08-04:00 UPSTREAM: <drop>: Remove duplicate VolumeGroupSnapshottableTestSuite from CSISuites
+  - a42f81f4b 2025-10-22T22:46:06+00:00 Fix startup probe worker termination for sidecar containers
+  - 60e3b5762 2025-10-20T13:34:04+02:00 kubeadm: add missing cluster-info context validation
+  - 30fd26640 2025-10-16T21:32:16+01:00 Do not validate etcd version for aggregated server conformance test
+  - f3b637f6c 2025-10-16T21:18:37+01:00 Bump etcd to v3.6.5
+  - 6ebab3f18 2025-10-16T13:55:04-04:00 Include relevant dimensions in pod controller indexing
+  - 7191ffc39 2025-10-15T16:24:35+02:00 apply integration test: fix ordering test flake
+  - 8cd6b631c 2025-10-15T11:44:40+02:00 update setcap and debian-base to bookworm-v1.0.6
+  - 2674d8a04 2025-10-15T11:44:00+02:00 Bump images, dependencies and versions to go 1.24.9 and distroless iptables
+  - bddc18b09 2025-10-14T09:36:50-04:00 Add integration test for invalid SAN certificate handling
+  - f40e4ce55 2025-10-14T09:35:42-04:00 Remove invalid SAN certificate construction
+  - ed6bf3e5d 2025-10-14T09:35:42-04:00 kubeadm preflight checks: fix host URL construction
+  - 5300f7a32 2025-10-11T01:25:59+00:00 change klog to log volume name instead of entire spec in GetDeviceMountPath
+  - 5be5dc9d5 2025-10-09T14:53:25-04:00 With new changes we will also have a VolumeModifying condition
+  - d74bd66e9 2025-10-09T15:31:58+05:30 authz tests: delay response in context cancelled scenario
+  - ea75d2aa0 2025-10-06T09:31:39+01:00 gce: Fix etcd manifest
+  - 61c0fb13a 2025-10-03T13:04:19+00:00 Disable SchedulerAsyncAPICalls feature gate due to a known regression
+  - 40899107c 2025-10-02T17:46:27+03:00 upgrade to cos 121
+  - 2bfc98b31 2025-10-02T14:27:32+00:00 Update pod resize test to accept new cpu.weight conversion.
+  - 3ffc54a9e 2025-10-01T22:07:30+02:00 kubeadm: rework the FetchInitConfigurationFromCluster node flags
+  - e9f5e892f 2025-09-25T21:26:38+02:00 kubeadm: use JoinHostPort in WaitControlPlaneClient
+  - 663664c61 2025-09-25T15:57:55+02:00 kubeadm: ensure waiting for apiserver uses a local client
+  - 3f170932b 2025-09-24T15:01:03+00:00 Revert "Merge pull request #133213 from sanposhiho/second-trial-conor"
+  - 09ddc5ebb 2025-09-23T15:23:17+02:00 Bump images, dependencies and versions to go 1.24.7 and distroless iptables
+  - b245b551f 2025-09-20T17:05:18+05:30 Split preemption integration tests to mitigate the timeout
+  - 560cc36db 2025-09-18T18:19:44+03:00 fix incorrect warning whenever headless service is created/updated
+  - 07ac83c14 2025-09-17T09:59:14-07:00 fix: use iifname for input interface name matches
+  - 35b87e4c1 2025-09-16T11:12:13-04:00 Wait for quota to report used before creating pvc
+  - 856ac4923 2025-09-16T23:06:52+08:00 release-1.34: pin system-validators to v1.10.2
+  - 7d43ddbbf 2025-09-11T21:47:13-07:00 Fix ClusterIP load balancer disappearing when InternalTrafficPolicy: Local is set.
+  - 4a40ddf1e 2025-09-10T15:57:45-07:00 gofmt and review feedback
+  - 4ae3b64b7 2025-09-10T15:57:45-07:00 fix: Update unit test to catch actual nil Labels case and fix functionality to handle nil Labels
+  - 16e3f7c17 2025-09-09T20:00:28+00:00 Update CHANGELOG/CHANGELOG-1.34.md for v1.34.1
+  - 988bdd125 2025-09-09T11:49:26+02:00 Do not remove PVC ClaimRef to fix flaky VAC test
+  - b97399727 2025-09-08T20:36:06+02:00 DRA kubelet: avoid deadlock when gRPC connection to driver goes idle
+  - 76ab5f066 2025-09-05T14:54:05+08:00 kubelet/metrics: fix multiple Register call
+  - 04fd1ada6 2025-09-05T14:54:05+08:00 kubelet/metrics: misc optimization
+
+- machine-config-operator embedded-component 4a3b43b9ac4750af612c2cb748f0383ce7d47430 to 00b8722ba3d4926f82541d781b3f6c1de7bd6b21
+  - 0e931a68 2025-12-04T22:59:52-05:00 Add rhel-10-coreos{,-extensions} to image-references
+  - d5b1c207 2025-12-03T10:40:59-05:00 hack: fix-up for ami collection script
+  - f1e38a69 2025-12-03T09:15:17-05:00 controller: add MachineConfigNode informer so changes trigger MachineConfigPool syncs
+  - 019e91ed 2025-12-03T14:14:09+01:00 MCO-1961: OSImageStream follow up
+  - 8b17be53 2025-12-03T11:56:41+00:00 MCO-1999: align extended test code with private repo. Pointers and permissions in lists
+  - 1e795e3f 2025-12-02T10:50:01-05:00 add InternalReleaseImage controller
+  - de7d9854 2025-12-02T10:49:11-05:00 add InternalReleaseImage bootstrap template generation
+  - 51051b82 2025-12-02T10:48:31-05:00 add docker-registry image to clusterconfig
+  - a2178bfa 2025-12-02T10:48:31-05:00 vendoring openshift client-go and api
+  - c2e23bb4 2025-12-01T16:18:56+01:00 MCO-1961: Add the OSImageStream Controller
+  - 3d32332a 2025-12-01T11:13:09+02:00 Add hostIP 127.0.0.1 to machine-config-daemon port 8798
+  - 18dbd1aa 2025-11-27T09:24:21+05:30 Fix AutoSizingReserved test
+  - f65510fb 2025-11-27T07:21:17+05:30 Disable AutoSizingReserved on hypershift
+  - 5db32f8f 2025-11-27T07:21:17+05:30 OCPNODE-3719:From 4.21 AutoSizingReserved set to true for new clusters
+  - 0e7dd9d5 2025-11-26T11:32:30+01:00 MCO-1956: Collect OSImageStream
+  - e9ed0e87 2025-11-25T16:53:54-05:00 Revert "OCPBUGS-50492: Add kube_rbac_proxy service"
+  - 571a148f 2025-11-25T16:42:52+01:00 MCO-1956: Client-go bump for OSImageStream
+  - 54daa4f1 2025-11-21T09:34:25-06:00 OPNET-678: Allow disabling internal DNS records
+  - 8b3391f6 2025-11-19T16:27:26-08:00 OKD-294: Migrate runtime from runc to crun on an upgrade for OKD
+  - 3cd57bd0 2025-11-19T17:13:34+00:00 Align code with private repository
+  - 7e405097 2025-11-19T17:13:27+00:00 MCO-1930: migrate ControlPlaneMachineset tests
+  - ea2fdc30 2025-11-10T11:38:43-06:00 OCPBUGS-59925: Fix keepalived SIGTERM handling
+
+- openshift-controller-manager embedded-component 433bd500afb879dd82e27336359cd4e3051245b0 to 438d52e79d691e016d66eabfe9a53c84229db40c
+  - cb38b48 2025-12-04T14:59:17+05:30 updatye go.mod vendor nad dependecies
+  - 66d7af8 2025-12-04T14:44:39+05:30 Refactor OTE to single-module architecture
+  - e4ecd68 2025-11-27T13:27:45+00:00 doc: Add rebase checklist to readme
+  - 0b30dc7 2025-11-26T14:49:27+00:00 doc: Update comments and messages around `maxInjectedEnvironmentAllowedSize`
+  - eac311f 2025-11-26T12:30:44+00:00 fix: Update list of fields ignored by `TestMakeDeployerPod`
+  - 2c27f49 2025-11-25T17:38:42+00:00 chore: go mod vendor
+  - 24762d3 2025-11-25T17:38:16+00:00 chore: Update deps for k8s 1.34.2
+  - c283a68 2025-11-25T17:21:54+00:00 chore: Switch from k8s.io/apimachinery/pkg/util/diff to github.com/google/go-cmp/cmp
+
+- operator-framework-olm embedded-component c2753896aecfd5b17c7cf5430b9a27abcbeab485 to 7d2dd62c2a73b66aa99e82c90f64ab53dd523ddf
+  - 0e98a0d7 2025-12-03T10:11:09+08:00 enhance oc case to apply for metal step
+  - 7c710ed1 2025-12-02T14:19:03-05:00 Revert "Merge pull request #1159 from Xia-Zhao-rh/migrate-1"
+  - 89a9a8de 2025-12-02T14:14:00-05:00 Revert "Merge pull request #1163 from kuiwang02/enhancecases"
+  - c3173db5 2025-12-02T14:13:31-05:00 Revert "Merge pull request #1162 from Xia-Zhao-rh/migrate-2"
+  - b3160fc3 2025-12-01T13:30:54+08:00 enhance oc case to apply for metal step
+  - 2ef420a5 2025-12-01T12:14:23+08:00 UPSTREAM: <carry>: migrate ocp-43975 to OTE
+  - f9216bee 2025-11-28T14:55:55+08:00 UPSTREAM: <carry>: migrate OLMv0 test cases to OTE
+  - 723c2850 2025-11-25T17:42:46+08:00 Migrate test cases 21080, 21953, 43135 from private repo
+  - ab482618 2025-11-25T09:01:21+08:00 Migrate OLM v0 stress test cases
+  - db9a36d8 2025-11-24T09:04:55+08:00 UPSTREAM: <carry>: migrate jiazha's OLMv0 test cases to OTE
+  - b571e99f 2025-11-20T07:10:53+00:00 Upgrade versions; ocp, kube-api, opm and indirects
+
+- service-ca-operator embedded-component f5a143a6e0d2110f8c0fc8b50dc8fa62ec26b291 to e9622ba18c86bf24aceab0c19fdcb87339c14f44
+  - 0de6ddb 2025-11-25T11:24:38+01:00 Revert "manifests: Use user namespace for the deployment"
+
+- oc image-amd64 8642d882f16de34a033ac4ac19dfde866c7a523f to 345800dc3c4164fbca313c1cbfb383f262547903
+  - 232df150 2025-12-01T13:39:19+01:00 .claude: Improve pr-review command/skill
+  - 201abbf9 2025-11-28T16:57:51+03:00 Fall back to simpler behavior, if setsid,ps,pkill are not installed
   - d5726146 2025-11-26T10:43:34+03:00 Unify ErrAlreadyExists to correctly match
   - 9e2ba3c1 2025-11-26T10:11:55+03:00 Update documentation of oc adm must-gather timeout flag
 
-- coredns image-arm64 91ae57f91e0bba5fc4fdb816e1f1cea633b3a8b5 to 7486e9e4330c1e41d9a91e4673b7f2782efc112c
+- coredns image-amd64 91ae57f91e0bba5fc4fdb816e1f1cea633b3a8b5 to 7486e9e4330c1e41d9a91e4673b7f2782efc112c
   - 0fa99d9 2025-11-24T17:41:15-05:00 UPSTREAM: <carry>: openshift: vendor deps + track vendor tree
   - 8f57c4f 2025-11-24T17:41:11-05:00 UPSTREAM: <carry>: openshift: document vendor tree ignore rules
   - b06f0e0 2025-11-24T17:41:05-05:00 UPSTREAM: <carry>: openshift: add ocp_dnsnameresolver plugin
@@ -513,8 +714,34 @@
   - 883b555 2024-05-11T15:18:17+02:00 build(deps): bump codecov/codecov-action from 4.3.0 to 4.3.1 (#6666)
   - 677e242 2024-05-11T15:18:00+02:00 build(deps): bump github.com/aws/aws-sdk-go from 1.51.25 to 1.52.2 (#6665)
 
-- ovn-kubernetes image-arm64 6fab57dcf4bdabe77a1da826f32252767049bfb0 to dc442479932a9173cc16317d114bc54bd945f04c
+- router image-amd64 61979f48e686cdccdf61a2825d0c558a5a391df1 to b231c65b5c06c1f74590ca8e77caecc6213beb6a
+  - 2ddcb5d 2025-11-24T16:19:18+01:00 Bump openshift/api to 4.21, and k8s.io to v0.34.1
+  - bee7676 2025-10-28T08:39:20-04:00 dynamicallyReplaceEndpoints: Check for idled svc
+
+- ovn-kubernetes image-amd64 9a9b8929d7040ab7d8cf574c48c96d58991bf6f6 to 25a714b82c643bcfdf5543cb467afa32dac06787
+  - af2a37fc 2025-12-01T16:59:24+01:00 Revert "Update libovsdb bindings to ovn 25.09"
+  - 49e73090 2025-11-28T13:30:10+01:00 Unskip kubernetes conformance test
+  - f41c3632 2025-11-28T13:30:10+01:00 Add unit tests for UDP conntrack entry deletion on service update
+  - b5ed1c74 2025-11-28T13:30:10+01:00 Cleanup UDP conntrack entries for service updates
+  - 4f79ff03 2025-11-28T13:30:10+01:00 DeleteConntrack function updates
+  - 676c1b30 2025-11-28T10:14:47+01:00 Add Patryk to maintainers group
+  - 1483ec16 2025-11-27T20:39:12+05:30 Update ocp-dnsnameresolver coredns plugin version
+  - 9a3366db 2025-11-21T11:28:08+08:00 Update libovsdb bindings to ovn 25.09
+  - 0f360806 2025-11-20T17:31:57-08:00 Bump ubuntu version to 25.10
+  - 74e5e6f4 2025-11-20T14:20:24+00:00 Bump back to go 1.24
+  - 9429d250 2025-11-20T13:07:58+01:00 Fix misuse of time.Duration values Comparing or setting a variable of type time.Duration to an integer, the integer is considered to be in nanoseconds
+  - 9ab20b93 2025-11-20T13:07:58+01:00 Bump kubevirt to v1.6.2 in kind clusters
+  - 3faa93d5 2025-11-20T13:07:58+01:00 Kind Updates > Update kubernetes version in the files below:     github/workflows/test.xml     contrib/kind-common     test/scripts/upgrade-ovn.sh     test/scripts/install-kind.sh     docs/installation/launching-ovn-kubernetes-on-kind.md     docs/developer-guide/local_testing_guide.md
+  - 584138e0 2025-11-20T13:07:58+01:00 test/conformance rebase 1.34 > test/conformance    go get k8s.io/kubernetes@v1.34.1    go get k8s.io/client-go@v0.34.1    go get k8s.io/kube-openapi    go get k8s.io/utils    go get sigs.k8s.io/structured-merge-diff/v4@v4.7.0    go get sigs.k8s.io/controller-runtime@v0.22.1    go get sigs.k8s.io/network-policy-api@v0.1.7    go mod tidy    make conformance
+  - 25ac6f54 2025-11-20T13:07:58+01:00 test/e2e rebase 1.34 > test/e2e    go get k8s.io/kubernetes@v1.34.1    go get k8s.io/api@v0.34.1    go get k8s.io/client-go@v0.34.1    go get k8s.io/pod-security-admission@v0.34.1    go get k8s.io/kubectl@v0.34.1    go get sigs.k8s.io/controller-runtime@v0.22.1    go get k8s.io/mount-utils@v0.34.1    go get k8s.io/cri-client@v0.34.1    go get k8s.io/dynamic-resource-allocation@v0.34.1    go get k8s.io/kube-scheduler@v0.34.1    go get k8s.io/csi-translation-lib@v0.34.1    go get k8s.io/cloud-provider@v0.34.1    go get k8s.io/controller-manager@v0.34.1    go get k8s.io/kube-openapi    go get golang.org/x/tools@v0.38.0    go mod tidy
+  - 30f80751 2025-11-20T13:07:58+01:00 go-controller rebase 1.34 > go-controller  go get k8s.io/api@v0.34.1  go get k8s.io/client-go@v0.34.1  go get k8s.io/component-helpers@v0.34.1  go get k8s.io/kubernetes@v1.34.1  go get k8s.io/apiextensions-apiserver@v0.34.1  go get sigs.k8s.io/controller-runtime@v0.22.1  go get k8s.io/controller-manager@v0.34.1  go get sigs.k8s.io/structured-merge-diff/v4@v4.7.0  go get sigs.k8s.io/knftables@v0.0.19  go get k8s.io/kubelet@v0.34.1  go get sigs.k8s.io/apiserver-network-proxy/konnectivity-client@v0.33.0  go get k8s.io/kube-openapi  go get sigs.k8s.io/json  go get k8s.io/utils  go get github.com/openshift/api  go get github.com/openshift/client-go  go get golang.org/x/tools@v0.38.0  go mod tidy  go mod vendor
+  - 18a31708 2025-11-17T14:13:00-08:00 cleanup primary pUDN connection details annotaton in cmdDel
   - 5d25180b 2025-11-17T13:48:09-05:00 Fixes regression with ecabc89
+  - e60a35ba 2025-11-17T15:16:11+01:00 Update enhancement replacing connectivityEnabled with connectivity
+  - 5a79a636 2025-11-17T15:16:11+01:00 Enable ClusterNetworkConnect tests to run in NetSeg lane
+  - 8f0ccf02 2025-11-17T15:16:11+01:00 Add API Validation E2E tests
+  - 0ac7c29b 2025-11-17T15:16:11+01:00 Generate CNC YAMLs
+  - 0605aafe 2025-11-17T15:16:11+01:00 Add ClusterNetworkConnect API
   - bdfb99a3 2025-11-17T13:16:59+01:00 Fix EIP reassignment on Namespace/Pod/EgressIP label updates
   - d5e8d2e8 2025-11-14T15:34:00-05:00 Fixes NAD Controller syncAll for networkID upgrade from node->NAD
   - 4cd1fc58 2025-11-14T12:44:40+01:00 Refresh PID when calling OVS/OVN binaries
@@ -523,8 +750,16 @@
   - c7633f9c 2025-11-12T14:08:27-05:00 Change rbac ovnkube-node-status-reader name to node-reader
   - edb24cc1 2025-11-12T11:50:42-05:00 Add node access to ovnkube-node-status-reader
   - e9e70f43 2025-11-12T11:16:17-05:00 Remove --subresource=status from ovnkube.sh get_node_zone
+  - 6e577b86 2025-11-12T13:50:32+01:00 Fix conntrack reconciliation to use service port instead of endpoint port
+  - b36a8eef 2025-11-07T14:12:07-08:00 no nft operation in dpu mode
+  - 9eb16176 2025-10-31T11:39:42+01:00 Send Unsolicited Neighbor Advertisement for IPv6 EgressIPs
+  - cc15dc1c 2025-10-31T11:29:53+01:00 Fix GARP sending 0.0.0.0 due to incorrect IPv4 byte extraction
+  - fb6046ab 2025-10-27T16:41:37+08:00 bridgeflows: fix MEG flows dependency on EgressIP
 
-- kubernetes image-arm64 737c81eb7539786ccefc91ab54080c674c3ad78c to f6c89d1c3286d2f58dff24c38cbb0eaedab00c4c
+- kubernetes image-amd64 737c81eb7539786ccefc91ab54080c674c3ad78c to 05182efbe79b0f9893cdffc9f76589cfd7419b39
+  - c939878e6 2025-12-04T13:13:39-08:00 UPSTREAM: <carry>: Extend HPA test timeout
+  - 850445a7f 2025-12-02T15:01:27-08:00 UPSTREAM: <carry>: Add HPA specific OTE suite
+  - ce2ef9665 2025-11-26T13:47:28-08:00 UPSTREAM: <carry>: move disabled HPA tests from Broken to DedicatedJob
   - df4ec5c73 2025-11-25T10:17:52-08:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
   - a27da674b 2025-11-25T10:17:52-08:00 UPSTREAM: <carry>: Remove update-test-annotations target
   - b03745483 2025-11-25T10:17:45-08:00 UPSTREAM: <drop>: manually resolve conflicts
@@ -540,6 +775,7 @@
   - 79ed9ffaa 2025-10-29T16:09:56+05:30 E2E volume: fix restarting of watch
   - 011338f9e 2025-10-27T13:46:41-03:00 Return error in case of discovery client failure
   - e1e4e2eb4 2025-10-25T01:20:04+08:00 etcd: bump etcd to v3.5.24 for k8s v1.31, v1.32, v1.33
+  - d3c4628d8 2025-10-24T07:15:08-04:00 UPSTREAM: <drop>: Remove duplicate VolumeGroupSnapshottableTestSuite from CSISuites
   - a42f81f4b 2025-10-22T22:46:06+00:00 Fix startup probe worker termination for sidecar containers
   - 60e3b5762 2025-10-20T13:34:04+02:00 kubeadm: add missing cluster-info context validation
   - 30fd26640 2025-10-16T21:32:16+01:00 Do not validate etcd version for aggregated server conformance test
@@ -576,4 +812,12 @@
   - b97399727 2025-09-08T20:36:06+02:00 DRA kubelet: avoid deadlock when gRPC connection to driver goes idle
   - 76ab5f066 2025-09-05T14:54:05+08:00 kubelet/metrics: fix multiple Register call
   - 04fd1ada6 2025-09-05T14:54:05+08:00 kubelet/metrics: misc optimization
+
+- service-ca-operator image-amd64 f5a143a6e0d2110f8c0fc8b50dc8fa62ec26b291 to e9622ba18c86bf24aceab0c19fdcb87339c14f44
+  - 0de6ddb 2025-11-25T11:24:38+01:00 Revert "manifests: Use user namespace for the deployment"
+
+- kubernetes image-arm64 0987ea121e432412b7582943a195708e67e0a38f to 9f57f51e3485ccc1cfd01ec94e9a0f5bef38eacb
+  - 873cd1d1b 2025-12-08T10:42:38+01:00 UPSTREAM: <drop>: make update
+  - 8d86655e3 2025-12-05T17:50:39+01:00 UPSTREAM: <drop>: pin cadvisor to downstream fork
+  - c939878e6 2025-12-04T13:13:39-08:00 UPSTREAM: <carry>: Extend HPA test timeout
 

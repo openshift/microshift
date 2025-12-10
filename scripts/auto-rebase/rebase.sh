@@ -624,14 +624,6 @@ update_images() {
             "${REPOROOT}/packaging/crio.conf.d/10-microshift_${goarch}.conf"
     done
 
-    # Lock OVN-K refs until https://issues.redhat.com/browse/OCPBUGS-65584 is resolved.
-    yq -i \
-        '.images."ovn-kubernetes-microshift" = "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:ad19c1f0010ebcda83c0f0e9f0b2618f0ccd4353388c8ce668c036a153dc70ab"' \
-        "${REPOROOT}/assets/release/release-x86_64.json"
-    yq -i \
-        '.images."ovn-kubernetes-microshift" = "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:9a9e1e2dff0b52b366036024ecaff25903baab14b03a6b9daba74f6dc9b66441"' \
-        "${REPOROOT}/assets/release/release-aarch64.json"
-
     popd >/dev/null
 
     go fmt "${REPOROOT}"/pkg/release

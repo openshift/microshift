@@ -10,6 +10,7 @@ source "${SCRIPTDIR}/common.sh"
 AWS_BUCKET_NAME="${AWS_BUCKET_NAME:-microshift-build-cache}"
 BCH_SUBDIR=
 TAG_SUBDIR=
+ARCH_SUBDIR="${UNAME_M}"
 
 usage() {
     cat - <<EOF
@@ -24,29 +25,33 @@ The cache directory structure is '${AWS_BUCKET_NAME}/<branch>/<arch>/<tag>'.
   -h        Show this help.
 
   upload:   Upload build artifacts from the local disk to the specified
-            '${AWS_BUCKET_NAME}/<branch>/${UNAME_M}/<tag>' AWS S3 bucket.
+            '${AWS_BUCKET_NAME}/<branch>/<arch>/<tag>' AWS S3 bucket.
             The 'verify' operation is run before the upload attempt. If
             data already exists at the destination, the upload is skipped
             and the script exits with 0 status.
 
   download: Download build artifacts from the specified
-            '${AWS_BUCKET_NAME}/<branch>/${UNAME_M}/<tag>' AWS S3 bucket
+            '${AWS_BUCKET_NAME}/<branch>/<arch>/<tag>' AWS S3 bucket
             to the local disk.
 
   verify:   Exit with 0 status if the specified
-            '${AWS_BUCKET_NAME}/<branch>/${UNAME_M}/<tag>' sub-directory
+            '${AWS_BUCKET_NAME}/<branch>/<arch>/<tag>' sub-directory
             exists and contains files, 1 otherwise.
 
-  setlast:  Update the '${AWS_BUCKET_NAME}/<branch>/${UNAME_M}/last' file
+  setlast:  Update the '${AWS_BUCKET_NAME}/<branch>/<arch>/last' file
             contents in the AWS S3 bucket with the specified '<tag>'.
 
-  getlast:  Retrieve the '${AWS_BUCKET_NAME}/<branch>/${UNAME_M}/last'
+  getlast:  Retrieve the '${AWS_BUCKET_NAME}/<branch>/<arch>/last'
             file contents from the AWS S3 bucket. The output format is
             "LAST: <tag>" for easy parsing. The script returns the
             specified '<tag>' as a fallback if the bucket file does
             not exist.
 
-  keep:     Delete all data from the '${AWS_BUCKET_NAME}/<branch>/${UNAME_M}'
+  dellast:  Delete the data pointed by the '${AWS_BUCKET_NAME}/<branch>/<arch>/last'
+            file contents and update the 'last' file contents in the AWS S3 bucket
+            with the specified '<tag>'
+
+  keep:     Delete all data from the '${AWS_BUCKET_NAME}/<branch>/<arch>'
             AWS S3 bucket, only keeping the 'last' and the specified
             '<tag>' sub-directories.
 
@@ -56,6 +61,7 @@ Options:
 
   -t <tag>      The tag sub-directory in the AWS S3 bucket.
 
+  -a <arch>     The architecture sub-directory in the AWS S3 bucket (default: ${ARCH_SUBDIR}).
 EOF
 }
 
@@ -68,7 +74,7 @@ run_aws_cli() {
 }
 
 check_contents(){
-    local -r src_dir="s3://${AWS_BUCKET_NAME}/${BCH_SUBDIR}/${UNAME_M}/${TAG_SUBDIR}"
+    local -r src_dir="s3://${AWS_BUCKET_NAME}/${BCH_SUBDIR}/${ARCH_SUBDIR}/${TAG_SUBDIR}"
     local -r must_contain_array=("mirror-registry\.tar$" "brew-rpms\.tar$" "repo\.tar$" "${VM_POOL_BASENAME}/.*\.iso$")
 
     echo "Checking contents of '${src_dir}'"
@@ -86,7 +92,7 @@ check_contents(){
 
 action_upload() {
     local -r src_base="${IMAGEDIR}"
-    local -r dst_base="s3://${AWS_BUCKET_NAME}/${BCH_SUBDIR}/${UNAME_M}/${TAG_SUBDIR}"
+    local -r dst_base="s3://${AWS_BUCKET_NAME}/${BCH_SUBDIR}/${ARCH_SUBDIR}/${TAG_SUBDIR}"
 
     if check_contents ; then
         echo "The '${dst_base}' already exists with valid contents"
@@ -120,7 +126,7 @@ action_upload() {
 }
 
 action_download() {
-    local -r src_base="s3://${AWS_BUCKET_NAME}/${BCH_SUBDIR}/${UNAME_M}/${TAG_SUBDIR}"
+    local -r src_base="s3://${AWS_BUCKET_NAME}/${BCH_SUBDIR}/${ARCH_SUBDIR}/${TAG_SUBDIR}"
     local -r dst_base="${IMAGEDIR}"
 
     # Download ISO images
@@ -166,7 +172,7 @@ action_verify() {
 
 action_setlast() {
     local -r src_file="$(mktemp /tmp/setlast.XXXXXXXX)"
-    local -r dst_file="s3://${AWS_BUCKET_NAME}/${BCH_SUBDIR}/${UNAME_M}/last"
+    local -r dst_file="s3://${AWS_BUCKET_NAME}/${BCH_SUBDIR}/${ARCH_SUBDIR}/last"
 
     if [ "${TAG_SUBDIR}" = "last" ] ; then
         echo "ERROR: Cannot set 'last' tag to itself"
@@ -180,7 +186,7 @@ action_setlast() {
 }
 
 action_getlast() {
-    local -r src_file="s3://${AWS_BUCKET_NAME}/${BCH_SUBDIR}/${UNAME_M}/last"
+    local -r src_file="s3://${AWS_BUCKET_NAME}/${BCH_SUBDIR}/${ARCH_SUBDIR}/last"
     local -r dst_file="$(mktemp /tmp/getlast.XXXXXXXX)"
 
     echo "Reading '${src_file}' tag contents"
@@ -193,12 +199,45 @@ action_getlast() {
     rm -f "${dst_file}"
 }
 
-action_keep() {
-    local -r top_dir="s3://${AWS_BUCKET_NAME}/${BCH_SUBDIR}/${UNAME_M}"
+action_dellast() {
+    local -r top_dir="s3://${AWS_BUCKET_NAME}/${BCH_SUBDIR}/${ARCH_SUBDIR}"
     # Get the last contents with the ${TAG_SUBDIR} default
     local -r last_dir="$(action_getlast | awk '/LAST:/ {print $NF}')"
 
-    for sub_dir in $(run_aws_cli s3 ls "${top_dir}/" | awk '{print $NF}'); do
+    if [ -z "${last_dir}" ] ; then
+        echo "ERROR: Cannot delete 'last' tag because it is not set or empty"
+        exit 1
+    fi
+    if [ "${last_dir}" = "${TAG_SUBDIR}" ] ; then
+        echo "ERROR: Cannot delete 'last' tag because it is the same as the new '${TAG_SUBDIR}' tag"
+        exit 1
+    fi
+
+    # Verify that the new tag exists
+    if ! check_contents ; then
+        echo "ERROR: Cannot reset 'last' tag to a non-existent '${TAG_SUBDIR}' tag"
+        exit 1
+    fi
+
+    # Reset the last tag and delete the old contents
+    action_setlast
+    run_aws_cli s3 rm --recursive "${top_dir}/${last_dir}"
+}
+
+action_keep() {
+    local -r top_dir="s3://${AWS_BUCKET_NAME}/${BCH_SUBDIR}/${ARCH_SUBDIR}"
+    # Get the last contents with the ${TAG_SUBDIR} default
+    local -r last_dir="$(action_getlast | awk '/LAST:/ {print $NF}')"
+
+    # Get all sub-directories in the top directory
+    local -r sub_dirs=$(run_aws_cli s3 ls "${top_dir}/" | grep '/$' | awk '{print $NF}')
+    # Skip if only one sub-directory exists
+    if [ "$(echo "${sub_dirs}" | wc -w)" -eq 1 ] ; then
+        echo "Only one sub-directory found in '${top_dir}', keeping it"
+        return 0
+    fi
+
+    for sub_dir in ${sub_dirs}; do
         if [ "${sub_dir}" = "last" ] ; then
             continue
         fi
@@ -223,7 +262,7 @@ action="${1}"
 shift
 
 # Parse options
-while getopts "b:t:h" opt; do
+while getopts "b:t:a:h" opt; do
     case "${opt}" in
         h)
             usage
@@ -234,6 +273,9 @@ while getopts "b:t:h" opt; do
             ;;
         t)
             TAG_SUBDIR="${OPTARG}"
+            ;;
+        a)
+            ARCH_SUBDIR="${OPTARG}"
             ;;
         *)
             usage
@@ -262,7 +304,7 @@ fi
 
 # Run actions
 case "${action}" in
-    upload|download|verify|setlast|getlast|keep)
+    upload|download|verify|setlast|getlast|dellast|keep)
         "action_${action}" "$@"
         ;;
     -h|help)
