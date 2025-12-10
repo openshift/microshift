@@ -38,17 +38,17 @@ require (
 	github.com/prometheus/prometheus v0.302.1
 	github.com/squat/generic-device-plugin v0.0.0-20251019101956-043a51e18f31
 	gopkg.in/yaml.v2 v2.4.0
-	k8s.io/api v1.34.1
-	k8s.io/apiextensions-apiserver v1.34.1
-	k8s.io/apimachinery v1.34.1
-	k8s.io/apiserver v1.34.1
-	k8s.io/cli-runtime v1.34.1
-	k8s.io/client-go v1.34.1
-	k8s.io/cloud-provider v1.34.1
-	k8s.io/component-base v1.34.1
-	k8s.io/kube-aggregator v1.34.1
-	k8s.io/kubectl v1.34.1
-	k8s.io/kubelet v1.34.1
+	k8s.io/api v1.34.2
+	k8s.io/apiextensions-apiserver v1.34.2
+	k8s.io/apimachinery v1.34.2
+	k8s.io/apiserver v1.34.2
+	k8s.io/cli-runtime v1.34.2
+	k8s.io/client-go v1.34.2
+	k8s.io/cloud-provider v1.34.2
+	k8s.io/component-base v1.34.2
+	k8s.io/kube-aggregator v1.34.2
+	k8s.io/kubectl v1.34.2
+	k8s.io/kubelet v1.34.2
 	k8s.io/utils v0.0.0-20251002143259-bc988d571ff4
 	sigs.k8s.io/kube-storage-version-migrator v0.0.6-0.20230721195810-5c8923c5ff96
 	sigs.k8s.io/kustomize/api v0.20.1
@@ -161,21 +161,21 @@ require (
 	gopkg.in/go-jose/go-jose.v2 v2.6.3 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1 // indirect
-	k8s.io/cluster-bootstrap v1.34.1 // indirect
-	k8s.io/component-helpers v1.34.1 // indirect
-	k8s.io/controller-manager v1.34.1 // indirect
-	k8s.io/cri-api v1.34.1 // indirect
-	k8s.io/cri-client v1.34.1 // indirect
-	k8s.io/csi-translation-lib v1.34.1 // indirect
-	k8s.io/dynamic-resource-allocation v1.34.1 // indirect
-	k8s.io/endpointslice v1.34.1 // indirect
-	k8s.io/externaljwt v1.34.1 // indirect
-	k8s.io/kms v1.34.1 // indirect
-	k8s.io/kube-controller-manager v1.34.1 // indirect
-	k8s.io/kube-scheduler v1.34.1 // indirect
-	k8s.io/metrics v1.34.1 // indirect
-	k8s.io/mount-utils v1.34.1 // indirect
-	k8s.io/pod-security-admission v1.34.1 // indirect
+	k8s.io/cluster-bootstrap v1.34.2 // indirect
+	k8s.io/component-helpers v1.34.2 // indirect
+	k8s.io/controller-manager v1.34.2 // indirect
+	k8s.io/cri-api v1.34.2 // indirect
+	k8s.io/cri-client v1.34.2 // indirect
+	k8s.io/csi-translation-lib v1.34.2 // indirect
+	k8s.io/dynamic-resource-allocation v1.34.2 // indirect
+	k8s.io/endpointslice v1.34.2 // indirect
+	k8s.io/externaljwt v1.34.2 // indirect
+	k8s.io/kms v1.34.2 // indirect
+	k8s.io/kube-controller-manager v1.34.2 // indirect
+	k8s.io/kube-scheduler v1.34.2 // indirect
+	k8s.io/metrics v1.34.2 // indirect
+	k8s.io/mount-utils v1.34.2 // indirect
+	k8s.io/pod-security-admission v1.34.2 // indirect
 	sigs.k8s.io/apiserver-network-proxy/konnectivity-client v0.31.2 // indirect
 	sigs.k8s.io/json v0.0.0-20241014173422-cfa47c3a1cc8 // indirect
 	sigs.k8s.io/randfill v1.0.0 // indirect
