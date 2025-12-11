@@ -1,0 +1,6 @@
+- api embedded-component f56b06773ddd1e5572579f4e2b6a73cbd2904a8b to a8983ec54ce158249a78c0bff2b9d8f33bfa6431
+  - 8f4812e5 2025-11-21T06:41:18-08:00 Enable streaming collections by default
+
+- router image-arm64 b41f9d05467fb7b3f6c2dafa6ac4b5e25164c0b6 to 5fe8cc069b2f44b3393545ac92c3201e8a87d82b
+  - 22cde42 2025-12-08T21:09:34+00:00 OCPBUGS-60885: Add option abortonclose to HAProxy configuration template
+
