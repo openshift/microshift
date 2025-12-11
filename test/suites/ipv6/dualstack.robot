@@ -88,13 +88,9 @@ Verify Host Network Pods Get Dual Stack IP Addresses
     [Setup]    Run Keywords
     ...    Migrate To Dual Stack
 
-    ${pod_ips}=    Oc Get JsonPath
-    ...    pod
-    ...    openshift-dns
-    ...    -l dns.operator.openshift.io/daemonset-node-resolver
-    ...    .items[*].status.podIPs[*].ip
-    Should Contain    ${pod_ips}    ${USHIFT_HOST_IP1}
-    Should Contain    ${pod_ips}    ${USHIFT_HOST_IP2}
+    # Wait a bit, as this is updated by kubelet and may not be immediate.
+    Wait Until Keyword Succeeds    10x    6s
+    ...    Host Network Pods Should Have Dual Stack IPs
 
     [Teardown]    Run Keywords
     ...    Remove Dual Stack Config Drop In
@@ -170,3 +166,13 @@ Restart Router
     ...    downtime and might need a restart (after the apiserver is ready) to resync all the routes.
     Run With Kubeconfig    oc rollout restart deployment router-default -n openshift-ingress
     Named Deployment Should Be Available    router-default    openshift-ingress    5m
+
+Host Network Pods Should Have Dual Stack IPs
+    [Documentation]    Check a system hostNetwork enabled pod for dual stack IP addresses
+    ${pod_ips}=    Oc Get JsonPath
+    ...    pod
+    ...    openshift-dns
+    ...    -l dns.operator.openshift.io/daemonset-node-resolver
+    ...    .items[*].status.podIPs[*].ip
+    Should Contain    ${pod_ips}    ${USHIFT_HOST_IP1}
+    Should Contain    ${pod_ips}    ${USHIFT_HOST_IP2}

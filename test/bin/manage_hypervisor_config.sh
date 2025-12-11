@@ -139,6 +139,10 @@ action_create() {
 
     # Start nginx web server
     "${TESTDIR}/bin/manage_webserver.sh" "start"
+
+    "${TESTDIR}/bin/manage_prometheus.sh" "start"
+
+    "${TESTDIR}/bin/manage_loki.sh" "start"
 }
 
 action_cleanup() {
@@ -176,6 +180,10 @@ action_cleanup() {
 
     # Stop nginx web server
     "${TESTDIR}/bin/manage_webserver.sh" "stop"
+
+    "${TESTDIR}/bin/manage_prometheus.sh" "stop"
+
+    "${TESTDIR}/bin/manage_loki.sh" "stop"
 }
 
 action_cleanup-all() {

@@ -234,7 +234,7 @@ metadata:
   namespace: ${namespace}
 EOL
     )
-    echo "${serviceAccount}" > "${target}"
+    echo "${serviceAccount}" >> "${target}"
 }
 
 # extract_operator_from_csv() extracts the operator manifest from cluster
@@ -253,6 +253,7 @@ extract_operator_from_csv() {
         | .metadata.namespace = \"${namespace}\"
         | del(.name)
         | del(.label)
+        | .spec.template.spec.containers[0].env += [{\"name\": \"SRIOV_CNI_BIN_PATH\", \"value\": \"/run/cni/bin\"}]
       " "${csv}" > "${target}"
 }
 

@@ -4,6 +4,7 @@ import argparse
 import concurrent.futures
 import getpass
 import glob
+import multiprocessing
 import os
 import platform
 import re
@@ -674,5 +675,6 @@ def main():
 
 
 if __name__ == "__main__":
+    multiprocessing.set_start_method("fork")
     _ = common.MeasureRunTimeInScope("[MAIN] Building Images")
     main()

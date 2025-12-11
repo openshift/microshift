@@ -366,7 +366,7 @@ def main():
     rbranch_does_not_exists = remote_branch is None
     rbranch_exists_and_needs_update = (
         remote_branch is not None and
-        g.is_local_branch_based_on_newer_base_branch_commit(adjusted_base_branch, remote_branch.name, rebase_branch_name)
+        g.is_local_branch_based_on_newer_base_branch_commit(base_branch, remote_branch.name, rebase_branch_name)
     )
     if rbranch_does_not_exists or rbranch_exists_and_needs_update:
         g.push(rebase_branch_name)
