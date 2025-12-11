@@ -4,5 +4,5 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    service.beta.openshift.io/inject-cabundle: "true"
+    cert-manager.io/inject-ca-from: $(kserveNamespace)/serving-cert
   name: inferenceservices.serving.kserve.io
