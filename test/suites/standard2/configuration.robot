@@ -238,21 +238,25 @@ Save Journal Cursor
 Setup With Bad Log Level
     [Documentation]    Set log level to an unknown value and restart
     Drop In MicroShift Config    ${BAD_LOG_LEVEL}    10-loglevel
+    Save Journal Cursor
     Restart MicroShift
 
 Setup With Debug Log Level
     [Documentation]    Set log level to debug and restart
     Drop In MicroShift Config    ${DEBUG_LOG_LEVEL}    10-loglevel
+    Save Journal Cursor
     Restart MicroShift
 
 Setup Known Audit Log Profile
     [Documentation]    Setup audit
     Drop In MicroShift Config    ${AUDIT_PROFILE}    10-audit
+    Save Journal Cursor
     Restart MicroShift
 
 Setup Audit Flags
     [Documentation]    Apply the audit config values set in ${AUDIT_FLAGS}
     Drop In MicroShift Config    ${AUDIT_FLAGS}    10-audit
+    Save Journal Cursor
     Restart MicroShift
 
 Deploy Storage Config
