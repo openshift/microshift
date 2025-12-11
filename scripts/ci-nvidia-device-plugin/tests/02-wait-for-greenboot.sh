@@ -2,7 +2,7 @@
 
 set -xeuo pipefail
 
-retries=20
+retries=30
 while [ ${retries} -gt 0 ] ; do
     ((retries-=1))
     if sudo systemctl status greenboot-healthcheck | grep -q 'active (exited)'; then
