@@ -1,4 +1,24 @@
-- api embedded-component 1886180ef4300f41168c2d498e0acecd02fa2a48 to 1cb53e34ca33d020c765093c21c9b7f4502cbea7
-  - 6461e395 2025-12-02T19:18:11+01:00 OCPBUGS-60885: Introduce ClosedClientConnectionPolicy to IngressController API
-  - cb64c7d3 2025-11-27T21:09:46+01:00 OCPBUGS-61858: Add HTTPKeepAliveTimeout to IngressController API
+- cluster-ingress-operator embedded-component 2371120eedb27049160c70859ef9972a7599c7e3 to fb7482e49c790206e370494221b7b02dc50bfd84
+  - 50c2597 2025-12-04T14:32:16+01:00 OCPBUGS-60885: Implement ClosedClientConnectionPolicy field
+  - 53e2431 2025-12-04T14:32:16+01:00 OCPBUGS-60885: Bump openshift/api to get ClosedClientConnectionPolicy
+  - 79c11fe 2025-11-17T10:51:03+00:00 OCPBUGS-61508: IngressOperator not exposing some metrics for degraded IngressController
+
+- cluster-network-operator embedded-component 8f216c0de0807e9a256aef6020d9f0a39cfff817 to c49c5e776b44dbac0dcba4897ca0ce803928693e
+  - 330fd06 2025-11-16T18:10:31+00:00 Remove unneeded logging config from managed ovn-kubernetes
+
+- machine-config-operator embedded-component 5fe9249e195b76d4e2482cbd5d3e50b848b9a3f5 to 2a29ea49e2625aac5e66e9675de04c2677689c7c
+  - 5de34379 2025-12-04T21:08:24+00:00 OKD-294: Migrate runtime from runc to crun on an upgrade for OKD
+  - 702dd8b2 2025-11-23T15:42:24+00:00 fixes systemd unit creation for empty units
+
+- oc image-amd64 0963a015e8051f256030f1af5895d5640530fa23 to dc61926008ad5333863dd1ae2902b95aed6dceaa
+  - 12889b84 2025-12-02T10:52:02+00:00 Fall back to simpler behavior, if setsid,ps,pkill are not installed
+
+- router image-amd64 96bfd2164c7885df9019ce9eeb79d506bd7e871b to db8d384266051ef06b67883aaa83674bc6c9f1ae
+  - 8d3a457 2025-12-01T23:54:44+01:00 OCPBUGS-60885: Add option abortonclose to HAProxy configuration template
+
+- oc image-arm64 0963a015e8051f256030f1af5895d5640530fa23 to dc61926008ad5333863dd1ae2902b95aed6dceaa
+  - 12889b84 2025-12-02T10:52:02+00:00 Fall back to simpler behavior, if setsid,ps,pkill are not installed
+
+- router image-arm64 96bfd2164c7885df9019ce9eeb79d506bd7e871b to db8d384266051ef06b67883aaa83674bc6c9f1ae
+  - 8d3a457 2025-12-01T23:54:44+01:00 OCPBUGS-60885: Add option abortonclose to HAProxy configuration template
 
