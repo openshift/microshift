@@ -5,7 +5,6 @@ Resource            ../../resources/common.resource
 Resource            ../../resources/microshift-config.resource
 Resource            ../../resources/microshift-process.resource
 Library             ../../resources/journalctl.py
-Library             SSHLibrary
 
 Suite Setup         Setup
 Suite Teardown      Teardown
@@ -173,9 +172,9 @@ Custom Feature Gates Are Passed To Kube APIServer
     ...    kube-apiserver. This test verifies that arbitrary feature gate values are correctly propagated from the
     ...    MicroShift configuration to the kube-apiserver, regardless of whether the feature gates are valid or have any effect.
     [Setup]    Setup Custom Feature Gates Test
-    Wait Until Keyword Succeeds    5 min    5 sec
+    Wait Until Keyword Succeeds    2 min    5 sec
     ...    Pattern Should Appear In Log Output    ${CURSOR}    kube:feature-gates=.*TestFeatureEnabled=true
-    Wait Until Keyword Succeeds    5 min    5 sec
+    Wait Until Keyword Succeeds    2 min    5 sec
     ...    Pattern Should Appear In Log Output    ${CURSOR}    kube:feature-gates=.*TestFeatureDisabled=false
     [Teardown]    Teardown Custom Feature Gates Test
 
@@ -192,18 +191,15 @@ Feature Gate Config Change Blocked After Lock Created
     [Documentation]    Verify that changing feature gate config is blocked after lock file exists.
     ...    MicroShift must refuse to start if feature gates change after CustomNoUpgrade is set.
     [Setup]    Setup Custom Feature Gates Test
-    Wait Until Keyword Succeeds    1 min    5 sec
-    ...    Feature Gate Lock File Should Exist
+
     Stop MicroShift
-
     Drop In MicroShift Config    ${DIFFERENT_FEATURE_GATES}    10-featuregates
-
-    # Unconditionally start MicroShift and verify that it fails without waiting for the service to be dead.
-    ${stdout}    ${stderr}    ${rc}=    Execute Command    sudo systemctl start microshift.service
-    ...    sudo=True    return_stdout=True    return_stderr=True    return_rc=True
-    Log Many    ${stdout}    ${stderr}    ${rc}
-    Should Be Equal As Integers    1    ${rc}
+    Save Journal Cursor
+    MicroShift Should Fail To Start
     Pattern Should Appear In Log Output    ${CURSOR}    feature gate configuration has changed
+    # Restore original config and verify that MicroShift starts
+    Drop In MicroShift Config    ${CUSTOM_FEATURE_GATES}    10-featuregates
+    Start MicroShift
     [Teardown]    Teardown Custom Feature Gates Test
 
 Feature Gate Lock File Persists Across Restarts With Same Config
@@ -228,7 +224,6 @@ Teardown
     [Documentation]    Test suite teardown
     Remove Drop In MicroShift Config    10-loglevel
     Remove Drop In MicroShift Config    10-audit
-    Remove Drop In MicroShift Config    10-featuregates
     Restart MicroShift
     Logout MicroShift Host
     Remove Kubeconfig
@@ -301,10 +296,10 @@ Check HTTP Proxy Env In Bootc Image
 
 Setup Custom Feature Gates Test
     [Documentation]    Drop in custom feature gates config and restart MicroShift
-    Remove Feature Gate Lock File If Exists
     Drop In MicroShift Config    ${CUSTOM_FEATURE_GATES}    10-featuregates
     Save Journal Cursor
     Restart MicroShift
+    Feature Gate Lock File Should Exist
 
 Teardown Custom Feature Gates Test
     [Documentation]    Remove custom feature gates config and restart MicroShift
@@ -326,3 +321,13 @@ Feature Gate Lock File Should Contain Feature Gates
     ${contents}=    Command Should Work    cat ${FEATURE_GATE_LOCK_FILE}
     Should Contain    ${contents}    ${feature_set}
     Should Contain    ${contents}    ${feature_name}
+
+MicroShift Should Fail To Start
+    [Documentation]    Verify that MicroShift fails to start and returns a non-zero exit code.
+    ...    This keyword is unique and differs from a composite keyword like
+    ...    Run Keyword And Expect Error    1 != 0    Start MicroShift
+    ...    because there is no need to poll the service for an "active" state, which Start MicroShift does.
+    ${stdout}    ${stderr}    ${rc}=    Execute Command    sudo systemctl start microshift.service
+    ...    sudo=True    return_stdout=True    return_stderr=True    return_rc=True
+    Log Many    ${stdout}    ${stderr}    ${rc}
+    Should Be Equal As Integers    1    ${rc}
