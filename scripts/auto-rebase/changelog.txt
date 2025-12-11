@@ -1,0 +1,3 @@
+- cluster-network-operator embedded-component 45379d9f5db177cc97f6e856a97e8b24c8f7a23c to 1bec7869b6a707b34a4c717b242f118fc1ff8e5c
+  - f203a2f 2024-11-26T20:16:32+00:00 Re-disable metrics server
+
