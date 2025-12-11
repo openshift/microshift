@@ -63,10 +63,12 @@ update_build_cache() {
         return
     fi
 
-    # Build the composer-cli base layer to be cached
+    # Build the composer-cli base layer and brew RPMs to be cached
     $(dry_run) bash -x ./bin/build_images.sh -l ./image-blueprints/layer1-base
-    # Build the bootc base layer to be cached
+    $(dry_run) bash -x ./bin/build_images.sh -l ./image-blueprints/layer4-release
+    # Build the bootc base layer and brew RPMs to be cached
     $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/layer1-base
+    $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/layer5-release
 
     # Prepare for the cache upload by stopping composer services and cleaning
     # temporary artifacts
