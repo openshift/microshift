@@ -4,14 +4,14 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.16.2
-  name: clusterlocalmodels.serving.kserve.io
+  name: localmodelcaches.serving.kserve.io
 spec:
   group: serving.kserve.io
   names:
-    kind: ClusterLocalModel
-    listKind: ClusterLocalModelList
-    plural: clusterlocalmodels
-    singular: clusterlocalmodel
+    kind: LocalModelCache
+    listKind: LocalModelCacheList
+    plural: localmodelcaches
+    singular: localmodelcache
   scope: Cluster
   versions:
   - name: v1alpha1
@@ -32,8 +32,11 @@ spec:
                 - type: string
                 pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
                 x-kubernetes-int-or-string: true
-              nodeGroup:
-                type: string
+              nodeGroups:
+                items:
+                  type: string
+                minItems: 1
+                type: array
               sourceModelUri:
                 type: string
                 x-kubernetes-validations:
@@ -41,7 +44,7 @@ spec:
                   rule: self == oldSelf
             required:
             - modelSize
-            - nodeGroup
+            - nodeGroups
             - sourceModelUri
             type: object
           status:
@@ -73,9 +76,6 @@ spec:
                   - NodeDownloading
                   - NodeDownloaded
                   - NodeDownloadError
-                  - NodeDeleting
-                  - NodeDeletionError
-                  - NodeDeleted
                   type: string
                 type: object
             type: object
