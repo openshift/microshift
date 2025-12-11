@@ -448,6 +448,12 @@ install -p -m644  ./assets/optional/ai-model-serving/kserve/configmap/* %{buildr
 install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/010-microshift-ai-model-serving-kserve/crd/
 install -p -m644  ./assets/optional/ai-model-serving/kserve/crd/*.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/010-microshift-ai-model-serving-kserve/crd/
 
+install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/010-microshift-ai-model-serving-kserve/crd/external/gateway-inference-extension
+install -p -m644  ./assets/optional/ai-model-serving/kserve/crd/external/gateway-inference-extension/*.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/010-microshift-ai-model-serving-kserve/crd/external/gateway-inference-extension
+
+install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/010-microshift-ai-model-serving-kserve/crd/external/opendatahub-operator
+install -p -m644  ./assets/optional/ai-model-serving/kserve/crd/external/opendatahub-operator/*.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/010-microshift-ai-model-serving-kserve/crd/external/opendatahub-operator
+
 install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/010-microshift-ai-model-serving-kserve/crd/full/
 install -p -m644  ./assets/optional/ai-model-serving/kserve/crd/full/*.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/010-microshift-ai-model-serving-kserve/crd/full/
 
@@ -461,13 +467,35 @@ install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/010-microshi
 install -p -m644  ./assets/optional/ai-model-serving/kserve/manager/*.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/010-microshift-ai-model-serving-kserve/manager/
 
 install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/010-microshift-ai-model-serving-kserve/overlays/odh/
-install -p -m644  ./assets/optional/ai-model-serving/kserve/overlays/odh/* %{buildroot}/%{_prefix}/lib/microshift/manifests.d/010-microshift-ai-model-serving-kserve/overlays/odh/
+install -p -m644  ./assets/optional/ai-model-serving/kserve/overlays/odh/*.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/010-microshift-ai-model-serving-kserve/overlays/odh/
+install -p -m644  ./assets/optional/ai-model-serving/kserve/overlays/odh/*.env %{buildroot}/%{_prefix}/lib/microshift/manifests.d/010-microshift-ai-model-serving-kserve/overlays/odh/
+
+install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/010-microshift-ai-model-serving-kserve/overlays/odh/patches/
+install -p -m644  ./assets/optional/ai-model-serving/kserve/overlays/odh/patches/*.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/010-microshift-ai-model-serving-kserve/overlays/odh/patches/
 
 install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/010-microshift-ai-model-serving-kserve/rbac/
 install -p -m644  ./assets/optional/ai-model-serving/kserve/rbac/*.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/010-microshift-ai-model-serving-kserve/rbac/
 
 install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/010-microshift-ai-model-serving-kserve/rbac/localmodel/
 install -p -m644  ./assets/optional/ai-model-serving/kserve/rbac/localmodel/*.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/010-microshift-ai-model-serving-kserve/rbac/localmodel/
+
+install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/010-microshift-ai-model-serving-kserve/rbac/localmodelnode/
+install -p -m644  ./assets/optional/ai-model-serving/kserve/rbac/localmodelnode/*.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/010-microshift-ai-model-serving-kserve/rbac/localmodelnode/
+
+install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/010-microshift-ai-model-serving-kserve/localmodels/
+install -p -m644  ./assets/optional/ai-model-serving/kserve/localmodels/*.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/010-microshift-ai-model-serving-kserve/localmodels/
+
+install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/010-microshift-ai-model-serving-kserve/localmodelnodes/
+install -p -m644  ./assets/optional/ai-model-serving/kserve/localmodelnodes/*.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/010-microshift-ai-model-serving-kserve/localmodelnodes/
+
+install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/010-microshift-ai-model-serving-kserve/llmisvc/
+install -p -m644  ./assets/optional/ai-model-serving/kserve/llmisvc/*.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/010-microshift-ai-model-serving-kserve/llmisvc/
+
+install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/010-microshift-ai-model-serving-kserve/certmanager/
+install -p -m644  ./assets/optional/ai-model-serving/kserve/certmanager/*.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/010-microshift-ai-model-serving-kserve/certmanager/
+
+install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/010-microshift-ai-model-serving-kserve/monitoring/llmisvc/
+install -p -m644  ./assets/optional/ai-model-serving/kserve/monitoring/llmisvc/*.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/010-microshift-ai-model-serving-kserve/monitoring/llmisvc/
 
 install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/010-microshift-ai-model-serving-kserve/webhook/
 install -p -m644  ./assets/optional/ai-model-serving/kserve/webhook/*.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/010-microshift-ai-model-serving-kserve/webhook/
