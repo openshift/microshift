@@ -17,14 +17,18 @@ data:
     {
         "image" : "$(kserve-storage-initializer)",
         "memoryRequest": "100Mi",
-        "memoryLimit": "1Gi",
+        "memoryLimit": "24Gi",
         "cpuRequest": "100m",
         "cpuLimit": "1",
         "enableDirectPvcVolumeMount": true,
+        "cpuModelcar": "10m",
+        "memoryModelcar": "15Mi",
         "enableModelcar": true
     }
   ingress: |-
     {
+        "enableGatewayApi": false,
+        "kserveIngressGateway": "openshift-ingress/openshift-ai-inference",
         "ingressGateway" : "knative-serving/knative-ingress-gateway",
         "knativeLocalGatewayService" : "knative-local-gateway.istio-system.svc.cluster.local",
         "ingressService" : "istio-ingressgateway.istio-system.svc.cluster.local",
@@ -88,7 +92,6 @@ data:
   inferenceService: |-
     {
       "serviceAnnotationDisallowedList": [
-        "autoscaling.knative.dev/initial-scale",
         "autoscaling.knative.dev/min-scale",
         "autoscaling.knative.dev/max-scale",
         "internal.serving.kserve.io/storage-initializer-sourceuri",
