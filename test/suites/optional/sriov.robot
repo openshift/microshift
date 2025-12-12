@@ -47,7 +47,7 @@ Create VFs And Verify
 *** Keywords ***
 Cleanup SR-IOV Policy
     [Documentation]    Deletes the policy
-    Run With Kubeconfig    oc delete -f ${OUTPUT_DIR}/final-sriov-policy.yaml
+    Run With Kubeconfig    oc delete -f ${OUTPUT_DIR}/final-sriov-policy.yaml -n sriov-network-operator
 
 Verify VF Count
     [Documentation]    Checks if the number of VFs matches the expected count
