@@ -399,8 +399,9 @@ does_image_exist() {
 exit_if_commit_not_found() {
     local -r commit="${1}"
     if ! does_commit_exist "${commit}"; then
-        echo "Commit '${commit}' not found in ostree repo - skipping test"
-        exit 0
+        echo "Commit '${commit}' not found in ostree repo - VM won't be created"
+        record_junit "${vm_name}" "vm_build_commit_not_fount" "FAILED"
+        exit 1
     fi
 }
 
@@ -408,8 +409,9 @@ exit_if_commit_not_found() {
 exit_if_image_not_found() {
     local -r image="${1}"
     if ! does_image_exist "${image}"; then
-        echo "Image '${image}' not found in mirror registry - skipping test"
-        exit 0
+        echo "Image '${image}' not found in mirror registry - VM won't be created"
+        record_junit "${vm_name}" "vm_build_image_not_fount" "FAILED"
+        exit 1
     fi
 }
 
