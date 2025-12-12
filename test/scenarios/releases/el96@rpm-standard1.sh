@@ -77,7 +77,7 @@ scenario_run_tests() {
     run_tests host1 \
         --exitonfailure \
         --variable "SOURCE_REPO_URL:${repo_url}" \
-        --variable "TARGET_VERSION:${BREW_LREL_RELEASE_VERSION}" \
+        --variable "TARGET_VERSION:${BREW_LATEST_RELEASE_VERSION}" \
         --variable "EXPECTED_OS_VERSION:9.6" \
         suites/rpm/install.robot \
         suites/standard1/ suites/selinux/validate-selinux-policy.robot
