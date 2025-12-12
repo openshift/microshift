@@ -8,6 +8,7 @@ SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 source "${SCRIPTDIR}/common.sh"
 
 AWS_BUCKET_NAME="${AWS_BUCKET_NAME:-microshift-build-cache}"
+AWS_BUCKET_NAME="microshift-build-pr5850-cache-us-west-2"
 BCH_SUBDIR=
 TAG_SUBDIR=
 ARCH_SUBDIR="${UNAME_M}"

@@ -1,0 +1,13 @@
+{{- if and (env.Getenv "UNAME_M" "") (eq "x86_64" .Env.UNAME_M) }}
+[rhel-9-for-x86_64-rt-rpms]
+name = Red Hat Enterprise Linux 9 for x86_64 - Real Time (RPMs)
+baseurl = https://cdn.redhat.com/content/dist/rhel9/9.6/{{ .Env.UNAME_M }}/rt/os
+enabled = 1
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+sslverify = 1
+sslcacert = /etc/rhsm/ca/redhat-uep.pem
+sslclientkey = {{ .Env.SSL_CLIENT_KEY_FILE }}
+sslclientcert = {{ .Env.SSL_CLIENT_CERT_FILE }}
+skip_if_unavailable = 0
+{{- end -}}

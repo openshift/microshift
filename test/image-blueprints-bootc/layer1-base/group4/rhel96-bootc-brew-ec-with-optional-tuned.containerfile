@@ -2,9 +2,19 @@
 # Note: This comment makes templating add a new line before the code
 FROM localhost/rhel96-bootc-brew-ec-with-optional:latest
 
+# Copy repository configuration for rt kernel
+# {{- if and (env.Getenv "UNAME_M" "") (eq "x86_64" .Env.UNAME_M) }}
+COPY ./bootc-images/microshift-rt.repo /etc/yum.repos.d/
+# {{- end }}
+
 # Install low-latency packages
 RUN dnf install -y microshift-low-latency-{{env.Getenv "BREW_EC_RELEASE_VERSION"}} && \
-    dnf clean all
+# {{- if and (env.Getenv "UNAME_M" "") (eq "x86_64" .Env.UNAME_M) }}
+dnf install -y kernel-rt && \
+dnf remove -y kernel kernel-core kernel-modules && \
+rm -vf /etc/yum.repos.d/microshift-rt.repo && \
+# {{- end }}
+dnf clean all
 
 # Enable microshift-tuned service
 RUN systemctl enable microshift-tuned
