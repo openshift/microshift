@@ -9,21 +9,32 @@ WEB_SERVER_URL="http://${VM_BRIDGE_IP}:${WEB_SERVER_PORT}"
 
 start_image="rhel-9.6-microshift-brew-optionals-4.${MINOR_VERSION}-${LATEST_RELEASE_TYPE}"
 
+# Skip the scenario if platform is ARM, as the igb driver is not supported.
+check_platform() {
+    if [[ "${UNAME_M}" =~ aarch64 ]] ; then
+        record_junit "setup" "scenario_create_vms" "SKIPPED"
+        exit 0
+    fi
+}
+
 scenario_create_vms() {
+    check_platform
     exit_if_commit_not_found "${start_image}"
 
-    # Two nics - one for macvlan, another for ipvlan (they cannot enslave the same interface)
+    # Three nics - one for sriov, one for macvlan, another for ipvlan (they cannot enslave the same interface)
     prepare_kickstart host1 kickstart.ks.template "${start_image}"
-    launch_vm  --network "${VM_MULTUS_NETWORK},${VM_MULTUS_NETWORK}"
+    launch_vm  --network "${VM_MULTUS_NETWORK},${VM_MULTUS_NETWORK},sriov"
 }
 
 scenario_remove_vms() {
+    check_platform
     exit_if_commit_not_found "${start_image}"
 
     remove_vm host1
 }
 
 scenario_run_tests() {
+    check_platform
     exit_if_commit_not_found "${start_image}"
 
     # Generic Device Plugin suite is excluded because getting serialsim for ostree would require:
