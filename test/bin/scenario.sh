@@ -32,7 +32,7 @@ IMAGE_SIGSTORE_ENABLED=false # may be overridden in scenario file
 VNC_CONSOLE=${VNC_CONSOLE:-false}  # may be overridden in global settings file
 TEST_RANDOMIZATION="all"  # may be overridden in scenario file
 TEST_EXCLUDES="none"  # may be overridden in scenario file
-TEST_EXECUTION_TIMEOUT="30m" # may be overriden in scenario file
+TEST_EXECUTION_TIMEOUT="${TEST_EXECUTION_TIMEOUT:-30m}" # may be overriden in scenario file or CI config
 SUBSCRIPTION_MANAGER_PLUGIN="${SUBSCRIPTION_MANAGER_PLUGIN:-${SCRIPTDIR}/subscription_manager_register.sh}"  # may be overridden in global settings file
 RUN_HOST_OVERRIDE=""  # target any given VM for running scenarios
 
