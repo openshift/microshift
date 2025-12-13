@@ -1,38 +1,35 @@
 
 images:
-  - name: caikit-tgis-image
-    newName: quay.io/modh/caikit-tgis-serving
-    digest: sha256:8c7ae765024ecd5ef27d4c4590a9fb1f9682ed18d116fc08b95cc8ca583272e7
-  - name: caikit-standalone-image
-    newName: quay.io/modh/caikit-nlp
-    digest: sha256:e16c35fe2cfef7820591bd88ab1aab42ac5f90bfe0cfd165f6b3c2b1e6801891
-  - name: tgis-image
-    newName: quay.io/modh/text-generation-inference
-    digest: sha256:7573fb6fa22fe259654d8be7d648b79b081fb565b34772f09cba0501e5005d73
-  - name: ovms-image
-    newName: quay.io/modh/openvino_model_server
-    digest: sha256:eee2857ddd5cc2df9ea7373ae7c6ae814d77bd631db5c52b91edad18ac6c73c8
-  - name: vllm-cuda-image
-    newName: quay.io/modh/vllm
-    digest: sha256:d75db59ecfe38287f51b8342851005cdbd879c5c6e8ec75a961a257adf66f9f2
-  - name: guardrails-detector-huggingface-runtime-image
-    newName: quay.io/modh/odh-trustyai-hf-detector-runtime-rhel9
-    digest: sha256:9081ffe45a8de4a9d80f5cad1c749c43ddad9bed12760a7efb67a7abd64ac38b
-  - name: vllm-cpu-image
-    newName: quay.io/modh/vllm
-    digest: sha256:ea905e759f0ad29d8a13af57996dbf6bbb013e7907bb555a49ebc8e4157f08ae
-  - name: vllm-gaudi-image
-    newName: quay.io/modh/vllm
-    digest: sha256:50bbe007f3e5c88977a5d5399e13d98f05b7542cee3455113a9028e699ccfdc9
-  - name: vllm-ppc64le-image
-    newName: quay.io/opendatahub/vllm:fast-ppc64le
-    digest: quay.io/opendatahub/vllm:fast-ppc64le
-  - name: vllm-rocm-image
-    newName: quay.io/modh/vllm
-    digest: sha256:7b9bd716efd34fae634e2f986bca2841ea240b113104cf73f68223e16c9ac3ff
-  - name: vllm-s390x-image
-    newName: quay.io/opendatahub/vllm:fast-s390x
-    digest: quay.io/opendatahub/vllm:fast-s390x
   - name: ray-tls-generator-image
     newName: registry.redhat.io/ubi9/ubi-minimal:latest
     digest: registry.redhat.io/ubi9/ubi-minimal:latest
+  - name: caikit-tgis-image
+    newName: quay.io/opendatahub/caikit-tgis-serving:fast
+    digest: quay.io/opendatahub/caikit-tgis-serving:fast
+  - name: caikit-standalone-image
+    newName: quay.io/opendatahub/caikit-nlp:fast
+    digest: quay.io/opendatahub/caikit-nlp:fast
+  - name: tgis-image
+    newName: quay.io/modh/text-generation-inference
+    digest: sha256:8419f73485c75b4eb0095d31879cc1a94e2be38a0ece08bc7923cef9cdd9444a
+  - name: ovms-image
+    newName: quay.io/opendatahub/openvino_model_server:2025.1-release
+    digest: quay.io/opendatahub/openvino_model_server:2025.1-release
+  - name: vllm-cuda-image
+    newName: quay.io/opendatahub/vllm:fast
+    digest: quay.io/opendatahub/vllm:fast
+  - name: vllm-cpu-image
+    newName: quay.io/opendatahub/vllm:fast-cpu
+    digest: quay.io/opendatahub/vllm:fast-cpu
+  - name: vllm-gaudi-image
+    newName: quay.io/opendatahub/vllm:fast-gaudi
+    digest: quay.io/opendatahub/vllm:fast-gaudi
+  - name: vllm-rocm-image
+    newName: quay.io/opendatahub/vllm:fast-rocm
+    digest: quay.io/opendatahub/vllm:fast-rocm
+  - name: vllm-spyre-image
+    newName: registry.redhat.io/rhaiis/vllm-spyre-rhel9
+    digest: sha256:f36864ec0d7a18a3143296ba2e624eca1fa6ba0af87a7196b325384785bbcf4b
+  - name: guardrails-detector-huggingface-runtime-image
+    newName: quay.io/trustyai/guardrails-detector-huggingface-runtime:latest
+    digest: quay.io/trustyai/guardrails-detector-huggingface-runtime:latest

@@ -5,7 +5,7 @@ metadata:
   annotations:
     openshift.io/display-name: vLLM NVIDIA GPU ServingRuntime for KServe
     opendatahub.io/recommended-accelerators: '["nvidia.com/gpu"]'
-    opendatahub.io/runtime-version: 'v0.9.1.0'
+    opendatahub.io/runtime-version: 'v0.10.1.1'
   labels:
     opendatahub.io/dashboard: "true"
 spec:

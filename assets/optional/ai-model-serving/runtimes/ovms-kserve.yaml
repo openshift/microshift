@@ -4,7 +4,7 @@ metadata:
   annotations:
     openshift.io/display-name: OpenVINO Model Server
     opendatahub.io/recommended-accelerators: '["nvidia.com/gpu"]'
-    opendatahub.io/runtime-version: 'v2025.1'
+    opendatahub.io/runtime-version: 'v2025.2.1'
   name: kserve-ovms
   labels:
     opendatahub.io/dashboard: 'true'
