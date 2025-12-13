@@ -228,7 +228,7 @@ github.com/golang/protobuf/ptypes/wrappers
 # github.com/google/btree v1.1.3
 ## explicit; go 1.18
 github.com/google/btree
-# github.com/google/cadvisor v0.52.1
+# github.com/google/cadvisor v0.52.1 => github.com/openshift/google-cadvisor v0.52.1-openshift-4.21-1
 ## explicit; go 1.23.0
 github.com/google/cadvisor/cache/memory
 github.com/google/cadvisor/client/v2
@@ -1582,4 +1582,5 @@ sigs.k8s.io/structured-merge-diff/v6/value
 ## explicit; go 1.22
 sigs.k8s.io/yaml
 sigs.k8s.io/yaml/kyaml
+# github.com/google/cadvisor => github.com/openshift/google-cadvisor v0.52.1-openshift-4.21-1
 # github.com/onsi/ginkgo/v2 => github.com/openshift/onsi-ginkgo/v2 v2.6.1-0.20251001123353-fd5b1fb35db1

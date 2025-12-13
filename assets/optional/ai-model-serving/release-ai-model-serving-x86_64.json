@@ -1,24 +1,26 @@
 {
   "release": {
-    "base": "2.22.3"
+    "base": "2.25.0"
   },
   "images": {
-    "caikit-tgis-image": "quay.io/modh/caikit-tgis-serving@sha256:8c7ae765024ecd5ef27d4c4590a9fb1f9682ed18d116fc08b95cc8ca583272e7",
-    "caikit-standalone-image": "quay.io/modh/caikit-nlp@sha256:e16c35fe2cfef7820591bd88ab1aab42ac5f90bfe0cfd165f6b3c2b1e6801891",
-    "tgis-image": "quay.io/modh/text-generation-inference@sha256:7573fb6fa22fe259654d8be7d648b79b081fb565b34772f09cba0501e5005d73",
-    "ovms-image": "quay.io/modh/openvino_model_server@sha256:eee2857ddd5cc2df9ea7373ae7c6ae814d77bd631db5c52b91edad18ac6c73c8",
-    "vllm-cuda-image": "quay.io/modh/vllm@sha256:d75db59ecfe38287f51b8342851005cdbd879c5c6e8ec75a961a257adf66f9f2",
-    "guardrails-detector-huggingface-runtime-image": "quay.io/modh/odh-trustyai-hf-detector-runtime-rhel9@sha256:9081ffe45a8de4a9d80f5cad1c749c43ddad9bed12760a7efb67a7abd64ac38b",
-    "vllm-cpu-image": "quay.io/modh/vllm@sha256:ea905e759f0ad29d8a13af57996dbf6bbb013e7907bb555a49ebc8e4157f08ae",
-    "vllm-gaudi-image": "quay.io/modh/vllm@sha256:50bbe007f3e5c88977a5d5399e13d98f05b7542cee3455113a9028e699ccfdc9",
-    "vllm-ppc64le-image": "quay.io/opendatahub/vllm:fast-ppc64le",
-    "vllm-rocm-image": "quay.io/modh/vllm@sha256:7b9bd716efd34fae634e2f986bca2841ea240b113104cf73f68223e16c9ac3ff",
-    "vllm-s390x-image": "quay.io/opendatahub/vllm:fast-s390x",
     "ray-tls-generator-image": "registry.redhat.io/ubi9/ubi-minimal:latest",
-    "kserve-controller": "quay.io/modh/kserve-controller@sha256:d7fc7368e496528e3a67b981756fecf35e28facafed56393ea2df7f25bfc9e99",
-    "kserve-agent": "quay.io/modh/kserve-agent@sha256:cea4f315a3ced482e3518a64da5bea1a1a51daba578304075fe90d029e124f1c",
-    "kserve-router": "quay.io/modh/kserve-router@sha256:dc8bbabe6d86a4a28f9649c8cae7efbc122e139714eb061ebbc56346c9729400",
-    "kserve-storage-initializer": "quay.io/modh/kserve-storage-initializer@sha256:0ea8e971ed7835a8b68bca06562b4a435584a38df03159a6b26a5014fdb9190f",
+    "caikit-tgis-image": "quay.io/opendatahub/caikit-tgis-serving:fast",
+    "caikit-standalone-image": "quay.io/opendatahub/caikit-nlp:fast",
+    "tgis-image": "quay.io/modh/text-generation-inference@sha256:8419f73485c75b4eb0095d31879cc1a94e2be38a0ece08bc7923cef9cdd9444a",
+    "ovms-image": "quay.io/opendatahub/openvino_model_server:2025.1-release",
+    "vllm-cuda-image": "quay.io/opendatahub/vllm:fast",
+    "vllm-cpu-image": "quay.io/opendatahub/vllm:fast-cpu",
+    "vllm-gaudi-image": "quay.io/opendatahub/vllm:fast-gaudi",
+    "vllm-rocm-image": "quay.io/opendatahub/vllm:fast-rocm",
+    "vllm-spyre-image": "registry.redhat.io/rhaiis/vllm-spyre-rhel9@sha256:f36864ec0d7a18a3143296ba2e624eca1fa6ba0af87a7196b325384785bbcf4b",
+    "guardrails-detector-huggingface-runtime-image": "quay.io/trustyai/guardrails-detector-huggingface-runtime:latest",
+    "kserve-controller": "quay.io/opendatahub/kserve-controller:stable-2.x",
+    "kserve-agent": "quay.io/opendatahub/kserve-agent:stable-2.x",
+    "kserve-router": "quay.io/opendatahub/kserve-router:stable-2.x",
+    "kserve-storage-initializer": "quay.io/opendatahub/kserve-storage-initializer:stable-2.x",
+    "kserve-llm-d": "ghcr.io/llm-d/llm-d-dev:sha-b3f0b0d",
+    "kserve-llm-d-inference-scheduler": "quay.io/opendatahub/llm-d-inference-scheduler:odh-v2.33",
+    "kserve-llm-d-routing-sidecar": "quay.io/opendatahub/llm-d-routing-sidecar:odh-v2.33",
     "oauth-proxy": "registry.redhat.io/openshift4/ose-oauth-proxy@sha256:bd49cfc8452b3d96467cc222db9487e120abc6cc5ba81349c6b3703706f36a08"
   }
 }

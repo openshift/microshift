@@ -1,0 +1,24 @@
+- cluster-kube-apiserver-operator embedded-component eecc8a9b87afa5ba882564cc4a352c93a555d7ab to 2c58d2f2bad129f0017ca194ae8a38711917c21c
+  - 5652b0b 2025-12-04T21:33:45-08:00 Update k8s version ranges for MutatingAdmissionPolicy
+
+- cluster-network-operator embedded-component 8bd3f1c3ea6055a49c14ece00a5b8779a100fc5d to 8d09651e31c64340865f7ec7f349786528805ebd
+  - b4c41d7 2025-12-04T23:56:54+01:00 Fix frr-k8s-statuscleaner crash: move $(LOG_LEVEL) to end of args
+
+- kubernetes embedded-component 05182efbe79b0f9893cdffc9f76589cfd7419b39 to 9f57f51e3485ccc1cfd01ec94e9a0f5bef38eacb
+  - 873cd1d1b 2025-12-08T10:42:38+01:00 UPSTREAM: <drop>: make update
+  - 8d86655e3 2025-12-05T17:50:39+01:00 UPSTREAM: <drop>: pin cadvisor to downstream fork
+
+- machine-config-operator embedded-component 00b8722ba3d4926f82541d781b3f6c1de7bd6b21 to e2f6042b4bd21ad64115fa5be529edc1cce8c451
+  - d41f4bb5 2025-12-09T11:44:00+02:00 add missing ports in contaiterport on the daemoset
+  - 130d0ccd 2025-12-08T15:16:04-05:00 e2e test: update  to wait until test node returns to ready
+  - ed3a3c85 2025-12-08T15:11:46-05:00 msbic: skip azure machinesets with securityType
+  - 92dda854 2025-12-08T09:53:35+02:00 add a relevant svc to the crio port
+
+- kubernetes image-amd64 05182efbe79b0f9893cdffc9f76589cfd7419b39 to 9f57f51e3485ccc1cfd01ec94e9a0f5bef38eacb
+  - 873cd1d1b 2025-12-08T10:42:38+01:00 UPSTREAM: <drop>: make update
+  - 8d86655e3 2025-12-05T17:50:39+01:00 UPSTREAM: <drop>: pin cadvisor to downstream fork
+
+- kubernetes image-arm64 9f57f51e3485ccc1cfd01ec94e9a0f5bef38eacb to 9bbcda1bf017104f96c0f1bd27175d122f416f5a
+  - 9d621f97b 2025-12-10T10:10:48-03:00 UPSTREAM: 135476: Filter out the nodes created by other tests
+  - e2b978d53 2025-12-10T09:45:34+01:00 UPSTREAM: 135623: Fix the preemption test
+
