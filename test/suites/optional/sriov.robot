@@ -6,6 +6,8 @@ Resource            ../../resources/microshift-process.resource
 Suite Setup         Setup Suite
 Suite Teardown      Teardown Suite
 
+Test Tags           optional    sriov
+
 
 *** Variables ***
 ${TEMPLATE_PATH}    ${CURDIR}/../../assets/sriov/sriov-network-policy-template.yaml

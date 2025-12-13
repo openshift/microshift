@@ -39,5 +39,6 @@ scenario_run_tests() {
     run_tests host1 \
         --variable "PROMETHEUS_HOST:$(hostname)" \
         --variable "LOKI_HOST:$(hostname)" \
+        --skip sriov \
         suites/optional/
 }
