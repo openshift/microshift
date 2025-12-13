@@ -2,7 +2,7 @@
 
 # Sourced from scenario.sh and uses functions defined there.
 
-start_image=rhel96-bootc-crel
+start_image=rhel96-bootc-brew-nightly-with-optional
 
 scenario_create_vms() {
     exit_if_image_not_found "${start_image}"
@@ -20,8 +20,6 @@ scenario_remove_vms() {
 scenario_run_tests() {
     exit_if_image_not_found "${start_image}"
 
-    run_tests host1 \
-        --variable "TARGET_REF:rhel96-bootc-source" \
-        --variable "BOOTC_REGISTRY:${MIRROR_REGISTRY_URL}" \
-        suites/upgrade/upgrade-successful.robot
+    run_tests host1 suites/standard2
 }
+
