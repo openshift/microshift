@@ -1,0 +1,17 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: kserve-llm-isvc-gateway
+  labels:
+    app.kubernetes.io/name: kserve-llm-isvc-gateway-monitoring
+spec:
+  selector:
+    matchLabels:
+      serving.kserve.io/gateway: kserve-ingress-gateway
+  endpoints:
+  - targetPort: 15020
+    metricRelabelings:
+    - sourceLabels: [ __name__ ]
+      action: replace
+      replacement: "kserve_$1"
+      targetLabel: __name__
