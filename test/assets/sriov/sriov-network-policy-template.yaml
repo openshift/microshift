@@ -1,0 +1,17 @@
+apiVersion: sriovnetwork.openshift.io/v1
+kind: SriovNetworkNodePolicy
+metadata:
+  name: policy-1
+spec:
+  nodeSelector:
+    node.kubernetes.io/instance-type: rhde
+  resourceName: intelnics
+  priority: 99
+  mtu: 9000
+  numVfs: 2
+  nicSelector:
+      deviceID: "PLACEHOLDER_DEVICE_ID"
+      rootDevices:
+      - PLACEHOLDER_PCI_ADDRESS
+      vendor: "8086"
+  deviceType: netdevice
