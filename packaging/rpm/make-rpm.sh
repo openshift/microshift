@@ -58,6 +58,7 @@ build_commit() {
 %global commit ${1}
 %global embedded_git_tag ${SOURCE_GIT_TAG}
 %global embedded_git_tree_state ${SOURCE_GIT_TREE_STATE}
+%global microshift_variant ${MICROSHIFT_VARIANT}
 EOF
   cat "${SCRIPT_DIR}/microshift.spec" >> "${RPMBUILD_DIR}SPECS/microshift.spec"
 
@@ -72,7 +73,6 @@ EOF
   rpmbuild --quiet ${RPMBUILD_OPT} \
    --define "_topdir ${RPMBUILD_DIR}" \
    --define "_binary_payload w19T8.zstdio" \
-   --define "microshift_variant ${MICROSHIFT_VARIANT}" \
    "${RPMBUILD_DIR}"SPECS/microshift.spec
 }
 
