@@ -13,6 +13,7 @@ Resource            ../../resources/oc.resource
 Resource            ../../resources/microshift-config.resource
 Resource            ../../resources/microshift-network.resource
 Resource            ../../resources/microshift-process.resource
+Resource            ../../resources/ostree-health.resource
 
 Suite Setup         Setup Suite With Namespace
 Suite Teardown      Teardown Suite With Namespace
@@ -407,6 +408,7 @@ Setup DNS For Test
         Add Entry To Hosts    ${ip_address}    ${dns_name}    /etc/hosts
         Drop In MicroShift Config    ${HOSTSFILE_ENABLED}    20-dns
         Restart MicroShift
+        Restart Greenboot And Wait For Success
     EXCEPT
         Configure DNS For Domain    ${ip_address}    ${dns_name}
     END
