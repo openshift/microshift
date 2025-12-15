@@ -5,14 +5,14 @@ https://github.com/openshift/cluster-ingress-operator embedded-component fb7482e
 https://github.com/openshift/cluster-kube-apiserver-operator embedded-component 974542ae2ef86a631546b3a48fd0da3c2e3b74dd
 https://github.com/openshift/cluster-kube-controller-manager-operator embedded-component 438c9dba80ddadeabe9efe4a654297a7b550b2b8
 https://github.com/openshift/cluster-kube-scheduler-operator embedded-component 58cbd296eecc61c0871739588ae65af9c05e87a6
-https://github.com/openshift/cluster-network-operator embedded-component c49c5e776b44dbac0dcba4897ca0ce803928693e
+https://github.com/openshift/cluster-network-operator embedded-component 698e349cb60e84967bf93345d1b0802dd15ccc1a
 https://github.com/openshift/cluster-openshift-controller-manager-operator embedded-component aa455c043152123595c2b4f72e02279aad9dd48a
 https://github.com/openshift/cluster-policy-controller embedded-component 47c783103216aa5e1242632127a5d8f98b8b7455
 https://github.com/openshift/csi-external-snapshotter embedded-component 42604822c25eb2aa0ecb017c24e328221b238eb9
 https://github.com/openshift/etcd embedded-component eac09c01677bb03daed156d407be27785fd61e0d
 https://github.com/openshift/kubernetes embedded-component 2a7ef4adf7d3074804e6666221bc7c73c2c89ca1
 https://github.com/openshift/kubernetes-kube-storage-version-migrator embedded-component 0f8a4eb84ace9b746cf25d51d80dacf34ca5f953
-https://github.com/openshift/machine-config-operator embedded-component 2a29ea49e2625aac5e66e9675de04c2677689c7c
+https://github.com/openshift/machine-config-operator embedded-component bb066c315eb491455d97d4307c0c6c3b9e7a4fc7
 https://github.com/openshift/openshift-controller-manager embedded-component d9e543dd31e981f279c447e4f92f0dac3f665f9e
 https://github.com/openshift/operator-framework-olm embedded-component dd6d22bd02554c039e7bbec4bf39c6e97ebf0b9b
 https://github.com/openshift/route-controller-manager embedded-component bf2fa662f57f233d8541f94c4953e0dcd7a5ab20
