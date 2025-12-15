@@ -51,8 +51,8 @@ require (
 	k8s.io/kubelet v1.33.6
 	k8s.io/utils v0.0.0-20250604170112-4c0f3b243397
 	sigs.k8s.io/kube-storage-version-migrator v0.0.6-0.20230721195810-5c8923c5ff96
-	sigs.k8s.io/kustomize/api v0.19.0
-	sigs.k8s.io/kustomize/kyaml v0.19.0
+	sigs.k8s.io/kustomize/api v0.20.1
+	sigs.k8s.io/kustomize/kyaml v0.20.1
 )
 
 require (
@@ -100,7 +100,6 @@ require (
 	github.com/google/cadvisor v0.52.1 // indirect
 	github.com/google/cel-go v0.23.2 // indirect
 	github.com/google/pprof v0.0.0-20241210010833-40e02aabc2ad // indirect
-	github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/gorilla/websocket v1.5.4-0.20250319132907-e064f32e3674 // indirect
 	github.com/gregjones/httpcache v0.0.0-20190611155906-901d90724c79 // indirect
