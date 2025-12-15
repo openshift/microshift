@@ -1,6 +1,10 @@
-- api embedded-component f56b06773ddd1e5572579f4e2b6a73cbd2904a8b to a8983ec54ce158249a78c0bff2b9d8f33bfa6431
-  - 8f4812e5 2025-11-21T06:41:18-08:00 Enable streaming collections by default
+- api embedded-component a8983ec54ce158249a78c0bff2b9d8f33bfa6431 to 6c879a9fc8f493cfaa700ce2b0b296f6149796df
+  - f23251b6 2025-12-08T21:21:21+01:00 OCPBUGS-60885: Introduce ClosedClientConnectionPolicy to IngressController API
 
-- router image-arm64 b41f9d05467fb7b3f6c2dafa6ac4b5e25164c0b6 to 5fe8cc069b2f44b3393545ac92c3201e8a87d82b
+- cluster-ingress-operator embedded-component ddd78734833eb45f2cd5fba677fe50e4ae9f063b to 250f3a6856d22058af7e675b1b783389139f6aa4
+  - 07ab02e 2025-12-09T16:10:50+01:00 OCPBUGS-60885: Implement ClosedClientConnectionPolicy field
+  - f255eb0 2025-12-09T16:10:50+01:00 OCPBUGS-60885: Bump openshift/api to get ClosedClientConnectionPolicy
+
+- router image-amd64 b41f9d05467fb7b3f6c2dafa6ac4b5e25164c0b6 to 5fe8cc069b2f44b3393545ac92c3201e8a87d82b
   - 22cde42 2025-12-08T21:09:34+00:00 OCPBUGS-60885: Add option abortonclose to HAProxy configuration template
 
