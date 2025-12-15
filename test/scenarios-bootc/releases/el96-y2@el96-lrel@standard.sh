@@ -6,6 +6,8 @@
 # ensure MicroShift is upgraded before running standard suite tests
 export TEST_RANDOMIZATION=none
 
+export TEST_EXECUTION_TIMEOUT="60m"
+
 dest_image="rhel96-bootc-brew-${LATEST_RELEASE_TYPE}-with-optional"
 
 scenario_create_vms() {
@@ -27,6 +29,8 @@ scenario_run_tests() {
     run_tests host1 \
         --variable "TARGET_REF:${dest_image}" \
         --variable "BOOTC_REGISTRY:${MIRROR_REGISTRY_URL}" \
+        --variable "EXPECTED_OS_VERSION:9.6" \
         suites/upgrade/upgrade-successful.robot \
-        suites/standard2
+        suites/standard1/ \
+        suites/standard2/
 }

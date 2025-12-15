@@ -7,6 +7,8 @@
 # shellcheck disable=SC2034  # used elsewhere
 IMAGE_SIGSTORE_ENABLED=true
 
+export TEST_EXECUTION_TIMEOUT="60m"
+
 scenario_create_vms() {
     if [[ "${CURRENT_RELEASE_REPO}" == "" ]] ; then
         # Empty string means there's no EC build yet, so the test needs to be skipped.
@@ -55,5 +57,7 @@ scenario_run_tests() {
     run_tests host1 \
         --variable "EXPECTED_OS_VERSION:9.6" \
         --variable "IMAGE_SIGSTORE_ENABLED:True" \
-        suites/standard1/ suites/selinux/validate-selinux-policy.robot
+        suites/standard1/ \
+        suites/standard2/ \
+        suites/selinux/validate-selinux-policy.robot
 }

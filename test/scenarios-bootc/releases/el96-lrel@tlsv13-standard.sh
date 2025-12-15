@@ -2,6 +2,8 @@
 
 # Sourced from scenario.sh and uses functions defined there.
 
+export TEST_EXECUTION_TIMEOUT="60m"
+
 start_image="rhel96-bootc-brew-${LATEST_RELEASE_TYPE}-with-optional"
 
 scenario_create_vms() {
@@ -45,5 +47,7 @@ EOF"
     run_tests host1 \
         --variable "EXPECTED_OS_VERSION:9.6" \
         --exclude tls-configuration \
-        suites/standard1/ suites/selinux/validate-selinux-policy.robot
+        suites/standard1/ \
+        suites/standard2/ \
+        suites/selinux/validate-selinux-policy.robot
 }

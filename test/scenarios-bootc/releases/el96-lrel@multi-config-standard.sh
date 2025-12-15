@@ -10,6 +10,8 @@
 
 export TEST_RANDOMIZATION=none
 
+export TEST_EXECUTION_TIMEOUT="60m"
+
 # Redefine network-related settings to use the dedicated IPv6 network bridge
 # shellcheck disable=SC2034  # used elsewhere
 VM_BRIDGE_IP="$(get_vm_bridge_ip "${VM_IPV6_NETWORK}")"
@@ -112,6 +114,7 @@ EOF"
         --exclude tls-configuration \
         --exclude version \
         suites/standard1/ \
+        suites/standard2/ \
         suites/selinux/validate-selinux-policy.robot
 
     echo "SUCCESS: Multi-config scenario validation completed - no conflicts detected"
