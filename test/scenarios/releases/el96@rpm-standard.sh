@@ -13,6 +13,8 @@ export SKIP_GREENBOOT=true
 # did not want to spend the resources on a new VM.
 export TEST_RANDOMIZATION=none
 
+export TEST_EXECUTION_TIMEOUT="60m"
+
 configure_rhocp_repo() {
     local -r rhocp=$1
     local -r version=$2
@@ -45,7 +47,6 @@ EOF
 scenario_create_vms() {
     prepare_kickstart host1 kickstart-liveimg.ks.template ""
     launch_vm --boot_blueprint rhel-9.6
-
     # Open the firewall ports. Other scenarios get this behavior by
     # embedding settings in the blueprint, but there is no blueprint
     # for this scenario. We need do this step before running the RF
@@ -81,5 +82,7 @@ scenario_run_tests() {
         --variable "TARGET_VERSION:${BREW_LREL_RELEASE_VERSION}" \
         --variable "EXPECTED_OS_VERSION:9.6" \
         suites/rpm/install.robot \
-        suites/standard2/
+        suites/standard1/ \
+        suites/standard2/ \
+        suites/selinux/validate-selinux-policy.robot
 }

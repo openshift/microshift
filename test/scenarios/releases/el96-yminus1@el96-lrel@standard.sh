@@ -6,6 +6,8 @@
 # ensure MicroShift is upgraded before running standard suite tests
 export TEST_RANDOMIZATION=none
 
+export TEST_EXECUTION_TIMEOUT="60m"
+
 start_image="rhel-9.6-microshift-brew-optionals-4.${PREVIOUS_MINOR_VERSION}-zstream"
 
 scenario_create_vms() {
@@ -26,6 +28,9 @@ scenario_run_tests() {
 
     run_tests host1 \
         --variable "TARGET_REF:rhel-9.6-microshift-brew-optionals-4.${MINOR_VERSION}-${LATEST_RELEASE_TYPE}" \
+        --variable "EXPECTED_OS_VERSION:9.6" \
         suites/upgrade/upgrade-successful.robot \
-        suites/standard2/
+        suites/standard1/ \
+        suites/standard2/ \
+        suites/selinux/validate-selinux-policy.robot
 }
