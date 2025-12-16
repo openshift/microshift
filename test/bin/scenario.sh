@@ -1197,9 +1197,6 @@ run_ginkgo_tests() {
         echo "Running Ginkgo tests with MicroShift filter..."
     fi
 
-    echo "----------------Remove 62738 test case---------------"
-    sed -i "/62738/d" "${case_selected}"
-    echo "-----------------------------------------------------"
     echo "------------------Selected test cases------------------"
     cat "${case_selected}"
     echo "-----------------------------------------------------"
