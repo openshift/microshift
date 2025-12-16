@@ -2,7 +2,7 @@
 #
 # This script should be run on the build host to manage cache of build artifacts
 set -euo pipefail
-
+# comment to force cache rebuild
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # shellcheck source=test/bin/common.sh
 source "${SCRIPTDIR}/common.sh"
