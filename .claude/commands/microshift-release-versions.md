@@ -87,16 +87,18 @@ Parsed:
 
 ### Step 2: Check OpenShift Release Status
 
-**Goal**: Verify if the version is marked as "Accepted" in the OpenShift release system.
+**Goal**: Check if OCP payload is Accecpted for this version.
 
 **Actions**:
-1. For EC versions, fetch the dev-preview release stream:
+1. Web Fetch this and look for the version:
    ```
    https://openshift-release.apps.ci.l2s4.p1.openshiftapps.com/
    ```
-2. For RC/GA versions, check the stable release stream
-3. Look for the version in the accepted releases list
-4. Extract acceptance status and timestamp if available
+2. Check if the payload for the version is Accepted.
+
+**Outcome**:
+ - If the payload is Accepted continue with next step.
+ - If the payload is Not Accepted do not run next steps. MicroShift version won't be created if the OCP is not Accepted.
 
 **Note**: MicroShift packages become available when the corresponding OCP version is marked as "Accepted".
 
@@ -122,46 +124,16 @@ Parsed:
    ```
 
 **For GA/Z-stream versions**:
-1. Check rhocp repos (requires subscription):
-   - Format: `rhocp-X.Y-for-rhel-9-ARCH-rpms`
-2. Provide catalog link:
-   ```
-   https://access.redhat.com/downloads/content/microshift/<version>/x86_64/
-   ```
-
-### Step 4: Check Brew Build Status
-
-**Goal**: Check if the version is available in Brew (internal Red Hat build system).
-
-**Note**: Brew is an internal Red Hat tool. VPN connection is required to access it.
-
-**Actions**:
-
-1. **Web Interface** (for browsing all builds):
+1. Check on brew:
    ```
    https://brewweb.engineering.redhat.com/brew/packageinfo?packageID=82827
    ```
    Use this command to check for microshift releases:
    ```
-   curl -sk "https://brewweb.engineering.redhat.com/brew/packageinfo?packageID=82827" 2>/dev/null
+   curl -sk "https://brewweb.engineering.redhat.com/brew/search?match=glob&type=build&terms={version}" 2>/dev/null
    ```
-   When not found look for it in the next 50 packages:
-   ```
-   curl -sk "https://brewweb.engineering.redhat.com/brew/packageinfo?buildStart=50&packageID=82827" 2>/dev/null
-   ```
-   You can try looking in the next 50 packages more times, but do look for more than 2 months ago.
 
-
-2. **Interpret Results**:
-   - If matches are found, the build exists in Brew
-   - The output format is: `microshift-<version>-<release>.el9`
-   - Multiple builds may exist for the same version (different release numbers)
-
-**Note on Version Format**:
-- Brew uses `~` or `-0.` for pre-release versions (e.g., `4.21.0-0.ec.3.el9`)
-- Search with the base version pattern to find all related builds
-
-### Step 5: Check Bootc Image Availability
+### Step 4: Check Bootc Image Availability
 
 **Goal**: Find bootc image pull specs for versions 4.18+.
 
@@ -183,19 +155,15 @@ Parsed:
    ```
 
 **For GA/Z-stream versions**:
-1. Check registry.redhat.io:
-   ```
-   registry.redhat.io/openshift4/microshift-bootc-rhel9:<version>
-   ```
-2. For pre-GA z-stream, check registry.stage.redhat.io:
-   ```
-   registry.stage.redhat.io/openshift4/microshift-bootc-rhel9:<version>
-   ```
-3. Provide catalog links:
+1. For pre-GA z-stream, check registry.stage.redhat.io:
    - Production: `https://catalog.redhat.com/en/software/containers/openshift4/microshift-bootc-rhel9/`
+      - Use this command to check the catalog: `curl -sk "https://catalog.redhat.com/api/containers/v1/repositories/registry/registry.access.redhat.com/repository/openshift4/microshift-bootc-rhel9/images?page_size=500&page=0" 2>/dev/null`
+         - if not found try few more pages
    - Stage: `https://catalog.stage.redhat.com/en/software/containers/openshift4/microshift-bootc-rhel9/`
+      - Use this command to check the catalog: `curl -sk "https://catalog.stage.redhat.com/api/containers/v1/repositories/registry/registry.access.redhat.com/repository/openshift4/microshift-bootc-rhel9/images?page_size=500&page=0" 2>/dev/null`
+         - if not found try few more pages
 
-### Step 6: List Available Versions (if short version provided)
+### Step 5: List Available Versions (if short version provided)
 
 **Goal**: If user provides a short version like `4.21`, list all available sub-versions.
 
@@ -208,7 +176,7 @@ Parsed:
 2. Filter for versions matching the major.minor pattern
 3. List all available versions with their types
 
-### Step 7: Generate Report
+### Step 6: Generate Report
 
 **Goal**: Create a comprehensive availability report.
 
