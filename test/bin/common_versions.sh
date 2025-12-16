@@ -122,7 +122,7 @@ export RHOCP_MINOR_Y_BETA
 
 # The 'rhocp_minor_y' variable should be the previous minor version number, if
 # the previous release is available through the 'rhocp' stream, otherwise empty.
-RHOCP_MINOR_Y1="20"
+RHOCP_MINOR_Y1=20
 # The beta repository, containing dependencies, should point to the
 # OpenShift mirror URL. The mirror for previous release should always
 # be available.
