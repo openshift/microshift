@@ -87,7 +87,7 @@ Parsed:
 
 ### Step 2: Check OpenShift Release Status
 
-**Goal**: Check if OCP payload is Accecpted for this version.
+**Goal**: Check if OCP payload is Accepted for this version.
 
 **Actions**:
 1. Web Fetch this and look for the version:
