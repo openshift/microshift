@@ -142,26 +142,26 @@ export CNCF_SYSTEMD_LOGS_VERSION=v0.4
 export GITOPS_VERSION=1.16
 
 # The brew release versions needed for release regression testing
-Y0_VERSION="$(ls "${BREW_RPM_SOURCE}" | grep -E "(4|5).${MINOR_VERSION}.[0-9]{1,2}$" | sort -V | tail -n1 || echo "")"
-Y1_VERSION="$(ls "${BREW_RPM_SOURCE}" | grep -E "(4|5).${PREVIOUS_MINOR_VERSION}.[0-9]{1,2}$" | sort -V | head -n1 || echo "")"
-Y2_VERSION="$(ls "${BREW_RPM_SOURCE}" | grep -E "(4|5).${YMINUS2_MINOR_VERSION}.[0-9]{1,2}$" | sort -V | head -n1 || echo "")"
-Z1_VERSION="$(ls "${BREW_RPM_SOURCE}" | grep -E "(4|5).${MINOR_VERSION}.[0-9]{1,2}$" | sort -V | head -n1 || echo "")"
-RC_VERSION="$(ls "${BREW_RPM_SOURCE}" | grep -E "(4|5).${MINOR_VERSION}.[0-9]{1,2}-rc$" | sort -V | tail -n1 || echo "")"
-EC_VERSION="$(ls "${BREW_RPM_SOURCE}" | grep -E "(4|5).${MINOR_VERSION}.[0-9]{1,2}-ec$" | sort -V | tail -n1 || echo "")"
-NIGHTLY_VERSION="$(ls "${BREW_RPM_SOURCE}" | grep -E "(4|5).${MINOR_VERSION}.[0-9]{1,2}-nightly$" | sort -V | tail -n1 || echo "")"
+Y0_VERSION="$(ls "${BREW_RPM_SOURCE}" | grep -E "(4|5).${MINOR_VERSION}.[0-9]*$" | sort -V | tail -n1 || echo "")"
+Z1_VERSION="$(ls "${BREW_RPM_SOURCE}" | grep -E "(4|5).${MINOR_VERSION}.[0-9]*$" | sort -V | head -n1 || echo "")"
+Y1_VERSION="$(ls "${BREW_RPM_SOURCE}" | grep -E "(4|5).${PREVIOUS_MINOR_VERSION}.[0-9]*$" | sort -V | head -n1 || echo "")"
+Y2_VERSION="$(ls "${BREW_RPM_SOURCE}" | grep -E "(4|5).${YMINUS2_MINOR_VERSION}.[0-9]*$" | sort -V | head -n1 || echo "")"
+RC_VERSION="$(ls "${BREW_RPM_SOURCE}" | grep -E "(4|5).${MINOR_VERSION}.[0-9]*-rc$" | sort -V | head -n1 || echo "")"
+EC_VERSION="$(ls "${BREW_RPM_SOURCE}" | grep -E "(4|5).${MINOR_VERSION}.[0-9]*-ec$" | sort -V | head -n1 || echo "")"
+NIGHTLY_VERSION="$(ls "${BREW_RPM_SOURCE}" | grep -E "(4|5).${MINOR_VERSION}.[0-9]*-nightly$" | sort -V | head -n1 || echo "")"
 
 BREW_Y0_RELEASE_VERSION="$(get_vrel_from_rpm "${BREW_RPM_SOURCE}/${Y0_VERSION}/${UNAME_M}/")"
+BREW_Z1_RELEASE_VERSION="$(get_vrel_from_rpm "${BREW_RPM_SOURCE}/${Z1_VERSION}/${UNAME_M}/")"
 BREW_Y1_RELEASE_VERSION="$(get_vrel_from_rpm "${BREW_RPM_SOURCE}/${Y1_VERSION}/${UNAME_M}/")"
 BREW_Y2_RELEASE_VERSION="$(get_vrel_from_rpm "${BREW_RPM_SOURCE}/${Y2_VERSION}/${UNAME_M}/")"
-BREW_Z1_RELEASE_VERSION="$(get_vrel_from_rpm "${BREW_RPM_SOURCE}/${Z1_VERSION}/${UNAME_M}/")"
 BREW_RC_RELEASE_VERSION="$(get_vrel_from_rpm "${BREW_RPM_SOURCE}/${RC_VERSION}/${UNAME_M}/")"
 BREW_EC_RELEASE_VERSION="$(get_vrel_from_rpm "${BREW_RPM_SOURCE}/${EC_VERSION}/${UNAME_M}/")"
 BREW_NIGHTLY_RELEASE_VERSION="$(get_vrel_from_rpm "${BREW_RPM_SOURCE}/${NIGHTLY_VERSION}/${UNAME_M}/")"
 
 export BREW_Y0_RELEASE_VERSION
+export BREW_Z1_RELEASE_VERSION
 export BREW_Y1_RELEASE_VERSION
 export BREW_Y2_RELEASE_VERSION
-export BREW_Z1_RELEASE_VERSION
 export BREW_RC_RELEASE_VERSION
 export BREW_EC_RELEASE_VERSION
 export BREW_NIGHTLY_RELEASE_VERSION
