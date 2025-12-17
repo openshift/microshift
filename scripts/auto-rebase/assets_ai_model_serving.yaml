@@ -19,13 +19,22 @@ assets:
   - dir: optional/ai-model-serving/kserve/overlays/odh/
     src: rhoai/operator/kserve/overlays/odh/
     files:
-      - file: inferenceservice-config-patch.yaml
       - file: kustomization.yaml
+      - file: llm-svc-scc.yaml
+      - file: network-policies.yaml
       - file: params.env
       - file: params.yaml
-      - file: remove-namespace.yaml
-      - file: set-resources-manager-patch.yaml
       - file: user-cluster-roles.yaml
+
+  - dir: optional/ai-model-serving/kserve/overlays/odh/patches/
+    src: rhoai/operator/kserve/overlays/odh/patches/
+    files:
+      - file: patch-inferenceservice-config.yaml
+      - file: patch-set-resources-manager.yaml
+      - file: patch-webhook-svc-openshift-cert-injection.yaml
+      - file: remove-cert-manager.yaml
+      - file: remove-clusterservingruntime.yaml
+      - file: remove-local-model.yaml
 
   - dir: optional/ai-model-serving/kserve/default/
     src: rhoai/operator/kserve/default/
@@ -36,14 +45,16 @@ assets:
       - file: isvc_mutatingwebhook_cainjection_patch.yaml
       - file: isvc_validatingwebhook_cainjection_patch.yaml
       - file: kustomization.yaml
+      - file: llmisvcconfig_validatingwebhook_cainjection_patch.yaml
+      - file: llmisvc_validatingwebhook_cainjection_patch.yaml
+      - file: localmodelcache_validatingwebhook_cainjection_patch.yaml
       - file: localmodel_manager_image_patch.yaml
+      - file: localmodelnode_agent_image_patch.yaml
       - file: manager_auth_proxy_patch.yaml
       - file: manager_image_patch.yaml
       - file: manager_prometheus_metrics_patch.yaml
       - file: manager_resources_patch.yaml
-      - file: network-policies.yaml
       - file: servingruntime_validationwebhook_cainjection_patch.yaml
-      - file: svc_webhook_cainjection_patch.yaml
       - file: trainedmodel_validatingwebhook_cainjection_patch.yaml
 
   - dir: optional/ai-model-serving/kserve/crd/
@@ -51,15 +62,32 @@ assets:
     files:
       - file: kustomization.yaml
 
+  - dir: optional/ai-model-serving/kserve/crd/external/gateway-inference-extension/
+    src: rhoai/operator/kserve/crd/external/gateway-inference-extension/
+    files:
+      - file: kustomization.yaml
+      - file: gateway-inference-extension.yaml
+
+  - dir: optional/ai-model-serving/kserve/crd/external/opendatahub-operator/
+    src: rhoai/operator/kserve/crd/external/opendatahub-operator/
+    files:
+      - file: kustomization.yaml
+      - file: datasciencecluster.opendatahub.io_datascienceclusters.yaml
+      - file: dscinitialization.opendatahub.io_dscinitializations.yaml
+
   - dir: optional/ai-model-serving/kserve/crd/full/
     src: rhoai/operator/kserve/crd/full/
     files:
-      - file: serving.kserve.io_clusterlocalmodels.yaml
+      - file: kustomization.yaml
       - file: serving.kserve.io_clusterservingruntimes.yaml
       - file: serving.kserve.io_clusterstoragecontainers.yaml
       - file: serving.kserve.io_inferencegraphs.yaml
       - file: serving.kserve.io_inferenceservices.yaml
+      - file: serving.kserve.io_llminferenceserviceconfigs.yaml
+      - file: serving.kserve.io_llminferenceservices.yaml
+      - file: serving.kserve.io_localmodelcaches.yaml
       - file: serving.kserve.io_localmodelnodegroups.yaml
+      - file: serving.kserve.io_localmodelnodes.yaml
       - file: serving.kserve.io_servingruntimes.yaml
       - file: serving.kserve.io_trainedmodels.yaml
 
@@ -94,6 +122,13 @@ assets:
       - file: role.yaml
       - file: service_account.yaml
 
+  - dir: optional/ai-model-serving/kserve/rbac/localmodelnode/
+    src: rhoai/operator/kserve/rbac/localmodelnode/
+    files:
+      - file: role_binding.yaml
+      - file: role.yaml
+      - file: service_account.yaml
+
   - dir: optional/ai-model-serving/kserve/manager/
     src: rhoai/operator/kserve/manager/
     files:
@@ -107,6 +142,44 @@ assets:
       - file: kustomization.yaml
       - file: manifests.yaml
       - file: service.yaml
+
+  - dir: optional/ai-model-serving/kserve/localmodels/
+    src: rhoai/operator/kserve/localmodels/
+    files:
+      - file: kustomization.yaml
+      - file: manager.yaml
+
+  - dir: optional/ai-model-serving/kserve/localmodelnodes/
+    src: rhoai/operator/kserve/localmodelnodes/
+    files:
+      - file: kustomization.yaml
+      - file: manager.yaml
+
+  - dir: optional/ai-model-serving/kserve/llmisvc/
+    src: rhoai/operator/kserve/llmisvc/
+    files:
+      - file: config-llm-decode-template.yaml
+      - file: config-llm-decode-worker-data-parallel.yaml
+      - file: config-llm-prefill-template.yaml
+      - file: config-llm-prefill-worker-data-parallel.yaml
+      - file: config-llm-router-route.yaml
+      - file: config-llm-scheduler.yaml
+      - file: config-llm-template.yaml
+      - file: config-llm-worker-data-parallel.yaml
+      - file: kustomization.yaml
+
+  - dir: optional/ai-model-serving/kserve/certmanager/
+    src: rhoai/operator/kserve/certmanager/
+    files:
+      - file: certificate.yaml
+      - file: kustomization.yaml
+
+  - dir: optional/ai-model-serving/kserve/monitoring/llmisvc/
+    src: rhoai/operator/kserve/monitoring/llmisvc/
+    files:
+      - file: kustomization.yaml
+      - file: rbac.yaml
+      - file: istio_gateway_monitor.yaml
 
   # Serving Runtimes
   - dir: optional/ai-model-serving/runtimes/
