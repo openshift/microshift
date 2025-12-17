@@ -109,7 +109,7 @@ Parsed:
 **Actions**:
 
 **For EC versions**:
-1. Check mirror.openshift.com for dev-preview packages:
+1. Check mirror.openshift.com, EC packages are under `ocp-dev-preview/`, see:
    ```
    https://mirror.openshift.com/pub/openshift-v4/x86_64/microshift/ocp-dev-preview/<version>/el9/os/Packages/
    https://mirror.openshift.com/pub/openshift-v4/aarch64/microshift/ocp-dev-preview/<version>/el9/os/Packages/
@@ -117,11 +117,12 @@ Parsed:
 2. Use WebFetch to verify the directory exists and list packages
 
 **For RC versions**:
-1. Check mirror.openshift.com for ocp packages:
+1. Check mirror.openshift.com, RC packages are under `ocp/`, see:
    ```
    https://mirror.openshift.com/pub/openshift-v4/x86_64/microshift/ocp/<version>/el9/os/Packages/
    https://mirror.openshift.com/pub/openshift-v4/aarch64/microshift/ocp/<version>/el9/os/Packages/
    ```
+2. Use WebFetch to verify the directory exists and list packages
 
 **For GA/Z-stream versions**:
 1. Check on brew:
