@@ -56,8 +56,8 @@ Oc Delete
 Oc Exec
     [Documentation]    Run 'oc exec' on a specific pod in the curret test namespace
     ...    Returns the command's combined STDOUT/STDER
-    [Arguments]    ${pod}    ${cmd}    ${ns}=${NAMESPACE}
-    ${output}=    Run With Kubeconfig    oc exec -n ${ns} pod/${pod} -- /bin/bash -c '${cmd}'
+    [Arguments]    ${pod}    ${cmd}    ${ns}=${NAMESPACE}    ${type}=pod
+    ${output}=    Run With Kubeconfig    oc exec -n ${ns} ${type}/${pod} -- /bin/bash -c '${cmd}'
     RETURN    ${output}
 
 Oc Wait
@@ -193,7 +193,7 @@ All Pods Should Be Running
     [Documentation]    Check if all pods are running in the given namespace
     [Arguments]    ${ns}=-A    ${timeout}=${DEFAULT_WAIT_TIMEOUT}
     IF    "${ns}"=="-A"
-        Oc Wait    pods --all -A    --for="condition=Ready" --timeout=${timeout}
+        Oc Wait    pods -A    --all --for="condition=Ready" --timeout=${timeout}
     ELSE
-        Oc Wait    pods --all -n ${ns}    --for="condition=Ready" --timeout=${timeout}
+        Oc Wait    pods -n ${ns}    --all --for="condition=Ready" --timeout=${timeout}
     END

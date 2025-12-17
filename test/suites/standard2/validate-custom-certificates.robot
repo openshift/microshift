@@ -4,6 +4,7 @@ Documentation       Tests custom certificates functionality
 Resource            ../../resources/microshift-config.resource
 Resource            ../../resources/microshift-process.resource
 Resource            ../../resources/openssl.resource
+Resource            ../../resources/hosts.resource
 Library             ../../resources/journalctl.py
 
 Suite Setup         Setup
@@ -42,10 +43,10 @@ Test Expired Cert
     Upload Certificates
     Configure Named Certificates    ${TMPDIR}/server.crt    ${TMPDIR}/server.key
     Restart MicroShift
-    Add Entry To Hosts    ${USHIFT_HOST}    ${hostname}
+    Add Entry To Local Hosts    ${USHIFT_HOST}    ${hostname}
     Setup Custom Kubeconfig    ${hostname}
     OC Should Fail To Connect With Expired Cert
-    [Teardown]    Remove Entry From Hosts    ${hostname}
+    [Teardown]    Remove Entry From Local Hosts    ${hostname}
 
 Test Local Cert
     [Documentation]    localhost certs should be ignored with a warning
@@ -70,11 +71,11 @@ Test SAN Cert
     Upload Certificates
     Configure Named Certificates    ${TMPDIR}/server.crt    ${TMPDIR}/server.key    test
     Restart MicroShift
-    Add Entry To Hosts    ${USHIFT_HOST}    ${hostname}
+    Add Entry To Local Hosts    ${USHIFT_HOST}    ${hostname}
     Setup Custom Kubeconfig    ${hostname}
     OC Should Fail To Connect With Unknown CA
     MicroShift Is Live With Custom CA    ${TMPDIR}/ca.crt
-    [Teardown]    Remove Entry From Hosts    ${hostname}
+    [Teardown]    Remove Entry From Local Hosts    ${hostname}
 
 Test Wildcard Only Cert
     [Documentation]    Create WildCard only certificate
@@ -85,12 +86,12 @@ Test Wildcard Only Cert
     Upload Certificates
     Configure Named Certificates    ${TMPDIR}/server.crt    ${TMPDIR}/server.key
     Restart MicroShift
-    Add Entry To Hosts    ${USHIFT_HOST}    ${hostname}
+    Add Entry To Local Hosts    ${USHIFT_HOST}    ${hostname}
     Setup Custom Kubeconfig    TestCN
     Replace Server In Kubeconfig    ${hostname}
     OC Should Fail To Connect With Unknown CA
     MicroShift Is Live With Custom CA    ${TMPDIR}/ca.crt
-    [Teardown]    Remove Entry From Hosts    ${hostname}
+    [Teardown]    Remove Entry From Local Hosts    ${hostname}
 
 Test Wildcard With Names Cert
     [Documentation]    Create WildCard certificate with additional config name
@@ -101,11 +102,11 @@ Test Wildcard With Names Cert
     Upload Certificates
     Configure Named Certificates    ${TMPDIR}/server.crt    ${TMPDIR}/server.key    ${hostname}
     Restart MicroShift
-    Add Entry To Hosts    ${USHIFT_HOST}    ${hostname}
+    Add Entry To Local Hosts    ${USHIFT_HOST}    ${hostname}
     Setup Custom Kubeconfig    ${hostname}
     OC Should Fail To Connect With Unknown CA
     MicroShift Is Live With Custom CA    ${TMPDIR}/ca.crt
-    [Teardown]    Remove Entry From Hosts    ${hostname}
+    [Teardown]    Remove Entry From Local Hosts    ${hostname}
 
 
 *** Keywords ***
@@ -175,25 +176,6 @@ Configure Named Certificates
         ...    \ \ \ \ - ${sni}
     END
     Drop In MicroShift Config    ${subject_alt_names}    10-subjectAltNames
-
-Generate Random HostName
-    [Documentation]    Generate Random Hostname
-    ${rand}=    Generate Random String
-    ${rand}=    Convert To Lower Case    ${rand}
-    RETURN    ${rand}.api.com
-
-Add Entry To Hosts
-    [Documentation]    Add new entry to local /etc/hosts
-    [Arguments]    ${ip}    ${host}
-    VAR    ${ttt}=    ${ip}\t${host} # RF test marker\n
-    ${result}=    Run Process    sudo tee -a /etc/hosts    shell=True    stdin=${ttt}
-    Should Be Equal As Integers    ${result.rc}    0
-
-Remove Entry From Hosts
-    [Documentation]    Removes entry from local /etc/hosts
-    [Arguments]    ${host}
-    ${result}=    Run Process    sudo sed -i "/${host} # RF test marker/d" /etc/hosts    shell=True
-    Should Be Equal As Integers    ${result.rc}    0
 
 Replace Server In Kubeconfig
     [Documentation]    replace the server part of kubeconfig

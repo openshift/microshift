@@ -56,7 +56,6 @@ type Config struct {
 	Ingress   IngressConfig `json:"ingress"`
 	Storage   Storage       `json:"storage"`
 	Telemetry Telemetry     `json:"telemetry"`
-
 	// Settings specified in this section are transferred as-is into the Kubelet config.
 	// +kubebuilder:validation:Schemaless
 	Kubelet map[string]any `json:"kubelet"`
@@ -123,9 +122,7 @@ func (c *Config) fillDefaults() error {
 		HostnameOverride: hostname,
 		NodeIP:           nodeIP,
 	}
-	c.DNS = DNS{
-		BaseDomain: "example.com",
-	}
+
 	c.Network = Network{
 		ServiceNodePortRange: "30000-32767",
 	}
@@ -186,7 +183,7 @@ func (c *Config) fillDefaults() error {
 	c.Kubelet = nil
 	c.GenericDevicePlugin = genericDevicePluginDefaults()
 	c.Telemetry = telemetryDefaults()
-
+	c.DNS = dnsDefaults()
 	return nil
 }
 
@@ -418,6 +415,23 @@ func (c *Config) incorporateUserSettings(u *Config) {
 	if u.Ingress.AccessLogging.HttpCaptureCookies != nil {
 		c.Ingress.AccessLogging.HttpCaptureCookies = u.Ingress.AccessLogging.HttpCaptureCookies
 	}
+
+	// HostsWatcher configuration - only set if user provided it
+	if u.DNS.Hosts.Status != "" {
+		c.DNS.Hosts.Status = u.DNS.Hosts.Status
+		if u.DNS.Hosts.File != "" {
+			c.DNS.Hosts.File = u.DNS.Hosts.File
+		}
+	}
+	if u.ApiServer.FeatureGates.FeatureSet != "" {
+		c.ApiServer.FeatureGates.FeatureSet = u.ApiServer.FeatureGates.FeatureSet
+	}
+	if len(u.ApiServer.FeatureGates.CustomNoUpgrade.Enabled) > 0 {
+		c.ApiServer.FeatureGates.CustomNoUpgrade.Enabled = u.ApiServer.FeatureGates.CustomNoUpgrade.Enabled
+	}
+	if len(u.ApiServer.FeatureGates.CustomNoUpgrade.Disabled) > 0 {
+		c.ApiServer.FeatureGates.CustomNoUpgrade.Disabled = u.ApiServer.FeatureGates.CustomNoUpgrade.Disabled
+	}
 }
 
 // updateComputedValues examins the existing settings and converts any
@@ -647,6 +661,13 @@ func (c *Config) validate() error {
 		return fmt.Errorf("error validating Generic Device Plugin configuration: %v", err)
 	}
 
+	if err := c.ApiServer.FeatureGates.validateFeatureGates(); err != nil {
+		return fmt.Errorf("error validating feature gates: %v", err)
+	}
+
+	if err := c.DNS.validate(); err != nil {
+		return fmt.Errorf("error validating DNS: %v", err)
+	}
 	return nil
 }
 

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -415,6 +416,18 @@ func (c *Controller) sync(key queueKey) error {
 		old = append(old, route)
 	}
 
+	// In case the annotation does not contain a valid value, the reconciliation
+	// should continue, so we don't return the error, but instead register an
+	// event of InvalidAnnotationValue.
+	propagateLabels, err := shouldPropagateLabelsToRoute(ingress.Annotations)
+	if err != nil {
+		c.eventRecorder.Eventf(&corev1.ObjectReference{
+			Kind:      "Ingress",
+			Namespace: key.namespace,
+			Name:      key.name,
+		}, corev1.EventTypeNormal, "InvalidAnnotationValue", "Invalid value on annotation %q due to: %q", routecontroller.PropagateIngressLabelFlag, err)
+	}
+
 	// walk the ingress and identify whether any of the child routes need to be updated, deleted,
 	// or created, as efficiently as possible.
 	var creates, updates, matches []*routev1.Route
@@ -463,7 +476,7 @@ func (c *Controller) sync(key queueKey) error {
 				continue
 			}
 
-			match, err := routeMatchesIngress(existing, ingress, &rule, &path, c.secretLister, c.serviceLister, host, hostIsWildcard)
+			match, err := routeMatchesIngress(existing, ingress, &rule, &path, c.secretLister, c.serviceLister, host, hostIsWildcard, propagateLabels)
 			if err != nil {
 				incompleteIngressToRouteRules = append(incompleteIngressToRouteRules, fmt.Sprintf("%s at index %d, path index %d", err.Error(), i, j))
 			}
@@ -496,22 +509,36 @@ func (c *Controller) sync(key queueKey) error {
 
 	// update any existing routes in place
 	for _, route := range updates {
-		data, err := json.Marshal(&route.Spec)
+		patchOperations := []map[string]any{
+			{
+				"op":    "replace",
+				"path":  "/spec",
+				"value": &route.Spec,
+			},
+			{
+				"op":    "replace",
+				"path":  "/metadata/annotations",
+				"value": &route.Annotations,
+			},
+			{
+				"op":    "replace",
+				"path":  "/metadata/ownerReferences",
+				"value": &route.OwnerReferences,
+			},
+		}
+
+		if propagateLabels {
+			patchOperations = append(patchOperations, map[string]any{
+				"op":    "replace",
+				"path":  "/metadata/labels",
+				"value": &route.Labels,
+			})
+		}
+
+		data, err := json.Marshal(patchOperations)
 		if err != nil {
 			return err
 		}
-		annotations, err := json.Marshal(&route.Annotations)
-		if err != nil {
-			return err
-		}
-		ownerRefs, err := json.Marshal(&route.OwnerReferences)
-		if err != nil {
-			return err
-		}
-		data = []byte(fmt.Sprintf(`[{"op":"replace","path":"/spec","value":%s},`+
-			`{"op":"replace","path":"/metadata/annotations","value":%s},`+
-			`{"op":"replace","path":"/metadata/ownerReferences","value":%s}]`,
-			data, annotations, ownerRefs))
 		_, err = c.routeClient.Routes(route.Namespace).Patch(context.TODO(), route.Name, types.JSONPatchType, data, metav1.PatchOptions{})
 		if err != nil {
 			errs = append(errs, err)
@@ -709,11 +736,13 @@ func routeMatchesIngress(
 	serviceLister corelisters.ServiceLister,
 	host string,
 	hostIsWildcard bool,
+	propagateLabels bool,
 ) (bool, error) {
 	wildcardPolicy := routev1.WildcardPolicyNone
 	if hostIsWildcard {
 		wildcardPolicy = routev1.WildcardPolicySubdomain
 	}
+
 	match := route.Spec.Host == host &&
 		route.Spec.Path == path.Path &&
 		route.Spec.To.Name == path.Backend.Service.Name &&
@@ -721,7 +750,9 @@ func routeMatchesIngress(
 		len(route.Spec.AlternateBackends) == 0 &&
 		route.Spec.WildcardPolicy == wildcardPolicy &&
 		reflect.DeepEqual(route.Annotations, ingress.Annotations) &&
-		route.OwnerReferences[0].APIVersion == "networking.k8s.io/v1"
+		route.OwnerReferences[0].APIVersion == "networking.k8s.io/v1" &&
+		// Matching labels is conditional on the 'reconcile-labels' annotation's being set to 'true'
+		(!propagateLabels || reflect.DeepEqual(route.Labels, ingress.Labels))
 
 	if !match {
 		return false, nil
@@ -972,4 +1003,23 @@ func destinationCACertificateForIngress(ingress *networkingv1.Ingress, secretLis
 		return &value
 	}
 	return nil
+}
+
+// shouldPropagateLabelsToRoute verifies if annotation map contains the key
+// 'router.openshift.io/reconcile-labels' and if its value is a non-empty
+// parseable boolean (true, false, t, T, f, F, etc).
+// In case the annotation exists but the value is invalid, it will return "false"
+// and the parsing error.
+// Otherwise it returns the underlying boolean value.
+func shouldPropagateLabelsToRoute(annotations map[string]string) (bool, error) {
+	propagateLabelsFlag, ok := annotations[routecontroller.PropagateIngressLabelFlag]
+	if !ok {
+		return false, nil
+	}
+
+	shouldPropagate, err := strconv.ParseBool(strings.TrimSpace(propagateLabelsFlag))
+	if err != nil {
+		return false, err
+	}
+	return shouldPropagate, nil
 }

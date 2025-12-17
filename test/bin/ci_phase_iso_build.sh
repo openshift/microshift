@@ -63,10 +63,12 @@ update_build_cache() {
         return
     fi
 
-    # Build the composer-cli base layer to be cached
+    # Build the composer-cli base layer and brew RPMs to be cached
     $(dry_run) bash -x ./bin/build_images.sh -l ./image-blueprints/layer1-base
-    # Build the bootc base layer to be cached
+    $(dry_run) bash -x ./bin/build_images.sh -l ./image-blueprints/layer4-release
+    # Build the bootc base layer and brew RPMs to be cached
     $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/layer1-base
+    $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/layer5-release
 
     # Prepare for the cache upload by stopping composer services and cleaning
     # temporary artifacts
@@ -97,6 +99,9 @@ run_image_build() {
         if [[ "${CI_JOB_NAME}" =~ .*periodic.* ]]; then
             $(dry_run) bash -x ./bin/build_images.sh -l ./image-blueprints/layer3-periodic
         fi
+        if [[ "${CI_JOB_NAME}" =~ .*release.* ]]; then
+            $(dry_run) bash -x ./bin/build_images.sh -l ./image-blueprints/layer4-release
+        fi
     else
         # Fall back to full build when not running in CI
         $(dry_run) bash -x ./bin/build_images.sh
@@ -117,11 +122,15 @@ run_bootc_image_build() {
         if [[ "${CI_JOB_NAME}" =~ .*upstream.* ]]; then
             $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/layer4-upstream
         fi
+        if [[ "${CI_JOB_NAME}" =~ .*release.* ]]; then
+            $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/layer5-release
+        fi
     else
         $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/layer1-base
         $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/layer2-presubmit
         $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/layer3-periodic
         $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/layer4-upstream
+        $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/layer5-release
     fi
 }
 
@@ -135,7 +144,7 @@ cd "${ROOTDIR}"
 
 # Get firewalld and repos in place. Use scripts to get the right repos
 # for each branch.
-$(dry_run) bash -x ./scripts/devenv-builder/configure-vm.sh --no-build --force-firewall "${PULL_SECRET}"
+$(dry_run) bash -x ./scripts/devenv-builder/configure-vm.sh --skip-dnf-update --no-build --force-firewall "${PULL_SECRET}"
 $(dry_run) bash -x ./test/bin/manage_composer_config.sh create
 
 cd "${ROOTDIR}/test/"
@@ -143,6 +152,9 @@ cd "${ROOTDIR}/test/"
 # Source common.sh only after all dependencies are installed.
 # shellcheck source=test/bin/common.sh
 source "${SCRIPTDIR}/common.sh"
+
+# shellcheck source=test/bin/common_versions_verify.sh
+source "${SCRIPTDIR}/common_versions_verify.sh"
 
 if ${COMPOSER_CLI_BUILDS} ; then
     # Determine and create the ideal number of workers

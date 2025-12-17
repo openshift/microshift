@@ -14,6 +14,11 @@ apiServer:
         maxFileSize: 0
         maxFiles: 0
         profile: ""
+    featureGates:
+        customNoUpgrade:
+            disabled: []
+            enabled: []
+        featureSet: ""
     namedCertificates:
         - certPath: ""
           keyPath: ""
@@ -26,6 +31,9 @@ debugging:
     logLevel: ""
 dns:
     baseDomain: ""
+    hosts:
+        file: ""
+        status: ""
 etcd:
     memoryLimitMB: 0
 genericDevicePlugin:
@@ -155,6 +163,11 @@ apiServer:
         maxFileSize: 200
         maxFiles: 10
         profile: Default
+    featureGates:
+        customNoUpgrade:
+            disabled: []
+            enabled: []
+        featureSet: ""
     namedCertificates:
         - certPath: ""
           keyPath: ""
@@ -167,6 +180,9 @@ debugging:
     logLevel: Normal
 dns:
     baseDomain: example.com
+    hosts:
+        file: /etc/hosts
+        status: Disabled
 etcd:
     memoryLimitMB: 0
 genericDevicePlugin:

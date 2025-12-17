@@ -1,0 +1,111 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.14.0
+  creationTimestamp: null
+  name: ovsnetworks.sriovnetwork.openshift.io
+spec:
+  group: sriovnetwork.openshift.io
+  names:
+    kind: OVSNetwork
+    listKind: OVSNetworkList
+    plural: ovsnetworks
+    singular: ovsnetwork
+  scope: Namespaced
+  versions:
+  - name: v1
+    schema:
+      openAPIV3Schema:
+        description: OVSNetwork is the Schema for the ovsnetworks API
+        properties:
+          apiVersion:
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+            type: string
+          kind:
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: OVSNetworkSpec defines the desired state of OVSNetwork
+            properties:
+              bridge:
+                description: |-
+                  name of the OVS bridge, if not set OVS will automatically select bridge
+                  based on VF PCI address
+                type: string
+              capabilities:
+                description: |-
+                  Capabilities to be configured for this network.
+                  Capabilities supported: (mac|ips), e.g. '{"mac": true}'
+                type: string
+              interfaceType:
+                description: The type of interface on ovs.
+                type: string
+              ipam:
+                description: IPAM configuration to be used for this network.
+                type: string
+              metaPlugins:
+                description: MetaPluginsConfig configuration to be used in order to
+                  chain metaplugins
+                type: string
+              mtu:
+                description: Mtu for the OVS port
+                type: integer
+              networkNamespace:
+                description: Namespace of the NetworkAttachmentDefinition custom resource
+                type: string
+              resourceName:
+                description: OVS Network device plugin endpoint resource name
+                type: string
+              trunk:
+                description: Trunk configuration for the OVS port
+                items:
+                  description: TrunkConfig contains configuration for bridge trunk
+                  properties:
+                    id:
+                      maximum: 4095
+                      minimum: 0
+                      type: integer
+                    maxID:
+                      maximum: 4095
+                      minimum: 0
+                      type: integer
+                    minID:
+                      maximum: 4095
+                      minimum: 0
+                      type: integer
+                  type: object
+                type: array
+              vlan:
+                description: Vlan to assign for the OVS port
+                maximum: 4095
+                minimum: 0
+                type: integer
+            required:
+            - resourceName
+            type: object
+          status:
+            description: OVSNetworkStatus defines the observed state of OVSNetwork
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: null
+  storedVersions: null

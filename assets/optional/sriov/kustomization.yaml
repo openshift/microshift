@@ -1,0 +1,19 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - crd/sriovnetwork.openshift.io_ovsnetworks.yaml
+  - crd/sriovnetwork.openshift.io_sriovibnetworks.yaml
+  - crd/sriovnetwork.openshift.io_sriovnetworknodepolicies.yaml
+  - crd/sriovnetwork.openshift.io_sriovnetworknodestates.yaml
+  - crd/sriovnetwork.openshift.io_sriovnetworkpoolconfigs.yaml
+  - crd/sriovnetwork.openshift.io_sriovnetworks.yaml
+  - crd/sriovnetwork.openshift.io_sriovoperatorconfigs.yaml
+  - deploy/clusterrolebinding.yaml
+  - deploy/clusterrole.yaml
+  - deploy/namespace.yaml
+  - deploy/operator.yaml
+  - deploy/role.yaml
+  - deploy/rolebinding.yaml
+  - deploy/serviceaccount.yaml
+  - deploy/sriovoperatorconfig.yaml
+  - deploy/supported-nic-ids_v1_configmap.yaml

@@ -13,30 +13,21 @@ MIRROR_REGISTRY_URL="${VM_BRIDGE_IP}:${MIRROR_REGISTRY_PORT}"
 start_image="rhel-9.6-microshift-brew-optionals-4.${MINOR_VERSION}-${LATEST_RELEASE_TYPE}"
 
 scenario_create_vms() {
-    # Enable IPv6 single stack in kickstart
-    if ! does_commit_exist "${start_image}"; then
-        echo "Image '${start_image}' not found - skipping test"
-        return 0
-    fi
+    exit_if_commit_not_found "${start_image}"
 
+    # Enable IPv6 single stack in kickstart
     prepare_kickstart host1 kickstart.ks.template "${start_image}" false true
     launch_vm  --network "${VM_IPV6_NETWORK}"
 }
 
 scenario_remove_vms() {
-    if ! does_commit_exist "${start_image}"; then
-        echo "Image '${start_image}' not found - skipping test"
-        return 0
-    fi
+    exit_if_commit_not_found "${start_image}"
 
     remove_vm host1
 }
 
 scenario_run_tests() {
-    if ! does_commit_exist "${start_image}"; then
-        echo "Image '${start_image}' not found - skipping test"
-        return 0
-    fi
+    exit_if_commit_not_found "${start_image}"
 
     run_tests host1 suites/ipv6/singlestack.robot
 }

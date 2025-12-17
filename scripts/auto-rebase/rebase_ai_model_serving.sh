@@ -115,14 +115,14 @@ update_kserve() {
         yq -i ".images.${image_name} = \"${image_ref}\"" "${RELEASE_JSON}"
     done
 
-    # Update kserve's config
+    ### Update kserve's config
     local -r microshift_config="${REPOROOT}/assets/optional/ai-model-serving/kserve/inferenceservice-config-microshift-patch.yaml"
-    local -r rhoai_config="${REPOROOT}/assets/optional/ai-model-serving/kserve/overlays/odh/inferenceservice-config-patch.yaml"
+    local -r rhoai_config="${REPOROOT}/assets/optional/ai-model-serving/kserve/overlays/odh/patches/patch-inferenceservice-config.yaml"
 
     # Clear the file and add a comment on top
     cat <<EOF > "${microshift_config}"
 # This is a MicroShift specific kserve configuration.
-# For RHOAI kserve configuration see: assets/optional/ai-model-serving/kserve/overlays/odh/inferenceservice-config-patch.yaml
+# For RHOAI kserve configuration see: assets/optional/ai-model-serving/kserve/overlays/odh/patches/patch-inferenceservice-config.yaml
 # For upstream kserve configuration and description of the config see: assets/optional/ai-model-serving/kserve/configmap/inferenceservice.yaml
 #
 # The difference compared to RHOAI's kserve configuration is the 'deploy' section setting:
@@ -136,6 +136,9 @@ EOF
 
     # Change Deployment Mode
     sed -i 's/"defaultDeploymentMode": "Serverless"/"defaultDeploymentMode": "RawDeployment"/g' "${microshift_config}"
+
+    ### Remove Namespace from assets/optional/ai-model-serving/kserve/manager/service.yaml
+    yq -i 'del(select(.kind == "Namespace"))' "${REPOROOT}/assets/optional/ai-model-serving/kserve/manager/service.yaml"
 }
 
 update_runtimes() {

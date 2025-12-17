@@ -247,16 +247,6 @@ Crio Process ID
     Log    ${stderr}
     RETURN    ${stdout}
 
-Remove Files
-    [Documentation]    removes files from the microshit host
-    [Arguments]    @{files}
-    Log    ${files}
-    ${files_path}=    Catenate    SEPARATOR=${SPACE}    @{files}
-    ${stdout}    ${stderr}    ${rc}=    Execute Command
-    ...    rm -f ${files_path}
-    ...    sudo=True    return_stdout=True    return_stderr=True    return_rc=True
-    Should Be Equal As Integers    ${rc}    0
-
 Cleanup And Create NS
     [Documentation]    cleanup microshift and recreate the namespace for workloads
     Cleanup MicroShift    --all    --keep-images

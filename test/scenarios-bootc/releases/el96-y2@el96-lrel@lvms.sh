@@ -10,50 +10,29 @@ start_image="rhel96-bootc-brew-y2-with-optional"
 dest_image="rhel96-bootc-brew-${LATEST_RELEASE_TYPE}-with-optional"
 
 scenario_create_vms() {
-    if ! does_image_exist "${start_image}"; then
-        echo "Image '${start_image}' not found - skipping test"
-        return 0
-    fi
-    if ! does_image_exist "${dest_image}"; then
-        echo "Image '${dest_image}' not found - skipping test"
-        return 0
-    fi
+    exit_if_image_not_found "${start_image}"
+    exit_if_image_not_found "${dest_image}"
+
     prepare_kickstart host1 kickstart-bootc.ks.template "${start_image}"
     launch_vm --boot_blueprint rhel96-bootc --vm_disksize 30
 }
 
 scenario_remove_vms() {
-    if ! does_image_exist "${start_image}"; then
-        echo "Image '${start_image}' not found - skipping test"
-        return 0
-    fi
-    if ! does_image_exist "${dest_image}"; then
-        echo "Image '${dest_image}' not found - skipping test"
-        return 0
-    fi
+    exit_if_image_not_found "${start_image}"
+    exit_if_image_not_found "${dest_image}"
+
     remove_vm host1
 }
 
 scenario_run_tests() {
-    if ! does_image_exist "${start_image}"; then
-        echo "Image '${start_image}' not found - skipping test"
-        return 0
-    fi
+    exit_if_image_not_found "${start_image}"
+    exit_if_image_not_found "${dest_image}"
 
-    if ! does_image_exist "${dest_image}"; then
-        echo "Image '${dest_image}' not found - skipping test"
-        return 0
-    fi
+    # Wait for MicroShift to be ready
+    wait_for_microshift_to_be_ready host1
 
-    # Verify if microshift has started up fully
-    local vmname="host1"
-    local -r full_vmname="$(full_vm_name "${vmname}")"
-    local -r vm_ip="$(get_vm_property "${vmname}" ip)"
-    if ! wait_for_greenboot "${full_vmname}" "${vm_ip}"; then
-        record_junit "${vmname}" "pre_test_greenboot_check" "FAILED"
-        return 1
-    fi
-    record_junit "${vmname}" "pre_test_greenboot_check" "OK"
+    # Setup oc client and kubeconfig for ginkgo tests
+    setup_oc_and_kubeconfig host1
 
     # Pre-upgrade: Create LVMS workloads and validate LVMS is working
     echo "INFO: Creating LVMS workloads before upgrade..."
@@ -77,7 +56,7 @@ scenario_run_tests() {
     run_command_on_vm host1 'bash -s' < "${TESTDIR}/../scripts/lvms-helpers/checkLvmsResources.sh"
 
     # Run ginkgo tests to validate functionality
-    run_gingko_tests host1 "~Disruptive"
+    run_ginkgo_tests host1 "~Disruptive"
 
     # Cleanup LVMS workloads
     echo "INFO: Cleaning up LVMS workloads..."

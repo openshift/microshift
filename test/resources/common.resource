@@ -138,3 +138,14 @@ Local Command Should Work
     Log    ${stdout}
     Should Be Equal As Integers    0    ${rc}
     RETURN    ${stdout}
+
+Remove Files
+    [Documentation]    removes files from the microshift host
+    [Arguments]    @{files}
+    Log    ${files}
+    FOR    ${file}    IN    @{files}
+        ${stdout}    ${stderr}    ${rc}=    Execute Command
+        ...    rm -f "${file}"
+        ...    sudo=True    return_stdout=True    return_stderr=True    return_rc=True
+        Should Be Equal As Integers    ${rc}    0
+    END

@@ -11,6 +11,8 @@ Library             ../../resources/DataFormats.py
 Suite Setup         Setup
 Suite Teardown      Teardown
 
+Test Tags           version
+
 
 *** Variables ***
 ${USHIFT_HOST}              ${EMPTY}

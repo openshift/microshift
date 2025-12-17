@@ -800,6 +800,67 @@ func TestValidate(t *testing.T) {
 			}(),
 			expectErr: true,
 		},
+		{
+			name: "feature-gates-unset",
+			config: func() *Config {
+				c := mkDefaultConfig()
+				c.ApiServer.FeatureGates = FeatureGates{}
+				return c
+			}(),
+			expectErr: false,
+		},
+		{
+			name: "feature-gates-invalid-feature-set",
+			config: func() *Config {
+				c := mkDefaultConfig()
+				c.ApiServer.FeatureGates.FeatureSet = "invalid"
+				return c
+			}(),
+			expectErr: true,
+		},
+		{
+			name: "feature-gates-custom-no-upgrade-with-feature-set",
+			config: func() *Config {
+				c := mkDefaultConfig()
+				c.ApiServer.FeatureGates.FeatureSet = "CustomNoUpgrade"
+				c.ApiServer.FeatureGates.CustomNoUpgrade.Enabled = []string{"feature1"}
+				c.ApiServer.FeatureGates.CustomNoUpgrade.Disabled = []string{"feature2"}
+				return c
+			}(),
+		},
+		{
+			name: "feature-gates-custom-no-upgrade-with-feature-set-empty",
+			config: func() *Config {
+				c := mkDefaultConfig()
+				c.ApiServer.FeatureGates.FeatureSet = ""
+				c.ApiServer.FeatureGates.CustomNoUpgrade.Enabled = []string{"feature1"}
+				c.ApiServer.FeatureGates.CustomNoUpgrade.Disabled = []string{"feature2"}
+				return c
+			}(),
+			expectErr: true,
+		},
+		{
+			name: "feature-gates-custom-no-upgrade-with-empty-enabled-and-disabled-lists",
+			config: func() *Config {
+				c := mkDefaultConfig()
+				c.ApiServer.FeatureGates.FeatureSet = "CustomNoUpgrade"
+				c.ApiServer.FeatureGates.CustomNoUpgrade.Enabled = []string{}
+				c.ApiServer.FeatureGates.CustomNoUpgrade.Disabled = []string{}
+				return c
+			}(),
+			expectErr: true,
+		},
+		{
+			name: "feature-gates-custom-no-upgrade-enabled-and-disabled-have-same-feature-gate",
+			config: func() *Config {
+				c := mkDefaultConfig()
+				c.ApiServer.FeatureGates.FeatureSet = "CustomNoUpgrade"
+				c.ApiServer.FeatureGates.CustomNoUpgrade.Enabled = []string{"feature1"}
+				c.ApiServer.FeatureGates.CustomNoUpgrade.Disabled = []string{"feature1"}
+				return c
+			}(),
+			expectErr: true,
+		},
 	}
 	for _, tt := range ttests {
 		t.Run(tt.name, func(t *testing.T) {

@@ -97,8 +97,8 @@ export CURRENT_RELEASE_VERSION
 # For a release branch, the previous release repository should come from the
 # official 'rhocp' stream.# The previous release repository value should either
 # point to the OpenShift mirror URL or the 'rhocp' repository name.
-PREVIOUS_RELEASE_REPO="https://mirror.openshift.com/pub/openshift-v4/${UNAME_M}/microshift/ocp/latest-4.20/el9/os"
-PREVIOUS_RELEASE_VERSION="$(get_vrel_from_beta "${PREVIOUS_RELEASE_REPO}")"
+PREVIOUS_RELEASE_REPO="rhocp-4.20-for-rhel-9-${UNAME_M}-rpms"
+PREVIOUS_RELEASE_VERSION="$(get_vrel_from_rhsm "${PREVIOUS_RELEASE_REPO}")"
 export PREVIOUS_RELEASE_REPO
 export PREVIOUS_RELEASE_VERSION
 
@@ -122,7 +122,7 @@ export RHOCP_MINOR_Y_BETA
 
 # The 'rhocp_minor_y' variable should be the previous minor version number, if
 # the previous release is available through the 'rhocp' stream, otherwise empty.
-RHOCP_MINOR_Y1=""
+RHOCP_MINOR_Y1=20
 # The beta repository, containing dependencies, should point to the
 # OpenShift mirror URL. The mirror for previous release should always
 # be available.
@@ -142,16 +142,29 @@ export CNCF_SYSTEMD_LOGS_VERSION=v0.4
 export GITOPS_VERSION=1.16
 
 # The brew release versions needed for release regression testing
-BREW_Y0_RELEASE_VERSION="$(get_vrel_from_rpm "${BREW_RPM_SOURCE}/4.${MINOR_VERSION}-zstream/${UNAME_M}/")"
-BREW_Y1_RELEASE_VERSION="$(get_vrel_from_rpm "${BREW_RPM_SOURCE}/4.${PREVIOUS_MINOR_VERSION}-zstream/${UNAME_M}/")"
-BREW_Y2_RELEASE_VERSION="$(get_vrel_from_rpm "${BREW_RPM_SOURCE}/4.${YMINUS2_MINOR_VERSION}-zstream/${UNAME_M}/")"
-BREW_RC_RELEASE_VERSION="$(get_vrel_from_rpm "${BREW_RPM_SOURCE}/4.${MINOR_VERSION}-rc/${UNAME_M}/")"
-BREW_EC_RELEASE_VERSION="$(get_vrel_from_rpm "${BREW_RPM_SOURCE}/4.${MINOR_VERSION}-ec/${UNAME_M}/")"
+Y0_VERSION="$(ls "${BREW_RPM_SOURCE}" | grep -E "(4|5).${MINOR_VERSION}.[0-9]{1,2}$" | sort -V | tail -n1 || echo "")"
+Y1_VERSION="$(ls "${BREW_RPM_SOURCE}" | grep -E "(4|5).${PREVIOUS_MINOR_VERSION}.[0-9]{1,2}$" | sort -V | head -n1 || echo "")"
+Y2_VERSION="$(ls "${BREW_RPM_SOURCE}" | grep -E "(4|5).${YMINUS2_MINOR_VERSION}.[0-9]{1,2}$" | sort -V | head -n1 || echo "")"
+Z1_VERSION="$(ls "${BREW_RPM_SOURCE}" | grep -E "(4|5).${MINOR_VERSION}.[0-9]{1,2}$" | sort -V | head -n1 || echo "")"
+RC_VERSION="$(ls "${BREW_RPM_SOURCE}" | grep -E "(4|5).${MINOR_VERSION}.[0-9]{1,2}-rc$" | sort -V | tail -n1 || echo "")"
+EC_VERSION="$(ls "${BREW_RPM_SOURCE}" | grep -E "(4|5).${MINOR_VERSION}.[0-9]{1,2}-ec$" | sort -V | tail -n1 || echo "")"
+NIGHTLY_VERSION="$(ls "${BREW_RPM_SOURCE}" | grep -E "(4|5).${MINOR_VERSION}.[0-9]{1,2}-nightly$" | sort -V | tail -n1 || echo "")"
+
+BREW_Y0_RELEASE_VERSION="$(get_vrel_from_rpm "${BREW_RPM_SOURCE}/${Y0_VERSION}/${UNAME_M}/")"
+BREW_Y1_RELEASE_VERSION="$(get_vrel_from_rpm "${BREW_RPM_SOURCE}/${Y1_VERSION}/${UNAME_M}/")"
+BREW_Y2_RELEASE_VERSION="$(get_vrel_from_rpm "${BREW_RPM_SOURCE}/${Y2_VERSION}/${UNAME_M}/")"
+BREW_Z1_RELEASE_VERSION="$(get_vrel_from_rpm "${BREW_RPM_SOURCE}/${Z1_VERSION}/${UNAME_M}/")"
+BREW_RC_RELEASE_VERSION="$(get_vrel_from_rpm "${BREW_RPM_SOURCE}/${RC_VERSION}/${UNAME_M}/")"
+BREW_EC_RELEASE_VERSION="$(get_vrel_from_rpm "${BREW_RPM_SOURCE}/${EC_VERSION}/${UNAME_M}/")"
+BREW_NIGHTLY_RELEASE_VERSION="$(get_vrel_from_rpm "${BREW_RPM_SOURCE}/${NIGHTLY_VERSION}/${UNAME_M}/")"
+
 export BREW_Y0_RELEASE_VERSION
 export BREW_Y1_RELEASE_VERSION
 export BREW_Y2_RELEASE_VERSION
+export BREW_Z1_RELEASE_VERSION
 export BREW_RC_RELEASE_VERSION
 export BREW_EC_RELEASE_VERSION
+export BREW_NIGHTLY_RELEASE_VERSION
 
 # Set the release type to ec, rc or zstream
 LATEST_RELEASE_TYPE="ec"
@@ -165,4 +178,3 @@ OPENSHIFT_TESTS_PRIVATE_REPO_BRANCH="release-4.${MINOR_VERSION}"
 OPENSHIFT_TESTS_PRIVATE_REPO_COMMIT="61613d96c91db7b2907c24dd257075d3f2201991"
 export OPENSHIFT_TESTS_PRIVATE_REPO_BRANCH
 export OPENSHIFT_TESTS_PRIVATE_REPO_COMMIT
-

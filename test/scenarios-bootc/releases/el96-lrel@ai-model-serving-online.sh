@@ -17,12 +17,8 @@ check_platform() {
 }
 
 scenario_create_vms() {
-    if ! does_image_exist "${start_image}"; then
-        echo "Image '${start_image}' not found - skipping test"
-        return 0
-    fi
-
     check_platform true
+    exit_if_image_not_found "${start_image}"
 
     # Increased disk size because of the additional embedded images (especially OVMS which is ~3.5GiB)
     LVM_SYSROOT_SIZE=20480 prepare_kickstart host1 kickstart-bootc.ks.template "${start_image}"
@@ -30,23 +26,15 @@ scenario_create_vms() {
 }
 
 scenario_remove_vms() {
-    if ! does_image_exist "${start_image}"; then
-        echo "Image '${start_image}' not found - skipping test"
-        return 0
-    fi
-
     check_platform
+    exit_if_image_not_found "${start_image}"
 
     remove_vm host1
 }
 
 scenario_run_tests() {
-    if ! does_image_exist "${start_image}"; then
-        echo "Image '${start_image}' not found - skipping test"
-        return 0
-    fi
-
     check_platform
+    exit_if_image_not_found "${start_image}"
 
     run_tests host1 \
         suites/ai-model-serving/ai-model-serving-online.robot

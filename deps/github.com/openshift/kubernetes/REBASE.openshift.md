@@ -273,19 +273,20 @@ go mod tidy && go mod vendor
 
 Alternatively, you can edit `go.mod` file manually with your favourite editor and use search&replace.
 
-## Review test annotation rules
+## Review test environmental selection rules
 
-The names of upstream e2e tests are annotated according to the a set of
-[declarative rules](openshift-hack/e2e/annotate/rules.go). These annotations
-are used to group tests into suites and to skip tests that are known not to be
-incompatible with some or all configurations of OpenShift.
+Test environmental selection rules are defined in two files:
+- [disabled_tests.go](openshift-hack/cmd/k8s-tests-ext/disabled_tests.go) - for completely disabled tests
+- [environment_selectors.go](openshift-hack/cmd/k8s-tests-ext/environment_selectors.go) - for conditionally skipped tests
+
+These rules are used to skip tests that are known to be incompatible with some or all configurations of OpenShift.
 
 When performing a rebase, it is important to review the rules to
 ensure they are still relevant:
 
-- [ ] Ensure that `[Disabled:Alpha]` rules are appropriate for the current kube
+- [ ] Ensure that `Alpha` rules in [disabled_tests.go](openshift-hack/cmd/k8s-tests-ext/disabled_tests.go) are appropriate for the current kube
       level. Alpha features that are not enabled by default should be targeted
-      by this annotation to ensure that tests of those features are skipped.
+      by these rules to ensure that tests of those features are skipped.
 - [ ] Add new skips (along with a bz to track resolution) where e2e tests fail
       consistently.
 

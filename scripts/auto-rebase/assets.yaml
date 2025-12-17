@@ -10,6 +10,12 @@ assets:
       - file: namespace.yaml
       - file: service-account.yaml
       - file: service.yaml
+      - file: hosts-configmap-rolebinding.yaml
+        ignore: "RBAC rules for hosts customization"
+        git_restore: True
+      - file: hosts-configmap-role.yaml
+        ignore: "RBAC rules for hosts customization"
+        git_restore: True
 
   - dir: components/openshift-dns/node-resolver
     src: cluster-dns-operator/pkg/manifests/assets/node-resolver/
@@ -145,8 +151,10 @@ assets:
       - file: 0000_20_kube-apiserver-operator_00_cr-scc-nonroot.yaml
       - file: 0000_20_kube-apiserver-operator_00_cr-scc-privileged.yaml
       - file: 0000_20_kube-apiserver-operator_00_cr-scc-restricted-v2.yaml
+      - file: 0000_20_kube-apiserver-operator_00_cr-scc-restricted-v3.yaml
       - file: 0000_20_kube-apiserver-operator_00_cr-scc-restricted.yaml
       - file: 0000_20_kube-apiserver-operator_00_crb-systemauthenticated-scc-restricted-v2.yaml
+      - file: 0000_20_kube-apiserver-operator_00_crb-systemauthenticated-scc-restricted-v3.yaml
       - file: 0000_20_kube-apiserver-operator_00_scc-anyuid.yaml
       - file: 0000_20_kube-apiserver-operator_00_scc-hostaccess.yaml
       - file: 0000_20_kube-apiserver-operator_00_scc-hostmount-anyuid.yaml
@@ -156,6 +164,7 @@ assets:
       - file: 0000_20_kube-apiserver-operator_00_scc-nonroot.yaml
       - file: 0000_20_kube-apiserver-operator_00_scc-privileged.yaml
       - file: 0000_20_kube-apiserver-operator_00_scc-restricted-v2.yaml
+      - file: 0000_20_kube-apiserver-operator_00_scc-restricted-v3.yaml
       - file: 0000_20_kube-apiserver-operator_00_scc-restricted.yaml
 
   - dir: controllers/route-controller-manager/

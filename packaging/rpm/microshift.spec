@@ -252,6 +252,24 @@ The microshift-cert-manager-release-info package provides release information fi
 release. These files contain the list of container image references used by Cert Manager
 and can be used to embed those images into osbuilder blueprints or bootc containerfiles.
 
+%package sriov
+Summary: SR-IOV Network Operator for MicroShift
+ExclusiveArch: x86_64 aarch64
+Requires: microshift = %{version}
+
+%description sriov
+The microshift-sriov package provides the required manifests for the SR-IOV Network Operator to be installed on MicroShift.
+
+%package sriov-release-info
+Summary: Release information for SR-IOV Network Operator for MicroShift
+BuildArch: noarch
+Requires: microshift = %{version}
+
+%description sriov-release-info
+The microshift-sriov-release-info package provides release information files for this
+release. These files contain the list of container image references used by SR-IOV Network Operator
+and can be used to embed those images into osbuilder blueprints or bootc containerfiles.
+
 %prep
 # Dynamic detection of the available golang version also works for non-RPM golang packages
 golang_detected=$(go version | awk '{print $3}' | tr -d '[a-z]' | cut -f1-2 -d.)
@@ -460,6 +478,12 @@ install -p -m644  ./assets/optional/ai-model-serving/kserve/configmap/* %{buildr
 install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/010-microshift-ai-model-serving-kserve/crd/
 install -p -m644  ./assets/optional/ai-model-serving/kserve/crd/*.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/010-microshift-ai-model-serving-kserve/crd/
 
+install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/010-microshift-ai-model-serving-kserve/crd/external/gateway-inference-extension
+install -p -m644  ./assets/optional/ai-model-serving/kserve/crd/external/gateway-inference-extension/*.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/010-microshift-ai-model-serving-kserve/crd/external/gateway-inference-extension
+
+install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/010-microshift-ai-model-serving-kserve/crd/external/opendatahub-operator
+install -p -m644  ./assets/optional/ai-model-serving/kserve/crd/external/opendatahub-operator/*.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/010-microshift-ai-model-serving-kserve/crd/external/opendatahub-operator
+
 install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/010-microshift-ai-model-serving-kserve/crd/full/
 install -p -m644  ./assets/optional/ai-model-serving/kserve/crd/full/*.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/010-microshift-ai-model-serving-kserve/crd/full/
 
@@ -473,13 +497,35 @@ install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/010-microshi
 install -p -m644  ./assets/optional/ai-model-serving/kserve/manager/*.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/010-microshift-ai-model-serving-kserve/manager/
 
 install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/010-microshift-ai-model-serving-kserve/overlays/odh/
-install -p -m644  ./assets/optional/ai-model-serving/kserve/overlays/odh/* %{buildroot}/%{_prefix}/lib/microshift/manifests.d/010-microshift-ai-model-serving-kserve/overlays/odh/
+install -p -m644  ./assets/optional/ai-model-serving/kserve/overlays/odh/*.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/010-microshift-ai-model-serving-kserve/overlays/odh/
+install -p -m644  ./assets/optional/ai-model-serving/kserve/overlays/odh/*.env %{buildroot}/%{_prefix}/lib/microshift/manifests.d/010-microshift-ai-model-serving-kserve/overlays/odh/
+
+install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/010-microshift-ai-model-serving-kserve/overlays/odh/patches/
+install -p -m644  ./assets/optional/ai-model-serving/kserve/overlays/odh/patches/*.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/010-microshift-ai-model-serving-kserve/overlays/odh/patches/
 
 install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/010-microshift-ai-model-serving-kserve/rbac/
 install -p -m644  ./assets/optional/ai-model-serving/kserve/rbac/*.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/010-microshift-ai-model-serving-kserve/rbac/
 
 install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/010-microshift-ai-model-serving-kserve/rbac/localmodel/
 install -p -m644  ./assets/optional/ai-model-serving/kserve/rbac/localmodel/*.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/010-microshift-ai-model-serving-kserve/rbac/localmodel/
+
+install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/010-microshift-ai-model-serving-kserve/rbac/localmodelnode/
+install -p -m644  ./assets/optional/ai-model-serving/kserve/rbac/localmodelnode/*.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/010-microshift-ai-model-serving-kserve/rbac/localmodelnode/
+
+install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/010-microshift-ai-model-serving-kserve/localmodels/
+install -p -m644  ./assets/optional/ai-model-serving/kserve/localmodels/*.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/010-microshift-ai-model-serving-kserve/localmodels/
+
+install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/010-microshift-ai-model-serving-kserve/localmodelnodes/
+install -p -m644  ./assets/optional/ai-model-serving/kserve/localmodelnodes/*.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/010-microshift-ai-model-serving-kserve/localmodelnodes/
+
+install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/010-microshift-ai-model-serving-kserve/llmisvc/
+install -p -m644  ./assets/optional/ai-model-serving/kserve/llmisvc/*.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/010-microshift-ai-model-serving-kserve/llmisvc/
+
+install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/010-microshift-ai-model-serving-kserve/certmanager/
+install -p -m644  ./assets/optional/ai-model-serving/kserve/certmanager/*.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/010-microshift-ai-model-serving-kserve/certmanager/
+
+install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/010-microshift-ai-model-serving-kserve/monitoring/llmisvc/
+install -p -m644  ./assets/optional/ai-model-serving/kserve/monitoring/llmisvc/*.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/010-microshift-ai-model-serving-kserve/monitoring/llmisvc/
 
 install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/010-microshift-ai-model-serving-kserve/webhook/
 install -p -m644  ./assets/optional/ai-model-serving/kserve/webhook/*.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/010-microshift-ai-model-serving-kserve/webhook/
@@ -524,6 +570,18 @@ install -p -m644 assets/optional/cert-manager/kustomization.yaml %{buildroot}/%{
 # cert-manager-release-info
 mkdir -p -m755 %{buildroot}%{_datadir}/microshift/release
 install -p -m644 assets/optional/cert-manager/release-cert-manager-{x86_64,aarch64}.json %{buildroot}%{_datadir}/microshift/release/
+
+# sriov
+install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/070-microshift-sriov
+install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/070-microshift-sriov/crd
+install -p -m644 assets/optional/sriov/crd/*.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/070-microshift-sriov/crd
+install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/070-microshift-sriov/deploy
+install -p -m644 assets/optional/sriov/deploy/*.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/070-microshift-sriov/deploy
+install -p -m644 assets/optional/sriov/kustomization.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/070-microshift-sriov/kustomization.yaml
+
+# sriov-release-info
+mkdir -p -m755 %{buildroot}%{_datadir}/microshift/release
+install -p -m644 assets/optional/sriov/release-sriov-{x86_64,aarch64}.json %{buildroot}%{_datadir}/microshift/release/
 
 %pre networking
 
@@ -577,7 +635,7 @@ systemctl enable --now --quiet openvswitch || true
 
 %post greenboot
 # Make sure that the greenboot-healthcheck service is enabled
-systemctl is-enabled --quiet greenboot-healthcheck || systemctl enable --now --quiet greenboot-healthcheck
+systemctl is-enabled --quiet greenboot-healthcheck || systemctl enable --quiet greenboot-healthcheck
 
 %post multus
 # only for install, not on upgrades
@@ -704,6 +762,17 @@ fi
 
 %files cert-manager-release-info
 %{_datadir}/microshift/release/release-cert-manager-{x86_64,aarch64}.json
+
+%files sriov
+%dir %{_prefix}/lib/microshift/manifests.d/070-microshift-sriov
+%dir %{_prefix}/lib/microshift/manifests.d/070-microshift-sriov/crd
+%dir %{_prefix}/lib/microshift/manifests.d/070-microshift-sriov/deploy
+%{_prefix}/lib/microshift/manifests.d/070-microshift-sriov/kustomization.yaml
+%{_prefix}/lib/microshift/manifests.d/070-microshift-sriov/crd/*
+%{_prefix}/lib/microshift/manifests.d/070-microshift-sriov/deploy/*
+
+%files sriov-release-info
+%{_datadir}/microshift/release/release-sriov-{x86_64,aarch64}.json
 
 
 # Use Git command to generate the log and replace the VERSION string

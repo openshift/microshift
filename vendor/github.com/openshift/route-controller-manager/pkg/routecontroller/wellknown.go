@@ -14,6 +14,12 @@ var (
 	// TerminationPolicyAnnotationKey defines what TLSTerminationType should be used
 	// on the Route being created
 	TerminationPolicyAnnotationKey = routev1.GroupName + "/termination"
+	// PropagateIngressLabelFlag defines if the labels of the Ingress resource
+	// should be used to replace the labels on the generated Route resource.
+	// In case this feature/annotation is enabled, any existing label on the
+	// underlying route resource will be replaced by the labels from the parent
+	// ingress resource
+	PropagateIngressLabelFlag = routev1.GroupName + "/reconcile-labels"
 	// IngressClassAnnotation is the legacy annotation used to define which
 	// controller/class should reconcile an ingress resource.
 	// In case of a conversion from an ingress to route, if the ingress specifies

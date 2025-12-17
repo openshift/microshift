@@ -721,6 +721,7 @@ if ${EXTRACT_CONTAINER_IMAGES}; then
     [ -n "${BREW_Y2_RELEASE_VERSION}" ] && extract_container_images "${BREW_Y2_RELEASE_VERSION}" "${BREW_REPO}" "${CONTAINER_LIST}"
     [ -n "${BREW_RC_RELEASE_VERSION}" ] && extract_container_images "${BREW_RC_RELEASE_VERSION}" "${BREW_REPO}" "${CONTAINER_LIST}"
     [ -n "${BREW_EC_RELEASE_VERSION}" ] && extract_container_images "${BREW_EC_RELEASE_VERSION}" "${BREW_REPO}" "${CONTAINER_LIST}"
+    [ -n "${BREW_NIGHTLY_RELEASE_VERSION}" ] && extract_container_images "${BREW_NIGHTLY_RELEASE_VERSION}" "${BREW_REPO}" "${CONTAINER_LIST}"
 fi
 
 trap 'osbuild_logs' EXIT

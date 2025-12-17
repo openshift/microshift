@@ -1,9 +1,9 @@
 package revbump
 
 import (
-	"go.etcd.io/etcd/server/v3/mvcc"
-	"go.etcd.io/etcd/server/v3/mvcc/backend"
-	"go.etcd.io/etcd/server/v3/mvcc/buckets"
+	"go.etcd.io/etcd/server/v3/storage/backend"
+	"go.etcd.io/etcd/server/v3/storage/mvcc"
+	"go.etcd.io/etcd/server/v3/storage/schema"
 	"go.uber.org/zap"
 )
 
@@ -36,7 +36,7 @@ func unsafeBumpRevision(lg *zap.Logger, tx backend.BatchTx, latest revision, amo
 	latest.sub = 0
 	k := make([]byte, revBytesLen)
 	revToBytes(k, latest)
-	tx.UnsafePut(buckets.Key, k, []byte{})
+	tx.UnsafePut(schema.Key, k, []byte{})
 
 	return latest
 }
@@ -52,7 +52,7 @@ func unsafeMarkRevisionCompacted(lg *zap.Logger, tx backend.BatchTx, latest revi
 
 func unsafeGetLatestRevision(tx backend.BatchTx) (revision, error) {
 	var latest revision
-	err := tx.UnsafeForEach(buckets.Key, func(k, _ []byte) (err error) {
+	err := tx.UnsafeForEach(schema.Key, func(k, _ []byte) (err error) {
 		rev := bytesToRev(k)
 
 		if rev.GreaterThan(latest) {

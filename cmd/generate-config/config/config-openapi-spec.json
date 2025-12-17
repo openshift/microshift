@@ -19,6 +19,7 @@
       "type": "object",
       "required": [
         "auditLog",
+        "featureGates",
         "namedCertificates",
         "subjectAltNames",
         "tls"
@@ -56,6 +57,39 @@
               "description": "profile is the OpenShift profile specifying a specific logging policy",
               "type": "string",
               "default": "Default"
+            }
+          }
+        },
+        "featureGates": {
+          "type": "object",
+          "required": [
+            "customNoUpgrade",
+            "featureSet"
+          ],
+          "properties": {
+            "customNoUpgrade": {
+              "type": "object",
+              "required": [
+                "disabled",
+                "enabled"
+              ],
+              "properties": {
+                "disabled": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "enabled": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "featureSet": {
+              "type": "string"
             }
           }
         },
@@ -144,6 +178,28 @@
           "type": "string",
           "default": "example.com",
           "example": "microshift.example.com"
+        },
+        "hosts": {
+          "description": "Hosts contains configuration for the hosts file.",
+          "type": "object",
+          "properties": {
+            "file": {
+              "description": "File is the path to the hosts file to monitor.\nIf not specified, defaults to \"/etc/hosts\".",
+              "type": "string",
+              "default": "/etc/hosts",
+              "example": "/etc/hosts"
+            },
+            "status": {
+              "description": "Status controls whether the hosts file is enabled or disabled.\nAllowed values are \"Enabled\" and \"Disabled\".\nIf not specified, defaults to \"Disabled\".",
+              "type": "string",
+              "default": "Disabled",
+              "enum": [
+                "Enabled",
+                "Disabled"
+              ],
+              "example": "Enabled"
+            }
+          }
         }
       }
     },

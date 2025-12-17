@@ -45,6 +45,12 @@ get_vrel_from_rhsm() {{
 get_vrel_from_rpm() {{
     local -r rpm_dir="$1"
 
+    # exit if rpm_dir directory does not exist
+    if [ ! -d "${{rpm_dir}}" ]; then
+        echo ""
+        return
+    fi
+
     local -r rpm_release_info_file=$(find "${{rpm_dir}}" -name "microshift-release-info-*.rpm" | sort | tail -n1)
     if [ -z "${{rpm_release_info_file}}" ]; then
         echo ""
@@ -136,16 +142,29 @@ export CNCF_SYSTEMD_LOGS_VERSION={CNCF_SYSTEMD_LOGS_VERSION}
 export GITOPS_VERSION={GITOPS_VERSION}
 
 # The brew release versions needed for release regression testing
-BREW_Y0_RELEASE_VERSION="$(get_vrel_from_rpm "${{BREW_RPM_SOURCE}}/4.${{MINOR_VERSION}}-zstream/{ARCH}/")"
-BREW_Y1_RELEASE_VERSION="$(get_vrel_from_rpm "${{BREW_RPM_SOURCE}}/4.${{PREVIOUS_MINOR_VERSION}}-zstream/{ARCH}/")"
-BREW_Y2_RELEASE_VERSION="$(get_vrel_from_rpm "${{BREW_RPM_SOURCE}}/4.${{YMINUS2_MINOR_VERSION}}-zstream/{ARCH}/")"
-BREW_RC_RELEASE_VERSION="$(get_vrel_from_rpm "${{BREW_RPM_SOURCE}}/4.${{MINOR_VERSION}}-rc/{ARCH}/")"
-BREW_EC_RELEASE_VERSION="$(get_vrel_from_rpm "${{BREW_RPM_SOURCE}}/4.${{MINOR_VERSION}}-ec/{ARCH}/")"
+Y0_VERSION="$(ls "${{BREW_RPM_SOURCE}}" | grep -E "(4|5).${{MINOR_VERSION}}.[0-9]{1,2}$" | sort -V | tail -n1 || echo "")"
+Y1_VERSION="$(ls "${{BREW_RPM_SOURCE}}" | grep -E "(4|5).${{PREVIOUS_MINOR_VERSION}}.[0-9]{1,2}$" | sort -V | head -n1 || echo "")"
+Y2_VERSION="$(ls "${{BREW_RPM_SOURCE}}" | grep -E "(4|5).${{YMINUS2_MINOR_VERSION}}.[0-9]{1,2}$" | sort -V | head -n1 || echo "")"
+Z1_VERSION="$(ls "${{BREW_RPM_SOURCE}}" | grep -E "(4|5).${{MINOR_VERSION}}.[0-9]{1,2}$" | sort -V | head -n1 || echo "")"
+RC_VERSION="$(ls "${{BREW_RPM_SOURCE}}" | grep -E "(4|5).${{MINOR_VERSION}}.[0-9]{1,2}-rc$" | sort -V | tail -n1 || echo "")"
+EC_VERSION="$(ls "${{BREW_RPM_SOURCE}}" | grep -E "(4|5).${{MINOR_VERSION}}.[0-9]{1,2}-ec$" | sort -V | tail -n1 || echo "")"
+NIGHTLY_VERSION="$(ls "${{BREW_RPM_SOURCE}}" | grep -E "(4|5).${{MINOR_VERSION}}.[0-9]{1,2}-nightly$" | sort -V | tail -n1 || echo "")"
+
+BREW_Y0_RELEASE_VERSION="$(get_vrel_from_rpm "${{BREW_RPM_SOURCE}}/${{Y0_VERSION}}/{ARCH}/")"
+BREW_Y1_RELEASE_VERSION="$(get_vrel_from_rpm "${{BREW_RPM_SOURCE}}/${{Y1_VERSION}}/{ARCH}/")"
+BREW_Y2_RELEASE_VERSION="$(get_vrel_from_rpm "${{BREW_RPM_SOURCE}}/${{Y2_VERSION}}/{ARCH}/")"
+BREW_Z1_RELEASE_VERSION="$(get_vrel_from_rpm "${{BREW_RPM_SOURCE}}/${{Z1_VERSION}}/{ARCH}/")"
+BREW_RC_RELEASE_VERSION="$(get_vrel_from_rpm "${{BREW_RPM_SOURCE}}/${{RC_VERSION}}/{ARCH}/")"
+BREW_EC_RELEASE_VERSION="$(get_vrel_from_rpm "${{BREW_RPM_SOURCE}}/${{EC_VERSION}}/{ARCH}/")"
+BREW_NIGHTLY_RELEASE_VERSION="$(get_vrel_from_rpm "${{BREW_RPM_SOURCE}}/${{NIGHTLY_VERSION}}/{ARCH}/")"
+
 export BREW_Y0_RELEASE_VERSION
 export BREW_Y1_RELEASE_VERSION
 export BREW_Y2_RELEASE_VERSION
+export BREW_Z1_RELEASE_VERSION
 export BREW_RC_RELEASE_VERSION
 export BREW_EC_RELEASE_VERSION
+export BREW_NIGHTLY_RELEASE_VERSION
 
 # Set the release type to ec, rc or zstream
 LATEST_RELEASE_TYPE="{LATEST_RELEASE_TYPE}"

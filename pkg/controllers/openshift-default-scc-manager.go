@@ -65,10 +65,12 @@ func ApplyDefaultSCCs(ctx context.Context, cfg *config.Config) error {
 			"controllers/openshift-default-scc-manager/0000_20_kube-apiserver-operator_00_cr-scc-nonroot.yaml",
 			"controllers/openshift-default-scc-manager/0000_20_kube-apiserver-operator_00_cr-scc-privileged.yaml",
 			"controllers/openshift-default-scc-manager/0000_20_kube-apiserver-operator_00_cr-scc-restricted-v2.yaml",
+			"controllers/openshift-default-scc-manager/0000_20_kube-apiserver-operator_00_cr-scc-restricted-v3.yaml",
 			"controllers/openshift-default-scc-manager/0000_20_kube-apiserver-operator_00_cr-scc-restricted.yaml",
 		}
 		clusterRoleBinding = []string{
 			"controllers/openshift-default-scc-manager/0000_20_kube-apiserver-operator_00_crb-systemauthenticated-scc-restricted-v2.yaml",
+			"controllers/openshift-default-scc-manager/0000_20_kube-apiserver-operator_00_crb-systemauthenticated-scc-restricted-v3.yaml",
 		}
 		sccs = []string{
 			"controllers/openshift-default-scc-manager/0000_20_kube-apiserver-operator_00_scc-anyuid.yaml",
@@ -80,6 +82,7 @@ func ApplyDefaultSCCs(ctx context.Context, cfg *config.Config) error {
 			"controllers/openshift-default-scc-manager/0000_20_kube-apiserver-operator_00_scc-nonroot.yaml",
 			"controllers/openshift-default-scc-manager/0000_20_kube-apiserver-operator_00_scc-privileged.yaml",
 			"controllers/openshift-default-scc-manager/0000_20_kube-apiserver-operator_00_scc-restricted-v2.yaml",
+			"controllers/openshift-default-scc-manager/0000_20_kube-apiserver-operator_00_scc-restricted-v3.yaml",
 			"controllers/openshift-default-scc-manager/0000_20_kube-apiserver-operator_00_scc-restricted.yaml",
 		}
 	)

@@ -9,32 +9,23 @@ export TEST_RANDOMIZATION=none
 dest_image="rhel-9.6-microshift-brew-optionals-4.${MINOR_VERSION}-${LATEST_RELEASE_TYPE}"
 
 scenario_create_vms() {
-    if ! does_commit_exist "${dest_image}"; then
-        echo "Image '${dest_image}' not found - skipping test"
-        return 0
-    fi
+    exit_if_commit_not_found "${dest_image}"
 
     prepare_kickstart host1 kickstart.ks.template "rhel-9.6-microshift-brew-optionals-4.${YMINUS2_MINOR_VERSION}-zstream"
     launch_vm
 }
 
 scenario_remove_vms() {
-    if ! does_commit_exist "${dest_image}"; then
-        echo "Image '${dest_image}' not found - skipping test"
-        return 0
-    fi
+    exit_if_commit_not_found "${dest_image}"
 
     remove_vm host1
 }
 
 scenario_run_tests() {
-    if ! does_commit_exist "${dest_image}"; then
-        echo "Image '${dest_image}' not found - skipping test"
-        return 0
-    fi
+    exit_if_commit_not_found "${dest_image}"
 
     run_tests host1 \
-    --variable "TARGET_REF:${dest_image}" \
-    suites/upgrade/upgrade-successful.robot \
-    suites/standard2/
+        --variable "TARGET_REF:${dest_image}" \
+        suites/upgrade/upgrade-successful.robot \
+        suites/standard2/
 }

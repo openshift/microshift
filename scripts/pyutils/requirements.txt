@@ -1,0 +1,2 @@
+pygithub==2.8.1
+gitpython==3.1.45

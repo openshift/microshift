@@ -54,11 +54,19 @@ func NewRunMicroshiftCommand() *cobra.Command {
 
 	var multinode bool
 
+	multinodeDefault := true
+	if version.Get().BuildVariant != version.BuildVariantCommunity {
+		multinodeDefault = false
+	}
+
 	flags := cmd.Flags()
-	flags.BoolVar(&multinode, "multinode", false, "enable multinode mode")
-	err := flags.MarkHidden("multinode")
-	if err != nil {
-		panic(err)
+	flags.BoolVar(&multinode, "multinode", multinodeDefault, "enable multinode mode")
+
+	if version.Get().BuildVariant != version.BuildVariantCommunity {
+		err := flags.MarkHidden("multinode")
+		if err != nil {
+			panic(err)
+		}
 	}
 
 	cmd.RunE = func(cmd *cobra.Command, args []string) error {
@@ -183,6 +191,11 @@ func RunMicroshift(cfg *config.Config) error {
 		return err
 	}
 
+	if err := prerun.FeatureGateLockManagement(cfg); err != nil {
+		writeLogFileError(preRunFailedLogPath, err)
+		return err
+	}
+
 	// TODO: change to only initialize what is strictly necessary for the selected role(s)
 	certChains, err := initCerts(cfg)
 	if err != nil {
@@ -216,6 +229,7 @@ func RunMicroshift(cfg *config.Config) error {
 	util.Must(m.AddService(controllers.NewKubeStorageVersionMigrator(cfg)))
 	util.Must(m.AddService(controllers.NewClusterID(cfg)))
 	util.Must(m.AddService(controllers.NewTelemetryManager(cfg)))
+	util.Must(m.AddService(controllers.NewHostsWatcherManager(cfg)))
 	util.Must(m.AddService(gdp.NewGenericDevicePlugin(cfg)))
 
 	// Storing and clearing the env, so other components don't send the READY=1 until MicroShift is fully ready

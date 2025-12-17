@@ -113,7 +113,6 @@ Setup
 
 Teardown
     [Documentation]    Test suite teardown
-    Restart MicroShift
     Logout MicroShift Host
     Remove Kubeconfig
 

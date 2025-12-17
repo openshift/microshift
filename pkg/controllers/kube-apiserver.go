@@ -33,6 +33,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/serializer"
+	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
@@ -63,7 +64,6 @@ var (
 		embedded.MustAsset("controllers/kube-apiserver/config-overrides.yaml"),
 	}
 )
-
 var fixedTLSProfile *configv1.TLSProfileSpec
 
 func init() {
@@ -169,6 +169,17 @@ func (s *KubeAPIServer) configure(ctx context.Context, cfg *config.Config) error
 		return fmt.Errorf("failed to discover etcd servers: %w", err)
 	}
 
+	featureGateArgs, err := cfg.ApiServer.FeatureGates.ToApiserverArgs()
+	if err != nil {
+		return fmt.Errorf("failed to convert feature gates to CLI flags: %w", err)
+	}
+	// Inject required feature gates into the feature-gates argument.
+	enabledRequiredFGs := make(sets.Set[string], 0)
+	for _, fg := range config.RequiredFeatureGates {
+		enabledRequiredFGs.Insert(fg + "=true")
+	}
+	featureGateArgs = sets.New(featureGateArgs...).Union(enabledRequiredFGs).UnsortedList()
+
 	overrides := &kubecontrolplanev1.KubeAPIServerConfig{
 		APIServerArguments: map[string]kubecontrolplanev1.Arguments{
 			"advertise-address":             {s.advertiseAddress},
@@ -221,7 +232,7 @@ func (s *KubeAPIServer) configure(ctx context.Context, cfg *config.Config) error
 			"enable-admission-plugins":              {},
 			"send-retry-after-while-not-ready-once": {"true"},
 			"shutdown-delay-duration":               {"5s"},
-			"feature-gates":                         {"UserNamespacesSupport=true", "UserNamespacesPodSecurityStandards=true"},
+			"feature-gates":                         featureGateArgs,
 		},
 		GenericAPIServerConfig: configv1.GenericAPIServerConfig{
 			AdmissionConfig: configv1.AdmissionConfig{
@@ -322,24 +333,24 @@ func (s *KubeAPIServer) Run(ctx context.Context, ready chan<- struct{}, stopped 
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
+	restConfig, err := clientcmd.BuildConfigFromFlags(s.masterURL, "")
+	if err != nil {
+		return err
+	}
+	if err := rest.SetKubernetesDefaults(restConfig); err != nil {
+		return err
+	}
+	restConfig.NegotiatedSerializer = serializer.NewCodecFactory(runtime.NewScheme())
+	restConfig.CAFile = s.servingCAPath
+
+	restClient, err := rest.UnversionedRESTClientFor(restConfig)
+	if err != nil {
+		return err
+	}
+
 	// run readiness check
 	go func() {
 		err := wait.PollUntilContextTimeout(ctx, time.Second, kubeAPIStartupTimeout*time.Second, true, func(ctx context.Context) (bool, error) {
-			restConfig, err := clientcmd.BuildConfigFromFlags(s.masterURL, "")
-			if err != nil {
-				return false, err
-			}
-			if err := rest.SetKubernetesDefaults(restConfig); err != nil {
-				return false, err
-			}
-			restConfig.NegotiatedSerializer = serializer.NewCodecFactory(runtime.NewScheme())
-			restConfig.CAFile = s.servingCAPath
-
-			restClient, err := rest.UnversionedRESTClientFor(restConfig)
-			if err != nil {
-				return false, err
-			}
-
 			var status int
 			if err := restClient.Get().AbsPath("/readyz").Do(ctx).StatusCode(&status).Error(); err != nil {
 				klog.Infof("%q not yet ready: %v", s.Name(), err)

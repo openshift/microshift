@@ -26,7 +26,8 @@ dnf install -y git make python3-pyserial
 dnf clean all
 
 # Clone the serialsim repository and build the serialsim module.
-git clone https://github.com/pmtk/serialsim.git /tmp/serialsim
+git clone https://github.com/microshift-io/serialsim.git /tmp/serialsim
+
 cd /tmp/serialsim
 make KERNEL="${KERNEL_VER_ARCH}" all install
 rm -rf /tmp/serialsim

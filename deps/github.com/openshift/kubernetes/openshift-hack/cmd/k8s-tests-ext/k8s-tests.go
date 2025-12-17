@@ -5,11 +5,8 @@ import (
 	"fmt"
 	"os"
 	"reflect"
-	"strconv"
+	"time"
 
-	et "github.com/openshift-eng/openshift-tests-extension/pkg/extension/extensiontests"
-
-	"k8s.io/kubernetes/openshift-hack/e2e/annotate/generated"
 	"k8s.io/kubernetes/test/e2e/framework"
 
 	"github.com/spf13/cobra"
@@ -61,7 +58,7 @@ func main() {
 		Parents: []string{
 			"openshift/conformance/parallel/minimal",
 		},
-		Qualifiers: []string{withExcludedTestsFilter(`!name.contains('[Serial]') && labels.exists(l, l == "Conformance")`)},
+		Qualifiers: []string{withExcludedTestsFilter(`(!name.contains('[Serial]') && !labels.exists(l, l == '[Serial]')) && labels.exists(l, l == "Conformance")`)},
 	})
 
 	kubeTestsExtension.AddSuite(e.Suite{
@@ -69,7 +66,7 @@ func main() {
 		Parents: []string{
 			"openshift/conformance/serial/minimal",
 		},
-		Qualifiers: []string{withExcludedTestsFilter(`name.contains('[Serial]') && labels.exists(l, l == "Conformance")`)},
+		Qualifiers: []string{withExcludedTestsFilter(`(name.contains('[Serial]') || labels.exists(l, l == '[Serial]')) && labels.exists(l, l == "Conformance")`)},
 	})
 
 	kubeTestsExtension.AddSuite(e.Suite{
@@ -77,7 +74,7 @@ func main() {
 		Parents: []string{
 			"openshift/conformance/parallel",
 		},
-		Qualifiers: []string{withExcludedTestsFilter(`!name.contains('[Serial]')`)},
+		Qualifiers: []string{withExcludedTestsFilter(`(!name.contains('[Serial]') && !labels.exists(l, l == '[Serial]'))`)},
 	})
 
 	kubeTestsExtension.AddSuite(e.Suite{
@@ -85,7 +82,15 @@ func main() {
 		Parents: []string{
 			"openshift/conformance/serial",
 		},
-		Qualifiers: []string{withExcludedTestsFilter(`name.contains('[Serial]')`)},
+		Qualifiers: []string{withExcludedTestsFilter(`(name.contains('[Serial]') || labels.exists(l, l == '[Serial]'))`)},
+	})
+
+	hpaTestTimeout := time.Minute * 30
+	kubeTestsExtension.AddSuite(e.Suite{
+		Name:        "kubernetes/autoscaling/hpa",
+		Qualifiers:  []string{"name.contains('[Feature:HPA]')"}, // Note that this does not use withExcludedTestsFilter to be able to run DedicatedJob labelled tests.
+		Parallelism: 3,                                          // HPA tests have high CPU + memory usage, so we cannot have a high level of parallelism here.
+		TestTimeout: &hpaTestTimeout,
 	})
 
 	for k, v := range image.GetOriginalImageConfigs() {
@@ -108,30 +113,6 @@ func main() {
 			panic(err)
 		}
 	})
-
-	// Annotations get appended to test names, these are additions to upstream
-	// tests for controlling skips, suite membership, etc.
-	//
-	// TODO:
-	//		- Remove this annotation code, and migrate to Labels/Tags and
-	//		  the environmental skip code from the enhancement once its implemented.
-	//		- Make sure to account for test renames that occur because of removal of these
-	//		  annotations
-	var omitAnnotations bool
-	omitAnnotationsVal := os.Getenv("OMIT_ANNOTATIONS")
-	if omitAnnotationsVal != "" {
-		omitAnnotations, err = strconv.ParseBool(omitAnnotationsVal)
-		if err != nil {
-			panic("Failed to parse OMIT_ANNOTATIONS: " + err.Error())
-		}
-	}
-	if !omitAnnotations {
-		specs.Walk(func(spec *et.ExtensionTestSpec) {
-			if annotations, ok := generated.Annotations[spec.Name]; ok {
-				spec.Name += annotations
-			}
-		})
-	}
 
 	specs = filterOutDisabledSpecs(specs)
 	addLabelsToSpecs(specs)
@@ -188,6 +169,7 @@ func withExcludedTestsFilter(baseExpr string) string {
 		"[Slow]",
 		"[Flaky]",
 		"[Local]",
+		"[DedicatedJob]",
 	}
 
 	filter := ""
@@ -195,7 +177,7 @@ func withExcludedTestsFilter(baseExpr string) string {
 		if i > 0 {
 			filter += " && "
 		}
-		filter += fmt.Sprintf("!name.contains('%s')", s)
+		filter += fmt.Sprintf("!name.contains('%s') && !labels.exists(l, l == '%s')", s, s)
 	}
 
 	if baseExpr != "" {

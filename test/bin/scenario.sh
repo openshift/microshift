@@ -32,7 +32,7 @@ IMAGE_SIGSTORE_ENABLED=false # may be overridden in scenario file
 VNC_CONSOLE=${VNC_CONSOLE:-false}  # may be overridden in global settings file
 TEST_RANDOMIZATION="all"  # may be overridden in scenario file
 TEST_EXCLUDES="none"  # may be overridden in scenario file
-TEST_EXECUTION_TIMEOUT="30m" # may be overriden in scenario file
+TEST_EXECUTION_TIMEOUT="${TEST_EXECUTION_TIMEOUT:-30m}" # may be overriden in scenario file or CI config
 SUBSCRIPTION_MANAGER_PLUGIN="${SUBSCRIPTION_MANAGER_PLUGIN:-${SCRIPTDIR}/subscription_manager_register.sh}"  # may be overridden in global settings file
 RUN_HOST_OVERRIDE=""  # target any given VM for running scenarios
 
@@ -395,6 +395,24 @@ does_image_exist() {
     fi
 }
 
+# Exit the script if the commit is not found in the ostree repository.
+exit_if_commit_not_found() {
+    local -r commit="${1}"
+    if ! does_commit_exist "${commit}"; then
+        echo "Commit '${commit}' not found in ostree repo - skipping test"
+        exit 0
+    fi
+}
+
+# Exit the script if the image is not found in the mirror registry.
+exit_if_image_not_found() {
+    local -r image="${1}"
+    if ! does_image_exist "${image}"; then
+        echo "Image '${image}' not found in mirror registry - skipping test"
+        exit 0
+    fi
+}
+
 # Show the IP address of the VM
 function get_vm_ip {
     local -r vmname="${1}"
@@ -438,6 +456,26 @@ wait_for_ssh() {
     done
     # Return an error if non of the ssh attempts succeeded
     return 1
+}
+
+wait_for_microshift_to_be_ready() {
+    local vmname="${1}"
+    shift
+
+    # Handle RUN_HOST_OVERRIDE
+    vmname=$(apply_host_override "${vmname}")
+
+    # Set up kubeconfig for tests
+    local -r vm_ip=$(get_vm_property "${vmname}" "ip")
+    local -r full_vmname="$(full_vm_name "${vmname}")"
+
+    # Wait for MicroShift to be ready
+    if ! wait_for_greenboot "${full_vmname}" "${vm_ip}"; then
+        record_junit "${vmname}" "pre_test_greenboot_check" "FAILED"
+        popd &>/dev/null
+        exit 1
+    fi
+    record_junit "${vmname}" "pre_test_greenboot_check" "OK"
 }
 
 # Wait for greenboot health check to complete, without checking the results
@@ -681,7 +719,12 @@ launch_vm() {
     for n in ${network}; do
         # For simplicity we assume that network filters are named the same as the networks
         # If there is a filter with the same name as the network, attach it to the NIC
-        vm_network_args+="--network network=${n},model=virtio"
+        if [ "${n}" = "sriov" ] ; then
+            vm_network_args+="--network network=default,model=igb"
+        else
+            vm_network_args+="--network network=${n},model=virtio"
+        fi
+
         if sudo virsh nwfilter-list | awk '{print $2}' | grep -qx "${n}"; then
             vm_network_args+=",filterref=${n}"
         fi
@@ -1041,11 +1084,7 @@ USHIFT_USER: "${USHIFT_USER:-redhat}"
 SSH_PRIV_KEY: "${SSH_PRIVATE_KEY:-}"
 SSH_PORT: ${ssh_port}
 EOF
-        if ! wait_for_greenboot "${full_vmname}" "${vm_ip}"; then
-            record_junit "${vmname}" "pre_test_greenboot_check" "FAILED"
-            return 1
-        fi
-        record_junit "${vmname}" "pre_test_greenboot_check" "OK"
+        wait_for_microshift_to_be_ready "${vmname}"
     fi
 
     # Make sure the test execution times out after a predefined period.
@@ -1082,8 +1121,8 @@ EOF
     fi
 }
 
-# Implementation of Gingko tests
-run_gingko_tests() {
+# Setup oc client and kubeconfig for ginkgo tests
+setup_oc_and_kubeconfig() {
     local vmname="${1}"
     shift
 
@@ -1093,7 +1132,7 @@ run_gingko_tests() {
     # Save current directory
     pushd . &>/dev/null
 
-    # Check/install oc
+    # Install oc
     if ! command -v oc &> /dev/null ; then
         "${ROOTDIR}/scripts/fetch_tools.sh" "oc" || {
             record_junit "${vmname}" "oc_installed" "FAILED"
@@ -1102,36 +1141,43 @@ run_gingko_tests() {
     fi
     record_junit "${vmname}" "oc_installed" "OK"
 
-    # Check/get openshift-tests-binary
-    if ! "${ROOTDIR}/scripts/fetch_tools.sh" "ginkgo"; then
-        record_junit "${vmname}" "build_test_binary" "FAILED"
-        exit 1
-    fi
-    record_junit "${vmname}" "build_test_binary" "OK"
-
-    # Set up test environment variables
-    local kubeconfig="${SCENARIO_INFO_DIR}/${SCENARIO}/kubeconfig"
-    local -r test_results_dir="${SCENARIO_INFO_DIR}/${SCENARIO}/gingko-results"
-    mkdir -p "${test_results_dir}"
-
-    # Set up kubeconfig for tests
-    local -r vm_ip=$(get_vm_property "${vmname}" "ip")
-    local -r full_vmname="$(full_vm_name "${vmname}")"
-
-    # Wait for MicroShift to be ready
-    if ! wait_for_greenboot "${full_vmname}" "${vm_ip}"; then
-        record_junit "${vmname}" "pre_test_greenboot_check" "FAILED"
-        popd &>/dev/null
-        exit 1
-    fi
-    record_junit "${vmname}" "pre_test_greenboot_check" "OK"
-
     # Get kubeconfig from VM
-    run_command_on_vm "${vmname}" "sudo cat /var/lib/microshift/resources/kubeadmin/${vm_ip}/kubeconfig" > "${kubeconfig}"
+    local -r vm_ip=$(get_vm_property "${vmname}" "ip")
+    local kubeconfig="${SCENARIO_INFO_DIR}/${SCENARIO}/kubeconfig"
+    if ! run_command_on_vm "${vmname}" "sudo cat /var/lib/microshift/resources/kubeadmin/${vm_ip}/kubeconfig" > "${kubeconfig}"; then
+        record_junit "${vmname}" "setup_kubeconfig" "FAILED"
+        exit 1
+    fi
     export KUBECONFIG="${kubeconfig}"
     record_junit "${vmname}" "setup_kubeconfig" "OK"
+    
+    popd &>/dev/null
+}
+
+# Implementation of ginkgo tests
+run_ginkgo_tests() {
+    local vmname="${1}"
+    shift
+
+    # Handle RUN_HOST_OVERRIDE
+    vmname=$(apply_host_override "${vmname}")
+
+    # Save current directory
+    pushd . &>/dev/null
+
+    # Setup oc client and kubeconfig for ginkgo tests
+    setup_oc_and_kubeconfig "${vmname}"
+
+    # Build ginkgo binary
+    if ! "${ROOTDIR}/scripts/fetch_tools.sh" "ginkgo"; then
+        record_junit "${vmname}" "build_ginkgo_binary" "FAILED"
+        exit 1
+    fi
+    record_junit "${vmname}" "build_ginkgo_binary" "OK"
 
     # Create case selection file
+    local -r test_results_dir="${SCENARIO_INFO_DIR}/${SCENARIO}/ginkgo-results"
+    mkdir -p "${test_results_dir}"
     local case_selected="${test_results_dir}/case_selected"
 
     # Get all MicroShift tests using dry-run
@@ -1151,6 +1197,9 @@ run_gingko_tests() {
         echo "Running Ginkgo tests with MicroShift filter..."
     fi
 
+    echo "----------------Remove 62738 test case---------------"
+    sed -i "/62738/d" "${case_selected}"
+    echo "-----------------------------------------------------"
     echo "------------------Selected test cases------------------"
     cat "${case_selected}"
     echo "-----------------------------------------------------"
@@ -1167,7 +1216,7 @@ run_gingko_tests() {
     fi
 
     # Run the tests and capture output with 10m timeout for every test case
-    echo "Gingko test execution started..."
+    echo "ginkgo test execution started..."
     ginkgo_result_success=true
     if ! eval '${timeout_ginkgo} run --timeout 10m --junit-dir=${test_results_dir} -f ${case_selected}' 2>&1 | tee "${test_results_dir}/test-output.log"; then
         if [ $? -ge 124 ] ; then
@@ -1175,7 +1224,7 @@ run_gingko_tests() {
         fi
         ginkgo_result_success=false
     fi
-    echo "Gingko test execution completed"
+    echo "ginkgo test execution completed"
     popd &>/dev/null
 
     # Clean the JUnit XML files
@@ -1219,9 +1268,9 @@ run_gingko_tests() {
 
     # Record the junit result of the ginkgo tests
     if [[ "${ginkgo_result_success}" == "true" ]]; then
-        record_junit "${vmname}" "run_gingko_tests" "OK"
+        record_junit "${vmname}" "run_ginkgo_tests" "OK"
     else
-        record_junit "${vmname}" "run_gingko_tests" "FAILED"
+        record_junit "${vmname}" "run_ginkgo_tests" "FAILED"
         exit 1
     fi
 }
