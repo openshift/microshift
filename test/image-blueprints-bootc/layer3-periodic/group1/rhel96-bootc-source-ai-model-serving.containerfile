@@ -53,7 +53,7 @@ RUN --mount=type=secret,id=pullsecret,dst=/run/secrets/pull-secret.json \
     IMAGE_PULL_LIST="${images}" /usr/bin/microshift-copy-images pull
 
 # Images are filtered:
-# - 'kserve*' are required for the kserve components
+# - 'kserve*' are required for the kserve components (excluding kserve-llm-d due to its size)
 # - 'ovms-image' is needed for OpenVino Model Server
 # Images of remaining ServingRuntimes are omitted due to their size (they vary between 2 and 5 GiB).
 # Embedding them would unnecessarily increase size of the bootc image, size of the ISO installer,
@@ -61,7 +61,7 @@ RUN --mount=type=secret,id=pullsecret,dst=/run/secrets/pull-secret.json \
 #
 # Additionally, OCI image with resnet50 model is embedded.
 RUN --mount=type=secret,id=pullsecret,dst=/run/secrets/pull-secret.json \
-    images="$(jq -r '.images | with_entries(select(.key | startswith("kserve") or startswith("ovms-image"))) | .[]' /usr/share/microshift/release/release-ai-model-serving-"$(uname -m)".json)" ; \
+    images="$(jq -r '.images | with_entries(select((.key | startswith("kserve") or startswith("ovms-image")) and (.key | contains("kserve-llm-d") | not))) | .[]' /usr/share/microshift/release/release-ai-model-serving-"$(uname -m)".json)" ; \
     images="${images} quay.io/microshift/ai-testing-model:ovms-resnet50" ; \
     IMAGE_PULL_LIST="${images}" /usr/bin/microshift-copy-images pull
 
