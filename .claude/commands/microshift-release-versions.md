@@ -373,7 +373,7 @@ Release versions are tested in CI:
 - Latest release version must be **manually updated** in `test/bin/common_versions.sh` when new RC or z-stream is available
 
 ## Notes
-- VPN access is enabled by default
+- Assume VPN access is enabled by default when looking for Brew resources
 - Bootc images are only available for MicroShift 4.18 and later
 - MicroShift packages become available when the OCP version is marked as "Accepted"
 - For nightly builds, only RPMs are available in Brew (VPN required)
