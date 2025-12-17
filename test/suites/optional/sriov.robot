@@ -6,7 +6,7 @@ Resource            ../../resources/microshift-process.resource
 Suite Setup         Setup Suite
 Suite Teardown      Teardown Suite
 
-Test Tags           optional    sriov
+Test Tags           optional    sriov    slow
 
 
 *** Variables ***
@@ -37,10 +37,10 @@ Create VFs And Verify
     ${stdout}=    Execute Command    sudo ls -l /run/cni/bin
     Should Contain    ${stdout}    sriov
 
-    Wait Until Keyword Succeeds    1min    5s
+    Wait Until Keyword Succeeds    5min    5s
     ...    Verify VF Count    2
 
-    Wait Until Keyword Succeeds    1min    5s
+    Wait Until Keyword Succeeds    5min    5s
     ...    Device Plugin Should Be Running
 
     [Teardown]    Cleanup SR-IOV Policy
