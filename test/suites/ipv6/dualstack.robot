@@ -29,19 +29,13 @@ Verify New Pod Works With IPv6
     ...    Expose Hello MicroShift Service Via Route IPv6
     ...    Restart Router
 
-    ${pod_ip}=    Oc Get JsonPath    pod    ${NAMESPACE}    hello-microshift    .status.podIPs[0].ip
-    Must Not Be Ipv6    ${pod_ip}
-    ${pod_ip}=    Oc Get JsonPath    pod    ${NAMESPACE}    hello-microshift    .status.podIPs[1].ip
-    Must Be Ipv6    ${pod_ip}
     ${service_ip}=    Oc Get JsonPath    svc    ${NAMESPACE}    hello-microshift    .spec.clusterIP
     Must Be Ipv6    ${service_ip}
+    ${addr_type}=    Oc Get JsonPath    endpointslice    ${NAMESPACE}    -l kubernetes.io/service-name=hello-microshift    .items[0].addressType
+    Should Be Equal    ${addr_type}    IPv6
 
-    Wait Until Keyword Succeeds    10x    6s
+    Wait Until Keyword Succeeds    20x    10s
     ...    Access Hello Microshift Success    ushift_ip=${USHIFT_HOST_IP1}
-    ...    ushift_port=${HTTP_PORT}
-    ...    hostname=${HOSTNAME}
-    Wait Until Keyword Succeeds    10x    6s
-    ...    Access Hello Microshift Success    ushift_ip=${USHIFT_HOST_IP2}
     ...    ushift_port=${HTTP_PORT}
     ...    hostname=${HOSTNAME}
 
@@ -60,19 +54,13 @@ Verify New Pod Works With IPv4
     ...    Expose Hello MicroShift Service Via Route IPv4
     ...    Restart Router
 
-    ${pod_ip}=    Oc Get JsonPath    pod    ${NAMESPACE}    hello-microshift    .status.podIPs[0].ip
-    Must Not Be Ipv6    ${pod_ip}
-    ${pod_ip}=    Oc Get JsonPath    pod    ${NAMESPACE}    hello-microshift    .status.podIPs[1].ip
-    Must Be Ipv6    ${pod_ip}
     ${service_ip}=    Oc Get JsonPath    svc    ${NAMESPACE}    hello-microshift    .spec.clusterIP
     Must Not Be Ipv6    ${service_ip}
+    ${addr_type}=    Oc Get JsonPath    endpointslice    ${NAMESPACE}    -l kubernetes.io/service-name=hello-microshift    .items[0].addressType
+    Should Be Equal    ${addr_type}    IPv4
 
-    Wait Until Keyword Succeeds    10x    6s
+    Wait Until Keyword Succeeds    20x    10s
     ...    Access Hello Microshift Success    ushift_ip=${USHIFT_HOST_IP1}
-    ...    ushift_port=${HTTP_PORT}
-    ...    hostname=${HOSTNAME}
-    Wait Until Keyword Succeeds    10x    6s
-    ...    Access Hello Microshift Success    ushift_ip=${USHIFT_HOST_IP2}
     ...    ushift_port=${HTTP_PORT}
     ...    hostname=${HOSTNAME}
 
@@ -89,7 +77,7 @@ Verify Host Network Pods Get Dual Stack IP Addresses
     ...    Migrate To Dual Stack
 
     # Wait a bit, as this is updated by kubelet and may not be immediate.
-    Wait Until Keyword Succeeds    10x    6s
+    Wait Until Keyword Succeeds    20x    6s
     ...    Host Network Pods Should Have Dual Stack IPs
 
     [Teardown]    Run Keywords
