@@ -29,8 +29,8 @@ Verify New Pod Works With IPv6
     ...    Expose Hello MicroShift Service Via Route IPv6
     ...    Restart Router
 
-    ${service_ip}=    Oc Get JsonPath    svc    ${NAMESPACE}    hello-microshift    .spec.clusterIP
-    Must Be Ipv6    ${service_ip}
+    ${ip_families}=    Oc Get JsonPath    svc    ${NAMESPACE}    hello-microshift    .spec.ipFamilies
+    Should Contain    ${ip_families}    IPv6
     ${addr_type}=    Oc Get JsonPath    endpointslice    ${NAMESPACE}    -l kubernetes.io/service-name=hello-microshift    .items[0].addressType
     Should Be Equal    ${addr_type}    IPv6
 
@@ -54,8 +54,8 @@ Verify New Pod Works With IPv4
     ...    Expose Hello MicroShift Service Via Route IPv4
     ...    Restart Router
 
-    ${service_ip}=    Oc Get JsonPath    svc    ${NAMESPACE}    hello-microshift    .spec.clusterIP
-    Must Not Be Ipv6    ${service_ip}
+    ${ip_families}=    Oc Get JsonPath    svc    ${NAMESPACE}    hello-microshift    .spec.ipFamilies
+    Should Contain    ${ip_families}    IPv4
     ${addr_type}=    Oc Get JsonPath    endpointslice    ${NAMESPACE}    -l kubernetes.io/service-name=hello-microshift    .items[0].addressType
     Should Be Equal    ${addr_type}    IPv4
 
@@ -104,7 +104,7 @@ Remove Dual Stack Config Drop In
 
 Initialize Global Variables
     [Documentation]    Initializes global variables.
-    Log    IP1: ${USHIFT_HOST_IP1} IPv6: ${USHIFT_HOST_IP2}
+    Log    IP1: ${USHIFT_HOST_IP1} IP2: ${USHIFT_HOST_IP2}
     Should Not Be Empty    ${USHIFT_HOST_IP1}    USHIFT_HOST_IP1 variable is required
     Should Not Be Empty    ${USHIFT_HOST_IP2}    USHIFT_HOST_IP2 variable is required
 
