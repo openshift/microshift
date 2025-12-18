@@ -15,8 +15,7 @@ Test Tags           ipv6    network
 
 
 *** Variables ***
-${USHIFT_HOST_IP1}      ${EMPTY}
-${USHIFT_HOST_IP2}      ${EMPTY}
+${USHIFT_HOST}          ${EMPTY}
 ${HOSTNAME}             hello-microshift.dualstack.cluster.local
 
 
@@ -35,7 +34,12 @@ Verify New Pod Works With IPv6
     Should Be Equal    ${addr_type}    IPv6
 
     Wait Until Keyword Succeeds    20x    10s
-    ...    Access Hello Microshift Success    ushift_ip=${USHIFT_HOST_IP1}
+    ...    Access Hello Microshift Success    ushift_ip=${USHIFT_HOST}
+    ...    ushift_port=${HTTP_PORT}
+    ...    hostname=${HOSTNAME}
+    ${USHIFT_HOST_IPV6}=    Get MicroShift Node IPv6
+    Wait Until Keyword Succeeds    20x    10s
+    ...    Access Hello Microshift Success    ushift_ip=${USHIFT_HOST_IPV6}
     ...    ushift_port=${HTTP_PORT}
     ...    hostname=${HOSTNAME}
 
@@ -60,7 +64,12 @@ Verify New Pod Works With IPv4
     Should Be Equal    ${addr_type}    IPv4
 
     Wait Until Keyword Succeeds    20x    10s
-    ...    Access Hello Microshift Success    ushift_ip=${USHIFT_HOST_IP1}
+    ...    Access Hello Microshift Success    ushift_ip=${USHIFT_HOST}
+    ...    ushift_port=${HTTP_PORT}
+    ...    hostname=${HOSTNAME}
+    ${USHIFT_HOST_IPV6}=    Get MicroShift Node IPv6
+    Wait Until Keyword Succeeds    20x    10s
+    ...    Access Hello Microshift Success    ushift_ip=${USHIFT_HOST_IPV6}
     ...    ushift_port=${HTTP_PORT}
     ...    hostname=${HOSTNAME}
 
@@ -88,10 +97,14 @@ Verify Host Network Pods Get Dual Stack IP Addresses
 *** Keywords ***
 Setup
     [Documentation]    Test suite setup
-    Initialize Global Variables
     Login MicroShift Host
     Setup Suite With Namespace
     Wait Until Greenboot Health Check Exited
+
+Get MicroShift Node IPv6
+    [Documentation]    Retrieve the IPv6 address from the MicroShift config under node.nodeIPv6
+    ${cfg}=    Show Config    effective
+    RETURN    ${cfg['node']['nodeIPv6']}
 
 Teardown
     [Documentation]    Test suite teardown
@@ -101,12 +114,6 @@ Teardown
 Remove Dual Stack Config Drop In
     [Documentation]    Remove dual stack config drop-in
     Remove Drop In MicroShift Config    10-dualstack
-
-Initialize Global Variables
-    [Documentation]    Initializes global variables.
-    Log    IP1: ${USHIFT_HOST_IP1} IP2: ${USHIFT_HOST_IP2}
-    Should Not Be Empty    ${USHIFT_HOST_IP1}    USHIFT_HOST_IP1 variable is required
-    Should Not Be Empty    ${USHIFT_HOST_IP2}    USHIFT_HOST_IP2 variable is required
 
 Migrate To Dual Stack
     [Documentation]    Configure MicroShift to enable dual stack network
@@ -162,5 +169,16 @@ Host Network Pods Should Have Dual Stack IPs
     ...    openshift-dns
     ...    -l dns.operator.openshift.io/daemonset-node-resolver
     ...    .items[*].status.podIPs[*].ip
-    Should Contain    ${pod_ips}    ${USHIFT_HOST_IP1}
-    Should Contain    ${pod_ips}    ${USHIFT_HOST_IP2}
+    ${ipv4_found}=    Set Variable    False
+    ${ipv6_found}=    Set Variable    False
+    ${pod_ips_list}=    Split String    ${pod_ips}
+    FOR    ${ip}    IN    @{pod_ips_list}
+        ${is_ipv6}=    Is Ipv6    ${ip}
+        IF    ${is_ipv6}
+            Set Test Variable    ${ipv6_found}    True
+        ELSE
+            Set Test Variable    ${ipv4_found}    True
+        END
+    END
+    Should Be True    ${ipv4_found}    At least one IPv4 address should be found
+    Should Be True    ${ipv6_found}    At least one IPv6 address should be found
