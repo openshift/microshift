@@ -1,6 +1,10 @@
-- cluster-network-operator embedded-component c49c5e776b44dbac0dcba4897ca0ce803928693e to 698e349cb60e84967bf93345d1b0802dd15ccc1a
-  - 7ad5624 2025-12-04T15:31:03+00:00 Fix: whereabouts-token-watcher DaemonSet improvements
+- cluster-ingress-operator embedded-component fb7482e49c790206e370494221b7b02dc50bfd84 to 24ef5ae121b8f658b649bb555be827f114ead438
+  - b272f60 2025-12-09T14:39:29+01:00 OCPBUGS-61858: Implement e2e test for HTTPKeepAliveTimeout
+  - 5c90dcb 2025-12-09T14:39:22+01:00 OCPBUGS-61858: Implement HTTPKeepAliveTimeout tuning option
+  - f3afe9a 2025-12-05T17:44:57+01:00 Add new NID team members to OWNERS
 
-- machine-config-operator embedded-component 2a29ea49e2625aac5e66e9675de04c2677689c7c to bb066c315eb491455d97d4307c0c6c3b9e7a4fc7
-  - 91bd02fc 2025-12-09T19:30:17+00:00 e2e test: update to wait until test node returns to ready
+- machine-config-operator embedded-component bb066c315eb491455d97d4307c0c6c3b9e7a4fc7 to 3eb8e48748919195aaa65b415c21b05f6287fc8f
+  - 2499bc28 2025-12-10T12:08:40+02:00 add missing ports in contaiterport on the daemoset
+  - 939701a5 2025-12-10T12:07:18+02:00 add a relevant svc to the crio port
+  - 45e456a3 2025-12-10T12:05:50+02:00 Add hostIP 127.0.0.1 to machine-config-daemon port 8798
 
