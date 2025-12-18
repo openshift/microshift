@@ -119,9 +119,6 @@ run_bootc_image_build() {
         if [[ "${CI_JOB_NAME}" =~ .*periodic.* ]]; then
             $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/layer3-periodic
         fi
-        if [[ "${CI_JOB_NAME}" =~ .*upstream.* ]]; then
-            $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/layer4-upstream
-        fi
         if [[ "${CI_JOB_NAME}" =~ .*release.* ]]; then
             $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/layer5-release
         fi
@@ -129,7 +126,6 @@ run_bootc_image_build() {
         $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/layer1-base
         $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/layer2-presubmit
         $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/layer3-periodic
-        $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/layer4-upstream
         $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/layer5-release
     fi
 }
