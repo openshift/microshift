@@ -1,0 +1,21 @@
+- api embedded-component 28db677d74623ae691400619565d01b7a5818601 to ed475190f7c93836318deb53086eb5b66bbe5dbc
+  - d449523 2025-12-15T10:00:35-05:00 OWNERS: update approvers/reviewers
+  - 6fa7550 2025-12-11T11:03:30+01:00 OCPBUGS-60885: Introduce ClosedClientConnectionPolicy to IngressController API
+  - 09fdabc 2025-11-21T10:29:23-08:00 Promote streaming list encoding to Default
+
+- cluster-ingress-operator embedded-component d967a73c5f7da76783ee1af093f21817e7681e1d to fa3906c161077e00a90d1b9a2e688ac047f4531e
+  - 40eead4 2025-12-15T17:56:26+01:00 OCPBUGS-60885: Implement ClosedClientConnectionPolicy field
+  - 18d8a36 2025-12-15T17:56:26+01:00 OCPBUGS-60885: Bump openshift/api to get ClosedClientConnectionPolicy
+
+- router image-amd64 d8058949aaf91dcdea050c58e6a34ef5f6670c67 to ccd9551702a89cac27e38ebb63801ddb6823d101
+  - 3ba45cf 2025-12-11T08:53:39+00:00 OCPBUGS-60885: Add option abortonclose to HAProxy configuration template
+
+- ovn-kubernetes image-amd64 9f04906c9822218d53f51b1e4311f6590eca1db8 to 02a1ed0b226798ef029783eb34d55099ee7da8dc
+  - 965577a4 2025-12-09T08:48:22-08:00 Add ricky-rav to OWNERS for release-4.18
+
+- router image-arm64 d8058949aaf91dcdea050c58e6a34ef5f6670c67 to ccd9551702a89cac27e38ebb63801ddb6823d101
+  - 3ba45cf 2025-12-11T08:53:39+00:00 OCPBUGS-60885: Add option abortonclose to HAProxy configuration template
+
+- ovn-kubernetes image-arm64 9f04906c9822218d53f51b1e4311f6590eca1db8 to 02a1ed0b226798ef029783eb34d55099ee7da8dc
+  - 965577a4 2025-12-09T08:48:22-08:00 Add ricky-rav to OWNERS for release-4.18
+
