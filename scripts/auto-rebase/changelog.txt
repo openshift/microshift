@@ -1,7 +1,6 @@
-- machine-config-operator embedded-component ddfedfcc8fa48e7826db17ed06c19a6e1b4b5e18 to 0ba59a8ecaa09254bd2c14bd565a3cb597cdcda1
-  - cd128fd6 2025-10-15T17:27:34+00:00 add: fallback check for br-ex-br in ofport NM dispatcher script
-  - 71a01127 2025-10-15T17:27:34+00:00 Revert "ofport-request dispatcher script takes br-ex(-br) managed by nmstate into account"
-  - ee63aaad 2025-10-15T17:27:34+00:00 Revert "improve of-port request so it uses a common path instead of retrying on NMS managed br-ex"
-  - 164247c3 2025-10-15T17:27:34+00:00 improve of-port request so it uses a common path instead of retrying on NMS managed br-ex
-  - a3874b0a 2025-10-15T17:27:34+00:00 ofport-request dispatcher script takes br-ex(-br) managed by nmstate into account
+- ovn-kubernetes image-amd64 187ee3d355dc5e2b5ed8e2cfbd2d3342e66c14be to 5190b4a6433b4a18f29ba1a5df541ba95e225e04
+  - 6b0f4700 2025-12-09T08:52:15-08:00 Add ricky-rav to OWNERS for release-4.17
+
+- ovn-kubernetes image-arm64 187ee3d355dc5e2b5ed8e2cfbd2d3342e66c14be to 5190b4a6433b4a18f29ba1a5df541ba95e225e04
+  - 6b0f4700 2025-12-09T08:52:15-08:00 Add ricky-rav to OWNERS for release-4.17
 
