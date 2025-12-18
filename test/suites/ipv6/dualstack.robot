@@ -30,7 +30,11 @@ Verify New Pod Works With IPv6
 
     ${ip_families}=    Oc Get JsonPath    svc    ${NAMESPACE}    hello-microshift    .spec.ipFamilies
     Should Contain    ${ip_families}    IPv6
-    ${addr_type}=    Oc Get JsonPath    endpointslice    ${NAMESPACE}    -l kubernetes.io/service-name=hello-microshift    .items[0].addressType
+    ${addr_type}=    Oc Get JsonPath
+    ...    endpointslice
+    ...    ${NAMESPACE}
+    ...    -l kubernetes.io/service-name=hello-microshift
+    ...    .items[0].addressType
     Should Be Equal    ${addr_type}    IPv6
 
     Wait Until Keyword Succeeds    20x    10s
@@ -60,7 +64,11 @@ Verify New Pod Works With IPv4
 
     ${ip_families}=    Oc Get JsonPath    svc    ${NAMESPACE}    hello-microshift    .spec.ipFamilies
     Should Contain    ${ip_families}    IPv4
-    ${addr_type}=    Oc Get JsonPath    endpointslice    ${NAMESPACE}    -l kubernetes.io/service-name=hello-microshift    .items[0].addressType
+    ${addr_type}=    Oc Get JsonPath
+    ...    endpointslice
+    ...    ${NAMESPACE}
+    ...    -l kubernetes.io/service-name=hello-microshift
+    ...    .items[0].addressType
     Should Be Equal    ${addr_type}    IPv4
 
     Wait Until Keyword Succeeds    20x    10s
@@ -169,16 +177,16 @@ Host Network Pods Should Have Dual Stack IPs
     ...    openshift-dns
     ...    -l dns.operator.openshift.io/daemonset-node-resolver
     ...    .items[*].status.podIPs[*].ip
-    ${ipv4_found}=    Set Variable    False
-    ${ipv6_found}=    Set Variable    False
+    VAR    ${IPV4_FOUND}=    False    scope=TEST
+    VAR    ${IPV6_FOUND}=    False    scope=TEST
     ${pod_ips_list}=    Split String    ${pod_ips}
     FOR    ${ip}    IN    @{pod_ips_list}
         ${is_ipv6}=    Is Ipv6    ${ip}
         IF    ${is_ipv6}
-            Set Test Variable    ${ipv6_found}    True
+            VAR    ${IPV6_FOUND}=    True    scope=TEST
         ELSE
-            Set Test Variable    ${ipv4_found}    True
+            VAR    ${IPV4_FOUND}=    True    scope=TEST
         END
     END
-    Should Be True    ${ipv4_found}    At least one IPv4 address should be found
-    Should Be True    ${ipv6_found}    At least one IPv6 address should be found
+    Should Be True    ${IPV4_FOUND}    At least one IPv4 address should be found
+    Should Be True    ${IPV6_FOUND}    At least one IPv6 address should be found
