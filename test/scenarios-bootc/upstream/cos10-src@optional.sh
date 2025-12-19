@@ -8,14 +8,9 @@ VM_BRIDGE_IP="$(get_vm_bridge_ip "${VM_MULTUS_NETWORK}")"
 WEB_SERVER_URL="http://${VM_BRIDGE_IP}:${WEB_SERVER_PORT}"
 
 scenario_create_vms() {
-    # Skip sriov network on ARM because the igb driver is not supported.
-    local networks="${VM_MULTUS_NETWORK},${VM_MULTUS_NETWORK},sriov"
-    if [[ "${UNAME_M}" =~ aarch64 ]]; then
-        networks="${VM_MULTUS_NETWORK},${VM_MULTUS_NETWORK}"
-    fi
-    prepare_kickstart host1 kickstart-bootc.ks.template rhel100-bootc-source-optionals
-    # Three nics - one for sriov, one for macvlan, another for ipvlan (they cannot enslave the same interface)
-    launch_vm --boot_blueprint rhel100-bootc --network "${networks}"
+    prepare_kickstart host1 kickstart-bootc.ks.template cos10-bootc-source-optionals
+    # Two nics - one for macvlan, another for ipvlan (they cannot enslave the same interface)
+    launch_vm --boot_blueprint centos10-bootc --network "${VM_MULTUS_NETWORK},${VM_MULTUS_NETWORK}"
 
     # Open the firewall ports. Other scenarios get this behavior by
     # embedding settings in the blueprint, but there is no blueprint
@@ -30,13 +25,9 @@ scenario_remove_vms() {
 }
 
 scenario_run_tests() {
-    local skip_args=""
-    if [[ "${UNAME_M}" =~ aarch64 ]]; then
-        skip_args="--skip sriov"
-    fi
     run_tests host1 \
         --variable "PROMETHEUS_HOST:$(hostname)" \
         --variable "LOKI_HOST:$(hostname)" \
-        ${skip_args} \
+        --skip sriov \
         suites/optional/
 }
