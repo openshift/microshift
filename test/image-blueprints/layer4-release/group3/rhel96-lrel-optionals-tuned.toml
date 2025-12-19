@@ -1,4 +1,4 @@
-{{- if and (env.Getenv "BREW_LREL_RELEASE_VERSION" "") (env.Getenv "BREW_Y1_RELEASE_VERSION" "") -}}
+{{- if and (env.Getenv "BREW_LATEST_RELEASE_VERSION" "") (env.Getenv "BREW_Y1_RELEASE_VERSION" "") -}}
 {{- /*
 
   We wrap this template in a test so that the body of the output is
@@ -9,7 +9,7 @@
 */ -}}
 
 name = "rhel-9.6-microshift-brew-tuned-4.{{ .Env.MINOR_VERSION}}-{{ .Env.LATEST_RELEASE_TYPE}}"
-description = "A RHEL 9.6 image with already built and released RPMs like EC, RC, or Z-stream release: {{ .Env.BREW_LREL_RELEASE_VERSION }}"
+description = "A RHEL 9.6 image with already built and released RPMs like EC, RC, or Z-stream release: {{ .Env.BREW_LATEST_RELEASE_VERSION }}"
 version = "0.0.1"
 modules = []
 groups = []
@@ -22,20 +22,20 @@ distro = "rhel-96"
 {{ range (env.Getenv "MICROSHIFT_MANDATORY_RPMS" | strings.Split " ") }}
 [[packages]]
 name = "{{ . }}"
-version = "{{ env.Getenv "BREW_LREL_RELEASE_VERSION" }}"
+version = "{{ env.Getenv "BREW_LATEST_RELEASE_VERSION" }}"
 {{ end }}
 
 {{ range (env.Getenv "MICROSHIFT_OPTIONAL_RPMS" | strings.Split " ") }}
 [[packages]]
 name = "{{ . }}"
-version = "{{ env.Getenv "BREW_LREL_RELEASE_VERSION" }}"
+version = "{{ env.Getenv "BREW_LATEST_RELEASE_VERSION" }}"
 {{ end }}
 
 {{- if and (env.Getenv "UNAME_M" "") (eq "x86_64" .Env.UNAME_M) }}
 {{ range (env.Getenv "MICROSHIFT_X86_64_RPMS" | strings.Split " ") }}
 [[packages]]
 name = "{{ . }}"
-version = "{{ env.Getenv "BREW_LREL_RELEASE_VERSION" }}"
+version = "{{ env.Getenv "BREW_LATEST_RELEASE_VERSION" }}"
 {{ end }}
 {{- end }}
 
