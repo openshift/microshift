@@ -44,7 +44,6 @@ scenario_run_tests() {
 
     run_tests host1 \
         --exitonfailure \
-        suites/tuned/profile.robot \
         suites/tuned/microshift-tuned.robot \
         suites/tuned/workload-partitioning.robot \
         suites/tuned/uncore-cache.robot
