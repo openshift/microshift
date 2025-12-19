@@ -32,7 +32,7 @@ IMAGE_SIGSTORE_ENABLED=false # may be overridden in scenario file
 VNC_CONSOLE=${VNC_CONSOLE:-false}  # may be overridden in global settings file
 TEST_RANDOMIZATION="all"  # may be overridden in scenario file
 TEST_EXCLUDES="none"  # may be overridden in scenario file
-TEST_EXECUTION_TIMEOUT="30m" # may be overriden in scenario file
+TEST_EXECUTION_TIMEOUT="${TEST_EXECUTION_TIMEOUT:-30m}" # may be overriden in scenario file or CI config
 SUBSCRIPTION_MANAGER_PLUGIN="${SUBSCRIPTION_MANAGER_PLUGIN:-${SCRIPTDIR}/subscription_manager_register.sh}"  # may be overridden in global settings file
 RUN_HOST_OVERRIDE=""  # target any given VM for running scenarios
 
@@ -399,7 +399,8 @@ does_image_exist() {
 exit_if_commit_not_found() {
     local -r commit="${1}"
     if ! does_commit_exist "${commit}"; then
-        echo "Commit '${commit}' not found in ostree repo - skipping test"
+        echo "Commit '${commit}' not found in ostree repo - VM can't be created"
+        record_junit "${vm_name}" "build_vm_commit_not_found" "SKIPPED"
         exit 0
     fi
 }
@@ -408,7 +409,8 @@ exit_if_commit_not_found() {
 exit_if_image_not_found() {
     local -r image="${1}"
     if ! does_image_exist "${image}"; then
-        echo "Image '${image}' not found in mirror registry - skipping test"
+        echo "Image '${image}' not found in mirror registry - VM can't be created"
+        record_junit "${vm_name}" "build_vm_image_not_found" "SKIPPED"
         exit 0
     fi
 }
