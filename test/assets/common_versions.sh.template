@@ -72,12 +72,11 @@ get_redhat_bootc_image_url() {{
     local -r registry="$1"
     local -r release_version="$2"
     local image_url=""
-
     # get arch
     local arch=""
-    if [ "${{UNAME_M}}" = "x86_64" ]; then
+    if [[ "{ARCH}" =~ x86 ]]; then
         arch="amd64"
-    elif [ "${{UNAME_M}}" = "aarch64" ]; then
+    elif [[ "{ARCH}" =~ aarch ]]; then
         arch="arm64"
     fi
 
@@ -95,9 +94,9 @@ get_lrel_release_image_url() {{
     local image_url=""
 
     if [[ "${{release_type}}" == "ec" ]]; then
-        image_url="$(curl -s "https://mirror.openshift.com/pub/openshift-v4/${{UNAME_M}}/microshift/ocp-dev-preview/${{release_version}}/el9/bootc-pullspec.txt")"
+        image_url="$(curl -s "https://mirror.openshift.com/pub/openshift-v4/{ARCH}/microshift/ocp-dev-preview/${{release_version}}/el9/bootc-pullspec.txt")"
     elif [[ "${{release_type}}" == "rc" ]]; then
-        image_url="$(curl -s "https://mirror.openshift.com/pub/openshift-v4/${{UNAME_M}}/microshift/ocp/${{release_version}}/el9/bootc-pullspec.txt")"
+        image_url="$(curl -s "https://mirror.openshift.com/pub/openshift-v4/{ARCH}/microshift/ocp/${{release_version}}/el9/bootc-pullspec.txt")"
     elif [[ "${{release_type}}" == "zstream" ]]; then
         for registry in "registry.redhat.io" "registry.stage.redhat.io"; do
             image_url="$(get_redhat_bootc_image_url "${{registry}}" "${{release_version}}")"
