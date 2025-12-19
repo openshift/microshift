@@ -161,9 +161,6 @@ func filterOutDisabledSpecs(specs et.ExtensionTestSpecs) et.ExtensionTestSpecs {
 
 			// https://issues.redhat.com/browse/OCPBUGS-45275
 			"[sig-network] Connectivity Pod Lifecycle should be able to connect to other Pod from a terminating Pod",
-
-			// https://issues.redhat.com/browse/OCPBUGS-61376
-			"[sig-autoscaling] [Feature:HPA] Horizontal pod autoscaling",
 		},
 		// tests that need to be temporarily disabled while the rebase is in progress.
 		"RebaseInProgress": {
@@ -212,8 +209,6 @@ func filterOutDisabledSpecs(specs et.ExtensionTestSpecs) et.ExtensionTestSpecs {
 		// tests that are known flaky
 		"Flaky": {
 			"Job should run a job to completion when tasks sometimes fail and are not locally restarted", // seems flaky, also may require too many resources
-			// TODO(node): test works when run alone, but not in the suite in CI
-			"[Feature:HPA] Horizontal pod autoscaling (scale resource: CPU) [sig-autoscaling] ReplicationController light Should scale from 1 pod to 2 pods",
 		},
 	}
 

@@ -3,26 +3,117 @@ kind: Kustomization
 
 resources:
 - ../../default
+- ../../llmisvc
+- ../../monitoring/llmisvc
+- llm-svc-scc.yaml
+- network-policies.yaml
 - user-cluster-roles.yaml
 
 namespace: opendatahub
 
 patches:
-- path: remove-namespace.yaml
-- path: inferenceservice-config-patch.yaml
-- path: set-resources-manager-patch.yaml
+- path: patches/remove-clusterservingruntime.yaml
+- path: patches/remove-cert-manager.yaml
+- path: patches/remove-local-model.yaml
+- path: patches/patch-webhook-svc-openshift-cert-injection.yaml
+- path: patches/patch-inferenceservice-config.yaml
+- path: patches/patch-set-resources-manager.yaml
+- target:
+    kind: MutatingWebhookConfiguration
+  patch: |
+    - op: remove
+      path: /metadata/annotations/cert-manager.io~1inject-ca-from
+    - op: add
+      path: /metadata/annotations/service.beta.openshift.io~1inject-cabundle
+      value: "true"
+- target:
+      kind: CustomResourceDefinition
+      name: inferenceservices.serving.kserve.io
+  patch: |
+    - op: remove
+      path: /metadata/annotations/cert-manager.io~1inject-ca-from
+    - op: add
+      path: /metadata/annotations/service.beta.openshift.io~1inject-cabundle
+      value: "true"
+- target:
+    kind: ValidatingWebhookConfiguration
+  patch: |
+    - op: remove
+      path: /metadata/annotations/cert-manager.io~1inject-ca-from
+    - op: add
+      path: /metadata/annotations/service.beta.openshift.io~1inject-cabundle
+      value: "true"
+- target:
+    kind: LLMInferenceServiceConfig
+    name: kserve-config-llm-scheduler
+  patch: |-
+    - op: replace
+      path: /spec/router/scheduler/template/containers/0/image
+      value: "$(kserve-llm-d-inference-scheduler)"
+- target:
+    kind: LLMInferenceServiceConfig
+    name: kserve-config-llm-decode-template
+  patch: |-
+    - op: replace
+      path: /spec/template/initContainers/0/image
+      value: "$(kserve-llm-d-routing-sidecar)"
+- target:
+    kind: LLMInferenceServiceConfig
+    name: kserve-config-llm-decode-worker-data-parallel
+  patch: |-
+    - op: replace
+      path: /spec/template/initContainers/0/image
+      value: "$(kserve-llm-d-routing-sidecar)"
 
 replacements:
 - source:
     kind: ConfigMap
     name: kserve-parameters
-    fieldpath: data.kserve-controller
+    fieldPath: data.kserve-controller
   targets:
   - select:
       kind: Deployment
       name: kserve-controller-manager
     fieldPaths:
     - spec.template.spec.containers.[name=manager].image
+- source:
+    kind: ConfigMap
+    name: kserve-parameters
+    fieldPath: data.kserve-llm-d
+  targets:
+    - select:
+        kind: LLMInferenceServiceConfig
+        name: kserve-config-llm-decode-template
+      fieldPaths:
+        - spec.template.containers.[name=main].image
+    - select:
+        kind: LLMInferenceServiceConfig
+        name: kserve-config-llm-decode-worker-data-parallel
+      fieldPaths:
+        - spec.template.containers.[name=main].image
+        - spec.worker.containers.[name=main].image
+    - select:
+        kind: LLMInferenceServiceConfig
+        name: kserve-config-llm-prefill-template
+      fieldPaths:
+        - spec.prefill.template.containers.[name=main].image
+    - select:
+        kind: LLMInferenceServiceConfig
+        name: kserve-config-llm-prefill-worker-data-parallel
+      fieldPaths:
+        - spec.prefill.template.containers.[name=main].image
+        - spec.prefill.worker.containers.[name=main].image
+    - select:
+        kind: LLMInferenceServiceConfig
+        name: kserve-config-llm-template
+      fieldPaths:
+        - spec.template.containers.[name=main].image
+    - select:
+        kind: LLMInferenceServiceConfig
+        name: kserve-config-llm-worker-data-parallel
+      fieldPaths:
+        - spec.template.containers.[name=main].image
+        - spec.worker.containers.[name=main].image
 
 configMapGenerator:
 - envs:
@@ -61,6 +152,20 @@ vars:
     apiVersion: v1
     kind: ConfigMap
     name: kserve-parameters
+- fieldref:
+    fieldpath: data.kserve-llm-d-inference-scheduler
+  name: kserve-llm-d-inference-scheduler
+  objref:
+    apiVersion: v1
+    kind: ConfigMap
+    name: kserve-parameters
+- fieldref:
+    fieldpath: data.kserve-llm-d-routing-sidecar
+  name: kserve-llm-d-routing-sidecar
+  objref:
+    apiVersion: v1
+    kind: ConfigMap
+    name: kserve-parameters
 
 configurations:
-  - params.yaml
+- params.yaml

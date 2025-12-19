@@ -30,4 +30,6 @@ spec:
           name: https
       - name: manager
         args:
+        # When changing args, also update manager.yaml because the following
+        # list of args will fully override the arguments in manager.yaml.
         - "--metrics-addr=127.0.0.1:8080"

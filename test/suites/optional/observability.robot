@@ -11,6 +11,7 @@ Resource            ../../resources/kubeconfig.resource
 Resource            ../../resources/common.resource
 Resource            ../../resources/systemd.resource
 Resource            ../../resources/observability.resource
+Resource            ../../resources/microshift-network.resource
 
 Suite Setup         Setup Suite And Prepare Test Host
 Suite Teardown      Teardown Suite And Revert Test Host
@@ -45,12 +46,12 @@ Kube Metrics Are Exported
 Journald Logs Are Exported
     [Documentation]    The opentelemetry-collector should be able to export journald logs.
 
-    Check Loki Query    ${LOKI_HOST}    ${LOKI_PORT}    {job="journald",exporter="OTLP"}
+    Check Loki Query    ${LOKI_HOST}    ${LOKI_PORT}    {service_name="journald"}
 
 Kube Events Logs Are Exported
     [Documentation]    The opentelemetry-collector should be able to export Kubernetes events.
 
-    Check Loki Query    ${LOKI_HOST}    ${LOKI_PORT}    {job="kube_events",exporter="OTLP"}
+    Check Loki Query    ${LOKI_HOST}    ${LOKI_PORT}    {service_name="kube_events"}
 
 Logs Should Not Contain Receiver Errors
     [Documentation]    Internal receiver errors are not treated as fatal. Typically these are due to a misconfiguration
@@ -65,11 +66,12 @@ Logs Should Not Contain Receiver Errors
 Setup Suite And Prepare Test Host
     [Documentation]    The service starts after MicroShift starts and thus will start generating pertinent log data
     ...    right away. When the suite is executed, immediately get the cursor for the microshift-observability unit.
-    Start Prometheus Server    ${PROMETHEUS_PORT}
-    Start Loki Server    ${LOKI_PORT}
-    Setup Suite
+    Setup Suite With Namespace
     Check Required Observability Variables
     Set Test OTEL Configuration
+    # We need to do something to the cluster to generate new kube events.
+    Create Hello MicroShift Pod
+    Expose Hello MicroShift
     ${cur}    Get Journal Cursor    unit=microshift-observability
     VAR    ${JOURNAL_CUR}    ${cur}    scope=SUITE
 
@@ -79,10 +81,8 @@ Check Required Observability Variables
     ${string_value}    Convert To String    ${PROMETHEUS_PORT}
     Should Not Be Empty    ${string_value}    PROMETHEUS_PORT variable is required
     Should Not Be Empty    ${LOKI_HOST}    LOKI_HOST variable is required
-    ${string_value}    Convert To String    ${LOKI_PORT}
-    Should Not Be Empty    ${string_value}    LOKI_PORT variable is required
-    ${string_value}    Convert To String    ${PROM_EXPORTER_PORT}
-    Should Not Be Empty    ${string_value}    PROM_EXPORTER_PORT variable is required
+    ${string_value}    Convert To String    ${LOKI_HOST}
+    Should Not Be Empty    ${string_value}    LOKI_HOST variable is required
 
 Set Test OTEL Configuration
     [Documentation]    Set Test OTEL Configuration
@@ -97,9 +97,7 @@ Set Test OTEL Configuration
 Teardown Suite And Revert Test Host
     [Documentation]    Set back original OTEL config and teardown Suite
     Set Back Original OTEL Configuration
-    Teardown Suite
-    Stop Loki Server    ${LOKI_PORT}
-    Stop Prometheus Server    ${PROMETHEUS_PORT}
+    Teardown Suite With Namespace
 
 Set Back Original OTEL Configuration
     [Documentation]    Set Back Original OTEL Configuration

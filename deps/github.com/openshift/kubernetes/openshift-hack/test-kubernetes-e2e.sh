@@ -29,7 +29,7 @@ NETWORK_SKIPS="\[Skipped:Network/OVNKubernetes\]|\[Feature:Networking-IPv6\]|\[F
 
 # Support serial and parallel test suites
 TEST_SUITE="${TEST_SUITE:-parallel}"
-COMMON_SKIPS="\[Slow\]|\[Disruptive\]|\[Flaky\]|\[Disabled:.+\]|\[Skipped:${PLATFORM}\]|${NETWORK_SKIPS}"
+COMMON_SKIPS="\[Slow\]|\[Disruptive\]|\[Flaky\]|\[Disabled:.+\]|\[Skipped:${PLATFORM}\]|\[DedicatedJob\]|${NETWORK_SKIPS}"
 # Skip tests for features that require a TechPreview cluster. TODO: Remove when the feature is enabled by default.
 COMMON_SKIPS="\[OCPFeatureGate:VolumeGroupSnapshot\]|\[Feature:OffByDefault\]|\[DRA\]|${COMMON_SKIPS}"
 

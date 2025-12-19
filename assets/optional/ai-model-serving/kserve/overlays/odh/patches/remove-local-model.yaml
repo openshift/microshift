@@ -1,0 +1,75 @@
+$patch: delete
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kserve-localmodel-controller-manager
+  namespace: kserve
+---
+$patch: delete
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: kserve-localmodelnode-agent
+  namespace: kserve
+---
+$patch: delete
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingWebhookConfiguration
+metadata:
+  name: localmodelcache.serving.kserve.io
+---
+$patch: delete
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: kserve-localmodelnode-agent-role
+---
+$patch: delete
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: kserve-localmodelnode-agent-rolebinding
+---
+$patch: delete
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: kserve-localmodelnode-agent
+  namespace: kserve
+---
+$patch: delete
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: kserve-localmodel-manager-role
+---
+$patch: delete
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: kserve-localmodel-manager-rolebinding
+---
+$patch: delete
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: kserve-localmodel-controller-manager
+  namespace: kserve
+---
+$patch: delete
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: localmodelcaches.serving.kserve.io
+---
+$patch: delete
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: localmodelnodes.serving.kserve.io
+---
+$patch: delete
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: localmodelnodegroups.serving.kserve.io
