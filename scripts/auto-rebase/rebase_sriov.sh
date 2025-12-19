@@ -244,6 +244,13 @@ extract_operator_from_csv() {
     local namespace="$2"
     local target="$3"
 
+    # SRIOV_CNI_BIN_PATH override the default CNI bin path used by the operator
+    # to be consistent with the CNI path use by other components.
+    #
+    # SRIOV_BIN_FILE overrides the default SRIOV binary file copied to the CNI
+    # bin path by the sriov-network-config container. This is necessary because
+    # the copy script fails to detect RHEL 10 host operating system. With this
+    # setting, the RHEL 9 binary will be copied on both RHEL 9 and 10.
     yq eval "
         .spec.install.spec.deployments[]
         | select(.name == \"sriov-network-operator\")
@@ -254,6 +261,7 @@ extract_operator_from_csv() {
         | del(.name)
         | del(.label)
         | .spec.template.spec.containers[0].env += [{\"name\": \"SRIOV_CNI_BIN_PATH\", \"value\": \"/run/cni/bin\"}]
+        | .spec.template.spec.containers[0].env += [{\"name\": \"SRIOV_BIN_FILE\", \"value\": \"/usr/bin/rhel9/sriov\"}]
       " "${csv}" > "${target}"
 }
 

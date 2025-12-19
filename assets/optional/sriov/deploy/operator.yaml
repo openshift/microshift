@@ -77,6 +77,8 @@ spec:
               value: 4.20.0
             - name: SRIOV_CNI_BIN_PATH
               value: /run/cni/bin
+            - name: SRIOV_BIN_FILE
+              value: /usr/bin/rhel9/sriov
             - name: CLUSTER_TYPE
               value: kubernetes
           image: registry.redhat.io/openshift4/ose-sriov-network-rhel9-operator@sha256:edf864070393e01c4423ead4f86a066cb2e083de870ad84e1367c6c0fee5c84d
