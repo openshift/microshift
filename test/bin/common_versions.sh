@@ -75,9 +75,9 @@ get_redhat_bootc_image_url() {
 
     # get arch
     local arch=""
-    if [ "${UNAME_M}" = "x86_64" ]; then
+    if [[ "${UNAME_M}" =~ x86 ]]; then
         arch="amd64"
-    elif [ "${UNAME_M}" = "aarch64" ]; then
+    elif [[ "${UNAME_M}" =~ aarch ]]; then
         arch="arm64"
     fi
 
