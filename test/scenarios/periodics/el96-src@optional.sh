@@ -45,6 +45,6 @@ scenario_run_tests() {
     --variable "PROMETHEUS_HOST:$(hostname)" \
     --variable "LOKI_HOST:$(hostname)" \
     --exclude generic-device-plugin \
-    ${skip_args} \
+    "${skip_args}" \
     suites/optional/
 }
