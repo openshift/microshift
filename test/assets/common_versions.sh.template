@@ -72,6 +72,7 @@ get_redhat_bootc_image_url() {{
     local -r registry="$1"
     local -r release_version="$2"
     local image_url=""
+
     # get arch
     local arch=""
     if [[ "{ARCH}" =~ x86 ]]; then
