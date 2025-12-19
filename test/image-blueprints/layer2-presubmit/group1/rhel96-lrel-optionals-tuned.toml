@@ -1,0 +1,125 @@
+{{- if and (env.Getenv "BREW_LREL_RELEASE_VERSION" "") (env.Getenv "BREW_Y1_RELEASE_VERSION" "") -}}
+{{- /*
+
+  We wrap this template in a test so that the body of the output is
+  empty when there is no "current" version release. The output file
+  must end up completely empty, so we need to remove whitespace from
+  around the first and last template instructions.
+
+*/ -}}
+
+name = "rhel-9.6-microshift-brew-tuned-4.{{ .Env.MINOR_VERSION}}-{{ .Env.LATEST_RELEASE_TYPE}}"
+description = "A RHEL 9.6 image with already built and released RPMs like EC, RC, or Z-stream release: {{ .Env.BREW_LREL_RELEASE_VERSION }}"
+version = "0.0.1"
+modules = []
+groups = []
+distro = "rhel-96"
+
+# Parent specification directive recognized by test/bin/build_images.sh to be
+# used with the '--parent' argument of 'osbuild-composer'
+# parent = "rhel-9.6-microshift-brew-optionals-4.{{ .Env.PREVIOUS_MINOR_VERSION }}-zstream"
+
+{{ range (env.Getenv "MICROSHIFT_MANDATORY_RPMS" | strings.Split " ") }}
+[[packages]]
+name = "{{ . }}"
+version = "{{ env.Getenv "BREW_LREL_RELEASE_VERSION" }}"
+{{ end }}
+
+{{ range (env.Getenv "MICROSHIFT_OPTIONAL_RPMS" | strings.Split " ") }}
+[[packages]]
+name = "{{ . }}"
+version = "{{ env.Getenv "BREW_LREL_RELEASE_VERSION" }}"
+{{ end }}
+
+{{- if and (env.Getenv "UNAME_M" "") (eq "x86_64" .Env.UNAME_M) }}
+{{ range (env.Getenv "MICROSHIFT_X86_64_RPMS" | strings.Split " ") }}
+[[packages]]
+name = "{{ . }}"
+version = "{{ env.Getenv "BREW_LREL_RELEASE_VERSION" }}"
+{{ end }}
+{{- end }}
+
+[[packages]]
+name = "microshift-test-agent"
+version = "*"
+
+[[packages]]
+name = "systemd-resolved"
+version = "*"
+
+{{- if and (env.Getenv "UNAME_M" "") (eq "x86_64" .Env.UNAME_M) }}
+# Kernel RT is only available for x86_64
+[customizations.kernel]
+name = "kernel-rt"
+{{- end }}
+
+[customizations.services]
+enabled = ["microshift-test-agent", "microshift", "microshift-tuned"]
+
+[customizations.firewall]
+ports = [
+    "22:tcp",
+    "80:tcp",
+    "443:tcp",
+    "5353:udp",
+    "6443:tcp",
+    "8889:tcp",
+    "30000-32767:tcp",
+    "30000-32767:udp",
+]
+
+[customizations.firewall.services]
+enabled = ["mdns", "ssh", "http", "https"]
+
+[[customizations.firewall.zones]]
+name = "trusted"
+sources = ["10.42.0.0/16", "169.254.169.1", "fd01::/48"]
+
+[[customizations.files]]
+path = "/etc/microshift/config.yaml"
+data = """
+kubelet:
+  cpuManagerPolicy: static
+  cpuManagerPolicyOptions:
+    full-pcpus-only: "true"
+  cpuManagerReconcilePeriod: 5s
+  memoryManagerPolicy: Static
+  topologyManagerPolicy: single-numa-node
+  reservedSystemCPUs: 0-1
+  reservedMemory:
+  - limits:
+      memory: 1100Mi
+    numaNode: 0
+  kubeReserved:
+    memory: 500Mi
+  systemReserved:
+    memory: 500Mi
+  evictionHard:
+    imagefs.available: 15%
+    memory.available: 100Mi
+    nodefs.available: 10%
+    nodefs.inodesFree: 5%
+  evictionPressureTransitionPeriod: 0s
+"""
+
+[[customizations.files]]
+path = "/etc/tuned/microshift-baseline-variables.conf"
+data = """
+# Isolated cores should be complementary to kubelet's reserved CPUs.
+# Isolated and reserved CPUs should contain all online CPUs.
+# Core #3 is for testing offlining hence skipped.
+isolated_cores=2,4-5
+hugepages_size=2M
+hugepages=10
+additional_args=test1=on test2=true dummy
+offline_cpu_set=3
+"""
+
+[[customizations.files]]
+path = "/etc/microshift/tuned.yaml"
+data = """
+profile: microshift-baseline
+reboot_after_apply: True
+"""
+
+{{- end -}}
