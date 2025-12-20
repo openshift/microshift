@@ -15,8 +15,8 @@ Test Tags           ipv6    network
 
 
 *** Variables ***
-${USHIFT_HOST}          ${EMPTY}
-${HOSTNAME}             hello-microshift.dualstack.cluster.local
+${USHIFT_HOST}      ${EMPTY}
+${HOSTNAME}         hello-microshift.dualstack.cluster.local
 
 
 *** Test Cases ***
