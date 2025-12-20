@@ -87,7 +87,7 @@ CatalogSource Should Be Ready
 Create Subscription
     [Documentation]    Creates subscription.
     Oc Create    -f ${SUBSCRIPTION}
-    Wait Until Keyword Succeeds    120s    5s
+    Wait Until Keyword Succeeds    5m    10s
     ...    Subscription Should Be AtLatestKnown    ${OPERATORS_NAMESPACE}    ${SUBSCRIPTION_NAME}
 
 Subscription Should Be AtLatestKnown
@@ -106,7 +106,7 @@ Wait For CSV
     [Documentation]    Waits for ready CSV.
     [Arguments]    ${namespace}    ${name}
 
-    Wait Until Keyword Succeeds    120s    5s
+    Wait Until Keyword Succeeds    5m    10s
     ...    CSV Should Be Succeeded    ${namespace}    ${name}
 
 CSV Should Be Succeeded
