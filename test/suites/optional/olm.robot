@@ -4,6 +4,7 @@ Documentation       Operator Lifecycle Manager on MicroShift
 Resource            ../../resources/common.resource
 Resource            ../../resources/microshift-process.resource
 Resource            ../../resources/microshift-rpm.resource
+Library             DataFormats.py
 
 Suite Setup         Setup
 Suite Teardown      Teardown
@@ -49,6 +50,7 @@ Setup Test
     [Documentation]    Test setup
     TRY
         OLM Should Be Ready
+        Download CatalogSource Image
         Create CatalogSource
         Create Subscription
     EXCEPT
@@ -66,6 +68,18 @@ OLM Should Be Ready
     [Documentation]    Verify that OLM is running.
     Named Deployment Should Be Available    catalog-operator    openshift-operator-lifecycle-manager
     Named Deployment Should Be Available    olm-operator    openshift-operator-lifecycle-manager
+
+Download CatalogSource Image
+    [Documentation]    CatalogSource container image contains a few gigabytes of data.
+    ...    Preload it to avoid timeouts during the CatalogSource resource creation.
+    ${yaml_content}=    OperatingSystem.Get File    ${CATALOG_SOURCE}
+    ${yaml_data}=    Yaml Parse    ${yaml_content}
+    VAR    ${image}=    ${yaml_data.spec.image}
+
+    ${stdout}    ${stderr}    ${rc}=    Execute Command
+    ...    podman pull ${image}
+    ...    return_stdout=True    return_stderr=True    return_rc=True    sudo=True
+    Should Be Equal As Integers    0    ${rc}
 
 Create CatalogSource
     [Documentation]    Create CatalogSource resource with Red Hat Community Catalog Index.
