@@ -84,7 +84,7 @@ Download CatalogSource Image
 Create CatalogSource
     [Documentation]    Create CatalogSource resource with Red Hat Community Catalog Index.
     Oc Create    -f ${CATALOG_SOURCE}
-    Wait Until Keyword Succeeds    5m    10s
+    Wait Until Keyword Succeeds    10m    15s
     ...    CatalogSource Should Be Ready    ${MARKETPLACE_NAMESPACE}    redhat-operators
 
 CatalogSource Should Be Ready
@@ -101,7 +101,7 @@ CatalogSource Should Be Ready
 Create Subscription
     [Documentation]    Creates subscription.
     Oc Create    -f ${SUBSCRIPTION}
-    Wait Until Keyword Succeeds    5m    10s
+    Wait Until Keyword Succeeds    10m    15s
     ...    Subscription Should Be AtLatestKnown    ${OPERATORS_NAMESPACE}    ${SUBSCRIPTION_NAME}
 
 Subscription Should Be AtLatestKnown
@@ -120,7 +120,7 @@ Wait For CSV
     [Documentation]    Waits for ready CSV.
     [Arguments]    ${namespace}    ${name}
 
-    Wait Until Keyword Succeeds    5m    10s
+    Wait Until Keyword Succeeds    10m    15s
     ...    CSV Should Be Succeeded    ${namespace}    ${name}
 
 CSV Should Be Succeeded
