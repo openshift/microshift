@@ -34,6 +34,13 @@ def add_brackets_if_ipv6(ip: str) -> str:
     """
     Add square brackets to the given IP if its ipv6 for later use in other tools (e.g. curl)
     """
+
+    # If it's a hostname (not a valid IP address), return it as-is
+    try:
+        ipaddress.ip_address(ip)
+    except ValueError:
+        return ip
+
     if is_ipv6(ip):
         return f"[{ip}]"
     return ip
