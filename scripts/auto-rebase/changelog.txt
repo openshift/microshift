@@ -1,6 +1,3 @@
-- ovn-kubernetes image-amd64 187ee3d355dc5e2b5ed8e2cfbd2d3342e66c14be to 5190b4a6433b4a18f29ba1a5df541ba95e225e04
-  - 6b0f4700 2025-12-09T08:52:15-08:00 Add ricky-rav to OWNERS for release-4.17
-
-- ovn-kubernetes image-arm64 187ee3d355dc5e2b5ed8e2cfbd2d3342e66c14be to 5190b4a6433b4a18f29ba1a5df541ba95e225e04
-  - 6b0f4700 2025-12-09T08:52:15-08:00 Add ricky-rav to OWNERS for release-4.17
+- operator-framework-olm embedded-component 12fbe1b70635c5c100a6a5fc5734280a17a95c3d to 52652d0744d7cf955defb84d38f45bfe640d7850
+  - 3b968a15 2025-12-12T14:17:47+01:00 Fix TOCTOU race condition in ensureInstallPlan (#3682)
 
