@@ -28,7 +28,7 @@ CNCF_SYSTEMD_LOGS_VERSION = "v0.4"
 GITOPS_VERSION = "1.16"
 
 # Set the release type to ec, rc or zstream
-LATEST_RELEASE_TYPE = "ec"
+LATEST_RELEASE_TYPE = "rc"
 
 logging.basicConfig(
     level=logging.INFO,
