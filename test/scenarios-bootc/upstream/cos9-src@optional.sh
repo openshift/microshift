@@ -11,13 +11,6 @@ scenario_create_vms() {
     LVM_SYSROOT_SIZE=20480 prepare_kickstart host1 kickstart-bootc.ks.template cos9-bootc-source-optionals
     # Two nics - one for macvlan, another for ipvlan (they cannot enslave the same interface)
     launch_vm --boot_blueprint centos9-bootc --network "${VM_MULTUS_NETWORK},${VM_MULTUS_NETWORK}" --vm_disksize 25
-
-    # Open the firewall ports. Other scenarios get this behavior by
-    # embedding settings in the blueprint, but there is no blueprint
-    # for this scenario. We need do this step before running the RF
-    # suite so that suite can assume it can reach all of the same
-    # ports as for any other test.
-    configure_vm_firewall host1
 }
 
 scenario_remove_vms() {
