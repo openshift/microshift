@@ -22,8 +22,8 @@ scenario_create_vms() {
     exit_if_commit_not_found "${start_image}"
 
     # Three nics - one for sriov, one for macvlan, another for ipvlan (they cannot enslave the same interface)
-    prepare_kickstart host1 kickstart.ks.template "${start_image}"
-    launch_vm  --network "${VM_MULTUS_NETWORK},${VM_MULTUS_NETWORK},sriov"
+    LVM_SYSROOT_SIZE=20480 prepare_kickstart host1 kickstart.ks.template "${start_image}"
+    launch_vm  --network "${VM_MULTUS_NETWORK},${VM_MULTUS_NETWORK},sriov" --vm_disksize 25
 }
 
 scenario_remove_vms() {
