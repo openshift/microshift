@@ -22,7 +22,7 @@ function skopeo_retry() {
     for attempt in $(seq 3) ; do
         if ! skopeo "$@" ; then
             echo "WARNING: Failed to run skopeo, retry #${attempt}" >&2
-            echo "WARNING: skopeo $@" >&2
+            echo "WARNING: skopeo $*" >&2
         else
             return 0
         fi

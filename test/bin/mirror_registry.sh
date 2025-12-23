@@ -321,8 +321,27 @@ finalize_registry() {
     rm -f "${QUAY_PULL_SECRET}"
 }
 
+get_release_info_images() {
+    local -r idir=$1
+    local -r ofile=$2
+
+    find "${idir}" -name "release-*$(uname -m).json" | while read -r json; do
+        for img in $(jq -r '.images[]' "${json}"); do
+            [ -z "${img}" ] && continue
+            # Skip OpenDataHub, llm-d and Red Hat AI images because they are too large to mirror
+            [[ "${img}" =~ "/opendatahub/" ]] && continue
+            [[ "${img}" =~ "/llm-d/" ]] && continue
+            [[ "${img}" =~ "/rhaiis/" ]] && continue
+            [[ "${img}" =~ "/modh/" ]] && continue
+
+            echo "${img}" >> "${ofile}"
+        done
+    done
+}
+
 mirror_images() {
     local -r ifile=$1
+    local -r ri_dir=$2
     local -r ffile=$(mktemp /tmp/from-list.XXXXXXXX)
     local -r ofile=$(mktemp /tmp/container-list.XXXXXXXX)
 
@@ -335,18 +354,22 @@ mirror_images() {
         echo "${src_img}" >> "${ffile}"
     done
 
-    # Add release info images
-    find ${SCRIPTDIR}/../../assets/ -name "release-*$(uname -m).json" | while read -r json; do
-        for img in $(jq -r '.images[]' "${json}"); do
-            [ -z "${img}" ] && continue
-            # Skip OpenDataHub, llm-d and Red Hat AI images because they are too large to mirror
-            [[ "${img}" =~ "/opendatahub/" ]] && continue
-            [[ "${img}" =~ "/llm-d/" ]] && continue
-            [[ "${img}" =~ "/rhaiis/" ]] && continue
+    # Add images extracted from brew release info RPMs
+    if [ -n "${ri_dir}" ]; then
+        local -r brew_workdir=$(mktemp -d /tmp/brew-workdir.XXXXXXXX)
+        find "${ri_dir}" -name 'microshift-*release-info*.rpm' | while read -r rpm ; do
+            local rpm_dir
+            rpm_dir="${brew_workdir}/$(basename "${rpm}")"
+            mkdir -p "${rpm_dir}"
 
-            echo "${img}" >> "${ffile}"
+            rpm2cpio "${rpm}" | cpio -idmu --quiet -D "${rpm_dir}"
+            get_release_info_images "${rpm_dir}" "${ffile}"
         done
-    done
+        rm -rf "${brew_workdir}"
+    fi
+
+    # Add release info images from the source directory
+    get_release_info_images "${SCRIPTDIR}/../../assets/" "${ffile}"
 
     # Add test assets images
     find "${SCRIPTDIR}/../assets/" -type f -exec grep -hPo "(?<=image: ).*\..*" {} \; | while read -r img; do
@@ -363,6 +386,8 @@ usage() {
     echo "Usage: ${0} [-cf FILE]"
     echo "   -cf FILE    File containing the container image references to mirror."
     echo "               Defaults to '${CONTAINER_LIST}', skipped if does not exist."
+    echo "   -ri DIR     Directory containing the release info RPM packages to"
+    echo "               extract the container image references from."
     echo ""
     echo "The registry data is stored at '${MIRROR_REGISTRY_DIR}' on the host."
     exit 1
@@ -372,6 +397,7 @@ usage() {
 # Main
 #
 image_list_file="${CONTAINER_LIST}"
+release_info_dir=""
 
 while [ $# -gt 0 ]; do
     case $1 in
@@ -379,6 +405,11 @@ while [ $# -gt 0 ]; do
         shift
         [ -z "$1" ] && usage
         image_list_file=$1
+        ;;
+    -ri)
+        shift
+        [ -z "$1" ] && usage
+        release_info_dir=$1
         ;;
     *)
         usage
@@ -392,8 +423,13 @@ if [ ! -f "${image_list_file}" ]; then
     exit 1
 fi
 
+if [ -n "${release_info_dir}" ] && [ ! -d "${release_info_dir}" ]; then
+    echo "ERROR: Directory '${release_info_dir}' does not exist"
+    exit 1
+fi
+
 setup_prereqs
 setup_registry
-mirror_images "${image_list_file}"
+mirror_images "${image_list_file}" "${release_info_dir}"
 finalize_registry
 echo "OK"
