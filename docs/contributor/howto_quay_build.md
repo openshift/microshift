@@ -47,7 +47,7 @@ git checkout "${QUAY_VER}"
 Install the RPM dependencies required to build Quay images from sources.
 
 ```
-sudo dnf install -y podman podman-compose
+sudo dnf install -y podman podman-docker podman-compose
 sudo ln -s $(which podman-compose) /usr/bin/docker-compose
 ```
 
