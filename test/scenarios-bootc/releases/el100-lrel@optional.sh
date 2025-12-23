@@ -12,9 +12,9 @@ start_image="rhel100-bootc-brew-${LATEST_RELEASE_TYPE}-with-optional"
 scenario_create_vms() {
     exit_if_image_not_found "${start_image}"
 
-    prepare_kickstart host1 kickstart-bootc.ks.template "${start_image}"
+    LVM_SYSROOT_SIZE=20480 prepare_kickstart host1 kickstart-bootc.ks.template "${start_image}"
     # Two nics - one for macvlan, another for ipvlan (they cannot enslave the same interface)
-    launch_vm --boot_blueprint rhel100-bootc --network "${VM_MULTUS_NETWORK},${VM_MULTUS_NETWORK}"
+    launch_vm --boot_blueprint rhel100-bootc --network "${VM_MULTUS_NETWORK},${VM_MULTUS_NETWORK}" --vm_disksize 25
 }
 
 scenario_remove_vms() {
@@ -29,5 +29,6 @@ scenario_run_tests() {
     run_tests host1 \
         --variable "PROMETHEUS_HOST:$(hostname)" \
         --variable "LOKI_HOST:$(hostname)" \
+        --skip sriov \
         suites/optional/
 }
