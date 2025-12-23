@@ -34,10 +34,12 @@ scenario_run_tests() {
     # - packaging serialsim as an RPM
     # - including the RPM in the ostree blueprint
     # GDP suite is tested with bootc images instead.
+    #
+    # shellcheck disable=SC2086
     run_tests host1 \
     --variable "PROMETHEUS_HOST:$(hostname)" \
     --variable "LOKI_HOST:$(hostname)" \
     --exclude generic-device-plugin \
-    "${skip_args}" \
+    ${skip_args} \
     suites/optional/
 }

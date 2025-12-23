@@ -35,9 +35,10 @@ scenario_run_tests() {
     if [[ "${UNAME_M}" =~ aarch64 ]]; then
         skip_args="--skip sriov"
     fi
+    # shellcheck disable=SC2086
     run_tests host1 \
         --variable "PROMETHEUS_HOST:$(hostname)" \
         --variable "LOKI_HOST:$(hostname)" \
-        "${skip_args}" \
+        ${skip_args} \
         suites/optional/
 }
