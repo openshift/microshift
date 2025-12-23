@@ -335,7 +335,20 @@ mirror_images() {
         echo "${src_img}" >> "${ffile}"
     done
 
-    # Add test assets images.
+    # Add release info images
+    find ${SCRIPTDIR}/../../assets/ -name "release-*$(uname -m).json" | while read -r json; do
+        for img in $(jq -r '.images[]' "${json}"); do
+            [ -z "${img}" ] && continue
+            # Skip OpenDataHub, llm-d and Red Hat AI images because they are too large to mirror
+            [[ "${img}" =~ "/opendatahub/" ]] && continue
+            [[ "${img}" =~ "/llm-d/" ]] && continue
+            [[ "${img}" =~ "/rhaiis/" ]] && continue
+
+            echo "${img}" >> "${ffile}"
+        done
+    done
+
+    # Add test assets images
     find "${SCRIPTDIR}/../assets/" -type f -exec grep -hPo "(?<=image: ).*\..*" {} \; | while read -r img; do
         echo "${img}" >> "${ffile}"
     done
