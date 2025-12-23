@@ -8,9 +8,9 @@ VM_BRIDGE_IP="$(get_vm_bridge_ip "${VM_MULTUS_NETWORK}")"
 WEB_SERVER_URL="http://${VM_BRIDGE_IP}:${WEB_SERVER_PORT}"
 
 scenario_create_vms() {
-    prepare_kickstart host1 kickstart-bootc.ks.template cos10-bootc-source-optionals
+    LVM_SYSROOT_SIZE=20480 prepare_kickstart host1 kickstart-bootc.ks.template cos10-bootc-source-optionals
     # Two nics - one for macvlan, another for ipvlan (they cannot enslave the same interface)
-    launch_vm --boot_blueprint centos10-bootc --network "${VM_MULTUS_NETWORK},${VM_MULTUS_NETWORK}"
+    launch_vm --boot_blueprint centos10-bootc --network "${VM_MULTUS_NETWORK},${VM_MULTUS_NETWORK}" --vm_disksize 25
 
     # Open the firewall ports. Other scenarios get this behavior by
     # embedding settings in the blueprint, but there is no blueprint

@@ -13,9 +13,9 @@ scenario_create_vms() {
     if [[ "${UNAME_M}" =~ aarch64 ]]; then
         networks="${VM_MULTUS_NETWORK},${VM_MULTUS_NETWORK}"
     fi
-    prepare_kickstart host1 kickstart.ks.template rhel-9.6-microshift-source-optionals
+    LVM_SYSROOT_SIZE=20480 prepare_kickstart host1 kickstart.ks.template rhel-9.6-microshift-source-optionals
     # Three nics - one for sriov, one for macvlan, another for ipvlan (they cannot enslave the same interface)
-    launch_vm  --network "${networks}"
+    launch_vm  --network "${networks}" --vm_disksize 25
 
     # Open the firewall ports. Other scenarios get this behavior by
     # embedding settings in the blueprint, but there is no blueprint

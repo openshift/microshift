@@ -17,9 +17,9 @@ scenario_create_vms() {
     if [[ "${UNAME_M}" =~ aarch64 ]]; then
         networks="${VM_MULTUS_NETWORK},${VM_MULTUS_NETWORK}"
     fi
+    LVM_SYSROOT_SIZE=20480 prepare_kickstart host1 kickstart.ks.template "${start_image}"
     # Three nics - one for sriov, one for macvlan, another for ipvlan (they cannot enslave the same interface)
-    prepare_kickstart host1 kickstart.ks.template "${start_image}"
-    launch_vm  --network "${networks}"
+    launch_vm  --network "${networks}" --vm_disksize 25
 }
 
 scenario_remove_vms() {
