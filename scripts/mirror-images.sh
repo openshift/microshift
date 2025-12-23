@@ -22,6 +22,7 @@ function skopeo_retry() {
     for attempt in $(seq 3) ; do
         if ! skopeo "$@" ; then
             echo "WARNING: Failed to run skopeo, retry #${attempt}" >&2
+            echo "WARNING: skopeo $@" >&2
         else
             return 0
         fi
@@ -39,7 +40,8 @@ function skopeo_opts_for_image() {
     # Cannot copy a single platform for manifest image references
     local media_type
     media_type=$(skopeo_retry inspect --raw --authfile "${img_pull_file}" "${img_src_ref}" | jq -r .mediaType)
-    if [ "${media_type}" == "application/vnd.docker.distribution.manifest.list.v2+json" ] ; then
+    if [ "${media_type}" == "application/vnd.docker.distribution.manifest.list.v2+json" ] ||
+       [ "${media_type}" == "application/vnd.oci.image.index.v1+json" ] ; then
         echo -n "--all"
     fi
     echo -n ""
