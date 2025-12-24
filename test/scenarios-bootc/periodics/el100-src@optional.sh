@@ -9,7 +9,8 @@ WEB_SERVER_URL="http://${VM_BRIDGE_IP}:${WEB_SERVER_PORT}"
 
 scenario_create_vms() {
     # Skip sriov network on ARM because the igb driver is not supported.
-    local networks="${VM_MULTUS_NETWORK},${VM_MULTUS_NETWORK},sriov"
+    # TODO: Skip sriov on RHEL 10 until USHIFT-6400 is resolved.
+    local networks="${VM_MULTUS_NETWORK},${VM_MULTUS_NETWORK}" #,sriov"
     if [[ "${UNAME_M}" =~ aarch64 ]]; then
         networks="${VM_MULTUS_NETWORK},${VM_MULTUS_NETWORK}"
     fi
@@ -23,7 +24,8 @@ scenario_remove_vms() {
 }
 
 scenario_run_tests() {
-    local skip_args=""
+    # TODO: Skip sriov on RHEL 10 until USHIFT-6400 is resolved.
+    local skip_args="--skip sriov"
     if [[ "${UNAME_M}" =~ aarch64 ]]; then
         skip_args="--skip sriov"
     fi
