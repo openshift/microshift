@@ -8,27 +8,30 @@ KUBECONFIG=${KUBECONFIG:-/var/lib/microshift/resources/kubeadmin/kubeconfig}
 ns="test-lvms"
 appLabel="app-lvms"
 
-echo "INFO:" "Check if deployment Pod is 'Running'......."
+echo "INFO:" "Waiting for deployment Pod to be created (max 2-minutes)....."
 iter=24
 period=5
-podName=$(sudo oc --kubeconfig "${KUBECONFIG}" get pod -n ${ns} -l app=${appLabel} --no-headers | awk '{print $1}')
+podName=""
+while [[ "${podName}" == "" && ${iter} -gt 0 ]]; do
+  podName=$(sudo oc --kubeconfig "${KUBECONFIG}" get pod -n ${ns} -l app=${appLabel} --no-headers 2>/dev/null | awk '{print $1}')
+  if [ "${podName}" == "" ]; then
+    (( iter -- ))
+    sleep ${period}
+  fi
+done
+
 if [ "${podName}" == "" ]; then
-  echo "ERROR:" "Deployment Pod not found."
+  echo "ERROR:" "Deployment Pod not found after waiting."
   exit 1
 fi
+echo "INFO:" "Pod ${podName} found."
 
-echo "INFO:" "Waiting for Pod to become ready(max 2-minutes)....."
-result=""
-while [[ "${result}" != "Running" && ${iter} -gt 0 ]]; do
-  #shellcheck disable=SC1083
-  result=$(sudo oc --kubeconfig "${KUBECONFIG}" get pod "${podName}" -n "${ns}" -o=jsonpath={.status.phase})
-  (( iter -- ))
-  sleep ${period}
-done
-if [ "${result}" == "Running" ]; then
-  echo "INFO:" "Deployment Pod is Running."
+# Now wait for the pod to be ready (all containers initialized and ready)
+echo "INFO:" "Waiting for Pod and all containers to be ready (max 3-minutes)....."
+if sudo oc --kubeconfig "${KUBECONFIG}" wait --for=condition=Ready pod/"${podName}" -n "${ns}" --timeout=180s; then
+  echo "INFO:" "Deployment Pod is Ready."
 else
-  echo "ERROR:" "Deployment Pod is not in 'Running' state."
+  echo "ERROR:" "Pod did not become ready within timeout."
   sudo oc --kubeconfig "${KUBECONFIG}" -n "${ns}" describe pod "${podName}"
   exit 1
 fi
