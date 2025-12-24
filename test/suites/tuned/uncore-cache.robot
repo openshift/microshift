@@ -77,10 +77,10 @@ Cleanup CPU State
     Remove Files    ${KUBELET_CPU_STATE_FILE}
 
 Check FeatureGates Is Enabled
-    [Documentation]    Skip suite if CoreDNS hosts feature is not available
+    [Documentation]    Skip suite if FeatureGates feature is not available
     ${config}=    Show Config    default
     TRY
         VAR    ${featuregates}=    ${config}[apiServer][featureGates]
     EXCEPT
-        Skip    CoreDNS hosts feature not available in this MicroShift version
+        Skip    FeatureGates feature not available in this MicroShift version
     END

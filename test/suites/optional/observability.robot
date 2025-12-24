@@ -108,9 +108,13 @@ Set Back Original OTEL Configuration
 Render Otel Test Config
     [Documentation]    Set IPs and ports in OTEL config yaml
 
-    Command Should Work    sed -i "s|{{NODE_IP}}|${USHIFT_HOST}|g" ${OTEL_CONFIG_PATH}
-    Command Should Work    sed -i "s|{{PROMETHEUS_HOST}}|${PROMETHEUS_HOST}|g" ${OTEL_CONFIG_PATH}
+    ${ushift_host_formatted}    Add Brackets If Ipv6    ${USHIFT_HOST}
+    ${prometheus_host_formatted}    Add Brackets If Ipv6    ${PROMETHEUS_HOST}
+    ${loki_host_formatted}    Add Brackets If Ipv6    ${LOKI_HOST}
+
+    Command Should Work    sed -i "s|{{NODE_IP}}|${ushift_host_formatted}|g" ${OTEL_CONFIG_PATH}
+    Command Should Work    sed -i "s|{{PROMETHEUS_HOST}}|${prometheus_host_formatted}|g" ${OTEL_CONFIG_PATH}
     Command Should Work    sed -i "s|{{PROMETHEUS_PORT}}|${PROMETHEUS_PORT}|g" ${OTEL_CONFIG_PATH}
-    Command Should Work    sed -i "s|{{LOKI_HOST}}|${LOKI_HOST}|g" ${OTEL_CONFIG_PATH}
+    Command Should Work    sed -i "s|{{LOKI_HOST}}|${loki_host_formatted}|g" ${OTEL_CONFIG_PATH}
     Command Should Work    sed -i "s|{{LOKI_PORT}}|${LOKI_PORT}|g" ${OTEL_CONFIG_PATH}
     Command Should Work    sed -i "s|{{PROM_EXPORTER_PORT}}|${PROM_EXPORTER_PORT}|g" ${OTEL_CONFIG_PATH}
