@@ -1,18 +1,5 @@
-- api embedded-component e1518e359600c751717baa421de9dbaa86671515 to 482f1b56dcc4d97ab9d3f7c22f102ecb54af83bb
-  - 7bff45f1 2025-12-15T22:26:43+01:00 OCPBUGS-61858: Add HTTPKeepAliveTimeout to IngressController API
-
-- cluster-ingress-operator embedded-component ec434c6706b1acd3d21d6eb29cf0f0112666c7dd to 7ce99b2c11f456e0e6e3cfa80ebf7682466eb0ea
-  - 9b6dd45 2025-12-17T18:16:41+01:00 OCPBUGS-61858: Implement e2e test for HTTPKeepAliveTimeout
-  - df9cb8d 2025-12-17T18:16:41+01:00 OCPBUGS-61858: Implement HTTPKeepAliveTimeout tuning option
-  - 4c4fddd 2025-12-17T18:16:41+01:00 OCPBUGS-61858: Bump openshift/api to get HTTPKeepAliveTimeout tuning option
-  - 67fc892 2025-11-18T15:49:28+00:00 OCPBUGS-61508: IngressOperator not exposing some metrics for degraded IngressController
-
-- machine-config-operator embedded-component 6fd31b7e48fefb01d263cd19b733aca57ba2cf95 to 1953be053180f4ffd129c69d59e0b1cb9d211b1a
-  - 00eaa31d 2025-12-15T10:04:30-05:00 e2e test: update  to wait until test node returns to ready
-
-- oc image-amd64 581d48a297ae8c89a7dbefedd6694b1ab300c082 to 24755b6e82745a4dfa5a6db4b467564c237f244c
-  - 42b145aa 2025-11-18T20:11:16+00:00 pkg/cli/admin/upgrade: Tighten force warnings
-
-- oc image-arm64 581d48a297ae8c89a7dbefedd6694b1ab300c082 to 24755b6e82745a4dfa5a6db4b467564c237f244c
-  - 42b145aa 2025-11-18T20:11:16+00:00 pkg/cli/admin/upgrade: Tighten force warnings
+- machine-config-operator embedded-component 1953be053180f4ffd129c69d59e0b1cb9d211b1a to 7681914bad27b31b2065d5bf661093df72546066
+  - 507dbb2a 2025-12-12T01:45:08+00:00 add missing ports in contaiterport on the daemoset
+  - 0a9871c0 2025-12-12T01:45:08+00:00 add a relevant svc to the crio port
+  - 9f5fb4ab 2025-12-12T01:45:08+00:00 Add hostIP 127.0.0.1 to machine-config-daemon port 8798
 
