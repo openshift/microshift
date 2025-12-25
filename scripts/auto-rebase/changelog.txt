@@ -1,3 +1,0 @@
-- operator-framework-olm embedded-component 12fbe1b70635c5c100a6a5fc5734280a17a95c3d to 52652d0744d7cf955defb84d38f45bfe640d7850
-  - 3b968a15 2025-12-12T14:17:47+01:00 Fix TOCTOU race condition in ensureInstallPlan (#3682)
-
