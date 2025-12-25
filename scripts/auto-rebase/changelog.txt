@@ -1,3 +1,98 @@
-- cluster-ingress-operator embedded-component fa3906c161077e00a90d1b9a2e688ac047f4531e to 80d446496b742284fb2fcfeb1fccde797cde6978
-  - e160ce1 2025-12-05T17:57:36+01:00 Add new NID team members to OWNERS
+- ovn-kubernetes image-amd64 02a1ed0b226798ef029783eb34d55099ee7da8dc to 803675917e89283aa7c07a46f300b1177a75690a
+  - c9b592ea 2025-12-03T17:09:07-08:00 fix lint issue from merge conflict fix mistake
+  - 85fa1bb0 2025-11-20T20:45:53+02:00 CARRY: Fix linter issues
+  - 6ea54c78 2025-11-19T14:50:39+01:00 Send Unsolicited Neighbor Advertisement for IPv6 EgressIPs
+  - 39f8bd73 2025-11-19T14:50:39+01:00 Fix GARP sending 0.0.0.0 due to incorrect IPv4 byte extraction
+  - 860cc8dc 2025-11-12T15:30:03-08:00 add lint target to run golanci natively
+  - be0f3b84 2025-11-07T13:19:27+01:00 Fix cleanup of LRP for deleted pods
+  - 3f391e7b 2025-11-07T13:19:27+01:00 Handle missing pod delete event in EIP controller
+  - 0a3e1b90 2025-11-07T13:19:27+01:00 EgressIP: fix failover and restart stale SNAT/LRP; ensure status sync
+  - c17fec2e 2025-11-07T13:19:27+01:00 OVN EIP: fix printing of stale next hops value
+  - 8049fdf8 2025-11-07T13:19:27+01:00 OVN EIP: add UT for syncing next hops for v4/v6
+  - 88740434 2025-11-07T13:19:27+01:00 EIP: do not skip generating potential valid next hops if LSP not found
+  - 158ce34b 2025-11-07T13:19:27+01:00 EIP: when checking for stale LRP next hops on startup, restrict to enodes
+  - f4e2c179 2025-11-07T13:01:19+01:00 Fix cleanup of LRP for deleted pods
+  - b8303a2a 2025-11-07T13:01:08+01:00 Handle missing pod delete event in EIP controller
+  - 7060af6c 2025-11-07T12:59:46+01:00 EgressIP: fix failover and restart stale SNAT/LRP; ensure status sync
+  - c337b162 2025-11-07T12:59:46+01:00 OVN EIP: fix printing of stale next hops value
+  - 562c7495 2025-11-07T12:59:46+01:00 OVN EIP: add UT for syncing next hops for v4/v6
+  - 6f6edf31 2025-11-07T12:59:46+01:00 EIP: do not skip generating potential valid next hops if LSP not found
+  - 688885f1 2025-11-07T12:59:46+01:00 EIP: when checking for stale LRP next hops on startup, restrict to enodes
+  - a3a48276 2025-11-05T19:33:25+01:00 E2E service: Add test for named port handling with ETP=Local services
+  - b2b17a22 2025-11-05T19:32:14+01:00 E2E service: Fix potential flake in conn to an ext IP using src port
+  - 87b946bf 2025-11-05T19:32:14+01:00 E2E service: Move checkNumberOf.. to util.go
+  - 9bab81f3 2025-11-05T19:32:14+01:00 Extends unit test coverage for named port handling in ETP local
+  - 8c50a8dc 2025-11-05T19:32:11+01:00 Fix named port handling in externalTrafficPolicy Local services
+  - 6d5a5c44 2025-11-05T15:29:41+05:30 MultiNetPol: Process update only when spec fields and/or related annotations are updated
+  - 54115325 2025-11-05T15:27:58+05:30 NetPol: Process update only when spec fields and/or related annotation are updated
+  - d687b252 2025-11-04T16:19:32+00:00 Reintroduce completed pod check in shouldReleaseDeletedPod
+  - 8a31820f 2025-11-04T16:19:32+00:00 kubevirt: test with per-pod SNATs
+  - 14b97fe3 2025-11-04T16:19:32+00:00 kubevirt: test OVN DB after completion of source pod
+  - c2d4e502 2025-11-04T16:19:32+00:00 kubevirt: fix search of colliding pods for migrated pods
+  - 26a2114f 2025-11-04T16:19:32+00:00 kubevirt: prevent error log on IP release
+  - 48c117a0 2025-11-04T16:19:32+00:00 kubevirt: fix bad release of IPs of live migratable pods
+  - 1011a33f 2025-11-04T16:19:32+00:00 kubevirt e2e: use a value for vm nodeselector
+  - 16b7e676 2025-11-04T16:19:32+00:00 Fix naming of "Secondary" to be "User-Defined"
+  - f8ad9567 2025-10-30T13:48:08-04:00 udn host->ovn flows needs to be vlan aware
+  - 53338510 2025-10-30T13:48:08-04:00 make primary UDN node mode aware
+  - a1871a08 2025-10-29T09:54:12+00:00 Skip Pending pods in EgressIP status updates
+  - 90fa4bb9 2025-10-28T13:41:43+01:00 Skip Pending pods in EgressIP status updates
+  - d644e2a5 2025-10-24T09:04:43+00:00 Reintroduce completed pod check in shouldReleaseDeletedPod
+  - ab22bde2 2025-10-24T09:04:43+00:00 kubevirt: test with per-pod SNATs
+  - 86ddff96 2025-10-24T09:04:43+00:00 kubevirt: test OVN DB after completion of source pod
+  - 6b7dffc5 2025-10-24T09:04:43+00:00 kubevirt: fix search of colliding pods for migrated pods
+  - 84d10eff 2025-10-24T09:04:43+00:00 kubevirt: prevent error log on IP release
+  - 69d71ecb 2025-10-24T09:04:43+00:00 kubevirt: fix bad release of IPs of live migratable pods
+  - b3ba6a8d 2025-10-24T09:04:43+00:00 kubevirt e2e: use a value for vm nodeselector
+  - 9ce2987a 2025-10-24T09:04:43+00:00 Fix naming of "Secondary" to be "User-Defined"
+  - 3771a89f 2025-10-16T07:59:46+00:00 Dockerfile: Unpin OVN and consume the latest from FDP.
+
+- ovn-kubernetes image-arm64 02a1ed0b226798ef029783eb34d55099ee7da8dc to 803675917e89283aa7c07a46f300b1177a75690a
+  - c9b592ea 2025-12-03T17:09:07-08:00 fix lint issue from merge conflict fix mistake
+  - 85fa1bb0 2025-11-20T20:45:53+02:00 CARRY: Fix linter issues
+  - 6ea54c78 2025-11-19T14:50:39+01:00 Send Unsolicited Neighbor Advertisement for IPv6 EgressIPs
+  - 39f8bd73 2025-11-19T14:50:39+01:00 Fix GARP sending 0.0.0.0 due to incorrect IPv4 byte extraction
+  - 860cc8dc 2025-11-12T15:30:03-08:00 add lint target to run golanci natively
+  - be0f3b84 2025-11-07T13:19:27+01:00 Fix cleanup of LRP for deleted pods
+  - 3f391e7b 2025-11-07T13:19:27+01:00 Handle missing pod delete event in EIP controller
+  - 0a3e1b90 2025-11-07T13:19:27+01:00 EgressIP: fix failover and restart stale SNAT/LRP; ensure status sync
+  - c17fec2e 2025-11-07T13:19:27+01:00 OVN EIP: fix printing of stale next hops value
+  - 8049fdf8 2025-11-07T13:19:27+01:00 OVN EIP: add UT for syncing next hops for v4/v6
+  - 88740434 2025-11-07T13:19:27+01:00 EIP: do not skip generating potential valid next hops if LSP not found
+  - 158ce34b 2025-11-07T13:19:27+01:00 EIP: when checking for stale LRP next hops on startup, restrict to enodes
+  - f4e2c179 2025-11-07T13:01:19+01:00 Fix cleanup of LRP for deleted pods
+  - b8303a2a 2025-11-07T13:01:08+01:00 Handle missing pod delete event in EIP controller
+  - 7060af6c 2025-11-07T12:59:46+01:00 EgressIP: fix failover and restart stale SNAT/LRP; ensure status sync
+  - c337b162 2025-11-07T12:59:46+01:00 OVN EIP: fix printing of stale next hops value
+  - 562c7495 2025-11-07T12:59:46+01:00 OVN EIP: add UT for syncing next hops for v4/v6
+  - 6f6edf31 2025-11-07T12:59:46+01:00 EIP: do not skip generating potential valid next hops if LSP not found
+  - 688885f1 2025-11-07T12:59:46+01:00 EIP: when checking for stale LRP next hops on startup, restrict to enodes
+  - a3a48276 2025-11-05T19:33:25+01:00 E2E service: Add test for named port handling with ETP=Local services
+  - b2b17a22 2025-11-05T19:32:14+01:00 E2E service: Fix potential flake in conn to an ext IP using src port
+  - 87b946bf 2025-11-05T19:32:14+01:00 E2E service: Move checkNumberOf.. to util.go
+  - 9bab81f3 2025-11-05T19:32:14+01:00 Extends unit test coverage for named port handling in ETP local
+  - 8c50a8dc 2025-11-05T19:32:11+01:00 Fix named port handling in externalTrafficPolicy Local services
+  - 6d5a5c44 2025-11-05T15:29:41+05:30 MultiNetPol: Process update only when spec fields and/or related annotations are updated
+  - 54115325 2025-11-05T15:27:58+05:30 NetPol: Process update only when spec fields and/or related annotation are updated
+  - d687b252 2025-11-04T16:19:32+00:00 Reintroduce completed pod check in shouldReleaseDeletedPod
+  - 8a31820f 2025-11-04T16:19:32+00:00 kubevirt: test with per-pod SNATs
+  - 14b97fe3 2025-11-04T16:19:32+00:00 kubevirt: test OVN DB after completion of source pod
+  - c2d4e502 2025-11-04T16:19:32+00:00 kubevirt: fix search of colliding pods for migrated pods
+  - 26a2114f 2025-11-04T16:19:32+00:00 kubevirt: prevent error log on IP release
+  - 48c117a0 2025-11-04T16:19:32+00:00 kubevirt: fix bad release of IPs of live migratable pods
+  - 1011a33f 2025-11-04T16:19:32+00:00 kubevirt e2e: use a value for vm nodeselector
+  - 16b7e676 2025-11-04T16:19:32+00:00 Fix naming of "Secondary" to be "User-Defined"
+  - f8ad9567 2025-10-30T13:48:08-04:00 udn host->ovn flows needs to be vlan aware
+  - 53338510 2025-10-30T13:48:08-04:00 make primary UDN node mode aware
+  - a1871a08 2025-10-29T09:54:12+00:00 Skip Pending pods in EgressIP status updates
+  - 90fa4bb9 2025-10-28T13:41:43+01:00 Skip Pending pods in EgressIP status updates
+  - d644e2a5 2025-10-24T09:04:43+00:00 Reintroduce completed pod check in shouldReleaseDeletedPod
+  - ab22bde2 2025-10-24T09:04:43+00:00 kubevirt: test with per-pod SNATs
+  - 86ddff96 2025-10-24T09:04:43+00:00 kubevirt: test OVN DB after completion of source pod
+  - 6b7dffc5 2025-10-24T09:04:43+00:00 kubevirt: fix search of colliding pods for migrated pods
+  - 84d10eff 2025-10-24T09:04:43+00:00 kubevirt: prevent error log on IP release
+  - 69d71ecb 2025-10-24T09:04:43+00:00 kubevirt: fix bad release of IPs of live migratable pods
+  - b3ba6a8d 2025-10-24T09:04:43+00:00 kubevirt e2e: use a value for vm nodeselector
+  - 9ce2987a 2025-10-24T09:04:43+00:00 Fix naming of "Secondary" to be "User-Defined"
+  - 3771a89f 2025-10-16T07:59:46+00:00 Dockerfile: Unpin OVN and consume the latest from FDP.
 
