@@ -10,6 +10,7 @@ SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 source "${SCRIPTDIR}/common.sh"
 
 PROMETHEUS_DIR="${IMAGEDIR}/prometheus"
+PROMETHEUS_IMAGE="quay.io/prometheus/prometheus"
 DEFAULT_HOST_PORT="9091"
 
 usage() {
@@ -40,6 +41,9 @@ action_start() {
     local host_port="${1:-${DEFAULT_HOST_PORT}}"
     local container_name="prometheus"
 
+    # Prefetch the image with retries
+    PULL_CMD="podman pull" "${SCRIPTDIR}/../../scripts/pull_retry.sh" "${PROMETHEUS_IMAGE}"
+
     mkdir -p "${PROMETHEUS_DIR}"
     PROM_CONFIG="${PROMETHEUS_DIR}/prometheus.yml"
     # Empty configuration file will take all defaults.
@@ -54,7 +58,7 @@ action_start() {
     podman run -d --rm --name "${container_name}" \
         -p "${host_port}:9090" \
         -v "${PROMETHEUS_DIR}:/etc/prometheus:Z" \
-        quay.io/prometheus/prometheus \
+        "${PROMETHEUS_IMAGE}" \
         --config.file=/etc/prometheus/prometheus.yml \
         --web.enable-remote-write-receiver > /dev/null
 }
