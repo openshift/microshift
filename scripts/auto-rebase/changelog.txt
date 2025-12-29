@@ -1,5 +1,0 @@
-- machine-config-operator embedded-component 1953be053180f4ffd129c69d59e0b1cb9d211b1a to 7681914bad27b31b2065d5bf661093df72546066
-  - 507dbb2a 2025-12-12T01:45:08+00:00 add missing ports in contaiterport on the daemoset
-  - 0a9871c0 2025-12-12T01:45:08+00:00 add a relevant svc to the crio port
-  - 9f5fb4ab 2025-12-12T01:45:08+00:00 Add hostIP 127.0.0.1 to machine-config-daemon port 8798
-
