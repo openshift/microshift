@@ -389,6 +389,26 @@ do_group() {
                     continue
                 fi
             fi
+
+            # Ensure blueprint is registered in composer-cli before building ISO.
+            # This handles cases where ostree commits were cached but composer-cli
+            # state was cleared (e.g., after cleanup or cache restore).
+            if ! sudo composer-cli blueprints list | grep -q "^${blueprint}$"; then
+                echo "Blueprint ${blueprint} not found in composer-cli, registering it for ISO building"
+                # Find the corresponding .toml blueprint file
+                local toml_basename
+                toml_basename="${image_installer%.image-installer}.toml"
+                local blueprint_toml_file
+                blueprint_toml_file="${IMAGEDIR}/blueprints/$(basename "${toml_basename}")"
+                if [ -f "${blueprint_toml_file}" ] && [ -s "${blueprint_toml_file}" ]; then
+                    sudo composer-cli blueprints push "${blueprint_toml_file}"
+                else
+                    echo "WARNING: Blueprint file ${blueprint_toml_file} is missing or empty, skipping ISO build"
+                    record_junit "${groupdir}" "${image_installer}" "compose" "SKIPPED"
+                    continue
+                fi
+            fi
+
             echo "Building image-installer from ${blueprint}"
             build_cmd="sudo composer-cli compose start ${blueprint} image-installer"
             buildid=$(${build_cmd} | awk '{print $2}')
