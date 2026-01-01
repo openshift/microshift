@@ -1,24 +1,179 @@
-- cluster-kube-apiserver-operator embedded-component eecc8a9b87afa5ba882564cc4a352c93a555d7ab to 2c58d2f2bad129f0017ca194ae8a38711917c21c
-  - 5652b0b 2025-12-04T21:33:45-08:00 Update k8s version ranges for MutatingAdmissionPolicy
+- api embedded-component c2a41ea924bd8227622363c3d12f456cd2186924 to 3f584b29ee4a4faeb1a733e97c5ba16a1e5ee4f8
+  - 71ef3c0e 2025-12-19T15:45:07+00:00 Disable the statusoptional linter
+  - 59642090 2025-12-17T10:33:21+01:00 Add NetworkConnect DevPreview feature gate
+  - b67d202b 2025-12-17T10:33:02+01:00 Allow for ovn-kubernetes repo enhancement URLs
+  - 67719123 2025-12-16T16:10:55+01:00 Add apiextensions group and CompatibilityRequirement
+  - d1bbe4d5 2025-12-12T13:39:23-05:00 Added validation to check if OKD has all default featuregates and rebased repo
+  - 301d5721 2025-12-12T13:16:42-05:00 Fixing integration test failure
+  - ae79145a 2025-12-12T13:16:41-05:00 Introduce new OKD featureset and enable all default featuregates
+  - 887fcda8 2025-12-09T11:28:01+01:00 NO-JIRA: remove beta enabled TranslateStreamCloseWebsocketRequests feature from gates
+  - 57d5184a 2025-11-24T11:02:07-06:00 Migrate away from deprecated ioutil
 
-- cluster-network-operator embedded-component 8bd3f1c3ea6055a49c14ece00a5b8779a100fc5d to 8d09651e31c64340865f7ec7f349786528805ebd
-  - b4c41d7 2025-12-04T23:56:54+01:00 Fix frr-k8s-statuscleaner crash: move $(LOG_LEVEL) to end of args
+- cluster-csi-snapshot-controller-operator embedded-component 0dd541084bee8885dbd14dcd6eb2f826ba779883 to 455c9eb412bb41634e127b9491c2cf6d3580a0ec
+  - 58e58df 2025-12-18T17:55:40+00:00 Updating ose-cluster-csi-snapshot-controller-operator-container image to be consistent with ART for 4.22 Reconciling with https://github.com/openshift/ocp-build-data/tree/087d1930e36b609f77d73bd8a313d85c940cff4d/images/ose-cluster-csi-snapshot-controller-operator.yml
 
-- kubernetes embedded-component 05182efbe79b0f9893cdffc9f76589cfd7419b39 to 9f57f51e3485ccc1cfd01ec94e9a0f5bef38eacb
-  - 873cd1d1b 2025-12-08T10:42:38+01:00 UPSTREAM: <drop>: make update
-  - 8d86655e3 2025-12-05T17:50:39+01:00 UPSTREAM: <drop>: pin cadvisor to downstream fork
+- cluster-ingress-operator embedded-component b62dd27c901d495e6e78b11968872c002cc2416f to 81c961d319f2cdc5cee9eae2ef57f2229ffc2200
+  - d8e1530 2025-12-16T14:27:53-05:00 update command to get Konflux index image
+  - 056f80f 2025-10-23T09:32:25-04:00 don't use constant in unit test
+  - 85b6fc9 2025-10-02T09:13:08-04:00 set trustBundleName in Istio global values
 
-- machine-config-operator embedded-component 00b8722ba3d4926f82541d781b3f6c1de7bd6b21 to e2f6042b4bd21ad64115fa5be529edc1cce8c451
-  - d41f4bb5 2025-12-09T11:44:00+02:00 add missing ports in contaiterport on the daemoset
-  - 130d0ccd 2025-12-08T15:16:04-05:00 e2e test: update  to wait until test node returns to ready
-  - ed3a3c85 2025-12-08T15:11:46-05:00 msbic: skip azure machinesets with securityType
-  - 92dda854 2025-12-08T09:53:35+02:00 add a relevant svc to the crio port
+- cluster-kube-apiserver-operator embedded-component 2c58d2f2bad129f0017ca194ae8a38711917c21c to 3fb92ce8d990d1608c4b2bbd79f412b4a3eac629
+  - 01fae25 2025-12-17T10:50:54+05:30 Update go.mod
+  - c61b8b3 2025-12-12T17:46:37+05:30 Add cert rotation tests with Ginkgo integration
+  - 98fc926 2025-12-12T12:31:30+01:00 OCPBUGS-61674: increases termination timeouts for GCP
+  - 49c18f5 2025-12-03T13:56:39+05:30 Move ginkgo/v2 to main require section in go.mod
+  - fbdac14 2025-12-03T13:56:24+05:30 Migrate TestTokenRequestAndReview to Ginkgo framework
 
-- kubernetes image-amd64 05182efbe79b0f9893cdffc9f76589cfd7419b39 to 9f57f51e3485ccc1cfd01ec94e9a0f5bef38eacb
-  - 873cd1d1b 2025-12-08T10:42:38+01:00 UPSTREAM: <drop>: make update
-  - 8d86655e3 2025-12-05T17:50:39+01:00 UPSTREAM: <drop>: pin cadvisor to downstream fork
+- cluster-network-operator embedded-component 8d09651e31c64340865f7ec7f349786528805ebd to 9d8ab483ef704b0c5c74ad564156085558e2e112
+  - d4f5de4 2025-12-02T10:41:21+02:00 Add kubevirt platform to dual-stack supported platforms
+  - df98ce8 2025-02-05T18:23:22+05:30 Prevent resetting masquerade subnet
+  - 326ead3 2025-02-05T17:59:54+05:30 Update masquerade subnet to ovnkube-control-plane deployment
 
-- kubernetes image-arm64 9f57f51e3485ccc1cfd01ec94e9a0f5bef38eacb to 9bbcda1bf017104f96c0f1bd27175d122f416f5a
+- csi-external-snapshotter embedded-component 9098db0e434e0d986eeadd2ebe69119540a550d1 to 6383ab93be114af8d1067523602bd2a44c927f1a
+  - 9141223 2025-12-19T20:40:10+00:00 UPSTREAM: <carry>: Updating ose-csi-snapshot-controller-container image to be consistent with ART for 4.22 Reconciling with https://github.com/openshift/ocp-build-data/tree/087d1930e36b609f77d73bd8a313d85c940cff4d/images/ose-csi-snapshot-controller.yml
+  - a38d3cc 2025-12-19T11:01:23+01:00 UPSTREAM: <drop>: Bump log level of the snapshot controller
+  - 44255b2 2025-12-18T00:41:21+00:00 UPSTREAM: <carry>: Updating ose-csi-external-snapshotter-container image to be consistent with ART for 4.22 Reconciling with https://github.com/openshift/ocp-build-data/tree/087d1930e36b609f77d73bd8a313d85c940cff4d/images/ose-csi-external-snapshotter.yml
+
+- kubernetes embedded-component 9f57f51e3485ccc1cfd01ec94e9a0f5bef38eacb to 76cb1db555ed7a57f12025018d54622ef2e9458c
+  - c8f673758 2025-12-11T14:09:08-05:00 UPSTREAM: <carry>: enable InPlace resize test
   - 9d621f97b 2025-12-10T10:10:48-03:00 UPSTREAM: 135476: Filter out the nodes created by other tests
   - e2b978d53 2025-12-10T09:45:34+01:00 UPSTREAM: 135623: Fix the preemption test
+  - bd75dce1e 2025-12-09T14:04:40+01:00 UPSTREAM: 135680: test/e2e: increase memory limits in pod resize tests
+  - 59a2d7e3f 2025-10-27T09:35:42-04:00 UPSTREAM: <carry>: Extend k8s suite timeouts for parallel testing load Analysis of flakes from the k8s suite has shown consistent examples of otherwise well behaved testing failing due timeouts because of temporary load on controllers during parallel testing. Increasing these timeouts will reduce flakes.
+
+- machine-config-operator embedded-component e2f6042b4bd21ad64115fa5be529edc1cce8c451 to 9333c5a69d9e8159b98908561d7fb2269b7a9197
+  - bfab3ed9 2025-12-22T16:02:30+01:00 NO-ISSUE: Bump OpenShift builder images to 4.22
+  - 89d1c1c9 2025-12-18T12:58:16-05:00 msbic: skip update if arch annotation not found
+  - 668ed84e 2025-12-18T17:29:52+01:00 Integrate OSImageStream into MCP and sync logic
+  - 9d52d684 2025-12-15T13:31:40+01:00 MCO-1961: Rework MC's OSImageURL merge logic
+  - cbf776a7 2025-12-12T13:40:29-06:00 fixed state to go to degraded
+  - d6a4e185 2025-12-11T13:52:32-05:00 boot_image: add event based queueing
+  - b09a9e7c 2025-12-11T13:52:32-05:00 controller: rename msbic to boot image controller
+  - cd5c07bd 2025-12-11T10:40:55-05:00 Revert "OCPNODE-3719: Default Enablement of Auto Sizing Reserved in OpenShift 4.21"
+  - c2b31747 2025-12-11T07:23:37-05:00 added OWNERS file
+  - 9f747564 2025-12-11T03:53:42-05:00 added tls cert to workers trust store
+  - 37cdfeb6 2025-12-10T15:15:16-06:00 fixes empty pull secret degradation
+  - 0632e3cc 2025-12-10T10:23:16-05:00 add tls certificate to InternalReleaseImage registry
+  - 9462f6ed 2025-12-09T16:32:17-05:00 miscellaneous verify fixes
+  - c7aa7a43 2025-12-09T11:05:18+00:00 MCO-2006: Migrate pinned images sets private test cases
+  - 7681165a 2025-12-08T09:33:11-05:00 Remove log exposing kubeconfig
+  - c58adcca 2025-12-03T16:59:04-05:00 operator: add retry for MachineConfiguration calls
+  - 2447fa43 2025-10-31T07:44:46-04:00 Only update when there is an actual controller change
+
+- operator-framework-olm embedded-component 7d2dd62c2a73b66aa99e82c90f64ab53dd523ddf to c66c7a81be6f259c46fb8d4bc1b691fbe97722df
+  - d6b22526 2025-12-18T23:12:47-05:00 Fix the macos cross build within the OCP builder image
+  - 423abcaf 2025-12-18T23:12:43-05:00 Update Dockerfiles/CI to use golang 1.25/ocp 4.22
+  - 015755b7 2025-12-18T10:00:13+00:00 Updating operator-registry-container image to be consistent with ART for 4.22 Reconciling with https://github.com/openshift/ocp-build-data/tree/087d1930e36b609f77d73bd8a313d85c940cff4d/images/operator-registry.yml
+  - 7e975d9d 2025-12-18T03:34:13+00:00 Updating operator-lifecycle-manager-container image to be consistent with ART for 4.22 Reconciling with https://github.com/openshift/ocp-build-data/tree/087d1930e36b609f77d73bd8a313d85c940cff4d/images/operator-lifecycle-manager.yml
+  - 83058a03 2025-12-18T00:55:53+00:00 Updating ose-operator-framework-tools-container image to be consistent with ART for 4.22 Reconciling with https://github.com/openshift/ocp-build-data/tree/087d1930e36b609f77d73bd8a313d85c940cff4d/images/ose-operator-framework-tools.yml
+
+- service-ca-operator embedded-component e9622ba18c86bf24aceab0c19fdcb87339c14f44 to 17676192189f5612ba4fd0ee7a23a562390b72ec
+  - b9ff307 2025-12-19T08:51:27+00:00 Updating ose-service-ca-operator-container image to be consistent with ART for 4.22 Reconciling with https://github.com/openshift/ocp-build-data/tree/087d1930e36b609f77d73bd8a313d85c940cff4d/images/ose-service-ca-operator.yml
+  - 85619ff 2025-12-12T18:11:17+08:00 vendor: update dependencies for OTE/Ginkgo support
+  - ac809e4 2025-12-12T16:59:14+08:00 cmd/README: add OTE infrastructure and remove legacy test extension
+
+- oc image-amd64 345800dc3c4164fbca313c1cbfb383f262547903 to 6d61f7657300dcc77f91df9c0b2f23f88cdf7123
+  - e3e3bd27 2025-12-22T16:29:10+03:00 Bump library-go to update selinux and x/crypto
+  - bb6a44e1 2025-12-20T12:46:25+00:00 Updating ose-cli-artifacts-container image to be consistent with ART for 4.22 Reconciling with https://github.com/openshift/ocp-build-data/tree/087d1930e36b609f77d73bd8a313d85c940cff4d/images/ose-cli-artifacts.yml
+  - 127463a5 2025-12-20T12:17:41+00:00 Updating openshift-enterprise-deployer-container image to be consistent with ART for 4.22 Reconciling with https://github.com/openshift/ocp-build-data/tree/087d1930e36b609f77d73bd8a313d85c940cff4d/images/openshift-enterprise-deployer.yml
+  - d0e94b1f 2025-12-19T05:58:25+00:00 Updating ose-tools-container image to be consistent with ART for 4.22 Reconciling with https://github.com/openshift/ocp-build-data/tree/087d1930e36b609f77d73bd8a313d85c940cff4d/images/ose-tools.yml
+  - 17105551 2025-12-18T15:16:36+00:00 Updating openshift-enterprise-cli-container image to be consistent with ART for 4.22 Reconciling with https://github.com/openshift/ocp-build-data/tree/087d1930e36b609f77d73bd8a313d85c940cff4d/images/openshift-enterprise-cli.yml
+  - 5f5ed85a 2025-12-16T14:39:57+03:00 Bump docker/docker to 28.5.2 to drop dependency of containerd/containerd
+
+- csi-external-snapshotter image-amd64 9098db0e434e0d986eeadd2ebe69119540a550d1 to 6383ab93be114af8d1067523602bd2a44c927f1a
+  - 9141223 2025-12-19T20:40:10+00:00 UPSTREAM: <carry>: Updating ose-csi-snapshot-controller-container image to be consistent with ART for 4.22 Reconciling with https://github.com/openshift/ocp-build-data/tree/087d1930e36b609f77d73bd8a313d85c940cff4d/images/ose-csi-snapshot-controller.yml
+  - a38d3cc 2025-12-19T11:01:23+01:00 UPSTREAM: <drop>: Bump log level of the snapshot controller
+  - 44255b2 2025-12-18T00:41:21+00:00 UPSTREAM: <carry>: Updating ose-csi-external-snapshotter-container image to be consistent with ART for 4.22 Reconciling with https://github.com/openshift/ocp-build-data/tree/087d1930e36b609f77d73bd8a313d85c940cff4d/images/ose-csi-external-snapshotter.yml
+
+- ovn-kubernetes image-amd64 25a714b82c643bcfdf5543cb467afa32dac06787 to 53c2d29efefeaa21e44dfef40c350124016b1273
+  - 6a4a58af 2025-12-04T22:58:41+08:00 No-overlay mode enhancement
+  - b6ccbf7a 2025-12-04T13:06:23+01:00 Fix coderabbit path_filters
+  - 33903521 2025-12-04T10:33:04+01:00 Fix coderabbit config
+  - b52e40b0 2025-12-03T13:01:03+01:00 remove forced V(5) logging during startup
+  - 92a778c2 2025-12-02T11:54:08+01:00 [udn isolation] Update RA ACLs to handle multi-subnet networks.
+  - 5dbab4fa 2025-12-02T11:54:08+01:00 Multi-subnet default network: require the same hostSubnet.
+  - dcb90b85 2025-12-02T11:54:08+01:00 EgressIP: add route policies for east-west traffic between networks
+  - 2e1d47ba 2025-12-02T11:54:04+01:00 [test] always use multi-subnet setup for CI.
+  - 30b06cbe 2025-12-02T11:54:01+01:00 [kind] Add multi-cidr default subnet option.
+  - 34784e71 2025-12-01T09:55:30-05:00 Fixes gateway interface VLAN tag settings
+  - 76eb7c5c 2025-11-26T11:14:48+02:00 test/e2e:: Fix duplicate IP validation test for IP family enforcement
+  - 81bbf015 2025-11-26T09:39:53+02:00 test/e2e: add IP family validation tests for layer2 primary networks
+  - 8421af49 2025-11-26T09:39:53+02:00 test/e2e: Move createVMWithStaticIP helper function
+  - 08c5b40a 2025-11-26T09:39:53+02:00 test/e2e/kubevirt: Refactor duplicate VM pod err event waiter to shared helper
+  - 5d6b7784 2025-11-26T09:39:49+02:00 allocator/pod: add IP family validation for layer2 primary networks
+  - 819aad3c 2025-11-25T13:00:56-05:00 fix: Remove duplicate - and sometimes incorrect - defaults from --help
+  - 6cba203a 2025-11-25T13:00:17-05:00 fix: Register a bunch of cli flags for --help message
+  - fd54939c 2025-11-25T12:59:53-05:00 chore: Remove redundant wording in some --help option descriptions
+  - f71844ac 2025-11-25T12:56:03-05:00 ci: Split unit test phase from build
+  - bdfb2488 2025-11-25T13:36:28+01:00 Refactor ETP=local flow generation to reduce code duplication
+  - 01c33f42 2025-11-25T13:36:28+01:00 Service OpenFlows: Return traffic should not be committed to conntrack
+  - e0156740 2025-11-25T13:36:28+01:00 Fix issues with dualstack detection for nodePort with hostNetwork tests
+  - f0a3f5f1 2025-11-25T13:36:28+01:00 Fix cookie generation for ETP=local service flows with target ports
+  - c33ddf99 2025-11-25T13:35:59+01:00 Adjust E2E tests for named port handling
+  - eebbb4a1 2025-11-25T10:55:17+01:00 Add unit test for named port handling in ETP=local services
+  - ce18cfd0 2025-11-25T10:55:17+01:00 Fix named port handling in ETP=local services with host-networked pods
+
+- kubernetes image-amd64 9f57f51e3485ccc1cfd01ec94e9a0f5bef38eacb to 76cb1db555ed7a57f12025018d54622ef2e9458c
+  - c8f673758 2025-12-11T14:09:08-05:00 UPSTREAM: <carry>: enable InPlace resize test
+  - 9d621f97b 2025-12-10T10:10:48-03:00 UPSTREAM: 135476: Filter out the nodes created by other tests
+  - e2b978d53 2025-12-10T09:45:34+01:00 UPSTREAM: 135623: Fix the preemption test
+  - bd75dce1e 2025-12-09T14:04:40+01:00 UPSTREAM: 135680: test/e2e: increase memory limits in pod resize tests
+  - 59a2d7e3f 2025-10-27T09:35:42-04:00 UPSTREAM: <carry>: Extend k8s suite timeouts for parallel testing load Analysis of flakes from the k8s suite has shown consistent examples of otherwise well behaved testing failing due timeouts because of temporary load on controllers during parallel testing. Increasing these timeouts will reduce flakes.
+
+- service-ca-operator image-amd64 e9622ba18c86bf24aceab0c19fdcb87339c14f44 to 17676192189f5612ba4fd0ee7a23a562390b72ec
+  - b9ff307 2025-12-19T08:51:27+00:00 Updating ose-service-ca-operator-container image to be consistent with ART for 4.22 Reconciling with https://github.com/openshift/ocp-build-data/tree/087d1930e36b609f77d73bd8a313d85c940cff4d/images/ose-service-ca-operator.yml
+  - 85619ff 2025-12-12T18:11:17+08:00 vendor: update dependencies for OTE/Ginkgo support
+  - ac809e4 2025-12-12T16:59:14+08:00 cmd/README: add OTE infrastructure and remove legacy test extension
+
+- oc image-arm64 345800dc3c4164fbca313c1cbfb383f262547903 to 6d61f7657300dcc77f91df9c0b2f23f88cdf7123
+  - e3e3bd27 2025-12-22T16:29:10+03:00 Bump library-go to update selinux and x/crypto
+  - bb6a44e1 2025-12-20T12:46:25+00:00 Updating ose-cli-artifacts-container image to be consistent with ART for 4.22 Reconciling with https://github.com/openshift/ocp-build-data/tree/087d1930e36b609f77d73bd8a313d85c940cff4d/images/ose-cli-artifacts.yml
+  - 127463a5 2025-12-20T12:17:41+00:00 Updating openshift-enterprise-deployer-container image to be consistent with ART for 4.22 Reconciling with https://github.com/openshift/ocp-build-data/tree/087d1930e36b609f77d73bd8a313d85c940cff4d/images/openshift-enterprise-deployer.yml
+  - d0e94b1f 2025-12-19T05:58:25+00:00 Updating ose-tools-container image to be consistent with ART for 4.22 Reconciling with https://github.com/openshift/ocp-build-data/tree/087d1930e36b609f77d73bd8a313d85c940cff4d/images/ose-tools.yml
+  - 17105551 2025-12-18T15:16:36+00:00 Updating openshift-enterprise-cli-container image to be consistent with ART for 4.22 Reconciling with https://github.com/openshift/ocp-build-data/tree/087d1930e36b609f77d73bd8a313d85c940cff4d/images/openshift-enterprise-cli.yml
+  - 5f5ed85a 2025-12-16T14:39:57+03:00 Bump docker/docker to 28.5.2 to drop dependency of containerd/containerd
+
+- csi-external-snapshotter image-arm64 9098db0e434e0d986eeadd2ebe69119540a550d1 to 6383ab93be114af8d1067523602bd2a44c927f1a
+  - 9141223 2025-12-19T20:40:10+00:00 UPSTREAM: <carry>: Updating ose-csi-snapshot-controller-container image to be consistent with ART for 4.22 Reconciling with https://github.com/openshift/ocp-build-data/tree/087d1930e36b609f77d73bd8a313d85c940cff4d/images/ose-csi-snapshot-controller.yml
+  - a38d3cc 2025-12-19T11:01:23+01:00 UPSTREAM: <drop>: Bump log level of the snapshot controller
+  - 44255b2 2025-12-18T00:41:21+00:00 UPSTREAM: <carry>: Updating ose-csi-external-snapshotter-container image to be consistent with ART for 4.22 Reconciling with https://github.com/openshift/ocp-build-data/tree/087d1930e36b609f77d73bd8a313d85c940cff4d/images/ose-csi-external-snapshotter.yml
+
+- ovn-kubernetes image-arm64 25a714b82c643bcfdf5543cb467afa32dac06787 to 1a9c60ba700d88afd6d4805091905c3cf094e75d
+  - 8b509ae2 2025-12-19T16:14:42+08:00 Bump ovn to 25.09.1-25.el9fdp and 25.09.1-25.el9s for OKD
+  - 6a4a58af 2025-12-04T22:58:41+08:00 No-overlay mode enhancement
+  - b6ccbf7a 2025-12-04T13:06:23+01:00 Fix coderabbit path_filters
+  - 33903521 2025-12-04T10:33:04+01:00 Fix coderabbit config
+  - b52e40b0 2025-12-03T13:01:03+01:00 remove forced V(5) logging during startup
+  - 92a778c2 2025-12-02T11:54:08+01:00 [udn isolation] Update RA ACLs to handle multi-subnet networks.
+  - 5dbab4fa 2025-12-02T11:54:08+01:00 Multi-subnet default network: require the same hostSubnet.
+  - dcb90b85 2025-12-02T11:54:08+01:00 EgressIP: add route policies for east-west traffic between networks
+  - 2e1d47ba 2025-12-02T11:54:04+01:00 [test] always use multi-subnet setup for CI.
+  - 30b06cbe 2025-12-02T11:54:01+01:00 [kind] Add multi-cidr default subnet option.
+  - 34784e71 2025-12-01T09:55:30-05:00 Fixes gateway interface VLAN tag settings
+  - 76eb7c5c 2025-11-26T11:14:48+02:00 test/e2e:: Fix duplicate IP validation test for IP family enforcement
+  - 81bbf015 2025-11-26T09:39:53+02:00 test/e2e: add IP family validation tests for layer2 primary networks
+  - 8421af49 2025-11-26T09:39:53+02:00 test/e2e: Move createVMWithStaticIP helper function
+  - 08c5b40a 2025-11-26T09:39:53+02:00 test/e2e/kubevirt: Refactor duplicate VM pod err event waiter to shared helper
+  - 5d6b7784 2025-11-26T09:39:49+02:00 allocator/pod: add IP family validation for layer2 primary networks
+  - 819aad3c 2025-11-25T13:00:56-05:00 fix: Remove duplicate - and sometimes incorrect - defaults from --help
+  - 6cba203a 2025-11-25T13:00:17-05:00 fix: Register a bunch of cli flags for --help message
+  - fd54939c 2025-11-25T12:59:53-05:00 chore: Remove redundant wording in some --help option descriptions
+  - f71844ac 2025-11-25T12:56:03-05:00 ci: Split unit test phase from build
+  - bdfb2488 2025-11-25T13:36:28+01:00 Refactor ETP=local flow generation to reduce code duplication
+  - 01c33f42 2025-11-25T13:36:28+01:00 Service OpenFlows: Return traffic should not be committed to conntrack
+  - e0156740 2025-11-25T13:36:28+01:00 Fix issues with dualstack detection for nodePort with hostNetwork tests
+  - f0a3f5f1 2025-11-25T13:36:28+01:00 Fix cookie generation for ETP=local service flows with target ports
+  - c33ddf99 2025-11-25T13:35:59+01:00 Adjust E2E tests for named port handling
+  - eebbb4a1 2025-11-25T10:55:17+01:00 Add unit test for named port handling in ETP=local services
+  - ce18cfd0 2025-11-25T10:55:17+01:00 Fix named port handling in ETP=local services with host-networked pods
+
+- kubernetes image-arm64 9bbcda1bf017104f96c0f1bd27175d122f416f5a to 76cb1db555ed7a57f12025018d54622ef2e9458c
+  - c8f673758 2025-12-11T14:09:08-05:00 UPSTREAM: <carry>: enable InPlace resize test
+  - bd75dce1e 2025-12-09T14:04:40+01:00 UPSTREAM: 135680: test/e2e: increase memory limits in pod resize tests
+  - 59a2d7e3f 2025-10-27T09:35:42-04:00 UPSTREAM: <carry>: Extend k8s suite timeouts for parallel testing load Analysis of flakes from the k8s suite has shown consistent examples of otherwise well behaved testing failing due timeouts because of temporary load on controllers during parallel testing. Increasing these timeouts will reduce flakes.
+
+- service-ca-operator image-arm64 e9622ba18c86bf24aceab0c19fdcb87339c14f44 to 17676192189f5612ba4fd0ee7a23a562390b72ec
+  - b9ff307 2025-12-19T08:51:27+00:00 Updating ose-service-ca-operator-container image to be consistent with ART for 4.22 Reconciling with https://github.com/openshift/ocp-build-data/tree/087d1930e36b609f77d73bd8a313d85c940cff4d/images/ose-service-ca-operator.yml
+  - 85619ff 2025-12-12T18:11:17+08:00 vendor: update dependencies for OTE/Ginkgo support
+  - ac809e4 2025-12-12T16:59:14+08:00 cmd/README: add OTE infrastructure and remove legacy test extension
 
