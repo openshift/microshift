@@ -134,6 +134,7 @@ Setup Invalid TLS Configuration
     [Arguments]    ${config}
     Drop In MicroShift Config    ${config}    10-tls
     Save Journal Cursor
+    Sleep    10s    # To avoid systemctl start error: Start request repeated too quickly
     ${stdout}    ${stderr}    ${rc}=    Execute Command
     ...    systemctl restart microshift.service
     ...    sudo=True    return_stdout=True    return_stderr=True    return_rc=True
