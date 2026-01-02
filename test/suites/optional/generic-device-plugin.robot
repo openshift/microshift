@@ -16,6 +16,7 @@ Test Tags           generic-device-plugin
 *** Variables ***
 ${NAMESPACE}        ${EMPTY}
 ${DEVICE_COUNT}     5
+${WAIT_TIMEOUT}     5m
 
 
 *** Test Cases ***
@@ -56,7 +57,7 @@ Verify FUSE device allocation and accessibility
     Wait Until Device Is Allocatable    10    fuse
     Oc Create    -f ./assets/generic-device-plugin/fuse-test-pod.yaml -n ${NAMESPACE}
 
-    Oc Wait    -n ${NAMESPACE} pod/fuse-test-pod    --for=condition=Ready --timeout=120s
+    Oc Wait    -n ${NAMESPACE} pod/fuse-test-pod    --for=condition=Ready --timeout=${WAIT_TIMEOUT}
 
     # Verify /dev/fuse is accessible in the pod
     ${fuse_device}=    Oc Exec    fuse-test-pod    ls -l /dev/fuse
@@ -176,7 +177,7 @@ Device Should Be Allocatable
 Wait For Job Completion And Check Logs
     [Documentation]    Waits for Job completion and checks Pod logs looking for 'Test successful' message
 
-    Oc Wait    -n ${NAMESPACE} job/gdp-test    --for=condition=complete --timeout=120s
+    Oc Wait    -n ${NAMESPACE} job/gdp-test    --for=condition=complete --timeout=${WAIT_TIMEOUT}
     ${pod}=    Oc Get JsonPath
     ...    pod
     ...    ${NAMESPACE}
@@ -234,7 +235,7 @@ Create Pod And Verify Allocation
     # Create and wait for pod
     ${path}=    Create Random Temp File    ${pod_spec}
     Oc Create    -f ${path} -n ${NAMESPACE}
-    Oc Wait    -n ${NAMESPACE} pod/${pod_name}    --for=condition=Ready --timeout=120s
+    Oc Wait    -n ${NAMESPACE} pod/${pod_name}    --for=condition=Ready --timeout=${WAIT_TIMEOUT}
 
     # Verify correct number of devices allocated to pod
     ${devices_in_pod}=    Oc Exec    ${pod_name}    ls /dev/ | grep ttyUSB | wc -l    ${NAMESPACE}
