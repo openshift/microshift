@@ -135,11 +135,7 @@ Setup Invalid TLS Configuration
     [Arguments]    ${config}
     Drop In MicroShift Config    ${config}    10-tls
     Save Journal Cursor
-    Sleep    10s    # To avoid systemctl start error: Start request repeated too quickly
-    ${stdout}    ${stderr}    ${rc}=    Execute Command
-    ...    systemctl restart microshift.service
-    ...    sudo=True    return_stdout=True    return_stderr=True    return_rc=True
-    Should Be Equal As Numbers    1    ${rc}
+    Run Keyword And Expect Error    0 != 1    Restart MicroShift
 
 Remove TLS Drop In Config
     [Documentation]    Remove the previously created drop-in config for storage
@@ -148,11 +144,7 @@ Remove TLS Drop In Config
 Restore Valid TLS Configuration
     [Documentation]    Restore the TLS configuration
     Remove TLS Drop In Config
-    Sleep    10s    # To avoid systemctl start error: Start request repeated too quickly
-    ${stdout}    ${stderr}    ${rc}=    Execute Command
-    ...    systemctl restart microshift.service
-    ...    sudo=True    return_stdout=True    return_stderr=True    return_rc=True
-    Should Be Equal As Numbers    0    ${rc}
+    Restart MicroShift
 
 Openssl Connect Command
     [Documentation]    Run Openssl Connect Command in the remote server
