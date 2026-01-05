@@ -116,7 +116,7 @@ RHOCP_MINOR_Y=""
 # The beta repository, containing dependencies, should point to the
 # OpenShift mirror URL. If the mirror for current minor is not
 # available yet, it should point to an older release.
-RHOCP_MINOR_Y_BETA="https://mirror.openshift.com/pub/openshift-v4/${UNAME_M}/dependencies/rpms/4.21-el9-beta"
+RHOCP_MINOR_Y_BETA="https://mirror.openshift.com/pub/openshift-v4/${UNAME_M}/dependencies/rpms/4.22-el9-beta"
 export RHOCP_MINOR_Y
 export RHOCP_MINOR_Y_BETA
 
@@ -156,10 +156,10 @@ export BREW_EC_RELEASE_VERSION
 export BREW_NIGHTLY_RELEASE_VERSION
 
 # Set the release type to ec, rc or zstream
-LATEST_RELEASE_TYPE="rc"
+LATEST_RELEASE_TYPE="ec"
 export LATEST_RELEASE_TYPE
 
-BREW_LREL_RELEASE_VERSION="${BREW_RC_RELEASE_VERSION}"
+BREW_LREL_RELEASE_VERSION="${BREW_EC_RELEASE_VERSION}"
 export BREW_LREL_RELEASE_VERSION
 
 # Branch and commit for the openshift-tests-private repository
