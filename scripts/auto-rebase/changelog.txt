@@ -1,0 +1,3 @@
+- ovn-kubernetes image-arm64 6c78b6defbd606f8fdf002d7cc37e3d49c7bcd98 to 1faf1ac5bb2e604f745d93a5fe70bec93024ad7f
+  - 0eb16983 2025-11-26T14:56:03+08:00 Fix conntrack reconciliation to use service port instead of endpoint port
+
