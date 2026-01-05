@@ -1,8 +1,0 @@
-- ovn-kubernetes image-amd64 b1144476cf7e585d3ab765a5a9e0367e7b9801c5 to c5c0bd46a93cf838cfadfeda6dcfcd405b13be7a
-  - f0e11043 2025-12-11T12:05:02+01:00 Skip Pending pods in EgressIP status updates
-  - 0ea29341 2025-12-09T08:53:27-08:00 Add ricky-rav to OWNERS for release-4.16
-
-- ovn-kubernetes image-arm64 b1144476cf7e585d3ab765a5a9e0367e7b9801c5 to c5c0bd46a93cf838cfadfeda6dcfcd405b13be7a
-  - f0e11043 2025-12-11T12:05:02+01:00 Skip Pending pods in EgressIP status updates
-  - 0ea29341 2025-12-09T08:53:27-08:00 Add ricky-rav to OWNERS for release-4.16
-
