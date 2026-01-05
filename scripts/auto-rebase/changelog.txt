@@ -1,0 +1,18 @@
+- ovn-kubernetes image-arm64 1f07d27f00ead9fd39b18d9001a7b2fe24eb11ea to 7533eec4e8f5c34c0a9efe1d3c0e2b119323c2f2
+  - 49b03c0a 2025-11-25T13:03:44+01:00 Status manager: add startup cleanup for ANP/BANP
+  - c8eb63c1 2025-11-25T13:03:44+01:00 Status manager: add startup cleanup for stale managedFields
+  - 9c71d2fd 2025-11-25T13:03:44+01:00 Status manager: fix cleanup for EgressQoS and NetworkQoS
+  - 89ee2dd3 2025-11-25T13:03:44+01:00 Status manager: remove managedFields upon node deletion
+  - 46b708be 2025-11-13T13:49:08+02:00 utils,multinet: GetPodNADToNetworkMappingWithActiveNetwork CUDN support
+  - 7db91fc6 2025-11-13T13:39:35+02:00 e2e,kubevirt: Test MAC conflict detection
+  - 2d2a34ad 2025-11-13T13:39:35+02:00 e2e,net-seg default-net annot: Test MAC conflict detection
+  - a737f871 2025-11-13T13:39:35+02:00 clustermanager,allocator: Init MAC manager with pod MACs
+  - deb4d173 2025-11-13T13:39:35+02:00 clustermanager,allocator: Init MAC manager with infra MACs
+  - 720cacd7 2025-11-13T13:39:35+02:00 clustermanager,allocator: Release reserved MAC on pod deletion
+  - b4328b9e 2025-11-13T13:39:35+02:00 clustermanager,allocator: Emit pod event reflecting MAC conflicts
+  - 545d2773 2025-11-13T13:39:35+02:00 clustermanager,allocator: Detect MAC conflict on pod allocation
+  - f5255b23 2025-11-13T13:39:35+02:00 pod-allocator: Introduce MAC addresses manager
+  - 4b476e3c 2025-11-13T13:39:35+02:00 test/e2e/preconfigured_layer2: Add duplicate IP Validation pod tests
+  - a1686d33 2025-11-13T13:39:35+02:00 test/e2e/kubevirt: Add duplicate IP Validation test
+  - 58406f22 2025-11-13T13:39:35+02:00 pod_annotations: Block duplicate IP on new pods
+
