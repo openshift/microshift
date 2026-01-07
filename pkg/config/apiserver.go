@@ -149,6 +149,11 @@ type CustomNoUpgrade struct {
 // They are injected into the feature-gates field later by the microshift kube-apiserver controller.
 var RequiredFeatureGates = []string{"UserNamespacesSupport", "UserNamespacesPodSecurityStandards"}
 
+// ForbiddenFeatureGates are the feature gates that specific to MicroShift that will cause the cluster to fail to start.
+//
+//	MutatingAdmissionPolicy requires that the v1beta1.MutatingAdmissionPolicyBinding andv1beta1.MutatingAdmissionPolicy
+var ForbiddenFeatureGates = []string{"MutatingAdmissionPolicy"}
+
 type FeatureGates struct {
 	FeatureSet      string          `json:"featureSet"`
 	CustomNoUpgrade CustomNoUpgrade `json:"customNoUpgrade"`
@@ -171,6 +176,10 @@ func (fg FeatureGates) ToApiserverArgs() ([]string, error) {
 			return nil, fmt.Errorf("failed to get feature set gates: %w", err)
 		}
 		for _, f := range fgEnabledDisabled.Enabled {
+			// Skip adding forbidden feature gates to the list
+			if slices.Contains(ForbiddenFeatureGates, string(f.FeatureGateAttributes.Name)) {
+				continue
+			}
 			ret.Insert(fmt.Sprintf("%s=true", f.FeatureGateAttributes.Name))
 		}
 		for _, f := range fgEnabledDisabled.Disabled {
