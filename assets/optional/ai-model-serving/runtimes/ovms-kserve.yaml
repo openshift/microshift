@@ -11,6 +11,7 @@ metadata:
 spec:
   multiModel: false
   annotations:
+    opendatahub.io/kserve-runtime: 'ovms'
     prometheus.io/port: '8888'
     prometheus.io/path: /metrics
   supportedModelFormats:
