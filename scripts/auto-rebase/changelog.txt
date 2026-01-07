@@ -1,0 +1,10 @@
+- api embedded-component c2a41ea924bd8227622363c3d12f456cd2186924 to d1c4dc4fd37b8e8f6e4992cda4e84167a3f2cb8c
+  - 2d294d4a 2025-12-15T10:16:08-05:00 features: disable psa
+
+- machine-config-operator embedded-component 251c4bdf92564d0a97ced5459f7a809e8d3ef11c to 4334df8b665e4568a1ea435bceda413baae625d9
+  - db8a3de0 2025-12-19T10:39:42-05:00 msbic: skip update if arch annotation not found
+  - 12858f79 2025-12-19T10:37:28-05:00 boot_image: add event based queueing
+  - 4d8a497c 2025-12-19T10:37:20-05:00 controller: rename msbic to boot image controller
+  - 939d7e3e 2025-12-19T10:37:11-05:00 miscellaneous verify fixes
+  - e0099af2 2025-12-18T23:46:11+00:00 operator: add retry for MachineConfiguration calls
+
