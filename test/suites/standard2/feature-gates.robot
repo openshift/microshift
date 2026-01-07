@@ -38,17 +38,13 @@ Custom Feature Gates Are Passed To Kube APIServer
     [Documentation]    Check that custom feature gates specified in the MicroShift config are passed to and logged by the
     ...    kube-apiserver. This test verifies that arbitrary feature gate values are correctly propagated from the
     ...    MicroShift configuration to the kube-apiserver, regardless of whether the feature gates are valid or have any effect.
+    ...    Also verify that feature gate lock file is created when custom feature gates are configured.
+    ...    The lock file prevents upgrades and configuration changes when CustomNoUpgrade feature set is used.
     [Setup]    Setup Custom Feature Gates Test
     Wait Until Keyword Succeeds    2 min    5 sec
     ...    Pattern Should Appear In Log Output    ${CURSOR}    kube:feature-gates=.*TestFeatureEnabled=true
     Wait Until Keyword Succeeds    2 min    5 sec
     ...    Pattern Should Appear In Log Output    ${CURSOR}    kube:feature-gates=.*TestFeatureDisabled=false
-    [Teardown]    Teardown Custom Feature Gates Test
-
-Feature Gate Lock File Created With Custom Feature Gates
-    [Documentation]    Verify that feature gate lock file is created when custom feature gates are configured.
-    ...    The lock file prevents upgrades and configuration changes when CustomNoUpgrade feature set is used.
-    [Setup]    Setup Custom Feature Gates Test
     Wait Until Keyword Succeeds    2 min    5 sec
     ...    Feature Gate Lock File Should Exist
     Feature Gate Lock File Should Contain Feature Gates    CustomNoUpgrade    TestFeatureEnabled
@@ -58,7 +54,6 @@ Feature Gate Config Change Blocked After Lock Created
     [Documentation]    Verify that changing feature gate config is blocked after lock file exists.
     ...    MicroShift must refuse to start if feature gates change after CustomNoUpgrade is set.
     [Setup]    Setup Custom Feature Gates Test
-
     Stop MicroShift
     Drop In MicroShift Config    ${DIFFERENT_FEATURE_GATES}    10-featuregates
     Save Journal Cursor
@@ -89,7 +84,6 @@ Setup
 
 Teardown
     [Documentation]    Test suite teardown
-    Restart MicroShift
     Logout MicroShift Host
     Remove Kubeconfig
 
@@ -102,16 +96,18 @@ Save Journal Cursor
 
 Setup Custom Feature Gates Test
     [Documentation]    Drop in custom feature gates config and restart MicroShift
+    Stop MicroShift
     Drop In MicroShift Config    ${CUSTOM_FEATURE_GATES}    10-featuregates
     Save Journal Cursor
-    Restart MicroShift
+    Start MicroShift
     Feature Gate Lock File Should Exist
 
 Teardown Custom Feature Gates Test
     [Documentation]    Remove custom feature gates config and restart MicroShift
+    Stop MicroShift
     Remove Drop In MicroShift Config    10-featuregates
     Remove Feature Gate Lock File If Exists
-    Restart MicroShift
+    Start MicroShift
 
 Remove Feature Gate Lock File If Exists
     [Documentation]    Remove the feature gate lock file if it exists, for test cleanup

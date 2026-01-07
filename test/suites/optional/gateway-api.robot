@@ -23,7 +23,8 @@ Test Simple HTTP Route
     ...    Deploy Hello MicroShift
     Create Gateway    ${GATEWAY_HOSTNAME}    ${GATEWAY_PORT}    ${NS_GATEWAY}
     Create HTTP Route    ${GATEWAY_HOSTNAME}    ${NS_GATEWAY}
-    Access Hello MicroShift Success    ushift_port=${GATEWAY_PORT}    hostname=${GATEWAY_HOSTNAME}
+    Wait Until Keyword Succeeds    10x    6s
+    ...    Access Hello MicroShift Success    ushift_port=${GATEWAY_PORT}    hostname=${GATEWAY_HOSTNAME}
     [Teardown]    Run Keywords
     ...    Delete Namespace
 

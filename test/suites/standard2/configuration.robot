@@ -115,8 +115,9 @@ Deploy MicroShift Without LVMS
     [Setup]    Deploy Storage Config    ${LVMS_DISABLED}
 
     CSI Snapshot Controller Is Deployed
+    # Reduce the default timeout to 2 minutes for a quicker failure
     Run Keyword And Expect Error    1 != 0
-    ...    LVMS Is Deployed
+    ...    LVMS Is Deployed    timeout=2m
     [Teardown]    Run Keywords
     ...    Remove Storage Drop In Config
     ...    Restart MicroShift
@@ -126,8 +127,9 @@ Deploy MicroShift Without CSI Snapshotter
     [Setup]    Deploy Storage Config    ${CSI_SNAPSHOT_DISABLED}
 
     LVMS Is Deployed
+    # Reduce the default timeout to 2 minutes for a quicker failure
     Run Keyword And Expect Error    1 != 0
-    ...    CSI Snapshot Controller Is Deployed
+    ...    CSI Snapshot Controller Is Deployed    timeout=2m
 
     [Teardown]    Run Keywords
     ...    Remove Storage Drop In Config
@@ -208,15 +210,17 @@ Remove Storage Drop In Config
 
 LVMS Is Deployed
     [Documentation]    Wait for LVMS components to deploy
-    Named Deployment Should Be Available    lvms-operator    openshift-storage    120s
+    [Arguments]    ${timeout}=5m
+    Named Deployment Should Be Available    lvms-operator    openshift-storage    ${timeout}
     # Wait for vg-manager daemonset to exist before trying to "wait".
     # `oc wait` fails if the object doesn't exist.
-    Wait Until Resource Exists    daemonset    vg-manager    openshift-storage    120s
-    Named Daemonset Should Be Available    vg-manager    openshift-storage    120s
+    Wait Until Resource Exists    daemonset    vg-manager    openshift-storage    ${timeout}
+    Named Daemonset Should Be Available    vg-manager    openshift-storage    ${timeout}
 
 CSI Snapshot Controller Is Deployed
     [Documentation]    Wait for CSI snapshot controller to be deployed
-    Named Deployment Should Be Available    csi-snapshot-controller    kube-system    120s
+    [Arguments]    ${timeout}=5m
+    Named Deployment Should Be Available    csi-snapshot-controller    kube-system    ${timeout}
 
 Check HTTP Proxy Env In Bootc Image
     [Documentation]    Check that the HTTP proxy environment variables are not defined

@@ -21,5 +21,7 @@ scenario_run_tests() {
     exit_if_image_not_found "${start_image}"
 
     run_tests host1 \
+        suites/osconfig/clusterid.robot \
+        suites/osconfig/systemd-resolved.robot \
         suites/router
 }

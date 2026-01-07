@@ -32,7 +32,7 @@ IMAGE_SIGSTORE_ENABLED=false # may be overridden in scenario file
 VNC_CONSOLE=${VNC_CONSOLE:-false}  # may be overridden in global settings file
 TEST_RANDOMIZATION="all"  # may be overridden in scenario file
 TEST_EXCLUDES="none"  # may be overridden in scenario file
-TEST_EXECUTION_TIMEOUT="30m" # may be overriden in scenario file
+TEST_EXECUTION_TIMEOUT="${TEST_EXECUTION_TIMEOUT:-30m}" # may be overriden in scenario file or CI config
 SUBSCRIPTION_MANAGER_PLUGIN="${SUBSCRIPTION_MANAGER_PLUGIN:-${SCRIPTDIR}/subscription_manager_register.sh}"  # may be overridden in global settings file
 RUN_HOST_OVERRIDE=""  # target any given VM for running scenarios
 
@@ -183,7 +183,7 @@ sos_report() {
         else
             if "${junit}"; then
                 record_junit "${vmname}" "sos-report" "OK"
-            fi  
+            fi
         fi
     done
     return "${scenario_result}"
@@ -197,7 +197,7 @@ sos_report_for_vm() {
     # is. Copy the script to the host, just in case, along with a
     # wrapper that knows how to execute it or the installed version.
 
-    copy_file_to_vm "${vmname}" "${ROOTDIR}/test/assets/sos-wrapper.sh" "/tmp/sos-wrapper.sh" 
+    copy_file_to_vm "${vmname}" "${ROOTDIR}/test/assets/sos-wrapper.sh" "/tmp/sos-wrapper.sh"
     copy_file_to_vm "${vmname}" "${ROOTDIR}/scripts/microshift-sos-report.sh" "/tmp/microshift-sos-report.sh"
     run_command_on_vm "${vmname}" "sudo bash -x /tmp/sos-wrapper.sh"
     mkdir -p "${vmdir}/sos"
@@ -253,9 +253,9 @@ sos_report_for_vm_offline() {
     invoke_qemu_script "bash" \
         "--vm"  "${full_vmname}" \
         "--args"  "sudo bash -x /tmp/sos-wrapper.sh"
-    
+
     mkdir -p "${vmdir}/sos"
-    
+
     invoke_qemu_script "download" \
         "--vm"  "${full_vmname}" \
         "--src_dir" "/tmp/" \
@@ -291,7 +291,7 @@ sos_report_for_vm_offline() {
         "--vm"  "${full_vmname}" \
         "--src_dir" "/tmp/var-log-anaconda/" \
         "--dst_dir" "${vmdir}/anaconda/" \
-        "--filename" "*.log" 
+        "--filename" "*.log"
 }
 
 # Public function to render a unique kickstart from a template for a
@@ -399,7 +399,8 @@ does_image_exist() {
 exit_if_commit_not_found() {
     local -r commit="${1}"
     if ! does_commit_exist "${commit}"; then
-        echo "Commit '${commit}' not found in ostree repo - skipping test"
+        echo "Commit '${commit}' not found in ostree repo - VM can't be created"
+        record_junit "${commit}" "build_vm_commit_not_found" "SKIPPED"
         exit 0
     fi
 }
@@ -408,7 +409,8 @@ exit_if_commit_not_found() {
 exit_if_image_not_found() {
     local -r image="${1}"
     if ! does_image_exist "${image}"; then
-        echo "Image '${image}' not found in mirror registry - skipping test"
+        echo "Image '${image}' not found in mirror registry - VM can't be created"
+        record_junit "${image}" "build_vm_image_not_found" "SKIPPED"
         exit 0
     fi
 }
@@ -531,9 +533,9 @@ EOF
 
 close_junit() {
     echo '</testsuite>' >> "${JUNIT_OUTPUT_FILE}"
-    
+
     local line="<testsuite name=\"infrastructure for ${SCENARIO}\" tests=\"${TESTCASES}\" failures=\"${FAILURES}\" skipped=\"${SKIPPED}\" timestamp=\"${TIMESTAMP}\">"
-    
+
     sed -i "2c${line}" "${JUNIT_OUTPUT_FILE}"
 }
 
@@ -929,9 +931,8 @@ configure_vm_firewall() {
     # - Incoming for NodePort services
     run_command_on_vm "${vmname}" "sudo firewall-cmd --permanent --zone=public --add-port=30000-32767/tcp"
     run_command_on_vm "${vmname}" "sudo firewall-cmd --permanent --zone=public --add-port=30000-32767/udp"
-    # - Default Prometheus exporter port (for observability RF tests)
-    run_command_on_vm "${vmname}" "sudo firewall-cmd --permanent --zone=public --add-port=8889/tcp"
 
+    # Reload the firewall configuration
     run_command_on_vm "${vmname}" "sudo firewall-cmd --reload"
 }
 
@@ -1150,7 +1151,7 @@ setup_oc_and_kubeconfig() {
     fi
     export KUBECONFIG="${kubeconfig}"
     record_junit "${vmname}" "setup_kubeconfig" "OK"
-    
+
     popd &>/dev/null
 }
 

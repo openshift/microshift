@@ -67,9 +67,13 @@ Setup Suite And Prepare Test Host
     [Documentation]    The service starts after MicroShift starts and thus will start generating pertinent log data
     ...    right away. When the suite is executed, immediately get the cursor for the microshift-observability unit.
     Setup Suite With Namespace
+    # Configure the firewall for the Prometheus exporter
+    Command Should Work    sudo firewall-cmd --permanent --zone=public --add-port=8889/tcp
+    Command Should Work    sudo firewall-cmd --reload
+    # Configure observability settings
     Check Required Observability Variables
     Set Test OTEL Configuration
-    # We need to do something to the cluster to generate new kube events.
+    # We need to do something to the cluster to generate new kube events
     Create Hello MicroShift Pod
     Expose Hello MicroShift
     ${cur}    Get Journal Cursor    unit=microshift-observability
@@ -108,9 +112,13 @@ Set Back Original OTEL Configuration
 Render Otel Test Config
     [Documentation]    Set IPs and ports in OTEL config yaml
 
-    Command Should Work    sed -i "s|{{NODE_IP}}|${USHIFT_HOST}|g" ${OTEL_CONFIG_PATH}
-    Command Should Work    sed -i "s|{{PROMETHEUS_HOST}}|${PROMETHEUS_HOST}|g" ${OTEL_CONFIG_PATH}
+    ${ushift_host_formatted}    Add Brackets If Ipv6    ${USHIFT_HOST}
+    ${prometheus_host_formatted}    Add Brackets If Ipv6    ${PROMETHEUS_HOST}
+    ${loki_host_formatted}    Add Brackets If Ipv6    ${LOKI_HOST}
+
+    Command Should Work    sed -i "s|{{NODE_IP}}|${ushift_host_formatted}|g" ${OTEL_CONFIG_PATH}
+    Command Should Work    sed -i "s|{{PROMETHEUS_HOST}}|${prometheus_host_formatted}|g" ${OTEL_CONFIG_PATH}
     Command Should Work    sed -i "s|{{PROMETHEUS_PORT}}|${PROMETHEUS_PORT}|g" ${OTEL_CONFIG_PATH}
-    Command Should Work    sed -i "s|{{LOKI_HOST}}|${LOKI_HOST}|g" ${OTEL_CONFIG_PATH}
+    Command Should Work    sed -i "s|{{LOKI_HOST}}|${loki_host_formatted}|g" ${OTEL_CONFIG_PATH}
     Command Should Work    sed -i "s|{{LOKI_PORT}}|${LOKI_PORT}|g" ${OTEL_CONFIG_PATH}
     Command Should Work    sed -i "s|{{PROM_EXPORTER_PORT}}|${PROM_EXPORTER_PORT}|g" ${OTEL_CONFIG_PATH}

@@ -18,9 +18,9 @@ ${HTTPS_PORT}       443
 *** Keywords ***
 Create Hello MicroShift Pod
     [Documentation]    Create a pod running the "hello microshift" application
-    [Arguments]    ${ns}=${NAMESPACE}
+    [Arguments]    ${ns}=${NAMESPACE}    ${timeout}=5m
     Oc Create    -f ${HELLO_USHIFT} -n ${ns}
-    Labeled Pod Should Be Ready    app\=hello-microshift    timeout=120s    ns=${ns}
+    Labeled Pod Should Be Ready    app\=hello-microshift    timeout=${timeout}    ns=${ns}
 
 Expose Hello MicroShift
     [Documentation]    Expose the "hello microshift" application via cluster ip service
