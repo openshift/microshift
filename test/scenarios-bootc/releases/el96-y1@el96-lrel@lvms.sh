@@ -55,12 +55,12 @@ scenario_run_tests() {
     echo "INFO: Checking LVMS resources after upgrade..."
     run_command_on_vm host1 'bash -s' < "${TESTDIR}/../scripts/lvms-helpers/checkLvmsResources.sh"
 
+    # Cleanup LVMS workloads
+    echo "INFO: Cleaning up LVMS workloads..."
+    run_command_on_vm host1 'bash -s' < "${TESTDIR}/../scripts/lvms-helpers/cleanupWorkload.sh"
+
     # Run standard1 suite for basic validation after upgrade
     run_tests host1 \
         --variable "EXPECTED_OS_VERSION:9.6" \
         suites/standard1/
-
-    # Cleanup LVMS workloads
-    echo "INFO: Cleaning up LVMS workloads..."
-    run_command_on_vm host1 'bash -s' < "${TESTDIR}/../scripts/lvms-helpers/cleanupWorkload.sh"
 }
