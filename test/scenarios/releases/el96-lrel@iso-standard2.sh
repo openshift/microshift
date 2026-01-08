@@ -8,7 +8,7 @@ scenario_create_vms() {
     exit_if_commit_not_found "${start_image}"
 
     prepare_kickstart host1 kickstart.ks.template "${start_image}"
-    launch_vm
+    launch_vm --boot_blueprint "${start_image}"
 }
 
 scenario_remove_vms() {
