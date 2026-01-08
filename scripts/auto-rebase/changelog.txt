@@ -1,3 +1,6 @@
-- ovn-kubernetes image-arm64 6c78b6defbd606f8fdf002d7cc37e3d49c7bcd98 to 1faf1ac5bb2e604f745d93a5fe70bec93024ad7f
+- cluster-network-operator embedded-component 698e349cb60e84967bf93345d1b0802dd15ccc1a to dbd9826dbe5373bd3605dfef606d118ffc65b830
+  - ec1f517 2025-12-18T09:55:06+02:00 Add kubevirt platform to dual-stack supported platforms
+
+- ovn-kubernetes image-amd64 6c78b6defbd606f8fdf002d7cc37e3d49c7bcd98 to 1faf1ac5bb2e604f745d93a5fe70bec93024ad7f
   - 0eb16983 2025-11-26T14:56:03+08:00 Fix conntrack reconciliation to use service port instead of endpoint port
 
