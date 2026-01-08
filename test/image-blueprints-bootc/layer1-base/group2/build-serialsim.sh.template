@@ -1,24 +1,26 @@
 #!/bin/bash
 set -euo pipefail
+set -x
 
 function get_kernel_ver() {
-    KERNEL_VER=$(rpm -q --qf "%{VERSION}-%{RELEASE}\n" kernel | sort | tail -1)
+    KERNEL_VER="$(rpm -q --qf "%{VERSION}-%{RELEASE}\n" kernel | sort | tail -1)"
     KERNEL_VER_ARCH="${KERNEL_VER}.$(uname -m)"
+
     export KERNEL_VER
     export KERNEL_VER_ARCH
 }
 
-# Upgrade the kernel only if necessary to align the procedure with both RHEL and CentOS.
-#
-# On CentOS, a kernel upgrade may be required due to its different package
-# retention policy, which can cause the kernel in the base bootc image to be
-# unavailable in the repositories.
+# Set the current kernel version and architecture variables.
 get_kernel_ver
-if ! dnf --quiet list available "kernel-devel-${KERNEL_VER}" >/dev/null 2>&1; then
-    dnf install -y kernel-devel-matched
+
+# Attempt to install the kernel-devel package for the current kernel version,
+# falling back to the kernel-devel-matched package.
+# Note: The OS release version is pinned to make sure that the potentially upgraded
+# kernel package belongs to the current OS release.
+source /etc/os-release
+if ! dnf install -y --releasever="${VERSION_ID}" "kernel-devel-${KERNEL_VER}" ; then
+    dnf install -y --releasever="${VERSION_ID}" kernel-devel-matched
     get_kernel_ver
-else
-    dnf install -y "kernel-devel-${KERNEL_VER}"
 fi
 
 # Install the necessary dependencies and clean up.
