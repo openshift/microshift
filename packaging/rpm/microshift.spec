@@ -256,6 +256,7 @@ and can be used to embed those images into osbuilder blueprints or bootc contain
 Summary: SR-IOV Network Operator for MicroShift
 ExclusiveArch: x86_64 aarch64
 Requires: microshift = %{version}
+Requires: rdma-core
 
 %description sriov
 The microshift-sriov package provides the required manifests for the SR-IOV Network Operator to be installed on MicroShift.
