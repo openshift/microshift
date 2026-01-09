@@ -12,7 +12,7 @@ scenario_create_vms() {
     exit_if_image_not_found "${dest_image}"
 
     prepare_kickstart host1 kickstart-bootc.ks.template rhel96-bootc-brew-y2-with-optional
-    launch_vm --boot_blueprint rhel96-bootc
+    launch_vm --boot_blueprint rhel96-bootc --vm_vcpus 4
 }
 
 scenario_remove_vms() {
