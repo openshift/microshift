@@ -1,29 +1,47 @@
 #!/bin/bash
 set -euo pipefail
+set -x
 
 function get_kernel_ver() {
-    KERNEL_VER=$(rpm -q --qf "%{VERSION}-%{RELEASE}\n" kernel | sort | tail -1)
+    KERNEL_VER="$(rpm -q --qf "%{VERSION}-%{RELEASE}\n" kernel | sort | tail -1)"
     KERNEL_VER_ARCH="${KERNEL_VER}.$(uname -m)"
+
     export KERNEL_VER
     export KERNEL_VER_ARCH
 }
 
-# Upgrade the kernel only if necessary to align the procedure with both RHEL and CentOS.
-#
-# On CentOS, a kernel upgrade may be required due to its different package
-# retention policy, which can cause the kernel in the base bootc image to be
-# unavailable in the repositories.
+# Set the current kernel version and architecture variables.
 get_kernel_ver
-if ! dnf --quiet list available "kernel-devel-${KERNEL_VER}" >/dev/null 2>&1; then
-    dnf install -y kernel-devel-matched
-    get_kernel_ver
-else
+
+# Lock the OS release version to prevent the installation of a newer kernel package
+# belonging to a newer OS release.
+source /etc/os-release
+echo "${VERSION_ID}" > /etc/dnf/vars/releasever
+
+if [[ "${ID}" == "rhel" ]] ; then
+    # On RHEL, enable RHEL EUS repositories to allow the installation of the
+    # kernel-devel package for the current kernel version.
+    VERSION_ID_MAJOR="$(awk -F. '{print $1}' <<< "${VERSION_ID}")"
+    VERSION_ID_MINOR="$(awk -F. '{print $2}' <<< "${VERSION_ID}")"
+    if (( "${VERSION_ID_MINOR}" % 2 == 0 )) ; then
+        dnf config-manager --set-enabled \
+            "rhel-${VERSION_ID_MAJOR}-for-$(uname -m)-baseos-eus-rpms" \
+            "rhel-${VERSION_ID_MAJOR}-for-$(uname -m)-appstream-eus-rpms"
+    fi
     dnf install -y "kernel-devel-${KERNEL_VER}"
+else
+    # On CentOS, attempt to install the kernel-devel package for the current kernel
+    # version, falling back to kernel-devel-matched if the former is not available.
+    dnf install -y "kernel-devel-${KERNEL_VER}" || dnf install -y kernel-devel-matched
 fi
+
+# Reset the current kernel version and architecture variables.
+get_kernel_ver
 
 # Install the necessary dependencies and clean up.
 dnf install -y git make python3-pyserial
 dnf clean all
+rm -f /etc/dnf/vars/releasever
 
 # Clone the serialsim repository and build the serialsim module.
 git clone https://github.com/pmtk/serialsim.git /tmp/serialsim
