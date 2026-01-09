@@ -10,6 +10,7 @@ metadata:
     opendatahub.io/dashboard: 'true'
 spec:
   annotations:
+    opendatahub.io/kserve-runtime: 'vllm'
     prometheus.io/port: '8080'
     prometheus.io/path: '/metrics'
   multiModel: false
