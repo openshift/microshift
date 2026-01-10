@@ -67,9 +67,13 @@ Setup Suite And Prepare Test Host
     [Documentation]    The service starts after MicroShift starts and thus will start generating pertinent log data
     ...    right away. When the suite is executed, immediately get the cursor for the microshift-observability unit.
     Setup Suite With Namespace
+    # Configure the firewall for the Prometheus exporter
+    Command Should Work    sudo firewall-cmd --permanent --zone=public --add-port=8889/tcp
+    Command Should Work    sudo firewall-cmd --reload
+    # Configure observability settings
     Check Required Observability Variables
     Set Test OTEL Configuration
-    # We need to do something to the cluster to generate new kube events.
+    # We need to do something to the cluster to generate new kube events
     Create Hello MicroShift Pod
     Expose Hello MicroShift
     ${cur}    Get Journal Cursor    unit=microshift-observability

@@ -78,9 +78,11 @@ Wait For MicroShift Service
     ...    MicroShift Service Is Active
 
 Restart MicroShift
-    [Documentation]    Restart the MicroShift service
+    [Documentation]    Restart the MicroShift service with a delay to avoid too
+    ...    many start requests.
     ${ushift_pid}=    MicroShift Process ID
     ${ushift_etcd_pid}=    MicroShift Etcd Process ID
+    Sleep    10s
     Systemctl    restart    microshift.service
     Wait Until MicroShift Process ID Changes    ${ushift_pid}
     Wait Until MicroShift Etcd Process ID Changes    ${ushift_etcd_pid}

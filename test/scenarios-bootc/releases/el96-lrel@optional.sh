@@ -9,36 +9,36 @@ WEB_SERVER_URL="http://${VM_BRIDGE_IP}:${WEB_SERVER_PORT}"
 
 start_image="rhel96-bootc-brew-${LATEST_RELEASE_TYPE}-with-optional"
 
-# Skip the scenario if platform is ARM, as the igb driver is not supported.
-check_platform() {
-    if [[ "${UNAME_M}" =~ aarch64 ]] ; then
-        record_junit "setup" "scenario_create_vms" "SKIPPED"
-        exit 0
-    fi
-}
-
 scenario_create_vms() {
-    check_platform
     exit_if_image_not_found "${start_image}"
 
+    # Skip sriov network on ARM because the igb driver is not supported.
+    local networks="${VM_MULTUS_NETWORK},${VM_MULTUS_NETWORK},sriov"
+    if [[ "${UNAME_M}" =~ aarch64 ]]; then
+        networks="${VM_MULTUS_NETWORK},${VM_MULTUS_NETWORK}"
+    fi
     LVM_SYSROOT_SIZE=20480 prepare_kickstart host1 kickstart-bootc.ks.template "${start_image}"
     # Three nics - one for sriov, one for macvlan, another for ipvlan (they cannot enslave the same interface)
-    launch_vm --boot_blueprint rhel96-bootc --network "${VM_MULTUS_NETWORK},${VM_MULTUS_NETWORK},sriov" --vm_disksize 25
+    launch_vm --boot_blueprint rhel96-bootc --network "${networks}" --vm_disksize 25
 }
 
 scenario_remove_vms() {
-    check_platform
     exit_if_image_not_found "${start_image}"
 
     remove_vm host1
 }
 
 scenario_run_tests() {
-    check_platform
     exit_if_image_not_found "${start_image}"
 
+    local skip_args=""
+    if [[ "${UNAME_M}" =~ aarch64 ]]; then
+        skip_args="--skip sriov"
+    fi
+    # shellcheck disable=SC2086
     run_tests host1 \
         --variable "PROMETHEUS_HOST:$(hostname)" \
         --variable "LOKI_HOST:$(hostname)" \
+        ${skip_args} \
         suites/optional/
 }
