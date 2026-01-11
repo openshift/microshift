@@ -19,7 +19,7 @@ scenario_create_vms() {
     fi
     LVM_SYSROOT_SIZE=20480 prepare_kickstart host1 kickstart.ks.template "${start_image}"
     # Three nics - one for sriov, one for macvlan, another for ipvlan (they cannot enslave the same interface)
-    launch_vm  --network "${networks}" --vm_disksize 25
+    launch_vm  --network "${networks}" --vm_disksize 25 --vm_vcpus 4
 }
 
 scenario_remove_vms() {

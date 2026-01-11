@@ -8,7 +8,7 @@ scenario_create_vms() {
     exit_if_image_not_found "${start_image}"
 
     prepare_kickstart host1 kickstart-bootc.ks.template "${start_image}"
-    launch_vm --boot_blueprint "${start_image}"
+    launch_vm --boot_blueprint "${start_image}" --vm_vcpus 4
 }
 
 scenario_remove_vms() {
