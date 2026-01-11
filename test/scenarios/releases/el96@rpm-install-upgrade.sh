@@ -109,7 +109,7 @@ scenario_run_tests() {
     run_tests host1 \
         --exitonfailure \
         --variable "SOURCE_REPO_URL:${repo_url}" \
-        --variable "TARGET_VERSION:${BREW_LREL_RELEASE_VERSION}" \
+        --variable "TARGET_VERSION:${BREW_LATEST_RELEASE_VERSION}" \
         --variable "PREVIOUS_MINOR_VERSION:${PREVIOUS_MINOR_VERSION}" \
         suites/rpm/install.robot \
         suites/rpm/remove.robot \
