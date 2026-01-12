@@ -64,6 +64,9 @@
   ansible.builtin.reboot:
     reboot_timeout: 600
 
+- name: initialize results directory
+  include_tasks: roles/common/tasks/results-dir.yml
+
 - name: record post-install disk utilization
   vars:
     filename: disk1.txt
@@ -151,6 +154,6 @@
     - name: record network usage to file
       ansible.builtin.copy:
         content: "{{ vnstat.stdout }}"
-        dest: network.txt
+        dest: "{{ results_dir }}/network.txt"
       delegate_to: localhost
   when: vnstat_check.rc == 0
