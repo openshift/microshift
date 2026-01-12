@@ -1,3 +1,0 @@
-- machine-config-operator embedded-component 4334df8b665e4568a1ea435bceda413baae625d9 to 8542312713dac225bc5d4c5a48b4453f64498511
-  - a2eed309 2026-01-07T02:24:09+00:00 OCPNODE-3973: Disable autoSizingReserved on control plane and arbiter nodes
-
