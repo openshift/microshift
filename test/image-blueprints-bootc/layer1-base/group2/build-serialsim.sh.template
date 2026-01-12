@@ -14,7 +14,8 @@ function get_kernel_ver() {
 get_kernel_ver
 
 # Lock the OS release version to prevent the installation of a newer kernel package
-# belonging to a newer OS release.
+# belonging to a newer OS release. This file should not be removed to allow subsequent
+# dnf command execution.
 source /etc/os-release
 echo "${VERSION_ID}" > /etc/dnf/vars/releasever
 
@@ -41,7 +42,6 @@ get_kernel_ver
 # Install the necessary dependencies and clean up.
 dnf install -y git make python3-pyserial
 dnf clean all
-rm -f /etc/dnf/vars/releasever
 
 # Clone the serialsim repository and build the serialsim module.
 git clone https://github.com/microshift-io/serialsim.git /tmp/serialsim
