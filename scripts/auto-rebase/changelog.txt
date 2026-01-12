@@ -1,11 +1,4 @@
-- api embedded-component b315b8f7268a44367e6ab34880093564d0923ef0 to 0b46e314ebfecc649a3c14b5db7aed50cd5263a3
-  - ad6b79b 2026-01-06T23:17:50+01:00 OCPBUGS-61858: Add HTTPKeepAliveTimeout to IngressController API
-
-- cluster-ingress-operator embedded-component d95595b1c3242f5aea8b7c2ec7a548e1b4ce0581 to 1a164c16e804a4cf4f8b7aca4b8cb24d265dedb4
-  - 5d966d5 2026-01-07T12:04:55+01:00 OCPBUGS-61858: Implement e2e test for HTTPKeepAliveTimeout
-  - c1f7e1b 2026-01-07T12:04:55+01:00 OCPBUGS-61858: Implement HTTPKeepAliveTimeout tuning option
-  - 83d6de9 2026-01-07T12:04:55+01:00 OCPBUGS-61858: Bump openshift/api to get HTTPKeepAliveTimeout tuning option
-
-- machine-config-operator embedded-component 0ba59a8ecaa09254bd2c14bd565a3cb597cdcda1 to 247c2c7ff38913836a0ff6c469e80b82df8cb5a5
-  - ef3ff96f 2025-08-04T20:57:56+00:00 OCPBUGS-55971: Enable debug logging for nodeip-configuration
+- ovn-kubernetes image-arm64 5190b4a6433b4a18f29ba1a5df541ba95e225e04 to 6b42cd2527741cec0876136e986011a648934647
+  - 5bf99c79 2026-01-07T15:22:29+05:30 MultiNetPol: Process update only when spec fields and/or related annotations are updated
+  - a9f8d6f4 2026-01-07T15:04:17+05:30 NetPol: Process update only when spec fields and/or related annotation are updated
 
