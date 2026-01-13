@@ -9,7 +9,7 @@ scenario_create_vms() {
 
     prepare_kickstart host1 kickstart.ks.template "${start_image}"
     # Using multus as secondary network to have 2 nics in different networks.
-    launch_vm --network default,"${VM_MULTUS_NETWORK}"
+    launch_vm --network default,"${VM_MULTUS_NETWORK}" --vm_vcpus 4
 }
 
 scenario_remove_vms() {
