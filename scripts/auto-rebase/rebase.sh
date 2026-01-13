@@ -1031,6 +1031,9 @@ checkout_rebase_branch() {
 update_multus_images() {
     title "Rebasing Multus images"
 
+    # Pin multus images until https://issues.redhat.com//browse/OCPBUGS-73737 is solved and images updated.
+    return
+
     for goarch in amd64 arm64; do
         arch=${GOARCH_TO_UNAME_MAP["${goarch}"]:-noarch}
 
