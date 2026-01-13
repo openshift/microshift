@@ -56,7 +56,8 @@ Auto Recovery On Red Boot
     Start MicroShift Expecting Failure
 
     ${bootid}=    Get Current Boot Id
-    Command Should Fail    systemctl restart greenboot-healthcheck
+    Run Keyword And Expect Error    0 != 1
+    ...    Restart Greenboot And Wait For Success
     Wait Until Keyword Succeeds    5m    15s
     ...    System Should Be Rebooted    ${bootid}
     Wait Until Greenboot Health Check Exited
