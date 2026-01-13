@@ -1,3 +1,0 @@
-- router image-arm64 b231c65b5c06c1f74590ca8e77caecc6213beb6a to b5fcf0cd7f62a4eb76faa167cc9eca7e198fb5c9
-  - 823a6fd 2026-01-09T10:29:24-05:00 Fix HAProxy redirect: strip port from Host header and preserve query strings
-
