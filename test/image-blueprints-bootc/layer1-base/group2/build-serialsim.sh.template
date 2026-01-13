@@ -13,12 +13,13 @@ function get_kernel_ver() {
 # Set the current kernel version and architecture variables.
 get_kernel_ver
 
-# On CentOS, attempt to install the kernel-devel package for the current kernel
-# version, falling back to kernel-devel-matched if the former is not available.
 source /etc/os-release
 if [[ "${ID}" == "rhel" ]] ; then
+    # On RHEL, always install the kernel-devel package for the current kernel version.
     dnf install -y "kernel-devel-${KERNEL_VER}"
 else
+    # On CentOS, attempt to install the kernel-devel package for the current kernel
+    # version, falling back to kernel-devel-matched if the former is not available.
     dnf install -y "kernel-devel-${KERNEL_VER}" || dnf install -y kernel-devel-matched
 fi
 

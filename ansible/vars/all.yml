@@ -1,20 +1,28 @@
+# General setup
 create_devenv: false
 prometheus_logging: "{{ prometheus_logging_arg | default('true')  }}"
 
+# Results directory for performance metrics output
+results_base_dir: "{{ playbook_dir }}/results"
+
+# RHEL subscription and repository management
 manage_subscription: false
 rhel_username:
 rhel_password:
 rhel_pool_id:
 manage_repos: false
 
+# MicroShift installation options
 setup_microshift_host: false
 install_microshift: "{{ install_microshift_arg | default('false') }}"
 build_etcd_binary: false
 build_microshift: false
-microshift_version: "4.19"
+microshift_version: "4.20"
 
+# Service account
 sa_token_file: sa-token
 
+# pbench performance testing
 install_pbench: false
 pbench_configuration_environment: ec2
 pbench_key_url:
