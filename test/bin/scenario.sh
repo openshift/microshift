@@ -427,8 +427,8 @@ function get_vm_ip {
        while true; do
            now=$(date +%s)
            if [ $(( now - start )) -ge ${VM_BOOT_TIMEOUT} ]; then
-               echo "Timed out while waiting for IP retrieval"
-               exit 1
+               echo "Timed out while waiting for IP retrieval" >&2
+               return 1
            fi
            sleep 1
            # Try pinging the IP address to avoid stale DHCP leases that would falsely
@@ -466,6 +466,10 @@ wait_for_microshift_to_be_ready() {
 
     # Handle RUN_HOST_OVERRIDE
     vmname=$(apply_host_override "${vmname}")
+    if [ -z "${vmname}" ]; then
+        record_junit "${vmname}" "apply_host_override" "FAILED"
+        exit 1
+    fi
 
     # Set up kubeconfig for tests
     local -r vm_ip=$(get_vm_property "${vmname}" "ip")
@@ -474,7 +478,6 @@ wait_for_microshift_to_be_ready() {
     # Wait for MicroShift to be ready
     if ! wait_for_greenboot "${full_vmname}" "${vm_ip}"; then
         record_junit "${vmname}" "pre_test_greenboot_check" "FAILED"
-        popd &>/dev/null
         exit 1
     fi
     record_junit "${vmname}" "pre_test_greenboot_check" "OK"
@@ -828,6 +831,12 @@ launch_vm() {
         # Wait for an IP to be assigned
         echo "Waiting for VM ${full_vmname} to have an IP"
         local -r ip=$(get_vm_ip "${full_vmname}")
+        if [ -z "${ip}" ]; then
+            echo "VM ${full_vmname} has no IP"
+            record_junit "${vmname}" "ip-assignment" "FAILED"
+            return 1
+        fi
+
         echo "VM ${full_vmname} has IP ${ip}"
         record_junit "${vmname}" "ip-assignment" "OK"
 
@@ -986,15 +995,17 @@ stress_testing() {
 
 # Apply RUN_HOST_OVERRIDE logic if needed
 apply_host_override() {
-    local -r original_vmname="$1"
-    local vmname="${original_vmname}"
+    local vmname="$1"
 
     if [[ -n "${RUN_HOST_OVERRIDE}" ]]; then
         vmname="${RUN_HOST_OVERRIDE}"
-        local full_vmname
-        local ip
-        full_vmname="$(full_vm_name "${vmname}")"
-        ip=$(get_vm_ip "${full_vmname}")
+        local -r full_vmname="$(full_vm_name "${vmname}")"
+        local -r ip=$(get_vm_ip "${full_vmname}")
+
+        if [ -z "${ip}" ]; then
+            echo "VM ${full_vmname} has no IP" >&2
+            return 1
+        fi
         set_vm_property "${vmname}" "ip" "${ip}"
         set_vm_property "${vmname}" "ssh_port" "22"
         set_vm_property "${vmname}" "api_port" "6443"
@@ -1009,6 +1020,10 @@ run_tests() {
     local vmname="${1}"
     # Handle RUN_HOST_OVERRIDE
     vmname=$(apply_host_override "${vmname}")
+    if [ -z "${vmname}" ]; then
+        record_junit "${vmname}" "apply_host_override" "FAILED"
+        exit 1
+    fi
 
     shift
     echo "Running tests with $# args" "$@"
@@ -1129,6 +1144,10 @@ setup_oc_and_kubeconfig() {
 
     # Handle RUN_HOST_OVERRIDE
     vmname=$(apply_host_override "${vmname}")
+    if [ -z "${vmname}" ]; then
+        record_junit "${vmname}" "apply_host_override" "FAILED"
+        exit 1
+    fi
 
     # Save current directory
     pushd . &>/dev/null
@@ -1162,6 +1181,10 @@ run_ginkgo_tests() {
 
     # Handle RUN_HOST_OVERRIDE
     vmname=$(apply_host_override "${vmname}")
+    if [ -z "${vmname}" ]; then
+        record_junit "${vmname}" "apply_host_override" "FAILED"
+        exit 1
+    fi
 
     # Save current directory
     pushd . &>/dev/null
