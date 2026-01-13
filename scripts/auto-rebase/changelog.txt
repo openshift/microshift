@@ -1,3 +1,15 @@
-- ovn-kubernetes image-arm64 6c78b6defbd606f8fdf002d7cc37e3d49c7bcd98 to 1faf1ac5bb2e604f745d93a5fe70bec93024ad7f
+- api embedded-component 1cb53e34ca33d020c765093c21c9b7f4502cbea7 to 50517c6f4bfdbf9fc2cb291fd97cce150a3237ca
+  - b93b7907 2025-10-23T13:58:30+03:00 network, virt: graduate preconfigured UDN addresses feature gate
+
+- cluster-network-operator embedded-component 698e349cb60e84967bf93345d1b0802dd15ccc1a to dbd9826dbe5373bd3605dfef606d118ffc65b830
+  - ec1f517 2025-12-18T09:55:06+02:00 Add kubevirt platform to dual-stack supported platforms
+
+- machine-config-operator embedded-component 5c5e056e2484d1e3265eef638f2a326958b166f5 to 8af0c84e6fcc34c60768b3955366a78a440b7a85
+  - 704f74a5 2026-01-06T16:15:48+05:30 Remove the dead code of setting the operator status for cgroupv1 clusters
+  - 84ef367e 2026-01-05T09:49:43-05:00 msbic: skip update if arch annotation not found
+  - 4a1982eb 2026-01-05T09:46:34-05:00 boot_image: add event based queueing
+  - 6cb98619 2026-01-05T09:46:18-05:00 controller: rename msbic to boot image controller
+
+- ovn-kubernetes image-amd64 6c78b6defbd606f8fdf002d7cc37e3d49c7bcd98 to 1faf1ac5bb2e604f745d93a5fe70bec93024ad7f
   - 0eb16983 2025-11-26T14:56:03+08:00 Fix conntrack reconciliation to use service port instead of endpoint port
 
