@@ -20,13 +20,13 @@ Greenboot Health Check Exited
 
 Restart Greenboot And Wait For Success
     [Documentation]    Verify the health of the deployments using the MicroShift healthcheck command
-    [Arguments]    ${wait_timeout_secs}=600s
+    [Arguments]    ${wait_timeout}=600s
 
     # Note that the newer implementation of greenboot-healthcheck service no
     # longer allows service restart. Using the MicroShift healthcheck command
     # to verify the health of the deployments.
     ${stdout}    ${stderr}    ${rc}    Execute Command
-    ...    microshift healthcheck -v=2 --timeout="${wait_timeout_secs}"
+    ...    microshift healthcheck -v=2 --timeout="${wait_timeout}"
     ...    sudo=True    return_stdout=True    return_stderr=True    return_rc=True
-    IF    ${rc} != 0    Log    ${stdout}    ${stderr}    level=ERROR
+    IF    ${rc} != 0    Log Many    ${stdout}    ${stderr}
     Should Be Equal As Integers    0    ${rc}
