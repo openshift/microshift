@@ -14,7 +14,7 @@ scenario_create_vms() {
     exit_if_commit_not_found "${dest_image}"
 
     prepare_kickstart host1 kickstart.ks.template "${start_image}"
-    launch_vm
+    launch_vm --vm_vcpus 4
 }
 
 scenario_remove_vms() {
