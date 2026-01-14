@@ -165,7 +165,7 @@ func (fg FeatureGates) ToApiserverArgs() ([]string, error) {
 		for _, feature := range fg.CustomNoUpgrade.Disabled {
 			ret.Insert(fmt.Sprintf("%s=false", feature))
 		}
-	case FeatureSetDevPreviewNoUpgrade, FeatureSetTechPreviewNoUpgrade:
+	case FeatureSetTechPreviewNoUpgrade:
 		fgEnabledDisabled, err := featuresUtils.FeatureSets(featuresUtils.SelfManaged, configv1.FeatureSet(fg.FeatureSet))
 		if err != nil {
 			return nil, fmt.Errorf("failed to get feature set gates: %w", err)
@@ -191,7 +191,12 @@ func (fg *FeatureGates) validateFeatureGates() error {
 		return nil
 	}
 	// Must use a recognized feature set, or else empty
-	if fg.FeatureSet != "" && fg.FeatureSet != FeatureSetCustomNoUpgrade && fg.FeatureSet != FeatureSetTechPreviewNoUpgrade && fg.FeatureSet != FeatureSetDevPreviewNoUpgrade {
+	switch fg.FeatureSet {
+	case "", FeatureSetCustomNoUpgrade, FeatureSetTechPreviewNoUpgrade:
+		// valid, do nothing
+	case FeatureSetDevPreviewNoUpgrade:
+		return fmt.Errorf("%s feature set is not available on MicroShift", FeatureSetDevPreviewNoUpgrade)
+	default:
 		return fmt.Errorf("invalid feature set: %s", fg.FeatureSet)
 	}
 	// Must set FeatureSet to CustomNoUpgrade to use custom feature gates
