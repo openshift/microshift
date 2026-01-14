@@ -1,0 +1,11 @@
+- coredns image-arm64 7486e9e4330c1e41d9a91e4673b7f2782efc112c to 45cf8aec34b207657d88a54f785cf09ae569d4fe
+  - f523fe5 2026-01-05T18:23:09+00:00 Add team members to the OWNERS file
+
+- ovn-kubernetes image-arm64 904d66a2d4c674e35868a5c047a97c8a77f4a3fa to 1938041fd8f8c1fb5d376fa59faec1fef7614a92
+  - 58296b6d 2025-12-20T11:48:57+00:00 Updating ovn-kubernetes-microshift-container image to be consistent with ART for 4.22 Reconciling with https://github.com/openshift/ocp-build-data/tree/087d1930e36b609f77d73bd8a313d85c940cff4d/images/ovn-kubernetes-microshift.yml
+
+- service-ca-operator image-arm64 f5fde683e742dd5ddebcbfaf2d1a07fa96131a73 to 7c43fea353e9d13663e51e44788bf3c2ec737c1a
+  - f750e73 2026-01-12T19:37:30+08:00 test/e2e: migrate serving-cert-secret-delete-data test for OTE compatibility
+  - 685de04 2026-01-12T13:37:39+08:00 test/e2e: migrate serving-cert-secret-add-data test for OTE compatibility
+  - f0218f8 2026-01-09T21:27:32+08:00 test/e2e: migrate serving-cert-secret-modify-bad-tlsCert test for OTE compatibility
+
