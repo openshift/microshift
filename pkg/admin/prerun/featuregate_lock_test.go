@@ -393,59 +393,114 @@ func TestFeatureGateLockManagement_ConfigChange(t *testing.T) {
 }
 
 func TestFeatureGateLockManagement_VersionChange(t *testing.T) {
-	// Create a temporary directory for testing
-	tmpDir, err := os.MkdirTemp("", "featuregate-lockFile-test-*")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer os.RemoveAll(tmpDir)
-
-	// Override the lockFile file path for testing
-	originalPath := featureGateLockFilePath
-	featureGateLockFilePath = filepath.Join(tmpDir, "no-upgrade")
-	defer func() { featureGateLockFilePath = originalPath }()
-
-	// Override version file path for testing
-	originalVersionPath := versionFilePath
-	versionFilePath = filepath.Join(tmpDir, "version")
-	defer func() { versionFilePath = originalVersionPath }()
-
-	// Create a version file with NEW version (simulating upgrade) (version file uses JSON format)
-	versionData := versionFile{
-		Version: versionMetadata{Major: 4, Minor: 19, Patch: 0}, // Newer version
-		BootID:  "test-boot",
-	}
-	versionJSON, _ := json.Marshal(versionData)
-	if err := os.WriteFile(versionFilePath, versionJSON, 0600); err != nil {
-		t.Fatal(err)
-	}
-
-	// Create lockFile file with OLD version
-	lockFile := featureGateLockFile{
-		FeatureSet: config.FeatureSetCustomNoUpgrade,
-		CustomNoUpgrade: config.CustomNoUpgrade{
-			Enabled: []string{"FeatureA"},
+	tests := []struct {
+		name        string
+		lockFileVer versionMetadata
+		currentVer  versionMetadata
+		wantErr     bool
+		description string
+	}{
+		{
+			name:        "minor version upgrade should fail",
+			lockFileVer: versionMetadata{Major: 4, Minor: 18, Patch: 0},
+			currentVer:  versionMetadata{Major: 4, Minor: 19, Patch: 0},
+			wantErr:     true,
+			description: "Minor version upgrade (4.18.0 -> 4.19.0) should be blocked",
 		},
-		Version: versionMetadata{Major: 4, Minor: 18, Patch: 0}, // Older version
-	}
-	if err := writeFeatureGateLockFile(featureGateLockFilePath, lockFile); err != nil {
-		t.Fatal(err)
+		{
+			name:        "major version upgrade should fail",
+			lockFileVer: versionMetadata{Major: 4, Minor: 18, Patch: 0},
+			currentVer:  versionMetadata{Major: 5, Minor: 0, Patch: 0},
+			wantErr:     true,
+			description: "Major version upgrade (4.18.0 -> 5.0.0) should be blocked",
+		},
+		{
+			name:        "patch version change should succeed",
+			lockFileVer: versionMetadata{Major: 4, Minor: 18, Patch: 0},
+			currentVer:  versionMetadata{Major: 4, Minor: 18, Patch: 1},
+			wantErr:     false,
+			description: "Patch version change (4.18.0 -> 4.18.1) should be allowed",
+		},
+		{
+			name:        "same version should succeed",
+			lockFileVer: versionMetadata{Major: 4, Minor: 18, Patch: 0},
+			currentVer:  versionMetadata{Major: 4, Minor: 18, Patch: 0},
+			wantErr:     false,
+			description: "Same version (4.18.0 -> 4.18.0) should be allowed",
+		},
+		{
+			name:        "version downgrade minor should fail",
+			lockFileVer: versionMetadata{Major: 4, Minor: 19, Patch: 0},
+			currentVer:  versionMetadata{Major: 4, Minor: 18, Patch: 0},
+			wantErr:     true,
+			description: "Minor version downgrade (4.19.0 -> 4.18.0) should be blocked",
+		},
+		{
+			name:        "version downgrade major should fail",
+			lockFileVer: versionMetadata{Major: 5, Minor: 0, Patch: 0},
+			currentVer:  versionMetadata{Major: 4, Minor: 18, Patch: 0},
+			wantErr:     true,
+			description: "Major version downgrade (5.0.0 -> 4.18.0) should be blocked",
+		},
 	}
 
-	cfg := &config.Config{
-		ApiServer: config.ApiServer{
-			FeatureGates: config.FeatureGates{
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Create a temporary directory for testing
+			tmpDir, err := os.MkdirTemp("", "featuregate-lockFile-test-*")
+			if err != nil {
+				t.Fatal(err)
+			}
+			defer os.RemoveAll(tmpDir)
+
+			// Override the lockFile file path for testing
+			originalPath := featureGateLockFilePath
+			featureGateLockFilePath = filepath.Join(tmpDir, "no-upgrade")
+			defer func() { featureGateLockFilePath = originalPath }()
+
+			// Override version file path for testing
+			originalVersionPath := versionFilePath
+			versionFilePath = filepath.Join(tmpDir, "version")
+			defer func() { versionFilePath = originalVersionPath }()
+
+			// Create a version file with current version (version file uses JSON format)
+			versionData := versionFile{
+				Version: tt.currentVer,
+				BootID:  "test-boot",
+			}
+			versionJSON, _ := json.Marshal(versionData)
+			if err := os.WriteFile(versionFilePath, versionJSON, 0600); err != nil {
+				t.Fatal(err)
+			}
+
+			// Create lockFile file with locked version
+			lockFile := featureGateLockFile{
 				FeatureSet: config.FeatureSetCustomNoUpgrade,
 				CustomNoUpgrade: config.CustomNoUpgrade{
 					Enabled: []string{"FeatureA"},
 				},
-			},
-		},
-	}
+				Version: tt.lockFileVer,
+			}
+			if err := writeFeatureGateLockFile(featureGateLockFilePath, lockFile); err != nil {
+				t.Fatal(err)
+			}
 
-	err = FeatureGateLockManagement(cfg)
-	if err == nil {
-		t.Error("FeatureGateLockManagement() should have failed with version change")
+			cfg := &config.Config{
+				ApiServer: config.ApiServer{
+					FeatureGates: config.FeatureGates{
+						FeatureSet: config.FeatureSetCustomNoUpgrade,
+						CustomNoUpgrade: config.CustomNoUpgrade{
+							Enabled: []string{"FeatureA"},
+						},
+					},
+				},
+			}
+
+			err = FeatureGateLockManagement(cfg)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("FeatureGateLockManagement() error = %v, wantErr %v. %s", err, tt.wantErr, tt.description)
+			}
+		})
 	}
 }
 
