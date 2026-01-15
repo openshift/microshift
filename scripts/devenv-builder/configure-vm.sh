@@ -147,10 +147,10 @@ function check_rhel_subscription_type() {
 }
 
 function configure_rhel_subscription() {
-    sudo subscription-manager config --rhsm.manage_repos=1 --server.hostname=subscription-legacy.rhsm.redhat.com --rhsm.baseurl=https://cdn-legacy.redhat.com
     if ! sudo subscription-manager status; then
         sudo subscription-manager register --auto-attach --force
     fi
+    sudo subscription-manager config --rhsm.manage_repos=1
 
     # Parse the OS versions and determine if EUS
     source /etc/os-release
