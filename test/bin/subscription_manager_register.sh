@@ -34,10 +34,8 @@ EOF
         copy_file_to_vm "${vmname}" /tmp/subscription-manager-act-key /tmp/subscription-manager-act-key
         run_command_on_vm "${vmname}" "chmod 600 /tmp/subscription-manager-org /tmp/subscription-manager-act-key"
         run_command_on_vm "${vmname}" "chmod 700 ${sub_script} && sudo ${sub_script}"
-        run_command_on_vm "${vmname}" "sudo subscription-manager config --server.hostname=subscription-legacy.rhsm.redhat.com --rhsm.baseurl=https://cdn-legacy.redhat.com"
     else
         # Local developer workflow
-        run_command_on_vm "${vmname}" "sudo subscription-manager config --server.hostname=subscription-legacy.rhsm.redhat.com --rhsm.baseurl=https://cdn-legacy.redhat.com"
         run_command_on_vm "${vmname}" "sudo subscription-manager register"
     fi
 }
