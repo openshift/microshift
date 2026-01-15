@@ -1,6 +1,3 @@
-- cluster-csi-snapshot-controller-operator embedded-component 0dd541084bee8885dbd14dcd6eb2f826ba779883 to 186ad6f430ae3f8f8e777e912efa6670033857e5
-  - 2c7b7d8 2026-01-08T13:31:02+00:00 Set client throttling parameters
-
-- cluster-network-operator embedded-component 8d09651e31c64340865f7ec7f349786528805ebd to ab9804d6df18e79145a4524d9abbd50475d4b21d
-  - 59dff32 2026-01-12T04:00:24+00:00 OCPBUGS-72411: use net.JoinHostPort for URL construction
+- kubernetes image-arm64 52351d68ef76ea7ad374e31ae1afb32e1d132c97 to f80fdf620b057bc3c66a6feb8b6cdc9f33f2c5c9
+  - f80fdf620 2026-01-13T18:11:43+00:00 [release-4.21] OCPBUGS-72378: UPSTREAM: 135372: Re-enable temporarily disabled SchedulerPreemption test (#2556)
 
