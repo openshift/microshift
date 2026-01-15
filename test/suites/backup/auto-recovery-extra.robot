@@ -55,11 +55,7 @@ Auto Recovery On Red Boot
     Corrupt Etcd Database
     Start MicroShift Expecting Failure
 
-    ${bootid}=    Get Current Boot Id
-    Run Keyword And Expect Error    0 != 1
-    ...    Restart Greenboot And Wait For Success
-    Wait Until Keyword Succeeds    5m    15s
-    ...    System Should Be Rebooted    ${bootid}
+    Reboot MicroShift Host
     Wait Until Greenboot Health Check Exited
 
     [Teardown]    Run Keywords
