@@ -1,3 +1,0 @@
-- kubernetes image-arm64 52351d68ef76ea7ad374e31ae1afb32e1d132c97 to f80fdf620b057bc3c66a6feb8b6cdc9f33f2c5c9
-  - f80fdf620 2026-01-13T18:11:43+00:00 [release-4.21] OCPBUGS-72378: UPSTREAM: 135372: Re-enable temporarily disabled SchedulerPreemption test (#2556)
-
