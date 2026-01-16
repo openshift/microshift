@@ -400,28 +400,18 @@ Router Should Resolve Hostname
     Should Contain    ${fuse_device}    Name:    ${hostname}
 
 Setup DNS For Test
-    [Documentation]    Setup DNS using CoreDNS hosts feature if available, otherwise use legacy method
+    [Documentation]    Setup DNS using CoreDNS hosts feature
     [Arguments]    ${ip_address}    ${dns_name}
-    ${config}=    Show Config    default
-    TRY
-        VAR    ${hosts}=    ${config}[dns][hosts]
-        Add Entry To Hosts    ${ip_address}    ${dns_name}    /etc/hosts
-        Drop In MicroShift Config    ${HOSTSFILE_ENABLED}    20-dns
-        Restart MicroShift
-        Restart Greenboot And Wait For Success
-    EXCEPT
-        Configure DNS For Domain    ${ip_address}    ${dns_name}
-    END
+
+    Add Entry To Hosts    ${ip_address}    ${dns_name}    /etc/hosts
+    Drop In MicroShift Config    ${HOSTSFILE_ENABLED}    20-dns
+    Restart MicroShift
+    Restart Greenboot And Wait For Success
 
 Cleanup DNS For Test
-    [Documentation]    Cleanup DNS configuration based on method used
+    [Documentation]    Cleanup DNS configuration
     [Arguments]    ${dns_name}
-    ${config}=    Show Config    default
-    TRY
-        VAR    ${hosts}=    ${config}[dns][hosts]
-        Remove Entry From Hosts    ${dns_name}
-        Remove Drop In MicroShift Config    20-dns
-        Restart MicroShift
-    EXCEPT
-        Remove DNS Configuration
-    END
+
+    Remove Entry From Hosts    ${dns_name}
+    Remove Drop In MicroShift Config    20-dns
+    Restart MicroShift
