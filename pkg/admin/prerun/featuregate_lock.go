@@ -143,13 +143,14 @@ func validateFeatureGateLockFile(cfg *config.Config) error {
 	}
 
 	if lockFile.Version.Major != currentVersion.Major || lockFile.Version.Minor != currentVersion.Minor {
-		return fmt.Errorf("major or minor version upgrade detected with custom feature gates: locked version %s, current version %s\n\n"+
-			"Upgrades (major or minor) are not supported when custom feature gates are configured.\n"+
+		return fmt.Errorf("version upgrade detected with custom feature gates: locked version %s, current version %s\n\n"+
+			"Upgrades are not supported when custom feature gates are configured.\n"+
 			"Custom feature gates (%s) were configured in version %s.\n"+
 			"To restore MicroShift to a supported state, you must:\n"+
-			"- Roll back MicroShift to version %s, OR\n"+
-			"- Run: sudo microshift-cleanup-data --all\n"+
-			"  and remove custom feature gates from /etc/microshift/config.yaml before restarting MicroShift.",
+			"1. Roll back to version %s, OR\n"+
+			"2. Run: sudo microshift-cleanup-data --all\n"+
+			"3. Remove custom feature gates from /etc/microshift/config.yaml\n"+
+			"4. Restart MicroShift: sudo systemctl restart microshift",
 			lockFile.Version.String(), currentVersion.String(),
 			lockFile.FeatureSet, lockFile.Version.String(), lockFile.Version.String())
 	}
