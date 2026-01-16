@@ -1,16 +1,16 @@
 {
   "release": {
-    "base": "4.22.0-0.nightly-arm64-2026-01-15-012506"
+    "base": "4.22.0-0.nightly-arm64-2026-01-16-012506"
   },
   "images": {
     "cli": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:af1a0337616d78fb8352827f5d282b938bd9739e779b4f157992feddf827bf0f",
-    "coredns": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:8b56ac334752163e41858c8364685df45c52f938cd8cfd9761363fb98e7fd838",
-    "haproxy-router": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:d48e0ff6eb2d6a6bd1c0ce661e1ebfedec0d076ebb8e1e637958c7d97a9d3120",
+    "coredns": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:99c8462acebcef0ef8922efdb5689f61c9a2e7c307b89b7e75d63228e9c4ae86",
+    "haproxy-router": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:c9eb4500dd1b8b1e1ecb2063e0138d732ae59c9f3577e0aff321469d2dcaaa67",
     "kube-rbac-proxy": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:256d6131d6dd8c071d3cd945798afc40a2cbf62347d7ae28b20e1a2335917521",
     "ovn-kubernetes-microshift": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:a22501e27a7c4192b99102f2b6f779288226e8afe7fc6432cee35ebae275e60b",
     "pod": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:3433ebe7fc79a4d62d9fd57b130b552e504c53aa9cf6f57d06c73bd58b55c117",
-    "service-ca-operator": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:4f884f9eda98a55f1c2397c8c874de878176382d2d648f2cd5150dba9d96d381",
+    "service-ca-operator": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:af55c6ec47c3b56aded929e8e3ea9e6e7db729140e4bc5d780fb89152ca4fc29",
     "lvms_operator": "registry.redhat.io/lvms4/lvms-rhel9-operator@sha256:3766640b19c336b443619ecdb35f36b479c79ea71b21de97febf024a5eaf6c84",
-    "csi-snapshot-controller": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:6ca6a87683d5be51a2d6f2d1328097443cb636b5edc8c1d239494afd0674b91e"
+    "csi-snapshot-controller": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:68f2607c70abf8e28aa43b4c81e1c3f4a770ef63e73e7798ffccf2fe82cd6863"
   }
 }
