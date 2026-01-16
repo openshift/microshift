@@ -6,7 +6,7 @@ ARG USHIFT_RPM_REPO_PATH=/tmp/$USHIFT_RPM_REPO_NAME
 
 # Configure the RPM repositories (without EUS enabled)
 COPY --chmod=755 ./bootc-images/rpm-repo-config.sh /tmp/rpm-repo-config.sh
-RUN /tmp/rpm-repo-config.sh && rm -f /tmp/rpm-repo-config.sh
+RUN /tmp/rpm-repo-config.sh --enable-eus && rm -f /tmp/rpm-repo-config.sh
 
 # Copy the MicroShift repository contents
 COPY ./rpm-repos/$USHIFT_RPM_REPO_NAME $USHIFT_RPM_REPO_PATH
