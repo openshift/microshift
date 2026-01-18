@@ -1,0 +1,35 @@
+#!/bin/bash
+set -euo pipefail
+set -x
+
+function enable_eus_repositories() {
+    local -r vmajor="$(awk -F. '{print $1}' <<< "${VERSION_ID}")"
+    local -r vminor="$(awk -F. '{print $2}' <<< "${VERSION_ID}")"
+
+    dnf config-manager --set-disabled '*'
+    dnf config-manager --set-enabled \
+        "rhel-${vmajor}-for-$(uname -m)-baseos-eus-rpms" \
+        "rhel-${vmajor}-for-$(uname -m)-appstream-eus-rpms"
+}
+
+# Lock the OS release version to prevent the installation of packages belonging
+# to a newer OS release
+source /etc/os-release
+echo "${VERSION_ID}" > /etc/dnf/vars/releasever
+
+# Process the command line arguments
+while [ $# -gt 0 ] ; do
+    case "$1" in
+    --enable-eus)
+        enable_eus_repositories
+        shift
+        ;;
+    *)
+        echo "Unknown option: $1"
+        exit 1
+        ;;
+    esac
+done
+
+# Print the enabled repositories
+dnf repoinfo --enabled

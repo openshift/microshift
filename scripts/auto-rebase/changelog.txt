@@ -1,0 +1,10 @@
+- csi-external-snapshotter image-arm64 6383ab93be114af8d1067523602bd2a44c927f1a to d20b90a92cd7d77166319f5bc2feb80623747d28
+  - 06ed333 2026-01-06T14:18:57+08:00 UPSTREAM: 1359: Fix group snapshot not taken on conflict
+  - 44323ca 2026-01-06T14:17:22+08:00 UPSTREAM: 1354: Fix for cases where the resource is already present on the cluster
+
+- router image-arm64 b5fcf0cd7f62a4eb76faa167cc9eca7e198fb5c9 to fa55e2723077811ef81c4b494c68f6c38282d6e2
+  - 9569f21 2025-12-20T13:59:35+00:00 Updating openshift-enterprise-haproxy-router-container image to be consistent with ART for 4.22 Reconciling with https://github.com/openshift/ocp-build-data/tree/087d1930e36b609f77d73bd8a313d85c940cff4d/images/openshift-enterprise-haproxy-router.yml
+
+- service-ca-operator image-arm64 b43ed91efd958355b8209bf252f901bb2213daf3 to bb522851659b55683ff29410ee1a300af1506926
+  - 35a06a2 2026-01-14T02:39:22+08:00 test/e2e: migrate vulnerable-legacy-ca-bundle-injection-configmap test for OTE compatibility
+

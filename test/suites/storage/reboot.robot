@@ -31,7 +31,7 @@ Test Case Setup
     ${ns}=    Create Unique Namespace
     VAR    ${NAMESPACE}=    ${ns}    scope=SUITE
     Oc Create    -f ${SOURCE_POD} -n ${NAMESPACE}
-    Named Pod Should Be Ready    ${POD_NAME_STATIC}
+    Named Pod Should Be Ready    ${POD_NAME_STATIC}    timeout=120s
 
 Test Case Teardown
     [Documentation]    Clean up test suite resources
