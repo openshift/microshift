@@ -38,7 +38,7 @@
 
   - name: Set microshift_prerelease if microshift_version is a prerelease
     ansible.builtin.set_fact:
-      microshift_prerelease: "{{ 'rc' in microshift_version or 'ec' in microshift_version }}"
+      microshift_prerelease: "{{ 'rc' in microshift_version or 'ec' in microshift_version or 'latest' in microshift_version }}"
 
   - name: Create microshift prerelease mirrors
     include_tasks: roles/manage-repos/tasks/create-mirrors.yaml
