@@ -119,10 +119,6 @@ Restore Service
     ...    sudo=True    return_rc=True
     Should Be Equal As Integers    0    ${rc}
 
-    # Reboot to regain ostree deployment (revert usroverlay)
-    ${is_ostree}=    Is System OSTree
-    IF    ${is_ostree}    Reboot MicroShift Host
-
 Disrupt Pod Network
     [Documentation]    Prevent MicroShift pods from starting correctly
     ${configuration}=    Catenate    SEPARATOR=\n
@@ -135,8 +131,8 @@ Disrupt Pod Network
     Drop In MicroShift Config    ${configuration}    10-svcNetwork
 
 Cleanup And Start
-    [Documentation]    Wipe MicroShift data and start the service
+    [Documentation]    Wipe MicroShift data and restart the system
     Cleanup MicroShift    --all    --keep-images
-    Start MicroShift
-    Setup Kubeconfig
-    Restart Greenboot And Wait For Success
+    Enable MicroShift
+    Reboot MicroShift Host
+    Wait Until Greenboot Health Check Exited
