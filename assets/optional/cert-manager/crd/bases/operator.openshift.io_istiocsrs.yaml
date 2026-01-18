@@ -4,10 +4,17 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.15.0
+  labels:
+    app.kubernetes.io/name: istiocsr
+    app.kubernetes.io/part-of: cert-manager-operator
   name: istiocsrs.operator.openshift.io
 spec:
   group: operator.openshift.io
   names:
+    categories:
+    - cert-manager-operator
+    - istio-csr
+    - istiocsr
     kind: IstioCSR
     listKind: IstioCSRList
     plural: istiocsrs
@@ -15,22 +22,26 @@ spec:
   scope: Namespaced
   versions:
   - additionalPrinterColumns:
-    - jsonPath: .metadata.creationTimestamp
-      name: Age
-      type: date
     - jsonPath: .status.istioCSRGRPCEndpoint
       name: GRPC Endpoint
       type: string
+    - jsonPath: .status.conditions[?(@.type=='Ready')].status
+      name: Ready
+      type: string
+    - jsonPath: .status.conditions[?(@.type=='Ready')].message
+      name: Message
+      type: string
+    - jsonPath: .metadata.creationTimestamp
+      name: AGE
+      type: date
     name: v1alpha1
     schema:
       openAPIV3Schema:
         description: |-
-          IstioCSR describes configuration and information about the managed istio-csr
-          agent. The name must be `default` to make istiocsr a singleton that is, to
-          allow only one instance of istiocsr per namespace.
+          IstioCSR describes the configuration and information about the managed istio-csr agent.
+          The name must be `default` to make IstioCSR a singleton that is, to allow only one instance of IstioCSR per namespace.
 
-          When an IstioCSR is created, a new deployment is created which manages the
-          istio-csr agent and keeps it in the desired state.
+          When an IstioCSR is created, istio-csr agent is deployed in the IstioCSR-created namespace.
         properties:
           apiVersion:
             description: |-
@@ -54,21 +65,22 @@ spec:
               IstioCSR.
             properties:
               controllerConfig:
-                description: |-
-                  controllerConfig is for configuring the controller for setting up
-                  defaults to enable istio-csr agent.
+                description: controllerConfig configures the controller for setting
+                  up defaults to enable the istio-csr agent.
                 properties:
                   labels:
                     additionalProperties:
                       type: string
-                    description: labels to apply to all resources created for istio-csr
-                      agent deployment.
+                    description: |-
+                      labels to apply to all resources created for the istio-csr agent deployment.
+                      This field can have a maximum of 20 entries.
+                    maxProperties: 20
+                    minProperties: 0
                     type: object
                     x-kubernetes-map-type: granular
                 type: object
               istioCSRConfig:
-                description: istioCSRConfig is for configuring the istio-csr agent
-                  behavior.
+                description: istioCSRConfig configures the istio-csr agent's behavior.
                 properties:
                   affinity:
                     description: |-
@@ -358,7 +370,6 @@ spec:
                                         pod labels will be ignored. The default value is empty.
                                         The same key is forbidden to exist in both matchLabelKeys and labelSelector.
                                         Also, matchLabelKeys cannot be set when labelSelector isn't set.
-                                        This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                       items:
                                         type: string
                                       type: array
@@ -373,7 +384,6 @@ spec:
                                         pod labels will be ignored. The default value is empty.
                                         The same key is forbidden to exist in both mismatchLabelKeys and labelSelector.
                                         Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
-                                        This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                       items:
                                         type: string
                                       type: array
@@ -540,7 +550,6 @@ spec:
                                     pod labels will be ignored. The default value is empty.
                                     The same key is forbidden to exist in both matchLabelKeys and labelSelector.
                                     Also, matchLabelKeys cannot be set when labelSelector isn't set.
-                                    This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                   items:
                                     type: string
                                   type: array
@@ -555,7 +564,6 @@ spec:
                                     pod labels will be ignored. The default value is empty.
                                     The same key is forbidden to exist in both mismatchLabelKeys and labelSelector.
                                     Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
-                                    This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                   items:
                                     type: string
                                   type: array
@@ -720,7 +728,6 @@ spec:
                                         pod labels will be ignored. The default value is empty.
                                         The same key is forbidden to exist in both matchLabelKeys and labelSelector.
                                         Also, matchLabelKeys cannot be set when labelSelector isn't set.
-                                        This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                       items:
                                         type: string
                                       type: array
@@ -735,7 +742,6 @@ spec:
                                         pod labels will be ignored. The default value is empty.
                                         The same key is forbidden to exist in both mismatchLabelKeys and labelSelector.
                                         Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
-                                        This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                       items:
                                         type: string
                                       type: array
@@ -902,7 +908,6 @@ spec:
                                     pod labels will be ignored. The default value is empty.
                                     The same key is forbidden to exist in both matchLabelKeys and labelSelector.
                                     Also, matchLabelKeys cannot be set when labelSelector isn't set.
-                                    This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                   items:
                                     type: string
                                   type: array
@@ -917,7 +922,6 @@ spec:
                                     pod labels will be ignored. The default value is empty.
                                     The same key is forbidden to exist in both mismatchLabelKeys and labelSelector.
                                     Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
-                                    This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                   items:
                                     type: string
                                   type: array
@@ -1004,9 +1008,9 @@ spec:
                     properties:
                       issuerRef:
                         description: |-
-                          issuerRef contains details to the referenced object used for
-                          obtaining the certificates. When issuerRef.Kind is Issuer, it must exist in the
-                          .spec.istioCSRConfig.istio.namespace.
+                          issuerRef contains details of the referenced object used for obtaining certificates.
+                          When `issuerRef.Kind` is `Issuer`, it must exist in the `.spec.istioCSRConfig.istio.namespace`.
+                          This field is immutable once set.
                         properties:
                           group:
                             description: Group of the resource being referred to.
@@ -1028,6 +1032,33 @@ spec:
                             == 'clusterissuer'
                         - message: group must be 'cert-manager.io'
                           rule: self.group.lowerAscii() == 'cert-manager.io'
+                      istioCACertificate:
+                        description: |-
+                          istioCACertificate when provided, the operator will use the CA certificate from the specified ConfigMap.
+                          If empty, the operator will automatically extract the CA certificate from the Secret containing the istiod certificate obtained from cert-manager.
+                        properties:
+                          key:
+                            description: key name holding the required data.
+                            maxLength: 253
+                            minLength: 1
+                            pattern: ^[-._a-zA-Z0-9]+$
+                            type: string
+                          name:
+                            description: name of the ConfigMap.
+                            maxLength: 253
+                            minLength: 1
+                            type: string
+                          namespace:
+                            description: namespace in which the ConfigMap exists.
+                              If empty, ConfigMap will be looked up in IstioCSR created
+                              namespace.
+                            maxLength: 63
+                            minLength: 0
+                            type: string
+                        required:
+                        - key
+                        - name
+                        type: object
                     required:
                     - issuerRef
                     type: object
@@ -1039,7 +1070,11 @@ spec:
                     description: istio is for configuring the istio specifics.
                     properties:
                       namespace:
-                        description: namespace of the istio control-plane.
+                        description: |-
+                          namespace of the Istio control plane.
+                          This field can have a maximum of 63 characters.
+                        maxLength: 63
+                        minLength: 1
                         type: string
                         x-kubernetes-validations:
                         - message: namespace is immutable once set
@@ -1048,99 +1083,130 @@ spec:
                         default:
                         - default
                         description: |-
-                          revisions are the istio revisions that are currently installed in the cluster.
-                          Changing this field will modify the DNS names that will be requested for
-                          the istiod certificate.
+                          revisions are the Istio revisions that are currently installed in the cluster.
+                          Changing this field will modify the DNS names that will be requested for the istiod certificate.
+                          This field can have a maximum of 25 entries.
                         items:
+                          maxLength: 63
+                          minLength: 1
                           type: string
-                        maxItems: 10
+                        maxItems: 25
+                        minItems: 0
                         type: array
                         x-kubernetes-list-type: set
-                        x-kubernetes-validations:
-                        - message: revisions is immutable once set
-                          rule: self.all(x, x in oldSelf) && oldSelf.all(x, x in self)
                     required:
                     - namespace
                     type: object
+                  istioDataPlaneNamespaceSelector:
+                    description: |-
+                      Istio-csr creates a ConfigMap named `istio-ca-root-cert` containing the root CA certificate, which the Istio data plane uses to verify server certificates. Its default behavior is to create and monitor ConfigMaps in all namespaces.
+                      The istioDataPlaneNamespaceSelector restricts the namespaces where the ConfigMap is created by using label selectors, such as maistra.io/member-of=istio-system. This selector is also attached to all desired namespaces that are part of the data plane.
+                      This field can have a maximum of 4096 characters.
+                    example: maistra.io/member-of=istio-system
+                    maxLength: 4096
+                    minLength: 0
+                    type: string
                   istiodTLSConfig:
                     description: istiodTLSConfig is for configuring istiod certificate
                       specifics.
                     properties:
                       certificateDNSNames:
-                        description: certificateDNSNames contains the additional DNS
-                          names to be added to the istiod certificate SAN.
+                        description: |-
+                          certificateDNSNames contains the additional DNS names to be added to the istiod certificate SAN.
+                          This field can have a maximum of 25 entries.
                         items:
+                          maxLength: 253
+                          minLength: 1
                           type: string
+                        maxItems: 25
+                        minItems: 0
                         type: array
                         x-kubernetes-list-type: set
                       certificateDuration:
                         default: 1h
-                        description: certificateDuration is the istio-csr and the
-                          istiod certificates validity period.
+                        description: certificateDuration is the validity period for
+                          the istio-csr and istiod certificates.
                         type: string
                       certificateRenewBefore:
                         default: 30m
-                        description: |-
-                          certificateRenewBefore is the ahead time to renew the istio-csr and the istiod certificates
-                          before expiry.
+                        description: certificateRenewBefore is the time before expiry
+                          to renew the istio-csr and istiod certificates.
                         type: string
                       commonName:
                         description: |-
-                          commonName is the common name to be set in the certificate.cert-manager.io
-                          created for istiod. CommonName will be of the form `istiod.<istio_namespace>.svc`
-                          when not set.
+                          commonName is the common name to be set in the cert-manager.io Certificate created for istiod.
+                          The commonName will be of the form istiod.<istio_namespace>.svc when not set.
+                          This field can have a maximum of 64 characters.
+                        example: istiod.istio-system.svc
+                        maxLength: 64
+                        minLength: 0
                         type: string
                       maxCertificateDuration:
                         default: 1h
-                        description: |-
-                          MaxCertificateDuration is the maximum validity duration that can be
-                          requested for a certificate.
+                        description: MaxCertificateDuration is the maximum validity
+                          duration that can be requested for a certificate.
                         type: string
-                      privateKeySize:
-                        default: 2048
-                        description: |-
-                          privateKeySize is the istio-csr and the istiod certificate's key size. When the SignatureAlgorithm
-                          is RSA, must be >= 2048 and for ECDSA, can only be 256 or 384, corresponding to P-256 and P-384 respectively.
-                        type: integer
-                        x-kubernetes-validations:
-                        - message: privateKeySize is immutable once set
-                          rule: oldSelf == 0 || self == oldSelf
-                      signatureAlgorithm:
+                      privateKeyAlgorithm:
                         default: RSA
                         description: |-
-                          signatureAlgorithm is the signature algorithm to use when generating
-                          private keys. At present only RSA and ECDSA are supported.
+                          privateKeyAlgorithm is the algorithm to use when generating private keys. Allowed values are RSA, and ECDSA.
+                          This field is immutable once set.
                         enum:
                         - RSA
                         - ECDSA
                         type: string
                         x-kubernetes-validations:
-                        - message: signatureAlgorithm is immutable once set
+                        - message: privateKeyAlgorithm is immutable once set
                           rule: oldSelf == '' || self == oldSelf
+                      privateKeySize:
+                        default: 2048
+                        description: |-
+                          privateKeySize is the key size for the istio-csr and istiod certificates. Allowed values when privateKeyAlgorithm is RSA are 2048, 4096, 8192; and for ECDSA, they are 256, 384.
+                          This field is immutable once set.
+                        enum:
+                        - 256
+                        - 384
+                        - 2048
+                        - 4096
+                        - 8192
+                        format: int32
+                        type: integer
+                        x-kubernetes-validations:
+                        - message: privateKeySize is immutable once set
+                          rule: oldSelf == 0 || self == oldSelf
                       trustDomain:
                         description: |-
-                          trustDomain is the istio cluster's trust domain, which will also be used for deriving
-                          spiffe URI.
+                          trustDomain is the Istio cluster's trust domain, which will also be used for deriving the SPIFFE URI.
+                          This field can have a maximum of 63 characters.
+                        maxLength: 63
+                        minLength: 1
                         type: string
                     required:
                     - trustDomain
                     type: object
                     x-kubernetes-validations:
-                    - message: signatureAlgorithm may only be configured during creation
-                      rule: '!has(oldSelf.signatureAlgorithm) && !has(self.signatureAlgorithm)
-                        || has(oldSelf.signatureAlgorithm) && has(self.signatureAlgorithm)'
+                    - message: privateKeyAlgorithm may only be configured during creation
+                      rule: '!has(oldSelf.privateKeyAlgorithm) && !has(self.privateKeyAlgorithm)
+                        || has(oldSelf.privateKeyAlgorithm) && has(self.privateKeyAlgorithm)'
                     - message: privateKeySize may only be configured during creation
                       rule: '!has(oldSelf.privateKeySize) && !has(self.privateKeySize)
                         || has(oldSelf.privateKeySize) && has(self.privateKeySize)'
+                    - message: privateKeySize must match with configured privateKeyAlgorithm
+                      rule: '(!has(self.privateKeyAlgorithm) || self.privateKeyAlgorithm
+                        == ''RSA'') ? (self.privateKeySize in [2048,4096,8192]) :
+                        (self.privateKeySize in [256,384])'
                   logFormat:
                     default: text
                     description: |-
-                      logFormat is for specifying the output format of istio-csr agent logging.
-                      Support log formats are text and json.
+                      logFormat specifies the output format for istio-csr agent logging.
+                      Supported log formats are text and json.
+                    enum:
+                    - text
+                    - json
                     type: string
                   logLevel:
                     default: 1
-                    description: logLevel supports value range as per [kubernetes
+                    description: logLevel supports a value range as per [Kubernetes
                       logging guidelines](https://github.com/kubernetes/community/blob/master/contributors/devel/sig-instrumentation/logging.md#what-method-to-use).
                     format: int32
                     maximum: 5
@@ -1151,7 +1217,10 @@ spec:
                       type: string
                     description: |-
                       nodeSelector is for defining the scheduling criteria using node labels.
+                      This field can have a maximum of 50 entries.
                       ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
+                    maxProperties: 50
+                    minProperties: 0
                     type: object
                     x-kubernetes-map-type: atomic
                   resources:
@@ -1217,14 +1286,23 @@ spec:
                         type: object
                     type: object
                   server:
-                    description: |-
-                      server is for configuring the server endpoint used by istio
-                      for obtaining the certificates.
+                    description: server is for configuring the server endpoint used
+                      by istio for obtaining the certificates.
                     properties:
+                      clusterID:
+                        default: Kubernetes
+                        description: |-
+                          clusterID is the Istio cluster ID used to verify incoming CSRs.
+                          This field can have a maximum of 253 characters.
+                        maxLength: 253
+                        minLength: 0
+                        type: string
                       port:
                         default: 443
-                        description: port to serve istio-csr gRPC service.
+                        description: port to serve the istio-csr gRPC service.
                         format: int32
+                        maximum: 65535
+                        minimum: 1
                         type: integer
                         x-kubernetes-validations:
                         - message: port is immutable once set
@@ -1233,6 +1311,7 @@ spec:
                   tolerations:
                     description: |-
                       tolerations is for setting the pod tolerations.
+                      This field can have a maximum of 50 entries.
                       ref: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
                     items:
                       description: |-
@@ -1270,6 +1349,8 @@ spec:
                             If the operator is Exists, the value should be empty, otherwise just a regular string.
                           type: string
                       type: object
+                    maxItems: 50
+                    minItems: 0
                     type: array
                     x-kubernetes-list-type: atomic
                 required:
@@ -1292,8 +1373,8 @@ spec:
                   istio-csr agent.
                 type: string
               conditions:
-                description: conditions holds information of the current state of
-                  the istio-csr agent deployment.
+                description: conditions holds information about the current state
+                  of the istio-csr agent deployment.
                 items:
                   description: Condition contains details for one aspect of the current
                     state of this API Resource.
@@ -1353,10 +1434,9 @@ spec:
                 - type
                 x-kubernetes-list-type: map
               istioCSRGRPCEndpoint:
-                description: |-
-                  istioCSRGRPCEndpoint is the service endpoint of istio-csr made available for user
-                  to configure the same in istiod config to enable istio to use istio-csr for
-                  certificate requests.
+                description: istioCSRGRPCEndpoint is the service endpoint of istio-csr,
+                  made available for users to configure in the istiod config to enable
+                  Istio to use istio-csr for certificate requests.
                 type: string
               istioCSRImage:
                 description: istioCSRImage is the name of the image and the tag used
