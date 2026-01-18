@@ -234,7 +234,6 @@ copy_manifests() {
         cp "${REPOROOT}/assets/optional/cert-manager/manager/manager.yaml" \
             "${REPOROOT}/assets/optional/cert-manager/manager/manager-${GOARCH_TO_UNAME_MAP[${arch}]}.yaml"
     done
-    rm -f "${REPOROOT}/assets/optional/cert-manager/manager/manager.yaml"
 }
 
 update_last_cert_manager_rebase() {
