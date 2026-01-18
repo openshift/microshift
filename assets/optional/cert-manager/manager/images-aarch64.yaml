@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cert-manager-images
+  namespace: cert-manager
+data:
+  cert-manager-webhook: registry.redhat.io/cert-manager/jetstack-cert-manager-rhel9@sha256:8227c8925d00d1c81c95e7017209fdc6b5b1925cde2fa4fe3752fb6c81510a2d
+  cert-manager-ca-injector: registry.redhat.io/cert-manager/jetstack-cert-manager-rhel9@sha256:8227c8925d00d1c81c95e7017209fdc6b5b1925cde2fa4fe3752fb6c81510a2d
+  cert-manager-controller: registry.redhat.io/cert-manager/jetstack-cert-manager-rhel9@sha256:8227c8925d00d1c81c95e7017209fdc6b5b1925cde2fa4fe3752fb6c81510a2d
+  cert-manager-acmesolver: registry.redhat.io/cert-manager/jetstack-cert-manager-acmesolver-rhel9@sha256:b001612ad6362a1b7273e178d9870ab3d020a40ee3339a0f95fef1cd3913356e
+  cert-manager-istiocsr: registry.redhat.io/cert-manager/cert-manager-istio-csr-rhel9@sha256:78564158857ed7f1534597f3ee7faaee23b692f9ed5aa0259e19196f5400167d
+  controller: registry.redhat.io/cert-manager/cert-manager-operator-rhel9@sha256:9f37a838089d2e3c199a4fd97bea028cb6b66b4214e8233884716efe0a998298

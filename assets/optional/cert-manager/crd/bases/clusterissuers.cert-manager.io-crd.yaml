@@ -8,7 +8,7 @@ metadata:
     app: cert-manager
     app.kubernetes.io/instance: cert-manager
     app.kubernetes.io/name: cert-manager
-    app.kubernetes.io/version: v1.16.4
+    app.kubernetes.io/version: v1.18.4
   name: clusterissuers.cert-manager.io
 spec:
   group: cert-manager.io
@@ -18,6 +18,8 @@ spec:
     kind: ClusterIssuer
     listKind: ClusterIssuerList
     plural: clusterissuers
+    shortNames:
+      - ciss
     singular: clusterissuer
   scope: Cluster
   versions:
@@ -156,7 +158,7 @@ spec:
                         PreferredChain is the chain to use if the ACME server outputs multiple.
                         PreferredChain is no guarantee that this one gets delivered by the ACME
                         endpoint.
-                        For example, for Let's Encrypt's DST crosssign you would use:
+                        For example, for Let's Encrypt's DST cross-sign you would use:
                         "DST Root CA X3" or "ISRG Root X1" for the newer Let's Encrypt root CA.
                         This value picks the first certificate bundle in the combined set of
                         ACME default and alternative chains that has a root-most certificate with
@@ -185,6 +187,11 @@ spec:
                       required:
                         - name
                       type: object
+                    profile:
+                      description: |-
+                        Profile allows requesting a certificate profile from the ACME server.
+                        Supported profiles are listed by the server's ACME directory URL.
+                      type: string
                     server:
                       description: |-
                         Server is the URL used to access the ACME server's 'directory' endpoint.
@@ -367,12 +374,15 @@ spec:
                                       If set, ClientID, ClientSecret and TenantID must not be set.
                                     properties:
                                       clientID:
-                                        description: client ID of the managed identity, can not be used at the same time as resourceID
+                                        description: client ID of the managed identity, cannot be used at the same time as resourceID
                                         type: string
                                       resourceID:
                                         description: |-
-                                          resource ID of the managed identity, can not be used at the same time as clientID
+                                          resource ID of the managed identity, cannot be used at the same time as clientID
                                           Cannot be used for Azure Managed Service Identity
+                                        type: string
+                                      tenantID:
+                                        description: tenant ID of the managed identity, cannot be used at the same time as resourceID
                                         type: string
                                     type: object
                                   resourceGroupName:
@@ -682,7 +692,7 @@ spec:
                                       when challenges are processed.
                                       This can contain arbitrary JSON data.
                                       Secret values should not be specified in this stanza.
-                                      If secret values are needed (e.g. credentials for a DNS service), you
+                                      If secret values are needed (e.g., credentials for a DNS service), you
                                       should use a SecretKeySelector to reference a Secret resource.
                                       For details on the schema of this field, consult the webhook provider
                                       implementation's documentation.
@@ -698,7 +708,7 @@ spec:
                                     description: |-
                                       The name of the solver to use, as defined in the webhook provider
                                       implementation.
-                                      This will typically be the name of the provider, e.g. 'cloudflare'.
+                                      This will typically be the name of the provider, e.g., 'cloudflare'.
                                     type: string
                                 required:
                                   - groupName
@@ -710,7 +720,7 @@ spec:
                               Configures cert-manager to attempt to complete authorizations by
                               performing the HTTP01 challenge flow.
                               It is not possible to obtain certificates for wildcard domain names
-                              (e.g. `*.example.com`) using the HTTP01 challenge mechanism.
+                              (e.g., `*.example.com`) using the HTTP01 challenge mechanism.
                             properties:
                               gatewayHTTPRoute:
                                 description: |-
@@ -3524,6 +3534,11 @@ spec:
                     server:
                       description: 'Server is the connection address for the Vault server, e.g: "https://vault.example.com:8200".'
                       type: string
+                    serverName:
+                      description: |-
+                        ServerName is used to verify the hostname on the returned certificates
+                        by the Vault server.
+                      type: string
                   required:
                     - auth
                     - path
@@ -3559,7 +3574,7 @@ spec:
                         url:
                           description: |-
                             URL is the base URL for Venafi Cloud.
-                            Defaults to "https://api.venafi.cloud/v1".
+                            Defaults to "https://api.venafi.cloud/".
                           type: string
                       required:
                         - apiTokenSecretRef
