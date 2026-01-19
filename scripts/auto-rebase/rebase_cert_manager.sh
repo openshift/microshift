@@ -156,25 +156,12 @@ update_configmap_image() {
     yq -i ".data.\"${component_name}\" = \"${full_image_ref}\"" "${configmap_file}"
 }
 
-# helper to update environment variables with image references in manager.yaml
-update_deploymentenv_manager() {
-    local component_name="$1"
-    local full_image_ref="$2"
-    local manager_file="$3"
-
-    # convert component names to uppercase and replace hyphens with underscores
-    component_name="${component_name^^}"
-    component_name="${component_name//-/_}"
-    sed -i "/name: RELATED_IMAGE_${component_name}/ {n;s|value: .*|value: ${full_image_ref}|;}" "${manager_file}"
-}
-
 write_cert_manager_images_for_arch() {
     local arch="$1"
     local arch_digest
 
     title "Updating images for ${arch}"
     local cert_manager_release_json="${REPOROOT}/assets/optional/cert-manager/release-cert-manager-${GOARCH_TO_UNAME_MAP[${arch}]}.json"
-    local cert_manager_operator_yaml="${REPOROOT}/assets/optional/cert-manager/manager/manager-${GOARCH_TO_UNAME_MAP[${arch}]}.yaml"
     local cert_manager_images_yaml="${REPOROOT}/assets/optional/cert-manager/manager/images-${GOARCH_TO_UNAME_MAP[${arch}]}.yaml"
 
     local operatorVersion=$(yq '.properties[] | select(.type == "olm.package").value.version' "${OPERATOR_CERT_MANAGER_INDEX}")
@@ -206,9 +193,6 @@ write_cert_manager_images_for_arch() {
 
             # update component image in images.yaml
             update_configmap_image "${component}" "${image}" "${cert_manager_images_yaml}"
-
-            # update component image in manager.yaml
-            update_deploymentenv_manager "${component}" "${image}" "${cert_manager_operator_yaml}"
         fi
     done
 }
@@ -228,12 +212,6 @@ update_cert_manager_images() {
 copy_manifests() {
     title "Copying manifests"
     "$REPOROOT/scripts/auto-rebase/handle_assets.py" "./scripts/auto-rebase/assets_cert_manager.yaml"
-
-    # Copy manager.yaml per each architecture to be updated during the rebase
-    for arch in "${ARCHS[@]}"; do
-        cp "${REPOROOT}/assets/optional/cert-manager/manager/manager.yaml" \
-            "${REPOROOT}/assets/optional/cert-manager/manager/manager-${GOARCH_TO_UNAME_MAP[${arch}]}.yaml"
-    done
 }
 
 update_last_cert_manager_rebase() {
