@@ -543,16 +543,15 @@ install -p -m644 assets/optional/cert-manager/rbac/*.yaml %{buildroot}/%{_prefix
 install -p -m644 assets/optional/cert-manager/kustomization.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/060-microshift-cert-manager
 
 install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/060-microshift-cert-manager/manager
+install -p -m644 assets/optional/cert-manager/manager/manager.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/060-microshift-cert-manager/manager
 install -p -m644 assets/optional/cert-manager/manager/kustomization.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/060-microshift-cert-manager/manager
 
 %ifarch %{arm} aarch64
 cat assets/optional/cert-manager/manager/images-aarch64.yaml >> %{buildroot}/%{_prefix}/lib/microshift/manifests.d/060-microshift-cert-manager/manager/images.yaml
-cat assets/optional/cert-manager/manager/manager-aarch64.yaml >> %{buildroot}/%{_prefix}/lib/microshift/manifests.d/060-microshift-cert-manager/manager/manager.yaml
 %endif
 
 %ifarch x86_64
 cat assets/optional/cert-manager/manager/images-x86_64.yaml >> %{buildroot}/%{_prefix}/lib/microshift/manifests.d/060-microshift-cert-manager/manager/images.yaml
-cat assets/optional/cert-manager/manager/manager-x86_64.yaml >> %{buildroot}/%{_prefix}/lib/microshift/manifests.d/060-microshift-cert-manager/manager/manager.yaml
 %endif
 
 # cert-manager-release-info
