@@ -105,7 +105,7 @@ By default, all of the test suites will be run. To run a subset,
 specify the filenames as arguments on the command line.
 
 ```
-$ ./test/run.sh suites/standard/show-config.robot
+$ ./test/run.sh suites/configuration/show-config.robot
 ```
 
 > The test suite file names should be relative to the `test` directory.
@@ -120,7 +120,7 @@ files must also be specified explicitly in all of these cases.
 To run tests with names matching a pattern, use the `-t` option:
 
 ```
-$ ./test/run.sh -- -t '*No Mode*' suites/standard/show-config.robot
+$ ./test/run.sh -- -t '*No Mode*' suites/configuration/show-config.robot
 ```
 
 To run tests with specific tags, use the `-i` option:
