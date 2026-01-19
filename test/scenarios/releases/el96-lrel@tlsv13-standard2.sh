@@ -42,9 +42,7 @@ EOF"
     fi
     record_junit "${vmname}" "pre_test_greenboot_check" "OK"
 
-    # Run standard tests excluding tls-configuration.robot since TLS v1.3 is already configured
     run_tests host1 \
         --variable "EXPECTED_OS_VERSION:9.6" \
-        --exclude tls-configuration \
         suites/standard2/ suites/selinux/validate-selinux-policy.robot
 }
