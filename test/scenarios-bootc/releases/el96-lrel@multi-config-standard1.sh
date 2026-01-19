@@ -105,11 +105,9 @@ EOF"
     run_command_on_vm host1 'bash -s' < "${TESTDIR}/../scripts/lvms-helpers/cleanupWorkload.sh"
 
     # Run all standard1 tests except version (which requires RPM install verification)
-    # and tls-configuration (which is already configured)
     echo "INFO: Running validation tests for multi-config scenario..."
     run_tests host1 \
         --variable "EXPECTED_OS_VERSION:9.6" \
-        --exclude tls-configuration \
         --exclude version \
         suites/standard1/ \
         suites/selinux/validate-selinux-policy.robot
