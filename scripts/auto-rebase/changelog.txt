@@ -1,0 +1,24 @@
+- cluster-network-operator embedded-component ab9804d6df18e79145a4524d9abbd50475d4b21d to 05d65e63fd668e97c1b7f45837ba66075f478d6d
+  - 126c594 2025-12-19T13:58:27+00:00 Add kubevirt platform to dual-stack supported platforms
+
+- kubernetes embedded-component 52351d68ef76ea7ad374e31ae1afb32e1d132c97 to f80fdf620b057bc3c66a6feb8b6cdc9f33f2c5c9
+  - f80fdf620 2026-01-13T18:11:43+00:00 [release-4.21] OCPBUGS-72378: UPSTREAM: 135372: Re-enable temporarily disabled SchedulerPreemption test (#2556)
+
+- machine-config-operator embedded-component 8542312713dac225bc5d4c5a48b4453f64498511 to f20ca236ffead6b7603c4f42a35c49fbed328bc3
+  - b7e349e3 2026-01-12T14:56:38+00:00 Fix timeout during configMap cleanup
+  - 6b7c1fcf 2026-01-08T10:23:19-05:00 metrics: use TLS profile in listener
+  - 645f16cf 2026-01-08T09:47:55-05:00 operator: remove metrics server
+  - 12ab21c1 2026-01-08T09:47:46-05:00 operator: move pool metrics to controller
+
+- operator-framework-olm embedded-component 7d2dd62c2a73b66aa99e82c90f64ab53dd523ddf to 67b24a854479ff5e92f98a928b07683bddfc91b6
+  - 0b51ec93 2026-01-12T05:31:42+00:00 enhance OCPQE-31297, OCPQE-31284, OCPQE-31283 and microshfit case
+
+- oc image-amd64 345800dc3c4164fbca313c1cbfb383f262547903 to 19a2243fe780f1aa9b5c8d80bd413a8721cc2e8c
+  - 8b24e1d2 2026-01-16T15:06:09+00:00 Fix unit test failure by updating ruby version to 3.3
+
+- kubernetes image-amd64 52351d68ef76ea7ad374e31ae1afb32e1d132c97 to f80fdf620b057bc3c66a6feb8b6cdc9f33f2c5c9
+  - f80fdf620 2026-01-13T18:11:43+00:00 [release-4.21] OCPBUGS-72378: UPSTREAM: 135372: Re-enable temporarily disabled SchedulerPreemption test (#2556)
+
+- oc image-arm64 345800dc3c4164fbca313c1cbfb383f262547903 to 19a2243fe780f1aa9b5c8d80bd413a8721cc2e8c
+  - 8b24e1d2 2026-01-16T15:06:09+00:00 Fix unit test failure by updating ruby version to 3.3
+
