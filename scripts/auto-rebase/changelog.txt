@@ -1,6 +1,3 @@
-- cluster-network-operator embedded-component dbd9826dbe5373bd3605dfef606d118ffc65b830 to b54bbb1659c4078cb467b69d260f5eee100c6284
-  - 6386725 2026-01-12T17:27:12+00:00 OCPBUGS-72411: use net.JoinHostPort for URL construction
-
-- machine-config-operator embedded-component 8af0c84e6fcc34c60768b3955366a78a440b7a85 to 117708020d5d2549b72a2046aebfdc0064dd8d41
-  - f6941f67 2025-12-17T22:08:24+00:00 OCPBUGS-59925: Fix keepalived SIGTERM handling
+- machine-config-operator embedded-component 117708020d5d2549b72a2046aebfdc0064dd8d41 to 930bff17125ac90ff7817b68f2f8cece04c51e35
+  - bcb18a0f 2026-01-15T13:19:00-05:00 ctrcfg: set increase ulimits when upgrading from 4.20 to 4.21
 
