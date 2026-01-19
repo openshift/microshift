@@ -1,10 +1,11 @@
-- csi-external-snapshotter image-arm64 6383ab93be114af8d1067523602bd2a44c927f1a to d20b90a92cd7d77166319f5bc2feb80623747d28
-  - 06ed333 2026-01-06T14:18:57+08:00 UPSTREAM: 1359: Fix group snapshot not taken on conflict
-  - 44323ca 2026-01-06T14:17:22+08:00 UPSTREAM: 1354: Fix for cases where the resource is already present on the cluster
+- oc image-arm64 4df0e94abe472105343c5c132396fbfafa47c569 to 430c82293109e23f3caaf9ba60e5affd2d5356f5
+  - 4f7cc648 2026-01-16T09:12:56+03:00 Fix unit test failure by updating ruby version to 3.3
 
-- router image-arm64 b5fcf0cd7f62a4eb76faa167cc9eca7e198fb5c9 to fa55e2723077811ef81c4b494c68f6c38282d6e2
-  - 9569f21 2025-12-20T13:59:35+00:00 Updating openshift-enterprise-haproxy-router-container image to be consistent with ART for 4.22 Reconciling with https://github.com/openshift/ocp-build-data/tree/087d1930e36b609f77d73bd8a313d85c940cff4d/images/openshift-enterprise-haproxy-router.yml
+- kubernetes image-arm64 581cfc7ee3313c212378878350aec16236e3f155 to e4a4167c40c9ed543c5a80f2e08cc73696f7a4f6
+  - 11bb75887 2026-01-16T10:25:44-05:00 UPSTREAM: 135340: cbor: bump limits
+  - a0f87aee4 2026-01-15T21:44:31+08:00 UPSTREAM: <carry>: change iperf2 test case from parallel into serial
 
-- service-ca-operator image-arm64 b43ed91efd958355b8209bf252f901bb2213daf3 to bb522851659b55683ff29410ee1a300af1506926
-  - 35a06a2 2026-01-14T02:39:22+08:00 test/e2e: migrate vulnerable-legacy-ca-bundle-injection-configmap test for OTE compatibility
+- service-ca-operator image-arm64 bb522851659b55683ff29410ee1a300af1506926 to 503e4f5f4c74fd095a8dca385541125f3c9ee28b
+  - aaba756 2026-01-16T15:51:27+08:00 test/e2e: migrate metrics tests for OTE compatibility
+  - c9f6639 2026-01-15T20:26:00+08:00 test/e2e: migrate headless-stateful-serving-cert-secret-delete-data test for OTE compatibility
 
