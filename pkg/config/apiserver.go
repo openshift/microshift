@@ -153,6 +153,8 @@ type FeatureGates struct {
 	CustomNoUpgrade CustomNoUpgrade `json:"customNoUpgrade"`
 }
 
+// ToApiserverArgs converts the FeatureGates struct to a list of feature-gates arguments for the kube-apiserver.
+// Validation checks should be performed before calling this function to ensure the FeatureGates struct is valid.
 func (fg FeatureGates) ToApiserverArgs() ([]string, error) {
 	ret := sets.NewString()
 	addFeatures := func(features []string, enabled bool) {

@@ -892,6 +892,37 @@ func TestValidate(t *testing.T) {
 			}(),
 			expectErr: true,
 		},
+		{
+			name: "feature-gates-required-feature-gate-cannot-be-disabled",
+			config: func() *Config {
+				c := mkDefaultConfig()
+				c.ApiServer.FeatureGates.FeatureSet = "CustomNoUpgrade"
+				c.ApiServer.FeatureGates.CustomNoUpgrade.Enabled = []string{"feature1"}
+				c.ApiServer.FeatureGates.CustomNoUpgrade.Disabled = []string{"UserNamespacesSupport"}
+				return c
+			}(),
+			expectErr: true,
+		},
+		{
+			name: "feature-gates-required-feature-gate-cannot-be-explicitly-enabled",
+			config: func() *Config {
+				c := mkDefaultConfig()
+				c.ApiServer.FeatureGates.FeatureSet = "CustomNoUpgrade"
+				c.ApiServer.FeatureGates.CustomNoUpgrade.Enabled = []string{"UserNamespacesSupport"}
+				c.ApiServer.FeatureGates.CustomNoUpgrade.Disabled = []string{"feature2"}
+				return c
+			}(),
+			expectErr: true,
+		},
+		{
+			name: "feature-gates-preview-feature-sets-not-supported",
+			config: func() *Config {
+				c := mkDefaultConfig()
+				c.ApiServer.FeatureGates.FeatureSet = "TechPreviewNoUpgrade"
+				return c
+			}(),
+			expectErr: true,
+		},
 	}
 	for _, tt := range ttests {
 		t.Run(tt.name, func(t *testing.T) {
