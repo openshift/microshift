@@ -75,15 +75,15 @@ spec:
             - name: OPERATOR_NAME
               value: cert-manager-operator
             - name: RELATED_IMAGE_CERT_MANAGER_WEBHOOK
-              value: quay.io/jetstack/cert-manager-webhook:latest
+              value: registry.redhat.io/cert-manager/jetstack-cert-manager-rhel9@sha256:40b47054e42363a365b491ccfe0d86f109e19fc317058ba834ffe0f5c733880b
             - name: RELATED_IMAGE_CERT_MANAGER_CA_INJECTOR
-              value: quay.io/jetstack/cert-manager-cainjector:latest
+              value: registry.redhat.io/cert-manager/jetstack-cert-manager-rhel9@sha256:40b47054e42363a365b491ccfe0d86f109e19fc317058ba834ffe0f5c733880b
             - name: RELATED_IMAGE_CERT_MANAGER_CONTROLLER
-              value: quay.io/jetstack/cert-manager-controller:latest
+              value: registry.redhat.io/cert-manager/jetstack-cert-manager-rhel9@sha256:40b47054e42363a365b491ccfe0d86f109e19fc317058ba834ffe0f5c733880b
             - name: RELATED_IMAGE_CERT_MANAGER_ACMESOLVER
-              value: quay.io/jetstack/cert-manager-acmesolver:v1.18.4
+              value: registry.redhat.io/cert-manager/jetstack-cert-manager-acmesolver-rhel9@sha256:3a40eb434e032fb2135f369b6fc65266ae0f409db92fd65d12cf13c7f32b5020
             - name: RELATED_IMAGE_CERT_MANAGER_ISTIOCSR
-              value: quay.io/jetstack/cert-manager-istio-csr:v0.14.2
+              value: registry.redhat.io/cert-manager/cert-manager-istio-csr-rhel9@sha256:0f20d178f980a3fa4527bc1613b8639385e36c367e30c93b4cbb4c4a434d3405
             - name: OPERAND_IMAGE_VERSION
               value: 1.18.4
             - name: ISTIOCSR_OPERAND_IMAGE_VERSION

@@ -8,7 +8,7 @@ metadata:
     app: cert-manager
     app.kubernetes.io/instance: cert-manager
     app.kubernetes.io/name: cert-manager
-    app.kubernetes.io/version: v1.16.4
+    app.kubernetes.io/version: v1.18.4
   name: challenges.acme.cert-manager.io
 spec:
   group: acme.cert-manager.io
@@ -68,9 +68,9 @@ spec:
                   type: string
                 dnsName:
                   description: |-
-                    dnsName is the identifier that this challenge is for, e.g. example.com.
+                    dnsName is the identifier that this challenge is for, e.g., example.com.
                     If the requested DNSName is a 'wildcard', this field MUST be set to the
-                    non-wildcard domain, e.g. for `*.example.com`, it must be `example.com`.
+                    non-wildcard domain, e.g., for `*.example.com`, it must be `example.com`.
                   type: string
                 issuerRef:
                   description: |-
@@ -257,12 +257,15 @@ spec:
                                 If set, ClientID, ClientSecret and TenantID must not be set.
                               properties:
                                 clientID:
-                                  description: client ID of the managed identity, can not be used at the same time as resourceID
+                                  description: client ID of the managed identity, cannot be used at the same time as resourceID
                                   type: string
                                 resourceID:
                                   description: |-
-                                    resource ID of the managed identity, can not be used at the same time as clientID
+                                    resource ID of the managed identity, cannot be used at the same time as clientID
                                     Cannot be used for Azure Managed Service Identity
+                                  type: string
+                                tenantID:
+                                  description: tenant ID of the managed identity, cannot be used at the same time as resourceID
                                   type: string
                               type: object
                             resourceGroupName:
@@ -572,7 +575,7 @@ spec:
                                 when challenges are processed.
                                 This can contain arbitrary JSON data.
                                 Secret values should not be specified in this stanza.
-                                If secret values are needed (e.g. credentials for a DNS service), you
+                                If secret values are needed (e.g., credentials for a DNS service), you
                                 should use a SecretKeySelector to reference a Secret resource.
                                 For details on the schema of this field, consult the webhook provider
                                 implementation's documentation.
@@ -588,7 +591,7 @@ spec:
                               description: |-
                                 The name of the solver to use, as defined in the webhook provider
                                 implementation.
-                                This will typically be the name of the provider, e.g. 'cloudflare'.
+                                This will typically be the name of the provider, e.g., 'cloudflare'.
                               type: string
                           required:
                             - groupName
@@ -600,7 +603,7 @@ spec:
                         Configures cert-manager to attempt to complete authorizations by
                         performing the HTTP01 challenge flow.
                         It is not possible to obtain certificates for wildcard domain names
-                        (e.g. `*.example.com`) using the HTTP01 challenge mechanism.
+                        (e.g., `*.example.com`) using the HTTP01 challenge mechanism.
                       properties:
                         gatewayHTTPRoute:
                           description: |-
