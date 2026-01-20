@@ -297,10 +297,9 @@ def generate_common_versions(minor_version):
         rhocp_minor_y1=rhocp_minor_y1,
         rhocp_minor_y1_beta=rhocp_minor_y1_beta,
         rhocp_minor_y2=rhocp_minor_y2,
-        GITOPS_VERSION=gitops_version,
         CNCF_SONOBUOY_VERSION=CNCF_SONOBUOY_VERSION,
         CNCF_SYSTEMD_LOGS_VERSION=CNCF_SYSTEMD_LOGS_VERSION,
-        GITOPS_VERSION=GITOPS_VERSION,
+        GITOPS_VERSION=gitops_version,
         LATEST_RELEASE_TYPE=LATEST_RELEASE_TYPE,
         ARCH=ARCH
     )
