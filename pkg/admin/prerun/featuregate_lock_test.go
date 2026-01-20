@@ -429,14 +429,14 @@ func TestFeatureGateLockManagement_VersionChange(t *testing.T) {
 			description: "Same version (4.21.0 -> 4.21.0) should be allowed",
 		},
 		{
-			name:        "version downgrade minor should fail",
+			name:        "minor version downgrade should fail",
 			lockFileVer: versionMetadata{Major: 4, Minor: 22, Patch: 0},
 			currentVer:  versionMetadata{Major: 4, Minor: 21, Patch: 0},
 			wantErr:     true,
 			description: "Minor version downgrade (4.22.0 -> 4.21.0) should be blocked",
 		},
 		{
-			name:        "version downgrade major should fail",
+			name:        "major version downgrade should fail",
 			lockFileVer: versionMetadata{Major: 5, Minor: 0, Patch: 0},
 			currentVer:  versionMetadata{Major: 4, Minor: 21, Patch: 0},
 			wantErr:     true,
