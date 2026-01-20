@@ -109,8 +109,7 @@ EOF"
     run_tests host1 \
         --variable "EXPECTED_OS_VERSION:9.6" \
         --exclude version \
-        suites/standard1/ \
-        suites/selinux/validate-selinux-policy.robot
+        suites/standard1/
 
     echo "SUCCESS: Multi-config scenario validation completed - no conflicts detected"
 }

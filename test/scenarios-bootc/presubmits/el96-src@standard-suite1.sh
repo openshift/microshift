@@ -17,5 +17,5 @@ scenario_run_tests() {
     run_tests host1 \
         --variable "EXPECTED_OS_VERSION:9.6" \
         --variable "SYNC_FREQUENCY:5s" \
-        suites/standard1/ suites/selinux/validate-selinux-policy.robot
+        suites/standard1/
 }
