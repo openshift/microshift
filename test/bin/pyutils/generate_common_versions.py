@@ -10,6 +10,7 @@ import sys
 import argparse
 import logging
 import pathlib
+import time
 
 sys.path.append(str(pathlib.Path(__file__).resolve().parent / '../../../scripts/pyutils'))
 import gitutils  # noqa: E402
@@ -215,17 +216,26 @@ def get_gitops_version(minor_version):
     """
     url = "https://access.redhat.com/product-life-cycles/api/v1/products"
     params = {"name": "Red Hat OpenShift GitOps"}
-    try:
-        resp = requests.get(url, params=params, timeout=10)
-        resp.raise_for_status()
-        data = resp.json()
+    for attempt in range(1, 4):
+        try:
+            resp = requests.get(url, params=params, timeout=10)
+            resp.raise_for_status()
+        except Exception as e:
+            logging.warning(f"Attempt {attempt} failed with error: {e}. Retrying...")
+            time.sleep(2)
+            continue
+        break
+
+    if attempt == 3:
+        logging.error(f"Failed to fetch data from {url} after 3 attempts")
+        return ""
+    data = resp.json()
+    while minor_version >= 18:
         for version in data.get("data", [{}])[0].get("versions", []):
             if version.get("openshift_compatibility") and f"4.{minor_version}" in version["openshift_compatibility"]:
+                logging.info(f"Latest GitOps version: {version.get('name', '')} which is compatible with OCP {version['openshift_compatibility']}")
                 return version.get("name", "")
-    except Exception as e:
-        import logging
-        logging.warning(f"Could not fetch GitOps version for OCP 4.{minor_version}: {e}")
-    return ""
+        minor_version -= 1
 
 
 def generate_common_versions(minor_version):
