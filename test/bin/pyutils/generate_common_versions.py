@@ -24,9 +24,6 @@ CNCF_SONOBUOY_VERSION = "v0.57.3"
 # The version of systemd-logs image included in the sonobuoy release.
 CNCF_SYSTEMD_LOGS_VERSION = "v0.4"
 
-# The current version of the microshift-gitops package.
-GITOPS_VERSION = "1.16"
-
 # Set the release type to ec, rc or zstream
 LATEST_RELEASE_TYPE = "ec"
 
@@ -211,6 +208,26 @@ def get_release_version_string(repo, var_name):
         return None
 
 
+def get_gitops_version(minor_version):
+    """
+    Get the version of the microshift-gitops package.
+    Versions compatible with MicroShift: https://access.redhat.com/product-life-cycles?product=Red%20Hat%20OpenShift%20GitOps
+    """
+    url = "https://access.redhat.com/product-life-cycles/api/v1/products"
+    params = {"name": "Red Hat OpenShift GitOps"}
+    try:
+        resp = requests.get(url, params=params, timeout=10)
+        resp.raise_for_status()
+        data = resp.json()
+        for version in data.get("data", [{}])[0].get("versions", []):
+            if version.get("openshift_compatibility") and f"4.{minor_version}" in version["openshift_compatibility"]:
+                return version.get("name", "")
+    except Exception as e:
+        import logging
+        logging.warning(f"Could not fetch GitOps version for OCP 4.{minor_version}: {e}")
+    return ""
+
+
 def generate_common_versions(minor_version):
     previous_minor_version = minor_version - 1
     yminus2_minor_version = minor_version - 2
@@ -258,6 +275,10 @@ def generate_common_versions(minor_version):
     # The 'rhocp_minor_y2' should always be the y-2 minor version number.
     rhocp_minor_y2 = yminus2_minor_version
 
+    # The current version of the microshift-gitops package.
+    logging.info("Getting GITOPS_VERSION")
+    gitops_version = get_gitops_version(minor_version)
+
     template_path = pathlib.Path(__file__).resolve().parent / '../../assets/common_versions.sh.template'
 
     with open(template_path, 'r') as f:
@@ -276,6 +297,7 @@ def generate_common_versions(minor_version):
         rhocp_minor_y1=rhocp_minor_y1,
         rhocp_minor_y1_beta=rhocp_minor_y1_beta,
         rhocp_minor_y2=rhocp_minor_y2,
+        GITOPS_VERSION=gitops_version,
         CNCF_SONOBUOY_VERSION=CNCF_SONOBUOY_VERSION,
         CNCF_SYSTEMD_LOGS_VERSION=CNCF_SYSTEMD_LOGS_VERSION,
         GITOPS_VERSION=GITOPS_VERSION,
