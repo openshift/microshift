@@ -265,6 +265,7 @@ The microshift-sriov package provides the required manifests for the SR-IOV Netw
 Summary: Release information for SR-IOV Network Operator for MicroShift
 BuildArch: noarch
 Requires: microshift = %{version}
+Requires: microshift-multus = %{version}
 
 %description sriov-release-info
 The microshift-sriov-release-info package provides release information files for this
