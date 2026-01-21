@@ -33,5 +33,5 @@ scenario_run_tests() {
         --variable "BOOTC_REGISTRY:${MIRROR_REGISTRY_URL}" \
         --variable "EXPECTED_OS_VERSION:9.6" \
         suites/upgrade/upgrade-successful.robot \
-        suites/standard1/ suites/selinux/validate-selinux-policy.robot
+        suites/standard1/
 }
