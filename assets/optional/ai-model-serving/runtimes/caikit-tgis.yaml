@@ -9,6 +9,7 @@ metadata:
     opendatahub.io/dashboard: 'true'
 spec:
   annotations:
+    opendatahub.io/kserve-runtime: 'tgis'
     prometheus.io/port: '3000'
     prometheus.io/path: /metrics
   multiModel: false

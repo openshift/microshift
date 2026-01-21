@@ -20,6 +20,8 @@ func addLabelsToSpecs(specs et.ExtensionTestSpecs) {
 			"should prevent Ingress creation if more than 1 IngressClass marked as default", // https://bugzilla.redhat.com/show_bug.cgi?id=1822286
 
 			"[sig-network] IngressClass [Feature:Ingress] should set default value on new IngressClass", //https://bugzilla.redhat.com/show_bug.cgi?id=1833583
+
+			"[Feature:Networking-Performance]", //https://issues.redhat.com/browse/OCPBUGS-70170
 		},
 		"[sig-node]": {
 			"[NodeConformance]",

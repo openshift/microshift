@@ -6,6 +6,9 @@
   include_vars:
     file: "{{ playbook_dir }}/vars/microshift_versions.yml"
 
+- name: initialize results directory
+  include_tasks: roles/common/tasks/results-dir.yml
+
 - block:
   - name: find microshift cleanup script
     ansible.builtin.find:
@@ -65,5 +68,5 @@
 - name: save microshift boot info to local file
   ansible.builtin.copy:
     content: "{{ script_output.stdout }}"
-    dest: "{{ boot_output_filename | default('boot_quick.txt') }}"
+    dest: "{{ results_dir }}/{{ boot_output_filename | default('boot_quick.txt') }}"
   delegate_to: localhost

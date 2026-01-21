@@ -23,7 +23,7 @@ scenario_create_vms() {
     # Enable IPv6 single stack in kickstart
     prepare_kickstart host1 kickstart-bootc.ks.template "${start_image}" false true
     MIRROR_REGISTRY_URL="${original_mirror_registry_url}"
-    launch_vm --boot_blueprint rhel96-bootc --network "${VM_IPV6_NETWORK}"
+    launch_vm --boot_blueprint rhel96-bootc --network "${VM_IPV6_NETWORK}" --vm_vcpus 4
 }
 
 scenario_remove_vms() {

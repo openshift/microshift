@@ -11,7 +11,7 @@ scenario_create_vms() {
     fi
 
     prepare_kickstart host1 kickstart-bootc.ks.template "${start_image}"
-    launch_vm --boot_blueprint rhel100-bootc
+    launch_vm --boot_blueprint rhel100-bootc --vm_vcpus 4
 }
 
 scenario_remove_vms() {

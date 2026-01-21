@@ -72,9 +72,17 @@
     - lvm_disk_stat is defined
     - not lvm_disk_stat.stat.exists
 
+- name: Check if volume group exists
+  ansible.builtin.command: vgdisplay -s {{ vg_name }}
+  register: vg_exists
+  changed_when: false
+  failed_when: false
+
 - name: Configure TopoLVM storage
   include_tasks: storage.yml
-  when: rhel_vg_present.rc == 0 or (lvm_disk_stat is defined and lvm_disk_stat.stat.exists)
+  when:
+    - vg_name != default_vg_name
+    - vg_exists.rc == 0
 
 - name: upgrade all packages
   ansible.builtin.dnf:

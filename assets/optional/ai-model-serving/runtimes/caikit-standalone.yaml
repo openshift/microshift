@@ -9,6 +9,7 @@ metadata:
     opendatahub.io/dashboard: 'true'
 spec:
   annotations:
+    opendatahub.io/kserve-runtime: 'caikit'
     prometheus.io/port: '8086'
     prometheus.io/path: /metrics
   multiModel: false

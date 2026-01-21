@@ -9,6 +9,7 @@ SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # shellcheck source=test/bin/common.sh
 source "${SCRIPTDIR}/common.sh"
 
+LOKI_IMAGE="docker.io/grafana/loki"
 DEFAULT_HOST_PORT="3100"
 
 usage() {
@@ -38,6 +39,9 @@ action_start() {
     local host_port="${1:-${DEFAULT_HOST_PORT}}"
     local container_name="loki"
 
+    # Prefetch the image with retries
+    PULL_CMD="podman pull" "${SCRIPTDIR}/../../scripts/pull_retry.sh" "${LOKI_IMAGE}"
+
     echo "Stopping previous instance of Loki container ${container_name} (if any)"
     action_stop "${host_port}"
 
@@ -45,7 +49,7 @@ action_start() {
     podman run -d --rm --name "${container_name}" \
         -p "${host_port}:3100" \
         --user root \
-        docker.io/grafana/loki > /dev/null
+        "${LOKI_IMAGE}" > /dev/null
 }
 
 if [ $# -eq 0 ]; then

@@ -300,6 +300,14 @@ do_group() {
 
         blueprint=$(get_blueprint_name "${blueprint_file}")
 
+        if sudo composer-cli blueprints list | grep -q "^${blueprint}$"; then
+            echo "Removing existing definition of ${blueprint}"
+            sudo composer-cli blueprints delete "${blueprint}"
+        fi
+
+        echo "Loading new definition of ${blueprint}"
+        sudo composer-cli blueprints push "${blueprint_file}"
+
         # Check if the image for this blueprint already exists, in
         # case it was downloaded from the cache.
         if ostree summary --view --repo="${IMAGEDIR}/repo" | grep -q " ${blueprint}\$"; then
@@ -309,14 +317,6 @@ do_group() {
                 continue
             fi
         fi
-
-        if sudo composer-cli blueprints list | grep -q "^${blueprint}$"; then
-            echo "Removing existing definition of ${blueprint}"
-            sudo composer-cli blueprints delete "${blueprint}"
-        fi
-
-        echo "Loading new definition of ${blueprint}"
-        sudo composer-cli blueprints push "${blueprint_file}"
 
         echo "Resolving dependencies for ${blueprint}"
         # shellcheck disable=SC2024  # redirect and sudo
@@ -381,6 +381,11 @@ do_group() {
                 fi
             fi
             blueprint=$("${GOMPLATE}" --file "${image_installer}")
+            if [ -z "${blueprint}" ]; then
+                echo "Skipping ${image_installer}: blueprint name is empty (environment variables may not be set)"
+                record_junit "${groupdir}" "${image_installer}" "compose" "SKIPPED"
+                continue
+            fi
             local expected_iso_file="${VM_DISK_BASEDIR}/${blueprint}.iso"
             if [ -f "${expected_iso_file}" ]; then
                 echo "${expected_iso_file} already exists"

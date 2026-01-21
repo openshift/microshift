@@ -256,6 +256,7 @@ and can be used to embed those images into osbuilder blueprints or bootc contain
 Summary: SR-IOV Network Operator for MicroShift
 ExclusiveArch: x86_64 aarch64
 Requires: microshift = %{version}
+Requires: rdma-core
 
 %description sriov
 The microshift-sriov package provides the required manifests for the SR-IOV Network Operator to be installed on MicroShift.
@@ -561,11 +562,21 @@ install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/060-microshi
 install -p -m644 assets/optional/cert-manager/crd/bases/*.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/060-microshift-cert-manager/crd/bases
 install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/060-microshift-cert-manager/crd/patches
 install -p -m644 assets/optional/cert-manager/crd/patches/*.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/060-microshift-cert-manager/crd/patches
-install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/060-microshift-cert-manager/manager
-install -p -m644 assets/optional/cert-manager/manager/*.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/060-microshift-cert-manager/manager
 install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/060-microshift-cert-manager/rbac
 install -p -m644 assets/optional/cert-manager/rbac/*.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/060-microshift-cert-manager/rbac
 install -p -m644 assets/optional/cert-manager/kustomization.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/060-microshift-cert-manager
+
+install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/060-microshift-cert-manager/manager
+install -p -m644 assets/optional/cert-manager/manager/manager.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/060-microshift-cert-manager/manager
+install -p -m644 assets/optional/cert-manager/manager/kustomization.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/060-microshift-cert-manager/manager
+
+%ifarch %{arm} aarch64
+cat assets/optional/cert-manager/manager/images-aarch64.yaml >> %{buildroot}/%{_prefix}/lib/microshift/manifests.d/060-microshift-cert-manager/manager/images.yaml
+%endif
+
+%ifarch x86_64
+cat assets/optional/cert-manager/manager/images-x86_64.yaml >> %{buildroot}/%{_prefix}/lib/microshift/manifests.d/060-microshift-cert-manager/manager/images.yaml
+%endif
 
 # cert-manager-release-info
 mkdir -p -m755 %{buildroot}%{_datadir}/microshift/release
@@ -778,6 +789,12 @@ fi
 # Use Git command to generate the log and replace the VERSION string
 # LANG=C git log --date="format:%a %b %d %Y" --pretty="tformat:* %cd %an <%ae> VERSION%n- %s%n" packaging/rpm/microshift.spec
 %changelog
+* Sun Jan 18 2026 Gregory Giguashvili <ggiguash@redhat.com> 4.21.0
+- Update cert-manager manifests to use per-platform images
+
+* Fri Jan 09 2026 Pablo Acevedo Montserrat <pacevedo@redhat.com> 4.21.0
+- Add rdma-core dependency to SR-IOV RPM
+
 * Mon Sep 29 2025 Gregory Giguashvili <ggiguash@redhat.com> 4.21.0
 - Ensure containernetworking-plugins package is installed on RHEL 9 as a weak dependency
 

@@ -148,7 +148,7 @@ download_cert_manager(){
 
 }
 
-# helper to update ConfigMap with image references
+# helper to update ConfigMap with image references in images.yaml
 update_configmap_image() {
     local component_name="$1"
     local full_image_ref="$2"
@@ -158,17 +158,21 @@ update_configmap_image() {
 
 write_cert_manager_images_for_arch() {
     local arch="$1"
+    local arch_digest
+
     title "Updating images for ${arch}"
     local cert_manager_release_json="${REPOROOT}/assets/optional/cert-manager/release-cert-manager-${GOARCH_TO_UNAME_MAP[${arch}]}.json"
-    local cert_manager_operator_yaml="${REPOROOT}/assets/optional/cert-manager/manager/manager.yaml"
-    local cert_manager_images_yaml="${REPOROOT}/assets/optional/cert-manager/manager/images.yaml"
+    local cert_manager_images_yaml="${REPOROOT}/assets/optional/cert-manager/manager/images-${GOARCH_TO_UNAME_MAP[${arch}]}.yaml"
 
     local operatorVersion=$(yq '.properties[] | select(.type == "olm.package").value.version' "${OPERATOR_CERT_MANAGER_INDEX}")
 
     jq -n "{\"release\": {\"base\": \"${operatorVersion}\"}, \"images\": {}}" > "${cert_manager_release_json}"
 
-    #containerImage
+    # controllerImage
     local operatorImageFull=$(yq '.properties[] | select(.type == "olm.csv.metadata").value.annotations.containerImage' "${OPERATOR_CERT_MANAGER_INDEX}")
+    arch_digest=$(oc -a "${PULL_SECRET_FILE}" image info -o json --filter-by-os "linux/${arch}" "${operatorImageFull}" | jq -r '.digest')
+    operatorImageFull="${operatorImageFull%@*}@${arch_digest}"
+
     local operatorImage="${operatorImageFull%:*}"
     local operatorTag="${operatorImageFull#*:}"
 
@@ -177,28 +181,20 @@ write_cert_manager_images_for_arch() {
     # update controller image in ConfigMap
     update_configmap_image "controller" "${operatorImageFull}" "${cert_manager_images_yaml}"
 
-    #relatedImages
+    # relatedImages
     for index in $(yq '.relatedImages.[] | path | .[-1] ' "${OPERATOR_CERT_MANAGER_INDEX}"); do
-     local image=$(yq ".relatedImages.${index}.image" "${OPERATOR_CERT_MANAGER_INDEX}" )
-     local component=$(yq ".relatedImages.${index}.name" "${OPERATOR_CERT_MANAGER_INDEX}")
-    if [[  -n "${component}" && "${OPERATOR_COMPONENTS}" == *"${component}"* ]]; then
-        yq -i -o json ".images += {\"${component}\": \"${image}\"}" "${cert_manager_release_json}"
+        local image=$(yq ".relatedImages.${index}.image" "${OPERATOR_CERT_MANAGER_INDEX}" )
+        arch_digest=$(oc -a "${PULL_SECRET_FILE}" image info -o json --filter-by-os "linux/${arch}" "${image}" | jq -r '.digest')
+        image="${image%@*}@${arch_digest}"
 
-        # update component image in ConfigMap
-        update_configmap_image "${component}" "${image}" "${cert_manager_images_yaml}"
+        local component=$(yq ".relatedImages.${index}.name" "${OPERATOR_CERT_MANAGER_INDEX}")
+        if [[  -n "${component}" && "${OPERATOR_COMPONENTS}" == *"${component}"* ]]; then
+            yq -i -o json ".images += {\"${component}\": \"${image}\"}" "${cert_manager_release_json}"
 
-        # update environment variables in manager.yaml
-        sed -i "s#value:.*${component}.*#value: ${image}#g" "${cert_manager_operator_yaml}"
-
-        # handle special case istiocsr v istio-csr mismatch
-        if [[ "${component}" == "cert-manager-istiocsr" ]]; then
-            sed -i "s#value:.*cert-manager-istio-csr.*#value: ${image}#g" "${cert_manager_operator_yaml}"
+            # update component image in images.yaml
+            update_configmap_image "${component}" "${image}" "${cert_manager_images_yaml}"
         fi
-    fi
-
-
     done
-
 }
 
 update_cert_manager_images() {
@@ -213,10 +209,31 @@ update_cert_manager_images() {
     done
 }
 
-
 copy_manifests() {
     title "Copying manifests"
     "$REPOROOT/scripts/auto-rebase/handle_assets.py" "./scripts/auto-rebase/assets_cert_manager.yaml"
+}
+
+update_last_cert_manager_rebase() {
+    local cert_manager_operator_bundle="$1"
+
+    title "## Updating last_rebase_cert_manager.sh"
+
+    local last_rebase_script="${REPOROOT}/scripts/auto-rebase/last_rebase_cert_manager.sh"
+
+    rm -f "${last_rebase_script}"
+    cat - >"${last_rebase_script}" <<EOF
+#!/bin/bash -x
+./scripts/auto-rebase/rebase_cert_manager.sh to "${cert_manager_operator_bundle}"
+EOF
+    chmod +x "${last_rebase_script}"
+
+    (cd "${REPOROOT}" && \
+         if test -n "$(git status -s scripts/auto-rebase/last_rebase_cert_manager.sh)"; then \
+             title "## Committing changes to last_rebase_cert_manager.sh" && \
+             git add scripts/auto-rebase/last_rebase_cert_manager.sh && \
+             git commit -m "update last_rebase_cert_manager.sh"; \
+         fi)
 }
 
 rebase_cert_manager_to(){
@@ -224,6 +241,7 @@ rebase_cert_manager_to(){
     download_cert_manager "${operator_bundle}"
     copy_manifests
     update_cert_manager_images
+    update_last_cert_manager_rebase "${operator_bundle}"
 }
 
 usage() {

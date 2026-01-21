@@ -52,7 +52,12 @@ cd "${ROOTDIR}/test"
 bash -x ./bin/manage_hypervisor_config.sh create
 
 # Setup a container registry and mirror images.
-bash -x ./bin/mirror_registry.sh
+# Release jobs need to also mirror the images from the brew RPMs.
+if [[ "${SCENARIO_SOURCES:-}" =~ .*releases.* ]]; then
+    bash -x ./bin/mirror_registry.sh -ri "${BREW_RPM_SOURCE}"
+else
+    bash -x ./bin/mirror_registry.sh
+fi
 
 # Prepare all the scenarios that need to run into an output directory
 # where all the relevant scenarios will be copied for execution
