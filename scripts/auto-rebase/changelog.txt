@@ -1,0 +1,15 @@
+- cluster-ingress-operator embedded-component 218159f7b060760c7e910b57429beea2f3eb3146 to 1708977af70b2de62642dadd29d6f2f25a0240fd
+  - 9102ef4 2026-01-07T16:16:44+01:00 OCPBUGS-61858: Implement e2e test for HTTPKeepAliveTimeout
+  - 3dd7871 2026-01-07T16:00:06+01:00 OCPBUGS-61858: Implement HTTPKeepAliveTimeout tuning option
+  - 8734d56 2026-01-07T15:59:29+01:00 OCPBUGS-61858: Bump openshift/api to get HTTPKeepAliveTimeout tuning option
+
+- ovn-kubernetes image-amd64 c5c0bd46a93cf838cfadfeda6dcfcd405b13be7a to 664d01e170a4b2363b28164646ab6c546f5ef3df
+  - 1790f28a 2026-01-12T12:37:09+05:30 MultiNetPol: Process update only when spec fields and/or related annotations are updated
+  - 86c085fc 2026-01-12T12:37:07+05:30 NetPol: Process update only when spec fields and/or related annotation are updated
+  - 694a03cb 2025-12-18T07:37:06+02:00 OCPBUGS-68047: CVE-2025-65637 Bump github.com/sirupsen/logrus to v1.9.1 through indirect dependency conversion
+
+- ovn-kubernetes image-arm64 c5c0bd46a93cf838cfadfeda6dcfcd405b13be7a to 664d01e170a4b2363b28164646ab6c546f5ef3df
+  - 1790f28a 2026-01-12T12:37:09+05:30 MultiNetPol: Process update only when spec fields and/or related annotations are updated
+  - 86c085fc 2026-01-12T12:37:07+05:30 NetPol: Process update only when spec fields and/or related annotation are updated
+  - 694a03cb 2025-12-18T07:37:06+02:00 OCPBUGS-68047: CVE-2025-65637 Bump github.com/sirupsen/logrus to v1.9.1 through indirect dependency conversion
+
