@@ -62,7 +62,7 @@ find_package() {
         zstream)
             package_list=$(sudo dnf repoquery --quiet --repo "rhocp-${ver_x}.${ver_y}-for-rhel-9-${UNAME_M}-rpms" 2>/dev/null) || true
             package_filtered=$(echo "${package_list}" | grep "microshift-0:" | sed 's/0://' | sed "s/.${UNAME_M}$//" | sort -V | uniq ) || true
-            if [ -z "${package}" ] ; then
+            if [ -z "${package_filtered}" ] ; then
                 package_list=$(brew list-builds --quiet --package=microshift --state=COMPLETE 2>/dev/null) || true
                 package_filtered=$(echo "${package_list}" | grep "^microshift-${ver_x}.${ver_y}" | grep -v "~" | sort -V | uniq ) || true
             fi
