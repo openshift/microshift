@@ -20,11 +20,11 @@ RUN dnf repoinfo --enabled && \
         {{ range (env.Getenv "MICROSHIFT_MANDATORY_RPMS" | strings.Split " ") -}}
         "{{ . }}-{{ env.Getenv "BREW_Z1_RELEASE_VERSION" }}" \
         {{ end -}}
-        {{ range (env.Getenv "MICROSHIFT_Y1_OPTIONAL_RPMS" | strings.Split " ") -}}
+        {{ range (env.Getenv "MICROSHIFT_Z1_OPTIONAL_RPMS" | strings.Split " ") -}}
         "{{ . }}-{{ env.Getenv "BREW_Z1_RELEASE_VERSION" }}" \
         {{ end -}}
         {{ if and (env.Getenv "UNAME_M" "") (eq "x86_64" .Env.UNAME_M) -}}
-        {{ range (env.Getenv "MICROSHIFT_Y1_X86_64_RPMS" | strings.Split " ") -}}
+        {{ range (env.Getenv "MICROSHIFT_Z1_X86_64_RPMS" | strings.Split " ") -}}
         "{{ . }}-{{ env.Getenv "BREW_Z1_RELEASE_VERSION" }}" \
         {{ end -}}
         {{ end -}}
