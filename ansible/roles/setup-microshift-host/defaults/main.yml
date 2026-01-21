@@ -25,5 +25,6 @@ install_packages:
   - tar
   - vnstat
 
-vg_name: rhel
+default_vg_name: microshift
+vg_name: "{{ default_vg_name }}"
 lvm_disk: /dev/xvdb
