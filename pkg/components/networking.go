@@ -134,8 +134,8 @@ func deployMultus(ctx context.Context, cfg *config.Config, kubeconfigPath string
 	}
 
 	if _, err := os.Stat(multusCrioConfigPath); os.IsNotExist(err) {
-		klog.Warningf("Multus cri-o configuration not found. Please install multus package")
-		return fmt.Errorf("multus cri-o configuration not found. Please install multus package")
+		klog.Warningf("Multus cri-o configuration not found. Please install multus package and restart the host")
+		return fmt.Errorf("multus cri-o configuration not found. Please install multus package and restart the host")
 	} else if err != nil {
 		klog.Warningf("Could not check existence of cri-o configuration file for multus: %v", err)
 		return fmt.Errorf("could not check existence of cri-o configuration file for multus: %v", err)
