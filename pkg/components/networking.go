@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"os"
 	"path/filepath"
 	"runtime"
 	"strings"
@@ -14,6 +15,11 @@ import (
 	"github.com/openshift/microshift/pkg/config/ovn"
 	"github.com/vishvananda/netlink"
 	"k8s.io/klog/v2"
+)
+
+const (
+	// Multus CRI-O configuration file path with default CNI and plugin dirs.
+	multusCrioConfigPath = "/etc/crio/crio.conf.d/12-microshift-multus.conf"
 )
 
 func startCNIPlugin(ctx context.Context, cfg *config.Config, kubeconfigPath string) error {
@@ -125,6 +131,14 @@ func deployMultus(ctx context.Context, cfg *config.Config, kubeconfigPath string
 	if !cfg.Network.Multus.IsEnabled() {
 		klog.Warningf("Multus CNI is disabled. Uninstall is not supported if it was installed previously.")
 		return nil
+	}
+
+	if _, err := os.Stat(multusCrioConfigPath); os.IsNotExist(err) {
+		klog.Warningf("Multus cri-o configuration not found. Please install multus package")
+		return fmt.Errorf("multus cri-o configuration not found. Please install multus package")
+	} else if err != nil {
+		klog.Warningf("Could not check existence of cri-o configuration file for multus: %v", err)
+		return fmt.Errorf("could not check existence of cri-o configuration file for multus: %v", err)
 	}
 
 	var (
