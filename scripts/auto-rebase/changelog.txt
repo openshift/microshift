@@ -1,3 +1,8 @@
-- machine-config-operator embedded-component 117708020d5d2549b72a2046aebfdc0064dd8d41 to 930bff17125ac90ff7817b68f2f8cece04c51e35
-  - bcb18a0f 2026-01-15T13:19:00-05:00 ctrcfg: set increase ulimits when upgrading from 4.20 to 4.21
+- cluster-network-operator embedded-component b54bbb1659c4078cb467b69d260f5eee100c6284 to 63bfcdac6e6d861a4bc54dad13e91bd60e767b18
+  - f0682c2 2026-01-09T15:07:33+00:00 Skip _stackmanager execution for libreswan 5.3+
+
+- machine-config-operator embedded-component 930bff17125ac90ff7817b68f2f8cece04c51e35 to 4593e456f3b51f4c6c458c00752e38f2687baedc
+  - 731a9afb 2026-01-19T15:28:00-05:00 Fix timeout during configMap cleanup
+  - 8ef493c0 2026-01-19T08:41:46+00:00 OCPBUGS-71196: Enable existing units without content
+  - 25e44b18 2025-12-02T18:53:35+00:00 OCPBUGS-62232: Set -fin timeouts in HAProxy config
 
