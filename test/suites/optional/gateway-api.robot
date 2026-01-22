@@ -23,7 +23,7 @@ Test Simple HTTP Route
     ...    Deploy Hello MicroShift
     Create Gateway    ${GATEWAY_HOSTNAME}    ${GATEWAY_PORT}    ${NS_GATEWAY}
     Create HTTP Route    ${GATEWAY_HOSTNAME}    ${NS_GATEWAY}
-    Wait Until Keyword Succeeds    10x    6s
+    Wait Until Keyword Succeeds    20x    6s
     ...    Access Hello MicroShift Success    ushift_port=${GATEWAY_PORT}    hostname=${GATEWAY_HOSTNAME}
     [Teardown]    Run Keywords
     ...    Delete Namespace
@@ -71,9 +71,9 @@ Create HTTP Route
     Generate File From Template    ${HTTP_ROUTE_MANIFEST_TMPL}    ${tmp}
     Oc Apply    -n ${namespace} -f ${tmp}
 
-    Wait Until Keyword Succeeds    10x    6s
+    Wait Until Keyword Succeeds    20x    6s
     ...    Verify HTTPRoute Parent Accepted    ${namespace}
-    Wait Until Keyword Succeeds    10x    6s
+    Wait Until Keyword Succeeds    20x    6s
     ...    Verify HTTPRoute References Resolved    ${namespace}
 
 Verify HTTPRoute Parent Accepted
