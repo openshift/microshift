@@ -230,12 +230,14 @@ def get_gitops_version(minor_version):
         logging.error(f"Failed to fetch data from {url} after 3 attempts")
         return ""
     data = resp.json()
-    while minor_version >= 18:
-        for version in data.get("data", [{}])[0].get("versions", []):
-            if version.get("openshift_compatibility") and f"4.{minor_version}" in version["openshift_compatibility"]:
-                logging.info(f"Latest GitOps version: {version.get('name', '')} which is compatible with OCP {version['openshift_compatibility']}")
-                return version.get("name", "")
-        minor_version -= 1
+    for current_microshift_minor_version in range(minor_version, minor_version - 4, -1):
+        for gitops_version_from_api_docs in data.get("data", [{}])[0].get("versions", []):
+            gitops_version_ocp_compatibility = gitops_version_from_api_docs.get("openshift_compatibility")
+            gitops_version_number = gitops_version_from_api_docs.get("name")
+            if f"4.{current_microshift_minor_version}" in gitops_version_ocp_compatibility:
+                logging.info(f"Latest GitOps version: {gitops_version_number} which is compatible with OCP {gitops_version_ocp_compatibility}")
+                return gitops_version_number
+    return ""
 
 
 def generate_common_versions(minor_version):
