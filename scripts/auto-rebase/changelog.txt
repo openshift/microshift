@@ -1,8 +1,0 @@
-- api embedded-component 0b46e314ebfecc649a3c14b5db7aed50cd5263a3 to 92c55bf0f372c222dc02f17685c383d18e2c2e8b
-  - 2b38482 2025-11-21T10:53:09-08:00 Promote streaming list encoding to Default
-
-- ovn-kubernetes image-amd64 5190b4a6433b4a18f29ba1a5df541ba95e225e04 to fc112155baeb6423e0b9969e08bb1160d736f43f
-  - 5bf99c79 2026-01-07T15:22:29+05:30 MultiNetPol: Process update only when spec fields and/or related annotations are updated
-  - a9f8d6f4 2026-01-07T15:04:17+05:30 NetPol: Process update only when spec fields and/or related annotation are updated
-  - a332dcf8 2025-12-18T07:37:04+02:00 OCPBUGS-68144: CVE-2025-65637 Bump github.com/sirupsen/logrus to v1.9.1 through indirect dependency conversion
-
