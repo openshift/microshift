@@ -8,7 +8,7 @@ scenario_create_vms() {
     exit_if_image_not_found "${start_image}"
 
     prepare_kickstart host1 kickstart-bootc.ks.template "${start_image}"
-    launch_vm --boot_blueprint "${start_image}" --vm_vcpus 4
+    launch_vm --boot_blueprint rhel96-bootc --vm_vcpus 4
 }
 
 scenario_remove_vms() {
@@ -20,7 +20,5 @@ scenario_remove_vms() {
 scenario_run_tests() {
     exit_if_image_not_found "${start_image}"
 
-    run_tests host1 \
-        --variable "EXPECTED_OS_VERSION:9.6" \
-        suites/standard1/
+    run_tests host1 suites/configuration/
 }

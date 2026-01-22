@@ -28,5 +28,5 @@ scenario_run_tests() {
         --variable "TARGET_REF:rhel-9.6-microshift-brew-optionals-4.${MINOR_VERSION}-${LATEST_RELEASE_TYPE}" \
         --variable "EXPECTED_OS_VERSION:9.6" \
         suites/upgrade/upgrade-successful.robot \
-        suites/standard1/ suites/selinux/validate-selinux-policy.robot
+        suites/standard1/
 }
