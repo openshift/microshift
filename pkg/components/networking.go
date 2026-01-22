@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"os"
 	"path/filepath"
 	"runtime"
 	"strings"
@@ -13,6 +12,7 @@ import (
 	"github.com/openshift/microshift/pkg/assets"
 	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/config/ovn"
+	"github.com/openshift/microshift/pkg/util"
 	"github.com/vishvananda/netlink"
 	"k8s.io/klog/v2"
 )
@@ -133,12 +133,12 @@ func deployMultus(ctx context.Context, cfg *config.Config, kubeconfigPath string
 		return nil
 	}
 
-	if _, err := os.Stat(multusCrioConfigPath); os.IsNotExist(err) {
-		klog.Warningf("Multus cri-o configuration not found. Please install multus package and restart the host")
-		return fmt.Errorf("multus cri-o configuration not found. Please install multus package and restart the host")
-	} else if err != nil {
+	if exists, err := util.PathExists(multusCrioConfigPath); err != nil {
 		klog.Warningf("Could not check existence of cri-o configuration file for multus: %v", err)
 		return fmt.Errorf("could not check existence of cri-o configuration file for multus: %v", err)
+	} else if !exists {
+		klog.Warningf("Multus cri-o configuration not found. Please install multus package and restart the host")
+		return fmt.Errorf("multus cri-o configuration not found. Please install multus package and restart the host")
 	}
 
 	var (
