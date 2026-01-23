@@ -1,22 +1,10 @@
-- api embedded-component 6fb7fdae95fd20a36809d502cfc0e0459550d527 to 4c643a652d54d4d2a06c1ebdb1350abcb568c07f
-  - 6ca8f36f 2026-01-20T14:21:04+00:00 Update KAL config based on latest version
-  - 62d560b9 2026-01-20T13:35:11+00:00 Update KAL to latest
+- api embedded-component 4c643a652d54d4d2a06c1ebdb1350abcb568c07f to 59aa3e50a9fb94f93ab0f86649db2bab6ef61f01
+  - 98cf8463 2026-01-20T10:50:03-05:00 chore(tools): bump controller-tools with stable slice sort fix
+  - e87c917e 2026-01-20T09:30:17-06:00 NO-JIRA: Fix Infrastructure PlatformType comment
 
-- cluster-ingress-operator embedded-component 56e29778bc2168c324e55ddecd2d838a3ea287bf to f97a4486f20f362b5c1fd45890997791ba73f09d
-  - 21afaae 2026-01-20T16:50:47-03:00 add jcmoraisjr to owners
+- cluster-kube-apiserver-operator embedded-component 1aee49b41513b3d263bd9a1b7670286e5898565e to f4181f9afff1d9592ee98c9be7613b93554279d0
+  - 850daef 2026-01-21T15:44:02+05:30 Migrating user_client_ca_test to ginkgo
 
-- cluster-kube-apiserver-operator embedded-component acccbfeb80bdc1dd0277b574e40c9f1475c9a0b9 to 1aee49b41513b3d263bd9a1b7670286e5898565e
-  - eab448d 2026-01-20T16:19:17+05:30 Migrate cases
-  - 4770028 2026-01-19T21:00:37+05:30 Use g.By steps for serviceaccountissuer lifecycle tests
-  - 79795a6 2025-11-19T15:54:22-05:00 SCC: allow image volume type for all SCCs
-
-- machine-config-operator embedded-component a01d54831ee2d007a062e0f80dc231f7247ac69b to de8ed4525df018102a15f15c3b3dd25138b09681
-  - 5ddfe9bf 2026-01-19T19:51:44-05:00 Revert "OCPBUGS-58023: Prevent unnecessary systemd unit disable"
-  - 0ee39a1a 2026-01-16T14:02:51-05:00 e2e-bootstrap: reconcile CRD updates
-
-- operator-framework-olm embedded-component a32628ea3dc20c685529695d5093f17036850b01 to 8cfcfeb397a89bf0d273e06b914caf5e9885dedd
-  - b4676477 2026-01-16T16:20:58+08:00 UPSTREAM: <carry>: automate ocp-85743 and ocp-85745
-
-- route-controller-manager embedded-component 8a69194a461dc33d2ed67a220bca91d384d34df4 to 3b4cc7b25c3c340b6708b7f0c1deafe38ef8a942
-  - ec51eac 2026-01-20T15:43:21-03:00 add jcmoraisjr to owners
+- cluster-kube-scheduler-operator embedded-component f56b603a018af8ec2ff6fcb3a72cb8dc3f28b3e5 to ed10ad69474b83c568452f59dbd3d943778799d7
+  - aba7c9a 2026-01-16T10:33:45+01:00 Add OPERATOR_IMAGE_VERSION to recovery container
 
