@@ -874,6 +874,17 @@ func TestValidate(t *testing.T) {
 			expectErr: true,
 		},
 		{
+			name: "feature-gates-custom-no-upgrade-with-empty-enabled-and-disabled-lists",
+			config: func() *Config {
+				c := mkDefaultConfig()
+				c.ApiServer.FeatureGates.FeatureSet = "CustomNoUpgrade"
+				c.ApiServer.FeatureGates.CustomNoUpgrade.Enabled = []string{}
+				c.ApiServer.FeatureGates.CustomNoUpgrade.Disabled = []string{}
+				return c
+			}(),
+			expectErr: false,
+		},
+		{
 			name: "feature-gates-preview-feature-sets-not-supported",
 			config: func() *Config {
 				c := mkDefaultConfig()
