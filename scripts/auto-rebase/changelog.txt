@@ -1,9 +1,4 @@
-- kubernetes embedded-component f80fdf620b057bc3c66a6feb8b6cdc9f33f2c5c9 to 4d58ab3bbfecb4e7a3affaa3885d1d4c0ec87c0a
-  - bca762874 2026-01-16T10:32:17-05:00 UPSTREAM: 135340: cbor: bump limits
-
-- machine-config-operator embedded-component 4b9b8a97487ba314079ab588b7cdbd95ef15c846 to 2b4dd60a63aa85e3f9f54f6e1c7d1c0228ccd57c
-  - cfaa1732 2026-01-19T16:46:05+00:00 Fixes the issue in the test TestKubeletConfigMaxPods when AutoNodeSizing is enabled by default
-
-- kubernetes image-amd64 f80fdf620b057bc3c66a6feb8b6cdc9f33f2c5c9 to 4d58ab3bbfecb4e7a3affaa3885d1d4c0ec87c0a
-  - bca762874 2026-01-16T10:32:17-05:00 UPSTREAM: 135340: cbor: bump limits
+- machine-config-operator embedded-component 2b4dd60a63aa85e3f9f54f6e1c7d1c0228ccd57c to 4862395f521be4a54436be13b0dd745d94abb4c1
+  - 779dcbfd 2026-01-15T20:49:10+00:00 operator: update unit tests for boot image status
+  - 31ad2af2 2026-01-15T20:49:10+00:00 operator: refactor boot image status population
 
