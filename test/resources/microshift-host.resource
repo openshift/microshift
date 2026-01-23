@@ -57,8 +57,10 @@ Reboot MicroShift Host
     SSHLibrary.Start Command    reboot    sudo=True
     Sleep    30s
 
-    Wait Until Keyword Succeeds    5m    15s
+    ${cur_bootid}=    Wait Until Keyword Succeeds    5m    15s
     ...    System Should Be Rebooted    ${bootid}
+
+    RETURN    ${cur_bootid}
 
 Create Thin Storage Pool
     [Documentation]    Create a new thin storage pool
@@ -107,8 +109,10 @@ System Should Not Be Ostree
 System Should Be Rebooted
     [Documentation]    Assert if the system rebooted comparing the current and provided boot identifier
     [Arguments]    ${old_bootid}
-    ${rebooted}=    Is System Rebooted    ${old_bootid}
+    ${rebooted}    ${cur_bootid}=    Is System Rebooted    ${old_bootid}
     Should Be True    ${rebooted}
+
+    RETURN    ${cur_bootid}
 
 Is System Rebooted
     [Documentation]    Check if the system rebooted comparing the current and provided boot identifier
@@ -118,10 +122,10 @@ Is System Rebooted
     ${cur_bootid}=    Get Current Boot Id
     ${len}=    Get Length    ${cur_bootid}
     IF    ${len} == 0
-        RETURN    False
+        RETURN    False    ${old_bootid}
     ELSE
         ${system_rebooted}=    Evaluate    '${old_bootid}' != '${cur_bootid}'
-        RETURN    ${system_rebooted}
+        RETURN    ${system_rebooted}    ${cur_bootid}
     END
 
 Change Hostname
