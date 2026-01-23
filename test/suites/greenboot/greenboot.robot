@@ -16,15 +16,16 @@ Test Tags           restart    slow
 ${LOCAL_WORKLOAD_FILE}          ../docs/config/busybox_running_check.sh
 ${GREENBOOT_WORKLOAD_FILE}      /etc/greenboot/check/required.d/50_busybox_running_check.sh
 ${GREENBOOT_CONFIG_FILE}        /etc/greenboot/greenboot.conf
-${GREENBOOT_CONFIG_CONTENT}     MICROSHIFT_WAIT_TIMEOUT_SEC=180
+${WAIT_TIMEOUT}                 180
+${GREENBOOT_CONFIG_CONTENT}     MICROSHIFT_WAIT_TIMEOUT_SEC=${WAIT_TIMEOUT}
 ${MANIFEST_SOURCE_DIR}          ./assets/kustomizations/greenboot/
 ${MANIFEST_DIR}                 /etc/microshift/manifests
-${HOSTNAME_BIN_PATH}            ""
+${HOSTNAME_BIN_PATH}            /usr/bin/hostname
 
 
 *** Test Cases ***
 Run with User Workload
-    [Documentation]    Add user's workload and verify that the workload starts and greenboot is successful.
+    [Documentation]    Add a user workload, verify that it starts and greenboot is successful
     Restart Greenboot And Wait For Success
     Add User Workload
     Cleanup And Start
@@ -38,11 +39,12 @@ Simulate Service Failure
     Restart Greenboot And Wait For Success
     Disrupt Service
     Cleanup MicroShift    --all    --keep-images
-    # not using 'Start MicroShift' kw because it retries
+    # Not using the 'Start MicroShift' keyword because it retries
     Run Keyword And Expect Error    0 != 1
     ...    Systemctl    start    microshift
+    # Lower the default wait timeout to fail-fast tests
     Run Keyword And Expect Error    0 != 1
-    ...    Restart Greenboot And Wait For Success
+    ...    Restart Greenboot And Wait For Success    ${WAIT_TIMEOUT}s
 
     [Teardown]    Run Keywords
     ...    Restore Service
@@ -53,8 +55,9 @@ Simulate Pod Failure
     Restart Greenboot And Wait For Success
     Disrupt Pod Network
     Restart MicroShift
+    # Lower the default wait timeout to fail-fast tests
     Run Keyword And Expect Error    0 != 1
-    ...    Restart Greenboot And Wait For Success
+    ...    Restart Greenboot And Wait For Success    ${WAIT_TIMEOUT}s
 
     [Teardown]    Run Keywords
     ...    Remove Drop In MicroShift Config    10-svcNetwork
@@ -68,7 +71,8 @@ Setup Suite
     Check Required Env Variables
     Login MicroShift Host
     Setup Kubeconfig
-    Upload String To File    ${GREENBOOT_CONFIG_CONTENT}    ${GREENBOOT_CONFIG_FILE} # change the default timeout
+    # Change the default timeout to fail-fast tests
+    Upload String To File    ${GREENBOOT_CONFIG_CONTENT}    ${GREENBOOT_CONFIG_FILE}
 
 Add User Workload
     [Documentation]    Upload User workload files to the MicroShift host
@@ -92,7 +96,7 @@ Cleanup User Workload
     Should Be Equal As Integers    0    ${rc}
 
 Disrupt Service
-    [Documentation]    Prevent Microshift service from starting correctly.
+    [Documentation]    Prevent MicroShift service from starting correctly
 
     ${stdout}    ${rc}=    Execute Command
     ...    which hostname
@@ -109,18 +113,14 @@ Disrupt Service
     Should Be Equal As Integers    0    ${rc}
 
 Restore Service
-    [Documentation]    Restore Microshift service to the correct form.
+    [Documentation]    Restore MicroShift service to the correct form
     ${stdout}    ${rc}=    Execute Command
     ...    chmod 755 ${HOSTNAME_BIN_PATH}
     ...    sudo=True    return_rc=True
     Should Be Equal As Integers    0    ${rc}
 
-    # Reboot to regain ostree deployment (revert usroverlay)
-    ${is_ostree}=    Is System OSTree
-    IF    ${is_ostree}    Reboot MicroShift Host
-
 Disrupt Pod Network
-    [Documentation]    Prevent Microshift pods From starting correctly
+    [Documentation]    Prevent MicroShift pods from starting correctly
     ${configuration}=    Catenate    SEPARATOR=\n
     ...    network:
     ...    \ clusterNetwork:
@@ -131,8 +131,8 @@ Disrupt Pod Network
     Drop In MicroShift Config    ${configuration}    10-svcNetwork
 
 Cleanup And Start
-    [Documentation]    Wipe Microshift data and start it.
+    [Documentation]    Wipe MicroShift data and restart the system
     Cleanup MicroShift    --all    --keep-images
-    Start MicroShift
-    Setup Kubeconfig
-    Restart Greenboot And Wait For Success
+    Enable MicroShift
+    Reboot MicroShift Host
+    Wait Until Greenboot Health Check Exited
