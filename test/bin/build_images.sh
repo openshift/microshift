@@ -610,6 +610,9 @@ build_images.sh [-iIsdf] [-l layer-dir | -g group-dir] [-t template]
           The FILE should be the path to the template to build.
           Implies -f along with -l and -g based on the filename.
 
+  -X      Extract container images only; skip all do_group builds and
+          installer builds.
+
 EOF
 }
 
@@ -622,9 +625,10 @@ TEMPLATE=""
 FORCE_REBUILD=false
 FORCE_SOURCE=false
 EXTRACT_CONTAINER_IMAGES=true
+EXTRACT_ONLY=false
 
 selCount=0
-while getopts "dEfg:hiIl:sSt:" opt; do
+while getopts "dEfg:hiIl:sSt:X" opt; do
     case "${opt}" in
         d)
             COMPOSER_DRY_RUN=true
@@ -665,6 +669,10 @@ while getopts "dEfg:hiIl:sSt:" opt; do
             GROUP="$(dirname "$(realpath "${OPTARG}")")"
             selCount=$((selCount+1))
             FORCE_REBUILD=true
+            ;;
+        X)
+            EXTRACT_ONLY=true
+            BUILD_INSTALLER=false
             ;;
         *)
             usage "ERROR: Unknown option ${opt}"
@@ -736,14 +744,16 @@ if [ $(pgrep -cx nginx) -eq 0 ] ; then
     "${TESTDIR}/bin/manage_webserver.sh" "start"
 fi
 
-if [ -n "${LAYER}" ]; then
-    for group in "${LAYER}"/group*; do
-       do_group "${group}" ""
-    done
-elif [ -n "${GROUP}" ]; then
-    do_group "${GROUP}" "${TEMPLATE}"
-else
-    for group in "${TESTDIR}"/image-blueprints/layer*/group*; do
-        do_group "${group}" ""
-    done
+if ! ${EXTRACT_ONLY}; then
+    if [ -n "${LAYER}" ]; then
+        for group in "${LAYER}"/group*; do
+           do_group "${group}" ""
+        done
+    elif [ -n "${GROUP}" ]; then
+        do_group "${GROUP}" "${TEMPLATE}"
+    else
+        for group in "${TESTDIR}"/image-blueprints/layer*/group*; do
+            do_group "${group}" ""
+        done
+    fi
 fi
