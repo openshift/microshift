@@ -16,7 +16,7 @@ VM_BRIDGE_IP="$(get_vm_bridge_ip "${VM_IPV6_NETWORK}")"
 # shellcheck disable=SC2034  # used elsewhere
 WEB_SERVER_URL="http://[${VM_BRIDGE_IP}]:${WEB_SERVER_PORT}"
 
-start_image="rhel96-bootc-brew-${LATEST_RELEASE_TYPE}-with-optional-tuned"
+start_image="rhel96-bootc-brew-lrel-tuned"
 
 scenario_create_vms() {
     if ! does_image_exist "${start_image}"; then

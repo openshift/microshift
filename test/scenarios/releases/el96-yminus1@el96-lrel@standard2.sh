@@ -25,7 +25,7 @@ scenario_run_tests() {
     exit_if_commit_not_found "${start_image}"
 
     run_tests host1 \
-        --variable "TARGET_REF:rhel-9.6-microshift-brew-optionals-4.${MINOR_VERSION}-${LATEST_RELEASE_TYPE}" \
+        --variable "TARGET_REF:rhel96-brew-lrel-optional" \
         suites/upgrade/upgrade-successful.robot \
         suites/standard2/
 }

@@ -155,11 +155,17 @@ export BREW_RC_RELEASE_VERSION
 export BREW_EC_RELEASE_VERSION
 export BREW_NIGHTLY_RELEASE_VERSION
 
-# Set the release type to ec, rc or zstream
-LATEST_RELEASE_TYPE="{LATEST_RELEASE_TYPE}"
-export LATEST_RELEASE_TYPE
+# Set the release type based on priority: zstream > RC > EC > nightly
+if [ -n "${{BREW_Y0_RELEASE_VERSION}}" ]; then
+    BREW_LREL_RELEASE_VERSION="${{BREW_Y0_RELEASE_VERSION}}"
+elif [ -n "${{BREW_RC_RELEASE_VERSION}}" ]; then
+    BREW_LREL_RELEASE_VERSION="${{BREW_RC_RELEASE_VERSION}}"
+elif [ -n "${{BREW_EC_RELEASE_VERSION}}" ]; then
+    BREW_LREL_RELEASE_VERSION="${{BREW_EC_RELEASE_VERSION}}"
+else
+    BREW_LREL_RELEASE_VERSION="${{BREW_NIGHTLY_RELEASE_VERSION}}"
+fi
 
-BREW_LREL_RELEASE_VERSION="${{BREW_EC_RELEASE_VERSION}}"
 export BREW_LREL_RELEASE_VERSION
 
 # Branch and commit for the openshift-tests-private repository
