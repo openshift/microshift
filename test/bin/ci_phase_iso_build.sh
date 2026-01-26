@@ -187,15 +187,19 @@ else
         echo "WARNING: Build cache is not available, rebuilding all the artifacts"
     fi
 
-    # Re-build from source after downloading the cache because
-    # the build may depend on some cached artifacts
-    $(dry_run) bash -x ./bin/build_rpms.sh
-
-    # Optionally run bootc image builds
-    if ${COMPOSER_CLI_BUILDS} ; then
-        run_image_build
+    if [[ "${CI_JOB_NAME}" =~ .*release.* ]]; then
+        echo "INFO: Release Testing CI job detected, skipping RPM and image builds"
     else
-        run_bootc_image_build
+        # Re-build from source after downloading the cache because
+        # the build may depend on some cached artifacts
+        $(dry_run) bash -x ./bin/build_rpms.sh
+
+        # Optionally run bootc image builds
+        if ${COMPOSER_CLI_BUILDS} ; then
+            run_image_build
+        else
+            run_bootc_image_build
+        fi
     fi
 fi
 
