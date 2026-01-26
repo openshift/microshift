@@ -1,10 +1,46 @@
-- api embedded-component 4c643a652d54d4d2a06c1ebdb1350abcb568c07f to 59aa3e50a9fb94f93ab0f86649db2bab6ef61f01
-  - 98cf8463 2026-01-20T10:50:03-05:00 chore(tools): bump controller-tools with stable slice sort fix
-  - e87c917e 2026-01-20T09:30:17-06:00 NO-JIRA: Fix Infrastructure PlatformType comment
+- api embedded-component 59aa3e50a9fb94f93ab0f86649db2bab6ef61f01 to a2212e630b91ffc03b9981f76b761048b3022402
+  - 4b2f7e23 2026-01-22T12:09:51-05:00 etcd: add PacemakerCluster CRD for Two Node Fencing
+  - f0442bff 2026-01-20T16:26:19+00:00 add sentence breaks to comments
+  - 8c649d63 2026-01-20T12:10:36+00:00 add additional crds
+  - 1786bf6f 2026-01-20T11:52:15+00:00 fix typo
+  - 6916ef43 2026-01-20T11:20:26+00:00 update additional multiline comments + update crd
+  - bfc5f7f5 2026-01-19T16:58:38+00:00 add sentence break
+  - 994b8ece 2026-01-19T10:51:07+00:00 update codegen crds
+  - 4a790514 2026-01-19T09:26:22+00:00 update codegen
+  - fcb97da7 2026-01-16T17:11:08+00:00 make multiline comments for oidc one line for better crd gen
+  - 244900a2 2026-01-09T12:55:32-05:00 Generate CRDS: for aws tag prefix validation
+  - 62ef4196 2026-01-09T12:52:50-05:00 refactor validation and add ratcheting validation
+  - a21e0918 2026-01-09T12:52:42-05:00 Validate aws resource tag keys with aws prefix & immutable
 
-- cluster-kube-apiserver-operator embedded-component 1aee49b41513b3d263bd9a1b7670286e5898565e to f4181f9afff1d9592ee98c9be7613b93554279d0
-  - 850daef 2026-01-21T15:44:02+05:30 Migrating user_client_ca_test to ginkgo
+- cluster-csi-snapshot-controller-operator embedded-component f57fd597a374ed37f2cdfa37e2853753fd9f7773 to 8be3728d7db58111e6efb46f6075698d6b7ec994
+  - d877dd4 2026-01-14T13:37:34+01:00 Generate manifest
+  - f05b1e3 2026-01-14T10:44:51+01:00 Re-add serving cert volume mount to ibm cloud managed manifest
 
-- cluster-kube-scheduler-operator embedded-component f56b603a018af8ec2ff6fcb3a72cb8dc3f28b3e5 to ed10ad69474b83c568452f59dbd3d943778799d7
-  - aba7c9a 2026-01-16T10:33:45+01:00 Add OPERATOR_IMAGE_VERSION to recovery container
+- machine-config-operator embedded-component de8ed4525df018102a15f15c3b3dd25138b09681 to b1eb6cc3b59bc0cb8b2e9b21cf5724b13e2df039
+  - 22a856f3 2026-01-22T19:17:13-05:00 AGENT-1412: Prevent deletion of InternalReleaseImage when in use
+  - 010dc0a4 2026-01-22T16:42:12+01:00 OCPBUGS-71238: Follow mirrors in OS image operations
+  - 317c38ae 2026-01-22T14:24:46+00:00 MCO-1182: migrate private test case OCP-87023
+  - 0271769d 2026-01-21T08:56:11-05:00 add initial e2e tests for the InternalReleaseImage controller
+  - 91dcec5f 2026-01-20T12:59:14+00:00 MCO-2055 migrate bootimages tests
+  - ba52a8db 2026-01-12T10:21:35+05:30 Fix Failure Status condition to True when kubeletconfig or container runtime config validation fails
+  - 9399af9f 2025-09-25T16:23:51-05:00 Shorten HAProxy timeouts
+
+- operator-framework-olm embedded-component 8cfcfeb397a89bf0d273e06b914caf5e9885dedd to 1222e2d41cab5cc0c5f4b5095928ceb032dfa2c5
+  - cc75f1f6 2026-01-23T00:05:16+00:00 (e2e): Enhance e2e test to check workload resilience when catalogs goes away (#3747)
+  - d4162cc1 2026-01-23T00:04:35+00:00 Add APIServer TLS controller for OpenShift cluster-wide TLS configuration (#3739)
+  - c71393da 2026-01-23T00:04:18+00:00 Fix server startup failure when client-ca is empty or not provided (#3742)
+  - da02662d 2026-01-23T00:04:02+00:00 Add e2e test for operator workload persistence after catalog deletion (#3737)
+  - dcd5e215 2026-01-23T00:03:46+00:00 Fix nil pointer dereference panic in event recorder (#3727)
+  - 4df8095b 2026-01-23T00:03:18+00:00 :seedling: Bump github.com/sirupsen/logrus from 1.9.3 to 1.9.4 (#3740)
+  - 30fcc26e 2026-01-21T09:26:58-05:00 Remove kube-rbac-proxy from PSM
+
+- router image-amd64 fa55e2723077811ef81c4b494c68f6c38282d6e2 to d2db065ae452ecfdb482f0ac4c6778b0c0e48b7f
+  - 57123f1 2026-01-20T15:32:46-03:00 add jcmoraisjr to owners
+  - ff16210 2026-01-14T10:59:19-03:00 Hack: update image without push
+  - 3c42bc7 2026-01-12T11:56:05+01:00 OCPBUGS-72591: Lower verbosity for parseIPList empty list logging
+
+- router image-arm64 fa55e2723077811ef81c4b494c68f6c38282d6e2 to d2db065ae452ecfdb482f0ac4c6778b0c0e48b7f
+  - 57123f1 2026-01-20T15:32:46-03:00 add jcmoraisjr to owners
+  - ff16210 2026-01-14T10:59:19-03:00 Hack: update image without push
+  - 3c42bc7 2026-01-12T11:56:05+01:00 OCPBUGS-72591: Lower verbosity for parseIPList empty list logging
 
