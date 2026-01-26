@@ -48,17 +48,26 @@ SSH Connection To MicroShift Host Should Be Functional
     Should Be Equal As Integers    0    ${rc}
 
 Reboot MicroShift Host
-    [Documentation]    Reboot the MicroShift host and wait until
-    ...    SSH connection is working again and boot identifier changes
+    [Documentation]    Reboot the MicroShift host, waiting until SSH connection
+    ...    is working again and boot identifier changes. Exactly one reboot
+    ...    should have happened. Returns the new boot identifier.
     ...
     ...    Expects that initial SSH connection to MicroShift host is active.
 
+    # Save the initial boot identifier and number of reboots
     ${bootid}=    Get Current Boot Id
-    SSHLibrary.Start Command    reboot    sudo=True
-    Sleep    30s
+    ${reboots}=    Get Last Reboots Count
 
-    ${cur_bootid}=    Wait Until Keyword Succeeds    5m    15s
+    # Reboot the system
+    SSHLibrary.Start Command    reboot    sudo=True
+
+    # Wait until the system reboots and the boot identifier changes
+    ${cur_bootid}=    Wait Until Keyword Succeeds    5m    5s
     ...    System Should Be Rebooted    ${bootid}
+
+    # Verify that there was exactly one reboot
+    ${cur_reboots}=    Get Last Reboots Count
+    Should Be Equal As Integers    ${cur_reboots}    ${reboots + 1}
 
     RETURN    ${cur_bootid}
 
