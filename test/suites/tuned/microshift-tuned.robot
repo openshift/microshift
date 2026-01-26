@@ -100,4 +100,4 @@ Restart MicroShift-Tuned Not Expecting Reboot
     ...    Systemctl Check Service SubState    microshift-tuned.service    dead
     ${rebooted}    ${cur_bootid}=    Is System Rebooted    ${bootid}
     Should Not Be True    ${rebooted}
-    Should Not Be Equal As Strings    ${cur_bootid}    ${bootid}
+    Should Be Equal As Strings    ${cur_bootid}    ${bootid}
