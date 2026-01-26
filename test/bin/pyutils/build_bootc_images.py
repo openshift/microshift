@@ -573,15 +573,21 @@ def main():
     parser.add_argument("-b", "--build-type",
                         choices=["image-bootc", "containerfile", "container-encapsulate"],
                         help="Only build images of the specified type.")
-    dirgroup = parser.add_mutually_exclusive_group(required=True)
+    dirgroup = parser.add_mutually_exclusive_group(required=False)
     dirgroup.add_argument("-l", "--layer-dir", type=str, help="Path to the layer directory to process.")
     dirgroup.add_argument("-g", "--group-dir", type=str, help="Path to the group directory to process.")
     dirgroup.add_argument("-t", "--template", type=str, help="Path to a template to build. Allows glob patterns (requires double qoutes).")
 
     args = parser.parse_args()
+
+    # Validate: directory is required unless extract-only mode
+    if not args.extract_only and not (args.layer_dir or args.group_dir or args.template):
+        parser.error("one of the arguments -l/--layer-dir -g/--group-dir -t/--template is required (unless using -X/--extract-only)")
+
     success_message = False
     try:
         pattern = "*"
+        dir2process = None
         # Convert input directories to absolute paths
         if args.group_dir:
             args.group_dir = os.path.abspath(args.group_dir)
@@ -593,8 +599,8 @@ def main():
             args.template = os.path.abspath(args.template)
             dir2process = os.path.dirname(args.template)
             pattern = os.path.basename(args.template)
-        # Make sure the input directory exists
-        if not os.path.isdir(dir2process):
+        # Make sure the input directory exists (only if specified)
+        if dir2process and not os.path.isdir(dir2process):
             raise Exception(f"The input directory '{dir2process}' does not exist")
         # Make sure the local RPM repository exists
         if not os.path.isdir(LOCAL_REPO):
