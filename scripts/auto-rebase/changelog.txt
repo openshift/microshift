@@ -1,9 +1,0 @@
-- cluster-network-operator embedded-component af0e6d30bcfd2f3f55b61e8538d33e6d052afb68 to f63a7ffb316c9ca4359210ff5ea2c003dbe2d6a9
-  - 61091ce 2026-01-13T17:17:30Z Tweak iptables-alerter to try to avoid crictl bug
-
-- machine-config-operator embedded-component 9e588a1318823dac89a6bc1790ca584d1100dd57 to 0b0569287da3daea19bf47aa298037ccb4cbff98
-  - c3326266 2026-01-07T20:19:41Z fixed state to go to degraded
-
-- ovn-kubernetes image-amd64 45c973d9aeb907885878f92e3e16a142427e8477 to 70a2d777ecb661c3267d24092381518f0420fa9a
-  - 0eb16983 2025-11-26T14:56:03+08:00 Fix conntrack reconciliation to use service port instead of endpoint port
-
