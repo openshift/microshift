@@ -1,6 +1,6 @@
-# {{- if env.Getenv "BREW_EC_RELEASE_VERSION" "" -}}
+# {{- if env.Getenv "BREW_Y0_RELEASE_VERSION" "" -}}
 # Note: This comment makes templating add a new line before the code
-FROM localhost/rhel100-test-agent:latest
+FROM localhost/rhel102-test-agent:latest
 
 # Build arguments
 ARG USHIFT_RPM_REPO_NAME=microshift-brew
@@ -21,14 +21,14 @@ COPY ./bootc-images/$USHIFT_RPM_REPO_NAME.repo ./bootc-images/microshift-fast-da
 RUN dnf repoinfo --enabled && \
     dnf install -y firewalld systemd-resolved openssl \
         {{ range (env.Getenv "MICROSHIFT_MANDATORY_RPMS" | strings.Split " ") -}}
-        "{{ . }}-{{ env.Getenv "BREW_EC_RELEASE_VERSION" }}" \
+        "{{ . }}-{{ env.Getenv "BREW_Y0_RELEASE_VERSION" }}" \
         {{ end -}}
         {{ range (env.Getenv "MICROSHIFT_OPTIONAL_RPMS" | strings.Split " ") -}}
-        "{{ . }}-{{ env.Getenv "BREW_EC_RELEASE_VERSION" }}" \
+        "{{ . }}-{{ env.Getenv "BREW_Y0_RELEASE_VERSION" }}" \
         {{ end -}}
         {{ if and (env.Getenv "UNAME_M" "") (eq "x86_64" .Env.UNAME_M) -}}
         {{ range (env.Getenv "MICROSHIFT_X86_64_RPMS" | strings.Split " ") -}}
-        "{{ . }}-{{ env.Getenv "BREW_EC_RELEASE_VERSION" }}" \
+        "{{ . }}-{{ env.Getenv "BREW_Y0_RELEASE_VERSION" }}" \
         {{ end -}}
         {{ end -}}
         && \

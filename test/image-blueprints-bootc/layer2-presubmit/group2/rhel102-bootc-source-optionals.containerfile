@@ -1,4 +1,4 @@
-FROM localhost/rhel100-bootc-source:latest
+FROM localhost/rhel102-bootc-source:latest
 
 # Build arguments
 ARG USHIFT_RPM_REPO_NAME=microshift-local

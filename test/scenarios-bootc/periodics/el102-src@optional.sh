@@ -14,9 +14,9 @@ scenario_create_vms() {
     if [[ "${UNAME_M}" =~ aarch64 ]]; then
         networks="${VM_MULTUS_NETWORK},${VM_MULTUS_NETWORK}"
     fi
-    LVM_SYSROOT_SIZE=20480 prepare_kickstart host1 kickstart-bootc.ks.template rhel100-bootc-source-optionals
+    LVM_SYSROOT_SIZE=20480 prepare_kickstart host1 kickstart-bootc.ks.template rhel102-bootc-source-optionals
     # Three nics - one for sriov, one for macvlan, another for ipvlan (they cannot enslave the same interface)
-    launch_vm --boot_blueprint rhel100-bootc --network "${networks}" --vm_disksize 25
+    launch_vm --boot_blueprint rhel102-bootc --network "${networks}" --vm_disksize 25
 }
 
 scenario_remove_vms() {
