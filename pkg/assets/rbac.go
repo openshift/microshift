@@ -195,7 +195,7 @@ func handleRbac(ctx context.Context, rbacs []string, handler resourceHandler) er
 			return fmt.Errorf("error getting asset %s: %v", rbac, err)
 		}
 		handler.Read(objBytes, nil, nil)
-		if err := handler.Handle(ctx); err != nil {
+		if err := handleWithRetry(ctx, handler, rbac); err != nil {
 			klog.Warningf("Failed to handle rbac %s: %v", rbac, err)
 			return err
 		}
