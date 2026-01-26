@@ -1,0 +1,9 @@
+- kubernetes embedded-component ef8f548afe29ceeb65b386ed968bf33d17e4b7c2 to a931c99df81015a22cfee1dbfc891104df612409
+  - 06115cd86 2026-01-21T16:42:23+01:00 UPSTREAM: <carry>: Skip e2e test: attach on previously attached volumes should work
+
+- kubernetes image-amd64 ef8f548afe29ceeb65b386ed968bf33d17e4b7c2 to a931c99df81015a22cfee1dbfc891104df612409
+  - 06115cd86 2026-01-21T16:42:23+01:00 UPSTREAM: <carry>: Skip e2e test: attach on previously attached volumes should work
+
+- kubernetes image-arm64 ef8f548afe29ceeb65b386ed968bf33d17e4b7c2 to a931c99df81015a22cfee1dbfc891104df612409
+  - 06115cd86 2026-01-21T16:42:23+01:00 UPSTREAM: <carry>: Skip e2e test: attach on previously attached volumes should work
+
