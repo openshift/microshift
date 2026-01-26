@@ -12,6 +12,7 @@ import (
 	coreclientv1 "k8s.io/client-go/kubernetes/typed/core/v1"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
+	"k8s.io/client-go/util/retry"
 	"k8s.io/klog/v2"
 
 	"github.com/openshift/library-go/pkg/operator/resource/resourceapply"
@@ -141,7 +142,7 @@ func handleCore(ctx context.Context, cores []string, handler resourceHandler, re
 			return fmt.Errorf("error getting asset %s: %v", core, err)
 		}
 		handler.Read(objBytes, render, params)
-		if err := handler.Handle(ctx); err != nil {
+		if err := handleWithRetry(ctx, handler, core); err != nil {
 			klog.Warningf("Failed to apply corev1 api %s: %v", core, err)
 			return err
 		}
@@ -189,8 +190,10 @@ func ApplyConfigMapWithData(ctx context.Context, cmPath string, data map[string]
 	}
 	cm.Read(cmBytes, nil, nil)
 	cm.cm.Data = data
-	_, _, err = resourceapply.ApplyConfigMap(ctx, cm.Client, assetsEventRecorder, cm.cm)
-	return err
+	return retry.RetryOnConflict(retry.DefaultBackoff, func() error {
+		_, _, err := resourceapply.ApplyConfigMap(ctx, cm.Client, assetsEventRecorder, cm.cm)
+		return err
+	})
 }
 
 func ApplySecretWithData(ctx context.Context, secretPath string, data map[string][]byte, kubeconfigPath string) error {
@@ -202,6 +205,8 @@ func ApplySecretWithData(ctx context.Context, secretPath string, data map[string
 	}
 	secret.Read(secretBytes, nil, nil)
 	secret.secret.Data = data
-	_, _, err = resourceapply.ApplySecret(ctx, secret.Client, assetsEventRecorder, secret.secret)
-	return err
+	return retry.RetryOnConflict(retry.DefaultBackoff, func() error {
+		_, _, err := resourceapply.ApplySecret(ctx, secret.Client, assetsEventRecorder, secret.secret)
+		return err
+	})
 }
