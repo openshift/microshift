@@ -10,6 +10,7 @@ import sys
 import argparse
 import logging
 import pathlib
+import time
 
 sys.path.append(str(pathlib.Path(__file__).resolve().parent / '../../../scripts/pyutils'))
 import gitutils  # noqa: E402
@@ -23,9 +24,6 @@ CNCF_SONOBUOY_VERSION = "v0.57.3"
 
 # The version of systemd-logs image included in the sonobuoy release.
 CNCF_SYSTEMD_LOGS_VERSION = "v0.4"
-
-# The current version of the microshift-gitops package.
-GITOPS_VERSION = "1.16"
 
 # Set the release type to ec, rc or zstream
 LATEST_RELEASE_TYPE = "ec"
@@ -211,6 +209,37 @@ def get_release_version_string(repo, var_name):
         return None
 
 
+def get_gitops_version(minor_version):
+    """
+    Get the version of the microshift-gitops package.
+    Versions compatible with MicroShift: https://access.redhat.com/product-life-cycles?product=Red%20Hat%20OpenShift%20GitOps
+    """
+    url = "https://access.redhat.com/product-life-cycles/api/v1/products"
+    params = {"name": "Red Hat OpenShift GitOps"}
+    for attempt in range(1, 4):
+        try:
+            resp = requests.get(url, params=params, timeout=10)
+            resp.raise_for_status()
+        except Exception as e:
+            logging.warning(f"Attempt {attempt} failed with error: {e}. Retrying...")
+            time.sleep(2)
+            continue
+        break
+
+    if attempt == 3:
+        logging.error(f"Failed to fetch data from {url} after 3 attempts")
+        return ""
+    data = resp.json()
+    for current_microshift_minor_version in range(minor_version, minor_version - 4, -1):
+        for gitops_version_from_api_docs in data.get("data", [{}])[0].get("versions", []):
+            gitops_version_ocp_compatibility = gitops_version_from_api_docs.get("openshift_compatibility")
+            gitops_version_number = gitops_version_from_api_docs.get("name")
+            if f"4.{current_microshift_minor_version}" in gitops_version_ocp_compatibility:
+                logging.info(f"Latest GitOps version: {gitops_version_number} which is compatible with OCP {gitops_version_ocp_compatibility}")
+                return gitops_version_number
+    return ""
+
+
 def generate_common_versions(minor_version):
     previous_minor_version = minor_version - 1
     yminus2_minor_version = minor_version - 2
@@ -258,6 +287,10 @@ def generate_common_versions(minor_version):
     # The 'rhocp_minor_y2' should always be the y-2 minor version number.
     rhocp_minor_y2 = yminus2_minor_version
 
+    # The current version of the microshift-gitops package.
+    logging.info("Getting GITOPS_VERSION")
+    gitops_version = get_gitops_version(minor_version)
+
     template_path = pathlib.Path(__file__).resolve().parent / '../../assets/common_versions.sh.template'
 
     with open(template_path, 'r') as f:
@@ -278,7 +311,7 @@ def generate_common_versions(minor_version):
         rhocp_minor_y2=rhocp_minor_y2,
         CNCF_SONOBUOY_VERSION=CNCF_SONOBUOY_VERSION,
         CNCF_SYSTEMD_LOGS_VERSION=CNCF_SYSTEMD_LOGS_VERSION,
-        GITOPS_VERSION=GITOPS_VERSION,
+        GITOPS_VERSION=gitops_version,
         LATEST_RELEASE_TYPE=LATEST_RELEASE_TYPE,
         ARCH=ARCH
     )
