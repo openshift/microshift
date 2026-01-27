@@ -1,10 +1,6 @@
-# {{- if env.Getenv "BREW_RC_RELEASE_VERSION" "" -}}
+# {{- if env.Getenv "BREW_LREL_RELEASE_VERSION" "" -}}
 # Note: This comment makes templating add a new line before the code
-FROM localhost/rhel96-bootc-brew-rc-with-optional:latest
-
-# Install low-latency packages
-RUN dnf install -y microshift-low-latency-{{env.Getenv "BREW_RC_RELEASE_VERSION"}} && \
-    dnf clean all
+FROM localhost/rhel96-bootc-brew-lrel-optional:latest
 
 # Enable microshift-tuned service
 RUN systemctl enable microshift-tuned

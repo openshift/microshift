@@ -8,8 +8,8 @@
 
 */ -}}
 
-name = "rhel-9.6-microshift-brew-tuned-4.{{ .Env.MINOR_VERSION}}-{{ .Env.LATEST_RELEASE_TYPE}}"
-description = "A RHEL 9.6 image with already built and released RPMs like EC, RC, or Z-stream release: {{ .Env.BREW_LREL_RELEASE_VERSION }}"
+name = "rhel96-brew-lrel-optional"
+description = "A RHEL 9.6 image with latest release RPMs (EC, RC, or Z-stream): {{ .Env.BREW_LREL_RELEASE_VERSION }}"
 version = "0.0.1"
 modules = []
 groups = []
@@ -47,14 +47,8 @@ version = "*"
 name = "systemd-resolved"
 version = "*"
 
-{{- if and (env.Getenv "UNAME_M" "") (eq "x86_64" .Env.UNAME_M) }}
-# Kernel RT is only available for x86_64
-[customizations.kernel]
-name = "kernel-rt"
-{{- end }}
-
 [customizations.services]
-enabled = ["microshift-test-agent", "microshift", "microshift-tuned"]
+enabled = ["microshift", "microshift-test-agent"]
 
 [customizations.firewall]
 ports = [
@@ -74,52 +68,4 @@ enabled = ["mdns", "ssh", "http", "https"]
 [[customizations.firewall.zones]]
 name = "trusted"
 sources = ["10.42.0.0/16", "169.254.169.1", "fd01::/48"]
-
-[[customizations.files]]
-path = "/etc/microshift/config.yaml"
-data = """
-kubelet:
-  cpuManagerPolicy: static
-  cpuManagerPolicyOptions:
-    full-pcpus-only: "true"
-  cpuManagerReconcilePeriod: 5s
-  memoryManagerPolicy: Static
-  topologyManagerPolicy: single-numa-node
-  reservedSystemCPUs: 0-1
-  reservedMemory:
-  - limits:
-      memory: 1100Mi
-    numaNode: 0
-  kubeReserved:
-    memory: 500Mi
-  systemReserved:
-    memory: 500Mi
-  evictionHard:
-    imagefs.available: 15%
-    memory.available: 100Mi
-    nodefs.available: 10%
-    nodefs.inodesFree: 5%
-  evictionPressureTransitionPeriod: 0s
-"""
-
-[[customizations.files]]
-path = "/etc/tuned/microshift-baseline-variables.conf"
-data = """
-# Isolated cores should be complementary to kubelet's reserved CPUs.
-# Isolated and reserved CPUs should contain all online CPUs.
-# Core #3 is for testing offlining hence skipped.
-isolated_cores=2,4-5
-hugepages_size=2M
-hugepages=10
-additional_args=test1=on test2=true dummy
-offline_cpu_set=3
-"""
-
-[[customizations.files]]
-path = "/etc/microshift/tuned.yaml"
-data = """
-profile: microshift-baseline
-reboot_after_apply: True
-"""
-
 {{- end -}}

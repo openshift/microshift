@@ -6,7 +6,7 @@
 # ensure MicroShift is upgraded before running standard suite tests
 export TEST_RANDOMIZATION=none
 
-dest_image="rhel-9.6-microshift-brew-optionals-4.${MINOR_VERSION}-${LATEST_RELEASE_TYPE}"
+dest_image="rhel96-brew-lrel-optional"
 
 scenario_create_vms() {
     exit_if_commit_not_found "${dest_image}"

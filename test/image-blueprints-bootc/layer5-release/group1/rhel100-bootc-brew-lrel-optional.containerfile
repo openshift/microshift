@@ -1,6 +1,6 @@
-# {{- if env.Getenv "BREW_RC_RELEASE_VERSION" "" -}}
+# {{- if env.Getenv "BREW_LREL_RELEASE_VERSION" "" -}}
 # Note: This comment makes templating add a new line before the code
-FROM localhost/rhel96-test-agent:latest
+FROM localhost/rhel100-test-agent:latest
 
 # Build arguments
 ARG USHIFT_RPM_REPO_NAME=microshift-brew
@@ -15,17 +15,20 @@ COPY ./bootc-images/$USHIFT_RPM_REPO_NAME.repo ./bootc-images/microshift-fast-da
 
 # Print repository configuration contents.
 # Install MicroShift, test agent and cleanup.
+# OpenSSL is added as a temporary workaround. Systemd-resolved will bump systemd to a newer
+# version that requires openssl 3.4 or higher, but package is kept at 3.2.2. By installing
+# it we force an upgrade so that everything works.
 RUN dnf repoinfo --enabled && \
-    dnf install -y firewalld systemd-resolved \
+    dnf install -y firewalld systemd-resolved openssl \
         {{ range (env.Getenv "MICROSHIFT_MANDATORY_RPMS" | strings.Split " ") -}}
-        "{{ . }}-{{ env.Getenv "BREW_RC_RELEASE_VERSION" }}" \
+        "{{ . }}-{{ env.Getenv "BREW_LREL_RELEASE_VERSION" }}" \
         {{ end -}}
         {{ range (env.Getenv "MICROSHIFT_OPTIONAL_RPMS" | strings.Split " ") -}}
-        "{{ . }}-{{ env.Getenv "BREW_RC_RELEASE_VERSION" }}" \
+        "{{ . }}-{{ env.Getenv "BREW_LREL_RELEASE_VERSION" }}" \
         {{ end -}}
         {{ if and (env.Getenv "UNAME_M" "") (eq "x86_64" .Env.UNAME_M) -}}
         {{ range (env.Getenv "MICROSHIFT_X86_64_RPMS" | strings.Split " ") -}}
-        "{{ . }}-{{ env.Getenv "BREW_RC_RELEASE_VERSION" }}" \
+        "{{ . }}-{{ env.Getenv "BREW_LREL_RELEASE_VERSION" }}" \
         {{ end -}}
         {{ end -}}
         && \

@@ -27,8 +27,6 @@ CNCF_SYSTEMD_LOGS_VERSION = "v0.4"
 # The current version of the microshift-gitops package.
 GITOPS_VERSION = "1.16"
 
-# Set the release type to ec, rc or zstream
-LATEST_RELEASE_TYPE = "ec"
 
 logging.basicConfig(
     level=logging.INFO,
@@ -279,7 +277,6 @@ def generate_common_versions(minor_version):
         CNCF_SONOBUOY_VERSION=CNCF_SONOBUOY_VERSION,
         CNCF_SYSTEMD_LOGS_VERSION=CNCF_SYSTEMD_LOGS_VERSION,
         GITOPS_VERSION=GITOPS_VERSION,
-        LATEST_RELEASE_TYPE=LATEST_RELEASE_TYPE,
         ARCH=ARCH
     )
 
