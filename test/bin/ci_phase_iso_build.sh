@@ -187,10 +187,11 @@ else
         echo "WARNING: Build cache is not available, rebuilding all the artifacts"
     fi
 
-    # When running a Release Testing CI job, we fetch the RPMs from brew
+    # When running a Release Testing CI job, we use the RPMs from brew which must be in the cache.
+    # For this reason we skip building bootc images, rpm-ostree commits and RPMs from source.
+    # But we still need to extract the container images from the brew RPMs.
     if [[ "${CI_JOB_NAME}" =~ .*release.* ]]; then
-        echo "INFO: Release Testing CI job detected, skipping building RPMs from source"
-        # Extract the container images from the brew RPMs
+        echo "INFO: Release Testing CI job detected, skipping building artifacts (RPMs and images) from source and extracting container images from brew RPMs"
         if ${COMPOSER_CLI_BUILDS} ; then
             $(dry_run) bash -x ./bin/build_images.sh -X
         else
