@@ -1,8 +1,8 @@
-https://github.com/openshift/api embedded-component a2212e630b91ffc03b9981f76b761048b3022402
+https://github.com/openshift/api embedded-component 64571445812a66e84df4b36180a114f3365ff340
 https://github.com/openshift/cluster-csi-snapshot-controller-operator embedded-component 8be3728d7db58111e6efb46f6075698d6b7ec994
 https://github.com/openshift/cluster-dns-operator embedded-component 41a53fed36e6e99c7c9ceb3a699c3547ee5d9bb9
 https://github.com/openshift/cluster-ingress-operator embedded-component f97a4486f20f362b5c1fd45890997791ba73f09d
-https://github.com/openshift/cluster-kube-apiserver-operator embedded-component f4181f9afff1d9592ee98c9be7613b93554279d0
+https://github.com/openshift/cluster-kube-apiserver-operator embedded-component e99b43d8a1b9139933aa0f6e71fc7f8397d29b58
 https://github.com/openshift/cluster-kube-controller-manager-operator embedded-component a6a751080c9b2bdd3a721851b206cf2f7c8bbc41
 https://github.com/openshift/cluster-kube-scheduler-operator embedded-component ed10ad69474b83c568452f59dbd3d943778799d7
 https://github.com/openshift/cluster-network-operator embedded-component b9a777441ccdbaea524196ecd15aed7e0aa8ab5e
@@ -14,7 +14,7 @@ https://github.com/openshift/kubernetes embedded-component e4a4167c40c9ed543c5a8
 https://github.com/openshift/kubernetes-kube-storage-version-migrator embedded-component 73b468abf83d3d5894534f5d5cc42d1cad2a9045
 https://github.com/openshift/machine-config-operator embedded-component b1eb6cc3b59bc0cb8b2e9b21cf5724b13e2df039
 https://github.com/openshift/openshift-controller-manager embedded-component aaacf2be3860ec3609e6031527a6ffca4f282ba7
-https://github.com/openshift/operator-framework-olm embedded-component 1222e2d41cab5cc0c5f4b5095928ceb032dfa2c5
+https://github.com/openshift/operator-framework-olm embedded-component 34bb15d6590b8803c5e6390e75d68f6c075d6c97
 https://github.com/openshift/route-controller-manager embedded-component 3b4cc7b25c3c340b6708b7f0c1deafe38ef8a942
 https://github.com/openshift/service-ca-operator embedded-component 503e4f5f4c74fd095a8dca385541125f3c9ee28b
 https://github.com/openshift/oc image-amd64 430c82293109e23f3caaf9ba60e5affd2d5356f5
