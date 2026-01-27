@@ -203,7 +203,7 @@ func applyGeneric(ctx context.Context, resources []string, handler resourceHandl
 		}(); err != nil {
 			return err
 		}
-		if err := handler.Handle(ctx); err != nil {
+		if err := handleWithRetry(ctx, handler, resource); err != nil {
 			klog.Warningf("failed to apply resource %s: %v", resource, err)
 			return err
 		}

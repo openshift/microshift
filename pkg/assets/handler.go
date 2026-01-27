@@ -7,6 +7,8 @@ import (
 	"sync"
 
 	"github.com/openshift/library-go/pkg/operator/events"
+	"k8s.io/client-go/util/retry"
+	"k8s.io/klog/v2"
 	"k8s.io/utils/clock"
 )
 
@@ -53,4 +55,18 @@ type resourceHandler interface {
 type resourceHandlerV2 interface {
 	Read(reader io.Reader, function RenderFuncV2, params RenderParams) error
 	Handle(context.Context) error
+}
+
+type handleable interface {
+	Handle(context.Context) error
+}
+
+func handleWithRetry[T handleable](ctx context.Context, handler T, assetName string) error {
+	return retry.RetryOnConflict(retry.DefaultBackoff, func() error {
+		err := handler.Handle(ctx)
+		if err != nil {
+			klog.V(2).Infof("Asset apply attempt for %s: %v", assetName, err)
+		}
+		return err
+	})
 }

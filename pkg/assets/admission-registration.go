@@ -61,7 +61,7 @@ func applyAdmissionRegistration(ctx context.Context, admissionRegistrations []st
 			return fmt.Errorf("error getting embedded asset %s: %w", ar, err)
 		}
 		handler.Read(objBytes, render, params)
-		if err := handler.Handle(ctx); err != nil {
+		if err := handleWithRetry(ctx, handler, ar); err != nil {
 			klog.Warningf("failed to apply admissionRegistration object: %s, %v", ar, err)
 			return err
 		}
