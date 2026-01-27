@@ -7,7 +7,7 @@ VM_BRIDGE_IP="$(get_vm_bridge_ip "${VM_MULTUS_NETWORK}")"
 # shellcheck disable=SC2034  # used elsewhere
 WEB_SERVER_URL="http://${VM_BRIDGE_IP}:${WEB_SERVER_PORT}"
 
-start_image="rhel100-bootc-brew-${LATEST_RELEASE_TYPE}-with-optional"
+start_image="rhel102-bootc-brew-${LATEST_RELEASE_TYPE}-with-optional"
 
 scenario_create_vms() {
     exit_if_image_not_found "${start_image}"
@@ -21,7 +21,7 @@ scenario_create_vms() {
 
     LVM_SYSROOT_SIZE=20480 prepare_kickstart host1 kickstart-bootc.ks.template "${start_image}"
     # Three nics - one for sriov, one for macvlan, another for ipvlan (they cannot enslave the same interface)
-    launch_vm --boot_blueprint rhel100-bootc --network "${networks}" --vm_disksize 25 --vm_vcpus 4
+    launch_vm --boot_blueprint rhel102-bootc --network "${networks}" --vm_disksize 25 --vm_vcpus 4
 }
 
 scenario_remove_vms() {

@@ -1,6 +1,6 @@
 # {{- if env.Getenv "CURRENT_RELEASE_VERSION" "" -}}
 # Note: This comment makes templating add a new line before the code
-FROM localhost/rhel100-test-agent:latest
+FROM localhost/rhel102-test-agent:latest
 
 # Copy repository configuration
 COPY ./bootc-images/microshift-fast-datapath-rhel9.repo ./bootc-images/microshift-crel.repo ./bootc-images/microshift-rhocp-y.repo \
@@ -17,6 +17,22 @@ RUN dnf repoinfo --enabled && \
     systemctl enable microshift && \
     rm -vf /etc/yum.repos.d/microshift-*.repo && \
     dnf clean all
+
+# Embed images based on contents of release-info RPMs
+COPY --chmod=755 ./bootc-images/microshift-copy-images.sh /usr/bin/microshift-copy-images
+RUN --mount=type=secret,id=pullsecret,dst=/run/secrets/pull-secret.json \
+    images="$(jq -r ".images[]" /usr/share/microshift/release/release-"$(uname -m)".json)" ; \
+    images="${images} quay.io/microshift/busybox:1.36" ; \
+    IMAGE_PULL_LIST="${images}" /usr/bin/microshift-copy-images pull
+
+# Install a systemd drop-in unit to address the problem with image upgrades
+# overwriting the container images in additional store. The workaround is to
+# copy the images from the pre-loaded to the main container storage.
+# In this case, it is not necessary to update /etc/containers/storage.conf with
+# the additional store path.
+# See https://issues.redhat.com/browse/RHEL-75827
+RUN mkdir -p /usr/lib/systemd/system/microshift.service.d
+COPY --chmod=644 ./bootc-images/microshift-copy-images.conf /usr/lib/systemd/system/microshift.service.d/microshift-copy-images.conf
 
 # Configure firewall
 RUN firewall-offline-cmd --zone=public --add-port=22/tcp && \
