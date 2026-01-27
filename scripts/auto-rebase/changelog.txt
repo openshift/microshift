@@ -1,46 +1,64 @@
-- api embedded-component 59aa3e50a9fb94f93ab0f86649db2bab6ef61f01 to a2212e630b91ffc03b9981f76b761048b3022402
-  - 4b2f7e23 2026-01-22T12:09:51-05:00 etcd: add PacemakerCluster CRD for Two Node Fencing
-  - f0442bff 2026-01-20T16:26:19+00:00 add sentence breaks to comments
-  - 8c649d63 2026-01-20T12:10:36+00:00 add additional crds
-  - 1786bf6f 2026-01-20T11:52:15+00:00 fix typo
-  - 6916ef43 2026-01-20T11:20:26+00:00 update additional multiline comments + update crd
-  - bfc5f7f5 2026-01-19T16:58:38+00:00 add sentence break
-  - 994b8ece 2026-01-19T10:51:07+00:00 update codegen crds
-  - 4a790514 2026-01-19T09:26:22+00:00 update codegen
-  - fcb97da7 2026-01-16T17:11:08+00:00 make multiline comments for oidc one line for better crd gen
-  - 244900a2 2026-01-09T12:55:32-05:00 Generate CRDS: for aws tag prefix validation
-  - 62ef4196 2026-01-09T12:52:50-05:00 refactor validation and add ratcheting validation
-  - a21e0918 2026-01-09T12:52:42-05:00 Validate aws resource tag keys with aws prefix & immutable
+- api embedded-component a2212e630b91ffc03b9981f76b761048b3022402 to 64571445812a66e84df4b36180a114f3365ff340
+  - 64571445 2026-01-25T18:15:20+00:00 Add featuregates for installs with CAPI Machine Management (#2664)
+  - 55634635 2026-01-24T15:31:36+00:00 Revert AWS Immutability Validation (#2666)
 
-- cluster-csi-snapshot-controller-operator embedded-component f57fd597a374ed37f2cdfa37e2853753fd9f7773 to 8be3728d7db58111e6efb46f6075698d6b7ec994
-  - d877dd4 2026-01-14T13:37:34+01:00 Generate manifest
-  - f05b1e3 2026-01-14T10:44:51+01:00 Re-add serving cert volume mount to ibm cloud managed manifest
+- cluster-kube-apiserver-operator embedded-component f4181f9afff1d9592ee98c9be7613b93554279d0 to e99b43d8a1b9139933aa0f6e71fc7f8397d29b58
+  - f65a2b8 2026-01-23T20:19:56+05:30 CNTRLPLANE-2247: Add empty KMS encryption test case for CI job validation
 
-- machine-config-operator embedded-component de8ed4525df018102a15f15c3b3dd25138b09681 to b1eb6cc3b59bc0cb8b2e9b21cf5724b13e2df039
-  - 22a856f3 2026-01-22T19:17:13-05:00 AGENT-1412: Prevent deletion of InternalReleaseImage when in use
-  - 010dc0a4 2026-01-22T16:42:12+01:00 OCPBUGS-71238: Follow mirrors in OS image operations
-  - 317c38ae 2026-01-22T14:24:46+00:00 MCO-1182: migrate private test case OCP-87023
-  - 0271769d 2026-01-21T08:56:11-05:00 add initial e2e tests for the InternalReleaseImage controller
-  - 91dcec5f 2026-01-20T12:59:14+00:00 MCO-2055 migrate bootimages tests
-  - ba52a8db 2026-01-12T10:21:35+05:30 Fix Failure Status condition to True when kubeletconfig or container runtime config validation fails
-  - 9399af9f 2025-09-25T16:23:51-05:00 Shorten HAProxy timeouts
-
-- operator-framework-olm embedded-component 8cfcfeb397a89bf0d273e06b914caf5e9885dedd to 1222e2d41cab5cc0c5f4b5095928ceb032dfa2c5
-  - cc75f1f6 2026-01-23T00:05:16+00:00 (e2e): Enhance e2e test to check workload resilience when catalogs goes away (#3747)
-  - d4162cc1 2026-01-23T00:04:35+00:00 Add APIServer TLS controller for OpenShift cluster-wide TLS configuration (#3739)
-  - c71393da 2026-01-23T00:04:18+00:00 Fix server startup failure when client-ca is empty or not provided (#3742)
-  - da02662d 2026-01-23T00:04:02+00:00 Add e2e test for operator workload persistence after catalog deletion (#3737)
-  - dcd5e215 2026-01-23T00:03:46+00:00 Fix nil pointer dereference panic in event recorder (#3727)
-  - 4df8095b 2026-01-23T00:03:18+00:00 :seedling: Bump github.com/sirupsen/logrus from 1.9.3 to 1.9.4 (#3740)
-  - 30fcc26e 2026-01-21T09:26:58-05:00 Remove kube-rbac-proxy from PSM
-
-- router image-amd64 fa55e2723077811ef81c4b494c68f6c38282d6e2 to d2db065ae452ecfdb482f0ac4c6778b0c0e48b7f
-  - 57123f1 2026-01-20T15:32:46-03:00 add jcmoraisjr to owners
-  - ff16210 2026-01-14T10:59:19-03:00 Hack: update image without push
-  - 3c42bc7 2026-01-12T11:56:05+01:00 OCPBUGS-72591: Lower verbosity for parseIPList empty list logging
-
-- router image-arm64 fa55e2723077811ef81c4b494c68f6c38282d6e2 to d2db065ae452ecfdb482f0ac4c6778b0c0e48b7f
-  - 57123f1 2026-01-20T15:32:46-03:00 add jcmoraisjr to owners
-  - ff16210 2026-01-14T10:59:19-03:00 Hack: update image without push
-  - 3c42bc7 2026-01-12T11:56:05+01:00 OCPBUGS-72591: Lower verbosity for parseIPList empty list logging
+- operator-framework-olm embedded-component 1222e2d41cab5cc0c5f4b5095928ceb032dfa2c5 to 34bb15d6590b8803c5e6390e75d68f6c075d6c97
+  - 62296533 2026-01-24T00:23:37+00:00 Bump github.com/sirupsen/logrus from 1.9.3 to 1.9.4 (#467)
+  - 6362e767 2026-01-24T00:22:42+00:00 🌱 Upgrade controller-gen from v0.18.0 to v0.20.0 (#466)
+  - 2f08aec8 2026-01-24T00:22:23+00:00 Migrate away from ioutil (#463)
+  - f9dfb354 2026-01-24T00:22:05+00:00 Update to golang 1.25 (#464)
+  - 500a9207 2026-01-24T00:21:47+00:00 Bump actions/cache from 4 to 5 (#462)
+  - ac3beeea 2026-01-24T00:21:30+00:00 Bump the k8s-dependencies group with 4 updates (#461)
+  - 7a21f58f 2026-01-24T00:21:10+00:00 set up a docker buildx builder to support sbom attestations on tag-release
+  - 653cf4bd 2026-01-24T00:20:49+00:00 updating to api v0.38.0 (#1887)
+  - 421364d2 2026-01-24T00:20:29+00:00 OPRUN-4195,OPRUN-4275,OPRUN-4276: release bundle attribute in version property (#1792)
+  - f7b7595f 2026-01-24T00:20:09+00:00 Bump github.com/grpc-ecosystem/grpc-health-probe from 0.4.43 to 0.4.44 (#1885)
+  - 90ece241 2026-01-24T00:19:47+00:00 Bump github.com/sirupsen/logrus from 1.9.3 to 1.9.4 (#1883)
+  - 76b01948 2026-01-24T00:19:27+00:00 Bump github.com/docker/cli (#1884)
+  - 626110f1 2026-01-24T00:19:07+00:00 detect template type from input, but respect explicit specification (#1844)
+  - f59bd23f 2026-01-24T00:18:46+00:00 sync test override pattern with op-con (#1874)
+  - acfdf54c 2026-01-24T00:18:26+00:00 Bump github.com/onsi/ginkgo/v2 from 2.27.4 to 2.27.5 (#1882)
+  - 33ce1075 2026-01-24T00:18:05+00:00 Bump github.com/onsi/gomega from 1.38.3 to 1.39.0 (#1877)
+  - b7ccc214 2026-01-24T00:17:44+00:00 Bump github.com/docker/cli (#1881)
+  - 58509577 2026-01-24T00:17:21+00:00 Bump the golang-x-deps group across 1 directory with 3 updates (#1880)
+  - c2b81f64 2026-01-24T00:16:58+00:00 Bump github.com/onsi/ginkgo/v2 from 2.27.3 to 2.27.4 (#1876)
+  - 88c3610a 2026-01-24T00:16:36+00:00 🌱  Golangci lint bump v1.64.8 --> v2.7.2 (#1878)
+  - 218fa5ae 2026-01-24T00:16:16+00:00 freshen maintainers by request (#1879)
+  - 7b9819d9 2026-01-24T00:15:55+00:00 Bump github.com/mattn/go-sqlite3 from 1.14.32 to 1.14.33 (#1872)
+  - 378bfbc2 2026-01-24T00:15:35+00:00 Bump github.com/grpc-ecosystem/grpc-health-probe from 0.4.42 to 0.4.43 (#1871)
+  - 99b7dcf7 2026-01-24T00:15:15+00:00 Migrate away from ioutil (#1865)
+  - 052e59c5 2026-01-24T00:14:53+00:00 Fix goreleaser (#1869)
+  - 91d570d8 2026-01-24T00:14:32+00:00 Bump github.com/sigstore/fulcio from 1.7.1 to 1.8.3 (#1868)
+  - f99c19ac 2026-01-24T00:14:11+00:00 Update to golang 1.25 (#1866)
+  - 97e00154 2026-01-24T00:13:50+00:00 Bump google.golang.org/grpc from 1.77.0 to 1.78.0 (#1867)
+  - 1eb526fc 2026-01-24T00:13:30+00:00 Bump github.com/containerd/containerd from 1.7.29 to 1.7.30 (#1864)
+  - de89f88e 2026-01-24T00:13:08+00:00 Bump the k8s-dependencies group with 4 updates (#1857)
+  - c25686f8 2026-01-24T00:12:48+00:00 Bump github.com/onsi/gomega from 1.38.2 to 1.38.3 (#1856)
+  - bdc18ffa 2026-01-24T00:12:26+00:00 Bump actions/upload-artifact from 5 to 6 (#1862)
+  - a87554b4 2026-01-24T00:12:05+00:00 Bump actions/download-artifact from 6 to 7 (#1861)
+  - 86e25ae8 2026-01-24T00:11:46+00:00 Bump google.golang.org/protobuf from 1.36.10 to 1.36.11 (#1860)
+  - 0e0ecd5c 2026-01-24T00:11:25+00:00 Bump github.com/docker/cli (#1859)
+  - 4d0baf76 2026-01-24T00:11:04+00:00 Bump github.com/operator-framework/api from 0.36.0 to 0.37.0 (#1858)
+  - 36ce2cf6 2026-01-24T00:10:42+00:00 Bump github.com/onsi/ginkgo/v2 from 2.27.2 to 2.27.3 (#1855)
+  - 1dff2da6 2026-01-24T00:10:22+00:00 Bump the golang-x-deps group with 4 updates (#1854)
+  - 24367b5c 2026-01-24T00:10:00+00:00 Bump go.podman.io/common from 0.66.0 to 0.66.1 (#1853)
+  - 227be8da 2026-01-24T00:09:40+00:00 Bump github.com/spf13/cobra from 1.10.1 to 1.10.2 (#1851)
+  - f2ab0bb7 2026-01-24T00:09:19+00:00 Bump github.com/docker/cli (#1850)
+  - ab873657 2026-01-24T00:08:58+00:00 Bump github.com/golang-migrate/migrate/v4 from 4.19.0 to 4.19.1 (#1848)
+  - 9fd7ba80 2026-01-24T00:08:38+00:00 Bump google.golang.org/grpc/cmd/protoc-gen-go-grpc from 1.5.1 to 1.6.0 (#1845)
+  - 9cbdb122 2026-01-24T00:08:17+00:00 Bump github.com/maxbrunsfeld/counterfeiter/v6 from 6.12.0 to 6.12.1 (#1849)
+  - 3e379feb 2026-01-24T00:07:57+00:00 Bump github.com/docker/cli (#1847)
+  - c3b46f9c 2026-01-24T00:07:37+00:00 Bump actions/checkout from 5 to 6 (#1840)
+  - 8fc4ff34 2026-01-24T00:07:17+00:00 Bump google.golang.org/grpc from 1.76.0 to 1.77.0 (#1838)
+  - 0e821e3a 2026-01-24T00:06:57+00:00 Bump the golang-x-deps group with 3 updates (#1834)
+  - 90ded342 2026-01-24T00:06:36+00:00 Bump the k8s-dependencies group with 4 updates (#1832)
+  - 9b6091a9 2026-01-24T00:06:14+00:00 Bump github.com/grpc-ecosystem/grpc-health-probe from 0.4.41 to 0.4.42 (#1833)
+  - f8f810bf 2026-01-24T00:05:45+00:00 Refactor APIServer TLS setup into common function (#3751)
+  - 8e619cab 2026-01-24T00:05:26+00:00 update script for new yq v4 (#3750)
+  - 8d1fc960 2026-01-24T00:05:07+00:00 Integrate APIServer TLS controller into OLM operator (#3744)
+  - d5940637 2026-01-24T00:04:48+00:00 Integrate APIServer TLS controller into Catalog operator (#3745)
+  - b7dd7872 2026-01-24T00:04:29+00:00 update api & op-reg dependencies (#3749)
 
