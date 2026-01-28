@@ -1,64 +1,22 @@
-- api embedded-component a2212e630b91ffc03b9981f76b761048b3022402 to 64571445812a66e84df4b36180a114f3365ff340
-  - 64571445 2026-01-25T18:15:20+00:00 Add featuregates for installs with CAPI Machine Management (#2664)
-  - 55634635 2026-01-24T15:31:36+00:00 Revert AWS Immutability Validation (#2666)
+- api embedded-component 64571445812a66e84df4b36180a114f3365ff340 to 606bd613f9f7b6965f1d087b2fce8227aa49ceca
+  - ec37c6e6 2026-01-26T16:55:26+03:00 Update tests for mutually exclusive feature gates
+  - d7e760f3 2026-01-26T16:07:55+03:00 Move KMSEncryptionProvider FG to DevPreview
+  - fe4267b0 2026-01-26T15:17:57+03:00 Introduce KMSEncryption feature gate
+  - 7e2657b6 2026-01-23T12:07:37+00:00 Fix payload CRD/FetaureGate ordering
 
-- cluster-kube-apiserver-operator embedded-component f4181f9afff1d9592ee98c9be7613b93554279d0 to e99b43d8a1b9139933aa0f6e71fc7f8397d29b58
-  - f65a2b8 2026-01-23T20:19:56+05:30 CNTRLPLANE-2247: Add empty KMS encryption test case for CI job validation
+- cluster-ingress-operator embedded-component f97a4486f20f362b5c1fd45890997791ba73f09d to ea67a8ce10072efe06ab180fce8c9fef58e5b997
+  - 664e540 2026-01-26T13:57:00-05:00 update conformance script
+  - 003308a 2026-01-26T13:57:00-05:00 remove backendtlspolicy tests
+  - 10e14fd 2026-01-26T13:57:00-05:00 add backendtlspolicy logic
+  - ae517c4 2026-01-26T13:57:00-05:00 update gwc name
+  - 86989c1 2026-01-26T13:57:00-05:00 add blank line
+  - f04b1bf 2026-01-26T13:57:00-05:00 Update the script to run all supported tests
+  - 2725b27 2026-01-26T13:57:00-05:00 Bump GWAPI CRDs to v1.4.0
+  - 33f4ef1 2026-01-22T22:16:25-05:00 OCPBUGS-16728: Require Service Deletion for LB Type Updates
+  - 80004c8 2026-01-22T17:06:27-05:00 Refactor: Consolidate effectuation message creation
+  - cfc917e 2026-01-22T17:06:24-05:00 Refactor: Add `managedAtServiceCreationLBServiceAnnotations` Map
+  - 5bd963a 2026-01-05T17:36:57-05:00 Update Broken Annotation Documentation Links
 
-- operator-framework-olm embedded-component 1222e2d41cab5cc0c5f4b5095928ceb032dfa2c5 to 34bb15d6590b8803c5e6390e75d68f6c075d6c97
-  - 62296533 2026-01-24T00:23:37+00:00 Bump github.com/sirupsen/logrus from 1.9.3 to 1.9.4 (#467)
-  - 6362e767 2026-01-24T00:22:42+00:00 🌱 Upgrade controller-gen from v0.18.0 to v0.20.0 (#466)
-  - 2f08aec8 2026-01-24T00:22:23+00:00 Migrate away from ioutil (#463)
-  - f9dfb354 2026-01-24T00:22:05+00:00 Update to golang 1.25 (#464)
-  - 500a9207 2026-01-24T00:21:47+00:00 Bump actions/cache from 4 to 5 (#462)
-  - ac3beeea 2026-01-24T00:21:30+00:00 Bump the k8s-dependencies group with 4 updates (#461)
-  - 7a21f58f 2026-01-24T00:21:10+00:00 set up a docker buildx builder to support sbom attestations on tag-release
-  - 653cf4bd 2026-01-24T00:20:49+00:00 updating to api v0.38.0 (#1887)
-  - 421364d2 2026-01-24T00:20:29+00:00 OPRUN-4195,OPRUN-4275,OPRUN-4276: release bundle attribute in version property (#1792)
-  - f7b7595f 2026-01-24T00:20:09+00:00 Bump github.com/grpc-ecosystem/grpc-health-probe from 0.4.43 to 0.4.44 (#1885)
-  - 90ece241 2026-01-24T00:19:47+00:00 Bump github.com/sirupsen/logrus from 1.9.3 to 1.9.4 (#1883)
-  - 76b01948 2026-01-24T00:19:27+00:00 Bump github.com/docker/cli (#1884)
-  - 626110f1 2026-01-24T00:19:07+00:00 detect template type from input, but respect explicit specification (#1844)
-  - f59bd23f 2026-01-24T00:18:46+00:00 sync test override pattern with op-con (#1874)
-  - acfdf54c 2026-01-24T00:18:26+00:00 Bump github.com/onsi/ginkgo/v2 from 2.27.4 to 2.27.5 (#1882)
-  - 33ce1075 2026-01-24T00:18:05+00:00 Bump github.com/onsi/gomega from 1.38.3 to 1.39.0 (#1877)
-  - b7ccc214 2026-01-24T00:17:44+00:00 Bump github.com/docker/cli (#1881)
-  - 58509577 2026-01-24T00:17:21+00:00 Bump the golang-x-deps group across 1 directory with 3 updates (#1880)
-  - c2b81f64 2026-01-24T00:16:58+00:00 Bump github.com/onsi/ginkgo/v2 from 2.27.3 to 2.27.4 (#1876)
-  - 88c3610a 2026-01-24T00:16:36+00:00 🌱  Golangci lint bump v1.64.8 --> v2.7.2 (#1878)
-  - 218fa5ae 2026-01-24T00:16:16+00:00 freshen maintainers by request (#1879)
-  - 7b9819d9 2026-01-24T00:15:55+00:00 Bump github.com/mattn/go-sqlite3 from 1.14.32 to 1.14.33 (#1872)
-  - 378bfbc2 2026-01-24T00:15:35+00:00 Bump github.com/grpc-ecosystem/grpc-health-probe from 0.4.42 to 0.4.43 (#1871)
-  - 99b7dcf7 2026-01-24T00:15:15+00:00 Migrate away from ioutil (#1865)
-  - 052e59c5 2026-01-24T00:14:53+00:00 Fix goreleaser (#1869)
-  - 91d570d8 2026-01-24T00:14:32+00:00 Bump github.com/sigstore/fulcio from 1.7.1 to 1.8.3 (#1868)
-  - f99c19ac 2026-01-24T00:14:11+00:00 Update to golang 1.25 (#1866)
-  - 97e00154 2026-01-24T00:13:50+00:00 Bump google.golang.org/grpc from 1.77.0 to 1.78.0 (#1867)
-  - 1eb526fc 2026-01-24T00:13:30+00:00 Bump github.com/containerd/containerd from 1.7.29 to 1.7.30 (#1864)
-  - de89f88e 2026-01-24T00:13:08+00:00 Bump the k8s-dependencies group with 4 updates (#1857)
-  - c25686f8 2026-01-24T00:12:48+00:00 Bump github.com/onsi/gomega from 1.38.2 to 1.38.3 (#1856)
-  - bdc18ffa 2026-01-24T00:12:26+00:00 Bump actions/upload-artifact from 5 to 6 (#1862)
-  - a87554b4 2026-01-24T00:12:05+00:00 Bump actions/download-artifact from 6 to 7 (#1861)
-  - 86e25ae8 2026-01-24T00:11:46+00:00 Bump google.golang.org/protobuf from 1.36.10 to 1.36.11 (#1860)
-  - 0e0ecd5c 2026-01-24T00:11:25+00:00 Bump github.com/docker/cli (#1859)
-  - 4d0baf76 2026-01-24T00:11:04+00:00 Bump github.com/operator-framework/api from 0.36.0 to 0.37.0 (#1858)
-  - 36ce2cf6 2026-01-24T00:10:42+00:00 Bump github.com/onsi/ginkgo/v2 from 2.27.2 to 2.27.3 (#1855)
-  - 1dff2da6 2026-01-24T00:10:22+00:00 Bump the golang-x-deps group with 4 updates (#1854)
-  - 24367b5c 2026-01-24T00:10:00+00:00 Bump go.podman.io/common from 0.66.0 to 0.66.1 (#1853)
-  - 227be8da 2026-01-24T00:09:40+00:00 Bump github.com/spf13/cobra from 1.10.1 to 1.10.2 (#1851)
-  - f2ab0bb7 2026-01-24T00:09:19+00:00 Bump github.com/docker/cli (#1850)
-  - ab873657 2026-01-24T00:08:58+00:00 Bump github.com/golang-migrate/migrate/v4 from 4.19.0 to 4.19.1 (#1848)
-  - 9fd7ba80 2026-01-24T00:08:38+00:00 Bump google.golang.org/grpc/cmd/protoc-gen-go-grpc from 1.5.1 to 1.6.0 (#1845)
-  - 9cbdb122 2026-01-24T00:08:17+00:00 Bump github.com/maxbrunsfeld/counterfeiter/v6 from 6.12.0 to 6.12.1 (#1849)
-  - 3e379feb 2026-01-24T00:07:57+00:00 Bump github.com/docker/cli (#1847)
-  - c3b46f9c 2026-01-24T00:07:37+00:00 Bump actions/checkout from 5 to 6 (#1840)
-  - 8fc4ff34 2026-01-24T00:07:17+00:00 Bump google.golang.org/grpc from 1.76.0 to 1.77.0 (#1838)
-  - 0e821e3a 2026-01-24T00:06:57+00:00 Bump the golang-x-deps group with 3 updates (#1834)
-  - 90ded342 2026-01-24T00:06:36+00:00 Bump the k8s-dependencies group with 4 updates (#1832)
-  - 9b6091a9 2026-01-24T00:06:14+00:00 Bump github.com/grpc-ecosystem/grpc-health-probe from 0.4.41 to 0.4.42 (#1833)
-  - f8f810bf 2026-01-24T00:05:45+00:00 Refactor APIServer TLS setup into common function (#3751)
-  - 8e619cab 2026-01-24T00:05:26+00:00 update script for new yq v4 (#3750)
-  - 8d1fc960 2026-01-24T00:05:07+00:00 Integrate APIServer TLS controller into OLM operator (#3744)
-  - d5940637 2026-01-24T00:04:48+00:00 Integrate APIServer TLS controller into Catalog operator (#3745)
-  - b7dd7872 2026-01-24T00:04:29+00:00 update api & op-reg dependencies (#3749)
+- machine-config-operator embedded-component b1eb6cc3b59bc0cb8b2e9b21cf5724b13e2df039 to 2607eb0c541524fa7b95c7697c2dc50baffbbd07
+  - 82198935 2026-01-23T15:35:16-05:00 Fix intermittent e2e-ocl test failures
 
