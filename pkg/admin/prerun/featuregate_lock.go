@@ -104,9 +104,9 @@ func runValidationsChecks(cfg *config.Config) error {
 	}
 
 	// Check if version has changed (upgrade attempted)
-	currentExecutableVersion, err := getVersionOfData()
+	currentExecutableVersion, err := GetVersionOfExecutable()
 	if err != nil {
-		return fmt.Errorf("failed to get current version: %w", err)
+		return fmt.Errorf("failed to get current executable version: %w", err)
 	}
 
 	if lockFile.Version.Major != currentExecutableVersion.Major || lockFile.Version.Minor != currentExecutableVersion.Minor {
