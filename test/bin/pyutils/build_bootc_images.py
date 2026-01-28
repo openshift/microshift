@@ -569,7 +569,7 @@ def main():
     parser.add_argument("-d", "--dry-run", action="store_true", help="Dry run: skip executing build commands.")
     parser.add_argument("-f", "--force-rebuild", action="store_true", help="Force rebuilding images that already exist.")
     parser.add_argument("-E", "--no-extract-images", action="store_true", help="Skip container image extraction.")
-    parser.add_argument("-X", "--extract-only", action="store_true", help="Extract container images only, skipping the image builds.")
+    parser.add_argument("-X", "--skip-all-builds", action="store_true", help="Skip all image builds.")
     parser.add_argument("-b", "--build-type",
                         choices=["image-bootc", "containerfile", "container-encapsulate"],
                         help="Only build images of the specified type.")
@@ -580,8 +580,8 @@ def main():
 
     args = parser.parse_args()
 
-    # Validate: directory is required unless extract-only mode
-    if not args.extract_only and not (args.layer_dir or args.group_dir or args.template):
+    # Validate: directory is required unless skip-all-builds mode
+    if not args.skip_all_builds and not (args.layer_dir or args.group_dir or args.template):
         parser.error("one of the arguments -l/--layer-dir -g/--group-dir -t/--template is required (unless using -X/--extract-only)")
 
     success_message = False
@@ -645,6 +645,12 @@ def main():
         # Sort the images list, only leaving unique entries
         common.sort_uniq_file(CONTAINER_LIST)
 
+        # Skip all image builds
+        if args.skip_all_builds:
+            common.print_msg("Skipping all image builds")
+            success_message = True
+            return
+
         # Process package source templates
         ipkgdir = f"{SCRIPTDIR}/../package-sources-bootc"
         for ifile in os.listdir(ipkgdir):
@@ -660,16 +666,15 @@ def main():
         common.update_pull_secret(PULL_SECRET, opull_secret, MIRROR_REGISTRY)
         PULL_SECRET = opull_secret
         # Process layer directory contents sorted by length and then alphabetically
-        if not args.extract_only:
-            if args.layer_dir:
-                for item in sorted(os.listdir(args.layer_dir), key=lambda i: (len(i), i)):
-                    item_path = os.path.join(args.layer_dir, item)
-                    # Check if this item is a directory
-                    if os.path.isdir(item_path):
-                        process_group(item_path, args.build_type, dry_run=args.dry_run)
-            else:
-                # Process individual group directory or template
-                process_group(dir2process, args.build_type, pattern, args.dry_run)
+        if args.layer_dir:
+            for item in sorted(os.listdir(args.layer_dir), key=lambda i: (len(i), i)):
+                item_path = os.path.join(args.layer_dir, item)
+                # Check if this item is a directory
+                if os.path.isdir(item_path):
+                    process_group(item_path, args.build_type, dry_run=args.dry_run)
+        else:
+            # Process individual group directory or template
+            process_group(dir2process, args.build_type, pattern, args.dry_run)
         # Toggle the success flag
         success_message = True
     except Exception as e:

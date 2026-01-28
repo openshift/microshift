@@ -610,7 +610,7 @@ build_images.sh [-iIsdf] [-l layer-dir | -g group-dir] [-t template]
           The FILE should be the path to the template to build.
           Implies -f along with -l and -g based on the filename.
 
-  -X      Extract container images only. Skip all image and installer builds.
+  -X      Skip all images builds and installer builds.
 
 EOF
 }
@@ -624,7 +624,7 @@ TEMPLATE=""
 FORCE_REBUILD=false
 FORCE_SOURCE=false
 EXTRACT_CONTAINER_IMAGES=true
-EXTRACT_ONLY=false
+SKIP_ALL_BUILDS=false
 
 selCount=0
 while getopts "dEfg:hiIl:sSt:X" opt; do
@@ -670,8 +670,7 @@ while getopts "dEfg:hiIl:sSt:X" opt; do
             FORCE_REBUILD=true
             ;;
         X)
-            EXTRACT_ONLY=true
-            BUILD_INSTALLER=false
+            SKIP_ALL_BUILDS=true
             ;;
         *)
             usage "ERROR: Unknown option ${opt}"
@@ -743,8 +742,9 @@ if [ $(pgrep -cx nginx) -eq 0 ] ; then
     "${TESTDIR}/bin/manage_webserver.sh" "start"
 fi
 
-if ${EXTRACT_ONLY}; then
-    echo "INFO: Extracting container images only. Skipping all image builds and installer builds."
+# Build the images
+if ${SKIP_ALL_BUILDS}; then
+    echo "INFO: Skipping all images builds and installer builds."
     exit 0
 fi
 
