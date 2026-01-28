@@ -569,18 +569,25 @@ def main():
     parser.add_argument("-d", "--dry-run", action="store_true", help="Dry run: skip executing build commands.")
     parser.add_argument("-f", "--force-rebuild", action="store_true", help="Force rebuilding images that already exist.")
     parser.add_argument("-E", "--no-extract-images", action="store_true", help="Skip container image extraction.")
+    parser.add_argument("-X", "--skip-all-builds", action="store_true", help="Skip all image builds.")
     parser.add_argument("-b", "--build-type",
                         choices=["image-bootc", "containerfile", "container-encapsulate"],
                         help="Only build images of the specified type.")
-    dirgroup = parser.add_mutually_exclusive_group(required=True)
+    dirgroup = parser.add_mutually_exclusive_group(required=False)
     dirgroup.add_argument("-l", "--layer-dir", type=str, help="Path to the layer directory to process.")
     dirgroup.add_argument("-g", "--group-dir", type=str, help="Path to the group directory to process.")
     dirgroup.add_argument("-t", "--template", type=str, help="Path to a template to build. Allows glob patterns (requires double qoutes).")
 
     args = parser.parse_args()
+
+    # Validate: directory is required unless skip-all-builds mode
+    if not args.skip_all_builds and not (args.layer_dir or args.group_dir or args.template):
+        parser.error("one of the arguments -l/--layer-dir -g/--group-dir -t/--template is required (unless using -X/--extract-only)")
+
     success_message = False
     try:
         pattern = "*"
+        dir2process = None
         # Convert input directories to absolute paths
         if args.group_dir:
             args.group_dir = os.path.abspath(args.group_dir)
@@ -592,8 +599,8 @@ def main():
             args.template = os.path.abspath(args.template)
             dir2process = os.path.dirname(args.template)
             pattern = os.path.basename(args.template)
-        # Make sure the input directory exists
-        if not os.path.isdir(dir2process):
+        # Make sure the input directory exists (only if specified)
+        if dir2process and not os.path.isdir(dir2process):
             raise Exception(f"The input directory '{dir2process}' does not exist")
         # Make sure the local RPM repository exists
         if not os.path.isdir(LOCAL_REPO):
@@ -637,7 +644,6 @@ def main():
                 extract_container_images(BREW_NIGHTLY_RELEASE_VERSION, BREW_REPO, CONTAINER_LIST, args.dry_run)
         # Sort the images list, only leaving unique entries
         common.sort_uniq_file(CONTAINER_LIST)
-
         # Process package source templates
         ipkgdir = f"{SCRIPTDIR}/../package-sources-bootc"
         for ifile in os.listdir(ipkgdir):
@@ -647,6 +653,11 @@ def main():
             run_template_cmd(ifile, ofile, args.dry_run)
         # Run the mirror registry
         common.run_command([f"{SCRIPTDIR}/mirror_registry.sh"], args.dry_run)
+        # Skip all image builds
+        if args.skip_all_builds:
+            common.print_msg("Skipping all image builds")
+            success_message = True
+            return
         # Add local registry credentials to the input pull secret file
         global PULL_SECRET
         opull_secret = os.path.join(BOOTC_IMAGE_DIR, "pull_secret.json", )
