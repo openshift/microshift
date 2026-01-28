@@ -97,14 +97,8 @@ function copy_bootstrap_kubeconfig() {
 }
 
 function run_healthcheck() {
-    if ! sudo systemctl start greenboot-healthcheck; then
-        echo "Error: Failed to start greenboot-healthcheck service"
-        exit 1
-    fi
-
-    greenboot_status=$(systemctl show -p Result --value greenboot-healthcheck)
-    if [ "${greenboot_status}" != "success" ]; then
-        echo "Error: greenboot-healthcheck did not complete successfully (Result: ${greenboot_status})"
+    if ! sudo microshift healthcheck -v=2 --timeout=600s; then
+        echo "Error: Failed to run the 'microshift healthcheck' command"
         exit 1
     fi
 }

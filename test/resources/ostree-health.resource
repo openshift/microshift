@@ -19,18 +19,14 @@ Greenboot Health Check Exited
     Systemctl Check Service SubState    greenboot-healthcheck.service    exited
 
 Restart Greenboot And Wait For Success
-    [Documentation]    Restart the greenboot-healthcheck service and check its status
+    [Documentation]    Verify the health of the deployments using the MicroShift healthcheck command
+    [Arguments]    ${wait_timeout}=600s
 
-    VAR    ${unit_name}    greenboot-healthcheck.service
-
-    # Note that the Systemctl keyword from systemd.resource cannot be used to
-    # restart the greenboot-healthcheck service due to the keyword expecting
-    # the 'running' state after the restart. This condition does not apply on
-    # services like greenboot that exit after their startup finishes.
+    # Note that the newer implementation of greenboot-healthcheck service no
+    # longer allows service restart. Using the MicroShift healthcheck command
+    # to verify the health of the deployments.
     ${stdout}    ${stderr}    ${rc}    Execute Command
-    ...    systemctl restart ${unit_name}
+    ...    microshift healthcheck -v=2 --timeout="${wait_timeout}"
     ...    sudo=True    return_stdout=True    return_stderr=True    return_rc=True
-    IF    ${rc} != 0    Systemctl Print Service Status And Logs    ${unit_name}
+    IF    ${rc} != 0    Log Many    ${stdout}    ${stderr}
     Should Be Equal As Integers    0    ${rc}
-
-    Wait Until Greenboot Health Check Exited
