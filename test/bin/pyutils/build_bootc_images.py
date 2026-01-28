@@ -644,13 +644,6 @@ def main():
                 extract_container_images(BREW_NIGHTLY_RELEASE_VERSION, BREW_REPO, CONTAINER_LIST, args.dry_run)
         # Sort the images list, only leaving unique entries
         common.sort_uniq_file(CONTAINER_LIST)
-
-        # Skip all image builds
-        if args.skip_all_builds:
-            common.print_msg("Skipping all image builds")
-            success_message = True
-            return
-
         # Process package source templates
         ipkgdir = f"{SCRIPTDIR}/../package-sources-bootc"
         for ifile in os.listdir(ipkgdir):
@@ -660,6 +653,11 @@ def main():
             run_template_cmd(ifile, ofile, args.dry_run)
         # Run the mirror registry
         common.run_command([f"{SCRIPTDIR}/mirror_registry.sh"], args.dry_run)
+        # Skip all image builds
+        if args.skip_all_builds:
+            common.print_msg("Skipping all image builds")
+            success_message = True
+            return
         # Add local registry credentials to the input pull secret file
         global PULL_SECRET
         opull_secret = os.path.join(BOOTC_IMAGE_DIR, "pull_secret.json", )
