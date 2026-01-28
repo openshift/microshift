@@ -91,6 +91,7 @@ update_build_cache() {
 # - Only build the 'periodic' layer when 'CI_JOB_NAME' contains 'periodic' token.
 run_image_build() {
     if [ -v CI_JOB_NAME ] ; then
+        # Skip all image builds for release testing CI jobs because all the images are fetched from the cache.
         if [[ "${CI_JOB_NAME}" =~ .*release.* ]]; then
             $(dry_run) bash -x ./bin/build_images.sh -X
             return
@@ -115,6 +116,7 @@ run_bootc_image_build() {
     make -C "${ROOTDIR}" verify-containers
 
     if [ -v CI_JOB_NAME ] ; then
+        # Skip all image builds for release testing CI jobs because all the images are fetched from the cache.
         if [[ "${CI_JOB_NAME}" =~ .*release.* ]]; then
             $(dry_run) bash -x ./bin/build_bootc_images.sh -X
             return
