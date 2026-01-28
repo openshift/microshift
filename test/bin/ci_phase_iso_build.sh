@@ -91,6 +91,11 @@ update_build_cache() {
 # - Only build the 'periodic' layer when 'CI_JOB_NAME' contains 'periodic' token.
 run_image_build() {
     if [ -v CI_JOB_NAME ] ; then
+        if [[ "${CI_JOB_NAME}" =~ .*release.* ]]; then
+            $(dry_run) bash -x ./bin/build_images.sh -X
+            return
+        fi
+
         # Conditional per-layer builds when running in CI.
         # The build_images.sh script skips any images that have been downloaded from the cache.
         $(dry_run) bash -x ./bin/build_images.sh -l ./image-blueprints/layer1-base
@@ -98,9 +103,6 @@ run_image_build() {
 
         if [[ "${CI_JOB_NAME}" =~ .*periodic.* ]]; then
             $(dry_run) bash -x ./bin/build_images.sh -l ./image-blueprints/layer3-periodic
-        fi
-        if [[ "${CI_JOB_NAME}" =~ .*release.* ]]; then
-            $(dry_run) bash -x ./bin/build_images.sh -l ./image-blueprints/layer4-release
         fi
     else
         # Fall back to full build when not running in CI
@@ -113,14 +115,19 @@ run_bootc_image_build() {
     make -C "${ROOTDIR}" verify-containers
 
     if [ -v CI_JOB_NAME ] ; then
+        if [[ "${CI_JOB_NAME}" =~ .*release.* ]]; then
+            $(dry_run) bash -x ./bin/build_bootc_images.sh -X
+            return
+        fi
+
         $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/layer1-base
         $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/layer2-presubmit
 
         if [[ "${CI_JOB_NAME}" =~ .*periodic.* ]]; then
             $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/layer3-periodic
         fi
-        if [[ "${CI_JOB_NAME}" =~ .*release.* ]]; then
-            $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/layer5-release
+        if [[ "${CI_JOB_NAME}" =~ .*upstream.* ]]; then
+            $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/layer4-upstream
         fi
     else
         $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/layer1-base
@@ -187,27 +194,15 @@ else
         echo "WARNING: Build cache is not available, rebuilding all the artifacts"
     fi
 
-    # When running a Release Testing CI job, we use the RPMs from brew which must be in the cache.
-    # For this reason we skip building bootc images, rpm-ostree commits and RPMs from source.
-    # But we still need to extract the container images from the brew RPMs.
-    if [[ "${CI_JOB_NAME}" =~ .*release.* ]]; then
-        echo "INFO: Release Testing CI job detected, skipping building artifacts (RPMs and images) from source and extracting container images from brew RPMs"
-        if ${COMPOSER_CLI_BUILDS} ; then
-            $(dry_run) bash -x ./bin/build_images.sh -X
-        else
-            $(dry_run) bash -x ./bin/build_bootc_images.sh -X
-        fi
-    else
-        # Re-build from source after downloading the cache because
-        # the build may depend on some cached artifacts
-        $(dry_run) bash -x ./bin/build_rpms.sh
+    # Re-build from source after downloading the cache because
+    # the build may depend on some cached artifacts
+    $(dry_run) bash -x ./bin/build_rpms.sh
 
-        # Optionally run bootc image builds
-        if ${COMPOSER_CLI_BUILDS} ; then
-            run_image_build
-        else
-            run_bootc_image_build
-        fi
+    # Optionally run bootc image builds
+    if ${COMPOSER_CLI_BUILDS} ; then
+        run_image_build
+    else
+        run_bootc_image_build
     fi
 fi
 
