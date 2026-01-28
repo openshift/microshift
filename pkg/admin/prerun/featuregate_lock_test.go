@@ -21,7 +21,7 @@ func TestFeatureGateLockFile_Marshal(t *testing.T) {
 			name: "custom feature gates with enabled and disabled",
 			lockFile: featureGateLockFile{
 				FeatureSet: config.FeatureSetCustomNoUpgrade,
-				CustomNoUpgrade: config.CustomNoUpgrade{
+				CustomNoUpgrade: config.EnableDisableFeatures{
 					Enabled:  []string{"FeatureA", "FeatureB"},
 					Disabled: []string{"FeatureC"},
 				},
@@ -32,7 +32,7 @@ func TestFeatureGateLockFile_Marshal(t *testing.T) {
 			name: "TechPreviewNoUpgrade",
 			lockFile: featureGateLockFile{
 				FeatureSet:      config.FeatureSetTechPreviewNoUpgrade,
-				CustomNoUpgrade: config.CustomNoUpgrade{},
+				CustomNoUpgrade: config.EnableDisableFeatures{},
 			},
 			wantErr: false,
 		},
@@ -40,7 +40,7 @@ func TestFeatureGateLockFile_Marshal(t *testing.T) {
 			name: "DevPreviewNoUpgrade",
 			lockFile: featureGateLockFile{
 				FeatureSet:      config.FeatureSetDevPreviewNoUpgrade,
-				CustomNoUpgrade: config.CustomNoUpgrade{},
+				CustomNoUpgrade: config.EnableDisableFeatures{},
 			},
 			wantErr: false,
 		},
@@ -48,7 +48,7 @@ func TestFeatureGateLockFile_Marshal(t *testing.T) {
 			name: "empty feature gates",
 			lockFile: featureGateLockFile{
 				FeatureSet:      "",
-				CustomNoUpgrade: config.CustomNoUpgrade{},
+				CustomNoUpgrade: config.EnableDisableFeatures{},
 			},
 			wantErr: false,
 		},
@@ -85,7 +85,7 @@ func TestIsCustomFeatureGatesConfigured(t *testing.T) {
 			name: "CustomNoUpgrade with enabled features",
 			fg: config.FeatureGates{
 				FeatureSet: config.FeatureSetCustomNoUpgrade,
-				CustomNoUpgrade: config.CustomNoUpgrade{
+				CustomNoUpgrade: config.EnableDisableFeatures{
 					Enabled: []string{"FeatureA"},
 				},
 			},
@@ -116,7 +116,7 @@ func TestIsCustomFeatureGatesConfigured(t *testing.T) {
 			name: "CustomNoUpgrade without any enabled/disabled",
 			fg: config.FeatureGates{
 				FeatureSet:      config.FeatureSetCustomNoUpgrade,
-				CustomNoUpgrade: config.CustomNoUpgrade{},
+				CustomNoUpgrade: config.EnableDisableFeatures{},
 			},
 			want: false,
 		},
@@ -156,7 +156,7 @@ func TestFeatureGateLockFile_ReadWrite(t *testing.T) {
 			name: "write and read custom feature gates",
 			lockFile: featureGateLockFile{
 				FeatureSet: config.FeatureSetCustomNoUpgrade,
-				CustomNoUpgrade: config.CustomNoUpgrade{
+				CustomNoUpgrade: config.EnableDisableFeatures{
 					Enabled:  []string{"FeatureA", "FeatureB"},
 					Disabled: []string{"FeatureC"},
 				},
@@ -277,7 +277,7 @@ func TestFeatureGateLockManagement_FirstRun(t *testing.T) {
 		ApiServer: config.ApiServer{
 			FeatureGates: config.FeatureGates{
 				FeatureSet: config.FeatureSetCustomNoUpgrade,
-				CustomNoUpgrade: config.CustomNoUpgrade{
+				CustomNoUpgrade: config.EnableDisableFeatures{
 					Enabled: []string{"FeatureA"},
 				},
 			},
@@ -326,7 +326,7 @@ func TestFeatureGateLockManagement_ConfigChange(t *testing.T) {
 	// Create lockFile file with initial config (CustomNoUpgrade feature set)
 	initialLock := featureGateLockFile{
 		FeatureSet: config.FeatureSetCustomNoUpgrade,
-		CustomNoUpgrade: config.CustomNoUpgrade{
+		CustomNoUpgrade: config.EnableDisableFeatures{
 			Enabled: []string{"FeatureA"},
 		},
 		Version: testVersion,
@@ -439,7 +439,7 @@ func TestFeatureGateLockManagement_VersionChange(t *testing.T) {
 			// Create lockFile file with locked version
 			lockFile := featureGateLockFile{
 				FeatureSet: config.FeatureSetCustomNoUpgrade,
-				CustomNoUpgrade: config.CustomNoUpgrade{
+				CustomNoUpgrade: config.EnableDisableFeatures{
 					Enabled: []string{"FeatureA"},
 				},
 				Version: tt.lockFileVer,
@@ -452,7 +452,7 @@ func TestFeatureGateLockManagement_VersionChange(t *testing.T) {
 				ApiServer: config.ApiServer{
 					FeatureGates: config.FeatureGates{
 						FeatureSet: config.FeatureSetCustomNoUpgrade,
-						CustomNoUpgrade: config.CustomNoUpgrade{
+						CustomNoUpgrade: config.EnableDisableFeatures{
 							Enabled: []string{"FeatureA"},
 						},
 					},
