@@ -74,9 +74,16 @@ sudo chown "${USER}":"${USER}" "${USER_KUBECONFIG}"/config
 # podcheck_nostorage fn waits for an expected number of non-storage pods to be in Ready state
 podcheck_nostorage() {
   expected=$1
+  prev_ready=-1
   while true; do
       OUTPUT=$(eval "oc get po -A --no-headers")
       PODS_READY=$(echo "${OUTPUT}" | grep -vE "csi|storage" | grep -c Running)
+
+      # Print progress when pod count changes
+      if [[ ${PODS_READY} -ne ${prev_ready} ]]; then
+          echo "Non-storage pods: ${PODS_READY}/${expected} ready"
+          prev_ready=${PODS_READY}
+      fi
 
       # Wait until all pods report ready
       if [[ ${PODS_READY} -ge ${expected} ]]; then
@@ -97,9 +104,16 @@ podcheck_nostorage() {
 # podcheck fn waits for an expected number of pods to be in Ready state
 podcheck() {
   expected=$1
+  prev_ready=-1
   while true; do
       OUTPUT=$(eval "${COMMAND}")
       PODS_READY=$(echo "${OUTPUT}" | grep -o -w "True" | wc -l)
+
+      # Print progress when pod count changes
+      if [[ ${PODS_READY} -ne ${prev_ready} ]]; then
+          echo "All pods: ${PODS_READY}/${expected} ready"
+          prev_ready=${PODS_READY}
+      fi
 
       # Wait until all pods report ready
       if [[ ${PODS_READY} -ge ${expected} ]]; then
