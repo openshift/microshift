@@ -27,6 +27,13 @@ name = "{{ . }}"
 version = "{{ env.Getenv "BREW_Y2_RELEASE_VERSION" }}"
 {{ end }}
 
+{{- if and (env.Getenv "UNAME_M" "") (eq "x86_64" .Env.UNAME_M) }}
+{{ range (env.Getenv "MICROSHIFT_Y2_X86_64_RPMS" | strings.Split " ") }}
+[[packages]]
+name = "{{ . }}"
+version = "{{ env.Getenv "BREW_Y2_RELEASE_VERSION" }}"
+{{ end }}
+{{- end }}
 
 [[packages]]
 name = "microshift-test-agent"

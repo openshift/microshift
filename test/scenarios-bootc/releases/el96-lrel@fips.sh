@@ -2,7 +2,7 @@
 
 # Sourced from scenario.sh and uses functions defined there.
 
-start_image="rhel96-bootc-brew-${LATEST_RELEASE_TYPE}-with-optional-fips"
+start_image="rhel96-bootc-brew-lrel-fips"
 
 check_platform() {
     if [[ "${UNAME_M}" =~ aarch64 ]] ; then

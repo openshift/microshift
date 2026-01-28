@@ -2,7 +2,7 @@
 
 # Sourced from scenario.sh and uses functions defined there.
 
-start_image="rhel100-bootc-brew-${LATEST_RELEASE_TYPE}-with-optional"
+start_image="rhel100-bootc-brew-lrel-optional"
 
 scenario_create_vms() {
     if ! does_image_exist "${start_image}"; then

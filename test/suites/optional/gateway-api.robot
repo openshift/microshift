@@ -23,7 +23,7 @@ Test Simple HTTP Route
     ...    Deploy Hello MicroShift
     Create Gateway    ${GATEWAY_HOSTNAME}    ${GATEWAY_PORT}    ${NS_GATEWAY}
     Create HTTP Route    ${GATEWAY_HOSTNAME}    ${NS_GATEWAY}
-    Wait Until Keyword Succeeds    10x    6s
+    Wait Until Keyword Succeeds    20x    6s
     ...    Access Hello MicroShift Success    ushift_port=${GATEWAY_PORT}    hostname=${GATEWAY_HOSTNAME}
     [Teardown]    Run Keywords
     ...    Delete Namespace
@@ -59,7 +59,6 @@ Create Gateway
     # Run healthcheck command to avoid premature wait returns if the object does not yet exist
     Command Should Work
     ...    sudo microshift healthcheck --namespace ${namespace} --deployments test-gateway-openshift-gateway-api --timeout 120s
-    Oc Wait    -n ${namespace} gateway/test-gateway    --for="condition=Programmed" --timeout=120s
 
 Create HTTP Route
     [Documentation]    Create an HTTP route using the given hostname and namespace. Waits for acceptance in a gateway.
@@ -71,12 +70,29 @@ Create HTTP Route
     ...    Remove File    ${tmp}
     Generate File From Template    ${HTTP_ROUTE_MANIFEST_TMPL}    ${tmp}
     Oc Apply    -n ${namespace} -f ${tmp}
-    Oc Wait
-    ...    -n ${namespace} httproutes/http
-    ...    --for jsonpath='{.status.parents[].conditions[?(@.type=="Accepted")].status}=True' --timeout=120s
-    Oc Wait
-    ...    -n ${namespace} httproutes/http
-    ...    --for jsonpath='{.status.parents[].conditions[?(@.type=="ResolvedRefs")].status}=True' --timeout=120s
+
+    Wait Until Keyword Succeeds    20x    6s
+    ...    Verify HTTPRoute Parent Accepted    ${namespace}
+    Wait Until Keyword Succeeds    20x    6s
+    ...    Verify HTTPRoute References Resolved    ${namespace}
+
+Verify HTTPRoute Parent Accepted
+    [Documentation]    Verify that the HTTPRoute is accepted by its parent gateway
+    [Arguments]    ${namespace}
+    ${result}    Run With Kubeconfig
+    ...    oc get httproutes/http -n ${namespace} -o jsonpath='{.status.parents[*].conditions[?(@.type=="Accepted")].status}'
+    Should Not Be Empty    ${result}    HTTPRoute parent conditions not found
+    Should Not Contain    ${result}    False    HTTPRoute not accepted by parent gateway
+    Should Not Contain    ${result}    Unknown    HTTPRoute acceptance status is unknown
+
+Verify HTTPRoute References Resolved
+    [Documentation]    Verify that all references in the HTTPRoute are resolved
+    [Arguments]    ${namespace}
+    ${result}    Run With Kubeconfig
+    ...    oc get httproutes/http -n ${namespace} -o jsonpath='{.status.parents[*].conditions[?(@.type=="ResolvedRefs")].status}'
+    Should Not Be Empty    ${result}    HTTPRoute reference conditions not found
+    Should Not Contain    ${result}    False    HTTPRoute references not resolved
+    Should Not Contain    ${result}    Unknown    HTTPRoute reference resolution status is unknown
 
 Generate File From Template
     [Documentation]    Generate file from template

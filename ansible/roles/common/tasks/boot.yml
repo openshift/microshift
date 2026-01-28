@@ -39,13 +39,17 @@
       seconds: 60
   when: reboot | default('false') | bool
 
+- name: Normalize microshift version for pod counts
+  set_fact:
+    microshift_version_clean: "{{ microshift_version | regex_replace('^latest-', '') }}"
+
 - name: Extract major version for pod counts
   set_fact:
-    microshift_major_version: "{{ microshift_version.split('.')[:2] | join('.') }}"
+    microshift_major_version: "{{ microshift_version_clean.split('.')[:2] | join('.') }}"
 
 - name: Validate that version exists in config
   fail:
-    msg: "Error: MicroShift version {{ microshift_major_version }} not found in microshift_versions dictionary. Please update the defaults/main.yml file."
+    msg: "Error: MicroShift version {{ microshift_major_version }} not found in microshift_versions dictionary. Please update vars/microshift_versions.yml."
   when: microshift_major_version not in microshift_versions
 
 - name: Set expected pod counts

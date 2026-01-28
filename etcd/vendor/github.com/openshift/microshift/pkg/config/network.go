@@ -127,3 +127,10 @@ func (n Network) IsEnabled() bool {
 func (m Multus) IsEnabled() bool {
 	return m.Status == MultusEnabled
 }
+
+func (m Multus) Validate() error {
+	if m.Status != MultusEnabled && m.Status != MultusDisabled {
+		return fmt.Errorf("invalid multus status: %v", m.Status)
+	}
+	return nil
+}

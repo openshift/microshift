@@ -381,16 +381,16 @@ MICROSHIFT_Y2_OPTIONAL_RPMS_LIST=(
     microshift-gateway-api-release-info
     microshift-low-latency
     microshift-observability
-)
-MICROSHIFT_Y1_OPTIONAL_RPMS_LIST=(
-    "${MICROSHIFT_Y2_OPTIONAL_RPMS_LIST[@]}"
     microshift-cert-manager
     microshift-cert-manager-release-info
 )
-MICROSHIFT_Z1_OPTIONAL_RPMS_LIST=(
-    "${MICROSHIFT_Y1_OPTIONAL_RPMS_LIST[@]}"
+MICROSHIFT_Y1_OPTIONAL_RPMS_LIST=(
+    "${MICROSHIFT_Y2_OPTIONAL_RPMS_LIST[@]}"
     microshift-sriov
     microshift-sriov-release-info
+)
+MICROSHIFT_Z1_OPTIONAL_RPMS_LIST=(
+    "${MICROSHIFT_Y1_OPTIONAL_RPMS_LIST[@]}"
 )
 MICROSHIFT_OPTIONAL_RPMS_LIST=(
     "${MICROSHIFT_Z1_OPTIONAL_RPMS_LIST[@]}"

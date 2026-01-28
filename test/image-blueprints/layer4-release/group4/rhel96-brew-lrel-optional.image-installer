@@ -1,0 +1,3 @@
+{{- if and (env.Getenv "BREW_LREL_RELEASE_VERSION" "") (env.Getenv "BREW_Y1_RELEASE_VERSION" "") -}}
+rhel96-brew-lrel-optional
+{{- end -}}

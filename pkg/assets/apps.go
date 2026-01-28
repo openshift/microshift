@@ -94,7 +94,7 @@ func applyApps(ctx context.Context, apps []string, handler resourceHandler, rend
 			return fmt.Errorf("error getting asset %s: %v", app, err)
 		}
 		handler.Read(objBytes, render, params)
-		if err := handler.Handle(ctx); err != nil {
+		if err := handleWithRetry(ctx, handler, app); err != nil {
 			klog.Warningf("Failed to apply apps api %s: %v", app, err)
 			return err
 		}

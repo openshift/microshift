@@ -265,6 +265,7 @@ The microshift-sriov package provides the required manifests for the SR-IOV Netw
 Summary: Release information for SR-IOV Network Operator for MicroShift
 BuildArch: noarch
 Requires: microshift = %{version}
+Requires: microshift-multus = %{version}
 
 %description sriov-release-info
 The microshift-sriov-release-info package provides release information files for this
@@ -789,6 +790,9 @@ fi
 # Use Git command to generate the log and replace the VERSION string
 # LANG=C git log --date="format:%a %b %d %Y" --pretty="tformat:* %cd %an <%ae> VERSION%n- %s%n" packaging/rpm/microshift.spec
 %changelog
+* Tue Jan 20 2026 Pablo Acevedo Montserrat <pacevedo@redhat.com> 4.21.0
+- Add multus as dependency for sriov
+
 * Sun Jan 18 2026 Gregory Giguashvili <ggiguash@redhat.com> 4.21.0
 - Update cert-manager manifests to use per-platform images
 

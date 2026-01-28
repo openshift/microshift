@@ -5,7 +5,7 @@ export TEST_RANDOMIZATION=none
 
 # Sourced from scenario.sh and uses functions defined there.
 
-start_image="rhel-9.6-microshift-brew-tuned-4.${MINOR_VERSION}-${LATEST_RELEASE_TYPE}"
+start_image="rhel96-brew-lrel-tuned"
 
 scenario_create_vms() {
     exit_if_commit_not_found "${start_image}"

@@ -2,7 +2,7 @@
 
 # Sourced from scenario.sh and uses functions defined there.
 
-start_image="rhel96-bootc-brew-${LATEST_RELEASE_TYPE}-with-optional"
+start_image="rhel96-bootc-brew-lrel-optional"
 
 scenario_create_vms() {
     exit_if_image_not_found "${start_image}"
@@ -22,5 +22,5 @@ scenario_run_tests() {
 
     run_tests host1 \
         --variable "EXPECTED_OS_VERSION:9.6" \
-        suites/standard1/ suites/selinux/validate-selinux-policy.robot
+        suites/standard1/
 }

@@ -17,44 +17,21 @@ ${CURSOR}       ${EMPTY}    # The journal cursor before restarting MicroShift
 
 
 *** Test Cases ***
-Check Logs After Clean Start
-    [Documentation]    Start from scratch, wait until initialized,
-    ...    stop and check for errors.
-
+Log Scan
+    [Documentation]    Run log scan tests in a specific order.
+    # Clean up and enable MicroShift to start from scratch
     Cleanup MicroShift    --all    --keep-images
-    ${cursor}=    Get Journal Cursor
-    VAR    ${CURSOR}=    ${cursor}    scope=SUITE
-
     Enable MicroShift
-    Start MicroShift
-    Setup Kubeconfig
-
-    Restart Greenboot And Wait For Success
-    Stop MicroShift
-
-    # Note: The 'forbidden' messages appear on clean startup.
-    # Should Not Find Forbidden
-    Should Not Find Cannot Patch Resource
-    Services Should Not Timeout When Stopping
-    Should Find Etcd Is Ready
-    Should Find MicroShift Is Ready
-
-Check Logs After Restart
-    [Documentation]    Start again, wait until initialized,
-    ...    stop and check for errors.
 
     ${cursor}=    Get Journal Cursor
     VAR    ${CURSOR}=    ${cursor}    scope=SUITE
+    # Start, stop and check logs after clean startup
+    Start Stop And Check Logs    check_forbidden=False
 
-    Start MicroShift
-    Restart Greenboot And Wait For Success
-    Stop MicroShift
-
-    Should Not Find Forbidden
-    Should Not Find Cannot Patch Resource
-    Services Should Not Timeout When Stopping
-    Should Find Etcd Is Ready
-    Should Find MicroShift Is Ready
+    ${cursor}=    Get Journal Cursor
+    VAR    ${CURSOR}=    ${cursor}    scope=SUITE
+    # Restart, stop and check logs
+    Start Stop And Check Logs
 
 
 *** Keywords ***
@@ -70,6 +47,22 @@ Teardown
 
     Logout MicroShift Host
     Remove Kubeconfig
+
+Start Stop And Check Logs
+    [Documentation]    Start, wait until initialized, stop and check for errors.
+    [Arguments]    ${check_forbidden}=True
+    Start MicroShift
+    Setup Kubeconfig
+
+    Restart Greenboot And Wait For Success
+    Stop MicroShift
+
+    # Note: The 'forbidden' messages appear on clean startup
+    IF    ${check_forbidden}    Should Not Find Forbidden
+    Should Not Find Cannot Patch Resource
+    Services Should Not Timeout When Stopping
+    Should Find Etcd Is Ready
+    Should Find MicroShift Is Ready
 
 Should Not Find Forbidden
     [Documentation]    Logs should not say "forbidden"

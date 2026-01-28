@@ -84,7 +84,7 @@ func applySCCs(ctx context.Context, sccs []string, handler resourceHandler, rend
 			return fmt.Errorf("error getting asset %s: %v", scc, err)
 		}
 		handler.Read(objBytes, render, params)
-		if err := handler.Handle(ctx); err != nil {
+		if err := handleWithRetry(ctx, handler, scc); err != nil {
 			klog.Warningf("Failed to apply scc api %s: %v", scc, err)
 			return err
 		}
