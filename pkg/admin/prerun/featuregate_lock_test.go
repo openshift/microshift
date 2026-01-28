@@ -125,9 +125,15 @@ func TestIsCustomFeatureGatesConfigured(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := hasCustomFeatureGates(tt.fg)
-			if got != tt.want {
-				t.Errorf("isCustomFeatureGatesConfigured() = %v, want %v", got, tt.want)
+			err := configValidationChecksPass(featureGateLockFile{
+				FeatureSet:      tt.fg.FeatureSet,
+				CustomNoUpgrade: tt.fg.CustomNoUpgrade,
+			}, tt.fg)
+			if err != nil {
+				t.Errorf("featureValidationsPass() error = %v", err)
+			}
+			if err != nil {
+				t.Errorf("featureValidationsPass() error = %v", err)
 			}
 		})
 	}
@@ -206,75 +212,40 @@ func TestFeatureGateLockFile_ReadNonExistent(t *testing.T) {
 	}
 }
 
-func TestCompareFeatureGates(t *testing.T) {
+func TestConfigValidationChecksPass(t *testing.T) {
 	tests := []struct {
-		name      string
-		lockFile  featureGateLockFile
-		current   config.FeatureGates
-		wantMatch bool
+		name     string
+		lockFile featureGateLockFile
+		current  config.FeatureGates
+		wantErr  bool
 	}{
 		{
-			name: "identical custom feature gates",
+			name: "unset any feature set",
 			lockFile: featureGateLockFile{
 				FeatureSet: config.FeatureSetCustomNoUpgrade,
-				CustomNoUpgrade: config.CustomNoUpgrade{
-					Enabled:  []string{"FeatureA", "FeatureB"},
-					Disabled: []string{"FeatureC"},
-				},
 			},
 			current: config.FeatureGates{
-				FeatureSet: config.FeatureSetCustomNoUpgrade,
-				CustomNoUpgrade: config.CustomNoUpgrade{
-					Enabled:  []string{"FeatureA", "FeatureB"},
-					Disabled: []string{"FeatureC"},
-				},
+				FeatureSet: "",
 			},
-			wantMatch: true,
+			wantErr: true,
 		},
 		{
-			name: "different enabled features",
+			name: "change CustomNoUpgrade to any other feature set",
 			lockFile: featureGateLockFile{
 				FeatureSet: config.FeatureSetCustomNoUpgrade,
-				CustomNoUpgrade: config.CustomNoUpgrade{
-					Enabled: []string{"FeatureA"},
-				},
-			},
-			current: config.FeatureGates{
-				FeatureSet: config.FeatureSetCustomNoUpgrade,
-				CustomNoUpgrade: config.CustomNoUpgrade{
-					Enabled: []string{"FeatureB"},
-				},
-			},
-			wantMatch: false,
-		},
-		{
-			name: "different feature sets",
-			lockFile: featureGateLockFile{
-				FeatureSet: config.FeatureSetTechPreviewNoUpgrade,
-			},
-			current: config.FeatureGates{
-				FeatureSet: config.FeatureSetDevPreviewNoUpgrade,
-			},
-			wantMatch: false,
-		},
-		{
-			name: "identical TechPreviewNoUpgrade",
-			lockFile: featureGateLockFile{
-				FeatureSet: config.FeatureSetTechPreviewNoUpgrade,
 			},
 			current: config.FeatureGates{
 				FeatureSet: config.FeatureSetTechPreviewNoUpgrade,
 			},
-			wantMatch: true,
+			wantErr: true,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := compareFeatureGates(tt.lockFile, tt.current)
-			gotMatch := err == nil
-			if gotMatch != tt.wantMatch {
-				t.Errorf("compareFeatureGates() match = %v, want %v, error = %v", gotMatch, tt.wantMatch, err)
+			err := configValidationChecksPass(tt.lockFile, tt.current)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("configValidationChecksPass() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}
@@ -299,8 +270,13 @@ func TestFeatureGateLockManagement_FirstRun(t *testing.T) {
 	defer func() { versionFilePath = originalVersionPath }()
 
 	// Create a version file to simulate existing data (version file uses JSON format)
+	version, err := GetVersionOfExecutable()
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Logf("version: %s", version.String())
 	versionData := versionFile{
-		Version: versionMetadata{Major: 4, Minor: 18, Patch: 0},
+		Version: version,
 		BootID:  "test-boot",
 	}
 	versionJSON, _ := json.Marshal(versionData)
@@ -354,8 +330,12 @@ func TestFeatureGateLockManagement_ConfigChange(t *testing.T) {
 	defer func() { versionFilePath = originalVersionPath }()
 
 	// Create a version file to simulate existing data (version file uses JSON format)
+	version, err := GetVersionOfExecutable()
+	if err != nil {
+		t.Fatal(err)
+	}
 	versionData := versionFile{
-		Version: versionMetadata{Major: 4, Minor: 18, Patch: 0},
+		Version: version,
 		BootID:  "test-boot",
 	}
 	versionJSON, _ := json.Marshal(versionData)
