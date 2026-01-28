@@ -296,9 +296,8 @@ spec:
         terminationMessagePolicy: FallbackToLogsOnError
 
       # ovnkube master: convert kubernetes objects in to nbdb logical network components
-      - name: ovnkube-master
-        # Patched ovnk version with https://github.com/pmtk/ovn-kubernetes/commit/6f667604fe51c8bd80e205d3c90143aca784f57f#diff-b13e3c3ee5d6b83836c1951006a06a1fbd0f539d22b75be7aae080f085dd31f4R110
-        image: localhost/ovnk:latest
+      - name: ovnkube-controller
+        image: {{ .ReleaseImage.ovn_kubernetes_microshift }}
         imagePullPolicy: Never
         command:
         - /bin/bash
@@ -350,7 +349,6 @@ spec:
             --nb-address "" \
             --sb-address "" \
             --enable-multicast \
-            --disable-snat-multiple-gws \
             --single-node \
             --enable-network-segmentation=true \
             --enable-multi-network=true \

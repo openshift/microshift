@@ -181,7 +181,7 @@ func VerifyAllowedSNI(advertiseAddress string, clusterNetwork []string, serviceN
 	} else {
 		if ContainIPANetwork(ipAddress, clusterNetwork) ||
 			ContainIPANetwork(ipAddress, serviceNetwork) ||
-			ContainIPANetwork(ipAddress, []string{"127.0.0.1/8", "169.254.169.2/29", "::1/128", "fe80::/10", "fd69::/125"}) ||
+			ContainIPANetwork(ipAddress, []string{"127.0.0.1/8", "169.254.0.0/17", "::1/128", "fe80::/10", "fd69::/112"}) ||
 			advertiseAddress == ipAddress.String() {
 			return false
 		}

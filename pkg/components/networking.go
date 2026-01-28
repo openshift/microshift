@@ -35,17 +35,26 @@ func startCNIPlugin(ctx context.Context, cfg *config.Config, kubeconfigPath stri
 			"components/ovn/common/master-serviceaccount.yaml",
 			"components/ovn/common/node-serviceaccount.yaml",
 		}
+		crd = []string{
+			"components/ovn/common/crd-udn.yaml",
+			"components/ovn/common/crd-cudn.yaml",
+			// "components/ovn/common/crd-ra.yaml",
+		}
 		r = []string{
 			"components/ovn/common/role.yaml",
+			"components/ovn/common/role-sbdb.yaml",
 		}
 		rb = []string{
 			"components/ovn/common/rolebinding.yaml",
+			"components/ovn/common/rolebinding-sbdb.yaml",
 		}
 		cr = []string{
 			"components/ovn/common/clusterrole.yaml",
+			"components/ovn/common/clusterrole-controller.yaml",
 		}
 		crb = []string{
 			"components/ovn/common/clusterrolebinding.yaml",
+			"components/ovn/common/clusterrolebinding-controller.yaml",
 		}
 		cm = []string{
 			"components/ovn/common/configmap.yaml",
@@ -83,6 +92,10 @@ func startCNIPlugin(ctx context.Context, cfg *config.Config, kubeconfigPath stri
 
 	if err := assets.ApplyNamespaces(ctx, ns, kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply ns %v: %v", ns, err)
+		return err
+	}
+	if err := assets.ApplyCRDAndWaitForEstablish(ctx, crd, kubeconfigPath); err != nil {
+		klog.Warningf("Failed to apply crd %v: %v", crd, err)
 		return err
 	}
 	if err := assets.ApplyServiceAccounts(ctx, sa, kubeconfigPath); err != nil {

@@ -18,7 +18,7 @@ const (
 	ovnConfigFileName           = "ovn.yaml"
 	OVNGatewayInterface         = "br-ex"
 	defaultMTU                  = 1500
-	OVNKubernetesV4MasqueradeIP = "169.254.169.2"
+	OVNKubernetesV4MasqueradeIP = "169.254.0.2"
 	OVNKubernetesV6MasqueradeIP = "fd69::2"
 
 	// used for multinode ovn database transport

@@ -1,22 +1,40 @@
----
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: openshift-ovn-kubernetes-node
+  name: openshift-ovn-kubernetes-controller
 rules:
+- apiGroups: [""]
+  resources:
+  - namespaces
+  - nodes
+  - pods
+  verbs:
+  - get
+  - list
+  - patch
+  - watch
+  - update
 - apiGroups: [""]
   resources:
   - pods
   verbs:
   - get
   - list
+  - patch
   - watch
+  - delete
+- apiGroups: [""]
+  resources:
+  - configmaps
+  verbs:
+  - get
+  - create
+  - update
   - patch
 - apiGroups: [""]
   resources:
-  - namespaces
-  - endpoints
   - services
+  - endpoints
   verbs:
   - get
   - list
@@ -42,19 +60,44 @@ rules:
   - create
   - patch
   - update
+- apiGroups: ["security.openshift.io"]
+  resources:
+  - securitycontextconstraints
+  verbs:
+  - use
+  resourceNames:
+  - privileged
 - apiGroups: [""]
   resources:
-  - nodes
+  - "nodes/status"
   verbs:
-  - get
-  - list
-  - watch
   - patch
   - update
 - apiGroups: ["k8s.ovn.org"]
   resources:
+  - egressfirewalls
   - egressips
+  - egressqoses
+  - adminpolicybasedexternalroutes
   verbs:
+  - get
+  - list
+  - watch
+  - update
+  - patch
+- apiGroups:
+  - k8s.ovn.org
+  resources:
+  - adminpolicybasedexternalroutes/status  
+  verbs: [ "update"]  
+- apiGroups: ["cloud.network.openshift.io"]
+  resources:
+  - cloudprivateipconfigs
+  verbs:
+  - create
+  - patch
+  - update
+  - delete
   - get
   - list
   - watch
@@ -71,3 +114,13 @@ rules:
 - apiGroups: ['authorization.k8s.io']
   resources: ['subjectaccessreviews']
   verbs: ['create']
+- apiGroups: [k8s.ovn.org]
+  resources:
+  - userdefinednetworks
+  - clusteruserdefinednetworks
+  verbs:
+  - get
+  - list
+  - watch
+  - patch
+  - update
