@@ -22,9 +22,9 @@ var (
 // featureGateLockFile represents the structure of the lock file
 // that tracks custom feature gate configuration and prevents changes/upgrades
 type featureGateLockFile struct {
-	FeatureSet      string                 `json:"featureSet"`
-	CustomNoUpgrade config.CustomNoUpgrade `json:"customNoUpgrade"`
-	Version         versionMetadata        `json:"version"`
+	FeatureSet      string                       `json:"featureSet"`
+	CustomNoUpgrade config.EnableDisableFeatures `json:"customNoUpgrade"`
+	Version         versionMetadata              `json:"version"`
 }
 
 // FeatureGateLockManagement manages the feature gate lock file
