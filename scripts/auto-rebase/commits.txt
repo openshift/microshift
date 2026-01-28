@@ -1,7 +1,7 @@
-https://github.com/openshift/api embedded-component 64571445812a66e84df4b36180a114f3365ff340
+https://github.com/openshift/api embedded-component 606bd613f9f7b6965f1d087b2fce8227aa49ceca
 https://github.com/openshift/cluster-csi-snapshot-controller-operator embedded-component 8be3728d7db58111e6efb46f6075698d6b7ec994
 https://github.com/openshift/cluster-dns-operator embedded-component 41a53fed36e6e99c7c9ceb3a699c3547ee5d9bb9
-https://github.com/openshift/cluster-ingress-operator embedded-component f97a4486f20f362b5c1fd45890997791ba73f09d
+https://github.com/openshift/cluster-ingress-operator embedded-component ea67a8ce10072efe06ab180fce8c9fef58e5b997
 https://github.com/openshift/cluster-kube-apiserver-operator embedded-component e99b43d8a1b9139933aa0f6e71fc7f8397d29b58
 https://github.com/openshift/cluster-kube-controller-manager-operator embedded-component a6a751080c9b2bdd3a721851b206cf2f7c8bbc41
 https://github.com/openshift/cluster-kube-scheduler-operator embedded-component ed10ad69474b83c568452f59dbd3d943778799d7
@@ -12,7 +12,7 @@ https://github.com/openshift/csi-external-snapshotter embedded-component d20b90a
 https://github.com/openshift/etcd embedded-component 806f690e1f140e0aea2eb05ef5f288b756b62895
 https://github.com/openshift/kubernetes embedded-component e4a4167c40c9ed543c5a80f2e08cc73696f7a4f6
 https://github.com/openshift/kubernetes-kube-storage-version-migrator embedded-component 73b468abf83d3d5894534f5d5cc42d1cad2a9045
-https://github.com/openshift/machine-config-operator embedded-component b1eb6cc3b59bc0cb8b2e9b21cf5724b13e2df039
+https://github.com/openshift/machine-config-operator embedded-component 2607eb0c541524fa7b95c7697c2dc50baffbbd07
 https://github.com/openshift/openshift-controller-manager embedded-component aaacf2be3860ec3609e6031527a6ffca4f282ba7
 https://github.com/openshift/operator-framework-olm embedded-component 34bb15d6590b8803c5e6390e75d68f6c075d6c97
 https://github.com/openshift/route-controller-manager embedded-component 3b4cc7b25c3c340b6708b7f0c1deafe38ef8a942
