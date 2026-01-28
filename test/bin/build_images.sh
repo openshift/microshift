@@ -610,8 +610,7 @@ build_images.sh [-iIsdf] [-l layer-dir | -g group-dir] [-t template]
           The FILE should be the path to the template to build.
           Implies -f along with -l and -g based on the filename.
 
-  -X      Extract container images only; skip all do_group builds and
-          installer builds.
+  -X      Extract container images only. Skip all image and installer builds.
 
 EOF
 }
@@ -744,16 +743,19 @@ if [ $(pgrep -cx nginx) -eq 0 ] ; then
     "${TESTDIR}/bin/manage_webserver.sh" "start"
 fi
 
-if ! ${EXTRACT_ONLY}; then
-    if [ -n "${LAYER}" ]; then
-        for group in "${LAYER}"/group*; do
-           do_group "${group}" ""
-        done
-    elif [ -n "${GROUP}" ]; then
-        do_group "${GROUP}" "${TEMPLATE}"
-    else
-        for group in "${TESTDIR}"/image-blueprints/layer*/group*; do
-            do_group "${group}" ""
-        done
-    fi
+if ${EXTRACT_ONLY}; then
+    echo "INFO: Extracting container images only. Skipping all image builds and installer builds."
+    exit 0
+fi
+
+if [ -n "${LAYER}" ]; then
+    for group in "${LAYER}"/group*; do
+       do_group "${group}" ""
+    done
+elif [ -n "${GROUP}" ]; then
+    do_group "${GROUP}" "${TEMPLATE}"
+else
+    for group in "${TESTDIR}"/image-blueprints/layer*/group*; do
+        do_group "${group}" ""
+    done
 fi

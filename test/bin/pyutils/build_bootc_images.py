@@ -569,7 +569,7 @@ def main():
     parser.add_argument("-d", "--dry-run", action="store_true", help="Dry run: skip executing build commands.")
     parser.add_argument("-f", "--force-rebuild", action="store_true", help="Force rebuilding images that already exist.")
     parser.add_argument("-E", "--no-extract-images", action="store_true", help="Skip container image extraction.")
-    parser.add_argument("-X", "--extract-only", action="store_true", help="Extract container images only; skip all image builds.")
+    parser.add_argument("-X", "--extract-only", action="store_true", help="Extract container images only, skipping the image builds.")
     parser.add_argument("-b", "--build-type",
                         choices=["image-bootc", "containerfile", "container-encapsulate"],
                         help="Only build images of the specified type.")
