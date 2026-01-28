@@ -6,7 +6,6 @@ import (
 	"slices"
 
 	configv1 "github.com/openshift/api/config/v1"
-	featuresUtils "github.com/openshift/api/features"
 	"github.com/openshift/library-go/pkg/crypto"
 
 	"k8s.io/apimachinery/pkg/util/sets"
@@ -154,28 +153,15 @@ type FeatureGates struct {
 	CustomNoUpgrade CustomNoUpgrade `json:"customNoUpgrade"`
 }
 
+// ToApiserverArgs converts the FeatureGates struct to a list of feature-gates arguments for the kube-apiserver.
+// Validation checks should be performed before calling this function to ensure the FeatureGates struct is valid.
 func (fg FeatureGates) ToApiserverArgs() ([]string, error) {
 	ret := sets.NewString()
-
-	switch fg.FeatureSet {
-	case FeatureSetCustomNoUpgrade:
-		for _, feature := range fg.CustomNoUpgrade.Enabled {
-			ret.Insert(fmt.Sprintf("%s=true", feature))
-		}
-		for _, feature := range fg.CustomNoUpgrade.Disabled {
-			ret.Insert(fmt.Sprintf("%s=false", feature))
-		}
-	case FeatureSetDevPreviewNoUpgrade, FeatureSetTechPreviewNoUpgrade:
-		fgEnabledDisabled, err := featuresUtils.FeatureSets(featuresUtils.SelfManaged, configv1.FeatureSet(fg.FeatureSet))
-		if err != nil {
-			return nil, fmt.Errorf("failed to get feature set gates: %w", err)
-		}
-		for _, f := range fgEnabledDisabled.Enabled {
-			ret.Insert(fmt.Sprintf("%s=true", f.FeatureGateAttributes.Name))
-		}
-		for _, f := range fgEnabledDisabled.Disabled {
-			ret.Insert(fmt.Sprintf("%s=false", f.FeatureGateAttributes.Name))
-		}
+	for _, feature := range fg.CustomNoUpgrade.Enabled {
+		ret.Insert(fmt.Sprintf("%s=true", feature))
+	}
+	for _, feature := range fg.CustomNoUpgrade.Disabled {
+		ret.Insert(fmt.Sprintf("%s=false", feature))
 	}
 	return ret.List(), nil
 }
@@ -190,17 +176,20 @@ func (fg *FeatureGates) validateFeatureGates() error {
 	if fg == nil || reflect.DeepEqual(*fg, FeatureGates{}) {
 		return nil
 	}
-	// Must use a recognized feature set, or else empty
-	if fg.FeatureSet != "" && fg.FeatureSet != FeatureSetCustomNoUpgrade && fg.FeatureSet != FeatureSetTechPreviewNoUpgrade && fg.FeatureSet != FeatureSetDevPreviewNoUpgrade {
+
+	// FeatureSet must be empty or CustomNoUpgrade. If empty, CustomNoUpgrade.Enabled/Disabled lists must be empty.
+	switch fg.FeatureSet {
+	case "":
+		if len(fg.CustomNoUpgrade.Enabled) > 0 || len(fg.CustomNoUpgrade.Disabled) > 0 {
+			return fmt.Errorf("CustomNoUpgrade enabled/disabled lists must be empty when FeatureSet is empty")
+		}
+		return nil
+	case FeatureSetCustomNoUpgrade:
+		// Valid - continue to validate enabled/disabled lists below
+	case FeatureSetDevPreviewNoUpgrade, FeatureSetTechPreviewNoUpgrade:
+		return fmt.Errorf("FeatureSet %s is not supported. Use CustomNoUpgrade to enable/disable feature gates", fg.FeatureSet)
+	default:
 		return fmt.Errorf("invalid feature set: %s", fg.FeatureSet)
-	}
-	// Must set FeatureSet to CustomNoUpgrade to use custom feature gates
-	if fg.FeatureSet != FeatureSetCustomNoUpgrade && (len(fg.CustomNoUpgrade.Enabled) > 0 || len(fg.CustomNoUpgrade.Disabled) > 0) {
-		return fmt.Errorf("CustomNoUpgrade must be empty when FeatureSet is empty")
-	}
-	// Must set CustomNoUpgrade enabled or disabled lists when FeatureSet is CustomNoUpgrade
-	if fg.FeatureSet == FeatureSetCustomNoUpgrade && len(fg.CustomNoUpgrade.Enabled) == 0 && len(fg.CustomNoUpgrade.Disabled) == 0 {
-		return fmt.Errorf("CustomNoUpgrade enabled or disabled lists must be set when FeatureSet is CustomNoUpgrade")
 	}
 
 	var errs = make(sets.Set[error], 0)
