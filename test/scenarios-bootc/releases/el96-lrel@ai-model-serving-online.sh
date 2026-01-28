@@ -2,7 +2,7 @@
 
 # Sourced from scenario.sh and uses functions defined there.
 
-start_image="rhel96-bootc-brew-${LATEST_RELEASE_TYPE}-with-optional"
+start_image="rhel96-bootc-brew-lrel-optional"
 
 # Currently, RHOAI is only available for x86_64
 check_platform() {
