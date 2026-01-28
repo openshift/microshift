@@ -139,7 +139,7 @@ const (
 	FeatureSetDevPreviewNoUpgrade  = "DevPreviewNoUpgrade"
 )
 
-type CustomNoUpgrade struct {
+type EnableDisableFeatures struct {
 	Enabled  []string `json:"enabled"`
 	Disabled []string `json:"disabled"`
 }
@@ -149,15 +149,21 @@ type CustomNoUpgrade struct {
 var RequiredFeatureGates = []string{"UserNamespacesSupport", "UserNamespacesPodSecurityStandards"}
 
 type FeatureGates struct {
-	FeatureSet      string          `json:"featureSet"`
-	CustomNoUpgrade CustomNoUpgrade `json:"customNoUpgrade"`
+	FeatureSet string `json:"featureSet"`
+	// CustomNoUpgrade is used to enable/disable feature gates. When the enabled or disable lists are not empty, x- and y-stream upgrades will be blocked.
+	// Use this field exclusively for custom feature gates, unless you are certain that the feature gate is a SpecialHandlingSupportExceptionRequired feature.
+	CustomNoUpgrade EnableDisableFeatures `json:"customNoUpgrade"`
+	// SpecialHandlingSupportExceptionRequired is used to enable/disable feature gates without blocking x- and y-stream upgrades.
+	// A SpecialHandlingSupportExceptionRequired feature will be given precedence over the same feature (if set) in CustomNoUpgrade features.
+	SpecialHandlingSupportExceptionRequired EnableDisableFeatures `json:"specialHandlingSupportExceptionRequired"`
 }
 
 // ToApiserverArgs converts the FeatureGates struct to a list of feature-gates arguments for the kube-apiserver.
 // Validation checks should be performed before calling this function to ensure the FeatureGates struct is valid.
 func (fg FeatureGates) ToApiserverArgs() ([]string, error) {
 	ret := sets.NewString()
-addFeatures := func(features []string, enabled bool) {
+
+	addFeatures := func(features []string, enabled bool) {
 		for _, feature := range features {
 			ret.Insert(fmt.Sprintf("%s=%t", feature, enabled))
 		}
@@ -165,6 +171,8 @@ addFeatures := func(features []string, enabled bool) {
 
 	addFeatures(fg.CustomNoUpgrade.Enabled, true)
 	addFeatures(fg.CustomNoUpgrade.Disabled, false)
+	addFeatures(fg.SpecialHandlingSupportExceptionRequired.Enabled, true)
+	addFeatures(fg.SpecialHandlingSupportExceptionRequired.Disabled, false)
 	return ret.List(), nil
 }
 
@@ -193,7 +201,7 @@ func (fg *FeatureGates) validateFeatureGates() error {
 		return nil
 	}
 
-switch fg.FeatureSet {
+	switch fg.FeatureSet {
 	case "":
 		return nil
 	case FeatureSetCustomNoUpgrade:
