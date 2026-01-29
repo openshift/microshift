@@ -157,7 +157,7 @@ type FeatureGates struct {
 // Validation checks should be performed before calling this function to ensure the FeatureGates struct is valid.
 func (fg FeatureGates) ToApiserverArgs() ([]string, error) {
 	ret := sets.NewString()
-addFeatures := func(features []string, enabled bool) {
+	addFeatures := func(features []string, enabled bool) {
 		for _, feature := range features {
 			ret.Insert(fmt.Sprintf("%s=%t", feature, enabled))
 		}
@@ -193,7 +193,7 @@ func (fg *FeatureGates) validateFeatureGates() error {
 		return nil
 	}
 
-switch fg.FeatureSet {
+	switch fg.FeatureSet {
 	case "":
 		return nil
 	case FeatureSetCustomNoUpgrade:

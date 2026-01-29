@@ -97,7 +97,6 @@ GO_BUILD_FLAGS :=-tags 'include_gcs include_oss containers_image_openpgp gssapi 
 
 # Set variables for test-unit target
 GO_TEST_FLAGS=$(GO_BUILD_FLAGS)
-GO_TEST_ARGS=$(GO_LD_FLAGS)
 GO_TEST_PACKAGES=./cmd/... ./pkg/...
 
 # Enable CGO when building microshift binary for access to local libraries.
