@@ -1,7 +1,5 @@
 #!/bin/bash
 
-# Parse command line arguments
-# Default values
 DEFAULT_EXPECTED_PODS=6
 DEFAULT_ALL_PODS=10
 
@@ -33,12 +31,12 @@ if [[ $# -eq 2 ]]; then
   fi
 fi
 
-# Use provided values or defaults
 EXPECTED_PODS=${1:-${DEFAULT_EXPECTED_PODS}}
 ALL_PODS=${2:-${DEFAULT_ALL_PODS}}
 
-# Define our check command
-COMMAND="oc get pods -A -o 'jsonpath={..status.conditions[?(@.type==\"Ready\")].status}'"
+# Timeout in seconds (10 minutes) - fail fast to get useful output before CI kills the job
+TIMEOUT=600
+
 # Define the location of the microshift kubeconfig
 KUBECONFIG="/var/lib/microshift/resources/kubeadmin/kubeconfig"
 USER_KUBECONFIG="${HOME}/.kube"
@@ -67,69 +65,74 @@ DURATION=$((KUBE_TIME - START_TIME))
 echo "Kubeconfig: ${DURATION} seconds"
 
 # Copy the kubeconfig to the user homedir
-[ ! -d "${USER_KUBECONFIG}" ] && mkdir "${USER_KUBECONFIG}"
-sudo cp ${KUBECONFIG} "${USER_KUBECONFIG}"/config
+mkdir -p "${USER_KUBECONFIG}"
+sudo cp "${KUBECONFIG}" "${USER_KUBECONFIG}"/config
 sudo chown "${USER}":"${USER}" "${USER_KUBECONFIG}"/config
 
-# podcheck_nostorage fn waits for an expected number of non-storage pods to be in Ready state
-podcheck_nostorage() {
-  expected=$1
-  prev_ready=-1
+count_ready_nostorage() {
+  oc get po -A --no-headers | grep -vE "csi|storage" | grep -c Running
+}
+
+count_ready_all() {
+  oc get pods -A -o "jsonpath={..status.conditions[?(@.type==\"Ready\")].status}" \
+    | grep -o -w "True" \
+    | wc -l
+}
+
+wait_for_ready() {
+  local label=$1
+  local expected=$2
+  local count_fn=$3
+  local result_var=$4
+  local prev_ready=-1
+
   while true; do
-      OUTPUT=$(eval "oc get po -A --no-headers")
-      PODS_READY=$(echo "${OUTPUT}" | grep -vE "csi|storage" | grep -c Running)
+    # Check for timeout
+    local elapsed=$(( $(date +%s) - START_TIME ))
+    if [[ ${elapsed} -gt ${TIMEOUT} ]]; then
+      echo "ERROR: Timed out after ${elapsed}s waiting for ${label} (${prev_ready}/${expected} ready)"
+      echo "Final pod status:"
+      oc get pods -A
+      echo ""
+      echo "Recent events:"
+      oc get events -A --sort-by='.lastTimestamp' | tail -20
+      exit 1
+    fi
 
-      # Print progress when pod count changes
-      if [[ ${PODS_READY} -ne ${prev_ready} ]]; then
-          echo "Non-storage pods: ${PODS_READY}/${expected} ready"
-          prev_ready=${PODS_READY}
-      fi
+    local ready
+    ready=$(${count_fn})
 
-      # Wait until all pods report ready
-      if [[ ${PODS_READY} -ge ${expected} ]]; then
-          break
-      fi
-      sleep 1
+    # Print progress when pod count changes
+    if [[ ${ready} -ne ${prev_ready} ]]; then
+      echo "${label}: ${ready}/${expected} ready"
+      prev_ready=${ready}
+    fi
+
+    # Wait until all pods report ready
+    if [[ ${ready} -ge ${expected} ]]; then
+      break
+    fi
+    sleep 1
   done
 
   oc get po -A
 
   # Calculate the time it took for all pods to be running
-  END_TIME=$(date +%s)
-  DURATION=$((END_TIME - START_TIME))
+  local end_time
+  local duration
+  end_time=$(date +%s)
+  duration=$((end_time - START_TIME))
 
-  echo "Boot: ${DURATION} seconds (${expected} pods)"
+  echo "Ready (${label}): ${duration} seconds (${expected} pods)"
+  if [[ -n ${result_var} ]]; then
+    printf -v "${result_var}" "%s" "${duration}"
+  fi
 }
 
-# podcheck fn waits for an expected number of pods to be in Ready state
-podcheck() {
-  expected=$1
-  prev_ready=-1
-  while true; do
-      OUTPUT=$(eval "${COMMAND}")
-      PODS_READY=$(echo "${OUTPUT}" | grep -o -w "True" | wc -l)
+READY_SECONDS_NON_STORAGE=""
+READY_SECONDS_ALL=""
 
-      # Print progress when pod count changes
-      if [[ ${PODS_READY} -ne ${prev_ready} ]]; then
-          echo "All pods: ${PODS_READY}/${expected} ready"
-          prev_ready=${PODS_READY}
-      fi
+wait_for_ready "Non-storage pods" "${EXPECTED_PODS}" count_ready_nostorage READY_SECONDS_NON_STORAGE
+wait_for_ready "All pods" "${ALL_PODS}" count_ready_all READY_SECONDS_ALL
 
-      # Wait until all pods report ready
-      if [[ ${PODS_READY} -ge ${expected} ]]; then
-          break
-      fi
-      sleep 1
-  done
-
-  oc get po -A
-
-  # Calculate the time it took for all pods to be running
-  END_TIME=$(date +%s)
-  DURATION=$((END_TIME - START_TIME))
-
-  echo "Boot: ${DURATION} seconds (${expected} pods)"
-}
-
-podcheck_nostorage "${EXPECTED_PODS}"
-podcheck "${ALL_PODS}"
+echo "{\"ready_seconds_non_storage\":${READY_SECONDS_NON_STORAGE},\"ready_seconds_all\":${READY_SECONDS_ALL}}"
