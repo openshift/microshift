@@ -3,10 +3,7 @@ package servicemanager
 import (
 	"context"
 	"errors"
-	"os"
-	"os/signal"
 	"sync"
-	"syscall"
 	"testing"
 	"time"
 
@@ -163,7 +160,7 @@ func TestRunToServiceCrash(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	cancelOnSigTerm(cancel, ctx)
+	cancelOnError(cancel, m.ErrChan(), ctx)
 
 	ready, stopped := make(chan struct{}), make(chan struct{})
 	if err := m.Run(ctx, ready, stopped); err == nil {
@@ -179,12 +176,10 @@ func TestRunToServiceCrash(t *testing.T) {
 	}
 }
 
-func cancelOnSigTerm(cancel context.CancelFunc, ctx context.Context) {
-	sigTerm := make(chan os.Signal, 1)
-	signal.Notify(sigTerm, os.Interrupt, syscall.SIGTERM)
+func cancelOnError(cancel context.CancelFunc, errChan <-chan error, ctx context.Context) {
 	go func() {
 		select {
-		case <-sigTerm:
+		case <-errChan:
 			cancel()
 		case <-ctx.Done():
 		}
@@ -219,7 +214,7 @@ func TestRunToServicePanic(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	cancelOnSigTerm(cancel, ctx)
+	cancelOnError(cancel, m.ErrChan(), ctx)
 
 	ready, stopped := make(chan struct{}), make(chan struct{})
 	if err := m.Run(ctx, ready, stopped); err == nil {

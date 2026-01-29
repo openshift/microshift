@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"runtime/debug"
-	"syscall"
 	"time"
 
 	"github.com/openshift/microshift/pkg/servicemanager/startuprecorder"
@@ -20,6 +19,8 @@ type ServiceManager struct {
 	services   []Service
 	serviceMap map[string]Service
 	startRec   *startuprecorder.StartupRecorder
+
+	errChan chan error
 }
 
 func NewServiceManager(startRec *startuprecorder.StartupRecorder) *ServiceManager {
@@ -30,10 +31,14 @@ func NewServiceManager(startRec *startuprecorder.StartupRecorder) *ServiceManage
 		services:   []Service{},
 		serviceMap: make(map[string]Service),
 		startRec:   startRec,
+		errChan:    make(chan error, 1),
 	}
 }
+
 func (s *ServiceManager) Name() string           { return s.name }
 func (s *ServiceManager) Dependencies() []string { return s.deps }
+
+func (s *ServiceManager) ErrChan() <-chan error { return s.errChan }
 
 func (m *ServiceManager) AddService(s Service) error {
 	if s == nil {
@@ -115,9 +120,7 @@ func (m *ServiceManager) asyncRun(ctx context.Context, service Service) (<-chan 
 				if r := recover(); r != nil {
 					klog.Errorf("%s panicked: %s trace: %s.", service.Name(), r, debug.Stack())
 					klog.Error("Stopping MicroShift")
-					if err := syscall.Kill(syscall.Getpid(), syscall.SIGTERM); err != nil {
-						klog.Warningf("error killing process: %v", err)
-					}
+					m.errChan <- fmt.Errorf("service %q panicked: %v", service.Name(), r)
 					if !sigchannel.IsClosed(stopped) {
 						close(stopped)
 					}
@@ -137,9 +140,7 @@ func (m *ServiceManager) asyncRun(ctx context.Context, service Service) (<-chan 
 
 			if err := service.Run(ctx, ready, stopped); err != nil && !errors.Is(err, context.Canceled) {
 				klog.ErrorS(err, "SERVICE FAILED - stopping MicroShift", "service", service.Name(), "since-start", time.Since(svcStart))
-				if err := syscall.Kill(syscall.Getpid(), syscall.SIGTERM); err != nil {
-					klog.Warningf("error killing process: %v", err)
-				}
+				m.errChan <- fmt.Errorf("service %q failed: %w", service.Name(), err)
 			} else {
 				klog.InfoS("SERVICE COMPLETED", "service", service.Name(), "since-start", time.Since(svcStart))
 			}

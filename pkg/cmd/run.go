@@ -138,6 +138,7 @@ func prerunDataManagement() error {
 	return prerun.DataManagement(dataManager)
 }
 
+//nolint:cyclop
 func RunMicroshift(cfg *config.Config) error {
 	// fail early if we don't have enough privileges
 	if os.Geteuid() > 0 {
@@ -276,6 +277,8 @@ func RunMicroshift(cfg *config.Config) error {
 	sigTerm := make(chan os.Signal, 1)
 	signal.Notify(sigTerm, os.Interrupt, syscall.SIGTERM)
 
+	var serviceErr error
+
 	select {
 	case <-ready:
 		startRec.MicroshiftReady()
@@ -292,12 +295,21 @@ func RunMicroshift(cfg *config.Config) error {
 		// After MicroShift's core becomes ready, run the kustomizer (delete and/or apply manifests).
 		kustomize.NewKustomizer(cfg).RunStandalone(runCtx)
 
-		// Watch for SIGTERM to exit, now that we are ready.
-		<-sigTerm
-		klog.Info("Interrupt received")
+		// Watch for SIGTERM or service error to exit, now that we are ready.
+		select {
+		case <-sigTerm:
+			klog.Info("Interrupt received")
+		case err := <-m.ErrChan():
+			serviceErr = err
+			klog.Infof("Service error: %v", err)
+		}
 	case <-sigTerm:
 		// A signal that comes in before we are ready is handled here.
 		klog.Info("Interrupt received")
+	case err := <-m.ErrChan():
+		// A service error that comes in before we are ready is handled here.
+		serviceErr = err
+		klog.Infof("Service error before ready: %v", err)
 	case <-runCtx.Done():
 		// We might end up here if the certificate rotation is
 		// triggered and we exit on our own, instead of via a signal.
@@ -312,5 +324,5 @@ func RunMicroshift(cfg *config.Config) error {
 		klog.InfoS("MICROSHIFT STOP TIMED OUT", "since-stop", time.Since(microshiftStop))
 	}
 	klog.InfoS("MICROSHIFT STOPPED", "since-stop", time.Since(microshiftStop))
-	return nil
+	return serviceErr
 }
