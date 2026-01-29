@@ -1,6 +1,7 @@
 *** Settings ***
 Documentation       Verify that that MicroShift feature gate configuration is correctly integrated into the kube-apiserver.
 ...                 Validation testing is handled by prerun unit tests and is not included here.
+
 Resource            ../../resources/common.resource
 Resource            ../../resources/microshift-config.resource
 Resource            ../../resources/microshift-process.resource
