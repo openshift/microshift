@@ -15,6 +15,8 @@ import (
 var (
 	featureGateLockFilePath = filepath.Join(config.DataDir, "no-upgrade")
 	errLockFileDoesNotExist = errors.New("feature gate lock file does not exist")
+	// getExecutableVersion is a function variable that allows tests to override the version
+	getExecutableVersion = GetVersionOfExecutable
 )
 
 // featureGateLockFile represents the structure of the lock file
@@ -61,8 +63,8 @@ func createFeatureGateLockFile(cfg *config.Config) error {
 	klog.InfoS("Creating feature gate lock file - this cluster can no longer be upgraded",
 		"path", featureGateLockFilePath)
 
-	// Get current version from version file
-	currentVersion, err := GetVersionOfExecutable()
+	// Get current version from executable
+	currentVersion, err := getExecutableVersion()
 	if err != nil {
 		return fmt.Errorf("failed to get version: %w", err)
 	}
@@ -104,7 +106,7 @@ func runValidationsChecks(cfg *config.Config) error {
 	}
 
 	// Check if version has changed (upgrade attempted)
-	currentExecutableVersion, err := GetVersionOfExecutable()
+	currentExecutableVersion, err := getExecutableVersion()
 	if err != nil {
 		return fmt.Errorf("failed to get current executable version: %w", err)
 	}
