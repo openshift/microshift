@@ -33,7 +33,7 @@ Custom Feature Gates Are Passed To Kube APIServer
     ...    kube-apiserver. This test verifies that arbitrary feature gate values are correctly propagated from the
     ...    MicroShift configuration to the kube-apiserver, regardless of whether the feature gates are valid or have any effect.
     ...    Also verify that feature gate lock file is created when custom feature gates are configured.
-    ...    The lock file prevents upgrades and configuration changes when CustomNoUpgrade feature set is used.j
+    ...    The lock file prevents upgrades and configuration changes when CustomNoUpgrade feature set is used.
     [Setup]    Setup Custom Feature Gates Test
     Wait Until Keyword Succeeds    2 min    5 sec
     ...    Pattern Should Appear In Log Output    ${CURSOR}    kube:feature-gates=.*TestFeatureEnabled=true
