@@ -1,22 +1,37 @@
-- api embedded-component 64571445812a66e84df4b36180a114f3365ff340 to 606bd613f9f7b6965f1d087b2fce8227aa49ceca
-  - ec37c6e6 2026-01-26T16:55:26+03:00 Update tests for mutually exclusive feature gates
-  - d7e760f3 2026-01-26T16:07:55+03:00 Move KMSEncryptionProvider FG to DevPreview
-  - fe4267b0 2026-01-26T15:17:57+03:00 Introduce KMSEncryption feature gate
-  - 7e2657b6 2026-01-23T12:07:37+00:00 Fix payload CRD/FetaureGate ordering
-
-- cluster-ingress-operator embedded-component f97a4486f20f362b5c1fd45890997791ba73f09d to ea67a8ce10072efe06ab180fce8c9fef58e5b997
-  - 664e540 2026-01-26T13:57:00-05:00 update conformance script
-  - 003308a 2026-01-26T13:57:00-05:00 remove backendtlspolicy tests
-  - 10e14fd 2026-01-26T13:57:00-05:00 add backendtlspolicy logic
-  - ae517c4 2026-01-26T13:57:00-05:00 update gwc name
-  - 86989c1 2026-01-26T13:57:00-05:00 add blank line
-  - f04b1bf 2026-01-26T13:57:00-05:00 Update the script to run all supported tests
-  - 2725b27 2026-01-26T13:57:00-05:00 Bump GWAPI CRDs to v1.4.0
-  - 33f4ef1 2026-01-22T22:16:25-05:00 OCPBUGS-16728: Require Service Deletion for LB Type Updates
-  - 80004c8 2026-01-22T17:06:27-05:00 Refactor: Consolidate effectuation message creation
-  - cfc917e 2026-01-22T17:06:24-05:00 Refactor: Add `managedAtServiceCreationLBServiceAnnotations` Map
-  - 5bd963a 2026-01-05T17:36:57-05:00 Update Broken Annotation Documentation Links
-
-- machine-config-operator embedded-component b1eb6cc3b59bc0cb8b2e9b21cf5724b13e2df039 to 2607eb0c541524fa7b95c7697c2dc50baffbbd07
-  - 82198935 2026-01-23T15:35:16-05:00 Fix intermittent e2e-ocl test failures
+- kube-rbac-proxy image-arm64 cd636680e06a55395c26570dff0cb37277014388 to c7ab76fd6fdf651d5022db8946c35b158ecc2396
+  - d9ad6ac 2026-01-22T16:22:25+01:00 go.mod: downgrade to go 1.24.11 for CI compatibility
+  - 5df54c0 2026-01-22T16:22:24+01:00 test/e2e: try to drop the runScenarioInNamespace
+  - 0eaf82f 2026-01-22T16:22:23+01:00 test/e2e: don't use hardcoded namespace naem
+  - ae57c8f 2026-01-19T19:23:10+01:00 test/e2e: migrate tests to new style
+  - 24eff15 2026-01-19T17:48:15+01:00 vendor: bump
+  - 65152b8 2026-01-12T17:39:22+01:00 *: cut v0.20.2 release
+  - 62b9ee2 2026-01-12T17:39:15+01:00 go*: update dependencies
+  - d56a26b 2025-12-02T09:54:28+01:00 e2e: use the new config action for tokenmasking tests
+  - 4771ac6 2025-12-02T09:54:28+01:00 e2e: use the new config action for flags tests
+  - 9996c46 2025-12-02T09:54:27+01:00 e2e: wait after each test for proxy pods to be gone
+  - 4cf2212 2025-12-02T09:54:27+01:00 e2e: add helper functions
+  - 3f7c5bd 2025-12-02T09:54:27+01:00 e2e: use the new config action for h2c tests
+  - af1f283 2025-12-02T09:54:26+01:00 e2e: use the new config action for http2 tests
+  - 99bb640 2025-12-02T09:54:26+01:00 e2e: use the new config action for static-authz tests
+  - c7941a2 2025-12-02T09:54:26+01:00 e2e: use the new action for allow- and ignorepath tests
+  - 5362766 2025-12-02T09:54:26+01:00 e2e: use the new action for allowpath tests
+  - 4f0bdef 2025-12-02T09:54:25+01:00 e2e: use the new action for clientcerts tests
+  - 8878b47 2025-12-02T09:54:25+01:00 e2e: use the new action for tokenaudience tests
+  - 3bdf275 2025-12-02T09:54:25+01:00 showcase the config action on the basics test
+  - 88516e3 2025-12-02T09:54:24+01:00 Add an action for KRP config
+  - 0ae5ba9 2025-12-02T09:54:02+01:00 backport e2e test TLS setup changes
+  - b578851 2025-11-25T15:26:49+01:00 *: cut release v0.20.1
+  - f4cffa1 2025-11-25T15:26:49+01:00 go*: update dependencies
+  - 9ecbe68 2025-11-20T02:49:56+00:00 build(deps): bump golang.org/x/crypto from 0.42.0 to 0.45.0
+  - 8e021b7 2025-11-05T14:24:20+01:00 fix: bump go version to fix CVEs
+  - b09fd16 2025-09-25T16:39:04+02:00 .github/workflows: increase timer
+  - 8e93546 2025-09-25T16:39:04+02:00 .github/workflows: bump all deps, verify hashes
+  - 19508ff 2025-09-25T16:39:04+02:00 .github/workflows: don't hardcore action
+  - eb81d87 2025-09-25T16:39:04+02:00 .github/workflows: add versioned ubuntu, add timeouts
+  - c07016d 2025-09-25T16:39:04+02:00 .github/workflows: set go var version. go version set to stable ver
+  - 8350326 2025-09-25T16:39:04+02:00 Update outdated GitHub Actions
+  - 110d18b 2025-09-18T11:24:50+02:00 VERSION, *.md, examples: version number bump
+  - 570cf60 2025-09-18T11:24:49+02:00 go.*, .github/w/build.yml: bump dependencies
+  - 501c875 2025-08-20T16:07:04+02:00 fix: updating Go and packages to fix CVEs
+  - ae929f9 2025-07-06T23:42:08+02:00 fix ARGs in Dockerfile
 
