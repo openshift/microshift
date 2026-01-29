@@ -79,3 +79,45 @@ func TestNetwork_cniPluginIsValid(t *testing.T) {
 		})
 	}
 }
+
+func TestNetwork_ValidateGatewayInterface(t *testing.T) {
+	tests := []struct {
+		name             string
+		gatewayInterface string
+		wantErr          bool
+	}{
+		{
+			name:             "empty value is valid (no-uplink mode)",
+			gatewayInterface: "",
+			wantErr:          false,
+		},
+		{
+			name:             "auto is valid",
+			gatewayInterface: "auto",
+			wantErr:          false,
+		},
+		{
+			name:             "lo interface exists and is valid",
+			gatewayInterface: "lo",
+			wantErr:          false,
+		},
+		{
+			name:             "non-existent interface is invalid",
+			gatewayInterface: "nonexistent-iface-12345",
+			wantErr:          true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			n := Network{
+				GatewayInterface: tt.gatewayInterface,
+			}
+			err := n.ValidateGatewayInterface()
+			if tt.wantErr {
+				assert.Error(t, err, "ValidateGatewayInterface() should return error")
+			} else {
+				assert.NoError(t, err, "ValidateGatewayInterface() should not return error")
+			}
+		})
+	}
+}

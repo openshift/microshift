@@ -76,6 +76,13 @@ type Network struct {
 	// +kubebuilder:default="30000-32767"
 	ServiceNodePortRange string `json:"serviceNodePortRange"`
 
+	// GatewayInterface specifies the physical interface to use as the OVS gateway bridge (br-ex) uplink.
+	// When set, the interface's IP configuration is transferred to br-ex, enabling external network connectivity.
+	// When empty (default), br-ex is created with a static MAC address and no physical uplink.
+	// Use "auto" to auto-detect the default gateway interface.
+	// +kubebuilder:validation:Optional
+	GatewayInterface string `json:"gatewayInterface,omitempty"`
+
 	Multus Multus `json:"multus"`
 
 	// The DNS server to use
@@ -131,6 +138,21 @@ func (m Multus) IsEnabled() bool {
 func (m Multus) Validate() error {
 	if m.Status != MultusEnabled && m.Status != MultusDisabled {
 		return fmt.Errorf("invalid multus status: %v", m.Status)
+	}
+	return nil
+}
+
+// ValidateGatewayInterface checks that the gateway interface configuration is valid.
+// It returns nil if the interface is empty (no-uplink mode), "auto" (auto-detect), or
+// if the specified interface exists on the system.
+func (n Network) ValidateGatewayInterface() error {
+	if n.GatewayInterface == "" || n.GatewayInterface == "auto" {
+		return nil
+	}
+
+	_, err := net.InterfaceByName(n.GatewayInterface)
+	if err != nil {
+		return fmt.Errorf("gateway interface %q not found: %w", n.GatewayInterface, err)
 	}
 	return nil
 }

@@ -230,6 +230,10 @@ func (c *Config) incorporateUserSettings(u *Config) {
 		c.Network.Multus.Status = u.Network.Multus.Status
 	}
 
+	if u.Network.GatewayInterface != "" {
+		c.Network.GatewayInterface = u.Network.GatewayInterface
+	}
+
 	if u.Etcd.MemoryLimitMB != 0 {
 		c.Etcd.MemoryLimitMB = u.Etcd.MemoryLimitMB
 	}
@@ -673,6 +677,9 @@ func (c *Config) validate() error {
 	}
 	if err := c.Network.Multus.Validate(); err != nil {
 		return fmt.Errorf("error validating multus configuration: %v", err)
+	}
+	if err := c.Network.ValidateGatewayInterface(); err != nil {
+		return fmt.Errorf("error validating network.gatewayInterface: %v", err)
 	}
 	return nil
 }
