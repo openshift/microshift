@@ -92,7 +92,7 @@ update_build_cache() {
 run_image_build() {
     if [ -v CI_JOB_NAME ] ; then
         # Skip all image builds for release testing CI jobs because all the images are fetched from the cache.
-        if [[ "${CI_JOB_NAME}" =~ .*release.* ]]; then
+        if [[ "${CI_JOB_NAME}" =~ .*release(-arm)?$ ]]; then
             $(dry_run) bash -x ./bin/build_images.sh -X
             return
         fi
@@ -117,7 +117,7 @@ run_bootc_image_build() {
 
     if [ -v CI_JOB_NAME ] ; then
         # Skip all image builds for release testing CI jobs because all the images are fetched from the cache.
-        if [[ "${CI_JOB_NAME}" =~ .*release.* ]]; then
+        if [[ "${CI_JOB_NAME}" =~ .*release(-arm)?$ ]]; then
             $(dry_run) bash -x ./bin/build_bootc_images.sh -X
             return
         fi
