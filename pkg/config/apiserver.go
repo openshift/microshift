@@ -173,14 +173,6 @@ func (fg FeatureGates) GoString() string {
 	return fmt.Sprintf("FeatureGates{FeatureSet: %q, CustomNoUpgrade: %#v}", fg.FeatureSet, fg.CustomNoUpgrade)
 }
 
-// checkFeatureGateConflict checks if two sets of feature gates have any intersection and returns an error if they do.
-func checkFeatureGateConflict(a, b sets.Set[string], errorMsg string) error {
-	if intersect := a.Intersection(b); intersect.Len() > 0 {
-		return fmt.Errorf("%s: %s", errorMsg, intersect.UnsortedList())
-	}
-	return nil
-}
-
 // validateFeatureGates validates the FeatureGates struct according to the following rules:
 // 1. FeatureGates may be unset.
 // 2. FeatureSet must be empty or CustomNoUpgrade.
@@ -206,6 +198,14 @@ func (fg *FeatureGates) validateFeatureGates() error {
 
 	enabledCustom := sets.New(fg.CustomNoUpgrade.Enabled...)
 	disabledCustom := sets.New(fg.CustomNoUpgrade.Disabled...)
+
+	// checkFeatureGateConflict checks if two sets of feature gates have any intersection and returns an error if they do.
+	checkFeatureGateConflict := func(a, b sets.Set[string], errorMsg string) error {
+		if intersect := a.Intersection(b); intersect.Len() > 0 {
+			return fmt.Errorf("%s: %s", errorMsg, intersect.UnsortedList())
+		}
+		return nil
+	}
 
 	conflictChecks := []struct {
 		setA sets.Set[string]
