@@ -109,9 +109,9 @@ def set_rpm_version_info_vars():
     global PREVIOUS_RELEASE_VERSION
     global YMINUS2_RELEASE_REPO
     global YMINUS2_RELEASE_VERSION
-    global BREW_Y0_RELEASE_VERSION
-    global BREW_Y1_RELEASE_VERSION
-    global BREW_Y2_RELEASE_VERSION
+    global BREW_LATEST_ZSTREAM_VERSION
+    global BREW_YMINUS1_VERSION
+    global BREW_YMINUS2_VERSION
     global BREW_RC_RELEASE_VERSION
     global BREW_EC_RELEASE_VERSION
     global BREW_NIGHTLY_RELEASE_VERSION
@@ -121,9 +121,9 @@ def set_rpm_version_info_vars():
     PREVIOUS_RELEASE_VERSION = common.get_env_var('PREVIOUS_RELEASE_VERSION')
     YMINUS2_RELEASE_REPO = common.get_env_var('YMINUS2_RELEASE_REPO')
     YMINUS2_RELEASE_VERSION = common.get_env_var('YMINUS2_RELEASE_VERSION')
-    BREW_Y0_RELEASE_VERSION = common.get_env_var('BREW_Y0_RELEASE_VERSION')
-    BREW_Y1_RELEASE_VERSION = common.get_env_var('BREW_Y1_RELEASE_VERSION')
-    BREW_Y2_RELEASE_VERSION = common.get_env_var('BREW_Y2_RELEASE_VERSION')
+    BREW_LATEST_ZSTREAM_VERSION = common.get_env_var('BREW_LATEST_ZSTREAM_VERSION')
+    BREW_YMINUS1_VERSION = common.get_env_var('BREW_YMINUS1_VERSION')
+    BREW_YMINUS2_VERSION = common.get_env_var('BREW_YMINUS2_VERSION')
     BREW_RC_RELEASE_VERSION = common.get_env_var('BREW_RC_RELEASE_VERSION')
     BREW_EC_RELEASE_VERSION = common.get_env_var('BREW_EC_RELEASE_VERSION')
     BREW_NIGHTLY_RELEASE_VERSION = common.get_env_var('BREW_NIGHTLY_RELEASE_VERSION')
@@ -623,12 +623,12 @@ def main():
             extract_container_images(PREVIOUS_RELEASE_VERSION, PREVIOUS_RELEASE_REPO, CONTAINER_LIST, args.dry_run)
             extract_container_images(YMINUS2_RELEASE_VERSION, YMINUS2_RELEASE_REPO, CONTAINER_LIST, args.dry_run)
             # The following images are specific to the brew release versions
-            if BREW_Y0_RELEASE_VERSION:
-                extract_container_images(BREW_Y0_RELEASE_VERSION, BREW_REPO, CONTAINER_LIST, args.dry_run)
-            if BREW_Y1_RELEASE_VERSION:
-                extract_container_images(BREW_Y1_RELEASE_VERSION, BREW_REPO, CONTAINER_LIST, args.dry_run)
-            if BREW_Y2_RELEASE_VERSION:
-                extract_container_images(BREW_Y2_RELEASE_VERSION, BREW_REPO, CONTAINER_LIST, args.dry_run)
+            if BREW_LATEST_ZSTREAM_VERSION:
+                extract_container_images(BREW_LATEST_ZSTREAM_VERSION, BREW_REPO, CONTAINER_LIST, args.dry_run)
+            if BREW_YMINUS1_VERSION:
+                extract_container_images(BREW_YMINUS1_VERSION, BREW_REPO, CONTAINER_LIST, args.dry_run)
+            if BREW_YMINUS2_VERSION:
+                extract_container_images(BREW_YMINUS2_VERSION, BREW_REPO, CONTAINER_LIST, args.dry_run)
             if BREW_RC_RELEASE_VERSION:
                 extract_container_images(BREW_RC_RELEASE_VERSION, BREW_REPO, CONTAINER_LIST, args.dry_run)
             if BREW_EC_RELEASE_VERSION:

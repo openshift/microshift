@@ -1,4 +1,4 @@
-# {{- if env.Getenv "BREW_YMINUS2_VERSION" "" -}}
+# {{- if env.Getenv "BREW_PREV_ZSTREAM_VERSION" "" -}}
 # Note: This comment makes templating add a new line before the code
 FROM localhost/rhel96-test-agent:latest
 
@@ -10,7 +10,7 @@ ARG USHIFT_RPM_REPO_PATH=/tmp/$USHIFT_RPM_REPO_NAME
 COPY ./rpm-repos/$USHIFT_RPM_REPO_NAME $USHIFT_RPM_REPO_PATH
 
 # Copy repository configuration
-COPY ./bootc-images/$USHIFT_RPM_REPO_NAME.repo ./bootc-images/microshift-fast-datapath-rhel9.repo ./bootc-images/microshift-rhocp-y2.repo \
+COPY ./bootc-images/$USHIFT_RPM_REPO_NAME.repo ./bootc-images/microshift-fast-datapath-rhel9.repo ./bootc-images/microshift-rhocp-y1.repo \
     /etc/yum.repos.d/
 
 # Print repository configuration contents.
@@ -18,14 +18,14 @@ COPY ./bootc-images/$USHIFT_RPM_REPO_NAME.repo ./bootc-images/microshift-fast-da
 RUN dnf repoinfo --enabled && \
     dnf install -y firewalld systemd-resolved \
         {{ range (env.Getenv "MICROSHIFT_MANDATORY_RPMS" | strings.Split " ") -}}
-        "{{ . }}-{{ env.Getenv "BREW_YMINUS2_VERSION" }}" \
+        "{{ . }}-{{ env.Getenv "BREW_PREV_ZSTREAM_VERSION" }}" \
         {{ end -}}
-        {{ range (env.Getenv "MICROSHIFT_Y2_OPTIONAL_RPMS" | strings.Split " ") -}}
-        "{{ . }}-{{ env.Getenv "BREW_YMINUS2_VERSION" }}" \
+        {{ range (env.Getenv "MICROSHIFT_PREV_ZSTREAM_OPTIONAL_RPMS" | strings.Split " ") -}}
+        "{{ . }}-{{ env.Getenv "BREW_PREV_ZSTREAM_VERSION" }}" \
         {{ end -}}
         {{ if and (env.Getenv "UNAME_M" "") (eq "x86_64" .Env.UNAME_M) -}}
-        {{ range (env.Getenv "MICROSHIFT_Y2_X86_64_RPMS" | strings.Split " ") -}}
-        "{{ . }}-{{ env.Getenv "BREW_YMINUS2_VERSION" }}" \
+        {{ range (env.Getenv "MICROSHIFT_PREV_ZSTREAM_X86_64_RPMS" | strings.Split " ") -}}
+        "{{ . }}-{{ env.Getenv "BREW_PREV_ZSTREAM_VERSION" }}" \
         {{ end -}}
         {{ end -}}
         && \

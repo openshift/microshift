@@ -121,12 +121,12 @@ download_brew_rpms() {
         rm -rf "${BREW_RPM_SOURCE}"
         # Run the download procedure
         bash -x "${SCRIPTDIR}/../../scripts/fetch_tools.sh" brew
-        bash -x "${SCRIPTDIR}/manage_brew_rpms.sh" download "4.${MINOR_VERSION}" "${BREW_RPM_SOURCE}" "zstream" || true
-        bash -x "${SCRIPTDIR}/manage_brew_rpms.sh" download "4.${PREVIOUS_MINOR_VERSION}" "${BREW_RPM_SOURCE}" "zstream" || true
-        bash -x "${SCRIPTDIR}/manage_brew_rpms.sh" download "4.${YMINUS2_MINOR_VERSION}" "${BREW_RPM_SOURCE}" "zstream" || true
-        bash -x "${SCRIPTDIR}/manage_brew_rpms.sh" download "4.${MINOR_VERSION}" "${BREW_RPM_SOURCE}" "rc" || true
-        bash -x "${SCRIPTDIR}/manage_brew_rpms.sh" download "4.${MINOR_VERSION}" "${BREW_RPM_SOURCE}" "ec" || true
-        bash -x "${SCRIPTDIR}/manage_brew_rpms.sh" download "4.${MINOR_VERSION}" "${BREW_RPM_SOURCE}" "nightly" || true
+        bash -x "${SCRIPTDIR}/manage_brew_rpms.sh" download "4.${MINOR_VERSION}" "${BREW_RPM_SOURCE}" "rc" || echo "WARNING: Failed to download RC RPMs for 4.${MINOR_VERSION}"
+        bash -x "${SCRIPTDIR}/manage_brew_rpms.sh" download "4.${MINOR_VERSION}" "${BREW_RPM_SOURCE}" "ec" || echo "WARNING: Failed to download EC RPMs for 4.${MINOR_VERSION}"
+        bash -x "${SCRIPTDIR}/manage_brew_rpms.sh" download "4.${MINOR_VERSION}" "${BREW_RPM_SOURCE}" "zstream" || echo "WARNING: Failed to download zstream RPMs for 4.${MINOR_VERSION}"
+        bash -x "${SCRIPTDIR}/manage_brew_rpms.sh" download "4.${MINOR_VERSION}" "${BREW_RPM_SOURCE}" "nightly" || echo "WARNING: Failed to download nightly RPMs for 4.${MINOR_VERSION}"
+        bash -x "${SCRIPTDIR}/manage_brew_rpms.sh" download "4.${PREVIOUS_MINOR_VERSION}" "${BREW_RPM_SOURCE}" "zstream" || echo "WARNING: Failed to download zstream RPMs for 4.${PREVIOUS_MINOR_VERSION}"
+        bash -x "${SCRIPTDIR}/manage_brew_rpms.sh" download "4.${YMINUS2_MINOR_VERSION}" "${BREW_RPM_SOURCE}" "zstream" || ( echo "WARNING: Failed to download zstream RPMs for 4.${YMINUS2_MINOR_VERSION}" && return 1 )
     else
         echo "WARNING: The Brew Hub site is not accessible, skipping the download"
     fi
