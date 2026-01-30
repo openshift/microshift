@@ -1,4 +1,33 @@
-- kube-rbac-proxy image-arm64 cd636680e06a55395c26570dff0cb37277014388 to c7ab76fd6fdf651d5022db8946c35b158ecc2396
+- api embedded-component 606bd613f9f7b6965f1d087b2fce8227aa49ceca to c16ec2bcf089999a012322dbf889c632729dc80d
+  - 1ac2624e 2026-01-27T10:48:45+00:00 Remove AlibabaPlatform FeatureGate
+  - 84fc67a4 2026-01-22T16:05:29+01:00 Re-enable NewOLMBoxcutterRuntime featuregate in TPNU
+
+- cluster-ingress-operator embedded-component ea67a8ce10072efe06ab180fce8c9fef58e5b997 to eeb7347184177d0f0855632bad82398089547e87
+  - 0c08ea1 2026-01-26T17:23:34-03:00 Add additional validation to AWS managed zone
+  - 411aa23 2026-01-26T17:23:34-03:00 Address review comments on on-prem test
+  - ce0f80d 2026-01-26T17:23:33-03:00 NE-2395: Fix e2e tests to work on platforms with unmanaged DNS
+  - cbd2ce5 2026-01-21T17:47:05-05:00 Ensure canary cert matches the default ingress controller's cert
+  - 060687e 2026-01-05T16:40:00+08:00 Add e2e test for Gateway API infrastructure annotations
+
+- cluster-kube-apiserver-operator embedded-component e99b43d8a1b9139933aa0f6e71fc7f8397d29b58 to 064809665fd54e4c15d3b0c2f6da9fadce715c34
+  - 549921f 2026-01-23T20:22:03+05:30 Migrating user_cors_test to OTE
+
+- machine-config-operator embedded-component 2607eb0c541524fa7b95c7697c2dc50baffbbd07 to 1881dab7389ab49e3fbb2eaee17ea74b4f84b2ad
+  - 4dbab5a9 2026-01-27T10:38:05-05:00 test/extended-priv: account for skew API
+  - 3922850f 2026-01-26T09:19:27+00:00 MCO-2059: migrate machineconfignodes from private repo
+  - 708b5213 2026-01-23T11:20:41-05:00 install: delete stale operator metrics resources
+  - 493dd78b 2026-01-21T15:15:12-05:00 tests: update MCN condition transition test to account for quick transitions through 'Unknown' state
+  - b03faf5e 2026-01-20T10:36:51-05:00 helpers: Compute systemdUnits that added and changed between Ign configs update: Only write added or updated systemd units on_disk_validation: Check if systemd units in config enabled correctly
+
+- operator-framework-olm embedded-component 34bb15d6590b8803c5e6390e75d68f6c075d6c97 to 526cde8d70dc640972eab717f80b42b66e8dff15
+  - d324e914 2026-01-27T00:05:56+00:00 fix: create separate config client to resolve APIServer TLS update conflicts (#3753)
+  - 0713d54c 2026-01-27T00:04:44+00:00 Hard-code version upgrade message for 4.22 upgrade paths (#3748)
+  - 17d7bc7f 2026-01-26T11:08:37-05:00 Integrate APIServer TLS controller into PSM
+
+- route-controller-manager embedded-component 3b4cc7b25c3c340b6708b7f0c1deafe38ef8a942 to 2b9e93a5f0fc1e93090bbe34ce95f3b4ad5cff15
+  - 68aba6a 2026-01-26T10:31:47-03:00 filter ingress namespace on UnmanagedRoutes metric
+
+- kube-rbac-proxy image-amd64 cd636680e06a55395c26570dff0cb37277014388 to c7ab76fd6fdf651d5022db8946c35b158ecc2396
   - d9ad6ac 2026-01-22T16:22:25+01:00 go.mod: downgrade to go 1.24.11 for CI compatibility
   - 5df54c0 2026-01-22T16:22:24+01:00 test/e2e: try to drop the runScenarioInNamespace
   - 0eaf82f 2026-01-22T16:22:23+01:00 test/e2e: don't use hardcoded namespace naem
@@ -34,4 +63,8 @@
   - 570cf60 2025-09-18T11:24:49+02:00 go.*, .github/w/build.yml: bump dependencies
   - 501c875 2025-08-20T16:07:04+02:00 fix: updating Go and packages to fix CVEs
   - ae929f9 2025-07-06T23:42:08+02:00 fix ARGs in Dockerfile
+
+- kubernetes image-arm64 e4a4167c40c9ed543c5a80f2e08cc73696f7a4f6 to 0a955ccf26bb6091b9053309eb0ce0b2992fed70
+  - 5579c3340 2026-01-16T14:19:18-05:00 UPSTREAM: <carry>: Added validation to check if OKD featureset is being enabled on OKD clusters
+  - 8504fe0c7 2026-01-13T14:38:55-05:00 UPSTREAM: <drop>: Vendored API repo
 
