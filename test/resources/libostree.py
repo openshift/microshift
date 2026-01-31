@@ -138,6 +138,14 @@ def get_current_boot_id() -> str:
     return boot_id.replace("-", "")
 
 
+def get_last_reboots_count() -> int:
+    """
+    Get number of system reboots using 'last reboot' command
+    """
+    stdout = remote_sudo("last reboot | grep -c '^reboot'")
+    return int(stdout)
+
+
 def does_backup_exist(deploy_id: str, boot_id: str = "") -> bool:
     prefix = get_deployment_backup_prefix_path(deploy_id)
 
