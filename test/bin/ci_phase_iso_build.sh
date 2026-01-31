@@ -91,6 +91,12 @@ update_build_cache() {
 # - Only build the 'periodic' layer when 'CI_JOB_NAME' contains 'periodic' token.
 run_image_build() {
     if [ -v CI_JOB_NAME ] ; then
+        # Skip all image builds for release testing CI jobs because all the images are fetched from the cache.
+        if [[ "${CI_JOB_NAME}" =~ .*release(-arm)?$ ]]; then
+            $(dry_run) bash -x ./bin/build_images.sh -X
+            return
+        fi
+
         # Conditional per-layer builds when running in CI.
         # The build_images.sh script skips any images that have been downloaded from the cache.
         $(dry_run) bash -x ./bin/build_images.sh -l ./image-blueprints/layer1-base
@@ -98,9 +104,6 @@ run_image_build() {
 
         if [[ "${CI_JOB_NAME}" =~ .*periodic.* ]]; then
             $(dry_run) bash -x ./bin/build_images.sh -l ./image-blueprints/layer3-periodic
-        fi
-        if [[ "${CI_JOB_NAME}" =~ .*release.* ]]; then
-            $(dry_run) bash -x ./bin/build_images.sh -l ./image-blueprints/layer4-release
         fi
     else
         # Fall back to full build when not running in CI
@@ -113,14 +116,20 @@ run_bootc_image_build() {
     make -C "${ROOTDIR}" verify-containers
 
     if [ -v CI_JOB_NAME ] ; then
+        # Skip all image builds for release testing CI jobs because all the images are fetched from the cache.
+        if [[ "${CI_JOB_NAME}" =~ .*release(-arm)?$ ]]; then
+            $(dry_run) bash -x ./bin/build_bootc_images.sh -X
+            return
+        fi
+
         $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/layer1-base
         $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/layer2-presubmit
 
         if [[ "${CI_JOB_NAME}" =~ .*periodic.* ]]; then
             $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/layer3-periodic
         fi
-        if [[ "${CI_JOB_NAME}" =~ .*release.* ]]; then
-            $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/layer5-release
+        if [[ "${CI_JOB_NAME}" =~ .*upstream.* ]]; then
+            $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/layer4-upstream
         fi
     else
         $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/layer1-base
