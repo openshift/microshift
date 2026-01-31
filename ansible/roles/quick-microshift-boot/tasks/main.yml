@@ -3,7 +3,3 @@
 
 - name: measure microshift service boot time
   include_tasks: roles/common/tasks/boot.yml
-  vars:
-    boot_output_filename: "{{ boot_output_filename }}"
-    cleanup_microshift: "{{ cleanup_microshift }}"
-    reboot: "{{ reboot }}"
