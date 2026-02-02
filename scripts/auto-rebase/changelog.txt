@@ -1,3 +1,7 @@
-- ovn-kubernetes image-arm64 fc112155baeb6423e0b9969e08bb1160d736f43f to a7f14dd8b75e92fff6fcac2093641e0d1d4b6c48
+- cluster-network-operator embedded-component 1bec7869b6a707b34a4c717b242f118fc1ff8e5c to 5054141c25a5f77788345ca4f0146ab684c21c4e
+  - 20180b8 2026-01-23T11:46:26+01:00 fix typo in release annotation for whereabouts-token-watcher ds
+  - ef7a1bb 2025-08-11T15:33:48+00:00 Update CNO reviwers/approvers
+
+- ovn-kubernetes image-amd64 fc112155baeb6423e0b9969e08bb1160d736f43f to a7f14dd8b75e92fff6fcac2093641e0d1d4b6c48
   - 3b6ba1c9 2026-01-21T22:11:00+08:00 Fix conntrack reconciliation to use service port instead of endpoint port
 
