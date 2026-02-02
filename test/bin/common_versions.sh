@@ -68,6 +68,46 @@ get_vrel_from_rpm() {
     echo ""
 }
 
+get_redhat_bootc_image_url() {
+    local -r registry="$1"
+    local -r release_version="$2"
+    local image_url=""
+
+    # get arch
+    local arch=""
+    if [[ "${UNAME_M}" =~ x86 ]]; then
+        arch="amd64"
+    elif [[ "${UNAME_M}" =~ aarch ]]; then
+        arch="arm64"
+    fi
+
+    sha_id=$(skopeo inspect --raw "docker://${registry}/openshift4/microshift-bootc-rhel9:v${release_version}" | \
+        jq -r ".manifests[] | select(.platform.architecture==\"${arch}\") | .digest" 2>/dev/null)
+    if [[ "${sha_id}" =~ ^sha256:[0-9a-f]{64}$ ]]; then
+        image_url="${registry}/openshift4/microshift-bootc-rhel9@${sha_id}"
+    fi
+    echo "${image_url}"
+}
+
+get_lrel_release_image_url() {
+    local -r release_version="$1" # examples: 4.21.0-ec.3, 4.21.0-rc.3 and 4.21.0
+    local image_url=""
+
+    if [[ "${release_version}" =~ -ec\. ]]; then
+        image_url="$(curl -s "https://mirror.openshift.com/pub/openshift-v4/${UNAME_M}/microshift/ocp-dev-preview/${release_version}/el9/bootc-pullspec.txt")"
+    elif [[ "${release_version}" =~ -rc\. ]]; then
+        image_url="$(curl -s "https://mirror.openshift.com/pub/openshift-v4/${UNAME_M}/microshift/ocp/${release_version}/el9/bootc-pullspec.txt")"
+    elif [[ "${release_version}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+        for registry in "registry.redhat.io" "registry.stage.redhat.io"; do
+            image_url="$(get_redhat_bootc_image_url "${registry}" "${release_version}")"
+            if [ -n "${image_url}" ]; then
+                break
+            fi
+        done
+    fi
+    echo "${image_url}"
+}
+
 # The current release minor version (e.g. '17' for '4.17') affects
 # the definition of previous and fake next versions.
 export MINOR_VERSION=22
@@ -165,8 +205,12 @@ elif [ -n "${BREW_EC_RELEASE_VERSION}" ]; then
 else
     BREW_LREL_RELEASE_VERSION="${BREW_NIGHTLY_RELEASE_VERSION}"
 fi
-
 export BREW_LREL_RELEASE_VERSION
+
+# Set the latest release image URL
+LATEST_RELEASE_VERSION="$(echo "${BREW_LREL_RELEASE_VERSION}" | sed -E 's/(.*)-.*/\1/' | sed -E 's/(.*)~(.*)/\1-\2/')" # examples: 4.21.0 or 4.21.0-rc.3
+LATEST_RELEASE_IMAGE_URL="$(get_lrel_release_image_url "${LATEST_RELEASE_VERSION}")"
+export LATEST_RELEASE_IMAGE_URL
 
 # Branch and commit for the openshift-tests-private repository
 OPENSHIFT_TESTS_PRIVATE_REPO_BRANCH="release-4.${MINOR_VERSION}"
