@@ -127,7 +127,7 @@ func TestIsCustomFeatureGatesConfigured(t *testing.T) {
 			err := configValidationChecksPass(featureGateLockFile{
 				FeatureSet:      tt.fg.FeatureSet,
 				CustomNoUpgrade: tt.fg.CustomNoUpgrade,
-			}, tt.fg)
+			}, &tt.fg)
 			if err != nil {
 				t.Errorf("featureValidationsPass() error = %v", err)
 			}
@@ -242,7 +242,7 @@ func TestConfigValidationChecksPass(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := configValidationChecksPass(tt.lockFile, tt.current)
+			err := configValidationChecksPass(tt.lockFile, &tt.current)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("configValidationChecksPass() error = %v, wantErr %v", err, tt.wantErr)
 			}
