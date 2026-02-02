@@ -1,3 +1,16 @@
-- ovn-kubernetes image-arm64 25a714b82c643bcfdf5543cb467afa32dac06787 to 190e114128b9f358d1d6a700c464797d4c3e36af
+- cluster-kube-apiserver-operator embedded-component 528174d2e1769670fea521f09bb97f0390ca4abd to 41d526c4367b210b9868fe025d0a50e55f30ac64
+  - 3f41472 2026-01-12T10:52:24-05:00 bump(library-go)
+
+- cluster-kube-scheduler-operator embedded-component 4f59ea50a588e9afa714e30e7502eca8b570751b to 7809937c07c5dbfa272bfbe87d99e09104bf3fc9
+  - 8bd16f4 2026-01-27T09:56:12+00:00 pkg/operator: Fix wrong ClusterOperator name
+  - 10f29bf 2026-01-22T10:39:44+01:00 Add OPERATOR_IMAGE_VERSION to recovery container
+
+- machine-config-operator embedded-component 4862395f521be4a54436be13b0dd745d94abb4c1 to a3c57fb568ba9201394624595e88c3ba6a5bd165
+  - 338c8554 2026-01-27T19:40:49+00:00 install: delete stale operator metrics resources
+  - c42f4e9d 2026-01-26T15:47:39-06:00 bumped go minor version for cve-2025-58183
+  - 9c557ffd 2026-01-19T17:32:48+00:00 e2e-bootstrap: reconcile CRD updates
+  - aaaef7ee 2026-01-15T02:05:50+00:00 daemon: update 'SetDegrade' flow to include updating the degrade condition in the MCN
+
+- ovn-kubernetes image-amd64 25a714b82c643bcfdf5543cb467afa32dac06787 to 190e114128b9f358d1d6a700c464797d4c3e36af
   - 440dab6f 2026-01-21T13:55:39+01:00 fix(localnet, ipamless): Prevent LSP deletion on sync
 
