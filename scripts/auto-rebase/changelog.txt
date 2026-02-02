@@ -1,4 +1,6 @@
-- machine-config-operator embedded-component 4593e456f3b51f4c6c458c00752e38f2687baedc to 035a7f3c16e820ed0461b25ba82c263131ff6c3d
-  - 0bb00dbe 2026-01-26T17:35:51-05:00 e2e-bootstrap: reconcile CRD updates
-  - f249bea5 2026-01-26T12:49:27-08:00 pkg/controller/container-runtime-config: admin_ack handling for 4.20-to-4.21 OCI mirror requirement
+- cluster-kube-scheduler-operator embedded-component 58cbd296eecc61c0871739588ae65af9c05e87a6 to ad21ef032211c5455a3ba48c7147b27558204658
+  - 9d8b243 2025-11-03T15:49:42+00:00 Update ks_pod_scenario_3.yaml
+  - c02d20d 2025-11-03T15:49:42+00:00 Update ks_pod_scenario_2.yaml
+  - a463bd6 2025-11-03T15:49:42+00:00 Update ks_pod_scenario_1.yaml
+  - 19754fe 2025-11-03T15:49:42+00:00 Add priority field to prevent early shutdown
 
