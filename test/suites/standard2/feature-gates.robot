@@ -1,5 +1,6 @@
 *** Settings ***
-Documentation       Tests for feature gate configuration
+Documentation       Verify that that MicroShift feature gate configuration is correctly integrated into the kube-apiserver.
+...                 Validation testing is handled by prerun unit tests and is not included here.
 
 Resource            ../../resources/common.resource
 Resource            ../../resources/microshift-config.resource
@@ -23,13 +24,6 @@ ${CUSTOM_FEATURE_GATES}         SEPARATOR=\n
 ...                             \ \ \ \ \ \ \ \ - TestFeatureEnabled
 ...                             \ \ \ \ \ \ disabled:
 ...                             \ \ \ \ \ \ \ \ - TestFeatureDisabled
-${DIFFERENT_FEATURE_GATES}      SEPARATOR=\n
-...                             apiServer:
-...                             \ \ featureGates:
-...                             \ \ \ \ featureSet: CustomNoUpgrade
-...                             \ \ \ \ customNoUpgrade:
-...                             \ \ \ \ \ \ enabled:
-...                             \ \ \ \ \ \ \ \ - DifferentTestFeature
 ${FEATURE_GATE_LOCK_FILE}       /var/lib/microshift/no-upgrade
 
 
@@ -48,20 +42,6 @@ Custom Feature Gates Are Passed To Kube APIServer
     Wait Until Keyword Succeeds    2 min    5 sec
     ...    Feature Gate Lock File Should Exist
     Feature Gate Lock File Should Contain Feature Gates    CustomNoUpgrade    TestFeatureEnabled
-    [Teardown]    Teardown Custom Feature Gates Test
-
-Feature Gate Config Change Blocked After Lock Created
-    [Documentation]    Verify that changing feature gate config is blocked after lock file exists.
-    ...    MicroShift must refuse to start if feature gates change after CustomNoUpgrade is set.
-    [Setup]    Setup Custom Feature Gates Test
-    Stop MicroShift
-    Drop In MicroShift Config    ${DIFFERENT_FEATURE_GATES}    10-featuregates
-    Save Journal Cursor
-    MicroShift Should Fail To Start
-    Pattern Should Appear In Log Output    ${CURSOR}    feature gate configuration has changed
-    # Restore original config and verify that MicroShift starts
-    Drop In MicroShift Config    ${CUSTOM_FEATURE_GATES}    10-featuregates
-    Start MicroShift
     [Teardown]    Teardown Custom Feature Gates Test
 
 Feature Gate Lock File Persists Across Restarts With Same Config
@@ -123,13 +103,3 @@ Feature Gate Lock File Should Contain Feature Gates
     ${contents}=    Command Should Work    cat ${FEATURE_GATE_LOCK_FILE}
     Should Contain    ${contents}    ${feature_set}
     Should Contain    ${contents}    ${feature_name}
-
-MicroShift Should Fail To Start
-    [Documentation]    Verify that MicroShift fails to start and returns a non-zero exit code.
-    ...    This keyword is unique and differs from a composite keyword like
-    ...    Run Keyword And Expect Error    1 != 0    Start MicroShift
-    ...    because there is no need to poll the service for an "active" state, which Start MicroShift does.
-    ${stdout}    ${stderr}    ${rc}=    Execute Command    sudo systemctl start microshift.service
-    ...    sudo=True    return_stdout=True    return_stderr=True    return_rc=True
-    Log Many    ${stdout}    ${stderr}    ${rc}
-    Should Be Equal As Integers    1    ${rc}
