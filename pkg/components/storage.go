@@ -303,7 +303,7 @@ func copyUserCfg(userCfg string, runtimeCfg string, onFail context.CancelCauseFu
 		return
 	}
 
-	runtimeCfgFile, err := os.OpenFile(runtimeCfg, os.O_RDWR|os.O_CREATE, 0644)
+	runtimeCfgFile, err := os.OpenFile(runtimeCfg, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0644)
 	if err != nil {
 		onFail(fmt.Errorf("unable to open lvmd runtime config file %q: %w", runtimeCfg, err))
 		return
