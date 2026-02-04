@@ -130,19 +130,20 @@ func configValidationChecksPass(prev featureGateLockFile, fgCfg *config.FeatureG
 
 func upgradeChecksPass(lockFile featureGateLockFile, fgCfg *config.FeatureGates) error {
 	currentExecutableVersion, err := getExecutableVersion()
+	lockedVersion := lockFile.Version
 	if err != nil {
 		return fmt.Errorf("failed to get current executable version: %w", err)
 	}
-	featureGatesNoExemptionsEnabled := sets.New[string]()
-	featureGatesNoExemptionsDisabled := sets.New[string]()
-	if lockFile.Version.Major != currentExecutableVersion.Major || lockFile.Version.Minor != currentExecutableVersion.Minor {
-		customFgEnabled := sets.New(fgCfg.CustomNoUpgrade.Enabled...)
-		customFgDisabled := sets.New(fgCfg.CustomNoUpgrade.Disabled...)
-		specialHandlingFgEnabled := sets.New(fgCfg.SpecialHandlingSupportExceptionRequired.Enabled...)
-		specialHandlingFgDisabled := sets.New(fgCfg.SpecialHandlingSupportExceptionRequired.Disabled...)
 
-		featureGatesNoExemptionsEnabled.Insert(customFgEnabled.Difference(specialHandlingFgEnabled).UnsortedList()...)
-		featureGatesNoExemptionsDisabled.Insert(customFgDisabled.Difference(specialHandlingFgDisabled).UnsortedList()...)
+	if lockedVersion.Major != currentExecutableVersion.Major || lockedVersion.Minor != currentExecutableVersion.Minor {
+		extractFeatureGatesWithoutExemptions := func(lhs []string, rhs []string) []string {
+			lhsSet := sets.New(lhs...)
+			rhsSet := sets.New(rhs...)
+			return lhsSet.Difference(rhsSet).UnsortedList()
+		}
+
+		featureGatesNoExemptionsEnabled := extractFeatureGatesWithoutExemptions(fgCfg.CustomNoUpgrade.Enabled, fgCfg.SpecialHandlingSupportExceptionRequired.Enabled)
+		featureGatesNoExemptionsDisabled := extractFeatureGatesWithoutExemptions(fgCfg.CustomNoUpgrade.Disabled, fgCfg.SpecialHandlingSupportExceptionRequired.Disabled)
 
 		return fmt.Errorf("version upgrade detected with custom feature gates: locked version %s, current version %s\n\n"+
 			"Upgrades are not supported when custom feature gates are configured.\n"+
@@ -154,9 +155,9 @@ func upgradeChecksPass(lockFile featureGateLockFile, fgCfg *config.FeatureGates)
 			"2. Run: sudo microshift-cleanup-data --all\n"+
 			"3. Remove custom feature gates from /etc/microshift/config.yaml\n"+
 			"4. Restart MicroShift: sudo systemctl restart microshift",
-			lockFile.Version.String(), currentExecutableVersion.String(),
-			lockFile.Version.String(), featureGatesNoExemptionsEnabled.UnsortedList(),
-			featureGatesNoExemptionsDisabled.UnsortedList(), lockFile.Version.String())
+			lockedVersion.String(), currentExecutableVersion.String(),
+			lockedVersion.String(), featureGatesNoExemptionsEnabled,
+			featureGatesNoExemptionsDisabled, lockedVersion.String())
 	}
 	return nil
 }

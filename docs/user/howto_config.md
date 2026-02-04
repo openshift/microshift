@@ -19,6 +19,9 @@ apiServer:
             disabled: []
             enabled: []
         featureSet: ""
+        specialHandlingSupportExceptionRequired:
+            disabled: []
+            enabled: []
     namedCertificates:
         - certPath: ""
           keyPath: ""
@@ -168,6 +171,9 @@ apiServer:
             disabled: []
             enabled: []
         featureSet: ""
+        specialHandlingSupportExceptionRequired:
+            disabled: []
+            enabled: []
     namedCertificates:
         - certPath: ""
           keyPath: ""
