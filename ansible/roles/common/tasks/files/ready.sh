@@ -53,8 +53,27 @@ sudo systemctl start microshift.service
 SYSTEMD_BLAME=$(systemd-analyze blame | grep microshift.service)
 echo "${SYSTEMD_BLAME}" | awk '{print $2 ": " $1}' | sed 's/s$/ seconds/'
 
-# Loop until the kubeconfig exists
+# Loop until the kubeconfig exists, checking service health
 while ! sudo [ -e "${KUBECONFIG}" ]; do
+  # Check if service has failed
+  if systemctl is-failed --quiet microshift.service; then
+    echo "ERROR: microshift.service failed to start"
+    echo "Service status:"
+    systemctl status microshift.service --no-pager
+    echo ""
+    echo "Recent journal logs:"
+    journalctl -u microshift.service --no-pager -n 50
+    exit 1
+  fi
+
+  # Check for timeout
+  elapsed=$(( $(date +%s) - START_TIME ))
+  if [[ ${elapsed} -gt ${TIMEOUT} ]]; then
+    echo "ERROR: Timed out after ${elapsed}s waiting for kubeconfig"
+    systemctl status microshift.service --no-pager
+    exit 1
+  fi
+
   sleep 1
 done
 
