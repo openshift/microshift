@@ -68,7 +68,7 @@ update_build_cache() {
     $(dry_run) bash -x ./bin/build_images.sh -l ./image-blueprints/layer4-release
     # Build the bootc base layer and brew RPMs to be cached
     $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/layer1-base
-    $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/layer5-release
+    $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/layer4-release
 
     # Prepare for the cache upload by stopping composer services and cleaning
     # temporary artifacts
@@ -135,7 +135,7 @@ run_bootc_image_build() {
         $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/layer1-base
         $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/layer2-presubmit
         $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/layer3-periodic
-        $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/layer5-release
+        $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/layer4-release
     fi
 }
 
