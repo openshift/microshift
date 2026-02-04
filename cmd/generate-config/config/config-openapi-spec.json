@@ -64,10 +64,12 @@
           "type": "object",
           "required": [
             "customNoUpgrade",
-            "featureSet"
+            "featureSet",
+            "specialHandlingSupportExceptionRequired"
           ],
           "properties": {
             "customNoUpgrade": {
+              "description": "CustomNoUpgrade is used to enable/disable feature gates. When the enabled or disable lists are not empty, x- and y-stream upgrades will be blocked.\nUse this field exclusively for custom feature gates, unless you are certain that the feature gate is a SpecialHandlingSupportExceptionRequired feature.",
               "type": "object",
               "required": [
                 "disabled",
@@ -90,6 +92,28 @@
             },
             "featureSet": {
               "type": "string"
+            },
+            "specialHandlingSupportExceptionRequired": {
+              "description": "SpecialHandlingSupportExceptionRequired is used to enable/disable feature gates without blocking x- and y-stream upgrades.\nA SpecialHandlingSupportExceptionRequired feature will be given precedence over the same feature (if set) in CustomNoUpgrade features.",
+              "type": "object",
+              "required": [
+                "disabled",
+                "enabled"
+              ],
+              "properties": {
+                "disabled": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "enabled": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
             }
           }
         },

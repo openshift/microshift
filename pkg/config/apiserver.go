@@ -170,8 +170,6 @@ func (fg FeatureGates) ToApiserverArgs() ([]string, error) {
 
 	addFeatures(fg.CustomNoUpgrade.Enabled, true)
 	addFeatures(fg.CustomNoUpgrade.Disabled, false)
-	addFeatures(fg.SpecialHandlingSupportExceptionRequired.Enabled, true)
-	addFeatures(fg.SpecialHandlingSupportExceptionRequired.Disabled, false)
 	return ret.List(), nil
 }
 
