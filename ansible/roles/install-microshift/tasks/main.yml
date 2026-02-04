@@ -58,7 +58,7 @@
         state: present
         disable_gpg_check: yes
   when:
-    - ansible_distribution == "RedHat"
+    - ansible_facts.distribution == "RedHat"
     - build_microshift | bool
 
 - name: install microshift package on RHEL
@@ -70,8 +70,8 @@
         state: present
         disable_gpg_check: yes
   when:
-    - ansible_distribution == "RedHat"
-    - not build_microshift
+    - ansible_facts.distribution == "RedHat"
+    - not (build_microshift | bool)
 
 - name: build & install etcd
   block:
@@ -110,7 +110,7 @@
         name: etcd
   when:
     - build_etcd_binary | bool
-    - not build_microshift
+    - not (build_microshift | bool)
 
 - name: check if pull-secret is present
   ansible.builtin.stat:

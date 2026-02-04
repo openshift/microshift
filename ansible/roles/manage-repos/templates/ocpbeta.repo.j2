@@ -1,5 +1,5 @@
 [{{ item.repo_name }}]
-name=MicroShift {{ ocp_version }} RPMs for RHEL {{ ansible_distribution_major_version }}
+name=MicroShift {{ ocp_version }} RPMs for RHEL {{ ansible_facts.distribution_major_version }}
 baseurl={{ item.repo_url }}
 enabled=1
 gpgcheck=0

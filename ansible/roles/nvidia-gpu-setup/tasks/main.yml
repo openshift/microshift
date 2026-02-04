@@ -287,7 +287,7 @@
         timeout: 300
 
 - name: Validate NVIDIA GPU Setup
-  when: validate_gpu
+  when: validate_gpu | bool
   block:
     - name: Check nvidia-smi command
       ansible.builtin.command: nvidia-smi
