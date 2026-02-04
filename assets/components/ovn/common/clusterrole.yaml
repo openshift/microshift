@@ -71,3 +71,11 @@ rules:
 - apiGroups: ['authorization.k8s.io']
   resources: ['subjectaccessreviews']
   verbs: ['create']
+- apiGroups:
+  - k8s.ovn.org
+  resources:
+  - routeadvertisements
+  verbs:
+  - list
+  - get
+  - watch

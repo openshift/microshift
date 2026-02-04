@@ -124,3 +124,30 @@ rules:
   - watch
   - patch
   - update
+- apiGroups:
+  - k8s.ovn.org
+  resources:
+  - routeadvertisements
+  verbs:
+  - list
+  - get
+  - watch
+- apiGroups:
+  - k8s.ovn.org
+  resources:
+  - routeadvertisements/status
+  verbs:
+  - patch
+  - update
+- apiGroups: 
+  - frrk8s.metallb.io
+  resources:
+  - frrconfigurations
+  verbs:
+  - list
+  - get
+  - watch
+  - create
+  - delete
+  - update
+  - patch

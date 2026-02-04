@@ -1,0 +1,1581 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  labels:
+    app.kubernetes.io/component: frr-k8s
+    app.kubernetes.io/created-by: frr-k8s
+    app.kubernetes.io/instance: system
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/name: namespace
+    app.kubernetes.io/part-of: frr-k8s
+    control-plane: frr-k8s
+    pod-security.kubernetes.io/audit: privileged
+    pod-security.kubernetes.io/enforce: privileged
+    pod-security.kubernetes.io/warn: privileged
+  name: frr-k8s-system
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.14.0
+  name: bgpsessionstates.frrk8s.metallb.io
+spec:
+  group: frrk8s.metallb.io
+  names:
+    kind: BGPSessionState
+    listKind: BGPSessionStateList
+    plural: bgpsessionstates
+    singular: bgpsessionstate
+  scope: Namespaced
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: .status.node
+      name: Node
+      type: string
+    - jsonPath: .status.peer
+      name: Peer
+      type: string
+    - jsonPath: .status.vrf
+      name: VRF
+      type: string
+    - jsonPath: .status.bgpStatus
+      name: BGP
+      type: string
+    - jsonPath: .status.bfdStatus
+      name: BFD
+      type: string
+    name: v1beta1
+    schema:
+      openAPIV3Schema:
+        description: BGPSessionState exposes the status of a BGP Session from the
+          FRR instance running on the node.
+        properties:
+          apiVersion:
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+            type: string
+          kind:
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: BGPSessionStateSpec defines the desired state of BGPSessionState.
+            type: object
+          status:
+            description: BGPSessionStateStatus defines the observed state of BGPSessionState.
+            properties:
+              bfdStatus:
+                type: string
+              bgpStatus:
+                type: string
+              node:
+                type: string
+              peer:
+                type: string
+              vrf:
+                type: string
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.14.0
+  name: frrconfigurations.frrk8s.metallb.io
+spec:
+  group: frrk8s.metallb.io
+  names:
+    kind: FRRConfiguration
+    listKind: FRRConfigurationList
+    plural: frrconfigurations
+    singular: frrconfiguration
+  scope: Namespaced
+  versions:
+  - name: v1beta1
+    schema:
+      openAPIV3Schema:
+        description: FRRConfiguration is a piece of FRR configuration.
+        properties:
+          apiVersion:
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+            type: string
+          kind:
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: FRRConfigurationSpec defines the desired state of FRRConfiguration.
+            properties:
+              bgp:
+                description: BGP is the configuration related to the BGP protocol.
+                properties:
+                  bfdProfiles:
+                    description: BFDProfiles is the list of bfd profiles to be used
+                      when configuring the neighbors.
+                    items:
+                      description: |-
+                        BFDProfile is the configuration related to the BFD protocol associated
+                        to a BGP session.
+                      properties:
+                        detectMultiplier:
+                          description: |-
+                            Configures the detection multiplier to determine
+                            packet loss. The remote transmission interval will be multiplied
+                            by this value to determine the connection loss detection timer.
+                          format: int32
+                          maximum: 255
+                          minimum: 2
+                          type: integer
+                        echoInterval:
+                          description: |-
+                            Configures the minimal echo receive transmission
+                            interval that this system is capable of handling in milliseconds.
+                            Defaults to 50ms
+                          format: int32
+                          maximum: 60000
+                          minimum: 10
+                          type: integer
+                        echoMode:
+                          description: |-
+                            Enables or disables the echo transmission mode.
+                            This mode is disabled by default, and not supported on multi
+                            hops setups.
+                          type: boolean
+                        minimumTtl:
+                          description: |-
+                            For multi hop sessions only: configure the minimum
+                            expected TTL for an incoming BFD control packet.
+                          format: int32
+                          maximum: 254
+                          minimum: 1
+                          type: integer
+                        name:
+                          description: |-
+                            The name of the BFD Profile to be referenced in other parts
+                            of the configuration.
+                          type: string
+                        passiveMode:
+                          description: |-
+                            Mark session as passive: a passive session will not
+                            attempt to start the connection and will wait for control packets
+                            from peer before it begins replying.
+                          type: boolean
+                        receiveInterval:
+                          description: |-
+                            The minimum interval that this system is capable of
+                            receiving control packets in milliseconds.
+                            Defaults to 300ms.
+                          format: int32
+                          maximum: 60000
+                          minimum: 10
+                          type: integer
+                        transmitInterval:
+                          description: |-
+                            The minimum transmission interval (less jitter)
+                            that this system wants to use to send BFD control packets in
+                            milliseconds. Defaults to 300ms
+                          format: int32
+                          maximum: 60000
+                          minimum: 10
+                          type: integer
+                      required:
+                      - name
+                      type: object
+                    type: array
+                  routers:
+                    description: Routers is the list of routers we want FRR to configure
+                      (one per VRF).
+                    items:
+                      description: Router represent a neighbor router we want FRR
+                        to connect to.
+                      properties:
+                        asn:
+                          description: ASN is the AS number to use for the local end
+                            of the session.
+                          format: int32
+                          maximum: 4294967295
+                          minimum: 0
+                          type: integer
+                        id:
+                          description: ID is the BGP router ID
+                          type: string
+                        imports:
+                          description: Imports is the list of imported VRFs we want
+                            for this router / vrf.
+                          items:
+                            description: Import represents the possible imported VRFs
+                              to a given router.
+                            properties:
+                              vrf:
+                                description: Vrf is the vrf we want to import from
+                                type: string
+                            type: object
+                          type: array
+                        neighbors:
+                          description: Neighbors is the list of neighbors we want
+                            to establish BGP sessions with.
+                          items:
+                            description: Neighbor represents a BGP Neighbor we want
+                              FRR to connect to.
+                            properties:
+                              address:
+                                description: Address is the IP address to establish
+                                  the session with.
+                                type: string
+                              asn:
+                                description: |-
+                                  ASN is the AS number to use for the local end of the session.
+                                  ASN and DynamicASN are mutually exclusive and one of them must be specified.
+                                format: int32
+                                maximum: 4294967295
+                                minimum: 0
+                                type: integer
+                              bfdProfile:
+                                description: |-
+                                  BFDProfile is the name of the BFD Profile to be used for the BFD session associated
+                                  to the BGP session. If not set, the BFD session won't be set up.
+                                type: string
+                              connectTime:
+                                description: Requested BGP connect time, controls
+                                  how long BGP waits between connection attempts to
+                                  a neighbor.
+                                type: string
+                                x-kubernetes-validations:
+                                - message: connect time should be between 1 seconds
+                                    to 65535
+                                  rule: duration(self).getSeconds() >= 1 && duration(self).getSeconds()
+                                    <= 65535
+                                - message: connect time should contain a whole number
+                                    of seconds
+                                  rule: duration(self).getMilliseconds() % 1000 ==
+                                    0
+                              disableMP:
+                                default: false
+                                description: |-
+                                  DisableMP is no longer used and has no effect.
+                                  Use DualStackAddressFamily instead to enable the neighbor for both IPv4 and IPv6 address families.
+
+
+                                  Deprecated: This field is ignored. Use DualStackAddressFamily instead.
+                                type: boolean
+                              dualStackAddressFamily:
+                                default: false
+                                description: |-
+                                  To set if we want to enable the neighbor not only for the ipfamily related to its session,
+                                  but also the other one. This allows to advertise/receive IPv4 prefixes over IPv6 sessions and vice versa.
+                                type: boolean
+                              dynamicASN:
+                                description: |-
+                                  DynamicASN detects the AS number to use for the local end of the session
+                                  without explicitly setting it via the ASN field. Limited to:
+                                  internal - if the neighbor's ASN is different than the router's the connection is denied.
+                                  external - if the neighbor's ASN is the same as the router's the connection is denied.
+                                  ASN and DynamicASN are mutually exclusive and one of them must be specified.
+                                enum:
+                                - internal
+                                - external
+                                type: string
+                              ebgpMultiHop:
+                                description: EBGPMultiHop indicates if the BGPPeer
+                                  is multi-hops away.
+                                type: boolean
+                              enableGracefulRestart:
+                                description: |-
+                                  EnableGracefulRestart allows BGP peer to continue to forward data packets along
+                                  known routes while the routing protocol information is being restored. If
+                                  the session is already established, the configuration will have effect
+                                  after reconnecting to the peer
+                                type: boolean
+                              holdTime:
+                                description: |-
+                                  HoldTime is the requested BGP hold time, per RFC4271.
+                                  Defaults to 180s.
+                                type: string
+                              interface:
+                                description: |-
+                                  Interface is the node interface over which the unnumbered BGP peering will
+                                  be established. No API validation takes place as that string value
+                                  represents an interface name on the host and if user provides an invalid
+                                  value, only the actual BGP session will not be established.
+                                  Address and Interface are mutually exclusive and one of them must be specified.
+                                  Note: when enabling unnumbered, the neighbor will be enabled for both
+                                  IPv4 and IPv6 address families.
+                                type: string
+                              keepaliveTime:
+                                description: |-
+                                  KeepaliveTime is the requested BGP keepalive time, per RFC4271.
+                                  Defaults to 60s.
+                                type: string
+                              password:
+                                description: |-
+                                  Password to be used for establishing the BGP session.
+                                  Password and PasswordSecret are mutually exclusive.
+                                type: string
+                              passwordSecret:
+                                description: |-
+                                  PasswordSecret is name of the authentication secret for the neighbor.
+                                  the secret must be of type "kubernetes.io/basic-auth", and created in the
+                                  same namespace as the frr-k8s daemon. The password is stored in the
+                                  secret as the key "password".
+                                  Password and PasswordSecret are mutually exclusive.
+                                properties:
+                                  name:
+                                    description: name is unique within a namespace
+                                      to reference a secret resource.
+                                    type: string
+                                  namespace:
+                                    description: namespace defines the space within
+                                      which the secret name must be unique.
+                                    type: string
+                                type: object
+                                x-kubernetes-map-type: atomic
+                              port:
+                                description: |-
+                                  Port is the port to dial when establishing the session.
+                                  Defaults to 179.
+                                maximum: 16384
+                                minimum: 0
+                                type: integer
+                              sourceaddress:
+                                description: |-
+                                  SourceAddress is the IPv4 or IPv6 source address to use for the BGP
+                                  session to this neighbour, may be specified as either an IP address
+                                  directly or as an interface name
+                                type: string
+                              toAdvertise:
+                                description: |-
+                                  ToAdvertise represents the list of prefixes to advertise to the given neighbor
+                                  and the associated properties.
+                                properties:
+                                  allowed:
+                                    description: |-
+                                      Allowed is is the list of prefixes allowed to be propagated to
+                                      this neighbor. They must match the prefixes defined in the router.
+                                    properties:
+                                      mode:
+                                        default: filtered
+                                        description: |-
+                                          Mode is the mode to use when handling the prefixes.
+                                          When set to "filtered", only the prefixes in the given list will be allowed.
+                                          When set to "all", all the prefixes configured on the router will be allowed.
+                                        enum:
+                                        - all
+                                        - filtered
+                                        type: string
+                                      prefixes:
+                                        items:
+                                          type: string
+                                        type: array
+                                    type: object
+                                  withCommunity:
+                                    description: |-
+                                      PrefixesWithCommunity is a list of prefixes that are associated to a
+                                      bgp community when being advertised. The prefixes associated to a given local pref
+                                      must be in the prefixes allowed to be advertised.
+                                    items:
+                                      description: CommunityPrefixes is a list of
+                                        prefixes associated to a community.
+                                      properties:
+                                        community:
+                                          description: Community is the community
+                                            associated to the prefixes.
+                                          type: string
+                                        prefixes:
+                                          description: Prefixes is the list of prefixes
+                                            associated to the community.
+                                          format: cidr
+                                          items:
+                                            type: string
+                                          minItems: 1
+                                          type: array
+                                      type: object
+                                    type: array
+                                  withLocalPref:
+                                    description: |-
+                                      PrefixesWithLocalPref is a list of prefixes that are associated to a local
+                                      preference when being advertised. The prefixes associated to a given local pref
+                                      must be in the prefixes allowed to be advertised.
+                                    items:
+                                      description: LocalPrefPrefixes is a list of
+                                        prefixes associated to a local preference.
+                                      properties:
+                                        localPref:
+                                          description: LocalPref is the local preference
+                                            associated to the prefixes.
+                                          format: int32
+                                          type: integer
+                                        prefixes:
+                                          description: Prefixes is the list of prefixes
+                                            associated to the local preference.
+                                          format: cidr
+                                          items:
+                                            type: string
+                                          minItems: 1
+                                          type: array
+                                      type: object
+                                    type: array
+                                type: object
+                              toReceive:
+                                description: ToReceive represents the list of prefixes
+                                  to receive from the given neighbor.
+                                properties:
+                                  allowed:
+                                    description: |-
+                                      Allowed is the list of prefixes allowed to be received from
+                                      this neighbor.
+                                    properties:
+                                      mode:
+                                        default: filtered
+                                        description: |-
+                                          Mode is the mode to use when handling the prefixes.
+                                          When set to "filtered", only the prefixes in the given list will be allowed.
+                                          When set to "all", all the prefixes configured on the router will be allowed.
+                                        enum:
+                                        - all
+                                        - filtered
+                                        type: string
+                                      prefixes:
+                                        items:
+                                          description: PrefixSelector is a filter
+                                            of prefixes to receive.
+                                          properties:
+                                            ge:
+                                              description: |-
+                                                The prefix length modifier. This selector accepts any matching prefix with length
+                                                greater or equal the given value.
+                                              format: int32
+                                              maximum: 128
+                                              minimum: 1
+                                              type: integer
+                                            le:
+                                              description: |-
+                                                The prefix length modifier. This selector accepts any matching prefix with length
+                                                less or equal the given value.
+                                              format: int32
+                                              maximum: 128
+                                              minimum: 1
+                                              type: integer
+                                            prefix:
+                                              format: cidr
+                                              type: string
+                                          type: object
+                                        type: array
+                                    type: object
+                                type: object
+                            type: object
+                          type: array
+                        prefixes:
+                          description: Prefixes is the list of prefixes we want to
+                            advertise from this router instance.
+                          items:
+                            type: string
+                          type: array
+                        vrf:
+                          description: VRF is the host vrf used to establish sessions
+                            from this router.
+                          type: string
+                      required:
+                      - asn
+                      type: object
+                    type: array
+                type: object
+              nodeSelector:
+                description: |-
+                  NodeSelector limits the nodes that will attempt to apply this config.
+                  When specified, the configuration will be considered only on nodes
+                  whose labels match the specified selectors.
+                  When it is not specified all nodes will attempt to apply this config.
+                properties:
+                  matchExpressions:
+                    description: matchExpressions is a list of label selector requirements.
+                      The requirements are ANDed.
+                    items:
+                      description: |-
+                        A label selector requirement is a selector that contains values, a key, and an operator that
+                        relates the key and values.
+                      properties:
+                        key:
+                          description: key is the label key that the selector applies
+                            to.
+                          type: string
+                        operator:
+                          description: |-
+                            operator represents a key's relationship to a set of values.
+                            Valid operators are In, NotIn, Exists and DoesNotExist.
+                          type: string
+                        values:
+                          description: |-
+                            values is an array of string values. If the operator is In or NotIn,
+                            the values array must be non-empty. If the operator is Exists or DoesNotExist,
+                            the values array must be empty. This array is replaced during a strategic
+                            merge patch.
+                          items:
+                            type: string
+                          type: array
+                          x-kubernetes-list-type: atomic
+                      required:
+                      - key
+                      - operator
+                      type: object
+                    type: array
+                    x-kubernetes-list-type: atomic
+                  matchLabels:
+                    additionalProperties:
+                      type: string
+                    description: |-
+                      matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
+                      map is equivalent to an element of matchExpressions, whose key field is "key", the
+                      operator is "In", and the values array contains only "value". The requirements are ANDed.
+                    type: object
+                type: object
+                x-kubernetes-map-type: atomic
+              raw:
+                description: |-
+                  Raw is a snippet of raw frr configuration that gets appended to the
+                  one rendered translating the type safe API.
+                properties:
+                  priority:
+                    description: |-
+                      Priority is the order with this configuration is appended to the
+                      bottom of the rendered configuration. A higher value means the
+                      raw config is appended later in the configuration file.
+                    type: integer
+                  rawConfig:
+                    description: |-
+                      Config is a raw FRR configuration to be appended to the configuration
+                      rendered via the k8s api.
+                    type: string
+                type: object
+            type: object
+          status:
+            description: FRRConfigurationStatus defines the observed state of FRRConfiguration.
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.14.0
+  name: frrk8sconfigurations.frrk8s.metallb.io
+spec:
+  group: frrk8s.metallb.io
+  names:
+    kind: FRRK8sConfiguration
+    listKind: FRRK8sConfigurationList
+    plural: frrk8sconfigurations
+    singular: frrk8sconfiguration
+  scope: Namespaced
+  versions:
+  - name: v1beta1
+    schema:
+      openAPIV3Schema:
+        description: |-
+          FRRK8sConfiguration holds the FRR Operator configuration with global
+          settings for the K8s and FRR.
+        properties:
+          apiVersion:
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+            type: string
+          kind:
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: FRRK8sConfigurationSpec defines the desired state of FRRK8sConfiguration.
+            properties:
+              logLevel:
+                description: |-
+                  LogLevel sets the logging verbosity for the FRR-K8s components at runtime.
+                  When configured, this value overrides the defaults established by the --log-level CLI flag.
+                  Valid values are: all, debug, info, warn, error, none.
+                enum:
+                - all
+                - debug
+                - info
+                - warn
+                - error
+                - none
+                type: string
+            type: object
+          status:
+            description: FRRK8sConfigurationStatus defines the observed state of FRRK8sConfiguration.
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.14.0
+  name: frrnodestates.frrk8s.metallb.io
+spec:
+  group: frrk8s.metallb.io
+  names:
+    kind: FRRNodeState
+    listKind: FRRNodeStateList
+    plural: frrnodestates
+    singular: frrnodestate
+  scope: Cluster
+  versions:
+  - name: v1beta1
+    schema:
+      openAPIV3Schema:
+        description: FRRNodeState exposes the status of the FRR instance running on
+          each node.
+        properties:
+          apiVersion:
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+            type: string
+          kind:
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: FRRNodeStateSpec defines the desired state of FRRNodeState.
+            type: object
+          status:
+            description: FRRNodeStateStatus defines the observed state of FRRNodeState.
+            properties:
+              lastConversionResult:
+                description: LastConversionResult is the status of the last translation
+                  between the `FRRConfiguration`s resources and FRR's configuration,
+                  contains "success" or an error.
+                type: string
+              lastReloadResult:
+                description: LastReloadResult represents the status of the last configuration
+                  update operation by FRR, contains "success" or an error.
+                type: string
+              runningConfig:
+                description: RunningConfig represents the current FRR running config,
+                  which is the configuration the FRR instance is currently running
+                  with.
+                type: string
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  labels:
+    app.kubernetes.io/component: rbac
+    app.kubernetes.io/created-by: frr-k8s
+    app.kubernetes.io/instance: frr-k8s-sa
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/name: serviceaccount
+    app.kubernetes.io/part-of: frr-k8s
+  name: frr-k8s-daemon
+  namespace: frr-k8s-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  labels:
+    app: frr-k8s
+  name: frr-k8s-daemon-role
+  namespace: frr-k8s-system
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - secrets
+  verbs:
+  - get
+  - list
+  - watch
+  - update
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  verbs:
+  - get
+  - list
+  - watch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  labels:
+    app.kubernetes.io/component: rbac
+    app.kubernetes.io/created-by: frr-k8s
+    app.kubernetes.io/instance: frr-k8s-role
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/name: role
+    app.kubernetes.io/part-of: frr-k8s
+  name: frr-k8s-nodestate-cleaner-role
+  namespace: frr-k8s-system
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - frrk8s.metallb.io
+  resources:
+  - frrnodestates
+  verbs:
+  - get
+  - list
+  - watch
+  - delete
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: frr-k8s-daemon-role
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - nodes
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - admissionregistration.k8s.io
+  resources:
+  - validatingwebhookconfigurations
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - admissionregistration.k8s.io
+  resourceNames:
+  - frr-k8s-validating-webhook-configuration
+  resources:
+  - validatingwebhookconfigurations
+  verbs:
+  - update
+- apiGroups:
+  - frrk8s.metallb.io
+  resources:
+  - bgpsessionstates
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - frrk8s.metallb.io
+  resources:
+  - bgpsessionstates/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - frrk8s.metallb.io
+  resources:
+  - frrconfigurations
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - frrk8s.metallb.io
+  resources:
+  - frrconfigurations/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - frrk8s.metallb.io
+  resources:
+  - frrconfigurations/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - frrk8s.metallb.io
+  resources:
+  - frrk8sconfigurations
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - frrk8s.metallb.io
+  resources:
+  - frrnodestates
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - frrk8s.metallb.io
+  resources:
+  - frrnodestates/status
+  verbs:
+  - get
+  - patch
+  - update
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/component: kube-rbac-proxy
+    app.kubernetes.io/created-by: frr-k8s
+    app.kubernetes.io/instance: metrics-reader
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/name: clusterrole
+    app.kubernetes.io/part-of: frr-k8s
+  name: frr-k8s-metrics-reader
+rules:
+- nonResourceURLs:
+  - /metrics
+  verbs:
+  - get
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/component: kube-rbac-proxy
+    app.kubernetes.io/created-by: frr-k8s
+    app.kubernetes.io/instance: proxy-role
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/name: clusterrole
+    app.kubernetes.io/part-of: frr-k8s
+  name: frr-k8s-proxy-role
+rules:
+- apiGroups:
+  - authentication.k8s.io
+  resources:
+  - tokenreviews
+  verbs:
+  - create
+- apiGroups:
+  - authorization.k8s.io
+  resources:
+  - subjectaccessreviews
+  verbs:
+  - create
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  labels:
+    app.kubernetes.io/component: rbac
+    app.kubernetes.io/created-by: frr-k8s
+    app.kubernetes.io/instance: frr-k8s-rolebinding
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/name: rolebinding
+    app.kubernetes.io/part-of: frr-k8s
+  name: frr-k8s-daemon-rolebinding
+  namespace: frr-k8s-system
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: frr-k8s-daemon-role
+subjects:
+- kind: ServiceAccount
+  name: frr-k8s-daemon
+  namespace: frr-k8s-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  labels:
+    app.kubernetes.io/component: rbac
+    app.kubernetes.io/created-by: frr-k8s
+    app.kubernetes.io/instance: frr-k8s-rolebinding
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/name: rolebinding
+    app.kubernetes.io/part-of: frr-k8s
+  name: frr-k8s-nodestate-cleaner-rolebinding
+  namespace: frr-k8s-system
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: frr-k8s-nodestate-cleaner-role
+subjects:
+- kind: ServiceAccount
+  name: frr-k8s-daemon
+  namespace: frr-k8s-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  labels:
+    app.kubernetes.io/component: rbac
+    app.kubernetes.io/created-by: frr-k8s
+    app.kubernetes.io/instance: frr-k8s-rolebinding
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/name: clusterrolebinding
+    app.kubernetes.io/part-of: frr-k8s
+  name: frr-k8s-daemon-rolebinding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: frr-k8s-daemon-role
+subjects:
+- kind: ServiceAccount
+  name: frr-k8s-daemon
+  namespace: frr-k8s-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  labels:
+    app.kubernetes.io/component: kube-rbac-proxy
+    app.kubernetes.io/created-by: frr-k8s
+    app.kubernetes.io/instance: proxy-rolebinding
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/name: clusterrolebinding
+    app.kubernetes.io/part-of: frr-k8s
+  name: frr-k8s-proxy-rolebinding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: frr-k8s-proxy-role
+subjects:
+- kind: ServiceAccount
+  name: frr-k8s-daemon
+  namespace: frr-k8s-system
+---
+apiVersion: v1
+data:
+  daemons: |
+    # This file tells the frr package which daemons to start.
+    #
+    # Sample configurations for these daemons can be found in
+    # /usr/share/doc/frr/examples/.
+    #
+    # ATTENTION:
+    #
+    # When activating a daemon for the first time, a config file, even if it is
+    # empty, has to be present *and* be owned by the user and group "frr", else
+    # the daemon will not be started by /etc/init.d/frr. The permissions should
+    # be u=rw,g=r,o=.
+    # When using "vtysh" such a config file is also needed. It should be owned by
+    # group "frrvty" and set to ug=rw,o= though. Check /etc/pam.d/frr, too.
+    #
+    # The watchfrr and zebra daemons are always started.
+    #
+    bgpd=yes
+    ospfd=no
+    ospf6d=no
+    ripd=no
+    ripngd=no
+    isisd=no
+    pimd=no
+    ldpd=no
+    nhrpd=no
+    eigrpd=no
+    babeld=no
+    sharpd=no
+    pbrd=no
+    bfdd=yes
+    fabricd=no
+    vrrpd=no
+
+    #
+    # If this option is set the /etc/init.d/frr script automatically loads
+    # the config via "vtysh -b" when the servers are started.
+    # Check /etc/pam.d/frr if you intend to use "vtysh"!
+    #
+    vtysh_enable=yes
+    zebra_options="  -A 127.0.0.1 -K 120 -s 90000000 --limit-fds 100000"
+    bgpd_options="   -A 127.0.0.1 -p 0 --limit-fds 100000"
+    ospfd_options="  -A 127.0.0.1"
+    ospf6d_options=" -A ::1"
+    ripd_options="   -A 127.0.0.1"
+    ripngd_options=" -A ::1"
+    isisd_options="  -A 127.0.0.1"
+    pimd_options="   -A 127.0.0.1"
+    ldpd_options="   -A 127.0.0.1"
+    nhrpd_options="  -A 127.0.0.1"
+    eigrpd_options=" -A 127.0.0.1"
+    babeld_options=" -A 127.0.0.1"
+    sharpd_options=" -A 127.0.0.1"
+    pbrd_options="   -A 127.0.0.1"
+    staticd_options="-A 127.0.0.1 --limit-fds 100000"
+    bfdd_options="   -A 127.0.0.1 --limit-fds 100000"
+    fabricd_options="-A 127.0.0.1"
+    vrrpd_options="  -A 127.0.0.1"
+
+    # configuration profile
+    #
+    #frr_profile="traditional"
+    #frr_profile="datacenter"
+
+    #
+    # This is the maximum number of FD's that will be available.
+    # Upon startup this is read by the control files and ulimit
+    # is called. Uncomment and use a reasonable value for your
+    # setup if you are expecting a large number of peers in
+    # say BGP.
+    #MAX_FDS=1024
+
+    # The list of daemons to watch is automatically generated by the init script.
+    #watchfrr_options=""
+
+    # for debugging purposes, you can specify a "wrap" command to start instead
+    # of starting the daemon directly, e.g. to use valgrind on ospfd:
+    #   ospfd_wrap="/usr/bin/valgrind"
+    # or you can use "all_wrap" for all daemons, e.g. to use perf record:
+    #   all_wrap="/usr/bin/perf record --call-graph -"
+    # the normal daemon command is added to this at the end.
+  frr.conf: |
+    ! This file gets overriden the first time the speaker renders a config.
+    ! So anything configured here is only temporary.
+    frr version 8.0
+    frr defaults traditional
+    hostname Router
+    line vty
+    log stdout informational
+  vtysh.conf: |
+    service integrated-vtysh-config
+kind: ConfigMap
+metadata:
+  name: frr-k8s-frr-startup
+  namespace: frr-k8s-system
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: frr-k8s-webhook-server-cert
+  namespace: frr-k8s-system
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/component: kube-rbac-proxy
+    app.kubernetes.io/created-by: frr-k8s
+    app.kubernetes.io/instance: frr-k8s-metrics-service
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/name: service
+    app.kubernetes.io/part-of: frr-k8s
+    control-plane: frr-k8s
+  name: frr-k8s-metrics-service
+  namespace: frr-k8s-system
+spec:
+  ports:
+  - name: metricshttps
+    port: 9140
+    targetPort: metricshttps
+  - name: frrmetricshttps
+    port: 9141
+    targetPort: frrmetricshttps
+  selector:
+    control-plane: frr-k8s
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frr-k8s-webhook-service
+  namespace: frr-k8s-system
+spec:
+  ports:
+  - port: 443
+    targetPort: webhook
+  selector:
+    control-plane: statuscleaner
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/component: statuscleaner
+    app.kubernetes.io/created-by: frr-k8s
+    app.kubernetes.io/instance: frr-k8s
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/name: frr-k8s
+    app.kubernetes.io/part-of: frr-k8s
+    control-plane: statuscleaner
+  name: frr-k8s-statuscleaner
+  namespace: frr-k8s-system
+spec:
+  selector:
+    matchLabels:
+      control-plane: statuscleaner
+  template:
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/default-container: frr-k8s-webhook-server
+      labels:
+        app: frr-k8s-webhook-server
+        app.kubernetes.io/component: statuscleaner
+        control-plane: statuscleaner
+    spec:
+      containers:
+      - args:
+        - --log-level=info
+        - --namespace=$(NAMESPACE)
+        command:
+        - /statuscleaner
+        env:
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        image: quay.io/metallb/frr-k8s:main
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: webhook
+            scheme: HTTPS
+          initialDelaySeconds: 15
+          periodSeconds: 20
+        name: frr-k8s-statuscleaner
+        ports:
+        - containerPort: 19443
+          name: webhook
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: webhook
+            scheme: HTTPS
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        resources:
+          limits:
+            cpu: 500m
+            memory: 128Mi
+          requests:
+            cpu: 10m
+            memory: 64Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+          readOnlyRootFilesystem: true
+        volumeMounts:
+        - mountPath: /tmp/k8s-webhook-server/serving-certs
+          name: cert
+          readOnly: true
+      hostNetwork: true
+      serviceAccountName: frr-k8s-daemon
+      terminationGracePeriodSeconds: 10
+      tolerations:
+      - effect: NoSchedule
+        key: node-role.kubernetes.io/master
+        operator: Exists
+      - effect: NoSchedule
+        key: node-role.kubernetes.io/control-plane
+        operator: Exists
+      volumes:
+      - name: cert
+        secret:
+          defaultMode: 420
+          secretName: frr-k8s-webhook-server-cert
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  labels:
+    app.kubernetes.io/component: frr-k8s
+    app.kubernetes.io/created-by: frr-k8s
+    app.kubernetes.io/instance: frr-k8s
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/name: frr-k8s
+    app.kubernetes.io/part-of: frr-k8s
+    control-plane: frr-k8s
+  name: frr-k8s-daemon
+  namespace: frr-k8s-system
+spec:
+  selector:
+    matchLabels:
+      control-plane: frr-k8s
+  template:
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/default-container: frr-k8s
+      labels:
+        app: frr-k8s
+        app.kubernetes.io/component: frr-k8s
+        control-plane: frr-k8s
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: kubernetes.io/arch
+                operator: In
+                values:
+                - amd64
+                - arm64
+                - ppc64le
+                - s390x
+              - key: kubernetes.io/os
+                operator: In
+                values:
+                - linux
+      containers:
+      - args:
+        - --secure-listen-address=0.0.0.0:9140
+        - --upstream=http://127.0.0.1:7572/
+        - --logtostderr=true
+        - --v=0
+        image: gcr.io/kubebuilder/kube-rbac-proxy:v0.13.1
+        name: kube-rbac-proxy
+        ports:
+        - containerPort: 9140
+          name: metricshttps
+          protocol: TCP
+        resources:
+          limits:
+            cpu: 500m
+            memory: 128Mi
+          requests:
+            cpu: 5m
+            memory: 64Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+      - args:
+        - --secure-listen-address=0.0.0.0:9141
+        - --upstream=http://127.0.0.1:7573/
+        - --logtostderr=true
+        - --v=0
+        image: gcr.io/kubebuilder/kube-rbac-proxy:v0.13.1
+        name: kube-rbac-proxy-frr
+        ports:
+        - containerPort: 9141
+          name: frrmetricshttps
+          protocol: TCP
+        resources:
+          limits:
+            cpu: 500m
+            memory: 128Mi
+          requests:
+            cpu: 5m
+            memory: 64Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+      - args:
+        - --metrics-bind-address=127.0.0.1:7572
+        - --node-name=$(NODE_NAME)
+        - --namespace=$(NAMESPACE)
+        - --log-level=info
+        command:
+        - /frr-k8s
+        env:
+        - name: FRR_CONFIG_FILE
+          value: /etc/frr_reloader/frr.conf
+        - name: FRR_RELOADER_PID_FILE
+          value: /etc/frr_reloader/reloader.pid
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        image: quay.io/metallb/frr-k8s:main
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          httpGet:
+            host: 127.0.0.1
+            path: /metrics
+            port: monitoring
+          initialDelaySeconds: 15
+          periodSeconds: 20
+        name: controller
+        ports:
+        - containerPort: 7572
+          name: monitoring
+        readinessProbe:
+          httpGet:
+            host: 127.0.0.1
+            path: /metrics
+            port: monitoring
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        resources:
+          limits:
+            cpu: 500m
+            memory: 128Mi
+          requests:
+            cpu: 10m
+            memory: 64Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+          readOnlyRootFilesystem: true
+        volumeMounts:
+        - mountPath: /etc/frr_reloader
+          name: reloader
+      - command:
+        - /bin/sh
+        - -c
+        - /sbin/tini -- /usr/lib/frr/docker-start
+        env:
+        - name: TINI_SUBREAPER
+          value: "true"
+        image: quay.io/frrouting/frr:10.4.1
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            host: 127.0.0.1
+            path: /livez
+            port: 7573
+          periodSeconds: 5
+        name: frr
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            add:
+            - NET_ADMIN
+            - NET_RAW
+            - SYS_ADMIN
+            - NET_BIND_SERVICE
+          readOnlyRootFilesystem: true
+        startupProbe:
+          failureThreshold: 30
+          httpGet:
+            host: 127.0.0.1
+            path: /livez
+            port: 7573
+          periodSeconds: 5
+        volumeMounts:
+        - mountPath: /var/run/frr
+          name: frr-sockets
+        - mountPath: /etc/frr
+          name: frr-conf
+        - mountPath: /var/lib/frr
+          name: frr-lib
+        - mountPath: /var/tmp/frr
+          name: frr-tmp
+      - args:
+        - --metrics-port=7573
+        - --metrics-bind-address=127.0.0.1
+        command:
+        - /etc/frr_metrics/frr-metrics
+        image: quay.io/frrouting/frr:10.4.1
+        name: frr-metrics
+        ports:
+        - containerPort: 7573
+          name: frr-metrics
+        volumeMounts:
+        - mountPath: /var/run/frr
+          name: frr-sockets
+        - mountPath: /etc/frr
+          name: frr-conf
+        - mountPath: /etc/frr_metrics
+          name: metrics
+      - args:
+        - --node-name=$(NODE_NAME)
+        - --namespace=$(NAMESPACE)
+        - --pod-name=$(POD_NAME)
+        - --log-level=info
+        command:
+        - /etc/frr_status/frr-status
+        env:
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        image: quay.io/frrouting/frr:10.4.1
+        name: frr-status
+        volumeMounts:
+        - mountPath: /var/run/frr
+          name: frr-sockets
+        - mountPath: /etc/frr
+          name: frr-conf
+        - mountPath: /etc/frr_status
+          name: frr-status
+      - command:
+        - /etc/frr_reloader/frr-reloader.sh
+        image: quay.io/frrouting/frr:10.4.1
+        name: reloader
+        volumeMounts:
+        - mountPath: /var/run/frr
+          name: frr-sockets
+        - mountPath: /etc/frr
+          name: frr-conf
+        - mountPath: /etc/frr_reloader
+          name: reloader
+      hostNetwork: true
+      initContainers:
+      - command:
+        - /bin/sh
+        - -c
+        - cp -rLf /tmp/frr/* /etc/frr/
+        image: quay.io/frrouting/frr:10.4.1
+        name: cp-frr-files
+        securityContext:
+          runAsGroup: 101
+          runAsUser: 100
+        volumeMounts:
+        - mountPath: /tmp/frr
+          name: frr-startup
+        - mountPath: /etc/frr
+          name: frr-conf
+      - command:
+        - /bin/sh
+        - -c
+        - cp -f /frr-reloader.sh /etc/frr_reloader/
+        image: quay.io/metallb/frr-k8s:main
+        name: cp-reloader
+        volumeMounts:
+        - mountPath: /etc/frr_reloader
+          name: reloader
+      - command:
+        - /bin/sh
+        - -c
+        - cp -f /frr-metrics /etc/frr_metrics/
+        image: quay.io/metallb/frr-k8s:main
+        name: cp-metrics
+        volumeMounts:
+        - mountPath: /etc/frr_metrics
+          name: metrics
+      - command:
+        - /bin/sh
+        - -c
+        - cp -f /frr-status /etc/frr_status/
+        image: quay.io/metallb/frr-k8s:main
+        name: cp-frr-status
+        volumeMounts:
+        - mountPath: /etc/frr_status
+          name: frr-status
+      serviceAccountName: frr-k8s-daemon
+      shareProcessNamespace: true
+      terminationGracePeriodSeconds: 10
+      tolerations:
+      - effect: NoSchedule
+        key: node-role.kubernetes.io/master
+        operator: Exists
+      - effect: NoSchedule
+        key: node-role.kubernetes.io/control-plane
+        operator: Exists
+      volumes:
+      - emptyDir: {}
+        name: frr-sockets
+      - configMap:
+          name: frr-k8s-frr-startup
+        name: frr-startup
+      - emptyDir: {}
+        name: frr-conf
+      - emptyDir: {}
+        name: reloader
+      - emptyDir: {}
+        name: metrics
+      - emptyDir: {}
+        name: frr-status
+      - emptyDir: {}
+        name: frr-lib
+      - emptyDir: {}
+        name: frr-tmp
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingWebhookConfiguration
+metadata:
+  name: frr-k8s-validating-webhook-configuration
+webhooks:
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    service:
+      name: frr-k8s-webhook-service
+      namespace: frr-k8s-system
+      path: /validate-frrk8s-metallb-io-v1beta1-frrconfiguration
+  failurePolicy: Fail
+  name: frrconfigurationsvalidationwebhook.metallb.io
+  rules:
+  - apiGroups:
+    - frrk8s.metallb.io
+    apiVersions:
+    - v1beta1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - frrconfigurations
+  sideEffects: None

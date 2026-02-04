@@ -297,7 +297,7 @@ spec:
 
       # ovnkube master: convert kubernetes objects in to nbdb logical network components
       - name: ovnkube-controller
-        image: {{ .ReleaseImage.ovn_kubernetes_microshift }}
+        image: localhost/ovn-daemonset-fedora:latest
         imagePullPolicy: Never
         command:
         - /bin/bash
@@ -340,6 +340,7 @@ spec:
           exec /usr/bin/ovnkube \
             --init-master "${K8S_NODE}" \
             --init-node "${K8S_NODE}" \
+            --enable-interconnect \
             --allow-no-uplink \
             --config-file=/run/ovnkube-config/ovnkube.conf \
             --loglevel "${OVN_KUBE_LOG_LEVEL}" \
@@ -352,6 +353,7 @@ spec:
             --single-node \
             --enable-network-segmentation=true \
             --enable-multi-network=true \
+            --enable-route-advertisements \
             --gateway-v4-masquerade-subnet 169.254.0.0/17 \
             --gateway-v6-masquerade-subnet fd69::/112 \
             --acl-logging-rate-limit "20"
