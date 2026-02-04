@@ -610,6 +610,8 @@ build_images.sh [-iIsdf] [-l layer-dir | -g group-dir] [-t template]
           The FILE should be the path to the template to build.
           Implies -f along with -l and -g based on the filename.
 
+  -X      Skip all images builds and installer builds.
+
 EOF
 }
 
@@ -622,9 +624,10 @@ TEMPLATE=""
 FORCE_REBUILD=false
 FORCE_SOURCE=false
 EXTRACT_CONTAINER_IMAGES=true
+SKIP_ALL_BUILDS=false
 
 selCount=0
-while getopts "dEfg:hiIl:sSt:" opt; do
+while getopts "dEfg:hiIl:sSt:X" opt; do
     case "${opt}" in
         d)
             COMPOSER_DRY_RUN=true
@@ -665,6 +668,9 @@ while getopts "dEfg:hiIl:sSt:" opt; do
             GROUP="$(dirname "$(realpath "${OPTARG}")")"
             selCount=$((selCount+1))
             FORCE_REBUILD=true
+            ;;
+        X)
+            SKIP_ALL_BUILDS=true
             ;;
         *)
             usage "ERROR: Unknown option ${opt}"
@@ -734,6 +740,12 @@ trap 'osbuild_logs' EXIT
 # Check if webserver is running
 if [ $(pgrep -cx nginx) -eq 0 ] ; then
     "${TESTDIR}/bin/manage_webserver.sh" "start"
+fi
+
+# Build the images
+if ${SKIP_ALL_BUILDS}; then
+    echo "INFO: Skipping all images builds and installer builds."
+    exit 0
 fi
 
 if [ -n "${LAYER}" ]; then

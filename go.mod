@@ -32,7 +32,7 @@ require (
 	github.com/gogo/protobuf v1.3.2
 	github.com/golang/snappy v0.0.4
 	github.com/openshift/cluster-policy-controller v0.0.0-20251120141414-8b775487512f
-	github.com/openshift/route-controller-manager v0.0.0-20260120230031-3b4cc7b25c3c
+	github.com/openshift/route-controller-manager v0.0.0-20260127173744-2b9e93a5f0fc
 	github.com/prometheus/client_model v0.6.2
 	github.com/prometheus/common v0.66.1
 	github.com/prometheus/prometheus v0.302.1

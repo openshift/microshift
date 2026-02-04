@@ -1,22 +1,70 @@
-- api embedded-component 64571445812a66e84df4b36180a114f3365ff340 to 606bd613f9f7b6965f1d087b2fce8227aa49ceca
-  - ec37c6e6 2026-01-26T16:55:26+03:00 Update tests for mutually exclusive feature gates
-  - d7e760f3 2026-01-26T16:07:55+03:00 Move KMSEncryptionProvider FG to DevPreview
-  - fe4267b0 2026-01-26T15:17:57+03:00 Introduce KMSEncryption feature gate
-  - 7e2657b6 2026-01-23T12:07:37+00:00 Fix payload CRD/FetaureGate ordering
+- api embedded-component 606bd613f9f7b6965f1d087b2fce8227aa49ceca to c16ec2bcf089999a012322dbf889c632729dc80d
+  - 1ac2624e 2026-01-27T10:48:45+00:00 Remove AlibabaPlatform FeatureGate
+  - 84fc67a4 2026-01-22T16:05:29+01:00 Re-enable NewOLMBoxcutterRuntime featuregate in TPNU
 
-- cluster-ingress-operator embedded-component f97a4486f20f362b5c1fd45890997791ba73f09d to ea67a8ce10072efe06ab180fce8c9fef58e5b997
-  - 664e540 2026-01-26T13:57:00-05:00 update conformance script
-  - 003308a 2026-01-26T13:57:00-05:00 remove backendtlspolicy tests
-  - 10e14fd 2026-01-26T13:57:00-05:00 add backendtlspolicy logic
-  - ae517c4 2026-01-26T13:57:00-05:00 update gwc name
-  - 86989c1 2026-01-26T13:57:00-05:00 add blank line
-  - f04b1bf 2026-01-26T13:57:00-05:00 Update the script to run all supported tests
-  - 2725b27 2026-01-26T13:57:00-05:00 Bump GWAPI CRDs to v1.4.0
-  - 33f4ef1 2026-01-22T22:16:25-05:00 OCPBUGS-16728: Require Service Deletion for LB Type Updates
-  - 80004c8 2026-01-22T17:06:27-05:00 Refactor: Consolidate effectuation message creation
-  - cfc917e 2026-01-22T17:06:24-05:00 Refactor: Add `managedAtServiceCreationLBServiceAnnotations` Map
-  - 5bd963a 2026-01-05T17:36:57-05:00 Update Broken Annotation Documentation Links
+- cluster-ingress-operator embedded-component ea67a8ce10072efe06ab180fce8c9fef58e5b997 to eeb7347184177d0f0855632bad82398089547e87
+  - 0c08ea1 2026-01-26T17:23:34-03:00 Add additional validation to AWS managed zone
+  - 411aa23 2026-01-26T17:23:34-03:00 Address review comments on on-prem test
+  - ce0f80d 2026-01-26T17:23:33-03:00 NE-2395: Fix e2e tests to work on platforms with unmanaged DNS
+  - cbd2ce5 2026-01-21T17:47:05-05:00 Ensure canary cert matches the default ingress controller's cert
+  - 060687e 2026-01-05T16:40:00+08:00 Add e2e test for Gateway API infrastructure annotations
 
-- machine-config-operator embedded-component b1eb6cc3b59bc0cb8b2e9b21cf5724b13e2df039 to 2607eb0c541524fa7b95c7697c2dc50baffbbd07
-  - 82198935 2026-01-23T15:35:16-05:00 Fix intermittent e2e-ocl test failures
+- cluster-kube-apiserver-operator embedded-component e99b43d8a1b9139933aa0f6e71fc7f8397d29b58 to 064809665fd54e4c15d3b0c2f6da9fadce715c34
+  - 549921f 2026-01-23T20:22:03+05:30 Migrating user_cors_test to OTE
+
+- machine-config-operator embedded-component 2607eb0c541524fa7b95c7697c2dc50baffbbd07 to 1881dab7389ab49e3fbb2eaee17ea74b4f84b2ad
+  - 4dbab5a9 2026-01-27T10:38:05-05:00 test/extended-priv: account for skew API
+  - 3922850f 2026-01-26T09:19:27+00:00 MCO-2059: migrate machineconfignodes from private repo
+  - 708b5213 2026-01-23T11:20:41-05:00 install: delete stale operator metrics resources
+  - 493dd78b 2026-01-21T15:15:12-05:00 tests: update MCN condition transition test to account for quick transitions through 'Unknown' state
+  - b03faf5e 2026-01-20T10:36:51-05:00 helpers: Compute systemdUnits that added and changed between Ign configs update: Only write added or updated systemd units on_disk_validation: Check if systemd units in config enabled correctly
+
+- operator-framework-olm embedded-component 34bb15d6590b8803c5e6390e75d68f6c075d6c97 to 526cde8d70dc640972eab717f80b42b66e8dff15
+  - d324e914 2026-01-27T00:05:56+00:00 fix: create separate config client to resolve APIServer TLS update conflicts (#3753)
+  - 0713d54c 2026-01-27T00:04:44+00:00 Hard-code version upgrade message for 4.22 upgrade paths (#3748)
+  - 17d7bc7f 2026-01-26T11:08:37-05:00 Integrate APIServer TLS controller into PSM
+
+- route-controller-manager embedded-component 3b4cc7b25c3c340b6708b7f0c1deafe38ef8a942 to 2b9e93a5f0fc1e93090bbe34ce95f3b4ad5cff15
+  - 68aba6a 2026-01-26T10:31:47-03:00 filter ingress namespace on UnmanagedRoutes metric
+
+- kube-rbac-proxy image-amd64 cd636680e06a55395c26570dff0cb37277014388 to c7ab76fd6fdf651d5022db8946c35b158ecc2396
+  - d9ad6ac 2026-01-22T16:22:25+01:00 go.mod: downgrade to go 1.24.11 for CI compatibility
+  - 5df54c0 2026-01-22T16:22:24+01:00 test/e2e: try to drop the runScenarioInNamespace
+  - 0eaf82f 2026-01-22T16:22:23+01:00 test/e2e: don't use hardcoded namespace naem
+  - ae57c8f 2026-01-19T19:23:10+01:00 test/e2e: migrate tests to new style
+  - 24eff15 2026-01-19T17:48:15+01:00 vendor: bump
+  - 65152b8 2026-01-12T17:39:22+01:00 *: cut v0.20.2 release
+  - 62b9ee2 2026-01-12T17:39:15+01:00 go*: update dependencies
+  - d56a26b 2025-12-02T09:54:28+01:00 e2e: use the new config action for tokenmasking tests
+  - 4771ac6 2025-12-02T09:54:28+01:00 e2e: use the new config action for flags tests
+  - 9996c46 2025-12-02T09:54:27+01:00 e2e: wait after each test for proxy pods to be gone
+  - 4cf2212 2025-12-02T09:54:27+01:00 e2e: add helper functions
+  - 3f7c5bd 2025-12-02T09:54:27+01:00 e2e: use the new config action for h2c tests
+  - af1f283 2025-12-02T09:54:26+01:00 e2e: use the new config action for http2 tests
+  - 99bb640 2025-12-02T09:54:26+01:00 e2e: use the new config action for static-authz tests
+  - c7941a2 2025-12-02T09:54:26+01:00 e2e: use the new action for allow- and ignorepath tests
+  - 5362766 2025-12-02T09:54:26+01:00 e2e: use the new action for allowpath tests
+  - 4f0bdef 2025-12-02T09:54:25+01:00 e2e: use the new action for clientcerts tests
+  - 8878b47 2025-12-02T09:54:25+01:00 e2e: use the new action for tokenaudience tests
+  - 3bdf275 2025-12-02T09:54:25+01:00 showcase the config action on the basics test
+  - 88516e3 2025-12-02T09:54:24+01:00 Add an action for KRP config
+  - 0ae5ba9 2025-12-02T09:54:02+01:00 backport e2e test TLS setup changes
+  - b578851 2025-11-25T15:26:49+01:00 *: cut release v0.20.1
+  - f4cffa1 2025-11-25T15:26:49+01:00 go*: update dependencies
+  - 9ecbe68 2025-11-20T02:49:56+00:00 build(deps): bump golang.org/x/crypto from 0.42.0 to 0.45.0
+  - 8e021b7 2025-11-05T14:24:20+01:00 fix: bump go version to fix CVEs
+  - b09fd16 2025-09-25T16:39:04+02:00 .github/workflows: increase timer
+  - 8e93546 2025-09-25T16:39:04+02:00 .github/workflows: bump all deps, verify hashes
+  - 19508ff 2025-09-25T16:39:04+02:00 .github/workflows: don't hardcore action
+  - eb81d87 2025-09-25T16:39:04+02:00 .github/workflows: add versioned ubuntu, add timeouts
+  - c07016d 2025-09-25T16:39:04+02:00 .github/workflows: set go var version. go version set to stable ver
+  - 8350326 2025-09-25T16:39:04+02:00 Update outdated GitHub Actions
+  - 110d18b 2025-09-18T11:24:50+02:00 VERSION, *.md, examples: version number bump
+  - 570cf60 2025-09-18T11:24:49+02:00 go.*, .github/w/build.yml: bump dependencies
+  - 501c875 2025-08-20T16:07:04+02:00 fix: updating Go and packages to fix CVEs
+  - ae929f9 2025-07-06T23:42:08+02:00 fix ARGs in Dockerfile
+
+- kubernetes image-arm64 e4a4167c40c9ed543c5a80f2e08cc73696f7a4f6 to 0a955ccf26bb6091b9053309eb0ce0b2992fed70
+  - 5579c3340 2026-01-16T14:19:18-05:00 UPSTREAM: <carry>: Added validation to check if OKD featureset is being enabled on OKD clusters
+  - 8504fe0c7 2026-01-13T14:38:55-05:00 UPSTREAM: <drop>: Vendored API repo
 
