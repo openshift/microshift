@@ -84,6 +84,14 @@
     - vg_name != default_vg_name
     - vg_exists.rc == 0
 
+- name: pin RHEL version to prevent upgrading beyond supported release
+  become: true
+  ansible.builtin.copy:
+    content: "{{ rhel_target_version }}"
+    dest: /etc/dnf/vars/releasever
+    mode: '0644'
+  when: rhel_target_version is defined
+
 - name: upgrade all packages
   ansible.builtin.dnf:
     name: "*"
