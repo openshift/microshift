@@ -142,7 +142,7 @@ func validateFeatureGateLockFile(cfg *config.Config) error {
 		return fmt.Errorf("failed to get current version: %w", err)
 	}
 
-	if lockFile.Version != currentVersion {
+	if lockFile.Version.Major != currentVersion.Major || lockFile.Version.Minor != currentVersion.Minor {
 		return fmt.Errorf("version upgrade detected with custom feature gates: locked version %s, current version %s\n\n"+
 			"Upgrades are not supported when custom feature gates are configured.\n"+
 			"Custom feature gates (%s) were configured in version %s.\n"+
