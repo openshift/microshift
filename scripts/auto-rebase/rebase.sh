@@ -45,6 +45,30 @@ title() {
     echo -e "\E[34m$1\E[00m";
 }
 
+# Retry a command with exponential backoff
+# Usage: retry_cmd <command> [args...]
+retry_cmd() {
+    local -r max_attempts=5
+    local timeout=1
+    local attempt=1
+    local exit_code=0
+
+    while (( attempt <= max_attempts )); do
+        if "$@"; then
+            return 0
+        else
+            exit_code=$?
+        fi
+        echo "Attempt ${attempt} of ${max_attempts} failed (exit code ${exit_code}). Retrying in ${timeout}s..."
+        sleep "${timeout}"
+        attempt=$(( attempt + 1 ))
+        timeout=$(( timeout * 2 ))
+    done
+
+    echo "Command failed after ${max_attempts} attempts: $@"
+    return "${exit_code}"
+}
+
 check_preconditions() {
     if ! hash yq; then
         title "Installing yq"
@@ -82,7 +106,7 @@ clone_repo() {
     git init "${repodir}"
     pushd "${repodir}" >/dev/null
     git remote add origin "${repo}"
-    git fetch origin --quiet  --filter=tree:0 --tags "${commit}"
+    retry_cmd git fetch origin --quiet  --filter=tree:0 --tags "${commit}"
     git checkout "${commit}"
     popd >/dev/null
 }
@@ -516,7 +540,7 @@ handle_deps() {
             go mod edit -require "${modulepath}@${ver}"
 
             rm -fr "${REPOROOT}/${replace_path}"
-            git clone "${repo_url}" --branch "${ver}" "${REPOROOT}/${replace_path}"
+            retry_cmd git clone "${repo_url}" --branch "${ver}" "${REPOROOT}/${replace_path}"
             rm -fr "${REPOROOT}/${replace_path}/.git"
             find "${REPOROOT}/${replace_path}/" -name "OWNERS" -delete
         ;;
