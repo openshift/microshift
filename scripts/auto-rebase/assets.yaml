@@ -232,9 +232,6 @@ assets:
       - file: 0000_50_olm_00-operatorgroups.crd.yaml
       - file: 0000_50_olm_00-operators.crd.yaml
       - file: 0000_50_olm_00-packageserver.pdb.yaml
-      - file: 0000_50_olm_00-pprof-config.yaml
-      - file: 0000_50_olm_00-pprof-rbac.yaml
-      - file: 0000_50_olm_00-pprof-secret.yaml
       - file: 0000_50_olm_00-subscriptions.crd.yaml
       - file: 0000_50_olm_01-networkpolicies.yaml
       - file: 0000_50_olm_02-olm-operator.serviceaccount.yaml
