@@ -142,22 +142,26 @@ func upgradeChecksPass(lockFile featureGateLockFile, fgCfg *config.FeatureGates)
 			return lhsSet.Difference(rhsSet).UnsortedList()
 		}
 
-		featureGatesNoExemptionsEnabled := extractFeatureGatesWithoutExemptions(fgCfg.CustomNoUpgrade.Enabled, fgCfg.SpecialHandlingSupportExceptionRequired.Enabled)
-		featureGatesNoExemptionsDisabled := extractFeatureGatesWithoutExemptions(fgCfg.CustomNoUpgrade.Disabled, fgCfg.SpecialHandlingSupportExceptionRequired.Disabled)
+		// Extract feature gates that lack a special handling support exception.
+		customNoUpgradeEnabled := extractFeatureGatesWithoutExemptions(fgCfg.CustomNoUpgrade.Enabled, fgCfg.SpecialHandlingSupportExceptionRequired.Enabled)
+		customNoUpgradeDisabled := extractFeatureGatesWithoutExemptions(fgCfg.CustomNoUpgrade.Disabled, fgCfg.SpecialHandlingSupportExceptionRequired.Disabled)
 
-		return fmt.Errorf("version upgrade detected with custom feature gates: locked version %s, current version %s\n\n"+
-			"Upgrades are not supported when custom feature gates are configured.\n"+
-			"Custom feature gates were configured in version %s.\n"+
-			"Gates Enabled: %s\n"+
-			"Gates Disabled: %s\n"+
-			"To restore MicroShift to a supported state, you must:\n"+
-			"1. Roll back to version %s, OR\n"+
-			"2. Run: sudo microshift-cleanup-data --all\n"+
-			"3. Remove custom feature gates from /etc/microshift/config.yaml\n"+
-			"4. Restart MicroShift: sudo systemctl restart microshift",
-			lockedVersion.String(), currentExecutableVersion.String(),
-			lockedVersion.String(), featureGatesNoExemptionsEnabled,
-			featureGatesNoExemptionsDisabled, lockedVersion.String())
+		// If there are any gates that lack a special handling support exception, return an error.
+		if len(customNoUpgradeEnabled) > 0 || len(customNoUpgradeDisabled) > 0 {
+			return fmt.Errorf("version upgrade detected with custom feature gates: locked version %s, current version %s\n\n"+
+				"Upgrades are not supported when custom feature gates are configured.\n"+
+				"Custom feature gates were configured in version %s.\n"+
+				"Gates Enabled: %s\n"+
+				"Gates Disabled: %s\n"+
+				"To restore MicroShift to a supported state, you must:\n"+
+				"1. Roll back to version %s, OR\n"+
+				"2. Run: sudo microshift-cleanup-data --all\n"+
+				"3. Remove custom feature gates from /etc/microshift/config.yaml\n"+
+				"4. Restart MicroShift: sudo systemctl restart microshift",
+				lockedVersion.String(), currentExecutableVersion.String(),
+				lockedVersion.String(), customNoUpgradeEnabled,
+				customNoUpgradeDisabled, lockedVersion.String())
+		}
 	}
 	return nil
 }
