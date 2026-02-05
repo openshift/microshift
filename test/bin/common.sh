@@ -200,6 +200,10 @@ export MIRROR_REGISTRY_PORT=5000
 MIRROR_REGISTRY_URL="${VM_BRIDGE_IP:-$(hostname)}:${MIRROR_REGISTRY_PORT}/microshift"
 export MIRROR_REGISTRY_URL
 
+# File names containing credentials for the OpenShift mirror repositories
+export OCP_MIRROR_USERNAME_FILE="${OCP_MIRROR_USERNAME_FILE:-"${HOME}/.ocp_mirror_username"}"
+export OCP_MIRROR_PASSWORD_FILE="${OCP_MIRROR_PASSWORD_FILE:-"${HOME}/.ocp_mirror_password"}"
+
 get_build_branch() {
     local -r ocp_ver="$(grep ^OCP_VERSION "${ROOTDIR}/Makefile.version.$(uname -m).var"  | awk '{print $NF}' | awk -F. '{print $1"."$2}')"
     local -r cur_branch="$(git branch --show-current 2>/dev/null)"
