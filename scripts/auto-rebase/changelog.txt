@@ -1,3 +1,6 @@
-- kubernetes image-arm64 436b373e7dec669750c65a1ef832665e56b733b7 to 91c24081f468e7636c824f4f5a2eb68660b81012
+- kubernetes embedded-component 436b373e7dec669750c65a1ef832665e56b733b7 to 91c24081f468e7636c824f4f5a2eb68660b81012
+  - b18acb299 2025-04-08T14:24:38+00:00 UPSTREAM: 130450: Fix implementation of ContainsCIDR to allow non-equal addresses
+
+- kubernetes image-amd64 436b373e7dec669750c65a1ef832665e56b733b7 to 91c24081f468e7636c824f4f5a2eb68660b81012
   - b18acb299 2025-04-08T14:24:38+00:00 UPSTREAM: 130450: Fix implementation of ContainsCIDR to allow non-equal addresses
 
