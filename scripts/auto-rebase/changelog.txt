@@ -1,0 +1,3 @@
+- ovn-kubernetes image-arm64 16e5e201025c67a8cc2253851ebbbe3dfa7d7910 to 194e289903051ba951e479c227ad3d44f9fc321a
+  - 1ce92737 2026-01-21T14:02:20+01:00 fix(localnet, ipamless): Prevent LSP deletion on sync
+
