@@ -74,7 +74,7 @@ enable_rt_repositories() {
     # and replacing 'baseos' with 'rt'.
     # Note that kernel-rt is only available for x86_64.
     "${SCRIPTDIR}/../fetch_tools.sh" yq
-    sudo mkdir -p /etc/osbuild-composer/repositories/
+    sudo mkdir -p "$(dirname "${composer_config}")"
     "${SCRIPTDIR}/../../_output/bin/yq" \
         '.["x86_64"] += (.["x86_64"][0] | .name = "kernel-rt" | .baseurl |= sub("baseos", "rt"))' \
         "/usr/share/osbuild-composer/repositories/rhel-${version_id}.json" | jq | sudo tee "${composer_config}" >/dev/null
@@ -133,6 +133,60 @@ EOF
     fi
 }
 
+enable_ocp_mirror_repositories() {
+    local -r version_id=$1
+    local -r composer_config=$3
+
+    local version_id_ocp=$2
+    if [ "$(uname -m)" = "aarch64" ]; then
+        version_id_ocp="${version_id_ocp}_aarch64"
+    fi
+
+    # Check if a released version of the configuration file exists
+    local -r config_file="/usr/share/osbuild-composer/repositories/rhel-${version_id}.json"
+    if [ -f "${config_file}" ]; then
+        echo "WARNING: Skipping pre-release RHEL repository configuration for version '${version_id}'"
+        echo "WARNING: Using '${config_file}' configuration file"
+        return
+    fi
+
+    # Check if OCP mirror credentials are present
+    local -r ocp_mirror_ufile="${HOME}/.ocp_mirror_username"
+    local -r ocp_mirror_pfile="${HOME}/.ocp_mirror_password"
+    if ! [ -f "${ocp_mirror_ufile}" ] || ! [ -f "${ocp_mirror_pfile}" ]; then
+        echo "WARNING: OCP mirror credentials are not present"
+        return
+    fi
+
+    # Read the OCP mirror credentials from the files
+    local -r ocp_mirror_username=$(cat "${ocp_mirror_ufile}")
+    local -r ocp_mirror_password=$(cat "${ocp_mirror_pfile}")
+    local -r version_id_short="$(tr -d '.' <<< "${version_id}")"
+
+    # Create the configuration file in the composer configuration directory
+    sudo mkdir -p "$(dirname "${composer_config}")"
+    sudo tee "${composer_config}" &>/dev/null <<EOF
+{
+  "$(uname -m)": [
+    {
+      "name": "baseos",
+      "baseurl": "https://${ocp_mirror_username}:${ocp_mirror_password}@mirror2.openshift.com/enterprise/reposync/${version_id_ocp}/rhel-${version_id_short}-baseos/",
+      "rhsm": false,
+      "check_gpg": false
+    },
+    {
+      "name": "appstream",
+      "baseurl": "https://${ocp_mirror_username}:${ocp_mirror_password}@mirror2.openshift.com/enterprise/reposync/${version_id_ocp}/rhel-${version_id_short}-appstream/",
+      "rhsm": false,
+      "check_gpg": false
+    }
+  ]
+}
+EOF
+    sudo chmod 0640 "${composer_config}"
+    sudo chgrp _osbuild-composer "${composer_config}"
+}
+
 #
 # Main
 #
@@ -147,6 +201,9 @@ check_umask_and_permissions
 # Configure repositories for the current OS
 enable_rt_repositories          "${VERSION_ID}" "/etc/osbuild-composer/repositories/rhel-${VERSION_ID}.json"
 enable_beta_or_eus_repositories "${VERSION_ID}" "/etc/osbuild-composer/repositories/rhel-${VERSION_ID}.json"
+
+# Configure OCP mirror repositories for pre-release versions
+enable_ocp_mirror_repositories "9.8" "4.22" "/etc/osbuild-composer/repositories/rhel-9.8.json"
 
 # This step must come in the end to make sure all the potential configuration
 # changes are picked up by the service
