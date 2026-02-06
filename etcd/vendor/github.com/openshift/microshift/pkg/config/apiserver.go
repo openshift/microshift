@@ -153,8 +153,7 @@ type FeatureGates struct {
 	// CustomNoUpgrade is used to enable/disable feature gates. When the enabled or disable lists are not empty, x- and y-stream upgrades will be blocked.
 	// Use this field exclusively for custom feature gates, unless you are certain that the feature gate is a SpecialHandlingSupportExceptionRequired feature.
 	CustomNoUpgrade EnableDisableFeatures `json:"customNoUpgrade"`
-	// SpecialHandlingSupportExceptionRequired is used to enable/disable feature gates without blocking x- and y-stream upgrades.
-	// A SpecialHandlingSupportExceptionRequired feature will be given precedence over the same feature (if set) in CustomNoUpgrade features.
+	// SpecialHandlingSupportExceptionRequired allows for feature gates to be exempted from blocking x- and y-stream upgrades.
 	SpecialHandlingSupportExceptionRequired EnableDisableFeatures `json:"specialHandlingSupportExceptionRequired"`
 }
 
