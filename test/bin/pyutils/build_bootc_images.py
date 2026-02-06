@@ -284,17 +284,31 @@ def process_containerfile(groupdir, containerfile, dry_run):
             # Note:
             # - The pull secret is necessary in some builds for pulling embedded
             #   container images referenced in release-info RPMs
+            # - The OpenShift mirror repository credentials are optional and are used
+            #   for accessing pre-release RHEL RPM repositories.
             # - The explicit push-to-mirror sets the 'latest' tag as all the build
             #   layers are in the mirror due to 'cache-to' option
             build_args = [
                 "sudo", "podman", "build",
                 "--authfile", PULL_SECRET,
-                "--secret", f"id=pullsecret,src={PULL_SECRET}",
+                "--secret", f"id=pullsecret,src={PULL_SECRET}"
+            ]
+
+            ocp_mirror_ufile = common.get_env_var('OCP_MIRROR_USERNAME_FILE')
+            ocp_mirror_pfile = common.get_env_var('OCP_MIRROR_PASSWORD_FILE')
+            if common.file_has_valid_lines(ocp_mirror_ufile) and common.file_has_valid_lines(ocp_mirror_pfile):
+                common.print_msg(f"Using OpenShift mirror repository credentials from '{ocp_mirror_ufile}' and '{ocp_mirror_pfile}'")
+                build_args += [
+                    "--volume", f"{ocp_mirror_ufile}:/etc/dnf/vars/ocp_mirror_username:z",
+                    "--volume", f"{ocp_mirror_pfile}:/etc/dnf/vars/ocp_mirror_password:z"
+                ]
+            build_args += [
                 "--cache-to", f"{MIRROR_REGISTRY}/{cf_outname}",
                 "--cache-from", f"{MIRROR_REGISTRY}/{cf_outname}",
                 "-t", cf_outname, "-f", cf_outfile,
                 IMAGEDIR
             ]
+
             start = time.time()
             common.retry_on_exception(3, common.run_command_in_shell, build_args, dry_run, logfile, logfile)
             common.record_junit(cf_path, "build-container", "OK", start)
