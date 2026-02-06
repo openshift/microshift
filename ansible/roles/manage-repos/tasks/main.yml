@@ -24,7 +24,7 @@
 
       - name: Enable repo management from subscription-manager
         ansible.builtin.command: subscription-manager config --rhsm.manage_repos=1
-    when: manage_subscription
+    when: manage_subscription | bool
 
   - name: Slurp redhat-release
     ansible.builtin.slurp:
@@ -44,21 +44,21 @@
     include_tasks: roles/manage-repos/tasks/create-mirrors.yaml
     loop: "{{ repo_list }}"
     when:
-      - microshift_prerelease
-      - not build_microshift
+      - microshift_prerelease | bool
+      - not (build_microshift | bool)
 
   - name: Enable required repos for microshift
     community.general.rhsm_repository:
       name: "{{ rhel_repos }}"
     when:
-      - not microshift_prerelease
+      - not (microshift_prerelease | bool)
 
   - name: Install EPEL repo
     ansible.builtin.dnf:
-      name: "https://dl.fedoraproject.org/pub/epel/epel-release-latest-{{ ansible_distribution_major_version }}.noarch.rpm"
+      name: "https://dl.fedoraproject.org/pub/epel/epel-release-latest-{{ ansible_facts.distribution_major_version }}.noarch.rpm"
       disable_gpg_check: true
       state: present
-  when: ansible_distribution == "RedHat"
+  when: ansible_facts.distribution == "RedHat"
 
 - name: Gather the package facts
   ansible.builtin.package_facts:

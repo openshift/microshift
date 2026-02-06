@@ -45,5 +45,5 @@
     update_cache: true
   when:
     - packages_to_install | length > 0
-    - (ansible_distribution == "CentOS") or (ansible_distribution == "RedHat") or (ansible_distribution == "Fedora")
+    - (ansible_facts.distribution == "CentOS") or (ansible_facts.distribution == "RedHat") or (ansible_facts.distribution == "Fedora")
   become: yes

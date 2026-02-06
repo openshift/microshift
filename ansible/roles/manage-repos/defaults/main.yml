@@ -6,15 +6,15 @@ microshift_version_clean: "{{ microshift_version | regex_replace('^latest-', '')
 ocp_version: "{{ microshift_version_clean.split('.')[0] }}.{{ microshift_version_clean.split('.')[1] }}"
 microshift_base_url: "{{ 'ocp-dev-preview' if 'ec' in microshift_version else 'ocp' }}"
 repo_list:
-  - repo_name: 'microshift-{{ ocp_version }}-for-rhel-{{ ansible_distribution_major_version }}-mirrorbeta-{{ ansible_architecture }}-rpms'
-    repo_url: "https://mirror.openshift.com/pub/openshift-v4/{{ ansible_architecture }}/microshift/{{ microshift_base_url }}/{{ microshift_version }}/el9/os/"
-  - repo_name: 'microshift-{{ ocp_version }}-deps-for-rhel-{{ ansible_distribution_major_version }}-mirrorbeta-{{ ansible_architecture }}-rpms'
-    repo_url: "https://mirror.openshift.com/pub/openshift-v4/{{ ansible_architecture }}/dependencies/rpms/{{ ocp_version }}-el9-beta/"
+  - repo_name: 'microshift-{{ ocp_version }}-for-rhel-{{ ansible_facts.distribution_major_version }}-mirrorbeta-{{ ansible_facts.architecture }}-rpms'
+    repo_url: "https://mirror.openshift.com/pub/openshift-v4/{{ ansible_facts.architecture }}/microshift/{{ microshift_base_url }}/{{ microshift_version }}/el9/os/"
+  - repo_name: 'microshift-{{ ocp_version }}-deps-for-rhel-{{ ansible_facts.distribution_major_version }}-mirrorbeta-{{ ansible_facts.architecture }}-rpms'
+    repo_url: "https://mirror.openshift.com/pub/openshift-v4/{{ ansible_facts.architecture }}/dependencies/rpms/{{ ocp_version }}-el9-beta/"
 
 rhel_beta: ''
 rhel_repos:
-  - rhel-{{ ansible_distribution_major_version }}-for-{{ ansible_architecture }}-baseos-{{ rhel_beta }}rpms
-  - rhel-{{ ansible_distribution_major_version }}-for-{{ ansible_architecture }}-appstream-{{ rhel_beta }}rpms
-  - codeready-builder-{{ rhel_beta }}for-rhel-{{ ansible_distribution_major_version }}-{{ ansible_architecture }}-rpms
-  - fast-datapath-{{ rhel_beta }}for-rhel-{{ ansible_distribution_major_version }}-{{ ansible_architecture }}-rpms
-  - rhocp-{{ ocp_version }}-for-rhel-{{ ansible_distribution_major_version }}-{{ ansible_architecture }}-rpms
+  - rhel-{{ ansible_facts.distribution_major_version }}-for-{{ ansible_facts.architecture }}-baseos-{{ rhel_beta }}rpms
+  - rhel-{{ ansible_facts.distribution_major_version }}-for-{{ ansible_facts.architecture }}-appstream-{{ rhel_beta }}rpms
+  - codeready-builder-{{ rhel_beta }}for-rhel-{{ ansible_facts.distribution_major_version }}-{{ ansible_facts.architecture }}-rpms
+  - fast-datapath-{{ rhel_beta }}for-rhel-{{ ansible_facts.distribution_major_version }}-{{ ansible_facts.architecture }}-rpms
+  - rhocp-{{ ocp_version }}-for-rhel-{{ ansible_facts.distribution_major_version }}-{{ ansible_facts.architecture }}-rpms

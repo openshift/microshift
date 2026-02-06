@@ -7,7 +7,7 @@
     dest: metrics-sa.yaml
 
 - name: create service account for metrics gathering from kubelet
-  ansible.builtin.command: oc create -f metrics-sa.yaml
+  ansible.builtin.command: oc apply -f metrics-sa.yaml
 
 - name: create token for service account
   ansible.builtin.command: oc create token metrics-server -n kube-system --duration 720h

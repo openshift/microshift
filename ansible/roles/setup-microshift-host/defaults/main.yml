@@ -1,6 +1,10 @@
 ---
 # setup-microshift-host default vars
 
+# Pin RHEL to a specific version during upgrades (e.g., "9.6")
+# Leave undefined to upgrade to the latest available version
+# rhel_target_version: "9.6"
+
 go_arch: arm64
 go_files:
   - go

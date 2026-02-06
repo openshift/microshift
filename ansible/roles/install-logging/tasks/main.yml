@@ -2,7 +2,7 @@
 # install-logging tasks
 
 - name: RPM tasks
-  when: (ansible_distribution == "CentOS") or (ansible_distribution == "RedHat") or (ansible_distribution == "Fedora")
+  when: (ansible_facts.distribution == "CentOS") or (ansible_facts.distribution == "RedHat") or (ansible_facts.distribution == "Fedora")
   block:
     - name: Install prometheus & grafana
       ansible.builtin.dnf:
@@ -37,7 +37,7 @@
   loop: "{{ logging_services }}"
 
 - name: Configure Grafana dashboards and datasources
-  when: grafana_setup
+  when: grafana_setup | bool
   block:
     - name: Get content of microshift grafana dashboard
       ansible.builtin.set_fact:
