@@ -21,8 +21,7 @@ apiServer:
             disabled: []
             enabled: []
         featureSet: ""
-        # SpecialHandlingSupportExceptionRequired is used to enable/disable feature gates without blocking x- and y-stream upgrades.
-        # A SpecialHandlingSupportExceptionRequired feature will be given precedence over the same feature (if set) in CustomNoUpgrade features.
+        # SpecialHandlingSupportExceptionRequired allows for feature gates to be exempted from blocking x- and y-stream upgrades.
         specialHandlingSupportExceptionRequired:
             disabled: []
             enabled: []
