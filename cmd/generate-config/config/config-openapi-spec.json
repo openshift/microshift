@@ -94,7 +94,7 @@
               "type": "string"
             },
             "specialHandlingSupportExceptionRequired": {
-              "description": "SpecialHandlingSupportExceptionRequired is used to enable/disable feature gates without blocking x- and y-stream upgrades.\nA SpecialHandlingSupportExceptionRequired feature will be given precedence over the same feature (if set) in CustomNoUpgrade features.",
+              "description": "SpecialHandlingSupportExceptionRequired allows for feature gates to be exempted from blocking x- and y-stream upgrades.",
               "type": "object",
               "required": [
                 "disabled",
