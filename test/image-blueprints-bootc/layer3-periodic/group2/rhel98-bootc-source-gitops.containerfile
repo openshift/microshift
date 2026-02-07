@@ -1,4 +1,4 @@
-FROM localhost/rhel96-bootc-source:latest
+FROM localhost/rhel98-bootc-source:latest
 
 # Copy repository configuration
 COPY ./bootc-images/microshift-gitops.repo \
