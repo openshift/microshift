@@ -3,8 +3,8 @@
 # Sourced from scenario.sh and uses functions defined there.
 
 scenario_create_vms() {
-    prepare_kickstart host1 kickstart-bootc.ks.template rhel96-bootc-source
-    launch_vm --boot_blueprint rhel96-bootc --network "${VM_DUAL_STACK_NETWORK}"
+    prepare_kickstart host1 kickstart-bootc.ks.template rhel98-bootc-source
+    launch_vm --boot_blueprint rhel98-bootc --network "${VM_DUAL_STACK_NETWORK}"
 }
 
 scenario_remove_vms() {

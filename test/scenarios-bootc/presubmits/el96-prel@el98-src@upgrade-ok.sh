@@ -8,7 +8,7 @@ scenario_create_vms() {
     exit_if_image_not_found "${start_image}"
 
     prepare_kickstart host1 kickstart-bootc.ks.template "${start_image}"
-    launch_vm --boot_blueprint rhel96-bootc
+    launch_vm --boot_blueprint rhel98-bootc
 }
 
 scenario_remove_vms() {
@@ -21,7 +21,7 @@ scenario_run_tests() {
     exit_if_image_not_found "${start_image}"
 
     run_tests host1 \
-        --variable "TARGET_REF:rhel96-bootc-source" \
+        --variable "TARGET_REF:rhel98-bootc-source" \
         --variable "BOOTC_REGISTRY:${MIRROR_REGISTRY_URL}" \
         suites/upgrade/upgrade-successful.robot
 }
