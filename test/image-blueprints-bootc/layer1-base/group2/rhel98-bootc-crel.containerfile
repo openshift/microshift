@@ -1,25 +1,17 @@
 # {{- if env.Getenv "CURRENT_RELEASE_VERSION" "" -}}
 # Note: This comment makes templating add a new line before the code
-FROM localhost/rhel96-test-agent:latest
+FROM localhost/rhel98-test-agent:latest
 
 # Copy repository configuration
 COPY ./bootc-images/microshift-fast-datapath-rhel9.repo ./bootc-images/microshift-crel.repo ./bootc-images/microshift-rhocp-y.repo \
     /etc/yum.repos.d/
 
 # Print repository configuration contents.
-# Install MicroShift with optional components and cleanup.
+# Install MicroShift and cleanup.
 RUN dnf repoinfo --enabled && \
     dnf install -y firewalld \
         {{ range (env.Getenv "MICROSHIFT_MANDATORY_RPMS" | strings.Split " ") -}}
         "{{ . }}-{{ env.Getenv "CURRENT_RELEASE_VERSION" }}" \
-        {{ end -}}
-        {{ range (env.Getenv "MICROSHIFT_OPTIONAL_RPMS" | strings.Split " ") -}}
-        "{{ . }}-{{ env.Getenv "CURRENT_RELEASE_VERSION" }}" \
-        {{ end -}}
-        {{ if and (env.Getenv "UNAME_M" "") (eq "x86_64" .Env.UNAME_M) -}}
-        {{ range (env.Getenv "MICROSHIFT_X86_64_RPMS" | strings.Split " ") -}}
-        "{{ . }}-{{ env.Getenv "CURRENT_RELEASE_VERSION" }}" \
-        {{ end -}}
         {{ end -}}
         && \
     systemctl enable microshift && \
