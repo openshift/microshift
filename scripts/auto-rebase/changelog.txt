@@ -1,3 +1,15 @@
-- ovn-kubernetes image-arm64 16e5e201025c67a8cc2253851ebbbe3dfa7d7910 to 194e289903051ba951e479c227ad3d44f9fc321a
+- cluster-kube-apiserver-operator embedded-component 8ce34d695b2ee3a93e748cd039db7c238ffc9f12 to 4bbd3be9dfda4a08dca98648209151de2a869f25
+  - 8047018 2025-11-05T16:34:26+00:00 Add priority field to prevent early shutdown
+
+- cluster-kube-scheduler-operator embedded-component 8740a60de76690a17d5081db078eb93dfdb7a066 to b5671f10f0b03ac19e584e08b08267f67dd2d709
+  - ca3fba9 2026-01-30T12:59:18-05:00 Update ks_pod_scenario_3.yaml
+  - b35f237 2026-01-30T12:59:18-05:00 Update ks_pod_scenario_2.yaml
+  - bb1599c 2026-01-30T12:59:17-05:00 Update ks_pod_scenario_1.yaml
+  - 95d235b 2026-01-30T12:59:17-05:00 Add priority field to prevent early shutdown
+
+- machine-config-operator embedded-component b405535023b88949e231be90778e5cf63e438c40 to 25321abfd952d282486d28fe27c4ab6052469ebf
+  - 1b30b594 2026-01-28T16:02:00-06:00 Fix MCN conditions not updating during OCL sync
+
+- ovn-kubernetes image-amd64 16e5e201025c67a8cc2253851ebbbe3dfa7d7910 to 194e289903051ba951e479c227ad3d44f9fc321a
   - 1ce92737 2026-01-21T14:02:20+01:00 fix(localnet, ipamless): Prevent LSP deletion on sync
 
