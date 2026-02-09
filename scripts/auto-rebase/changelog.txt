@@ -1,14 +1,26 @@
-- oc image-amd64 dc61926008ad5333863dd1ae2902b95aed6dceaa to 040daf8c96442098f8d6a6acd9faef69693222a3
-  - a2fcac9d 2026-02-03T06:07:38+00:00 Fix unit test failure by updating ruby version to 3.3
-  - 0d8d1876 2026-02-03T04:18:35+00:00 Clear defaultNodeSelector to run on any node
+- cluster-kube-apiserver-operator embedded-component 974542ae2ef86a631546b3a48fd0da3c2e3b74dd to f6bb470ca76bd37d533a5366321faa9f478c614a
+  - 29d4a74 2026-01-20T22:44:35+00:00 SCC: allow image volume type for all SCCs
 
-- ovn-kubernetes image-amd64 1faf1ac5bb2e604f745d93a5fe70bec93024ad7f to 3f6615b1bb18ff1841fe4596bd32cb91bc2854e6
-  - b1669576 2026-01-21T14:00:27+01:00 fix(localnet, ipamless): Prevent LSP deletion on sync
+- etcd embedded-component eac09c01677bb03daed156d407be27785fd61e0d to 05bca97760b1cfa1bcef11c0b1f1a5c4dab19709
+  - 65251b30 2025-12-18T03:27:13+08:00 version: bump up to 3.5.26
+  - 751f1628 2025-12-15T22:36:25-06:00 dependency: Bump golang.org/x/crypto from 0.38.0 to 0.45.0
+  - 47f9b5aa 2025-12-10T09:37:59-05:00 server: cleanup zombie membership information
+  - 5ff84215 2025-12-10T09:36:18-05:00 tests: setup two testcases to reproduce 20967 issue
+  - a8ffc2e2 2025-12-06T21:32:18+08:00 Bump go to 1.24.11
+  - 80e15b8f 2025-11-18T13:11:14+00:00 Fix a typo of 'etcdctl snapshot restore/status' commands
+  - 8bdb0edc 2025-11-17T17:56:45+00:00 Print token fingerprint instead of the original tokens in log messages
+  - e2eff772 2025-11-12T00:00:11-05:00 version: bump up to 3.5.25
+  - 26c67519 2025-11-06T21:57:49-08:00 Bump from go1.24.9 to go1.24.10
+  - 547d6f42 2025-11-06T19:37:43+00:00 Fix the '--force-new-cluster' can't clean up learners issue
+  - 2cdacbc4 2025-11-06T19:35:12+00:00 Add an e2e test cases to reproduce the '--force-new-cluster' can't remove learners issue
+  - 67ddeb51 2025-11-04T09:30:54-05:00 etcdutl: add --wal-dir for check-v2store
 
-- oc image-arm64 dc61926008ad5333863dd1ae2902b95aed6dceaa to 040daf8c96442098f8d6a6acd9faef69693222a3
-  - a2fcac9d 2026-02-03T06:07:38+00:00 Fix unit test failure by updating ruby version to 3.3
-  - 0d8d1876 2026-02-03T04:18:35+00:00 Clear defaultNodeSelector to run on any node
+- kubernetes embedded-component 33a825ebe5da727e8ccce0fb3c9d33fce7c6bdd9 to 53f1c84ab86e3e029927fc302d5a1e4e0bf47eed
+  - 607a93617 2026-02-03T09:35:30+01:00 UPSTREAM: 136595: raise kubelet CSI init backoff to cover ~140s DNS delays
 
-- ovn-kubernetes image-arm64 1faf1ac5bb2e604f745d93a5fe70bec93024ad7f to 3f6615b1bb18ff1841fe4596bd32cb91bc2854e6
-  - b1669576 2026-01-21T14:00:27+01:00 fix(localnet, ipamless): Prevent LSP deletion on sync
+- kubernetes image-amd64 33a825ebe5da727e8ccce0fb3c9d33fce7c6bdd9 to 53f1c84ab86e3e029927fc302d5a1e4e0bf47eed
+  - 607a93617 2026-02-03T09:35:30+01:00 UPSTREAM: 136595: raise kubelet CSI init backoff to cover ~140s DNS delays
+
+- kubernetes image-arm64 33a825ebe5da727e8ccce0fb3c9d33fce7c6bdd9 to 53f1c84ab86e3e029927fc302d5a1e4e0bf47eed
+  - 607a93617 2026-02-03T09:35:30+01:00 UPSTREAM: 136595: raise kubelet CSI init backoff to cover ~140s DNS delays
 
