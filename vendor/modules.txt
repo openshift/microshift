@@ -413,7 +413,7 @@ github.com/opencontainers/runtime-spec/specs-go
 github.com/opencontainers/selinux/go-selinux
 github.com/opencontainers/selinux/go-selinux/label
 github.com/opencontainers/selinux/pkg/pwalkdir
-# github.com/openshift/api v0.0.0-20251117165054-348370f055bf
+# github.com/openshift/api v0.0.0-20251214014457-bfa868a22401
 ## explicit; go 1.24.0
 github.com/openshift/api
 github.com/openshift/api/annotations
@@ -518,7 +518,7 @@ github.com/openshift/build-machinery-go/make/targets/golang
 github.com/openshift/build-machinery-go/make/targets/openshift
 github.com/openshift/build-machinery-go/make/targets/openshift/operator
 github.com/openshift/build-machinery-go/scripts
-# github.com/openshift/client-go v0.0.0-20251015124057-db0dee36e235
+# github.com/openshift/client-go v0.0.0-20251205093018-96a6cbc1420c
 ## explicit; go 1.24.0
 github.com/openshift/client-go/apiserver/applyconfigurations/apiserver/v1
 github.com/openshift/client-go/apiserver/applyconfigurations/internal

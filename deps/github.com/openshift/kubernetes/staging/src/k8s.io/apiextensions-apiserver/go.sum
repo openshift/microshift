@@ -168,8 +168,8 @@ github.com/onsi/gomega v1.35.1/go.mod h1:PvZbdDc8J6XJEpDK4HCuRBm8a6Fzp9/DmhC9C7y
 github.com/opencontainers/go-digest v1.0.0/go.mod h1:0JzlMkj0TRzQZfJkVvzbP0HBR3IKzErnv2BNG4W4MAM=
 github.com/opencontainers/image-spec v1.0.2/go.mod h1:BtxoFyWECRxE4U/7sNtV5W15zMzWCbyJoFRP3s7yZA0=
 github.com/opencontainers/selinux v1.11.0/go.mod h1:E5dMC3VPuVvVHDYmi78qvhJp8+M586T4DlDRYpFkyec=
-github.com/openshift/api v0.0.0-20251015095338-264e80a2b6e7 h1:Ot2fbEEPmF3WlPQkyEW/bUCV38GMugH/UmZvxpWceNc=
-github.com/openshift/api v0.0.0-20251015095338-264e80a2b6e7/go.mod h1:d5uzF0YN2nQQFA0jIEWzzOZ+edmo6wzlGLvx5Fhz4uY=
+github.com/openshift/api v0.0.0-20251214014457-bfa868a22401 h1:goMf6pBtRFSQaVElFk6K+GIAqnv7O84p7PJHH6pDz/E=
+github.com/openshift/api v0.0.0-20251214014457-bfa868a22401/go.mod h1:d5uzF0YN2nQQFA0jIEWzzOZ+edmo6wzlGLvx5Fhz4uY=
 github.com/openshift/build-machinery-go v0.0.0-20250530140348-dc5b2804eeee/go.mod h1:8jcm8UPtg2mCAsxfqKil1xrmRMI3a+XU2TZ9fF8A7TE=
 github.com/openshift/client-go v0.0.0-20251015124057-db0dee36e235/go.mod h1:L49W6pfrZkfOE5iC1PqEkuLkXG4W0BX4w8b+L2Bv7fM=
 github.com/openshift/library-go v0.0.0-20251015151611-6fc7a74b67c5 h1:bANtDc8SgetSK4nQehf59x3+H9FqVJCprgjs49/OTg0=

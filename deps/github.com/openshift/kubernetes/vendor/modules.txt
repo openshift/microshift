@@ -512,7 +512,7 @@ github.com/openshift-eng/openshift-tests-extension/pkg/ginkgo
 github.com/openshift-eng/openshift-tests-extension/pkg/junit
 github.com/openshift-eng/openshift-tests-extension/pkg/util/sets
 github.com/openshift-eng/openshift-tests-extension/pkg/version
-# github.com/openshift/api v0.0.0-20251015095338-264e80a2b6e7
+# github.com/openshift/api v0.0.0-20251214014457-bfa868a22401
 ## explicit; go 1.24.0
 github.com/openshift/api/apiserver/v1
 github.com/openshift/api/apps/v1
@@ -560,7 +560,7 @@ github.com/openshift/apiserver-library-go/pkg/securitycontextconstraints/sysctl
 github.com/openshift/apiserver-library-go/pkg/securitycontextconstraints/user
 github.com/openshift/apiserver-library-go/pkg/securitycontextconstraints/util
 github.com/openshift/apiserver-library-go/pkg/securitycontextconstraints/util/sort
-# github.com/openshift/client-go v0.0.0-20251015124057-db0dee36e235
+# github.com/openshift/client-go v0.0.0-20251205093018-96a6cbc1420c
 ## explicit; go 1.24.0
 github.com/openshift/client-go/apiserver/applyconfigurations
 github.com/openshift/client-go/apiserver/applyconfigurations/apiserver/v1
