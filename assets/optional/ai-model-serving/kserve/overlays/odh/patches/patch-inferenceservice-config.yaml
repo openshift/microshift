@@ -5,9 +5,10 @@ metadata:
   namespace: kserve
 data:
   explainers: "{}"
-  oauthProxy: |- 
+  oauthProxy: |-
     {
-      "image" : "$(oauth-proxy)",
+      "oauthProxyImage" : "$(oauth-proxy)",
+      "kubeRbacProxyImage" : "$(kube-rbac-proxy)",
       "memoryRequest": "64Mi",
       "memoryLimit": "128Mi",
       "cpuRequest": "100m",
