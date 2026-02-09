@@ -1,3 +1,12 @@
-- kubernetes image-arm64 436b373e7dec669750c65a1ef832665e56b733b7 to 91c24081f468e7636c824f4f5a2eb68660b81012
+- kubernetes embedded-component 436b373e7dec669750c65a1ef832665e56b733b7 to 91c24081f468e7636c824f4f5a2eb68660b81012
   - b18acb299 2025-04-08T14:24:38+00:00 UPSTREAM: 130450: Fix implementation of ContainsCIDR to allow non-equal addresses
+
+- ovn-kubernetes image-amd64 70a2d777ecb661c3267d24092381518f0420fa9a to 4bee86ff82e3632f99ee5926c0f8ab7a78c93f48
+  - 3bbc31b3 2026-01-21T14:03:37+01:00 fix(localnet, ipamless): Prevent LSP deletion on sync
+
+- kubernetes image-amd64 436b373e7dec669750c65a1ef832665e56b733b7 to 91c24081f468e7636c824f4f5a2eb68660b81012
+  - b18acb299 2025-04-08T14:24:38+00:00 UPSTREAM: 130450: Fix implementation of ContainsCIDR to allow non-equal addresses
+
+- ovn-kubernetes image-arm64 70a2d777ecb661c3267d24092381518f0420fa9a to 4bee86ff82e3632f99ee5926c0f8ab7a78c93f48
+  - 3bbc31b3 2026-01-21T14:03:37+01:00 fix(localnet, ipamless): Prevent LSP deletion on sync
 
