@@ -284,25 +284,12 @@ def process_containerfile(groupdir, containerfile, dry_run):
             # Note:
             # - The pull secret is necessary in some builds for pulling embedded
             #   container images referenced in release-info RPMs
-            # - The OpenShift mirror repository credentials are optional and are used
-            #   for accessing pre-release RHEL RPM repositories.
             # - The explicit push-to-mirror sets the 'latest' tag as all the build
             #   layers are in the mirror due to 'cache-to' option
             build_args = [
                 "sudo", "podman", "build",
                 "--authfile", PULL_SECRET,
-                "--secret", f"id=pullsecret,src={PULL_SECRET}"
-            ]
-
-            ocp_mirror_ufile = common.get_env_var('OCP_MIRROR_USERNAME_FILE')
-            ocp_mirror_pfile = common.get_env_var('OCP_MIRROR_PASSWORD_FILE')
-            if common.file_has_valid_lines(ocp_mirror_ufile) and common.file_has_valid_lines(ocp_mirror_pfile):
-                common.print_msg(f"Using OpenShift mirror repository credentials from '{ocp_mirror_ufile}' and '{ocp_mirror_pfile}'")
-                build_args += [
-                    "--volume", f"{ocp_mirror_ufile}:/etc/dnf/vars/ocp_mirror_username:z",
-                    "--volume", f"{ocp_mirror_pfile}:/etc/dnf/vars/ocp_mirror_password:z"
-                ]
-            build_args += [
+                "--secret", f"id=pullsecret,src={PULL_SECRET}",
                 "--cache-to", f"{MIRROR_REGISTRY}/{cf_outname}",
                 "--cache-from", f"{MIRROR_REGISTRY}/{cf_outname}",
                 "-t", cf_outname, "-f", cf_outfile,
@@ -381,15 +368,16 @@ def process_image_bootc(groupdir, bootcfile, dry_run):
             # Read the image reference
             bf_imgref = common.read_file_valid_lines(bf_outfile).strip()
 
-            # If not already local, download the image to be used by bootc image builder
-            if not bf_imgref.startswith('localhost/'):
-                pull_args = [
-                    "sudo", "podman", "pull",
-                    "--authfile", PULL_SECRET, bf_imgref
-                ]
-                start = time.time()
-                common.retry_on_exception(3, common.run_command_in_shell, pull_args, dry_run, logfile, logfile)
-                common.record_junit(bf_path, "pull-bootc-image", "OK", start)
+            # Download the image to be used by bootc image builder.
+            # Locally built images should also be downloaded in case they were
+            # cached but not fetched from the mirror registry.
+            pull_args = [
+                "sudo", "podman", "pull",
+                "--authfile", PULL_SECRET, bf_imgref
+            ]
+            start = time.time()
+            common.retry_on_exception(3, common.run_command_in_shell, pull_args, dry_run, logfile, logfile)
+            common.record_junit(bf_path, "pull-bootc-image", "OK", start)
 
             # The podman command with security elevation and
             # mount of output / container storage
@@ -405,7 +393,6 @@ def process_image_bootc(groupdir, bootcfile, dry_run):
             build_args += [
                 BIB_IMAGE,
                 "--type", "anaconda-iso",
-                "--local",
                 bf_imgref
             ]
             start = time.time()
