@@ -88,8 +88,8 @@ setup_ocp_mirror_proxy() {
     fi
 
     # Create the basic auth credentials for the OCP mirror
-    local -r auth_user="$(cat "${OCP_MIRROR_USERNAME_FILE:-}" | tr -d '\n')"
-    local -r auth_pass="$(cat "${OCP_MIRROR_PASSWORD_FILE:-}" | tr -d '\n')"
+    local -r auth_user="$(tr -d '\n' < "${OCP_MIRROR_USERNAME_FILE}")"
+    local -r auth_pass="$(tr -d '\n' < "${OCP_MIRROR_PASSWORD_FILE}")"
     local -r auth_cred="$(echo -n "${auth_user}:${auth_pass}" | base64 -w0)"
 
     # Print the nginx configuration for the OCP mirror proxy
