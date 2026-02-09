@@ -297,7 +297,9 @@ spec:
 
       # ovnkube master: convert kubernetes objects in to nbdb logical network components
       - name: ovnkube-master
-        image: {{ .ReleaseImage.ovn_kubernetes_microshift }}
+        # Patched ovnk version with https://github.com/pmtk/ovn-kubernetes/commit/6f667604fe51c8bd80e205d3c90143aca784f57f#diff-b13e3c3ee5d6b83836c1951006a06a1fbd0f539d22b75be7aae080f085dd31f4R110
+        image: localhost/ovnk:latest
+        imagePullPolicy: Never
         command:
         - /bin/bash
         - -c
@@ -350,6 +352,10 @@ spec:
             --enable-multicast \
             --disable-snat-multiple-gws \
             --single-node \
+            --enable-network-segmentation=true \
+            --enable-multi-network=true \
+            --gateway-v4-masquerade-subnet 169.254.0.0/17 \
+            --gateway-v6-masquerade-subnet fd69::/112 \
             --acl-logging-rate-limit "20"
         lifecycle:
           preStop:
@@ -396,6 +402,11 @@ spec:
           name: etc-openvswitch-node
         - mountPath: /etc/ovn/
           name: etc-openvswitch-node
+        - mountPath: /run/systemd/private
+          mountPropagation: HostToContainer
+          name: run-systemd
+          readOnly: true
+          subPath: private          
         resources:
           requests:
             cpu: 10m
@@ -455,6 +466,10 @@ spec:
       - name: host-cni-bin
         hostPath:
           path: "/run/cni/bin"
+      - hostPath:
+          path: /run/systemd
+          type: ""
+        name: run-systemd
 
       - name: kubeconfig
         hostPath:
