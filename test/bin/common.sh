@@ -191,7 +191,7 @@ WEB_SERVER_PORT=8080
 
 # Web server URL using VM bridge IP with fallback to host name
 # shellcheck disable=SC2034  # used elsewhere
-WEB_SERVER_URL="http://${VM_BRIDGE_IP:-$(hostname)}:${WEB_SERVER_PORT}"
+export WEB_SERVER_URL="http://${VM_BRIDGE_IP:-$(hostname)}:${WEB_SERVER_PORT}"
 
 # Mirror registry port number
 export MIRROR_REGISTRY_PORT=5000
