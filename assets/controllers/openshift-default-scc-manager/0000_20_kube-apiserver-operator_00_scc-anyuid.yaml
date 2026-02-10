@@ -39,6 +39,7 @@ volumes:
 - downwardAPI
 - emptyDir
 - ephemeral
+- image
 - persistentVolumeClaim
 - projected
 - secret
