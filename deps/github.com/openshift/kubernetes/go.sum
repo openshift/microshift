@@ -306,13 +306,13 @@ github.com/opencontainers/selinux v1.11.1 h1:nHFvthhM0qY8/m+vfhJylliSshm8G1jJ2jD
 github.com/opencontainers/selinux v1.11.1/go.mod h1:E5dMC3VPuVvVHDYmi78qvhJp8+M586T4DlDRYpFkyec=
 github.com/openshift-eng/openshift-tests-extension v0.0.0-20250916161632-d81c09058835 h1:rkqIIfdYYkasXbF2XKVgh/3f1mhjSQK9By8WtVMgYo8=
 github.com/openshift-eng/openshift-tests-extension v0.0.0-20250916161632-d81c09058835/go.mod h1:6gkP5f2HL0meusT0Aim8icAspcD1cG055xxBZ9yC68M=
-github.com/openshift/api v0.0.0-20251015095338-264e80a2b6e7 h1:Ot2fbEEPmF3WlPQkyEW/bUCV38GMugH/UmZvxpWceNc=
-github.com/openshift/api v0.0.0-20251015095338-264e80a2b6e7/go.mod h1:d5uzF0YN2nQQFA0jIEWzzOZ+edmo6wzlGLvx5Fhz4uY=
+github.com/openshift/api v0.0.0-20251214014457-bfa868a22401 h1:goMf6pBtRFSQaVElFk6K+GIAqnv7O84p7PJHH6pDz/E=
+github.com/openshift/api v0.0.0-20251214014457-bfa868a22401/go.mod h1:d5uzF0YN2nQQFA0jIEWzzOZ+edmo6wzlGLvx5Fhz4uY=
 github.com/openshift/apiserver-library-go v0.0.0-20251015164739-79d04067059d h1:Mfya3RxHWvidOrKyHj3bmFn5x2B89DLZIvDAhwm+C2s=
 github.com/openshift/apiserver-library-go v0.0.0-20251015164739-79d04067059d/go.mod h1:zm2/rIUp0p83pz0/1kkSoKTqhTr3uUKSKQ9fP7Z3g7Y=
 github.com/openshift/build-machinery-go v0.0.0-20250530140348-dc5b2804eeee/go.mod h1:8jcm8UPtg2mCAsxfqKil1xrmRMI3a+XU2TZ9fF8A7TE=
-github.com/openshift/client-go v0.0.0-20251015124057-db0dee36e235 h1:9JBeIXmnHlpXTQPi7LPmu1jdxznBhAE7bb1K+3D8gxY=
-github.com/openshift/client-go v0.0.0-20251015124057-db0dee36e235/go.mod h1:L49W6pfrZkfOE5iC1PqEkuLkXG4W0BX4w8b+L2Bv7fM=
+github.com/openshift/client-go v0.0.0-20251205093018-96a6cbc1420c h1:TBE0Gl+oCo/SNEhLKZQNNH/SWHXrpGyhAw7P0lAqdHg=
+github.com/openshift/client-go v0.0.0-20251205093018-96a6cbc1420c/go.mod h1:IsynOWZAfdH+BgWimcFQRtI41Id9sgdhsCEjIk8ACLw=
 github.com/openshift/google-cadvisor v0.52.1-openshift-4.21-1 h1:GNwO7gdyk6kAbFwIRo0T8NOTgxKYA2J6tSAtVMYavY0=
 github.com/openshift/google-cadvisor v0.52.1-openshift-4.21-1/go.mod h1:OAhPcx1nOm5YwMh/JhpUOMKyv1YKLRtS9KgzWPndHmA=
 github.com/openshift/library-go v0.0.0-20251015151611-6fc7a74b67c5 h1:bANtDc8SgetSK4nQehf59x3+H9FqVJCprgjs49/OTg0=
