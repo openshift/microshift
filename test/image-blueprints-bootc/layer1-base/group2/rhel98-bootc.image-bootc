@@ -1,0 +1,6 @@
+# TODO: Replace this by a RHEL 9.8 image when its RPM repositories are released.
+# Bootc Image Builder has a limitation does not allowing it to build ISO images
+# from containers that use repositories protected by credentials. Thus, we build
+# from the test agent container image which uses proxy for accessing repositories.
+# registry.redhat.io/rhel9/rhel-bootc:9.8
+localhost/rhel98-test-agent:latest
