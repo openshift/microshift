@@ -33,7 +33,7 @@ robotidy:
 
 ####################################################
 # Testing Framework commands for local development #
-#################################################### 
+####################################################
 
 #
 # Configuration commands
@@ -67,6 +67,12 @@ endef
 #
 # Build commands
 #
+.PHONY: test-build-registry-clean
+test-build-registry-clean:
+	./bin/manage_composer_config.sh cleanup
+	rm -rf "$(REPO)/_output/test-images/mirror-registry"
+	./bin/manage_webserver.sh start
+
 PHONY: test-build-ostree-presubmit
 test-build-ostree-presubmit:
 	./bin/build_images.sh -l $(call find_layer,image-blueprints,base) $(ARGS)
