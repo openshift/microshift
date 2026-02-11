@@ -157,12 +157,14 @@ type FeatureGates struct {
 // Validation checks should be performed before calling this function to ensure the FeatureGates struct is valid.
 func (fg FeatureGates) ToApiserverArgs() ([]string, error) {
 	ret := sets.NewString()
-	for _, feature := range fg.CustomNoUpgrade.Enabled {
-		ret.Insert(fmt.Sprintf("%s=true", feature))
+	addFeatures := func(features []string, enabled bool) {
+		for _, feature := range features {
+			ret.Insert(fmt.Sprintf("%s=%t", feature, enabled))
+		}
 	}
-	for _, feature := range fg.CustomNoUpgrade.Disabled {
-		ret.Insert(fmt.Sprintf("%s=false", feature))
-	}
+
+	addFeatures(fg.CustomNoUpgrade.Enabled, true)
+	addFeatures(fg.CustomNoUpgrade.Disabled, false)
 	return ret.List(), nil
 }
 
@@ -171,49 +173,53 @@ func (fg FeatureGates) GoString() string {
 	return fmt.Sprintf("FeatureGates{FeatureSet: %q, CustomNoUpgrade: %#v}", fg.FeatureSet, fg.CustomNoUpgrade)
 }
 
+// validateFeatureGates validates the FeatureGates struct according to the following rules:
+// 1. FeatureGates may be unset.
+// 2. FeatureSet must be empty or CustomNoUpgrade.
+// 3. If FeatureSet is DevPreviewNoUpgrade or TechPreviewNoUpgrade, return an error.
+// 4. If FeatureSet is CustomNoUpgrade, CustomNoUpgrade.Enabled/Disabled lists may be set but are not required.
+// 5. Required feature gates cannot be disabled.
+// 6. Feature gates cannot be both enabled and disabled within the same object.
 func (fg *FeatureGates) validateFeatureGates() error {
-	// FG is unset
 	if fg == nil || reflect.DeepEqual(*fg, FeatureGates{}) {
 		return nil
 	}
 
-	// FeatureSet must be empty or CustomNoUpgrade. If empty, CustomNoUpgrade.Enabled/Disabled lists must be empty.
 	switch fg.FeatureSet {
 	case "":
-		if len(fg.CustomNoUpgrade.Enabled) > 0 || len(fg.CustomNoUpgrade.Disabled) > 0 {
-			return fmt.Errorf("CustomNoUpgrade enabled/disabled lists must be empty when FeatureSet is empty")
-		}
 		return nil
 	case FeatureSetCustomNoUpgrade:
-		// Valid - continue to validate enabled/disabled lists below
+		// Valid - continue with validation
 	case FeatureSetDevPreviewNoUpgrade, FeatureSetTechPreviewNoUpgrade:
 		return fmt.Errorf("FeatureSet %s is not supported. Use CustomNoUpgrade to enable/disable feature gates", fg.FeatureSet)
 	default:
 		return fmt.Errorf("invalid feature set: %s", fg.FeatureSet)
 	}
 
-	var errs = make(sets.Set[error], 0)
-	for _, requiredFG := range RequiredFeatureGates {
-		// Edge case: Users must not be allowed to explicitly disable required feature gates.
-		if sets.NewString(fg.CustomNoUpgrade.Disabled...).Has(requiredFG) {
-			errs.Insert(fmt.Errorf("required feature gate %s cannot be disabled: %s", requiredFG, fg.CustomNoUpgrade.Disabled))
+	enabledCustom := sets.New(fg.CustomNoUpgrade.Enabled...)
+	disabledCustom := sets.New(fg.CustomNoUpgrade.Disabled...)
+
+	// checkFeatureGateConflict checks if two sets of feature gates have any intersection and returns an error if they do.
+	checkFeatureGateConflict := func(a, b sets.Set[string], errorMsg string) error {
+		if intersect := a.Intersection(b); intersect.Len() > 0 {
+			return fmt.Errorf("%s: %s", errorMsg, intersect.UnsortedList())
 		}
-		// Edge case: Users must not be allowed to explicitly enable required feature gates or else the config would be locked and the cluster
-		// would not be able to be upgraded.
-		if sets.New(fg.CustomNoUpgrade.Enabled...).Has(requiredFG) {
-			errs.Insert(fmt.Errorf("feature gate %s is explicitly enabled and cannot be enabled by the user", requiredFG))
-		}
-	}
-	if errs.Len() > 0 {
-		return fmt.Errorf("invalid feature gates: %s", errs.UnsortedList())
+		return nil
 	}
 
-	// Must not have any feature gates that are enabled and disabled at the same time
-	enabledSet := sets.New(fg.CustomNoUpgrade.Enabled...)
-	disabledSet := sets.New(fg.CustomNoUpgrade.Disabled...)
-	inBothSets := enabledSet.Intersection(disabledSet)
-	if inBothSets.Len() > 0 {
-		return fmt.Errorf("featuregates cannot be enabled and disabled at the same time: %s", inBothSets.UnsortedList())
+	conflictChecks := []struct {
+		setA sets.Set[string]
+		setB sets.Set[string]
+		msg  string
+	}{
+		{disabledCustom, sets.New(RequiredFeatureGates...), "required feature gates cannot be disabled"},
+		{enabledCustom, disabledCustom, "feature gates cannot be both enabled and disabled"},
+	}
+
+	for _, check := range conflictChecks {
+		if err := checkFeatureGateConflict(check.setA, check.setB, check.msg); err != nil {
+			return err
+		}
 	}
 
 	return nil
