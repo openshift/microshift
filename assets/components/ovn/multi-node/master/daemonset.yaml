@@ -377,6 +377,7 @@ spec:
           echo "I$(date "+%m%d %H:%M:%S.%N") - ovnkube-master - start ovnkube --init-master ${K8S_NODE}"
           exec /usr/bin/ovnkube \
             --init-master "${K8S_NODE}" \
+            --enable-interconnect \
             --nb-address "{{.OVN_NB_DB_LIST}}" \
             --sb-address "{{.OVN_SB_DB_LIST}}" \
             --config-file=/run/ovnkube-config/ovnkube.conf \
@@ -384,8 +385,14 @@ spec:
             ${gateway_mode_flags} \
             --inactivity-probe="180000" \
             --enable-multicast \
+            --enable-network-segmentation=true \
+            --enable-multi-network=true \
+            --enable-route-advertisements \
             --disable-snat-multiple-gws \
-            --acl-logging-rate-limit "20"
+            --acl-logging-rate-limit "20" \
+            --gateway-v4-masquerade-subnet 169.254.0.0/17 \
+            --gateway-v6-masquerade-subnet fd69::/112 
+
         volumeMounts:
         # for checking ovs-configuration service
         - mountPath: /etc/systemd/system
