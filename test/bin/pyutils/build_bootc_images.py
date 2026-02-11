@@ -284,11 +284,15 @@ def process_containerfile(groupdir, containerfile, dry_run):
             # Note:
             # - The pull secret is necessary in some builds for pulling embedded
             #   container images referenced in release-info RPMs
+            # - The host network usage is required to access the RPM repository
+            #   proxy server using the localhost URL to make generated builds
+            #   reusable from cache on other hosts.
             # - The explicit push-to-mirror sets the 'latest' tag as all the build
             #   layers are in the mirror due to 'cache-to' option
             build_args = [
                 "sudo", "podman", "build",
                 "--authfile", PULL_SECRET,
+                "--network", "host",
                 "--secret", f"id=pullsecret,src={PULL_SECRET}",
                 "--cache-to", f"{MIRROR_REGISTRY}/{cf_outname}",
                 "--cache-from", f"{MIRROR_REGISTRY}/{cf_outname}",
@@ -373,7 +377,8 @@ def process_image_bootc(groupdir, bootcfile, dry_run):
             # cached but not fetched from the mirror registry.
             pull_args = [
                 "sudo", "podman", "pull",
-                "--authfile", PULL_SECRET, bf_imgref
+                "--authfile", PULL_SECRET,
+                bf_imgref
             ]
             start = time.time()
             common.retry_on_exception(3, common.run_command_in_shell, pull_args, dry_run, logfile, logfile)
@@ -384,6 +389,7 @@ def process_image_bootc(groupdir, bootcfile, dry_run):
             build_args = [
                 "sudo", "podman", "run",
                 "--rm", "-i", "--privileged",
+                "--network", "host",
                 "--pull=newer",
                 "--security-opt", "label=type:unconfined_t",
                 "-v", f"{bf_outdir}:/output",
