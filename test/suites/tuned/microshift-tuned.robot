@@ -98,5 +98,6 @@ Restart MicroShift-Tuned Not Expecting Reboot
     Command Should Work    systemctl restart microshift-tuned.service
     Wait Until Keyword Succeeds    1m    10s
     ...    Systemctl Check Service SubState    microshift-tuned.service    dead
-    ${rebooted}=    Is System Rebooted    ${bootid}
+    ${rebooted}    ${cur_bootid}=    Is System Rebooted    ${bootid}
     Should Not Be True    ${rebooted}
+    Should Be Equal As Strings    ${cur_bootid}    ${bootid}

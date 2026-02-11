@@ -44,7 +44,6 @@ Using Systemd Dropin To React On Failure Of MicroShift
 Auto Recovery On Red Boot
     [Documentation]    Verify greenboot integration to start auto-recovery procedure.
 
-    Greenboot Workaround For Boot Counter
     Command Should Work    rm -rf ${SAFETY_BACKUP}
 
     Stop MicroShift
@@ -55,10 +54,13 @@ Auto Recovery On Red Boot
     Corrupt Etcd Database
     Start MicroShift Expecting Failure
 
-    ${bootid}=    Get Current Boot Id
-    Command Should Fail    systemctl restart greenboot-healthcheck
-    Wait Until Keyword Succeeds    5m    15s
-    ...    System Should Be Rebooted    ${bootid}
+    # Reboot to trigger greenboot auto-recovery, saving the boot identifier
+    ${cur_bootid}=    Reboot MicroShift Host
+    # The auto-recovery procedure will reboot the system after restoring the backup
+    ${new_bootid}=    Wait Until Keyword Succeeds    5m    15s
+    ...    System Should Be Rebooted    ${cur_bootid}
+    Should Not Be Equal As Strings    ${cur_bootid}    ${new_bootid}
+    # Verify the system is healthy after auto-recovery
     Wait Until Greenboot Health Check Exited
 
     [Teardown]    Run Keywords
@@ -157,9 +159,3 @@ Set Up Greenboot Red Script
     Command Should Work    mkdir -p /etc/greenboot/red.d
     ${drop_in}=    Operating System.Get File    ./assets/auto-recovery/red-script.sh
     Upload String To File    ${drop_in}    /etc/greenboot/red.d/99-auto-recovery.sh
-
-Greenboot Workaround For Boot Counter
-    [Documentation]    If the grub's boot_success is 1, clears boot_counter.
-    # Because of greenboot's bug, we need to it here, so the system doesn't reboot after red boot.
-    Command Should Work
-    ...    bash -c "grub2-editenv list | grep -q boot_success=1 && /usr/bin/grub2-editenv /boot/grub2/grubenv unset boot_counter || true"
