@@ -1,7 +1,7 @@
 [rhel-9.8-appstream]
 name = rhel-9.8-appstream
 
-baseurl = {{ .Env.WEB_SERVER_URL }}/ocp-mirror/reposync/4.22{{ if eq .Env.UNAME_M "aarch64" }}_aarch64{{ end }}/rhel-98-appstream
+baseurl = http://localhost:{{ .Env.WEB_SERVER_PORT }}/ocp-mirror/reposync/4.22{{ if eq .Env.UNAME_M "aarch64" }}_aarch64{{ end }}/rhel-98-appstream
 enabled = 1
 sslverify = false
 gpgcheck = 0
@@ -9,7 +9,7 @@ skip_if_unavailable = false
 
 [rhel-9.8-baseos]
 name = rhel-9.8-baseos
-baseurl = {{ .Env.WEB_SERVER_URL }}/ocp-mirror/reposync/4.22{{ if eq .Env.UNAME_M "aarch64" }}_aarch64{{ end }}/rhel-98-baseos
+baseurl = http://localhost:{{ .Env.WEB_SERVER_PORT }}/ocp-mirror/reposync/4.22{{ if eq .Env.UNAME_M "aarch64" }}_aarch64{{ end }}/rhel-98-baseos
 enabled = 1
 sslverify = false
 gpgcheck = 0

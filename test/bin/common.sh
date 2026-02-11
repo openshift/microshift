@@ -187,7 +187,7 @@ get_vm_bridge_ip() {
 VM_BRIDGE_IP="$(get_vm_bridge_ip "default")"
 
 # Web server port number
-WEB_SERVER_PORT=8080
+export WEB_SERVER_PORT=8080
 
 # Web server URL using VM bridge IP with fallback to host name
 # shellcheck disable=SC2034  # used elsewhere
