@@ -33,7 +33,6 @@ action_stop() {
 }
 
 action_start() {
-    echo "Starting web server in ${IMAGEDIR}"
     mkdir -p "${IMAGEDIR}"
     cd "${IMAGEDIR}"
 
@@ -76,6 +75,8 @@ EOF
 
     # Restart the nginx web server
     action_stop
+
+    echo "Starting web server in ${IMAGEDIR}"
     nginx \
         -c "${NGINX_CONFIG}" \
         -e "${IMAGEDIR}/nginx.log"
