@@ -21,7 +21,7 @@ func TestFeatureGateLockFile_Marshal(t *testing.T) {
 			name: "custom feature gates with enabled and disabled",
 			lockFile: featureGateLockFile{
 				FeatureSet: config.FeatureSetCustomNoUpgrade,
-				CustomNoUpgrade: config.CustomNoUpgrade{
+				CustomNoUpgrade: config.EnableDisableFeatures{
 					Enabled:  []string{"FeatureA", "FeatureB"},
 					Disabled: []string{"FeatureC"},
 				},
@@ -32,7 +32,7 @@ func TestFeatureGateLockFile_Marshal(t *testing.T) {
 			name: "TechPreviewNoUpgrade",
 			lockFile: featureGateLockFile{
 				FeatureSet:      config.FeatureSetTechPreviewNoUpgrade,
-				CustomNoUpgrade: config.CustomNoUpgrade{},
+				CustomNoUpgrade: config.EnableDisableFeatures{},
 			},
 			wantErr: false,
 		},
@@ -40,7 +40,7 @@ func TestFeatureGateLockFile_Marshal(t *testing.T) {
 			name: "DevPreviewNoUpgrade",
 			lockFile: featureGateLockFile{
 				FeatureSet:      config.FeatureSetDevPreviewNoUpgrade,
-				CustomNoUpgrade: config.CustomNoUpgrade{},
+				CustomNoUpgrade: config.EnableDisableFeatures{},
 			},
 			wantErr: false,
 		},
@@ -48,7 +48,7 @@ func TestFeatureGateLockFile_Marshal(t *testing.T) {
 			name: "empty feature gates",
 			lockFile: featureGateLockFile{
 				FeatureSet:      "",
-				CustomNoUpgrade: config.CustomNoUpgrade{},
+				CustomNoUpgrade: config.EnableDisableFeatures{},
 			},
 			wantErr: false,
 		},
@@ -85,7 +85,7 @@ func TestIsCustomFeatureGatesConfigured(t *testing.T) {
 			name: "CustomNoUpgrade with enabled features",
 			fg: config.FeatureGates{
 				FeatureSet: config.FeatureSetCustomNoUpgrade,
-				CustomNoUpgrade: config.CustomNoUpgrade{
+				CustomNoUpgrade: config.EnableDisableFeatures{
 					Enabled: []string{"FeatureA"},
 				},
 			},
@@ -116,7 +116,7 @@ func TestIsCustomFeatureGatesConfigured(t *testing.T) {
 			name: "CustomNoUpgrade without any enabled/disabled",
 			fg: config.FeatureGates{
 				FeatureSet:      config.FeatureSetCustomNoUpgrade,
-				CustomNoUpgrade: config.CustomNoUpgrade{},
+				CustomNoUpgrade: config.EnableDisableFeatures{},
 			},
 			want: false,
 		},
@@ -127,7 +127,7 @@ func TestIsCustomFeatureGatesConfigured(t *testing.T) {
 			err := configValidationChecksPass(featureGateLockFile{
 				FeatureSet:      tt.fg.FeatureSet,
 				CustomNoUpgrade: tt.fg.CustomNoUpgrade,
-			}, tt.fg)
+			}, &tt.fg)
 			if err != nil {
 				t.Errorf("featureValidationsPass() error = %v", err)
 			}
@@ -156,7 +156,7 @@ func TestFeatureGateLockFile_ReadWrite(t *testing.T) {
 			name: "write and read custom feature gates",
 			lockFile: featureGateLockFile{
 				FeatureSet: config.FeatureSetCustomNoUpgrade,
-				CustomNoUpgrade: config.CustomNoUpgrade{
+				CustomNoUpgrade: config.EnableDisableFeatures{
 					Enabled:  []string{"FeatureA", "FeatureB"},
 					Disabled: []string{"FeatureC"},
 				},
@@ -242,7 +242,7 @@ func TestConfigValidationChecksPass(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := configValidationChecksPass(tt.lockFile, tt.current)
+			err := configValidationChecksPass(tt.lockFile, &tt.current)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("configValidationChecksPass() error = %v, wantErr %v", err, tt.wantErr)
 			}
@@ -277,7 +277,7 @@ func TestFeatureGateLockManagement_FirstRun(t *testing.T) {
 		ApiServer: config.ApiServer{
 			FeatureGates: config.FeatureGates{
 				FeatureSet: config.FeatureSetCustomNoUpgrade,
-				CustomNoUpgrade: config.CustomNoUpgrade{
+				CustomNoUpgrade: config.EnableDisableFeatures{
 					Enabled: []string{"FeatureA"},
 				},
 			},
@@ -326,7 +326,7 @@ func TestFeatureGateLockManagement_ConfigChange(t *testing.T) {
 	// Create lockFile file with initial config (CustomNoUpgrade feature set)
 	initialLock := featureGateLockFile{
 		FeatureSet: config.FeatureSetCustomNoUpgrade,
-		CustomNoUpgrade: config.CustomNoUpgrade{
+		CustomNoUpgrade: config.EnableDisableFeatures{
 			Enabled: []string{"FeatureA"},
 		},
 		Version: testVersion,
@@ -365,18 +365,24 @@ func TestFeatureGateLockManagement_VersionChange(t *testing.T) {
 	}
 
 	tests := []struct {
-		name        string
-		lockFileVer versionMetadata
-		currentVer  versionMetadata
-		wantErr     bool
-		description string
+		name                            string
+		lockFileVer                     versionMetadata
+		currentVer                      versionMetadata
+		customNoUpgrade                 *config.EnableDisableFeatures
+		specialHandlingSupportException *config.EnableDisableFeatures
+		wantErr                         bool
+		description                     string
 	}{
 		{
-			name:        "minor version upgrade should fail",
-			lockFileVer: getVersion(0, 0, 0),
-			currentVer:  getVersion(0, 1, 0),
-			wantErr:     true,
-			description: "Minor version upgrade (4.21.0 -> 4.22.0) should be blocked",
+			name:                            "minor version upgrade should fail",
+			lockFileVer:                     getVersion(0, 0, 0),
+			currentVer:                      getVersion(0, 1, 0),
+			wantErr:                         true,
+			specialHandlingSupportException: &config.EnableDisableFeatures{},
+			description:                     "Minor version upgrade (4.21.0 -> 4.22.0) should be blocked",
+			customNoUpgrade: &config.EnableDisableFeatures{
+				Enabled: []string{"FeatureA"},
+			},
 		},
 		{
 			name:        "major version upgrade should fail",
@@ -384,6 +390,10 @@ func TestFeatureGateLockManagement_VersionChange(t *testing.T) {
 			currentVer:  getVersion(1, 0, 0),
 			wantErr:     true,
 			description: "Major version upgrade (4.21.0 -> 5.0.0) should be blocked",
+			customNoUpgrade: &config.EnableDisableFeatures{
+				Enabled: []string{"FeatureA"},
+			},
+			specialHandlingSupportException: &config.EnableDisableFeatures{},
 		},
 		{
 			name:        "patch version change should succeed",
@@ -391,6 +401,10 @@ func TestFeatureGateLockManagement_VersionChange(t *testing.T) {
 			currentVer:  getVersion(0, 0, 1),
 			wantErr:     false,
 			description: "Patch version change (4.21.0 -> 4.21.1) should be allowed",
+			customNoUpgrade: &config.EnableDisableFeatures{
+				Enabled: []string{"FeatureA"},
+			},
+			specialHandlingSupportException: &config.EnableDisableFeatures{},
 		},
 		{
 			name:        "same version should succeed",
@@ -398,6 +412,10 @@ func TestFeatureGateLockManagement_VersionChange(t *testing.T) {
 			currentVer:  getVersion(0, 0, 0),
 			wantErr:     false,
 			description: "Same version (4.21.0 -> 4.21.0) should be allowed",
+			customNoUpgrade: &config.EnableDisableFeatures{
+				Enabled: []string{"FeatureA"},
+			},
+			specialHandlingSupportException: &config.EnableDisableFeatures{},
 		},
 		{
 			name:        "minor version downgrade should fail",
@@ -405,6 +423,10 @@ func TestFeatureGateLockManagement_VersionChange(t *testing.T) {
 			currentVer:  getVersion(0, 0, 0),
 			wantErr:     true,
 			description: "Minor version downgrade (4.22.0 -> 4.21.0) should be blocked",
+			customNoUpgrade: &config.EnableDisableFeatures{
+				Enabled: []string{"FeatureA"},
+			},
+			specialHandlingSupportException: &config.EnableDisableFeatures{},
 		},
 		{
 			name:        "major version downgrade should fail",
@@ -412,6 +434,36 @@ func TestFeatureGateLockManagement_VersionChange(t *testing.T) {
 			currentVer:  getVersion(0, 0, 0),
 			wantErr:     true,
 			description: "Major version downgrade (5.0.0 -> 4.21.0) should be blocked",
+			customNoUpgrade: &config.EnableDisableFeatures{
+				Enabled: []string{"FeatureA"},
+			},
+			specialHandlingSupportException: &config.EnableDisableFeatures{},
+		},
+		{
+			name:        "major version upgrade with special handling support exception should succeed",
+			lockFileVer: getVersion(0, 0, 0),
+			currentVer:  getVersion(1, -21, 0),
+			wantErr:     false,
+			description: "major version upgrade (4.21.0 -> 5.0.0) with special handling support exception should succeed",
+			customNoUpgrade: &config.EnableDisableFeatures{
+				Enabled: []string{"FeatureA"},
+			},
+			specialHandlingSupportException: &config.EnableDisableFeatures{
+				Enabled: []string{"FeatureA"},
+			},
+		},
+		{
+			name:        "minor version upgrade with special handling support exception should succeed",
+			lockFileVer: getVersion(0, 0, 0),
+			currentVer:  getVersion(1, -21, 0),
+			wantErr:     false,
+			description: "minor version upgrade (4.21.0 -> 4.22.0) with special handling support exception should succeed",
+			customNoUpgrade: &config.EnableDisableFeatures{
+				Enabled: []string{"FeatureA"},
+			},
+			specialHandlingSupportException: &config.EnableDisableFeatures{
+				Enabled: []string{"FeatureA"},
+			},
 		},
 	}
 
@@ -436,13 +488,11 @@ func TestFeatureGateLockManagement_VersionChange(t *testing.T) {
 			}
 			defer func() { getExecutableVersion = originalGetExecutableVersion }()
 
-			// Create lockFile file with locked version
+			// Create lockFile file with locked version. Lock file does not store the special handling support exception.
 			lockFile := featureGateLockFile{
-				FeatureSet: config.FeatureSetCustomNoUpgrade,
-				CustomNoUpgrade: config.CustomNoUpgrade{
-					Enabled: []string{"FeatureA"},
-				},
-				Version: tt.lockFileVer,
+				FeatureSet:      config.FeatureSetCustomNoUpgrade,
+				CustomNoUpgrade: *tt.customNoUpgrade,
+				Version:         tt.lockFileVer,
 			}
 			if err := writeFeatureGateLockFile(featureGateLockFilePath, lockFile); err != nil {
 				t.Fatal(err)
@@ -451,10 +501,9 @@ func TestFeatureGateLockManagement_VersionChange(t *testing.T) {
 			cfg := &config.Config{
 				ApiServer: config.ApiServer{
 					FeatureGates: config.FeatureGates{
-						FeatureSet: config.FeatureSetCustomNoUpgrade,
-						CustomNoUpgrade: config.CustomNoUpgrade{
-							Enabled: []string{"FeatureA"},
-						},
+						FeatureSet:                              config.FeatureSetCustomNoUpgrade,
+						CustomNoUpgrade:                         *tt.customNoUpgrade,
+						SpecialHandlingSupportExceptionRequired: *tt.specialHandlingSupportException,
 					},
 				},
 			}
