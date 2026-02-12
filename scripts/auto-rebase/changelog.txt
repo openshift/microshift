@@ -1,24 +1,15 @@
-- cluster-csi-snapshot-controller-operator embedded-component 186ad6f430ae3f8f8e777e912efa6670033857e5 to 43ad01e88038be54792f16f0d692b96da1244404
-  - 5b2faae 2026-01-22T15:50:14+00:00 Generate manifest
-  - b5b8a65 2026-01-22T15:50:14+00:00 Re-add serving cert volume mount to ibm cloud managed manifest
+- cluster-network-operator embedded-component 05d65e63fd668e97c1b7f45837ba66075f478d6d to 0b156e3a60bcf64068c8ddb4f5204f2ca4d9758c
+  - 72aaf14 2026-02-05T19:53:07+00:00 OCPBUGS-74401: Remove duplicated openssl parameter
 
-- cluster-kube-apiserver-operator embedded-component 41d526c4367b210b9868fe025d0a50e55f30ac64 to 1d68351b053987df54b4e6fef60b480b72cfd714
-  - 1f7bd18 2026-01-20T22:45:14+00:00 SCC: allow image volume type for all SCCs
+- machine-config-operator embedded-component c3866b26598bbdd7ac883b2c2db42805d80b4759 to b59e48e724f57ca773268b4d12fa7e8da656fdda
+  - 155c20e7 2026-02-06T13:53:30-05:00 hack: update ami script and list
+  - e6c28ade 2026-02-06T17:54:12+00:00 crio: disable short_name_mode until we introduce ctrcfg api for it
+  - 3a5e3389 2026-02-06T14:41:29+01:00 MCO-2017: Backport OSImageStreams to 4.21
+  - e7415546 2026-02-05T15:13:44+00:00 fixes exposure of sensitive data in log files
 
-- kubernetes embedded-component 4d58ab3bbfecb4e7a3affaa3885d1d4c0ec87c0a to 0df353502309af2497270ddf993bb866e2f2b5a9
-  - cf8ec576c 2026-02-03T09:32:41+01:00 UPSTREAM: 136594: raise kubelet CSI init backoff to cover ~140s DNS delays
-
-- machine-config-operator embedded-component a3c57fb568ba9201394624595e88c3ba6a5bd165 to c3866b26598bbdd7ac883b2c2db42805d80b4759
-  - 45b4f01c 2026-02-02T13:11:27-05:00 Merge pull request #5562 from andfasano/iri-followup-changes
-  - 7a295ffb 2026-02-02T13:11:14-05:00 Merge pull request #5608 from bfournie/e2e-test-iri-deletion
-  - e25b74b8 2026-01-29T19:35:25-05:00 Merge pull request #5545 from bfournie/AGENT-1412-iri-deletion-guard
-  - 1e78a10d 2026-01-29T12:29:20-05:00 Add minimal osimagestream package for ClusterVersion support
-  - 3c5c111a 2026-01-29T10:34:08-05:00 Merge pull request #5588 from andfasano/iri-e2e-tests
-  - 27dd147a 2026-01-29T10:25:36-05:00 Merge pull request #5543 from andfasano/fix-iri-load-registry-file
-  - 374fe9ca 2026-01-29T10:25:28-05:00 Merge pull request #5514 from andfasano/iri-fix-registry-service
-  - e8c59928 2026-01-29T10:25:20-05:00 Merge pull request #5483 from andfasano/iri-tls-cert
-  - ebd501ab 2026-01-20T11:37:20+00:00 Add: enable nodeip-configuration for platform external
-
-- kubernetes image-amd64 4d58ab3bbfecb4e7a3affaa3885d1d4c0ec87c0a to 0df353502309af2497270ddf993bb866e2f2b5a9
-  - cf8ec576c 2026-02-03T09:32:41+01:00 UPSTREAM: 136594: raise kubelet CSI init backoff to cover ~140s DNS delays
+- operator-framework-olm embedded-component 67b24a854479ff5e92f98a928b07683bddfc91b6 to ced1896bd762f97651c69213256728348331e024
+  - fa1d49dc 2026-02-06T21:32:57+08:00 remove qe case of testing collect-profiles
+  - 76fd75de 2026-02-05T15:06:04-05:00 continue to adjust case per collect-profiles change
+  - 84bc2e63 2026-02-05T15:05:57-05:00 change to check collect-profile networkpolicy dynamically
+  - e497da16 2026-02-05T14:16:49+00:00 Remove the collect-profiles job
 
