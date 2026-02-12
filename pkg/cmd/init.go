@@ -61,6 +61,21 @@ func initCerts(cfg *config.Config) (*certchains.CertificateChains, error) {
 }
 
 func certSetup(cfg *config.Config) (*certchains.CertificateChains, error) {
+	// Anchor certificate expiration to the next day. This forces
+	// homogenous expiry dates for all certificates with the same validity.
+	startTime := time.Now()
+	nextMidnight := time.Date(
+		startTime.Year(),
+		startTime.Month(),
+		startTime.Day()+1,
+		0, 0, 0, 0,
+		startTime.Location(),
+	)
+	alignValidity := func(baseValidity time.Duration) time.Duration {
+		targetExpiration := nextMidnight.Add(baseValidity)
+		return time.Until(targetExpiration)
+	}
+
 	_, svcNet, err := net.ParseCIDR(cfg.Network.ServiceNetwork[0])
 	if err != nil {
 		return nil, err
@@ -97,33 +112,33 @@ func certSetup(cfg *config.Config) (*certchains.CertificateChains, error) {
 		certchains.NewCertificateSigner(
 			"kube-control-plane-signer",
 			cryptomaterial.KubeControlPlaneSignerCertDir(certsDir),
-			cryptomaterial.ShortLivedCertificateValidity,
+			alignValidity(cryptomaterial.ShortLivedCertificateValidity),
 		).WithClientCertificates(
 			&certchains.ClientCertificateSigningRequestInfo{
 				CSRMeta: certchains.CSRMeta{
 					Name:     "kube-controller-manager",
-					Validity: cryptomaterial.ShortLivedCertificateValidity,
+					Validity: alignValidity(cryptomaterial.ShortLivedCertificateValidity),
 				},
 				UserInfo: &user.DefaultInfo{Name: "system:kube-controller-manager"},
 			},
 			&certchains.ClientCertificateSigningRequestInfo{
 				CSRMeta: certchains.CSRMeta{
 					Name:     "kube-scheduler",
-					Validity: cryptomaterial.ShortLivedCertificateValidity,
+					Validity: alignValidity(cryptomaterial.ShortLivedCertificateValidity),
 				},
 				UserInfo: &user.DefaultInfo{Name: "system:kube-scheduler"},
 			},
 			&certchains.ClientCertificateSigningRequestInfo{
 				CSRMeta: certchains.CSRMeta{
 					Name:     "cluster-policy-controller",
-					Validity: cryptomaterial.ShortLivedCertificateValidity,
+					Validity: alignValidity(cryptomaterial.ShortLivedCertificateValidity),
 				},
 				UserInfo: &user.DefaultInfo{Name: "system:kube-controller-manager"},
 			},
 			&certchains.ClientCertificateSigningRequestInfo{
 				CSRMeta: certchains.CSRMeta{
 					Name:     "route-controller-manager",
-					Validity: cryptomaterial.ShortLivedCertificateValidity,
+					Validity: alignValidity(cryptomaterial.ShortLivedCertificateValidity),
 				},
 				UserInfo: serviceaccount.UserInfo("openshift-route-controller-manager", "route-controller-manager-sa", ""),
 			}),
@@ -132,12 +147,12 @@ func certSetup(cfg *config.Config) (*certchains.CertificateChains, error) {
 		certchains.NewCertificateSigner(
 			"kube-apiserver-to-kubelet-signer",
 			cryptomaterial.KubeAPIServerToKubeletSignerCertDir(certsDir),
-			cryptomaterial.ShortLivedCertificateValidity,
+			alignValidity(cryptomaterial.ShortLivedCertificateValidity),
 		).WithClientCertificates(
 			&certchains.ClientCertificateSigningRequestInfo{
 				CSRMeta: certchains.CSRMeta{
 					Name:     "kube-apiserver-to-kubelet-client",
-					Validity: cryptomaterial.ShortLivedCertificateValidity,
+					Validity: alignValidity(cryptomaterial.ShortLivedCertificateValidity),
 				},
 				UserInfo: &user.DefaultInfo{Name: "system:kube-apiserver", Groups: []string{"kube-master"}},
 			}),
@@ -146,19 +161,19 @@ func certSetup(cfg *config.Config) (*certchains.CertificateChains, error) {
 		certchains.NewCertificateSigner(
 			"admin-kubeconfig-signer",
 			cryptomaterial.AdminKubeconfigSignerDir(certsDir),
-			cryptomaterial.LongLivedCertificateValidity,
+			alignValidity(cryptomaterial.LongLivedCertificateValidity),
 		).WithClientCertificates(
 			&certchains.ClientCertificateSigningRequestInfo{
 				CSRMeta: certchains.CSRMeta{
 					Name:     "admin-kubeconfig-client",
-					Validity: cryptomaterial.LongLivedCertificateValidity,
+					Validity: alignValidity(cryptomaterial.LongLivedCertificateValidity),
 				},
 				UserInfo: &user.DefaultInfo{Name: "system:admin", Groups: []string{"system:masters"}},
 			}).WithClientCertificates(
 			&certchains.ClientCertificateSigningRequestInfo{
 				CSRMeta: certchains.CSRMeta{
 					Name:     "openshift-observability-client",
-					Validity: cryptomaterial.ShortLivedCertificateValidity,
+					Validity: alignValidity(cryptomaterial.ShortLivedCertificateValidity),
 				},
 				UserInfo: &user.DefaultInfo{Name: "openshift-observability-client", Groups: []string{""}},
 			},
@@ -168,17 +183,17 @@ func certSetup(cfg *config.Config) (*certchains.CertificateChains, error) {
 		certchains.NewCertificateSigner(
 			"kubelet-signer",
 			cryptomaterial.KubeletCSRSignerSignerCertDir(certsDir),
-			cryptomaterial.ShortLivedCertificateValidity,
+			alignValidity(cryptomaterial.ShortLivedCertificateValidity),
 		).WithSubCAs(
 			certchains.NewCertificateSigner(
 				"kube-csr-signer",
 				cryptomaterial.CSRSignerCertDir(certsDir),
-				cryptomaterial.ShortLivedCertificateValidity,
+				alignValidity(cryptomaterial.ShortLivedCertificateValidity),
 			).WithClientCertificates(
 				&certchains.ClientCertificateSigningRequestInfo{
 					CSRMeta: certchains.CSRMeta{
 						Name:     "kubelet-client",
-						Validity: cryptomaterial.ShortLivedCertificateValidity,
+						Validity: alignValidity(cryptomaterial.ShortLivedCertificateValidity),
 					},
 					// userinfo per https://kubernetes.io/docs/reference/access-authn-authz/node/#overview
 					UserInfo: &user.DefaultInfo{Name: "system:node:" + cfg.CanonicalNodeName(), Groups: []string{"system:nodes"}},
@@ -187,7 +202,7 @@ func certSetup(cfg *config.Config) (*certchains.CertificateChains, error) {
 				&certchains.ServingCertificateSigningRequestInfo{
 					CSRMeta: certchains.CSRMeta{
 						Name:     "kubelet-server",
-						Validity: cryptomaterial.ShortLivedCertificateValidity,
+						Validity: alignValidity(cryptomaterial.ShortLivedCertificateValidity),
 					},
 					Hostnames: []string{cfg.Node.HostnameOverride, cfg.Node.NodeIP},
 				},
@@ -196,12 +211,12 @@ func certSetup(cfg *config.Config) (*certchains.CertificateChains, error) {
 		certchains.NewCertificateSigner(
 			"aggregator-signer",
 			cryptomaterial.AggregatorSignerDir(certsDir),
-			cryptomaterial.ShortLivedCertificateValidity,
+			alignValidity(cryptomaterial.ShortLivedCertificateValidity),
 		).WithClientCertificates(
 			&certchains.ClientCertificateSigningRequestInfo{
 				CSRMeta: certchains.CSRMeta{
 					Name:     "aggregator-client",
-					Validity: cryptomaterial.ShortLivedCertificateValidity,
+					Validity: alignValidity(cryptomaterial.ShortLivedCertificateValidity),
 				},
 				UserInfo: &user.DefaultInfo{Name: "system:openshift-aggregator"},
 			},
@@ -213,12 +228,12 @@ func certSetup(cfg *config.Config) (*certchains.CertificateChains, error) {
 		certchains.NewCertificateSigner(
 			"service-ca",
 			cryptomaterial.ServiceCADir(certsDir),
-			cryptomaterial.LongLivedCertificateValidity,
+			alignValidity(cryptomaterial.LongLivedCertificateValidity),
 		).WithServingCertificates(
 			&certchains.ServingCertificateSigningRequestInfo{
 				CSRMeta: certchains.CSRMeta{
 					Name:     "route-controller-manager-serving",
-					Validity: cryptomaterial.ShortLivedCertificateValidity,
+					Validity: alignValidity(cryptomaterial.ShortLivedCertificateValidity),
 				},
 				Hostnames: []string{
 					"route-controller-manager.openshift-route-controller-manager.svc",
@@ -230,12 +245,12 @@ func certSetup(cfg *config.Config) (*certchains.CertificateChains, error) {
 		certchains.NewCertificateSigner(
 			"ingress-ca",
 			cryptomaterial.IngressCADir(certsDir),
-			cryptomaterial.LongLivedCertificateValidity,
+			alignValidity(cryptomaterial.LongLivedCertificateValidity),
 		).WithServingCertificates(
 			&certchains.ServingCertificateSigningRequestInfo{
 				CSRMeta: certchains.CSRMeta{
 					Name:     "router-default-serving",
-					Validity: cryptomaterial.ShortLivedCertificateValidity,
+					Validity: alignValidity(cryptomaterial.ShortLivedCertificateValidity),
 				},
 				Hostnames: []string{
 					"*.apps." + cfg.DNS.BaseDomain, // wildcard for any additional auto-generated domains
@@ -248,12 +263,12 @@ func certSetup(cfg *config.Config) (*certchains.CertificateChains, error) {
 		certchains.NewCertificateSigner(
 			"kube-apiserver-external-signer",
 			cryptomaterial.KubeAPIServerExternalSigner(certsDir),
-			cryptomaterial.LongLivedCertificateValidity,
+			alignValidity(cryptomaterial.LongLivedCertificateValidity),
 		).WithServingCertificates(
 			&certchains.ServingCertificateSigningRequestInfo{
 				CSRMeta: certchains.CSRMeta{
 					Name:     "kube-external-serving",
-					Validity: cryptomaterial.ShortLivedCertificateValidity,
+					Validity: alignValidity(cryptomaterial.ShortLivedCertificateValidity),
 				},
 				Hostnames: externalCertNames,
 			},
@@ -262,12 +277,12 @@ func certSetup(cfg *config.Config) (*certchains.CertificateChains, error) {
 		certchains.NewCertificateSigner(
 			"kube-apiserver-localhost-signer",
 			cryptomaterial.KubeAPIServerLocalhostSigner(certsDir),
-			cryptomaterial.LongLivedCertificateValidity,
+			alignValidity(cryptomaterial.LongLivedCertificateValidity),
 		).WithServingCertificates(
 			&certchains.ServingCertificateSigningRequestInfo{
 				CSRMeta: certchains.CSRMeta{
 					Name:     "kube-apiserver-localhost-serving",
-					Validity: cryptomaterial.ShortLivedCertificateValidity,
+					Validity: alignValidity(cryptomaterial.ShortLivedCertificateValidity),
 				},
 				Hostnames: []string{
 					"localhost",
@@ -278,12 +293,12 @@ func certSetup(cfg *config.Config) (*certchains.CertificateChains, error) {
 		certchains.NewCertificateSigner(
 			"kube-apiserver-service-network-signer",
 			cryptomaterial.KubeAPIServerServiceNetworkSigner(certsDir),
-			cryptomaterial.LongLivedCertificateValidity,
+			alignValidity(cryptomaterial.LongLivedCertificateValidity),
 		).WithServingCertificates(
 			&certchains.ServingCertificateSigningRequestInfo{
 				CSRMeta: certchains.CSRMeta{
 					Name:     "kube-apiserver-service-network-serving",
-					Validity: cryptomaterial.ShortLivedCertificateValidity,
+					Validity: alignValidity(cryptomaterial.ShortLivedCertificateValidity),
 				},
 				Hostnames: []string{
 					"kubernetes",
@@ -308,12 +323,12 @@ func certSetup(cfg *config.Config) (*certchains.CertificateChains, error) {
 		certchains.NewCertificateSigner(
 			"etcd-signer",
 			cryptomaterial.EtcdSignerDir(certsDir),
-			cryptomaterial.LongLivedCertificateValidity,
+			alignValidity(cryptomaterial.LongLivedCertificateValidity),
 		).WithClientCertificates(
 			&certchains.ClientCertificateSigningRequestInfo{
 				CSRMeta: certchains.CSRMeta{
 					Name:     "apiserver-etcd-client",
-					Validity: cryptomaterial.LongLivedCertificateValidity,
+					Validity: alignValidity(cryptomaterial.LongLivedCertificateValidity),
 				},
 				UserInfo: &user.DefaultInfo{Name: "etcd", Groups: []string{"etcd"}},
 			},
@@ -321,7 +336,7 @@ func certSetup(cfg *config.Config) (*certchains.CertificateChains, error) {
 			&certchains.PeerCertificateSigningRequestInfo{
 				CSRMeta: certchains.CSRMeta{
 					Name:     "etcd-peer",
-					Validity: cryptomaterial.LongLivedCertificateValidity,
+					Validity: alignValidity(cryptomaterial.LongLivedCertificateValidity),
 				},
 				UserInfo:  &user.DefaultInfo{Name: "system:etcd-peer:etcd-client", Groups: []string{"system:etcd-peers"}},
 				Hostnames: []string{"localhost", cfg.Node.HostnameOverride, cfg.Node.NodeIP},
@@ -329,7 +344,7 @@ func certSetup(cfg *config.Config) (*certchains.CertificateChains, error) {
 			&certchains.PeerCertificateSigningRequestInfo{
 				CSRMeta: certchains.CSRMeta{
 					Name:     "etcd-serving",
-					Validity: cryptomaterial.LongLivedCertificateValidity,
+					Validity: alignValidity(cryptomaterial.LongLivedCertificateValidity),
 				},
 				UserInfo:  &user.DefaultInfo{Name: "system:etcd-server:etcd-client", Groups: []string{"system:etcd-servers"}},
 				Hostnames: []string{"localhost", cfg.Node.HostnameOverride, cfg.Node.NodeIP},
