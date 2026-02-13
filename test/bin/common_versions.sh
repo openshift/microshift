@@ -142,22 +142,40 @@ export CNCF_SYSTEMD_LOGS_VERSION=v0.4
 export GITOPS_VERSION=1.16
 
 # The brew release versions needed for release regression testing
-BREW_Y0_RELEASE_VERSION="$(get_vrel_from_rpm "${BREW_RPM_SOURCE}/4.${MINOR_VERSION}-zstream/${UNAME_M}/")"
-BREW_Y1_RELEASE_VERSION="$(get_vrel_from_rpm "${BREW_RPM_SOURCE}/4.${PREVIOUS_MINOR_VERSION}-zstream/${UNAME_M}/")"
-BREW_Y2_RELEASE_VERSION="$(get_vrel_from_rpm "${BREW_RPM_SOURCE}/4.${YMINUS2_MINOR_VERSION}-zstream/${UNAME_M}/")"
-BREW_RC_RELEASE_VERSION="$(get_vrel_from_rpm "${BREW_RPM_SOURCE}/4.${MINOR_VERSION}-rc/${UNAME_M}/")"
-BREW_EC_RELEASE_VERSION="$(get_vrel_from_rpm "${BREW_RPM_SOURCE}/4.${MINOR_VERSION}-ec/${UNAME_M}/")"
-BREW_NIGHTLY_RELEASE_VERSION="$(get_vrel_from_rpm "${BREW_RPM_SOURCE}/4.${MINOR_VERSION}-nightly/${UNAME_M}/")"
-export BREW_Y0_RELEASE_VERSION
-export BREW_Y1_RELEASE_VERSION
-export BREW_Y2_RELEASE_VERSION
+#
+# Version naming convention (for X.Y.Z format where X=major, Y=minor, Z=patch):
+# - LATEST_ZSTREAM:  Latest z-stream of current minor (e.g., 4.22.7) - for current release testing
+# - PREV_ZSTREAM:    Previous z-stream of current minor (e.g., 4.22.4) - for previous Z upgrade testing
+# - YMINUS1:         Latest z-stream of previous minor (e.g., 4.21.26) - for Y-1 upgrade testing
+# - YMINUS2:         Latest z-stream of Y-2 minor (e.g., 4.20.44) - for Y-2 upgrade testing
+#
+LATEST_ZSTREAM_VERSION="$(find "${BREW_RPM_SOURCE}" -maxdepth 1 -type d -regex ".*/[45]\.${MINOR_VERSION}\.[0-9]+$" -printf '%f\n' | sort -V | tail -n1 || echo "")"
+PREV_ZSTREAM_VERSION="$(find "${BREW_RPM_SOURCE}" -maxdepth 1 -type d -regex ".*/[45]\.${MINOR_VERSION}\.[0-9]+$" -printf '%f\n' | sort -V | head -n1 || echo "")"
+YMINUS1_VERSION="$(find "${BREW_RPM_SOURCE}" -maxdepth 1 -type d -regex ".*/[45]\.${PREVIOUS_MINOR_VERSION}\.[0-9]+$" -printf '%f\n' | sort -V | tail -n1 || echo "")"
+YMINUS2_VERSION="$(find "${BREW_RPM_SOURCE}" -maxdepth 1 -type d -regex ".*/[45]\.${YMINUS2_MINOR_VERSION}\.[0-9]+$" -printf '%f\n' | sort -V | tail -n1 || echo "")"
+RC_VERSION="$(find "${BREW_RPM_SOURCE}" -maxdepth 1 -type d -regex ".*/[45]\.${MINOR_VERSION}\.[0-9]*-rc$" -printf '%f\n' | sort -V | tail -n1 || echo "")"
+EC_VERSION="$(find "${BREW_RPM_SOURCE}" -maxdepth 1 -type d -regex ".*/[45]\.${MINOR_VERSION}\.[0-9]*-ec$" -printf '%f\n' | sort -V | tail -n1 || echo "")"
+NIGHTLY_VERSION="$(find "${BREW_RPM_SOURCE}" -maxdepth 1 -type d -regex ".*/[45]\.${MINOR_VERSION}\.[0-9]*-nightly$" -printf '%f\n' | sort -V | tail -n1 || echo "")"
+
+BREW_LATEST_ZSTREAM_VERSION="$(get_vrel_from_rpm "${BREW_RPM_SOURCE}/${LATEST_ZSTREAM_VERSION}/${UNAME_M}/")"
+BREW_PREV_ZSTREAM_VERSION="$(get_vrel_from_rpm "${BREW_RPM_SOURCE}/${PREV_ZSTREAM_VERSION}/${UNAME_M}/")"
+BREW_YMINUS1_VERSION="$(get_vrel_from_rpm "${BREW_RPM_SOURCE}/${YMINUS1_VERSION}/${UNAME_M}/")"
+BREW_YMINUS2_VERSION="$(get_vrel_from_rpm "${BREW_RPM_SOURCE}/${YMINUS2_VERSION}/${UNAME_M}/")"
+BREW_RC_RELEASE_VERSION="$(get_vrel_from_rpm "${BREW_RPM_SOURCE}/${RC_VERSION}/${UNAME_M}/")"
+BREW_EC_RELEASE_VERSION="$(get_vrel_from_rpm "${BREW_RPM_SOURCE}/${EC_VERSION}/${UNAME_M}/")"
+BREW_NIGHTLY_RELEASE_VERSION="$(get_vrel_from_rpm "${BREW_RPM_SOURCE}/${NIGHTLY_VERSION}/${UNAME_M}/")"
+
+export BREW_LATEST_ZSTREAM_VERSION
+export BREW_PREV_ZSTREAM_VERSION
+export BREW_YMINUS1_VERSION
+export BREW_YMINUS2_VERSION
 export BREW_RC_RELEASE_VERSION
 export BREW_EC_RELEASE_VERSION
 export BREW_NIGHTLY_RELEASE_VERSION
 
 # Set the release type based on priority: zstream > RC > EC > nightly
-if [ -n "${BREW_Y0_RELEASE_VERSION}" ]; then
-    BREW_LREL_RELEASE_VERSION="${BREW_Y0_RELEASE_VERSION}"
+if [ -n "${BREW_LATEST_ZSTREAM_VERSION}" ]; then
+    BREW_LREL_RELEASE_VERSION="${BREW_LATEST_ZSTREAM_VERSION}"
 elif [ -n "${BREW_RC_RELEASE_VERSION}" ]; then
     BREW_LREL_RELEASE_VERSION="${BREW_RC_RELEASE_VERSION}"
 elif [ -n "${BREW_EC_RELEASE_VERSION}" ]; then
