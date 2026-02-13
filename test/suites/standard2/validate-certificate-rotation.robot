@@ -25,9 +25,14 @@ ${FUTURE_DAYS}                      150
 *** Test Cases ***
 Certificate Rotation
     [Documentation]    Performs Certificate Expiration Rotation test
+    # Certificates expire at midnight of (tomorrow + validity). For short-lived certs,
+    # validity is 365 days, so expiry = tomorrow + 365 days.
     ${first_cert_date}=    Compute Date After Days    365    ${OSSL_DATE_FORMAT}
     Certs Should Expire On    ${KUBE_SCHEDULER_CLIENT_CERT}    ${first_cert_date}
-    ${cert_should_expire_in_days}=    Evaluate    365+${FUTURE_DAYS}
+    # After moving the clock forward by FUTURE_DAYS, regenerated certs will expire at
+    # (new tomorrow + 365). Since "new tomorrow" is (original tomorrow + FUTURE_DAYS + 1),
+    # the expected expiry from the original date is: tomorrow + 366 + FUTURE_DAYS.
+    ${cert_should_expire_in_days}=    Evaluate    366+${FUTURE_DAYS}
     ${cert_expiry_date}=    Compute Date After Days    ${cert_should_expire_in_days}    ${OSSL_DATE_FORMAT}
     ${future_date}=    Compute Date After Days    ${FUTURE_DAYS}    ${TIMEDATECTL_DATE_FORMAT}
     Change System Date To    ${future_date}
@@ -67,10 +72,10 @@ Change System Date To
     Wait For MicroShift
 
 Compute Date After Days
-    [Documentation]    return system date after number of days elapsed
+    [Documentation]    return system date after number of days elapsed from midnight tomorrow
     [Arguments]    ${number_of_days}    ${date_format}
-    # date command is used here because we need to consider the remote vm timezone .
-    ${future_date}=    Command Should Work    TZ=UTC date "+${date_format}" -d "$(date) + ${number_of_days} day"
+    # Certificates are aligned to expire at midnight of the next day + validity
+    ${future_date}=    Command Should Work    TZ=UTC date "+${date_format}" -d "tomorrow + ${number_of_days} day"
     RETURN    ${future_date}
 
 Certs Should Expire On
