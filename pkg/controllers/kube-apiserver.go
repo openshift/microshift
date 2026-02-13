@@ -82,6 +82,7 @@ type KubeAPIServer struct {
 	masterURL        string
 	servingCAPath    string
 	advertiseAddress string
+	kubeconfigPath   string
 }
 
 func NewKubeAPIServer(cfg *config.Config) *KubeAPIServer {
@@ -115,6 +116,7 @@ func (s *KubeAPIServer) configure(ctx context.Context, cfg *config.Config) error
 	s.masterURL = cfg.ApiServer.URL
 	s.servingCAPath = cryptomaterial.ServiceAccountTokenCABundlePath(certsDir)
 	s.advertiseAddress = cfg.ApiServer.AdvertiseAddresses[0]
+	s.kubeconfigPath = cfg.KubeConfigPath(config.KubeAdmin)
 
 	namedCerts := []configv1.NamedCertificate{
 		{
@@ -182,6 +184,7 @@ func (s *KubeAPIServer) configure(ctx context.Context, cfg *config.Config) error
 
 	overrides := &kubecontrolplanev1.KubeAPIServerConfig{
 		APIServerArguments: map[string]kubecontrolplanev1.Arguments{
+			"anonymous-auth":                {"false"},
 			"advertise-address":             {s.advertiseAddress},
 			"audit-policy-file":             {filepath.Join(config.DataDir, "/resources/kube-apiserver-audit-policies/default.yaml")},
 			"audit-log-maxage":              {strconv.Itoa(cfg.ApiServer.AuditLog.MaxFileAge)},
@@ -333,7 +336,7 @@ func (s *KubeAPIServer) Run(ctx context.Context, ready chan<- struct{}, stopped 
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	restConfig, err := clientcmd.BuildConfigFromFlags(s.masterURL, "")
+	restConfig, err := clientcmd.BuildConfigFromFlags(s.masterURL, s.kubeconfigPath)
 	if err != nil {
 		return err
 	}
@@ -341,7 +344,6 @@ func (s *KubeAPIServer) Run(ctx context.Context, ready chan<- struct{}, stopped 
 		return err
 	}
 	restConfig.NegotiatedSerializer = serializer.NewCodecFactory(runtime.NewScheme())
-	restConfig.CAFile = s.servingCAPath
 
 	restClient, err := rest.UnversionedRESTClientFor(restConfig)
 	if err != nil {
