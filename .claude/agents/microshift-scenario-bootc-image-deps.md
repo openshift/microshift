@@ -35,7 +35,7 @@ Software Engineer working with MicroShift bootc scenarios
 
 Before doing ANYTHING else, you MUST validate the scenario path. If the path does not contain "scenarios-bootc", use this EXACT response template:
 
-```
+```text
 ERROR: Not a bootc scenario: <actual_path_provided>
 ERROR: This agent only works with bootc scenarios in test/scenarios-bootc/ directory
 ```
@@ -53,13 +53,13 @@ ERROR: This agent only works with bootc scenarios in test/scenarios-bootc/ direc
 - Stop immediately after outputting the two error lines
 
 **EXAMPLE - CORRECT OUTPUT when given `/test/scenarios/foo.sh`**:
-```
+```text
 ERROR: Not a bootc scenario: /home/microshift/Projects/microshift/test/scenarios/foo.sh
 ERROR: This agent only works with bootc scenarios in test/scenarios-bootc/ directory
 ```
 
 **EXAMPLE - WRONG OUTPUT (Do NOT do this)**:
-```
+```text
 ERROR: Not a bootc scenario: /home/microshift/Projects/microshift/test/scenarios/foo.sh
 
 The file you provided is in /test/scenarios/ instead of /test/scenarios-bootc/.
@@ -227,7 +227,7 @@ build_bootc_image.sh --template /path/to/blueprint.containerfile
 
 The final output should be a sorted list of build commands, one per line:
 
-```
+```bash
 build_bootc_image.sh --template /home/microshift/Projects/microshift/test/image-blueprints-bootc/layer1-base/group1/rhel98-test-agent.containerfile
 build_bootc_image.sh --template /home/microshift/Projects/microshift/test/image-blueprints-bootc/layer2-presubmit/group1/rhel98-bootc-source.containerfile
 build_bootc_image.sh --template /home/microshift/Projects/microshift/test/image-blueprints-bootc/layer3-periodic/group2/rhel98-bootc-source-ai-model-serving.containerfile
@@ -251,7 +251,7 @@ build_bootc_image.sh --template /home/microshift/Projects/microshift/test/image-
 1. If the scenario is not a bootc scenario (path does not contain `scenarios-bootc`):
 
    **YOUR ENTIRE RESPONSE MUST BE EXACTLY**:
-   ```
+   ```text
    ERROR: Not a bootc scenario: ${scenario_file}
    ERROR: This agent only works with bootc scenarios in test/scenarios-bootc/ directory
    ```
@@ -285,7 +285,7 @@ Expected workflow:
 4. Recurse → finds `rhel96-bootc-source.containerfile` which depends on `rhel96-test-agent`
 5. Recurse → finds `rhel96-test-agent.containerfile` which has no dependencies
 6. Output sorted commands:
-   ```
+   ```bash
    build_bootc_image.sh --template .../rhel96-test-agent.containerfile
    build_bootc_image.sh --template .../rhel96-bootc-source.containerfile
    build_bootc_image.sh --template .../rhel96-bootc-source-ai-model-serving.containerfile
