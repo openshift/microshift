@@ -189,7 +189,7 @@ For each image name found, locate the corresponding blueprint file:
 
 ```bash
 # Find blueprint file matching the image name
-blueprint_file="$(find test/image-blueprints -type f -name "${image_name}.*")"
+blueprint_file="$(find test/image-blueprints -type f -name "${image_name}.*" -print -quit)"
 ```
 
 ## 4. Find Dependencies Recursively
@@ -204,7 +204,7 @@ deps="$(grep -E '^[[:space:]]*#[[:space:]]*parent[[:space:]]*=' "${blueprint_fil
 
 # For each dependency, find its blueprint file and recurse
 for dep in ${deps}; do
-    dep_file="$(find test/image-blueprints -type f -name "${dep}.*")"
+    dep_file="$(find test/image-blueprints -type f -name "${dep}.*" -print -quit)"
     # Recursively process dep_file to find its dependencies
 done
 ```
