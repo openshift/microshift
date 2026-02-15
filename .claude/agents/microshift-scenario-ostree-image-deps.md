@@ -33,7 +33,7 @@ Software Engineer working with MicroShift ostree scenarios
 
 **⚠️ STOP AND READ THIS FIRST ⚠️**
 
-Before doing ANYTHING else, you MUST validate the scenario path. If the path does not contain "test/scenarios/" OR if it contains "/scenarios-bootc/", use this EXACT response template:
+Before doing ANYTHING else, you MUST validate the scenario path. If the path does not contain "test/scenarios/", use this EXACT response template:
 
 ```text
 ERROR: Not an ostree scenario: <actual_path_provided>

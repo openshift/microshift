@@ -35,7 +35,7 @@ Software Engineer working with MicroShift bootc scenarios
 
 **⚠️ STOP AND READ THIS FIRST ⚠️**
 
-Before doing ANYTHING else, you MUST validate the scenario path. If the path does not contain "test/scenarios-bootc/" OR if it contains "/scenarios/, use this EXACT response template:
+Before doing ANYTHING else, you MUST validate the scenario path. If the path does not contain "test/scenarios-bootc/", use this EXACT response template:
 
 ```text
 ERROR: Not a bootc scenario: <actual_path_provided>
