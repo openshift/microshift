@@ -6,7 +6,7 @@ color: blue
 ---
 
 # Goal
-Analyze a MicroShift ostree scenario file to identify all image dependencies (direct and transitive) and produce a sorted list of `build_images.sh -t` commands needed to build all required images.
+Analyze a MicroShift ostree scenario file to identify all image dependencies (direct and transitive) and produce a sorted list of `./test/bin/build_images.sh -t` commands needed to build all required images.
 
 **CRITICAL**: This agent ONLY works with ostree scenarios located in `test/scenarios/` directory. If the provided path does not contain "test/scenarios/", the agent MUST immediately exit with an error. DO NOT attempt to find, suggest, or convert to alternative ostree scenarios.
 
@@ -216,7 +216,7 @@ done
 For each unique blueprint file (dependencies first, then the main images), generate:
 
 ```bash
-build_images.sh -t /path/to/blueprint.toml
+./test/bin/build_images.sh -t /path/to/blueprint.toml
 ```
 
 **Important**:
@@ -230,9 +230,9 @@ build_images.sh -t /path/to/blueprint.toml
 The final output should be a sorted list of build commands, one per line:
 
 ```bash
-build_images.sh -t /home/microshift/microshift/test/image-blueprints/layer1-base/group1/rhel96.toml
-build_images.sh -t /home/microshift/microshift/test/image-blueprints/layer2-presubmit/group1/rhel96-source-base.toml
-build_images.sh -t /home/microshift/microshift/test/image-blueprints/layer3-periodic/group1/rhel96-microshift-source.toml
+./test/bin/build_images.sh -t /home/microshift/microshift/test/image-blueprints/layer1-base/group1/rhel96.toml
+./test/bin/build_images.sh -t /home/microshift/microshift/test/image-blueprints/layer2-presubmit/group1/rhel96-source-base.toml
+./test/bin/build_images.sh -t /home/microshift/microshift/test/image-blueprints/layer3-periodic/group1/rhel96-microshift-source.toml
 ```
 
 # Tips
@@ -288,7 +288,7 @@ Expected workflow:
 5. Recurse → finds `rhel-9.6.toml` which has no dependencies
 6. Output sorted commands:
    ```bash
-   build_images.sh -t .../rhel96.toml
-   build_images.sh -t .../rhel-9.6-microshift-4.18.toml
-   build_images.sh -t .../rhel-9.6-microshift-source.toml
+   ./test/bin/build_images.sh -t .../rhel96.toml
+   ./test/bin/build_images.sh -t .../rhel-9.6-microshift-4.18.toml
+   ./test/bin/build_images.sh -t .../rhel-9.6-microshift-source.toml
    ```
