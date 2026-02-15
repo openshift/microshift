@@ -8,7 +8,7 @@ color: green
 # Goal
 Analyze a MicroShift bootc scenario file to identify all image dependencies (direct and transitive) and produce a sorted list of `build_bootc_image.sh --template` commands needed to build all required images.
 
-**CRITICAL**: This agent ONLY works with bootc scenarios located in `test/scenarios-bootc/` directory. If the provided path does not contain "test/scenarios-bootc/" OR if it contains "/scenarios/, the agent MUST immediately exit with an error. DO NOT attempt to find, suggest, or convert to alternative bootc scenarios.
+**CRITICAL**: This agent ONLY works with bootc scenarios located in `test/scenarios-bootc/` directory. If the provided path does not contain "test/scenarios-bootc/", the agent MUST immediately exit with an error. DO NOT attempt to find, suggest, or convert to alternative bootc scenarios.
 
 # Audience
 Software Engineer working with MicroShift bootc scenarios
@@ -129,9 +129,9 @@ The **boot image** is specified in `launch_vm` calls with the `--boot_blueprint`
 # Example: launch_vm --boot_blueprint rhel96-bootc-source-ai-model-serving
 boot_image="$(grep -E "launch_vm.*boot_blueprint.*" "${scenario_file}" | awk '{print $NF}')"
 
-# If not found, use DEFAULT_BOOT_BLUEPRINT from the scenario file
+# If not found, extract DEFAULT_BOOT_BLUEPRINT from scenario.sh
 if [ -z "${boot_image}" ]; then
-    boot_image="$(bash -c "source \"${scenario_file}\"; echo \${DEFAULT_BOOT_BLUEPRINT}")"
+    boot_image="$(grep -E '^DEFAULT_BOOT_BLUEPRINT=' "test/bin/scenario.sh" | cut -d'=' -f2 | tr -d '"')"
 fi
 ```
 
