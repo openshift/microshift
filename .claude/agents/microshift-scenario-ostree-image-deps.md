@@ -111,7 +111,7 @@ The **kickstart image** is used to create the initial VM installation via kickst
 # Extract kickstart_image from prepare_kickstart calls
 # Example: prepare_kickstart host1 kickstart.ks.template rhel-9.6-microshift-source
 #          The last argument is the kickstart image name
-kickstart_image=$(grep -E "prepare_kickstart.*kickstart.*" "${scenario_file}" | awk '{print $NF}')
+kickstart_image="$(grep -E "prepare_kickstart.*kickstart.*" "${scenario_file}" | awk '{print $NF}')"
 
 # Validate that kickstart_image was found (mandatory)
 if [ -z "${kickstart_image}" ]; then
@@ -127,11 +127,11 @@ The **boot image** is specified in `launch_vm` calls with the `--boot_blueprint`
 ```bash
 # Extract boot_image from launch_vm --boot_blueprint calls
 # Example: launch_vm --boot_blueprint rhel-9.6-microshift-source-isolated
-boot_image=$(grep -E "launch_vm.*boot_blueprint.*" "${scenario_file}" | awk '{print $NF}')
+boot_image="$(grep -E "launch_vm.*boot_blueprint.*" "${scenario_file}" | awk '{print $NF}')"
 
 # If not found, use DEFAULT_BOOT_BLUEPRINT from the scenario file
 if [ -z "${boot_image}" ]; then
-    boot_image=$(bash -c "source \"${scenario_file}\"; echo \${DEFAULT_BOOT_BLUEPRINT}")
+    boot_image="$(bash -c "source \"${scenario_file}\"; echo \${DEFAULT_BOOT_BLUEPRINT}")"
 fi
 ```
 
@@ -142,11 +142,11 @@ fi
 ```bash
 # Extract target_ref_image from --variable "TARGET_REF:..." in run_tests calls
 # Example: --variable "TARGET_REF:rhel-9.6-microshift-source"
-target_ref_image=$(awk -F'TARGET_REF:' '{print $2}' "${scenario_file}" | tr -d '[:space:]"\\')
+target_ref_image="$(awk -F'TARGET_REF:' '{print $2}' "${scenario_file}" | tr -d '[:space:]"\\')"
 
 # Extract failing_ref_image from --variable "FAILING_REF:..." in run_tests calls
 # Example: --variable "FAILING_REF:rhel-9.6-microshift-source"
-failing_ref_image=$(awk -F'FAILING_REF:' '{print $2}' "${scenario_file}" | tr -d '[:space:]"\\')
+failing_ref_image="$(awk -F'FAILING_REF:' '{print $2}' "${scenario_file}" | tr -d '[:space:]"\\')"
 
 # Collect all upgrade images found
 upgrade_images=()
@@ -160,18 +160,18 @@ All extracted image names may be shell variables, so evaluate them by sourcing t
 
 ```bash
 # Evaluate kickstart_image (may be a variable or expression)
-kickstart_image=$(bash -c "source \"${scenario_file}\"; echo ${kickstart_image}")
+kickstart_image="$(bash -c "source \"${scenario_file}\"; echo ${kickstart_image}")"
 
 # Evaluate boot_image
-boot_image=$(bash -c "source \"${scenario_file}\"; echo ${boot_image}")
+boot_image="$(bash -c "source \"${scenario_file}\"; echo ${boot_image}")"
 
 # Evaluate upgrade images (only if they exist)
 if [ -n "${target_ref_image}" ]; then
-    target_ref_image=$(bash -c "source \"${scenario_file}\"; echo ${target_ref_image}")
+    target_ref_image="$(bash -c "source \"${scenario_file}\"; echo ${target_ref_image}")"
 fi
 
 if [ -n "${failing_ref_image}" ]; then
-    failing_ref_image=$(bash -c "source \"${scenario_file}\"; echo ${failing_ref_image}")
+    failing_ref_image="$(bash -c "source \"${scenario_file}\"; echo ${failing_ref_image}")"
 fi
 
 # Collect all images found
@@ -189,7 +189,7 @@ For each image name found, locate the corresponding blueprint file:
 
 ```bash
 # Find blueprint file matching the image name
-blueprint_file=$(find test/image-blueprints -type f -name "${image_name}.*")
+blueprint_file="$(find test/image-blueprints -type f -name "${image_name}.*")"
 ```
 
 ## 4. Find Dependencies Recursively
@@ -199,12 +199,12 @@ For each blueprint file, recursively find all dependencies:
 ```bash
 # Extract parent dependencies from the blueprint file
 # Example: # parent = "rhel-9.6-microshift-4.18"
-deps=$(grep -E '^[[:space:]]*#[[:space:]]*parent[[:space:]]*=' "${blueprint_file}" | \
-       sed -n 's/.*parent[[:space:]]*=[[:space:]]*"\([^"]*\)".*/\1/p')
+deps="$(grep -E '^[[:space:]]*#[[:space:]]*parent[[:space:]]*=' "${blueprint_file}" | \
+       sed -n 's/.*parent[[:space:]]*=[[:space:]]*"\([^"]*\)".*/\1/p')"
 
 # For each dependency, find its blueprint file and recurse
 for dep in ${deps}; do
-    dep_file=$(find test/image-blueprints -type f -name "${dep}.*")
+    dep_file="$(find test/image-blueprints -type f -name "${dep}.*")"
     # Recursively process dep_file to find its dependencies
 done
 ```

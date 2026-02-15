@@ -111,7 +111,7 @@ The **kickstart image** is used to create the initial VM installation via kickst
 # Extract kickstart_image from prepare_kickstart calls
 # Example: prepare_kickstart host1 kickstart-bootc-offline.ks.template rhel96-bootc-source-ai-model-serving
 #          The last argument is the kickstart image name
-kickstart_image=$(grep -E "prepare_kickstart.*kickstart.*" "${scenario_file}" | awk '{print $NF}')
+kickstart_image="$(grep -E "prepare_kickstart.*kickstart.*" "${scenario_file}" | awk '{print $NF}')"
 
 # Validate that kickstart_image was found (mandatory)
 if [ -z "${kickstart_image}" ]; then
@@ -127,11 +127,11 @@ The **boot image** is specified in `launch_vm` calls with the `--boot_blueprint`
 ```bash
 # Extract boot_image from launch_vm --boot_blueprint calls
 # Example: launch_vm --boot_blueprint rhel96-bootc-source-ai-model-serving
-boot_image=$(grep -E "launch_vm.*boot_blueprint.*" "${scenario_file}" | awk '{print $NF}')
+boot_image="$(grep -E "launch_vm.*boot_blueprint.*" "${scenario_file}" | awk '{print $NF}')"
 
 # If not found, use DEFAULT_BOOT_BLUEPRINT from the scenario file
 if [ -z "${boot_image}" ]; then
-    boot_image=$(bash -c "source \"${scenario_file}\"; echo \${DEFAULT_BOOT_BLUEPRINT}")
+    boot_image="$(bash -c "source \"${scenario_file}\"; echo \${DEFAULT_BOOT_BLUEPRINT}")"
 fi
 ```
 
@@ -142,11 +142,11 @@ fi
 ```bash
 # Extract target_ref_image from TARGET_REF environment variable
 # Example: TARGET_REF: "rhel96-bootc-upgraded"
-target_ref_image=$(awk -F'TARGET_REF:' '{print $2}' "${scenario_file}" | tr -d '[:space:]"\\')
+target_ref_image="$(awk -F'TARGET_REF:' '{print $2}' "${scenario_file}" | tr -d '[:space:]"\\')"
 
 # Extract failing_ref_image from FAILING_REF environment variable
 # Example: FAILING_REF: "rhel96-bootc-failing"
-failing_ref_image=$(awk -F'FAILING_REF:' '{print $2}' "${scenario_file}" | tr -d '[:space:]"\\')
+failing_ref_image="$(awk -F'FAILING_REF:' '{print $2}' "${scenario_file}" | tr -d '[:space:]"\\')"
 
 # Collect all upgrade images found
 upgrade_images=()
@@ -160,18 +160,18 @@ All extracted image names may be shell variables, so evaluate them by sourcing t
 
 ```bash
 # Evaluate kickstart_image (may be a variable like ${RHEL96_BOOTC_SOURCE})
-kickstart_image=$(bash -c "source \"${scenario_file}\"; echo ${kickstart_image}")
+kickstart_image="$(bash -c "source \"${scenario_file}\"; echo ${kickstart_image}")"
 
 # Evaluate boot_image
-boot_image=$(bash -c "source \"${scenario_file}\"; echo ${boot_image}")
+boot_image="$(bash -c "source \"${scenario_file}\"; echo ${boot_image}")"
 
 # Evaluate upgrade images (only if they exist)
 if [ -n "${target_ref_image}" ]; then
-    target_ref_image=$(bash -c "source \"${scenario_file}\"; echo ${target_ref_image}")
+    target_ref_image="$(bash -c "source \"${scenario_file}\"; echo ${target_ref_image}")"
 fi
 
 if [ -n "${failing_ref_image}" ]; then
-    failing_ref_image=$(bash -c "source \"${scenario_file}\"; echo ${failing_ref_image}")
+    failing_ref_image="$(bash -c "source \"${scenario_file}\"; echo ${failing_ref_image}")"
 fi
 
 # Collect all images found
@@ -188,7 +188,7 @@ For each image name found, locate the corresponding blueprint file:
 
 ```bash
 # Find blueprint file matching the image name
-blueprint_file=$(find test/image-blueprints-bootc -type f -name "${image_name}.*")
+blueprint_file="$(find test/image-blueprints-bootc -type f -name "${image_name}.*")"
 ```
 
 ## 4. Find Dependencies Recursively
@@ -197,12 +197,12 @@ For each blueprint file, recursively find all dependencies:
 
 ```bash
 # Extract localhost dependencies from the blueprint file
-deps=$(grep -Eo 'localhost/[a-zA-Z0-9-]+:latest' "${blueprint_file}" | \
-       awk -F'localhost/' '{print $2}' | sed 's/:latest//')
+deps="$(grep -Eo 'localhost/[a-zA-Z0-9-]+:latest' "${blueprint_file}" | \
+       awk -F'localhost/' '{print $2}' | sed 's/:latest//')"
 
 # For each dependency, find its blueprint file and recurse
 for dep in ${deps}; do
-    dep_file=$(find test/image-blueprints-bootc -type f -name "${dep}.*")
+    dep_file="$(find test/image-blueprints-bootc -type f -name "${dep}.*")"
     # Recursively process dep_file to find its dependencies
 done
 ```
