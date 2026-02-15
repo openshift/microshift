@@ -6,7 +6,7 @@ color: green
 ---
 
 # Goal
-Analyze a MicroShift bootc scenario file to identify all image dependencies (direct and transitive) and produce a sorted list of `build_bootc_image.sh --template` commands needed to build all required images.
+Analyze a MicroShift bootc scenario file to identify all image dependencies (direct and transitive) and produce a sorted list of `./test/bin/build_bootc_images.sh --template` commands needed to build all required images.
 
 **CRITICAL**: This agent ONLY works with bootc scenarios located in `test/scenarios-bootc/` directory. If the provided path does not contain "test/scenarios-bootc/", the agent MUST immediately exit with an error. DO NOT attempt to find, suggest, or convert to alternative bootc scenarios.
 
@@ -16,8 +16,10 @@ Software Engineer working with MicroShift bootc scenarios
 # Glossary
 
 - **bootc scenario**: A test scenario file that defines virtual machine configurations using bootc container images
-- **image blueprint**: A containerfile that defines how to build a bootc image
-- **image dependency**: When one image is based on another (referenced via `FROM localhost/...`)
+- **image blueprint**: A file in `test/image-blueprints-bootc/` that defines how to build a bootc image. Two types exist:
+  - **containerfile** (`.containerfile`): A Containerfile with `FROM` instructions for building container images
+  - **image-bootc** (`.image-bootc`): A file containing an image reference (registry URL or `localhost/...` reference) used by bootc image builder (BIB) to create ISOs. May use Go templates.
+- **image dependency**: When one image is based on another (referenced via `FROM localhost/...` in containerfiles or `localhost/...` in image-bootc files)
 - **kickstart_image**: The image used for kickstart installation (extracted from `prepare_kickstart` calls) - mandatory
 - **boot_image**: The image used to boot the VM (extracted from `launch_vm --boot_blueprint` calls or DEFAULT_BOOT_BLUEPRINT) - optional with fallback
 - **target_ref_image**: Optional upgrade target image (extracted from TARGET_REF environment variable)
@@ -26,7 +28,7 @@ Software Engineer working with MicroShift bootc scenarios
 # Important Directories
 
 - `test/scenarios-bootc/`: Directory containing bootc scenario files
-- `test/image-blueprints-bootc/`: Directory containing image blueprint containerfiles
+- `test/image-blueprints-bootc/`: Directory containing image blueprint files (`.containerfile` and `.image-bootc`)
 - `test/bin/`: Directory containing build scripts
 
 # Workflow
@@ -184,19 +186,24 @@ echo "Found images: kickstart=${kickstart_image} boot=${boot_image} target_ref=$
 
 ## 3. Find Blueprint Files
 
-For each image name found, locate the corresponding blueprint file:
+For each image name found, locate the corresponding blueprint file. Blueprint files can be either `.containerfile` or `.image-bootc` files:
 
 ```bash
-# Find blueprint file matching the image name
+# Find blueprint file matching the image name (matches both .containerfile and .image-bootc extensions)
 blueprint_file="$(find test/image-blueprints-bootc -type f -name "${image_name}.*" -print -quit)"
 ```
 
 ## 4. Find Dependencies Recursively
 
-For each blueprint file, recursively find all dependencies:
+For each blueprint file, recursively find all dependencies. Both `.containerfile` and `.image-bootc` files can reference `localhost/` images:
+- In `.containerfile` files: `FROM localhost/image-name:latest`
+- In `.image-bootc` files: `localhost/image-name:latest` (bare reference, no `FROM` prefix)
+
+The same grep pattern works for both file types:
 
 ```bash
 # Extract localhost dependencies from the blueprint file
+# Works for both .containerfile (FROM localhost/...) and .image-bootc (localhost/...) files
 deps="$(grep -Eo 'localhost/[a-zA-Z0-9-]+:latest' "${blueprint_file}" | \
        awk -F'localhost/' '{print $2}' | sed 's/:latest//')"
 
@@ -209,40 +216,47 @@ done
 
 **Important**: Track all processed files to avoid infinite loops and duplicates.
 
+**Note on `.image-bootc` dependencies**: An `.image-bootc` file may reference a `localhost/` image that is built from a `.containerfile`. For example, `rhel98-bootc.image-bootc` contains `localhost/rhel98-test-agent:latest`, which depends on the `rhel98-test-agent.containerfile` blueprint. Follow these cross-type dependencies the same way.
+
 ## 5. Generate Build Commands
 
 For each unique blueprint file (dependencies first, then the main images), generate:
 
 ```bash
-build_bootc_image.sh --template /path/to/blueprint.containerfile
+# For .containerfile blueprints:
+./test/bin/build_bootc_images.sh --template /path/to/blueprint.containerfile
+# For .image-bootc blueprints:
+./test/bin/build_bootc_images.sh --template /path/to/blueprint.image-bootc
 ```
 
 **Important**:
 - Sort the output so dependencies are built before images that depend on them
 - Use absolute paths for blueprint files (use `realpath`)
 - Output commands in a deterministic, sorted order
-- NEVER actually execute `build_bootc_image.sh` - only output the commands
+- NEVER actually execute `./test/bin/build_bootc_images.sh` - only output the commands
 
 ## 6. Output Format
 
-The final output should be a sorted list of build commands, one per line:
+The final output should be a sorted list of build commands, one per line. The file extension in the path reflects the actual blueprint type (`.containerfile` or `.image-bootc`):
 
 ```bash
-build_bootc_image.sh --template /home/microshift/microshift/test/image-blueprints-bootc/layer1-base/group1/rhel98-test-agent.containerfile
-build_bootc_image.sh --template /home/microshift/microshift/test/image-blueprints-bootc/layer2-presubmit/group1/rhel98-bootc-source.containerfile
-build_bootc_image.sh --template /home/microshift/microshift/test/image-blueprints-bootc/layer3-periodic/group2/rhel98-bootc-source-ai-model-serving.containerfile
+./test/bin/build_bootc_images.sh --template microshift/test/image-blueprints-bootc/layer1-base/group1/rhel98-test-agent.containerfile
+./test/bin/build_bootc_images.sh --template microshift/test/image-blueprints-bootc/layer1-base/group2/rhel98-bootc.image-bootc
+./test/bin/build_bootc_images.sh --template microshift/test/image-blueprints-bootc/layer2-presubmit/group1/rhel98-bootc-source.containerfile
 ```
 
 # Tips
 
 1. **CRITICAL**: Validate that the scenario file path contains `scenarios-bootc` BEFORE any processing. Exit with error if not.
 2. **DO NOT** attempt to find or convert non-bootc scenarios to bootc scenarios. Report error immediately.
-3. Use `grep -Eo 'localhost/[a-zA-Z0-9-]+:latest'` to extract localhost image references
+3. Use `grep -Eo 'localhost/[a-zA-Z0-9-]+:latest'` to extract localhost image references from both `.containerfile` and `.image-bootc` files
 4. Use `realpath` to convert relative paths to absolute paths
 5. Use `sort -u` to ensure unique, sorted output
 6. Maintain a set of processed blueprint files to avoid duplicates and infinite recursion
 7. Dependencies must appear before images that depend on them in the output
 8. If a blueprint file is not found, report an error with the image name
+9. Blueprint files can be `.containerfile` or `.image-bootc` - the `find` with `"${image_name}.*"` matches both
+10. An `.image-bootc` file's `localhost/` dependency may resolve to a `.containerfile` blueprint (cross-type dependency)
 
 # Error Handling
 
@@ -276,17 +290,19 @@ build_bootc_image.sh --template /home/microshift/microshift/test/image-blueprint
 
 # Example Usage
 
-Input: `/home/microshift/microshift/test/scenarios-bootc/periodics/el96-src@ai-model-serving-offline.sh`
+Input: `microshift/test/scenarios-bootc/periodics/el96-src@ai-model-serving-offline.sh`
 
 Expected workflow:
-1. Parse scenario → finds `rhel96-bootc-source-ai-model-serving` image
-2. Find blueprint → locates `rhel96-bootc-source-ai-model-serving.containerfile`
-3. Check dependencies → finds `FROM localhost/rhel96-bootc-source:latest`
-4. Recurse → finds `rhel96-bootc-source.containerfile` which depends on `rhel96-test-agent`
-5. Recurse → finds `rhel96-test-agent.containerfile` which has no dependencies
-6. Output sorted commands:
+1. Parse scenario → finds kickstart image `rhel96-bootc-source-ai-model-serving` and boot image `rhel96-bootc-source-ai-model-serving`
+2. Find blueprints → locates `rhel96-bootc-source-ai-model-serving.containerfile` and `rhel96-bootc-source-ai-model-serving.image-bootc`
+3. Check `.image-bootc` dependencies → finds `localhost/rhel96-bootc-source-ai-model-serving:latest`
+4. Check `.containerfile` dependencies → finds `FROM localhost/rhel96-bootc-source:latest`
+5. Recurse → finds `rhel96-bootc-source.containerfile` which depends on `localhost/rhel96-test-agent:latest`
+6. Recurse → finds `rhel96-test-agent.containerfile` which depends on an external registry image (no further localhost dependencies)
+7. Output sorted commands (dependencies first):
    ```bash
-   build_bootc_image.sh --template .../rhel96-test-agent.containerfile
-   build_bootc_image.sh --template .../rhel96-bootc-source.containerfile
-   build_bootc_image.sh --template .../rhel96-bootc-source-ai-model-serving.containerfile
+   ./test/bin/build_bootc_images.sh --template .../layer1-base/group1/rhel96-test-agent.containerfile
+   ./test/bin/build_bootc_images.sh --template .../layer2-presubmit/group1/rhel96-bootc-source.containerfile
+   ./test/bin/build_bootc_images.sh --template .../layer3-periodic/group1/rhel96-bootc-source-ai-model-serving.containerfile
+   ./test/bin/build_bootc_images.sh --template .../layer3-periodic/group2/rhel96-bootc-source-ai-model-serving.image-bootc
    ```
