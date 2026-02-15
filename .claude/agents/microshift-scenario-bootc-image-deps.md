@@ -184,6 +184,8 @@ all_images=("${kickstart_image}" "${boot_image}")
 echo "Found images: kickstart=${kickstart_image} boot=${boot_image} target_ref=${target_ref_image} failing_ref=${failing_ref_image}"
 ```
 
+**CRITICAL**: Only use the prescribed extraction commands above (grep, awk, source) to find image names. If these commands produce no results or incomplete results, report an error. Do NOT attempt creative alternatives such as reading the entire file and guessing image names, searching for patterns not described in these rules, or browsing other files to infer image names.
+
 ## 3. Find Blueprint Files
 
 For each image name found, locate the corresponding blueprint file. Blueprint files can be either `.containerfile` or `.image-bootc` files:
@@ -192,6 +194,14 @@ For each image name found, locate the corresponding blueprint file. Blueprint fi
 # Find blueprint file matching the image name (matches both .containerfile and .image-bootc extensions)
 blueprint_file="$(find test/image-blueprints-bootc -type f -name "${image_name}.*" -print -quit)"
 ```
+
+**CRITICAL**: If a blueprint file is not found using the exact `find` command above, report an error immediately. Do NOT attempt any alternative search strategies such as:
+- Searching with partial or fuzzy image names
+- Browsing directories manually to find similar files
+- Stripping prefixes/suffixes from image names to find matches
+- Using `grep` to search file contents for references
+- Listing directory contents to guess matching files
+- Any other creative approach to locate the blueprint
 
 ## 4. Find Dependencies Recursively
 
@@ -254,7 +264,7 @@ The final output should be a sorted list of build commands, one per line. The fi
 5. Use `sort -u` to ensure unique, sorted output
 6. Maintain a set of processed blueprint files to avoid duplicates and infinite recursion
 7. Dependencies must appear before images that depend on them in the output
-8. If a blueprint file is not found, report an error with the image name
+8. If a blueprint file is not found, report an error with the image name. Do NOT attempt alternative search strategies to find it
 9. Blueprint files can be `.containerfile` or `.image-bootc` - the `find` with `"${image_name}.*"` matches both
 10. An `.image-bootc` file's `localhost/` dependency may resolve to a `.containerfile` blueprint (cross-type dependency)
 
