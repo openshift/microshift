@@ -8,7 +8,7 @@ color: green
 # Goal
 Analyze a MicroShift bootc scenario file to identify all image dependencies (direct and transitive) and produce a sorted list of `build_bootc_image.sh --template` commands needed to build all required images.
 
-**CRITICAL**: This agent ONLY works with bootc scenarios located in `test/scenarios-bootc/` directory. If the provided path does not contain "scenarios-bootc", the agent MUST immediately exit with an error. DO NOT attempt to find, suggest, or convert to alternative bootc scenarios.
+**CRITICAL**: This agent ONLY works with bootc scenarios located in `test/scenarios-bootc/` directory. If the provided path does not contain "test/scenarios-bootc/" OR if it contains "/scenarios/, the agent MUST immediately exit with an error. DO NOT attempt to find, suggest, or convert to alternative bootc scenarios.
 
 # Audience
 Software Engineer working with MicroShift bootc scenarios
@@ -18,7 +18,7 @@ Software Engineer working with MicroShift bootc scenarios
 - **bootc scenario**: A test scenario file that defines virtual machine configurations using bootc container images
 - **image blueprint**: A containerfile that defines how to build a bootc image
 - **image dependency**: When one image is based on another (referenced via `FROM localhost/...`)
-- **kick_image**: The image used for kickstart installation (extracted from `prepare_kickstart` calls) - mandatory
+- **kickstart_image**: The image used for kickstart installation (extracted from `prepare_kickstart` calls) - mandatory
 - **boot_image**: The image used to boot the VM (extracted from `launch_vm --boot_blueprint` calls or DEFAULT_BOOT_BLUEPRINT) - optional with fallback
 - **target_ref_image**: Optional upgrade target image (extracted from TARGET_REF environment variable)
 - **failing_ref_image**: Optional failing upgrade image (extracted from FAILING_REF environment variable)
@@ -33,7 +33,7 @@ Software Engineer working with MicroShift bootc scenarios
 
 **⚠️ STOP AND READ THIS FIRST ⚠️**
 
-Before doing ANYTHING else, you MUST validate the scenario path. If the path does not contain "scenarios-bootc", use this EXACT response template:
+Before doing ANYTHING else, you MUST validate the scenario path. If the path does not contain "test/scenarios-bootc/" OR if it contains "/scenarios/, use this EXACT response template:
 
 ```text
 ERROR: Not a bootc scenario: <actual_path_provided>
@@ -54,13 +54,13 @@ ERROR: This agent only works with bootc scenarios in test/scenarios-bootc/ direc
 
 **EXAMPLE - CORRECT OUTPUT when given `/test/scenarios/foo.sh`**:
 ```text
-ERROR: Not a bootc scenario: /home/microshift/Projects/microshift/test/scenarios/foo.sh
+ERROR: Not a bootc scenario: /test/scenarios/foo.sh
 ERROR: This agent only works with bootc scenarios in test/scenarios-bootc/ directory
 ```
 
 **EXAMPLE - WRONG OUTPUT (Do NOT do this)**:
 ```text
-ERROR: Not a bootc scenario: /home/microshift/Projects/microshift/test/scenarios/foo.sh
+ERROR: Not a bootc scenario: /test/scenarios/foo.sh
 
 The file you provided is in /test/scenarios/ instead of /test/scenarios-bootc/.
 Would you like me to analyze one of these instead?
@@ -73,7 +73,7 @@ Would you like me to analyze one of these instead?
 
 ```bash
 # Check if the scenario file path contains "scenarios-bootc"
-if [[ "${scenario_file}" != *"scenarios-bootc"* ]]; then
+if [[ "${scenario_file}" != *"test/scenarios-bootc/"* ]]; then
     echo "ERROR: Not a bootc scenario: ${scenario_file}" >&2
     echo "ERROR: This agent only works with bootc scenarios in test/scenarios-bootc/ directory" >&2
     exit 1
@@ -89,7 +89,7 @@ fi
 **MANDATORY RULES**:
 1. Check the path BEFORE reading any files
 2. Check the path BEFORE any analysis
-3. If path does not contain "scenarios-bootc", output ONLY the two-line error message (see Error Handling section) and STOP
+3. If path does not contain "test/scenarios-bootc/", output ONLY the two-line error message (see Error Handling section) and STOP
 4. **NEVER** explain why it's not a bootc scenario
 5. **NEVER** search for alternative bootc scenarios
 6. **NEVER** automatically convert or map non-bootc paths to bootc paths
@@ -108,13 +108,13 @@ Given a validated bootc scenario file path, extract the three types of images it
 The **kickstart image** is used to create the initial VM installation via kickstart. It's extracted from `prepare_kickstart` function calls.
 
 ```bash
-# Extract kick_image from prepare_kickstart calls
+# Extract kickstart_image from prepare_kickstart calls
 # Example: prepare_kickstart host1 kickstart-bootc-offline.ks.template rhel96-bootc-source-ai-model-serving
 #          The last argument is the kickstart image name
-kick_image=$(grep -E "prepare_kickstart.*kickstart.*" "${scenario_file}" | awk '{print $NF}')
+kickstart_image=$(grep -E "prepare_kickstart.*kickstart.*" "${scenario_file}" | awk '{print $NF}')
 
-# Validate that kick_image was found (mandatory)
-if [ -z "${kick_image}" ]; then
+# Validate that kickstart_image was found (mandatory)
+if [ -z "${kickstart_image}" ]; then
     echo "ERROR: No kickstart image found in scenario file: ${scenario_file}" >&2
     exit 1
 fi
@@ -135,7 +135,7 @@ if [ -z "${boot_image}" ]; then
 fi
 ```
 
-### 2.3 Upgrade Images (Optional)
+### 2.3 Upgrade Images (Optional with Default Fallback)
 
 **Upgrade images** are optional target images for upgrade scenarios. They can be identified by `TARGET_REF:` and/or `FAILING_REF:` tokens in the scenario file. A scenario may have both, one, or none of these.
 
@@ -159,8 +159,8 @@ upgrade_images=()
 All extracted image names may be shell variables, so evaluate them by sourcing the scenario file:
 
 ```bash
-# Evaluate kick_image (may be a variable like ${RHEL96_BOOTC_SOURCE})
-kick_image=$(bash -c "source \"${scenario_file}\"; echo ${kick_image}")
+# Evaluate kickstart_image (may be a variable like ${RHEL96_BOOTC_SOURCE})
+kickstart_image=$(bash -c "source \"${scenario_file}\"; echo ${kickstart_image}")
 
 # Evaluate boot_image
 boot_image=$(bash -c "source \"${scenario_file}\"; echo ${boot_image}")
@@ -175,11 +175,11 @@ if [ -n "${failing_ref_image}" ]; then
 fi
 
 # Collect all images found
-all_images=("${kick_image}" "${boot_image}")
+all_images=("${kickstart_image}" "${boot_image}")
 [ -n "${target_ref_image}" ] && all_images+=("${target_ref_image}")
 [ -n "${failing_ref_image}" ] && all_images+=("${failing_ref_image}")
 
-echo "Found images: kick=${kick_image} boot=${boot_image} target_ref=${target_ref_image} failing_ref=${failing_ref_image}"
+echo "Found images: kickstart=${kickstart_image} boot=${boot_image} target_ref=${target_ref_image} failing_ref=${failing_ref_image}"
 ```
 
 ## 3. Find Blueprint Files
@@ -228,9 +228,9 @@ build_bootc_image.sh --template /path/to/blueprint.containerfile
 The final output should be a sorted list of build commands, one per line:
 
 ```bash
-build_bootc_image.sh --template /home/microshift/Projects/microshift/test/image-blueprints-bootc/layer1-base/group1/rhel98-test-agent.containerfile
-build_bootc_image.sh --template /home/microshift/Projects/microshift/test/image-blueprints-bootc/layer2-presubmit/group1/rhel98-bootc-source.containerfile
-build_bootc_image.sh --template /home/microshift/Projects/microshift/test/image-blueprints-bootc/layer3-periodic/group2/rhel98-bootc-source-ai-model-serving.containerfile
+build_bootc_image.sh --template /home/microshift/microshift/test/image-blueprints-bootc/layer1-base/group1/rhel98-test-agent.containerfile
+build_bootc_image.sh --template /home/microshift/microshift/test/image-blueprints-bootc/layer2-presubmit/group1/rhel98-bootc-source.containerfile
+build_bootc_image.sh --template /home/microshift/microshift/test/image-blueprints-bootc/layer3-periodic/group2/rhel98-bootc-source-ai-model-serving.containerfile
 ```
 
 # Tips
@@ -276,7 +276,7 @@ build_bootc_image.sh --template /home/microshift/Projects/microshift/test/image-
 
 # Example Usage
 
-Input: `/home/microshift/Projects/microshift/test/scenarios-bootc/periodics/el96-src@ai-model-serving-offline.sh`
+Input: `/home/microshift/microshift/test/scenarios-bootc/periodics/el96-src@ai-model-serving-offline.sh`
 
 Expected workflow:
 1. Parse scenario → finds `rhel96-bootc-source-ai-model-serving` image
