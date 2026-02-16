@@ -455,7 +455,7 @@ func TestFeatureGateLockManagement_VersionChange(t *testing.T) {
 		{
 			name:        "minor version upgrade with special handling support exception should succeed",
 			lockFileVer: getVersion(0, 0, 0),
-			currentVer:  getVersion(1, -21, 0),
+			currentVer:  getVersion(0, 1, 0),
 			wantErr:     false,
 			description: "minor version upgrade (4.21.0 -> 4.22.0) with special handling support exception should succeed",
 			customNoUpgrade: &config.EnableDisableFeatures{
