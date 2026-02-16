@@ -17,7 +17,9 @@ Software Engineer working with MicroShift ostree scenarios
 
 - **ostree scenario**: A test scenario file that defines virtual machine configurations using ostree commit images
 - **image blueprint**: A TOML file that defines how to build an ostree image using osbuild-composer
-- **image dependency**: When one image is based on another (referenced via `# parent = "..."`)
+- **image-installer file** (`.image-installer`): A file that contains the image name to be built as an ISO installer. Shares the same basename as its corresponding `.toml` blueprint and is processed automatically alongside it
+- **alias file** (`.alias`): A file that defines an image name alias. The filename (without extension) is the alias image name, and the file contents is the real image name it resolves to. For example, `rhel-9.6-microshift-source-aux.alias` contains `rhel-9.6-microshift-source`, meaning image `rhel-9.6-microshift-source-aux` is an alias for `rhel-9.6-microshift-source`
+- **image dependency**: When one image is based on another (referenced via `# parent = "..."`). The `# parent` directive is a pseudo-directive that is always commented out — it is NOT a TOML key. It is parsed directly from the comment by `build_images.sh`. A commented `# parent = "..."` line is ALWAYS an active dependency and must never be ignored
 - **kickstart_image**: The image used for kickstart installation (extracted from `prepare_kickstart` calls) - mandatory
 - **boot_image**: The image used to boot the VM (extracted from `launch_vm --boot_blueprint` calls) - optional
 - **target_ref_image**: Optional upgrade target image (extracted from `--variable "TARGET_REF:..."` in run_tests calls)
@@ -187,35 +189,106 @@ echo "Found images: kickstart=${kickstart_image} boot=${boot_image} target_ref=$
 
 ## 3. Find Blueprint Files
 
-For each image name found, locate the corresponding blueprint file:
+For each image name found, locate the corresponding blueprint file. Image names are found by searching file contents, not by matching filenames.
+
+There are three types of files that produce image names:
+- **TOML files** (`.toml`): The image name is defined by the `name = "..."` field at the top of the file (e.g., `rhel96.toml` contains `name = "rhel-9.6"`)
+- **Image-installer files** (`.image-installer`): The file contents IS the image name (e.g., `rhel96.image-installer` contains `rhel-9.6`)
+- **Alias files** (`.alias`): The filename (without extension) is an alias image name, and the file contents is the real image name it resolves to (e.g., `rhel-9.6-microshift-source-aux.alias` contains `rhel-9.6-microshift-source`)
+
+Search TOML files first, then `.image-installer` files, then `.alias` files:
 
 ```bash
-# Find blueprint file matching the image name
-blueprint_file="$(find test/image-blueprints -type f -name "${image_name}.*" -print -quit)"
+# Step 1: Search for ^name = "<image_name>" inside TOML files
+blueprint_file="$(grep -rl "^name = \"${image_name}\"" test/image-blueprints/ --include="*.toml" | head -1)"
+
+# Step 2: If not found in TOML files, search .image-installer files for the image name
+# The .image-installer file content is the image name itself (one name per file)
+if [ -z "${blueprint_file}" ]; then
+    blueprint_file="$(grep -rl "^${image_name}$" test/image-blueprints/ --include="*.image-installer" | head -1)"
+fi
+
+# Step 3: If still not found, check if the image name is an alias
+# Alias files are named <alias-image-name>.alias and contain the real image name
+if [ -z "${blueprint_file}" ]; then
+    blueprint_file="$(find test/image-blueprints -type f -name "${image_name}.alias" -print -quit)"
+fi
+
+if [ -z "${blueprint_file}" ]; then
+    echo "ERROR: No blueprint file found for image: ${image_name}" >&2
+    exit 1
+fi
 ```
 
-**CRITICAL**: If a blueprint file is not found using the exact `find` command above, report an error immediately. Do NOT attempt any alternative search strategies such as:
+**CRITICAL**: If a blueprint file is not found using the exact search commands above, report an error immediately. Do NOT attempt any alternative search strategies such as:
 - Searching with partial or fuzzy image names
 - Browsing directories manually to find similar files
 - Stripping prefixes/suffixes from image names to find matches
-- Using `grep` to search file contents for references
+- Matching by filename instead of file contents
 - Listing directory contents to guess matching files
 - Any other creative approach to locate the blueprint
 
 ## 4. Find Dependencies Recursively
 
-For each blueprint file, recursively find all dependencies:
+For each blueprint file, extract parent dependencies and recursively resolve them.
+
+### 4.1 Extract Parent Dependency
+
+Run this command to extract the parent image name from a blueprint file:
 
 ```bash
-# Extract parent dependencies from the blueprint file
-# Example: # parent = "rhel-9.6-microshift-4.18"
 deps="$(grep -E '^[[:space:]]*#[[:space:]]*parent[[:space:]]*=' "${blueprint_file}" | \
        sed -n 's/.*parent[[:space:]]*=[[:space:]]*"\([^"]*\)".*/\1/p')"
+```
 
-# For each dependency, find its blueprint file and recurse
+**⚠️ MANDATORY RULE**: If the above command produces any output, that output is a **real, active parent dependency**. You MUST:
+1. Treat it as a required dependency
+2. Resolve it and find its blueprint file
+3. Include it in the build commands
+
+**⚠️ FORBIDDEN**: You must NEVER:
+- Describe `# parent` lines as "commented out" — the `#` is part of the directive syntax, not a comment
+- Skip a parent dependency for any reason
+- Say the blueprint "has no active dependencies" when the grep command found a match
+
+The `# parent = "..."` syntax is a pseudo-directive parsed by `build_images.sh`. The `#` prefix is required because `parent` is not a valid TOML key. Every `# parent` line is active by design.
+
+### 4.2 Resolve Go Template Expressions in Parent Values
+
+Parent values may contain Go template expressions (e.g., `{{ .Env.PREVIOUS_MINOR_VERSION }}`). These MUST be resolved before searching for the blueprint:
+
+1. Read `test/bin/common_versions.sh` to get version variables
+2. Replace `{{ .Env.VARNAME }}` patterns with the shell variable values
+
+Key variables from `test/bin/common_versions.sh`:
+- `MINOR_VERSION` — current minor version (e.g., `22`)
+- `PREVIOUS_MINOR_VERSION` — computed as `MINOR_VERSION - 1` (e.g., `21`)
+- `YMINUS2_MINOR_VERSION` — computed as `MINOR_VERSION - 2` (e.g., `20`)
+- `FAKE_NEXT_MINOR_VERSION` — computed as `MINOR_VERSION + 1` (e.g., `23`)
+
+**Example**:
+- Raw: `rhel-9.6-microshift-brew-optionals-4.{{ .Env.PREVIOUS_MINOR_VERSION }}-zstream`
+- Read `common_versions.sh` → `MINOR_VERSION=22`, so `PREVIOUS_MINOR_VERSION=21`
+- Resolved: `rhel-9.6-microshift-brew-optionals-4.21-zstream`
+
+### 4.3 Find Blueprint for Parent Dependency
+
+For each resolved parent dependency, find its blueprint file using the same three-step search as Section 3:
+
+```bash
 for dep in ${deps}; do
-    dep_file="$(find test/image-blueprints -type f -name "${dep}.*" -print -quit)"
-    # Recursively process dep_file to find its dependencies
+    dep_file="$(grep -rl "^name = \"${dep}\"" test/image-blueprints/ --include="*.toml" | head -1)"
+    if [ -z "${dep_file}" ]; then
+        dep_file="$(grep -rl "^${dep}$" test/image-blueprints/ --include="*.image-installer" | head -1)"
+    fi
+    if [ -z "${dep_file}" ]; then
+        dep_file="$(find test/image-blueprints -type f -name "${dep}.alias" -print -quit)"
+    fi
+    if [ -z "${dep_file}" ]; then
+        echo "ERROR: No blueprint file found for image: ${dep}" >&2
+        exit 1
+    fi
+    # Recursively process dep_file to find its dependencies (go back to step 4.1)
 done
 ```
 
@@ -249,12 +322,15 @@ The final output should be a sorted list of build commands, one per line:
 
 1. **CRITICAL**: Validate that the scenario file path contains `test/scenarios/` and does NOT contain `scenarios-bootc` BEFORE any processing. Exit with error if validation fails.
 2. **DO NOT** attempt to find or convert non-ostree scenarios to ostree scenarios. Report error immediately.
-3. Use `grep -E '^[[:space:]]*#[[:space:]]*parent[[:space:]]*='` to extract parent image references
+3. Use `grep -E '^[[:space:]]*#[[:space:]]*parent[[:space:]]*='` to extract parent image references. The `#` is NOT a comment — it is part of the pseudo-directive syntax. These lines are ALWAYS active dependencies
 4. Use `realpath` to convert relative paths to absolute paths
 5. Use `sort -u` to ensure unique, sorted output
 6. Maintain a set of processed blueprint files to avoid duplicates and infinite recursion
 7. Dependencies must appear before images that depend on them in the output
 8. If a blueprint file is not found, report an error with the image name. Do NOT attempt alternative search strategies to find it
+9. **IMPORTANT**: Blueprint files are found by searching file contents, NOT by matching filenames. Search `^name = "<image_name>"` in `.toml` files first, then `^<image_name>$` in `.image-installer` files, then `<image_name>.alias` by filename. The filename does not necessarily match the image name (e.g., `rhel96.toml` produces image `rhel-9.6`)
+10. **`.image-installer` files**: These contain the image name directly (file content = image name). When a match is found in a `.image-installer` file, the corresponding `.toml` blueprint has the same basename (e.g., `rhel96.image-installer` → `rhel96.toml`)
+11. **`.alias` files**: These define image name aliases. The filename (without extension) is the alias, and the file contents is the real image name. When an alias is found, resolve the real image name and restart the search from Step 1. For example, `rhel-9.6-microshift-source-aux.alias` contains `rhel-9.6-microshift-source`, so looking up `rhel-9.6-microshift-source-aux` resolves to the blueprint for `rhel-9.6-microshift-source`
 
 # Error Handling
 
