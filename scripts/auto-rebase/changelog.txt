@@ -1,3 +1,31 @@
-- ovn-kubernetes image-arm64 16e5e201025c67a8cc2253851ebbbe3dfa7d7910 to 194e289903051ba951e479c227ad3d44f9fc321a
+- cluster-kube-apiserver-operator embedded-component 8ce34d695b2ee3a93e748cd039db7c238ffc9f12 to 4bbd3be9dfda4a08dca98648209151de2a869f25
+  - 8047018 2025-11-05T16:34:26+00:00 Add priority field to prevent early shutdown
+
+- cluster-kube-scheduler-operator embedded-component 8740a60de76690a17d5081db078eb93dfdb7a066 to b5671f10f0b03ac19e584e08b08267f67dd2d709
+  - ca3fba9 2026-01-30T12:59:18-05:00 Update ks_pod_scenario_3.yaml
+  - b35f237 2026-01-30T12:59:18-05:00 Update ks_pod_scenario_2.yaml
+  - bb1599c 2026-01-30T12:59:17-05:00 Update ks_pod_scenario_1.yaml
+  - 95d235b 2026-01-30T12:59:17-05:00 Add priority field to prevent early shutdown
+
+- etcd embedded-component 0737eac4bbe3903f725064c06a88af761418e5fd to 3ebce536634cb76794f1b9668072a094c132c16a
+  - da481c1f 2026-02-06T10:54:08-05:00 UPSTREAM: <drop>: Revert "dependency: Bump golang.org/x/crypto from 0.38.0 to 0.45.0"
+  - 847c0464 2026-02-06T10:45:22-05:00 UPSTREAM: <drop>: manually resolve conflicts
+  - 65251b30 2025-12-18T03:27:13+08:00 version: bump up to 3.5.26
+  - 751f1628 2025-12-15T22:36:25-06:00 dependency: Bump golang.org/x/crypto from 0.38.0 to 0.45.0
+  - 47f9b5aa 2025-12-10T09:37:59-05:00 server: cleanup zombie membership information
+  - 5ff84215 2025-12-10T09:36:18-05:00 tests: setup two testcases to reproduce 20967 issue
+  - a8ffc2e2 2025-12-06T21:32:18+08:00 Bump go to 1.24.11
+  - 80e15b8f 2025-11-18T13:11:14+00:00 Fix a typo of 'etcdctl snapshot restore/status' commands
+  - 8bdb0edc 2025-11-17T17:56:45+00:00 Print token fingerprint instead of the original tokens in log messages
+  - e2eff772 2025-11-12T00:00:11-05:00 version: bump up to 3.5.25
+  - 26c67519 2025-11-06T21:57:49-08:00 Bump from go1.24.9 to go1.24.10
+  - 547d6f42 2025-11-06T19:37:43+00:00 Fix the '--force-new-cluster' can't clean up learners issue
+  - 2cdacbc4 2025-11-06T19:35:12+00:00 Add an e2e test cases to reproduce the '--force-new-cluster' can't remove learners issue
+  - 67ddeb51 2025-11-04T09:30:54-05:00 etcdutl: add --wal-dir for check-v2store
+
+- machine-config-operator embedded-component b405535023b88949e231be90778e5cf63e438c40 to 25321abfd952d282486d28fe27c4ab6052469ebf
+  - 1b30b594 2026-01-28T16:02:00-06:00 Fix MCN conditions not updating during OCL sync
+
+- ovn-kubernetes image-amd64 16e5e201025c67a8cc2253851ebbbe3dfa7d7910 to 194e289903051ba951e479c227ad3d44f9fc321a
   - 1ce92737 2026-01-21T14:02:20+01:00 fix(localnet, ipamless): Prevent LSP deletion on sync
 
