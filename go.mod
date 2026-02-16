@@ -19,7 +19,7 @@ require (
 	github.com/spf13/pflag v1.0.6
 	github.com/stretchr/testify v1.10.0
 	github.com/vishvananda/netlink v1.3.1-0.20250206174618-62fb240731fa
-	go.etcd.io/etcd/client/pkg/v3 v3.5.24
+	go.etcd.io/etcd/client/pkg/v3 v3.5.26
 	go.etcd.io/etcd/client/v3 v3.5.16
 	golang.org/x/sys v0.31.0
 	gopkg.in/yaml.v3 v3.0.1
@@ -197,7 +197,7 @@ require (
 	github.com/robfig/cron v1.2.0 // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
 	github.com/vishvananda/netns v0.0.4 // indirect
-	go.etcd.io/etcd/api/v3 v3.5.24 // indirect
+	go.etcd.io/etcd/api/v3 v3.5.26 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.27.0 // indirect
 	golang.org/x/mod v0.22.0 // indirect
@@ -258,7 +258,7 @@ replace (
 )
 
 replace (
-	go.etcd.io/etcd/api/v3 => github.com/openshift/etcd/api/v3 v3.5.1-0.20251107205749-0737eac4bbe3 // from etcd
-	go.etcd.io/etcd/client/pkg/v3 => github.com/openshift/etcd/client/pkg/v3 v3.5.1-0.20251107205749-0737eac4bbe3 // from etcd
-	go.etcd.io/etcd/client/v3 => github.com/openshift/etcd/client/v3 v3.5.1-0.20251107205749-0737eac4bbe3 // from etcd
+	go.etcd.io/etcd/api/v3 => github.com/openshift/etcd/api/v3 v3.5.1-0.20260208160752-3ebce536634c // from etcd
+	go.etcd.io/etcd/client/pkg/v3 => github.com/openshift/etcd/client/pkg/v3 v3.5.1-0.20260208160752-3ebce536634c // from etcd
+	go.etcd.io/etcd/client/v3 => github.com/openshift/etcd/client/v3 v3.5.1-0.20260208160752-3ebce536634c // from etcd
 )
