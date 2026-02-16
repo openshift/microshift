@@ -1,8 +1,8 @@
 #!/bin/bash
 #
-# Analyze a MicroShift bootc scenario file to identify all image dependencies
-# (direct and transitive) and produce a sorted list of build commands needed
-# to build all required images.
+# Analyze a MicroShift scenario file (bootc or ostree) to identify all image
+# dependencies (direct and transitive) and produce a sorted list of build
+# commands needed to build all required images.
 #
 # Usage: scenario_builder.sh <scenario-file>
 #
@@ -20,13 +20,17 @@ fi
 scenario_file="${1}"
 
 # ============================================================================
-# Step 1: Validate Scenario File Path
+# Step 1: Validate Scenario File Path and Detect Scenario Type
 # ============================================================================
 
-# Check if the scenario file path contains "test/scenarios-bootc/"
-if [[ "${scenario_file}" != *"test/scenarios-bootc/"* ]]; then
-    echo "ERROR: Not a bootc scenario: ${scenario_file}" >&2
-    echo "ERROR: This script only works with bootc scenarios in test/scenarios-bootc/ directory" >&2
+# Detect scenario type based on path
+if [[ "${scenario_file}" == *"test/scenarios-bootc/"* ]]; then
+    scenario_type="bootc"
+elif [[ "${scenario_file}" == *"test/scenarios/"* ]]; then
+    scenario_type="ostree"
+else
+    echo "ERROR: Unknown scenario type: ${scenario_file}" >&2
+    echo "ERROR: Scenario must be in test/scenarios-bootc/ or test/scenarios/ directory" >&2
     exit 1
 fi
 
@@ -91,7 +95,7 @@ declare -A processed_blueprints
 declare -a blueprint_order
 
 # Recursive function to find dependencies
-find_dependencies() {
+find_dependencies_bootc() {
     local image_name="${1}"
 
     # Find all blueprint files matching the image name (may have both .containerfile and .image-bootc)
@@ -127,7 +131,7 @@ find_dependencies() {
 
         # Recursively process each dependency
         for dep in ${deps}; do
-            find_dependencies "${dep}"
+            find_dependencies_bootc "${dep}"
         done
 
         # Add this blueprint to the ordered list (dependencies first)
@@ -135,10 +139,20 @@ find_dependencies() {
     done
 }
 
-# Process all found images
+# Recursive function to find dependencies for ostree blueprints
+find_dependencies_ostree() {
+    echo "ERROR: find_dependencies_ostree is not implemented" >&2
+    exit 1
+}
+
+# Process all found images using the appropriate function
 for image_name in "${all_images[@]}"; do
     if [ -n "${image_name}" ]; then
-        find_dependencies "${image_name}"
+        if [ "${scenario_type}" = "bootc" ]; then
+            find_dependencies_bootc "${image_name}"
+        else
+            find_dependencies_ostree "${image_name}"
+        fi
     fi
 done
 
@@ -153,5 +167,9 @@ fi
 
 # Output build commands in dependency order
 for blueprint_file in "${blueprint_order[@]}"; do
-    echo "./test/bin/build_bootc_images.sh --template ${blueprint_file}"
+    if [ "${scenario_type}" = "bootc" ]; then
+        echo "./test/bin/build_bootc_images.sh --template ${blueprint_file}"
+    else
+        echo "./test/bin/build_images.sh -t ${blueprint_file}"
+    fi
 done
