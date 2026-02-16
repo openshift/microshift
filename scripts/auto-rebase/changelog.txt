@@ -1,3 +1,26 @@
-- kubernetes image-arm64 436b373e7dec669750c65a1ef832665e56b733b7 to 91c24081f468e7636c824f4f5a2eb68660b81012
+- cluster-kube-apiserver-operator embedded-component 416eeae4e60970f5ab52a833774c7bb60644e6af to e9bc90906c726823f154c78d3e568c98ff77b6a5
+  - c3aa9e5 2026-02-05T18:49:21+00:00 Add priority field to prevent early shutdown
+
+- cluster-kube-scheduler-operator embedded-component 971ffbb8239a8c49f1254e5fdaab854eed224f31 to c7b51633b67e3e2860ca053930422f69e17bd40a
+  - d49ed9c 2026-02-05T13:57:22-05:00 Update ks_pod_scenario_3.yaml
+  - 9d3ee9b 2026-02-05T13:57:22-05:00 Update ks_pod_scenario_2.yaml
+  - ec36d40 2026-02-05T13:57:22-05:00 Update ks_pod_scenario_1.yaml
+  - 916812c 2026-02-05T13:57:21-05:00 Add priority field to prevent early shutdown
+
+- kubernetes embedded-component 436b373e7dec669750c65a1ef832665e56b733b7 to 91c24081f468e7636c824f4f5a2eb68660b81012
   - b18acb299 2025-04-08T14:24:38+00:00 UPSTREAM: 130450: Fix implementation of ContainsCIDR to allow non-equal addresses
+
+- machine-config-operator embedded-component 0b0569287da3daea19bf47aa298037ccb4cbff98 to d4eb710b17481f468c73d93c876a385253a863e0
+  - d9c75d7a 2026-02-11T18:48:08+03:00 Add hostIP 127.0.0.1 to machine-config-daemon port 8798
+  - 352749e7 2026-02-11T18:47:59+03:00 add a relevant svc to the crio port
+  - 93ade935 2026-02-11T18:46:50+03:00 add missing ports in contaiterport on the daemoset
+
+- ovn-kubernetes image-amd64 70a2d777ecb661c3267d24092381518f0420fa9a to 4bee86ff82e3632f99ee5926c0f8ab7a78c93f48
+  - 3bbc31b3 2026-01-21T14:03:37+01:00 fix(localnet, ipamless): Prevent LSP deletion on sync
+
+- kubernetes image-amd64 436b373e7dec669750c65a1ef832665e56b733b7 to 91c24081f468e7636c824f4f5a2eb68660b81012
+  - b18acb299 2025-04-08T14:24:38+00:00 UPSTREAM: 130450: Fix implementation of ContainsCIDR to allow non-equal addresses
+
+- ovn-kubernetes image-arm64 70a2d777ecb661c3267d24092381518f0420fa9a to 4bee86ff82e3632f99ee5926c0f8ab7a78c93f48
+  - 3bbc31b3 2026-01-21T14:03:37+01:00 fix(localnet, ipamless): Prevent LSP deletion on sync
 
