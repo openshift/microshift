@@ -110,7 +110,7 @@ func TestIsCustomFeatureGatesConfigured(t *testing.T) {
 			fg: config.FeatureGates{
 				FeatureSet: "",
 			},
-			want: false,
+			want: true, // validation passes when prev and current both have no feature set
 		},
 		{
 			name: "CustomNoUpgrade without any enabled/disabled",
@@ -118,7 +118,7 @@ func TestIsCustomFeatureGatesConfigured(t *testing.T) {
 				FeatureSet:      config.FeatureSetCustomNoUpgrade,
 				CustomNoUpgrade: config.EnableDisableFeatures{},
 			},
-			want: false,
+			want: true, // validation passes when prev and current match
 		},
 	}
 
@@ -128,11 +128,9 @@ func TestIsCustomFeatureGatesConfigured(t *testing.T) {
 				FeatureSet:      tt.fg.FeatureSet,
 				CustomNoUpgrade: tt.fg.CustomNoUpgrade,
 			}, &tt.fg)
-			if err != nil {
-				t.Errorf("featureValidationsPass() error = %v", err)
-			}
-			if err != nil {
-				t.Errorf("featureValidationsPass() error = %v", err)
+			got := err == nil
+			if got != tt.want {
+				t.Errorf("configValidationChecksPass() got pass = %v, want %v (err = %v)", got, tt.want, err)
 			}
 		})
 	}
@@ -489,9 +487,17 @@ func TestFeatureGateLockManagement_VersionChange(t *testing.T) {
 			defer func() { getExecutableVersion = originalGetExecutableVersion }()
 
 			// Create lockFile file with locked version. Lock file does not store the special handling support exception.
+			customNoUpgrade := config.EnableDisableFeatures{}
+			if tt.customNoUpgrade != nil {
+				customNoUpgrade = *tt.customNoUpgrade
+			}
+			specialHandling := config.EnableDisableFeatures{}
+			if tt.specialHandlingSupportException != nil {
+				specialHandling = *tt.specialHandlingSupportException
+			}
 			lockFile := featureGateLockFile{
 				FeatureSet:      config.FeatureSetCustomNoUpgrade,
-				CustomNoUpgrade: *tt.customNoUpgrade,
+				CustomNoUpgrade: customNoUpgrade,
 				Version:         tt.lockFileVer,
 			}
 			if err := writeFeatureGateLockFile(featureGateLockFilePath, lockFile); err != nil {
@@ -502,8 +508,8 @@ func TestFeatureGateLockManagement_VersionChange(t *testing.T) {
 				ApiServer: config.ApiServer{
 					FeatureGates: config.FeatureGates{
 						FeatureSet:                              config.FeatureSetCustomNoUpgrade,
-						CustomNoUpgrade:                         *tt.customNoUpgrade,
-						SpecialHandlingSupportExceptionRequired: *tt.specialHandlingSupportException,
+						CustomNoUpgrade:                         customNoUpgrade,
+						SpecialHandlingSupportExceptionRequired: specialHandling,
 					},
 				},
 			}
