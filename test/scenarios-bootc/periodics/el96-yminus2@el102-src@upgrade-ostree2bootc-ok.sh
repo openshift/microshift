@@ -3,8 +3,10 @@
 # Sourced from scenario.sh and uses functions defined there.
 
 scenario_create_vms() {
-    prepare_kickstart host1 kickstart-bootc.ks.template rhel96-bootc-yminus2
-    launch_vm --boot_blueprint rhel96-bootc
+    # The y-2 ostree image will be fetched from the cache as it is not built
+    # as part of the bootc image build procedure
+    prepare_kickstart host1 kickstart.ks.template "rhel-9.6-microshift-4.${YMINUS2_MINOR_VERSION}"
+    launch_vm
 }
 
 scenario_remove_vms() {
@@ -13,7 +15,7 @@ scenario_remove_vms() {
 
 scenario_run_tests() {
     run_tests host1 \
-        --variable "TARGET_REF:rhel100-bootc-source" \
+        --variable "TARGET_REF:rhel102-bootc-source" \
         --variable "BOOTC_REGISTRY:${MIRROR_REGISTRY_URL}" \
         suites/upgrade/upgrade-successful.robot
 }

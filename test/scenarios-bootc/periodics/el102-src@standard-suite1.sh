@@ -3,8 +3,8 @@
 # Sourced from scenario.sh and uses functions defined there.
 
 scenario_create_vms() {
-    prepare_kickstart host1 kickstart-bootc.ks.template rhel100-bootc-source
-    launch_vm --boot_blueprint rhel100-bootc
+    prepare_kickstart host1 kickstart-bootc.ks.template rhel102-bootc-source
+    launch_vm --boot_blueprint rhel102-bootc
 }
 
 scenario_remove_vms() {
