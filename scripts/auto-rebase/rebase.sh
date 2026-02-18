@@ -1104,6 +1104,33 @@ metadata:
 EOF
     fi
 
+    #TODO remove this section once we have OCPBUGS-77006 ready in 4.20
+    # Remove pprof-related manifests and their entries from kustomization.yaml (these manifests were removed upstream)
+    local olm_dir="${REPOROOT}/assets/optional/operator-lifecycle-manager"
+    rm -f "${olm_dir}/0000_50_olm_00-pprof-config.yaml"
+    rm -f "${olm_dir}/0000_50_olm_00-pprof-rbac.yaml"
+    rm -f "${olm_dir}/0000_50_olm_00-pprof-secret.yaml"
+
+    local olm_kustomization="${olm_dir}/kustomization.yaml"
+    sed -i \
+        -e '/0000_50_olm_00-pprof-config\.yaml/d' \
+        -e '/0000_50_olm_00-pprof-rbac\.yaml/d' \
+        -e '/0000_50_olm_00-pprof-secret\.yaml/d' \
+        "${olm_kustomization}"
+
+    # Remove pprof-cert secret references from OLM deployments (volume, volumeMount, and --client-ca arg)
+    local olm_operator_deployment="${REPOROOT}/assets/optional/operator-lifecycle-manager/0000_50_olm_07-olm-operator.deployment.yaml"
+    local catalog_operator_deployment="${REPOROOT}/assets/optional/operator-lifecycle-manager/0000_50_olm_08-catalog-operator.deployment.yaml"
+
+    for deployment in "${olm_operator_deployment}" "${catalog_operator_deployment}"; do
+        # Remove profile-collector-cert volume
+        yq -i 'del(.spec.template.spec.volumes[] | select(.name == "profile-collector-cert"))' "${deployment}"
+        # Remove profile-collector-cert volumeMount
+        yq -i 'del(.spec.template.spec.containers[0].volumeMounts[] | select(.name == "profile-collector-cert"))' "${deployment}"
+        # Remove --client-ca and its value from args
+        yq -i 'del(.spec.template.spec.containers[0].args[] | select(. == "--client-ca" or . == "/profile-collector-cert/tls.crt"))' "${deployment}"
+    done
+
     for goarch in amd64 arm64; do
         arch=${GOARCH_TO_UNAME_MAP["${goarch}"]:-noarch}
 
