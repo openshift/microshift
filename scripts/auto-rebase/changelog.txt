@@ -1,95 +1,432 @@
-- api embedded-component c16ec2bcf089999a012322dbf889c632729dc80d to 81371d13d1fcad175a48627cf11524a94a80c377
-  - 43dd9725 2026-02-03T15:18:57Z CodeRabbit should not be looking at openapi generated content
-  - b792c564 2026-02-02T12:08:34Z Remove pre 4.20 SDN feature gates
-  - fe0f7f81 2026-01-30T12:12:42+01:00 add suggestions
-  - f7f52ce3 2026-01-30T11:03:10+01:00 feat: add Insights capability to Insights CRDs
-  - 1d800807 2026-01-29T10:29:12-05:00 promote ManagedBootImagesCPMS fg to Default
-  - e73ed72f 2026-01-29T09:48:40-05:00 Add CRIOCredentialProviderConfig API
-  - 60662b01 2026-01-29T10:55:55Z Remove ProcMountType
-  - 7441eb56 2026-01-28T12:06:53+01:00 add suggestions
-  - f8a69ad1 2026-01-08T13:08:09+01:00 Fix documentation punctuation and regenerate files
-  - 66fff255 2026-01-08T12:23:59+01:00 add prometheusOperatorConfig API
+- api embedded-component 81371d13d1fcad175a48627cf11524a94a80c377 to d34f11c515b3d00fdb3809cd59737e3bd77167c4
+  - a51a8c21 2026-02-13T14:33:53-05:00 CORS-4096: Add DNS Record Type for IPv6 Domain mapping
+  - 164ef8ee 2026-02-11T21:51:41+01:00 make update
+  - 9ee7e57f 2026-02-11T21:51:40+01:00 TLSSecurityProfile: Remove go's unsupported ciphers
+  - 2a4d5aca 2026-02-11T16:55:12Z Synchronous review updates
+  - f1afd44b 2026-02-11T15:55:12Z Add ClusterAPI config
+  - 03090cfb 2026-02-11T15:58:03+01:00 Remove CPMSMachineNamePrefix featuregate
+  - 43458f18 2026-02-09T16:17:23Z Add a timeout for aysnc calls in integration tests
+  - 8d70004f 2026-02-09T14:04:43Z Update integration test timeout and make parallel where possible
+  - 49591510 2026-02-09T13:05:22Z Deploy CompatibilityRequirement from o/api repo
+  - 33223cf6 2026-02-09T13:01:36Z Feature gate CVO application of CompatibilityRequirement CRD
+  - f8283c1d 2026-02-05T11:44:39-05:00 Add link to the dynamic-config-manager EP PR
+  - 1fece6c0 2026-02-05T10:44:12-05:00 Add DRAPartitionableDevices to TechPreviewNoUpgrade
+  - 2fc32cc5 2026-02-05T08:14:06-05:00 Added support for dynamic AWS dedicated hosts
+  - 40188ba8 2026-02-05T01:24:01-05:00 Move DynamicConfigurationManager back to TPNU
+  - 3643afa3 2026-02-05T10:36:51+08:00 Graduate MutableCSINodeAllocatableCount to GA
+  - a47ac128 2026-02-04T04:56:57-05:00 NE-2480: Add featuregate for Gateway API without OLM
+  - f39c09df 2026-01-28T14:06:41+01:00 Remove VolumeAttributesClass FeatureGate
 
-- cluster-csi-snapshot-controller-operator embedded-component 8be3728d7db58111e6efb46f6075698d6b7ec994 to 7b6335396677dfd392dc72e1f1bbb5afcfa74a44
-  - f6a61f9 2026-01-27T21:59:36-08:00 Rename replacer func to more generic name
-  - 4b3bf71 2026-01-27T21:52:16-08:00 hypershift: Add version annotation to controller Deployments
-  - 4cfd73e 2026-01-27T19:40:57-08:00 Bump library-go dependency
-  - 90e85d2 2026-01-27T19:40:57-08:00 Add desired-version annotation to controller Deployment
+- cluster-dns-operator embedded-component 41a53fed36e6e99c7c9ceb3a699c3547ee5d9bb9 to 5d7c973968909d4155796363222f6edc001e19a3
+  - e2b909a 2026-01-15T10:37:12-05:00 Use `trafficDistribution: PreferSameNode` for openshift-dns Service
 
-- cluster-ingress-operator embedded-component eeb7347184177d0f0855632bad82398089547e87 to 77901360f18951f2a51d38acd1a07714f9183493
-  - b2c8e1c 2026-02-02T15:26:39-05:00 E2E test for internal LB creation
+- cluster-ingress-operator embedded-component 77901360f18951f2a51d38acd1a07714f9183493 to abfb6fa7b9c95dc54fb3988e84297912ad88e0e4
+  - 15e4cae 2026-02-06T10:35:49-05:00 Fix formatting in secret_hash.go
+  - 900e9f0 2026-02-06T09:44:08-03:00 bump go on base image
+  - ff08e12 2026-02-05T17:30:47-05:00 Move CanaryServingCertHashAnnotation to daemonset.go
+  - 9df597d 2026-02-05T17:29:11-05:00 Address PR review comments: use CanaryCertificateName and propagate context
+  - 1e5f504 2026-02-05T17:22:04-05:00 OCPBUGS-58145: reload serving cert on rotation
+  - 9fbaa11 2026-02-05T11:34:38-03:00 bump controller-runtime
+  - a2e1cd1 2026-02-05T11:15:27-03:00 bump k8s libraries to v0.35.0 Update Kubernetes libraries to v0.35.0. Due to the library version update: * Indirect dependencies were also updated * Minimal go version updated to 1.25, so updating build image accordingly
+  - 0de9609 2026-01-22T14:59:26-03:00 NO-JIRA: Add coderabbit to CIO
 
-- cluster-kube-apiserver-operator embedded-component 064809665fd54e4c15d3b0c2f6da9fadce715c34 to fecf00cbeaf1fc18178bffddab767ee8f3d7e36f
-  - f82dace 2026-01-29T12:46:58-03:00 Bump library-go to get KMS helper
-  - 0e25cb4 2026-01-29T12:46:58-03:00 Conditionally add the KMS plugin volume mount to the kube-apiserver container
-  - f6a1c91 2026-01-27T17:06:18+01:00 CNTRLPLANE-2563: update wording for major upgrades
+- cluster-kube-apiserver-operator embedded-component fecf00cbeaf1fc18178bffddab767ee8f3d7e36f to cee7acb6c820b707fbb1e1dc01cef6c1971f146d
+  - 4cf4d0b 2026-02-09T12:48:47+03:00 Test encryption provider migration
+  - 2a40ac5 2026-02-09T12:48:41+03:00 Bump library-go
+  - 436f939 2026-02-05T15:15:23+05:30 vendor: update library-go to latest
+  - fe307df 2026-02-04T19:05:31+05:30 CNTRLPLANE-2247: Add KMS TestKMSEncryptionOnOff e2e test
+  - b9d2f86 2026-01-22T11:52:23Z remove kube-apiserver user from crb
 
-- cluster-kube-scheduler-operator embedded-component ed10ad69474b83c568452f59dbd3d943778799d7 to b37b73a87e7a6612f3354c2ffc134a23a0a8c13c
-  - d7f76dc 2026-01-27T20:23:53+05:30 Bump dependencies
-  - a7a7db7 2026-01-27T20:23:21+05:30 Adds openshift/cluster-kube-scheduler-operator/operator/serial suite to the test ext binary
+- cluster-kube-scheduler-operator embedded-component b37b73a87e7a6612f3354c2ffc134a23a0a8c13c to 14c5fdcfc2602292e19cab8713e42accf94b593d
+  - 4746564 2026-02-12T15:26:40+05:30 Register preferred-host test suite in OTE and update documentation
+  - 6d5d557 2026-02-12T15:24:43+05:30 Refactor test utilities to eliminate code duplication
+  - c58aa5c 2026-02-03T20:12:57+05:30 Add Ginkgo-based e2e tests and parallel test suite
 
-- cluster-network-operator embedded-component b9a777441ccdbaea524196ecd15aed7e0aa8ab5e to f0bdee37451757734c3e84cb6c0a8646290c4ffa
-  - d19cb3f 2026-01-28T20:28:45+01:00 Fix staticcheck QF* and ST* lint issues
-  - eba58e4 2026-01-28T20:28:45+01:00 Update golangci-lint config for v2 compatibility
-  - 46882d6 2026-01-28T15:29:08+01:00 Fix existing lint errors found by golangci-lint v1
-  - 2527aec 2026-01-28T11:51:13Z Remove templating for removed feature gates
-  - 9f45d8d 2026-01-27T17:11:09-08:00 avoid flapping Degraded on transient failures
-  - ebdaccd 2026-01-27T12:15:46Z Remove references to AdminNetworkPolicy and NetworkSegmentation featuregates
-  - 756a7ea 2026-01-26T14:32:35+01:00 OCPBUGS-74401: Remove duplicated openssl parameter
-  - 5e9c628 2026-01-12T17:35:27+01:00 CNF-20883: Align templates frrk8s
+- cluster-network-operator embedded-component f0bdee37451757734c3e84cb6c0a8646290c4ffa to 9d540eb7929f83879d3dafbcd1ae6cb1feca36b3
+  - d69bd30 2025-08-04T16:54:19+02:00 silenced output of start-audit-log-rotation and made it ENV dependning instead
 
-- etcd embedded-component 806f690e1f140e0aea2eb05ef5f288b756b62895 to 6a0992267004177e385e35b91e186635a644dbfe
-  - 4afffb4f 2025-12-18T20:05:04Z Updating ose-etcd-container image to be consistent with ART for 4.22 Reconciling with https://github.com/openshift/ocp-build-data/tree/087d1930e36b609f77d73bd8a313d85c940cff4d/images/ose-etcd.yml
+- cluster-openshift-controller-manager-operator embedded-component a6ce1136e71ded4af3cb5e771435e098b5e30349 to 7634c413830a510ff942bd6886ffe5f79db707b4
+  - 2e329e3 2026-02-03T12:30:47+01:00 CNTRLPLANE-2620: propagate global tls config to operand
+  - 5282921 2026-02-02T19:27:01+01:00 CNTRLPLANE-2620: vendor github.com/openshift/library-go/pkg/operator/configobserver
+  - 44f341c 2026-02-02T14:40:44+01:00 CNTRLPLANE-2620: bump github.com/openshift/library-go
 
-- kubernetes embedded-component e4a4167c40c9ed543c5a80f2e08cc73696f7a4f6 to 9d521311f5fb67dc43f49eeb728ee2c80976835a
-  - bb37a6c1a 2026-02-03T09:47:51+01:00 UPSTREAM: 136202: raise kubelet CSI init backoff to cover ~140s DNS delays
-  - 5579c3340 2026-01-16T14:19:18-05:00 UPSTREAM: <carry>: Added validation to check if OKD featureset is being enabled on OKD clusters
-  - 8504fe0c7 2026-01-13T14:38:55-05:00 UPSTREAM: <drop>: Vendored API repo
+- kubernetes embedded-component 9d521311f5fb67dc43f49eeb728ee2c80976835a to 047d96223dd843e9d54bed59bc212d2e9122c56a
+  - bbdf0eb44 2026-02-06T13:54:27+01:00 UPSTREAM: 135629: selinux: Fix the controller to ignore finished pods
 
-- machine-config-operator embedded-component 1881dab7389ab49e3fbb2eaee17ea74b4f84b2ad to 067395ed863e0254c4e7ce85bf8bce7e464778bb
-  - df7f0605 2026-02-03T15:52:07-05:00 Fix OSImageStream validating admission policies for OKD
-  - 29a85663 2026-02-01T21:26:26-08:00 OKD: Pass TAGS argument to the machine-config-controller image build
-  - a9ea6555 2026-01-30T13:32:42-05:00 daemon: migrate legacy direct runGetOut references to use the CommandRunner interface
-  - 23c15b3e 2026-01-29T18:44:08Z MCO-2090: migrate nodedisruptionpolicy tests from the private repository to MCO repository
-  - 0b7af4aa 2026-01-29T08:36:25-05:00 AGENT-1424: Add e2e test for IRI deletion
-  - 56825a4f 2026-01-28T13:24:29-05:00 docs: add bootstrap e2e guide
-  - 64001b7a 2026-01-27T15:38:19-06:00 fixes exposure of sensitive data in log files
-  - e3841fb7 2026-01-27T10:34:18-05:00 add VAP for CPMS boot image updates
-  - 28f9c724 2026-01-27T12:44:31+01:00 MCO-2088: Remove wasm extension
-  - a223cc74 2026-01-23T10:15:20-05:00 add iri prefix to root certificate file
-  - 5b44ac92 2026-01-23T10:15:08-05:00 replaced controller clients with the related listers
-  - c6271f42 2026-01-12T09:44:27-05:00 controller: refactor helpers to get machines by state
+- machine-config-operator embedded-component 067395ed863e0254c4e7ce85bf8bce7e464778bb to 7eb4793ae255b19327e781f66aaf1dbd3e5210c5
+  - 64d3b69c 2026-02-13T13:16:27-05:00 bump openshift/client-go
+  - d98db2ff 2026-02-13T10:00:11-05:00 e2e: update boot image tests
+  - 604c1dae 2026-02-13T09:58:43-05:00 bootimage: enable opt-out for azure and vsphere
+  - 85764598 2026-02-12T10:44:04-05:00 OCPBUGS-76444: pkg/daemon/update: Remove conditional logic for kernel-rt-kvm
+  - a9c528d1 2026-02-12T09:00:42Z Make tls tests more stable
+  - 55ddcf86 2026-02-11T15:33:35-05:00 Bump openshift/api
+  - 5b2e93d4 2026-02-11T10:32:33-05:00 Fix cleanup verification timeouts in e2e-ocl tests
+  - 84eedc34 2026-02-11T09:09:01-05:00 copy binaries directly into final stage
+  - b8507587 2026-02-11T09:06:47-05:00 clear dnf cache to reduce image size
+  - 1cf8e054 2026-02-10T12:17:38-06:00 fix pull secret log spam make verify error
+  - b84815f0 2026-02-09T13:41:23Z Adapt boot images test cases to the new skew functionality
+  - 6ab5da81 2026-02-09T10:22:37Z MCO-2110: Migrate security tests
+  - 945c0af3 2026-02-06T14:51:16-05:00 Revert "Merge pull request #5586 from pablintino/dbus"
+  - 23650384 2026-02-05T15:31:31-05:00 crio: disable short_name_mode until we introduce ctrcfg api for it
+  - 6bde8f65 2026-02-05T13:39:36-05:00 node: add skew enforcement prometheus alert
+  - ed0b5ca8 2026-02-05T13:39:02-05:00 text/extended: add skew enforcement e2es
+  - 4d993aa6 2026-02-05T13:39:02-05:00 test/extended: refactor bootimage helpers
+  - b138090f 2026-02-05T12:07:53-05:00 hack: fix ami update script
+  - 6ef06dff 2026-02-05T00:54:41-05:00 feat: increase reserved memory for tnf masters
+  - 936c8e17 2026-02-04T13:15:09-05:00 hack: update ami script and list
+  - 24a0730d 2026-02-04T08:50:26-05:00 daemon: rewrite all systemd units when forcefile exists
+  - d89321d9 2026-02-02T10:51:18-05:00 Make TestImagePrunerErrors flexible to registry behavior changes
+  - 2277bea0 2026-01-30T14:21:59-05:00 operator: verify boot image controller state
+  - a16d81c4 2026-01-30T14:21:59-05:00 operator: add upgrade block unit tests
+  - e2b09f2a 2026-01-30T14:21:59-05:00 operator: block upgrades on skew violation
+  - c82370ae 2026-01-30T14:21:59-05:00 bootimage: update skew enforcement status
+  - 985f299c 2026-01-30T14:21:59-05:00 operator: add skew enforcement status unit tests
+  - 62becfc1 2026-01-30T14:21:59-05:00 operator: populate skew enforcement status
+  - aedd96ea 2026-01-29T23:46:05+01:00 OCPBUGS-63699: Remove MCD liveness probe
+  - 688d5dd1 2026-01-27T12:12:02+01:00 MCO-2065: Move systemctl execs to dbus calls
 
-- openshift-controller-manager embedded-component aaacf2be3860ec3609e6031527a6ffca4f282ba7 to 19ac71374ea7d42957fe0eb3cc6d38679cc257e1
-  - d39fedb 2026-02-02T20:41:05+01:00 CNTRLPLANE-2620: bump github.com/openshift/library-go
+- operator-framework-olm embedded-component fae41b2724eeab7a0e9b1ad89408bbbb36516fe2 to 811919f88bc3b8da4f97c6e6ca031258cc4fa13b
+  - 459f2fe9 2026-02-11T00:07:13Z :seedling: Bump go.podman.io/image/v5 from 5.38.0 to 5.39.1 (#3763)
+  - 81299149 2026-02-06T16:55:00-05:00 chore(deps): upgrade Go module dependencies (edge) (#473)
+  - 554de2ad 2026-02-06T16:55:00-05:00 Bump github.com/google/cel-go from 0.26.1 to 0.27.0 (#472)
+  - caa6e197 2026-02-06T16:55:00-05:00 move binary dependency management to bingo (#471)
+  - 9deb9d8a 2026-02-06T16:55:00-05:00 Bump sigs.k8s.io/controller-runtime (#470)
+  - 351eed19 2026-02-06T16:54:53-05:00 Fix k8s dependencies ci (#469)
+  - 5b805800 2026-02-06T16:54:38-05:00 fix(release) Issues faced with invalid latest tag after changes in goreleaser (#1901)
+  - 02a7f066 2026-02-06T16:54:38-05:00 fix CreateTemplateByType regression (#1899)
+  - 3b7ae219 2026-02-06T16:54:37-05:00 Bump github.com/operator-framework/api from 0.38.0 to 0.39.0 (#1900)
+  - ff328222 2026-02-06T16:54:37-05:00 chore(deps): upgrade Go module dependencies (edge) (#1897)
+  - 60763c02 2026-02-06T16:54:37-05:00 Bump github.com/onsi/gomega from 1.39.0 to 1.39.1 (#1895)
+  - 92ca3e1c 2026-02-06T16:54:37-05:00 Bump github.com/docker/cli (#1896)
+  - 550443d3 2026-02-06T16:54:37-05:00 Bump github.com/onsi/ginkgo/v2 from 2.27.5 to 2.28.1 (#1894)
+  - 5b9ccbc9 2026-02-06T16:54:36-05:00 Bump sigs.k8s.io/controller-runtime (#1893)
+  - bddef8d5 2026-02-06T16:54:36-05:00 Bump the k8s-dependencies with additional fixes (#1892)
+  - 01f01c89 2026-02-06T16:54:36-05:00 Bump github.com/docker/cli (#1890)
+  - 486368bc 2026-02-06T16:54:36-05:00 fix dropped :latest tag publication from migration to goreleaser v2.12 and go1.25 (#1891)
+  - e549c695 2026-02-06T16:54:36-05:00 upgraded github.com/operator-framework/operator-registry v1.62.0 => v1.63.0 (#3761)
+  - 8a49e5fd 2026-02-06T16:54:36-05:00 Add pedjak to OWNERS (#3760)
+  - 6c8852fe 2026-02-06T16:54:35-05:00 chore(deps): upgrade Go module dependencies (edge) (#3759)
+  - 275fbcf2 2026-02-06T16:54:35-05:00 fix: add OpenAPIModelName for PackageManifest to fix oc explain (#3755)
+  - e19d4286 2026-02-06T16:54:35-05:00 :seedling: Bump github.com/onsi/gomega from 1.39.0 to 1.39.1 (#3758)
+  - 561217b4 2026-02-06T16:54:35-05:00 :seedling: Bump github.com/onsi/ginkgo/v2 from 2.27.5 to 2.28.1 (#3757)
+  - 5d4b1b37 2026-02-06T16:54:35-05:00 fix: disable WatchListClient for envtest-based tests (#3756)
+  - ea7e0300 2026-02-06T16:54:34-05:00 :seedling: Bump sigs.k8s.io/controller-runtime (#3754)
+  - 2925d07f 2026-02-06T16:54:34-05:00 :seedling: Bump the k8s-dependencies group to 1.35 (#3743)
+  - 8bb814da 2026-02-06T16:54:22-05:00 fishing to see if testing explicitly for success will work for matrixed tests with fail-fast:false (#3752)
+  - 16ebb98d 2026-02-06T10:05:08+08:00 remove qe case of testing collect-profiles
+  - 82a07751 2026-02-05T18:29:54-03:00 UPSTREAM: <carry>: automate OCP-40945
+  - 7b17a6ac 2026-02-05T02:30:31-03:00 tests: update OLMv0 QE cases
 
-- operator-framework-olm embedded-component 526cde8d70dc640972eab717f80b42b66e8dff15 to fae41b2724eeab7a0e9b1ad89408bbbb36516fe2
-  - 7c903b19 2026-02-04T13:39:02+08:00 continue to adjust case per collect-profiles change
-  - 0fc3cdb2 2026-02-03T16:16:18+08:00 UPSTREAM: <carry>: automate OCP-87276
-  - 0085e3c9 2026-02-03T00:13:13-05:00 Remove the collect-profiles job
-  - 04ce50ea 2026-02-03T10:45:55+08:00 UPSTREAM: <carry>: remove redhat-marketplace catalog
-  - ec98e0d8 2026-02-03T09:08:53+08:00 change to check collect-profile networkpolicy dynamically
-  - d8f66874 2026-01-28T14:38:57+08:00 Add retry logic for SNO cluster detection in leader election configuration
+- route-controller-manager embedded-component 2b9e93a5f0fc1e93090bbe34ce95f3b4ad5cff15 to 624742d93f3a7885cf7f70985f1e23ff60da580d
+  - 4ca0f15 2026-02-10T15:21:30-03:00 bump library-go version
+  - cd4fccc 2026-02-06T18:19:54-03:00 fix compilation error after bump k8s lib
+  - d65cfe0 2026-02-06T18:16:17-03:00 bump k8s libraries to v0.35.0
 
-- oc image-amd64 430c82293109e23f3caaf9ba60e5affd2d5356f5 to 7e80dbab5a9ce563cd4f78f2874f18e4664767f5
-  - 08d5f27a 2026-01-30T14:17:04+01:00 expose: Fix labels not being added to route
-  - e87384f5 2026-01-29T20:38:10-05:00 Revert "CNTRLPLANE-2656:Migrating oc cli tests to ote"
-  - 9619e215 2026-01-28T11:01:38-05:00 OSDOCS#18071: Updating CLI docs templates to include a required abstract/short description
-  - 63b9258c 2026-01-28T19:41:37+05:30 removing bindata.go
-  - c423f7b7 2026-01-21T12:39:18+05:30 Removed sos cases
+- oc image-amd64 7e80dbab5a9ce563cd4f78f2874f18e4664767f5 to 8b0a043216f7ae608606afb5bdb0ce451561021e
+  - deaedbf2 2026-02-06T20:16:54-05:00 Revert "CNTRLPLANE-2656: Fixing oc client cases for microshift and metal ipv6 profiles"
+  - 82d41d0b 2026-02-05T11:33:56+05:30 CNTRLPLANE-2656: Add oc CLI e2e tests with OTE framework support
 
-- kubernetes image-amd64 e4a4167c40c9ed543c5a80f2e08cc73696f7a4f6 to 9d521311f5fb67dc43f49eeb728ee2c80976835a
-  - bb37a6c1a 2026-02-03T09:47:51+01:00 UPSTREAM: 136202: raise kubelet CSI init backoff to cover ~140s DNS delays
-  - 5579c3340 2026-01-16T14:19:18-05:00 UPSTREAM: <carry>: Added validation to check if OKD featureset is being enabled on OKD clusters
-  - 8504fe0c7 2026-01-13T14:38:55-05:00 UPSTREAM: <drop>: Vendored API repo
+- router image-amd64 d2db065ae452ecfdb482f0ac4c6778b0c0e48b7f to d8ed3559fd4808a4f10c927ba4a199d3fd5b84a2
+  - c46d819 2026-02-11T09:03:56-03:00 update base image to OCP 4.22
+  - cb8dba6 2026-02-10T09:19:25-03:00 disable WatchListClient featuregate
+  - b92c259 2026-02-05T11:24:23-03:00 bump k8s libraries to v0.35.0
 
-- oc image-arm64 430c82293109e23f3caaf9ba60e5affd2d5356f5 to 7e80dbab5a9ce563cd4f78f2874f18e4664767f5
-  - 08d5f27a 2026-01-30T14:17:04+01:00 expose: Fix labels not being added to route
-  - e87384f5 2026-01-29T20:38:10-05:00 Revert "CNTRLPLANE-2656:Migrating oc cli tests to ote"
-  - 9619e215 2026-01-28T11:01:38-05:00 OSDOCS#18071: Updating CLI docs templates to include a required abstract/short description
-  - 63b9258c 2026-01-28T19:41:37+05:30 removing bindata.go
-  - c423f7b7 2026-01-21T12:39:18+05:30 Removed sos cases
+- ovn-kubernetes image-amd64 1938041fd8f8c1fb5d376fa59faec1fef7614a92 to 2a9cd189db9c74dc678fcfca68473d6fdc278028
+  - 7dd0e556 2026-01-27T15:00:53-08:00 skip new NetSeg Localnet test
+  - 245941b1 2026-01-27T20:09:36Z sync openshift/go.mod with upstream dependencies
+  - aaf3f757 2026-01-26T21:36:19+02:00 docs: add OVS Dynamic CPU Affinity feature documentation
+  - 1e68f901 2026-01-26T21:36:18+02:00 createFileWatcherFor: rename argument
+  - 9dccb75e 2026-01-26T21:36:18+02:00 vendor: go mod tidy && go mod vendor
+  - 31ea00c0 2026-01-26T21:36:18+02:00 unit-test: adjust to new logic
+  - da87ab85 2026-01-26T21:36:18+02:00 ovspinning: detect reservedSystemCPUs
+  - e6606173 2026-01-26T21:36:18+02:00 ovspinning: detect nonpinned cpus using podresourceAPI
+  - 23fdd5fd 2026-01-26T21:36:18+02:00 ovspinning: pass context
+  - 5ba2cc11 2026-01-26T21:36:18+02:00 package: podresourceAPI client
+  - c9a29b50 2026-01-24T17:46:28-08:00 Use promhttp handler for emitting metrics
+  - cbba98ef 2026-01-24T17:46:28-08:00 change from periodic interval to request-based metrics collection
+  - c01ff2ff 2026-01-23T11:42:00-05:00 Integrate Network Manager resolver everywhere
+  - 7f0a4df1 2026-01-22T18:20:05-05:00 Fixes shouldFilter with Dynamic UDN
+  - 64d6bc2e 2026-01-22T18:20:05-05:00 Adds support for CNC with Dynamic UDN
+  - 56202d01 2026-01-22T18:20:05-05:00 Fix syncNAD
+  - 6e8dee9a 2026-01-22T18:20:05-05:00 NodeHasNAD -> NodeHasNetwork Refactor
+  - 8d7a89b3 2026-01-22T18:20:05-05:00 simplify NAD controller dynamic logic
+  - 7daff06c 2026-01-22T18:20:05-05:00 Fixes releasing network IDs for filtered NADs
+  - ea687aab 2026-01-22T18:20:05-05:00 Simplify ref counting with NCC and D-UDN
+  - 87a20d77 2026-01-22T18:20:05-05:00 Refactor remote D-UDN handling (again)
+  - 1dcd01fe 2026-01-22T18:20:05-05:00 Move D-UDN status/metrics to NCC
+  - 998e916f 2026-01-22T18:20:05-05:00 Fix DoWithLock crash
+  - 3e160739 2026-01-22T18:20:05-05:00 Add better debug logging for NAD controller
+  - a6b34b3b 2026-01-22T18:20:05-05:00 Critical Dynamic UDN NAD controller fixes
+  - 4dae25a6 2026-01-22T18:20:05-05:00 Convert pod/egress ip trackers to register with nad controller
+  - 20411a9a 2026-01-22T18:20:05-05:00 Add .gocache to gitignore
+  - f9531483 2026-01-22T18:20:05-05:00 Add unit test for Dynamic UDN status update
+  - 09f8efbd 2026-01-22T18:20:05-05:00 Move Dynamic UDN status/metrics to nad controller
+  - c0add608 2026-01-22T18:20:05-05:00 Move the trackers and dynamic filtering to the nad_controller.
+  - c09fcf05 2026-01-22T18:20:05-05:00 Only reconcile remote nodes on start up once
+  - fda7f71d 2026-01-22T18:20:05-05:00 Refactor OnNetworkRefChange
+  - a797c8c6 2026-01-22T18:20:05-05:00 Optimize performance for tracker primary nad lookups
+  - 4e11aa41 2026-01-22T18:20:05-05:00 Updates unit test nodes with new transit topo anno
+  - 57d9cad8 2026-01-22T18:20:05-05:00 Add Dynamic UDN metrics
+  - a96d67b5 2026-01-22T18:20:05-05:00 Add status update for UDNs with dynamic allocation
+  - 70f4f131 2026-01-22T18:20:05-05:00 Change pod handling to not rely on active network
+  - f1ff2e7b 2026-01-22T18:20:05-05:00 Add unit test for UDN deletion grace period
+  - 08248fcb 2026-01-22T18:20:05-05:00 Skip service tests to "other node"
+  - 8725a93d 2026-01-22T18:20:05-05:00 Fixes remote node removal with UDN
+  - 3440f2ad 2026-01-22T18:20:05-05:00 Enable Dynamic UDN in CI for one lane
+  - 7abc582e 2026-01-22T17:14:12-05:00 Enable dynamic UDN allocation with kind/helm
+  - 950aba76 2026-01-22T17:12:59-05:00 Enable NAD on Node tracking in UDN controllers
+  - f841691e 2026-01-22T17:12:59-05:00 Fix UDN controller test framework
+  - 58a969c2 2026-01-22T17:12:59-05:00 Integrate the trackers into controller managers and nad controller
+  - 6e6201f0 2026-01-22T17:12:59-05:00 Adds EgressIPTracker
+  - 48de82d1 2026-01-22T17:12:59-05:00 Adds pod tracker controller
+  - db4ca916 2026-01-22T17:12:59-05:00 Move WatchFactory interface to API
+  - ea1d89fc 2026-01-22T17:12:58-05:00 Exposes new dynamic allocation config knobs
+  - 47400690 2026-01-22T11:56:47Z Add EVPN feature flag
+  - 4b85ee3f 2026-01-22T10:03:29+08:00 test: fix race condition in waitForRollout
+  - 9dd6dc8d 2026-01-20T21:14:15+09:00 add Internet Initiative Japan Inc. to ADOPTERS
+  - 765fbd9a 2026-01-16T13:03:26-05:00 codegen: fix script when GOPATH is not in PATH
+  - 19f191fc 2026-01-16T14:59:51+01:00 Move common helpers into util/network-connect
+  - 9ca888f5 2026-01-16T14:59:51+01:00 ci: increase network-segmentation lane timeout to 190 minutes
+  - 2dc80388 2026-01-16T14:59:51+01:00 e2e: support multiple CNCs with different connect subnets
+  - c17da56e 2026-01-16T14:59:51+01:00 e2e: add ClusterNetworkConnect OVN controller connectivity tests
+  - 5a69fb5e 2026-01-16T14:59:51+01:00 making the e2e utils global for reusability
+  - b101a3d0 2026-01-16T14:59:51+01:00 Add controller integration tests
+  - db5e941f 2026-01-16T14:59:51+01:00 STEP4: Add LRSRs to connect router
+  - 17f77b3a 2026-01-16T14:59:50+01:00 STEP3: Add routing policies to connected network routers
+  - 64279f6e 2026-01-16T14:59:50+01:00 Add GetNetworkScopedSwitchToRouterPortName util
+  - 7dc67800 2026-01-16T14:59:23+01:00 STEP2: Create patch ports to connect routers together
+  - e371fc55 2026-01-16T14:54:10+01:00 Add GetNetworkByID util to network manager
+  - 8f60a8b5 2026-01-16T14:54:10+01:00 Add static subnet and tunnel key generator helpers for CNC
+  - 4291607f 2026-01-16T14:54:10+01:00 Add COPP protection for connect router
+  - 56db7ae7 2026-01-16T14:53:01+01:00 STEP1: Create Connect Router for CNC
+  - c3666788 2026-01-16T12:33:21+01:00 Add network connect controller plumbing
+  - 622a3f23 2026-01-15T19:18:31-08:00 Skip Node Shutdown and OVN node pod restart sync tests
+  - 80db3f2c 2026-01-15T19:18:31-08:00 OpenShift E2E: Add deployment config timeout support
+  - 118948b6 2026-01-15T19:18:31-08:00 Skip net-seg overlapping CIDRs tests
+  - cb301f71 2026-01-15T19:18:31-08:00 skip ClusterNetworkConnect: API validations tests
+  - d1963911 2026-01-15T19:18:31-08:00 Bump k8s.io to v1.34.1
+  - 9770e116 2026-01-15T19:18:14-08:00 <ds-only> infraprovider: Add openshift provider
+  - 40cf2ff1 2026-01-15T19:18:09-08:00 <ds-only> Add o/test-exts
+  - 34337f0a 2026-01-15T22:15:34+01:00 Add RBAC for CNCs access from ovnkube-node pod
+  - 1b665e97 2026-01-15T22:15:33+01:00 Add factory and clientset settings for ovnkube-controller
+  - cdb9e9a3 2026-01-15T21:59:47+09:00 fix golang builder image registry path in docker workflow
+  - 75e38626 2026-01-15T02:46:17-05:00 test: unskip Services fallback to local terminating endpoints test
+  - 2c3671c4 2026-01-15T02:46:17-05:00 for LGW with ETP=Local have different error code for l3 and l2
+  - 0dc90599 2026-01-14T10:34:17+01:00 Use labels to skip tests
+  - d6501811 2026-01-13T16:13:28+01:00 Expose EVPN fields via NetInfo utils
+  - 6b33ee67 2026-01-13T16:13:28+01:00 Add NetConf fields for EVPN
+  - 13415218 2026-01-13T16:13:28+01:00 Add E2E test for VTEP API Validations
+  - a1fe31d9 2026-01-13T16:13:28+01:00 Add E2E test for CUDN-EVPN validation
+  - 69647db7 2026-01-13T16:13:28+01:00 Add VTEP API reference docs
+  - 9c30fc27 2026-01-13T16:13:28+01:00 Generate VTEP Yaml
+  - 6641c7c3 2026-01-13T16:13:28+01:00 Add VTEP CRD
+  - 155779fa 2026-01-13T16:13:28+01:00 Update CUDN API reference docs
+  - fc37829e 2026-01-13T16:13:28+01:00 Generate CUDN Yaml
+  - 00ed2851 2026-01-13T16:13:28+01:00 Add EVPN fields to CUDN
+  - ecb3b72c 2026-01-13T16:13:28+01:00 Update tests for noOverlay field
+  - 00f1291f 2026-01-13T16:13:28+01:00 Update API reference docs
+  - 2c3ab32b 2026-01-13T16:13:28+01:00 Re-generate CUDN YAML
+  - 953bb6ac 2026-01-13T16:13:28+01:00 Rename noOverlayOptions to noOverlay
+  - 06486fa7 2026-01-13T16:13:28+01:00 Cleanup codegen files before regenerating
+  - 5ffc1bef 2026-01-12T16:25:38-05:00 Bug fix: Skip BridgeEIPAddrManager in DPU-host mode
+  - 106ea801 2026-01-12T11:20:41-05:00 iprulemanager: add mark check when comparing netlink rule equality
+  - e60b1cdb 2026-01-12T11:20:41-05:00 iprulemanager: remove string operations from areNetlinkRulesEqual
+  - 10c9c2a8 2026-01-09T06:44:18-05:00 Addressing trozet feedback
+  - 560aee20 2026-01-08T19:26:03-05:00 Attempt to capture and store pprof data
+  - ac29faf5 2026-01-08T19:26:03-05:00 Adding kubelet-density-cni performance workload
+  - 3c1c3967 2026-01-08T18:33:55+08:00 add eip e2e case on namespace/pod labels update
+  - 67f9fbf8 2026-01-08T10:54:40+01:00 bump up frr-k8s and frr image versions
+  - 0c3604e3 2026-01-08T10:05:13+01:00 Use interface index for IPv6 zone when sending unsolicited neighbor advertisements
+  - 4e343bc4 2026-01-07T15:27:04-08:00 always set arp sysctl configuration for multiple same network interfaces
+  - e200f2d1 2026-01-07T15:10:41-08:00 docs/multi-homing: support of multiple interfaces in the same network
+  - 36ddd004 2026-01-06T12:44:28-08:00 e2e: add e2e test case for Pod with multiple same secondary UDN
+  - 76d27a29 2026-01-06T12:44:28-08:00 add ECMP pod route for multiple same secondary UDN interfaces
+  - d0120301 2026-01-06T08:06:51-08:00 support ipamClaim for multiple same UDN on the pod
+  - 1597b780 2026-01-06T08:06:51-08:00 add additional pod-if-name external-id for Pod OVS interface
+  - 66cf0639 2026-01-06T08:06:51-08:00 support pod with multiple same secondary UDN
+  - 3c0e3d2d 2026-01-06T13:38:45Z Updating ose-ovn-kubernetes-base-container image to be consistent with ART for 4.22 Reconciling with https://github.com/openshift/ocp-build-data/tree/532305ad2d84f57355ac03b308650bcc5a8d7740/images/ovn-kubernetes-base.yml
+  - 2ea53bd1 2026-01-06T12:10:29+08:00 node: fix DeleteEndpointSlice namespace deletion race condition
+  - 61cc216e 2025-12-30T07:36:52-05:00 add nodePort etp=local e2e test for UDN and default network when advertised BGP routes
+  - 2d4a479c 2025-12-29T15:20:13+01:00 egressip: Skip bridge configuration for secondary network IPs
+  - d1c55f1c 2025-12-29T11:57:24+01:00 fix(localnet, ipamless): Prevent LSP deletion on sync
+  - 47cecd9c 2025-12-29T10:13:56+02:00 dist, fedora: Use the right package manager
+  - 54bc8959 2025-12-28T12:18:46+02:00 dist: Use the project golang container image
+  - 7b413f85 2025-12-22T18:28:19+01:00 Re-order upgrade image step
+  - 542bbb37 2025-12-22T17:40:27+01:00 Allow CI workflow dispatcher on release-1.2 branch
+  - 0b7607fe 2025-12-22T17:40:27+01:00 Update release docs to mention new cadance
+  - 32287237 2025-12-22T17:40:27+01:00 Update helm-chart version to 1.2.0
+  - 8571ba40 2025-12-22T17:40:26+01:00 Change OVN_DAEMONSET_VERSION to 1.2.0
+  - 69e28d98 2025-12-22T16:11:30+01:00 OVN-Kubernetes 1.2 release
+  - 727a0e82 2025-12-22T16:11:29+01:00 Add deprecation warning signs on docs/scripts for central mode
+  - aa6c1c86 2025-12-22T13:42:08+01:00 Update L2 topology to reflect new TR
+  - c75a25a0 2025-12-22T09:19:04+08:00 Update libovsdb bindings to ovn 25.09
+  - f50653ee 2025-12-21T14:45:36-08:00 minor updates on unit test cases
+  - 988ace17 2025-12-21T14:45:36-08:00 metrics: move OVN/OVS metrics update from periodic interval to request-based
+  - 9e7c7180 2025-12-19T15:27:54-05:00 Adds level-driven, UDN aware dev docs
+  - 5b01e17b 2025-12-19T15:27:54-05:00 Refactor NADController notifying into level driven reconciler
+  - e8fb693f 2025-12-19T19:29:18+01:00 Skip FRR bfdd process Coredumps
+  - f10deeba 2025-12-19T14:08:58+01:00 [retry] Make an exception for pods and retry them infinitely.
+  - 07b68bb6 2025-12-19T09:23:34+01:00 fix template referencing gatewayOps instead of gatewayOpts variable
+  - d22f59da 2025-12-18T17:15:49-05:00 OKEP 5674: DPU Healthcheck
+  - bbc03ca8 2025-12-17T17:08:11Z egressip: handle LinkNotFoundError gracefully in isEgressIPOnLink
+  - 8c83e326 2025-12-10T07:43:41+01:00 fix(e2e, kubevirt): Wait for IP after VM restart in ipamless localnet tests
+  - 5856fb09 2025-09-02T12:42:39+01:00 fix: drop prometheus operator CRDs and make CRs configurable
 
-- kubernetes image-arm64 0a955ccf26bb6091b9053309eb0ce0b2992fed70 to 9d521311f5fb67dc43f49eeb728ee2c80976835a
-  - bb37a6c1a 2026-02-03T09:47:51+01:00 UPSTREAM: 136202: raise kubelet CSI init backoff to cover ~140s DNS delays
+- kubernetes image-amd64 9d521311f5fb67dc43f49eeb728ee2c80976835a to 047d96223dd843e9d54bed59bc212d2e9122c56a
+  - bbdf0eb44 2026-02-06T13:54:27+01:00 UPSTREAM: 135629: selinux: Fix the controller to ignore finished pods
+
+- oc image-arm64 7e80dbab5a9ce563cd4f78f2874f18e4664767f5 to 7f88fe2132f6969e1686808e5301aa3c808d4a45
+  - 1de915e0 2026-02-12T14:47:52-05:00 images/tools: Install subscription-manager
+  - 12d5804c 2026-02-11T13:45:48-05:00 OCPBUGS-76394: Install subscription-manager in cli image
+  - deaedbf2 2026-02-06T20:16:54-05:00 Revert "CNTRLPLANE-2656: Fixing oc client cases for microshift and metal ipv6 profiles"
+  - 82d41d0b 2026-02-05T11:33:56+05:30 CNTRLPLANE-2656: Add oc CLI e2e tests with OTE framework support
+
+- router image-arm64 d2db065ae452ecfdb482f0ac4c6778b0c0e48b7f to d8ed3559fd4808a4f10c927ba4a199d3fd5b84a2
+  - c46d819 2026-02-11T09:03:56-03:00 update base image to OCP 4.22
+  - cb8dba6 2026-02-10T09:19:25-03:00 disable WatchListClient featuregate
+  - b92c259 2026-02-05T11:24:23-03:00 bump k8s libraries to v0.35.0
+
+- ovn-kubernetes image-arm64 1938041fd8f8c1fb5d376fa59faec1fef7614a92 to 2a9cd189db9c74dc678fcfca68473d6fdc278028
+  - 7dd0e556 2026-01-27T15:00:53-08:00 skip new NetSeg Localnet test
+  - 245941b1 2026-01-27T20:09:36Z sync openshift/go.mod with upstream dependencies
+  - aaf3f757 2026-01-26T21:36:19+02:00 docs: add OVS Dynamic CPU Affinity feature documentation
+  - 1e68f901 2026-01-26T21:36:18+02:00 createFileWatcherFor: rename argument
+  - 9dccb75e 2026-01-26T21:36:18+02:00 vendor: go mod tidy && go mod vendor
+  - 31ea00c0 2026-01-26T21:36:18+02:00 unit-test: adjust to new logic
+  - da87ab85 2026-01-26T21:36:18+02:00 ovspinning: detect reservedSystemCPUs
+  - e6606173 2026-01-26T21:36:18+02:00 ovspinning: detect nonpinned cpus using podresourceAPI
+  - 23fdd5fd 2026-01-26T21:36:18+02:00 ovspinning: pass context
+  - 5ba2cc11 2026-01-26T21:36:18+02:00 package: podresourceAPI client
+  - c9a29b50 2026-01-24T17:46:28-08:00 Use promhttp handler for emitting metrics
+  - cbba98ef 2026-01-24T17:46:28-08:00 change from periodic interval to request-based metrics collection
+  - c01ff2ff 2026-01-23T11:42:00-05:00 Integrate Network Manager resolver everywhere
+  - 7f0a4df1 2026-01-22T18:20:05-05:00 Fixes shouldFilter with Dynamic UDN
+  - 64d6bc2e 2026-01-22T18:20:05-05:00 Adds support for CNC with Dynamic UDN
+  - 56202d01 2026-01-22T18:20:05-05:00 Fix syncNAD
+  - 6e8dee9a 2026-01-22T18:20:05-05:00 NodeHasNAD -> NodeHasNetwork Refactor
+  - 8d7a89b3 2026-01-22T18:20:05-05:00 simplify NAD controller dynamic logic
+  - 7daff06c 2026-01-22T18:20:05-05:00 Fixes releasing network IDs for filtered NADs
+  - ea687aab 2026-01-22T18:20:05-05:00 Simplify ref counting with NCC and D-UDN
+  - 87a20d77 2026-01-22T18:20:05-05:00 Refactor remote D-UDN handling (again)
+  - 1dcd01fe 2026-01-22T18:20:05-05:00 Move D-UDN status/metrics to NCC
+  - 998e916f 2026-01-22T18:20:05-05:00 Fix DoWithLock crash
+  - 3e160739 2026-01-22T18:20:05-05:00 Add better debug logging for NAD controller
+  - a6b34b3b 2026-01-22T18:20:05-05:00 Critical Dynamic UDN NAD controller fixes
+  - 4dae25a6 2026-01-22T18:20:05-05:00 Convert pod/egress ip trackers to register with nad controller
+  - 20411a9a 2026-01-22T18:20:05-05:00 Add .gocache to gitignore
+  - f9531483 2026-01-22T18:20:05-05:00 Add unit test for Dynamic UDN status update
+  - 09f8efbd 2026-01-22T18:20:05-05:00 Move Dynamic UDN status/metrics to nad controller
+  - c0add608 2026-01-22T18:20:05-05:00 Move the trackers and dynamic filtering to the nad_controller.
+  - c09fcf05 2026-01-22T18:20:05-05:00 Only reconcile remote nodes on start up once
+  - fda7f71d 2026-01-22T18:20:05-05:00 Refactor OnNetworkRefChange
+  - a797c8c6 2026-01-22T18:20:05-05:00 Optimize performance for tracker primary nad lookups
+  - 4e11aa41 2026-01-22T18:20:05-05:00 Updates unit test nodes with new transit topo anno
+  - 57d9cad8 2026-01-22T18:20:05-05:00 Add Dynamic UDN metrics
+  - a96d67b5 2026-01-22T18:20:05-05:00 Add status update for UDNs with dynamic allocation
+  - 70f4f131 2026-01-22T18:20:05-05:00 Change pod handling to not rely on active network
+  - f1ff2e7b 2026-01-22T18:20:05-05:00 Add unit test for UDN deletion grace period
+  - 08248fcb 2026-01-22T18:20:05-05:00 Skip service tests to "other node"
+  - 8725a93d 2026-01-22T18:20:05-05:00 Fixes remote node removal with UDN
+  - 3440f2ad 2026-01-22T18:20:05-05:00 Enable Dynamic UDN in CI for one lane
+  - 7abc582e 2026-01-22T17:14:12-05:00 Enable dynamic UDN allocation with kind/helm
+  - 950aba76 2026-01-22T17:12:59-05:00 Enable NAD on Node tracking in UDN controllers
+  - f841691e 2026-01-22T17:12:59-05:00 Fix UDN controller test framework
+  - 58a969c2 2026-01-22T17:12:59-05:00 Integrate the trackers into controller managers and nad controller
+  - 6e6201f0 2026-01-22T17:12:59-05:00 Adds EgressIPTracker
+  - 48de82d1 2026-01-22T17:12:59-05:00 Adds pod tracker controller
+  - db4ca916 2026-01-22T17:12:59-05:00 Move WatchFactory interface to API
+  - ea1d89fc 2026-01-22T17:12:58-05:00 Exposes new dynamic allocation config knobs
+  - 47400690 2026-01-22T11:56:47Z Add EVPN feature flag
+  - 4b85ee3f 2026-01-22T10:03:29+08:00 test: fix race condition in waitForRollout
+  - 9dd6dc8d 2026-01-20T21:14:15+09:00 add Internet Initiative Japan Inc. to ADOPTERS
+  - 765fbd9a 2026-01-16T13:03:26-05:00 codegen: fix script when GOPATH is not in PATH
+  - 19f191fc 2026-01-16T14:59:51+01:00 Move common helpers into util/network-connect
+  - 9ca888f5 2026-01-16T14:59:51+01:00 ci: increase network-segmentation lane timeout to 190 minutes
+  - 2dc80388 2026-01-16T14:59:51+01:00 e2e: support multiple CNCs with different connect subnets
+  - c17da56e 2026-01-16T14:59:51+01:00 e2e: add ClusterNetworkConnect OVN controller connectivity tests
+  - 5a69fb5e 2026-01-16T14:59:51+01:00 making the e2e utils global for reusability
+  - b101a3d0 2026-01-16T14:59:51+01:00 Add controller integration tests
+  - db5e941f 2026-01-16T14:59:51+01:00 STEP4: Add LRSRs to connect router
+  - 17f77b3a 2026-01-16T14:59:50+01:00 STEP3: Add routing policies to connected network routers
+  - 64279f6e 2026-01-16T14:59:50+01:00 Add GetNetworkScopedSwitchToRouterPortName util
+  - 7dc67800 2026-01-16T14:59:23+01:00 STEP2: Create patch ports to connect routers together
+  - e371fc55 2026-01-16T14:54:10+01:00 Add GetNetworkByID util to network manager
+  - 8f60a8b5 2026-01-16T14:54:10+01:00 Add static subnet and tunnel key generator helpers for CNC
+  - 4291607f 2026-01-16T14:54:10+01:00 Add COPP protection for connect router
+  - 56db7ae7 2026-01-16T14:53:01+01:00 STEP1: Create Connect Router for CNC
+  - c3666788 2026-01-16T12:33:21+01:00 Add network connect controller plumbing
+  - 622a3f23 2026-01-15T19:18:31-08:00 Skip Node Shutdown and OVN node pod restart sync tests
+  - 80db3f2c 2026-01-15T19:18:31-08:00 OpenShift E2E: Add deployment config timeout support
+  - 118948b6 2026-01-15T19:18:31-08:00 Skip net-seg overlapping CIDRs tests
+  - cb301f71 2026-01-15T19:18:31-08:00 skip ClusterNetworkConnect: API validations tests
+  - d1963911 2026-01-15T19:18:31-08:00 Bump k8s.io to v1.34.1
+  - 9770e116 2026-01-15T19:18:14-08:00 <ds-only> infraprovider: Add openshift provider
+  - 40cf2ff1 2026-01-15T19:18:09-08:00 <ds-only> Add o/test-exts
+  - 34337f0a 2026-01-15T22:15:34+01:00 Add RBAC for CNCs access from ovnkube-node pod
+  - 1b665e97 2026-01-15T22:15:33+01:00 Add factory and clientset settings for ovnkube-controller
+  - cdb9e9a3 2026-01-15T21:59:47+09:00 fix golang builder image registry path in docker workflow
+  - 75e38626 2026-01-15T02:46:17-05:00 test: unskip Services fallback to local terminating endpoints test
+  - 2c3671c4 2026-01-15T02:46:17-05:00 for LGW with ETP=Local have different error code for l3 and l2
+  - 0dc90599 2026-01-14T10:34:17+01:00 Use labels to skip tests
+  - d6501811 2026-01-13T16:13:28+01:00 Expose EVPN fields via NetInfo utils
+  - 6b33ee67 2026-01-13T16:13:28+01:00 Add NetConf fields for EVPN
+  - 13415218 2026-01-13T16:13:28+01:00 Add E2E test for VTEP API Validations
+  - a1fe31d9 2026-01-13T16:13:28+01:00 Add E2E test for CUDN-EVPN validation
+  - 69647db7 2026-01-13T16:13:28+01:00 Add VTEP API reference docs
+  - 9c30fc27 2026-01-13T16:13:28+01:00 Generate VTEP Yaml
+  - 6641c7c3 2026-01-13T16:13:28+01:00 Add VTEP CRD
+  - 155779fa 2026-01-13T16:13:28+01:00 Update CUDN API reference docs
+  - fc37829e 2026-01-13T16:13:28+01:00 Generate CUDN Yaml
+  - 00ed2851 2026-01-13T16:13:28+01:00 Add EVPN fields to CUDN
+  - ecb3b72c 2026-01-13T16:13:28+01:00 Update tests for noOverlay field
+  - 00f1291f 2026-01-13T16:13:28+01:00 Update API reference docs
+  - 2c3ab32b 2026-01-13T16:13:28+01:00 Re-generate CUDN YAML
+  - 953bb6ac 2026-01-13T16:13:28+01:00 Rename noOverlayOptions to noOverlay
+  - 06486fa7 2026-01-13T16:13:28+01:00 Cleanup codegen files before regenerating
+  - 5ffc1bef 2026-01-12T16:25:38-05:00 Bug fix: Skip BridgeEIPAddrManager in DPU-host mode
+  - 106ea801 2026-01-12T11:20:41-05:00 iprulemanager: add mark check when comparing netlink rule equality
+  - e60b1cdb 2026-01-12T11:20:41-05:00 iprulemanager: remove string operations from areNetlinkRulesEqual
+  - 10c9c2a8 2026-01-09T06:44:18-05:00 Addressing trozet feedback
+  - 560aee20 2026-01-08T19:26:03-05:00 Attempt to capture and store pprof data
+  - ac29faf5 2026-01-08T19:26:03-05:00 Adding kubelet-density-cni performance workload
+  - 3c1c3967 2026-01-08T18:33:55+08:00 add eip e2e case on namespace/pod labels update
+  - 67f9fbf8 2026-01-08T10:54:40+01:00 bump up frr-k8s and frr image versions
+  - 0c3604e3 2026-01-08T10:05:13+01:00 Use interface index for IPv6 zone when sending unsolicited neighbor advertisements
+  - 4e343bc4 2026-01-07T15:27:04-08:00 always set arp sysctl configuration for multiple same network interfaces
+  - e200f2d1 2026-01-07T15:10:41-08:00 docs/multi-homing: support of multiple interfaces in the same network
+  - 36ddd004 2026-01-06T12:44:28-08:00 e2e: add e2e test case for Pod with multiple same secondary UDN
+  - 76d27a29 2026-01-06T12:44:28-08:00 add ECMP pod route for multiple same secondary UDN interfaces
+  - d0120301 2026-01-06T08:06:51-08:00 support ipamClaim for multiple same UDN on the pod
+  - 1597b780 2026-01-06T08:06:51-08:00 add additional pod-if-name external-id for Pod OVS interface
+  - 66cf0639 2026-01-06T08:06:51-08:00 support pod with multiple same secondary UDN
+  - 3c0e3d2d 2026-01-06T13:38:45Z Updating ose-ovn-kubernetes-base-container image to be consistent with ART for 4.22 Reconciling with https://github.com/openshift/ocp-build-data/tree/532305ad2d84f57355ac03b308650bcc5a8d7740/images/ovn-kubernetes-base.yml
+  - 2ea53bd1 2026-01-06T12:10:29+08:00 node: fix DeleteEndpointSlice namespace deletion race condition
+  - 61cc216e 2025-12-30T07:36:52-05:00 add nodePort etp=local e2e test for UDN and default network when advertised BGP routes
+  - 2d4a479c 2025-12-29T15:20:13+01:00 egressip: Skip bridge configuration for secondary network IPs
+  - d1c55f1c 2025-12-29T11:57:24+01:00 fix(localnet, ipamless): Prevent LSP deletion on sync
+  - 47cecd9c 2025-12-29T10:13:56+02:00 dist, fedora: Use the right package manager
+  - 54bc8959 2025-12-28T12:18:46+02:00 dist: Use the project golang container image
+  - 7b413f85 2025-12-22T18:28:19+01:00 Re-order upgrade image step
+  - 542bbb37 2025-12-22T17:40:27+01:00 Allow CI workflow dispatcher on release-1.2 branch
+  - 0b7607fe 2025-12-22T17:40:27+01:00 Update release docs to mention new cadance
+  - 32287237 2025-12-22T17:40:27+01:00 Update helm-chart version to 1.2.0
+  - 8571ba40 2025-12-22T17:40:26+01:00 Change OVN_DAEMONSET_VERSION to 1.2.0
+  - 69e28d98 2025-12-22T16:11:30+01:00 OVN-Kubernetes 1.2 release
+  - 727a0e82 2025-12-22T16:11:29+01:00 Add deprecation warning signs on docs/scripts for central mode
+  - aa6c1c86 2025-12-22T13:42:08+01:00 Update L2 topology to reflect new TR
+  - c75a25a0 2025-12-22T09:19:04+08:00 Update libovsdb bindings to ovn 25.09
+  - f50653ee 2025-12-21T14:45:36-08:00 minor updates on unit test cases
+  - 988ace17 2025-12-21T14:45:36-08:00 metrics: move OVN/OVS metrics update from periodic interval to request-based
+  - 9e7c7180 2025-12-19T15:27:54-05:00 Adds level-driven, UDN aware dev docs
+  - 5b01e17b 2025-12-19T15:27:54-05:00 Refactor NADController notifying into level driven reconciler
+  - e8fb693f 2025-12-19T19:29:18+01:00 Skip FRR bfdd process Coredumps
+  - f10deeba 2025-12-19T14:08:58+01:00 [retry] Make an exception for pods and retry them infinitely.
+  - 07b68bb6 2025-12-19T09:23:34+01:00 fix template referencing gatewayOps instead of gatewayOpts variable
+  - d22f59da 2025-12-18T17:15:49-05:00 OKEP 5674: DPU Healthcheck
+  - bbc03ca8 2025-12-17T17:08:11Z egressip: handle LinkNotFoundError gracefully in isEgressIPOnLink
+  - 8c83e326 2025-12-10T07:43:41+01:00 fix(e2e, kubevirt): Wait for IP after VM restart in ipamless localnet tests
+  - 5856fb09 2025-09-02T12:42:39+01:00 fix: drop prometheus operator CRDs and make CRs configurable
+
+- kubernetes image-arm64 9d521311f5fb67dc43f49eeb728ee2c80976835a to 047d96223dd843e9d54bed59bc212d2e9122c56a
+  - bbdf0eb44 2026-02-06T13:54:27+01:00 UPSTREAM: 135629: selinux: Fix the controller to ignore finished pods
 
