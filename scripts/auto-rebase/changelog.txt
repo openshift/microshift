@@ -1,0 +1,7 @@
+- machine-config-operator embedded-component b59e48e724f57ca773268b4d12fa7e8da656fdda to 074b3c0953cb81283d7d129e4c3ba6b1a95eb090
+  - d47759d1 2026-02-12T21:57:23+00:00 fix pull secret log spam make verify error
+  - 1010c423 2026-02-10T16:44:01-05:00 helpers: compute systemdUnits that added and changed between Ign configs update: only write added or updated systemd units unless forcefile exists then rewrite all systemd units on_disk_validation: check if systemd units in config enabled correctly tests: update MCN condition transition test to account for quick transitions through 'Unknown' state (cherry picked from commit 4512ec46f7b13a6e85588bbf480c4d029990724a)
+
+- route-controller-manager embedded-component 8a69194a461dc33d2ed67a220bca91d384d34df4 to 559b7122d1a0cad4ff475b496c2896b39eed8c08
+  - 3be2f72 2026-02-12T10:56:07+00:00 filter ingress namespace on UnmanagedRoutes metric
+
