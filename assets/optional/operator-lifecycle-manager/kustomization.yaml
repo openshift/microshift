@@ -10,6 +10,9 @@ resources:
   - 0000_50_olm_00-operatorgroups.crd.yaml
   - 0000_50_olm_00-operators.crd.yaml
   - 0000_50_olm_00-packageserver.pdb.yaml
+  - 0000_50_olm_00-pprof-config.yaml
+  - 0000_50_olm_00-pprof-rbac.yaml
+  - 0000_50_olm_00-pprof-secret.yaml
   - 0000_50_olm_00-subscriptions.crd.yaml
   - 0000_50_olm_01-networkpolicies.yaml
   - 0000_50_olm_02-olm-operator.serviceaccount.yaml
