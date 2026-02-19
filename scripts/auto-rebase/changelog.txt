@@ -1,0 +1,8 @@
+- cluster-network-operator embedded-component 9d540eb7929f83879d3dafbcd1ae6cb1feca36b3 to f28e91e89d1ec31bda057e8ade21d4cc68aaefe1
+  - 93b77b1 2026-02-16T12:33:22+01:00 Add VTEP and CUDN EVPN APIs
+  - ed8923b 2026-02-16T12:30:37+01:00 Bump OCP API
+
+- oc image-amd64 8b0a043216f7ae608606afb5bdb0ce451561021e to 7f88fe2132f6969e1686808e5301aa3c808d4a45
+  - 1de915e0 2026-02-12T14:47:52-05:00 images/tools: Install subscription-manager
+  - 12d5804c 2026-02-11T13:45:48-05:00 OCPBUGS-76394: Install subscription-manager in cli image
+
