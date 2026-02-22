@@ -1069,6 +1069,14 @@ EOF
 update_olm_images() {
     title "Rebasing operator-lifecycle-manager manifests"
 
+    # Temporary fix, remove once OCPBUGS-77006 is solved.
+    local olm_kustomization="${REPOROOT}/assets/optional/operator-lifecycle-manager/kustomization.yaml"
+    sed -i \
+        -e '/0000_50_olm_00-pprof-config\.yaml/d' \
+        -e '/0000_50_olm_00-pprof-rbac\.yaml/d' \
+        -e '/0000_50_olm_00-pprof-secret\.yaml/d' \
+        "${olm_kustomization}"
+
     # Replace hardcoded image refs with variables. Variables will be provided via kustomize's patches (added to `env`).
     # Expr with --util-image finds line with --util-image and edits the line after.
     sed -i \
