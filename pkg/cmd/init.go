@@ -353,6 +353,7 @@ func certSetup(cfg *config.Config) (*certchains.CertificateChains, error) {
 		cryptomaterial.ServiceAccountTokenCABundlePath(certsDir),
 		[]string{"kube-apiserver-localhost-signer"},
 		[]string{"kube-apiserver-service-network-signer"},
+		[]string{"kube-apiserver-external-signer"},
 	).Complete()
 
 	if err != nil {
