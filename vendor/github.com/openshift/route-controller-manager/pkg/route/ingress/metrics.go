@@ -84,7 +84,7 @@ func (c *Controller) Collect(ch chan<- prometheus.Metric) {
 				if err != nil || ingress == nil {
 					continue
 				}
-				if ingress.Name == owner {
+				if ingress.Name == owner && ingress.Namespace == routeInstance.Namespace {
 					managed, err := c.ingressManaged(ingress)
 					if err != nil {
 						utilruntime.HandleError(err)
