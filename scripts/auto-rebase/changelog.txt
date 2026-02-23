@@ -1,0 +1,10 @@
+- machine-config-operator embedded-component 247c2c7ff38913836a0ff6c469e80b82df8cb5a5 to 1b370d9158cc914760dfc4ef5508d8634ede0f2e
+  - 6f0b00b4 2026-02-05T11:35:21-06:00 PIS
+  - 1dedbe7a 2026-02-05T11:27:40-06:00 check if the MachineOSConfig CRD exists before starting the informer
+  - 868a609f 2026-01-20T11:27:09-06:00 WaitForCacheSync blocks forever
+
+- operator-framework-olm embedded-component 52652d0744d7cf955defb84d38f45bfe640d7850 to e92a5cf8d93f756e47646aaf8f064f656a5f27dd
+  - aa2ff0b4 2026-02-16T15:40:24+00:00 fixup! Remove the collect-profiles job
+  - e293a216 2026-02-16T15:40:24+00:00 fixup! Remove the collect-profiles job
+  - 21d30d28 2026-02-16T15:40:24+00:00 Remove the collect-profiles job
+
