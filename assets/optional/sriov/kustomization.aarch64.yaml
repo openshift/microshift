@@ -1,0 +1,56 @@
+images:
+  - name: quay.io/openshift/sriov-network-operator
+    newName: registry.redhat.io/openshift4/ose-sriov-network-rhel9-operator
+    digest: sha256:3e2b9b901aa1bcfff360edd73622372619ea6f957de8e0811496af1382645749
+
+patches:
+  - patch: |-
+      - op: add
+        path: /spec/template/spec/containers/0/env/-
+        value:
+          name: SRIOV_CNI_IMAGE
+          value: registry.redhat.io/openshift4/sriov-cni-rhel9@sha256:d72b66d8666607b3286b764dea45298f9e3fc06e7505cfeb018b758e8e48a93f
+      - op: add
+        path: /spec/template/spec/containers/0/env/-
+        value:
+          name: SRIOV_DEVICE_PLUGIN_IMAGE
+          value: registry.redhat.io/openshift4/ose-sriov-network-device-plugin-rhel9@sha256:c73669fd80b1c6a13eec123d77f866b5e89dd8840a05e911f07ac6a171daef59
+      - op: add
+        path: /spec/template/spec/containers/0/env/-
+        value:
+          name: NETWORK_RESOURCES_INJECTOR_IMAGE
+          value: registry.redhat.io/openshift4/ose-sriov-dp-admission-controller-rhel9@sha256:b7ec25334c72bf11bcc9b7f4579e0acb9acdfb23d8b868dbda88d28e86e75496
+      - op: add
+        path: /spec/template/spec/containers/0/env/-
+        value:
+          name: SRIOV_NETWORK_CONFIG_DAEMON_IMAGE
+          value: registry.redhat.io/openshift4/ose-sriov-network-config-daemon-rhel9@sha256:7cfd1d5e970caae2d00bd2947a39e25a58f7040ce0267642609d1e188b74a2e5
+      - op: add
+        path: /spec/template/spec/containers/0/env/-
+        value:
+          name: SRIOV_NETWORK_WEBHOOK_IMAGE
+          value: registry.redhat.io/openshift4/ose-sriov-network-webhook-rhel9@sha256:c50839d83a9faa192c1c8e43801202c820997472ba2586b9de9bf3bcbde6b05a
+      - op: add
+        path: /spec/template/spec/containers/0/env/-
+        value:
+          name: SRIOV_INFINIBAND_CNI_IMAGE
+          value: registry.redhat.io/openshift4/ose-sriov-infiniband-cni-rhel9@sha256:9892f574e3ecdf30f0f88d3aab2719e9b4d2309e591bad035648647d2a1fdbad
+      - op: add
+        path: /spec/template/spec/containers/0/env/-
+        value:
+          name: RDMA_CNI_IMAGE
+          value: registry.redhat.io/openshift4/ose-sriov-rdma-cni-rhel9@sha256:289a53338cfdbf2f53355779a92393ae369fec5872f73c6103abbbddbf88b4a6
+      - op: add
+        path: /spec/template/spec/containers/0/env/-
+        value:
+          name: METRICS_EXPORTER_IMAGE
+          value: registry.redhat.io/openshift4/ose-sriov-network-metrics-exporter-rhel9@sha256:1a73ee1ae917ed9fed015798e1b11626912eb22e0dce46e465bf28b7b61cfc4b
+      - op: add
+        path: /spec/template/spec/containers/0/env/-
+        value:
+          name: METRICS_EXPORTER_KUBE_RBAC_PROXY_IMAGE
+          value: registry.redhat.io/openshift4/ose-kube-rbac-proxy-rhel9@sha256:b6a1747f473e48a4c4993c668142c2492c1e6b5a5a8cefd6f093c0777a7a9c60
+    target:
+      kind: Deployment
+      name: sriov-network-operator
+      namespace: sriov-network-operator
