@@ -591,6 +591,14 @@ install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/070-microshi
 install -p -m644 assets/optional/sriov/deploy/*.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/070-microshift-sriov/deploy
 install -p -m644 assets/optional/sriov/kustomization.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/070-microshift-sriov/kustomization.yaml
 
+%ifarch %{arm} aarch64
+cat assets/optional/sriov/kustomization.aarch64.yaml >> %{buildroot}/%{_prefix}/lib/microshift/manifests.d/070-microshift-sriov/kustomization.yaml
+%endif
+
+%ifarch x86_64
+cat assets/optional/sriov/kustomization.x86_64.yaml >> %{buildroot}/%{_prefix}/lib/microshift/manifests.d/070-microshift-sriov/kustomization.yaml
+%endif
+
 # sriov-release-info
 mkdir -p -m755 %{buildroot}%{_datadir}/microshift/release
 install -p -m644 assets/optional/sriov/release-sriov-{x86_64,aarch64}.json %{buildroot}%{_datadir}/microshift/release/
