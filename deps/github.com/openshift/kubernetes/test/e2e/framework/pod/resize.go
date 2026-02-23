@@ -21,7 +21,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"math"
 	"strconv"
 	"strings"
 
@@ -31,7 +30,6 @@ import (
 	utilerrors "k8s.io/apimachinery/pkg/util/errors"
 	helpers "k8s.io/component-helpers/resource"
 	"k8s.io/kubectl/pkg/util/podutils"
-	kubecm "k8s.io/kubernetes/pkg/kubelet/cm"
 	kubeqos "k8s.io/kubernetes/pkg/kubelet/qos"
 	"k8s.io/kubernetes/test/e2e/framework"
 	imageutils "k8s.io/kubernetes/test/utils/image"
@@ -322,17 +320,9 @@ func VerifyPodContainersCgroupValues(ctx context.Context, f *framework.Framework
 		}
 		tc := makeResizableContainer(ci)
 		if tc.Resources.Limits != nil || tc.Resources.Requests != nil {
-			var expectedCPUShares, v1expectedCPUShares, newExpectedCPUShares int64
 			var expectedMemLimitString string
 			expectedMemLimitInBytes := tc.Resources.Limits.Memory().Value()
-			cpuRequest := tc.Resources.Requests.Cpu()
 			cpuLimit := tc.Resources.Limits.Cpu()
-			if cpuRequest.IsZero() && !cpuLimit.IsZero() {
-				v1expectedCPUShares = int64(kubecm.MilliCPUToShares(cpuLimit.MilliValue()))
-			} else {
-				v1expectedCPUShares = int64(kubecm.MilliCPUToShares(cpuRequest.MilliValue()))
-			}
-			expectedCPUShares = v1expectedCPUShares
 
 			expectedCPULimits := GetCPULimitCgroupExpectations(cpuLimit)
 			expectedMemLimitString = strconv.FormatInt(expectedMemLimitInBytes, 10)
@@ -340,52 +330,19 @@ func VerifyPodContainersCgroupValues(ctx context.Context, f *framework.Framework
 				if expectedMemLimitString == "0" {
 					expectedMemLimitString = "max"
 				}
-				// convert cgroup v1 cpu.shares value to cgroup v2 cpu.weight value
-				// https://github.com/kubernetes/enhancements/tree/master/keps/sig-node/2254-cgroup-v2#phase-1-convert-from-cgroups-v1-settings-to-v2
-				expectedCPUShares = int64(1 + ((v1expectedCPUShares-2)*9999)/262142)
-				// TODO(atokubi): This is required to fix https://github.com/kubernetes/kubernetes/pull/132791
-				//    This should be dropped in 4.21, because 4.21(=1.34) fix would be a carry pulled from 1.35
-				newExpectedCPUShares = ConvertCPUSharesToCgroupV2Value(v1expectedCPUShares)
 			}
 
 			if expectedMemLimitString != "0" {
 				errs = append(errs, VerifyCgroupValue(f, pod, ci.Name, cgroupMemLimit, expectedMemLimitString))
 			}
 			errs = append(errs, VerifyCgroupValue(f, pod, ci.Name, cgroupCPULimit, expectedCPULimits...))
-			errs = append(errs, VerifyCgroupValue(f, pod, ci.Name, cgroupCPURequest, strconv.FormatInt(expectedCPUShares, 10), strconv.FormatInt(newExpectedCPUShares, 10)))
+			expectedCPUSharesString := GetExpectedCPUShares(&tc.Resources, *podOnCgroupv2Node)
+			errs = append(errs, VerifyCgroupValue(f, pod, ci.Name, cgroupCPURequest, expectedCPUSharesString...))
 			// TODO(vinaykul,InPlacePodVerticalScaling): Verify oom_score_adj when runc adds support for updating it
 			// See https://github.com/opencontainers/runc/pull/4669
 		}
 	}
 	return utilerrors.NewAggregate(errs)
-}
-
-// ConvertCPUSharesToCgroupV2Value converts CPU shares, used by cgroup v1,
-// to CPU weight, used by cgroup v2.
-//
-// Cgroup v1 CPU shares has a range of [2^1...2^18], i.e. [2...262144],
-// and the default value is 1024.
-//
-// Cgroup v2 CPU weight has a range of [10^0...10^4], i.e. [1...10000],
-// and the default value is 100.
-//
-// This function is identical to https://github.com/opencontainers/cgroups/blob/a3e2ecd1f756a19cee15f85b96337a59c3b5337b/utils.go#L417-L441
-func ConvertCPUSharesToCgroupV2Value(cpuShares int64) int64 {
-	// The value of 0 means "unset".
-	if cpuShares == 0 {
-		return 0
-	}
-	if cpuShares <= 2 {
-		return 1
-	}
-	if cpuShares >= 262144 {
-		return 10000
-	}
-	l := math.Log2(float64(cpuShares))
-	// Quadratic function which fits min, max, and default.
-	exponent := (l*l+125*l)/612.0 - 7.0/34.0
-
-	return int64(math.Ceil(math.Pow(10, exponent)))
 }
 
 func verifyPodRestarts(f *framework.Framework, pod *v1.Pod, wantInfo []ResizableContainerInfo) error {
