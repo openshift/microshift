@@ -121,15 +121,58 @@ download_brew_rpms() {
         rm -rf "${BREW_RPM_SOURCE}"
         # Run the download procedure
         bash -x "${SCRIPTDIR}/../../scripts/fetch_tools.sh" brew
-        bash -x "${SCRIPTDIR}/manage_brew_rpms.sh" download "4.${MINOR_VERSION}" "${BREW_RPM_SOURCE}" "zstream" || true
-        bash -x "${SCRIPTDIR}/manage_brew_rpms.sh" download "4.${PREVIOUS_MINOR_VERSION}" "${BREW_RPM_SOURCE}" "zstream" || true
-        bash -x "${SCRIPTDIR}/manage_brew_rpms.sh" download "4.${YMINUS2_MINOR_VERSION}" "${BREW_RPM_SOURCE}" "zstream" || true
-        bash -x "${SCRIPTDIR}/manage_brew_rpms.sh" download "4.${MINOR_VERSION}" "${BREW_RPM_SOURCE}" "rc" || true
-        bash -x "${SCRIPTDIR}/manage_brew_rpms.sh" download "4.${MINOR_VERSION}" "${BREW_RPM_SOURCE}" "ec" || true
-        bash -x "${SCRIPTDIR}/manage_brew_rpms.sh" download "4.${MINOR_VERSION}" "${BREW_RPM_SOURCE}" "nightly" || true
+        bash -x "${SCRIPTDIR}/manage_brew_rpms.sh" download "4.${MINOR_VERSION}" "${BREW_RPM_SOURCE}" "rc" || echo "WARNING: Failed to download RC RPMs for 4.${MINOR_VERSION}"
+        bash -x "${SCRIPTDIR}/manage_brew_rpms.sh" download "4.${MINOR_VERSION}" "${BREW_RPM_SOURCE}" "ec" || echo "WARNING: Failed to download EC RPMs for 4.${MINOR_VERSION}"
+        bash -x "${SCRIPTDIR}/manage_brew_rpms.sh" download "4.${MINOR_VERSION}" "${BREW_RPM_SOURCE}" "zstream" || echo "WARNING: Failed to download zstream RPMs for 4.${MINOR_VERSION}"
+        bash -x "${SCRIPTDIR}/manage_brew_rpms.sh" download "4.${MINOR_VERSION}" "${BREW_RPM_SOURCE}" "nightly" || echo "WARNING: Failed to download nightly RPMs for 4.${MINOR_VERSION}"
+        bash -x "${SCRIPTDIR}/manage_brew_rpms.sh" download "4.${PREVIOUS_MINOR_VERSION}" "${BREW_RPM_SOURCE}" "zstream" || echo "WARNING: Failed to download zstream RPMs for 4.${PREVIOUS_MINOR_VERSION}"
+        # Y-2 failure returns an error because it is the minimum supported upgrade, path and must always be available for release testing to proceed.
+        bash -x "${SCRIPTDIR}/manage_brew_rpms.sh" download "4.${YMINUS2_MINOR_VERSION}" "${BREW_RPM_SOURCE}" "zstream" || ( echo "WARNING: Failed to download zstream RPMs for 4.${YMINUS2_MINOR_VERSION}" && return 1 )
     else
         echo "WARNING: The Brew Hub site is not accessible, skipping the download"
     fi
+}
+
+# Create fake z-stream directories from EC RPMs so that common_versions.sh
+# discovers PREV_ZSTREAM_VERSION as non-empty. This allows validating the
+# prev-zstream upgrade path even when no real z-stream releases exist yet
+# (e.g. during the EC phase of a new minor).
+#
+# Both fake dirs contain the same EC RPMs, so BREW_PREV_ZSTREAM_VERSION
+# resolves to the EC version string, which exists in the brew repo.
+#
+# TODO: Remove this function once real z-stream releases are available
+# for the current minor version.
+mock_prev_zstream() {
+    local ec_dir
+    source "${SCRIPTDIR}/common_versions.sh"
+    ec_dir=$(find "${BREW_RPM_SOURCE}" -maxdepth 1 -type d -name "4.${MINOR_VERSION}.0-ec" | head -1)
+    if [ -z "${ec_dir}" ]; then
+        echo "WARNING: No EC directory found in ${BREW_RPM_SOURCE}, skipping prev-zstream mock"
+        return
+    fi
+
+    # Skip if real z-stream directories already exist
+    local zstream_count
+    zstream_count=$(find "${BREW_RPM_SOURCE}" -maxdepth 1 -type d -regex ".*/[45]\.${MINOR_VERSION}\.[0-9]+$" | wc -l)
+    if [ "${zstream_count}" -ge 2 ]; then
+        echo "Found ${zstream_count} z-stream directories, skipping prev-zstream mock"
+        return
+    fi
+
+    echo "Creating fake z-stream directories for prev-zstream validation"
+    for arch_dir in "${ec_dir}"/*/; do
+        [ -d "${arch_dir}" ] || continue
+        local arch
+        arch=$(basename "${arch_dir}")
+        mkdir -p "${BREW_RPM_SOURCE}/4.${MINOR_VERSION}.1/${arch}"
+        mkdir -p "${BREW_RPM_SOURCE}/4.${MINOR_VERSION}.2/${arch}"
+        for rpm in "${arch_dir}"/*.rpm; do
+            [ -f "${rpm}" ] || continue
+            ln -sf "${rpm}" "${BREW_RPM_SOURCE}/4.${MINOR_VERSION}.1/${arch}/"
+            ln -sf "${rpm}" "${BREW_RPM_SOURCE}/4.${MINOR_VERSION}.2/${arch}/"
+        done
+    done
 }
 
 create_local_repo() {
@@ -151,4 +194,5 @@ create_local_repo() {
 #
 build_rpms
 download_brew_rpms
+mock_prev_zstream
 create_local_repo
