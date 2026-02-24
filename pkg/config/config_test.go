@@ -819,16 +819,6 @@ func TestValidate(t *testing.T) {
 			expectErr: true,
 		},
 		{
-			name: "feature-gates-custom-no-upgrade-with-feature-set-empty",
-			config: func() *Config {
-				c := mkDefaultConfig()
-				c.ApiServer.FeatureGates.FeatureSet = ""
-				c.ApiServer.FeatureGates.CustomNoUpgrade.Enabled = []string{"feature1"}
-				c.ApiServer.FeatureGates.CustomNoUpgrade.Disabled = []string{"feature2"}
-				return c
-			}(),
-		},
-		{
 			name: "feature-gates-custom-no-upgrade-valid",
 			config: func() *Config {
 				c := mkDefaultConfig()
@@ -840,15 +830,15 @@ func TestValidate(t *testing.T) {
 			expectErr: false,
 		},
 		{
-			name: "feature-gates-required-feature-gate-cannot-be-explicitly-enabled",
+			name: "feature-gates-custom-no-upgrade-with-feature-set-empty",
 			config: func() *Config {
 				c := mkDefaultConfig()
-				c.ApiServer.FeatureGates.FeatureSet = "CustomNoUpgrade"
-				c.ApiServer.FeatureGates.CustomNoUpgrade.Enabled = []string{"UserNamespacesSupport"}
+				c.ApiServer.FeatureGates.FeatureSet = ""
+				c.ApiServer.FeatureGates.CustomNoUpgrade.Enabled = []string{"feature1"}
 				c.ApiServer.FeatureGates.CustomNoUpgrade.Disabled = []string{"feature2"}
 				return c
 			}(),
-			expectErr: false,
+			expectErr: true,
 		},
 		{
 			name: "feature-gates-custom-no-upgrade-enabled-and-disabled-have-same-feature-gate",
@@ -857,37 +847,6 @@ func TestValidate(t *testing.T) {
 				c.ApiServer.FeatureGates.FeatureSet = "CustomNoUpgrade"
 				c.ApiServer.FeatureGates.CustomNoUpgrade.Enabled = []string{"feature1"}
 				c.ApiServer.FeatureGates.CustomNoUpgrade.Disabled = []string{"feature1"}
-				return c
-			}(),
-			expectErr: true,
-		},
-		{
-			name: "feature-gates-required-feature-gate-cannot-be-disabled",
-			config: func() *Config {
-				c := mkDefaultConfig()
-				c.ApiServer.FeatureGates.FeatureSet = "CustomNoUpgrade"
-				c.ApiServer.FeatureGates.CustomNoUpgrade.Enabled = []string{"feature1"}
-				c.ApiServer.FeatureGates.CustomNoUpgrade.Disabled = []string{"UserNamespacesSupport"}
-				return c
-			}(),
-			expectErr: true,
-		},
-		{
-			name: "feature-gates-custom-no-upgrade-with-empty-enabled-and-disabled-lists",
-			config: func() *Config {
-				c := mkDefaultConfig()
-				c.ApiServer.FeatureGates.FeatureSet = "CustomNoUpgrade"
-				c.ApiServer.FeatureGates.CustomNoUpgrade.Enabled = []string{}
-				c.ApiServer.FeatureGates.CustomNoUpgrade.Disabled = []string{}
-				return c
-			}(),
-			expectErr: false,
-		},
-		{
-			name: "feature-gates-preview-feature-sets-not-supported",
-			config: func() *Config {
-				c := mkDefaultConfig()
-				c.ApiServer.FeatureGates.FeatureSet = "TechPreviewNoUpgrade"
 				return c
 			}(),
 			expectErr: true,

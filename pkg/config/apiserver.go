@@ -153,8 +153,6 @@ type FeatureGates struct {
 	CustomNoUpgrade CustomNoUpgrade `json:"customNoUpgrade"`
 }
 
-// ToApiserverArgs converts the FeatureGates struct to a list of feature-gates arguments for the kube-apiserver.
-// Validation checks should be performed before calling this function to ensure the FeatureGates struct is valid.
 func (fg FeatureGates) ToApiserverArgs() ([]string, error) {
 	ret := sets.NewString()
 	addFeatures := func(features []string, enabled bool) {
@@ -187,6 +185,9 @@ func (fg *FeatureGates) validateFeatureGates() error {
 
 	switch fg.FeatureSet {
 	case "":
+		if len(fg.CustomNoUpgrade.Enabled) > 0 || len(fg.CustomNoUpgrade.Disabled) > 0 {
+			return fmt.Errorf("CustomNoUpgrade enabled/disabled lists must be empty when FeatureSet is empty")
+		}
 		return nil
 	case FeatureSetCustomNoUpgrade:
 		// Valid - continue with validation
@@ -213,6 +214,7 @@ func (fg *FeatureGates) validateFeatureGates() error {
 		msg  string
 	}{
 		{disabledCustom, sets.New(RequiredFeatureGates...), "required feature gates cannot be disabled"},
+		{enabledCustom, sets.New(RequiredFeatureGates...), "required feature gates cannot be explicitly enabled"},
 		{enabledCustom, disabledCustom, "feature gates cannot be both enabled and disabled"},
 	}
 
