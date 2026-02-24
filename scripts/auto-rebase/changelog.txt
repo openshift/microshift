@@ -1,0 +1,24 @@
+- kubernetes embedded-component 03a907c6d182353a0e9b83a224a6f0398406f6d5 to a3faddd974f0c6d0b11e7181da5d4b09fad645b2
+  - 30711f6a7 2026-02-10T20:05:27+05:30 UPSTREAM: <carry>: Bump github.com/sirupsen/logrus to v1.9.3 for CVE-2025-65637
+  - 921ccdb43 2026-02-06T12:17:22-03:00 UPSTREAM: <drop>: hack/update-vendor.sh
+  - 60a122b6c 2026-02-05T11:36:03+01:00 UPSTREAM: <carry>: Skip e2e test: attach on previously attached volumes should work
+  - 28382a421 2026-02-02T15:04:32-05:00 UPSTREAM: 119824: fix race creating etcd client for healthchecks
+  - ec9b58b38 2026-02-02T14:19:41-05:00 UPSTREAM: <carry>: disable some legacy cloud provider Azure tests
+  - bb43dabbf 2026-02-02T14:15:56-05:00 UPSTREAM: 129011: skip TestCreateBlobDisk test
+
+- kubernetes image-amd64 03a907c6d182353a0e9b83a224a6f0398406f6d5 to a3faddd974f0c6d0b11e7181da5d4b09fad645b2
+  - 30711f6a7 2026-02-10T20:05:27+05:30 UPSTREAM: <carry>: Bump github.com/sirupsen/logrus to v1.9.3 for CVE-2025-65637
+  - 921ccdb43 2026-02-06T12:17:22-03:00 UPSTREAM: <drop>: hack/update-vendor.sh
+  - 60a122b6c 2026-02-05T11:36:03+01:00 UPSTREAM: <carry>: Skip e2e test: attach on previously attached volumes should work
+  - 28382a421 2026-02-02T15:04:32-05:00 UPSTREAM: 119824: fix race creating etcd client for healthchecks
+  - ec9b58b38 2026-02-02T14:19:41-05:00 UPSTREAM: <carry>: disable some legacy cloud provider Azure tests
+  - bb43dabbf 2026-02-02T14:15:56-05:00 UPSTREAM: 129011: skip TestCreateBlobDisk test
+
+- kubernetes image-arm64 03a907c6d182353a0e9b83a224a6f0398406f6d5 to a3faddd974f0c6d0b11e7181da5d4b09fad645b2
+  - 30711f6a7 2026-02-10T20:05:27+05:30 UPSTREAM: <carry>: Bump github.com/sirupsen/logrus to v1.9.3 for CVE-2025-65637
+  - 921ccdb43 2026-02-06T12:17:22-03:00 UPSTREAM: <drop>: hack/update-vendor.sh
+  - 60a122b6c 2026-02-05T11:36:03+01:00 UPSTREAM: <carry>: Skip e2e test: attach on previously attached volumes should work
+  - 28382a421 2026-02-02T15:04:32-05:00 UPSTREAM: 119824: fix race creating etcd client for healthchecks
+  - ec9b58b38 2026-02-02T14:19:41-05:00 UPSTREAM: <carry>: disable some legacy cloud provider Azure tests
+  - bb43dabbf 2026-02-02T14:15:56-05:00 UPSTREAM: 129011: skip TestCreateBlobDisk test
+
