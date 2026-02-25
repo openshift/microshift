@@ -7,14 +7,14 @@
 export TEST_RANDOMIZATION=none
 
 start_image="rhel-9.6-microshift-brew-optionals-4.${PREVIOUS_MINOR_VERSION}-zstream"
-dest_image="rhel-9.6-microshift-brew-optionals-4.${MINOR_VERSION}-${LATEST_RELEASE_TYPE}"
+dest_image="rhel96-brew-lrel-optional"
 
 scenario_create_vms() {
     exit_if_commit_not_found "${start_image}"
     exit_if_commit_not_found "${dest_image}"
 
     prepare_kickstart host1 kickstart.ks.template "${start_image}"
-    launch_vm
+    launch_vm --vm_vcpus 4
 }
 
 scenario_remove_vms() {
@@ -54,12 +54,12 @@ scenario_run_tests() {
     echo "INFO: Checking LVMS resources after upgrade..."
     run_command_on_vm host1 'bash -s' < "${TESTDIR}/../scripts/lvms-helpers/checkLvmsResources.sh"
 
+    # Cleanup LVMS workloads
+    echo "INFO: Cleaning up LVMS workloads..."
+    run_command_on_vm host1 'bash -s' < "${TESTDIR}/../scripts/lvms-helpers/cleanupWorkload.sh"
+
     # Run standard1 suite for basic validation after upgrade
     run_tests host1 \
         --variable "EXPECTED_OS_VERSION:9.6" \
         suites/standard1/
-
-    # Cleanup LVMS workloads
-    echo "INFO: Cleaning up LVMS workloads..."
-    run_command_on_vm host1 'bash -s' < "${TESTDIR}/../scripts/lvms-helpers/cleanupWorkload.sh"
 }

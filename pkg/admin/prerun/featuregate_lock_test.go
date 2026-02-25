@@ -1,7 +1,6 @@
 package prerun
 
 import (
-	"encoding/json"
 	"errors"
 	"os"
 	"path/filepath"
@@ -125,9 +124,15 @@ func TestIsCustomFeatureGatesConfigured(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := hasCustomFeatureGates(tt.fg)
-			if got != tt.want {
-				t.Errorf("isCustomFeatureGatesConfigured() = %v, want %v", got, tt.want)
+			err := configValidationChecksPass(featureGateLockFile{
+				FeatureSet:      tt.fg.FeatureSet,
+				CustomNoUpgrade: tt.fg.CustomNoUpgrade,
+			}, tt.fg)
+			if err != nil {
+				t.Errorf("featureValidationsPass() error = %v", err)
+			}
+			if err != nil {
+				t.Errorf("featureValidationsPass() error = %v", err)
 			}
 		})
 	}
@@ -206,81 +211,49 @@ func TestFeatureGateLockFile_ReadNonExistent(t *testing.T) {
 	}
 }
 
-func TestCompareFeatureGates(t *testing.T) {
+func TestConfigValidationChecksPass(t *testing.T) {
 	tests := []struct {
-		name      string
-		lockFile  featureGateLockFile
-		current   config.FeatureGates
-		wantMatch bool
+		name     string
+		lockFile featureGateLockFile
+		current  config.FeatureGates
+		wantErr  bool
 	}{
 		{
-			name: "identical custom feature gates",
+			name: "unset any feature set",
 			lockFile: featureGateLockFile{
 				FeatureSet: config.FeatureSetCustomNoUpgrade,
-				CustomNoUpgrade: config.CustomNoUpgrade{
-					Enabled:  []string{"FeatureA", "FeatureB"},
-					Disabled: []string{"FeatureC"},
-				},
 			},
 			current: config.FeatureGates{
-				FeatureSet: config.FeatureSetCustomNoUpgrade,
-				CustomNoUpgrade: config.CustomNoUpgrade{
-					Enabled:  []string{"FeatureA", "FeatureB"},
-					Disabled: []string{"FeatureC"},
-				},
+				FeatureSet: "",
 			},
-			wantMatch: true,
+			wantErr: true,
 		},
 		{
-			name: "different enabled features",
+			name: "change CustomNoUpgrade to any other feature set",
 			lockFile: featureGateLockFile{
 				FeatureSet: config.FeatureSetCustomNoUpgrade,
-				CustomNoUpgrade: config.CustomNoUpgrade{
-					Enabled: []string{"FeatureA"},
-				},
-			},
-			current: config.FeatureGates{
-				FeatureSet: config.FeatureSetCustomNoUpgrade,
-				CustomNoUpgrade: config.CustomNoUpgrade{
-					Enabled: []string{"FeatureB"},
-				},
-			},
-			wantMatch: false,
-		},
-		{
-			name: "different feature sets",
-			lockFile: featureGateLockFile{
-				FeatureSet: config.FeatureSetTechPreviewNoUpgrade,
-			},
-			current: config.FeatureGates{
-				FeatureSet: config.FeatureSetDevPreviewNoUpgrade,
-			},
-			wantMatch: false,
-		},
-		{
-			name: "identical TechPreviewNoUpgrade",
-			lockFile: featureGateLockFile{
-				FeatureSet: config.FeatureSetTechPreviewNoUpgrade,
 			},
 			current: config.FeatureGates{
 				FeatureSet: config.FeatureSetTechPreviewNoUpgrade,
 			},
-			wantMatch: true,
+			wantErr: true,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := compareFeatureGates(tt.lockFile, tt.current)
-			gotMatch := err == nil
-			if gotMatch != tt.wantMatch {
-				t.Errorf("compareFeatureGates() match = %v, want %v, error = %v", gotMatch, tt.wantMatch, err)
+			err := configValidationChecksPass(tt.lockFile, tt.current)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("configValidationChecksPass() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}
 }
 
 func TestFeatureGateLockManagement_FirstRun(t *testing.T) {
+	// Use a fixed test version (doesn't depend on ldflags)
+	testVersion := versionMetadata{Major: 4, Minor: 21, Patch: 0}
+
 	// Create a temporary directory for testing
 	tmpDir, err := os.MkdirTemp("", "featuregate-lockFile-test-*")
 	if err != nil {
@@ -293,20 +266,12 @@ func TestFeatureGateLockManagement_FirstRun(t *testing.T) {
 	featureGateLockFilePath = filepath.Join(tmpDir, "no-upgrade")
 	defer func() { featureGateLockFilePath = originalPath }()
 
-	// Override version file path for testing
-	originalVersionPath := versionFilePath
-	versionFilePath = filepath.Join(tmpDir, "version")
-	defer func() { versionFilePath = originalVersionPath }()
-
-	// Create a version file to simulate existing data (version file uses JSON format)
-	versionData := versionFile{
-		Version: versionMetadata{Major: 4, Minor: 18, Patch: 0},
-		BootID:  "test-boot",
+	// Override getExecutableVersion for testing
+	originalGetExecutableVersion := getExecutableVersion
+	getExecutableVersion = func() (versionMetadata, error) {
+		return testVersion, nil
 	}
-	versionJSON, _ := json.Marshal(versionData)
-	if err := os.WriteFile(versionFilePath, versionJSON, 0600); err != nil {
-		t.Fatal(err)
-	}
+	defer func() { getExecutableVersion = originalGetExecutableVersion }()
 
 	cfg := &config.Config{
 		ApiServer: config.ApiServer{
@@ -336,6 +301,9 @@ func TestFeatureGateLockManagement_FirstRun(t *testing.T) {
 }
 
 func TestFeatureGateLockManagement_ConfigChange(t *testing.T) {
+	// Use a fixed test version (doesn't depend on ldflags)
+	testVersion := versionMetadata{Major: 4, Minor: 21, Patch: 0}
+
 	// Create a temporary directory for testing
 	tmpDir, err := os.MkdirTemp("", "featuregate-lockFile-test-*")
 	if err != nil {
@@ -348,104 +316,154 @@ func TestFeatureGateLockManagement_ConfigChange(t *testing.T) {
 	featureGateLockFilePath = filepath.Join(tmpDir, "no-upgrade")
 	defer func() { featureGateLockFilePath = originalPath }()
 
-	// Override version file path for testing
-	originalVersionPath := versionFilePath
-	versionFilePath = filepath.Join(tmpDir, "version")
-	defer func() { versionFilePath = originalVersionPath }()
-
-	// Create a version file to simulate existing data (version file uses JSON format)
-	versionData := versionFile{
-		Version: versionMetadata{Major: 4, Minor: 18, Patch: 0},
-		BootID:  "test-boot",
+	// Override getExecutableVersion for testing
+	originalGetExecutableVersion := getExecutableVersion
+	getExecutableVersion = func() (versionMetadata, error) {
+		return testVersion, nil
 	}
-	versionJSON, _ := json.Marshal(versionData)
-	if err := os.WriteFile(versionFilePath, versionJSON, 0600); err != nil {
-		t.Fatal(err)
-	}
+	defer func() { getExecutableVersion = originalGetExecutableVersion }()
 
-	// Create lockFile file with initial config
+	// Create lockFile file with initial config (CustomNoUpgrade feature set)
 	initialLock := featureGateLockFile{
 		FeatureSet: config.FeatureSetCustomNoUpgrade,
 		CustomNoUpgrade: config.CustomNoUpgrade{
 			Enabled: []string{"FeatureA"},
 		},
+		Version: testVersion,
 	}
 	if err := writeFeatureGateLockFile(featureGateLockFilePath, initialLock); err != nil {
 		t.Fatal(err)
 	}
 
-	// Try to run with different config - should fail
+	// Try to run with no feature gates configured - should fail
+	// (configValidationChecksPass blocks unsetting a feature set)
 	cfg := &config.Config{
 		ApiServer: config.ApiServer{
 			FeatureGates: config.FeatureGates{
-				FeatureSet: config.FeatureSetCustomNoUpgrade,
-				CustomNoUpgrade: config.CustomNoUpgrade{
-					Enabled: []string{"FeatureB"}, // Different feature
-				},
+				FeatureSet: "", // Trying to unset feature gates
 			},
 		},
 	}
 
 	err = FeatureGateLockManagement(cfg)
 	if err == nil {
-		t.Error("FeatureGateLockManagement() should have failed with config change")
+		t.Error("FeatureGateLockManagement() should have failed when trying to unset feature gates")
 	}
 }
 
 func TestFeatureGateLockManagement_VersionChange(t *testing.T) {
-	// Create a temporary directory for testing
-	tmpDir, err := os.MkdirTemp("", "featuregate-lockFile-test-*")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer os.RemoveAll(tmpDir)
+	// Use a fixed base version for testing (doesn't depend on ldflags)
+	baseVersion := versionMetadata{Major: 4, Minor: 21, Patch: 0}
 
-	// Override the lockFile file path for testing
-	originalPath := featureGateLockFilePath
-	featureGateLockFilePath = filepath.Join(tmpDir, "no-upgrade")
-	defer func() { featureGateLockFilePath = originalPath }()
-
-	// Override version file path for testing
-	originalVersionPath := versionFilePath
-	versionFilePath = filepath.Join(tmpDir, "version")
-	defer func() { versionFilePath = originalVersionPath }()
-
-	// Create a version file with NEW version (simulating upgrade) (version file uses JSON format)
-	versionData := versionFile{
-		Version: versionMetadata{Major: 4, Minor: 19, Patch: 0}, // Newer version
-		BootID:  "test-boot",
-	}
-	versionJSON, _ := json.Marshal(versionData)
-	if err := os.WriteFile(versionFilePath, versionJSON, 0600); err != nil {
-		t.Fatal(err)
+	// getVersion creates a version with offsets from the base version
+	getVersion := func(majorOffset, minorOffset, patchOffset int) versionMetadata {
+		return versionMetadata{
+			Major: baseVersion.Major + majorOffset,
+			Minor: baseVersion.Minor + minorOffset,
+			Patch: baseVersion.Patch + patchOffset,
+		}
 	}
 
-	// Create lockFile file with OLD version
-	lockFile := featureGateLockFile{
-		FeatureSet: config.FeatureSetCustomNoUpgrade,
-		CustomNoUpgrade: config.CustomNoUpgrade{
-			Enabled: []string{"FeatureA"},
+	tests := []struct {
+		name        string
+		lockFileVer versionMetadata
+		currentVer  versionMetadata
+		wantErr     bool
+		description string
+	}{
+		{
+			name:        "minor version upgrade should fail",
+			lockFileVer: getVersion(0, 0, 0),
+			currentVer:  getVersion(0, 1, 0),
+			wantErr:     true,
+			description: "Minor version upgrade (4.21.0 -> 4.22.0) should be blocked",
 		},
-		Version: versionMetadata{Major: 4, Minor: 18, Patch: 0}, // Older version
-	}
-	if err := writeFeatureGateLockFile(featureGateLockFilePath, lockFile); err != nil {
-		t.Fatal(err)
+		{
+			name:        "major version upgrade should fail",
+			lockFileVer: getVersion(0, 0, 0),
+			currentVer:  getVersion(1, 0, 0),
+			wantErr:     true,
+			description: "Major version upgrade (4.21.0 -> 5.0.0) should be blocked",
+		},
+		{
+			name:        "patch version change should succeed",
+			lockFileVer: getVersion(0, 0, 0),
+			currentVer:  getVersion(0, 0, 1),
+			wantErr:     false,
+			description: "Patch version change (4.21.0 -> 4.21.1) should be allowed",
+		},
+		{
+			name:        "same version should succeed",
+			lockFileVer: getVersion(0, 0, 0),
+			currentVer:  getVersion(0, 0, 0),
+			wantErr:     false,
+			description: "Same version (4.21.0 -> 4.21.0) should be allowed",
+		},
+		{
+			name:        "minor version downgrade should fail",
+			lockFileVer: getVersion(0, 1, 0),
+			currentVer:  getVersion(0, 0, 0),
+			wantErr:     true,
+			description: "Minor version downgrade (4.22.0 -> 4.21.0) should be blocked",
+		},
+		{
+			name:        "major version downgrade should fail",
+			lockFileVer: getVersion(1, -21, 0),
+			currentVer:  getVersion(0, 0, 0),
+			wantErr:     true,
+			description: "Major version downgrade (5.0.0 -> 4.21.0) should be blocked",
+		},
 	}
 
-	cfg := &config.Config{
-		ApiServer: config.ApiServer{
-			FeatureGates: config.FeatureGates{
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Create a temporary directory for testing
+			tmpDir, err := os.MkdirTemp("", "featuregate-lockFile-test-*")
+			if err != nil {
+				t.Fatal(err)
+			}
+			defer os.RemoveAll(tmpDir)
+
+			// Override the lockFile file path for testing
+			originalPath := featureGateLockFilePath
+			featureGateLockFilePath = filepath.Join(tmpDir, "no-upgrade")
+			defer func() { featureGateLockFilePath = originalPath }()
+
+			// Override getExecutableVersion for testing
+			originalGetExecutableVersion := getExecutableVersion
+			getExecutableVersion = func() (versionMetadata, error) {
+				return tt.currentVer, nil
+			}
+			defer func() { getExecutableVersion = originalGetExecutableVersion }()
+
+			// Create lockFile file with locked version
+			lockFile := featureGateLockFile{
 				FeatureSet: config.FeatureSetCustomNoUpgrade,
 				CustomNoUpgrade: config.CustomNoUpgrade{
 					Enabled: []string{"FeatureA"},
 				},
-			},
-		},
-	}
+				Version: tt.lockFileVer,
+			}
+			if err := writeFeatureGateLockFile(featureGateLockFilePath, lockFile); err != nil {
+				t.Fatal(err)
+			}
 
-	err = FeatureGateLockManagement(cfg)
-	if err == nil {
-		t.Error("FeatureGateLockManagement() should have failed with version change")
+			cfg := &config.Config{
+				ApiServer: config.ApiServer{
+					FeatureGates: config.FeatureGates{
+						FeatureSet: config.FeatureSetCustomNoUpgrade,
+						CustomNoUpgrade: config.CustomNoUpgrade{
+							Enabled: []string{"FeatureA"},
+						},
+					},
+				},
+			}
+
+			err = FeatureGateLockManagement(cfg)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("FeatureGateLockManagement() error = %v, wantErr %v. %s", err, tt.wantErr, tt.description)
+			}
+		})
 	}
 }
 

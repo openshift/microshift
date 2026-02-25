@@ -1,0 +1,6 @@
+---
+# quick-microshift-boot default vars
+
+boot_output_filename: "boot1.txt"
+cleanup_microshift: false
+reboot: true

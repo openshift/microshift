@@ -1,0 +1,5 @@
+---
+# quick-microshift-boot tasks - measures warm boot time
+
+- name: measure microshift service boot time
+  include_tasks: roles/common/tasks/boot.yml

@@ -1,13 +1,13 @@
 {
   "release": {
-    "base": "1.17.0"
+    "base": "1.18.0"
   },
   "images": {
-    "cert-manager-operator": "registry.redhat.io/cert-manager/cert-manager-operator-rhel9@sha256:4d5e238300ce6f427a1045d51d6b37a4e5c5633985208ebb44f91e7dd53897d9",
-    "cert-manager-webhook": "registry.redhat.io/cert-manager/jetstack-cert-manager-rhel9@sha256:96d51e3a64bf30cbd92836c7cbd82f06edca16eef78ab1432757d34c16628659",
-    "cert-manager-ca-injector": "registry.redhat.io/cert-manager/jetstack-cert-manager-rhel9@sha256:96d51e3a64bf30cbd92836c7cbd82f06edca16eef78ab1432757d34c16628659",
-    "cert-manager-controller": "registry.redhat.io/cert-manager/jetstack-cert-manager-rhel9@sha256:96d51e3a64bf30cbd92836c7cbd82f06edca16eef78ab1432757d34c16628659",
-    "cert-manager-acmesolver": "registry.redhat.io/cert-manager/jetstack-cert-manager-acmesolver-rhel9@sha256:4f7c045819c39e176a6090efdaba6ec736edf772d88fc87dd1c6fb33d3b5b26b",
-    "cert-manager-istiocsr": "registry.redhat.io/cert-manager/cert-manager-istio-csr-rhel9@sha256:9ea2c29a384b964cef14f853278821df3cd30320f25afab8823897192f67fc7e"
+    "cert-manager-operator": "registry.redhat.io/cert-manager/cert-manager-operator-rhel9@sha256:8eecb53c8c81c0fa8f198260acb273759c0d12b5c01642a128923c5716df19d2",
+    "cert-manager-istiocsr": "registry.redhat.io/cert-manager/cert-manager-istio-csr-rhel9@sha256:0f20d178f980a3fa4527bc1613b8639385e36c367e30c93b4cbb4c4a434d3405",
+    "cert-manager-acmesolver": "registry.redhat.io/cert-manager/jetstack-cert-manager-acmesolver-rhel9@sha256:3a40eb434e032fb2135f369b6fc65266ae0f409db92fd65d12cf13c7f32b5020",
+    "cert-manager-webhook": "registry.redhat.io/cert-manager/jetstack-cert-manager-rhel9@sha256:40b47054e42363a365b491ccfe0d86f109e19fc317058ba834ffe0f5c733880b",
+    "cert-manager-ca-injector": "registry.redhat.io/cert-manager/jetstack-cert-manager-rhel9@sha256:40b47054e42363a365b491ccfe0d86f109e19fc317058ba834ffe0f5c733880b",
+    "cert-manager-controller": "registry.redhat.io/cert-manager/jetstack-cert-manager-rhel9@sha256:40b47054e42363a365b491ccfe0d86f109e19fc317058ba834ffe0f5c733880b"
   }
 }

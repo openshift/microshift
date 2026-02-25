@@ -35,6 +35,7 @@ const BuildVariantCommunity = "community"
 
 type Info struct {
 	version.Info
+
 	BuildVariant string
 	Patch        string `json:"patch"`
 }

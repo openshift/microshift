@@ -83,7 +83,7 @@ Create New MicroShift Cluster
     Enable MicroShift
     Start MicroShift
     Setup Kubeconfig
-    Restart Greenboot And Wait For Success
+    Wait For MicroShift Healthcheck Success
 
 Get MicroShift Cluster ID From Namespace
     [Documentation]    Read and return the cluster ID from the kube-system namespace.

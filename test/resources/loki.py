@@ -47,21 +47,37 @@ def _print_results(results: dict) -> None:
         sys.exit(1)
 
     streams = results["data"]["result"]
+    if len(streams) == 0:
+        raise Exception("ERROR: No results found")
+
     for i, stream in enumerate(streams):
         _log(f"Labels: {stream['stream']}")
+        if stream["stream"]["service_name"] not in ["journald", "kube_events"]:
+            raise Exception(f"ERROR: Unknown service name: {stream['stream']['service_name']}")
+
+        is_journald = stream["stream"]["service_name"] == "journald"
         for entry in stream["values"]:
             log_line = entry[1]
-            try:
-                log_line = json.loads(log_line)
-                if "MESSAGE" in log_line["body"]:
-                    _log(f"{log_line['body']['MESSAGE']}")
-                else:
-                    _log(f"{log_line['body']}")
-            except json.JSONDecodeError as e:
-                raise Exception(f"ERROR: Error decoding log line as JSON: {e}")
+            if is_journald:
+                try:
+                    log_line = json.loads(log_line)
+                    _log(f"{log_line['MESSAGE']}")
+                except json.JSONDecodeError as e:
+                    raise Exception(f"ERROR: Error decoding log line as JSON: {e}")
+            else:
+                _log(f"{log_line}")
 
 
 def check_loki_query(host: str, port: int, query: str, limit: int = 10) -> None:
+    try:
+        from robot.libraries.BuiltIn import BuiltIn
+        # Running within RF
+        stdout, _, _ = BuiltIn().run_keyword("Command Execution", "hostname")
+        if stdout:
+            query = f"{query} | host_name=`{stdout}`"
+            _log(f"Added hostname to query: {query}")
+    except Exception:
+        None
     results = query_loki(f"http://{host}:{port}", query, limit)
     _print_results(results)
 

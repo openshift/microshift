@@ -1,0 +1,7 @@
+# Complete reference: https://docs.coderabbit.ai/reference/configuration
+
+tone_instructions: "Be concise"
+
+reviews:
+  in_progress_fortune: false
+  poem: false

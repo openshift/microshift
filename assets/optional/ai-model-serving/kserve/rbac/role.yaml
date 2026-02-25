@@ -4,6 +4,10 @@ kind: ClusterRole
 metadata:
   name: kserve-manager-role
 rules:
+- nonResourceURLs:
+  - /metrics
+  verbs:
+  - get
 - apiGroups:
   - ""
   resources:
@@ -16,6 +20,8 @@ rules:
   - ""
   resources:
   - events
+  - secrets
+  - serviceaccounts
   - services
   verbs:
   - create
@@ -34,21 +40,6 @@ rules:
   - get
   - list
   - watch
-- apiGroups:
-  - ""
-  resources:
-  - secrets
-  verbs:
-  - get
-- apiGroups:
-  - ""
-  resources:
-  - serviceaccounts
-  verbs:
-  - create
-  - delete
-  - get
-  - patch
 - apiGroups:
   - admissionregistration.k8s.io
   resources:
@@ -75,6 +66,13 @@ rules:
   - update
   - watch
 - apiGroups:
+  - authentication.k8s.io
+  resources:
+  - subjectaccessreviews
+  - tokenreviews
+  verbs:
+  - create
+- apiGroups:
   - autoscaling
   resources:
   - horizontalpodautoscalers
@@ -87,8 +85,90 @@ rules:
   - update
   - watch
 - apiGroups:
+  - discovery.k8s.io
+  resources:
+  - endpointslices
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - gateway.networking.k8s.io
+  resources:
+  - gatewayclasses
+  - gateways
+  - httproutes
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - inference.networking.x-k8s.io
+  resources:
+  - inferencemodels
+  - inferencepools
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - keda.sh
+  resources:
+  - scaledobjects
+  - scaledobjects/finalizers
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - keda.sh
+  resources:
+  - scaledobjects/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - leaderworkerset.x-k8s.io
+  resources:
+  - leaderworkersets
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - monitoring.coreos.com
+  resources:
+  - podmonitors
+  - servicemonitors
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
   - networking.istio.io
   resources:
+  - destinationrules
   - virtualservices
   - virtualservices/finalizers
   verbs:
@@ -120,13 +200,26 @@ rules:
   - update
   - watch
 - apiGroups:
-  - operator.knative.dev
+  - opentelemetry.io
   resources:
-  - knativeservings
+  - opentelemetrycollectors
+  - opentelemetrycollectors/finalizers
   verbs:
+  - create
+  - delete
   - get
   - list
+  - patch
+  - update
   - watch
+- apiGroups:
+  - opentelemetry.io
+  resources:
+  - opentelemetrycollectors/status
+  verbs:
+  - get
+  - patch
+  - update
 - apiGroups:
   - rbac.authorization.k8s.io
   resourceNames:
@@ -138,6 +231,20 @@ rules:
   - get
   - patch
   - update
+- apiGroups:
+  - rbac.authorization.k8s.io
+  resources:
+  - clusterrolebindings
+  - rolebindings
+  - roles
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
 - apiGroups:
   - route.openshift.io
   resources:
@@ -156,6 +263,14 @@ rules:
   - routes/status
   verbs:
   - get
+- apiGroups:
+  - security.openshift.io
+  resourceNames:
+  - openshift-ai-llminferenceservice-scc
+  resources:
+  - securitycontextconstraints
+  verbs:
+  - use
 - apiGroups:
   - serving.knative.dev
   resources:
@@ -180,13 +295,6 @@ rules:
 - apiGroups:
   - serving.kserve.io
   resources:
-  - clusterlocalmodels
-  verbs:
-  - get
-  - list
-- apiGroups:
-  - serving.kserve.io
-  resources:
   - clusterservingruntimes
   - clusterservingruntimes/finalizers
   - clusterstoragecontainers
@@ -194,6 +302,8 @@ rules:
   - inferencegraphs/finalizers
   - inferenceservices
   - inferenceservices/finalizers
+  - llminferenceserviceconfigs
+  - llminferenceservices
   - servingruntimes
   - servingruntimes/finalizers
   - trainedmodels
@@ -211,9 +321,25 @@ rules:
   - clusterservingruntimes/status
   - inferencegraphs/status
   - inferenceservices/status
+  - llminferenceservices/status
   - servingruntimes/status
   - trainedmodels/status
   verbs:
   - get
   - patch
   - update
+- apiGroups:
+  - serving.kserve.io
+  resources:
+  - llminferenceserviceconfigs/finalizers
+  - llminferenceservices/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - serving.kserve.io
+  resources:
+  - localmodelcaches
+  verbs:
+  - get
+  - list
+  - watch

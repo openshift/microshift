@@ -1,0 +1,7 @@
+
+# TODO: Replace this by a RHEL 10.2 image when its RPM repositories are released.
+# Bootc Image Builder has a limitation does not allowing it to build ISO images
+# from containers that use repositories protected by credentials. Thus, we build
+# from the test agent container image which uses proxy for accessing repositories.
+# registry.redhat.io/rhel10/rhel-bootc:10.2
+localhost/rhel102-test-agent:latest

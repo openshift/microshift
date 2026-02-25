@@ -125,6 +125,9 @@ func (c *Config) fillDefaults() error {
 
 	c.Network = Network{
 		ServiceNodePortRange: "30000-32767",
+		Multus: Multus{
+			Status: MultusDisabled,
+		},
 	}
 	c.Etcd = EtcdConfig{
 		MemoryLimitMB:           0,
@@ -667,6 +670,9 @@ func (c *Config) validate() error {
 
 	if err := c.DNS.validate(); err != nil {
 		return fmt.Errorf("error validating DNS: %v", err)
+	}
+	if err := c.Network.Multus.Validate(); err != nil {
+		return fmt.Errorf("error validating multus configuration: %v", err)
 	}
 	return nil
 }

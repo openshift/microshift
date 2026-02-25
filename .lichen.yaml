@@ -1,6 +1,6 @@
 ---
 # Licenses other than Apache-2.0 are governed by
-# https://github.com/cncf/foundation/blob/master/allowed-third-party-license-policy.md#approved-licenses-for-allowlist
+# https://github.com/cncf/foundation/blob/main/policies-guidance/allowed-third-party-license-policy.md#approved-licenses-for-allowlist
 # Note that Allowlist also requires that projects were created
 # on GitHub at least 12 months prior and have at least 10 stars
 # or 10 forks
@@ -34,6 +34,10 @@ exceptions:
     licenses: ["CC-BY-SA-4.0"]  # also dual licensed as Apache-2.0
   - path: "github.com/hashicorp/golang-lru"
     licenses: ["MPL-2.0"]
+    # Although not on the exception list, at the time of writing this comment,
+    # kubernetes is using v0.6.1 of filepath-securejoin (v0.6.0 for K8s 1.35) which is already dual licensed.
+  - path: "github.com/cyphar/filepath-securejoin"
+    licenses: ["BSD-3-Clause", "MPL-2.0"]
 override:
   - path: "sigs.k8s.io/yaml"
     licenses: ["Apache-2.0", "MIT"] # Override license to match those of LICENSE files

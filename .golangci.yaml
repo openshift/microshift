@@ -34,6 +34,8 @@ linters:
     - nlreturn
     # Replaced by whitespace.
     - wsl
+    # We do not enforce godoc comments.
+    - godoclint
   # https://golangci-lint.run/usage/linters/
   enable:
   - asasalint
@@ -107,6 +109,14 @@ linters:
         text: 'G301: Expect directory permissions to be 0750 or less'
       - path: 'pkg/components/storage\.go'
         text: 'G302: Expect file permissions to be 0600 or less'
+      - path: 'pkg/config/node\.go'
+        text: 'G703: Path traversal via taint analysis'
+      - path: 'pkg/controllers/kube-apiserver\.go'
+        text: 'G703: Path traversal via taint analysis'
+      - path: 'pkg/telemetry/telemetry\.go'
+        text: 'G704: SSRF via taint analysis'
+      - path: 'pkg/util/cryptomaterial/certchains/signers\.go'
+        text: 'toBuilder returns interface'
   settings:
     cyclop:
       max-complexity: 20

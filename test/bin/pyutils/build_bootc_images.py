@@ -4,6 +4,7 @@ import argparse
 import concurrent.futures
 import getpass
 import glob
+import multiprocessing
 import os
 import platform
 import re
@@ -283,17 +284,22 @@ def process_containerfile(groupdir, containerfile, dry_run):
             # Note:
             # - The pull secret is necessary in some builds for pulling embedded
             #   container images referenced in release-info RPMs
+            # - The host network usage is required to access the RPM repository
+            #   proxy server using the localhost URL to make generated builds
+            #   reusable from cache on other hosts.
             # - The explicit push-to-mirror sets the 'latest' tag as all the build
             #   layers are in the mirror due to 'cache-to' option
             build_args = [
                 "sudo", "podman", "build",
                 "--authfile", PULL_SECRET,
+                "--network", "host",
                 "--secret", f"id=pullsecret,src={PULL_SECRET}",
                 "--cache-to", f"{MIRROR_REGISTRY}/{cf_outname}",
                 "--cache-from", f"{MIRROR_REGISTRY}/{cf_outname}",
                 "-t", cf_outname, "-f", cf_outfile,
                 IMAGEDIR
             ]
+
             start = time.time()
             common.retry_on_exception(3, common.run_command_in_shell, build_args, dry_run, logfile, logfile)
             common.record_junit(cf_path, "build-container", "OK", start)
@@ -366,21 +372,24 @@ def process_image_bootc(groupdir, bootcfile, dry_run):
             # Read the image reference
             bf_imgref = common.read_file_valid_lines(bf_outfile).strip()
 
-            # If not already local, download the image to be used by bootc image builder
-            if not bf_imgref.startswith('localhost/'):
-                pull_args = [
-                    "sudo", "podman", "pull",
-                    "--authfile", PULL_SECRET, bf_imgref
-                ]
-                start = time.time()
-                common.retry_on_exception(3, common.run_command_in_shell, pull_args, dry_run, logfile, logfile)
-                common.record_junit(bf_path, "pull-bootc-image", "OK", start)
+            # Download the image to be used by bootc image builder.
+            # Locally built images should also be downloaded in case they were
+            # cached but not fetched from the mirror registry.
+            pull_args = [
+                "sudo", "podman", "pull",
+                "--authfile", PULL_SECRET,
+                bf_imgref
+            ]
+            start = time.time()
+            common.retry_on_exception(3, common.run_command_in_shell, pull_args, dry_run, logfile, logfile)
+            common.record_junit(bf_path, "pull-bootc-image", "OK", start)
 
             # The podman command with security elevation and
             # mount of output / container storage
             build_args = [
                 "sudo", "podman", "run",
                 "--rm", "-i", "--privileged",
+                "--network", "host",
                 "--pull=newer",
                 "--security-opt", "label=type:unconfined_t",
                 "-v", f"{bf_outdir}:/output",
@@ -390,7 +399,6 @@ def process_image_bootc(groupdir, bootcfile, dry_run):
             build_args += [
                 BIB_IMAGE,
                 "--type", "anaconda-iso",
-                "--local",
                 bf_imgref
             ]
             start = time.time()
@@ -568,18 +576,25 @@ def main():
     parser.add_argument("-d", "--dry-run", action="store_true", help="Dry run: skip executing build commands.")
     parser.add_argument("-f", "--force-rebuild", action="store_true", help="Force rebuilding images that already exist.")
     parser.add_argument("-E", "--no-extract-images", action="store_true", help="Skip container image extraction.")
+    parser.add_argument("-X", "--skip-all-builds", action="store_true", help="Skip all image builds.")
     parser.add_argument("-b", "--build-type",
                         choices=["image-bootc", "containerfile", "container-encapsulate"],
                         help="Only build images of the specified type.")
-    dirgroup = parser.add_mutually_exclusive_group(required=True)
+    dirgroup = parser.add_mutually_exclusive_group(required=False)
     dirgroup.add_argument("-l", "--layer-dir", type=str, help="Path to the layer directory to process.")
     dirgroup.add_argument("-g", "--group-dir", type=str, help="Path to the group directory to process.")
     dirgroup.add_argument("-t", "--template", type=str, help="Path to a template to build. Allows glob patterns (requires double qoutes).")
 
     args = parser.parse_args()
+
+    # Validate: directory is required unless skip-all-builds mode
+    if not args.skip_all_builds and not (args.layer_dir or args.group_dir or args.template):
+        parser.error("one of the arguments -l/--layer-dir -g/--group-dir -t/--template is required (unless using -X/--extract-only)")
+
     success_message = False
     try:
         pattern = "*"
+        dir2process = None
         # Convert input directories to absolute paths
         if args.group_dir:
             args.group_dir = os.path.abspath(args.group_dir)
@@ -591,8 +606,8 @@ def main():
             args.template = os.path.abspath(args.template)
             dir2process = os.path.dirname(args.template)
             pattern = os.path.basename(args.template)
-        # Make sure the input directory exists
-        if not os.path.isdir(dir2process):
+        # Make sure the input directory exists (only if specified)
+        if dir2process and not os.path.isdir(dir2process):
             raise Exception(f"The input directory '{dir2process}' does not exist")
         # Make sure the local RPM repository exists
         if not os.path.isdir(LOCAL_REPO):
@@ -636,7 +651,6 @@ def main():
                 extract_container_images(BREW_NIGHTLY_RELEASE_VERSION, BREW_REPO, CONTAINER_LIST, args.dry_run)
         # Sort the images list, only leaving unique entries
         common.sort_uniq_file(CONTAINER_LIST)
-
         # Process package source templates
         ipkgdir = f"{SCRIPTDIR}/../package-sources-bootc"
         for ifile in os.listdir(ipkgdir):
@@ -646,6 +660,11 @@ def main():
             run_template_cmd(ifile, ofile, args.dry_run)
         # Run the mirror registry
         common.run_command([f"{SCRIPTDIR}/mirror_registry.sh"], args.dry_run)
+        # Skip all image builds
+        if args.skip_all_builds:
+            common.print_msg("Skipping all image builds")
+            success_message = True
+            return
         # Add local registry credentials to the input pull secret file
         global PULL_SECRET
         opull_secret = os.path.join(BOOTC_IMAGE_DIR, "pull_secret.json", )
@@ -674,5 +693,6 @@ def main():
 
 
 if __name__ == "__main__":
+    multiprocessing.set_start_method("fork")
     _ = common.MeasureRunTimeInScope("[MAIN] Building Images")
     main()

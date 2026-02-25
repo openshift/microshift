@@ -2,13 +2,13 @@
 
 # Sourced from scenario.sh and uses functions defined there.
 
-start_image="rhel-9.6-microshift-brew-optionals-4.${MINOR_VERSION}-${LATEST_RELEASE_TYPE}"
+start_image="rhel96-brew-lrel-optional"
 
 scenario_create_vms() {
     exit_if_commit_not_found "${start_image}"
 
     prepare_kickstart host1 kickstart.ks.template "${start_image}"
-    launch_vm
+    launch_vm --vm_vcpus 4
 }
 
 scenario_remove_vms() {
@@ -42,9 +42,7 @@ EOF"
     fi
     record_junit "${vmname}" "pre_test_greenboot_check" "OK"
 
-    # Run standard tests excluding tls-configuration.robot since TLS v1.3 is already configured
     run_tests host1 \
         --variable "EXPECTED_OS_VERSION:9.6" \
-        --exclude tls-configuration \
-        suites/standard1/ suites/selinux/validate-selinux-policy.robot
+        suites/standard1/
 }

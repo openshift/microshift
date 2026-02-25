@@ -51,3 +51,14 @@ Artifacts built in this layer cannot be cached as they depend on the current sou
 |group2| Average  | Current source artifacts on CentOS used only in upstream
 
 > Note: Total build times are up to 15 minutes.
+
+## Bootc Release Layer
+
+Artifacts built in this layer are cached as they depend on Brew RPM packages available only behind the VPN.
+
+|Group |Build Time|Description|
+|------|----------|-----------|
+|group1| Average  | Bootc images from for release testing (EC, RC, z-stream, y-1, y-2) including all microshift RPMs.
+|group2| Average  | Bootc images from previous group plus special config (FIPS, tuned) and image installers.
+
+> Note: Total build times are up to 15 minutes.

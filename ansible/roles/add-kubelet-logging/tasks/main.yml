@@ -10,6 +10,8 @@
   ansible.builtin.stat:
     path: "{{ sa_token_file }}"
   register: token_file
+  delegate_to: localhost
+  become: false
 
 - name: Deal with metrics service account token file
   when: token_file.stat.exists
@@ -19,6 +21,7 @@
         src: "{{ sa_token_file }}"
       register: bearer_token_slurp
       delegate_to: localhost
+      become: false
 
     - name: Decode bearer token
       ansible.builtin.set_fact:
@@ -35,6 +38,8 @@
       ansible.builtin.file:
         path: "{{ sa_token_file }}"
         state: absent
+      delegate_to: localhost
+      become: false
 
 - name: Append kubelet scrape config target to prometheus config
   ansible.builtin.blockinfile:

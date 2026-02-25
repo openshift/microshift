@@ -325,12 +325,11 @@ func computeMicroShiftVersionMetric() (Metric, error) {
 }
 
 func convertMetricsToWriteRequest(metrics []Metric) *prompb.WriteRequest {
-	timeSeriesList := make([]prompb.TimeSeries, 0)
-	metricMetadataList := make([]prompb.MetricMetadata, 0)
+	timeSeriesList := make([]prompb.TimeSeries, 0, len(metrics))
+	metricMetadataList := make([]prompb.MetricMetadata, 0, len(metrics))
 	for _, metric := range metrics {
-		labels := []prompb.Label{
-			{Name: "__name__", Value: metric.Name},
-		}
+		labels := make([]prompb.Label, 0, 1+len(metric.Labels))
+		labels = append(labels, prompb.Label{Name: "__name__", Value: metric.Name})
 		for _, label := range metric.Labels {
 			labels = append(labels, prompb.Label{
 				Name:  label.Name,

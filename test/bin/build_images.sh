@@ -300,6 +300,14 @@ do_group() {
 
         blueprint=$(get_blueprint_name "${blueprint_file}")
 
+        if sudo composer-cli blueprints list | grep -q "^${blueprint}$"; then
+            echo "Removing existing definition of ${blueprint}"
+            sudo composer-cli blueprints delete "${blueprint}"
+        fi
+
+        echo "Loading new definition of ${blueprint}"
+        sudo composer-cli blueprints push "${blueprint_file}"
+
         # Check if the image for this blueprint already exists, in
         # case it was downloaded from the cache.
         if ostree summary --view --repo="${IMAGEDIR}/repo" | grep -q " ${blueprint}\$"; then
@@ -309,14 +317,6 @@ do_group() {
                 continue
             fi
         fi
-
-        if sudo composer-cli blueprints list | grep -q "^${blueprint}$"; then
-            echo "Removing existing definition of ${blueprint}"
-            sudo composer-cli blueprints delete "${blueprint}"
-        fi
-
-        echo "Loading new definition of ${blueprint}"
-        sudo composer-cli blueprints push "${blueprint_file}"
 
         echo "Resolving dependencies for ${blueprint}"
         # shellcheck disable=SC2024  # redirect and sudo
@@ -381,6 +381,11 @@ do_group() {
                 fi
             fi
             blueprint=$("${GOMPLATE}" --file "${image_installer}")
+            if [ -z "${blueprint}" ]; then
+                echo "Skipping ${image_installer}: blueprint name is empty (environment variables may not be set)"
+                record_junit "${groupdir}" "${image_installer}" "compose" "SKIPPED"
+                continue
+            fi
             local expected_iso_file="${VM_DISK_BASEDIR}/${blueprint}.iso"
             if [ -f "${expected_iso_file}" ]; then
                 echo "${expected_iso_file} already exists"
@@ -605,6 +610,8 @@ build_images.sh [-iIsdf] [-l layer-dir | -g group-dir] [-t template]
           The FILE should be the path to the template to build.
           Implies -f along with -l and -g based on the filename.
 
+  -X      Skip all images builds and installer builds.
+
 EOF
 }
 
@@ -617,9 +624,10 @@ TEMPLATE=""
 FORCE_REBUILD=false
 FORCE_SOURCE=false
 EXTRACT_CONTAINER_IMAGES=true
+SKIP_ALL_BUILDS=false
 
 selCount=0
-while getopts "dEfg:hiIl:sSt:" opt; do
+while getopts "dEfg:hiIl:sSt:X" opt; do
     case "${opt}" in
         d)
             COMPOSER_DRY_RUN=true
@@ -660,6 +668,9 @@ while getopts "dEfg:hiIl:sSt:" opt; do
             GROUP="$(dirname "$(realpath "${OPTARG}")")"
             selCount=$((selCount+1))
             FORCE_REBUILD=true
+            ;;
+        X)
+            SKIP_ALL_BUILDS=true
             ;;
         *)
             usage "ERROR: Unknown option ${opt}"
@@ -729,6 +740,12 @@ trap 'osbuild_logs' EXIT
 # Check if webserver is running
 if [ $(pgrep -cx nginx) -eq 0 ] ; then
     "${TESTDIR}/bin/manage_webserver.sh" "start"
+fi
+
+# Build the images
+if ${SKIP_ALL_BUILDS}; then
+    echo "INFO: Skipping all images builds and installer builds."
+    exit 0
 fi
 
 if [ -n "${LAYER}" ]; then

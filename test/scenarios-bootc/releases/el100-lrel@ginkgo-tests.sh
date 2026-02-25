@@ -2,7 +2,7 @@
 
 # Sourced from scenario.sh and uses functions defined there.
 
-start_image="rhel100-bootc-brew-${LATEST_RELEASE_TYPE}-with-optional"
+start_image="rhel100-bootc-brew-lrel-optional"
 
 scenario_create_vms() {
     if ! does_image_exist "${start_image}"; then
@@ -11,7 +11,7 @@ scenario_create_vms() {
     fi
 
     prepare_kickstart host1 kickstart-bootc.ks.template "${start_image}"
-    launch_vm --boot_blueprint rhel100-bootc --vm_disksize 30
+    launch_vm --boot_blueprint rhel100-bootc --vm_disksize 30 --vm_vcpus 4
 }
 
 scenario_remove_vms() {

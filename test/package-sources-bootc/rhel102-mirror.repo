@@ -1,0 +1,16 @@
+[rhel-10.2-appstream]
+name = rhel-10.2-appstream
+
+baseurl = http://localhost:{{ .Env.WEB_SERVER_PORT }}/ocp-mirror/reposync/4.22{{ if eq .Env.UNAME_M "aarch64" }}_aarch64{{ end }}/rhel-102-appstream
+enabled = 1
+sslverify = false
+gpgcheck = 0
+skip_if_unavailable = false
+
+[rhel-10.2-baseos]
+name = rhel-10.2-baseos
+baseurl = http://localhost:{{ .Env.WEB_SERVER_PORT }}/ocp-mirror/reposync/4.22{{ if eq .Env.UNAME_M "aarch64" }}_aarch64{{ end }}/rhel-102-baseos
+enabled = 1
+sslverify = false
+gpgcheck = 0
+skip_if_unavailable = false

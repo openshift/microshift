@@ -26,6 +26,7 @@ const defaultTTL = 120
 
 type Resolver struct {
 	sync.Mutex
+
 	domain map[string][]net.IP
 }
 
@@ -38,7 +39,7 @@ func NewResolver() *Resolver {
 func (r *Resolver) AddDomain(name string, ipStrs []string) {
 	r.Lock()
 	defer r.Unlock()
-	var ips = make([]net.IP, 0)
+	var ips = make([]net.IP, 0, len(ipStrs))
 
 	for _, ip := range ipStrs {
 		ips = append(ips, net.ParseIP(ip))

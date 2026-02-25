@@ -14,9 +14,9 @@ import (
 )
 
 type VersionOptions struct {
-	Output string
-
 	genericclioptions.IOStreams
+
+	Output string
 }
 
 func NewVersionOptions(ioStreams genericclioptions.IOStreams) *VersionOptions {

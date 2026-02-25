@@ -144,6 +144,7 @@ The following variables found in `vars/all.yml` may need user configuration.
 | `build_etcd_binary` | Build and deploy a separate etcd process | `false` |
 | `enable_gpu` | Install NVIDIA GPU drivers and container toolkit for GPU workloads | `false` |
 | `deploy_gpu_test` | Deploy a test GPU workload to validate GPU functionality | `true` |
+| `rhel_target_version` | Pin RHEL to a specific version during upgrades (e.g., "9.6") to prevent upgrading beyond MicroShift-compatible releases | `undefined` |
 
 ### Inventory Configuration
 

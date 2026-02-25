@@ -44,6 +44,7 @@ volumes:
 - emptyDir
 - ephemeral
 - hostPath
+- image
 - persistentVolumeClaim
 - projected
 - secret

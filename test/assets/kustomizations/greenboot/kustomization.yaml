@@ -6,4 +6,4 @@ resources:
   - busybox.yaml
 images:
   - name: BUSYBOX_IMAGE
-    newName: busybox:1.35
+    newName: quay.io/microshift/busybox:1.36

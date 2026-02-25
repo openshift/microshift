@@ -15,10 +15,10 @@ scenario_run_tests() {
     prepare_static_delta rhel96-bootc-yminus2 rhel96-bootc-prel
     apply_static_delta   rhel96-bootc-yminus2 rhel96-bootc-prel
 
-    prepare_static_delta rhel96-bootc-prel rhel96-bootc-source
-    apply_static_delta   rhel96-bootc-prel rhel96-bootc-source
+    prepare_static_delta rhel96-bootc-prel rhel98-bootc-source
+    apply_static_delta   rhel96-bootc-prel rhel98-bootc-source
     
-    for ref in rhel96-bootc-prel-from-sdelta rhel96-bootc-source-from-sdelta ; do
+    for ref in rhel96-bootc-prel-from-sdelta rhel98-bootc-source-from-sdelta ; do
         run_tests host1 \
             --variable "TARGET_REF:${ref}" \
             --variable "BOOTC_REGISTRY:${MIRROR_REGISTRY_URL}" \

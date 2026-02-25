@@ -45,6 +45,30 @@ title() {
     echo -e "\E[34m$1\E[00m";
 }
 
+# Retry a command with exponential backoff
+# Usage: retry_cmd <command> [args...]
+retry_cmd() {
+    local -r max_attempts=5
+    local timeout=1
+    local attempt=1
+    local exit_code=0
+
+    while (( attempt <= max_attempts )); do
+        if "$@"; then
+            return 0
+        else
+            exit_code=$?
+        fi
+        echo "Attempt ${attempt} of ${max_attempts} failed (exit code ${exit_code}). Retrying in ${timeout}s..."
+        sleep "${timeout}"
+        attempt=$(( attempt + 1 ))
+        timeout=$(( timeout * 2 ))
+    done
+
+    echo "Command failed after ${max_attempts} attempts: $@"
+    return "${exit_code}"
+}
+
 check_preconditions() {
     if ! hash yq; then
         title "Installing yq"
@@ -82,7 +106,7 @@ clone_repo() {
     git init "${repodir}"
     pushd "${repodir}" >/dev/null
     git remote add origin "${repo}"
-    git fetch origin --quiet  --filter=tree:0 --tags "${commit}"
+    retry_cmd git fetch origin --quiet  --filter=tree:0 --tags "${commit}"
     git checkout "${commit}"
     popd >/dev/null
 }
@@ -516,7 +540,7 @@ handle_deps() {
             go mod edit -require "${modulepath}@${ver}"
 
             rm -fr "${REPOROOT}/${replace_path}"
-            git clone "${repo_url}" --branch "${ver}" "${REPOROOT}/${replace_path}"
+            retry_cmd git clone "${repo_url}" --branch "${ver}" "${REPOROOT}/${replace_path}"
             rm -fr "${REPOROOT}/${replace_path}/.git"
             find "${REPOROOT}/${replace_path}/" -name "OWNERS" -delete
         ;;
@@ -623,14 +647,6 @@ update_images() {
         sed -i "s|pause_image =.*|pause_image = \"${pause_image_digest}\"|g" \
             "${REPOROOT}/packaging/crio.conf.d/10-microshift_${goarch}.conf"
     done
-
-    # Lock OVN-K refs until https://issues.redhat.com/browse/OCPBUGS-65584 is resolved.
-    yq -i \
-        '.images."ovn-kubernetes-microshift" = "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:ad19c1f0010ebcda83c0f0e9f0b2618f0ccd4353388c8ce668c036a153dc70ab"' \
-        "${REPOROOT}/assets/release/release-x86_64.json"
-    yq -i \
-        '.images."ovn-kubernetes-microshift" = "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:9a9e1e2dff0b52b366036024ecaff25903baab14b03a6b9daba74f6dc9b66441"' \
-        "${REPOROOT}/assets/release/release-aarch64.json"
 
     popd >/dev/null
 
@@ -1094,6 +1110,14 @@ EOF
 
 update_olm_images() {
     title "Rebasing operator-lifecycle-manager manifests"
+
+    # Temporary fix, remove once OCPBUGS-77006 is solved.
+    local olm_kustomization="${REPOROOT}/assets/optional/operator-lifecycle-manager/kustomization.yaml"
+    sed -i \
+        -e '/0000_50_olm_00-pprof-config\.yaml/d' \
+        -e '/0000_50_olm_00-pprof-rbac\.yaml/d' \
+        -e '/0000_50_olm_00-pprof-secret\.yaml/d' \
+        "${olm_kustomization}"
 
     # Replace hardcoded image refs with variables. Variables will be provided via kustomize's patches (added to `env`).
     # Expr with --util-image finds line with --util-image and edits the line after.

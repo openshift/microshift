@@ -129,6 +129,7 @@ type unpulledImage struct {
 
 type failedImage struct {
 	unpulledImage
+
 	Message string
 }
 

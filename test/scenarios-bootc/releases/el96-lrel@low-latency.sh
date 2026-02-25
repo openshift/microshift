@@ -5,7 +5,7 @@ export TEST_RANDOMIZATION=none
 
 # Sourced from scenario.sh and uses functions defined there.
 
-start_image="rhel96-bootc-brew-${LATEST_RELEASE_TYPE}-with-optional-tuned"
+start_image="rhel96-bootc-brew-lrel-tuned"
 
 scenario_create_vms() {
     exit_if_image_not_found "${start_image}"

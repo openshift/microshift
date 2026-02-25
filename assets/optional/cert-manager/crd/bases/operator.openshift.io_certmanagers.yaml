@@ -177,6 +177,13 @@ spec:
                     additionalProperties:
                       type: string
                     type: object
+                  overrideReplicas:
+                    description: |-
+                      OverrideReplicas defines the number of replicas for the operand deployment.
+                      If not specified, the default replicas from the deployment manifest will be used.
+                    format: int32
+                    minimum: 1
+                    type: integer
                   overrideResources:
                     description: |-
                       CertManagerResourceRequirements describes the compute resource requirements for the cert-manager operands,
@@ -413,6 +420,13 @@ spec:
                     additionalProperties:
                       type: string
                     type: object
+                  overrideReplicas:
+                    description: |-
+                      OverrideReplicas defines the number of replicas for the operand deployment.
+                      If not specified, the default replicas from the deployment manifest will be used.
+                    format: int32
+                    minimum: 1
+                    type: integer
                   overrideResources:
                     description: |-
                       CertManagerResourceRequirements describes the compute resource requirements for the cert-manager operands,
@@ -502,6 +516,26 @@ spec:
                         x-kubernetes-list-type: atomic
                     type: object
                 type: object
+              defaultNetworkPolicy:
+                description: |-
+                  DefaultNetworkPolicy enables the default network policy for cert-manager components.
+                  When set to "true", the operator will create default network policies to secure
+                  communication between cert-manager controller, webhook, and cainjector components.
+                  When set to "false" or empty, no default network policies are created.
+                  Valid values are: "true", "false", or empty (default: false).
+
+                  This field is immutable once set to "true" for security reasons. Network policies
+                  cannot be disabled once enabled to prevent accidental security degradation.
+                  Users should carefully plan their network policy requirements before enabling this field.
+                enum:
+                - "true"
+                - "false"
+                - ""
+                type: string
+                x-kubernetes-validations:
+                - message: defaultNetworkPolicy cannot be changed from 'true' to 'false'
+                    once set
+                  rule: oldSelf != 'true' || self == 'true'
               logLevel:
                 default: Normal
                 description: |-
@@ -522,6 +556,256 @@ spec:
                   should manage the component
                 pattern: ^(Managed|Unmanaged|Force|Removed)$
                 type: string
+              networkPolicies:
+                description: |-
+                  NetworkPolicies specifies the egress network policy configuration to be applied to cert-manager
+                  pods/operands when DefaultNetworkPolicy is "true". By default, enabling network policies
+                  creates a deny-all policy that blocks all outgoing traffic from cert-manager components.
+                  Ingress rules are automatically handled by the operator based on the current running ports.
+                  Use this field to provide the necessary egress policy rules that allow required outbound traffic
+                  for cert-manager to function properly (e.g., API server communication, external issuer access, etc.).
+
+                  Each NetworkPolicy in this slice will be created as a separate Kubernetes NetworkPolicy
+                  resource. Multiple policies can be defined to organize egress rules logically (e.g., separate
+                  policies for different types of outbound traffic or different security zones).
+
+                  This field is only effective when DefaultNetworkPolicy is set to "true".
+                  If DefaultNetworkPolicy is "true" but this field is not provided, cert-manager
+                  components will be isolated with deny-all egress policies.
+
+                  This field is immutable once DefaultNetworkPolicy is set to "true" for security reasons.
+                items:
+                  description: |-
+                    NetworkPolicy represents a custom network policy configuration for operator-managed components.
+                    It includes a name for identification and the network policy rules to be enforced.
+                  properties:
+                    componentName:
+                      description: ComponentName represents the different cert-manager
+                        components that can have network policies applied.
+                      enum:
+                      - CoreController
+                      type: string
+                    egress:
+                      description: |-
+                        egress is a list of egress rules to be applied to the selected pods. Outgoing traffic
+                        is allowed if there are no NetworkPolicies selecting the pod (and cluster policy
+                        otherwise allows the traffic), OR if the traffic matches at least one egress rule
+                        across all of the NetworkPolicy objects whose podSelector matches the pod. If
+                        this field is empty then this NetworkPolicy limits all outgoing traffic (and serves
+                        solely to ensure that the pods it selects are isolated by default).
+                        The operator will automatically handle ingress rules based on the current running ports.
+                      items:
+                        description: |-
+                          NetworkPolicyEgressRule describes a particular set of traffic that is allowed out of pods
+                          matched by a NetworkPolicySpec's podSelector. The traffic must match both ports and to.
+                          This type is beta-level in 1.8
+                        properties:
+                          ports:
+                            description: |-
+                              ports is a list of destination ports for outgoing traffic.
+                              Each item in this list is combined using a logical OR. If this field is
+                              empty or missing, this rule matches all ports (traffic not restricted by port).
+                              If this field is present and contains at least one item, then this rule allows
+                              traffic only if the traffic matches at least one port in the list.
+                            items:
+                              description: NetworkPolicyPort describes a port to allow
+                                traffic on
+                              properties:
+                                endPort:
+                                  description: |-
+                                    endPort indicates that the range of ports from port to endPort if set, inclusive,
+                                    should be allowed by the policy. This field cannot be defined if the port field
+                                    is not defined or if the port field is defined as a named (string) port.
+                                    The endPort must be equal or greater than port.
+                                  format: int32
+                                  type: integer
+                                port:
+                                  anyOf:
+                                  - type: integer
+                                  - type: string
+                                  description: |-
+                                    port represents the port on the given protocol. This can either be a numerical or named
+                                    port on a pod. If this field is not provided, this matches all port names and
+                                    numbers.
+                                    If present, only traffic on the specified protocol AND port will be matched.
+                                  x-kubernetes-int-or-string: true
+                                protocol:
+                                  default: TCP
+                                  description: |-
+                                    protocol represents the protocol (TCP, UDP, or SCTP) which traffic must match.
+                                    If not specified, this field defaults to TCP.
+                                  type: string
+                              type: object
+                            type: array
+                            x-kubernetes-list-type: atomic
+                          to:
+                            description: |-
+                              to is a list of destinations for outgoing traffic of pods selected for this rule.
+                              Items in this list are combined using a logical OR operation. If this field is
+                              empty or missing, this rule matches all destinations (traffic not restricted by
+                              destination). If this field is present and contains at least one item, this rule
+                              allows traffic only if the traffic matches at least one item in the to list.
+                            items:
+                              description: |-
+                                NetworkPolicyPeer describes a peer to allow traffic to/from. Only certain combinations of
+                                fields are allowed
+                              properties:
+                                ipBlock:
+                                  description: |-
+                                    ipBlock defines policy on a particular IPBlock. If this field is set then
+                                    neither of the other fields can be.
+                                  properties:
+                                    cidr:
+                                      description: |-
+                                        cidr is a string representing the IPBlock
+                                        Valid examples are "192.168.1.0/24" or "2001:db8::/64"
+                                      type: string
+                                    except:
+                                      description: |-
+                                        except is a slice of CIDRs that should not be included within an IPBlock
+                                        Valid examples are "192.168.1.0/24" or "2001:db8::/64"
+                                        Except values will be rejected if they are outside the cidr range
+                                      items:
+                                        type: string
+                                      type: array
+                                      x-kubernetes-list-type: atomic
+                                  required:
+                                  - cidr
+                                  type: object
+                                namespaceSelector:
+                                  description: |-
+                                    namespaceSelector selects namespaces using cluster-scoped labels. This field follows
+                                    standard label selector semantics; if present but empty, it selects all namespaces.
+
+                                    If podSelector is also set, then the NetworkPolicyPeer as a whole selects
+                                    the pods matching podSelector in the namespaces selected by namespaceSelector.
+                                    Otherwise it selects all pods in the namespaces selected by namespaceSelector.
+                                  properties:
+                                    matchExpressions:
+                                      description: matchExpressions is a list of label
+                                        selector requirements. The requirements are
+                                        ANDed.
+                                      items:
+                                        description: |-
+                                          A label selector requirement is a selector that contains values, a key, and an operator that
+                                          relates the key and values.
+                                        properties:
+                                          key:
+                                            description: key is the label key that
+                                              the selector applies to.
+                                            type: string
+                                          operator:
+                                            description: |-
+                                              operator represents a key's relationship to a set of values.
+                                              Valid operators are In, NotIn, Exists and DoesNotExist.
+                                            type: string
+                                          values:
+                                            description: |-
+                                              values is an array of string values. If the operator is In or NotIn,
+                                              the values array must be non-empty. If the operator is Exists or DoesNotExist,
+                                              the values array must be empty. This array is replaced during a strategic
+                                              merge patch.
+                                            items:
+                                              type: string
+                                            type: array
+                                            x-kubernetes-list-type: atomic
+                                        required:
+                                        - key
+                                        - operator
+                                        type: object
+                                      type: array
+                                      x-kubernetes-list-type: atomic
+                                    matchLabels:
+                                      additionalProperties:
+                                        type: string
+                                      description: |-
+                                        matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
+                                        map is equivalent to an element of matchExpressions, whose key field is "key", the
+                                        operator is "In", and the values array contains only "value". The requirements are ANDed.
+                                      type: object
+                                  type: object
+                                  x-kubernetes-map-type: atomic
+                                podSelector:
+                                  description: |-
+                                    podSelector is a label selector which selects pods. This field follows standard label
+                                    selector semantics; if present but empty, it selects all pods.
+
+                                    If namespaceSelector is also set, then the NetworkPolicyPeer as a whole selects
+                                    the pods matching podSelector in the Namespaces selected by NamespaceSelector.
+                                    Otherwise it selects the pods matching podSelector in the policy's own namespace.
+                                  properties:
+                                    matchExpressions:
+                                      description: matchExpressions is a list of label
+                                        selector requirements. The requirements are
+                                        ANDed.
+                                      items:
+                                        description: |-
+                                          A label selector requirement is a selector that contains values, a key, and an operator that
+                                          relates the key and values.
+                                        properties:
+                                          key:
+                                            description: key is the label key that
+                                              the selector applies to.
+                                            type: string
+                                          operator:
+                                            description: |-
+                                              operator represents a key's relationship to a set of values.
+                                              Valid operators are In, NotIn, Exists and DoesNotExist.
+                                            type: string
+                                          values:
+                                            description: |-
+                                              values is an array of string values. If the operator is In or NotIn,
+                                              the values array must be non-empty. If the operator is Exists or DoesNotExist,
+                                              the values array must be empty. This array is replaced during a strategic
+                                              merge patch.
+                                            items:
+                                              type: string
+                                            type: array
+                                            x-kubernetes-list-type: atomic
+                                        required:
+                                        - key
+                                        - operator
+                                        type: object
+                                      type: array
+                                      x-kubernetes-list-type: atomic
+                                    matchLabels:
+                                      additionalProperties:
+                                        type: string
+                                      description: |-
+                                        matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
+                                        map is equivalent to an element of matchExpressions, whose key field is "key", the
+                                        operator is "In", and the values array contains only "value". The requirements are ANDed.
+                                      type: object
+                                  type: object
+                                  x-kubernetes-map-type: atomic
+                              type: object
+                            type: array
+                            x-kubernetes-list-type: atomic
+                        type: object
+                      type: array
+                      x-kubernetes-list-type: atomic
+                    name:
+                      description: |-
+                        Name is a unique identifier for this network policy configuration.
+                        This name will be used as part of the generated NetworkPolicy resource name.
+                      maxLength: 253
+                      minLength: 1
+                      type: string
+                  required:
+                  - componentName
+                  - name
+                  type: object
+                maxItems: 50
+                minItems: 0
+                type: array
+                x-kubernetes-list-map-keys:
+                - name
+                - componentName
+                x-kubernetes-list-type: map
+                x-kubernetes-validations:
+                - message: name and componentName fields in networkPolicies are immutable
+                  rule: oldSelf.all(op, self.exists(p, p.name == op.name && p.componentName
+                    == op.componentName))
               observedConfig:
                 description: |-
                   observedConfig holds a sparse config that controller has observed from the cluster state.  It exists in spec because
@@ -694,6 +978,13 @@ spec:
                     additionalProperties:
                       type: string
                     type: object
+                  overrideReplicas:
+                    description: |-
+                      OverrideReplicas defines the number of replicas for the operand deployment.
+                      If not specified, the default replicas from the deployment manifest will be used.
+                    format: int32
+                    minimum: 1
+                    type: integer
                   overrideResources:
                     description: |-
                       CertManagerResourceRequirements describes the compute resource requirements for the cert-manager operands,

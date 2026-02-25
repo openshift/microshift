@@ -5,11 +5,12 @@ metadata:
   annotations:
     openshift.io/display-name: vLLM AMD GPU ServingRuntime for KServe
     opendatahub.io/recommended-accelerators: '["amd.com/gpu"]'
-    opendatahub.io/runtime-version: 'v0.8.4.3'
+    opendatahub.io/runtime-version: 'v0.10.1.1'
   labels:
     opendatahub.io/dashboard: 'true'
 spec:
   annotations:
+    opendatahub.io/kserve-runtime: 'vllm'
     prometheus.io/port: '8080'
     prometheus.io/path: '/metrics'
   multiModel: false

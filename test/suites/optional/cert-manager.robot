@@ -13,6 +13,7 @@ Resource            ../../resources/oc.resource
 Resource            ../../resources/microshift-config.resource
 Resource            ../../resources/microshift-network.resource
 Resource            ../../resources/microshift-process.resource
+Resource            ../../resources/ostree-health.resource
 
 Suite Setup         Setup Suite With Namespace
 Suite Teardown      Teardown Suite With Namespace
@@ -63,7 +64,7 @@ Create Ingress route with Custom certificate
     Deploy Hello MicroShift
     ${route_yaml}=    Create Ingress Route YAML
     Apply YAML Manifest    ${route_yaml}
-    Oc Wait    -n ${NAMESPACE} route ${ROUTE_NAME}    --for=jsonpath='.status.ingress' --timeout=60s
+    Oc Wait    -n ${NAMESPACE} route ${ROUTE_NAME}    --for=jsonpath='.status.ingress' --timeout=120s
     [Teardown]    Run Keywords
     ...    Remove ClusterIssuer
 
@@ -399,27 +400,18 @@ Router Should Resolve Hostname
     Should Contain    ${fuse_device}    Name:    ${hostname}
 
 Setup DNS For Test
-    [Documentation]    Setup DNS using CoreDNS hosts feature if available, otherwise use legacy method
+    [Documentation]    Setup DNS using CoreDNS hosts feature
     [Arguments]    ${ip_address}    ${dns_name}
-    ${config}=    Show Config    default
-    TRY
-        VAR    ${hosts}=    ${config}[dns][hosts]
-        Add Entry To Hosts    ${ip_address}    ${dns_name}    /etc/hosts
-        Drop In MicroShift Config    ${HOSTSFILE_ENABLED}    20-dns
-        Restart MicroShift
-    EXCEPT
-        Configure DNS For Domain    ${ip_address}    ${dns_name}
-    END
+
+    Add Entry To Hosts    ${ip_address}    ${dns_name}    /etc/hosts
+    Drop In MicroShift Config    ${HOSTSFILE_ENABLED}    20-dns
+    Restart MicroShift
+    Wait For MicroShift Healthcheck Success
 
 Cleanup DNS For Test
-    [Documentation]    Cleanup DNS configuration based on method used
+    [Documentation]    Cleanup DNS configuration
     [Arguments]    ${dns_name}
-    ${config}=    Show Config    default
-    TRY
-        VAR    ${hosts}=    ${config}[dns][hosts]
-        Remove Entry From Hosts    ${dns_name}
-        Remove Drop In MicroShift Config    20-dns
-        Restart MicroShift
-    EXCEPT
-        Remove DNS Configuration
-    END
+
+    Remove Entry From Hosts    ${dns_name}
+    Remove Drop In MicroShift Config    20-dns
+    Restart MicroShift

@@ -145,7 +145,7 @@ func parseJSONValue(jsonType interface{}) (value string, node []*yaml.Node) {
 }
 
 func schemaKeyToOrderedArray[K string | int, V any](schemaProperties map[K]V) []K {
-	var ordered = []K{}
+	var ordered = make([]K, 0, len(schemaProperties))
 	for k := range schemaProperties {
 		ordered = append(ordered, k)
 	}

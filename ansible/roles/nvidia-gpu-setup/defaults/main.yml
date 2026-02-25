@@ -8,11 +8,11 @@ nvidia_driver_version: "575-open"
 nvidia_driver_module: "nvidia-driver:{{ nvidia_driver_version }}"
 
 # RHEL version for repositories
-rhel_version: "{{ ansible_distribution_major_version }}"
+rhel_version: "{{ ansible_facts.distribution_major_version }}"
 
 # CUDA repository URL
 cuda_repo_base_url: "https://developer.download.nvidia.com/compute/cuda/repos"
-cuda_repo_url: "{{ cuda_repo_base_url }}/rhel{{ rhel_version }}/{{ ansible_architecture }}/cuda-rhel{{ rhel_version }}.repo"
+cuda_repo_url: "{{ cuda_repo_base_url }}/rhel{{ rhel_version }}/{{ ansible_facts.architecture }}/cuda-rhel{{ rhel_version }}.repo"
 
 # Container toolkit repository (stable)
 container_toolkit_repo_url: "https://nvidia.github.io/libnvidia-container/stable/rpm/nvidia-container-toolkit.repo"

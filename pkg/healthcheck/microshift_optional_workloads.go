@@ -33,6 +33,10 @@ var optionalWorkloadPaths = map[string]optionalWorkloads{
 		Namespace: "redhat-ods-applications",
 		Workloads: NamespaceWorkloads{Deployments: []string{"kserve-controller-manager"}},
 	},
+	"/usr/lib/microshift/manifests.d/070-microshift-sriov": {
+		Namespace: "sriov-network-operator",
+		Workloads: NamespaceWorkloads{Deployments: []string{"sriov-network-operator"}},
+	},
 }
 
 // fillOptionalMicroShiftWorkloads assembles list of optional MicroShift workloads

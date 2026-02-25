@@ -1,3 +1,0 @@
-{{- if env.Getenv "BREW_Y0_RELEASE_VERSION" "" -}}
-localhost/rhel96-bootc-brew-zstream-with-optional:latest
-{{- end }}

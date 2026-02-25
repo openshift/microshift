@@ -49,7 +49,7 @@ Test Suite Setup
     Upload Lvmd Config    ${config}
     Oc Apply    -f ${STORAGE_CLASS} -f ${SNAPSHOT_CLASS}
     Restart Microshift
-    Restart Greenboot And Wait For Success
+    Wait For MicroShift Healthcheck Success
 
 Test Suite Teardown
     [Documentation]    Clean up test suite resources
@@ -57,7 +57,7 @@ Test Suite Teardown
     Restore Lvmd Config
     Delete Thin Storage Pool
     Restart Microshift
-    Restart Greenboot And Wait For Success
+    Wait For MicroShift Healthcheck Success
     Teardown Suite
 
 Test Case Setup

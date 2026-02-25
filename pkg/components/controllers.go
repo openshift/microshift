@@ -349,7 +349,7 @@ func startDNSController(ctx context.Context, cfg *config.Config, kubeconfigPath 
 // type list. Also quote/escape any characters that are special to HAProxy (\,', and ").
 // See http://cbonte.github.io/haproxy-dconv/2.2/configuration.html#2.2
 func getMIMETypes(mimeTypes []operatorv1.CompressionMIMEType) []string {
-	mimes := []string{}
+	mimes := make([]string, 0, len(mimeTypes))
 
 	for _, m := range mimeTypes {
 		mimeType := string(m)

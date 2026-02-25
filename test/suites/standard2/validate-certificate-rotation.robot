@@ -40,7 +40,7 @@ Setup
     Check Required Env Variables
     Login MicroShift Host
     Setup Kubeconfig    # for readiness checks
-    Restart Greenboot And Wait For Success
+    Wait For MicroShift Healthcheck Success
 
 Teardown
     [Documentation]    Test suite teardown

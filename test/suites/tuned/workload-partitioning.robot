@@ -8,7 +8,7 @@ Resource            ../../resources/microshift-process.resource
 Resource            ../../resources/microshift-network.resource
 Resource            ../../resources/ostree-health.resource
 
-Suite Setup         Setup Suite And Wait For Greenboot
+Suite Setup         Setup Suite And Wait For Healthcheck
 Suite Teardown      Teardown Suite
 
 
@@ -255,7 +255,7 @@ Cleanup And Create NS
     ${ns}=    Create Unique Namespace
     VAR    ${NAMESPACE}=    ${ns}    scope=SUITE
 
-Setup Suite And Wait For Greenboot
-    [Documentation]    Run setup suit and wait for greenboot to become ready
+Setup Suite And Wait For Healthcheck
+    [Documentation]    Run setup suit and wait for healthcheck to succeed
     Setup Suite
-    Restart Greenboot And Wait For Success
+    Wait For MicroShift Healthcheck Success

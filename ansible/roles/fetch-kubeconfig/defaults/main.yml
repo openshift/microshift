@@ -3,4 +3,4 @@
 
 kubeconfig_directory: "{{ lookup('env', 'HOME') }}/.kube"
 kubeconfig_local_file: "{{ kubeconfig_directory }}/config"
-kubeconfig_remote_file: "/var/lib/microshift/resources/kubeadmin/{{ ansible_fqdn }}/kubeconfig"
+kubeconfig_remote_file: "/var/lib/microshift/resources/kubeadmin/{{ ansible_facts.fqdn }}/kubeconfig"

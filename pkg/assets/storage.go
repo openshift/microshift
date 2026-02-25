@@ -69,7 +69,7 @@ func applySCs(ctx context.Context, scs []string, handler resourceHandler, render
 			return fmt.Errorf("error getting asset %s: %v", sc, err)
 		}
 		handler.Read(objBytes, render, params)
-		if err := handler.Handle(ctx); err != nil {
+		if err := handleWithRetry(ctx, handler, sc); err != nil {
 			klog.Warningf("Failed to apply sc api %s: %v", sc, err)
 			return err
 		}
@@ -128,7 +128,7 @@ func applyVolumeSnapshotClass(ctx context.Context, handler resourceHandler, vcs 
 			return fmt.Errorf("error getting asset %s: %v", vc, err)
 		}
 		handler.Read(objBytes, render, params)
-		if err := handler.Handle(ctx); err != nil {
+		if err := handleWithRetry(ctx, handler, vc); err != nil {
 			klog.Warningf("Failed to apply volumeSnapshotClass api %s: %v", vc, err)
 			return err
 		}

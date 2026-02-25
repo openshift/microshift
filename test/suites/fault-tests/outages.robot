@@ -39,8 +39,9 @@ Network Disconnection
     Local Command Should Work    ${STRESS_TESTING_SCRIPT} -d network_outage ${STRESS_TESTING_REMOTE_FLAGS}
 
     # Check results
-    ${system_rebooted}=    Is System Rebooted    ${old_bootid}
+    ${system_rebooted}    ${cur_bootid}=    Is System Rebooted    ${old_bootid}
     Should Not Be True    ${system_rebooted}
+    Should Be Equal As Strings    ${cur_bootid}    ${old_bootid}
     Wait For MicroShift
     All Pods Should Be Running    timeout=600s
 

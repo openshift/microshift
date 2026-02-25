@@ -33,7 +33,7 @@ Verify MicroShift Runs On Both NICs
 
     Configure Subject Alternative Name    ${USHIFT_HOST_IP1}    ${USHIFT_HOST_IP2}
     Restart MicroShift
-    Restart Greenboot And Wait For Success
+    Wait For MicroShift Healthcheck Success
 
     Verify Hello MicroShift LB
     Verify Hello MicroShift NodePort    ${USHIFT_HOST_IP1}
@@ -55,7 +55,7 @@ Verify MicroShift Runs Only On Primary NIC
     Disable Interface    ${NIC2_NAME}
 
     Restart MicroShift
-    Restart Greenboot And Wait For Success
+    Wait For MicroShift Healthcheck Success
 
     Verify MicroShift On Single NIC    ${USHIFT_HOST_IP1}    ${USHIFT_HOST_IP2}
 

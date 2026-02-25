@@ -3,6 +3,8 @@ apiVersion: apps/v1
 metadata:
   name: csi-snapshot-controller
   namespace: kube-system
+  annotations:
+    release.openshift.io/desired-version: ${RELEASE_VERSION}
   labels:
     hypershift.openshift.io/managed-by: csi-snapshot-controller-operator
 spec:

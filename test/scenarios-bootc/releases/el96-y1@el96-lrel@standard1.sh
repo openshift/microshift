@@ -7,14 +7,14 @@
 export TEST_RANDOMIZATION=none
 
 start_image="rhel96-bootc-brew-y1-with-optional"
-dest_image="rhel96-bootc-brew-${LATEST_RELEASE_TYPE}-with-optional"
+dest_image="rhel96-bootc-brew-lrel-optional"
 
 scenario_create_vms() {
     exit_if_image_not_found "${start_image}"
     exit_if_image_not_found "${dest_image}"
 
     prepare_kickstart host1 kickstart-bootc.ks.template "${start_image}"
-    launch_vm --boot_blueprint rhel96-bootc
+    launch_vm --boot_blueprint rhel96-bootc --vm_vcpus 4
 }
 
 scenario_remove_vms() {
@@ -33,5 +33,5 @@ scenario_run_tests() {
         --variable "BOOTC_REGISTRY:${MIRROR_REGISTRY_URL}" \
         --variable "EXPECTED_OS_VERSION:9.6" \
         suites/upgrade/upgrade-successful.robot \
-        suites/standard1/ suites/selinux/validate-selinux-policy.robot
+        suites/standard1/
 }

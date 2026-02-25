@@ -56,5 +56,5 @@ Setup Hostname
     ${old}=    Change Hostname    ${hostname}
     Cleanup MicroShift    --all    --keep-images
     Start MicroShift
-    Restart Greenboot And Wait For Success
+    Wait For MicroShift Healthcheck Success
     RETURN    ${old}

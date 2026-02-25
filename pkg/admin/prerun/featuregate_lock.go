@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"reflect"
 
 	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/util"
@@ -16,6 +15,8 @@ import (
 var (
 	featureGateLockFilePath = filepath.Join(config.DataDir, "no-upgrade")
 	errLockFileDoesNotExist = errors.New("feature gate lock file does not exist")
+	// getExecutableVersion is a function variable that allows tests to override the version
+	getExecutableVersion = GetVersionOfExecutable
 )
 
 // featureGateLockFile represents the structure of the lock file
@@ -45,42 +46,16 @@ func featureGateLockManagement(cfg *config.Config) error {
 	if err != nil {
 		return fmt.Errorf("failed to check if lock file exists: %w", err)
 	}
-
 	// Lock file exists - validate configuration
 	if lockExists {
-		return validateFeatureGateLockFile(cfg)
+		return runValidationsChecks(cfg)
 	}
-
 	// No lock file exists yet and custom feature gates are configured, so this is the first time configuring custom feature gates
-	if hasCustomFeatureGates(cfg.ApiServer.FeatureGates) {
-		klog.InfoS("Custom feature gates detected", "featureSet", cfg.ApiServer.FeatureGates.FeatureSet)
+	if cfg.ApiServer.FeatureGates.FeatureSet != "" {
 		return createFeatureGateLockFile(cfg)
 	}
-
 	// No lock file and no custom feature gates - normal operation
-	klog.InfoS("No custom feature gates configured - skipping lock file management")
 	return nil
-}
-
-// hasCustomFeatureGates checks if any custom feature gates are configured
-func hasCustomFeatureGates(fg config.FeatureGates) bool {
-	// Empty feature set means no custom feature gates
-	if fg.FeatureSet == "" {
-		return false
-	}
-
-	// TechPreviewNoUpgrade and DevPreviewNoUpgrade are considered custom
-	if fg.FeatureSet == config.FeatureSetTechPreviewNoUpgrade ||
-		fg.FeatureSet == config.FeatureSetDevPreviewNoUpgrade {
-		return true
-	}
-
-	// CustomNoUpgrade requires actual enabled or disabled features
-	if fg.FeatureSet == config.FeatureSetCustomNoUpgrade {
-		return len(fg.CustomNoUpgrade.Enabled) > 0 || len(fg.CustomNoUpgrade.Disabled) > 0
-	}
-
-	return false
 }
 
 // createFeatureGateLockFile creates the lock file with current configuration
@@ -88,15 +63,10 @@ func createFeatureGateLockFile(cfg *config.Config) error {
 	klog.InfoS("Creating feature gate lock file - this cluster can no longer be upgraded",
 		"path", featureGateLockFilePath)
 
-	// Get current version from version file
-	currentVersion, err := getVersionOfData()
+	// Get current version from executable
+	currentVersion, err := getExecutableVersion()
 	if err != nil {
-		// If version file doesn't exist yet, get executable version
-		klog.InfoS("Version file does not exist yet, using executable version")
-		currentVersion, err = GetVersionOfExecutable()
-		if err != nil {
-			return fmt.Errorf("failed to get version: %w", err)
-		}
+		return fmt.Errorf("failed to get version: %w", err)
 	}
 
 	lockFile := featureGateLockFile{
@@ -116,9 +86,9 @@ func createFeatureGateLockFile(cfg *config.Config) error {
 	return nil
 }
 
-// validateFeatureGateLockFile validates that the current configuration matches the lock file
-// and that no version upgrade has occurred
-func validateFeatureGateLockFile(cfg *config.Config) error {
+// runValidationsChecks validates the feature gate lock file and the current configuration
+// It returns an error if the configuration is invalid or if an x or y stream version upgrade has occurred.
+func runValidationsChecks(cfg *config.Config) error {
 	klog.InfoS("Validating feature gate lock file", "path", featureGateLockFilePath)
 
 	lockFile, err := readFeatureGateLockFile(featureGateLockFilePath)
@@ -127,9 +97,8 @@ func validateFeatureGateLockFile(cfg *config.Config) error {
 	}
 
 	// Check if feature gate configuration has changed
-	if err := compareFeatureGates(lockFile, cfg.ApiServer.FeatureGates); err != nil {
-		return fmt.Errorf("feature gate configuration has changed: %w\n\n"+
-			"Custom feature gates cannot be modified or reverted once applied.\n"+
+	if err := configValidationChecksPass(lockFile, cfg.ApiServer.FeatureGates); err != nil {
+		return fmt.Errorf("detected invalid changes in feature gate configuration: %w\n\n"+
 			"To restore MicroShift to a supported state, you must:\n"+
 			"1. Run: sudo microshift-cleanup-data --all\n"+
 			"2. Remove custom feature gates from /etc/microshift/config.yaml\n"+
@@ -137,12 +106,12 @@ func validateFeatureGateLockFile(cfg *config.Config) error {
 	}
 
 	// Check if version has changed (upgrade attempted)
-	currentVersion, err := getVersionOfData()
+	currentExecutableVersion, err := getExecutableVersion()
 	if err != nil {
-		return fmt.Errorf("failed to get current version: %w", err)
+		return fmt.Errorf("failed to get current executable version: %w", err)
 	}
 
-	if lockFile.Version != currentVersion {
+	if lockFile.Version.Major != currentExecutableVersion.Major || lockFile.Version.Minor != currentExecutableVersion.Minor {
 		return fmt.Errorf("version upgrade detected with custom feature gates: locked version %s, current version %s\n\n"+
 			"Upgrades are not supported when custom feature gates are configured.\n"+
 			"Custom feature gates (%s) were configured in version %s.\n"+
@@ -151,7 +120,7 @@ func validateFeatureGateLockFile(cfg *config.Config) error {
 			"2. Run: sudo microshift-cleanup-data --all\n"+
 			"3. Remove custom feature gates from /etc/microshift/config.yaml\n"+
 			"4. Restart MicroShift: sudo systemctl restart microshift",
-			lockFile.Version.String(), currentVersion.String(),
+			lockFile.Version.String(), currentExecutableVersion.String(),
 			lockFile.FeatureSet, lockFile.Version.String(), lockFile.Version.String())
 	}
 
@@ -159,21 +128,16 @@ func validateFeatureGateLockFile(cfg *config.Config) error {
 	return nil
 }
 
-// compareFeatureGates compares the lock file with current configuration
-func compareFeatureGates(lockFile featureGateLockFile, current config.FeatureGates) error {
-	var errs []error
-
-	if lockFile.FeatureSet != current.FeatureSet {
-		errs = append(errs, fmt.Errorf("feature set changed: locked config has %q, current config has %q",
-			lockFile.FeatureSet, current.FeatureSet))
+func configValidationChecksPass(prev featureGateLockFile, current config.FeatureGates) error {
+	if prev.FeatureSet != "" && current.FeatureSet == "" {
+		// Disallow changing from feature set to no feature set
+		return fmt.Errorf("cannot unset feature set. Previous config had feature set %q, current config has no feature set configured", prev.FeatureSet)
 	}
-
-	if !reflect.DeepEqual(lockFile.CustomNoUpgrade, current.CustomNoUpgrade) {
-		errs = append(errs, fmt.Errorf("custom feature gates changed: locked config has %#v, current config has %#v",
-			lockFile.CustomNoUpgrade, current.CustomNoUpgrade))
+	if prev.FeatureSet == config.FeatureSetCustomNoUpgrade && current.FeatureSet != config.FeatureSetCustomNoUpgrade {
+		// Disallow changing from custom feature gates to any other feature set
+		return fmt.Errorf("cannot change CustomNoUpgrade feature set. Previous feature set was %q, current feature set is %q", prev.FeatureSet, current.FeatureSet)
 	}
-
-	return errors.Join(errs...)
+	return nil
 }
 
 // writeFeatureGateLockFile writes the lock file to disk in YAML format

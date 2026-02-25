@@ -15,8 +15,6 @@ SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 source "${SCRIPTDIR}/common.sh"
 # shellcheck source=test/bin/common_versions.sh
 source "${SCRIPTDIR}/common_versions.sh"
-# shellcheck source=test/bin/scenario_container.sh
-source "${SCRIPTDIR}/scenario_container.sh"
 
 DEFAULT_BOOT_BLUEPRINT="rhel-9.6"
 LVM_SYSROOT_SIZE="15360"
@@ -26,13 +24,14 @@ VM_BOOT_TIMEOUT=1200 # Overall total boot times are around 15m
 VM_GREENBOOT_TIMEOUT=1800 # Greenboot readiness may take up to 15-30m depending on the load
 SKIP_SOS=${SKIP_SOS:-false}  # may be overridden in global settings file
 SKIP_GREENBOOT=${SKIP_GREENBOOT:-false}  # may be overridden in scenario file
+GREENBOOT_TIMEOUT=${GREENBOOT_TIMEOUT:-600}  # may be overridden in scenario file
 # Container image signature verification should be disabled by default in the
 # main branch because not all the images are signed
 IMAGE_SIGSTORE_ENABLED=false # may be overridden in scenario file
 VNC_CONSOLE=${VNC_CONSOLE:-false}  # may be overridden in global settings file
 TEST_RANDOMIZATION="all"  # may be overridden in scenario file
 TEST_EXCLUDES="none"  # may be overridden in scenario file
-TEST_EXECUTION_TIMEOUT="30m" # may be overriden in scenario file
+TEST_EXECUTION_TIMEOUT="${TEST_EXECUTION_TIMEOUT:-30m}" # may be overriden in scenario file or CI config
 SUBSCRIPTION_MANAGER_PLUGIN="${SUBSCRIPTION_MANAGER_PLUGIN:-${SCRIPTDIR}/subscription_manager_register.sh}"  # may be overridden in global settings file
 RUN_HOST_OVERRIDE=""  # target any given VM for running scenarios
 
@@ -183,7 +182,7 @@ sos_report() {
         else
             if "${junit}"; then
                 record_junit "${vmname}" "sos-report" "OK"
-            fi  
+            fi
         fi
     done
     return "${scenario_result}"
@@ -197,7 +196,7 @@ sos_report_for_vm() {
     # is. Copy the script to the host, just in case, along with a
     # wrapper that knows how to execute it or the installed version.
 
-    copy_file_to_vm "${vmname}" "${ROOTDIR}/test/assets/sos-wrapper.sh" "/tmp/sos-wrapper.sh" 
+    copy_file_to_vm "${vmname}" "${ROOTDIR}/test/assets/sos-wrapper.sh" "/tmp/sos-wrapper.sh"
     copy_file_to_vm "${vmname}" "${ROOTDIR}/scripts/microshift-sos-report.sh" "/tmp/microshift-sos-report.sh"
     run_command_on_vm "${vmname}" "sudo bash -x /tmp/sos-wrapper.sh"
     mkdir -p "${vmdir}/sos"
@@ -253,9 +252,9 @@ sos_report_for_vm_offline() {
     invoke_qemu_script "bash" \
         "--vm"  "${full_vmname}" \
         "--args"  "sudo bash -x /tmp/sos-wrapper.sh"
-    
+
     mkdir -p "${vmdir}/sos"
-    
+
     invoke_qemu_script "download" \
         "--vm"  "${full_vmname}" \
         "--src_dir" "/tmp/" \
@@ -291,7 +290,7 @@ sos_report_for_vm_offline() {
         "--vm"  "${full_vmname}" \
         "--src_dir" "/tmp/var-log-anaconda/" \
         "--dst_dir" "${vmdir}/anaconda/" \
-        "--filename" "*.log" 
+        "--filename" "*.log"
 }
 
 # Public function to render a unique kickstart from a template for a
@@ -366,6 +365,7 @@ prepare_kickstart() {
             -e "s|REPLACE_MIRROR_PORT|${MIRROR_REGISTRY_PORT}|g" \
             -e "s|REPLACE_VM_BRIDGE_IP|${VM_BRIDGE_IP}|g" \
             -e "s|REPLACE_IMAGE_SIGSTORE_ENABLED|${IMAGE_SIGSTORE_ENABLED}|g" \
+            -e "s|REPLACE_GREENBOOT_TIMEOUT|${GREENBOOT_TIMEOUT}|g" \
             "${ifile}" > "${output_file}"
     done
     record_junit "${vmname}" "prepare_kickstart" "OK"
@@ -399,7 +399,8 @@ does_image_exist() {
 exit_if_commit_not_found() {
     local -r commit="${1}"
     if ! does_commit_exist "${commit}"; then
-        echo "Commit '${commit}' not found in ostree repo - skipping test"
+        echo "Commit '${commit}' not found in ostree repo - VM can't be created"
+        record_junit "${commit}" "build_vm_commit_not_found" "SKIPPED"
         exit 0
     fi
 }
@@ -408,7 +409,8 @@ exit_if_commit_not_found() {
 exit_if_image_not_found() {
     local -r image="${1}"
     if ! does_image_exist "${image}"; then
-        echo "Image '${image}' not found in mirror registry - skipping test"
+        echo "Image '${image}' not found in mirror registry - VM can't be created"
+        record_junit "${image}" "build_vm_image_not_found" "SKIPPED"
         exit 0
     fi
 }
@@ -425,8 +427,8 @@ function get_vm_ip {
        while true; do
            now=$(date +%s)
            if [ $(( now - start )) -ge ${VM_BOOT_TIMEOUT} ]; then
-               echo "Timed out while waiting for IP retrieval"
-               exit 1
+               echo "Timed out while waiting for IP retrieval" >&2
+               return 1
            fi
            sleep 1
            # Try pinging the IP address to avoid stale DHCP leases that would falsely
@@ -464,6 +466,10 @@ wait_for_microshift_to_be_ready() {
 
     # Handle RUN_HOST_OVERRIDE
     vmname=$(apply_host_override "${vmname}")
+    if [ -z "${vmname}" ]; then
+        record_junit "${vmname}" "apply_host_override" "FAILED"
+        exit 1
+    fi
 
     # Set up kubeconfig for tests
     local -r vm_ip=$(get_vm_property "${vmname}" "ip")
@@ -472,7 +478,6 @@ wait_for_microshift_to_be_ready() {
     # Wait for MicroShift to be ready
     if ! wait_for_greenboot "${full_vmname}" "${vm_ip}"; then
         record_junit "${vmname}" "pre_test_greenboot_check" "FAILED"
-        popd &>/dev/null
         exit 1
     fi
     record_junit "${vmname}" "pre_test_greenboot_check" "OK"
@@ -531,9 +536,9 @@ EOF
 
 close_junit() {
     echo '</testsuite>' >> "${JUNIT_OUTPUT_FILE}"
-    
+
     local line="<testsuite name=\"infrastructure for ${SCENARIO}\" tests=\"${TESTCASES}\" failures=\"${FAILURES}\" skipped=\"${SKIPPED}\" timestamp=\"${TIMESTAMP}\">"
-    
+
     sed -i "2c${line}" "${JUNIT_OUTPUT_FILE}"
 }
 
@@ -719,7 +724,12 @@ launch_vm() {
     for n in ${network}; do
         # For simplicity we assume that network filters are named the same as the networks
         # If there is a filter with the same name as the network, attach it to the NIC
-        vm_network_args+="--network network=${n},model=virtio"
+        if [ "${n}" = "sriov" ] ; then
+            vm_network_args+="--network network=default,model=igb"
+        else
+            vm_network_args+="--network network=${n},model=virtio"
+        fi
+
         if sudo virsh nwfilter-list | awk '{print $2}' | grep -qx "${n}"; then
             vm_network_args+=",filterref=${n}"
         fi
@@ -821,6 +831,12 @@ launch_vm() {
         # Wait for an IP to be assigned
         echo "Waiting for VM ${full_vmname} to have an IP"
         local -r ip=$(get_vm_ip "${full_vmname}")
+        if [ -z "${ip}" ]; then
+            echo "VM ${full_vmname} has no IP"
+            record_junit "${vmname}" "ip-assignment" "FAILED"
+            return 1
+        fi
+
         echo "VM ${full_vmname} has IP ${ip}"
         record_junit "${vmname}" "ip-assignment" "OK"
 
@@ -924,9 +940,8 @@ configure_vm_firewall() {
     # - Incoming for NodePort services
     run_command_on_vm "${vmname}" "sudo firewall-cmd --permanent --zone=public --add-port=30000-32767/tcp"
     run_command_on_vm "${vmname}" "sudo firewall-cmd --permanent --zone=public --add-port=30000-32767/udp"
-    # - Default Prometheus exporter port (for observability RF tests)
-    run_command_on_vm "${vmname}" "sudo firewall-cmd --permanent --zone=public --add-port=8889/tcp"
 
+    # Reload the firewall configuration
     run_command_on_vm "${vmname}" "sudo firewall-cmd --reload"
 }
 
@@ -980,15 +995,17 @@ stress_testing() {
 
 # Apply RUN_HOST_OVERRIDE logic if needed
 apply_host_override() {
-    local -r original_vmname="$1"
-    local vmname="${original_vmname}"
+    local vmname="$1"
 
     if [[ -n "${RUN_HOST_OVERRIDE}" ]]; then
         vmname="${RUN_HOST_OVERRIDE}"
-        local full_vmname
-        local ip
-        full_vmname="$(full_vm_name "${vmname}")"
-        ip=$(get_vm_ip "${full_vmname}")
+        local -r full_vmname="$(full_vm_name "${vmname}")"
+        local -r ip=$(get_vm_ip "${full_vmname}")
+
+        if [ -z "${ip}" ]; then
+            echo "VM ${full_vmname} has no IP" >&2
+            return 1
+        fi
         set_vm_property "${vmname}" "ip" "${ip}"
         set_vm_property "${vmname}" "ssh_port" "22"
         set_vm_property "${vmname}" "api_port" "6443"
@@ -1003,6 +1020,10 @@ run_tests() {
     local vmname="${1}"
     # Handle RUN_HOST_OVERRIDE
     vmname=$(apply_host_override "${vmname}")
+    if [ -z "${vmname}" ]; then
+        record_junit "${vmname}" "apply_host_override" "FAILED"
+        exit 1
+    fi
 
     shift
     echo "Running tests with $# args" "$@"
@@ -1123,6 +1144,10 @@ setup_oc_and_kubeconfig() {
 
     # Handle RUN_HOST_OVERRIDE
     vmname=$(apply_host_override "${vmname}")
+    if [ -z "${vmname}" ]; then
+        record_junit "${vmname}" "apply_host_override" "FAILED"
+        exit 1
+    fi
 
     # Save current directory
     pushd . &>/dev/null
@@ -1145,7 +1170,7 @@ setup_oc_and_kubeconfig() {
     fi
     export KUBECONFIG="${kubeconfig}"
     record_junit "${vmname}" "setup_kubeconfig" "OK"
-    
+
     popd &>/dev/null
 }
 
@@ -1156,6 +1181,10 @@ run_ginkgo_tests() {
 
     # Handle RUN_HOST_OVERRIDE
     vmname=$(apply_host_override "${vmname}")
+    if [ -z "${vmname}" ]; then
+        record_junit "${vmname}" "apply_host_override" "FAILED"
+        exit 1
+    fi
 
     # Save current directory
     pushd . &>/dev/null
@@ -1192,9 +1221,6 @@ run_ginkgo_tests() {
         echo "Running Ginkgo tests with MicroShift filter..."
     fi
 
-    echo "----------------Remove 62738 test case---------------"
-    sed -i "/62738/d" "${case_selected}"
-    echo "-----------------------------------------------------"
     echo "------------------Selected test cases------------------"
     cat "${case_selected}"
     echo "-----------------------------------------------------"

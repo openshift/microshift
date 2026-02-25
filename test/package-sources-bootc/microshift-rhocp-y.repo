@@ -17,5 +17,8 @@ baseurl = {{ .Env.RHOCP_MINOR_Y_BETA }}
 enabled=1
 gpgcheck=0
 sslverify=1
+# Increase the priority of the RHOCP beta repository to ensure its packages take
+# precedence over RHEL mirror repositories
+priority=50
 skip_if_unavailable=0
 {{- end -}}

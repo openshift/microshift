@@ -1,5 +1,5 @@
 # This is a MicroShift specific kserve configuration.
-# For RHOAI kserve configuration see: assets/optional/ai-model-serving/kserve/overlays/odh/inferenceservice-config-patch.yaml
+# For RHOAI kserve configuration see: assets/optional/ai-model-serving/kserve/overlays/odh/patches/patch-inferenceservice-config.yaml
 # For upstream kserve configuration and description of the config see: assets/optional/ai-model-serving/kserve/configmap/inferenceservice.yaml
 #
 # The difference compared to RHOAI's kserve configuration is the 'deploy' section setting:
@@ -13,9 +13,10 @@ metadata:
   namespace: kserve
 data:
   explainers: "{}"
-  oauthProxy: |- 
+  oauthProxy: |-
     {
-      "image" : "$(oauth-proxy)",
+      "oauthProxyImage" : "$(oauth-proxy)",
+      "kubeRbacProxyImage" : "$(kube-rbac-proxy)",
       "memoryRequest": "64Mi",
       "memoryLimit": "128Mi",
       "cpuRequest": "100m",
@@ -25,14 +26,18 @@ data:
     {
         "image" : "$(kserve-storage-initializer)",
         "memoryRequest": "100Mi",
-        "memoryLimit": "1Gi",
+        "memoryLimit": "24Gi",
         "cpuRequest": "100m",
         "cpuLimit": "1",
         "enableDirectPvcVolumeMount": true,
+        "cpuModelcar": "10m",
+        "memoryModelcar": "15Mi",
         "enableModelcar": true
     }
   ingress: |-
     {
+        "enableGatewayApi": false,
+        "kserveIngressGateway": "openshift-ingress/openshift-ai-inference",
         "ingressGateway" : "knative-serving/knative-ingress-gateway",
         "knativeLocalGatewayService" : "knative-local-gateway.istio-system.svc.cluster.local",
         "ingressService" : "istio-ingressgateway.istio-system.svc.cluster.local",
@@ -96,7 +101,6 @@ data:
   inferenceService: |-
     {
       "serviceAnnotationDisallowedList": [
-        "autoscaling.knative.dev/initial-scale",
         "autoscaling.knative.dev/min-scale",
         "autoscaling.knative.dev/max-scale",
         "internal.serving.kserve.io/storage-initializer-sourceuri",

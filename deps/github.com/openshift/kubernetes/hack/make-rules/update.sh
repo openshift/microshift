@@ -37,7 +37,6 @@ fi
 
 BASH_TARGETS=(
 	update-kubensenter
-	update-test-annotations
 	update-codegen
 	update-featuregates
 	update-generated-api-compatibility-data

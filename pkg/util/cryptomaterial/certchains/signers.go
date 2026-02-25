@@ -63,6 +63,7 @@ type CertificateSigner struct {
 
 type signedCertificateInfo struct {
 	CSRInfo
+
 	tlsConfig *crypto.TLSCertificateConfig
 }
 
@@ -228,7 +229,7 @@ func (s *CertificateSigner) AddToBundles(bundlePaths ...string) error {
 	return nil
 }
 
-func (s *CertificateSigner) toBuilder() CertificateSignerBuilder { //nolint:ireturn
+func (s *CertificateSigner) toBuilder() CertificateSignerBuilder {
 	signer := NewCertificateSigner(s.signerName, s.signerDir, s.signerValidity)
 
 	for _, subCA := range s.subCAs {

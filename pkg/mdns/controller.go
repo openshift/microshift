@@ -16,6 +16,7 @@ import (
 
 type MicroShiftmDNSController struct {
 	sync.Mutex
+
 	NodeName   string
 	NodeIP     string
 	KubeConfig string
@@ -127,7 +128,7 @@ func ipInAddrs(ip string, addrs []net.Addr) bool {
 }
 
 func addrsToStrings(addrs []net.Addr) []string {
-	var ipAddrs = make([]string, 0)
+	var ipAddrs = make([]string, 0, len(addrs))
 
 	for _, a := range addrs {
 		ipAddr, _, _ := net.ParseCIDR(a.String())
