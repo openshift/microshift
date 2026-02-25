@@ -29,5 +29,6 @@ RUN dnf repoinfo --enabled && \
     dnf clean all
 
 # Prepare system for testing Generic Device Plugin
-COPY --chmod=755 ./bootc-images/build-serialsim.sh /tmp/build-serialsim.sh
-RUN /tmp/build-serialsim.sh && rm -f /tmp/build-serialsim.sh
+# Temporarily disable until we can get the correct kernel-devel package
+# COPY --chmod=755 ./bootc-images/build-serialsim.sh /tmp/build-serialsim.sh
+# RUN /tmp/build-serialsim.sh && rm -f /tmp/build-serialsim.sh
