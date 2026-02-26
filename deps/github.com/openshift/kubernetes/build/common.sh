@@ -97,8 +97,8 @@ readonly KUBE_RSYNC_PORT="${KUBE_RSYNC_PORT:-}"
 readonly KUBE_CONTAINER_RSYNC_PORT=8730
 
 # These are the default versions (image tags) for their respective base images.
-readonly __default_distroless_iptables_version=v0.7.11
-readonly __default_go_runner_version=v2.4.0-go1.24.9-bookworm.0
+readonly __default_distroless_iptables_version=v0.7.14
+readonly __default_go_runner_version=v2.4.0-go1.24.12-bookworm.0
 readonly __default_setcap_version=bookworm-v1.0.6
 
 # These are the base images for the Docker-wrapped binaries.
@@ -621,7 +621,7 @@ function kube::build::start_rsyncd_container() {
   fi
 
   local container_ip
-  container_ip=$("${DOCKER[@]}" inspect --format '{{ .NetworkSettings.IPAddress }}' "${KUBE_RSYNC_CONTAINER_NAME}")
+  container_ip=$("${DOCKER[@]}" inspect --format '{{range .NetworkSettings.Networks}}{{.IPAddress}},{{end}}' "${KUBE_RSYNC_CONTAINER_NAME}" | cut -d',' -f1)
 
   # Sometimes we can reach rsync through localhost and a NAT'd port.  Other
   # times (when we are running in another docker container on the Jenkins
