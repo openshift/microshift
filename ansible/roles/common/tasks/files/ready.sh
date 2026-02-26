@@ -123,7 +123,12 @@ wait_for_ready() {
 
     # Print progress when pod count changes
     if [[ ${ready} -ne ${prev_ready} ]]; then
-      echo "${label}: ${ready}/${expected} ready"
+      elapsed=$(( $(date +%s) - START_TIME ))
+      echo "[${elapsed}s] ${label}: ${ready}/${expected} ready"
+      # Show which pods are not yet ready
+      oc get pods -A -o json \
+        | jq -r '.items[] | select(.status.conditions[]? | select(.type=="Ready" and .status!="True")) | "  NOT READY: \(.metadata.namespace)/\(.metadata.name)"' \
+        2>/dev/null || true
       prev_ready=${ready}
     fi
 
@@ -154,4 +159,5 @@ READY_SECONDS_ALL=""
 wait_for_ready "Non-storage pods" "${EXPECTED_PODS}" count_ready_nostorage READY_SECONDS_NON_STORAGE
 wait_for_ready "All pods" "${ALL_PODS}" count_ready_all READY_SECONDS_ALL
 
-echo "{\"ready_seconds_non_storage\":${READY_SECONDS_NON_STORAGE},\"ready_seconds_all\":${READY_SECONDS_ALL}}"
+END_TIME=$(date +%s)
+echo "{\"ready_seconds_non_storage\":${READY_SECONDS_NON_STORAGE},\"ready_seconds_all\":${READY_SECONDS_ALL},\"start_epoch\":${START_TIME},\"end_epoch\":${END_TIME}}"

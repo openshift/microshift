@@ -293,6 +293,92 @@ sos_report_for_vm_offline() {
         "--filename" "*.log"
 }
 
+get_lrel_release_image_url() {
+    local -r brew_lrel_release_version="$1"
+    local image_url=""
+
+    # Strip the rpm release suffix and convert tilde to dash.
+    # "4.19.7-202501010000.p0.gc62e92f.assembly.4.19.7.el9" -> "4.19.7"
+    # "4.20.0~rc.3-..."                                     -> "4.20.0-rc.3"
+    local release_version=""
+    release_version="$(echo "${brew_lrel_release_version}" \
+        | sed -E 's/(.*)-.*/\1/' \
+        | sed -E 's/(.*)~(.*)/\1-\2/')"
+
+    # EC and RC releases have their bootc pullspec published on the mirror.
+    local mirror_path=""
+    if [[ "${release_version}" == *"ec"* ]]; then
+        mirror_path="ocp-dev-preview"
+    elif [[ "${release_version}" == *"rc"* ]]; then
+        mirror_path="ocp"
+    fi
+
+    if [ -n "${mirror_path}" ]; then
+        if ! image_url="$(curl -fsS --retry 3 \
+            "https://mirror.openshift.com/pub/openshift-v4/${UNAME_M}/microshift/${mirror_path}/${release_version}/el9/bootc-pullspec.txt")"; then
+            image_url=""
+        fi
+        echo "${image_url}"
+        return
+    fi
+
+    # GA releases: resolve the arch-specific image digest from the registry.
+    local arch=""
+    if [[ "${UNAME_M}" =~ x86 ]]; then
+        arch="amd64"
+    elif [[ "${UNAME_M}" =~ aarch ]]; then
+        arch="arm64"
+    fi
+
+    # Resolve the arch-specific digest from both registries
+    local -r image_path="openshift4/microshift-bootc-rhel9"
+    local -r image_tag="v${release_version}"
+    local -r prod_registry="registry.redhat.io"
+    local -r stage_registry="registry.stage.redhat.io"
+
+    local prod_sha=""
+    local stage_sha=""
+    for registry in "${prod_registry}" "${stage_registry}"; do
+        local sha_id=""
+        if sha_id=$(skopeo inspect --raw --authfile "${PULL_SECRET}" \
+            "docker://${registry}/${image_path}:${image_tag}" 2>/dev/null | \
+            jq -r ".manifests[] | select(.platform.architecture==\"${arch}\") | .digest" 2>/dev/null); then
+            if [[ "${sha_id}" =~ ^sha256:[0-9a-f]{64}$ ]]; then
+                case "${registry}" in
+                    "${prod_registry}")  prod_sha="${sha_id}" ;;
+                    "${stage_registry}") stage_sha="${sha_id}" ;;
+                esac
+            fi
+        fi
+    done
+
+    # Select registry with the following priority:
+    # 1. use stage if it is available and prod is unavailable (e.g., pre-GA release)
+    # 2. use stage if it is available and has a newer digest than prod (e.g., new z-stream not yet in prod)
+    # 3. use prod if it is available and stage is available and has same digest as prod (e.g., post GA)
+    # 4. use prod if it is available and stage is unavailable
+    local selected_registry=""
+    if [[ -n "${stage_sha}" && -z "${prod_sha}" ]]; then
+        selected_registry="${stage_registry}"
+    elif [[ -n "${stage_sha}" && -n "${prod_sha}" && "${stage_sha}" != "${prod_sha}" ]]; then
+        selected_registry="${stage_registry}"
+    elif [[ -n "${stage_sha}" && -n "${prod_sha}" && "${stage_sha}" == "${prod_sha}" ]]; then
+        selected_registry="${prod_registry}"
+    elif [[ -z "${stage_sha}" && -n "${prod_sha}" ]]; then
+        selected_registry="${prod_registry}"
+    fi
+
+    if [[ -n "${selected_registry}" ]]; then
+        local selected_sha
+        case "${selected_registry}" in
+            "${prod_registry}")  selected_sha="${prod_sha}" ;;
+            "${stage_registry}") selected_sha="${stage_sha}" ;;
+        esac
+        image_url="${selected_registry}/${image_path}@${selected_sha}"
+    fi
+    echo "${image_url}"
+}
+
 # Public function to render a unique kickstart from a template for a
 # VM in a scenario.
 #
@@ -411,6 +497,16 @@ exit_if_image_not_found() {
     if ! does_image_exist "${image}"; then
         echo "Image '${image}' not found in mirror registry - VM can't be created"
         record_junit "${image}" "build_vm_image_not_found" "SKIPPED"
+        exit 0
+    fi
+}
+
+# Exit the script if the latest release image is not set.
+exit_if_image_not_set() {
+    local -r release_image_url="${1}"
+    if [[ "${release_image_url}" == "" ]] ; then
+        echo "Release image URL is not defined - VM can't be created"
+        record_junit "release image URL is not defined" "exit_if_image_not_set" "SKIPPED"
         exit 0
     fi
 }

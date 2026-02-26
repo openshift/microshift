@@ -1,6 +1,44 @@
 ---
 # install-microshift tasks
 
+- name: check if microshift is installed
+  ansible.builtin.command: rpm -q microshift
+  register: microshift_installed
+  ignore_errors: true
+  changed_when: false
+
+- name: cleanup and uninstall existing microshift
+  block:
+    - name: stop microshift service
+      become: yes
+      ansible.builtin.systemd:
+        name: microshift
+        state: stopped
+      ignore_errors: true
+
+    - name: find microshift cleanup script
+      ansible.builtin.find:
+        paths: /usr/bin
+        patterns:
+          - '.*microshift.*cleanup.*'
+          - '.*cleanup.*microshift.*'
+        use_regex: yes
+      register: find_cleanup
+
+    - name: cleanup microshift data
+      become: yes
+      ansible.builtin.shell: echo 1 | {{ find_cleanup.files[0].path }} --all
+      when: find_cleanup.files | length > 0
+
+    - name: uninstall microshift packages and dependencies
+      become: yes
+      ansible.builtin.dnf:
+        name:
+          - microshift*
+        autoremove: yes
+        state: absent
+  when: microshift_installed.rc == 0
+
 - name: record initial disk space
   vars:
     filename: disk0.txt

@@ -6,4 +6,4 @@ process_exporter_url: https://github.com/ncabatoff/process-exporter/releases/dow
 
 prometheus_services:
   - process-exporter
-  - prometheus-node-exporter
+  - node_exporter

@@ -915,6 +915,8 @@ EOF
     # snapshotter's rbac is defined as a multidoc, which MicroShift is too picky to work with. Split into separate files
     yq 'select(.kind == "ClusterRole")' $target > "$(dirname $target)/clusterrole.yaml"
     yq 'select(.kind == "ClusterRoleBinding")' $target > "$(dirname $target)/clusterrolebinding.yaml"
+    yq 'select(.kind == "Role")' $target > "$(dirname $target)/role.yaml"
+    yq 'select(.kind == "RoleBinding")' $target > "$(dirname $target)/rolebinding.yaml"
 
     update_olm_images
     update_multus_images

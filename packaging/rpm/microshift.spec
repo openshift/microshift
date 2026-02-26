@@ -64,9 +64,9 @@ BuildRequires: systemd
 BuildRequires: golang
 # DO NOT REMOVE
 
-# TODO: The cri-tools version is relaxed in the transition period.
-# It needs to be updated to match the cri-o version before the release.
-Requires: cri-o >= 1.35.0, cri-o < 1.36.0
+# TODO: The cri-o and cri-tools versions are relaxed in the transition period.
+# They need to be updated to target a single version range before the release.
+Requires: cri-o >= 1.34.0, cri-o < 1.36.0
 Requires: cri-tools >= 1.34.0, cri-tools < 1.36.0
 # The container networking plugins package has been removed from RHEL 10 and
 # cri-o no longer has an explicit dependency on it.

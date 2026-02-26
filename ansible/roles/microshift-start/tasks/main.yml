@@ -34,26 +34,6 @@
     state: stopped
     enabled: no
 
-- name: check for vnstat
-  ansible.builtin.command: rpm -q vnstat
-  register: vnstat_check
-  ignore_errors: true
-
-- name: vnstat cleanup
-  become: yes
-  block:
-  - name: stop & enable vnstat service
-    ansible.builtin.systemd:
-      name: vnstat
-      state: stopped
-      enabled: yes
-
-  - name: delete vnstat db
-    ansible.builtin.file:
-      path: "{{ vnstat_db }}"
-      state: absent
-  when: vnstat_check.rc == 0
-
 - name: create .kube home dir
   ansible.builtin.file:
     path: ~/.kube/
@@ -82,7 +62,7 @@
   block:
   - name: source pbench-agent & register-tool-set
     ansible.builtin.shell: source /etc/profile.d/pbench-agent.sh && pbench-register-tool-set
-  
+
   - name: set new pidstat interval
     ansible.builtin.shell: source /etc/profile.d/pbench-agent.sh && pbench-register-tool --name=pidstat -- --interval={{ sample_interval }}
 
@@ -91,7 +71,7 @@
     async: "{{ pbench_record_duration|int * 2 }}"
     poll: 0
     register: pbench_user_benchmark_result
-  
+
   - name: Pause for 60 seconds to gather steady state for pbench tool recording
     ansible.builtin.pause:
       seconds: 60
@@ -103,6 +83,10 @@
   ansible.builtin.command: which cadvisor
   register: cadvisor_check
   ignore_errors: true
+
+- name: record network measurement start epoch
+  ansible.builtin.command: date +%s
+  register: network_start_epoch
 
 - name: measure microshift service boot time
   include_tasks: roles/common/tasks/boot.yml
@@ -138,22 +122,68 @@
   include_tasks: roles/common/tasks/disk.yml
   loop: "{{ du_dirs }}"
 
-- name: vnstat collection tasks
+- name: capture container image sizes
   block:
-    - name: wait for vnstat db to populate
-      ansible.builtin.shell: vnstat | grep today
-      retries: 60
-      delay: 10
-      register: vnstat_db
-      until: vnstat_db.rc == 0
-
-    - name: get vnstat network usage
-      ansible.builtin.command: vnstat
-      register: vnstat
-
-    - name: record network usage to file
+    - name: copy crio-df script to remote host
+      become: yes
       ansible.builtin.copy:
-        content: "{{ vnstat.stdout }}"
+        src: roles/common/tasks/files/crio-df.py
+        dest: /tmp/crio-df.py
+        mode: '0755'
+
+    - name: run crio-df script
+      become: yes
+      ansible.builtin.command: python3 /tmp/crio-df.py -v
+      register: crio_df
+
+    - name: save container image sizes to results
+      ansible.builtin.copy:
+        content: "{{ crio_df.stdout }}"
+        dest: "{{ results_dir }}/images.txt"
+      delegate_to: localhost
+
+- name: record network measurement end epoch
+  ansible.builtin.command: date +%s
+  register: network_end_epoch
+
+- name: resolve prometheus network query settings
+  ansible.builtin.set_fact:
+    prom_network_endpoint: >-
+      {{
+        prometheus_query_endpoint | default(
+          'http://' ~
+          (
+            (
+              hostvars[(groups['logging'] | default([]) | first)].ansible_host
+              | default((groups['logging'] | default([]) | first))
+            )
+            if (groups['logging'] | default([]) | length > 0)
+            else 'zen3'
+          )
+          ~ ':' ~ (prometheus_port | default(9091) | string),
+          true
+        )
+      }}
+    prom_network_device: "{{ network_device | default(ansible_default_ipv4.interface | default('enp5s0'), true) }}"
+    prom_network_instance: "{{ inventory_hostname }}:9100"
+  when: prometheus_logging | bool
+
+- name: query prometheus for network transfer
+  block:
+    - name: run prometheus network query
+      ansible.builtin.command: >
+        python3 roles/common/tasks/files/prom-network-query.py
+        --prometheus {{ prom_network_endpoint }}
+        --instance {{ prom_network_instance }}
+        --device {{ prom_network_device }}
+        {{ network_start_epoch.stdout }}
+        {{ network_end_epoch.stdout }}
+      register: prom_network
+      delegate_to: localhost
+
+    - name: save network data to results
+      ansible.builtin.copy:
+        content: "{{ prom_network.stdout }}"
         dest: "{{ results_dir }}/network.txt"
       delegate_to: localhost
-  when: vnstat_check.rc == 0
+  when: prometheus_logging | bool
