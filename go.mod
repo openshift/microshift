@@ -16,9 +16,9 @@ require (
 	github.com/spf13/pflag v1.0.7
 	github.com/stretchr/testify v1.10.0
 	github.com/vishvananda/netlink v1.3.1-0.20250206174618-62fb240731fa
-	go.etcd.io/etcd/client/pkg/v3 v3.5.24
+	go.etcd.io/etcd/client/pkg/v3 v3.5.26
 	go.etcd.io/etcd/client/v3 v3.5.21
-	golang.org/x/sys v0.34.0
+	golang.org/x/sys v0.38.0
 	gopkg.in/yaml.v3 v3.0.1
 	k8s.io/kube-openapi v0.0.0-20250318190949-c8a335a9a2ff
 	sigs.k8s.io/yaml v1.5.0
@@ -38,17 +38,17 @@ require (
 	github.com/prometheus/prometheus v0.302.1
 	github.com/squat/generic-device-plugin v0.0.0-20250710162141-0f7fddf166f1
 	gopkg.in/yaml.v2 v2.4.0
-	k8s.io/api v1.33.6
-	k8s.io/apiextensions-apiserver v1.33.6
-	k8s.io/apimachinery v1.33.6
-	k8s.io/apiserver v1.33.6
-	k8s.io/cli-runtime v1.33.6
-	k8s.io/client-go v1.33.6
-	k8s.io/cloud-provider v1.33.6
-	k8s.io/component-base v1.33.6
-	k8s.io/kube-aggregator v1.33.6
-	k8s.io/kubectl v1.33.6
-	k8s.io/kubelet v1.33.6
+	k8s.io/api v1.33.8
+	k8s.io/apiextensions-apiserver v1.33.8
+	k8s.io/apimachinery v1.33.8
+	k8s.io/apiserver v1.33.8
+	k8s.io/cli-runtime v1.33.8
+	k8s.io/client-go v1.33.8
+	k8s.io/cloud-provider v1.33.8
+	k8s.io/component-base v1.33.8
+	k8s.io/kube-aggregator v1.33.8
+	k8s.io/kubectl v1.33.8
+	k8s.io/kubelet v1.33.8
 	k8s.io/utils v0.0.0-20250604170112-4c0f3b243397
 	sigs.k8s.io/kube-storage-version-migrator v0.0.6-0.20230721195810-5c8923c5ff96
 	sigs.k8s.io/kustomize/api v0.20.1
@@ -120,7 +120,7 @@ require (
 	github.com/monochromegane/go-gitignore v0.0.0-20200626010858-205db1a8cc00 // indirect
 	github.com/mxk/go-flowrate v0.0.0-20140419014527-cca7078d478f // indirect
 	github.com/oklog/run v1.1.0 // indirect
-	github.com/opencontainers/cgroups v0.0.1 // indirect
+	github.com/opencontainers/cgroups v0.0.3 // indirect
 	github.com/opencontainers/go-digest v1.0.0 // indirect
 	github.com/opencontainers/image-spec v1.1.1 // indirect
 	github.com/opencontainers/runc v1.2.5 // indirect
@@ -152,30 +152,31 @@ require (
 	go.uber.org/atomic v1.11.0 // indirect
 	go.yaml.in/yaml/v2 v2.4.2 // indirect
 	go.yaml.in/yaml/v3 v3.0.3 // indirect
-	golang.org/x/crypto v0.40.0 // indirect
+	golang.org/x/crypto v0.44.0 // indirect
 	golang.org/x/exp v0.0.0-20240719175910-8a7402abbf56 // indirect
 	golang.org/x/oauth2 v0.27.0 // indirect
-	golang.org/x/term v0.33.0 // indirect
+	golang.org/x/term v0.37.0 // indirect
 	golang.org/x/time v0.9.0 // indirect
+	golang.org/x/tools/go/packages/packagestest v0.1.1-deprecated // indirect
 	gopkg.in/evanphx/json-patch.v4 v4.12.0 // indirect
 	gopkg.in/go-jose/go-jose.v2 v2.6.3 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1 // indirect
-	k8s.io/cluster-bootstrap v1.33.6 // indirect
-	k8s.io/component-helpers v1.33.6 // indirect
-	k8s.io/controller-manager v1.33.6 // indirect
-	k8s.io/cri-api v1.33.6 // indirect
-	k8s.io/cri-client v1.33.6 // indirect
-	k8s.io/csi-translation-lib v1.33.6 // indirect
-	k8s.io/dynamic-resource-allocation v1.33.6 // indirect
-	k8s.io/endpointslice v1.33.6 // indirect
-	k8s.io/externaljwt v1.33.6 // indirect
-	k8s.io/kms v1.33.6 // indirect
-	k8s.io/kube-controller-manager v1.33.6 // indirect
-	k8s.io/kube-scheduler v1.33.6 // indirect
-	k8s.io/metrics v1.33.6 // indirect
-	k8s.io/mount-utils v1.33.6 // indirect
-	k8s.io/pod-security-admission v1.33.6 // indirect
+	k8s.io/cluster-bootstrap v1.33.8 // indirect
+	k8s.io/component-helpers v1.33.8 // indirect
+	k8s.io/controller-manager v1.33.8 // indirect
+	k8s.io/cri-api v1.33.8 // indirect
+	k8s.io/cri-client v1.33.8 // indirect
+	k8s.io/csi-translation-lib v1.33.8 // indirect
+	k8s.io/dynamic-resource-allocation v1.33.8 // indirect
+	k8s.io/endpointslice v1.33.8 // indirect
+	k8s.io/externaljwt v1.33.8 // indirect
+	k8s.io/kms v1.33.8 // indirect
+	k8s.io/kube-controller-manager v1.33.8 // indirect
+	k8s.io/kube-scheduler v1.33.8 // indirect
+	k8s.io/metrics v1.33.8 // indirect
+	k8s.io/mount-utils v1.33.8 // indirect
+	k8s.io/pod-security-admission v1.33.8 // indirect
 	sigs.k8s.io/apiserver-network-proxy/konnectivity-client v0.31.2 // indirect
 	sigs.k8s.io/json v0.0.0-20241014173422-cfa47c3a1cc8 // indirect
 	sigs.k8s.io/randfill v1.0.0 // indirect
@@ -202,21 +203,21 @@ require (
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
 	github.com/vishvananda/netns v0.0.4 // indirect
-	go.etcd.io/etcd/api/v3 v3.5.24 // indirect
+	go.etcd.io/etcd/api/v3 v3.5.26 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.27.0 // indirect
-	golang.org/x/mod v0.25.0 // indirect
-	golang.org/x/net v0.42.0 // indirect
-	golang.org/x/sync v0.16.0 // indirect
-	golang.org/x/text v0.27.0 // indirect
-	golang.org/x/tools v0.34.0 // indirect
+	golang.org/x/mod v0.29.0 // indirect
+	golang.org/x/net v0.47.0 // indirect
+	golang.org/x/sync v0.18.0 // indirect
+	golang.org/x/text v0.31.0 // indirect
+	golang.org/x/tools v0.38.0 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20250115164207-1a7da9e5054f // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250115164207-1a7da9e5054f // indirect
 	google.golang.org/grpc v1.71.1 // indirect
 	google.golang.org/protobuf v1.36.5 // indirect
 	k8s.io/gengo/v2 v2.0.0-20250207200755-1244d31929d7 // indirect
 	k8s.io/klog/v2 v2.130.1
-	k8s.io/kubernetes v1.33.6
+	k8s.io/kubernetes v1.33.8
 	sigs.k8s.io/structured-merge-diff/v4 v4.7.0 // indirect
 )
 
@@ -262,7 +263,7 @@ replace (
 )
 
 replace (
-	go.etcd.io/etcd/api/v3 => github.com/openshift/etcd/api/v3 v3.5.1-0.20251031145924-eac09c01677b // from etcd
-	go.etcd.io/etcd/client/pkg/v3 => github.com/openshift/etcd/client/pkg/v3 v3.5.1-0.20251031145924-eac09c01677b // from etcd
-	go.etcd.io/etcd/client/v3 => github.com/openshift/etcd/client/v3 v3.5.1-0.20251031145924-eac09c01677b // from etcd
+	go.etcd.io/etcd/api/v3 => github.com/openshift/etcd/api/v3 v3.5.1-0.20260206170206-05bca97760b1 // from etcd
+	go.etcd.io/etcd/client/pkg/v3 => github.com/openshift/etcd/client/pkg/v3 v3.5.1-0.20260206170206-05bca97760b1 // from etcd
+	go.etcd.io/etcd/client/v3 => github.com/openshift/etcd/client/v3 v3.5.1-0.20260206170206-05bca97760b1 // from etcd
 )
