@@ -463,6 +463,28 @@ func TestFeatureGateLockManagement_VersionChange(t *testing.T) {
 				Enabled: []string{"FeatureA"},
 			},
 		},
+		{
+			name:            "minor version upgrade with feature only in special handling should succeed",
+			lockFileVer:     getVersion(0, 0, 0),
+			currentVer:      getVersion(0, 1, 0),
+			wantErr:         false,
+			description:     "feature only in SpecialHandlingSupportExceptionRequired should not block upgrades",
+			customNoUpgrade: &config.EnableDisableFeatures{},
+			specialHandlingSupportException: &config.EnableDisableFeatures{
+				Enabled: []string{"FeatureA"},
+			},
+		},
+		{
+			name:            "major version upgrade with feature only in special handling should succeed",
+			lockFileVer:     getVersion(0, 0, 0),
+			currentVer:      getVersion(1, -21, 0),
+			wantErr:         false,
+			description:     "feature only in SpecialHandlingSupportExceptionRequired should not block major upgrades",
+			customNoUpgrade: &config.EnableDisableFeatures{},
+			specialHandlingSupportException: &config.EnableDisableFeatures{
+				Enabled: []string{"FeatureA"},
+			},
+		},
 	}
 
 	for _, tt := range tests {
