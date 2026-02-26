@@ -1,34 +1,7 @@
-- api embedded-component d34f11c515b3d00fdb3809cd59737e3bd77167c4 to 43090db3afe48e7dff0f6e39a866474d15cd0db5
-  - 523451b3 2026-02-17T13:01:53+01:00 MCO-2126: Add defaultStream field to OSImageStream spec
-  - 887b5e84 2026-02-17T10:38:57Z Prefer feature-gate manifest inclusion for merged CRDs
+- oc image-arm64 36384453463224e67ca737d246589de2fa95733b to 9b77539af975e5627df7e623b9ee183ef1fd33ba
+  - abcf821d 2026-02-19T12:39:00+01:00 Fix ns inspect when resource group is specified
+  - 999b54e4 2026-02-19T10:55:38+01:00 inspect: Refactor to use sets.Set[string]
 
-- cluster-kube-controller-manager-operator embedded-component a6a751080c9b2bdd3a721851b206cf2f7c8bbc41 to 99f17e64c5e623f5e909418d6690214f5583f6c2
-  - 7d9db03 2025-10-31T12:52:32-07:00 CORS-4220: pass dualstack cluster and service cidrs as comma-separated lists
-
-- cluster-kube-scheduler-operator embedded-component 14c5fdcfc2602292e19cab8713e42accf94b593d to 820d82bbc61c739c6c95a450cdbc454b5e6cd1fc
-  - 4022ec6 2026-02-17T20:27:07+05:30 Add 30-minute timeout to preferred host e2e test
-
-- cluster-openshift-controller-manager-operator embedded-component 7634c413830a510ff942bd6886ffe5f79db707b4 to 7349d0f7dba3285dfc31d309cfad4124c1e7f943
-  - f65d0bd 2026-02-13T09:03:34Z Use the configured clock source during startup
-
-- machine-config-operator embedded-component 7eb4793ae255b19327e781f66aaf1dbd3e5210c5 to e8fd02f68658c3a7a65126740aec4775491ddb6c
-  - de189040 2026-02-17T15:04:46-05:00 Break e2e-ocl test suite into 2
-  - f194385e 2026-02-13T08:00:47+01:00 MCO-2032: Avoid MCPs duplication at install time
-  - 348da479 2026-02-12T08:53:28+01:00 MCO-2120: Rework OS image stream label classification
-  - a0d71bf3 2026-02-10T12:33:59-06:00 fixes config drift metric persistence
-
-- operator-framework-olm embedded-component 811919f88bc3b8da4f97c6e6ca031258cc4fa13b to af1eb8f8acc2959c5a722467e880cac66ce5246b
-  - 64fe26b2 2026-02-17T15:20:31-05:00 Remove the collect-profiles info from the microshift kustomization file
-
-- oc image-amd64 7f88fe2132f6969e1686808e5301aa3c808d4a45 to 36384453463224e67ca737d246589de2fa95733b
-  - 686e6f13 2026-02-19T11:33:23-05:00 OCPBUGS-76394: Ignore group ownership on rpm -V
-
-- ovn-kubernetes image-amd64 2a9cd189db9c74dc678fcfca68473d6fdc278028 to c698004c7eb3de25cc95169e660448b4eaf77843
-  - d0dcc089 2026-02-05T16:11:34-08:00 Exclude NetSeg tests for SingleReplica topology
-
-- oc image-arm64 7f88fe2132f6969e1686808e5301aa3c808d4a45 to 36384453463224e67ca737d246589de2fa95733b
-  - 686e6f13 2026-02-19T11:33:23-05:00 OCPBUGS-76394: Ignore group ownership on rpm -V
-
-- ovn-kubernetes image-arm64 2a9cd189db9c74dc678fcfca68473d6fdc278028 to c698004c7eb3de25cc95169e660448b4eaf77843
-  - d0dcc089 2026-02-05T16:11:34-08:00 Exclude NetSeg tests for SingleReplica topology
+- ovn-kubernetes image-arm64 c698004c7eb3de25cc95169e660448b4eaf77843 to 517194700aba68ee6ad222841e312e0c29899e73
+  - afe27f93 2026-02-17T13:38:26+01:00 OTE: Exclude new BGP and EVPN tests
 
