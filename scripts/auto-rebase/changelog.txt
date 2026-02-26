@@ -1,31 +1,90 @@
-- cluster-kube-apiserver-operator embedded-component 8ce34d695b2ee3a93e748cd039db7c238ffc9f12 to 4bbd3be9dfda4a08dca98648209151de2a869f25
-  - 8047018 2025-11-05T16:34:26+00:00 Add priority field to prevent early shutdown
+- kubernetes embedded-component 9d45edc58ca6d5240fc84d3d50eb7490aa683c16 to 346896bae752bb9def8cacca75fdc7f7dcae9496
+  - 4591c3293 2026-02-17T13:52:33-05:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - 39350c63d 2026-02-10T12:54:39+00:00 Release commit for Kubernetes v1.32.12
+  - 21615dafa 2026-01-30T11:13:36+01:00 Bump dependencies, images and versions used to Go 1.24.12 and distroless iptables
+  - 1d30ce5a0 2026-01-29T15:03:25-05:00 Apparently some EC2 images we use do not have /proc/net/nf_conntrack
+  - 168701dda 2026-01-29T15:03:25-05:00 test: cleanup from review
+  - 4a485a05a 2026-01-29T15:03:24-05:00 test: Fix KubeProxy CLOSE_WAIT test for IPv6 environments
+  - 78ace1048 2026-01-29T15:03:22-05:00 test: Read /proc/net/nf_conntrack instead of using conntrack binary
+  - eb7391688 2026-01-27T14:34:56+01:00 DRA scheduler: fix another root cause of double device allocation
+  - 6179b6db5 2026-01-27T14:34:56+01:00 DRA scheduler: fix one root cause of double device allocation
+  - a44152180 2026-01-20T16:01:41-08:00 kubeadm: waiting for etcd learner member to be started before promoting during 'kubeadm join'
+  - 4957b71b2 2026-01-08T13:49:59+01:00 mark QuotaMonitor as not running and invalidate monitors list
+  - 8a9586e02 2026-01-07T14:26:50+01:00 kubeadm: always retry Patch() Node API calls
+  - 5df89e6f4 2025-12-19T17:42:39+01:00 kubeadm: do not sort extraArgs alpha-numerically
+  - 60e446a7b 2025-12-18T18:06:00+09:00 hack/lib/util.sh: support uutils' `date` command
+  - 5ed8e8aa8 2025-12-16T18:27:43+00:00 Update CHANGELOG/CHANGELOG-1.32.md for v1.32.11
+  - 2195eae9e 2025-12-16T17:59:23+00:00 Release commit for Kubernetes v1.32.11
+  - cabe97a6e 2025-12-10T11:57:13+01:00 upgrade to cos 121
+  - 1fb4fe155 2025-12-05T11:49:06+01:00 Bump dependencies, images and versions used to Go 1.24.11 and distroless iptables
+  - fff934eed 2025-12-03T12:20:05-08:00 fix docker IP address detection for rsync
+  - 8ffde8cfc 2025-11-29T11:19:27+01:00 Bump dependencies, images and versions used to Go 1.24.10 and distroless iptables
+  - 9af05b650 2025-11-25T18:15:23+00:00 Fallback to live ns lookup on admission if lister cannot find namespace
+  - 7247ba38f 2025-11-11T20:52:28+00:00 Update CHANGELOG/CHANGELOG-1.32.md for v1.32.10
+  - aeeda7b58 2025-11-07T03:06:43+00:00 mark device manager as haelthy before it started for the first time
+  - 00ab04409 2025-11-03T15:50:07+00:00 Mark API server errors as transient in csi raw block driver
 
-- cluster-kube-scheduler-operator embedded-component 8740a60de76690a17d5081db078eb93dfdb7a066 to b5671f10f0b03ac19e584e08b08267f67dd2d709
-  - ca3fba9 2026-01-30T12:59:18-05:00 Update ks_pod_scenario_3.yaml
-  - b35f237 2026-01-30T12:59:18-05:00 Update ks_pod_scenario_2.yaml
-  - bb1599c 2026-01-30T12:59:17-05:00 Update ks_pod_scenario_1.yaml
-  - 95d235b 2026-01-30T12:59:17-05:00 Add priority field to prevent early shutdown
+- machine-config-operator embedded-component 25321abfd952d282486d28fe27c4ab6052469ebf to 1d699383bfd81188d2ab77fc9e0c659ab3683c12
+  - 1f382703 2026-02-24T12:21:44-06:00 Fix MCN conditions not updating during OCL sync
+  - 3513ac82 2026-02-19T15:50:14+00:00 fix pull secret log spam make verify error
+  - 4c423326 2026-02-12T21:56:37+00:00 fixes exposure of sensitive data in log files
+  - fa437a60 2026-02-08T06:33:31-05:00 hack: add AMI update automation script
+  - 9de890b0 2026-02-08T06:33:31-05:00 move msbic controller to bootimage/
 
-- etcd embedded-component 0737eac4bbe3903f725064c06a88af761418e5fd to 3ebce536634cb76794f1b9668072a094c132c16a
-  - da481c1f 2026-02-06T10:54:08-05:00 UPSTREAM: <drop>: Revert "dependency: Bump golang.org/x/crypto from 0.38.0 to 0.45.0"
-  - 847c0464 2026-02-06T10:45:22-05:00 UPSTREAM: <drop>: manually resolve conflicts
-  - 65251b30 2025-12-18T03:27:13+08:00 version: bump up to 3.5.26
-  - 751f1628 2025-12-15T22:36:25-06:00 dependency: Bump golang.org/x/crypto from 0.38.0 to 0.45.0
-  - 47f9b5aa 2025-12-10T09:37:59-05:00 server: cleanup zombie membership information
-  - 5ff84215 2025-12-10T09:36:18-05:00 tests: setup two testcases to reproduce 20967 issue
-  - a8ffc2e2 2025-12-06T21:32:18+08:00 Bump go to 1.24.11
-  - 80e15b8f 2025-11-18T13:11:14+00:00 Fix a typo of 'etcdctl snapshot restore/status' commands
-  - 8bdb0edc 2025-11-17T17:56:45+00:00 Print token fingerprint instead of the original tokens in log messages
-  - e2eff772 2025-11-12T00:00:11-05:00 version: bump up to 3.5.25
-  - 26c67519 2025-11-06T21:57:49-08:00 Bump from go1.24.9 to go1.24.10
-  - 547d6f42 2025-11-06T19:37:43+00:00 Fix the '--force-new-cluster' can't clean up learners issue
-  - 2cdacbc4 2025-11-06T19:35:12+00:00 Add an e2e test cases to reproduce the '--force-new-cluster' can't remove learners issue
-  - 67ddeb51 2025-11-04T09:30:54-05:00 etcdutl: add --wal-dir for check-v2store
+- operator-framework-olm embedded-component 8332256a5954ab312b33e91fd1befa847f551a0b to 05a5a754366264a0926abf61e1ae11837a94b393
+  - eddd12ad 2026-02-11T14:01:03-05:00 fixup! Remove the collect-profiles job
+  - 9af6e609 2026-02-11T13:59:52-05:00 fixup! Remove the collect-profiles job
+  - 7eaf98ab 2026-02-11T13:52:34-05:00 Remove the collect-profiles job
 
-- machine-config-operator embedded-component b405535023b88949e231be90778e5cf63e438c40 to 25321abfd952d282486d28fe27c4ab6052469ebf
-  - 1b30b594 2026-01-28T16:02:00-06:00 Fix MCN conditions not updating during OCL sync
+- kubernetes image-amd64 9d45edc58ca6d5240fc84d3d50eb7490aa683c16 to 346896bae752bb9def8cacca75fdc7f7dcae9496
+  - 4591c3293 2026-02-17T13:52:33-05:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - 39350c63d 2026-02-10T12:54:39+00:00 Release commit for Kubernetes v1.32.12
+  - 21615dafa 2026-01-30T11:13:36+01:00 Bump dependencies, images and versions used to Go 1.24.12 and distroless iptables
+  - 1d30ce5a0 2026-01-29T15:03:25-05:00 Apparently some EC2 images we use do not have /proc/net/nf_conntrack
+  - 168701dda 2026-01-29T15:03:25-05:00 test: cleanup from review
+  - 4a485a05a 2026-01-29T15:03:24-05:00 test: Fix KubeProxy CLOSE_WAIT test for IPv6 environments
+  - 78ace1048 2026-01-29T15:03:22-05:00 test: Read /proc/net/nf_conntrack instead of using conntrack binary
+  - eb7391688 2026-01-27T14:34:56+01:00 DRA scheduler: fix another root cause of double device allocation
+  - 6179b6db5 2026-01-27T14:34:56+01:00 DRA scheduler: fix one root cause of double device allocation
+  - a44152180 2026-01-20T16:01:41-08:00 kubeadm: waiting for etcd learner member to be started before promoting during 'kubeadm join'
+  - 4957b71b2 2026-01-08T13:49:59+01:00 mark QuotaMonitor as not running and invalidate monitors list
+  - 8a9586e02 2026-01-07T14:26:50+01:00 kubeadm: always retry Patch() Node API calls
+  - 5df89e6f4 2025-12-19T17:42:39+01:00 kubeadm: do not sort extraArgs alpha-numerically
+  - 60e446a7b 2025-12-18T18:06:00+09:00 hack/lib/util.sh: support uutils' `date` command
+  - 5ed8e8aa8 2025-12-16T18:27:43+00:00 Update CHANGELOG/CHANGELOG-1.32.md for v1.32.11
+  - 2195eae9e 2025-12-16T17:59:23+00:00 Release commit for Kubernetes v1.32.11
+  - cabe97a6e 2025-12-10T11:57:13+01:00 upgrade to cos 121
+  - 1fb4fe155 2025-12-05T11:49:06+01:00 Bump dependencies, images and versions used to Go 1.24.11 and distroless iptables
+  - fff934eed 2025-12-03T12:20:05-08:00 fix docker IP address detection for rsync
+  - 8ffde8cfc 2025-11-29T11:19:27+01:00 Bump dependencies, images and versions used to Go 1.24.10 and distroless iptables
+  - 9af05b650 2025-11-25T18:15:23+00:00 Fallback to live ns lookup on admission if lister cannot find namespace
+  - 7247ba38f 2025-11-11T20:52:28+00:00 Update CHANGELOG/CHANGELOG-1.32.md for v1.32.10
+  - aeeda7b58 2025-11-07T03:06:43+00:00 mark device manager as haelthy before it started for the first time
+  - 00ab04409 2025-11-03T15:50:07+00:00 Mark API server errors as transient in csi raw block driver
 
-- ovn-kubernetes image-amd64 16e5e201025c67a8cc2253851ebbbe3dfa7d7910 to 194e289903051ba951e479c227ad3d44f9fc321a
-  - 1ce92737 2026-01-21T14:02:20+01:00 fix(localnet, ipamless): Prevent LSP deletion on sync
+- kubernetes image-arm64 9d45edc58ca6d5240fc84d3d50eb7490aa683c16 to 346896bae752bb9def8cacca75fdc7f7dcae9496
+  - 4591c3293 2026-02-17T13:52:33-05:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - 39350c63d 2026-02-10T12:54:39+00:00 Release commit for Kubernetes v1.32.12
+  - 21615dafa 2026-01-30T11:13:36+01:00 Bump dependencies, images and versions used to Go 1.24.12 and distroless iptables
+  - 1d30ce5a0 2026-01-29T15:03:25-05:00 Apparently some EC2 images we use do not have /proc/net/nf_conntrack
+  - 168701dda 2026-01-29T15:03:25-05:00 test: cleanup from review
+  - 4a485a05a 2026-01-29T15:03:24-05:00 test: Fix KubeProxy CLOSE_WAIT test for IPv6 environments
+  - 78ace1048 2026-01-29T15:03:22-05:00 test: Read /proc/net/nf_conntrack instead of using conntrack binary
+  - eb7391688 2026-01-27T14:34:56+01:00 DRA scheduler: fix another root cause of double device allocation
+  - 6179b6db5 2026-01-27T14:34:56+01:00 DRA scheduler: fix one root cause of double device allocation
+  - a44152180 2026-01-20T16:01:41-08:00 kubeadm: waiting for etcd learner member to be started before promoting during 'kubeadm join'
+  - 4957b71b2 2026-01-08T13:49:59+01:00 mark QuotaMonitor as not running and invalidate monitors list
+  - 8a9586e02 2026-01-07T14:26:50+01:00 kubeadm: always retry Patch() Node API calls
+  - 5df89e6f4 2025-12-19T17:42:39+01:00 kubeadm: do not sort extraArgs alpha-numerically
+  - 60e446a7b 2025-12-18T18:06:00+09:00 hack/lib/util.sh: support uutils' `date` command
+  - 5ed8e8aa8 2025-12-16T18:27:43+00:00 Update CHANGELOG/CHANGELOG-1.32.md for v1.32.11
+  - 2195eae9e 2025-12-16T17:59:23+00:00 Release commit for Kubernetes v1.32.11
+  - cabe97a6e 2025-12-10T11:57:13+01:00 upgrade to cos 121
+  - 1fb4fe155 2025-12-05T11:49:06+01:00 Bump dependencies, images and versions used to Go 1.24.11 and distroless iptables
+  - fff934eed 2025-12-03T12:20:05-08:00 fix docker IP address detection for rsync
+  - 8ffde8cfc 2025-11-29T11:19:27+01:00 Bump dependencies, images and versions used to Go 1.24.10 and distroless iptables
+  - 9af05b650 2025-11-25T18:15:23+00:00 Fallback to live ns lookup on admission if lister cannot find namespace
+  - 7247ba38f 2025-11-11T20:52:28+00:00 Update CHANGELOG/CHANGELOG-1.32.md for v1.32.10
+  - aeeda7b58 2025-11-07T03:06:43+00:00 mark device manager as haelthy before it started for the first time
+  - 00ab04409 2025-11-03T15:50:07+00:00 Mark API server errors as transient in csi raw block driver
 
