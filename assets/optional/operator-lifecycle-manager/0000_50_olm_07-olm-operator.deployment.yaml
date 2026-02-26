@@ -32,9 +32,6 @@ spec:
         - name: srv-cert
           secret:
             secretName: olm-operator-serving-cert
-        - name: profile-collector-cert
-          secret:
-            secretName: pprof-cert
         - name: tmpfs
           emptyDir: {}
       containers:
@@ -48,9 +45,6 @@ spec:
             - name: srv-cert
               mountPath: "/srv-cert"
               readOnly: true
-            - name: profile-collector-cert
-              mountPath: "/profile-collector-cert"
-              readOnly: true
             - name: tmpfs
               mountPath: /tmp
           command:
@@ -62,8 +56,6 @@ spec:
             - /srv-cert/tls.crt
             - --tls-key
             - /srv-cert/tls.key
-            - --client-ca
-            - /profile-collector-cert/tls.crt
             - --protectedCopiedCSVNamespaces
             - openshift
           image: quay.io/operator-framework/olm
