@@ -142,9 +142,11 @@ func upgradeChecksPass(lockFile featureGateLockFile, fgCfg *config.FeatureGates)
 			return lhsSet.Difference(rhsSet).UnsortedList()
 		}
 
-		// Extract feature gates that lack a special handling support exception.
-		customNoUpgradeEnabled := extractFeatureGatesWithoutExemptions(fgCfg.CustomNoUpgrade.Enabled, fgCfg.SpecialHandlingSupportExceptionRequired.Enabled)
-		customNoUpgradeDisabled := extractFeatureGatesWithoutExemptions(fgCfg.CustomNoUpgrade.Disabled, fgCfg.SpecialHandlingSupportExceptionRequired.Disabled)
+		// Parse out featureGates from the last known cluster state and filter them by the latest config. This allows users to update
+		// the feature gate config and upgrade the cluster simultaneously if they want. In the typical case where the config does not change
+		// between upgrades, non-exempt featureGates are still validated and will still block the upgrade.
+		customNoUpgradeEnabled := extractFeatureGatesWithoutExemptions(lockFile.CustomNoUpgrade.Enabled, fgCfg.SpecialHandlingSupportExceptionRequired.Enabled)
+		customNoUpgradeDisabled := extractFeatureGatesWithoutExemptions(lockFile.CustomNoUpgrade.Disabled, fgCfg.SpecialHandlingSupportExceptionRequired.Disabled)
 
 		// If there are any gates that lack a special handling support exception, return an error.
 		if len(customNoUpgradeEnabled) > 0 || len(customNoUpgradeDisabled) > 0 {
