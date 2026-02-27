@@ -69,7 +69,7 @@
           ],
           "properties": {
             "customNoUpgrade": {
-              "description": "CustomNoUpgrade is used to enable/disable feature gates. When the enabled or disable lists are not empty, x- and y-stream upgrades will be blocked.\nUse this field exclusively for custom feature gates, unless you are certain that the feature gate is a SpecialHandlingSupportExceptionRequired feature.",
+              "description": "CustomNoUpgrade is used to enable/disable feature gates that block x- and y-stream upgrades.",
               "type": "object",
               "required": [
                 "disabled",
@@ -94,7 +94,7 @@
               "type": "string"
             },
             "specialHandlingSupportExceptionRequired": {
-              "description": "SpecialHandlingSupportExceptionRequired allows for feature gates to be exempted from blocking x- and y-stream upgrades.",
+              "description": "SpecialHandlingSupportExceptionRequired is used to enable/disable feature gates that are exempt from blocking x- and y-stream upgrades.\nFeatures listed here do not need to be duplicated in CustomNoUpgrade.",
               "type": "object",
               "required": [
                 "disabled",
