@@ -5,6 +5,7 @@ domain_type(microshift_t);
 
 gen_require(`
 	type kubelet_t, var_lib_t, container_var_lib_t;
+	type init_t, container_runtime_t;
 ')
 
 # When microshift creates backup folders in /var/lib/microshift-backups, the correct labels are applied
@@ -14,3 +15,5 @@ gen_require(`
 filetrans_pattern(kubelet_t, var_lib_t, container_var_lib_t, dir, "microshift-backups")
 # Also make sure that during restore the temporary directory gets the same labels.
 filetrans_pattern(kubelet_t, var_lib_t, container_var_lib_t, dir, "microshift.saved")
+
+allow init_t container_runtime_t:bpf { prog_run };

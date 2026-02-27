@@ -19,7 +19,6 @@
 # SELinux specifics
 %global selinuxtype targeted
 %define selinux_policyver 38.1.35
-%define container_selinux_ver 4:2.237.0
 %define microshift_relabel_files() \
    mkdir -p /var/lib/kubelet/pods; \
    mkdir -p /etc/microshift; \
@@ -98,7 +97,6 @@ also included in the package.
 Summary: SELinux policies for MicroShift
 BuildRequires: selinux-policy >= %{selinux_policyver}
 BuildRequires: selinux-policy-devel >= %{selinux_policyver}
-Requires: container-selinux >= %{container_selinux_ver}
 BuildArch: noarch
 Requires: microshift = %{version}
 Requires: selinux-policy >= %{selinux_policyver}
