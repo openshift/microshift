@@ -21,6 +21,7 @@
           state: present
           username: "{{ rhel_username }}"
           password: "{{ rhel_password }}"
+        no_log: true
 
       - name: Enable repo management from subscription-manager
         ansible.builtin.command: subscription-manager config --rhsm.manage_repos=1

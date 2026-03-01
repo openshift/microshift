@@ -163,6 +163,7 @@
     owner: root
     group: root
     mode: '0600'
+  no_log: true
   when: not pull_secret.stat.exists
 
 - name: check if crio metrics config is present

@@ -22,10 +22,12 @@
       register: bearer_token_slurp
       delegate_to: localhost
       become: false
+      no_log: true
 
     - name: Decode bearer token
       ansible.builtin.set_fact:
         bearer_token: "{{ bearer_token_slurp.content | b64decode }}"
+      no_log: true
 
     - name: Create metrics service account token file in prometheus folder
       ansible.builtin.copy:
@@ -33,6 +35,7 @@
         dest: "{{ kubelet_auth_token_file }}"
         mode: '0644'
       when: promdir.stat.exists
+      no_log: true
 
     - name: Remove the sa-token file
       ansible.builtin.file:

@@ -60,6 +60,7 @@
           Accept: application/json
           Content-Type: application/json
         body: "{{ lookup('ansible.builtin.template', 'prometheus_datasource.json.j2') }}"
+      no_log: true
 
     - name: Create microshift perf dashboard in grafana
       ansible.builtin.uri:
@@ -73,3 +74,4 @@
           Accept: application/json
           Content-Type: application/json
         body: "{{ lookup('ansible.builtin.template', 'grafana_dashboard.json.j2') }}"
+      no_log: true
