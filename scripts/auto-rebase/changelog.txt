@@ -1,15 +1,22 @@
-- kubernetes embedded-component c80debdd0580ea09f2359ac9c3297a2afd24bdc6 to 41c4e9ba94f4f1bfece6b81f287a9e3cf63e79cd
-  - 12ddf403a 2026-02-04T00:07:42+05:30 UPSTREAM: <carry>: Bump github.com/sirupsen/logrus to v1.9.3 for CVE-2025-65637
+- cluster-network-operator embedded-component e0302b4751a6fb567a2635e537df8e78ee8ee9ee to ab21214d8dc49e36a0b69620484c55d22ddeb02d
+  - 4805444 2026-02-04T12:21:15Z Tweak iptables-alerter to try to avoid crictl bug
 
-- ovn-kubernetes image-amd64 664d01e170a4b2363b28164646ab6c546f5ef3df to 87e907048daff0331a98a86330fa45972dc99a6f
-  - 2583473c 2026-02-05T17:38:17+01:00 Dockerfile: Unpin OVN and consume the latest from FDP.
+- operator-framework-olm embedded-component e48ec38c748a5cb90cdaf2fe017fb161301886ae to 5a6ac6fc8284c8ed88db3e2ce42d845cccf95c16
+  - 5ed6450c 2026-02-23T15:24:55Z fixup! Remove the collect-profiles job
+  - 54a067aa 2026-02-23T15:24:55Z fixup! Remove the collect-profiles job
+  - 66f29b29 2026-02-23T15:24:55Z Remove the collect-profiles job
 
-- kubernetes image-amd64 c80debdd0580ea09f2359ac9c3297a2afd24bdc6 to 41c4e9ba94f4f1bfece6b81f287a9e3cf63e79cd
-  - 12ddf403a 2026-02-04T00:07:42+05:30 UPSTREAM: <carry>: Bump github.com/sirupsen/logrus to v1.9.3 for CVE-2025-65637
+- coredns image-amd64 1e417656c1c72d3410b31ee08caf25bcdf8836e3 to 6704e15689cbc58c40c2747d04a39a1d55104fef
+  - e2bc74f 2026-02-25T13:27:12+01:00 UPSTREAM: 7083: Fix unit test TestZoneExternalCNAMELookupWithProxy
+  - e1b8144 2026-02-25T13:15:38+01:00 UPSTREAM <carry>: Modify .gitignore to not exclude vendor build folders
 
-- ovn-kubernetes image-arm64 664d01e170a4b2363b28164646ab6c546f5ef3df to 87e907048daff0331a98a86330fa45972dc99a6f
-  - 2583473c 2026-02-05T17:38:17+01:00 Dockerfile: Unpin OVN and consume the latest from FDP.
+- ovn-kubernetes image-amd64 87e907048daff0331a98a86330fa45972dc99a6f to 6c926c1045cf177a1790b1321aa466857d7228b8
+  - 88eff287 2026-02-24T15:52:21+08:00 Fix conntrack reconciliation to use service port instead of endpoint port
 
-- kubernetes image-arm64 c80debdd0580ea09f2359ac9c3297a2afd24bdc6 to 41c4e9ba94f4f1bfece6b81f287a9e3cf63e79cd
-  - 12ddf403a 2026-02-04T00:07:42+05:30 UPSTREAM: <carry>: Bump github.com/sirupsen/logrus to v1.9.3 for CVE-2025-65637
+- coredns image-arm64 1e417656c1c72d3410b31ee08caf25bcdf8836e3 to 6704e15689cbc58c40c2747d04a39a1d55104fef
+  - e2bc74f 2026-02-25T13:27:12+01:00 UPSTREAM: 7083: Fix unit test TestZoneExternalCNAMELookupWithProxy
+  - e1b8144 2026-02-25T13:15:38+01:00 UPSTREAM <carry>: Modify .gitignore to not exclude vendor build folders
+
+- ovn-kubernetes image-arm64 87e907048daff0331a98a86330fa45972dc99a6f to 6c926c1045cf177a1790b1321aa466857d7228b8
+  - 88eff287 2026-02-24T15:52:21+08:00 Fix conntrack reconciliation to use service port instead of endpoint port
 
