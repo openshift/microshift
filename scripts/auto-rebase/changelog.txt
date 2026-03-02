@@ -1,0 +1,25 @@
+- cluster-kube-apiserver-operator embedded-component 8e391e9a79393c3bcba34c7de63afd3381fb51f3 to 84e19b2149ab818a455b00717d790856c13ea387
+  - 6cc667d 2026-02-25T15:55:56+00:00 OCPBUGS-68162: CVE-2025-65637 openshift4/ose-cluster-kube-apiserver-rhel9-operator: github.com/sirupsen/logrus: Denial-of-Service due to large single-line payload [openshift-4.17]
+
+- machine-config-operator embedded-component 247c2c7ff38913836a0ff6c469e80b82df8cb5a5 to 039f9834a4104785d41d5e10aeaa672492c8dd15
+  - 4edc4f0e 2026-02-24T12:12:01-06:00 added mcn conditions to ocl sync
+  - dd8a517c 2026-02-19T15:05:18-06:00 fix pull secret log spam make verify error
+  - 3fc58518 2026-02-19T20:51:03+00:00 fixes exposure of sensitive data in log files
+  - 6f0b00b4 2026-02-05T11:35:21-06:00 PIS
+  - 1dedbe7a 2026-02-05T11:27:40-06:00 check if the MachineOSConfig CRD exists before starting the informer
+  - 868a609f 2026-01-20T11:27:09-06:00 WaitForCacheSync blocks forever
+
+- operator-framework-olm embedded-component 52652d0744d7cf955defb84d38f45bfe640d7850 to e92a5cf8d93f756e47646aaf8f064f656a5f27dd
+  - aa2ff0b4 2026-02-16T15:40:24+00:00 fixup! Remove the collect-profiles job
+  - e293a216 2026-02-16T15:40:24+00:00 fixup! Remove the collect-profiles job
+  - 21d30d28 2026-02-16T15:40:24+00:00 Remove the collect-profiles job
+
+- service-ca-operator embedded-component 73ca97dd83f69d878cb5059161645f6eb693368a to 2cb0a44d1245cf2f5d7bdf2072484cdfdfa50eaa
+  - c573cef 2026-02-04T16:49:19-05:00 Update logrus to 1.9.3 to address CVE-2025-65637
+
+- service-ca-operator image-amd64 73ca97dd83f69d878cb5059161645f6eb693368a to 2cb0a44d1245cf2f5d7bdf2072484cdfdfa50eaa
+  - c573cef 2026-02-04T16:49:19-05:00 Update logrus to 1.9.3 to address CVE-2025-65637
+
+- service-ca-operator image-arm64 73ca97dd83f69d878cb5059161645f6eb693368a to 2cb0a44d1245cf2f5d7bdf2072484cdfdfa50eaa
+  - c573cef 2026-02-04T16:49:19-05:00 Update logrus to 1.9.3 to address CVE-2025-65637
+
