@@ -1,7 +1,59 @@
-- oc image-arm64 36384453463224e67ca737d246589de2fa95733b to 9b77539af975e5627df7e623b9ee183ef1fd33ba
+- api embedded-component 43090db3afe48e7dff0f6e39a866474d15cd0db5 to 64dddb8f3186537f3682b7e735f1cc392196a101
+  - 2f247934 2026-02-24T18:10:02+01:00 refactor: use deepcopy-gen style in DeepCopyInto functions
+  - 4facae20 2026-02-24T09:37:13+01:00 MON-4032: Add PrometheusOperatorAdmissionWebhookConfig to ClusterMonitoringSpec
+  - 0e1531ae 2026-02-24T09:09:22+01:00 fix(insights): v1alpha1 verify errors
+  - 64ae6c0b 2026-02-24T08:41:54+01:00 feat(insights): remove feature gate
+  - 3c4723ad 2026-02-19T14:42:26Z Ensure unique paths for excluded fields in compatibility requirement
+  - 00bee773 2026-02-19T14:02:50Z Update generated merged CRDs
+  - e0e84651 2026-02-19T12:50:02Z Fix coderabbit nits
+  - d7c57397 2026-02-19T12:50:01Z Fix update-payload-crds script
+  - 20dae4e3 2026-02-19T12:50:00Z Handle CRDs with multiple feature gates in integration tests
+  - f4ff6978 2026-02-19T12:49:59Z Fix cluster profile feature set deduplication
+  - b2e42589 2026-02-19T12:49:58Z Handle feature gate annotation vs feature set annotation in manifest merge
+  - ab702814 2026-02-19T12:49:57Z Update generated feature gates
+  - 90ed755d 2026-02-19T12:49:56Z Add operator to inVersion
+  - db19aa54 2026-02-19T12:49:55Z Implement version awareness in crd-manifest-merge
+  - 73e68efd 2026-02-19T12:49:54Z Introduce version based feature gating
+  - 46946d83 2026-02-19T12:49:53Z Features and payload command should not be linted
+  - 457ded88 2026-02-17T14:55:10-05:00 OCPBUGS-76919: add listtype atomic
+  - 9650576a 2026-02-17T10:51:49-05:00 feat: update the html for feature promotion
+  - 70ab6a8b 2026-02-16T16:23:18-05:00 Add empty CRIOCredentialProviderConfig resource
+  - 22c911d1 2026-02-09T21:49:53+01:00 make update
+  - c994015e 2026-02-09T21:49:53+01:00 postpone the removal of the DeploymentConfig API
+
+- cluster-ingress-operator embedded-component abfb6fa7b9c95dc54fb3988e84297912ad88e0e4 to add0516e322140127200057716ea9f9080b19fa4
+  - 01cdb69 2026-02-24T15:42:42Z NE-2376: Remove restriction of unmanaged x-k8s.io (#1336)
+  - 006060f 2026-01-26T16:15:43+01:00 chore(ossm): Bump to OSSM 3.2.2 and Istio 1.27.5
+
+- cluster-kube-apiserver-operator embedded-component cee7acb6c820b707fbb1e1dc01cef6c1971f146d to bf2d69223e840eed1c3ad73eb7145c6d8c747fa8
+  - fe0d938 2026-02-23T20:29:31+01:00 CNTRLPLANE-2622: config tls on check-endpoints container
+  - cd4bb00 2026-02-23T18:02:05+03:00 Update library-go to get KMS mode
+
+- cluster-network-operator embedded-component f28e91e89d1ec31bda057e8ade21d4cc68aaefe1 to b1c55d71bfc33a4e2aba1083c0eed1ff698a84c5
+  - 59290dc 2026-01-22T12:52:36-05:00 Simplify some network type checks
+  - 8873f59 2026-01-22T09:46:20-05:00 Remove remaining references to openshift-sdn
+  - 20f9f3f 2026-01-17T10:40:17-05:00 Fix some bad copy+pasting in comments
+
+- cluster-openshift-controller-manager-operator embedded-component 7349d0f7dba3285dfc31d309cfad4124c1e7f943 to ec06b68a376c9ddbab8e9d85347cfb5dadcea0bf
+  - faab8be 2026-02-18T09:18:58-06:00 Migrate away from deprecated ioutil
+
+- machine-config-operator embedded-component e8fd02f68658c3a7a65126740aec4775491ddb6c to b8e0c0c1dd6cb646740fc3deed65bfd41b15a04f
+  - 59b22f2d 2026-02-25T16:02:45-05:00 Revert "MCO-2120: Rework OS Image Stream label classification"
+  - 7a82a69d 2026-02-23T11:48:19-05:00 Create timeout per resource to clean up
+  - 509278e6 2026-02-19T09:09:49Z Refactor the import image logic in vsphere
+  - 6801893b 2026-02-18T13:58:17Z MCO-2124 MCO-2125: migrate units and storage test cases
+  - 5d4608d3 2026-02-18T10:47:25Z Add test case: CPMS interaction with automatic skew
+  - 52f1536f 2026-02-17T12:39:11-05:00 tests: update ImageModeStatusReporting regression tests for split applied OS and file conditions
+  - 68a17fcc 2026-02-17T12:39:08-05:00 daemon, upgrade_monitor, and controller: split 'MachineConfigNodeUpdateFilesAndOS' condition to 'MachineConfigNodeUpdateOS' and 'MachineConfigNodeUpdateFiles' and introduce 'ImagePulledFromRegistry' when 'ImageModeStatusReporting' is enabled
+
+- oc image-amd64 36384453463224e67ca737d246589de2fa95733b to 5cbfaa519ec55b8ac7217b316061cb904381ab91
   - abcf821d 2026-02-19T12:39:00+01:00 Fix ns inspect when resource group is specified
   - 999b54e4 2026-02-19T10:55:38+01:00 inspect: Refactor to use sets.Set[string]
+  - 719e8487 2026-02-16T12:01:03+01:00 Makefile: Strip debugging symbols by default
 
-- ovn-kubernetes image-arm64 c698004c7eb3de25cc95169e660448b4eaf77843 to 517194700aba68ee6ad222841e312e0c29899e73
+- ovn-kubernetes image-amd64 c698004c7eb3de25cc95169e660448b4eaf77843 to 517194700aba68ee6ad222841e312e0c29899e73
   - afe27f93 2026-02-17T13:38:26+01:00 OTE: Exclude new BGP and EVPN tests
+
+- oc image-arm64 9b77539af975e5627df7e623b9ee183ef1fd33ba to 5cbfaa519ec55b8ac7217b316061cb904381ab91
+  - 719e8487 2026-02-16T12:01:03+01:00 Makefile: Strip debugging symbols by default
 
