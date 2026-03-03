@@ -3,7 +3,7 @@
 # Sourced from scenario.sh and uses functions defined there.
 
 scenario_create_vms() {
-    prepare_kickstart host1 kickstart.ks.template rhel-9.6-microshift-source
+    prepare_kickstart host1 kickstart.ks.template rhel-9.8-microshift-source
     launch_vm 
 }
 
@@ -12,5 +12,5 @@ scenario_remove_vms() {
 }
 
 scenario_run_tests() {
-    run_tests host1 suites/osconfig/cleanup-data.robot
+    run_tests host1 suites/osconfig/lifecycle.robot
 }

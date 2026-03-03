@@ -13,7 +13,7 @@ scenario_remove_vms() {
 
 scenario_run_tests() {
     run_tests host1 \
-        --variable "FAILING_REF:rhel-9.6-microshift-source" \
+        --variable "FAILING_REF:rhel-9.8-microshift-source" \
         --variable "REASON:fail_greenboot" \
         suites/upgrade/upgrade-fails-and-rolls-back.robot
 }

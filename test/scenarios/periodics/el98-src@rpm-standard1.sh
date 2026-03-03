@@ -4,7 +4,7 @@
 
 scenario_create_vms() {
     prepare_kickstart host1 kickstart-liveimg.ks.template ""
-    launch_vm --boot_blueprint rhel-9.6-microshift-source-isolated
+    launch_vm --boot_blueprint rhel-9.8-microshift-source-isolated
 }
 
 scenario_remove_vms() {
@@ -13,6 +13,6 @@ scenario_remove_vms() {
 
 scenario_run_tests() {
     run_tests host1 \
-        --variable "EXPECTED_OS_VERSION:9.6" \
+        --variable "EXPECTED_OS_VERSION:9.8" \
         suites/standard1/
 }

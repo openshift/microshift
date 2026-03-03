@@ -170,10 +170,10 @@ run_sonobuoy() {
 }
 
 scenario_create_vms() {
-    prepare_kickstart host1 kickstart.ks.template rhel-9.6-microshift-source
-    prepare_kickstart host2 kickstart.ks.template rhel-9.6-microshift-source
-    launch_vm --vmname host1 --boot_blueprint rhel-9.6
-    launch_vm --vmname host2 --boot_blueprint rhel-9.6
+    prepare_kickstart host1 kickstart.ks.template rhel-9.8-microshift-source
+    prepare_kickstart host2 kickstart.ks.template rhel-9.8-microshift-source
+    launch_vm --vmname host1 --boot_blueprint rhel-9.8
+    launch_vm --vmname host2 --boot_blueprint rhel-9.8
 }
 
 scenario_remove_vms() {
