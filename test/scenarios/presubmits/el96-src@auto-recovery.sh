@@ -9,14 +9,14 @@ min_vcpus=2
 min_memory=4096
 min_disksize=20
 networks=default
-boot_image=rhel-9.6-microshift-source-fake-next-minor
+boot_image=rhel-9.6-microshift-source
 fips=false
 EOF
 }
 
 scenario_create_vms() {
-    prepare_kickstart host1 kickstart.ks.template rhel-9.8-microshift-source-fake-next-minor
-    launch_vm rhel-9.8
+    prepare_kickstart host1 kickstart.ks.template rhel-9.6-microshift-source
+    launch_vm
 }
 
 scenario_remove_vms() {
@@ -24,7 +24,5 @@ scenario_remove_vms() {
 }
 
 scenario_run_tests() {
-    run_tests host1 \
-        --variable "OLDER_MICROSHIFT_REF:rhel-9.8-microshift-source" \
-        suites/upgrade/downgrade-block.robot
+    run_tests host1 suites/backup/auto-recovery.robot suites/backup/auto-recovery-extra.robot
 }
