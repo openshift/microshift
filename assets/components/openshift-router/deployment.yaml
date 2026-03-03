@@ -40,6 +40,10 @@ spec:
               value: '{{ .RouterCiphers }}'
             - name: ROUTER_CIPHERSUITES
               value: '{{ .RouterCiphersSuites }}'
+            {{- if .RouterCurves }}
+            - name: ROUTER_CURVES
+              value: '{{ .RouterCurves }}'
+            {{- end }}
             - name: ROUTER_DISABLE_HTTP2
               value: '{{ .RouterDisableHttp2 }}'
             - name: ROUTER_DISABLE_NAMESPACE_OWNERSHIP_CHECK
