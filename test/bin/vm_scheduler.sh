@@ -722,24 +722,24 @@ run_scenario_on_vm() {
 
     # Phase 1: Create VM (only for new VMs)
     if [ "${is_new_vm}" = "true" ]; then
-        local create_log="${scenario_log_dir}/create.log"
+        local boot_log="${scenario_log_dir}/boot.log"
         local vm_dir="${VM_REGISTRY}/${vm_name}"
         mkdir -p "${vm_dir}"
-        ln -sf "${create_log}" "${vm_dir}/creation_log"
+        ln -sf "${boot_log}" "${vm_dir}/creation_log"
 
-        log "Creating VM ${vm_name} (timeout: ${create_timeout}s) - logging to ${create_log}. Linking to ${vm_dir}/creation_log"
+        log "Creating VM ${vm_name} (timeout: ${create_timeout}s) - logging to ${boot_log}. Linking to ${vm_dir}/creation_log"
 
         local create_exit=0
         timeout --signal=TERM --kill-after=60 "${create_timeout}" \
-            bash -x "${SCRIPTDIR}/scenario.sh" create "${scenario_script}" &> "${create_log}" || create_exit=$?
+            bash -x "${SCRIPTDIR}/scenario.sh" create "${scenario_script}" &> "${boot_log}" || create_exit=$?
 
         if [ ${create_exit} -ne 0 ]; then
             result="FAILED"
             exit_code=1
             if [ ${create_exit} -eq 124 ]; then
-                log "VM creation TIMED OUT for ${scenario_name} after ${create_timeout}s - see ${create_log}"
+                log "VM creation TIMED OUT for ${scenario_name} after ${create_timeout}s - see ${boot_log}"
             else
-                log "VM creation failed for ${scenario_name} (exit ${create_exit}) - see ${create_log}"
+                log "VM creation failed for ${scenario_name} (exit ${create_exit}) - see ${boot_log}"
             fi
         fi
     fi
