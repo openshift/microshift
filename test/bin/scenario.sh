@@ -33,6 +33,12 @@ TEST_EXCLUDES="none"  # may be overridden in scenario file
 TEST_EXECUTION_TIMEOUT="${TEST_EXECUTION_TIMEOUT:-30m}" # may be overriden in scenario file or CI config
 SUBSCRIPTION_MANAGER_PLUGIN="${SUBSCRIPTION_MANAGER_PLUGIN:-${SCRIPTDIR}/subscription_manager_register.sh}"  # may be overridden in global settings file
 RUN_HOST_OVERRIDE=""  # target any given VM for running scenarios
+# Scheduler integration
+SCHEDULER_ENABLED="${SCHEDULER_ENABLED:-false}"
+SCHEDULER_VM_NAME="${SCHEDULER_VM_NAME:-}"
+SCHEDULER_SCENARIO_NAME="${SCHEDULER_SCENARIO_NAME:-}"
+SCHEDULER_IS_NEW_VM="${SCHEDULER_IS_NEW_VM:-true}"
+SCHEDULER_STATE_DIR="${SCHEDULER_STATE_DIR:-${IMAGEDIR}/scheduler-state}"
 
 declare -i TESTCASES=0
 declare -i FAILURES=0
@@ -41,6 +47,18 @@ TIMESTAMP="$(date --iso-8601=ns)"
 
 full_vm_name() {
     local -r base="${1}"
+    # In scheduler mode, use the scheduler-assigned VM name (e.g., dynamic-vm-001)
+    # This keeps VM names neutral and not tied to any specific scenario
+    if [ "${SCHEDULER_ENABLED}" = "true" ] && [ -n "${SCHEDULER_VM_NAME}" ]; then
+        if [ "${base}" = "host1" ]; then
+            echo "${SCHEDULER_VM_NAME}"
+        else
+            # For multiple VMs in a scenario, append the base name
+            echo "${SCHEDULER_VM_NAME}-${base}"
+        fi
+        return
+    fi
+
     local -r type="$(get_scenario_type_from_path "${SCENARIO_SCRIPT}")"
     # Add a type suffix to the name to allow running scenarios from different
     # build types on the same hypervisor
@@ -689,6 +707,96 @@ EOF
 EOF
 }
 
+# Check if a scheduler-assigned VM exists for this scenario
+get_scheduler_assigned_vm() {
+    if [ "${SCHEDULER_ENABLED}" != "true" ]; then
+        return 1
+    fi
+
+    if [ -n "${SCHEDULER_VM_NAME}" ]; then
+        echo "${SCHEDULER_VM_NAME}"
+        return 0
+    fi
+
+    # Check for assignment file
+    local assigned_vm="${SCHEDULER_STATE_DIR}/scenarios/${SCENARIO}/vm_assignment"
+    if [ -f "${assigned_vm}" ]; then
+        cat "${assigned_vm}"
+        return 0
+    fi
+
+    return 1
+}
+
+# Check if we should reuse an existing VM (scheduler mode)
+should_reuse_vm() {
+    if [ "${SCHEDULER_ENABLED}" != "true" ]; then
+        return 1
+    fi
+
+    # If the scheduler assigned a VM and it's not a new VM, reuse it
+    if [ "${SCHEDULER_IS_NEW_VM}" = "false" ]; then
+        return 0
+    fi
+
+    local reused_file="${SCHEDULER_STATE_DIR}/scenarios/${SCENARIO}/vm_reused"
+    if [ -f "${reused_file}" ] && [ "$(cat "${reused_file}")" = "true" ]; then
+        return 0
+    fi
+
+    return 1
+}
+
+# Set up VM properties from an existing VM (for scheduler reuse)
+setup_vm_properties_from_existing() {
+    local vmname="$1"
+    local scheduler_vm="$2"
+
+    echo "Reusing scheduler-assigned VM: ${scheduler_vm}"
+
+    # The VM already exists, so we need to set up properties for this scenario
+    local -r full_vmname="${scheduler_vm}"
+
+    # Ensure the VM is running
+    if sudo virsh dominfo "${full_vmname}" 2>/dev/null | grep '^State' | grep -q 'shut off'; then
+        echo "Starting VM ${full_vmname}"
+        sudo virsh start "${full_vmname}"
+    fi
+
+    # Wait for IP and set properties
+    echo "Waiting for VM ${full_vmname} to have an IP"
+    local ip
+    ip=$(get_vm_ip "${full_vmname}")
+    if [ -z "${ip}" ]; then
+        echo "VM ${full_vmname} has no IP"
+        record_junit "${vmname}" "ip-assignment" "FAILED"
+        return 1
+    fi
+
+    echo "VM ${full_vmname} has IP ${ip}"
+    record_junit "${vmname}" "ip-assignment" "OK"
+
+    # Clear any previous SSH key info for this IP
+    if [ -f "${HOME}/.ssh/known_hosts" ]; then
+        ssh-keygen -R "${ip}" 2>/dev/null || true
+    fi
+
+    # Set the VM properties for this scenario
+    set_vm_property "${vmname}" "ip" "${ip}"
+    set_vm_property "${vmname}" "ssh_port" "22"
+    set_vm_property "${vmname}" "api_port" "6443"
+    set_vm_property "${vmname}" "lb_port" "5678"
+
+    if wait_for_ssh "${ip}"; then
+        record_junit "${vmname}" "ssh-access" "OK"
+    else
+        record_junit "${vmname}" "ssh-access" "FAILED"
+        return 1
+    fi
+
+    echo "${full_vmname} is up and ready (reused)"
+    return 0
+}
 
 # Public function to start a VM.
 #
@@ -783,6 +891,19 @@ launch_vm() {
     done
 
     record_junit "${vmname}" "vm-launch-args" "OK"
+
+    # Check if scheduler assigned a VM for reuse
+    local scheduler_vm=""
+    if scheduler_vm=$(get_scheduler_assigned_vm) && should_reuse_vm; then
+        # Scheduler has assigned an existing VM for reuse
+        if setup_vm_properties_from_existing "${vmname}" "${scheduler_vm}"; then
+            record_junit "${vmname}" "install_vm" "OK (reused)"
+            return 0
+        else
+            record_junit "${vmname}" "install_vm" "FAILED (reuse failed)"
+            return 1
+        fi
+    fi
 
     local -r full_vmname="$(full_vm_name "${vmname}")"
     local -r kickstart_url="${WEB_SERVER_URL}/scenario-info/${SCENARIO}/vms/${vmname}/kickstart.ks"
@@ -1005,6 +1126,16 @@ remove_vm() {
     local -r vmname="${1}"
     local -r keep_pool="${2:-false}"
     local -r full_vmname="$(full_vm_name "${vmname}")"
+
+    # In scheduler mode, the scheduler handles VM lifecycle
+    # We only release the VM back to the scheduler, not destroy it
+    if [ "${SCHEDULER_ENABLED}" = "true" ]; then
+        echo "Scheduler mode: releasing VM ${full_vmname} to scheduler"
+        # The scheduler will handle destruction when no compatible scenarios remain
+        # Just clean up scenario-specific state
+        rm -rf "${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}"
+        return 0
+    fi
 
     # Remove the actual VM
     if sudo virsh dumpxml "${full_vmname}" >/dev/null; then
