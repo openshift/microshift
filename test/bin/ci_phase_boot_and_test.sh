@@ -30,7 +30,7 @@ prepare_scenario_sources() {
 # VM Scheduler configuration
 # Set SCHEDULER_ENABLED=true to use the dynamic VM scheduler
 # The scheduler provides VM reuse and resource-aware queuing
-SCHEDULER_ENABLED="${SCHEDULER_ENABLED:-false}"
+SCHEDULER_ENABLED="${SCHEDULER_ENABLED:-true}"
 export SCHEDULER_ENABLED
 
 # Host resource limits for the scheduler (defaults from system)
@@ -96,6 +96,8 @@ fi
 # Tell scenario.sh to merge stderr into stdout
 export SCENARIO_MERGE_OUTPUT_STREAMS=true
 
+TEST_OK=true
+
 if [ "${SCHEDULER_ENABLED}" = "true" ]; then
     # Use the dynamic VM scheduler for resource-aware execution
     echo "Using dynamic VM scheduler (total: vcpus=${HOST_TOTAL_VCPUS}, memory=${HOST_TOTAL_MEMORY}MB, reserved: vcpus=${SYSTEM_RESERVED_VCPUS}, memory=${SYSTEM_RESERVED_MEMORY}MB)"
@@ -103,6 +105,9 @@ if [ "${SCHEDULER_ENABLED}" = "true" ]; then
     if ! bash -x ./bin/vm_scheduler.sh orchestrate "${SCENARIOS_TO_RUN}"; then
         TEST_OK=false
     fi
+
+    # Print scheduler summary
+    bash -x ./bin/vm_scheduler.sh status
 else
     # Legacy mode: use GNU parallel without resource awareness
     echo "Using GNU parallel for scenario execution (legacy mode)"

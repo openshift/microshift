@@ -924,8 +924,8 @@ orchestrate() {
         exit 1
     fi
 
-    log "=== PHASE 0: Preparing ==="    
     init_scheduler
+    log "=== PHASE 0: Preparing ==="
 
     log "=== PHASE 1: Classifying scenarios ==="
     local -a dynamic_scenarios=()
@@ -1005,6 +1005,18 @@ orchestrate() {
     log "Resource validation PASSED - all scenarios can run"
     log ""
 
+    # Persist resource allocation for status command
+    cat > "${SCHEDULER_STATE_DIR}/resource_allocation" <<EOF
+STATIC_TOTAL_VCPUS=${STATIC_TOTAL_VCPUS}
+STATIC_TOTAL_MEMORY=${STATIC_TOTAL_MEMORY}
+DYNAMIC_AVAILABLE_VCPUS=${DYNAMIC_AVAILABLE_VCPUS}
+DYNAMIC_AVAILABLE_MEMORY=${DYNAMIC_AVAILABLE_MEMORY}
+MAX_DYNAMIC_VCPUS=${MAX_DYNAMIC_VCPUS}
+MAX_DYNAMIC_MEMORY=${MAX_DYNAMIC_MEMORY}
+STATIC_SCENARIO_COUNT=${#static_scenarios[@]}
+DYNAMIC_SCENARIO_COUNT=${#dynamic_scenarios[@]}
+EOF
+
     if [ ${#static_scenarios[@]} -gt 0 ]; then
         log "=== PHASE 3: Creating static VMs ==="
         if ! create_static_vms "${static_scenarios[@]}"; then
@@ -1056,9 +1068,6 @@ orchestrate() {
 
     log "Orchestration complete (dynamic=${dynamic_result}, static=${static_result})"
 
-    # Print final summary
-    show_status
-
     return ${overall_result}
 }
 
@@ -1069,6 +1078,17 @@ show_status() {
     echo ""
     echo "State directory: ${SCHEDULER_STATE_DIR}"
     echo ""
+
+    # Load persisted resource allocation if available
+    local resource_file="${SCHEDULER_STATE_DIR}/resource_allocation"
+    local static_scenario_count=0
+    local dynamic_scenario_count=0
+    if [ -f "${resource_file}" ]; then
+        # shellcheck source=/dev/null
+        source "${resource_file}"
+        static_scenario_count="${STATIC_SCENARIO_COUNT:-0}"
+        dynamic_scenario_count="${DYNAMIC_SCENARIO_COUNT:-0}"
+    fi
 
     # --- Scenario Results ---
     local total_scenarios=0
@@ -1125,12 +1145,11 @@ show_status() {
     fi
 
     echo "=== Scenario Results ==="
-    echo "  Total scenarios:          ${total_scenarios}"
-    echo "  Passed:                   ${passed_scenarios}"
-    echo "  Failed:                   ${failed_scenarios}"
+    echo "  Static scenarios:         ${static_scenario_count}"
+    echo "  Dynamic scenarios:        ${dynamic_scenario_count} (passed: ${passed_scenarios}, failed: ${failed_scenarios})"
     echo ""
 
-    echo "=== VM Efficiency ==="
+    echo "=== Dynamic VM Efficiency ==="
     echo "  VMs created:              ${vms_created}"
     echo "  VM reuses:                ${vm_reuses}"
     echo "  Reuse rate:               ${reuse_rate}%"
