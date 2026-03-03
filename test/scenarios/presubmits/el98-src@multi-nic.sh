@@ -3,7 +3,7 @@
 # Sourced from scenario.sh and uses functions defined there.
 
 scenario_create_vms() {
-    prepare_kickstart host1 kickstart.ks.template rhel-9.6-microshift-source
+    prepare_kickstart host1 kickstart.ks.template rhel-9.8-microshift-source
     # Using multus as secondary network to have 2 nics in different networks.
     launch_vm --network default,"${VM_MULTUS_NETWORK}"
 }

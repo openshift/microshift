@@ -12,7 +12,7 @@ MIRROR_REGISTRY_URL="${VM_BRIDGE_IP}:${MIRROR_REGISTRY_PORT}"
 
 scenario_create_vms() {
     # Enable IPv6 single stack in kickstart
-    prepare_kickstart host1 kickstart.ks.template rhel-9.6-microshift-source false true
+    prepare_kickstart host1 kickstart.ks.template rhel-9.8-microshift-source false true
     launch_vm  --network "${VM_IPV6_NETWORK}"
 }
 
