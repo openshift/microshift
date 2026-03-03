@@ -23,7 +23,7 @@ DNF_PACK=""
 rc=0
 for _ in $(seq 3) ; do
     # shellcheck disable=SC2086
-    sudo dnf "${DNF_MODE}" -y ${DNF_PACK} && exit 0
+    sudo dnf ${DNF_MODE} -y ${DNF_PACK} && exit 0
     # If unsuccessful, save the return code for exit
     rc=$?
     # Clean cache and retry

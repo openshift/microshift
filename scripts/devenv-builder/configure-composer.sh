@@ -16,9 +16,12 @@ install_and_configure_composer() {
     local -r version_id=$1
     local -r version_id_major="$(awk -F. '{print $1}' <<< "${version_id}")"
 
+    # The osbuild packages may come from 'copr' repositories.
+    # They are installed separately to resolve potential RPM package dependency
+    # conflicts with the system packages.
+    "${DNF_RETRY}" "install --nobest" "osbuild osbuild-composer"
     "${DNF_RETRY}" "install" \
-        "osbuild osbuild-composer \
-        git composer-cli ostree rpm-ostree \
+        "git composer-cli ostree rpm-ostree \
         cockpit-composer bash-completion podman runc genisoimage \
         createrepo yum-utils selinux-policy-devel jq wget lorax rpm-build \
         containernetworking-plugins expect httpd-tools vim-common"
