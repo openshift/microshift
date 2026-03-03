@@ -21,7 +21,7 @@ import (
 // +openshift:compatibility-gen:level=1
 type PinnedImageSet struct {
 	metav1.TypeMeta `json:",inline"`
-	
+
 	// metadata is the standard object metadata.
 	// +optional
 	metav1.ObjectMeta `json:"metadata,omitempty"`

@@ -932,19 +932,18 @@ var (
 						mustRegister()
 
 	FeatureGateGatewayAPIWithoutOLM = newFeatureGate("GatewayAPIWithoutOLM").
-				reportProblemsToJiraComponent("Routing").
-				contactPerson("miciah").
-				productScope(ocpSpecific).
-				enhancementPR("https://github.com/openshift/enhancements/pull/1933").
-				enableIn(configv1.DevPreviewNoUpgrade, configv1.TechPreviewNoUpgrade).
-				mustRegister()
+					reportProblemsToJiraComponent("Routing").
+					contactPerson("miciah").
+					productScope(ocpSpecific).
+					enhancementPR("https://github.com/openshift/enhancements/pull/1933").
+					enableIn(configv1.DevPreviewNoUpgrade, configv1.TechPreviewNoUpgrade).
+					mustRegister()
 
 	FeatureGateTLSCurvePreferences = newFeatureGate("TLSCurvePreferences").
-						reportProblemsToJiraComponent("Networking").
-						contactPerson("davidesalerno").
-						productScope(ocpSpecific).
-						enhancementPR("https://github.com/openshift/enhancements/pull/1894").
-						enableIn(configv1.DevPreviewNoUpgrade, configv1.TechPreviewNoUpgrade).
-						mustRegister()
+					reportProblemsToJiraComponent("Networking").
+					contactPerson("davidesalerno").
+					productScope(ocpSpecific).
+					enhancementPR("https://github.com/openshift/enhancements/pull/1894").
+					enableIn(configv1.DevPreviewNoUpgrade, configv1.TechPreviewNoUpgrade).
+					mustRegister()
 )
-
