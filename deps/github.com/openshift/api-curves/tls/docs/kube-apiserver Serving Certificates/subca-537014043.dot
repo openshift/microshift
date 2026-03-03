@@ -1,0 +1,16 @@
+digraph "Local Certificate" {
+  // Node definitions.
+  4 [
+    label="certkeypair/kube-apiserver-localhost-signer\n\nsecret/localhost-serving-signer -nopenshift-kube-apiserver-operator\n    file:///etc/kubernetes/static-pod-resources/kube-apiserver-pod-3/secrets/localhost-recovery-client-token/ca.crt/ca.crt,file://\n    file:///etc/kubernetes/static-pod-resources/kube-controller-manager-pod-4/secrets/localhost-recovery-client-token/ca.crt/ca.crt,file://\n    file:///etc/kubernetes/static-pod-resources/kube-scheduler-pod-6/secrets/localhost-recovery-client-token/ca.crt/ca.crt,file://\n"
+    style=filled
+    fillcolor="#c7bfff"
+  ];
+  13 [
+    label="cabundle/kube-apiserver-localhost-serving-ca\n\nconfigmaps/localhost-serving-ca -nopenshift-kube-apiserver-operator\n"
+    style=filled
+    fillcolor="#fda172"
+  ];
+
+  // Edge definitions.
+  4 -> 13;
+}

@@ -1,0 +1,16 @@
+digraph "Local Certificate" {
+  // Node definitions.
+  0 [
+    label="certkeypair/kube-apiserver-service-network-signer\n\nsecret/service-network-serving-signer -nopenshift-kube-apiserver-operator\n"
+    style=filled
+    fillcolor="#c7bfff"
+  ];
+  16 [
+    label="cabundle/kube-apiserver-service-network-serving-ca\n\nconfigmaps/service-network-serving-ca -nopenshift-kube-apiserver-operator\n"
+    style=filled
+    fillcolor="#fda172"
+  ];
+
+  // Edge definitions.
+  0 -> 16;
+}

@@ -1,0 +1,52 @@
+digraph "Local Certificate" {
+  // Node definitions.
+  1 [
+    label="certkeypair/kube-controller-manager-csr-signer\n\nsecret/csr-signer -nopenshift-kube-controller-manager\n    secret/csr-signer -nopenshift-kube-controller-manager-operator\n    file:///etc/kubernetes/static-pod-resources/kube-controller-manager-certs/secrets/csr-signer/tls.crt/tls.crt,file:///etc/kubernetes/static-pod-resources/kube-controller-manager-certs/secrets/csr-signer/tls.crt/tls.key\n"
+    style=filled
+    fillcolor="#c7bfff"
+  ];
+  12 [
+    label="certkeypair/kube-controller-manager-csr-signer-signer\n\nsecret/csr-signer-signer -nopenshift-kube-controller-manager-operator\n"
+    style=filled
+    fillcolor="#c7bfff"
+  ];
+  13 [
+    label="certkeypair/system:serviceaccount:openshift-oauth-apiserver:openshift-authenticator::122907677913153492574449624837636959338\n\nsecret/openshift-authenticator-certs -nopenshift-oauth-apiserver\n"
+    style=filled
+    fillcolor="#c8fbcd"
+  ];
+  14 [
+    label="certkeypair/system:serviceaccount:openshift-monitoring:prometheus-k8s::245984941195439209045265417880856366162\n\nsecret/metrics-client-certs -nopenshift-monitoring\n"
+    style=filled
+    fillcolor="#c8fbcd"
+  ];
+  16 [
+    label="cabundle/kube-apiserver-total-client-ca\n\nconfigmaps/kube-apiserver-client-ca -nopenshift-config-managed\n    configmaps/client-ca -nopenshift-controller-manager\n    configmaps/client-ca -nopenshift-kube-apiserver\n    configmaps/client-ca -nopenshift-kube-controller-manager\n    file:///etc/kubernetes/static-pod-resources/kube-apiserver-certs/configmaps/client-ca/ca-bundle.crt/ca-bundle.crt\n    file:///etc/kubernetes/static-pod-resources/kube-controller-manager-certs/configmaps/client-ca/ca-bundle.crt/ca-bundle.crt\n"
+    style=filled
+    fillcolor="#fda172"
+  ];
+  17 [
+    label="cabundle/kube-controller-manager-csr-ca\n\nconfigmaps/csr-controller-ca -nopenshift-config-managed\n    configmaps/kubelet-serving-ca -nopenshift-config-managed\n    configmaps/kubelet-serving-ca -nopenshift-kube-apiserver\n    configmaps/kubelet-serving-ca-2 -nopenshift-kube-apiserver\n    configmaps/kubelet-serving-ca-3 -nopenshift-kube-apiserver\n    configmaps/kubelet-serving-ca-4 -nopenshift-kube-apiserver\n    configmaps/kubelet-serving-ca-5 -nopenshift-kube-apiserver\n    configmaps/kubelet-serving-ca-6 -nopenshift-kube-apiserver\n    configmaps/kubelet-serving-ca-7 -nopenshift-kube-apiserver\n    configmaps/csr-controller-ca -nopenshift-kube-controller-manager-operator\n    configmaps/csr-signer-ca -nopenshift-kube-controller-manager-operator\n    configmaps/kubelet-serving-ca-bundle -nopenshift-monitoring\n    file:///etc/kubernetes/static-pod-resources/kube-apiserver-pod-7/configmaps/kubelet-serving-ca/ca-bundle.crt/ca-bundle.crt\n"
+    style=filled
+    fillcolor="#fda172"
+  ];
+  22 [
+    label="cabundle/kube-controller-manager-csr-signer-signer-ca\n\nconfigmaps/csr-controller-signer-ca -nopenshift-kube-controller-manager-operator\n"
+    style=filled
+    fillcolor="#fda172"
+  ];
+  23 [
+    label="cabundle/kube-apiserver-from-installer-client-ca\n\nconfigmaps/initial-kube-apiserver-server-ca -nopenshift-config\n"
+    style=filled
+    fillcolor="#fda172"
+  ];
+
+  // Edge definitions.
+  12 -> 1;
+  12 -> 13;
+  12 -> 14;
+  12 -> 16;
+  12 -> 17;
+  12 -> 22;
+  12 -> 23;
+}

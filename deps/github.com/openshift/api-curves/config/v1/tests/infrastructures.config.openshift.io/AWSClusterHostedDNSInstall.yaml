@@ -1,0 +1,249 @@
+apiVersion: apiextensions.k8s.io/v1 # Hack because controller-gen complains if we don't have this
+name: "Infrastructure"
+crdName: infrastructures.config.openshift.io
+featureGates:
+- AWSClusterHostedDNSInstall
+tests:
+  onCreate:
+    - name: Should be able to create a minimal Infrastructure
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec: {} # No spec is required for a Infrastructure
+      expected: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec: {}
+  onUpdate:
+    - name: dnsType should default to `PlatformDefault` when not specified
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec:
+          platformSpec:
+            aws: {}
+            type: AWS
+        status:
+          controlPlaneTopology: HighlyAvailable
+          infrastructureTopology: HighlyAvailable
+          platform: AWS
+          platformStatus:
+            aws: {}
+            type: AWS
+      updated: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec:
+          platformSpec:
+            type: AWS
+            aws: {}
+        status:
+          controlPlaneTopology: HighlyAvailable
+          infrastructureTopology: HighlyAvailable
+          platform: AWS
+          platformStatus:
+            aws: {}
+            type: AWS
+      expected: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec:
+          platformSpec:
+            type: AWS
+            aws: {}
+        status:
+          controlPlaneTopology: HighlyAvailable
+          cpuPartitioning: None
+          infrastructureTopology: HighlyAvailable
+          platform: AWS
+          platformStatus:
+            aws:
+              cloudLoadBalancerConfig:
+                dnsType: PlatformDefault
+              ipFamily: IPv4
+            type: AWS
+    - name: should be able to set dnsType to non-default value of `ClusterHosted`
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec:
+          platformSpec:
+            aws: {}
+            type: AWS
+      updated: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec:
+          platformSpec:
+            type: AWS
+            aws: {}
+        status:
+          controlPlaneTopology: HighlyAvailable
+          infrastructureTopology: HighlyAvailable
+          platform: AWS
+          platformStatus:
+            aws:
+              cloudLoadBalancerConfig:
+                dnsType: ClusterHosted
+            type: AWS
+      expected: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec:
+          platformSpec:
+            type: AWS
+            aws: {}
+        status:
+          controlPlaneTopology: HighlyAvailable
+          cpuPartitioning: None
+          infrastructureTopology: HighlyAvailable
+          platform: AWS
+          platformStatus:
+            aws:
+              cloudLoadBalancerConfig:
+                dnsType: ClusterHosted
+              ipFamily: IPv4
+            type: AWS
+    - name: Should not allow changing the immutable dnsType field
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec:
+          platformSpec:
+            aws: {}
+            type: AWS
+        status:
+          controlPlaneTopology: HighlyAvailable
+          infrastructureTopology: HighlyAvailable
+          platform: AWS
+          platformStatus:
+            aws:
+              cloudLoadBalancerConfig:
+                dnsType: ClusterHosted
+                clusterHosted:
+                  apiIntLoadBalancerIPs:
+                  - 10.10.10.20
+            type: AWS
+      updated: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec:
+          platformSpec:
+            type: AWS
+            aws: {}
+        status:
+          controlPlaneTopology: HighlyAvailable
+          infrastructureTopology: HighlyAvailable
+          platform: AWS
+          platformStatus:
+            aws:
+              cloudLoadBalancerConfig:
+                dnsType: PlatformDefault
+            type: AWS
+      expectedStatusError: "status.platformStatus.aws.cloudLoadBalancerConfig.dnsType: Invalid value: \"string\": dnsType is immutable"
+    - name: Should not accept non-IP address values for Load Balancer IPs
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec:
+          platformSpec:
+            aws: {}
+            type: AWS
+        status:
+          controlPlaneTopology: HighlyAvailable
+          infrastructureTopology: HighlyAvailable
+          platform: AWS
+          platformStatus:
+            aws:
+              cloudLoadBalancerConfig:
+                dnsType: ClusterHosted
+                clusterHosted:
+                  apiIntLoadBalancerIPs:
+                  - 10.10.10.20
+            type: AWS
+      updated: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec:
+          platformSpec:
+            type: AWS
+            aws: {}
+        status:
+          controlPlaneTopology: HighlyAvailable
+          infrastructureTopology: HighlyAvailable
+          platform: AWS
+          platformStatus:
+            aws:
+              cloudLoadBalancerConfig:
+                dnsType: ClusterHosted
+                clusterHosted:
+                  apiIntLoadBalancerIPs:
+                  - 10.10.10.20
+                  - not-an-ip-address
+            type: AWS
+      expectedStatusError: "status.platformStatus.aws.cloudLoadBalancerConfig.clusterHosted.apiIntLoadBalancerIPs[1]: Invalid value: \"string\": value must be a valid IP address"
+    - name: Should not accept update when `clusterHosted` is specified with DNSType `PlatformDefault`
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec:
+          platformSpec:
+            aws: {}
+            type: AWS
+        status:
+          controlPlaneTopology: HighlyAvailable
+          infrastructureTopology: HighlyAvailable
+          platform: AWS
+          platformStatus:
+            aws: {}
+            type: AWS
+      updated: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec:
+          platformSpec:
+            type: AWS
+            aws: {}
+        status:
+          controlPlaneTopology: HighlyAvailable
+          infrastructureTopology: HighlyAvailable
+          platform: AWS
+          platformStatus:
+            aws:
+              cloudLoadBalancerConfig:
+                dnsType: PlatformDefault
+                clusterHosted:
+                  apiIntLoadBalancerIPs:
+                  - 10.10.10.20
+            type: AWS
+      expectedStatusError: "status.platformStatus.aws.cloudLoadBalancerConfig: Invalid value: \"object\": clusterHosted is permitted only when dnsType is ClusterHosted"
+    - name: Should not accept duplicate IP addresses for any of the Load Balancer IPs
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec:
+          platformSpec:
+            aws: {}
+            type: AWS
+      updated: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec:
+          platformSpec:
+            type: AWS
+            aws: {}
+        status:
+          controlPlaneTopology: HighlyAvailable
+          infrastructureTopology: HighlyAvailable
+          platform: AWS
+          platformStatus:
+            aws:
+              cloudLoadBalancerConfig:
+                dnsType: ClusterHosted
+                clusterHosted:
+                  apiIntLoadBalancerIPs:
+                  - 10.10.10.20
+                  - 10.10.20.20
+                  - 10.10.10.20
+            type: AWS
+      expectedStatusError: "status.platformStatus.aws.cloudLoadBalancerConfig.clusterHosted.apiIntLoadBalancerIPs[2]: Duplicate value: \"10.10.10.20\""

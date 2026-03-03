@@ -1,0 +1,210 @@
+apiVersion: apiextensions.k8s.io/v1 # Hack because controller-gen complains if we don't have this
+name: "[TechPreview] OSStreams"
+crdName: machineconfigpools.machineconfiguration.openshift.io
+featureGates:
+- OSStreams
+tests:
+  onCreate:
+    - name: Should be able to create a minimal MachineConfigPool
+      initial: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: MachineConfigPool
+        spec: {} # No spec is required for a MachineConfigPool
+      expected: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: MachineConfigPool
+        spec: {}
+    - name: Should be able to select a non-default osImageStream
+      initial: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: MachineConfigPool
+        spec:
+          osImageStream:
+            name: "rhel10-coreos"
+      expected: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: MachineConfigPool
+        spec:
+          osImageStream:
+            name: "rhel10-coreos"
+    - name: If given, the osImageStream.name must not be empty
+      initial: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: MachineConfigPool
+        spec:
+          osImageStream:
+            name: ""
+      expectedError: "spec.osImageStream.name in body should be at least 1 chars long"
+    - name: If given, the osImageStream.name should be composed only by lowercase alphanumeric chars, hyphens and dots
+      initial: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: MachineConfigPool
+        spec:
+          osImageStream:
+            name: "rhel10#1-coreos"
+      expectedError: "spec.osImageStream.name: Invalid value: \"string\": a RFC 1123 subdomain must consist of lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character."
+    - name: If given, the osImageStream.name must be lowercase
+      initial: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: MachineConfigPool
+        spec:
+          osImageStream:
+            name: "RHEL10-COREOS"
+      expectedError: "spec.osImageStream.name: Invalid value: \"string\": a RFC 1123 subdomain must consist of lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character."
+    - name: If given, the osImageStream.name should not exceed 253 characters
+      initial: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: MachineConfigPool
+        spec:
+          osImageStream:
+            name: "rhel-coreos32131e2ddf34f44r3r3r4f43tg54frg54tg45454g4g45gt34f43g54g45g3rhel-coreos32131e2ddf34f44r3r3r4f43tg54frg54tg45454g4g45gt34f43g54g45g3rhel-coreos32131e2ddf34f44r3r3r4f43tg54frg54tg45454g4g45gt34f43g54g45g3rhel-coreos32131e2ddf34f44r3r3r4f43tg54frg54tg"
+      expectedError: "Too long: may not be more than 253 bytes"
+  onUpdate:
+    - name: If given, the osImageStream can be removed
+      initial: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: MachineConfigPool
+        spec:
+          osImageStream:
+            name: "rhel10-coreos"
+      updated: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: MachineConfigPool
+        spec: {}
+      expected: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: MachineConfigPool
+        spec: {}
+    - name: If not present, the osImageStream can be added to the pool
+      initial: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: MachineConfigPool
+        spec: {}
+      updated: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: MachineConfigPool
+        spec:
+          osImageStream:
+            name: "rhel10-coreos"
+      expected: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: MachineConfigPool
+        spec:
+          osImageStream:
+            name: "rhel10-coreos"
+    - name: Status osImageStream can be set
+      initial: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: MachineConfigPool
+        spec: {}
+        status: {}
+      updated: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: MachineConfigPool
+        spec: {}
+        status:
+          osImageStream:
+            name: "rhel10-coreos"
+      expected: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: MachineConfigPool
+        spec: {}
+        status:
+          osImageStream:
+            name: "rhel10-coreos"
+    - name: Status osImageStream can be updated
+      initial: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: MachineConfigPool
+        spec: {}
+        status:
+          osImageStream:
+            name: "rhel9-coreos"
+      updated: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: MachineConfigPool
+        spec: {}
+        status:
+          osImageStream:
+            name: "rhel10-coreos"
+      expected: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: MachineConfigPool
+        spec: {}
+        status:
+          osImageStream:
+            name: "rhel10-coreos"
+    - name: Status osImageStream can be removed
+      initial: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: MachineConfigPool
+        spec: {}
+        status:
+          osImageStream:
+            name: "rhel10-coreos"
+      updated: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: MachineConfigPool
+        spec: {}
+        status: {}
+      expected: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: MachineConfigPool
+        spec: {}
+        status: {}
+    - name: Status osImageStream.name must not be empty
+      initial: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: MachineConfigPool
+        spec: {}
+        status: {}
+      updated: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: MachineConfigPool
+        spec: {}
+        status:
+          osImageStream:
+            name: ""
+      expectedStatusError: "status.osImageStream.name: Invalid value: \"\": osImageStream.name in body should be at least 1 chars long"
+    - name: Status osImageStream.name should be composed only by lowercase alphanumeric chars, hyphens and dots
+      initial: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: MachineConfigPool
+        spec: {}
+        status: {}
+      updated: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: MachineConfigPool
+        spec: {}
+        status:
+          osImageStream:
+            name: "rhel10#1-coreos"
+      expectedStatusError: "status.osImageStream.name: Invalid value: \"string\": a RFC 1123 subdomain must consist of lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character."
+    - name: Status osImageStream.name must be lowercase
+      initial: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: MachineConfigPool
+        spec: {}
+        status: {}
+      updated: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: MachineConfigPool
+        spec: {}
+        status:
+          osImageStream:
+            name: "RHEL10-COREOS"
+      expectedStatusError: "status.osImageStream.name: Invalid value: \"string\": a RFC 1123 subdomain must consist of lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character."
+    - name: Status osImageStream.name should not exceed 253 characters
+      initial: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: MachineConfigPool
+        spec: {}
+        status: {}
+      updated: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: MachineConfigPool
+        spec: {}
+        status:
+          osImageStream:
+            name: "rhel-coreos32131e2ddf34f44r3r3r4f43tg54frg54tg45454g4g45gt34f43g54g45g3rhel-coreos32131e2ddf34f44r3r3r4f43tg54frg54tg45454g4g45gt34f43g54g45g3rhel-coreos32131e2ddf34f44r3r3r4f43tg54frg54tg45454g4g45gt34f43g54g45g3rhel-coreos32131e2ddf34f44r3r3r4f43tg54frg54tg"
+      expectedStatusError: "Too long: may not be more than 253 bytes"

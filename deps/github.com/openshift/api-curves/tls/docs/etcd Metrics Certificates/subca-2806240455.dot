@@ -1,0 +1,16 @@
+digraph "Local Certificate" {
+  // Node definitions.
+  0 [
+    label="certkeypair/etcd-metric-signer::4218002264880163000\n\nsecret/etcd-metric-signer -nopenshift-config\n"
+    style=filled
+    fillcolor="#c7bfff"
+  ];
+  5 [
+    label="cabundle/etcd-metrics-ca\n\nconfigmaps/etcd-metric-serving-ca -nopenshift-config\n    configmaps/etcd-metrics-proxy-client-ca -nopenshift-etcd\n    configmaps/etcd-metrics-proxy-client-ca-4 -nopenshift-etcd\n    configmaps/etcd-metrics-proxy-client-ca-5 -nopenshift-etcd\n    configmaps/etcd-metrics-proxy-client-ca-6 -nopenshift-etcd\n    configmaps/etcd-metrics-proxy-client-ca-7 -nopenshift-etcd\n    configmaps/etcd-metrics-proxy-client-ca-8 -nopenshift-etcd\n    configmaps/etcd-metrics-proxy-serving-ca -nopenshift-etcd\n    configmaps/etcd-metrics-proxy-serving-ca-4 -nopenshift-etcd\n    configmaps/etcd-metrics-proxy-serving-ca-5 -nopenshift-etcd\n    configmaps/etcd-metrics-proxy-serving-ca-6 -nopenshift-etcd\n    configmaps/etcd-metrics-proxy-serving-ca-7 -nopenshift-etcd\n    configmaps/etcd-metrics-proxy-serving-ca-8 -nopenshift-etcd\n    file:///etc/kubernetes/static-pod-resources/etcd-certs/configmaps/etcd-metrics-proxy-client-ca/ca-bundle.crt/ca-bundle.crt\n    file:///etc/kubernetes/static-pod-resources/etcd-certs/configmaps/etcd-metrics-proxy-serving-ca/ca-bundle.crt/ca-bundle.crt\n    file:///etc/kubernetes/static-pod-resources/etcd-pod-4/configmaps/etcd-metrics-proxy-client-ca/ca-bundle.crt/ca-bundle.crt\n    file:///etc/kubernetes/static-pod-resources/etcd-pod-4/configmaps/etcd-metrics-proxy-serving-ca/ca-bundle.crt/ca-bundle.crt\n    file:///etc/kubernetes/static-pod-resources/etcd-pod-7/configmaps/etcd-metrics-proxy-client-ca/ca-bundle.crt/ca-bundle.crt\n    file:///etc/kubernetes/static-pod-resources/etcd-pod-7/configmaps/etcd-metrics-proxy-serving-ca/ca-bundle.crt/ca-bundle.crt\n    file:///etc/kubernetes/static-pod-resources/etcd-pod-8/configmaps/etcd-metrics-proxy-client-ca/ca-bundle.crt/ca-bundle.crt\n    file:///etc/kubernetes/static-pod-resources/etcd-pod-8/configmaps/etcd-metrics-proxy-serving-ca/ca-bundle.crt/ca-bundle.crt\n"
+    style=filled
+    fillcolor="#fda172"
+  ];
+
+  // Edge definitions.
+  0 -> 5;
+}

@@ -1,0 +1,306 @@
+apiVersion: apiextensions.k8s.io/v1 # Hack because controller-gen complains if we don't have this
+name: "[TechPreview] InternalReleaseImage"
+crdName: internalreleaseimages.machineconfiguration.openshift.io
+featureGate: NoRegistryClusterInstall
+tests:
+  onCreate:
+  - name: Should be able to create a minimal InternalReleaseImage
+    initial: |
+      apiVersion: machineconfiguration.openshift.io/v1alpha1
+      kind: InternalReleaseImage
+      metadata:
+        name: cluster
+      spec:
+        releases:
+          - name: ocp-release-bundle-4.18.0-x86_64
+    expected: |
+      apiVersion: machineconfiguration.openshift.io/v1alpha1
+      kind: InternalReleaseImage
+      metadata:
+        name: cluster
+      spec:
+        releases:
+          - name: ocp-release-bundle-4.18.0-x86_64
+  - name: Valid release names
+    initial: |
+      apiVersion: machineconfiguration.openshift.io/v1alpha1
+      kind: InternalReleaseImage
+      metadata:
+        name: cluster
+      spec:
+        releases:
+          - name: ocp-release-bundle-4.21.0-ec.3-x86_64
+          - name: ocp-release-bundle-4.20.5-x86_64
+          - name: ocp-release-bundle-4.14.0-0.nightly-2025-11-23-025204
+          - name: ocp-release-bundle-4.21.0-ec.2-s390x
+          - name: ocp-release-bundle-4.15.0-0.ci-2025-11-22-162639
+    expected: |
+      apiVersion: machineconfiguration.openshift.io/v1alpha1
+      kind: InternalReleaseImage
+      metadata:
+        name: cluster
+      spec:
+        releases:
+          - name: ocp-release-bundle-4.21.0-ec.3-x86_64
+          - name: ocp-release-bundle-4.20.5-x86_64
+          - name: ocp-release-bundle-4.14.0-0.nightly-2025-11-23-025204
+          - name: ocp-release-bundle-4.21.0-ec.2-s390x
+          - name: ocp-release-bundle-4.15.0-0.ci-2025-11-22-162639
+  - name: Invalid undefined releases
+    initial: |
+      apiVersion: machineconfiguration.openshift.io/v1alpha1
+      kind: InternalReleaseImage
+      metadata:
+        name: cluster      
+      spec:
+    expectedError: "spec: Required value"    
+  - name: Invalid empty release name
+    initial: |
+      apiVersion: machineconfiguration.openshift.io/v1alpha1
+      kind: InternalReleaseImage
+      metadata:
+        name: cluster      
+      spec:
+        releases:
+          - name: ""
+    expectedError: "Invalid value: \"\": spec.releases[0].name in body should be at least 1 chars long"
+  - name: Should reject duplicate releases
+    initial: |
+      apiVersion: machineconfiguration.openshift.io/v1alpha1
+      kind: InternalReleaseImage
+      metadata:
+        name: cluster      
+      spec:
+        releases:
+          - name: ocp-release-bundle-4.18.0-x86_64
+          - name: ocp-release-bundle-4.18.0-x86_64
+    expectedError: "Duplicate value: map[string]interface {}{\"name\":\"ocp-release-bundle-4.18.0-x86_64\"}"
+  - name: Invalid release name format
+    initial: |
+      apiVersion: machineconfiguration.openshift.io/v1alpha1
+      kind: InternalReleaseImage
+      metadata:
+        name: cluster      
+      spec:
+        releases:
+          - name: "Not a valid release name format"
+    expectedError: "Invalid value: \"string\": must be ocp-release-bundle-<version>-<arch|stream> and <= 64 chars"
+  onUpdate:
+  - name: A new mounted release has been discovered
+    initial: |
+      apiVersion: machineconfiguration.openshift.io/v1alpha1
+      kind: InternalReleaseImage
+      metadata:
+        name: cluster      
+      spec:
+        releases:
+          - name: ocp-release-bundle-4.18.0-x86_64          
+    updated: |
+      apiVersion: machineconfiguration.openshift.io/v1alpha1
+      kind: InternalReleaseImage
+      spec: 
+        releases:
+          - name: ocp-release-bundle-4.18.0-x86_64
+      status:
+        releases:
+          - name: ocp-release-bundle-4.18.0-x86_64
+            image: example.com/example/openshift-release-dev@sha256:aa8795f7932441b30bb8bcfbbf05912875383fad1f2b3be08a22ec148d6860ff
+            conditions:
+            - type: Available
+              status: "True"
+              reason: "Available"
+              message: "Release ocp-release-bundle-4.18.0-x86_64 is currently available"
+              lastTransitionTime: "2024-11-01T07:00:00Z"
+          - name: ocp-release-bundle-4.19.0-x86_64
+            conditions:
+            - type: Mounted
+              status: "True" 
+              reason: "Mounted"
+              message: "Release ocp-release-bundle-4.19.0-x86_64 discovered on node master-0"
+              lastTransitionTime: "2024-12-01T08:04:21Z"
+    expected: |
+      apiVersion: machineconfiguration.openshift.io/v1alpha1
+      kind: InternalReleaseImage
+      metadata:
+        name: cluster      
+      spec: 
+        releases:
+          - name: ocp-release-bundle-4.18.0-x86_64
+      status:
+        releases:
+          - name: ocp-release-bundle-4.18.0-x86_64
+            image: example.com/example/openshift-release-dev@sha256:aa8795f7932441b30bb8bcfbbf05912875383fad1f2b3be08a22ec148d6860ff
+            conditions:
+            - type: Available
+              status: "True"
+              reason: "Available"
+              message: "Release ocp-release-bundle-4.18.0-x86_64 is currently available"
+              lastTransitionTime: "2024-11-01T07:00:00Z"
+          - name: ocp-release-bundle-4.19.0-x86_64
+            conditions:
+            - type: Mounted
+              status: "True" 
+              reason: "Mounted"
+              message: "Release ocp-release-bundle-4.19.0-x86_64 discovered on node master-0"
+              lastTransitionTime: "2024-12-01T08:04:21Z"
+  - name: A release has been installed
+    initial: |
+      apiVersion: machineconfiguration.openshift.io/v1alpha1
+      kind: InternalReleaseImage
+      metadata:
+        name: cluster      
+      spec:
+        releases:
+          - name: ocp-release-bundle-4.18.0-x86_64          
+    updated: |
+      apiVersion: machineconfiguration.openshift.io/v1alpha1
+      kind: InternalReleaseImage
+      metadata:
+        name: cluster      
+      spec: 
+        releases:
+          - name: ocp-release-bundle-4.18.0-x86_64
+          - name: ocp-release-bundle-4.19.0-x86_64
+      status:
+        releases:
+          - name: ocp-release-bundle-4.18.0-x86_64
+            image: example.com/example/openshift-release-dev@sha256:aa8795f7932441b30bb8bcfbbf05912875383fad1f2b3be08a22ec148d6860ff
+            conditions:
+            - type: Available
+              status: "True"
+              reason: "Available"
+              message: "Release ocp-release-bundle-4.18.0-x86_64 is currently available"
+              lastTransitionTime: "2024-11-01T07:00:00Z"
+          - name: ocp-release-bundle-4.19.0-x86_64
+            image: example.com/example/openshift-release-dev@sha256:d98795f7932441b30bb8bcfbbf05912875383fad1f2b3be08a22ec148d68607f
+            conditions:
+            - type: Available
+              status: "True" 
+              reason: "Available"
+              message: "Release ocp-release-bundle-4.19.0-x86_64 is currently available"
+              lastTransitionTime: "2024-12-01T09:00:00Z"
+    expected: |
+      apiVersion: machineconfiguration.openshift.io/v1alpha1
+      kind: InternalReleaseImage
+      metadata:
+        name: cluster      
+      spec: 
+        releases:
+          - name: ocp-release-bundle-4.18.0-x86_64
+          - name: ocp-release-bundle-4.19.0-x86_64
+      status:
+        releases:
+          - name: ocp-release-bundle-4.18.0-x86_64
+            image: example.com/example/openshift-release-dev@sha256:aa8795f7932441b30bb8bcfbbf05912875383fad1f2b3be08a22ec148d6860ff
+            conditions:
+            - type: Available
+              status: "True"
+              reason: "Available"
+              message: "Release ocp-release-bundle-4.18.0-x86_64 is currently available"
+              lastTransitionTime: "2024-11-01T07:00:00Z"
+          - name: ocp-release-bundle-4.19.0-x86_64
+            image: example.com/example/openshift-release-dev@sha256:d98795f7932441b30bb8bcfbbf05912875383fad1f2b3be08a22ec148d68607f
+            conditions:
+            - type: Available
+              status: "True" 
+              reason: "Available"
+              message: "Release ocp-release-bundle-4.19.0-x86_64 is currently available"
+              lastTransitionTime: "2024-12-01T09:00:00Z"
+  - name: A degraded release
+    initial: |
+      apiVersion: machineconfiguration.openshift.io/v1alpha1
+      kind: InternalReleaseImage
+      metadata:
+        name: cluster      
+      spec:
+        releases:
+          - name: ocp-release-bundle-4.18.0-x86_64          
+    updated: |
+      apiVersion: machineconfiguration.openshift.io/v1alpha1
+      kind: InternalReleaseImage
+      metadata:
+        name: cluster      
+      spec: 
+        releases:
+          - name: ocp-release-bundle-4.18.0-x86_64
+          - name: ocp-release-bundle-4.19.0-x86_64
+      status:
+        releases:
+          - name: ocp-release-bundle-4.18.0-x86_64
+            image: example.com/example/openshift-release-dev@sha256:aa8795f7932441b30bb8bcfbbf05912875383fad1f2b3be08a22ec148d6860ff
+            conditions:
+            - type: Available
+              status: "True"
+              reason: "Available"
+              message: "Release ocp-release-bundle-4.18.0-x86_64 is currently available"
+              lastTransitionTime: "2024-11-01T07:00:00Z"
+          - name: ocp-release-bundle-4.19.0-x86_64
+            conditions:
+            - type: Degraded
+              status: "True" 
+              reason: "Degraded"
+              message: "Cannot install release ocp-release-bundle-4.19.0-x86_64 on master-0, out of disk space"
+              lastTransitionTime: "2024-12-01T09:00:00Z"
+    expected: |
+      apiVersion: machineconfiguration.openshift.io/v1alpha1
+      kind: InternalReleaseImage
+      metadata:
+        name: cluster      
+      spec: 
+        releases:
+          - name: ocp-release-bundle-4.18.0-x86_64
+          - name: ocp-release-bundle-4.19.0-x86_64
+      status:
+        releases:
+          - name: ocp-release-bundle-4.18.0-x86_64
+            image: example.com/example/openshift-release-dev@sha256:aa8795f7932441b30bb8bcfbbf05912875383fad1f2b3be08a22ec148d6860ff
+            conditions:
+            - type: Available
+              status: "True"
+              reason: "Available"
+              message: "Release ocp-release-bundle-4.18.0-x86_64 is currently available"
+              lastTransitionTime: "2024-11-01T07:00:00Z"
+          - name: ocp-release-bundle-4.19.0-x86_64
+            conditions:
+            - type: Degraded
+              status: "True" 
+              reason: "Degraded"
+              message: "Cannot install release ocp-release-bundle-4.19.0-x86_64 on master-0, out of disk space"
+              lastTransitionTime: "2024-12-01T09:00:00Z"
+  - name: Invalid image reference format
+    initial: |
+      apiVersion: machineconfiguration.openshift.io/v1alpha1
+      kind: InternalReleaseImage
+      metadata:
+        name: cluster      
+      spec:
+        releases:
+          - name: ocp-release-bundle-4.18.0-x86_64
+      status:
+        releases:
+          - name: ocp-release-bundle-4.18.0-x86_64
+            conditions:
+            - type: Available
+              status: "True"
+              reason: "Available"
+              message: "Release ocp-release-bundle-4.18.0-x86_64 is currently available"
+              lastTransitionTime: "2024-11-01T07:00:00Z"
+    updated: |
+      apiVersion: machineconfiguration.openshift.io/v1alpha1
+      kind: InternalReleaseImage
+      metadata:
+        name: cluster      
+      spec:
+        releases:
+          - name: ocp-release-bundle-4.18.0-x86_64
+      status:
+        releases:
+          - name: ocp-release-bundle-4.18.0-x86_64
+            image: not-a-valid-image-reference
+            conditions:
+            - type: Available
+              status: "True"
+              reason: "Available"
+              message: "Release ocp-release-bundle-4.18.0-x86_64 is currently available"
+              lastTransitionTime: "2024-11-01T07:00:00Z"
+    expectedStatusError: "Invalid value: \"string\": the OCI Image name should follow the host[:port][/namespace]/name format, resembling a valid URL without the scheme"

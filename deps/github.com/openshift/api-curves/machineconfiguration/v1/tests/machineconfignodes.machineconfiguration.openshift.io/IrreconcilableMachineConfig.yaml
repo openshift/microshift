@@ -1,0 +1,207 @@
+apiVersion: apiextensions.k8s.io/v1 # Hack because controller-gen complains if we don't have this
+name: "[TechPreview] IrreconcilableMachineConfig"
+crdName: machineconfignodes.machineconfiguration.openshift.io
+featureGates:
+- MachineConfigNodes
+- IrreconcilableMachineConfig
+tests:
+  onUpdate:
+    - name: Should be able to update a MachineConfigNode with a minimal irreconcilableChanges status field.
+      initial: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: MachineConfigNode
+        metadata:
+          name: foobar
+        spec:
+          node:
+            name: foobar
+          pool:
+            name: worker
+          configVersion:
+            desired: rendered-worker-abc
+      updated: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: MachineConfigNode
+        metadata:
+          name: foobar
+        spec:
+          node:
+            name: foobar
+          pool:
+            name: worker
+          configVersion:
+            desired: rendered-worker-abc
+        status:
+          irreconcilableChanges:
+            - fieldPath: spec.config.storage.disks[0]
+              diff: "dif content"
+      expected: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: MachineConfigNode
+        metadata:
+          name: foobar
+        spec:
+          node:
+            name: foobar
+          pool:
+            name: worker
+          configVersion:
+            desired: rendered-worker-abc
+        status:
+          irreconcilableChanges:
+            - fieldPath: spec.config.storage.disks[0]
+              diff: "dif content"
+    - name: Should be able to update a MachineConfigNode to remove the irreconcilableChanges status field.
+      initial: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: MachineConfigNode
+        metadata:
+          name: foobar
+        spec:
+          node:
+            name: foobar
+          pool:
+            name: worker
+          configVersion:
+            desired: rendered-worker-abc
+        status:
+          irreconcilableChanges:
+            - fieldPath: spec.config.storage.disks[0]
+              diff: "dif content"
+      updated: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: MachineConfigNode
+        metadata:
+          name: foobar
+        spec:
+          node:
+            name: foobar
+          pool:
+            name: worker
+          configVersion:
+            desired: rendered-worker-abc
+        status: {}
+      expected: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: MachineConfigNode
+        metadata:
+          name: foobar
+        spec:
+          node:
+            name: foobar
+          pool:
+            name: worker
+          configVersion:
+            desired: rendered-worker-abc
+        status: {}
+
+    - name: Should not be able to set a fieldPath that does not start with spec. prefix in the irreconcilableChanges status field.
+      initial: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: MachineConfigNode
+        metadata:
+          name: foobar
+        spec:
+          node:
+            name: foobar
+          pool:
+            name: worker
+          configVersion:
+            desired: rendered-worker-abc
+        status:
+          irreconcilableChanges:
+            - fieldPath: spec.config.storage.disks[0]
+              diff: "dif content"
+      updated: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: MachineConfigNode
+        metadata:
+          name: foobar
+        spec:
+          node:
+            name: foobar
+          pool:
+            name: worker
+          configVersion:
+            desired: rendered-worker-abc
+        status:
+          irreconcilableChanges:
+            - fieldPath: spec.config.storage.disks[0]
+              diff: "dif content"
+            - fieldPath: an.invalid.path
+              diff: "dif content"
+      expectedStatusError: "status.irreconcilableChanges[1].fieldPath: Invalid value: \"string\": The fieldPath must start with `spec.`"
+
+    - name: Should not be able to set a fieldPath with invalid characters in the irreconcilableChanges status field.
+      initial: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: MachineConfigNode
+        metadata:
+          name: foobar
+        spec:
+          node:
+            name: foobar
+          pool:
+            name: worker
+          configVersion:
+            desired: rendered-worker-abc
+        status:
+          irreconcilableChanges:
+            - fieldPath: spec.config.storage.disks[0]
+              diff: "dif content"
+      updated: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: MachineConfigNode
+        metadata:
+          name: foobar
+        spec:
+          node:
+            name: foobar
+          pool:
+            name: worker
+          configVersion:
+            desired: rendered-worker-abc
+        status:
+          irreconcilableChanges:
+            - fieldPath: spec.config.storage.disks[0]
+              diff: "dif content"
+            - fieldPath: spec.config@field{1}
+              diff: "dif content"
+      expectedStatusError: "status.irreconcilableChanges[1].fieldPath: Invalid value: \"string\": The fieldPath must consist only of alphanumeric characters, brackets [] and dots ('.')."
+
+    - name: Should not be able to set set multiple diff elements for the same path in the irreconcilableChanges status field.
+      initial: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: MachineConfigNode
+        metadata:
+          name: foobar
+        spec:
+          node:
+            name: foobar
+          pool:
+            name: worker
+          configVersion:
+            desired: rendered-worker-abc
+        status:
+          irreconcilableChanges:
+            - fieldPath: spec.config.storage.disks[0]
+              diff: "dif content"
+      updated: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: MachineConfigNode
+        metadata:
+          name: foobar
+        spec:
+          node:
+            name: foobar
+          pool:
+            name: worker
+          configVersion:
+            desired: rendered-worker-abc
+        status:
+          irreconcilableChanges:
+            - fieldPath: spec.config.storage.disks[0]
+              diff: "dif content"
+            - fieldPath: spec.config.storage.disks[0]
+              diff: "dif content updated"
+      expectedStatusError: "status.irreconcilableChanges[1]: Duplicate value: map[string]interface {}{\"fieldPath\":\"spec.config.storage.disks[0]\"}"

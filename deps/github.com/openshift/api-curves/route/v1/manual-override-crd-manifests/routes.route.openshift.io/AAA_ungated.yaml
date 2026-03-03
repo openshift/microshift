@@ -1,0 +1,81 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    feature-gate.release.openshift.io/: "true"
+  name: routes.route.openshift.io
+spec:
+  versions:
+  - name: v1
+    schema:
+      openAPIV3Schema:
+        properties:
+          spec:
+            allOf:
+            - anyOf:
+              - properties:
+                  path:
+                    maxLength: 0
+              - properties:
+                  tls:
+                    enum:
+                    - null
+              - not:
+                  properties:
+                    tls:
+                      properties:
+                        termination:
+                          enum:
+                          - passthrough
+            - anyOf:
+              - not:
+                  properties:
+                    host:
+                      maxLength: 0
+              - not:
+                  properties:
+                    wildcardPolicy:
+                      enum:
+                      - Subdomain
+            properties:
+              port:
+                properties:
+                  targetPort:
+                    allOf:
+                    - not:
+                        enum:
+                        - 0
+                    - not:
+                        enum:
+                        - ""
+                    anyOf: null
+                    description: The target port on pods selected by the service this
+                      route points to. If this is a string, it will be looked up as
+                      a named port in the target endpoints port list. Required
+                    x-kubernetes-int-or-string: true
+              tls:
+                allOf:
+                - anyOf:
+                  - properties:
+                      caCertificate:
+                        maxLength: 0
+                      certificate:
+                        maxLength: 0
+                      destinationCACertificate:
+                        maxLength: 0
+                      key:
+                        maxLength: 0
+                  - not:
+                      properties:
+                        termination:
+                          enum:
+                          - passthrough
+                - anyOf:
+                  - properties:
+                      destinationCACertificate:
+                        maxLength: 0
+                  - not:
+                      properties:
+                        termination:
+                          enum:
+                          - edge

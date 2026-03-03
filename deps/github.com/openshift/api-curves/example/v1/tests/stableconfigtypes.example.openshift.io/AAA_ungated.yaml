@@ -1,0 +1,964 @@
+apiVersion: apiextensions.k8s.io/v1 # Hack because controller-gen complains if we don't have this
+name: "Example API"
+crdName: stableconfigtypes.example.openshift.io
+tests:
+  onCreate:
+    - name: Should persist stable fields
+      initial: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          stableField: "Allowed"
+          immutableField: foo
+      expected: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          stableField: "Allowed"
+          immutableField: foo
+          nonZeroDefault: 8
+    - name: With an EvolvingUnion, Should allow an empty enum value
+      initial: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          evolvingUnion:
+            type: ""
+          immutableField: foo
+      expected: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          evolvingUnion:
+            type: ""
+          immutableField: foo
+          nonZeroDefault: 8
+    - name: With an EvolvingUnion, Should allow a Stable enum value
+      initial: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          evolvingUnion:
+            type: StableValue
+          immutableField: foo
+      expected: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          evolvingUnion:
+            type: StableValue
+          immutableField: foo
+          nonZeroDefault: 8
+    - name: With an CEL validated Discrminated union, should allow an empty member with the empty type value
+      initial: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          celUnion:
+            type: EmptyMember
+          immutableField: foo
+      expected: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          celUnion:
+            type: EmptyMember
+          immutableField: foo
+          nonZeroDefault: 8
+    - name: With an CEL validated Discrminated union, should allow an empty member with the empty type value
+      initial: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          celUnion:
+            type: EmptyMember
+          immutableField: foo
+      expected: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          celUnion:
+            type: EmptyMember
+          immutableField: foo
+          nonZeroDefault: 8
+    - name: With an CEL validated Discrminated union, should allow a required member with the required type value
+      initial: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          celUnion:
+            type: RequiredMember
+            requiredMember: foo
+          immutableField: foo
+      expected: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          celUnion:
+            type: RequiredMember
+            requiredMember: foo
+          immutableField: foo
+          nonZeroDefault: 8
+    - name: With an CEL validated Discrminated union, should not allow omitting required member with the required type value
+      initial: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          celUnion:
+            type: RequiredMember
+          immutableField: foo
+      expectedError: "Invalid value: \"object\": requiredMember is required when type is RequiredMember, and forbidden otherwise"
+    - name: With an CEL validated Discrminated union, should not allow the required member without the required type value
+      initial: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          celUnion:
+            type: OptionalMember
+            requiredMember: foo
+          immutableField: foo
+      expectedError: "Invalid value: \"object\": requiredMember is required when type is RequiredMember, and forbidden otherwise"
+    - name: With an CEL validated Discrminated union, should not allow the optional member with the required type value
+      initial: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          celUnion:
+            type: RequiredMember
+            requiredMember: foo
+            optionalMember: foo
+          immutableField: foo
+      expectedError: "Invalid value: \"object\": optionalMember is forbidden when type is not OptionalMember"
+    - name: With an CEL validated Discrminated union, should allow an optional member with the optional type value
+      initial: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          celUnion:
+            type: OptionalMember
+            optionalMember: foo
+          immutableField: foo
+      expected: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          celUnion:
+            type: OptionalMember
+            optionalMember: foo
+          immutableField: foo
+          nonZeroDefault: 8
+    - name: With an CEL validated Discrminated union, should allow omitting the optional member with the optional type value
+      initial: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          celUnion:
+            type: OptionalMember
+          immutableField: foo
+      expected: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          celUnion:
+            type: OptionalMember
+          immutableField: foo
+          nonZeroDefault: 8
+    - name: With an CEL validated Discrminated union, should not allow the optional member without the optional type value
+      initial: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          celUnion:
+            type: RequiredMember
+            optionalMember: foo
+          immutableField: foo
+      expectedError: "Invalid value: \"object\": optionalMember is forbidden when type is not OptionalMember"
+    - name: With an CEL validated Discrminated union, should not allow the required member with the optional type value
+      initial: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          celUnion:
+            type: OptionalMember
+            requiredMember: foo
+          immutableField: foo
+      expectedError: "Invalid value: \"object\": requiredMember is required when type is RequiredMember, and forbidden otherwise"
+    - name: Should accept valid IPv4 address
+      initial: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          immutableField: foo
+          formatMarkerExamples:
+            ipv4Address: 192.168.1.1
+      expected: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          immutableField: foo
+          formatMarkerExamples:
+            ipv4Address: 192.168.1.1
+          nonZeroDefault: 8
+    - name: Should reject invalid IPv4 address
+      initial: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          immutableField: foo
+          formatMarkerExamples:
+            ipv4Address: 999.999.999.999
+      expectedError: "Invalid value: \"999.999.999.999\": spec.formatMarkerExamples.ipv4Address in body must be of type ipv4: \"999.999.999.999\""
+    - name: Should accept maximum length IPv4 address
+      initial: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          immutableField: foo
+          formatMarkerExamples:
+            ipv4Address: 255.255.255.255
+      expected: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          immutableField: foo
+          formatMarkerExamples:
+            ipv4Address: 255.255.255.255
+          nonZeroDefault: 8
+    - name: Should accept valid IPv6 address
+      initial: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          immutableField: foo
+          formatMarkerExamples:
+            ipv6Address: "2001:db8::1"
+      expected: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          immutableField: foo
+          formatMarkerExamples:
+            ipv6Address: "2001:db8::1"
+          nonZeroDefault: 8
+    - name: Should reject invalid IPv6 address
+      initial: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          immutableField: foo
+          formatMarkerExamples:
+            ipv6Address: "gggg::1"
+      expectedError: "Invalid value: \"gggg::1\": spec.formatMarkerExamples.ipv6Address in body must be of type ipv6: \"gggg::1\""
+    - name: Should accept non-canonical IPv6 with leading zeros
+      initial: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          immutableField: foo
+          formatMarkerExamples:
+            ipv6Address: "2001:0db8::0001"
+      expected: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          immutableField: foo
+          formatMarkerExamples:
+            ipv6Address: "2001:0db8::0001"
+          nonZeroDefault: 8
+    - name: Should accept IPv6 with uppercase hex
+      initial: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          immutableField: foo
+          formatMarkerExamples:
+            ipv6Address: "2001:DB8::ABCD"
+      expected: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          immutableField: foo
+          formatMarkerExamples:
+            ipv6Address: "2001:DB8::ABCD"
+          nonZeroDefault: 8
+    - name: Should reject IPv6 with zone identifier
+      initial: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          immutableField: foo
+          formatMarkerExamples:
+            ipv6Address: "fe80::1%eth0"
+      expectedError: "Invalid value: \"fe80::1%eth0\": spec.formatMarkerExamples.ipv6Address in body must be of type ipv6: \"fe80::1%eth0\""
+    - name: Should accept IPv6 with IPv4 suffix (dual notation)
+      initial: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          immutableField: foo
+          formatMarkerExamples:
+            ipv6Address: "::192.0.2.1"
+      expected: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          immutableField: foo
+          formatMarkerExamples:
+            ipv6Address: "::192.0.2.1"
+          nonZeroDefault: 8
+    - name: Should accept full uncompressed IPv6 address
+      initial: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          immutableField: foo
+          formatMarkerExamples:
+            ipv6Address: "2001:0db8:0000:0000:0000:0000:0000:0001"
+      expected: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          immutableField: foo
+          formatMarkerExamples:
+            ipv6Address: "2001:0db8:0000:0000:0000:0000:0000:0001"
+          nonZeroDefault: 8
+    - name: Should accept valid CIDR notation
+      initial: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          immutableField: foo
+          formatMarkerExamples:
+            cidrNotation: 10.0.0.0/8
+      expected: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          immutableField: foo
+          formatMarkerExamples:
+            cidrNotation: 10.0.0.0/8
+          nonZeroDefault: 8
+    - name: Should reject invalid CIDR notation
+      initial: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          immutableField: foo
+          formatMarkerExamples:
+            cidrNotation: 10.0.0.0/33
+      expectedError: "Invalid value: \"10.0.0.0/33\": spec.formatMarkerExamples.cidrNotation in body must be of type cidr: \"10.0.0.0/33\""
+    - name: Should accept IPv4 CIDR with non-zero host bits
+      initial: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          immutableField: foo
+          formatMarkerExamples:
+            cidrNotation: 192.168.1.5/24
+      expected: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          immutableField: foo
+          formatMarkerExamples:
+            cidrNotation: 192.168.1.5/24
+          nonZeroDefault: 8
+    - name: Should accept IPv4 CIDR with maximum prefix length
+      initial: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          immutableField: foo
+          formatMarkerExamples:
+            cidrNotation: 192.168.1.1/32
+      expected: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          immutableField: foo
+          formatMarkerExamples:
+            cidrNotation: 192.168.1.1/32
+          nonZeroDefault: 8
+    - name: Should reject IPv6 CIDR with zone identifier
+      initial: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          immutableField: foo
+          formatMarkerExamples:
+            cidrNotation: "fe80::1%eth0/64"
+      expectedError: "Invalid value: \"fe80::1%eth0/64\": spec.formatMarkerExamples.cidrNotation in body must be of type cidr: \"fe80::1%eth0/64\""
+    - name: Should accept IPv6 CIDR with non-zero host bits
+      initial: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          immutableField: foo
+          formatMarkerExamples:
+            cidrNotation: "2001:db8::abcd:1234/64"
+      expected: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          immutableField: foo
+          formatMarkerExamples:
+            cidrNotation: "2001:db8::abcd:1234/64"
+          nonZeroDefault: 8
+    - name: Should accept IPv6 CIDR canonical form
+      initial: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          immutableField: foo
+          formatMarkerExamples:
+            cidrNotation: "2001:db8::/64"
+      expected: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          immutableField: foo
+          formatMarkerExamples:
+            cidrNotation: "2001:db8::/64"
+          nonZeroDefault: 8
+    - name: Should reject IPv6 CIDR with invalid prefix length
+      initial: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          immutableField: foo
+          formatMarkerExamples:
+            cidrNotation: "2001:db8::/129"
+      expectedError: "Invalid value: \"2001:db8::/129\": spec.formatMarkerExamples.cidrNotation in body must be of type cidr: \"2001:db8::/129\""
+    - name: Should accept IPv6 CIDR with maximum prefix length
+      initial: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          immutableField: foo
+          formatMarkerExamples:
+            cidrNotation: "2001:db8::1/128"
+      expected: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          immutableField: foo
+          formatMarkerExamples:
+            cidrNotation: "2001:db8::1/128"
+          nonZeroDefault: 8
+    - name: Should accept IPv6 CIDR with maximum length
+      initial: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          immutableField: foo
+          formatMarkerExamples:
+            cidrNotation: "2001:0db8:85a3:0000:0000:8a2e:0370:7334/128"
+      expected: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          immutableField: foo
+          formatMarkerExamples:
+            cidrNotation: "2001:0db8:85a3:0000:0000:8a2e:0370:7334/128"
+          nonZeroDefault: 8
+    - name: Should accept valid URI
+      initial: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          immutableField: foo
+          formatMarkerExamples:
+            uriField: https://example.com/path
+      expected: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          immutableField: foo
+          formatMarkerExamples:
+            uriField: https://example.com/path
+          nonZeroDefault: 8
+    - name: Should reject invalid URI
+      initial: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          immutableField: foo
+          formatMarkerExamples:
+            uriField: "not a valid uri"
+      expectedError: "Invalid value: \"not a valid uri\": spec.formatMarkerExamples.uriField in body must be of type uri: \"not a valid uri\""
+    - name: Should accept valid email address
+      initial: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          immutableField: foo
+          formatMarkerExamples:
+            emailAddress: user@example.com
+      expected: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          immutableField: foo
+          formatMarkerExamples:
+            emailAddress: user@example.com
+          nonZeroDefault: 8
+    - name: Should reject invalid email address
+      initial: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          immutableField: foo
+          formatMarkerExamples:
+            emailAddress: "not-an-email"
+      expectedError: "Invalid value: \"not-an-email\": spec.formatMarkerExamples.emailAddress in body must be of type email: \"not-an-email\""
+    - name: Should accept valid hostname
+      initial: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          immutableField: foo
+          formatMarkerExamples:
+            hostnameField: api.example.com
+      expected: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          immutableField: foo
+          formatMarkerExamples:
+            hostnameField: api.example.com
+          nonZeroDefault: 8
+    - name: Should reject invalid hostname
+      initial: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          immutableField: foo
+          formatMarkerExamples:
+            hostnameField: "invalid_hostname!"
+      expectedError: "Invalid value: \"invalid_hostname!\": spec.formatMarkerExamples.hostnameField in body must be of type hostname: \"invalid_hostname!\""
+    - name: Should accept valid MAC address
+      initial: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          immutableField: foo
+          formatMarkerExamples:
+            macAddress: "00:1A:2B:3C:4D:5E"
+      expected: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          immutableField: foo
+          formatMarkerExamples:
+            macAddress: "00:1A:2B:3C:4D:5E"
+          nonZeroDefault: 8
+    - name: Should reject invalid MAC address
+      initial: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          immutableField: foo
+          formatMarkerExamples:
+            macAddress: "GG:GG:GG:GG:GG:GG"
+      expectedError: "Invalid value: \"GG:GG:GG:GG:GG:GG\": spec.formatMarkerExamples.macAddress in body must be of type mac: \"GG:GG:GG:GG:GG:GG\""
+    - name: Should accept valid UUID
+      initial: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          immutableField: foo
+          formatMarkerExamples:
+            uuidField: 550e8400-e29b-41d4-a716-446655440000
+      expected: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          immutableField: foo
+          formatMarkerExamples:
+            uuidField: 550e8400-e29b-41d4-a716-446655440000
+          nonZeroDefault: 8
+    - name: Should reject invalid UUID
+      initial: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          immutableField: foo
+          formatMarkerExamples:
+            uuidField: not-a-uuid
+      expectedError: "Invalid value: \"not-a-uuid\": spec.formatMarkerExamples.uuidField in body must be of type uuid: \"not-a-uuid\""
+    - name: Should accept valid UUID version 3
+      initial: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          immutableField: foo
+          formatMarkerExamples:
+            uuid3Field: a987fbc9-4bed-3078-cf07-9141ba07c9f3
+      expected: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          immutableField: foo
+          formatMarkerExamples:
+            uuid3Field: a987fbc9-4bed-3078-cf07-9141ba07c9f3
+          nonZeroDefault: 8
+    - name: Should reject invalid UUID version 3
+      initial: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          immutableField: foo
+          formatMarkerExamples:
+            uuid3Field: not-a-uuid-v3
+      expectedError: "Invalid value: \"not-a-uuid-v3\": spec.formatMarkerExamples.uuid3Field in body must be of type uuid3: \"not-a-uuid-v3\""
+    - name: Should accept valid UUID version 4
+      initial: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          immutableField: foo
+          formatMarkerExamples:
+            uuid4Field: 550e8400-e29b-41d4-a716-446655440000
+      expected: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          immutableField: foo
+          formatMarkerExamples:
+            uuid4Field: 550e8400-e29b-41d4-a716-446655440000
+          nonZeroDefault: 8
+    - name: Should reject invalid UUID version 4
+      initial: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          immutableField: foo
+          formatMarkerExamples:
+            uuid4Field: not-a-uuid-v4
+      expectedError: "Invalid value: \"not-a-uuid-v4\": spec.formatMarkerExamples.uuid4Field in body must be of type uuid4: \"not-a-uuid-v4\""
+    - name: Should accept valid UUID version 5
+      initial: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          immutableField: foo
+          formatMarkerExamples:
+            uuid5Field: 886313e1-3b8a-5372-9b90-0c9aee199e5d
+      expected: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          immutableField: foo
+          formatMarkerExamples:
+            uuid5Field: 886313e1-3b8a-5372-9b90-0c9aee199e5d
+          nonZeroDefault: 8
+    - name: Should reject invalid UUID version 5
+      initial: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          immutableField: foo
+          formatMarkerExamples:
+            uuid5Field: not-a-uuid-v5
+      expectedError: "Invalid value: \"not-a-uuid-v5\": spec.formatMarkerExamples.uuid5Field in body must be of type uuid5: \"not-a-uuid-v5\""
+    - name: Should accept valid date
+      initial: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          immutableField: foo
+          formatMarkerExamples:
+            dateField: "2024-01-15"
+      expected: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          immutableField: foo
+          formatMarkerExamples:
+            dateField: "2024-01-15"
+          nonZeroDefault: 8
+    - name: Should reject invalid date
+      initial: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          immutableField: foo
+          formatMarkerExamples:
+            dateField: "2024-13-45"
+      expectedError: "Invalid value: \"2024-13-45\": spec.formatMarkerExamples.dateField in body must be of type date: \"2024-13-45\""
+    - name: Should accept valid date-time
+      initial: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          immutableField: foo
+          formatMarkerExamples:
+            dateTimeField: "2024-01-15T14:30:00Z"
+      expected: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          immutableField: foo
+          formatMarkerExamples:
+            dateTimeField: "2024-01-15T14:30:00Z"
+          nonZeroDefault: 8
+    - name: Should reject invalid date-time
+      initial: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          immutableField: foo
+          formatMarkerExamples:
+            dateTimeField: "not-a-datetime"
+      expectedError: "Invalid value: \"not-a-datetime\": spec.formatMarkerExamples.dateTimeField in body must be of type date-time: \"not-a-datetime\""
+    - name: Should accept valid duration
+      initial: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          immutableField: foo
+          formatMarkerExamples:
+            durationField: 5m30s
+      expected: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          immutableField: foo
+          formatMarkerExamples:
+            durationField: 5m30s
+          nonZeroDefault: 8
+    - name: Should reject invalid duration
+      initial: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          immutableField: foo
+          formatMarkerExamples:
+            durationField: "not-a-duration"
+      expectedError: "Invalid value: \"not-a-duration\": spec.formatMarkerExamples.durationField in body must be of type duration: \"not-a-duration\""
+    - name: Should accept valid base64 data
+      initial: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          immutableField: foo
+          formatMarkerExamples:
+            base64Data: aGVsbG8gd29ybGQ=
+      expected: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          immutableField: foo
+          formatMarkerExamples:
+            base64Data: aGVsbG8gd29ybGQ=
+          nonZeroDefault: 8
+    - name: Should reject invalid base64 data
+      initial: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          immutableField: foo
+          formatMarkerExamples:
+            base64Data: "not valid base64!!!"
+      expectedError: "Invalid value: \"not valid base64!!!\": spec.formatMarkerExamples.base64Data in body must be of type byte: \"not valid base64!!!\""
+    - name: Should accept any string for password field
+      initial: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          immutableField: foo
+          formatMarkerExamples:
+            passwordField: any-string-is-valid
+      expected: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          immutableField: foo
+          formatMarkerExamples:
+            passwordField: any-string-is-valid
+          nonZeroDefault: 8
+
+# The following tests pass, but we would prefer they fail due to CVE-2021-29923
+#    - name: Should reject IPv4 address with leading zeros
+#      initial: |
+#        apiVersion: example.openshift.io/v1
+#        kind: StableConfigType
+#        spec:
+#          immutableField: foo
+#          formatMarkerExamples:
+#            ipv4Address: 192.168.001.1
+#      expectedError: "failed to match pattern"
+#    - name: Should reject IPv4 address with leading zeros (octal ambiguity)
+#      initial: |
+#        apiVersion: example.openshift.io/v1
+#        kind: StableConfigType
+#        spec:
+#          immutableField: foo
+#          formatMarkerExamples:
+#            ipv4Address: 012.000.001.002
+#      expectedError: "failed to match pattern"
+#    - name: Should reject IPv4 CIDR with leading zeros
+#      initial: |
+#        apiVersion: example.openshift.io/v1
+#        kind: StableConfigType
+#        spec:
+#          immutableField: foo
+#          formatMarkerExamples:
+#            cidrNotation: 192.168.001.0/24
+#      expectedError: "failed to match pattern"
+
+# The following tests pass, but we would prefer they fail due to CVE-2024-24790
+#    - name: Should reject IPv4-mapped IPv6 address
+#      initial: |
+#        apiVersion: example.openshift.io/v1
+#        kind: StableConfigType
+#        spec:
+#          immutableField: foo
+#          formatMarkerExamples:
+#            ipv6Address: "::ffff:192.168.1.1"
+#      expectedError: "failed to match pattern"
+#    - name: Should reject IPv4-mapped IPv6 CIDR
+#      initial: |
+#        apiVersion: example.openshift.io/v1
+#        kind: StableConfigType
+#        spec:
+#          immutableField: foo
+#          formatMarkerExamples:
+#            cidrNotation: "::ffff:192.168.1.1/128"
+#      expectedError: "failed to match pattern"
+
+  onUpdate:
+    - name: Should not allow changing an immutable field
+      initial: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          immutableField: foo
+      updated: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          immutableField: bar
+      expectedError: "spec.immutableField: Invalid value: \"string\": immutableField is immutable"
+    - name: Should allow setting the optional immutable field
+      initial: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          immutableField: foo
+      updated: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          immutableField: foo
+          optionalImmutableField: foo
+      expected: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          immutableField: foo
+          optionalImmutableField: foo
+          nonZeroDefault: 8
+    - name: Should not allow changing the optional immutable field
+      initial: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          immutableField: foo
+          optionalImmutableField: foo
+      updated: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          immutableField: foo
+          optionalImmutableField: bar
+      expectedError: "spec.optionalImmutableField: Invalid value: \"string\": optionalImmutableField is immutable once set"
+    - name: Should allow setting an immutable status field
+      initial: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+      updated: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        status:
+          immutableField: bar
+      expected: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        status:
+          immutableField: bar
+    - name: Should not allow changing an immutable status field
+      initial: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        status:
+          immutableField: foo
+      updated: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        status:
+          immutableField: bar
+      expectedStatusError: "status.immutableField: Invalid value: \"string\": immutableField is immutable"
+    - name: Should allow changing other fields when a persisted value is no longer valid
+      initialCRDPatches:
+      - op: remove
+        path: /spec/versions/0/schema/openAPIV3Schema/properties/spec/properties/nonZeroDefault/minimum # Minimum is normally 8
+      initial: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          nonZeroDefault: 1
+          immutableField: foo
+      updated: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          nonZeroDefault: 1
+          immutableField: foo
+          optionalImmutableField: foo
+      expected: | 
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          nonZeroDefault: 1
+          immutableField: foo
+          optionalImmutableField: foo
+    - name: Should allow updating a persisted value that is no longer valid to a valid value
+      initialCRDPatches:
+      - op: remove
+        path: /spec/versions/0/schema/openAPIV3Schema/properties/spec/properties/nonZeroDefault/minimum # Minimum is normally 8
+      initial: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          nonZeroDefault: 1
+          immutableField: foo
+      updated: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          nonZeroDefault: 8
+          immutableField: foo
+      expected: | 
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          nonZeroDefault: 8
+          immutableField: foo
+    - name: Should not allow updating a persisted value that is no longer valid to a still invalid value
+      initialCRDPatches:
+      - op: remove
+        path: /spec/versions/0/schema/openAPIV3Schema/properties/spec/properties/nonZeroDefault/minimum # Minimum is normally 8
+      initial: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          nonZeroDefault: 1
+          immutableField: foo
+      updated: |
+        apiVersion: example.openshift.io/v1
+        kind: StableConfigType
+        spec:
+          nonZeroDefault: 2
+          immutableField: foo
+      expectedError: "spec.nonZeroDefault: Invalid value: 2: spec.nonZeroDefault in body should be greater than or equal to 8"

@@ -1,0 +1,1 @@
+package etcd_v1alpha1_crdmanifests

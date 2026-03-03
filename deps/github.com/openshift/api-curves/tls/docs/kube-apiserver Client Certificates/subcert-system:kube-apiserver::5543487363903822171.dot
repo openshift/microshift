@@ -1,0 +1,16 @@
+digraph "Local Certificate" {
+  // Node definitions.
+  2 [
+    label="certkeypair/kube-apiserver-to-kubelet-signer\n\nsecret/kube-apiserver-to-kubelet-signer -nopenshift-kube-apiserver-operator\n"
+    style=filled
+    fillcolor="#c7bfff"
+  ];
+  3 [
+    label="certkeypair/kube-apiserver-to-kubelet-client\n\nsecret/kubelet-client -nopenshift-kube-apiserver\n    file:///etc/kubernetes/static-pod-resources/kube-apiserver-certs/secrets/kubelet-client/tls.crt/tls.crt,file:///etc/kubernetes/static-pod-resources/kube-apiserver-certs/secrets/kubelet-client/tls.crt/tls.key\n"
+    style=filled
+    fillcolor="#c8fbcd"
+  ];
+
+  // Edge definitions.
+  2 -> 3;
+}

@@ -1,0 +1,1 @@
+package authorization_v1_crdmanifests

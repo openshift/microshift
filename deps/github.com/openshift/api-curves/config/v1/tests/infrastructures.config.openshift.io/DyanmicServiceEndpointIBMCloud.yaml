@@ -1,0 +1,326 @@
+apiVersion: apiextensions.k8s.io/v1 # Hack because controller-gen complains if we don't have this
+name: "Infrastructure"
+crdName: infrastructures.config.openshift.io
+featureGates: 
+- DyanmicServiceEndpointIBMCloud
+tests:
+  onCreate:
+  - name: Should be able to create a minimal Infrastructure
+    initial: |
+      apiVersion: config.openshift.io/v1
+      kind: Infrastructure
+      spec: {} # No spec is required for a Infrastructure
+    expected: |
+      apiVersion: config.openshift.io/v1
+      kind: Infrastructure
+      spec: {}
+  - name: Should not be able to add invalid ServiceEndpoint (invalid http URL scheme) to IBMCloud PlatformSpec
+    initial: |
+      apiVersion: config.openshift.io/v1
+      kind: Infrastructure
+      spec:
+        platformSpec:
+          type: IBMCloud
+          ibmcloud:
+            serviceEndpoints:
+            - name: VPC
+              url: "http://dummy.vpc.com/v1"
+    expectedError: "spec.platformSpec.ibmcloud.serviceEndpoints[0].url: Invalid value: \"string\": url must use https scheme"
+  - name: Should not be able to add invalid ServiceEndpoint (invalid URL length) to IBMCloud PlatformSpec
+    initial: |
+      apiVersion: config.openshift.io/v1
+      kind: Infrastructure
+      spec:
+        platformSpec:
+          type: IBMCloud
+          ibmcloud:
+            serviceEndpoints:
+            - name: VPC
+              url: https://foobarfoobarbarfoobarfoobarbarfoobarbarfoobarbarfoobarbarfoobarbarfoobarbarfoobarbarfoobarbarfoobarbarfoobarbarfoobarbarfoobarbarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobar/api/v1
+    expectedError: "spec.platformSpec.ibmcloud.serviceEndpoints[0].url: Too long: may not be more than 300 bytes, <nil>: Invalid value: \"null\": some validation rules were not checked because the object was invalid; correct the existing errors to complete validation"
+  - name: Should not be able to add invalid ServiceEndpoint (empty URL) to IBMCloud PlatformSpec
+    initial: |
+      apiVersion: config.openshift.io/v1
+      kind: Infrastructure
+      spec:
+        cloudConfig: {}
+        platformSpec:
+          type: IBMCloud
+          ibmcloud:
+            serviceEndpoints:
+            - name: VPC
+              url: " "
+    expectedError: "spec.platformSpec.ibmcloud.serviceEndpoints[0].url: Invalid value: \"string\": URL parse error during conversion from string: parse \" \": invalid URI for request evaluating rule: url must use https scheme, spec.platformSpec.ibmcloud.serviceEndpoints[0].url: Invalid value: \"string\": URL parse error during conversion from string: parse \" \": invalid URI for request evaluating rule: url path must match /v[0,9]+ or /api/v[0,9]+, spec.platformSpec.ibmcloud.serviceEndpoints[0].url: Invalid value: \"string\": url must be a valid absolute URL]"
+  - name: Should not be able to add invalid ServiceEndpoint (incorect URL path) to IBMCloud PlatformSpec
+    initial: |
+      apiVersion: config.openshift.io/v1
+      kind: Infrastructure
+      spec:
+        cloudConfig: {}
+        platformSpec:
+          type: IBMCloud
+          ibmcloud:
+            serviceEndpoints:
+            - name: COS
+              url: https://dummy.vpc.com/badpath
+    expectedError: "spec.platformSpec.ibmcloud.serviceEndpoints[0].url: Invalid value: \"string\": url path must match /v[0,9]+ or /api/v[0,9]+"
+  - name: Should not be able to add invalid ServiceEndpoint (invalid URL length) to IBMCloud PlatformSpec
+    initial: |
+      apiVersion: config.openshift.io/v1
+      kind: Infrastructure
+      spec:
+        cloudConfig: {}
+        platformSpec:
+          type: IBMCloud
+          ibmcloud:
+            serviceEndpoints:
+            - name: VPC
+              url: https://foobarfoobarbarfoobarbarfoobarbarfoobarbarfoobarbarfoobarbarfoobarbarfoobarbarfoobarbarfoobarbarfoobarbarfoobarbarfoobarbarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobar/api/v1
+    expectedError: "spec.platformSpec.ibmcloud.serviceEndpoints[0].url: Too long: may not be more than 300 bytes, <nil>: Invalid value: \"null\": some validation rules were not checked because the object was invalid; correct the existing errors to complete validation"
+  - name: Should not be able to add invalid ServiceEndpoint (invalid name) to IBMCloud PlatformSpec
+    initial: |
+      apiVersion: config.openshift.io/v1
+      kind: Infrastructure
+      spec:
+        cloudConfig: {}
+        platformSpec:
+          type: IBMCloud
+          ibmcloud:
+            serviceEndpoints:
+            - name: InvalidService
+              url: https://dummy.vpc.com/v1
+    expectedError: "spec.platformSpec.ibmcloud.serviceEndpoints[0].name: Unsupported value: \"InvalidService\": supported values: \"CIS\", \"COS\", \"COSConfig\", \"DNSServices\", \"GlobalCatalog\", \"GlobalSearch\", \"GlobalTagging\", \"HyperProtect\", \"IAM\", \"KeyProtect\", \"ResourceController\", \"ResourceManager\", \"VPC\", <nil>: Invalid value: \"null\": some validation rules were not checked because the object was invalid; correct the existing errors to complete validation"
+  - name: Should be able to add valid ServiceEndpoints to IBMCloud PlatformSpec
+    initial: |
+      apiVersion: config.openshift.io/v1
+      kind: Infrastructure
+      spec:
+        cloudConfig: {}
+        platformSpec:
+          type: IBMCloud
+          ibmcloud:
+            serviceEndpoints:
+            - name: VPC
+              url: https://dummy.vpc.com/v1
+            - name: COS
+              url: https://dummy.cos.com/api/v22/
+    expected: |
+      apiVersion: config.openshift.io/v1
+      kind: Infrastructure
+      spec:
+        cloudConfig: {}
+        platformSpec:
+          type: IBMCloud
+          ibmcloud:
+            serviceEndpoints:
+            - name: VPC
+              url: https://dummy.vpc.com/v1
+            - name: COS
+              url: https://dummy.cos.com/api/v22/
+onUpdate:
+  - name: Should allow updating other fields with an invalid persisted IBMCloud service endpoint url in status that exceeds length limit
+    initialCRDPatches:
+    - op: replace
+      path: /spec/versions/0/schema/openAPIV3Schema/properties/status/properties/platformStatus/properties/ibmcloud/properties/serviceEndpoints/items/properties/url
+      value:
+        pattern: "^[a-z0-9-:./]+$"
+        type: string
+    initial: |
+      apiVersion: config.openshift.io/v1
+      kind: Infrastructure
+      spec: {}
+      status:
+        platformStatus:
+          type: IBMCloud
+          ibmcloud:
+            serviceEndpoints:
+            - name: IAM
+              url: https://foobarfoobarbarfoobarbarfoobarbarfoobarbarfoobarbarfoobarbarfoobarbarfoobarbarfoobarbarfoobarbarfoobarbarfoobarbarfoobarbarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobar/api/v1
+    updated: |
+      apiVersion: config.openshift.io/v1
+      kind: Infrastructure
+      spec: {}
+      status:
+        platformStatus:
+          type: IBMCloud
+          ibmcloud:
+            cisInstanceCRN: oldCRN
+            serviceEndpoints:
+            - name: IAM
+              url: https://foobarfoobarbarfoobarbarfoobarbarfoobarbarfoobarbarfoobarbarfoobarbarfoobarbarfoobarbarfoobarbarfoobarbarfoobarbarfoobarbarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobar/api/v1
+    expected: |
+      apiVersion: config.openshift.io/v1
+      kind: Infrastructure
+      spec: {}
+      status:
+        controlPlaneTopology: HighlyAvailable
+        cpuPartitioning: None
+        infrastructureTopology: HighlyAvailable
+        platformStatus:
+          type: IBMCloud
+          ibmcloud:
+            cisInstanceCRN: oldCRN
+            serviceEndpoints:
+            - name: IAM
+              url: https://foobarfoobarbarfoobarbarfoobarbarfoobarbarfoobarbarfoobarbarfoobarbarfoobarbarfoobarbarfoobarbarfoobarbarfoobarbarfoobarbarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobar/api/v1
+  - name: Should allow updating other fields with an invalid persisted IBMCloud service endpoint url in status that isnt https
+    initialCRDPatches:
+    - op: replace
+      path: /spec/versions/0/schema/openAPIV3Schema/properties/status/properties/platformStatus/properties/ibmcloud/properties/serviceEndpoints/items/properties/url
+      value:
+        pattern: "^[a-z0-9-:./]+$"
+        type: string
+    initial: |
+      apiVersion: config.openshift.io/v1
+      kind: Infrastructure
+      spec: {}
+      status:
+        platformStatus:
+          type: IBMCloud
+          ibmcloud:
+            serviceEndpoints:
+            - name: IAM
+              url: http://foobar/api/v1
+    updated: |
+      apiVersion: config.openshift.io/v1
+      kind: Infrastructure
+      spec: {}
+      status:
+        platformStatus:
+          type: IBMCloud
+          ibmcloud:
+            cisInstanceCRN: oldCRN
+            serviceEndpoints:
+            - name: IAM
+              url: http://foobar/api/v1
+    expected: |
+      apiVersion: config.openshift.io/v1
+      kind: Infrastructure
+      spec: {}
+      status:
+        controlPlaneTopology: HighlyAvailable
+        cpuPartitioning: None
+        infrastructureTopology: HighlyAvailable
+        platformStatus:
+          type: IBMCloud
+          ibmcloud:
+            cisInstanceCRN: oldCRN
+            serviceEndpoints:
+            - name: IAM
+              url: http://foobar/api/v1
+  - name: Should allow updating other fields with an invalid persisted IBMCloud service endpoint url in status that doesnt match URL path regex
+    initialCRDPatches:
+    - op: replace
+      path: /spec/versions/0/schema/openAPIV3Schema/properties/status/properties/platformStatus/properties/ibmcloud/properties/serviceEndpoints/items/properties/url
+      value:
+        pattern: "^[a-z0-9-:./]+$"
+        type: string
+    initial: |
+      apiVersion: config.openshift.io/v1
+      kind: Infrastructure
+      spec: {}
+      status:
+        platformStatus:
+          type: IBMCloud
+          ibmcloud:
+            serviceEndpoints:
+            - name: IAM
+              url: http://foobar/api/wrong1
+    updated: |
+      apiVersion: config.openshift.io/v1
+      kind: Infrastructure
+      spec: {}
+      status:
+        platformStatus:
+          type: IBMCloud
+          ibmcloud:
+            cisInstanceCRN: oldCRN
+            serviceEndpoints:
+            - name: IAM
+              url: http://foobar/api/wrong1
+    expected: |
+      apiVersion: config.openshift.io/v1
+      kind: Infrastructure
+      spec: {}
+      status:
+        controlPlaneTopology: HighlyAvailable
+        cpuPartitioning: None
+        infrastructureTopology: HighlyAvailable
+        platformStatus:
+          type: IBMCloud
+          ibmcloud:
+            cisInstanceCRN: oldCRN
+            serviceEndpoints:
+            - name: IAM
+              url: http://foobar/api/wrong1
+  - name: Should not be able to add invalid ServiceEndpoint (invalid http URL scheme) to IBMCloud PlatformStatus
+    initial: |
+      apiVersion: config.openshift.io/v1
+      kind: Infrastructure
+      spec: {}
+      status:
+        platform: IBMCloud
+        platformStatus:
+          type: IBMCloud
+          ibmcloud:
+            serviceEndpoints: []
+    updated: |
+      apiVersion: config.openshift.io/v1
+      kind: Infrastructure
+      spec: {}
+      status:
+        platform: IBMCloud
+        platformStatus:
+          type: IBMCloud
+          ibmcloud:
+            serviceEndpoints:
+            - name: VPC
+              url: http://dummy.vpc.com/api/v1
+    expectedStatusError: "platformStatus.ibmcloud.serviceEndpoints[0].url: Invalid value: \"string\": url must be a valid absolute https URL"
+  - name: Should not be able to add invalid ServiceEndpoint (invalid URL path) to IBMCloud PlatformStatus
+    initial: |
+      apiVersion: config.openshift.io/v1
+      kind: Infrastructure
+      spec: {}
+      status:
+        platform: IBMCloud
+        platformStatus:
+          type: IBMCloud
+          ibmcloud:
+            serviceEndpoints: []
+    updated: |
+      apiVersion: config.openshift.io/v1
+      kind: Infrastructure
+      spec: {}
+      status:
+        platform: IBMCloud
+        platformStatus:
+          type: IBMCloud
+          ibmcloud:
+            serviceEndpoints:
+            - name: VPC
+              url: https://dummy.vpc.com/badpath
+    expectedStatusError: "status.platformStatus.ibmcloud.serviceEndpoints[0].url: Invalid value: \"string\": url path must match /v[0,9]+ or /api/v[0,9]+"
+  - name: Should be able to add invalid ServiceEndpoint (invalid URL length) to IBMCloud PlatformStatus
+    initial: |
+      apiVersion: config.openshift.io/v1
+      kind: Infrastructure
+      spec: {}
+      status:
+        platformStatus:
+          type: IBMCloud
+          ibmcloud:
+            serviceEndpoints: []
+    updated: |
+      apiVersion: config.openshift.io/v1
+      kind: Infrastructure
+      spec: {}
+      status:
+        platformStatus:
+          type: IBMCloud
+          ibmcloud:
+            cisInstanceCRN: oldCRN
+            serviceEndpoints:
+            - name: IAM
+              url: https://foobarfoobarbarfoobarfoobarbarfoobarbarfoobarbarfoobarbarfoobarbarfoobarbarfoobarbarfoobarbarfoobarbarfoobarbarfoobarbarfoobarbarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobar/api/v1
+    expectedStatusError: "status.platformStatus.ibmcloud.serviceEndpoints[0].url: Too long: may not be more than 300 bytes, <nil>: Invalid value: \"null\": some validation rules were not checked because the object was invalid; correct the existing errors to complete validation"

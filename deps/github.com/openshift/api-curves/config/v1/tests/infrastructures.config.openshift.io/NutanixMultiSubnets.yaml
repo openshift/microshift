@@ -1,0 +1,447 @@
+apiVersion: apiextensions.k8s.io/v1 # Hack because controller-gen complains if we don't have this
+name: "Infrastructure"
+crdName: infrastructures.config.openshift.io
+featureGates:
+- NutanixMultiSubnets
+tests:
+  onCreate:
+    - name: Should be able to create a minimal Infrastructure
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec: {} # No spec is required for a Infrastructure
+      expected: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec: {}
+    - name: Should be able to create FailureDomain with more than one subnets
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec:
+          cloudConfig:
+            key: config
+            name: cloud-provider-config
+          platformSpec:
+            type: Nutanix
+            nutanix:
+              failureDomains:
+              - name: fd0
+                cluster:
+                  type: Name
+                  name: test-pe1
+                subnets:
+                - type: Name
+                  name: test-nic1
+                - type: Name
+                  name: test-nic2
+              prismCentral:
+                address: pc.test.com
+                port: 9440
+              prismElements:
+              - endpoint:
+                  address: pe1.test.com
+                  port: 9440
+                name: test-pe1
+      expected: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec:
+          cloudConfig:
+            key: config
+            name: cloud-provider-config
+          platformSpec:
+            type: Nutanix
+            nutanix:
+              failureDomains:
+              - name: fd0
+                cluster:
+                  type: Name
+                  name: test-pe1
+                subnets:
+                - type: Name
+                  name: test-nic1
+                - type: Name
+                  name: test-nic2
+              prismCentral:
+                address: pc.test.com
+                port: 9440
+              prismElements:
+              - endpoint:
+                  address: pe1.test.com
+                  port: 9440
+                name: test-pe1
+    - name: FailureDomain should not have duplicate subnets configured
+      expectedError: "spec.platformSpec.nutanix.failureDomains[0].subnets: Invalid value: \"array\": each subnet must be unique"
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec:
+          cloudConfig:
+            key: config
+            name: cloud-provider-config
+          platformSpec:
+            type: Nutanix
+            nutanix:
+              failureDomains:
+              - name: fd0
+                cluster:
+                  type: Name
+                  name: test-pe1
+                subnets:
+                - type: Name
+                  name: test-nic1
+                - type: Name
+                  name: test-nic1
+              prismCentral:
+                address: pc.test.com
+                port: 9440
+              prismElements:
+              - endpoint:
+                  address: pe1.test.com
+                  port: 9440
+                name: test-pe1
+    - name: FailureDomain should not have more than 32 subnets configured
+      expectedError: "spec.platformSpec.nutanix.failureDomains[0].subnets: Too many: 33: must have at most 32 items"
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec:
+          cloudConfig:
+            key: config
+            name: cloud-provider-config
+          platformSpec:
+            type: Nutanix
+            nutanix:
+              failureDomains:
+              - name: fd0
+                cluster:
+                  type: Name
+                  name: test-pe1
+                subnets:
+                - type: Name
+                  name: test-nic1
+                - type: Name
+                  name: test-nic2
+                - type: Name
+                  name: test-nic3
+                - type: Name
+                  name: test-nic4
+                - type: Name
+                  name: test-nic5
+                - type: Name
+                  name: test-nic6
+                - type: Name
+                  name: test-nic7
+                - type: Name
+                  name: test-nic8
+                - type: Name
+                  name: test-nic9
+                - type: Name
+                  name: test-nic10
+                - type: Name
+                  name: test-nic11
+                - type: Name
+                  name: test-nic12
+                - type: Name
+                  name: test-nic13
+                - type: Name
+                  name: test-nic14
+                - type: Name
+                  name: test-nic15
+                - type: Name
+                  name: test-nic16
+                - type: Name
+                  name: test-nic17
+                - type: Name
+                  name: test-nic18
+                - type: Name
+                  name: test-nic19
+                - type: Name
+                  name: test-nic20
+                - type: Name
+                  name: test-nic21
+                - type: Name
+                  name: test-nic22
+                - type: Name
+                  name: test-nic23
+                - type: Name
+                  name: test-nic24
+                - type: Name
+                  name: test-nic25
+                - type: Name
+                  name: test-nic26
+                - type: Name
+                  name: test-nic27
+                - type: Name
+                  name: test-nic28
+                - type: Name
+                  name: test-nic29
+                - type: Name
+                  name: test-nic30
+                - type: Name
+                  name: test-nic31
+                - type: Name
+                  name: test-nic32
+                - type: Name
+                  name: test-nic33
+              prismCentral:
+                address: pc.test.com
+                port: 9440
+              prismElements:
+              - endpoint:
+                  address: pe1.test.com
+                  port: 9440
+                name: test-pe1
+    - name: FailureDomain items should not exceed the limit of 32
+      expectedError: "spec.platformSpec.nutanix.failureDomains: Too many: 33: must have at most 32 items"
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec:
+          cloudConfig:
+            key: config
+            name: cloud-provider-config
+          platformSpec:
+            type: Nutanix
+            nutanix:
+              failureDomains:
+              - name: fd1
+                cluster:
+                  type: Name
+                  name: test-pe1
+                subnets:
+                - type: Name
+                  name: test-nic1
+              - name: fd2
+                cluster:
+                  type: Name
+                  name: test-pe1
+                subnets:
+                - type: Name
+                  name: test-nic1
+              - name: fd3
+                cluster:
+                  type: Name
+                  name: test-pe1
+                subnets:
+                - type: Name
+                  name: test-nic1
+              - name: fd4
+                cluster:
+                  type: Name
+                  name: test-pe1
+                subnets:
+                - type: Name
+                  name: test-nic1
+              - name: fd5
+                cluster:
+                  type: Name
+                  name: test-pe1
+                subnets:
+                - type: Name
+                  name: test-nic1
+              - name: fd6
+                cluster:
+                  type: Name
+                  name: test-pe1
+                subnets:
+                - type: Name
+                  name: test-nic1
+              - name: fd7
+                cluster:
+                  type: Name
+                  name: test-pe1
+                subnets:
+                - type: Name
+                  name: test-nic1
+              - name: fd8
+                cluster:
+                  type: Name
+                  name: test-pe1
+                subnets:
+                - type: Name
+                  name: test-nic1
+              - name: fd9
+                cluster:
+                  type: Name
+                  name: test-pe1
+                subnets:
+                - type: Name
+                  name: test-nic1
+              - name: fd10
+                cluster:
+                  type: Name
+                  name: test-pe1
+                subnets:
+                - type: Name
+                  name: test-nic1
+              - name: fd11
+                cluster:
+                  type: Name
+                  name: test-pe1
+                subnets:
+                - type: Name
+                  name: test-nic1
+              - name: fd12
+                cluster:
+                  type: Name
+                  name: test-pe1
+                subnets:
+                - type: Name
+                  name: test-nic1
+              - name: fd13
+                cluster:
+                  type: Name
+                  name: test-pe1
+                subnets:
+                - type: Name
+                  name: test-nic1
+              - name: fd14
+                cluster:
+                  type: Name
+                  name: test-pe1
+                subnets:
+                - type: Name
+                  name: test-nic1
+              - name: fd15
+                cluster:
+                  type: Name
+                  name: test-pe1
+                subnets:
+                - type: Name
+                  name: test-nic1
+              - name: fd16
+                cluster:
+                  type: Name
+                  name: test-pe1
+                subnets:
+                - type: Name
+                  name: test-nic1
+              - name: fd17
+                cluster:
+                  type: Name
+                  name: test-pe1
+                subnets:
+                - type: Name
+                  name: test-nic1
+              - name: fd18
+                cluster:
+                  type: Name
+                  name: test-pe1
+                subnets:
+                - type: Name
+                  name: test-nic1
+              - name: fd19
+                cluster:
+                  type: Name
+                  name: test-pe1
+                subnets:
+                - type: Name
+                  name: test-nic1
+              - name: fd20
+                cluster:
+                  type: Name
+                  name: test-pe1
+                subnets:
+                - type: Name
+                  name: test-nic1
+              - name: fd21
+                cluster:
+                  type: Name
+                  name: test-pe1
+                subnets:
+                - type: Name
+                  name: test-nic1
+              - name: fd22
+                cluster:
+                  type: Name
+                  name: test-pe1
+                subnets:
+                - type: Name
+                  name: test-nic1
+              - name: fd23
+                cluster:
+                  type: Name
+                  name: test-pe1
+                subnets:
+                - type: Name
+                  name: test-nic1
+              - name: fd24
+                cluster:
+                  type: Name
+                  name: test-pe1
+                subnets:
+                - type: Name
+                  name: test-nic1
+              - name: fd25
+                cluster:
+                  type: Name
+                  name: test-pe1
+                subnets:
+                - type: Name
+                  name: test-nic1
+              - name: fd26
+                cluster:
+                  type: Name
+                  name: test-pe1
+                subnets:
+                - type: Name
+                  name: test-nic1
+              - name: fd27
+                cluster:
+                  type: Name
+                  name: test-pe1
+                subnets:
+                - type: Name
+                  name: test-nic1
+              - name: fd28
+                cluster:
+                  type: Name
+                  name: test-pe1
+                subnets:
+                - type: Name
+                  name: test-nic1
+              - name: fd29
+                cluster:
+                  type: Name
+                  name: test-pe1
+                subnets:
+                - type: Name
+                  name: test-nic1
+              - name: fd30
+                cluster:
+                  type: Name
+                  name: test-pe1
+                subnets:
+                - type: Name
+                  name: test-nic1
+              - name: fd31
+                cluster:
+                  type: Name
+                  name: test-pe1
+                subnets:
+                - type: Name
+                  name: test-nic1
+              - name: fd32
+                cluster:
+                  type: Name
+                  name: test-pe1
+                subnets:
+                - type: Name
+                  name: test-nic1
+              - name: fd33
+                cluster:
+                  type: Name
+                  name: test-pe1
+                subnets:
+                - type: Name
+                  name: test-nic1
+              prismCentral:
+                address: pc.test.com
+                port: 9440
+              prismElements:
+              - endpoint:
+                  address: pe1.test.com
+                  port: 9440
+                name: test-pe1

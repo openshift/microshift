@@ -1,0 +1,28 @@
+digraph "Local Certificate" {
+  // Node definitions.
+  3 [
+    label="certkeypair/kube-controller-manager-csr-signer-signer\n\nsecret/csr-signer-signer -nopenshift-kube-controller-manager-operator\n"
+    style=filled
+    fillcolor="#c7bfff"
+  ];
+  4 [
+    label="certkeypair/kube-controller-manager-csr-signer\n\nsecret/csr-signer -nopenshift-kube-controller-manager\n    secret/csr-signer -nopenshift-kube-controller-manager-operator\n    file:///etc/kubernetes/static-pod-resources/kube-controller-manager-certs/secrets/csr-signer/tls.crt/tls.crt,file:///etc/kubernetes/static-pod-resources/kube-controller-manager-certs/secrets/csr-signer/tls.crt/tls.key\n"
+    style=filled
+    fillcolor="#c7bfff"
+  ];
+  14 [
+    label="cabundle/kube-apiserver-total-client-ca\n\nconfigmaps/kube-apiserver-client-ca -nopenshift-config-managed\n    configmaps/client-ca -nopenshift-controller-manager\n    configmaps/client-ca -nopenshift-kube-apiserver\n    configmaps/client-ca -nopenshift-kube-controller-manager\n    file:///etc/kubernetes/static-pod-resources/kube-apiserver-certs/configmaps/client-ca/ca-bundle.crt/ca-bundle.crt\n    file:///etc/kubernetes/static-pod-resources/kube-controller-manager-certs/configmaps/client-ca/ca-bundle.crt/ca-bundle.crt\n"
+    style=filled
+    fillcolor="#fda172"
+  ];
+  15 [
+    label="cabundle/kube-controller-manager-csr-ca\n\nconfigmaps/csr-controller-ca -nopenshift-config-managed\n    configmaps/kubelet-serving-ca -nopenshift-config-managed\n    configmaps/kubelet-serving-ca -nopenshift-kube-apiserver\n    configmaps/kubelet-serving-ca-2 -nopenshift-kube-apiserver\n    configmaps/kubelet-serving-ca-3 -nopenshift-kube-apiserver\n    configmaps/kubelet-serving-ca-4 -nopenshift-kube-apiserver\n    configmaps/csr-controller-ca -nopenshift-kube-controller-manager-operator\n    configmaps/csr-signer-ca -nopenshift-kube-controller-manager-operator\n    configmaps/kubelet-serving-ca-bundle -nopenshift-monitoring\n    file:///etc/kubernetes/static-pod-resources/kube-apiserver-pod-2/configmaps/kubelet-serving-ca/ca-bundle.crt/ca-bundle.crt\n    file:///etc/kubernetes/static-pod-resources/kube-apiserver-pod-3/configmaps/kubelet-serving-ca/ca-bundle.crt/ca-bundle.crt\n    file:///etc/kubernetes/static-pod-resources/kube-apiserver-pod-4/configmaps/kubelet-serving-ca/ca-bundle.crt/ca-bundle.crt\n"
+    style=filled
+    fillcolor="#fda172"
+  ];
+
+  // Edge definitions.
+  3 -> 4;
+  4 -> 14;
+  4 -> 15;
+}

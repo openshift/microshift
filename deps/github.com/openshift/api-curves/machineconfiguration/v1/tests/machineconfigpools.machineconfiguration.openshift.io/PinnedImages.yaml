@@ -1,0 +1,172 @@
+apiVersion: apiextensions.k8s.io/v1 # Hack because controller-gen complains if we don't have this
+name: "[TechPreview] MachineConfigPool"
+crdName: machineconfigpools.machineconfiguration.openshift.io
+featureGates:
+- PinnedImages
+tests:
+  onCreate:
+    - name: Should be able to create a minimal MachineConfigPool
+      initial: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: MachineConfigPool
+        spec: {} # No spec is required for a MachineConfigPool
+      expected: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: MachineConfigPool
+        spec: {}
+    - name: Should be able to add a PinnedImageSet
+      initial: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: MachineConfigPool
+        spec:
+          pinnedImageSets:
+            - name: test-pinnedimageset
+      expected: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: MachineConfigPool
+        spec:
+          pinnedImageSets:
+            - name: test-pinnedimageset
+  onUpdate:
+    - name: MachineCount must be greater than or equal to updatedMachineCount
+      initial: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: MachineConfigPool
+        spec:
+          pinnedImageSets:
+            - name: test-pinnedimageset
+        status:
+          poolSynchronizersStatus:
+            - poolSynchronizerType: PinnedImageSets
+              machineCount: 3
+              updatedMachineCount: 3
+              readyMachineCount: 3
+              availableMachineCount: 3
+              unavailableMachineCount: 0
+              observedGeneration: 3
+      updated: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: MachineConfigPool
+        spec:
+          pinnedImageSets:
+            - name: test-pinnedimageset
+        status:
+          poolSynchronizersStatus:
+            - poolSynchronizerType: PinnedImageSets
+              machineCount: 3
+              updatedMachineCount: 4
+              readyMachineCount: 3
+              availableMachineCount: 3
+              unavailableMachineCount: 0
+              observedGeneration: 3
+      expectedStatusError: "Invalid value: \"object\": machineCount must be greater than or equal to updatedMachineCount"
+    - name: AvailableMachineCount must be greater than or equal to readyMachineCount
+      initial: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: MachineConfigPool
+        spec:
+          pinnedImageSets:
+            - name: test-pinnedimageset
+        status:
+          poolSynchronizersStatus:
+            - poolSynchronizerType: PinnedImageSets
+              machineCount: 3
+              updatedMachineCount: 3
+              readyMachineCount: 3
+              availableMachineCount: 3
+              unavailableMachineCount: 0
+              observedGeneration: 3
+      updated: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: MachineConfigPool
+        spec:
+          pinnedImageSets:
+            - name: test-pinnedimageset
+        status:
+          poolSynchronizersStatus:
+            - poolSynchronizerType: PinnedImageSets
+              machineCount: 3
+              updatedMachineCount: 3
+              readyMachineCount: 3
+              availableMachineCount: 2
+              unavailableMachineCount: 0
+              observedGeneration: 4
+      expectedStatusError: "Invalid value: \"object\": availableMachineCount must be greater than or equal to readyMachineCount"
+    - name: ObservedGeneration can not decrease in value except to zero
+      initial: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: MachineConfigPool
+        spec:
+          pinnedImageSets:
+            - name: test-pinnedimageset
+        status:
+          poolSynchronizersStatus:
+            - poolSynchronizerType: PinnedImageSets
+              machineCount: 3
+              updatedMachineCount: 3
+              readyMachineCount: 3
+              availableMachineCount: 3
+              unavailableMachineCount: 0
+              observedGeneration: 2
+      updated: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: MachineConfigPool
+        spec:
+          pinnedImageSets:
+            - name: test-pinnedimageset
+        status:
+          poolSynchronizersStatus:
+            - poolSynchronizerType: PinnedImageSets
+              machineCount: 3
+              updatedMachineCount: 3
+              readyMachineCount: 3
+              availableMachineCount: 3
+              unavailableMachineCount: 0
+              observedGeneration: 1
+      expectedStatusError: "Invalid value: \"integer\": observedGeneration must not move backwards except to zero"
+    - name: ObservedGeneration can move from positive to zero
+      initial: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: MachineConfigPool
+        spec:
+          pinnedImageSets:
+            - name: test-pinnedimageset
+        status:
+          poolSynchronizersStatus:
+            - poolSynchronizerType: PinnedImageSets
+              machineCount: 3
+              updatedMachineCount: 3
+              readyMachineCount: 3
+              availableMachineCount: 3
+              unavailableMachineCount: 0
+              observedGeneration: 2
+      updated: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: MachineConfigPool
+        spec:
+          pinnedImageSets:
+            - name: test-pinnedimageset
+        status:
+          poolSynchronizersStatus:
+            - poolSynchronizerType: PinnedImageSets
+              machineCount: 3
+              updatedMachineCount: 3
+              readyMachineCount: 3
+              availableMachineCount: 3
+              unavailableMachineCount: 0
+              observedGeneration: 0
+      expected: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: MachineConfigPool
+        spec:
+          pinnedImageSets:
+            - name: test-pinnedimageset
+        status:
+          poolSynchronizersStatus:
+            - poolSynchronizerType: PinnedImageSets
+              machineCount: 3
+              updatedMachineCount: 3
+              readyMachineCount: 3
+              availableMachineCount: 3
+              unavailableMachineCount: 0
+              observedGeneration: 0

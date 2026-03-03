@@ -1,0 +1,534 @@
+apiVersion: apiextensions.k8s.io/v1 # Hack because controller-gen complains if we don't have this
+name: "Infrastructure"
+crdName: infrastructures.config.openshift.io
+featureGates:
+- VSphereHostVMGroupZonal
+tests:
+  onCreate:
+    - name: Should not be able to have regionAffinity type Datacenter or HostGroup if zoneAffinity type is HostGroup
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec:
+          cloudConfig:
+            key: config
+            name: cloud-provider-config
+          platformSpec:
+            type: VSphere
+            vsphere:
+              failureDomains:
+              - name: generated-failure-domain
+                region: generated-region
+                server: server1.dev.cluster.com
+                regionAffinity:
+                  type: Datacenter 
+                zoneAffinity:
+                  type: HostGroup
+                  hostGroup:
+                    vmGroup: vmg1
+                    hostGroup: hg1
+                    vmHostRule: mhr1
+                topology:
+                  computeCluster: /IBMCloud/host/vcs-8e-workload
+                  datacenter: IBMCloud
+                  datastore: /IBMCloud/datastore/mdcnc-ds-shared
+                  networks:
+                    - ocp-ci-seg-13
+                  resourcePool: /IBMCloud/host/vcs-8e-workload/Resources
+                  template: /IBMCloud/vm/ngirard-dev-rqh5s-rhcos-generated-region-generated-zone
+                zone: generated-zone
+              nodeNetworking:
+                external: {}
+                internal: {}
+              vcenters:
+              - datacenters:
+                - IBMCloud
+                port: 443
+                server: server1.dev.cluster.com
+      expectedError: "when zoneAffinity type is HostGroup, regionAffinity type must be ComputeCluster"
+    - name: Should not be able to have regionAffinity type ComputeCluster or HostGroup if zoneAffinity type is ComputeCluster
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec:
+          cloudConfig:
+            key: config
+            name: cloud-provider-config
+          platformSpec:
+            type: VSphere
+            vsphere:
+              failureDomains:
+              - name: generated-failure-domain
+                region: generated-region
+                server: server1.dev.cluster.com
+                regionAffinity:
+                  type: ComputeCluster 
+                zoneAffinity:
+                  type: ComputeCluster 
+                topology:
+                  computeCluster: /IBMCloud/host/vcs-8e-workload
+                  datacenter: IBMCloud
+                  datastore: /IBMCloud/datastore/mdcnc-ds-shared
+                  networks:
+                    - ocp-ci-seg-13
+                  resourcePool: /IBMCloud/host/vcs-8e-workload/Resources
+                  template: /IBMCloud/vm/ngirard-dev-rqh5s-rhcos-generated-region-generated-zone
+                zone: generated-zone
+              nodeNetworking:
+                external: {}
+                internal: {}
+              vcenters:
+              - datacenters:
+                - IBMCloud
+                port: 443
+                server: server1.dev.cluster.com
+      expectedError: "when zoneAffinity type is ComputeCluster, regionAffinity type must be Datacenter"
+    - name: Should not be able to have missing vmGroup, hostGroup and vmHostRule fields if zone type is HostGroup
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec:
+          cloudConfig:
+            key: config
+            name: cloud-provider-config
+          platformSpec:
+            type: VSphere
+            vsphere:
+              failureDomains:
+              - name: generated-failure-domain
+                region: generated-region
+                server: server1.dev.cluster.com
+                regionAffinity:
+                  type: ComputeCluster
+                zoneAffinity:
+                  type: HostGroup
+                topology:
+                  computeCluster: /IBMCloud/host/vcs-8e-workload
+                  datacenter: IBMCloud
+                  datastore: /IBMCloud/datastore/mdcnc-ds-shared
+                  networks:
+                    - ocp-ci-seg-13
+                  resourcePool: /IBMCloud/host/vcs-8e-workload/Resources
+                  template: /IBMCloud/vm/ngirard-dev-rqh5s-rhcos-generated-region-generated-zone
+                zone: generated-zone
+              nodeNetworking:
+                external: {}
+                internal: {}
+              vcenters:
+              - datacenters:
+                - IBMCloud
+                port: 443
+                server: server1.dev.cluster.com
+      expectedError: "zoneAffinity: Invalid value: \"object\": hostGroup is required when type is HostGroup, and forbidden otherwise"
+    - name: Should not be able to have missing vmGroup field if zone type is HostGroup
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec:
+          cloudConfig:
+            key: config
+            name: cloud-provider-config
+          platformSpec:
+            type: VSphere
+            vsphere:
+              failureDomains:
+              - name: generated-failure-domain
+                region: generated-region
+                server: server1.dev.cluster.com
+                regionAffinity:
+                  type: ComputeCluster
+                zoneAffinity:
+                  hostGroup:
+                    hostGroup: hg1
+                    vmHostRule: mhr1
+                  type: HostGroup
+                topology:
+                  computeCluster: /IBMCloud/host/vcs-8e-workload
+                  datacenter: IBMCloud
+                  datastore: /IBMCloud/datastore/mdcnc-ds-shared
+                  networks:
+                    - ocp-ci-seg-13
+                  resourcePool: /IBMCloud/host/vcs-8e-workload/Resources
+                  template: /IBMCloud/vm/ngirard-dev-rqh5s-rhcos-generated-region-generated-zone
+                zone: generated-zone
+              nodeNetworking:
+                external: {}
+                internal: {}
+              vcenters:
+              - datacenters:
+                - IBMCloud
+                port: 443
+                server: server1.dev.cluster.com
+      expectedError: "zoneAffinity.hostGroup.vmGroup: Required value"
+    - name: Should not be able to have missing hostGroup field if zone type is HostGroup
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec:
+          cloudConfig:
+            key: config
+            name: cloud-provider-config
+          platformSpec:
+            type: VSphere
+            vsphere:
+              failureDomains:
+              - name: generated-failure-domain
+                region: generated-region
+                server: server1.dev.cluster.com
+                regionAffinity:
+                  type: ComputeCluster
+                zoneAffinity:
+                  type: HostGroup
+                  hostGroup:
+                    vmGroup: vmg1
+                    vmHostRule: mhr1
+                topology:
+                  computeCluster: /IBMCloud/host/vcs-8e-workload
+                  datacenter: IBMCloud
+                  datastore: /IBMCloud/datastore/mdcnc-ds-shared
+                  networks:
+                    - ocp-ci-seg-13
+                  resourcePool: /IBMCloud/host/vcs-8e-workload/Resources
+                  template: /IBMCloud/vm/ngirard-dev-rqh5s-rhcos-generated-region-generated-zone
+                zone: generated-zone
+              nodeNetworking:
+                external: {}
+                internal: {}
+              vcenters:
+              - datacenters:
+                - IBMCloud
+                port: 443
+                server: server1.dev.cluster.com
+      expectedError: "zoneAffinity.hostGroup.hostGroup: Required value"
+    - name: Should not be able to have empty hostGroup if zone type is not HostGroup
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec:
+          cloudConfig:
+            key: config
+            name: cloud-provider-config
+          platformSpec:
+            type: VSphere
+            vsphere:
+              failureDomains:
+              - name: generated-failure-domain
+                region: generated-region
+                server: server1.dev.cluster.com
+                regionAffinity:
+                  type: Datacenter 
+                zoneAffinity:
+                  type: ComputeCluster 
+                  hostGroup: {}
+                topology:
+                  computeCluster: /IBMCloud/host/vcs-8e-workload
+                  datacenter: IBMCloud
+                  datastore: /IBMCloud/datastore/mdcnc-ds-shared
+                  networks:
+                    - ocp-ci-seg-13
+                  resourcePool: /IBMCloud/host/vcs-8e-workload/Resources
+                  template: /IBMCloud/vm/ngirard-dev-rqh5s-rhcos-generated-region-generated-zone
+                zone: generated-zone
+              nodeNetworking:
+                external: {}
+                internal: {}
+              vcenters:
+              - datacenters:
+                - IBMCloud
+                port: 443
+                server: server1.dev.cluster.com
+      expectedError: "zoneAffinity.hostGroup.hostGroup: Required value, spec.platformSpec.vsphere.failureDomains[0].zoneAffinity.hostGroup.vmGroup: Required value, spec.platformSpec.vsphere.failureDomains[0].zoneAffinity.hostGroup.vmHostRule: Required value"
+    - name: Should not be able to have empty vmHostRule field if zone type is HostGroup
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec:
+          cloudConfig:
+            key: config
+            name: cloud-provider-config
+          platformSpec:
+            type: VSphere
+            vsphere:
+              failureDomains:
+              - name: generated-failure-domain
+                region: generated-region
+                server: server1.dev.cluster.com
+                regionAffinity:
+                  type: ComputeCluster
+                zoneAffinity:
+                  type: HostGroup
+                  hostGroup:
+                    vmGroup: vmg1
+                    hostGroup: hg1
+                topology:
+                  computeCluster: /IBMCloud/host/vcs-8e-workload
+                  datacenter: IBMCloud
+                  datastore: /IBMCloud/datastore/mdcnc-ds-shared
+                  networks:
+                    - ocp-ci-seg-13
+                  resourcePool: /IBMCloud/host/vcs-8e-workload/Resources
+                  template: /IBMCloud/vm/ngirard-dev-rqh5s-rhcos-generated-region-generated-zone
+                zone: generated-zone
+              nodeNetworking:
+                external: {}
+                internal: {}
+              vcenters:
+              - datacenters:
+                - IBMCloud
+                port: 443
+                server: server1.dev.cluster.com
+      expectedError: "zoneAffinity.hostGroup.vmHostRule: Required value"
+    - name: Should not be less then 1 chars long
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec:
+          cloudConfig:
+            key: config
+            name: cloud-provider-config
+          platformSpec:
+            type: VSphere
+            vsphere:
+              failureDomains:
+              - name: generated-failure-domain
+                region: generated-region
+                server: server1.dev.cluster.com
+                regionAffinity:
+                  type: ComputeCluster
+                zoneAffinity:
+                  type: HostGroup
+                  hostGroup:
+                    vmGroup: "" 
+                    hostGroup: ""
+                    vmHostRule: ""
+                topology:
+                  computeCluster: /IBMCloud/host/vcs-8e-workload
+                  datacenter: IBMCloud
+                  datastore: /IBMCloud/datastore/mdcnc-ds-shared
+                  networks:
+                    - ocp-ci-seg-13
+                  resourcePool: /IBMCloud/host/vcs-8e-workload/Resources
+                  template: /IBMCloud/vm/ngirard-dev-rqh5s-rhcos-generated-region-generated-zone
+                zone: generated-zone
+              nodeNetworking:
+                external: {}
+                internal: {}
+              vcenters:
+              - datacenters:
+                - IBMCloud
+                port: 443
+                server: server1.dev.cluster.com
+      expectedError: "spec.platformSpec.vsphere.failureDomains[0].zoneAffinity.hostGroup.hostGroup in body should be at least 1 chars long"
+    - name: Should be able to create a vm-host zonal infrastructure spec
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec:
+          cloudConfig:
+            key: config
+            name: cloud-provider-config
+          platformSpec:
+            type: VSphere
+            vsphere:
+              failureDomains:
+              - name: generated-failure-domain
+                server: server1.dev.cluster.com
+                region: generated-region
+                zone: generated-zone
+                regionAffinity:
+                  type: ComputeCluster
+                zoneAffinity:
+                  type: HostGroup
+                  hostGroup:
+                    vmGroup: vmg1
+                    hostGroup: hg1
+                    vmHostRule: mhr1
+                topology:
+                  computeCluster: /IBMCloud/host/vcs-8e-workload
+                  datacenter: IBMCloud
+                  datastore: /IBMCloud/datastore/mdcnc-ds-shared
+                  networks:
+                    - ocp-ci-seg-13
+                  resourcePool: /IBMCloud/host/vcs-8e-workload/Resources
+                  template: /IBMCloud/vm/ngirard-dev-rqh5s-rhcos-generated-region-generated-zone
+              nodeNetworking:
+                external: {}
+                internal: {}
+              vcenters:
+              - datacenters:
+                - IBMCloud
+                port: 443
+                server: server1.dev.cluster.com
+      expected: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec:
+          cloudConfig:
+            key: config
+            name: cloud-provider-config
+          platformSpec:
+            type: VSphere
+            vsphere:
+              failureDomains:
+              - name: generated-failure-domain
+                region: generated-region
+                server: server1.dev.cluster.com
+                zone: generated-zone
+                regionAffinity:
+                  type: ComputeCluster
+                zoneAffinity:
+                  type: HostGroup
+                  hostGroup:
+                    vmGroup: vmg1
+                    hostGroup: hg1
+                    vmHostRule: mhr1
+                topology:
+                  computeCluster: /IBMCloud/host/vcs-8e-workload
+                  datacenter: IBMCloud
+                  datastore: /IBMCloud/datastore/mdcnc-ds-shared
+                  networks:
+                    - ocp-ci-seg-13
+                  resourcePool: /IBMCloud/host/vcs-8e-workload/Resources
+                  template: /IBMCloud/vm/ngirard-dev-rqh5s-rhcos-generated-region-generated-zone
+              nodeNetworking:
+                external: {}
+                internal: {}
+              vcenters:
+              - datacenters:
+                - IBMCloud
+                port: 443
+                server: server1.dev.cluster.com
+    - name: Should be able to create a pre 4.18 non-vm-host zonal infrastructure spec
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec:
+          cloudConfig:
+            key: config
+            name: cloud-provider-config
+          platformSpec:
+            type: VSphere
+            vsphere:
+              failureDomains:
+              - name: generated-failure-domain
+                region: generated-region
+                server: server1.dev.cluster.com
+                topology:
+                  computeCluster: /IBMCloud/host/vcs-8e-workload
+                  datacenter: IBMCloud
+                  datastore: /IBMCloud/datastore/mdcnc-ds-shared
+                  networks:
+                    - ocp-ci-seg-13
+                  resourcePool: /IBMCloud/host/vcs-8e-workload/Resources
+                  template: /IBMCloud/vm/ngirard-dev-rqh5s-rhcos-generated-region-generated-zone
+                zone: generated-zone
+              nodeNetworking:
+                external: {}
+                internal: {}
+              vcenters:
+              - datacenters:
+                - IBMCloud
+                port: 443
+                server: server1.dev.cluster.com
+      expected: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec:
+          cloudConfig:
+            key: config
+            name: cloud-provider-config
+          platformSpec:
+            type: VSphere
+            vsphere:
+              failureDomains:
+              - name: generated-failure-domain
+                region: generated-region
+                server: server1.dev.cluster.com
+                topology:
+                  computeCluster: /IBMCloud/host/vcs-8e-workload
+                  datacenter: IBMCloud
+                  datastore: /IBMCloud/datastore/mdcnc-ds-shared
+                  networks:
+                    - ocp-ci-seg-13
+                  resourcePool: /IBMCloud/host/vcs-8e-workload/Resources
+                  template: /IBMCloud/vm/ngirard-dev-rqh5s-rhcos-generated-region-generated-zone
+                zone: generated-zone
+              nodeNetworking:
+                external: {}
+                internal: {}
+              vcenters:
+              - datacenters:
+                - IBMCloud
+                port: 443
+                server: server1.dev.cluster.com
+    - name: Should be able to create a 4.18+ non-vm-host zonal infrastructure spec
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec:
+          cloudConfig:
+            key: config
+            name: cloud-provider-config
+          platformSpec:
+            type: VSphere
+            vsphere:
+              failureDomains:
+              - name: generated-failure-domain
+                region: generated-region
+                server: server1.dev.cluster.com
+                regionAffinity:
+                  type: Datacenter 
+                zoneAffinity:
+                  type: ComputeCluster 
+                topology:
+                  computeCluster: /IBMCloud/host/vcs-8e-workload
+                  datacenter: IBMCloud
+                  datastore: /IBMCloud/datastore/mdcnc-ds-shared
+                  networks:
+                    - ocp-ci-seg-13
+                  resourcePool: /IBMCloud/host/vcs-8e-workload/Resources
+                  template: /IBMCloud/vm/ngirard-dev-rqh5s-rhcos-generated-region-generated-zone
+                zone: generated-zone
+              nodeNetworking:
+                external: {}
+                internal: {}
+              vcenters:
+              - datacenters:
+                - IBMCloud
+                port: 443
+                server: server1.dev.cluster.com
+      expected: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec:
+          cloudConfig:
+            key: config
+            name: cloud-provider-config
+          platformSpec:
+            type: VSphere
+            vsphere:
+              failureDomains:
+              - name: generated-failure-domain
+                region: generated-region
+                server: server1.dev.cluster.com
+                regionAffinity:
+                  type: Datacenter 
+                zoneAffinity:
+                  type: ComputeCluster 
+                topology:
+                  computeCluster: /IBMCloud/host/vcs-8e-workload
+                  datacenter: IBMCloud
+                  datastore: /IBMCloud/datastore/mdcnc-ds-shared
+                  networks:
+                    - ocp-ci-seg-13
+                  resourcePool: /IBMCloud/host/vcs-8e-workload/Resources
+                  template: /IBMCloud/vm/ngirard-dev-rqh5s-rhcos-generated-region-generated-zone
+                zone: generated-zone
+              nodeNetworking:
+                external: {}
+                internal: {}
+              vcenters:
+              - datacenters:
+                - IBMCloud
+                port: 443
+                server: server1.dev.cluster.com

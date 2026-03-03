@@ -1,0 +1,610 @@
+apiVersion: apiextensions.k8s.io/v1 # Hack because controller-gen complains if we don't have this
+name: "Ingress"
+crdName: ingresscontrollers.operator.openshift.io
+tests:
+  onCreate:
+    - name: Should be able to create a minimal ingresscontroller with an CLB with subnets using IDs and names.
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        spec:
+          endpointPublishingStrategy:
+            type: LoadBalancerService
+            loadBalancer:
+              scope: External
+              providerParameters:
+                type: AWS
+                aws:
+                  type: Classic
+                  classicLoadBalancer:
+                    subnets:
+                      ids:
+                      - subnet-0fcf8e0392f0910d5
+                      names:
+                      - subnetA
+                      - subnetB
+      expected: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        spec:
+          httpEmptyRequestsPolicy: Respond
+          idleConnectionTerminationPolicy: Immediate
+          closedClientConnectionPolicy: Continue
+          endpointPublishingStrategy:
+            type: LoadBalancerService
+            loadBalancer:
+              dnsManagementPolicy: Managed
+              scope: External
+              providerParameters:
+                type: AWS
+                aws:
+                  type: Classic
+                  classicLoadBalancer:
+                    subnets:
+                      ids:
+                      - subnet-0fcf8e0392f0910d5
+                      names:
+                      - subnetA
+                      - subnetB
+    - name: Should be able to create a minimal ingresscontroller with an NLB with subnets using IDs and names.
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        spec:
+          endpointPublishingStrategy:
+            type: LoadBalancerService
+            loadBalancer:
+              scope: External
+              providerParameters:
+                type: AWS
+                aws:
+                  type: NLB
+                  networkLoadBalancer:
+                    subnets:
+                      ids:
+                      - subnet-0fcf8e0392f0910d5
+                      names:
+                      - subnetA
+                      - subnetB
+      expected: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        spec:
+          httpEmptyRequestsPolicy: Respond
+          idleConnectionTerminationPolicy: Immediate
+          closedClientConnectionPolicy: Continue
+          endpointPublishingStrategy:
+            type: LoadBalancerService
+            loadBalancer:
+              dnsManagementPolicy: Managed
+              scope: External
+              providerParameters:
+                type: AWS
+                aws:
+                  type: NLB
+                  networkLoadBalancer:
+                    subnets:
+                      ids:
+                      - subnet-0fcf8e0392f0910d5
+                      names:
+                      - subnetA
+                      - subnetB
+    - name: Should not be able to create ingresscontroller with duplicate subnets ids.
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        spec:
+          endpointPublishingStrategy:
+            type: LoadBalancerService
+            loadBalancer:
+              scope: External
+              providerParameters:
+                type: AWS
+                aws:
+                  type: Classic
+                  classicLoadBalancer:
+                    subnets:
+                      ids:
+                      - subnet-0fcf8e0392f0910d5
+                      - subnet-0fcf8e0392f0910d5
+      expectedError: "subnet ids cannot contain duplicates"
+    - name: Should not be able to create ingresscontroller with duplicate subnets names.
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        spec:
+          endpointPublishingStrategy:
+            type: LoadBalancerService
+            loadBalancer:
+              scope: External
+              providerParameters:
+                type: AWS
+                aws:
+                  type: Classic
+                  classicLoadBalancer:
+                    subnets:
+                      names:
+                      - subnetA
+                      - subnetA
+      expectedError: "subnet names cannot contain duplicates"
+    - name: Should not be able to create ingresscontroller with subnets names that contain commas.
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        spec:
+          endpointPublishingStrategy:
+            type: LoadBalancerService
+            loadBalancer:
+              scope: External
+              providerParameters:
+                type: AWS
+                aws:
+                  type: Classic
+                  classicLoadBalancer:
+                    subnets:
+                      names:
+                      - subnetA,
+      expectedError: "subnet name cannot contain a comma"
+    - name: Should not be able to create ingresscontroller with subnets names that start with subnet-.
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        spec:
+          endpointPublishingStrategy:
+            type: LoadBalancerService
+            loadBalancer:
+              scope: External
+              providerParameters:
+                type: AWS
+                aws:
+                  type: Classic
+                  classicLoadBalancer:
+                    subnets:
+                      names:
+                      - subnet-0fcf8e0392f0910d5
+      expectedError: "subnet name cannot start with 'subnet-'"
+    - name: Should be able to create ingresscontroller with case sensitive subnet names.
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        spec:
+          endpointPublishingStrategy:
+            type: LoadBalancerService
+            loadBalancer:
+              scope: External
+              providerParameters:
+                type: AWS
+                aws:
+                  type: Classic
+                  classicLoadBalancer:
+                    subnets:
+                      names:
+                      - subnetA
+                      - subneta
+      expected: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        spec:
+          httpEmptyRequestsPolicy: Respond
+          idleConnectionTerminationPolicy: Immediate
+          closedClientConnectionPolicy: Continue
+          endpointPublishingStrategy:
+            type: LoadBalancerService
+            loadBalancer:
+              dnsManagementPolicy: Managed
+              scope: External
+              providerParameters:
+                type: AWS
+                aws:
+                  type: Classic
+                  classicLoadBalancer:
+                    subnets:
+                      names:
+                      - subnetA
+                      - subneta
+    - name: Should not be able to create ingresscontroller with empty subnet id.
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        spec:
+          endpointPublishingStrategy:
+            type: LoadBalancerService
+            loadBalancer:
+              scope: External
+              providerParameters:
+                type: AWS
+                aws:
+                  type: Classic
+                  classicLoadBalancer:
+                    subnets:
+                      ids:
+                      - ''
+      expectedError: "Invalid value: \"\": spec.endpointPublishingStrategy.loadBalancer.providerParameters.aws.classicLoadBalancer.subnets.ids[0] in body should be at least 24 chars long"
+    - name: Should not be able to create ingresscontroller with empty subnet name.
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        spec:
+          endpointPublishingStrategy:
+            type: LoadBalancerService
+            loadBalancer:
+              scope: External
+              providerParameters:
+                type: AWS
+                aws:
+                  type: Classic
+                  classicLoadBalancer:
+                    subnets:
+                      names:
+                      - ''
+      expectedError: "Invalid value: \"\": spec.endpointPublishingStrategy.loadBalancer.providerParameters.aws.classicLoadBalancer.subnets.names[0] in body should be at least 1 chars long"
+    - name: Should not be able to create ingresscontroller with more than 10 subnets combined.
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        spec:
+          endpointPublishingStrategy:
+            type: LoadBalancerService
+            loadBalancer:
+              scope: External
+              providerParameters:
+                type: AWS
+                aws:
+                  type: Classic
+                  classicLoadBalancer:
+                    subnets:
+                      ids:
+                      - subnet-00000000000000001
+                      - subnet-00000000000000002
+                      - subnet-00000000000000003
+                      - subnet-00000000000000004
+                      - subnet-00000000000000005
+                      names:
+                      - subnet1
+                      - subnet2
+                      - subnet3
+                      - subnet4
+                      - subnet5
+                      - subnet6
+      expectedError: "the total number of subnets cannot exceed 10"
+    - name: Should not be able to create ingresscontroller with more than 10 subnets ids.
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        spec:
+          endpointPublishingStrategy:
+            type: LoadBalancerService
+            loadBalancer:
+              scope: External
+              providerParameters:
+                type: AWS
+                aws:
+                  type: Classic
+                  classicLoadBalancer:
+                    subnets:
+                      ids:
+                      - subnet-00000000000000001
+                      - subnet-00000000000000002
+                      - subnet-00000000000000003
+                      - subnet-00000000000000004
+                      - subnet-00000000000000005
+                      - subnet-00000000000000006
+                      - subnet-00000000000000007
+                      - subnet-00000000000000008
+                      - subnet-00000000000000009
+                      - subnet-00000000000000010
+                      - subnet-00000000000000011
+      expectedError: "spec.endpointPublishingStrategy.loadBalancer.providerParameters.aws.classicLoadBalancer.subnets.ids: Too many: 11: must have at most 10 items"
+    - name: Should not be able to create ingresscontroller with more than 10 subnets names.
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        spec:
+          endpointPublishingStrategy:
+            type: LoadBalancerService
+            loadBalancer:
+              scope: External
+              providerParameters:
+                type: AWS
+                aws:
+                  type: Classic
+                  classicLoadBalancer:
+                    subnets:
+                      names:
+                      - subnet00000000000000001
+                      - subnet00000000000000002
+                      - subnet00000000000000003
+                      - subnet00000000000000004
+                      - subnet00000000000000005
+                      - subnet00000000000000006
+                      - subnet00000000000000007
+                      - subnet00000000000000008
+                      - subnet00000000000000009
+                      - subnet00000000000000010
+                      - subnet00000000000000011
+      expectedError: "spec.endpointPublishingStrategy.loadBalancer.providerParameters.aws.classicLoadBalancer.subnets.names: Too many: 11: must have at most 10 items"
+    - name: Should not be able to create ingresscontroller with spec.endpointPublishingStrategy.loadBalancer.providerParameters.classicLoadBalancer.aws.subnets specified, but no ids or names.
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        spec:
+          endpointPublishingStrategy:
+            type: LoadBalancerService
+            loadBalancer:
+              scope: External
+              providerParameters:
+                type: AWS
+                aws:
+                  type: Classic
+                  classicLoadBalancer:
+                    subnets: {}
+      expectedError: "must specify at least 1 subnet name or id"
+    - name: Should not be able to create ingresscontroller with spec.endpointPublishingStrategy.loadBalancer.providerParameters.aws.classicLoadBalancer.subnets specified, but empty ids and names.
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        spec:
+          endpointPublishingStrategy:
+            type: LoadBalancerService
+            loadBalancer:
+              scope: External
+              providerParameters:
+                type: AWS
+                aws:
+                  type: Classic
+                  classicLoadBalancer:
+                    subnets:
+                      ids: []
+                      names: []
+      expectedError: "must specify at least 1 subnet name or id"
+    - name: Should not be able to create ingresscontroller with subnet id less than 24 characters.
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        spec:
+          endpointPublishingStrategy:
+            type: LoadBalancerService
+            loadBalancer:
+              scope: External
+              providerParameters:
+                type: AWS
+                aws:
+                  type: Classic
+                  classicLoadBalancer:
+                    subnets:
+                      ids:
+                      - subnet-0000000000000000
+      expectedError: "Invalid value: \"subnet-0000000000000000\": spec.endpointPublishingStrategy.loadBalancer.providerParameters.aws.classicLoadBalancer.subnets.ids[0] in body should be at least 24 chars long"
+    - name: Should not be able to create ingresscontroller with subnet id more than 24 characters.
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        spec:
+          endpointPublishingStrategy:
+            type: LoadBalancerService
+            loadBalancer:
+              scope: External
+              providerParameters:
+                type: AWS
+                aws:
+                  type: Classic
+                  classicLoadBalancer:
+                    subnets:
+                      ids:
+                      - subnet-000000000000000010
+      expectedError: "spec.endpointPublishingStrategy.loadBalancer.providerParameters.aws.classicLoadBalancer.subnets.ids[0]: Too long: may not be more than 24 bytes"
+    - name: Should not be able to create ingresscontroller with subnet id that doesn't start with subnet-.
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        spec:
+          endpointPublishingStrategy:
+            type: LoadBalancerService
+            loadBalancer:
+              scope: External
+              providerParameters:
+                type: AWS
+                aws:
+                  type: Classic
+                  classicLoadBalancer:
+                    subnets:
+                      ids:
+                      - subnot-00000000000000001
+      expectedError: "spec.endpointPublishingStrategy.loadBalancer.providerParameters.aws.classicLoadBalancer.subnets.ids[0] in body should match '^subnet-[0-9A-Za-z]+$'"
+    - name: Should not be able to create ingresscontroller with subnet id that contains non-alphanumeric characters.
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        spec:
+          endpointPublishingStrategy:
+            type: LoadBalancerService
+            loadBalancer:
+              scope: External
+              providerParameters:
+                type: AWS
+                aws:
+                  type: Classic
+                  classicLoadBalancer:
+                    subnets:
+                      ids:
+                      - subnet-~!@#$%^&*()-=_+;1
+      expectedError: "spec.endpointPublishingStrategy.loadBalancer.providerParameters.aws.classicLoadBalancer.subnets.ids[0] in body should match '^subnet-[0-9A-Za-z]+$'"
+  onUpdate:
+    - name: Subnets should be mutable.
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        spec:
+          endpointPublishingStrategy:
+            type: LoadBalancerService
+            loadBalancer:
+              dnsManagementPolicy: Managed
+              scope: External
+              providerParameters:
+                type: AWS
+                aws:
+                  type: Classic
+                  classicLoadBalancer:
+                    subnets:
+                      ids:
+                      - subnet-00000000000000001
+                      names:
+                      - subnetA
+                      - subnetB
+                      - subnetC
+      updated: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        spec:
+          endpointPublishingStrategy:
+            type: LoadBalancerService
+            loadBalancer:
+              dnsManagementPolicy: Managed
+              scope: External
+              providerParameters:
+                type: AWS
+                aws:
+                  type: Classic
+                  classicLoadBalancer:
+                    subnets:
+                      ids:
+                      - subnet-00000000000000002
+                      names:
+                      - subnetA
+                      - subnetB
+                      - subnetC
+      expected: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        spec:
+          httpEmptyRequestsPolicy: Respond
+          idleConnectionTerminationPolicy: Immediate
+          closedClientConnectionPolicy: Continue
+          endpointPublishingStrategy:
+            type: LoadBalancerService
+            loadBalancer:
+              dnsManagementPolicy: Managed
+              scope: External
+              providerParameters:
+                type: AWS
+                aws:
+                  type: Classic
+                  classicLoadBalancer:
+                    subnets:
+                      ids:
+                      - subnet-00000000000000002
+                      names:
+                      - subnetA
+                      - subnetB
+                      - subnetC
+    - name: Subnets should be able to be removed once set.
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        spec:
+          endpointPublishingStrategy:
+            type: LoadBalancerService
+            loadBalancer:
+              scope: External
+              providerParameters:
+                type: AWS
+                aws:
+                  type: Classic
+                  classicLoadBalancer:
+                    subnets:
+                      ids:
+                      - subnet-00000000000000001
+                      - subnet-00000000000000002
+                      names:
+                      - subnetA
+                      - subnetB
+                      - subnetC
+      updated: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        spec:
+          endpointPublishingStrategy:
+            type: LoadBalancerService
+            loadBalancer:
+              dnsManagementPolicy: Managed
+              scope: External
+              providerParameters:
+                type: AWS
+                aws:
+                  type: Classic
+      expected: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        spec:
+          httpEmptyRequestsPolicy: Respond
+          idleConnectionTerminationPolicy: Immediate
+          closedClientConnectionPolicy: Continue
+          endpointPublishingStrategy:
+            type: LoadBalancerService
+            loadBalancer:
+              dnsManagementPolicy: Managed
+              scope: External
+              providerParameters:
+                type: AWS
+                aws:
+                  type: Classic
+    - name: Should be able to add subnets after IC creation.
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        spec:
+          endpointPublishingStrategy:
+            type: LoadBalancerService
+            loadBalancer:
+              scope: External
+              providerParameters:
+                type: AWS
+                aws:
+                  type: Classic
+      updated: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        spec:
+          endpointPublishingStrategy:
+            type: LoadBalancerService
+            loadBalancer:
+              dnsManagementPolicy: Managed
+              scope: External
+              providerParameters:
+                type: AWS
+                aws:
+                  type: Classic
+                  classicLoadBalancer:
+                    subnets:
+                      ids:
+                      - subnet-00000000000000001
+                      - subnet-00000000000000002
+                      names:
+                      - subnetA
+                      - subnetB
+                      - subnetC
+      expected: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        spec:
+          httpEmptyRequestsPolicy: Respond
+          idleConnectionTerminationPolicy: Immediate
+          closedClientConnectionPolicy: Continue
+          endpointPublishingStrategy:
+            type: LoadBalancerService
+            loadBalancer:
+              dnsManagementPolicy: Managed
+              scope: External
+              providerParameters:
+                type: AWS
+                aws:
+                  type: Classic
+                  classicLoadBalancer:
+                    subnets:
+                      ids:
+                      - subnet-00000000000000001
+                      - subnet-00000000000000002
+                      names:
+                      - subnetA
+                      - subnetB
+                      - subnetC

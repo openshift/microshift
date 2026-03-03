@@ -1,0 +1,127 @@
+apiVersion: apiextensions.k8s.io/v1 # Hack because controller-gen complains if we don't have this
+name: "ClusterCSIDriver"
+crdName: clustercsidrivers.operator.openshift.io
+featureGates:
+  - VSphereConfigurableMaxAllowedBlockVolumesPerNode
+tests:
+  onCreate:
+    - name: Should be able to create ClusterCSIDriver with volume limit option
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: ClusterCSIDriver
+        metadata:
+          name: csi.sharedresource.openshift.io
+        spec:
+          driverConfig:
+            driverType: vSphere
+            vSphere:
+              maxAllowedBlockVolumesPerNode: 59
+          logLevel: Normal
+          operatorLogLevel: Normal
+      expected: |
+        apiVersion: operator.openshift.io/v1
+        kind: ClusterCSIDriver
+        metadata:
+          name: csi.sharedresource.openshift.io
+        spec:
+          driverConfig:
+            driverType: vSphere
+            vSphere:
+              maxAllowedBlockVolumesPerNode: 59
+          logLevel: Normal
+          operatorLogLevel: Normal
+    - name: Should be able to create a minimal ClusterCSIDriver
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: ClusterCSIDriver
+        metadata:
+          name: csi.sharedresource.openshift.io
+        spec: {} # No spec is required for a ClusterCSIDriver
+      expected: |
+        apiVersion: operator.openshift.io/v1
+        kind: ClusterCSIDriver
+        metadata:
+          name: csi.sharedresource.openshift.io
+        spec:
+          logLevel: Normal
+          operatorLogLevel: Normal
+    - name: Should not be able to set limit above allowed range
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: ClusterCSIDriver
+        metadata:
+          name: csi.sharedresource.openshift.io
+        spec:
+          driverConfig:
+            driverType: vSphere
+            vSphere:
+              maxAllowedBlockVolumesPerNode: 256
+          logLevel: Normal
+          operatorLogLevel: Normal
+      expectedError: "Invalid value: 256: spec.driverConfig.vSphere.maxAllowedBlockVolumesPerNode in body should be less than or equal to 255"
+    - name: Should not be able to set zero limit
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: ClusterCSIDriver
+        metadata:
+          name: csi.sharedresource.openshift.io
+        spec:
+          driverConfig:
+            driverType: vSphere
+            vSphere:
+              maxAllowedBlockVolumesPerNode: 0
+          logLevel: Normal
+          operatorLogLevel: Normal
+      expectedError: "Invalid value: 0: spec.driverConfig.vSphere.maxAllowedBlockVolumesPerNode in body should be greater than or equal to 1"
+    - name: Should not be able to set negative limit
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: ClusterCSIDriver
+        metadata:
+          name: csi.sharedresource.openshift.io
+        spec:
+          driverConfig:
+            driverType: vSphere
+            vSphere:
+              maxAllowedBlockVolumesPerNode: -1
+          logLevel: Normal
+          operatorLogLevel: Normal
+      expectedError: "Invalid value: -1: spec.driverConfig.vSphere.maxAllowedBlockVolumesPerNode in body should be greater than or equal to 1"
+  onUpdate:
+    - name: Should be able to update the limit field
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: ClusterCSIDriver
+        metadata:
+          name: csi.sharedresource.openshift.io
+        spec:
+          driverConfig:
+            driverType: vSphere
+            vSphere:
+              maxAllowedBlockVolumesPerNode: 59
+          logLevel: Normal
+          operatorLogLevel: Normal
+      updated: |
+        apiVersion: operator.openshift.io/v1
+        kind: ClusterCSIDriver
+        metadata:
+          name: csi.sharedresource.openshift.io
+        spec:
+          driverConfig:
+            driverType: vSphere
+            vSphere:
+              maxAllowedBlockVolumesPerNode: 255
+          logLevel: Normal
+          operatorLogLevel: Normal
+      expected: |
+        apiVersion: operator.openshift.io/v1
+        kind: ClusterCSIDriver
+        metadata:
+          name: csi.sharedresource.openshift.io
+        spec:
+          driverConfig:
+            driverType: vSphere
+            vSphere:
+              maxAllowedBlockVolumesPerNode: 255
+          logLevel: Normal
+          operatorLogLevel: Normal

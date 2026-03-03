@@ -1,0 +1,16 @@
+digraph "Local Certificate" {
+  // Node definitions.
+  0 [
+    label="certkeypair/root-ca::8389990467108443888\n\nfile:///etc/kubernetes/ca.crt/ca.crt,file://\n"
+    style=filled
+    fillcolor="#c7bfff"
+  ];
+  1 [
+    label="certkeypair/mco-mystery-cert\n\nsecret/machine-config-server-tls -nopenshift-machine-config-operator\n"
+    style=filled
+    fillcolor="#bdebfd"
+  ];
+
+  // Edge definitions.
+  0 -> 1;
+}

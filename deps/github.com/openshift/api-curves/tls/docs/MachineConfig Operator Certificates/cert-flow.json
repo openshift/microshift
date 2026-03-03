@@ -1,0 +1,114 @@
+{
+  "LogicalName": "MachineConfig Operator Certificates",
+  "Description": "TODO need to work out who and what.",
+  "CertificateAuthorityBundles": {
+    "Items": null
+  },
+  "CertKeyPairs": {
+    "Items": [
+      {
+        "LogicalName": "",
+        "Description": "",
+        "Name": "root-ca::8681071573803367953",
+        "Spec": {
+          "SecretLocations": null,
+          "OnDiskLocations": [
+            {
+              "Cert": {
+                "Path": "/etc/kubernetes/ca.crt/ca.crt",
+                "User": "root",
+                "Group": "root",
+                "Permissions": "-rw-r--r--.",
+                "SELinuxOptions": "system_u:object_r:kubernetes_file_t:s0"
+              },
+              "Key": {
+                "Path": "",
+                "User": "",
+                "Group": "",
+                "Permissions": "",
+                "SELinuxOptions": ""
+              }
+            }
+          ],
+          "CertMetadata": {
+            "CertIdentifier": {
+              "CommonName": "root-ca",
+              "SerialNumber": "8681071573803367953",
+              "Issuer": {
+                "CommonName": "root-ca",
+                "SerialNumber": "",
+                "Issuer": null
+              }
+            },
+            "SignatureAlgorithm": "SHA256-RSA",
+            "PublicKeyAlgorithm": "RSA",
+            "PublicKeyBitSize": "2048 bit",
+            "ValidityDuration": "10y",
+            "Usages": [
+              "KeyUsageDigitalSignature",
+              "KeyUsageKeyEncipherment",
+              "KeyUsageCertSign"
+            ],
+            "ExtendedUsages": []
+          },
+          "Details": {
+            "CertType": "SignerCertDetails",
+            "SignerDetails": {},
+            "ServingCertDetails": null,
+            "ClientCertDetails": null
+          }
+        },
+        "Status": {
+          "Errors": null
+        }
+      },
+      {
+        "LogicalName": "mco-mystery-cert",
+        "Description": "TODO: team needs to make description",
+        "Name": "system:machine-config-server::3862173860818707761",
+        "Spec": {
+          "SecretLocations": [
+            {
+              "Namespace": "openshift-machine-config-operator",
+              "Name": "machine-config-server-tls"
+            }
+          ],
+          "OnDiskLocations": null,
+          "CertMetadata": {
+            "CertIdentifier": {
+              "CommonName": "system:machine-config-server",
+              "SerialNumber": "3862173860818707761",
+              "Issuer": {
+                "CommonName": "root-ca",
+                "SerialNumber": "",
+                "Issuer": null
+              }
+            },
+            "SignatureAlgorithm": "SHA256-RSA",
+            "PublicKeyAlgorithm": "RSA",
+            "PublicKeyBitSize": "2048 bit",
+            "ValidityDuration": "10y",
+            "Usages": [],
+            "ExtendedUsages": [
+              "ExtKeyUsageServerAuth"
+            ]
+          },
+          "Details": {
+            "CertType": "ServingCertDetails",
+            "SignerDetails": null,
+            "ServingCertDetails": {
+              "DNSNames": [
+                "api-int.kostrows-202208111815.group-b.devcluster.openshift.com"
+              ],
+              "IPAddresses": null
+            },
+            "ClientCertDetails": null
+          }
+        },
+        "Status": {
+          "Errors": null
+        }
+      }
+    ]
+  }
+}

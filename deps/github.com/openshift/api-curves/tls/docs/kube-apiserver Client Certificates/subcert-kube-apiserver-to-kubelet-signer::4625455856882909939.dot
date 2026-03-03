@@ -1,0 +1,34 @@
+digraph "Local Certificate" {
+  // Node definitions.
+  9 [
+    label="certkeypair/kube-apiserver-to-kubelet-signer\n\nsecret/kube-apiserver-to-kubelet-signer -nopenshift-kube-apiserver-operator\n"
+    style=filled
+    fillcolor="#c7bfff"
+  ];
+  10 [
+    label="certkeypair/kube-apiserver-to-kubelet-client\n\nsecret/kubelet-client -nopenshift-kube-apiserver\n    secret/kubelet-client-2 -nopenshift-kube-apiserver\n    secret/kubelet-client-3 -nopenshift-kube-apiserver\n    secret/kubelet-client-4 -nopenshift-kube-apiserver\n    file:///etc/kubernetes/static-pod-resources/kube-apiserver-pod-2/secrets/kubelet-client/tls.crt/tls.crt,file:///etc/kubernetes/static-pod-resources/kube-apiserver-pod-2/secrets/kubelet-client/tls.crt/tls.key\n    file:///etc/kubernetes/static-pod-resources/kube-apiserver-pod-3/secrets/kubelet-client/tls.crt/tls.crt,file:///etc/kubernetes/static-pod-resources/kube-apiserver-pod-3/secrets/kubelet-client/tls.crt/tls.key\n    file:///etc/kubernetes/static-pod-resources/kube-apiserver-pod-4/secrets/kubelet-client/tls.crt/tls.crt,file:///etc/kubernetes/static-pod-resources/kube-apiserver-pod-4/secrets/kubelet-client/tls.crt/tls.key\n"
+    style=filled
+    fillcolor="#c8fbcd"
+  ];
+  14 [
+    label="cabundle/kube-apiserver-total-client-ca\n\nconfigmaps/kube-apiserver-client-ca -nopenshift-config-managed\n    configmaps/client-ca -nopenshift-controller-manager\n    configmaps/client-ca -nopenshift-kube-apiserver\n    configmaps/client-ca -nopenshift-kube-controller-manager\n    file:///etc/kubernetes/static-pod-resources/kube-apiserver-certs/configmaps/client-ca/ca-bundle.crt/ca-bundle.crt\n    file:///etc/kubernetes/static-pod-resources/kube-controller-manager-certs/configmaps/client-ca/ca-bundle.crt/ca-bundle.crt\n"
+    style=filled
+    fillcolor="#fda172"
+  ];
+  20 [
+    label="cabundle/kubelet-to-recognize-kube-apiserver-client-ca\n\nconfigmaps/kube-apiserver-to-kubelet-client-ca -nopenshift-kube-apiserver-operator\n"
+    style=filled
+    fillcolor="#fda172"
+  ];
+  21 [
+    label="cabundle/kube-apiserver-from-installer-client-ca\n\nconfigmaps/initial-kube-apiserver-server-ca -nopenshift-config\n"
+    style=filled
+    fillcolor="#fda172"
+  ];
+
+  // Edge definitions.
+  9 -> 10;
+  9 -> 14;
+  9 -> 20;
+  9 -> 21;
+}

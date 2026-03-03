@@ -1,0 +1,16 @@
+digraph "Local Certificate" {
+  // Node definitions.
+  6 [
+    label="certkeypair/per-master-debugging-signer\n\nsecret/node-system-admin-signer -nopenshift-kube-apiserver-operator\n"
+    style=filled
+    fillcolor="#c7bfff"
+  ];
+  7 [
+    label="certkeypair/per-master-debugging-client\n\nsecret/node-system-admin-client -nopenshift-kube-apiserver-operator\n"
+    style=filled
+    fillcolor="#c8fbcd"
+  ];
+
+  // Edge definitions.
+  6 -> 7;
+}

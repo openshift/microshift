@@ -1,0 +1,16 @@
+digraph "Local Certificate" {
+  // Node definitions.
+  1 [
+    label="certkeypair/service-serving-signer\n\nsecret/signing-key -nopenshift-service-ca\n"
+    style=filled
+    fillcolor="#c7bfff"
+  ];
+  32 [
+    label="certkeypair/image-registry.openshift-image-registry.svc\n\nsecret/image-registry-tls -nopenshift-image-registry\n"
+    style=filled
+    fillcolor="#bdebfd"
+  ];
+
+  // Edge definitions.
+  1 -> 32;
+}

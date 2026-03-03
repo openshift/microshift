@@ -1,0 +1,1375 @@
+apiVersion: apiextensions.k8s.io/v1 # Hack because controller-gen complains if we don't have this
+name: "CompatibilityRequirement"
+crdName: compatibilityrequirements.apiextensions.openshift.io
+tests:
+  onCreate:
+  - name: Should be able to create a minimal CompatibilityRequirement
+    initial: |
+      apiVersion: apiextensions.openshift.io/v1alpha1
+      kind: CompatibilityRequirement
+      metadata:
+        name: test-requirement
+      spec:
+        compatibilitySchema:
+          customResourceDefinition:
+            type: YAML
+            data: |
+              apiVersion: apiextensions.k8s.io/v1
+              kind: CustomResourceDefinition
+              metadata:
+                name: testrequirements.example.com
+              spec:
+                group: example.com
+                names:
+                  kind: TestRequirement
+                  plural: testrequirements
+                scope: Namespaced
+                versions:
+                - name: v1
+                  served: true
+                  storage: true
+                  schema:
+                    openAPIV3Schema:
+                      type: object
+                      properties:
+                        spec:
+                          type: object
+          requiredVersions:
+            defaultSelection: StorageOnly
+    expected: |
+      apiVersion: apiextensions.openshift.io/v1alpha1
+      kind: CompatibilityRequirement
+      metadata:
+        name: test-requirement
+      spec:
+        compatibilitySchema:
+          customResourceDefinition:
+            type: YAML
+            data: |
+              apiVersion: apiextensions.k8s.io/v1
+              kind: CustomResourceDefinition
+              metadata:
+                name: testrequirements.example.com
+              spec:
+                group: example.com
+                names:
+                  kind: TestRequirement
+                  plural: testrequirements
+                scope: Namespaced
+                versions:
+                - name: v1
+                  served: true
+                  storage: true
+                  schema:
+                    openAPIV3Schema:
+                      type: object
+                      properties:
+                        spec:
+                          type: object
+          requiredVersions:
+            defaultSelection: StorageOnly
+
+  - name: Should be able to create CompatibilityRequirement with additional API versions
+    initial: |
+      apiVersion: apiextensions.openshift.io/v1alpha1
+      kind: CompatibilityRequirement
+      metadata:
+        name: test-requirement
+      spec:
+        compatibilitySchema:
+          customResourceDefinition:
+            type: YAML
+            data: |
+              apiVersion: apiextensions.k8s.io/v1
+              kind: CustomResourceDefinition
+              metadata:
+                name: testrequirements.example.com
+              spec:
+                group: example.com
+                names:
+                  kind: TestRequirement
+                  plural: testrequirements
+                scope: Namespaced
+                versions:
+                - name: v1
+                  served: true
+                  storage: true
+                  schema:
+                    openAPIV3Schema:
+                      type: object
+          requiredVersions:
+            defaultSelection: StorageOnly
+            additionalVersions:
+            - v1alpha1
+            - v1beta1
+    expected: |
+      apiVersion: apiextensions.openshift.io/v1alpha1
+      kind: CompatibilityRequirement
+      metadata:
+        name: test-requirement
+      spec:
+        compatibilitySchema:
+          customResourceDefinition:
+            type: YAML
+            data: |
+              apiVersion: apiextensions.k8s.io/v1
+              kind: CustomResourceDefinition
+              metadata:
+                name: testrequirements.example.com
+              spec:
+                group: example.com
+                names:
+                  kind: TestRequirement
+                  plural: testrequirements
+                scope: Namespaced
+                versions:
+                - name: v1
+                  served: true
+                  storage: true
+                  schema:
+                    openAPIV3Schema:
+                      type: object
+          requiredVersions:
+            defaultSelection: StorageOnly
+            additionalVersions:
+            - v1alpha1
+            - v1beta1
+
+  - name: Should be able to create CompatibilityRequirement with excluded fields
+    initial: |
+      apiVersion: apiextensions.openshift.io/v1alpha1
+      kind: CompatibilityRequirement
+      metadata:
+        name: test-requirement
+      spec:
+        compatibilitySchema:
+          customResourceDefinition:
+            type: YAML
+            data: |
+              apiVersion: apiextensions.k8s.io/v1
+              kind: CustomResourceDefinition
+              metadata:
+                name: testrequirements.example.com
+              spec:
+                group: example.com
+                names:
+                  kind: TestRequirement
+                  plural: testrequirements
+                scope: Namespaced
+                versions:
+                - name: v1
+                  served: true
+                  storage: true
+                  schema:
+                    openAPIV3Schema:
+                      type: object
+          requiredVersions:
+            defaultSelection: StorageOnly
+          excludedFields:
+          - path: spec.fieldToExclude
+          - path: status.anotherField
+            versions:
+            - v1alpha1
+    expected: |
+      apiVersion: apiextensions.openshift.io/v1alpha1
+      kind: CompatibilityRequirement
+      metadata:
+        name: test-requirement
+      spec:
+        compatibilitySchema:
+          customResourceDefinition:
+            type: YAML
+            data: |
+              apiVersion: apiextensions.k8s.io/v1
+              kind: CustomResourceDefinition
+              metadata:
+                name: testrequirements.example.com
+              spec:
+                group: example.com
+                names:
+                  kind: TestRequirement
+                  plural: testrequirements
+                scope: Namespaced
+                versions:
+                - name: v1
+                  served: true
+                  storage: true
+                  schema:
+                    openAPIV3Schema:
+                      type: object
+          requiredVersions:
+            defaultSelection: StorageOnly
+          excludedFields:
+          - path: spec.fieldToExclude
+          - path: status.anotherField
+            versions:
+            - v1alpha1
+
+  - name: Should not be able to create CompatibilityRequirement with invalid excluded field path
+    initial: |
+      apiVersion: apiextensions.openshift.io/v1alpha1
+      kind: CompatibilityRequirement
+      metadata:
+        name: test-requirement
+      spec:
+        compatibilitySchema:
+          customResourceDefinition:
+            type: YAML
+            data: |
+              apiVersion: apiextensions.k8s.io/v1
+              kind: CustomResourceDefinition
+              metadata:
+                name: testrequirements.example.com
+              spec:
+                group: example.com
+                names:
+                  kind: TestRequirement
+                  plural: testrequirements
+                scope: Namespaced
+                versions:
+                - name: v1
+                  served: true
+                  storage: true
+                  schema:
+                    openAPIV3Schema:
+                      type: object
+          requiredVersions:
+            defaultSelection: StorageOnly
+          excludedFields:
+          - path: "1invalidFieldName"
+    expectedError: "spec.compatibilitySchema.excludedFields[0].path: Invalid value"
+
+  - name: Should not be able to create CompatibilityRequirement with invalid DNS 1035 label in additionalVersions
+    initial: |
+      apiVersion: apiextensions.openshift.io/v1alpha1
+      kind: CompatibilityRequirement
+      metadata:
+        name: test-requirement
+      spec:
+        compatibilitySchema:
+          customResourceDefinition:
+            type: YAML
+            data: |
+              apiVersion: apiextensions.k8s.io/v1
+              kind: CustomResourceDefinition
+              metadata:
+                name: testrequirements.example.com
+              spec:
+                group: example.com
+                names:
+                  kind: TestRequirement
+                  plural: testrequirements
+                scope: Namespaced
+                versions:
+                - name: v1
+                  served: true
+                  storage: true
+                  schema:
+                    openAPIV3Schema:
+                      type: object
+          requiredVersions:
+            defaultSelection: StorageOnly
+            additionalVersions:
+            - V1Alpha1
+    expectedError: "It must contain only lower-case alphanumeric characters and hyphens and must start with an alphabetic character and end with an alphanumeric character"
+
+  - name: Should not be able to create CompatibilityRequirement with additionalVersions when defaultSelection is AllServed
+    initial: |
+      apiVersion: apiextensions.openshift.io/v1alpha1
+      kind: CompatibilityRequirement
+      metadata:
+        name: test-requirement
+      spec:
+        compatibilitySchema:
+          customResourceDefinition:
+            type: YAML
+            data: |
+              apiVersion: apiextensions.k8s.io/v1
+              kind: CustomResourceDefinition
+              metadata:
+                name: testrequirements.example.com
+              spec:
+                group: example.com
+                names:
+                  kind: TestRequirement
+                  plural: testrequirements
+                scope: Namespaced
+                versions:
+                - name: v1
+                  served: true
+                  storage: true
+                  schema:
+                    openAPIV3Schema:
+                      type: object
+          requiredVersions:
+            defaultSelection: AllServed
+            additionalVersions:
+            - v1alpha1
+    expectedError: "additionalVersions may not be defined when defaultSelection is 'AllServed'"
+
+  - name: Should not be able to create CompatibilityRequirement with excludedFields path containing field name exceeding 63 characters
+    initial: |
+      apiVersion: apiextensions.openshift.io/v1alpha1
+      kind: CompatibilityRequirement
+      metadata:
+        name: test-requirement
+      spec:
+        compatibilitySchema:
+          customResourceDefinition:
+            type: YAML
+            data: |
+              apiVersion: apiextensions.k8s.io/v1
+              kind: CustomResourceDefinition
+              metadata:
+                name: testrequirements.example.com
+              spec:
+                group: example.com
+                names:
+                  kind: TestRequirement
+                  plural: testrequirements
+                scope: Namespaced
+                versions:
+                - name: v1
+                  served: true
+                  storage: true
+                  schema:
+                    openAPIV3Schema:
+                      type: object
+          requiredVersions:
+            defaultSelection: StorageOnly
+          excludedFields:
+          - path: spec.thisFieldNameIsWayTooLongBecauseItExceedsSixtyThreeCharactersInLength
+    expectedError: "path must be dot-separated field names, each starting with a letter and containing only letters, digits, and underscores not exceeding 63 characters"
+
+  - name: Should not be able to create CompatibilityRequirement with excludedFields path containing more than 16 fields
+    initial: |
+      apiVersion: apiextensions.openshift.io/v1alpha1
+      kind: CompatibilityRequirement
+      metadata:
+        name: test-requirement
+      spec:
+        compatibilitySchema:
+          customResourceDefinition:
+            type: YAML
+            data: |
+              apiVersion: apiextensions.k8s.io/v1
+              kind: CustomResourceDefinition
+              metadata:
+                name: testrequirements.example.com
+              spec:
+                group: example.com
+                names:
+                  kind: TestRequirement
+                  plural: testrequirements
+                scope: Namespaced
+                versions:
+                - name: v1
+                  served: true
+                  storage: true
+                  schema:
+                    openAPIV3Schema:
+                      type: object
+          requiredVersions:
+            defaultSelection: StorageOnly
+          excludedFields:
+          - path: a.b.c.d.e.f.g.h.i.j.k.l.m.n.o.p.q
+    expectedError: "path must be dot-separated field names, each starting with a letter and containing only letters, digits, and underscores not exceeding 63 characters. There may be at most 16 fields in the path"
+
+  - name: Should not be able to create CompatibilityRequirement with excludedFields path containing invalid characters
+    initial: |
+      apiVersion: apiextensions.openshift.io/v1alpha1
+      kind: CompatibilityRequirement
+      metadata:
+        name: test-requirement
+      spec:
+        compatibilitySchema:
+          customResourceDefinition:
+            type: YAML
+            data: |
+              apiVersion: apiextensions.k8s.io/v1
+              kind: CustomResourceDefinition
+              metadata:
+                name: testrequirements.example.com
+              spec:
+                group: example.com
+                names:
+                  kind: TestRequirement
+                  plural: testrequirements
+                scope: Namespaced
+                versions:
+                - name: v1
+                  served: true
+                  storage: true
+                  schema:
+                    openAPIV3Schema:
+                      type: object
+          requiredVersions:
+            defaultSelection: StorageOnly
+          excludedFields:
+          - path: spec.field-name
+    expectedError: "path must be dot-separated field names, each starting with a letter and containing only letters, digits, and underscores not exceeding 63 characters"
+
+  - name: Should be able to create CompatibilityRequirement with excludedFields path containing exactly 16 fields
+    initial: |
+      apiVersion: apiextensions.openshift.io/v1alpha1
+      kind: CompatibilityRequirement
+      metadata:
+        name: test-requirement
+      spec:
+        compatibilitySchema:
+          customResourceDefinition:
+            type: YAML
+            data: |
+              apiVersion: apiextensions.k8s.io/v1
+              kind: CustomResourceDefinition
+              metadata:
+                name: testrequirements.example.com
+              spec:
+                group: example.com
+                names:
+                  kind: TestRequirement
+                  plural: testrequirements
+                scope: Namespaced
+                versions:
+                - name: v1
+                  served: true
+                  storage: true
+                  schema:
+                    openAPIV3Schema:
+                      type: object
+          requiredVersions:
+            defaultSelection: StorageOnly
+          excludedFields:
+          - path: a.b.c.d.e.f.g.h.i.j.k.l.m.n.o.p
+    expected: |
+      apiVersion: apiextensions.openshift.io/v1alpha1
+      kind: CompatibilityRequirement
+      metadata:
+        name: test-requirement
+      spec:
+        compatibilitySchema:
+          customResourceDefinition:
+            type: YAML
+            data: |
+              apiVersion: apiextensions.k8s.io/v1
+              kind: CustomResourceDefinition
+              metadata:
+                name: testrequirements.example.com
+              spec:
+                group: example.com
+                names:
+                  kind: TestRequirement
+                  plural: testrequirements
+                scope: Namespaced
+                versions:
+                - name: v1
+                  served: true
+                  storage: true
+                  schema:
+                    openAPIV3Schema:
+                      type: object
+          requiredVersions:
+            defaultSelection: StorageOnly
+          excludedFields:
+          - path: a.b.c.d.e.f.g.h.i.j.k.l.m.n.o.p
+
+  - name: Should not be able to create CompatibilityRequirement with empty objectSchemaValidation.namespaceSelector
+    initial: |
+      apiVersion: apiextensions.openshift.io/v1alpha1
+      kind: CompatibilityRequirement
+      metadata:
+        name: test-requirement
+      spec:
+        compatibilitySchema:
+          customResourceDefinition:
+            type: YAML
+            data: |
+              apiVersion: apiextensions.k8s.io/v1
+              kind: CustomResourceDefinition
+              metadata:
+                name: testrequirements.example.com
+              spec:
+                group: example.com
+                names:
+                  kind: TestRequirement
+                  plural: testrequirements
+                scope: Namespaced
+                versions:
+                - name: v1
+                  served: true
+                  storage: true
+                  schema:
+                    openAPIV3Schema:
+                      type: object
+          requiredVersions:
+            defaultSelection: StorageOnly
+        objectSchemaValidation:
+          action: Warn
+          namespaceSelector: {}
+    expectedError: "must have at least one of matchLabels or matchExpressions when specified"
+  - name: Should not be able to create CompatibilityRequirement with zero length objectSchemaValidation.namespaceSelector matchLabels and matchExpressions
+    initial: |
+      apiVersion: apiextensions.openshift.io/v1alpha1
+      kind: CompatibilityRequirement
+      metadata:
+        name: test-requirement
+      spec:
+        compatibilitySchema:
+          customResourceDefinition:
+            type: YAML
+            data: |
+              apiVersion: apiextensions.k8s.io/v1
+              kind: CustomResourceDefinition
+              metadata:
+                name: testrequirements.example.com
+              spec:
+                group: example.com
+                names:
+                  kind: TestRequirement
+                  plural: testrequirements
+                scope: Namespaced
+                versions:
+                - name: v1
+                  served: true
+                  storage: true
+                  schema:
+                    openAPIV3Schema:
+                      type: object
+          requiredVersions:
+            defaultSelection: StorageOnly
+        objectSchemaValidation:
+          action: Warn
+          namespaceSelector:
+            matchLabels: {}
+            matchExpressions: []
+    expectedError: "must have at least one of matchLabels or matchExpressions when specified"
+
+  onUpdate:
+  - name: Should be able to set valid observedCRD uid
+    initial: |
+      apiVersion: apiextensions.openshift.io/v1alpha1
+      kind: CompatibilityRequirement
+      metadata:
+        name: test-requirement
+      spec:
+        compatibilitySchema:
+          customResourceDefinition:
+            type: YAML
+            data: |
+              apiVersion: apiextensions.k8s.io/v1
+              kind: CustomResourceDefinition
+              metadata:
+                name: testrequirements.example.com
+              spec:
+                group: example.com
+                names:
+                  kind: TestRequirement
+                  plural: testrequirements
+                scope: Namespaced
+                versions:
+                - name: v1
+                  served: true
+                  storage: true
+                  schema:
+                    openAPIV3Schema:
+                      type: object
+          requiredVersions:
+            defaultSelection: StorageOnly
+    updated: |
+      apiVersion: apiextensions.openshift.io/v1alpha1
+      kind: CompatibilityRequirement
+      metadata:
+        name: test-requirement
+      spec:
+        compatibilitySchema:
+          customResourceDefinition:
+            type: YAML
+            data: |
+              apiVersion: apiextensions.k8s.io/v1
+              kind: CustomResourceDefinition
+              metadata:
+                name: testrequirements.example.com
+              spec:
+                group: example.com
+                names:
+                  kind: TestRequirement
+                  plural: testrequirements
+                scope: Namespaced
+                versions:
+                - name: v1
+                  served: true
+                  storage: true
+                  schema:
+                    openAPIV3Schema:
+                      type: object
+          requiredVersions:
+            defaultSelection: StorageOnly
+      status:
+        observedCRD:
+          uid: "123e4567-e89b-12d3-a456-426614174000"
+          generation: 1
+    expected: |
+      apiVersion: apiextensions.openshift.io/v1alpha1
+      kind: CompatibilityRequirement
+      metadata:
+        name: test-requirement
+      spec:
+        compatibilitySchema:
+          customResourceDefinition:
+            type: YAML
+            data: |
+              apiVersion: apiextensions.k8s.io/v1
+              kind: CustomResourceDefinition
+              metadata:
+                name: testrequirements.example.com
+              spec:
+                group: example.com
+                names:
+                  kind: TestRequirement
+                  plural: testrequirements
+                scope: Namespaced
+                versions:
+                - name: v1
+                  served: true
+                  storage: true
+                  schema:
+                    openAPIV3Schema:
+                      type: object
+          requiredVersions:
+            defaultSelection: StorageOnly
+      status:
+        observedCRD:
+          uid: "123e4567-e89b-12d3-a456-426614174000"
+          generation: 1
+
+  - name: Should not be able to set invalid observedCRD uid
+    initial: |
+      apiVersion: apiextensions.openshift.io/v1alpha1
+      kind: CompatibilityRequirement
+      metadata:
+        name: test-requirement
+      spec:
+        compatibilitySchema:
+          customResourceDefinition:
+            type: YAML
+            data: |
+              apiVersion: apiextensions.k8s.io/v1
+              kind: CustomResourceDefinition
+              metadata:
+                name: testrequirements.example.com
+              spec:
+                group: example.com
+                names:
+                  kind: TestRequirement
+                  plural: testrequirements
+                scope: Namespaced
+                versions:
+                - name: v1
+                  served: true
+                  storage: true
+                  schema:
+                    openAPIV3Schema:
+                      type: object
+          requiredVersions:
+            defaultSelection: StorageOnly
+    updated: |
+      apiVersion: apiextensions.openshift.io/v1alpha1
+      kind: CompatibilityRequirement
+      metadata:
+        name: test-requirement
+      spec:
+        compatibilitySchema:
+          customResourceDefinition:
+            type: YAML
+            data: |
+              apiVersion: apiextensions.k8s.io/v1
+              kind: CustomResourceDefinition
+              metadata:
+                name: testrequirements.example.com
+              spec:
+                group: example.com
+                names:
+                  kind: TestRequirement
+                  plural: testrequirements
+                scope: Namespaced
+                versions:
+                - name: v1
+                  served: true
+                  storage: true
+                  schema:
+                    openAPIV3Schema:
+                      type: object
+          requiredVersions:
+            defaultSelection: StorageOnly
+      status:
+        observedCRD:
+          uid: "invalid-uuid"
+          generation: 1
+    expectedStatusError: "status.observedCRD.uid: Invalid value: \"invalid-uuid\": observedCRD.uid in body must be of type uuid: \"invalid-uuid\""
+
+  - name: observedCRD may increase for the same CRD
+    initial: |
+      apiVersion: apiextensions.openshift.io/v1alpha1
+      kind: CompatibilityRequirement
+      metadata:
+        name: test-requirement
+      spec:
+        compatibilitySchema:
+          customResourceDefinition:
+            type: YAML
+            data: |
+              apiVersion: apiextensions.k8s.io/v1
+              kind: CustomResourceDefinition
+              metadata:
+                name: testrequirements.example.com
+              spec:
+                group: example.com
+                names:
+                  kind: TestRequirement
+                  plural: testrequirements
+                scope: Namespaced
+                versions:
+                - name: v1
+                  served: true
+                  storage: true
+                  schema:
+                    openAPIV3Schema:
+                      type: object
+          requiredVersions:
+            defaultSelection: StorageOnly
+      status:
+        observedCRD:
+          uid: "123e4567-e89b-12d3-a456-426614174000"
+          generation: 1
+    updated: |
+      apiVersion: apiextensions.openshift.io/v1alpha1
+      kind: CompatibilityRequirement
+      metadata:
+        name: test-requirement
+      spec:
+        compatibilitySchema:
+          customResourceDefinition:
+            type: YAML
+            data: |
+              apiVersion: apiextensions.k8s.io/v1
+              kind: CustomResourceDefinition
+              metadata:
+                name: testrequirements.example.com
+              spec:
+                group: example.com
+                names:
+                  kind: TestRequirement
+                  plural: testrequirements
+                scope: Namespaced
+                versions:
+                - name: v1
+                  served: true
+                  storage: true
+                  schema:
+                    openAPIV3Schema:
+                      type: object
+          requiredVersions:
+            defaultSelection: StorageOnly
+      status:
+        observedCRD:
+          uid: "123e4567-e89b-12d3-a456-426614174000"
+          generation: 2
+    expected: |
+      apiVersion: apiextensions.openshift.io/v1alpha1
+      kind: CompatibilityRequirement
+      metadata:
+        name: test-requirement
+      spec:
+        compatibilitySchema:
+          customResourceDefinition:
+            type: YAML
+            data: |
+              apiVersion: apiextensions.k8s.io/v1
+              kind: CustomResourceDefinition
+              metadata:
+                name: testrequirements.example.com
+              spec:
+                group: example.com
+                names:
+                  kind: TestRequirement
+                  plural: testrequirements
+                scope: Namespaced
+                versions:
+                - name: v1
+                  served: true
+                  storage: true
+                  schema:
+                    openAPIV3Schema:
+                      type: object
+          requiredVersions:
+            defaultSelection: StorageOnly
+      status:
+        observedCRD:
+          uid: "123e4567-e89b-12d3-a456-426614174000"
+          generation: 2
+
+  - name: Should not be able to decrease observedCRD.generation for the same CRD UID
+    initial: |
+      apiVersion: apiextensions.openshift.io/v1alpha1
+      kind: CompatibilityRequirement
+      metadata:
+        name: test-requirement
+      spec:
+        compatibilitySchema:
+          customResourceDefinition:
+            type: YAML
+            data: |
+              apiVersion: apiextensions.k8s.io/v1
+              kind: CustomResourceDefinition
+              metadata:
+                name: testrequirements.example.com
+              spec:
+                group: example.com
+                names:
+                  kind: TestRequirement
+                  plural: testrequirements
+                scope: Namespaced
+                versions:
+                - name: v1
+                  served: true
+                  storage: true
+                  schema:
+                    openAPIV3Schema:
+                      type: object
+          requiredVersions:
+            defaultSelection: StorageOnly
+      status:
+        observedCRD:
+          uid: "123e4567-e89b-12d3-a456-426614174000"
+          generation: 5
+        conditions:
+        - type: Progressing
+          status: "True"
+          lastTransitionTime: "2023-01-01T00:00:00Z"
+          reason: "UpToDate"
+          message: "Processing"
+    updated: |
+      apiVersion: apiextensions.openshift.io/v1alpha1
+      kind: CompatibilityRequirement
+      metadata:
+        name: test-requirement
+      spec:
+        compatibilitySchema:
+          customResourceDefinition:
+            type: YAML
+            data: |
+              apiVersion: apiextensions.k8s.io/v1
+              kind: CustomResourceDefinition
+              metadata:
+                name: testrequirements.example.com
+              spec:
+                group: example.com
+                names:
+                  kind: TestRequirement
+                  plural: testrequirements
+                scope: Namespaced
+                versions:
+                - name: v1
+                  served: true
+                  storage: true
+                  schema:
+                    openAPIV3Schema:
+                      type: object
+          requiredVersions:
+            defaultSelection: StorageOnly
+      status:
+        observedCRD:
+          uid: "123e4567-e89b-12d3-a456-426614174000"
+          generation: 3
+        conditions:
+        - type: Progressing
+          status: "True"
+          lastTransitionTime: "2023-01-01T00:00:00Z"
+          reason: "UpToDate"
+          message: "Processing"
+    expectedStatusError: "generation may only increase on the same CRD"
+
+  - name: Should be able to decrease generation when UID changes
+    initial: |
+      apiVersion: apiextensions.openshift.io/v1alpha1
+      kind: CompatibilityRequirement
+      metadata:
+        name: test-requirement
+      spec:
+        compatibilitySchema:
+          customResourceDefinition:
+            type: YAML
+            data: |
+              apiVersion: apiextensions.k8s.io/v1
+              kind: CustomResourceDefinition
+              metadata:
+                name: testrequirements.example.com
+              spec:
+                group: example.com
+                names:
+                  kind: TestRequirement
+                  plural: testrequirements
+                scope: Namespaced
+                versions:
+                - name: v1
+                  served: true
+                  storage: true
+                  schema:
+                    openAPIV3Schema:
+                      type: object
+          requiredVersions:
+            defaultSelection: StorageOnly
+      status:
+        observedCRD:
+          uid: "123e4567-e89b-12d3-a456-426614174000"
+          generation: 5
+        conditions:
+        - type: Progressing
+          status: "True"
+          lastTransitionTime: "2023-01-01T00:00:00Z"
+          reason: "UpToDate"
+          message: "Processing"
+    updated: |
+      apiVersion: apiextensions.openshift.io/v1alpha1
+      kind: CompatibilityRequirement
+      metadata:
+        name: test-requirement
+      spec:
+        compatibilitySchema:
+          customResourceDefinition:
+            type: YAML
+            data: |
+              apiVersion: apiextensions.k8s.io/v1
+              kind: CustomResourceDefinition
+              metadata:
+                name: testrequirements.example.com
+              spec:
+                group: example.com
+                names:
+                  kind: TestRequirement
+                  plural: testrequirements
+                scope: Namespaced
+                versions:
+                - name: v1
+                  served: true
+                  storage: true
+                  schema:
+                    openAPIV3Schema:
+                      type: object
+          requiredVersions:
+            defaultSelection: StorageOnly
+      status:
+        observedCRD:
+          uid: "987fcdeb-51a2-43d1-b654-123456789abc"
+          generation: 1
+        conditions:
+        - type: Progressing
+          status: "True"
+          lastTransitionTime: "2023-01-01T00:00:00Z"
+          reason: "UpToDate"
+          message: "Processing"
+    expected: |
+      apiVersion: apiextensions.openshift.io/v1alpha1
+      kind: CompatibilityRequirement
+      metadata:
+        name: test-requirement
+      spec:
+        compatibilitySchema:
+          customResourceDefinition:
+            type: YAML
+            data: |
+              apiVersion: apiextensions.k8s.io/v1
+              kind: CustomResourceDefinition
+              metadata:
+                name: testrequirements.example.com
+              spec:
+                group: example.com
+                names:
+                  kind: TestRequirement
+                  plural: testrequirements
+                scope: Namespaced
+                versions:
+                - name: v1
+                  served: true
+                  storage: true
+                  schema:
+                    openAPIV3Schema:
+                      type: object
+          requiredVersions:
+            defaultSelection: StorageOnly
+      status:
+        observedCRD:
+          uid: "987fcdeb-51a2-43d1-b654-123456789abc"
+          generation: 1
+        conditions:
+        - type: Progressing
+          status: "True"
+          lastTransitionTime: "2023-01-01T00:00:00Z"
+          reason: "UpToDate"
+          message: "Processing"
+
+  - name: Should be able to set crdName initially
+    initial: |
+      apiVersion: apiextensions.openshift.io/v1alpha1
+      kind: CompatibilityRequirement
+      metadata:
+        name: test-requirement
+      spec:
+        compatibilitySchema:
+          customResourceDefinition:
+            type: YAML
+            data: |
+              apiVersion: apiextensions.k8s.io/v1
+              kind: CustomResourceDefinition
+              metadata:
+                name: testrequirements.example.com
+              spec:
+                group: example.com
+                names:
+                  kind: TestRequirement
+                  plural: testrequirements
+                scope: Namespaced
+                versions:
+                - name: v1
+                  served: true
+                  storage: true
+                  schema:
+                    openAPIV3Schema:
+                      type: object
+          requiredVersions:
+            defaultSelection: StorageOnly
+      status:
+        conditions:
+        - type: Progressing
+          status: "True"
+          lastTransitionTime: "2023-01-01T00:00:00Z"
+          reason: "UpToDate"
+          message: "Processing"
+    updated: |
+      apiVersion: apiextensions.openshift.io/v1alpha1
+      kind: CompatibilityRequirement
+      metadata:
+        name: test-requirement
+      spec:
+        compatibilitySchema:
+          customResourceDefinition:
+            type: YAML
+            data: |
+              apiVersion: apiextensions.k8s.io/v1
+              kind: CustomResourceDefinition
+              metadata:
+                name: testrequirements.example.com
+              spec:
+                group: example.com
+                names:
+                  kind: TestRequirement
+                  plural: testrequirements
+                scope: Namespaced
+                versions:
+                - name: v1
+                  served: true
+                  storage: true
+                  schema:
+                    openAPIV3Schema:
+                      type: object
+          requiredVersions:
+            defaultSelection: StorageOnly
+      status:
+        crdName: original.example.com
+        conditions:
+        - type: Progressing
+          status: "True"
+          lastTransitionTime: "2023-01-01T00:00:00Z"
+          reason: "UpToDate"
+          message: "Processing"
+    expected: |
+      apiVersion: apiextensions.openshift.io/v1alpha1
+      kind: CompatibilityRequirement
+      metadata:
+        name: test-requirement
+      spec:
+        compatibilitySchema:
+          customResourceDefinition:
+            type: YAML
+            data: |
+              apiVersion: apiextensions.k8s.io/v1
+              kind: CustomResourceDefinition
+              metadata:
+                name: testrequirements.example.com
+              spec:
+                group: example.com
+                names:
+                  kind: TestRequirement
+                  plural: testrequirements
+                scope: Namespaced
+                versions:
+                - name: v1
+                  served: true
+                  storage: true
+                  schema:
+                    openAPIV3Schema:
+                      type: object
+          requiredVersions:
+            defaultSelection: StorageOnly
+      status:
+        crdName: original.example.com
+        conditions:
+        - type: Progressing
+          status: "True"
+          lastTransitionTime: "2023-01-01T00:00:00Z"
+          reason: "UpToDate"
+          message: "Processing"
+
+  - name: Should not be able to change crdName once set in status
+    initial: |
+      apiVersion: apiextensions.openshift.io/v1alpha1
+      kind: CompatibilityRequirement
+      metadata:
+        name: test-requirement
+      spec:
+        compatibilitySchema:
+          customResourceDefinition:
+            type: YAML
+            data: |
+              apiVersion: apiextensions.k8s.io/v1
+              kind: CustomResourceDefinition
+              metadata:
+                name: testrequirements.example.com
+              spec:
+                group: example.com
+                names:
+                  kind: TestRequirement
+                  plural: testrequirements
+                scope: Namespaced
+                versions:
+                - name: v1
+                  served: true
+                  storage: true
+                  schema:
+                    openAPIV3Schema:
+                      type: object
+          requiredVersions:
+            defaultSelection: StorageOnly
+      status:
+        crdName: original.example.com
+        conditions:
+        - type: Progressing
+          status: "True"
+          lastTransitionTime: "2023-01-01T00:00:00Z"
+          reason: "UpToDate"
+          message: "Processing"
+    updated: |
+      apiVersion: apiextensions.openshift.io/v1alpha1
+      kind: CompatibilityRequirement
+      metadata:
+        name: test-requirement
+      spec:
+        compatibilitySchema:
+          customResourceDefinition:
+            type: YAML
+            data: |
+              apiVersion: apiextensions.k8s.io/v1
+              kind: CustomResourceDefinition
+              metadata:
+                name: testrequirements.example.com
+              spec:
+                group: example.com
+                names:
+                  kind: TestRequirement
+                  plural: testrequirements
+                scope: Namespaced
+                versions:
+                - name: v1
+                  served: true
+                  storage: true
+                  schema:
+                    openAPIV3Schema:
+                      type: object
+          requiredVersions:
+            defaultSelection: StorageOnly
+      status:
+        crdName: different.example.com
+        conditions:
+        - type: Progressing
+          status: "True"
+          lastTransitionTime: "2023-01-01T00:00:00Z"
+          reason: "UpToDate"
+          message: "Processing"
+    expectedStatusError: "crdName cannot be changed once set"
+
+  - name: Should not be able to remove crdName once set in status
+    initial: |
+      apiVersion: apiextensions.openshift.io/v1alpha1
+      kind: CompatibilityRequirement
+      metadata:
+        name: test-requirement
+      spec:
+        compatibilitySchema:
+          customResourceDefinition:
+            type: YAML
+            data: |
+              apiVersion: apiextensions.k8s.io/v1
+              kind: CustomResourceDefinition
+              metadata:
+                name: testrequirements.example.com
+              spec:
+                group: example.com
+                names:
+                  kind: TestRequirement
+                  plural: testrequirements
+                scope: Namespaced
+                versions:
+                - name: v1
+                  served: true
+                  storage: true
+                  schema:
+                    openAPIV3Schema:
+                      type: object
+          requiredVersions:
+            defaultSelection: StorageOnly
+      status:
+        crdName: original.example.com
+        conditions:
+        - type: Progressing
+          status: "True"
+          lastTransitionTime: "2023-01-01T00:00:00Z"
+          reason: "UpToDate"
+          message: "Processing"
+    updated: |
+      apiVersion: apiextensions.openshift.io/v1alpha1
+      kind: CompatibilityRequirement
+      metadata:
+        name: test-requirement
+      spec:
+        compatibilitySchema:
+          customResourceDefinition:
+            type: YAML
+            data: |
+              apiVersion: apiextensions.k8s.io/v1
+              kind: CustomResourceDefinition
+              metadata:
+                name: testrequirements.example.com
+              spec:
+                group: example.com
+                names:
+                  kind: TestRequirement
+                  plural: testrequirements
+                scope: Namespaced
+                versions:
+                - name: v1
+                  served: true
+                  storage: true
+                  schema:
+                    openAPIV3Schema:
+                      type: object
+          requiredVersions:
+            defaultSelection: StorageOnly
+      status:
+        conditions:
+        - type: Progressing
+          status: "True"
+          lastTransitionTime: "2023-01-01T00:00:00Z"
+          reason: "UpToDate"
+          message: "Processing"
+    expectedStatusError: "crdName cannot be changed once set"
+
+  - name: Should be able to set valid observedCRD uid
+    initial: |
+      apiVersion: apiextensions.openshift.io/v1alpha1
+      kind: CompatibilityRequirement
+      metadata:
+        name: test-requirement
+      spec:
+        compatibilitySchema:
+          customResourceDefinition:
+            type: YAML
+            data: |
+              apiVersion: apiextensions.k8s.io/v1
+              kind: CustomResourceDefinition
+              metadata:
+                name: testrequirements.example.com
+              spec:
+                group: example.com
+                names:
+                  kind: TestRequirement
+                  plural: testrequirements
+                scope: Namespaced
+                versions:
+                - name: v1
+                  served: true
+                  storage: true
+                  schema:
+                    openAPIV3Schema:
+                      type: object
+          requiredVersions:
+            defaultSelection: StorageOnly
+      status:
+        observedCRD:
+          uid: "123e4567-e89b-12d3-a456-426614174000"
+          generation: 1
+    updated: |
+      apiVersion: apiextensions.openshift.io/v1alpha1
+      kind: CompatibilityRequirement
+      metadata:
+        name: test-requirement
+      spec:
+        compatibilitySchema:
+          customResourceDefinition:
+            type: YAML
+            data: |
+              apiVersion: apiextensions.k8s.io/v1
+              kind: CustomResourceDefinition
+              metadata:
+                name: testrequirements.example.com
+              spec:
+                group: example.com
+                names:
+                  kind: TestRequirement
+                  plural: testrequirements
+                scope: Namespaced
+                versions:
+                - name: v1
+                  served: true
+                  storage: true
+                  schema:
+                    openAPIV3Schema:
+                      type: object
+          requiredVersions:
+            defaultSelection: StorageOnly
+      status:
+        observedCRD:
+          uid: "123e4567-e89b-12d3-a456-426614174000"
+          generation: 1
+    expected: |
+      apiVersion: apiextensions.openshift.io/v1alpha1
+      kind: CompatibilityRequirement
+      metadata:
+        name: test-requirement
+      spec:
+        compatibilitySchema:
+          customResourceDefinition:
+            type: YAML
+            data: |
+              apiVersion: apiextensions.k8s.io/v1
+              kind: CustomResourceDefinition
+              metadata:
+                name: testrequirements.example.com
+              spec:
+                group: example.com
+                names:
+                  kind: TestRequirement
+                  plural: testrequirements
+                scope: Namespaced
+                versions:
+                - name: v1
+                  served: true
+                  storage: true
+                  schema:
+                    openAPIV3Schema:
+                      type: object
+          requiredVersions:
+            defaultSelection: StorageOnly
+      status:
+        observedCRD:
+          uid: "123e4567-e89b-12d3-a456-426614174000"
+          generation: 1

@@ -1,0 +1,3566 @@
+{
+  "LogicalName": "Service Serving Certificates",
+  "Description": "Used to secure inter-service communication on the local cluster.",
+  "CertificateAuthorityBundles": {
+    "Items": [
+      {
+        "LogicalName": "service-ca",
+        "Description": "CA for recognizing serving certificates for services that were signed by our service-ca controller.",
+        "Name": "openshift-service-serving-signer@1660235194",
+        "Spec": {
+          "ConfigMapLocations": [
+            {
+              "Namespace": "openshift-config-managed",
+              "Name": "service-ca"
+            },
+            {
+              "Namespace": "openshift-kube-controller-manager",
+              "Name": "service-ca"
+            },
+            {
+              "Namespace": "openshift-kube-controller-manager",
+              "Name": "service-ca-2"
+            },
+            {
+              "Namespace": "openshift-kube-controller-manager",
+              "Name": "service-ca-3"
+            },
+            {
+              "Namespace": "openshift-kube-controller-manager",
+              "Name": "service-ca-4"
+            },
+            {
+              "Namespace": "openshift-kube-controller-manager",
+              "Name": "service-ca-5"
+            },
+            {
+              "Namespace": "openshift-kube-controller-manager",
+              "Name": "service-ca-6"
+            },
+            {
+              "Namespace": "openshift-service-ca",
+              "Name": "signing-cabundle"
+            }
+          ],
+          "OnDiskLocations": [
+            {
+              "Path": "/etc/kubernetes/static-pod-resources/kube-controller-manager-pod-4/configmaps/service-ca/ca-bundle.crt/ca-bundle.crt",
+              "User": "root",
+              "Group": "root",
+              "Permissions": "-rw-r--r--.",
+              "SELinuxOptions": "system_u:object_r:kubernetes_file_t:s0"
+            },
+            {
+              "Path": "/etc/kubernetes/static-pod-resources/kube-controller-manager-pod-5/configmaps/service-ca/ca-bundle.crt/ca-bundle.crt",
+              "User": "root",
+              "Group": "root",
+              "Permissions": "-rw-r--r--.",
+              "SELinuxOptions": "system_u:object_r:kubernetes_file_t:s0"
+            },
+            {
+              "Path": "/etc/kubernetes/static-pod-resources/kube-controller-manager-pod-6/configmaps/service-ca/ca-bundle.crt/ca-bundle.crt",
+              "User": "root",
+              "Group": "root",
+              "Permissions": "-rw-r--r--.",
+              "SELinuxOptions": "system_u:object_r:kubernetes_file_t:s0"
+            }
+          ],
+          "CertificateMetadata": [
+            {
+              "CertIdentifier": {
+                "CommonName": "openshift-service-serving-signer@1660235194",
+                "SerialNumber": "316321027491433813",
+                "Issuer": {
+                  "CommonName": "openshift-service-serving-signer@1660235194",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA256-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "2048 bit",
+              "ValidityDuration": "2y60d",
+              "Usages": [
+                "KeyUsageDigitalSignature",
+                "KeyUsageKeyEncipherment",
+                "KeyUsageCertSign"
+              ],
+              "ExtendedUsages": []
+            }
+          ]
+        },
+        "Status": {
+          "Errors": null
+        }
+      }
+    ]
+  },
+  "CertKeyPairs": {
+    "Items": [
+      {
+        "LogicalName": "cco-metrics.openshift-cloud-credential-operator.svc",
+        "Description": "",
+        "Name": "cco-metrics.openshift-cloud-credential-operator.svc::761473066828534832",
+        "Spec": {
+          "SecretLocations": [
+            {
+              "Namespace": "openshift-cloud-credential-operator",
+              "Name": "cloud-credential-operator-serving-cert"
+            }
+          ],
+          "OnDiskLocations": null,
+          "CertMetadata": {
+            "CertIdentifier": {
+              "CommonName": "cco-metrics.openshift-cloud-credential-operator.svc",
+              "SerialNumber": "761473066828534832",
+              "Issuer": {
+                "CommonName": "openshift-service-serving-signer@1660235194",
+                "SerialNumber": "",
+                "Issuer": null
+              }
+            },
+            "SignatureAlgorithm": "SHA256-RSA",
+            "PublicKeyAlgorithm": "RSA",
+            "PublicKeyBitSize": "2048 bit",
+            "ValidityDuration": "2y",
+            "Usages": [
+              "KeyUsageDigitalSignature",
+              "KeyUsageKeyEncipherment"
+            ],
+            "ExtendedUsages": [
+              "ExtKeyUsageServerAuth"
+            ]
+          },
+          "Details": {
+            "CertType": "ServingCertDetails",
+            "SignerDetails": null,
+            "ServingCertDetails": {
+              "DNSNames": [
+                "cco-metrics.openshift-cloud-credential-operator.svc",
+                "cco-metrics.openshift-cloud-credential-operator.svc.cluster.local"
+              ],
+              "IPAddresses": null
+            },
+            "ClientCertDetails": null
+          }
+        },
+        "Status": {
+          "Errors": null
+        }
+      },
+      {
+        "LogicalName": "service-serving-signer",
+        "Description": "Signer used by service-ca to sign serving certificates for internal service DNS names.",
+        "Name": "openshift-service-serving-signer@1660235194::316321027491433813",
+        "Spec": {
+          "SecretLocations": [
+            {
+              "Namespace": "openshift-service-ca",
+              "Name": "signing-key"
+            }
+          ],
+          "OnDiskLocations": null,
+          "CertMetadata": {
+            "CertIdentifier": {
+              "CommonName": "openshift-service-serving-signer@1660235194",
+              "SerialNumber": "316321027491433813",
+              "Issuer": {
+                "CommonName": "openshift-service-serving-signer@1660235194",
+                "SerialNumber": "",
+                "Issuer": null
+              }
+            },
+            "SignatureAlgorithm": "SHA256-RSA",
+            "PublicKeyAlgorithm": "RSA",
+            "PublicKeyBitSize": "2048 bit",
+            "ValidityDuration": "2y60d",
+            "Usages": [
+              "KeyUsageDigitalSignature",
+              "KeyUsageKeyEncipherment",
+              "KeyUsageCertSign"
+            ],
+            "ExtendedUsages": []
+          },
+          "Details": {
+            "CertType": "SignerCertDetails",
+            "SignerDetails": {},
+            "ServingCertDetails": null,
+            "ClientCertDetails": null
+          }
+        },
+        "Status": {
+          "Errors": null
+        }
+      },
+      {
+        "LogicalName": "*.metrics.openshift-network-operator.svc",
+        "Description": "",
+        "Name": "*.metrics.openshift-network-operator.svc::6421516406206552641",
+        "Spec": {
+          "SecretLocations": [
+            {
+              "Namespace": "openshift-network-operator",
+              "Name": "metrics-tls"
+            }
+          ],
+          "OnDiskLocations": null,
+          "CertMetadata": {
+            "CertIdentifier": {
+              "CommonName": "*.metrics.openshift-network-operator.svc",
+              "SerialNumber": "6421516406206552641",
+              "Issuer": {
+                "CommonName": "openshift-service-serving-signer@1660235194",
+                "SerialNumber": "",
+                "Issuer": null
+              }
+            },
+            "SignatureAlgorithm": "SHA256-RSA",
+            "PublicKeyAlgorithm": "RSA",
+            "PublicKeyBitSize": "2048 bit",
+            "ValidityDuration": "2y",
+            "Usages": [
+              "KeyUsageDigitalSignature",
+              "KeyUsageKeyEncipherment"
+            ],
+            "ExtendedUsages": [
+              "ExtKeyUsageServerAuth"
+            ]
+          },
+          "Details": {
+            "CertType": "ServingCertDetails",
+            "SignerDetails": null,
+            "ServingCertDetails": {
+              "DNSNames": [
+                "*.metrics.openshift-network-operator.svc",
+                "*.metrics.openshift-network-operator.svc.cluster.local",
+                "metrics.openshift-network-operator.svc",
+                "metrics.openshift-network-operator.svc.cluster.local"
+              ],
+              "IPAddresses": null
+            },
+            "ClientCertDetails": null
+          }
+        },
+        "Status": {
+          "Errors": null
+        }
+      },
+      {
+        "LogicalName": "metrics.openshift-etcd-operator.svc",
+        "Description": "",
+        "Name": "metrics.openshift-etcd-operator.svc::6677616133175219939",
+        "Spec": {
+          "SecretLocations": [
+            {
+              "Namespace": "openshift-etcd-operator",
+              "Name": "etcd-operator-serving-cert"
+            }
+          ],
+          "OnDiskLocations": null,
+          "CertMetadata": {
+            "CertIdentifier": {
+              "CommonName": "metrics.openshift-etcd-operator.svc",
+              "SerialNumber": "6677616133175219939",
+              "Issuer": {
+                "CommonName": "openshift-service-serving-signer@1660235194",
+                "SerialNumber": "",
+                "Issuer": null
+              }
+            },
+            "SignatureAlgorithm": "SHA256-RSA",
+            "PublicKeyAlgorithm": "RSA",
+            "PublicKeyBitSize": "2048 bit",
+            "ValidityDuration": "2y",
+            "Usages": [
+              "KeyUsageDigitalSignature",
+              "KeyUsageKeyEncipherment"
+            ],
+            "ExtendedUsages": [
+              "ExtKeyUsageServerAuth"
+            ]
+          },
+          "Details": {
+            "CertType": "ServingCertDetails",
+            "SignerDetails": null,
+            "ServingCertDetails": {
+              "DNSNames": [
+                "metrics.openshift-etcd-operator.svc",
+                "metrics.openshift-etcd-operator.svc.cluster.local"
+              ],
+              "IPAddresses": null
+            },
+            "ClientCertDetails": null
+          }
+        },
+        "Status": {
+          "Errors": null
+        }
+      },
+      {
+        "LogicalName": "metrics.openshift-controller-manager-operator.svc",
+        "Description": "",
+        "Name": "metrics.openshift-controller-manager-operator.svc::6876654977757942073",
+        "Spec": {
+          "SecretLocations": [
+            {
+              "Namespace": "openshift-controller-manager-operator",
+              "Name": "openshift-controller-manager-operator-serving-cert"
+            }
+          ],
+          "OnDiskLocations": null,
+          "CertMetadata": {
+            "CertIdentifier": {
+              "CommonName": "metrics.openshift-controller-manager-operator.svc",
+              "SerialNumber": "6876654977757942073",
+              "Issuer": {
+                "CommonName": "openshift-service-serving-signer@1660235194",
+                "SerialNumber": "",
+                "Issuer": null
+              }
+            },
+            "SignatureAlgorithm": "SHA256-RSA",
+            "PublicKeyAlgorithm": "RSA",
+            "PublicKeyBitSize": "2048 bit",
+            "ValidityDuration": "2y",
+            "Usages": [
+              "KeyUsageDigitalSignature",
+              "KeyUsageKeyEncipherment"
+            ],
+            "ExtendedUsages": [
+              "ExtKeyUsageServerAuth"
+            ]
+          },
+          "Details": {
+            "CertType": "ServingCertDetails",
+            "SignerDetails": null,
+            "ServingCertDetails": {
+              "DNSNames": [
+                "metrics.openshift-controller-manager-operator.svc",
+                "metrics.openshift-controller-manager-operator.svc.cluster.local"
+              ],
+              "IPAddresses": null
+            },
+            "ClientCertDetails": null
+          }
+        },
+        "Status": {
+          "Errors": null
+        }
+      },
+      {
+        "LogicalName": "olm-operator-metrics.openshift-operator-lifecycle-manager.svc",
+        "Description": "",
+        "Name": "olm-operator-metrics.openshift-operator-lifecycle-manager.svc::5116318574914027760",
+        "Spec": {
+          "SecretLocations": [
+            {
+              "Namespace": "openshift-operator-lifecycle-manager",
+              "Name": "olm-operator-serving-cert"
+            }
+          ],
+          "OnDiskLocations": null,
+          "CertMetadata": {
+            "CertIdentifier": {
+              "CommonName": "olm-operator-metrics.openshift-operator-lifecycle-manager.svc",
+              "SerialNumber": "5116318574914027760",
+              "Issuer": {
+                "CommonName": "openshift-service-serving-signer@1660235194",
+                "SerialNumber": "",
+                "Issuer": null
+              }
+            },
+            "SignatureAlgorithm": "SHA256-RSA",
+            "PublicKeyAlgorithm": "RSA",
+            "PublicKeyBitSize": "2048 bit",
+            "ValidityDuration": "2y",
+            "Usages": [
+              "KeyUsageDigitalSignature",
+              "KeyUsageKeyEncipherment"
+            ],
+            "ExtendedUsages": [
+              "ExtKeyUsageServerAuth"
+            ]
+          },
+          "Details": {
+            "CertType": "ServingCertDetails",
+            "SignerDetails": null,
+            "ServingCertDetails": {
+              "DNSNames": [
+                "olm-operator-metrics.openshift-operator-lifecycle-manager.svc",
+                "olm-operator-metrics.openshift-operator-lifecycle-manager.svc.cluster.local"
+              ],
+              "IPAddresses": null
+            },
+            "ClientCertDetails": null
+          }
+        },
+        "Status": {
+          "Errors": null
+        }
+      },
+      {
+        "LogicalName": "thanos-querier.openshift-monitoring.svc",
+        "Description": "",
+        "Name": "thanos-querier.openshift-monitoring.svc::2215041012551543033",
+        "Spec": {
+          "SecretLocations": [
+            {
+              "Namespace": "openshift-monitoring",
+              "Name": "thanos-querier-tls"
+            }
+          ],
+          "OnDiskLocations": null,
+          "CertMetadata": {
+            "CertIdentifier": {
+              "CommonName": "thanos-querier.openshift-monitoring.svc",
+              "SerialNumber": "2215041012551543033",
+              "Issuer": {
+                "CommonName": "openshift-service-serving-signer@1660235194",
+                "SerialNumber": "",
+                "Issuer": null
+              }
+            },
+            "SignatureAlgorithm": "SHA256-RSA",
+            "PublicKeyAlgorithm": "RSA",
+            "PublicKeyBitSize": "2048 bit",
+            "ValidityDuration": "2y",
+            "Usages": [
+              "KeyUsageDigitalSignature",
+              "KeyUsageKeyEncipherment"
+            ],
+            "ExtendedUsages": [
+              "ExtKeyUsageServerAuth"
+            ]
+          },
+          "Details": {
+            "CertType": "ServingCertDetails",
+            "SignerDetails": null,
+            "ServingCertDetails": {
+              "DNSNames": [
+                "thanos-querier.openshift-monitoring.svc",
+                "thanos-querier.openshift-monitoring.svc.cluster.local"
+              ],
+              "IPAddresses": null
+            },
+            "ClientCertDetails": null
+          }
+        },
+        "Status": {
+          "Errors": null
+        }
+      },
+      {
+        "LogicalName": "*.telemeter-client.openshift-monitoring.svc",
+        "Description": "",
+        "Name": "*.telemeter-client.openshift-monitoring.svc::6316470005412686670",
+        "Spec": {
+          "SecretLocations": [
+            {
+              "Namespace": "openshift-monitoring",
+              "Name": "telemeter-client-tls"
+            }
+          ],
+          "OnDiskLocations": null,
+          "CertMetadata": {
+            "CertIdentifier": {
+              "CommonName": "*.telemeter-client.openshift-monitoring.svc",
+              "SerialNumber": "6316470005412686670",
+              "Issuer": {
+                "CommonName": "openshift-service-serving-signer@1660235194",
+                "SerialNumber": "",
+                "Issuer": null
+              }
+            },
+            "SignatureAlgorithm": "SHA256-RSA",
+            "PublicKeyAlgorithm": "RSA",
+            "PublicKeyBitSize": "2048 bit",
+            "ValidityDuration": "2y",
+            "Usages": [
+              "KeyUsageDigitalSignature",
+              "KeyUsageKeyEncipherment"
+            ],
+            "ExtendedUsages": [
+              "ExtKeyUsageServerAuth"
+            ]
+          },
+          "Details": {
+            "CertType": "ServingCertDetails",
+            "SignerDetails": null,
+            "ServingCertDetails": {
+              "DNSNames": [
+                "*.telemeter-client.openshift-monitoring.svc",
+                "*.telemeter-client.openshift-monitoring.svc.cluster.local",
+                "telemeter-client.openshift-monitoring.svc",
+                "telemeter-client.openshift-monitoring.svc.cluster.local"
+              ],
+              "IPAddresses": null
+            },
+            "ClientCertDetails": null
+          }
+        },
+        "Status": {
+          "Errors": null
+        }
+      },
+      {
+        "LogicalName": "*.node-exporter.openshift-monitoring.svc",
+        "Description": "",
+        "Name": "*.node-exporter.openshift-monitoring.svc::5820670729257377840",
+        "Spec": {
+          "SecretLocations": [
+            {
+              "Namespace": "openshift-monitoring",
+              "Name": "node-exporter-tls"
+            }
+          ],
+          "OnDiskLocations": null,
+          "CertMetadata": {
+            "CertIdentifier": {
+              "CommonName": "*.node-exporter.openshift-monitoring.svc",
+              "SerialNumber": "5820670729257377840",
+              "Issuer": {
+                "CommonName": "openshift-service-serving-signer@1660235194",
+                "SerialNumber": "",
+                "Issuer": null
+              }
+            },
+            "SignatureAlgorithm": "SHA256-RSA",
+            "PublicKeyAlgorithm": "RSA",
+            "PublicKeyBitSize": "2048 bit",
+            "ValidityDuration": "2y",
+            "Usages": [
+              "KeyUsageDigitalSignature",
+              "KeyUsageKeyEncipherment"
+            ],
+            "ExtendedUsages": [
+              "ExtKeyUsageServerAuth"
+            ]
+          },
+          "Details": {
+            "CertType": "ServingCertDetails",
+            "SignerDetails": null,
+            "ServingCertDetails": {
+              "DNSNames": [
+                "*.node-exporter.openshift-monitoring.svc",
+                "*.node-exporter.openshift-monitoring.svc.cluster.local",
+                "node-exporter.openshift-monitoring.svc",
+                "node-exporter.openshift-monitoring.svc.cluster.local"
+              ],
+              "IPAddresses": null
+            },
+            "ClientCertDetails": null
+          }
+        },
+        "Status": {
+          "Errors": null
+        }
+      },
+      {
+        "LogicalName": "multus-admission-controller.openshift-multus.svc",
+        "Description": "",
+        "Name": "multus-admission-controller.openshift-multus.svc::1734585295770866263",
+        "Spec": {
+          "SecretLocations": [
+            {
+              "Namespace": "openshift-multus",
+              "Name": "multus-admission-controller-secret"
+            }
+          ],
+          "OnDiskLocations": null,
+          "CertMetadata": {
+            "CertIdentifier": {
+              "CommonName": "multus-admission-controller.openshift-multus.svc",
+              "SerialNumber": "1734585295770866263",
+              "Issuer": {
+                "CommonName": "openshift-service-serving-signer@1660235194",
+                "SerialNumber": "",
+                "Issuer": null
+              }
+            },
+            "SignatureAlgorithm": "SHA256-RSA",
+            "PublicKeyAlgorithm": "RSA",
+            "PublicKeyBitSize": "2048 bit",
+            "ValidityDuration": "2y",
+            "Usages": [
+              "KeyUsageDigitalSignature",
+              "KeyUsageKeyEncipherment"
+            ],
+            "ExtendedUsages": [
+              "ExtKeyUsageServerAuth"
+            ]
+          },
+          "Details": {
+            "CertType": "ServingCertDetails",
+            "SignerDetails": null,
+            "ServingCertDetails": {
+              "DNSNames": [
+                "multus-admission-controller.openshift-multus.svc",
+                "multus-admission-controller.openshift-multus.svc.cluster.local"
+              ],
+              "IPAddresses": null
+            },
+            "ClientCertDetails": null
+          }
+        },
+        "Status": {
+          "Errors": null
+        }
+      },
+      {
+        "LogicalName": "alertmanager-main.openshift-monitoring.svc",
+        "Description": "",
+        "Name": "alertmanager-main.openshift-monitoring.svc::6223384734159182299",
+        "Spec": {
+          "SecretLocations": [
+            {
+              "Namespace": "openshift-monitoring",
+              "Name": "alertmanager-main-tls"
+            }
+          ],
+          "OnDiskLocations": null,
+          "CertMetadata": {
+            "CertIdentifier": {
+              "CommonName": "alertmanager-main.openshift-monitoring.svc",
+              "SerialNumber": "6223384734159182299",
+              "Issuer": {
+                "CommonName": "openshift-service-serving-signer@1660235194",
+                "SerialNumber": "",
+                "Issuer": null
+              }
+            },
+            "SignatureAlgorithm": "SHA256-RSA",
+            "PublicKeyAlgorithm": "RSA",
+            "PublicKeyBitSize": "2048 bit",
+            "ValidityDuration": "2y",
+            "Usages": [
+              "KeyUsageDigitalSignature",
+              "KeyUsageKeyEncipherment"
+            ],
+            "ExtendedUsages": [
+              "ExtKeyUsageServerAuth"
+            ]
+          },
+          "Details": {
+            "CertType": "ServingCertDetails",
+            "SignerDetails": null,
+            "ServingCertDetails": {
+              "DNSNames": [
+                "alertmanager-main.openshift-monitoring.svc",
+                "alertmanager-main.openshift-monitoring.svc.cluster.local"
+              ],
+              "IPAddresses": null
+            },
+            "ClientCertDetails": null
+          }
+        },
+        "Status": {
+          "Errors": null
+        }
+      },
+      {
+        "LogicalName": "cluster-baremetal-webhook-service.openshift-machine-api.svc",
+        "Description": "",
+        "Name": "cluster-baremetal-webhook-service.openshift-machine-api.svc::7893619671345938179",
+        "Spec": {
+          "SecretLocations": [
+            {
+              "Namespace": "openshift-machine-api",
+              "Name": "cluster-baremetal-webhook-server-cert"
+            }
+          ],
+          "OnDiskLocations": null,
+          "CertMetadata": {
+            "CertIdentifier": {
+              "CommonName": "cluster-baremetal-webhook-service.openshift-machine-api.svc",
+              "SerialNumber": "7893619671345938179",
+              "Issuer": {
+                "CommonName": "openshift-service-serving-signer@1660235194",
+                "SerialNumber": "",
+                "Issuer": null
+              }
+            },
+            "SignatureAlgorithm": "SHA256-RSA",
+            "PublicKeyAlgorithm": "RSA",
+            "PublicKeyBitSize": "2048 bit",
+            "ValidityDuration": "2y",
+            "Usages": [
+              "KeyUsageDigitalSignature",
+              "KeyUsageKeyEncipherment"
+            ],
+            "ExtendedUsages": [
+              "ExtKeyUsageServerAuth"
+            ]
+          },
+          "Details": {
+            "CertType": "ServingCertDetails",
+            "SignerDetails": null,
+            "ServingCertDetails": {
+              "DNSNames": [
+                "cluster-baremetal-webhook-service.openshift-machine-api.svc",
+                "cluster-baremetal-webhook-service.openshift-machine-api.svc.cluster.local"
+              ],
+              "IPAddresses": null
+            },
+            "ClientCertDetails": null
+          }
+        },
+        "Status": {
+          "Errors": null
+        }
+      },
+      {
+        "LogicalName": "csi-snapshot-webhook.openshift-cluster-storage-operator.svc",
+        "Description": "",
+        "Name": "csi-snapshot-webhook.openshift-cluster-storage-operator.svc::4841878348055970704",
+        "Spec": {
+          "SecretLocations": [
+            {
+              "Namespace": "openshift-cluster-storage-operator",
+              "Name": "csi-snapshot-webhook-secret"
+            }
+          ],
+          "OnDiskLocations": null,
+          "CertMetadata": {
+            "CertIdentifier": {
+              "CommonName": "csi-snapshot-webhook.openshift-cluster-storage-operator.svc",
+              "SerialNumber": "4841878348055970704",
+              "Issuer": {
+                "CommonName": "openshift-service-serving-signer@1660235194",
+                "SerialNumber": "",
+                "Issuer": null
+              }
+            },
+            "SignatureAlgorithm": "SHA256-RSA",
+            "PublicKeyAlgorithm": "RSA",
+            "PublicKeyBitSize": "2048 bit",
+            "ValidityDuration": "2y",
+            "Usages": [
+              "KeyUsageDigitalSignature",
+              "KeyUsageKeyEncipherment"
+            ],
+            "ExtendedUsages": [
+              "ExtKeyUsageServerAuth"
+            ]
+          },
+          "Details": {
+            "CertType": "ServingCertDetails",
+            "SignerDetails": null,
+            "ServingCertDetails": {
+              "DNSNames": [
+                "csi-snapshot-webhook.openshift-cluster-storage-operator.svc",
+                "csi-snapshot-webhook.openshift-cluster-storage-operator.svc.cluster.local"
+              ],
+              "IPAddresses": null
+            },
+            "ClientCertDetails": null
+          }
+        },
+        "Status": {
+          "Errors": null
+        }
+      },
+      {
+        "LogicalName": "marketplace-operator-metrics.openshift-marketplace.svc",
+        "Description": "",
+        "Name": "marketplace-operator-metrics.openshift-marketplace.svc::3229932011111333191",
+        "Spec": {
+          "SecretLocations": [
+            {
+              "Namespace": "openshift-marketplace",
+              "Name": "marketplace-operator-metrics"
+            }
+          ],
+          "OnDiskLocations": null,
+          "CertMetadata": {
+            "CertIdentifier": {
+              "CommonName": "marketplace-operator-metrics.openshift-marketplace.svc",
+              "SerialNumber": "3229932011111333191",
+              "Issuer": {
+                "CommonName": "openshift-service-serving-signer@1660235194",
+                "SerialNumber": "",
+                "Issuer": null
+              }
+            },
+            "SignatureAlgorithm": "SHA256-RSA",
+            "PublicKeyAlgorithm": "RSA",
+            "PublicKeyBitSize": "2048 bit",
+            "ValidityDuration": "2y",
+            "Usages": [
+              "KeyUsageDigitalSignature",
+              "KeyUsageKeyEncipherment"
+            ],
+            "ExtendedUsages": [
+              "ExtKeyUsageServerAuth"
+            ]
+          },
+          "Details": {
+            "CertType": "ServingCertDetails",
+            "SignerDetails": null,
+            "ServingCertDetails": {
+              "DNSNames": [
+                "marketplace-operator-metrics.openshift-marketplace.svc",
+                "marketplace-operator-metrics.openshift-marketplace.svc.cluster.local"
+              ],
+              "IPAddresses": null
+            },
+            "ClientCertDetails": null
+          }
+        },
+        "Status": {
+          "Errors": null
+        }
+      },
+      {
+        "LogicalName": "cluster-baremetal-operator-service.openshift-machine-api.svc",
+        "Description": "",
+        "Name": "cluster-baremetal-operator-service.openshift-machine-api.svc::6219679491641346115",
+        "Spec": {
+          "SecretLocations": [
+            {
+              "Namespace": "openshift-machine-api",
+              "Name": "cluster-baremetal-operator-tls"
+            }
+          ],
+          "OnDiskLocations": null,
+          "CertMetadata": {
+            "CertIdentifier": {
+              "CommonName": "cluster-baremetal-operator-service.openshift-machine-api.svc",
+              "SerialNumber": "6219679491641346115",
+              "Issuer": {
+                "CommonName": "openshift-service-serving-signer@1660235194",
+                "SerialNumber": "",
+                "Issuer": null
+              }
+            },
+            "SignatureAlgorithm": "SHA256-RSA",
+            "PublicKeyAlgorithm": "RSA",
+            "PublicKeyBitSize": "2048 bit",
+            "ValidityDuration": "2y",
+            "Usages": [
+              "KeyUsageDigitalSignature",
+              "KeyUsageKeyEncipherment"
+            ],
+            "ExtendedUsages": [
+              "ExtKeyUsageServerAuth"
+            ]
+          },
+          "Details": {
+            "CertType": "ServingCertDetails",
+            "SignerDetails": null,
+            "ServingCertDetails": {
+              "DNSNames": [
+                "cluster-baremetal-operator-service.openshift-machine-api.svc",
+                "cluster-baremetal-operator-service.openshift-machine-api.svc.cluster.local"
+              ],
+              "IPAddresses": null
+            },
+            "ClientCertDetails": null
+          }
+        },
+        "Status": {
+          "Errors": null
+        }
+      },
+      {
+        "LogicalName": "metrics.openshift-apiserver-operator.svc",
+        "Description": "",
+        "Name": "metrics.openshift-apiserver-operator.svc::3364654077885766892",
+        "Spec": {
+          "SecretLocations": [
+            {
+              "Namespace": "openshift-apiserver-operator",
+              "Name": "openshift-apiserver-operator-serving-cert"
+            }
+          ],
+          "OnDiskLocations": null,
+          "CertMetadata": {
+            "CertIdentifier": {
+              "CommonName": "metrics.openshift-apiserver-operator.svc",
+              "SerialNumber": "3364654077885766892",
+              "Issuer": {
+                "CommonName": "openshift-service-serving-signer@1660235194",
+                "SerialNumber": "",
+                "Issuer": null
+              }
+            },
+            "SignatureAlgorithm": "SHA256-RSA",
+            "PublicKeyAlgorithm": "RSA",
+            "PublicKeyBitSize": "2048 bit",
+            "ValidityDuration": "2y",
+            "Usages": [
+              "KeyUsageDigitalSignature",
+              "KeyUsageKeyEncipherment"
+            ],
+            "ExtendedUsages": [
+              "ExtKeyUsageServerAuth"
+            ]
+          },
+          "Details": {
+            "CertType": "ServingCertDetails",
+            "SignerDetails": null,
+            "ServingCertDetails": {
+              "DNSNames": [
+                "metrics.openshift-apiserver-operator.svc",
+                "metrics.openshift-apiserver-operator.svc.cluster.local"
+              ],
+              "IPAddresses": null
+            },
+            "ClientCertDetails": null
+          }
+        },
+        "Status": {
+          "Errors": null
+        }
+      },
+      {
+        "LogicalName": "*.network-metrics-service.openshift-multus.svc",
+        "Description": "",
+        "Name": "*.network-metrics-service.openshift-multus.svc::1150444052307414109",
+        "Spec": {
+          "SecretLocations": [
+            {
+              "Namespace": "openshift-multus",
+              "Name": "metrics-daemon-secret"
+            }
+          ],
+          "OnDiskLocations": null,
+          "CertMetadata": {
+            "CertIdentifier": {
+              "CommonName": "*.network-metrics-service.openshift-multus.svc",
+              "SerialNumber": "1150444052307414109",
+              "Issuer": {
+                "CommonName": "openshift-service-serving-signer@1660235194",
+                "SerialNumber": "",
+                "Issuer": null
+              }
+            },
+            "SignatureAlgorithm": "SHA256-RSA",
+            "PublicKeyAlgorithm": "RSA",
+            "PublicKeyBitSize": "2048 bit",
+            "ValidityDuration": "2y",
+            "Usages": [
+              "KeyUsageDigitalSignature",
+              "KeyUsageKeyEncipherment"
+            ],
+            "ExtendedUsages": [
+              "ExtKeyUsageServerAuth"
+            ]
+          },
+          "Details": {
+            "CertType": "ServingCertDetails",
+            "SignerDetails": null,
+            "ServingCertDetails": {
+              "DNSNames": [
+                "*.network-metrics-service.openshift-multus.svc",
+                "*.network-metrics-service.openshift-multus.svc.cluster.local",
+                "network-metrics-service.openshift-multus.svc",
+                "network-metrics-service.openshift-multus.svc.cluster.local"
+              ],
+              "IPAddresses": null
+            },
+            "ClientCertDetails": null
+          }
+        },
+        "Status": {
+          "Errors": null
+        }
+      },
+      {
+        "LogicalName": "prometheus-k8s.openshift-monitoring.svc",
+        "Description": "",
+        "Name": "prometheus-k8s.openshift-monitoring.svc::7607235645352172219",
+        "Spec": {
+          "SecretLocations": [
+            {
+              "Namespace": "openshift-monitoring",
+              "Name": "prometheus-k8s-tls"
+            }
+          ],
+          "OnDiskLocations": null,
+          "CertMetadata": {
+            "CertIdentifier": {
+              "CommonName": "prometheus-k8s.openshift-monitoring.svc",
+              "SerialNumber": "7607235645352172219",
+              "Issuer": {
+                "CommonName": "openshift-service-serving-signer@1660235194",
+                "SerialNumber": "",
+                "Issuer": null
+              }
+            },
+            "SignatureAlgorithm": "SHA256-RSA",
+            "PublicKeyAlgorithm": "RSA",
+            "PublicKeyBitSize": "2048 bit",
+            "ValidityDuration": "2y",
+            "Usages": [
+              "KeyUsageDigitalSignature",
+              "KeyUsageKeyEncipherment"
+            ],
+            "ExtendedUsages": [
+              "ExtKeyUsageServerAuth"
+            ]
+          },
+          "Details": {
+            "CertType": "ServingCertDetails",
+            "SignerDetails": null,
+            "ServingCertDetails": {
+              "DNSNames": [
+                "prometheus-k8s.openshift-monitoring.svc",
+                "prometheus-k8s.openshift-monitoring.svc.cluster.local"
+              ],
+              "IPAddresses": null
+            },
+            "ClientCertDetails": null
+          }
+        },
+        "Status": {
+          "Errors": null
+        }
+      },
+      {
+        "LogicalName": "machine-config-daemon.openshift-machine-config-operator.svc",
+        "Description": "",
+        "Name": "machine-config-daemon.openshift-machine-config-operator.svc::6197080748599099553",
+        "Spec": {
+          "SecretLocations": [
+            {
+              "Namespace": "openshift-machine-config-operator",
+              "Name": "proxy-tls"
+            }
+          ],
+          "OnDiskLocations": null,
+          "CertMetadata": {
+            "CertIdentifier": {
+              "CommonName": "machine-config-daemon.openshift-machine-config-operator.svc",
+              "SerialNumber": "6197080748599099553",
+              "Issuer": {
+                "CommonName": "openshift-service-serving-signer@1660235194",
+                "SerialNumber": "",
+                "Issuer": null
+              }
+            },
+            "SignatureAlgorithm": "SHA256-RSA",
+            "PublicKeyAlgorithm": "RSA",
+            "PublicKeyBitSize": "2048 bit",
+            "ValidityDuration": "2y",
+            "Usages": [
+              "KeyUsageDigitalSignature",
+              "KeyUsageKeyEncipherment"
+            ],
+            "ExtendedUsages": [
+              "ExtKeyUsageServerAuth"
+            ]
+          },
+          "Details": {
+            "CertType": "ServingCertDetails",
+            "SignerDetails": null,
+            "ServingCertDetails": {
+              "DNSNames": [
+                "machine-config-daemon.openshift-machine-config-operator.svc",
+                "machine-config-daemon.openshift-machine-config-operator.svc.cluster.local"
+              ],
+              "IPAddresses": null
+            },
+            "ClientCertDetails": null
+          }
+        },
+        "Status": {
+          "Errors": null
+        }
+      },
+      {
+        "LogicalName": "metrics.openshift-kube-storage-version-migrator-operator.svc",
+        "Description": "",
+        "Name": "metrics.openshift-kube-storage-version-migrator-operator.svc::1904991570617038281",
+        "Spec": {
+          "SecretLocations": [
+            {
+              "Namespace": "openshift-kube-storage-version-migrator-operator",
+              "Name": "serving-cert"
+            }
+          ],
+          "OnDiskLocations": null,
+          "CertMetadata": {
+            "CertIdentifier": {
+              "CommonName": "metrics.openshift-kube-storage-version-migrator-operator.svc",
+              "SerialNumber": "1904991570617038281",
+              "Issuer": {
+                "CommonName": "openshift-service-serving-signer@1660235194",
+                "SerialNumber": "",
+                "Issuer": null
+              }
+            },
+            "SignatureAlgorithm": "SHA256-RSA",
+            "PublicKeyAlgorithm": "RSA",
+            "PublicKeyBitSize": "2048 bit",
+            "ValidityDuration": "2y",
+            "Usages": [
+              "KeyUsageDigitalSignature",
+              "KeyUsageKeyEncipherment"
+            ],
+            "ExtendedUsages": [
+              "ExtKeyUsageServerAuth"
+            ]
+          },
+          "Details": {
+            "CertType": "ServingCertDetails",
+            "SignerDetails": null,
+            "ServingCertDetails": {
+              "DNSNames": [
+                "metrics.openshift-kube-storage-version-migrator-operator.svc",
+                "metrics.openshift-kube-storage-version-migrator-operator.svc.cluster.local"
+              ],
+              "IPAddresses": null
+            },
+            "ClientCertDetails": null
+          }
+        },
+        "Status": {
+          "Errors": null
+        }
+      },
+      {
+        "LogicalName": "*.image-registry-operator.openshift-image-registry.svc",
+        "Description": "",
+        "Name": "*.image-registry-operator.openshift-image-registry.svc::4675784410318447775",
+        "Spec": {
+          "SecretLocations": [
+            {
+              "Namespace": "openshift-image-registry",
+              "Name": "image-registry-operator-tls"
+            }
+          ],
+          "OnDiskLocations": null,
+          "CertMetadata": {
+            "CertIdentifier": {
+              "CommonName": "*.image-registry-operator.openshift-image-registry.svc",
+              "SerialNumber": "4675784410318447775",
+              "Issuer": {
+                "CommonName": "openshift-service-serving-signer@1660235194",
+                "SerialNumber": "",
+                "Issuer": null
+              }
+            },
+            "SignatureAlgorithm": "SHA256-RSA",
+            "PublicKeyAlgorithm": "RSA",
+            "PublicKeyBitSize": "2048 bit",
+            "ValidityDuration": "2y",
+            "Usages": [
+              "KeyUsageDigitalSignature",
+              "KeyUsageKeyEncipherment"
+            ],
+            "ExtendedUsages": [
+              "ExtKeyUsageServerAuth"
+            ]
+          },
+          "Details": {
+            "CertType": "ServingCertDetails",
+            "SignerDetails": null,
+            "ServingCertDetails": {
+              "DNSNames": [
+                "*.image-registry-operator.openshift-image-registry.svc",
+                "*.image-registry-operator.openshift-image-registry.svc.cluster.local",
+                "image-registry-operator.openshift-image-registry.svc",
+                "image-registry-operator.openshift-image-registry.svc.cluster.local"
+              ],
+              "IPAddresses": null
+            },
+            "ClientCertDetails": null
+          }
+        },
+        "Status": {
+          "Errors": null
+        }
+      },
+      {
+        "LogicalName": "metrics.openshift-dns-operator.svc",
+        "Description": "",
+        "Name": "metrics.openshift-dns-operator.svc::3456920330567479390",
+        "Spec": {
+          "SecretLocations": [
+            {
+              "Namespace": "openshift-dns-operator",
+              "Name": "metrics-tls"
+            }
+          ],
+          "OnDiskLocations": null,
+          "CertMetadata": {
+            "CertIdentifier": {
+              "CommonName": "metrics.openshift-dns-operator.svc",
+              "SerialNumber": "3456920330567479390",
+              "Issuer": {
+                "CommonName": "openshift-service-serving-signer@1660235194",
+                "SerialNumber": "",
+                "Issuer": null
+              }
+            },
+            "SignatureAlgorithm": "SHA256-RSA",
+            "PublicKeyAlgorithm": "RSA",
+            "PublicKeyBitSize": "2048 bit",
+            "ValidityDuration": "2y",
+            "Usages": [
+              "KeyUsageDigitalSignature",
+              "KeyUsageKeyEncipherment"
+            ],
+            "ExtendedUsages": [
+              "ExtKeyUsageServerAuth"
+            ]
+          },
+          "Details": {
+            "CertType": "ServingCertDetails",
+            "SignerDetails": null,
+            "ServingCertDetails": {
+              "DNSNames": [
+                "metrics.openshift-dns-operator.svc",
+                "metrics.openshift-dns-operator.svc.cluster.local"
+              ],
+              "IPAddresses": null
+            },
+            "ClientCertDetails": null
+          }
+        },
+        "Status": {
+          "Errors": null
+        }
+      },
+      {
+        "LogicalName": "performance-addon-operator-service.openshift-cluster-node-tuning-operator.svc",
+        "Description": "",
+        "Name": "performance-addon-operator-service.openshift-cluster-node-tuning-operator.svc::4586704378265138575",
+        "Spec": {
+          "SecretLocations": [
+            {
+              "Namespace": "openshift-cluster-node-tuning-operator",
+              "Name": "performance-addon-operator-webhook-cert"
+            }
+          ],
+          "OnDiskLocations": null,
+          "CertMetadata": {
+            "CertIdentifier": {
+              "CommonName": "performance-addon-operator-service.openshift-cluster-node-tuning-operator.svc",
+              "SerialNumber": "4586704378265138575",
+              "Issuer": {
+                "CommonName": "openshift-service-serving-signer@1660235194",
+                "SerialNumber": "",
+                "Issuer": null
+              }
+            },
+            "SignatureAlgorithm": "SHA256-RSA",
+            "PublicKeyAlgorithm": "RSA",
+            "PublicKeyBitSize": "2048 bit",
+            "ValidityDuration": "2y",
+            "Usages": [
+              "KeyUsageDigitalSignature",
+              "KeyUsageKeyEncipherment"
+            ],
+            "ExtendedUsages": [
+              "ExtKeyUsageServerAuth"
+            ]
+          },
+          "Details": {
+            "CertType": "ServingCertDetails",
+            "SignerDetails": null,
+            "ServingCertDetails": {
+              "DNSNames": [
+                "performance-addon-operator-service.openshift-cluster-node-tuning-operator.svc",
+                "performance-addon-operator-service.openshift-cluster-node-tuning-operator.svc.cluster.local"
+              ],
+              "IPAddresses": null
+            },
+            "ClientCertDetails": null
+          }
+        },
+        "Status": {
+          "Errors": null
+        }
+      },
+      {
+        "LogicalName": "*.sdn-controller.openshift-sdn.svc",
+        "Description": "",
+        "Name": "*.sdn-controller.openshift-sdn.svc::7537155398406497139",
+        "Spec": {
+          "SecretLocations": [
+            {
+              "Namespace": "openshift-sdn",
+              "Name": "sdn-controller-metrics-certs"
+            }
+          ],
+          "OnDiskLocations": null,
+          "CertMetadata": {
+            "CertIdentifier": {
+              "CommonName": "*.sdn-controller.openshift-sdn.svc",
+              "SerialNumber": "7537155398406497139",
+              "Issuer": {
+                "CommonName": "openshift-service-serving-signer@1660235194",
+                "SerialNumber": "",
+                "Issuer": null
+              }
+            },
+            "SignatureAlgorithm": "SHA256-RSA",
+            "PublicKeyAlgorithm": "RSA",
+            "PublicKeyBitSize": "2048 bit",
+            "ValidityDuration": "2y",
+            "Usages": [
+              "KeyUsageDigitalSignature",
+              "KeyUsageKeyEncipherment"
+            ],
+            "ExtendedUsages": [
+              "ExtKeyUsageServerAuth"
+            ]
+          },
+          "Details": {
+            "CertType": "ServingCertDetails",
+            "SignerDetails": null,
+            "ServingCertDetails": {
+              "DNSNames": [
+                "*.sdn-controller.openshift-sdn.svc",
+                "*.sdn-controller.openshift-sdn.svc.cluster.local",
+                "sdn-controller.openshift-sdn.svc",
+                "sdn-controller.openshift-sdn.svc.cluster.local"
+              ],
+              "IPAddresses": null
+            },
+            "ClientCertDetails": null
+          }
+        },
+        "Status": {
+          "Errors": null
+        }
+      },
+      {
+        "LogicalName": "*.prometheus-k8s-thanos-sidecar.openshift-monitoring.svc",
+        "Description": "",
+        "Name": "*.prometheus-k8s-thanos-sidecar.openshift-monitoring.svc::9043370268645417073",
+        "Spec": {
+          "SecretLocations": [
+            {
+              "Namespace": "openshift-monitoring",
+              "Name": "prometheus-k8s-thanos-sidecar-tls"
+            }
+          ],
+          "OnDiskLocations": null,
+          "CertMetadata": {
+            "CertIdentifier": {
+              "CommonName": "*.prometheus-k8s-thanos-sidecar.openshift-monitoring.svc",
+              "SerialNumber": "9043370268645417073",
+              "Issuer": {
+                "CommonName": "openshift-service-serving-signer@1660235194",
+                "SerialNumber": "",
+                "Issuer": null
+              }
+            },
+            "SignatureAlgorithm": "SHA256-RSA",
+            "PublicKeyAlgorithm": "RSA",
+            "PublicKeyBitSize": "2048 bit",
+            "ValidityDuration": "2y",
+            "Usages": [
+              "KeyUsageDigitalSignature",
+              "KeyUsageKeyEncipherment"
+            ],
+            "ExtendedUsages": [
+              "ExtKeyUsageServerAuth"
+            ]
+          },
+          "Details": {
+            "CertType": "ServingCertDetails",
+            "SignerDetails": null,
+            "ServingCertDetails": {
+              "DNSNames": [
+                "*.prometheus-k8s-thanos-sidecar.openshift-monitoring.svc",
+                "*.prometheus-k8s-thanos-sidecar.openshift-monitoring.svc.cluster.local",
+                "prometheus-k8s-thanos-sidecar.openshift-monitoring.svc",
+                "prometheus-k8s-thanos-sidecar.openshift-monitoring.svc.cluster.local"
+              ],
+              "IPAddresses": null
+            },
+            "ClientCertDetails": null
+          }
+        },
+        "Status": {
+          "Errors": null
+        }
+      },
+      {
+        "LogicalName": "machine-config-controller.openshift-machine-config-operator.svc",
+        "Description": "",
+        "Name": "machine-config-controller.openshift-machine-config-operator.svc::1669568144903591080",
+        "Spec": {
+          "SecretLocations": [
+            {
+              "Namespace": "openshift-machine-config-operator",
+              "Name": "mcc-proxy-tls"
+            }
+          ],
+          "OnDiskLocations": null,
+          "CertMetadata": {
+            "CertIdentifier": {
+              "CommonName": "machine-config-controller.openshift-machine-config-operator.svc",
+              "SerialNumber": "1669568144903591080",
+              "Issuer": {
+                "CommonName": "openshift-service-serving-signer@1660235194",
+                "SerialNumber": "",
+                "Issuer": null
+              }
+            },
+            "SignatureAlgorithm": "SHA256-RSA",
+            "PublicKeyAlgorithm": "RSA",
+            "PublicKeyBitSize": "2048 bit",
+            "ValidityDuration": "2y",
+            "Usages": [
+              "KeyUsageDigitalSignature",
+              "KeyUsageKeyEncipherment"
+            ],
+            "ExtendedUsages": [
+              "ExtKeyUsageServerAuth"
+            ]
+          },
+          "Details": {
+            "CertType": "ServingCertDetails",
+            "SignerDetails": null,
+            "ServingCertDetails": {
+              "DNSNames": [
+                "machine-config-controller.openshift-machine-config-operator.svc",
+                "machine-config-controller.openshift-machine-config-operator.svc.cluster.local"
+              ],
+              "IPAddresses": null
+            },
+            "ClientCertDetails": null
+          }
+        },
+        "Status": {
+          "Errors": null
+        }
+      },
+      {
+        "LogicalName": "etcd.openshift-etcd.svc",
+        "Description": "",
+        "Name": "etcd.openshift-etcd.svc::3848846062663214511",
+        "Spec": {
+          "SecretLocations": [
+            {
+              "Namespace": "openshift-etcd",
+              "Name": "serving-cert"
+            }
+          ],
+          "OnDiskLocations": null,
+          "CertMetadata": {
+            "CertIdentifier": {
+              "CommonName": "etcd.openshift-etcd.svc",
+              "SerialNumber": "3848846062663214511",
+              "Issuer": {
+                "CommonName": "openshift-service-serving-signer@1660235194",
+                "SerialNumber": "",
+                "Issuer": null
+              }
+            },
+            "SignatureAlgorithm": "SHA256-RSA",
+            "PublicKeyAlgorithm": "RSA",
+            "PublicKeyBitSize": "2048 bit",
+            "ValidityDuration": "2y",
+            "Usages": [
+              "KeyUsageDigitalSignature",
+              "KeyUsageKeyEncipherment"
+            ],
+            "ExtendedUsages": [
+              "ExtKeyUsageServerAuth"
+            ]
+          },
+          "Details": {
+            "CertType": "ServingCertDetails",
+            "SignerDetails": null,
+            "ServingCertDetails": {
+              "DNSNames": [
+                "etcd.openshift-etcd.svc",
+                "etcd.openshift-etcd.svc.cluster.local"
+              ],
+              "IPAddresses": null
+            },
+            "ClientCertDetails": null
+          }
+        },
+        "Status": {
+          "Errors": null
+        }
+      },
+      {
+        "LogicalName": "api.openshift-oauth-apiserver.svc",
+        "Description": "",
+        "Name": "api.openshift-oauth-apiserver.svc::2801162004244502483",
+        "Spec": {
+          "SecretLocations": [
+            {
+              "Namespace": "openshift-oauth-apiserver",
+              "Name": "serving-cert"
+            }
+          ],
+          "OnDiskLocations": null,
+          "CertMetadata": {
+            "CertIdentifier": {
+              "CommonName": "api.openshift-oauth-apiserver.svc",
+              "SerialNumber": "2801162004244502483",
+              "Issuer": {
+                "CommonName": "openshift-service-serving-signer@1660235194",
+                "SerialNumber": "",
+                "Issuer": null
+              }
+            },
+            "SignatureAlgorithm": "SHA256-RSA",
+            "PublicKeyAlgorithm": "RSA",
+            "PublicKeyBitSize": "2048 bit",
+            "ValidityDuration": "2y",
+            "Usages": [
+              "KeyUsageDigitalSignature",
+              "KeyUsageKeyEncipherment"
+            ],
+            "ExtendedUsages": [
+              "ExtKeyUsageServerAuth"
+            ]
+          },
+          "Details": {
+            "CertType": "ServingCertDetails",
+            "SignerDetails": null,
+            "ServingCertDetails": {
+              "DNSNames": [
+                "api.openshift-oauth-apiserver.svc",
+                "api.openshift-oauth-apiserver.svc.cluster.local"
+              ],
+              "IPAddresses": null
+            },
+            "ClientCertDetails": null
+          }
+        },
+        "Status": {
+          "Errors": null
+        }
+      },
+      {
+        "LogicalName": "*.openshift-state-metrics.openshift-monitoring.svc",
+        "Description": "",
+        "Name": "*.openshift-state-metrics.openshift-monitoring.svc::4684927540193099053",
+        "Spec": {
+          "SecretLocations": [
+            {
+              "Namespace": "openshift-monitoring",
+              "Name": "openshift-state-metrics-tls"
+            }
+          ],
+          "OnDiskLocations": null,
+          "CertMetadata": {
+            "CertIdentifier": {
+              "CommonName": "*.openshift-state-metrics.openshift-monitoring.svc",
+              "SerialNumber": "4684927540193099053",
+              "Issuer": {
+                "CommonName": "openshift-service-serving-signer@1660235194",
+                "SerialNumber": "",
+                "Issuer": null
+              }
+            },
+            "SignatureAlgorithm": "SHA256-RSA",
+            "PublicKeyAlgorithm": "RSA",
+            "PublicKeyBitSize": "2048 bit",
+            "ValidityDuration": "2y",
+            "Usages": [
+              "KeyUsageDigitalSignature",
+              "KeyUsageKeyEncipherment"
+            ],
+            "ExtendedUsages": [
+              "ExtKeyUsageServerAuth"
+            ]
+          },
+          "Details": {
+            "CertType": "ServingCertDetails",
+            "SignerDetails": null,
+            "ServingCertDetails": {
+              "DNSNames": [
+                "*.openshift-state-metrics.openshift-monitoring.svc",
+                "*.openshift-state-metrics.openshift-monitoring.svc.cluster.local",
+                "openshift-state-metrics.openshift-monitoring.svc",
+                "openshift-state-metrics.openshift-monitoring.svc.cluster.local"
+              ],
+              "IPAddresses": null
+            },
+            "ClientCertDetails": null
+          }
+        },
+        "Status": {
+          "Errors": null
+        }
+      },
+      {
+        "LogicalName": "scheduler.openshift-kube-scheduler.svc",
+        "Description": "",
+        "Name": "scheduler.openshift-kube-scheduler.svc::449821371379777563",
+        "Spec": {
+          "SecretLocations": [
+            {
+              "Namespace": "openshift-kube-scheduler",
+              "Name": "serving-cert"
+            },
+            {
+              "Namespace": "openshift-kube-scheduler",
+              "Name": "serving-cert-3"
+            },
+            {
+              "Namespace": "openshift-kube-scheduler",
+              "Name": "serving-cert-4"
+            },
+            {
+              "Namespace": "openshift-kube-scheduler",
+              "Name": "serving-cert-5"
+            },
+            {
+              "Namespace": "openshift-kube-scheduler",
+              "Name": "serving-cert-6"
+            },
+            {
+              "Namespace": "openshift-kube-scheduler",
+              "Name": "serving-cert-7"
+            }
+          ],
+          "OnDiskLocations": [
+            {
+              "Cert": {
+                "Path": "/etc/kubernetes/static-pod-resources/kube-scheduler-pod-6/secrets/serving-cert/tls.crt/tls.crt",
+                "User": "root",
+                "Group": "root",
+                "Permissions": "-rw-------.",
+                "SELinuxOptions": "system_u:object_r:kubernetes_file_t:s0"
+              },
+              "Key": {
+                "Path": "/etc/kubernetes/static-pod-resources/kube-scheduler-pod-6/secrets/serving-cert/tls.crt/tls.key",
+                "User": "root",
+                "Group": "root",
+                "Permissions": "-rw-------.",
+                "SELinuxOptions": "system_u:object_r:kubernetes_file_t:s0"
+              }
+            },
+            {
+              "Cert": {
+                "Path": "/etc/kubernetes/static-pod-resources/kube-scheduler-pod-7/secrets/serving-cert/tls.crt/tls.crt",
+                "User": "root",
+                "Group": "root",
+                "Permissions": "-rw-------.",
+                "SELinuxOptions": "system_u:object_r:kubernetes_file_t:s0"
+              },
+              "Key": {
+                "Path": "/etc/kubernetes/static-pod-resources/kube-scheduler-pod-7/secrets/serving-cert/tls.crt/tls.key",
+                "User": "root",
+                "Group": "root",
+                "Permissions": "-rw-------.",
+                "SELinuxOptions": "system_u:object_r:kubernetes_file_t:s0"
+              }
+            }
+          ],
+          "CertMetadata": {
+            "CertIdentifier": {
+              "CommonName": "scheduler.openshift-kube-scheduler.svc",
+              "SerialNumber": "449821371379777563",
+              "Issuer": {
+                "CommonName": "openshift-service-serving-signer@1660235194",
+                "SerialNumber": "",
+                "Issuer": null
+              }
+            },
+            "SignatureAlgorithm": "SHA256-RSA",
+            "PublicKeyAlgorithm": "RSA",
+            "PublicKeyBitSize": "2048 bit",
+            "ValidityDuration": "2y",
+            "Usages": [
+              "KeyUsageDigitalSignature",
+              "KeyUsageKeyEncipherment"
+            ],
+            "ExtendedUsages": [
+              "ExtKeyUsageServerAuth"
+            ]
+          },
+          "Details": {
+            "CertType": "ServingCertDetails",
+            "SignerDetails": null,
+            "ServingCertDetails": {
+              "DNSNames": [
+                "scheduler.openshift-kube-scheduler.svc",
+                "scheduler.openshift-kube-scheduler.svc.cluster.local"
+              ],
+              "IPAddresses": null
+            },
+            "ClientCertDetails": null
+          }
+        },
+        "Status": {
+          "Errors": null
+        }
+      },
+      {
+        "LogicalName": "csi-snapshot-controller-operator-metrics.openshift-cluster-storage-operator.svc",
+        "Description": "",
+        "Name": "csi-snapshot-controller-operator-metrics.openshift-cluster-storage-operator.svc::5515853684854288522",
+        "Spec": {
+          "SecretLocations": [
+            {
+              "Namespace": "openshift-cluster-storage-operator",
+              "Name": "serving-cert"
+            }
+          ],
+          "OnDiskLocations": null,
+          "CertMetadata": {
+            "CertIdentifier": {
+              "CommonName": "csi-snapshot-controller-operator-metrics.openshift-cluster-storage-operator.svc",
+              "SerialNumber": "5515853684854288522",
+              "Issuer": {
+                "CommonName": "openshift-service-serving-signer@1660235194",
+                "SerialNumber": "",
+                "Issuer": null
+              }
+            },
+            "SignatureAlgorithm": "SHA256-RSA",
+            "PublicKeyAlgorithm": "RSA",
+            "PublicKeyBitSize": "2048 bit",
+            "ValidityDuration": "2y",
+            "Usages": [
+              "KeyUsageDigitalSignature",
+              "KeyUsageKeyEncipherment"
+            ],
+            "ExtendedUsages": [
+              "ExtKeyUsageServerAuth"
+            ]
+          },
+          "Details": {
+            "CertType": "ServingCertDetails",
+            "SignerDetails": null,
+            "ServingCertDetails": {
+              "DNSNames": [
+                "csi-snapshot-controller-operator-metrics.openshift-cluster-storage-operator.svc",
+                "csi-snapshot-controller-operator-metrics.openshift-cluster-storage-operator.svc.cluster.local"
+              ],
+              "IPAddresses": null
+            },
+            "ClientCertDetails": null
+          }
+        },
+        "Status": {
+          "Errors": null
+        }
+      },
+      {
+        "LogicalName": "metrics.openshift-service-ca-operator.svc",
+        "Description": "",
+        "Name": "metrics.openshift-service-ca-operator.svc::7400587186269430937",
+        "Spec": {
+          "SecretLocations": [
+            {
+              "Namespace": "openshift-service-ca-operator",
+              "Name": "serving-cert"
+            }
+          ],
+          "OnDiskLocations": null,
+          "CertMetadata": {
+            "CertIdentifier": {
+              "CommonName": "metrics.openshift-service-ca-operator.svc",
+              "SerialNumber": "7400587186269430937",
+              "Issuer": {
+                "CommonName": "openshift-service-serving-signer@1660235194",
+                "SerialNumber": "",
+                "Issuer": null
+              }
+            },
+            "SignatureAlgorithm": "SHA256-RSA",
+            "PublicKeyAlgorithm": "RSA",
+            "PublicKeyBitSize": "2048 bit",
+            "ValidityDuration": "2y",
+            "Usages": [
+              "KeyUsageDigitalSignature",
+              "KeyUsageKeyEncipherment"
+            ],
+            "ExtendedUsages": [
+              "ExtKeyUsageServerAuth"
+            ]
+          },
+          "Details": {
+            "CertType": "ServingCertDetails",
+            "SignerDetails": null,
+            "ServingCertDetails": {
+              "DNSNames": [
+                "metrics.openshift-service-ca-operator.svc",
+                "metrics.openshift-service-ca-operator.svc.cluster.local"
+              ],
+              "IPAddresses": null
+            },
+            "ClientCertDetails": null
+          }
+        },
+        "Status": {
+          "Errors": null
+        }
+      },
+      {
+        "LogicalName": "*.sdn.openshift-sdn.svc",
+        "Description": "",
+        "Name": "*.sdn.openshift-sdn.svc::2028218742012863699",
+        "Spec": {
+          "SecretLocations": [
+            {
+              "Namespace": "openshift-sdn",
+              "Name": "sdn-metrics-certs"
+            }
+          ],
+          "OnDiskLocations": null,
+          "CertMetadata": {
+            "CertIdentifier": {
+              "CommonName": "*.sdn.openshift-sdn.svc",
+              "SerialNumber": "2028218742012863699",
+              "Issuer": {
+                "CommonName": "openshift-service-serving-signer@1660235194",
+                "SerialNumber": "",
+                "Issuer": null
+              }
+            },
+            "SignatureAlgorithm": "SHA256-RSA",
+            "PublicKeyAlgorithm": "RSA",
+            "PublicKeyBitSize": "2048 bit",
+            "ValidityDuration": "2y",
+            "Usages": [
+              "KeyUsageDigitalSignature",
+              "KeyUsageKeyEncipherment"
+            ],
+            "ExtendedUsages": [
+              "ExtKeyUsageServerAuth"
+            ]
+          },
+          "Details": {
+            "CertType": "ServingCertDetails",
+            "SignerDetails": null,
+            "ServingCertDetails": {
+              "DNSNames": [
+                "*.sdn.openshift-sdn.svc",
+                "*.sdn.openshift-sdn.svc.cluster.local",
+                "sdn.openshift-sdn.svc",
+                "sdn.openshift-sdn.svc.cluster.local"
+              ],
+              "IPAddresses": null
+            },
+            "ClientCertDetails": null
+          }
+        },
+        "Status": {
+          "Errors": null
+        }
+      },
+      {
+        "LogicalName": "catalog-operator-metrics.openshift-operator-lifecycle-manager.svc",
+        "Description": "",
+        "Name": "catalog-operator-metrics.openshift-operator-lifecycle-manager.svc::8354235402282530330",
+        "Spec": {
+          "SecretLocations": [
+            {
+              "Namespace": "openshift-operator-lifecycle-manager",
+              "Name": "catalog-operator-serving-cert"
+            }
+          ],
+          "OnDiskLocations": null,
+          "CertMetadata": {
+            "CertIdentifier": {
+              "CommonName": "catalog-operator-metrics.openshift-operator-lifecycle-manager.svc",
+              "SerialNumber": "8354235402282530330",
+              "Issuer": {
+                "CommonName": "openshift-service-serving-signer@1660235194",
+                "SerialNumber": "",
+                "Issuer": null
+              }
+            },
+            "SignatureAlgorithm": "SHA256-RSA",
+            "PublicKeyAlgorithm": "RSA",
+            "PublicKeyBitSize": "2048 bit",
+            "ValidityDuration": "2y",
+            "Usages": [
+              "KeyUsageDigitalSignature",
+              "KeyUsageKeyEncipherment"
+            ],
+            "ExtendedUsages": [
+              "ExtKeyUsageServerAuth"
+            ]
+          },
+          "Details": {
+            "CertType": "ServingCertDetails",
+            "SignerDetails": null,
+            "ServingCertDetails": {
+              "DNSNames": [
+                "catalog-operator-metrics.openshift-operator-lifecycle-manager.svc",
+                "catalog-operator-metrics.openshift-operator-lifecycle-manager.svc.cluster.local"
+              ],
+              "IPAddresses": null
+            },
+            "ClientCertDetails": null
+          }
+        },
+        "Status": {
+          "Errors": null
+        }
+      },
+      {
+        "LogicalName": "machine-api-operator-webhook.openshift-machine-api.svc",
+        "Description": "",
+        "Name": "machine-api-operator-webhook.openshift-machine-api.svc::821173380931708658",
+        "Spec": {
+          "SecretLocations": [
+            {
+              "Namespace": "openshift-machine-api",
+              "Name": "machine-api-operator-webhook-cert"
+            }
+          ],
+          "OnDiskLocations": null,
+          "CertMetadata": {
+            "CertIdentifier": {
+              "CommonName": "machine-api-operator-webhook.openshift-machine-api.svc",
+              "SerialNumber": "821173380931708658",
+              "Issuer": {
+                "CommonName": "openshift-service-serving-signer@1660235194",
+                "SerialNumber": "",
+                "Issuer": null
+              }
+            },
+            "SignatureAlgorithm": "SHA256-RSA",
+            "PublicKeyAlgorithm": "RSA",
+            "PublicKeyBitSize": "2048 bit",
+            "ValidityDuration": "2y",
+            "Usages": [
+              "KeyUsageDigitalSignature",
+              "KeyUsageKeyEncipherment"
+            ],
+            "ExtendedUsages": [
+              "ExtKeyUsageServerAuth"
+            ]
+          },
+          "Details": {
+            "CertType": "ServingCertDetails",
+            "SignerDetails": null,
+            "ServingCertDetails": {
+              "DNSNames": [
+                "machine-api-operator-webhook.openshift-machine-api.svc",
+                "machine-api-operator-webhook.openshift-machine-api.svc.cluster.local"
+              ],
+              "IPAddresses": null
+            },
+            "ClientCertDetails": null
+          }
+        },
+        "Status": {
+          "Errors": null
+        }
+      },
+      {
+        "LogicalName": "machine-api-controllers.openshift-machine-api.svc",
+        "Description": "",
+        "Name": "machine-api-controllers.openshift-machine-api.svc::4805346021808337200",
+        "Spec": {
+          "SecretLocations": [
+            {
+              "Namespace": "openshift-machine-api",
+              "Name": "machine-api-controllers-tls"
+            }
+          ],
+          "OnDiskLocations": null,
+          "CertMetadata": {
+            "CertIdentifier": {
+              "CommonName": "machine-api-controllers.openshift-machine-api.svc",
+              "SerialNumber": "4805346021808337200",
+              "Issuer": {
+                "CommonName": "openshift-service-serving-signer@1660235194",
+                "SerialNumber": "",
+                "Issuer": null
+              }
+            },
+            "SignatureAlgorithm": "SHA256-RSA",
+            "PublicKeyAlgorithm": "RSA",
+            "PublicKeyBitSize": "2048 bit",
+            "ValidityDuration": "2y",
+            "Usages": [
+              "KeyUsageDigitalSignature",
+              "KeyUsageKeyEncipherment"
+            ],
+            "ExtendedUsages": [
+              "ExtKeyUsageServerAuth"
+            ]
+          },
+          "Details": {
+            "CertType": "ServingCertDetails",
+            "SignerDetails": null,
+            "ServingCertDetails": {
+              "DNSNames": [
+                "machine-api-controllers.openshift-machine-api.svc",
+                "machine-api-controllers.openshift-machine-api.svc.cluster.local"
+              ],
+              "IPAddresses": null
+            },
+            "ClientCertDetails": null
+          }
+        },
+        "Status": {
+          "Errors": null
+        }
+      },
+      {
+        "LogicalName": "dns-default.openshift-dns.svc",
+        "Description": "",
+        "Name": "dns-default.openshift-dns.svc::1698320698676275660",
+        "Spec": {
+          "SecretLocations": [
+            {
+              "Namespace": "openshift-dns",
+              "Name": "dns-default-metrics-tls"
+            }
+          ],
+          "OnDiskLocations": null,
+          "CertMetadata": {
+            "CertIdentifier": {
+              "CommonName": "dns-default.openshift-dns.svc",
+              "SerialNumber": "1698320698676275660",
+              "Issuer": {
+                "CommonName": "openshift-service-serving-signer@1660235194",
+                "SerialNumber": "",
+                "Issuer": null
+              }
+            },
+            "SignatureAlgorithm": "SHA256-RSA",
+            "PublicKeyAlgorithm": "RSA",
+            "PublicKeyBitSize": "2048 bit",
+            "ValidityDuration": "2y",
+            "Usages": [
+              "KeyUsageDigitalSignature",
+              "KeyUsageKeyEncipherment"
+            ],
+            "ExtendedUsages": [
+              "ExtKeyUsageServerAuth"
+            ]
+          },
+          "Details": {
+            "CertType": "ServingCertDetails",
+            "SignerDetails": null,
+            "ServingCertDetails": {
+              "DNSNames": [
+                "dns-default.openshift-dns.svc",
+                "dns-default.openshift-dns.svc.cluster.local"
+              ],
+              "IPAddresses": null
+            },
+            "ClientCertDetails": null
+          }
+        },
+        "Status": {
+          "Errors": null
+        }
+      },
+      {
+        "LogicalName": "cluster-storage-operator-metrics.openshift-cluster-storage-operator.svc",
+        "Description": "",
+        "Name": "cluster-storage-operator-metrics.openshift-cluster-storage-operator.svc::2369046118565646928",
+        "Spec": {
+          "SecretLocations": [
+            {
+              "Namespace": "openshift-cluster-storage-operator",
+              "Name": "cluster-storage-operator-serving-cert"
+            }
+          ],
+          "OnDiskLocations": null,
+          "CertMetadata": {
+            "CertIdentifier": {
+              "CommonName": "cluster-storage-operator-metrics.openshift-cluster-storage-operator.svc",
+              "SerialNumber": "2369046118565646928",
+              "Issuer": {
+                "CommonName": "openshift-service-serving-signer@1660235194",
+                "SerialNumber": "",
+                "Issuer": null
+              }
+            },
+            "SignatureAlgorithm": "SHA256-RSA",
+            "PublicKeyAlgorithm": "RSA",
+            "PublicKeyBitSize": "2048 bit",
+            "ValidityDuration": "2y",
+            "Usages": [
+              "KeyUsageDigitalSignature",
+              "KeyUsageKeyEncipherment"
+            ],
+            "ExtendedUsages": [
+              "ExtKeyUsageServerAuth"
+            ]
+          },
+          "Details": {
+            "CertType": "ServingCertDetails",
+            "SignerDetails": null,
+            "ServingCertDetails": {
+              "DNSNames": [
+                "cluster-storage-operator-metrics.openshift-cluster-storage-operator.svc",
+                "cluster-storage-operator-metrics.openshift-cluster-storage-operator.svc.cluster.local"
+              ],
+              "IPAddresses": null
+            },
+            "ClientCertDetails": null
+          }
+        },
+        "Status": {
+          "Errors": null
+        }
+      },
+      {
+        "LogicalName": "oauth-openshift.openshift-authentication.svc",
+        "Description": "",
+        "Name": "oauth-openshift.openshift-authentication.svc::4046784375362903289",
+        "Spec": {
+          "SecretLocations": [
+            {
+              "Namespace": "openshift-authentication",
+              "Name": "v4-0-config-system-serving-cert"
+            }
+          ],
+          "OnDiskLocations": null,
+          "CertMetadata": {
+            "CertIdentifier": {
+              "CommonName": "oauth-openshift.openshift-authentication.svc",
+              "SerialNumber": "4046784375362903289",
+              "Issuer": {
+                "CommonName": "openshift-service-serving-signer@1660235194",
+                "SerialNumber": "",
+                "Issuer": null
+              }
+            },
+            "SignatureAlgorithm": "SHA256-RSA",
+            "PublicKeyAlgorithm": "RSA",
+            "PublicKeyBitSize": "2048 bit",
+            "ValidityDuration": "2y",
+            "Usages": [
+              "KeyUsageDigitalSignature",
+              "KeyUsageKeyEncipherment"
+            ],
+            "ExtendedUsages": [
+              "ExtKeyUsageServerAuth"
+            ]
+          },
+          "Details": {
+            "CertType": "ServingCertDetails",
+            "SignerDetails": null,
+            "ServingCertDetails": {
+              "DNSNames": [
+                "oauth-openshift.openshift-authentication.svc",
+                "oauth-openshift.openshift-authentication.svc.cluster.local"
+              ],
+              "IPAddresses": null
+            },
+            "ClientCertDetails": null
+          }
+        },
+        "Status": {
+          "Errors": null
+        }
+      },
+      {
+        "LogicalName": "prometheus-operator-admission-webhook.openshift-monitoring.svc",
+        "Description": "",
+        "Name": "prometheus-operator-admission-webhook.openshift-monitoring.svc::8444555083473456618",
+        "Spec": {
+          "SecretLocations": [
+            {
+              "Namespace": "openshift-monitoring",
+              "Name": "prometheus-operator-admission-webhook-tls"
+            }
+          ],
+          "OnDiskLocations": null,
+          "CertMetadata": {
+            "CertIdentifier": {
+              "CommonName": "prometheus-operator-admission-webhook.openshift-monitoring.svc",
+              "SerialNumber": "8444555083473456618",
+              "Issuer": {
+                "CommonName": "openshift-service-serving-signer@1660235194",
+                "SerialNumber": "",
+                "Issuer": null
+              }
+            },
+            "SignatureAlgorithm": "SHA256-RSA",
+            "PublicKeyAlgorithm": "RSA",
+            "PublicKeyBitSize": "2048 bit",
+            "ValidityDuration": "2y",
+            "Usages": [
+              "KeyUsageDigitalSignature",
+              "KeyUsageKeyEncipherment"
+            ],
+            "ExtendedUsages": [
+              "ExtKeyUsageServerAuth"
+            ]
+          },
+          "Details": {
+            "CertType": "ServingCertDetails",
+            "SignerDetails": null,
+            "ServingCertDetails": {
+              "DNSNames": [
+                "prometheus-operator-admission-webhook.openshift-monitoring.svc",
+                "prometheus-operator-admission-webhook.openshift-monitoring.svc.cluster.local"
+              ],
+              "IPAddresses": null
+            },
+            "ClientCertDetails": null
+          }
+        },
+        "Status": {
+          "Errors": null
+        }
+      },
+      {
+        "LogicalName": "*.cluster-monitoring-operator.openshift-monitoring.svc",
+        "Description": "",
+        "Name": "*.cluster-monitoring-operator.openshift-monitoring.svc::5408701497193776530",
+        "Spec": {
+          "SecretLocations": [
+            {
+              "Namespace": "openshift-monitoring",
+              "Name": "cluster-monitoring-operator-tls"
+            }
+          ],
+          "OnDiskLocations": null,
+          "CertMetadata": {
+            "CertIdentifier": {
+              "CommonName": "*.cluster-monitoring-operator.openshift-monitoring.svc",
+              "SerialNumber": "5408701497193776530",
+              "Issuer": {
+                "CommonName": "openshift-service-serving-signer@1660235194",
+                "SerialNumber": "",
+                "Issuer": null
+              }
+            },
+            "SignatureAlgorithm": "SHA256-RSA",
+            "PublicKeyAlgorithm": "RSA",
+            "PublicKeyBitSize": "2048 bit",
+            "ValidityDuration": "2y",
+            "Usages": [
+              "KeyUsageDigitalSignature",
+              "KeyUsageKeyEncipherment"
+            ],
+            "ExtendedUsages": [
+              "ExtKeyUsageServerAuth"
+            ]
+          },
+          "Details": {
+            "CertType": "ServingCertDetails",
+            "SignerDetails": null,
+            "ServingCertDetails": {
+              "DNSNames": [
+                "*.cluster-monitoring-operator.openshift-monitoring.svc",
+                "*.cluster-monitoring-operator.openshift-monitoring.svc.cluster.local",
+                "cluster-monitoring-operator.openshift-monitoring.svc",
+                "cluster-monitoring-operator.openshift-monitoring.svc.cluster.local"
+              ],
+              "IPAddresses": null
+            },
+            "ClientCertDetails": null
+          }
+        },
+        "Status": {
+          "Errors": null
+        }
+      },
+      {
+        "LogicalName": "machine-api-operator.openshift-machine-api.svc",
+        "Description": "",
+        "Name": "machine-api-operator.openshift-machine-api.svc::7061257560361596120",
+        "Spec": {
+          "SecretLocations": [
+            {
+              "Namespace": "openshift-machine-api",
+              "Name": "machine-api-operator-tls"
+            }
+          ],
+          "OnDiskLocations": null,
+          "CertMetadata": {
+            "CertIdentifier": {
+              "CommonName": "machine-api-operator.openshift-machine-api.svc",
+              "SerialNumber": "7061257560361596120",
+              "Issuer": {
+                "CommonName": "openshift-service-serving-signer@1660235194",
+                "SerialNumber": "",
+                "Issuer": null
+              }
+            },
+            "SignatureAlgorithm": "SHA256-RSA",
+            "PublicKeyAlgorithm": "RSA",
+            "PublicKeyBitSize": "2048 bit",
+            "ValidityDuration": "2y",
+            "Usages": [
+              "KeyUsageDigitalSignature",
+              "KeyUsageKeyEncipherment"
+            ],
+            "ExtendedUsages": [
+              "ExtKeyUsageServerAuth"
+            ]
+          },
+          "Details": {
+            "CertType": "ServingCertDetails",
+            "SignerDetails": null,
+            "ServingCertDetails": {
+              "DNSNames": [
+                "machine-api-operator.openshift-machine-api.svc",
+                "machine-api-operator.openshift-machine-api.svc.cluster.local"
+              ],
+              "IPAddresses": null
+            },
+            "ClientCertDetails": null
+          }
+        },
+        "Status": {
+          "Errors": null
+        }
+      },
+      {
+        "LogicalName": "router-internal-default.openshift-ingress.svc",
+        "Description": "",
+        "Name": "router-internal-default.openshift-ingress.svc::5196656952303372444",
+        "Spec": {
+          "SecretLocations": [
+            {
+              "Namespace": "openshift-ingress",
+              "Name": "router-metrics-certs-default"
+            }
+          ],
+          "OnDiskLocations": null,
+          "CertMetadata": {
+            "CertIdentifier": {
+              "CommonName": "router-internal-default.openshift-ingress.svc",
+              "SerialNumber": "5196656952303372444",
+              "Issuer": {
+                "CommonName": "openshift-service-serving-signer@1660235194",
+                "SerialNumber": "",
+                "Issuer": null
+              }
+            },
+            "SignatureAlgorithm": "SHA256-RSA",
+            "PublicKeyAlgorithm": "RSA",
+            "PublicKeyBitSize": "2048 bit",
+            "ValidityDuration": "2y",
+            "Usages": [
+              "KeyUsageDigitalSignature",
+              "KeyUsageKeyEncipherment"
+            ],
+            "ExtendedUsages": [
+              "ExtKeyUsageServerAuth"
+            ]
+          },
+          "Details": {
+            "CertType": "ServingCertDetails",
+            "SignerDetails": null,
+            "ServingCertDetails": {
+              "DNSNames": [
+                "router-internal-default.openshift-ingress.svc",
+                "router-internal-default.openshift-ingress.svc.cluster.local"
+              ],
+              "IPAddresses": null
+            },
+            "ClientCertDetails": null
+          }
+        },
+        "Status": {
+          "Errors": null
+        }
+      },
+      {
+        "LogicalName": "*.node-tuning-operator.openshift-cluster-node-tuning-operator.svc",
+        "Description": "",
+        "Name": "*.node-tuning-operator.openshift-cluster-node-tuning-operator.svc::1966650171226976553",
+        "Spec": {
+          "SecretLocations": [
+            {
+              "Namespace": "openshift-cluster-node-tuning-operator",
+              "Name": "node-tuning-operator-tls"
+            }
+          ],
+          "OnDiskLocations": null,
+          "CertMetadata": {
+            "CertIdentifier": {
+              "CommonName": "*.node-tuning-operator.openshift-cluster-node-tuning-operator.svc",
+              "SerialNumber": "1966650171226976553",
+              "Issuer": {
+                "CommonName": "openshift-service-serving-signer@1660235194",
+                "SerialNumber": "",
+                "Issuer": null
+              }
+            },
+            "SignatureAlgorithm": "SHA256-RSA",
+            "PublicKeyAlgorithm": "RSA",
+            "PublicKeyBitSize": "2048 bit",
+            "ValidityDuration": "2y",
+            "Usages": [
+              "KeyUsageDigitalSignature",
+              "KeyUsageKeyEncipherment"
+            ],
+            "ExtendedUsages": [
+              "ExtKeyUsageServerAuth"
+            ]
+          },
+          "Details": {
+            "CertType": "ServingCertDetails",
+            "SignerDetails": null,
+            "ServingCertDetails": {
+              "DNSNames": [
+                "*.node-tuning-operator.openshift-cluster-node-tuning-operator.svc",
+                "*.node-tuning-operator.openshift-cluster-node-tuning-operator.svc.cluster.local",
+                "node-tuning-operator.openshift-cluster-node-tuning-operator.svc",
+                "node-tuning-operator.openshift-cluster-node-tuning-operator.svc.cluster.local"
+              ],
+              "IPAddresses": null
+            },
+            "ClientCertDetails": null
+          }
+        },
+        "Status": {
+          "Errors": null
+        }
+      },
+      {
+        "LogicalName": "metrics.openshift-authentication-operator.svc",
+        "Description": "",
+        "Name": "metrics.openshift-authentication-operator.svc::1159011675408915412",
+        "Spec": {
+          "SecretLocations": [
+            {
+              "Namespace": "openshift-authentication-operator",
+              "Name": "serving-cert"
+            }
+          ],
+          "OnDiskLocations": null,
+          "CertMetadata": {
+            "CertIdentifier": {
+              "CommonName": "metrics.openshift-authentication-operator.svc",
+              "SerialNumber": "1159011675408915412",
+              "Issuer": {
+                "CommonName": "openshift-service-serving-signer@1660235194",
+                "SerialNumber": "",
+                "Issuer": null
+              }
+            },
+            "SignatureAlgorithm": "SHA256-RSA",
+            "PublicKeyAlgorithm": "RSA",
+            "PublicKeyBitSize": "2048 bit",
+            "ValidityDuration": "2y",
+            "Usages": [
+              "KeyUsageDigitalSignature",
+              "KeyUsageKeyEncipherment"
+            ],
+            "ExtendedUsages": [
+              "ExtKeyUsageServerAuth"
+            ]
+          },
+          "Details": {
+            "CertType": "ServingCertDetails",
+            "SignerDetails": null,
+            "ServingCertDetails": {
+              "DNSNames": [
+                "metrics.openshift-authentication-operator.svc",
+                "metrics.openshift-authentication-operator.svc.cluster.local"
+              ],
+              "IPAddresses": null
+            },
+            "ClientCertDetails": null
+          }
+        },
+        "Status": {
+          "Errors": null
+        }
+      },
+      {
+        "LogicalName": "metrics.openshift-kube-scheduler-operator.svc",
+        "Description": "",
+        "Name": "metrics.openshift-kube-scheduler-operator.svc::4366531022562557239",
+        "Spec": {
+          "SecretLocations": [
+            {
+              "Namespace": "openshift-kube-scheduler-operator",
+              "Name": "kube-scheduler-operator-serving-cert"
+            }
+          ],
+          "OnDiskLocations": null,
+          "CertMetadata": {
+            "CertIdentifier": {
+              "CommonName": "metrics.openshift-kube-scheduler-operator.svc",
+              "SerialNumber": "4366531022562557239",
+              "Issuer": {
+                "CommonName": "openshift-service-serving-signer@1660235194",
+                "SerialNumber": "",
+                "Issuer": null
+              }
+            },
+            "SignatureAlgorithm": "SHA256-RSA",
+            "PublicKeyAlgorithm": "RSA",
+            "PublicKeyBitSize": "2048 bit",
+            "ValidityDuration": "2y",
+            "Usages": [
+              "KeyUsageDigitalSignature",
+              "KeyUsageKeyEncipherment"
+            ],
+            "ExtendedUsages": [
+              "ExtKeyUsageServerAuth"
+            ]
+          },
+          "Details": {
+            "CertType": "ServingCertDetails",
+            "SignerDetails": null,
+            "ServingCertDetails": {
+              "DNSNames": [
+                "metrics.openshift-kube-scheduler-operator.svc",
+                "metrics.openshift-kube-scheduler-operator.svc.cluster.local"
+              ],
+              "IPAddresses": null
+            },
+            "ClientCertDetails": null
+          }
+        },
+        "Status": {
+          "Errors": null
+        }
+      },
+      {
+        "LogicalName": "image-registry.openshift-image-registry.svc",
+        "Description": "",
+        "Name": "image-registry.openshift-image-registry.svc::2533061878705206203",
+        "Spec": {
+          "SecretLocations": [
+            {
+              "Namespace": "openshift-image-registry",
+              "Name": "image-registry-tls"
+            }
+          ],
+          "OnDiskLocations": null,
+          "CertMetadata": {
+            "CertIdentifier": {
+              "CommonName": "image-registry.openshift-image-registry.svc",
+              "SerialNumber": "2533061878705206203",
+              "Issuer": {
+                "CommonName": "openshift-service-serving-signer@1660235194",
+                "SerialNumber": "",
+                "Issuer": null
+              }
+            },
+            "SignatureAlgorithm": "SHA256-RSA",
+            "PublicKeyAlgorithm": "RSA",
+            "PublicKeyBitSize": "2048 bit",
+            "ValidityDuration": "2y",
+            "Usages": [
+              "KeyUsageDigitalSignature",
+              "KeyUsageKeyEncipherment"
+            ],
+            "ExtendedUsages": [
+              "ExtKeyUsageServerAuth"
+            ]
+          },
+          "Details": {
+            "CertType": "ServingCertDetails",
+            "SignerDetails": null,
+            "ServingCertDetails": {
+              "DNSNames": [
+                "image-registry.openshift-image-registry.svc",
+                "image-registry.openshift-image-registry.svc.cluster.local"
+              ],
+              "IPAddresses": null
+            },
+            "ClientCertDetails": null
+          }
+        },
+        "Status": {
+          "Errors": null
+        }
+      },
+      {
+        "LogicalName": "metrics.openshift-console-operator.svc",
+        "Description": "",
+        "Name": "metrics.openshift-console-operator.svc::2594480697393708491",
+        "Spec": {
+          "SecretLocations": [
+            {
+              "Namespace": "openshift-console-operator",
+              "Name": "serving-cert"
+            }
+          ],
+          "OnDiskLocations": null,
+          "CertMetadata": {
+            "CertIdentifier": {
+              "CommonName": "metrics.openshift-console-operator.svc",
+              "SerialNumber": "2594480697393708491",
+              "Issuer": {
+                "CommonName": "openshift-service-serving-signer@1660235194",
+                "SerialNumber": "",
+                "Issuer": null
+              }
+            },
+            "SignatureAlgorithm": "SHA256-RSA",
+            "PublicKeyAlgorithm": "RSA",
+            "PublicKeyBitSize": "2048 bit",
+            "ValidityDuration": "2y",
+            "Usages": [
+              "KeyUsageDigitalSignature",
+              "KeyUsageKeyEncipherment"
+            ],
+            "ExtendedUsages": [
+              "ExtKeyUsageServerAuth"
+            ]
+          },
+          "Details": {
+            "CertType": "ServingCertDetails",
+            "SignerDetails": null,
+            "ServingCertDetails": {
+              "DNSNames": [
+                "metrics.openshift-console-operator.svc",
+                "metrics.openshift-console-operator.svc.cluster.local"
+              ],
+              "IPAddresses": null
+            },
+            "ClientCertDetails": null
+          }
+        },
+        "Status": {
+          "Errors": null
+        }
+      },
+      {
+        "LogicalName": "aws-ebs-csi-driver-controller-metrics.openshift-cluster-csi-drivers.svc",
+        "Description": "",
+        "Name": "aws-ebs-csi-driver-controller-metrics.openshift-cluster-csi-drivers.svc::3785796387182627089",
+        "Spec": {
+          "SecretLocations": [
+            {
+              "Namespace": "openshift-cluster-csi-drivers",
+              "Name": "aws-ebs-csi-driver-controller-metrics-serving-cert"
+            }
+          ],
+          "OnDiskLocations": null,
+          "CertMetadata": {
+            "CertIdentifier": {
+              "CommonName": "aws-ebs-csi-driver-controller-metrics.openshift-cluster-csi-drivers.svc",
+              "SerialNumber": "3785796387182627089",
+              "Issuer": {
+                "CommonName": "openshift-service-serving-signer@1660235194",
+                "SerialNumber": "",
+                "Issuer": null
+              }
+            },
+            "SignatureAlgorithm": "SHA256-RSA",
+            "PublicKeyAlgorithm": "RSA",
+            "PublicKeyBitSize": "2048 bit",
+            "ValidityDuration": "2y",
+            "Usages": [
+              "KeyUsageDigitalSignature",
+              "KeyUsageKeyEncipherment"
+            ],
+            "ExtendedUsages": [
+              "ExtKeyUsageServerAuth"
+            ]
+          },
+          "Details": {
+            "CertType": "ServingCertDetails",
+            "SignerDetails": null,
+            "ServingCertDetails": {
+              "DNSNames": [
+                "aws-ebs-csi-driver-controller-metrics.openshift-cluster-csi-drivers.svc",
+                "aws-ebs-csi-driver-controller-metrics.openshift-cluster-csi-drivers.svc.cluster.local"
+              ],
+              "IPAddresses": null
+            },
+            "ClientCertDetails": null
+          }
+        },
+        "Status": {
+          "Errors": null
+        }
+      },
+      {
+        "LogicalName": "pod-identity-webhook.openshift-cloud-credential-operator.svc",
+        "Description": "",
+        "Name": "pod-identity-webhook.openshift-cloud-credential-operator.svc::2242223452909203393",
+        "Spec": {
+          "SecretLocations": [
+            {
+              "Namespace": "openshift-cloud-credential-operator",
+              "Name": "pod-identity-webhook"
+            }
+          ],
+          "OnDiskLocations": null,
+          "CertMetadata": {
+            "CertIdentifier": {
+              "CommonName": "pod-identity-webhook.openshift-cloud-credential-operator.svc",
+              "SerialNumber": "2242223452909203393",
+              "Issuer": {
+                "CommonName": "openshift-service-serving-signer@1660235194",
+                "SerialNumber": "",
+                "Issuer": null
+              }
+            },
+            "SignatureAlgorithm": "SHA256-RSA",
+            "PublicKeyAlgorithm": "RSA",
+            "PublicKeyBitSize": "2048 bit",
+            "ValidityDuration": "2y",
+            "Usages": [
+              "KeyUsageDigitalSignature",
+              "KeyUsageKeyEncipherment"
+            ],
+            "ExtendedUsages": [
+              "ExtKeyUsageServerAuth"
+            ]
+          },
+          "Details": {
+            "CertType": "ServingCertDetails",
+            "SignerDetails": null,
+            "ServingCertDetails": {
+              "DNSNames": [
+                "pod-identity-webhook.openshift-cloud-credential-operator.svc",
+                "pod-identity-webhook.openshift-cloud-credential-operator.svc.cluster.local"
+              ],
+              "IPAddresses": null
+            },
+            "ClientCertDetails": null
+          }
+        },
+        "Status": {
+          "Errors": null
+        }
+      },
+      {
+        "LogicalName": "*.kube-state-metrics.openshift-monitoring.svc",
+        "Description": "",
+        "Name": "*.kube-state-metrics.openshift-monitoring.svc::149350220636519763",
+        "Spec": {
+          "SecretLocations": [
+            {
+              "Namespace": "openshift-monitoring",
+              "Name": "kube-state-metrics-tls"
+            }
+          ],
+          "OnDiskLocations": null,
+          "CertMetadata": {
+            "CertIdentifier": {
+              "CommonName": "*.kube-state-metrics.openshift-monitoring.svc",
+              "SerialNumber": "149350220636519763",
+              "Issuer": {
+                "CommonName": "openshift-service-serving-signer@1660235194",
+                "SerialNumber": "",
+                "Issuer": null
+              }
+            },
+            "SignatureAlgorithm": "SHA256-RSA",
+            "PublicKeyAlgorithm": "RSA",
+            "PublicKeyBitSize": "2048 bit",
+            "ValidityDuration": "2y",
+            "Usages": [
+              "KeyUsageDigitalSignature",
+              "KeyUsageKeyEncipherment"
+            ],
+            "ExtendedUsages": [
+              "ExtKeyUsageServerAuth"
+            ]
+          },
+          "Details": {
+            "CertType": "ServingCertDetails",
+            "SignerDetails": null,
+            "ServingCertDetails": {
+              "DNSNames": [
+                "*.kube-state-metrics.openshift-monitoring.svc",
+                "*.kube-state-metrics.openshift-monitoring.svc.cluster.local",
+                "kube-state-metrics.openshift-monitoring.svc",
+                "kube-state-metrics.openshift-monitoring.svc.cluster.local"
+              ],
+              "IPAddresses": null
+            },
+            "ClientCertDetails": null
+          }
+        },
+        "Status": {
+          "Errors": null
+        }
+      },
+      {
+        "LogicalName": "*.machine-approver.openshift-cluster-machine-approver.svc",
+        "Description": "",
+        "Name": "*.machine-approver.openshift-cluster-machine-approver.svc::6308567208770339707",
+        "Spec": {
+          "SecretLocations": [
+            {
+              "Namespace": "openshift-cluster-machine-approver",
+              "Name": "machine-approver-tls"
+            }
+          ],
+          "OnDiskLocations": null,
+          "CertMetadata": {
+            "CertIdentifier": {
+              "CommonName": "*.machine-approver.openshift-cluster-machine-approver.svc",
+              "SerialNumber": "6308567208770339707",
+              "Issuer": {
+                "CommonName": "openshift-service-serving-signer@1660235194",
+                "SerialNumber": "",
+                "Issuer": null
+              }
+            },
+            "SignatureAlgorithm": "SHA256-RSA",
+            "PublicKeyAlgorithm": "RSA",
+            "PublicKeyBitSize": "2048 bit",
+            "ValidityDuration": "2y",
+            "Usages": [
+              "KeyUsageDigitalSignature",
+              "KeyUsageKeyEncipherment"
+            ],
+            "ExtendedUsages": [
+              "ExtKeyUsageServerAuth"
+            ]
+          },
+          "Details": {
+            "CertType": "ServingCertDetails",
+            "SignerDetails": null,
+            "ServingCertDetails": {
+              "DNSNames": [
+                "*.machine-approver.openshift-cluster-machine-approver.svc",
+                "*.machine-approver.openshift-cluster-machine-approver.svc.cluster.local",
+                "machine-approver.openshift-cluster-machine-approver.svc",
+                "machine-approver.openshift-cluster-machine-approver.svc.cluster.local"
+              ],
+              "IPAddresses": null
+            },
+            "ClientCertDetails": null
+          }
+        },
+        "Status": {
+          "Errors": null
+        }
+      },
+      {
+        "LogicalName": "metrics.openshift-insights.svc",
+        "Description": "",
+        "Name": "metrics.openshift-insights.svc::7854905682415005669",
+        "Spec": {
+          "SecretLocations": [
+            {
+              "Namespace": "openshift-insights",
+              "Name": "openshift-insights-serving-cert"
+            }
+          ],
+          "OnDiskLocations": null,
+          "CertMetadata": {
+            "CertIdentifier": {
+              "CommonName": "metrics.openshift-insights.svc",
+              "SerialNumber": "7854905682415005669",
+              "Issuer": {
+                "CommonName": "openshift-service-serving-signer@1660235194",
+                "SerialNumber": "",
+                "Issuer": null
+              }
+            },
+            "SignatureAlgorithm": "SHA256-RSA",
+            "PublicKeyAlgorithm": "RSA",
+            "PublicKeyBitSize": "2048 bit",
+            "ValidityDuration": "2y",
+            "Usages": [
+              "KeyUsageDigitalSignature",
+              "KeyUsageKeyEncipherment"
+            ],
+            "ExtendedUsages": [
+              "ExtKeyUsageServerAuth"
+            ]
+          },
+          "Details": {
+            "CertType": "ServingCertDetails",
+            "SignerDetails": null,
+            "ServingCertDetails": {
+              "DNSNames": [
+                "metrics.openshift-insights.svc",
+                "metrics.openshift-insights.svc.cluster.local"
+              ],
+              "IPAddresses": null
+            },
+            "ClientCertDetails": null
+          }
+        },
+        "Status": {
+          "Errors": null
+        }
+      },
+      {
+        "LogicalName": "metrics.openshift-ingress-operator.svc",
+        "Description": "",
+        "Name": "metrics.openshift-ingress-operator.svc::848448456271825148",
+        "Spec": {
+          "SecretLocations": [
+            {
+              "Namespace": "openshift-ingress-operator",
+              "Name": "metrics-tls"
+            }
+          ],
+          "OnDiskLocations": null,
+          "CertMetadata": {
+            "CertIdentifier": {
+              "CommonName": "metrics.openshift-ingress-operator.svc",
+              "SerialNumber": "848448456271825148",
+              "Issuer": {
+                "CommonName": "openshift-service-serving-signer@1660235194",
+                "SerialNumber": "",
+                "Issuer": null
+              }
+            },
+            "SignatureAlgorithm": "SHA256-RSA",
+            "PublicKeyAlgorithm": "RSA",
+            "PublicKeyBitSize": "2048 bit",
+            "ValidityDuration": "2y",
+            "Usages": [
+              "KeyUsageDigitalSignature",
+              "KeyUsageKeyEncipherment"
+            ],
+            "ExtendedUsages": [
+              "ExtKeyUsageServerAuth"
+            ]
+          },
+          "Details": {
+            "CertType": "ServingCertDetails",
+            "SignerDetails": null,
+            "ServingCertDetails": {
+              "DNSNames": [
+                "metrics.openshift-ingress-operator.svc",
+                "metrics.openshift-ingress-operator.svc.cluster.local"
+              ],
+              "IPAddresses": null
+            },
+            "ClientCertDetails": null
+          }
+        },
+        "Status": {
+          "Errors": null
+        }
+      },
+      {
+        "LogicalName": "controller-manager.openshift-controller-manager.svc",
+        "Description": "",
+        "Name": "controller-manager.openshift-controller-manager.svc::7579546110906496244",
+        "Spec": {
+          "SecretLocations": [
+            {
+              "Namespace": "openshift-controller-manager",
+              "Name": "serving-cert"
+            }
+          ],
+          "OnDiskLocations": null,
+          "CertMetadata": {
+            "CertIdentifier": {
+              "CommonName": "controller-manager.openshift-controller-manager.svc",
+              "SerialNumber": "7579546110906496244",
+              "Issuer": {
+                "CommonName": "openshift-service-serving-signer@1660235194",
+                "SerialNumber": "",
+                "Issuer": null
+              }
+            },
+            "SignatureAlgorithm": "SHA256-RSA",
+            "PublicKeyAlgorithm": "RSA",
+            "PublicKeyBitSize": "2048 bit",
+            "ValidityDuration": "2y",
+            "Usages": [
+              "KeyUsageDigitalSignature",
+              "KeyUsageKeyEncipherment"
+            ],
+            "ExtendedUsages": [
+              "ExtKeyUsageServerAuth"
+            ]
+          },
+          "Details": {
+            "CertType": "ServingCertDetails",
+            "SignerDetails": null,
+            "ServingCertDetails": {
+              "DNSNames": [
+                "controller-manager.openshift-controller-manager.svc",
+                "controller-manager.openshift-controller-manager.svc.cluster.local"
+              ],
+              "IPAddresses": null
+            },
+            "ClientCertDetails": null
+          }
+        },
+        "Status": {
+          "Errors": null
+        }
+      },
+      {
+        "LogicalName": "console.openshift-console.svc",
+        "Description": "",
+        "Name": "console.openshift-console.svc::8197011233209597696",
+        "Spec": {
+          "SecretLocations": [
+            {
+              "Namespace": "openshift-console",
+              "Name": "console-serving-cert"
+            }
+          ],
+          "OnDiskLocations": null,
+          "CertMetadata": {
+            "CertIdentifier": {
+              "CommonName": "console.openshift-console.svc",
+              "SerialNumber": "8197011233209597696",
+              "Issuer": {
+                "CommonName": "openshift-service-serving-signer@1660235194",
+                "SerialNumber": "",
+                "Issuer": null
+              }
+            },
+            "SignatureAlgorithm": "SHA256-RSA",
+            "PublicKeyAlgorithm": "RSA",
+            "PublicKeyBitSize": "2048 bit",
+            "ValidityDuration": "2y",
+            "Usages": [
+              "KeyUsageDigitalSignature",
+              "KeyUsageKeyEncipherment"
+            ],
+            "ExtendedUsages": [
+              "ExtKeyUsageServerAuth"
+            ]
+          },
+          "Details": {
+            "CertType": "ServingCertDetails",
+            "SignerDetails": null,
+            "ServingCertDetails": {
+              "DNSNames": [
+                "console.openshift-console.svc",
+                "console.openshift-console.svc.cluster.local"
+              ],
+              "IPAddresses": null
+            },
+            "ClientCertDetails": null
+          }
+        },
+        "Status": {
+          "Errors": null
+        }
+      },
+      {
+        "LogicalName": "*.metrics.openshift-cluster-samples-operator.svc",
+        "Description": "",
+        "Name": "*.metrics.openshift-cluster-samples-operator.svc::376205288372847070",
+        "Spec": {
+          "SecretLocations": [
+            {
+              "Namespace": "openshift-cluster-samples-operator",
+              "Name": "samples-operator-tls"
+            }
+          ],
+          "OnDiskLocations": null,
+          "CertMetadata": {
+            "CertIdentifier": {
+              "CommonName": "*.metrics.openshift-cluster-samples-operator.svc",
+              "SerialNumber": "376205288372847070",
+              "Issuer": {
+                "CommonName": "openshift-service-serving-signer@1660235194",
+                "SerialNumber": "",
+                "Issuer": null
+              }
+            },
+            "SignatureAlgorithm": "SHA256-RSA",
+            "PublicKeyAlgorithm": "RSA",
+            "PublicKeyBitSize": "2048 bit",
+            "ValidityDuration": "2y",
+            "Usages": [
+              "KeyUsageDigitalSignature",
+              "KeyUsageKeyEncipherment"
+            ],
+            "ExtendedUsages": [
+              "ExtKeyUsageServerAuth"
+            ]
+          },
+          "Details": {
+            "CertType": "ServingCertDetails",
+            "SignerDetails": null,
+            "ServingCertDetails": {
+              "DNSNames": [
+                "*.metrics.openshift-cluster-samples-operator.svc",
+                "*.metrics.openshift-cluster-samples-operator.svc.cluster.local",
+                "metrics.openshift-cluster-samples-operator.svc",
+                "metrics.openshift-cluster-samples-operator.svc.cluster.local"
+              ],
+              "IPAddresses": null
+            },
+            "ClientCertDetails": null
+          }
+        },
+        "Status": {
+          "Errors": null
+        }
+      },
+      {
+        "LogicalName": "api.openshift-apiserver.svc",
+        "Description": "",
+        "Name": "api.openshift-apiserver.svc::2457272755999329987",
+        "Spec": {
+          "SecretLocations": [
+            {
+              "Namespace": "openshift-apiserver",
+              "Name": "serving-cert"
+            }
+          ],
+          "OnDiskLocations": null,
+          "CertMetadata": {
+            "CertIdentifier": {
+              "CommonName": "api.openshift-apiserver.svc",
+              "SerialNumber": "2457272755999329987",
+              "Issuer": {
+                "CommonName": "openshift-service-serving-signer@1660235194",
+                "SerialNumber": "",
+                "Issuer": null
+              }
+            },
+            "SignatureAlgorithm": "SHA256-RSA",
+            "PublicKeyAlgorithm": "RSA",
+            "PublicKeyBitSize": "2048 bit",
+            "ValidityDuration": "2y",
+            "Usages": [
+              "KeyUsageDigitalSignature",
+              "KeyUsageKeyEncipherment"
+            ],
+            "ExtendedUsages": [
+              "ExtKeyUsageServerAuth"
+            ]
+          },
+          "Details": {
+            "CertType": "ServingCertDetails",
+            "SignerDetails": null,
+            "ServingCertDetails": {
+              "DNSNames": [
+                "api.openshift-apiserver.svc",
+                "api.openshift-apiserver.svc.cluster.local"
+              ],
+              "IPAddresses": null
+            },
+            "ClientCertDetails": null
+          }
+        },
+        "Status": {
+          "Errors": null
+        }
+      },
+      {
+        "LogicalName": "prometheus-adapter.openshift-monitoring.svc",
+        "Description": "",
+        "Name": "prometheus-adapter.openshift-monitoring.svc::1732525563472031104",
+        "Spec": {
+          "SecretLocations": [
+            {
+              "Namespace": "openshift-monitoring",
+              "Name": "prometheus-adapter-5f9puh20l637u"
+            },
+            {
+              "Namespace": "openshift-monitoring",
+              "Name": "prometheus-adapter-tls"
+            }
+          ],
+          "OnDiskLocations": null,
+          "CertMetadata": {
+            "CertIdentifier": {
+              "CommonName": "prometheus-adapter.openshift-monitoring.svc",
+              "SerialNumber": "1732525563472031104",
+              "Issuer": {
+                "CommonName": "openshift-service-serving-signer@1660235194",
+                "SerialNumber": "",
+                "Issuer": null
+              }
+            },
+            "SignatureAlgorithm": "SHA256-RSA",
+            "PublicKeyAlgorithm": "RSA",
+            "PublicKeyBitSize": "2048 bit",
+            "ValidityDuration": "2y",
+            "Usages": [
+              "KeyUsageDigitalSignature",
+              "KeyUsageKeyEncipherment"
+            ],
+            "ExtendedUsages": [
+              "ExtKeyUsageServerAuth"
+            ]
+          },
+          "Details": {
+            "CertType": "ServingCertDetails",
+            "SignerDetails": null,
+            "ServingCertDetails": {
+              "DNSNames": [
+                "prometheus-adapter.openshift-monitoring.svc",
+                "prometheus-adapter.openshift-monitoring.svc.cluster.local"
+              ],
+              "IPAddresses": null
+            },
+            "ClientCertDetails": null
+          }
+        },
+        "Status": {
+          "Errors": null
+        }
+      },
+      {
+        "LogicalName": "metrics.openshift-kube-controller-manager-operator.svc",
+        "Description": "",
+        "Name": "metrics.openshift-kube-controller-manager-operator.svc::5438971602805831466",
+        "Spec": {
+          "SecretLocations": [
+            {
+              "Namespace": "openshift-kube-controller-manager-operator",
+              "Name": "kube-controller-manager-operator-serving-cert"
+            }
+          ],
+          "OnDiskLocations": null,
+          "CertMetadata": {
+            "CertIdentifier": {
+              "CommonName": "metrics.openshift-kube-controller-manager-operator.svc",
+              "SerialNumber": "5438971602805831466",
+              "Issuer": {
+                "CommonName": "openshift-service-serving-signer@1660235194",
+                "SerialNumber": "",
+                "Issuer": null
+              }
+            },
+            "SignatureAlgorithm": "SHA256-RSA",
+            "PublicKeyAlgorithm": "RSA",
+            "PublicKeyBitSize": "2048 bit",
+            "ValidityDuration": "2y",
+            "Usages": [
+              "KeyUsageDigitalSignature",
+              "KeyUsageKeyEncipherment"
+            ],
+            "ExtendedUsages": [
+              "ExtKeyUsageServerAuth"
+            ]
+          },
+          "Details": {
+            "CertType": "ServingCertDetails",
+            "SignerDetails": null,
+            "ServingCertDetails": {
+              "DNSNames": [
+                "metrics.openshift-kube-controller-manager-operator.svc",
+                "metrics.openshift-kube-controller-manager-operator.svc.cluster.local"
+              ],
+              "IPAddresses": null
+            },
+            "ClientCertDetails": null
+          }
+        },
+        "Status": {
+          "Errors": null
+        }
+      },
+      {
+        "LogicalName": "kube-controller-manager.openshift-kube-controller-manager.svc",
+        "Description": "",
+        "Name": "kube-controller-manager.openshift-kube-controller-manager.svc::1896250909081897532",
+        "Spec": {
+          "SecretLocations": [
+            {
+              "Namespace": "openshift-kube-controller-manager",
+              "Name": "serving-cert"
+            },
+            {
+              "Namespace": "openshift-kube-controller-manager",
+              "Name": "serving-cert-2"
+            },
+            {
+              "Namespace": "openshift-kube-controller-manager",
+              "Name": "serving-cert-3"
+            },
+            {
+              "Namespace": "openshift-kube-controller-manager",
+              "Name": "serving-cert-4"
+            },
+            {
+              "Namespace": "openshift-kube-controller-manager",
+              "Name": "serving-cert-5"
+            },
+            {
+              "Namespace": "openshift-kube-controller-manager",
+              "Name": "serving-cert-6"
+            }
+          ],
+          "OnDiskLocations": [
+            {
+              "Cert": {
+                "Path": "/etc/kubernetes/static-pod-resources/kube-controller-manager-pod-4/secrets/serving-cert/tls.crt/tls.crt",
+                "User": "root",
+                "Group": "root",
+                "Permissions": "-rw-------.",
+                "SELinuxOptions": "system_u:object_r:kubernetes_file_t:s0"
+              },
+              "Key": {
+                "Path": "/etc/kubernetes/static-pod-resources/kube-controller-manager-pod-4/secrets/serving-cert/tls.crt/tls.key",
+                "User": "root",
+                "Group": "root",
+                "Permissions": "-rw-------.",
+                "SELinuxOptions": "system_u:object_r:kubernetes_file_t:s0"
+              }
+            },
+            {
+              "Cert": {
+                "Path": "/etc/kubernetes/static-pod-resources/kube-controller-manager-pod-5/secrets/serving-cert/tls.crt/tls.crt",
+                "User": "root",
+                "Group": "root",
+                "Permissions": "-rw-------.",
+                "SELinuxOptions": "system_u:object_r:kubernetes_file_t:s0"
+              },
+              "Key": {
+                "Path": "/etc/kubernetes/static-pod-resources/kube-controller-manager-pod-5/secrets/serving-cert/tls.crt/tls.key",
+                "User": "root",
+                "Group": "root",
+                "Permissions": "-rw-------.",
+                "SELinuxOptions": "system_u:object_r:kubernetes_file_t:s0"
+              }
+            },
+            {
+              "Cert": {
+                "Path": "/etc/kubernetes/static-pod-resources/kube-controller-manager-pod-6/secrets/serving-cert/tls.crt/tls.crt",
+                "User": "root",
+                "Group": "root",
+                "Permissions": "-rw-------.",
+                "SELinuxOptions": "system_u:object_r:kubernetes_file_t:s0"
+              },
+              "Key": {
+                "Path": "/etc/kubernetes/static-pod-resources/kube-controller-manager-pod-6/secrets/serving-cert/tls.crt/tls.key",
+                "User": "root",
+                "Group": "root",
+                "Permissions": "-rw-------.",
+                "SELinuxOptions": "system_u:object_r:kubernetes_file_t:s0"
+              }
+            }
+          ],
+          "CertMetadata": {
+            "CertIdentifier": {
+              "CommonName": "kube-controller-manager.openshift-kube-controller-manager.svc",
+              "SerialNumber": "1896250909081897532",
+              "Issuer": {
+                "CommonName": "openshift-service-serving-signer@1660235194",
+                "SerialNumber": "",
+                "Issuer": null
+              }
+            },
+            "SignatureAlgorithm": "SHA256-RSA",
+            "PublicKeyAlgorithm": "RSA",
+            "PublicKeyBitSize": "2048 bit",
+            "ValidityDuration": "2y",
+            "Usages": [
+              "KeyUsageDigitalSignature",
+              "KeyUsageKeyEncipherment"
+            ],
+            "ExtendedUsages": [
+              "ExtKeyUsageServerAuth"
+            ]
+          },
+          "Details": {
+            "CertType": "ServingCertDetails",
+            "SignerDetails": null,
+            "ServingCertDetails": {
+              "DNSNames": [
+                "kube-controller-manager.openshift-kube-controller-manager.svc",
+                "kube-controller-manager.openshift-kube-controller-manager.svc.cluster.local"
+              ],
+              "IPAddresses": null
+            },
+            "ClientCertDetails": null
+          }
+        },
+        "Status": {
+          "Errors": null
+        }
+      },
+      {
+        "LogicalName": "metrics.openshift-kube-apiserver-operator.svc",
+        "Description": "",
+        "Name": "metrics.openshift-kube-apiserver-operator.svc::6235465719572846931",
+        "Spec": {
+          "SecretLocations": [
+            {
+              "Namespace": "openshift-kube-apiserver-operator",
+              "Name": "kube-apiserver-operator-serving-cert"
+            }
+          ],
+          "OnDiskLocations": null,
+          "CertMetadata": {
+            "CertIdentifier": {
+              "CommonName": "metrics.openshift-kube-apiserver-operator.svc",
+              "SerialNumber": "6235465719572846931",
+              "Issuer": {
+                "CommonName": "openshift-service-serving-signer@1660235194",
+                "SerialNumber": "",
+                "Issuer": null
+              }
+            },
+            "SignatureAlgorithm": "SHA256-RSA",
+            "PublicKeyAlgorithm": "RSA",
+            "PublicKeyBitSize": "2048 bit",
+            "ValidityDuration": "2y",
+            "Usages": [
+              "KeyUsageDigitalSignature",
+              "KeyUsageKeyEncipherment"
+            ],
+            "ExtendedUsages": [
+              "ExtKeyUsageServerAuth"
+            ]
+          },
+          "Details": {
+            "CertType": "ServingCertDetails",
+            "SignerDetails": null,
+            "ServingCertDetails": {
+              "DNSNames": [
+                "metrics.openshift-kube-apiserver-operator.svc",
+                "metrics.openshift-kube-apiserver-operator.svc.cluster.local"
+              ],
+              "IPAddresses": null
+            },
+            "ClientCertDetails": null
+          }
+        },
+        "Status": {
+          "Errors": null
+        }
+      },
+      {
+        "LogicalName": "*.prometheus-operator.openshift-monitoring.svc",
+        "Description": "",
+        "Name": "*.prometheus-operator.openshift-monitoring.svc::8610502219646032799",
+        "Spec": {
+          "SecretLocations": [
+            {
+              "Namespace": "openshift-monitoring",
+              "Name": "prometheus-operator-tls"
+            }
+          ],
+          "OnDiskLocations": null,
+          "CertMetadata": {
+            "CertIdentifier": {
+              "CommonName": "*.prometheus-operator.openshift-monitoring.svc",
+              "SerialNumber": "8610502219646032799",
+              "Issuer": {
+                "CommonName": "openshift-service-serving-signer@1660235194",
+                "SerialNumber": "",
+                "Issuer": null
+              }
+            },
+            "SignatureAlgorithm": "SHA256-RSA",
+            "PublicKeyAlgorithm": "RSA",
+            "PublicKeyBitSize": "2048 bit",
+            "ValidityDuration": "2y",
+            "Usages": [
+              "KeyUsageDigitalSignature",
+              "KeyUsageKeyEncipherment"
+            ],
+            "ExtendedUsages": [
+              "ExtKeyUsageServerAuth"
+            ]
+          },
+          "Details": {
+            "CertType": "ServingCertDetails",
+            "SignerDetails": null,
+            "ServingCertDetails": {
+              "DNSNames": [
+                "*.prometheus-operator.openshift-monitoring.svc",
+                "*.prometheus-operator.openshift-monitoring.svc.cluster.local",
+                "prometheus-operator.openshift-monitoring.svc",
+                "prometheus-operator.openshift-monitoring.svc.cluster.local"
+              ],
+              "IPAddresses": null
+            },
+            "ClientCertDetails": null
+          }
+        },
+        "Status": {
+          "Errors": null
+        }
+      },
+      {
+        "LogicalName": "cluster-autoscaler-operator.openshift-machine-api.svc",
+        "Description": "",
+        "Name": "cluster-autoscaler-operator.openshift-machine-api.svc::4413431980141135024",
+        "Spec": {
+          "SecretLocations": [
+            {
+              "Namespace": "openshift-machine-api",
+              "Name": "cluster-autoscaler-operator-cert"
+            }
+          ],
+          "OnDiskLocations": null,
+          "CertMetadata": {
+            "CertIdentifier": {
+              "CommonName": "cluster-autoscaler-operator.openshift-machine-api.svc",
+              "SerialNumber": "4413431980141135024",
+              "Issuer": {
+                "CommonName": "openshift-service-serving-signer@1660235194",
+                "SerialNumber": "",
+                "Issuer": null
+              }
+            },
+            "SignatureAlgorithm": "SHA256-RSA",
+            "PublicKeyAlgorithm": "RSA",
+            "PublicKeyBitSize": "2048 bit",
+            "ValidityDuration": "2y",
+            "Usages": [
+              "KeyUsageDigitalSignature",
+              "KeyUsageKeyEncipherment"
+            ],
+            "ExtendedUsages": [
+              "ExtKeyUsageServerAuth"
+            ]
+          },
+          "Details": {
+            "CertType": "ServingCertDetails",
+            "SignerDetails": null,
+            "ServingCertDetails": {
+              "DNSNames": [
+                "cluster-autoscaler-operator.openshift-machine-api.svc",
+                "cluster-autoscaler-operator.openshift-machine-api.svc.cluster.local"
+              ],
+              "IPAddresses": null
+            },
+            "ClientCertDetails": null
+          }
+        },
+        "Status": {
+          "Errors": null
+        }
+      },
+      {
+        "LogicalName": "metrics.openshift-config-operator.svc",
+        "Description": "",
+        "Name": "metrics.openshift-config-operator.svc::2875861632403042198",
+        "Spec": {
+          "SecretLocations": [
+            {
+              "Namespace": "openshift-config-operator",
+              "Name": "config-operator-serving-cert"
+            }
+          ],
+          "OnDiskLocations": null,
+          "CertMetadata": {
+            "CertIdentifier": {
+              "CommonName": "metrics.openshift-config-operator.svc",
+              "SerialNumber": "2875861632403042198",
+              "Issuer": {
+                "CommonName": "openshift-service-serving-signer@1660235194",
+                "SerialNumber": "",
+                "Issuer": null
+              }
+            },
+            "SignatureAlgorithm": "SHA256-RSA",
+            "PublicKeyAlgorithm": "RSA",
+            "PublicKeyBitSize": "2048 bit",
+            "ValidityDuration": "2y",
+            "Usages": [
+              "KeyUsageDigitalSignature",
+              "KeyUsageKeyEncipherment"
+            ],
+            "ExtendedUsages": [
+              "ExtKeyUsageServerAuth"
+            ]
+          },
+          "Details": {
+            "CertType": "ServingCertDetails",
+            "SignerDetails": null,
+            "ServingCertDetails": {
+              "DNSNames": [
+                "metrics.openshift-config-operator.svc",
+                "metrics.openshift-config-operator.svc.cluster.local"
+              ],
+              "IPAddresses": null
+            },
+            "ClientCertDetails": null
+          }
+        },
+        "Status": {
+          "Errors": null
+        }
+      }
+    ]
+  }
+}

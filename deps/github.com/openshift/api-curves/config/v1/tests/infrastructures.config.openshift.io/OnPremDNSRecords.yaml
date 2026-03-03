@@ -1,0 +1,464 @@
+apiVersion: apiextensions.k8s.io/v1 # Hack because controller-gen complains if we don't have this
+name: "Infrastructure"
+crdName: infrastructures.config.openshift.io
+featureGates:
+- OnPremDNSRecords
+tests:
+  onCreate:
+    - name: Should be able to create a minimal Infrastructure
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec: {} # No spec is required for a Infrastructure
+      expected: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec: {}
+  onUpdate:
+    - name: Status Should contain default fields
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec: {}
+        status: {}
+      updated: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec: {}
+        status: {}
+      expected: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec: {}
+        status:
+          cpuPartitioning: None
+          infrastructureTopology: HighlyAvailable
+          controlPlaneTopology: HighlyAvailable
+    - name: Should allow setting dnsRecordsType to External with UserManaged loadBalancer (BareMetal)
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec:
+          platformSpec:
+            baremetal: {}
+            type: BareMetal
+      updated: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec:
+          platformSpec:
+            baremetal: {}
+            type: BareMetal
+        status:
+          platform: BareMetal
+          platformStatus:
+            baremetal:
+              dnsRecordsType: External
+              loadBalancer:
+                type: UserManaged
+            type: BareMetal
+      expected: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec:
+          platformSpec:
+            baremetal: {}
+            type: BareMetal
+        status:
+          platform: BareMetal
+          platformStatus:
+            baremetal:
+              dnsRecordsType: External
+              loadBalancer:
+                type: UserManaged
+            type: BareMetal
+          cpuPartitioning: None
+          infrastructureTopology: HighlyAvailable
+          controlPlaneTopology: HighlyAvailable
+    - name: Should reject setting dnsRecordsType to External with OpenShiftManagedDefault loadBalancer (BareMetal)
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec:
+          platformSpec:
+            baremetal: {}
+            type: BareMetal
+      updated: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec:
+          platformSpec:
+            baremetal: {}
+            type: BareMetal
+        status:
+          platform: BareMetal
+          platformStatus:
+            baremetal:
+              dnsRecordsType: External
+              loadBalancer:
+                type: OpenShiftManagedDefault
+            type: BareMetal
+      expectedStatusError: "status.platformStatus.baremetal: Invalid value: \"object\": dnsRecordsType may only be set to External when loadBalancer.type is UserManaged"
+    - name: Should allow setting dnsRecordsType to Internal with any loadBalancer type (BareMetal)
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec:
+          platformSpec:
+            baremetal: {}
+            type: BareMetal
+      updated: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec:
+          platformSpec:
+            baremetal: {}
+            type: BareMetal
+        status:
+          platform: BareMetal
+          platformStatus:
+            baremetal:
+              dnsRecordsType: Internal
+              loadBalancer:
+                type: OpenShiftManagedDefault
+            type: BareMetal
+      expected: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec:
+          platformSpec:
+            baremetal: {}
+            type: BareMetal
+        status:
+          platform: BareMetal
+          platformStatus:
+            baremetal:
+              dnsRecordsType: Internal
+              loadBalancer:
+                type: OpenShiftManagedDefault
+            type: BareMetal
+          cpuPartitioning: None
+          infrastructureTopology: HighlyAvailable
+          controlPlaneTopology: HighlyAvailable
+    - name: Should allow setting dnsRecordsType to External with UserManaged loadBalancer (OpenStack)
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec:
+          platformSpec:
+            openstack: {}
+            type: OpenStack
+      updated: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec:
+          platformSpec:
+            openstack: {}
+            type: OpenStack
+        status:
+          platform: OpenStack
+          platformStatus:
+            openstack:
+              dnsRecordsType: External
+              loadBalancer:
+                type: UserManaged
+            type: OpenStack
+      expected: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec:
+          platformSpec:
+            openstack: {}
+            type: OpenStack
+        status:
+          platform: OpenStack
+          platformStatus:
+            openstack:
+              dnsRecordsType: External
+              loadBalancer:
+                type: UserManaged
+            type: OpenStack
+          cpuPartitioning: None
+          infrastructureTopology: HighlyAvailable
+          controlPlaneTopology: HighlyAvailable
+    - name: Should reject setting dnsRecordsType to External with OpenShiftManagedDefault loadBalancer (OpenStack)
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec:
+          platformSpec:
+            openstack: {}
+            type: OpenStack
+      updated: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec:
+          platformSpec:
+            openstack: {}
+            type: OpenStack
+        status:
+          platform: OpenStack
+          platformStatus:
+            openstack:
+              dnsRecordsType: External
+              loadBalancer:
+                type: OpenShiftManagedDefault
+            type: OpenStack
+      expectedStatusError: "status.platformStatus.openstack: Invalid value: \"object\": dnsRecordsType may only be set to External when loadBalancer.type is UserManaged"
+    - name: Should allow setting dnsRecordsType to External with UserManaged loadBalancer (VSphere)
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec:
+          platformSpec:
+            vsphere: {}
+            type: VSphere
+      updated: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec:
+          platformSpec:
+            vsphere: {}
+            type: VSphere
+        status:
+          platform: VSphere
+          platformStatus:
+            vsphere:
+              dnsRecordsType: External
+              loadBalancer:
+                type: UserManaged
+            type: VSphere
+      expected: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec:
+          platformSpec:
+            vsphere: {}
+            type: VSphere
+        status:
+          platform: VSphere
+          platformStatus:
+            vsphere:
+              dnsRecordsType: External
+              loadBalancer:
+                type: UserManaged
+            type: VSphere
+          cpuPartitioning: None
+          infrastructureTopology: HighlyAvailable
+          controlPlaneTopology: HighlyAvailable
+    - name: Should reject setting dnsRecordsType to External with OpenShiftManagedDefault loadBalancer (VSphere)
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec:
+          platformSpec:
+            vsphere: {}
+            type: VSphere
+      updated: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec:
+          platformSpec:
+            vsphere: {}
+            type: VSphere
+        status:
+          platform: VSphere
+          platformStatus:
+            vsphere:
+              dnsRecordsType: External
+              loadBalancer:
+                type: OpenShiftManagedDefault
+            type: VSphere
+      expectedStatusError: "status.platformStatus.vsphere: Invalid value: \"object\": dnsRecordsType may only be set to External when loadBalancer.type is UserManaged"
+    - name: Should allow setting dnsRecordsType to External with UserManaged loadBalancer (Ovirt)
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec:
+          platformSpec:
+            ovirt: {}
+            type: oVirt
+      updated: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec:
+          platformSpec:
+            ovirt: {}
+            type: oVirt
+        status:
+          platform: oVirt
+          platformStatus:
+            ovirt:
+              dnsRecordsType: External
+              loadBalancer:
+                type: UserManaged
+            type: oVirt
+      expected: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec:
+          platformSpec:
+            ovirt: {}
+            type: oVirt
+        status:
+          platform: oVirt
+          platformStatus:
+            ovirt:
+              dnsRecordsType: External
+              loadBalancer:
+                type: UserManaged
+            type: oVirt
+          cpuPartitioning: None
+          infrastructureTopology: HighlyAvailable
+          controlPlaneTopology: HighlyAvailable
+    - name: Should reject setting dnsRecordsType to External with OpenShiftManagedDefault loadBalancer (Ovirt)
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec:
+          platformSpec:
+            ovirt: {}
+            type: oVirt
+      updated: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec:
+          platformSpec:
+            ovirt: {}
+            type: oVirt
+        status:
+          platform: oVirt
+          platformStatus:
+            ovirt:
+              dnsRecordsType: External
+              loadBalancer:
+                type: OpenShiftManagedDefault
+            type: oVirt
+      expectedStatusError: "status.platformStatus.ovirt: Invalid value: \"object\": dnsRecordsType may only be set to External when loadBalancer.type is UserManaged"
+    - name: Should allow setting dnsRecordsType to External with UserManaged loadBalancer (Nutanix)
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec:
+          platformSpec:
+            nutanix:
+              prismCentral:
+                address: test.nutanix.com
+                port: 9440
+              prismElements:
+              - endpoint:
+                  address: test-pe.nutanix.com
+                  port: 9440
+                name: test-pe
+            type: Nutanix
+      updated: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec:
+          platformSpec:
+            nutanix:
+              prismCentral:
+                address: test.nutanix.com
+                port: 9440
+              prismElements:
+              - endpoint:
+                  address: test-pe.nutanix.com
+                  port: 9440
+                name: test-pe
+            type: Nutanix
+        status:
+          platform: Nutanix
+          platformStatus:
+            nutanix:
+              dnsRecordsType: External
+              loadBalancer:
+                type: UserManaged
+            type: Nutanix
+      expected: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec:
+          platformSpec:
+            nutanix:
+              prismCentral:
+                address: test.nutanix.com
+                port: 9440
+              prismElements:
+              - endpoint:
+                  address: test-pe.nutanix.com
+                  port: 9440
+                name: test-pe
+            type: Nutanix
+        status:
+          platform: Nutanix
+          platformStatus:
+            nutanix:
+              dnsRecordsType: External
+              loadBalancer:
+                type: UserManaged
+            type: Nutanix
+          cpuPartitioning: None
+          infrastructureTopology: HighlyAvailable
+          controlPlaneTopology: HighlyAvailable
+    - name: Should reject setting dnsRecordsType to External with OpenShiftManagedDefault loadBalancer (Nutanix)
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec:
+          platformSpec:
+            nutanix:
+              prismCentral:
+                address: test.nutanix.com
+                port: 9440
+              prismElements:
+              - endpoint:
+                  address: test-pe.nutanix.com
+                  port: 9440
+                name: test-pe
+            type: Nutanix
+      updated: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec:
+          platformSpec:
+            nutanix:
+              prismCentral:
+                address: test.nutanix.com
+                port: 9440
+              prismElements:
+              - endpoint:
+                  address: test-pe.nutanix.com
+                  port: 9440
+                name: test-pe
+            type: Nutanix
+        status:
+          platform: Nutanix
+          platformStatus:
+            nutanix:
+              dnsRecordsType: External
+              loadBalancer:
+                type: OpenShiftManagedDefault
+            type: Nutanix
+      expectedStatusError: "status.platformStatus.nutanix: Invalid value: \"object\": dnsRecordsType may only be set to External when loadBalancer.type is UserManaged"
+    - name: Should not allow setting the dnsRecordsType to a wrong value
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec:
+          platformSpec:
+            baremetal: {}
+            type: BareMetal
+      updated: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec:
+          platformSpec:
+            baremetal: {}
+            type: BareMetal
+        status:
+          platform: BareMetal
+          platformStatus:
+            baremetal:
+              dnsRecordsType: Invalid
+            type: BareMetal
+      expectedStatusError: "platformStatus.baremetal.dnsRecordsType: Unsupported value: \"Invalid\": supported values: \"Internal\", \"External\""

@@ -1,0 +1,150 @@
+apiVersion: apiextensions.k8s.io/v1 # Hack because controller-gen complains if we don't have this
+name: "Etcd"
+crdName: etcds.operator.openshift.io
+featureGates:
+- EtcdBackendQuota
+tests:
+  onCreate:
+    - name: Should be able to create with 8 BackendQuotaGiB
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: Etcd
+        metadata:
+          name: gib8
+        spec:
+          backendQuotaGiB: 8
+      expected: |
+        apiVersion: operator.openshift.io/v1
+        kind: Etcd
+        metadata:
+          name: default
+        spec:
+          logLevel: Normal
+          operatorLogLevel: Normal
+          backendQuotaGiB: 8
+    - name: Should be able to create with 16 BackendQuotaGiB
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: Etcd
+        metadata:
+          name: gib16
+        spec:
+          backendQuotaGiB: 16
+      expected: |
+        apiVersion: operator.openshift.io/v1
+        kind: Etcd
+        metadata:
+          name: gib16
+        spec:
+          logLevel: Normal
+          operatorLogLevel: Normal
+          backendQuotaGiB: 16
+    - name: Should be able to create with 20 BackendQuotaGiB
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: Etcd
+        metadata:
+          name: gib20
+        spec:
+          backendQuotaGiB: 20
+      expected: |
+        apiVersion: operator.openshift.io/v1
+        kind: Etcd
+        metadata:
+          name: gib20
+        spec:
+          logLevel: Normal
+          operatorLogLevel: Normal
+          backendQuotaGiB: 20
+    - name: Should be able to create with 32 BackendQuotaGiB
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: Etcd
+        metadata:
+          name: gib32
+        spec:
+          backendQuotaGiB: 32
+      expected: |
+        apiVersion: operator.openshift.io/v1
+        kind: Etcd
+        metadata:
+          name: gib32
+        spec:
+          logLevel: Normal
+          operatorLogLevel: Normal
+          backendQuotaGiB: 32
+    - name: Should not be able to create with less than 8 BackendQuotaGiB
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: Etcd
+        metadata:
+          name: gib6
+        spec:
+          backendQuotaGiB: 6
+      expectedError: "spec.backendQuotaGiB: Invalid value: 6: spec.backendQuotaGiB in body should be greater than or equal to 8"
+    - name: Should not be able to create with more than 32 BackendQuotaGiB
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: Etcd
+        metadata:
+          name: gib40
+        spec:
+          backendQuotaGiB: 40
+      expectedError: "spec.backendQuotaGiB: Invalid value: 40: spec.backendQuotaGiB in body should be less than or equal to 32"
+  onUpdate:
+    - name: Should be able to create with default then upgrade to 16
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: Etcd
+        metadata:
+          name: default
+        spec:
+          backendQuotaGiB: 8
+      updated: |
+        apiVersion: operator.openshift.io/v1
+        kind: Etcd
+        metadata:
+          name: gib16
+        spec:
+          backendQuotaGiB: 16
+      expected: |
+        apiVersion: operator.openshift.io/v1
+        kind: Etcd
+        metadata:
+          name: gib16
+        spec:
+          logLevel: Normal
+          operatorLogLevel: Normal
+          backendQuotaGiB: 16
+    - name: Should not be allowed to try to decrease BackendQuotaGiB
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: Etcd
+        metadata:
+          name: gib16
+        spec:
+          backendQuotaGiB: 16
+      updated: |
+        apiVersion: operator.openshift.io/v1
+        kind: Etcd
+        metadata:
+          name: gib8
+        spec:
+          backendQuotaGiB: 8
+      expectedError: etcd backendQuotaGiB may not be decreased
+    - name: Should not be allowed to upgrade to more than 32 BackendQuotaGiB
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: Etcd
+        metadata:
+          name: gib16
+        spec:
+          backendQuotaGiB: 16
+      updated: |
+        apiVersion: operator.openshift.io/v1
+        kind: Etcd
+        metadata:
+          name: gib40
+        spec:
+          backendQuotaGiB: 40
+      expectedError: "spec.backendQuotaGiB: Invalid value: 40: spec.backendQuotaGiB in body should be less than or equal to 32"

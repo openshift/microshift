@@ -1,0 +1,458 @@
+
+apiVersion: apiextensions.k8s.io/v1 
+name: "Authentication"
+crdName: authentications.config.openshift.io
+featureGates:
+- ExternalOIDCWithUpstreamParity
+tests:
+  onCreate:
+    - name: Valid discoveryURL
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: Authentication
+        spec:
+          type: OIDC
+          oidcProviders:
+          - name: myoidc
+            issuer:
+              issuerURL: https://meh.tld/
+              audiences: ['openshift-aud']
+              discoveryURL: https://auth.example.com/.well-known/openid-configuration
+            claimMappings:
+              username:
+                claim: "preferred_username"
+                prefixPolicy: Prefix
+                prefix:
+                  prefixString: "myoidc:"
+      expected: |
+        apiVersion: config.openshift.io/v1
+        kind: Authentication
+        spec:
+          type: OIDC
+          oidcProviders:
+          - name: myoidc
+            issuer:
+              issuerURL: https://meh.tld/
+              audiences: ['openshift-aud']
+              discoveryURL: https://auth.example.com/.well-known/openid-configuration
+            claimMappings:
+              username:
+                claim: "preferred_username"
+                prefixPolicy: Prefix
+                prefix:
+                  prefixString: "myoidc:"
+
+    - name: Valid discoveryURL with same hostname as issuerURL but different path 
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: Authentication
+        spec:
+          type: OIDC
+          oidcProviders:
+          - name: myoidc
+            issuer:
+              issuerURL: https://meh.tld
+              audiences: ['openshift-aud']
+              discoveryURL: https://meh.tld/.well-known/openid-configuration
+            claimMappings:
+              username:
+                claim: "preferred_username"
+                prefixPolicy: Prefix
+                prefix:
+                  prefixString: "myoidc:"
+      expected: |
+        apiVersion: config.openshift.io/v1
+        kind: Authentication
+        spec:
+          type: OIDC
+          oidcProviders:
+          - name: myoidc
+            issuer:
+              issuerURL: https://meh.tld
+              audiences: ['openshift-aud']
+              discoveryURL: https://meh.tld/.well-known/openid-configuration
+            claimMappings:
+              username:
+                claim: "preferred_username"
+                prefixPolicy: Prefix
+                prefix:
+                  prefixString: "myoidc:"
+
+    - name: discoveryURL must be a valid URL
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: Authentication
+        spec:
+          type: OIDC
+          oidcProviders:
+          - name: myoidc
+            issuer:
+              issuerURL: https://meh.tld/
+              audiences: ['openshift-aud']
+              discoveryURL: not-a-valid-url
+            claimMappings:
+              username:
+                claim: "preferred_username"
+                prefixPolicy: Prefix
+                prefix:
+                  prefixString: "myoidc:"
+      expectedError: "discoveryURL must be a valid URL"
+
+    - name: discoveryURL must not contain user info
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: Authentication
+        spec:
+          type: OIDC
+          oidcProviders:
+          - name: myoidc
+            issuer:
+              issuerURL: https://meh.tld/
+              audiences: ['openshift-aud']
+              discoveryURL: https://user:pass@auth.example.com/
+            claimMappings:
+              username:
+                claim: "preferred_username"
+                prefixPolicy: Prefix
+                prefix:
+                  prefixString: "myoidc:"
+      expectedError: "discoveryURL must not contain user info"
+
+    - name: discoveryURL must not contain fragment
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: Authentication
+        spec:
+          type: OIDC
+          oidcProviders:
+          - name: myoidc
+            issuer:
+              issuerURL: https://meh.tld/
+              audiences: ['openshift-aud']
+              discoveryURL: https://auth.example.com/#fragment
+            claimMappings:
+              username:
+                claim: "preferred_username"
+                prefixPolicy: Prefix
+                prefix:
+                  prefixString: "myoidc:"
+      expectedError: "discoveryURL must not contain fragments"
+
+    - name: discoveryURL must use https
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: Authentication
+        spec:
+          type: OIDC
+          oidcProviders:
+          - name: myoidc
+            issuer:
+              issuerURL: https://meh.tld/
+              audiences: ['openshift-aud']
+              discoveryURL: http://auth.example.com/invalid
+            claimMappings:
+              username:
+                claim: "preferred_username"
+                prefixPolicy: Prefix
+                prefix:
+                  prefixString: "myoidc:"
+      expectedError: "discoveryURL must be a valid https URL"
+
+    - name: discoveryURL must not contain query
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: Authentication
+        spec:
+          type: OIDC
+          oidcProviders:
+          - name: myoidc
+            issuer:
+              issuerURL: https://meh.tld/
+              audiences: ['openshift-aud']
+              discoveryURL: https://auth.example.com/path?foo=bar
+            claimMappings:
+              username:
+                claim: "preferred_username"
+                prefixPolicy: Prefix
+                prefix:
+                  prefixString: "myoidc:"
+      expectedError: "discoveryURL must not contain query parameters"
+
+    - name: discoveryURL must be different from URL
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: Authentication
+        spec:
+          type: OIDC
+          oidcProviders:
+          - name: myoidc
+            issuer:
+              issuerURL: https://auth.example.com/.well-known/openid-configuration
+              audiences: ['openshift-aud']
+              discoveryURL: https://auth.example.com/.well-known/openid-configuration
+            claimMappings:
+              username:
+                claim: "preferred_username"
+                prefixPolicy: Prefix
+                prefix:
+                  prefixString: "myoidc:"
+      expectedError: "discoveryURL must be different from issuerURL"
+    
+    - name: Valid RequiredClaim rule
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: Authentication
+        spec:
+          type: OIDC
+          oidcProviders:
+          - name: myoidc
+            issuer:
+              issuerURL: https://meh.tld
+              audiences: ['openshift-aud']
+            claimValidationRules:
+              - type: RequiredClaim
+                requiredClaim:
+                  claim: "role"
+                  requiredValue: "admin"
+            claimMappings:
+              username:
+                claim: "preferred_username"
+                prefixPolicy: Prefix
+                prefix:
+                  prefixString: "myoidc:"
+      expected: |
+        apiVersion: config.openshift.io/v1
+        kind: Authentication
+        spec:
+          type: OIDC
+          oidcProviders:
+          - name: myoidc
+            issuer:
+              issuerURL: https://meh.tld
+              audiences: ['openshift-aud']
+            claimValidationRules:
+              - type: RequiredClaim
+                requiredClaim:
+                  claim: "role"
+                  requiredValue: "admin"
+            claimMappings:
+              username:
+                claim: "preferred_username"
+                prefixPolicy: Prefix
+                prefix:
+                  prefixString: "myoidc:"
+
+    - name: Missing requiredClaim when type is RequiredClaim
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: Authentication
+        spec:
+          type: OIDC
+          oidcProviders:
+          - name: myoidc
+            issuer:
+              issuerURL: https://meh.tld
+              audiences: ['openshift-aud']
+            claimValidationRules:
+              - type: RequiredClaim
+            claimMappings:
+              username:
+                claim: "preferred_username"
+                prefixPolicy: Prefix
+                prefix:
+                  prefixString: "myoidc:"
+      expectedError: "requiredClaim must be set when type is 'RequiredClaim'"
+
+    - name: Valid claimValidationRules CEL expression configuration
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: Authentication
+        spec:
+          type: OIDC
+          oidcProviders:
+          - name: myoidc
+            issuer:
+              issuerURL: https://meh.tld
+              audiences: ['openshift-aud']
+            claimMappings:
+              username:
+                claim: "preferred_username"
+                prefixPolicy: Prefix
+                prefix:
+                  prefixString: "myoidc:"
+            claimValidationRules:
+              - type: CEL
+                cel:
+                  expression: "claims.email.endsWith('@example.com')"
+                  message: "email must be from example.com"
+      expected: |
+        apiVersion: config.openshift.io/v1
+        kind: Authentication
+        spec:
+          type: OIDC
+          oidcProviders:
+          - name: myoidc
+            issuer:
+              issuerURL: https://meh.tld
+              audiences: ['openshift-aud']
+            claimValidationRules:
+              - type: CEL
+                cel:
+                  expression: "claims.email.endsWith('@example.com')"
+                  message: "email must be from example.com"
+            claimMappings:
+              username:
+                claim: "preferred_username"
+                prefixPolicy: Prefix
+                prefix:
+                  prefixString: "myoidc:"
+
+    - name: Missing cel for claimValidationRules CEL type
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: Authentication
+        spec:
+          type: OIDC
+          oidcProviders:
+          - name: myoidc
+            issuer:
+              issuerURL: https://meh.tld
+              audiences: ['openshift-aud']
+            claimMappings:
+              username:
+                claim: "preferred_username"
+                prefixPolicy: Prefix
+                prefix:
+                  prefixString: "myoidc:"
+            claimValidationRules:
+              - type: CEL
+      expectedError: "cel must be set when type is 'CEL', and forbidden otherwise"
+
+    - name: Empty expression in the claimValidationRules CEL field
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: Authentication
+        spec:
+          type: OIDC
+          oidcProviders:
+          - name: myoidc
+            issuer:
+              issuerURL: https://meh.tld
+              audiences: ['openshift-aud']
+            claimMappings:
+              username:
+                claim: "preferred_username"
+                prefixPolicy: Prefix
+                prefix:
+                  prefixString: "myoidc:"
+            claimValidationRules:
+              - type: CEL
+                cel:
+                  expression: ""
+                  message: "must not be empty"
+      expectedError: "expression: Invalid value"
+
+    - name: Valid TokenUserValidationRule with expression and message
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: Authentication
+        spec:
+          type: OIDC
+          oidcProviders:
+            - name: myoidc
+              issuer:
+                issuerURL: https://meh.tld
+                audiences: ['openshift-aud']
+              claimMappings:
+                username:
+                  claim: "preferred_username"
+                  prefixPolicy: Prefix
+                  prefix:
+                    prefixString: "myoidc:"
+              userValidationRules:
+                - expression: "user.username.startsWith('admin')"
+                  message: "Only admin users are allowed"
+      expected: |
+        apiVersion: config.openshift.io/v1
+        kind: Authentication
+        spec:
+          type: OIDC
+          oidcProviders:
+            - name: myoidc
+              issuer:
+                issuerURL: https://meh.tld
+                audiences: ['openshift-aud']
+              claimMappings:
+                username:
+                  claim: "preferred_username"
+                  prefixPolicy: Prefix
+                  prefix:
+                    prefixString: "myoidc:"
+              userValidationRules:
+                - expression: "user.username.startsWith('admin')"
+                  message: "Only admin users are allowed"
+
+    - name: Missing expression in TokenUserValidationRule
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: Authentication
+        spec:
+          type: OIDC
+          oidcProviders:
+            - name: myoidc
+              issuer:
+                issuerURL: https://meh.tld
+                audiences: ['openshift-aud']
+              claimMappings:
+                username:
+                  claim: "preferred_username"
+                  prefixPolicy: Prefix
+                  prefix:
+                    prefixString: "myoidc:"
+              userValidationRules:
+                - message: "Should never reach here"
+      expectedError: "expression: Required value"
+
+    - name: Empty expression in TokenUserValidationRule
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: Authentication
+        spec:
+          type: OIDC
+          oidcProviders:
+            - name: myoidc
+              issuer:
+                issuerURL: https://meh.tld
+                audiences: ['openshift-aud']
+              claimMappings:
+                username:
+                  claim: "preferred_username"
+                  prefixPolicy: Prefix
+                  prefix:
+                    prefixString: "myoidc:"
+              userValidationRules:
+                - expression: ""
+                  message: "Empty expressions are invalid"
+      expectedError: "spec.oidcProviders[0].userValidationRules[0].expression: Invalid value: \"\": spec.oidcProviders[0].userValidationRules[0].expression in body should be at least 1 chars long"
+
+
+    - name: Invalid TokenUserValidationRule with expression only
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: Authentication
+        spec:
+          type: OIDC
+          oidcProviders:
+            - name: myoidc
+              issuer:
+                issuerURL: https://meh.tld
+                audiences: ['openshift-aud']
+              claimMappings:
+                username:
+                  claim: "preferred_username"
+                  prefixPolicy: Prefix
+                  prefix:
+                    prefixString: "myoidc:"
+              userValidationRules:
+                - expression: "user.username.startsWith('admin')"
+      expectedError: "message: Required value"

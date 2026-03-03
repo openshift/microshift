@@ -7,7 +7,7 @@ require (
 	github.com/coreos/go-systemd v0.0.0-20190321100706-95778dfbb74e // openshift-controller-manager
 	github.com/google/go-cmp v0.7.0
 	github.com/miekg/dns v1.1.63 // microshift
-	github.com/openshift/api v0.0.0-20251214014457-bfa868a22401
+	github.com/openshift/api v0.0.0
 	github.com/openshift/build-machinery-go v0.0.0-20251023084048-5d77c1a5e5af
 	github.com/openshift/client-go v0.0.0-20251205093018-96a6cbc1420c
 	github.com/openshift/library-go v0.0.0-20260121132910-dc3a1c884c04
@@ -223,6 +223,7 @@ require (
 
 replace (
 	github.com/onsi/ginkgo/v2 => github.com/openshift/onsi-ginkgo/v2 v2.6.1-0.20251001123353-fd5b1fb35db1 // from kubernetes
+	github.com/openshift/api => /home/eslutsky/dev/openshift/api // use local api with curves support
 	k8s.io/klog/v2 => ./deps/k8s.io/klog // deps clone github.com/kubernetes/klog from kubernetes
 	k8s.io/kubernetes => ./deps/github.com/openshift/kubernetes // deps copy
 	sigs.k8s.io/kube-storage-version-migrator => github.com/openshift/kubernetes-kube-storage-version-migrator v0.0.3-0.20260105155255-73b468abf83d // release kube-storage-version-migrator via kubernetes-kube-storage-version-migrator

@@ -1,0 +1,56 @@
+apiVersion: apiextensions.k8s.io/v1 # Hack because controller-gen complains if we don't have this
+name: "Image"
+crdName: images.config.openshift.io
+featureGates:
+- ImageStreamImportMode
+tests:
+  onCreate:
+    - name: Should be able to create a minimal Image config
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: Image
+        spec: {}
+      expected: |
+        apiVersion: config.openshift.io/v1
+        kind: Image
+        spec: {}
+    - name: Should be able to configure imageStreamImportMode to Legacy
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: Image
+        spec:
+          imageStreamImportMode: Legacy
+      expected: |
+        apiVersion: config.openshift.io/v1
+        kind: Image
+        spec:
+          imageStreamImportMode: Legacy
+    - name: Should be able to configure imageStreamImportMode to PreserveOriginal
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: Image
+        spec:
+          imageStreamImportMode: PreserveOriginal
+      expected: |
+        apiVersion: config.openshift.io/v1
+        kind: Image
+        spec:
+          imageStreamImportMode: PreserveOriginal
+    - name: Should not be able to configure imageStreamImportMode to a value other than Legacy or PreserveOriginal
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: Image
+        spec:
+          imageStreamImportMode: InvalidValue
+      expectedError: 'spec.imageStreamImportMode: Unsupported value: "InvalidValue": supported values: "", "Legacy", "PreserveOriginal"'
+    - name: Should be able to configure imageStreamImportMode to empty string
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: Image
+        spec:
+          imageStreamImportMode: ""
+      expected: |
+        apiVersion: config.openshift.io/v1
+        kind: Image
+        spec:
+          imageStreamImportMode: ""

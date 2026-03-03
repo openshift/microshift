@@ -1,0 +1,100 @@
+apiVersion: apiextensions.k8s.io/v1 # Hack because controller-gen complains if we don't have this
+name: "[TechPreview] PinnedImageSet"
+crdName: pinnedimagesets.machineconfiguration.openshift.io
+featureGates:
+- PinnedImages
+tests:
+  onCreate:
+    - name: Should be able to create a minimal PinnedImageSet
+      initial: |
+        apiVersion: machineconfiguration.openshift.io/v1alpha1
+        kind: PinnedImageSet
+        metadata:
+          name: test-pinnedimageset
+        spec:
+          pinnedImages:
+            - name: "example.io/my-project/image-v1.0_23@sha256:2c3ea52ac3a41c6d58e85977c3149413e3fa4b70eb2397426456863adbf43306"
+            - name: "example.com:5000/project/image@sha256:abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890"
+            - name: "example.com/image@sha256:abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890"
+            - name: "my-registry.local/project/my-image@sha256:1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"
+      expected: |
+        apiVersion: machineconfiguration.openshift.io/v1alpha1
+        kind: PinnedImageSet
+        metadata:
+          name: test-pinnedimageset
+        spec:
+          pinnedImages:
+            - name: "example.io/my-project/image-v1.0_23@sha256:2c3ea52ac3a41c6d58e85977c3149413e3fa4b70eb2397426456863adbf43306"
+            - name: "example.com:5000/project/image@sha256:abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890"
+            - name: "example.com/image@sha256:abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890"
+            - name: "my-registry.local/project/my-image@sha256:1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"
+    - name: Invalid image referenced by tag
+      initial: |
+        apiVersion: machineconfiguration.openshift.io/v1alpha1
+        kind: PinnedImageSet
+        metadata:
+          name: test-pinnedimageset
+        spec:
+          pinnedImages:
+            - name: "example.io/my-project/image-v1.0_23:latest"
+      expectedError: "Invalid value: \"string\": the OCI Image reference must end with a valid '@sha256:<digest>' suffix, where '<digest>' is 64 characters long"
+    - name: Invalid empty image
+      initial: |
+        apiVersion: machineconfiguration.openshift.io/v1alpha1
+        kind: PinnedImageSet
+        metadata:
+          name: test-pinnedimageset
+        spec:
+          pinnedImages:
+            - name: ""
+      expectedError: "Invalid value: \"\": spec.pinnedImages[0].name in body should be at least 1 chars long"
+    - name: Should reject a malformed SHA256 digest
+      initial: |
+        apiVersion: machineconfiguration.openshift.io/v1alpha1
+        kind: PinnedImageSet
+        metadata:
+          name: test-pinnedimageset-bad-digest length
+        spec:
+          pinnedImages:
+            - name: "example.io/bad-digest/image@sha256:12345"
+      expectedError: "Invalid value: \"string\": the OCI Image reference must end with a valid '@sha256:<digest>' suffix, where '<digest>' is 64 characters long"
+    - name: Should accept multiple images with different registries and namespaces
+      initial: |
+        apiVersion: machineconfiguration.openshift.io/v1alpha1
+        kind: PinnedImageSet
+        metadata:
+          name: test-pinnedimageset-multiple-registries
+        spec:
+          pinnedImages:
+            - name: "docker.io/project/name@sha256:1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"
+            - name: "quay.io/project/name@sha256:1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"
+      expected: |
+        apiVersion: machineconfiguration.openshift.io/v1alpha1
+        kind: PinnedImageSet
+        metadata:
+          name: test-pinnedimageset-multiple-registries
+        spec:
+          pinnedImages:
+            - name: "docker.io/project/name@sha256:1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"
+            - name: "quay.io/project/name@sha256:1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"
+    - name: Should reject images without a registry specified
+      initial: |
+        apiVersion: machineconfiguration.openshift.io/v1alpha1
+        kind: PinnedImageSet
+        metadata:
+          name: test-pinnedimageset-no-registry
+        spec:
+          pinnedImages:
+          - name: "my-project/image@sha256:abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890"
+      expectedError: "Invalid value: \"string\": the OCI Image name should follow the host[:port][/namespace]/name format, resembling a valid URL without the scheme"
+    - name: Should reject duplicate images
+      initial: |
+        apiVersion: machineconfiguration.openshift.io/v1alpha1
+        kind: PinnedImageSet
+        metadata:
+          name: test-pinnedimageset-duplicates
+        spec:
+          pinnedImages:
+          - name: "docker.io/project/name@sha256:1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"
+          - name: "docker.io/project/name@sha256:1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"
+      expectedError: "Duplicate value: map[string]interface {}{\"name\":\"docker.io/project/name@sha256:1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef\"}"

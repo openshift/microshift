@@ -1,0 +1,16 @@
+digraph "Local Certificate" {
+  // Node definitions.
+  9 [
+    label="certkeypair/kube-apiserver-to-kubelet-signer\n\nsecret/kube-apiserver-to-kubelet-signer -nopenshift-kube-apiserver-operator\n"
+    style=filled
+    fillcolor="#c7bfff"
+  ];
+  10 [
+    label="certkeypair/kube-apiserver-to-kubelet-client\n\nsecret/kubelet-client -nopenshift-kube-apiserver\n    secret/kubelet-client-2 -nopenshift-kube-apiserver\n    secret/kubelet-client-3 -nopenshift-kube-apiserver\n    secret/kubelet-client-4 -nopenshift-kube-apiserver\n    file:///etc/kubernetes/static-pod-resources/kube-apiserver-pod-2/secrets/kubelet-client/tls.crt/tls.crt,file:///etc/kubernetes/static-pod-resources/kube-apiserver-pod-2/secrets/kubelet-client/tls.crt/tls.key\n    file:///etc/kubernetes/static-pod-resources/kube-apiserver-pod-3/secrets/kubelet-client/tls.crt/tls.crt,file:///etc/kubernetes/static-pod-resources/kube-apiserver-pod-3/secrets/kubelet-client/tls.crt/tls.key\n    file:///etc/kubernetes/static-pod-resources/kube-apiserver-pod-4/secrets/kubelet-client/tls.crt/tls.crt,file:///etc/kubernetes/static-pod-resources/kube-apiserver-pod-4/secrets/kubelet-client/tls.crt/tls.key\n"
+    style=filled
+    fillcolor="#c8fbcd"
+  ];
+
+  // Edge definitions.
+  9 -> 10;
+}

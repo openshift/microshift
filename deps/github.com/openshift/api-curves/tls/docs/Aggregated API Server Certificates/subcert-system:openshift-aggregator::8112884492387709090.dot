@@ -1,0 +1,16 @@
+digraph "Local Certificate" {
+  // Node definitions.
+  0 [
+    label="certkeypair/aggregator-front-proxy-signer\n\nsecret/aggregator-client-signer -nopenshift-kube-apiserver-operator\n"
+    style=filled
+    fillcolor="#c7bfff"
+  ];
+  1 [
+    label="certkeypair/aggregator-front-proxy-client\n\nsecret/aggregator-client -nopenshift-kube-apiserver\n    file:///etc/kubernetes/static-pod-resources/kube-apiserver-certs/secrets/aggregator-client/tls.crt/tls.crt,file:///etc/kubernetes/static-pod-resources/kube-apiserver-certs/secrets/aggregator-client/tls.crt/tls.key\n"
+    style=filled
+    fillcolor="#c8fbcd"
+  ];
+
+  // Edge definitions.
+  0 -> 1;
+}

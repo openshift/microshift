@@ -1,0 +1,16 @@
+digraph "Local Certificate" {
+  // Node definitions.
+  1 [
+    label="certkeypair/service-serving-signer\n\nsecret/signing-key -nopenshift-service-ca\n"
+    style=filled
+    fillcolor="#c7bfff"
+  ];
+  12 [
+    label="certkeypair/scheduler.openshift-kube-scheduler.svc\n\nsecret/serving-cert -nopenshift-kube-scheduler\n    secret/serving-cert-2 -nopenshift-kube-scheduler\n    secret/serving-cert-3 -nopenshift-kube-scheduler\n    secret/serving-cert-4 -nopenshift-kube-scheduler\n    secret/serving-cert-5 -nopenshift-kube-scheduler\n    secret/serving-cert-6 -nopenshift-kube-scheduler\n    file:///etc/kubernetes/static-pod-resources/kube-scheduler-pod-3/secrets/serving-cert/tls.crt/tls.crt,file:///etc/kubernetes/static-pod-resources/kube-scheduler-pod-3/secrets/serving-cert/tls.crt/tls.key\n    file:///etc/kubernetes/static-pod-resources/kube-scheduler-pod-5/secrets/serving-cert/tls.crt/tls.crt,file:///etc/kubernetes/static-pod-resources/kube-scheduler-pod-5/secrets/serving-cert/tls.crt/tls.key\n    file:///etc/kubernetes/static-pod-resources/kube-scheduler-pod-6/secrets/serving-cert/tls.crt/tls.crt,file:///etc/kubernetes/static-pod-resources/kube-scheduler-pod-6/secrets/serving-cert/tls.crt/tls.key\n    file:///etc/kubernetes/static-pod-resources/kube-scheduler-pod-2/secrets/serving-cert/tls.crt/tls.crt,file:///etc/kubernetes/static-pod-resources/kube-scheduler-pod-2/secrets/serving-cert/tls.crt/tls.key\n    file:///etc/kubernetes/static-pod-resources/kube-scheduler-pod-4/secrets/serving-cert/tls.crt/tls.crt,file:///etc/kubernetes/static-pod-resources/kube-scheduler-pod-4/secrets/serving-cert/tls.crt/tls.key\n"
+    style=filled
+    fillcolor="#bdebfd"
+  ];
+
+  // Edge definitions.
+  1 -> 12;
+}

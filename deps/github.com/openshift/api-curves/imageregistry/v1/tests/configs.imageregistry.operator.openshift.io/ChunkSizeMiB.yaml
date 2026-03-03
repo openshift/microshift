@@ -1,0 +1,98 @@
+apiVersion: apiextensions.k8s.io/v1 # Hack because controller-gen complains if we don't have this
+name: "Config"
+crdName: configs.imageregistry.operator.openshift.io
+tests:
+  onCreate:
+    - name: Should be able to create a minimal Config
+      initial: |
+        apiVersion: imageregistry.operator.openshift.io/v1
+        kind: Config
+        spec:
+          replicas: 1
+      expected: |
+        apiVersion: imageregistry.operator.openshift.io/v1
+        kind: Config
+        spec:
+          logLevel: Normal
+          operatorLogLevel: Normal
+          replicas: 1
+    - name: Should be able to configure chunksizemib for storage s3
+      initial: |
+        apiVersion: imageregistry.operator.openshift.io/v1
+        kind: Config
+        spec:
+          replicas: 1
+          storage:
+            s3:
+              bucket: bucket-1
+              region: region-1
+              chunkSizeMiB: 10
+      expected: |
+        apiVersion: imageregistry.operator.openshift.io/v1
+        kind: Config
+        spec:
+          logLevel: Normal
+          operatorLogLevel: Normal
+          replicas: 1
+          storage:
+            s3:
+              bucket: bucket-1
+              region: region-1
+              chunkSizeMiB: 10
+    - name: Should be able to configure storage s3 without chunkSizeMiB
+      initial: |
+        apiVersion: imageregistry.operator.openshift.io/v1
+        kind: Config
+        spec:
+          replicas: 1
+          storage:
+            s3:
+              bucket: bucket-2
+              region: region-2
+      expected: |
+        apiVersion: imageregistry.operator.openshift.io/v1
+        kind: Config
+        spec:
+          logLevel: Normal
+          operatorLogLevel: Normal
+          replicas: 1
+          storage:
+            s3:
+              bucket: bucket-2
+              region: region-2
+    - name: Should reject configuration with value less than 5 in chunkSizeMiB for storage s3
+      initial: |
+        apiVersion: imageregistry.operator.openshift.io/v1
+        kind: Config
+        spec:
+          replicas: 1
+          storage:
+            s3:
+              bucket: bucket-2
+              region: region-2
+              chunkSizeMiB: 2
+      expectedError: "Invalid value: 2: spec.storage.s3.chunkSizeMiB in body should be greater than or equal to 5"
+    - name: Should reject configuration with value more than 5120 in chunkSizeMiB for storage s3
+      initial: |
+        apiVersion: imageregistry.operator.openshift.io/v1
+        kind: Config
+        spec:
+          replicas: 1
+          storage:
+            s3:
+              bucket: bucket-3
+              region: region-3
+              chunkSizeMiB: 6000
+      expectedError: "Invalid value: 6000: spec.storage.s3.chunkSizeMiB in body should be less than or equal to 5120"
+    - name: Should reject configuration with decimal value in chunkSizeMiB for storage s3
+      initial: |
+        apiVersion: imageregistry.operator.openshift.io/v1
+        kind: Config
+        spec:
+          replicas: 1
+          storage:
+            s3:
+              bucket: bucket-4
+              region: region-4
+              chunkSizeMiB: 19.5
+      expectedError: "Invalid value: \"number\": spec.storage.s3.chunkSizeMiB in body must be of type integer: \"number\""

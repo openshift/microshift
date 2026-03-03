@@ -1,0 +1,130 @@
+apiVersion: apiextensions.k8s.io/v1 # Hack because controller-gen complains if we don't have this
+name: "Authentication"
+crdName: authentications.operator.openshift.io
+tests:
+  onCreate:
+    - name: Should be able to create a minimal Authentication
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: Authentication
+        spec: {} # No spec is required for a Authentication
+      expected: |
+        apiVersion: operator.openshift.io/v1
+        kind: Authentication
+        spec:
+          logLevel: Normal
+          operatorLogLevel: Normal
+  onUpdate:
+    - name: Can add latest revision after creation
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: Authentication
+        metadata:
+          name: cluster
+        spec:
+          logLevel: Normal
+          operatorLogLevel: Normal
+      updated: |
+        apiVersion: operator.openshift.io/v1
+        kind: Authentication
+        metadata:
+         name: cluster
+        spec:
+          logLevel: Normal
+          operatorLogLevel: Normal
+        status:
+          latestAvailableRevision: 0
+      expected: |
+        apiVersion: operator.openshift.io/v1
+        kind: Authentication
+        metadata:
+         name: cluster
+        spec:
+          logLevel: Normal
+          operatorLogLevel: Normal
+        status:
+          latestAvailableRevision: 0
+    - name: Can update latestRevision to the same value
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: Authentication
+        metadata:
+          name: cluster
+        spec:
+          logLevel: Normal
+          operatorLogLevel: Normal
+        status:
+          latestAvailableRevision: 6
+      updated: |
+        apiVersion: operator.openshift.io/v1
+        kind: Authentication
+        metadata:
+         name: cluster
+        spec:
+          logLevel: Normal
+          operatorLogLevel: Normal
+        status:
+          latestAvailableRevision: 6
+      expected: |
+        apiVersion: operator.openshift.io/v1
+        kind: Authentication
+        metadata:
+         name: cluster
+        spec:
+          logLevel: Normal
+          operatorLogLevel: Normal
+        status:
+          latestAvailableRevision: 6
+    - name: Can increase latestRevision
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: Authentication
+        metadata:
+          name: cluster
+        spec:
+          logLevel: Normal
+          operatorLogLevel: Normal
+        status:
+          latestAvailableRevision: 6
+      updated: |
+        apiVersion: operator.openshift.io/v1
+        kind: Authentication
+        metadata:
+         name: cluster
+        spec:
+          logLevel: Normal
+          operatorLogLevel: Normal
+        status:
+          latestAvailableRevision: 16
+      expected: |
+        apiVersion: operator.openshift.io/v1
+        kind: Authentication
+        metadata:
+         name: cluster
+        spec:
+          logLevel: Normal
+          operatorLogLevel: Normal
+        status:
+          latestAvailableRevision: 16
+    - name: Cannot decrease latestRevision
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: Authentication
+        metadata:
+          name: cluster
+        spec:
+          logLevel: Normal
+          operatorLogLevel: Normal
+        status:
+          latestAvailableRevision: 6
+      updated: |
+        apiVersion: operator.openshift.io/v1
+        kind: Authentication
+        metadata:
+         name: cluster
+        spec:
+          logLevel: Normal
+          operatorLogLevel: Normal
+        status:
+          latestAvailableRevision: 5
+      expectedStatusError: must only increase

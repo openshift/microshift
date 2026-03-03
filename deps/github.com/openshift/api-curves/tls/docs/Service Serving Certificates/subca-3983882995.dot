@@ -1,0 +1,16 @@
+digraph "Local Certificate" {
+  // Node definitions.
+  1 [
+    label="certkeypair/service-serving-signer\n\nsecret/signing-key -nopenshift-service-ca\n"
+    style=filled
+    fillcolor="#c7bfff"
+  ];
+  57 [
+    label="cabundle/service-ca\n\nconfigmaps/service-ca -nopenshift-config-managed\n    configmaps/service-ca -nopenshift-kube-controller-manager\n    configmaps/service-ca-2 -nopenshift-kube-controller-manager\n    configmaps/service-ca-3 -nopenshift-kube-controller-manager\n    configmaps/service-ca-4 -nopenshift-kube-controller-manager\n    configmaps/service-ca-5 -nopenshift-kube-controller-manager\n    configmaps/service-ca-6 -nopenshift-kube-controller-manager\n    configmaps/service-ca-7 -nopenshift-kube-controller-manager\n    configmaps/signing-cabundle -nopenshift-service-ca\n    file:///etc/kubernetes/static-pod-resources/kube-controller-manager-pod-3/configmaps/service-ca/ca-bundle.crt/ca-bundle.crt\n    file:///etc/kubernetes/static-pod-resources/kube-controller-manager-pod-4/configmaps/service-ca/ca-bundle.crt/ca-bundle.crt\n    file:///etc/kubernetes/static-pod-resources/kube-controller-manager-pod-5/configmaps/service-ca/ca-bundle.crt/ca-bundle.crt\n    file:///etc/kubernetes/static-pod-resources/kube-controller-manager-pod-6/configmaps/service-ca/ca-bundle.crt/ca-bundle.crt\n    file:///etc/kubernetes/static-pod-resources/kube-controller-manager-pod-7/configmaps/service-ca/ca-bundle.crt/ca-bundle.crt\n"
+    style=filled
+    fillcolor="#fda172"
+  ];
+
+  // Edge definitions.
+  1 -> 57;
+}

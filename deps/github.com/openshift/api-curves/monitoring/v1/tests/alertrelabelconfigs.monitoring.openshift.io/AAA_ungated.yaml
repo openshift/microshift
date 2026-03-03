@@ -1,0 +1,147 @@
+apiVersion: apiextensions.k8s.io/v1 # Hack because controller-gen complains if we don't have this
+name: "AlertRelabelConfig"
+crdName: alertrelabelconfigs.monitoring.openshift.io
+tests:
+  onCreate:
+    - name: Should be able to create a minimal AlertRelabelConfig
+      initial: |
+        apiVersion: monitoring.openshift.io/v1
+        kind: AlertRelabelConfig
+        spec:
+          configs:
+          - sourceLabels:
+              - foo
+            targetLabel: bar
+            replacement: '$1'
+      expected: |
+        apiVersion: monitoring.openshift.io/v1
+        kind: AlertRelabelConfig
+        spec:
+          configs:
+          - action: Replace
+            sourceLabels:
+              - foo
+            targetLabel: bar
+            replacement: '$1'
+            regex: '(.*)'
+    - name: Action Replace requires sourceLabels
+      initial: |
+        apiVersion: monitoring.openshift.io/v1
+        kind: AlertRelabelConfig
+        spec:
+          configs:
+          - action: Replace
+            targetLabel: bar
+      expectedError: "Invalid value: \"object\": sourceLabels is required for actions Replace, Keep, Drop, HashMod and LabelMap"
+    - name: Action Keep requires sourceLabels
+      initial: |
+        apiVersion: monitoring.openshift.io/v1
+        kind: AlertRelabelConfig
+        spec:
+          configs:
+          - action: Keep
+            targetLabel: bar
+      expectedError: "Invalid value: \"object\": sourceLabels is required for actions Replace, Keep, Drop, HashMod and LabelMap"
+    - name: Action Drop requires sourceLabels
+      initial: |
+        apiVersion: monitoring.openshift.io/v1
+        kind: AlertRelabelConfig
+        spec:
+          configs:
+          - action: Drop
+            targetLabel: bar
+      expectedError: "Invalid value: \"object\": sourceLabels is required for actions Replace, Keep, Drop, HashMod and LabelMap"
+    - name: Action HashMod requires sourceLabels
+      initial: |
+        apiVersion: monitoring.openshift.io/v1
+        kind: AlertRelabelConfig
+        spec:
+          configs:
+          - action: HashMod
+            targetLabel: bar
+      expectedError: "Invalid value: \"object\": sourceLabels is required for actions Replace, Keep, Drop, HashMod and LabelMap"
+    - name: Action LabelMap requires sourceLabels
+      initial: |
+        apiVersion: monitoring.openshift.io/v1
+        kind: AlertRelabelConfig
+        spec:
+          configs:
+          - action: LabelMap
+            targetLabel: bar
+      expectedError: "Invalid value: \"object\": sourceLabels is required for actions Replace, Keep, Drop, HashMod and LabelMap"
+    - name: Field modulus requires sourceLabels
+      initial: |
+        apiVersion: monitoring.openshift.io/v1
+        kind: AlertRelabelConfig
+        spec:
+          configs:
+          - action: HashMod
+            targetLabel: bar
+            modulus: 3
+      expectedError: "[spec.configs[0]: Invalid value: \"object\": no such key: sourceLabels evaluating rule: modulus requires sourceLabels to be present, spec.configs[0]: Invalid value: \"object\": sourceLabels is required for actions Replace, Keep, Drop, HashMod and LabelMap]"
+    - name: Action Replace requires targetLabel
+      initial: |
+        apiVersion: monitoring.openshift.io/v1
+        kind: AlertRelabelConfig
+        spec:
+          configs:
+          - sourceLabels:
+              - foo
+      expectedError: "spec.configs[0]: Invalid value: \"object\": targetLabel is required when action is Replace or HashMod"
+    - name: Action HashMod requires targetLabel
+      initial: |
+        apiVersion: monitoring.openshift.io/v1
+        kind: AlertRelabelConfig
+        spec:
+          configs:
+          - sourceLabels:
+              - foo
+            action: HashMod
+            modulus: 3
+      expectedError: "spec.configs[0]: Invalid value: \"object\": targetLabel is required when action is Replace or HashMod"
+    - name: Action LabelKeep only allows regex
+      initial: |
+        apiVersion: monitoring.openshift.io/v1
+        kind: AlertRelabelConfig
+        spec:
+          configs:
+          - sourceLabels:
+              - foo
+            action: LabelKeep
+      expectedError: "spec.configs[0]: Invalid value: \"object\": LabelKeep and LabelDrop actions require only 'regex', and no other fields (found sourceLabels)"
+    - name: Action LabelKeep only allows regex not sourceLabels
+      initial: |
+        apiVersion: monitoring.openshift.io/v1
+        kind: AlertRelabelConfig
+        spec:
+          configs:
+          - action: LabelKeep
+            targetLabel: foo
+      expectedError: "spec.configs[0]: Invalid value: \"object\": LabelKeep and LabelDrop actions require only 'regex', and no other fields (found targetLabel)"
+    - name: Action LabelKeep only allows regex not targetLabel
+      initial: |
+        apiVersion: monitoring.openshift.io/v1
+        kind: AlertRelabelConfig
+        spec:
+          configs:
+          - action: LabelKeep
+            modulus: 3
+      expectedError: "spec.configs[0]: Invalid value: \"object\": LabelKeep and LabelDrop actions require only 'regex', and no other fields (found modulus)"
+    - name: Action LabelKeep only allows regex not separator
+      initial: |
+        apiVersion: monitoring.openshift.io/v1
+        kind: AlertRelabelConfig
+        spec:
+          configs:
+          - action: LabelKeep
+            separator: ;
+      expectedError: "spec.configs[0]: Invalid value: \"object\": LabelKeep and LabelDrop actions require only 'regex', and no other fields (found separator)"
+    - name: Action LabelKeep only allows regex not replacement
+      initial: |
+        apiVersion: monitoring.openshift.io/v1
+        kind: AlertRelabelConfig
+        spec:
+          configs:
+          - action: LabelKeep
+            replacement: foo
+      expectedError: "spec.configs[0]: Invalid value: \"object\": LabelKeep and LabelDrop actions require only 'regex', and no other fields (found replacement)"

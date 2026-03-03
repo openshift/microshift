@@ -1,0 +1,16 @@
+compatibility:
+  disabled: false
+deepcopy:
+  disabled: false
+  headerFilePath: ../hack/empty.txt
+  outputFileBaseName: zz_generated.deepcopy.go
+schemacheck:
+  disabled: false
+  enabledValidators: []
+  disabledValidators: []
+schemapatch:
+swaggerdocs:
+  disabled: false
+  commentPolicy: Warn
+  outputFileName: zz_generated.swagger_doc_generated.go
+manifestMerge:

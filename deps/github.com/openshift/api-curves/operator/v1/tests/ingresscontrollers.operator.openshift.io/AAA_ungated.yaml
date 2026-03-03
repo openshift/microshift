@@ -1,0 +1,832 @@
+apiVersion: apiextensions.k8s.io/v1 # Hack because controller-gen complains if we don't have this
+name: "IngressController"
+crdName: ingresscontrollers.operator.openshift.io
+tests:
+  onCreate:
+    - name: Should be able to create a minimal IngressController
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        spec: {} # No spec is required for a IngressController
+      expected: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        spec:
+          httpEmptyRequestsPolicy: Respond
+          idleConnectionTerminationPolicy: Immediate
+          closedClientConnectionPolicy: Continue
+    - name: Should be able to create an IngressController with valid Actions
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        spec:
+          httpHeaders:
+            actions:
+              response:
+              - name: X-Frame-Options
+                action:
+                  type: Set
+                  set:
+                    value: DENY
+              - name: X-Cache-Info
+                action:
+                  type: Set
+                  set:
+                    value: "not cacheable; meta data too large"            
+              - name: X-XSS-Protection
+                action:
+                  type: Delete
+              - name: X-Source
+                action:
+                  type: Set
+                  set:
+                    value: "%[res.hdr(X-Value),lower]"       
+              request:
+              - name: Content-Location
+                action:
+                  type: Set
+                  set:
+                    value: /my-first-blog-post
+              - name: X-SSL-Client-Cert 
+                action:
+                  type: Set
+                  set:
+                    value: "%{+Q}[ssl_c_der,base64]"
+              - name:   Content-Language
+                action:
+                  type: Delete
+              - name: X-Target
+                action:
+                  type: Set
+                  set:
+                    value: "%[req.hdr(host),lower]"
+              - name: X-Conditional
+                action:
+                  type: Set
+                  set:
+                    value: "%[req.hdr(Host)] if foo"
+              - name: X-Condition
+                action:
+                  type: Set
+                  set:
+                    value: "%[req.hdr(Host)]\ if\ foo"
+      expected: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        spec:
+          httpEmptyRequestsPolicy: Respond
+          idleConnectionTerminationPolicy: Immediate
+          closedClientConnectionPolicy: Continue
+          httpHeaders:
+            actions:
+              response:
+              - name: X-Frame-Options
+                action:
+                  type: Set
+                  set:
+                    value: DENY
+              - name: X-Cache-Info
+                action:
+                  type: Set
+                  set:
+                    value: "not cacheable; meta data too large"          
+              - name: X-XSS-Protection
+                action:
+                  type: Delete
+              - name: X-Source
+                action:
+                  type: Set
+                  set:
+                    value: "%[res.hdr(X-Value),lower]"       
+              request:
+              - name: Content-Location
+                action:
+                  type: Set
+                  set:
+                    value: /my-first-blog-post
+              - name: X-SSL-Client-Cert 
+                action:
+                  type: Set
+                  set:
+                    value: "%{+Q}[ssl_c_der,base64]"
+              - name:   Content-Language
+                action:
+                  type: Delete
+              - name: X-Target
+                action:
+                  type: Set
+                  set:
+                    value: "%[req.hdr(host),lower]"
+              - name: X-Conditional
+                action:
+                  type: Set
+                  set:
+                    value: "%[req.hdr(Host)] if foo"
+              - name: X-Condition
+                action:
+                  type: Set
+                  set:
+                    value: "%[req.hdr(Host)]\ if\ foo"
+    - name: Should not allow to set/delete HSTS header.
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        metadata:
+          name: default-hsts
+          namespace: openshift-ingress-operator
+        spec:
+          httpHeaders:
+            actions:
+              response:
+              - name: X-Frame-Options
+                action:
+                  type: Set
+                  set:
+                    value: DENY
+              - name: Strict-Transport-Security
+                action:
+                  type: Delete
+              request:
+              - name: Content-Location
+                action:
+                  type: Set
+                  set:
+                    value: /my-first-blog-post
+              - name:   Content-Language
+                action:
+                  type: Delete
+      expectedError: "strict-transport-security header may not be modified via header actions"
+    - name: Should not allow to set/delete Proxy header.
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        metadata:
+          name: default-hsts
+          namespace: openshift-ingress-operator
+        spec:
+          httpHeaders:
+            actions:
+              response:
+              - name: X-Frame-Options
+                action:
+                  type: Set
+                  set:
+                    value: DENY
+              request:
+              - name: Proxy
+                action:
+                  type: Set
+                  set:
+                    value: example.xyz      
+              - name: Content-Location
+                action:
+                  type: Set
+                  set:
+                    value: /my-first-blog-post
+              - name:   Content-Language
+                action:
+                  type: Delete
+      expectedError: "proxy header may not be modified via header actions"
+    - name: Should not allow to set/delete Host header.
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        metadata:
+          name: default-hsts
+          namespace: openshift-ingress-operator
+        spec:
+          httpHeaders:
+            actions:
+              response:
+              - name: X-Frame-Options
+                action:
+                  type: Set
+                  set:
+                    value: DENY
+              request:
+              - name: Host
+                action:
+                  type: Set
+                  set:
+                    value: example.xyz      
+              - name: Content-Location
+                action:
+                  type: Set
+                  set:
+                    value: /my-first-blog-post
+              - name:   Content-Language
+                action:
+                  type: Delete
+      expectedError: "host header may not be modified via header actions"
+    - name: Should not allow to set/delete cookie header.
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        metadata:
+          name: default-hsts
+          namespace: openshift-ingress-operator
+        spec:
+          httpHeaders:
+            actions:
+              response:
+              - name: X-Frame-Options
+                action:
+                  type: Set
+                  set:
+                    value: DENY
+              request:
+              - name: Cookie
+                action:
+                  type: Set
+                  set:
+                    value: "PHPSESSID=298zf09hf012fh2; csrftoken=u32t4o3tb3gg43; _gat=1"      
+              - name: Content-Location
+                action:
+                  type: Set
+                  set:
+                    value: /my-first-blog-post
+              - name:   Content-Language
+                action:
+                  type: Delete
+      expectedError: "cookie header may not be modified via header actions"
+    - name: Should not allow to set/delete set-cookie header.
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        metadata:
+          name: default-hsts
+          namespace: openshift-ingress-operator
+        spec:
+          httpHeaders:
+            actions:
+              response:
+              - name: Set-Cookie
+                action:
+                  type: Set
+                  set:
+                    value: "sessionId=e8bb43229de9; Domain=foo.example.com"
+              request:    
+              - name: Content-Location
+                action:
+                  type: Set
+                  set:
+                    value: /my-first-blog-post
+              - name:   Content-Language
+                action:
+                  type: Delete
+      expectedError: "set-cookie header may not be modified via header actions"
+    - name: Should not allow to set/delete dynamic headers with unclosed braces.
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        metadata:
+          name: default-unclosed-braces
+          namespace: openshift-ingress-operator
+        spec:
+          httpHeaders:
+            actions:
+              request:
+              - name: Content-Location
+                action:
+                  type: Set
+                  set:
+                    value: /my-first-blog-post
+              - name:   Content-Language
+                action:
+                  type: Delete
+              - name: expires
+                action:
+                  type: Set
+                  set:
+                    value: "%[req.hdr(host),lower"
+      expectedError: "Either the header value provided is not in correct format or the sample fetcher/converter specified is not allowed. The dynamic header value will be interpreted as an HAProxy format string as defined in http://cbonte.github.io/haproxy-dconv/2.6/configuration.html#8.2.6 and may use HAProxy's %[] syntax and otherwise must be a valid HTTP header value as defined in https://datatracker.ietf.org/doc/html/rfc7230#section-3.2. Sample fetchers allowed are req.hdr, ssl_c_der. Converters allowed are lower, base64."
+    - name: Should not allow to set dynamic response header values with not allowed sample fetchers.
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        metadata:
+          name: default-not-allowed-values
+          namespace: openshift-ingress-operator
+        spec:
+          httpHeaders:
+            actions:
+              response:
+              - name: X-Frame-Options
+                action:
+                  type: Set
+                  set:
+                    value: DENY      
+              - name: X-Target 
+                action:
+                  type: Set
+                  set:
+                    value: "%[req.hdrs(host),lower]"
+      expectedError: "Either the header value provided is not in correct format or the sample fetcher/converter specified is not allowed. The dynamic header value will be interpreted as an HAProxy format string as defined in http://cbonte.github.io/haproxy-dconv/2.6/configuration.html#8.2.6 and may use HAProxy's %[] syntax and otherwise must be a valid HTTP header value as defined in https://datatracker.ietf.org/doc/html/rfc7230#section-3.2. Sample fetchers allowed are res.hdr, ssl_c_der. Converters allowed are lower, base64."
+    - name: Should not allow empty value in response.
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        metadata:
+          name: default-not-allowed-values
+          namespace: openshift-ingress-operator
+        spec:
+          httpHeaders:
+            actions:
+              response:
+              - name: X-Frame-Options
+                action:
+                  type: Set
+                  set:
+                    value:
+      expectedError: 'IngressController.operator.openshift.io "default-not-allowed-values" is invalid: [spec.httpHeaders.actions.response[0].action.set.value: Required value, <nil>: Invalid value: "null": some validation rules were not checked because the object was invalid; correct the existing errors to complete validation]'
+    - name: Should not allow empty value in request.
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        metadata:
+          name: default-not-allowed-values
+          namespace: openshift-ingress-operator
+        spec:
+          httpHeaders:
+            actions:
+              request:
+              - name: X-Frame-Options
+                action:
+                  type: Set
+                  set:
+                    value:
+      expectedError: 'IngressController.operator.openshift.io "default-not-allowed-values" is invalid: [spec.httpHeaders.actions.request[0].action.set.value: Required value, <nil>: Invalid value: "null": some validation rules were not checked because the object was invalid; correct the existing errors to complete validation]'
+    - name: Should not allow to set dynamic response header values with not allowed converters.
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        metadata:
+          name: default-not-allowed-values
+          namespace: openshift-ingress-operator
+        spec:
+          httpHeaders:
+            actions:
+              response:
+              - name: X-Frame-Options
+                action:
+                  type: Set
+                  set:
+                    value: DENY      
+              - name: X-Source 
+                action:
+                  type: Set
+                  set:
+                    value: "%{+Q}[ssl_c_der,bogus]"
+      expectedError: "Either the header value provided is not in correct format or the sample fetcher/converter specified is not allowed. The dynamic header value will be interpreted as an HAProxy format string as defined in http://cbonte.github.io/haproxy-dconv/2.6/configuration.html#8.2.6 and may use HAProxy's %[] syntax and otherwise must be a valid HTTP header value as defined in https://datatracker.ietf.org/doc/html/rfc7230#section-3.2. Sample fetchers allowed are res.hdr, ssl_c_der. Converters allowed are lower, base64."
+    - name: Should not allow to set dynamic request header values containing sample fetcher res.hdr.
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        metadata:
+          name: default-not-allowed-values
+          namespace: openshift-ingress-operator
+        spec:
+          httpHeaders:
+            actions:
+              request:    
+              - name: X-Target 
+                action:
+                  type: Set
+                  set:
+                    value: "%[res.hdr(X-Value),lower]"
+      expectedError: "Either the header value provided is not in correct format or the sample fetcher/converter specified is not allowed. The dynamic header value will be interpreted as an HAProxy format string as defined in http://cbonte.github.io/haproxy-dconv/2.6/configuration.html#8.2.6 and may use HAProxy's %[] syntax and otherwise must be a valid HTTP header value as defined in https://datatracker.ietf.org/doc/html/rfc7230#section-3.2. Sample fetchers allowed are req.hdr, ssl_c_der. Converters allowed are lower, base64."
+    - name: Should not allow to set dynamic response headers value containing sample fetcher req.hdr.
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        metadata:
+          name: default-not-allowed-values
+          namespace: openshift-ingress-operator
+        spec:
+          httpHeaders:
+            actions:
+              response:    
+              - name: X-Source 
+                action:
+                  type: Set
+                  set:
+                    value: "%[req.hdr(host),lower]"
+      expectedError: "Either the header value provided is not in correct format or the sample fetcher/converter specified is not allowed. The dynamic header value will be interpreted as an HAProxy format string as defined in http://cbonte.github.io/haproxy-dconv/2.6/configuration.html#8.2.6 and may use HAProxy's %[] syntax and otherwise must be a valid HTTP header value as defined in https://datatracker.ietf.org/doc/html/rfc7230#section-3.2. Sample fetchers allowed are res.hdr, ssl_c_der. Converters allowed are lower, base64."
+    - name: Should not allow to set dynamic request header values with not allowed converters.
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        metadata:
+          name: default-not-allowed-values
+          namespace: openshift-ingress-operator
+        spec:
+          httpHeaders:
+            actions:          
+              request:
+              - name: X-SSL-Client-Cert 
+                action:
+                  type: Set
+                  set:
+                    value: "%{+Q}[ssl_c_der,hello]"
+              - name:   Content-Language
+                action:
+                  type: Delete
+      expectedError: "Either the header value provided is not in correct format or the sample fetcher/converter specified is not allowed. The dynamic header value will be interpreted as an HAProxy format string as defined in http://cbonte.github.io/haproxy-dconv/2.6/configuration.html#8.2.6 and may use HAProxy's %[] syntax and otherwise must be a valid HTTP header value as defined in https://datatracker.ietf.org/doc/html/rfc7230#section-3.2. Sample fetchers allowed are req.hdr, ssl_c_der. Converters allowed are lower, base64."
+    - name: Should not allow to set dynamic request header values with not allowed sample fetchers.
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        metadata:
+          name: default-not-allowed-values
+          namespace: openshift-ingress-operator
+        spec:
+          httpHeaders:
+            actions:          
+              request:
+              - name: X-SSL-Client-Cert 
+                action:
+                  type: Set
+                  set:
+                    value: "%{+Q}[ssl_c_der1234,base64]"
+              - name:   Content-Language
+                action:
+                  type: Delete
+      expectedError: "Either the header value provided is not in correct format or the sample fetcher/converter specified is not allowed. The dynamic header value will be interpreted as an HAProxy format string as defined in http://cbonte.github.io/haproxy-dconv/2.6/configuration.html#8.2.6 and may use HAProxy's %[] syntax and otherwise must be a valid HTTP header value as defined in https://datatracker.ietf.org/doc/html/rfc7230#section-3.2. Sample fetchers allowed are req.hdr, ssl_c_der. Converters allowed are lower, base64."
+    - name: Should be required to specify the set field when the discriminant type is Set.
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        spec:
+          httpHeaders:
+            actions:
+              response:
+              - name: X-Frame-Options
+                action:
+                  type: Set
+      expectedError: "set is required when type is Set, and forbidden otherwise"
+    - name: Should be able to add set field only when discriminant type is Set.
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        metadata: 
+          name: default-not-allowed-values
+          namespace: openshift-ingress-operator      
+        spec:
+          httpHeaders:
+            actions:
+              response:
+              - name: X-Frame-Options
+                action:
+                  set:
+                    value: DENY
+      expectedError: 'IngressController.operator.openshift.io "default-not-allowed-values" is invalid: [spec.httpHeaders.actions.response[0].action.type: Required value, <nil>: Invalid value: "null": some validation rules were not checked because the object was invalid; correct the existing errors to complete validation]'
+    - name: Should be able to create an IngressController with valid nominal connect timeout
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        metadata:
+          name: default
+          namespace: openshift-ingress-operator
+        spec:
+          tuningOptions:
+            connectTimeout: 10s
+      expected: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        metadata:
+          name: default
+          namespace: openshift-ingress-operator
+        spec:
+          httpEmptyRequestsPolicy: Respond
+          idleConnectionTerminationPolicy: Immediate
+          closedClientConnectionPolicy: Continue
+          tuningOptions:
+            connectTimeout: 10s
+    - name: Should be able to create an IngressController with valid composite connect timeout
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        metadata:
+          name: default
+          namespace: openshift-ingress-operator
+        spec:
+          tuningOptions:
+            connectTimeout: 100ms300μs
+      expected: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        metadata:
+          name: default
+          namespace: openshift-ingress-operator
+        spec:
+          httpEmptyRequestsPolicy: Respond
+          idleConnectionTerminationPolicy: Immediate
+          closedClientConnectionPolicy: Continue
+          tuningOptions:
+            connectTimeout: 100ms300μs
+    - name: Should be able to create an IngressController with valid fraction connect timeout
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        metadata:
+          name: default
+          namespace: openshift-ingress-operator
+        spec:
+          tuningOptions:
+            connectTimeout: 1.5m
+      expected: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        metadata:
+          name: default
+          namespace: openshift-ingress-operator
+        spec:
+          httpEmptyRequestsPolicy: Respond
+          idleConnectionTerminationPolicy: Immediate
+          closedClientConnectionPolicy: Continue
+          tuningOptions:
+            connectTimeout: 1.5m
+    - name: Should not be able to create an IngressController with invalid unit connect timeout
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        metadata:
+          name: default
+          namespace: openshift-ingress-operator
+        spec:
+          tuningOptions:
+            connectTimeout: 3d
+      expectedError: "IngressController.operator.openshift.io \"default\" is invalid: spec.tuningOptions.connectTimeout: Invalid value: \"3d\": spec.tuningOptions.connectTimeout in body should match '^(0|([0-9]+(\\.[0-9]+)?(ns|us|µs|μs|ms|s|m|h))+)$'"
+    - name: Should not be able to create an IngressController with invalid space connect timeout
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        metadata:
+          name: default
+          namespace: openshift-ingress-operator
+        spec:
+          tuningOptions:
+            connectTimeout: "4 s"
+      expectedError: "IngressController.operator.openshift.io \"default\" is invalid: spec.tuningOptions.connectTimeout: Invalid value: \"4 s\": spec.tuningOptions.connectTimeout in body should match '^(0|([0-9]+(\\.[0-9]+)?(ns|us|µs|μs|ms|s|m|h))+)$'"
+    - name: Should be able to create an IngressController with valid nominal httpKeepAlive timeout
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        metadata:
+          name: default
+          namespace: openshift-ingress-operator
+        spec:
+          tuningOptions:
+            httpKeepAliveTimeout: 10s
+      expected: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        metadata:
+          name: default
+          namespace: openshift-ingress-operator
+        spec:
+          httpEmptyRequestsPolicy: Respond
+          idleConnectionTerminationPolicy: Immediate
+          closedClientConnectionPolicy: Continue
+          tuningOptions:
+            httpKeepAliveTimeout: 10s
+    - name: Should be able to create an IngressController with valid composite httpKeepAlive timeout
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        metadata:
+          name: default
+          namespace: openshift-ingress-operator
+        spec:
+          tuningOptions:
+            httpKeepAliveTimeout: 100s300ms
+      expected: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        metadata:
+          name: default
+          namespace: openshift-ingress-operator
+        spec:
+          httpEmptyRequestsPolicy: Respond
+          idleConnectionTerminationPolicy: Immediate
+          closedClientConnectionPolicy: Continue
+          tuningOptions:
+            httpKeepAliveTimeout: 100s300ms
+    - name: Should be able to create an IngressController with valid fraction httpKeepAlive timeout
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        metadata:
+          name: default
+          namespace: openshift-ingress-operator
+        spec:
+          tuningOptions:
+            httpKeepAliveTimeout: 1.5m
+      expected: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        metadata:
+          name: default
+          namespace: openshift-ingress-operator
+        spec:
+          httpEmptyRequestsPolicy: Respond
+          idleConnectionTerminationPolicy: Immediate
+          closedClientConnectionPolicy: Continue
+          tuningOptions:
+            httpKeepAliveTimeout: 1.5m
+    - name: Should not be able to create an IngressController with invalid unit httpKeepAlive timeout
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        metadata:
+          name: default
+          namespace: openshift-ingress-operator
+        spec:
+          tuningOptions:
+            httpKeepAliveTimeout: 3d
+      expectedError: "IngressController.operator.openshift.io \"default\" is invalid: spec.tuningOptions.httpKeepAliveTimeout: Invalid value: \"string\": httpKeepAliveTimeout must be a valid duration string composed of an unsigned integer value, optionally followed by a decimal fraction and a unit suffix (ms, s, m)"
+    - name: Should not be able to create an IngressController with invalid space httpKeepAlive timeout
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        metadata:
+          name: default
+          namespace: openshift-ingress-operator
+        spec:
+          tuningOptions:
+            httpKeepAliveTimeout: "4 s"
+      expectedError: "IngressController.operator.openshift.io \"default\" is invalid: spec.tuningOptions.httpKeepAliveTimeout: Invalid value: \"string\": httpKeepAliveTimeout must be a valid duration string composed of an unsigned integer value, optionally followed by a decimal fraction and a unit suffix (ms, s, m)"
+    - name: Should not be able to create an IngressController with httpKeepAlive timeout too big
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        metadata:
+          name: default
+          namespace: openshift-ingress-operator
+        spec:
+          tuningOptions:
+            httpKeepAliveTimeout: 100m
+      expectedError: "IngressController.operator.openshift.io \"default\" is invalid: spec.tuningOptions.httpKeepAliveTimeout: Invalid value: \"string\": httpKeepAliveTimeout must be less than or equal to 15 minutes"
+    - name: Should not be able to create an IngressController with httpKeepAlive timeout too small
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        metadata:
+          name: default
+          namespace: openshift-ingress-operator
+        spec:
+          tuningOptions:
+            httpKeepAliveTimeout: 0.001ms
+      expectedError: "IngressController.operator.openshift.io \"default\" is invalid: spec.tuningOptions.httpKeepAliveTimeout: Invalid value: \"string\": httpKeepAliveTimeout must be greater than or equal to 1 millisecond"
+    - name: Should be able to create an IngressController with valid domain
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        metadata:
+          name: ic-spec-domain-test
+          namespace: openshift-ingress-operator
+        spec:
+          domain: "this-label-has-exactly-63-characters-validating-at-the-boundary.com"
+      expected: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        metadata:
+          name: ic-spec-domain-test
+          namespace: openshift-ingress-operator
+        spec:
+          httpEmptyRequestsPolicy: Respond
+          idleConnectionTerminationPolicy: Immediate
+          closedClientConnectionPolicy: Continue
+          domain: "this-label-has-exactly-63-characters-validating-at-the-boundary.com"
+    - name: Should not be able to create an IngressController with invalid domain
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        metadata:
+          name: ic-spec-domain-test
+          namespace: openshift-ingress-operator
+        spec:
+          domain: "*.foo.com"
+      expectedError: "domain must consist of lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character"
+    - name: Should not be able to create an IngressController with domain label exceeding 63 characters
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        metadata:
+          name: ic-spec-domain-test
+          namespace: openshift-ingress-operator
+        spec:
+          domain: "foo.this-label-exceeds-63-characters-for-the-purpose-of-testing-the-domain-validation.com"
+      expectedError: "each DNS label must not exceed 63 characters"
+    - name: Should not be able to create an IngressController with the domain exceeding 244 characters
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        metadata:
+          name: a
+          namespace: openshift-ingress-operator
+        spec:
+          domain: "this-domain.has-exactly-245-characters.for-the-purpose-of-testing.the-spec-domain-field-length-validation.it-exceeds-the-limit-set-on-the-spec-domain-field.by-one-character-to-test-the-error.message-from-this-validation.otherwise-it-is-valid.com"
+      expectedError: "Too long: may not be more than 244 bytes"
+    - name: Should not be able to create an IngressController with the combined canonical domain exceeding 253 characters
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        metadata:
+          name: ic-name-containing-exactly-40-characters
+          namespace: openshift-ingress-operator
+        spec:
+          domain: "this-domain.has-208-characters.which-on.its-own-would-not-exceed.the-limit-of-253-chars.but-combined-with-the-ingress-controller-name.with-40-chars.and-the-router-prefix.ends-up-as-a-too-long.canonical-domain"
+      expectedError: "The combined 'router-' + metadata.name + '.' + .spec.domain cannot exceed 253 characters"
+  onUpdate:
+    - name: Should be able to update invalid domain to a valid domain
+      initialCRDPatches:
+        - op: remove
+          path: /spec/versions/0/schema/openAPIV3Schema/properties/spec/properties/domain/x-kubernetes-validations
+        - op: remove
+          path: /spec/versions/0/schema/openAPIV3Schema/properties/spec/properties/domain/maxLength
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        metadata:
+          name: ic-spec-domain-test
+          namespace: openshift-ingress-operator
+        spec:
+          domain: "*.foo.com"
+      updated: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        metadata:
+          name: ic-spec-domain-test
+          namespace: openshift-ingress-operator
+        spec:
+          domain: "123-foo.com"
+      expected: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        metadata:
+          name: ic-spec-domain-test
+          namespace: openshift-ingress-operator
+        spec:
+          httpEmptyRequestsPolicy: Respond
+          idleConnectionTerminationPolicy: Immediate
+          closedClientConnectionPolicy: Continue
+          domain: "123-foo.com"
+    - name: Should not be able to update already invalid domain to another invalid domain
+      initialCRDPatches:
+        - op: remove
+          path: /spec/versions/0/schema/openAPIV3Schema/properties/spec/properties/domain/x-kubernetes-validations
+        - op: remove
+          path: /spec/versions/0/schema/openAPIV3Schema/properties/spec/properties/domain/maxLength
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        metadata:
+          name: ic-spec-domain-test
+          namespace: openshift-ingress-operator
+        spec:
+          domain: "*.foo.com"
+      updated: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        metadata:
+          name: ic-spec-domain-test
+          namespace: openshift-ingress-operator
+        spec:
+          domain: "foo.*.com"
+      expectedError: "domain must consist of lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character"
+    - name: Should be able to update other fields while retaining invalid domain due to ratcheting
+      initialCRDPatches:
+        - op: remove
+          path: /spec/versions/0/schema/openAPIV3Schema/properties/spec/properties/domain/x-kubernetes-validations
+        - op: remove
+          path: /spec/versions/0/schema/openAPIV3Schema/properties/spec/properties/domain/maxLength
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        metadata:
+          name: ic-spec-domain-test
+          namespace: openshift-ingress-operator
+        spec:
+          domain: "*.foo.com"
+      updated: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        metadata:
+          name: ic-spec-domain-test
+          namespace: openshift-ingress-operator
+        spec:
+          domain: "*.foo.com"
+          replicas: 3
+      expected: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        metadata:
+          name: ic-spec-domain-test
+          namespace: openshift-ingress-operator
+        spec:
+          httpEmptyRequestsPolicy: Respond
+          idleConnectionTerminationPolicy: Immediate
+          closedClientConnectionPolicy: Continue
+          domain: "*.foo.com"
+          replicas: 3

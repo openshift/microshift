@@ -1,0 +1,146 @@
+apiVersion: apiextensions.k8s.io/v1 # Hack because controller-gen complains if we don't have this
+name: "ContainerRuntimeConfig"
+crdName: containerruntimeconfigs.machineconfiguration.openshift.io
+tests:
+  onCreate:
+    - name: Should fail if set to empty string
+      initial: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: ContainerRuntimeConfig
+        spec:  
+          containerRuntimeConfig:
+            defaultRuntime: ""
+      expectedError: "spec.containerRuntimeConfig.defaultRuntime: Unsupported value: \"\": supported values: \"crun\", \"runc\""
+    - name: Should not fail if not set and other fields set
+      initial: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: ContainerRuntimeConfig
+        spec:  
+          containerRuntimeConfig:
+            logLevel: info
+      expected: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: ContainerRuntimeConfig
+        spec: 
+          containerRuntimeConfig:
+            logLevel: info
+    - name: Should fail if set to a number
+      initial: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: ContainerRuntimeConfig
+        spec:  
+          containerRuntimeConfig:
+            defaultRuntime: 1234
+      expectedError: "spec.containerRuntimeConfig.defaultRuntime: Invalid value: \"integer\": spec.containerRuntimeConfig.defaultRuntime in body must be of type string: \"integer\", spec.containerRuntimeConfig.defaultRuntime: Unsupported value: 1234: supported values: \"crun\", \"runc\""
+    - name: Should fail if set to a blank string
+      initial: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: ContainerRuntimeConfig
+        spec:  
+          containerRuntimeConfig:
+            defaultRuntime: "    "
+      expectedError: "Unsupported value: \"    \": supported values: \"crun\", \"runc\""
+    - name: Should fail if invalid ContainerRuntimeConfig is provided
+      initial: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: ContainerRuntimeConfig
+        spec:  
+          containerRuntimeConfig:
+            defaultRuntime: docker
+      expectedError: "Unsupported value: \"docker\": supported values: \"crun\", \"runc\""
+    - name: Should be able to set crun in ContainerRuntimeConfig
+      initial: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: ContainerRuntimeConfig
+        spec:  
+          containerRuntimeConfig:
+            defaultRuntime: crun
+      expected: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: ContainerRuntimeConfig
+        spec: 
+          containerRuntimeConfig:
+            defaultRuntime: crun
+    - name: Should be able to set runc in ContainerRuntimeConfig with other params
+      initial: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: ContainerRuntimeConfig
+        spec:  
+          containerRuntimeConfig:
+            defaultRuntime: runc
+            logLevel: info
+      expected: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: ContainerRuntimeConfig
+        spec: 
+          containerRuntimeConfig:
+            defaultRuntime: runc
+            logLevel: info
+  onUpdate:
+    - name: Case 1 - Change another field - Should be able to update other parameters with invalid defaultRuntime
+      initialCRDPatches:
+        - op: remove
+          path: /spec/versions/0/schema/openAPIV3Schema/properties/spec/properties/containerRuntimeConfig/properties/defaultRuntime/enum
+      initial: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: ContainerRuntimeConfig
+        spec:
+          containerRuntimeConfig:
+            defaultRuntime: docker
+            logLevel: fatal
+      updated: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: ContainerRuntimeConfig
+        spec:
+          containerRuntimeConfig:
+            defaultRuntime: docker
+            logLevel: info
+      expected: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: ContainerRuntimeConfig
+        spec:
+          containerRuntimeConfig:
+            defaultRuntime: docker
+            logLevel: info
+    - name: Case 2 - Remove the field - Should be able to update from invalid to removed
+      initialCRDPatches:
+        - op: remove
+          path: /spec/versions/0/schema/openAPIV3Schema/properties/spec/properties/containerRuntimeConfig/properties/defaultRuntime/enum
+      initial: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: ContainerRuntimeConfig
+        spec:
+          containerRuntimeConfig:
+            defaultRuntime: docker
+      updated: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: ContainerRuntimeConfig
+        spec:
+          containerRuntimeConfig: {}
+      expected: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: ContainerRuntimeConfig
+        spec:
+          containerRuntimeConfig: {}
+    - name: Case 3 - Update the field - Should be able to update from invalid to correct value
+      initialCRDPatches:
+        - op: remove
+          path: /spec/versions/0/schema/openAPIV3Schema/properties/spec/properties/containerRuntimeConfig/properties/defaultRuntime/enum
+      initial: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: ContainerRuntimeConfig
+        spec:
+          containerRuntimeConfig:
+            defaultRuntime: docker
+      updated: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: ContainerRuntimeConfig
+        spec:
+          containerRuntimeConfig:
+            defaultRuntime: runc
+      expected: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: ContainerRuntimeConfig
+        spec:
+          containerRuntimeConfig:
+            defaultRuntime: runc

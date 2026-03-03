@@ -1,0 +1,16 @@
+digraph "Local Certificate" {
+  // Node definitions.
+  0 [
+    label="certkeypair/system:etcd-peer:etcd-client::8953043022604429717\n\nsecret/etcd-peer-ci-ln-z2l4snt-f76d1-prqp5-master-0 -nopenshift-etcd\n    file:///etc/kubernetes/static-pod-resources/etcd-certs/secrets/etcd-all-peer/etcd-peer-ci-ln-z2l4snt-f76d1-prqp5-master-0.crt/etcd-peer-ci-ln-z2l4snt-f76d1-prqp5-master-0.crt,file:///etc/kubernetes/static-pod-resources/etcd-certs/secrets/etcd-all-peer/etcd-peer-ci-ln-z2l4snt-f76d1-prqp5-master-0.crt/etcd-peer-ci-ln-z2l4snt-f76d1-prqp5-master-0.key\n    file:///etc/kubernetes/static-pod-resources/etcd-pod-2/secrets/etcd-all-peer/etcd-peer-ci-ln-z2l4snt-f76d1-prqp5-master-0.crt/etcd-peer-ci-ln-z2l4snt-f76d1-prqp5-master-0.crt,file:///etc/kubernetes/static-pod-resources/etcd-pod-2/secrets/etcd-all-peer/etcd-peer-ci-ln-z2l4snt-f76d1-prqp5-master-0.crt/etcd-peer-ci-ln-z2l4snt-f76d1-prqp5-master-0.key\n    file:///etc/kubernetes/static-pod-resources/etcd-pod-3/secrets/etcd-all-peer/etcd-peer-ci-ln-z2l4snt-f76d1-prqp5-master-0.crt/etcd-peer-ci-ln-z2l4snt-f76d1-prqp5-master-0.crt,file:///etc/kubernetes/static-pod-resources/etcd-pod-3/secrets/etcd-all-peer/etcd-peer-ci-ln-z2l4snt-f76d1-prqp5-master-0.crt/etcd-peer-ci-ln-z2l4snt-f76d1-prqp5-master-0.key\n"
+    style=filled
+    fillcolor="#fffdb8"
+  ];
+  1 [
+    label="certkeypair/etcd-signer\n\nsecret/etcd-signer -nopenshift-config\n"
+    style=filled
+    fillcolor="#c7bfff"
+  ];
+
+  // Edge definitions.
+  1 -> 0;
+}

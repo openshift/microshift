@@ -1,0 +1,16 @@
+digraph "Local Certificate" {
+  // Node definitions.
+  0 [
+    label="certkeypair/etcd-metrics-for-master-ip-10-0-175-168.eu-central-1.compute.internal\n\nsecret/etcd-serving-metrics-ip-10-0-175-168.eu-central-1.compute.internal -nopenshift-etcd\n    file:///etc/kubernetes/static-pod-resources/etcd-certs/secrets/etcd-all-certs/etcd-serving-metrics-ip-10-0-175-168.eu-central-1.compute.internal.crt/etcd-serving-metrics-ip-10-0-175-168.eu-central-1.compute.internal.crt,file:///etc/kubernetes/static-pod-resources/etcd-certs/secrets/etcd-all-certs/etcd-serving-metrics-ip-10-0-175-168.eu-central-1.compute.internal.crt/etcd-serving-metrics-ip-10-0-175-168.eu-central-1.compute.internal.key\n    file:///etc/kubernetes/static-pod-resources/etcd-pod-2/secrets/etcd-all-certs/etcd-serving-metrics-ip-10-0-175-168.eu-central-1.compute.internal.crt/etcd-serving-metrics-ip-10-0-175-168.eu-central-1.compute.internal.crt,file:///etc/kubernetes/static-pod-resources/etcd-pod-2/secrets/etcd-all-certs/etcd-serving-metrics-ip-10-0-175-168.eu-central-1.compute.internal.crt/etcd-serving-metrics-ip-10-0-175-168.eu-central-1.compute.internal.key\n    file:///etc/kubernetes/static-pod-resources/etcd-pod-6/secrets/etcd-all-certs/etcd-serving-metrics-ip-10-0-175-168.eu-central-1.compute.internal.crt/etcd-serving-metrics-ip-10-0-175-168.eu-central-1.compute.internal.crt,file:///etc/kubernetes/static-pod-resources/etcd-pod-6/secrets/etcd-all-certs/etcd-serving-metrics-ip-10-0-175-168.eu-central-1.compute.internal.crt/etcd-serving-metrics-ip-10-0-175-168.eu-central-1.compute.internal.key\n    file:///etc/kubernetes/static-pod-resources/etcd-pod-7/secrets/etcd-all-certs/etcd-serving-metrics-ip-10-0-175-168.eu-central-1.compute.internal.crt/etcd-serving-metrics-ip-10-0-175-168.eu-central-1.compute.internal.crt,file:///etc/kubernetes/static-pod-resources/etcd-pod-7/secrets/etcd-all-certs/etcd-serving-metrics-ip-10-0-175-168.eu-central-1.compute.internal.crt/etcd-serving-metrics-ip-10-0-175-168.eu-central-1.compute.internal.key\n"
+    style=filled
+    fillcolor="#fffdb8"
+  ];
+  1 [
+    label="certkeypair/etcd-metric-signer::2553087888933531173\n\nsecret/etcd-metric-signer -nopenshift-config\n"
+    style=filled
+    fillcolor="#c7bfff"
+  ];
+
+  // Edge definitions.
+  1 -> 0;
+}

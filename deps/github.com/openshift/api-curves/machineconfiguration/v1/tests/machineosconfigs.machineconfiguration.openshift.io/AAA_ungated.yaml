@@ -1,0 +1,283 @@
+apiVersion: apiextensions.k8s.io/v1 # Hack because controller-gen complains if we don't have this
+name: "MachineOSConfig"
+crdName: machineosconfigs.machineconfiguration.openshift.io
+tests:
+  onCreate:
+    - name: Should be able to create a minimal MachineOSConfig
+      initial: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: MachineOSConfig
+        metadata:
+          name: worker
+        spec:
+          machineConfigPool:
+            name: worker
+          imageBuilder: 
+            imageBuilderType: Job
+          baseImagePullSecret:
+            name: foo
+          renderedImagePushSecret:
+            name: foo
+          renderedImagePushSpec: quay.io/mco/renderedImg:latest
+      expected: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: MachineOSConfig
+        metadata:
+          name: worker
+        spec:
+          machineConfigPool:
+            name: worker
+          imageBuilder: 
+            imageBuilderType: Job
+          baseImagePullSecret:
+            name: foo
+          renderedImagePushSecret:
+            name: foo
+          renderedImagePushSpec: quay.io/mco/renderedImg:latest
+    - name: Should be able to create a MachineOSConfig with a renderedImagePushSpec that contains a port
+      initial: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: MachineOSConfig
+        metadata:
+          name: worker
+        spec:
+          machineConfigPool:
+            name: worker
+          imageBuilder: 
+            imageBuilderType: Job
+          baseImagePullSecret:
+            name: foo
+          renderedImagePushSecret:
+            name: foo
+          renderedImagePushSpec: registry.test.example.local:5000/test/custom-os-image:v0.1
+      expected: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: MachineOSConfig
+        metadata:
+          name: worker
+        spec:
+          machineConfigPool:
+            name: worker
+          imageBuilder: 
+            imageBuilderType: Job
+          baseImagePullSecret:
+            name: foo
+          renderedImagePushSecret:
+            name: foo
+          renderedImagePushSpec: registry.test.example.local:5000/test/custom-os-image:v0.1
+    - name: Fail on invalid rendered image push spec
+      initial: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: MachineOSConfig
+        metadata:
+          name: worker
+        spec:
+          machineConfigPool:
+            name: worker
+          imageBuilder: 
+            imageBuilderType: Job
+          baseImagePullSecret:
+            name: foo
+          renderedImagePushSecret:
+            name: foo
+          renderedImagePushSpec: foo.bar
+      expectedError: "spec.renderedImagePushSpec: Invalid value: \"string\": the OCI Image name should follow the host[:port][/namespace]/name format, resembling a valid URL without the scheme. Or it must be a valid .svc followed by a port, repository, image name, and tag."
+    - name: Allows for an empty pull secret
+      initial: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: MachineOSConfig
+        metadata:
+          name: worker
+        spec:
+          machineConfigPool:
+            name: worker
+          imageBuilder: 
+            imageBuilderType: Job
+          renderedImagePushSecret:
+            name: foo
+          renderedImagePushSpec: quay.io/mco/renderedImg:latest
+      expected: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: MachineOSConfig
+        metadata:
+          name: worker
+        spec:
+          machineConfigPool:
+            name: worker
+          imageBuilder:
+            imageBuilderType: Job
+          renderedImagePushSecret:
+            name: foo
+          renderedImagePushSpec: quay.io/mco/renderedImg:latest
+    - name: Should succeed when MachineOSConfig name matches MachineConfigPool name
+      initial: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: MachineOSConfig
+        metadata:
+          name: worker
+        spec:
+          machineConfigPool:
+            name: worker
+          imageBuilder:
+            imageBuilderType: Job
+          renderedImagePushSecret:
+            name: foo
+          renderedImagePushSpec: quay.io/mco/renderedImg:latest
+      expected: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: MachineOSConfig
+        metadata:
+          name: worker
+        spec:
+          machineConfigPool:
+            name: worker
+          imageBuilder:
+            imageBuilderType: Job
+          renderedImagePushSecret:
+            name: foo
+          renderedImagePushSpec: quay.io/mco/renderedImg:latest
+    - name: Should fail when MachineOSConfig name does not match MachineConfigPool name
+      initial: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: MachineOSConfig
+        metadata:
+          name: different-name
+        spec:
+          machineConfigPool:
+            name: worker
+          imageBuilder:
+            imageBuilderType: Job
+          renderedImagePushSecret:
+            name: foo
+          renderedImagePushSpec: quay.io/mco/renderedImg:latest
+      expectedError: "MachineOSConfig name must match the referenced MachineConfigPool name; can only have one MachineOSConfig per MachineConfigPool"
+  onUpdate:
+    - name: Should allow changing other fields when a persisted value is no longer valid (mismatched names)
+      initialCRDPatches:
+      - op: remove
+        path: /spec/versions/0/schema/openAPIV3Schema/x-kubernetes-validations  # Remove the name matching validation
+      initial: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: MachineOSConfig
+        metadata:
+          name: different-name
+        spec:
+          machineConfigPool:
+            name: worker
+          imageBuilder:
+            imageBuilderType: Job
+          renderedImagePushSecret:
+            name: foo
+          renderedImagePushSpec: quay.io/mco/renderedImg:latest
+      updated: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: MachineOSConfig
+        metadata:
+          name: different-name
+        spec:
+          machineConfigPool:
+            name: worker
+          imageBuilder:
+            imageBuilderType: Job
+          renderedImagePushSecret:
+            name: foo
+          renderedImagePushSpec: quay.io/mco/renderedImg:v2.0
+          containerFile:
+          - containerfileArch: AMD64
+            content: |
+              FROM configs AS final
+              RUN rpm-ostree install tree && \
+                ostree container commit
+      expected: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: MachineOSConfig
+        metadata:
+          name: different-name
+        spec:
+          machineConfigPool:
+            name: worker
+          imageBuilder:
+            imageBuilderType: Job
+          renderedImagePushSecret:
+            name: foo
+          renderedImagePushSpec: quay.io/mco/renderedImg:v2.0
+          containerFile:
+          - containerfileArch: AMD64
+            content: |
+              FROM configs AS final
+              RUN rpm-ostree install tree && \
+                ostree container commit
+    - name: Should allow updating a persisted value that is no longer valid to a valid value (fix mismatched names)
+      initialCRDPatches:
+      - op: remove
+        path: /spec/versions/0/schema/openAPIV3Schema/x-kubernetes-validations  # Remove the name matching validation
+      initial: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: MachineOSConfig
+        metadata:
+          name: worker
+        spec:
+          machineConfigPool:
+            name: different-pool
+          imageBuilder:
+            imageBuilderType: Job
+          renderedImagePushSecret:
+            name: foo
+          renderedImagePushSpec: quay.io/mco/renderedImg:latest
+      updated: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: MachineOSConfig
+        metadata:
+          name: worker
+        spec:
+          machineConfigPool:
+            name: worker
+          imageBuilder:
+            imageBuilderType: Job
+          renderedImagePushSecret:
+            name: foo
+          renderedImagePushSpec: quay.io/mco/renderedImg:latest
+      expected: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: MachineOSConfig
+        metadata:
+          name: worker
+        spec:
+          machineConfigPool:
+            name: worker
+          imageBuilder:
+            imageBuilderType: Job
+          renderedImagePushSecret:
+            name: foo
+          renderedImagePushSpec: quay.io/mco/renderedImg:latest
+    - name: Should not allow updating a persisted value that is no longer valid to a still invalid value (different mismatched MCP names)
+      initialCRDPatches:
+      - op: remove
+        path: /spec/versions/0/schema/openAPIV3Schema/x-kubernetes-validations  # Remove the name matching validation
+      initial: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: MachineOSConfig
+        metadata:
+          name: different-name
+        spec:
+          machineConfigPool:
+            name: worker
+          imageBuilder:
+            imageBuilderType: Job
+          renderedImagePushSecret:
+            name: foo
+          renderedImagePushSpec: quay.io/mco/renderedImg:latest
+      updated: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: MachineOSConfig
+        metadata:
+          name: different-name
+        spec:
+          machineConfigPool:
+            name: worker-different
+          imageBuilder:
+            imageBuilderType: Job
+          renderedImagePushSecret:
+            name: foo
+          renderedImagePushSpec: quay.io/mco/renderedImg:latest
+      expectedError: "MachineOSConfig name must match the referenced MachineConfigPool name; can only have one MachineOSConfig per MachineConfigPool"

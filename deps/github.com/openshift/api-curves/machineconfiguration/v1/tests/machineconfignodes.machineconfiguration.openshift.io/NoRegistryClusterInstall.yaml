@@ -1,0 +1,87 @@
+apiVersion: apiextensions.k8s.io/v1 # Hack because controller-gen complains if we don't have this
+name: "[TechPreview] InternalReleaseImage"
+crdName: machineconfignodes.machineconfiguration.openshift.io
+featureGates:
+- MachineConfigNodes
+- NoRegistryClusterInstall
+tests:
+  onUpdate:
+    - name: Should be able to update a MachineConfigNode with a minimal internalReleaseImage status field.
+      initial: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: MachineConfigNode
+        metadata:
+          name: foobar
+        spec:
+          node:
+            name: foobar
+          pool:
+            name: master
+          configVersion:
+            desired: rendered-master-abc
+      updated: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: MachineConfigNode
+        metadata:
+          name: foobar
+        spec:
+          node:
+            name: foobar
+          pool:
+            name: master
+          configVersion:
+            desired: rendered-master-abc
+        status:
+          internalReleaseImage:
+            releases:
+              - name: ocp-release-bundle-4.18.0-x86_64
+                image: example.com/example/openshift-release-dev@sha256:d98795f7932441b30bb8bcfbbf05912875383fad1f2b3be08a22ec148d68607f
+                conditions:
+                  - type: Mounted
+                    status: "False" 
+                    reason: "Mounted"
+                    message: ""
+                    lastTransitionTime: "2024-12-01T08:04:21Z"
+                  - type: Available
+                    status: "True"               
+                    reason: "Available"
+                    message: "Release ocp-release-bundle-4.18.0-x86_64 is currently available on node master-0"
+                    lastTransitionTime: "2024-12-01T08:04:21Z"
+                  - type: Degraded
+                    status: "False"               
+                    reason: "Degraded"
+                    message: ""
+                    lastTransitionTime: "2024-12-01T08:04:21Z"
+      expected: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: MachineConfigNode
+        metadata:
+          name: foobar
+        spec:
+          node:
+            name: foobar
+          pool:
+            name: master
+          configVersion:
+            desired: rendered-master-abc
+        status:
+          internalReleaseImage:
+            releases:
+              - name: ocp-release-bundle-4.18.0-x86_64
+                image: example.com/example/openshift-release-dev@sha256:d98795f7932441b30bb8bcfbbf05912875383fad1f2b3be08a22ec148d68607f
+                conditions:
+                  - type: Mounted
+                    status: "False" 
+                    reason: "Mounted"
+                    message: ""  
+                    lastTransitionTime: "2024-12-01T08:04:21Z"
+                  - type: Available
+                    status: "True"               
+                    reason: "Available"
+                    message: "Release ocp-release-bundle-4.18.0-x86_64 is currently available on node master-0"
+                    lastTransitionTime: "2024-12-01T08:04:21Z"
+                  - type: Degraded
+                    status: "False"               
+                    reason: "Degraded"
+                    message: ""
+                    lastTransitionTime: "2024-12-01T08:04:21Z"

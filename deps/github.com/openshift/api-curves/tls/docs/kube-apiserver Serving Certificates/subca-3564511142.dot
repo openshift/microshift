@@ -1,0 +1,34 @@
+digraph "Local Certificate" {
+  // Node definitions.
+  0 [
+    label="certkeypair/kube-apiserver-service-network-signer\n\nsecret/service-network-serving-signer -nopenshift-kube-apiserver-operator\n"
+    style=filled
+    fillcolor="#c7bfff"
+  ];
+  2 [
+    label="certkeypair/kube-apiserver-recovery-signer\n\nsecret/localhost-recovery-serving-signer -nopenshift-kube-apiserver-operator\n"
+    style=filled
+    fillcolor="#c7bfff"
+  ];
+  4 [
+    label="certkeypair/kube-apiserver-localhost-signer\n\nsecret/localhost-serving-signer -nopenshift-kube-apiserver-operator\n    file:///etc/kubernetes/static-pod-resources/kube-apiserver-pod-3/secrets/localhost-recovery-client-token/ca.crt/ca.crt,file://\n    file:///etc/kubernetes/static-pod-resources/kube-controller-manager-pod-4/secrets/localhost-recovery-client-token/ca.crt/ca.crt,file://\n    file:///etc/kubernetes/static-pod-resources/kube-scheduler-pod-6/secrets/localhost-recovery-client-token/ca.crt/ca.crt,file://\n"
+    style=filled
+    fillcolor="#c7bfff"
+  ];
+  6 [
+    label="certkeypair/kube-apiserver-load-balancer-signer\n\nsecret/loadbalancer-serving-signer -nopenshift-kube-apiserver-operator\n    file:///etc/kubernetes/static-pod-resources/kube-apiserver-pod-7/secrets/localhost-recovery-client-token/ca.crt/ca.crt,file://\n    file:///etc/kubernetes/static-pod-resources/kube-apiserver-pod-7/secrets/localhost-recovery-client-token/service-ca.crt/service-ca.crt,file://\n    file:///etc/kubernetes/static-pod-resources/kube-controller-manager-pod-5/secrets/localhost-recovery-client-token/ca.crt/ca.crt,file://\n    file:///etc/kubernetes/static-pod-resources/kube-controller-manager-pod-5/secrets/localhost-recovery-client-token/service-ca.crt/service-ca.crt,file://\n    file:///etc/kubernetes/static-pod-resources/kube-controller-manager-pod-6/secrets/localhost-recovery-client-token/ca.crt/ca.crt,file://\n    file:///etc/kubernetes/static-pod-resources/kube-controller-manager-pod-6/secrets/localhost-recovery-client-token/service-ca.crt/service-ca.crt,file://\n    file:///etc/kubernetes/static-pod-resources/kube-scheduler-pod-7/secrets/localhost-recovery-client-token/ca.crt/ca.crt,file://\n    file:///etc/kubernetes/static-pod-resources/kube-scheduler-pod-7/secrets/localhost-recovery-client-token/service-ca.crt/service-ca.crt,file://\n"
+    style=filled
+    fillcolor="#c7bfff"
+  ];
+  17 [
+    label="cabundle/kube-apiserver-total-serving-ca\n\nconfigmaps/kube-apiserver-server-ca -nopenshift-config-managed\n    configmaps/kube-apiserver-server-ca -nopenshift-kube-apiserver\n    configmaps/kube-apiserver-server-ca-3 -nopenshift-kube-apiserver\n    configmaps/kube-apiserver-server-ca-4 -nopenshift-kube-apiserver\n    configmaps/kube-apiserver-server-ca-5 -nopenshift-kube-apiserver\n    configmaps/kube-apiserver-server-ca-6 -nopenshift-kube-apiserver\n    configmaps/kube-apiserver-server-ca-7 -nopenshift-kube-apiserver\n    file:///etc/kubernetes/static-pod-resources/kube-apiserver-pod-3/configmaps/kube-apiserver-server-ca/ca-bundle.crt/ca-bundle.crt\n    file:///etc/kubernetes/static-pod-resources/kube-apiserver-pod-7/configmaps/kube-apiserver-server-ca/ca-bundle.crt/ca-bundle.crt\n"
+    style=filled
+    fillcolor="#fda172"
+  ];
+
+  // Edge definitions.
+  0 -> 17;
+  2 -> 17;
+  4 -> 17;
+  6 -> 17;
+}

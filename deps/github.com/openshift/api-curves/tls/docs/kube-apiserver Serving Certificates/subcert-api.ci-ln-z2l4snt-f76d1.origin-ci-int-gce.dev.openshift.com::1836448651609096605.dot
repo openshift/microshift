@@ -1,0 +1,16 @@
+digraph "Local Certificate" {
+  // Node definitions.
+  8 [
+    label="certkeypair/kube-apiserver-load-balancer-signer\n\nsecret/loadbalancer-serving-signer -nopenshift-kube-apiserver-operator\n    file:///etc/kubernetes/static-pod-resources/kube-apiserver-pod-3/secrets/localhost-recovery-client-token/ca.crt/ca.crt,file://\n    file:///etc/kubernetes/static-pod-resources/kube-apiserver-pod-3/secrets/localhost-recovery-client-token/service-ca.crt/service-ca.crt,file://\n    file:///etc/kubernetes/static-pod-resources/kube-apiserver-pod-4/secrets/localhost-recovery-client-token/ca.crt/ca.crt,file://\n    file:///etc/kubernetes/static-pod-resources/kube-apiserver-pod-4/secrets/localhost-recovery-client-token/service-ca.crt/service-ca.crt,file://\n    file:///etc/kubernetes/static-pod-resources/kube-controller-manager-pod-6/secrets/localhost-recovery-client-token/ca.crt/ca.crt,file://\n    file:///etc/kubernetes/static-pod-resources/kube-controller-manager-pod-6/secrets/localhost-recovery-client-token/service-ca.crt/service-ca.crt,file://\n    file:///etc/kubernetes/static-pod-resources/kube-controller-manager-pod-7/secrets/localhost-recovery-client-token/ca.crt/ca.crt,file://\n    file:///etc/kubernetes/static-pod-resources/kube-controller-manager-pod-7/secrets/localhost-recovery-client-token/service-ca.crt/service-ca.crt,file://\n    file:///etc/kubernetes/static-pod-resources/kube-scheduler-pod-6/secrets/localhost-recovery-client-token/ca.crt/ca.crt,file://\n    file:///etc/kubernetes/static-pod-resources/kube-scheduler-pod-6/secrets/localhost-recovery-client-token/service-ca.crt/service-ca.crt,file://\n"
+    style=filled
+    fillcolor="#c7bfff"
+  ];
+  10 [
+    label="certkeypair/kube-apiserver-external-load-balancer-serving\n\nsecret/external-loadbalancer-serving-certkey -nopenshift-kube-apiserver\n    file:///etc/kubernetes/static-pod-resources/kube-apiserver-certs/secrets/external-loadbalancer-serving-certkey/tls.crt/tls.crt,file:///etc/kubernetes/static-pod-resources/kube-apiserver-certs/secrets/external-loadbalancer-serving-certkey/tls.crt/tls.key\n"
+    style=filled
+    fillcolor="#bdebfd"
+  ];
+
+  // Edge definitions.
+  8 -> 10;
+}

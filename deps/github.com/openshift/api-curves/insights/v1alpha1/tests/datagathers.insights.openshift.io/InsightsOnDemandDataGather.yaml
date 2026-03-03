@@ -1,0 +1,529 @@
+apiVersion: apiextensions.k8s.io/v1 # Hack because controller-gen complains if we don't have this
+name: "[TechPreview] DataGather"
+crdName: datagathers.insights.openshift.io
+featureGates:
+  - InsightsOnDemandDataGather
+tests:
+  onCreate:
+    - name: Should be able to create a minimal DataGather
+      initial: |
+        apiVersion: insights.openshift.io/v1alpha1
+        kind: DataGather
+        spec: {} # No spec is required for a DataGather
+      expected: |
+        apiVersion: insights.openshift.io/v1alpha1
+        kind: DataGather
+        spec: {}
+    - name: Should be able to create a DataGather with a storage persistentVolume
+      initial: |
+        apiVersion: insights.openshift.io/v1alpha1
+        kind: DataGather
+        spec:
+          storage:
+            type: PersistentVolume
+            persistentVolume:
+              mountPath: /data
+              claim:
+                name: test-claim
+      expected: |
+        apiVersion: insights.openshift.io/v1alpha1
+        kind: DataGather
+        spec:
+          storage:
+            type: PersistentVolume
+            persistentVolume:
+              mountPath: /data
+              claim:
+                name: test-claim
+    - name: Should be able to create a DataGather with a storage Epemeral
+      initial: |
+        apiVersion: insights.openshift.io/v1alpha1
+        kind: DataGather
+        spec:
+          storage:
+            type: Ephemeral
+      expected: |
+        apiVersion: insights.openshift.io/v1alpha1
+        kind: DataGather
+        spec:
+          storage:
+            type: Ephemeral
+    - name: When storage.type is persistentVolume then PersistentVolume must be present
+      initial: |
+        apiVersion: insights.openshift.io/v1alpha1
+        kind: DataGather
+        spec:
+          storage:
+            type: PersistentVolume
+      expectedError: 'spec.storage: Invalid value: "object": persistentVolume is required when type is PersistentVolume, and forbidden otherwise'
+    - name: When storage.type is not persistentVolume then PersistentVolume must not be present
+      initial: |
+        apiVersion: insights.openshift.io/v1alpha1
+        kind: DataGather
+        spec:
+          storage:
+            type: Ephemeral
+            persistentVolume:
+              claim:
+                name: test-claim
+      expectedError: 'spec.storage: Invalid value: "object": persistentVolume is required when type is PersistentVolume, and forbidden otherwise'
+    - name: mountPath must not contain colon
+      initial: |
+        apiVersion: insights.openshift.io/v1alpha1
+        kind: DataGather
+        spec:
+          storage:
+            type: PersistentVolume
+            persistentVolume:
+              mountPath: /data:/data
+              claim:
+                name: test-claim
+      expectedError: 'spec.storage.persistentVolume.mountPath: Invalid value: "string": mountPath must not contain a colon'
+    - name: storage.type is required
+      initial: |
+        apiVersion: insights.openshift.io/v1alpha1
+        kind: DataGather
+        spec:
+          storage:
+            persistentVolume:
+              mountPath: /data
+              claim:
+                name: test-claim
+      expectedError: "spec.storage.type: Required value"
+    - name: storage.persistentVolume.claim can not be empty
+      initial: |
+        apiVersion: insights.openshift.io/v1alpha1
+        kind: DataGather
+        spec:
+          storage:
+            type: PersistentVolume
+            persistentVolume:
+              mountPath: /data
+              claim:
+      expectedError: "spec.storage.persistentVolume.claim: Required value"
+    - name: persistentVolumeClaim must follow the naming convention
+      initial: |
+        apiVersion: insights.openshift.io/v1alpha1
+        kind: DataGather
+        spec:
+          storage:
+            type: PersistentVolume
+            persistentVolume:
+              claim:
+                name: INVALID_PVC_NAME
+      expectedError: 'Invalid value: "string": a lowercase RFC 1123 subdomain must consist of lower case alphanumeric characters, ''-'' or ''.'', and must start and end with an alphanumeric character.'
+  onUpdate:
+    - name: status is present and startTime is added
+      initial: |
+        apiVersion: insights.openshift.io/v1alpha1
+        kind: DataGather
+        spec: {} # No spec is required for a DataGather
+        status: 
+          insightsRequestID: xyz
+      updated: |
+        apiVersion: insights.openshift.io/v1alpha1
+        kind: DataGather
+        spec: {} # No spec is required for a DataGather
+        status: 
+          insightsRequestID: xyz
+          startTime: 2023-03-13T11:34:06Z
+      expected: |
+        apiVersion: insights.openshift.io/v1alpha1
+        kind: DataGather
+        spec: {} # No spec is required for a DataGather
+        status: 
+          insightsRequestID: xyz
+          startTime: 2023-03-13T11:34:06Z
+    - name: startTime cannot be removed from status
+      initial: |
+        apiVersion: insights.openshift.io/v1alpha1
+        kind: DataGather
+        spec: {} # No spec is required for a DataGather
+        status: 
+          insightsRequestID: xyz
+          startTime: 2023-03-13T11:34:06Z
+      updated: |
+        apiVersion: insights.openshift.io/v1alpha1
+        kind: DataGather
+        spec: {} # No spec is required for a DataGather
+        status: 
+          insightsRequestID: xyz
+      expectedStatusError: 'status: Invalid value: "object": cannot remove startTime attribute from status'
+    - name: startTime is immutable once set
+      initial: |
+        apiVersion: insights.openshift.io/v1alpha1
+        kind: DataGather
+        spec: {} # No spec is required for a DataGather
+        status: 
+          insightsRequestID: xyz
+          startTime: 2023-03-13T11:34:06Z
+      updated: |
+        apiVersion: insights.openshift.io/v1alpha1
+        kind: DataGather
+        spec: {} # No spec is required for a DataGather
+        status: 
+          insightsRequestID: xyz
+          startTime: 2023-03-13T12:34:06Z
+      expectedStatusError: 'Invalid value: "string": startTime is immutable once set'
+    - name: Status is present and insightsRequestID is added
+      initial: |
+        apiVersion: insights.openshift.io/v1alpha1
+        kind: DataGather
+        spec: {} # No spec is required for a DataGather
+        status: 
+          relatedObjects:
+            - name: periodic-job-xyz
+              resource: "pods"
+              group: ""
+              namespace: "openshift-insights"
+      updated: |
+        apiVersion: insights.openshift.io/v1alpha1
+        kind: DataGather
+        spec: {} # No spec is required for a DataGather
+        status: 
+          insightsRequestID: testing-xyz
+          relatedObjects:
+            - name: periodic-job-xyz
+              resource: "pods"
+              group: ""
+              namespace: "openshift-insights"
+      expected: |
+        apiVersion: insights.openshift.io/v1alpha1
+        kind: DataGather
+        spec: {} # No spec is required for a DataGather
+        status: 
+          insightsRequestID: testing-xyz
+          relatedObjects:
+            - name: periodic-job-xyz
+              group: ""
+              resource: "pods"
+              namespace: "openshift-insights"
+    - name: insightsRequestID cannot be removed from status
+      initial: |
+        apiVersion: insights.openshift.io/v1alpha1
+        kind: DataGather
+        spec: {} # No spec is required for a DataGather
+        status: 
+          insightsRequestID: testing-xyz
+          relatedObjects:
+            - name: periodic-job-xyz
+              group: ""
+              resource: "pods"
+              namespace: "openshift-insights"
+      updated: |
+        apiVersion: insights.openshift.io/v1alpha1
+        kind: DataGather
+        spec: {} # No spec is required for a DataGather
+        status: 
+          relatedObjects:
+            - name: periodic-job-xyz
+              group: ""
+              resource: "pods"
+              namespace: "openshift-insights"
+      expectedStatusError: 'status: Invalid value: "object": cannot remove insightsRequestID attribute from status'
+    - name: insightsRequestID is immutable once set
+      initial: |
+        apiVersion: insights.openshift.io/v1alpha1
+        kind: DataGather
+        spec: {} # No spec is required for a DataGather
+        status: 
+          insightsRequestID: testing-xyz
+          relatedObjects:
+            - name: periodic-job-xyz
+              group: ""
+              resource: "pods"
+              namespace: "openshift-insights"
+      updated: |
+        apiVersion: insights.openshift.io/v1alpha1
+        kind: DataGather
+        spec: {} # No spec is required for a DataGather
+        status: 
+          insightsRequestID: testing-xyz-updated
+          relatedObjects:
+            - name: periodic-job-xyz
+              group: ""
+              resource: "pods"
+              namespace: "openshift-insights"
+      expectedStatusError: 'Invalid value: "string": insightsRequestID is immutable once set'
+    - name: finishTime cannot be removed from status
+      initial: |
+        apiVersion: insights.openshift.io/v1alpha1
+        kind: DataGather
+        spec: {} # No spec is required for a DataGather
+        status: 
+          finishTime: 2023-03-13T11:34:06Z
+          relatedObjects:
+            - name: periodic-job-xyz
+              group: ""
+              resource: "pods"
+              namespace: "openshift-insights"
+      updated: |
+        apiVersion: insights.openshift.io/v1alpha1
+        kind: DataGather
+        spec: {} # No spec is required for a DataGather
+        status: 
+          relatedObjects:
+            - name: periodic-job-xyz
+              group: ""
+              resource: "pods"
+              namespace: "openshift-insights"
+      expectedStatusError: 'status: Invalid value: "object": cannot remove finishTime attribute from status'
+    - name: dataGatherState cannot be removed from status
+      initial: |
+        apiVersion: insights.openshift.io/v1alpha1
+        kind: DataGather
+        spec: {} # No spec is required for a DataGather
+        status: 
+          dataGatherState: Running
+      updated: |
+        apiVersion: insights.openshift.io/v1alpha1
+        kind: DataGather
+        spec: {} # No spec is required for a DataGather
+        status: 
+           relatedObjects:
+            - name: periodic-job-xyz
+              group: ""
+              resource: "pods"
+              namespace: "openshift-insights"
+      expectedStatusError: 'status: Invalid value: "object": cannot remove dataGatherState attribute from status'
+    - name: dataGatherState cannot transition from Running to Pending
+      initial: |
+        apiVersion: insights.openshift.io/v1alpha1
+        kind: DataGather
+        spec: {} # No spec is required for a DataGather
+        status: 
+          dataGatherState: Running
+      updated: |
+        apiVersion: insights.openshift.io/v1alpha1
+        kind: DataGather
+        spec: {} # No spec is required for a DataGather
+        status: 
+          dataGatherState: Pending
+      expectedStatusError: 'status.dataGatherState: Invalid value: "string": dataGatherState cannot transition from Running to Pending'
+    - name: dataGatherState cannot transition from Completed to Pending
+      initial: |
+        apiVersion: insights.openshift.io/v1alpha1
+        kind: DataGather
+        spec: {} # No spec is required for a DataGather
+        status: 
+          dataGatherState: Completed
+      updated: |
+        apiVersion: insights.openshift.io/v1alpha1
+        kind: DataGather
+        spec: {} # No spec is required for a DataGather
+        status: 
+          dataGatherState: Pending
+      expectedStatusError: 'status.dataGatherState: Invalid value: "string": dataGatherState cannot transition from Completed to Pending'
+    - name: dataGatherState cannot transition from Failed to Pending
+      initial: |
+        apiVersion: insights.openshift.io/v1alpha1
+        kind: DataGather
+        spec: {} # No spec is required for a DataGather
+        status: 
+          dataGatherState: Failed
+      updated: |
+        apiVersion: insights.openshift.io/v1alpha1
+        kind: DataGather
+        spec: {} # No spec is required for a DataGather
+        status: 
+          dataGatherState: Pending
+      expectedStatusError: 'status.dataGatherState: Invalid value: "string": dataGatherState cannot transition from Failed to Pending'
+    - name: dataGatherState cannot transition from Completed to Running
+      initial: |
+        apiVersion: insights.openshift.io/v1alpha1
+        kind: DataGather
+        spec: {} # No spec is required for a DataGather
+        status: 
+          dataGatherState: Completed
+      updated: |
+        apiVersion: insights.openshift.io/v1alpha1
+        kind: DataGather
+        spec: {} # No spec is required for a DataGather
+        status: 
+          dataGatherState: Running
+      expectedStatusError: 'status.dataGatherState: Invalid value: "string": dataGatherState cannot transition from Completed to Running'
+    - name: dataGatherState cannot transition from Failed to Running
+      initial: |
+        apiVersion: insights.openshift.io/v1alpha1
+        kind: DataGather
+        spec: {} # No spec is required for a DataGather
+        status: 
+          dataGatherState: Failed
+      updated: |
+        apiVersion: insights.openshift.io/v1alpha1
+        kind: DataGather
+        spec: {} # No spec is required for a DataGather
+        status: 
+          dataGatherState: Running
+      expectedStatusError: 'status.dataGatherState: Invalid value: "string": dataGatherState cannot transition from Failed to Running'
+    - name: lastGatherDuration can be updated with a trailing zero value
+      initial: |
+        apiVersion: insights.openshift.io/v1alpha1
+        kind: DataGather
+        spec: {} # No spec is required for a DataGather
+      updated: |
+        apiVersion: insights.openshift.io/v1alpha1
+        kind: DataGather
+        spec: {} # No spec is required for a DataGather
+        status:
+          gatherers:
+          - name: testGatherer
+            lastGatherDuration: 1m0s
+            conditions:
+            - type: Gathered
+              status: "True"
+              reason: OK
+              message: "test message"
+              lastTransitionTime: "2024-12-01T08:04:21Z"
+      expected: |
+        apiVersion: insights.openshift.io/v1alpha1
+        kind: DataGather
+        spec: {} # No spec is required for a DataGather
+        status:
+          gatherers:
+          - name: testGatherer
+            lastGatherDuration: 1m0s
+            conditions:
+            - type: Gathered
+              status: "True"
+              reason: OK
+              message: "test message"
+              lastTransitionTime: "2024-12-01T08:04:21Z"
+    - name: lastGatherDuration can be updated with a leading zero value
+      initial: |
+        apiVersion: insights.openshift.io/v1alpha1
+        kind: DataGather
+        spec: {} # No spec is required for a DataGather
+      updated: |
+        apiVersion: insights.openshift.io/v1alpha1
+        kind: DataGather
+        spec: {} # No spec is required for a DataGather
+        status:
+          gatherers:
+          - name: testGatherer
+            lastGatherDuration: 0m11s
+            conditions:
+            - type: Gathered
+              status: "True"
+              reason: OK
+              message: "test message"
+              lastTransitionTime: "2024-12-01T08:04:21Z"
+      expected: |
+        apiVersion: insights.openshift.io/v1alpha1
+        kind: DataGather
+        spec: {} # No spec is required for a DataGather
+        status:
+          gatherers:
+          - name: testGatherer
+            lastGatherDuration: 0m11s
+            conditions:
+            - type: Gathered
+              status: "True"
+              reason: OK
+              message: "test message"
+              lastTransitionTime: "2024-12-01T08:04:21Z"
+    - name: lastGatherDuration can be updated with a decimal number value
+      initial: |
+        apiVersion: insights.openshift.io/v1alpha1
+        kind: DataGather
+        spec: {} # No spec is required for a DataGather
+      updated: |
+        apiVersion: insights.openshift.io/v1alpha1
+        kind: DataGather
+        spec: {} # No spec is required for a DataGather
+        status:
+          gatherers:
+          - name: testGatherer
+            lastGatherDuration: 1m0.77s
+            conditions:
+            - type: Gathered
+              status: "True"
+              reason: OK
+              message: "test message"
+              lastTransitionTime: "2024-12-01T08:04:21Z"
+      expected: |
+        apiVersion: insights.openshift.io/v1alpha1
+        kind: DataGather
+        spec: {} # No spec is required for a DataGather
+        status:
+          gatherers:
+          - name: testGatherer
+            lastGatherDuration: 1m0.77s
+            conditions:
+            - type: Gathered
+              status: "True"
+              reason: OK
+              message: "test message"
+              lastTransitionTime: "2024-12-01T08:04:21Z"
+    - name: lastGatherDuration cannot be updated with an invalid value
+      initial: |
+        apiVersion: insights.openshift.io/v1alpha1
+        kind: DataGather
+        spec: {} # No spec is required for a DataGather
+      updated: |
+        apiVersion: insights.openshift.io/v1alpha1
+        kind: DataGather
+        spec: {} # No spec is required for a DataGather
+        status:
+          gatherers:
+          - name: testGatherer
+            lastGatherDuration: 1d2h
+            conditions:
+            - type: Gathered
+              status: "True"
+              reason: OK
+              message: "test message"
+              lastTransitionTime: "2024-12-01T08:04:21Z"
+      expectedStatusError: "Invalid value: \"1d2h\": gatherers[0].lastGatherDuration in body should match '^(([0-9]+(?:\\.[0-9]+)?(ns|us|µs|μs|ms|s|m|h))+)$'"
+    - name: lastGatherDuration cannot be updated with a negative value
+      initial: |
+        apiVersion: insights.openshift.io/v1alpha1
+        kind: DataGather
+        spec: {} # No spec is required for a DataGather
+      updated: |
+        apiVersion: insights.openshift.io/v1alpha1
+        kind: DataGather
+        spec: {} # No spec is required for a DataGather
+        status:
+          gatherers:
+          - name: testGatherer
+            lastGatherDuration: -0m5s
+            conditions:
+            - type: Gathered
+              status: "True"
+              reason: OK
+              message: "test message"
+              lastTransitionTime: "2024-12-01T08:04:21Z"
+      expectedStatusError: "Invalid value: \"-0m5s\": gatherers[0].lastGatherDuration in body should match '^(([0-9]+(?:\\.[0-9]+)?(ns|us|µs|μs|ms|s|m|h))+)$'"
+    - name: should not be updated with URL that is not HTTPS
+      initial: |
+        apiVersion: insights.openshift.io/v1alpha1
+        kind: DataGather
+        spec: {} # No spec is required for a DataGather
+      updated: |
+        apiVersion: insights.openshift.io/v1alpha1
+        kind: DataGather
+        spec: {} # No spec is required for a DataGather
+        status:
+          insightsReport:
+            uri: http://example.com
+      expectedStatusError: 'status.insightsReport.uri: Invalid value: "string": URI must be a valid HTTPS URL (e.g., https://example.com)'
+    - name: should be updated with a valid HTTPS URL
+      initial: |
+        apiVersion: insights.openshift.io/v1alpha1
+        kind: DataGather
+        spec: {} # No spec is required for a DataGather
+      updated: |
+        apiVersion: insights.openshift.io/v1alpha1
+        kind: DataGather
+        spec: {} # No spec is required for a DataGather
+        status:
+          insightsReport:
+            uri: https://example.com
+      expected: |
+        apiVersion: insights.openshift.io/v1alpha1
+        kind: DataGather
+        spec: {} # No spec is required for a DataGather
+        status:
+          insightsReport:
+            uri: https://example.com

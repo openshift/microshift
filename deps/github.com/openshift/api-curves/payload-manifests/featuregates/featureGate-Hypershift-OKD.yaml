@@ -1,0 +1,366 @@
+{
+    "apiVersion": "config.openshift.io/v1",
+    "kind": "FeatureGate",
+    "metadata": {
+        "annotations": {
+            "include.release.openshift.io/ibm-cloud-managed": "false-except-for-the-config-operator"
+        },
+        "name": "cluster"
+    },
+    "spec": {
+        "featureSet": "OKD"
+    },
+    "status": {
+        "featureGates": [
+            {
+                "disabled": [
+                    {
+                        "name": "AWSClusterHostedDNS"
+                    },
+                    {
+                        "name": "AWSClusterHostedDNSInstall"
+                    },
+                    {
+                        "name": "AWSDedicatedHosts"
+                    },
+                    {
+                        "name": "AWSDualStackInstall"
+                    },
+                    {
+                        "name": "AWSServiceLBNetworkSecurityGroup"
+                    },
+                    {
+                        "name": "AutomatedEtcdBackup"
+                    },
+                    {
+                        "name": "AzureClusterHostedDNSInstall"
+                    },
+                    {
+                        "name": "AzureDedicatedHosts"
+                    },
+                    {
+                        "name": "AzureDualStackInstall"
+                    },
+                    {
+                        "name": "AzureMultiDisk"
+                    },
+                    {
+                        "name": "BootImageSkewEnforcement"
+                    },
+                    {
+                        "name": "BootcNodeManagement"
+                    },
+                    {
+                        "name": "CBORServingAndStorage"
+                    },
+                    {
+                        "name": "CRDCompatibilityRequirementOperator"
+                    },
+                    {
+                        "name": "CRIOCredentialProviderConfig"
+                    },
+                    {
+                        "name": "ClientsAllowCBOR"
+                    },
+                    {
+                        "name": "ClientsPreferCBOR"
+                    },
+                    {
+                        "name": "ClusterAPIComputeInstall"
+                    },
+                    {
+                        "name": "ClusterAPIControlPlaneInstall"
+                    },
+                    {
+                        "name": "ClusterAPIInstall"
+                    },
+                    {
+                        "name": "ClusterAPIInstallIBMCloud"
+                    },
+                    {
+                        "name": "ClusterAPIMachineManagement"
+                    },
+                    {
+                        "name": "ClusterAPIMachineManagementVSphere"
+                    },
+                    {
+                        "name": "ClusterMonitoringConfig"
+                    },
+                    {
+                        "name": "ClusterUpdateAcceptRisks"
+                    },
+                    {
+                        "name": "ClusterVersionOperatorConfiguration"
+                    },
+                    {
+                        "name": "ConfigurablePKI"
+                    },
+                    {
+                        "name": "DNSNameResolver"
+                    },
+                    {
+                        "name": "DRAPartitionableDevices"
+                    },
+                    {
+                        "name": "DualReplica"
+                    },
+                    {
+                        "name": "DyanmicServiceEndpointIBMCloud"
+                    },
+                    {
+                        "name": "EVPN"
+                    },
+                    {
+                        "name": "EtcdBackendQuota"
+                    },
+                    {
+                        "name": "EventTTL"
+                    },
+                    {
+                        "name": "EventedPLEG"
+                    },
+                    {
+                        "name": "Example"
+                    },
+                    {
+                        "name": "Example2"
+                    },
+                    {
+                        "name": "ExternalOIDCWithUpstreamParity"
+                    },
+                    {
+                        "name": "ExternalSnapshotMetadata"
+                    },
+                    {
+                        "name": "GCPClusterHostedDNS"
+                    },
+                    {
+                        "name": "GCPCustomAPIEndpoints"
+                    },
+                    {
+                        "name": "GCPCustomAPIEndpointsInstall"
+                    },
+                    {
+                        "name": "GCPDualStackInstall"
+                    },
+                    {
+                        "name": "GatewayAPIWithoutOLM"
+                    },
+                    {
+                        "name": "ImageModeStatusReporting"
+                    },
+                    {
+                        "name": "IngressControllerDynamicConfigurationManager"
+                    },
+                    {
+                        "name": "InsightsConfig"
+                    },
+                    {
+                        "name": "InsightsOnDemandDataGather"
+                    },
+                    {
+                        "name": "IrreconcilableMachineConfig"
+                    },
+                    {
+                        "name": "KMSEncryption"
+                    },
+                    {
+                        "name": "KMSEncryptionProvider"
+                    },
+                    {
+                        "name": "MachineAPIMigration"
+                    },
+                    {
+                        "name": "MachineAPIOperatorDisableMachineHealthCheckController"
+                    },
+                    {
+                        "name": "MaxUnavailableStatefulSet"
+                    },
+                    {
+                        "name": "MinimumKubeletVersion"
+                    },
+                    {
+                        "name": "MixedCPUsAllocation"
+                    },
+                    {
+                        "name": "MultiArchInstallAzure"
+                    },
+                    {
+                        "name": "MultiDiskSetup"
+                    },
+                    {
+                        "name": "MutatingAdmissionPolicy"
+                    },
+                    {
+                        "name": "NetworkConnect"
+                    },
+                    {
+                        "name": "NewOLM"
+                    },
+                    {
+                        "name": "NewOLMBoxCutterRuntime"
+                    },
+                    {
+                        "name": "NewOLMCatalogdAPIV1Metas"
+                    },
+                    {
+                        "name": "NewOLMOwnSingleNamespace"
+                    },
+                    {
+                        "name": "NewOLMPreflightPermissionChecks"
+                    },
+                    {
+                        "name": "NewOLMWebhookProviderOpenshiftServiceCA"
+                    },
+                    {
+                        "name": "NoRegistryClusterInstall"
+                    },
+                    {
+                        "name": "NutanixMultiSubnets"
+                    },
+                    {
+                        "name": "OSStreams"
+                    },
+                    {
+                        "name": "OVNObservability"
+                    },
+                    {
+                        "name": "OnPremDNSRecords"
+                    },
+                    {
+                        "name": "ProvisioningRequestAvailable"
+                    },
+                    {
+                        "name": "SELinuxMount"
+                    },
+                    {
+                        "name": "ShortCertRotation"
+                    },
+                    {
+                        "name": "SignatureStores"
+                    },
+                    {
+                        "name": "TLSCurvePreferences"
+                    },
+                    {
+                        "name": "VSphereConfigurableMaxAllowedBlockVolumesPerNode"
+                    },
+                    {
+                        "name": "VSphereHostVMGroupZonal"
+                    },
+                    {
+                        "name": "VSphereMixedNodeEnv"
+                    },
+                    {
+                        "name": "VolumeGroupSnapshot"
+                    }
+                ],
+                "enabled": [
+                    {
+                        "name": "AzureWorkloadIdentity"
+                    },
+                    {
+                        "name": "BuildCSIVolumes"
+                    },
+                    {
+                        "name": "CPMSMachineNamePrefix"
+                    },
+                    {
+                        "name": "ConsolePluginContentSecurityPolicy"
+                    },
+                    {
+                        "name": "ExternalOIDC"
+                    },
+                    {
+                        "name": "ExternalOIDCWithUIDAndExtraClaimMappings"
+                    },
+                    {
+                        "name": "GCPClusterHostedDNSInstall"
+                    },
+                    {
+                        "name": "GatewayAPI"
+                    },
+                    {
+                        "name": "GatewayAPIController"
+                    },
+                    {
+                        "name": "HighlyAvailableArbiter"
+                    },
+                    {
+                        "name": "HyperShiftOnlyDynamicResourceAllocation"
+                    },
+                    {
+                        "name": "ImageStreamImportMode"
+                    },
+                    {
+                        "name": "ImageVolume"
+                    },
+                    {
+                        "name": "KMSv1"
+                    },
+                    {
+                        "name": "MachineConfigNodes"
+                    },
+                    {
+                        "name": "ManagedBootImages"
+                    },
+                    {
+                        "name": "ManagedBootImagesAWS"
+                    },
+                    {
+                        "name": "ManagedBootImagesAzure"
+                    },
+                    {
+                        "name": "ManagedBootImagesCPMS"
+                    },
+                    {
+                        "name": "ManagedBootImagesvSphere"
+                    },
+                    {
+                        "name": "MetricsCollectionProfiles"
+                    },
+                    {
+                        "name": "MutableCSINodeAllocatableCount"
+                    },
+                    {
+                        "name": "OpenShiftPodSecurityAdmission"
+                    },
+                    {
+                        "name": "PinnedImages"
+                    },
+                    {
+                        "name": "RouteExternalCertificate"
+                    },
+                    {
+                        "name": "ServiceAccountTokenNodeBinding"
+                    },
+                    {
+                        "name": "SigstoreImageVerification"
+                    },
+                    {
+                        "name": "SigstoreImageVerificationPKI"
+                    },
+                    {
+                        "name": "StoragePerformantSecurityPolicy"
+                    },
+                    {
+                        "name": "UpgradeStatus"
+                    },
+                    {
+                        "name": "UserNamespacesPodSecurityStandards"
+                    },
+                    {
+                        "name": "UserNamespacesSupport"
+                    },
+                    {
+                        "name": "VSphereMultiDisk"
+                    },
+                    {
+                        "name": "VSphereMultiNetworks"
+                    }
+                ],
+                "version": ""
+            }
+        ]
+    }
+}

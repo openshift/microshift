@@ -1,0 +1,52 @@
+digraph "Local Certificate" {
+  // Node definitions.
+  0 [
+    label="certkeypair/kube-control-plane-signer\n\nsecret/kube-control-plane-signer -nopenshift-kube-apiserver-operator\n"
+    style=filled
+    fillcolor="#c7bfff"
+  ];
+  3 [
+    label="certkeypair/kube-controller-manager-csr-signer-signer\n\nsecret/csr-signer-signer -nopenshift-kube-controller-manager-operator\n"
+    style=filled
+    fillcolor="#c7bfff"
+  ];
+  4 [
+    label="certkeypair/kube-controller-manager-csr-signer\n\nsecret/csr-signer -nopenshift-kube-controller-manager\n    secret/csr-signer -nopenshift-kube-controller-manager-operator\n    file:///etc/kubernetes/static-pod-resources/kube-controller-manager-certs/secrets/csr-signer/tls.crt/tls.crt,file:///etc/kubernetes/static-pod-resources/kube-controller-manager-certs/secrets/csr-signer/tls.crt/tls.key\n"
+    style=filled
+    fillcolor="#c7bfff"
+  ];
+  5 [
+    label="certkeypair/admin-kubeconfig-signer::7222735057655048698\n\nfile:///etc/kubernetes/kubelet-ca.crt/kubelet-ca.crt,file://\n"
+    style=filled
+    fillcolor="#c7bfff"
+  ];
+  6 [
+    label="certkeypair/per-master-debugging-signer\n\nsecret/node-system-admin-signer -nopenshift-kube-apiserver-operator\n"
+    style=filled
+    fillcolor="#c7bfff"
+  ];
+  8 [
+    label="certkeypair/kubelet-bootstrap-kubeconfig-signer\n\n\n"
+    style=filled
+    fillcolor=white
+  ];
+  9 [
+    label="certkeypair/kube-apiserver-to-kubelet-signer\n\nsecret/kube-apiserver-to-kubelet-signer -nopenshift-kube-apiserver-operator\n"
+    style=filled
+    fillcolor="#c7bfff"
+  ];
+  14 [
+    label="cabundle/kube-apiserver-total-client-ca\n\nconfigmaps/kube-apiserver-client-ca -nopenshift-config-managed\n    configmaps/client-ca -nopenshift-controller-manager\n    configmaps/client-ca -nopenshift-kube-apiserver\n    configmaps/client-ca -nopenshift-kube-controller-manager\n    file:///etc/kubernetes/static-pod-resources/kube-apiserver-certs/configmaps/client-ca/ca-bundle.crt/ca-bundle.crt\n    file:///etc/kubernetes/static-pod-resources/kube-controller-manager-certs/configmaps/client-ca/ca-bundle.crt/ca-bundle.crt\n"
+    style=filled
+    fillcolor="#fda172"
+  ];
+
+  // Edge definitions.
+  0 -> 14;
+  3 -> 14;
+  4 -> 14;
+  5 -> 14;
+  6 -> 14;
+  8 -> 14;
+  9 -> 14;
+}

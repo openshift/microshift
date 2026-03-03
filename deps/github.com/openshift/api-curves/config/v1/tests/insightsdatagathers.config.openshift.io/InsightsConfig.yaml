@@ -1,0 +1,317 @@
+apiVersion: apiextensions.k8s.io/v1 # Hack because controller-gen complains if we don't have this
+name: "[TechPreview] InsightsDataGather"
+crdName: insightsdatagathers.config.openshift.io
+featureGates:
+  - InsightsConfig
+tests:
+  onCreate:
+    - name: Should be able to create a minimal InsightsDataGather
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: InsightsDataGather
+        spec:
+          gatherConfig:
+              gatherers:
+                mode: All
+      expected: |
+        apiVersion: config.openshift.io/v1
+        kind: InsightsDataGather
+        spec:
+          gatherConfig:
+              gatherers:
+                mode: All
+    - name: InsightsDataGather without the spec should not be created
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: InsightsDataGather
+        spec: {}
+      expectedError: "spec.gatherConfig: Required value, <nil>: Invalid value"
+    - name: Should be able to create InsightsDataGather with a storage and PersistentVolume
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: InsightsDataGather
+        spec:
+          gatherConfig:
+            gatherers:
+              mode: All
+            dataPolicy:
+              - WorkloadNames
+            storage:
+              type: PersistentVolume
+              persistentVolume:
+                mountPath: /data
+                claim:
+                  name: test-claim
+      expected: |
+        apiVersion: config.openshift.io/v1
+        kind: InsightsDataGather
+        spec:
+          gatherConfig:
+            gatherers:
+              mode: All
+            dataPolicy:
+              - WorkloadNames
+            storage:
+              type: PersistentVolume
+              persistentVolume:
+                mountPath: /data
+                claim:
+                  name: test-claim
+    - name: Should be able to create InsightsDataGather with a multiple DataPolicy values
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: InsightsDataGather
+        spec:
+          gatherConfig:
+            gatherers:
+              mode: All
+            dataPolicy:
+              - ObfuscateNetworking
+              - WorkloadNames
+            storage:
+              type: PersistentVolume
+              persistentVolume:
+                mountPath: /data
+                claim:
+                  name: test-claim
+      expected: |
+        apiVersion: config.openshift.io/v1
+        kind: InsightsDataGather
+        spec:
+          gatherConfig:
+            gatherers:
+              mode: All
+            dataPolicy:
+              - ObfuscateNetworking
+              - WorkloadNames
+            storage:
+              type: PersistentVolume
+              persistentVolume:
+                mountPath: /data
+                claim:
+                  name: test-claim
+    - name: Should be able to create InsightsDataGather with a storage and Ephemeral
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: InsightsDataGather
+        spec:
+          gatherConfig:
+            gatherers:
+              mode: All
+            storage:
+              type: Ephemeral
+      expected: |
+        apiVersion: config.openshift.io/v1
+        kind: InsightsDataGather
+        spec:
+          gatherConfig:
+            gatherers:
+              mode: All
+            storage:
+              type: Ephemeral
+    - name: Should be able to create InsightsDataGather with valid GathererConfig
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: InsightsDataGather
+        spec:
+          gatherConfig:
+            gatherers:
+              mode: Custom
+              custom:
+                configs:
+                  - name: gatherer
+                    state: Disabled
+                  - name: valid_gatherer
+                    state: Enabled
+                  - name: gatherer/function
+                    state: Enabled
+                  - name: gatherer_a/function_a
+                    state: Disabled
+      expected: |
+        apiVersion: config.openshift.io/v1
+        kind: InsightsDataGather
+        spec:
+          gatherConfig:
+            gatherers:
+              mode: Custom
+              custom:
+                configs:
+                  - name: gatherer
+                    state: Disabled
+                  - name: valid_gatherer
+                    state: Enabled
+                  - name: gatherer/function
+                    state: Enabled
+                  - name: gatherer_a/function_a
+                    state: Disabled
+    - name: Should be able to create InsightsDataGather with valid combination of dataPolicy values
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: InsightsDataGather
+        spec:
+          gatherConfig:
+            gatherers:
+              mode: All
+            dataPolicy:
+              - ObfuscateNetworking
+              - WorkloadNames
+      expected: |
+        apiVersion: config.openshift.io/v1
+        kind: InsightsDataGather
+        spec:
+          gatherConfig:
+            gatherers:
+              mode: All
+            dataPolicy:
+              - ObfuscateNetworking
+              - WorkloadNames
+    - name: When storage.type is PersistentVolume then PersistentVolume must be present
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: InsightsDataGather
+        spec:
+          gatherConfig:
+            gatherers:
+              mode: All
+            storage:
+              type: PersistentVolume
+      expectedError: 'spec.gatherConfig.storage: Invalid value: "object": persistentVolume is required when type is PersistentVolume, and forbidden otherwise'
+    - name: When storage.type is not PersistentVolume then PersistentVolume must not be present
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: InsightsDataGather
+        spec:
+          gatherConfig:
+            gatherers:
+              mode: All
+            storage:
+              type: Ephemeral
+              persistentVolume:
+                claim:
+                  name: test-claim
+      expectedError: 'spec.gatherConfig.storage: Invalid value: "object": persistentVolume is required when type is PersistentVolume, and forbidden otherwise'
+    - name: mountPath must not contain colon
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: InsightsDataGather
+        spec:
+          gatherConfig:
+            gatherers:
+              mode: All
+            storage:
+              type: PersistentVolume
+              persistentVolume:
+                mountPath: /data:/data
+                claim:
+                  name: test-claim
+      expectedError: 'spec.gatherConfig.storage.persistentVolume.mountPath: Invalid value: "string": mountPath must not contain a colon'
+    - name: invalid gatherer name
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: InsightsDataGather
+        spec:
+          gatherConfig:
+            gatherers:
+              mode: All
+              custom:
+                configs:
+                  - name: invalid_gatherer_1
+                    state: Disabled
+      expectedError: 'Invalid value: "string": gatherer name must be in the format of {gatherer}/{function} where the gatherer and function are lowercase letters only that may include underscores (_) and are separated by a forward slash (/) if the function is provided'
+    - name: storage.type is required
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: InsightsDataGather
+        spec:
+          gatherConfig:
+            gatherers:
+              mode: All
+            storage:
+              persistentVolume:
+                mountPath: /data
+                claim:
+                  name: test-claim
+      expectedError: "spec.gatherConfig.storage.type: Required value"
+    - name: storage.persistentVolume.claim can not be empty
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: InsightsDataGather
+        spec:
+          gatherConfig:
+            gatherers:
+              mode: All
+            storage:
+              type: PersistentVolume
+              persistentVolume:
+                mountPath: /data
+                claim:
+      expectedError: "spec.gatherConfig.storage.persistentVolume.claim: Required value"
+    - name: claim must follow the naming convention
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: InsightsDataGather
+        spec:
+          gatherConfig:
+            gatherers:
+              mode: All
+            storage:
+              type: PersistentVolume
+              persistentVolume:
+                claim:
+                  name: INVALID_PVC_NAME
+      expectedError: 'Invalid value: "string": a lowercase RFC 1123 subdomain must consist of lower case alphanumeric characters, ''-'' or ''.'', and must start and end with an alphanumeric character.'
+    - name: gatherer state must be Disabled or Enabled
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: InsightsDataGather
+        spec:
+          gatherConfig:
+            gatherers:
+              mode: Custom
+              custom:
+                configs:
+                  - name: gatherer
+                    state: InvalidState
+      expectedError: 'spec.gatherConfig.gatherers.custom.configs[0].state: Unsupported value: "InvalidState": supported values: "Enabled", "Disabled"'
+    - name: dataPolicy must be one of the valid values
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: InsightsDataGather
+        spec:
+          gatherConfig:
+            gatherers:
+              mode: All
+            dataPolicy:
+              - InvalidPolicy
+      expectedError: 'spec.gatherConfig.dataPolicy[0]: Unsupported value: "InvalidPolicy": supported values: "ObfuscateNetworking", "WorkloadNames"'
+    - name: mode must have a valid value
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: InsightsDataGather
+        spec:
+          gatherConfig:
+            gatherers:
+              mode: InvalidMode
+      expectedError: 'spec.gatherConfig.gatherers.mode: Unsupported value: "InvalidMode": supported values: "All", "None", "Custom"'
+    - name: mode set to Custom must have gatherers present
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: InsightsDataGather
+        spec:
+          gatherConfig:
+            gatherers:
+              mode: Custom
+      expectedError: 'spec.gatherConfig.gatherers: Invalid value: "object": custom is required when mode is Custom, and forbidden otherwise'
+    - name: mode set to Disabled must not have gatherers present
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: InsightsDataGather
+        spec:
+          gatherConfig:
+            gatherers:
+              mode: None
+              custom:
+                configs:
+                  - name: gatherer
+                    state: Enabled
+      expectedError: 'Invalid value: "object": custom is required when mode is Custom, and forbidden otherwise'

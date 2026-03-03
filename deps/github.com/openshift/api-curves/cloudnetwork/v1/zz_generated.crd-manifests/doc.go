@@ -1,0 +1,1 @@
+package cloudnetwork_v1_crdmanifests

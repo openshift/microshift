@@ -1,0 +1,321 @@
+apiVersion: apiextensions.k8s.io/v1 # Hack because controller-gen complains if we don't have this
+name: "ControlPlaneMachineSet (OpenStack+MachineAPIMigration)"
+crdName: controlplanemachinesets.machine.openshift.io
+featureGates:
+- MachineAPIMigration
+tests:
+  onCreate:
+  - name: Should accept no failureDomains (+MachineAPIMigration)
+    initial: |
+      apiVersion: machine.openshift.io/v1
+      kind: ControlPlaneMachineSet
+      spec:
+        selector:
+          matchLabels:
+            machine.openshift.io/cluster-api-machine-role: master
+            machine.openshift.io/cluster-api-machine-type: master
+        template:
+          machineType: machines_v1beta1_machine_openshift_io
+          machines_v1beta1_machine_openshift_io:
+            metadata:
+              labels:
+                machine.openshift.io/cluster-api-machine-role: master
+                machine.openshift.io/cluster-api-machine-type: master
+                machine.openshift.io/cluster-api-cluster: cluster
+            spec:
+              providerSpec: {}
+            failureDomains:
+              platform: ""
+    expected: |
+      apiVersion: machine.openshift.io/v1
+      kind: ControlPlaneMachineSet
+      spec:
+        replicas: 3
+        state: Inactive
+        strategy:
+          type: RollingUpdate
+        selector:
+          matchLabels:
+            machine.openshift.io/cluster-api-machine-role: master
+            machine.openshift.io/cluster-api-machine-type: master
+        template:
+          machineType: machines_v1beta1_machine_openshift_io
+          machines_v1beta1_machine_openshift_io:
+            metadata:
+              labels:
+                machine.openshift.io/cluster-api-machine-role: master
+                machine.openshift.io/cluster-api-machine-type: master
+                machine.openshift.io/cluster-api-cluster: cluster
+            spec:
+              providerSpec: {}
+              authoritativeAPI: MachineAPI
+            failureDomains:
+              platform: ""
+  - name: Should accept an OpenStack failure domain with only the availabilityZone provided (+MachineAPIMigration)
+    initial: |
+      apiVersion: machine.openshift.io/v1
+      kind: ControlPlaneMachineSet
+      spec:
+        selector:
+          matchLabels:
+            machine.openshift.io/cluster-api-machine-role: master
+            machine.openshift.io/cluster-api-machine-type: master
+        template:
+          machineType: machines_v1beta1_machine_openshift_io
+          machines_v1beta1_machine_openshift_io:
+            metadata:
+              labels:
+                machine.openshift.io/cluster-api-machine-role: master
+                machine.openshift.io/cluster-api-machine-type: master
+                machine.openshift.io/cluster-api-cluster: cluster
+            spec:
+              providerSpec: {}
+            failureDomains:
+              platform: OpenStack
+              openstack:
+              - availabilityZone: foo
+    expected: |
+      apiVersion: machine.openshift.io/v1
+      kind: ControlPlaneMachineSet
+      spec:
+        replicas: 3
+        state: Inactive
+        strategy:
+          type: RollingUpdate
+        selector:
+          matchLabels:
+            machine.openshift.io/cluster-api-machine-role: master
+            machine.openshift.io/cluster-api-machine-type: master
+        template:
+          machineType: machines_v1beta1_machine_openshift_io
+          machines_v1beta1_machine_openshift_io:
+            metadata:
+              labels:
+                machine.openshift.io/cluster-api-machine-role: master
+                machine.openshift.io/cluster-api-machine-type: master
+                machine.openshift.io/cluster-api-cluster: cluster
+            spec:
+              providerSpec: {}
+              authoritativeAPI: MachineAPI
+            failureDomains:
+              platform: OpenStack
+              openstack:
+              - availabilityZone: foo
+  - name: Should accept an OpenStack failure domain with only the rootVolume provided
+    initial: |
+      apiVersion: machine.openshift.io/v1
+      kind: ControlPlaneMachineSet
+      spec:
+        selector:
+          matchLabels:
+            machine.openshift.io/cluster-api-machine-role: master
+            machine.openshift.io/cluster-api-machine-type: master
+        template:
+          machineType: machines_v1beta1_machine_openshift_io
+          machines_v1beta1_machine_openshift_io:
+            metadata:
+              labels:
+                machine.openshift.io/cluster-api-machine-role: master
+                machine.openshift.io/cluster-api-machine-type: master
+                machine.openshift.io/cluster-api-cluster: cluster
+            spec:
+              providerSpec: {}
+            failureDomains:
+              platform: OpenStack
+              openstack:
+              - rootVolume:
+                  availabilityZone: foo
+                  volumeType: fast
+    expected: |
+      apiVersion: machine.openshift.io/v1
+      kind: ControlPlaneMachineSet
+      spec:
+        replicas: 3
+        state: Inactive
+        strategy:
+          type: RollingUpdate
+        selector:
+          matchLabels:
+            machine.openshift.io/cluster-api-machine-role: master
+            machine.openshift.io/cluster-api-machine-type: master
+        template:
+          machineType: machines_v1beta1_machine_openshift_io
+          machines_v1beta1_machine_openshift_io:
+            metadata:
+              labels:
+                machine.openshift.io/cluster-api-machine-role: master
+                machine.openshift.io/cluster-api-machine-type: master
+                machine.openshift.io/cluster-api-cluster: cluster
+            spec:
+              providerSpec: {}
+              authoritativeAPI: MachineAPI
+            failureDomains:
+              platform: OpenStack
+              openstack:
+              - rootVolume:
+                  availabilityZone: foo
+                  volumeType: fast
+  - name: Should accept an OpenStack failure domain with only the root volume type provided
+    initial: |
+      apiVersion: machine.openshift.io/v1
+      kind: ControlPlaneMachineSet
+      spec:
+        selector:
+          matchLabels:
+            machine.openshift.io/cluster-api-machine-role: master
+            machine.openshift.io/cluster-api-machine-type: master
+        template:
+          machineType: machines_v1beta1_machine_openshift_io
+          machines_v1beta1_machine_openshift_io:
+            metadata:
+              labels:
+                machine.openshift.io/cluster-api-machine-role: master
+                machine.openshift.io/cluster-api-machine-type: master
+                machine.openshift.io/cluster-api-cluster: cluster
+            spec:
+              providerSpec: {}
+            failureDomains:
+              platform: OpenStack
+              openstack:
+              - rootVolume:
+                  volumeType: typeone
+    expected: |
+      apiVersion: machine.openshift.io/v1
+      kind: ControlPlaneMachineSet
+      spec:
+        replicas: 3
+        state: Inactive
+        strategy:
+          type: RollingUpdate
+        selector:
+          matchLabels:
+            machine.openshift.io/cluster-api-machine-role: master
+            machine.openshift.io/cluster-api-machine-type: master
+        template:
+          machineType: machines_v1beta1_machine_openshift_io
+          machines_v1beta1_machine_openshift_io:
+            metadata:
+              labels:
+                machine.openshift.io/cluster-api-machine-role: master
+                machine.openshift.io/cluster-api-machine-type: master
+                machine.openshift.io/cluster-api-cluster: cluster
+            spec:
+              providerSpec: {}
+              authoritativeAPI: MachineAPI
+            failureDomains:
+              platform: OpenStack
+              openstack:
+              - rootVolume:
+                  volumeType: typeone
+  - name: Should accept an OpenStack failure domain with both availabilityZone and rootVolume provided
+    initial: |
+      apiVersion: machine.openshift.io/v1
+      kind: ControlPlaneMachineSet
+      spec:
+        selector:
+          matchLabels:
+            machine.openshift.io/cluster-api-machine-role: master
+            machine.openshift.io/cluster-api-machine-type: master
+        template:
+          machineType: machines_v1beta1_machine_openshift_io
+          machines_v1beta1_machine_openshift_io:
+            metadata:
+              labels:
+                machine.openshift.io/cluster-api-machine-role: master
+                machine.openshift.io/cluster-api-machine-type: master
+                machine.openshift.io/cluster-api-cluster: cluster
+            spec:
+              providerSpec: {}
+            failureDomains:
+              platform: OpenStack
+              openstack:
+              - availabilityZone: foo
+                rootVolume:
+                  availabilityZone: foo
+                  volumeType: fast
+    expected: |
+      apiVersion: machine.openshift.io/v1
+      kind: ControlPlaneMachineSet
+      spec:
+        replicas: 3
+        state: Inactive
+        strategy:
+          type: RollingUpdate
+        selector:
+          matchLabels:
+            machine.openshift.io/cluster-api-machine-role: master
+            machine.openshift.io/cluster-api-machine-type: master
+        template:
+          machineType: machines_v1beta1_machine_openshift_io
+          machines_v1beta1_machine_openshift_io:
+            metadata:
+              labels:
+                machine.openshift.io/cluster-api-machine-role: master
+                machine.openshift.io/cluster-api-machine-type: master
+                machine.openshift.io/cluster-api-cluster: cluster
+            spec:
+              providerSpec: {}
+              authoritativeAPI: MachineAPI
+            failureDomains:
+              platform: OpenStack
+              openstack:
+              - availabilityZone: foo
+                rootVolume:
+                  availabilityZone: foo
+                  volumeType: fast
+  - name: Should accept an OpenStack failure domain with both availabilityZone and root volume type provided
+    initial: |
+      apiVersion: machine.openshift.io/v1
+      kind: ControlPlaneMachineSet
+      spec:
+        selector:
+          matchLabels:
+            machine.openshift.io/cluster-api-machine-role: master
+            machine.openshift.io/cluster-api-machine-type: master
+        template:
+          machineType: machines_v1beta1_machine_openshift_io
+          machines_v1beta1_machine_openshift_io:
+            metadata:
+              labels:
+                machine.openshift.io/cluster-api-machine-role: master
+                machine.openshift.io/cluster-api-machine-type: master
+                machine.openshift.io/cluster-api-cluster: cluster
+            spec:
+              providerSpec: {}
+            failureDomains:
+              platform: OpenStack
+              openstack:
+              - availabilityZone: foo
+                rootVolume:
+                  availabilityZone: foo
+                  volumeType: bar
+    expected: |
+      apiVersion: machine.openshift.io/v1
+      kind: ControlPlaneMachineSet
+      spec:
+        replicas: 3
+        state: Inactive
+        strategy:
+          type: RollingUpdate
+        selector:
+          matchLabels:
+            machine.openshift.io/cluster-api-machine-role: master
+            machine.openshift.io/cluster-api-machine-type: master
+        template:
+          machineType: machines_v1beta1_machine_openshift_io
+          machines_v1beta1_machine_openshift_io:
+            metadata:
+              labels:
+                machine.openshift.io/cluster-api-machine-role: master
+                machine.openshift.io/cluster-api-machine-type: master
+                machine.openshift.io/cluster-api-cluster: cluster
+            spec:
+              providerSpec: {}
+              authoritativeAPI: MachineAPI
+            failureDomains:
+              platform: OpenStack
+              openstack:
+              - availabilityZone: foo
+                rootVolume:
+                  availabilityZone: foo
+                  volumeType: bar

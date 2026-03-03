@@ -1,0 +1,81 @@
+apiVersion: apiextensions.k8s.io/v1 # Hack because controller-gen complains if we don't have this
+name: "PinnedImageSet"
+crdName: pinnedimagesets.machineconfiguration.openshift.io
+featureGate: PinnedImages
+tests:
+  onCreate:
+    - name: Should be able to create a minimal PinnedImageSet
+      initial: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: PinnedImageSet
+        metadata:
+          name: foobar
+          labels:
+            machineconfiguration.openshift.io/role: "master"
+        spec:
+          pinnedImages:
+            - name: registry.example.com/custom-os-image@sha256:86d26e7ebcccd6f07a75db5b1e56283b25c2ee1c6a755d6ffc5a4d59beb9c504 
+      expected: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: PinnedImageSet
+        metadata:
+          name: foobar
+          labels:
+            machineconfiguration.openshift.io/role: "master"
+        spec:
+          pinnedImages:
+            - name: registry.example.com/custom-os-image@sha256:86d26e7ebcccd6f07a75db5b1e56283b25c2ee1c6a755d6ffc5a4d59beb9c504
+    - name: Should be able to create a PinnedImageSet with the PinnedImageRef name containing a port
+      initial: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: PinnedImageSet
+        metadata:
+          name: foobar
+          labels:
+            machineconfiguration.openshift.io/role: "master"
+        spec:
+          pinnedImages:
+            - name: registry.example.com:5000/custom-os-image@sha256:86d26e7ebcccd6f07a75db5b1e56283b25c2ee1c6a755d6ffc5a4d59beb9c504 
+      expected: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: PinnedImageSet
+        metadata:
+          name: foobar
+          labels:
+            machineconfiguration.openshift.io/role: "master"
+        spec:
+          pinnedImages:
+            - name: registry.example.com:5000/custom-os-image@sha256:86d26e7ebcccd6f07a75db5b1e56283b25c2ee1c6a755d6ffc5a4d59beb9c504
+    - name: Should be able to create a PinnedImageSet with the PinnedImageRef name containing a namespace
+      initial: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: PinnedImageSet
+        metadata:
+          name: foobar
+          labels:
+            machineconfiguration.openshift.io/role: "master"
+        spec:
+          pinnedImages:
+            - name: registry.example.com/my-namespace/custom-os-image@sha256:86d26e7ebcccd6f07a75db5b1e56283b25c2ee1c6a755d6ffc5a4d59beb9c504 
+      expected: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: PinnedImageSet
+        metadata:
+          name: foobar
+          labels:
+            machineconfiguration.openshift.io/role: "master"
+        spec:
+          pinnedImages:
+            - name: registry.example.com/my-namespace/custom-os-image@sha256:86d26e7ebcccd6f07a75db5b1e56283b25c2ee1c6a755d6ffc5a4d59beb9c504
+    - name: Fail on invalid PinnedImageRef name
+      initial: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: PinnedImageSet
+        metadata:
+          name: foobar
+          labels:
+            machineconfiguration.openshift.io/role: "master"
+        spec:
+          pinnedImages:
+            - name: foo.bar 
+      expectedError: "spec.pinnedImages[0].name: Invalid value: \"string\": the OCI Image reference must end with a valid '@sha256:<digest>' suffix, where '<digest>' is 64 characters long"
