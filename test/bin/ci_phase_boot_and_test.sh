@@ -102,7 +102,7 @@ if [ "${SCHEDULER_ENABLED}" = "true" ]; then
     # Use the dynamic VM scheduler for resource-aware execution
     echo "Using dynamic VM scheduler (total: vcpus=${HOST_TOTAL_VCPUS}, memory=${HOST_TOTAL_MEMORY}MB, reserved: vcpus=${SYSTEM_RESERVED_VCPUS}, memory=${SYSTEM_RESERVED_MEMORY}MB)"
 
-    if ! bash -x ./bin/vm_scheduler.sh orchestrate "${SCENARIOS_TO_RUN}"; then
+    if ! bash ./bin/vm_scheduler.sh orchestrate "${SCENARIOS_TO_RUN}"; then
         TEST_OK=false
     fi
 
