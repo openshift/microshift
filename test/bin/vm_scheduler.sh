@@ -301,8 +301,8 @@ generate_dynamic_vm_name() {
             echo "${vm_name}"
             return 0
         fi
-        ((count++))
-        #TODO do i even need this?
+        ((count++)) || true
+        # Safety limit to prevent infinite loop
         if [ ${count} -gt 999 ]; then
             echo "ERROR: Too many VMs" >&2
             return 1
@@ -1114,14 +1114,14 @@ show_status() {
 
     for queue_file in "${SCENARIO_QUEUE}"/*; do
         [ -f "${queue_file}" ] || continue
-        ((total_scenarios++))
+        ((total_scenarios++)) || true
 
         local result
         result=$(get_req_value "${queue_file}" "result" "")
         if [ "${result}" = "SUCCESS" ]; then
-            ((passed_scenarios++))
+            ((passed_scenarios++)) || true
         elif [ "${result}" = "FAILED" ]; then
-            ((failed_scenarios++))
+            ((failed_scenarios++)) || true
         fi
     done
 
@@ -1137,9 +1137,9 @@ show_status() {
             local reused
             reused=$(cat "${reused_file}")
             if [ "${reused}" = "true" ]; then
-                ((vm_reuses++))
+                ((vm_reuses++)) || true
             else
-                ((vms_created++))
+                ((vms_created++)) || true
             fi
         fi
     done
