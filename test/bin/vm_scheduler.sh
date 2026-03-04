@@ -786,6 +786,15 @@ run_scenario_on_vm() {
         return ${exit_code}
     fi
 
+    # Check if scenario requested VM destruction after completion (e.g., system-level changes)
+    local destroy_after
+    destroy_after=$(get_req_value "${req_file}" "destroy_after" "false")
+    if [ "${destroy_after}" = "true" ]; then
+        destroy_vm "${vm_name}" "destroy_after flag set"
+        release_lock "vm_dispatch"
+        return ${exit_code}
+    fi
+
     # Check if any queued scenario can use this VM
     local next_scenario=""
     for queued in $(get_queued_scenarios); do
