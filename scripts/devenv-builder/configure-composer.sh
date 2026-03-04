@@ -19,7 +19,7 @@ install_and_configure_composer() {
     # The osbuild packages may come from 'copr' repositories.
     # They are installed separately to resolve potential RPM package dependency
     # conflicts with the system packages.
-    "${DNF_RETRY}" "install --nobest" "osbuild osbuild-composer"
+    "${DNF_RETRY}" "install" "--nobest osbuild osbuild-composer"
     "${DNF_RETRY}" "install" \
         "git composer-cli ostree rpm-ostree \
         cockpit-composer bash-completion podman runc genisoimage \
