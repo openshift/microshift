@@ -81,10 +81,8 @@ SYSTEM_RESERVED_MEMORY="${SYSTEM_RESERVED_MEMORY:-4096}"
 HOST_AVAILABLE_VCPUS=$((HOST_TOTAL_VCPUS - SYSTEM_RESERVED_VCPUS))
 HOST_AVAILABLE_MEMORY=$((HOST_TOTAL_MEMORY - SYSTEM_RESERVED_MEMORY))
 
-# Timeouts for VM operations (in seconds)
-# VM creation includes kickstart installation
-VM_CREATE_TIMEOUT="${VM_CREATE_TIMEOUT:-600}"
-# Default test timeout - scenarios can override via test_timeout in requirements
+# Timeout for test execution (in seconds)
+# Scenarios can override via test_timeout in requirements
 VM_TEST_TIMEOUT="${VM_TEST_TIMEOUT:-3600}"
 
 # Calculated resource requirements (populated during planning phase)
@@ -480,7 +478,6 @@ recalculate_resource_usage() {
         local vm_status
         vm_status=$(get_req_value "${vm_state}" "status" "unknown")
 
-        #TODO do i have a "creating" status? if thats the case i need to take it too
         if [ "${vm_status}" = "in_use" ] || [ "${vm_status}" = "available" ]; then
             local vm_vcpus vm_memory
             vm_vcpus=$(get_req_value "${vm_state}" "vcpus" "0")
@@ -704,15 +701,8 @@ run_scenario_on_vm() {
 
     # Get scenario-specific timeouts if specified, otherwise use defaults
     local req_file="${SCENARIO_STATUS}/${scenario_name}/requirements"
-    local create_timeout="${VM_CREATE_TIMEOUT}"
     local test_timeout="${VM_TEST_TIMEOUT}"
     if [ -f "${req_file}" ]; then
-        local custom_create_timeout
-        custom_create_timeout=$(get_req_value "${req_file}" "create_timeout" "")
-        if [ -n "${custom_create_timeout}" ]; then
-            create_timeout="${custom_create_timeout}"
-        fi
-
         local custom_test_timeout
         custom_test_timeout=$(get_req_value "${req_file}" "test_timeout" "")
         if [ -n "${custom_test_timeout}" ]; then
@@ -729,26 +719,22 @@ run_scenario_on_vm() {
     fi
 
     # Phase 1: Create VM (only for new VMs)
+    # No timeout wrapper - scenario.sh has its own retry mechanism with timeouts
     if [ "${is_new_vm}" = "true" ]; then
         local boot_log="${scenario_log_dir}/boot.log"
         local vm_dir="${VM_REGISTRY}/${vm_name}"
         mkdir -p "${vm_dir}"
         ln -sf "${boot_log}" "${vm_dir}/creation_log"
 
-        log "Creating VM ${vm_name} (timeout: ${create_timeout}s) - logging to ${boot_log}. Linking to ${vm_dir}/creation_log"
+        log "Creating VM ${vm_name} - logging to ${boot_log}"
 
         local create_exit=0
-        timeout --signal=TERM --kill-after=60 "${create_timeout}" \
-            bash -x "${SCRIPTDIR}/scenario.sh" create "${scenario_script}" &> "${boot_log}" || create_exit=$?
+        bash -x "${SCRIPTDIR}/scenario.sh" create "${scenario_script}" &> "${boot_log}" || create_exit=$?
 
         if [ ${create_exit} -ne 0 ]; then
             result="FAILED"
             exit_code=1
-            if [ ${create_exit} -eq 124 ]; then
-                log "VM creation TIMED OUT for ${scenario_name} after ${create_timeout}s - see ${boot_log}"
-            else
-                log "VM creation failed for ${scenario_name} (exit ${create_exit}) - see ${boot_log}"
-            fi
+            log "VM creation failed for ${scenario_name} (exit ${create_exit}) - see ${boot_log}"
         fi
     fi
 
@@ -1224,8 +1210,8 @@ Commands:
     status                      Show current scheduler state
 
 Environment Variables:
-    HOST_TOTAL_VCPUS       Total host vCPUs (default: 48)
-    HOST_TOTAL_MEMORY      Total host memory in MB (default: 98304)
+    HOST_TOTAL_VCPUS       Total host vCPUs (default: system detected)
+    HOST_TOTAL_MEMORY      Total host memory in MB (default: system detected)
     SYSTEM_RESERVED_VCPUS  vCPUs reserved for host OS (default: 2)
     SYSTEM_RESERVED_MEMORY Memory reserved for host OS in MB (default: 4096)
     SCHEDULER_ENABLED      Enable scheduler mode (default: false)
