@@ -32,7 +32,7 @@ EOF
 scenario_create_vms() {
     LVM_SYSROOT_SIZE=20480 prepare_kickstart host1 kickstart-bootc.ks.template rhel98-bootc-source-optionals
     # Three nics - one for sriov, one for macvlan, another for ipvlan (they cannot enslave the same interface)
-    launch_vm rhel98-bootc --network "${networks}" --vm_disksize 25 --vm_vcpus 4
+    launch_vm --boot_blueprint rhel98-bootc --network "${NETWORKS}" --vm_disksize 25 --vm_vcpus 4
 }
 
 scenario_remove_vms() {
@@ -42,12 +42,12 @@ scenario_remove_vms() {
 scenario_run_tests() {
     local skip_args=""
     if [[ "${UNAME_M}" =~ aarch64 ]]; then
-        skip_args="--skip sriov --skip tls-scanner"
+        skip_args="--skip sriov"
     fi
     # shellcheck disable=SC2086
     run_tests host1 \
         --variable "PROMETHEUS_HOST:$(hostname)" \
         --variable "LOKI_HOST:$(hostname)" \
         ${skip_args} \
-        suites/optional/olm.robot
+        suites/optional/generic-device-plugin.robot
 }

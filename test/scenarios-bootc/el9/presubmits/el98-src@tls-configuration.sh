@@ -16,7 +16,7 @@ EOF
 
 scenario_create_vms() {
     prepare_kickstart host1 kickstart-bootc.ks.template rhel98-bootc-source
-    launch_vm rhel98-bootc
+    launch_vm --boot_blueprint rhel98-bootc
 }
 
 scenario_remove_vms() {
@@ -24,5 +24,5 @@ scenario_remove_vms() {
 }
 
 scenario_run_tests() {
-    run_tests host1 suites/standard2
+    run_tests host1 suites/configuration/tls-configuration.robot
 }

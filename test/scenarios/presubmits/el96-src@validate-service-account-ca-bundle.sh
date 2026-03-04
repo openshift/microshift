@@ -9,14 +9,14 @@ min_vcpus=2
 min_memory=4096
 min_disksize=20
 networks=default
-boot_image=rhel98-bootc-source
+boot_image=rhel-9.6-microshift-source
 fips=false
 EOF
 }
 
 scenario_create_vms() {
-    prepare_kickstart host1 kickstart-bootc.ks.template rhel98-bootc-source
-    launch_vm rhel98-bootc
+    prepare_kickstart host1 kickstart.ks.template rhel-9.6-microshift-source
+    launch_vm
 }
 
 scenario_remove_vms() {
@@ -27,7 +27,7 @@ scenario_run_tests() {
     # The SYNC_FREQUENCY is set to a shorter-than-default value to speed up
     # pre-submit scenario completion time in DNS tests.
     run_tests host1 \
-        --variable "EXPECTED_OS_VERSION:9.8" \
+        --variable "EXPECTED_OS_VERSION:9.6" \
         --variable "SYNC_FREQUENCY:5s" \
-        suites/standard1/
+        suites/standard2/validate-service-account-ca-bundle.robot
 }

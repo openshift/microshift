@@ -14,6 +14,12 @@ fips=false
 EOF
 }
 
+
+
+
+
+
+
 scenario_create_vms() {
     prepare_kickstart host1 kickstart.ks.template rhel-9.8-microshift-source
     launch_vm rhel-9.8

@@ -15,8 +15,8 @@ EOF
 }
 
 scenario_create_vms() {
-    prepare_kickstart host1 kickstart.ks.template rhel-9.8-microshift-source
-    launch_vm rhel-9.8
+    prepare_kickstart host1 kickstart.ks.template rhel-9.6-microshift-source
+    launch_vm
 }
 
 scenario_remove_vms() {
@@ -24,5 +24,10 @@ scenario_remove_vms() {
 }
 
 scenario_run_tests() {
-    run_tests host1 suites/storage/reboot.robot
+    # The SYNC_FREQUENCY is set to a shorter-than-default value to speed up
+    # pre-submit scenario completion time in DNS tests.
+    run_tests host1 \
+        --variable "EXPECTED_OS_VERSION:9.6" \
+        --variable "SYNC_FREQUENCY:5s" \
+        suites/standard1/kustomize.robot
 }

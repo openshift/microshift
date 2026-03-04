@@ -9,14 +9,14 @@ min_vcpus=2
 min_memory=4096
 min_disksize=20
 networks=default
-boot_image=rhel-9.6-microshift-source
+boot_image=rhel98-bootc-source
 fips=false
 EOF
 }
 
 scenario_create_vms() {
-    prepare_kickstart host1 kickstart.ks.template rhel-9.8-microshift-source
-    launch_vm rhel-9.8
+    prepare_kickstart host1 kickstart-bootc.ks.template rhel98-bootc-source
+    launch_vm --boot_blueprint rhel98-bootc
 }
 
 scenario_remove_vms() {
@@ -24,5 +24,5 @@ scenario_remove_vms() {
 }
 
 scenario_run_tests() {
-    run_tests host1 suites/storage/reboot.robot
+    run_tests host1 suites/backup/auto-recovery-extra.robot
 }

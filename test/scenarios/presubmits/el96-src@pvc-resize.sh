@@ -15,8 +15,8 @@ EOF
 }
 
 scenario_create_vms() {
-    prepare_kickstart host1 kickstart.ks.template rhel-9.8-microshift-source
-    launch_vm rhel-9.8
+    prepare_kickstart host1 kickstart.ks.template rhel-9.6-microshift-source
+    launch_vm 
 }
 
 scenario_remove_vms() {
@@ -24,5 +24,5 @@ scenario_remove_vms() {
 }
 
 scenario_run_tests() {
-    run_tests host1 suites/storage/reboot.robot
+    run_tests host1 suites/storage/pvc-resize.robot
 }

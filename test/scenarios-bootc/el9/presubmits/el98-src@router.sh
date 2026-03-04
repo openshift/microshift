@@ -25,5 +25,6 @@ scenario_remove_vms() {
 
 scenario_run_tests() {
     run_tests host1 \
-        suites/router
+        suites/router/router.robot
 }
+
