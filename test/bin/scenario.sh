@@ -513,6 +513,16 @@ exit_if_image_not_set() {
     fi
 }
 
+# Exit the script if microshift packages are not found in rhocp repository
+exit_if_zprev_not_exist() {
+    local -r rhocp_repo="rhocp-4.${MINOR_VERSION}-for-rhel-9-${UNAME_M}-rpms"
+    local -r microshift_prev_z="$(dnf repoquery -q --repo "${rhocp_repo}" --nvr microshift)"
+    if [[ -z ${microshift_prev_z} ]]; then
+        record_junit "microshift packages not found in repo: ${rhocp_repo}" "exit_if_zprev_not_exist" "SKIPPED"
+        exit 0
+    fi
+}
+
 # Show the IP address of the VM
 function get_vm_ip {
     local -r vmname="${1}"
