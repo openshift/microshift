@@ -41,9 +41,9 @@ _SYSTEM_MEMORY_MB=$((_SYSTEM_MEMORY_KB / 1024))
 export HOST_TOTAL_VCPUS="${HOST_TOTAL_VCPUS:-${_SYSTEM_VCPUS}}"
 export HOST_TOTAL_MEMORY="${HOST_TOTAL_MEMORY:-${_SYSTEM_MEMORY_MB}}"
 
-# System reserved resources (for host OS, hypervisor overhead, etc.)
-export SYSTEM_RESERVED_VCPUS="${SYSTEM_RESERVED_VCPUS:-4}"
-export SYSTEM_RESERVED_MEMORY="${SYSTEM_RESERVED_MEMORY:-8192}"
+# System reserved resources (for host OS, hypervisor overhead, robot framework, etc.)
+export SYSTEM_RESERVED_VCPUS="${SYSTEM_RESERVED_VCPUS:-12}"
+export SYSTEM_RESERVED_MEMORY="${SYSTEM_RESERVED_MEMORY:-16384}"
 
 # Log output automatically
 LOGDIR="${ROOTDIR}/_output/ci-logs"
