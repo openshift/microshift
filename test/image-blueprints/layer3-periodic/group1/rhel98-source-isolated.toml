@@ -1,9 +1,9 @@
-name = "rhel-9.6-microshift-source-isolated"
-description = "A RHEL 9.6 image with the RPMs built from source with embedded container images."
+name = "rhel-9.8-microshift-source-isolated"
+description = "A RHEL 9.8 image with the RPMs built from source with embedded container images."
 version = "0.0.1"
 modules = []
 groups = []
-distro = "rhel-96"
+distro = "rhel-98"
 
 {{ range (env.Getenv "MICROSHIFT_MANDATORY_RPMS" | strings.Split " ") }}
 [[packages]]
