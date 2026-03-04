@@ -1,5 +1,8 @@
 # Complete reference: https://docs.coderabbit.ai/reference/configuration
 
+# Ensure organizational-level safety checks are enabled
+inheritance: true
+
 tone_instructions: "Be concise"
 
 reviews:
