@@ -513,12 +513,16 @@ exit_if_image_not_set() {
     fi
 }
 
-# Exit the script if microshift packages are not found in rhocp repository
+# Exit the script if microshift previous Z-stream version does not exist in rhocp repository
 exit_if_zprev_not_exist() {
     local -r rhocp_repo="rhocp-4.${MINOR_VERSION}-for-rhel-9-${UNAME_M}-rpms"
     local -r microshift_prev_z="$(dnf repoquery -q --repo "${rhocp_repo}" --nvr microshift)"
     if [[ -z ${microshift_prev_z} ]]; then
-        record_junit "microshift packages not found in repo: ${rhocp_repo}" "exit_if_zprev_not_exist" "SKIPPED"
+        record_junit "no microshift packages found in ${rhocp_repo} repo" "exit_if_zprev_not_exist" "SKIPPED"
+        exit 0
+    fi
+    if [[ "${microshift_prev_z}" == "microshift-${BREW_LREL_RELEASE_VERSION}" ]]; then
+        record_junit "microshift packages found in ${rhocp_repo} repo ${microshift_prev_z} is the same as the target version: ${BREW_LREL_RELEASE_VERSION}" "exit_if_zprev_not_exist" "SKIPPED"
         exit 0
     fi
 }
