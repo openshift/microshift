@@ -19,8 +19,8 @@ source "${SCRIPTDIR}/common_versions.sh"
 LVM_SYSROOT_SIZE="15360"
 PULL_SECRET="${PULL_SECRET:-${HOME}/.pull-secret.json}"
 PULL_SECRET_CONTENT="$(jq -c . "${PULL_SECRET}")"
-VM_BOOT_TIMEOUT=1200 # Overall total boot times are around 15m
-VM_GREENBOOT_TIMEOUT=1800 # Greenboot readiness may take up to 15-30m depending on the load
+VM_BOOT_TIMEOUT="${VM_BOOT_TIMEOUT:-1200}" # Overall total boot times are around 15m
+VM_GREENBOOT_TIMEOUT="${VM_GREENBOOT_TIMEOUT:-1800}" # Greenboot readiness may take up to 15-30m depending on the load
 SKIP_SOS=${SKIP_SOS:-false}  # may be overridden in global settings file
 SKIP_GREENBOOT=${SKIP_GREENBOOT:-false}  # may be overridden in scenario file
 GREENBOOT_TIMEOUT=${GREENBOOT_TIMEOUT:-600}  # may be overridden in scenario file

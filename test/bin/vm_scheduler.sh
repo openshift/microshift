@@ -718,6 +718,14 @@ run_scenario_on_vm() {
         if [ -n "${custom_test_timeout}" ]; then
             test_timeout="${custom_test_timeout}"
         fi
+
+        # Export greenboot timeout for scenario.sh to use
+        local custom_greenboot_timeout
+        custom_greenboot_timeout=$(get_req_value "${req_file}" "greenboot_timeout" "")
+        if [ -n "${custom_greenboot_timeout}" ]; then
+            export VM_GREENBOOT_TIMEOUT="${custom_greenboot_timeout}"
+            log "Using custom greenboot timeout: ${custom_greenboot_timeout}s"
+        fi
     fi
 
     # Phase 1: Create VM (only for new VMs)
