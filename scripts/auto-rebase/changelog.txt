@@ -1,0 +1,20 @@
+- cluster-network-operator embedded-component f5aaab800060be6b8c299d2a1feaaaa40298d71a to b7adb6895b84c1916904e6eccd93ce578731171f
+  - 5d9bd03 2025-12-11T06:58:42+00:00 Fix: whereabouts-token-watcher DaemonSet improvements
+
+- machine-config-operator embedded-component 1d699383bfd81188d2ab77fc9e0c659ab3683c12 to 3566e363bfb1d08b43bc0aba63efe70248abb86e
+  - b1e8d8a7 2026-03-02T14:54:09+01:00 OCPBUGS-77420: Remove MCD liveness probe
+  - f50f308d 2026-02-26T18:03:32+00:00 fixes config drift metric persistence
+
+- route-controller-manager embedded-component bc97534a12a7a6bac096e4ed488b29535c8d4f33 to 25d79fdf101f3d41f4583a970e5f324b79fb42d8
+  - d9cf8b8 2026-02-23T15:37:19+00:00 filter ingress namespace on UnmanagedRoutes metric
+
+- ovn-kubernetes image-amd64 194e289903051ba951e479c227ad3d44f9fc321a to 8adb10a1f2919be9cc8eca1134963ac1faa0fe23
+  - 28f5871b 2026-02-26T18:28:53+01:00 nodeallocator: fix subnet leak when hybrid overlay is enabled
+  - d1bc30cb 2026-02-24T11:50:36+01:00 Fix IC cluster cleanup tests zone configuration
+  - ab1f5789 2026-02-24T11:50:36+01:00 Remove IC zone migration HACK code
+
+- ovn-kubernetes image-arm64 194e289903051ba951e479c227ad3d44f9fc321a to 8adb10a1f2919be9cc8eca1134963ac1faa0fe23
+  - 28f5871b 2026-02-26T18:28:53+01:00 nodeallocator: fix subnet leak when hybrid overlay is enabled
+  - d1bc30cb 2026-02-24T11:50:36+01:00 Fix IC cluster cleanup tests zone configuration
+  - ab1f5789 2026-02-24T11:50:36+01:00 Remove IC zone migration HACK code
+
