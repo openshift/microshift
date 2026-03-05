@@ -718,24 +718,28 @@ run_scenario_on_vm() {
         fi
     fi
 
-    # Phase 1: Create VM (only for new VMs)
+    # Phase 1: Create/setup VM
+    # For new VMs: creates the VM from scratch
+    # For reused VMs: launch_vm detects reuse via should_reuse_vm() and sets up properties
     # No timeout wrapper - scenario.sh has its own retry mechanism with timeouts
+    local boot_log="${scenario_log_dir}/boot.log"
+    local vm_dir="${VM_REGISTRY}/${vm_name}"
+    mkdir -p "${vm_dir}"
+    ln -sf "${boot_log}" "${vm_dir}/creation_log"
+
     if [ "${is_new_vm}" = "true" ]; then
-        local boot_log="${scenario_log_dir}/boot.log"
-        local vm_dir="${VM_REGISTRY}/${vm_name}"
-        mkdir -p "${vm_dir}"
-        ln -sf "${boot_log}" "${vm_dir}/creation_log"
-
         log "Creating VM ${vm_name} - logging to ${boot_log}"
+    else
+        log "Setting up reused VM ${vm_name} - logging to ${boot_log}"
+    fi
 
-        local create_exit=0
-        bash -x "${SCRIPTDIR}/scenario.sh" create "${scenario_script}" &> "${boot_log}" || create_exit=$?
+    local create_exit=0
+    bash -x "${SCRIPTDIR}/scenario.sh" create "${scenario_script}" &> "${boot_log}" || create_exit=$?
 
-        if [ ${create_exit} -ne 0 ]; then
-            result="FAILED"
-            exit_code=1
-            log "VM creation failed for ${scenario_name} (exit ${create_exit}) - see ${boot_log}"
-        fi
+    if [ ${create_exit} -ne 0 ]; then
+        result="FAILED"
+        exit_code=1
+        log "VM setup failed for ${scenario_name} (exit ${create_exit}) - see ${boot_log}"
     fi
 
     # Phase 2: Run tests (only if creation succeeded or VM was reused)
@@ -807,7 +811,12 @@ run_scenario_on_vm() {
         release_lock "vm_dispatch"
 
         # Run the next scenario (recursive call)
-        run_scenario_on_vm "${next_script}" "${next_scenario}" "${vm_name}" "false"
+        # Capture exit code to propagate failures from reused scenarios
+        local reuse_exit=0
+        run_scenario_on_vm "${next_script}" "${next_scenario}" "${vm_name}" "false" || reuse_exit=$?
+        if [ ${reuse_exit} -ne 0 ]; then
+            exit_code=${reuse_exit}
+        fi
     else
         # No compatible scenario waiting - destroy VM
         destroy_vm "${vm_name}"
