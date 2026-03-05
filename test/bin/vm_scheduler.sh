@@ -356,24 +356,28 @@ boot_image_compatible() {
     [ "${vm_image}" = "${req_image}" ] && return 0
 
     # Special images require exact match (cannot substitute)
+    # These have unique configurations that can't be approximated
     case "${req_image}" in
-        *-fips|*-tuned|*-isolated|*-ai-model-serving)
+        *-fips|*-tuned|*-isolated|*-ai-model-serving|*-fake-next-minor)
             return 1  # Must be exact
             ;;
     esac
 
-    # Check if VM image is a superset of required image
-    # Hierarchy: source < source-optionals, brew-lrel < brew-lrel-optional
-    case "${req_image}" in
-        *-source)
-            # source-optionals is superset of source
-            [[ "${vm_image}" == "${req_image}-optionals" ]] && return 0
-            ;;
-        *-brew-lrel)
-            # brew-lrel-optional is superset of brew-lrel
-            [[ "${vm_image}" == "${req_image}-optional" ]] && return 0
+    # If VM has a special configuration, it can only run its exact scenarios
+    case "${vm_image}" in
+        *-fips|*-tuned|*-isolated|*-ai-model-serving|*-fake-next-minor)
+            return 1  # Special VM can't run generic scenarios
             ;;
     esac
+
+    # Check if VM image is a superset of required image
+    # A VM with "optionals" can run scenarios that need the base image
+    # This is like networks: having more capabilities is fine
+    if [[ "${vm_image}" == "${req_image}-optionals" ]] || \
+       [[ "${vm_image}" == "${req_image}-optional" ]] || \
+       [[ "${vm_image}" == "${req_image}-with-optional" ]]; then
+        return 0
+    fi
 
     # ai-model-serving includes qemu-guest-agent, so can run isolated scenarios
     if [[ "${req_image}" == *-isolated ]] && [[ "${vm_image}" == *-ai-model-serving ]]; then
