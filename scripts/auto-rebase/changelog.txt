@@ -1,36 +1,23 @@
-- cluster-kube-apiserver-operator embedded-component 416eeae4e60970f5ab52a833774c7bb60644e6af to e9bc90906c726823f154c78d3e568c98ff77b6a5
-  - c3aa9e5 2026-02-05T18:49:21+00:00 Add priority field to prevent early shutdown
+- cluster-kube-scheduler-operator embedded-component c7b51633b67e3e2860ca053930422f69e17bd40a to 4e99db62cea1d2ca48765230c6f5663d1f2c2702
+  - b900da1 2026-03-03T14:45:38+01:00 chore: update OWNERS
 
-- cluster-kube-controller-manager-operator embedded-component 9a9a437f2342dc9bba7844298b955d5f9bbc76bb to 6347fc8179b2a04d51c99432ae612bf4df595dc0
-  - a3ccc2c 2026-02-05T13:59:13-05:00 Add priority field to prevent early shutdown
+- cluster-network-operator embedded-component f63a7ffb316c9ca4359210ff5ea2c003dbe2d6a9 to 8df9d04f3019ff6e0a4c51504601e8a73b4322e3
+  - fc585b2 2026-01-20T13:10:54+00:00 whereabouts-config is a reserved name for user interaction.
 
-- cluster-kube-scheduler-operator embedded-component 971ffbb8239a8c49f1254e5fdaab854eed224f31 to c7b51633b67e3e2860ca053930422f69e17bd40a
-  - d49ed9c 2026-02-05T13:57:22-05:00 Update ks_pod_scenario_3.yaml
-  - 9d3ee9b 2026-02-05T13:57:22-05:00 Update ks_pod_scenario_2.yaml
-  - ec36d40 2026-02-05T13:57:22-05:00 Update ks_pod_scenario_1.yaml
-  - 916812c 2026-02-05T13:57:21-05:00 Add priority field to prevent early shutdown
+- machine-config-operator embedded-component 8575e08bba14b3c0eb97620181b763449951d03b to 8e8d70cd2861f60af9597775a2de0f3297339ee1
+  - 884131c7 2026-03-02T20:40:01+00:00 fixes config drift metric persistence
+  - f1c3e0c9 2026-02-27T13:13:26+01:00 OCPBUGS-77421: Remove MCD liveness probe
+  - 0c580e09 2026-02-24T12:03:28-06:00 Fix MCN conditions not updating during OCL sync
 
-- kubernetes embedded-component 436b373e7dec669750c65a1ef832665e56b733b7 to 91c24081f468e7636c824f4f5a2eb68660b81012
-  - b18acb299 2025-04-08T14:24:38+00:00 UPSTREAM: 130450: Fix implementation of ContainsCIDR to allow non-equal addresses
+- ovn-kubernetes image-amd64 4bee86ff82e3632f99ee5926c0f8ab7a78c93f48 to 0a68692ea5e733e87eac8d6361c9cbb6a6258fb5
+  - 6a945d5a 2026-02-26T18:29:36+01:00 nodeallocator: fix subnet leak when hybrid overlay is enabled
+  - 21444cc3 2026-02-24T11:55:34+01:00 Fix IC cluster cleanup tests zone configuration
+  - dccddff2 2026-02-24T11:55:34+01:00 Remove IC zone migration HACK code
+  - 1ce92737 2026-01-21T14:02:20+01:00 fix(localnet, ipamless): Prevent LSP deletion on sync
 
-- machine-config-operator embedded-component 0b0569287da3daea19bf47aa298037ccb4cbff98 to 8575e08bba14b3c0eb97620181b763449951d03b
-  - a274ec57 2026-02-19T15:06:48-06:00 fix pull secret log spam make verify error
-  - 52cd8505 2026-02-18T10:39:13-06:00 fixes exposure of sensitive data in log files
-  - d9c75d7a 2026-02-11T18:48:08+03:00 Add hostIP 127.0.0.1 to machine-config-daemon port 8798
-  - 352749e7 2026-02-11T18:47:59+03:00 add a relevant svc to the crio port
-  - 93ade935 2026-02-11T18:46:50+03:00 add missing ports in contaiterport on the daemoset
-
-- operator-framework-olm embedded-component 357bb130e6149ef87afbaadd6677ab1f71876d53 to c2df9e7c6ccac3489c833a03cfa3518d5eedf01f
-  - 096873a0 2026-02-13T21:17:41+00:00 fixup! Remove the collect-profiles job
-  - 267547d4 2026-02-13T21:17:40+00:00 fixup! Remove the collect-profiles job
-  - cd9d4dc4 2026-02-13T21:17:40+00:00 Remove the collect-profiles job
-
-- ovn-kubernetes image-amd64 70a2d777ecb661c3267d24092381518f0420fa9a to 4bee86ff82e3632f99ee5926c0f8ab7a78c93f48
-  - 3bbc31b3 2026-01-21T14:03:37+01:00 fix(localnet, ipamless): Prevent LSP deletion on sync
-
-- kubernetes image-amd64 436b373e7dec669750c65a1ef832665e56b733b7 to 91c24081f468e7636c824f4f5a2eb68660b81012
-  - b18acb299 2025-04-08T14:24:38+00:00 UPSTREAM: 130450: Fix implementation of ContainsCIDR to allow non-equal addresses
-
-- ovn-kubernetes image-arm64 70a2d777ecb661c3267d24092381518f0420fa9a to 4bee86ff82e3632f99ee5926c0f8ab7a78c93f48
-  - 3bbc31b3 2026-01-21T14:03:37+01:00 fix(localnet, ipamless): Prevent LSP deletion on sync
+- ovn-kubernetes image-arm64 4bee86ff82e3632f99ee5926c0f8ab7a78c93f48 to 0a68692ea5e733e87eac8d6361c9cbb6a6258fb5
+  - 6a945d5a 2026-02-26T18:29:36+01:00 nodeallocator: fix subnet leak when hybrid overlay is enabled
+  - 21444cc3 2026-02-24T11:55:34+01:00 Fix IC cluster cleanup tests zone configuration
+  - dccddff2 2026-02-24T11:55:34+01:00 Remove IC zone migration HACK code
+  - 1ce92737 2026-01-21T14:02:20+01:00 fix(localnet, ipamless): Prevent LSP deletion on sync
 
