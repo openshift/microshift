@@ -33,7 +33,7 @@ require (
 	github.com/fsnotify/fsnotify v1.8.0
 	github.com/gogo/protobuf v1.3.2
 	github.com/golang/snappy v0.0.4
-	github.com/openshift/route-controller-manager v0.0.0-20241218160919-bc97534a12a7
+	github.com/openshift/route-controller-manager v0.0.0-20260302140353-25d79fdf101f
 	github.com/prometheus/client_model v0.6.1
 	github.com/prometheus/common v0.62.0
 	github.com/prometheus/prometheus v0.302.1
