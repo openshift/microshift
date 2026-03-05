@@ -414,9 +414,12 @@ vm_satisfies_requirements() {
     [ "${vm_disksize}" -ge "${req_disksize}" ] || return 1
 
     # Check networks (VM must have all required networks)
-    for net in ${req_networks//,/ }; do
-        echo ",${vm_networks}," | grep -q ",${net}," || return 1
-    done
+    # Empty network requirement means "any network is fine" (network-agnostic)
+    if [ -n "${req_networks}" ]; then
+        for net in ${req_networks//,/ }; do
+            echo ",${vm_networks}," | grep -q ",${net}," || return 1
+        done
+    fi
 
     # Check FIPS (if required, VM must have it)
     if [ "${req_fips}" = "true" ] && [ "${vm_fips}" != "true" ]; then
@@ -612,18 +615,60 @@ destroy_vm() {
     log "Destroyed VM ${vm_name}"
 }
 
+# Calculate reusability score for a scenario
+# Lower score = less reusable = should run first
+# Higher score = more reusable = should stay queued longer for reuse
+get_reusability_score() {
+    local boot_image="$1"
+    local networks="$2"
+
+    # Score 0: Completely non-reusable (special boot_image that requires exact match)
+    case "${boot_image}" in
+        *-fips|*-tuned|*-isolated|*-ai-model-serving|*-fake-next-minor)
+            echo "0"
+            return
+            ;;
+    esac
+
+    # Score 1: Non-reusable due to special network (not default or empty)
+    if [ -n "${networks}" ] && [ "${networks}" != "default" ]; then
+        echo "1"
+        return
+    fi
+
+    # Score 2: Reusable - optionals can be reused by source scenarios
+    case "${boot_image}" in
+        *-optionals|*-optional|*-with-optional)
+            echo "2"
+            return
+            ;;
+    esac
+
+    # Score 3: Flexible - source/base image with default network
+    if [ "${networks}" = "default" ]; then
+        echo "3"
+        return
+    fi
+
+    # Score 4: Most flexible - network-agnostic (empty networks)
+    # Can run on ANY VM, stays queued longest for maximum reuse
+    echo "4"
+}
+
 # Sort scenarios by requirements to maximize VM reuse
-# Scenarios with same requirements end up adjacent, enabling reuse
 sort_scenarios_for_reuse() {
     local -a scenarios=("$@")
 
-    # Sort scenarios to maximize VM reuse:
-    # 1. boot_image: more capable first (optionals before base) - descending
-    # 2. networks: more networks first - descending
-    # 3. vcpus: more vcpus first - descending
+    # Sort strategy for maximum VM reuse:
+    # 1. Reusability score (ascending): restrictive scenarios first
+    #    - They can't be reused anyway, so get them out of the way
+    #    - Their VMs are destroyed when done
+    # 2. Within same reusability: boot_image descending (optionals before source)
+    # 3. Then vcpus descending (larger VMs first)
     #
-    # This ensures larger/more capable VMs are created first.
-    # When they finish, they can run smaller/simpler scenarios.
+    # This ensures:
+    # - Restrictive scenarios (special networks/boot_images) start first
+    # - Flexible scenarios stay queued longer, maximizing reuse opportunities
 
     for scenario_script in "${scenarios[@]}"; do
         local scenario_name
@@ -631,16 +676,19 @@ sort_scenarios_for_reuse() {
         local req_file="${SCENARIO_STATUS}/${scenario_name}/requirements"
 
         if [ -f "${req_file}" ]; then
-            local boot_image networks vcpus
+            local boot_image networks vcpus reuse_score
             boot_image=$(get_req_value "${req_file}" "boot_image" "default")
             networks=$(get_req_value "${req_file}" "networks" "default")
             vcpus=$(get_req_value "${req_file}" "min_vcpus" "2")
-            # Sort key: boot_image, networks, vcpus - all descending via reverse sort
-            printf "%s\t%s\t%02d\t%s\n" "${boot_image}" "${networks}" "${vcpus}" "${scenario_script}"
+            reuse_score=$(get_reusability_score "${boot_image}" "${networks}")
+            # Sort key: reuse_score (asc), boot_image (desc), vcpus (desc)
+            # Use inverse vcpus (100-vcpus) so ascending sort gives descending vcpus
+            printf "%d\t%s\t%02d\t%s\n" "${reuse_score}" "${boot_image}" "$((100 - vcpus))" "${scenario_script}"
         else
-            printf "aaa\tdefault\t00\t%s\n" "${scenario_script}"
+            # Unknown requirements - treat as flexible, put last
+            printf "9\taaa\t99\t%s\n" "${scenario_script}"
         fi
-    done | sort -r | cut -f4
+    done | sort -t$'\t' -k1,1n -k2,2r -k3,3n | cut -f4
 }
 
 # Global sequence counter for queue ordering
