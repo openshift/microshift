@@ -612,31 +612,71 @@ destroy_vm() {
     log "Destroyed VM ${vm_name}"
 }
 
+# Sort scenarios by requirements to maximize VM reuse
+# Scenarios with same requirements end up adjacent, enabling reuse
+sort_scenarios_for_reuse() {
+    local -a scenarios=("$@")
+
+    # Sort scenarios to maximize VM reuse:
+    # 1. boot_image: more capable first (optionals before base) - descending
+    # 2. networks: more networks first - descending
+    # 3. vcpus: more vcpus first - descending
+    #
+    # This ensures larger/more capable VMs are created first.
+    # When they finish, they can run smaller/simpler scenarios.
+
+    for scenario_script in "${scenarios[@]}"; do
+        local scenario_name
+        scenario_name=$(basename "${scenario_script}" .sh)
+        local req_file="${SCENARIO_STATUS}/${scenario_name}/requirements"
+
+        if [ -f "${req_file}" ]; then
+            local boot_image networks vcpus
+            boot_image=$(get_req_value "${req_file}" "boot_image" "default")
+            networks=$(get_req_value "${req_file}" "networks" "default")
+            vcpus=$(get_req_value "${req_file}" "min_vcpus" "2")
+            # Sort key: boot_image, networks, vcpus - all descending via reverse sort
+            printf "%s\t%s\t%02d\t%s\n" "${boot_image}" "${networks}" "${vcpus}" "${scenario_script}"
+        else
+            printf "aaa\tdefault\t00\t%s\n" "${scenario_script}"
+        fi
+    done | sort -r | cut -f4
+}
+
+# Global sequence counter for queue ordering
+QUEUE_SEQUENCE=0
+
 queue_scenario() {
     local scenario_script="$1"
     local scenario_name="$2"
     local req_file="$3"
 
+    QUEUE_SEQUENCE=$((QUEUE_SEQUENCE + 1))
     local queue_file="${SCENARIO_QUEUE}/${scenario_name}"
     cat > "${queue_file}" <<EOF
 script=${scenario_script}
 requirements=${req_file}
 status=queued
 queued_at=$(date -Iseconds)
+sequence=${QUEUE_SEQUENCE}
 EOF
 
-    log "Queued scenario ${scenario_name}"
+    log "Queued scenario ${scenario_name} (seq=${QUEUE_SEQUENCE})"
 }
 
 get_queued_scenarios() {
+    # Return queued scenarios sorted by their sequence number
+    # to preserve the order they were added (which is sorted by requirements)
     for queue_file in "${SCENARIO_QUEUE}"/*; do
         [ -f "${queue_file}" ] || continue
         local status
         status=$(get_req_value "${queue_file}" "status" "")
         if [ "${status}" = "queued" ]; then
-            basename "${queue_file}"
+            local seq
+            seq=$(get_req_value "${queue_file}" "sequence" "999")
+            printf "%03d\t%s\n" "${seq}" "$(basename "${queue_file}")"
         fi
-    done
+    done | sort -n | cut -f2
 }
 
 mark_scenario_running() {
@@ -1056,13 +1096,14 @@ EOF
         fi
     fi
 
-    for scenario_script in "${dynamic_scenarios[@]}"; do
+    # Sort scenarios by requirements to maximize VM reuse
+    while IFS= read -r scenario_script; do
+        [ -n "${scenario_script}" ] || continue
         local scenario_name
         scenario_name=$(basename "${scenario_script}" .sh)
         local req_file="${SCENARIO_STATUS}/${scenario_name}/requirements"
-
         queue_scenario "${scenario_script}" "${scenario_name}" "${req_file}"
-    done
+    done < <(sort_scenarios_for_reuse "${dynamic_scenarios[@]}")
 
     log "=== PHASE 4: Running tests ==="
 
