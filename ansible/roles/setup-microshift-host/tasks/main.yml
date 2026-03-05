@@ -32,18 +32,16 @@
     state: link
   with_items: "{{ go_files }}"
 
-- name: check firewalld service status
+- name: unmask firewalld if masked
   ansible.builtin.systemd:
     name: firewalld
-  register: firewalld_status
-  ignore_errors: true
+    masked: no
 
 - name: start and enable firewalld
   ansible.builtin.systemd:
     name: firewalld
     state: started
     enabled: yes
-  when: firewalld_status.status.UnitFileState is not defined or firewalld_status.status.UnitFileState != 'masked'
 
 - name: check if rhel vg exists
   ansible.builtin.command: vgdisplay -s {{ vg_name }}
