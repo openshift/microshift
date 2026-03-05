@@ -1073,7 +1073,8 @@ launch_vm() {
 
         # Cleanup the failed VM before trying to recreate it
         # Keep the storage pool for the subsequent VM creation
-        remove_vm "${vmname}" true
+        # Force destroy even in scheduler mode so retry can work
+        remove_vm "${vmname}" true true
     done
 
     if ${vm_created} ; then
@@ -1143,23 +1144,25 @@ launch_vm() {
 }
 
 # Clean up the resources for one VM, optionally skipping storage pool removal
+# Parameters:
+#   vmname: name of the VM to remove
+#   keep_pool: if true, keep the storage pool (default: false)
+#   force_destroy: if true, destroy VM even in scheduler mode (default: false)
+#                  Used by retry logic to clean up failed VM creation attempts
 remove_vm() {
     local -r vmname="${1}"
     local -r keep_pool="${2:-false}"
+    local -r force_destroy="${3:-false}"
     local -r full_vmname="$(full_vm_name "${vmname}")"
 
-    # In scheduler mode, the scheduler handles VM lifecycle
-    # We only release the VM back to the scheduler, not destroy it
-    if [ "${SCHEDULER_ENABLED}" = "true" ]; then
-        echo "Scheduler mode: releasing VM ${full_vmname} to scheduler"
-        # The scheduler will handle destruction when no compatible scenarios remain
-        # Just clean up scenario-specific state
-        rm -rf "${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${vmname}"
+    # In scheduler mode, skip VM destruction unless forced (needed for retry logic)
+    # This allows VMs to be reused by subsequent scenarios
+    if [ "${SCHEDULER_ENABLED}" = "true" ] && [ "${force_destroy}" != "true" ]; then
         return 0
     fi
 
     # Remove the actual VM
-    if sudo virsh dumpxml "${full_vmname}" >/dev/null; then
+    if sudo virsh dumpxml "${full_vmname}" >/dev/null 2>&1; then
         if ! sudo virsh dominfo "${full_vmname}" | grep '^State' | grep -q 'shut off'; then
             sudo virsh destroy --graceful "${full_vmname}" || true
         fi
