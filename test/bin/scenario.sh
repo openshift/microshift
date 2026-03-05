@@ -511,6 +511,26 @@ exit_if_image_not_set() {
     fi
 }
 
+# Exit the script if microshift previous Z-stream version does not exist in rhocp repository
+exit_if_zprev_not_exist() {
+    local -r rhocp_repo="rhocp-4.${MINOR_VERSION}-for-rhel-9-${UNAME_M}-rpms"
+    local microshift_prev_z
+    if ! microshift_prev_z="$(dnf repoquery -q --repo "${rhocp_repo}" --latest-limit 1 --nvr microshift 2>&1)"; then
+        record_junit "repo ${rhocp_repo} does not exist or is not available: ${microshift_prev_z}" "exit_if_zprev_not_exist" "SKIPPED"
+        exit 0
+    fi
+    # check if there are any microshift packages found
+    if [[ -z ${microshift_prev_z} ]]; then
+        record_junit "no microshift packages found in ${rhocp_repo} repo" "exit_if_zprev_not_exist" "SKIPPED"
+        exit 0
+    fi
+    # check if the microshift package is the same as the target version
+    if [[ "${microshift_prev_z}" == "microshift-${BREW_LREL_RELEASE_VERSION}" ]]; then
+        record_junit "microshift packages found in ${rhocp_repo} repo ${microshift_prev_z} is the same as the target version: ${BREW_LREL_RELEASE_VERSION}" "exit_if_zprev_not_exist" "SKIPPED"
+        exit 0
+    fi
+}
+
 # Show the IP address of the VM
 function get_vm_ip {
     local -r vmname="${1}"
