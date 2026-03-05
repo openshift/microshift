@@ -718,46 +718,65 @@ run_scenario_on_vm() {
         fi
     fi
 
-    # Phase 1: Create/setup VM
-    # For new VMs: creates the VM from scratch
-    # For reused VMs: launch_vm detects reuse via should_reuse_vm() and sets up properties
-    # No timeout wrapper - scenario.sh has its own retry mechanism with timeouts
     local boot_log="${scenario_log_dir}/boot.log"
+    local run_log="${scenario_log_dir}/run.log"
     local vm_dir="${VM_REGISTRY}/${vm_name}"
     mkdir -p "${vm_dir}"
     ln -sf "${boot_log}" "${vm_dir}/creation_log"
 
     if [ "${is_new_vm}" = "true" ]; then
+        # New VM: separate create and run phases
+        # Create phase has its own retry logic with timeouts
         log "Creating VM ${vm_name} - logging to ${boot_log}"
-    else
-        log "Setting up reused VM ${vm_name} - logging to ${boot_log}"
-    fi
 
-    local create_exit=0
-    bash -x "${SCRIPTDIR}/scenario.sh" create "${scenario_script}" &> "${boot_log}" || create_exit=$?
+        local create_exit=0
+        bash -x "${SCRIPTDIR}/scenario.sh" create "${scenario_script}" &> "${boot_log}" || create_exit=$?
 
-    if [ ${create_exit} -ne 0 ]; then
-        result="FAILED"
-        exit_code=1
-        log "VM setup failed for ${scenario_name} (exit ${create_exit}) - see ${boot_log}"
-    fi
-
-    # Phase 2: Run tests (only if creation succeeded or VM was reused)
-    if [ "${exit_code}" -eq 0 ]; then
-        local run_log="${scenario_log_dir}/run.log"
-        log "Running tests for ${scenario_name} (timeout: ${test_timeout}s) - logging to ${run_log}"
-
-        local run_exit=0
-        timeout --signal=TERM --kill-after=60 "${test_timeout}" \
-            bash -x "${SCRIPTDIR}/scenario.sh" run "${scenario_script}" &> "${run_log}" || run_exit=$?
-
-        if [ ${run_exit} -ne 0 ]; then
+        if [ ${create_exit} -ne 0 ]; then
             result="FAILED"
             exit_code=1
-            if [ ${run_exit} -eq 124 ]; then
+            log "VM creation failed for ${scenario_name} (exit ${create_exit}) - see ${boot_log}"
+        fi
+
+        # Run tests only if creation succeeded
+        if [ "${exit_code}" -eq 0 ]; then
+            log "Running tests for ${scenario_name} (timeout: ${test_timeout}s) - logging to ${run_log}"
+
+            local run_exit=0
+            timeout --signal=TERM --kill-after=60 "${test_timeout}" \
+                bash -x "${SCRIPTDIR}/scenario.sh" run "${scenario_script}" &> "${run_log}" || run_exit=$?
+
+            if [ ${run_exit} -ne 0 ]; then
+                result="FAILED"
+                exit_code=1
+                if [ ${run_exit} -eq 124 ]; then
+                    log "Tests TIMED OUT for ${scenario_name} after ${test_timeout}s - see ${run_log}"
+                else
+                    log "Tests failed for ${scenario_name} (exit ${run_exit}) - see ${run_log}"
+                fi
+            fi
+        fi
+    else
+        # Reused VM: use create-and-run for faster turnaround
+        # The create phase is very quick (just IP lookup and SSH check)
+        # Combined output goes to run.log, with setup info in boot.log
+        log "Setting up reused VM ${vm_name} and running tests (timeout: ${test_timeout}s)"
+
+        # Log reuse info to boot.log for consistency
+        echo "VM ${vm_name} reused for scenario ${scenario_name}" > "${boot_log}"
+        date >> "${boot_log}"
+
+        local combined_exit=0
+        timeout --signal=TERM --kill-after=60 "${test_timeout}" \
+            bash -x "${SCRIPTDIR}/scenario.sh" create-and-run "${scenario_script}" &> "${run_log}" || combined_exit=$?
+
+        if [ ${combined_exit} -ne 0 ]; then
+            result="FAILED"
+            exit_code=1
+            if [ ${combined_exit} -eq 124 ]; then
                 log "Tests TIMED OUT for ${scenario_name} after ${test_timeout}s - see ${run_log}"
             else
-                log "Tests failed for ${scenario_name} (exit ${run_exit}) - see ${run_log}"
+                log "Tests failed for ${scenario_name} (exit ${combined_exit}) - see ${run_log}"
             fi
         fi
     fi
@@ -1123,6 +1142,7 @@ show_status() {
     # --- VM Metrics ---
     local vms_created=0
     local vm_reuses=0
+    local vm_creation_retries=0
     local max_runs_per_vm=0
 
     for scenario_dir in "${SCENARIO_STATUS}"/*; do
@@ -1136,6 +1156,17 @@ show_status() {
             else
                 ((vms_created++)) || true
             fi
+        fi
+    done
+
+    # Count VM creation retries from scenario info directories
+    for scenario_dir in "${SCENARIO_INFO_DIR}"/*; do
+        [ -d "${scenario_dir}" ] || continue
+        local retry_file="${scenario_dir}/vm_creation_retries"
+        if [ -f "${retry_file}" ]; then
+            local retries
+            retries=$(cat "${retry_file}")
+            ((vm_creation_retries += retries)) || true
         fi
     done
 
@@ -1163,6 +1194,7 @@ show_status() {
 
     echo "=== Dynamic VM Efficiency ==="
     echo "  VMs created:              ${vms_created}"
+    echo "  VM creation retries:      ${vm_creation_retries}"
     echo "  VM reuses:                ${vm_reuses}"
     echo "  Reuse rate:               ${reuse_rate}%"
     echo "  Max scenarios per VM:     ${max_runs_per_vm}"

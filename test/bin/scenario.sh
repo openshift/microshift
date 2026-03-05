@@ -761,16 +761,24 @@ setup_vm_properties_from_existing() {
     if sudo virsh dominfo "${full_vmname}" 2>/dev/null | grep '^State' | grep -q 'shut off'; then
         echo "Starting VM ${full_vmname}"
         sudo virsh start "${full_vmname}"
-    fi
-
-    # Wait for IP and set properties
-    echo "Waiting for VM ${full_vmname} to have an IP"
-    local ip
-    ip=$(get_vm_ip "${full_vmname}")
-    if [ -z "${ip}" ]; then
-        echo "VM ${full_vmname} has no IP"
-        record_junit "${vmname}" "ip-assignment" "FAILED"
-        return 1
+        # For a VM that was shut off, use the full wait logic
+        local ip
+        ip=$(get_vm_ip "${full_vmname}")
+        if [ -z "${ip}" ]; then
+            echo "VM ${full_vmname} has no IP"
+            record_junit "${vmname}" "ip-assignment" "FAILED"
+            return 1
+        fi
+    else
+        # VM is already running - get IP directly without ping loop
+        # The VM was just used by another scenario, so the IP is valid
+        local ip
+        ip=$("${ROOTDIR}/scripts/devenv-builder/manage-vm.sh" ip -n "${full_vmname}" | head -1)
+        if [ -z "${ip}" ]; then
+            echo "VM ${full_vmname} has no IP"
+            record_junit "${vmname}" "ip-assignment" "FAILED"
+            return 1
+        fi
     fi
 
     echo "VM ${full_vmname} has IP ${ip}"
@@ -787,11 +795,19 @@ setup_vm_properties_from_existing() {
     set_vm_property "${vmname}" "api_port" "6443"
     set_vm_property "${vmname}" "lb_port" "5678"
 
-    if wait_for_ssh "${ip}"; then
+    # For a reused VM, do a quick SSH check instead of the full wait loop
+    # The VM was just running tests, so SSH should be immediately available
+    if ssh -oConnectTimeout=5 -oBatchMode=yes -oStrictHostKeyChecking=accept-new "redhat@${ip}" "echo host is up" &>/dev/null; then
         record_junit "${vmname}" "ssh-access" "OK"
     else
-        record_junit "${vmname}" "ssh-access" "FAILED"
-        return 1
+        # Fall back to full wait if quick check fails
+        echo "Quick SSH check failed, waiting for SSH..."
+        if wait_for_ssh "${ip}"; then
+            record_junit "${vmname}" "ssh-access" "OK"
+        else
+            record_junit "${vmname}" "ssh-access" "FAILED"
+            return 1
+        fi
     fi
 
     echo "${full_vmname} is up and ready (reused)"
@@ -1048,6 +1064,11 @@ launch_vm() {
         # Retry the operation on error
         local backoff=$(( attempt * 5 ))
         echo "Error running virt-install: retrying in ${backoff}s on attempt ${attempt}"
+
+        # Record retry for metrics (scheduler will aggregate these)
+        local retry_file="${SCENARIO_INFO_DIR}/${SCENARIO}/vm_creation_retries"
+        echo "${attempt}" > "${retry_file}"
+
         sleep "${backoff}"
 
         # Cleanup the failed VM before trying to recreate it
