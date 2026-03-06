@@ -1,82 +1,97 @@
-- api embedded-component 64dddb8f3186537f3682b7e735f1cc392196a101 to 9b2ee997d297702c53d26185becda97e8f003f44
-  - 9c5267b1 2026-02-27T15:59:12Z Add platform-specific feature gates for CAPI Operator features
-  - b81d2a16 2026-02-26T21:43:01-05:00 feat: add link to sippy for tests
-  - 9b8f43c8 2026-02-26T09:44:16-08:00 Promote ClusterAPIMachineManagementVSphere to TechPreview
-  - 74577ddf 2026-02-25T16:57:44Z ClusterAPI revision components can be empty
-  - 3cfb57ea 2026-02-25T16:54:05Z Require APIExcludedFields Versions to be set
-  - a58ab739 2026-02-09T17:35:08Z OCPBUGS-32275: Add ingress.spec.domain validation
+- api embedded-component 9b2ee997d297702c53d26185becda97e8f003f44 to 09d04f823a63db0fb0f5c0404081d438dd5a8d44
+  - 1bd464b2 2026-03-04T16:47:07Z LabelSelector should have omitzero
+  - 91c9cba7 2026-03-03T18:06:57+05:30 Add new generate-tests claude command
+  - e54c5804 2026-03-03T10:09:26+01:00 Add additional storage configuration fields to ContainerRuntimeConfig
+  - aeae1824 2026-03-02T08:10:28-08:00 bump(k8s): make update
+  - c63fe74a 2026-03-02T08:10:27-08:00 bump(k8s): update builder images
+  - 3410e77e 2026-03-02T08:10:27-08:00 bump(k8s): tools: align to new upstream function for getting openapi targets for codegen
+  - d7bb63f3 2026-03-02T08:10:27-08:00 bump(k8s): go mod vendor
+  - 6c291957 2026-03-02T08:10:01-08:00 bump(k8s): tools: go mod vendor
+  - abd7943b 2026-03-02T08:10:00-08:00 bump(k8s): update k8s.io/* dependencies to v1.35.1
+  - da663ed9 2026-02-27T10:22:40-08:00 bump(k8s): tools: update k8s.io/* dependencies to v1.35.1
 
-- cluster-dns-operator embedded-component 5d7c973968909d4155796363222f6edc001e19a3 to 979dca867681e4121155d586fc9c374745d0d6e0
-  - 0b50f72 2026-02-25T15:05:58Z Add NI&D team members to OWNERS
-  - 7ba9264 2026-02-11T15:41:57Z Bump base images from 4.21 to 4.22
-  - d08fbd6 2026-01-14T09:11:55+01:00 OCPBUGS-65498: Add openshift-dns-operator ClusterRole to ClusterOperator relatedObjects
-  - c72db7b 2025-11-11T15:58:57+01:00 manifests: Enable user namespaces
+- cluster-dns-operator embedded-component 979dca867681e4121155d586fc9c374745d0d6e0 to 2acb1912070d2c76afe869facc97565964572b66
+  - 675fb67 2026-03-02T09:03:30-03:00 bump base image
+  - 11c3aca 2026-03-02T09:03:14-03:00 bump coredns-ocp-dnsnameresolver
+  - d9bc0f8 2026-03-02T09:03:10-03:00 bump k8s libraries to v0.35.0 and cr to v0.23.1
 
-- cluster-kube-apiserver-operator embedded-component bf2d69223e840eed1c3ad73eb7145c6d8c747fa8 to ee1aaf0b8169bbd19a297ce34bca4eff3698e8f0
-  - 890526a 2026-02-26T07:52:43-05:00 Revert "Merge pull request #2032 from ricardomaraschini/CNTRLPLANE-2622"
-  - 5ee2e85 2026-02-19T13:48:19+05:30 Fixing bound sa token test
+- cluster-ingress-operator embedded-component add0516e322140127200057716ea9f9080b19fa4 to 134fce90180992e3011809f0d84d536c053a219e
+  - 70bab84 2026-03-03T13:46:29-03:00 remove RouteExternalCertificate feature gate
+  - 41dc31c 2026-02-27T15:31:20Z ensure canary daemon set uses its own service account.
 
-- cluster-kube-controller-manager-operator embedded-component 99f17e64c5e623f5e909418d6690214f5583f6c2 to 1d852bde83bf699297a6164d131b78343d922afd
-  - 16022e4 2026-01-17T11:22:43Z Updating ose-cluster-kube-controller-manager-operator-container image to be consistent with ART for 4.22 Reconciling with https://github.com/openshift/ocp-build-data/tree/37a25cc2e6eec9883ae439d785f89ab3f6cb2f51/images/ose-cluster-kube-controller-manager-operator.yml
+- cluster-kube-apiserver-operator embedded-component ee1aaf0b8169bbd19a297ce34bca4eff3698e8f0 to 57b8b8705fdaab6aa4a45a0353cbfd0217fc57f9
+  - 20e53dc 2026-03-03T09:39:06-08:00 bump(k8s): pod security evaluator now requires an emulation version - using latest
+  - 7dd5b01 2026-03-03T09:39:06-08:00 bump(k8s): bump builder image version
+  - 4672fa2 2026-03-03T09:39:05-08:00 bump(k8s): go mod vendor
+  - ee4c008 2026-03-03T09:38:30-08:00 bump(k8s): update k8s.io/* dependencies to v1.35.0
 
-- cluster-network-operator embedded-component b1c55d71bfc33a4e2aba1083c0eed1ff698a84c5 to 1c1a0978d85b2a582f12690ed89fc7cb5b261744
-  - 44ebf06 2026-02-19T12:54:45-08:00 fix more transient error condtions caused Degraded
+- cluster-kube-controller-manager-operator embedded-component 1d852bde83bf699297a6164d131b78343d922afd to a7ff6a4647805362618c61a031196cc791cb9963
+  - 4b3225d 2026-03-03T09:44:29-08:00 bump(k8s): bump builder image version
+  - 1bd9904 2026-03-03T09:44:29-08:00 bump(k8s): go mod vendor
+  - f10a460 2026-03-03T09:43:18-08:00 bump(k8s): update k8s.io/* dependencies to v1.35.1
 
-- csi-external-snapshotter embedded-component d20b90a92cd7d77166319f5bc2feb80623747d28 to 7c9f2f4695042e415747e94d77cbbcc11c59c6cf
-  - f689ea8 2026-02-27T21:30:09+08:00 UPSTREAM: <drop>: restore log level of the group snapshot reconciler
-  - 8025819 2026-02-26T13:10:51Z UPSTREAM: <carry>: Updating ose-csi-external-snapshotter-container image to be consistent with ART for 4.22 Reconciling with https://github.com/openshift/ocp-build-data/tree/cb57200ffcd7ad506814eaf8c941fed0481fe837/images/ose-csi-external-snapshotter.yml
+- cluster-kube-scheduler-operator embedded-component 820d82bbc61c739c6c95a450cdbc454b5e6cd1fc to 3fe8a24ab5e6f6420181b572e3e43670a5fb1ca1
+  - abac17d 2026-03-03T09:41:19-08:00 bump(k8s): bump builder image version
+  - 3df2b5e 2026-03-03T09:41:19-08:00 bump(k8s): go mod vendor
+  - d608ce6 2026-03-03T09:40:48-08:00 bump(k8s): update k8s.io/* dependencies to v1.35.1
+  - f1311bb 2026-03-03T14:44:01+01:00 chore: update OWNERS
 
-- kubernetes-kube-storage-version-migrator embedded-component 73b468abf83d3d5894534f5d5cc42d1cad2a9045 to a740e5343a8b0944074c80a72fa3433b21864b35
-  - 8591d56 2026-01-16T20:26:36Z UPSTREAM: <carry>: Updating ose-kube-storage-version-migrator-container image to be consistent with ART for 4.22 Reconciling with https://github.com/openshift/ocp-build-data/tree/37a25cc2e6eec9883ae439d785f89ab3f6cb2f51/images/ose-kube-storage-version-migrator.yml
+- cluster-network-operator embedded-component 1c1a0978d85b2a582f12690ed89fc7cb5b261744 to 42bb9ee08326a4994b403b5750f4e3f180a4735f
+  - 7dc793f 2026-02-24T15:46:47+05:30 Add ValidatingAdmissionPolicy for EgressIP
 
-- machine-config-operator embedded-component b8e0c0c1dd6cb646740fc3deed65bfd41b15a04f to 297cce4e5c79285b9fcf2a939f1034894d7a9f2c
-  - ccdcea07 2026-02-27T18:16:28Z chore: update AMIs
-  - 33b1adb0 2026-02-27T11:18:50-05:00 remove ManagedBootImages* feature gates
-  - 2bc7ceef 2026-02-25T14:37:17-05:00 bootimage: remove URL in vsphere login failure log
-  - 0e1d4a4e 2026-02-24T20:11:08-05:00 Increate timeout for sharded ocl test
-  - cd13fea7 2026-02-05T17:35:21-05:00 Remove lingering references to openshift-sdn
+- csi-external-snapshotter embedded-component 7c9f2f4695042e415747e94d77cbbcc11c59c6cf to 698eb2c97de7d16ffc0bde7eaaba22f761664dee
+  - 48eb703 2026-03-03T18:33:57Z UPSTREAM: <carry>: Updating ose-csi-snapshot-controller-container image to be consistent with ART for 4.22 Reconciling with https://github.com/openshift/ocp-build-data/tree/56cb39ad358cdec1db7c84ea1919fe8849c2550b/images/ose-csi-snapshot-controller.yml
 
-- operator-framework-olm embedded-component af1eb8f8acc2959c5a722467e880cac66ce5246b to 248492dba7f542d4bf68004f85218137bba987d1
-  - e537de8b 2026-02-25T16:09:35-05:00 Remove aliases and selectors from NetworkPolicy tests
-  - 16791e3c 2026-02-25T13:40:49-05:00 Update downstream NetworkPolicies for HyperShift
-  - a1e313a8 2026-02-25T09:31:52-05:00 update the network policy port per new change
-  - 49626b5a 2026-02-24T00:07:53Z OCPBUGS-76971: Update NetworkPolicy egress to support HyperShift custom API ports (#3770)
-  - bf18ea54 2026-02-24T00:06:50Z MON-4513: Use endpointslices for metrics (#3773)
-  - f265c6b5 2026-02-24T00:06:32Z abandon evaluation of any new catalogsource image which is pathological (#3766)
-  - 801784ae 2026-02-24T00:06:14Z :seedling: Bump google.golang.org/grpc from 1.78.0 to 1.79.1 (#3772)
-  - 96af84cf 2026-02-24T00:05:56Z :seedling: Bump the k8s-dependencies group with 9 updates (#3771)
-  - 5ec11c1d 2026-02-24T00:05:22Z :seedling: Bump golang.org/x/net from 0.49.0 to 0.50.0 (#3764)
-  - a266010b 2026-02-24T00:05:03Z Auto-generate OpenAPIModelName() via openapi-gen (#3769)
-  - 38b6af53 2026-02-24T00:04:38Z add rashmigottipati as a reviewer (#3768)
-  - 8c1de022 2026-02-24T00:04:11Z remove incompatible licensing statements (#3767)
-  - 551e315b 2026-02-24T00:03:51Z fix: add OpenAPIModelName for all PackageManifest related types (#3765)
+- kubernetes-kube-storage-version-migrator embedded-component a740e5343a8b0944074c80a72fa3433b21864b35 to 72835e43c7754356645e41031f3a99926b4d42e6
+  - 370719b 2026-02-19T09:59:04-05:00 UPSTREAM: <carry>: add leaderelection
+  - 46d2346 2026-01-29T17:23:07-05:00 UPSTREAM: <drop>: update vendor
 
-- csi-external-snapshotter image-amd64 d20b90a92cd7d77166319f5bc2feb80623747d28 to 7c9f2f4695042e415747e94d77cbbcc11c59c6cf
-  - f689ea8 2026-02-27T21:30:09+08:00 UPSTREAM: <drop>: restore log level of the group snapshot reconciler
-  - 8025819 2026-02-26T13:10:51Z UPSTREAM: <carry>: Updating ose-csi-external-snapshotter-container image to be consistent with ART for 4.22 Reconciling with https://github.com/openshift/ocp-build-data/tree/cb57200ffcd7ad506814eaf8c941fed0481fe837/images/ose-csi-external-snapshotter.yml
+- machine-config-operator embedded-component 297cce4e5c79285b9fcf2a939f1034894d7a9f2c to d6719e59154b61300e40056a99b629d9a713ef69
+  - d650e25a 2026-03-02T10:25:15-05:00 bootimage: fix failure domain matching
+  - b590a085 2026-02-27T10:37:44-05:00 set the OWNERS for the IRI e2e test folder
+  - 0d66bcd7 2026-02-27T10:37:28-05:00 skip e2e tests that cannot be run in the openshift CI environment
+  - 19582524 2026-02-27T13:17:11Z NO-ISSUE:dont execute tls tests until OCPBUGS-76990 is fixed
 
-- kube-rbac-proxy image-amd64 c7ab76fd6fdf651d5022db8946c35b158ecc2396 to bdd87a0646eae5683bb83fe30e3649471b757ebf
-  - 8b1c864 2026-02-26T12:55:56Z Updating kube-rbac-proxy-container image to be consistent with ART for 4.22 Reconciling with https://github.com/openshift/ocp-build-data/tree/cb57200ffcd7ad506814eaf8c941fed0481fe837/images/kube-rbac-proxy.yml
+- operator-framework-olm embedded-component 248492dba7f542d4bf68004f85218137bba987d1 to b51083fdf05c74e2d798761488dd1a07ba7c6d8c
+  - 17b9c25f 2026-03-03T00:10:40Z Upgrade from go 1.25.3 to 1.25.7 (#474)
+  - 4c677581 2026-03-03T00:09:56Z Add OpenAPIModelName() generation for v1alpha1 and lib/version types (#477)
+  - 074f9aa8 2026-03-03T00:09:41Z add bundle relatedimage image pullspec validation (#475)
+  - 363f3c92 2026-03-03T00:09:26Z Bump the k8s-dependencies group with 4 updates (#478)
+  - 3bf5ed39 2026-03-03T00:09:11Z bumping api to capture go bumps across the whole o-f set (#1921)
+  - 495287c2 2026-03-03T00:08:56Z Bump actions/upload-artifact from 6 to 7 (#1920)
+  - e1d46dd7 2026-03-03T00:08:40Z Bump actions/download-artifact from 7 to 8 (#1919)
+  - cf0b109b 2026-03-03T00:08:26Z Bump github.com/operator-framework/api from 0.39.0 to 0.40.0 (#1917)
+  - e8668e30 2026-03-03T00:08:11Z Update to go 1.25.7 (#1918)
+  - 201e7fb3 2026-03-03T00:07:56Z handle cases where spec.version.release is a number instead of string (#1909)
+  - e601b841 2026-03-03T00:07:41Z adding olm.bundle image/relatedImages pullspec format validation (#1905)
+  - f0d196df 2026-03-03T00:07:26Z Bump google.golang.org/grpc from 1.79.0 to 1.79.1 (#1916)
+  - 8f772d69 2026-03-03T00:07:11Z Bump google.golang.org/grpc from 1.78.0 to 1.79.0 (#1915)
+  - afdf672e 2026-03-03T00:06:55Z Bump the k8s-dependencies group with 4 updates (#1912)
+  - c78e67df 2026-03-03T00:06:40Z Bump github.com/mattn/go-sqlite3 from 1.14.33 to 1.14.34 (#1913)
+  - bf06fb9a 2026-03-03T00:06:26Z Bump the golang-x-deps group across 1 directory with 3 updates (#1911)
+  - 18493040 2026-03-03T00:06:11Z Bump github.com/grpc-ecosystem/grpc-health-probe from 0.4.44 to 0.4.45 (#1908)
+  - c27f75f1 2026-03-03T00:05:56Z Bump go.podman.io/common from 0.66.1 to 0.67.0 (#1907)
+  - bfdb3d66 2026-03-03T00:05:41Z Bump google.golang.org/grpc/cmd/protoc-gen-go-grpc from 1.6.0 to 1.6.1 (#1903)
+  - 3d21e21f 2026-03-03T00:05:26Z Add pedjak to OWNERS (#1902)
+  - b22b649e 2026-03-03T00:05:05Z bumping o-f components (#3779)
+  - ec491277 2026-03-03T00:04:48Z Update operator-framework/api to v0.40.0 (#3777)
+  - 49d886f8 2026-03-03T00:04:28Z Bump goreleaser/goreleaser-action from 6 to 7 (#3775)
+  - 12a2c954 2026-03-03T00:04:09Z fix: upgrade Go to 1.25.7 to resolve CVE-2025-68121 (#3776)
 
-- oc image-arm64 5cbfaa519ec55b8ac7217b316061cb904381ab91 to dcdd63608b569e5710cdcc5f0882a95796d925c7
+- oc image-amd64 5cbfaa519ec55b8ac7217b316061cb904381ab91 to dcdd63608b569e5710cdcc5f0882a95796d925c7
   - 57a74e4c 2026-03-03T09:39:57-05:00 images/tools/Dockerfile: Just install it and if it fails fall back to iotop-c
   - 02339fc4 2026-03-03T14:40:18+01:00 Allow periods in display name labels for version validation
   - 189ac91b 2026-02-19T12:21:23-05:00 Update Dockerfile to work on CentOS/RHEL 10
   - 2bd770b8 2026-02-12T12:01:40+05:30 fixing oc cli failures
   - c9f1f7c6 2026-02-06T12:45:09+01:00 pkg/helpers: Print the right error object
 
-- csi-external-snapshotter image-arm64 d20b90a92cd7d77166319f5bc2feb80623747d28 to 698eb2c97de7d16ffc0bde7eaaba22f761664dee
+- csi-external-snapshotter image-amd64 7c9f2f4695042e415747e94d77cbbcc11c59c6cf to 698eb2c97de7d16ffc0bde7eaaba22f761664dee
   - 48eb703 2026-03-03T18:33:57Z UPSTREAM: <carry>: Updating ose-csi-snapshot-controller-container image to be consistent with ART for 4.22 Reconciling with https://github.com/openshift/ocp-build-data/tree/56cb39ad358cdec1db7c84ea1919fe8849c2550b/images/ose-csi-snapshot-controller.yml
-  - f689ea8 2026-02-27T21:30:09+08:00 UPSTREAM: <drop>: restore log level of the group snapshot reconciler
-  - 8025819 2026-02-26T13:10:51Z UPSTREAM: <carry>: Updating ose-csi-external-snapshotter-container image to be consistent with ART for 4.22 Reconciling with https://github.com/openshift/ocp-build-data/tree/cb57200ffcd7ad506814eaf8c941fed0481fe837/images/ose-csi-external-snapshotter.yml
 
-- router image-arm64 d8ed3559fd4808a4f10c927ba4a199d3fd5b84a2 to a7f351b6bbc67c322fc37a47da0c0674a4a19ac4
+- router image-amd64 d8ed3559fd4808a4f10c927ba4a199d3fd5b84a2 to a7f351b6bbc67c322fc37a47da0c0674a4a19ac4
   - c08455a 2026-03-03T18:34:31-03:00 remove RouteExternalCertificate feature gate
 
-- kube-rbac-proxy image-arm64 c7ab76fd6fdf651d5022db8946c35b158ecc2396 to bdd87a0646eae5683bb83fe30e3649471b757ebf
-  - 8b1c864 2026-02-26T12:55:56Z Updating kube-rbac-proxy-container image to be consistent with ART for 4.22 Reconciling with https://github.com/openshift/ocp-build-data/tree/cb57200ffcd7ad506814eaf8c941fed0481fe837/images/kube-rbac-proxy.yml
-
-- ovn-kubernetes image-arm64 517194700aba68ee6ad222841e312e0c29899e73 to e69a72608af037a70a5e44a410f1c9c7eb6c2f97
+- ovn-kubernetes image-amd64 517194700aba68ee6ad222841e312e0c29899e73 to e69a72608af037a70a5e44a410f1c9c7eb6c2f97
   - c79a4600 2026-02-25T14:14:03-08:00 make new tests informing by default
   - 515d4c74 2026-02-11T17:46:31-05:00 Fixes e2e sflow test
   - 95c0a261 2026-02-11T16:57:31+01:00 Fix asynchronous race with nad controller UT
@@ -142,4 +157,13 @@
   - 9e1889e7 2026-01-27T21:10:43+09:00 use native arm64 runners instead of QEMU emulation
   - 3e6b2a3d 2026-01-27T21:10:43+09:00 parallelize multi-platform Docker image builds
   - 7d408c1c 2026-01-21T15:38:23+01:00 Remove IC zone migration HACK code
+
+- oc image-arm64 dcdd63608b569e5710cdcc5f0882a95796d925c7 to 4aebabfa7bfd7c68f4b06601246daad782741070
+  - 014fa165 2026-02-27T09:57:53-08:00 pkg/cli/admin/upgrade/recommend/alerts: Add VMCannotBeEvicted
+  - ba31c88d 2026-02-27T09:57:25-08:00 pkg/cli/admin/upgrade/recommend/alerts: Add openShiftUpdatePrecheck label
+  - 4a969c1e 2026-02-27T09:56:59-08:00 pkg/cli/admin/upgrade/recommend/alerts: Add VirtHandlerDaemonSetRolloutFailing
+  - 2899d2b0 2026-02-23T10:20:56-08:00 pkg/cli/admin/upgrade/recommend/alerts: Add KubeletHealthState
+
+- ovn-kubernetes image-arm64 e69a72608af037a70a5e44a410f1c9c7eb6c2f97 to eedfcd073cbae0eea97638716019b2b39f141a41
+  - 14b73098 2026-02-23T09:21:35+01:00 Minimize ACLs by combining ipBlocks into single ACL
 
