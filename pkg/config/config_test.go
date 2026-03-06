@@ -863,17 +863,6 @@ func TestValidate(t *testing.T) {
 			expectErr: true,
 		},
 		{
-			name: "feature-gates-required-feature-gate-cannot-be-explicitly-enabled",
-			config: func() *Config {
-				c := mkDefaultConfig()
-				c.ApiServer.FeatureGates.FeatureSet = "CustomNoUpgrade"
-				c.ApiServer.FeatureGates.CustomNoUpgrade.Enabled = []string{"UserNamespacesSupport"}
-				c.ApiServer.FeatureGates.CustomNoUpgrade.Disabled = []string{"feature2"}
-				return c
-			}(),
-			expectErr: true,
-		},
-		{
 			name: "feature-gates-custom-no-upgrade-with-empty-enabled-and-disabled-lists",
 			config: func() *Config {
 				c := mkDefaultConfig()
