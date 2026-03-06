@@ -115,28 +115,53 @@ run_image_build() {
 run_bootc_image_build() {
     make -C "${ROOTDIR}" verify-containers
 
+    # Build templates first
+    $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/templates
+
     if [ -v CI_JOB_NAME ] ; then
-        # Skip all image builds for release testing CI jobs because all the images are fetched from the cache.
-        if [[ "${CI_JOB_NAME}" =~ .*release(-arm)?$ ]]; then
-            $(dry_run) bash -x ./bin/build_bootc_images.sh -X
-            return
+        # Build el9 images
+        if [[ "${CI_JOB_NAME}" =~ .*el9.* ]]; then
+            $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/el9/layer1-base
+            $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/el9/layer2-presubmit
+
+            if [[ "${CI_JOB_NAME}" =~ .*periodic.* ]]; then
+                $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/el9/layer3-periodic
+            fi
+            if [[ "${CI_JOB_NAME}" =~ .*release.* ]]; then
+                $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/el9/layer4-release
+            fi
         fi
 
-        $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/layer1-base
-        $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/layer2-presubmit
+        # Build el10 images
+        if [[ "${CI_JOB_NAME}" =~ .*el10.* ]]; then
+            $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/el10/layer1-base
+            $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/el10/layer2-presubmit
 
-        if [[ "${CI_JOB_NAME}" =~ .*periodic.* ]]; then
-            $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/layer3-periodic
+            # Build el9 images for upgrade tests
+            $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/el9/layer1-base
+            $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/el9/layer2-presubmit
+
+            if [[ "${CI_JOB_NAME}" =~ .*periodic.* ]]; then
+                $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/el10/layer3-periodic
+            fi
+            if [[ "${CI_JOB_NAME}" =~ .*release.* ]]; then
+                $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/el10/layer4-release
+            fi
         fi
+
+        # Build upstream images
         if [[ "${CI_JOB_NAME}" =~ .*upstream.* ]]; then
-            $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/layer5-upstream
+            $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/upstream
         fi
     else
-        $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/layer1-base
-        $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/layer2-presubmit
-        $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/layer3-periodic
-        $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/layer4-release
-        $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/layer5-upstream
+        # Full build for all OS versions
+        for os in el9 el10; do
+            $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/${os}/layer1-base
+            $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/${os}/layer2-presubmit
+            $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/${os}/layer3-periodic
+            $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/${os}/layer4-release
+        done
+        $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/upstream
     fi
 }
 
