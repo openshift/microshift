@@ -2,7 +2,8 @@ id = "fast-datapath"
 name = "Fast Datapath for RHEL 9"
 type = "yum-baseurl"
 url = "https://cdn.redhat.com/content/dist/layered/rhel9/{{ .Env.UNAME_M }}/fast-datapath/os"
-check_gpg = true
+# Reenable GPG check when build platform switches to RHEL 9.8
+check_gpg = false
 check_ssl = true
 system = false
 rhsm = true
