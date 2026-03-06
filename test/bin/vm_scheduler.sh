@@ -129,7 +129,10 @@ init_scheduler() {
 }
 
 # Default VM resources when not specified in launch_vm
-DEFAULT_VM_VCPUS=2
+# Using 4 vCPUs by default maximizes VM reuse potential:
+# - All VMs can run any scenario (no vcpu mismatch)
+# - More queuing = more reuse opportunities
+DEFAULT_VM_VCPUS=4
 DEFAULT_VM_MEMORY=4096
 
 parse_static_scenario_resources() {
@@ -405,8 +408,8 @@ vm_satisfies_requirements() {
 
     # Get scenario requirements
     local req_vcpus req_memory req_disksize req_networks req_fips req_boot_image
-    req_vcpus=$(get_req_value "${scenario_reqs}" "min_vcpus" "2")
-    req_memory=$(get_req_value "${scenario_reqs}" "min_memory" "4096")
+    req_vcpus=$(get_req_value "${scenario_reqs}" "min_vcpus" "${DEFAULT_VM_VCPUS}")
+    req_memory=$(get_req_value "${scenario_reqs}" "min_memory" "${DEFAULT_VM_MEMORY}")
     req_disksize=$(get_req_value "${scenario_reqs}" "min_disksize" "20")
     req_networks=$(get_req_value "${scenario_reqs}" "networks" "default")
     req_fips=$(get_req_value "${scenario_reqs}" "fips" "false")
@@ -507,10 +510,9 @@ register_vm() {
     cp "${scenario_reqs}" "${vm_dir}/state"
 
     # Add vcpus/memory/disksize from min_* values and set status
-    #TODO this should use the defaults, right?
     local vcpus memory disksize networks fips boot_image
-    vcpus=$(get_req_value "${scenario_reqs}" "min_vcpus" "2")
-    memory=$(get_req_value "${scenario_reqs}" "min_memory" "4096")
+    vcpus=$(get_req_value "${scenario_reqs}" "min_vcpus" "${DEFAULT_VM_VCPUS}")
+    memory=$(get_req_value "${scenario_reqs}" "min_memory" "${DEFAULT_VM_MEMORY}")
     disksize=$(get_req_value "${scenario_reqs}" "min_disksize" "20")
     networks=$(get_req_value "${scenario_reqs}" "networks" "default")
     fips=$(get_req_value "${scenario_reqs}" "fips" "false")
@@ -683,7 +685,7 @@ sort_scenarios_for_reuse() {
             local boot_image networks vcpus reuse_score
             boot_image=$(get_req_value "${req_file}" "boot_image" "default")
             networks=$(get_req_value "${req_file}" "networks" "default")
-            vcpus=$(get_req_value "${req_file}" "min_vcpus" "2")
+            vcpus=$(get_req_value "${req_file}" "min_vcpus" "${DEFAULT_VM_VCPUS}")
             reuse_score=$(get_reusability_score "${boot_image}" "${networks}")
             # Sort key: reuse_score (asc), boot_image (desc), vcpus (desc)
             # Use inverse vcpus (100-vcpus) so ascending sort gives descending vcpus
@@ -995,8 +997,8 @@ dispatch_dynamic_scenarios() {
             fi
 
             local min_vcpus min_memory
-            min_vcpus=$(get_req_value "${req_file}" "min_vcpus" "2")
-            min_memory=$(get_req_value "${req_file}" "min_memory" "4096")
+            min_vcpus=$(get_req_value "${req_file}" "min_vcpus" "${DEFAULT_VM_VCPUS}")
+            min_memory=$(get_req_value "${req_file}" "min_memory" "${DEFAULT_VM_MEMORY}")
 
             # Try to find compatible free VM
             local vm_name=""
