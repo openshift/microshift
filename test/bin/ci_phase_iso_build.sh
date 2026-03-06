@@ -188,11 +188,11 @@ if [ $# -gt 0 ] && [ "$1" = "-update_cache" ] ; then
     fi
 else
     GOT_CACHED_DATA=false
-    if ${HAS_CACHE_ACCESS} ; then
-        if download_build_cache ; then
-            GOT_CACHED_DATA=true
-        fi
-    fi
+    # if ${HAS_CACHE_ACCESS} ; then
+    #     if download_build_cache ; then
+    #         GOT_CACHED_DATA=true
+    #     fi
+    # fi
     if ! ${GOT_CACHED_DATA} ; then
         echo "WARNING: Build cache is not available, rebuilding all the artifacts"
     fi
