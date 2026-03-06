@@ -150,14 +150,15 @@ var RequiredFeatureGates = []string{"UserNamespacesSupport", "UserNamespacesPodS
 
 type FeatureGates struct {
 	FeatureSet string `json:"featureSet"`
-	// CustomNoUpgrade is used to enable/disable feature gates. When the enabled or disable lists are not empty, x- and y-stream upgrades will be blocked.
-	// Use this field exclusively for custom feature gates, unless you are certain that the feature gate is a SpecialHandlingSupportExceptionRequired feature.
+	// CustomNoUpgrade is used to enable/disable feature gates that block x- and y-stream upgrades.
 	CustomNoUpgrade EnableDisableFeatures `json:"customNoUpgrade"`
-	// SpecialHandlingSupportExceptionRequired allows for feature gates to be exempted from blocking x- and y-stream upgrades.
+	// SpecialHandlingSupportExceptionRequired is used to enable/disable feature gates that are exempt from blocking x- and y-stream upgrades.
+	// Features listed here do not need to be duplicated in CustomNoUpgrade.
 	SpecialHandlingSupportExceptionRequired EnableDisableFeatures `json:"specialHandlingSupportExceptionRequired"`
 }
 
 // ToApiserverArgs converts the FeatureGates struct to a list of feature-gates arguments for the kube-apiserver.
+// Features from both CustomNoUpgrade and SpecialHandlingSupportExceptionRequired are included.
 // Validation checks should be performed before calling this function to ensure the FeatureGates struct is valid.
 func (fg FeatureGates) ToApiserverArgs() ([]string, error) {
 	ret := sets.NewString()
@@ -169,12 +170,14 @@ func (fg FeatureGates) ToApiserverArgs() ([]string, error) {
 
 	addFeatures(fg.CustomNoUpgrade.Enabled, true)
 	addFeatures(fg.CustomNoUpgrade.Disabled, false)
+	addFeatures(fg.SpecialHandlingSupportExceptionRequired.Enabled, true)
+	addFeatures(fg.SpecialHandlingSupportExceptionRequired.Disabled, false)
 	return ret.List(), nil
 }
 
-// Implement the GoStringer interface for better %#v printing
 func (fg FeatureGates) GoString() string {
-	return fmt.Sprintf("FeatureGates{FeatureSet: %q, CustomNoUpgrade: %#v}", fg.FeatureSet, fg.CustomNoUpgrade)
+	return fmt.Sprintf("FeatureGates{FeatureSet: %q, CustomNoUpgrade: %#v, SpecialHandlingSupportExceptionRequired: %#v}",
+		fg.FeatureSet, fg.CustomNoUpgrade, fg.SpecialHandlingSupportExceptionRequired)
 }
 
 // validateFeatureGates validates the FeatureGates struct according to the following rules:
@@ -202,8 +205,9 @@ func (fg *FeatureGates) validateFeatureGates() error {
 
 	enabledCustom := sets.New(fg.CustomNoUpgrade.Enabled...)
 	disabledCustom := sets.New(fg.CustomNoUpgrade.Disabled...)
+	enabledSpecial := sets.New(fg.SpecialHandlingSupportExceptionRequired.Enabled...)
+	disabledSpecial := sets.New(fg.SpecialHandlingSupportExceptionRequired.Disabled...)
 
-	// checkFeatureGateConflict checks if two sets of feature gates have any intersection and returns an error if they do.
 	checkFeatureGateConflict := func(a, b sets.Set[string], errorMsg string) error {
 		if intersect := a.Intersection(b); intersect.Len() > 0 {
 			return fmt.Errorf("%s: %s", errorMsg, intersect.UnsortedList())
@@ -211,13 +215,18 @@ func (fg *FeatureGates) validateFeatureGates() error {
 		return nil
 	}
 
+	requiredGates := sets.New(RequiredFeatureGates...)
 	conflictChecks := []struct {
 		setA sets.Set[string]
 		setB sets.Set[string]
 		msg  string
 	}{
-		{disabledCustom, sets.New(RequiredFeatureGates...), "required feature gates cannot be disabled"},
-		{enabledCustom, disabledCustom, "feature gates cannot be both enabled and disabled"},
+		{disabledCustom, requiredGates, "required feature gates cannot be disabled"},
+		{disabledSpecial, requiredGates, "required feature gates cannot be disabled"},
+		{enabledCustom, disabledCustom, "feature gates cannot be both enabled and disabled in customNoUpgrade"},
+		{enabledSpecial, disabledSpecial, "feature gates cannot be both enabled and disabled in specialHandlingSupportExceptionRequired"},
+		{enabledCustom, disabledSpecial, "feature gates cannot be enabled in customNoUpgrade and disabled in specialHandlingSupportExceptionRequired"},
+		{disabledCustom, enabledSpecial, "feature gates cannot be disabled in customNoUpgrade and enabled in specialHandlingSupportExceptionRequired"},
 	}
 
 	for _, check := range conflictChecks {
