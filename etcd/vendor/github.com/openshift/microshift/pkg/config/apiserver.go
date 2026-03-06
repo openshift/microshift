@@ -191,6 +191,9 @@ func (fg *FeatureGates) validateFeatureGates() error {
 
 	switch fg.FeatureSet {
 	case "":
+		if len(fg.CustomNoUpgrade.Enabled) > 0 || len(fg.CustomNoUpgrade.Disabled) > 0 {
+			return fmt.Errorf("CustomNoUpgrade enabled/disabled lists must be empty when FeatureSet is empty")
+		}
 		return nil
 	case FeatureSetCustomNoUpgrade:
 		// Valid - continue with validation
