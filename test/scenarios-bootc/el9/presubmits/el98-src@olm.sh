@@ -26,6 +26,7 @@ min_disksize=25
 networks="${NETWORKS}"
 boot_image=rhel98-bootc-source-optionals
 fips=false
+slow=true
 EOF
 }
 

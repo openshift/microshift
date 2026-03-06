@@ -8,9 +8,10 @@ dynamic_schedule_requirements() {
 min_vcpus=2
 min_memory=4096
 min_disksize=20
-networks=default
+networks=
 boot_image=rhel-9.6-microshift-source
 fips=false
+slow=true
 EOF
 }
 

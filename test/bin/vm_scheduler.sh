@@ -42,6 +42,22 @@
 #          multiple processes try to create VMs concurrently.
 #
 # ============================================================================
+# SCENARIO REQUIREMENTS
+# ============================================================================
+#
+# Scenarios opt-in to dynamic scheduling by defining dynamic_schedule_requirements().
+# Supported fields:
+#   - min_vcpus:    Minimum vCPUs required (default: DEFAULT_VM_VCPUS)
+#   - min_memory:   Minimum memory in MB (default: DEFAULT_VM_MEMORY)
+#   - min_disksize: Minimum disk size in GB
+#   - networks:     Required networks (empty = network-agnostic, can run on any VM)
+#   - boot_image:   Required boot image
+#   - fips:         Whether FIPS mode is required
+#   - slow:         Set to "true" for long-running tests (e.g., router, conformance)
+#                   Slow tests get priority within their reusability tier to avoid
+#                   becoming the critical path.
+#
+# ============================================================================
 
 set -euo pipefail
 
@@ -669,11 +685,14 @@ sort_scenarios_for_reuse() {
     # 1. Reusability score (ascending): restrictive scenarios first
     #    - They can't be reused anyway, so get them out of the way
     #    - Their VMs are destroyed when done
-    # 2. Within same reusability: boot_image descending (optionals before source)
-    # 3. Then vcpus descending (larger VMs first)
+    # 2. Within same reusability: slow tests first (ascending 0=slow, 1=normal)
+    #    - Long-running tests start early to avoid becoming critical path
+    # 3. Then boot_image descending (optionals before source)
+    # 4. Then vcpus descending (larger VMs first)
     #
     # This ensures:
     # - Restrictive scenarios (special networks/boot_images) start first
+    # - Slow tests start early within their reusability tier
     # - Flexible scenarios stay queued longer, maximizing reuse opportunities
 
     for scenario_script in "${scenarios[@]}"; do
@@ -682,19 +701,25 @@ sort_scenarios_for_reuse() {
         local req_file="${SCENARIO_STATUS}/${scenario_name}/requirements"
 
         if [ -f "${req_file}" ]; then
-            local boot_image networks vcpus reuse_score
+            local boot_image networks vcpus reuse_score slow_flag slow_sort
             boot_image=$(get_req_value "${req_file}" "boot_image" "default")
             networks=$(get_req_value "${req_file}" "networks" "default")
             vcpus=$(get_req_value "${req_file}" "min_vcpus" "${DEFAULT_VM_VCPUS}")
+            slow_flag=$(get_req_value "${req_file}" "slow" "false")
             reuse_score=$(get_reusability_score "${boot_image}" "${networks}")
-            # Sort key: reuse_score (asc), boot_image (desc), vcpus (desc)
+            # slow=true -> sort value 0 (first), slow=false -> sort value 1 (after)
+            slow_sort=1
+            if [ "${slow_flag}" = "true" ]; then
+                slow_sort=0
+            fi
+            # Sort key: reuse_score (asc), slow_sort (asc), boot_image (desc), vcpus (desc)
             # Use inverse vcpus (100-vcpus) so ascending sort gives descending vcpus
-            printf "%d\t%s\t%02d\t%s\n" "${reuse_score}" "${boot_image}" "$((100 - vcpus))" "${scenario_script}"
+            printf "%d\t%d\t%s\t%02d\t%s\n" "${reuse_score}" "${slow_sort}" "${boot_image}" "$((100 - vcpus))" "${scenario_script}"
         else
             # Unknown requirements - treat as flexible, put last
-            printf "9\taaa\t99\t%s\n" "${scenario_script}"
+            printf "9\t1\taaa\t99\t%s\n" "${scenario_script}"
         fi
-    done | sort -t$'\t' -k1,1n -k2,2r -k3,3n | cut -f4
+    done | sort -t$'\t' -k1,1n -k2,2n -k3,3r -k4,4n | cut -f5
 }
 
 # Global sequence counter for queue ordering

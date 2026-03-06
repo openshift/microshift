@@ -11,6 +11,7 @@ min_disksize=20
 networks=default,"${VM_MULTUS_NETWORK}"
 boot_image=rhel98-bootc-source
 fips=false
+slow=true
 EOF
 }
 
