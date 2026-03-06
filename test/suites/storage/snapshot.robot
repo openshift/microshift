@@ -15,13 +15,15 @@ Suite Teardown      Test Suite Teardown
 
 
 *** Variables ***
-${POD_NAME_STATIC}      base
-${TEST_DATA}            FOOBAR
-${SOURCE_KUSTOMIZE}     assets/kustomizations/patches/pvc-thin
-${RESTORE_KUSTOMIZE}    assets/kustomizations/patches/pvc-from-snapshot
-${SNAPSHOT}             assets/storage/snapshot.yaml
-${STORAGE_CLASS}        assets/storage/storage-class-thin.yaml
-${SNAPSHOT_CLASS}       assets/storage/volume-snapshot-class.yaml
+${POD_NAME_STATIC}          base
+${TEST_DATA}                FOOBAR
+${SOURCE_KUSTOMIZE}         assets/kustomizations/patches/pvc-thin
+${RESTORE_KUSTOMIZE}        assets/kustomizations/patches/pvc-from-snapshot
+${SNAPSHOT}                 assets/storage/snapshot.yaml
+${STORAGE_CLASS}            assets/storage/storage-class-thin.yaml
+${SNAPSHOT_CLASS}           assets/storage/volume-snapshot-class.yaml
+${RUNTIME_LVMD_CONFIG}      /var/lib/microshift/lvms/lvmd.yaml
+${SMALL_LVMD_ASSET}         assets/storage/lvmd-small.yaml
 
 
 *** Test Cases ***
@@ -37,6 +39,34 @@ Snapshotter Smoke Test
     Should Be Equal As Strings    ${TESTDATA}    ${data}
     [Teardown]    Test Case Teardown
 
+Lvmd Runtime Config Is Valid After Replacing With Smaller Config
+    [Documentation]    Verify that replacing a larger lvmd.yaml with a smaller one
+    ...    produces a valid, correctly truncated runtime config at
+    ...    /var/lib/microshift/lvms/lvmd.yaml with no leftover garbage bytes.
+    ...    Regression test for USHIFT-6584.
+    [Tags]    ushift-6584
+
+    ${small_cfg}=    OperatingSystem.Get File    ${SMALL_LVMD_ASSET}
+    Upload Lvmd Config    ${small_cfg}
+    Restart MicroShift
+    Wait For MicroShift Healthcheck Success
+
+    # Compare user config and runtime config are identical
+    ${user_content}=    Command Should Work    cat /etc/microshift/lvmd.yaml
+    ${runtime_content}=    Command Should Work    cat ${RUNTIME_LVMD_CONFIG}
+    Should Be Equal As Strings    ${user_content}    ${runtime_content}
+    ...    Runtime config does not match user config - file was not properly truncated
+
+    # Verify openshift-storage pods are healthy with the new config
+    Named Deployment Should Be Available    lvms-operator    openshift-storage    5m
+    Wait Until Resource Exists    daemonset    vg-manager    openshift-storage    5m
+    Named Daemonset Should Be Available    vg-manager    openshift-storage    5m
+
+    [Teardown]    Run Keywords
+    ...    Upload Lvmd Config    ${EXTENDED_LVMD_CONFIG}
+    ...    AND    Restart MicroShift
+    ...    AND    Wait For MicroShift Healthcheck Success
+
 
 *** Keywords ***
 Test Suite Setup
@@ -46,6 +76,7 @@ Test Suite Setup
     Create Thin Storage Pool
     Save Lvmd Config
     ${config}=    Extend Lvmd Config
+    VAR    ${EXTENDED_LVMD_CONFIG}=    ${config}    scope=SUITE
     Upload Lvmd Config    ${config}
     Oc Apply    -f ${STORAGE_CLASS} -f ${SNAPSHOT_CLASS}
     Restart Microshift

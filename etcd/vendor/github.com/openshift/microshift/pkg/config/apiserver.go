@@ -139,7 +139,7 @@ const (
 	FeatureSetDevPreviewNoUpgrade  = "DevPreviewNoUpgrade"
 )
 
-type CustomNoUpgrade struct {
+type EnableDisableFeatures struct {
 	Enabled  []string `json:"enabled"`
 	Disabled []string `json:"disabled"`
 }
@@ -149,8 +149,12 @@ type CustomNoUpgrade struct {
 var RequiredFeatureGates = []string{"UserNamespacesSupport", "UserNamespacesPodSecurityStandards"}
 
 type FeatureGates struct {
-	FeatureSet      string          `json:"featureSet"`
-	CustomNoUpgrade CustomNoUpgrade `json:"customNoUpgrade"`
+	FeatureSet string `json:"featureSet"`
+	// CustomNoUpgrade is used to enable/disable feature gates. When the enabled or disable lists are not empty, x- and y-stream upgrades will be blocked.
+	// Use this field exclusively for custom feature gates, unless you are certain that the feature gate is a SpecialHandlingSupportExceptionRequired feature.
+	CustomNoUpgrade EnableDisableFeatures `json:"customNoUpgrade"`
+	// SpecialHandlingSupportExceptionRequired allows for feature gates to be exempted from blocking x- and y-stream upgrades.
+	SpecialHandlingSupportExceptionRequired EnableDisableFeatures `json:"specialHandlingSupportExceptionRequired"`
 }
 
 // ToApiserverArgs converts the FeatureGates struct to a list of feature-gates arguments for the kube-apiserver.

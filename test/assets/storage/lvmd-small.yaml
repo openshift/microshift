@@ -1,0 +1,6 @@
+device-classes:
+- default: true
+  name: "userdev"
+  volume-group: rhel
+  spare-gb: 10
+socket-name: /run/lvmd/lvmd.socket

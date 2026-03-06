@@ -1,0 +1,14 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: openshift-ovn-kubernetes-sbdb
+  namespace: openshift-ovn-kubernetes
+rules:
+- apiGroups: [""]
+  resources:
+  - endpoints
+  verbs:
+  - create
+  - update
+  - patch

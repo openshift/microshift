@@ -12,6 +12,7 @@
 - name: create token for service account
   ansible.builtin.command: oc create token metrics-server -n kube-system --duration 720h
   register: token
+  no_log: true
 
 - name: remove metrics service account yaml
   ansible.builtin.file:
@@ -22,4 +23,6 @@
   ansible.builtin.copy:
     content: "{{ token.stdout }}"
     dest: "{{ sa_token_file }}"
+    mode: '0600'
   delegate_to: localhost
+  no_log: true

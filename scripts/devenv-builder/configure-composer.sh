@@ -4,13 +4,24 @@ set -euxo pipefail
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 DNF_RETRY="${SCRIPTDIR}/../dnf_retry.sh"
 
+enable_copr_repositories() {
+    local -r version_id=$1
+    local -r version_id_major="$(awk -F. '{print $1}' <<< "${version_id}")"
+
+    sudo dnf copr enable -y @osbuild/osbuild-composer "rhel-${version_id_major}-$(uname -m)"
+    sudo dnf copr enable -y @osbuild/osbuild          "epel-${version_id_major}-$(uname -m)"
+}
+
 install_and_configure_composer() {
     local -r version_id=$1
     local -r version_id_major="$(awk -F. '{print $1}' <<< "${version_id}")"
 
+    # The osbuild packages may come from 'copr' repositories.
+    # They are installed separately to resolve potential RPM package dependency
+    # conflicts with the system packages.
+    "${DNF_RETRY}" "install" "--nobest osbuild osbuild-composer"
     "${DNF_RETRY}" "install" \
-        "osbuild osbuild-composer \
-        git composer-cli ostree rpm-ostree \
+        "git composer-cli ostree rpm-ostree \
         cockpit-composer bash-completion podman runc genisoimage \
         createrepo yum-utils selinux-policy-devel jq wget lorax rpm-build \
         containernetworking-plugins expect httpd-tools vim-common"
@@ -133,6 +144,13 @@ EOF
     fi
 }
 
+disable_gpg_check() {
+    local -r composer_config=$1
+
+    sudo cp "${composer_config}" "${composer_config}.with-gpg-check"
+    sudo sed -i 's;"check_gpg": true;"check_gpg": false;g' "${composer_config}"
+}
+
 enable_ocp_mirror_repositories() {
     local -r version_id=$1
     local -r composer_config=$3
@@ -140,14 +158,6 @@ enable_ocp_mirror_repositories() {
     local version_id_ocp=$2
     if [ "$(uname -m)" = "aarch64" ]; then
         version_id_ocp="${version_id_ocp}_aarch64"
-    fi
-
-    # Check if a released version of the configuration file exists
-    local -r config_file="/usr/share/osbuild-composer/repositories/rhel-${version_id}.json"
-    if [ -f "${config_file}" ]; then
-        echo "WARNING: Skipping pre-release RHEL repository configuration for version '${version_id}'"
-        echo "WARNING: Using '${config_file}' configuration file"
-        return
     fi
 
     # Check if OCP mirror credentials are present
@@ -195,12 +205,17 @@ EOF
 source /etc/os-release
 
 # shellcheck disable=SC2153
+enable_copr_repositories       "${VERSION_ID}"
 install_and_configure_composer "${VERSION_ID}"
 check_umask_and_permissions
 
 # Configure repositories for the current OS
 enable_rt_repositories          "${VERSION_ID}" "/etc/osbuild-composer/repositories/rhel-${VERSION_ID}.json"
 enable_beta_or_eus_repositories "${VERSION_ID}" "/etc/osbuild-composer/repositories/rhel-${VERSION_ID}.json"
+
+# Disable GPG check for all repositories to work around the issue with signing
+# across different OS versions due to the introduction of post-quantum keys
+disable_gpg_check "/etc/osbuild-composer/repositories/rhel-${VERSION_ID}.json"
 
 # Configure OCP mirror repositories for pre-release versions
 enable_ocp_mirror_repositories "9.8" "4.22" "/etc/osbuild-composer/repositories/rhel-9.8.json"

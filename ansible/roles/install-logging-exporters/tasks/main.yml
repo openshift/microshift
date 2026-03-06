@@ -1,7 +1,7 @@
 - name: install node-exporter
   ansible.builtin.dnf:
     name:
-    - golang-github-prometheus-node-exporter
+    - node-exporter
     state: present
 
 - name: install process-exporter

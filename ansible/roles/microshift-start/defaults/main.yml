@@ -12,5 +12,3 @@ du_dirs:
   - /usr/bin/*
 
 sample_interval: 5
-
-vnstat_db: /var/lib/vnstat/vnstat.db

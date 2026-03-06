@@ -36,16 +36,20 @@ func startCNIPlugin(ctx context.Context, cfg *config.Config, kubeconfigPath stri
 			"components/ovn/common/node-serviceaccount.yaml",
 		}
 		r = []string{
-			"components/ovn/common/role.yaml",
+			"components/ovn/common/role-node.yaml",
+			"components/ovn/common/role-sbdb.yaml",
 		}
 		rb = []string{
-			"components/ovn/common/rolebinding.yaml",
+			"components/ovn/common/rolebinding-node.yaml",
+			"components/ovn/common/rolebinding-sbdb.yaml",
 		}
 		cr = []string{
-			"components/ovn/common/clusterrole.yaml",
+			"components/ovn/common/clusterrole-controller.yaml",
+			"components/ovn/common/clusterrole-node.yaml",
 		}
 		crb = []string{
-			"components/ovn/common/clusterrolebinding.yaml",
+			"components/ovn/common/clusterrolebinding-controller.yaml",
+			"components/ovn/common/clusterrolebinding-node.yaml",
 		}
 		cm = []string{
 			"components/ovn/common/configmap.yaml",

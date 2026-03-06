@@ -15,10 +15,16 @@ apiServer:
         # profile is the OpenShift profile specifying a specific logging policy
         profile: Default
     featureGates:
+        # CustomNoUpgrade is used to enable/disable feature gates that block x- and y-stream upgrades.
         customNoUpgrade:
             disabled: []
             enabled: []
         featureSet: ""
+        # SpecialHandlingSupportExceptionRequired is used to enable/disable feature gates that are exempt from blocking x- and y-stream upgrades.
+        # Features listed here do not need to be duplicated in CustomNoUpgrade.
+        specialHandlingSupportExceptionRequired:
+            disabled: []
+            enabled: []
     # List of custom certificates used to secure requests to specific host names
     namedCertificates:
         - certPath: ""

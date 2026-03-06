@@ -64,9 +64,9 @@ BuildRequires: systemd
 BuildRequires: golang
 # DO NOT REMOVE
 
-# TODO: The cri-tools version is relaxed in the transition period.
-# It needs to be updated to match the cri-o version before the release.
-Requires: cri-o >= 1.35.0, cri-o < 1.36.0
+# TODO: The cri-o and cri-tools versions are relaxed in the transition period.
+# They need to be updated to target a single version range before the release.
+Requires: cri-o >= 1.34.0, cri-o < 1.36.0
 Requires: cri-tools >= 1.34.0, cri-tools < 1.36.0
 # The container networking plugins package has been removed from RHEL 10 and
 # cri-o no longer has an explicit dependency on it.
@@ -592,6 +592,14 @@ install -p -m644 assets/optional/sriov/crd/*.yaml %{buildroot}/%{_prefix}/lib/mi
 install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/070-microshift-sriov/deploy
 install -p -m644 assets/optional/sriov/deploy/*.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/070-microshift-sriov/deploy
 install -p -m644 assets/optional/sriov/kustomization.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/070-microshift-sriov/kustomization.yaml
+
+%ifarch %{arm} aarch64
+cat assets/optional/sriov/kustomization.aarch64.yaml >> %{buildroot}/%{_prefix}/lib/microshift/manifests.d/070-microshift-sriov/kustomization.yaml
+%endif
+
+%ifarch x86_64
+cat assets/optional/sriov/kustomization.x86_64.yaml >> %{buildroot}/%{_prefix}/lib/microshift/manifests.d/070-microshift-sriov/kustomization.yaml
+%endif
 
 # sriov-release-info
 mkdir -p -m755 %{buildroot}%{_datadir}/microshift/release

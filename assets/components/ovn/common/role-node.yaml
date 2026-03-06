@@ -1,0 +1,22 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: openshift-ovn-kubernetes-node
+  namespace: openshift-ovn-kubernetes
+rules:
+- apiGroups: [""]
+  resources:
+  - configmaps
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups: [certificates.k8s.io]
+  resources: ['certificatesigningrequests']
+  verbs:
+    - create
+    - get
+    - delete
+    - update
+    - list

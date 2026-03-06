@@ -12,7 +12,7 @@ set -xuo pipefail
 # chmod 755 "${DNF_RETRY}"
 #
 if [ $# -ne 1 ] && [ $# -ne 2 ] ; then
-    echo "Usage: $(basename "$0") <dnf_mode> [packages_to_install]"
+    echo "Usage: $(basename "$0") <dnf_mode> [[optional_dnf_switches] packages_to_install]"
     exit 1
 fi
 
@@ -20,10 +20,16 @@ DNF_MODE=$1
 DNF_PACK=""
 [ $# -eq 2 ] && DNF_PACK=$2
 
+# Build the command line for dnf
+DNF_CMD=(sudo dnf "${DNF_MODE}" -y)
+if [ -n "${DNF_PACK}" ] ; then
+    read -ra packages <<< "${DNF_PACK}"
+    DNF_CMD+=("${packages[@]}")
+fi
+
 rc=0
 for _ in $(seq 3) ; do
-    # shellcheck disable=SC2086
-    sudo dnf "${DNF_MODE}" -y ${DNF_PACK} && exit 0
+    "${DNF_CMD[@]}" && exit 0
     # If unsuccessful, save the return code for exit
     rc=$?
     # Clean cache and retry

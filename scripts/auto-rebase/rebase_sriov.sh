@@ -18,10 +18,11 @@ CONFIGMAP_FILENAME="supported-nic-ids_v1_configmap.yaml"
 OPERATOR_FILENAME="operator.yaml"
 PULL_SECRET_FILE="${HOME}/.pull-secret.json"
 
-RELEASE_JSON_X86="${REPOROOT}/assets/optional/sriov/release-sriov-x86_64.json"
-RELEASE_JSON_ARM="${REPOROOT}/assets/optional/sriov/release-sriov-aarch64.json"
 NAMESPACE="sriov-network-operator"
 NO_BRANCH=${NO_BRANCH:-false}
+
+declare -a ARCHS=("amd64" "arm64")
+declare -A GOARCH_TO_UNAME_MAP=( ["amd64"]="x86_64" ["arm64"]="aarch64" )
 
 title() {
     echo -e "\E[34m$1\E[00m";
@@ -50,6 +51,11 @@ check_preconditions() {
 
     if ! hash oc; then
         echo "ERROR: oc is not present on the system - please install"
+        exit 1
+    fi
+
+    if ! hash jq; then
+        echo "ERROR: jq is not present on the system - please install"
         exit 1
     fi
 }
@@ -369,6 +375,14 @@ update_rebase_job_entrypoint_sh() {
 update_sriov_manifests() {
     title "Copying manifests"
     "${REPOROOT}/scripts/auto-rebase/handle_assets.py" "./scripts/auto-rebase/assets_sriov.yaml"
+
+    local -r operator_yaml="${REPOROOT}/assets/optional/sriov/deploy/operator.yaml"
+    title "Preparing operator.yaml for per-arch image injection"
+    local -r image_env_regex="^(SRIOV_CNI_IMAGE|SRIOV_DEVICE_PLUGIN_IMAGE|NETWORK_RESOURCES_INJECTOR_IMAGE|SRIOV_NETWORK_CONFIG_DAEMON_IMAGE|SRIOV_NETWORK_WEBHOOK_IMAGE|SRIOV_INFINIBAND_CNI_IMAGE|RDMA_CNI_IMAGE|METRICS_EXPORTER_IMAGE|METRICS_EXPORTER_KUBE_RBAC_PROXY_IMAGE)$"
+    yq eval -i "
+        .spec.template.spec.containers[0].env = [.spec.template.spec.containers[0].env[] | select(.name | test(\"${image_env_regex}\") | not)] |
+        .spec.template.spec.containers[0].image = \"quay.io/openshift/sriov-network-operator:latest\"
+    " "${operator_yaml}"
 }
 
 update_sriov_images() {
@@ -378,7 +392,12 @@ update_sriov_images() {
         return 1
     }
 
-    yq "
+    local base_version
+    base_version="$(get_sriov_bundle_version)"
+
+    # Extract images from operator deployment (multiarch in the CSV)
+    local images_json
+    images_json=$(yq "
       (
         [.spec.template.spec.containers[].env[] |
         select(.name | test(\"_IMAGE$\")) |
@@ -389,9 +408,123 @@ update_sriov_images() {
         .spec.template.spec.containers[] |
         {(.name): .image}
       ) as \$main_images |
-      {\"release\": {\"base\": \"$(get_sriov_bundle_version)\"}, \"images\": (\$env_images + \$main_images)}
-    " "${STAGING_SRIOV}/${OPERATOR_FILENAME}" -o json | sed 's/"sriov_\([^"]*\)_\([^"]*\)"/"sriov-\1-\2"/g; s/_/-/g' > "${RELEASE_JSON_X86}"
-    cp "${RELEASE_JSON_X86}" "${RELEASE_JSON_ARM}"
+      (\$env_images + \$main_images)
+    " "${STAGING_SRIOV}/${OPERATOR_FILENAME}" -o json | sed 's/"sriov_\([^"]*\)_\([^"]*\)"/"sriov-\1-\2"/g; s/_/-/g')
+
+    # For each architecture, resolve arch-specific digests
+    for arch in "${ARCHS[@]}"; do
+        write_sriov_images_for_arch "${arch}" "${base_version}" "${images_json}"
+    done
+}
+
+write_sriov_images_for_arch() {
+    local arch="$1"
+    local base_version="$2"
+    local images_json="$3"
+    local uname_arch="${GOARCH_TO_UNAME_MAP[${arch}]}"
+    local release_file="${REPOROOT}/assets/optional/sriov/release-sriov-${uname_arch}.json"
+    local kustomization_file="${REPOROOT}/assets/optional/sriov/kustomization.${uname_arch}.yaml"
+    local authentication
+    authentication="$(get_auth)"
+
+    title "Resolving SR-IOV images for ${arch}"
+
+    # Initialize the release JSON
+    echo "{\"release\": {\"base\": \"${base_version}\"}, \"images\": {}}" > "${release_file}"
+
+    # Declare associative array to store resolved images
+    declare -A resolved_images
+
+    # Iterate over each image and resolve arch-specific digest
+    for image_name in $(echo "${images_json}" | jq -r 'keys[]'); do
+        local image_ref
+        image_ref=$(echo "${images_json}" | jq -r --arg name "${image_name}" '.[$name]')
+
+        local arch_digest
+        # shellcheck disable=SC2086
+        arch_digest=$(oc ${authentication} image info -o json --filter-by-os "linux/${arch}" "${image_ref}" 2>/dev/null | jq -r '.digest') || {
+            >&2 echo "Warning: Could not get ${arch} digest for ${image_name}, using original"
+            arch_digest=""
+        }
+
+        local arch_image
+        if [[ -n "${arch_digest}" && "${arch_digest}" != "null" ]]; then
+            # Replace digest with arch-specific one
+            arch_image="${image_ref%@*}@${arch_digest}"
+        else
+            # Fallback to original image reference
+            arch_image="${image_ref}"
+        fi
+
+        # Add to release JSON
+        jq --arg name "${image_name}" --arg img "${arch_image}" \
+            '.images[$name] = $img' "${release_file}" > "${release_file}.tmp" && \
+            mv "${release_file}.tmp" "${release_file}"
+
+        # Store resolved image
+        resolved_images["${image_name}"]="${arch_image}"
+    done
+
+    # Generate kustomization.{arch}.yaml with images and JSON patches
+    # Image env vars are removed from operator.yaml and added here via patches (like OLM pattern)
+    cat > "${kustomization_file}" <<EOF
+images:
+  - name: quay.io/openshift/sriov-network-operator
+    newName: ${resolved_images["sriov-network-operator"]%@*}
+    digest: ${resolved_images["sriov-network-operator"]#*@}
+
+patches:
+  - patch: |-
+      - op: add
+        path: /spec/template/spec/containers/0/env/-
+        value:
+          name: SRIOV_CNI_IMAGE
+          value: ${resolved_images["sriov-cni-image"]}
+      - op: add
+        path: /spec/template/spec/containers/0/env/-
+        value:
+          name: SRIOV_DEVICE_PLUGIN_IMAGE
+          value: ${resolved_images["sriov-device-plugin-image"]}
+      - op: add
+        path: /spec/template/spec/containers/0/env/-
+        value:
+          name: NETWORK_RESOURCES_INJECTOR_IMAGE
+          value: ${resolved_images["network-resources-injector-image"]}
+      - op: add
+        path: /spec/template/spec/containers/0/env/-
+        value:
+          name: SRIOV_NETWORK_CONFIG_DAEMON_IMAGE
+          value: ${resolved_images["sriov-network-config-daemon-image"]}
+      - op: add
+        path: /spec/template/spec/containers/0/env/-
+        value:
+          name: SRIOV_NETWORK_WEBHOOK_IMAGE
+          value: ${resolved_images["sriov-network-webhook-image"]}
+      - op: add
+        path: /spec/template/spec/containers/0/env/-
+        value:
+          name: SRIOV_INFINIBAND_CNI_IMAGE
+          value: ${resolved_images["sriov-infiniband-cni-image"]}
+      - op: add
+        path: /spec/template/spec/containers/0/env/-
+        value:
+          name: RDMA_CNI_IMAGE
+          value: ${resolved_images["rdma-cni-image"]}
+      - op: add
+        path: /spec/template/spec/containers/0/env/-
+        value:
+          name: METRICS_EXPORTER_IMAGE
+          value: ${resolved_images["metrics-exporter-image"]}
+      - op: add
+        path: /spec/template/spec/containers/0/env/-
+        value:
+          name: METRICS_EXPORTER_KUBE_RBAC_PROXY_IMAGE
+          value: ${resolved_images["metrics-exporter-kube-rbac-proxy-image"]}
+    target:
+      kind: Deployment
+      name: sriov-network-operator
+      namespace: ${NAMESPACE}
+EOF
 }
 
 rebase_sriov_to() {

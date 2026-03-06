@@ -1,34 +1,145 @@
-- api embedded-component d34f11c515b3d00fdb3809cd59737e3bd77167c4 to 43090db3afe48e7dff0f6e39a866474d15cd0db5
-  - 523451b3 2026-02-17T13:01:53+01:00 MCO-2126: Add defaultStream field to OSImageStream spec
-  - 887b5e84 2026-02-17T10:38:57Z Prefer feature-gate manifest inclusion for merged CRDs
+- api embedded-component 64dddb8f3186537f3682b7e735f1cc392196a101 to 9b2ee997d297702c53d26185becda97e8f003f44
+  - 9c5267b1 2026-02-27T15:59:12Z Add platform-specific feature gates for CAPI Operator features
+  - b81d2a16 2026-02-26T21:43:01-05:00 feat: add link to sippy for tests
+  - 9b8f43c8 2026-02-26T09:44:16-08:00 Promote ClusterAPIMachineManagementVSphere to TechPreview
+  - 74577ddf 2026-02-25T16:57:44Z ClusterAPI revision components can be empty
+  - 3cfb57ea 2026-02-25T16:54:05Z Require APIExcludedFields Versions to be set
+  - a58ab739 2026-02-09T17:35:08Z OCPBUGS-32275: Add ingress.spec.domain validation
 
-- cluster-kube-controller-manager-operator embedded-component a6a751080c9b2bdd3a721851b206cf2f7c8bbc41 to 99f17e64c5e623f5e909418d6690214f5583f6c2
-  - 7d9db03 2025-10-31T12:52:32-07:00 CORS-4220: pass dualstack cluster and service cidrs as comma-separated lists
+- cluster-dns-operator embedded-component 5d7c973968909d4155796363222f6edc001e19a3 to 979dca867681e4121155d586fc9c374745d0d6e0
+  - 0b50f72 2026-02-25T15:05:58Z Add NI&D team members to OWNERS
+  - 7ba9264 2026-02-11T15:41:57Z Bump base images from 4.21 to 4.22
+  - d08fbd6 2026-01-14T09:11:55+01:00 OCPBUGS-65498: Add openshift-dns-operator ClusterRole to ClusterOperator relatedObjects
+  - c72db7b 2025-11-11T15:58:57+01:00 manifests: Enable user namespaces
 
-- cluster-kube-scheduler-operator embedded-component 14c5fdcfc2602292e19cab8713e42accf94b593d to 820d82bbc61c739c6c95a450cdbc454b5e6cd1fc
-  - 4022ec6 2026-02-17T20:27:07+05:30 Add 30-minute timeout to preferred host e2e test
+- cluster-kube-apiserver-operator embedded-component bf2d69223e840eed1c3ad73eb7145c6d8c747fa8 to ee1aaf0b8169bbd19a297ce34bca4eff3698e8f0
+  - 890526a 2026-02-26T07:52:43-05:00 Revert "Merge pull request #2032 from ricardomaraschini/CNTRLPLANE-2622"
+  - 5ee2e85 2026-02-19T13:48:19+05:30 Fixing bound sa token test
 
-- cluster-openshift-controller-manager-operator embedded-component 7634c413830a510ff942bd6886ffe5f79db707b4 to 7349d0f7dba3285dfc31d309cfad4124c1e7f943
-  - f65d0bd 2026-02-13T09:03:34Z Use the configured clock source during startup
+- cluster-kube-controller-manager-operator embedded-component 99f17e64c5e623f5e909418d6690214f5583f6c2 to 1d852bde83bf699297a6164d131b78343d922afd
+  - 16022e4 2026-01-17T11:22:43Z Updating ose-cluster-kube-controller-manager-operator-container image to be consistent with ART for 4.22 Reconciling with https://github.com/openshift/ocp-build-data/tree/37a25cc2e6eec9883ae439d785f89ab3f6cb2f51/images/ose-cluster-kube-controller-manager-operator.yml
 
-- machine-config-operator embedded-component 7eb4793ae255b19327e781f66aaf1dbd3e5210c5 to e8fd02f68658c3a7a65126740aec4775491ddb6c
-  - de189040 2026-02-17T15:04:46-05:00 Break e2e-ocl test suite into 2
-  - f194385e 2026-02-13T08:00:47+01:00 MCO-2032: Avoid MCPs duplication at install time
-  - 348da479 2026-02-12T08:53:28+01:00 MCO-2120: Rework OS image stream label classification
-  - a0d71bf3 2026-02-10T12:33:59-06:00 fixes config drift metric persistence
+- cluster-network-operator embedded-component b1c55d71bfc33a4e2aba1083c0eed1ff698a84c5 to 1c1a0978d85b2a582f12690ed89fc7cb5b261744
+  - 44ebf06 2026-02-19T12:54:45-08:00 fix more transient error condtions caused Degraded
 
-- operator-framework-olm embedded-component 811919f88bc3b8da4f97c6e6ca031258cc4fa13b to af1eb8f8acc2959c5a722467e880cac66ce5246b
-  - 64fe26b2 2026-02-17T15:20:31-05:00 Remove the collect-profiles info from the microshift kustomization file
+- csi-external-snapshotter embedded-component d20b90a92cd7d77166319f5bc2feb80623747d28 to 7c9f2f4695042e415747e94d77cbbcc11c59c6cf
+  - f689ea8 2026-02-27T21:30:09+08:00 UPSTREAM: <drop>: restore log level of the group snapshot reconciler
+  - 8025819 2026-02-26T13:10:51Z UPSTREAM: <carry>: Updating ose-csi-external-snapshotter-container image to be consistent with ART for 4.22 Reconciling with https://github.com/openshift/ocp-build-data/tree/cb57200ffcd7ad506814eaf8c941fed0481fe837/images/ose-csi-external-snapshotter.yml
 
-- oc image-amd64 7f88fe2132f6969e1686808e5301aa3c808d4a45 to 36384453463224e67ca737d246589de2fa95733b
-  - 686e6f13 2026-02-19T11:33:23-05:00 OCPBUGS-76394: Ignore group ownership on rpm -V
+- kubernetes-kube-storage-version-migrator embedded-component 73b468abf83d3d5894534f5d5cc42d1cad2a9045 to a740e5343a8b0944074c80a72fa3433b21864b35
+  - 8591d56 2026-01-16T20:26:36Z UPSTREAM: <carry>: Updating ose-kube-storage-version-migrator-container image to be consistent with ART for 4.22 Reconciling with https://github.com/openshift/ocp-build-data/tree/37a25cc2e6eec9883ae439d785f89ab3f6cb2f51/images/ose-kube-storage-version-migrator.yml
 
-- ovn-kubernetes image-amd64 2a9cd189db9c74dc678fcfca68473d6fdc278028 to c698004c7eb3de25cc95169e660448b4eaf77843
-  - d0dcc089 2026-02-05T16:11:34-08:00 Exclude NetSeg tests for SingleReplica topology
+- machine-config-operator embedded-component b8e0c0c1dd6cb646740fc3deed65bfd41b15a04f to 297cce4e5c79285b9fcf2a939f1034894d7a9f2c
+  - ccdcea07 2026-02-27T18:16:28Z chore: update AMIs
+  - 33b1adb0 2026-02-27T11:18:50-05:00 remove ManagedBootImages* feature gates
+  - 2bc7ceef 2026-02-25T14:37:17-05:00 bootimage: remove URL in vsphere login failure log
+  - 0e1d4a4e 2026-02-24T20:11:08-05:00 Increate timeout for sharded ocl test
+  - cd13fea7 2026-02-05T17:35:21-05:00 Remove lingering references to openshift-sdn
 
-- oc image-arm64 7f88fe2132f6969e1686808e5301aa3c808d4a45 to 36384453463224e67ca737d246589de2fa95733b
-  - 686e6f13 2026-02-19T11:33:23-05:00 OCPBUGS-76394: Ignore group ownership on rpm -V
+- operator-framework-olm embedded-component af1eb8f8acc2959c5a722467e880cac66ce5246b to 248492dba7f542d4bf68004f85218137bba987d1
+  - e537de8b 2026-02-25T16:09:35-05:00 Remove aliases and selectors from NetworkPolicy tests
+  - 16791e3c 2026-02-25T13:40:49-05:00 Update downstream NetworkPolicies for HyperShift
+  - a1e313a8 2026-02-25T09:31:52-05:00 update the network policy port per new change
+  - 49626b5a 2026-02-24T00:07:53Z OCPBUGS-76971: Update NetworkPolicy egress to support HyperShift custom API ports (#3770)
+  - bf18ea54 2026-02-24T00:06:50Z MON-4513: Use endpointslices for metrics (#3773)
+  - f265c6b5 2026-02-24T00:06:32Z abandon evaluation of any new catalogsource image which is pathological (#3766)
+  - 801784ae 2026-02-24T00:06:14Z :seedling: Bump google.golang.org/grpc from 1.78.0 to 1.79.1 (#3772)
+  - 96af84cf 2026-02-24T00:05:56Z :seedling: Bump the k8s-dependencies group with 9 updates (#3771)
+  - 5ec11c1d 2026-02-24T00:05:22Z :seedling: Bump golang.org/x/net from 0.49.0 to 0.50.0 (#3764)
+  - a266010b 2026-02-24T00:05:03Z Auto-generate OpenAPIModelName() via openapi-gen (#3769)
+  - 38b6af53 2026-02-24T00:04:38Z add rashmigottipati as a reviewer (#3768)
+  - 8c1de022 2026-02-24T00:04:11Z remove incompatible licensing statements (#3767)
+  - 551e315b 2026-02-24T00:03:51Z fix: add OpenAPIModelName for all PackageManifest related types (#3765)
 
-- ovn-kubernetes image-arm64 2a9cd189db9c74dc678fcfca68473d6fdc278028 to c698004c7eb3de25cc95169e660448b4eaf77843
-  - d0dcc089 2026-02-05T16:11:34-08:00 Exclude NetSeg tests for SingleReplica topology
+- csi-external-snapshotter image-amd64 d20b90a92cd7d77166319f5bc2feb80623747d28 to 7c9f2f4695042e415747e94d77cbbcc11c59c6cf
+  - f689ea8 2026-02-27T21:30:09+08:00 UPSTREAM: <drop>: restore log level of the group snapshot reconciler
+  - 8025819 2026-02-26T13:10:51Z UPSTREAM: <carry>: Updating ose-csi-external-snapshotter-container image to be consistent with ART for 4.22 Reconciling with https://github.com/openshift/ocp-build-data/tree/cb57200ffcd7ad506814eaf8c941fed0481fe837/images/ose-csi-external-snapshotter.yml
+
+- kube-rbac-proxy image-amd64 c7ab76fd6fdf651d5022db8946c35b158ecc2396 to bdd87a0646eae5683bb83fe30e3649471b757ebf
+  - 8b1c864 2026-02-26T12:55:56Z Updating kube-rbac-proxy-container image to be consistent with ART for 4.22 Reconciling with https://github.com/openshift/ocp-build-data/tree/cb57200ffcd7ad506814eaf8c941fed0481fe837/images/kube-rbac-proxy.yml
+
+- oc image-arm64 5cbfaa519ec55b8ac7217b316061cb904381ab91 to dcdd63608b569e5710cdcc5f0882a95796d925c7
+  - 57a74e4c 2026-03-03T09:39:57-05:00 images/tools/Dockerfile: Just install it and if it fails fall back to iotop-c
+  - 02339fc4 2026-03-03T14:40:18+01:00 Allow periods in display name labels for version validation
+  - 189ac91b 2026-02-19T12:21:23-05:00 Update Dockerfile to work on CentOS/RHEL 10
+  - 2bd770b8 2026-02-12T12:01:40+05:30 fixing oc cli failures
+  - c9f1f7c6 2026-02-06T12:45:09+01:00 pkg/helpers: Print the right error object
+
+- csi-external-snapshotter image-arm64 d20b90a92cd7d77166319f5bc2feb80623747d28 to 698eb2c97de7d16ffc0bde7eaaba22f761664dee
+  - 48eb703 2026-03-03T18:33:57Z UPSTREAM: <carry>: Updating ose-csi-snapshot-controller-container image to be consistent with ART for 4.22 Reconciling with https://github.com/openshift/ocp-build-data/tree/56cb39ad358cdec1db7c84ea1919fe8849c2550b/images/ose-csi-snapshot-controller.yml
+  - f689ea8 2026-02-27T21:30:09+08:00 UPSTREAM: <drop>: restore log level of the group snapshot reconciler
+  - 8025819 2026-02-26T13:10:51Z UPSTREAM: <carry>: Updating ose-csi-external-snapshotter-container image to be consistent with ART for 4.22 Reconciling with https://github.com/openshift/ocp-build-data/tree/cb57200ffcd7ad506814eaf8c941fed0481fe837/images/ose-csi-external-snapshotter.yml
+
+- router image-arm64 d8ed3559fd4808a4f10c927ba4a199d3fd5b84a2 to a7f351b6bbc67c322fc37a47da0c0674a4a19ac4
+  - c08455a 2026-03-03T18:34:31-03:00 remove RouteExternalCertificate feature gate
+
+- kube-rbac-proxy image-arm64 c7ab76fd6fdf651d5022db8946c35b158ecc2396 to bdd87a0646eae5683bb83fe30e3649471b757ebf
+  - 8b1c864 2026-02-26T12:55:56Z Updating kube-rbac-proxy-container image to be consistent with ART for 4.22 Reconciling with https://github.com/openshift/ocp-build-data/tree/cb57200ffcd7ad506814eaf8c941fed0481fe837/images/kube-rbac-proxy.yml
+
+- ovn-kubernetes image-arm64 517194700aba68ee6ad222841e312e0c29899e73 to e69a72608af037a70a5e44a410f1c9c7eb6c2f97
+  - c79a4600 2026-02-25T14:14:03-08:00 make new tests informing by default
+  - 515d4c74 2026-02-11T17:46:31-05:00 Fixes e2e sflow test
+  - 95c0a261 2026-02-11T16:57:31+01:00 Fix asynchronous race with nad controller UT
+  - 3b141338 2026-02-10T09:28:41-05:00 Move from chassis hostname -> chassis ID
+  - c44cbbfb 2026-02-10T10:44:59+01:00 nodeallocator: fix subnet leak when hybrid overlay is enabled
+  - 2dc1f0fb 2026-02-09T15:51:58-08:00 Add ENABLE_NO_OVERLAY in dpu and dpu host helm charts
+  - 3d71dbc3 2026-02-09T15:51:58-08:00 Documentation for launching DPU and DPU Host clusters
+  - 6882878f 2026-02-09T15:51:58-08:00 Daemonset changes for supporting DPU in IC mode
+  - d0e79e98 2026-02-09T15:51:58-08:00 Helm chart changes for supporing DPU in IC mode
+  - 8043a218 2026-02-09T15:51:58-08:00 Enable interconnect and networksegmentation in DPU-Hosts podspec
+  - bf64ee06 2026-02-09T15:51:58-08:00 Enable DPUs to watch on a separate DPU Host cluster
+  - 9d608ccb 2026-02-09T15:51:58-08:00 Add gateway options for dpu in IC mode
+  - 1d5ee82f 2026-02-09T18:07:11+05:30 EgressFirewall: Use exponential backoff to refresh IP addresses for DNS names
+  - bc93b2cf 2026-02-06T15:00:31-05:00 Organize and add CUDN/UDN workloads
+  - 322e3911 2026-02-05T10:04:41+01:00 ANP: Skip redundant status updates to reduce API server load
+  - ff079902 2026-02-05T12:10:16+08:00 test: mark test IP as deprecated to prevent gateway IP selection
+  - 5db3201f 2026-02-05T12:10:16+08:00 no-overlay: add CI test lanes
+  - 546328cf 2026-02-05T12:10:16+08:00 no-overlay: add toReceive routes for pod subnets to FrrConfiguration
+  - 8312c0e4 2026-02-05T12:10:16+08:00 no-overlay: Implement no-overlay for the default network
+  - 67d3348e 2026-02-05T12:10:16+08:00 no-overlay: Set transport defaults and add validation
+  - 0c76a90e 2026-02-05T12:10:16+08:00 no-overlay: Helm support for no-overlay enabeld clusters
+  - 4eee03cd 2026-02-05T12:10:16+08:00 no-overlay: Kind support for deploying no-overlay enabled clusters
+  - b8e644bb 2026-02-05T12:10:16+08:00 no-overlay: Add no-overlay and managed BGP configuration options
+  - 0bf71766 2026-02-04T15:47:13-05:00 e2e: Collect binaries for collected coredumps
+  - ddb32d43 2026-02-04T11:20:31+01:00 egressip: fix duplicate IP assignment on control-plane restart
+  - 9fb7e85e 2026-02-04T10:19:09+01:00 Add ValidatingAdmissionPolicy for EgressIP
+  - 5e666678 2026-02-04T10:19:09+01:00 Prevent restoration of k8s.ovn.org/egressip-mark annotation
+  - 468d4724 2026-02-03T12:30:07-05:00 Remove limit on ovs-node
+  - a9e45056 2026-02-02T18:47:08-05:00 Fixes race with cluster manager UDN test
+  - 3ac35137 2026-02-02T14:35:16-08:00 misc fixes
+  - 5dccd365 2026-02-02T14:35:14-08:00 update node switch external-ids
+  - e83c0c75 2026-02-02T14:15:00-08:00 cleanup gateway manager only for primary network
+  - 2b1e7ef1 2026-02-02T14:10:21-08:00 Set always_learn_from_arp_request to false for cluster router
+  - 0d2e63c8 2026-02-02T14:10:21-08:00 no OVS bridges on dpu-host
+  - b35671c2 2026-02-02T14:10:21-08:00 move mtu caculation out of loop
+  - b7b77708 2026-02-02T13:29:41-05:00 fix: panic in runKubeletRestartTracker when reading from closed dbus channel
+  - 197f2971 2026-02-02T12:32:38+01:00 RA controller: require EVPN feature flag for EVPN networks
+  - 74032ba8 2026-02-02T12:32:38+01:00 Add EVPN support to RouteAdvertisements controller
+  - ed1be245 2026-01-30T12:38:46+01:00 Fix race condition in GetNadNamespaces
+  - e94bb529 2026-01-29T16:44:05+01:00 UDN controller: Add EVPN feature flag gating Signed-off-by: Matteo Dallaglio <mdallagl@redhat.com>
+  - 7c70ab22 2026-01-29T16:44:04+01:00 UDN controller: Add VTEP validation for EVPN CUDNs
+  - 86c71320 2026-01-29T16:43:56+01:00 UDN controller: Add cluster-wide VID allocation for EVPN
+  - 060c0fd3 2026-01-29T11:56:02+01:00 UDN controller: Add EVPN configuration translation to NAD
+  - 10827aec 2026-01-29T11:31:45+01:00 Align HA labeling and removing taints
+  - 364317dc 2026-01-29T11:31:45+01:00 Unify checking depenencies between kind and kind-helm
+  - 1ae93711 2026-01-29T11:31:45+01:00 E2E skip mulihoming ipv6 and dualstack for ipv4
+  - 47464729 2026-01-29T11:31:45+01:00 Unify kind create cluster
+  - 701ff434 2026-01-29T11:31:45+01:00 Add missing Get permissions for RA controller
+  - c26b190f 2026-01-29T11:31:45+01:00 conslidate delete function to kind-common.sh
+  - ed019b60 2026-01-29T11:31:45+01:00 Remove stale methods from kind-helm.sh
+  - 80d5ce44 2026-01-29T11:31:45+01:00 Consolidate variables between kind-helm.sh and kind.sh
+  - aaea1912 2026-01-29T11:31:45+01:00 Consolidate BGP related params into kind-common.sh
+  - d30130a0 2026-01-29T11:31:45+01:00 Add frr install to helm as well
+  - 13bcba21 2026-01-29T11:31:45+01:00 Enable bgp helm lane
+  - 43303065 2026-01-29T11:31:45+01:00 Add shell extension to kind-common
+  - 1191db6a 2026-01-29T11:31:45+01:00 Fix kind-helm.sh image
+  - e86ea087 2026-01-29T11:31:45+01:00 Add missing BGP support to kind-helm.sh
+  - ea55b702 2026-01-29T11:19:19+01:00 Add a e2e test for NodePort service
+  - 63793324 2026-01-29T11:19:19+01:00 Clear stale conntrack UDP entries for nodePorts
+  - acb088cc 2026-01-28T19:13:59+01:00 Fix IC cluster cleanup tests zone configuration
+  - d3b87ad2 2026-01-27T08:03:36-05:00 Add PodSecurity compliance to util.go
+  - 2c9f0517 2026-01-27T21:10:44+09:00 enable fail-fast to prevent partial releases
+  - 9e1889e7 2026-01-27T21:10:43+09:00 use native arm64 runners instead of QEMU emulation
+  - 3e6b2a3d 2026-01-27T21:10:43+09:00 parallelize multi-platform Docker image builds
+  - 7d408c1c 2026-01-21T15:38:23+01:00 Remove IC zone migration HACK code
 

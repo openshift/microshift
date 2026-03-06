@@ -59,14 +59,18 @@ assets:
     dirs:
       - dir: common/
         files:
-          - file: clusterrole.yaml
-          - file: clusterrolebinding.yaml
+          - file: clusterrole-controller.yaml
+          - file: clusterrole-node.yaml
+          - file: clusterrolebinding-controller.yaml
+          - file: clusterrolebinding-node.yaml
           - file: configmap.yaml
           - file: master-serviceaccount.yaml
           - file: namespace.yaml
           - file: node-serviceaccount.yaml
-          - file: role.yaml
-          - file: rolebinding.yaml
+          - file: role-node.yaml
+          - file: role-sbdb.yaml
+          - file: rolebinding-node.yaml
+          - file: rolebinding-sbdb.yaml
       - dir: multi-node/
         dirs:
           - dir: master/
@@ -111,6 +115,10 @@ assets:
     - file: clusterrole.yaml
       ignore: "extracted automatically from 05_operand_rbac.yaml"
     - file: clusterrolebinding.yaml
+      ignore: "extracted automatically from 05_operand_rbac.yaml"
+    - file: role.yaml
+      ignore: "extracted automatically from 05_operand_rbac.yaml"
+    - file: rolebinding.yaml
       ignore: "extracted automatically from 05_operand_rbac.yaml"
 
   - dir: controllers/cluster-policy-controller/
