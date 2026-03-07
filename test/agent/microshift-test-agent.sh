@@ -58,32 +58,6 @@ _debug_info() {
     cat "${AGENT_CFG}" || true
 }
 
-_get_current_boot_number() {
-    if ! /usr/bin/grub2-editenv list | grep -q boot_counter; then
-        echo "boot_counter is missing - script only for newly staged deployments"
-        exit 0
-    fi
-
-    local -r boot_counter=$(/usr/bin/grub2-editenv list | grep boot_counter | sed 's,boot_counter=,,')
-    local max_boot_attempts
-
-    if test -f "${GREENBOOT_CONFIGURATION_FILE}"; then
-        # shellcheck source=/dev/null
-        source "${GREENBOOT_CONFIGURATION_FILE}"
-    fi
-
-    if [ -v GREENBOOT_MAX_BOOT_ATTEMPTS ]; then
-        max_boot_attempts="${GREENBOOT_MAX_BOOT_ATTEMPTS}"
-    else
-        max_boot_attempts=3
-    fi
-
-    # When deployment is staged, greenboot sets boot_counter to 3
-    # and this variable gets decremented on each boot.
-    # First boot of new deployment will have it set to 2.
-    echo "$((max_boot_attempts - boot_counter))"
-}
-
 _get_current_deployment_id() {
     local -r id="$(rpm-ostree status --booted --json | jq -r ".deployments[0].id")"
     echo "${id}"
@@ -147,7 +121,6 @@ if [ ! -f "${AGENT_CFG}" ] ; then
     exit 0
 fi
 
-current_boot="$(_get_current_boot_number)"
 current_deployment_id="$(_get_current_deployment_id)"
 
 deploy=$(jq -c ".\"${current_deployment_id}\"" "${AGENT_CFG}")
@@ -155,10 +128,27 @@ if [[ "${deploy}" == "null" ]]; then
     exit 0
 fi
 
-every_boot_actions=$(echo "${deploy}" | jq -c ".\"every\"")
-current_boot_actions=$(echo "${deploy}" | jq -c ".\"${current_boot}\"")
+current_boot_actions=$(echo "${deploy}" | jq -c "[.[]] | flatten")
 
-_run_actions "${every_boot_actions}"
+# greenboot-rs takes a different approach compared to bash greenboot implementation.
+# bash greenboot: when deployment is staged, boot_counter is set immediately,
+#     when host boots again, the variable is present on 1st boot of new deployment.
+# greenboot-rs: boot_counter is set only when the healthchecks fail for the new deployment.
+#
+# Therefore, test-agent cannot depend on boot_counter anymore to do
+# actions on first boot of the new deployment.
+# For this reason, the way how the test agent config is interpreted changed:
+# the .deployment.number is no longer the "ordinal boot number" (i.e. 1st, 2nd, 3rd boot of the deployment)
+# but "how many boots this action should be active".
+#
+# After collecting actions for the current boot, numbers are decremented, and if reach 0,
+# removed from the config.
+jq \
+    --arg key "${current_deployment_id}" \
+    '.[$key] |= (with_entries(if (.key | test("^[0-9]+$")) then .key |= (tonumber - 1 | tostring) else . end) | with_entries(select(.key != "0")))' \
+    "${AGENT_CFG}" > "${AGENT_CFG}.tmp" && \
+    mv "${AGENT_CFG}.tmp" "${AGENT_CFG}"
+
 _run_actions "${current_boot_actions}"
 
 # If running under systemd, notify systemd that the service is ready so that
