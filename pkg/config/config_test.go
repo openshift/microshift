@@ -827,7 +827,7 @@ func TestValidate(t *testing.T) {
 				c.ApiServer.FeatureGates.CustomNoUpgrade.Disabled = []string{"feature2"}
 				return c
 			}(),
-			expectErr: false,
+			expectErr: true,
 		},
 		{
 			name: "feature-gates-custom-no-upgrade-valid",
