@@ -51,6 +51,7 @@ Upgrade From Previous Version
     ...    check_warnings=False
     # Verify the package version is as expected
     ${version}=    MicroShift Version
+    Log    MicroShift init version: ${version}
     Should Be Equal As Integers    ${version.minor}    ${PREVIOUS_MINOR_VERSION}
     # Start the service and wait until initialized
     Start MicroShift
@@ -68,6 +69,9 @@ Upgrade From Previous Version
     Verify Service Active Timestamps
     ...    ${cts1}    ${mts1}
     ...    ${cts2}    ${mts2}
+    # Log MicroShift Version
+    ${version}=    MicroShift Version
+    Log    MicroShift final version: ${version}
     # Restart the host to verify a clean start
     Reboot MicroShift Host
     # Health of the system is implicitly checked by greenboot successful exit
