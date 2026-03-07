@@ -1,6 +1,6 @@
 # {{- if env.Getenv "BREW_LREL_RELEASE_VERSION" "" -}}
 # Note: This comment makes templating add a new line before the code
-FROM localhost/rhel96-bootc-brew-lrel-optional:latest
+FROM localhost/rhel98-bootc-brew-lrel-optional:latest
 
 # Enable microshift-tuned service
 RUN systemctl enable microshift-tuned

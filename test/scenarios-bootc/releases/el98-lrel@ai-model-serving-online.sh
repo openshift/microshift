@@ -2,7 +2,7 @@
 
 # Sourced from scenario.sh and uses functions defined there.
 
-start_image="rhel96-bootc-brew-lrel-optional"
+start_image="rhel98-bootc-brew-lrel-optional"
 
 # Currently, RHOAI is only available for x86_64
 check_platform() {
@@ -22,7 +22,7 @@ scenario_create_vms() {
 
     # Increased disk size because of the additional embedded images (especially OVMS which is ~3.5GiB)
     LVM_SYSROOT_SIZE=20480 prepare_kickstart host1 kickstart-bootc.ks.template "${start_image}"
-    launch_vm --boot_blueprint rhel96-bootc --vm_disksize 30 --vm_vcpus 4
+    launch_vm --boot_blueprint rhel98-bootc --vm_disksize 30 --vm_vcpus 4
 }
 
 scenario_remove_vms() {

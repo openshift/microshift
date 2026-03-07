@@ -6,8 +6,8 @@
 # ensure MicroShift is upgraded before running standard suite tests
 export TEST_RANDOMIZATION=none
 
-start_image="rhel96-bootc-brew-y1-with-optional"
-dest_image="rhel96-bootc-brew-lrel-optional"
+start_image="rhel96-bootc-brew-y2-with-optional"
+dest_image="rhel98-bootc-brew-lrel-optional"
 
 scenario_create_vms() {
     exit_if_image_not_found "${start_image}"
@@ -16,14 +16,12 @@ scenario_create_vms() {
     prepare_kickstart host1 kickstart-bootc.ks.template "${start_image}"
     launch_vm --boot_blueprint rhel96-bootc --vm_vcpus 4
 }
-
 scenario_remove_vms() {
     exit_if_image_not_found "${start_image}"
     exit_if_image_not_found "${dest_image}"
 
     remove_vm host1
 }
-
 scenario_run_tests() {
     exit_if_image_not_found "${start_image}"
     exit_if_image_not_found "${dest_image}"
@@ -31,6 +29,7 @@ scenario_run_tests() {
     run_tests host1 \
         --variable "TARGET_REF:${dest_image}" \
         --variable "BOOTC_REGISTRY:${MIRROR_REGISTRY_URL}" \
+        --variable "EXPECTED_OS_VERSION:9.8" \
         suites/upgrade/upgrade-successful.robot \
-        suites/standard2
+        suites/standard1/
 }

@@ -16,7 +16,7 @@ VM_BRIDGE_IP="$(get_vm_bridge_ip "${VM_IPV6_NETWORK}")"
 # shellcheck disable=SC2034  # used elsewhere
 WEB_SERVER_URL="http://[${VM_BRIDGE_IP}]:${WEB_SERVER_PORT}"
 
-start_image="rhel96-bootc-brew-lrel-tuned"
+start_image="rhel98-bootc-brew-lrel-tuned"
 
 scenario_create_vms() {
     if ! does_image_exist "${start_image}"; then
@@ -30,14 +30,14 @@ scenario_create_vms() {
     # shellcheck disable=SC2034  # used elsewhere
     MIRROR_REGISTRY_URL="$(hostname):${MIRROR_REGISTRY_PORT}/microshift"
 
-    # Enable IPv6 single stack in kickstart, with tuned configuration enabled
+    # Enable IPv6 single stack in kickstart
     prepare_kickstart host1 kickstart-bootc.ks.template "${start_image}" false true
 
     # Restore original MIRROR_REGISTRY_URL for runtime use
     # shellcheck disable=SC2034  # used elsewhere
     MIRROR_REGISTRY_URL="${original_mirror_url}"
 
-    launch_vm --boot_blueprint rhel96-bootc --network "${VM_IPV6_NETWORK}" --vm_vcpus 6
+    launch_vm --boot_blueprint rhel98-bootc --network "${VM_IPV6_NETWORK}" --vm_vcpus 6
 }
 
 scenario_remove_vms() {
@@ -80,13 +80,12 @@ apiServer:
 EOF"
 
     # Restart MicroShift to apply TLS configuration
-    echo "INFO: Restarting MicroShift to apply TLS configuration..."
     run_command_on_vm host1 "sudo systemctl restart microshift"
 
     # Wait for MicroShift to be ready
     wait_for_microshift_to_be_ready host1
 
-    # Setup oc client and kubeconfig for scripts that need it
+    # Setup oc client and kubeconfig for gingko tests
     setup_oc_and_kubeconfig host1
 
     # Create LVMS workloads
@@ -96,20 +95,19 @@ EOF"
     echo "INFO: Checking LVMS resources..."
     run_command_on_vm host1 'bash -s' < "${TESTDIR}/../scripts/lvms-helpers/checkLvmsResources.sh"
 
-    # Validate LVMS workloads before running tests
-    echo "INFO: Validating LVMS workloads..."
+    # Validate LVMS still works after all tests
+    echo "INFO: Validating LVMS workloads after tests..."
     run_command_on_vm host1 'bash -s' < "${TESTDIR}/../scripts/lvms-helpers/checkWorkloadExists.sh"
 
-    # Cleanup LVMS workloads before running tests that may restart MicroShift
+    # Cleanup LVMS workloads
     echo "INFO: Cleaning up LVMS workloads..."
     run_command_on_vm host1 'bash -s' < "${TESTDIR}/../scripts/lvms-helpers/cleanupWorkload.sh"
 
-    # Run all standard1 tests except version (which requires RPM install verification)
+    # Run all standard2 tests except default-config (which conflicts with TLS drop-in config)
     echo "INFO: Running validation tests for multi-config scenario..."
     run_tests host1 \
-        --variable "EXPECTED_OS_VERSION:9.6" \
-        --exclude version \
-        suites/standard1/
+        --exclude default-config \
+        suites/standard2/
 
     echo "SUCCESS: Multi-config scenario validation completed - no conflicts detected"
 }
