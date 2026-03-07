@@ -1,9 +1,7 @@
-# {{- if env.Getenv "BREW_LREL_RELEASE_VERSION" "" -}}
-# Note: This comment makes templating add a new line before the code
-FROM localhost/rhel100-test-agent:latest
+FROM localhost/rhel102-test-agent:latest
 
 # Build arguments
-ARG USHIFT_RPM_REPO_NAME=microshift-brew
+ARG USHIFT_RPM_REPO_NAME=microshift-local
 ARG USHIFT_RPM_REPO_PATH=/tmp/$USHIFT_RPM_REPO_NAME
 
 # Copy the MicroShift repository contents
@@ -21,15 +19,7 @@ COPY ./bootc-images/$USHIFT_RPM_REPO_NAME.repo ./bootc-images/microshift-fast-da
 RUN dnf repoinfo --enabled && \
     dnf install -y firewalld systemd-resolved openssl \
         {{ range (env.Getenv "MICROSHIFT_MANDATORY_RPMS" | strings.Split " ") -}}
-        "{{ . }}-{{ env.Getenv "BREW_LREL_RELEASE_VERSION" }}" \
-        {{ end -}}
-        {{ range (env.Getenv "MICROSHIFT_OPTIONAL_RPMS" | strings.Split " ") -}}
-        "{{ . }}-{{ env.Getenv "BREW_LREL_RELEASE_VERSION" }}" \
-        {{ end -}}
-        {{ if and (env.Getenv "UNAME_M" "") (eq "x86_64" .Env.UNAME_M) -}}
-        {{ range (env.Getenv "MICROSHIFT_X86_64_RPMS" | strings.Split " ") -}}
-        "{{ . }}-{{ env.Getenv "BREW_LREL_RELEASE_VERSION" }}" \
-        {{ end -}}
+        "{{ . }}-{{ env.Getenv "SOURCE_VERSION" }}" \
         {{ end -}}
         && \
     systemctl enable microshift microshift-test-agent && \
@@ -49,7 +39,7 @@ RUN firewall-offline-cmd --zone=public --add-port=22/tcp && \
     firewall-offline-cmd --zone=public --add-port=30000-32767/tcp && \
     firewall-offline-cmd --zone=public --add-port=30000-32767/udp
 
-# Prepare system for testing Generic Device Plugin
-COPY --chmod=755 ./bootc-images/build-serialsim.sh /tmp/build-serialsim.sh
-RUN /tmp/build-serialsim.sh && rm -f /tmp/build-serialsim.sh
-# {{- end -}}
+# Install systemd configuration drop-ins to fix potential permission problems
+# when upgrading from older ostree commits to bootc container layers
+RUN mkdir -p /usr/lib/systemd/system/ovsdb-server.service.d
+COPY --chmod=644 ./bootc-images/microshift-ovsdb-ownership.conf /usr/lib/systemd/system/ovsdb-server.service.d/microshift-ovsdb-ownership.conf

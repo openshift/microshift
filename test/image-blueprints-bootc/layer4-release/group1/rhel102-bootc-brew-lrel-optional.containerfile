@@ -1,6 +1,6 @@
-# {{- if env.Getenv "BREW_VERSION" "" -}}
+# {{- if env.Getenv "BREW_LREL_RELEASE_VERSION" "" -}}
 # Note: This comment makes templating add a new line before the code
-FROM localhost/rhel100-test-agent:latest
+FROM localhost/rhel102-test-agent:latest
 
 # Build arguments
 ARG USHIFT_RPM_REPO_NAME=microshift-brew
@@ -21,7 +21,15 @@ COPY ./bootc-images/$USHIFT_RPM_REPO_NAME.repo ./bootc-images/microshift-fast-da
 RUN dnf repoinfo --enabled && \
     dnf install -y firewalld systemd-resolved openssl \
         {{ range (env.Getenv "MICROSHIFT_MANDATORY_RPMS" | strings.Split " ") -}}
-        "{{ . }}-{{ env.Getenv "BREW_VERSION" }}" \
+        "{{ . }}-{{ env.Getenv "BREW_LREL_RELEASE_VERSION" }}" \
+        {{ end -}}
+        {{ range (env.Getenv "MICROSHIFT_OPTIONAL_RPMS" | strings.Split " ") -}}
+        "{{ . }}-{{ env.Getenv "BREW_LREL_RELEASE_VERSION" }}" \
+        {{ end -}}
+        {{ if and (env.Getenv "UNAME_M" "") (eq "x86_64" .Env.UNAME_M) -}}
+        {{ range (env.Getenv "MICROSHIFT_X86_64_RPMS" | strings.Split " ") -}}
+        "{{ . }}-{{ env.Getenv "BREW_LREL_RELEASE_VERSION" }}" \
+        {{ end -}}
         {{ end -}}
         && \
     systemctl enable microshift microshift-test-agent && \
@@ -40,4 +48,9 @@ RUN firewall-offline-cmd --zone=public --add-port=22/tcp && \
     firewall-offline-cmd --zone=public --add-port=6443/tcp && \
     firewall-offline-cmd --zone=public --add-port=30000-32767/tcp && \
     firewall-offline-cmd --zone=public --add-port=30000-32767/udp
+
+# Prepare system for testing Generic Device Plugin
+# Temporarily disable until we can get the kernel-devel package
+# COPY --chmod=755 ./bootc-images/build-serialsim.sh /tmp/build-serialsim.sh
+# RUN /tmp/build-serialsim.sh && rm -f /tmp/build-serialsim.sh
 # {{- end -}}

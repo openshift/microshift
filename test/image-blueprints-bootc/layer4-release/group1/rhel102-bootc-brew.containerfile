@@ -1,7 +1,9 @@
-FROM localhost/rhel100-test-agent:latest
+# {{- if env.Getenv "BREW_VERSION" "" -}}
+# Note: This comment makes templating add a new line before the code
+FROM localhost/rhel102-test-agent:latest
 
 # Build arguments
-ARG USHIFT_RPM_REPO_NAME=microshift-local
+ARG USHIFT_RPM_REPO_NAME=microshift-brew
 ARG USHIFT_RPM_REPO_PATH=/tmp/$USHIFT_RPM_REPO_NAME
 
 # Copy the MicroShift repository contents
@@ -19,7 +21,7 @@ COPY ./bootc-images/$USHIFT_RPM_REPO_NAME.repo ./bootc-images/microshift-fast-da
 RUN dnf repoinfo --enabled && \
     dnf install -y firewalld systemd-resolved openssl \
         {{ range (env.Getenv "MICROSHIFT_MANDATORY_RPMS" | strings.Split " ") -}}
-        "{{ . }}-{{ env.Getenv "SOURCE_VERSION" }}" \
+        "{{ . }}-{{ env.Getenv "BREW_VERSION" }}" \
         {{ end -}}
         && \
     systemctl enable microshift microshift-test-agent && \
@@ -38,8 +40,4 @@ RUN firewall-offline-cmd --zone=public --add-port=22/tcp && \
     firewall-offline-cmd --zone=public --add-port=6443/tcp && \
     firewall-offline-cmd --zone=public --add-port=30000-32767/tcp && \
     firewall-offline-cmd --zone=public --add-port=30000-32767/udp
-
-# Install systemd configuration drop-ins to fix potential permission problems
-# when upgrading from older ostree commits to bootc container layers
-RUN mkdir -p /usr/lib/systemd/system/ovsdb-server.service.d
-COPY --chmod=644 ./bootc-images/microshift-ovsdb-ownership.conf /usr/lib/systemd/system/ovsdb-server.service.d/microshift-ovsdb-ownership.conf
+# {{- end -}}

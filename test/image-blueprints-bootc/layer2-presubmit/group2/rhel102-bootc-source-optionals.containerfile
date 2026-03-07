@@ -1,4 +1,4 @@
-FROM localhost/rhel100-bootc-source:latest
+FROM localhost/rhel102-bootc-source:latest
 
 # Build arguments
 ARG USHIFT_RPM_REPO_NAME=microshift-local
@@ -29,5 +29,6 @@ RUN dnf repoinfo --enabled && \
     dnf clean all
 
 # Prepare system for testing Generic Device Plugin
-COPY --chmod=755 ./bootc-images/build-serialsim.sh /tmp/build-serialsim.sh
-RUN /tmp/build-serialsim.sh && rm -f /tmp/build-serialsim.sh
+# Temporarily disable until we can get the correct kernel-devel package
+# COPY --chmod=755 ./bootc-images/build-serialsim.sh /tmp/build-serialsim.sh
+# RUN /tmp/build-serialsim.sh && rm -f /tmp/build-serialsim.sh
