@@ -1,0 +1,473 @@
+apiVersion: apiextensions.k8s.io/v1 # Hack because controller-gen complains if we don't have this
+name: "Console"
+crdName: consoles.operator.openshift.io
+tests:
+  onCreate:
+    - name: Should be able to create a minimal Console
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: Console
+        spec: {} # No spec is required for a Console
+      expected: |
+        apiVersion: operator.openshift.io/v1
+        kind: Console
+        spec:
+          logLevel: Normal
+          operatorLogLevel: Normal
+    - name: Should be able to customize perspectives
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: Console
+        spec:
+          customization:
+            perspectives:
+            - id: dev
+              visibility: 
+                state: Enabled
+            - id: admin
+              visibility: 
+                state: Disabled
+      expected: |
+        apiVersion: operator.openshift.io/v1
+        kind: Console
+        spec:
+          logLevel: Normal
+          operatorLogLevel: Normal
+          customization:
+            perspectives:
+            - id: dev
+              visibility: 
+                state: Enabled
+            - id: admin
+              visibility: 
+                state: Disabled
+    - name: Should throw an error for incorrect value of state in perspectives
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: Console
+        spec:
+          customization:
+            perspectives:
+            - id: dev
+              visibility: 
+                state: Enables
+      expectedError: "spec.customization.perspectives[0].visibility.state: Unsupported value: \"Enables\": supported values: \"Enabled\", \"Disabled\", \"AccessReview\""
+    - name: Should be able to add pinned resources to a perspective
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: Console
+        spec:
+          customization:
+            perspectives:
+            - id: dev
+              visibility: 
+                state: Enabled
+              pinnedResources:
+              - group: ""
+                resource: configmaps
+                version: v1
+      expected: |
+        apiVersion: operator.openshift.io/v1
+        kind: Console
+        spec:
+          logLevel: Normal
+          operatorLogLevel: Normal
+          customization:
+            perspectives:
+            - id: dev
+              visibility: 
+                state: Enabled
+              pinnedResources:
+              - group: ""
+                resource: configmaps
+                version: v1
+    - name: Should not be able to add pinned resources to "admin" perspective
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: Console
+        spec:
+          customization:
+            perspectives:
+            - id: admin
+              visibility: 
+                state: Enabled
+              pinnedResources:
+              - group: ""
+                resource: configmaps
+                version: v1
+      expectedError: "pinnedResources is allowed only for dev and forbidden for other perspectives"
+    - name: Should throw an error if "group" is missing from the pinnedResources
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: Console
+        spec:
+          customization:
+            perspectives:
+            - id: dev
+              visibility: 
+                state: Enabled
+              pinnedResources:
+              - resource: configmaps
+                version: v1
+      expectedError: "spec.customization.perspectives[0].pinnedResources[0].group: Required value"
+    - name: Should throw an error if the value of "version" in the pinnedResources doesnot match the required regex
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: Console
+        spec:
+          customization:
+            perspectives:
+            - id: dev
+              visibility: 
+                state: Enabled
+              pinnedResources:
+              - group: ""
+                resource: configmaps
+                version: v'
+      expectedError: "spec.customization.perspectives[0].pinnedResources[0].version in body should match '^[a-z0-9]+$'"
+    - name: Should throw an error if the value of "group" in the pinnedResources doesnot match the required regex
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: Console
+        spec:
+          customization:
+            perspectives:
+            - id: dev
+              visibility: 
+                state: Enabled
+              pinnedResources:
+              - group: .apps.
+                resource: deployments
+                version: v1
+      expectedError: "spec.customization.perspectives[0].pinnedResources[0].group in body should match '^$|^[a-z0-9]([-a-z0-9]*[a-z0-9])?(.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$'"
+    - name: Should throw an error if the value of "resource" in the pinnedResources doesnot match the required regex
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: Console
+        spec:
+          customization:
+            perspectives:
+            - id: dev
+              visibility: 
+                state: Enabled
+              pinnedResources:
+              - group: apps
+                resource: Deployment
+                version: v1
+      expectedError: "spec.customization.perspectives[0].pinnedResources[0].resource in body should match '^[a-z0-9]([-a-z0-9]*[a-z0-9])?$'"
+    - name: Should be able to add https urls
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: Console
+        spec:
+          ingress:
+            consoleURL: "https://testingress.com"
+            clientDownloadsURL: "https://testingress.com"
+      expected: |
+        apiVersion: operator.openshift.io/v1
+        kind: Console
+        spec:
+          logLevel: Normal
+          operatorLogLevel: Normal
+          ingress:
+            consoleURL: "https://testingress.com"
+            clientDownloadsURL: "https://testingress.com"
+    - name: Should be able to add empty urls
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: Console
+        spec:
+          ingress:
+            consoleURL: ""
+            clientDownloadsURL: ""
+      expected: |
+        apiVersion: operator.openshift.io/v1
+        kind: Console
+        spec:
+          logLevel: Normal
+          operatorLogLevel: Normal
+          ingress:
+            consoleURL: ""
+            clientDownloadsURL: ""
+    - name: Should throw an error if the value of console url has http scheme
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: Console
+        spec:
+          ingress:
+            consoleURL: "http://testingress.com"
+      expectedError: "spec.ingress.consoleURL: Invalid value: \"string\": console url scheme must be https"
+    - name: Should throw an error if the value of client downloads url has http scheme
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: Console
+        spec:
+          ingress:
+            clientDownloadsURL: "http://testingress.com"
+      expectedError: "spec.ingress.clientDownloadsURL: Invalid value: \"string\": client downloads url scheme must be https"
+    - name: Should throw an error if console url is invalid
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: Console
+        spec:
+          ingress:
+            consoleURL: "https://\ntestingress.com"
+      expectedError: "spec.ingress.consoleURL: Invalid value: \"string\": console url must be a valid absolute URL"
+    - name: Should throw an error if client downloads url is invalid
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: Console
+        spec:
+          ingress:
+            clientDownloadsURL: "https://\ntestingress.com"
+      expectedError: "spec.ingress.clientDownloadsURL: Invalid value: \"string\": client downloads url must be a valid absolute URL"
+    - name: Should throw an invalid url error if console url is invalid and has no scheme
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: Console
+        spec:
+          ingress:
+            consoleURL: "\ntestingress.com"
+      expectedError: "spec.ingress.consoleURL: Invalid value: \"string\": console url must be a valid absolute URL"
+    - name: Should throw an invalid error if client downloads url is invalid and has no scheme
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: Console
+        spec:
+          ingress:
+            clientDownloadsURL: "\ntestingress.com"
+      expectedError: "spec.ingress.clientDownloadsURL: Invalid value: \"string\": client downloads url must be a valid absolute URL"
+    - name: Should be able to disable the LightspeedButton console capability
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: Console
+        spec:
+          customization:
+            capabilities:
+            - name: LightspeedButton
+              visibility:
+                state: Disabled
+      expected: |
+        apiVersion: operator.openshift.io/v1
+        kind: Console
+        spec:
+          logLevel: Normal
+          operatorLogLevel: Normal
+          customization:
+            capabilities:
+            - name: LightspeedButton
+              visibility:
+                state: Disabled
+    - name: Should throw an error for adding duplicate capability
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: Console
+        spec:
+          customization:
+            capabilities:
+            - name: LightspeedButton
+              visibility:
+                state: Enabled
+            - name: LightspeedButton
+              visibility:
+                state: Enabled
+      expectedError: "Duplicate value: map[string]interface {}{\"name\":\"LightspeedButton\""
+    - name: Should throw an error for incorrect value of name in capabilities
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: Console
+        spec:
+          customization:
+            capabilities:
+            - name: LightspeedBurton
+              visibility:
+                state: Enabled
+      expectedError: "spec.customization.capabilities[0].name: Unsupported value: \"LightspeedBurton\": supported values: \"LightspeedButton\""
+    - name: Should throw an error for incorrect value of state in capabilities
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: Console
+        spec:
+          logLevel: Normal
+          operatorLogLevel: Normal
+          customization:
+            capabilities:
+            - name: LightspeedButton
+              visibility:
+                state: Enables
+      expectedError: "spec.customization.capabilities[0].visibility.state: Unsupported value: \"Enables\": supported values: \"Enabled\", \"Disabled\""
+    - name: Should allow creating custom logos for Dark and Light themes
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: Console
+        spec:
+          customization:
+            logos:
+              - type: Masthead
+                themes:
+                  - mode: Dark
+                    source:
+                      from: ConfigMap
+                      configMap:
+                        name: custom-logos-config
+                        key: masthead-dark-logo.svg
+                  - mode: Light
+                    source:
+                      from: ConfigMap
+                      configMap:
+                        name: custom-logos-config
+                        key: masthead-light-logo.svg
+      expected: |
+        apiVersion: operator.openshift.io/v1
+        kind: Console
+        spec:
+          logLevel: Normal
+          operatorLogLevel: Normal
+          customization:
+            logos:
+              - type: Masthead
+                themes:
+                  - mode: Dark
+                    source:
+                      from: ConfigMap
+                      configMap:
+                        name: custom-logos-config
+                        key: masthead-dark-logo.svg
+                  - mode: Light
+                    source:
+                      from: ConfigMap
+                      configMap:
+                        name: custom-logos-config
+                        key: masthead-light-logo.svg
+    - name: Should not allow duplicate theme types
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: Console
+        spec:
+          customization:
+            logos:
+              - type: Masthead
+                themes:
+                  - mode: Dark
+                    source:
+                      from: ConfigMap
+                      configMap:
+                        name: custom-logos-config
+                        key: masthead-dark-logo.svg
+                  - mode: Dark
+                    source:
+                      from: ConfigMap
+                      configMap:
+                        type: custom-logos-config
+                        key: masthead-dark-logo.svg
+      expectedError: "spec.customization.logos[0].themes[1]: Duplicate value: map[string]interface {}{\"mode\":\"Dark\"}"
+    - name: Should not allow duplicate custom logo types
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: Console
+        spec:
+          customization:
+            logos:
+              - type: Masthead
+                themes:
+                  - mode: Dark
+                    source:
+                      from: ConfigMap
+                      configMap:
+                        name: custom-logos-config
+                        key: masthead-dark-logo.svg
+              - type: Masthead
+                themes:
+                  - mode: Light
+                    source:
+                      from: ConfigMap
+                      configMap:
+                        name: custom-logos-config
+                        key: masthead-light-logo.svg
+      expectedError: "spec.customization.logos[1]: Duplicate value: map[string]interface {}{\"type\":\"Masthead\"}"
+    - name: Should not allow both logos and customLogoFile to be set
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: Console
+        spec:
+          customization:
+            logos:
+              - type: Masthead
+                themes:
+                  - mode: Dark
+                    source:
+                      from: ConfigMap
+                      configMap:
+                        name: custom-logos-config
+                        key: masthead-dark-logo.svg
+                  - mode: Light
+                    source:
+                      from: ConfigMap
+                      configMap:
+                        name: custom-logos-config
+                        key: masthead-light-logo.svg
+            customLogoFile:
+              name: custom-logos-config
+              key: custom-logo.svg
+      expectedError: 'spec.customization: Invalid value: "object": Only one of logos or customLogoFile can be set'
+    - name: Should not allow invalid file extension in source.configMap.key
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: Console
+        spec:
+          customization:
+            logos:
+              - type: Masthead
+                themes:
+                  - mode: Dark
+                    source:
+                      from: ConfigMap
+                      configMap:
+                        name: custom-logos-config
+                        key: invalid-key.invalidextension
+      expectedError: 'spec.customization.logos[0].themes[0].source.configMap.key: Invalid value: "string": The ConfigMap key must end with a valid file extension (2 to 5 letters).'
+    - name: Should not allow invalid characters in source.configMap.name
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: Console
+        spec:
+          customization:
+            logos:
+              - type: Masthead
+                themes:
+                  - mode: Dark
+                    source:
+                      from: ConfigMap
+                      configMap:
+                        name: invalid name!
+                        key: masthead-dark-logo.svg
+      expectedError: "spec.customization.logos[0].themes[0].source.configMap.name: Invalid value: \"string\": a lowercase RFC 1123 subdomain must consist of lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character."
+    - name: Should fail validation if ConfigMap is not set when From is ConfigMap
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: Console
+        spec:
+          customization:
+            logos:
+              - type: Masthead
+                themes:
+                  - mode: Dark
+                    source:
+                      from: ConfigMap
+      expectedError: "spec.customization.logos[0].themes[0].source: Invalid value: \"object\": configMap is required when from is 'ConfigMap', and forbidden otherwise."
+    - name: Should fail validation if ConfigMap is set and From is invalid source
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: Console
+        spec:
+          customization:
+            logos:
+              - type: Masthead
+                themes:
+                  - mode: Dark
+                    source:
+                      from: InvalidSource
+                      configMap:
+                        name: custom-logos-config
+                        key: masthead-dark-logo.svg
+      expectedError: "spec.customization.logos[0].themes[0].source.from: Unsupported value: \"InvalidSource\": supported values: \"ConfigMap\""

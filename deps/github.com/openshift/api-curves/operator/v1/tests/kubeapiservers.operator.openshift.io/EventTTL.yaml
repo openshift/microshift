@@ -1,0 +1,49 @@
+apiVersion: apiextensions.k8s.io/v1 # Hack because controller-gen complains if we don't have this
+name: "KubeAPIServer"
+crdName: kubeapiservers.operator.openshift.io
+featureGates:
+  - EventTTL
+tests:
+  onCreate:
+    - name: Should be able to create default omitted event ttl
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: KubeAPIServer
+        spec: {} # No spec is required for a KubeAPIServer
+      expected: |
+        apiVersion: operator.openshift.io/v1
+        kind: KubeAPIServer
+        spec:
+          logLevel: Normal
+          operatorLogLevel: Normal
+    - name: Should be able to create a normal hour event ttl
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: KubeAPIServer
+        spec:
+          eventTTLMinutes: 60
+      expected: |
+        apiVersion: operator.openshift.io/v1
+        kind: KubeAPIServer
+        spec:
+          logLevel: Normal
+          operatorLogLevel: Normal
+          eventTTLMinutes: 60
+    - name: Should not be able to create with less than 5 minutes
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: KubeAPIServer
+        metadata:
+          name: gg1
+        spec:
+          eventTTLMinutes: 4
+      expectedError: "Invalid value: 4: spec.eventTTLMinutes in body should be greater than or equal to 5"
+    - name: Should not be able to create more than 360 minutes
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: KubeAPIServer
+        metadata:
+          name: gg1
+        spec:
+          eventTTLMinutes: 181
+      expectedError: "Invalid value: 181: spec.eventTTLMinutes in body should be less than or equal to 180"

@@ -1,0 +1,16 @@
+digraph "Local Certificate" {
+  // Node definitions.
+  9 [
+    label="certkeypair/admin-kubeconfig-signer::7981521128360560540\n\nfile:///etc/kubernetes/kubelet-ca.crt/kubelet-ca.crt,file://\n"
+    style=filled
+    fillcolor="#c7bfff"
+  ];
+  20 [
+    label="cabundle/kube-apiserver-admin-kubeconfig-client-ca\n\nconfigmaps/admin-kubeconfig-client-ca -nopenshift-config\n"
+    style=filled
+    fillcolor="#fda172"
+  ];
+
+  // Edge definitions.
+  9 -> 20;
+}

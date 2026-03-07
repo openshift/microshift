@@ -1,0 +1,82 @@
+apiVersion: apiextensions.k8s.io/v1 # Hack because controller-gen complains if we don't have this
+name: "Network"
+crdName: networks.config.openshift.io
+tests:
+  onCreate:
+    - name: Should be able to set network diagnostics sourcePlacement and targetPlacement when mode is not set
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: Network
+        spec:
+          networkDiagnostics:
+            sourcePlacement:
+              nodeSelector:
+                kubernetes.io/os: linux
+                node-role.kubernetes.io/infra: ""
+            targetPlacement:
+              nodeSelector:
+                kubernetes.io/os: linux
+              tolerations:
+                - operator: Exists
+      expected: |
+        apiVersion: config.openshift.io/v1
+        kind: Network
+        spec:
+          networkDiagnostics:
+            sourcePlacement:
+              nodeSelector:
+                kubernetes.io/os: linux
+                node-role.kubernetes.io/infra: ""
+            targetPlacement:
+              nodeSelector:
+                kubernetes.io/os: linux
+              tolerations:
+                - operator: Exists
+    - name: Should be able to set network diagnostics sourcePlacement and targetPlacement when mode is All
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: Network
+        spec:
+          networkDiagnostics:
+            mode: All
+            sourcePlacement:
+              nodeSelector:
+                kubernetes.io/os: linux
+                node-role.kubernetes.io/infra: ""
+            targetPlacement:
+              nodeSelector:
+                kubernetes.io/os: linux
+              tolerations:
+                - operator: Exists
+      expected: |
+        apiVersion: config.openshift.io/v1
+        kind: Network
+        spec:
+          networkDiagnostics:
+            mode: All
+            sourcePlacement:
+              nodeSelector:
+                kubernetes.io/os: linux
+                node-role.kubernetes.io/infra: ""
+            targetPlacement:
+              nodeSelector:
+                kubernetes.io/os: linux
+              tolerations:
+                - operator: Exists
+    - name: Should not be able to set network diagnostics sourcePlacement and targetPlacement when mode is Disabled
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: Network
+        spec:
+          networkDiagnostics:
+            mode: Disabled
+            sourcePlacement:
+              nodeSelector:
+                kubernetes.io/os: linux
+                node-role.kubernetes.io/infra: ""
+            targetPlacement:
+              nodeSelector:
+                kubernetes.io/os: linux
+              tolerations:
+                - operator: Exists
+      expectedError: "cannot set networkDiagnostics.sourcePlacement and networkDiagnostics.targetPlacement when networkDiagnostics.mode is Disabled"

@@ -1,0 +1,458 @@
+apiVersion: apiextensions.k8s.io/v1 # Hack because controller-gen complains if we don't have this
+name: "ClusterVersion"
+crdName: clusterversions.config.openshift.io
+featureGates:
+  - ClusterUpdateAcceptRisks
+tests:
+  onCreate:
+    - name: Should be able to set accepted risks
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: ClusterVersion
+        spec:
+          clusterID: foo
+          desiredUpdate:
+            architecture: Multi
+            version: 4.11.1
+            acceptRisks:
+              - name: RiskA
+              - name: RiskB
+      expected: |
+        apiVersion: config.openshift.io/v1
+        kind: ClusterVersion
+        spec:
+          clusterID: foo
+          desiredUpdate:
+            architecture: Multi
+            version: 4.11.1
+            acceptRisks:
+              - name: RiskA
+              - name: RiskB
+    - name: A risk name greater than 256 characters is not allowed
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: ClusterVersion
+        spec:
+          clusterID: foo
+          desiredUpdate:
+            architecture: Multi
+            version: 4.11.1
+            acceptRisks:
+              - name: RiskA
+              - name: a261aabbbaaabbbaaabbbaaabbbaaabbbaaabbbaaabbbaaabbbaaabbbaaabbbaaabbbaaabbbaaabbbaaabbbaaabbbaaabbbaaabbbaaabbbaaabbbaaabbbaaabbbaaabbbaaabbbaaabbbaaabbbaaabbbaaabbbaaabbbaaabbbaaabbbaaabbbaaabbbaaabbbaaabbbaaabbbaaabbbaaabbbaaabbbaaabbbaaabbbaaabbbaaabbbaaabbb
+      expectedError: "Too long: may not be more than 256 bytes"
+    - name: Risk names from the accept field must be unique
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: ClusterVersion
+        spec:
+          clusterID: foo
+          desiredUpdate:
+            architecture: Multi
+            version: 4.11.1
+            acceptRisks:
+              - name: RiskA
+              - name: RiskA
+      expectedError: "Duplicate value: map[string]interface {}{\"name\":\"RiskA\""
+  onUpdate:
+    - name: The riskNames field might be unspecified
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: ClusterVersion
+        spec:
+          clusterID: foo
+          desiredUpdate:
+            architecture: Multi
+            version: 4.11.1
+      updated: |
+        apiVersion: config.openshift.io/v1
+        kind: ClusterVersion
+        spec:
+          clusterID: foo
+          desiredUpdate:
+            architecture: Multi
+            version: 4.11.2
+        status:
+          desired:
+            version: foo
+            image: foo
+          observedGeneration: 1
+          versionHash: foo
+          availableUpdates:
+            - version: foo
+              image: foo
+          conditionalUpdates:
+            - release:
+                version: 4.18.16
+                image: bar
+              risks:
+                - name: DualStackNeedsController
+                  message: Upgrade can get stuck on clusters that use multiple networks together with dual stack.
+                  url: https://issues.redhat.com/browse/SDN-3996
+                  matchingRules:
+                    - type: Always
+                  conditions:
+                    - status: "True"
+                      type: Applies
+                      reason: MatchingRule
+                      message: The matchingRules[0] matches
+                      lastTransitionTime: 2021-09-13T17:03:05Z
+      expected: |
+        apiVersion: config.openshift.io/v1
+        kind: ClusterVersion
+        spec:
+          clusterID: foo
+          desiredUpdate:
+            architecture: Multi
+            version: 4.11.2
+        status:
+          desired:
+            version: foo
+            image: foo
+          observedGeneration: 1
+          versionHash: foo
+          availableUpdates:
+            - version: foo
+              image: foo
+          conditionalUpdates:
+            - release:
+                version: 4.18.16
+                image: bar
+              risks:
+                - name: DualStackNeedsController
+                  message: Upgrade can get stuck on clusters that use multiple networks together with dual stack.
+                  url: https://issues.redhat.com/browse/SDN-3996
+                  matchingRules:
+                    - type: Always
+                  conditions:
+                    - status: "True"
+                      type: Applies
+                      reason: MatchingRule
+                      message: The matchingRules[0] matches
+                      lastTransitionTime: 2021-09-13T17:03:05Z
+    - name: Should be able to update fields related to accepted risks
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: ClusterVersion
+        spec:
+          clusterID: foo
+          desiredUpdate:
+            architecture: Multi
+            version: 4.11.1
+            acceptRisks:
+              - name: RiskA
+              - name: RiskB
+      updated: |
+        apiVersion: config.openshift.io/v1
+        kind: ClusterVersion
+        spec:
+          clusterID: foo
+          desiredUpdate:
+            architecture: Multi
+            version: 4.11.2
+            acceptRisks:
+              - name: RiskA
+              - name: RiskC
+        status:
+          desired:
+            version: foo
+            image: foo
+          observedGeneration: 1
+          versionHash: foo
+          availableUpdates:
+            - version: foo
+              image: foo
+          conditionalUpdateRisks:
+            - name: DualStackNeedsController
+              message: Upgrade can get stuck on clusters that use multiple networks together with dual stack.
+              url: https://issues.redhat.com/browse/SDN-3996
+              matchingRules:
+                - type: Always
+              conditions:
+                - status: "True"
+                  type: Applies
+                  reason: MatchingRule
+                  message: The matchingRules[0] matches
+                  lastTransitionTime: 2021-09-13T17:03:05Z
+                - status: "False"
+                  type: Far
+                  reason: Far
+                  message: Far
+                  lastTransitionTime: 2021-09-13T12:03:05Z
+          conditionalUpdates:
+            - release:
+                version: 4.18.16
+                image: bar
+              riskNames:
+                - DualStackNeedsController
+              risks:
+                - name: DualStackNeedsController
+                  message: Upgrade can get stuck on clusters that use multiple networks together with dual stack.
+                  url: https://issues.redhat.com/browse/SDN-3996
+                  matchingRules:
+                    - type: Always
+                  conditions:
+                    - status: "True"
+                      type: Applies
+                      reason: MatchingRule
+                      message: The matchingRules[0] matches
+                      lastTransitionTime: 2021-09-13T17:03:05Z
+                    - status: "False"
+                      type: Far
+                      reason: Far
+                      message: Far
+                      lastTransitionTime: 2021-09-13T12:03:05Z
+      expected: |
+        apiVersion: config.openshift.io/v1
+        kind: ClusterVersion
+        spec:
+          clusterID: foo
+          desiredUpdate:
+            architecture: Multi
+            version: 4.11.2
+            acceptRisks:
+              - name: RiskA
+              - name: RiskC
+        status:
+          desired:
+            version: foo
+            image: foo
+          observedGeneration: 1
+          versionHash: foo
+          availableUpdates:
+            - version: foo
+              image: foo
+          conditionalUpdateRisks:
+            - name: DualStackNeedsController
+              message: Upgrade can get stuck on clusters that use multiple networks together with dual stack.
+              url: https://issues.redhat.com/browse/SDN-3996
+              matchingRules:
+                - type: Always
+              conditions:
+                - status: "True"
+                  type: Applies
+                  reason: MatchingRule
+                  message: The matchingRules[0] matches
+                  lastTransitionTime: 2021-09-13T17:03:05Z
+                - status: "False"
+                  type: Far
+                  reason: Far
+                  message: Far
+                  lastTransitionTime: 2021-09-13T12:03:05Z
+          conditionalUpdates:
+            - release:
+                version: 4.18.16
+                image: bar
+              riskNames:
+                - DualStackNeedsController
+              risks:
+                - name: DualStackNeedsController
+                  message: Upgrade can get stuck on clusters that use multiple networks together with dual stack.
+                  url: https://issues.redhat.com/browse/SDN-3996
+                  matchingRules:
+                    - type: Always
+                  conditions:
+                    - status: "True"
+                      type: Applies
+                      reason: MatchingRule
+                      message: The matchingRules[0] matches
+                      lastTransitionTime: 2021-09-13T17:03:05Z
+                    - status: "False"
+                      type: Far
+                      reason: Far
+                      message: Far
+                      lastTransitionTime: 2021-09-13T12:03:05Z
+    - name: Risk names of a conditional update must be unique
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: ClusterVersion
+        spec:
+          clusterID: foo
+          desiredUpdate:
+            architecture: Multi
+            version: 4.11.1
+            acceptRisks:
+              - name: RiskA
+              - name: RiskB
+      updated: |
+        apiVersion: config.openshift.io/v1
+        kind: ClusterVersion
+        spec:
+          clusterID: foo
+          desiredUpdate:
+            architecture: Multi
+            version: 4.11.2
+            acceptRisks:
+              - name: RiskA
+              - name: RiskC
+        status:
+          desired:
+            version: foo
+            image: foo
+          observedGeneration: 1
+          versionHash: foo
+          availableUpdates:
+            - version: foo
+              image: foo
+          conditionalUpdateRisks:
+            - name: DualStackNeedsController
+              message: Upgrade can get stuck on clusters that use multiple networks together with dual stack.
+              url: https://issues.redhat.com/browse/SDN-3996
+              matchingRules:
+                - type: Always
+              conditions:
+                - status: "True"
+                  type: Applies
+                  reason: MatchingRule
+                  message: The matchingRules[0] matches
+                  lastTransitionTime: 2021-09-13T17:03:05Z
+          conditionalUpdates:
+            - release:
+                version: 4.18.16
+                image: bar
+              riskNames:
+                - DualStackNeedsController
+                - DualStackNeedsController
+              risks:
+                - name: DualStackNeedsController
+                  message: Upgrade can get stuck on clusters that use multiple networks together with dual stack.
+                  url: https://issues.redhat.com/browse/SDN-3996
+                  matchingRules:
+                    - type: Always
+                  conditions:
+                    - status: "True"
+                      type: Applies
+                      reason: MatchingRule
+                      message: The matchingRules[0] matches
+                      lastTransitionTime: 2021-09-13T17:03:05Z
+                    - status: "False"
+                      type: Applies
+                      reason: Far
+                      message: Far
+                      lastTransitionTime: 2021-09-13T12:03:05Z
+      expectedStatusError: 'Duplicate value: "DualStackNeedsController"'
+    - name: The conditions must contain a condition of type Applies
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: ClusterVersion
+        spec:
+          clusterID: foo
+          desiredUpdate:
+            architecture: Multi
+            version: 4.11.1
+            acceptRisks:
+              - name: RiskA
+              - name: RiskB
+      updated: |
+        apiVersion: config.openshift.io/v1
+        kind: ClusterVersion
+        spec:
+          clusterID: foo
+          desiredUpdate:
+            architecture: Multi
+            version: 4.11.2
+            acceptRisks:
+              - name: RiskA
+              - name: RiskC
+        status:
+          desired:
+            version: foo
+            image: foo
+          observedGeneration: 1
+          versionHash: foo
+          availableUpdates:
+            - version: foo
+              image: foo
+          conditionalUpdateRisks:
+            - name: DualStackNeedsController
+              message: Upgrade can get stuck on clusters that use multiple networks together with dual stack.
+              url: https://issues.redhat.com/browse/SDN-3996
+              matchingRules:
+                - type: Always
+              conditions:
+                - status: "True"
+                  type: Wrong
+                  reason: MatchingRule
+                  message: The matchingRules[0] matches
+                  lastTransitionTime: 2021-09-13T17:03:05Z
+          conditionalUpdates:
+            - release:
+                version: 4.18.16
+                image: bar
+              riskNames:
+                - DualStackNeedsController
+              risks:
+                - name: DualStackNeedsController
+                  message: Upgrade can get stuck on clusters that use multiple networks together with dual stack.
+                  url: https://issues.redhat.com/browse/SDN-3996
+                  matchingRules:
+                    - type: Always
+                  conditions:
+                    - status: "True"
+                      type: Applies
+                      reason: MatchingRule
+                      message: The matchingRules[0] matches
+                      lastTransitionTime: 2021-09-13T17:03:05Z
+      expectedStatusError: "must contain a condition of type 'Applies'"
+    - name: The value of riskNames cannot be the empty set
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: ClusterVersion
+        spec:
+          clusterID: foo
+          desiredUpdate:
+            architecture: Multi
+            version: 4.11.1
+            acceptRisks:
+              - name: RiskA
+              - name: RiskB
+      updated: |
+        apiVersion: config.openshift.io/v1
+        kind: ClusterVersion
+        spec:
+          clusterID: foo
+          desiredUpdate:
+            architecture: Multi
+            version: 4.11.2
+            acceptRisks:
+              - name: RiskA
+              - name: RiskC
+        status:
+          desired:
+            version: foo
+            image: foo
+          observedGeneration: 1
+          versionHash: foo
+          availableUpdates:
+            - version: foo
+              image: foo
+          conditionalUpdateRisks:
+            - name: DualStackNeedsController
+              message: Upgrade can get stuck on clusters that use multiple networks together with dual stack.
+              url: https://issues.redhat.com/browse/SDN-3996
+              matchingRules:
+                - type: Always
+              conditions:
+                - status: "True"
+                  type: Applies
+                  reason: MatchingRule
+                  message: The matchingRules[0] matches
+                  lastTransitionTime: 2021-09-13T17:03:05Z
+          conditionalUpdates:
+            - release:
+                version: 4.18.16
+                image: bar
+              riskNames: []
+              risks:
+                - name: DualStackNeedsController
+                  message: Upgrade can get stuck on clusters that use multiple networks together with dual stack.
+                  url: https://issues.redhat.com/browse/SDN-3996
+                  matchingRules:
+                    - type: Always
+                  conditions:
+                    - status: "True"
+                      type: Applies
+                      reason: MatchingRule
+                      message: The matchingRules[0] matches
+                      lastTransitionTime: 2021-09-13T17:03:05Z
+      expectedStatusError: "should have at least 1 items"

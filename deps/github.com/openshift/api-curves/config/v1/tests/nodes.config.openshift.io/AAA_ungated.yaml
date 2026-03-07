@@ -1,0 +1,122 @@
+apiVersion: apiextensions.k8s.io/v1 # Hack because controller-gen complains if we don't have this
+name: "Node"
+crdName: nodes.config.openshift.io
+tests:
+  onCreate:
+    - name: Should be able to create a minimal Node
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: Node
+        spec: {} # No spec is required for a Node
+      expected: |
+        apiVersion: config.openshift.io/v1
+        kind: Node
+        spec: {}
+    - name: Should be able to create a Node object with cgroupMode set to "v2"
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: Node
+        spec:
+          cgroupMode: "v2"
+      expected: |
+        apiVersion: config.openshift.io/v1
+        kind: Node
+        spec:
+          cgroupMode: "v2"
+    - name: Should not allow to create a Node object with the cgroupMode set to "v1"
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: Node
+        spec:
+          cgroupMode: "v1"
+      expectedError: "spec.cgroupMode: Unsupported value: \"v1\""
+    - name: Should not allow to create a Node object with the cgroupMode set to unknown value
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: Node
+        spec:
+          cgroupMode: "unknown"
+      expectedError: "spec.cgroupMode: Unsupported value: \"unknown\""
+  onUpdate:
+    - name: Should be able to update a Node object with cgroupMode set to "v2"
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: Node
+        spec: {}
+      updated: |
+        apiVersion: config.openshift.io/v1
+        kind: Node
+        spec:
+          cgroupMode: "v2"
+      expected: |
+        apiVersion: config.openshift.io/v1
+        kind: Node
+        spec:
+          cgroupMode: "v2"
+    - name: Should not allow update of cgroupMode from "v2" to "v1"
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: Node
+        spec:
+          cgroupMode: "v2"
+      updated: |
+        apiVersion: config.openshift.io/v1
+        kind: Node
+        spec:
+          cgroupMode: "v1"
+      expectedError: "spec.cgroupMode: Unsupported value: \"v1\""
+    - name: Should allow changing fields other than cgroupMode when a persisted value "v1" is no longer valid
+      initialCRDPatches:
+        - op: replace
+          path: /spec/versions/0/schema/openAPIV3Schema/properties/spec/properties/cgroupMode
+          value:
+            enum:
+              - v1
+              - v2
+              - ""
+            type: string
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: Node
+        spec:
+          cgroupMode: "v1"
+      updated: |
+        apiVersion: config.openshift.io/v1
+        kind: Node
+        spec:
+          cgroupMode: "v1"
+          workerLatencyProfile: "MediumUpdateAverageReaction"
+      expected: |
+        apiVersion: config.openshift.io/v1
+        kind: Node
+        spec:
+          cgroupMode: "v1"
+          workerLatencyProfile: "MediumUpdateAverageReaction"
+    - name: Should allow updating a persisted value of cgroupMode that is no longer valid "v1" to a valid value "v2"
+      initialCRDPatches:
+        - op: replace
+          path: /spec/versions/0/schema/openAPIV3Schema/properties/spec/properties/cgroupMode
+          value:
+            enum:
+              - v1
+              - v2
+              - ""
+            type: string
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: Node
+        spec:
+          cgroupMode: "v1"
+          workerLatencyProfile: "MediumUpdateAverageReaction"
+      updated: |
+        apiVersion: config.openshift.io/v1
+        kind: Node
+        spec:
+          cgroupMode: "v2"
+          workerLatencyProfile: "MediumUpdateAverageReaction"
+      expected: |
+        apiVersion: config.openshift.io/v1
+        kind: Node
+        spec:
+          cgroupMode: "v2"
+          workerLatencyProfile: "MediumUpdateAverageReaction"

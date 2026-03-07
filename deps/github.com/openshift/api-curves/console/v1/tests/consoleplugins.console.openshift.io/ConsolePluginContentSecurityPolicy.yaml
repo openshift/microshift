@@ -1,0 +1,194 @@
+apiVersion: apiextensions.k8s.io/v1 # Hack because controller-gen complains if we don't have this
+name: "ConsolePlugin"
+crdName: consoleplugins.console.openshift.io
+featureGates:
+- ConsolePluginContentSecurityPolicy
+version: v1
+tests:
+  onCreate:
+    - name: Should be able to create a ConsolePlugin with valid CSP configuration
+      initial: |
+        apiVersion: console.openshift.io/v1
+        kind: ConsolePlugin
+        spec:
+          displayName: foo
+          backend:
+            type: Service
+          contentSecurityPolicy:
+          - directive: ScriptSrc
+            values:
+            - https://script1.com/
+          - directive: ImgSrc
+            values:
+            - https://img1.com/
+      expected: |
+        apiVersion: console.openshift.io/v1
+        kind: ConsolePlugin
+        spec:
+          displayName: foo
+          backend:
+            type: Service
+          contentSecurityPolicy:
+          - directive: ScriptSrc
+            values:
+            - https://script1.com/
+          - directive: ImgSrc
+            values:
+            - https://img1.com/
+    - name: Should throw an error for duplicate CSP directive entries
+      initial: |
+        apiVersion: console.openshift.io/v1
+        kind: ConsolePlugin
+        spec:
+          displayName: foo
+          backend:
+            type: Service
+          contentSecurityPolicy:
+          - directive: ScriptSrc
+            values:
+            - https://script1.com/
+          - directive: ScriptSrc
+            values:
+            - https://script1.com/
+      expectedError: "spec.contentSecurityPolicy[1]: Duplicate value: map[string]interface {}{\"directive\":\"ScriptSrc\"}"
+    - name: Should throw an error for duplicate CSP directive values
+      initial: |
+        apiVersion: console.openshift.io/v1
+        kind: ConsolePlugin
+        spec:
+          displayName: foo
+          backend:
+            type: Service
+          contentSecurityPolicy:
+          - directive: ScriptSrc
+            values:
+            - https://script1.com/
+            - https://script1.com/
+      expectedError: "spec.contentSecurityPolicy[0].values: Invalid value: \"array\": each CSP directive value must be unique"
+    - name: Should throw an error for incorrect directive type
+      initial: |
+        apiVersion: console.openshift.io/v1
+        kind: ConsolePlugin
+        spec:
+          displayName: foo
+          backend:
+            type: Service
+          contentSecurityPolicy:
+          - directive: TestSrc
+            values:
+            - https://script1.com/
+      expectedError: "spec.contentSecurityPolicy[0].directive: Unsupported value: \"TestSrc\": supported values: \"DefaultSrc\", \"ScriptSrc\", \"StyleSrc\", \"ImgSrc\", \"FontSrc\""
+    - name: Should throw an error for invalid CSP directive values, using wildcard
+      initial: |
+        apiVersion: console.openshift.io/v1
+        kind: ConsolePlugin
+        spec:
+          displayName: foo
+          backend:
+            type: Service
+          contentSecurityPolicy:
+          - directive: ScriptSrc
+            values:
+            - "*"
+      expectedError: "spec.contentSecurityPolicy[0].values[0]: Invalid value: \"string\": CSP directive value cannot be a wildcard"
+    - name: Should be able to create a ConsolePlugin with valid CSP value, using domain with wildcard prefix
+      initial: |
+        apiVersion: console.openshift.io/v1
+        kind: ConsolePlugin
+        spec:
+          displayName: foo
+          backend:
+            type: Service
+          contentSecurityPolicy:
+          - directive: ScriptSrc
+            values:
+            - "*.example.com"
+      expected: |
+        apiVersion: console.openshift.io/v1
+        kind: ConsolePlugin
+        spec:
+          displayName: foo
+          backend:
+            type: Service
+          contentSecurityPolicy:
+          - directive: ScriptSrc
+            values:
+            - "*.example.com"
+    - name: Should throw an error for invalid CSP directive values, starting and ending with quotes
+      initial: |
+        apiVersion: console.openshift.io/v1
+        kind: ConsolePlugin
+        spec:
+          displayName: foo
+          backend:
+            type: Service
+          contentSecurityPolicy:
+          - directive: ScriptSrc
+            values:
+            - "'none'"
+      expectedError: "\"string\": CSP directive value cannot contain a quote"
+    - name: Should throw an error for invalid CSP directive values with quote
+      initial: |
+        apiVersion: console.openshift.io/v1
+        kind: ConsolePlugin
+        spec:
+          displayName: foo
+          backend:
+            type: Service
+          contentSecurityPolicy:
+          - directive: ScriptSrc
+            values:
+            - "foo'bar"
+      expectedError: "\"string\": CSP directive value cannot contain a quote"
+    - name: Should throw an error for invalid CSP directive values with comma
+      initial: |
+        apiVersion: console.openshift.io/v1
+        kind: ConsolePlugin
+        spec:
+          displayName: foo
+          backend:
+            type: Service
+          contentSecurityPolicy:
+          - directive: ScriptSrc
+            values:
+            - "foo,bar"
+      expectedError: "spec.contentSecurityPolicy[0].values[0]: Invalid value: \"string\": CSP directive value cannot contain a comma"
+    - name: Should throw an error for invalid CSP directive values with semi-colon
+      initial: |
+        apiVersion: console.openshift.io/v1
+        kind: ConsolePlugin
+        spec:
+          displayName: foo
+          backend:
+            type: Service
+          contentSecurityPolicy:
+          - directive: ScriptSrc
+            values:
+            - "foo;bar"
+      expectedError: "spec.contentSecurityPolicy[0].values[0]: Invalid value: \"string\": CSP directive value cannot contain a semi-colon"
+    - name: Should throw an error for invalid CSP directive values with whitespace, using space
+      initial: |
+        apiVersion: console.openshift.io/v1
+        kind: ConsolePlugin
+        spec:
+          displayName: foo
+          backend:
+            type: Service
+          contentSecurityPolicy:
+          - directive: ScriptSrc
+            values:
+            - https://scr ipt1.com/
+      expectedError: "spec.contentSecurityPolicy[0].values[0]: Invalid value: \"string\": CSP directive value cannot contain a whitespace"
+    - name: Should throw an error for invalid CSP directive values with whitespace, using tab
+      initial: |
+        apiVersion: console.openshift.io/v1
+        kind: ConsolePlugin
+        spec:
+          displayName: foo
+          backend:
+            type: Service
+          contentSecurityPolicy:
+          - directive: ScriptSrc
+            values:
+            - https://scri    pt1.com/
+      expectedError: "spec.contentSecurityPolicy[0].values[0]: Invalid value: \"string\": CSP directive value cannot contain a whitespace"

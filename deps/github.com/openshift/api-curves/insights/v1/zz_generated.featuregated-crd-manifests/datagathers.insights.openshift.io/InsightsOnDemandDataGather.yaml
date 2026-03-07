@@ -1,0 +1,628 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    api-approved.openshift.io: https://github.com/openshift/api/pull/2448
+    api.openshift.io/filename-cvo-runlevel: "0000_10"
+    api.openshift.io/filename-operator: insights
+    api.openshift.io/filename-ordering: "01"
+    capability.openshift.io/name: Insights
+    feature-gate.release.openshift.io/InsightsOnDemandDataGather: "true"
+  name: datagathers.insights.openshift.io
+spec:
+  group: insights.openshift.io
+  names:
+    kind: DataGather
+    listKind: DataGatherList
+    plural: datagathers
+    singular: datagather
+  scope: Cluster
+  versions:
+  - additionalPrinterColumns:
+    - description: DataGather start time
+      jsonPath: .status.startTime
+      name: StartTime
+      type: date
+    - description: DataGather finish time
+      jsonPath: .status.finishTime
+      name: FinishTime
+      type: date
+    - description: DataGather age
+      jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+    name: v1
+    schema:
+      openAPIV3Schema:
+        description: |-
+          DataGather provides data gather configuration options and status for the particular Insights data gathering.
+
+          Compatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).
+        properties:
+          apiVersion:
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+            type: string
+          kind:
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: spec holds user settable values for configuration
+            properties:
+              dataPolicy:
+                description: |-
+                  dataPolicy is an optional list of DataPolicyOptions that allows user to enable additional obfuscation of the Insights archive data.
+                  It may not exceed 2 items and must not contain duplicates.
+                  Valid values are ObfuscateNetworking and WorkloadNames.
+                  When set to ObfuscateNetworking the IP addresses and the cluster domain name are obfuscated.
+                  When set to WorkloadNames, the gathered data about cluster resources will not contain the workload names for your deployments. Resources UIDs will be used instead.
+                  When omitted no obfuscation is applied.
+                items:
+                  description: DataPolicyOption declares valid data policy types
+                  enum:
+                  - ObfuscateNetworking
+                  - WorkloadNames
+                  type: string
+                maxItems: 2
+                minItems: 1
+                type: array
+                x-kubernetes-list-type: atomic
+                x-kubernetes-validations:
+                - message: dataPolicy items must be unique
+                  rule: self.all(x, self.exists_one(y, x == y))
+              gatherers:
+                description: gatherers is a required field that specifies the configuration
+                  of the gatherers.
+                properties:
+                  custom:
+                    description: |-
+                      custom provides gathering configuration.
+                      It is required when mode is Custom, and forbidden otherwise.
+                      Custom configuration allows user to disable only a subset of gatherers.
+                      Gatherers that are not explicitly disabled in custom configuration will run.
+                    properties:
+                      configs:
+                        description: |-
+                          configs is a required list of gatherers configurations that can be used to enable or disable specific gatherers.
+                          It may not exceed 100 items and each gatherer can be present only once.
+                          It is possible to disable an entire set of gatherers while allowing a specific function within that set.
+                          The particular gatherers IDs can be found at https://github.com/openshift/insights-operator/blob/master/docs/gathered-data.md.
+                          Run the following command to get the names of last active gatherers:
+                          "oc get insightsoperators.operator.openshift.io cluster -o json | jq '.status.gatherStatus.gatherers[].name'"
+                        items:
+                          description: GathererConfig allows to configure specific
+                            gatherers
+                          properties:
+                            name:
+                              description: |-
+                                name is the required name of a specific gatherer.
+                                It may not exceed 256 characters.
+                                The format for a gatherer name is: {gatherer}/{function} where the function is optional.
+                                Gatherer consists of a lowercase letters only that may include underscores (_).
+                                Function consists of a lowercase letters only that may include underscores (_) and is separated from the gatherer by a forward slash (/).
+                                The particular gatherers can be found at https://github.com/openshift/insights-operator/blob/master/docs/gathered-data.md.
+                                Run the following command to get the names of last active gatherers:
+                                "oc get insightsoperators.operator.openshift.io cluster -o json | jq '.status.gatherStatus.gatherers[].name'"
+                              maxLength: 256
+                              minLength: 1
+                              type: string
+                              x-kubernetes-validations:
+                              - message: gatherer name must be in the format of {gatherer}/{function}
+                                  where the gatherer and function are lowercase letters
+                                  only that may include underscores (_) and are separated
+                                  by a forward slash (/) if the function is provided
+                                rule: self.matches("^[a-z]+[_a-z]*[a-z]([/a-z][_a-z]*)?[a-z]$")
+                            state:
+                              description: |-
+                                state is a required field that allows you to configure specific gatherer. Valid values are "Enabled" and "Disabled".
+                                When set to Enabled the gatherer will run.
+                                When set to Disabled the gatherer will not run.
+                              enum:
+                              - Enabled
+                              - Disabled
+                              type: string
+                          required:
+                          - name
+                          - state
+                          type: object
+                        maxItems: 100
+                        minItems: 1
+                        type: array
+                        x-kubernetes-list-map-keys:
+                        - name
+                        x-kubernetes-list-type: map
+                    required:
+                    - configs
+                    type: object
+                  mode:
+                    description: |-
+                      mode is a required field that specifies the mode for gatherers. Allowed values are All and Custom.
+                      When set to All, all gatherers will run and gather data.
+                      When set to Custom, the custom configuration from the custom field will be applied.
+                    enum:
+                    - All
+                    - Custom
+                    type: string
+                required:
+                - mode
+                type: object
+                x-kubernetes-validations:
+                - message: custom is required when mode is Custom, and forbidden otherwise
+                  rule: 'has(self.mode) && self.mode == ''Custom'' ?  has(self.custom)
+                    : !has(self.custom)'
+              storage:
+                description: |-
+                  storage is an optional field that allows user to define persistent storage for gathering jobs to store the Insights data archive.
+                  If omitted, the gathering job will use ephemeral storage.
+                properties:
+                  persistentVolume:
+                    description: |-
+                      persistentVolume is an optional field that specifies the PersistentVolume that will be used to store the Insights data archive.
+                      The PersistentVolume must be created in the openshift-insights namespace.
+                    properties:
+                      claim:
+                        description: |-
+                          claim is a required field that specifies the configuration of the PersistentVolumeClaim that will be used to store the Insights data archive.
+                          The PersistentVolumeClaim must be created in the openshift-insights namespace.
+                        properties:
+                          name:
+                            description: |-
+                              name is the name of the PersistentVolumeClaim that will be used to store the Insights data archive.
+                              It is a string that follows the DNS1123 subdomain format.
+                              It must be at most 253 characters in length, and must consist only of lower case alphanumeric characters, '-' and '.', and must start and end with an alphanumeric character.
+                            maxLength: 253
+                            minLength: 1
+                            type: string
+                            x-kubernetes-validations:
+                            - message: a lowercase RFC 1123 subdomain must consist
+                                of lower case alphanumeric characters, '-' or '.',
+                                and must start and end with an alphanumeric character.
+                              rule: '!format.dns1123Subdomain().validate(self).hasValue()'
+                        required:
+                        - name
+                        type: object
+                      mountPath:
+                        description: |-
+                          mountPath is an optional field specifying the directory where the PVC will be mounted inside the Insights data gathering Pod.
+                          When omitted, this means no opinion and the platform is left to choose a reasonable default, which is subject to change over time.
+                          The current default mount path is /var/lib/insights-operator
+                          The path may not exceed 1024 characters and must not contain a colon.
+                        maxLength: 1024
+                        minLength: 1
+                        type: string
+                        x-kubernetes-validations:
+                        - message: mountPath must not contain a colon
+                          rule: '!self.contains('':'')'
+                    required:
+                    - claim
+                    type: object
+                  type:
+                    description: |-
+                      type is a required field that specifies the type of storage that will be used to store the Insights data archive.
+                      Valid values are "PersistentVolume" and "Ephemeral".
+                      When set to Ephemeral, the Insights data archive is stored in the ephemeral storage of the gathering job.
+                      When set to PersistentVolume, the Insights data archive is stored in the PersistentVolume that is
+                      defined by the PersistentVolume field.
+                    enum:
+                    - PersistentVolume
+                    - Ephemeral
+                    type: string
+                required:
+                - type
+                type: object
+                x-kubernetes-validations:
+                - message: persistentVolume is required when type is PersistentVolume,
+                    and forbidden otherwise
+                  rule: 'has(self.type) && self.type == ''PersistentVolume'' ?  has(self.persistentVolume)
+                    : !has(self.persistentVolume)'
+            required:
+            - gatherers
+            type: object
+          status:
+            description: status holds observed values from the cluster. They may not
+              be overridden.
+            minProperties: 1
+            properties:
+              conditions:
+                description: |-
+                  conditions is an optional field that provides details on the status of the gatherer job.
+                  It may not exceed 100 items and must not contain duplicates.
+
+                  The current condition types are DataUploaded, DataRecorded, DataProcessed, RemoteConfigurationNotAvailable, RemoteConfigurationInvalid
+
+                  The DataUploaded condition is used to represent whether or not the archive was successfully uploaded for further processing.
+                  When it has a status of True and a reason of Succeeded, the archive was successfully uploaded.
+                  When it has a status of Unknown and a reason of NoUploadYet, the upload has not occurred, or there was no data to upload.
+                  When it has a status of False and a reason Failed, the upload failed. The accompanying message will include the specific error encountered.
+
+                  The DataRecorded condition is used to represent whether or not the archive was successfully recorded.
+                  When it has a status of True and a reason of Succeeded, the archive was recorded successfully.
+                  When it has a status of Unknown and a reason of NoDataGatheringYet, the data gathering process has not started yet.
+                  When it has a status of False and a reason of RecordingFailed, the recording failed and a message will include the specific error encountered.
+
+                  The DataProcessed condition is used to represent whether or not the archive was processed by the processing service.
+                  When it has a status of True and a reason of Processed, the data was processed successfully.
+                  When it has a status of Unknown and a reason of NothingToProcessYet, there is no data to process at the moment.
+                  When it has a status of False and a reason of Failure, processing failed and a message will include the specific error encountered.
+
+                  The RemoteConfigurationAvailable condition is used to represent whether the remote configuration is available.
+                  When it has a status of Unknown and a reason of Unknown or RemoteConfigNotRequestedYet, the state of the remote configuration is unknown—typically at startup.
+                  When it has a status of True and a reason of Succeeded, the configuration is available.
+                  When it has a status of False and a reason of NoToken, the configuration was disabled by removing the cloud.openshift.com field from the pull secret.
+                  When it has a status of False and a reason of DisabledByConfiguration, the configuration was disabled in insightsdatagather.config.openshift.io.
+
+                  The RemoteConfigurationValid condition is used to represent whether the remote configuration is valid.
+                  When it has a status of Unknown and a reason of Unknown or NoValidationYet, the validity of the remote configuration is unknown—typically at startup.
+                  When it has a status of True and a reason of Succeeded, the configuration is valid.
+                  When it has a status of False and a reason of Invalid, the configuration is invalid.
+
+                  The Progressing condition is used to represent the phase of gathering
+                  When it has a status of False and the reason is DataGatherPending, the gathering has not started yet.
+                  When it has a status of True and reason is Gathering, the gathering is running.
+                  When it has a status of False and reason is GatheringSucceeded, the gathering successfully finished.
+                  When it has a status of False and reason is GatheringFailed, the gathering failed.
+                items:
+                  description: Condition contains details for one aspect of the current
+                    state of this API Resource.
+                  properties:
+                    lastTransitionTime:
+                      description: |-
+                        lastTransitionTime is the last time the condition transitioned from one status to another.
+                        This should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.
+                      format: date-time
+                      type: string
+                    message:
+                      description: |-
+                        message is a human readable message indicating details about the transition.
+                        This may be an empty string.
+                      maxLength: 32768
+                      type: string
+                    observedGeneration:
+                      description: |-
+                        observedGeneration represents the .metadata.generation that the condition was set based upon.
+                        For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
+                        with respect to the current state of the instance.
+                      format: int64
+                      minimum: 0
+                      type: integer
+                    reason:
+                      description: |-
+                        reason contains a programmatic identifier indicating the reason for the condition's last transition.
+                        Producers of specific condition types may define expected values and meanings for this field,
+                        and whether the values are considered a guaranteed API.
+                        The value should be a CamelCase string.
+                        This field may not be empty.
+                      maxLength: 1024
+                      minLength: 1
+                      pattern: ^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$
+                      type: string
+                    status:
+                      description: status of the condition, one of True, False, Unknown.
+                      enum:
+                      - "True"
+                      - "False"
+                      - Unknown
+                      type: string
+                    type:
+                      description: type of condition in CamelCase or in foo.example.com/CamelCase.
+                      maxLength: 316
+                      pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$
+                      type: string
+                  required:
+                  - lastTransitionTime
+                  - message
+                  - reason
+                  - status
+                  - type
+                  type: object
+                maxItems: 100
+                minItems: 1
+                type: array
+                x-kubernetes-list-map-keys:
+                - type
+                x-kubernetes-list-type: map
+              finishTime:
+                description: finishTime is the time when Insights data gathering finished.
+                format: date-time
+                type: string
+                x-kubernetes-validations:
+                - message: finishTime is immutable once set
+                  rule: self == oldSelf
+              gatherers:
+                description: gatherers is a list of active gatherers (and their statuses)
+                  in the last gathering.
+                items:
+                  description: |-
+                    GathererStatus represents information about a particular
+                    data gatherer.
+                  properties:
+                    conditions:
+                      description: |-
+                        conditions provide details on the status of each gatherer.
+
+                        The current condition type is DataGathered
+
+                        The DataGathered condition is used to represent whether or not the data was gathered by a gatherer specified by name.
+                        When it has a status of True and a reason of GatheredOK, the data has been successfully gathered as expected.
+                        When it has a status of False and a reason of NoData, no data was gathered—for example, when the resource is not present in the cluster.
+                        When it has a status of False and a reason of GatherError, an error occurred and no data was gathered.
+                        When it has a status of False and a reason of GatherPanic, a panic occurred during gathering and no data was collected.
+                        When it has a status of False and a reason of GatherWithErrorReason, data was partially gathered or gathered with an error message.
+                      items:
+                        description: Condition contains details for one aspect of
+                          the current state of this API Resource.
+                        properties:
+                          lastTransitionTime:
+                            description: |-
+                              lastTransitionTime is the last time the condition transitioned from one status to another.
+                              This should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.
+                            format: date-time
+                            type: string
+                          message:
+                            description: |-
+                              message is a human readable message indicating details about the transition.
+                              This may be an empty string.
+                            maxLength: 32768
+                            type: string
+                          observedGeneration:
+                            description: |-
+                              observedGeneration represents the .metadata.generation that the condition was set based upon.
+                              For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
+                              with respect to the current state of the instance.
+                            format: int64
+                            minimum: 0
+                            type: integer
+                          reason:
+                            description: |-
+                              reason contains a programmatic identifier indicating the reason for the condition's last transition.
+                              Producers of specific condition types may define expected values and meanings for this field,
+                              and whether the values are considered a guaranteed API.
+                              The value should be a CamelCase string.
+                              This field may not be empty.
+                            maxLength: 1024
+                            minLength: 1
+                            pattern: ^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$
+                            type: string
+                          status:
+                            description: status of the condition, one of True, False,
+                              Unknown.
+                            enum:
+                            - "True"
+                            - "False"
+                            - Unknown
+                            type: string
+                          type:
+                            description: type of condition in CamelCase or in foo.example.com/CamelCase.
+                            maxLength: 316
+                            pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$
+                            type: string
+                        required:
+                        - lastTransitionTime
+                        - message
+                        - reason
+                        - status
+                        - type
+                        type: object
+                      maxItems: 100
+                      minItems: 1
+                      type: array
+                      x-kubernetes-list-map-keys:
+                      - type
+                      x-kubernetes-list-type: map
+                    lastGatherSeconds:
+                      description: lastGatherSeconds is required field that represents
+                        the time spent gathering in seconds
+                      format: int32
+                      minimum: 0
+                      type: integer
+                    name:
+                      description: |-
+                        name is the required name of the gatherer.
+                        It must contain at least 5 characters and may not exceed 256 characters.
+                      maxLength: 256
+                      minLength: 5
+                      type: string
+                  required:
+                  - lastGatherSeconds
+                  - name
+                  type: object
+                maxItems: 100
+                minItems: 1
+                type: array
+                x-kubernetes-list-map-keys:
+                - name
+                x-kubernetes-list-type: map
+              insightsReport:
+                description: |-
+                  insightsReport provides general Insights analysis results.
+                  When omitted, this means no data gathering has taken place yet or the
+                  corresponding Insights analysis (identified by "insightsRequestID") is not available.
+                properties:
+                  downloadedTime:
+                    description: downloadedTime is a required field that specifies
+                      when the Insights report was last downloaded.
+                    format: date-time
+                    type: string
+                  healthChecks:
+                    description: |-
+                      healthChecks is an optional field that provides basic information about active Insights
+                      recommendations, which serve as proactive notifications for potential issues in the cluster.
+                      When omitted, it means that there are no active recommendations in the cluster.
+                    items:
+                      description: HealthCheck represents an Insights health check
+                        attributes.
+                      properties:
+                        advisorURI:
+                          description: |-
+                            advisorURI is required field that provides the URL link to the Insights Advisor.
+                            The link must be a valid HTTPS URL and the maximum length is 2048 characters.
+                          maxLength: 2048
+                          minLength: 1
+                          type: string
+                          x-kubernetes-validations:
+                          - message: advisorURI must be a valid HTTPS URL (e.g., https://example.com)
+                            rule: isURL(self) && url(self).getScheme() == "https"
+                        description:
+                          description: |-
+                            description is required field that provides basic description of the healthcheck.
+                            It must contain at least 10 characters and may not exceed 2048 characters.
+                          maxLength: 2048
+                          minLength: 10
+                          type: string
+                        totalRisk:
+                          description: |-
+                            totalRisk is the required field of the healthcheck.
+                            It is indicator of the total risk posed by the detected issue; combination of impact and likelihood.
+                            Allowed values are Low, Moderate, Important and Critical.
+                            The value represents the severity of the issue.
+                          enum:
+                          - Low
+                          - Moderate
+                          - Important
+                          - Critical
+                          type: string
+                      required:
+                      - advisorURI
+                      - description
+                      - totalRisk
+                      type: object
+                    maxItems: 100
+                    minItems: 1
+                    type: array
+                    x-kubernetes-list-map-keys:
+                    - advisorURI
+                    - totalRisk
+                    - description
+                    x-kubernetes-list-type: map
+                  uri:
+                    description: |-
+                      uri is a required field that provides the URL link from which the report was downloaded.
+                      The link must be a valid HTTPS URL and the maximum length is 2048 characters.
+                    maxLength: 2048
+                    minLength: 1
+                    type: string
+                    x-kubernetes-validations:
+                    - message: URI must be a valid HTTPS URL (e.g., https://example.com)
+                      rule: isURL(self) && url(self).getScheme() == "https"
+                required:
+                - downloadedTime
+                - uri
+                type: object
+              insightsRequestID:
+                description: |-
+                  insightsRequestID is an optional Insights request ID to track the status of the Insights analysis (in console.redhat.com processing pipeline) for the corresponding Insights data archive.
+                  It may not exceed 256 characters and is immutable once set.
+                maxLength: 256
+                minLength: 1
+                type: string
+                x-kubernetes-validations:
+                - message: insightsRequestID is immutable once set
+                  rule: self == oldSelf
+              relatedObjects:
+                description: |-
+                  relatedObjects is an optional list of resources which are useful when debugging or inspecting the data gathering Pod
+                  It may not exceed 100 items and must not contain duplicates.
+                items:
+                  description: ObjectReference contains enough information to let
+                    you inspect or modify the referred object.
+                  properties:
+                    group:
+                      description: |-
+                        group is required field that specifies the API Group of the Resource.
+                        Enter empty string for the core group.
+                        This value is empty or it should follow the DNS1123 subdomain format.
+                        It must be at most 253 characters in length, and must consist only of lower case alphanumeric characters, '-' and '.', and must start with an alphabetic character and end with an alphanumeric character.
+                        Example: "", "apps", "build.openshift.io", etc.
+                      maxLength: 253
+                      minLength: 0
+                      type: string
+                      x-kubernetes-validations:
+                      - message: a lowercase RFC 1123 subdomain must consist of lower
+                          case alphanumeric characters, '-' or '.', and must start
+                          with an alphabetic character and end with an alphanumeric
+                          character.
+                        rule: self.size() == 0 || !format.dns1123Subdomain().validate(self).hasValue()
+                    name:
+                      description: |-
+                        name is required field that specifies the referent that follows the DNS1123 subdomain format.
+                        It must be at most 253 characters in length, and must consist only of lower case alphanumeric characters, '-' and '.', and must start with an alphabetic character and end with an alphanumeric character..
+                      maxLength: 253
+                      minLength: 1
+                      type: string
+                      x-kubernetes-validations:
+                      - message: a lowercase RFC 1123 subdomain must consist of lower
+                          case alphanumeric characters, '-' or '.', and must start
+                          with an alphabetic character and end with an alphanumeric
+                          character.
+                        rule: '!format.dns1123Subdomain().validate(self).hasValue()'
+                    namespace:
+                      description: |-
+                        namespace if required field of the referent that follows the DNS1123 labels format.
+                        It must be at most 63 characters in length, and must must consist of only lowercase alphanumeric characters and hyphens, and must start with an alphabetic character and end with an alphanumeric character.
+                      maxLength: 63
+                      minLength: 1
+                      type: string
+                      x-kubernetes-validations:
+                      - message: the value must consist of only lowercase alphanumeric
+                          characters and hyphens, and must start with an alphabetic
+                          character and end with an alphanumeric character.
+                        rule: '!format.dns1123Label().validate(self).hasValue()'
+                    resource:
+                      description: |-
+                        resource is required field of the type that is being referenced and follows the DNS1035 format.
+                        It is normally the plural form of the resource kind in lowercase.
+                        It must be at most 63 characters in length, and must must consist of only lowercase alphanumeric characters and hyphens, and must start with an alphabetic character and end with an alphanumeric character.
+                        Example: "deployments", "deploymentconfigs", "pods", etc.
+                      maxLength: 63
+                      minLength: 1
+                      type: string
+                      x-kubernetes-validations:
+                      - message: the value must consist of only lowercase alphanumeric
+                          characters and hyphens, and must start with an alphabetic
+                          character and end with an alphanumeric character.
+                        rule: '!format.dns1035Label().validate(self).hasValue()'
+                  required:
+                  - group
+                  - name
+                  - namespace
+                  - resource
+                  type: object
+                maxItems: 100
+                minItems: 1
+                type: array
+                x-kubernetes-list-map-keys:
+                - name
+                - namespace
+                x-kubernetes-list-type: map
+              startTime:
+                description: startTime is the time when Insights data gathering started.
+                format: date-time
+                type: string
+                x-kubernetes-validations:
+                - message: startTime is immutable once set
+                  rule: self == oldSelf
+            type: object
+            x-kubernetes-validations:
+            - message: cannot remove insightsRequestID attribute from status
+              rule: (!has(oldSelf.insightsRequestID) || has(self.insightsRequestID))
+            - message: cannot remove startTime attribute from status
+              rule: (!has(oldSelf.startTime) || has(self.startTime))
+            - message: cannot remove finishTime attribute from status
+              rule: (!has(oldSelf.finishTime) || has(self.finishTime))
+        required:
+        - spec
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}

@@ -1,0 +1,617 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    api-approved.openshift.io: https://github.com/openshift/api/pull/1453
+    api.openshift.io/merged-by-featuregates: "true"
+    include.release.openshift.io/ibm-cloud-managed: "true"
+    include.release.openshift.io/self-managed-high-availability: "true"
+    release.openshift.io/feature-set: OKD
+  labels:
+    openshift.io/operator-managed: ""
+  name: machineconfigpools.machineconfiguration.openshift.io
+spec:
+  group: machineconfiguration.openshift.io
+  names:
+    kind: MachineConfigPool
+    listKind: MachineConfigPoolList
+    plural: machineconfigpools
+    shortNames:
+    - mcp
+    singular: machineconfigpool
+  scope: Cluster
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: .status.configuration.name
+      name: Config
+      type: string
+    - description: When all the machines in the pool are updated to the correct machine
+        config.
+      jsonPath: .status.conditions[?(@.type=="Updated")].status
+      name: Updated
+      type: string
+    - description: When at least one of machine is not either not updated or is in
+        the process of updating to the desired machine config.
+      jsonPath: .status.conditions[?(@.type=="Updating")].status
+      name: Updating
+      type: string
+    - description: When progress is blocked on updating one or more nodes or the pool
+        configuration is failing.
+      jsonPath: .status.conditions[?(@.type=="Degraded")].status
+      name: Degraded
+      type: string
+    - description: Total number of machines in the machine config pool
+      jsonPath: .status.machineCount
+      name: MachineCount
+      type: number
+    - description: Total number of ready machines targeted by the pool
+      jsonPath: .status.readyMachineCount
+      name: ReadyMachineCount
+      type: number
+    - description: Total number of machines targeted by the pool that have the CurrentMachineConfig
+        as their config
+      jsonPath: .status.updatedMachineCount
+      name: UpdatedMachineCount
+      type: number
+    - description: Total number of machines marked degraded (or unreconcilable)
+      jsonPath: .status.degradedMachineCount
+      name: DegradedMachineCount
+      type: number
+    - jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+    name: v1
+    schema:
+      openAPIV3Schema:
+        description: |-
+          MachineConfigPool describes a pool of MachineConfigs.
+
+          Compatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).
+        properties:
+          apiVersion:
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+            type: string
+          kind:
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: spec contains the desired machine config pool configuration.
+            properties:
+              configuration:
+                description: The targeted MachineConfig object for the machine config
+                  pool.
+                properties:
+                  apiVersion:
+                    description: API version of the referent.
+                    type: string
+                  fieldPath:
+                    description: |-
+                      If referring to a piece of an object instead of an entire object, this string
+                      should contain a valid JSON/Go field access statement, such as desiredState.manifest.containers[2].
+                      For example, if the object reference is to a container within a pod, this would take on a value like:
+                      "spec.containers{name}" (where "name" refers to the name of the container that triggered
+                      the event) or if no container name is specified "spec.containers[2]" (container with
+                      index 2 in this pod). This syntax is chosen only to have some well-defined way of
+                      referencing a part of an object.
+                    type: string
+                  kind:
+                    description: |-
+                      Kind of the referent.
+                      More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+                    type: string
+                  name:
+                    description: |-
+                      Name of the referent.
+                      More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                    type: string
+                  namespace:
+                    description: |-
+                      Namespace of the referent.
+                      More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/
+                    type: string
+                  resourceVersion:
+                    description: |-
+                      Specific resourceVersion to which this reference is made, if any.
+                      More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency
+                    type: string
+                  source:
+                    description: source is the list of MachineConfig objects that
+                      were used to generate the single MachineConfig object specified
+                      in `content`.
+                    items:
+                      description: ObjectReference contains enough information to
+                        let you inspect or modify the referred object.
+                      properties:
+                        apiVersion:
+                          description: API version of the referent.
+                          type: string
+                        fieldPath:
+                          description: |-
+                            If referring to a piece of an object instead of an entire object, this string
+                            should contain a valid JSON/Go field access statement, such as desiredState.manifest.containers[2].
+                            For example, if the object reference is to a container within a pod, this would take on a value like:
+                            "spec.containers{name}" (where "name" refers to the name of the container that triggered
+                            the event) or if no container name is specified "spec.containers[2]" (container with
+                            index 2 in this pod). This syntax is chosen only to have some well-defined way of
+                            referencing a part of an object.
+                          type: string
+                        kind:
+                          description: |-
+                            Kind of the referent.
+                            More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+                          type: string
+                        name:
+                          description: |-
+                            Name of the referent.
+                            More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                          type: string
+                        namespace:
+                          description: |-
+                            Namespace of the referent.
+                            More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/
+                          type: string
+                        resourceVersion:
+                          description: |-
+                            Specific resourceVersion to which this reference is made, if any.
+                            More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency
+                          type: string
+                        uid:
+                          description: |-
+                            UID of the referent.
+                            More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#uids
+                          type: string
+                      type: object
+                      x-kubernetes-map-type: atomic
+                    type: array
+                    x-kubernetes-list-type: atomic
+                  uid:
+                    description: |-
+                      UID of the referent.
+                      More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#uids
+                    type: string
+                type: object
+                x-kubernetes-map-type: atomic
+              machineConfigSelector:
+                description: |-
+                  machineConfigSelector specifies a label selector for MachineConfigs.
+                  Refer https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/ on how label and selectors work.
+                properties:
+                  matchExpressions:
+                    description: matchExpressions is a list of label selector requirements.
+                      The requirements are ANDed.
+                    items:
+                      description: |-
+                        A label selector requirement is a selector that contains values, a key, and an operator that
+                        relates the key and values.
+                      properties:
+                        key:
+                          description: key is the label key that the selector applies
+                            to.
+                          type: string
+                        operator:
+                          description: |-
+                            operator represents a key's relationship to a set of values.
+                            Valid operators are In, NotIn, Exists and DoesNotExist.
+                          type: string
+                        values:
+                          description: |-
+                            values is an array of string values. If the operator is In or NotIn,
+                            the values array must be non-empty. If the operator is Exists or DoesNotExist,
+                            the values array must be empty. This array is replaced during a strategic
+                            merge patch.
+                          items:
+                            type: string
+                          type: array
+                          x-kubernetes-list-type: atomic
+                      required:
+                      - key
+                      - operator
+                      type: object
+                    type: array
+                    x-kubernetes-list-type: atomic
+                  matchLabels:
+                    additionalProperties:
+                      type: string
+                    description: |-
+                      matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
+                      map is equivalent to an element of matchExpressions, whose key field is "key", the
+                      operator is "In", and the values array contains only "value". The requirements are ANDed.
+                    type: object
+                type: object
+                x-kubernetes-map-type: atomic
+              maxUnavailable:
+                anyOf:
+                - type: integer
+                - type: string
+                description: |-
+                  maxUnavailable defines either an integer number or percentage
+                  of nodes in the pool that can go Unavailable during an update.
+                  This includes nodes Unavailable for any reason, including user
+                  initiated cordons, failing nodes, etc. The default value is 1.
+
+                  A value larger than 1 will mean multiple nodes going unavailable during
+                  the update, which may affect your workload stress on the remaining nodes.
+                  You cannot set this value to 0 to stop updates (it will default back to 1);
+                  to stop updates, use the 'paused' property instead. Drain will respect
+                  Pod Disruption Budgets (PDBs) such as etcd quorum guards, even if
+                  maxUnavailable is greater than one.
+                x-kubernetes-int-or-string: true
+              nodeSelector:
+                description: nodeSelector specifies a label selector for Machines
+                properties:
+                  matchExpressions:
+                    description: matchExpressions is a list of label selector requirements.
+                      The requirements are ANDed.
+                    items:
+                      description: |-
+                        A label selector requirement is a selector that contains values, a key, and an operator that
+                        relates the key and values.
+                      properties:
+                        key:
+                          description: key is the label key that the selector applies
+                            to.
+                          type: string
+                        operator:
+                          description: |-
+                            operator represents a key's relationship to a set of values.
+                            Valid operators are In, NotIn, Exists and DoesNotExist.
+                          type: string
+                        values:
+                          description: |-
+                            values is an array of string values. If the operator is In or NotIn,
+                            the values array must be non-empty. If the operator is Exists or DoesNotExist,
+                            the values array must be empty. This array is replaced during a strategic
+                            merge patch.
+                          items:
+                            type: string
+                          type: array
+                          x-kubernetes-list-type: atomic
+                      required:
+                      - key
+                      - operator
+                      type: object
+                    type: array
+                    x-kubernetes-list-type: atomic
+                  matchLabels:
+                    additionalProperties:
+                      type: string
+                    description: |-
+                      matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
+                      map is equivalent to an element of matchExpressions, whose key field is "key", the
+                      operator is "In", and the values array contains only "value". The requirements are ANDed.
+                    type: object
+                type: object
+                x-kubernetes-map-type: atomic
+              paused:
+                description: |-
+                  paused specifies whether or not changes to this machine config pool should be stopped.
+                  This includes generating new desiredMachineConfig and update of machines.
+                type: boolean
+              pinnedImageSets:
+                description: |-
+                  pinnedImageSets specifies a sequence of PinnedImageSetRef objects for the
+                  pool. Nodes within this pool will preload and pin images defined in the
+                  PinnedImageSet. Before pulling images the MachineConfigDaemon will ensure
+                  the total uncompressed size of all the images does not exceed available
+                  resources. If the total size of the images exceeds the available
+                  resources the controller will report a Degraded status to the
+                  MachineConfigPool and not attempt to pull any images. Also to help ensure
+                  the kubelet can mitigate storage risk, the pinned_image configuration and
+                  subsequent service reload will happen only after all of the images have
+                  been pulled for each set. Images from multiple PinnedImageSets are loaded
+                  and pinned sequentially as listed. Duplicate and existing images will be
+                  skipped.
+
+                  Any failure to prefetch or pin images will result in a Degraded pool.
+                  Resolving these failures is the responsibility of the user. The admin
+                  should be proactive in ensuring adequate storage and proper image
+                  authentication exists in advance.
+                items:
+                  properties:
+                    name:
+                      description: |-
+                        name is a reference to the name of a PinnedImageSet.  Must adhere to
+                        RFC-1123 (https://tools.ietf.org/html/rfc1123).
+                        Made up of one of more period-separated (.) segments, where each segment
+                        consists of alphanumeric characters and hyphens (-), must begin and end
+                        with an alphanumeric character, and is at most 63 characters in length.
+                        The total length of the name must not exceed 253 characters.
+                      maxLength: 253
+                      minLength: 1
+                      pattern: ^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])(\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]{0,61}[a-zA-Z0-9]))*$
+                      type: string
+                  required:
+                  - name
+                  type: object
+                maxItems: 100
+                type: array
+                x-kubernetes-list-map-keys:
+                - name
+                x-kubernetes-list-type: map
+            type: object
+          status:
+            description: status contains observed information about the machine config
+              pool.
+            properties:
+              certExpirys:
+                description: certExpirys keeps track of important certificate expiration
+                  data
+                items:
+                  description: ceryExpiry contains the bundle name and the expiry
+                    date
+                  properties:
+                    bundle:
+                      description: bundle is the name of the bundle in which the subject
+                        certificate resides
+                      type: string
+                    expiry:
+                      description: expiry is the date after which the certificate
+                        will no longer be valid
+                      format: date-time
+                      type: string
+                    subject:
+                      description: subject is the subject of the certificate
+                      type: string
+                  required:
+                  - bundle
+                  - subject
+                  type: object
+                type: array
+                x-kubernetes-list-type: atomic
+              conditions:
+                description: conditions represents the latest available observations
+                  of current state.
+                items:
+                  description: MachineConfigPoolCondition contains condition information
+                    for an MachineConfigPool.
+                  properties:
+                    lastTransitionTime:
+                      description: |-
+                        lastTransitionTime is the timestamp corresponding to the last status
+                        change of this condition.
+                      format: date-time
+                      nullable: true
+                      type: string
+                    message:
+                      description: |-
+                        message is a human readable description of the details of the last
+                        transition, complementing reason.
+                      type: string
+                    reason:
+                      description: |-
+                        reason is a brief machine readable explanation for the condition's last
+                        transition.
+                      type: string
+                    status:
+                      description: status of the condition, one of ('True', 'False',
+                        'Unknown').
+                      type: string
+                    type:
+                      description: type of the condition, currently ('Done', 'Updating',
+                        'Failed').
+                      type: string
+                  type: object
+                type: array
+                x-kubernetes-list-type: atomic
+              configuration:
+                description: configuration represents the current MachineConfig object
+                  for the machine config pool.
+                properties:
+                  apiVersion:
+                    description: API version of the referent.
+                    type: string
+                  fieldPath:
+                    description: |-
+                      If referring to a piece of an object instead of an entire object, this string
+                      should contain a valid JSON/Go field access statement, such as desiredState.manifest.containers[2].
+                      For example, if the object reference is to a container within a pod, this would take on a value like:
+                      "spec.containers{name}" (where "name" refers to the name of the container that triggered
+                      the event) or if no container name is specified "spec.containers[2]" (container with
+                      index 2 in this pod). This syntax is chosen only to have some well-defined way of
+                      referencing a part of an object.
+                    type: string
+                  kind:
+                    description: |-
+                      Kind of the referent.
+                      More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+                    type: string
+                  name:
+                    description: |-
+                      Name of the referent.
+                      More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                    type: string
+                  namespace:
+                    description: |-
+                      Namespace of the referent.
+                      More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/
+                    type: string
+                  resourceVersion:
+                    description: |-
+                      Specific resourceVersion to which this reference is made, if any.
+                      More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency
+                    type: string
+                  source:
+                    description: source is the list of MachineConfig objects that
+                      were used to generate the single MachineConfig object specified
+                      in `content`.
+                    items:
+                      description: ObjectReference contains enough information to
+                        let you inspect or modify the referred object.
+                      properties:
+                        apiVersion:
+                          description: API version of the referent.
+                          type: string
+                        fieldPath:
+                          description: |-
+                            If referring to a piece of an object instead of an entire object, this string
+                            should contain a valid JSON/Go field access statement, such as desiredState.manifest.containers[2].
+                            For example, if the object reference is to a container within a pod, this would take on a value like:
+                            "spec.containers{name}" (where "name" refers to the name of the container that triggered
+                            the event) or if no container name is specified "spec.containers[2]" (container with
+                            index 2 in this pod). This syntax is chosen only to have some well-defined way of
+                            referencing a part of an object.
+                          type: string
+                        kind:
+                          description: |-
+                            Kind of the referent.
+                            More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+                          type: string
+                        name:
+                          description: |-
+                            Name of the referent.
+                            More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                          type: string
+                        namespace:
+                          description: |-
+                            Namespace of the referent.
+                            More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/
+                          type: string
+                        resourceVersion:
+                          description: |-
+                            Specific resourceVersion to which this reference is made, if any.
+                            More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency
+                          type: string
+                        uid:
+                          description: |-
+                            UID of the referent.
+                            More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#uids
+                          type: string
+                      type: object
+                      x-kubernetes-map-type: atomic
+                    type: array
+                    x-kubernetes-list-type: atomic
+                  uid:
+                    description: |-
+                      UID of the referent.
+                      More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#uids
+                    type: string
+                type: object
+                x-kubernetes-map-type: atomic
+              degradedMachineCount:
+                description: |-
+                  degradedMachineCount represents the total number of machines marked degraded (or unreconcilable).
+                  A node is marked degraded if applying a configuration failed..
+                format: int32
+                type: integer
+              machineCount:
+                description: machineCount represents the total number of machines
+                  in the machine config pool.
+                format: int32
+                type: integer
+              observedGeneration:
+                description: observedGeneration represents the generation observed
+                  by the controller.
+                format: int64
+                type: integer
+              poolSynchronizersStatus:
+                description: poolSynchronizersStatus is the status of the machines
+                  managed by the pool synchronizers.
+                items:
+                  properties:
+                    availableMachineCount:
+                      description: availableMachineCount is the number of machines
+                        managed by the node synchronizer which are available.
+                      format: int64
+                      minimum: 0
+                      type: integer
+                    machineCount:
+                      description: machineCount is the number of machines that are
+                        managed by the node synchronizer.
+                      format: int64
+                      minimum: 0
+                      type: integer
+                    observedGeneration:
+                      description: observedGeneration is the last generation change
+                        that has been applied.
+                      format: int64
+                      minimum: 0
+                      type: integer
+                      x-kubernetes-validations:
+                      - message: observedGeneration must not move backwards except
+                          to zero
+                        rule: self >= oldSelf || (self == 0 && oldSelf > 0)
+                    poolSynchronizerType:
+                      description: poolSynchronizerType describes the type of the
+                        pool synchronizer.
+                      enum:
+                      - PinnedImageSets
+                      maxLength: 256
+                      type: string
+                    readyMachineCount:
+                      description: readyMachineCount is the number of machines managed
+                        by the node synchronizer that are in a ready state.
+                      format: int64
+                      minimum: 0
+                      type: integer
+                    unavailableMachineCount:
+                      description: unavailableMachineCount is the number of machines
+                        managed by the node synchronizer but are unavailable.
+                      format: int64
+                      minimum: 0
+                      type: integer
+                    updatedMachineCount:
+                      description: updatedMachineCount is the number of machines that
+                        have been updated by the node synchronizer.
+                      format: int64
+                      minimum: 0
+                      type: integer
+                  required:
+                  - availableMachineCount
+                  - machineCount
+                  - poolSynchronizerType
+                  - readyMachineCount
+                  - unavailableMachineCount
+                  - updatedMachineCount
+                  type: object
+                  x-kubernetes-validations:
+                  - message: machineCount must be greater than or equal to updatedMachineCount
+                    rule: self.machineCount >= self.updatedMachineCount
+                  - message: machineCount must be greater than or equal to availableMachineCount
+                    rule: self.machineCount >= self.availableMachineCount
+                  - message: machineCount must be greater than or equal to unavailableMachineCount
+                    rule: self.machineCount >= self.unavailableMachineCount
+                  - message: machineCount must be greater than or equal to readyMachineCount
+                    rule: self.machineCount >= self.readyMachineCount
+                  - message: availableMachineCount must be greater than or equal to
+                      readyMachineCount
+                    rule: self.availableMachineCount >= self.readyMachineCount
+                type: array
+                x-kubernetes-list-map-keys:
+                - poolSynchronizerType
+                x-kubernetes-list-type: map
+              readyMachineCount:
+                description: readyMachineCount represents the total number of ready
+                  machines targeted by the pool.
+                format: int32
+                type: integer
+              unavailableMachineCount:
+                description: |-
+                  unavailableMachineCount represents the total number of unavailable (non-ready) machines targeted by the pool.
+                  A node is marked unavailable if it is in updating state or NodeReady condition is false.
+                format: int32
+                type: integer
+              updatedMachineCount:
+                description: updatedMachineCount represents the total number of machines
+                  targeted by the pool that have the CurrentMachineConfig as their
+                  config.
+                format: int32
+                type: integer
+            type: object
+        required:
+        - spec
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}

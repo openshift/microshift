@@ -1,0 +1,101 @@
+apiVersion: apiextensions.k8s.io/v1 # Hack because controller-gen complains if we don't have this
+name: "MachineConfiguration"
+crdName: machineconfigurations.operator.openshift.io
+featureGates:
+  - IrreconcilableMachineConfig
+tests:
+  onCreate:
+    - name: Should be able to create a minimal MachineConfiguration
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: MachineConfiguration
+        spec: {} # No spec is required for a MachineConfiguration
+      expected: |
+        apiVersion: operator.openshift.io/v1
+        kind: MachineConfiguration
+        spec:
+          logLevel: Normal
+          operatorLogLevel: Normal
+    - name: Should be able to create a IrreconcilableValidationOverrides configuration knob that enables all overrides
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: MachineConfiguration
+        spec:
+          irreconcilableValidationOverrides:
+            storage:
+              - Disks
+              - FileSystems
+              - Raid
+      expected: |
+        apiVersion: operator.openshift.io/v1
+        kind: MachineConfiguration
+        spec:
+          logLevel: Normal
+          operatorLogLevel: Normal
+          irreconcilableValidationOverrides:
+            storage:
+              - Disks
+              - FileSystems
+              - Raid
+    - name: Should be able to create a IrreconcilableValidationOverrides configuration knob that only enables a set of overrides
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: MachineConfiguration
+        spec:
+          irreconcilableValidationOverrides:
+            storage:
+              - Disks
+              - FileSystems
+      expected: |
+        apiVersion: operator.openshift.io/v1
+        kind: MachineConfiguration
+        spec:
+          logLevel: Normal
+          operatorLogLevel: Normal
+          irreconcilableValidationOverrides:
+            storage:
+              - Disks
+              - FileSystems
+    - name: Should not be able to create a IrreconcilableValidationOverrides with invalid storage override values
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: MachineConfiguration
+        spec:
+          irreconcilableValidationOverrides:
+            storage:
+              - Disks
+              - invalid
+      expectedError: "spec.irreconcilableValidationOverrides.storage[1]: Unsupported value: \"invalid\": supported values: \"Disks\", \"FileSystems\", \"Raid\""
+
+    - name: Should not be able to set set duplicated elements in the storage section of IrreconcilableValidationOverrides.
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: MachineConfiguration
+        spec:
+          irreconcilableValidationOverrides:
+            storage:
+              - Disks
+              - FileSystems
+              - Disks
+      expectedError: "spec.irreconcilableValidationOverrides.storage[2]: Duplicate value: \"Disks\""
+  onUpdate:
+    - name: Should be able to remove the irreconcilableValidationOverrides and restore the default behavior.
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: MachineConfiguration
+        spec:
+          irreconcilableValidationOverrides:
+            storage:
+              - Disks
+              - FileSystems
+              - Raid
+      updated: |
+        apiVersion: operator.openshift.io/v1
+        kind: MachineConfiguration
+        spec: {}
+      expected: |
+        apiVersion: operator.openshift.io/v1
+        kind: MachineConfiguration
+        spec:
+          logLevel: Normal
+          operatorLogLevel: Normal

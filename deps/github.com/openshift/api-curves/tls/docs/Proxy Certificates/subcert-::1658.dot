@@ -1,0 +1,16 @@
+digraph "Local Certificate" {
+  // Node definitions.
+  11 [
+    label="certkeypair/::1658\n\nsecret/pprof-cert -nopenshift-operator-lifecycle-manager\n"
+    style=filled
+    fillcolor="#c8fbcd"
+  ];
+  12 [
+    label="certkeypair/::7981676500072753307\n\nsecret/packageserver-service-cert -nopenshift-operator-lifecycle-manager\n"
+    style=filled
+    fillcolor="#fffdb8"
+  ];
+
+  // Edge definitions.
+  12 -> 11;
+}

@@ -1,0 +1,127 @@
+apiVersion: apiextensions.k8s.io/v1 # Hack because controller-gen complains if we don't have this
+name: "APIServer"
+crdName: apiservers.config.openshift.io
+featureGates:
+  - KMSEncryptionProvider
+tests:
+  onCreate:
+    - name: Should be able to create encrypt with KMS for AWS with valid values
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: APIServer
+        spec:
+          encryption:
+            type: KMS
+            kms:
+              type: AWS
+              aws:
+                keyARN: arn:aws:kms:us-east-1:101010101010:key/9a512e29-0d9c-4cf5-8174-fc1a5b22cd6a
+                region: us-east-1
+      expected: |
+        apiVersion: config.openshift.io/v1
+        kind: APIServer
+        spec:
+          audit:
+            profile: Default
+          encryption:
+            type: KMS
+            kms:
+              type: AWS
+              aws:
+                keyARN: arn:aws:kms:us-east-1:101010101010:key/9a512e29-0d9c-4cf5-8174-fc1a5b22cd6a
+                region: us-east-1
+    - name: Should fail to create encrypt with KMS for AWS without region
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: APIServer
+        spec:
+          encryption:
+            type: KMS
+            kms:
+              type: AWS
+              aws:
+                keyARN: arn:aws:kms:us-east-1:101010101010:key/9a512e29-0d9c-4cf5-8174-fc1a5b22cd6a
+      expectedError: "spec.encryption.kms.aws.region: Required value"
+    - name: Should not allow kms config with encrypt aescbc
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: APIServer
+        spec:
+          encryption:
+            type: aescbc
+            kms:
+              type: AWS
+              aws:
+                keyARN: arn:aws:kms:us-east-1:101010101010:key/9a512e29-0d9c-4cf5-8174-fc1a5b22cd6a
+                region: us-east-1
+      expectedError: "kms config is required when encryption type is KMS, and forbidden otherwise"
+    - name: Should fail to create with an empty KMS config
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: APIServer
+        spec:
+          encryption:
+            type: KMS
+            kms: {}
+      expectedError: "spec.encryption.kms.type: Required value"
+    - name: Should fail to create with kms type AWS but without aws config
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: APIServer
+        spec:
+          encryption:
+            type: KMS
+            kms:
+              type: AWS
+      expectedError: "aws config is required when kms provider type is AWS, and forbidden otherwise"
+    - name: Should fail to create AWS KMS without a keyARN
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: APIServer
+        spec:
+          encryption:
+            type: KMS
+            kms:
+              type: AWS
+              aws:
+                region: us-east-1
+      expectedError: "spec.encryption.kms.aws.keyARN: Required value"
+    - name: Should fail to create AWS KMS with invalid keyARN format
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: APIServer
+        spec:
+          encryption:
+            type: KMS
+            kms:
+              type: AWS
+              aws:
+                keyARN: not-a-kms-arn
+                region: us-east-1
+      expectedError: "keyARN must follow the format `arn:aws:kms:<region>:<account_id>:key/<key_id>`. The account ID must be a 12 digit number and the region and key ID should consist only of lowercase hexadecimal characters and hyphens (-)."
+    - name: Should fail to create AWS KMS with empty region
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: APIServer
+        spec:
+          encryption:
+            type: KMS
+            kms:
+              type: AWS
+              aws:
+                keyARN: arn:aws:kms:us-east-1:101010101010:key/9a512e29-0d9c-4cf5-8174-fc1a5b22cd6a
+                region: ""
+      expectedError: "spec.encryption.kms.aws.region in body should be at least 1 chars long"
+    - name: Should fail to create AWS KMS with invalid region format
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: APIServer
+        spec:
+          encryption:
+            type: KMS
+            kms:
+              type: AWS
+              aws:
+                keyARN: arn:aws:kms:us-east-1:101010101010:key/9a512e29-0d9c-4cf5-8174-fc1a5b22cd6a
+                region: "INVALID-REGION"
+      expectedError: "region must be a valid AWS region, consisting of lowercase characters, digits and hyphens (-) only."

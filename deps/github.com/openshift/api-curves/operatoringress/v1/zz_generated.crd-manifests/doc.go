@@ -1,0 +1,1 @@
+package operatoringress_v1_crdmanifests

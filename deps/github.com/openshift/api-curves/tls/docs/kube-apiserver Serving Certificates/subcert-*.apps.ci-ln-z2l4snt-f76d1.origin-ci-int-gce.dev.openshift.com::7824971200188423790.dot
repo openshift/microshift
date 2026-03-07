@@ -1,0 +1,28 @@
+digraph "Local Certificate" {
+  // Node definitions.
+  2 [
+    label="certkeypair/ingress-operator@1622133677::1\n\nsecret/router-ca -nopenshift-ingress-operator\n"
+    style=filled
+    fillcolor="#c7bfff"
+  ];
+  3 [
+    label="certkeypair/*.apps.ci-ln-z2l4snt-f76d1.origin-ci-int-gce.dev.openshift.com::7824971200188423790\n\nsecret/router-certs-default -nopenshift-ingress\n"
+    style=filled
+    fillcolor="#bdebfd"
+  ];
+  11 [
+    label="cabundle/service-account-token-ca.crt\n\nconfigmaps/serviceaccount-ca -nopenshift-kube-controller-manager\n    configmaps/serviceaccount-ca-5 -nopenshift-kube-controller-manager\n    configmaps/serviceaccount-ca-6 -nopenshift-kube-controller-manager\n    configmaps/serviceaccount-ca-7 -nopenshift-kube-controller-manager\n    configmaps/serviceaccount-ca -nopenshift-kube-scheduler\n    configmaps/serviceaccount-ca-5 -nopenshift-kube-scheduler\n    configmaps/serviceaccount-ca-6 -nopenshift-kube-scheduler\n    file:///etc/kubernetes/static-pod-resources/kube-controller-manager-pod-5/configmaps/serviceaccount-ca/ca-bundle.crt/ca-bundle.crt\n    file:///etc/kubernetes/static-pod-resources/kube-controller-manager-pod-6/configmaps/serviceaccount-ca/ca-bundle.crt/ca-bundle.crt\n    file:///etc/kubernetes/static-pod-resources/kube-controller-manager-pod-7/configmaps/serviceaccount-ca/ca-bundle.crt/ca-bundle.crt\n    file:///etc/kubernetes/static-pod-resources/kube-scheduler-pod-5/configmaps/serviceaccount-ca/ca-bundle.crt/ca-bundle.crt\n    file:///etc/kubernetes/static-pod-resources/kube-scheduler-pod-6/configmaps/serviceaccount-ca/ca-bundle.crt/ca-bundle.crt\n"
+    style=filled
+    fillcolor="#fda172"
+  ];
+  12 [
+    label="cabundle/router-wildcard-serving-ca\n\nconfigmaps/default-ingress-cert -nopenshift-config-managed\n    configmaps/default-ingress-cert -nopenshift-console\n"
+    style=filled
+    fillcolor="#fda172"
+  ];
+
+  // Edge definitions.
+  2 -> 3;
+  3 -> 11;
+  3 -> 12;
+}

@@ -1,0 +1,449 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    api-approved.openshift.io: https://github.com/openshift/api/pull/xxx
+    api.openshift.io/merged-by-featuregates: "true"
+    include.release.openshift.io/ibm-cloud-managed: "true"
+    include.release.openshift.io/self-managed-high-availability: "true"
+    release.openshift.io/feature-set: TechPreviewNoUpgrade
+  name: stableconfigtypes.example.openshift.io
+spec:
+  group: example.openshift.io
+  names:
+    kind: StableConfigType
+    listKind: StableConfigTypeList
+    plural: stableconfigtypes
+    singular: stableconfigtype
+  scope: Cluster
+  versions:
+  - name: v1
+    schema:
+      openAPIV3Schema:
+        description: |-
+          StableConfigType is a stable config type that may include TechPreviewNoUpgrade fields.
+
+          Compatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).
+        properties:
+          apiVersion:
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+            type: string
+          kind:
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: spec is the specification of the desired behavior of the
+              StableConfigType.
+            properties:
+              celUnion:
+                description: celUnion demonstrates how to validate a discrminated
+                  union using CEL
+                properties:
+                  optionalMember:
+                    description: optionalMember is a union member that is optional.
+                    type: string
+                  requiredMember:
+                    description: requiredMember is a union member that is required.
+                    type: string
+                  type:
+                    description: type determines which of the union members should
+                      be populated.
+                    enum:
+                    - RequiredMember
+                    - OptionalMember
+                    - EmptyMember
+                    type: string
+                required:
+                - type
+                type: object
+                x-kubernetes-validations:
+                - message: requiredMember is required when type is RequiredMember,
+                    and forbidden otherwise
+                  rule: 'has(self.type) && self.type == ''RequiredMember'' ?  has(self.requiredMember)
+                    : !has(self.requiredMember)'
+                - message: optionalMember is forbidden when type is not OptionalMember
+                  rule: 'has(self.type) && self.type == ''OptionalMember'' ?  true
+                    : !has(self.optionalMember)'
+              coolNewField:
+                description: coolNewField is a field that is for tech preview only.  On
+                  normal clusters this shouldn't be present
+                type: string
+              evolvingCollection:
+                description: |-
+                  evolvingCollection demonstrates how to have a collection where the maximum number of items varies on cluster type.
+                  For default clusters, this will be "1" but on TechPreview clusters, this value will be "3".
+                items:
+                  type: string
+                maxItems: 3
+                type: array
+                x-kubernetes-list-type: atomic
+              evolvingUnion:
+                description: evolvingUnion demonstrates how to phase in new values
+                  into discriminated union
+                properties:
+                  type:
+                    description: type is the discriminator. It has different values
+                      for Default and for TechPreviewNoUpgrade
+                    enum:
+                    - ""
+                    - StableValue
+                    - TechPreviewOnlyValue
+                    type: string
+                required:
+                - type
+                type: object
+              formatMarkerExamples:
+                description: |-
+                  formatMarkerExamples demonstrates all Kubebuilder Format markers supported as of Kubernetes 1.33.
+                  This field serves as a comprehensive reference for format marker validation.
+                properties:
+                  base64Data:
+                    description: |-
+                      base64Data must be valid base64-encoded data.
+                      Valid examples include aGVsbG8= (encodes "hello") or SGVsbG8gV29ybGQh (encodes "Hello World!").
+                    format: byte
+                    maxLength: 2048
+                    minLength: 1
+                    type: string
+                  cidrNotation:
+                    description: |-
+                      cidrNotation must be a valid CIDR notation IP address range.
+                      Valid examples include IPv4 CIDR (10.0.0.0/8, 192.168.1.0/24) or IPv6 CIDR (fd00::/8, 2001:db8::/32).
+
+                      Use of Format=cidr is not recommended due to CVE-2021-29923 and CVE-2024-24790.
+                      Instead, use the CEL expression `isCIDR(self)` to validate CIDR notation.
+                      Additionally, use `isCIDR(self) && cidr(self).ip().family() == X` to validate IPvX specifically.
+                    format: cidr
+                    maxLength: 49
+                    minLength: 1
+                    type: string
+                  dateField:
+                    description: |-
+                      dateField must be a valid date in RFC 3339 full-date format (YYYY-MM-DD).
+                      Valid examples include 2024-01-15 or 2023-12-31.
+                    format: date
+                    maxLength: 10
+                    minLength: 10
+                    type: string
+                  dateTimeField:
+                    description: |-
+                      dateTimeField must be a valid RFC 3339 date-time.
+                      Valid examples include 2024-01-15T14:30:00Z, 2024-01-15T14:30:00+00:00, or 2024-01-15T14:30:00.123Z.
+                    format: date-time
+                    maxLength: 35
+                    minLength: 20
+                    type: string
+                  durationField:
+                    description: |-
+                      durationField must be a valid duration string parseable by Go's time.ParseDuration.
+                      Valid time units are ns, us (or µs), ms, s, m, h.
+                      Valid examples include 30s, 5m, 1h30m, 100ms, or 1h.
+                    format: duration
+                    maxLength: 255
+                    minLength: 1
+                    type: string
+                  emailAddress:
+                    description: |-
+                      emailAddress must be a valid email address.
+                      Valid examples include user@example.com or firstname.lastname@company.co.uk.
+                    format: email
+                    maxLength: 254
+                    minLength: 1
+                    type: string
+                  hostnameField:
+                    description: |-
+                      hostnameField must be a valid Internet hostname per RFC 1034.
+                      Valid examples include example.com, api.example.com, or my-service.
+                    format: hostname
+                    maxLength: 253
+                    minLength: 1
+                    type: string
+                  ipv4Address:
+                    description: |-
+                      ipv4Address must be a valid IPv4 address in dotted-quad notation.
+                      Valid values range from 0.0.0.0 to 255.255.255.255 (e.g., 192.168.1.1).
+
+                      Use of Format=ipv4 is not recommended due to CVE-2021-29923 and CVE-2024-24790.
+                      Instead, use the CEL expression `isIP(self) && ip(self).family() == 4` to validate IPv4 addresses.
+                    format: ipv4
+                    maxLength: 15
+                    minLength: 1
+                    type: string
+                  ipv6Address:
+                    description: |-
+                      ipv6Address must be a valid IPv6 address.
+                      Valid examples include full form (2001:0db8:0000:0000:0000:0000:0000:0001) or compressed form (2001:db8::1 or ::1).
+
+                      Use of Format=ipv6 is not recommended due to CVE-2021-29923 and CVE-2024-24790.
+                      Instead, use the CEL expression `isIP(self) && ip(self).family() == 6` to validate IPv6 addresses.
+                    format: ipv6
+                    maxLength: 45
+                    minLength: 1
+                    type: string
+                  macAddress:
+                    description: |-
+                      macAddress must be a valid MAC address.
+                      Valid examples include 00:1A:2B:3C:4D:5E or 00-1A-2B-3C-4D-5E.
+                    format: mac
+                    maxLength: 17
+                    minLength: 1
+                    type: string
+                  passwordField:
+                    description: |-
+                      passwordField is a marker for sensitive data.
+                      Note that the password format marker does not perform any actual validation - it accepts any string value.
+                      This marker is primarily used to signal that the field contains sensitive information.
+                    format: password
+                    maxLength: 255
+                    minLength: 1
+                    type: string
+                  uriField:
+                    description: |-
+                      uriField must be a valid URI following RFC 3986 syntax.
+                      Valid examples include https://example.com/path?query=value or /absolute-path.
+                    format: uri
+                    maxLength: 2048
+                    minLength: 1
+                    type: string
+                  uuid3Field:
+                    description: |-
+                      uuid3Field must be a valid UUID version 3 (MD5 hash-based).
+                      Version 3 UUIDs are generated using MD5 hashing of a namespace and name.
+                      Valid example: a3bb189e-8bf9-3888-9912-ace4e6543002.
+                    format: uuid3
+                    maxLength: 36
+                    minLength: 36
+                    type: string
+                  uuid4Field:
+                    description: |-
+                      uuid4Field must be a valid UUID version 4 (random).
+                      Version 4 UUIDs are randomly generated.
+                      Valid example: 550e8400-e29b-41d4-a716-446655440000.
+                    format: uuid4
+                    maxLength: 36
+                    minLength: 36
+                    type: string
+                  uuid5Field:
+                    description: |-
+                      uuid5Field must be a valid UUID version 5 (SHA-1 hash-based).
+                      Version 5 UUIDs are generated using SHA-1 hashing of a namespace and name.
+                      Valid example: 74738ff5-5367-5958-9aee-98fffdcd1876.
+                    format: uuid5
+                    maxLength: 36
+                    minLength: 36
+                    type: string
+                  uuidField:
+                    description: |-
+                      uuidField must be a valid UUID (any version) in 8-4-4-4-12 format.
+                      Valid examples include 550e8400-e29b-41d4-a716-446655440000 or 123e4567-e89b-12d3-a456-426614174000.
+                    format: uuid
+                    maxLength: 36
+                    minLength: 36
+                    type: string
+                type: object
+              immutableField:
+                description: |-
+                  immutableField is a field that is immutable once the object has been created.
+                  It is required at all times.
+                type: string
+                x-kubernetes-validations:
+                - message: immutableField is immutable
+                  rule: self == oldSelf
+              nonZeroDefault:
+                default: 8
+                description: |-
+                  nonZeroDefault is a demonstration of creating an integer field that has a non zero default.
+                  It required two default tags (one for CRD generation, one for client generation) and must have `omitempty` and be optional.
+                  A minimum value is added to demonstrate that a zero value would not be accepted.
+                format: int32
+                minimum: 8
+                type: integer
+              optionalImmutableField:
+                description: |-
+                  optionalImmutableField is a field that is immutable once set.
+                  It is optional but may not be changed once set.
+                type: string
+                x-kubernetes-validations:
+                - message: optionalImmutableField is immutable once set
+                  rule: oldSelf == '' || self == oldSelf
+              set:
+                description: set demonstrates how to define and validate set of strings
+                items:
+                  description: SetValue defines the types allowed in string set type
+                  enum:
+                  - Foo
+                  - Bar
+                  - Baz
+                  - Qux
+                  - Corge
+                  type: string
+                maxItems: 5
+                type: array
+                x-kubernetes-list-type: set
+                x-kubernetes-validations:
+                - rule: self.all(x,self.exists_one(y,x == y))
+              stableField:
+                description: |-
+                  stableField is a field that is present on default clusters and on tech preview clusters
+
+                  If empty, the platform will choose a good default, which may change over time without notice.
+                type: string
+              subdomainNameField:
+                description: |-
+                  subdomainNameField represents a kubenetes name field.
+                  The intention is that it validates the name in the same way metadata.Name is validated.
+                  That is, it is a DNS-1123 subdomain.
+                maxLength: 253
+                type: string
+                x-kubernetes-validations:
+                - message: a lowercase RFC 1123 subdomain must consist of lower case
+                    alphanumeric characters, '-' or '.', and must start and end with
+                    an alphanumeric character.
+                  rule: '!format.dns1123Subdomain().validate(self).hasValue()'
+              subnetsWithExclusions:
+                description: subnetsWithExclusions demonstrates how to validate a
+                  list of subnets with exclusions
+                properties:
+                  excludeSubnets:
+                    description: |-
+                      excludeSubnets is a list of CIDR exclusions.
+                      The subnets in this list must be subnetworks of the subnets in the subnets list.
+                    items:
+                      description: |-
+                        CIDR is used to validate a CIDR notation network.
+                        The longest CIDR notation is 43 characters.
+                      maxLength: 43
+                      type: string
+                      x-kubernetes-validations:
+                      - message: value must be a valid CIDR
+                        rule: isCIDR(self)
+                    maxItems: 25
+                    type: array
+                    x-kubernetes-list-type: atomic
+                  subnets:
+                    description: |-
+                      subnets is a list of subnets.
+                      It may contain up to 2 subnets.
+                      The list may be either 1 IPv4 subnet, 1 IPv6 subnet, or 1 of each.
+                    items:
+                      description: |-
+                        CIDR is used to validate a CIDR notation network.
+                        The longest CIDR notation is 43 characters.
+                      maxLength: 43
+                      type: string
+                      x-kubernetes-validations:
+                      - message: value must be a valid CIDR
+                        rule: isCIDR(self)
+                    maxItems: 2
+                    minItems: 1
+                    type: array
+                    x-kubernetes-list-type: atomic
+                    x-kubernetes-validations:
+                    - message: subnets must not contain 2 subnets of the same IP family
+                      rule: size(self) != 2 || !isCIDR(self[0]) || !isCIDR(self[1])
+                        || cidr(self[0]).ip().family() != cidr(self[1]).ip().family()
+                required:
+                - subnets
+                type: object
+                x-kubernetes-validations:
+                - fieldPath: .excludeSubnets
+                  message: excludeSubnets must be subnetworks of the networks specified
+                    in the subnets field
+                  rule: '!has(self.excludeSubnets) || self.excludeSubnets.all(e, self.subnets.exists(s,
+                    cidr(s).containsCIDR(cidr(e))))'
+            required:
+            - immutableField
+            type: object
+            x-kubernetes-validations:
+            - message: coolNewField may not be removed once set
+              rule: 'has(oldSelf.coolNewField) ? has(self.coolNewField) : true'
+          status:
+            description: status is the most recently observed status of the StableConfigType.
+            properties:
+              conditions:
+                description: |-
+                  Represents the observations of a foo's current state.
+                  Known .status.conditions.type are: "Available", "Progressing", and "Degraded"
+                items:
+                  description: Condition contains details for one aspect of the current
+                    state of this API Resource.
+                  properties:
+                    lastTransitionTime:
+                      description: |-
+                        lastTransitionTime is the last time the condition transitioned from one status to another.
+                        This should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.
+                      format: date-time
+                      type: string
+                    message:
+                      description: |-
+                        message is a human readable message indicating details about the transition.
+                        This may be an empty string.
+                      maxLength: 32768
+                      type: string
+                    observedGeneration:
+                      description: |-
+                        observedGeneration represents the .metadata.generation that the condition was set based upon.
+                        For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
+                        with respect to the current state of the instance.
+                      format: int64
+                      minimum: 0
+                      type: integer
+                    reason:
+                      description: |-
+                        reason contains a programmatic identifier indicating the reason for the condition's last transition.
+                        Producers of specific condition types may define expected values and meanings for this field,
+                        and whether the values are considered a guaranteed API.
+                        The value should be a CamelCase string.
+                        This field may not be empty.
+                      maxLength: 1024
+                      minLength: 1
+                      pattern: ^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$
+                      type: string
+                    status:
+                      description: status of the condition, one of True, False, Unknown.
+                      enum:
+                      - "True"
+                      - "False"
+                      - Unknown
+                      type: string
+                    type:
+                      description: type of condition in CamelCase or in foo.example.com/CamelCase.
+                      maxLength: 316
+                      pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$
+                      type: string
+                  required:
+                  - lastTransitionTime
+                  - message
+                  - reason
+                  - status
+                  - type
+                  type: object
+                type: array
+                x-kubernetes-list-map-keys:
+                - type
+                x-kubernetes-list-type: map
+              immutableField:
+                description: |-
+                  immutableField is a field that is immutable once the object has been created.
+                  It is required at all times.
+                type: string
+                x-kubernetes-validations:
+                - message: immutableField is immutable
+                  rule: self == oldSelf
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}

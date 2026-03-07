@@ -1,0 +1,116 @@
+apiVersion: apiextensions.k8s.io/v1 # Hack because controller-gen complains if we don't have this
+name: "Image"
+crdName: images.config.openshift.io
+tests:
+  onCreate:
+    - name: Should be able to create a minimal Image
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: Image
+        spec: {} # No spec is required for a Image
+      expected: |
+        apiVersion: config.openshift.io/v1
+        kind: Image
+        spec: {}
+  onUpdate:
+    - name: Should allow updating other fields with an invalid persisted registrySources in spec
+      initialCRDPatches:
+        - op: remove
+          path: /spec/versions/0/schema/openAPIV3Schema/properties/spec/properties/registrySources/x-kubernetes-validations
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: Image
+        spec:
+          registrySources:
+            blockedRegistries: ["test"]
+            allowedRegistries: ["test"]
+      updated: |
+        apiVersion: config.openshift.io/v1
+        kind: Image
+        spec:
+          # imageStreamImportMode: Legacy
+          externalRegistryHostnames: ["test"]
+          registrySources:
+            blockedRegistries: ["test"]
+            allowedRegistries: ["test"]
+      expected: |
+        apiVersion: config.openshift.io/v1
+        kind: Image
+        spec:
+          # imageStreamImportMode: Legacy
+          externalRegistryHostnames: ["test"]
+          registrySources:
+            blockedRegistries: ["test"]
+            allowedRegistries: ["test"]
+    - name: Should allow removing one of blockedRegistries or allowedRegistries with an invalid persisted registrySources in spec
+      initialCRDPatches:
+        - op: remove
+          path: /spec/versions/0/schema/openAPIV3Schema/properties/spec/properties/registrySources/x-kubernetes-validations
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: Image
+        spec:
+          registrySources:
+            blockedRegistries: ["test"]
+            allowedRegistries: ["test"]
+      updated: |
+        apiVersion: config.openshift.io/v1
+        kind: Image
+        spec:
+          registrySources:
+            allowedRegistries: ["test"]
+      expected: |
+        apiVersion: config.openshift.io/v1
+        kind: Image
+        spec:
+          registrySources:
+            allowedRegistries: ["test"]
+    - name: Should not allow adding another slice entry with an invalid persisted registrySources in spec
+      initialCRDPatches:
+        - op: remove
+          path: /spec/versions/0/schema/openAPIV3Schema/properties/spec/properties/registrySources/x-kubernetes-validations
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: Image
+        spec:
+          registrySources:
+            blockedRegistries: ["test"]
+            allowedRegistries: ["test"]
+      updated: |
+        apiVersion: config.openshift.io/v1
+        kind: Image
+        spec:
+          registrySources:
+            blockedRegistries: ["test", "test2"]
+            allowedRegistries: ["test"]
+      expectedError: 'Only one of blockedRegistries or allowedRegistries may be set'
+    - name: Should not allow adding blockedRegistries field when a valid registrySources with allowedRegistries is persisted in spec
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: Image
+        spec:
+          registrySources:
+            allowedRegistries: ["test"]
+      updated: |
+        apiVersion: config.openshift.io/v1
+        kind: Image
+        spec:
+          registrySources:
+            allowedRegistries: ["test"]
+            blockedRegistries: ["test"]
+      expectedError: 'Only one of blockedRegistries or allowedRegistries may be set'
+    - name: Should not allow adding allowedRegistries field when a valid registrySources with blockedRegistries is persisted in spec
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: Image
+        spec:
+          registrySources:
+            blockedRegistries: ["test"]
+      updated: |
+        apiVersion: config.openshift.io/v1
+        kind: Image
+        spec:
+          registrySources:
+            allowedRegistries: ["test"]
+            blockedRegistries: ["test"]
+      expectedError: 'Only one of blockedRegistries or allowedRegistries may be set'

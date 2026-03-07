@@ -1,0 +1,259 @@
+apiVersion: apiextensions.k8s.io/v1 # Hack because controller-gen complains if we don't have this
+name: "IngressController"
+crdName: ingresscontrollers.operator.openshift.io
+tests:
+  onCreate:
+    - name: Should be able to create a minimal IngressController
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        spec: {} # No spec is required for a IngressController
+      expected: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        spec:
+          httpEmptyRequestsPolicy: Respond
+          idleConnectionTerminationPolicy: Immediate
+          closedClientConnectionPolicy: Continue
+    - name: Should not allow ingress controller creation if sum of number subnets name and id provided is not equal to the number of eipAllocations.
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        metadata:
+          name: eiptestnlb
+          namespace: openshift-ingress-operator
+        spec:
+          endpointPublishingStrategy:
+            loadBalancer:
+              scope: External
+              providerParameters:
+                type: AWS
+                aws:
+                  type: NLB
+                  networkLoadBalancer:
+                    subnets:
+                      ids:
+                      - subnet-0fcf8e0392f0910d5
+                      names:
+                      - subnetA
+                      - subnetB        
+                    eipAllocations:
+                    - eipalloc-1234567890abcdefa
+                    - eipalloc-1234567890abcdefb
+            type: LoadBalancerService
+      expectedError: "IngressController.operator.openshift.io \"eiptestnlb\" is invalid: spec.endpointPublishingStrategy.loadBalancer.providerParameters.aws.networkLoadBalancer: Invalid value: \"object\": number of subnets must be equal to number of eipAllocations"
+    - name: Should not allow ingress controller creation if number of subnets names provided is not equal to the number of eipAllocations.
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        metadata:
+          name: eiptestnlb
+          namespace: openshift-ingress-operator
+        spec:
+          endpointPublishingStrategy:
+            loadBalancer:
+              scope: External
+              providerParameters:
+                type: AWS
+                aws:
+                  type: NLB
+                  networkLoadBalancer:
+                    subnets:                    
+                      names:
+                      - subnetA
+                      - subnetB        
+                    eipAllocations:
+                    - eipalloc-1234567890abcdefa
+            type: LoadBalancerService
+      expectedError: "IngressController.operator.openshift.io \"eiptestnlb\" is invalid: spec.endpointPublishingStrategy.loadBalancer.providerParameters.aws.networkLoadBalancer: Invalid value: \"object\": number of subnets must be equal to number of eipAllocations"
+    - name: Should not allow ingress controller creation if number of ids provided is not equal to the number of eipAllocations.
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        metadata:
+          name: eiptestnlb
+          namespace: openshift-ingress-operator
+        spec:
+          endpointPublishingStrategy:
+            loadBalancer:
+              scope: External
+              providerParameters:
+                type: AWS
+                aws:
+                  type: NLB
+                  networkLoadBalancer:
+                    subnets:
+                      ids:
+                      - subnet-0fcf8e0392f0910d5     
+                    eipAllocations:
+                    - eipalloc-1234567890abcdefa
+                    - eipalloc-1234567890abcdefb
+            type: LoadBalancerService
+      expectedError: "IngressController.operator.openshift.io \"eiptestnlb\" is invalid: spec.endpointPublishingStrategy.loadBalancer.providerParameters.aws.networkLoadBalancer: Invalid value: \"object\": number of subnets must be equal to number of eipAllocations"
+    - name: Should allow to set NLB parameters when LBType is NLB and eipAllocations are equal to the sum of subnets names and ids.
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        metadata:
+          name: eiptestnlb
+          namespace: openshift-ingress-operator
+        spec:
+          endpointPublishingStrategy:
+            loadBalancer:
+              scope: External
+              providerParameters:
+                type: AWS
+                aws:
+                  type: NLB
+                  networkLoadBalancer:
+                    subnets:
+                      ids:
+                      - subnet-0fcf8e0392f0910d5
+                      names:
+                      - subnetA
+                      - subnetB         
+                    eipAllocations:
+                    - eipalloc-1234567890abcdefa
+                    - eipalloc-1234567890abcdefb
+                    - eipalloc-1234567890abcdefc
+            type: LoadBalancerService
+      expected: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        metadata:
+          name: eiptestnlb
+          namespace: openshift-ingress-operator
+        spec:
+          httpEmptyRequestsPolicy: Respond
+          idleConnectionTerminationPolicy: Immediate
+          closedClientConnectionPolicy: Continue
+          endpointPublishingStrategy:
+            loadBalancer:
+              dnsManagementPolicy: Managed
+              scope: External
+              providerParameters:
+                type: AWS
+                aws:
+                  type: NLB
+                  networkLoadBalancer:
+                    subnets:
+                      ids:
+                      - subnet-0fcf8e0392f0910d5
+                      names:
+                      - subnetA
+                      - subnetB         
+                    eipAllocations:
+                    - eipalloc-1234567890abcdefa
+                    - eipalloc-1234567890abcdefb
+                    - eipalloc-1234567890abcdefc
+            type: LoadBalancerService
+    - name: Should allow to set NLB parameters when LBType is NLB and eipAllocations are equal to the number of subnets names.
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        metadata:
+          name: eiptestnlb
+          namespace: openshift-ingress-operator
+        spec:
+          endpointPublishingStrategy:
+            loadBalancer:
+              scope: External
+              providerParameters:
+                type: AWS
+                aws:
+                  type: NLB
+                  networkLoadBalancer:
+                    subnets:
+                      names:
+                      - subnetA
+                      - subnetB
+                      - subnetC
+                    eipAllocations:
+                    - eipalloc-1234567890abcdefa
+                    - eipalloc-1234567890abcdefb
+                    - eipalloc-1234567890abcdefc
+            type: LoadBalancerService
+      expected: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        metadata:
+          name: eiptestnlb
+          namespace: openshift-ingress-operator
+        spec:
+          httpEmptyRequestsPolicy: Respond
+          idleConnectionTerminationPolicy: Immediate
+          closedClientConnectionPolicy: Continue
+          endpointPublishingStrategy:
+            loadBalancer:
+              dnsManagementPolicy: Managed
+              scope: External
+              providerParameters:
+                type: AWS
+                aws:
+                  type: NLB
+                  networkLoadBalancer:
+                    subnets:
+                      names:
+                      - subnetA
+                      - subnetB
+                      - subnetC
+                    eipAllocations:
+                    - eipalloc-1234567890abcdefa
+                    - eipalloc-1234567890abcdefb
+                    - eipalloc-1234567890abcdefc
+            type: LoadBalancerService
+    - name: Should allow to set NLB parameters when LBType is NLB and eipAllocations are equal to the number of subnet ids.
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        metadata:
+          name: eiptestnlb
+          namespace: openshift-ingress-operator
+        spec:
+          endpointPublishingStrategy:
+            loadBalancer:
+              scope: External
+              providerParameters:
+                type: AWS
+                aws:
+                  type: NLB
+                  networkLoadBalancer:
+                    subnets:
+                      ids:
+                      - subnet-0fcf8e0392f0910d5
+                      - subnet-0fcf8e0392f0910d6
+                      - subnet-0fcf8e0392f0910d7        
+                    eipAllocations:
+                    - eipalloc-1234567890abcdefa
+                    - eipalloc-1234567890abcdefb
+                    - eipalloc-1234567890abcdefc
+            type: LoadBalancerService
+      expected: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        metadata:
+          name: eiptestnlb
+          namespace: openshift-ingress-operator
+        spec:
+          httpEmptyRequestsPolicy: Respond
+          idleConnectionTerminationPolicy: Immediate
+          closedClientConnectionPolicy: Continue
+          endpointPublishingStrategy:
+            loadBalancer:
+              dnsManagementPolicy: Managed
+              scope: External
+              providerParameters:
+                type: AWS
+                aws:
+                  type: NLB
+                  networkLoadBalancer:
+                    subnets:
+                      ids:
+                      - subnet-0fcf8e0392f0910d5
+                      - subnet-0fcf8e0392f0910d6
+                      - subnet-0fcf8e0392f0910d7
+                    eipAllocations:
+                    - eipalloc-1234567890abcdefa
+                    - eipalloc-1234567890abcdefb
+                    - eipalloc-1234567890abcdefc
+            type: LoadBalancerService

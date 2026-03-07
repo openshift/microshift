@@ -1,0 +1,16 @@
+digraph "Local Certificate" {
+  // Node definitions.
+  4 [
+    label="certkeypair/kube-apiserver-recovery-signer\n\nsecret/localhost-recovery-serving-signer -nopenshift-kube-apiserver-operator\n"
+    style=filled
+    fillcolor="#c7bfff"
+  ];
+  5 [
+    label="certkeypair/kube-apiserver-recovery-serving\n\nsecret/localhost-recovery-serving-certkey -nopenshift-kube-apiserver\n    secret/localhost-recovery-serving-certkey-2 -nopenshift-kube-apiserver\n    secret/localhost-recovery-serving-certkey-3 -nopenshift-kube-apiserver\n    secret/localhost-recovery-serving-certkey-4 -nopenshift-kube-apiserver\n    file:///etc/kubernetes/static-pod-resources/kube-apiserver-pod-2/secrets/localhost-recovery-serving-certkey/tls.crt/tls.crt,file:///etc/kubernetes/static-pod-resources/kube-apiserver-pod-2/secrets/localhost-recovery-serving-certkey/tls.crt/tls.key\n    file:///etc/kubernetes/static-pod-resources/kube-apiserver-pod-3/secrets/localhost-recovery-serving-certkey/tls.crt/tls.crt,file:///etc/kubernetes/static-pod-resources/kube-apiserver-pod-3/secrets/localhost-recovery-serving-certkey/tls.crt/tls.key\n    file:///etc/kubernetes/static-pod-resources/kube-apiserver-pod-4/secrets/localhost-recovery-serving-certkey/tls.crt/tls.crt,file:///etc/kubernetes/static-pod-resources/kube-apiserver-pod-4/secrets/localhost-recovery-serving-certkey/tls.crt/tls.key\n"
+    style=filled
+    fillcolor="#bdebfd"
+  ];
+
+  // Edge definitions.
+  4 -> 5;
+}

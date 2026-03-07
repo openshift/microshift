@@ -478,6 +478,15 @@ func generateIngressParams(cfg *config.Config) (assets.RenderParams, error) {
 		RouterCiphersSuites = strings.Join(tls13Ciphers, ":")
 	}
 
+	RouterCurves := ""
+	if len(tlsProfileSpec.Curves) != 0 {
+		curves := make([]string, len(tlsProfileSpec.Curves))
+		for i, curve := range tlsProfileSpec.Curves {
+			curves[i] = string(curve)
+		}
+		RouterCurves = strings.Join(curves, ":")
+	}
+
 	var RouterSSLMinVersion string
 	switch tlsProfileSpec.MinTLSVersion {
 	// TLS 1.0 is not supported, convert to TLS 1.1.
@@ -568,6 +577,7 @@ func generateIngressParams(cfg *config.Config) (assets.RenderParams, error) {
 		"ServingCertificateSecret":    &cfg.Ingress.ServingCertificateSecret,
 		"RouterCiphers":               RouterCiphers,
 		"RouterCiphersSuites":         RouterCiphersSuites,
+		"RouterCurves":                RouterCurves,
 		"RouterSSLMinVersion":         RouterSSLMinVersion,
 		"RouterAllowWildcardRoutes":   RouterAllowWildcardRoutes,
 		"ClientCAMapName":             clientCAMapName,

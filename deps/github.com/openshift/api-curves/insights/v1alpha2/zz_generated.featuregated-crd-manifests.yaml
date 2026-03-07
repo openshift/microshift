@@ -1,0 +1,31 @@
+datagathers.insights.openshift.io:
+  Annotations: {}
+  ApprovedPRNumber: https://github.com/openshift/api/pull/2248
+  CRDName: datagathers.insights.openshift.io
+  Capability: Insights
+  Category: ""
+  FeatureGates:
+  - InsightsOnDemandDataGather
+  FilenameOperatorName: insights
+  FilenameOperatorOrdering: "01"
+  FilenameRunLevel: "0000_10"
+  GroupName: insights.openshift.io
+  HasStatus: true
+  KindName: DataGather
+  Labels: {}
+  PluralName: datagathers
+  PrinterColumns:
+  - description: DataGather start time
+    jsonPath: .status.startTime
+    name: StartTime
+    type: date
+  - description: DataGather finish time
+    jsonPath: .status.finishTime
+    name: FinishTime
+    type: date
+  Scope: Cluster
+  ShortNames: null
+  TopLevelFeatureGates:
+  - InsightsOnDemandDataGather
+  Version: v1alpha2
+

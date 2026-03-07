@@ -1,0 +1,340 @@
+apiVersion: apiextensions.k8s.io/v1 # Hack because controller-gen complains if we don't have this
+name: "IngressController"
+crdName: ingresscontrollers.operator.openshift.io
+tests:
+  onCreate:
+    - name: Should be able to create a minimal IngressController
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        spec: {} # No spec is required for a IngressController
+      expected: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        spec:
+          httpEmptyRequestsPolicy: Respond
+          idleConnectionTerminationPolicy: Immediate
+          closedClientConnectionPolicy: Continue
+    - name: Should allow to set NLB parameters when LBType is NLB.
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        metadata:
+          name: eiptestnlb
+          namespace: openshift-ingress-operator
+        spec:
+          endpointPublishingStrategy:
+            loadBalancer:
+              scope: External
+              providerParameters:
+                type: AWS
+                aws:
+                  type: NLB
+                  networkLoadBalancer:
+                    eipAllocations:
+                    - eipalloc-1234567890abcdefa
+                    - eipalloc-1234567890abcdefb
+            type: LoadBalancerService
+      expected: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        metadata:
+          name: eiptestnlb
+          namespace: openshift-ingress-operator
+        spec:
+          httpEmptyRequestsPolicy: Respond
+          idleConnectionTerminationPolicy: Immediate
+          closedClientConnectionPolicy: Continue
+          endpointPublishingStrategy:
+            loadBalancer:
+              dnsManagementPolicy: Managed
+              scope: External
+              providerParameters:
+                type: AWS
+                aws:
+                  type: NLB
+                  networkLoadBalancer:
+                    eipAllocations:
+                    - eipalloc-1234567890abcdefa
+                    - eipalloc-1234567890abcdefb
+            type: LoadBalancerService
+    - name: Should not allow to set eip allocations when scope is Internal.
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        metadata:
+          name: default-eip
+          namespace: openshift-ingress-operator
+        spec:
+          endpointPublishingStrategy:
+            loadBalancer:
+              scope: Internal
+              providerParameters:
+                type: AWS
+                aws:
+                  type: NLB
+                  networkLoadBalancer:
+                    eipAllocations:
+                    - eipalloc-12345
+                    - eipalloc-12346
+            type: LoadBalancerService
+      expectedError: "eipAllocations are forbidden when the scope is Internal."
+    - name: Should not allow to set eip allocations with an empty value.
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        metadata:
+          name: default-eip
+          namespace: openshift-ingress-operator
+        spec:
+          endpointPublishingStrategy:
+            loadBalancer:
+              scope: External
+              providerParameters:
+                type: AWS
+                aws:
+                  type: NLB
+                  networkLoadBalancer:
+                    eipAllocations:
+                    - ''
+            type: LoadBalancerService
+      expectedError: "Invalid value: \"\": spec.endpointPublishingStrategy.loadBalancer.providerParameters.aws.networkLoadBalancer.eipAllocations[0] in body should be at least 26 chars long"
+    - name: Should not be able to create ingresscontroller if the value of eipAllocations is more than 26 characters.
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        metadata:
+          name: default-eip
+          namespace: openshift-ingress-operator
+        spec:
+          endpointPublishingStrategy:
+            loadBalancer:
+              scope: External
+              providerParameters:
+                type: AWS
+                aws:
+                  type: NLB
+                  networkLoadBalancer:
+                    eipAllocations:
+                    - eipalloc-1234533333333333333333333
+                    - eipalloc-1234644444444444444444444
+            type: LoadBalancerService
+      expectedError: "[spec.endpointPublishingStrategy.loadBalancer.providerParameters.aws.networkLoadBalancer.eipAllocations[0]: Too long: may not be more than 26 bytes, spec.endpointPublishingStrategy.loadBalancer.providerParameters.aws.networkLoadBalancer.eipAllocations[1]: Too long: may not be more than 26 bytes,"
+    - name: Should not be able to create ingresscontroller if the number of eipAllocations is more than 10.
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        metadata:
+          name: default-eip
+          namespace: openshift-ingress-operator
+        spec:
+          endpointPublishingStrategy:
+            loadBalancer:
+              scope: External
+              providerParameters:
+                type: AWS
+                aws:
+                  type: NLB
+                  networkLoadBalancer:
+                    eipAllocations:
+                    - eipalloc-12345
+                    - eipalloc-12346
+                    - eipalloc-12347
+                    - eipalloc-12348
+                    - eipalloc-12349
+                    - eipalloc-12341
+                    - eiplloac-12342
+                    - eipalloc-12343
+                    - eipalloc-12344
+                    - eipalloc-12340
+                    - eipalloc-12350
+            type: LoadBalancerService
+      expectedError: "spec.endpointPublishingStrategy.loadBalancer.providerParameters.aws.networkLoadBalancer.eipAllocations: Too many: 11: must have at most 10 items"
+    - name: Should not be able to create ingresscontroller if the value of eipAllocations is not unique.
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        metadata:
+          name: default-eip
+          namespace: openshift-ingress-operator
+        spec:
+          endpointPublishingStrategy:
+            loadBalancer:
+              scope: External
+              providerParameters:
+                type: AWS
+                aws:
+                  type: NLB
+                  networkLoadBalancer:
+                    eipAllocations:
+                    - eipalloc-1234
+                    - eipalloc-1234
+            type: LoadBalancerService
+      expectedError: "spec.endpointPublishingStrategy.loadBalancer.providerParameters.aws.networkLoadBalancer.eipAllocations: Invalid value: \"array\": eipAllocations cannot contain duplicates"
+    - name: Should not be able to create ingresscontroller if the value of eipAllocations has comma.
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        metadata:
+          name: default-eip
+          namespace: openshift-ingress-operator
+        spec:
+          endpointPublishingStrategy:
+            loadBalancer:
+              scope: External
+              providerParameters:
+                type: AWS
+                aws:
+                  type: NLB
+                  networkLoadBalancer:
+                    eipAllocations:
+                    - eipalloc-1,34567890abcdefe
+            type: LoadBalancerService
+      expectedError: "eipAllocations must be 'eipalloc-' followed by exactly 17 hexadecimal characters (0-9, a-f, A-F)"
+    - name: Should not be able to create ingresscontroller if the value of eipAllocations does not start with eipalloc-.
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        metadata:
+          name: default-eip
+          namespace: openshift-ingress-operator
+        spec:
+          endpointPublishingStrategy:
+            loadBalancer:
+              scope: External
+              providerParameters:
+                type: AWS
+                aws:
+                  type: NLB
+                  networkLoadBalancer:
+                    eipAllocations:
+                    - "12345678901233566812342345"
+            type: LoadBalancerService
+      expectedError: "eipAllocations should start with 'eipalloc-'"
+    - name: Should not be able to create ingresscontroller if the value of eipAllocations after eipalloc- does not have a hexadecimal character.
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        metadata:
+          name: default-eip
+          namespace: openshift-ingress-operator
+        spec:
+          endpointPublishingStrategy:
+            loadBalancer:
+              scope: External
+              providerParameters:
+                type: AWS
+                aws:
+                  type: NLB
+                  networkLoadBalancer:
+                    eipAllocations:
+                    - eipalloc-1234567890abcdefg
+            type: LoadBalancerService
+      expectedError: "eipAllocations must be 'eipalloc-' followed by exactly 17 hexadecimal characters (0-9, a-f, A-F)"
+    - name: Should not be able to create an ingress controller in which the value of eipAllocations has a valid hexadecimal part followed by an extra hexadecimal part.
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        metadata:
+          name: default-eip
+          namespace: openshift-ingress-operator
+        spec:
+          endpointPublishingStrategy:
+            loadBalancer:
+              scope: External
+              providerParameters:
+                type: AWS
+                aws:
+                  type: NLB
+                  networkLoadBalancer:
+                    eipAllocations:
+                    - eipalloc-0123456789abcdef0-0123456
+            type: LoadBalancerService
+      expectedError: "IngressController.operator.openshift.io \"default-eip\" is invalid: [spec.endpointPublishingStrategy.loadBalancer.providerParameters.aws.networkLoadBalancer.eipAllocations[0]: Too long: may not be more than 26 bytes"
+    - name: Should not be able to create an ingress controller in which the value of eipAllocations has a short hexadecimal part followed by an extra hexadecimal part.
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        metadata:
+          name: default-eip
+          namespace: openshift-ingress-operator
+        spec:
+          endpointPublishingStrategy:
+            loadBalancer:
+              scope: External
+              providerParameters:
+                type: AWS
+                aws:
+                  type: NLB
+                  networkLoadBalancer:
+                    eipAllocations:
+                    - eipalloc-012345678-0123456
+            type: LoadBalancerService
+      expectedError: "eipAllocations must be 'eipalloc-' followed by exactly 17 hexadecimal characters (0-9, a-f, A-F)"
+  onUpdate:
+    - name: EIPAllocations should be mutable
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        metadata:
+          name: eiptestnlb
+          namespace: openshift-ingress-operator
+        spec:
+          endpointPublishingStrategy:
+            loadBalancer:
+              scope: External
+              providerParameters:
+                type: AWS
+                aws:
+                  type: NLB
+                  networkLoadBalancer:
+                    eipAllocations:
+                    - eipalloc-1234567890abcdefc
+                    - eipalloc-1234567890abcdefb
+            type: LoadBalancerService
+      updated: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        metadata:
+          name: eiptestnlb
+          namespace: openshift-ingress-operator
+        spec:
+          httpEmptyRequestsPolicy: Respond
+          idleConnectionTerminationPolicy: Immediate
+          closedClientConnectionPolicy: Continue
+          endpointPublishingStrategy:
+            loadBalancer:
+              dnsManagementPolicy: Managed
+              scope: External
+              providerParameters:
+                type: AWS
+                aws:
+                  type: NLB
+                  networkLoadBalancer:
+                    eipAllocations:
+                    - eipalloc-1234567890abcdefa
+                    - eipalloc-1234567890abcdefb
+            type: LoadBalancerService
+      expected: |
+        apiVersion: operator.openshift.io/v1
+        kind: IngressController
+        metadata:
+          name: eiptestnlb
+          namespace: openshift-ingress-operator
+        spec:
+          httpEmptyRequestsPolicy: Respond
+          idleConnectionTerminationPolicy: Immediate
+          closedClientConnectionPolicy: Continue
+          endpointPublishingStrategy:
+            loadBalancer:
+              dnsManagementPolicy: Managed
+              scope: External
+              providerParameters:
+                type: AWS
+                aws:
+                  type: NLB
+                  networkLoadBalancer:
+                    eipAllocations:
+                    - eipalloc-1234567890abcdefa
+                    - eipalloc-1234567890abcdefb
+            type: LoadBalancerService

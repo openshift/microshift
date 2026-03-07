@@ -1,0 +1,34 @@
+digraph "Local Certificate" {
+  // Node definitions.
+  4 [
+    label="certkeypair/kube-apiserver-recovery-signer\n\nsecret/localhost-recovery-serving-signer -nopenshift-kube-apiserver-operator\n"
+    style=filled
+    fillcolor="#c7bfff"
+  ];
+  5 [
+    label="certkeypair/kube-apiserver-recovery-serving\n\nsecret/localhost-recovery-serving-certkey -nopenshift-kube-apiserver\n    secret/localhost-recovery-serving-certkey-2 -nopenshift-kube-apiserver\n    secret/localhost-recovery-serving-certkey-3 -nopenshift-kube-apiserver\n    secret/localhost-recovery-serving-certkey-4 -nopenshift-kube-apiserver\n    file:///etc/kubernetes/static-pod-resources/kube-apiserver-pod-2/secrets/localhost-recovery-serving-certkey/tls.crt/tls.crt,file:///etc/kubernetes/static-pod-resources/kube-apiserver-pod-2/secrets/localhost-recovery-serving-certkey/tls.crt/tls.key\n    file:///etc/kubernetes/static-pod-resources/kube-apiserver-pod-3/secrets/localhost-recovery-serving-certkey/tls.crt/tls.crt,file:///etc/kubernetes/static-pod-resources/kube-apiserver-pod-3/secrets/localhost-recovery-serving-certkey/tls.crt/tls.key\n    file:///etc/kubernetes/static-pod-resources/kube-apiserver-pod-4/secrets/localhost-recovery-serving-certkey/tls.crt/tls.crt,file:///etc/kubernetes/static-pod-resources/kube-apiserver-pod-4/secrets/localhost-recovery-serving-certkey/tls.crt/tls.key\n"
+    style=filled
+    fillcolor="#bdebfd"
+  ];
+  11 [
+    label="cabundle/service-account-token-ca.crt\n\nconfigmaps/serviceaccount-ca -nopenshift-kube-controller-manager\n    configmaps/serviceaccount-ca-5 -nopenshift-kube-controller-manager\n    configmaps/serviceaccount-ca-6 -nopenshift-kube-controller-manager\n    configmaps/serviceaccount-ca-7 -nopenshift-kube-controller-manager\n    configmaps/serviceaccount-ca -nopenshift-kube-scheduler\n    configmaps/serviceaccount-ca-5 -nopenshift-kube-scheduler\n    configmaps/serviceaccount-ca-6 -nopenshift-kube-scheduler\n    file:///etc/kubernetes/static-pod-resources/kube-controller-manager-pod-5/configmaps/serviceaccount-ca/ca-bundle.crt/ca-bundle.crt\n    file:///etc/kubernetes/static-pod-resources/kube-controller-manager-pod-6/configmaps/serviceaccount-ca/ca-bundle.crt/ca-bundle.crt\n    file:///etc/kubernetes/static-pod-resources/kube-controller-manager-pod-7/configmaps/serviceaccount-ca/ca-bundle.crt/ca-bundle.crt\n    file:///etc/kubernetes/static-pod-resources/kube-scheduler-pod-5/configmaps/serviceaccount-ca/ca-bundle.crt/ca-bundle.crt\n    file:///etc/kubernetes/static-pod-resources/kube-scheduler-pod-6/configmaps/serviceaccount-ca/ca-bundle.crt/ca-bundle.crt\n"
+    style=filled
+    fillcolor="#fda172"
+  ];
+  13 [
+    label="cabundle/kube-apiserver-recovery-serving-ca\n\nconfigmaps/localhost-recovery-serving-ca -nopenshift-kube-apiserver-operator\n"
+    style=filled
+    fillcolor="#fda172"
+  ];
+  17 [
+    label="cabundle/kube-apiserver-total-serving-ca\n\nconfigmaps/kube-apiserver-server-ca -nopenshift-config-managed\n    configmaps/kube-apiserver-server-ca -nopenshift-kube-apiserver\n    configmaps/kube-apiserver-server-ca-2 -nopenshift-kube-apiserver\n    configmaps/kube-apiserver-server-ca-3 -nopenshift-kube-apiserver\n    configmaps/kube-apiserver-server-ca-4 -nopenshift-kube-apiserver\n    configmaps/serviceaccount-ca-4 -nopenshift-kube-controller-manager\n    configmaps/serviceaccount-ca-4 -nopenshift-kube-scheduler\n    file:///etc/kubernetes/static-pod-resources/kube-apiserver-pod-2/configmaps/kube-apiserver-server-ca/ca-bundle.crt/ca-bundle.crt\n    file:///etc/kubernetes/static-pod-resources/kube-apiserver-pod-3/configmaps/kube-apiserver-server-ca/ca-bundle.crt/ca-bundle.crt\n    file:///etc/kubernetes/static-pod-resources/kube-apiserver-pod-4/configmaps/kube-apiserver-server-ca/ca-bundle.crt/ca-bundle.crt\n    file:///etc/kubernetes/static-pod-resources/kube-controller-manager-pod-4/configmaps/serviceaccount-ca/ca-bundle.crt/ca-bundle.crt\n    file:///etc/kubernetes/static-pod-resources/kube-scheduler-pod-4/configmaps/serviceaccount-ca/ca-bundle.crt/ca-bundle.crt\n"
+    style=filled
+    fillcolor="#fda172"
+  ];
+
+  // Edge definitions.
+  4 -> 5;
+  4 -> 11;
+  4 -> 13;
+  4 -> 17;
+}

@@ -1,0 +1,1 @@
+package imageregistry_v1_crdmanifests

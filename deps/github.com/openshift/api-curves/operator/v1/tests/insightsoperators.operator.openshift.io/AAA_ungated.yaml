@@ -1,0 +1,223 @@
+apiVersion: apiextensions.k8s.io/v1 # Hack because controller-gen complains if we don't have this
+name: "InsightsOperator"
+crdName: insightsoperators.operator.openshift.io
+tests:
+  onCreate:
+    - name: Should be able to create a minimal InsightsOperator
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: InsightsOperator
+        spec: {} # No spec is required for a InsightsOperator
+      expected: |
+        apiVersion: operator.openshift.io/v1
+        kind: InsightsOperator
+        spec:
+          logLevel: Normal
+          operatorLogLevel: Normal
+  onUpdate:
+    - name: Should be able to update lasGatherDuration attribute with a trailing zero in the status 
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: InsightsOperator
+        metadata:
+          name: cluster
+        spec:
+          logLevel: Normal
+          operatorLogLevel: Normal
+      updated: |
+        apiVersion: operator.openshift.io/v1
+        kind: InsightsOperator
+        metadata:
+         name: cluster
+        spec:
+          logLevel: Normal
+          operatorLogLevel: Normal
+        status:
+          gatherStatus:
+            lastGatherDuration: 2m0s
+            gatherers:
+            - name: testGatherer
+              lastGatherDuration: 1m0s
+              conditions:
+              - type: Gathered
+                status: "True"
+                reason: OK
+                message: "test message"
+                lastTransitionTime: "2024-12-01T08:04:21Z"
+      expected: |
+        apiVersion: operator.openshift.io/v1
+        kind: InsightsOperator
+        metadata:
+         name: cluster
+        spec:
+          logLevel: Normal
+          operatorLogLevel: Normal
+        status:
+          gatherStatus:
+            lastGatherDuration: 2m0s
+            gatherers:
+            - name: testGatherer
+              lastGatherDuration: 1m0s
+              conditions:
+              - type: Gathered
+                status: "True"
+                reason: OK
+                message: "test message"
+                lastTransitionTime: "2024-12-01T08:04:21Z"
+    - name: Should be able to update lasGatherDuration attribute with a leading zero in the status 
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: InsightsOperator
+        metadata:
+          name: cluster
+        spec:
+          logLevel: Normal
+          operatorLogLevel: Normal
+      updated: |
+        apiVersion: operator.openshift.io/v1
+        kind: InsightsOperator
+        metadata:
+         name: cluster
+        spec:
+          logLevel: Normal
+          operatorLogLevel: Normal
+        status:
+          gatherStatus:
+            lastGatherDuration: 0h2m
+            gatherers:
+            - name: testGatherer
+              lastGatherDuration: 0m5s
+              conditions:
+              - type: Gathered
+                status: "True"
+                reason: OK
+                message: "test message"
+                lastTransitionTime: "2024-12-01T08:04:21Z"
+      expected: |
+        apiVersion: operator.openshift.io/v1
+        kind: InsightsOperator
+        metadata:
+         name: cluster
+        spec:
+          logLevel: Normal
+          operatorLogLevel: Normal
+        status:
+          gatherStatus:
+            lastGatherDuration: 0h2m
+            gatherers:
+            - name: testGatherer
+              lastGatherDuration: 0m5s
+              conditions:
+              - type: Gathered
+                status: "True"
+                reason: OK
+                message: "test message"
+                lastTransitionTime: "2024-12-01T08:04:21Z"
+    - name: Should be able to update lasGatherDuration attribute with a decimal number value in the status 
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: InsightsOperator
+        metadata:
+          name: cluster
+        spec:
+          logLevel: Normal
+          operatorLogLevel: Normal
+      updated: |
+        apiVersion: operator.openshift.io/v1
+        kind: InsightsOperator
+        metadata:
+          name: cluster
+        spec:
+          logLevel: Normal
+          operatorLogLevel: Normal
+        status:
+          gatherStatus:
+            lastGatherDuration: 2m0.77s
+            gatherers:
+            - name: testGatherer
+              lastGatherDuration: 1m0.294s
+              conditions:
+              - type: Gathered
+                status: "True"
+                reason: OK
+                message: "test message"
+                lastTransitionTime: "2024-12-01T08:04:21Z"
+      expected: |
+        apiVersion: operator.openshift.io/v1
+        kind: InsightsOperator
+        metadata:
+          name: cluster
+        spec:
+          logLevel: Normal
+          operatorLogLevel: Normal
+        status:
+          gatherStatus:
+            lastGatherDuration: 2m0.77s
+            gatherers:
+            - name: testGatherer
+              lastGatherDuration: 1m0.294s
+              conditions:
+              - type: Gathered
+                status: "True"
+                reason: OK
+                message: "test message"
+                lastTransitionTime: "2024-12-01T08:04:21Z"
+    - name: Should not be able to update lasGatherDuration attribute with a negative value in the status 
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: InsightsOperator
+        metadata:
+          name: cluster
+        spec:
+          logLevel: Normal
+          operatorLogLevel: Normal
+      updated: |
+        apiVersion: operator.openshift.io/v1
+        kind: InsightsOperator
+        metadata:
+         name: cluster
+        spec:
+          logLevel: Normal
+          operatorLogLevel: Normal
+        status:
+          gatherStatus:
+            gatherers:
+            - name: testGatherer
+              lastGatherDuration: -0m5s
+              conditions:
+              - type: Gathered
+                status: "True"
+                reason: OK
+                message: "test message"
+                lastTransitionTime: "2024-12-01T08:04:21Z"
+      expectedStatusError: "Invalid value: \"-0m5s\": gatherStatus.gatherers[0].lastGatherDuration in body should match '^(([0-9]+(?:\\.[0-9]+)?(ns|us|µs|μs|ms|s|m|h))+)$'"
+    - name: Should not be able to update lasGatherDuration attribute with an invalid value in the status 
+      initial: |
+        apiVersion: operator.openshift.io/v1
+        kind: InsightsOperator
+        metadata:
+          name: cluster
+        spec:
+          logLevel: Normal
+          operatorLogLevel: Normal
+      updated: |
+        apiVersion: operator.openshift.io/v1
+        kind: InsightsOperator
+        metadata:
+         name: cluster
+        spec:
+          logLevel: Normal
+          operatorLogLevel: Normal
+        status:
+          gatherStatus:
+            gatherers:
+            - name: testGatherer
+              lastGatherDuration: 0d5s
+              conditions:
+              - type: Gathered
+                status: "True"
+                reason: OK
+                message: "test message"
+                lastTransitionTime: "2024-12-01T08:04:21Z"
+      expectedStatusError: "Invalid value: \"0d5s\": gatherStatus.gatherers[0].lastGatherDuration in body should match '^(([0-9]+(?:\\.[0-9]+)?(ns|us|µs|μs|ms|s|m|h))+)$'"
+

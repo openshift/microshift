@@ -1,0 +1,702 @@
+apiVersion: apiextensions.k8s.io/v1 # Hack because controller-gen complains if we don't have this
+name: "[TechPreview] DataGather"
+crdName: datagathers.insights.openshift.io
+featureGates:
+  - InsightsOnDemandDataGather
+tests:
+  onCreate:
+    - name: Should be able to create a minimal DataGather
+      initial: |
+        apiVersion: insights.openshift.io/v1
+        kind: DataGather
+        spec:
+          gatherers:
+            mode: All
+      expected: |
+        apiVersion: insights.openshift.io/v1
+        kind: DataGather
+        spec:
+          gatherers:
+            mode: All
+    - name: Should not be created with empty spec
+      initial: |
+        apiVersion: insights.openshift.io/v1
+        kind: DataGather
+        spec: {}
+      expectedError: "spec.gatherers: Required value, <nil>: Invalid value"
+    - name: Should not be created with invalid gathering mode
+      initial: |
+        apiVersion: insights.openshift.io/v1
+        kind: DataGather
+        spec:
+          gatherers:
+            mode: None
+      expectedError: 'spec.gatherers.mode: Unsupported value: "None": supported values: "All", "Custom"'
+    - name: Should be able to create a DataGather with a storage persistentVolume, dataPolicy and gatherers
+      initial: |
+        apiVersion: insights.openshift.io/v1
+        kind: DataGather
+        spec:
+          dataPolicy:
+            - WorkloadNames
+          gatherers:
+            mode: All
+          storage:
+            type: PersistentVolume
+            persistentVolume:
+              mountPath: /data
+              claim:
+                name: test-claim
+      expected: |
+        apiVersion: insights.openshift.io/v1
+        kind: DataGather
+        spec:
+          dataPolicy:
+            - WorkloadNames
+          gatherers:
+            mode: All
+          storage:
+            type: PersistentVolume
+            persistentVolume:
+              mountPath: /data
+              claim:
+                name: test-claim
+    - name: Should be able to create a DataGather with a storage Epemeral, multitple DataPolicy options and gatherers
+      initial: |
+        apiVersion: insights.openshift.io/v1
+        kind: DataGather
+        spec:
+          dataPolicy:
+            - ObfuscateNetworking
+            - WorkloadNames
+          gatherers:
+            mode: All
+          storage:
+            type: Ephemeral
+      expected: |
+        apiVersion: insights.openshift.io/v1
+        kind: DataGather
+        spec:
+          dataPolicy:
+            - ObfuscateNetworking
+            - WorkloadNames
+          gatherers:
+            mode: All
+          storage:
+            type: Ephemeral
+    - name: Should be able to create DataGather with valid custom config
+      initial: |
+        apiVersion: insights.openshift.io/v1
+        kind: DataGather
+        spec:
+          gatherers:
+            mode: Custom
+            custom:
+              configs:
+                - name: gatherer
+                  state: Disabled
+      expected: |
+        apiVersion: insights.openshift.io/v1
+        kind: DataGather
+        spec:
+          gatherers:
+            mode: Custom
+            custom:
+              configs:
+                - name: gatherer
+                  state: Disabled
+    - name: When gatherers.mode is Custom then Custom must be present
+      initial: |
+        apiVersion: insights.openshift.io/v1
+        kind: DataGather
+        spec:
+          gatherers:
+            mode: Custom
+      expectedError: 'Invalid value: "object": custom is required when mode is Custom, and forbidden otherwise'
+    - name: State must contain only valid values
+      initial: |
+        apiVersion: insights.openshift.io/v1
+        kind: DataGather
+        spec:
+          gatherers:
+            mode: Custom
+            custom:
+              configs:
+                - name: gatherer
+                  state: InvalidState
+      expectedError: 'spec.gatherers.custom.configs[0].state: Unsupported value: "InvalidState": supported values: "Enabled", "Disabled"'
+    - name: Name must be in a described format
+      initial: |
+        apiVersion: insights.openshift.io/v1
+        kind: DataGather
+        spec:
+          gatherers:
+            mode: Custom
+            custom:
+              configs:
+                - name: gatherer_1
+                  state: Enabled
+      expectedError: 'spec.gatherers.custom.configs[0].name: Invalid value: "string": gatherer name must be in the format of {gatherer}/{function} where the gatherer and function are lowercase letters only that may include underscores (_) and are separated by a forward slash (/) if the function is provided'
+    - name: When storage.type is persistentVolume then PersistentVolume must be present
+      initial: |
+        apiVersion: insights.openshift.io/v1
+        kind: DataGather
+        spec:
+          gatherers:
+            mode: All
+          storage:
+            type: PersistentVolume
+      expectedError: 'spec.storage: Invalid value: "object": persistentVolume is required when type is PersistentVolume, and forbidden otherwise'
+    - name: When storage.type is not persistentVolume then PersistentVolume must not be present
+      initial: |
+        apiVersion: insights.openshift.io/v1
+        kind: DataGather
+        spec:
+          gatherers:
+            mode: All
+          storage:
+            type: Ephemeral
+            persistentVolume:
+              claim:
+                name: test-claim
+      expectedError: 'spec.storage: Invalid value: "object": persistentVolume is required when type is PersistentVolume, and forbidden otherwise'
+    - name: mountPath must not contain colon
+      initial: |
+        apiVersion: insights.openshift.io/v1
+        kind: DataGather
+        spec:
+          gatherers:
+              mode: All
+          storage:
+            type: PersistentVolume
+            persistentVolume:
+              mountPath: /data:/data
+              claim:
+                name: test-claim
+      expectedError: 'spec.storage.persistentVolume.mountPath: Invalid value: "string": mountPath must not contain a colon'
+    - name: storage.type is required
+      initial: |
+        apiVersion: insights.openshift.io/v1
+        kind: DataGather
+        spec:
+          gatherers:
+              mode: All
+          storage:
+            persistentVolume:
+              mountPath: /data
+              claim:
+                name: test-claim
+      expectedError: "spec.storage.type: Required value"
+    - name: storage.persistentVolume.claim can not be empty
+      initial: |
+        apiVersion: insights.openshift.io/v1
+        kind: DataGather
+        spec:
+          gatherers:
+            mode: All
+          storage:
+            type: PersistentVolume
+            persistentVolume:
+              mountPath: /data
+              claim:
+      expectedError: "spec.storage.persistentVolume.claim: Required value"
+    - name: persistentVolumeClaim must follow the naming convention
+      initial: |
+        apiVersion: insights.openshift.io/v1
+        kind: DataGather
+        spec:
+          gatherers:
+            mode: All
+          storage:
+            type: PersistentVolume
+            persistentVolume:
+              claim:
+                name: INVALID_PVC_NAME
+      expectedError: 'Invalid value: "string": a lowercase RFC 1123 subdomain must consist of lower case alphanumeric characters, ''-'' or ''.'', and must start and end with an alphanumeric character.'
+    - name: dataPolicy must be one of a valid values
+      initial: |
+        apiVersion: insights.openshift.io/v1
+        kind: DataGather
+        spec:
+          gatherers:
+            mode: All
+          dataPolicy:
+            - InvalidValue
+      expectedError: 'spec.dataPolicy[0]: Unsupported value: "InvalidValue": supported values: "ObfuscateNetworking", "WorkloadNames"'
+    - name: dataPolicy must not contain duplicates
+      initial: |
+        apiVersion: insights.openshift.io/v1
+        kind: DataGather
+        spec:
+          gatherers:
+            mode: All
+          dataPolicy:
+            - WorkloadNames
+            - WorkloadNames
+      expectedError: 'invalid: spec.dataPolicy: Invalid value: "array": dataPolicy items must be unique'
+  onUpdate:
+    - name: status is present and startTime is added
+      initial: |
+        apiVersion: insights.openshift.io/v1
+        kind: DataGather
+        spec:
+          gatherers:
+              mode: All
+        status: 
+          insightsRequestID: xyz
+      updated: |
+        apiVersion: insights.openshift.io/v1
+        kind: DataGather
+        spec:
+          gatherers:
+              mode: All
+        status: 
+          insightsRequestID: xyz
+          startTime: 2023-03-13T11:34:06Z
+      expected: |
+        apiVersion: insights.openshift.io/v1
+        kind: DataGather
+        spec:
+          gatherers:
+              mode: All
+        status: 
+          insightsRequestID: xyz
+          startTime: 2023-03-13T11:34:06Z
+    - name: startTime cannot be removed from status
+      initial: |
+        apiVersion: insights.openshift.io/v1
+        kind: DataGather
+        spec:
+          gatherers:
+              mode: All
+        status: 
+          insightsRequestID: xyz
+          startTime: 2023-03-13T11:34:06Z
+      updated: |
+        apiVersion: insights.openshift.io/v1
+        kind: DataGather
+        spec:
+          gatherers:
+              mode: All
+        status: 
+          insightsRequestID: xyz
+      expectedStatusError: 'status: Invalid value: "object": cannot remove startTime attribute from status'
+    - name: startTime is immutable once set
+      initial: |
+        apiVersion: insights.openshift.io/v1
+        kind: DataGather
+        spec:
+          gatherers:
+              mode: All
+        status: 
+          insightsRequestID: xyz
+          startTime: 2023-03-13T11:34:06Z
+      updated: |
+        apiVersion: insights.openshift.io/v1
+        kind: DataGather
+        spec:
+          gatherers:
+              mode: All
+        status: 
+          insightsRequestID: xyz
+          startTime: 2023-03-13T12:34:06Z
+      expectedStatusError: 'Invalid value: "string": startTime is immutable once set'
+    - name: Status is present and insightsRequestID is added
+      initial: |
+        apiVersion: insights.openshift.io/v1
+        kind: DataGather
+        spec:
+          gatherers:
+              mode: All
+        status: 
+          relatedObjects:
+            - name: periodic-job-xyz
+              resource: "pods"
+              group: "group"
+              namespace: "openshift-insights"
+      updated: |
+        apiVersion: insights.openshift.io/v1
+        kind: DataGather
+        spec:
+          gatherers:
+              mode: All
+        status: 
+          insightsRequestID: testing-xyz
+          relatedObjects:
+            - name: periodic-job-xyz
+              resource: "pods"
+              group: "group"
+              namespace: "openshift-insights"
+      expected: |
+        apiVersion: insights.openshift.io/v1
+        kind: DataGather
+        spec:
+          gatherers:
+              mode: All
+        status: 
+          insightsRequestID: testing-xyz
+          relatedObjects:
+            - name: periodic-job-xyz
+              group: "group"
+              resource: "pods"
+              namespace: "openshift-insights"
+    - name: insightsRequestID cannot be removed from status
+      initial: |
+        apiVersion: insights.openshift.io/v1
+        kind: DataGather
+        spec:
+          gatherers:
+              mode: All
+        status: 
+          insightsRequestID: testing-xyz
+          relatedObjects:
+            - name: periodic-job-xyz
+              group: "group"
+              resource: "pods"
+              namespace: "openshift-insights"
+      updated: |
+        apiVersion: insights.openshift.io/v1
+        kind: DataGather
+        spec:
+          gatherers:
+              mode: All
+        status: 
+          relatedObjects:
+            - name: periodic-job-xyz
+              group: "group"
+              resource: "pods"
+              namespace: "openshift-insights"
+      expectedStatusError: 'status: Invalid value: "object": cannot remove insightsRequestID attribute from status'
+    - name: insightsRequestID is immutable once set
+      initial: |
+        apiVersion: insights.openshift.io/v1
+        kind: DataGather
+        spec:
+          gatherers:
+              mode: All
+        status: 
+          insightsRequestID: testing-xyz
+          relatedObjects:
+            - name: periodic-job-xyz
+              group: "group"
+              resource: "pods"
+              namespace: "openshift-insights"
+      updated: |
+        apiVersion: insights.openshift.io/v1
+        kind: DataGather
+        spec:
+          gatherers:
+              mode: All
+        status: 
+          insightsRequestID: testing-xyz-updated
+          relatedObjects:
+            - name: periodic-job-xyz
+              group: "group"
+              resource: "pods"
+              namespace: "openshift-insights"
+      expectedStatusError: 'Invalid value: "string": insightsRequestID is immutable once set'
+    - name: finishTime cannot be removed from status
+      initial: |
+        apiVersion: insights.openshift.io/v1
+        kind: DataGather
+        spec:
+          gatherers:
+              mode: All
+        status: 
+          finishTime: 2023-03-13T11:34:06Z
+          relatedObjects:
+            - name: periodic-job-xyz
+              group: "group"
+              resource: "pods"
+              namespace: "openshift-insights"
+      updated: |
+        apiVersion: insights.openshift.io/v1
+        kind: DataGather
+        spec:
+          gatherers:
+              mode: All
+        status: 
+          relatedObjects:
+            - name: periodic-job-xyz
+              group: "group"
+              resource: "pods"
+              namespace: "openshift-insights"
+      expectedStatusError: 'status: Invalid value: "object": cannot remove finishTime attribute from status'
+    - name: lastGatherSeconds must be integer
+      initial: |
+        apiVersion: insights.openshift.io/v1
+        kind: DataGather
+        spec:
+          gatherers:
+              mode: All
+      updated: |
+        apiVersion: insights.openshift.io/v1
+        kind: DataGather
+        spec:
+          gatherers:
+              mode: All
+        status:
+          gatherers:
+          - name: testGatherer
+            lastGatherSeconds: 1.1
+            conditions:
+            - type: Gathered
+              status: "True"
+              reason: OK
+              message: "test message"
+              lastTransitionTime: "2024-12-01T08:04:21Z"
+      expectedStatusError: "gatherers[0].lastGatherSeconds in body must be of type integer"
+    - name: lastGatherSeconds cannot be updated with an invalid value
+      initial: |
+        apiVersion: insights.openshift.io/v1
+        kind: DataGather
+        spec:
+          gatherers:
+              mode: All
+      updated: |
+        apiVersion: insights.openshift.io/v1
+        kind: DataGather
+        spec:
+          gatherers:
+              mode: All
+        status:
+          gatherers:
+          - name: testGatherer
+            lastGatherSeconds: 1d2h
+            conditions:
+            - type: Gathered
+              status: "True"
+              reason: OK
+              message: "test message"
+              lastTransitionTime: "2024-12-01T08:04:21Z"
+      expectedStatusError: 'Invalid value: "string": gatherers[0].lastGatherSeconds in body must be of type integer'
+    - name: lastGatherSeconds cannot be updated with a negative value
+      initial: |
+        apiVersion: insights.openshift.io/v1
+        kind: DataGather
+        spec:
+          gatherers:
+              mode: All
+      updated: |
+        apiVersion: insights.openshift.io/v1
+        kind: DataGather
+        spec:
+          gatherers:
+              mode: All
+        status:
+          gatherers:
+          - name: testGatherer
+            lastGatherSeconds: -5
+            conditions:
+            - type: Gathered
+              status: "True"
+              reason: OK
+              message: "test message"
+              lastTransitionTime: "2024-12-01T08:04:21Z"
+      expectedStatusError: "lastGatherSeconds in body should be greater than or equal to 0"
+    - name: should not be updated with URL that is not HTTPS
+      initial: |
+        apiVersion: insights.openshift.io/v1
+        kind: DataGather
+        spec:
+          gatherers:
+              mode: All
+      updated: |
+        apiVersion: insights.openshift.io/v1
+        kind: DataGather
+        spec:
+          gatherers:
+              mode: All
+        status:
+          insightsReport:
+            uri: http://example.com
+            downloadedTime: 2025-09-15T12:56:41Z
+      expectedStatusError: 'status.insightsReport.uri: Invalid value: "string": URI must be a valid HTTPS URL (e.g., https://example.com)'
+    - name: should be updated with a valid HTTPS URL
+      initial: |
+        apiVersion: insights.openshift.io/v1
+        kind: DataGather
+        spec:
+          gatherers:
+              mode: All
+      updated: |
+        apiVersion: insights.openshift.io/v1
+        kind: DataGather
+        spec:
+          gatherers:
+              mode: All
+        status:
+          insightsReport:
+            downloadedTime: 2025-09-15T12:56:41Z
+            uri: https://example.com
+      expected: |
+        apiVersion: insights.openshift.io/v1
+        kind: DataGather
+        spec:
+          gatherers:
+              mode: All
+        status:
+          insightsReport:
+            downloadedTime: 2025-09-15T12:56:41Z
+            uri: https://example.com
+    - name: should be updated with a valid totalRisk
+      initial: |
+        apiVersion: insights.openshift.io/v1
+        kind: DataGather
+        spec:
+          gatherers:
+              mode: All
+      updated: |
+        apiVersion: insights.openshift.io/v1
+        kind: DataGather
+        spec:
+          gatherers:
+              mode: All
+        status:
+          insightsReport:
+            downloadedTime: 2025-09-15T12:56:41Z
+            uri: https://example.com
+            healthChecks:
+              - description: Low risk update test
+                totalRisk: Low
+                advisorURI: https://example.com
+      expected: |
+        apiVersion: insights.openshift.io/v1
+        kind: DataGather
+        spec:
+          gatherers:
+              mode: All
+        status:
+          insightsReport:
+            downloadedTime: 2025-09-15T12:56:41Z
+            uri: https://example.com
+            healthChecks:
+              - description: Low risk update test
+                totalRisk: Low
+                advisorURI: https://example.com
+    - name: should not be updated with invalid totalRisk value
+      initial: |
+        apiVersion: insights.openshift.io/v1
+        kind: DataGather
+        spec:
+          gatherers:
+              mode: All
+      updated: |
+        apiVersion: insights.openshift.io/v1
+        kind: DataGather
+        spec:
+          gatherers:
+              mode: All
+        status:
+          insightsReport:
+            downloadedTime: 2025-09-15T12:56:41Z
+            uri: https://example.com
+            healthChecks:
+              - description:  NoRisk update test
+                totalRisk: NoRisk
+                advisorURI: https://example.com
+      expectedStatusError: 'totalRisk: Unsupported value: "NoRisk": supported values: "Low", "Moderate", "Important", "Critical"'
+    - name: should pass
+      initial: |
+        apiVersion: insights.openshift.io/v1
+        kind: DataGather
+        spec:
+          gatherers:
+              mode: All
+      updated: |
+        apiVersion: insights.openshift.io/v1
+        kind: DataGather
+        spec:
+          gatherers:
+              mode: All
+        status:
+          insightsReport:
+            downloadedTime: 2025-09-15T12:56:41Z
+            uri: https://example.com
+            healthChecks:
+              - description:  NoRisk update test
+                totalRisk: Low
+                advisorURI: https://example.com
+              - description:  NoRisk update test
+                totalRisk: Important
+                advisorURI: https://example.com
+      expected: |
+        apiVersion: insights.openshift.io/v1
+        kind: DataGather
+        spec:
+          gatherers:
+              mode: All
+        status:
+          insightsReport:
+            downloadedTime: 2025-09-15T12:56:41Z
+            uri: https://example.com
+            healthChecks:
+              - description:  NoRisk update test
+                totalRisk: Low
+                advisorURI: https://example.com
+              - description:  NoRisk update test
+                totalRisk: Important
+                advisorURI: https://example.com
+    - name: no duplicates
+      initial: |
+        apiVersion: insights.openshift.io/v1
+        kind: DataGather
+        spec:
+          gatherers:
+              mode: All
+      updated: |
+        apiVersion: insights.openshift.io/v1
+        kind: DataGather
+        spec:
+          gatherers:
+              mode: All
+        status:
+          insightsReport:
+            downloadedTime: 2025-09-15T12:56:41Z
+            uri: https://example.com
+            healthChecks:
+              - description:  Low risk update test
+                totalRisk: Low
+                advisorURI: https://example.com
+              - description:  Low risk update test
+                totalRisk: Low
+                advisorURI: https://example.com
+      expectedStatusError: "invalid: status.insightsReport.healthChecks[1]: Duplicate value"
+    - name: missing insightsReport.uri
+      initial: |
+        apiVersion: insights.openshift.io/v1
+        kind: DataGather
+        spec:
+          gatherers:
+              mode: All
+      updated: |
+        apiVersion: insights.openshift.io/v1
+        kind: DataGather
+        spec:
+          gatherers:
+              mode: All
+        status:
+          insightsReport:
+            downloadedTime: 2025-09-15T12:56:41Z
+      expectedStatusError: "status.insightsReport.uri: Required value"
+    - name: missing insightsReport.downloadedTime
+      initial: |
+        apiVersion: insights.openshift.io/v1
+        kind: DataGather
+        spec:
+          gatherers:
+              mode: All
+      updated: |
+        apiVersion: insights.openshift.io/v1
+        kind: DataGather
+        spec:
+          gatherers:
+              mode: All
+        status:
+          insightsReport:
+            uri: https://example.com
+            healthChecks:
+              - description:  Low risk update test
+                totalRisk: Low
+                advisorURI: https://example.com
+      expectedStatusError: "status.insightsReport.downloadedTime: Required value"

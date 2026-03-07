@@ -1,0 +1,300 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    api-approved.openshift.io: https://github.com/openshift/api/pull/1453
+    api.openshift.io/merged-by-featuregates: "true"
+    include.release.openshift.io/ibm-cloud-managed: "true"
+    include.release.openshift.io/self-managed-high-availability: "true"
+    release.openshift.io/feature-set: Default
+  labels:
+    openshift.io/operator-managed: ""
+  name: kubeletconfigs.machineconfiguration.openshift.io
+spec:
+  group: machineconfiguration.openshift.io
+  names:
+    kind: KubeletConfig
+    listKind: KubeletConfigList
+    plural: kubeletconfigs
+    singular: kubeletconfig
+  scope: Cluster
+  versions:
+  - name: v1
+    schema:
+      openAPIV3Schema:
+        description: |-
+          KubeletConfig describes a customized Kubelet configuration.
+
+          Compatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).
+        properties:
+          apiVersion:
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+            type: string
+          kind:
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: spec contains the desired kubelet configuration.
+            properties:
+              autoSizingReserved:
+                type: boolean
+              kubeletConfig:
+                description: |-
+                  kubeletConfig fields are defined in kubernetes upstream. Please refer to the types defined in the version/commit used by
+                  OpenShift of the upstream kubernetes. It's important to note that, since the fields of the kubelet configuration are directly fetched from
+                  upstream the validation of those values is handled directly by the kubelet. Please refer to the upstream version of the relevant kubernetes
+                  for the valid values of these fields. Invalid values of the kubelet configuration fields may render cluster nodes unusable.
+                type: object
+                x-kubernetes-preserve-unknown-fields: true
+              logLevel:
+                format: int32
+                type: integer
+              machineConfigPoolSelector:
+                description: |-
+                  machineConfigPoolSelector selects which pools the KubeletConfig shoud apply to.
+                  A nil selector will result in no pools being selected.
+                properties:
+                  matchExpressions:
+                    description: matchExpressions is a list of label selector requirements.
+                      The requirements are ANDed.
+                    items:
+                      description: |-
+                        A label selector requirement is a selector that contains values, a key, and an operator that
+                        relates the key and values.
+                      properties:
+                        key:
+                          description: key is the label key that the selector applies
+                            to.
+                          type: string
+                        operator:
+                          description: |-
+                            operator represents a key's relationship to a set of values.
+                            Valid operators are In, NotIn, Exists and DoesNotExist.
+                          type: string
+                        values:
+                          description: |-
+                            values is an array of string values. If the operator is In or NotIn,
+                            the values array must be non-empty. If the operator is Exists or DoesNotExist,
+                            the values array must be empty. This array is replaced during a strategic
+                            merge patch.
+                          items:
+                            type: string
+                          type: array
+                          x-kubernetes-list-type: atomic
+                      required:
+                      - key
+                      - operator
+                      type: object
+                    type: array
+                    x-kubernetes-list-type: atomic
+                  matchLabels:
+                    additionalProperties:
+                      type: string
+                    description: |-
+                      matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
+                      map is equivalent to an element of matchExpressions, whose key field is "key", the
+                      operator is "In", and the values array contains only "value". The requirements are ANDed.
+                    type: object
+                type: object
+                x-kubernetes-map-type: atomic
+              tlsSecurityProfile:
+                description: |-
+                  If unset, the default is based on the apiservers.config.openshift.io/cluster resource.
+                  Note that only Old and Intermediate profiles are currently supported, and
+                  the maximum available minTLSVersion is VersionTLS12.
+                properties:
+                  custom:
+                    description: |-
+                      custom is a user-defined TLS security profile. Be extremely careful using a custom
+                      profile as invalid configurations can be catastrophic.
+
+                      The curve list for this profile is empty by default.
+
+                      An example custom profile looks like this:
+
+                        minTLSVersion: VersionTLS11
+                        ciphers:
+                          - ECDHE-ECDSA-CHACHA20-POLY1305
+                          - ECDHE-RSA-CHACHA20-POLY1305
+                          - ECDHE-RSA-AES128-GCM-SHA256
+                          - ECDHE-ECDSA-AES128-GCM-SHA256
+                    nullable: true
+                    properties:
+                      ciphers:
+                        description: |-
+                          ciphers is used to specify the cipher algorithms that are negotiated
+                          during the TLS handshake. Operators may remove entries that their operands
+                          do not support. For example, to use only ECDHE-RSA-AES128-GCM-SHA256 (yaml):
+
+                            ciphers:
+                              - ECDHE-RSA-AES128-GCM-SHA256
+
+                          TLS 1.3 cipher suites (e.g. TLS_AES_128_GCM_SHA256) are not configurable
+                          and are always enabled when TLS 1.3 is negotiated.
+                        items:
+                          type: string
+                        type: array
+                        x-kubernetes-list-type: atomic
+                      minTLSVersion:
+                        description: |-
+                          minTLSVersion is used to specify the minimal version of the TLS protocol
+                          that is negotiated during the TLS handshake. For example, to use TLS
+                          versions 1.1, 1.2 and 1.3 (yaml):
+
+                            minTLSVersion: VersionTLS11
+                        enum:
+                        - VersionTLS10
+                        - VersionTLS11
+                        - VersionTLS12
+                        - VersionTLS13
+                        type: string
+                    type: object
+                  intermediate:
+                    description: |-
+                      intermediate is a TLS profile for use when you do not need compatibility with
+                      legacy clients and want to remain highly secure while being compatible with
+                      most clients currently in use.
+
+                      The curve list includes by default the following curves:
+                      X25519, SecP256r1, SecP384r1, X25519MLKEM768.
+
+                      This profile is equivalent to a Custom profile specified as:
+                        minTLSVersion: VersionTLS12
+                        ciphers:
+                          - TLS_AES_128_GCM_SHA256
+                          - TLS_AES_256_GCM_SHA384
+                          - TLS_CHACHA20_POLY1305_SHA256
+                          - ECDHE-ECDSA-AES128-GCM-SHA256
+                          - ECDHE-RSA-AES128-GCM-SHA256
+                          - ECDHE-ECDSA-AES256-GCM-SHA384
+                          - ECDHE-RSA-AES256-GCM-SHA384
+                          - ECDHE-ECDSA-CHACHA20-POLY1305
+                          - ECDHE-RSA-CHACHA20-POLY1305
+                    nullable: true
+                    type: object
+                  modern:
+                    description: |-
+                      modern is a TLS security profile for use with clients that support TLS 1.3 and
+                      do not need backward compatibility for older clients.
+                      The curve list includes by default the following curves:
+                      X25519, SecP256r1, SecP384r1, X25519MLKEM768.
+                      This profile is equivalent to a Custom profile specified as:
+                        minTLSVersion: VersionTLS13
+                        ciphers:
+                          - TLS_AES_128_GCM_SHA256
+                          - TLS_AES_256_GCM_SHA384
+                          - TLS_CHACHA20_POLY1305_SHA256
+                    nullable: true
+                    type: object
+                  old:
+                    description: |-
+                      old is a TLS profile for use when services need to be accessed by very old
+                      clients or libraries and should be used only as a last resort.
+
+                      The curve list includes by default the following curves:
+                      X25519, SecP256r1, SecP384r1, X25519MLKEM768.
+
+                      This profile is equivalent to a Custom profile specified as:
+                        minTLSVersion: VersionTLS10
+                        ciphers:
+                          - TLS_AES_128_GCM_SHA256
+                          - TLS_AES_256_GCM_SHA384
+                          - TLS_CHACHA20_POLY1305_SHA256
+                          - ECDHE-ECDSA-AES128-GCM-SHA256
+                          - ECDHE-RSA-AES128-GCM-SHA256
+                          - ECDHE-ECDSA-AES256-GCM-SHA384
+                          - ECDHE-RSA-AES256-GCM-SHA384
+                          - ECDHE-ECDSA-CHACHA20-POLY1305
+                          - ECDHE-RSA-CHACHA20-POLY1305
+                          - ECDHE-ECDSA-AES128-SHA256
+                          - ECDHE-RSA-AES128-SHA256
+                          - ECDHE-ECDSA-AES128-SHA
+                          - ECDHE-RSA-AES128-SHA
+                          - ECDHE-ECDSA-AES256-SHA
+                          - ECDHE-RSA-AES256-SHA
+                          - AES128-GCM-SHA256
+                          - AES256-GCM-SHA384
+                          - AES128-SHA256
+                          - AES128-SHA
+                          - AES256-SHA
+                          - DES-CBC3-SHA
+                    nullable: true
+                    type: object
+                  type:
+                    description: |-
+                      type is one of Old, Intermediate, Modern or Custom. Custom provides the
+                      ability to specify individual TLS security profile parameters.
+
+                      The profiles are based on version 5.7 of the Mozilla Server Side TLS
+                      configuration guidelines. The cipher lists consist of the configuration's
+                      "ciphersuites" followed by the Go-specific "ciphers" from the guidelines.
+                      See: https://ssl-config.mozilla.org/guidelines/5.7.json
+
+                      The profiles are intent based, so they may change over time as new ciphers are
+                      developed and existing ciphers are found to be insecure. Depending on
+                      precisely which ciphers are available to a process, the list may be reduced.
+                    enum:
+                    - Old
+                    - Intermediate
+                    - Modern
+                    - Custom
+                    type: string
+                type: object
+            type: object
+          status:
+            description: status contains observed information about the kubelet configuration.
+            properties:
+              conditions:
+                description: conditions represents the latest available observations
+                  of current state.
+                items:
+                  description: KubeletConfigCondition defines the state of the KubeletConfig
+                  properties:
+                    lastTransitionTime:
+                      description: lastTransitionTime is the time of the last update
+                        to the current status object.
+                      format: date-time
+                      nullable: true
+                      type: string
+                    message:
+                      description: |-
+                        message provides additional information about the current condition.
+                        This is only to be consumed by humans.
+                      type: string
+                    reason:
+                      description: reason is the reason for the condition's last transition.  Reasons
+                        are PascalCase
+                      type: string
+                    status:
+                      description: status of the condition, one of True, False, Unknown.
+                      type: string
+                    type:
+                      description: type specifies the state of the operator's reconciliation
+                        functionality.
+                      type: string
+                  type: object
+                type: array
+              observedGeneration:
+                description: observedGeneration represents the generation observed
+                  by the controller.
+                format: int64
+                type: integer
+            type: object
+        required:
+        - spec
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}

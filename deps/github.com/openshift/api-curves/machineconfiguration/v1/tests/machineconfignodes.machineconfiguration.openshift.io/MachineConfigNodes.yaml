@@ -1,0 +1,211 @@
+apiVersion: apiextensions.k8s.io/v1 # Hack because controller-gen complains if we don't have this
+name: "[TechPreview] MachineConfigNode"
+crdName: machineconfignodes.machineconfiguration.openshift.io
+featureGates:
+- MachineConfigNodes
+tests:
+  onCreate:
+    - name: Should be able to create a minimal MachineConfigNode
+      initial: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: MachineConfigNode
+        metadata:
+          name: foobar
+        spec:
+          node:
+            name: foobar
+          pool:
+            name: worker
+          configVersion:
+            desired: rendered-worker-abc
+      expected: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: MachineConfigNode
+        metadata:
+          name: foobar
+        spec:
+          node:
+            name: foobar
+          pool:
+            name: worker
+          configVersion:
+            desired: rendered-worker-abc
+    - name: Node name must match the Object name.
+      initial: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: MachineConfigNode
+        metadata:
+          name: foobar
+        spec:
+          node:
+            name: barfoo
+          pool:
+            name: worker
+          configVersion:
+            desired: rendered-worker-abc
+      expectedError: "Invalid value: \"object\": spec.node.name should match metadata.name"
+    - name: Pool is required.
+      initial: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: MachineConfigNode
+        metadata:
+          name: foobar
+        spec:
+          node:
+            name: barfoo
+          configVersion:
+            desired: rendered-worker-abc
+      expectedError: "spec.pool: Required value, <nil>: Invalid value: \"null\""
+    - name: Node is required.
+      initial: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: MachineConfigNode
+        metadata:
+          name: foobar
+        spec:
+          pool:
+            name: barfoo
+          configVersion:
+            desired: rendered-worker-abc
+      expectedError: "spec.node: Required value, <nil>: Invalid value: \"null\""
+    - name: ConfigVersion is required.
+      initial: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: MachineConfigNode
+        metadata:
+          name: foobar
+        spec:
+          pool:
+            name: barfoo
+          node:
+            name: foobar
+      expectedError: "spec.configVersion: Required value, <nil>: Invalid value: \"null\""
+  onUpdate:
+    - name: PinnedImageSet desired generation must be greater than or equal to the current generation
+      initial: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: MachineConfigNode
+        metadata:
+          name: foobar
+        spec:
+          node:
+            name: foobar
+          pool:
+            name: worker
+          configVersion:
+            desired: rendered-worker-abc
+        status:
+          observedGeneration: 1
+          configVersion:
+            desired: rendered-worker-abc
+          pinnedImageSets:
+            - name: test-pinned-image-set
+              currentGeneration: 1
+              desiredGeneration: 1
+      updated: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: MachineConfigNode
+        metadata:
+          name: foobar
+        spec:
+          node:
+            name: foobar
+          pool:
+            name: worker
+          configVersion:
+            desired: rendered-worker-abc
+        status:
+          observedGeneration: 1
+          configVersion:
+            desired: rendered-worker-abc
+          pinnedImageSets:
+            - name: test-pinned-image-set
+              currentGeneration: 2
+              desiredGeneration: 1
+      expectedStatusError: "Invalid value: \"object\": desired generation must be greater than or equal to the current generation"
+    - name: PinnedImageSet desired generation must be greater than or equal to the last failed generation
+      initial: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: MachineConfigNode
+        metadata:
+          name: foobar
+        spec:
+          node:
+            name: foobar
+          pool:
+            name: worker
+          configVersion:
+            desired: rendered-worker-abc
+        status:
+          observedGeneration: 4
+          configVersion:
+            desired: rendered-worker-abc
+          pinnedImageSets:
+            - name: test-pinned-image-set
+              currentGeneration: 2
+              desiredGeneration: 2
+      updated: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: MachineConfigNode
+        metadata:
+          name: foobar
+        spec:
+          node:
+            name: foobar
+          pool:
+            name: worker
+          configVersion:
+            desired: rendered-worker-abc
+        status:
+          observedGeneration: 5
+          configVersion:
+            desired: rendered-worker-abc
+          pinnedImageSets:
+            - name: test-pinned-image-set
+              currentGeneration: 3
+              desiredGeneration: 3
+              lastFailedGeneration: 4
+      expectedStatusError: "Invalid value: \"object\": desired generation must be greater than or equal to the last failed generation"
+    - name: PinnedImageSet last failed generation error must be defined on image pull and pin failure
+      initial: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: MachineConfigNode
+        metadata:
+          name: foobar
+        spec:
+          node:
+            name: foobar
+          pool:
+            name: worker
+          configVersion:
+            desired: rendered-worker-abc
+        status:
+          observedGeneration: 4
+          configVersion:
+            desired: rendered-worker-abc
+          pinnedImageSets:
+            - name: test-pinned-image-set
+              currentGeneration: 2
+              desiredGeneration: 2
+      updated: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: MachineConfigNode
+        metadata:
+          name: foobar
+        spec:
+          node:
+            name: foobar
+          pool:
+            name: worker
+          configVersion:
+            desired: rendered-worker-abc
+        status:
+          observedGeneration: 5
+          configVersion:
+            desired: rendered-worker-abc
+          pinnedImageSets:
+            - name: test-pinned-image-set
+              currentGeneration: 2
+              desiredGeneration: 3
+              lastFailedGeneration: 3
+      expectedStatusError: "Invalid value: \"object\": last failed generation error must be defined on image pull and pin failure"

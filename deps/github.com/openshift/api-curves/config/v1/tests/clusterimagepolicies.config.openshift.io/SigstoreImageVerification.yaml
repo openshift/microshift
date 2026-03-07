@@ -1,0 +1,453 @@
+apiVersion: apiextensions.k8s.io/v1 # Hack because controller-gen complains if we don't have this
+name: "ClusterImagePolicy"
+crdName: clusterimagepolicies.config.openshift.io
+featureGates:
+- SigstoreImageVerification
+tests:
+  onCreate:
+    - name: Should be able to create a minimal ImagePolicy with policyType PublicKey
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: ClusterImagePolicy
+        spec:
+          scopes:
+          - example.com
+          policy:
+            rootOfTrust:
+              policyType: PublicKey
+              publicKey:
+                keyData: LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUZrd0V3WUhLb1pJemowQ0FRWUlLb1pJemowREFRY0RRZ0FFK0tpN0I3K2tpTFdPSmRQWXBZanRqUmtXVnBxRgpuNHl1TjU2VjZHaGdLRm5SZjJqemlweEFWR084cm0vWUVQU3d2clBORHJqdnA0YlpoNm5NR0Z0NzhBPT0KLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0t
+      expected: |
+        apiVersion: config.openshift.io/v1
+        kind: ClusterImagePolicy
+        spec:
+          scopes:
+          - example.com
+          policy:
+            rootOfTrust:
+              policyType: PublicKey
+              publicKey:
+                keyData: LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUZrd0V3WUhLb1pJemowQ0FRWUlLb1pJemowREFRY0RRZ0FFK0tpN0I3K2tpTFdPSmRQWXBZanRqUmtXVnBxRgpuNHl1TjU2VjZHaGdLRm5SZjJqemlweEFWR084cm0vWUVQU3d2clBORHJqdnA0YlpoNm5NR0Z0NzhBPT0KLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0t
+    - name: Should be able to create a minimal ImagePolicy with policyType FulcioCAWithRekor
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: ClusterImagePolicy
+        spec:
+          scopes:
+          - example.com
+          policy:
+            rootOfTrust:
+              policyType: FulcioCAWithRekor
+              fulcioCAWithRekor:
+                fulcioCAData: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUZ2ekNDQTZlZ0F3SUJBZ0lVRDVuLzdUMGszUHBVekMvZE5CRUVpWHhDaFVjd0RRWUpLb1pJaHZjTkFRRUwKQlFBd2JqRUxNQWtHQTFVRUJoTUNSVk14RVRBUEJnTlZCQWNNQ0ZaaGJHVnVZMmxoTVFzd0NRWURWUVFLREFKSgpWREVSTUE4R0ExVUVDd3dJVTJWamRYSnBkSGt4TERBcUJnTlZCQU1NSTB4cGJuVjRaWEpoSUZKdmIzUWdRMlZ5CmRHbG1hV05oZEdVZ1FYVjBhRzl5YVhSNU1DQVhEVEkwTURneE1ERTNNVFF3TTFvWUR6SXdOVEV4TWpJMk1UY3gKTkRBeldqQnVNUXN3Q1FZRFZRUUdFd0pGVXpFUk1BOEdBMVVFQnd3SVZtRnNaVzVqYVdFeEN6QUpCZ05WQkFvTQpBa2xVTVJFd0R3WURWUVFMREFoVFpXTjFjbWwwZVRFc01Db0dBMVVFQXd3alRHbHVkWGhsY21FZ1VtOXZkQ0JEClpYSjBhV1pwWTJGMFpTQkJkWFJvYjNKcGRIa3dnZ0lpTUEwR0NTcUdTSWIzRFFFQkFRVUFBNElDRHdBd2dnSUsKQW9JQ0FRQ1h5ekpBSGRlY0NES0tpdFN4MlN0d215RWdUc2psRHhMdUpEUlZkUGVYZWpNTzVZQ1lxdW4raXl6awpkZm5jZ3k4TTlOTHU1bWZUSWpUZ3dLRVBHWHhpQjZ4VXVtNjRPUmt2RUVnT0oyV3JWV3M5NHJLL21iaTB4eUl1ClZjTlNFT0M0Ry9OY2VmYlFJY3JJNk5PV0xsRTN3WEFlRlNQVTNDTnJlbzV5NGlkNEtmR29oWlN1QXJJNkxZQzcKTm0vRlQ5cGgzZW5JdTBubVFjUGZYaU0xS2E2ZWpKK3hHMk5TdXRFL1dWVTNUL0JPVWM5b3MvWUJSbHlvakZGbwpkSHZ4L2lLRGpWZXBFOGRySXZMa1c1OEFoUXZNbmh4VVErWk1YdHhYaDlyVXZzOTdEdjNsdE85ek91STRaTGVsCmt2ZjRvWW5PbGltQm1SNk5zZlAvaUNZR1dLVVQ2VmUxZTZFbGkzaG5COElOQ2tzQmF1cEYxZ0YyeWpOakYyc2sKQnowcmoydjFFb2ZsSEhsZ1BnM2NyYkNON2RoSnF6RHhGQmFaeXdXRjZjYzFNYjVDMUgrUFFudXVGOEI2L0JTQQp0VEF5M3hpNUVlcWhxeGNxdG5BS0pnSXc3Q0dTUHZGQ280OG5lVzlmdERlNkFrcEpTMjhBNVBRVCtuZDY1T3VjClpqbnBGNzhGdkE5aXdsSjNxaE90WE5DWVlQOVhMWnNvSjNJK2ZLaEQ0dE9kRklta3dFS3RYUW9xRGtuUmdKeEYKMmFrNDdndnZuQkpKa1o4ZEhpYU85ZWlzL1R3Q2p2ekhQbk9oaEZqWmRmNlFOTlVMVERXcGp3YW1kSDQrd3VjVgpjQXpmUlhtbEVpbnIyaXlXQW5ycEZzdGlSeHRySDRFTytqb25MbXpmUlNOVnoxL0xXd0lEQVFBQm8xTXdVVEFkCkJnTlZIUTRFRmdRVWxJMXJ6b3FNZlZxbHFKZkJzYWt6bXJVZjl6OHdId1lEVlIwakJCZ3dGb0FVbEkxcnpvcU0KZlZxbHFKZkJzYWt6bXJVZjl6OHdEd1lEVlIwVEFRSC9CQVV3QXdFQi96QU5CZ2txaGtpRzl3MEJBUXNGQUFPQwpBZ0VBZXEwMTJPWGxNRE9OUVNaSXRnd3pUaURsVHE1MzNCekkrak50cWVUTzBZZUNwTGZYRlROUXFxdyt6WVFuCi80UVlacW5lSUhkTnByaFlkZDdORUc5ak5jaXV0dW4vZUNaZXZYVktPc3d6VHk3a2l5Nm9Rek1hZklVZ2dMMTUKV2JFZlU5c3JjT0xBOXFVN2MvUHdPQURzdEhQTVBuZ3Z4UzdqWmw2Z0cwNUFVMGcyYXF2bkRiVmtmY3M2SUxMUgpFRnNUTXBLK1lHaWhBU1NrUTBwbVpUTGdEem1HVWdVOFFvejZFWTAwMzZiZzZJbTJKL0RNUU9ic0MvQmVqb1EzCnkxQmJWR1Job0F2bytQYkprd0hzaUE2SythR3RZYXJmSzR2VUpoVEJMb0JHSElNRDlPbkVRc0pDT2JvWnhsVU4KYmwxZVhjOHFzQzVqVmNWOG9TakNWbmVOZ241aW1HYVFLdEVWdjdBYUNvL3RCYXJYNVJucEdKZ1h0bnhuNjVmVApYNUh3NENCR2RIeUtmZTliWjV0K2lFSm1WbTgva2M2Z216V2JmNVZUcmkyTUp0ZEFwWGlnRmxIYzZVK09uMnk5CitYbU9pbWVDbVA5WTNqcGdITkIxVVA0Q2hFSEg0azdmWDFaSkpYeGVLWERJTWFxWmFRYjZ5VCtDbFJvU2lsQSsKQU95dEd4c3B0OVpmemN4ZGRaTUdNYXcrQzlaYW5WTjNRVTZ1Tk0wOGYra2lkRkdJL29vN1pNZ0xaQ1RKWnozSQpINktFSkl1L1ZpWFlONTFlM1ZpV0srNFBBKzZjRXVmZzMwZE52cFExTVVuYW10Sjc2QXQ2UVJnY3NBMzVYemxWCkZ0RlV6VVFkZk1KQnBSVVR1ZEtvK2d0TG9oT1BkZXdYM2xaUVA4QkJCZWdrdlJzPQotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0t
+                rekorKeyData: LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUZrd0V3WUhLb1pJemowQ0FRWUlLb1pJemowREFRY0RRZ0FFMkcyWSsydGFiZFRWNUJjR2lCSXgwYTlmQUZ3cgprQmJtTFNHdGtzNEwzcVg2eVlZMHp1ZkJuaEM4VXIvaXk1NUdoV1AvOUEvYlkyTGhDMzBNOStSWXR3PT0KLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0tCg==
+                fulcioSubject:
+                  oidcIssuer: https://oidc.localhost
+                  signedEmail: test-user@example.com
+      expected: |
+        apiVersion: config.openshift.io/v1
+        kind: ClusterImagePolicy
+        spec:
+          scopes:
+          - example.com
+          policy:
+            rootOfTrust:
+              policyType: FulcioCAWithRekor
+              fulcioCAWithRekor:
+                fulcioCAData: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUZ2ekNDQTZlZ0F3SUJBZ0lVRDVuLzdUMGszUHBVekMvZE5CRUVpWHhDaFVjd0RRWUpLb1pJaHZjTkFRRUwKQlFBd2JqRUxNQWtHQTFVRUJoTUNSVk14RVRBUEJnTlZCQWNNQ0ZaaGJHVnVZMmxoTVFzd0NRWURWUVFLREFKSgpWREVSTUE4R0ExVUVDd3dJVTJWamRYSnBkSGt4TERBcUJnTlZCQU1NSTB4cGJuVjRaWEpoSUZKdmIzUWdRMlZ5CmRHbG1hV05oZEdVZ1FYVjBhRzl5YVhSNU1DQVhEVEkwTURneE1ERTNNVFF3TTFvWUR6SXdOVEV4TWpJMk1UY3gKTkRBeldqQnVNUXN3Q1FZRFZRUUdFd0pGVXpFUk1BOEdBMVVFQnd3SVZtRnNaVzVqYVdFeEN6QUpCZ05WQkFvTQpBa2xVTVJFd0R3WURWUVFMREFoVFpXTjFjbWwwZVRFc01Db0dBMVVFQXd3alRHbHVkWGhsY21FZ1VtOXZkQ0JEClpYSjBhV1pwWTJGMFpTQkJkWFJvYjNKcGRIa3dnZ0lpTUEwR0NTcUdTSWIzRFFFQkFRVUFBNElDRHdBd2dnSUsKQW9JQ0FRQ1h5ekpBSGRlY0NES0tpdFN4MlN0d215RWdUc2psRHhMdUpEUlZkUGVYZWpNTzVZQ1lxdW4raXl6awpkZm5jZ3k4TTlOTHU1bWZUSWpUZ3dLRVBHWHhpQjZ4VXVtNjRPUmt2RUVnT0oyV3JWV3M5NHJLL21iaTB4eUl1ClZjTlNFT0M0Ry9OY2VmYlFJY3JJNk5PV0xsRTN3WEFlRlNQVTNDTnJlbzV5NGlkNEtmR29oWlN1QXJJNkxZQzcKTm0vRlQ5cGgzZW5JdTBubVFjUGZYaU0xS2E2ZWpKK3hHMk5TdXRFL1dWVTNUL0JPVWM5b3MvWUJSbHlvakZGbwpkSHZ4L2lLRGpWZXBFOGRySXZMa1c1OEFoUXZNbmh4VVErWk1YdHhYaDlyVXZzOTdEdjNsdE85ek91STRaTGVsCmt2ZjRvWW5PbGltQm1SNk5zZlAvaUNZR1dLVVQ2VmUxZTZFbGkzaG5COElOQ2tzQmF1cEYxZ0YyeWpOakYyc2sKQnowcmoydjFFb2ZsSEhsZ1BnM2NyYkNON2RoSnF6RHhGQmFaeXdXRjZjYzFNYjVDMUgrUFFudXVGOEI2L0JTQQp0VEF5M3hpNUVlcWhxeGNxdG5BS0pnSXc3Q0dTUHZGQ280OG5lVzlmdERlNkFrcEpTMjhBNVBRVCtuZDY1T3VjClpqbnBGNzhGdkE5aXdsSjNxaE90WE5DWVlQOVhMWnNvSjNJK2ZLaEQ0dE9kRklta3dFS3RYUW9xRGtuUmdKeEYKMmFrNDdndnZuQkpKa1o4ZEhpYU85ZWlzL1R3Q2p2ekhQbk9oaEZqWmRmNlFOTlVMVERXcGp3YW1kSDQrd3VjVgpjQXpmUlhtbEVpbnIyaXlXQW5ycEZzdGlSeHRySDRFTytqb25MbXpmUlNOVnoxL0xXd0lEQVFBQm8xTXdVVEFkCkJnTlZIUTRFRmdRVWxJMXJ6b3FNZlZxbHFKZkJzYWt6bXJVZjl6OHdId1lEVlIwakJCZ3dGb0FVbEkxcnpvcU0KZlZxbHFKZkJzYWt6bXJVZjl6OHdEd1lEVlIwVEFRSC9CQVV3QXdFQi96QU5CZ2txaGtpRzl3MEJBUXNGQUFPQwpBZ0VBZXEwMTJPWGxNRE9OUVNaSXRnd3pUaURsVHE1MzNCekkrak50cWVUTzBZZUNwTGZYRlROUXFxdyt6WVFuCi80UVlacW5lSUhkTnByaFlkZDdORUc5ak5jaXV0dW4vZUNaZXZYVktPc3d6VHk3a2l5Nm9Rek1hZklVZ2dMMTUKV2JFZlU5c3JjT0xBOXFVN2MvUHdPQURzdEhQTVBuZ3Z4UzdqWmw2Z0cwNUFVMGcyYXF2bkRiVmtmY3M2SUxMUgpFRnNUTXBLK1lHaWhBU1NrUTBwbVpUTGdEem1HVWdVOFFvejZFWTAwMzZiZzZJbTJKL0RNUU9ic0MvQmVqb1EzCnkxQmJWR1Job0F2bytQYkprd0hzaUE2SythR3RZYXJmSzR2VUpoVEJMb0JHSElNRDlPbkVRc0pDT2JvWnhsVU4KYmwxZVhjOHFzQzVqVmNWOG9TakNWbmVOZ241aW1HYVFLdEVWdjdBYUNvL3RCYXJYNVJucEdKZ1h0bnhuNjVmVApYNUh3NENCR2RIeUtmZTliWjV0K2lFSm1WbTgva2M2Z216V2JmNVZUcmkyTUp0ZEFwWGlnRmxIYzZVK09uMnk5CitYbU9pbWVDbVA5WTNqcGdITkIxVVA0Q2hFSEg0azdmWDFaSkpYeGVLWERJTWFxWmFRYjZ5VCtDbFJvU2lsQSsKQU95dEd4c3B0OVpmemN4ZGRaTUdNYXcrQzlaYW5WTjNRVTZ1Tk0wOGYra2lkRkdJL29vN1pNZ0xaQ1RKWnozSQpINktFSkl1L1ZpWFlONTFlM1ZpV0srNFBBKzZjRXVmZzMwZE52cFExTVVuYW10Sjc2QXQ2UVJnY3NBMzVYemxWCkZ0RlV6VVFkZk1KQnBSVVR1ZEtvK2d0TG9oT1BkZXdYM2xaUVA4QkJCZWdrdlJzPQotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0t
+                rekorKeyData: LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUZrd0V3WUhLb1pJemowQ0FRWUlLb1pJemowREFRY0RRZ0FFMkcyWSsydGFiZFRWNUJjR2lCSXgwYTlmQUZ3cgprQmJtTFNHdGtzNEwzcVg2eVlZMHp1ZkJuaEM4VXIvaXk1NUdoV1AvOUEvYlkyTGhDMzBNOStSWXR3PT0KLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0tCg==
+                fulcioSubject:
+                  oidcIssuer: https://oidc.localhost
+                  signedEmail: test-user@example.com
+    - name: Should not allow policyType PublicKey but not set publicKey
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: ClusterImagePolicy
+        spec:
+          scopes:
+          - example.com
+          policy:
+            rootOfTrust:
+              policyType: PublicKey
+              FulcioCAWithRekor:
+                fulcioCAData: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUZ2ekNDQTZlZ0F3SUJBZ0lVRDVuLzdUMGszUHBVekMvZE5CRUVpWHhDaFVjd0RRWUpLb1pJaHZjTkFRRUwKQlFBd2JqRUxNQWtHQTFVRUJoTUNSVk14RVRBUEJnTlZCQWNNQ0ZaaGJHVnVZMmxoTVFzd0NRWURWUVFLREFKSgpWREVSTUE4R0ExVUVDd3dJVTJWamRYSnBkSGt4TERBcUJnTlZCQU1NSTB4cGJuVjRaWEpoSUZKdmIzUWdRMlZ5CmRHbG1hV05oZEdVZ1FYVjBhRzl5YVhSNU1DQVhEVEkwTURneE1ERTNNVFF3TTFvWUR6SXdOVEV4TWpJMk1UY3gKTkRBeldqQnVNUXN3Q1FZRFZRUUdFd0pGVXpFUk1BOEdBMVVFQnd3SVZtRnNaVzVqYVdFeEN6QUpCZ05WQkFvTQpBa2xVTVJFd0R3WURWUVFMREFoVFpXTjFjbWwwZVRFc01Db0dBMVVFQXd3alRHbHVkWGhsY21FZ1VtOXZkQ0JEClpYSjBhV1pwWTJGMFpTQkJkWFJvYjNKcGRIa3dnZ0lpTUEwR0NTcUdTSWIzRFFFQkFRVUFBNElDRHdBd2dnSUsKQW9JQ0FRQ1h5ekpBSGRlY0NES0tpdFN4MlN0d215RWdUc2psRHhMdUpEUlZkUGVYZWpNTzVZQ1lxdW4raXl6awpkZm5jZ3k4TTlOTHU1bWZUSWpUZ3dLRVBHWHhpQjZ4VXVtNjRPUmt2RUVnT0oyV3JWV3M5NHJLL21iaTB4eUl1ClZjTlNFT0M0Ry9OY2VmYlFJY3JJNk5PV0xsRTN3WEFlRlNQVTNDTnJlbzV5NGlkNEtmR29oWlN1QXJJNkxZQzcKTm0vRlQ5cGgzZW5JdTBubVFjUGZYaU0xS2E2ZWpKK3hHMk5TdXRFL1dWVTNUL0JPVWM5b3MvWUJSbHlvakZGbwpkSHZ4L2lLRGpWZXBFOGRySXZMa1c1OEFoUXZNbmh4VVErWk1YdHhYaDlyVXZzOTdEdjNsdE85ek91STRaTGVsCmt2ZjRvWW5PbGltQm1SNk5zZlAvaUNZR1dLVVQ2VmUxZTZFbGkzaG5COElOQ2tzQmF1cEYxZ0YyeWpOakYyc2sKQnowcmoydjFFb2ZsSEhsZ1BnM2NyYkNON2RoSnF6RHhGQmFaeXdXRjZjYzFNYjVDMUgrUFFudXVGOEI2L0JTQQp0VEF5M3hpNUVlcWhxeGNxdG5BS0pnSXc3Q0dTUHZGQ280OG5lVzlmdERlNkFrcEpTMjhBNVBRVCtuZDY1T3VjClpqbnBGNzhGdkE5aXdsSjNxaE90WE5DWVlQOVhMWnNvSjNJK2ZLaEQ0dE9kRklta3dFS3RYUW9xRGtuUmdKeEYKMmFrNDdndnZuQkpKa1o4ZEhpYU85ZWlzL1R3Q2p2ekhQbk9oaEZqWmRmNlFOTlVMVERXcGp3YW1kSDQrd3VjVgpjQXpmUlhtbEVpbnIyaXlXQW5ycEZzdGlSeHRySDRFTytqb25MbXpmUlNOVnoxL0xXd0lEQVFBQm8xTXdVVEFkCkJnTlZIUTRFRmdRVWxJMXJ6b3FNZlZxbHFKZkJzYWt6bXJVZjl6OHdId1lEVlIwakJCZ3dGb0FVbEkxcnpvcU0KZlZxbHFKZkJzYWt6bXJVZjl6OHdEd1lEVlIwVEFRSC9CQVV3QXdFQi96QU5CZ2txaGtpRzl3MEJBUXNGQUFPQwpBZ0VBZXEwMTJPWGxNRE9OUVNaSXRnd3pUaURsVHE1MzNCekkrak50cWVUTzBZZUNwTGZYRlROUXFxdyt6WVFuCi80UVlacW5lSUhkTnByaFlkZDdORUc5ak5jaXV0dW4vZUNaZXZYVktPc3d6VHk3a2l5Nm9Rek1hZklVZ2dMMTUKV2JFZlU5c3JjT0xBOXFVN2MvUHdPQURzdEhQTVBuZ3Z4UzdqWmw2Z0cwNUFVMGcyYXF2bkRiVmtmY3M2SUxMUgpFRnNUTXBLK1lHaWhBU1NrUTBwbVpUTGdEem1HVWdVOFFvejZFWTAwMzZiZzZJbTJKL0RNUU9ic0MvQmVqb1EzCnkxQmJWR1Job0F2bytQYkprd0hzaUE2SythR3RZYXJmSzR2VUpoVEJMb0JHSElNRDlPbkVRc0pDT2JvWnhsVU4KYmwxZVhjOHFzQzVqVmNWOG9TakNWbmVOZ241aW1HYVFLdEVWdjdBYUNvL3RCYXJYNVJucEdKZ1h0bnhuNjVmVApYNUh3NENCR2RIeUtmZTliWjV0K2lFSm1WbTgva2M2Z216V2JmNVZUcmkyTUp0ZEFwWGlnRmxIYzZVK09uMnk5CitYbU9pbWVDbVA5WTNqcGdITkIxVVA0Q2hFSEg0azdmWDFaSkpYeGVLWERJTWFxWmFRYjZ5VCtDbFJvU2lsQSsKQU95dEd4c3B0OVpmemN4ZGRaTUdNYXcrQzlaYW5WTjNRVTZ1Tk0wOGYra2lkRkdJL29vN1pNZ0xaQ1RKWnozSQpINktFSkl1L1ZpWFlONTFlM1ZpV0srNFBBKzZjRXVmZzMwZE52cFExTVVuYW10Sjc2QXQ2UVJnY3NBMzVYemxWCkZ0RlV6VVFkZk1KQnBSVVR1ZEtvK2d0TG9oT1BkZXdYM2xaUVA4QkJCZWdrdlJzPQotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0t
+                rekorKeyData: LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUZrd0V3WUhLb1pJemowQ0FRWUlLb1pJemowREFRY0RRZ0FFMkcyWSsydGFiZFRWNUJjR2lCSXgwYTlmQUZ3cgprQmJtTFNHdGtzNEwzcVg2eVlZMHp1ZkJuaEM4VXIvaXk1NUdoV1AvOUEvYlkyTGhDMzBNOStSWXR3PT0KLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0tCg==
+                fulcioSubject:
+                  oidcIssuer: https://oidc.localhost
+                  signedEmail: test-user@example.com
+      expectedError: "spec.policy.rootOfTrust: Invalid value: \"object\": publicKey is required when policyType is PublicKey, and forbidden otherwise"
+    - name: Should not allow policyType FulcioCAData but not set fulcioCAWithRekor
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: ClusterImagePolicy
+        spec:
+          scopes:
+          - example.com
+          policy:
+            rootOfTrust:
+              policyType: FulcioCAWithRekor
+              PublicKey:
+                keyData: Zm9vIGJhcg==
+      expectedError: "spec.policy.rootOfTrust: Invalid value: \"object\": fulcioCAWithRekor is required when policyType is FulcioCAWithRekor, and forbidden otherwise"
+    - name: Should not allow policyType set but not set corresponding policy
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: ClusterImagePolicy
+        spec:
+          scopes:
+          - example.com
+          policy:
+            rootOfTrust:
+              policyType: PublicKey
+      expectedError: "spec.policy.rootOfTrust: Invalid value: \"object\": publicKey is required when policyType is PublicKey, and forbidden otherwise"
+    - name: Should not allow policyType set FulcioCAWith but not set corresponding policy
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: ClusterImagePolicy
+        spec:
+          scopes:
+          - example.com
+          policy:
+            rootOfTrust:
+              policyType: FulcioCAWithRekor
+      expectedError: "spec.policy.rootOfTrust: Invalid value: \"object\": fulcioCAWithRekor is required when policyType is FulcioCAWithRekor, and forbidden otherwise"
+    - name: Should not allow signedIdentity matchPolicy ExactRepository but not set repository
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: ClusterImagePolicy
+        spec:
+          scopes:
+          - example.com
+          policy:
+            rootOfTrust:
+              policyType: PublicKey
+              publicKey:
+                keyData: Zm9vIGJhcg==
+            signedIdentity:
+              matchPolicy: ExactRepository
+      expectedError: "spec.policy.signedIdentity: Invalid value: \"object\": exactRepository is required when matchPolicy is ExactRepository, and forbidden otherwise"
+    - name: Should not allow signedIdentity matchPolicy RemapIdentity but not set prefixes
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: ClusterImagePolicy
+        spec:
+          scopes:
+          - example.com
+          policy:
+            rootOfTrust:
+              policyType: PublicKey
+              publicKey:
+                keyData: Zm9vIGJhcg==
+            signedIdentity:
+              matchPolicy: RemapIdentity
+      expectedError: "spec.policy.signedIdentity: Invalid value: \"object\": remapIdentity is required when matchPolicy is RemapIdentity, and forbidden otherwise"
+    - name: Test scope should not allow 'busybox'
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: ClusterImagePolicy
+        spec:
+          scopes:
+          - busybox
+          policy:
+            rootOfTrust:
+              policyType: PublicKey
+              publicKey:
+                keyData: Zm9vIGJhcg==
+      expectedError: "spec.scopes[0]: Invalid value: \"string\": invalid image scope format, scope must contain a fully qualified domain name or 'localhost'"
+    - name: Test scope should not allow start with subnamesapces '*.example.com/test'
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: ClusterImagePolicy
+        spec:
+          scopes:
+          - "*.example.com/test"
+          policy:
+            rootOfTrust:
+              policyType: PublicKey
+              publicKey:
+                keyData: Zm9vIGJhcg==
+      expectedError: "spec.scopes[0]: Invalid value: \"string\": invalid image scope with wildcard, a wildcard can only be at the start of the domain and is only supported for subdomain matching, not path matching"
+    - name: Test scope should not allow invalid digest
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: ClusterImagePolicy
+        spec:
+          scopes:
+          - example.com/namespace/namespace@sha256:12dsdf
+          policy:
+            rootOfTrust:
+              policyType: PublicKey
+              publicKey:
+                keyData: LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUZrd0V3WUhLb1pJemowQ0FRWUlLb1pJemowREFRY0RRZ0FFK0tpN0I3K2tpTFdPSmRQWXBZanRqUmtXVnBxRgpuNHl1TjU2VjZHaGdLRm5SZjJqemlweEFWR084cm0vWUVQU3d2clBORHJqdnA0YlpoNm5NR0Z0NzhBPT0KLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0t
+      expectedError: "spec.scopes[0]: Invalid value: \"string\": invalid repository namespace or image specification in the image scope"
+    - name: Test should not allow tag in ExactRepository repository
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: ClusterImagePolicy
+        spec:
+          scopes:
+          - example.com
+          policy:
+            rootOfTrust:
+              policyType: PublicKey
+              publicKey:
+                keyData: LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUZrd0V3WUhLb1pJemowQ0FRWUlLb1pJemowREFRY0RRZ0FFK0tpN0I3K2tpTFdPSmRQWXBZanRqUmtXVnBxRgpuNHl1TjU2VjZHaGdLRm5SZjJqemlweEFWR084cm0vWUVQU3d2clBORHJqdnA0YlpoNm5NR0Z0NzhBPT0KLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0t
+            signedIdentity:
+              matchPolicy: ExactRepository
+              exactRepository: 
+                repository: example.com/namespace/namespace:latest
+      expectedError: "[spec.policy.signedIdentity.exactRepository.repository: Invalid value: \"string\": invalid repository or prefix in the signedIdentity, should not include the tag or digest, spec.policy.signedIdentity.exactRepository.repository: Invalid value: \"string\": invalid repository or prefix in the signedIdentity. The repository or prefix must starts with 'localhost' or a valid '.' separated domain. If contains registry paths, the path component names must start with at least one letter or number, with following parts able to be separated by one period, one or two underscore and multiple dashes.]"
+    - name: Test should not allow tag in ExactRepository repository
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: ClusterImagePolicy
+        spec:
+          scopes:
+          - example.com
+          policy:
+            rootOfTrust:
+              policyType: PublicKey
+              publicKey:
+                keyData: LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUZrd0V3WUhLb1pJemowQ0FRWUlLb1pJemowREFRY0RRZ0FFK0tpN0I3K2tpTFdPSmRQWXBZanRqUmtXVnBxRgpuNHl1TjU2VjZHaGdLRm5SZjJqemlweEFWR084cm0vWUVQU3d2clBORHJqdnA0YlpoNm5NR0Z0NzhBPT0KLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0t
+            signedIdentity:
+              matchPolicy: ExactRepository
+              exactRepository: 
+                repository: localhost:1234/namespace/namespace:latest
+      expectedError: "[spec.policy.signedIdentity.exactRepository.repository: Invalid value: \"string\": invalid repository or prefix in the signedIdentity, should not include the tag or digest, spec.policy.signedIdentity.exactRepository.repository: Invalid value: \"string\": invalid repository or prefix in the signedIdentity. The repository or prefix must starts with 'localhost' or a valid '.' separated domain. If contains registry paths, the path component names must start with at least one letter or number, with following parts able to be separated by one period, one or two underscore and multiple dashes.]"
+    - name: Test should not allow digest in ExactRepository repository
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: ClusterImagePolicy
+        spec:
+          scopes:
+          - example.com
+          policy:
+            rootOfTrust:
+              policyType: PublicKey
+              publicKey:
+                keyData: LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUZrd0V3WUhLb1pJemowQ0FRWUlLb1pJemowREFRY0RRZ0FFK0tpN0I3K2tpTFdPSmRQWXBZanRqUmtXVnBxRgpuNHl1TjU2VjZHaGdLRm5SZjJqemlweEFWR084cm0vWUVQU3d2clBORHJqdnA0YlpoNm5NR0Z0NzhBPT0KLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0t
+            signedIdentity:
+              matchPolicy: ExactRepository
+              exactRepository: 
+                repository: localhost:1234/namespace/namespace@sha256:b7e686e30346e9ace664fa09c0275262f8b9a443ed56d22165a0e201f6488c13
+      expectedError: "[spec.policy.signedIdentity.exactRepository.repository: Invalid value: \"string\": invalid repository or prefix in the signedIdentity, should not include the tag or digest, spec.policy.signedIdentity.exactRepository.repository: Invalid value: \"string\": invalid repository or prefix in the signedIdentity. The repository or prefix must starts with 'localhost' or a valid '.' separated domain. If contains registry paths, the path component names must start with at least one letter or number, with following parts able to be separated by one period, one or two underscore and multiple dashes.]"
+    - name: Test should not allow tag in prefix/signedPrefix
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: ClusterImagePolicy
+        spec:
+          scopes:
+          - example.com
+          policy:
+            rootOfTrust:
+              policyType: PublicKey
+              publicKey:
+                keyData: LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUZrd0V3WUhLb1pJemowQ0FRWUlLb1pJemowREFRY0RRZ0FFK0tpN0I3K2tpTFdPSmRQWXBZanRqUmtXVnBxRgpuNHl1TjU2VjZHaGdLRm5SZjJqemlweEFWR084cm0vWUVQU3d2clBORHJqdnA0YlpoNm5NR0Z0NzhBPT0KLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0t
+            signedIdentity:
+              matchPolicy: RemapIdentity
+              remapIdentity:
+                prefix: example.com/namespace:latest
+                signedPrefix: example.com/namespace
+      expectedError: "[spec.policy.signedIdentity.remapIdentity.prefix: Invalid value: \"string\": invalid repository or prefix in the signedIdentity, should not include the tag or digest, spec.policy.signedIdentity.remapIdentity.prefix: Invalid value: \"string\": invalid repository or prefix in the signedIdentity. The repository or prefix must starts with 'localhost' or a valid '.' separated domain. If contains registry paths, the path component names must start with at least one letter or number, with following parts able to be separated by one period, one or two underscore and multiple dashes.]"
+    - name: Test should allow valid ExactRepository repository
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: ClusterImagePolicy
+        spec:
+          scopes:
+          - example.com
+          policy:
+            rootOfTrust:
+              policyType: PublicKey
+              publicKey:
+                keyData: LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUZrd0V3WUhLb1pJemowQ0FRWUlLb1pJemowREFRY0RRZ0FFK0tpN0I3K2tpTFdPSmRQWXBZanRqUmtXVnBxRgpuNHl1TjU2VjZHaGdLRm5SZjJqemlweEFWR084cm0vWUVQU3d2clBORHJqdnA0YlpoNm5NR0Z0NzhBPT0KLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0t
+            signedIdentity:
+              matchPolicy: ExactRepository
+              exactRepository: 
+                repository: example.com
+      expected: |
+        apiVersion: config.openshift.io/v1
+        kind: ClusterImagePolicy
+        spec:
+          scopes:
+          - example.com
+          policy:
+            rootOfTrust:
+              policyType: PublicKey
+              publicKey:
+                keyData: LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUZrd0V3WUhLb1pJemowQ0FRWUlLb1pJemowREFRY0RRZ0FFK0tpN0I3K2tpTFdPSmRQWXBZanRqUmtXVnBxRgpuNHl1TjU2VjZHaGdLRm5SZjJqemlweEFWR084cm0vWUVQU3d2clBORHJqdnA0YlpoNm5NR0Z0NzhBPT0KLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0t
+            signedIdentity:
+              matchPolicy: ExactRepository
+              exactRepository: 
+                repository: example.com
+    - name: Test should allow valid signedIdentity prefix/signedPrefix
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: ClusterImagePolicy
+        spec:
+          scopes:
+          - example.com
+          policy:
+            rootOfTrust:
+              policyType: PublicKey
+              publicKey:
+                keyData: LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUZrd0V3WUhLb1pJemowQ0FRWUlLb1pJemowREFRY0RRZ0FFK0tpN0I3K2tpTFdPSmRQWXBZanRqUmtXVnBxRgpuNHl1TjU2VjZHaGdLRm5SZjJqemlweEFWR084cm0vWUVQU3d2clBORHJqdnA0YlpoNm5NR0Z0NzhBPT0KLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0t
+            signedIdentity:
+              matchPolicy: RemapIdentity
+              remapIdentity:
+                prefix: example.com
+                signedPrefix: mirror.com
+      expected: |
+        apiVersion: config.openshift.io/v1
+        kind: ClusterImagePolicy
+        spec:
+          scopes:
+          - example.com
+          policy:
+            rootOfTrust:
+              policyType: PublicKey
+              publicKey:
+                keyData: LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUZrd0V3WUhLb1pJemowQ0FRWUlLb1pJemowREFRY0RRZ0FFK0tpN0I3K2tpTFdPSmRQWXBZanRqUmtXVnBxRgpuNHl1TjU2VjZHaGdLRm5SZjJqemlweEFWR084cm0vWUVQU3d2clBORHJqdnA0YlpoNm5NR0Z0NzhBPT0KLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0t
+            signedIdentity:
+              matchPolicy: RemapIdentity
+              remapIdentity:
+                prefix: example.com
+                signedPrefix: mirror.com
+    - name: Test scope should allow localhost name with port 'localhost:1234/namespace/namespace'
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: ClusterImagePolicy
+        spec:
+          scopes:
+          - localhost:1234/namespace/namespace
+          policy:
+            rootOfTrust:
+              policyType: PublicKey
+              publicKey:
+                keyData: LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUZrd0V3WUhLb1pJemowQ0FRWUlLb1pJemowREFRY0RRZ0FFK0tpN0I3K2tpTFdPSmRQWXBZanRqUmtXVnBxRgpuNHl1TjU2VjZHaGdLRm5SZjJqemlweEFWR084cm0vWUVQU3d2clBORHJqdnA0YlpoNm5NR0Z0NzhBPT0KLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0t
+      expected: |
+        apiVersion: config.openshift.io/v1
+        kind: ClusterImagePolicy
+        spec:
+          scopes:
+          - localhost:1234/namespace/namespace
+          policy:
+            rootOfTrust:
+              policyType: PublicKey
+              publicKey:
+                keyData: LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUZrd0V3WUhLb1pJemowQ0FRWUlLb1pJemowREFRY0RRZ0FFK0tpN0I3K2tpTFdPSmRQWXBZanRqUmtXVnBxRgpuNHl1TjU2VjZHaGdLRm5SZjJqemlweEFWR084cm0vWUVQU3d2clBORHJqdnA0YlpoNm5NR0Z0NzhBPT0KLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0t
+    - name: Test scope should allow localhost 'localhost/foo/bar'
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: ClusterImagePolicy
+        spec:
+          scopes:
+          - localhost/foo/bar
+          policy:
+            rootOfTrust:
+              policyType: PublicKey
+              publicKey:
+                keyData: LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUZrd0V3WUhLb1pJemowQ0FRWUlLb1pJemowREFRY0RRZ0FFK0tpN0I3K2tpTFdPSmRQWXBZanRqUmtXVnBxRgpuNHl1TjU2VjZHaGdLRm5SZjJqemlweEFWR084cm0vWUVQU3d2clBORHJqdnA0YlpoNm5NR0Z0NzhBPT0KLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0t
+      expected: |
+        apiVersion: config.openshift.io/v1
+        kind: ClusterImagePolicy
+        spec:
+          scopes:
+          - localhost/foo/bar
+          policy:
+            rootOfTrust:
+              policyType: PublicKey
+              publicKey:
+                keyData: LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUZrd0V3WUhLb1pJemowQ0FRWUlLb1pJemowREFRY0RRZ0FFK0tpN0I3K2tpTFdPSmRQWXBZanRqUmtXVnBxRgpuNHl1TjU2VjZHaGdLRm5SZjJqemlweEFWR084cm0vWUVQU3d2clBORHJqdnA0YlpoNm5NR0Z0NzhBPT0KLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0t
+    - name: Test scope should allow 'example.com/foo/bar'
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: ClusterImagePolicy
+        spec:
+          scopes:
+          - example.com/foo/bar
+          policy:
+            rootOfTrust:
+              policyType: PublicKey
+              publicKey:
+                keyData: LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUZrd0V3WUhLb1pJemowQ0FRWUlLb1pJemowREFRY0RRZ0FFK0tpN0I3K2tpTFdPSmRQWXBZanRqUmtXVnBxRgpuNHl1TjU2VjZHaGdLRm5SZjJqemlweEFWR084cm0vWUVQU3d2clBORHJqdnA0YlpoNm5NR0Z0NzhBPT0KLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0t
+      expected: |
+        apiVersion: config.openshift.io/v1
+        kind: ClusterImagePolicy
+        spec:
+          scopes:
+          - example.com/foo/bar
+          policy:
+            rootOfTrust:
+              policyType: PublicKey
+              publicKey:
+                keyData: LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUZrd0V3WUhLb1pJemowQ0FRWUlLb1pJemowREFRY0RRZ0FFK0tpN0I3K2tpTFdPSmRQWXBZanRqUmtXVnBxRgpuNHl1TjU2VjZHaGdLRm5SZjJqemlweEFWR084cm0vWUVQU3d2clBORHJqdnA0YlpoNm5NR0Z0NzhBPT0KLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0t
+    - name: Test scope should allow tag 'example.com/foo/bar:latest'
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: ClusterImagePolicy
+        spec:
+          scopes:
+          - example.com/foo/bar:latest
+          policy:
+            rootOfTrust:
+              policyType: PublicKey
+              publicKey:
+                keyData: LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUZrd0V3WUhLb1pJemowQ0FRWUlLb1pJemowREFRY0RRZ0FFK0tpN0I3K2tpTFdPSmRQWXBZanRqUmtXVnBxRgpuNHl1TjU2VjZHaGdLRm5SZjJqemlweEFWR084cm0vWUVQU3d2clBORHJqdnA0YlpoNm5NR0Z0NzhBPT0KLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0t
+      expected: |
+        apiVersion: config.openshift.io/v1
+        kind: ClusterImagePolicy
+        spec:
+          scopes:
+          - example.com/foo/bar:latest
+          policy:
+            rootOfTrust:
+              policyType: PublicKey
+              publicKey:
+                keyData: LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUZrd0V3WUhLb1pJemowQ0FRWUlLb1pJemowREFRY0RRZ0FFK0tpN0I3K2tpTFdPSmRQWXBZanRqUmtXVnBxRgpuNHl1TjU2VjZHaGdLRm5SZjJqemlweEFWR084cm0vWUVQU3d2clBORHJqdnA0YlpoNm5NR0Z0NzhBPT0KLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0t
+    - name: Test scope should allow full specification digest
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: ClusterImagePolicy
+        spec:
+          scopes:
+          - example.com/namespace/namespace@sha256:b7e686e30346e9ace664fa09c0275262f8b9a443ed56d22165a0e201f6488c13
+          policy:
+            rootOfTrust:
+              policyType: PublicKey
+              publicKey:
+                keyData: LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUZrd0V3WUhLb1pJemowQ0FRWUlLb1pJemowREFRY0RRZ0FFK0tpN0I3K2tpTFdPSmRQWXBZanRqUmtXVnBxRgpuNHl1TjU2VjZHaGdLRm5SZjJqemlweEFWR084cm0vWUVQU3d2clBORHJqdnA0YlpoNm5NR0Z0NzhBPT0KLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0t
+      expected: |
+        apiVersion: config.openshift.io/v1
+        kind: ClusterImagePolicy
+        spec:
+          scopes:
+          - example.com/namespace/namespace@sha256:b7e686e30346e9ace664fa09c0275262f8b9a443ed56d22165a0e201f6488c13
+          policy:
+            rootOfTrust:
+              policyType: PublicKey
+              publicKey:
+                keyData: LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUZrd0V3WUhLb1pJemowQ0FRWUlLb1pJemowREFRY0RRZ0FFK0tpN0I3K2tpTFdPSmRQWXBZanRqUmtXVnBxRgpuNHl1TjU2VjZHaGdLRm5SZjJqemlweEFWR084cm0vWUVQU3d2clBORHJqdnA0YlpoNm5NR0Z0NzhBPT0KLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0t
+    - name: Test scope should allow '*.example.com'
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: ClusterImagePolicy
+        spec:
+          scopes:
+          - "*.example.com"
+          policy:
+            rootOfTrust:
+              policyType: PublicKey
+              publicKey:
+                keyData: LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUZrd0V3WUhLb1pJemowQ0FRWUlLb1pJemowREFRY0RRZ0FFK0tpN0I3K2tpTFdPSmRQWXBZanRqUmtXVnBxRgpuNHl1TjU2VjZHaGdLRm5SZjJqemlweEFWR084cm0vWUVQU3d2clBORHJqdnA0YlpoNm5NR0Z0NzhBPT0KLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0t
+      expected: |
+        apiVersion: config.openshift.io/v1
+        kind: ClusterImagePolicy
+        spec:
+          scopes:
+          - "*.example.com"
+          policy:
+            rootOfTrust:
+              policyType: PublicKey
+              publicKey:
+                keyData: LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUZrd0V3WUhLb1pJemowQ0FRWUlLb1pJemowREFRY0RRZ0FFK0tpN0I3K2tpTFdPSmRQWXBZanRqUmtXVnBxRgpuNHl1TjU2VjZHaGdLRm5SZjJqemlweEFWR084cm0vWUVQU3d2clBORHJqdnA0YlpoNm5NR0Z0NzhBPT0KLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0t

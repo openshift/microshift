@@ -1,0 +1,148 @@
+apiVersion: apiextensions.k8s.io/v1 # Hack because controller-gen complains if we don't have this
+name: "Infrastructure"
+crdName: infrastructures.config.openshift.io
+featureGates:
+- DualReplica
+- HighlyAvailableArbiter
+tests:
+  onCreate:
+    - name: Should be able to create a minimal Infrastructure
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec: {} # No spec is required for a Infrastructure
+      expected: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec: {}
+  onUpdate:
+    - name: status should allow controlPlaneTopology value for `HighlyAvailableArbiter`
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec:
+          platformSpec:
+            baremetal: {}
+            type: BareMetal
+      updated: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec:
+          platformSpec:
+            type: BareMetal
+            baremetal: {}
+        status:
+          controlPlaneTopology: HighlyAvailableArbiter
+          infrastructureTopology: HighlyAvailable
+          platform: BareMetal
+          platformStatus:
+            baremetal: {}
+            type: BareMetal
+      expected: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec:
+          platformSpec:
+            type: BareMetal
+            baremetal: {}
+        status:
+          controlPlaneTopology: HighlyAvailableArbiter
+          cpuPartitioning: None
+          infrastructureTopology: HighlyAvailable
+          platform: BareMetal
+          platformStatus:
+            baremetal:
+              loadBalancer:
+                type: OpenShiftManagedDefault
+            type: BareMetal
+    - name: should not allow changing infrastructureTopology value to `HighlyAvailableArbiter`
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec:
+          platformSpec:
+            baremetal: {}
+            type: BareMetal
+      updated: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec:
+          platformSpec:
+            type: BareMetal
+            baremetal: {}
+        status:
+          controlPlaneTopology: HighlyAvailable
+          infrastructureTopology: HighlyAvailableArbiter
+          platform: BareMetal
+          platformStatus:
+            baremetal:
+              loadBalancer:
+                type: OpenShiftManagedDefault
+            type: BareMetal
+      expectedStatusError: 'status.infrastructureTopology: Unsupported value: "HighlyAvailableArbiter": supported values: "HighlyAvailable", "SingleReplica"'
+    - name: status should allow controlPlaneTopology value for `DualReplica`
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec:
+          platformSpec:
+            baremetal: {}
+            type: BareMetal
+      updated: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec:
+          platformSpec:
+            type: BareMetal
+            baremetal: {}
+        status:
+          controlPlaneTopology: DualReplica
+          infrastructureTopology: HighlyAvailable
+          platform: BareMetal
+          platformStatus:
+            baremetal:
+              loadBalancer:
+                type: OpenShiftManagedDefault
+            type: BareMetal
+      expected: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec:
+          platformSpec:
+            type: BareMetal
+            baremetal: {}
+        status:
+          controlPlaneTopology: DualReplica
+          cpuPartitioning: None
+          infrastructureTopology: HighlyAvailable
+          platform: BareMetal
+          platformStatus:
+            baremetal:
+              loadBalancer:
+                type: OpenShiftManagedDefault
+            type: BareMetal
+    - name: should not allow changing infrastructureTopology value to `DualReplica`
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec:
+          platformSpec:
+            baremetal: {}
+            type: BareMetal
+      updated: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec:
+          platformSpec:
+            type: BareMetal
+            baremetal: {}
+        status:
+          controlPlaneTopology: HighlyAvailable
+          infrastructureTopology: DualReplica
+          platform: BareMetal
+          platformStatus:
+            baremetal:
+              loadBalancer:
+                type: OpenShiftManagedDefault
+            type: BareMetal
+      expectedStatusError: 'status.infrastructureTopology: Unsupported value: "DualReplica": supported values: "HighlyAvailable", "SingleReplica"'

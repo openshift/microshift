@@ -1,0 +1,632 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    api-approved.openshift.io: https://github.com/openshift/api/pull/2544
+    api.openshift.io/merged-by-featuregates: "true"
+    include.release.openshift.io/ibm-cloud-managed: "true"
+    include.release.openshift.io/self-managed-high-availability: "true"
+    release.openshift.io/feature-set: TechPreviewNoUpgrade
+  name: pacemakerclusters.etcd.openshift.io
+spec:
+  group: etcd.openshift.io
+  names:
+    kind: PacemakerCluster
+    listKind: PacemakerClusterList
+    plural: pacemakerclusters
+    singular: pacemakercluster
+  scope: Cluster
+  versions:
+  - name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: |-
+          PacemakerCluster represents the current state of the pacemaker cluster as reported by the pcs status command.
+          PacemakerCluster is a cluster-scoped singleton resource. The name of this instance is "cluster". This
+          resource provides a view into the health and status of a pacemaker-managed cluster in Two Node OpenShift with Fencing deployments.
+
+          Compatibility level 4: No compatibility is provided, the API can change at any point for any reason. These capabilities should not be used by applications needing long term support.
+        properties:
+          apiVersion:
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+            type: string
+          kind:
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+            type: string
+          metadata:
+            type: object
+          status:
+            description: |-
+              status contains the actual pacemaker cluster status information collected from the cluster.
+              The goal of this status is to be able to quickly identify if pacemaker is in a healthy state.
+              In Two Node OpenShift with Fencing, a healthy pacemaker cluster has 2 nodes, both of which have healthy kubelet, etcd, and fencing resources.
+              This field is optional on creation - the status collector populates it immediately after creating
+              the resource via the status subresource.
+            properties:
+              conditions:
+                description: |-
+                  conditions represent the observations of the pacemaker cluster's current state.
+                  Known condition types are: "Healthy", "InService", "NodeCountAsExpected".
+                  The "Healthy" condition is an aggregate that tracks the overall health of the cluster.
+                  The "InService" condition tracks whether the cluster is in service (not in maintenance mode).
+                  The "NodeCountAsExpected" condition tracks whether the expected number of nodes are present.
+                  Each of these conditions is required, so the array must contain at least 3 items.
+                items:
+                  description: Condition contains details for one aspect of the current
+                    state of this API Resource.
+                  properties:
+                    lastTransitionTime:
+                      description: |-
+                        lastTransitionTime is the last time the condition transitioned from one status to another.
+                        This should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.
+                      format: date-time
+                      type: string
+                    message:
+                      description: |-
+                        message is a human readable message indicating details about the transition.
+                        This may be an empty string.
+                      maxLength: 32768
+                      type: string
+                    observedGeneration:
+                      description: |-
+                        observedGeneration represents the .metadata.generation that the condition was set based upon.
+                        For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
+                        with respect to the current state of the instance.
+                      format: int64
+                      minimum: 0
+                      type: integer
+                    reason:
+                      description: |-
+                        reason contains a programmatic identifier indicating the reason for the condition's last transition.
+                        Producers of specific condition types may define expected values and meanings for this field,
+                        and whether the values are considered a guaranteed API.
+                        The value should be a CamelCase string.
+                        This field may not be empty.
+                      maxLength: 1024
+                      minLength: 1
+                      pattern: ^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$
+                      type: string
+                    status:
+                      description: status of the condition, one of True, False, Unknown.
+                      enum:
+                      - "True"
+                      - "False"
+                      - Unknown
+                      type: string
+                    type:
+                      description: type of condition in CamelCase or in foo.example.com/CamelCase.
+                      maxLength: 316
+                      pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$
+                      type: string
+                  required:
+                  - lastTransitionTime
+                  - message
+                  - reason
+                  - status
+                  - type
+                  type: object
+                maxItems: 8
+                minItems: 3
+                type: array
+                x-kubernetes-list-map-keys:
+                - type
+                x-kubernetes-list-type: map
+                x-kubernetes-validations:
+                - message: conditions must contain a condition of type Healthy
+                  rule: self.exists(c, c.type == 'Healthy')
+                - message: conditions must contain a condition of type InService
+                  rule: self.exists(c, c.type == 'InService')
+                - message: conditions must contain a condition of type NodeCountAsExpected
+                  rule: self.exists(c, c.type == 'NodeCountAsExpected')
+              lastUpdated:
+                description: |-
+                  lastUpdated is the timestamp when this status was last updated. This is useful for identifying
+                  stale status reports. It must be a valid timestamp in RFC3339 format. Once set, this field cannot
+                  be removed and cannot be set to an earlier timestamp than the current value.
+                format: date-time
+                type: string
+              nodes:
+                description: |-
+                  nodes provides detailed status for each control-plane node in the Pacemaker cluster.
+                  While Pacemaker supports up to 32 nodes, the limit is set to 5 (max OpenShift control-plane nodes).
+                  For Two Node OpenShift with Fencing, exactly 2 nodes are expected in a healthy cluster.
+                  An empty list indicates a catastrophic failure where Pacemaker reports no nodes.
+                items:
+                  description: |-
+                    PacemakerClusterNodeStatus represents the status of a single node in the pacemaker cluster including
+                    the node's conditions and the health of critical resources running on that node.
+                  properties:
+                    addresses:
+                      description: |-
+                        addresses is a list of IP addresses for the node.
+                        Pacemaker allows multiple IP addresses for Corosync communication between nodes.
+                        The first address in this list is used for IP-based peer URLs for etcd membership.
+                        Each address must be a valid global unicast IPv4 or IPv6 address in canonical form
+                        (e.g., "192.168.1.1" not "192.168.001.001", or "2001:db8::1" not "2001:0db8::1").
+                        This excludes loopback, link-local, and multicast addresses.
+                      items:
+                        description: |-
+                          PacemakerNodeAddress contains information for a node's address.
+                          This is similar to corev1.NodeAddress but adds validation for IP addresses.
+                        properties:
+                          address:
+                            description: |-
+                              address is the node address.
+                              For InternalIP, this must be a valid global unicast IPv4 or IPv6 address in canonical form.
+                              Canonical form means the shortest standard representation (e.g., "192.168.1.1" not "192.168.001.001",
+                              or "2001:db8::1" not "2001:0db8::1"). Maximum length is 39 characters (full IPv6 address).
+                              Global unicast includes private/RFC1918 addresses but excludes loopback, link-local, and multicast.
+                            maxLength: 39
+                            minLength: 1
+                            type: string
+                            x-kubernetes-validations:
+                            - message: must be a valid global unicast IPv4 or IPv6
+                                address in canonical form
+                              rule: isIP(self) && ip.isCanonical(self) && ip(self).isGlobalUnicast()
+                          type:
+                            description: |-
+                              type is the type of node address.
+                              Currently only "InternalIP" is supported.
+                            enum:
+                            - InternalIP
+                            type: string
+                        required:
+                        - address
+                        - type
+                        type: object
+                      maxItems: 8
+                      minItems: 1
+                      type: array
+                      x-kubernetes-list-type: atomic
+                    conditions:
+                      description: |-
+                        conditions represent the observations of the node's current state.
+                        Known condition types are: "Healthy", "Online", "InService", "Active", "Ready", "Clean", "Member",
+                        "FencingAvailable", "FencingHealthy".
+                        The "Healthy" condition is an aggregate that tracks the overall health of the node.
+                        The "Online" condition tracks whether the node is online.
+                        The "InService" condition tracks whether the node is in service (not in maintenance mode).
+                        The "Active" condition tracks whether the node is active (not in standby mode).
+                        The "Ready" condition tracks whether the node is ready (not in a pending state).
+                        The "Clean" condition tracks whether the node is in a clean (status known) state.
+                        The "Member" condition tracks whether the node is a member of the cluster.
+                        The "FencingAvailable" condition tracks whether this node can be fenced by at least one healthy agent.
+                        The "FencingHealthy" condition tracks whether all fencing agents for this node are healthy.
+                        Each of these conditions is required, so the array must contain at least 9 items.
+                      items:
+                        description: Condition contains details for one aspect of
+                          the current state of this API Resource.
+                        properties:
+                          lastTransitionTime:
+                            description: |-
+                              lastTransitionTime is the last time the condition transitioned from one status to another.
+                              This should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.
+                            format: date-time
+                            type: string
+                          message:
+                            description: |-
+                              message is a human readable message indicating details about the transition.
+                              This may be an empty string.
+                            maxLength: 32768
+                            type: string
+                          observedGeneration:
+                            description: |-
+                              observedGeneration represents the .metadata.generation that the condition was set based upon.
+                              For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
+                              with respect to the current state of the instance.
+                            format: int64
+                            minimum: 0
+                            type: integer
+                          reason:
+                            description: |-
+                              reason contains a programmatic identifier indicating the reason for the condition's last transition.
+                              Producers of specific condition types may define expected values and meanings for this field,
+                              and whether the values are considered a guaranteed API.
+                              The value should be a CamelCase string.
+                              This field may not be empty.
+                            maxLength: 1024
+                            minLength: 1
+                            pattern: ^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$
+                            type: string
+                          status:
+                            description: status of the condition, one of True, False,
+                              Unknown.
+                            enum:
+                            - "True"
+                            - "False"
+                            - Unknown
+                            type: string
+                          type:
+                            description: type of condition in CamelCase or in foo.example.com/CamelCase.
+                            maxLength: 316
+                            pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$
+                            type: string
+                        required:
+                        - lastTransitionTime
+                        - message
+                        - reason
+                        - status
+                        - type
+                        type: object
+                      maxItems: 16
+                      minItems: 9
+                      type: array
+                      x-kubernetes-list-map-keys:
+                      - type
+                      x-kubernetes-list-type: map
+                      x-kubernetes-validations:
+                      - message: conditions must contain a condition of type Healthy
+                        rule: self.exists(c, c.type == 'Healthy')
+                      - message: conditions must contain a condition of type Online
+                        rule: self.exists(c, c.type == 'Online')
+                      - message: conditions must contain a condition of type InService
+                        rule: self.exists(c, c.type == 'InService')
+                      - message: conditions must contain a condition of type Active
+                        rule: self.exists(c, c.type == 'Active')
+                      - message: conditions must contain a condition of type Ready
+                        rule: self.exists(c, c.type == 'Ready')
+                      - message: conditions must contain a condition of type Clean
+                        rule: self.exists(c, c.type == 'Clean')
+                      - message: conditions must contain a condition of type Member
+                        rule: self.exists(c, c.type == 'Member')
+                      - message: conditions must contain a condition of type FencingAvailable
+                        rule: self.exists(c, c.type == 'FencingAvailable')
+                      - message: conditions must contain a condition of type FencingHealthy
+                        rule: self.exists(c, c.type == 'FencingHealthy')
+                    fencingAgents:
+                      description: |-
+                        fencingAgents contains the status of fencing agents that can fence this node.
+                        Unlike resources (which are scheduled to run on this node), fencing agents are mapped
+                        to the node they can fence (their target), not the node where monitoring operations run.
+                        Each fencing agent entry includes a unique name, fencing type, target node, and health conditions.
+                        A node is considered fence-capable if at least one fencing agent is healthy.
+                        Expected to have 1 fencing agent per node, but up to 8 are supported for redundancy.
+                        Names must be unique within this array.
+                      items:
+                        description: |-
+                          PacemakerClusterFencingAgentStatus represents the status of a fencing agent that can fence a node.
+                          Fencing agents are STONITH (Shoot The Other Node In The Head) devices used to isolate failed nodes.
+                          Unlike regular pacemaker resources, fencing agents are mapped to their target node (the node they
+                          can fence), not the node where their monitoring operations are scheduled.
+                        properties:
+                          conditions:
+                            description: |-
+                              conditions represent the observations of the fencing agent's current state.
+                              Known condition types are: "Healthy", "InService", "Managed", "Enabled", "Operational",
+                              "Active", "Started", "Schedulable".
+                              The "Healthy" condition is an aggregate that tracks the overall health of the fencing agent.
+                              The "InService" condition tracks whether the fencing agent is in service (not in maintenance mode).
+                              The "Managed" condition tracks whether the fencing agent is managed by pacemaker.
+                              The "Enabled" condition tracks whether the fencing agent is enabled.
+                              The "Operational" condition tracks whether the fencing agent is operational (not failed).
+                              The "Active" condition tracks whether the fencing agent is active (available to be used).
+                              The "Started" condition tracks whether the fencing agent is started.
+                              The "Schedulable" condition tracks whether the fencing agent is schedulable (not blocked).
+                              Each of these conditions is required, so the array must contain at least 8 items.
+                            items:
+                              description: Condition contains details for one aspect
+                                of the current state of this API Resource.
+                              properties:
+                                lastTransitionTime:
+                                  description: |-
+                                    lastTransitionTime is the last time the condition transitioned from one status to another.
+                                    This should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.
+                                  format: date-time
+                                  type: string
+                                message:
+                                  description: |-
+                                    message is a human readable message indicating details about the transition.
+                                    This may be an empty string.
+                                  maxLength: 32768
+                                  type: string
+                                observedGeneration:
+                                  description: |-
+                                    observedGeneration represents the .metadata.generation that the condition was set based upon.
+                                    For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
+                                    with respect to the current state of the instance.
+                                  format: int64
+                                  minimum: 0
+                                  type: integer
+                                reason:
+                                  description: |-
+                                    reason contains a programmatic identifier indicating the reason for the condition's last transition.
+                                    Producers of specific condition types may define expected values and meanings for this field,
+                                    and whether the values are considered a guaranteed API.
+                                    The value should be a CamelCase string.
+                                    This field may not be empty.
+                                  maxLength: 1024
+                                  minLength: 1
+                                  pattern: ^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$
+                                  type: string
+                                status:
+                                  description: status of the condition, one of True,
+                                    False, Unknown.
+                                  enum:
+                                  - "True"
+                                  - "False"
+                                  - Unknown
+                                  type: string
+                                type:
+                                  description: type of condition in CamelCase or in
+                                    foo.example.com/CamelCase.
+                                  maxLength: 316
+                                  pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$
+                                  type: string
+                              required:
+                              - lastTransitionTime
+                              - message
+                              - reason
+                              - status
+                              - type
+                              type: object
+                            maxItems: 16
+                            minItems: 8
+                            type: array
+                            x-kubernetes-list-map-keys:
+                            - type
+                            x-kubernetes-list-type: map
+                            x-kubernetes-validations:
+                            - message: conditions must contain a condition of type
+                                Healthy
+                              rule: self.exists(c, c.type == 'Healthy')
+                            - message: conditions must contain a condition of type
+                                InService
+                              rule: self.exists(c, c.type == 'InService')
+                            - message: conditions must contain a condition of type
+                                Managed
+                              rule: self.exists(c, c.type == 'Managed')
+                            - message: conditions must contain a condition of type
+                                Enabled
+                              rule: self.exists(c, c.type == 'Enabled')
+                            - message: conditions must contain a condition of type
+                                Operational
+                              rule: self.exists(c, c.type == 'Operational')
+                            - message: conditions must contain a condition of type
+                                Active
+                              rule: self.exists(c, c.type == 'Active')
+                            - message: conditions must contain a condition of type
+                                Started
+                              rule: self.exists(c, c.type == 'Started')
+                            - message: conditions must contain a condition of type
+                                Schedulable
+                              rule: self.exists(c, c.type == 'Schedulable')
+                          method:
+                            description: |-
+                              method is the fencing method used by this agent.
+                              Valid values are "Redfish" and "IPMI".
+                              Redfish is a standard RESTful API for server management.
+                              IPMI (Intelligent Platform Management Interface) is a hardware management interface.
+                            enum:
+                            - Redfish
+                            - IPMI
+                            type: string
+                          name:
+                            description: |-
+                              name is the unique identifier for this fencing agent (e.g., "master-0_redfish").
+                              The name must be unique within the fencingAgents array for this node.
+                              It may contain alphanumeric characters, dots, hyphens, and underscores.
+                              Maximum length is 300 characters, providing headroom beyond the typical format of
+                              <node_name>_<type> (253 for RFC 1123 node name + 1 underscore + type).
+                            maxLength: 300
+                            minLength: 1
+                            type: string
+                            x-kubernetes-validations:
+                            - message: name must contain only alphanumeric characters,
+                                dots, hyphens, and underscores
+                              rule: self.matches('^[a-zA-Z0-9._-]+$')
+                        required:
+                        - conditions
+                        - method
+                        - name
+                        type: object
+                      maxItems: 8
+                      minItems: 1
+                      type: array
+                      x-kubernetes-list-map-keys:
+                      - name
+                      x-kubernetes-list-type: map
+                      x-kubernetes-validations:
+                      - message: fencing agent names must be unique
+                        rule: self.all(x, self.exists_one(y, x.name == y.name))
+                    nodeName:
+                      description: |-
+                        nodeName is the name of the node. This is expected to match the Kubernetes node's name, which must be a lowercase
+                        RFC 1123 subdomain consisting of lowercase alphanumeric characters, '-' or '.', starting and ending with
+                        an alphanumeric character, and be at most 253 characters in length.
+                      maxLength: 253
+                      minLength: 1
+                      type: string
+                      x-kubernetes-validations:
+                      - message: nodeName must be a lowercase RFC 1123 subdomain consisting
+                          of lowercase alphanumeric characters, '-' or '.', and must
+                          start and end with an alphanumeric character
+                        rule: '!format.dns1123Subdomain().validate(self).hasValue()'
+                    resources:
+                      description: |-
+                        resources contains the status of pacemaker resources scheduled on this node.
+                        Each resource entry includes the resource name and its health conditions.
+                        For Two Node OpenShift with Fencing, we track Kubelet and Etcd resources per node.
+                        Both resources are required to be present, so the array must contain at least 2 items.
+                        Valid resource names are "Kubelet" and "Etcd".
+                        Fencing agents are tracked separately in the fencingAgents field.
+                      items:
+                        description: |-
+                          PacemakerClusterResourceStatus represents the status of a pacemaker resource scheduled on a node.
+                          A pacemaker resource is a unit of work managed by pacemaker. In pacemaker terminology, resources are services or
+                          applications that pacemaker monitors, starts, stops, and moves between nodes to maintain high availability.
+                          For Two Node OpenShift with Fencing, we track two resources per node:
+                            - Kubelet (the Kubernetes node agent and a prerequisite for etcd)
+                            - Etcd (the distributed key-value store)
+
+                          Fencing agents are tracked separately in the fencingAgents field because they are mapped to
+                          their target node (the node they can fence), not the node where monitoring operations are scheduled.
+                        properties:
+                          conditions:
+                            description: |-
+                              conditions represent the observations of the resource's current state.
+                              Known condition types are: "Healthy", "InService", "Managed", "Enabled", "Operational",
+                              "Active", "Started", "Schedulable".
+                              The "Healthy" condition is an aggregate that tracks the overall health of the resource.
+                              The "InService" condition tracks whether the resource is in service (not in maintenance mode).
+                              The "Managed" condition tracks whether the resource is managed by pacemaker.
+                              The "Enabled" condition tracks whether the resource is enabled.
+                              The "Operational" condition tracks whether the resource is operational (not failed).
+                              The "Active" condition tracks whether the resource is active (available to be used).
+                              The "Started" condition tracks whether the resource is started.
+                              The "Schedulable" condition tracks whether the resource is schedulable (not blocked).
+                              Each of these conditions is required, so the array must contain at least 8 items.
+                            items:
+                              description: Condition contains details for one aspect
+                                of the current state of this API Resource.
+                              properties:
+                                lastTransitionTime:
+                                  description: |-
+                                    lastTransitionTime is the last time the condition transitioned from one status to another.
+                                    This should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.
+                                  format: date-time
+                                  type: string
+                                message:
+                                  description: |-
+                                    message is a human readable message indicating details about the transition.
+                                    This may be an empty string.
+                                  maxLength: 32768
+                                  type: string
+                                observedGeneration:
+                                  description: |-
+                                    observedGeneration represents the .metadata.generation that the condition was set based upon.
+                                    For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
+                                    with respect to the current state of the instance.
+                                  format: int64
+                                  minimum: 0
+                                  type: integer
+                                reason:
+                                  description: |-
+                                    reason contains a programmatic identifier indicating the reason for the condition's last transition.
+                                    Producers of specific condition types may define expected values and meanings for this field,
+                                    and whether the values are considered a guaranteed API.
+                                    The value should be a CamelCase string.
+                                    This field may not be empty.
+                                  maxLength: 1024
+                                  minLength: 1
+                                  pattern: ^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$
+                                  type: string
+                                status:
+                                  description: status of the condition, one of True,
+                                    False, Unknown.
+                                  enum:
+                                  - "True"
+                                  - "False"
+                                  - Unknown
+                                  type: string
+                                type:
+                                  description: type of condition in CamelCase or in
+                                    foo.example.com/CamelCase.
+                                  maxLength: 316
+                                  pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$
+                                  type: string
+                              required:
+                              - lastTransitionTime
+                              - message
+                              - reason
+                              - status
+                              - type
+                              type: object
+                            maxItems: 16
+                            minItems: 8
+                            type: array
+                            x-kubernetes-list-map-keys:
+                            - type
+                            x-kubernetes-list-type: map
+                            x-kubernetes-validations:
+                            - message: conditions must contain a condition of type
+                                Healthy
+                              rule: self.exists(c, c.type == 'Healthy')
+                            - message: conditions must contain a condition of type
+                                InService
+                              rule: self.exists(c, c.type == 'InService')
+                            - message: conditions must contain a condition of type
+                                Managed
+                              rule: self.exists(c, c.type == 'Managed')
+                            - message: conditions must contain a condition of type
+                                Enabled
+                              rule: self.exists(c, c.type == 'Enabled')
+                            - message: conditions must contain a condition of type
+                                Operational
+                              rule: self.exists(c, c.type == 'Operational')
+                            - message: conditions must contain a condition of type
+                                Active
+                              rule: self.exists(c, c.type == 'Active')
+                            - message: conditions must contain a condition of type
+                                Started
+                              rule: self.exists(c, c.type == 'Started')
+                            - message: conditions must contain a condition of type
+                                Schedulable
+                              rule: self.exists(c, c.type == 'Schedulable')
+                          name:
+                            description: |-
+                              name is the name of the pacemaker resource.
+                              Valid values are "Kubelet" and "Etcd".
+                              The Kubelet resource is a prerequisite for etcd in Two Node OpenShift with Fencing deployments.
+                              The Etcd resource may temporarily transition to stopped during pacemaker quorum-recovery operations.
+                              Fencing agents are tracked separately in the node's fencingAgents field.
+                            enum:
+                            - Kubelet
+                            - Etcd
+                            type: string
+                        required:
+                        - conditions
+                        - name
+                        type: object
+                      maxItems: 8
+                      minItems: 2
+                      type: array
+                      x-kubernetes-list-map-keys:
+                      - name
+                      x-kubernetes-list-type: map
+                      x-kubernetes-validations:
+                      - message: resources must contain a resource named Kubelet
+                        rule: self.exists(r, r.name == 'Kubelet')
+                      - message: resources must contain a resource named Etcd
+                        rule: self.exists(r, r.name == 'Etcd')
+                  required:
+                  - addresses
+                  - conditions
+                  - fencingAgents
+                  - nodeName
+                  - resources
+                  type: object
+                maxItems: 5
+                minItems: 0
+                type: array
+                x-kubernetes-list-map-keys:
+                - nodeName
+                x-kubernetes-list-type: map
+            required:
+            - conditions
+            - lastUpdated
+            - nodes
+            type: object
+            x-kubernetes-validations:
+            - message: lastUpdated may not be set to an earlier timestamp
+              rule: '!has(oldSelf.lastUpdated) || self.lastUpdated >= oldSelf.lastUpdated'
+        required:
+        - metadata
+        type: object
+        x-kubernetes-validations:
+        - message: PacemakerCluster must be named 'cluster'
+          rule: self.metadata.name == 'cluster'
+        - message: status may not be removed once set
+          rule: '!has(oldSelf.status) || has(self.status)'
+    served: true
+    storage: true
+    subresources:
+      status: {}

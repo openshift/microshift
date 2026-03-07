@@ -1,0 +1,3280 @@
+{
+  "LogicalName": "Proxy Certificates",
+  "Description": "Used by the OpenShift platform to recognize the proxy.  Other usages are side-effects which work by accident and not by principled design.",
+  "CertificateAuthorityBundles": {
+    "Items": [
+      {
+        "LogicalName": "proxy-ca",
+        "Description": "CA used to recognize proxy servers.  By default this will contain standard root CAs on the cluster-network-operator pod.",
+        "Name": "ACCVRAIZ1||AC RAIZ FNMT-RCM SERVIDORES SEGUROS|ANF Secure Server Root CA|Actalis Authentication Root CA|AffirmTrust Commercial|AffirmTrust Networking|AffirmTrust Premium|AffirmTrust Premium ECC|Amazon Root CA 1|Amazon Root CA 2|Amazon Root CA 3|Amazon Root CA 4|Atos TrustedRoot 2011|Autoridad de Certificacion Firmaprofesional CIF A62634068|Baltimore CyberTrust Root|Buypass Class 2 Root CA|Buypass Class 3 Root CA|CA Disig Root R2|CFCA EV ROOT|COMODO Certification Authority|COMODO ECC Certification Authority|COMODO RSA Certification Authority|Certigna|Certigna Root CA|Certum EC-384 CA|Certum Trusted Network CA|Certum Trusted Network CA 2|Certum Trusted Root CA|AAA Certificate Services|Cybertrust Global Root|D-TRUST Root Class 3 CA 2 2009|D-TRUST Root Class 3 CA 2 EV 2009|DST Root CA X3|DigiCert Assured ID Root CA|DigiCert Assured ID Root G2|DigiCert Assured ID Root G3|DigiCert Global Root CA|DigiCert Global Root G2|DigiCert Global Root G3|DigiCert High Assurance EV Root CA|DigiCert Trusted Root G4|E-Tugra Certification Authority|EC-ACC|Entrust.net Certification Authority (2048)|Entrust Root Certification Authority|Entrust Root Certification Authority - EC1|Entrust Root Certification Authority - G2|Entrust Root Certification Authority - G4|GDCA TrustAUTH R5 ROOT|GLOBALTRUST 2020|GTS Root R1|GTS Root R2|GTS Root R3|GTS Root R4|GlobalSign|GlobalSign|GlobalSign Root CA|GlobalSign|GlobalSign|GlobalSign|GlobalSign Root E46|GlobalSign Root R46||Go Daddy Root Certificate Authority - G2|Hellenic Academic and Research Institutions ECC RootCA 2015|Hellenic Academic and Research Institutions RootCA 2011|Hellenic Academic and Research Institutions RootCA 2015|Hongkong Post Root CA 1|Hongkong Post Root CA 3|ISRG Root X1|IdenTrust Commercial Root CA 1|IdenTrust Public Sector Root CA 1|Izenpe.com|Microsec e-Szigno Root CA 2009|Microsoft ECC Root Certificate Authority 2017|Microsoft RSA Root Certificate Authority 2017|NAVER Global Root Certification Authority|NetLock Arany (Class Gold) Főtanúsítvány|Network Solutions Certificate Authority|OISTE WISeKey Global Root GB CA|OISTE WISeKey Global Root GC CA|QuoVadis Root CA 1 G3|QuoVadis Root CA 2|QuoVadis Root CA 2 G3|QuoVadis Root CA 3|QuoVadis Root CA 3 G3|SSL.com EV Root Certification Authority ECC|SSL.com EV Root Certification Authority RSA R2|SSL.com Root Certification Authority ECC|SSL.com Root Certification Authority RSA|SZAFIR ROOT CA2|SecureSign RootCA11|SecureTrust CA|Secure Global CA|||Staat der Nederlanden EV Root CA||Starfield Root Certificate Authority - G2|Starfield Services Root Certificate Authority - G2|SwissSign Gold CA - G2|SwissSign Silver CA - G2|T-TeleSec GlobalRoot Class 2|T-TeleSec GlobalRoot Class 3|TUBITAK Kamu SM SSL Kok Sertifikasi - Surum 1|TWCA Global Root CA|TWCA Root Certification Authority|TeliaSonera Root CA v1|TrustCor ECA-1|TrustCor RootCert CA-1|TrustCor RootCert CA-2|Trustwave Global Certification Authority|Trustwave Global ECC P256 Certification Authority|Trustwave Global ECC P384 Certification Authority|UCA Extended Validation Root|UCA Global G2 Root|USERTrust ECC Certification Authority|USERTrust RSA Certification Authority|XRamp Global Certification Authority|||e-Szigno Root CA 2017||emSign ECC Root CA - C3|emSign ECC Root CA - G3|emSign Root CA - C1|emSign Root CA - G1",
+        "Spec": {
+          "ConfigMapLocations": [
+            {
+              "Namespace": "openshift-apiserver",
+              "Name": "trusted-ca-bundle"
+            },
+            {
+              "Namespace": "openshift-apiserver-operator",
+              "Name": "trusted-ca-bundle"
+            },
+            {
+              "Namespace": "openshift-authentication",
+              "Name": "v4-0-config-system-trusted-ca-bundle"
+            },
+            {
+              "Namespace": "openshift-authentication-operator",
+              "Name": "trusted-ca-bundle"
+            },
+            {
+              "Namespace": "openshift-cloud-controller-manager",
+              "Name": "ccm-trusted-ca"
+            },
+            {
+              "Namespace": "openshift-cloud-credential-operator",
+              "Name": "cco-trusted-ca"
+            },
+            {
+              "Namespace": "openshift-cloud-network-config-controller",
+              "Name": "trusted-ca"
+            },
+            {
+              "Namespace": "openshift-cluster-csi-drivers",
+              "Name": "aws-ebs-csi-driver-trusted-ca-bundle"
+            },
+            {
+              "Namespace": "openshift-cluster-node-tuning-operator",
+              "Name": "trusted-ca"
+            },
+            {
+              "Namespace": "openshift-config-managed",
+              "Name": "trusted-ca-bundle"
+            },
+            {
+              "Namespace": "openshift-console",
+              "Name": "trusted-ca-bundle"
+            },
+            {
+              "Namespace": "openshift-controller-manager",
+              "Name": "openshift-global-ca"
+            },
+            {
+              "Namespace": "openshift-image-registry",
+              "Name": "trusted-ca"
+            },
+            {
+              "Namespace": "openshift-ingress-operator",
+              "Name": "trusted-ca"
+            },
+            {
+              "Namespace": "openshift-insights",
+              "Name": "trusted-ca-bundle"
+            },
+            {
+              "Namespace": "openshift-kube-apiserver",
+              "Name": "trusted-ca-bundle"
+            },
+            {
+              "Namespace": "openshift-kube-controller-manager",
+              "Name": "trusted-ca-bundle"
+            },
+            {
+              "Namespace": "openshift-machine-api",
+              "Name": "cbo-trusted-ca"
+            },
+            {
+              "Namespace": "openshift-machine-api",
+              "Name": "mao-trusted-ca"
+            },
+            {
+              "Namespace": "openshift-marketplace",
+              "Name": "marketplace-trusted-ca"
+            },
+            {
+              "Namespace": "openshift-monitoring",
+              "Name": "alertmanager-trusted-ca-bundle"
+            },
+            {
+              "Namespace": "openshift-monitoring",
+              "Name": "alertmanager-trusted-ca-bundle-2rsonso43rc5p"
+            },
+            {
+              "Namespace": "openshift-monitoring",
+              "Name": "prometheus-trusted-ca-bundle"
+            },
+            {
+              "Namespace": "openshift-monitoring",
+              "Name": "prometheus-trusted-ca-bundle-2rsonso43rc5p"
+            },
+            {
+              "Namespace": "openshift-monitoring",
+              "Name": "telemeter-trusted-ca-bundle"
+            },
+            {
+              "Namespace": "openshift-monitoring",
+              "Name": "telemeter-trusted-ca-bundle-2rsonso43rc5p"
+            },
+            {
+              "Namespace": "openshift-monitoring",
+              "Name": "thanos-querier-trusted-ca-bundle"
+            },
+            {
+              "Namespace": "openshift-monitoring",
+              "Name": "thanos-querier-trusted-ca-bundle-2rsonso43rc5p"
+            }
+          ],
+          "OnDiskLocations": [
+            {
+              "Path": "/etc/kubernetes/static-pod-resources/kube-apiserver-certs/configmaps/trusted-ca-bundle/ca-bundle.crt/ca-bundle.crt",
+              "User": "root",
+              "Group": "root",
+              "Permissions": "-rw-r--r--.",
+              "SELinuxOptions": "system_u:object_r:kubernetes_file_t:s0"
+            },
+            {
+              "Path": "/etc/kubernetes/static-pod-resources/kube-controller-manager-certs/configmaps/trusted-ca-bundle/ca-bundle.crt/ca-bundle.crt",
+              "User": "root",
+              "Group": "root",
+              "Permissions": "-rw-r--r--.",
+              "SELinuxOptions": "system_u:object_r:kubernetes_file_t:s0"
+            }
+          ],
+          "CertificateMetadata": [
+            {
+              "CertIdentifier": {
+                "CommonName": "ACCVRAIZ1",
+                "SerialNumber": "6828503384748696800",
+                "Issuer": {
+                  "CommonName": "ACCVRAIZ1",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA1-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "4096 bit",
+              "ValidityDuration": "19y",
+              "Usages": [
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "",
+                "SerialNumber": "485876308206448804701554682760554759",
+                "Issuer": {
+                  "CommonName": "",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA256-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "4096 bit",
+              "ValidityDuration": "21y",
+              "Usages": [
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "AC RAIZ FNMT-RCM SERVIDORES SEGUROS",
+                "SerialNumber": "131542671362353147877283741781055151509",
+                "Issuer": {
+                  "CommonName": "AC RAIZ FNMT-RCM SERVIDORES SEGUROS",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "ECDSA-SHA384",
+              "PublicKeyAlgorithm": "ECDSA",
+              "PublicKeyBitSize": "384 bit, P-384 curve",
+              "ValidityDuration": "25y",
+              "Usages": [
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "ANF Secure Server Root CA",
+                "SerialNumber": "996390341000653745",
+                "Issuer": {
+                  "CommonName": "ANF Secure Server Root CA",
+                  "SerialNumber": "G63287510",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA256-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "4096 bit",
+              "ValidityDuration": "20y",
+              "Usages": [
+                "KeyUsageDigitalSignature",
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "Actalis Authentication Root CA",
+                "SerialNumber": "6271844772424770508",
+                "Issuer": {
+                  "CommonName": "Actalis Authentication Root CA",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA256-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "4096 bit",
+              "ValidityDuration": "19y",
+              "Usages": [
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "AffirmTrust Commercial",
+                "SerialNumber": "8608355977964138876",
+                "Issuer": {
+                  "CommonName": "AffirmTrust Commercial",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA256-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "2048 bit",
+              "ValidityDuration": "20y",
+              "Usages": [
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "AffirmTrust Networking",
+                "SerialNumber": "8957382827206547757",
+                "Issuer": {
+                  "CommonName": "AffirmTrust Networking",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA1-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "2048 bit",
+              "ValidityDuration": "20y",
+              "Usages": [
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "AffirmTrust Premium",
+                "SerialNumber": "7893706540734352110",
+                "Issuer": {
+                  "CommonName": "AffirmTrust Premium",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA384-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "4096 bit",
+              "ValidityDuration": "30y",
+              "Usages": [
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "AffirmTrust Premium ECC",
+                "SerialNumber": "8401224907861490260",
+                "Issuer": {
+                  "CommonName": "AffirmTrust Premium ECC",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "ECDSA-SHA384",
+              "PublicKeyAlgorithm": "ECDSA",
+              "PublicKeyBitSize": "384 bit, P-384 curve",
+              "ValidityDuration": "30y",
+              "Usages": [
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "Amazon Root CA 1",
+                "SerialNumber": "143266978916655856878034712317230054538369994",
+                "Issuer": {
+                  "CommonName": "Amazon Root CA 1",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA256-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "2048 bit",
+              "ValidityDuration": "22y",
+              "Usages": [
+                "KeyUsageDigitalSignature",
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "Amazon Root CA 2",
+                "SerialNumber": "143266982885963551818349160658925006970653239",
+                "Issuer": {
+                  "CommonName": "Amazon Root CA 2",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA384-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "4096 bit",
+              "ValidityDuration": "25y",
+              "Usages": [
+                "KeyUsageDigitalSignature",
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "Amazon Root CA 3",
+                "SerialNumber": "143266986699090766294700635381230934788665930",
+                "Issuer": {
+                  "CommonName": "Amazon Root CA 3",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "ECDSA-SHA256",
+              "PublicKeyAlgorithm": "ECDSA",
+              "PublicKeyBitSize": "256 bit, P-256 curve",
+              "ValidityDuration": "25y",
+              "Usages": [
+                "KeyUsageDigitalSignature",
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "Amazon Root CA 4",
+                "SerialNumber": "143266989758080763974105200630763877849284878",
+                "Issuer": {
+                  "CommonName": "Amazon Root CA 4",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "ECDSA-SHA384",
+              "PublicKeyAlgorithm": "ECDSA",
+              "PublicKeyBitSize": "384 bit, P-384 curve",
+              "ValidityDuration": "25y",
+              "Usages": [
+                "KeyUsageDigitalSignature",
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "Atos TrustedRoot 2011",
+                "SerialNumber": "6643877497813316402",
+                "Issuer": {
+                  "CommonName": "Atos TrustedRoot 2011",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA256-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "2048 bit",
+              "ValidityDuration": "19y",
+              "Usages": [
+                "KeyUsageDigitalSignature",
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "Autoridad de Certificacion Firmaprofesional CIF A62634068",
+                "SerialNumber": "6047274297262753887",
+                "Issuer": {
+                  "CommonName": "Autoridad de Certificacion Firmaprofesional CIF A62634068",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA1-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "4096 bit",
+              "ValidityDuration": "21y",
+              "Usages": [
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "Baltimore CyberTrust Root",
+                "SerialNumber": "33554617",
+                "Issuer": {
+                  "CommonName": "Baltimore CyberTrust Root",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA1-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "2048 bit",
+              "ValidityDuration": "25y",
+              "Usages": [
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "Buypass Class 2 Root CA",
+                "SerialNumber": "2",
+                "Issuer": {
+                  "CommonName": "Buypass Class 2 Root CA",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA256-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "4096 bit",
+              "ValidityDuration": "30y",
+              "Usages": [
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "Buypass Class 3 Root CA",
+                "SerialNumber": "2",
+                "Issuer": {
+                  "CommonName": "Buypass Class 3 Root CA",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA256-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "4096 bit",
+              "ValidityDuration": "30y",
+              "Usages": [
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "CA Disig Root R2",
+                "SerialNumber": "10572350602393338211",
+                "Issuer": {
+                  "CommonName": "CA Disig Root R2",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA256-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "4096 bit",
+              "ValidityDuration": "30y",
+              "Usages": [
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "CFCA EV ROOT",
+                "SerialNumber": "407555286",
+                "Issuer": {
+                  "CommonName": "CFCA EV ROOT",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA256-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "4096 bit",
+              "ValidityDuration": "17y",
+              "Usages": [
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "COMODO Certification Authority",
+                "SerialNumber": "104350513648249232941998508985834464573",
+                "Issuer": {
+                  "CommonName": "COMODO Certification Authority",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA1-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "2048 bit",
+              "ValidityDuration": "23y",
+              "Usages": [
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "COMODO ECC Certification Authority",
+                "SerialNumber": "41578283867086692638256921589707938090",
+                "Issuer": {
+                  "CommonName": "COMODO ECC Certification Authority",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "ECDSA-SHA384",
+              "PublicKeyAlgorithm": "ECDSA",
+              "PublicKeyBitSize": "384 bit, P-384 curve",
+              "ValidityDuration": "29y",
+              "Usages": [
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "COMODO RSA Certification Authority",
+                "SerialNumber": "101909084537582093308941363524873193117",
+                "Issuer": {
+                  "CommonName": "COMODO RSA Certification Authority",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA384-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "4096 bit",
+              "ValidityDuration": "28y",
+              "Usages": [
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "Certigna",
+                "SerialNumber": "18364802974209362175",
+                "Issuer": {
+                  "CommonName": "Certigna",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA1-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "2048 bit",
+              "ValidityDuration": "20y",
+              "Usages": [
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "Certigna Root CA",
+                "SerialNumber": "269714418870597844693661054334862075617",
+                "Issuer": {
+                  "CommonName": "Certigna Root CA",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA256-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "4096 bit",
+              "ValidityDuration": "20y",
+              "Usages": [
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "Certum EC-384 CA",
+                "SerialNumber": "160250656287871593594747141429395092468",
+                "Issuer": {
+                  "CommonName": "Certum EC-384 CA",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "ECDSA-SHA384",
+              "PublicKeyAlgorithm": "ECDSA",
+              "PublicKeyBitSize": "384 bit, P-384 curve",
+              "ValidityDuration": "25y",
+              "Usages": [
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "Certum Trusted Network CA",
+                "SerialNumber": "279744",
+                "Issuer": {
+                  "CommonName": "Certum Trusted Network CA",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA1-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "2048 bit",
+              "ValidityDuration": "21y",
+              "Usages": [
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "Certum Trusted Network CA 2",
+                "SerialNumber": "44979900017204383099463764357512596969",
+                "Issuer": {
+                  "CommonName": "Certum Trusted Network CA 2",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA512-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "4096 bit",
+              "ValidityDuration": "35y",
+              "Usages": [
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "Certum Trusted Root CA",
+                "SerialNumber": "40870380103424195783807378461123655149",
+                "Issuer": {
+                  "CommonName": "Certum Trusted Root CA",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA512-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "4096 bit",
+              "ValidityDuration": "25y",
+              "Usages": [
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "AAA Certificate Services",
+                "SerialNumber": "1",
+                "Issuer": {
+                  "CommonName": "AAA Certificate Services",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA1-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "2048 bit",
+              "ValidityDuration": "25y",
+              "Usages": [
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "Cybertrust Global Root",
+                "SerialNumber": "4835703278459682877484360",
+                "Issuer": {
+                  "CommonName": "Cybertrust Global Root",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA1-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "2048 bit",
+              "ValidityDuration": "15y",
+              "Usages": [
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "D-TRUST Root Class 3 CA 2 2009",
+                "SerialNumber": "623603",
+                "Issuer": {
+                  "CommonName": "D-TRUST Root Class 3 CA 2 2009",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA256-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "2048 bit",
+              "ValidityDuration": "20y",
+              "Usages": [
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "D-TRUST Root Class 3 CA 2 EV 2009",
+                "SerialNumber": "623604",
+                "Issuer": {
+                  "CommonName": "D-TRUST Root Class 3 CA 2 EV 2009",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA256-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "2048 bit",
+              "ValidityDuration": "20y",
+              "Usages": [
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "DST Root CA X3",
+                "SerialNumber": "91299735575339953335919266965803778155",
+                "Issuer": {
+                  "CommonName": "DST Root CA X3",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA1-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "2048 bit",
+              "ValidityDuration": "21y",
+              "Usages": [
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "DigiCert Assured ID Root CA",
+                "SerialNumber": "17154717934120587862167794914071425081",
+                "Issuer": {
+                  "CommonName": "DigiCert Assured ID Root CA",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA1-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "2048 bit",
+              "ValidityDuration": "25y",
+              "Usages": [
+                "KeyUsageDigitalSignature",
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "DigiCert Assured ID Root G2",
+                "SerialNumber": "15385348160840213938643033620894905419",
+                "Issuer": {
+                  "CommonName": "DigiCert Assured ID Root G2",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA256-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "2048 bit",
+              "ValidityDuration": "24y",
+              "Usages": [
+                "KeyUsageDigitalSignature",
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "DigiCert Assured ID Root G3",
+                "SerialNumber": "15459312981008553731928384953135426796",
+                "Issuer": {
+                  "CommonName": "DigiCert Assured ID Root G3",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "ECDSA-SHA384",
+              "PublicKeyAlgorithm": "ECDSA",
+              "PublicKeyBitSize": "384 bit, P-384 curve",
+              "ValidityDuration": "24y",
+              "Usages": [
+                "KeyUsageDigitalSignature",
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "DigiCert Global Root CA",
+                "SerialNumber": "10944719598952040374951832963794454346",
+                "Issuer": {
+                  "CommonName": "DigiCert Global Root CA",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA1-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "2048 bit",
+              "ValidityDuration": "25y",
+              "Usages": [
+                "KeyUsageDigitalSignature",
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "DigiCert Global Root G2",
+                "SerialNumber": "4293743540046975378534879503202253541",
+                "Issuer": {
+                  "CommonName": "DigiCert Global Root G2",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA256-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "2048 bit",
+              "ValidityDuration": "24y",
+              "Usages": [
+                "KeyUsageDigitalSignature",
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "DigiCert Global Root G3",
+                "SerialNumber": "7089244469030293291760083333884364146",
+                "Issuer": {
+                  "CommonName": "DigiCert Global Root G3",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "ECDSA-SHA384",
+              "PublicKeyAlgorithm": "ECDSA",
+              "PublicKeyBitSize": "384 bit, P-384 curve",
+              "ValidityDuration": "24y",
+              "Usages": [
+                "KeyUsageDigitalSignature",
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "DigiCert High Assurance EV Root CA",
+                "SerialNumber": "3553400076410547919724730734378100087",
+                "Issuer": {
+                  "CommonName": "DigiCert High Assurance EV Root CA",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA1-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "2048 bit",
+              "ValidityDuration": "25y",
+              "Usages": [
+                "KeyUsageDigitalSignature",
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "DigiCert Trusted Root G4",
+                "SerialNumber": "7451500558977370777930084869016614236",
+                "Issuer": {
+                  "CommonName": "DigiCert Trusted Root G4",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA384-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "4096 bit",
+              "ValidityDuration": "24y",
+              "Usages": [
+                "KeyUsageDigitalSignature",
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "E-Tugra Certification Authority",
+                "SerialNumber": "7667447206703254355",
+                "Issuer": {
+                  "CommonName": "E-Tugra Certification Authority",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA256-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "4096 bit",
+              "ValidityDuration": "10y",
+              "Usages": [
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "EC-ACC",
+                "SerialNumber": "-23701579247955709139626555126524820479",
+                "Issuer": {
+                  "CommonName": "EC-ACC",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA1-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "2048 bit",
+              "ValidityDuration": "28y",
+              "Usages": [
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "Entrust.net Certification Authority (2048)",
+                "SerialNumber": "946069240",
+                "Issuer": {
+                  "CommonName": "Entrust.net Certification Authority (2048)",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA1-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "2048 bit",
+              "ValidityDuration": "29y",
+              "Usages": [
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "Entrust Root Certification Authority",
+                "SerialNumber": "1164660820",
+                "Issuer": {
+                  "CommonName": "Entrust Root Certification Authority",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA1-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "2048 bit",
+              "ValidityDuration": "20y",
+              "Usages": [
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "Entrust Root Certification Authority - EC1",
+                "SerialNumber": "51543124481930649114116133369",
+                "Issuer": {
+                  "CommonName": "Entrust Root Certification Authority - EC1",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "ECDSA-SHA384",
+              "PublicKeyAlgorithm": "ECDSA",
+              "PublicKeyBitSize": "384 bit, P-384 curve",
+              "ValidityDuration": "25y",
+              "Usages": [
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "Entrust Root Certification Authority - G2",
+                "SerialNumber": "1246989352",
+                "Issuer": {
+                  "CommonName": "Entrust Root Certification Authority - G2",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA256-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "2048 bit",
+              "ValidityDuration": "21y",
+              "Usages": [
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "Entrust Root Certification Authority - G4",
+                "SerialNumber": "289383649854506086828220374796556676440",
+                "Issuer": {
+                  "CommonName": "Entrust Root Certification Authority - G4",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA256-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "4096 bit",
+              "ValidityDuration": "22y",
+              "Usages": [
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "GDCA TrustAUTH R5 ROOT",
+                "SerialNumber": "9009899650740120186",
+                "Issuer": {
+                  "CommonName": "GDCA TrustAUTH R5 ROOT",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA256-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "4096 bit",
+              "ValidityDuration": "26y",
+              "Usages": [
+                "KeyUsageDigitalSignature",
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "GLOBALTRUST 2020",
+                "SerialNumber": "109160994242082918454945253",
+                "Issuer": {
+                  "CommonName": "GLOBALTRUST 2020",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA256-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "4096 bit",
+              "ValidityDuration": "20y",
+              "Usages": [
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "GTS Root R1",
+                "SerialNumber": "146587175971765017618439757810265552097",
+                "Issuer": {
+                  "CommonName": "GTS Root R1",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA384-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "4096 bit",
+              "ValidityDuration": "20y",
+              "Usages": [
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "GTS Root R2",
+                "SerialNumber": "146587176055767053814479386953112547951",
+                "Issuer": {
+                  "CommonName": "GTS Root R2",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA384-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "4096 bit",
+              "ValidityDuration": "20y",
+              "Usages": [
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "GTS Root R3",
+                "SerialNumber": "146587176140553309517047991083707763997",
+                "Issuer": {
+                  "CommonName": "GTS Root R3",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "ECDSA-SHA384",
+              "PublicKeyAlgorithm": "ECDSA",
+              "PublicKeyBitSize": "384 bit, P-384 curve",
+              "ValidityDuration": "20y",
+              "Usages": [
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "GTS Root R4",
+                "SerialNumber": "146587176229350439916519468929765261721",
+                "Issuer": {
+                  "CommonName": "GTS Root R4",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "ECDSA-SHA384",
+              "PublicKeyAlgorithm": "ECDSA",
+              "PublicKeyBitSize": "384 bit, P-384 curve",
+              "ValidityDuration": "20y",
+              "Usages": [
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "GlobalSign",
+                "SerialNumber": "14367148294922964480859022125800977897474",
+                "Issuer": {
+                  "CommonName": "GlobalSign",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "ECDSA-SHA256",
+              "PublicKeyAlgorithm": "ECDSA",
+              "PublicKeyBitSize": "256 bit, P-256 curve",
+              "ValidityDuration": "25y",
+              "Usages": [
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "GlobalSign",
+                "SerialNumber": "32785792099990507226680698011560947931244",
+                "Issuer": {
+                  "CommonName": "GlobalSign",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "ECDSA-SHA384",
+              "PublicKeyAlgorithm": "ECDSA",
+              "PublicKeyBitSize": "384 bit, P-384 curve",
+              "ValidityDuration": "25y",
+              "Usages": [
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "GlobalSign Root CA",
+                "SerialNumber": "4835703278459707669005204",
+                "Issuer": {
+                  "CommonName": "GlobalSign Root CA",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA1-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "2048 bit",
+              "ValidityDuration": "29y",
+              "Usages": [
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "GlobalSign",
+                "SerialNumber": "4835703278459682885658125",
+                "Issuer": {
+                  "CommonName": "GlobalSign",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA1-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "2048 bit",
+              "ValidityDuration": "15y",
+              "Usages": [
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "GlobalSign",
+                "SerialNumber": "4835703278459759426209954",
+                "Issuer": {
+                  "CommonName": "GlobalSign",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA256-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "2048 bit",
+              "ValidityDuration": "20y",
+              "Usages": [
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "GlobalSign",
+                "SerialNumber": "1417766617973444989252670301619537",
+                "Issuer": {
+                  "CommonName": "GlobalSign",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA384-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "4096 bit",
+              "ValidityDuration": "20y",
+              "Usages": [
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "GlobalSign Root E46",
+                "SerialNumber": "1552617690338932563915843282459653771421763",
+                "Issuer": {
+                  "CommonName": "GlobalSign Root E46",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "ECDSA-SHA384",
+              "PublicKeyAlgorithm": "ECDSA",
+              "PublicKeyBitSize": "384 bit, P-384 curve",
+              "ValidityDuration": "27y",
+              "Usages": [
+                "KeyUsageDigitalSignature",
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "GlobalSign Root R46",
+                "SerialNumber": "1552617688466950547958867513931858518042577",
+                "Issuer": {
+                  "CommonName": "GlobalSign Root R46",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA384-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "4096 bit",
+              "ValidityDuration": "27y",
+              "Usages": [
+                "KeyUsageDigitalSignature",
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "",
+                "SerialNumber": "0",
+                "Issuer": {
+                  "CommonName": "",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA1-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "2048 bit",
+              "ValidityDuration": "30y",
+              "Usages": [],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "Go Daddy Root Certificate Authority - G2",
+                "SerialNumber": "0",
+                "Issuer": {
+                  "CommonName": "Go Daddy Root Certificate Authority - G2",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA256-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "2048 bit",
+              "ValidityDuration": "28y",
+              "Usages": [
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "Hellenic Academic and Research Institutions ECC RootCA 2015",
+                "SerialNumber": "0",
+                "Issuer": {
+                  "CommonName": "Hellenic Academic and Research Institutions ECC RootCA 2015",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "ECDSA-SHA256",
+              "PublicKeyAlgorithm": "ECDSA",
+              "PublicKeyBitSize": "384 bit, P-384 curve",
+              "ValidityDuration": "25y",
+              "Usages": [
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "Hellenic Academic and Research Institutions RootCA 2011",
+                "SerialNumber": "0",
+                "Issuer": {
+                  "CommonName": "Hellenic Academic and Research Institutions RootCA 2011",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA1-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "2048 bit",
+              "ValidityDuration": "20y",
+              "Usages": [
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "Hellenic Academic and Research Institutions RootCA 2015",
+                "SerialNumber": "0",
+                "Issuer": {
+                  "CommonName": "Hellenic Academic and Research Institutions RootCA 2015",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA256-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "4096 bit",
+              "ValidityDuration": "25y",
+              "Usages": [
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "Hongkong Post Root CA 1",
+                "SerialNumber": "1000",
+                "Issuer": {
+                  "CommonName": "Hongkong Post Root CA 1",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA1-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "2048 bit",
+              "ValidityDuration": "20y",
+              "Usages": [
+                "KeyUsageDigitalSignature",
+                "KeyUsageContentCommitment",
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "Hongkong Post Root CA 3",
+                "SerialNumber": "46170865288971385588281144162979347873371282084",
+                "Issuer": {
+                  "CommonName": "Hongkong Post Root CA 3",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA256-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "4096 bit",
+              "ValidityDuration": "25y",
+              "Usages": [
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "ISRG Root X1",
+                "SerialNumber": "172886928669790476064670243504169061120",
+                "Issuer": {
+                  "CommonName": "ISRG Root X1",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA256-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "4096 bit",
+              "ValidityDuration": "20y",
+              "Usages": [
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "IdenTrust Commercial Root CA 1",
+                "SerialNumber": "13298821034946342390520003877796839426",
+                "Issuer": {
+                  "CommonName": "IdenTrust Commercial Root CA 1",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA256-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "4096 bit",
+              "ValidityDuration": "20y",
+              "Usages": [
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "IdenTrust Public Sector Root CA 1",
+                "SerialNumber": "13298821034946342390521976156843933698",
+                "Issuer": {
+                  "CommonName": "IdenTrust Public Sector Root CA 1",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA256-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "4096 bit",
+              "ValidityDuration": "20y",
+              "Usages": [
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "Izenpe.com",
+                "SerialNumber": "917563065490389241595536686991402621",
+                "Issuer": {
+                  "CommonName": "Izenpe.com",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA256-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "4096 bit",
+              "ValidityDuration": "30y",
+              "Usages": [
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "Microsec e-Szigno Root CA 2009",
+                "SerialNumber": "14014712776195784473",
+                "Issuer": {
+                  "CommonName": "Microsec e-Szigno Root CA 2009",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA256-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "2048 bit",
+              "ValidityDuration": "20y",
+              "Usages": [
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "Microsoft ECC Root Certificate Authority 2017",
+                "SerialNumber": "136839042543790627607696632466672567020",
+                "Issuer": {
+                  "CommonName": "Microsoft ECC Root Certificate Authority 2017",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "ECDSA-SHA384",
+              "PublicKeyAlgorithm": "ECDSA",
+              "PublicKeyBitSize": "384 bit, P-384 curve",
+              "ValidityDuration": "22y",
+              "Usages": [
+                "KeyUsageDigitalSignature",
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "Microsoft RSA Root Certificate Authority 2017",
+                "SerialNumber": "40975477897264996090493496164228220339",
+                "Issuer": {
+                  "CommonName": "Microsoft RSA Root Certificate Authority 2017",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA384-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "4096 bit",
+              "ValidityDuration": "22y",
+              "Usages": [
+                "KeyUsageDigitalSignature",
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "NAVER Global Root Certification Authority",
+                "SerialNumber": "9013692873798656336226253319739695165984492813",
+                "Issuer": {
+                  "CommonName": "NAVER Global Root Certification Authority",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA384-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "4096 bit",
+              "ValidityDuration": "20y",
+              "Usages": [
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "NetLock Arany (Class Gold) Főtanúsítvány",
+                "SerialNumber": "80544274841616",
+                "Issuer": {
+                  "CommonName": "NetLock Arany (Class Gold) Főtanúsítvány",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA256-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "2048 bit",
+              "ValidityDuration": "20y",
+              "Usages": [
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "Network Solutions Certificate Authority",
+                "SerialNumber": "116697915152937497490437556386812487904",
+                "Issuer": {
+                  "CommonName": "Network Solutions Certificate Authority",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA1-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "2048 bit",
+              "ValidityDuration": "23y",
+              "Usages": [
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "OISTE WISeKey Global Root GB CA",
+                "SerialNumber": "157768595616588414422159278966750757568",
+                "Issuer": {
+                  "CommonName": "OISTE WISeKey Global Root GB CA",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA256-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "2048 bit",
+              "ValidityDuration": "25y",
+              "Usages": [
+                "KeyUsageDigitalSignature",
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "OISTE WISeKey Global Root GC CA",
+                "SerialNumber": "44084345621038548146064804565436152554",
+                "Issuer": {
+                  "CommonName": "OISTE WISeKey Global Root GC CA",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "ECDSA-SHA384",
+              "PublicKeyAlgorithm": "ECDSA",
+              "PublicKeyBitSize": "384 bit, P-384 curve",
+              "ValidityDuration": "25y",
+              "Usages": [
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "QuoVadis Root CA 1 G3",
+                "SerialNumber": "687049649626669250736271037606554624078720034195",
+                "Issuer": {
+                  "CommonName": "QuoVadis Root CA 1 G3",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA256-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "4096 bit",
+              "ValidityDuration": "30y",
+              "Usages": [
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "QuoVadis Root CA 2",
+                "SerialNumber": "1289",
+                "Issuer": {
+                  "CommonName": "QuoVadis Root CA 2",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA1-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "4096 bit",
+              "ValidityDuration": "25y",
+              "Usages": [
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "QuoVadis Root CA 2 G3",
+                "SerialNumber": "390156079458959257446133169266079962026824725800",
+                "Issuer": {
+                  "CommonName": "QuoVadis Root CA 2 G3",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA256-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "4096 bit",
+              "ValidityDuration": "30y",
+              "Usages": [
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "QuoVadis Root CA 3",
+                "SerialNumber": "1478",
+                "Issuer": {
+                  "CommonName": "QuoVadis Root CA 3",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA1-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "4096 bit",
+              "ValidityDuration": "25y",
+              "Usages": [
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "QuoVadis Root CA 3 G3",
+                "SerialNumber": "268090761170461462463995952157327242137089239581",
+                "Issuer": {
+                  "CommonName": "QuoVadis Root CA 3 G3",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA256-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "4096 bit",
+              "ValidityDuration": "30y",
+              "Usages": [
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "SSL.com EV Root Certification Authority ECC",
+                "SerialNumber": "3182246526754555285",
+                "Issuer": {
+                  "CommonName": "SSL.com EV Root Certification Authority ECC",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "ECDSA-SHA256",
+              "PublicKeyAlgorithm": "ECDSA",
+              "PublicKeyBitSize": "384 bit, P-384 curve",
+              "ValidityDuration": "25y",
+              "Usages": [
+                "KeyUsageDigitalSignature",
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "SSL.com EV Root Certification Authority RSA R2",
+                "SerialNumber": "6248227494352943350",
+                "Issuer": {
+                  "CommonName": "SSL.com EV Root Certification Authority RSA R2",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA256-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "4096 bit",
+              "ValidityDuration": "25y",
+              "Usages": [
+                "KeyUsageDigitalSignature",
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "SSL.com Root Certification Authority ECC",
+                "SerialNumber": "8495723813297216424",
+                "Issuer": {
+                  "CommonName": "SSL.com Root Certification Authority ECC",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "ECDSA-SHA256",
+              "PublicKeyAlgorithm": "ECDSA",
+              "PublicKeyBitSize": "384 bit, P-384 curve",
+              "ValidityDuration": "25y",
+              "Usages": [
+                "KeyUsageDigitalSignature",
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "SSL.com Root Certification Authority RSA",
+                "SerialNumber": "8875640296558310041",
+                "Issuer": {
+                  "CommonName": "SSL.com Root Certification Authority RSA",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA256-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "4096 bit",
+              "ValidityDuration": "25y",
+              "Usages": [
+                "KeyUsageDigitalSignature",
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "SZAFIR ROOT CA2",
+                "SerialNumber": "357043034767186914217277344587386743377558296292",
+                "Issuer": {
+                  "CommonName": "SZAFIR ROOT CA2",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA256-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "2048 bit",
+              "ValidityDuration": "20y",
+              "Usages": [
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "SecureSign RootCA11",
+                "SerialNumber": "1",
+                "Issuer": {
+                  "CommonName": "SecureSign RootCA11",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA1-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "2048 bit",
+              "ValidityDuration": "20y",
+              "Usages": [
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "SecureTrust CA",
+                "SerialNumber": "17199774589125277788362757014266862032",
+                "Issuer": {
+                  "CommonName": "SecureTrust CA",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA1-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "2048 bit",
+              "ValidityDuration": "23y",
+              "Usages": [
+                "KeyUsageDigitalSignature",
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "Secure Global CA",
+                "SerialNumber": "9751836167731051554232119481456978597",
+                "Issuer": {
+                  "CommonName": "Secure Global CA",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA1-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "2048 bit",
+              "ValidityDuration": "23y",
+              "Usages": [
+                "KeyUsageDigitalSignature",
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "",
+                "SerialNumber": "0",
+                "Issuer": {
+                  "CommonName": "",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA256-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "2048 bit",
+              "ValidityDuration": "20y",
+              "Usages": [
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "",
+                "SerialNumber": "0",
+                "Issuer": {
+                  "CommonName": "",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA1-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "2048 bit",
+              "ValidityDuration": "20y",
+              "Usages": [
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "Staat der Nederlanden EV Root CA",
+                "SerialNumber": "10000013",
+                "Issuer": {
+                  "CommonName": "Staat der Nederlanden EV Root CA",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA256-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "4096 bit",
+              "ValidityDuration": "12y",
+              "Usages": [
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "",
+                "SerialNumber": "0",
+                "Issuer": {
+                  "CommonName": "",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA1-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "2048 bit",
+              "ValidityDuration": "30y",
+              "Usages": [],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "Starfield Root Certificate Authority - G2",
+                "SerialNumber": "0",
+                "Issuer": {
+                  "CommonName": "Starfield Root Certificate Authority - G2",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA256-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "2048 bit",
+              "ValidityDuration": "28y",
+              "Usages": [
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "Starfield Services Root Certificate Authority - G2",
+                "SerialNumber": "0",
+                "Issuer": {
+                  "CommonName": "Starfield Services Root Certificate Authority - G2",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA256-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "2048 bit",
+              "ValidityDuration": "28y",
+              "Usages": [
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "SwissSign Gold CA - G2",
+                "SerialNumber": "13492815561806991280",
+                "Issuer": {
+                  "CommonName": "SwissSign Gold CA - G2",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA1-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "4096 bit",
+              "ValidityDuration": "30y",
+              "Usages": [
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "SwissSign Silver CA - G2",
+                "SerialNumber": "5700383053117599563",
+                "Issuer": {
+                  "CommonName": "SwissSign Silver CA - G2",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA1-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "4096 bit",
+              "ValidityDuration": "30y",
+              "Usages": [
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "T-TeleSec GlobalRoot Class 2",
+                "SerialNumber": "1",
+                "Issuer": {
+                  "CommonName": "T-TeleSec GlobalRoot Class 2",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA256-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "2048 bit",
+              "ValidityDuration": "25y",
+              "Usages": [
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "T-TeleSec GlobalRoot Class 3",
+                "SerialNumber": "1",
+                "Issuer": {
+                  "CommonName": "T-TeleSec GlobalRoot Class 3",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA256-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "2048 bit",
+              "ValidityDuration": "25y",
+              "Usages": [
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "TUBITAK Kamu SM SSL Kok Sertifikasi - Surum 1",
+                "SerialNumber": "1",
+                "Issuer": {
+                  "CommonName": "TUBITAK Kamu SM SSL Kok Sertifikasi - Surum 1",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA256-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "2048 bit",
+              "ValidityDuration": "29y",
+              "Usages": [
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "TWCA Global Root CA",
+                "SerialNumber": "3262",
+                "Issuer": {
+                  "CommonName": "TWCA Global Root CA",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA256-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "4096 bit",
+              "ValidityDuration": "18y",
+              "Usages": [
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "TWCA Root Certification Authority",
+                "SerialNumber": "1",
+                "Issuer": {
+                  "CommonName": "TWCA Root Certification Authority",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA1-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "2048 bit",
+              "ValidityDuration": "22y",
+              "Usages": [
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "TeliaSonera Root CA v1",
+                "SerialNumber": "199041966741090107964904287217786801558",
+                "Issuer": {
+                  "CommonName": "TeliaSonera Root CA v1",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA1-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "4096 bit",
+              "ValidityDuration": "25y",
+              "Usages": [
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "TrustCor ECA-1",
+                "SerialNumber": "9548242946988625984",
+                "Issuer": {
+                  "CommonName": "TrustCor ECA-1",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA256-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "2048 bit",
+              "ValidityDuration": "13y",
+              "Usages": [
+                "KeyUsageDigitalSignature",
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "TrustCor RootCert CA-1",
+                "SerialNumber": "15752444095811006489",
+                "Issuer": {
+                  "CommonName": "TrustCor RootCert CA-1",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA256-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "2048 bit",
+              "ValidityDuration": "13y",
+              "Usages": [
+                "KeyUsageDigitalSignature",
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "TrustCor RootCert CA-2",
+                "SerialNumber": "2711694510199101698",
+                "Issuer": {
+                  "CommonName": "TrustCor RootCert CA-2",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA256-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "4096 bit",
+              "ValidityDuration": "18y",
+              "Usages": [
+                "KeyUsageDigitalSignature",
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "Trustwave Global Certification Authority",
+                "SerialNumber": "1846098327275375458322922162",
+                "Issuer": {
+                  "CommonName": "Trustwave Global Certification Authority",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA256-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "4096 bit",
+              "ValidityDuration": "25y",
+              "Usages": [
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "Trustwave Global ECC P256 Certification Authority",
+                "SerialNumber": "4151900041497450638097112925",
+                "Issuer": {
+                  "CommonName": "Trustwave Global ECC P256 Certification Authority",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "ECDSA-SHA256",
+              "PublicKeyAlgorithm": "ECDSA",
+              "PublicKeyBitSize": "256 bit, P-256 curve",
+              "ValidityDuration": "25y",
+              "Usages": [
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "Trustwave Global ECC P384 Certification Authority",
+                "SerialNumber": "2704997926503831671788816187",
+                "Issuer": {
+                  "CommonName": "Trustwave Global ECC P384 Certification Authority",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "ECDSA-SHA384",
+              "PublicKeyAlgorithm": "ECDSA",
+              "PublicKeyBitSize": "384 bit, P-384 curve",
+              "ValidityDuration": "25y",
+              "Usages": [
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "UCA Extended Validation Root",
+                "SerialNumber": "106100277556486529736699587978573607008",
+                "Issuer": {
+                  "CommonName": "UCA Extended Validation Root",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA256-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "4096 bit",
+              "ValidityDuration": "23y",
+              "Usages": [
+                "KeyUsageDigitalSignature",
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "UCA Global G2 Root",
+                "SerialNumber": "124779693093741543919145257850076631279",
+                "Issuer": {
+                  "CommonName": "UCA Global G2 Root",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA256-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "4096 bit",
+              "ValidityDuration": "24y",
+              "Usages": [
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "USERTrust ECC Certification Authority",
+                "SerialNumber": "123013823720199481456569720443997572134",
+                "Issuer": {
+                  "CommonName": "USERTrust ECC Certification Authority",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "ECDSA-SHA384",
+              "PublicKeyAlgorithm": "ECDSA",
+              "PublicKeyBitSize": "384 bit, P-384 curve",
+              "ValidityDuration": "27y",
+              "Usages": [
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "USERTrust RSA Certification Authority",
+                "SerialNumber": "2645093764781058787591871645665788717",
+                "Issuer": {
+                  "CommonName": "USERTrust RSA Certification Authority",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA384-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "4096 bit",
+              "ValidityDuration": "27y",
+              "Usages": [
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "XRamp Global Certification Authority",
+                "SerialNumber": "107108908803651509692980124233745014957",
+                "Issuer": {
+                  "CommonName": "XRamp Global Certification Authority",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA1-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "2048 bit",
+              "ValidityDuration": "30y",
+              "Usages": [
+                "KeyUsageDigitalSignature",
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "",
+                "SerialNumber": "35210227249154",
+                "Issuer": {
+                  "CommonName": "",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA1-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "2048 bit",
+              "ValidityDuration": "25y",
+              "Usages": [
+                "KeyUsageDigitalSignature",
+                "KeyUsageContentCommitment",
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "",
+                "SerialNumber": "313609486401300475190",
+                "Issuer": {
+                  "CommonName": "",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA256-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "4096 bit",
+              "ValidityDuration": "25y",
+              "Usages": [
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "e-Szigno Root CA 2017",
+                "SerialNumber": "411379200276854331539784714",
+                "Issuer": {
+                  "CommonName": "e-Szigno Root CA 2017",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "ECDSA-SHA256",
+              "PublicKeyAlgorithm": "ECDSA",
+              "PublicKeyBitSize": "256 bit, P-256 curve",
+              "ValidityDuration": "25y",
+              "Usages": [
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "",
+                "SerialNumber": "28956088682735189655030529057352760477",
+                "Issuer": {
+                  "CommonName": "",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA1-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "4096 bit",
+              "ValidityDuration": "30y",
+              "Usages": [],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "emSign ECC Root CA - C3",
+                "SerialNumber": "582948710642506000014504",
+                "Issuer": {
+                  "CommonName": "emSign ECC Root CA - C3",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "ECDSA-SHA384",
+              "PublicKeyAlgorithm": "ECDSA",
+              "PublicKeyBitSize": "384 bit, P-384 curve",
+              "ValidityDuration": "25y",
+              "Usages": [
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "emSign ECC Root CA - G3",
+                "SerialNumber": "287880440101571086945156",
+                "Issuer": {
+                  "CommonName": "emSign ECC Root CA - G3",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "ECDSA-SHA384",
+              "PublicKeyAlgorithm": "ECDSA",
+              "PublicKeyBitSize": "384 bit, P-384 curve",
+              "ValidityDuration": "25y",
+              "Usages": [
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "emSign Root CA - C1",
+                "SerialNumber": "825510296613316004955058",
+                "Issuer": {
+                  "CommonName": "emSign Root CA - C1",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA256-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "2048 bit",
+              "ValidityDuration": "25y",
+              "Usages": [
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            },
+            {
+              "CertIdentifier": {
+                "CommonName": "emSign Root CA - G1",
+                "SerialNumber": "235931866688319308814040",
+                "Issuer": {
+                  "CommonName": "emSign Root CA - G1",
+                  "SerialNumber": "",
+                  "Issuer": null
+                }
+              },
+              "SignatureAlgorithm": "SHA256-RSA",
+              "PublicKeyAlgorithm": "RSA",
+              "PublicKeyBitSize": "2048 bit",
+              "ValidityDuration": "25y",
+              "Usages": [
+                "KeyUsageCertSign",
+                "KeyUsageCRLSign"
+              ],
+              "ExtendedUsages": []
+            }
+          ]
+        },
+        "Status": {
+          "Errors": null
+        }
+      }
+    ]
+  },
+  "CertKeyPairs": {
+    "Items": [
+      {
+        "LogicalName": "",
+        "Description": "",
+        "Name": "Microsoft ECC Root Certificate Authority 2017",
+        "Spec": {
+          "SecretLocations": null,
+          "OnDiskLocations": null,
+          "CertMetadata": {
+            "CertIdentifier": {
+              "CommonName": "Microsoft ECC Root Certificate Authority 2017",
+              "SerialNumber": "",
+              "Issuer": null
+            },
+            "SignatureAlgorithm": "",
+            "PublicKeyAlgorithm": "",
+            "PublicKeyBitSize": "",
+            "ValidityDuration": "",
+            "Usages": null,
+            "ExtendedUsages": null
+          },
+          "Details": {
+            "CertType": "",
+            "SignerDetails": null,
+            "ServingCertDetails": null,
+            "ClientCertDetails": null
+          }
+        },
+        "Status": {
+          "Errors": null
+        }
+      },
+      {
+        "LogicalName": "",
+        "Description": "",
+        "Name": "Trustwave Global ECC P256 Certification Authority",
+        "Spec": {
+          "SecretLocations": null,
+          "OnDiskLocations": null,
+          "CertMetadata": {
+            "CertIdentifier": {
+              "CommonName": "Trustwave Global ECC P256 Certification Authority",
+              "SerialNumber": "",
+              "Issuer": null
+            },
+            "SignatureAlgorithm": "",
+            "PublicKeyAlgorithm": "",
+            "PublicKeyBitSize": "",
+            "ValidityDuration": "",
+            "Usages": null,
+            "ExtendedUsages": null
+          },
+          "Details": {
+            "CertType": "",
+            "SignerDetails": null,
+            "ServingCertDetails": null,
+            "ClientCertDetails": null
+          }
+        },
+        "Status": {
+          "Errors": null
+        }
+      },
+      {
+        "LogicalName": "",
+        "Description": "",
+        "Name": "Trustwave Global Certification Authority",
+        "Spec": {
+          "SecretLocations": null,
+          "OnDiskLocations": null,
+          "CertMetadata": {
+            "CertIdentifier": {
+              "CommonName": "Trustwave Global Certification Authority",
+              "SerialNumber": "",
+              "Issuer": null
+            },
+            "SignatureAlgorithm": "",
+            "PublicKeyAlgorithm": "",
+            "PublicKeyBitSize": "",
+            "ValidityDuration": "",
+            "Usages": null,
+            "ExtendedUsages": null
+          },
+          "Details": {
+            "CertType": "",
+            "SignerDetails": null,
+            "ServingCertDetails": null,
+            "ClientCertDetails": null
+          }
+        },
+        "Status": {
+          "Errors": null
+        }
+      },
+      {
+        "LogicalName": "",
+        "Description": "",
+        "Name": "NAVER Global Root Certification Authority",
+        "Spec": {
+          "SecretLocations": null,
+          "OnDiskLocations": null,
+          "CertMetadata": {
+            "CertIdentifier": {
+              "CommonName": "NAVER Global Root Certification Authority",
+              "SerialNumber": "",
+              "Issuer": null
+            },
+            "SignatureAlgorithm": "",
+            "PublicKeyAlgorithm": "",
+            "PublicKeyBitSize": "",
+            "ValidityDuration": "",
+            "Usages": null,
+            "ExtendedUsages": null
+          },
+          "Details": {
+            "CertType": "",
+            "SignerDetails": null,
+            "ServingCertDetails": null,
+            "ClientCertDetails": null
+          }
+        },
+        "Status": {
+          "Errors": null
+        }
+      },
+      {
+        "LogicalName": "",
+        "Description": "",
+        "Name": "e-Szigno Root CA 2017",
+        "Spec": {
+          "SecretLocations": null,
+          "OnDiskLocations": null,
+          "CertMetadata": {
+            "CertIdentifier": {
+              "CommonName": "e-Szigno Root CA 2017",
+              "SerialNumber": "",
+              "Issuer": null
+            },
+            "SignatureAlgorithm": "",
+            "PublicKeyAlgorithm": "",
+            "PublicKeyBitSize": "",
+            "ValidityDuration": "",
+            "Usages": null,
+            "ExtendedUsages": null
+          },
+          "Details": {
+            "CertType": "",
+            "SignerDetails": null,
+            "ServingCertDetails": null,
+            "ClientCertDetails": null
+          }
+        },
+        "Status": {
+          "Errors": null
+        }
+      },
+      {
+        "LogicalName": "",
+        "Description": "",
+        "Name": "Certum EC-384 CA",
+        "Spec": {
+          "SecretLocations": null,
+          "OnDiskLocations": null,
+          "CertMetadata": {
+            "CertIdentifier": {
+              "CommonName": "Certum EC-384 CA",
+              "SerialNumber": "",
+              "Issuer": null
+            },
+            "SignatureAlgorithm": "",
+            "PublicKeyAlgorithm": "",
+            "PublicKeyBitSize": "",
+            "ValidityDuration": "",
+            "Usages": null,
+            "ExtendedUsages": null
+          },
+          "Details": {
+            "CertType": "",
+            "SignerDetails": null,
+            "ServingCertDetails": null,
+            "ClientCertDetails": null
+          }
+        },
+        "Status": {
+          "Errors": null
+        }
+      },
+      {
+        "LogicalName": "",
+        "Description": "",
+        "Name": "Microsoft RSA Root Certificate Authority 2017",
+        "Spec": {
+          "SecretLocations": null,
+          "OnDiskLocations": null,
+          "CertMetadata": {
+            "CertIdentifier": {
+              "CommonName": "Microsoft RSA Root Certificate Authority 2017",
+              "SerialNumber": "",
+              "Issuer": null
+            },
+            "SignatureAlgorithm": "",
+            "PublicKeyAlgorithm": "",
+            "PublicKeyBitSize": "",
+            "ValidityDuration": "",
+            "Usages": null,
+            "ExtendedUsages": null
+          },
+          "Details": {
+            "CertType": "",
+            "SignerDetails": null,
+            "ServingCertDetails": null,
+            "ClientCertDetails": null
+          }
+        },
+        "Status": {
+          "Errors": null
+        }
+      },
+      {
+        "LogicalName": "",
+        "Description": "",
+        "Name": "GlobalSign Root R46",
+        "Spec": {
+          "SecretLocations": null,
+          "OnDiskLocations": null,
+          "CertMetadata": {
+            "CertIdentifier": {
+              "CommonName": "GlobalSign Root R46",
+              "SerialNumber": "",
+              "Issuer": null
+            },
+            "SignatureAlgorithm": "",
+            "PublicKeyAlgorithm": "",
+            "PublicKeyBitSize": "",
+            "ValidityDuration": "",
+            "Usages": null,
+            "ExtendedUsages": null
+          },
+          "Details": {
+            "CertType": "",
+            "SignerDetails": null,
+            "ServingCertDetails": null,
+            "ClientCertDetails": null
+          }
+        },
+        "Status": {
+          "Errors": null
+        }
+      },
+      {
+        "LogicalName": "",
+        "Description": "",
+        "Name": "Certum Trusted Root CA",
+        "Spec": {
+          "SecretLocations": null,
+          "OnDiskLocations": null,
+          "CertMetadata": {
+            "CertIdentifier": {
+              "CommonName": "Certum Trusted Root CA",
+              "SerialNumber": "",
+              "Issuer": null
+            },
+            "SignatureAlgorithm": "",
+            "PublicKeyAlgorithm": "",
+            "PublicKeyBitSize": "",
+            "ValidityDuration": "",
+            "Usages": null,
+            "ExtendedUsages": null
+          },
+          "Details": {
+            "CertType": "",
+            "SignerDetails": null,
+            "ServingCertDetails": null,
+            "ClientCertDetails": null
+          }
+        },
+        "Status": {
+          "Errors": null
+        }
+      },
+      {
+        "LogicalName": "",
+        "Description": "",
+        "Name": "ANF Secure Server Root CA",
+        "Spec": {
+          "SecretLocations": null,
+          "OnDiskLocations": null,
+          "CertMetadata": {
+            "CertIdentifier": {
+              "CommonName": "ANF Secure Server Root CA",
+              "SerialNumber": "",
+              "Issuer": null
+            },
+            "SignatureAlgorithm": "",
+            "PublicKeyAlgorithm": "",
+            "PublicKeyBitSize": "",
+            "ValidityDuration": "",
+            "Usages": null,
+            "ExtendedUsages": null
+          },
+          "Details": {
+            "CertType": "",
+            "SignerDetails": null,
+            "ServingCertDetails": null,
+            "ClientCertDetails": null
+          }
+        },
+        "Status": {
+          "Errors": null
+        }
+      },
+      {
+        "LogicalName": "",
+        "Description": "",
+        "Name": "AC RAIZ FNMT-RCM SERVIDORES SEGUROS",
+        "Spec": {
+          "SecretLocations": null,
+          "OnDiskLocations": null,
+          "CertMetadata": {
+            "CertIdentifier": {
+              "CommonName": "AC RAIZ FNMT-RCM SERVIDORES SEGUROS",
+              "SerialNumber": "",
+              "Issuer": null
+            },
+            "SignatureAlgorithm": "",
+            "PublicKeyAlgorithm": "",
+            "PublicKeyBitSize": "",
+            "ValidityDuration": "",
+            "Usages": null,
+            "ExtendedUsages": null
+          },
+          "Details": {
+            "CertType": "",
+            "SignerDetails": null,
+            "ServingCertDetails": null,
+            "ClientCertDetails": null
+          }
+        },
+        "Status": {
+          "Errors": null
+        }
+      },
+      {
+        "LogicalName": "",
+        "Description": "",
+        "Name": "::1658",
+        "Spec": {
+          "SecretLocations": [
+            {
+              "Namespace": "openshift-operator-lifecycle-manager",
+              "Name": "pprof-cert"
+            }
+          ],
+          "OnDiskLocations": null,
+          "CertMetadata": {
+            "CertIdentifier": {
+              "CommonName": "",
+              "SerialNumber": "1658",
+              "Issuer": {
+                "CommonName": "",
+                "SerialNumber": "",
+                "Issuer": null
+              }
+            },
+            "SignatureAlgorithm": "SHA256-RSA",
+            "PublicKeyAlgorithm": "RSA",
+            "PublicKeyBitSize": "4096 bit",
+            "ValidityDuration": "60m",
+            "Usages": [
+              "KeyUsageDigitalSignature"
+            ],
+            "ExtendedUsages": [
+              "ExtKeyUsageClientAuth"
+            ]
+          },
+          "Details": {
+            "CertType": "ClientCertDetails",
+            "SignerDetails": null,
+            "ServingCertDetails": null,
+            "ClientCertDetails": {
+              "Organizations": [
+                "Red Hat, Inc."
+              ]
+            }
+          }
+        },
+        "Status": {
+          "Errors": null
+        }
+      },
+      {
+        "LogicalName": "",
+        "Description": "",
+        "Name": "::7981676500072753307",
+        "Spec": {
+          "SecretLocations": [
+            {
+              "Namespace": "openshift-operator-lifecycle-manager",
+              "Name": "packageserver-service-cert"
+            }
+          ],
+          "OnDiskLocations": null,
+          "CertMetadata": {
+            "CertIdentifier": {
+              "CommonName": "",
+              "SerialNumber": "7981676500072753307",
+              "Issuer": {
+                "CommonName": "",
+                "SerialNumber": "",
+                "Issuer": null
+              }
+            },
+            "SignatureAlgorithm": "ECDSA-SHA256",
+            "PublicKeyAlgorithm": "ECDSA",
+            "PublicKeyBitSize": "256 bit, P-256 curve",
+            "ValidityDuration": "2y",
+            "Usages": [
+              "KeyUsageDigitalSignature",
+              "KeyUsageCertSign"
+            ],
+            "ExtendedUsages": [
+              "ExtKeyUsageClientAuth",
+              "ExtKeyUsageServerAuth"
+            ]
+          },
+          "Details": {
+            "CertType": "Multiple",
+            "SignerDetails": {},
+            "ServingCertDetails": {
+              "DNSNames": [
+                "packageserver-service.openshift-operator-lifecycle-manager",
+                "packageserver-service.openshift-operator-lifecycle-manager.svc"
+              ],
+              "IPAddresses": null
+            },
+            "ClientCertDetails": {
+              "Organizations": [
+                "Red Hat, Inc."
+              ]
+            }
+          }
+        },
+        "Status": {
+          "Errors": [
+            "you have a cert for more than one?  We don't do that. :("
+          ]
+        }
+      },
+      {
+        "LogicalName": "",
+        "Description": "",
+        "Name": "Trustwave Global ECC P384 Certification Authority",
+        "Spec": {
+          "SecretLocations": null,
+          "OnDiskLocations": null,
+          "CertMetadata": {
+            "CertIdentifier": {
+              "CommonName": "Trustwave Global ECC P384 Certification Authority",
+              "SerialNumber": "",
+              "Issuer": null
+            },
+            "SignatureAlgorithm": "",
+            "PublicKeyAlgorithm": "",
+            "PublicKeyBitSize": "",
+            "ValidityDuration": "",
+            "Usages": null,
+            "ExtendedUsages": null
+          },
+          "Details": {
+            "CertType": "",
+            "SignerDetails": null,
+            "ServingCertDetails": null,
+            "ClientCertDetails": null
+          }
+        },
+        "Status": {
+          "Errors": null
+        }
+      },
+      {
+        "LogicalName": "",
+        "Description": "",
+        "Name": "GlobalSign Root E46",
+        "Spec": {
+          "SecretLocations": null,
+          "OnDiskLocations": null,
+          "CertMetadata": {
+            "CertIdentifier": {
+              "CommonName": "GlobalSign Root E46",
+              "SerialNumber": "",
+              "Issuer": null
+            },
+            "SignatureAlgorithm": "",
+            "PublicKeyAlgorithm": "",
+            "PublicKeyBitSize": "",
+            "ValidityDuration": "",
+            "Usages": null,
+            "ExtendedUsages": null
+          },
+          "Details": {
+            "CertType": "",
+            "SignerDetails": null,
+            "ServingCertDetails": null,
+            "ClientCertDetails": null
+          }
+        },
+        "Status": {
+          "Errors": null
+        }
+      },
+      {
+        "LogicalName": "",
+        "Description": "",
+        "Name": "GLOBALTRUST 2020",
+        "Spec": {
+          "SecretLocations": null,
+          "OnDiskLocations": null,
+          "CertMetadata": {
+            "CertIdentifier": {
+              "CommonName": "GLOBALTRUST 2020",
+              "SerialNumber": "",
+              "Issuer": null
+            },
+            "SignatureAlgorithm": "",
+            "PublicKeyAlgorithm": "",
+            "PublicKeyBitSize": "",
+            "ValidityDuration": "",
+            "Usages": null,
+            "ExtendedUsages": null
+          },
+          "Details": {
+            "CertType": "",
+            "SignerDetails": null,
+            "ServingCertDetails": null,
+            "ClientCertDetails": null
+          }
+        },
+        "Status": {
+          "Errors": null
+        }
+      }
+    ]
+  }
+}

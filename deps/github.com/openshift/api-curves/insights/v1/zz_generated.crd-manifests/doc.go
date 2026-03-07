@@ -1,0 +1,1 @@
+package insights_v1_crdmanifests

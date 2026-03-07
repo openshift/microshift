@@ -1,0 +1,383 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    api-approved.openshift.io: https://github.com/openshift/api/pull/2255
+    api.openshift.io/merged-by-featuregates: "true"
+    include.release.openshift.io/ibm-cloud-managed: "true"
+    release.openshift.io/feature-set: Default
+  labels:
+    openshift.io/operator-managed: ""
+  name: machineconfignodes.machineconfiguration.openshift.io
+spec:
+  group: machineconfiguration.openshift.io
+  names:
+    kind: MachineConfigNode
+    listKind: MachineConfigNodeList
+    plural: machineconfignodes
+    singular: machineconfignode
+  scope: Cluster
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: .spec.pool.name
+      name: PoolName
+      type: string
+    - jsonPath: .spec.configVersion.desired
+      name: DesiredConfig
+      type: string
+    - jsonPath: .status.configVersion.current
+      name: CurrentConfig
+      type: string
+    - jsonPath: .status.conditions[?(@.type=="Updated")].status
+      name: Updated
+      type: string
+    - jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+    - jsonPath: .status.conditions[?(@.type=="UpdatePrepared")].status
+      name: UpdatePrepared
+      priority: 1
+      type: string
+    - jsonPath: .status.conditions[?(@.type=="UpdateExecuted")].status
+      name: UpdateExecuted
+      priority: 1
+      type: string
+    - jsonPath: .status.conditions[?(@.type=="UpdatePostActionComplete")].status
+      name: UpdatePostActionComplete
+      priority: 1
+      type: string
+    - jsonPath: .status.conditions[?(@.type=="UpdateComplete")].status
+      name: UpdateComplete
+      priority: 1
+      type: string
+    - jsonPath: .status.conditions[?(@.type=="Resumed")].status
+      name: Resumed
+      priority: 1
+      type: string
+    - jsonPath: .status.conditions[?(@.type=="AppliedFilesAndOS")].status
+      name: UpdatedFilesAndOS
+      priority: 1
+      type: string
+    - jsonPath: .status.conditions[?(@.type=="Cordoned")].status
+      name: CordonedNode
+      priority: 1
+      type: string
+    - jsonPath: .status.conditions[?(@.type=="Drained")].status
+      name: DrainedNode
+      priority: 1
+      type: string
+    - jsonPath: .status.conditions[?(@.type=="RebootedNode")].status
+      name: RebootedNode
+      priority: 1
+      type: string
+    - jsonPath: .status.conditions[?(@.type=="Uncordoned")].status
+      name: UncordonedNode
+      priority: 1
+      type: string
+    name: v1
+    schema:
+      openAPIV3Schema:
+        description: |-
+          MachineConfigNode describes the health of the Machines on the system
+          Compatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).
+        properties:
+          apiVersion:
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+            type: string
+          kind:
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: spec describes the configuration of the machine config node.
+            properties:
+              configVersion:
+                description: |-
+                  configVersion holds the desired config version for the node targeted by this machine config node resource.
+                  The desired version represents the machine config the node will attempt to update to and gets set before the machine config operator validates
+                  the new machine config against the current machine config.
+                properties:
+                  desired:
+                    description: |-
+                      desired is the name of the machine config that the the node should be upgraded to.
+                      This value is set when the machine config pool generates a new version of its rendered configuration.
+                      When this value is changed, the machine config daemon starts the node upgrade process.
+                      This value gets set in the machine config node spec once the machine config has been targeted for upgrade and before it is validated.
+                      Must be a lowercase RFC-1123 subdomain name (https://tools.ietf.org/html/rfc1123) consisting
+                      of only lowercase alphanumeric characters, hyphens (-), and periods (.), and must start and end
+                      with an alphanumeric character, and be at most 253 characters in length.
+                    maxLength: 253
+                    type: string
+                    x-kubernetes-validations:
+                    - message: a lowercase RFC 1123 subdomain must consist of lower
+                        case alphanumeric characters, '-' or '.', and must start and
+                        end with an alphanumeric character.
+                      rule: '!format.dns1123Subdomain().validate(self).hasValue()'
+                required:
+                - desired
+                type: object
+              node:
+                description: node contains a reference to the node for this machine
+                  config node.
+                properties:
+                  name:
+                    description: |-
+                      name is the name of the object being referenced. For example, this can represent a machine
+                      config pool or node name.
+                      Must be a lowercase RFC-1123 subdomain name (https://tools.ietf.org/html/rfc1123) consisting
+                      of only lowercase alphanumeric characters, hyphens (-), and periods (.), and must start and end
+                      with an alphanumeric character, and be at most 253 characters in length.
+                    maxLength: 253
+                    type: string
+                    x-kubernetes-validations:
+                    - message: a lowercase RFC 1123 subdomain must consist of lower
+                        case alphanumeric characters, '-' or '.', and must start and
+                        end with an alphanumeric character.
+                      rule: '!format.dns1123Subdomain().validate(self).hasValue()'
+                required:
+                - name
+                type: object
+              pool:
+                description: |-
+                  pool contains a reference to the machine config pool that this machine config node's
+                  referenced node belongs to.
+                properties:
+                  name:
+                    description: |-
+                      name is the name of the object being referenced. For example, this can represent a machine
+                      config pool or node name.
+                      Must be a lowercase RFC-1123 subdomain name (https://tools.ietf.org/html/rfc1123) consisting
+                      of only lowercase alphanumeric characters, hyphens (-), and periods (.), and must start and end
+                      with an alphanumeric character, and be at most 253 characters in length.
+                    maxLength: 253
+                    type: string
+                    x-kubernetes-validations:
+                    - message: a lowercase RFC 1123 subdomain must consist of lower
+                        case alphanumeric characters, '-' or '.', and must start and
+                        end with an alphanumeric character.
+                      rule: '!format.dns1123Subdomain().validate(self).hasValue()'
+                required:
+                - name
+                type: object
+            required:
+            - configVersion
+            - node
+            - pool
+            type: object
+          status:
+            description: status describes the last observed state of this machine
+              config node.
+            properties:
+              conditions:
+                description: |-
+                  conditions represent the observations of a machine config node's current state. Valid types are:
+                  UpdatePrepared, UpdateExecuted, UpdatePostActionComplete, UpdateComplete, Updated, Resumed,
+                  Drained, AppliedFilesAndOS, Cordoned, Uncordoned, RebootedNode, NodeDegraded, PinnedImageSetsProgressing,
+                  and PinnedImageSetsDegraded.
+                  The following types are only available when the ImageModeStatusReporting feature gate is enabled: ImagePulledFromRegistry,
+                  AppliedOSImage, AppliedFiles
+                items:
+                  description: Condition contains details for one aspect of the current
+                    state of this API Resource.
+                  properties:
+                    lastTransitionTime:
+                      description: |-
+                        lastTransitionTime is the last time the condition transitioned from one status to another.
+                        This should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.
+                      format: date-time
+                      type: string
+                    message:
+                      description: |-
+                        message is a human readable message indicating details about the transition.
+                        This may be an empty string.
+                      maxLength: 32768
+                      type: string
+                    observedGeneration:
+                      description: |-
+                        observedGeneration represents the .metadata.generation that the condition was set based upon.
+                        For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
+                        with respect to the current state of the instance.
+                      format: int64
+                      minimum: 0
+                      type: integer
+                    reason:
+                      description: |-
+                        reason contains a programmatic identifier indicating the reason for the condition's last transition.
+                        Producers of specific condition types may define expected values and meanings for this field,
+                        and whether the values are considered a guaranteed API.
+                        The value should be a CamelCase string.
+                        This field may not be empty.
+                      maxLength: 1024
+                      minLength: 1
+                      pattern: ^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$
+                      type: string
+                    status:
+                      description: status of the condition, one of True, False, Unknown.
+                      enum:
+                      - "True"
+                      - "False"
+                      - Unknown
+                      type: string
+                    type:
+                      description: type of condition in CamelCase or in foo.example.com/CamelCase.
+                      maxLength: 316
+                      pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$
+                      type: string
+                  required:
+                  - lastTransitionTime
+                  - message
+                  - reason
+                  - status
+                  - type
+                  type: object
+                maxItems: 20
+                type: array
+                x-kubernetes-list-map-keys:
+                - type
+                x-kubernetes-list-type: map
+              configVersion:
+                description: configVersion describes the current and desired machine
+                  config version for this node.
+                properties:
+                  current:
+                    description: |-
+                      current is the name of the machine config currently in use on the node.
+                      This value is updated once the machine config daemon has completed the update of the configuration for the node.
+                      This value should match the desired version unless an upgrade is in progress.
+                      Must be a lowercase RFC-1123 subdomain name (https://tools.ietf.org/html/rfc1123) consisting
+                      of only lowercase alphanumeric characters, hyphens (-), and periods (.), and must start and end
+                      with an alphanumeric character, and be at most 253 characters in length.
+                    maxLength: 253
+                    type: string
+                    x-kubernetes-validations:
+                    - message: a lowercase RFC 1123 subdomain must consist of lower
+                        case alphanumeric characters, '-' or '.', and must start and
+                        end with an alphanumeric character.
+                      rule: '!format.dns1123Subdomain().validate(self).hasValue()'
+                  desired:
+                    description: |-
+                      desired is the MachineConfig the node wants to upgrade to.
+                      This value gets set in the machine config node status once the machine config has been validated
+                      against the current machine config.
+                      Must be a lowercase RFC-1123 subdomain name (https://tools.ietf.org/html/rfc1123) consisting
+                      of only lowercase alphanumeric characters, hyphens (-), and periods (.), and must start and end
+                      with an alphanumeric character, and be at most 253 characters in length.
+                    maxLength: 253
+                    type: string
+                    x-kubernetes-validations:
+                    - message: a lowercase RFC 1123 subdomain must consist of lower
+                        case alphanumeric characters, '-' or '.', and must start and
+                        end with an alphanumeric character.
+                      rule: '!format.dns1123Subdomain().validate(self).hasValue()'
+                required:
+                - desired
+                type: object
+              observedGeneration:
+                description: |-
+                  observedGeneration represents the generation of the MachineConfigNode object observed by the Machine Config Operator's controller.
+                  This field is updated when the controller observes a change to the desiredConfig in the configVersion of the machine config node spec.
+                format: int64
+                minimum: 1
+                type: integer
+                x-kubernetes-validations:
+                - message: observedGeneration must not decrease
+                  rule: self >= oldSelf
+              pinnedImageSets:
+                description: pinnedImageSets describes the current and desired pinned
+                  image sets for this node.
+                items:
+                  description: MachineConfigNodeStatusPinnedImageSet holds information
+                    about the current, desired, and failed pinned image sets for the
+                    observed machine config node.
+                  properties:
+                    currentGeneration:
+                      description: currentGeneration is the generation of the pinned
+                        image set that has most recently been successfully pulled
+                        and pinned on this node.
+                      format: int32
+                      minimum: 1
+                      type: integer
+                      x-kubernetes-validations:
+                      - message: currentGeneration must not decrease
+                        rule: self >= oldSelf
+                    desiredGeneration:
+                      description: desiredGeneration is the generation of the pinned
+                        image set that is targeted to be pulled and pinned on this
+                        node.
+                      format: int32
+                      minimum: 1
+                      type: integer
+                      x-kubernetes-validations:
+                      - message: desiredGeneration must not decrease
+                        rule: self >= oldSelf
+                    lastFailedGeneration:
+                      description: lastFailedGeneration is the generation of the most
+                        recent pinned image set that failed to be pulled and pinned
+                        on this node.
+                      format: int32
+                      minimum: 1
+                      type: integer
+                      x-kubernetes-validations:
+                      - message: lastFailedGeneration must not decrease
+                        rule: self >= oldSelf
+                    lastFailedGenerationError:
+                      description: |-
+                        lastFailedGenerationError is the error explaining why the desired images failed to be pulled and pinned.
+                        The error is an empty string if the image pull and pin is successful.
+                      maxLength: 32768
+                      type: string
+                    name:
+                      description: |-
+                        name is the name of the pinned image set.
+                        Must be a lowercase RFC-1123 subdomain name (https://tools.ietf.org/html/rfc1123) consisting
+                        of only lowercase alphanumeric characters, hyphens (-), and periods (.), and must start and end
+                        with an alphanumeric character, and be at most 253 characters in length.
+                      maxLength: 253
+                      type: string
+                      x-kubernetes-validations:
+                      - message: a lowercase RFC 1123 subdomain must consist of lower
+                          case alphanumeric characters, '-' or '.', and must start
+                          and end with an alphanumeric character.
+                        rule: '!format.dns1123Subdomain().validate(self).hasValue()'
+                  required:
+                  - name
+                  type: object
+                  x-kubernetes-validations:
+                  - message: desired generation must be greater than or equal to the
+                      current generation
+                    rule: 'has(self.desiredGeneration) && has(self.currentGeneration)
+                      ? self.desiredGeneration >= self.currentGeneration : true'
+                  - message: desired generation must be greater than or equal to the
+                      last failed generation
+                    rule: 'has(self.lastFailedGeneration) && has(self.desiredGeneration)
+                      ? self.desiredGeneration >= self.lastFailedGeneration : true'
+                  - message: last failed generation error must be defined on image
+                      pull and pin failure
+                    rule: 'has(self.lastFailedGeneration) ? has(self.lastFailedGenerationError)
+                      : true'
+                maxItems: 100
+                type: array
+                x-kubernetes-list-map-keys:
+                - name
+                x-kubernetes-list-type: map
+            type: object
+        required:
+        - spec
+        type: object
+        x-kubernetes-validations:
+        - message: spec.node.name should match metadata.name
+          rule: self.metadata.name == self.spec.node.name
+    served: true
+    storage: true
+    subresources:
+      status: {}

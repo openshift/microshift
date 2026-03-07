@@ -1,0 +1,124 @@
+apiVersion: apiextensions.k8s.io/v1 # Hack because controller-gen complains if we don't have this
+name: "FeatureGate"
+crdName: featuregates.config.openshift.io
+tests:
+  onCreate:
+    - name: Should be able to create a minimal FeatureGate
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: FeatureGate
+        spec: {} # No spec is required for a FeatureGate
+      expected: |
+        apiVersion: config.openshift.io/v1
+        kind: FeatureGate
+        spec: {}
+    - name: Can create TechPreview
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: FeatureGate
+        spec:
+          featureSet: TechPreviewNoUpgrade
+      expected: |
+        apiVersion: config.openshift.io/v1
+        kind: FeatureGate
+        spec:
+          featureSet: TechPreviewNoUpgrade
+    - name: Must reject unsupported value of a FeatureGate
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: FeatureGate
+        spec:
+          featureSet: bar
+      expectedError: "spec.featureSet: Unsupported value: \"bar\": supported values: \"CustomNoUpgrade\", \"DevPreviewNoUpgrade\", \"TechPreviewNoUpgrade\", \"OKD\", \"\""
+  onUpdate:
+    - name: Default to TechPreview
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: FeatureGate
+        spec:
+          featureSet: ""
+      updated: |
+        apiVersion: config.openshift.io/v1
+        kind: FeatureGate
+        spec:
+          featureSet: TechPreviewNoUpgrade
+      expected: |
+        apiVersion: config.openshift.io/v1
+        kind: FeatureGate
+        spec:
+          featureSet: TechPreviewNoUpgrade
+    - name: TechPreview to Default
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: FeatureGate
+        spec:
+          featureSet: TechPreviewNoUpgrade
+      updated: |
+        apiVersion: config.openshift.io/v1
+        kind: FeatureGate
+        spec:
+          featureSet: ""
+      expectedError: "TechPreviewNoUpgrade may not be changed"
+    - name: TechPreview to Removed
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: FeatureGate
+        spec:
+          featureSet: TechPreviewNoUpgrade
+      updated: |
+        apiVersion: config.openshift.io/v1
+        kind: FeatureGate
+        spec: {}
+      expectedError: ".spec.featureSet cannot be removed"
+    - name: TechPreview to Custom
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: FeatureGate
+        spec:
+          featureSet: TechPreviewNoUpgrade
+      updated: |
+        apiVersion: config.openshift.io/v1
+        kind: FeatureGate
+        spec:
+          featureSet: CustomNoUpgrade
+      expectedError: "TechPreviewNoUpgrade may not be changed"
+    - name: Default to Custom
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: FeatureGate
+        spec:
+          featureSet: ""
+      updated: |
+        apiVersion: config.openshift.io/v1
+        kind: FeatureGate
+        spec:
+          featureSet: CustomNoUpgrade
+      expected: |
+        apiVersion: config.openshift.io/v1
+        kind: FeatureGate
+        spec:
+          featureSet: CustomNoUpgrade
+    - name: Custom to Default
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: FeatureGate
+        spec:
+          featureSet: CustomNoUpgrade
+      updated: |
+        apiVersion: config.openshift.io/v1
+        kind: FeatureGate
+        spec:
+          featureSet: ""
+      expectedError: "CustomNoUpgrade may not be changed"
+    - name: Must reject an update if unsupported value of a FeatureGate is provided
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: FeatureGate
+        spec:
+          featureSet: ""
+      updated: |
+        apiVersion: config.openshift.io/v1
+        kind: FeatureGate
+        spec:
+          featureSet: "bar"
+      expectedError: "spec.featureSet: Unsupported value: \"bar\": supported values: \"CustomNoUpgrade\", \"DevPreviewNoUpgrade\", \"TechPreviewNoUpgrade\", \"OKD\", \"\""

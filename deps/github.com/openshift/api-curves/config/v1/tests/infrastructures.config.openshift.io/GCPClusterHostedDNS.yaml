@@ -1,0 +1,247 @@
+apiVersion: apiextensions.k8s.io/v1 # Hack because controller-gen complains if we don't have this
+name: "Infrastructure"
+crdName: infrastructures.config.openshift.io
+featureGates:
+- GCPClusterHostedDNSInstall
+tests:
+  onCreate:
+    - name: Should be able to create a minimal Infrastructure
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec: {} # No spec is required for a Infrastructure
+      expected: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec: {}
+  onUpdate:
+    - name: dnsType should default to `PlatformDefault` when not specified
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec:
+          platformSpec:
+            gcp: {}
+            type: GCP
+        status:
+          controlPlaneTopology: HighlyAvailable
+          infrastructureTopology: HighlyAvailable
+          platform: GCP
+          platformStatus:
+            gcp: {}
+            type: GCP
+      updated: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec:
+          platformSpec:
+            type: GCP
+            gcp: {}
+        status:
+          controlPlaneTopology: HighlyAvailable
+          infrastructureTopology: HighlyAvailable
+          platform: GCP
+          platformStatus:
+            gcp: {}
+            type: GCP
+      expected: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec:
+          platformSpec:
+            type: GCP
+            gcp: {}
+        status:
+          controlPlaneTopology: HighlyAvailable
+          cpuPartitioning: None
+          infrastructureTopology: HighlyAvailable
+          platform: GCP
+          platformStatus:
+            gcp:
+              cloudLoadBalancerConfig:
+                dnsType: PlatformDefault
+            type: GCP
+    - name: should be able to set dnsType to non-default value of `ClusterHosted`
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec:
+          platformSpec:
+            gcp: {}
+            type: GCP
+      updated: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec:
+          platformSpec:
+            type: GCP
+            gcp: {}
+        status:
+          controlPlaneTopology: HighlyAvailable
+          infrastructureTopology: HighlyAvailable
+          platform: GCP
+          platformStatus:
+            gcp:
+              cloudLoadBalancerConfig:
+                dnsType: ClusterHosted
+            type: GCP
+      expected: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec:
+          platformSpec:
+            type: GCP
+            gcp: {}
+        status:
+          controlPlaneTopology: HighlyAvailable
+          cpuPartitioning: None
+          infrastructureTopology: HighlyAvailable
+          platform: GCP
+          platformStatus:
+            gcp:
+              cloudLoadBalancerConfig:
+                dnsType: ClusterHosted
+            type: GCP
+    - name: Should not allow changing the immutable dnsType field
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec:
+          platformSpec:
+            gcp: {}
+            type: GCP
+        status:
+          controlPlaneTopology: HighlyAvailable
+          infrastructureTopology: HighlyAvailable
+          platform: GCP
+          platformStatus:
+            gcp:
+              cloudLoadBalancerConfig:
+                dnsType: ClusterHosted
+                clusterHosted:
+                  apiIntLoadBalancerIPs:
+                  - 10.10.10.20
+            type: GCP
+      updated: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec:
+          platformSpec:
+            type: GCP
+            gcp: {}
+        status:
+          controlPlaneTopology: HighlyAvailable
+          infrastructureTopology: HighlyAvailable
+          platform: GCP
+          platformStatus:
+            gcp:
+              cloudLoadBalancerConfig:
+                dnsType: PlatformDefault
+            type: GCP
+      expectedStatusError: "status.platformStatus.gcp.cloudLoadBalancerConfig.dnsType: Invalid value: \"string\": dnsType is immutable"
+    - name: Should not accept non-IP address values for Load Balancer IPs
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec:
+          platformSpec:
+            gcp: {}
+            type: GCP
+        status:
+          controlPlaneTopology: HighlyAvailable
+          infrastructureTopology: HighlyAvailable
+          platform: GCP
+          platformStatus:
+            gcp:
+              cloudLoadBalancerConfig:
+                dnsType: ClusterHosted
+                clusterHosted:
+                  apiIntLoadBalancerIPs:
+                  - 10.10.10.20
+            type: GCP
+      updated: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec:
+          platformSpec:
+            type: GCP
+            gcp: {}
+        status:
+          controlPlaneTopology: HighlyAvailable
+          infrastructureTopology: HighlyAvailable
+          platform: GCP
+          platformStatus:
+            gcp:
+              cloudLoadBalancerConfig:
+                dnsType: ClusterHosted
+                clusterHosted:
+                  apiIntLoadBalancerIPs:
+                  - 10.10.10.20
+                  - not-an-ip-address
+            type: GCP
+      expectedStatusError: "status.platformStatus.gcp.cloudLoadBalancerConfig.clusterHosted.apiIntLoadBalancerIPs[1]: Invalid value: \"string\": value must be a valid IP address"
+    - name: Should not accept update when `clusterHosted` is specified with DNSType `PlatformDefault`
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec:
+          platformSpec:
+            gcp: {}
+            type: GCP
+        status:
+          controlPlaneTopology: HighlyAvailable
+          infrastructureTopology: HighlyAvailable
+          platform: GCP
+          platformStatus:
+            gcp: {}
+            type: GCP
+      updated: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec:
+          platformSpec:
+            type: GCP
+            gcp: {}
+        status:
+          controlPlaneTopology: HighlyAvailable
+          infrastructureTopology: HighlyAvailable
+          platform: GCP
+          platformStatus:
+            gcp:
+              cloudLoadBalancerConfig:
+                dnsType: PlatformDefault
+                clusterHosted:
+                  apiIntLoadBalancerIPs:
+                  - 10.10.10.20
+            type: GCP
+      expectedStatusError: "status.platformStatus.gcp.cloudLoadBalancerConfig: Invalid value: \"object\": clusterHosted is permitted only when dnsType is ClusterHosted"
+    - name: Should not accept duplicate IP addresses for any of the Load Balancer IPs
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec:
+          platformSpec:
+            gcp: {}
+            type: GCP
+      updated: |
+        apiVersion: config.openshift.io/v1
+        kind: Infrastructure
+        spec:
+          platformSpec:
+            type: GCP
+            gcp: {}
+        status:
+          controlPlaneTopology: HighlyAvailable
+          infrastructureTopology: HighlyAvailable
+          platform: GCP
+          platformStatus:
+            gcp:
+              cloudLoadBalancerConfig:
+                dnsType: ClusterHosted
+                clusterHosted:
+                  apiIntLoadBalancerIPs:
+                  - 10.10.10.20
+                  - 10.10.20.20
+                  - 10.10.10.20
+            type: GCP
+      expectedStatusError: "status.platformStatus.gcp.cloudLoadBalancerConfig.clusterHosted.apiIntLoadBalancerIPs[2]: Duplicate value: \"10.10.10.20\""

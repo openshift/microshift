@@ -1,0 +1,443 @@
+apiVersion: apiextensions.k8s.io/v1 # Hack because controller-gen complains if we don't have this
+name: "Machine (+MachineAPIMigration)"
+crdName: machines.machine.openshift.io
+featureGates:
+- MachineAPIMigration
+tests:
+  onCreate:
+  - name: Should be able to create a minimal Machine
+    initial: |
+      apiVersion: machine.openshift.io/v1beta1
+      kind: Machine
+      spec: {} # No spec is required for a Machine
+    expected: |
+      apiVersion: machine.openshift.io/v1beta1
+      kind: Machine
+      spec:
+        authoritativeAPI: MachineAPI
+  - name: Should accept MachineAPI as a valid spec authoritative API
+    initial: |
+      apiVersion: machine.openshift.io/v1beta1
+      kind: Machine
+      spec:
+        authoritativeAPI: MachineAPI
+    expected: |
+      apiVersion: machine.openshift.io/v1beta1
+      kind: Machine
+      spec:
+        authoritativeAPI: MachineAPI
+  - name: Should accept ClusterAPI as a valid spec authoritative API
+    initial: |
+      apiVersion: machine.openshift.io/v1beta1
+      kind: Machine
+      spec:
+        authoritativeAPI: ClusterAPI
+    expected: |
+      apiVersion: machine.openshift.io/v1beta1
+      kind: Machine
+      spec:
+        authoritativeAPI: ClusterAPI
+  - name: Should reject Migrating as a valid spec authoritative API
+    initial: |
+      apiVersion: machine.openshift.io/v1beta1
+      kind: Machine
+      spec:
+        authoritativeAPI: Migrating
+    expectedError: "spec.authoritativeAPI: Unsupported value: \"Migrating\": supported values: \"MachineAPI\", \"ClusterAPI\""
+  onUpdate:
+  - name: Should allow updating the spec authoritative API to ClusterAPI
+    initial: |
+      apiVersion: machine.openshift.io/v1beta1
+      kind: Machine
+      spec:
+        authoritativeAPI: MachineAPI
+    updated: |
+      apiVersion: machine.openshift.io/v1beta1
+      kind: Machine
+      spec:
+        authoritativeAPI: ClusterAPI
+    expected: |
+      apiVersion: machine.openshift.io/v1beta1
+      kind: Machine
+      spec:
+        authoritativeAPI: ClusterAPI
+  - name: Should allow updating the spec authoritative API to MachineAPI
+    initial: |
+      apiVersion: machine.openshift.io/v1beta1
+      kind: Machine
+      spec:
+        authoritativeAPI: ClusterAPI
+    updated: |
+      apiVersion: machine.openshift.io/v1beta1
+      kind: Machine
+      spec:
+        authoritativeAPI: MachineAPI
+    expected: |
+      apiVersion: machine.openshift.io/v1beta1
+      kind: Machine
+      spec:
+        authoritativeAPI: MachineAPI
+  - name: Should allow updating the status authoritative API to Migrating from MachineAPI
+    initial: |
+      apiVersion: machine.openshift.io/v1beta1
+      kind: Machine
+      spec:
+        authoritativeAPI: ClusterAPI
+      status:
+        authoritativeAPI: MachineAPI
+    updated: |
+      apiVersion: machine.openshift.io/v1beta1
+      kind: Machine
+      spec:
+        authoritativeAPI: ClusterAPI
+      status:
+        authoritativeAPI: Migrating
+    expected: |
+      apiVersion: machine.openshift.io/v1beta1
+      kind: Machine
+      spec:
+        authoritativeAPI: ClusterAPI
+      status:
+        authoritativeAPI: Migrating
+  - name: Should allow updating the status authoritative API to Migrating from ClusterAPI
+    initial: |
+      apiVersion: machine.openshift.io/v1beta1
+      kind: Machine
+      spec:
+        authoritativeAPI: MachineAPI
+      status:
+        authoritativeAPI: ClusterAPI
+    updated: |
+      apiVersion: machine.openshift.io/v1beta1
+      kind: Machine
+      spec:
+        authoritativeAPI: MachineAPI
+      status:
+        authoritativeAPI: Migrating
+    expected: |
+      apiVersion: machine.openshift.io/v1beta1
+      kind: Machine
+      spec:
+        authoritativeAPI: MachineAPI
+      status:
+        authoritativeAPI: Migrating
+  - name: Should allow updating the status authoritative API to MachineAPI from Migrating
+    initial: |
+      apiVersion: machine.openshift.io/v1beta1
+      kind: Machine
+      spec:
+        authoritativeAPI: MachineAPI
+      status:
+        authoritativeAPI: Migrating
+    updated: |
+      apiVersion: machine.openshift.io/v1beta1
+      kind: Machine
+      spec:
+        authoritativeAPI: MachineAPI
+      status:
+        authoritativeAPI: MachineAPI
+    expected: |
+      apiVersion: machine.openshift.io/v1beta1
+      kind: Machine
+      spec:
+        authoritativeAPI: MachineAPI
+      status:
+        authoritativeAPI: MachineAPI
+  - name: Should allow updating the status authoritative API to ClusterAPI from Migrating
+    initial: |
+      apiVersion: machine.openshift.io/v1beta1
+      kind: Machine
+      spec:
+        authoritativeAPI: ClusterAPI
+      status:
+        authoritativeAPI: Migrating
+    updated: |
+      apiVersion: machine.openshift.io/v1beta1
+      kind: Machine
+      spec:
+        authoritativeAPI: ClusterAPI
+      status:
+        authoritativeAPI: ClusterAPI
+    expected: |
+      apiVersion: machine.openshift.io/v1beta1
+      kind: Machine
+      spec:
+        authoritativeAPI: ClusterAPI
+      status:
+        authoritativeAPI: ClusterAPI
+  - name: Should not allow updating the status authoritative API to ClusterAPI from MachineAPI
+    initial: |
+      apiVersion: machine.openshift.io/v1beta1
+      kind: Machine
+      spec:
+        authoritativeAPI: ClusterAPI
+      status:
+        authoritativeAPI: MachineAPI
+    updated: |
+      apiVersion: machine.openshift.io/v1beta1
+      kind: Machine
+      spec:
+        authoritativeAPI: ClusterAPI
+      status:
+        authoritativeAPI: ClusterAPI
+    expectedStatusError: "status.authoritativeAPI: Invalid value: \"string\": The authoritativeAPI field must not transition directly from MachineAPI to ClusterAPI or vice versa. It must transition through Migrating."
+  - name: Should not allow updating the status authoritative API to MachineAPI from ClusterAPI
+    initial: |
+      apiVersion: machine.openshift.io/v1beta1
+      kind: Machine
+      spec:
+        authoritativeAPI: MachineAPI
+      status:
+        authoritativeAPI: ClusterAPI
+    updated: |
+      apiVersion: machine.openshift.io/v1beta1
+      kind: Machine
+      spec:
+        authoritativeAPI: MachineAPI
+      status:
+        authoritativeAPI: MachineAPI
+    expectedStatusError: "status.authoritativeAPI: Invalid value: \"string\": The authoritativeAPI field must not transition directly from MachineAPI to ClusterAPI or vice versa. It must transition through Migrating."
+  - name: Should allow adding the synchronizedGeneration field to an existing status
+    initial: |
+      apiVersion: machine.openshift.io/v1beta1
+      kind: Machine
+      spec:
+        authoritativeAPI: MachineAPI
+      status:
+        authoritativeAPI: MachineAPI
+    updated: |
+      apiVersion: machine.openshift.io/v1beta1
+      kind: Machine
+      spec:
+        authoritativeAPI: MachineAPI
+      status:
+        authoritativeAPI: MachineAPI
+        synchronizedGeneration: 0
+    expected: |
+      apiVersion: machine.openshift.io/v1beta1
+      kind: Machine
+      spec:
+        authoritativeAPI: MachineAPI
+      status:
+        authoritativeAPI: MachineAPI
+        synchronizedGeneration: 0
+  - name: Should allow adding the authoritativeAPI field to an existing status
+    initial: |
+      apiVersion: machine.openshift.io/v1beta1
+      kind: Machine
+      spec:
+        authoritativeAPI: MachineAPI
+      status:
+        synchronizedGeneration: 0
+    updated: |
+      apiVersion: machine.openshift.io/v1beta1
+      kind: Machine
+      spec:
+        authoritativeAPI: MachineAPI
+      status:
+        authoritativeAPI: MachineAPI
+        synchronizedGeneration: 0
+    expected: |
+      apiVersion: machine.openshift.io/v1beta1
+      kind: Machine
+      spec:
+        authoritativeAPI: MachineAPI
+      status:
+        authoritativeAPI: MachineAPI
+        synchronizedGeneration: 0
+  - name: Should not allow removing the status authoritativeAPI once set
+    initial: |
+      apiVersion: machine.openshift.io/v1beta1
+      kind: Machine
+      spec:
+        authoritativeAPI: MachineAPI
+      status:
+        authoritativeAPI: MachineAPI
+        synchronizedGeneration: 0
+    updated: |
+      apiVersion: machine.openshift.io/v1beta1
+      kind: Machine
+      spec:
+        authoritativeAPI: MachineAPI
+      status:
+        synchronizedGeneration: 0
+    expectedStatusError: "status: Invalid value: \"object\": authoritativeAPI may not be removed once set"
+  - name: Should increasing the synchronizedGeneration while the Authoritative API is MachineAPI
+    initial: |
+      apiVersion: machine.openshift.io/v1beta1
+      kind: Machine
+      spec:
+        authoritativeAPI: MachineAPI
+      status:
+        authoritativeAPI: MachineAPI
+        synchronizedGeneration: 1
+    updated: |
+      apiVersion: machine.openshift.io/v1beta1
+      kind: Machine
+      spec:
+        authoritativeAPI: MachineAPI
+      status:
+        authoritativeAPI: MachineAPI
+        synchronizedGeneration: 2
+    expected: |
+      apiVersion: machine.openshift.io/v1beta1
+      kind: Machine
+      spec:
+        authoritativeAPI: MachineAPI
+      status:
+        authoritativeAPI: MachineAPI
+        synchronizedGeneration: 2
+  - name: Should increasing the synchronizedGeneration while the Authoritative API is Migrating
+    initial: |
+      apiVersion: machine.openshift.io/v1beta1
+      kind: Machine
+      spec:
+        authoritativeAPI: MachineAPI
+      status:
+        authoritativeAPI: Migrating
+        synchronizedGeneration: 1
+    updated: |
+      apiVersion: machine.openshift.io/v1beta1
+      kind: Machine
+      spec:
+        authoritativeAPI: MachineAPI
+      status:
+        authoritativeAPI: Migrating
+        synchronizedGeneration: 2
+    expected: |
+      apiVersion: machine.openshift.io/v1beta1
+      kind: Machine
+      spec:
+        authoritativeAPI: MachineAPI
+      status:
+        authoritativeAPI: Migrating
+        synchronizedGeneration: 2
+  - name: Should increasing the synchronizedGeneration while the Authoritative API is ClusterAPI
+    initial: |
+      apiVersion: machine.openshift.io/v1beta1
+      kind: Machine
+      spec:
+        authoritativeAPI: ClusterAPI
+      status:
+        authoritativeAPI: ClusterAPI
+        synchronizedGeneration: 1
+    updated: |
+      apiVersion: machine.openshift.io/v1beta1
+      kind: Machine
+      spec:
+        authoritativeAPI: ClusterAPI
+      status:
+        authoritativeAPI: ClusterAPI
+        synchronizedGeneration: 2
+    expected: |
+      apiVersion: machine.openshift.io/v1beta1
+      kind: Machine
+      spec:
+        authoritativeAPI: ClusterAPI
+      status:
+        authoritativeAPI: ClusterAPI
+        synchronizedGeneration: 2
+  - name: Should not allow decreasing the synchronizedGeneration while the Authoritative API is MachineAPI
+    initial: |
+      apiVersion: machine.openshift.io/v1beta1
+      kind: Machine
+      spec:
+        authoritativeAPI: MachineAPI
+      status:
+        authoritativeAPI: MachineAPI
+        synchronizedGeneration: 2
+    updated: |
+      apiVersion: machine.openshift.io/v1beta1
+      kind: Machine
+      spec:
+        authoritativeAPI: MachineAPI
+      status:
+        authoritativeAPI: MachineAPI
+        synchronizedGeneration: 1
+    expectedStatusError: "status.synchronizedGeneration: Invalid value: \"object\": synchronizedGeneration must not decrease unless authoritativeAPI is transitioning from Migrating to another value"
+  - name: Should not allow decreasing the synchronizedGeneration while the Authoritative API is Migrating
+    initial: |
+      apiVersion: machine.openshift.io/v1beta1
+      kind: Machine
+      spec:
+        authoritativeAPI: MachineAPI
+      status:
+        authoritativeAPI: Migrating
+        synchronizedGeneration: 2
+    updated: |
+      apiVersion: machine.openshift.io/v1beta1
+      kind: Machine
+      spec:
+        authoritativeAPI: MachineAPI
+      status:
+        authoritativeAPI: Migrating
+        synchronizedGeneration: 1
+    expectedStatusError: "status.synchronizedGeneration: Invalid value: \"object\": synchronizedGeneration must not decrease unless authoritativeAPI is transitioning from Migrating to another value"
+  - name: Should not allow decreasing the synchronizedGeneration while the Authoritative API is ClusterAPI
+    initial: |
+      apiVersion: machine.openshift.io/v1beta1
+      kind: Machine
+      spec:
+        authoritativeAPI: ClusterAPI
+      status:
+        authoritativeAPI: ClusterAPI
+        synchronizedGeneration: 2
+    updated: |
+      apiVersion: machine.openshift.io/v1beta1
+      kind: Machine
+      spec:
+        authoritativeAPI: ClusterAPI
+      status:
+        authoritativeAPI: ClusterAPI
+        synchronizedGeneration: 1
+    expectedStatusError: "status.synchronizedGeneration: Invalid value: \"object\": synchronizedGeneration must not decrease unless authoritativeAPI is transitioning from Migrating to another value"
+  - name: Should allow decreasing the synchronizedGeneration while the Authoritative API is moved from Migrating to MachineAPI
+    initial: |
+      apiVersion: machine.openshift.io/v1beta1
+      kind: Machine
+      spec:
+        authoritativeAPI: MachineAPI
+      status:
+        authoritativeAPI: Migrating
+        synchronizedGeneration: 1
+    updated: |
+      apiVersion: machine.openshift.io/v1beta1
+      kind: Machine
+      spec:
+        authoritativeAPI: MachineAPI
+      status:
+        authoritativeAPI: MachineAPI
+        synchronizedGeneration: 0
+    expected: |
+      apiVersion: machine.openshift.io/v1beta1
+      kind: Machine
+      spec:
+        authoritativeAPI: MachineAPI
+      status:
+        authoritativeAPI: MachineAPI
+        synchronizedGeneration: 0
+  - name: Should allow decreasing the synchronizedGeneration while the Authoritative API is moved from Migrating to ClusterAPI
+    initial: |
+      apiVersion: machine.openshift.io/v1beta1
+      kind: Machine
+      spec:
+        authoritativeAPI: ClusterAPI
+      status:
+        authoritativeAPI: Migrating
+        synchronizedGeneration: 1
+    updated: |
+      apiVersion: machine.openshift.io/v1beta1
+      kind: Machine
+      spec:
+        authoritativeAPI: ClusterAPI
+      status:
+        authoritativeAPI: ClusterAPI
+        synchronizedGeneration: 0
+    expected: |
+      apiVersion: machine.openshift.io/v1beta1
+      kind: Machine
+      spec:
+        authoritativeAPI: ClusterAPI
+      status:
+        authoritativeAPI: ClusterAPI
+        synchronizedGeneration: 0

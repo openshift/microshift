@@ -1,0 +1,353 @@
+apiVersion: apiextensions.k8s.io/v1 # Hack because controller-gen complains if we don't have this
+name: "ClusterMonitoring"
+crdName: clustermonitorings.config.openshift.io
+featureGate: ClusterMonitoringConfig
+tests:
+  onCreate:
+    - name: Should be able to create a minimal ClusterMonitoring
+      initial: |
+        apiVersion: config.openshift.io/v1alpha1
+        kind: ClusterMonitoring
+        spec:
+          userDefined:
+            mode: "Disabled" 
+                       
+      expected: |
+        apiVersion: config.openshift.io/v1alpha1
+        kind: ClusterMonitoring
+        spec:
+          userDefined:
+            mode: "Disabled" 
+    - name: Should reject ContainerResource with duplicate names
+      initial: |
+        apiVersion: config.openshift.io/v1alpha1
+        kind: ClusterMonitoring
+        spec:
+          userDefined:
+            mode: "Disabled"
+          alertmanagerConfig:
+            deploymentMode: "CustomConfig"
+            customConfig:
+              resources:
+                - name: "cpu"
+                  request: "100m"
+                - name: "cpu"
+                  request: "200m"
+      expectedError: 'spec.alertmanagerConfig.customConfig.resources[1]: Duplicate value: map[string]interface {}{"name":"cpu"}'
+    - name: Should reject ContainerResource with more than 10 items
+      initial: |
+        apiVersion: config.openshift.io/v1alpha1
+        kind: ClusterMonitoring
+        spec:
+          userDefined:
+            mode: "Disabled"
+          alertmanagerConfig:
+            deploymentMode: "CustomConfig"
+            customConfig:
+              resources:
+                - name: "cpu"
+                  request: "100m"
+                - name: "memory"
+                  request: "64Mi"
+                - name: "hugepages-2Mi"
+                  request: "32Mi"
+                - name: "hugepages-1Gi"
+                  request: "1Gi"
+                - name: "ephemeral-storage"
+                  request: "1Gi"
+                - name: "nvidia.com/gpu"
+                  request: "1"
+                - name: "example.com/foo"
+                  request: "1"
+                - name: "example.com/bar"
+                  request: "1"
+                - name: "example.com/baz"
+                  request: "1"
+                - name: "example.com/qux"
+                  request: "1"
+                - name: "example.com/quux"
+                  request: "1"
+      expectedError: 'spec.alertmanagerConfig.customConfig.resources: Too many: 11: must have at most 10 items'
+    - name: Should reject ContainerResource request with MaxLength violation
+      initial: |
+        apiVersion: config.openshift.io/v1alpha1
+        kind: ClusterMonitoring
+        spec:
+          userDefined:
+            mode: "Disabled"
+          alertmanagerConfig:
+            deploymentMode: "CustomConfig"
+            customConfig:
+              resources:
+                - name: "cpu"
+                  request: "123456789012345678901"
+      expectedError: 'spec.alertmanagerConfig.customConfig.resources[0].request: Too long: may not be more than 20 bytes'
+    - name: Should reject ContainerResource request with MinLength violation
+      initial: |
+        apiVersion: config.openshift.io/v1alpha1
+        kind: ClusterMonitoring
+        spec:
+          userDefined:
+            mode: "Disabled"
+          alertmanagerConfig:
+            deploymentMode: "CustomConfig"
+            customConfig:
+              resources:
+                - name: "cpu"
+                  request: ""
+      expectedError: 'spec.alertmanagerConfig.customConfig.resources[0].request: Invalid value: "": spec.alertmanagerConfig.customConfig.resources[0].request in body should be at least 1 chars long'
+    - name: Should reject ContainerResource request with non-positive quantity
+      initial: |
+        apiVersion: config.openshift.io/v1alpha1
+        kind: ClusterMonitoring
+        spec:
+          userDefined:
+            mode: "Disabled"
+          alertmanagerConfig:
+            deploymentMode: "CustomConfig"
+            customConfig:
+              resources:
+                - name: "cpu"
+                  request: "0"
+      expectedError: 'spec.alertmanagerConfig.customConfig.resources[0].request: Invalid value: "": request must be a positive, non-zero quantity'
+    - name: Should reject ContainerResource limit with MaxLength violation
+      initial: |
+        apiVersion: config.openshift.io/v1alpha1
+        kind: ClusterMonitoring
+        spec:
+          userDefined:
+            mode: "Disabled"
+          alertmanagerConfig:
+            deploymentMode: "CustomConfig"
+            customConfig:
+              resources:
+                - name: "cpu"
+                  limit: "123456789012345678901"
+      expectedError: 'spec.alertmanagerConfig.customConfig.resources[0].limit: Too long: may not be more than 20 bytes'
+    - name: Should reject ContainerResource limit with MinLength violation
+      initial: |
+        apiVersion: config.openshift.io/v1alpha1
+        kind: ClusterMonitoring
+        spec:
+          userDefined:
+            mode: "Disabled"
+          alertmanagerConfig:
+            deploymentMode: "CustomConfig"
+            customConfig:
+              resources:
+                - name: "cpu"
+                  limit: ""
+      expectedError: 'spec.alertmanagerConfig.customConfig.resources[0].limit: Invalid value: "": spec.alertmanagerConfig.customConfig.resources[0].limit in body should be at least 1 chars long'
+    - name: Should reject ContainerResource limit with non-positive quantity
+      initial: |
+        apiVersion: config.openshift.io/v1alpha1
+        kind: ClusterMonitoring
+        spec:
+          userDefined:
+            mode: "Disabled"
+          alertmanagerConfig:
+            deploymentMode: "CustomConfig"
+            customConfig:
+              resources:
+                - name: "cpu"
+                  limit: "0"
+      expectedError: 'spec.alertmanagerConfig.customConfig.resources[0].limit: Invalid value: "": limit must be a positive, non-zero quantity'
+    - name: Should reject ContainerResource name with MaxLength violation
+      initial: |
+        apiVersion: config.openshift.io/v1alpha1
+        kind: ClusterMonitoring
+        spec:
+          userDefined:
+            mode: "Disabled"
+          alertmanagerConfig:
+            deploymentMode: "CustomConfig"
+            customConfig:
+              resources:
+                - name: "this-is-a-very-long-resource-name-that-exceeds-the-maximum-length-of-253-characters-and-should-be-rejected-by-the-validation-this-is-a-very-long-resource-name-that-exceeds-the-maximum-length-of-253-characters-and-should-be-rejected-by-the-validation-more-text-to-exceed-253-chars"
+                  request: "100m"
+      expectedError: 'spec.alertmanagerConfig.customConfig.resources[0].name: Too long: may not be more than 253 bytes'
+    - name: Should reject ContainerResource name with invalid qualified name format
+      initial: |
+        apiVersion: config.openshift.io/v1alpha1
+        kind: ClusterMonitoring
+        spec:
+          userDefined:
+            mode: "Disabled"
+          alertmanagerConfig:
+            deploymentMode: "CustomConfig"
+            customConfig:
+              resources:
+                - name: "-invalid-start"
+                  request: "100m"
+      expectedError: 'spec.alertmanagerConfig.customConfig.resources[0].name: Invalid value: "string": name must consist only of alphanumeric characters, `-`, `_` and `.` and must start and end with an alphanumeric character'
+    - name: Should reject ContainerResource with neither request nor limit
+      initial: |
+        apiVersion: config.openshift.io/v1alpha1
+        kind: ClusterMonitoring
+        spec:
+          userDefined:
+            mode: "Disabled"
+          alertmanagerConfig:
+            deploymentMode: "CustomConfig"
+            customConfig:
+              resources:
+                - name: "cpu"
+      expectedError: 'spec.alertmanagerConfig.customConfig.resources[0]: Invalid value: "object": at least one of request or limit must be set'
+    - name: Should reject ContainerResource with limit less than request
+      initial: |
+        apiVersion: config.openshift.io/v1alpha1
+        kind: ClusterMonitoring
+        spec:
+          userDefined:
+            mode: "Disabled"
+          alertmanagerConfig:
+            deploymentMode: "CustomConfig"
+            customConfig:
+              resources:
+                - name: "cpu"
+                  request: "500m"
+                  limit: "200m"
+      expectedError: 'spec.alertmanagerConfig.customConfig.resources[0]: Invalid value: "object": limit must be greater than or equal to request'
+    - name: Should be able to create a minimal MetricsServerConfig
+      initial: |
+        apiVersion: config.openshift.io/v1alpha1
+        kind: ClusterMonitoring
+        spec:
+          metricsServerConfig:
+            verbosity: Info
+      expected: |
+        apiVersion: config.openshift.io/v1alpha1
+        kind: ClusterMonitoring
+        spec:
+          metricsServerConfig:
+            verbosity: Info
+    - name: Should accept MetricsServerConfig with comprehensive ContainerResource array
+      initial: |
+        apiVersion: config.openshift.io/v1alpha1
+        kind: ClusterMonitoring
+        spec:
+          userDefined:
+            mode: "Disabled"
+          metricsServerConfig:
+            resources:
+              - name: "cpu"
+                request: "100m"
+                limit: "500m"
+              - name: "memory"
+                request: "128Mi"
+                limit: "512Mi"
+              - name: "ephemeral-storage"
+                request: "1Gi"
+                limit: "2Gi"
+      expected: |
+        apiVersion: config.openshift.io/v1alpha1
+        kind: ClusterMonitoring
+        spec:
+          userDefined:
+            mode: "Disabled"
+          metricsServerConfig:
+            resources:
+              - name: "cpu"
+                request: "100m"
+                limit: "500m"
+              - name: "memory"
+                request: "128Mi"
+                limit: "512Mi"
+              - name: "ephemeral-storage"
+                request: "1Gi"
+                limit: "2Gi"
+    - name: Should accept MetricsServerConfig with only requests
+      initial: |
+        apiVersion: config.openshift.io/v1alpha1
+        kind: ClusterMonitoring
+        spec:
+          userDefined:
+            mode: "Disabled"
+          metricsServerConfig:
+            resources:
+              - name: "cpu"
+                request: "200m"
+              - name: "memory"
+                request: "256Mi"
+      expected: |
+        apiVersion: config.openshift.io/v1alpha1
+        kind: ClusterMonitoring
+        spec:
+          userDefined:
+            mode: "Disabled"
+          metricsServerConfig:
+            resources:
+              - name: "cpu"
+                request: "200m"
+              - name: "memory"
+                request: "256Mi"
+    - name: Should accept MetricsServerConfig with only limits
+      initial: |
+        apiVersion: config.openshift.io/v1alpha1
+        kind: ClusterMonitoring
+        spec:
+          userDefined:
+            mode: "Disabled"
+          metricsServerConfig:
+            resources:
+              - name: "cpu"
+                limit: "1"
+              - name: "memory"
+                limit: "1Gi"
+      expected: |
+        apiVersion: config.openshift.io/v1alpha1
+        kind: ClusterMonitoring
+        spec:
+          userDefined:
+            mode: "Disabled"
+          metricsServerConfig:
+            resources:
+              - name: "cpu"
+                limit: "1"
+              - name: "memory"
+                limit: "1Gi"
+    - name: Should reject MetricsServerConfig with limit less than request
+      initial: |
+        apiVersion: config.openshift.io/v1alpha1
+        kind: ClusterMonitoring
+        spec:
+          userDefined:
+            mode: "Disabled"
+          metricsServerConfig:
+            resources:
+              - name: "cpu"
+                request: "500m"
+                limit: "200m"
+      expectedError: 'spec.metricsServerConfig.resources[0]: Invalid value: "object": limit must be greater than or equal to request'
+    - name: Should reject MetricsServerConfig with more than 10 resource items
+      initial: |
+        apiVersion: config.openshift.io/v1alpha1
+        kind: ClusterMonitoring
+        spec:
+          userDefined:
+            mode: "Disabled"
+          metricsServerConfig:
+            resources:
+              - name: "cpu"
+                request: "100m"
+              - name: "memory"
+                request: "64Mi"
+              - name: "hugepages-2Mi"
+                request: "32Mi"
+              - name: "hugepages-1Gi"
+                request: "1Gi"
+              - name: "ephemeral-storage"
+                request: "1Gi"
+              - name: "nvidia.com/gpu"
+                request: "1"
+              - name: "example.com/foo"
+                request: "1"
+              - name: "example.com/bar"
+                request: "1"
+              - name: "example.com/baz"
+                request: "1"
+              - name: "example.com/qux"
+                request: "1"
+              - name: "example.com/quux"
+                request: "1"
+      expectedError: 'spec.metricsServerConfig.resources: Too many: 11: must have at most 10 items'

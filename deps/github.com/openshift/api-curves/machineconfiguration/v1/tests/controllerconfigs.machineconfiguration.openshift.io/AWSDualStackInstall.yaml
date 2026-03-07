@@ -1,0 +1,321 @@
+apiVersion: apiextensions.k8s.io/v1 # Hack because controller-gen complains if we don't have this
+name: "AWSDualStackInstall ControllerConfig"
+crdName: controllerconfigs.machineconfiguration.openshift.io
+featureGates:
+- AWSDualStackInstall
+tests:
+  onCreate:
+    - name: Should be able to create a minimal ControllerConfig
+      initial: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: ControllerConfig
+        spec:
+          additionalTrustBundle: Y2VydGlmaWNhdGUK
+          baseOSContainerImage: example.com/example/openshift-release-dev@sha256:d98795f7932441b30bb8bcfbbf05912875383fad1f2b3be08a22ec148d68607e
+          baseOSExtensionsContainerImage: example.com/example/openshift-release-dev@sha256:d98795f7932441b30bb8bcfbbf05912875383fad1f2b3be08a22ec148d68607e
+          cloudProviderCAData: null
+          cloudProviderConfig: ""
+          clusterDNSIP: 10.0.0.10
+          dns:
+            apiVersion: config.openshift.io/v1
+            kind: DNS
+            spec:
+              baseDomain: example.redhat.com
+          images:
+            machineConfigOperator: example.com/example/openshift-release-dev@sha256:2c3ea52ac3a41c6d58e85977c3149413e3fa4b70eb2397426456863adbf43306
+          infra:
+            apiVersion: config.openshift.io/v1
+            kind: Infrastructure
+            spec:
+              platformSpec:
+                type: AWS
+                aws: {}
+            status:
+              apiServerInternalURI: https://api-int.test.example.com:6443
+              apiServerURL: https://api.test.example.com:6443
+              cpuPartitioning: "None"
+              controlPlaneTopology: HighlyAvailable
+              etcdDiscoveryDomain: ""
+              infrastructureName: test-aws-cluster
+              infrastructureTopology: HighlyAvailable
+              platform: AWS
+              platformStatus:
+                type: AWS
+                aws:
+                  region: us-east-1
+          ipFamilies: IPv4
+          kubeAPIServerServingCAData: Y2VydGlmaWNhdGUK
+          network: null
+          networkType: OVNKubernetes
+          osImageURL: example.com/example/openshift-release-dev@sha256:eacdc37aec78fdbf8caa9601e4012ab31453cf59b086474901900e853e803ea8
+          platform: aws
+          proxy: null
+          pullSecret:
+            name: pull-secret
+            namespace: openshift-config
+          releaseImage: ""
+          rootCAData: Y2VydGlmaWNhdGUK
+      expected: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: ControllerConfig
+        spec:
+          additionalTrustBundle: Y2VydGlmaWNhdGUK
+          baseOSContainerImage: example.com/example/openshift-release-dev@sha256:d98795f7932441b30bb8bcfbbf05912875383fad1f2b3be08a22ec148d68607e
+          baseOSExtensionsContainerImage: example.com/example/openshift-release-dev@sha256:d98795f7932441b30bb8bcfbbf05912875383fad1f2b3be08a22ec148d68607e
+          cloudProviderCAData: null
+          cloudProviderConfig: ""
+          clusterDNSIP: 10.0.0.10
+          dns:
+            apiVersion: config.openshift.io/v1
+            kind: DNS
+            spec:
+              baseDomain: example.redhat.com
+          images:
+            machineConfigOperator: example.com/example/openshift-release-dev@sha256:2c3ea52ac3a41c6d58e85977c3149413e3fa4b70eb2397426456863adbf43306
+          infra:
+            apiVersion: config.openshift.io/v1
+            kind: Infrastructure
+            spec:
+              platformSpec:
+                type: AWS
+                aws: {}
+            status:
+              apiServerInternalURI: https://api-int.test.example.com:6443
+              apiServerURL: https://api.test.example.com:6443
+              cpuPartitioning: "None"
+              controlPlaneTopology: HighlyAvailable
+              etcdDiscoveryDomain: ""
+              infrastructureName: test-aws-cluster
+              infrastructureTopology: HighlyAvailable
+              platform: AWS
+              platformStatus:
+                type: AWS
+                aws:
+                  region: us-east-1
+                  ipFamily: IPv4
+                  cloudLoadBalancerConfig:
+                    dnsType: PlatformDefault
+          ipFamilies: IPv4
+          kubeAPIServerServingCAData: Y2VydGlmaWNhdGUK
+          network: null
+          networkType: OVNKubernetes
+          osImageURL: example.com/example/openshift-release-dev@sha256:eacdc37aec78fdbf8caa9601e4012ab31453cf59b086474901900e853e803ea8
+          platform: aws
+          proxy: null
+          pullSecret:
+            name: pull-secret
+            namespace: openshift-config
+          releaseImage: ""
+          rootCAData: Y2VydGlmaWNhdGUK
+  onUpdate:
+    - name: Should be able to set ipFamily to DualStackIPv6Primary in AWS platform status
+      initial: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: ControllerConfig
+        spec:
+          additionalTrustBundle: Y2VydGlmaWNhdGUK
+          baseOSContainerImage: example.com/example/openshift-release-dev@sha256:d98795f7932441b30bb8bcfbbf05912875383fad1f2b3be08a22ec148d68607e
+          cloudProviderCAData: null
+          cloudProviderConfig: ""
+          clusterDNSIP: 10.0.0.10
+          dns:
+            apiVersion: config.openshift.io/v1
+            kind: DNS
+            spec:
+              baseDomain: example.redhat.com
+          images:
+            machineConfigOperator: example.com/example/openshift-release-dev@sha256:2c3ea52ac3a41c6d58e85977c3149413e3fa4b70eb2397426456863adbf43306
+          infra:
+            apiVersion: config.openshift.io/v1
+            kind: Infrastructure
+            spec:
+              platformSpec:
+                type: AWS
+                aws: {}
+          ipFamilies: IPv4
+          kubeAPIServerServingCAData: Y2VydGlmaWNhdGUK
+          network: null
+          networkType: OVNKubernetes
+          osImageURL: example.com/example/openshift-release-dev@sha256:eacdc37aec78fdbf8caa9601e4012ab31453cf59b086474901900e853e803ea8
+          platform: aws
+          proxy: null
+          pullSecret:
+            name: pull-secret
+            namespace: openshift-config
+          releaseImage: ""
+          rootCAData: Y2VydGlmaWNhdGUK
+      updated: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: ControllerConfig
+        spec:
+          additionalTrustBundle: Y2VydGlmaWNhdGUK
+          baseOSContainerImage: example.com/example/openshift-release-dev@sha256:d98795f7932441b30bb8bcfbbf05912875383fad1f2b3be08a22ec148d68607e
+          cloudProviderCAData: null
+          cloudProviderConfig: ""
+          clusterDNSIP: 10.0.0.10
+          dns:
+            apiVersion: config.openshift.io/v1
+            kind: DNS
+            spec:
+              baseDomain: example.redhat.com
+          images:
+            machineConfigOperator: example.com/example/openshift-release-dev@sha256:2c3ea52ac3a41c6d58e85977c3149413e3fa4b70eb2397426456863adbf43306
+          infra:
+            apiVersion: config.openshift.io/v1
+            kind: Infrastructure
+            spec:
+              platformSpec:
+                type: AWS
+                aws: {}
+            status:
+              platform: AWS
+              platformStatus:
+                type: AWS
+                aws:
+                  region: us-east-1
+                  ipFamily: DualStackIPv6Primary
+          ipFamilies: IPv4
+          kubeAPIServerServingCAData: Y2VydGlmaWNhdGUK
+          network: null
+          networkType: OVNKubernetes
+          osImageURL: example.com/example/openshift-release-dev@sha256:eacdc37aec78fdbf8caa9601e4012ab31453cf59b086474901900e853e803ea8
+          platform: aws
+          proxy: null
+          pullSecret:
+            name: pull-secret
+            namespace: openshift-config
+          releaseImage: ""
+          rootCAData: Y2VydGlmaWNhdGUK
+      expected: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: ControllerConfig
+        spec:
+          additionalTrustBundle: Y2VydGlmaWNhdGUK
+          baseOSContainerImage: example.com/example/openshift-release-dev@sha256:d98795f7932441b30bb8bcfbbf05912875383fad1f2b3be08a22ec148d68607e
+          cloudProviderCAData: null
+          cloudProviderConfig: ""
+          clusterDNSIP: 10.0.0.10
+          dns:
+            apiVersion: config.openshift.io/v1
+            kind: DNS
+            spec:
+              baseDomain: example.redhat.com
+          images:
+            machineConfigOperator: example.com/example/openshift-release-dev@sha256:2c3ea52ac3a41c6d58e85977c3149413e3fa4b70eb2397426456863adbf43306
+          infra:
+            apiVersion: config.openshift.io/v1
+            kind: Infrastructure
+            spec:
+              platformSpec:
+                type: AWS
+                aws: {}
+            status:
+              cpuPartitioning: "None"
+              controlPlaneTopology: HighlyAvailable
+              infrastructureTopology: HighlyAvailable
+              platform: AWS
+              platformStatus:
+                type: AWS
+                aws:
+                  region: us-east-1
+                  ipFamily: DualStackIPv6Primary
+                  cloudLoadBalancerConfig:
+                    dnsType: PlatformDefault
+          ipFamilies: IPv4
+          kubeAPIServerServingCAData: Y2VydGlmaWNhdGUK
+          network: null
+          networkType: OVNKubernetes
+          osImageURL: example.com/example/openshift-release-dev@sha256:eacdc37aec78fdbf8caa9601e4012ab31453cf59b086474901900e853e803ea8
+          platform: aws
+          proxy: null
+          pullSecret:
+            name: pull-secret
+            namespace: openshift-config
+          releaseImage: ""
+          rootCAData: Y2VydGlmaWNhdGUK
+    - name: Should not allow changing ipFamily once set in AWS platform status
+      initial: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: ControllerConfig
+        spec:
+          additionalTrustBundle: Y2VydGlmaWNhdGUK
+          baseOSContainerImage: example.com/example/openshift-release-dev@sha256:d98795f7932441b30bb8bcfbbf05912875383fad1f2b3be08a22ec148d68607e
+          cloudProviderCAData: null
+          cloudProviderConfig: ""
+          clusterDNSIP: 10.0.0.10
+          dns:
+            apiVersion: config.openshift.io/v1
+            kind: DNS
+            spec:
+              baseDomain: example.redhat.com
+          images:
+            machineConfigOperator: example.com/example/openshift-release-dev@sha256:2c3ea52ac3a41c6d58e85977c3149413e3fa4b70eb2397426456863adbf43306
+          infra:
+            apiVersion: config.openshift.io/v1
+            kind: Infrastructure
+            spec:
+              platformSpec:
+                type: AWS
+                aws: {}
+            status:
+              platform: AWS
+              platformStatus:
+                type: AWS
+                aws:
+                  region: us-east-1
+                  ipFamily: IPv4
+          ipFamilies: IPv4
+          kubeAPIServerServingCAData: Y2VydGlmaWNhdGUK
+          network: null
+          networkType: OVNKubernetes
+          osImageURL: example.com/example/openshift-release-dev@sha256:eacdc37aec78fdbf8caa9601e4012ab31453cf59b086474901900e853e803ea8
+          platform: aws
+          proxy: null
+          pullSecret:
+            name: pull-secret
+            namespace: openshift-config
+          releaseImage: ""
+          rootCAData: Y2VydGlmaWNhdGUK
+      updated: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: ControllerConfig
+        spec:
+          additionalTrustBundle: Y2VydGlmaWNhdGUK
+          baseOSContainerImage: example.com/example/openshift-release-dev@sha256:d98795f7932441b30bb8bcfbbf05912875383fad1f2b3be08a22ec148d68607e
+          cloudProviderCAData: null
+          cloudProviderConfig: ""
+          clusterDNSIP: 10.0.0.10
+          dns:
+            apiVersion: config.openshift.io/v1
+            kind: DNS
+            spec:
+              baseDomain: example.redhat.com
+          images:
+            machineConfigOperator: example.com/example/openshift-release-dev@sha256:2c3ea52ac3a41c6d58e85977c3149413e3fa4b70eb2397426456863adbf43306
+          infra:
+            apiVersion: config.openshift.io/v1
+            kind: Infrastructure
+            spec:
+              platformSpec:
+                type: AWS
+                aws: {}
+            status:
+              platform: AWS
+              platformStatus:
+                type: AWS
+                aws:
+                  region: us-east-1
+                  ipFamily: DualStackIPv6Primary
+          ipFamilies: IPv4
+          kubeAPIServerServingCAData: Y2VydGlmaWNhdGUK
+          network: null
+          networkType: OVNKubernetes
+          osImageURL: example.com/example/openshift-release-dev@sha256:eacdc37aec78fdbf8caa9601e4012ab31453cf59b086474901900e853e803ea8
+          platform: aws
+          proxy: null
+          pullSecret:
+            name: pull-secret
+            namespace: openshift-config
+          releaseImage: ""
+          rootCAData: Y2VydGlmaWNhdGUK
+      expectedError: "spec.infra.status.platformStatus.aws.ipFamily: Invalid value: \"string\": ipFamily is immutable once set"

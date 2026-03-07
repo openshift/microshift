@@ -1,0 +1,234 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    api-approved.openshift.io: https://github.com/openshift/api/pull/2448
+    api.openshift.io/merged-by-featuregates: "true"
+    capability.openshift.io/name: Insights
+    include.release.openshift.io/ibm-cloud-managed: "true"
+    include.release.openshift.io/self-managed-high-availability: "true"
+    release.openshift.io/feature-set: DevPreviewNoUpgrade
+  name: insightsdatagathers.config.openshift.io
+spec:
+  group: config.openshift.io
+  names:
+    kind: InsightsDataGather
+    listKind: InsightsDataGatherList
+    plural: insightsdatagathers
+    singular: insightsdatagather
+  scope: Cluster
+  versions:
+  - name: v1
+    schema:
+      openAPIV3Schema:
+        description: |-
+          InsightsDataGather provides data gather configuration options for the Insights Operator.
+
+          Compatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).
+        properties:
+          apiVersion:
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+            type: string
+          kind:
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: spec holds user settable values for configuration
+            properties:
+              gatherConfig:
+                description: gatherConfig is a required spec attribute that includes
+                  all the configuration options related to gathering of the Insights
+                  data and its uploading to the ingress.
+                properties:
+                  dataPolicy:
+                    description: |-
+                      dataPolicy is an optional list of DataPolicyOptions that allows user to enable additional obfuscation of the Insights archive data.
+                      It may not exceed 2 items and must not contain duplicates.
+                      Valid values are ObfuscateNetworking and WorkloadNames.
+                      When set to ObfuscateNetworking the IP addresses and the cluster domain name are obfuscated.
+                      When set to WorkloadNames, the gathered data about cluster resources will not contain the workload names for your deployments. Resources UIDs will be used instead.
+                      When omitted no obfuscation is applied.
+                    items:
+                      description: DataPolicyOption declares valid data policy options
+                      enum:
+                      - ObfuscateNetworking
+                      - WorkloadNames
+                      type: string
+                    maxItems: 2
+                    minItems: 1
+                    type: array
+                    x-kubernetes-list-type: atomic
+                    x-kubernetes-validations:
+                    - message: dataPolicy items must be unique
+                      rule: self.all(x, self.exists_one(y, x == y))
+                  gatherers:
+                    description: gatherers is a required field that specifies the
+                      configuration of the gatherers.
+                    properties:
+                      custom:
+                        description: |-
+                          custom provides gathering configuration.
+                          It is required when mode is Custom, and forbidden otherwise.
+                          Custom configuration allows user to disable only a subset of gatherers.
+                          Gatherers that are not explicitly disabled in custom configuration will run.
+                        properties:
+                          configs:
+                            description: |-
+                              configs is a required list of gatherers configurations that can be used to enable or disable specific gatherers.
+                              It may not exceed 100 items and each gatherer can be present only once.
+                              It is possible to disable an entire set of gatherers while allowing a specific function within that set.
+                              The particular gatherers IDs can be found at https://github.com/openshift/insights-operator/blob/master/docs/gathered-data.md.
+                              Run the following command to get the names of last active gatherers:
+                              "oc get insightsoperators.operator.openshift.io cluster -o json | jq '.status.gatherStatus.gatherers[].name'"
+                            items:
+                              description: GathererConfig allows to configure specific
+                                gatherers
+                              properties:
+                                name:
+                                  description: |-
+                                    name is the required name of a specific gatherer.
+                                    It may not exceed 256 characters.
+                                    The format for a gatherer name is: {gatherer}/{function} where the function is optional.
+                                    Gatherer consists of a lowercase letters only that may include underscores (_).
+                                    Function consists of a lowercase letters only that may include underscores (_) and is separated from the gatherer by a forward slash (/).
+                                    The particular gatherers can be found at https://github.com/openshift/insights-operator/blob/master/docs/gathered-data.md.
+                                    Run the following command to get the names of last active gatherers:
+                                    "oc get insightsoperators.operator.openshift.io cluster -o json | jq '.status.gatherStatus.gatherers[].name'"
+                                  maxLength: 256
+                                  minLength: 1
+                                  type: string
+                                  x-kubernetes-validations:
+                                  - message: gatherer name must be in the format of
+                                      {gatherer}/{function} where the gatherer and
+                                      function are lowercase letters only that may
+                                      include underscores (_) and are separated by
+                                      a forward slash (/) if the function is provided
+                                    rule: self.matches("^[a-z]+[_a-z]*[a-z]([/a-z][_a-z]*)?[a-z]$")
+                                state:
+                                  description: |-
+                                    state is a required field that allows you to configure specific gatherer. Valid values are "Enabled" and "Disabled".
+                                    When set to Enabled the gatherer will run.
+                                    When set to Disabled the gatherer will not run.
+                                  enum:
+                                  - Enabled
+                                  - Disabled
+                                  type: string
+                              required:
+                              - name
+                              - state
+                              type: object
+                            maxItems: 100
+                            minItems: 1
+                            type: array
+                            x-kubernetes-list-map-keys:
+                            - name
+                            x-kubernetes-list-type: map
+                        required:
+                        - configs
+                        type: object
+                      mode:
+                        description: |-
+                          mode is a required field that specifies the mode for gatherers. Allowed values are All, None, and Custom.
+                          When set to All, all gatherers will run and gather data.
+                          When set to None, all gatherers will be disabled and no data will be gathered.
+                          When set to Custom, the custom configuration from the custom field will be applied.
+                        enum:
+                        - All
+                        - None
+                        - Custom
+                        type: string
+                    required:
+                    - mode
+                    type: object
+                    x-kubernetes-validations:
+                    - message: custom is required when mode is Custom, and forbidden
+                        otherwise
+                      rule: 'has(self.mode) && self.mode == ''Custom'' ?  has(self.custom)
+                        : !has(self.custom)'
+                  storage:
+                    description: |-
+                      storage is an optional field that allows user to define persistent storage for gathering jobs to store the Insights data archive.
+                      If omitted, the gathering job will use ephemeral storage.
+                    properties:
+                      persistentVolume:
+                        description: |-
+                          persistentVolume is an optional field that specifies the PersistentVolume that will be used to store the Insights data archive.
+                          The PersistentVolume must be created in the openshift-insights namespace.
+                        properties:
+                          claim:
+                            description: |-
+                              claim is a required field that specifies the configuration of the PersistentVolumeClaim that will be used to store the Insights data archive.
+                              The PersistentVolumeClaim must be created in the openshift-insights namespace.
+                            properties:
+                              name:
+                                description: |-
+                                  name is the name of the PersistentVolumeClaim that will be used to store the Insights data archive.
+                                  It is a string that follows the DNS1123 subdomain format.
+                                  It must be at most 253 characters in length, and must consist only of lower case alphanumeric characters, '-' and '.', and must start and end with an alphanumeric character.
+                                maxLength: 253
+                                minLength: 1
+                                type: string
+                                x-kubernetes-validations:
+                                - message: a lowercase RFC 1123 subdomain must consist
+                                    of lower case alphanumeric characters, '-' or
+                                    '.', and must start and end with an alphanumeric
+                                    character.
+                                  rule: '!format.dns1123Subdomain().validate(self).hasValue()'
+                            required:
+                            - name
+                            type: object
+                          mountPath:
+                            description: |-
+                              mountPath is an optional field specifying the directory where the PVC will be mounted inside the Insights data gathering Pod.
+                              When omitted, this means no opinion and the platform is left to choose a reasonable default, which is subject to change over time.
+                              The current default mount path is /var/lib/insights-operator
+                              The path may not exceed 1024 characters and must not contain a colon.
+                            maxLength: 1024
+                            minLength: 1
+                            type: string
+                            x-kubernetes-validations:
+                            - message: mountPath must not contain a colon
+                              rule: '!self.contains('':'')'
+                        required:
+                        - claim
+                        type: object
+                      type:
+                        description: |-
+                          type is a required field that specifies the type of storage that will be used to store the Insights data archive.
+                          Valid values are "PersistentVolume" and "Ephemeral".
+                          When set to Ephemeral, the Insights data archive is stored in the ephemeral storage of the gathering job.
+                          When set to PersistentVolume, the Insights data archive is stored in the PersistentVolume that is defined by the persistentVolume field.
+                        enum:
+                        - PersistentVolume
+                        - Ephemeral
+                        type: string
+                    required:
+                    - type
+                    type: object
+                    x-kubernetes-validations:
+                    - message: persistentVolume is required when type is PersistentVolume,
+                        and forbidden otherwise
+                      rule: 'has(self.type) && self.type == ''PersistentVolume'' ?  has(self.persistentVolume)
+                        : !has(self.persistentVolume)'
+                required:
+                - gatherers
+                type: object
+            required:
+            - gatherConfig
+            type: object
+        required:
+        - spec
+        type: object
+    served: true
+    storage: true

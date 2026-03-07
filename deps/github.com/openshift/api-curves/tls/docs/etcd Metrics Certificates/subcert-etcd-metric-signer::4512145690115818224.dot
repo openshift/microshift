@@ -1,0 +1,40 @@
+digraph "Local Certificate" {
+  // Node definitions.
+  0 [
+    label="certkeypair/etcd-metric-signer::4512145690115818224\n\nsecret/etcd-metric-signer -nopenshift-config\n"
+    style=filled
+    fillcolor="#c7bfff"
+  ];
+  1 [
+    label="certkeypair/etcd-metric::381254556453658027\n\nsecret/etcd-metric-client -nopenshift-config\n"
+    style=filled
+    fillcolor="#c8fbcd"
+  ];
+  2 [
+    label="certkeypair/etcd-metrics-for-master-ci-ln-z2l4snt-f76d1-prqp5-master-2\n\nsecret/etcd-serving-metrics-ci-ln-z2l4snt-f76d1-prqp5-master-2 -nopenshift-etcd\n    file:///etc/kubernetes/static-pod-resources/etcd-certs/secrets/etcd-all-serving-metrics/etcd-serving-metrics-ci-ln-z2l4snt-f76d1-prqp5-master-2.crt/etcd-serving-metrics-ci-ln-z2l4snt-f76d1-prqp5-master-2.crt,file:///etc/kubernetes/static-pod-resources/etcd-certs/secrets/etcd-all-serving-metrics/etcd-serving-metrics-ci-ln-z2l4snt-f76d1-prqp5-master-2.crt/etcd-serving-metrics-ci-ln-z2l4snt-f76d1-prqp5-master-2.key\n    file:///etc/kubernetes/static-pod-resources/etcd-pod-2/secrets/etcd-all-serving-metrics/etcd-serving-metrics-ci-ln-z2l4snt-f76d1-prqp5-master-2.crt/etcd-serving-metrics-ci-ln-z2l4snt-f76d1-prqp5-master-2.crt,file:///etc/kubernetes/static-pod-resources/etcd-pod-2/secrets/etcd-all-serving-metrics/etcd-serving-metrics-ci-ln-z2l4snt-f76d1-prqp5-master-2.crt/etcd-serving-metrics-ci-ln-z2l4snt-f76d1-prqp5-master-2.key\n    file:///etc/kubernetes/static-pod-resources/etcd-pod-3/secrets/etcd-all-serving-metrics/etcd-serving-metrics-ci-ln-z2l4snt-f76d1-prqp5-master-2.crt/etcd-serving-metrics-ci-ln-z2l4snt-f76d1-prqp5-master-2.crt,file:///etc/kubernetes/static-pod-resources/etcd-pod-3/secrets/etcd-all-serving-metrics/etcd-serving-metrics-ci-ln-z2l4snt-f76d1-prqp5-master-2.crt/etcd-serving-metrics-ci-ln-z2l4snt-f76d1-prqp5-master-2.key\n"
+    style=filled
+    fillcolor="#fffdb8"
+  ];
+  3 [
+    label="certkeypair/etcd-metrics-for-master-ci-ln-z2l4snt-f76d1-prqp5-master-1\n\nsecret/etcd-serving-metrics-ci-ln-z2l4snt-f76d1-prqp5-master-1 -nopenshift-etcd\n    file:///etc/kubernetes/static-pod-resources/etcd-certs/secrets/etcd-all-serving-metrics/etcd-serving-metrics-ci-ln-z2l4snt-f76d1-prqp5-master-1.crt/etcd-serving-metrics-ci-ln-z2l4snt-f76d1-prqp5-master-1.crt,file:///etc/kubernetes/static-pod-resources/etcd-certs/secrets/etcd-all-serving-metrics/etcd-serving-metrics-ci-ln-z2l4snt-f76d1-prqp5-master-1.crt/etcd-serving-metrics-ci-ln-z2l4snt-f76d1-prqp5-master-1.key\n    file:///etc/kubernetes/static-pod-resources/etcd-pod-2/secrets/etcd-all-serving-metrics/etcd-serving-metrics-ci-ln-z2l4snt-f76d1-prqp5-master-1.crt/etcd-serving-metrics-ci-ln-z2l4snt-f76d1-prqp5-master-1.crt,file:///etc/kubernetes/static-pod-resources/etcd-pod-2/secrets/etcd-all-serving-metrics/etcd-serving-metrics-ci-ln-z2l4snt-f76d1-prqp5-master-1.crt/etcd-serving-metrics-ci-ln-z2l4snt-f76d1-prqp5-master-1.key\n    file:///etc/kubernetes/static-pod-resources/etcd-pod-3/secrets/etcd-all-serving-metrics/etcd-serving-metrics-ci-ln-z2l4snt-f76d1-prqp5-master-1.crt/etcd-serving-metrics-ci-ln-z2l4snt-f76d1-prqp5-master-1.crt,file:///etc/kubernetes/static-pod-resources/etcd-pod-3/secrets/etcd-all-serving-metrics/etcd-serving-metrics-ci-ln-z2l4snt-f76d1-prqp5-master-1.crt/etcd-serving-metrics-ci-ln-z2l4snt-f76d1-prqp5-master-1.key\n"
+    style=filled
+    fillcolor="#fffdb8"
+  ];
+  4 [
+    label="certkeypair/etcd-metrics-for-master-ci-ln-z2l4snt-f76d1-prqp5-master-0\n\nsecret/etcd-serving-metrics-ci-ln-z2l4snt-f76d1-prqp5-master-0 -nopenshift-etcd\n    file:///etc/kubernetes/static-pod-resources/etcd-certs/secrets/etcd-all-serving-metrics/etcd-serving-metrics-ci-ln-z2l4snt-f76d1-prqp5-master-0.crt/etcd-serving-metrics-ci-ln-z2l4snt-f76d1-prqp5-master-0.crt,file:///etc/kubernetes/static-pod-resources/etcd-certs/secrets/etcd-all-serving-metrics/etcd-serving-metrics-ci-ln-z2l4snt-f76d1-prqp5-master-0.crt/etcd-serving-metrics-ci-ln-z2l4snt-f76d1-prqp5-master-0.key\n    file:///etc/kubernetes/static-pod-resources/etcd-pod-2/secrets/etcd-all-serving-metrics/etcd-serving-metrics-ci-ln-z2l4snt-f76d1-prqp5-master-0.crt/etcd-serving-metrics-ci-ln-z2l4snt-f76d1-prqp5-master-0.crt,file:///etc/kubernetes/static-pod-resources/etcd-pod-2/secrets/etcd-all-serving-metrics/etcd-serving-metrics-ci-ln-z2l4snt-f76d1-prqp5-master-0.crt/etcd-serving-metrics-ci-ln-z2l4snt-f76d1-prqp5-master-0.key\n    file:///etc/kubernetes/static-pod-resources/etcd-pod-3/secrets/etcd-all-serving-metrics/etcd-serving-metrics-ci-ln-z2l4snt-f76d1-prqp5-master-0.crt/etcd-serving-metrics-ci-ln-z2l4snt-f76d1-prqp5-master-0.crt,file:///etc/kubernetes/static-pod-resources/etcd-pod-3/secrets/etcd-all-serving-metrics/etcd-serving-metrics-ci-ln-z2l4snt-f76d1-prqp5-master-0.crt/etcd-serving-metrics-ci-ln-z2l4snt-f76d1-prqp5-master-0.key\n"
+    style=filled
+    fillcolor="#fffdb8"
+  ];
+  5 [
+    label="cabundle/etcd-metrics-ca\n\nconfigmaps/etcd-metric-serving-ca -nopenshift-config\n    configmaps/etcd-metrics-proxy-client-ca -nopenshift-etcd\n    configmaps/etcd-metrics-proxy-client-ca-2 -nopenshift-etcd\n    configmaps/etcd-metrics-proxy-client-ca-3 -nopenshift-etcd\n    configmaps/etcd-metrics-proxy-serving-ca -nopenshift-etcd\n    configmaps/etcd-metrics-proxy-serving-ca-2 -nopenshift-etcd\n    configmaps/etcd-metrics-proxy-serving-ca-3 -nopenshift-etcd\n    file:///etc/kubernetes/static-pod-resources/etcd-certs/configmaps/etcd-metrics-proxy-client-ca/ca-bundle.crt/ca-bundle.crt\n    file:///etc/kubernetes/static-pod-resources/etcd-certs/configmaps/etcd-metrics-proxy-serving-ca/ca-bundle.crt/ca-bundle.crt\n    file:///etc/kubernetes/static-pod-resources/etcd-pod-2/configmaps/etcd-metrics-proxy-client-ca/ca-bundle.crt/ca-bundle.crt\n    file:///etc/kubernetes/static-pod-resources/etcd-pod-2/configmaps/etcd-metrics-proxy-serving-ca/ca-bundle.crt/ca-bundle.crt\n    file:///etc/kubernetes/static-pod-resources/etcd-pod-3/configmaps/etcd-metrics-proxy-client-ca/ca-bundle.crt/ca-bundle.crt\n    file:///etc/kubernetes/static-pod-resources/etcd-pod-3/configmaps/etcd-metrics-proxy-serving-ca/ca-bundle.crt/ca-bundle.crt\n"
+    style=filled
+    fillcolor="#fda172"
+  ];
+
+  // Edge definitions.
+  0 -> 1;
+  0 -> 2;
+  0 -> 3;
+  0 -> 4;
+  0 -> 5;
+}

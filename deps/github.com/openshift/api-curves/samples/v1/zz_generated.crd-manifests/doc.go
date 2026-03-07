@@ -1,0 +1,1 @@
+package samples_v1_crdmanifests

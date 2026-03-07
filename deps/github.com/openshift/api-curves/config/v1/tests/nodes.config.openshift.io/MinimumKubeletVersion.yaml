@@ -1,0 +1,45 @@
+apiVersion: apiextensions.k8s.io/v1 # Hack because controller-gen complains if we don't have this
+name: "Node"
+crdName: nodes.config.openshift.io
+featureGates:
+- MinimumKubeletVersion
+tests:
+  onCreate:
+    - name: Should be able to create a minimal Node
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: Node
+        spec: {} # No spec is required for a Node
+      expected: |
+        apiVersion: config.openshift.io/v1
+        kind: Node
+        spec: {}
+    - name: Should be able to create an empty minimumKubeletVersion
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: Node
+        spec:
+          minimumKubeletVersion: ""
+      expected: |
+        apiVersion: config.openshift.io/v1
+        kind: Node
+        spec:
+          minimumKubeletVersion: ""
+    - name: Should be able to create a minimumKubeletVersion
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: Node
+        spec:
+          minimumKubeletVersion: 1.30.0
+      expected: |
+        apiVersion: config.openshift.io/v1
+        kind: Node
+        spec:
+          minimumKubeletVersion: 1.30.0
+    - name: Should fail to create a bogus version
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: Node
+        spec:
+          minimumKubeletVersion: bogus
+      expectedError: "Invalid value: \"string\": minmumKubeletVersion must be in a semver compatible format of x.y.z, or empty"

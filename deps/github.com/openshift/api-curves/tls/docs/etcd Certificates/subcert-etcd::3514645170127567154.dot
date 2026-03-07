@@ -1,0 +1,16 @@
+digraph "Local Certificate" {
+  // Node definitions.
+  0 [
+    label="certkeypair/etcd::3514645170127567154\n\nsecret/etcd-client -nopenshift-apiserver\n    secret/etcd-client -nopenshift-config\n    secret/etcd-client -nopenshift-etcd\n    secret/etcd-client -nopenshift-etcd-operator\n    secret/etcd-client -nopenshift-kube-apiserver\n    secret/etcd-client-3 -nopenshift-kube-apiserver\n    secret/etcd-client-4 -nopenshift-kube-apiserver\n    secret/etcd-client-5 -nopenshift-kube-apiserver\n    secret/etcd-client-6 -nopenshift-kube-apiserver\n    secret/etcd-client-7 -nopenshift-kube-apiserver\n    secret/etcd-client -nopenshift-oauth-apiserver\n    file:///etc/kubernetes/static-pod-resources/kube-apiserver-pod-3/secrets/etcd-client/tls.crt/tls.crt,file:///etc/kubernetes/static-pod-resources/kube-apiserver-pod-3/secrets/etcd-client/tls.crt/tls.key\n    file:///etc/kubernetes/static-pod-resources/kube-apiserver-pod-7/secrets/etcd-client/tls.crt/tls.crt,file:///etc/kubernetes/static-pod-resources/kube-apiserver-pod-7/secrets/etcd-client/tls.crt/tls.key\n"
+    style=filled
+    fillcolor="#c8fbcd"
+  ];
+  1 [
+    label="certkeypair/etcd-signer\n\nsecret/etcd-signer -nopenshift-config\n"
+    style=filled
+    fillcolor="#c7bfff"
+  ];
+
+  // Edge definitions.
+  1 -> 0;
+}

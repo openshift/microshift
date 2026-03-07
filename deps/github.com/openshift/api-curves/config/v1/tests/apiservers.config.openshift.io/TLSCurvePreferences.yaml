@@ -1,0 +1,349 @@
+apiVersion: apiextensions.k8s.io/v1
+name: "APIServer"
+crdName: apiservers.config.openshift.io
+featureGates:
+  - TLSCurvePreferences
+tests:
+  onCreate:
+    - name: Should be able to create with Custom TLS profile and curves
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: APIServer
+        spec:
+          tlsSecurityProfile:
+            type: Custom
+            custom:
+              minTLSVersion: VersionTLS12
+              ciphers:
+                - TLS_AES_128_GCM_SHA256
+                - TLS_AES_256_GCM_SHA384
+              curves:
+                - X25519
+                - SecP256r1
+      expected: |
+        apiVersion: config.openshift.io/v1
+        kind: APIServer
+        spec:
+          audit:
+            profile: Default
+          tlsSecurityProfile:
+            type: Custom
+            custom:
+              minTLSVersion: VersionTLS12
+              ciphers:
+                - TLS_AES_128_GCM_SHA256
+                - TLS_AES_256_GCM_SHA384
+              curves:
+                - X25519
+                - SecP256r1
+    - name: Should be able to create with all supported curves
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: APIServer
+        spec:
+          tlsSecurityProfile:
+            type: Custom
+            custom:
+              minTLSVersion: VersionTLS12
+              ciphers:
+                - TLS_AES_128_GCM_SHA256
+              curves:
+                - X25519
+                - SecP256r1
+                - SecP384r1
+                - SecP521r1
+                - X25519MLKEM768
+      expected: |
+        apiVersion: config.openshift.io/v1
+        kind: APIServer
+        spec:
+          audit:
+            profile: Default
+          tlsSecurityProfile:
+            type: Custom
+            custom:
+              minTLSVersion: VersionTLS12
+              ciphers:
+                - TLS_AES_128_GCM_SHA256
+              curves:
+                - X25519
+                - SecP256r1
+                - SecP384r1
+                - SecP521r1
+                - X25519MLKEM768
+    - name: Should fail to create with Custom TLS profile and empty curves
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: APIServer
+        spec:
+          tlsSecurityProfile:
+            type: Custom
+            custom:
+              minTLSVersion: VersionTLS12
+              ciphers:
+                - TLS_AES_128_GCM_SHA256
+              curves: []
+      expectedError: "spec.tlsSecurityProfile.custom.curves in body should have at least 1 items"
+    - name: Should be able to create with Custom TLS profile and curves omitted
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: APIServer
+        spec:
+          tlsSecurityProfile:
+            type: Custom
+            custom:
+              minTLSVersion: VersionTLS12
+              ciphers:
+                - TLS_AES_128_GCM_SHA256
+      expected: |
+        apiVersion: config.openshift.io/v1
+        kind: APIServer
+        spec:
+          audit:
+            profile: Default
+          tlsSecurityProfile:
+            type: Custom
+            custom:
+              minTLSVersion: VersionTLS12
+              ciphers:
+                - TLS_AES_128_GCM_SHA256
+    - name: Should be able to create with Custom TLS profile VersionTLS10 and curves
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: APIServer
+        spec:
+          tlsSecurityProfile:
+            type: Custom
+            custom:
+              minTLSVersion: VersionTLS10
+              ciphers:
+                - TLS_AES_128_GCM_SHA256
+              curves:
+                - SecP256r1
+                - SecP384r1
+      expected: |
+        apiVersion: config.openshift.io/v1
+        kind: APIServer
+        spec:
+          audit:
+            profile: Default
+          tlsSecurityProfile:
+            type: Custom
+            custom:
+              minTLSVersion: VersionTLS10
+              ciphers:
+                - TLS_AES_128_GCM_SHA256
+              curves:
+                - SecP256r1
+                - SecP384r1
+    - name: Should be able to create with Custom TLS profile VersionTLS11 and curves
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: APIServer
+        spec:
+          tlsSecurityProfile:
+            type: Custom
+            custom:
+              minTLSVersion: VersionTLS11
+              ciphers:
+                - TLS_AES_128_GCM_SHA256
+              curves:
+                - SecP384r1
+      expected: |
+        apiVersion: config.openshift.io/v1
+        kind: APIServer
+        spec:
+          audit:
+            profile: Default
+          tlsSecurityProfile:
+            type: Custom
+            custom:
+              minTLSVersion: VersionTLS11
+              ciphers:
+                - TLS_AES_128_GCM_SHA256
+              curves:
+                - SecP384r1
+    - name: Should fail to create with more than 5 curves
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: APIServer
+        spec:
+          tlsSecurityProfile:
+            type: Custom
+            custom:
+              minTLSVersion: VersionTLS12
+              ciphers:
+                - TLS_AES_128_GCM_SHA256
+              curves:
+                - X25519
+                - SecP256r1
+                - SecP384r1
+                - SecP521r1
+                - X25519MLKEM768
+                - X25519
+      expectedError: "spec.tlsSecurityProfile.custom.curves: Too many: 6: must have at most 5 items"
+    - name: Should fail to create with invalid curve value
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: APIServer
+        spec:
+          tlsSecurityProfile:
+            type: Custom
+            custom:
+              minTLSVersion: VersionTLS12
+              ciphers:
+                - TLS_AES_128_GCM_SHA256
+              curves:
+                - InvalidCurve
+      expectedError: "spec.tlsSecurityProfile.custom.curves[0]: Unsupported value: \"InvalidCurve\": supported values: \"X25519\", \"SecP256r1\", \"SecP384r1\", \"SecP521r1\", \"X25519MLKEM768\""
+  onUpdate:
+    - name: Should be able to add curves to existing Custom TLS profile
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: APIServer
+        spec:
+          tlsSecurityProfile:
+            type: Custom
+            custom:
+              minTLSVersion: VersionTLS12
+              ciphers:
+                - TLS_AES_128_GCM_SHA256
+      updated: |
+        apiVersion: config.openshift.io/v1
+        kind: APIServer
+        spec:
+          audit:
+            profile: Default
+          tlsSecurityProfile:
+            type: Custom
+            custom:
+              minTLSVersion: VersionTLS12
+              ciphers:
+                - TLS_AES_128_GCM_SHA256
+              curves:
+                - X25519
+                - SecP256r1
+      expected: |
+        apiVersion: config.openshift.io/v1
+        kind: APIServer
+        spec:
+          audit:
+            profile: Default
+          tlsSecurityProfile:
+            type: Custom
+            custom:
+              minTLSVersion: VersionTLS12
+              ciphers:
+                - TLS_AES_128_GCM_SHA256
+              curves:
+                - X25519
+                - SecP256r1
+    - name: Should be able to update curves in existing Custom TLS profile
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: APIServer
+        spec:
+          tlsSecurityProfile:
+            type: Custom
+            custom:
+              minTLSVersion: VersionTLS12
+              ciphers:
+                - TLS_AES_128_GCM_SHA256
+              curves:
+                - X25519
+      updated: |
+        apiVersion: config.openshift.io/v1
+        kind: APIServer
+        spec:
+          audit:
+            profile: Default
+          tlsSecurityProfile:
+            type: Custom
+            custom:
+              minTLSVersion: VersionTLS12
+              ciphers:
+                - TLS_AES_128_GCM_SHA256
+              curves:
+                - SecP256r1
+                - SecP384r1
+      expected: |
+        apiVersion: config.openshift.io/v1
+        kind: APIServer
+        spec:
+          audit:
+            profile: Default
+          tlsSecurityProfile:
+            type: Custom
+            custom:
+              minTLSVersion: VersionTLS12
+              ciphers:
+                - TLS_AES_128_GCM_SHA256
+              curves:
+                - SecP256r1
+                - SecP384r1
+    - name: Should be able to remove curves field from existing Custom TLS profile
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: APIServer
+        spec:
+          tlsSecurityProfile:
+            type: Custom
+            custom:
+              minTLSVersion: VersionTLS12
+              ciphers:
+                - TLS_AES_128_GCM_SHA256
+              curves:
+                - X25519
+                - SecP256r1
+      updated: |
+        apiVersion: config.openshift.io/v1
+        kind: APIServer
+        spec:
+          audit:
+            profile: Default
+          tlsSecurityProfile:
+            type: Custom
+            custom:
+              minTLSVersion: VersionTLS12
+              ciphers:
+                - TLS_AES_128_GCM_SHA256
+      expected: |
+        apiVersion: config.openshift.io/v1
+        kind: APIServer
+        spec:
+          audit:
+            profile: Default
+          tlsSecurityProfile:
+            type: Custom
+            custom:
+              minTLSVersion: VersionTLS12
+              ciphers:
+                - TLS_AES_128_GCM_SHA256
+    - name: Should fail to remove all curves from existing Custom TLS profile
+      initial: |
+        apiVersion: config.openshift.io/v1
+        kind: APIServer
+        spec:
+          tlsSecurityProfile:
+            type: Custom
+            custom:
+              minTLSVersion: VersionTLS12
+              ciphers:
+                - TLS_AES_128_GCM_SHA256
+              curves:
+                - X25519
+                - SecP256r1
+      updated: |
+        apiVersion: config.openshift.io/v1
+        kind: APIServer
+        spec:
+          audit:
+            profile: Default
+          tlsSecurityProfile:
+            type: Custom
+            custom:
+              minTLSVersion: VersionTLS12
+              ciphers:
+                - TLS_AES_128_GCM_SHA256
+              curves: []
+      expectedError: "spec.tlsSecurityProfile.custom.curves in body should have at least 1 items"

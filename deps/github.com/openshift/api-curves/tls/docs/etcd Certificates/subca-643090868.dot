@@ -1,0 +1,16 @@
+digraph "Local Certificate" {
+  // Node definitions.
+  1 [
+    label="certkeypair/etcd-signer\n\nsecret/etcd-signer -nopenshift-config\n"
+    style=filled
+    fillcolor="#c7bfff"
+  ];
+  8 [
+    label="cabundle/etcd-ca\n\nconfigmaps/etcd-serving-ca -nopenshift-apiserver\n    configmaps/etcd-ca-bundle -nopenshift-config\n    configmaps/etcd-serving-ca -nopenshift-config\n    configmaps/etcd-ca-bundle -nopenshift-etcd\n    configmaps/etcd-peer-client-ca -nopenshift-etcd\n    configmaps/etcd-peer-client-ca-4 -nopenshift-etcd\n    configmaps/etcd-peer-client-ca-5 -nopenshift-etcd\n    configmaps/etcd-peer-client-ca-6 -nopenshift-etcd\n    configmaps/etcd-peer-client-ca-7 -nopenshift-etcd\n    configmaps/etcd-peer-client-ca-8 -nopenshift-etcd\n    configmaps/etcd-serving-ca -nopenshift-etcd\n    configmaps/etcd-serving-ca-4 -nopenshift-etcd\n    configmaps/etcd-serving-ca-5 -nopenshift-etcd\n    configmaps/etcd-serving-ca-6 -nopenshift-etcd\n    configmaps/etcd-serving-ca-7 -nopenshift-etcd\n    configmaps/etcd-serving-ca-8 -nopenshift-etcd\n    configmaps/etcd-ca-bundle -nopenshift-etcd-operator\n    configmaps/etcd-serving-ca -nopenshift-kube-apiserver\n    configmaps/etcd-serving-ca-3 -nopenshift-kube-apiserver\n    configmaps/etcd-serving-ca-4 -nopenshift-kube-apiserver\n    configmaps/etcd-serving-ca-5 -nopenshift-kube-apiserver\n    configmaps/etcd-serving-ca-6 -nopenshift-kube-apiserver\n    configmaps/etcd-serving-ca-7 -nopenshift-kube-apiserver\n    configmaps/etcd-serving-ca -nopenshift-oauth-apiserver\n    file:///etc/kubernetes/static-pod-resources/etcd-certs/configmaps/etcd-peer-client-ca/ca-bundle.crt/ca-bundle.crt\n    file:///etc/kubernetes/static-pod-resources/etcd-certs/configmaps/etcd-serving-ca/ca-bundle.crt/ca-bundle.crt\n    file:///etc/kubernetes/static-pod-resources/etcd-pod-4/configmaps/etcd-peer-client-ca/ca-bundle.crt/ca-bundle.crt\n    file:///etc/kubernetes/static-pod-resources/etcd-pod-4/configmaps/etcd-serving-ca/ca-bundle.crt/ca-bundle.crt\n    file:///etc/kubernetes/static-pod-resources/etcd-pod-7/configmaps/etcd-peer-client-ca/ca-bundle.crt/ca-bundle.crt\n    file:///etc/kubernetes/static-pod-resources/etcd-pod-7/configmaps/etcd-serving-ca/ca-bundle.crt/ca-bundle.crt\n    file:///etc/kubernetes/static-pod-resources/etcd-pod-8/configmaps/etcd-peer-client-ca/ca-bundle.crt/ca-bundle.crt\n    file:///etc/kubernetes/static-pod-resources/etcd-pod-8/configmaps/etcd-serving-ca/ca-bundle.crt/ca-bundle.crt\n    file:///etc/kubernetes/static-pod-resources/kube-apiserver-pod-3/configmaps/etcd-serving-ca/ca-bundle.crt/ca-bundle.crt\n    file:///etc/kubernetes/static-pod-resources/kube-apiserver-pod-7/configmaps/etcd-serving-ca/ca-bundle.crt/ca-bundle.crt\n"
+    style=filled
+    fillcolor="#fda172"
+  ];
+
+  // Edge definitions.
+  1 -> 8;
+}

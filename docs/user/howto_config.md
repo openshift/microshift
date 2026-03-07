@@ -107,6 +107,7 @@ ingress:
     tlsSecurityProfile:
         custom:
             ciphers: []
+            curves: []
             minTLSVersion: ""
         intermediate: {}
         modern: {}
@@ -259,6 +260,7 @@ ingress:
     tlsSecurityProfile:
         custom:
             ciphers: []
+            curves: []
             minTLSVersion: ""
         intermediate: {}
         modern: {}

@@ -1,0 +1,28 @@
+digraph "Local Certificate" {
+  // Node definitions.
+  6 [
+    label="certkeypair/per-master-debugging-signer\n\nsecret/node-system-admin-signer -nopenshift-kube-apiserver-operator\n"
+    style=filled
+    fillcolor="#c7bfff"
+  ];
+  7 [
+    label="certkeypair/per-master-debugging-client\n\nsecret/node-system-admin-client -nopenshift-kube-apiserver-operator\n"
+    style=filled
+    fillcolor="#c8fbcd"
+  ];
+  14 [
+    label="cabundle/kube-apiserver-total-client-ca\n\nconfigmaps/kube-apiserver-client-ca -nopenshift-config-managed\n    configmaps/client-ca -nopenshift-controller-manager\n    configmaps/client-ca -nopenshift-kube-apiserver\n    configmaps/client-ca -nopenshift-kube-controller-manager\n    file:///etc/kubernetes/static-pod-resources/kube-apiserver-certs/configmaps/client-ca/ca-bundle.crt/ca-bundle.crt\n    file:///etc/kubernetes/static-pod-resources/kube-controller-manager-certs/configmaps/client-ca/ca-bundle.crt/ca-bundle.crt\n"
+    style=filled
+    fillcolor="#fda172"
+  ];
+  18 [
+    label="cabundle/kube-apiserver-per-master-debugging-client-ca\n\nconfigmaps/node-system-admin-ca -nopenshift-kube-apiserver-operator\n"
+    style=filled
+    fillcolor="#fda172"
+  ];
+
+  // Edge definitions.
+  6 -> 7;
+  6 -> 14;
+  6 -> 18;
+}

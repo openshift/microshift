@@ -1,0 +1,214 @@
+apiVersion: apiextensions.k8s.io/v1 # Hack because controller-gen complains if we don't have this
+name: "MachineConfiguration"
+crdName: machineconfigurations.operator.openshift.io
+tests:
+  onCreate:
+  - name: Should be able to create a valid node disruption policy
+    initial: |
+      apiVersion: operator.openshift.io/v1
+      kind: MachineConfiguration
+      spec:
+        nodeDisruptionPolicy:
+          files:
+            - path: "/etc/my-file"
+              actions:
+                - type: DaemonReload
+                - type: Reload
+                  reload:
+                    serviceName: my.service
+          units:
+            - name: "my.service"
+              actions:
+                - type: Restart
+                  restart:
+                    serviceName: my-other.service
+          sshkey:
+            actions:
+              - type: None
+    expected: |
+      apiVersion: operator.openshift.io/v1
+      kind: MachineConfiguration
+      spec:
+        logLevel: Normal
+        operatorLogLevel: Normal
+        nodeDisruptionPolicy:
+          files:
+            - path: "/etc/my-file"
+              actions:
+                - type: DaemonReload
+                - type: Reload
+                  reload:
+                    serviceName: my.service
+          units:
+            - name: "my.service"
+              actions:
+                - type: Restart
+                  restart:
+                    serviceName: my-other.service
+          sshkey:
+            actions:
+              - type: None
+  - name: Should be able to define a node disruption policy with multiple entries of the same type
+    initial: |
+      apiVersion: operator.openshift.io/v1
+      kind: MachineConfiguration
+      spec:
+        nodeDisruptionPolicy:
+          files:
+            - path: "/etc/my-file"
+              actions:
+                - type: DaemonReload
+                - type: Reload
+                  reload:
+                    serviceName: my.service
+            - path: "/etc/my-other-file"
+              actions:
+                - type: Drain
+                - type: Restart
+                  restart:
+                    serviceName: my.service
+    expected: |
+      apiVersion: operator.openshift.io/v1
+      kind: MachineConfiguration
+      spec:
+        logLevel: Normal
+        operatorLogLevel: Normal
+        nodeDisruptionPolicy:
+          files:
+            - path: "/etc/my-file"
+              actions:
+                - type: DaemonReload
+                - type: Reload
+                  reload:
+                    serviceName: my.service
+            - path: "/etc/my-other-file"
+              actions:
+                - type: Drain
+                - type: Restart
+                  restart:
+                    serviceName: my.service
+  - name: Node disruption policies with duplicate file entries should fail
+    initial: |
+      apiVersion: operator.openshift.io/v1
+      kind: MachineConfiguration
+      spec:
+        nodeDisruptionPolicy:
+          files:
+            - path: "/etc/my-file"
+              actions:
+                - type: DaemonReload
+                - type: Reload
+                  reload:
+                    serviceName: my.service
+            - path: "/etc/my-file"
+              actions:
+                - type: Drain
+                - type: Reload
+                  reload:
+                    serviceName: my.service
+    expectedError: "spec.nodeDisruptionPolicy.files[1]: Duplicate value: map[string]interface {}{\"path\":\"/etc/my-file\"}"
+  - name: Node disruption policies that specify a reload action should fail if you don't specify the reload field
+    initial: |
+      apiVersion: operator.openshift.io/v1
+      kind: MachineConfiguration
+      spec:
+        nodeDisruptionPolicy:
+          files:
+            - path: "/etc/my-file"
+              actions:
+                - type: DaemonReload
+                - type: Reload
+    expectedError: "reload is required when type is Reload, and forbidden otherwise"
+  - name: Node disruption policies that specify a reboot action should not allow other actions in the list
+    initial: |
+      apiVersion: operator.openshift.io/v1
+      kind: MachineConfiguration
+      spec:
+        nodeDisruptionPolicy:
+          files:
+            - path: "/etc/my-file"
+              actions:
+                - type: Reboot
+                - type: DaemonReload
+    expectedError: "Reboot action can only be specified standalone, as it will override any other actions"
+  - name: Node disruption policies should use service name(s) which have a valid name prefix.
+    initial: |
+      apiVersion: operator.openshift.io/v1
+      kind: MachineConfiguration
+      spec:
+        nodeDisruptionPolicy:
+          files:
+            - path: "/etc/my-file"
+              actions:
+                - type: DaemonReload
+                - type: Reload
+                  reload:
+                    serviceName: .service
+    expectedError: "Invalid ${NAME} in service name. Expected format is ${NAME}${SERVICETYPE}, where {NAME} must be atleast 1 character long and can only consist of alphabets, digits, \":\", \"-\", \"_\", \".\", and \"\\\""  
+  - name: Node disruption policies should use service name(s) which have a valid name suffix.
+    initial: |
+      apiVersion: operator.openshift.io/v1
+      kind: MachineConfiguration
+      spec:
+        nodeDisruptionPolicy:
+          files:
+            - path: "/etc/my-file"
+              actions:
+                - type: DaemonReload
+                - type: Reload
+                  reload:
+                    serviceName: service
+    expectedError: "Invalid ${SERVICETYPE} in service name. Expected format is ${NAME}${SERVICETYPE}, where ${SERVICETYPE} must be one of \".service\", \".socket\", \".device\", \".mount\", \".automount\", \".swap\", \".target\", \".path\", \".timer\",\".snapshot\", \".slice\" or \".scope\"."
+  - name: Node disruption policies should use service name(s) which have a valid name suffix.
+    initial: |
+      apiVersion: operator.openshift.io/v1
+      kind: MachineConfiguration
+      spec:
+        nodeDisruptionPolicy:
+          files:
+            - path: "/etc/my-file"
+              actions:
+                - type: DaemonReload
+                - type: Reload
+                  reload:
+                    serviceName: serv.ice
+    expectedError: "Invalid ${SERVICETYPE} in service name. Expected format is ${NAME}${SERVICETYPE}, where ${SERVICETYPE} must be one of \".service\", \".socket\", \".device\", \".mount\", \".automount\", \".swap\", \".target\", \".path\", \".timer\",\".snapshot\", \".slice\" or \".scope\"."
+  - name: Should be able to define a node disruption policy that has a service name which has multiple permitted special characters
+    initial: |
+      apiVersion: operator.openshift.io/v1
+      kind: MachineConfiguration
+      spec:
+        nodeDisruptionPolicy:
+          files:
+            - path: "/etc/my-file"
+              actions:
+                - type: DaemonReload
+                - type: Reload
+                  reload:
+                    serviceName: a:b_c-d\.e.swap
+            - path: "/etc/my-other-file"
+              actions:
+                - type: Drain
+                - type: Restart
+                  restart:
+                    serviceName: a.b.c.d.e.snapshot
+    expected: |
+      apiVersion: operator.openshift.io/v1
+      kind: MachineConfiguration
+      spec:
+        logLevel: Normal
+        operatorLogLevel: Normal
+        nodeDisruptionPolicy:
+          files:
+            - path: "/etc/my-file"
+              actions:
+                - type: DaemonReload
+                - type: Reload
+                  reload:
+                    serviceName: a:b_c-d\.e.swap
+            - path: "/etc/my-other-file"
+              actions:
+                - type: Drain
+                - type: Restart
+                  restart:
+                    serviceName: a.b.c.d.e.snapshot

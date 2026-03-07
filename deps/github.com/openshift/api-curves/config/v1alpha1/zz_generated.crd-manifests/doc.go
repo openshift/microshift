@@ -1,0 +1,1 @@
+package config_v1alpha1_crdmanifests

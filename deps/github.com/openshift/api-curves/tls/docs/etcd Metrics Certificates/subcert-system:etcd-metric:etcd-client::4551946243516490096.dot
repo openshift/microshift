@@ -1,0 +1,16 @@
+digraph "Local Certificate" {
+  // Node definitions.
+  0 [
+    label="certkeypair/etcd-metric-signer::4512145690115818224\n\nsecret/etcd-metric-signer -nopenshift-config\n"
+    style=filled
+    fillcolor="#c7bfff"
+  ];
+  4 [
+    label="certkeypair/etcd-metrics-for-master-ci-ln-z2l4snt-f76d1-prqp5-master-0\n\nsecret/etcd-serving-metrics-ci-ln-z2l4snt-f76d1-prqp5-master-0 -nopenshift-etcd\n    file:///etc/kubernetes/static-pod-resources/etcd-certs/secrets/etcd-all-serving-metrics/etcd-serving-metrics-ci-ln-z2l4snt-f76d1-prqp5-master-0.crt/etcd-serving-metrics-ci-ln-z2l4snt-f76d1-prqp5-master-0.crt,file:///etc/kubernetes/static-pod-resources/etcd-certs/secrets/etcd-all-serving-metrics/etcd-serving-metrics-ci-ln-z2l4snt-f76d1-prqp5-master-0.crt/etcd-serving-metrics-ci-ln-z2l4snt-f76d1-prqp5-master-0.key\n    file:///etc/kubernetes/static-pod-resources/etcd-pod-2/secrets/etcd-all-serving-metrics/etcd-serving-metrics-ci-ln-z2l4snt-f76d1-prqp5-master-0.crt/etcd-serving-metrics-ci-ln-z2l4snt-f76d1-prqp5-master-0.crt,file:///etc/kubernetes/static-pod-resources/etcd-pod-2/secrets/etcd-all-serving-metrics/etcd-serving-metrics-ci-ln-z2l4snt-f76d1-prqp5-master-0.crt/etcd-serving-metrics-ci-ln-z2l4snt-f76d1-prqp5-master-0.key\n    file:///etc/kubernetes/static-pod-resources/etcd-pod-3/secrets/etcd-all-serving-metrics/etcd-serving-metrics-ci-ln-z2l4snt-f76d1-prqp5-master-0.crt/etcd-serving-metrics-ci-ln-z2l4snt-f76d1-prqp5-master-0.crt,file:///etc/kubernetes/static-pod-resources/etcd-pod-3/secrets/etcd-all-serving-metrics/etcd-serving-metrics-ci-ln-z2l4snt-f76d1-prqp5-master-0.crt/etcd-serving-metrics-ci-ln-z2l4snt-f76d1-prqp5-master-0.key\n"
+    style=filled
+    fillcolor="#fffdb8"
+  ];
+
+  // Edge definitions.
+  0 -> 4;
+}
