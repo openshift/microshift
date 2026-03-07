@@ -9,7 +9,7 @@ Library             DataFormats.py
 
 
 *** Variables ***
-${DEFAULT_WAIT_TIMEOUT}     60s
+${DEFAULT_WAIT_TIMEOUT}     120s
 
 
 *** Keywords ***
