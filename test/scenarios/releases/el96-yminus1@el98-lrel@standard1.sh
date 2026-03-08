@@ -14,7 +14,7 @@ scenario_create_vms() {
     exit_if_commit_not_found "${dest_image}"
 
     prepare_kickstart host1 kickstart.ks.template "${start_image}"
-    launch_vm --vm_vcpus 4
+    launch_vm --boot_blueprint rhel-9.6 --vm_vcpus 4
 }
 
 scenario_remove_vms() {
@@ -27,7 +27,7 @@ scenario_remove_vms() {
 scenario_run_tests() {
     exit_if_commit_not_found "${start_image}"
     exit_if_commit_not_found "${dest_image}"
-    
+
     run_tests host1 \
         --variable "TARGET_REF:${dest_image}" \
         --variable "EXPECTED_OS_VERSION:9.8" \
