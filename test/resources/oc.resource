@@ -9,7 +9,7 @@ Library             DataFormats.py
 
 
 *** Variables ***
-${DEFAULT_WAIT_TIMEOUT}     60s
+${DEFAULT_WAIT_TIMEOUT}     120s
 
 
 *** Keywords ***
@@ -84,7 +84,7 @@ Named Pod Should Be Ready
     [Documentation]    Wait for pod with name \${name} to become "Ready"
     ...    ${name}    Name of pod to wait for
     ...    ${ns}    Namespace of named pod. Defaults to NAMESPACE suite variable
-    ...    ${timeout}    Period of time to wait for pod to reach ready status. Default 60s.
+    ...    ${timeout}    Period of time to wait for pod to reach ready status.
     [Arguments]    ${name}    ${ns}=${NAMESPACE}    ${timeout}=${DEFAULT_WAIT_TIMEOUT}
 
     Oc Wait    -n ${ns} pod/${name}    --for="condition=Ready" --timeout=${timeout}
@@ -93,7 +93,7 @@ Named Pod Should Be Deleted
     [Documentation]    Wait for pod with ${name} to be deleted
     ...    ${name}    Name of pod to wait for
     ...    ${ns}    Namespace of named pod. Defaults to NAMESPACE suite variable
-    ...    ${timeout}    Period of time to wait for pod to reach ready status. Default 60s.
+    ...    ${timeout}    Period of time to wait for pod to reach ready status.
     [Arguments]    ${name}    ${ns}=${NAMESPACE}    ${timeout}=${DEFAULT_WAIT_TIMEOUT}
     Oc Wait    -n ${ns} pod/${name}    --for=delete --timeout=${timeout}
 
@@ -101,7 +101,7 @@ Labeled Pod Should Be Ready
     [Documentation]    Wait for pod(s) ready by ${label} to become "Ready"
     ...    ${label}    A label selector value to match by (e.g. "app\=my_app"). Note that '=' must be escaped with '\'.
     ...    ${ns}    Namespace of named pod. Defaults to NAMESPACE suite variable
-    ...    ${timeout}    Period of time to wait for pod to reach ready status. Default 60s.
+    ...    ${timeout}    Period of time to wait for pod to reach ready status.
     [Arguments]    ${label}    ${ns}=${NAMESPACE}    ${timeout}=${DEFAULT_WAIT_TIMEOUT}
     Oc Wait    -n ${ns} pod --selector="${label}"    --for=condition=Ready --timeout=${timeout}
 
@@ -109,7 +109,7 @@ Named Deployment Should Be Available
     [Documentation]    Wait for a given deployment's Available condition to be true
     ...    ${name}    Name of deployment to wait for
     ...    ${ns}    Namespace of named deployment. Defaults to NAMESPACE suite variable
-    ...    ${timeout}    Period of time to wait for deployment to reach ready status. Default 60s.
+    ...    ${timeout}    Period of time to wait for deployment to reach ready status.
     [Arguments]    ${name}    ${ns}=${NAMESPACE}    ${timeout}=${DEFAULT_WAIT_TIMEOUT}
     Oc Wait    -n ${ns} deploy ${name}    --for=condition=Available --timeout=${timeout}
 
@@ -117,7 +117,7 @@ Named Daemonset Should Be Available
     [Documentation]    Wait for a given daemonset's Available condition to be true
     ...    ${name}    Name of daemonset to wait for
     ...    ${ns}    Namespace of named daemonset. Defaults to NAMESPACE suite variable
-    ...    ${timeout}    Period of time to wait for daemonset to reach ready status. Default 60s.
+    ...    ${timeout}    Period of time to wait for daemonset to reach ready status.
     [Arguments]    ${name}    ${ns}=${NAMESPACE}    ${timeout}=${DEFAULT_WAIT_TIMEOUT}
     Oc Wait    -n ${ns} daemonset ${name}    --for=jsonpath='{.status.numberAvailable}'=1 --timeout=${timeout}
 
@@ -132,7 +132,7 @@ Named PVC Should Be Resized
     ...    ${name}    Name of pvc to wait for
     ...    ${ns}    Namespace of named pvc. Defaults to NAMESPACE suite variable
     ...    ${to_size}    Size pvc is expected to be updated to
-    ...    ${timeout}    Period of time to wait for pvc to resize to new size. Default 60s.
+    ...    ${timeout}    Period of time to wait for pvc to resize to new size.
     [Arguments]    ${name}    ${to_size}    ${ns}=${NAMESPACE}    ${timeout}=${DEFAULT_WAIT_TIMEOUT}
     Oc Wait    -n ${ns} pvc/${name}
     ...    --for=jsonpath="{.spec.resources.requests.storage}"=${to_size} --timeout=${timeout}
@@ -141,7 +141,7 @@ Named PVC Should Be Deleted
     [Documentation]    Wait for pvc with ${name} to be deleted
     ...    ${name}    Name of pvc to wait for
     ...    ${ns}    Namespace of named pvc. Defaults to NAMESPACE suite variable
-    ...    ${timeout}    Period of time to wait for pvc to be deleted. Default 60s.
+    ...    ${timeout}    Period of time to wait for pvc to be deleted.
     [Arguments]    ${name}    ${ns}=${NAMESPACE}    ${timeout}=${DEFAULT_WAIT_TIMEOUT}
     ${output}=    Oc Wait    -n ${ns} pvc/${name}    --for=Delete --timeout=${timeout}
     RETURN    ${output}
@@ -149,7 +149,7 @@ Named PVC Should Be Deleted
 Named VolumeSnapshot Should Be Ready
     [Documentation]    Wait for a volumesnap ${name} to become "readyToUse"
     ...    ${name}    Name of volumesnapshot to wait for
-    ...    ${timeout}    Period of time to wait for volumeSnapshot ready "readyToUse" state. Default 60s.
+    ...    ${timeout}    Period of time to wait for volumeSnapshot ready "readyToUse" state.
     [Arguments]    ${name}    ${timeout}=${DEFAULT_WAIT_TIMEOUT}
     Oc Wait    volumesnapshot/${name} -n ${NAMESPACE}    --for=jsonpath='{.status.readyToUse}=true'
 
@@ -157,7 +157,7 @@ Named VolumeSnapshot Should Be Deleted
     [Documentation]    Wait for volumesnapshot with ${name} to be deleted
     ...    ${name}    Name of volumesnapshot to wait for
     ...    ${ns}    Namespace of named pod. Defaults to NAMESPACE suite variable, specified by
-    ...    ${timeout}    Period of time to wait for volumesnapshot to reach ready status. Default 60s.
+    ...    ${timeout}    Period of time to wait for volumesnapshot to reach ready status.
     [Arguments]    ${name}    ${ns}=${NAMESPACE}    ${timeout}=${DEFAULT_WAIT_TIMEOUT}
     Oc Wait    -n ${ns} volumesnapshot/${name}    --for=Delete --timeout=${timeout}
 

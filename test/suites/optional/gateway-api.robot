@@ -2,6 +2,7 @@
 Documentation       Test Gateway API functionality
 
 Resource            ../../resources/microshift-network.resource
+Resource            ../../resources/oc.resource
 
 Suite Setup         Setup Suite With Namespace
 Suite Teardown      Teardown Suite With Namespace
@@ -57,7 +58,7 @@ Create Gateway
     ...    Remove File    ${tmp}
     Generate File From Template    ${GATEWAY_MANIFEST_TMPL}    ${tmp}
     Oc Apply    -n ${namespace} -f ${tmp}
-    Oc Wait    -n ${namespace} gateway/test-gateway    --for="condition=Accepted" --timeout=120s
+    Oc Wait    -n ${namespace} gateway/test-gateway    --for="condition=Accepted" --timeout=${DEFAULT_WAIT_TIMEOUT}
     # Run healthcheck command to avoid premature wait returns if the object does not yet exist
     Command Should Work
     ...    sudo microshift healthcheck --namespace ${namespace} --deployments test-gateway-openshift-gateway-api --timeout 120s
