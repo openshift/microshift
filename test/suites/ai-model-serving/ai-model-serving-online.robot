@@ -56,7 +56,7 @@ Deploy OpenVINO Resnet Model
 
     Oc Apply    -n ${NAMESPACE} -f ./assets/ai-model-serving/ovms-resources.yaml
     Wait Until Keyword Succeeds
-    ...    30x    1s
+    ...    15x    1s
     ...    Run With Kubeconfig
     ...    oc rollout status -n\=${NAMESPACE} --timeout=${DEFAULT_WAIT_TIMEOUT} deployment openvino-resnet-predictor
 
