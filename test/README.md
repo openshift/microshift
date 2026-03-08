@@ -609,10 +609,8 @@ kickstart file to already exist, and it defines a new VM configured to
 boot from the installer ISO and the kickstart file.
 
 The `launch_vm` function also accepts two optional arguments:
-- The image blueprint used to create the ISO that should
-be used to boot the VM (default to `$DEFAULT_BOOT_BLUEPRINT`).
-- The name of the network used when creating the VM
-(defaults to `default`).
+- The image blueprint used to create the ISO that should be used to boot the VM.
+- The name of the network used when creating the VM (defaults to `default`).
 
 #### scenario_remove_vms
 

@@ -16,7 +16,6 @@ source "${SCRIPTDIR}/common.sh"
 # shellcheck source=test/bin/common_versions.sh
 source "${SCRIPTDIR}/common_versions.sh"
 
-DEFAULT_BOOT_BLUEPRINT="rhel-9.6"
 LVM_SYSROOT_SIZE="15360"
 PULL_SECRET="${PULL_SECRET:-${HOME}/.pull-secret.json}"
 PULL_SECRET_CONTENT="$(jq -c . "${PULL_SECRET}")"
@@ -675,12 +674,11 @@ EOF
 # Creates a new VM using the scenario name and the vmname given to
 # create a unique name. Uses the boot_blueprint and network
 # arguments to select the ISO and networks from which to boot.
-# If no boot_blueprint is specified, uses DEFAULT_BOOT_BLUEPRINT.
 # If no network is specified, uses the "default" network.
 #
 # Usage: launch_vm \
+#           --boot_blueprint <blueprint> \
 #           [--vmname <name>] \
-#           [--boot_blueprint <blueprint>] \
 #           [--network <name>[,<name>...]] \
 #           [--vm_vcpus <vcpus>] \
 #           [--vm_memory <memory>] \
@@ -689,11 +687,11 @@ EOF
 #           [--no_network]
 #
 # Arguments:
-#   [--vmname <name>]: The short name of the VM in the scenario (e.g., "host1").
-#   [--boot_blueprint <blueprint>]: The image blueprint used to create the ISO that
+#   --boot_blueprint <blueprint:    The image blueprint used to create the ISO that
 #                                   should be used to boot the VM. This is _not_
 #                                   necessarily the image to be installed (see
 #                                   prepare_kickstart).
+#   [--vmname <name>]: The short name of the VM in the scenario (e.g., "host1").
 #   [--network <name>[,<name>...]]: A comma-separated list for the networks used
 #                                   when creating the VM. Each network entry will
 #                                   create a NIC and they are repeatable.
@@ -707,7 +705,7 @@ EOF
 launch_vm() {
     # set defaults
     local vmname="host1"
-    local boot_blueprint="${DEFAULT_BOOT_BLUEPRINT}"
+    local boot_blueprint=""
     local network="default"
     local vm_memory=4096
     local vm_vcpus=2
@@ -753,6 +751,12 @@ launch_vm() {
                 ;;
         esac
     done
+
+    if [ -z "${boot_blueprint}" ]; then
+        error "Boot blueprint is not set"
+        record_junit "${vmname}" "vm-launch-args" "FAILED"
+        exit 1
+    fi
 
     record_junit "${vmname}" "vm-launch-args" "OK"
 

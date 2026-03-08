@@ -17,13 +17,10 @@ VM_BRIDGE_IP="$(get_vm_bridge_ip "${VM_IPV6_NETWORK}")"
 # shellcheck disable=SC2034  # used elsewhere
 WEB_SERVER_URL="http://[${VM_BRIDGE_IP}]:${WEB_SERVER_PORT}"
 
-start_image="rhel96-brew-lrel-tuned"
+start_image="rhel98-brew-lrel-tuned"
 
 scenario_create_vms() {
-    if ! does_commit_exist "${start_image}"; then
-        echo "Image '${start_image}' not found - skipping test"
-        return 0
-    fi
+    exit_if_commit_not_found "${start_image}"
 
     # Temporarily override MIRROR_REGISTRY_URL for kickstart preparation
     # The kickstart template needs a hostname-based URL, not an IPv6 address
@@ -38,23 +35,17 @@ scenario_create_vms() {
     # shellcheck disable=SC2034  # used elsewhere
     MIRROR_REGISTRY_URL="${original_mirror_url}"
 
-    launch_vm --network "${VM_IPV6_NETWORK}" --vm_vcpus 6 --vm_disksize 30
+    launch_vm --boot_blueprint rhel-9.8 --network "${VM_IPV6_NETWORK}" --vm_vcpus 6 --vm_disksize 30
 }
 
 scenario_remove_vms() {
-    if ! does_commit_exist "${start_image}"; then
-        echo "Image '${start_image}' not found - skipping test"
-        return 0
-    fi
+    exit_if_commit_not_found "${start_image}"
 
     remove_vm host1
 }
 
 scenario_run_tests() {
-    if ! does_commit_exist "${start_image}"; then
-        echo "Image '${start_image}' not found - skipping test"
-        return 0
-    fi
+    exit_if_commit_not_found "${start_image}"
 
     # Wait for microshift-tuned to reboot the node
     local -r start_time=$(date +%s)
