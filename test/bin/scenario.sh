@@ -16,7 +16,7 @@ source "${SCRIPTDIR}/common.sh"
 # shellcheck source=test/bin/common_versions.sh
 source "${SCRIPTDIR}/common_versions.sh"
 
-DEFAULT_BOOT_BLUEPRINT="rhel-9.6"
+DEFAULT_BOOT_BLUEPRINT="rhel-9.8"
 LVM_SYSROOT_SIZE="15360"
 PULL_SECRET="${PULL_SECRET:-${HOME}/.pull-secret.json}"
 PULL_SECRET_CONTENT="$(jq -c . "${PULL_SECRET}")"

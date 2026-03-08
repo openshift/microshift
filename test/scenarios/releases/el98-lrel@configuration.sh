@@ -2,7 +2,7 @@
 
 # Sourced from scenario.sh and uses functions defined there.
 
-start_image="rhel96-brew-lrel-optional"
+start_image="rhel98-brew-lrel-optional"
 
 scenario_create_vms() {
     exit_if_commit_not_found "${start_image}"
@@ -20,7 +20,5 @@ scenario_remove_vms() {
 scenario_run_tests() {
     exit_if_commit_not_found "${start_image}"
 
-    run_tests host1 \
-        suites/osconfig/clusterid.robot \
-        suites/osconfig/systemd-resolved.robot
+    run_tests host1 suites/configuration/
 }

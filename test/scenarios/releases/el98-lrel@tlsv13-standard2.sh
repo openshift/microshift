@@ -2,7 +2,7 @@
 
 # Sourced from scenario.sh and uses functions defined there.
 
-start_image="rhel96-brew-lrel-optional"
+start_image="rhel98-brew-lrel-optional"
 
 scenario_create_vms() {
     exit_if_commit_not_found "${start_image}"
@@ -42,7 +42,5 @@ EOF"
     fi
     record_junit "${vmname}" "pre_test_greenboot_check" "OK"
 
-    run_tests host1 \
-        --variable "EXPECTED_OS_VERSION:9.6" \
-        suites/standard1/
+    run_tests host1 suites/standard2/
 }

@@ -7,7 +7,7 @@ VM_BRIDGE_IP="$(get_vm_bridge_ip "${VM_MULTUS_NETWORK}")"
 # shellcheck disable=SC2034  # used elsewhere
 WEB_SERVER_URL="http://${VM_BRIDGE_IP}:${WEB_SERVER_PORT}"
 
-start_image="rhel96-brew-lrel-optional"
+start_image="rhel98-brew-lrel-optional"
 
 scenario_create_vms() {
     exit_if_commit_not_found "${start_image}"
