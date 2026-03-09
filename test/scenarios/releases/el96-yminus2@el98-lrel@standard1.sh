@@ -10,6 +10,7 @@ start_image="rhel-9.6-microshift-brew-optionals-4.${YMINUS2_MINOR_VERSION}-zstre
 dest_image="rhel98-brew-lrel-optional"
 
 scenario_create_vms() {
+    exit_if_commit_not_found "${start_image}"
     exit_if_commit_not_found "${dest_image}"
 
     prepare_kickstart host1 kickstart.ks.template "${start_image}"
@@ -17,12 +18,14 @@ scenario_create_vms() {
 }
 
 scenario_remove_vms() {
+    exit_if_commit_not_found "${start_image}"
     exit_if_commit_not_found "${dest_image}"
 
     remove_vm host1
 }
 
 scenario_run_tests() {
+    exit_if_commit_not_found "${start_image}"
     exit_if_commit_not_found "${dest_image}"
 
     run_tests host1 \

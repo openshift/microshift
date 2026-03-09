@@ -48,13 +48,13 @@ The artifacts are only used by periodic CI jobs.
 Artifacts built in this layer are cached as they depend on Brew RPM packages available only behind the VPN.
 
 Groups 1-to-2 enforce an ordered build chain, necessary to satisfy a mandatory
-layer dependency of `rhel96 os-only -> rhel96 y-2 -> rhel96 y-1`, which is needed
+layer dependency of `rhel98 os-only -> rhel96 y-2 -> rhel96 y-1`, which is needed
 for testing upgrades.
 
 |Group |Build Time|Description|
 |------|----------|-----------|
-|group1| Short    | RHEL 9.6 layer with MicroShift `y-2` Brew packages
-|group2| Short    | RHEL 9.6 layer with MicroShift `y-1` Brew packages
+|group1| Short    | RHEL 9.8 layer with MicroShift `y-2` Brew packages
+|group2| Short    | RHEL 9.8 layer with MicroShift `y-1` Brew packages
 |group3| Average  | Brew RPM blueprints for release testing (EC, RC, z-stream, nightly, tuned)
 |group4| Average  | Image installers for release testing (EC, RC, z-stream)
 
