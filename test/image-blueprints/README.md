@@ -9,14 +9,14 @@ each layer or group under `test/image-blueprints` directory.
 Artifacts built in this layer are cached.
 
 Groups 1-to-3 enforce an ordered build chain, necessary to satisfy a mandatory
-layer dependency of `rhel94 os-only -> rhel94 y-2 -> rhel94 y-1`, which is needed
+layer dependency of `rhel9x os-only -> rhel9x y-2 -> rhel9x y-1`, which is needed
 for testing upgrades.
 
 |Group |Build Time|Description|
 |------|----------|-----------|
-|group1| Short    | RHEL 9.4 and 9.6 OS-only base layer
-|group2| Short    | RHEL 9.4 layer with MicroShift `y-2` packages
-|group3| Short    | RHEL 9.4 layer with MicroShift `y-1` packages
+|group1| Short    | RHEL 9.x OS-only base layer
+|group2| Short    | RHEL 9.x layer with MicroShift `y-2` packages
+|group3| Short    | RHEL 9.x layer with MicroShift `y-1` packages
 |group4| Average  | Other artifacts independent of current sources
 
 > Note: Total build times are up to 30 minutes.
@@ -48,13 +48,13 @@ The artifacts are only used by periodic CI jobs.
 Artifacts built in this layer are cached as they depend on Brew RPM packages available only behind the VPN.
 
 Groups 1-to-2 enforce an ordered build chain, necessary to satisfy a mandatory
-layer dependency of `rhel98 os-only -> rhel96 y-2 -> rhel96 y-1`, which is needed
+layer dependency of `rhel9x os-only -> rhel9x y-2 -> rhel9x y-1`, which is needed
 for testing upgrades.
 
 |Group |Build Time|Description|
 |------|----------|-----------|
-|group1| Short    | RHEL 9.8 layer with MicroShift `y-2` Brew packages
-|group2| Short    | RHEL 9.8 layer with MicroShift `y-1` Brew packages
+|group1| Short    | RHEL 9.x layer with MicroShift `y-2` Brew packages
+|group2| Short    | RHEL 9.x layer with MicroShift `y-1` Brew packages
 |group3| Average  | Brew RPM blueprints for release testing (EC, RC, z-stream, nightly, tuned)
 |group4| Average  | Image installers for release testing (EC, RC, z-stream)
 
