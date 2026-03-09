@@ -2,13 +2,13 @@
 
 # Sourced from scenario.sh and uses functions defined there.
 
-start_image="rhel96-bootc-brew-lrel-optional"
+start_image="rhel98-bootc-brew-lrel-optional"
 
 scenario_create_vms() {
     exit_if_image_not_found "${start_image}"
 
     prepare_kickstart host1 kickstart-bootc.ks.template "${start_image}"
-    launch_vm --boot_blueprint rhel96-bootc
+    launch_vm --boot_blueprint rhel98-bootc --vm_vcpus 4
 }
 
 scenario_remove_vms() {
@@ -42,6 +42,6 @@ EOF"
     record_junit "${vmname}" "pre_test_greenboot_check" "OK"
 
     run_tests host1 \
-        --variable "EXPECTED_OS_VERSION:9.6" \
-        suites/standard2/
+        --variable "EXPECTED_OS_VERSION:9.8" \
+        suites/standard1/
 }

@@ -1,6 +1,6 @@
 # {{- if env.Getenv "BREW_NIGHTLY_RELEASE_VERSION" "" -}}
 # Note: This comment makes templating add a new line before the code
-FROM localhost/rhel96-test-agent:latest
+FROM localhost/rhel98-test-agent:latest
 
 # Build arguments
 ARG USHIFT_RPM_REPO_NAME=microshift-brew

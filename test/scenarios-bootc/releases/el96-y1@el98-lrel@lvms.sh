@@ -7,7 +7,7 @@
 export TEST_RANDOMIZATION=none
 
 start_image="rhel96-bootc-brew-y1-with-optional"
-dest_image="rhel96-bootc-brew-lrel-optional"
+dest_image="rhel98-bootc-brew-lrel-optional"
 
 scenario_create_vms() {
     exit_if_image_not_found "${start_image}"
@@ -45,7 +45,6 @@ scenario_run_tests() {
     run_tests host1 \
         --variable "TARGET_REF:${dest_image}" \
         --variable "BOOTC_REGISTRY:${MIRROR_REGISTRY_URL}" \
-        --variable "EXPECTED_OS_VERSION:9.6" \
         suites/upgrade/upgrade-successful.robot
 
     # Post-upgrade: Validate LVMS workloads survived the upgrade
@@ -61,6 +60,6 @@ scenario_run_tests() {
 
     # Run standard1 suite for basic validation after upgrade
     run_tests host1 \
-        --variable "EXPECTED_OS_VERSION:9.6" \
+        --variable "EXPECTED_OS_VERSION:9.8" \
         suites/standard1/
 }

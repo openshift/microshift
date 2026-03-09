@@ -8,7 +8,7 @@ VM_BRIDGE_IP="$(get_vm_bridge_ip "${VM_IPV6_NETWORK}")"
 # shellcheck disable=SC2034  # used elsewhere
 WEB_SERVER_URL="http://[${VM_BRIDGE_IP}]:${WEB_SERVER_PORT}"
 
-start_image="rhel96-bootc-brew-lrel-optional"
+start_image="rhel98-bootc-brew-lrel-optional"
 
 scenario_create_vms() {
     exit_if_image_not_found "${start_image}"
@@ -23,7 +23,7 @@ scenario_create_vms() {
     # Enable IPv6 single stack in kickstart
     prepare_kickstart host1 kickstart-bootc.ks.template "${start_image}" false true
     MIRROR_REGISTRY_URL="${original_mirror_registry_url}"
-    launch_vm --boot_blueprint rhel96-bootc --network "${VM_IPV6_NETWORK}" --vm_vcpus 4
+    launch_vm --boot_blueprint rhel98-bootc --network "${VM_IPV6_NETWORK}" --vm_vcpus 4
 }
 
 scenario_remove_vms() {
