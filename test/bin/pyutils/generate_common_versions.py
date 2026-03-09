@@ -25,7 +25,7 @@ CNCF_SONOBUOY_VERSION = "v0.57.3"
 CNCF_SYSTEMD_LOGS_VERSION = "v0.4"
 
 # The current version of the microshift-gitops package.
-GITOPS_VERSION = "1.16"
+GITOPS_VERSION = "1.19"
 
 
 logging.basicConfig(
