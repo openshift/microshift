@@ -1,23 +1,16 @@
-- cluster-kube-scheduler-operator embedded-component c7b51633b67e3e2860ca053930422f69e17bd40a to 4e99db62cea1d2ca48765230c6f5663d1f2c2702
-  - b900da1 2026-03-03T14:45:38+01:00 chore: update OWNERS
+- machine-config-operator embedded-component 8e8d70cd2861f60af9597775a2de0f3297339ee1 to a72592f88e91c86ba00f14d5e104f9d3fbacb81a
+  - 88bf0661 2026-03-04T14:09:29+00:00 copy binaries directly into final stage
+  - a2725797 2026-03-04T14:09:29+00:00 clear dnf cache to reduce image size
+  - 832dd79b 2026-01-20T11:35:15+00:00 Add: enable nodeip-configuration for platform external
 
-- cluster-network-operator embedded-component f63a7ffb316c9ca4359210ff5ea2c003dbe2d6a9 to 8df9d04f3019ff6e0a4c51504601e8a73b4322e3
-  - fc585b2 2026-01-20T13:10:54+00:00 whereabouts-config is a reserved name for user interaction.
+- operator-framework-olm embedded-component c2df9e7c6ccac3489c833a03cfa3518d5eedf01f to 5cd473d377523ab5746804171dac03e4ae37993f
+  - d70e12ce 2026-03-04T00:41:24+00:00 Remove the collect-profiles info from the microshift kustomization file
 
-- machine-config-operator embedded-component 8575e08bba14b3c0eb97620181b763449951d03b to 8e8d70cd2861f60af9597775a2de0f3297339ee1
-  - 884131c7 2026-03-02T20:40:01+00:00 fixes config drift metric persistence
-  - f1c3e0c9 2026-02-27T13:13:26+01:00 OCPBUGS-77421: Remove MCD liveness probe
-  - 0c580e09 2026-02-24T12:03:28-06:00 Fix MCN conditions not updating during OCL sync
+- ovn-kubernetes image-amd64 0a68692ea5e733e87eac8d6361c9cbb6a6258fb5 to 57197a0378fb484aad6afccf9bd25d9445aaaf0c
+  - 1066c195 2026-03-01T00:20:26+05:30 Add a e2e test for NodePort service
+  - 5e6ce846 2026-03-01T00:19:19+05:30 Clear stale conntrack UDP entries for nodePorts
 
-- ovn-kubernetes image-amd64 4bee86ff82e3632f99ee5926c0f8ab7a78c93f48 to 0a68692ea5e733e87eac8d6361c9cbb6a6258fb5
-  - 6a945d5a 2026-02-26T18:29:36+01:00 nodeallocator: fix subnet leak when hybrid overlay is enabled
-  - 21444cc3 2026-02-24T11:55:34+01:00 Fix IC cluster cleanup tests zone configuration
-  - dccddff2 2026-02-24T11:55:34+01:00 Remove IC zone migration HACK code
-  - 1ce92737 2026-01-21T14:02:20+01:00 fix(localnet, ipamless): Prevent LSP deletion on sync
-
-- ovn-kubernetes image-arm64 4bee86ff82e3632f99ee5926c0f8ab7a78c93f48 to 0a68692ea5e733e87eac8d6361c9cbb6a6258fb5
-  - 6a945d5a 2026-02-26T18:29:36+01:00 nodeallocator: fix subnet leak when hybrid overlay is enabled
-  - 21444cc3 2026-02-24T11:55:34+01:00 Fix IC cluster cleanup tests zone configuration
-  - dccddff2 2026-02-24T11:55:34+01:00 Remove IC zone migration HACK code
-  - 1ce92737 2026-01-21T14:02:20+01:00 fix(localnet, ipamless): Prevent LSP deletion on sync
+- ovn-kubernetes image-arm64 0a68692ea5e733e87eac8d6361c9cbb6a6258fb5 to 57197a0378fb484aad6afccf9bd25d9445aaaf0c
+  - 1066c195 2026-03-01T00:20:26+05:30 Add a e2e test for NodePort service
+  - 5e6ce846 2026-03-01T00:19:19+05:30 Clear stale conntrack UDP entries for nodePorts
 
