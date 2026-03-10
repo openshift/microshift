@@ -55,16 +55,19 @@ Create Ingress route with Custom certificate
     Verify Cert Manager Kustomization Success
     ${cert_issuer_yaml}=    Create Cert Issuer YAML
     Apply YAML Manifest    ${cert_issuer_yaml}
-    Oc Wait    -n ${NAMESPACE} clusterissuer ${ISSUER_NAME}    --for="condition=Ready" --timeout=120s
+    Oc Wait    -n ${NAMESPACE} clusterissuer ${ISSUER_NAME}
+    ...    --for="condition=Ready" --timeout=${DEFAULT_WAIT_TIMEOUT}
     ${cert_yaml}=    Create Certificate YAML For Test
     Apply YAML Manifest    ${cert_yaml}
-    Oc Wait    -n ${NAMESPACE} certificate ${CERT_NAME}    --for="condition=Ready" --timeout=60s
+    Oc Wait    -n ${NAMESPACE} certificate ${CERT_NAME}
+    ...    --for="condition=Ready" --timeout=${DEFAULT_WAIT_TIMEOUT}
     ${rbac_yaml}=    Create Ingress RBAC YAML
     Apply YAML Manifest    ${rbac_yaml}
     Deploy Hello MicroShift
     ${route_yaml}=    Create Ingress Route YAML
     Apply YAML Manifest    ${route_yaml}
-    Oc Wait    -n ${NAMESPACE} route ${ROUTE_NAME}    --for=jsonpath='.status.ingress' --timeout=120s
+    Oc Wait    -n ${NAMESPACE} route ${ROUTE_NAME}
+    ...    --for=jsonpath='.status.ingress' --timeout=${DEFAULT_WAIT_TIMEOUT}
     [Teardown]    Run Keywords
     ...    Remove ClusterIssuer
 
@@ -78,7 +81,8 @@ Test Cert manager with local acme server
     Oc Get JsonPath    ingressclass    ${EMPTY}    openshift-ingress    .metadata.name
     ${http01_issuer_yaml}=    Create HTTP01 Issuer YAML
     Apply YAML Manifest    ${http01_issuer_yaml}
-    Oc Wait    -n ${NAMESPACE} issuer ${HTTP01_ISSUER_NAME}    --for="condition=Ready" --timeout=120s
+    Oc Wait    -n ${NAMESPACE} issuer ${HTTP01_ISSUER_NAME}
+    ...    --for="condition=Ready" --timeout=${DEFAULT_WAIT_TIMEOUT}
 
     ${cert_yaml}=    Create Certificate YAML    ${dns_name}
     Apply YAML Manifest    ${cert_yaml}
@@ -350,7 +354,7 @@ Configure DNS For Domain
     # Wait for DNS pod to be ready
     Oc Wait
     ...    -n openshift-dns pod -l dns.operator.openshift.io/daemonset-dns=default
-    ...    --for=condition=Ready --timeout=60s
+    ...    --for=condition=Ready --timeout=${DEFAULT_WAIT_TIMEOUT}
 
 Remove DNS Configuration
     [Documentation]    Remove custom DNS configuration and restore original
@@ -374,7 +378,7 @@ Remove DNS Configuration
     # Wait for DNS pod to be ready (ignore failures in teardown)
     Oc Wait
     ...    -n openshift-dns pod -l dns.operator.openshift.io/daemonset-dns=default
-    ...    --for=condition=Ready --timeout=60s
+    ...    --for=condition=Ready --timeout=${DEFAULT_WAIT_TIMEOUT}
 
 Verify Cert Manager Kustomization Success
     [Documentation]    Verify that cert-manager kustomization was successfully applied by checking journalctl logs

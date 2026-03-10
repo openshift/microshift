@@ -21,7 +21,7 @@ Rebooting Healthy System Should Keep Functional PVC
     [Setup]    Test Case Setup
     Reboot MicroShift Host
     Wait Until Greenboot Health Check Exited
-    Named Pod Should Be Ready    ${POD_NAME_STATIC}    timeout=120s
+    Named Pod Should Be Ready    ${POD_NAME_STATIC}    timeout=${DEFAULT_WAIT_TIMEOUT}
     [Teardown]    Test Case Teardown
 
 
@@ -31,7 +31,7 @@ Test Case Setup
     ${ns}=    Create Unique Namespace
     VAR    ${NAMESPACE}=    ${ns}    scope=SUITE
     Oc Create    -f ${SOURCE_POD} -n ${NAMESPACE}
-    Named Pod Should Be Ready    ${POD_NAME_STATIC}    timeout=120s
+    Named Pod Should Be Ready    ${POD_NAME_STATIC}    timeout=${DEFAULT_WAIT_TIMEOUT}
 
 Test Case Teardown
     [Documentation]    Clean up test suite resources

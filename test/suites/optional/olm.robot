@@ -4,6 +4,7 @@ Documentation       Operator Lifecycle Manager on MicroShift
 Resource            ../../resources/common.resource
 Resource            ../../resources/microshift-process.resource
 Resource            ../../resources/microshift-rpm.resource
+Resource            ../../resources/oc.resource
 Library             DataFormats.py
 
 Suite Setup         Setup
@@ -164,5 +165,6 @@ Wait For Deployments Deletion
     [Documentation]    Wait for Deployments to be deleted.
     [Arguments]    ${namespace}    @{deployments}
     FOR    ${deploy}    IN    @{deployments}
-        Run With Kubeconfig    kubectl wait deployment --for=delete -n ${namespace} ${deploy} --timeout=60s
+        Run With Kubeconfig
+        ...    oc wait deployment --for=delete -n ${namespace} ${deploy} --timeout=${DEFAULT_WAIT_TIMEOUT}
     END
