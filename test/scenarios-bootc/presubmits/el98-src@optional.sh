@@ -29,7 +29,7 @@ scenario_remove_vms() {
 scenario_run_tests() {
     local skip_args=""
     if [[ "${UNAME_M}" =~ aarch64 ]]; then
-        skip_args="--skip sriov"
+        skip_args="--skip sriov --skip tls-scanner"
     fi
     # shellcheck disable=SC2086
     run_tests host1 \

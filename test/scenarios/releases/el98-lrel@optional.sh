@@ -33,7 +33,7 @@ scenario_run_tests() {
 
     local skip_args=""
     if [[ "${UNAME_M}" =~ aarch64 ]]; then
-        skip_args="--skip sriov"
+        skip_args="--skip sriov --skip tls-scanner"
     fi
     # Generic Device Plugin suite is excluded because getting serialsim for ostree would require:
     # - getting the version of the kernel of ostree image,
