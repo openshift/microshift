@@ -139,7 +139,7 @@ export CNCF_SONOBUOY_VERSION=v0.57.3
 export CNCF_SYSTEMD_LOGS_VERSION=v0.4
 
 # The current version of the microshift-gitops package.
-export GITOPS_VERSION=1.16
+export GITOPS_VERSION=1.19
 
 # The brew release versions needed for release regression testing
 BREW_Y0_RELEASE_VERSION="$(get_vrel_from_rpm "${BREW_RPM_SOURCE}/4.${MINOR_VERSION}-zstream/${UNAME_M}/")"

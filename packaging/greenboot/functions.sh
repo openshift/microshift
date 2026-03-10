@@ -138,3 +138,9 @@ function clear_fail_marker() {
         rm -f "${MICROSHIFT_GREENBOOT_FAIL_MARKER}"
     fi
 }
+
+# No-op shim for gitops package
+function log_script_exit() {
+    >&2 echo "log_script_exit function is deprecated and should not be used"
+    :
+}
