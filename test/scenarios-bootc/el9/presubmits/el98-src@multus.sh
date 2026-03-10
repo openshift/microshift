@@ -20,10 +20,10 @@ fi
 # Opt-in to dynamic VM scheduling by declaring requirements
 dynamic_schedule_requirements() {
     cat <<EOF
-min_vcpus=4
+min_vcpus=2
 min_memory=4096
-min_disksize=25
-networks="${NETWORKS}"
+min_disksize=20
+networks=multus
 boot_image=rhel98-bootc-source-optionals
 fips=false
 EOF

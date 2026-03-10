@@ -53,9 +53,12 @@
 #   - networks:     Required networks (empty = network-agnostic, can run on any VM)
 #   - boot_image:   Required boot image
 #   - fips:         Whether FIPS mode is required
-#   - slow:         Set to "true" for long-running tests (e.g., router, conformance)
+#   - slow:         Set to "true" for tests longer than VM boot time (~4 min)
 #                   Slow tests get priority within their reusability tier to avoid
 #                   becoming the critical path.
+#   - fast:         Set to "true" for tests shorter than VM boot time (~4 min)
+#                   Fast tests stay queued longer to maximize VM reuse opportunities
+#                   (reusing a VM saves more time than the test itself takes).
 #
 # ============================================================================
 
@@ -685,14 +688,16 @@ sort_scenarios_for_reuse() {
     # 1. Reusability score (ascending): restrictive scenarios first
     #    - They can't be reused anyway, so get them out of the way
     #    - Their VMs are destroyed when done
-    # 2. Within same reusability: slow tests first (ascending 0=slow, 1=normal)
-    #    - Long-running tests start early to avoid becoming critical path
+    # 2. Within same reusability: duration priority (0=slow, 1=normal, 2=fast)
+    #    - Slow tests (longer than VM boot) start early to avoid critical path
+    #    - Fast tests (shorter than VM boot) stay queued for reuse opportunities
     # 3. Then boot_image descending (optionals before source)
     # 4. Then vcpus descending (larger VMs first)
     #
     # This ensures:
     # - Restrictive scenarios (special networks/boot_images) start first
     # - Slow tests start early within their reusability tier
+    # - Fast tests act as "gap fillers", maximizing VM reuse
     # - Flexible scenarios stay queued longer, maximizing reuse opportunities
 
     for scenario_script in "${scenarios[@]}"; do
@@ -701,20 +706,23 @@ sort_scenarios_for_reuse() {
         local req_file="${SCENARIO_STATUS}/${scenario_name}/requirements"
 
         if [ -f "${req_file}" ]; then
-            local boot_image networks vcpus reuse_score slow_flag slow_sort
+            local boot_image networks vcpus reuse_score slow_flag fast_flag duration_sort
             boot_image=$(get_req_value "${req_file}" "boot_image" "default")
             networks=$(get_req_value "${req_file}" "networks" "default")
             vcpus=$(get_req_value "${req_file}" "min_vcpus" "${DEFAULT_VM_VCPUS}")
             slow_flag=$(get_req_value "${req_file}" "slow" "false")
+            fast_flag=$(get_req_value "${req_file}" "fast" "false")
             reuse_score=$(get_reusability_score "${boot_image}" "${networks}")
-            # slow=true -> sort value 0 (first), slow=false -> sort value 1 (after)
-            slow_sort=1
+            # Duration priority: slow=0 (first), normal=1, fast=2 (last, best for reuse)
+            duration_sort=1
             if [ "${slow_flag}" = "true" ]; then
-                slow_sort=0
+                duration_sort=0
+            elif [ "${fast_flag}" = "true" ]; then
+                duration_sort=2
             fi
-            # Sort key: reuse_score (asc), slow_sort (asc), boot_image (desc), vcpus (desc)
+            # Sort key: reuse_score (asc), duration_sort (asc), boot_image (desc), vcpus (desc)
             # Use inverse vcpus (100-vcpus) so ascending sort gives descending vcpus
-            printf "%d\t%d\t%s\t%02d\t%s\n" "${reuse_score}" "${slow_sort}" "${boot_image}" "$((100 - vcpus))" "${scenario_script}"
+            printf "%d\t%d\t%s\t%02d\t%s\n" "${reuse_score}" "${duration_sort}" "${boot_image}" "$((100 - vcpus))" "${scenario_script}"
         else
             # Unknown requirements - treat as flexible, put last
             printf "9\t1\taaa\t99\t%s\n" "${scenario_script}"
@@ -848,8 +856,18 @@ run_scenario_on_vm() {
         # Create phase has its own retry logic with timeouts
         log "Creating VM ${vm_name} - logging to ${boot_log}"
 
+        # Track boot time for metrics
+        local boot_start_time
+        boot_start_time=$(date +%s)
+
         local create_exit=0
         bash -x "${SCRIPTDIR}/scenario.sh" create "${scenario_script}" &> "${boot_log}" || create_exit=$?
+
+        # Record boot time
+        local boot_end_time boot_duration
+        boot_end_time=$(date +%s)
+        boot_duration=$((boot_end_time - boot_start_time))
+        echo "${boot_duration}" > "${vm_dir}/boot_time"
 
         if [ ${create_exit} -ne 0 ]; then
             result="FAILED"
@@ -1332,12 +1350,33 @@ show_status() {
     echo "  Dynamic scenarios:        ${dynamic_scenario_count} (passed: ${passed_scenarios}, failed: ${failed_scenarios})"
     echo ""
 
+    # Calculate average boot time
+    local total_boot_time=0
+    local boot_time_count=0
+    for vm_dir in "${VM_REGISTRY}"/*; do
+        [ -d "${vm_dir}" ] || continue
+        local boot_time_file="${vm_dir}/boot_time"
+        if [ -f "${boot_time_file}" ]; then
+            local bt
+            bt=$(cat "${boot_time_file}")
+            total_boot_time=$((total_boot_time + bt))
+            boot_time_count=$((boot_time_count + 1))
+        fi
+    done
+    local avg_boot_time=0
+    local avg_boot_time_str="N/A"
+    if [ ${boot_time_count} -gt 0 ]; then
+        avg_boot_time=$((total_boot_time / boot_time_count))
+        avg_boot_time_str="$(printf '%d:%02d' $((avg_boot_time / 60)) $((avg_boot_time % 60)))"
+    fi
+
     echo "=== Dynamic VM Efficiency ==="
     echo "  VMs created:              ${vms_created}"
     echo "  VM creation retries:      ${vm_creation_retries}"
     echo "  VM reuses:                ${vm_reuses}"
     echo "  Reuse rate:               ${reuse_rate}%"
     echo "  Max scenarios per VM:     ${max_runs_per_vm}"
+    echo "  Avg VM boot time:         ${avg_boot_time_str} (${boot_time_count} VMs)"
     echo ""
 
     echo "=== Resource Configuration ==="

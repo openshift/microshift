@@ -77,6 +77,7 @@ min_disksize=20
 networks=default
 boot_image=rhel98-bootc-source
 fips=false
+fast=true
 EOF
 }
 

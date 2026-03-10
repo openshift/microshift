@@ -23,6 +23,7 @@ min_disksize=20
 networks="${VM_IPV6_NETWORK}"
 boot_image=rhel98-bootc-source
 fips=false
+fast=true
 EOF
 }
 
