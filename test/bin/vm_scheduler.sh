@@ -834,9 +834,19 @@ run_scenario_on_vm() {
         if [ "${exit_code}" -eq 0 ]; then
             log "Running tests for ${scenario_name} (timeout: ${test_timeout}s) - logging to ${run_log}"
 
+            # Track test execution time
+            local test_start_time
+            test_start_time=$(date +%s)
+
             local run_exit=0
             timeout --signal=TERM --kill-after=60 "${test_timeout}" \
                 bash -x "${SCRIPTDIR}/scenario.sh" run "${scenario_script}" &> "${run_log}" || run_exit=$?
+
+            # Record test execution time
+            local test_end_time test_duration
+            test_end_time=$(date +%s)
+            test_duration=$((test_end_time - test_start_time))
+            echo "${test_duration}" > "${scenario_log_dir}/test_time"
 
             if [ ${run_exit} -ne 0 ]; then
                 result="FAILED"
@@ -858,9 +868,19 @@ run_scenario_on_vm() {
         echo "VM ${vm_name} reused for scenario ${scenario_name}" > "${boot_log}"
         date >> "${boot_log}"
 
+        # Track test execution time (for reused VM, this includes quick setup)
+        local test_start_time
+        test_start_time=$(date +%s)
+
         local combined_exit=0
         timeout --signal=TERM --kill-after=60 "${test_timeout}" \
             bash -x "${SCRIPTDIR}/scenario.sh" create-and-run "${scenario_script}" &> "${run_log}" || combined_exit=$?
+
+        # Record test execution time
+        local test_end_time test_duration
+        test_end_time=$(date +%s)
+        test_duration=$((test_end_time - test_start_time))
+        echo "${test_duration}" > "${scenario_log_dir}/test_time"
 
         if [ ${combined_exit} -ne 0 ]; then
             result="FAILED"
@@ -1321,6 +1341,72 @@ show_status() {
             sed 's/^/  /' "${vm_state}"
         fi
     done
+    echo ""
+
+    echo "=== Test Durations ==="
+    echo "  (Tests longer than avg boot time should be 'slow', shorter should be 'fast')"
+    echo ""
+    # Collect test durations and check for mislabeling
+    local mislabeled_count=0
+    {
+        for scenario_dir in "${SCENARIO_INFO_DIR}"/*; do
+            [ -d "${scenario_dir}" ] || continue
+            local scenario_name
+            scenario_name=$(basename "${scenario_dir}")
+            local test_time_file="${scenario_dir}/test_time"
+
+            if [ -f "${test_time_file}" ]; then
+                local test_time
+                test_time=$(cat "${test_time_file}")
+                local test_mins=$((test_time / 60))
+                local test_secs=$((test_time % 60))
+                local time_str
+                time_str=$(printf '%2d:%02d' "${test_mins}" "${test_secs}")
+
+                # Get slow/fast flag from requirements
+                local req_file="${SCENARIO_STATUS}/${scenario_name}/requirements"
+                local slow_flag="false"
+                local fast_flag="false"
+                local current_label="-"
+                if [ -f "${req_file}" ]; then
+                    slow_flag=$(get_req_value "${req_file}" "slow" "false")
+                    fast_flag=$(get_req_value "${req_file}" "fast" "false")
+                    if [ "${slow_flag}" = "true" ]; then
+                        current_label="slow"
+                    elif [ "${fast_flag}" = "true" ]; then
+                        current_label="fast"
+                    fi
+                fi
+
+                # Determine if mislabeled (compare against avg boot time)
+                local status=""
+                if [ ${avg_boot_time} -gt 0 ]; then
+                    if [ ${test_time} -gt ${avg_boot_time} ]; then
+                        # Test is slower than boot - should be 'slow'
+                        if [ "${fast_flag}" = "true" ]; then
+                            status="<-- MISLABELED (should be slow)"
+                            mislabeled_count=$((mislabeled_count + 1))
+                        fi
+                    else
+                        # Test is faster than boot - should be 'fast'
+                        if [ "${slow_flag}" = "true" ]; then
+                            status="<-- MISLABELED (should be fast)"
+                            mislabeled_count=$((mislabeled_count + 1))
+                        fi
+                    fi
+                fi
+
+                # Output: time, scenario, label, status (tab-separated for sorting)
+                printf "%d\t%s\t%-40s\t%-6s\t%s\n" "${test_time}" "${time_str}" "${scenario_name}" "${current_label}" "${status}"
+            fi
+        done
+    } | sort -t$'\t' -k1,1rn | cut -f2- | while IFS=$'\t' read -r time_str scenario label status; do
+        printf "  %s  %-40s  [%s] %s\n" "${time_str}" "${scenario}" "${label}" "${status}"
+    done
+    echo ""
+    if [ ${mislabeled_count} -gt 0 ]; then
+        echo "  WARNING: ${mislabeled_count} test(s) appear to be mislabeled based on avg boot time (${avg_boot_time_str})"
+    fi
     echo ""
 
     echo "=== Scenarios ==="
