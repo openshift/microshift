@@ -55,8 +55,10 @@ Deploy OpenVINO Resnet Model
     ...    Also creates a Route to export the model endpoint outside the MicroShift cluster.
 
     Oc Apply    -n ${NAMESPACE} -f ./assets/ai-model-serving/ovms-resources.yaml
-    Wait Until Keyword Succeeds    30x    1s
-    ...    Run With Kubeconfig    oc rollout status -n\=${NAMESPACE} --timeout=60s deployment openvino-resnet-predictor
+    Wait Until Keyword Succeeds
+    ...    15x    1s
+    ...    Run With Kubeconfig
+    ...    oc rollout status -n\=${NAMESPACE} --timeout=${DEFAULT_WAIT_TIMEOUT} deployment openvino-resnet-predictor
 
 Check If Model Is Ready
     [Documentation]    Asks model server is model is ready for inference.

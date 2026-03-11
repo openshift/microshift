@@ -32,7 +32,7 @@ scenario_run_tests() {
     exit_if_image_not_set "${LATEST_RELEASE_IMAGE_URL}"
 
     run_tests host1 \
-        --variable "EXPECTED_OS_VERSION:9.8" \
+        --variable "EXPECTED_OS_VERSION:9.6" \
         --variable "IMAGE_SIGSTORE_ENABLED:True" \
         suites/standard1/
 }

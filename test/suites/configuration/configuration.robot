@@ -4,6 +4,7 @@ Documentation       Tests for configuration changes
 Resource            ../../resources/common.resource
 Resource            ../../resources/microshift-config.resource
 Resource            ../../resources/microshift-process.resource
+Resource            ../../resources/oc.resource
 Library             ../../resources/journalctl.py
 
 Suite Setup         Setup
@@ -117,7 +118,7 @@ Deploy MicroShift Without LVMS
     CSI Snapshot Controller Is Deployed
     # Reduce the default timeout to 2 minutes for a quicker failure
     Run Keyword And Expect Error    1 != 0
-    ...    LVMS Is Deployed    timeout=2m
+    ...    LVMS Is Deployed    timeout=${DEFAULT_WAIT_TIMEOUT}
     [Teardown]    Run Keywords
     ...    Remove Storage Drop In Config
     ...    Restart MicroShift
@@ -129,7 +130,7 @@ Deploy MicroShift Without CSI Snapshotter
     LVMS Is Deployed
     # Reduce the default timeout to 2 minutes for a quicker failure
     Run Keyword And Expect Error    1 != 0
-    ...    CSI Snapshot Controller Is Deployed    timeout=2m
+    ...    CSI Snapshot Controller Is Deployed    timeout=${DEFAULT_WAIT_TIMEOUT}
 
     [Teardown]    Run Keywords
     ...    Remove Storage Drop In Config
