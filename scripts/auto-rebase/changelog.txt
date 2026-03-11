@@ -1,3 +1,6 @@
-- cluster-kube-scheduler-operator embedded-component 0bb0678bead782461b35d7e8671b3e54b9a46788 to 013ff606240919fcb46eb9a8b707598a9b049ee5
-  - 7becfcb 2026-03-03T14:45:55+01:00 chore: update OWNERS
+- machine-config-operator embedded-component 039f9834a4104785d41d5e10aeaa672492c8dd15 to 6f05bc5557c46f06447c1c0f65921d75491293d1
+  - a9acb25d 2026-03-05T16:39:47-05:00 copy binaries directly into final stage
+  - cb757f10 2026-03-05T16:39:28-05:00 clear dnf cache to reduce image size
+  - 7045de11 2026-03-04T20:34:56+00:00 fixes config drift metric persistence
+  - 61838b88 2026-02-27T13:12:40+01:00 OCPBUGS-77422: Remove MCD liveness probe
 
