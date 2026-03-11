@@ -14,7 +14,7 @@ scenario_create_vms() {
     exit_if_commit_not_found "${dest_image}"
 
     prepare_kickstart host1 kickstart.ks.template "${start_image}"
-    launch_vm --boot_blueprint rhel-9.6 --vm_disksize 30 --vm_vcpus 4
+    launch_vm rhel-9.6 --vm_disksize 30 --vm_vcpus 4
 }
 
 scenario_remove_vms() {

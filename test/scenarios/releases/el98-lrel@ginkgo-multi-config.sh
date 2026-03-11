@@ -36,7 +36,7 @@ scenario_create_vms() {
     # shellcheck disable=SC2034  # used elsewhere
     MIRROR_REGISTRY_URL="${original_mirror_url}"
 
-    launch_vm --boot_blueprint rhel-9.8 --network "${VM_IPV6_NETWORK}" --vm_vcpus 6 --vm_disksize 30
+    launch_vm rhel-9.8 --network "${VM_IPV6_NETWORK}" --vm_vcpus 6 --vm_disksize 30
 }
 
 scenario_remove_vms() {

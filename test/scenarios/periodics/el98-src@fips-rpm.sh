@@ -12,7 +12,7 @@ check_platform() {
 scenario_create_vms() {
     check_platform
     prepare_kickstart host1 kickstart-liveimg.ks.template "" true
-    launch_vm --boot_blueprint rhel-9.8-microshift-source-isolated --fips
+    launch_vm rhel-9.8-microshift-source-isolated --fips
 }
 
 scenario_remove_vms() {

@@ -4,7 +4,7 @@
 
 scenario_create_vms() {
     prepare_kickstart host1 kickstart-bootc.ks.template rhel102-bootc-source
-    launch_vm --boot_blueprint rhel102-bootc
+    launch_vm rhel102-bootc
 }
 
 scenario_remove_vms() {
