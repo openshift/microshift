@@ -1,28 +1,29 @@
-- api embedded-component d1c4dc4fd37b8e8f6e4992cda4e84167a3f2cb8c to a591881943aef6228702994bee19b8a0504e672a
-  - aa8c9aaf 2026-02-09T22:50:11-05:00 Add link to the dynamic-config-manager EP PR
-  - a719857c 2026-02-09T22:49:26-05:00 Move DynamicConfigurationManager back to TPNU
-
-- cluster-ingress-operator embedded-component b62dd27c901d495e6e78b11968872c002cc2416f to c2ed7331f378e499b2092f04ca7aaf8b3a075274
-  - f88e73d 2026-02-26T21:13:12+00:00 Ensure canary cert matches the default ingress controller's cert
-
-- cluster-kube-scheduler-operator embedded-component 7809937c07c5dbfa272bfbe87d99e09104bf3fc9 to e60e39de9cdd273dadd341d0f56350f504db9623
-  - 9f5382f 2026-03-03T14:44:50+01:00 chore: update OWNERS
-
-- machine-config-operator embedded-component a42dfde397a6973140112eaa054458c189af60bb to 2b0caa01c82adf10f9b0e113cfc8c1b2a3f8919b
-  - 0463932f 2026-03-02T09:30:35-05:00 chore: update AMIs
-  - a766149d 2026-02-26T06:18:48+00:00 bootimage: remove URL in vsphere login failure log
-
-- oc image-amd64 6a13cc70a1c232f6e566fa7f155b54b0a7d75bfe to 56a56a3a76474ed4329fff4fc9958e2c60c3ab3f
-  - c4c51800 2026-02-27T18:48:39+00:00 Makefile: Strip debugging symbols by default
-
-- ovn-kubernetes image-amd64 190e114128b9f358d1d6a700c464797d4c3e36af to baa428823efc25f39c73eb0a2e45dc76ad7e0594
-  - 78263445 2026-02-26T18:20:40+01:00 nodeallocator: fix subnet leak when hybrid overlay is enabled
-  - 4e550265 2026-02-25T22:38:30+05:30 Add a e2e test for NodePort service
-  - b426934b 2026-02-25T22:32:55+05:30 Clear stale conntrack UDP entries for nodePorts
-  - e950ad5c 2026-02-18T18:27:45+01:00 Fix IC cluster cleanup tests zone configuration
-  - 83de58c1 2026-02-18T18:27:45+01:00 Remove IC zone migration HACK code
-
-- ovn-kubernetes image-arm64 81c9d5c2b4527e3139ee127a2b7d4f0aceb78211 to baa428823efc25f39c73eb0a2e45dc76ad7e0594
-  - 4e550265 2026-02-25T22:38:30+05:30 Add a e2e test for NodePort service
-  - b426934b 2026-02-25T22:32:55+05:30 Clear stale conntrack UDP entries for nodePorts
+- ovn-kubernetes image-arm64 baa428823efc25f39c73eb0a2e45dc76ad7e0594 to fc6a53f0e48f0418652c1ea4dee6c30e431127fc
+  - b2079d4b 2026-03-02T10:22:43-08:00 No-overlay mode enhancement
+  - fc2b8d65 2026-03-02T10:22:43-08:00 ci: Split unit test phase from build
+  - 34f5df2f 2026-03-02T10:22:43-08:00 Fix coderabbit path_filters
+  - ee492e18 2026-03-02T10:22:43-08:00 fix: Register a bunch of cli flags for --help message
+  - 67a438ed 2026-03-02T10:22:43-08:00 Fix coderabbit config
+  - bc50d3f4 2026-03-02T10:22:43-08:00 [udn isolation] Update RA ACLs to handle multi-subnet networks.
+  - 6843d581 2026-03-02T10:22:43-08:00 Multi-subnet default network: require the same hostSubnet.
+  - 886195b9 2026-03-02T10:22:43-08:00 EgressIP: add route policies for east-west traffic between networks
+  - 33b46db8 2026-03-02T10:22:43-08:00 [test] always use multi-subnet setup for CI.
+  - b5147d93 2026-03-02T10:22:43-08:00 [kind] Add multi-cidr default subnet option.
+  - 1aee6256 2026-03-02T10:22:41-08:00 remove forced V(5) logging during startup
+  - d8ad19b4 2026-03-02T09:44:57-08:00 Refactor ETP=local flow generation to reduce code duplication
+  - 624edcaa 2026-03-02T09:44:57-08:00 Service OpenFlows: Return traffic should not be committed to conntrack
+  - 5c35ec0a 2026-03-02T09:44:57-08:00 Fix issues with dualstack detection for nodePort with hostNetwork tests
+  - f1ec1d97 2026-03-02T09:44:57-08:00 Fix cookie generation for ETP=local service flows with target ports
+  - f7ccbc01 2026-03-02T09:44:57-08:00 Adjust E2E tests for named port handling
+  - ba78d308 2026-03-02T09:44:57-08:00 Add unit test for named port handling in ETP=local services
+  - f620841f 2026-03-02T09:44:57-08:00 Fix named port handling in ETP=local services with host-networked pods
+  - 8e80b034 2026-03-02T09:44:57-08:00 test/e2e:: Fix duplicate IP validation test for IP family enforcement
+  - 7d8c0171 2026-03-02T09:44:57-08:00 test/e2e: add IP family validation tests for layer2 primary networks
+  - 50b21587 2026-03-02T09:44:57-08:00 test/e2e: Move createVMWithStaticIP helper function
+  - 8bb72a9b 2026-03-02T09:44:57-08:00 test/e2e/kubevirt: Refactor duplicate VM pod err event waiter to shared helper
+  - d9e4528c 2026-03-02T09:44:57-08:00 allocator/pod: add IP family validation for layer2 primary networks
+  - af2dc272 2026-03-02T09:44:57-08:00 fix: Remove duplicate - and sometimes incorrect - defaults from --help
+  - fa462c96 2026-03-02T09:44:57-08:00 chore: Remove redundant wording in some --help option descriptions
+  - 30745e8d 2026-03-02T09:44:57-08:00 Fixes gateway interface VLAN tag settings
+  - 21ef6474 2026-02-23T09:35:43+01:00 Minimize ACLs by combining ipBlocks into single ACL
 
