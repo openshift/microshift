@@ -435,6 +435,13 @@ func (c *Config) incorporateUserSettings(u *Config) {
 	if len(u.ApiServer.FeatureGates.CustomNoUpgrade.Disabled) > 0 {
 		c.ApiServer.FeatureGates.CustomNoUpgrade.Disabled = u.ApiServer.FeatureGates.CustomNoUpgrade.Disabled
 	}
+	if len(u.ApiServer.FeatureGates.SpecialHandlingSupportExceptionRequired.Enabled) > 0 {
+		c.ApiServer.FeatureGates.SpecialHandlingSupportExceptionRequired.Enabled = u.ApiServer.FeatureGates.SpecialHandlingSupportExceptionRequired.Enabled
+	}
+	if len(u.ApiServer.FeatureGates.SpecialHandlingSupportExceptionRequired.Disabled) > 0 {
+		c.ApiServer.FeatureGates.SpecialHandlingSupportExceptionRequired.Disabled = u.ApiServer.FeatureGates.SpecialHandlingSupportExceptionRequired.Disabled
+	}
+
 }
 
 // updateComputedValues examins the existing settings and converts any
