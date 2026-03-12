@@ -1,20 +1,26 @@
-- cluster-network-operator embedded-component f5aaab800060be6b8c299d2a1feaaaa40298d71a to b7adb6895b84c1916904e6eccd93ce578731171f
-  - 5d9bd03 2025-12-11T06:58:42+00:00 Fix: whereabouts-token-watcher DaemonSet improvements
+- cluster-kube-scheduler-operator embedded-component b5671f10f0b03ac19e584e08b08267f67dd2d709 to bf8cd78f223b3d27ea4fb170d22edea14df26df3
+  - 68fd8c9 2026-03-03T14:45:22+01:00 chore: update OWNERS
 
-- machine-config-operator embedded-component 1d699383bfd81188d2ab77fc9e0c659ab3683c12 to 3566e363bfb1d08b43bc0aba63efe70248abb86e
-  - b1e8d8a7 2026-03-02T14:54:09+01:00 OCPBUGS-77420: Remove MCD liveness probe
-  - f50f308d 2026-02-26T18:03:32+00:00 fixes config drift metric persistence
+- machine-config-operator embedded-component 3566e363bfb1d08b43bc0aba63efe70248abb86e to 5bad8a0ae8b4473905b2865439080e05b80bdb6b
+  - c21cca4f 2026-03-08T13:38:22+00:00 chore: update AMIs
+  - 224c6f1b 2026-03-05T02:09:32+00:00 chore: update AMIs
+  - 762a0db8 2026-03-04T02:32:03+00:00 copy binaries directly into final stage
+  - ca8b057b 2026-03-04T02:32:02+00:00 clear dnf cache to reduce image size
+  - 4cb332ee 2026-02-24T15:44:30+00:00 units: add delays to TestOSBuildController
+  - 4b8f17e2 2026-02-24T10:09:09-05:00 fix
+  - c8acea3f 2026-02-24T09:46:37-05:00 fix
+  - 1976bc7f 2026-02-24T09:33:33-05:00 fix
+  - cd32621b 2026-02-24T09:14:00-05:00 helpers: compute systemdUnits that added and changed between Ign configs update: only write added or updated systemd units unless forcefile exists then rewrite all systemd units on_disk_validation: check if systemd units in config enabled correctly tests: update MCN condition transition test to account for quick transitions through 'Unknown' state (cherry picked from commit 4512ec46f7b13a6e85588bbf480c4d029990724a)
+  - 6ce19f4f 2026-01-20T11:35:57+00:00 Add: enable nodeip-configuration for platform external
 
-- route-controller-manager embedded-component bc97534a12a7a6bac096e4ed488b29535c8d4f33 to 25d79fdf101f3d41f4583a970e5f324b79fb42d8
-  - d9cf8b8 2026-02-23T15:37:19+00:00 filter ingress namespace on UnmanagedRoutes metric
+- operator-framework-olm embedded-component 05a5a754366264a0926abf61e1ae11837a94b393 to 457b7eb2fdaeb469c117c3e87201ba88281795b4
+  - 09cc6520 2026-02-27T02:03:52+00:00 Remove the collect-profiles info from the microshift kustomization file
 
-- ovn-kubernetes image-amd64 194e289903051ba951e479c227ad3d44f9fc321a to 8adb10a1f2919be9cc8eca1134963ac1faa0fe23
-  - 28f5871b 2026-02-26T18:28:53+01:00 nodeallocator: fix subnet leak when hybrid overlay is enabled
-  - d1bc30cb 2026-02-24T11:50:36+01:00 Fix IC cluster cleanup tests zone configuration
-  - ab1f5789 2026-02-24T11:50:36+01:00 Remove IC zone migration HACK code
+- ovn-kubernetes image-amd64 8adb10a1f2919be9cc8eca1134963ac1faa0fe23 to 208e0c7fabe0462cdec6d5ae9df4aa0c412f6a81
+  - 021457f5 2026-03-01T00:16:09+05:30 Add a e2e test for NodePort service
+  - e0a33894 2026-02-27T20:06:49+05:30 Clear stale conntrack UDP entries for nodePorts
 
-- ovn-kubernetes image-arm64 194e289903051ba951e479c227ad3d44f9fc321a to 8adb10a1f2919be9cc8eca1134963ac1faa0fe23
-  - 28f5871b 2026-02-26T18:28:53+01:00 nodeallocator: fix subnet leak when hybrid overlay is enabled
-  - d1bc30cb 2026-02-24T11:50:36+01:00 Fix IC cluster cleanup tests zone configuration
-  - ab1f5789 2026-02-24T11:50:36+01:00 Remove IC zone migration HACK code
+- ovn-kubernetes image-arm64 8adb10a1f2919be9cc8eca1134963ac1faa0fe23 to 208e0c7fabe0462cdec6d5ae9df4aa0c412f6a81
+  - 021457f5 2026-03-01T00:16:09+05:30 Add a e2e test for NodePort service
+  - e0a33894 2026-02-27T20:06:49+05:30 Clear stale conntrack UDP entries for nodePorts
 
