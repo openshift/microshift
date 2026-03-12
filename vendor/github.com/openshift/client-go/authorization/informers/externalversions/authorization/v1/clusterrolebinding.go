@@ -40,7 +40,7 @@ func NewClusterRoleBindingInformer(client versioned.Interface, resyncPeriod time
 // one. This reduces memory footprint and number of connections to the server.
 func NewFilteredClusterRoleBindingInformer(client versioned.Interface, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
 	return cache.NewSharedIndexInformer(
-		&cache.ListWatch{
+		cache.ToListWatcherWithWatchListSemantics(&cache.ListWatch{
 			ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
@@ -65,7 +65,7 @@ func NewFilteredClusterRoleBindingInformer(client versioned.Interface, resyncPer
 				}
 				return client.AuthorizationV1().ClusterRoleBindings().Watch(ctx, options)
 			},
-		},
+		}, client),
 		&apiauthorizationv1.ClusterRoleBinding{},
 		resyncPeriod,
 		indexers,
