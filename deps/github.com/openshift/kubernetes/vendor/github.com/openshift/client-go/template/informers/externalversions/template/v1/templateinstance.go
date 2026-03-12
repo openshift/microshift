@@ -41,7 +41,7 @@ func NewTemplateInstanceInformer(client versioned.Interface, namespace string, r
 // one. This reduces memory footprint and number of connections to the server.
 func NewFilteredTemplateInstanceInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
 	return cache.NewSharedIndexInformer(
-		&cache.ListWatch{
+		cache.ToListWatcherWithWatchListSemantics(&cache.ListWatch{
 			ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
@@ -66,7 +66,7 @@ func NewFilteredTemplateInstanceInformer(client versioned.Interface, namespace s
 				}
 				return client.TemplateV1().TemplateInstances(namespace).Watch(ctx, options)
 			},
-		},
+		}, client),
 		&apitemplatev1.TemplateInstance{},
 		resyncPeriod,
 		indexers,

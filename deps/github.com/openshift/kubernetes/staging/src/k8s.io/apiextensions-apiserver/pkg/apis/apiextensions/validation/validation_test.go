@@ -121,9 +121,10 @@ func TestValidateCustomResourceDefinition(t *testing.T) {
 		},
 	}
 	tests := []struct {
-		name     string
-		resource *apiextensions.CustomResourceDefinition
-		errors   []validationMatch
+		name        string
+		resource    *apiextensions.CustomResourceDefinition
+		oldResource *apiextensions.CustomResourceDefinition
+		errors      []validationMatch
 	}{
 		{
 			name: "invalid types disallowed",
@@ -5069,6 +5070,14 @@ func TestValidateFieldPath(t *testing.T) {
 }
 
 func TestValidateCustomResourceDefinitionUpdate(t *testing.T) {
+	singleVersionList := []apiextensions.CustomResourceDefinitionVersion{
+		{
+			Name:    "version",
+			Served:  true,
+			Storage: true,
+		},
+	}
+
 	tests := []struct {
 		name     string
 		old      *apiextensions.CustomResourceDefinition
@@ -7773,6 +7782,350 @@ func TestValidateCustomResourceDefinitionUpdate(t *testing.T) {
 				forbidden("spec", "versions[1]", "schema", "openAPIV3Schema", "properties[f]", "x-kubernetes-validations[0]", "messageExpression"),
 			},
 		},
+		{
+			name: "ratcheting: too many selectableFields are not allowed if existing CRD has different selectableFields",
+			old: &apiextensions.CustomResourceDefinition{
+				ObjectMeta: metav1.ObjectMeta{Name: "plural.group.com"},
+				Spec: apiextensions.CustomResourceDefinitionSpec{
+					Group:   "group.com",
+					Version: "version",
+					Versions: []apiextensions.CustomResourceDefinitionVersion{
+						{Name: "version", Served: true, Storage: true,
+							Schema: &apiextensions.CustomResourceValidation{
+								OpenAPIV3Schema: &apiextensions.JSONSchemaProps{
+									Type: "object",
+									Properties: map[string]apiextensions.JSONSchemaProps{
+										"a1": {Type: "string"}, "a2": {Type: "string"}, "a3": {Type: "string"},
+										"a4": {Type: "string"}, "a5": {Type: "string"}, "a6": {Type: "string"},
+										"a7": {Type: "string"}, "a8": {Type: "string"}, "different": {Type: "string"},
+									},
+									Required: []string{"a1", "a2", "a3", "a4", "a5", "a6", "a7", "a8", "different"},
+								},
+							},
+							SelectableFields: []apiextensions.SelectableField{
+								{JSONPath: ".a1"}, {JSONPath: ".a2"}, {JSONPath: ".a3"},
+								{JSONPath: ".a4"}, {JSONPath: ".a5"}, {JSONPath: ".a6"},
+								{JSONPath: ".a7"}, {JSONPath: ".a8"}, {JSONPath: ".different"},
+							},
+						},
+						{Name: "version2", Served: true, Storage: false,
+							Schema: &apiextensions.CustomResourceValidation{
+								OpenAPIV3Schema: &apiextensions.JSONSchemaProps{
+									Type:       "object",
+									Properties: map[string]apiextensions.JSONSchemaProps{"foo": {Type: "integer"}},
+								},
+							},
+						},
+					},
+					Scope: apiextensions.NamespaceScoped,
+					Names: apiextensions.CustomResourceDefinitionNames{
+						Plural:   "plural",
+						Singular: "singular",
+						Kind:     "Plural",
+						ListKind: "PluralList",
+					},
+					PreserveUnknownFields: ptr.To(false),
+				},
+				Status: apiextensions.CustomResourceDefinitionStatus{
+					StoredVersions: []string{"version"},
+				},
+			},
+			resource: &apiextensions.CustomResourceDefinition{
+				ObjectMeta: metav1.ObjectMeta{Name: "plural.group.com", ResourceVersion: "1"},
+				Spec: apiextensions.CustomResourceDefinitionSpec{
+					Group:   "group.com",
+					Version: "version",
+					Versions: []apiextensions.CustomResourceDefinitionVersion{
+						{Name: "version", Served: true, Storage: true,
+							Schema: &apiextensions.CustomResourceValidation{
+								OpenAPIV3Schema: &apiextensions.JSONSchemaProps{
+									Type: "object",
+									Properties: map[string]apiextensions.JSONSchemaProps{
+										"a1": {Type: "string"}, "a2": {Type: "string"}, "a3": {Type: "string"},
+										"a4": {Type: "string"}, "a5": {Type: "string"}, "a6": {Type: "string"},
+										"a7": {Type: "string"}, "a8": {Type: "string"}, "a9": {Type: "string"},
+									},
+									Required: []string{"a1", "a2", "a3", "a4", "a5", "a6", "a7", "a8", "a9"},
+								},
+							},
+							SelectableFields: []apiextensions.SelectableField{
+								{JSONPath: ".a1"}, {JSONPath: ".a2"}, {JSONPath: ".a3"},
+								{JSONPath: ".a4"}, {JSONPath: ".a5"}, {JSONPath: ".a6"},
+								{JSONPath: ".a7"}, {JSONPath: ".a8"}, {JSONPath: ".a9"},
+							},
+						},
+						{Name: "version2", Served: true, Storage: false,
+							Schema: &apiextensions.CustomResourceValidation{
+								OpenAPIV3Schema: &apiextensions.JSONSchemaProps{
+									Type:       "object",
+									Properties: map[string]apiextensions.JSONSchemaProps{"foo": {Type: "integer"}},
+								},
+							},
+						},
+					},
+					Scope: apiextensions.NamespaceScoped,
+					Names: apiextensions.CustomResourceDefinitionNames{
+						Plural:   "plural",
+						Singular: "singular",
+						Kind:     "Plural",
+						ListKind: "PluralList",
+					},
+					PreserveUnknownFields: ptr.To(false),
+				},
+				Status: apiextensions.CustomResourceDefinitionStatus{
+					StoredVersions: []string{"version"},
+				},
+			},
+			errors: []validationMatch{
+				tooMany("spec", "versions[0]", "selectableFields"),
+			},
+		},
+		{
+			name: "ratcheting: too many selectableFields are allowed if existing CRD has same selectableFields",
+			old: &apiextensions.CustomResourceDefinition{
+				ObjectMeta: metav1.ObjectMeta{Name: "plural.group.com"},
+				Spec: apiextensions.CustomResourceDefinitionSpec{
+					Group:   "group.com",
+					Version: "version",
+					Versions: []apiextensions.CustomResourceDefinitionVersion{
+						{Name: "version", Served: true, Storage: true,
+							Schema: &apiextensions.CustomResourceValidation{
+								OpenAPIV3Schema: &apiextensions.JSONSchemaProps{
+									Type: "object",
+									Properties: map[string]apiextensions.JSONSchemaProps{
+										"a1": {Type: "string"}, "a2": {Type: "string"}, "a3": {Type: "string"},
+										"a4": {Type: "string"}, "a5": {Type: "string"}, "a6": {Type: "string"},
+										"a7": {Type: "string"}, "a8": {Type: "string"}, "a9": {Type: "string"},
+									},
+									Required: []string{"a1", "a2", "a3", "a4", "a5", "a6", "a7", "a8", "a9"},
+								},
+							},
+							SelectableFields: []apiextensions.SelectableField{
+								{JSONPath: ".a1"}, {JSONPath: ".a2"}, {JSONPath: ".a3"},
+								{JSONPath: ".a4"}, {JSONPath: ".a5"}, {JSONPath: ".a6"},
+								{JSONPath: ".a7"}, {JSONPath: ".a8"}, {JSONPath: ".a9"},
+							},
+						},
+						{Name: "version2", Served: true, Storage: false,
+							Schema: &apiextensions.CustomResourceValidation{
+								OpenAPIV3Schema: &apiextensions.JSONSchemaProps{
+									Type:       "object",
+									Properties: map[string]apiextensions.JSONSchemaProps{"foo": {Type: "integer"}},
+								},
+							},
+						},
+					},
+					Scope: apiextensions.NamespaceScoped,
+					Names: apiextensions.CustomResourceDefinitionNames{
+						Plural:   "plural",
+						Singular: "singular",
+						Kind:     "Plural",
+						ListKind: "PluralList",
+					},
+					PreserveUnknownFields: ptr.To(false),
+				},
+				Status: apiextensions.CustomResourceDefinitionStatus{
+					StoredVersions: []string{"version"},
+				},
+			},
+			resource: &apiextensions.CustomResourceDefinition{
+				ObjectMeta: metav1.ObjectMeta{Name: "plural.group.com", ResourceVersion: "1"},
+				Spec: apiextensions.CustomResourceDefinitionSpec{
+					Group:   "group.com",
+					Version: "version",
+					Versions: []apiextensions.CustomResourceDefinitionVersion{
+						{Name: "version", Served: true, Storage: true,
+							Schema: &apiextensions.CustomResourceValidation{
+								OpenAPIV3Schema: &apiextensions.JSONSchemaProps{
+									Type: "object",
+									Properties: map[string]apiextensions.JSONSchemaProps{
+										"a1": {Type: "string"}, "a2": {Type: "string"}, "a3": {Type: "string"},
+										"a4": {Type: "string"}, "a5": {Type: "string"}, "a6": {Type: "string"},
+										"a7": {Type: "string"}, "a8": {Type: "string"}, "a9": {Type: "string"},
+									},
+									Required: []string{"a1", "a2", "a3", "a4", "a5", "a6", "a7", "a8", "a9"},
+								},
+							},
+							SelectableFields: []apiextensions.SelectableField{
+								{JSONPath: ".a1"}, {JSONPath: ".a2"}, {JSONPath: ".a3"},
+								{JSONPath: ".a4"}, {JSONPath: ".a5"}, {JSONPath: ".a6"},
+								{JSONPath: ".a7"}, {JSONPath: ".a8"}, {JSONPath: ".a9"},
+							},
+						},
+						{Name: "version2", Served: true, Storage: false,
+							Schema: &apiextensions.CustomResourceValidation{
+								OpenAPIV3Schema: &apiextensions.JSONSchemaProps{
+									Type:       "object",
+									Properties: map[string]apiextensions.JSONSchemaProps{"foo": {Type: "integer"}},
+								},
+							},
+						},
+					},
+					Scope: apiextensions.NamespaceScoped,
+					Names: apiextensions.CustomResourceDefinitionNames{
+						Plural:   "plural",
+						Singular: "singular",
+						Kind:     "Plural",
+						ListKind: "PluralList",
+					},
+					PreserveUnknownFields: ptr.To(false),
+				},
+				Status: apiextensions.CustomResourceDefinitionStatus{
+					StoredVersions: []string{"version"},
+				},
+			},
+			errors: []validationMatch{},
+		},
+		{
+			name: "ratcheting: top level schema: too many selectableFields are not allowed if existing CRD has different selectableFields",
+			old: &apiextensions.CustomResourceDefinition{
+				ObjectMeta: metav1.ObjectMeta{Name: "plural.group.com"},
+				Spec: apiextensions.CustomResourceDefinitionSpec{
+					Group:    "group.com",
+					Version:  "version",
+					Versions: singleVersionList,
+					Validation: &apiextensions.CustomResourceValidation{
+						OpenAPIV3Schema: &apiextensions.JSONSchemaProps{
+							Type: "object",
+							Properties: map[string]apiextensions.JSONSchemaProps{
+								"a1": {Type: "string"}, "a2": {Type: "string"}, "a3": {Type: "string"},
+								"a4": {Type: "string"}, "a5": {Type: "string"}, "a6": {Type: "string"},
+								"a7": {Type: "string"}, "a8": {Type: "string"}, "different": {Type: "string"},
+							},
+							Required: []string{"a1", "a2", "a3", "a4", "a5", "a6", "a7", "a8", "different"},
+						},
+					},
+					SelectableFields: []apiextensions.SelectableField{
+						{JSONPath: ".a1"}, {JSONPath: ".a2"}, {JSONPath: ".a3"},
+						{JSONPath: ".a4"}, {JSONPath: ".a5"}, {JSONPath: ".a6"},
+						{JSONPath: ".a7"}, {JSONPath: ".a8"}, {JSONPath: ".different"},
+					},
+					Scope: apiextensions.NamespaceScoped,
+					Names: apiextensions.CustomResourceDefinitionNames{
+						Plural:   "plural",
+						Singular: "singular",
+						Kind:     "Plural",
+						ListKind: "PluralList",
+					},
+					PreserveUnknownFields: ptr.To(false),
+				},
+				Status: apiextensions.CustomResourceDefinitionStatus{
+					StoredVersions: []string{"version"},
+				},
+			},
+			resource: &apiextensions.CustomResourceDefinition{
+				ObjectMeta: metav1.ObjectMeta{Name: "plural.group.com", ResourceVersion: "1"},
+				Spec: apiextensions.CustomResourceDefinitionSpec{
+					Group:    "group.com",
+					Version:  "version",
+					Versions: singleVersionList,
+					Validation: &apiextensions.CustomResourceValidation{
+						OpenAPIV3Schema: &apiextensions.JSONSchemaProps{
+							Type: "object",
+							Properties: map[string]apiextensions.JSONSchemaProps{
+								"a1": {Type: "string"}, "a2": {Type: "string"}, "a3": {Type: "string"},
+								"a4": {Type: "string"}, "a5": {Type: "string"}, "a6": {Type: "string"},
+								"a7": {Type: "string"}, "a8": {Type: "string"}, "a9": {Type: "string"},
+							},
+							Required: []string{"a1", "a2", "a3", "a4", "a5", "a6", "a7", "a8", "a9"},
+						},
+					},
+					SelectableFields: []apiextensions.SelectableField{
+						{JSONPath: ".a1"}, {JSONPath: ".a2"}, {JSONPath: ".a3"},
+						{JSONPath: ".a4"}, {JSONPath: ".a5"}, {JSONPath: ".a6"},
+						{JSONPath: ".a7"}, {JSONPath: ".a8"}, {JSONPath: ".a9"},
+					},
+					Scope: apiextensions.NamespaceScoped,
+					Names: apiextensions.CustomResourceDefinitionNames{
+						Plural:   "plural",
+						Singular: "singular",
+						Kind:     "Plural",
+						ListKind: "PluralList",
+					},
+					PreserveUnknownFields: ptr.To(false),
+				},
+				Status: apiextensions.CustomResourceDefinitionStatus{
+					StoredVersions: []string{"version"},
+				},
+			},
+			errors: []validationMatch{
+				tooMany("spec", "selectableFields"),
+			},
+		},
+		{
+			name: "ratcheting: top level schema: too many selectableFields are allowed if existing CRD has same selectableFields",
+			old: &apiextensions.CustomResourceDefinition{
+				ObjectMeta: metav1.ObjectMeta{Name: "plural.group.com"},
+				Spec: apiextensions.CustomResourceDefinitionSpec{
+					Group:    "group.com",
+					Version:  "version",
+					Versions: singleVersionList,
+					Validation: &apiextensions.CustomResourceValidation{
+						OpenAPIV3Schema: &apiextensions.JSONSchemaProps{
+							Type: "object",
+							Properties: map[string]apiextensions.JSONSchemaProps{
+								"a1": {Type: "string"}, "a2": {Type: "string"}, "a3": {Type: "string"},
+								"a4": {Type: "string"}, "a5": {Type: "string"}, "a6": {Type: "string"},
+								"a7": {Type: "string"}, "a8": {Type: "string"}, "a9": {Type: "string"},
+							},
+							Required: []string{"a1", "a2", "a3", "a4", "a5", "a6", "a7", "a8", "a9"},
+						},
+					},
+					SelectableFields: []apiextensions.SelectableField{
+						{JSONPath: ".a1"}, {JSONPath: ".a2"}, {JSONPath: ".a3"},
+						{JSONPath: ".a4"}, {JSONPath: ".a5"}, {JSONPath: ".a6"},
+						{JSONPath: ".a7"}, {JSONPath: ".a8"}, {JSONPath: ".a9"},
+					},
+					Scope: apiextensions.NamespaceScoped,
+					Names: apiextensions.CustomResourceDefinitionNames{
+						Plural:   "plural",
+						Singular: "singular",
+						Kind:     "Plural",
+						ListKind: "PluralList",
+					},
+					PreserveUnknownFields: ptr.To(false),
+				},
+				Status: apiextensions.CustomResourceDefinitionStatus{
+					StoredVersions: []string{"version"},
+				},
+			},
+			resource: &apiextensions.CustomResourceDefinition{
+				ObjectMeta: metav1.ObjectMeta{Name: "plural.group.com", ResourceVersion: "1"},
+				Spec: apiextensions.CustomResourceDefinitionSpec{
+					Group:    "group.com",
+					Version:  "version",
+					Versions: singleVersionList,
+					Validation: &apiextensions.CustomResourceValidation{
+						OpenAPIV3Schema: &apiextensions.JSONSchemaProps{
+							Type: "object",
+							Properties: map[string]apiextensions.JSONSchemaProps{
+								"a1": {Type: "string"}, "a2": {Type: "string"}, "a3": {Type: "string"},
+								"a4": {Type: "string"}, "a5": {Type: "string"}, "a6": {Type: "string"},
+								"a7": {Type: "string"}, "a8": {Type: "string"}, "a9": {Type: "string"},
+							},
+							Required: []string{"a1", "a2", "a3", "a4", "a5", "a6", "a7", "a8", "a9"},
+						},
+					},
+					SelectableFields: []apiextensions.SelectableField{
+						{JSONPath: ".a1"}, {JSONPath: ".a2"}, {JSONPath: ".a3"},
+						{JSONPath: ".a4"}, {JSONPath: ".a5"}, {JSONPath: ".a6"},
+						{JSONPath: ".a7"}, {JSONPath: ".a8"}, {JSONPath: ".a9"},
+					},
+					Scope: apiextensions.NamespaceScoped,
+					Names: apiextensions.CustomResourceDefinitionNames{
+						Plural:   "plural",
+						Singular: "singular",
+						Kind:     "Plural",
+						ListKind: "PluralList",
+					},
+					PreserveUnknownFields: ptr.To(false),
+				},
+				Status: apiextensions.CustomResourceDefinitionStatus{
+					StoredVersions: []string{"version"},
+				},
+			},
+			errors: []validationMatch{},
+		},
 	}
 
 	for _, tc := range tests {
@@ -7859,7 +8212,7 @@ func TestValidateCustomResourceDefinitionValidationRuleCompatibility(t *testing.
 	}
 
 	// Include the test library, which includes the test() function in the storage environment during test
-	base := environment.MustBaseEnvSet(version.MajorMinor(1, 998), true)
+	base := environment.MustBaseEnvSet(version.MajorMinor(1, 998))
 	envSet, err := base.Extend(environment.VersionedOptions{
 		IntroducedVersion: version.MajorMinor(1, 999),
 		EnvOptions:        []cel.EnvOption{library.Test()},
@@ -9213,7 +9566,7 @@ func TestValidateCustomResourceDefinitionValidation(t *testing.T) {
 			},
 			opts: validationOptions{
 				requireStructuralSchema: true,
-				celEnvironmentSet:       environment.MustBaseEnvSet(version.MajorMinor(1, 30), true),
+				celEnvironmentSet:       environment.MustBaseEnvSet(version.MajorMinor(1, 30)),
 			},
 			expectedErrors: []validationMatch{
 				invalid("spec.validation.openAPIV3Schema.x-kubernetes-validations[2].rule"),
@@ -9397,7 +9750,7 @@ func TestValidateCustomResourceDefinitionValidation(t *testing.T) {
 			},
 			opts: validationOptions{
 				requireStructuralSchema: true,
-				celEnvironmentSet:       environment.MustBaseEnvSet(version.MajorMinor(1, 31), true),
+				celEnvironmentSet:       environment.MustBaseEnvSet(version.MajorMinor(1, 31)),
 			},
 			expectedErrors: []validationMatch{
 				invalid("spec.validation.openAPIV3Schema.x-kubernetes-validations[21].rule"),
@@ -10947,7 +11300,7 @@ func TestValidateCustomResourceDefinitionValidation(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			ctx := context.TODO()
 			if tt.opts.celEnvironmentSet == nil {
-				tt.opts.celEnvironmentSet = environment.MustBaseEnvSet(environment.DefaultCompatibilityVersion(), true)
+				tt.opts.celEnvironmentSet = environment.MustBaseEnvSet(environment.DefaultCompatibilityVersion())
 			}
 			got := validateCustomResourceDefinitionValidation(ctx, &tt.input, tt.statusEnabled, tt.opts, field.NewPath("spec", "validation"))
 
@@ -11470,7 +11823,7 @@ func TestCelContext(t *testing.T) {
 			celContext := RootCELContext(tt.schema)
 			celContext.converter = converter
 			opts := validationOptions{
-				celEnvironmentSet: environment.MustBaseEnvSet(environment.DefaultCompatibilityVersion(), true),
+				celEnvironmentSet: environment.MustBaseEnvSet(environment.DefaultCompatibilityVersion()),
 			}
 			openAPIV3Schema := &specStandardValidatorV3{
 				allowDefaults:            opts.allowDefaults,

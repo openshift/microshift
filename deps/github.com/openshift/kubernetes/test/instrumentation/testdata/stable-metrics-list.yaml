@@ -183,6 +183,21 @@
   help: The count of hidden metrics.
   type: Counter
   stabilityLevel: BETA
+- name: image_volume_mounted_errors_total
+  subsystem: kubelet
+  help: Number of failed image volume mounts.
+  type: Counter
+  stabilityLevel: BETA
+- name: image_volume_mounted_succeed_total
+  subsystem: kubelet
+  help: Number of successful image volume mounts.
+  type: Counter
+  stabilityLevel: BETA
+- name: image_volume_requested_total
+  subsystem: kubelet
+  help: Number of requested image volumes.
+  type: Counter
+  stabilityLevel: BETA
 - name: feature_enabled
   namespace: kubernetes
   help: This metric records the data about the stage and enablement of a k8s feature.
@@ -416,6 +431,7 @@
     stored objects at the time of last check split by kind. In case of a fetching
     error, the value will be -1.'
   type: Gauge
+  deprecatedVersion: 1.34.0
   stabilityLevel: STABLE
   labels:
   - resource

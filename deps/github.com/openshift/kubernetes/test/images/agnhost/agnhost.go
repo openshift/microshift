@@ -28,12 +28,15 @@ import (
 	"k8s.io/kubernetes/test/images/agnhost/dns"
 	"k8s.io/kubernetes/test/images/agnhost/entrypoint-tester"
 	"k8s.io/kubernetes/test/images/agnhost/fakegitserver"
+	"k8s.io/kubernetes/test/images/agnhost/fakeregistryserver"
 	grpchealthchecking "k8s.io/kubernetes/test/images/agnhost/grpc-health-checking"
 	"k8s.io/kubernetes/test/images/agnhost/guestbook"
 	"k8s.io/kubernetes/test/images/agnhost/inclusterclient"
 	"k8s.io/kubernetes/test/images/agnhost/liveness"
 	logsgen "k8s.io/kubernetes/test/images/agnhost/logs-generator"
 	"k8s.io/kubernetes/test/images/agnhost/mounttest"
+	"k8s.io/kubernetes/test/images/agnhost/mtlsclient"
+	"k8s.io/kubernetes/test/images/agnhost/mtlsserver"
 	"k8s.io/kubernetes/test/images/agnhost/net"
 	"k8s.io/kubernetes/test/images/agnhost/netexec"
 	"k8s.io/kubernetes/test/images/agnhost/nettest"
@@ -68,6 +71,7 @@ func main() {
 	rootCmd.AddCommand(dns.CmdEtcHosts)
 	rootCmd.AddCommand(entrypoint.CmdEntrypointTester)
 	rootCmd.AddCommand(fakegitserver.CmdFakeGitServer)
+	rootCmd.AddCommand(fakeregistryserver.CmdFakeRegistryServer)
 	rootCmd.AddCommand(guestbook.CmdGuestbook)
 	rootCmd.AddCommand(inclusterclient.CmdInClusterClient)
 	rootCmd.AddCommand(liveness.CmdLiveness)
@@ -90,7 +94,8 @@ func main() {
 	rootCmd.AddCommand(grpchealthchecking.CmdGrpcHealthChecking)
 	rootCmd.AddCommand(vishhstress.CmdStress)
 	rootCmd.AddCommand(podcertificatesigner.CmdPodCertificateSigner)
-
+	rootCmd.AddCommand(mtlsclient.CmdMtlsClient)
+	rootCmd.AddCommand(mtlsserver.CmdMtlsServer)
 	// NOTE(claudiub): Some tests are passing logging related flags, so we need to be able to
 	// accept them. This will also include them in the printed help.
 	code := cli.Run(rootCmd)

@@ -14,6 +14,7 @@ import (
 
 	"github.com/openshift-eng/openshift-tests-extension/pkg/cmd"
 	e "github.com/openshift-eng/openshift-tests-extension/pkg/extension"
+	ext "github.com/openshift-eng/openshift-tests-extension/pkg/extension/extensiontests"
 	g "github.com/openshift-eng/openshift-tests-extension/pkg/ginkgo"
 	v "github.com/openshift-eng/openshift-tests-extension/pkg/version"
 
@@ -88,8 +89,8 @@ func main() {
 	hpaTestTimeout := time.Minute * 30
 	kubeTestsExtension.AddSuite(e.Suite{
 		Name:        "kubernetes/autoscaling/hpa",
-		Qualifiers:  []string{"name.contains('[Feature:HPA]')"}, // Note that this does not use withExcludedTestsFilter to be able to run DedicatedJob labelled tests.
-		Parallelism: 3,                                          // HPA tests have high CPU + memory usage, so we cannot have a high level of parallelism here.
+		Qualifiers:  []string{"name.contains('[Feature:HPA]') || name.contains('[Feature:HPAConfigurableTolerance]')"}, // Note that this does not use withExcludedTestsFilter to be able to run DedicatedJob labelled tests.
+		Parallelism: 3,                                                                                                 // HPA tests have high CPU + memory usage, so we cannot have a high level of parallelism here.
 		TestTimeout: &hpaTestTimeout,
 	})
 
@@ -99,10 +100,10 @@ func main() {
 		kubeTestsExtension.RegisterImage(image)
 	}
 
-	//FIXME(stbenjam): what other suites does k8s-test contribute to?
+	// FIXME(stbenjam): what other suites does k8s-test contribute to?
 
 	// Build our specs from ginkgo
-	specs, err := g.BuildExtensionTestSpecsFromOpenShiftGinkgoSuite()
+	specs, err := g.BuildExtensionTestSpecsFromOpenShiftGinkgoSuite(ext.AllTestsIncludingVendored())
 	if err != nil {
 		panic(err)
 	}

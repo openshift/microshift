@@ -401,8 +401,10 @@ func TestPreemptionStarvation(t *testing.T) {
 		for _, clearingNominatedNodeNameAfterBinding := range []bool{true, false} {
 			for _, test := range tests {
 				t.Run(fmt.Sprintf("%s (Async preemption enabled: %v, ClearingNominatedNodeNameAfterBinding: %v)", test.name, asyncPreemptionEnabled, clearingNominatedNodeNameAfterBinding), func(t *testing.T) {
-					featuregatetesting.SetFeatureGateDuringTest(t, utilfeature.DefaultFeatureGate, features.SchedulerAsyncPreemption, asyncPreemptionEnabled)
-					featuregatetesting.SetFeatureGateDuringTest(t, utilfeature.DefaultFeatureGate, features.ClearingNominatedNodeNameAfterBinding, clearingNominatedNodeNameAfterBinding)
+					featuregatetesting.SetFeatureGatesDuringTest(t, utilfeature.DefaultFeatureGate, featuregatetesting.FeatureOverrides{
+						features.SchedulerAsyncPreemption:              asyncPreemptionEnabled,
+						features.ClearingNominatedNodeNameAfterBinding: clearingNominatedNodeNameAfterBinding,
+					})
 
 					pendingPods := make([]*v1.Pod, test.numExpectedPending)
 					numRunningPods := test.numExistingPod - test.numExpectedPending
@@ -513,8 +515,10 @@ func TestPreemptionRaces(t *testing.T) {
 		for _, clearingNominatedNodeNameAfterBinding := range []bool{true, false} {
 			for _, test := range tests {
 				t.Run(fmt.Sprintf("%s (Async preemption enabled: %v, ClearingNominatedNodeNameAfterBinding: %v)", test.name, asyncPreemptionEnabled, clearingNominatedNodeNameAfterBinding), func(t *testing.T) {
-					featuregatetesting.SetFeatureGateDuringTest(t, utilfeature.DefaultFeatureGate, features.SchedulerAsyncPreemption, asyncPreemptionEnabled)
-					featuregatetesting.SetFeatureGateDuringTest(t, utilfeature.DefaultFeatureGate, features.ClearingNominatedNodeNameAfterBinding, clearingNominatedNodeNameAfterBinding)
+					featuregatetesting.SetFeatureGatesDuringTest(t, utilfeature.DefaultFeatureGate, featuregatetesting.FeatureOverrides{
+						features.SchedulerAsyncPreemption:              asyncPreemptionEnabled,
+						features.ClearingNominatedNodeNameAfterBinding: clearingNominatedNodeNameAfterBinding,
+					})
 
 					if test.numRepetitions <= 0 {
 						test.numRepetitions = 1
@@ -799,8 +803,10 @@ func TestPDBInPreemption(t *testing.T) {
 		for _, clearingNominatedNodeNameAfterBinding := range []bool{true, false} {
 			for _, test := range tests {
 				t.Run(fmt.Sprintf("%s (Async preemption enabled: %v, ClearingNominatedNodeNameAfterBinding: %v)", test.name, asyncPreemptionEnabled, clearingNominatedNodeNameAfterBinding), func(t *testing.T) {
-					featuregatetesting.SetFeatureGateDuringTest(t, utilfeature.DefaultFeatureGate, features.SchedulerAsyncPreemption, asyncPreemptionEnabled)
-					featuregatetesting.SetFeatureGateDuringTest(t, utilfeature.DefaultFeatureGate, features.ClearingNominatedNodeNameAfterBinding, clearingNominatedNodeNameAfterBinding)
+					featuregatetesting.SetFeatureGatesDuringTest(t, utilfeature.DefaultFeatureGate, featuregatetesting.FeatureOverrides{
+						features.SchedulerAsyncPreemption:              asyncPreemptionEnabled,
+						features.ClearingNominatedNodeNameAfterBinding: clearingNominatedNodeNameAfterBinding,
+					})
 
 					for i := 1; i <= test.nodeCnt; i++ {
 						nodeName := fmt.Sprintf("node-%v", i)
@@ -957,11 +963,11 @@ func TestReadWriteOncePodPreemption(t *testing.T) {
 			init: func() error {
 				_, err := testutils.CreatePV(cs, pv1)
 				if err != nil {
-					return fmt.Errorf("cannot create pv: %w", err)
+					return fmt.Errorf("cannot create pv: %v", err)
 				}
 				_, err = testutils.CreatePVC(cs, pvc1)
 				if err != nil {
-					return fmt.Errorf("cannot create pvc: %w", err)
+					return fmt.Errorf("cannot create pvc: %v", err)
 				}
 				return nil
 			},
@@ -996,10 +1002,10 @@ func TestReadWriteOncePodPreemption(t *testing.T) {
 			preemptedPodIndexes: map[int]struct{}{0: {}},
 			cleanup: func() error {
 				if err := testutils.DeletePVC(cs, pvc1.Name, pvc1.Namespace); err != nil {
-					return fmt.Errorf("cannot delete pvc: %w", err)
+					return fmt.Errorf("cannot delete pvc: %v", err)
 				}
 				if err := testutils.DeletePV(cs, pv1.Name); err != nil {
-					return fmt.Errorf("cannot delete pv: %w", err)
+					return fmt.Errorf("cannot delete pv: %v", err)
 				}
 				return nil
 			},
@@ -1010,13 +1016,13 @@ func TestReadWriteOncePodPreemption(t *testing.T) {
 				for _, pv := range []*v1.PersistentVolume{pv1, pv2} {
 					_, err := testutils.CreatePV(cs, pv)
 					if err != nil {
-						return fmt.Errorf("cannot create pv: %w", err)
+						return fmt.Errorf("cannot create pv: %v", err)
 					}
 				}
 				for _, pvc := range []*v1.PersistentVolumeClaim{pvc1, pvc2} {
 					_, err := testutils.CreatePVC(cs, pvc)
 					if err != nil {
-						return fmt.Errorf("cannot create pvc: %w", err)
+						return fmt.Errorf("cannot create pvc: %v", err)
 					}
 				}
 				return nil
@@ -1076,12 +1082,12 @@ func TestReadWriteOncePodPreemption(t *testing.T) {
 			cleanup: func() error {
 				for _, pvc := range []*v1.PersistentVolumeClaim{pvc1, pvc2} {
 					if err := testutils.DeletePVC(cs, pvc.Name, pvc.Namespace); err != nil {
-						return fmt.Errorf("cannot delete pvc: %w", err)
+						return fmt.Errorf("cannot delete pvc: %v", err)
 					}
 				}
 				for _, pv := range []*v1.PersistentVolume{pv1, pv2} {
 					if err := testutils.DeletePV(cs, pv.Name); err != nil {
-						return fmt.Errorf("cannot delete pv: %w", err)
+						return fmt.Errorf("cannot delete pv: %v", err)
 					}
 				}
 				return nil
@@ -1093,13 +1099,13 @@ func TestReadWriteOncePodPreemption(t *testing.T) {
 				for _, pv := range []*v1.PersistentVolume{pv1, pv2} {
 					_, err := testutils.CreatePV(cs, pv)
 					if err != nil {
-						return fmt.Errorf("cannot create pv: %w", err)
+						return fmt.Errorf("cannot create pv: %v", err)
 					}
 				}
 				for _, pvc := range []*v1.PersistentVolumeClaim{pvc1, pvc2} {
 					_, err := testutils.CreatePVC(cs, pvc)
 					if err != nil {
-						return fmt.Errorf("cannot create pvc: %w", err)
+						return fmt.Errorf("cannot create pvc: %v", err)
 					}
 				}
 				return nil
@@ -1156,12 +1162,12 @@ func TestReadWriteOncePodPreemption(t *testing.T) {
 			cleanup: func() error {
 				for _, pvc := range []*v1.PersistentVolumeClaim{pvc1, pvc2} {
 					if err := testutils.DeletePVC(cs, pvc.Name, pvc.Namespace); err != nil {
-						return fmt.Errorf("cannot delete pvc: %w", err)
+						return fmt.Errorf("cannot delete pvc: %v", err)
 					}
 				}
 				for _, pv := range []*v1.PersistentVolume{pv1, pv2} {
 					if err := testutils.DeletePV(cs, pv.Name); err != nil {
-						return fmt.Errorf("cannot delete pv: %w", err)
+						return fmt.Errorf("cannot delete pv: %v", err)
 					}
 				}
 				return nil
@@ -1184,8 +1190,10 @@ func TestReadWriteOncePodPreemption(t *testing.T) {
 		for _, clearingNominatedNodeNameAfterBinding := range []bool{true, false} {
 			for _, test := range tests {
 				t.Run(fmt.Sprintf("%s (Async preemption enabled: %v, ClearingNominatedNodeNameAfterBinding: %v)", test.name, asyncPreemptionEnabled, clearingNominatedNodeNameAfterBinding), func(t *testing.T) {
-					featuregatetesting.SetFeatureGateDuringTest(t, utilfeature.DefaultFeatureGate, features.SchedulerAsyncPreemption, asyncPreemptionEnabled)
-					featuregatetesting.SetFeatureGateDuringTest(t, utilfeature.DefaultFeatureGate, features.ClearingNominatedNodeNameAfterBinding, clearingNominatedNodeNameAfterBinding)
+					featuregatetesting.SetFeatureGatesDuringTest(t, utilfeature.DefaultFeatureGate, featuregatetesting.FeatureOverrides{
+						features.SchedulerAsyncPreemption:              asyncPreemptionEnabled,
+						features.ClearingNominatedNodeNameAfterBinding: clearingNominatedNodeNameAfterBinding,
+					})
 
 					if err := test.init(); err != nil {
 						t.Fatalf("Error while initializing test: %v", err)

@@ -42,6 +42,7 @@ import (
 	storagetesting "k8s.io/apiserver/pkg/storage/testing"
 	"k8s.io/apiserver/pkg/storage/value/encrypt/identity"
 	utilfeature "k8s.io/apiserver/pkg/util/feature"
+	clientfeatures "k8s.io/client-go/features"
 	"k8s.io/client-go/tools/cache"
 	featuregatetesting "k8s.io/component-base/featuregate/testing"
 	"k8s.io/klog/v2"
@@ -199,14 +200,14 @@ func TestLists(t *testing.T) {
 					t.Parallel()
 					ctx, cacher, server, terminate := testSetupWithEtcdServer(t)
 					t.Cleanup(terminate)
-					storagetesting.RunTestConsistentList(ctx, t, cacher, increaseRV(server.V3Client.Client), true, consistentRead, listFromCacheSnapshot)
+					storagetesting.RunTestConsistentList(ctx, t, cacher, increaseRVFunc(server.V3Client.Client), true, consistentRead, listFromCacheSnapshot)
 				})
 
 				t.Run("GetListNonRecursive", func(t *testing.T) {
 					t.Parallel()
 					ctx, cacher, server, terminate := testSetupWithEtcdServer(t)
 					t.Cleanup(terminate)
-					storagetesting.RunTestGetListNonRecursive(ctx, t, increaseRV(server.V3Client.Client), cacher)
+					storagetesting.RunTestGetListNonRecursive(ctx, t, increaseRVFunc(server.V3Client.Client), cacher)
 				})
 			})
 		}
@@ -218,7 +219,7 @@ func TestCompactRevision(t *testing.T) {
 	featuregatetesting.SetFeatureGateDuringTest(t, utilfeature.DefaultFeatureGate, features.ListFromCacheSnapshot, true)
 	ctx, cacher, server, terminate := testSetupWithEtcdServer(t)
 	t.Cleanup(terminate)
-	storagetesting.RunTestCompactRevision(ctx, t, cacher, increaseRV(server.V3Client.Client), compactStore(cacher, server.V3Client.Client))
+	storagetesting.RunTestCompactRevision(ctx, t, cacher, increaseRVFunc(server.V3Client.Client), compactStore(cacher, server.V3Client.Client))
 }
 
 func TestMarkConsistent(t *testing.T) {
@@ -303,7 +304,7 @@ func etcdListRequests(t *testing.T, ctx context.Context, store storage.Interface
 	key := rand.String(10)
 	listCtx := context.WithValue(ctx, storagetesting.RecorderContextKey, key)
 	listOut := &example.PodList{}
-	if err := store.GetList(listCtx, "/pods", opts, listOut); err != nil {
+	if err := store.GetList(listCtx, "/pods/", opts, listOut); err != nil {
 		t.Fatalf("Unexpected error: %v", err)
 	}
 	return recorder.ListRequestForKey(key)
@@ -390,6 +391,11 @@ func TestStats(t *testing.T) {
 			storagetesting.RunTestStats(ctx, t, cacher, codecs.LegacyCodec(examplev1.SchemeGroupVersion), identity.NewEncryptCheckTransformer(), sizeBasedListCostEstimate)
 		})
 	}
+}
+func TestKeySchema(t *testing.T) {
+	ctx, cacher, terminate := testSetup(t)
+	t.Cleanup(terminate)
+	storagetesting.RunTestKeySchema(ctx, t, cacher)
 }
 
 func TestWatch(t *testing.T) {
@@ -513,7 +519,7 @@ type setupOptions struct {
 type setupOption func(*setupOptions)
 
 func withDefaults(options *setupOptions) {
-	prefix := "/pods"
+	prefix := "/pods/"
 
 	options.resourcePrefix = prefix
 	options.keyFunc = func(obj runtime.Object) (string, error) { return storage.NamespaceKeyFunc(prefix, obj) }
@@ -563,9 +569,15 @@ func testSetupWithEtcdServer(t testing.TB, opts ...setupOption) (context.Context
 
 	server, etcdStorage := newEtcdTestStorage(t, etcd3testing.PathPrefix())
 	// Inject one list error to make sure we test the relist case.
+	listErrors := 1
+	if clientfeatures.FeatureGates().Enabled(clientfeatures.WatchListClient) {
+		// The WatchListClient feature changes the reflector to use WATCH
+		// instead of LIST, therefore we don't expect any errors
+		listErrors = 0
+	}
 	wrappedStorage := &storagetesting.StorageInjectingListErrors{
 		Interface: etcdStorage,
-		Errors:    1,
+		Errors:    listErrors,
 	}
 
 	config := Config{

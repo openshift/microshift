@@ -110,7 +110,7 @@ func createHandlerWithConfig(kubeClient kubernetes.Interface, informerFactory in
 	if config == nil {
 		config = &resourcequotaapi.Configuration{}
 	}
-	quotaConfiguration := install.NewQuotaConfigurationForAdmission()
+	quotaConfiguration := install.NewQuotaConfigurationForAdmission(nil)
 
 	handler, err := resourcequota.NewResourceQuota(config, 5)
 	if err != nil {
@@ -118,7 +118,7 @@ func createHandlerWithConfig(kubeClient kubernetes.Interface, informerFactory in
 	}
 
 	initializers := admission.PluginInitializers{
-		genericadmissioninitializer.New(kubeClient, nil, informerFactory, nil, nil, stopCh, nil),
+		genericadmissioninitializer.New(kubeClient, nil, informerFactory, nil, nil, nil, stopCh, nil),
 		controlplaneadmission.NewPluginInitializer(quotaConfiguration, nil),
 	}
 	initializers.Initialize(handler)

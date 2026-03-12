@@ -20,6 +20,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"sync"
 	"time"
 
 	v1 "k8s.io/api/core/v1"
@@ -356,23 +357,30 @@ func (c *Controller) enqueueAllPodsForCSIDriver(csiDriverName string) {
 
 func (c *Controller) Run(ctx context.Context, workers int) {
 	defer utilruntime.HandleCrash()
-	defer c.queue.ShutDown()
+
 	logger := klog.FromContext(ctx)
 	logger.Info("Starting SELinux warning controller")
-	defer logger.Info("Shutting down SELinux warning controller")
+
+	var wg sync.WaitGroup
+	defer func() {
+		logger.Info("Shutting down SELinux warning controller")
+		c.queue.ShutDown()
+		wg.Wait()
+	}()
 
 	c.eventBroadcaster.StartStructuredLogging(3) // verbosity level 3 is used by the other KCM controllers
 	c.eventBroadcaster.StartRecordingToSink(&v1core.EventSinkImpl{Interface: c.kubeClient.CoreV1().Events("")})
 	defer c.eventBroadcaster.Shutdown()
 
-	if !cache.WaitForNamedCacheSync("selinux_warning", ctx.Done(), c.podsSynced, c.pvcsSynced, c.pvsSynced, c.csiDriversSynced) {
+	if !cache.WaitForNamedCacheSyncWithContext(ctx, c.podsSynced, c.pvcsSynced, c.pvsSynced, c.csiDriversSynced) {
 		return
 	}
 
 	for i := 0; i < workers; i++ {
-		go wait.UntilWithContext(ctx, c.runWorker, time.Second)
+		wg.Go(func() {
+			wait.UntilWithContext(ctx, c.runWorker, time.Second)
+		})
 	}
-
 	<-ctx.Done()
 }
 

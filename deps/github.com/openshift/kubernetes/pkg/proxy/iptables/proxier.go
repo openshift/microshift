@@ -404,7 +404,7 @@ var iptablesCleanupOnlyChains = []iptablesJumpChain{}
 // CleanupLeftovers removes all iptables rules and chains created by the Proxier
 // It returns true if an error was encountered. Errors are logged.
 func CleanupLeftovers(ctx context.Context) (encounteredError bool) {
-	ipts, _ := utiliptables.NewDualStack()
+	ipts := utiliptables.NewBestEffort()
 	for _, ipt := range ipts {
 		encounteredError = cleanupLeftoversForFamily(ctx, ipt) || encounteredError
 	}
@@ -936,21 +936,6 @@ func (proxier *Proxier) syncProxyRules() (retryError error) {
 		// if the service has any usable endpoints on any node, not just this one.
 		allEndpoints := proxier.endpointsMap[svcName]
 		clusterEndpoints, localEndpoints, allLocallyReachableEndpoints, hasEndpoints := proxy.CategorizeEndpoints(allEndpoints, svcInfo, proxier.nodeName, proxier.topologyLabels)
-
-		// Prefer local endpoint for the DNS service.
-		// Fixes <https://bugzilla.redhat.com/show_bug.cgi?id=1919737>.
-		// TODO: Delete this once node-level topology is
-		// implemented and the DNS operator is updated to use it.
-		if svcPortNameString == "openshift-dns/dns-default:dns" || svcPortNameString == "openshift-dns/dns-default:dns-tcp" {
-			for _, ep := range clusterEndpoints {
-				if ep.IsLocal() {
-					klog.V(4).Infof("Found a local endpoint %q for service %q; preferring the local endpoint and ignoring %d other endpoints", ep.String(), svcPortNameString, len(clusterEndpoints)-1)
-					clusterEndpoints = []proxy.Endpoint{ep}
-					allLocallyReachableEndpoints = clusterEndpoints
-					break
-				}
-			}
-		}
 
 		// clusterPolicyChain contains the endpoints used with "Cluster" traffic policy
 		clusterPolicyChain := svcInfo.clusterPolicyChainName
