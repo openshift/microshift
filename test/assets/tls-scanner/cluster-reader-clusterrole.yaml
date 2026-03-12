@@ -1,0 +1,41 @@
+# ClusterRole equivalent to OpenShift's cluster-reader for MicroShift.
+# MicroShift does not ship this role; tls-scanner deploy.sh expects it.
+# Read-only (get, list, watch) on core and common resources.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: cluster-reader
+rules:
+- apiGroups: [""]
+  resources:
+  - configmaps
+  - endpoints
+  - namespaces
+  - nodes
+  - persistentvolumeclaims
+  - pods
+  - podtemplates
+  - replicationcontrollers
+  - resourcequotas
+  - services
+  - persistentvolumes
+  verbs: [get, list, watch]
+- apiGroups: ["apps"]
+  resources:
+  - daemonsets
+  - deployments
+  - replicasets
+  - statefulsets
+  verbs: [get, list, watch]
+- apiGroups: ["batch"]
+  resources:
+  - cronjobs
+  - jobs
+  verbs: [get, list, watch]
+- apiGroups: ["rbac.authorization.k8s.io"]
+  resources:
+  - clusterrolebindings
+  - clusterroles
+  - rolebindings
+  - roles
+  verbs: [get, list, watch]

@@ -36,7 +36,7 @@ scenario_run_tests() {
     # TODO: Skip sriov on RHEL 10 until USHIFT-6400 is resolved.
     local skip_args="--skip sriov"
     if [[ "${UNAME_M}" =~ aarch64 ]]; then
-        skip_args="--skip sriov"
+        skip_args="--skip sriov --skip tls-scanner"
     fi
     # Skip generic device plugin on RHEL 10 until we can get the correct kernel-devel package.
     skip_args+=" --skip generic-device-plugin"
