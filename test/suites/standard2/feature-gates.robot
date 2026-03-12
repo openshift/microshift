@@ -2,6 +2,7 @@
 Documentation       Verify that that MicroShift feature gate configuration is correctly integrated into the kube-apiserver.
 ...                 Validation testing is handled by prerun unit tests and is not included here.
 
+Library             Collections
 Resource            ../../resources/common.resource
 Resource            ../../resources/microshift-config.resource
 Resource            ../../resources/microshift-process.resource
@@ -24,6 +25,16 @@ ${CUSTOM_FEATURE_GATES}         SEPARATOR=\n
 ...                             \ \ \ \ \ \ \ \ - TestFeatureEnabled
 ...                             \ \ \ \ \ \ disabled:
 ...                             \ \ \ \ \ \ \ \ - TestFeatureDisabled
+${CUSTOM_FEATURE_GATES_WITH_EXEMPTIONS}    SEPARATOR=\n
+...                             apiServer:
+...                             \ \ featureGates:
+...                             \ \ \ \ featureSet: CustomNoUpgrade
+...                             \ \ \ \ customNoUpgrade:
+...                             \ \ \ \ \ \ enabled:
+...                             \ \ \ \ \ \ \ \ - TestFeatureEnabled
+...                             \ \ \ \ specialHandlingSupportExceptionRequired:
+...                             \ \ \ \ \ \ enabled:
+...                             \ \ \ \ \ \ \ \ - TestFeatureEnabled
 ${FEATURE_GATE_LOCK_FILE}       /var/lib/microshift/no-upgrade
 
 
@@ -54,6 +65,16 @@ Feature Gate Lock File Persists Across Restarts With Same Config
     Feature Gate Lock File Should Exist
     [Teardown]    Teardown Custom Feature Gates Test
 
+SpecialHandlingSupportExceptionRequired Config Is Applied
+    [Documentation]    Verify that specialHandlingSupportExceptionRequired feature gate values
+    ...    from the config are correctly parsed and appear in the effective configuration.
+    [Setup]    Setup Custom Feature Gates Test    ${CUSTOM_FEATURE_GATES_WITH_EXEMPTIONS}
+    ${config}=    Show Config    effective
+    List Should Contain Value
+    ...    ${config.apiServer.featureGates.specialHandlingSupportExceptionRequired.enabled}
+    ...    TestFeatureEnabled
+    [Teardown]    Teardown Custom Feature Gates Test
+
 
 *** Keywords ***
 Setup
@@ -76,8 +97,9 @@ Save Journal Cursor
 
 Setup Custom Feature Gates Test
     [Documentation]    Drop in custom feature gates config and restart MicroShift
+    [Arguments]    ${config}=${CUSTOM_FEATURE_GATES}
     Stop MicroShift
-    Drop In MicroShift Config    ${CUSTOM_FEATURE_GATES}    10-featuregates
+    Drop In MicroShift Config    ${config}    10-featuregates
     Save Journal Cursor
     Start MicroShift
     Feature Gate Lock File Should Exist
