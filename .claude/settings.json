@@ -1,28 +1,18 @@
 {
   "permissions": {
     "allow": [
-      "Agent(openshift-ci-analyzis)",
-      "Bash(cat *)",
-      "Bash(echo *)",
-      "Bash(find *)",
-      "Bash(gcloud storage cp *)",
+      "Read(//tmp/**)",
+      "Bash(mktemp:*)",
+      "Bash(curl:*)",
+      "Bash(gcloud storage cp:*)",
+      "Bash(gh pr view:*)",
+      "Bash(gh pr diff:*)",
+      "Bash(tar:*)",
       "Bash(gh pr checks:*)",
-      "Bash(gh pr diff *)",
-      "Bash(gh pr view *)",
-      "Bash(gh)",
-      "Bash(grep *)",
-      "Bash(ls *)",
-      "Bash(tar *)",
-      "Glob",
-      "Grep",
-      "Read",
-      "WebFetch(domain:prow.ci.openshift.org)"
+      "WebFetch(domain:prow.ci.openshift.org)",
+      "Bash(gh issue list:*)"
     ],
-    "deny": [
-      "Bash(curl*)"
-    ],
-    "ask": [
-      "Edit"
-    ]
+    "deny": [],
+    "ask": []
   }
 }
