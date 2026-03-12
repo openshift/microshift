@@ -10,8 +10,8 @@ Mappings:
      Throughput: 750
      Iops: 6000
    VirtualMachine:
-     PrimaryVolumeSize: "200"
-     SecondaryVolumeSize: "20"
+     PrimaryVolumeSize: "100"
+     SecondaryVolumeSize: "200"
      Throughput: 125
      Iops: 3000
 Parameters:
