@@ -80,5 +80,6 @@ scenario_run_tests() {
         --variable "SOURCE_REPO_URL:${repo_url}" \
         --variable "TARGET_VERSION:${BREW_LREL_RELEASE_VERSION}" \
         suites/rpm/install.robot \
-        suites/standard2/
+        suites/standard2/ \
+        suites/rpm/remove.robot
 }
