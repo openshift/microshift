@@ -2,7 +2,7 @@ diff --git a/deps/github.com/openshift/kubernetes/openshift-kube-apiserver/opens
 index d402786d..eb81d0bc 100644
 --- a/deps/github.com/openshift/kubernetes/openshift-kube-apiserver/openshiftkubeapiserver/patch.go
 +++ b/deps/github.com/openshift/kubernetes/openshift-kube-apiserver/openshiftkubeapiserver/patch.go
-@@ -6,25 +6,18 @@
+@@ -6,25 +6,18 @@ import (
  
  	"github.com/openshift/apiserver-library-go/pkg/admission/imagepolicy"
  	"github.com/openshift/apiserver-library-go/pkg/admission/imagepolicy/imagereferencemutators"
@@ -28,7 +28,7 @@ index d402786d..eb81d0bc 100644
  	"k8s.io/client-go/rest"
  	"k8s.io/client-go/tools/cache"
  	"k8s.io/kubernetes/openshift-kube-apiserver/admission/authorization/restrictusers"
-@@ -32,7 +25,6 @@
+@@ -33,7 +26,6 @@ import (
  	"k8s.io/kubernetes/openshift-kube-apiserver/admission/autoscaling/managementcpusoverride"
  	"k8s.io/kubernetes/openshift-kube-apiserver/admission/scheduler/nodeenv"
  	"k8s.io/kubernetes/openshift-kube-apiserver/enablement"
@@ -36,7 +36,7 @@ index d402786d..eb81d0bc 100644
  
  	// magnet to get authorizer package in hack/update-vendor.sh
  	_ "github.com/openshift/library-go/pkg/authorization/hardcodedauthorizer"
-@@ -57,21 +49,11 @@ func OpenShiftKubeAPIServerConfigPatch(genericConfig *genericapiserver.Config, k
+@@ -58,23 +50,13 @@ func OpenShiftKubeAPIServerConfigPatch(genericConfig *genericapiserver.Config, k
  	genericConfig.LongRunningFunc = apiserverconfig.IsLongRunningRequest
  
  	// ADMISSION
@@ -53,12 +53,14 @@ index d402786d..eb81d0bc 100644
 -		clusterresourcequota.NewInitializer(
 -			openshiftInformers.getOpenshiftQuotaInformers().Quota().V1().ClusterResourceQuotas(),
 -			clusterQuotaMappingController.GetClusterQuotaMapper(),
--			generic.NewRegistry(install.NewQuotaConfigurationForAdmission().Evaluators()),
+-			generic.NewRegistry(install.NewQuotaConfigurationForAdmission(kubeInformers).Evaluators()),
 -		),
  		nodeenv.NewInitializer(enablement.OpenshiftConfig().ProjectConfig.DefaultNodeSelector),
  		admissionrestconfig.NewInitializer(*rest.CopyConfig(genericConfig.LoopbackClientConfig)),
  		managementcpusoverride.NewInitializer(openshiftInformers.getOpenshiftInfraInformers().Config().V1().Infrastructures()),
-@@ -125,10 +107,6 @@ func newInformers(loopbackClientConfig *rest.Config) (*kubeAPIServerInformers, e
+ 		managednode.NewInitializer(openshiftInformers.getOpenshiftInfraInformers().Config().V1().Infrastructures()),
+ 	)
+@@ -127,10 +110,6 @@ func newInformers(loopbackClientConfig *rest.Config) (*kubeAPIServerInformers, e
  	// ClusterResourceQuota is served using CRD resource any status update must use JSON
  	jsonLoopbackClientConfig := makeJSONRESTConfig(loopbackClientConfig)
  
@@ -69,7 +71,7 @@ index d402786d..eb81d0bc 100644
  	securityClient, err := securityv1client.NewForConfig(jsonLoopbackClientConfig)
  	if err != nil {
  		return nil, err
-@@ -147,7 +125,6 @@ func newInformers(loopbackClientConfig *rest.Config) (*kubeAPIServerInformers, e
+@@ -149,7 +128,6 @@ func newInformers(loopbackClientConfig *rest.Config) (*kubeAPIServerInformers, e
  	const defaultInformerResyncPeriod = 10 * time.Minute
  
  	ret := &kubeAPIServerInformers{
@@ -77,7 +79,7 @@ index d402786d..eb81d0bc 100644
  		OpenshiftSecurityInformers: securityv1informer.NewSharedInformerFactory(securityClient, defaultInformerResyncPeriod),
  		OpenshiftUserInformers:     userinformer.NewSharedInformerFactory(userClient, defaultInformerResyncPeriod),
  		OpenshiftConfigInformers:   configv1informer.NewSharedInformerFactory(configClient, defaultInformerResyncPeriod),
-@@ -162,15 +139,11 @@ func newInformers(loopbackClientConfig *rest.Config) (*kubeAPIServerInformers, e
+@@ -164,15 +142,11 @@ func newInformers(loopbackClientConfig *rest.Config) (*kubeAPIServerInformers, e
  }
  
  type kubeAPIServerInformers struct {
@@ -93,7 +95,7 @@ index d402786d..eb81d0bc 100644
  func (i *kubeAPIServerInformers) getOpenshiftSecurityInformers() securityv1informer.SharedInformerFactory {
  	return i.OpenshiftSecurityInformers
  }
-@@ -182,12 +155,7 @@ func (i *kubeAPIServerInformers) getOpenshiftInfraInformers() configv1informer.S
+@@ -184,12 +158,7 @@ func (i *kubeAPIServerInformers) getOpenshiftInfraInformers() configv1informer.S
  }
  
  func (i *kubeAPIServerInformers) Start(stopCh <-chan struct{}) {
