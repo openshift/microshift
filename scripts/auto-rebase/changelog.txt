@@ -1,4 +1,28 @@
-- ovn-kubernetes image-arm64 baa428823efc25f39c73eb0a2e45dc76ad7e0594 to fc6a53f0e48f0418652c1ea4dee6c30e431127fc
+- api embedded-component a591881943aef6228702994bee19b8a0504e672a to b0658d22beea435e3a576165207416842cb2753b
+  - 16be4b9a 2026-03-04T07:45:22+03:00 Introduce KMSEncryption feature gate
+
+- cluster-kube-apiserver-operator embedded-component 1d68351b053987df54b4e6fef60b480b72cfd714 to 2c97d65aecb470b1972294ea45d898c0c43a01ce
+  - c612162 2026-03-09T20:40:09+03:00 Update library-go to get KMS
+  - 7ce43a9 2026-03-09T21:34:59+05:30 Backport Add support for event-ttl cases and go test cases in Kube API Server Operator
+  - 5f25565 2026-03-06T19:18:09+03:00 Carry test assertion
+  - b733b6f 2026-03-05T10:19:58-03:00 bump(openshift/library-go): to get KMS helper
+  - 52ffde3 2026-03-05T10:19:24-03:00 Conditionally add the KMS plugin volume mount to the kube-apiserver container
+  - 9f5d41b 2026-03-03T21:04:02+05:30 go mod vednor
+  - b733ea0 2026-02-24T18:38:30+05:30 KMS test cases
+
+- cluster-network-operator embedded-component 0b156e3a60bcf64068c8ddb4f5204f2ca4d9758c to 632552909c274bb0edfc1c62f82a677b3c8a3c84
+  - 311fab6 2026-03-04T19:17:51+05:30 Add config override for openflow-probe
+
+- machine-config-operator embedded-component 2b0caa01c82adf10f9b0e113cfc8c1b2a3f8919b to 1a10b6028c38a85207688a7ddb4ab8d70f3f1ace
+  - 3a6ff354 2026-03-05T05:10:26+00:00 chore: update AMIs
+  - 2c026c63 2026-03-04T13:23:05-05:00 op: add bootimage admin_acks for azure & vsphere
+  - 5ee16c91 2026-03-02T20:45:02+00:00 bootimage: fix failure domain matching
+
+- operator-framework-olm embedded-component fde87213e2b8c319da081a25c29599317c1ee9d7 to 58e4b429bc3f122b0488916a37a2ef00625c37a4
+  - 435e2ef3 2026-03-04T07:20:33-05:00 Update generated manifests for release-4.21
+  - 7a698eac 2026-03-03T21:49:18-05:00 OCPBUGS-77712: Update NetworkPolicy egress to support HyperShift custom API ports
+
+- ovn-kubernetes image-amd64 baa428823efc25f39c73eb0a2e45dc76ad7e0594 to fc6a53f0e48f0418652c1ea4dee6c30e431127fc
   - b2079d4b 2026-03-02T10:22:43-08:00 No-overlay mode enhancement
   - fc2b8d65 2026-03-02T10:22:43-08:00 ci: Split unit test phase from build
   - 34f5df2f 2026-03-02T10:22:43-08:00 Fix coderabbit path_filters
