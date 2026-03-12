@@ -16,7 +16,7 @@ scenario_create_vms() {
     fi
     LVM_SYSROOT_SIZE=20480 prepare_kickstart host1 kickstart-bootc.ks.template rhel102-bootc-source-optionals
     # Three nics - one for sriov, one for macvlan, another for ipvlan (they cannot enslave the same interface)
-    launch_vm --boot_blueprint rhel102-bootc --network "${networks}" --vm_disksize 25
+    launch_vm rhel102-bootc --network "${networks}" --vm_disksize 25
 }
 
 scenario_remove_vms() {

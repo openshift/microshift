@@ -2,14 +2,14 @@
 
 # Sourced from scenario.sh and uses functions defined there.
 
-start_image="rhel96-brew-lrel-optional"
+start_image="rhel98-brew-lrel-optional"
 
 scenario_create_vms() {
     exit_if_commit_not_found "${start_image}"
 
     prepare_kickstart host1 kickstart.ks.template "${start_image}"
     # Using multus as secondary network to have 2 nics in different networks.
-    launch_vm --network default,"${VM_MULTUS_NETWORK}" --vm_vcpus 4
+    launch_vm rhel-9.8 --network default,"${VM_MULTUS_NETWORK}" --vm_vcpus 4
 }
 
 scenario_remove_vms() {

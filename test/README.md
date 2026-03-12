@@ -277,7 +277,7 @@ rhel-9.2
 
 #### Bootc Image Customization
 
-Bootc images are defined by templated `containerfile` definitions. 
+Bootc images are defined by templated `containerfile` definitions.
 These files are written with [golang templating syntax](https://pkg.go.dev/text/template)
 and executed during the image build process.
 
@@ -608,11 +608,10 @@ The `launch_vm` function takes as input the VM name. It expects a
 kickstart file to already exist, and it defines a new VM configured to
 boot from the installer ISO and the kickstart file.
 
-The `launch_vm` function also accepts two optional arguments:
-- The image blueprint used to create the ISO that should
-be used to boot the VM (default to `$DEFAULT_BOOT_BLUEPRINT`).
-- The name of the network used when creating the VM
-(defaults to `default`).
+The `launch_vm` function also accepts two arguments:
+- The mandatory image blueprint used to create the ISO that should be used
+  to boot the VM.
+- The name of the network used when creating the VM (defaults to `default`).
 
 #### scenario_remove_vms
 

@@ -4,7 +4,7 @@
 
 scenario_create_vms() {
     prepare_kickstart host1 kickstart.ks.template "rhel-9.6-microshift-4.${PREVIOUS_MINOR_VERSION}"
-    launch_vm
+    launch_vm rhel-9.6
 }
 
 scenario_remove_vms() {

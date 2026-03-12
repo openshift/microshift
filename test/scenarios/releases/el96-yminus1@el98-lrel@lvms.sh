@@ -6,15 +6,15 @@
 # ensure MicroShift is upgraded before running validation tests
 export TEST_RANDOMIZATION=none
 
-start_image="rhel-9.6-microshift-brew-optionals-4.${YMINUS2_MINOR_VERSION}-zstream"
-dest_image="rhel96-brew-lrel-optional"
+start_image="rhel-9.6-microshift-brew-optionals-4.${PREVIOUS_MINOR_VERSION}-zstream"
+dest_image="rhel98-brew-lrel-optional"
 
 scenario_create_vms() {
     exit_if_commit_not_found "${start_image}"
     exit_if_commit_not_found "${dest_image}"
 
     prepare_kickstart host1 kickstart.ks.template "${start_image}"
-    launch_vm --vm_disksize 30 --vm_vcpus 4
+    launch_vm rhel-9.6 --vm_vcpus 4
 }
 
 scenario_remove_vms() {
@@ -44,7 +44,6 @@ scenario_run_tests() {
     # Perform upgrade and validate
     run_tests host1 \
         --variable "TARGET_REF:${dest_image}" \
-        --variable "EXPECTED_OS_VERSION:9.6" \
         suites/upgrade/upgrade-successful.robot
 
     # Post-upgrade: Validate LVMS workloads survived the upgrade
@@ -54,10 +53,12 @@ scenario_run_tests() {
     echo "INFO: Checking LVMS resources after upgrade..."
     run_command_on_vm host1 'bash -s' < "${TESTDIR}/../scripts/lvms-helpers/checkLvmsResources.sh"
 
-    # Run ginkgo tests to validate functionality
-    run_ginkgo_tests host1 "~Disruptive"
-
     # Cleanup LVMS workloads
     echo "INFO: Cleaning up LVMS workloads..."
     run_command_on_vm host1 'bash -s' < "${TESTDIR}/../scripts/lvms-helpers/cleanupWorkload.sh"
+
+    # Run standard1 suite for basic validation after upgrade
+    run_tests host1 \
+        --variable "EXPECTED_OS_VERSION:9.8" \
+        suites/standard1/
 }

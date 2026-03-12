@@ -13,7 +13,7 @@ scenario_create_vms() {
     exit_if_image_not_set "${LATEST_RELEASE_IMAGE_URL}"
 
     prepare_kickstart host1 kickstart-bootc.ks.template "${LATEST_RELEASE_IMAGE_URL}"
-    launch_vm --boot_blueprint rhel96-bootc
+    launch_vm rhel96-bootc
 
     # Open the firewall ports. Other scenarios get this behavior by embedding
     # settings in the blueprint, but we cannot open firewall ports in published
