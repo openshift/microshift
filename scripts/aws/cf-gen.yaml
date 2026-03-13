@@ -32,8 +32,8 @@ Parameters:
     Description: Current RHEL AMI to use.
     Type: AWS::EC2::Image::Id
   Machinename:
-    AllowedPattern: ^([a-zA-Z][a-zA-Z0-9\-]{0,26})$
-    MaxLength: 27
+    AllowedPattern: ^([a-zA-Z][a-zA-Z0-9\-]*)$
+    MaxLength: 64
     MinLength: 1
     ConstraintDescription: Machinename
     Description: Machinename
