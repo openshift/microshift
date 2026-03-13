@@ -441,7 +441,6 @@ func (c *Config) incorporateUserSettings(u *Config) {
 	if len(u.ApiServer.FeatureGates.SpecialHandlingSupportExceptionRequired.Disabled) > 0 {
 		c.ApiServer.FeatureGates.SpecialHandlingSupportExceptionRequired.Disabled = u.ApiServer.FeatureGates.SpecialHandlingSupportExceptionRequired.Disabled
 	}
-
 }
 
 // updateComputedValues examins the existing settings and converts any
