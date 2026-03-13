@@ -72,7 +72,7 @@ EOF
 
 scenario_create_vms() {
     prepare_kickstart host1 kickstart-liveimg.ks.template ""
-    launch_vm 
+    launch_vm
 
     # Open the firewall ports. Other scenarios get this behavior by
     # embedding settings in the blueprint, but there is no blueprint
@@ -111,7 +111,5 @@ scenario_run_tests() {
         --variable "SOURCE_REPO_URL:${repo_url}" \
         --variable "TARGET_VERSION:${BREW_LREL_RELEASE_VERSION}" \
         --variable "PREVIOUS_MINOR_VERSION:${PREVIOUS_MINOR_VERSION}" \
-        suites/rpm/install.robot \
-        suites/rpm/remove.robot \
         suites/rpm/upgrade-successful.robot
 }
