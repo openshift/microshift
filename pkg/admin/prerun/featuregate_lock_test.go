@@ -575,3 +575,163 @@ func TestFeatureGateLockManagement_NoCustomFeatureGates(t *testing.T) {
 		t.Error("Lock file should not have been created without custom feature gates")
 	}
 }
+
+// TestUpgradeThenRollbackWithFeatureGateLock simulates the scenario where:
+// 1. MicroShift 4.21.0 runs with CustomNoUpgrade + FeatureA
+// 2. RPM is upgraded to 4.22.0 and MicroShift is restarted
+// 3. FeatureGateLockManagement blocks startup due to version mismatch
+// 4. User rolls back to 4.21.0
+//
+// The test verifies that VersionMetadataManagement does not write the
+// version file, so when FeatureGateLockManagement fails the rollback
+// path described in the error message remains viable.
+func TestUpgradeThenRollbackWithFeatureGateLock(t *testing.T) {
+	tmpDir, err := os.MkdirTemp("", "prerun-rollback-test-*")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer os.RemoveAll(tmpDir)
+
+	originalVersionPath := versionFilePath
+	versionFilePath = filepath.Join(tmpDir, "version")
+	defer func() { versionFilePath = originalVersionPath }()
+
+	originalLockPath := featureGateLockFilePath
+	featureGateLockFilePath = filepath.Join(tmpDir, "no-upgrade")
+	defer func() { featureGateLockFilePath = originalLockPath }()
+
+	originalGetExecVer := getExecutableVersion
+	defer func() { getExecutableVersion = originalGetExecVer }()
+
+	v421 := versionMetadata{Major: 4, Minor: 21, Patch: 0}
+	v422 := versionMetadata{Major: 4, Minor: 22, Patch: 0}
+
+	cfg := &config.Config{
+		ApiServer: config.ApiServer{
+			FeatureGates: config.FeatureGates{
+				FeatureSet: config.FeatureSetCustomNoUpgrade,
+				CustomNoUpgrade: config.EnableDisableFeatures{
+					Enabled: []string{"FeatureA"},
+				},
+			},
+		},
+	}
+
+	// --- Phase 1: Initial run at 4.21.0 ---
+	getExecutableVersion = func() (versionMetadata, error) { return v421, nil }
+
+	if err := os.WriteFile(versionFilePath, []byte(`{"version":"4.21.0","boot_id":"boot-1"}`), 0600); err != nil {
+		t.Fatal(err)
+	}
+
+	if err := FeatureGateLockManagement(cfg); err != nil {
+		t.Fatalf("Phase 1: FeatureGateLockManagement should succeed on first run: %v", err)
+	}
+
+	lockFile, err := readFeatureGateLockFile(featureGateLockFilePath)
+	if err != nil {
+		t.Fatalf("Phase 1: failed to read lock file: %v", err)
+	}
+	if lockFile.Version != v421 {
+		t.Fatalf("Phase 1: lock file version = %s, want %s", lockFile.Version.String(), v421.String())
+	}
+
+	// --- Phase 2: Upgrade to 4.22.0 ---
+	getExecutableVersion = func() (versionMetadata, error) { return v422, nil }
+
+	// VersionMetadataManagement validates but does not write the version file
+	if err := VersionMetadataManagement(); err != nil {
+		t.Fatalf("Phase 2: VersionMetadataManagement should succeed: %v", err)
+	}
+
+	// FeatureGateLockManagement should FAIL (locked=4.21, exec=4.22)
+	err = FeatureGateLockManagement(cfg)
+	if err == nil {
+		t.Fatal("Phase 2: FeatureGateLockManagement should fail due to version mismatch")
+	}
+
+	// Because FeatureGateLockManagement failed, WriteVersionMetadata is NOT
+	// called. Verify the version file still contains 4.21.0.
+	dataVer, err := getVersionOfData()
+	if err != nil {
+		t.Fatalf("Phase 2: failed to read version file: %v", err)
+	}
+	if dataVer != v421 {
+		t.Fatalf("Phase 2: version file should still be %s after failed pre-run, got %s", v421.String(), dataVer.String())
+	}
+
+	// --- Phase 3: Roll back to 4.21.0 ---
+	getExecutableVersion = func() (versionMetadata, error) { return v421, nil }
+
+	if err := VersionMetadataManagement(); err != nil {
+		t.Fatalf("Phase 3: VersionMetadataManagement should succeed after rollback: %v", err)
+	}
+
+	if err := FeatureGateLockManagement(cfg); err != nil {
+		t.Fatalf("Phase 3: FeatureGateLockManagement should succeed after rollback: %v", err)
+	}
+
+	if err := WriteVersionMetadata(); err != nil {
+		t.Fatalf("Phase 3: WriteVersionMetadata should succeed: %v", err)
+	}
+
+	dataVer, err = getVersionOfData()
+	if err != nil {
+		t.Fatalf("Phase 3: failed to read version file after write: %v", err)
+	}
+	if dataVer != v421 {
+		t.Fatalf("Phase 3: version file should be %s after rollback, got %s", v421.String(), dataVer.String())
+	}
+}
+
+// TestVersionMetadataManagementDoesNotWriteVersionFile verifies that
+// VersionMetadataManagement is read-only and WriteVersionMetadata is
+// required to persist the version.
+func TestVersionMetadataManagementDoesNotWriteVersionFile(t *testing.T) {
+	tmpDir, err := os.MkdirTemp("", "prerun-no-write-test-*")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer os.RemoveAll(tmpDir)
+
+	originalVersionPath := versionFilePath
+	versionFilePath = filepath.Join(tmpDir, "version")
+	defer func() { versionFilePath = originalVersionPath }()
+
+	originalGetExecVer := getExecutableVersion
+	defer func() { getExecutableVersion = originalGetExecVer }()
+
+	v414 := versionMetadata{Major: 4, Minor: 14, Patch: 0}
+	v415 := versionMetadata{Major: 4, Minor: 15, Patch: 0}
+
+	if err := os.WriteFile(versionFilePath, []byte(`{"version":"4.14.0","boot_id":"b"}`), 0600); err != nil {
+		t.Fatal(err)
+	}
+
+	getExecutableVersion = func() (versionMetadata, error) { return v415, nil }
+
+	if err := VersionMetadataManagement(); err != nil {
+		t.Fatalf("VersionMetadataManagement should succeed: %v", err)
+	}
+
+	// Version file should still be 4.14.0 — no write happened yet
+	dataVer, err := getVersionOfData()
+	if err != nil {
+		t.Fatalf("failed to read version file: %v", err)
+	}
+	if dataVer != v414 {
+		t.Fatalf("version file should still be %s after management, got %s", v414.String(), dataVer.String())
+	}
+
+	if err := WriteVersionMetadata(); err != nil {
+		t.Fatalf("WriteVersionMetadata should succeed: %v", err)
+	}
+
+	dataVer, err = getVersionOfData()
+	if err != nil {
+		t.Fatalf("failed to read version file after write: %v", err)
+	}
+	if dataVer != v415 {
+		t.Fatalf("version file should be %s after write, got %s", v415.String(), dataVer.String())
+	}
+}
