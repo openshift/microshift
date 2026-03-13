@@ -1,10 +1,13 @@
 [rhel-10.2-appstream]
 name = rhel-10.2-appstream
-
 baseurl = http://localhost:{{ .Env.WEB_SERVER_PORT }}/ocp-mirror/reposync/4.22{{ if eq .Env.UNAME_M "aarch64" }}_aarch64{{ end }}/rhel-102-appstream
 enabled = 1
 sslverify = false
 gpgcheck = 0
+# Increase the priority of the RHEL mirror baseos / appstream repositories to
+# ensure its packages take precedence over RHEL mirror early-kernel repositories,
+# but not over RHOCP beta repositories with higher priority.
+priority=60
 skip_if_unavailable = false
 
 [rhel-10.2-baseos]
@@ -13,6 +16,10 @@ baseurl = http://localhost:{{ .Env.WEB_SERVER_PORT }}/ocp-mirror/reposync/4.22{{
 enabled = 1
 sslverify = false
 gpgcheck = 0
+# Increase the priority of the RHEL mirror baseos / appstream repositories to
+# ensure its packages take precedence over RHEL mirror early-kernel repositories,
+# but not over RHOCP beta repositories with higher priority.
+priority=60
 skip_if_unavailable = false
 
 [rhel-10.2-early-kernel]
