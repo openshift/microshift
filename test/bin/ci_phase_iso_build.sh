@@ -70,8 +70,8 @@ update_build_cache() {
     # Build templates
     $(dry_run) bash -x ./bin/build_bootc_images.sh -g ./image-blueprints-bootc/templates
     # Build the bootc base layer and brew RPMs to be cached
+    $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/layer1-base
     for os in el9 el10; do
-        $(dry_run) bash -x ./bin/build_bootc_images.sh -l "./image-blueprints-bootc/${os}/layer1-base"
         $(dry_run) bash -x ./bin/build_bootc_images.sh -l "./image-blueprints-bootc/${os}/layer4-release"
     done
 
@@ -129,12 +129,11 @@ run_bootc_image_build() {
     
         if [[ "${os}" == "el9" || "${os}" == "el10" ]]; then
 
-            $(dry_run) bash -x ./bin/build_bootc_images.sh -l "./image-blueprints-bootc/${os}/layer1-base"
+            $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/layer1-base
             $(dry_run) bash -x ./bin/build_bootc_images.sh -l "./image-blueprints-bootc/${os}/layer2-presubmit"
 
             if [[ "${os}" == "el10" ]]; then
                 # Build el9 images for upgrade tests
-                $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/el9/layer1-base
                 $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/el9/layer2-presubmit
             fi
 
@@ -151,9 +150,9 @@ run_bootc_image_build() {
             $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/upstream
         fi
     else
+            $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/layer1-base
         # Full build for all OS versions
         for os_ver in el9 el10; do
-            $(dry_run) bash -x ./bin/build_bootc_images.sh -l "./image-blueprints-bootc/${os_ver}/layer1-base"
             $(dry_run) bash -x ./bin/build_bootc_images.sh -l "./image-blueprints-bootc/${os_ver}/layer2-presubmit"
             $(dry_run) bash -x ./bin/build_bootc_images.sh -l "./image-blueprints-bootc/${os_ver}/layer3-periodic"
             $(dry_run) bash -x ./bin/build_bootc_images.sh -l "./image-blueprints-bootc/${os_ver}/layer4-release"
