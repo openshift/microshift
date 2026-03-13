@@ -583,6 +583,7 @@ Scenarios utilize following distinct MicroShift sources:
    branch cut, before first EC is released, it will be skipped.
 - `lrel`: latest available release (EC, RC or zstream) available from internal
    Red Hat repositories (staging).
+- `zprel`: z-previous release: latest z-stream release available in rhocp repository.
 
 | Starting ref | End ref | Successful upgrade scenario | Failed upgrade scenario |
 |--------------|---------|-----------------------------|-------------------------|
@@ -591,6 +592,7 @@ Scenarios utilize following distinct MicroShift sources:
 | `src` | `src` | **MISSING** | `el92-src@upgrade-failing-cannot-backup.sh` |
 | `crel` | `src` | `el92-crel@upgrade-ok.sh` | `el92-crel@upgrade-fails.sh` |
 | `y1` | `lrel` | `el96-y1@el96-lrel@standard1.sh` | **MISSING** |
+| `zprel` | `lrel` | `el96-zprel@el96-lrel@rpm-upgrade.sh` | **MISSING** |
 
 #### scenario_create_vms
 
