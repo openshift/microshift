@@ -15,27 +15,27 @@ Test Tags           restart    slow
 
 
 *** Variables ***
-${CURSOR}                       ${EMPTY}    # The journal cursor before restarting MicroShift
-${CUSTOM_FEATURE_GATES}         SEPARATOR=\n
-...                             apiServer:
-...                             \ \ featureGates:
-...                             \ \ \ \ featureSet: CustomNoUpgrade
-...                             \ \ \ \ customNoUpgrade:
-...                             \ \ \ \ \ \ enabled:
-...                             \ \ \ \ \ \ \ \ - TestFeatureEnabled
-...                             \ \ \ \ \ \ disabled:
-...                             \ \ \ \ \ \ \ \ - TestFeatureDisabled
-${CUSTOM_FEATURE_GATES_WITH_EXEMPTIONS}    SEPARATOR=\n
-...                             apiServer:
-...                             \ \ featureGates:
-...                             \ \ \ \ featureSet: CustomNoUpgrade
-...                             \ \ \ \ customNoUpgrade:
-...                             \ \ \ \ \ \ enabled:
-...                             \ \ \ \ \ \ \ \ - TestFeatureEnabled
-...                             \ \ \ \ specialHandlingSupportExceptionRequired:
-...                             \ \ \ \ \ \ enabled:
-...                             \ \ \ \ \ \ \ \ - TestFeatureEnabled
-${FEATURE_GATE_LOCK_FILE}       /var/lib/microshift/no-upgrade
+${CURSOR}                                   ${EMPTY}    # The journal cursor before restarting MicroShift
+${CUSTOM_FEATURE_GATES}                     SEPARATOR=\n
+...                                         apiServer:
+...                                         \ \ featureGates:
+...                                         \ \ \ \ featureSet: CustomNoUpgrade
+...                                         \ \ \ \ customNoUpgrade:
+...                                         \ \ \ \ \ \ enabled:
+...                                         \ \ \ \ \ \ \ \ - TestFeatureEnabled
+...                                         \ \ \ \ \ \ disabled:
+...                                         \ \ \ \ \ \ \ \ - TestFeatureDisabled
+${CUSTOM_FEATURE_GATES_WITH_EXEMPTIONS}     SEPARATOR=\n
+...                                         apiServer:
+...                                         \ \ featureGates:
+...                                         \ \ \ \ featureSet: CustomNoUpgrade
+...                                         \ \ \ \ customNoUpgrade:
+...                                         \ \ \ \ \ \ enabled:
+...                                         \ \ \ \ \ \ \ \ - TestFeatureEnabled
+...                                         \ \ \ \ specialHandlingSupportExceptionRequired:
+...                                         \ \ \ \ \ \ enabled:
+...                                         \ \ \ \ \ \ \ \ - TestFeatureEnabled
+${FEATURE_GATE_LOCK_FILE}                   /var/lib/microshift/no-upgrade
 
 
 *** Test Cases ***
