@@ -1,7 +1,7 @@
 ---
 name: Analyze CI for a Release
 argument-hint: <release>
-description: Analyze CI for a MicroShift release using analyse-ci-test-job skill and produce a summary
+description: Analyze CI for a MicroShift release using analyze-ci-test-job skill and produce a summary
 allowed-tools: Skill, Bash, Read, Write, Glob, Grep, Agent
 ---
 

@@ -10,7 +10,7 @@ PROW_JOB="microshift"
 # Base query - fetch all MicroShift jobs for a release
 fetch_base_data() {
     local release="${1}"
-    curl -s "${PROW_URL}" | jq -c --arg release "${release}" --arg job "${PROW_JOB}" '
+    curl -s --max-time 60 "${PROW_URL}" | jq -c --arg release "${release}" --arg job "${PROW_JOB}" '
         .[] | select((.job | contains($job)) and (.job | contains($release))) |
         {job: .job, status: .state, started: .started, finished: .finished, duration: .duration, url: .url}
     '
@@ -91,6 +91,10 @@ main() {
     while [[ ${#} -gt 0 ]]; do
         case "${1}" in
             --mode)
+                if [[ ${#} -lt 2 ]]; then
+                    echo "Error: mode requires an argument"
+                    usage
+                fi
                 mode="${2}"
                 shift 2
                 ;;
