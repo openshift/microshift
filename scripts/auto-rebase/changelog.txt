@@ -1,26 +1,21 @@
-- cluster-kube-scheduler-operator embedded-component b5671f10f0b03ac19e584e08b08267f67dd2d709 to bf8cd78f223b3d27ea4fb170d22edea14df26df3
-  - 68fd8c9 2026-03-03T14:45:22+01:00 chore: update OWNERS
+- kubernetes embedded-component 346896bae752bb9def8cacca75fdc7f7dcae9496 to a674efabac8b5044e6256ce4e2385914be215376
+  - 0cdaa9e74 2026-02-27T14:50:28-05:00 UPSTREAM: <drop>: hack/update-vendor.sh, make udpate and update image
+  - 6172d7357 2026-02-26T20:20:22+00:00 Release commit for Kubernetes v1.32.13
+  - 2f0b47d19 2026-02-16T12:19:51+01:00 Bump images and versions to go 1.24.13 and distroless iptables
+  - a0ab66fb0 2026-02-10T13:06:03+00:00 Update CHANGELOG/CHANGELOG-1.32.md for v1.32.12
 
-- machine-config-operator embedded-component 3566e363bfb1d08b43bc0aba63efe70248abb86e to 5bad8a0ae8b4473905b2865439080e05b80bdb6b
-  - c21cca4f 2026-03-08T13:38:22+00:00 chore: update AMIs
-  - 224c6f1b 2026-03-05T02:09:32+00:00 chore: update AMIs
-  - 762a0db8 2026-03-04T02:32:03+00:00 copy binaries directly into final stage
-  - ca8b057b 2026-03-04T02:32:02+00:00 clear dnf cache to reduce image size
-  - 4cb332ee 2026-02-24T15:44:30+00:00 units: add delays to TestOSBuildController
-  - 4b8f17e2 2026-02-24T10:09:09-05:00 fix
-  - c8acea3f 2026-02-24T09:46:37-05:00 fix
-  - 1976bc7f 2026-02-24T09:33:33-05:00 fix
-  - cd32621b 2026-02-24T09:14:00-05:00 helpers: compute systemdUnits that added and changed between Ign configs update: only write added or updated systemd units unless forcefile exists then rewrite all systemd units on_disk_validation: check if systemd units in config enabled correctly tests: update MCN condition transition test to account for quick transitions through 'Unknown' state (cherry picked from commit 4512ec46f7b13a6e85588bbf480c4d029990724a)
-  - 6ce19f4f 2026-01-20T11:35:57+00:00 Add: enable nodeip-configuration for platform external
+- kubernetes image-amd64 346896bae752bb9def8cacca75fdc7f7dcae9496 to a674efabac8b5044e6256ce4e2385914be215376
+  - 0cdaa9e74 2026-02-27T14:50:28-05:00 UPSTREAM: <drop>: hack/update-vendor.sh, make udpate and update image
+  - 6172d7357 2026-02-26T20:20:22+00:00 Release commit for Kubernetes v1.32.13
+  - 2f0b47d19 2026-02-16T12:19:51+01:00 Bump images and versions to go 1.24.13 and distroless iptables
+  - a0ab66fb0 2026-02-10T13:06:03+00:00 Update CHANGELOG/CHANGELOG-1.32.md for v1.32.12
 
-- operator-framework-olm embedded-component 05a5a754366264a0926abf61e1ae11837a94b393 to 457b7eb2fdaeb469c117c3e87201ba88281795b4
-  - 09cc6520 2026-02-27T02:03:52+00:00 Remove the collect-profiles info from the microshift kustomization file
+- oc image-arm64 24755b6e82745a4dfa5a6db4b467564c237f244c to b2a93a639c07ebf4d547d10877b6c13f65583248
+  - df5a830f 2026-03-04T19:06:39+00:00 Makefile: Strip debugging symbols by default
 
-- ovn-kubernetes image-amd64 8adb10a1f2919be9cc8eca1134963ac1faa0fe23 to 208e0c7fabe0462cdec6d5ae9df4aa0c412f6a81
-  - 021457f5 2026-03-01T00:16:09+05:30 Add a e2e test for NodePort service
-  - e0a33894 2026-02-27T20:06:49+05:30 Clear stale conntrack UDP entries for nodePorts
-
-- ovn-kubernetes image-arm64 8adb10a1f2919be9cc8eca1134963ac1faa0fe23 to 208e0c7fabe0462cdec6d5ae9df4aa0c412f6a81
-  - 021457f5 2026-03-01T00:16:09+05:30 Add a e2e test for NodePort service
-  - e0a33894 2026-02-27T20:06:49+05:30 Clear stale conntrack UDP entries for nodePorts
+- kubernetes image-arm64 346896bae752bb9def8cacca75fdc7f7dcae9496 to a674efabac8b5044e6256ce4e2385914be215376
+  - 0cdaa9e74 2026-02-27T14:50:28-05:00 UPSTREAM: <drop>: hack/update-vendor.sh, make udpate and update image
+  - 6172d7357 2026-02-26T20:20:22+00:00 Release commit for Kubernetes v1.32.13
+  - 2f0b47d19 2026-02-16T12:19:51+01:00 Bump images and versions to go 1.24.13 and distroless iptables
+  - a0ab66fb0 2026-02-10T13:06:03+00:00 Update CHANGELOG/CHANGELOG-1.32.md for v1.32.12
 
