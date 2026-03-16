@@ -138,6 +138,16 @@ func prerunDataManagement() error {
 	return prerun.DataManagement(dataManager)
 }
 
+func prerunVersionAndFeatureGateManagement(cfg *config.Config) error {
+	if err := prerun.VersionMetadataManagement(); err != nil {
+		return err
+	}
+	if err := prerun.FeatureGateLockManagement(cfg); err != nil {
+		return err
+	}
+	return prerun.WriteVersionMetadata()
+}
+
 func RunMicroshift(cfg *config.Config) error {
 	// fail early if we don't have enough privileges
 	if os.Geteuid() > 0 {
@@ -186,12 +196,7 @@ func RunMicroshift(cfg *config.Config) error {
 		return fmt.Errorf("failed to create dir %q: %w", config.DataDir, err)
 	}
 
-	if err := prerun.VersionMetadataManagement(); err != nil {
-		writeLogFileError(preRunFailedLogPath, err)
-		return err
-	}
-
-	if err := prerun.FeatureGateLockManagement(cfg); err != nil {
+	if err := prerunVersionAndFeatureGateManagement(cfg); err != nil {
 		writeLogFileError(preRunFailedLogPath, err)
 		return err
 	}

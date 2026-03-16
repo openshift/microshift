@@ -71,13 +71,23 @@ func versionMetadataManagement() error {
 		klog.InfoS("END checking if version upgrade is blocked")
 	}
 
+	return nil
+}
+
+// WriteVersionMetadata persists the current executable version to the
+// version file. It must be called only after all pre-run checks have
+// passed to avoid poisoning the version file on a failed startup.
+func WriteVersionMetadata() error {
 	klog.InfoS("START updating version file")
-	if err := updateVersionFile(ver.exec); err != nil {
+	execVer, err := getExecutableVersion()
+	if err != nil {
+		return fmt.Errorf("failed to get executable version: %w", err)
+	}
+	if err := updateVersionFile(execVer); err != nil {
 		klog.ErrorS(err, "FAIL updating version file")
 		return err
 	}
 	klog.InfoS("END updating version file")
-
 	return nil
 }
 
@@ -89,7 +99,7 @@ type versions struct {
 // getVersions obtains and returns versions of executable and data dir.
 // Version of data will be nil if the MicroShift data does not exist yet.
 func getVersions() (versions, error) {
-	execVer, err := GetVersionOfExecutable()
+	execVer, err := getExecutableVersion()
 	if err != nil {
 		return versions{}, fmt.Errorf("failed to get version of MicroShift executable: %w", err)
 	}
