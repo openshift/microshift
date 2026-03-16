@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"slices"
 	"strings"
+	"sync"
 	"time"
 
 	v1 "k8s.io/api/core/v1"
@@ -223,7 +224,15 @@ func (ec *Controller) enqueuePod(logger klog.Logger, obj interface{}, deleted bo
 		return
 	}
 
-	if len(pod.Spec.ResourceClaims) == 0 {
+	// Check if pod has any resource claims to process.
+	// Extended resource claims are stored in pod.Status.ExtendedResourceClaimStatus,
+	// not in pod.Spec.ResourceClaims, so we need to check both locations.
+	hasResourceClaims := len(pod.Spec.ResourceClaims) > 0
+	// For cleanup of extended resource claims, we must consider claims present
+	// in pod status regardless of the current feature gate state. The claim may
+	// have been created when the feature was enabled and still needs cleanup.
+	hasExtendedResourceClaims := pod.Status.ExtendedResourceClaimStatus != nil
+	if !hasResourceClaims && !hasExtendedResourceClaims {
 		// Nothing to do for it at all.
 		return
 	}
@@ -256,6 +265,18 @@ func (ec *Controller) enqueuePod(logger klog.Logger, obj interface{}, deleted bo
 				// Nothing to do, claim wasn't generated.
 				logger.V(6).Info("Nothing to do for skipped claim during pod change", "pod", klog.KObj(pod), "podClaim", podClaim.Name, "reason", reason)
 			}
+		}
+
+		// Process extended resource claims for completed/deleted pods.
+		// Extended resource claims are created by the scheduler and stored in
+		// pod.Status.ExtendedResourceClaimStatus, not in pod.Spec.ResourceClaims.
+		// Without this, extended resource claims would never be cleaned up when
+		// pods complete, causing device resources to remain allocated indefinitely.
+		if hasExtendedResourceClaims {
+			claimName := pod.Status.ExtendedResourceClaimStatus.ResourceClaimName
+			key := claimKeyPrefix + pod.Namespace + "/" + claimName
+			logger.V(6).Info("Process extended resource claim", "pod", klog.KObj(pod), "claim", klog.KRef(pod.Namespace, claimName), "key", key, "reason", reason)
+			ec.queue.Add(key)
 		}
 	}
 
@@ -390,12 +411,7 @@ func (ec *Controller) enqueueResourceClaim(logger klog.Logger, oldObj, newObj in
 }
 
 func (ec *Controller) Run(ctx context.Context, workers int) {
-	defer runtime.HandleCrash()
-	defer ec.queue.ShutDown()
-
-	logger := klog.FromContext(ctx)
-	logger.Info("Starting resource claim controller")
-	defer logger.Info("Shutting down resource claim controller")
+	defer runtime.HandleCrashWithContext(ctx)
 
 	eventBroadcaster := record.NewBroadcaster(record.WithContext(ctx))
 	eventBroadcaster.StartLogging(klog.Infof)
@@ -403,14 +419,25 @@ func (ec *Controller) Run(ctx context.Context, workers int) {
 	ec.recorder = eventBroadcaster.NewRecorder(scheme.Scheme, v1.EventSource{Component: "resource_claim"})
 	defer eventBroadcaster.Shutdown()
 
-	if !cache.WaitForNamedCacheSync("resource_claim", ctx.Done(), ec.podSynced, ec.claimsSynced, ec.templatesSynced) {
+	logger := klog.FromContext(ctx)
+	logger.Info("Starting resource claim controller")
+
+	var wg sync.WaitGroup
+	defer func() {
+		logger.Info("Shutting down resource claim controller")
+		ec.queue.ShutDown()
+		wg.Wait()
+	}()
+
+	if !cache.WaitForNamedCacheSyncWithContext(ctx, ec.podSynced, ec.claimsSynced, ec.templatesSynced) {
 		return
 	}
 
 	for i := 0; i < workers; i++ {
-		go wait.UntilWithContext(ctx, ec.runWorker, time.Second)
+		wg.Go(func() {
+			wait.UntilWithContext(ctx, ec.runWorker, time.Second)
+		})
 	}
-
 	<-ctx.Done()
 }
 
@@ -432,7 +459,7 @@ func (ec *Controller) processNextWorkItem(ctx context.Context) bool {
 		return true
 	}
 
-	runtime.HandleError(fmt.Errorf("%v failed with: %v", key, err))
+	runtime.HandleErrorWithContext(ctx, err, "Work item failed", "item", key)
 	ec.queue.AddRateLimited(key)
 
 	return true
@@ -639,12 +666,11 @@ func (ec *Controller) handleClaim(ctx context.Context, pod *v1.Pod, podClaim v1.
 				GenerateName: generateName,
 				OwnerReferences: []metav1.OwnerReference{
 					{
-						APIVersion:         "v1",
-						Kind:               "Pod",
-						Name:               pod.Name,
-						UID:                pod.UID,
-						Controller:         &isTrue,
-						BlockOwnerDeletion: &isTrue,
+						APIVersion: "v1",
+						Kind:       "Pod",
+						Name:       pod.Name,
+						UID:        pod.UID,
+						Controller: &isTrue,
 					},
 				},
 				Annotations: annotations,
@@ -1010,7 +1036,7 @@ func (collector *customCollector) DescribeWithStability(ch chan<- *metrics.Desc)
 }
 
 func (collector *customCollector) CollectWithStability(ch chan<- metrics.Metric) {
-	allocateMetrics := make(map[string]map[string]int)
+	rcMetrics := make(map[resourceclaimmetrics.NumResourceClaimLabels]int)
 	rcList, err := collector.rcLister.List(labels.Everything())
 	if err != nil {
 		collector.logger.Error(err, "failed to list resource claims for metrics collection")
@@ -1023,14 +1049,22 @@ func (collector *customCollector) CollectWithStability(ch chan<- metrics.Metric)
 			allocated = "true"
 		}
 		adminAccess := collector.adminAccessFunc(rc)
-		if allocateMetrics[allocated] == nil {
-			allocateMetrics[allocated] = make(map[string]int)
+		source := ""
+		if val, ok := rc.Annotations[resourceapi.ExtendedResourceClaimAnnotation]; ok && val == "true" {
+			source = "extended_resource"
+		} else if val, ok := rc.Annotations[podResourceClaimAnnotation]; ok && val != "" {
+			source = "resource_claim_template"
 		}
-		allocateMetrics[allocated][adminAccess]++
+		rcMetrics[resourceclaimmetrics.NumResourceClaimLabels{Allocated: allocated, AdminAccess: adminAccess, Source: source}]++
 	}
-	for allocated, adminAccessMap := range allocateMetrics {
-		for adminAccess, count := range adminAccessMap {
-			ch <- metrics.NewLazyConstMetric(resourceclaimmetrics.NumResourceClaimsDesc, metrics.GaugeValue, float64(count), allocated, adminAccess)
-		}
+	for rcLabels, count := range rcMetrics {
+		ch <- metrics.NewLazyConstMetric(
+			resourceclaimmetrics.NumResourceClaimsDesc,
+			metrics.GaugeValue,
+			float64(count),
+			rcLabels.Allocated,
+			rcLabels.AdminAccess,
+			rcLabels.Source,
+		)
 	}
 }
