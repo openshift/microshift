@@ -12,7 +12,7 @@ This script will generate a report with advisories, CVEs and jira tickets releva
 
 1. **Switch to the 4.19 branch** to use the advisory publication script
 2. Run: `sh advisory_publication_report.sh <ocp_release_version>` to check for rpm advisories.
-3. User will need to export both `GITLAB_API_TOKEN` and `JIRA_API_TOKEN` environment variables.
+3. User will need to export `GITLAB_API_TOKEN`, `ATLASSIAN_API_TOKEN`, and `ATLASSIAN_EMAIL` environment variables.
 4. A warning already appears when running `advisory_publication_report.sh` script from 4.20 and above branches to run `advisory_publication_report.sh` from 4.19 branches for rpm advisories
 
 ### Steps
@@ -29,13 +29,13 @@ This script will generate a report with advisories, CVEs and jira tickets releva
 
 ### Jira API token
 
-Visit [the Profile page on the Jira
-Server](https://issues.redhat.com/secure/ViewProfile.jspa?selectedTab=com.atlassian.pats.pats-plugin:jira-user-personal-access-tokens) and create a token.
+Visit [the Atlassian API tokens page](https://id.atlassian.com/manage-profile/security/api-tokens) and create a token.
 
-Set the `JIRA_API_TOKEN` in your env:
+Set the `ATLASSIAN_API_TOKEN` and `ATLASSIAN_EMAIL` in your env:
 
 ```
-export JIRA_API_TOKEN="TOKEN_VALUE"
+export ATLASSIAN_API_TOKEN="TOKEN_VALUE"
+export ATLASSIAN_EMAIL="your-email@redhat.com"
 ```
 
 ### GitLab API token
