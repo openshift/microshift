@@ -900,7 +900,6 @@ launch_vm() {
             --autoconsole text \
             --graphics "${graphics_args}" \
             --name "${full_vmname}" \
-            --vcpus "${vm_vcpus}" \
             --memory "${vm_memory}" \
             --disk "pool=${vm_pool_name},size=${vm_disksize}" \
             ${vm_network_args} \
