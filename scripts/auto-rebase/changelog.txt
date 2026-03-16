@@ -1,22 +1,22 @@
-- cluster-kube-apiserver-operator embedded-component f6bb470ca76bd37d533a5366321faa9f478c614a to d0cf9e755d887edf142bcb656c5b6d707a259d9d
-  - 362a74d 2025-10-23T12:35:15+00:00 scc: restricted-v3: Fix runAsUser range
+- kubernetes embedded-component b96a4039358613f770d20f5e4ce5125f66369521 to 4ef1baeb6786a70898f3842a06e988d9566aa444
+  - 481433b5f 2026-03-06T14:46:01-05:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - 69220b617 2026-02-26T20:19:41+00:00 Release commit for Kubernetes v1.33.9
+  - e4aef7c31 2026-02-12T14:07:59+01:00 Bump images and versions to go 1.24.13 and distroless iptables
+  - e95f580e5 2026-02-10T13:05:56+00:00 Update CHANGELOG/CHANGELOG-1.33.md for v1.33.8
 
-- cluster-network-operator embedded-component 6d443d079015388a4966370d200fe040f0754160 to d1ec37ecb90d74eccc8d8c3e0bc42a8c0fb5ac6a
-  - 86e3c68 2026-03-04T19:18:56+05:30 Add config override for openflow-probe
+- operator-framework-olm embedded-component 9cdde3bd7bf69417ec1a26a4c757f565b0107d0e to 12a261a3702726aaaa339c5d2fceb8b6078ceec8
+  - 5317aa59 2026-03-09T11:57:15-04:00 remove EndpointSlice content as it doesn't seem to be supported on 4.20 branch
+  - 479c4a33 2026-03-08T20:52:45-04:00  OCPBUGS-77958: Update NetworkPolicy egress to support HyperShift custom API ports
 
-- machine-config-operator embedded-component 47f9080550b29ca0af7c2cfc92633c61ad0ef971 to 662f6899c4461bbd296e149a8badd818e45c1252
-  - 8809a83b 2026-03-09T15:44:13-07:00 install/0000_80_machine-config_04_kube_rbac_proxy_config: Consistent terminal newline
-  - d58cd23c 2026-03-07T03:37:03+00:00 chore: update AMIs
-  - 553d30f0 2026-03-05T17:35:27+00:00 bootimage: fix failure domain matching
-  - ff725336 2026-03-03T15:49:38+00:00 chore: update AMIs
+- kubernetes image-amd64 b96a4039358613f770d20f5e4ce5125f66369521 to 4ef1baeb6786a70898f3842a06e988d9566aa444
+  - 481433b5f 2026-03-06T14:46:01-05:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - 69220b617 2026-02-26T20:19:41+00:00 Release commit for Kubernetes v1.33.9
+  - e4aef7c31 2026-02-12T14:07:59+01:00 Bump images and versions to go 1.24.13 and distroless iptables
+  - e95f580e5 2026-02-10T13:05:56+00:00 Update CHANGELOG/CHANGELOG-1.33.md for v1.33.8
 
-- ovn-kubernetes image-amd64 238410bc9ec6408baa5f9b9c37f1c1066ac90e45 to 304bd93419279813366b6a04d7d6f3d1ff464cb1
-  - 679442da 2026-02-27T14:28:44+05:30 Add a e2e test for NodePort service
-  - 46ce09a9 2026-02-27T14:28:22+05:30 Clear stale conntrack UDP entries for nodePorts
-  - 8336fa03 2026-02-23T09:49:28+01:00 Minimize ACLs by combining ipBlocks into single ACL
-
-- ovn-kubernetes image-arm64 238410bc9ec6408baa5f9b9c37f1c1066ac90e45 to 304bd93419279813366b6a04d7d6f3d1ff464cb1
-  - 679442da 2026-02-27T14:28:44+05:30 Add a e2e test for NodePort service
-  - 46ce09a9 2026-02-27T14:28:22+05:30 Clear stale conntrack UDP entries for nodePorts
-  - 8336fa03 2026-02-23T09:49:28+01:00 Minimize ACLs by combining ipBlocks into single ACL
+- kubernetes image-arm64 b96a4039358613f770d20f5e4ce5125f66369521 to 4ef1baeb6786a70898f3842a06e988d9566aa444
+  - 481433b5f 2026-03-06T14:46:01-05:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - 69220b617 2026-02-26T20:19:41+00:00 Release commit for Kubernetes v1.33.9
+  - e4aef7c31 2026-02-12T14:07:59+01:00 Bump images and versions to go 1.24.13 and distroless iptables
+  - e95f580e5 2026-02-10T13:05:56+00:00 Update CHANGELOG/CHANGELOG-1.33.md for v1.33.8
 
