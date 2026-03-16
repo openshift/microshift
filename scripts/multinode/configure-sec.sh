@@ -77,10 +77,10 @@ function configure_kubelet() {
 
     # Checksums can be obtained from https://www.downloadkubernetes.com/
     # or by downloading a "${url}.sha256" file (see below for ${url}). For example:
-    # version=v1.32.12; for kube_arch in amd64 arm64; do echo "${kube_arch}: $(curl -L https://dl.k8s.io/release/${version}/bin/linux/${kube_arch}/kubelet.sha256 2>/dev/null)"; done
-    local -r version="v1.32.12"
-    local -r kube_hash_amd64="a4573f91d6a2cf4cc7345db223051a754f60e550ab6fee078007e2be1b6b7178"
-    local -r kube_hash_arm64="6f0031185222f9e9c998aa1cc67985dd843a5c292647438eab765302b94f0ccf"
+    # version=v1.32.13; for kube_arch in amd64 arm64; do echo "${kube_arch}: $(curl -L https://dl.k8s.io/release/${version}/bin/linux/${kube_arch}/kubelet.sha256 2>/dev/null)"; done
+    local -r version="v1.32.13"
+    local -r kube_hash_amd64="4bc04c3f50725fa29ac9f0626c553941cfe07d128b3a313b7f5d176b07ab786e"
+    local -r kube_hash_arm64="46b5b8d313b47aa027e5a874fb8301503e848f313b56f54b9a2697f75409913c"
 
     local kube_arch=""
     local kube_hash=""
