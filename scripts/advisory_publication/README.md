@@ -19,13 +19,13 @@ This script will generate a report with advisories, CVEs and jira tickets releva
 
 ### Jira API token
 
-Visit [the Profile page on the Jira
-Server](https://issues.redhat.com/secure/ViewProfile.jspa?selectedTab=com.atlassian.pats.pats-plugin:jira-user-personal-access-tokens) and create a token.
+Visit [the Atlassian API tokens page](https://id.atlassian.com/manage-profile/security/api-tokens) and create a token.
 
-Set the `JIRA_API_TOKEN` in your env:
+Set the `ATLASSIAN_API_TOKEN` and `ATLASSIAN_EMAIL` in your env:
 
 ```
-export JIRA_API_TOKEN="TOKEN_VALUE"
+export ATLASSIAN_API_TOKEN="TOKEN_VALUE"
+export ATLASSIAN_EMAIL="your-email@redhat.com"
 ```
 
 ### Connect to Red Hat VPN
