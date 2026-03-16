@@ -12,8 +12,9 @@ import yaml
 import jira
 import jira.client
 
-JIRA_URL = 'https://issues.redhat.com/'
-JIRA_API_TOKEN = os.environ.get('JIRA_API_TOKEN')
+ATLASSIAN_URL = 'https://redhat.atlassian.net'
+ATLASSIAN_API_TOKEN = os.environ.get('ATLASSIAN_API_TOKEN')
+ATLASSIAN_EMAIL = os.environ.get('ATLASSIAN_EMAIL')
 GITLAB_API_TOKEN = os.environ.get('GITLAB_API_TOKEN')
 GITLAB_BASE_URL = 'https://gitlab.cee.redhat.com'
 GITLAB_PROJECT_ID = 'hybrid-platforms/art/ocp-shipment-data'
@@ -28,7 +29,8 @@ def usage():
             OCP_VERSION: The OCP versions to analyse if MicroShift version should be published. Format: "4.X.Z"
 
         environment variables:
-            JIRA_API_TOKEN: API token for Jira access
+            ATLASSIAN_API_TOKEN: API token for Atlassian Cloud access
+            ATLASSIAN_EMAIL: Email address for Atlassian Cloud authentication
             GITLAB_API_TOKEN: API token for GitLab access\
     """)
 
@@ -207,18 +209,23 @@ def get_advisories(ocp_version: str) -> dict[str, str]:
     return advisories_found
 
 
-def search_microshift_tickets(affects_version: str, cve_id: str) -> jira.client.ResultList:
+def get_jira_server() -> jira.JIRA:
+    """Create and return a JIRA client connection for Atlassian Cloud."""
+    return jira.JIRA(server=ATLASSIAN_URL, basic_auth=(ATLASSIAN_EMAIL, ATLASSIAN_API_TOKEN))
+
+
+def search_microshift_tickets(server: jira.JIRA, affects_version: str, cve_id: str) -> jira.client.ResultList:
     """
     Query Jira for MicroShift ticket with CVE id and MicroShift version.
 
     Parameters:
+        server (jira.JIRA): authenticated JIRA client
         affects_version (str): MicroShift affected version with format: "X.Y"
         cve_id (str): the CVE id with format: "CVE-YYYY-NNNNN"
 
     Returns:
         jira.client.ResultList: a list with all the Jira tickets matching the query
     """
-    server = jira.JIRA(server=JIRA_URL, token_auth=JIRA_API_TOKEN)
     jira_tickets = server.search_issues(f'''
         summary  ~ "{cve_id}" and component = MicroShift and (affectedVersion = {affects_version} or affectedVersion = {affects_version}.z)
     ''')
@@ -240,6 +247,7 @@ def get_report(ocp_version: str) -> dict[str, dict]:
     """
     result_json = {}
     advisories = get_advisories(ocp_version)
+    server = get_jira_server()
     for advisory_type, advisory_data in advisories.items():
         advisory_name = advisory_data['name']
         cve_list = advisory_data['cves']
@@ -249,7 +257,7 @@ def get_report(ocp_version: str) -> dict[str, dict]:
         }
 
         for cve in cve_list:
-            jira_tickets = search_microshift_tickets(".".join(ocp_version.split(".")[:2]), cve)
+            jira_tickets = search_microshift_tickets(server, ".".join(ocp_version.split(".")[:2]), cve)
             advisory_dict['cves'][cve] = {}
             if jira_tickets:
                 for ticket in jira_tickets:
@@ -270,12 +278,14 @@ def main():
         usage()
         raise ValueError('Invalid number of arguments')
 
-    if JIRA_API_TOKEN is None or GITLAB_API_TOKEN is None:
-        missing_tokens = []
-        if JIRA_API_TOKEN is None:
-            missing_tokens.append('JIRA_API_TOKEN')
-        if GITLAB_API_TOKEN is None:
-            missing_tokens.append('GITLAB_API_TOKEN')
+    missing_tokens = []
+    if not ATLASSIAN_API_TOKEN or not ATLASSIAN_API_TOKEN.strip():
+        missing_tokens.append('ATLASSIAN_API_TOKEN')
+    if not ATLASSIAN_EMAIL or not ATLASSIAN_EMAIL.strip():
+        missing_tokens.append('ATLASSIAN_EMAIL')
+    if not GITLAB_API_TOKEN or not GITLAB_API_TOKEN.strip():
+        missing_tokens.append('GITLAB_API_TOKEN')
+    if missing_tokens:
         raise ValueError(f"Missing required environment variables: {', '.join(missing_tokens)}")
 
     ocp_version = str(sys.argv[1])
