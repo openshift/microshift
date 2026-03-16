@@ -1,7 +1,7 @@
 ---
 name: Analyze CI for a Release
 argument-hint: <release>
-description: Analyze CI for a MicroShift release using analyze-ci-test-job skill and produce a summary
+description: Analyze CI for a MicroShift release using openshift-ci-analysis agent and produce a summary
 allowed-tools: Skill, Bash, Read, Write, Glob, Grep, Agent
 ---
 
@@ -11,7 +11,7 @@ allowed-tools: Skill, Bash, Read, Write, Glob, Grep, Agent
 analyze-ci-for-release - Analyze all failed periodic CI jobs for a MicroShift release
 
 ## Synopsis
-```
+```bash
 /analyze-ci-for-release <release-version> [--limit N]
 ```
 
@@ -19,7 +19,7 @@ analyze-ci-for-release - Analyze all failed periodic CI jobs for a MicroShift re
 Analyzes all failed periodic jobs for a specific MicroShift release by leveraging existing tools and agents. This command orchestrates the analysis workflow by:
 
 1. Fetching list of failed periodic jobs using `.claude/scripts/microshift-prow-jobs-for-release.sh`
-2. Analyzing each job individually using the `openshift-ci-test-job` agent
+2. Analyzing each job individually using the `openshift-ci-analysis` agent
 3. Aggregating results and presenting a concise summary with common failure patterns
 
 This approach reuses existing analysis capabilities rather than duplicating logic.
@@ -47,7 +47,7 @@ bash .claude/scripts/microshift-prow-jobs-for-release.sh 4.22 | grep -E "periodi
 ```
 
 **Expected Output**:
-```
+```text
 Found 17 failed periodic jobs for release 4.22
 ```
 
@@ -56,24 +56,24 @@ Found 17 failed periodic jobs for release 4.22
 - If no periodic jobs found, report "No failed periodic jobs found for release X.XX" and exit successfully
 - If microshift-prow-jobs-for-release.sh fails, report error and exit
 
-### Step 2: Analyze Each Job Using openshift-ci-test-job agent
+### Step 2: Analyze Each Job Using openshift-ci-analysis agent
 
 **Goal**: Get detailed root cause analysis for each failed job.
 
 **Actions**:
 1. For each job URL in the list:
-   - Call the `openshift-ci-test-job` agent with the job URL **in parallel**
+   - Call the `openshift-ci-analysis` agent with the job URL **in parallel**
    - Capture the analysis result (failure reason, error summary)
    - Track common patterns across jobs
    - Store all intermediate analysis files in `/tmp`
 
 2. Progress reporting:
    - Show "Analyzing job X/Y: <job-name>" for each job
-   - Use the agent tool to invoke `openshift-ci-test-job` for each URL
+   - Use the agent tool to invoke `openshift-ci-analysis` for each URL
    - **Run all job analyses in parallel** to maximize efficiency
 
 **Example**:
-```
+```text
 Analyzing 17 jobs in parallel...
 Job 1/17: periodic-ci-openshift-microshift-release-4.22-periodics-e2e-aws-ovn-ocp-conformance
 Job 2/17: periodic-ci-openshift-microshift-release-4.22-periodics-e2e-aws-tests-bootc-nightly
@@ -128,7 +128,7 @@ All intermediate analysis files are stored in `/tmp` with naming pattern:
 
 **Report Structure**:
 
-```
+```text
 ═══════════════════════════════════════════════════════════════
 MICROSHIFT 4.22 RELEASE - FAILED JOBS ANALYSIS
 ═══════════════════════════════════════════════════════════════
@@ -153,7 +153,7 @@ MICROSHIFT 4.22 RELEASE - FAILED JOBS ANALYSIS
    • periodic-ci-openshift-microshift-release-4.22-periodics-e2e-aws-ovn-ocp-conformance-serial
    • ... (6 more)
 
-   Root Cause: [summarized from openshift-ci-test-job results]
+   Root Cause: [summarized from openshift-ci-analysis results]
    Next Steps: [recommended actions]
 
 2. Bootc Image Test Failures (4 jobs)
@@ -185,18 +185,18 @@ Individual job reports available in:
 
 ### Example 1: Analyze All Failed Jobs
 
-```
+```bash
 /analyze-ci-for-release 4.22
 ```
 
 **Behavior**:
 - Fetches all failed periodic jobs for 4.22
-- Analyzes each job using openshift-ci-test-job agent
+- Analyzes each job using openshift-ci-analysis agent
 - Presents aggregated summary
 
 ### Example 2: Quick Analysis (First 5 Jobs)
 
-```
+```bash
 /analyze-ci-for-release 4.22 --limit 5
 ```
 
@@ -207,7 +207,7 @@ Individual job reports available in:
 
 ### Example 3: Different Release
 
-```
+```bash
 /analyze-ci-for-release 4.21
 ```
 
@@ -217,7 +217,7 @@ Individual job reports available in:
 
 ## Performance Considerations
 
-- **Execution Time**: Significantly reduced through parallel execution - typically 2-3 minutes for 15-20 jobs (depends on openshift-ci-test-job execution time)
+- **Execution Time**: Significantly reduced through parallel execution - typically 2-3 minutes for 15-20 jobs (depends on openshift-ci-analysis execution time)
 - **Network Usage**: Moderate to high - all jobs analyzed in parallel fetch logs from GCS simultaneously
 - **Parallelization**: All jobs are analyzed in parallel for maximum efficiency
 - **Use --limit**: For quick checks, use --limit flag to analyze subset
@@ -226,34 +226,34 @@ Individual job reports available in:
 ## Prerequisites
 
 - `.claude/scripts/microshift-prow-jobs-for-release.sh` script must exist and be executable
-- `openshift-ci-test-job` agent must be available
+- `openshift-ci-analysis` agent must be available
 - Internet access to fetch job data from Prow/GCS
 - Bash shell
 
 ## Error Handling
 
 ### No Failed Jobs
-```
+```text
 No failed periodic jobs found for release 4.22
 This is good news - all periodic jobs are passing! ✓
 ```
 
 ### Invalid Release Version
-```
+```text
 Error: Invalid release version
 Usage: /analyze-ci-for-release <release-version> [--limit N]
 Example: /analyze-ci-for-release 4.22
 ```
 
 ### microshift-prow-jobs-for-release.sh Not Found
-```
+```text
 Error: Could not find .claude/scripts/microshift-prow-jobs-for-release.sh
 Please ensure you're in the microshift project directory.
 ```
 
 ## Related Skills
 
-- **openshift-ci-test-job**: Detailed analysis of a single job (used internally)
+- **openshift-ci-analysis**: Detailed analysis of a single job (used internally)
 - **analyze-ci-test-scenario**: Analyze specific test scenario results
 - **analyze-microshift-start**: Analyze MicroShift startup performance
 - **analyze-sos-report**: Investigate runtime issues from SOS reports
@@ -261,19 +261,19 @@ Please ensure you're in the microshift project directory.
 ## Use Cases
 
 ### Daily CI Health Check
-```
+```bash
 /analyze-ci-for-release 4.22 --limit 10
 ```
 Quick morning check of CI status
 
 ### Pre-Release Verification
-```
+```bash
 /analyze-ci-for-release 4.22
 ```
 Complete analysis before cutting a release
 
 ### Root Cause Investigation
-```
+```bash
 /analyze-ci-for-release 4.22
 ```
 When multiple jobs fail, identify common issues

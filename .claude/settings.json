@@ -5,11 +5,10 @@
       "Write(//tmp/**)",
       "Bash(*)",
       "WebFetch(domain:prow.ci.openshift.org)",
-      "Skill(analyze-ci-for-release-manager)",
+      "Skill(analyze-ci-for-pull-requests)",
       "Skill(analyze-ci-for-release)",
-      "Skill(analyze-ci-test-job)",
-      "Skill(analyze-ci-test-scenario)",
-      "Skill(analyze-sos-report)"
+      "Skill(analyze-ci-for-release-manager)",
+      "Skill(openshift-ci-analysis)"
     ],
     "deny": [],
     "ask": [

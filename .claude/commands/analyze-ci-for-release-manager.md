@@ -8,7 +8,7 @@ allowed-tools: Skill, Bash, Read, Write, Glob, Grep, Agent
 # analyze-ci-for-release-manager
 
 ## Synopsis
-```
+```bash
 /analyze-ci-for-release-manager <release1,release2,...>
 ```
 
@@ -35,7 +35,7 @@ Accepts a comma-separated list of MicroShift release versions, runs the `analyze
 
 **Actions**:
 1. For each release version from the parsed list, invoke the `analyze-ci-for-release` skill:
-   ```
+   ```text
    Skill: analyze-ci-for-release, args: "<version>"
    ```
 2. Run releases **sequentially** (each skill invocation is a full analysis)
@@ -43,7 +43,7 @@ Accepts a comma-separated list of MicroShift release versions, runs the `analyze
 4. Track which releases succeeded and which failed
 
 **Progress Reporting**:
-```
+```text
 Analyzing release X/Y: <version>
 ```
 
@@ -51,14 +51,14 @@ Analyzing release X/Y: <version>
 
 **Actions**:
 1. Invoke the `analyze-ci-for-pull-requests` skill with `--rebase` argument:
-   ```
+   ```text
    Skill: analyze-ci-for-pull-requests, args: "--rebase"
    ```
 2. After the skill completes, note the summary report file path (typically `/tmp/analyze-ci-prs-summary.*.txt`)
 3. If no rebase PRs are found, note "No open rebase PRs" for the report
 
 **Progress Reporting**:
-```
+```text
 Analyzing rebase pull requests...
 ```
 
@@ -160,8 +160,8 @@ The HTML file must be a self-contained, single-file document with embedded CSS a
 
     <!-- Tab navigation -->
     <div class="tab-bar">
-        <button class="tab-btn active" onclick="showTab('periodics')">Periodics</button>
-        <button class="tab-btn" onclick="showTab('pull-requests')">Pull Requests</button>
+        <button class="tab-btn active" onclick="showTab(event, 'periodics')">Periodics</button>
+        <button class="tab-btn" onclick="showTab(event, 'pull-requests')">Pull Requests</button>
     </div>
 
     <!-- Periodics tab content -->
@@ -216,7 +216,7 @@ The HTML file must be a self-contained, single-file document with embedded CSS a
 
 <script>
 // Tab switching
-function showTab(name) {
+function showTab(e, name) {
     document.querySelectorAll('.tab-content').forEach(function(el) {
         el.classList.remove('active');
     });
@@ -224,7 +224,7 @@ function showTab(name) {
         el.classList.remove('active');
     });
     document.getElementById('tab-' + name).classList.add('active');
-    event.target.classList.add('active');
+    e.target.classList.add('active');
 }
 
 // Collapsible sections
@@ -261,7 +261,7 @@ document.querySelectorAll('.collapsible').forEach(function(el) {
 2. Provide a brief text summary listing each release and its failed job count, plus rebase PR status
 
 **Example Output**:
-```
+```text
 HTML report generated: /tmp/microshift-ci-release-manager-20260315-143022.html
 
 Summary:
@@ -277,17 +277,17 @@ Summary:
 ## Examples
 
 ### Example 1: Analyze Multiple Releases
-```
+```bash
 /analyze-ci-for-release-manager 4.19,4.20,4.21,4.22
 ```
 
 ### Example 2: Analyze Two Releases
-```
+```bash
 /analyze-ci-for-release-manager 4.21,4.22
 ```
 
 ### Example 3: Single Release (still produces HTML)
-```
+```bash
 /analyze-ci-for-release-manager 4.22
 ```
 

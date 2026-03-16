@@ -13,13 +13,13 @@ allowed-tools: Skill, Bash, Read, Write, Glob, Grep, Agent
 ```
 
 ## Description
-Fetches all open MicroShift pull requests, identifies failed Prow CI jobs for each PR, analyzes each failure using the `analyze-ci-test-job` agent, and produces a text summary report.
+Fetches all open MicroShift pull requests, identifies failed Prow CI jobs for each PR, analyzes each failure using the `openshift-ci-analysis` agent, and produces a text summary report.
 
 This command orchestrates the analysis workflow by:
 
 1. Fetching the list of open PRs and their failed jobs using `.claude/scripts/microshift-prow-jobs-for-pull-requests.sh --mode detail`
 2. Filtering to only PRs that have at least one failed job
-3. Analyzing each failed job individually using the `analyze-ci-test-job` agent
+3. Analyzing each failed job individually using the `openshift-ci-analysis` agent
 4. Aggregating results into a summary report saved to `/tmp`
 
 ## Arguments
@@ -67,19 +67,19 @@ bash .claude/scripts/microshift-prow-jobs-for-pull-requests.sh --mode detail --f
 - If no failed jobs across all PRs, report "All PR jobs are passing" and exit successfully
 - If `microshift-prow-jobs-for-pull-requests.sh` fails, report error and exit
 
-### Step 2: Analyze Each Failed Job Using analyze-ci-test-job Agent
+### Step 2: Analyze Each Failed Job Using openshift-ci-analysis Agent
 
 **Goal**: Get detailed root cause analysis for each failed job.
 
 **Actions**:
 1. For each failed job URL from Step 1:
-   - Call the `analyze-ci-test-job` agent with the job URL **in parallel**
+   - Call the `openshift-ci-analysis` agent with the job URL **in parallel**
    - Capture the analysis result (failure reason, error summary)
    - Store all intermediate analysis files in `/tmp`
 
 2. Progress reporting:
    - Show "Analyzing job X/Y: <job-name> (PR #NNN)" for each job
-   - Use the Agent tool to invoke `analyze-ci-test-job` for each URL
+   - Use the Agent tool to invoke `openshift-ci-analysis` for each URL
    - **Run all job analyses in parallel** to maximize efficiency
 
 **Data Collection**:
@@ -144,7 +144,7 @@ PR #6313: USHIFT-6636: Change test-agent impl to align with greenboot-rs
   Failed Jobs:
   1. pull-ci-openshift-microshift-main-e2e-aws-tests
      Status: FAILURE
-     Root Cause: [summarized from analyze-ci-test-job]
+     Root Cause: [summarized from openshift-ci-analysis]
      URL: https://prow.ci.openshift.org/view/gs/...
 
   2. pull-ci-openshift-microshift-main-e2e-aws-tests-arm
@@ -218,7 +218,7 @@ Individual job reports: /tmp/analyze-ci-prs-job-*.txt
 ## Prerequisites
 
 - `.claude/scripts/microshift-prow-jobs-for-pull-requests.sh` script must exist and be executable
-- `analyze-ci-test-job` agent must be available
+- `openshift-ci-analysis` agent must be available
 - `gh` CLI must be authenticated with access to openshift/microshift
 - Internet access to fetch job data from GCS
 - Bash shell
@@ -244,7 +244,7 @@ Please ensure you're in the microshift project directory.
 
 ## Related Skills
 
-- **analyze-ci-test-job**: Detailed analysis of a single job (used internally)
+- **openshift-ci-analysis**: Detailed analysis of a single job (used internally)
 - **analyze-ci-for-release**: Similar analysis for periodic release jobs
 - **analyze-ci-for-release-manager**: Multi-release analysis with HTML output
 - **analyze-ci-test-scenario**: Analyze specific test scenario results
