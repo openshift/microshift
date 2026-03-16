@@ -1705,8 +1705,10 @@ func TestGetScaleSubresourceAsTableForAllBuiltins(t *testing.T) {
 	// Enable all features and apis for testing
 	flags := framework.DefaultTestServerFlags()
 	flags = append(flags, "--runtime-config=api/all=true")
-	featuregatetesting.SetFeatureGateDuringTest(t, utilfeature.DefaultFeatureGate, "AllAlpha", true)
-	featuregatetesting.SetFeatureGateDuringTest(t, utilfeature.DefaultFeatureGate, "AllBeta", true)
+	featuregatetesting.SetFeatureGatesDuringTest(t, utilfeature.DefaultFeatureGate, featuregatetesting.FeatureOverrides{
+		"AllAlpha": true,
+		"AllBeta":  true,
+	})
 
 	testNamespace := "test-scale"
 	server := kubeapiservertesting.StartTestServerOrDie(t, nil, flags, framework.SharedEtcd())
@@ -3209,6 +3211,20 @@ func TestEmulatedStorageVersion(t *testing.T) {
 				Version: "v1",
 			},
 		},
+		{
+			name:            "vap before ga release",
+			emulatedVersion: "1.30",
+			gvr: schema.GroupVersionResource{
+				Group:    "admissionregistration.k8s.io",
+				Version:  "v1beta1",
+				Resource: "validatingadmissionpolicies",
+			},
+			object: validVap,
+			expectedStorageVersion: schema.GroupVersion{
+				Group:   "admissionregistration.k8s.io",
+				Version: "v1beta1",
+			},
+		},
 	}
 
 	// Group cases by their emulated version
@@ -3228,6 +3244,180 @@ func TestEmulatedStorageVersion(t *testing.T) {
 
 			// create test namespace
 			testNamespace := "test-emulated-storage-version"
+			_, err := client.CoreV1().Namespaces().Create(context.TODO(), &v1.Namespace{
+				ObjectMeta: metav1.ObjectMeta{
+					Name: testNamespace,
+				},
+			}, metav1.CreateOptions{})
+			if err != nil {
+				t.Fatalf("failed to create test ns: %v", err)
+			}
+
+			restMapper := restmapper.NewDeferredDiscoveryRESTMapper(memory.NewMemCacheClient(client.Discovery()))
+
+			for i, c := range cases {
+				t.Run(c.name, func(t *testing.T) {
+					gvk, err := restMapper.KindFor(c.gvr)
+					if err != nil {
+						t.Fatalf("failed to get GVK: %v", err)
+					}
+					c.object.GetObjectKind().SetGroupVersionKind(gvk)
+
+					mapping, err := restMapper.RESTMapping(gvk.GroupKind(), gvk.Version)
+					if err != nil {
+						t.Fatalf("failed to get RESTMapping: %v", err)
+					} else if mapping.Resource != c.gvr {
+						t.Fatalf("expected resource %v, got %v", c.gvr, mapping.Resource)
+					}
+
+					asUnstructured, err := runtime.DefaultUnstructuredConverter.ToUnstructured(c.object)
+					if err != nil {
+						t.Fatalf("failed to convert object to unstructured: %v", err)
+					}
+
+					uns := &unstructured.Unstructured{
+						Object: asUnstructured,
+					}
+					uns.SetName(fmt.Sprintf("test-object%d", i))
+
+					ns := testNamespace
+					if mapping.Scope.Name() == meta.RESTScopeNameRoot {
+						ns = ""
+					}
+
+					// create object
+					created, err := dynamicClient.Resource(c.gvr).Namespace(ns).Create(context.TODO(), uns, metav1.CreateOptions{})
+					if err != nil {
+						t.Fatalf("failed to create object: %v", err)
+					}
+
+					// Fetch object from ETCD
+					// Use this poor man's way to get the etcd path. This wont
+					// work for all resources, but should work for most we want
+					// to test against
+					resourcePrefix := mapping.Resource.Resource
+					if special, ok := kubeapiserver.SpecialDefaultResourcePrefixes[c.gvr.GroupResource()]; ok {
+						resourcePrefix = special
+					}
+					etcdPathComponents := []string{
+						"/",
+						server.EtcdStoragePrefix,
+						resourcePrefix,
+					}
+
+					if len(ns) > 0 {
+						etcdPathComponents = append(etcdPathComponents, ns)
+					}
+					etcdPathComponents = append(etcdPathComponents, created.GetName())
+					etcdPath := path.Join(etcdPathComponents...)
+					fetched, err := server.EtcdClient.Get(context.TODO(), etcdPath)
+					if err != nil {
+						t.Fatalf("failed to fetch object from etcd: %v", err)
+					} else if fetched.More || fetched.Count != 1 || len(fetched.Kvs) != 1 {
+						t.Fatalf("unexpected fetched response: %v", fetched)
+					}
+
+					storedObject := &metav1.PartialObjectMetadata{}
+					err = json.Unmarshal(fetched.Kvs[0].Value, storedObject)
+
+					if err != nil {
+						t.Fatalf("failed to decode object: %v", err)
+					} else if storedObject.GroupVersionKind().GroupVersion() != c.expectedStorageVersion {
+						t.Fatalf("expected storage version %s, got %s", c.expectedStorageVersion.String(), storedObject.GroupVersionKind().GroupVersion().String())
+					}
+				})
+			}
+		})
+	}
+}
+
+func TestMinCompatibilityStorageVersion(t *testing.T) {
+	validVap := &admissionregistrationv1.ValidatingAdmissionPolicy{
+		Spec: admissionregistrationv1.ValidatingAdmissionPolicySpec{
+			MatchConstraints: &admissionregistrationv1.MatchResources{
+				ResourceRules: []admissionregistrationv1.NamedRuleWithOperations{
+					{
+						ResourceNames: []string{"foo"},
+						RuleWithOperations: admissionregistrationv1.RuleWithOperations{
+							Operations: []admissionregistrationv1.OperationType{"CREATE"},
+							Rule: admissionregistrationv1.Rule{
+								APIGroups:   []string{"*"},
+								APIVersions: []string{"*"},
+								Resources:   []string{"*"},
+							},
+						},
+					},
+				},
+			},
+			Validations: []admissionregistrationv1.Validation{
+				{
+					Expression: "true",
+					Message:    "always valid",
+				},
+			},
+		},
+	}
+
+	type testCase struct {
+		name                    string
+		minCompatibilityVersion string
+		gvr                     schema.GroupVersionResource
+		object                  runtime.Object
+		expectedStorageVersion  schema.GroupVersion
+	}
+	cases := []testCase{
+		{
+			name:                    "vap after ga release",
+			minCompatibilityVersion: "1.31",
+			gvr: schema.GroupVersionResource{
+				Group:    "admissionregistration.k8s.io",
+				Version:  "v1beta1",
+				Resource: "validatingadmissionpolicies",
+			},
+			object: validVap,
+			expectedStorageVersion: schema.GroupVersion{
+				Group:   "admissionregistration.k8s.io",
+				Version: "v1",
+			},
+		},
+		{
+			name:                    "vap before ga release",
+			minCompatibilityVersion: "1.29",
+			gvr: schema.GroupVersionResource{
+				Group:    "admissionregistration.k8s.io",
+				Version:  "v1beta1",
+				Resource: "validatingadmissionpolicies",
+			},
+			object: validVap,
+			expectedStorageVersion: schema.GroupVersion{
+				Group:   "admissionregistration.k8s.io",
+				Version: "v1beta1",
+			},
+		},
+	}
+
+	// Group cases by their min compatibility version
+	groupedCases := map[string][]testCase{}
+	for _, c := range cases {
+		groupedCases[c.minCompatibilityVersion] = append(groupedCases[c.minCompatibilityVersion], c)
+	}
+
+	for minCompatibilityVersion, cases := range groupedCases {
+		t.Run(minCompatibilityVersion, func(t *testing.T) {
+			server := kubeapiservertesting.StartTestServerOrDie(
+				t, nil, []string{
+					"--emulated-version=kube=1.33", // admissionregistration.k8s.io/v1beta1 is removed at 1.34
+					"--min-compatibility-version=kube=" + minCompatibilityVersion,
+					`--storage-media-type=application/json`,
+					fmt.Sprintf("--runtime-config=%s=true", admissionregistrationv1beta1.SchemeGroupVersion),
+				}, framework.SharedEtcd())
+			defer server.TearDownFn()
+
+			client := clientset.NewForConfigOrDie(server.ClientConfig)
+			dynamicClient := dynamic.NewForConfigOrDie(server.ClientConfig)
+
+			// create test namespace
+			testNamespace := "test-min-compatibility-storage-version"
 			_, err := client.CoreV1().Namespaces().Create(context.TODO(), &v1.Namespace{
 				ObjectMeta: metav1.ObjectMeta{
 					Name: testNamespace,
@@ -3386,10 +3576,6 @@ func TestEnableEmulationVersion(t *testing.T) {
 			expectedStatusCode: 200,
 		},
 		{
-			path:               "/apis/flowcontrol.apiserver.k8s.io/v1beta3/flowschemas", // introduced at 1.26, removed at 1.32
-			expectedStatusCode: 200,
-		},
-		{
 			path:               "/apis/networking.k8s.io/v1beta1/servicecidrs", // introduced at 1.31, removed at 1.34
 			expectedStatusCode: 200,
 		},
@@ -3445,10 +3631,6 @@ func TestEnableEmulationVersionForwardCompatible(t *testing.T) {
 		},
 		{
 			path:               "/apis/flowcontrol.apiserver.k8s.io/v1/flowschemas",
-			expectedStatusCode: 200,
-		},
-		{
-			path:               "/apis/flowcontrol.apiserver.k8s.io/v1beta3/flowschemas", // introduced at 1.26, removed at 1.32
 			expectedStatusCode: 200,
 		},
 		{
@@ -3510,10 +3692,6 @@ func TestEnableRuntimeConfigEmulationVersionForwardCompatible(t *testing.T) {
 			expectedStatusCode: 200,
 		},
 		{
-			path:               "/apis/flowcontrol.apiserver.k8s.io/v1beta3/flowschemas", // introduced at 1.26, removed at 1.32
-			expectedStatusCode: 200,
-		},
-		{
 			path:               "/apis/networking.k8s.io/v1beta1/servicecidrs", // introduced at 1.31, removed at 1.34
 			expectedStatusCode: 200,
 		},
@@ -3544,9 +3722,9 @@ func TestEnableRuntimeConfigEmulationVersionForwardCompatible(t *testing.T) {
 }
 
 func TestDisableEmulationVersion(t *testing.T) {
-	featuregatetesting.SetFeatureGateEmulationVersionDuringTest(t, utilfeature.DefaultFeatureGate, version.MustParse("1.32"))
+	featuregatetesting.SetFeatureGateEmulationVersionDuringTest(t, utilfeature.DefaultFeatureGate, version.MustParse("1.34"))
 	server := kubeapiservertesting.StartTestServerOrDie(t,
-		&kubeapiservertesting.TestServerInstanceOptions{BinaryVersion: "1.32"},
+		&kubeapiservertesting.TestServerInstanceOptions{BinaryVersion: "1.34"},
 		[]string{}, framework.SharedEtcd())
 	defer server.TearDownFn()
 
@@ -3568,11 +3746,11 @@ func TestDisableEmulationVersion(t *testing.T) {
 			expectedStatusCode: 200,
 		},
 		{
-			path:               "/apis/flowcontrol.apiserver.k8s.io/v1/flowschemas",
+			path:               "/apis/networking.k8s.io/v1/servicecidrs",
 			expectedStatusCode: 200,
 		},
 		{
-			path:               "/apis/flowcontrol.apiserver.k8s.io/v1beta3/flowschemas", // introduced at 1.26, removed at 1.32
+			path:               "/apis/networking.k8s.io/v1beta1/servicecidrs", // introduced at 1.31, removed at 1.34
 			expectedStatusCode: 404,
 		},
 	}
@@ -3681,8 +3859,10 @@ func assertManagedFields(t *testing.T, obj *unstructured.Unstructured) {
 // TestDefaultStorageEncoding verifies that the storage encoding for all built-in resources is
 // Protobuf.
 func TestDefaultStorageEncoding(t *testing.T) {
-	featuregatetesting.SetFeatureGateDuringTest(t, utilfeature.DefaultFeatureGate, "AllAlpha", true)
-	featuregatetesting.SetFeatureGateDuringTest(t, utilfeature.DefaultFeatureGate, "AllBeta", true)
+	featuregatetesting.SetFeatureGatesDuringTest(t, utilfeature.DefaultFeatureGate, featuregatetesting.FeatureOverrides{
+		"AllAlpha": true,
+		"AllBeta":  true,
+	})
 
 	protobufRecognizer := protobuf.NewSerializer(runtime.NewScheme(), runtime.NewScheme())
 	var recognizersByGroup map[string]recognizer.RecognizingDecoder

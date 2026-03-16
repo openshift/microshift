@@ -36,6 +36,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/apimachinery/pkg/util/resourceversion"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/strategicpatch"
 	"k8s.io/apimachinery/pkg/util/wait"
@@ -44,6 +45,7 @@ import (
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/kubernetes/pkg/apis/scheduling"
 	"k8s.io/kubernetes/pkg/features"
+	apimachineryutils "k8s.io/kubernetes/test/e2e/common/apimachinery"
 	"k8s.io/kubernetes/test/e2e/feature"
 	"k8s.io/kubernetes/test/e2e/framework"
 	e2enode "k8s.io/kubernetes/test/e2e/framework/node"
@@ -373,7 +375,7 @@ var _ = SIGDescribe("SchedulerPreemption", framework.WithSerial(), func() {
 		highPriorityPods := make([]*v1.Pod, 0, 5*nodeListLen)
 		mediumPriorityPods := make([]*v1.Pod, 0, 10*nodeListLen)
 
-		ginkgo.By("Run medium priority pods that have same requirements as that of lower priority pod")
+		ginkgo.By("Run high/medium priority pods that have same requirements as that of lower priority pod")
 		for i := range nodeList.Items {
 			// Create medium priority pods first
 			// to confirm the scheduler finally prioritize the high priority pods, ignoring the medium priority pods.
@@ -391,6 +393,19 @@ var _ = SIGDescribe("SchedulerPreemption", framework.WithSerial(), func() {
 				})
 				mediumPriorityPods = append(mediumPriorityPods, p)
 			}
+
+			for j := 0; j < 5; j++ {
+				p := createPausePod(ctx, f, pausePodConfig{
+					Name:              fmt.Sprintf("pod%d-%d-%v", i, j, highPriorityClassName),
+					PriorityClassName: highPriorityClassName,
+					Resources: &v1.ResourceRequirements{
+						// Set the pod request to the low priority pod's resources
+						Requests: lowPriorityPods[0].Spec.Containers[0].Resources.Requests,
+						Limits:   lowPriorityPods[0].Spec.Containers[0].Resources.Requests,
+					},
+				})
+				highPriorityPods = append(highPriorityPods, p)
+			}
 		}
 
 		// All low priority Pods should be the target of preemption.
@@ -404,22 +419,6 @@ var _ = SIGDescribe("SchedulerPreemption", framework.WithSerial(), func() {
 				}
 				return preemptedPod.DeletionTimestamp != nil, nil
 			}))
-		}
-
-		ginkgo.By("Run high priority pods that have same requirements as that of lower priority pod")
-		for i := range nodeList.Items {
-			for j := 0; j < 5; j++ {
-				p := createPausePod(ctx, f, pausePodConfig{
-					Name:              fmt.Sprintf("pod%d-%d-%v", i, j, highPriorityClassName),
-					PriorityClassName: highPriorityClassName,
-					Resources: &v1.ResourceRequirements{
-						// Set the pod request to the low priority pod's resources
-						Requests: lowPriorityPods[0].Spec.Containers[0].Resources.Requests,
-						Limits:   lowPriorityPods[0].Spec.Containers[0].Resources.Requests,
-					},
-				})
-				highPriorityPods = append(highPriorityPods, p)
-			}
 		}
 
 		// All high priority Pods should be schedulable by removing the low priority Pods.
@@ -978,6 +977,8 @@ var _ = SIGDescribe("SchedulerPreemption", framework.WithSerial(), func() {
 				framework.ExpectNoError(err)
 				gomega.Expect(livePC.Value).To(gomega.Equal(pc.Value))
 				gomega.Expect(livePC.Description).To(gomega.Equal(newDesc))
+				gomega.Expect(livePC).To(apimachineryutils.HaveValidResourceVersion())
+				gomega.Expect(resourceversion.CompareResourceVersion(pc.ResourceVersion, livePC.ResourceVersion)).To(gomega.BeNumerically("==", -1), "changed object should have a larger resource version")
 			}
 		})
 	})

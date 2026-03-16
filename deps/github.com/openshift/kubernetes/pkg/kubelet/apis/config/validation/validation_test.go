@@ -36,39 +36,40 @@ import (
 
 var (
 	successConfig = kubeletconfig.KubeletConfiguration{
-		CgroupsPerQOS:                   cgroupsPerQOS,
-		EnforceNodeAllocatable:          enforceNodeAllocatable,
-		SystemReservedCgroup:            "/system.slice",
-		KubeReservedCgroup:              "/kubelet.service",
-		PodLogsDir:                      "/logs",
-		SystemCgroups:                   "",
-		CgroupRoot:                      "",
-		EventBurst:                      10,
-		EventRecordQPS:                  5,
-		HealthzPort:                     10248,
-		ImageGCHighThresholdPercent:     85,
-		ImageGCLowThresholdPercent:      80,
-		IPTablesDropBit:                 15,
-		IPTablesMasqueradeBit:           14,
-		KubeAPIBurst:                    10,
-		KubeAPIQPS:                      5,
-		MaxOpenFiles:                    1000000,
-		MaxPods:                         110,
-		OOMScoreAdj:                     -999,
-		PodsPerCore:                     100,
-		Port:                            65535,
-		ReadOnlyPort:                    0,
-		RegistryBurst:                   10,
-		RegistryPullQPS:                 5,
-		MaxParallelImagePulls:           nil,
-		HairpinMode:                     kubeletconfig.PromiscuousBridge,
-		NodeLeaseDurationSeconds:        1,
-		CPUCFSQuotaPeriod:               metav1.Duration{Duration: 25 * time.Millisecond},
-		TopologyManagerScope:            kubeletconfig.PodTopologyManagerScope,
-		TopologyManagerPolicy:           kubeletconfig.SingleNumaNodeTopologyManagerPolicy,
-		ShutdownGracePeriod:             metav1.Duration{Duration: 30 * time.Second},
-		ShutdownGracePeriodCriticalPods: metav1.Duration{Duration: 10 * time.Second},
-		MemoryThrottlingFactor:          ptr.To(0.9),
+		CgroupsPerQOS:                          cgroupsPerQOS,
+		EnforceNodeAllocatable:                 enforceNodeAllocatable,
+		SystemReservedCgroup:                   "/system.slice",
+		KubeReservedCgroup:                     "/kubelet.service",
+		PodLogsDir:                             "/logs",
+		SystemCgroups:                          "",
+		CgroupRoot:                             "",
+		EventBurst:                             10,
+		EventRecordQPS:                         5,
+		HealthzPort:                            10248,
+		ImageGCHighThresholdPercent:            85,
+		ImageGCLowThresholdPercent:             80,
+		ImagePullCredentialsVerificationPolicy: "NeverVerifyPreloadedImages",
+		IPTablesDropBit:                        15,
+		IPTablesMasqueradeBit:                  14,
+		KubeAPIBurst:                           10,
+		KubeAPIQPS:                             5,
+		MaxOpenFiles:                           1000000,
+		MaxPods:                                110,
+		OOMScoreAdj:                            -999,
+		PodsPerCore:                            100,
+		Port:                                   65535,
+		ReadOnlyPort:                           0,
+		RegistryBurst:                          10,
+		RegistryPullQPS:                        5,
+		MaxParallelImagePulls:                  nil,
+		HairpinMode:                            kubeletconfig.PromiscuousBridge,
+		NodeLeaseDurationSeconds:               1,
+		CPUCFSQuotaPeriod:                      metav1.Duration{Duration: 25 * time.Millisecond},
+		TopologyManagerScope:                   kubeletconfig.PodTopologyManagerScope,
+		TopologyManagerPolicy:                  kubeletconfig.SingleNumaNodeTopologyManagerPolicy,
+		ShutdownGracePeriod:                    metav1.Duration{Duration: 30 * time.Second},
+		ShutdownGracePeriodCriticalPods:        metav1.Duration{Duration: 10 * time.Second},
+		MemoryThrottlingFactor:                 ptr.To(0.9),
 		FeatureGates: map[string]bool{
 			"CustomCPUCFSQuotaPeriod":    true,
 			"GracefulNodeShutdown":       true,
@@ -76,7 +77,8 @@ var (
 			"KubeletCrashLoopBackOffMax": true,
 		},
 		Logging: logsapi.LoggingConfiguration{
-			Format: "text",
+			Format:         "text",
+			FlushFrequency: logsapi.TimeOrMetaDuration{Duration: metav1.Duration{Duration: logsapi.LogFlushFreqDefault}},
 		},
 		ContainerRuntimeEndpoint:    "unix:///run/containerd/containerd.sock",
 		ContainerLogMaxWorkers:      1,
@@ -360,7 +362,12 @@ func TestValidateKubeletConfiguration(t *testing.T) {
 	}, {
 		name: "specify ShutdownGracePeriod without enabling GracefulNodeShutdown",
 		configure: func(conf *kubeletconfig.KubeletConfiguration) *kubeletconfig.KubeletConfiguration {
-			conf.FeatureGates = map[string]bool{"GracefulNodeShutdown": false}
+			conf.FeatureGates = map[string]bool{
+				"GracefulNodeShutdown": false,
+				// Disable dependents.
+				"GracefulNodeShutdownBasedOnPodPriority": false,
+				"WindowsGracefulNodeShutdown":            false,
+			}
 			conf.ShutdownGracePeriod = metav1.Duration{Duration: 1 * time.Second}
 			return conf
 		},
@@ -368,7 +375,12 @@ func TestValidateKubeletConfiguration(t *testing.T) {
 	}, {
 		name: "specify ShutdownGracePeriodCriticalPods without enabling GracefulNodeShutdown",
 		configure: func(conf *kubeletconfig.KubeletConfiguration) *kubeletconfig.KubeletConfiguration {
-			conf.FeatureGates = map[string]bool{"GracefulNodeShutdown": false}
+			conf.FeatureGates = map[string]bool{
+				"GracefulNodeShutdown": false,
+				// Disable dependents.
+				"GracefulNodeShutdownBasedOnPodPriority": false,
+				"WindowsGracefulNodeShutdown":            false,
+			}
 			conf.ShutdownGracePeriodCriticalPods = metav1.Duration{Duration: 1 * time.Second}
 			return conf
 		},
@@ -606,7 +618,7 @@ func TestValidateKubeletConfiguration(t *testing.T) {
 				conf.EnableSystemLogQuery = true
 				return conf
 			},
-			errMsg: "invalid configuration: NodeLogQuery feature gate is required for enableSystemLogHandler",
+			errMsg: "invalid configuration: NodeLogQuery feature gate is required for enableSystemLogQuery",
 		}, {
 			name: "enableSystemLogQuery is enabled without enableSystemLogHandler",
 			configure: func(conf *kubeletconfig.KubeletConfiguration) *kubeletconfig.KubeletConfiguration {
@@ -617,17 +629,8 @@ func TestValidateKubeletConfiguration(t *testing.T) {
 			},
 			errMsg: "invalid configuration: enableSystemLogHandler is required for enableSystemLogQuery",
 		}, {
-			name: "imageMaximumGCAge should not be specified without feature gate",
-			configure: func(conf *kubeletconfig.KubeletConfiguration) *kubeletconfig.KubeletConfiguration {
-				conf.FeatureGates = map[string]bool{"ImageMaximumGCAge": false}
-				conf.ImageMaximumGCAge = metav1.Duration{Duration: 1}
-				return conf
-			},
-			errMsg: "invalid configuration: ImageMaximumGCAge feature gate is required for Kubelet configuration option imageMaximumGCAge",
-		}, {
 			name: "imageMaximumGCAge should not be negative",
 			configure: func(conf *kubeletconfig.KubeletConfiguration) *kubeletconfig.KubeletConfiguration {
-				conf.FeatureGates = map[string]bool{"ImageMaximumGCAge": true}
 				conf.ImageMaximumGCAge = metav1.Duration{Duration: -1}
 				return conf
 			},
@@ -635,7 +638,6 @@ func TestValidateKubeletConfiguration(t *testing.T) {
 		}, {
 			name: "imageMaximumGCAge should not be less than imageMinimumGCAge",
 			configure: func(conf *kubeletconfig.KubeletConfiguration) *kubeletconfig.KubeletConfiguration {
-				conf.FeatureGates = map[string]bool{"ImageMaximumGCAge": true}
 				conf.ImageMaximumGCAge = metav1.Duration{Duration: 1}
 				conf.ImageMinimumGCAge = metav1.Duration{Duration: 2}
 				return conf

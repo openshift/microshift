@@ -20,6 +20,8 @@ import (
 func ForKind(kind schema.GroupVersionKind) interface{} {
 	switch kind {
 	// Group=config.openshift.io, Version=v1
+	case v1.SchemeGroupVersion.WithKind("AcceptRisk"):
+		return &configv1.AcceptRiskApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("AlibabaCloudPlatformStatus"):
 		return &configv1.AlibabaCloudPlatformStatusApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("AlibabaCloudResourceTag"):
@@ -132,6 +134,8 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &configv1.ConsoleSpecApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("ConsoleStatus"):
 		return &configv1.ConsoleStatusApplyConfiguration{}
+	case v1.SchemeGroupVersion.WithKind("Custom"):
+		return &configv1.CustomApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("CustomFeatureGates"):
 		return &configv1.CustomFeatureGatesApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("CustomTLSProfile"):
@@ -170,8 +174,12 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &configv1.FeatureGateSpecApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("FeatureGateStatus"):
 		return &configv1.FeatureGateStatusApplyConfiguration{}
-	case v1.SchemeGroupVersion.WithKind("FulcioCAWithRekor"):
-		return &configv1.FulcioCAWithRekorApplyConfiguration{}
+	case v1.SchemeGroupVersion.WithKind("GatherConfig"):
+		return &configv1.GatherConfigApplyConfiguration{}
+	case v1.SchemeGroupVersion.WithKind("GathererConfig"):
+		return &configv1.GathererConfigApplyConfiguration{}
+	case v1.SchemeGroupVersion.WithKind("Gatherers"):
+		return &configv1.GatherersApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("GCPPlatformStatus"):
 		return &configv1.GCPPlatformStatusApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("GCPResourceLabel"):
@@ -216,10 +224,18 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &configv1.ImageLabelApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("ImagePolicy"):
 		return &configv1.ImagePolicyApplyConfiguration{}
+	case v1.SchemeGroupVersion.WithKind("ImagePolicyFulcioCAWithRekorRootOfTrust"):
+		return &configv1.ImagePolicyFulcioCAWithRekorRootOfTrustApplyConfiguration{}
+	case v1.SchemeGroupVersion.WithKind("ImagePolicyPKIRootOfTrust"):
+		return &configv1.ImagePolicyPKIRootOfTrustApplyConfiguration{}
+	case v1.SchemeGroupVersion.WithKind("ImagePolicyPublicKeyRootOfTrust"):
+		return &configv1.ImagePolicyPublicKeyRootOfTrustApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("ImagePolicySpec"):
 		return &configv1.ImagePolicySpecApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("ImagePolicyStatus"):
 		return &configv1.ImagePolicyStatusApplyConfiguration{}
+	case v1.SchemeGroupVersion.WithKind("ImageSigstoreVerificationPolicy"):
+		return &configv1.ImageSigstoreVerificationPolicyApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("ImageSpec"):
 		return &configv1.ImageSpecApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("ImageStatus"):
@@ -244,6 +260,10 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &configv1.IngressSpecApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("IngressStatus"):
 		return &configv1.IngressStatusApplyConfiguration{}
+	case v1.SchemeGroupVersion.WithKind("InsightsDataGather"):
+		return &configv1.InsightsDataGatherApplyConfiguration{}
+	case v1.SchemeGroupVersion.WithKind("InsightsDataGatherSpec"):
+		return &configv1.InsightsDataGatherSpecApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("KeystoneIdentityProvider"):
 		return &configv1.KeystoneIdentityProviderApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("KMSConfig"):
@@ -336,16 +356,16 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &configv1.OvirtPlatformLoadBalancerApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("OvirtPlatformStatus"):
 		return &configv1.OvirtPlatformStatusApplyConfiguration{}
-	case v1.SchemeGroupVersion.WithKind("PKI"):
-		return &configv1.PKIApplyConfiguration{}
+	case v1.SchemeGroupVersion.WithKind("PersistentVolumeClaimReference"):
+		return &configv1.PersistentVolumeClaimReferenceApplyConfiguration{}
+	case v1.SchemeGroupVersion.WithKind("PersistentVolumeConfig"):
+		return &configv1.PersistentVolumeConfigApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("PKICertificateSubject"):
 		return &configv1.PKICertificateSubjectApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("PlatformSpec"):
 		return &configv1.PlatformSpecApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("PlatformStatus"):
 		return &configv1.PlatformStatusApplyConfiguration{}
-	case v1.SchemeGroupVersion.WithKind("Policy"):
-		return &configv1.PolicyApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("PolicyFulcioSubject"):
 		return &configv1.PolicyFulcioSubjectApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("PolicyIdentity"):
@@ -378,8 +398,6 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &configv1.ProxySpecApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("ProxyStatus"):
 		return &configv1.ProxyStatusApplyConfiguration{}
-	case v1.SchemeGroupVersion.WithKind("PublicKey"):
-		return &configv1.PublicKeyApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("RegistryLocation"):
 		return &configv1.RegistryLocationApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("RegistrySources"):
@@ -400,6 +418,8 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &configv1.SecretNameReferenceApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("SignatureStore"):
 		return &configv1.SignatureStoreApplyConfiguration{}
+	case v1.SchemeGroupVersion.WithKind("Storage"):
+		return &configv1.StorageApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("TemplateReference"):
 		return &configv1.TemplateReferenceApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("TLSProfileSpec"):
@@ -412,6 +432,8 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &configv1.TokenClaimMappingsApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("TokenClaimOrExpressionMapping"):
 		return &configv1.TokenClaimOrExpressionMappingApplyConfiguration{}
+	case v1.SchemeGroupVersion.WithKind("TokenClaimValidationCELRule"):
+		return &configv1.TokenClaimValidationCELRuleApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("TokenClaimValidationRule"):
 		return &configv1.TokenClaimValidationRuleApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("TokenConfig"):
@@ -420,6 +442,8 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &configv1.TokenIssuerApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("TokenRequiredClaim"):
 		return &configv1.TokenRequiredClaimApplyConfiguration{}
+	case v1.SchemeGroupVersion.WithKind("TokenUserValidationRule"):
+		return &configv1.TokenUserValidationRuleApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("Update"):
 		return &configv1.UpdateApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("UpdateHistory"):
@@ -476,18 +500,30 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &configv1alpha1.ClusterMonitoringSpecApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("ContainerResource"):
 		return &configv1alpha1.ContainerResourceApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("CRIOCredentialProviderConfig"):
+		return &configv1alpha1.CRIOCredentialProviderConfigApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("CRIOCredentialProviderConfigSpec"):
+		return &configv1alpha1.CRIOCredentialProviderConfigSpecApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("CRIOCredentialProviderConfigStatus"):
+		return &configv1alpha1.CRIOCredentialProviderConfigStatusApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("EtcdBackupSpec"):
 		return &configv1alpha1.EtcdBackupSpecApplyConfiguration{}
-	case v1alpha1.SchemeGroupVersion.WithKind("FulcioCAWithRekor"):
-		return &configv1alpha1.FulcioCAWithRekorApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("GatherConfig"):
 		return &configv1alpha1.GatherConfigApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("ImagePolicy"):
 		return &configv1alpha1.ImagePolicyApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("ImagePolicyFulcioCAWithRekorRootOfTrust"):
+		return &configv1alpha1.ImagePolicyFulcioCAWithRekorRootOfTrustApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("ImagePolicyPKIRootOfTrust"):
+		return &configv1alpha1.ImagePolicyPKIRootOfTrustApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("ImagePolicyPublicKeyRootOfTrust"):
+		return &configv1alpha1.ImagePolicyPublicKeyRootOfTrustApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("ImagePolicySpec"):
 		return &configv1alpha1.ImagePolicySpecApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("ImagePolicyStatus"):
 		return &configv1alpha1.ImagePolicyStatusApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("ImageSigstoreVerificationPolicy"):
+		return &configv1alpha1.ImageSigstoreVerificationPolicyApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("InsightsDataGather"):
 		return &configv1alpha1.InsightsDataGatherApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("InsightsDataGatherSpec"):
@@ -498,12 +534,8 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &configv1alpha1.PersistentVolumeClaimReferenceApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("PersistentVolumeConfig"):
 		return &configv1alpha1.PersistentVolumeConfigApplyConfiguration{}
-	case v1alpha1.SchemeGroupVersion.WithKind("PKI"):
-		return &configv1alpha1.PKIApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("PKICertificateSubject"):
 		return &configv1alpha1.PKICertificateSubjectApplyConfiguration{}
-	case v1alpha1.SchemeGroupVersion.WithKind("Policy"):
-		return &configv1alpha1.PolicyApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("PolicyFulcioSubject"):
 		return &configv1alpha1.PolicyFulcioSubjectApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("PolicyIdentity"):
@@ -514,8 +546,10 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &configv1alpha1.PolicyMatchRemapIdentityApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("PolicyRootOfTrust"):
 		return &configv1alpha1.PolicyRootOfTrustApplyConfiguration{}
-	case v1alpha1.SchemeGroupVersion.WithKind("PublicKey"):
-		return &configv1alpha1.PublicKeyApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("PrometheusOperatorAdmissionWebhookConfig"):
+		return &configv1alpha1.PrometheusOperatorAdmissionWebhookConfigApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("PrometheusOperatorConfig"):
+		return &configv1alpha1.PrometheusOperatorConfigApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("RetentionNumberConfig"):
 		return &configv1alpha1.RetentionNumberConfigApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("RetentionPolicy"):

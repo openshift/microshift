@@ -306,6 +306,7 @@ function kube::codegen::gen_openapi() {
     local out_pkg=""
     local extra_pkgs=()
     local report="/dev/null"
+    local output_model_name_file=""
     local update_report=""
     local boilerplate="${KUBE_CODEGEN_ROOT}/hack/boilerplate.go.txt"
     local v="${KUBE_VERBOSE:-0}"
@@ -328,6 +329,10 @@ function kube::codegen::gen_openapi() {
                 report="$2"
                 shift 2
                 ;;
+            "--output-model-name-file")
+              output_model_name_file="$2"
+              shift 2
+              ;;
             "--update-report")
                 update_report="true"
                 shift
@@ -387,7 +392,7 @@ function kube::codegen::gen_openapi() {
         input_pkgs+=("${pkg}")
     done < <(
         ( kube::codegen::internal::grep -l --null \
-            -e '^\s*//\s*+k8s:openapi-gen=' \
+            -e '^\s*//\s*+k8s:openapi' \
             -r "${in_dir}" \
             --include '*.go' \
             || true \
@@ -411,9 +416,11 @@ function kube::codegen::gen_openapi() {
             --output-dir "${out_dir}" \
             --output-pkg "${out_pkg}" \
             --report-filename "${new_report}" \
+            --output-model-name-file="${output_model_name_file}" \
             "k8s.io/apimachinery/pkg/apis/meta/v1" \
             "k8s.io/apimachinery/pkg/runtime" \
             "k8s.io/apimachinery/pkg/version" \
+            "k8s.io/apimachinery/pkg/api/resource" \
             "${input_pkgs[@]}"
     fi
 

@@ -40,7 +40,7 @@ func NewOAuthAuthorizeTokenInformer(client versioned.Interface, resyncPeriod tim
 // one. This reduces memory footprint and number of connections to the server.
 func NewFilteredOAuthAuthorizeTokenInformer(client versioned.Interface, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
 	return cache.NewSharedIndexInformer(
-		&cache.ListWatch{
+		cache.ToListWatcherWithWatchListSemantics(&cache.ListWatch{
 			ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
@@ -65,7 +65,7 @@ func NewFilteredOAuthAuthorizeTokenInformer(client versioned.Interface, resyncPe
 				}
 				return client.OauthV1().OAuthAuthorizeTokens().Watch(ctx, options)
 			},
-		},
+		}, client),
 		&apioauthv1.OAuthAuthorizeToken{},
 		resyncPeriod,
 		indexers,

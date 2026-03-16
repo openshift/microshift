@@ -85,6 +85,7 @@
       "google.golang.org/appengine": "cloud dependency",
       "google.golang.org/genproto": "refer to #113366",
       "gopkg.in/square/go-jose.v2": "obsolete, use gopkg.in/go-jose/go-jose.v2",
+      "gopkg.in/evanphx/json-patch.v5": "refer to https://github.com/kubernetes/kubernetes/pull/91622#issuecomment-637087847",
       "gopkg.in/fsnotify.v1": "obsolete, use github.com/fsnotify/fsnotify",
       "gopkg.in/yaml.v2": "prefer sigs.k8s.io/yaml",
       "gopkg.in/yaml.v3": "prefer sigs.k8s.io/yaml/goyaml.v3",
@@ -146,16 +147,7 @@
         "go.etcd.io/etcd/client/v3",
         "go.etcd.io/etcd/server/v3",
         "go.etcd.io/raft/v3",
-        "k8s.io/api",
-        "k8s.io/apiextensions-apiserver",
-        "k8s.io/apimachinery",
-        "k8s.io/apiserver",
-        "k8s.io/client-go",
-        "k8s.io/code-generator",
-        "k8s.io/kube-aggregator",
-        "k8s.io/kubelet",
-        "k8s.io/kubernetes",
-        "k8s.io/metrics"
+        "k8s.io/code-generator"
       ],
       "github.com/golang/groupcache": [
         "go.etcd.io/etcd/server/v3"
@@ -216,7 +208,6 @@
         "sigs.k8s.io/structured-merge-diff/v6"
       ],
       "github.com/pkg/errors": [
-        "github.com/Microsoft/hnslib",
         "github.com/google/cadvisor",
         "sigs.k8s.io/kustomize/api",
         "sigs.k8s.io/kustomize/kustomize/v5"
@@ -229,11 +220,8 @@
         "github.com/google/cel-go",
         "github.com/grpc-ecosystem/go-grpc-middleware/v2"
       ],
-      "gopkg.in/yaml.v2": [
-        "github.com/prometheus/client_golang",
-        "github.com/prometheus/common"
-      ],
       "gopkg.in/yaml.v3": [
+        "github.com/containerd/containerd/api",
         "github.com/coreos/go-semver",
         "github.com/cyphar/filepath-securejoin",
         "github.com/go-logr/zapr",
@@ -245,8 +233,6 @@
         "github.com/grpc-ecosystem/go-grpc-middleware/providers/prometheus",
         "github.com/grpc-ecosystem/go-grpc-middleware/v2",
         "github.com/grpc-ecosystem/grpc-gateway/v2",
-        "github.com/onsi/ginkgo/v2",
-        "github.com/onsi/gomega",
         "github.com/prometheus/common",
         "github.com/spf13/cobra",
         "github.com/stretchr/objx",
@@ -287,7 +273,6 @@
       "github.com/mailru/easyjson",
       "github.com/modern-go/concurrent",
       "github.com/modern-go/reflect2",
-      "github.com/pkg/errors",
       "golang.org/x/exp",
       "gopkg.in/yaml.v3"
     ]

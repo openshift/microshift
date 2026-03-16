@@ -61,19 +61,20 @@ type pullerExpects struct {
 }
 
 type pullerTestCase struct {
-	testName            string
-	containerImage      string
-	policy              v1.PullPolicy
-	pullSecrets         []v1.Secret
-	allowedCredentials  *mockImagePullManagerConfig                       // controls what the image pull manager considers "allowed"
-	serviceAccountName  string                                            // for testing service account coordinates
-	registryCredentials map[string][]credentialprovider.TrackedAuthConfig // image -> registry credentials (obtained from credential providers using SA tokens)
-	inspectErr          error
-	pullerErr           error
-	qps                 float32
-	burst               int
-	expected            []pullerExpects
-	enableFeatures      []featuregate.Feature
+	testName                   string
+	containerImage             string
+	policy                     v1.PullPolicy
+	pullSecrets                []v1.Secret
+	allowedCredentials         *mockImagePullManagerConfig                       // controls what the image pull manager considers "allowed"
+	serviceAccountName         string                                            // for testing service account coordinates
+	registryCredentials        map[string][]credentialprovider.TrackedAuthConfig // image -> registry credentials (obtained from credential providers using SA tokens)
+	inspectErr                 error
+	pullerErr                  error
+	qps                        float32
+	burst                      int
+	expected                   []pullerExpects
+	expectedEnsureImageMetrics string
+	enableFeatures             []featuregate.Feature
 }
 
 // mockImagePullManagerConfig configures what credentials the mock pull manager considers "allowed"
@@ -108,7 +109,9 @@ func noFGPullerTestCases() []pullerTestCase {
 						{Reason: "Pulling"},
 						{Reason: "Pulled"},
 					}, ""},
-			}},
+			},
+			expectedEnsureImageMetrics: ensureExistsMetricForLabels("ifnotpresent", "false", "true"),
+		},
 
 		{ // image present, don't pull
 			testName:       "image present, allow all, don't pull ",
@@ -131,10 +134,12 @@ func noFGPullerTestCases() []pullerTestCase {
 					[]v1.Event{
 						{Reason: "Pulled"},
 					}, ""},
-			}},
+			},
+			expectedEnsureImageMetrics: ensureExistsMetricForLabels("ifnotpresent", "true", "false"),
+		},
 		// image present, pull it
 		{containerImage: "present_image",
-			testName:   "image present, pull ",
+			testName:   "image present, pull",
 			policy:     v1.PullAlways,
 			inspectErr: nil,
 			pullerErr:  nil,
@@ -156,7 +161,9 @@ func noFGPullerTestCases() []pullerTestCase {
 						{Reason: "Pulling"},
 						{Reason: "Pulled"},
 					}, ""},
-			}},
+			},
+			expectedEnsureImageMetrics: ensureExistsMetricForLabels("always", "unknown", "true"),
+		},
 		// missing image, error PullNever
 		{containerImage: "missing_image",
 			testName:   "image missing, never pull",
@@ -178,10 +185,12 @@ func noFGPullerTestCases() []pullerTestCase {
 					[]v1.Event{
 						{Reason: "ErrImageNeverPull"},
 					}, ""},
-			}},
+			},
+			expectedEnsureImageMetrics: ensureExistsMetricForLabels("never", "false", "unknown"),
+		},
 		// missing image, unable to inspect
 		{containerImage: "missing_image",
-			testName:   "image missing, pull if not present",
+			testName:   "image missing, pull if not present, fail on image inspect",
 			policy:     v1.PullIfNotPresent,
 			inspectErr: errors.New("unknown inspectError"),
 			pullerErr:  nil,
@@ -200,7 +209,9 @@ func noFGPullerTestCases() []pullerTestCase {
 					[]v1.Event{
 						{Reason: "InspectFailed"},
 					}, ""},
-			}},
+			},
+			expectedEnsureImageMetrics: ensureExistsMetricForLabels("ifnotpresent", "unknown", "unknown"),
+		},
 		// missing image, unable to fetch
 		{containerImage: "typo_image",
 			testName:   "image missing, unable to fetch",
@@ -237,7 +248,9 @@ func noFGPullerTestCases() []pullerTestCase {
 					[]v1.Event{
 						{Reason: "BackOff"},
 					}, ""},
-			}},
+			},
+			expectedEnsureImageMetrics: ensureExistsMetricForLabels("ifnotpresent", "false", "true"),
+		},
 		// image present, non-zero qps, try to pull
 		{containerImage: "present_image",
 			testName:   "image present and qps>0, pull",
@@ -262,7 +275,9 @@ func noFGPullerTestCases() []pullerTestCase {
 						{Reason: "Pulling"},
 						{Reason: "Pulled"},
 					}, ""},
-			}},
+			},
+			expectedEnsureImageMetrics: ensureExistsMetricForLabels("always", "unknown", "true"),
+		},
 		// image present, non-zero qps, try to pull when qps exceeded
 		{containerImage: "present_image",
 			testName:   "image present and excessive qps rate, pull",
@@ -286,7 +301,9 @@ func noFGPullerTestCases() []pullerTestCase {
 					[]v1.Event{
 						{Reason: "BackOff"},
 					}, ""},
-			}},
+			},
+			expectedEnsureImageMetrics: ensureExistsMetricForLabels("always", "unknown", "true"),
+		},
 		// error case if image name fails validation due to invalid reference format
 		{containerImage: "FAILED_IMAGE",
 			testName:   "invalid image name, no pull",
@@ -300,7 +317,9 @@ func noFGPullerTestCases() []pullerTestCase {
 					[]v1.Event{
 						{Reason: "InspectFailed"},
 					}, ""},
-			}},
+			},
+			expectedEnsureImageMetrics: ensureExistsMetricForLabels("always", "unknown", "unknown"),
+		},
 		// error case if image name contains http
 		{containerImage: "http://url",
 			testName:   "invalid image name with http, no pull",
@@ -314,7 +333,9 @@ func noFGPullerTestCases() []pullerTestCase {
 					[]v1.Event{
 						{Reason: "InspectFailed"},
 					}, ""},
-			}},
+			},
+			expectedEnsureImageMetrics: ensureExistsMetricForLabels("always", "unknown", "unknown"),
+		},
 		// error case if image name contains sha256
 		{containerImage: "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad",
 			testName:   "invalid image name with sha256, no pull",
@@ -328,7 +349,9 @@ func noFGPullerTestCases() []pullerTestCase {
 					[]v1.Event{
 						{Reason: "InspectFailed"},
 					}, ""},
-			}},
+			},
+			expectedEnsureImageMetrics: ensureExistsMetricForLabels("always", "unknown", "unknown"),
+		},
 		{containerImage: "typo_image",
 			testName:   "image missing, SignatureValidationFailed",
 			policy:     v1.PullIfNotPresent,
@@ -360,7 +383,9 @@ func noFGPullerTestCases() []pullerTestCase {
 					[]v1.Event{
 						{Reason: "BackOff"},
 					}, "Back-off pulling image \"typo_image\": SignatureValidationFailed: image pull failed for typo_image because the signature validation failed"},
-			}},
+			},
+			expectedEnsureImageMetrics: ensureExistsMetricForLabels("ifnotpresent", "false", "true"),
+		},
 	}
 }
 
@@ -401,7 +426,9 @@ func ensureSecretImagesTestCases() []pullerTestCase {
 						{Reason: "Pulling"},
 						{Reason: "Pulled"},
 					}, ""},
-			}},
+			},
+			expectedEnsureImageMetrics: ensureExistsMetricForLabels("ifnotpresent", "true", "true"),
+		},
 		{
 			testName:       "[KubeletEnsureSecretPulledImages] image present, unknown secret to image pull manager, pull",
 			containerImage: "present_image",
@@ -435,6 +462,7 @@ func ensureSecretImagesTestCases() []pullerTestCase {
 						{Reason: "Pulled"},
 					}, ""},
 			},
+			expectedEnsureImageMetrics: ensureExistsMetricForLabels("ifnotpresent", "true", "true"),
 		},
 		{
 			testName:       "[KubeletEnsureSecretPulledImages] image present, unknown secret to image pull manager, never pull policy -> fail",
@@ -466,6 +494,7 @@ func ensureSecretImagesTestCases() []pullerTestCase {
 						{Reason: "ErrImageNeverPull"},
 					}, ""},
 			},
+			expectedEnsureImageMetrics: ensureExistsMetricForLabels("never", "true", "true"),
 		},
 		{
 			testName:       "[KubeletEnsureSecretPulledImages] image present, a secret matches one of known to the image pull manager, don't pull",
@@ -500,6 +529,7 @@ func ensureSecretImagesTestCases() []pullerTestCase {
 						{Reason: "Pulled"},
 					}, ""},
 			},
+			expectedEnsureImageMetrics: ensureExistsMetricForLabels("ifnotpresent", "true", "false"),
 		},
 		{
 			testName:           "[KubeletEnsureSecretPulledImages] image present, service account credentials available, don't pull",
@@ -535,6 +565,7 @@ func ensureSecretImagesTestCases() []pullerTestCase {
 						{Reason: "Pulled"},
 					}, ""},
 			},
+			expectedEnsureImageMetrics: ensureExistsMetricForLabels("ifnotpresent", "true", "false"),
 		},
 		{
 			testName:           "[KubeletEnsureSecretPulledImages] image present, service account allowed by pull manager, don't pull",
@@ -580,6 +611,7 @@ func ensureSecretImagesTestCases() []pullerTestCase {
 						{Reason: "Pulled"},
 					}, ""},
 			},
+			expectedEnsureImageMetrics: ensureExistsMetricForLabels("ifnotpresent", "true", "false"),
 		},
 		{
 			testName:           "[KubeletEnsureSecretPulledImages] image present, mixed credentials (secrets + service accounts), pull required",
@@ -623,6 +655,7 @@ func ensureSecretImagesTestCases() []pullerTestCase {
 						{Reason: "Pulled"},
 					}, ""},
 			},
+			expectedEnsureImageMetrics: ensureExistsMetricForLabels("ifnotpresent", "true", "true"),
 		},
 		{
 			testName:       "[KubeletEnsureSecretPulledImages] image present, only node credentials (no source), proceed without tracking",
@@ -651,6 +684,7 @@ func ensureSecretImagesTestCases() []pullerTestCase {
 						{Reason: "Pulled"},
 					}, ""},
 			},
+			expectedEnsureImageMetrics: ensureExistsMetricForLabels("ifnotpresent", "true", "false"),
 		},
 	}
 
@@ -665,27 +699,33 @@ func ensureSecretImagesTestCases() []pullerTestCase {
 
 type mockPodPullingTimeRecorder struct {
 	sync.Mutex
-	startedPullingRecorded  bool
-	finishedPullingRecorded bool
+	startedPullingRecorded  map[types.UID]bool
+	finishedPullingRecorded map[types.UID]bool
 }
 
 func (m *mockPodPullingTimeRecorder) RecordImageStartedPulling(podUID types.UID) {
 	m.Lock()
 	defer m.Unlock()
-	m.startedPullingRecorded = true
+
+	if !m.startedPullingRecorded[podUID] {
+		m.startedPullingRecorded[podUID] = true
+	}
 }
 
 func (m *mockPodPullingTimeRecorder) RecordImageFinishedPulling(podUID types.UID) {
 	m.Lock()
 	defer m.Unlock()
-	m.finishedPullingRecorded = true
+
+	if m.startedPullingRecorded[podUID] {
+		m.finishedPullingRecorded[podUID] = true
+	}
 }
 
 func (m *mockPodPullingTimeRecorder) reset() {
 	m.Lock()
 	defer m.Unlock()
-	m.startedPullingRecorded = false
-	m.finishedPullingRecorded = false
+	clear(m.startedPullingRecorded)
+	clear(m.finishedPullingRecorded)
 }
 
 type mockImagePullManager struct {
@@ -694,9 +734,14 @@ type mockImagePullManager struct {
 	config *mockImagePullManagerConfig
 }
 
-func (m *mockImagePullManager) MustAttemptImagePull(image, _ string, podSecrets []kubeletconfiginternal.ImagePullSecret, podServiceAccount *kubeletconfiginternal.ImagePullServiceAccount) bool {
+func (m *mockImagePullManager) MustAttemptImagePull(ctx context.Context, image, _ string, getPodCredentials pullmanager.GetPodCredentials) (bool, error) {
 	if m.config == nil || m.config.allowAll {
-		return false
+		return false, nil
+	}
+
+	podSecrets, podServiceAccount, err := getPodCredentials()
+	if err != nil {
+		return true, err
 	}
 
 	// Check secrets
@@ -704,7 +749,7 @@ func (m *mockImagePullManager) MustAttemptImagePull(image, _ string, podSecrets 
 		for _, s := range podSecrets {
 			for _, allowed := range allowedSecrets {
 				if s.Namespace == allowed.Namespace && s.Name == allowed.Name && s.UID == allowed.UID {
-					return false
+					return false, nil
 				}
 			}
 		}
@@ -714,12 +759,12 @@ func (m *mockImagePullManager) MustAttemptImagePull(image, _ string, podSecrets 
 	if podServiceAccount != nil {
 		if allowedServiceAccounts, ok := m.config.allowedServiceAccounts[image]; ok {
 			if slices.Contains(allowedServiceAccounts, *podServiceAccount) {
-				return false
+				return false, nil
 			}
 		}
 	}
 
-	return true
+	return true, nil
 }
 
 // mockImagePullManagerWithTracking tracks calls to MustAttemptImagePull for service account testing
@@ -736,22 +781,28 @@ type mockImagePullManagerWithTracking struct {
 	recordedCredentials *kubeletconfiginternal.ImagePullCredentials
 }
 
-func (m *mockImagePullManagerWithTracking) MustAttemptImagePull(image, imageRef string, podSecrets []kubeletconfiginternal.ImagePullSecret, podServiceAccount *kubeletconfiginternal.ImagePullServiceAccount) bool {
+func (m *mockImagePullManagerWithTracking) MustAttemptImagePull(ctx context.Context, image, imageRef string, getPodCredentials pullmanager.GetPodCredentials) (bool, error) {
 	m.mustAttemptCalled = true
 	m.lastImage = image
 	m.lastImageRef = imageRef
+
+	podSecrets, podServiceAccount, err := getPodCredentials()
+	if err != nil {
+		return true, err
+	}
+
 	m.lastSecrets = podSecrets
 	if podServiceAccount != nil {
 		m.lastServiceAccounts = []kubeletconfiginternal.ImagePullServiceAccount{*podServiceAccount}
 	}
 
 	if m.allowAll {
-		return false
+		return false, nil
 	}
-	return m.mustAttemptReturn
+	return m.mustAttemptReturn, nil
 }
 
-func (m *mockImagePullManagerWithTracking) RecordImagePulled(image, imageRef string, credentials *kubeletconfiginternal.ImagePullCredentials) {
+func (m *mockImagePullManagerWithTracking) RecordImagePulled(ctx context.Context, image, imageRef string, credentials *kubeletconfiginternal.ImagePullCredentials) {
 	m.recordedCredentials = credentials
 }
 
@@ -799,7 +850,10 @@ func pullerTestEnv(
 	fakeRuntime.Err = c.pullerErr
 	fakeRuntime.InspectErr = c.inspectErr
 
-	fakePodPullingTimeRecorder = &mockPodPullingTimeRecorder{}
+	fakePodPullingTimeRecorder = &mockPodPullingTimeRecorder{
+		startedPullingRecorded:  make(map[types.UID]bool),
+		finishedPullingRecorded: make(map[types.UID]bool),
+	}
 
 	pullManager := &mockImagePullManager{
 		config: c.allowedCredentials,
@@ -834,7 +888,7 @@ func TestParallelPuller(t *testing.T) {
 	useSerializedEnv := false
 	for _, c := range cases {
 		t.Run(c.testName, func(t *testing.T) {
-			ctx := context.Background()
+			ctx := ktesting.Init(t)
 			puller, fakeClock, fakeRuntime, container, fakePodPullingTimeRecorder, _ := pullerTestEnv(t, c, useSerializedEnv, nil)
 
 			pod := &v1.Pod{
@@ -865,8 +919,8 @@ func TestParallelPuller(t *testing.T) {
 				_, msg, err := puller.EnsureImageExists(ctx, nil, pod, container.Image, c.pullSecrets, podSandboxConfig, "", container.ImagePullPolicy)
 				fakeRuntime.AssertCalls(expected.calls)
 				assert.Equal(t, expected.err, err)
-				assert.Equal(t, expected.shouldRecordStartedPullingTime, fakePodPullingTimeRecorder.startedPullingRecorded)
-				assert.Equal(t, expected.shouldRecordFinishedPullingTime, fakePodPullingTimeRecorder.finishedPullingRecorded)
+				assert.Equal(t, expected.shouldRecordStartedPullingTime, fakePodPullingTimeRecorder.startedPullingRecorded[pod.UID])
+				assert.Equal(t, expected.shouldRecordFinishedPullingTime, fakePodPullingTimeRecorder.finishedPullingRecorded[pod.UID])
 				assert.Contains(t, msg, expected.msg)
 				fakePodPullingTimeRecorder.reset()
 			}
@@ -880,7 +934,7 @@ func TestSerializedPuller(t *testing.T) {
 	useSerializedEnv := true
 	for _, c := range cases {
 		t.Run(c.testName, func(t *testing.T) {
-			ctx := context.Background()
+			ctx := ktesting.Init(t)
 			puller, fakeClock, fakeRuntime, container, fakePodPullingTimeRecorder, _ := pullerTestEnv(t, c, useSerializedEnv, nil)
 
 			pod := &v1.Pod{
@@ -911,8 +965,8 @@ func TestSerializedPuller(t *testing.T) {
 				_, msg, err := puller.EnsureImageExists(ctx, nil, pod, container.Image, c.pullSecrets, podSandboxConfig, "", container.ImagePullPolicy)
 				fakeRuntime.AssertCalls(expected.calls)
 				assert.Equal(t, expected.err, err)
-				assert.Equal(t, expected.shouldRecordStartedPullingTime, fakePodPullingTimeRecorder.startedPullingRecorded)
-				assert.Equal(t, expected.shouldRecordFinishedPullingTime, fakePodPullingTimeRecorder.finishedPullingRecorded)
+				assert.Equal(t, expected.shouldRecordStartedPullingTime, fakePodPullingTimeRecorder.startedPullingRecorded[pod.UID])
+				assert.Equal(t, expected.shouldRecordFinishedPullingTime, fakePodPullingTimeRecorder.finishedPullingRecorded[pod.UID])
 				assert.Contains(t, msg, expected.msg)
 				fakePodPullingTimeRecorder.reset()
 			}
@@ -975,7 +1029,7 @@ func TestPullAndListImageWithPodAnnotations(t *testing.T) {
 
 	useSerializedEnv := true
 	t.Run(c.testName, func(t *testing.T) {
-		ctx := context.Background()
+		ctx := ktesting.Init(t)
 		puller, fakeClock, fakeRuntime, container, fakePodPullingTimeRecorder, _ := pullerTestEnv(t, c, useSerializedEnv, nil)
 		fakeRuntime.CalledFunctions = nil
 		fakeRuntime.ImageList = []Image{}
@@ -984,8 +1038,8 @@ func TestPullAndListImageWithPodAnnotations(t *testing.T) {
 		_, _, err := puller.EnsureImageExists(ctx, nil, pod, container.Image, c.pullSecrets, podSandboxConfig, "", container.ImagePullPolicy)
 		fakeRuntime.AssertCalls(c.expected[0].calls)
 		assert.Equal(t, c.expected[0].err, err, "tick=%d", 0)
-		assert.Equal(t, c.expected[0].shouldRecordStartedPullingTime, fakePodPullingTimeRecorder.startedPullingRecorded)
-		assert.Equal(t, c.expected[0].shouldRecordFinishedPullingTime, fakePodPullingTimeRecorder.finishedPullingRecorded)
+		assert.Equal(t, c.expected[0].shouldRecordStartedPullingTime, fakePodPullingTimeRecorder.startedPullingRecorded[pod.UID])
+		assert.Equal(t, c.expected[0].shouldRecordFinishedPullingTime, fakePodPullingTimeRecorder.finishedPullingRecorded[pod.UID])
 
 		images, _ := fakeRuntime.ListImages(ctx)
 		assert.Len(t, images, 1, "ListImages() count")
@@ -1039,7 +1093,7 @@ func TestPullAndListImageWithRuntimeHandlerInImageCriAPIFeatureGate(t *testing.T
 	useSerializedEnv := true
 	t.Run(c.testName, func(t *testing.T) {
 		featuregatetesting.SetFeatureGateDuringTest(t, utilfeature.DefaultFeatureGate, features.RuntimeClassInImageCriAPI, true)
-		ctx := context.Background()
+		ctx := ktesting.Init(t)
 		puller, fakeClock, fakeRuntime, container, fakePodPullingTimeRecorder, _ := pullerTestEnv(t, c, useSerializedEnv, nil)
 		fakeRuntime.CalledFunctions = nil
 		fakeRuntime.ImageList = []Image{}
@@ -1048,8 +1102,8 @@ func TestPullAndListImageWithRuntimeHandlerInImageCriAPIFeatureGate(t *testing.T
 		_, _, err := puller.EnsureImageExists(ctx, nil, pod, container.Image, c.pullSecrets, podSandboxConfig, runtimeHandler, container.ImagePullPolicy)
 		fakeRuntime.AssertCalls(c.expected[0].calls)
 		assert.Equal(t, c.expected[0].err, err, "tick=%d", 0)
-		assert.Equal(t, c.expected[0].shouldRecordStartedPullingTime, fakePodPullingTimeRecorder.startedPullingRecorded)
-		assert.Equal(t, c.expected[0].shouldRecordFinishedPullingTime, fakePodPullingTimeRecorder.finishedPullingRecorded)
+		assert.Equal(t, c.expected[0].shouldRecordStartedPullingTime, fakePodPullingTimeRecorder.startedPullingRecorded[pod.UID])
+		assert.Equal(t, c.expected[0].shouldRecordFinishedPullingTime, fakePodPullingTimeRecorder.finishedPullingRecorded[pod.UID])
 
 		images, _ := fakeRuntime.ListImages(ctx)
 		assert.Len(t, images, 1, "ListImages() count")
@@ -1071,7 +1125,7 @@ func TestPullAndListImageWithRuntimeHandlerInImageCriAPIFeatureGate(t *testing.T
 }
 
 func TestMaxParallelImagePullsLimit(t *testing.T) {
-	ctx := context.Background()
+	ctx := ktesting.Init(t)
 	pod := &v1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:            "test_pod",
@@ -1141,6 +1195,108 @@ func TestMaxParallelImagePullsLimit(t *testing.T) {
 
 	wg.Wait()
 	fakeRuntime.AssertCallCounts("PullImage", 7)
+}
+
+func TestParallelPodPullingTimeRecorderWithErr(t *testing.T) {
+	ctx := context.Background()
+	pod1 := &v1.Pod{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:            "test_pod1",
+			Namespace:       "test-ns",
+			UID:             "bar1",
+			ResourceVersion: "42",
+		}}
+	pod1SandboxConfig := &runtimeapi.PodSandboxConfig{
+		Metadata: &runtimeapi.PodSandboxMetadata{
+			Name:      pod1.Name,
+			Namespace: pod1.Namespace,
+			Uid:       string(pod1.UID),
+		},
+	}
+
+	pod2 := &v1.Pod{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:            "test_pod2",
+			Namespace:       "test-ns",
+			UID:             "bar2",
+			ResourceVersion: "42",
+		}}
+	pod2SandboxConfig := &runtimeapi.PodSandboxConfig{
+		Metadata: &runtimeapi.PodSandboxMetadata{
+			Name:      pod2.Name,
+			Namespace: pod2.Namespace,
+			Uid:       string(pod2.UID),
+		},
+	}
+
+	pods := [2]*v1.Pod{pod1, pod2}
+	podSandboxes := [2]*runtimeapi.PodSandboxConfig{pod1SandboxConfig, pod2SandboxConfig}
+
+	testCase := &pullerTestCase{
+		containerImage: "missing_image",
+		testName:       "missing image, pull if not present",
+		policy:         v1.PullIfNotPresent,
+		inspectErr:     nil,
+		pullerErr:      nil,
+		qps:            0.0,
+		burst:          0,
+	}
+
+	useSerializedEnv := false
+	maxParallelImagePulls := 2
+	var wg sync.WaitGroup
+
+	puller, fakeClock, fakeRuntime, container, fakePodPullingTimeRecorder, _ := pullerTestEnv(t, *testCase, useSerializedEnv, ptr.To(int32(maxParallelImagePulls)))
+	fakeRuntime.BlockImagePulls = true
+	fakeRuntime.CalledFunctions = nil
+	fakeRuntime.T = t
+	fakeClock.Step(time.Second)
+
+	// First, each pod's puller calls EnsureImageExists
+	for i := 0; i < 2; i++ {
+		wg.Add(1)
+		go func(i int) {
+			_, _, _ = puller.EnsureImageExists(ctx, nil, pods[i], container.Image, testCase.pullSecrets, podSandboxes[i], "", container.ImagePullPolicy)
+			wg.Done()
+		}(i)
+	}
+	time.Sleep(1 * time.Second)
+
+	// Assert the number of PullImage calls is 2
+	fakeRuntime.AssertCallCounts("PullImage", 2)
+
+	// Recording for both of the pods should be started but not finished
+	assert.True(t, fakePodPullingTimeRecorder.startedPullingRecorded[pods[0].UID])
+	assert.True(t, fakePodPullingTimeRecorder.startedPullingRecorded[pods[1].UID])
+	assert.False(t, fakePodPullingTimeRecorder.finishedPullingRecorded[pods[0].UID])
+	assert.False(t, fakePodPullingTimeRecorder.finishedPullingRecorded[pods[1].UID])
+
+	// Unblock one of the pods to pull the image
+	fakeRuntime.UnblockImagePulls(1)
+	time.Sleep(1 * time.Second)
+
+	// Introduce a pull error for the second pod and unblock it
+	fakeRuntime.SendImagePullError(errors.New("pull image error"))
+
+	wg.Wait()
+
+	// This time EnsureImageExists will return without pulling
+	for i := 0; i < 2; i++ {
+		wg.Add(1)
+		go func(i int) {
+			_, _, err := puller.EnsureImageExists(ctx, nil, pods[i], container.Image, testCase.pullSecrets, podSandboxes[i], "", container.ImagePullPolicy)
+			assert.NoError(t, err)
+			wg.Done()
+		}(i)
+	}
+	wg.Wait()
+
+	// Assert the number of PullImage calls is still 2
+	fakeRuntime.AssertCallCounts("PullImage", 2)
+
+	// Both recorders should be finished
+	assert.True(t, fakePodPullingTimeRecorder.finishedPullingRecorded[pods[0].UID])
+	assert.True(t, fakePodPullingTimeRecorder.finishedPullingRecorded[pods[1].UID])
 }
 
 func TestEvalCRIPullErr(t *testing.T) {
@@ -1333,15 +1489,16 @@ func TestEnsureImageExistsWithServiceAccountCoordinates(t *testing.T) {
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			if tc.enableEnsureSecretImages {
-				featuregatetesting.SetFeatureGateDuringTest(t, utilfeature.DefaultFeatureGate, features.KubeletEnsureSecretPulledImages, true)
-			}
+			featuregatetesting.SetFeatureGateDuringTest(t, utilfeature.DefaultFeatureGate, features.KubeletEnsureSecretPulledImages, tc.enableEnsureSecretImages)
 
 			ctx := context.Background()
 			fakeClock := testingclock.NewFakeClock(time.Now())
 			fakeRuntime := &ctest.FakeRuntime{T: t}
 			fakeRecorder := testutil.NewFakeRecorder()
-			fakePodPullingTimeRecorder := &mockPodPullingTimeRecorder{}
+			fakePodPullingTimeRecorder := &mockPodPullingTimeRecorder{
+				startedPullingRecorded:  make(map[types.UID]bool),
+				finishedPullingRecorded: make(map[types.UID]bool),
+			}
 
 			fakeRuntime.ImageList = []Image{{ID: "present_image:latest"}}
 
@@ -1429,7 +1586,10 @@ func TestEnsureImageExistsWithNodeCredentialsOnly(t *testing.T) {
 	fakeClock := testingclock.NewFakeClock(time.Now())
 	fakeRuntime := &ctest.FakeRuntime{T: t}
 	fakeRecorder := testutil.NewFakeRecorder()
-	fakePodPullingTimeRecorder := &mockPodPullingTimeRecorder{}
+	fakePodPullingTimeRecorder := &mockPodPullingTimeRecorder{
+		startedPullingRecorded:  make(map[types.UID]bool),
+		finishedPullingRecorded: make(map[types.UID]bool),
+	}
 
 	fakeRuntime.ImageList = []Image{{ID: "present_image:latest"}}
 
@@ -1476,4 +1636,17 @@ func TestEnsureImageExistsWithNodeCredentialsOnly(t *testing.T) {
 
 	// Image should not be pulled since it's present and accessible
 	fakeRuntime.AssertCalls([]string{"GetImageRef"})
+}
+
+func ensureExistsMetricForLabels(pullPolicy, imagePresentLocally, pullRequired string) string {
+	const desc = `
+# HELP kubelet_image_manager_ensure_image_requests_total [ALPHA] Number of ensure-image requests processed by the kubelet.
+# TYPE kubelet_image_manager_ensure_image_requests_total counter
+`
+	return desc + fmt.Sprintf(
+		"kubelet_image_manager_ensure_image_requests_total{present_locally=\"%s\", pull_policy=\"%s\", pull_required=\"%s\"} 1\n",
+		imagePresentLocally,
+		pullPolicy,
+		pullRequired,
+	)
 }
