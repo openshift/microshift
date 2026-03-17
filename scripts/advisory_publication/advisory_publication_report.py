@@ -9,8 +9,9 @@ import json
 import jira
 import yaml
 
-SERVER_URL = 'https://issues.redhat.com/'
-JIRA_API_TOKEN = os.environ.get('JIRA_API_TOKEN')
+ATLASSIAN_URL = 'https://redhat.atlassian.net'
+ATLASSIAN_API_TOKEN = os.environ.get('ATLASSIAN_API_TOKEN')
+ATLASSIAN_EMAIL = os.environ.get('ATLASSIAN_EMAIL')
 
 
 def usage():
@@ -70,7 +71,12 @@ def get_advisory_info(advisory_id: int) -> dict[str, str]:
     return advisory_info
 
 
-def search_microshift_tickets(affects_version: str, cve_id: str) -> jira.client.ResultList:
+def get_jira_server() -> jira.JIRA:
+    """Create and return a JIRA client connection for Atlassian Cloud."""
+    return jira.JIRA(server=ATLASSIAN_URL, basic_auth=(ATLASSIAN_EMAIL, ATLASSIAN_API_TOKEN))
+
+
+def search_microshift_tickets(server: jira.JIRA, affects_version: str, cve_id: str) -> jira.client.ResultList:
     """
     Query Jira for MicroShift ticket with CVE id and MicroShift version
         Parameters:
@@ -79,7 +85,6 @@ def search_microshift_tickets(affects_version: str, cve_id: str) -> jira.client.
         Returns:
             (jira.client.ResultList): a list with all the Jira tickets matching the query
     """
-    server = jira.JIRA(server=SERVER_URL, token_auth=JIRA_API_TOKEN)
     jira_tickets = server.search_issues(f'''
         summary  ~ "{cve_id}" and component = MicroShift and (affectedVersion = {affects_version} or affectedVersion = {affects_version}.z)
     ''')
@@ -99,6 +104,7 @@ def get_report(ocp_version: str) -> dict[str, dict]:
     """
     result_json = dict()
     advisories = get_advisories(ocp_version)
+    server = get_jira_server()
     for advisory_type, advisory_id in advisories.items():
         advisory_info = get_advisory_info(advisory_id)
         cve_list = advisory_info['cve']
@@ -107,7 +113,7 @@ def get_report(ocp_version: str) -> dict[str, dict]:
         advisory_dict['url'] = f'https://errata.devel.redhat.com/advisory/{advisory_id}'
         advisory_dict['cves'] = dict()
         for cve in cve_list:
-            jira_tickets = search_microshift_tickets(".".join(ocp_version.split(".")[:2]), cve)
+            jira_tickets = search_microshift_tickets(server, ".".join(ocp_version.split(".")[:2]), cve)
             advisory_dict['cves'][cve] = dict()
             for ticket in jira_tickets:
                 jira_ticket_dict = dict()
@@ -125,8 +131,13 @@ def main():
         usage()
         raise ValueError('Invalid number of arguments')
 
-    if JIRA_API_TOKEN is None:
-        raise ValueError('JIRA_API_TOKEN var not found in the env')
+    missing_tokens = []
+    if not ATLASSIAN_API_TOKEN or not ATLASSIAN_API_TOKEN.strip():
+        missing_tokens.append('ATLASSIAN_API_TOKEN')
+    if not ATLASSIAN_EMAIL or not ATLASSIAN_EMAIL.strip():
+        missing_tokens.append('ATLASSIAN_EMAIL')
+    if missing_tokens:
+        raise ValueError(f"Missing required environment variables: {', '.join(missing_tokens)}")
 
     ocp_version = str(sys.argv[1])
     result_json = get_report(ocp_version)
