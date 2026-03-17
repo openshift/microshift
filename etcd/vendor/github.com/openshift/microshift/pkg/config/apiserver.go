@@ -187,6 +187,7 @@ func (fg FeatureGates) GoString() string {
 // 4. If FeatureSet is CustomNoUpgrade, CustomNoUpgrade.Enabled/Disabled lists may be set but are not required.
 // 5. Required feature gates cannot be disabled.
 // 6. Feature gates cannot be both enabled and disabled within the same object.
+// 7. If FeatureSet is empty, CustomNoUpgrade and SpecialHandlingSupportExceptionRequired lists must also be empty.
 func (fg *FeatureGates) validateFeatureGates() error {
 	if fg == nil || reflect.DeepEqual(*fg, FeatureGates{}) {
 		return nil
@@ -194,6 +195,10 @@ func (fg *FeatureGates) validateFeatureGates() error {
 
 	switch fg.FeatureSet {
 	case "":
+		if len(fg.CustomNoUpgrade.Enabled) > 0 || len(fg.CustomNoUpgrade.Disabled) > 0 ||
+			len(fg.SpecialHandlingSupportExceptionRequired.Enabled) > 0 || len(fg.SpecialHandlingSupportExceptionRequired.Disabled) > 0 {
+			return fmt.Errorf("CustomNoUpgrade and SpecialHandlingSupportExceptionRequired enabled/disabled lists must be empty when FeatureSet is empty")
+		}
 		return nil
 	case FeatureSetCustomNoUpgrade:
 		// Valid - continue with validation
