@@ -25,7 +25,7 @@ func RunResourceQuotaManager(ctx context.Context, controllerCtx *EnhancedControl
 	replenishmentSyncPeriodFunc := calculateResyncPeriod(controllerCtx.OpenshiftControllerConfig.ResourceQuota.MinResyncPeriod.Duration)
 	saName := "resourcequota-controller"
 	listerFuncForResource := generic.ListerFuncForResourceFunc(controllerCtx.GenericResourceInformer.ForResource)
-	quotaConfiguration := quotainstall.NewQuotaConfigurationForControllers(listerFuncForResource)
+	quotaConfiguration := quotainstall.NewQuotaConfigurationForControllers(listerFuncForResource, controllerCtx.KubernetesInformers)
 	resourceQuotaControllerClient := controllerCtx.ClientBuilder.ClientOrDie(saName)
 	imageEvaluators := image.NewReplenishmentEvaluators(
 		listerFuncForResource,
@@ -94,7 +94,7 @@ func RunClusterQuotaReconciliationController(ctx context.Context, controllerCtx 
 	resourceQuotaControllerClient := controllerCtx.ClientBuilder.ClientOrDie("resourcequota-controller")
 	discoveryFunc := resourceQuotaControllerClient.Discovery().ServerPreferredNamespacedResources
 	listerFuncForResource := generic.ListerFuncForResourceFunc(controllerCtx.GenericResourceInformer.ForResource)
-	quotaConfiguration := quotainstall.NewQuotaConfigurationForControllers(listerFuncForResource)
+	quotaConfiguration := quotainstall.NewQuotaConfigurationForControllers(listerFuncForResource, controllerCtx.KubernetesInformers)
 
 	// TODO make a union registry
 	resourceQuotaRegistry := generic.NewRegistry(quotaConfiguration.Evaluators())

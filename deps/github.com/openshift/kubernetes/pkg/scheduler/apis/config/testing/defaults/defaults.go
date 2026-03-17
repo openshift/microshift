@@ -42,7 +42,7 @@ var PluginsV1 = &config.Plugins{
 			{Name: names.VolumeZone},
 			{Name: names.PodTopologySpread, Weight: 2},
 			{Name: names.InterPodAffinity, Weight: 2},
-			{Name: names.DynamicResources},
+			{Name: names.DynamicResources, Weight: 2},
 			{Name: names.DefaultPreemption},
 			{Name: names.NodeResourcesBalancedAllocation, Weight: 1},
 			{Name: names.ImageLocality, Weight: 1},
@@ -124,10 +124,6 @@ var ExpandedPluginsV1 = &config.Plugins{
 			// - This is a score coming from user preference.
 			{Name: names.NodeAffinity, Weight: 2},
 			{Name: names.NodeResourcesFit, Weight: 1},
-			// Weight is tripled because:
-			// - This is a score coming from user preference.
-			// - Usage of node tainting to group nodes in the cluster is increasing becoming a use-case
-			//	 for many user workloads
 			{Name: names.VolumeBinding, Weight: 1},
 			// Weight is doubled because:
 			// - This is a score coming from user preference.
@@ -136,6 +132,9 @@ var ExpandedPluginsV1 = &config.Plugins{
 			// Weight is doubled because:
 			// - This is a score coming from user preference.
 			{Name: names.InterPodAffinity, Weight: 2},
+			// Weight is doubled because:
+			// - This is a score coming from user preference.
+			{Name: names.DynamicResources, Weight: 2},
 			{Name: names.NodeResourcesBalancedAllocation, Weight: 1},
 			{Name: names.ImageLocality, Weight: 1},
 		},

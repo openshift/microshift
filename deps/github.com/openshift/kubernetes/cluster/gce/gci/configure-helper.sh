@@ -1984,6 +1984,7 @@ def resolve(host):
     container_security_context="\"securityContext\": {\"runAsUser\": ${ETCD_RUNASUSER}, \"runAsGroup\": ${ETCD_RUNASGROUP}, \"allowPrivilegeEscalation\": false, \"capabilities\": {\"drop\": [\"all\"]}},"
   fi
   sed -i -e "s@{{security_context}}@${container_security_context}@g" "${temp_file}"
+
   mv "${temp_file}" /etc/kubernetes/manifests
 }
 

@@ -161,11 +161,20 @@ func filterOutDisabledSpecs(specs et.ExtensionTestSpecs) et.ExtensionTestSpecs {
 
 			// https://issues.redhat.com/browse/OCPBUGS-45275
 			"[sig-network] Connectivity Pod Lifecycle should be able to connect to other Pod from a terminating Pod",
+
+			// https://issues.redhat.com/browse/OCPBUGS-63132
+			"[sig-node] [Serial] Pod InPlace Resize Container (deferred-resizes) [FeatureGate:InPlacePodVerticalScaling] pod-resize-retry-deferred-test-3",
 		},
 		// tests that need to be temporarily disabled while the rebase is in progress.
 		"RebaseInProgress": {
+			// https://issues.redhat.com/browse/OCPBUGS-61515
+			"[sig-scheduling] SchedulerPreemption [Serial] validates various priority Pods preempt expectedly with the async preemption [Feature:SchedulerAsyncPreemption] [FeatureGate:SchedulerAsyncPreemption] [Beta]",
+
 			// https://issues.redhat.com/browse/OCPBUGS-61378
 			"[sig-network] Conntrack should be able to cleanup conntrack entries when UDP service target port changes for a NodePort service",
+
+			// https://issues.redhat.com/browse/OCPBUGS-77243
+			"[sig-node] Container Runtime blackbox test when running a container with a new image [Serial] should be able to pull from private registry with secret [NodeConformance]",
 		},
 		// tests that may work, but we don't support them
 		"Unsupported": {

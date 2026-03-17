@@ -141,12 +141,7 @@ linters:
 
       - linters:
           - gocritic
-        text: "append result not assigned to the same slice|put a space between `//` and comment text|sloppyLen|elseif|should rewrite switch statement to if statement|regexpMust|wrapperFunc: use strings.ReplaceAll|singleCaseSwitch|deprecatedComment|exitAfterDefer|captLocal|unlambda|underef|unslice|valSwap|typeSwitchVar"
-
-      # https://github.com/kubernetes/kubernetes/issues/117288#issuecomment-1507008918
-      - linters:
-          - gocritic
-        text: "assignOp:"
+        text: "wrapperFunc: use strings.ReplaceAll|should rewrite switch statement to if statement"
 
     {{- end}}
 
@@ -219,6 +214,9 @@ linters:
     forbidigo:
       analyze-types: true
       forbid:
+        - pattern: md5\.*
+          # https://github.com/kubernetes/kubernetes/issues/129652
+          msg: md5 is oudated, insecure, prefer a secure hash (such as sha256) or a non-cryptographic hash
         - pattern: ^managedfields\.ExtractInto$
           pkg: ^k8s\.io/apimachinery/pkg/util/managedfields$
           msg: should not be used because managedFields was removed
@@ -237,10 +235,25 @@ linters:
           msg: "it does not produce a good failure message - use BeFalseBecause with an explicit printf-style failure message instead, or plain Go: if ... { ginkgo.Fail(...) }"        
       {{- end}}
       {{- if .Base }}
-    gocritic:	
-      enabled-checks:	
-        - equalFold	
-        - boolExprSimplify	
+    gocritic:
+      enabled-checks: # These are in addition to the default checks - see https://golangci-lint.run/docs/linters/configuration/#gocritic
+        - boolExprSimplify
+        - equalFold
+      disabled-checks: # This disables checks that are enabled by default (this can be combined with enabled-checks, contrary to the docs)
+        - appendAssign
+        - assignOp # https://github.com/kubernetes/kubernetes/issues/117288#issuecomment-1507008918
+        - captLocal
+        - commentFormatting
+        - deprecatedComment
+        - elseif
+        # The following have few (single-digit) occurrences left in k/k and wouldn't be too onerous to enable
+        - exitAfterDefer
+        - regexpMust
+        - sloppyLen
+        - typeSwitchVar
+        - underef
+        - unslice
+        - valSwap
     {{- end}}
     revive:
       # Only these rules are enabled.
@@ -251,6 +264,7 @@ linters:
     staticcheck:
       checks:
         - "all"
+        - "-QF1008"  # Omit embedded fields from selector expression
         {{- if .Base }}
         - "-QF1001"  # Apply De Morgan’s law
         - "-QF1002"  # Convert untagged switch to tagged switch

@@ -182,6 +182,23 @@ Usage:
     kubectl exec test-agnhost -- /agnhost fake-gitserver
 ```
 
+### fake-registry-server
+
+Starts a fake OCI registry server that serves static image files. This can be used to test
+pulling images from a private (with `--private` flag) or public registry.
+
+Private registry has static credentials `user:password`
+
+Usage:
+
+```console
+kubectl exec test-agnhost -- /agnhost fake-registry-server [--private]
+```
+
+#### Adding new image to the registry
+
+Adding a new image requires a new version of agnhost. To add new image, add a new line 
+to `test/images/agnhost/fakeregistryserver/images.txt` in format `<image> <tag> <internal tag>`
 
 ### guestbook
 
@@ -350,6 +367,33 @@ Usage:
         [--retry_time <seconds>] [--break_on_expected_content <true_or_false>]
 ```
 
+### mtlsclient
+
+```console
+    kubectl run test-agnhost \
+      --generator=run-pod/v1 \
+      --image=registry.k8s.io/e2e-test-images/agnhost:2.58 \
+      --restart=Always \
+      -- \
+      mtlsclient \
+      --fetch-url=<server-address> \ 
+      --server-trust-bundle=<server-trust-bundle.pem> \ 
+      --client-cred-bundle=<client-cred-bundle.pem>
+```
+
+### mtlsserver
+
+```console
+    kubectl run test-agnhost \
+      --generator=run-pod/v1 \
+      --image=registry.k8s.io/e2e-test-images/agnhost:2.58 \
+      --restart=Always \
+      -- \
+      mtlsserver \
+      --listen=<0.0.0.0:443> \
+      --server-creds=<server-cred-bundle.pem> \ 
+      --spiffe-trust-bundle=<spiffe-trust-bundle.pem> 
+```
 
 ### net
 

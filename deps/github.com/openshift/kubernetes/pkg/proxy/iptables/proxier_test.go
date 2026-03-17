@@ -42,14 +42,10 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"k8s.io/apimachinery/pkg/util/sets"
-	"k8s.io/apimachinery/pkg/util/version"
-	utilfeature "k8s.io/apiserver/pkg/util/feature"
-	featuregatetesting "k8s.io/component-base/featuregate/testing"
 	"k8s.io/component-base/metrics/legacyregistry"
 	"k8s.io/component-base/metrics/testutil"
 	"k8s.io/klog/v2"
 	klogtesting "k8s.io/klog/v2/ktesting"
-	"k8s.io/kubernetes/pkg/features"
 	"k8s.io/kubernetes/pkg/proxy"
 	kubeproxyconfig "k8s.io/kubernetes/pkg/proxy/apis/config"
 	"k8s.io/kubernetes/pkg/proxy/conntrack"
@@ -2078,173 +2074,6 @@ func TestClusterIPGeneral(t *testing.T) {
 			destIP:   "172.30.0.41",
 			destPort: 443,
 			output:   "",
-		},
-	})
-}
-
-func TestOpenShiftDNSHackTCP(t *testing.T) {
-	ipt := iptablestest.NewFake()
-	fp := NewFakeProxier(ipt)
-	svcIP := "172.30.0.10"
-	svcPort := 53
-	podPort := 5353
-	svcPortName := proxy.ServicePortName{
-		NamespacedName: makeNSN("openshift-dns", "dns-default"),
-		Port:           "dns-tcp",
-		Protocol:       v1.ProtocolTCP,
-	}
-
-	makeServiceMap(fp,
-		makeTestService(svcPortName.Namespace, svcPortName.Name, func(svc *v1.Service) {
-			svc.Spec.ClusterIP = svcIP
-			svc.Spec.Ports = []v1.ServicePort{{
-				Name:     svcPortName.Port,
-				Port:     int32(svcPort),
-				Protocol: svcPortName.Protocol,
-			}}
-		}),
-	)
-
-	populateEndpointSlices(fp,
-		makeTestEndpointSlice(svcPortName.Namespace, svcPortName.Name, 1, func(eps *discovery.EndpointSlice) {
-			eps.AddressType = discovery.AddressTypeIPv4
-			eps.Endpoints = []discovery.Endpoint{{
-				// This endpoint is ignored because it's remote
-				Addresses: []string{"10.180.0.2"},
-				NodeName:  ptr.To("node2"),
-			}, {
-				Addresses: []string{"10.180.0.1"},
-				NodeName:  ptr.To(testNodeName),
-			}}
-			eps.Ports = []discovery.EndpointPort{{
-				Name:     ptr.To(svcPortName.Port),
-				Port:     ptr.To[int32](int32(podPort)),
-				Protocol: &svcPortName.Protocol,
-			}}
-		}),
-	)
-
-	fp.syncProxyRules()
-
-	runPacketFlowTests(t, getLine(), ipt, testNodeIPs, []packetFlowTest{
-		{
-			name:     "TCP DNS only goes to local endpoint",
-			sourceIP: "10.0.0.2",
-			destIP:   "172.30.0.10",
-			destPort: 53,
-			output:   "10.180.0.1:5353",
-		},
-	})
-}
-
-func TestOpenShiftDNSHackUDP(t *testing.T) {
-	ipt := iptablestest.NewFake()
-	fp := NewFakeProxier(ipt)
-	svcIP := "172.30.0.10"
-	svcPort := 53
-	podPort := 5353
-	svcPortName := proxy.ServicePortName{
-		NamespacedName: makeNSN("openshift-dns", "dns-default"),
-		Port:           "dns",
-		Protocol:       v1.ProtocolUDP,
-	}
-
-	makeServiceMap(fp,
-		makeTestService(svcPortName.Namespace, svcPortName.Name, func(svc *v1.Service) {
-			svc.Spec.ClusterIP = svcIP
-			svc.Spec.Ports = []v1.ServicePort{{
-				Name:     svcPortName.Port,
-				Port:     int32(svcPort),
-				Protocol: svcPortName.Protocol,
-			}}
-		}),
-	)
-
-	populateEndpointSlices(fp,
-		makeTestEndpointSlice(svcPortName.Namespace, svcPortName.Name, 1, func(eps *discovery.EndpointSlice) {
-			eps.AddressType = discovery.AddressTypeIPv4
-			eps.Endpoints = []discovery.Endpoint{{
-				// This endpoint is ignored because it's remote
-				Addresses: []string{"10.180.0.2"},
-				NodeName:  ptr.To("node2"),
-			}, {
-				Addresses: []string{"10.180.0.1"},
-				NodeName:  ptr.To(testNodeName),
-			}}
-			eps.Ports = []discovery.EndpointPort{{
-				Name:     ptr.To(svcPortName.Port),
-				Port:     ptr.To[int32](int32(podPort)),
-				Protocol: &svcPortName.Protocol,
-			}}
-		}),
-	)
-
-	fp.syncProxyRules()
-
-	runPacketFlowTests(t, getLine(), ipt, testNodeIPs, []packetFlowTest{
-		{
-			name:     "UDP DNS only goes to local endpoint",
-			sourceIP: "10.0.0.2",
-			protocol: v1.ProtocolUDP,
-			destIP:   "172.30.0.10",
-			destPort: 53,
-			output:   "10.180.0.1:5353",
-		},
-	})
-}
-
-func TestOpenShiftDNSHackFallback(t *testing.T) {
-	ipt := iptablestest.NewFake()
-	fp := NewFakeProxier(ipt)
-	svcIP := "172.30.0.10"
-	svcPort := 53
-	podPort := 5353
-	svcPortName := proxy.ServicePortName{
-		NamespacedName: makeNSN("openshift-dns", "dns-default"),
-		Port:           "dns",
-		Protocol:       v1.ProtocolUDP,
-	}
-
-	makeServiceMap(fp,
-		makeTestService(svcPortName.Namespace, svcPortName.Name, func(svc *v1.Service) {
-			svc.Spec.ClusterIP = svcIP
-			svc.Spec.Ports = []v1.ServicePort{{
-				Name:     svcPortName.Port,
-				Port:     int32(svcPort),
-				Protocol: svcPortName.Protocol,
-			}}
-		}),
-	)
-
-	populateEndpointSlices(fp,
-		makeTestEndpointSlice(svcPortName.Namespace, svcPortName.Name, 1, func(eps *discovery.EndpointSlice) {
-			eps.AddressType = discovery.AddressTypeIPv4
-			// Both endpoints are used because neither is local
-			eps.Endpoints = []discovery.Endpoint{{
-				Addresses: []string{"10.180.1.2"},
-				NodeName:  ptr.To("node2"),
-			}, {
-				Addresses: []string{"10.180.2.3"},
-				NodeName:  ptr.To("node3"),
-			}}
-			eps.Ports = []discovery.EndpointPort{{
-				Name:     ptr.To(svcPortName.Port),
-				Port:     ptr.To[int32](int32(podPort)),
-				Protocol: &svcPortName.Protocol,
-			}}
-		}),
-	)
-
-	fp.syncProxyRules()
-
-	runPacketFlowTests(t, getLine(), ipt, testNodeIPs, []packetFlowTest{
-		{
-			name:     "DNS goes to all endpoints when none are local",
-			sourceIP: "10.0.0.2",
-			protocol: v1.ProtocolUDP,
-			destIP:   "172.30.0.10",
-			destPort: 53,
-			output:   "10.180.1.2:5353, 10.180.2.3:5353",
 		},
 	})
 }
@@ -6694,62 +6523,32 @@ func TestNoEndpointsMetric(t *testing.T) {
 
 func TestLoadBalancerIngressRouteTypeProxy(t *testing.T) {
 	testCases := []struct {
-		name          string
-		ipModeEnabled bool
-		svcIP         string
-		svcLBIP       string
-		ipMode        *v1.LoadBalancerIPMode
-		expectedRule  bool
+		name         string
+		svcIP        string
+		svcLBIP      string
+		ipMode       *v1.LoadBalancerIPMode
+		expectedRule bool
 	}{
-		/* LoadBalancerIPMode disabled */
 		{
-			name:          "LoadBalancerIPMode disabled, ipMode Proxy",
-			ipModeEnabled: false,
-			svcIP:         "10.20.30.41",
-			svcLBIP:       "1.2.3.4",
-			ipMode:        ptr.To(v1.LoadBalancerIPModeProxy),
-			expectedRule:  true,
+			name:         "ipMode Proxy",
+			svcIP:        "10.20.30.41",
+			svcLBIP:      "1.2.3.4",
+			ipMode:       ptr.To(v1.LoadBalancerIPModeProxy),
+			expectedRule: false,
 		},
 		{
-			name:          "LoadBalancerIPMode disabled, ipMode VIP",
-			ipModeEnabled: false,
-			svcIP:         "10.20.30.42",
-			svcLBIP:       "1.2.3.5",
-			ipMode:        ptr.To(v1.LoadBalancerIPModeVIP),
-			expectedRule:  true,
+			name:         "ipMode VIP",
+			svcIP:        "10.20.30.42",
+			svcLBIP:      "1.2.3.5",
+			ipMode:       ptr.To(v1.LoadBalancerIPModeVIP),
+			expectedRule: true,
 		},
 		{
-			name:          "LoadBalancerIPMode disabled, ipMode nil",
-			ipModeEnabled: false,
-			svcIP:         "10.20.30.43",
-			svcLBIP:       "1.2.3.6",
-			ipMode:        nil,
-			expectedRule:  true,
-		},
-		/* LoadBalancerIPMode enabled */
-		{
-			name:          "LoadBalancerIPMode enabled, ipMode Proxy",
-			ipModeEnabled: true,
-			svcIP:         "10.20.30.41",
-			svcLBIP:       "1.2.3.4",
-			ipMode:        ptr.To(v1.LoadBalancerIPModeProxy),
-			expectedRule:  false,
-		},
-		{
-			name:          "LoadBalancerIPMode enabled, ipMode VIP",
-			ipModeEnabled: true,
-			svcIP:         "10.20.30.42",
-			svcLBIP:       "1.2.3.5",
-			ipMode:        ptr.To(v1.LoadBalancerIPModeVIP),
-			expectedRule:  true,
-		},
-		{
-			name:          "LoadBalancerIPMode enabled, ipMode nil",
-			ipModeEnabled: true,
-			svcIP:         "10.20.30.43",
-			svcLBIP:       "1.2.3.6",
-			ipMode:        nil,
-			expectedRule:  true,
+			name:         "ipMode nil",
+			svcIP:        "10.20.30.43",
+			svcLBIP:      "1.2.3.6",
+			ipMode:       nil,
+			expectedRule: true,
 		},
 	}
 
@@ -6763,10 +6562,6 @@ func TestLoadBalancerIngressRouteTypeProxy(t *testing.T) {
 
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(t *testing.T) {
-			if !testCase.ipModeEnabled {
-				featuregatetesting.SetFeatureGateEmulationVersionDuringTest(t, utilfeature.DefaultFeatureGate, version.MustParse("1.31"))
-			}
-			featuregatetesting.SetFeatureGateDuringTest(t, utilfeature.DefaultFeatureGate, features.LoadBalancerIPMode, testCase.ipModeEnabled)
 			ipt := iptablestest.NewFake()
 			fp := NewFakeProxier(ipt)
 			makeServiceMap(fp,

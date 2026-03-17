@@ -129,7 +129,6 @@ items:
     - ""
     resources:
     - configmaps
-    - events
     - persistentvolumeclaims
     - replicationcontrollers
     - replicationcontrollers/scale
@@ -149,6 +148,17 @@ items:
     - serviceaccounts/token
     verbs:
     - create
+  - apiGroups:
+    - ""
+    - events.k8s.io
+    resources:
+    - events
+    verbs:
+    - create
+    - delete
+    - deletecollection
+    - patch
+    - update
   - apiGroups:
     - apps
     resources:
@@ -281,7 +291,6 @@ items:
     - ""
     resources:
     - bindings
-    - events
     - limitranges
     - namespaces/status
     - pods/log
@@ -297,6 +306,15 @@ items:
     - ""
     resources:
     - namespaces
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - ""
+    - events.k8s.io
+    resources:
+    - events
     verbs:
     - get
     - list
@@ -958,6 +976,14 @@ items:
     - get
     - list
     - watch
+  - apiGroups:
+    - scheduling.k8s.io
+    resources:
+    - workloads
+    verbs:
+    - get
+    - list
+    - watch
 - apiVersion: rbac.authorization.k8s.io/v1
   kind: ClusterRole
   metadata:
@@ -1087,6 +1113,7 @@ items:
     - update
   - apiGroups:
     - ""
+    - events.k8s.io
     resources:
     - events
     verbs:
