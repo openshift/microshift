@@ -22,13 +22,15 @@ var templateFuncs = map[string]interface{}{
 
 func renderParamsFromConfig(cfg *config.Config, extra assets.RenderParams) assets.RenderParams {
 	params := map[string]interface{}{
-		"ReleaseImage": release.Image,
-		"NodeName":     cfg.CanonicalNodeName(),
-		"NodeIP":       cfg.Node.NodeIP,
-		"ClusterCIDR":  strings.Join(cfg.Network.ClusterNetwork, ","),
-		"ServiceCIDR":  strings.Join(cfg.Network.ServiceNetwork, ","),
-		"ClusterDNS":   cfg.Network.DNS,
-		"BaseDomain":   cfg.DNS.BaseDomain,
+		"ReleaseImage":    release.Image,
+		"NodeName":        cfg.CanonicalNodeName(),
+		"NodeIP":          cfg.Node.NodeIP,
+		"ClusterCIDR":     strings.Join(cfg.Network.ClusterNetwork, ","),
+		"ServiceCIDR":     strings.Join(cfg.Network.ServiceNetwork, ","),
+		"ClusterDNS":      cfg.Network.DNS,
+		"BaseDomain":      cfg.DNS.BaseDomain,
+		"TLSCipherSuites": strings.Join(cfg.ApiServer.TLS.CipherSuites, ","),
+		"TLSMinVersion":   cfg.ApiServer.TLS.MinVersion,
 	}
 	ipFamily := core.IPFamilyPolicySingleStack
 	if cfg.IsIPv4() && cfg.IsIPv6() {

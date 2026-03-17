@@ -762,7 +762,8 @@ EOF
     yq -i '.spec.template.spec.volumes[0].configMap.name = "dns-default"' "${REPOROOT}"/assets/components/openshift-dns/dns/daemonset.yaml
     yq -i '.spec.template.spec.volumes[1] += {"secret": {"defaultMode": 420, "secretName": "dns-default-metrics-tls"}}' "${REPOROOT}"/assets/components/openshift-dns/dns/daemonset.yaml
     yq -i '.spec.template.spec.tolerations = [{"key": "node-role.kubernetes.io/master", "operator": "Exists"}]' "${REPOROOT}"/assets/components/openshift-dns/dns/daemonset.yaml
-    sed -i '/#.*set at runtime/d' "${REPOROOT}"/assets/components/openshift-dns/dns/daemonset.yaml
+    sed -i -e '/#.*set at runtime/d' -e '/#.*centralized TLS security profile/d' "${REPOROOT}"/assets/components/openshift-dns/dns/daemonset.yaml
+    yq -i '.spec.template.spec.containers[1].args = ["--secure-listen-address=:9154", "--tls-cipher-suites={{ .TLSCipherSuites }}", "--tls-min-version={{ .TLSMinVersion }}", "--upstream=http://127.0.0.1:9153/", "--tls-cert-file=/etc/tls/private/tls.crt", "--tls-private-key-file=/etc/tls/private/tls.key"]' "${REPOROOT}"/assets/components/openshift-dns/dns/daemonset.yaml
 
     #    Render the node-resolver script into the DaemonSet template
     export NODE_RESOLVER_SCRIPT="$(sed 's|^.|          &|' "${REPOROOT}"/assets/components/openshift-dns/node-resolver/update-node-resolver.sh)"
