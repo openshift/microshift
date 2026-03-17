@@ -27,7 +27,7 @@ class GitUtils():
             return
 
         if all:
-            self.git_repo.index.add(A=True)
+            self.git_repo.git.add("-A")
         else:
             self.git_repo.index.add(file_paths)
 
