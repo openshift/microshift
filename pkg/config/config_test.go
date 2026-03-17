@@ -841,6 +841,17 @@ func TestValidate(t *testing.T) {
 			expectErr: true,
 		},
 		{
+			name: "feature-gates-special-handling-with-feature-set-empty",
+			config: func() *Config {
+				c := mkDefaultConfig()
+				c.ApiServer.FeatureGates.FeatureSet = ""
+				c.ApiServer.FeatureGates.SpecialHandlingSupportExceptionRequired.Enabled = []string{"feature1"}
+				c.ApiServer.FeatureGates.SpecialHandlingSupportExceptionRequired.Disabled = []string{"feature2"}
+				return c
+			}(),
+			expectErr: true,
+		},
+		{
 			name: "feature-gates-custom-no-upgrade-enabled-and-disabled-have-same-feature-gate",
 			config: func() *Config {
 				c := mkDefaultConfig()
