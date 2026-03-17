@@ -63,13 +63,6 @@ spec:
             readOnlyRootFilesystem: true
           image: '{{ .ReleaseImage.coredns }}'
         - name: kube-rbac-proxy
-          args:
-            - --logtostderr
-            - --secure-listen-address=:9154
-            - --tls-cipher-suites=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_RSA_WITH_AES_128_CBC_SHA256,TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256,TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256
-            - --upstream=http://127.0.0.1:9153/
-            - --tls-cert-file=/etc/tls/private/tls.crt
-            - --tls-private-key-file=/etc/tls/private/tls.key
           ports:
             - containerPort: 9154
               name: metrics
@@ -87,6 +80,13 @@ spec:
           securityContext:
             readOnlyRootFilesystem: true
           image: '{{ .ReleaseImage.kube_rbac_proxy }}'
+          args:
+            - --secure-listen-address=:9154
+            - --tls-cipher-suites={{ .TLSCipherSuites }}
+            - --tls-min-version={{ .TLSMinVersion }}
+            - --upstream=http://127.0.0.1:9153/
+            - --tls-cert-file=/etc/tls/private/tls.crt
+            - --tls-private-key-file=/etc/tls/private/tls.key
           imagePullPolicy: IfNotPresent
       dnsPolicy: Default
       volumes:
