@@ -23,8 +23,9 @@ DNF_PACK=""
 # Build the command line for dnf
 DNF_CMD=(sudo dnf "${DNF_MODE}" -y)
 if [ -n "${DNF_PACK}" ] ; then
-    read -ra packages <<< "${DNF_PACK}"
-    DNF_CMD+=("${packages[@]}")
+    for pack in ${DNF_PACK} ; do
+        DNF_CMD+=("${pack}")
+    done
 fi
 
 rc=0
