@@ -2,15 +2,23 @@
   "permissions": {
     "allow": [
       "Read(//tmp/**)",
-      "Bash(mktemp:*)",
+      "Write(//tmp/**)",
+      "Bash(bash .claude/scripts/*)",
+      "Bash(python3 .claude/scripts/*)",
       "Bash(curl:*)",
-      "Bash(gcloud storage cp:*)",
-      "Bash(gh pr view:*)",
-      "Bash(gh pr diff:*)",
-      "Bash(tar:*)",
-      "Bash(gh pr checks:*)",
+      "Bash(date:*)",
+      "Bash(cat:*)",
+      "Bash(echo:*)",
+      "Bash(wc:*)",
+      "Bash(ls:*)",
+      "Bash(jq:*)",
+      "Bash(gh pr list:*)",
+      "Bash(gh auth status:*)",
       "WebFetch(domain:prow.ci.openshift.org)",
-      "Bash(gh issue list:*)"
+      "Skill(analyze-ci-for-pull-requests)",
+      "Skill(analyze-ci-for-release)",
+      "Skill(analyze-ci-for-release-manager)",
+      "Skill(openshift-ci-analysis)"
     ],
     "deny": [],
     "ask": []
