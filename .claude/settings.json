@@ -3,7 +3,17 @@
     "allow": [
       "Read(//tmp/**)",
       "Write(//tmp/**)",
-      "Bash(*)",
+      "Bash(bash .claude/scripts/*)",
+      "Bash(python3 .claude/scripts/*)",
+      "Bash(curl:*)",
+      "Bash(date:*)",
+      "Bash(cat:*)",
+      "Bash(echo:*)",
+      "Bash(wc:*)",
+      "Bash(ls:*)",
+      "Bash(jq:*)",
+      "Bash(gh pr list:*)",
+      "Bash(gh auth status:*)",
       "WebFetch(domain:prow.ci.openshift.org)",
       "Skill(analyze-ci-for-pull-requests)",
       "Skill(analyze-ci-for-release)",
@@ -11,9 +21,6 @@
       "Skill(openshift-ci-analysis)"
     ],
     "deny": [],
-    "ask": [
-      "Bash(sudo:*)",
-      "Bash(git:*)"
-    ]
+    "ask": []
   }
 }
