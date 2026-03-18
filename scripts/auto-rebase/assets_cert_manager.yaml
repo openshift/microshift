@@ -25,6 +25,8 @@ assets:
       - file: operator.openshift.io_certmanagers.yaml
       - file: operator.openshift.io_istiocsrs.yaml
       - file: orders.acme.cert-manager.io-crd.yaml
+      - file: customresourcedefinition_bundles.trust.cert-manager.io.yml
+      - file: operator.openshift.io_trustmanagers.yaml
   - dir: optional/cert-manager/crd/patches/
     src: cert-manager-operator/config/crd/patches/
     files:

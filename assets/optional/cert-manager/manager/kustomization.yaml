@@ -4,6 +4,23 @@ resources:
   - manager.yaml
   - images.yaml
 
+# Add value field so replacement can target UNSUPPORTED_ADDON_FEATURES (base has only name)
+patches:
+  - target:
+      kind: Deployment
+      name: controller-manager
+    patch: |-
+      - op: add
+          path: /spec/template/spec/containers/0/env/-
+          value:
+            name: UNSUPPORTED_ADDON_FEATURES
+            value: ''
+      - op: add
+          path: /spec/template/spec/containers/0/env/-
+          value:
+            name: RELATED_IMAGE_CERT_MANAGER_TRUST_MANAGER
+            value: ''
+            
 replacements:
   - source:
       kind: ConfigMap
@@ -48,6 +65,16 @@ replacements:
   - source:
       kind: ConfigMap
       name: cert-manager-images
+      fieldPath: data.unsupported-addon-features
+    targets:
+      - select:
+          kind: Deployment
+          name: controller-manager
+        fieldPaths:
+          - spec.template.spec.containers.[name=cert-manager-operator].env.[name=UNSUPPORTED_ADDON_FEATURES].value
+  - source:
+      kind: ConfigMap
+      name: cert-manager-images
       fieldPath: data.cert-manager-istiocsr
     targets:
       - select:
@@ -55,6 +82,16 @@ replacements:
           name: controller-manager
         fieldPaths:
           - spec.template.spec.containers.[name=cert-manager-operator].env.[name=RELATED_IMAGE_CERT_MANAGER_ISTIOCSR].value
+  - source:
+      kind: ConfigMap
+      name: cert-manager-images
+      fieldPath: data.cert-manager-trust-manager
+    targets:
+      - select:
+          kind: Deployment
+          name: controller-manager
+        fieldPaths:
+          - spec.template.spec.containers.[name=cert-manager-operator].env.[name=RELATED_IMAGE_CERT_MANAGER_TRUST_MANAGER].value          
   - source:
       kind: ConfigMap
       name: cert-manager-images
