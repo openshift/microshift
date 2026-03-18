@@ -663,7 +663,7 @@ get_reusability_score() {
 
     # Score 2: Reusable - optionals can be reused by source scenarios
     case "${boot_image}" in
-        *-optionals|*-optional|*-with-optional)
+        *-optionals|*-with-optional)
             echo "2"
             return
             ;;
@@ -1412,65 +1412,72 @@ show_status() {
     echo "=== Test Durations ==="
     echo "  (Tests longer than avg boot time should be 'slow', shorter should be 'fast')"
     echo ""
-    # Collect test durations and check for mislabeling
-    local mislabeled_count=0
-    {
-        for scenario_dir in "${SCENARIO_INFO_DIR}"/*; do
-            [ -d "${scenario_dir}" ] || continue
-            local scenario_name
-            scenario_name=$(basename "${scenario_dir}")
-            local test_time_file="${scenario_dir}/test_time"
+    # Collect test durations to a temp file for sorting and counting
+    local tmp_durations
+    tmp_durations=$(mktemp)
+    # shellcheck disable=SC2064
+    trap "rm -f ${tmp_durations}" RETURN
 
-            if [ -f "${test_time_file}" ]; then
-                local test_time
-                test_time=$(cat "${test_time_file}")
-                local test_mins=$((test_time / 60))
-                local test_secs=$((test_time % 60))
-                local time_str
-                time_str=$(printf '%2d:%02d' "${test_mins}" "${test_secs}")
+    for scenario_dir in "${SCENARIO_INFO_DIR}"/*; do
+        [ -d "${scenario_dir}" ] || continue
+        local scenario_name
+        scenario_name=$(basename "${scenario_dir}")
+        local test_time_file="${scenario_dir}/test_time"
 
-                # Get slow/fast flag from requirements
-                local req_file="${SCENARIO_STATUS}/${scenario_name}/requirements"
-                local slow_flag="false"
-                local fast_flag="false"
-                local current_label="-"
-                if [ -f "${req_file}" ]; then
-                    slow_flag=$(get_req_value "${req_file}" "slow" "false")
-                    fast_flag=$(get_req_value "${req_file}" "fast" "false")
-                    if [ "${slow_flag}" = "true" ]; then
-                        current_label="slow"
-                    elif [ "${fast_flag}" = "true" ]; then
-                        current_label="fast"
-                    fi
+        if [ -f "${test_time_file}" ]; then
+            local test_time
+            test_time=$(cat "${test_time_file}")
+            local test_mins=$((test_time / 60))
+            local test_secs=$((test_time % 60))
+            local time_str
+            time_str=$(printf '%2d:%02d' "${test_mins}" "${test_secs}")
+
+            # Get slow/fast flag from requirements
+            local req_file="${SCENARIO_STATUS}/${scenario_name}/requirements"
+            local slow_flag="false"
+            local fast_flag="false"
+            local current_label="-"
+            if [ -f "${req_file}" ]; then
+                slow_flag=$(get_req_value "${req_file}" "slow" "false")
+                fast_flag=$(get_req_value "${req_file}" "fast" "false")
+                if [ "${slow_flag}" = "true" ]; then
+                    current_label="slow"
+                elif [ "${fast_flag}" = "true" ]; then
+                    current_label="fast"
                 fi
-
-                # Determine if mislabeled (compare against avg boot time)
-                local status=""
-                if [ ${avg_boot_time} -gt 0 ]; then
-                    if [ ${test_time} -gt ${avg_boot_time} ]; then
-                        # Test is slower than boot - should be 'slow'
-                        if [ "${fast_flag}" = "true" ]; then
-                            status="<-- MISLABELED (should be slow)"
-                            mislabeled_count=$((mislabeled_count + 1))
-                        fi
-                    else
-                        # Test is faster than boot - should be 'fast'
-                        if [ "${slow_flag}" = "true" ]; then
-                            status="<-- MISLABELED (should be fast)"
-                            mislabeled_count=$((mislabeled_count + 1))
-                        fi
-                    fi
-                fi
-
-                # Output: time, scenario, label, status (tab-separated for sorting)
-                printf "%d\t%s\t%-40s\t%-6s\t%s\n" "${test_time}" "${time_str}" "${scenario_name}" "${current_label}" "${status}"
             fi
-        done
-    } | sort -t$'\t' -k1,1rn | cut -f2- | while IFS=$'\t' read -r time_str scenario label status; do
+
+            # Determine if mislabeled (compare against avg boot time)
+            local status=""
+            if [ "${avg_boot_time}" -gt 0 ]; then
+                if [ "${test_time}" -gt "${avg_boot_time}" ]; then
+                    # Test is slower than boot - should be 'slow'
+                    if [ "${fast_flag}" = "true" ]; then
+                        status="<-- MISLABELED (should be slow)"
+                    fi
+                else
+                    # Test is faster than boot - should be 'fast'
+                    if [ "${slow_flag}" = "true" ]; then
+                        status="<-- MISLABELED (should be fast)"
+                    fi
+                fi
+            fi
+
+            # Output: time, scenario, label, status (tab-separated for sorting)
+            printf "%d\t%s\t%-40s\t%-6s\t%s\n" "${test_time}" "${time_str}" "${scenario_name}" "${current_label}" "${status}" >> "${tmp_durations}"
+        fi
+    done
+
+    # Sort and display
+    sort -t$'\t' -k1,1rn "${tmp_durations}" | cut -f2- | while IFS=$'\t' read -r time_str scenario label status; do
         printf "  %s  %-40s  [%s] %s\n" "${time_str}" "${scenario}" "${label}" "${status}"
     done
+
+    # Count mislabeled
+    local mislabeled_count
+    mislabeled_count=$(grep -c "MISLABELED" "${tmp_durations}" 2>/dev/null || echo 0)
     echo ""
-    if [ ${mislabeled_count} -gt 0 ]; then
+    if [ "${mislabeled_count}" -gt 0 ]; then
         echo "  WARNING: ${mislabeled_count} test(s) appear to be mislabeled based on avg boot time (${avg_boot_time_str})"
     fi
     echo ""

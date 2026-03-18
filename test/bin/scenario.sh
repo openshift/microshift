@@ -560,7 +560,7 @@ function get_vm_ip {
        ip=$("${ROOTDIR}/scripts/devenv-builder/manage-vm.sh" ip -n "${vmname}" | head -1)
        while true; do
            now=$(date +%s)
-           if [ $(( now - start )) -ge ${VM_BOOT_TIMEOUT} ]; then
+           if [ $(( now - start )) -ge "${VM_BOOT_TIMEOUT}" ]; then
                echo "Timed out while waiting for IP retrieval" >&2
                return 1
            fi
