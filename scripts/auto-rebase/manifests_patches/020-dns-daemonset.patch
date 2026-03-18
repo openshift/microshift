@@ -6,7 +6,7 @@ index 630fa3f93..590fc3daa 100644
                readOnly: true
              - mountPath: /tmp
                name: tmp-dir
-+            {{- if .HostsEnabled }}  
++            {{- if .HostsEnabled }}
 +            - mountPath: /tmp/hosts
 +              name: hosts
 +              readOnly: true
