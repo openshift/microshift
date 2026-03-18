@@ -24,7 +24,7 @@ spec:
               readOnly: true
             - mountPath: /tmp
               name: tmp-dir
-            {{- if .HostsEnabled }}  
+            {{- if .HostsEnabled }}
             - mountPath: /tmp/hosts
               name: hosts
               readOnly: true
