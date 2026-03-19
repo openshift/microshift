@@ -1,6 +1,117 @@
-- kubernetes image-arm64 1dcb406c2ca2033c3a01617372afbfe8bf09ac71 to 8b1d67b459cd554cd4b6d878e9bf4d425b3bf9a0
+- cluster-network-operator embedded-component 632552909c274bb0edfc1c62f82a677b3c8a3c84 to 259ea6b026f6663fa720a1e11c913a61122402f9
+  - 62d41cc 2026-02-06T13:32:53Z silenced output of start-audit-log-rotation and made it ENV dependning instead
+
+- kubernetes embedded-component 1dcb406c2ca2033c3a01617372afbfe8bf09ac71 to 8b1d67b459cd554cd4b6d878e9bf4d425b3bf9a0
   - dc33209f7 2026-02-27T11:26:39-05:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
   - ebfac0573 2026-02-26T20:03:29Z Release commit for Kubernetes v1.34.5
   - f3b756a0c 2026-02-12T14:11:01+01:00 Bump images and versions to go 1.24.13 and distroless iptables
   - 9b1432f35 2026-02-10T13:04:54Z Update CHANGELOG/CHANGELOG-1.34.md for v1.34.4
+
+- kubernetes image-amd64 1dcb406c2ca2033c3a01617372afbfe8bf09ac71 to 8b1d67b459cd554cd4b6d878e9bf4d425b3bf9a0
+  - dc33209f7 2026-02-27T11:26:39-05:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - ebfac0573 2026-02-26T20:03:29Z Release commit for Kubernetes v1.34.5
+  - f3b756a0c 2026-02-12T14:11:01+01:00 Bump images and versions to go 1.24.13 and distroless iptables
+  - 9b1432f35 2026-02-10T13:04:54Z Update CHANGELOG/CHANGELOG-1.34.md for v1.34.4
+
+- ovn-kubernetes image-arm64 fc6a53f0e48f0418652c1ea4dee6c30e431127fc to 010f7c2967b53f6c1be8286078cd4ae0dd65beae
+  - 52eee079 2025-12-19T01:03:33+01:00 E2E, networksegmentation: Use 172.16.0.0/16 for UDN tests to avoid conflicts
+  - 08bd51ce 2025-12-19T01:03:33+01:00 E2E,networksegmentation: Use e2e framework helper for pod readiness
+  - 867eabd4 2025-12-19T01:03:33+01:00 E2E: Refactor provider and deployment config initialization
+  - 42e3b657 2025-12-19T01:03:33+01:00 E2E,networksegmentation: Write test yamls to /tmp
+  - a95ff837 2025-12-18T11:04:58+01:00 Fix jinjate yaml templating
+  - c44de131 2025-12-18T10:59:14+08:00 Remove SetTaintOnNode from mock
+  - 975c1d5d 2025-12-18T10:53:47+08:00 docs: Update CUDN CRD API reference
+  - 6e4c56b3 2025-12-18T10:53:47+08:00 no-overlay: Add e2e CUDN validation tests for no-overlay mode
+  - 6db529ed 2025-12-18T10:53:33+08:00 no-overlay: Introduce no-overlay mode for the CUDN API
+  - e04469d9 2025-12-17T17:49:22-08:00 use pipefail in unit test script
+  - f1cf2eff 2025-12-17T17:45:46-08:00 add ability to skip tests that require root
+  - 3371d25a 2025-12-17T17:35:21+02:00 persistentIPs: Deprecate annotation 'k8s.ovn.org/primary-udn-ipamclaim'
+  - 23de91c9 2025-12-16T10:03:16+01:00 fail e2e targets if coredumps are found
+  - ff08c948 2025-12-16T09:53:01+01:00 Skip bgpd, zebra and mgmtd crashes
+  - 7e1f2331 2025-12-16T09:52:59+01:00 E2E: Configure and collect coredumps
+  - 4c2d6394 2025-12-16T09:43:41+01:00 Fix double-close channel panic in network controller Stop() method
+  - b64fe725 2025-12-16T16:11:02+08:00 Fix markdown unordered list style lint error in governance
+  - fa482815 2025-12-16T15:48:43+08:00 docs: Add Member role to governance
+  - 7ab91489 2025-12-15T14:54:29-08:00 e2e: fix util function isCIDRIPFamilySupported()
+  - 3d27a1e1 2025-12-15T18:27:01+01:00 Bugfix: Add CEL to ensure dualstack connectsubnets are of same block size
+  - f5fa819c 2025-12-15T18:27:01+01:00 Add UT to ensure we process healthy networks and retry it for the unhealthy ones
+  - 6ac4ef3a 2025-12-15T18:27:01+01:00 Fix UDN deletion race between network-manager cache and CNC reconcile
+  - d2fba33d 2025-12-15T18:27:01+01:00 Run initTunnelKeysAllocator for CNCs only if feature flag is enabled
+  - 19dba833 2025-12-15T18:27:01+01:00 Address coderabbitai review comments: fix nil pointer dereference
+  - 1dc022ed 2025-12-15T18:27:01+01:00 Ignore NADs not present in namespaces with UDN label
+  - 33f8d2e5 2025-12-15T18:27:01+01:00 Add getPrimaryNADForNamespace util
+  - cba8cd89 2025-12-15T18:27:00+01:00 Add initialSync (cache sync) logic for restarts
+  - fb7274e2 2025-12-15T18:27:00+01:00 Make NewHybridConnectSubnetAllocator also initialise the ranges
+  - d79ec0ea 2025-12-15T18:27:00+01:00 Enable ClusterNetworkConnect e2e's in CI
+  - 69fc5c08 2025-12-15T18:27:00+01:00 e2e: comprehensive ClusterNetworkConnect annotation test coverage
+  - 37c12547 2025-12-15T18:27:00+01:00 Add unit test for CNC annotation update utils
+  - fd709084 2025-12-15T18:27:00+01:00 Add unit test for full CNC controller in integrated fashion
+  - b0e500e9 2025-12-15T18:27:00+01:00 Add unit tests for network-connect controller components
+  - 47324483 2025-12-15T18:27:00+01:00 Add reconcileNamespace (Reacts to namespace label update events)
+  - 032a7ae9 2025-12-15T18:27:00+01:00 STEP2: Allocate && Annotate tunnel-ids for connect router
+  - a11fc146 2025-12-15T18:27:00+01:00 NetworkConnectSubnetAnnotation: STEP4.2: Annotate allocations on CNC
+  - a33a9807 2025-12-15T18:27:00+01:00 STEP4.1: Allocate/Release network subnets
+  - 7a43618a 2025-12-15T18:26:59+01:00 Release layer3 pool block if corresponding layer2 networks get released
+  - 8551bb6e 2025-12-15T18:26:59+01:00 Add HybridConnectSubnetAllocator
+  - 24eec756 2025-12-15T18:26:59+01:00 reconcileClusterNetworkConnect: STEP3: Discover the selected UDNs and CUDNs
+  - 7896a229 2025-12-15T18:26:59+01:00 Add reconcileNAD (React to network add, update, delete events)
+  - 53456091 2025-12-15T18:26:59+01:00 CM: Add network-connect controller plumbing
+  - b6f4e558 2025-12-15T18:26:59+01:00 Add CNC watchfactory, ovnclient, informer for CM
+  - c3ec1c35 2025-12-15T18:26:59+01:00 Add RBAC for cluster-manager to access CNC
+  - b6d15ecf 2025-12-15T18:26:59+01:00 Add IsNetworkConnectEnabled() util
+  - 73261f50 2025-12-15T18:26:59+01:00 Add enable-network-connect feature gate
+  - ffed158b 2025-12-15T12:11:32-05:00 tests: enforce at least one ip family on bridge when extracting families
+  - 0e4ddac3 2025-12-15T12:11:32-05:00 refactor: use getContainerState in doesContainerNameExist
+  - 76818e7a 2025-12-15T12:11:32-05:00 tests: wait for node ready after restarting after shutdown
+  - bc9eacac 2025-12-15T12:11:28-05:00 ci: Add serial lane
+  - de259708 2025-12-12T17:01:13-05:00 ci: skip serial tests from control-plane suite
+  - fdcddffd 2025-12-12T17:01:07-05:00 tests: Test transient port behavior on node reboot
+  - fba0fef6 2025-12-12T16:46:05-05:00 ovs-node: Delete transient ports on startup
+  - 45686504 2025-12-12T11:00:23+01:00 Adds EVPN enhancement
+  - 03b69d97 2025-12-11T14:37:21+01:00 Fix MAC conflict detection configuration
+  - 424a78ff 2025-12-10T18:34:51+01:00 BGP docs: add troubleshooting information
+  - 1df34944 2025-12-10T18:34:51+01:00 BGP docs: add additional details about CUDN isolation
+  - d3a64678 2025-12-10T18:34:51+01:00 BGP docs: add some illustrative examples to implementaiton details
+  - 3f737ff0 2025-12-10T18:34:51+01:00 BGP docs: remove references of CUDN route import in non VRF-Lite config
+  - 84a57b86 2025-12-10T22:06:42+08:00 ci: Allow build-go.sh to work in git worktrees inside containers
+  - 1b74b4e3 2025-12-10T13:40:57+01:00 [CI] use fixed host network port range for ANP tests
+  - 754c62dd 2025-12-10T09:22:22+01:00 fix(kubevirt): Use pod network subnet gateway IP for DHCP router option
+  - ee66f1c4 2025-12-08T13:47:49Z fix: fix github actions with correct image build args
+  - 8832169b 2025-12-08T15:15:35+02:00 test/e2e/kubevirt: Check IPAMClaim status update
+  - ec896135 2025-12-08T14:35:38+02:00 allocator, persistentips: update IPAM claim status for both success and failure
+  - 2efd8e11 2025-12-08T11:30:16+01:00 Bump OVN to 25.09.2-2
+  - d0401bdf 2025-12-05T11:26:14+01:00 contrib: fix IPv6 address handling in frr-k8s webhook check
+  - 6a4a58af 2025-12-04T22:58:41+08:00 No-overlay mode enhancement
+  - b6ccbf7a 2025-12-04T13:06:23+01:00 Fix coderabbit path_filters
+  - 33903521 2025-12-04T10:33:04+01:00 Fix coderabbit config
+  - b52e40b0 2025-12-03T13:01:03+01:00 remove forced V(5) logging during startup
+  - 92a778c2 2025-12-02T11:54:08+01:00 [udn isolation] Update RA ACLs to handle multi-subnet networks.
+  - 5dbab4fa 2025-12-02T11:54:08+01:00 Multi-subnet default network: require the same hostSubnet.
+  - dcb90b85 2025-12-02T11:54:08+01:00 EgressIP: add route policies for east-west traffic between networks
+  - 2e1d47ba 2025-12-02T11:54:04+01:00 [test] always use multi-subnet setup for CI.
+  - 30b06cbe 2025-12-02T11:54:01+01:00 [kind] Add multi-cidr default subnet option.
+  - 34784e71 2025-12-01T09:55:30-05:00 Fixes gateway interface VLAN tag settings
+  - 76eb7c5c 2025-11-26T11:14:48+02:00 test/e2e:: Fix duplicate IP validation test for IP family enforcement
+  - 81bbf015 2025-11-26T09:39:53+02:00 test/e2e: add IP family validation tests for layer2 primary networks
+  - 8421af49 2025-11-26T09:39:53+02:00 test/e2e: Move createVMWithStaticIP helper function
+  - 08c5b40a 2025-11-26T09:39:53+02:00 test/e2e/kubevirt: Refactor duplicate VM pod err event waiter to shared helper
+  - 5d6b7784 2025-11-26T09:39:49+02:00 allocator/pod: add IP family validation for layer2 primary networks
+  - e60e2005 2025-11-25T13:10:09-05:00 chore: Remove --disable-ovn-iface-id-ver
+  - 7d5f1485 2025-11-25T13:05:32-05:00 fix: make -C dist/images
+  - 819aad3c 2025-11-25T13:00:56-05:00 fix: Remove duplicate - and sometimes incorrect - defaults from --help
+  - 6cba203a 2025-11-25T13:00:17-05:00 fix: Register a bunch of cli flags for --help message
+  - fd54939c 2025-11-25T12:59:53-05:00 chore: Remove redundant wording in some --help option descriptions
+  - f71844ac 2025-11-25T12:56:03-05:00 ci: Split unit test phase from build
+  - bdfb2488 2025-11-25T13:36:28+01:00 Refactor ETP=local flow generation to reduce code duplication
+  - 01c33f42 2025-11-25T13:36:28+01:00 Service OpenFlows: Return traffic should not be committed to conntrack
+  - e0156740 2025-11-25T13:36:28+01:00 Fix issues with dualstack detection for nodePort with hostNetwork tests
+  - f0a3f5f1 2025-11-25T13:36:28+01:00 Fix cookie generation for ETP=local service flows with target ports
+  - c33ddf99 2025-11-25T13:35:59+01:00 Adjust E2E tests for named port handling
+  - eebbb4a1 2025-11-25T10:55:17+01:00 Add unit test for named port handling in ETP=local services
+  - ce18cfd0 2025-11-25T10:55:17+01:00 Fix named port handling in ETP=local services with host-networked pods
+  - 9763ce92 2025-11-07T13:29:42+01:00 Retry EgressIP assignment in cloud if the IP is set in spec
+  - 8509eb82 2025-11-07T13:14:13+01:00 Handle failed CloudPrivateIPConfig assignments on removed nodes
+  - ad76f259 2025-10-15T13:48:31+01:00 docs: Add backwards compatibility to OKEP template
+  - 103c7e31 2025-10-07T22:17:30Z refactor: don't panic in kind infra provider impl
+  - c4788d08 2025-09-25T11:56:31+01:00 fix: build ovn-kubernetes binaries inside the fedora image build
 
