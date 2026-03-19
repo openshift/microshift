@@ -120,6 +120,7 @@ The HTML file must be a self-contained, single-file document with embedded CSS a
         .collapsible { cursor: pointer; user-select: none; }
         .collapsible::before { content: '\25B6  '; font-size: 0.8em; }
         .collapsible.active::before { content: '\25BC  '; }
+        .collapsible .job-date { float: right; font-weight: 400; color: #6c757d; font-size: 0.85em; }
         .collapsible-content { display: none; }
         .collapsible-content.show { display: block; }
         .toc { background: white; border-radius: 8px; padding: 20px; margin: 20px 0; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
@@ -250,6 +251,7 @@ document.querySelectorAll('.collapsible').forEach(function(el) {
   - `badge-critical`: 5+ failed jobs or CRITICAL severity issues present
   - `badge-nodata`: analysis failed or no data
 - Make per-job details collapsible to keep the page manageable
+- Each collapsible job header in the Periodics tab MUST include the job's finish date (from the Prow job listing) displayed on the right side using `<span class="job-date">YYYY-MM-DD</span>`. Example: `<div class="collapsible">1. e2e-aws-tests-nightly - Root Cause Summary <span class="job-date">2026-03-17</span></div>`
 - The overview cards should show the number of failed jobs per release and for rebase PRs at a glance
 - The **Periodics** tab contains the per-release periodic job analyses (same as before)
 - The **Pull Requests** tab contains the rebase PR analyses grouped by PR
