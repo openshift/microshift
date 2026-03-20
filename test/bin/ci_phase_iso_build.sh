@@ -122,6 +122,11 @@ run_bootc_image_build() {
     $(dry_run) bash -x ./bin/build_bootc_images.sh -g ./image-blueprints-bootc/templates
 
     if [ -v CI_JOB_NAME ] ; then
+        # Skip all image builds for release testing CI jobs because all the images are fetched from the cache.
+        if [[ "${CI_JOB_NAME}" =~ .*release(-arm)?(-el(9|10))?$ ]]; then
+            $(dry_run) bash -x ./bin/build_bootc_images.sh -X
+            return
+        fi
 
         local -r os="${CI_JOB_NAME##*-}"
     
