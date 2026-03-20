@@ -107,7 +107,7 @@ spec:
                 type: string
               vlan:
                 description: VLAN ID to assign for the VF. Defaults to 0.
-                maximum: 4096
+                maximum: 4094
                 minimum: 0
                 type: integer
               vlanProto:

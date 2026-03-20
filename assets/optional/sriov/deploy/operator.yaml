@@ -56,7 +56,9 @@ spec:
                 fieldRef:
                   fieldPath: metadata.name
             - name: RELEASE_VERSION
-              value: 4.20.0
+              value: 4.21.0
+            - name: CLUSTER_TYPE
+              value: openshift
             - name: SRIOV_CNI_BIN_PATH
               value: /run/cni/bin
             - name: CLUSTER_TYPE
