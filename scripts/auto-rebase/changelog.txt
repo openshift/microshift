@@ -1,56 +1,34 @@
-- api embedded-component 5e946e2d43b71b30614a146906ffc7027b267b63 to b3c6104577797f804d921ac05ad91aa4186818f2
-  - 81c614a2 2026-03-16T09:51:00-04:00 features: remove MachineConfigNodes and PinnedImages feature gates
-  - 11342435 2026-03-16T09:50:56-04:00 MCO: remove v1alpha1 CRDs for MachineConfigNodes and PinnedImages
-  - 7b00e56d 2026-03-13T16:08:58-07:00 *: Renenerate after removing v1alpha1 (Cluster)ImagePolicy
-  - 85c1377d 2026-03-13T15:56:47-07:00 config/v1alpha1: Drop (Cluster)ImagePolicy since the hard cut to v1
-  - af55ae29 2026-03-13T13:06:09-07:00 CORS-4348: feature gate for EU Sovereign Cloud support
+- cluster-kube-controller-manager-operator embedded-component 41ab963edfef9473111879069620971365231c49 to a7ff6a4647805362618c61a031196cc791cb9963
 
-- cluster-dns-operator embedded-component d98f998ef32c2f2dadad13684432e14dcac191b7 to 7709285a381bc9ca24f833bab4789d327a856440
-  - 740bb11 2026-03-12T11:09:09-04:00 Fix gofmt issues in test file
-  - 67c40dd 2026-03-12T10:32:51-04:00 Address test feedback from PR review
-  - e5607e2 2026-03-11T20:26:12-04:00 Address PR review comments
-  - 6a46518 2026-03-09T13:55:08-04:00 Dynamically set kube-rbac-proxy TLS args
 
-- cluster-kube-apiserver-operator embedded-component 8a099d417645f3788106cedb71e7e4d35ff18a97 to deb703d26f017aea26d4619a7422094ab12b3e65
-  - 2884691 2026-03-12T21:27:26+01:00 Always set service-account-jwks-uri to LB URL even with custom issuer
-  - 85ccf93 2026-03-11T11:16:54+01:00 OCPBUGS-78146: move event-ttl test to its own suite
+- operator-framework-olm embedded-component c6dfbbd1a88049508b85c543fb5a631557e135e6 to bf71e98f7511ae273bf6885ac0951d2b3841340b
 
-- cluster-kube-controller-manager-operator embedded-component a7ff6a4647805362618c61a031196cc791cb9963 to 41ab963edfef9473111879069620971365231c49
-  - 1e5d6a7 2026-02-09T11:17:14+01:00 chore: add permissions on endpointslice to Prometheus Role and use serviceDiscoveryRole: EndpointSlice in ServiceMonitors
 
-- cluster-network-operator embedded-component a57b306cf55cb72521ab6f1e0e5ba63d2875d230 to 3b5ef2d8b37e2e040f5b98a07848a63774aa3012
-  - 2ebfbc8 2026-02-17T11:42:54Z add network-check-target + networking-console-plugin service accounts
+- oc image-arm64 cb542c5177b98b84b1ae921bee0d1e264b9ca00c to ee23f0583edad80c6fa3a3eefdcd6b063a97a371
+  - 84e31f76 2026-03-18T13:05:19+03:00 Add .coderabbit.yaml and AGENTS.md configurations
+  - dedf6262 2026-03-12T09:54:20+03:00 Update golang.org/x libraries to latest
+  - 562dc43d 2026-03-12T09:24:13+03:00 Fix lifecycle_test failure
+  - 1cf5f00c 2026-03-12T09:24:13+03:00 Skip new resources that do not have Describer
+  - 17310cf9 2026-03-12T09:24:13+03:00 Update manifest Include signature
+  - 6bbea279 2026-03-12T09:24:13+03:00 Bump openshift libraries
+  - 95fad07b 2026-03-12T09:24:13+03:00 Bump some of other packages to keep up to date
+  - b0c5ec0d 2026-03-12T09:24:13+03:00 Update metadata for Go 1.25 k8s 1.35
+  - 232cf7dd 2026-03-12T09:24:13+03:00 React to the changes coming from 1.35
+  - c6cedc89 2026-03-12T09:24:12+03:00 Bump k8s 1.35.2
 
-- operator-framework-olm embedded-component 425bb657d646f0485b841eead9ae903ea982a119 to c6dfbbd1a88049508b85c543fb5a631557e135e6
-  - 8e0301fb 2026-03-16T14:37:48+08:00 Fix admin context race condition in parallel tests
-  - 77c60679 2026-03-13T00:04:12Z delete obsolete files and shift webhook testing to use a kube-native approach (#3792)
-  - 21afb955 2026-03-13T00:03:24Z fix e2e: replace defunct gcr.io/kubebuilder/kube-rbac-proxy with quay.io/brancz (#3795)
+- router image-arm64 1c68a10861fa13a1210fa65c91c36cca3367cc93 to bb228d66f7305649c419e7f29c82d37364a41e50
+  - e74ec3c 2026-03-06T10:22:43-03:00 Configure tls version and ciphers for metrics
+  - f4de387 2026-03-05T18:39:11-03:00 bump library-go version
 
-- service-ca-operator embedded-component 4003a556c0efc7289b93d33985cd7d59e27794e9 to de11f78073eb847fca80ca6265882c69cb7a747b
-  - 12916e0 2026-03-12T17:41:50-04:00 vendor: bump(*)
-  - 7ce51e2 2026-03-12T17:41:50-04:00 Updating ose-service-ca-operator-container image to be consistent with ART for 4.22 Reconciling with https://github.com/openshift/ocp-build-data/tree/992b0dc3f0e12d86e7466dadf1eb51b2584a9a83/images/ose-service-ca-operator.yml
+- kube-rbac-proxy image-arm64 bdd87a0646eae5683bb83fe30e3649471b757ebf to d12e274605248f6c59373240a7eae7a7a357dcb3
+  - db13357 2026-03-16T16:51:48+01:00 go.mod: adjust Go version for downstream CI
+  - 22ca3af 2026-03-16T13:05:10+01:00 vendor: bump
+  - 8b45d57 2026-03-16T10:11:33+01:00 *: cut v0.21.1 release
+  - 2eac21f 2026-03-16T10:11:33+01:00 go*: update dependencies
+  - 898a9f4 2026-02-26T13:05:33+01:00 *: cut v0.21.0 release
+  - 6ca41ac 2026-02-26T09:33:36+01:00 go*: update dependencies
 
-- oc image-amd64 f7a24ec33be5c7d13ddc96b487969d749bbdac92 to cb542c5177b98b84b1ae921bee0d1e264b9ca00c
-  - 1f395ca9 2026-03-16T17:14:43+05:30 Fixing manifest ci failure
-  - 4ead568f 2026-03-13T20:07:29Z RFE-7406: Include the K8s ingress resource in namespace inspect collection (#2004)
-
-- router image-amd64 a6ba7ddae926f1466d32c72d05b71cebdce69123 to 1c68a10861fa13a1210fa65c91c36cca3367cc93
-  - a0ed627 2026-02-06T19:16:25+01:00 NE-2418: Add haproxy_max_connections metric
-  - b76cd01 2025-11-11T14:35:28-05:00 Do not install weak dependencies such as logrotate
-
-- service-ca-operator image-amd64 4003a556c0efc7289b93d33985cd7d59e27794e9 to de11f78073eb847fca80ca6265882c69cb7a747b
-  - 12916e0 2026-03-12T17:41:50-04:00 vendor: bump(*)
-  - 7ce51e2 2026-03-12T17:41:50-04:00 Updating ose-service-ca-operator-container image to be consistent with ART for 4.22 Reconciling with https://github.com/openshift/ocp-build-data/tree/992b0dc3f0e12d86e7466dadf1eb51b2584a9a83/images/ose-service-ca-operator.yml
-
-- oc image-arm64 f7a24ec33be5c7d13ddc96b487969d749bbdac92 to cb542c5177b98b84b1ae921bee0d1e264b9ca00c
-  - 1f395ca9 2026-03-16T17:14:43+05:30 Fixing manifest ci failure
-  - 4ead568f 2026-03-13T20:07:29Z RFE-7406: Include the K8s ingress resource in namespace inspect collection (#2004)
-
-- router image-arm64 a6ba7ddae926f1466d32c72d05b71cebdce69123 to 1c68a10861fa13a1210fa65c91c36cca3367cc93
-  - a0ed627 2026-02-06T19:16:25+01:00 NE-2418: Add haproxy_max_connections metric
-  - b76cd01 2025-11-11T14:35:28-05:00 Do not install weak dependencies such as logrotate
-
-- service-ca-operator image-arm64 4003a556c0efc7289b93d33985cd7d59e27794e9 to de11f78073eb847fca80ca6265882c69cb7a747b
-  - 12916e0 2026-03-12T17:41:50-04:00 vendor: bump(*)
-  - 7ce51e2 2026-03-12T17:41:50-04:00 Updating ose-service-ca-operator-container image to be consistent with ART for 4.22 Reconciling with https://github.com/openshift/ocp-build-data/tree/992b0dc3f0e12d86e7466dadf1eb51b2584a9a83/images/ose-service-ca-operator.yml
+- service-ca-operator image-arm64 de11f78073eb847fca80ca6265882c69cb7a747b to 9885e2eb052d38c15366ba001d94fd7c40fe0ec1
+  - e863ac3 2026-03-18T15:05:49+08:00 test/e2e: migrate forced-ca-rotation to OTE serial-disruptive suite
+  - e7f8a9d 2026-03-18T03:05:59+08:00 test/e2e: migrate time-based-ca-rotation to OTE serial-disruptive suite
 
