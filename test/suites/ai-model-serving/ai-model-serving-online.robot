@@ -43,7 +43,7 @@ Deploy OpenVINO Serving Runtime
     [Documentation]    Deploys OpenVino server.
 
     ${ovms_image}=    Command Should Work
-    ...    jq -r '.images | with_entries(select(.key == "ovms-image")) | .[]' /usr/share/microshift/release/release-ai-model-serving-"$(uname -i)".json
+    ...    jq -r '.images | with_entries(select(.key == "ovms-image")) | .[]' /usr/share/microshift/release/release-ai-model-serving-"$(uname -m)".json
     SSHLibrary.Get File
     ...    /usr/lib/microshift/manifests.d/050-microshift-ai-model-serving-runtimes/ovms-kserve.yaml
     ...    ${OVMS_KSERVE_MANIFEST}
