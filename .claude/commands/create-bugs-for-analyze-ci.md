@@ -224,9 +224,9 @@ For each candidate where user chose "create":
 
    ## Actual results
 
-   ```
+   ````
    <error details extracted from the analysis text — the specific error message and relevant log context>
-   ```
+   ````
 
    ## Expected results
 
