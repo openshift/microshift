@@ -58,11 +58,9 @@ spec:
             - name: RELEASE_VERSION
               value: 4.21.0
             - name: CLUSTER_TYPE
-              value: openshift
+              value: kubernetes
             - name: SRIOV_CNI_BIN_PATH
               value: /run/cni/bin
-            - name: CLUSTER_TYPE
-              value: kubernetes
           image: quay.io/openshift/sriov-network-operator:latest
           imagePullPolicy: IfNotPresent
           livenessProbe:
