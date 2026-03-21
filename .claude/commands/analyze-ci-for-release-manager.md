@@ -65,23 +65,25 @@ Analyzing rebase pull requests...
 ### Step 4: Collect All Results
 
 **Actions**:
-1. After all analyses complete, gather all summary files:
+1. **IMPORTANT**: Wait until ALL agents are confirmed complete
+2. After all analyses complete, gather all summary files:
    - Periodics: `/tmp/analyze-ci-release-<version>-summary.*.txt` for each version
    - Pull Requests: `/tmp/analyze-ci-prs-summary.*.txt`
    - Per-job files: `/tmp/analyze-ci-release-<version>-job-*.txt` and `/tmp/analyze-ci-prs-job-*.txt`
-2. Read each summary file to extract the analysis content
-3. If a summary file is missing for a release, note it as "Analysis failed or produced no output"
-4. If no PR summary file exists, note "No open rebase PRs or no failures found"
+3. Read each summary file to extract the analysis content
+4. If a summary file is missing for a release, note it as "Analysis failed or produced no output"
+5. If no PR summary file exists, note "No open rebase PRs or no failures found"
 
 ### Step 5: Generate HTML Summary Report
 
 **Goal**: Create a single HTML file at `/tmp/microshift-ci-release-manager-<timestamp>.html` that consolidates all analyses with tabbed navigation.
 
 **Actions**:
-1. Generate the HTML report with the structure described below
-2. Save to `/tmp/microshift-ci-release-manager-<timestamp>.html` where `<timestamp>` is `YYYYMMDD-HHMMSS`
-3. **IMPORTANT**: Use the `Bash` tool with `cat <<'HTMLEOF' > /tmp/microshift-ci-release-manager-<timestamp>.html` (heredoc) to write the file, NOT the `Write` tool. This ensures the absolute `/tmp` path is used and avoids permission prompts.
-4. Display the file path to the user in the end.
+1. **IMPORTANT**: Wait until ALL agents are confirmed complete
+2. Generate the HTML report with the structure described below
+3. Save to `/tmp/microshift-ci-release-manager-<timestamp>.html` where `<timestamp>` is `YYYYMMDD-HHMMSS`
+4. **IMPORTANT**: Use the `Bash` tool with `cat <<'HTMLEOF' > /tmp/microshift-ci-release-manager-<timestamp>.html` (heredoc) to write the file, NOT the `Write` tool. This ensures the absolute `/tmp` path is used and avoids permission prompts.
+5. Display the file path to the user in the end, AFTER the summary
 
 **HTML Structure**:
 
@@ -259,13 +261,11 @@ document.querySelectorAll('.collapsible').forEach(function(el) {
 ### Step 6: Report Completion
 
 **Actions**:
-1. Display the path to the generated HTML file
-2. Provide a brief text summary listing each release and its failed job count, plus rebase PR status
+1. Provide a brief text summary listing each release and its failed job count, plus rebase PR status
+2. Display the path to the generated HTML file
 
 **Example Output**:
 ```text
-HTML report generated: /tmp/microshift-ci-release-manager-20260315-143022.html
-
 Summary:
   Periodics:
     Release 4.19: 3 failed periodic jobs
@@ -274,6 +274,8 @@ Summary:
     Release 4.22: 12 failed periodic jobs
   Pull Requests:
     2 rebase PRs with 5 total failed jobs
+
+HTML report generated: /tmp/microshift-ci-release-manager-20260315-143022.html
 ```
 
 ## Examples
