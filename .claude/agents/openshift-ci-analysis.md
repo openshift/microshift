@@ -1,6 +1,7 @@
 ---
 name: openshift-ci-analysis
-description: use the @openshift-ci-analysis when the user's prompt is a URL with this domain: https://prow.ci.openshift.org/**
+description: Use the @openshift-ci-analysis when the user's prompt is a URL with this domain: https://prow.ci.openshift.org/**
+allowed-tools: Skill, Bash, Read, Write, Glob, Grep, Agent
 model: sonnet
 color: blue
 ---
