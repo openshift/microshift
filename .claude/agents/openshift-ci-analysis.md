@@ -104,3 +104,24 @@ Step Name: {The specific step where the error occurred}
 Error: {The exact error, including additional log context if it relates to the failure}
 Suggested Remediation: {Based on where the error occurs, think hard about how to correct the error ONLY if it requires fixing. Infrastructure failures may not require code changes.}
 ```
+
+After the human-readable report above, append a machine-readable block for downstream automation. This block MUST appear at the very end of the report, after all prose and analysis:
+
+```
+--- STRUCTURED SUMMARY ---
+SEVERITY: {1-5, same as Error Severity above}
+STACK_LAYER: {AWS Infra, build phase, deploy phase, test, teardown - same as Stack Layer above}
+STEP_NAME: {same as Step Name above}
+ERROR_SIGNATURE: {a concise, unique one-line description of the root cause - not the full error, just enough to identify and deduplicate this failure}
+INFRASTRUCTURE_FAILURE: {true if Stack Layer is AWS Infra or the failure is due to CI infrastructure rather than product code, false otherwise}
+JOB_URL: {the full prow job URL that was analyzed}
+JOB_NAME: {the full job name extracted from the URL}
+RELEASE: {the MicroShift release version extracted from the URL, e.g. 4.22}
+--- END STRUCTURED SUMMARY ---
+```
+
+The ERROR_SIGNATURE field is critical for deduplication. It should capture the essence of the failure in a way that two jobs failing for the same reason produce identical or near-identical signatures. Examples:
+- `greenboot timeout waiting for MicroShift to start after bootc upgrade`
+- `OCP conformance test NetworkPolicy timeout`
+- `AWS EC2 quota exceeded in us-east-1`
+- `rpm-ostree upgrade failed: package conflict microshift-selinux`
