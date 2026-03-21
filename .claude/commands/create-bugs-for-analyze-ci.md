@@ -191,7 +191,7 @@ jql: ... AND text ~ "OCP-68256" AND status not in (Closed, Verified) ...
      ```
    - **create**: Proceed to Step 7
    - **skip**: Skip this candidate, move to next
-   - **link-to-existing**: Record the existing JIRA key, skip creation, move to next
+   - **link-to-existing**: Validate the key by calling `mcp__jira__jira_get_issue(issue_key=<JIRA-KEY>)`. If the issue exists, record the key and move to next. If the call fails or returns not-found, show an error (e.g., `"JIRA key <JIRA-KEY> not found — check for typos"`) and re-prompt with the same `Action?` choices.
 
 ### Step 7: Create Bug via MCP (create mode only)
 
