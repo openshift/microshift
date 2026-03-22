@@ -20,7 +20,7 @@ This command orchestrates the analysis workflow by:
 1. Fetching the list of open PRs and their failed jobs using `.claude/scripts/microshift-prow-jobs-for-pull-requests.sh --mode detail`
 2. Filtering to only PRs that have at least one failed job
 3. Analyzing each failed job individually using the `openshift-ci-analysis` agent
-4. Aggregating results into a summary report saved to `/tmp`
+4. Aggregating results into a summary report saved to `/tmp/analyze-ci-claude-workdir`
 
 ## Arguments
 - `--rebase` (optional): Only analyze rebase PRs (titles containing `NO-ISSUE: rebase-release-`)
@@ -75,7 +75,7 @@ bash .claude/scripts/microshift-prow-jobs-for-pull-requests.sh --mode detail --f
 1. For each failed job URL from Step 1:
    - Call the `openshift-ci-analysis` agent with the job URL **in parallel**
    - Capture the analysis result (failure reason, error summary)
-   - Store all intermediate analysis files in `/tmp`
+   - Store all intermediate analysis files in `/tmp/analyze-ci-claude-workdir`
 
 2. Progress reporting:
    - Show "Analyzing job X/Y: <job-name> (PR #NNN)" for each job
@@ -92,8 +92,9 @@ For each job analysis, extract:
 - Affected test scenarios (if applicable)
 
 **File Storage**:
-All intermediate analysis files are stored in `/tmp` with naming pattern:
-- `/tmp/analyze-ci-prs-job-<N>-pr<PR>-<job-name-suffix>.txt`
+Before writing any files, run `mkdir -p /tmp/analyze-ci-claude-workdir` using the `Bash` tool.
+All intermediate analysis files are stored in `/tmp/analyze-ci-claude-workdir` with naming pattern:
+- `/tmp/analyze-ci-claude-workdir/analyze-ci-prs-job-<N>-pr<PR>-<job-name-suffix>.txt`
 
 ### Step 3: Aggregate Results and Identify Patterns
 
@@ -101,7 +102,7 @@ All intermediate analysis files are stored in `/tmp` with naming pattern:
 
 **Actions**:
 1. Collect results from all parallel job analyses
-   - Read individual job analysis files from `/tmp`
+   - Read individual job analysis files from `/tmp/analyze-ci-claude-workdir`
    - Extract key findings from each analysis
 
 2. Group failures by PR:
@@ -118,7 +119,7 @@ All intermediate analysis files are stored in `/tmp` with naming pattern:
 **Actions**:
 1. Aggregate all job analysis results from parallel execution
 2. Identify common patterns and group by PR and failure type
-3. Generate summary report and save to `/tmp/analyze-ci-prs-summary.<timestamp>.txt`
+3. Generate summary report and save to `/tmp/analyze-ci-claude-workdir/analyze-ci-prs-summary.<timestamp>.txt`
 4. Display the summary to the user
 
 **Report Structure**:
@@ -133,7 +134,7 @@ OVERVIEW
   PRs with Failures: 2
   Total Failed Jobs: 9
   Analysis Date: 2026-03-15
-  Report: /tmp/analyze-ci-prs-summary.20260315-143022.txt
+  Report: /tmp/analyze-ci-claude-workdir/analyze-ci-prs-summary.20260315-143022.txt
 
 PER-PR BREAKDOWN
 
@@ -170,7 +171,7 @@ COMMON PATTERNS (across PRs)
 
 ═══════════════════════════════════════════════════════════════
 
-Individual job reports: /tmp/analyze-ci-prs-job-*.txt
+Individual job reports: /tmp/analyze-ci-claude-workdir/analyze-ci-prs-job-*.txt
 ```
 
 ## Examples
@@ -213,7 +214,7 @@ Individual job reports: /tmp/analyze-ci-prs-job-*.txt
 - **Network Usage**: Each job analysis fetches logs from GCS
 - **Parallelization**: All job analyses run in parallel for maximum efficiency
 - **Use --limit**: For quick checks, use --limit flag to analyze a subset
-- **File Storage**: All intermediate and report files are stored in `/tmp` directory
+- **File Storage**: All intermediate and report files are stored in `/tmp/analyze-ci-claude-workdir` directory
 
 ## Prerequisites
 
@@ -253,7 +254,7 @@ Please ensure you're in the microshift project directory.
 
 - This skill focuses on **presubmit** PR jobs (not periodic/postsubmit)
 - Analysis is read-only - no modifications to CI data or PRs
-- Results are saved in files in /tmp directory with a timestamp
+- Results are saved in files in /tmp/analyze-ci-claude-workdir directory with a timestamp
 - Provide links to the jobs in the summary
 - Only present a concise analysis summary for each job
 - PRs with no Prow jobs (e.g., drafts without triggered tests) are skipped

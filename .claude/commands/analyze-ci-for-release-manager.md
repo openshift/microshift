@@ -34,13 +34,14 @@ Accepts a comma-separated list of MicroShift release versions, runs the `analyze
 ### Step 2: Analyze Each Release (Periodics)
 
 **Actions**:
-1. For each release version from the parsed list, invoke the `analyze-ci-for-release` skill:
+1. For each release version from the parsed list, launch the `analyze-ci-for-release` command as an **Agent** (using the `Agent` tool, NOT the `Skill` tool):
    ```text
-   Skill: analyze-ci-for-release, args: "<version>"
+   Agent: subagent_type=general, prompt="Run /analyze-ci-for-release <version>"
    ```
-2. Run releases **sequentially** (each skill invocation is a full analysis)
-3. After each skill completes, note the summary report file path it produced (typically `/tmp/analyze-ci-release-<version>-summary.*.txt`)
-4. Track which releases succeeded and which failed
+2. Launch all releases **in parallel** as separate agents — do NOT wait for one to finish before starting the next
+3. After each agent completes, note the summary report file path it produced (typically `/tmp/analyze-ci-claude-workdir/analyze-ci-release-<version>-summary.*.txt`)
+4. Wait until all the parallel agents are complete
+5. Track which releases succeeded and which failed
 
 **Progress Reporting**:
 ```text
@@ -50,39 +51,38 @@ Analyzing release X/Y: <version>
 ### Step 3: Analyze Rebase Pull Requests
 
 **Actions**:
-1. Invoke the `analyze-ci-for-pull-requests` skill with `--rebase` argument:
+1. Launch the `analyze-ci-for-pull-requests` command as an **Agent** (using the `Agent` tool, NOT the `Skill` tool) with `--rebase` argument:
    ```text
-   Skill: analyze-ci-for-pull-requests, args: "--rebase"
+   Agent: subagent_type=general, prompt="Run /analyze-ci-for-pull-requests --rebase"
    ```
-2. After the skill completes, note the summary report file path (typically `/tmp/analyze-ci-prs-summary.*.txt`)
-3. If no rebase PRs are found, note "No open rebase PRs" for the report
+2. This agent can be launched in parallel with the release agents in Step 2
+3. After the agent completes, note the summary report file path (typically `/tmp/analyze-ci-claude-workdir/analyze-ci-prs-summary.*.txt`)
+4. If no rebase PRs are found, note "No open rebase PRs" for the report
 
 **Progress Reporting**:
-```text
-Analyzing rebase pull requests...
-```
+1. Keep updating the background task list and completion status
 
 ### Step 4: Collect All Results
 
 **Actions**:
 1. **IMPORTANT**: Wait until ALL agents are confirmed complete
 2. After all analyses complete, gather all summary files:
-   - Periodics: `/tmp/analyze-ci-release-<version>-summary.*.txt` for each version
-   - Pull Requests: `/tmp/analyze-ci-prs-summary.*.txt`
-   - Per-job files: `/tmp/analyze-ci-release-<version>-job-*.txt` and `/tmp/analyze-ci-prs-job-*.txt`
+   - Periodics: `/tmp/analyze-ci-claude-workdir/analyze-ci-release-<version>-summary.*.txt` for each version
+   - Pull Requests: `/tmp/analyze-ci-claude-workdir/analyze-ci-prs-summary.*.txt`
+   - Per-job files: `/tmp/analyze-ci-claude-workdir/analyze-ci-release-<version>-job-*.txt` and `/tmp/analyze-ci-claude-workdir/analyze-ci-prs-job-*.txt`
 3. Read each summary file to extract the analysis content
 4. If a summary file is missing for a release, note it as "Analysis failed or produced no output"
 5. If no PR summary file exists, note "No open rebase PRs or no failures found"
 
 ### Step 5: Generate HTML Summary Report
 
-**Goal**: Create a single HTML file at `/tmp/microshift-ci-release-manager-<timestamp>.html` that consolidates all analyses with tabbed navigation.
+**Goal**: Create a single HTML file at `/tmp/analyze-ci-claude-workdir/microshift-ci-release-manager-<timestamp>.html` that consolidates all analyses with tabbed navigation.
 
 **Actions**:
 1. **IMPORTANT**: Wait until ALL agents are confirmed complete
 2. Generate the HTML report with the structure described below
-3. Save to `/tmp/microshift-ci-release-manager-<timestamp>.html` where `<timestamp>` is `YYYYMMDD-HHMMSS`
-4. **IMPORTANT**: Use the `Bash` tool with `cat <<'HTMLEOF' > /tmp/microshift-ci-release-manager-<timestamp>.html` (heredoc) to write the file, NOT the `Write` tool. This ensures the absolute `/tmp` path is used and avoids permission prompts.
+3. Save to `/tmp/analyze-ci-claude-workdir/microshift-ci-release-manager-<timestamp>.html` where `<timestamp>` is `YYYYMMDD-HHMMSS`
+4. **IMPORTANT**: First run `mkdir -p /tmp/analyze-ci-claude-workdir` using the `Bash` tool, then write the file using `cat <<'HTMLEOF' > /tmp/analyze-ci-claude-workdir/microshift-ci-release-manager-<timestamp>.html` (heredoc), NOT the `Write` tool. This ensures the absolute `/tmp/analyze-ci-claude-workdir` path is used and avoids permission prompts.
 5. Display the file path to the user in the end, AFTER the summary
 
 **HTML Structure**:
@@ -275,7 +275,7 @@ Summary:
   Pull Requests:
     2 rebase PRs with 5 total failed jobs
 
-HTML report generated: /tmp/microshift-ci-release-manager-20260315-143022.html
+HTML report generated: /tmp/analyze-ci-claude-workdir/microshift-ci-release-manager-20260315-143022.html
 ```
 
 ## Examples
@@ -296,10 +296,11 @@ HTML report generated: /tmp/microshift-ci-release-manager-20260315-143022.html
 ```
 
 ## Notes
-- Each release analysis uses the `analyze-ci-for-release` skill - this command does NOT duplicate that logic
-- Rebase PR analysis uses the `analyze-ci-for-pull-requests --rebase` skill
+- Each release analysis launches `analyze-ci-for-release` as an **Agent** (not a Skill) - this command does NOT duplicate that logic
+- Rebase PR analysis launches `analyze-ci-for-pull-requests --rebase` as an **Agent** (not a Skill)
+- All agents (releases + PR analysis) are launched in parallel for maximum efficiency
 - The HTML report is self-contained (no external CSS/JS dependencies)
-- All intermediate files from `analyze-ci-for-release` and `analyze-ci-for-pull-requests` remain available in `/tmp`
+- All intermediate files from `analyze-ci-for-release` and `analyze-ci-for-pull-requests` remain available in `/tmp/analyze-ci-claude-workdir`
 - Releases are analyzed sequentially since each invocation is resource-intensive
 - The rebase PR analysis runs after all releases are analyzed
 - The HTML file can be opened in any browser for convenient examination

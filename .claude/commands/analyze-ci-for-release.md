@@ -65,7 +65,7 @@ Found 17 failed periodic jobs for release 4.22
    - Call the `openshift-ci-analysis` agent with the job URL **in parallel**
    - Capture the analysis result (failure reason, error summary)
    - Track common patterns across jobs
-   - Store all intermediate analysis files in `/tmp`
+   - Store all intermediate analysis files in `/tmp/analyze-ci-claude-workdir`
 
 2. Progress reporting:
    - Show "Analyzing job X/Y: <job-name>" for each job
@@ -89,8 +89,9 @@ For each job analysis, extract:
 - Affected test scenarios (if applicable)
 
 **File Storage**:
-All intermediate analysis files are stored in `/tmp` with naming pattern:
-- `/tmp/analyze-ci-release-<release>-job-<N>-<job-id>.txt`
+Before writing any files, run `mkdir -p /tmp/analyze-ci-claude-workdir` using the `Bash` tool.
+All intermediate analysis files are stored in `/tmp/analyze-ci-claude-workdir` with naming pattern:
+- `/tmp/analyze-ci-claude-workdir/analyze-ci-release-<release>-job-<N>-<job-id>.txt`
 
 ### Step 3: Aggregate Results and Identify Patterns
 
@@ -98,7 +99,7 @@ All intermediate analysis files are stored in `/tmp` with naming pattern:
 
 **Actions**:
 1. Collect results from all parallel job analyses
-   - Read individual job analysis files from `/tmp`
+   - Read individual job analysis files from `/tmp/analyze-ci-claude-workdir`
    - Extract key findings from each analysis
 
 2. Group jobs by failure type:
@@ -123,7 +124,7 @@ All intermediate analysis files are stored in `/tmp` with naming pattern:
 **Actions**:
 1. Aggregate all job analysis results from parallel execution
 2. Identify common patterns and group by failure type
-3. Generate summary report and save to `/tmp/analyze-ci-release-<release>-summary.<timestamp>.txt`
+3. Generate summary report and save to `/tmp/analyze-ci-claude-workdir/analyze-ci-release-<release>-summary.<timestamp>.txt`
 4. Display the summary to the user
 
 **Report Structure**:
@@ -136,7 +137,7 @@ MICROSHIFT 4.22 RELEASE - FAILED JOBS ANALYSIS
 📊 OVERVIEW
   Total Failed Jobs: 17
   Analysis Date: 2026-03-14
-  Report saved to: /tmp/analyze-ci-release-4.22-summary.txt
+  Report saved to: /tmp/analyze-ci-claude-workdir/analyze-ci-release-4.22-summary.txt
 
 📋 FAILURE BREAKDOWN
   Build Failures:        0 jobs
@@ -178,7 +179,7 @@ MICROSHIFT 4.22 RELEASE - FAILED JOBS ANALYSIS
 ═══════════════════════════════════════════════════════════════
 
 Individual job reports available in:
-  /tmp/analyze-ci-release-4.22-job-*.txt
+  /tmp/analyze-ci-claude-workdir/analyze-ci-release-4.22-job-*.txt
 ```
 
 ## Examples
@@ -221,7 +222,7 @@ Individual job reports available in:
 - **Network Usage**: Moderate to high - all jobs analyzed in parallel fetch logs from GCS simultaneously
 - **Parallelization**: All jobs are analyzed in parallel for maximum efficiency
 - **Use --limit**: For quick checks, use --limit flag to analyze subset
-- **File Storage**: All intermediate and report files are stored in `/tmp` directory
+- **File Storage**: All intermediate and report files are stored in `/tmp/analyze-ci-claude-workdir` directory
 
 ## Prerequisites
 
@@ -285,7 +286,7 @@ Run periodically and compare summaries over time to identify regression patterns
 
 - This skill focuses on **periodic** jobs only (not presubmit/postsubmit)
 - Analysis is read-only - no modifications to CI data
-- Results are saved in files in /tmp directory with a timestamp
+- Results are saved in files in /tmp/analyze-ci-claude-workdir directory with a timestamp
 - Provide links to the jobs in the summary
 - Only present a concise analysis summary for each job
 - Pattern detection improves with more jobs analyzed (avoid limiting unless needed)

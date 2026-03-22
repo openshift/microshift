@@ -52,7 +52,7 @@ This link provides a diagram of the steps that make up the test. Think about rea
 
 Create a temporary working directory to store artifacts for the current job:
 ```bash
-mktemp -d /tmp/openshift-ci-analysis-XXXX
+mktemp -d /tmp/analyze-ci-claude-workdir/openshift-ci-analysis-XXXX
 ```
 
 Fetch the high level summary of the failed prow job:
