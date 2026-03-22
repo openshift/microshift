@@ -114,10 +114,6 @@ The HTML file must be a self-contained, single-file document with embedded CSS a
         .summary-table tr:hover { background: #f8f9fa; }
         .status-pass { color: #28a745; }
         .status-fail { color: #dc3545; }
-        .overview-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 20px 0; }
-        .overview-card { background: white; border-radius: 8px; padding: 20px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .overview-card .number { font-size: 2em; font-weight: 700; }
-        .overview-card .label { color: #6c757d; font-size: 0.9em; }
         .content-block { white-space: pre-wrap; font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace; font-size: 0.85em; background: #f8f9fa; padding: 15px; border-radius: 4px; border: 1px solid #e9ecef; overflow-x: auto; margin: 10px 0; }
         .collapsible { cursor: pointer; user-select: none; }
         .collapsible::before { content: '\25B6  '; font-size: 0.8em; }
@@ -146,20 +142,6 @@ The HTML file must be a self-contained, single-file document with embedded CSS a
 <div class="container">
     <h1>MicroShift CI Release Manager Report</h1>
     <p class="timestamp">Generated: YYYY-MM-DD HH:MM:SS UTC</p>
-
-    <!-- Overview cards: one per release + one for rebase PRs -->
-    <div class="overview-grid">
-        <!-- One card per release -->
-        <div class="overview-card">
-            <div class="number status-fail">N</div>
-            <div class="label">Release X.YY Failed Jobs</div>
-        </div>
-        <!-- Card for rebase PRs -->
-        <div class="overview-card">
-            <div class="number status-fail">N</div>
-            <div class="label">Rebase PRs Failed Jobs</div>
-        </div>
-    </div>
 
     <!-- Tab navigation -->
     <div class="tab-bar">
@@ -254,7 +236,6 @@ document.querySelectorAll('.collapsible').forEach(function(el) {
   - `badge-nodata`: analysis failed or no data
 - Make per-job details collapsible to keep the page manageable
 - Each collapsible job header in the Periodics tab MUST include the job's finish date (from the Prow job listing) displayed on the right side using `<span class="job-date">YYYY-MM-DD</span>`. Example: `<div class="collapsible">1. e2e-aws-tests-nightly - Root Cause Summary <span class="job-date">2026-03-17</span></div>`
-- The overview cards should show the number of failed jobs per release and for rebase PRs at a glance
 - The **Periodics** tab contains the per-release periodic job analyses (same as before)
 - The **Pull Requests** tab contains the rebase PR analyses grouped by PR
 
