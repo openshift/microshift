@@ -13,7 +13,7 @@ allowed-tools: Skill, Bash, Read, Write, Glob, Grep, Agent
 ```
 
 ## Description
-Accepts a comma-separated list of MicroShift release versions, runs the `analyze-ci-for-release` skill for each release and the `analyze-ci-for-pull-requests --rebase` skill for open rebase PRs, and produces a single HTML summary file consolidating all results. The HTML report uses tabs to separate Periodics (per-release) and Pull Requests sections.
+Accepts a comma-separated list of MicroShift release versions, runs the `analyze-ci-for-release` command for each release and the `analyze-ci-for-pull-requests --rebase` command for open rebase PRs, and produces a single HTML summary file consolidating all results. The HTML report uses tabs to separate Periodics (per-release) and Pull Requests sections.
 
 ## Arguments
 - `$ARGUMENTS` (required): Comma-separated list of release versions (e.g., `4.19,4.20,4.21,4.22`)
@@ -36,12 +36,9 @@ Accepts a comma-separated list of MicroShift release versions, runs the `analyze
 **Actions**:
 1. For each release version from the parsed list, launch the `analyze-ci-for-release` command as an **Agent** (using the `Agent` tool, NOT the `Skill` tool):
    ```text
-   Agent: subagent_type=general, prompt="Run /analyze-ci-for-release <version>"
+   Agent: subagent_type=general-purpose, prompt="Run /analyze-ci-for-release <version>"
    ```
 2. Launch all releases **in parallel** as separate agents — do NOT wait for one to finish before starting the next
-3. After each agent completes, note the summary report file path it produced (typically `/tmp/analyze-ci-claude-workdir/analyze-ci-release-<version>-summary.*.txt`)
-4. Wait until all the parallel agents are complete
-5. Track which releases succeeded and which failed
 
 **Progress Reporting**:
 ```text
@@ -53,191 +50,145 @@ Analyzing release X/Y: <version>
 **Actions**:
 1. Launch the `analyze-ci-for-pull-requests` command as an **Agent** (using the `Agent` tool, NOT the `Skill` tool) with `--rebase` argument:
    ```text
-   Agent: subagent_type=general, prompt="Run /analyze-ci-for-pull-requests --rebase"
+   Agent: subagent_type=general-purpose, prompt="Run /analyze-ci-for-pull-requests --rebase"
    ```
-2. This agent can be launched in parallel with the release agents in Step 2
-3. After the agent completes, note the summary report file path (typically `/tmp/analyze-ci-claude-workdir/analyze-ci-prs-summary.*.txt`)
-4. If no rebase PRs are found, note "No open rebase PRs" for the report
-
-**Progress Reporting**:
-1. Keep updating the background task list and completion status
+2. Launch this agent **in parallel** with the release agents in Step 2 — do NOT wait for Step 2 agents to finish first
 
 ### Step 4: Collect All Results
 
 **Actions**:
-1. **IMPORTANT**: Wait until ALL agents are confirmed complete
-2. After all analyses complete, gather all summary files:
-   - Periodics: `/tmp/analyze-ci-claude-workdir/analyze-ci-release-<version>-summary.*.txt` for each version
-   - Pull Requests: `/tmp/analyze-ci-claude-workdir/analyze-ci-prs-summary.*.txt`
-   - Per-job files: `/tmp/analyze-ci-claude-workdir/analyze-ci-release-<version>-job-*.txt` and `/tmp/analyze-ci-claude-workdir/analyze-ci-prs-job-*.txt`
-3. Read each summary file to extract the analysis content
-4. If a summary file is missing for a release, note it as "Analysis failed or produced no output"
-5. If no PR summary file exists, note "No open rebase PRs or no failures found"
+1. **IMPORTANT**: Wait until ALL agents from Steps 2 and 3 are confirmed complete
+2. Track which releases succeeded and which failed
+3. If no rebase PRs were found, note "No open rebase PRs" for the report
+4. Gather per-job files:
+   - Per-job files: `/tmp/analyze-ci-claude-workdir/analyze-ci-release-<version>-job-*.txt` for each version
+   - PR per-job files: `/tmp/analyze-ci-claude-workdir/analyze-ci-prs-job-*.txt`
+5. If no per-job files exist for a release, note it as "Analysis failed or produced no output"
+6. If no PR job files exist, note "No open rebase PRs or no failures found"
+7. Do NOT read the files manually — the Python script in Step 5 will read and parse them directly
 
 ### Step 5: Generate HTML Summary Report
 
-**Goal**: Create a single HTML file at `/tmp/analyze-ci-claude-workdir/microshift-ci-release-manager-<timestamp>.html` that consolidates all analyses with tabbed navigation.
+**Goal**: Create a single HTML file at `/tmp/analyze-ci-claude-workdir/microshift-ci-release-manager-<timestamp>.html` that consolidates all analyses with tabbed navigation. The report must be **concise at the top level** with expandable details per job.
 
 **Actions**:
-1. **IMPORTANT**: Wait until ALL agents are confirmed complete
-2. Generate the HTML report with the structure described below
-3. Save to `/tmp/analyze-ci-claude-workdir/microshift-ci-release-manager-<timestamp>.html` where `<timestamp>` is `YYYYMMDD-HHMMSS`
-4. **IMPORTANT**: First run `mkdir -p /tmp/analyze-ci-claude-workdir` using the `Bash` tool, then write the file using `cat <<'HTMLEOF' > /tmp/analyze-ci-claude-workdir/microshift-ci-release-manager-<timestamp>.html` (heredoc), NOT the `Write` tool. This ensures the absolute `/tmp/analyze-ci-claude-workdir` path is used and avoids permission prompts.
-5. Display the file path to the user in the end, AFTER the summary
+1. Write a Python script to `/tmp/analyze-ci-claude-workdir/gen_html.py` and execute it. Using Python (not a heredoc) is required because it handles HTML escaping and URL-to-link conversion properly.
+2. Save output to `/tmp/analyze-ci-claude-workdir/microshift-ci-release-manager-<timestamp>.html` where `<timestamp>` is `YYYYMMDD-HHMMSS`
+3. Display the file path to the user in the end, AFTER the summary
 
 **HTML Structure**:
 
-The HTML file must be a self-contained, single-file document with embedded CSS and JS. Use the following structure:
+The HTML file must be a self-contained, single-file document with embedded CSS and JS. The layout is:
 
-```html
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>MicroShift CI Release Manager Report - YYYY-MM-DD</title>
-    <style>
-        /* Clean, professional styling */
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 20px; background: #f5f5f5; color: #333; }
-        .container { max-width: 1200px; margin: 0 auto; }
-        h1 { color: #1a1a2e; border-bottom: 3px solid #e94560; padding-bottom: 10px; }
-        .release-section { background: white; border-radius: 8px; padding: 20px; margin: 20px 0; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .release-header { display: flex; justify-content: space-between; align-items: center; }
-        .release-header h2 { color: #16213e; margin: 0; }
-        .badge { padding: 4px 12px; border-radius: 12px; font-size: 0.85em; font-weight: 600; }
-        .badge-ok { background: #d4edda; color: #155724; }
-        .badge-issues { background: #fff3cd; color: #856404; }
-        .badge-critical { background: #f8d7da; color: #721c24; }
-        .badge-nodata { background: #e2e3e5; color: #383d41; }
-        .summary-table { width: 100%; border-collapse: collapse; margin: 15px 0; }
-        .summary-table th, .summary-table td { padding: 10px 14px; text-align: left; border-bottom: 1px solid #eee; }
-        .summary-table th { background: #f8f9fa; font-weight: 600; color: #495057; }
-        .summary-table tr:hover { background: #f8f9fa; }
-        .status-pass { color: #28a745; }
-        .status-fail { color: #dc3545; }
-        .content-block { white-space: pre-wrap; font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace; font-size: 0.85em; background: #f8f9fa; padding: 15px; border-radius: 4px; border: 1px solid #e9ecef; overflow-x: auto; margin: 10px 0; }
-        .collapsible { cursor: pointer; user-select: none; }
-        .collapsible::before { content: '\25B6  '; font-size: 0.8em; }
-        .collapsible.active::before { content: '\25BC  '; }
-        .collapsible .job-date { float: right; font-weight: 400; color: #6c757d; font-size: 0.85em; }
-        .collapsible-content { display: none; }
-        .collapsible-content.show { display: block; }
-        .toc { background: white; border-radius: 8px; padding: 20px; margin: 20px 0; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .toc ul { list-style: none; padding-left: 0; }
-        .toc li { padding: 5px 0; }
-        .toc a { color: #0366d6; text-decoration: none; }
-        .toc a:hover { text-decoration: underline; }
-        .timestamp { color: #6c757d; font-size: 0.9em; }
-        a { color: #0366d6; }
+1. **Header**: Title + timestamp
+2. **Tab bar**: "Periodics" and "Pull Requests" tabs
+3. **Table of Contents**: Horizontal list of release links with failure counts
+4. **Per-release sections**: Each contains a **concise table** of failed jobs (NOT large text blocks)
+5. **Expandable detail rows**: Clicking a table row reveals the full per-job analysis text
 
-        /* Tab styling */
-        .tab-bar { display: flex; gap: 0; margin: 20px 0 0 0; border-bottom: 2px solid #dee2e6; }
-        .tab-btn { padding: 12px 24px; border: none; background: transparent; font-size: 1em; font-weight: 600; color: #6c757d; cursor: pointer; border-bottom: 3px solid transparent; margin-bottom: -2px; transition: color 0.2s, border-color 0.2s; }
-        .tab-btn:hover { color: #333; }
-        .tab-btn.active { color: #e94560; border-bottom-color: #e94560; }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
-    </style>
-</head>
-<body>
-<div class="container">
-    <h1>MicroShift CI Release Manager Report</h1>
-    <p class="timestamp">Generated: YYYY-MM-DD HH:MM:SS UTC</p>
+**Per-Release Table Structure**:
 
-    <!-- Tab navigation -->
-    <div class="tab-bar">
-        <button class="tab-btn active" onclick="showTab(event, 'periodics')">Periodics</button>
-        <button class="tab-btn" onclick="showTab(event, 'pull-requests')">Pull Requests</button>
-    </div>
+Each release section contains a table with these columns:
+| Column | Width | Content |
+|--------|-------|---------|
+| **Job** | 30% | Shortened job name (linked to Prow URL). Strip `periodic-ci-openshift-microshift-release-X.YY-periodics-` prefix. |
+| **Date** | 8% | Job finish date from the `Finished:` line in the per-job file |
+| **Sev** | 5% | Severity badge (LOW/MED/HIGH/CRIT) from `SEVERITY:` field in per-job structured summary |
+| **Type** | 6% | "Infra" or "Test" badge from `INFRASTRUCTURE_FAILURE:` field in per-job structured summary |
+| **Summary** | 51% | One-line summary from `ERROR_SIGNATURE:` field in per-job structured summary |
 
-    <!-- Periodics tab content -->
-    <div id="tab-periodics" class="tab-content active">
+**Expandable Detail Rows**:
 
-        <!-- Table of Contents -->
-        <div class="toc">
-            <h3>Releases Analyzed</h3>
-            <ul>
-                <li><a href="#release-X.YY">Release X.YY</a></li>
-            </ul>
-        </div>
+Each table row is clickable. Clicking it toggles a hidden detail row below containing:
+- The full per-job analysis text (everything BEFORE `--- STRUCTURED SUMMARY ---`)
+- Rendered as a monospace `pre-wrap` block
+- All URLs converted to clickable `<a>` links
+- HTML special characters properly escaped
 
-        <!-- Per-release sections -->
-        <div class="release-section" id="release-X.YY">
-            <div class="release-header">
-                <h2>Release X.YY</h2>
-                <span class="badge badge-issues">N failed jobs</span>
-            </div>
+**Python Script Requirements**:
 
-            <!-- Embed the full analysis content from analyze-ci-for-release -->
-            <div class="content-block">
-                ... periodics analysis content ...
-            </div>
-        </div>
+The Python script (`gen_html.py`) must:
+1. Use `html.escape()` to escape all text content inserted into HTML
+2. Use `re.sub()` to convert bare `https://...` URLs to clickable `<a href="...">` links
+3. Parse each per-job file to extract structured fields (`SEVERITY`, `INFRASTRUCTURE_FAILURE`, `ERROR_SIGNATURE`, `JOB_NAME`, `JOB_URL`, `Finished`)
+4. Split per-job content at `--- STRUCTURED SUMMARY ---` to separate the human-readable analysis from the structured fields
+5. Shorten job names by stripping the `periodic-ci-openshift-microshift-release-*-periodics-` prefix
+6. Generate severity badges with appropriate colors:
+   - SEVERITY 2 → LOW (yellow)
+   - SEVERITY 3 → MED (yellow)
+   - SEVERITY 4 → HIGH (red)
+   - SEVERITY 5 → CRIT (red)
+7. Generate type badges: `INFRASTRUCTURE_FAILURE: true` → "Infra" (blue), otherwise → "Test" (gray)
 
-        <!-- Repeat for each release -->
-    </div>
+**Release Badge Colors**:
+- `badge-ok`: 0 failed jobs
+- `badge-issues`: 1-4 failed jobs
+- `badge-critical`: 5+ failed jobs
 
-    <!-- Pull Requests tab content -->
-    <div id="tab-pull-requests" class="tab-content">
+**Pull Requests Tab**:
 
-        <!-- Per-PR sections from analyze-ci-for-pull-requests --rebase -->
-        <div class="release-section" id="pr-NNN">
-            <div class="release-header">
-                <h2>PR #NNN: title</h2>
-                <span class="badge badge-issues">N failed jobs</span>
-            </div>
+The Pull Requests tab uses the same table layout. For each PR with failures:
+- Section header: "PR #NNN: title" with a badge
+- Table of failed jobs with the same columns
+- Expandable detail rows
 
-            <!-- Embed analysis content from analyze-ci-for-pull-requests -->
-            <div class="content-block">
-                ... PR analysis content ...
-            </div>
-        </div>
+If all PR jobs pass, show a simple table row with PR link, job count, and "All passing" status.
+If no rebase PRs are open, show "No open rebase pull requests found."
 
-        <!-- If no rebase PRs found -->
-        <div class="release-section">
-            <p>No open rebase pull requests found.</p>
-        </div>
-    </div>
-</div>
+**Reference CSS** (embed in the generated HTML):
 
-<script>
-// Tab switching
+```css
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;margin:0;padding:20px;background:#f5f5f5;color:#333}
+.container{max-width:1400px;margin:0 auto}
+h1{color:#1a1a2e;border-bottom:3px solid #e94560;padding-bottom:10px}
+.section{background:#fff;border-radius:8px;padding:20px;margin:20px 0;box-shadow:0 2px 4px rgba(0,0,0,.1)}
+.section-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.section-header h2{color:#16213e;margin:0}
+.badge{padding:4px 12px;border-radius:12px;font-size:.85em;font-weight:600;white-space:nowrap}
+.badge-ok{background:#d4edda;color:#155724}
+.badge-issues{background:#fff3cd;color:#856404}
+.badge-critical{background:#f8d7da;color:#721c24}
+table{width:100%;border-collapse:collapse}
+th{text-align:left;padding:8px 10px;background:#f8f9fa;border-bottom:2px solid #dee2e6;font-size:.85em;color:#495057}
+td{padding:8px 10px;border-bottom:1px solid #eee;font-size:.85em;vertical-align:top}
+tr.job-row{cursor:pointer}
+tr.job-row:hover{background:#f0f4ff}
+tr.job-row td:first-child::before{content:'\\25B6 ';font-size:.7em;color:#999}
+tr.job-row.active td:first-child::before{content:'\\25BC ';color:#333}
+.detail-row{display:none}
+.detail-row.show{display:table-row}
+.detail-cell{padding:0 10px 12px 28px}
+.detail-block{white-space:pre-wrap;font-family:Consolas,'Liberation Mono',Menlo,monospace;font-size:.82em;background:#f8f9fa;padding:14px;border-radius:4px;border:1px solid #e9ecef;overflow-x:auto}
+a{color:#0366d6}
+.timestamp{color:#6c757d;font-size:.9em}
+.tab-bar{display:flex;gap:0;margin:20px 0 0;border-bottom:2px solid #dee2e6}
+.tab-btn{padding:12px 24px;border:none;background:0 0;font-size:1em;font-weight:600;color:#6c757d;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px}
+.tab-btn:hover{color:#333}
+.tab-btn.active{color:#e94560;border-bottom-color:#e94560}
+.tab-content{display:none}
+.tab-content.active{display:block}
+.toc{background:#fff;border-radius:8px;padding:16px 20px;margin:20px 0;box-shadow:0 2px 4px rgba(0,0,0,.1)}
+.toc ul{list-style:none;padding:0;margin:0;display:flex;flex-wrap:wrap;gap:8px 24px}
+.toc a{color:#0366d6;text-decoration:none;font-weight:500}
+.fail{color:#dc3545}
+.pass{color:#28a745}
+```
+
+**Reference JS** (embed in the generated HTML):
+
+```javascript
 function showTab(e, name) {
-    document.querySelectorAll('.tab-content').forEach(function(el) {
-        el.classList.remove('active');
-    });
-    document.querySelectorAll('.tab-btn').forEach(function(el) {
-        el.classList.remove('active');
-    });
+    document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
     document.getElementById('tab-' + name).classList.add('active');
     e.target.classList.add('active');
 }
-
-// Collapsible sections
-document.querySelectorAll('.collapsible').forEach(function(el) {
-    el.addEventListener('click', function() {
-        this.classList.toggle('active');
-        var content = this.nextElementSibling;
-        content.classList.toggle('show');
-    });
-});
-</script>
-</body>
-</html>
+function toggleDetail(id) {
+    var row = document.getElementById(id);
+    row.classList.toggle('show');
+    row.previousElementSibling.classList.toggle('active');
+}
 ```
-
-**Content Guidelines**:
-- Do NOT re-analyze or reinterpret the data from `analyze-ci-for-release` or `analyze-ci-for-pull-requests` - use their output as-is
-- Convert the plain text analysis reports into HTML-formatted content, preserving all information
-- Ensure all Prow job URLs from the original analyses remain clickable links in the HTML
-- Use appropriate badge colors:
-  - `badge-ok`: 0 failed jobs
-  - `badge-issues`: 1+ failed jobs
-  - `badge-critical`: 5+ failed jobs or CRITICAL severity issues present
-  - `badge-nodata`: analysis failed or no data
-- Make per-job details collapsible to keep the page manageable
-- Each collapsible job header in the Periodics tab MUST include the job's finish date (from the Prow job listing) displayed on the right side using `<span class="job-date">YYYY-MM-DD</span>`. Example: `<div class="collapsible">1. e2e-aws-tests-nightly - Root Cause Summary <span class="job-date">2026-03-17</span></div>`
-- The **Periodics** tab contains the per-release periodic job analyses (same as before)
-- The **Pull Requests** tab contains the rebase PR analyses grouped by PR
 
 ### Step 6: Report Completion
 
