@@ -38,7 +38,7 @@ Each job analysis file produced by `openshift-ci-analysis` must end with a machi
 ```text
 --- STRUCTURED SUMMARY ---
 SEVERITY: <1-5>
-STACK_LAYER: <AWS Infra|build phase|deploy phase|test|teardown>
+STACK_LAYER: <AWS Infra|External Infrastructure|build phase|deploy phase|test setup phase|Test Configuration|test|teardown>
 STEP_NAME: <the CI step where the error occurred>
 ERROR_SIGNATURE: <concise, unique description of the root cause error>
 INFRASTRUCTURE_FAILURE: <true|false>
@@ -93,10 +93,18 @@ If a job file lacks this block, it is skipped with a warning.
 ### Step 3: Filter Out Non-Bug-Worthy Failures
 
 **Actions**:
-1. Remove entries where `INFRASTRUCTURE_FAILURE=true` (AWS quota, VM creation failures, etc.)
-2. Remove entries where `SEVERITY <= 2` (minor/flaky issues)
-3. Remove entries where `STACK_LAYER` is `AWS Infra` (infrastructure, not product bugs)
-4. Log each filtered-out entry with reason
+1. Remove entries where `SEVERITY <= 2` (minor/flaky issues)
+2. Remove entries where `INFRASTRUCTURE_FAILURE=true` **AND** the failure is transient/external (not a CI configuration bug). Use `STACK_LAYER` to distinguish:
+   - **Filter out** (transient infrastructure — out of our control):
+     - `STACK_LAYER` contains `AWS Infra` (AWS quota, VM creation, networking)
+     - `STACK_LAYER` contains `External Infrastructure` (container registry outages, third-party services)
+     - `STACK_LAYER` is `build phase` (release image import timeouts, registry 404s)
+   - **Keep as bug-worthy** (CI configuration issues — need code fixes):
+     - `STACK_LAYER` is `test setup phase`, `Test Configuration`, or similar (missing test files, wrong directory mappings, broken scenario selection logic)
+     - Any `INFRASTRUCTURE_FAILURE=true` entry whose analysis text indicates the fix requires a code change in the repository (e.g., adding missing files, updating directory mappings, fixing CI scripts)
+3. Log each filtered-out entry with reason. For kept CI configuration failures, log them as `"CI CONFIG (kept)"` to distinguish from product test failures.
+
+**Rationale**: Not all "infrastructure failures" are transient. A missing test scenario directory or broken CI script mapping is a configuration bug that requires a code fix — these should result in JIRA bugs, not be silently filtered out. Only truly external/transient failures (AWS outages, registry issues, image import timeouts) should be excluded.
 
 **Output**: Filtered list of bug-worthy failures with count of filtered entries reported to user.
 
@@ -374,7 +382,8 @@ Run the analysis first:
 - This command does NOT run CI analysis — it only consumes existing analysis files from `/tmp`
 - Dry-run is the default to prevent accidental bug creation
 - The `--create` flag triggers interactive mode where each candidate requires user confirmation
-- Infrastructure failures (AWS, VM creation, quota) are automatically filtered out
+- Transient infrastructure failures (AWS, VM creation, quota, registry outages) are automatically filtered out
+- CI configuration failures (missing test files, broken directory mappings) are kept as bug-worthy even if marked as INFRASTRUCTURE_FAILURE=true
 - Bugs are created in USHIFT with component "MicroShift"; duplicate search covers both USHIFT and OCPBUGS
 - All created bugs are labeled with `microshift-ci-ai-generated` for tracking
 - Security level is set to "Red Hat Employee" on all created issues
