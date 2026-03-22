@@ -52,6 +52,7 @@ This link provides a diagram of the steps that make up the test. Think about rea
 
 Create a temporary working directory to store artifacts for the current job:
 ```bash
+mkdir -p /tmp/analyze-ci-claude-workdir
 mktemp -d /tmp/analyze-ci-claude-workdir/openshift-ci-analysis-XXXX
 ```
 
@@ -107,7 +108,7 @@ Suggested Remediation: {Based on where the error occurs, think hard about how to
 
 After the human-readable report above, append a machine-readable block for downstream automation. This block MUST appear at the very end of the report, after all prose and analysis:
 
-```
+```text
 --- STRUCTURED SUMMARY ---
 SEVERITY: {1-5, same as Error Severity above}
 STACK_LAYER: {AWS Infra, build phase, deploy phase, test, teardown - same as Stack Layer above}

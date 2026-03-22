@@ -137,7 +137,7 @@ MICROSHIFT 4.22 RELEASE - FAILED JOBS ANALYSIS
 📊 OVERVIEW
   Total Failed Jobs: 17
   Analysis Date: 2026-03-14
-  Report saved to: /tmp/analyze-ci-claude-workdir/analyze-ci-release-4.22-summary.txt
+  Report saved to: /tmp/analyze-ci-claude-workdir/analyze-ci-release-4.22-summary.<timestamp>.txt
 
 📋 FAILURE BREAKDOWN
   Build Failures:        0 jobs

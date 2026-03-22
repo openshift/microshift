@@ -301,8 +301,6 @@ HTML report generated: /tmp/analyze-ci-claude-workdir/microshift-ci-release-mana
 - All agents (releases + PR analysis) are launched in parallel for maximum efficiency
 - The HTML report is self-contained (no external CSS/JS dependencies)
 - All intermediate files from `analyze-ci-for-release` and `analyze-ci-for-pull-requests` remain available in `/tmp/analyze-ci-claude-workdir`
-- Releases are analyzed sequentially since each invocation is resource-intensive
-- The rebase PR analysis runs after all releases are analyzed
 - The HTML file can be opened in any browser for convenient examination
 - If a release analysis fails, it is noted in the report but does not block other releases
 - If no rebase PRs are open, the Pull Requests tab shows "No open rebase pull requests found"

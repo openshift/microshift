@@ -380,7 +380,7 @@ Run the analysis first:
 
 ## Notes
 
-- This command does NOT run CI analysis — it only consumes existing analysis files from `/tmp/analyze-ci-claude-workdir/analyze-ci-claude-workdir`
+- This command does NOT run CI analysis — it only consumes existing analysis files from `/tmp/analyze-ci-claude-workdir`
 - Dry-run is the default to prevent accidental bug creation
 - The `--create` flag triggers interactive mode where each candidate requires user confirmation
 - Transient infrastructure failures (AWS, VM creation, quota, registry outages) are automatically filtered out
