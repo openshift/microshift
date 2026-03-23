@@ -1,4 +1,0 @@
-- machine-config-operator embedded-component 6f05bc5557c46f06447c1c0f65921d75491293d1 to b26f17094e08099aaaa7ff4cac3c3656a94297fa
-  - ecf5d00a 2026-03-12T16:07:11+01:00 hermetic 4.17
-  - db14e999 2026-01-20T11:34:33+00:00 Add: enable nodeip-configuration for platform external
-
