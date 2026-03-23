@@ -358,11 +358,10 @@ def process_image_bootc(groupdir, bootcfile, dry_run):
     # Run template command on the input file
     bf_outfile = os.path.join(BOOTC_IMAGE_DIR, bootcfile)
     run_template_cmd(bf_path, bf_outfile, dry_run)
-    # Templating may generate an empty file
-    if not dry_run:
-        if not common.file_has_valid_lines(bf_outfile):
-            common.print_msg(f"Skipping an empty {bootcfile} file")
-            return
+    # Templating may generate an empty file or in dry-run mode the file may not exist
+    if not os.path.exists(bf_outfile) or (not dry_run and not common.file_has_valid_lines(bf_outfile)):
+        common.print_msg(f"Skipping {bootcfile} file (not created or empty)")
+        return
 
     common.print_msg(f"Processing {bootcfile} with logs in {bf_logfile}")
     start_process_bootc_image = time.time()
@@ -472,6 +471,10 @@ def process_container_encapsulate(groupdir, containerfile, dry_run):
     # Run template command on the input file
     ce_outfile = os.path.join(BOOTC_IMAGE_DIR, containerfile)
     run_template_cmd(ce_path, ce_outfile, dry_run)
+    # Templating may generate an empty file or in dry-run mode the file may not exist
+    if not os.path.exists(ce_outfile) or (not dry_run and not common.file_has_valid_lines(ce_outfile)):
+        common.print_msg(f"Skipping {containerfile} file (not created or empty)")
+        return
 
     common.print_msg(f"Processing {containerfile} with logs in {ce_logfile}")
     start_process_container_encapsulate = time.time()
@@ -583,7 +586,7 @@ def main():
                         choices=["image-bootc", "containerfile", "container-encapsulate"],
                         help="Only build images of the specified type.")
     dirgroup = parser.add_mutually_exclusive_group(required=False)
-    dirgroup.add_argument("-l", "--layer-dir", type=str, help="Path to the layer directory to process.")
+    dirgroup.add_argument("-l", "--layer-dir", type=str, help="Path to the layer directory to process. Accepts comma-separated list of directories.")
     dirgroup.add_argument("-g", "--group-dir", type=str, help="Path to the group directory to process.")
     dirgroup.add_argument("-t", "--template", type=str, help="Path to a template to build. Allows glob patterns (requires double qoutes).")
 
@@ -602,13 +605,19 @@ def main():
             args.group_dir = os.path.abspath(args.group_dir)
             dir2process = args.group_dir
         if args.layer_dir:
-            args.layer_dir = os.path.abspath(args.layer_dir)
-            dir2process = args.layer_dir
+            # Handle comma-separated layer directories
+            layer_dirs = [d.strip() for d in args.layer_dir.split(",")]
+            args.layer_dir = ",".join([os.path.abspath(d) for d in layer_dirs])
+            # Validate each layer directory exists
+            for layer_dir in layer_dirs:
+                abs_layer_dir = os.path.abspath(layer_dir)
+                if not os.path.isdir(abs_layer_dir):
+                    raise Exception(f"The layer directory '{abs_layer_dir}' does not exist")
         if args.template:
             args.template = os.path.abspath(args.template)
             dir2process = os.path.dirname(args.template)
             pattern = os.path.basename(args.template)
-        # Make sure the input directory exists (only if specified)
+        # Make sure the input directory exists (only if specified for group_dir)
         if dir2process and not os.path.isdir(dir2process):
             raise Exception(f"The input directory '{dir2process}' does not exist")
         # Make sure the local RPM repository exists
@@ -652,7 +661,8 @@ def main():
             if BREW_NIGHTLY_RELEASE_VERSION:
                 extract_container_images(BREW_NIGHTLY_RELEASE_VERSION, BREW_REPO, CONTAINER_LIST, args.dry_run)
         # Sort the images list, only leaving unique entries
-        common.sort_uniq_file(CONTAINER_LIST)
+        if os.path.exists(CONTAINER_LIST):
+            common.sort_uniq_file(CONTAINER_LIST)
         # Process package source templates
         ipkgdir = f"{SCRIPTDIR}/../package-sources-bootc"
         for ifile in os.listdir(ipkgdir):
@@ -677,11 +687,12 @@ def main():
         PULL_SECRET = opull_secret
         # Process layer directory contents sorted by length and then alphabetically
         if args.layer_dir:
-            for item in sorted(os.listdir(args.layer_dir), key=lambda i: (len(i), i)):
-                item_path = os.path.join(args.layer_dir, item)
-                # Check if this item is a directory
-                if os.path.isdir(item_path):
-                    process_group(item_path, args.build_type, dry_run=args.dry_run)
+            for layer_dir in args.layer_dir.split(","):
+                for item in sorted(os.listdir(layer_dir), key=lambda i: (len(i), i)):
+                    item_path = os.path.join(layer_dir, item)
+                    # Check if this item is a directory
+                    if os.path.isdir(item_path):
+                        process_group(item_path, args.build_type, dry_run=args.dry_run)
         else:
             # Process individual group directory or template
             process_group(dir2process, args.build_type, pattern, args.dry_run)
