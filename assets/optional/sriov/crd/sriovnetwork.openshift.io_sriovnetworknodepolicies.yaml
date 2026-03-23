@@ -61,6 +61,13 @@ spec:
                             description: IDs to inject to external_ids field in the
                               Bridge table in OVSDB
                             type: object
+                          failMode:
+                            description: configure fail_mode field in the Bridge table
+                              in OVSDB (optional). 'secure' or 'standalone'.
+                            enum:
+                            - secure
+                            - standalone
+                            type: string
                           otherConfig:
                             additionalProperties:
                               type: string

@@ -56,11 +56,11 @@ spec:
                 fieldRef:
                   fieldPath: metadata.name
             - name: RELEASE_VERSION
-              value: 4.20.0
-            - name: SRIOV_CNI_BIN_PATH
-              value: /run/cni/bin
+              value: 4.21.0
             - name: CLUSTER_TYPE
               value: kubernetes
+            - name: SRIOV_CNI_BIN_PATH
+              value: /run/cni/bin
           image: quay.io/openshift/sriov-network-operator:latest
           imagePullPolicy: IfNotPresent
           livenessProbe:

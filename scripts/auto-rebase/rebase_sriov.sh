@@ -339,9 +339,10 @@ patch_sriov_manifests() {
             select(.name == \"METRICS_EXPORTER_PROMETHEUS_OPERATOR_ENABLED\")
         ).value = \"false\"
         |
-            .spec.template.spec.containers[0].env += [
-                {\"name\": \"CLUSTER_TYPE\", \"value\": \"kubernetes\"}
-            ]
+        (
+            .spec.template.spec.containers[0].env[] |
+            select(.name == \"CLUSTER_TYPE\")
+        ).value = \"kubernetes\"
         " "${STAGING_SRIOV}/${OPERATOR_FILENAME}"
 }
 
