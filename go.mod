@@ -218,7 +218,7 @@ replace (
 	github.com/openshift/route-controller-manager => ./deps/github.com/openshift/route-controller-manager // deps copy
 	k8s.io/klog/v2 => ./deps/k8s.io/klog // deps clone github.com/kubernetes/klog from kubernetes
 	k8s.io/kubernetes => ./deps/github.com/openshift/kubernetes // deps copy
-	sigs.k8s.io/kube-storage-version-migrator => github.com/openshift/kubernetes-kube-storage-version-migrator v0.0.3-0.20250805135739-c0f1886ab08d // release kube-storage-version-migrator via kubernetes-kube-storage-version-migrator
+	sigs.k8s.io/kube-storage-version-migrator => github.com/openshift/kubernetes-kube-storage-version-migrator v0.0.3-0.20260318155851-815b43b7f728 // release kube-storage-version-migrator via kubernetes-kube-storage-version-migrator
 )
 
 replace (
