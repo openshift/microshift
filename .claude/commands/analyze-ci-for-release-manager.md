@@ -2,7 +2,7 @@
 name: Analyze CI for Release Manager
 argument-hint: <release1,release2,...>
 description: Analyze CI for multiple MicroShift releases and produce an HTML summary
-allowed-tools: Skill, Bash, Read, Write, Glob, Grep, Agent
+allowed-tools: Bash, Read, Write, Glob, Grep, Agent
 ---
 
 # analyze-ci-for-release-manager
@@ -92,7 +92,7 @@ Each release section contains a table with these columns:
 | Column | Width | Content |
 |--------|-------|---------|
 | **Job** | 30% | Shortened job name (linked to Prow URL). Strip `periodic-ci-openshift-microshift-release-X.YY-periodics-` prefix. |
-| **Date** | 8% | Job finish date from the `Finished:` line in the per-job file |
+| **Date** | 8% | Job finish date from the `FINISHED:` line in the per-job file |
 | **Sev** | 5% | Severity badge (LOW/MED/HIGH/CRIT) from `SEVERITY:` field in per-job structured summary |
 | **Type** | 6% | "Infra" or "Test" badge from `INFRASTRUCTURE_FAILURE:` field in per-job structured summary |
 | **Summary** | 51% | One-line summary from `ERROR_SIGNATURE:` field in per-job structured summary |
@@ -110,7 +110,7 @@ Each table row is clickable. Clicking it toggles a hidden detail row below conta
 The Python script (`gen_html.py`) must:
 1. Use `html.escape()` to escape all text content inserted into HTML
 2. Use `re.sub()` to convert bare `https://...` URLs to clickable `<a href="...">` links
-3. Parse each per-job file to extract structured fields (`SEVERITY`, `INFRASTRUCTURE_FAILURE`, `ERROR_SIGNATURE`, `JOB_NAME`, `JOB_URL`, `Finished`)
+3. Parse each per-job file to extract structured fields (`SEVERITY`, `INFRASTRUCTURE_FAILURE`, `ERROR_SIGNATURE`, `JOB_NAME`, `JOB_URL`, `FINISHED`)
 4. Split per-job content at `--- STRUCTURED SUMMARY ---` to separate the human-readable analysis from the structured fields
 5. Shorten job names by stripping the `periodic-ci-openshift-microshift-release-*-periodics-` prefix
 6. Generate severity badges with appropriate colors:

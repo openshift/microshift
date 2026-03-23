@@ -2,7 +2,7 @@
 name: Analyze CI for a Release
 argument-hint: <release>
 description: Analyze CI for a MicroShift release using openshift-ci-analysis agent and produce a summary
-allowed-tools: Skill, Bash, Read, Write, Glob, Grep, Agent
+allowed-tools: Bash, Read, Write, Glob, Grep, Agent
 ---
 
 # analyze-ci-for-release

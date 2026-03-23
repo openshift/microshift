@@ -1,9 +1,7 @@
 ---
 name: openshift-ci-analysis
 description: Use the @openshift-ci-analysis when the user's prompt is a URL with this domain: https://prow.ci.openshift.org/**
-allowed-tools: Skill, Bash, Read, Write, Glob, Grep, Agent
-model: sonnet
-color: blue
+allowed-tools: Bash, Read, Write, Glob, Grep
 ---
 
 # Goal: Reduce noise for developers by processing large logs from a CI test pipeline and correctly classifying fatal errors with a false-positive rate of 0.01% and false-negative rate of 0.5%.
@@ -28,7 +26,7 @@ https://prow.ci.openshift.org/view/gs/test-platform-results/logs/periodic-ci-ope
 ```
 
 # Important Files
-> IMPORTANT! All files in this list will be downloaded after running the
+> IMPORTANT! All files in this list will be downloaded after running the `gcloud storage cp -r` command in step 1 of the Workflow.
 - `${TMP}/build-log.txt`: Log containing prow job output and most likely place to identify AWS infra related or hypervisor related errors.
 - `${STEP}/build-log.txt`: Each step in the CI job is individually logged in a build-log.txt file.
 - `./artifacts/${JOB_NAME}/openshift-microshift-infra-sos-aws/artifacts/sosreport-i-"${UNIQUE_ID}"-YYYY-MM-DD-"${UNIQUE_ID_2}".tar.xz`: Compressed archive containing select portions of the test host's filesystem, relevant logs, and system configurations.
@@ -75,16 +73,22 @@ gcloud storage cp -r gs://test-platform-results/logs/periodic-ci-openshift-micro
 
 0. Create and use a temporary working directory. Use the mktemp -d command to create this directory, then add the directory to the claude context by executing @add-dir /tmp/NEW_TEMP_DIR.
 
-1. **Scan for errors**: Start by scanning the top level `build-log.txt` file for errors and determine the step where the error occurred. Record each error with the filepath and line number for later reference.
+1. **Download all artifacts**: Download all prow job artifacts using `gcloud storage cp -r` into the temporary working directory:
+   ```bash
+   gcloud storage cp -r gs://test-platform-results/logs/${JOB_NAME}/${JOB_ID}/ ${TMP}/
+   ```
+   This makes all build logs, step logs, and SOS reports available locally for analysis.
 
-2. **Read context**: Iterate over each recorded error, locate the log file and line number, then read 50 lines before and 50 lines after the error. Use this information to characterize the error. Think about whether this error is transient and think about where in the stack the error occurs. Does it occur in the cloud infra, the openshift or prow ci-config, the hypvervisor, or is it a legitimate test failure? If it is a legitimate test failure, determine what stage of the test failed: setup, testing, teardown.
+2. **Scan for errors**: Start by scanning the top level `build-log.txt` file for errors and determine the step where the error occurred. Record each error with the filepath and line number for later reference.
 
-3. **Analyze the error**: Based on the context of the error, think hard about whether this error caused the test to fail, is a transient error, or is a red herring.
+3. **Read context**: Iterate over each recorded error, locate the log file and line number, then read 50 lines before and 50 lines after the error. Use this information to characterize the error. Think about whether this error is transient and think about where in the stack the error occurs. Does it occur in the cloud infra, the openshift or prow ci-config, the hypvervisor, or is it a legitimate test failure? If it is a legitimate test failure, determine what stage of the test failed: setup, testing, teardown.
 
-    3.1 If it is a legitimate test error, analyze the test logs to determine the source of the error.
-    3.2 If the source of the error appears to be due to microshift or a workload running on microshift, analyze the sos report's microshift journal and pod logs.
+4. **Analyze the error**: Based on the context of the error, think hard about whether this error caused the test to fail, is a transient error, or is a red herring.
 
-4. **Produce a report**: Create a concise report of the error. The report MUST specify:
+    4.1 If it is a legitimate test error, analyze the test logs to determine the source of the error.
+    4.2 If the source of the error appears to be due to microshift or a workload running on microshift, analyze the sos report's microshift journal and pod logs.
+
+5. **Produce a report**: Create a concise report of the error. The report MUST specify:
    - Where in the pipeline the error occurred
    - The specific step the error occurred in
    - Whether the test failure was legitimate (i.e., a test failed) or due to an infrastructure failure (i.e., build image was not found, AWS infra failed due to quota, hypervisor failed to create test host VM, etc.)
@@ -118,6 +122,7 @@ INFRASTRUCTURE_FAILURE: {true if Stack Layer is AWS Infra or the failure is due 
 JOB_URL: {the full prow job URL that was analyzed}
 JOB_NAME: {the full job name extracted from the URL}
 RELEASE: {the MicroShift release version extracted from the URL, e.g. 4.22}
+FINISHED: {the job finish date in YYYY-MM-DD format, extracted from finished.json or build log timestamps}
 --- END STRUCTURED SUMMARY ---
 ```
 

@@ -2,7 +2,7 @@
 name: Analyze CI for Pull Requests
 argument-hint: [--rebase] [--limit N]
 description: Analyze CI for open MicroShift pull requests and produce a summary of failures
-allowed-tools: Skill, Bash, Read, Write, Glob, Grep, Agent
+allowed-tools: Bash, Read, Write, Glob, Grep, Agent
 ---
 
 # analyze-ci-for-pull-requests

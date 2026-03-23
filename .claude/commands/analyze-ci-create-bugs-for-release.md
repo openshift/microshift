@@ -2,7 +2,6 @@
 name: Create JIRA Bugs for Analyze CI
 argument-hint: <release> [--create]
 description: Create JIRA bugs from analyze-ci failure reports (dry-run by default)
-model: sonnet
 allowed-tools: Bash, Read, Write, Glob, Grep, Agent, mcp__jira__jira_search, mcp__jira__jira_create_issue, mcp__jira__jira_get_issue
 ---
 
