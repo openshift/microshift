@@ -12,6 +12,7 @@ import (
 	"github.com/onsi/gomega"
 
 	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	kclientset "k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/kubernetes/openshift-hack/e2e"
@@ -21,6 +22,7 @@ import (
 	"k8s.io/kubernetes/test/e2e/storage/external"
 	e2etestingmanifests "k8s.io/kubernetes/test/e2e/testing-manifests"
 	testfixtures "k8s.io/kubernetes/test/fixtures"
+	utilnet "k8s.io/utils/net"
 
 	// this appears to inexplicably auto-register global flags.
 	_ "k8s.io/kubernetes/test/e2e/storage/drivers"
@@ -91,12 +93,6 @@ func updateTestFrameworkForTests(provider string) error {
 		ConfigFile:  config.ConfigFile,
 	}
 
-	// these constants are taken from kube e2e and used by tests
-	testContext.IPFamily = "ipv4"
-	if config.HasIPv6 && !config.HasIPv4 {
-		testContext.IPFamily = "ipv6"
-	}
-
 	// load and set the host variable for kubectl
 	clientConfig := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(&clientcmd.ClientConfigLoadingRules{ExplicitPath: testContext.KubeConfig}, &clientcmd.ConfigOverrides{})
 	cfg, err := clientConfig.ClientConfig()
@@ -104,6 +100,23 @@ func updateTestFrameworkForTests(provider string) error {
 		return err
 	}
 	testContext.Host = cfg.Host
+
+	// Detect the cluster's primary IP family by checking the kubernetes.default service ClusterIP.
+	// This is the same approach used in upstream test/e2e/e2e.go's getDefaultClusterIPFamily().
+	// For dual-stack clusters, the primary IP family is determined by the ClusterIP of the kubernetes service.
+	testContext.IPFamily = "ipv4" // default
+	c, err := kclientset.NewForConfig(cfg)
+	if err != nil {
+		return fmt.Errorf("failed to create kubernetes client: %v", err)
+	}
+	ctx := context.Background()
+	svc, err := c.CoreV1().Services("default").Get(ctx, "kubernetes", metav1.GetOptions{})
+	if err != nil {
+		return fmt.Errorf("failed to get kubernetes.default service: %v", err)
+	}
+	if utilnet.IsIPv6String(svc.Spec.ClusterIP) {
+		testContext.IPFamily = "ipv6"
+	}
 
 	// Ensure that Kube tests run privileged (like they do upstream)
 	testContext.CreateTestingNS = func(ctx context.Context, baseName string, c kclientset.Interface, labels map[string]string) (*corev1.Namespace, error) {
