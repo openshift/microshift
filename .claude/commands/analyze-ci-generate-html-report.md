@@ -105,7 +105,8 @@ The HTML file must be a self-contained, single-file document with embedded CSS a
         .collapsible { cursor: pointer; user-select: none; }
         .collapsible::before { content: '\25B6  '; font-size: 0.8em; }
         .collapsible.active::before { content: '\25BC  '; }
-        .collapsible .job-date { float: right; font-weight: 400; color: #6c757d; font-size: 0.85em; }
+        .collapsible .job-date { font-weight: 400; color: #6c757d; font-size: 0.85em; }
+        .job-date { font-weight: 400; color: #6c757d; font-size: 0.85em; }
         .collapsible-content { display: none; }
         .collapsible-content.show { display: block; }
         .toc { background: white; border-radius: 8px; padding: 20px; margin: 20px 0; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
@@ -168,14 +169,6 @@ The HTML file must be a self-contained, single-file document with embedded CSS a
                 <span class="badge badge-issues">N failed jobs</span>
             </div>
 
-            <!-- Issue blocks with grouped root cause analysis (from summary file) -->
-            <div class="issue-block high">
-                <strong>HIGH: Issue Title (N jobs)</strong><br>
-                Pattern description and root cause from the summary file.
-            </div>
-
-            <!-- Collapsible issue details extracted from the summary file -->
-            <h3>Issue Details</h3>
             <!-- One collapsible block per issue from the summary's TOP ISSUES section -->
             <div class="collapsible">1. SEVERITY: Issue Title (N jobs)</div>
             <div class="collapsible-content">
@@ -183,7 +176,7 @@ The HTML file must be a self-contained, single-file document with embedded CSS a
                 <p><strong>Affected Jobs:</strong></p>
                 <ul>
                     <!-- Each job link includes finish date from the grep extraction -->
-                    <li><a href="JOB_URL">job-name</a> <span class="job-date">YYYY-MM-DD</span></li>
+                    <li><span class="job-date">[YYYY-MM-DD]</span> <a href="JOB_URL">job-name</a></li>
                 </ul>
                 <p><strong>Next Steps:</strong> Next steps text from the summary</p>
             </div>
@@ -203,18 +196,10 @@ The HTML file must be a self-contained, single-file document with embedded CSS a
                 <span class="badge badge-issues">N failed jobs</span>
             </div>
 
-            <!-- Issue blocks with grouped root cause analysis -->
-            <div class="issue-block medium">
-                <strong>MEDIUM: Issue Title (N jobs)</strong><br>
-                Pattern description and root cause.
-            </div>
-
-            <!-- Per-PR failed jobs listed with links and root causes from summary -->
-            <h3>Failed Jobs</h3>
             <!-- One entry per failed job, extracted from the PR summary -->
-            <div class="collapsible">1. job-name - Root cause summary <span class="job-date">YYYY-MM-DD</span></div>
+            <div class="collapsible"><span class="job-date">[YYYY-MM-DD]</span> 1. job-name - Root cause summary</div>
             <div class="collapsible-content">
-                <p><strong>Job:</strong> <a href="JOB_URL">job-name</a> <span class="job-date">YYYY-MM-DD</span></p>
+                <p><strong>Job:</strong> <span class="job-date">[YYYY-MM-DD]</span> <a href="JOB_URL">job-name</a></p>
                 <div class="root-cause"><strong>Root Cause:</strong> Root cause from PR summary</div>
             </div>
         </div>
@@ -261,9 +246,7 @@ document.querySelectorAll('.collapsible').forEach(function(el) {
   - `badge-issues`: 1+ failed jobs
   - `badge-critical`: 5+ failed jobs or CRITICAL severity issues present
   - `badge-nodata`: analysis failed or no data
-- Each release section MUST contain two parts in order:
-  1. **Issue blocks**: Grouped root cause analysis from the summary file (HIGH/MEDIUM/CRITICAL/LOW patterns with severity, pattern, root cause, affected jobs, and next steps)
-  2. **Collapsible issue details**: Each issue from the summary's TOP ISSUES section gets a collapsible block showing root cause, affected jobs (linked to Prow), and next steps
+- Each release section contains collapsible issue details: each issue from the summary's TOP ISSUES section gets a collapsible block showing root cause, affected jobs (linked to Prow), and next steps
 - Each PR section shows the PR title, pass/fail counts, and collapsible failed job details with root causes — all extracted from the PR summary
 - Severity labels from summaries (CRITICAL/HIGH/MEDIUM/LOW) should be color-coded using CSS classes
 - The overview cards show the number of failed jobs per release and for rebase PRs at a glance
