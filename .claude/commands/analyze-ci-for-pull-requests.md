@@ -1,6 +1,6 @@
 ---
 name: Analyze CI for Pull Requests
-argument-hint: [--rebase] [--limit N]
+argument-hint: [--rebase]
 description: Analyze CI for open MicroShift pull requests and produce a summary of failures
 allowed-tools: Skill, Bash, Read, Write, Glob, Grep, Agent
 ---
@@ -9,22 +9,21 @@ allowed-tools: Skill, Bash, Read, Write, Glob, Grep, Agent
 
 ## Synopsis
 ```
-/analyze-ci-for-pull-requests [--rebase] [--limit N]
+/analyze-ci-for-pull-requests [--rebase]
 ```
 
 ## Description
-Fetches all open MicroShift pull requests, identifies failed Prow CI jobs for each PR, analyzes each failure using the `openshift-ci-analysis` agent, and produces a text summary report.
+Fetches all open MicroShift pull requests, identifies failed Prow CI jobs for each PR, analyzes each failure using the `/analyze-ci-for-prow-job` command, and produces a text summary report.
 
 This command orchestrates the analysis workflow by:
 
 1. Fetching the list of open PRs and their failed jobs using `.claude/scripts/microshift-prow-jobs-for-pull-requests.sh --mode detail`
 2. Filtering to only PRs that have at least one failed job
-3. Analyzing each failed job individually using the `openshift-ci-analysis` agent
-4. Aggregating results into a summary report saved to `/tmp`
+3. Analyzing each failed job individually using the `/analyze-ci-for-prow-job` command
+4. Aggregating results into a summary report saved to `/tmp/analyze-ci-claude-workdir`
 
 ## Arguments
 - `--rebase` (optional): Only analyze rebase PRs (titles containing `NO-ISSUE: rebase-release-`)
-- `--limit N` (optional): Limit analysis to first N failed jobs total (useful for quick checks, default: all failed jobs)
 
 ## Implementation Steps
 
@@ -40,7 +39,6 @@ This command orchestrates the analysis workflow by:
    - PR URL (line following the header)
    - Job name (first column)
    - Job URL (last column, the Prow URL)
-4. Apply `--limit N` if specified
 
 **Example Commands**:
 ```bash
@@ -67,20 +65,37 @@ bash .claude/scripts/microshift-prow-jobs-for-pull-requests.sh --mode detail --f
 - If no failed jobs across all PRs, report "All PR jobs are passing" and exit successfully
 - If `microshift-prow-jobs-for-pull-requests.sh` fails, report error and exit
 
-### Step 2: Analyze Each Failed Job Using openshift-ci-analysis Agent
+### Step 2: Analyze Each Failed Job Using /analyze-ci-for-prow-job
 
 **Goal**: Get detailed root cause analysis for each failed job.
 
-**Actions**:
-1. For each failed job URL from Step 1:
-   - Call the `openshift-ci-analysis` agent with the job URL **in parallel**
-   - Capture the analysis result (failure reason, error summary)
-   - Store all intermediate analysis files in `/tmp`
+**IMPORTANT - Mandatory Per-Job Agent Requirements**:
+Each job MUST be analyzed by launching a **separate Agent** (using the `Agent` tool, NOT the `Skill` tool) for each job URL. Do NOT analyze jobs inline or combine multiple jobs into a single agent. Each agent MUST:
+1. Run `/analyze-ci-for-prow-job <job-url>` (not by reimplementing the analysis)
+2. After the analysis completes, write the analysis report to an **exact file path** (see File Storage below)
+3. The file MUST contain the full report including the `--- STRUCTURED SUMMARY ---` block
 
-2. Progress reporting:
-   - Show "Analyzing job X/Y: <job-name> (PR #NNN)" for each job
-   - Use the Agent tool to invoke `openshift-ci-analysis` for each URL
-   - **Run all job analyses in parallel** to maximize efficiency
+**Actions**:
+1. Run `mkdir -p /tmp/analyze-ci-claude-workdir` using the `Bash` tool
+2. For each failed job URL, launch a separate **Agent** with this exact prompt template:
+   ```
+   Agent: subagent_type=general_purpose, prompt="Analyze this Prow job and save the report:
+   1. Run /analyze-ci-for-prow-job <JOB_URL>
+   2. After the analysis completes, save the FULL report output (including the --- STRUCTURED SUMMARY --- block) to:
+      /tmp/analyze-ci-claude-workdir/analyze-ci-prs-job-<N>-pr<PR>-<JOB_NAME_SUFFIX>.txt
+      Use the Write tool to save the file. The file must contain the complete analysis report."
+   ```
+   Replace `<JOB_URL>`, `<N>` (1-based job index), `<PR>` (PR number), and `<JOB_NAME_SUFFIX>` (last segment of job name) with actual values.
+3. Launch **ALL** job agents in parallel using `run_in_background: true`
+4. Wait for all agents to complete before proceeding to Step 3
+
+**Progress Reporting**:
+```text
+Analyzing N jobs in parallel...
+Job 1/N: <job-name> (PR #NNN) (background)
+Job 2/N: <job-name> (PR #NNN) (background)
+...
+```
 
 **Data Collection**:
 For each job analysis, extract:
@@ -92,8 +107,19 @@ For each job analysis, extract:
 - Affected test scenarios (if applicable)
 
 **File Storage**:
-All intermediate analysis files are stored in `/tmp` with naming pattern:
-- `/tmp/analyze-ci-prs-job-<N>-pr<PR>-<job-name-suffix>.txt`
+All per-job report files MUST be saved at this exact path:
+- `/tmp/analyze-ci-claude-workdir/analyze-ci-prs-job-<N>-pr<PR>-<job-name-suffix>.txt`
+
+Where:
+- `<N>` is the 1-based job index
+- `<PR>` is the PR number
+- `<job-name-suffix>` is the last segment of the job name
+
+**Verification**: After all agents complete, verify that per-job files exist:
+```bash
+ls /tmp/analyze-ci-claude-workdir/analyze-ci-prs-job-*.txt
+```
+If any files are missing, note the gap in the summary report but do NOT re-run the analysis.
 
 ### Step 3: Aggregate Results and Identify Patterns
 
@@ -101,7 +127,8 @@ All intermediate analysis files are stored in `/tmp` with naming pattern:
 
 **Actions**:
 1. Collect results from all parallel job analyses
-   - Read individual job analysis files from `/tmp`
+   - Read each per-job file from `/tmp/analyze-ci-claude-workdir`
+   - Extract the `--- STRUCTURED SUMMARY ---` block from each file for pattern detection (including the `FINISHED` field for job date tracking)
    - Extract key findings from each analysis
 
 2. Group failures by PR:
@@ -118,7 +145,7 @@ All intermediate analysis files are stored in `/tmp` with naming pattern:
 **Actions**:
 1. Aggregate all job analysis results from parallel execution
 2. Identify common patterns and group by PR and failure type
-3. Generate summary report and save to `/tmp/analyze-ci-prs-summary.<timestamp>.txt`
+3. Generate summary report and save to `/tmp/analyze-ci-claude-workdir/analyze-ci-prs-summary.<timestamp>.txt`
 4. Display the summary to the user
 
 **Report Structure**:
@@ -133,7 +160,7 @@ OVERVIEW
   PRs with Failures: 2
   Total Failed Jobs: 9
   Analysis Date: 2026-03-15
-  Report: /tmp/analyze-ci-prs-summary.20260315-143022.txt
+  Report: /tmp/analyze-ci-claude-workdir/analyze-ci-prs-summary.20260315-143022.txt
 
 PER-PR BREAKDOWN
 
@@ -144,7 +171,7 @@ PR #6313: USHIFT-6636: Change test-agent impl to align with greenboot-rs
   Failed Jobs:
   1. pull-ci-openshift-microshift-main-e2e-aws-tests
      Status: FAILURE
-     Root Cause: [summarized from openshift-ci-analysis]
+     Root Cause: [summarized from analyze-ci-for-prow-job]
      URL: https://prow.ci.openshift.org/view/gs/...
 
   2. pull-ci-openshift-microshift-main-e2e-aws-tests-arm
@@ -170,7 +197,7 @@ COMMON PATTERNS (across PRs)
 
 ═══════════════════════════════════════════════════════════════
 
-Individual job reports: /tmp/analyze-ci-prs-job-*.txt
+Individual job reports: /tmp/analyze-ci-claude-workdir/analyze-ci-prs-job-*.txt
 ```
 
 ## Examples
@@ -197,29 +224,19 @@ Individual job reports: /tmp/analyze-ci-prs-job-*.txt
 - Only includes PRs with `NO-ISSUE: rebase-release-` in the title
 - Useful for release manager workflow to check rebase CI status
 
-### Example 3: Quick Analysis (First 5 Failed Jobs)
-
-```
-/analyze-ci-for-pull-requests --limit 5
-```
-
-**Behavior**:
-- Analyzes only first 5 failed jobs across all PRs
-- Useful for quick health check
-
 ## Performance Considerations
 
 - **Execution Time**: Depends on number of failed jobs; parallel execution helps significantly
 - **Network Usage**: Each job analysis fetches logs from GCS
 - **Parallelization**: All job analyses run in parallel for maximum efficiency
-- **Use --limit**: For quick checks, use --limit flag to analyze a subset
-- **File Storage**: All intermediate and report files are stored in `/tmp` directory
+- **File Storage**: All intermediate and report files are stored in `/tmp/analyze-ci-claude-workdir` directory
 
 ## Prerequisites
 
 - `.claude/scripts/microshift-prow-jobs-for-pull-requests.sh` script must exist and be executable
-- `openshift-ci-analysis` agent must be available
+- `/analyze-ci-for-prow-job` command must be available
 - `gh` CLI must be authenticated with access to openshift/microshift
+- `gcloud` CLI must be installed and authenticated for GCS access (used by analyze-ci-for-prow-job)
 - Internet access to fetch job data from GCS
 - Bash shell
 
@@ -232,7 +249,7 @@ No open pull requests found.
 
 ### No Failed Jobs
 ```
-All open PR jobs are passing! ✓
+All open PR jobs are passing.
 No failures to analyze.
 ```
 
@@ -244,7 +261,7 @@ Please ensure you're in the microshift project directory.
 
 ## Related Skills
 
-- **openshift-ci-analysis**: Detailed analysis of a single job (used internally)
+- **analyze-ci-for-prow-job**: Detailed analysis of a single job (used internally)
 - **analyze-ci-for-release**: Similar analysis for periodic release jobs
 - **analyze-ci-for-release-manager**: Multi-release analysis with HTML output
 - **analyze-ci-test-scenario**: Analyze specific test scenario results
@@ -253,8 +270,8 @@ Please ensure you're in the microshift project directory.
 
 - This skill focuses on **presubmit** PR jobs (not periodic/postsubmit)
 - Analysis is read-only - no modifications to CI data or PRs
-- Results are saved in files in /tmp directory with a timestamp
+- Results are saved in files in /tmp/analyze-ci-claude-workdir directory with a timestamp
 - Provide links to the jobs in the summary
 - Only present a concise analysis summary for each job
 - PRs with no Prow jobs (e.g., drafts without triggered tests) are skipped
-- Pattern detection improves with more jobs analyzed (avoid limiting unless needed)
+- Pattern detection improves with more jobs analyzed
