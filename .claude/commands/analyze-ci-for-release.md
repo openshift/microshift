@@ -133,6 +133,11 @@ If any files are missing, note the gap in the summary report but do NOT re-run t
 3. Generate summary report and save to `/tmp/analyze-ci-claude-workdir/analyze-ci-release-<release>-summary.<timestamp>.txt`
 4. Display the summary to the user
 
+**Important**: Each job listed under "Affected Jobs" MUST include:
+- The job name followed by the finish date in `[YYYY-MM-DD]` format (from the per-job `FINISHED` field)
+- The Prow URL on the next line
+This ensures the HTML report generator can extract dates without reading per-job files.
+
 **Report Structure**:
 
 ```text
@@ -156,9 +161,11 @@ TOP ISSUES (by frequency)
    Severity: HIGH
    Pattern: Tests timeout or fail in conformance suite
    Affected Jobs:
-   • periodic-ci-openshift-microshift-release-4.22-periodics-e2e-aws-ovn-ocp-conformance
-   • periodic-ci-openshift-microshift-release-4.22-periodics-e2e-aws-ovn-ocp-conformance-serial
-   • ... (6 more)
+   * periodic-ci-openshift-microshift-release-4.22-periodics-e2e-aws-ovn-ocp-conformance [2026-03-14]
+     https://prow.ci.openshift.org/view/gs/test-platform-results/logs/.../1234567890
+   * periodic-ci-openshift-microshift-release-4.22-periodics-e2e-aws-ovn-ocp-conformance-serial [2026-03-14]
+     https://prow.ci.openshift.org/view/gs/test-platform-results/logs/.../1234567891
+   * ... (6 more)
 
    Root Cause: [summarized from analyze-ci-for-prow-job results]
    Next Steps: [recommended actions]
@@ -167,8 +174,9 @@ TOP ISSUES (by frequency)
    Severity: MEDIUM
    Pattern: Image build or deployment issues
    Affected Jobs:
-   • periodic-ci-openshift-microshift-release-4.22-periodics-e2e-aws-tests-bootc-nightly
-   • ... (3 more)
+   * periodic-ci-openshift-microshift-release-4.22-periodics-e2e-aws-tests-bootc-nightly [2026-03-14]
+     https://prow.ci.openshift.org/view/gs/test-platform-results/logs/.../1234567892
+   * ... (3 more)
 
    Root Cause: [summarized]
    Next Steps: [recommended actions]
@@ -177,8 +185,10 @@ TOP ISSUES (by frequency)
    Severity: LOW
    Pattern: Jobs timeout or fail to allocate resources
    Affected Jobs:
-   • periodic-ci-openshift-microshift-release-4.22-periodics-rebase-on-nightlies
-   • periodic-ci-openshift-microshift-release-4.22-periodics-update-versions-releases
+   * periodic-ci-openshift-microshift-release-4.22-periodics-rebase-on-nightlies [2026-03-14]
+     https://prow.ci.openshift.org/view/gs/test-platform-results/logs/.../1234567893
+   * periodic-ci-openshift-microshift-release-4.22-periodics-update-versions-releases [2026-03-14]
+     https://prow.ci.openshift.org/view/gs/test-platform-results/logs/.../1234567894
 
    Root Cause: [summarized]
 

@@ -148,6 +148,8 @@ If any files are missing, note the gap in the summary report but do NOT re-run t
 3. Generate summary report and save to `/tmp/analyze-ci-claude-workdir/analyze-ci-prs-summary.<timestamp>.txt`
 4. Display the summary to the user
 
+**Important**: Each failed job MUST include the finish date in `[YYYY-MM-DD]` format (from the per-job `FINISHED` field) after the job name. This ensures the HTML report generator can extract dates without reading per-job files.
+
 **Report Structure**:
 
 ```
@@ -169,12 +171,12 @@ PR #6313: USHIFT-6636: Change test-agent impl to align with greenboot-rs
   Jobs: 8 passed, 7 failed
 
   Failed Jobs:
-  1. pull-ci-openshift-microshift-main-e2e-aws-tests
+  1. pull-ci-openshift-microshift-main-e2e-aws-tests [2026-03-15]
      Status: FAILURE
      Root Cause: [summarized from analyze-ci-for-prow-job]
      URL: https://prow.ci.openshift.org/view/gs/...
 
-  2. pull-ci-openshift-microshift-main-e2e-aws-tests-arm
+  2. pull-ci-openshift-microshift-main-e2e-aws-tests-arm [2026-03-15]
      Status: FAILURE
      Root Cause: [summarized]
      URL: https://prow.ci.openshift.org/view/gs/...
@@ -186,7 +188,7 @@ PR #6116: USHIFT-6491: Improve gitops test
   Jobs: 15 passed, 2 failed
 
   Failed Jobs:
-  1. pull-ci-openshift-microshift-main-e2e-aws-tests-bootc-periodic
+  1. pull-ci-openshift-microshift-main-e2e-aws-tests-bootc-periodic [2026-03-15]
      Status: FAILURE
      Root Cause: [summarized]
      URL: https://prow.ci.openshift.org/view/gs/...
