@@ -309,7 +309,7 @@ HTML report generated: /tmp/analyze-ci-claude-workdir/microshift-ci-release-mana
 - **analyze-ci-for-release**: Per-release periodic job analysis (used internally)
 - **analyze-ci-for-pull-requests**: PR job analysis (used internally)
 - **analyze-ci-for-prow-job**: Single job analysis (used by the above)
-- **analyze-ci-create-bugs-for-release**: Creates JIRA bugs from analysis output (not yet integrated — run separately after this command)
+- **analyze-ci-create-bugs**: Creates JIRA bugs from analysis output (supports both release and PR job files — run separately after this command)
 
 ## Notes
 - Each release analysis launches `analyze-ci-for-release` as an **Agent** (not a Skill) - this command does NOT duplicate that logic
