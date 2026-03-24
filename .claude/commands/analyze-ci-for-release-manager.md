@@ -13,7 +13,7 @@ allowed-tools: Skill, Bash, Read, Write, Glob, Grep, Agent
 ```
 
 ## Description
-Accepts a comma-separated list of MicroShift release versions, runs the `analyze-ci-for-release` skill for each release and the `analyze-ci-for-pull-requests --rebase` skill for open rebase PRs, and produces a single HTML summary file consolidating all results. The HTML report uses tabs to separate Periodics (per-release) and Pull Requests sections.
+Accepts a comma-separated list of MicroShift release versions, runs the `analyze-ci-for-release` command for each release and the `analyze-ci-for-pull-requests --rebase` command for open rebase PRs, and produces a single HTML summary file consolidating all results. The HTML report uses tabs to separate Periodics (per-release) and Pull Requests sections.
 
 ## Arguments
 - `$ARGUMENTS` (required): Comma-separated list of release versions (e.g., `4.19,4.20,4.21,4.22`)
@@ -34,13 +34,14 @@ Accepts a comma-separated list of MicroShift release versions, runs the `analyze
 ### Step 2: Analyze Each Release (Periodics)
 
 **Actions**:
-1. For each release version from the parsed list, invoke the `analyze-ci-for-release` skill:
+1. For each release version from the parsed list, launch the `analyze-ci-for-release` command as an **Agent** (using the `Agent` tool, NOT the `Skill` tool):
    ```text
-   Skill: analyze-ci-for-release, args: "<version>"
+   Agent: subagent_type=general_purpose, prompt="Run /analyze-ci-for-release <version>"
    ```
-2. Run releases **sequentially** (each skill invocation is a full analysis)
-3. After each skill completes, note the summary report file path it produced (typically `/tmp/analyze-ci-release-<version>-summary.*.txt`)
-4. Track which releases succeeded and which failed
+2. Launch all releases **in parallel** as separate agents — do NOT wait for one to finish before starting the next
+3. After each agent completes, note the summary report file path it produced (typically `/tmp/analyze-ci-claude-workdir/analyze-ci-release-<version>-summary.*.txt`)
+4. Wait until all the parallel agents are complete
+5. Track which releases succeeded and which failed
 
 **Progress Reporting**:
 ```text
@@ -50,38 +51,39 @@ Analyzing release X/Y: <version>
 ### Step 3: Analyze Rebase Pull Requests
 
 **Actions**:
-1. Invoke the `analyze-ci-for-pull-requests` skill with `--rebase` argument:
+1. Launch the `analyze-ci-for-pull-requests` command as an **Agent** (using the `Agent` tool, NOT the `Skill` tool) with `--rebase` argument:
    ```text
-   Skill: analyze-ci-for-pull-requests, args: "--rebase"
+   Agent: subagent_type=general_purpose, prompt="Run /analyze-ci-for-pull-requests --rebase"
    ```
-2. After the skill completes, note the summary report file path (typically `/tmp/analyze-ci-prs-summary.*.txt`)
-3. If no rebase PRs are found, note "No open rebase PRs" for the report
+2. This agent can be launched in parallel with the release agents in Step 2
+3. After the agent completes, note the summary report file path (typically `/tmp/analyze-ci-claude-workdir/analyze-ci-prs-summary.*.txt`)
+4. If no rebase PRs are found, note "No open rebase PRs" for the report
 
 **Progress Reporting**:
-```text
-Analyzing rebase pull requests...
-```
+1. Keep updating the background task list and completion status
 
 ### Step 4: Collect All Results
 
 **Actions**:
-1. After all analyses complete, gather all summary files:
-   - Periodics: `/tmp/analyze-ci-release-<version>-summary.*.txt` for each version
-   - Pull Requests: `/tmp/analyze-ci-prs-summary.*.txt`
-   - Per-job files: `/tmp/analyze-ci-release-<version>-job-*.txt` and `/tmp/analyze-ci-prs-job-*.txt`
-2. Read each summary file to extract the analysis content
-3. If a summary file is missing for a release, note it as "Analysis failed or produced no output"
-4. If no PR summary file exists, note "No open rebase PRs or no failures found"
+1. **IMPORTANT**: Wait until ALL agents are confirmed complete
+2. After all analyses complete, gather all summary files:
+   - Periodics: `/tmp/analyze-ci-claude-workdir/analyze-ci-release-<version>-summary.*.txt` for each version
+   - Pull Requests: `/tmp/analyze-ci-claude-workdir/analyze-ci-prs-summary.*.txt`
+   - Per-job files: `/tmp/analyze-ci-claude-workdir/analyze-ci-release-<version>-job-*.txt` and `/tmp/analyze-ci-claude-workdir/analyze-ci-prs-job-*.txt`
+3. Read each summary file to extract the analysis content
+4. If a summary file is missing for a release, note it as "Analysis failed or produced no output"
+5. If no PR summary file exists, note "No open rebase PRs or no failures found"
 
 ### Step 5: Generate HTML Summary Report
 
-**Goal**: Create a single HTML file at `/tmp/microshift-ci-release-manager-<timestamp>.html` that consolidates all analyses with tabbed navigation.
+**Goal**: Create a single HTML file at `/tmp/analyze-ci-claude-workdir/microshift-ci-release-manager-<timestamp>.html` that consolidates all analyses with tabbed navigation.
 
 **Actions**:
-1. Generate the HTML report with the structure described below
-2. Save to `/tmp/microshift-ci-release-manager-<timestamp>.html` where `<timestamp>` is `YYYYMMDD-HHMMSS`
-3. **IMPORTANT**: Use the `Bash` tool with `cat <<'HTMLEOF' > /tmp/microshift-ci-release-manager-<timestamp>.html` (heredoc) to write the file, NOT the `Write` tool. This ensures the absolute `/tmp` path is used and avoids permission prompts.
-4. Display the file path to the user in the end.
+1. **IMPORTANT**: Wait until ALL agents are confirmed complete
+2. Generate the HTML report with the structure described below
+3. Save to `/tmp/analyze-ci-claude-workdir/microshift-ci-release-manager-<timestamp>.html` where `<timestamp>` is `YYYYMMDD-HHMMSS`
+4. **IMPORTANT**: First run `mkdir -p /tmp/analyze-ci-claude-workdir` using the `Bash` tool, then write the file using `cat <<'HTMLEOF' > /tmp/analyze-ci-claude-workdir/microshift-ci-release-manager-<timestamp>.html` (heredoc), NOT the `Write` tool. This ensures the absolute `/tmp/analyze-ci-claude-workdir` path is used and avoids permission prompts.
+5. Display the file path to the user in the end, AFTER the summary
 
 **HTML Structure**:
 
@@ -251,7 +253,7 @@ document.querySelectorAll('.collapsible').forEach(function(el) {
   - `badge-critical`: 5+ failed jobs or CRITICAL severity issues present
   - `badge-nodata`: analysis failed or no data
 - Make per-job details collapsible to keep the page manageable
-- Each collapsible job header in the Periodics tab MUST include the job's finish date (from the Prow job listing) displayed on the right side using `<span class="job-date">YYYY-MM-DD</span>`. Example: `<div class="collapsible">1. e2e-aws-tests-nightly - Root Cause Summary <span class="job-date">2026-03-17</span></div>`
+- Each collapsible job header in the Periodics tab MUST include the job's finish date (from the `FINISHED` field in the per-job STRUCTURED SUMMARY) displayed on the right side using `<span class="job-date">YYYY-MM-DD</span>`. Example: `<div class="collapsible">1. e2e-aws-tests-nightly - Root Cause Summary <span class="job-date">2026-03-17</span></div>`
 - The overview cards should show the number of failed jobs per release and for rebase PRs at a glance
 - The **Periodics** tab contains the per-release periodic job analyses (same as before)
 - The **Pull Requests** tab contains the rebase PR analyses grouped by PR
@@ -259,13 +261,11 @@ document.querySelectorAll('.collapsible').forEach(function(el) {
 ### Step 6: Report Completion
 
 **Actions**:
-1. Display the path to the generated HTML file
-2. Provide a brief text summary listing each release and its failed job count, plus rebase PR status
+1. Provide a brief text summary listing each release and its failed job count, plus rebase PR status
+2. Display the path to the generated HTML file
 
 **Example Output**:
 ```text
-HTML report generated: /tmp/microshift-ci-release-manager-20260315-143022.html
-
 Summary:
   Periodics:
     Release 4.19: 3 failed periodic jobs
@@ -274,6 +274,8 @@ Summary:
     Release 4.22: 12 failed periodic jobs
   Pull Requests:
     2 rebase PRs with 5 total failed jobs
+
+HTML report generated: /tmp/analyze-ci-claude-workdir/microshift-ci-release-manager-20260315-143022.html
 ```
 
 ## Examples
@@ -293,13 +295,28 @@ Summary:
 /analyze-ci-for-release-manager 4.22
 ```
 
+## Prerequisites
+
+- `/analyze-ci-for-release` command must be available
+- `/analyze-ci-for-pull-requests` command must be available
+- `gcloud` CLI must be installed and authenticated for GCS access (used by analyze-ci-for-prow-job)
+- `gh` CLI must be authenticated with access to openshift/microshift (used by analyze-ci-for-pull-requests)
+- Internet access to fetch job data from Prow/GCS
+- Bash shell
+
+## Related Skills
+
+- **analyze-ci-for-release**: Per-release periodic job analysis (used internally)
+- **analyze-ci-for-pull-requests**: PR job analysis (used internally)
+- **analyze-ci-for-prow-job**: Single job analysis (used by the above)
+- **analyze-ci-create-bugs-for-release**: Creates JIRA bugs from analysis output (not yet integrated — run separately after this command)
+
 ## Notes
-- Each release analysis uses the `analyze-ci-for-release` skill - this command does NOT duplicate that logic
-- Rebase PR analysis uses the `analyze-ci-for-pull-requests --rebase` skill
+- Each release analysis launches `analyze-ci-for-release` as an **Agent** (not a Skill) - this command does NOT duplicate that logic
+- Rebase PR analysis launches `analyze-ci-for-pull-requests --rebase` as an **Agent** (not a Skill)
+- All agents (releases + PR analysis) are launched in parallel for maximum efficiency
 - The HTML report is self-contained (no external CSS/JS dependencies)
-- All intermediate files from `analyze-ci-for-release` and `analyze-ci-for-pull-requests` remain available in `/tmp`
-- Releases are analyzed sequentially since each invocation is resource-intensive
-- The rebase PR analysis runs after all releases are analyzed
+- All intermediate files from `analyze-ci-for-release` and `analyze-ci-for-pull-requests` remain available in `/tmp/analyze-ci-claude-workdir`
 - The HTML file can be opened in any browser for convenient examination
 - If a release analysis fails, it is noted in the report but does not block other releases
 - If no rebase PRs are open, the Pull Requests tab shows "No open rebase pull requests found"
