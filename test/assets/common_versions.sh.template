@@ -68,11 +68,14 @@ get_vrel_from_rpm() {{
     echo ""
 }}
 
-# The current release minor version (e.g. '17' for '4.17') affects
+# The current release version (e.g. '4.17') affects
 # the definition of previous and fake next versions.
+export MAJOR_VERSION={major_version}
 export MINOR_VERSION={minor_version}
-export PREVIOUS_MINOR_VERSION=$(( "${{MINOR_VERSION}}" - 1 ))
-export YMINUS2_MINOR_VERSION=$(( "${{MINOR_VERSION}}" - 2 ))
+export PREVIOUS_MAJOR_VERSION={previous_major_version}
+export PREVIOUS_MINOR_VERSION={previous_minor_version}
+export YMINUS2_MAJOR_VERSION={yminus2_major_version}
+export YMINUS2_MINOR_VERSION={yminus2_minor_version}
 export FAKE_NEXT_MINOR_VERSION=$(( "${{MINOR_VERSION}}" + 1 ))
 
 # For a main branch, the current release repository usually comes from
@@ -110,27 +113,34 @@ YMINUS2_RELEASE_VERSION="{yminus2_release_version}"
 export YMINUS2_RELEASE_REPO
 export YMINUS2_RELEASE_VERSION
 
-# The 'rhocp_minor_y' variable should be the minor version number, if the
-# current release is available through the 'rhocp' stream, otherwise empty.
+# The 'rhocp_major_y' and 'rhocp_minor_y' variables should be the major and minor
+# version numbers, if the current release is available through the 'rhocp' stream,
+# otherwise empty.
+RHOCP_MAJOR_Y={rhocp_major_y}
 RHOCP_MINOR_Y={rhocp_minor_y}
 # The beta repository, containing dependencies, should point to the
 # OpenShift mirror URL. If the mirror for current minor is not
 # available yet, it should point to an older release.
 RHOCP_MINOR_Y_BETA="{rhocp_minor_y_beta}"
+export RHOCP_MAJOR_Y
 export RHOCP_MINOR_Y
 export RHOCP_MINOR_Y_BETA
 
-# The 'rhocp_minor_y' variable should be the previous minor version number, if
-# the previous release is available through the 'rhocp' stream, otherwise empty.
+# The 'rhocp_major_y1' and 'rhocp_minor_y1' variables should be the previous major
+# and minor version numbers, if the previous release is available through the
+# 'rhocp' stream, otherwise empty.
+RHOCP_MAJOR_Y1={rhocp_major_y1}
 RHOCP_MINOR_Y1={rhocp_minor_y1}
 # The beta repository, containing dependencies, should point to the
 # OpenShift mirror URL. The mirror for previous release should always
 # be available.
 RHOCP_MINOR_Y1_BETA="{rhocp_minor_y1_beta}"
+export RHOCP_MAJOR_Y1
 export RHOCP_MINOR_Y1
 export RHOCP_MINOR_Y1_BETA
 
-# The 'rhocp_minor_y2' should always be the y-2 minor version number.
+# The 'rhocp_major_y2' and 'rhocp_minor_y2' should always be the y-2 version numbers.
+export RHOCP_MAJOR_Y2={rhocp_major_y2}
 export RHOCP_MINOR_Y2={rhocp_minor_y2}
 
 export CNCF_SONOBUOY_VERSION={CNCF_SONOBUOY_VERSION}
@@ -142,12 +152,12 @@ export CNCF_SYSTEMD_LOGS_VERSION={CNCF_SYSTEMD_LOGS_VERSION}
 export GITOPS_VERSION={GITOPS_VERSION}
 
 # The brew release versions needed for release regression testing
-BREW_Y0_RELEASE_VERSION="$(get_vrel_from_rpm "${{BREW_RPM_SOURCE}}/4.${{MINOR_VERSION}}-zstream/{ARCH}/")"
-BREW_Y1_RELEASE_VERSION="$(get_vrel_from_rpm "${{BREW_RPM_SOURCE}}/4.${{PREVIOUS_MINOR_VERSION}}-zstream/{ARCH}/")"
-BREW_Y2_RELEASE_VERSION="$(get_vrel_from_rpm "${{BREW_RPM_SOURCE}}/4.${{YMINUS2_MINOR_VERSION}}-zstream/{ARCH}/")"
-BREW_RC_RELEASE_VERSION="$(get_vrel_from_rpm "${{BREW_RPM_SOURCE}}/4.${{MINOR_VERSION}}-rc/{ARCH}/")"
-BREW_EC_RELEASE_VERSION="$(get_vrel_from_rpm "${{BREW_RPM_SOURCE}}/4.${{MINOR_VERSION}}-ec/{ARCH}/")"
-BREW_NIGHTLY_RELEASE_VERSION="$(get_vrel_from_rpm "${{BREW_RPM_SOURCE}}/4.${{MINOR_VERSION}}-nightly/{ARCH}/")"
+BREW_Y0_RELEASE_VERSION="$(get_vrel_from_rpm "${{BREW_RPM_SOURCE}}/${{MAJOR_VERSION}}.${{MINOR_VERSION}}-zstream/{ARCH}/")"
+BREW_Y1_RELEASE_VERSION="$(get_vrel_from_rpm "${{BREW_RPM_SOURCE}}/${{PREVIOUS_MAJOR_VERSION}}.${{PREVIOUS_MINOR_VERSION}}-zstream/{ARCH}/")"
+BREW_Y2_RELEASE_VERSION="$(get_vrel_from_rpm "${{BREW_RPM_SOURCE}}/${{YMINUS2_MAJOR_VERSION}}.${{YMINUS2_MINOR_VERSION}}-zstream/{ARCH}/")"
+BREW_RC_RELEASE_VERSION="$(get_vrel_from_rpm "${{BREW_RPM_SOURCE}}/${{MAJOR_VERSION}}.${{MINOR_VERSION}}-rc/{ARCH}/")"
+BREW_EC_RELEASE_VERSION="$(get_vrel_from_rpm "${{BREW_RPM_SOURCE}}/${{MAJOR_VERSION}}.${{MINOR_VERSION}}-ec/{ARCH}/")"
+BREW_NIGHTLY_RELEASE_VERSION="$(get_vrel_from_rpm "${{BREW_RPM_SOURCE}}/${{MAJOR_VERSION}}.${{MINOR_VERSION}}-nightly/{ARCH}/")"
 export BREW_Y0_RELEASE_VERSION
 export BREW_Y1_RELEASE_VERSION
 export BREW_Y2_RELEASE_VERSION
@@ -169,7 +179,7 @@ fi
 export BREW_LREL_RELEASE_VERSION
 
 # Branch and commit for the openshift-tests-private repository
-OPENSHIFT_TESTS_PRIVATE_REPO_BRANCH="release-4.${{MINOR_VERSION}}"
+OPENSHIFT_TESTS_PRIVATE_REPO_BRANCH="release-${{MAJOR_VERSION}}.${{MINOR_VERSION}}"
 OPENSHIFT_TESTS_PRIVATE_REPO_COMMIT="b5111e366dc8f517732c6d48219ed659497de8e0"
 export OPENSHIFT_TESTS_PRIVATE_REPO_BRANCH
 export OPENSHIFT_TESTS_PRIVATE_REPO_COMMIT
