@@ -1,12 +1,10 @@
 .idea/
 .vagrant/
 .vscode/
-Vagrantfile
-_output/*
-_output
-sshfile
+.work/
+_output/
+__pycache__/
 ansible/*.txt
 test/variables.yaml
 test/scenario_settings.sh
-__pycache__
 test/dev_overrides.sh
