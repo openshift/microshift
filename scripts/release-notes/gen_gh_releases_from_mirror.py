@@ -105,17 +105,18 @@ def main():
     # We build a default list of versions to scan using the current
     # version and the previous version. This assumes the script is run
     # out of the main branch where we can find the most current
-    # version under development. During the period where 4.n is being
-    # developed, 4.n-1 may still be producing only release candidates,
+    # version under development. During the period where X.n is being
+    # developed, X.n-1 may still be producing only release candidates,
     # so that scanning those 2 versions give us the 2 most recent
     # candidates for having no releases. During the period where the
     # main branch has not landed a rebase to update the version and
     # both main and the pre-release branch have the same version, we
-    # will end up scanning for EC or RC releases of 4.n-2, but that's
+    # will end up scanning for EC or RC releases of X.n-2, but that's
     # OK because the should all have been tagged already.
+    prev_major, prev_minor = common.get_previous_version(major, minor)
     versions_to_scan = [
         '.'.join([major, minor]),              # this minor version
-        '.'.join([major, str(int(minor)-1)]),  # the previous minor version
+        '.'.join([prev_major, prev_minor]),    # the previous minor version
     ]
 
     parser = argparse.ArgumentParser(

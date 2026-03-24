@@ -8,7 +8,9 @@
 # because repositories are only usable after the release.
 # Accessing them before the release results in 403 error.
 #
-# Script can accept a minor version (e.g. 16) to check for RHOCP of specific version only.
+# Script can accept:
+# - A minor version (e.g. 16) to check for RHOCP of specific version only.
+# - A minor and major version (e.g. 22 4) to check for RHOCP of a specific major.minor.
 #
 # Output is:
 # - just a minor version in case of subscription RHOCP repository, e.g.: 15
@@ -38,12 +40,19 @@ if [ ! -f "${make_version}" ] ; then
         exit 1
     fi
 fi
-current_major=$(grep '^OCP_VERSION' "${make_version}" | cut -d'=' -f2 | tr -d ' ' | cut -d'.' -f1)
-
-if [[ "$#" -eq 1 ]]; then
+if [[ "$#" -ge 2 ]]; then
+    # Both minor and major provided as arguments
     current_minor="${1}"
+    current_major="${2}"
+    stop="${current_minor}"
+elif [[ "$#" -eq 1 ]]; then
+    # Only minor provided, get major from Makefile
+    current_minor="${1}"
+    current_major=$(grep '^OCP_VERSION' "${make_version}" | cut -d'=' -f2 | tr -d ' ' | cut -d'.' -f1)
     stop="${current_minor}"
 else
+    # No arguments, get both from Makefile
+    current_major=$(grep '^OCP_VERSION' "${make_version}" | cut -d'=' -f2 | tr -d ' ' | cut -d'.' -f1)
     current_minor=$(grep '^OCP_VERSION' "${make_version}" | cut -d'=' -f2 | tr -d ' ' | cut -d'.' -f2)
     stop=$(( current_minor - 3 ))
     if (( stop < 0 )); then

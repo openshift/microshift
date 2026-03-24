@@ -196,6 +196,23 @@ function configure_rhel_repositories() {
     # Extract major version from Makefile.version
     local -r ocp_major="$(grep '^OCP_VERSION' "${MAKE_VERSION}" | cut -d'=' -f2 | tr -d ' ' | cut -d'.' -f1)"
 
+    # Map of last minor version for each major (for cross-major transitions)
+    local -A last_minor_for_major=([4]=22)
+
+    # Calculate previous version handling cross-major boundaries
+    # Sets prev_major and prev_minor variables
+    get_prev_version() {
+        local major=$1
+        local minor=$2
+        if (( minor > 0 )); then
+            prev_major="${major}"
+            prev_minor=$(( minor - 1 ))
+        else
+            prev_major=$(( major - 1 ))
+            prev_minor="${last_minor_for_major[${prev_major}]:-}"
+        fi
+    }
+
     RHOCP=$("${RHOCP_REPO}")
     if [[ "${RHOCP}" =~ ^[0-9]{1,2}$ ]]; then
         sudo subscription-manager repos --enable "rhocp-${ocp_major}.${RHOCP}-for-rhel-9-$(uname -m)-rpms"
@@ -211,14 +228,21 @@ enabled=1
 gpgcheck=0
 skip_if_unavailable=0
 EOF
-        PREVIOUS_RHOCP=$("${RHOCP_REPO}" $((ver-1)))
-        if [[ "${PREVIOUS_RHOCP}" =~ ^[0-9]{1,2}$ ]]; then
-            sudo subscription-manager repos --enable "rhocp-${ocp_major}.${PREVIOUS_RHOCP}-for-rhel-9-$(uname -m)-rpms"
-        else
-            # If RHOCP Y-1 is not available, try RHOCP Y-2.
-            Y2_RHOCP=$("${RHOCP_REPO}" $((ver-2)))
-            if [[ "${Y2_RHOCP}" =~ ^[0-9]{1,2}$ ]]; then
-                sudo subscription-manager repos --enable "rhocp-${ocp_major}.${Y2_RHOCP}-for-rhel-9-$(uname -m)-rpms"
+        # Calculate Y-1 version
+        get_prev_version "${ocp_major}" "${ver}"
+        if [[ -n "${prev_minor}" ]]; then
+            PREVIOUS_RHOCP=$("${RHOCP_REPO}" "${prev_minor}" "${prev_major}")
+            if [[ "${PREVIOUS_RHOCP}" =~ ^[0-9]{1,2}$ ]]; then
+                sudo subscription-manager repos --enable "rhocp-${prev_major}.${PREVIOUS_RHOCP}-for-rhel-9-$(uname -m)-rpms"
+            else
+                # If RHOCP Y-1 is not available, try RHOCP Y-2.
+                get_prev_version "${prev_major}" "${prev_minor}"
+                if [[ -n "${prev_minor}" ]]; then
+                    Y2_RHOCP=$("${RHOCP_REPO}" "${prev_minor}" "${prev_major}")
+                    if [[ "${Y2_RHOCP}" =~ ^[0-9]{1,2}$ ]]; then
+                        sudo subscription-manager repos --enable "rhocp-${prev_major}.${Y2_RHOCP}-for-rhel-9-$(uname -m)-rpms"
+                    fi
+                fi
             fi
         fi
     fi
@@ -280,7 +304,7 @@ function install_openshift_clients() {
         OCP_MINOR="$(grep '^OCP_VERSION' "${MAKE_VERSION}" | cut -d'=' -f2 | tr -d ' ' | cut -d'.' -f2)"
         OCPVERSION="${OCP_MAJOR}.${OCP_MINOR}"
         OCC_SRC="https://mirror.openshift.com/pub/openshift-v${OCP_MAJOR}/$(uname -m)/dependencies/rpms/${OCPVERSION}-el9-beta"
-        OCC_RPM="$(curl -s "${OCC_SRC}/" | grep -o "openshift-clients-4[^\"']*.rpm" | sort | uniq)"
+        OCC_RPM="$(curl -s "${OCC_SRC}/" | grep -o "openshift-clients-${OCP_MAJOR}[^\"']*.rpm" | sort | uniq)"
         OCC_LOC="$(mktemp /tmp/openshift-client-XXXXX.rpm)"
         OCC_REM="${OCC_SRC}/${OCC_RPM}"
 

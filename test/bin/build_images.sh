@@ -723,7 +723,7 @@ rm -f "${CONTAINER_LIST}"
 if ${EXTRACT_CONTAINER_IMAGES}; then
     extract_container_images "${SOURCE_VERSION}" "${LOCAL_REPO}" "${CONTAINER_LIST}"
     # The following images are specific to layers that use fake rpms built from source.
-    extract_container_images "4.${FAKE_NEXT_MINOR_VERSION}.*" "${NEXT_REPO}" "${CONTAINER_LIST}"
+    extract_container_images "${MAJOR_VERSION}.${FAKE_NEXT_MINOR_VERSION}.*" "${NEXT_REPO}" "${CONTAINER_LIST}"
     extract_container_images "${PREVIOUS_RELEASE_VERSION}" "${PREVIOUS_RELEASE_REPO}" "${CONTAINER_LIST}"
     extract_container_images "${YMINUS2_RELEASE_VERSION}" "${YMINUS2_RELEASE_REPO}" "${CONTAINER_LIST}"
     # The following images are specific to the brew release versions.

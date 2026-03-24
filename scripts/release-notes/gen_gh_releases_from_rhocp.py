@@ -50,7 +50,8 @@ def get_rpm_releases():
         # Try to add current-1 (continuing example from above, it'd be 4.20).
         # This is separate because DNF does not query remote repos in order, so enabling not active repo can derail whole cache update.
         try:
-            r = base.repos.get(f"rhocp-{current_major}.{int(current_minor)-1}-for-rhel-9-{arch}-rpms")
+            prev_major, prev_minor = common.get_previous_version(current_major, current_minor)
+            r = base.repos.get(f"rhocp-{prev_major}.{prev_minor}-for-rhel-9-{arch}-rpms")
             r.enable()
             logging.info(f'Enabled repo: {r.id} - {r.name}')
             base.fill_sack()

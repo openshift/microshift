@@ -257,7 +257,6 @@ def get_gitops_version(major_version, minor_version):
     """
     url = "https://access.redhat.com/product-life-cycles/api/v1/products"
     params = {"name": "Red Hat OpenShift GitOps"}
-    versions = []
     for attempt in range(1, 4):
         try:
             resp = requests.get(url, params=params, timeout=10)
@@ -266,7 +265,6 @@ def get_gitops_version(major_version, minor_version):
             product_entries = data.get("data") or []
             if not product_entries:
                 raise ValueError("Missing GitOps lifecycle data")
-            versions = product_entries[0].get("versions", [])
             break
         except (requests.RequestException, ValueError, AttributeError) as e:
             if attempt == 3:

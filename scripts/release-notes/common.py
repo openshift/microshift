@@ -68,6 +68,44 @@ def get_version_from_makefile():
     return major, minor
 
 
+# Map of last minor version for each major version (for cross-major transitions).
+# When moving from X.0 to previous version, we need to know X-1's last minor.
+LAST_MINOR_FOR_MAJOR = {
+    4: 22
+}
+
+
+def get_previous_version(major, minor):
+    """
+    Calculate the previous version (Y-1) handling cross-major boundaries.
+
+    When minor > 0, the previous version is simply (major, minor-1).
+    When minor == 0, the previous version crosses to the prior major,
+    using LAST_MINOR_FOR_MAJOR to determine the last minor of that major.
+
+    Args:
+        major (int or str): The major version number.
+        minor (int or str): The minor version number.
+
+    Returns:
+        tuple: (previous_major, previous_minor) as strings.
+
+    Raises:
+        KeyError: If the previous major version is not defined in LAST_MINOR_FOR_MAJOR.
+    """
+    major_int = int(major)
+    minor_int = int(minor)
+
+    if minor_int > 0:
+        return (str(major_int), str(minor_int - 1))
+
+    prev_major = major_int - 1
+    if prev_major not in LAST_MINOR_FOR_MAJOR:
+        raise KeyError(f"Major version {prev_major} not found in LAST_MINOR_FOR_MAJOR. "
+                       f"Please add it with the last minor version.")
+    return (str(prev_major), str(LAST_MINOR_FOR_MAJOR[prev_major]))
+
+
 def redact(input):
     if GITHUB_TOKEN == "":
         return input
