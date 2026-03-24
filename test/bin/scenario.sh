@@ -439,6 +439,7 @@ prepare_kickstart() {
             -e "s|REPLACE_OSTREE_SERVER_URL|${WEB_SERVER_URL}/repo|g" \
             -e "s|REPLACE_BOOTC_REGISTRY_URL|${MIRROR_REGISTRY_URL}|g" \
             -e "s|REPLACE_RPM_SERVER_URL|${WEB_SERVER_URL}/rpm-repos|g" \
+            -e "s|REPLACE_MAJOR_VERSION|${MAJOR_VERSION}|g" \
             -e "s|REPLACE_MINOR_VERSION|${MINOR_VERSION}|g" \
             -e "s|REPLACE_BOOT_COMMIT_REF|${boot_commit_ref}|g" \
             -e "s|REPLACE_PULL_SECRET|${PULL_SECRET_CONTENT}|g" \

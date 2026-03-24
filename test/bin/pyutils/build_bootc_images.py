@@ -68,10 +68,20 @@ def find_latest_rpm(repo_path, version=""):
     return rpms[-1]
 
 
-def is_rhocp_available(ver):
+def is_rhocp_available(major, minor):
+    """
+    Check if the RHOCP repository is available for the specified version.
+
+    Args:
+        major (int or str): The major version number.
+        minor (int or str): The minor version number.
+
+    Returns:
+        bool: True if the repository is available, False otherwise.
+    """
     # Equivalent to `uname -m`
     architecture = platform.machine()
-    repository = f"rhocp-4.{ver}-for-rhel-9-{architecture}-rpms"
+    repository = f"rhocp-{major}.{minor}-for-rhel-9-{architecture}-rpms"
 
     try:
         # Run the dnf command to check for cri-o in the specified repository
@@ -82,9 +92,19 @@ def is_rhocp_available(ver):
         return False
 
 
-def get_rhocp_beta_url_if_available(ver):
-    url_amd = f"https://mirror.openshift.com/pub/openshift-v4/x86_64/dependencies/rpms/4.{ver}-el9-beta/"
-    url_arm = f"https://mirror.openshift.com/pub/openshift-v4/aarch64/dependencies/rpms/4.{ver}-el9-beta/"
+def get_rhocp_beta_url_if_available(major, minor):
+    """
+    Get the RHOCP beta URL if available for the specified version.
+
+    Args:
+        major (int or str): The major version number.
+        minor (int or str): The minor version number.
+
+    Returns:
+        str: The beta URL if available, otherwise empty string.
+    """
+    url_amd = f"https://mirror.openshift.com/pub/openshift-v{major}/x86_64/dependencies/rpms/{major}.{minor}-el9-beta/"
+    url_arm = f"https://mirror.openshift.com/pub/openshift-v{major}/aarch64/dependencies/rpms/{major}.{minor}-el9-beta/"
 
     try:
         # Run the dnf command to check for cri-o in the specified repository
@@ -96,7 +116,7 @@ def get_rhocp_beta_url_if_available(ver):
 
         # Use specific minor version RHOCP mirror only if both arches are available.
         architecture = platform.machine()
-        return f"https://mirror.openshift.com/pub/openshift-v4/{architecture}/dependencies/rpms/4.{ver}-el9-beta/"
+        return f"https://mirror.openshift.com/pub/openshift-v{major}/{architecture}/dependencies/rpms/{major}.{minor}-el9-beta/"
     except Exception:
         return ""
 
