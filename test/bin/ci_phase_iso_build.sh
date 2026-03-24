@@ -122,9 +122,14 @@ run_bootc_image_build() {
     $(dry_run) bash -x ./bin/build_bootc_images.sh -g ./image-blueprints-bootc/templates
 
     if [ -v CI_JOB_NAME ] ; then
+        # Skip all image builds for release testing CI jobs because all the images are fetched from the cache.
+        if [[ "${CI_JOB_NAME}" =~ .*release(-arm)?(-el(9|10))?$ ]]; then
+            $(dry_run) bash -x ./bin/build_bootc_images.sh -X
+            return
+        fi
 
         local -r os="${CI_JOB_NAME##*-}"
-    
+
         if [[ "${os}" == "el9" || "${os}" == "el10" ]]; then
 
             $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/layer1-base
@@ -138,11 +143,8 @@ run_bootc_image_build() {
             if [[ "${CI_JOB_NAME}" =~ .*periodic.* ]]; then
                 $(dry_run) bash -x ./bin/build_bootc_images.sh -l "./image-blueprints-bootc/${os}/layer3-periodic"
             fi
-            if [[ "${CI_JOB_NAME}" =~ .*release.* ]]; then
-                $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/layer4-release
-            fi
         fi
-        
+
         # Build upstream images
         if [[ "${CI_JOB_NAME}" =~ .*upstream.* ]]; then
             $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/upstream
