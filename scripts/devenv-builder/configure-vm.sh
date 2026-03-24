@@ -193,29 +193,32 @@ function configure_rhel_subscription() {
 function configure_rhel_repositories() {
     sudo subscription-manager config --rhsm.manage_repos=1
 
+    # Extract major version from Makefile.version
+    local -r ocp_major="$(grep '^OCP_VERSION' "${MAKE_VERSION}" | cut -d'=' -f2 | tr -d ' ' | cut -d'.' -f1)"
+
     RHOCP=$("${RHOCP_REPO}")
-    if [[ "${RHOCP}" =~ ^[0-9]{2} ]]; then
-        sudo subscription-manager repos --enable "rhocp-4.${RHOCP}-for-rhel-9-$(uname -m)-rpms"
+    if [[ "${RHOCP}" =~ ^[0-9]{1,2}$ ]]; then
+        sudo subscription-manager repos --enable "rhocp-${ocp_major}.${RHOCP}-for-rhel-9-$(uname -m)-rpms"
     elif [[ "${RHOCP}" =~ ^http ]]; then
         url=$(echo "${RHOCP}" | cut -d, -f1)
         ver=$(echo "${RHOCP}" | cut -d, -f2)
-        OCP_REPO_NAME="rhocp-4.${ver}-for-rhel-9-mirrorbeta-$(uname -i)-rpms"
+        OCP_REPO_NAME="rhocp-${ocp_major}.${ver}-for-rhel-9-mirrorbeta-$(uname -i)-rpms"
         sudo tee "/etc/yum.repos.d/${OCP_REPO_NAME}.repo" >/dev/null <<EOF
 [${OCP_REPO_NAME}]
-name=Beta rhocp-4.${ver} RPMs for RHEL 9
+name=Beta rhocp-${ocp_major}.${ver} RPMs for RHEL 9
 baseurl=${url}
 enabled=1
 gpgcheck=0
 skip_if_unavailable=0
 EOF
         PREVIOUS_RHOCP=$("${RHOCP_REPO}" $((ver-1)))
-        if [[ "${PREVIOUS_RHOCP}" =~ ^[0-9]{2} ]]; then
-            sudo subscription-manager repos --enable "rhocp-4.${PREVIOUS_RHOCP}-for-rhel-9-$(uname -m)-rpms"
+        if [[ "${PREVIOUS_RHOCP}" =~ ^[0-9]{1,2}$ ]]; then
+            sudo subscription-manager repos --enable "rhocp-${ocp_major}.${PREVIOUS_RHOCP}-for-rhel-9-$(uname -m)-rpms"
         else
             # If RHOCP Y-1 is not available, try RHOCP Y-2.
             Y2_RHOCP=$("${RHOCP_REPO}" $((ver-2)))
-            if [[ "${Y2_RHOCP}" =~ ^[0-9]{2} ]]; then
-                sudo subscription-manager repos --enable "rhocp-4.${Y2_RHOCP}-for-rhel-9-$(uname -m)-rpms"
+            if [[ "${Y2_RHOCP}" =~ ^[0-9]{1,2}$ ]]; then
+                sudo subscription-manager repos --enable "rhocp-${ocp_major}.${Y2_RHOCP}-for-rhel-9-$(uname -m)-rpms"
             fi
         fi
     fi
@@ -273,8 +276,10 @@ function install_openshift_clients() {
         "${DNF_RETRY}" "install" "openshift-clients"
     else
         # Assume the current development version on non-RHEL OS
-        OCPVERSION="4.$(cut -d'.' -f2 "${MAKE_VERSION}")"
-        OCC_SRC="https://mirror.openshift.com/pub/openshift-v4/$(uname -m)/dependencies/rpms/${OCPVERSION}-el9-beta"
+        OCP_MAJOR="$(grep '^OCP_VERSION' "${MAKE_VERSION}" | cut -d'=' -f2 | tr -d ' ' | cut -d'.' -f1)"
+        OCP_MINOR="$(grep '^OCP_VERSION' "${MAKE_VERSION}" | cut -d'=' -f2 | tr -d ' ' | cut -d'.' -f2)"
+        OCPVERSION="${OCP_MAJOR}.${OCP_MINOR}"
+        OCC_SRC="https://mirror.openshift.com/pub/openshift-v${OCP_MAJOR}/$(uname -m)/dependencies/rpms/${OCPVERSION}-el9-beta"
         OCC_RPM="$(curl -s "${OCC_SRC}/" | grep -o "openshift-clients-4[^\"']*.rpm" | sort | uniq)"
         OCC_LOC="$(mktemp /tmp/openshift-client-XXXXX.rpm)"
         OCC_REM="${OCC_SRC}/${OCC_RPM}"
