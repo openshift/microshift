@@ -118,6 +118,16 @@ func (c *Config) fillDefaults() error {
 		MaxFileSize: 200,
 		Profile:     "Default",
 	}
+	c.ApiServer.FeatureGates = FeatureGates{
+		CustomNoUpgrade: EnableDisableFeatures{
+			Enabled:  []string{},
+			Disabled: []string{},
+		},
+		SpecialHandlingSupportExceptionRequired: EnableDisableFeatures{
+			Enabled:  []string{},
+			Disabled: []string{},
+		},
+	}
 	c.Node = Node{
 		HostnameOverride: hostname,
 		NodeIP:           nodeIP,
