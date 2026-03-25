@@ -1,5 +1,5 @@
 ---
-# Setup Microshfit nodes
+# Setup MicroShift nodes
 #
 # Example Usage:
 #
@@ -8,8 +8,8 @@
 
 - name: Create vm and set up localhost
   hosts: localhost
+  become: no
   vars:
-    become: no
     ansible_connection: local
   vars_files:
   - vars/all.yml
@@ -108,10 +108,11 @@
 
 - name: Run performance workloads
   hosts: localhost
+  become: no
   vars:
-    ansible_become: no
     ansible_connection: local
   vars_files:
     - vars/all.yml
   roles:
     - role: run-workloads
+      when: (run_workloads | bool)

@@ -31,6 +31,8 @@ Run the following command on the Ansible control node to install the Ansible pac
 sudo dnf install -y ansible
 ```
 
+`setup-node.yml` always captures the install, boot, and footprint data described below. Kube-burner performance workloads are optional and run only when `run_workloads: true` is set in `vars/all.yml` or when `-e run_workloads_arg=true` is passed on the command line.
+
 ## Running
 
 Follow the instructions below depending on whether the MicroShift server is set up as a clean, development or RHEL for Edge host.
@@ -47,7 +49,7 @@ USHIFT_USER=microshift
 ssh-copy-id ${USHIFT_USER}@${USHIFT_HOST}
 time ansible-playbook -v \
     -e ansible_host_var=${USHIFT_HOST} -e ansible_user_var=${USHIFT_USER} \
-    -i inventory/inventory run-perf.yml
+    -i inventory/inventory setup-node.yml
 ```
 
 ### Development Host
@@ -64,12 +66,12 @@ ssh-copy-id ${USHIFT_USER}@${USHIFT_HOST}
 time ansible-playbook -v \
     -e ansible_host_var=${USHIFT_HOST} -e ansible_user_var=${USHIFT_USER} \
     -e install_microshift_arg=true \
-    -i inventory/inventory run-perf.yml
+    -i inventory/inventory setup-node.yml
 ```
 
 ### RHEL for Edge Host
 
-If the user has deployed a RHEL for Edge image built with MicroShift, the default settings in the `vars/all.yml` file can be used. The image must be build with `-prometheus` option to enable benchmark information collection as described in the [Building Installer](../docs/rhel4edge_iso.md#building-installer) section.
+If the user has deployed a RHEL for Edge image built with MicroShift, the default settings in the `vars/all.yml` file can be used. The image must be built with the `-prometheus` option to enable benchmark information collection as described in the [Building Installer](../docs/rhel4edge_iso.md#building-installer) section.
 > Review the instructions in [RHEL for Edge Host Example Variables](#rhel-for-edge-host-example-variables) for more information on the configuration settings.
 
 Run the playbook using the following commands, making sure that the values of the MicroShift server host and user variables are appropriate for your environment.
@@ -81,7 +83,7 @@ ssh-copy-id ${USHIFT_USER}@${USHIFT_HOST}
 time ansible-playbook -v \
     -e ansible_host_var=${USHIFT_HOST} -e ansible_user_var=${USHIFT_USER} \
     -e prometheus_logging_arg=false \
-    -i inventory/inventory run-perf.yml
+    -i inventory/inventory setup-node.yml
 ```
 
 ### GPU-Enabled Host
@@ -115,9 +117,16 @@ time ansible-playbook -v \
 
 ## Output
 
-The following text files will be created on the Ansible control node running the playbook:
-- The `boot.txt` will have the time that it took the microshift service to start and for all the pods to enter the `Running` state
-- The `disk0.txt, disk1.txt, disk2.txt` files will have a snapshot of the disk usage at different stages of installation and execution.
+The playbook stores results on the Ansible control node under `results/<microshift_version>/<timestamp>/`.
+
+The following text files are created for each run:
+- `boot0.txt` — cold start time (first boot, images pulled from registry)
+- `boot1.txt` — warm start time (second boot, images cached locally)
+- `disk0.txt` — disk usage baseline after cleanup, before install
+- `disk1.txt` — disk usage post-install, post-reboot, before MicroShift starts
+- `disk2.txt` — disk usage with MicroShift fully running
+- `images.txt` — container image sizes (compressed and uncompressed)
+- `network.txt` — network transfer (RX/TX) via Prometheus when `prometheus_logging` is enabled
 
 If Prometheus was enabled, the performance metrics will be uploaded to the Ansible control node, where users can view all the captured performance data using the `http://<ansible-server-ip>:9091` URL. These metrics can be conveniently visualized in the Grafana dashboards accessible at the `http://<ansible-server-ip>:3000` site.
 > Use `admin:admin` credentials to log into the Grafana server.
@@ -125,26 +134,30 @@ If Prometheus was enabled, the performance metrics will be uploaded to the Ansib
 ## Configuration Overview
 
 There are a few configuration files that can be configured before execution of the playbook.
->Certain Ansible playbook variables can be overriden using the `--extra-args` or `-e` command line argument.
+>Certain Ansible playbook variables can be overridden using `--extra-vars` or `-e`.
 
 ### Variables
 
-The following variables found in `vars/all.yml` may need user configuration.
+Most of the following variables are defined in `vars/all.yml`. `rhel_target_version` is provided by the `setup-microshift-host` role defaults and can be set in `vars/all.yml` or passed directly with `-e`.
 
 | Variable Name  | Description | Default |
 | -------------- | ----------- | ------- |
+| `create_devenv` | Create development VM environment | `false` |
 | `manage_subscription` | Use subscription-manager to entitle host and attach to pool | `false` |
-| `rhel_username` | Red Hat subscription account username (string) | `null` | 
-| `rhel_password` | Red Hat subscription account password (string) | `null` | 
-| `rhel_pool_id` | Red Hat subscription pool id (string) | `null` | 
-| `manage_repos` | Enable necessary repos to build MicroShift and install necessary components | `false` |
-| `setup_microshift_host` | Complete initial setup of MicroShift host (subscription, packages, firewall, etc) | `false` |
+| `rhel_username` | Red Hat subscription account username (string) | `null` |
+| `rhel_password` | Red Hat subscription account password (string) | `null` |
+| `rhel_pool_id` | Red Hat subscription pool id (string) | `null` |
+| `manage_repos` | Enable necessary repos to install MicroShift and dependencies | `false` |
+| `setup_microshift_host` | Complete initial setup of MicroShift host (packages, firewall, etc) | `false` |
 | `prometheus_logging` | Set up logging and exporters on the nodes | `true` |
-| `install_microshift` | Build and install MicroShift from git | `false` |
+| `install_microshift` | Install MicroShift (from packages or source) | `false` |
+| `build_microshift` | Build MicroShift from source instead of installing packages | `false` |
 | `build_etcd_binary` | Build and deploy a separate etcd process | `false` |
+| `microshift_version` | MicroShift version to install (supports EC/RC prereleases) | `"4.20"` |
 | `enable_gpu` | Install NVIDIA GPU drivers and container toolkit for GPU workloads | `false` |
 | `deploy_gpu_test` | Deploy a test GPU workload to validate GPU functionality | `true` |
-| `rhel_target_version` | Pin RHEL to a specific version during upgrades (e.g., "9.6") to prevent upgrading beyond MicroShift-compatible releases | `undefined` |
+| `run_workloads` | Run kube-burner performance workloads | `false` |
+| `rhel_target_version` | Pin RHEL to a specific version during upgrades (e.g., "9.6") | `undefined` |
 
 ### Inventory Configuration
 
@@ -176,6 +189,8 @@ The global variables file is located at `vars/all.yml`.
 > - `-e prometheus_logging_arg=<true | false>`
 > - `-e enable_gpu_arg=<true | false>`
 > - `-e deploy_gpu_test_arg=<true | false>`
+> - `-e run_workloads_arg=<true | false>`
+> - `-e rhel_target_version=<version>`
 
 #### Clean Host Example Variables
 
