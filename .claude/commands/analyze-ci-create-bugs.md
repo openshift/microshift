@@ -228,10 +228,10 @@ If results are found, fetch their details with `mcp__jira__jira_get_issue` and f
          - <job_url_1>
          - <job_url_2>
        Potential Duplicates (open):
-         - USHIFT-XXXXX: "<summary>" [Status]  (or OCPBUGS-YYYYY)
+         - USHIFT-XXXXX: "<summary>" [Status] (or OCPBUGS-YYYYY)
          (or "None found")
        Potential Regressions (closed):
-         - USHIFT-YYYYY: "<summary>" [Closed] ⚠️ potential regression
+         - USHIFT-YYYYY: "<summary>" [Closed] potential regression
          (or "None found")
 
      Action? [c]reate / [s]kip / [l]ink-to-existing <JIRA-KEY> / [r]eopen <JIRA-KEY>:
@@ -240,7 +240,7 @@ If results are found, fetch their details with `mcp__jira__jira_get_issue` and f
    - **create**: Proceed to Step 7
    - **skip**: Skip this candidate, move to next
    - **link-to-existing**: Validate the key by calling `mcp__jira__jira_get_issue(issue_key=<JIRA-KEY>)`. If the issue exists, record the key and move to next. If the call fails or returns not-found, show an error (e.g., `"JIRA key <JIRA-KEY> not found — check for typos"`) and re-prompt with the same `Action?` choices.
-   - **reopen**: Reopen a closed bug as a regression. Proceed to Step 7a.
+   - **reopen**: Validate the provided JIRA key before proceeding. Call `mcp__jira__jira_get_issue(issue_key=<JIRA-KEY>)` to confirm the issue exists, then verify that the key matches one of the candidate's closed regressions found in Search C and that the issue status is Closed or Verified. If validation fails (key not found, not in the candidate's closed regression list, or not in Closed/Verified state), show an error (e.g., `"JIRA key <JIRA-KEY> not eligible for reopen — must be a closed regression"`) and re-prompt with the same `Action?` choices. If validation passes, proceed to Step 7a.
 
 ### Step 7: Create Bug via MCP (create mode only)
 
