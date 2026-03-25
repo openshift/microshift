@@ -1,10 +1,124 @@
-- cluster-kube-controller-manager-operator embedded-component 41ab963edfef9473111879069620971365231c49 to a7ff6a4647805362618c61a031196cc791cb9963
+- api embedded-component b3c6104577797f804d921ac05ad91aa4186818f2 to 324a1bcb9f55701b25fba4a485d4568f0685fc86
+  - 8c0fe816 2026-03-18T11:02:35-04:00 tools: manifestmerge: update CRD schema to use atomic x-kubernetes-validations
+  - 08b6ebdd 2026-03-17T13:33:24-04:00 Move OLMv1 Single/Own Namespace support back to TP
+  - 221095e5 2026-03-17T19:17:51+08:00 Add API support and FeatureGate for OVN-Kubernetes no-overlay mode
+  - 969e5979 2026-03-16T13:57:50-04:00 OPRUN-4466: Add NewOLMConfigAPI feature gate
+  - b1be6747 2026-03-16T10:15:34-04:00 Update jira component to 'HPCASE / TLS Adherence'
+  - 69cff918 2026-03-16T10:14:47-04:00 Test: "Should be able to set tlsAdherence from unset on update"
+  - e05bcd80 2026-03-16T10:14:47-04:00 Test omitted tlsAdherence field
+  - c4e5922d 2026-03-16T10:14:47-04:00 s/which/if in tlsAdherence control language
+  - 76fab1a3 2026-03-16T10:14:47-04:00 Fix line break formatting
+  - 12ea9a63 2026-03-16T10:14:47-04:00 Update LegacyExternalAPIServerComponentsOnly to LegacyAdheringComponentsOnly and update LegacyAdheringComponentsOnly behavior
+  - 165d38f0 2026-03-16T10:14:47-04:00 Add TLSAdherence field to APIServer API
+  - 4d95f8cb 2026-03-15T17:12:05-04:00 Check duplicate entries in job tiers
+  - f3165b71 2026-03-13T16:56:51-04:00 address review comments
+  - ca4b06c0 2026-03-13T13:32:40+01:00 MCO-2142: Avoid OSImageStream defaultStream unset
+  - cece552d 2026-03-12T19:50:17-04:00 Add variant OS and JobTier to promotion check
 
+- cluster-dns-operator embedded-component 7709285a381bc9ca24f833bab4789d327a856440 to 3d2141182243cde1ec6417bd005c76d29aa88a01
+  - 1e7d47f 2026-03-13T14:02:38-03:00 NE-2500: Remove unnecessary policy
+  - d802cfd 2026-03-12T11:57:41-03:00 NE-2500: limit network policy watching and fix hypershift manifests
+  - 60b42af 2026-03-12T09:54:10-03:00 NE-1476 - Added network policies for DNS
+  - 6178e04 2026-03-11T17:39:24-04:00 OCPBUGS-78085: Fix dual-stack service update by preserving IP families
 
-- operator-framework-olm embedded-component c6dfbbd1a88049508b85c543fb5a631557e135e6 to bf71e98f7511ae273bf6885ac0951d2b3841340b
+- cluster-ingress-operator embedded-component 88b7301f88ba24577de72a84d52675f51ea30886 to dd97cd39c4de2674a5063d478f88c8a7bbde3941
+  - 556cce5 2026-03-20T12:39:27-04:00 Add BTLS Policy CRD into the OTE test suite
+  - 20a0f52 2026-03-19T22:26:32-04:00 update conformance tests
+  - fecf241 2026-03-19T18:34:57-04:00 update supported conformance tests
+  - ea77eed 2026-03-19T18:13:53-03:00 OCPBUGS-77457: Respect proxy configuration on gwapi provisioning
+  - b04055e 2026-03-19T17:08:03-04:00 Bump to OSSM 3.3.0 and Istio v1.28.4
+  - 955a5c0 2026-03-18T12:01:16-04:00 NE-2471: Add downstream image defaults for main OSSM branch
+  - 9c4d792 2026-03-18T12:01:16-04:00 NE-2471: E2E Tests for Gateway API with Sail Library
+  - a758d83 2026-03-18T12:01:16-04:00 NE-2471: Separate Sail Library RBAC permissions into dedicated ClusterRole
+  - ed2eb36 2026-03-18T12:01:09-04:00 NE-2471: Clean up and improve Sail Library integration
+  - 11b3c01 2026-03-16T20:58:16-04:00 OCPBUGS-78555: Increase Gateway E2E timeout to 5 minutes
+  - 2f204df 2026-03-16T13:58:30-04:00 Add RBAC to allow operator to manage network policies
+  - 18f7934 2026-03-16T19:01:32+08:00 tests-extension: Append suite names to OTE test specs to preserve original test names
+  - ab04ca4 2026-03-13T22:22:25-04:00 NE-2471: Improve Sail Library integration with notification channel
+  - 5617a41 2026-03-13T22:22:25-04:00 NE-2471: Add migration from OLM to Sail Library
+  - 8a40966 2026-03-13T22:22:25-04:00 NE-2471: Add Istio Install via Sail Library
+  - 5499634 2026-03-13T22:22:24-04:00 NE-2471: Bump api for GatewayAPIWithoutOLM feature gate
+  - 9ddddd1 2026-03-13T16:52:35-03:00 configure tls profile for router metrics
+  - fbe7dba 2026-02-15T23:35:02+01:00 NE-2418: Add e2e test for haproxy_max_connections metric
 
+- cluster-kube-apiserver-operator embedded-component deb703d26f017aea26d4619a7422094ab12b3e65 to 5092ca2c6c33001dfe65c879dd9c0abee2f8a2b4
+  - fa9ff48 2026-03-19T13:05:12-04:00 feat: default to a hardcoded webhook kubeconfig secret reference
+  - 8f9573d 2026-03-19T16:18:12Z use library-go from ehearne-redhat OCPBUGS-65626 PR
+  - f516fea 2026-03-19T14:30:59+05:30 Migrate TestBoundTokenSignerController to ginkgo
+  - d6607d1 2026-03-17T14:23:21-04:00 dependencies: bump o/api to commit w/ExternalOIDCExternalClaimsSourcing gate
+  - 8f7d837 2026-03-17T09:46:02+01:00 CNTRLPLANE-2622: config tls on check-endpoints container
 
-- oc image-arm64 cb542c5177b98b84b1ae921bee0d1e264b9ca00c to ee23f0583edad80c6fa3a3eefdcd6b063a97a371
+- cluster-kube-controller-manager-operator embedded-component a7ff6a4647805362618c61a031196cc791cb9963 to 49eb7c72d0ba0efc85dbd291e90335f0734ffa1a
+  - 1ce487f 2026-03-20T11:58:21Z use OCPBUGS-65626 library-go PR
+  - 1e5d6a7 2026-02-09T11:17:14+01:00 chore: add permissions on endpointslice to Prometheus Role and use serviceDiscoveryRole: EndpointSlice in ServiceMonitors
+
+- cluster-kube-scheduler-operator embedded-component a51975da7993b40c35a892e3437f354cb3e133d7 to a1e9a14ae7748e55b070dce831828800fd22639a
+  - 1723369 2026-03-19T16:21:00Z use library-go from ehearne-redhat OCPBUGS-65626 pr
+  - ff8beaa 2026-02-09T11:16:04+01:00 chore: add permissions on endpointslice to Prometheus Role and use serviceDiscoveryRole: EndpointSlice in ServiceMonitors
+
+- cluster-network-operator embedded-component 3b5ef2d8b37e2e040f5b98a07848a63774aa3012 to 3689d5ca55f440b337cae5b7d97014e99e40535e
+  - db11932 2026-03-20T10:14:36+08:00 fix make golangci-lint failure and ci/prow/verify failure
+  - 34e579c 2026-03-20T10:14:36+08:00 kube rebase to 1.35
+  - 6f5697c 2026-03-18T21:00:41+05:30 Revert "NVIDIA-554: DPU-host mode: use ConfigMap for OVN feature enablement instead of per-node script gating"
+  - 06d6699 2026-03-11T14:10:07-04:00 wait for patch port to apply drop garp flows
+  - 39c3a45 2026-03-04T01:48:39Z Updating cluster-network-operator-container image to be consistent with ART for 4.22 Reconciling with https://github.com/openshift/ocp-build-data/tree/56cb39ad358cdec1db7c84ea1919fe8849c2550b/images/cluster-network-operator.yml
+
+- kubernetes embedded-component 2034d92b4a3a51d42e306ba405fc10a89768ac69 to 2b19898a979eb1ff0cd87ec5d49106e555e70ce6
+  - 712de54f1 2026-03-19T15:56:32-07:00 UPSTREAM: 137612: fix: [sig-autoscaling] flaky HPAConfigurableTolerance e2e should scale up but should not scale down
+  - c3515de99 2026-03-19T15:56:18-07:00 UPSTREAM: 137168: Decrease likelihood of HPA flake in Configurable Tolerance
+  - 18545c402 2026-03-19T15:56:11-07:00 UPSTREAM: 137134: Mark HPA's configurable tolerance test as serial
+  - cc08411a8 2026-03-19T15:56:04-07:00 UPSTREAM: 137090: Update HPA Configurable Tolerance e2e test feature
+  - f97dabdcb 2026-03-17T10:08:59-07:00 UPSTREAM: <carry>: Add jacobsee and jubittajohn to DOWNSTREAM_OWNERS
+  - 9bca251eb 2026-03-10T11:44:15-07:00 UPSTREAM: <carry>: Fix ClusterIsIPv6() detection for dual-stack v6-primary clusters
+
+- machine-config-operator embedded-component 5f0d9d7cb472e9aa565bd1e2b0f71f875677de3d to d4008e5914090eaa04e7eec852a67d8f9cdf8bb8
+  - b31445c8 2026-03-23T14:24:08-04:00 hack: update ami script for installer changes
+  - d40b2284 2026-03-20T16:35:03-04:00 Revert "extract oc binary from base OS image after build"
+  - dd1bfb09 2026-03-20T14:55:24-04:00 e2e: add osstream exclusion for bootimage tests
+  - 7f832f47 2026-03-19T14:44:21-05:00 create default-timeout-stop dropin
+  - 76df85f4 2026-03-19T10:26:01-04:00 Fine tune CoreDNS pod configuration to improve performance
+  - f2f34053 2026-03-19T08:18:39-04:00 tests: fix HasAcquiredLease case sensitivity
+  - f5f18895 2026-03-18T14:45:44+01:00 MCO-2117: Allow default OSImageStream overrides
+  - 135004e8 2026-03-17T08:06:47-04:00 Makefile: always build golangci-lint from vendor
+  - f4a26aa9 2026-03-16T23:41:10-04:00 criocp controller
+  - a889880f 2026-03-17T06:00:49+05:30 OCPNODE-3201: Make system-reserved-compressible default
+  - 105e1db4 2026-03-17T06:00:49+05:30 OCPNODE-3201: Make system-reserved-compressible default
+  - 2dd19041 2026-03-13T20:10:27+01:00 Add additional storage configuration support for CRI-O
+  - 63d1f543 2026-03-11T08:38:12+05:30 NO-ISSUE: Allow setting kubeletconfig log level to zero
+  - 8e3da046 2026-03-10T16:45:52+01:00 OCPBUGS-78107: Disable sandboxed-containers in arm64 10
+  - d0665d73 2026-03-09T14:48:13-04:00 bootimage: skip non-default stream machinesets
+  - af45ad20 2026-03-09T13:30:08-04:00 do not use OSImageStream in Hypershift
+  - efe0cce8 2026-03-03T11:23:13-05:00 Increase timeout + interval for OCL test cleanup
+  - 5dc5eca0 2026-03-03T11:21:28-05:00 Increase timeout for cleanup for singular OCL suite
+  - 483c7c00 2026-03-03T11:12:58-05:00 extract oc binary from base OS image after build
+  - f013cc96 2026-02-27T15:08:14-05:00 server: re-order logger setting
+
+- operator-framework-olm embedded-component bf71e98f7511ae273bf6885ac0951d2b3841340b to 14b9a3cc7a394a107ba358ab02d60a1c19c913f6
+  - 4235f8ca 2026-03-21T00:03:59Z :seedling: Bump golang.org/x/net from 0.51.0 to 0.52.0 (#3797)
+  - facf8192 2026-03-21T00:03:15Z Fix nil pointer dereference in sortUnpackJobs when sorting non-failed jobs (#3793)
+  - 0403d025 2026-03-19T16:49:23+08:00 verify images command log pollution
+  - b51eec3a 2026-03-18T22:38:59-03:00 tests-extension: replace etcd usage in 32613/47181 and update 27680 Prometheus flow
+  - a3a93897 2026-03-18T11:35:31+08:00 Fix admin context race condition in parallel tests
+  - becc865e 2026-03-18T09:00:47+08:00 automate OCP-87188: Central TLS Profile Consistency
+  - 75b5a4e0 2026-03-17T14:32:24-04:00 Revert "Merge pull request #1256 from kuiwang02/enhancerace"
+  - 8e0301fb 2026-03-16T14:37:48+08:00 Fix admin context race condition in parallel tests
+
+- service-ca-operator embedded-component de11f78073eb847fca80ca6265882c69cb7a747b to 9c060391ca3d368c60d666d1cc47a90f3c978418
+  - 9155c5d 2026-03-20T16:34:42+08:00 test/e2e: migrate validatingwebhook-ca-bundle-injection to OTE serial suite
+  - 033c475 2026-03-20T10:58:52+08:00 test/e2e: migrate mutatingwebhook-ca-bundle-injection to OTE serial suite
+  - 55ab9ca 2026-03-20T00:24:55+08:00 test/e2e: migrate crd-ca-bundle-injection to OTE serial suite
+  - 6e2bf9e 2026-03-19T18:35:14+08:00 test/e2e: migrate apiservice-ca-bundle-injection to OTE serial suite
+  - 8e0761d 2026-03-18T23:39:20+08:00 test/e2e: restore operator config after forced rotation to prevent test contamination
+  - e863ac3 2026-03-18T15:05:49+08:00 test/e2e: migrate forced-ca-rotation to OTE serial-disruptive suite
+  - e7f8a9d 2026-03-18T03:05:59+08:00 test/e2e: migrate time-based-ca-rotation to OTE serial-disruptive suite
+
+- oc image-amd64 cb542c5177b98b84b1ae921bee0d1e264b9ca00c to 55b9cad5330317ff199a30fb7b1ab6642a6073d3
+  - 4eef1c91 2026-03-22T20:03:57-04:00 Revert "Merge pull request #2219 from ardaguclu/bump-1.35"
+  - b649913b 2026-03-22T20:03:38-04:00 Revert "Merge pull request #2222 from JoelSpeed/update-release-extract-inclusion"
+  - 72a96b03 2026-03-20T07:43:37-07:00 pkg/cli/admin/release/extract: Support zero-output extraction
+  - 50c6cf7f 2026-03-19T19:11:59Z Implement feature gate and major version extraction for manifest inclusion
+  - 760045b9 2026-03-18T20:56:21-07:00 pkg/cli/admin/release/extract: Read manifests into memory
+  - d9590570 2026-03-18T15:00:27+01:00 adm policy add-role-to-user: Fix --dry-run=server
   - 84e31f76 2026-03-18T13:05:19+03:00 Add .coderabbit.yaml and AGENTS.md configurations
   - dedf6262 2026-03-12T09:54:20+03:00 Update golang.org/x libraries to latest
   - 562dc43d 2026-03-12T09:24:13+03:00 Fix lifecycle_test failure
@@ -16,11 +130,11 @@
   - 232cf7dd 2026-03-12T09:24:13+03:00 React to the changes coming from 1.35
   - c6cedc89 2026-03-12T09:24:12+03:00 Bump k8s 1.35.2
 
-- router image-arm64 1c68a10861fa13a1210fa65c91c36cca3367cc93 to bb228d66f7305649c419e7f29c82d37364a41e50
+- router image-amd64 1c68a10861fa13a1210fa65c91c36cca3367cc93 to bb228d66f7305649c419e7f29c82d37364a41e50
   - e74ec3c 2026-03-06T10:22:43-03:00 Configure tls version and ciphers for metrics
   - f4de387 2026-03-05T18:39:11-03:00 bump library-go version
 
-- kube-rbac-proxy image-arm64 bdd87a0646eae5683bb83fe30e3649471b757ebf to d12e274605248f6c59373240a7eae7a7a357dcb3
+- kube-rbac-proxy image-amd64 bdd87a0646eae5683bb83fe30e3649471b757ebf to d12e274605248f6c59373240a7eae7a7a357dcb3
   - db13357 2026-03-16T16:51:48+01:00 go.mod: adjust Go version for downstream CI
   - 22ca3af 2026-03-16T13:05:10+01:00 vendor: bump
   - 8b45d57 2026-03-16T10:11:33+01:00 *: cut v0.21.1 release
@@ -28,7 +142,165 @@
   - 898a9f4 2026-02-26T13:05:33+01:00 *: cut v0.21.0 release
   - 6ca41ac 2026-02-26T09:33:36+01:00 go*: update dependencies
 
-- service-ca-operator image-arm64 de11f78073eb847fca80ca6265882c69cb7a747b to 9885e2eb052d38c15366ba001d94fd7c40fe0ec1
+- ovn-kubernetes image-amd64 eedfcd073cbae0eea97638716019b2b39f141a41 to 051683259bf47d709be19a78c5f218223da54dee
+  - eafe465f 2026-02-26T21:15:00-08:00 add ListNetworks() method to openshift infra provider
+  - d92494bc 2026-02-27T05:02:56Z sync test annotations with upstream changes
+  - 845456d0 2026-02-26T11:45:03-05:00 Moves OVN-K to CNI 1.1.0
+  - 99107d33 2026-02-25T15:58:14-05:00 Implements DPU Health Check
+  - 721400a4 2026-02-25T13:07:13+01:00 (B)ANP conformance: update framework to use retries
+  - 15d73b3d 2026-02-25T13:02:47+01:00 Revert "(B)ANP conformance: update framework to use retries"
+  - 3c67139a 2026-02-25T12:53:36+01:00 (B)ANP conformance: update framework to use retries
+  - 0b82e64f 2026-02-24T22:28:05-06:00 docs: user-defined-network: Fix 'l2-UDN' image link
+  - 9d7b70f8 2026-02-24T22:28:05-06:00 docs: user-defined-networks: Fix markdown syntax
+  - 533f66e7 2026-02-24T15:16:57-05:00 Fix UDN network controller deadlock due to stopChan nil race
+  - d033767f 2026-02-24T15:09:36Z Add Nutanix to adopters page
+  - ca967b82 2026-02-23T15:27:32-05:00 Adds unit test for stale ICMP network policy ACL
+  - 69afd47b 2026-02-23T09:51:35-05:00 Adds E2E testing for ICMP NP bypass
+  - 63468cc8 2026-02-23T08:56:01-05:00 Adds kind.sh and helm support for --allow-icmp-network-policy
+  - bcb7ec91 2026-02-22T02:34:12-08:00 Allow emitting metrics on a single endpoint
+  - 25a4e056 2026-02-20T16:52:44-05:00 docs: Add section on how to debug coredumps from non-go binaries
+  - 58c5dc93 2026-02-20T10:21:03-05:00 Adds support for bypassing network policy for ICMP/ICMPv6
+  - 75d2f8e4 2026-02-19T15:16:11-05:00 e2e: fix static IP collision in ValidatingAdmissionPolicy test
+  - 843ceff7 2026-02-19T12:05:16-05:00 Trivial E2E egress IP fixes
+  - fd270158 2026-02-19T17:58:44+01:00 Minimize ACLs by combining ipBlocks into single ACL
+  - 7feb1238 2026-02-19T10:35:47-05:00 Continue trying to assign egressIP on conflict
+  - 3b98daec 2026-02-19T10:35:47-05:00 Fixes race with egress ip + node ip mgr
+  - 2b1f4a84 2026-02-18T16:09:12-05:00 e2e: clean up stale networks before VRF-Lite BGP tests
+  - 2d3e48b7 2026-02-18T15:01:34-05:00 Adds benchmark test for OpenFlow stream reader
+  - 91375531 2026-02-18T15:01:34-05:00 Reduce memory allocation by OpenFlow Manager
+  - 005e15b8 2026-02-18T08:40:21-08:00 add unit tests for stale primary UDN cleanup
+  - 9caab0e4 2026-02-18T08:40:21-08:00 cleanup logical entities for stale primary networks
+  - d1daa85d 2026-02-18T10:30:50-05:00 E2E: Fixes flaking ANP ACL logging
+  - 24efc26e 2026-02-18T16:28:57+01:00 Reuse test setup across BGP isolation table entries
+  - 32cbabcd 2026-02-18T16:28:57+01:00 Speed up BGP isolation e2e tests
+  - d9888a12 2026-02-18T15:48:20+05:30 fix live migration link navigation
+  - 447b8d18 2026-02-17T12:08:37+01:00 Mention -add-ovs-collector to start sampling
+  - 56f2d8d8 2026-02-16T11:45:25+01:00 Update OVN observability documentation
+  - c2c8e8e5 2026-02-16T08:31:35+01:00 Reduce obj_retry.go log spam
+  - 7606fd88 2026-02-16T08:30:48+01:00 CUDN: cleanup NADs in terminating namespaces without pods
+  - 32f5e7c5 2026-02-15T12:02:26-05:00 Fixes Egress IP Tracker UT
+  - 16480b9e 2026-02-14T09:10:20+08:00 fix issues for adding SAIC Motor to Adopters
+  - b95fc808 2026-02-13T12:05:23-05:00 Fixes gateway egress IP node update logic
+  - 3cfbafff 2026-02-13T12:05:23-05:00 Fix hybrid overlay mutating informer pod object
+  - 0e44890d 2026-02-13T12:05:23-05:00 EgressIP: Fix crash from mutating node informer object
+  - a760e77b 2026-02-13T12:03:11-05:00 Improve EgressFW subnet parsing
+  - 16240491 2026-02-13T12:03:11-05:00 GetActiveNetworkForNamespace Refactor
+  - 67dfeafe 2026-02-13T12:03:11-05:00 egressip: trigger immediate retry when UDN pod port cache is populated
+  - 90e65d62 2026-02-13T12:03:11-05:00 egressip: force pod assignment reprogram when pod IP changes
+  - a114896d 2026-02-13T12:03:11-05:00 E2E: Add integration UDN test
+  - 9ab81e57 2026-02-13T12:03:11-05:00 Bring EgressIP inline with NAD Reconciliation
+  - f1a65d47 2026-02-13T12:03:11-05:00 Fix EgressFirewall GetActiveNetworkForNamespace
+  - 3ae25d25 2026-02-13T12:03:11-05:00 Guard GetPrimaryNADForNamespace when netseg not enabled
+  - b79e6f94 2026-02-13T12:03:11-05:00 Fix Dynamic UDN with services controller
+  - e624ec9d 2026-02-13T12:03:11-05:00 Fix GetActiveNetworkForNamespace usage for NetPol
+  - e95dc868 2026-02-13T12:03:11-05:00 Make node gateway Dynamic UDN aware
+  - 6f78d1d2 2026-02-13T17:56:21+01:00 Handle Docker 29+ "invalid IP" response for IP addresses
+  - 31ee5d7b 2026-02-13T21:32:16+08:00 Add SAIC Motor to ADOPTERS
+  - 2edd4307 2026-02-13T01:44:34-08:00 fix kind load docker-image content digest not found
+  - e527aa80 2026-02-12T10:03:24-05:00 Adds DPU blog
+  - 6ddb8b76 2026-02-12T12:36:15Z Handle stale PCI address in mgmt port Init for DPU Host case
+  - 0974f2e8 2026-01-27T16:17:13-08:00 Unify the metrics servers used by ovnkube-node and OVS/OVN metrics
+  - 1d5e616b 2026-01-23T10:57:13-05:00 Improve nodenft.MatchNFTRules behavior
+  - 809ad111 2026-01-19T15:18:32-05:00 Use `nft destroy` to simplify the UDN cleanup code
+
+- kubernetes image-amd64 2034d92b4a3a51d42e306ba405fc10a89768ac69 to 2b19898a979eb1ff0cd87ec5d49106e555e70ce6
+  - 712de54f1 2026-03-19T15:56:32-07:00 UPSTREAM: 137612: fix: [sig-autoscaling] flaky HPAConfigurableTolerance e2e should scale up but should not scale down
+  - c3515de99 2026-03-19T15:56:18-07:00 UPSTREAM: 137168: Decrease likelihood of HPA flake in Configurable Tolerance
+  - 18545c402 2026-03-19T15:56:11-07:00 UPSTREAM: 137134: Mark HPA's configurable tolerance test as serial
+  - cc08411a8 2026-03-19T15:56:04-07:00 UPSTREAM: 137090: Update HPA Configurable Tolerance e2e test feature
+  - f97dabdcb 2026-03-17T10:08:59-07:00 UPSTREAM: <carry>: Add jacobsee and jubittajohn to DOWNSTREAM_OWNERS
+  - 9bca251eb 2026-03-10T11:44:15-07:00 UPSTREAM: <carry>: Fix ClusterIsIPv6() detection for dual-stack v6-primary clusters
+
+- service-ca-operator image-amd64 de11f78073eb847fca80ca6265882c69cb7a747b to 9c060391ca3d368c60d666d1cc47a90f3c978418
+  - 9155c5d 2026-03-20T16:34:42+08:00 test/e2e: migrate validatingwebhook-ca-bundle-injection to OTE serial suite
+  - 033c475 2026-03-20T10:58:52+08:00 test/e2e: migrate mutatingwebhook-ca-bundle-injection to OTE serial suite
+  - 55ab9ca 2026-03-20T00:24:55+08:00 test/e2e: migrate crd-ca-bundle-injection to OTE serial suite
+  - 6e2bf9e 2026-03-19T18:35:14+08:00 test/e2e: migrate apiservice-ca-bundle-injection to OTE serial suite
+  - 8e0761d 2026-03-18T23:39:20+08:00 test/e2e: restore operator config after forced rotation to prevent test contamination
   - e863ac3 2026-03-18T15:05:49+08:00 test/e2e: migrate forced-ca-rotation to OTE serial-disruptive suite
   - e7f8a9d 2026-03-18T03:05:59+08:00 test/e2e: migrate time-based-ca-rotation to OTE serial-disruptive suite
+
+- oc image-arm64 ee23f0583edad80c6fa3a3eefdcd6b063a97a371 to 55b9cad5330317ff199a30fb7b1ab6642a6073d3
+  - 4eef1c91 2026-03-22T20:03:57-04:00 Revert "Merge pull request #2219 from ardaguclu/bump-1.35"
+  - b649913b 2026-03-22T20:03:38-04:00 Revert "Merge pull request #2222 from JoelSpeed/update-release-extract-inclusion"
+  - 72a96b03 2026-03-20T07:43:37-07:00 pkg/cli/admin/release/extract: Support zero-output extraction
+  - 50c6cf7f 2026-03-19T19:11:59Z Implement feature gate and major version extraction for manifest inclusion
+  - 760045b9 2026-03-18T20:56:21-07:00 pkg/cli/admin/release/extract: Read manifests into memory
+  - d9590570 2026-03-18T15:00:27+01:00 adm policy add-role-to-user: Fix --dry-run=server
+
+- ovn-kubernetes image-arm64 eedfcd073cbae0eea97638716019b2b39f141a41 to 051683259bf47d709be19a78c5f218223da54dee
+  - eafe465f 2026-02-26T21:15:00-08:00 add ListNetworks() method to openshift infra provider
+  - d92494bc 2026-02-27T05:02:56Z sync test annotations with upstream changes
+  - 845456d0 2026-02-26T11:45:03-05:00 Moves OVN-K to CNI 1.1.0
+  - 99107d33 2026-02-25T15:58:14-05:00 Implements DPU Health Check
+  - 721400a4 2026-02-25T13:07:13+01:00 (B)ANP conformance: update framework to use retries
+  - 15d73b3d 2026-02-25T13:02:47+01:00 Revert "(B)ANP conformance: update framework to use retries"
+  - 3c67139a 2026-02-25T12:53:36+01:00 (B)ANP conformance: update framework to use retries
+  - 0b82e64f 2026-02-24T22:28:05-06:00 docs: user-defined-network: Fix 'l2-UDN' image link
+  - 9d7b70f8 2026-02-24T22:28:05-06:00 docs: user-defined-networks: Fix markdown syntax
+  - 533f66e7 2026-02-24T15:16:57-05:00 Fix UDN network controller deadlock due to stopChan nil race
+  - d033767f 2026-02-24T15:09:36Z Add Nutanix to adopters page
+  - ca967b82 2026-02-23T15:27:32-05:00 Adds unit test for stale ICMP network policy ACL
+  - 69afd47b 2026-02-23T09:51:35-05:00 Adds E2E testing for ICMP NP bypass
+  - 63468cc8 2026-02-23T08:56:01-05:00 Adds kind.sh and helm support for --allow-icmp-network-policy
+  - bcb7ec91 2026-02-22T02:34:12-08:00 Allow emitting metrics on a single endpoint
+  - 25a4e056 2026-02-20T16:52:44-05:00 docs: Add section on how to debug coredumps from non-go binaries
+  - 58c5dc93 2026-02-20T10:21:03-05:00 Adds support for bypassing network policy for ICMP/ICMPv6
+  - 75d2f8e4 2026-02-19T15:16:11-05:00 e2e: fix static IP collision in ValidatingAdmissionPolicy test
+  - 843ceff7 2026-02-19T12:05:16-05:00 Trivial E2E egress IP fixes
+  - fd270158 2026-02-19T17:58:44+01:00 Minimize ACLs by combining ipBlocks into single ACL
+  - 7feb1238 2026-02-19T10:35:47-05:00 Continue trying to assign egressIP on conflict
+  - 3b98daec 2026-02-19T10:35:47-05:00 Fixes race with egress ip + node ip mgr
+  - 2b1f4a84 2026-02-18T16:09:12-05:00 e2e: clean up stale networks before VRF-Lite BGP tests
+  - 2d3e48b7 2026-02-18T15:01:34-05:00 Adds benchmark test for OpenFlow stream reader
+  - 91375531 2026-02-18T15:01:34-05:00 Reduce memory allocation by OpenFlow Manager
+  - 005e15b8 2026-02-18T08:40:21-08:00 add unit tests for stale primary UDN cleanup
+  - 9caab0e4 2026-02-18T08:40:21-08:00 cleanup logical entities for stale primary networks
+  - d1daa85d 2026-02-18T10:30:50-05:00 E2E: Fixes flaking ANP ACL logging
+  - 24efc26e 2026-02-18T16:28:57+01:00 Reuse test setup across BGP isolation table entries
+  - 32cbabcd 2026-02-18T16:28:57+01:00 Speed up BGP isolation e2e tests
+  - d9888a12 2026-02-18T15:48:20+05:30 fix live migration link navigation
+  - 447b8d18 2026-02-17T12:08:37+01:00 Mention -add-ovs-collector to start sampling
+  - 56f2d8d8 2026-02-16T11:45:25+01:00 Update OVN observability documentation
+  - c2c8e8e5 2026-02-16T08:31:35+01:00 Reduce obj_retry.go log spam
+  - 7606fd88 2026-02-16T08:30:48+01:00 CUDN: cleanup NADs in terminating namespaces without pods
+  - 32f5e7c5 2026-02-15T12:02:26-05:00 Fixes Egress IP Tracker UT
+  - 16480b9e 2026-02-14T09:10:20+08:00 fix issues for adding SAIC Motor to Adopters
+  - b95fc808 2026-02-13T12:05:23-05:00 Fixes gateway egress IP node update logic
+  - 3cfbafff 2026-02-13T12:05:23-05:00 Fix hybrid overlay mutating informer pod object
+  - 0e44890d 2026-02-13T12:05:23-05:00 EgressIP: Fix crash from mutating node informer object
+  - a760e77b 2026-02-13T12:03:11-05:00 Improve EgressFW subnet parsing
+  - 16240491 2026-02-13T12:03:11-05:00 GetActiveNetworkForNamespace Refactor
+  - 67dfeafe 2026-02-13T12:03:11-05:00 egressip: trigger immediate retry when UDN pod port cache is populated
+  - 90e65d62 2026-02-13T12:03:11-05:00 egressip: force pod assignment reprogram when pod IP changes
+  - a114896d 2026-02-13T12:03:11-05:00 E2E: Add integration UDN test
+  - 9ab81e57 2026-02-13T12:03:11-05:00 Bring EgressIP inline with NAD Reconciliation
+  - f1a65d47 2026-02-13T12:03:11-05:00 Fix EgressFirewall GetActiveNetworkForNamespace
+  - 3ae25d25 2026-02-13T12:03:11-05:00 Guard GetPrimaryNADForNamespace when netseg not enabled
+  - b79e6f94 2026-02-13T12:03:11-05:00 Fix Dynamic UDN with services controller
+  - e624ec9d 2026-02-13T12:03:11-05:00 Fix GetActiveNetworkForNamespace usage for NetPol
+  - e95dc868 2026-02-13T12:03:11-05:00 Make node gateway Dynamic UDN aware
+  - 6f78d1d2 2026-02-13T17:56:21+01:00 Handle Docker 29+ "invalid IP" response for IP addresses
+  - 31ee5d7b 2026-02-13T21:32:16+08:00 Add SAIC Motor to ADOPTERS
+  - 2edd4307 2026-02-13T01:44:34-08:00 fix kind load docker-image content digest not found
+  - e527aa80 2026-02-12T10:03:24-05:00 Adds DPU blog
+  - 6ddb8b76 2026-02-12T12:36:15Z Handle stale PCI address in mgmt port Init for DPU Host case
+  - 0974f2e8 2026-01-27T16:17:13-08:00 Unify the metrics servers used by ovnkube-node and OVS/OVN metrics
+  - 1d5e616b 2026-01-23T10:57:13-05:00 Improve nodenft.MatchNFTRules behavior
+  - 809ad111 2026-01-19T15:18:32-05:00 Use `nft destroy` to simplify the UDN cleanup code
+
+- kubernetes image-arm64 2034d92b4a3a51d42e306ba405fc10a89768ac69 to 2b19898a979eb1ff0cd87ec5d49106e555e70ce6
+  - 712de54f1 2026-03-19T15:56:32-07:00 UPSTREAM: 137612: fix: [sig-autoscaling] flaky HPAConfigurableTolerance e2e should scale up but should not scale down
+  - c3515de99 2026-03-19T15:56:18-07:00 UPSTREAM: 137168: Decrease likelihood of HPA flake in Configurable Tolerance
+  - 18545c402 2026-03-19T15:56:11-07:00 UPSTREAM: 137134: Mark HPA's configurable tolerance test as serial
+  - cc08411a8 2026-03-19T15:56:04-07:00 UPSTREAM: 137090: Update HPA Configurable Tolerance e2e test feature
+  - f97dabdcb 2026-03-17T10:08:59-07:00 UPSTREAM: <carry>: Add jacobsee and jubittajohn to DOWNSTREAM_OWNERS
+  - 9bca251eb 2026-03-10T11:44:15-07:00 UPSTREAM: <carry>: Fix ClusterIsIPv6() detection for dual-stack v6-primary clusters
+
+- service-ca-operator image-arm64 9885e2eb052d38c15366ba001d94fd7c40fe0ec1 to 9c060391ca3d368c60d666d1cc47a90f3c978418
+  - 9155c5d 2026-03-20T16:34:42+08:00 test/e2e: migrate validatingwebhook-ca-bundle-injection to OTE serial suite
+  - 033c475 2026-03-20T10:58:52+08:00 test/e2e: migrate mutatingwebhook-ca-bundle-injection to OTE serial suite
+  - 55ab9ca 2026-03-20T00:24:55+08:00 test/e2e: migrate crd-ca-bundle-injection to OTE serial suite
+  - 6e2bf9e 2026-03-19T18:35:14+08:00 test/e2e: migrate apiservice-ca-bundle-injection to OTE serial suite
+  - 8e0761d 2026-03-18T23:39:20+08:00 test/e2e: restore operator config after forced rotation to prevent test contamination
 
