@@ -1,7 +1,7 @@
 ---
 name: Generate HTML Report from CI Analysis
 argument-hint: <release1,release2,...>
-description: Generate an HTML report from analyze-ci analysis files in /tmp/analyze-ci-claude-workdir
+description: Generate an HTML report from analyze-ci analysis files in /tmp/analyze-ci-claude-workdir.$(date +%y%m%d)
 allowed-tools: Bash, Read, Write, Glob, Grep
 ---
 
@@ -13,7 +13,7 @@ allowed-tools: Bash, Read, Write, Glob, Grep
 ```
 
 ## Description
-Reads analysis output files from `/tmp/analyze-ci-claude-workdir/` (produced by `analyze-ci-for-release` and `analyze-ci-for-pull-requests`) and generates a single consolidated HTML report with tabbed navigation. This command does NOT run any CI analysis — it only reads existing files and generates HTML.
+Reads analysis output files from `/tmp/analyze-ci-claude-workdir.$(date +%y%m%d)/` (produced by `analyze-ci-for-release` and `analyze-ci-for-pull-requests`) and generates a single consolidated HTML report with tabbed navigation. This command does NOT run any CI analysis — it only reads existing files and generates HTML.
 
 ## Arguments
 - `$ARGUMENTS` (required): Comma-separated list of release versions that were analyzed (e.g., `4.19,4.20,4.21,4.22`)
@@ -26,11 +26,11 @@ Reads analysis output files from `/tmp/analyze-ci-claude-workdir/` (produced by 
 1. Split `$ARGUMENTS` by comma to get the list of release versions
 2. Trim whitespace from each version
 3. If no arguments provided, show usage and stop
-4. Run `mkdir -p /tmp/analyze-ci-claude-workdir`
+4. Run `mkdir -p /tmp/analyze-ci-claude-workdir.$(date +%y%m%d)`
 5. For each release version, find the summary file:
-   - `/tmp/analyze-ci-claude-workdir/analyze-ci-release-<version>-summary.*.txt`
+   - `/tmp/analyze-ci-claude-workdir.$(date +%y%m%d)/analyze-ci-release-<version>-summary.*.txt`
 6. Find the PR summary file:
-   - `/tmp/analyze-ci-claude-workdir/analyze-ci-prs-summary.*.txt`
+   - `/tmp/analyze-ci-claude-workdir.$(date +%y%m%d)/analyze-ci-prs-summary.*.txt`
 7. Report what was found:
    ```text
    Files discovered:
@@ -55,12 +55,12 @@ Reads analysis output files from `/tmp/analyze-ci-claude-workdir/` (produced by 
 
 ### Step 3: Generate HTML Report
 
-**Goal**: Create a single HTML file at `/tmp/analyze-ci-claude-workdir/microshift-ci-release-manager-<timestamp>.html` that consolidates all analyses with tabbed navigation.
+**Goal**: Create a single HTML file at `/tmp/analyze-ci-claude-workdir.$(date +%y%m%d)/microshift-ci-release-manager-<timestamp>.html` that consolidates all analyses with tabbed navigation.
 
 **Actions**:
 1. Determine `<timestamp>` as `YYYYMMDD-HHMMSS`
 2. Generate the HTML report with the structure described below
-3. **IMPORTANT**: Save using `cat <<'HTMLEOF' > /tmp/analyze-ci-claude-workdir/microshift-ci-release-manager-<timestamp>.html` (heredoc via Bash tool), NOT the `Write` tool. This avoids permission prompts for the `/tmp` path.
+3. **IMPORTANT**: Save using `cat <<'HTMLEOF' > /tmp/analyze-ci-claude-workdir.$(date +%y%m%d)/microshift-ci-release-manager-<timestamp>.html` (heredoc via Bash tool), NOT the `Write` tool. This avoids permission prompts for the `/tmp` path.
 
 **HTML Structure**:
 
@@ -271,7 +271,7 @@ Summary:
   Pull Requests:
     2 rebase PRs with 5 total failed jobs
 
-HTML report generated: /tmp/analyze-ci-claude-workdir/microshift-ci-release-manager-20260315-143022.html
+HTML report generated: /tmp/analyze-ci-claude-workdir.$(date +%y%m%d)/microshift-ci-release-manager-20260315-143022.html
 ```
 
 ## Examples
@@ -288,7 +288,7 @@ HTML report generated: /tmp/analyze-ci-claude-workdir/microshift-ci-release-mana
 
 ## Prerequisites
 
-- Analysis files must already exist in `/tmp/analyze-ci-claude-workdir/` (produced by `analyze-ci-for-release` and/or `analyze-ci-for-pull-requests`)
+- Analysis files must already exist in `/tmp/analyze-ci-claude-workdir.$(date +%y%m%d)/` (produced by `analyze-ci-for-release` and/or `analyze-ci-for-pull-requests`)
 - Bash shell
 
 ## Related Skills

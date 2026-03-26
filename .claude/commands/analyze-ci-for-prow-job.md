@@ -79,8 +79,8 @@ Where `${TEST_NAME}` is the test name directory (e.g., `e2e-aws-tests`, `e2e-aws
 
 Create a temporary working directory to store artifacts for the current job:
 ```bash
-mkdir -p /tmp/analyze-ci-claude-workdir
-mktemp -d /tmp/analyze-ci-claude-workdir/openshift-ci-analysis-XXXX
+mkdir -p /tmp/analyze-ci-claude-workdir.$(date +%y%m%d)
+mktemp -d /tmp/analyze-ci-claude-workdir.$(date +%y%m%d)/openshift-ci-analysis-XXXX
 ```
 
 Fetch the high level summary of the failed prow job:

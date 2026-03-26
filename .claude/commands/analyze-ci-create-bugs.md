@@ -15,7 +15,7 @@ allowed-tools: Bash, Read, Write, Glob, Grep, Agent, mcp__jira__jira_search, mcp
 ## Description
 Reads individual job analysis reports produced by `analyze-ci-for-release` or `analyze-ci-for-pull-requests` and creates JIRA bugs in USHIFT for legitimate test failures. Operates in **dry-run mode by default** - it shows what bugs would be created without actually creating them. Use `--create` to perform actual issue creation.
 
-This command does NOT re-analyze CI jobs. It consumes existing job analysis files from `/tmp/analyze-ci-claude-workdir/`.
+This command does NOT re-analyze CI jobs. It consumes existing job analysis files from `/tmp/analyze-ci-claude-workdir.$(date +%y%m%d)/`.
 
 ## Arguments
 - `$ARGUMENTS` (required): Source identifier, optionally followed by `--create`
@@ -27,7 +27,7 @@ This command does NOT re-analyze CI jobs. It consumes existing job analysis file
 
 ## Prerequisites
 
-- Job analysis files must already exist in `/tmp/analyze-ci-claude-workdir/`:
+- Job analysis files must already exist in `/tmp/analyze-ci-claude-workdir.$(date +%y%m%d)/`:
   - For releases: `analyze-ci-release-<release>-job-*.txt` (produced by `/analyze-ci-for-release`)
   - For PRs: `analyze-ci-prs-job-*-pr<number>-*.txt` (produced by `/analyze-ci-for-pull-requests`)
 - Each job file must contain a `--- STRUCTURED SUMMARY ---` block (see below)
@@ -61,21 +61,21 @@ If a job file lacks this block, it is skipped with a warning.
 **Actions**:
 1. Parse `$ARGUMENTS` to extract `<source>` and detect `--create` flag
 2. Determine mode: if `--create` is present, set `MODE=create`; otherwise `MODE=dry-run`
-3. Run `mkdir -p /tmp/analyze-ci-claude-workdir` using the `Bash` tool
+3. Run `mkdir -p /tmp/analyze-ci-claude-workdir.$(date +%y%m%d)` using the `Bash` tool
 4. Determine source type and locate job files:
 
    **a) Release version** (e.g., `4.22`, `main`, `4.19`):
-   - Glob for: `/tmp/analyze-ci-claude-workdir/analyze-ci-release-<release>-job-*.txt`
+   - Glob for: `/tmp/analyze-ci-claude-workdir.$(date +%y%m%d)/analyze-ci-release-<release>-job-*.txt`
    - Set `SOURCE_TYPE=release`, `SOURCE_LABEL="release <release>"`
 
    **b) PR number** (e.g., `pr-6396`, `pr6396`):
    - Extract the numeric PR number (strip `pr-` or `pr` prefix)
-   - Glob for: `/tmp/analyze-ci-claude-workdir/analyze-ci-prs-job-*-pr<number>-*.txt`
+   - Glob for: `/tmp/analyze-ci-claude-workdir.$(date +%y%m%d)/analyze-ci-prs-job-*-pr<number>-*.txt`
    - Set `SOURCE_TYPE=pr`, `SOURCE_LABEL="PR #<number>"`
 
    **c) Rebase PR shorthand** (e.g., `rebase-release-4.22`):
    - Extract the release version from the shorthand (e.g., `4.22`)
-   - Glob for all PR job files: `/tmp/analyze-ci-claude-workdir/analyze-ci-prs-job-*.txt`
+   - Glob for all PR job files: `/tmp/analyze-ci-claude-workdir.$(date +%y%m%d)/analyze-ci-prs-job-*.txt`
    - Read each file's STRUCTURED SUMMARY and find files where JOB_NAME contains the release version (e.g., `release-4.22` or `main`) OR where the JOB_URL contains the release branch
    - Alternatively, check the PR summary file (`analyze-ci-prs-summary.*.txt`) to find the PR number for the given rebase release
    - Set `SOURCE_TYPE=pr`, `SOURCE_LABEL="rebase PR for <release> (PR #<number>)"`
@@ -381,7 +381,7 @@ For each candidate where user chose "reopen":
 ### Step 8: Generate Results Report
 
 **Actions**:
-1. Save report to `/tmp/analyze-ci-claude-workdir/analyze-ci-create-bugs-<source>.<timestamp>.txt`
+1. Save report to `/tmp/analyze-ci-claude-workdir.$(date +%y%m%d)/analyze-ci-create-bugs-<source>.<timestamp>.txt`
 2. Display summary to user:
 
 **Dry-run report format**:
@@ -418,7 +418,7 @@ CANDIDATES
 To create these bugs, run:
   /analyze-ci-create-bugs <source> --create
 
-Report saved: /tmp/analyze-ci-claude-workdir/analyze-ci-create-bugs-<source>.<timestamp>.txt
+Report saved: /tmp/analyze-ci-claude-workdir.$(date +%y%m%d)/analyze-ci-create-bugs-<source>.<timestamp>.txt
 ═══════════════════════════════════════════════════════════════
 ```
 
@@ -456,7 +456,7 @@ SUMMARY
   Reopened: N
   Failed: N
 
-Report saved: /tmp/analyze-ci-claude-workdir/analyze-ci-create-bugs-<source>.<timestamp>.txt
+Report saved: /tmp/analyze-ci-claude-workdir.$(date +%y%m%d)/analyze-ci-create-bugs-<source>.<timestamp>.txt
 ═══════════════════════════════════════════════════════════════
 ```
 
@@ -491,7 +491,7 @@ Resolves the rebase PR for release 4.22, then interactively creates bugs.
 /analyze-ci-create-bugs 4.19
 ```
 ```text
-Error: No job analysis files found at /tmp/analyze-ci-claude-workdir/analyze-ci-release-4.19-job-*.txt
+Error: No job analysis files found at /tmp/analyze-ci-claude-workdir.$(date +%y%m%d)/analyze-ci-release-4.19-job-*.txt
 
 Run the analysis first:
   /analyze-ci-for-release 4.19
@@ -502,7 +502,7 @@ Run the analysis first:
 /analyze-ci-create-bugs pr-9999
 ```
 ```text
-Error: No job analysis files found at /tmp/analyze-ci-claude-workdir/analyze-ci-prs-job-*-pr9999-*.txt
+Error: No job analysis files found at /tmp/analyze-ci-claude-workdir.$(date +%y%m%d)/analyze-ci-prs-job-*-pr9999-*.txt
 
 Run the analysis first:
   /analyze-ci-for-pull-requests
@@ -510,7 +510,7 @@ Run the analysis first:
 
 ## Notes
 
-- This command does NOT run CI analysis — it only consumes existing analysis files from `/tmp/analyze-ci-claude-workdir`
+- This command does NOT run CI analysis — it only consumes existing analysis files from `/tmp/analyze-ci-claude-workdir.$(date +%y%m%d)`
 - Supports two file naming patterns:
   - Release jobs: `analyze-ci-release-<release>-job-*.txt` (from `/analyze-ci-for-release`)
   - PR jobs: `analyze-ci-prs-job-*-pr<number>-*.txt` (from `/analyze-ci-for-pull-requests`)
