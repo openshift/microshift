@@ -231,16 +231,20 @@ If results are found, fetch their details with `mcp__jira__jira_get_issue` and f
          - USHIFT-XXXXX: "<summary>" [Status] (or OCPBUGS-YYYYY)
          (or "None found")
        Potential Regressions (closed):
-         - USHIFT-YYYYY: "<summary>" [Closed] potential regression
+         - USHIFT-YYYYY (or OCPBUGS-YYYYY): "<summary>" [Status] potential regression
          (or "None found")
 
+     # ACTION_PROMPT_WITH_REOPEN (use when closed regressions exist):
      Action? [c]reate / [s]kip / [l]ink-to-existing <JIRA-KEY> / [r]eopen <JIRA-KEY>:
+
+     # ACTION_PROMPT_NO_REOPEN (use when no closed regressions exist):
+     Action? [c]reate / [s]kip / [l]ink-to-existing <JIRA-KEY>:
      ```
-   - The `[r]eopen` option should only be shown when closed regressions were found. When no closed regressions exist, omit it from the Action line.
+   - Select the prompt template based on whether closed regressions were found for the candidate: use `ACTION_PROMPT_WITH_REOPEN` when the candidate has closed regressions from Search C, and `ACTION_PROMPT_NO_REOPEN` otherwise.
    - **create**: Proceed to Step 7
    - **skip**: Skip this candidate, move to next
    - **link-to-existing**: Validate the key by calling `mcp__jira__jira_get_issue(issue_key=<JIRA-KEY>)`. If the issue exists, record the key and move to next. If the call fails or returns not-found, show an error (e.g., `"JIRA key <JIRA-KEY> not found — check for typos"`) and re-prompt with the same `Action?` choices.
-   - **reopen**: Validate the provided JIRA key before proceeding. Call `mcp__jira__jira_get_issue(issue_key=<JIRA-KEY>)` to confirm the issue exists, then verify that the key matches one of the candidate's closed regressions found in Search C and that the issue status is Closed or Verified. If validation fails (key not found, not in the candidate's closed regression list, or not in Closed/Verified state), show an error (e.g., `"JIRA key <JIRA-KEY> not eligible for reopen — must be a closed regression"`) and re-prompt with the same `Action?` choices. If validation passes, proceed to Step 7a.
+   - **reopen**: Validate the provided JIRA key before proceeding. Call `mcp__jira__jira_get_issue(issue_key=<JIRA-KEY>)` to confirm the issue exists, then verify that the key matches one of the candidate's closed regressions found in Search C, that the issue status is Closed or Verified, and that the issue type is Bug. If validation fails (key not found, not in the candidate's closed regression list, not in Closed/Verified state, or not a Bug), show an error (e.g., `"JIRA key <JIRA-KEY> not eligible for reopen — must be a Bug closed regression"`) and re-prompt with the same `Action?` choices. If validation passes, proceed to Step 7a.
 
 ### Step 7: Create Bug via MCP (create mode only)
 
@@ -320,6 +324,8 @@ For each candidate where user chose "create":
 
 ### Step 7a: Reopen Closed Bug as Regression (create mode only)
 
+**Precondition**: The JIRA issue must be a Bug in Closed or Verified state (validated in Step 6). If the issue type is not Bug, do not proceed — show an error and re-prompt.
+
 **Actions**:
 For each candidate where user chose "reopen":
 
@@ -328,7 +334,7 @@ For each candidate where user chose "reopen":
    mcp__jira__jira_get_transitions(issue_key="<JIRA-KEY>")
    ```
 
-2. **Find the reopen transition**: Look for a transition whose name contains "Reopen", "To Do", "New", or "Backlog" (case-insensitive). If no suitable transition is found, report the error and ask the user whether to create a new bug instead or skip.
+2. **Find the reopen transition**: Look for a transition whose name is exactly "To Do", "New", or "Backlog" (case-insensitive). If no suitable transition is found, report the error and ask the user whether to create a new bug instead or skip.
 
 3. **Construct a regression comment** describing the new occurrences:
    ```text
@@ -404,7 +410,7 @@ CANDIDATES
   1. MicroShift CI: <error_signature>
      Severity: X | Jobs: Y | Step: <step_name>
      Potential Duplicates: USHIFT-XXXXX, OCPBUGS-YYYYY (or "None")
-     Potential Regressions: USHIFT-YYYYY [Closed] (or "None")
+     Potential Regressions: USHIFT-YYYYY (or OCPBUGS-YYYYY) [Closed] (or "None")
 
   2. MicroShift CI: <error_signature>
      ...
