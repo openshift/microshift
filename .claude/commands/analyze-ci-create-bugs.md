@@ -152,24 +152,26 @@ If a job file lacks this block, it is skipped with a warning.
 
 For each bug candidate, run ALL of the following searches. Each search is MANDATORY — do not skip any.
 
-**Search A — Keyword search**:
+**Search A — Keyword search (multiple focused queries)**:
 1. Extract 2-4 distinctive keywords from the error signature (avoid generic words like "error", "failed", "test")
-2. Run:
+2. Run **2-3 separate searches in parallel**, each using 1-2 distinctive keywords. Do NOT put all keywords into a single `text ~` query — Jira requires all terms to match, so queries with 3+ keywords are fragile and miss issues that use slightly different wording. Instead, pick the most distinctive terms (tool names, hyphenated identifiers, error codes) and search for them independently.
    ```python
-   mcp__jira__jira_search(
-     jql='((project = OCPBUGS AND component = MicroShift) OR project = USHIFT) AND text ~ "<keywords>" AND status not in (Closed, Verified) ORDER BY created DESC',
-     limit=5
-   )
+   # Example for error signature: "TLS Scanner image pull failure (ErrImagePull registry.ci.openshift.org/ocp/4.22:tls-scanner-tool on arm64)"
+   # Search A1: most distinctive identifier
+   mcp__jira__jira_search(jql='... AND issuetype = Bug AND text ~ "tls-scanner" ...', limit=5)
+   # Search A2: different distinctive term
+   mcp__jira__jira_search(jql='... AND issuetype = Bug AND text ~ "tls-scanner-tool" ...', limit=5)
    ```
+3. Merge and deduplicate results from all A-series queries before proceeding
 
 **Search B — Test case ID search (MANDATORY when IDs are present)**:
 Extract ALL numeric IDs from the error signature that could be test case references (typically 4-6 digit numbers like `68256`). For EACH numeric ID found, run TWO separate searches:
 ```text
 # Search B1: bare number
-jql: ... AND text ~ "68256" AND status not in (Closed, Verified) ...
+jql: ... AND issuetype = Bug AND text ~ "68256" AND status not in (Closed, Verified) ...
 
 # Search B2: OCP-prefixed form (OpenShift Polarion convention)
-jql: ... AND text ~ "OCP-68256" AND status not in (Closed, Verified) ...
+jql: ... AND issuetype = Bug AND text ~ "OCP-68256" AND status not in (Closed, Verified) ...
 ```
 **Why both forms are required**: Jira's text indexer treats `OCP-68256` as a single token, so `text ~ "68256"` will NOT match issues containing `OCP-68256`, and vice versa. Skipping either form WILL cause missed duplicates.
 
@@ -181,7 +183,7 @@ jql: ... AND text ~ "OCP-68256" AND status not in (Closed, Verified) ...
 After completing searches A and B, run an additional keyword search against closed/verified issues to detect potential regressions:
 ```python
 mcp__jira__jira_search(
-  jql='((project = OCPBUGS AND component = MicroShift) OR project = USHIFT) AND text ~ "<keywords>" AND status in (Closed, Verified) ORDER BY updated DESC',
+  jql='((project = OCPBUGS AND component = MicroShift) OR project = USHIFT) AND issuetype = Bug AND text ~ "<keywords>" AND status in (Closed, Verified) ORDER BY updated DESC',
   limit=5
 )
 ```
