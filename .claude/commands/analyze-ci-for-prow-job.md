@@ -75,12 +75,19 @@ ${TMP}/artifacts/${TEST_NAME}/openshift-microshift-infra-sos-aws/artifacts/sosre
 ```
 Where `${TEST_NAME}` is the test name directory (e.g., `e2e-aws-tests`, `e2e-aws-ovn-ocp-conformance-serial`). Use `find ${TMP}/artifacts -name 'sosreport-*.tar.xz'` to locate it.
 
+## Work Directory
+
+Set once at the start and reference throughout:
+```bash
+WORKDIR=/tmp/analyze-ci-claude-workdir.$(date +%y%m%d)
+mkdir -p ${WORKDIR}
+```
+
 ## Common Commands
 
 Create a temporary working directory to store artifacts for the current job:
 ```bash
-mkdir -p /tmp/analyze-ci-claude-workdir.$(date +%y%m%d)
-mktemp -d /tmp/analyze-ci-claude-workdir.$(date +%y%m%d)/openshift-ci-analysis-XXXX
+mktemp -d ${WORKDIR}/openshift-ci-analysis-XXXX
 ```
 
 Fetch the high level summary of the failed prow job:

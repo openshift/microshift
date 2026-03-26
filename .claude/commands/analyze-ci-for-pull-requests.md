@@ -20,10 +20,17 @@ This command orchestrates the analysis workflow by:
 1. Fetching the list of open PRs and their failed jobs using `.claude/scripts/microshift-prow-jobs-for-pull-requests.sh --mode detail`
 2. Filtering to only PRs that have at least one failed job
 3. Analyzing each failed job individually using the `/analyze-ci-for-prow-job` command
-4. Aggregating results into a summary report saved to `/tmp/analyze-ci-claude-workdir.$(date +%y%m%d)`
+4. Aggregating results into a summary report saved to `${WORKDIR}`
 
 ## Arguments
 - `--rebase` (optional): Only analyze rebase PRs (titles containing `NO-ISSUE: rebase-release-`)
+
+## Work Directory
+
+Set once at the start and reference throughout:
+```bash
+WORKDIR=/tmp/analyze-ci-claude-workdir.$(date +%y%m%d)
+```
 
 ## Implementation Steps
 
@@ -76,13 +83,13 @@ Each job MUST be analyzed by launching a **separate Agent** (using the `Agent` t
 3. The file MUST contain the full report including the `--- STRUCTURED SUMMARY ---` block
 
 **Actions**:
-1. Run `mkdir -p /tmp/analyze-ci-claude-workdir.$(date +%y%m%d)` using the `Bash` tool
+1. Run `WORKDIR=/tmp/analyze-ci-claude-workdir.$(date +%y%m%d) && mkdir -p ${WORKDIR}` using the `Bash` tool
 2. For each failed job URL, launch a separate **Agent** with this exact prompt template:
    ```
    Agent: subagent_type=general_purpose, prompt="Analyze this Prow job and save the report:
    1. Run /analyze-ci-for-prow-job <JOB_URL>
    2. After the analysis completes, save the FULL report output (including the --- STRUCTURED SUMMARY --- block) to:
-      /tmp/analyze-ci-claude-workdir.$(date +%y%m%d)/analyze-ci-prs-job-<N>-pr<PR>-<JOB_NAME_SUFFIX>.txt
+      ${WORKDIR}/analyze-ci-prs-job-<N>-pr<PR>-<JOB_NAME_SUFFIX>.txt
       Use the Write tool to save the file. The file must contain the complete analysis report."
    ```
    Replace `<JOB_URL>`, `<N>` (1-based job index), `<PR>` (PR number), and `<JOB_NAME_SUFFIX>` (last segment of job name) with actual values.
@@ -108,7 +115,7 @@ For each job analysis, extract:
 
 **File Storage**:
 All per-job report files MUST be saved at this exact path:
-- `/tmp/analyze-ci-claude-workdir.$(date +%y%m%d)/analyze-ci-prs-job-<N>-pr<PR>-<job-name-suffix>.txt`
+- `${WORKDIR}/analyze-ci-prs-job-<N>-pr<PR>-<job-name-suffix>.txt`
 
 Where:
 - `<N>` is the 1-based job index
@@ -117,7 +124,7 @@ Where:
 
 **Verification**: After all agents complete, verify that per-job files exist:
 ```bash
-ls /tmp/analyze-ci-claude-workdir.$(date +%y%m%d)/analyze-ci-prs-job-*.txt
+ls ${WORKDIR}/analyze-ci-prs-job-*.txt
 ```
 If any files are missing, note the gap in the summary report but do NOT re-run the analysis.
 
@@ -127,7 +134,7 @@ If any files are missing, note the gap in the summary report but do NOT re-run t
 
 **Actions**:
 1. Collect results from all parallel job analyses
-   - Read each per-job file from `/tmp/analyze-ci-claude-workdir.$(date +%y%m%d)`
+   - Read each per-job file from `${WORKDIR}`
    - Extract the `--- STRUCTURED SUMMARY ---` block from each file for pattern detection (including the `FINISHED` field for job date tracking)
    - Extract key findings from each analysis
 
@@ -145,7 +152,7 @@ If any files are missing, note the gap in the summary report but do NOT re-run t
 **Actions**:
 1. Aggregate all job analysis results from parallel execution
 2. Identify common patterns and group by PR and failure type
-3. Generate summary report and save to `/tmp/analyze-ci-claude-workdir.$(date +%y%m%d)/analyze-ci-prs-summary.<timestamp>.txt`
+3. Generate summary report and save to `${WORKDIR}/analyze-ci-prs-summary.<timestamp>.txt`
 4. Display the summary to the user
 
 **Important**: Each failed job MUST include the finish date in `[YYYY-MM-DD]` format (from the per-job `FINISHED` field) after the job name. This ensures the HTML report generator can extract dates without reading per-job files.
@@ -162,7 +169,7 @@ OVERVIEW
   PRs with Failures: 2
   Total Failed Jobs: 9
   Analysis Date: 2026-03-15
-  Report: /tmp/analyze-ci-claude-workdir.$(date +%y%m%d)/analyze-ci-prs-summary.20260315-143022.txt
+  Report: ${WORKDIR}/analyze-ci-prs-summary.20260315-143022.txt
 
 PER-PR BREAKDOWN
 
@@ -199,7 +206,7 @@ COMMON PATTERNS (across PRs)
 
 ═══════════════════════════════════════════════════════════════
 
-Individual job reports: /tmp/analyze-ci-claude-workdir.$(date +%y%m%d)/analyze-ci-prs-job-*.txt
+Individual job reports: ${WORKDIR}/analyze-ci-prs-job-*.txt
 ```
 
 ## Examples
@@ -231,7 +238,7 @@ Individual job reports: /tmp/analyze-ci-claude-workdir.$(date +%y%m%d)/analyze-c
 - **Execution Time**: Depends on number of failed jobs; parallel execution helps significantly
 - **Network Usage**: Each job analysis fetches logs from GCS
 - **Parallelization**: All job analyses run in parallel for maximum efficiency
-- **File Storage**: All intermediate and report files are stored in `/tmp/analyze-ci-claude-workdir.$(date +%y%m%d)` directory
+- **File Storage**: All intermediate and report files are stored in `${WORKDIR}` directory
 
 ## Prerequisites
 
@@ -272,7 +279,7 @@ Please ensure you're in the microshift project directory.
 
 - This skill focuses on **presubmit** PR jobs (not periodic/postsubmit)
 - Analysis is read-only - no modifications to CI data or PRs
-- Results are saved in files in /tmp/analyze-ci-claude-workdir.$(date +%y%m%d) directory with a timestamp
+- Results are saved in files in ${WORKDIR} directory with a timestamp
 - Provide links to the jobs in the summary
 - Only present a concise analysis summary for each job
 - PRs with no Prow jobs (e.g., drafts without triggered tests) are skipped
