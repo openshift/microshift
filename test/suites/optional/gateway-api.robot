@@ -78,6 +78,8 @@ Create HTTP Route
     ...    Verify HTTPRoute Parent Accepted    ${namespace}
     Wait Until Keyword Succeeds    20x    6s
     ...    Verify HTTPRoute References Resolved    ${namespace}
+    Wait Until Keyword Succeeds    20x    6s
+    ...    Verify Gateway Port Listening    ${GATEWAY_PORT}
 
 Verify HTTPRoute Parent Accepted
     [Documentation]    Verify that the HTTPRoute is accepted by its parent gateway
@@ -96,6 +98,12 @@ Verify HTTPRoute References Resolved
     Should Not Be Empty    ${result}    HTTPRoute reference conditions not found
     Should Not Contain    ${result}    False    HTTPRoute references not resolved
     Should Not Contain    ${result}    Unknown    HTTPRoute reference resolution status is unknown
+
+Verify Gateway Port Listening
+    [Documentation]    Verify that the gateway port is accepting connections on the host.
+    [Arguments]    ${port}
+    ${rc}=    Run And Return Rc    nc -z -w 5 ${USHIFT_HOST} ${port}
+    Should Be Equal As Integers    ${rc}    0    Gateway port ${port} is not listening
 
 Generate File From Template
     [Documentation]    Generate file from template
