@@ -32,3 +32,6 @@ pbench_record_duration: 360
 # NVIDIA GPU support
 enable_gpu: "{{ enable_gpu_arg | default('false') }}"
 deploy_gpu_test: "{{ deploy_gpu_test_arg | default('true') }}"
+
+# Workload execution
+run_workloads: "{{ run_workloads_arg | default('false') }}"
