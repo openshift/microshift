@@ -260,7 +260,7 @@ Please ensure you're in the microshift project directory.
 ## Related Skills
 
 - **analyze-ci-for-prow-job**: Detailed analysis of a single job (used internally)
-- **analyze-ci-create-bugs-for-release**: Creates JIRA bugs from this command's output
+- **analyze-ci-create-bugs**: Creates JIRA bugs from this command's output
 - **analyze-ci-for-release-manager**: Multi-release orchestrator that delegates to this command
 - **analyze-ci-test-scenario**: Analyze specific test scenario results
 - **analyze-sos-report**: Investigate runtime issues from SOS reports

@@ -1,7 +1,7 @@
 ---
 name: Analyze CI for a Prow Job
 argument-hint: <prow-job-url>
-description: Analyze a MicroShift Prow CI Test Job execution
+description: Download Prow job artifacts, identify root cause of failure, and produce a structured error report
 allowed-tools: Skill, Bash, Read, Write, Glob, Grep, Agent
 ---
 
