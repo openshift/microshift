@@ -1,7 +1,0 @@
-- kubernetes-kube-storage-version-migrator embedded-component c0f1886ab08d8c2ed84c9ea648b3f65cd82dc5f5 to 815b43b7f7288da76dd314553e113aefe2a5897d
-  - 524a88e 2026-02-24T16:46:06+01:00 UPSTREAM: <carry>: fix /vendor for hermetic 4.18
-
-- machine-config-operator embedded-component a72592f88e91c86ba00f14d5e104f9d3fbacb81a to ddf9a058799932c22942bdbef849178a6321c883
-  - dd559ec9 2026-03-11T11:25:59-04:00 helpers: compute systemdUnits that added and changed between Ign configs update: only write added or updated systemd units unless forcefile exists then rewrite all systemd units on_disk_validation: check if systemd units in config enabled correctly tests: update MCN condition transition test to account for quick transitions through 'Unknown' state (cherry picked from commit 4512ec46f7b13a6e85588bbf480c4d029990724a)
-  - 858deafe 2025-10-03T07:06:05+00:00 OCPBUGS-60805: configure-ovs: work around a Cisco switch issue
-
