@@ -1,22 +1,3 @@
-- kubernetes embedded-component b96a4039358613f770d20f5e4ce5125f66369521 to 4ef1baeb6786a70898f3842a06e988d9566aa444
-  - 481433b5f 2026-03-06T14:46:01-05:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
-  - 69220b617 2026-02-26T20:19:41+00:00 Release commit for Kubernetes v1.33.9
-  - e4aef7c31 2026-02-12T14:07:59+01:00 Bump images and versions to go 1.24.13 and distroless iptables
-  - e95f580e5 2026-02-10T13:05:56+00:00 Update CHANGELOG/CHANGELOG-1.33.md for v1.33.8
-
-- operator-framework-olm embedded-component 9cdde3bd7bf69417ec1a26a4c757f565b0107d0e to 12a261a3702726aaaa339c5d2fceb8b6078ceec8
-  - 5317aa59 2026-03-09T11:57:15-04:00 remove EndpointSlice content as it doesn't seem to be supported on 4.20 branch
-  - 479c4a33 2026-03-08T20:52:45-04:00  OCPBUGS-77958: Update NetworkPolicy egress to support HyperShift custom API ports
-
-- kubernetes image-amd64 b96a4039358613f770d20f5e4ce5125f66369521 to 4ef1baeb6786a70898f3842a06e988d9566aa444
-  - 481433b5f 2026-03-06T14:46:01-05:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
-  - 69220b617 2026-02-26T20:19:41+00:00 Release commit for Kubernetes v1.33.9
-  - e4aef7c31 2026-02-12T14:07:59+01:00 Bump images and versions to go 1.24.13 and distroless iptables
-  - e95f580e5 2026-02-10T13:05:56+00:00 Update CHANGELOG/CHANGELOG-1.33.md for v1.33.8
-
-- kubernetes image-arm64 b96a4039358613f770d20f5e4ce5125f66369521 to 4ef1baeb6786a70898f3842a06e988d9566aa444
-  - 481433b5f 2026-03-06T14:46:01-05:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
-  - 69220b617 2026-02-26T20:19:41+00:00 Release commit for Kubernetes v1.33.9
-  - e4aef7c31 2026-02-12T14:07:59+01:00 Bump images and versions to go 1.24.13 and distroless iptables
-  - e95f580e5 2026-02-10T13:05:56+00:00 Update CHANGELOG/CHANGELOG-1.33.md for v1.33.8
+- machine-config-operator embedded-component 662f6899c4461bbd296e149a8badd818e45c1252 to 7a70444e626c6b9cc8206bd84b0719fe6bef4fcd
+  - 6e4d7d28 2026-03-23T18:43:36+00:00 create default-timeout-stop dropin
 
