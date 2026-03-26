@@ -1,21 +1,6 @@
-- kubernetes embedded-component 346896bae752bb9def8cacca75fdc7f7dcae9496 to a674efabac8b5044e6256ce4e2385914be215376
-  - 0cdaa9e74 2026-02-27T14:50:28-05:00 UPSTREAM: <drop>: hack/update-vendor.sh, make udpate and update image
-  - 6172d7357 2026-02-26T20:20:22+00:00 Release commit for Kubernetes v1.32.13
-  - 2f0b47d19 2026-02-16T12:19:51+01:00 Bump images and versions to go 1.24.13 and distroless iptables
-  - a0ab66fb0 2026-02-10T13:06:03+00:00 Update CHANGELOG/CHANGELOG-1.32.md for v1.32.12
+- machine-config-operator embedded-component 5bad8a0ae8b4473905b2865439080e05b80bdb6b to 27993cf190c12bd5f2191019206b9290e286694d
+  - 3b44a7fc 2026-03-24T21:50:00+00:00 create default-timeout-stop dropin
 
-- kubernetes image-amd64 346896bae752bb9def8cacca75fdc7f7dcae9496 to a674efabac8b5044e6256ce4e2385914be215376
-  - 0cdaa9e74 2026-02-27T14:50:28-05:00 UPSTREAM: <drop>: hack/update-vendor.sh, make udpate and update image
-  - 6172d7357 2026-02-26T20:20:22+00:00 Release commit for Kubernetes v1.32.13
-  - 2f0b47d19 2026-02-16T12:19:51+01:00 Bump images and versions to go 1.24.13 and distroless iptables
-  - a0ab66fb0 2026-02-10T13:06:03+00:00 Update CHANGELOG/CHANGELOG-1.32.md for v1.32.12
-
-- oc image-arm64 24755b6e82745a4dfa5a6db4b467564c237f244c to b2a93a639c07ebf4d547d10877b6c13f65583248
+- oc image-amd64 24755b6e82745a4dfa5a6db4b467564c237f244c to b2a93a639c07ebf4d547d10877b6c13f65583248
   - df5a830f 2026-03-04T19:06:39+00:00 Makefile: Strip debugging symbols by default
-
-- kubernetes image-arm64 346896bae752bb9def8cacca75fdc7f7dcae9496 to a674efabac8b5044e6256ce4e2385914be215376
-  - 0cdaa9e74 2026-02-27T14:50:28-05:00 UPSTREAM: <drop>: hack/update-vendor.sh, make udpate and update image
-  - 6172d7357 2026-02-26T20:20:22+00:00 Release commit for Kubernetes v1.32.13
-  - 2f0b47d19 2026-02-16T12:19:51+01:00 Bump images and versions to go 1.24.13 and distroless iptables
-  - a0ab66fb0 2026-02-10T13:06:03+00:00 Update CHANGELOG/CHANGELOG-1.32.md for v1.32.12
 
