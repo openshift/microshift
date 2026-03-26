@@ -2,7 +2,7 @@
 name: Create JIRA Bugs from CI Analysis
 argument-hint: <release|pr-NNNN> [--create]
 description: Create JIRA bugs from analyze-ci failure reports (dry-run by default). Supports both release and PR job files.
-allowed-tools: Bash, Read, Write, Glob, Grep, Agent, mcp__jira__jira_search, mcp__jira__jira_create_issue, mcp__jira__jira_get_issue
+allowed-tools: Bash, Read, Write, Glob, Grep, Agent, mcp__jira__jira_search, mcp__jira__jira_create_issue, mcp__jira__jira_get_issue, mcp__jira__jira_get_transitions, mcp__jira__jira_transition_issue, mcp__jira__jira_add_comment
 ---
 
 # analyze-ci-create-bugs
@@ -177,6 +177,16 @@ jql: ... AND text ~ "OCP-68256" AND status not in (Closed, Verified) ...
 1. Merge and deduplicate results from all search queries (A, B1, B2)
 2. If potential duplicates are found, fetch their details with `mcp__jira__jira_get_issue` to show summary and status
 
+**Search C — Regression check (closed/verified issues)**:
+After completing searches A and B, run an additional keyword search against closed/verified issues to detect potential regressions:
+```python
+mcp__jira__jira_search(
+  jql='((project = OCPBUGS AND component = MicroShift) OR project = USHIFT) AND text ~ "<keywords>" AND status in (Closed, Verified) ORDER BY updated DESC',
+  limit=5
+)
+```
+If results are found, fetch their details with `mcp__jira__jira_get_issue` and flag them as **"Potential regression of closed bug"** — distinct from open duplicates. These should be shown to the user but do NOT block creation; they serve as a warning that a previously fixed issue may have resurfaced.
+
 **Note**: Run searches in parallel where possible.
 
 ### Step 6: Present Bug Candidates to User
@@ -217,15 +227,24 @@ jql: ... AND text ~ "OCP-68256" AND status not in (Closed, Verified) ...
        Jobs:
          - <job_url_1>
          - <job_url_2>
-       Potential Duplicates:
-         - USHIFT-XXXXX: "<summary>" [Status]  (or OCPBUGS-YYYYY)
+       Potential Duplicates (open):
+         - USHIFT-XXXXX: "<summary>" [Status] (or OCPBUGS-YYYYY)
+         (or "None found")
+       Potential Regressions (closed):
+         - USHIFT-YYYYY (or OCPBUGS-YYYYY): "<summary>" [Status] potential regression
          (or "None found")
 
+     # ACTION_PROMPT_WITH_REOPEN (use when closed regressions exist):
+     Action? [c]reate / [s]kip / [l]ink-to-existing <JIRA-KEY> / [r]eopen <JIRA-KEY>:
+
+     # ACTION_PROMPT_NO_REOPEN (use when no closed regressions exist):
      Action? [c]reate / [s]kip / [l]ink-to-existing <JIRA-KEY>:
      ```
+   - Select the prompt template based on whether closed regressions were found for the candidate: use `ACTION_PROMPT_WITH_REOPEN` when the candidate has closed regressions from Search C, and `ACTION_PROMPT_NO_REOPEN` otherwise.
    - **create**: Proceed to Step 7
    - **skip**: Skip this candidate, move to next
    - **link-to-existing**: Validate the key by calling `mcp__jira__jira_get_issue(issue_key=<JIRA-KEY>)`. If the issue exists, record the key and move to next. If the call fails or returns not-found, show an error (e.g., `"JIRA key <JIRA-KEY> not found — check for typos"`) and re-prompt with the same `Action?` choices.
+   - **reopen**: Validate the provided JIRA key before proceeding. Call `mcp__jira__jira_get_issue(issue_key=<JIRA-KEY>)` to confirm the issue exists, then verify that the key matches one of the candidate's closed regressions found in Search C, that the issue status is Closed or Verified, and that the issue type is Bug. If validation fails (key not found, not in the candidate's closed regression list, not in Closed/Verified state, or not a Bug), show an error (e.g., `"JIRA key <JIRA-KEY> not eligible for reopen — must be a Bug closed regression"`) and re-prompt with the same `Action?` choices. If validation passes, proceed to Step 7a.
 
 ### Step 7: Create Bug via MCP (create mode only)
 
@@ -303,6 +322,62 @@ For each candidate where user chose "create":
 - If MCP call fails, report error, ask user if they want to retry or skip
 - Do NOT retry automatically
 
+### Step 7a: Reopen Closed Bug as Regression (create mode only)
+
+**Precondition**: The JIRA issue must be a Bug in Closed or Verified state (validated in Step 6). If the issue type is not Bug, do not proceed — show an error and re-prompt.
+
+**Actions**:
+For each candidate where user chose "reopen":
+
+1. **Get available transitions** for the closed issue:
+   ```python
+   mcp__jira__jira_get_transitions(issue_key="<JIRA-KEY>")
+   ```
+
+2. **Find the reopen transition**: Look for a transition whose name is exactly "To Do", "New", or "Backlog" (case-insensitive). If no suitable transition is found, report the error and ask the user whether to create a new bug instead or skip.
+
+3. **Construct a regression comment** describing the new occurrences:
+   ```text
+   ## Regression: issue has resurfaced
+
+   This issue was previously closed but the same failure has been detected again in CI.
+
+   **Error Signature:** <error_signature>
+   **Error Severity:** <severity>/5
+   **Number of affected jobs:** <count>
+   **Last observed:** <finished date>
+
+   **Affected Jobs:**
+   - [<job_name>](<job_url>)
+   ...
+
+   Reopened automatically by /analyze-ci-create-bugs.
+   ```
+
+4. **Transition the issue** to reopen it:
+   ```python
+   mcp__jira__jira_transition_issue(
+       issue_key="<JIRA-KEY>",
+       transition_id="<reopen_transition_id>",
+       comment="<regression comment>"
+   )
+   ```
+
+5. If the transition call does not support inline comments, add the comment separately:
+   ```python
+   mcp__jira__jira_add_comment(
+       issue_key="<JIRA-KEY>",
+       body="<regression comment>"
+   )
+   ```
+
+6. **Record the result**: Store the reopened issue key for the final report.
+
+**Error Handling**:
+- If no reopen-like transition is available, report available transitions to user and ask whether to create a new bug or skip
+- If the transition fails, report error and ask user if they want to retry, create a new bug instead, or skip
+- Do NOT retry automatically
+
 ### Step 8: Generate Results Report
 
 **Actions**:
@@ -335,6 +410,7 @@ CANDIDATES
   1. MicroShift CI: <error_signature>
      Severity: X | Jobs: Y | Step: <step_name>
      Potential Duplicates: USHIFT-XXXXX, OCPBUGS-YYYYY (or "None")
+     Potential Regressions: USHIFT-YYYYY (or OCPBUGS-YYYYY) [Closed] (or "None")
 
   2. MicroShift CI: <error_signature>
      ...
@@ -368,10 +444,16 @@ RESULTS
      MicroShift CI: <error_signature>
      Reason: Duplicate of existing issue
 
+  4. USHIFT-88888 (REOPENED)
+     MicroShift CI: <error_signature>
+     URL: https://redhat.atlassian.net/browse/USHIFT-88888
+     Reason: Regression of previously closed bug
+
 SUMMARY
   Created: N
   Skipped: N
   Linked to existing: N
+  Reopened: N
   Failed: N
 
 Report saved: /tmp/analyze-ci-claude-workdir/analyze-ci-create-bugs-<source>.<timestamp>.txt
