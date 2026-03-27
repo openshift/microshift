@@ -25,9 +25,14 @@ Test Simple HTTP Route
     ...    Setup Namespace
     ...    Deploy Hello MicroShift
     Create Gateway    ${GATEWAY_HOSTNAME}    ${GATEWAY_PORT}    ${NS_GATEWAY}
-    Create HTTP Route    ${GATEWAY_HOSTNAME}    ${NS_GATEWAY}
-    Wait Until Keyword Succeeds    20x    6s
-    ...    Access Hello MicroShift Success    ushift_port=${GATEWAY_PORT}    hostname=${GATEWAY_HOSTNAME}
+    ${gateway_ip}    Create HTTP Route    ${GATEWAY_HOSTNAME}    ${NS_GATEWAY}
+    Wait Until Keyword Succeeds
+    ...    20x
+    ...    6s
+    ...    Access Hello MicroShift Success
+    ...    ushift_port=${GATEWAY_PORT}
+    ...    hostname=${GATEWAY_HOSTNAME}
+    ...    ushift_ip=${gateway_ip}
     [Teardown]    Run Keywords
     ...    Delete Namespace
 
@@ -65,6 +70,7 @@ Create Gateway
 
 Create HTTP Route
     [Documentation]    Create an HTTP route using the given hostname and namespace. Waits for acceptance in a gateway.
+    ...    Returns the gateway service external IP.
     [Arguments]    ${hostname}    ${namespace}
     VAR    ${tmp}    /tmp/route.yaml
     VAR    ${HOSTNAME}    ${hostname}    scope=TEST
@@ -73,13 +79,21 @@ Create HTTP Route
     ...    Remove File    ${tmp}
     Generate File From Template    ${HTTP_ROUTE_MANIFEST_TMPL}    ${tmp}
     Oc Apply    -n ${namespace} -f ${tmp}
+    ${gateway_ip}    Wait For HTTPRoute And Gateway Ready    ${namespace}
+    RETURN    ${gateway_ip}
 
+Wait For HTTPRoute And Gateway Ready
+    [Documentation]    Wait for HTTPRoute acceptance and gateway readiness. Returns gateway service IP.
+    [Arguments]    ${namespace}
     Wait Until Keyword Succeeds    20x    6s
     ...    Verify HTTPRoute Parent Accepted    ${namespace}
     Wait Until Keyword Succeeds    20x    6s
     ...    Verify HTTPRoute References Resolved    ${namespace}
     Wait Until Keyword Succeeds    20x    6s
-    ...    Verify Gateway Port Listening    ${GATEWAY_PORT}
+    ...    Verify Gateway Programmed    ${namespace}
+    ${gateway_ip}    Wait Until Keyword Succeeds    20x    6s
+    ...    Verify Gateway Service Has External IP    ${namespace}
+    RETURN    ${gateway_ip}
 
 Verify HTTPRoute Parent Accepted
     [Documentation]    Verify that the HTTPRoute is accepted by its parent gateway
@@ -99,11 +113,20 @@ Verify HTTPRoute References Resolved
     Should Not Contain    ${result}    False    HTTPRoute references not resolved
     Should Not Contain    ${result}    Unknown    HTTPRoute reference resolution status is unknown
 
-Verify Gateway Port Listening
-    [Documentation]    Verify that the gateway port is accepting connections on the host.
-    [Arguments]    ${port}
-    ${rc}=    Run And Return Rc    nc -z -w 5 ${USHIFT_HOST} ${port}
-    Should Be Equal As Integers    ${rc}    0    Gateway port ${port} is not listening
+Verify Gateway Programmed
+    [Documentation]    Verify that the gateway data plane is programmed and ready to receive traffic
+    [Arguments]    ${namespace}
+    ${result}    Run With Kubeconfig
+    ...    oc get gateway/test-gateway -n ${namespace} -o jsonpath='{.status.conditions[?(@.type=="Programmed")].status}'
+    Should Be Equal As Strings    ${result}    True    Gateway is not yet programmed
+
+Verify Gateway Service Has External IP
+    [Documentation]    Verify that the gateway's LoadBalancer service has an external IP assigned and return it
+    [Arguments]    ${namespace}
+    ${result}    Run With Kubeconfig
+    ...    oc get svc test-gateway-openshift-gateway-api -n ${namespace} -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
+    Should Not Be Empty    ${result}    Gateway service does not have an external IP assigned
+    RETURN    ${result}
 
 Generate File From Template
     [Documentation]    Generate file from template
