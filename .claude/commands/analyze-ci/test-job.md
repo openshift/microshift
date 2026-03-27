@@ -9,7 +9,7 @@ allowed-tools: WebFetch, Bash, Read, Write, Glob, Grep
 analyze-ci:test-job
 
 ## Synopsis
-```
+```bash
 /analyze-ci:test-job <job-url>
 ```
 
@@ -382,7 +382,7 @@ Output:
 ```
 
 ### Example 3: Failed Job Analysis
-```
+```bash
 /analyze-ci:test-job https://prow.ci.openshift.org/view/gs/test-platform-results/logs/some-failing-job/9876543210
 ```
 

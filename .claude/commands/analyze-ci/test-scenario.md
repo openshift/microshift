@@ -10,7 +10,7 @@ allowed-tools: WebFetch, Bash, Read, Write, Glob, Grep
 analyze-ci:test-scenario
 
 ## Synopsis
-```
+```bash
 /analyze-ci:test-scenario <job-url> <scenario-name>
 ```
 
