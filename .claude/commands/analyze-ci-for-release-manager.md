@@ -18,15 +18,23 @@ Accepts a comma-separated list of MicroShift release versions, runs the `analyze
 ## Arguments
 - `$ARGUMENTS` (required): Comma-separated list of release versions (e.g., `4.19,4.20,4.21,4.22`)
 
+## Work Directory
+
+Set once at the start and reference throughout:
+```bash
+WORKDIR=/tmp/analyze-ci-claude-workdir.$(date +%y%m%d)
+```
+
 ## Implementation Steps
 
 ### Step 1: Parse and Validate Arguments
 
 **Actions**:
-1. Split `$ARGUMENTS` by comma to get a list of release versions
-2. Trim whitespace from each version
-3. Validate that at least one release version is provided
-4. If no arguments provided, show usage and stop
+1. Run `WORKDIR=/tmp/analyze-ci-claude-workdir.$(date +%y%m%d) && mkdir -p ${WORKDIR}` using the `Bash` tool
+2. Split `$ARGUMENTS` by comma to get a list of release versions
+3. Trim whitespace from each version
+4. Validate that at least one release version is provided
+5. If no arguments provided, show usage and stop
 
 **Error Handling**:
 - If `$ARGUMENTS` is empty, display: "Usage: /analyze-ci-for-release-manager <release1,release2,...>" and stop
@@ -39,7 +47,7 @@ Accepts a comma-separated list of MicroShift release versions, runs the `analyze
    Agent: subagent_type=general_purpose, prompt="Run /analyze-ci-for-release <version>"
    ```
 2. Launch all releases **in parallel** as separate agents — do NOT wait for one to finish before starting the next
-3. After each agent completes, note the summary report file path it produced (typically `/tmp/analyze-ci-claude-workdir/analyze-ci-release-<version>-summary.*.txt`)
+3. After each agent completes, note the summary report file path it produced (typically `${WORKDIR}/analyze-ci-release-<version>-summary.*.txt`)
 4. Wait until all the parallel agents are complete
 5. Track which releases succeeded and which failed
 
@@ -56,7 +64,7 @@ Analyzing release X/Y: <version>
    Agent: subagent_type=general_purpose, prompt="Run /analyze-ci-for-pull-requests --rebase"
    ```
 2. This agent can be launched in parallel with the release agents in Step 2
-3. After the agent completes, note the summary report file path (typically `/tmp/analyze-ci-claude-workdir/analyze-ci-prs-summary.*.txt`)
+3. After the agent completes, note the summary report file path (typically `${WORKDIR}/analyze-ci-prs-summary.*.txt`)
 4. If no rebase PRs are found, note "No open rebase PRs" for the report
 
 **Progress Reporting**:
@@ -93,7 +101,7 @@ Summary:
   Pull Requests:
     2 rebase PRs with 5 total failed jobs
 
-HTML report generated: /tmp/analyze-ci-claude-workdir/microshift-ci-release-manager-20260315-143022.html
+HTML report generated: ${WORKDIR}/microshift-ci-release-manager-20260315-143022.html
 ```
 
 ## Examples
@@ -136,7 +144,7 @@ HTML report generated: /tmp/analyze-ci-claude-workdir/microshift-ci-release-mana
 - All agents (releases + PR analysis) are launched in parallel for maximum efficiency
 - HTML generation is delegated to `analyze-ci-generate-html-report` running as a separate agent — it only reads summary files (not per-job files), keeping context usage minimal
 - The HTML report is self-contained (no external CSS/JS dependencies)
-- All intermediate files from `analyze-ci-for-release` and `analyze-ci-for-pull-requests` remain available in `/tmp/analyze-ci-claude-workdir`
+- All intermediate files from `analyze-ci-for-release` and `analyze-ci-for-pull-requests` remain available in `${WORKDIR}`
 - The HTML file can be opened in any browser for convenient examination
 - If a release analysis fails, it is noted in the report but does not block other releases
 - If no rebase PRs are open, the Pull Requests tab shows "No open rebase pull requests found"

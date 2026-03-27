@@ -15,7 +15,7 @@ allowed-tools: Bash, Read, Write, Glob, Grep, Agent, mcp__jira__jira_search, mcp
 ## Description
 Reads individual job analysis reports produced by `analyze-ci-for-release` or `analyze-ci-for-pull-requests` and creates JIRA bugs in USHIFT for legitimate test failures. Operates in **dry-run mode by default** - it shows what bugs would be created without actually creating them. Use `--create` to perform actual issue creation.
 
-This command does NOT re-analyze CI jobs. It consumes existing job analysis files from `/tmp/analyze-ci-claude-workdir/`.
+This command does NOT re-analyze CI jobs. It consumes existing job analysis files from `${WORKDIR}/`.
 
 ## Arguments
 - `$ARGUMENTS` (required): Source identifier, optionally followed by `--create`
@@ -27,7 +27,7 @@ This command does NOT re-analyze CI jobs. It consumes existing job analysis file
 
 ## Prerequisites
 
-- Job analysis files must already exist in `/tmp/analyze-ci-claude-workdir/`:
+- Job analysis files must already exist in `${WORKDIR}/`:
   - For releases: `analyze-ci-release-<release>-job-*.txt` (produced by `/analyze-ci-for-release`)
   - For PRs: `analyze-ci-prs-job-*-pr<number>-*.txt` (produced by `/analyze-ci-for-pull-requests`)
 - Each job file must contain a `--- STRUCTURED SUMMARY ---` block (see below)
@@ -54,6 +54,13 @@ FINISHED: <job finish date in YYYY-MM-DD format>
 
 If a job file lacks this block, it is skipped with a warning.
 
+## Work Directory
+
+Set once at the start and reference throughout:
+```bash
+WORKDIR=/tmp/analyze-ci-claude-workdir.$(date +%y%m%d)
+```
+
 ## Implementation Steps
 
 ### Step 1: Parse Arguments and Locate Job Files
@@ -61,21 +68,21 @@ If a job file lacks this block, it is skipped with a warning.
 **Actions**:
 1. Parse `$ARGUMENTS` to extract `<source>` and detect `--create` flag
 2. Determine mode: if `--create` is present, set `MODE=create`; otherwise `MODE=dry-run`
-3. Run `mkdir -p /tmp/analyze-ci-claude-workdir` using the `Bash` tool
+3. Run `WORKDIR=/tmp/analyze-ci-claude-workdir.$(date +%y%m%d) && mkdir -p ${WORKDIR}` using the `Bash` tool
 4. Determine source type and locate job files:
 
    **a) Release version** (e.g., `4.22`, `main`, `4.19`):
-   - Glob for: `/tmp/analyze-ci-claude-workdir/analyze-ci-release-<release>-job-*.txt`
+   - Glob for: `${WORKDIR}/analyze-ci-release-<release>-job-*.txt`
    - Set `SOURCE_TYPE=release`, `SOURCE_LABEL="release <release>"`
 
    **b) PR number** (e.g., `pr-6396`, `pr6396`):
    - Extract the numeric PR number (strip `pr-` or `pr` prefix)
-   - Glob for: `/tmp/analyze-ci-claude-workdir/analyze-ci-prs-job-*-pr<number>-*.txt`
+   - Glob for: `${WORKDIR}/analyze-ci-prs-job-*-pr<number>-*.txt`
    - Set `SOURCE_TYPE=pr`, `SOURCE_LABEL="PR #<number>"`
 
    **c) Rebase PR shorthand** (e.g., `rebase-release-4.22`):
    - Extract the release version from the shorthand (e.g., `4.22`)
-   - Glob for all PR job files: `/tmp/analyze-ci-claude-workdir/analyze-ci-prs-job-*.txt`
+   - Glob for all PR job files: `${WORKDIR}/analyze-ci-prs-job-*.txt`
    - Read each file's STRUCTURED SUMMARY and find files where JOB_NAME contains the release version (e.g., `release-4.22` or `main`) OR where the JOB_URL contains the release branch
    - Alternatively, check the PR summary file (`analyze-ci-prs-summary.*.txt`) to find the PR number for the given rebase release
    - Set `SOURCE_TYPE=pr`, `SOURCE_LABEL="rebase PR for <release> (PR #<number>)"`
@@ -152,24 +159,26 @@ If a job file lacks this block, it is skipped with a warning.
 
 For each bug candidate, run ALL of the following searches. Each search is MANDATORY — do not skip any.
 
-**Search A — Keyword search**:
+**Search A — Keyword search (multiple focused queries)**:
 1. Extract 2-4 distinctive keywords from the error signature (avoid generic words like "error", "failed", "test")
-2. Run:
+2. Run **2-3 separate searches in parallel**, each using 1-2 distinctive keywords. Do NOT put all keywords into a single `text ~` query — Jira requires all terms to match, so queries with 3+ keywords are fragile and miss issues that use slightly different wording. Instead, pick the most distinctive terms (tool names, hyphenated identifiers, error codes) and search for them independently.
    ```python
-   mcp__jira__jira_search(
-     jql='((project = OCPBUGS AND component = MicroShift) OR project = USHIFT) AND text ~ "<keywords>" AND status not in (Closed, Verified) ORDER BY created DESC',
-     limit=5
-   )
+   # Example for error signature: "TLS Scanner image pull failure (ErrImagePull registry.ci.openshift.org/ocp/4.22:tls-scanner-tool on arm64)"
+   # Search A1: most distinctive identifier
+   mcp__jira__jira_search(jql='... AND issuetype = Bug AND text ~ "tls-scanner" ...', limit=5)
+   # Search A2: different distinctive term
+   mcp__jira__jira_search(jql='... AND issuetype = Bug AND text ~ "tls-scanner-tool" ...', limit=5)
    ```
+3. Merge and deduplicate results from all A-series queries before proceeding
 
 **Search B — Test case ID search (MANDATORY when IDs are present)**:
 Extract ALL numeric IDs from the error signature that could be test case references (typically 4-6 digit numbers like `68256`). For EACH numeric ID found, run TWO separate searches:
 ```text
 # Search B1: bare number
-jql: ... AND text ~ "68256" AND status not in (Closed, Verified) ...
+jql: ... AND issuetype = Bug AND text ~ "68256" AND status not in (Closed, Verified) ...
 
 # Search B2: OCP-prefixed form (OpenShift Polarion convention)
-jql: ... AND text ~ "OCP-68256" AND status not in (Closed, Verified) ...
+jql: ... AND issuetype = Bug AND text ~ "OCP-68256" AND status not in (Closed, Verified) ...
 ```
 **Why both forms are required**: Jira's text indexer treats `OCP-68256` as a single token, so `text ~ "68256"` will NOT match issues containing `OCP-68256`, and vice versa. Skipping either form WILL cause missed duplicates.
 
@@ -181,7 +190,7 @@ jql: ... AND text ~ "OCP-68256" AND status not in (Closed, Verified) ...
 After completing searches A and B, run an additional keyword search against closed/verified issues to detect potential regressions:
 ```python
 mcp__jira__jira_search(
-  jql='((project = OCPBUGS AND component = MicroShift) OR project = USHIFT) AND text ~ "<keywords>" AND status in (Closed, Verified) ORDER BY updated DESC',
+  jql='((project = OCPBUGS AND component = MicroShift) OR project = USHIFT) AND issuetype = Bug AND text ~ "<keywords>" AND status in (Closed, Verified) ORDER BY updated DESC',
   limit=5
 )
 ```
@@ -381,7 +390,7 @@ For each candidate where user chose "reopen":
 ### Step 8: Generate Results Report
 
 **Actions**:
-1. Save report to `/tmp/analyze-ci-claude-workdir/analyze-ci-create-bugs-<source>.<timestamp>.txt`
+1. Save report to `${WORKDIR}/analyze-ci-create-bugs-<source>.<timestamp>.txt`
 2. Display summary to user:
 
 **Dry-run report format**:
@@ -418,7 +427,7 @@ CANDIDATES
 To create these bugs, run:
   /analyze-ci-create-bugs <source> --create
 
-Report saved: /tmp/analyze-ci-claude-workdir/analyze-ci-create-bugs-<source>.<timestamp>.txt
+Report saved: ${WORKDIR}/analyze-ci-create-bugs-<source>.<timestamp>.txt
 ═══════════════════════════════════════════════════════════════
 ```
 
@@ -456,7 +465,7 @@ SUMMARY
   Reopened: N
   Failed: N
 
-Report saved: /tmp/analyze-ci-claude-workdir/analyze-ci-create-bugs-<source>.<timestamp>.txt
+Report saved: ${WORKDIR}/analyze-ci-create-bugs-<source>.<timestamp>.txt
 ═══════════════════════════════════════════════════════════════
 ```
 
@@ -491,7 +500,7 @@ Resolves the rebase PR for release 4.22, then interactively creates bugs.
 /analyze-ci-create-bugs 4.19
 ```
 ```text
-Error: No job analysis files found at /tmp/analyze-ci-claude-workdir/analyze-ci-release-4.19-job-*.txt
+Error: No job analysis files found at ${WORKDIR}/analyze-ci-release-4.19-job-*.txt
 
 Run the analysis first:
   /analyze-ci-for-release 4.19
@@ -502,7 +511,7 @@ Run the analysis first:
 /analyze-ci-create-bugs pr-9999
 ```
 ```text
-Error: No job analysis files found at /tmp/analyze-ci-claude-workdir/analyze-ci-prs-job-*-pr9999-*.txt
+Error: No job analysis files found at ${WORKDIR}/analyze-ci-prs-job-*-pr9999-*.txt
 
 Run the analysis first:
   /analyze-ci-for-pull-requests
@@ -510,7 +519,7 @@ Run the analysis first:
 
 ## Notes
 
-- This command does NOT run CI analysis — it only consumes existing analysis files from `/tmp/analyze-ci-claude-workdir`
+- This command does NOT run CI analysis — it only consumes existing analysis files from `${WORKDIR}`
 - Supports two file naming patterns:
   - Release jobs: `analyze-ci-release-<release>-job-*.txt` (from `/analyze-ci-for-release`)
   - PR jobs: `analyze-ci-prs-job-*-pr<number>-*.txt` (from `/analyze-ci-for-pull-requests`)

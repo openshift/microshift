@@ -24,6 +24,13 @@ This approach reuses existing analysis capabilities rather than duplicating logi
 ## Arguments
 - `<release-version>` (required): OpenShift release version (e.g., 4.22, 4.21, 4.20)
 
+## Work Directory
+
+Set once at the start and reference throughout:
+```bash
+WORKDIR=/tmp/analyze-ci-claude-workdir.$(date +%y%m%d)
+```
+
 ## Implementation Steps
 
 ### Step 1: Validate Arguments and Fetch Failed Jobs
@@ -62,13 +69,13 @@ Each job MUST be analyzed by launching a **separate Agent** (using the `Agent` t
 3. The file MUST contain the full report including the `--- STRUCTURED SUMMARY ---` block
 
 **Actions**:
-1. Run `mkdir -p /tmp/analyze-ci-claude-workdir` using the `Bash` tool
+1. Run `WORKDIR=/tmp/analyze-ci-claude-workdir.$(date +%y%m%d) && mkdir -p ${WORKDIR}` using the `Bash` tool
 2. For each job URL, launch a separate **Agent** with this exact prompt template:
    ```
    Agent: subagent_type=general_purpose, prompt="Analyze this Prow job and save the report:
    1. Run /analyze-ci-for-prow-job <JOB_URL>
    2. After the analysis completes, save the FULL report output (including the --- STRUCTURED SUMMARY --- block) to:
-      /tmp/analyze-ci-claude-workdir/analyze-ci-release-<RELEASE>-job-<N>-<JOB_ID>.txt
+      ${WORKDIR}/analyze-ci-release-<RELEASE>-job-<N>-<JOB_ID>.txt
       Use the Write tool to save the file. The file must contain the complete analysis report."
    ```
    Replace `<JOB_URL>`, `<RELEASE>`, `<N>` (1-based job index), and `<JOB_ID>` with actual values.
@@ -85,7 +92,7 @@ Job 2/N: <job-name> (background)
 
 **File Storage**:
 All per-job report files MUST be saved at this exact path:
-- `/tmp/analyze-ci-claude-workdir/analyze-ci-release-<release>-job-<N>-<job-id>.txt`
+- `${WORKDIR}/analyze-ci-release-<release>-job-<N>-<job-id>.txt`
 
 Where:
 - `<release>` is the release version (e.g., `4.22`, `main`)
@@ -94,7 +101,7 @@ Where:
 
 **Verification**: After all agents complete, verify that per-job files exist:
 ```bash
-ls /tmp/analyze-ci-claude-workdir/analyze-ci-release-<release>-job-*.txt
+ls ${WORKDIR}/analyze-ci-release-<release>-job-*.txt
 ```
 If any files are missing, note the gap in the summary report but do NOT re-run the analysis.
 
@@ -104,7 +111,7 @@ If any files are missing, note the gap in the summary report but do NOT re-run t
 
 **Actions**:
 1. Collect results from all parallel job analyses
-   - Read each per-job file: `/tmp/analyze-ci-claude-workdir/analyze-ci-release-<release>-job-<N>-<job-id>.txt`
+   - Read each per-job file: `${WORKDIR}/analyze-ci-release-<release>-job-<N>-<job-id>.txt`
    - Extract the `--- STRUCTURED SUMMARY ---` block from each file for pattern detection (including the `FINISHED` field for job date tracking)
    - Extract key findings from each analysis
 
@@ -130,7 +137,7 @@ If any files are missing, note the gap in the summary report but do NOT re-run t
 **Actions**:
 1. Aggregate all job analysis results from parallel execution
 2. Identify common patterns and group by failure type
-3. Generate summary report and save to `/tmp/analyze-ci-claude-workdir/analyze-ci-release-<release>-summary.<timestamp>.txt`
+3. Generate summary report and save to `${WORKDIR}/analyze-ci-release-<release>-summary.<timestamp>.txt`
 4. Display the summary to the user
 
 **Important**: Each job listed under "Affected Jobs" MUST include:
@@ -148,7 +155,7 @@ MICROSHIFT 4.22 RELEASE - FAILED JOBS ANALYSIS
 OVERVIEW
   Total Failed Jobs: 17
   Analysis Date: 2026-03-14
-  Report saved to: /tmp/analyze-ci-claude-workdir/analyze-ci-release-4.22-summary.<timestamp>.txt
+  Report saved to: ${WORKDIR}/analyze-ci-release-4.22-summary.<timestamp>.txt
 
 FAILURE BREAKDOWN
   Build Failures:        0 jobs
@@ -195,7 +202,7 @@ TOP ISSUES (by frequency)
 ═══════════════════════════════════════════════════════════════
 
 Individual job reports available in:
-  /tmp/analyze-ci-claude-workdir/analyze-ci-release-4.22-job-*.txt
+  ${WORKDIR}/analyze-ci-release-4.22-job-*.txt
 ```
 
 ## Examples
@@ -226,7 +233,7 @@ Individual job reports available in:
 - **Execution Time**: Significantly reduced through parallel execution - typically 2-3 minutes for 15-20 jobs (depends on analyze-ci-for-prow-job execution time)
 - **Network Usage**: Moderate to high - all jobs analyzed in parallel fetch logs from GCS simultaneously
 - **Parallelization**: All jobs are analyzed in parallel for maximum efficiency
-- **File Storage**: All intermediate and report files are stored in `/tmp/analyze-ci-claude-workdir` directory
+- **File Storage**: All intermediate and report files are stored in `${WORKDIR}` directory
 
 ## Prerequisites
 
@@ -260,7 +267,7 @@ Please ensure you're in the microshift project directory.
 ## Related Skills
 
 - **analyze-ci-for-prow-job**: Detailed analysis of a single job (used internally)
-- **analyze-ci-create-bugs-for-release**: Creates JIRA bugs from this command's output
+- **analyze-ci-create-bugs**: Creates JIRA bugs from this command's output
 - **analyze-ci-for-release-manager**: Multi-release orchestrator that delegates to this command
 - **analyze-ci-test-scenario**: Analyze specific test scenario results
 - **analyze-sos-report**: Investigate runtime issues from SOS reports
@@ -280,7 +287,7 @@ Run periodically and compare summaries over time to identify regression patterns
 
 - This skill focuses on **periodic** jobs only (not presubmit/postsubmit)
 - Analysis is read-only - no modifications to CI data
-- Results are saved in files in /tmp/analyze-ci-claude-workdir directory with a timestamp
+- Results are saved in files in ${WORKDIR} directory with a timestamp
 - Provide links to the jobs in the summary
 - Only present a concise analysis summary for each job
 - Pattern detection improves with more jobs analyzed
