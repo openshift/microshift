@@ -7,15 +7,15 @@ allowed-tools: WebFetch, Bash, Read, Write, Glob, Grep
 
 
 ## Name
-analyze-ci-test-scenario
+analyze-ci:test-scenario
 
 ## Synopsis
 ```
-/analyze-ci-test-scenario <job-url> <scenario-name>
+/analyze-ci:test-scenario <job-url> <scenario-name>
 ```
 
 ## Description
-The `analyze-ci-test-scenario` command retrieves comprehensive information about a specific test scenario executed within a MicroShift CI job. It returns detailed information containing:
+The `analyze-ci:test-scenario` command retrieves comprehensive information about a specific test scenario executed within a MicroShift CI job. It returns detailed information containing:
 - Scenario configuration (OS version, test type, architecture)
 - Test execution results (pass/fail counts, test names)
 - MicroShift version tested
@@ -303,7 +303,7 @@ Displaying available information below...
 
 ### Example 1: Get scenario information
 ```
-/analyze-ci-test-scenario https://prow.ci.openshift.org/view/gs/test-platform-results/logs/periodic-ci-openshift-microshift-release-4.20-periodics-e2e-aws-tests-bootc-release-periodic/1979744605507162112 el96-lrel@standard1
+/analyze-ci:test-scenario https://prow.ci.openshift.org/view/gs/test-platform-results/logs/periodic-ci-openshift-microshift-release-4.20-periodics-e2e-aws-tests-bootc-release-periodic/1979744605507162112 el96-lrel@standard1
 ```
 
 Output:
@@ -342,7 +342,7 @@ Output:
 
 ### Example 2: List all scenarios (no scenario name provided)
 ```
-/analyze-ci-test-scenario https://prow.ci.openshift.org/view/gs/test-platform-results/logs/periodic-ci-openshift-microshift-release-4.20-periodics-e2e-aws-tests-bootc-release-periodic/1979744605507162112
+/analyze-ci:test-scenario https://prow.ci.openshift.org/view/gs/test-platform-results/logs/periodic-ci-openshift-microshift-release-4.20-periodics-e2e-aws-tests-bootc-release-periodic/1979744605507162112
 ```
 
 Output:
@@ -362,7 +362,7 @@ Job ID: 1979744605507162112
 
 ### Example 3: Get information about a failed scenario
 ```
-/analyze-ci-test-scenario https://prow.ci.openshift.org/view/gs/test-platform-results/logs/periodic-ci-openshift-microshift-release-4.20-periodics-e2e-aws-tests-release-periodic/1234567890 el96-lrel@lvm
+/analyze-ci:test-scenario https://prow.ci.openshift.org/view/gs/test-platform-results/logs/periodic-ci-openshift-microshift-release-4.20-periodics-e2e-aws-tests-release-periodic/1234567890 el96-lrel@lvm
 ```
 
 Output would include failure details:

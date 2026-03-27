@@ -6,15 +6,15 @@ allowed-tools: WebFetch, Bash, Read, Write, Glob, Grep
 ---
 
 ## Name
-analyze-ci-test-job
+analyze-ci:test-job
 
 ## Synopsis
 ```
-/analyze-ci-test-job <job-url>
+/analyze-ci:test-job <job-url>
 ```
 
 ## Description
-The `analyze-ci-test-job` command fetches comprehensive information from a Prow CI job execution and displays it in both JSON and Markdown formats.
+The `analyze-ci:test-job` command fetches comprehensive information from a Prow CI job execution and displays it in both JSON and Markdown formats.
 
 This command provides:
 - Job metadata (status, timing, architecture, image type)
@@ -33,11 +33,11 @@ This command works by:
 2. **Fetching job metadata** from `finished.json` and `started.json` to get status, timing, and result information
 3. **Extracting MicroShift version** using the `extract_microshift_version.py` helper script from build logs
 4. **Listing test scenarios** by fetching the scenario-info directory structure from GCS artifacts
-5. **Analyzing test results** for each scenario using the `analyze-test-scenario` command to get comprehensive JSON data
+5. **Analyzing test results** for each scenario using the `analyze-ci:test-scenario` command to get comprehensive JSON data
 6. **Compiling artifacts and logs** by constructing URLs to build logs, test execution logs, and failure diagnostics
 7. **Generating a detailed Markdown report** with job overview, version info, scenario results, and artifact links
 
-The command integrates with the `analyze-test-scenario` command to provide detailed per-scenario analysis and aggregates all information into a human-readable report with proper formatting (status icons, duration calculations, failure summaries).
+The command integrates with the `analyze-ci:test-scenario` command to provide detailed per-scenario analysis and aggregates all information into a human-readable report with proper formatting (status icons, duration calculations, failure summaries).
 
 ## Arguments
 - `$1` (job-url): URL to the Prow CI job - **Required**
@@ -169,14 +169,14 @@ python3 .claude/scripts/extract_microshift_version.py "https://prow.ci.openshift
 
 **Goal**: Get detailed test execution results for each scenario.
 
-**Method**: Use the `analyze-test-scenario` command for each scenario to get comprehensive JSON data.
+**Method**: Use the `analyze-ci:test-scenario` command for each scenario to get comprehensive JSON data.
 
 **Actions**:
 For each scenario found in Step 4:
 
-1. **Get scenario details** using the analyze-test-scenario command:
+1. **Get scenario details** using the analyze-ci:test-scenario command:
    ```bash
-   /microshift-prow-job:analyze-test-scenario <job-url> <scenario-name>
+   /analyze-ci:test-scenario <job-url> <scenario-name>
    ```
 
 2. **Parse the JSON response** which includes:
@@ -232,7 +232,7 @@ For each scenario found in Step 4:
    - Execution time
    - Test category and configuration
 
-**Alternative Manual Method** (if analyze-test-scenario command unavailable):
+**Alternative Manual Method** (if analyze-ci:test-scenario command unavailable):
 1. Fetch junit.xml directly from artifact URL
 2. Parse XML to extract test counts
 3. Check boot_and_run.log for execution details
@@ -342,7 +342,7 @@ For each scenario found in Step 4:
 
 ### Example 1: Successful Job Analysis
 ```
-/microshift-prow-job:analyze-ci-test-job https://prow.ci.openshift.org/view/gs/test-platform-results/logs/periodic-ci-openshift-microshift-release-4.20-periodics-e2e-aws-tests-bootc-release-periodic/1979744605507162112
+/analyze-ci:test-job https://prow.ci.openshift.org/view/gs/test-platform-results/logs/periodic-ci-openshift-microshift-release-4.20-periodics-e2e-aws-tests-bootc-release-periodic/1979744605507162112
 ```
 
 Output:
@@ -378,12 +378,12 @@ Output:
 
 ### Example 2: Using GCS Web URL
 ```
-/microshift-prow-job:analyze-ci-test-job https://gcsweb-ci.apps.ci.l2s4.p1.openshiftapps.com/gcs/test-platform-results/logs/periodic-ci-openshift-microshift-release-4.20-periodics-e2e-aws-tests-release-arm-periodic/1979744608019550208
+/analyze-ci:test-job https://gcsweb-ci.apps.ci.l2s4.p1.openshiftapps.com/gcs/test-platform-results/logs/periodic-ci-openshift-microshift-release-4.20-periodics-e2e-aws-tests-release-arm-periodic/1979744608019550208
 ```
 
 ### Example 3: Failed Job Analysis
 ```
-/microshift-prow-job:analyze-ci-test-job https://prow.ci.openshift.org/view/gs/test-platform-results/logs/some-failing-job/9876543210
+/analyze-ci:test-job https://prow.ci.openshift.org/view/gs/test-platform-results/logs/some-failing-job/9876543210
 ```
 
 Output would include failure details:
@@ -402,7 +402,7 @@ Output would include failure details:
 
 ### Example 4: Job ID Only
 ```
-/microshift-prow-job:analyze-ci-test-job 1979744605507162112
+/analyze-ci:test-job 1979744605507162112
 ```
 (May prompt for additional context or attempt to determine job type from recent jobs)
 
