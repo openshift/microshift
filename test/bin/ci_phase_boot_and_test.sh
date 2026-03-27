@@ -70,6 +70,7 @@ cd "${TESTDIR}"
 if [ ! -d "${RF_VENV}" ]; then
     "${ROOTDIR}/scripts/fetch_tools.sh" robotframework
 fi
+"${ROOTDIR}/scripts/fetch_tools.sh" etcdctl
 if [[ "${SCENARIO_SOURCES:-}" =~ .*releases.* ]]; then
     "${ROOTDIR}/scripts/fetch_tools.sh" ginkgo
 fi
