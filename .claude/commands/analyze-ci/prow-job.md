@@ -5,11 +5,11 @@ description: Download Prow job artifacts, identify root cause of failure, and pr
 allowed-tools: Skill, Bash, Read, Write, Glob, Grep, Agent
 ---
 
-# analyze-ci-for-prow-job
+# analyze-ci:prow-job
 
 ## Synopsis
 ```bash
-/analyze-ci-for-prow-job <prow-job-url>
+/analyze-ci:prow-job <prow-job-url>
 ```
 
 ## Description

@@ -5,21 +5,21 @@ description: Analyze CI for open MicroShift pull requests and produce a summary 
 allowed-tools: Skill, Bash, Read, Write, Glob, Grep, Agent
 ---
 
-# analyze-ci-for-pull-requests
+# analyze-ci:pull-requests
 
 ## Synopsis
 ```
-/analyze-ci-for-pull-requests [--rebase]
+/analyze-ci:pull-requests [--rebase]
 ```
 
 ## Description
-Fetches all open MicroShift pull requests, identifies failed Prow CI jobs for each PR, analyzes each failure using the `/analyze-ci-for-prow-job` command, and produces a text summary report.
+Fetches all open MicroShift pull requests, identifies failed Prow CI jobs for each PR, analyzes each failure using the `/analyze-ci:prow-job` command, and produces a text summary report.
 
 This command orchestrates the analysis workflow by:
 
 1. Fetching the list of open PRs and their failed jobs using `.claude/scripts/microshift-prow-jobs-for-pull-requests.sh --mode detail`
 2. Filtering to only PRs that have at least one failed job
-3. Analyzing each failed job individually using the `/analyze-ci-for-prow-job` command
+3. Analyzing each failed job individually using the `/analyze-ci:prow-job` command
 4. Aggregating results into a summary report saved to `${WORKDIR}`
 
 ## Arguments
@@ -72,13 +72,13 @@ bash .claude/scripts/microshift-prow-jobs-for-pull-requests.sh --mode detail --f
 - If no failed jobs across all PRs, report "All PR jobs are passing" and exit successfully
 - If `microshift-prow-jobs-for-pull-requests.sh` fails, report error and exit
 
-### Step 2: Analyze Each Failed Job Using /analyze-ci-for-prow-job
+### Step 2: Analyze Each Failed Job Using /analyze-ci:prow-job
 
 **Goal**: Get detailed root cause analysis for each failed job.
 
 **IMPORTANT - Mandatory Per-Job Agent Requirements**:
 Each job MUST be analyzed by launching a **separate Agent** (using the `Agent` tool, NOT the `Skill` tool) for each job URL. Do NOT analyze jobs inline or combine multiple jobs into a single agent. Each agent MUST:
-1. Run `/analyze-ci-for-prow-job <job-url>` (not by reimplementing the analysis)
+1. Run `/analyze-ci:prow-job <job-url>` (not by reimplementing the analysis)
 2. After the analysis completes, write the analysis report to an **exact file path** (see File Storage below)
 3. The file MUST contain the full report including the `--- STRUCTURED SUMMARY ---` block
 
@@ -87,7 +87,7 @@ Each job MUST be analyzed by launching a **separate Agent** (using the `Agent` t
 2. For each failed job URL, launch a separate **Agent** with this exact prompt template:
    ```
    Agent: subagent_type=general_purpose, prompt="Analyze this Prow job and save the report:
-   1. Run /analyze-ci-for-prow-job <JOB_URL>
+   1. Run /analyze-ci:prow-job <JOB_URL>
    2. After the analysis completes, save the FULL report output (including the --- STRUCTURED SUMMARY --- block) to:
       ${WORKDIR}/analyze-ci-prs-job-<N>-pr<PR>-<JOB_NAME_SUFFIX>.txt
       Use the Write tool to save the file. The file must contain the complete analysis report."
@@ -180,7 +180,7 @@ PR #6313: USHIFT-6636: Change test-agent impl to align with greenboot-rs
   Failed Jobs:
   1. pull-ci-openshift-microshift-main-e2e-aws-tests [2026-03-15]
      Status: FAILURE
-     Root Cause: [summarized from analyze-ci-for-prow-job]
+     Root Cause: [summarized from analyze-ci:prow-job]
      URL: https://prow.ci.openshift.org/view/gs/...
 
   2. pull-ci-openshift-microshift-main-e2e-aws-tests-arm [2026-03-15]
@@ -214,7 +214,7 @@ Individual job reports: ${WORKDIR}/analyze-ci-prs-job-*.txt
 ### Example 1: Analyze All Failed PR Jobs
 
 ```
-/analyze-ci-for-pull-requests
+/analyze-ci:pull-requests
 ```
 
 **Behavior**:
@@ -226,7 +226,7 @@ Individual job reports: ${WORKDIR}/analyze-ci-prs-job-*.txt
 ### Example 2: Analyze Only Rebase PRs
 
 ```
-/analyze-ci-for-pull-requests --rebase
+/analyze-ci:pull-requests --rebase
 ```
 
 **Behavior**:
@@ -243,9 +243,9 @@ Individual job reports: ${WORKDIR}/analyze-ci-prs-job-*.txt
 ## Prerequisites
 
 - `.claude/scripts/microshift-prow-jobs-for-pull-requests.sh` script must exist and be executable
-- `/analyze-ci-for-prow-job` command must be available
+- `/analyze-ci:prow-job` command must be available
 - `gh` CLI must be authenticated with access to openshift/microshift
-- `gcloud` CLI must be installed and authenticated for GCS access (used by analyze-ci-for-prow-job)
+- `gcloud` CLI must be installed and authenticated for GCS access (used by analyze-ci:prow-job)
 - Internet access to fetch job data from GCS
 - Bash shell
 
@@ -270,10 +270,10 @@ Please ensure you're in the microshift project directory.
 
 ## Related Skills
 
-- **analyze-ci-for-prow-job**: Detailed analysis of a single job (used internally)
-- **analyze-ci-for-release**: Similar analysis for periodic release jobs
-- **analyze-ci-for-release-manager**: Multi-release analysis with HTML output
-- **analyze-ci-test-scenario**: Analyze specific test scenario results
+- **analyze-ci:prow-job**: Detailed analysis of a single job (used internally)
+- **analyze-ci:release**: Similar analysis for periodic release jobs
+- **analyze-ci:doctor**: Multi-release analysis with HTML output
+- **analyze-ci:test-scenario**: Analyze specific test scenario results
 
 ## Notes
 

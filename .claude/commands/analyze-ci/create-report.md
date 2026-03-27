@@ -5,15 +5,15 @@ description: Generate an HTML report from analyze-ci analysis files in the WORKD
 allowed-tools: Bash, Read, Write, Glob, Grep
 ---
 
-# analyze-ci-generate-html-report
+# analyze-ci:create-report
 
 ## Synopsis
 ```bash
-/analyze-ci-generate-html-report <release1,release2,...>
+/analyze-ci:create-report <release1,release2,...>
 ```
 
 ## Description
-Reads analysis output files from `${WORKDIR}/` (produced by `analyze-ci-for-release` and `analyze-ci-for-pull-requests`) and generates a single consolidated HTML report with tabbed navigation. This command does NOT run any CI analysis — it only reads existing files and generates HTML.
+Reads analysis output files from `${WORKDIR}/` (produced by `analyze-ci:release` and `analyze-ci:pull-requests`) and generates a single consolidated HTML report with tabbed navigation. This command does NOT run any CI analysis — it only reads existing files and generates HTML.
 
 ## Arguments
 - `$ARGUMENTS` (required): Comma-separated list of release versions that were analyzed (e.g., `4.19,4.20,4.21,4.22`)
@@ -47,7 +47,7 @@ WORKDIR=/tmp/analyze-ci-claude-workdir.$(date +%y%m%d)
    ```
 
 **Error Handling**:
-- If `$ARGUMENTS` is empty, display: "Usage: /analyze-ci-generate-html-report <release1,release2,...>" and stop
+- If `$ARGUMENTS` is empty, display: "Usage: /analyze-ci:create-report <release1,release2,...>" and stop
 - If no files found at all, display error and stop
 
 ### Step 2: Read Summary Files
@@ -62,12 +62,12 @@ WORKDIR=/tmp/analyze-ci-claude-workdir.$(date +%y%m%d)
 
 ### Step 3: Generate HTML Report
 
-**Goal**: Create a single HTML file at `${WORKDIR}/microshift-ci-release-manager-<timestamp>.html` that consolidates all analyses with tabbed navigation.
+**Goal**: Create a single HTML file at `${WORKDIR}/microshift-ci-doctor-report.html` that consolidates all analyses with tabbed navigation.
 
 **Actions**:
 1. Determine `<timestamp>` as `YYYYMMDD-HHMMSS`
 2. Generate the HTML report with the structure described below
-3. **IMPORTANT**: Save using `cat <<'HTMLEOF' > ${WORKDIR}/microshift-ci-release-manager-<timestamp>.html` (heredoc via Bash tool), NOT the `Write` tool. This avoids permission prompts for the `/tmp` path.
+3. **IMPORTANT**: Save using `cat <<'HTMLEOF' > ${WORKDIR}/microshift-ci-doctor-report.html` (heredoc via Bash tool), NOT the `Write` tool. This avoids permission prompts for the `/tmp` path.
 
 **HTML Structure**:
 
@@ -78,7 +78,7 @@ The HTML file must be a self-contained, single-file document with embedded CSS a
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>MicroShift CI Release Manager Report - YYYY-MM-DD</title>
+    <title>MicroShift CI Doctor Report - YYYY-MM-DD</title>
     <style>
         /* Clean, professional styling */
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 20px; background: #f5f5f5; color: #333; }
@@ -135,7 +135,7 @@ The HTML file must be a self-contained, single-file document with embedded CSS a
 </head>
 <body>
 <div class="container">
-    <h1>MicroShift CI Release Manager Report</h1>
+    <h1>MicroShift CI Doctor Report</h1>
     <p class="timestamp">Generated: YYYY-MM-DD HH:MM:SS UTC</p>
 
     <!-- Overview cards: one per release + one for rebase PRs -->
@@ -196,7 +196,7 @@ The HTML file must be a self-contained, single-file document with embedded CSS a
     <!-- Pull Requests tab content -->
     <div id="tab-pull-requests" class="tab-content">
 
-        <!-- Per-PR sections from analyze-ci-for-pull-requests --rebase -->
+        <!-- Per-PR sections from analyze-ci:pull-requests --rebase -->
         <div class="release-section" id="pr-NNN">
             <div class="release-header">
                 <h2>PR #NNN: title</h2>
@@ -278,32 +278,32 @@ Summary:
   Pull Requests:
     2 rebase PRs with 5 total failed jobs
 
-HTML report generated: ${WORKDIR}/microshift-ci-release-manager-20260315-143022.html
+HTML report generated: ${WORKDIR}/microshift-ci-doctor-report.html
 ```
 
 ## Examples
 
 ### Example 1: Generate report after multi-release analysis
 ```bash
-/analyze-ci-generate-html-report 4.19,4.20,4.21,4.22
+/analyze-ci:create-report 4.19,4.20,4.21,4.22
 ```
 
 ### Example 2: Regenerate report for a subset
 ```bash
-/analyze-ci-generate-html-report 4.21,4.22
+/analyze-ci:create-report 4.21,4.22
 ```
 
 ## Prerequisites
 
-- Analysis files must already exist in `${WORKDIR}/` (produced by `analyze-ci-for-release` and/or `analyze-ci-for-pull-requests`)
+- Analysis files must already exist in `${WORKDIR}/` (produced by `analyze-ci:release` and/or `analyze-ci:pull-requests`)
 - Bash shell
 
 ## Related Skills
 
-- **analyze-ci-for-release-manager**: Orchestrator that runs analyses and then invokes this command
-- **analyze-ci-for-release**: Per-release periodic job analysis (produces the input files)
-- **analyze-ci-for-pull-requests**: PR job analysis (produces the input files)
-- **analyze-ci-create-bugs**: Creates JIRA bugs from analysis output
+- **analyze-ci:doctor**: Orchestrator that runs analyses and then invokes this command
+- **analyze-ci:release**: Per-release periodic job analysis (produces the input files)
+- **analyze-ci:pull-requests**: PR job analysis (produces the input files)
+- **analyze-ci:create-bugs**: Creates JIRA bugs from analysis output
 
 ## Notes
 - This command is read-only — it only reads existing analysis files and generates HTML

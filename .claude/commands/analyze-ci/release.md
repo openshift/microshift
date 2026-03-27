@@ -1,22 +1,22 @@
 ---
 name: Analyze CI for a Release
 argument-hint: <release-version>
-description: Analyze CI for a MicroShift release using analyze-ci-for-prow-job command and produce a summary
+description: Analyze CI for a MicroShift release using analyze-ci:prow-job command and produce a summary
 allowed-tools: Skill, Bash, Read, Write, Glob, Grep, Agent
 ---
 
-# analyze-ci-for-release
+# analyze-ci:release
 
 ## Synopsis
 ```bash
-/analyze-ci-for-release <release-version>
+/analyze-ci:release <release-version>
 ```
 
 ## Description
 Analyzes all failed periodic jobs for a specific MicroShift release by leveraging existing tools and agents. This command orchestrates the analysis workflow by:
 
 1. Fetching list of failed periodic jobs using `.claude/scripts/microshift-prow-jobs-for-release.sh`
-2. Analyzing each job individually using the `/analyze-ci-for-prow-job` command
+2. Analyzing each job individually using the `/analyze-ci:prow-job` command
 3. Aggregating results and presenting a concise summary with common failure patterns
 
 This approach reuses existing analysis capabilities rather than duplicating logic.
@@ -58,13 +58,13 @@ Found 17 failed periodic jobs for release 4.22
 - If no periodic jobs found, report "No failed periodic jobs found for release X.XX" and exit successfully
 - If microshift-prow-jobs-for-release.sh fails, report error and exit
 
-### Step 2: Analyze Each Job Using /analyze-ci-for-prow-job
+### Step 2: Analyze Each Job Using /analyze-ci:prow-job
 
 **Goal**: Get detailed root cause analysis for each failed job.
 
 **IMPORTANT - Mandatory Per-Job Agent Requirements**:
 Each job MUST be analyzed by launching a **separate Agent** (using the `Agent` tool, NOT the `Skill` tool) for each job URL. Do NOT analyze jobs inline or combine multiple jobs into a single agent. Each agent MUST:
-1. Run `/analyze-ci-for-prow-job <job-url>` (not by reimplementing the analysis)
+1. Run `/analyze-ci:prow-job <job-url>` (not by reimplementing the analysis)
 2. After the analysis completes, write the analysis report to an **exact file path** (see File Storage below)
 3. The file MUST contain the full report including the `--- STRUCTURED SUMMARY ---` block
 
@@ -73,7 +73,7 @@ Each job MUST be analyzed by launching a **separate Agent** (using the `Agent` t
 2. For each job URL, launch a separate **Agent** with this exact prompt template:
    ```
    Agent: subagent_type=general_purpose, prompt="Analyze this Prow job and save the report:
-   1. Run /analyze-ci-for-prow-job <JOB_URL>
+   1. Run /analyze-ci:prow-job <JOB_URL>
    2. After the analysis completes, save the FULL report output (including the --- STRUCTURED SUMMARY --- block) to:
       ${WORKDIR}/analyze-ci-release-<RELEASE>-job-<N>-<JOB_ID>.txt
       Use the Write tool to save the file. The file must contain the complete analysis report."
@@ -174,7 +174,7 @@ TOP ISSUES (by frequency)
      https://prow.ci.openshift.org/view/gs/test-platform-results/logs/.../1234567891
    * ... (6 more)
 
-   Root Cause: [summarized from analyze-ci-for-prow-job results]
+   Root Cause: [summarized from analyze-ci:prow-job results]
    Next Steps: [recommended actions]
 
 2. Bootc Image Test Failures (4 jobs)
@@ -210,18 +210,18 @@ Individual job reports available in:
 ### Example 1: Analyze All Failed Jobs
 
 ```bash
-/analyze-ci-for-release 4.22
+/analyze-ci:release 4.22
 ```
 
 **Behavior**:
 - Fetches all failed periodic jobs for 4.22
-- Analyzes each job using /analyze-ci-for-prow-job command
+- Analyzes each job using /analyze-ci:prow-job command
 - Presents aggregated summary
 
 ### Example 2: Different Release
 
 ```bash
-/analyze-ci-for-release 4.21
+/analyze-ci:release 4.21
 ```
 
 **Behavior**:
@@ -230,7 +230,7 @@ Individual job reports available in:
 
 ## Performance Considerations
 
-- **Execution Time**: Significantly reduced through parallel execution - typically 2-3 minutes for 15-20 jobs (depends on analyze-ci-for-prow-job execution time)
+- **Execution Time**: Significantly reduced through parallel execution - typically 2-3 minutes for 15-20 jobs (depends on analyze-ci:prow-job execution time)
 - **Network Usage**: Moderate to high - all jobs analyzed in parallel fetch logs from GCS simultaneously
 - **Parallelization**: All jobs are analyzed in parallel for maximum efficiency
 - **File Storage**: All intermediate and report files are stored in `${WORKDIR}` directory
@@ -238,8 +238,8 @@ Individual job reports available in:
 ## Prerequisites
 
 - `.claude/scripts/microshift-prow-jobs-for-release.sh` script must exist and be executable
-- `/analyze-ci-for-prow-job` command must be available
-- `gcloud` CLI must be installed and authenticated for GCS access (used by analyze-ci-for-prow-job)
+- `/analyze-ci:prow-job` command must be available
+- `gcloud` CLI must be installed and authenticated for GCS access (used by analyze-ci:prow-job)
 - Internet access to fetch job data from Prow/GCS
 - Bash shell
 
@@ -254,8 +254,8 @@ All periodic jobs are passing.
 ### Invalid Release Version
 ```text
 Error: Invalid release version
-Usage: /analyze-ci-for-release <release-version>
-Example: /analyze-ci-for-release 4.22
+Usage: /analyze-ci:release <release-version>
+Example: /analyze-ci:release 4.22
 ```
 
 ### microshift-prow-jobs-for-release.sh Not Found
@@ -266,17 +266,17 @@ Please ensure you're in the microshift project directory.
 
 ## Related Skills
 
-- **analyze-ci-for-prow-job**: Detailed analysis of a single job (used internally)
-- **analyze-ci-create-bugs**: Creates JIRA bugs from this command's output
-- **analyze-ci-for-release-manager**: Multi-release orchestrator that delegates to this command
-- **analyze-ci-test-scenario**: Analyze specific test scenario results
+- **analyze-ci:prow-job**: Detailed analysis of a single job (used internally)
+- **analyze-ci:create-bugs**: Creates JIRA bugs from this command's output
+- **analyze-ci:doctor**: Multi-release orchestrator that delegates to this command
+- **analyze-ci:test-scenario**: Analyze specific test scenario results
 - **analyze-sos-report**: Investigate runtime issues from SOS reports
 
 ## Use Cases
 
 ### Pre-Release Verification
 ```bash
-/analyze-ci-for-release 4.22
+/analyze-ci:release 4.22
 ```
 Complete analysis before cutting a release
 
