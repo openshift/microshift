@@ -224,7 +224,7 @@ If results are found, fetch their details with `mcp__jira__jira_get_issue` and f
      To create these bugs, run:
        /analyze-ci:create-bugs <source> --create
      ```
-   - Do NOT prompt for any actions. Do NOT create any issues. Stop here.
+   - Do NOT prompt for any actions. Do NOT create any issues. Do NOT proceed to Steps 7/7a (create/reopen). Continue to Step 7b and Step 8.
 
 3. **In create mode** (`--create` specified):
    - For each candidate, prompt the user:
@@ -387,6 +387,38 @@ For each candidate where user chose "reopen":
 - If the transition fails, report error and ask user if they want to retry, create a new bug instead, or skip
 - Do NOT retry automatically
 
+### Step 7b: Write Machine-Readable Bug Mapping File
+
+**Actions**:
+After processing all bug candidates (Steps 5-7a) and regardless of mode (dry-run or create), write a machine-readable bug mapping file that `analyze-ci:create-report` can consume to display JIRA bug links in the HTML report. The file content is based on the Jira search results from Step 5 — it is not affected by whether bugs were created or reopened in Steps 7/7a.
+
+1. Save to `${WORKDIR}/analyze-ci-bugs-<source>.txt` (overwrite if exists)
+2. Use this structured format with one block per bug candidate:
+
+```text
+--- BUG MAPPING ---
+SOURCE: <source>
+DATE: YYYY-MM-DD
+--- BUG CANDIDATE ---
+ERROR_SIGNATURE: <error_signature>
+SEVERITY: <N>
+STEP_NAME: <step_name>
+AFFECTED_JOBS: <count>
+JIRA_DUPLICATES: <comma-separated list of JIRA keys, or "None">
+JIRA_DUPLICATE_DETAILS: <KEY>|<summary>|<status>, <KEY>|<summary>|<status>, ...
+JIRA_REGRESSIONS: <comma-separated list of JIRA keys, or "None">
+JIRA_REGRESSION_DETAILS: <KEY>|<summary>|<status>, <KEY>|<summary>|<status>, ...
+--- END BUG CANDIDATE ---
+--- BUG CANDIDATE ---
+...
+--- END BUG CANDIDATE ---
+--- END BUG MAPPING ---
+```
+
+3. **IMPORTANT**: This file must be written in BOTH dry-run and create modes. The file enables `analyze-ci:create-report` to show linked bugs per issue in the HTML report.
+4. The `JIRA_DUPLICATE_DETAILS` and `JIRA_REGRESSION_DETAILS` lines provide summary and status for each JIRA key, pipe-separated within each entry and comma-separated between entries. If no duplicates/regressions, use "None".
+5. Save using a Bash heredoc to avoid Write tool permission issues with `/tmp` paths.
+
 ### Step 8: Generate Results Report
 
 **Actions**:
@@ -531,6 +563,7 @@ Run the analysis first:
 - All created bugs are labeled with `microshift-ci-ai-generated` for tracking
 - Security level is set to "Red Hat Employee" on all created issues
 - The STRUCTURED SUMMARY block in job files is required — this is a contract with `/analyze-ci:prow-job`
+- In addition to the text report, a machine-readable bug mapping file (`analyze-ci-bugs-<source>.txt`) is written in both dry-run and create modes — this file is consumed by `analyze-ci:create-report` to show JIRA bug links in the HTML report
 
 ## Related Skills
 
