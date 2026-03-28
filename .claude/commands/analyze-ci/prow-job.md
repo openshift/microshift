@@ -16,7 +16,9 @@ allowed-tools: Skill, Bash, Read, Write, Glob, Grep, Agent
 Analyzes a single Prow CI test job by downloading artifacts, scanning for errors, and producing a structured failure report.
 
 ## Arguments
-- `<prow-job-url>` (required): Full Prow job URL (e.g., `https://prow.ci.openshift.org/view/gs/test-platform-results/logs/periodic-ci-openshift-microshift-release-4.21-periodics-e2e-aws-ovn-ocp-conformance-serial/1984108354347208704`)
+- `<prow-job-url>` (required): Full job URL in either format:
+  - Prow URL: `https://prow.ci.openshift.org/view/gs/test-platform-results/logs/periodic-ci-openshift-microshift-release-4.21-periodics-e2e-aws-ovn-ocp-conformance-serial/1984108354347208704`
+  - GCS web URL: `https://gcsweb-ci.apps.ci.l2s4.p1.openshiftapps.com/gcs/test-platform-results/logs/periodic-ci-openshift-microshift-release-4.21-periodics-e2e-aws-ovn-ocp-conformance-serial/1984108354347208704`
 
 ## Goal
 Reduce noise for developers by processing large logs from a CI test pipeline and correctly classifying fatal errors with a false-positive rate of 0.01% and false-negative rate of 0.5%.
@@ -41,16 +43,20 @@ The Job Name and Job ID are encoded in the URL. There are two URL formats depend
 **Periodic/postsubmit jobs:**
 ```
 https://prow.ci.openshift.org/view/gs/test-platform-results/logs/{JOB_NAME}/{JOB_ID}
+https://gcsweb-ci.apps.ci.l2s4.p1.openshiftapps.com/gcs/test-platform-results/logs/{JOB_NAME}/{JOB_ID}
 ```
 GCS path: `gs://test-platform-results/logs/{JOB_NAME}/{JOB_ID}/`
 
 **Presubmit (PR) jobs:**
 ```
 https://prow.ci.openshift.org/view/gs/test-platform-results/pr-logs/pull/openshift_microshift/{PR_NUMBER}/{JOB_NAME}/{JOB_ID}
+https://gcsweb-ci.apps.ci.l2s4.p1.openshiftapps.com/gcs/test-platform-results/pr-logs/pull/openshift_microshift/{PR_NUMBER}/{JOB_NAME}/{JOB_ID}
 ```
 GCS path: `gs://test-platform-results/pr-logs/pull/openshift_microshift/{PR_NUMBER}/{JOB_NAME}/{JOB_ID}/`
 
-To determine the GCS path from any Prow URL, strip the `https://prow.ci.openshift.org/view/gs/` prefix — the remainder is the GCS bucket path (`gs://` + remainder).
+To determine the GCS path from any job URL, strip the web prefix and replace with `gs://`:
+- Prow URL: strip `https://prow.ci.openshift.org/view/gs/`
+- GCS web URL: strip `https://gcsweb-ci.apps.ci.l2s4.p1.openshiftapps.com/gcs/`
 
 ## Important Files
 > IMPORTANT! All files in this list will be downloaded after running the `gcloud storage cp -r` command in step 1 of the Workflow.
@@ -102,7 +108,7 @@ grep '${SOME_TEXT}' ${GREP_OPTS} ${TMP}/build-log.txt
 
 Download all prow job artifacts (derive GCS path by stripping the web prefix from the job URL):
 ```bash
-GCS_PATH=$(echo "${PROW_URL}" | sed 's|https://prow.ci.openshift.org/view/gs/|gs://|')
+GCS_PATH=$(echo "${PROW_URL}" | sed -e 's|https://prow.ci.openshift.org/view/gs/|gs://|' -e 's|https://gcsweb-ci.apps.ci.l2s4.p1.openshiftapps.com/gcs/|gs://|')
 gcloud storage cp -r "${GCS_PATH}/" ${TMP}/
 ```
 
@@ -112,12 +118,12 @@ The user argument is: $ARGUMENTS
 
 0. Create and use a temporary working directory. Use the mktemp -d command to create this directory.
 
-1. **Download all artifacts**: Download all prow job artifacts using `gcloud storage cp -r` into the temporary working directory. Derive the GCS path by stripping the web prefix from the Prow URL:
+1. **Download all artifacts**: Download all prow job artifacts using `gcloud storage cp -r` into the temporary working directory. Derive the GCS path by stripping the web prefix from the job URL (handles both Prow and GCS web URL formats):
    ```bash
-   GCS_PATH=$(echo "${PROW_URL}" | sed 's|https://prow.ci.openshift.org/view/gs/|gs://|')
+   GCS_PATH=$(echo "${PROW_URL}" | sed -e 's|https://prow.ci.openshift.org/view/gs/|gs://|' -e 's|https://gcsweb-ci.apps.ci.l2s4.p1.openshiftapps.com/gcs/|gs://|')
    gcloud storage cp -r "${GCS_PATH}/" ${TMP}/
    ```
-   This works for both periodic (`logs/...`) and presubmit PR (`pr-logs/pull/...`) job URLs.
+   This works for both periodic (`logs/...`) and presubmit PR (`pr-logs/pull/...`) job URLs, and for both Prow and GCS web URL formats.
    This makes all build logs, step logs, and SOS reports available locally for analysis.
 
 2. **Scan for errors**: Start by scanning the top level `build-log.txt` file for errors and determine the step where the error occurred. Record each error with the filepath and line number for later reference.
