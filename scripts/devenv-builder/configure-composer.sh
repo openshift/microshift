@@ -148,6 +148,11 @@ check_umask_and_permissions
 enable_rt_repositories          "${VERSION_ID}" "/etc/osbuild-composer/repositories/rhel-${VERSION_ID}.json"
 enable_beta_or_eus_repositories "${VERSION_ID}" "/etc/osbuild-composer/repositories/rhel-${VERSION_ID}.json"
 
+# Configure repositories for the previous EUS OS
+PEUS_VERSION_ID=9.4
+sudo cp "/usr/share/osbuild-composer/repositories/rhel-${PEUS_VERSION_ID}.json" "/etc/osbuild-composer/repositories/rhel-${PEUS_VERSION_ID}.json"
+enable_beta_or_eus_repositories "${PEUS_VERSION_ID}" "/etc/osbuild-composer/repositories/rhel-${PEUS_VERSION_ID}.json"
+
 # This step must come in the end to make sure all the potential configuration
 # changes are picked up by the service
 enable_or_restart_composer_services
