@@ -196,14 +196,8 @@ The HTML file must be a self-contained, single-file document with embedded CSS a
             <div class="collapsible-content">
                 <div class="root-cause"><strong>Root Cause:</strong> Root cause description from summary</div>
                 <!-- Bug links from bug mapping file (if available) -->
-                <!-- Match issue title/error signature against ERROR_SIGNATURE values using token-overlap matching: -->
-                <!--   1. Normalize both strings: lowercase, strip punctuation, remove stopwords (a, an, the, is, in, of, to, for, and, or, with, that, this, from, on, at, by) -->
-                <!--   2. Simple stemming: strip common suffixes (-ing, -ed, -s, -tion, -ment, -ness, -ly, -er, -est) -->
-                <!--   3. Extract distinctive tokens (tool names, error codes, test IDs, paths, numeric identifiers) -->
-                <!--   4. Compute token overlap: intersection of token sets; coverage = overlap_count / min(set_a_size, set_b_size) -->
-                <!--   5. Match if: (a) exact substring match of either full string within the other (highest confidence=1.0), OR (b) ≥3 distinctive tokens overlap, OR (c) token coverage ≥60% -->
-                <!--   6. Confidence score = overlap_count / min(set_a_size, set_b_size); ties broken by highest confidence, then longest ERROR_SIGNATURE -->
-                <!--   7. Each issue matches at most one bug candidate (the highest-confidence match) -->
+                <!-- Match by comparing the issue title/error signature against ERROR_SIGNATURE values in the bug mapping -->
+                <!-- Use fuzzy matching: if significant keywords from the issue title appear in a bug candidate's ERROR_SIGNATURE, consider it a match -->
                 <div class="bug-links">
                     <span class="bug-links-label">JIRA Bugs:</span>
                     <!-- For each matching JIRA duplicate (open bugs): -->
@@ -242,7 +236,7 @@ The HTML file must be a self-contained, single-file document with embedded CSS a
                 <p><strong>Job:</strong> <span class="job-date">[YYYY-MM-DD]</span> <a href="JOB_URL">job-name</a></p>
                 <div class="root-cause"><strong>Root Cause:</strong> Root cause from PR summary</div>
                 <!-- Bug links from bug mapping file (if available for this rebase PR) -->
-                <!-- Match job root cause/error description against ERROR_SIGNATURE values using the same token-overlap algorithm described in the Periodics section above -->
+                <!-- Match by comparing the job's root cause/error description against ERROR_SIGNATURE values in the bug mapping -->
                 <div class="bug-links">
                     <span class="bug-links-label">JIRA Bugs:</span>
                     <a class="bug-tag bug-tag-open" href="https://issues.redhat.com/browse/USHIFT-XXXXX" title="Bug summary text [Status]">USHIFT-XXXXX</a>
@@ -296,15 +290,7 @@ document.querySelectorAll('.collapsible').forEach(function(el) {
 - Do NOT re-analyze or reinterpret the data — use summary file content as-is
 - Convert the plain text summary reports into HTML-formatted content, preserving all information
 - Ensure all Prow job URLs from the summaries remain clickable links in the HTML
-- **Bug Correlation**: For each issue in the TOP ISSUES section (Periodics tab) and each failed job entry (Pull Requests tab), attempt to match it against the bug candidates from the corresponding bug mapping file (`analyze-ci-bugs-<release>.txt` for releases, `analyze-ci-bugs-rebase-release-<version>.txt` for rebase PRs). Match by comparing the issue title/description or job root cause against the `ERROR_SIGNATURE` in each `--- BUG CANDIDATE ---` block using this token-overlap algorithm:
-    1. **Normalize** both strings: lowercase, strip punctuation, remove stopwords (`a, an, the, is, in, of, to, for, and, or, with, that, this, from, on, at, by`)
-    2. **Simple stemming**: strip common suffixes (`-ing, -ed, -s, -tion, -ment, -ness, -ly, -er, -est`)
-    3. **Extract distinctive tokens**: tool names, error codes, test IDs, paths, numeric identifiers
-    4. **Compute token overlap**: intersection of token sets; coverage = `overlap_count / min(set_a_size, set_b_size)`
-    5. **Match criteria**: (a) exact substring match of either full string within the other (highest confidence=1.0), OR (b) ≥3 distinctive tokens overlap, OR (c) token coverage ≥60%
-    6. **Confidence score** = `overlap_count / min(set_a_size, set_b_size)`; ties broken by highest confidence, then longest `ERROR_SIGNATURE`
-    7. Each issue matches at most one bug candidate (the highest-confidence match)
-  When a match is found:
+- **Bug Correlation**: For each issue in the TOP ISSUES section (Periodics tab) and each failed job entry (Pull Requests tab), attempt to match it against the bug candidates from the corresponding bug mapping file (`analyze-ci-bugs-<release>.txt` for releases, `analyze-ci-bugs-rebase-release-<version>.txt` for rebase PRs). Match by comparing the issue title/description or job root cause against the `ERROR_SIGNATURE` in each `--- BUG CANDIDATE ---` block — use fuzzy keyword matching (shared distinctive terms like tool names, test IDs, error codes). When a match is found:
   - Show `JIRA_DUPLICATES` as clickable links with `bug-tag-open` styling (linking to `https://issues.redhat.com/browse/<KEY>`) with the summary from `JIRA_DUPLICATE_DETAILS` as the title attribute
   - Show `JIRA_REGRESSIONS` as clickable links with `bug-tag-regression` styling (with ⟲ suffix) with the summary from `JIRA_REGRESSION_DETAILS` as the title attribute
   - If no bug mapping file exists for a release, or no candidates match an issue, show `<span class="no-bugs">No tracked bugs</span>`
