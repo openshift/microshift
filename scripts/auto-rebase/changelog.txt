@@ -1,7 +1,82 @@
-- ovn-kubernetes image-arm64 051683259bf47d709be19a78c5f218223da54dee to cca0923d6f0ea9d09e77a8085d83a32e35055af0
+- api embedded-component 86893981287e242c0f90d53499b93cd3e46e5b81 to 1e7cd4b531e7ce17efdb1d541013e0c55362bfa5
+  - 6e17e9e0 2026-03-27T10:42:55+01:00 CNTRLPLANE-2777: add TypeMeta to GenericControllerConfig
+  - 99aafa57 2026-03-26T19:43:23-04:00 tools: codegen: increase sippy request timeout for feature promotion verification
+  - 429b5077 2026-03-26T09:52:14-03:00 Allow JobTier=candidate in featuregate-test-analyzer with warning
+  - 933cadf6 2026-03-26T02:34:14-07:00 CORS-4337: allow AWS Europe Sovereign Cloud partition
+  - 43a92bfd 2026-03-25T15:36:05+01:00 add API-side validation to enforce prefixPolicy is not set to Prefix when username expression is used
+  - f3693b4c 2026-03-25T10:38:34+01:00 MON-4036: Add TelemeterClientConfig to ClusterMonitoring API
+  - 458cdaf9 2026-03-24T14:06:39-04:00 added InternalReleaseImageDegraded state type for MachineConfigNodeStatus Conditions field
+  - 6a8c07c9 2026-03-12T09:57:11-04:00 operator/ingress: Add configurationManagement
+  - 3757b1d4 2026-02-27T07:34:42-05:00 vsphere vm-host zonal ga
+
+- cluster-ingress-operator embedded-component ccf658f9eb520933b5e50d5903715f71053c9adb to dde7a93953d8b82faf492b759cc48763645b7039
+  - fc6e70e 2026-03-25T22:54:57-04:00 gatewayclass: Enable Horizontal Pod Autoscaling
+  - 34fd6fa 2026-03-25T06:56:57-07:00 test: update unit tests for AWS client provider
+  - f46a00c 2026-03-25T06:56:57-07:00 dns: configure Route53 and tagging clients for AWS European Sovereign Cloud
+  - e1e5a26 2026-03-25T06:56:57-07:00 endpoint: support custom endpoint for ELB v2
+  - 9b58a24 2026-03-24T16:09:29+01:00 OCPBUGS-62237: Apply APIServer TLS security profile to canary daemonset
+  - 82dc195 2026-03-20T14:29:16+01:00 NE-2421: Support dual-stack IngressController on AWS
+
+- cluster-kube-apiserver-operator embedded-component 5092ca2c6c33001dfe65c879dd9c0abee2f8a2b4 to ece488fe8612a58b95add127413a2c6f33210445
+  - 5fadfe6 2026-03-25T00:12:36-07:00 CORS-4363: fix bindAddress/bindNetwork for dual-stack IPv6 primary clusters
+
+- cluster-kube-controller-manager-operator embedded-component 49eb7c72d0ba0efc85dbd291e90335f0734ffa1a to 7df2876085ac1d76ac11bf476c0538876110c9f0
+  - b686ecf 2026-03-11T10:43:57Z Restart operator when TLS config changes
+
+- cluster-kube-scheduler-operator embedded-component a1e9a14ae7748e55b070dce831828800fd22639a to ddbfddb8a0c77b03c1d7c994991caa031d99c330
+  - c29316c 2026-03-11T10:48:17Z Restart operator when TLS config changes
+
+- cluster-network-operator embedded-component b8d21fa3f9e0d10add2cc933b327693ff9904641 to 5ce0f713f24815bc508207b265d4a44d9c11a2d2
+  - be6b8e7 2026-03-27T16:07:05+01:00 Add DevPreview NetworkConnect FG
+  - d8c7bbf 2026-03-25T15:36:20+01:00 Update OWNERS_ALIASES to include myself + "taanyas" and "marty-power" as reviewers, clean up formatting, and remove "ricky-rav" as he left Red Hat. Signed-off-by: Matteo Dallaglio <mdallagl@redhat.com>
+  - 297328f 2026-03-25T14:44:52+05:30 Add config override for allow-icmp-network-policy
+
+- cluster-openshift-controller-manager-operator embedded-component 8e04fd3a6d1bbdb878a83fa13fde240c593504cc to e0d28ec9e1c91b0b72ff66c98f7a3b126f4480ad
+  - 1c4f329 2026-03-11T10:45:32Z Restart operator when TLS config changes
+
+- machine-config-operator embedded-component c564b220f27b907206273edaaa0ee9f037b796ff to 540dfc0e51cd7324d8860b53a50b1b19e23e1aaf
+  - 9a0ff420 2026-03-27T11:44:46+01:00 MCO-2182: MCS fallback to latest v3
+  - c9ac3b6e 2026-03-25T15:47:11-04:00 remove legacy bootimage tests
+  - 5db7a7fa 2026-03-25T15:29:00-04:00 move longrun bootimage tests to disruptive
+  - 0e36e4a6 2026-03-25T15:53:57Z Fix coderabbitai suggestions
+  - a3564a1e 2026-03-25T10:31:12-04:00 AGENT-1366: Report InternalReleaseImageController errors in IRI status
+  - 9f288d56 2026-03-24T15:52:38-04:00 test: update cluster skip helpers to use oc
+  - 915d537a 2026-03-24T18:39:58+05:30 add fixes in MCN and update the rhel-version regexp
+  - e75526f7 2026-03-24T10:57:06Z MCO-2167: Migrate alert test cases from the private repository
+  - fdf1f44b 2026-03-03T02:30:46-06:00 Add etcd size limit validation for rendered MachineConfigs
+
+- operator-framework-olm embedded-component 528f8249cda0c7987492b25c500499ad3c1e3202 to 3a864ce8343abf8877d7e20b0f5cff08d9e156f9
+  - dd3ff27b 2026-02-27T14:41:30-06:00 Migrate away from deprecated ioutil
+
+- service-ca-operator embedded-component 661be3215fe08bc35f4c9eab23a8f75c5f204203 to dda95b7cb4e6810b5f604599d99c64af6c2d56cf
+  - b4cf86c 2026-02-05T17:17:44-05:00 NO-JIRA: OWNERS: remove vrutkovs and add sanchezl
+
+- oc image-amd64 8d7f53ef218fd86c83c3cca2252623ac39fb7d44 to c268e49f1f3b68b830472e2244f0aeef2cca9d2c
+  - b9c6614b 2026-03-26T16:27:03-04:00 Address comments from review
+  - 7e63b076 2026-03-23T12:26:05-04:00 Use the informing label to not block the release
+  - e668cbd7 2026-03-18T15:48:15-04:00 Add e2e test for oc adm upgrade accept
+  - 9b7e87d5 2026-03-18T15:48:15-04:00 OTA-1548: set up accepted risks
+
+- router image-amd64 8b94c5cd90c435e6b3cf137dc35fcbddb4c048a3 to 235e224fe1acd6626f70bb4a21289d0f5173246a
+  - 79c1c84 2026-03-27T12:25:35-04:00 Revert "NE-2333: Add support for configurable SSL curves in HAProxy configuration"
+  - 4b539da 2026-03-25T19:41:26Z Use X25519MLKEM768:X25519:P-256 as default TLS groups
+  - 673f5f0 2026-03-25T15:57:01Z Add support for configurable SSL curves in HAProxy configuration
+
+- ovn-kubernetes image-amd64 051683259bf47d709be19a78c5f218223da54dee to cca0923d6f0ea9d09e77a8085d83a32e35055af0
   - 59a367d8 2026-03-04T18:35:45Z Updating ovn-kubernetes-microshift-container image to be consistent with ART for 4.22 Reconciling with https://github.com/openshift/ocp-build-data/tree/3598daf1fa2bf91473f6b3349b8aeb1d81dc397b/images/ovn-kubernetes-microshift.yml
   - 0e5eeedc 2026-03-04T08:21:36Z Updating ose-ovn-kubernetes-container image to be consistent with ART for 4.22 Reconciling with https://github.com/openshift/ocp-build-data/tree/56cb39ad358cdec1db7c84ea1919fe8849c2550b/images/ose-ovn-kubernetes.yml
 
-- service-ca-operator image-arm64 661be3215fe08bc35f4c9eab23a8f75c5f204203 to dda95b7cb4e6810b5f604599d99c64af6c2d56cf
+- service-ca-operator image-amd64 661be3215fe08bc35f4c9eab23a8f75c5f204203 to dda95b7cb4e6810b5f604599d99c64af6c2d56cf
   - b4cf86c 2026-02-05T17:17:44-05:00 NO-JIRA: OWNERS: remove vrutkovs and add sanchezl
+
+- oc image-arm64 8d7f53ef218fd86c83c3cca2252623ac39fb7d44 to c268e49f1f3b68b830472e2244f0aeef2cca9d2c
+  - b9c6614b 2026-03-26T16:27:03-04:00 Address comments from review
+  - 7e63b076 2026-03-23T12:26:05-04:00 Use the informing label to not block the release
+  - e668cbd7 2026-03-18T15:48:15-04:00 Add e2e test for oc adm upgrade accept
+  - 9b7e87d5 2026-03-18T15:48:15-04:00 OTA-1548: set up accepted risks
+
+- router image-arm64 8b94c5cd90c435e6b3cf137dc35fcbddb4c048a3 to 235e224fe1acd6626f70bb4a21289d0f5173246a
+  - 79c1c84 2026-03-27T12:25:35-04:00 Revert "NE-2333: Add support for configurable SSL curves in HAProxy configuration"
+  - 4b539da 2026-03-25T19:41:26Z Use X25519MLKEM768:X25519:P-256 as default TLS groups
+  - 673f5f0 2026-03-25T15:57:01Z Add support for configurable SSL curves in HAProxy configuration
 
