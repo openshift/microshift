@@ -64,7 +64,7 @@ Change System Date To
     Wait Until MicroShift Process ID Changes    ${ushift_pid}
     All Certificates Should Be Valid For Current Time
     Setup Kubeconfig
-    Wait For MicroShift
+    Wait For MicroShift Healthcheck Success
 
 Compute Date After Days
     [Documentation]    return system date after number of days elapsed
