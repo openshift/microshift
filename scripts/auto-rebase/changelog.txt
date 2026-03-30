@@ -1,6 +1,3 @@
-- machine-config-operator embedded-component 5bad8a0ae8b4473905b2865439080e05b80bdb6b to 27993cf190c12bd5f2191019206b9290e286694d
-  - 3b44a7fc 2026-03-24T21:50:00+00:00 create default-timeout-stop dropin
-
-- oc image-amd64 24755b6e82745a4dfa5a6db4b467564c237f244c to b2a93a639c07ebf4d547d10877b6c13f65583248
-  - df5a830f 2026-03-04T19:06:39+00:00 Makefile: Strip debugging symbols by default
+- machine-config-operator embedded-component 27993cf190c12bd5f2191019206b9290e286694d to 18f009eeb40748895fe8a6eba3778ad275655124
+  - c106a8a4 2026-03-27T13:51:25+00:00 chore: update AMIs
 
