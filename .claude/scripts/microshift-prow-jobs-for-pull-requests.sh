@@ -316,6 +316,8 @@ mode_restart() {
             build_id=$(curl -s --max-time 10 "${GCS_BASE}/${GCS_PR_PREFIX}/${pr_number}/${job}/latest-build.txt" 2>/dev/null) || continue
             short_name=$(curl -s --max-time 10 "${GCS_BASE}/${GCS_PR_PREFIX}/${pr_number}/${job}/${build_id}/prowjob.json" 2>/dev/null | \
                 jq -r '.spec.rerun_command // empty' 2>/dev/null | sed 's|^/test ||') || short_name=""
+            short_name=$(echo "${short_name}" | xargs)
+            [[ -z "${short_name}" ]] && continue
             comment+="/test ${short_name}"$'\n'
         done
         # Remove trailing newline
