@@ -64,6 +64,7 @@ usage() {
     echo "  --mode MODE:     Operation mode (default: summary)"
     echo "    summary: Show table of open PRs with test job status summary"
     echo "    detail:  Show table of open PRs with individual test job links"
+    echo "    approve: Approve PRs where ALL test jobs finished successfully"
     echo "  --filter STRING: Only include PRs whose title contains STRING"
     exit 1
 }
@@ -189,6 +190,57 @@ mode_detail() {
     done
 }
 
+# Approve mode - add /lgtm and /verified by ci comment to PRs with all tests passing
+mode_approve() {
+    local filter="${1:-}"
+    local pr_data
+
+    echo "Fetching open PRs..." >&2
+    pr_data=$(fetch_open_prs "${filter}")
+
+    local pr_count
+    pr_count=$(echo "${pr_data}" | jq 'length')
+
+    if [[ "${pr_count}" -eq 0 ]]; then
+        echo "No open pull requests found."
+        return
+    fi
+
+    echo "Fetching job results..." >&2
+
+    echo "${pr_data}" | jq -r '.[] | [.number, .title, .url] | @tsv' | while IFS=$'\t' read -r pr_number pr_title pr_url; do
+        local tmpdir
+        tmpdir=$(mktemp -d)
+
+        fetch_pr_results "${pr_number}" "${tmpdir}"
+
+        local total=0 success=0
+        for f in "${tmpdir}"/*; do
+            [[ -f "${f}" ]] || continue
+            local result
+            result=$(cut -f2 "${f}")
+            total=$((total + 1))
+            case "${result}" in
+                SUCCESS) success=$((success + 1)) ;;
+            esac
+        done
+        rm -rf "${tmpdir}"
+
+        if [[ "${total}" -eq 0 ]]; then
+            echo "PR #${pr_number}: No jobs found, skipping"
+            continue
+        fi
+
+        if [[ "${success}" -eq "${total}" ]]; then
+            echo "PR #${pr_number}: All ${total} jobs passed, approving..."
+            gh pr comment "${pr_number}" --repo "${GH_REPO}" --body $'/lgtm\n/verified by ci'
+            echo "PR #${pr_number}: Approved"
+        else
+            echo "PR #${pr_number}: ${success}/${total} jobs passed, skipping"
+        fi
+    done
+}
+
 # Main
 main() {
     local mode="summary"
@@ -231,6 +283,9 @@ main() {
             ;;
         detail)
             mode_detail "${filter}"
+            ;;
+        approve)
+            mode_approve "${filter}"
             ;;
         *)
             echo "Error: Unknown mode '${mode}'"
