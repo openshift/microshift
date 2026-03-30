@@ -237,6 +237,7 @@ The HTML file must be a self-contained, single-file document with embedded CSS a
                 <div class="root-cause"><strong>Root Cause:</strong> Root cause from PR summary</div>
                 <!-- Bug links from bug mapping file (if available for this rebase PR) -->
                 <!-- Match by comparing the job's root cause/error description against ERROR_SIGNATURE values in the bug mapping -->
+                <!-- Use the same fuzzy keyword matching as the Periodics tab: if significant keywords from the root cause/error description appear in a bug candidate's ERROR_SIGNATURE, consider it a match -->
                 <div class="bug-links">
                     <span class="bug-links-label">JIRA Bugs:</span>
                     <a class="bug-tag bug-tag-open" href="https://issues.redhat.com/browse/USHIFT-XXXXX" title="Bug summary text [Status]">USHIFT-XXXXX</a>
