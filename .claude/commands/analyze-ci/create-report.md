@@ -250,7 +250,14 @@ The HTML file must be a self-contained, single-file document with embedded CSS a
         <div class="release-section">
             <p>No open rebase pull requests found.</p>
         </div>
+
     </div>
+
+    <!-- Extra spacing to ensure tab content is fully visible in Prow Spyglass iframe -->
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
 </div>
 
 <script>
