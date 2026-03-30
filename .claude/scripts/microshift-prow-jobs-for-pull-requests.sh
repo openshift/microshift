@@ -64,31 +64,42 @@ usage() {
     echo "  --mode MODE:     Operation mode (default: summary)"
     echo "    summary: Show table of open PRs with test job status summary"
     echo "    detail:  Show table of open PRs with individual test job links"
+    echo "    approve: Approve PRs where ALL test jobs finished successfully"
+    echo "    restart: Restart failed test jobs by commenting /test for each failure"
     echo "  --filter STRING: Only include PRs whose title contains STRING"
     exit 1
 }
 
 # Fetch job results for a single PR (parallelized)
+# Returns non-zero if any job fetch fails, writing a .fetch_failed marker
 fetch_pr_results() {
     local pr="${1}"
     local tmpdir="${2}"
     local jobs
 
-    jobs=$(list_pr_jobs "${pr}")
+    jobs=$(list_pr_jobs "${pr}") || { touch "${tmpdir}/.fetch_failed"; return 1; }
     if [[ -z "${jobs}" ]]; then
-        return
+        return 0
     fi
 
     # Fetch latest build for each job in parallel
     while IFS= read -r job; do
         (
-            result_line=$(get_latest_build "${pr}" "${job}" 2>/dev/null) || true
+            result_line=$(get_latest_build "${pr}" "${job}" 2>/dev/null) || { touch "${tmpdir}/.fetch_failed"; exit 1; }
             if [[ -n "${result_line}" ]]; then
                 echo "${job}	${result_line}" > "${tmpdir}/${job}"
+            else
+                touch "${tmpdir}/.fetch_failed"
             fi
         ) &
     done <<< "${jobs}"
     wait
+
+    # Check if any subshell signaled a failure
+    if [[ -f "${tmpdir}/.fetch_failed" ]]; then
+        return 1
+    fi
+    return 0
 }
 
 # Summary mode - show PR with pass/fail counts
@@ -115,7 +126,11 @@ mode_summary() {
             local tmpdir
             tmpdir=$(mktemp -d)
 
-            fetch_pr_results "${pr_number}" "${tmpdir}"
+            if ! fetch_pr_results "${pr_number}" "${tmpdir}"; then
+                echo "PR #${pr_number}: incomplete job results, skipping" >&2
+                rm -rf "${tmpdir}"
+                continue
+            fi
 
             local success=0 failure=0 pending=0 total=0
             for f in "${tmpdir}"/*; do
@@ -166,7 +181,11 @@ mode_detail() {
         local tmpdir
         tmpdir=$(mktemp -d)
 
-        fetch_pr_results "${pr_number}" "${tmpdir}"
+        if ! fetch_pr_results "${pr_number}" "${tmpdir}"; then
+            echo "    PR #${pr_number}: incomplete job results, skipping"
+            rm -rf "${tmpdir}"
+            continue
+        fi
 
         local file_count
         file_count=$(find "${tmpdir}" -maxdepth 1 -type f | wc -l)
@@ -186,6 +205,127 @@ mode_detail() {
         fi
 
         rm -rf "${tmpdir}"
+    done
+}
+
+# Approve mode - add "/lgtm" and "/verified by ci" comments to PRs with all tests passing
+mode_approve() {
+    local filter="${1:-}"
+    local pr_data
+
+    echo "Fetching open PRs..." >&2
+    pr_data=$(fetch_open_prs "${filter}")
+
+    local pr_count
+    pr_count=$(echo "${pr_data}" | jq 'length')
+
+    if [[ "${pr_count}" -eq 0 ]]; then
+        echo "No open pull requests found."
+        return
+    fi
+
+    echo "Fetching job results..." >&2
+
+    echo "${pr_data}" | jq -r '.[] | [.number, .title, .url] | @tsv' | while IFS=$'\t' read -r pr_number pr_title pr_url; do
+        local tmpdir
+        tmpdir=$(mktemp -d)
+
+        if ! fetch_pr_results "${pr_number}" "${tmpdir}"; then
+            echo "PR #${pr_number}: incomplete job results, skipping"
+            rm -rf "${tmpdir}"
+            continue
+        fi
+
+        local total=0 success=0
+        for f in "${tmpdir}"/*; do
+            [[ -f "${f}" ]] || continue
+            local result
+            result=$(cut -f2 "${f}")
+            total=$((total + 1))
+            case "${result}" in
+                SUCCESS) success=$((success + 1)) ;;
+            esac
+        done
+        rm -rf "${tmpdir}"
+
+        if [[ "${total}" -eq 0 ]]; then
+            echo "PR #${pr_number}: No jobs found, skipping"
+            continue
+        fi
+
+        if [[ "${success}" -eq "${total}" ]]; then
+            echo "PR #${pr_number}: All ${total} jobs passed, approving..."
+            gh pr comment "${pr_number}" --repo "${GH_REPO}" --body $'/lgtm\n/verified by ci'
+            echo "PR #${pr_number}: Approved"
+        else
+            echo "PR #${pr_number}: ${success}/${total} jobs passed, skipping"
+        fi
+    done
+}
+
+# Restart mode - comment /test for each failed job on PRs with failures
+mode_restart() {
+    local filter="${1:-}"
+    local pr_data
+
+    echo "Fetching open PRs..." >&2
+    pr_data=$(fetch_open_prs "${filter}")
+
+    local pr_count
+    pr_count=$(echo "${pr_data}" | jq 'length')
+
+    if [[ "${pr_count}" -eq 0 ]]; then
+        echo "No open pull requests found."
+        return
+    fi
+
+    echo "Fetching job results..." >&2
+
+    echo "${pr_data}" | jq -r '.[] | [.number, .title, .url] | @tsv' | while IFS=$'\t' read -r pr_number pr_title pr_url; do
+        local tmpdir
+        tmpdir=$(mktemp -d)
+
+        if ! fetch_pr_results "${pr_number}" "${tmpdir}"; then
+            echo "PR #${pr_number}: incomplete job results, skipping"
+            rm -rf "${tmpdir}"
+            continue
+        fi
+
+        local failed_jobs=()
+        for f in "${tmpdir}"/*; do
+            [[ -f "${f}" ]] || continue
+            local job result
+            IFS=$'\t' read -r job result _ < "${f}"
+            if [[ "${result}" == "FAILURE" ]]; then
+                failed_jobs+=("${job}")
+            fi
+        done
+
+        if [[ ${#failed_jobs[@]} -eq 0 ]]; then
+            rm -rf "${tmpdir}"
+            echo "PR #${pr_number}: No failed jobs, skipping"
+            continue
+        fi
+
+        rm -rf "${tmpdir}"
+
+        # Fetch short /test names from prowjob.json for each failed job
+        local comment=""
+        for job in "${failed_jobs[@]}"; do
+            local build_id short_name
+            build_id=$(curl -s --max-time 10 "${GCS_BASE}/${GCS_PR_PREFIX}/${pr_number}/${job}/latest-build.txt" 2>/dev/null) || continue
+            short_name=$(curl -s --max-time 10 "${GCS_BASE}/${GCS_PR_PREFIX}/${pr_number}/${job}/${build_id}/prowjob.json" 2>/dev/null | \
+                jq -r '.spec.rerun_command // empty' 2>/dev/null | sed 's|^/test ||') || short_name=""
+            short_name=$(echo "${short_name}" | xargs)
+            [[ -z "${short_name}" ]] && continue
+            comment+="/test ${short_name}"$'\n'
+        done
+        # Remove trailing newline
+        comment="${comment%$'\n'}"
+
+        echo "PR #${pr_number}: Restarting ${#failed_jobs[@]} failed job(s): ${failed_jobs[*]}"
+        gh pr comment "${pr_number}" --repo "${GH_REPO}" --body "${comment}"
+        echo "PR #${pr_number}: Restart comment posted"
     done
 }
 
@@ -231,6 +371,12 @@ main() {
             ;;
         detail)
             mode_detail "${filter}"
+            ;;
+        approve)
+            mode_approve "${filter}"
+            ;;
+        restart)
+            mode_restart "${filter}"
             ;;
         *)
             echo "Error: Unknown mode '${mode}'"
