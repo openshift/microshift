@@ -13,7 +13,7 @@ allowed-tools: Bash, Read, Write, Glob, Grep
 ```
 
 ## Description
-Reads analysis output files from `${WORKDIR}/` (produced by `analyze-ci:release` and `analyze-ci:pull-requests`) and generates a single consolidated HTML report with tabbed navigation. This command does NOT run any CI analysis — it only reads existing files and generates HTML.
+Reads analysis output files from `${WORKDIR}/` (produced by `analyze-ci:release` and `analyze-ci:pull-requests`) and optionally bug mapping files (produced by `analyze-ci:create-bugs` in both dry-run and create modes) to generate a single consolidated HTML report with tabbed navigation. When bug mapping files are present, the report shows linked JIRA bugs per issue. This command does NOT run any CI analysis — it only reads existing files and generates HTML.
 
 ## Arguments
 - `$ARGUMENTS` (required): Comma-separated list of release versions that were analyzed (e.g., `4.19,4.20,4.21,4.22`)
@@ -38,12 +38,15 @@ WORKDIR=/tmp/analyze-ci-claude-workdir.$(date +%y%m%d)
    - `${WORKDIR}/analyze-ci-release-<version>-summary.*.txt`
 6. Find the PR summary file:
    - `${WORKDIR}/analyze-ci-prs-summary.*.txt`
-7. Report what was found:
+7. Find bug mapping files (produced by `analyze-ci:create-bugs` in both dry-run and create modes):
+   - `${WORKDIR}/analyze-ci-bugs-*.txt`
+   - These are optional — the report works without them, but when present, JIRA bug links are shown per issue
+8. Report what was found:
    ```text
    Files discovered:
-     Release 4.19: summary found
-     Release 4.20: summary found
-     PRs: summary found
+     Release 4.19: summary found, bug mapping found
+     Release 4.20: summary found, bug mapping found
+     PRs: summary found, bug mapping found (or "no bug mapping")
    ```
 
 **Error Handling**:
@@ -58,7 +61,13 @@ WORKDIR=/tmp/analyze-ci-claude-workdir.$(date +%y%m%d)
 3. If a summary file is missing for a release, note "Analysis failed or produced no output"
 4. If no PR summary file exists, note "No open rebase PRs or no failures found"
 
-**Important**: Only summary files are read — per-job files are NOT read. The summary files contain all information needed for the HTML report: severity levels, job names, Prow URLs, finish dates (in `[YYYY-MM-DD]` format after each job name), root cause descriptions, and affected scenarios. This keeps context usage minimal.
+**Important**: Only summary files and bug mapping files are read — per-job files are NOT read. The summary files contain all information needed for the HTML report: severity levels, job names, Prow URLs, finish dates (in `[YYYY-MM-DD]` format after each job name), root cause descriptions, and affected scenarios. This keeps context usage minimal.
+
+5. If bug mapping files were found, read and parse them:
+   - Each file contains `--- BUG CANDIDATE ---` blocks with `ERROR_SIGNATURE`, `JIRA_DUPLICATES`, `JIRA_DUPLICATE_DETAILS`, `JIRA_REGRESSIONS`, and `JIRA_REGRESSION_DETAILS` fields
+   - Build a lookup structure mapping error signatures to their JIRA bug information
+   - The bug mapping file for a release is `analyze-ci-bugs-<version>.txt`; for rebase PRs it is `analyze-ci-bugs-rebase-release-<version>.txt`
+   - This data will be used in Step 3 to show JIRA links per issue in the HTML
 
 ### Step 3: Generate HTML Report
 
@@ -116,6 +125,12 @@ The HTML file must be a self-contained, single-file document with embedded CSS a
         .job-date { font-weight: 400; color: #6c757d; font-size: 0.85em; }
         .collapsible-content { display: none; }
         .collapsible-content.show { display: block; }
+        .bug-links { margin: 8px 0; padding: 8px 12px; background: #f0f4ff; border-left: 3px solid #0366d6; font-size: 0.9em; }
+        .bug-links .bug-tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.85em; font-weight: 600; margin: 2px 4px 2px 0; text-decoration: none; }
+        .bug-tag-open { background: #fff3cd; color: #856404; border: 1px solid #ffc107; }
+        .bug-tag-regression { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .bug-links-label { font-weight: 600; color: #495057; margin-right: 6px; }
+        .no-bugs { color: #6c757d; font-style: italic; font-size: 0.85em; }
         .toc { background: white; border-radius: 8px; padding: 20px; margin: 20px 0; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
         .toc ul { list-style: none; padding-left: 0; }
         .toc li { padding: 5px 0; }
@@ -180,6 +195,24 @@ The HTML file must be a self-contained, single-file document with embedded CSS a
             <div class="collapsible">1. SEVERITY: Issue Title (N jobs)</div>
             <div class="collapsible-content">
                 <div class="root-cause"><strong>Root Cause:</strong> Root cause description from summary</div>
+                <!-- Bug links from bug mapping file (if available) -->
+                <!-- Match issue title/error signature against ERROR_SIGNATURE values using token-overlap matching: -->
+                <!--   1. Normalize both strings: lowercase, strip punctuation, remove stopwords (a, an, the, is, in, of, to, for, and, or, with, that, this, from, on, at, by) -->
+                <!--   2. Simple stemming: strip common suffixes (-ing, -ed, -s, -tion, -ment, -ness, -ly, -er, -est) -->
+                <!--   3. Extract distinctive tokens (tool names, error codes, test IDs, paths, numeric identifiers) -->
+                <!--   4. Compute token overlap: intersection of token sets; coverage = overlap_count / min(set_a_size, set_b_size) -->
+                <!--   5. Match if: (a) exact substring match of either full string within the other (highest confidence=1.0), OR (b) ≥3 distinctive tokens overlap, OR (c) token coverage ≥60% -->
+                <!--   6. Confidence score = overlap_count / min(set_a_size, set_b_size); ties broken by highest confidence, then longest ERROR_SIGNATURE -->
+                <!--   7. Each issue matches at most one bug candidate (the highest-confidence match) -->
+                <div class="bug-links">
+                    <span class="bug-links-label">JIRA Bugs:</span>
+                    <!-- For each matching JIRA duplicate (open bugs): -->
+                    <a class="bug-tag bug-tag-open" href="https://issues.redhat.com/browse/USHIFT-XXXXX" title="Bug summary text [Status]">USHIFT-XXXXX</a>
+                    <!-- For each matching JIRA regression (closed bugs): -->
+                    <a class="bug-tag bug-tag-regression" href="https://issues.redhat.com/browse/USHIFT-YYYYY" title="Bug summary text [Closed] regression">USHIFT-YYYYY ⟲</a>
+                    <!-- If no matching bugs found in bug mapping: -->
+                    <span class="no-bugs">No tracked bugs</span>
+                </div>
                 <p><strong>Affected Jobs:</strong></p>
                 <ul>
                     <!-- Each job link includes finish date from the grep extraction -->
@@ -208,6 +241,14 @@ The HTML file must be a self-contained, single-file document with embedded CSS a
             <div class="collapsible-content">
                 <p><strong>Job:</strong> <span class="job-date">[YYYY-MM-DD]</span> <a href="JOB_URL">job-name</a></p>
                 <div class="root-cause"><strong>Root Cause:</strong> Root cause from PR summary</div>
+                <!-- Bug links from bug mapping file (if available for this rebase PR) -->
+                <!-- Match job root cause/error description against ERROR_SIGNATURE values using the same token-overlap algorithm described in the Periodics section above -->
+                <div class="bug-links">
+                    <span class="bug-links-label">JIRA Bugs:</span>
+                    <a class="bug-tag bug-tag-open" href="https://issues.redhat.com/browse/USHIFT-XXXXX" title="Bug summary text [Status]">USHIFT-XXXXX</a>
+                    <a class="bug-tag bug-tag-regression" href="https://issues.redhat.com/browse/USHIFT-YYYYY" title="Bug summary text [Closed] regression">USHIFT-YYYYY ⟲</a>
+                    <span class="no-bugs">No tracked bugs</span>
+                </div>
             </div>
         </div>
 
@@ -215,7 +256,14 @@ The HTML file must be a self-contained, single-file document with embedded CSS a
         <div class="release-section">
             <p>No open rebase pull requests found.</p>
         </div>
+
     </div>
+
+    <!-- Extra spacing to ensure tab content is fully visible in Prow Spyglass iframe -->
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
 </div>
 
 <script>
@@ -248,6 +296,19 @@ document.querySelectorAll('.collapsible').forEach(function(el) {
 - Do NOT re-analyze or reinterpret the data — use summary file content as-is
 - Convert the plain text summary reports into HTML-formatted content, preserving all information
 - Ensure all Prow job URLs from the summaries remain clickable links in the HTML
+- **Bug Correlation**: For each issue in the TOP ISSUES section (Periodics tab) and each failed job entry (Pull Requests tab), attempt to match it against the bug candidates from the corresponding bug mapping file (`analyze-ci-bugs-<release>.txt` for releases, `analyze-ci-bugs-rebase-release-<version>.txt` for rebase PRs). Match by comparing the issue title/description or job root cause against the `ERROR_SIGNATURE` in each `--- BUG CANDIDATE ---` block using this token-overlap algorithm:
+    1. **Normalize** both strings: lowercase, strip punctuation, remove stopwords (`a, an, the, is, in, of, to, for, and, or, with, that, this, from, on, at, by`)
+    2. **Simple stemming**: strip common suffixes (`-ing, -ed, -s, -tion, -ment, -ness, -ly, -er, -est`)
+    3. **Extract distinctive tokens**: tool names, error codes, test IDs, paths, numeric identifiers
+    4. **Compute token overlap**: intersection of token sets; coverage = `overlap_count / min(set_a_size, set_b_size)`
+    5. **Match criteria**: (a) exact substring match of either full string within the other (highest confidence=1.0), OR (b) ≥3 distinctive tokens overlap, OR (c) token coverage ≥60%
+    6. **Confidence score** = `overlap_count / min(set_a_size, set_b_size)`; ties broken by highest confidence, then longest `ERROR_SIGNATURE`
+    7. Each issue matches at most one bug candidate (the highest-confidence match)
+  When a match is found:
+  - Show `JIRA_DUPLICATES` as clickable links with `bug-tag-open` styling (linking to `https://issues.redhat.com/browse/<KEY>`) with the summary from `JIRA_DUPLICATE_DETAILS` as the title attribute
+  - Show `JIRA_REGRESSIONS` as clickable links with `bug-tag-regression` styling (with ⟲ suffix) with the summary from `JIRA_REGRESSION_DETAILS` as the title attribute
+  - If no bug mapping file exists for a release, or no candidates match an issue, show `<span class="no-bugs">No tracked bugs</span>`
+  - If the bug mapping file exists but a candidate has `JIRA_DUPLICATES: None` and `JIRA_REGRESSIONS: None`, show `<span class="no-bugs">No tracked bugs</span>`
 - Use appropriate badge colors:
   - `badge-ok`: 0 failed jobs
   - `badge-issues`: 1+ failed jobs
@@ -303,7 +364,7 @@ HTML report generated: ${WORKDIR}/microshift-ci-doctor-report.html
 - **analyze-ci:doctor**: Orchestrator that runs analyses and then invokes this command
 - **analyze-ci:release**: Per-release periodic job analysis (produces the input files)
 - **analyze-ci:pull-requests**: PR job analysis (produces the input files)
-- **analyze-ci:create-bugs**: Creates JIRA bugs from analysis output
+- **analyze-ci:create-bugs**: Creates JIRA bugs from analysis output; also produces bug mapping files (`analyze-ci-bugs-<source>.txt`) consumed by this command to show JIRA links in the HTML report
 
 ## Notes
 - This command is read-only — it only reads existing analysis files and generates HTML
@@ -312,3 +373,4 @@ HTML report generated: ${WORKDIR}/microshift-ci-doctor-report.html
 - If analysis files are missing for a release, it is noted in the report but does not block generation
 - If no PR files exist, the Pull Requests tab shows "No open rebase pull requests found"
 - This command can be re-run to regenerate the HTML without re-running the analyses
+- If bug mapping files (`analyze-ci-bugs-*.txt`) exist in `${WORKDIR}/`, JIRA bug links are shown per issue in the HTML; if not, the report still generates correctly without bug links

@@ -2,7 +2,7 @@
 name: Analyze CI Test Job
 argument-hint: <job-url>
 description: Analyze a MicroShift Prow CI Test Job execution
-allowed-tools: WebFetch, Bash, Read, Write, Glob, Grep
+allowed-tools: Skill, WebFetch, Bash, Read, Write, Glob, Grep
 ---
 
 ## Name

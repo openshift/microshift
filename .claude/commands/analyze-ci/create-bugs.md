@@ -13,7 +13,7 @@ allowed-tools: Bash, Read, Write, Glob, Grep, Agent, mcp__jira__jira_search, mcp
 ```
 
 ## Description
-Reads individual job analysis reports produced by `analyze-ci:release` or `analyze-ci:pull-requests` and creates JIRA bugs in USHIFT for legitimate test failures. Operates in **dry-run mode by default** - it shows what bugs would be created without actually creating them. Use `--create` to perform actual issue creation.
+Reads individual job analysis reports produced by `analyze-ci:release` or `analyze-ci:pull-requests` and creates JIRA bugs in USHIFT for CI test failures. Operates in **dry-run mode by default** - it shows what bugs would be created without actually creating them. Use `--create` to perform actual issue creation.
 
 This command does NOT re-analyze CI jobs. It consumes existing job analysis files from `${WORKDIR}/`.
 
@@ -122,23 +122,14 @@ WORKDIR=/tmp/analyze-ci-claude-workdir.$(date +%y%m%d)
 }
 ```
 
-### Step 3: Filter Out Non-Bug-Worthy Failures
+### Step 3: Pass All Failures Through
 
 **Actions**:
-1. Remove entries where `SEVERITY <= 2` (minor/flaky issues)
-2. Remove entries where `INFRASTRUCTURE_FAILURE=true` **AND** the failure is transient/external (not a CI configuration bug). Use `STACK_LAYER` to distinguish:
-   - **Filter out** (transient infrastructure — out of our control):
-     - `STACK_LAYER` contains `AWS Infra` (AWS quota, VM creation, networking)
-     - `STACK_LAYER` contains `External Infrastructure` (container registry outages, third-party services)
-     - `STACK_LAYER` is `build phase` (release image import timeouts, registry 404s)
-   - **Keep as bug-worthy** (CI configuration issues — need code fixes):
-     - `STACK_LAYER` is `test setup phase`, `Test Configuration`, or similar (missing test files, wrong directory mappings, broken scenario selection logic)
-     - Any `INFRASTRUCTURE_FAILURE=true` entry whose analysis text indicates the fix requires a code change in the repository (e.g., adding missing files, updating directory mappings, fixing CI scripts)
-3. Log each filtered-out entry with reason. For kept CI configuration failures, log them as `"CI CONFIG (kept)"` to distinguish from product test failures.
+1. All parsed entries from Step 2 proceed directly to Step 4 without any filtering
+2. Do NOT skip entries based on severity, infrastructure failure status, or stack layer
+3. Log the total number of entries proceeding to deduplication
 
-**Rationale**: Not all "infrastructure failures" are transient. A missing test scenario directory or broken CI script mapping is a configuration bug that requires a code fix — these should result in JIRA bugs, not be silently filtered out. Only truly external/transient failures (AWS outages, registry issues, image import timeouts) should be excluded.
-
-**Output**: Filtered list of bug-worthy failures with count of filtered entries reported to user.
+**Output**: Complete list of all parsed failures proceeding to deduplication.
 
 ### Step 4: Deduplicate by ERROR_SIGNATURE
 
@@ -216,7 +207,6 @@ If results are found, fetch their details with `mcp__jira__jira_get_issue` and f
      DRY-RUN SUMMARY
        Source: <SOURCE_LABEL>
        Total job files parsed: N
-       Filtered out (infra/low severity): N
        Unique bug candidates: N
        Candidates with potential duplicates: N
        Candidates ready to file: N
@@ -224,7 +214,7 @@ If results are found, fetch their details with `mcp__jira__jira_get_issue` and f
      To create these bugs, run:
        /analyze-ci:create-bugs <source> --create
      ```
-   - Do NOT prompt for any actions. Do NOT create any issues. Stop here.
+   - Do NOT prompt for any actions. Do NOT create any issues. Do NOT proceed to Steps 7/7a (create/reopen). Continue to Step 7b and Step 8.
 
 3. **In create mode** (`--create` specified):
    - For each candidate, prompt the user:
@@ -387,6 +377,38 @@ For each candidate where user chose "reopen":
 - If the transition fails, report error and ask user if they want to retry, create a new bug instead, or skip
 - Do NOT retry automatically
 
+### Step 7b: Write Machine-Readable Bug Mapping File
+
+**Actions**:
+After processing all bug candidates (Steps 5-7a) and regardless of mode (dry-run or create), write a machine-readable bug mapping file that `analyze-ci:create-report` can consume to display JIRA bug links in the HTML report. The file content is based on the Jira search results from Step 5 — it is not affected by whether bugs were created or reopened in Steps 7/7a.
+
+1. Save to `${WORKDIR}/analyze-ci-bugs-<source>.txt` (overwrite if exists)
+2. Use this structured format with one block per bug candidate:
+
+```text
+--- BUG MAPPING ---
+SOURCE: <source>
+DATE: YYYY-MM-DD
+--- BUG CANDIDATE ---
+ERROR_SIGNATURE: <error_signature>
+SEVERITY: <N>
+STEP_NAME: <step_name>
+AFFECTED_JOBS: <count>
+JIRA_DUPLICATES: <comma-separated list of JIRA keys, or "None">
+JIRA_DUPLICATE_DETAILS: <KEY>|<summary>|<status>, <KEY>|<summary>|<status>, ...
+JIRA_REGRESSIONS: <comma-separated list of JIRA keys, or "None">
+JIRA_REGRESSION_DETAILS: <KEY>|<summary>|<status>, <KEY>|<summary>|<status>, ...
+--- END BUG CANDIDATE ---
+--- BUG CANDIDATE ---
+...
+--- END BUG CANDIDATE ---
+--- END BUG MAPPING ---
+```
+
+3. **IMPORTANT**: This file must be written in BOTH dry-run and create modes. The file enables `analyze-ci:create-report` to show linked bugs per issue in the HTML report.
+4. The `JIRA_DUPLICATE_DETAILS` and `JIRA_REGRESSION_DETAILS` lines provide summary and status for each JIRA key, pipe-separated within each entry and comma-separated between entries. If no duplicates/regressions, use "None".
+5. Save using a Bash heredoc to avoid Write tool permission issues with `/tmp` paths.
+
 ### Step 8: Generate Results Report
 
 **Actions**:
@@ -407,9 +429,7 @@ PARSING
   Skipped (no structured summary): N
 
 FILTERING
-  Infrastructure failures removed: N
-  Low severity (<=2) removed: N
-  Bug-worthy failures: N
+  None (all failures included)
 
 DEDUPLICATION
   Unique bug candidates: N
@@ -525,12 +545,12 @@ Run the analysis first:
   - PR jobs: `analyze-ci-prs-job-*-pr<number>-*.txt` (from `/analyze-ci:pull-requests`)
 - Dry-run is the default to prevent accidental bug creation
 - The `--create` flag triggers interactive mode where each candidate requires user confirmation
-- Transient infrastructure failures (AWS, VM creation, quota, registry outages) are automatically filtered out
-- CI configuration failures (missing test files, broken directory mappings) are kept as bug-worthy even if marked as INFRASTRUCTURE_FAILURE=true
+- All failures are included without filtering — no entries are skipped based on severity, infrastructure status, or stack layer
 - Bugs are created in USHIFT with component "MicroShift"; duplicate search covers both USHIFT and OCPBUGS
 - All created bugs are labeled with `microshift-ci-ai-generated` for tracking
 - Security level is set to "Red Hat Employee" on all created issues
 - The STRUCTURED SUMMARY block in job files is required — this is a contract with `/analyze-ci:prow-job`
+- In addition to the text report, a machine-readable bug mapping file (`analyze-ci-bugs-<source>.txt`) is written in both dry-run and create modes — this file is consumed by `analyze-ci:create-report` to show JIRA bug links in the HTML report
 
 ## Related Skills
 
