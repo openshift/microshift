@@ -2,7 +2,7 @@ https://github.com/openshift/api embedded-component 50517c6f4bfdbf9fc2cb291fd97c
 https://github.com/openshift/cluster-csi-snapshot-controller-operator embedded-component 019abe0c7671962829eb91269e1d76916966320e
 https://github.com/openshift/cluster-dns-operator embedded-component 82578923164636746e0d74d594ab32d83a660c0b
 https://github.com/openshift/cluster-ingress-operator embedded-component 24ef5ae121b8f658b649bb555be827f114ead438
-https://github.com/openshift/cluster-kube-apiserver-operator embedded-component d0cf9e755d887edf142bcb656c5b6d707a259d9d
+https://github.com/openshift/cluster-kube-apiserver-operator embedded-component b85497d2202b30ead006502767b96419c3a1c87e
 https://github.com/openshift/cluster-kube-controller-manager-operator embedded-component 438c9dba80ddadeabe9efe4a654297a7b550b2b8
 https://github.com/openshift/cluster-kube-scheduler-operator embedded-component 7cac34952f982895b5fdae60b29376fba838be89
 https://github.com/openshift/cluster-network-operator embedded-component d1ec37ecb90d74eccc8d8c3e0bc42a8c0fb5ac6a
@@ -12,7 +12,7 @@ https://github.com/openshift/csi-external-snapshotter embedded-component 4260482
 https://github.com/openshift/etcd embedded-component 05bca97760b1cfa1bcef11c0b1f1a5c4dab19709
 https://github.com/openshift/kubernetes embedded-component 4ef1baeb6786a70898f3842a06e988d9566aa444
 https://github.com/openshift/kubernetes-kube-storage-version-migrator embedded-component 0f8a4eb84ace9b746cf25d51d80dacf34ca5f953
-https://github.com/openshift/machine-config-operator embedded-component 7a70444e626c6b9cc8206bd84b0719fe6bef4fcd
+https://github.com/openshift/machine-config-operator embedded-component 30c659cb9c2a39931bde3b48c6fc35f1c6ea1945
 https://github.com/openshift/openshift-controller-manager embedded-component d9e543dd31e981f279c447e4f92f0dac3f665f9e
 https://github.com/openshift/operator-framework-olm embedded-component 12a261a3702726aaaa339c5d2fceb8b6078ceec8
 https://github.com/openshift/route-controller-manager embedded-component ec18e9be0ebcbd7cb262d31f50148f81d0edd48f
