@@ -71,26 +71,35 @@ usage() {
 }
 
 # Fetch job results for a single PR (parallelized)
+# Returns non-zero if any job fetch fails, writing a .fetch_failed marker
 fetch_pr_results() {
     local pr="${1}"
     local tmpdir="${2}"
     local jobs
 
-    jobs=$(list_pr_jobs "${pr}")
+    jobs=$(list_pr_jobs "${pr}") || { touch "${tmpdir}/.fetch_failed"; return 1; }
     if [[ -z "${jobs}" ]]; then
-        return
+        return 0
     fi
 
     # Fetch latest build for each job in parallel
     while IFS= read -r job; do
         (
-            result_line=$(get_latest_build "${pr}" "${job}" 2>/dev/null) || true
+            result_line=$(get_latest_build "${pr}" "${job}" 2>/dev/null) || { touch "${tmpdir}/.fetch_failed"; exit 1; }
             if [[ -n "${result_line}" ]]; then
                 echo "${job}	${result_line}" > "${tmpdir}/${job}"
+            else
+                touch "${tmpdir}/.fetch_failed"
             fi
         ) &
     done <<< "${jobs}"
     wait
+
+    # Check if any subshell signaled a failure
+    if [[ -f "${tmpdir}/.fetch_failed" ]]; then
+        return 1
+    fi
+    return 0
 }
 
 # Summary mode - show PR with pass/fail counts
@@ -117,7 +126,11 @@ mode_summary() {
             local tmpdir
             tmpdir=$(mktemp -d)
 
-            fetch_pr_results "${pr_number}" "${tmpdir}"
+            if ! fetch_pr_results "${pr_number}" "${tmpdir}"; then
+                echo "PR #${pr_number}: incomplete job results, skipping" >&2
+                rm -rf "${tmpdir}"
+                continue
+            fi
 
             local success=0 failure=0 pending=0 total=0
             for f in "${tmpdir}"/*; do
@@ -168,7 +181,11 @@ mode_detail() {
         local tmpdir
         tmpdir=$(mktemp -d)
 
-        fetch_pr_results "${pr_number}" "${tmpdir}"
+        if ! fetch_pr_results "${pr_number}" "${tmpdir}"; then
+            echo "    PR #${pr_number}: incomplete job results, skipping"
+            rm -rf "${tmpdir}"
+            continue
+        fi
 
         local file_count
         file_count=$(find "${tmpdir}" -maxdepth 1 -type f | wc -l)
@@ -213,7 +230,11 @@ mode_approve() {
         local tmpdir
         tmpdir=$(mktemp -d)
 
-        fetch_pr_results "${pr_number}" "${tmpdir}"
+        if ! fetch_pr_results "${pr_number}" "${tmpdir}"; then
+            echo "PR #${pr_number}: incomplete job results, skipping"
+            rm -rf "${tmpdir}"
+            continue
+        fi
 
         local total=0 success=0
         for f in "${tmpdir}"/*; do
@@ -264,7 +285,11 @@ mode_restart() {
         local tmpdir
         tmpdir=$(mktemp -d)
 
-        fetch_pr_results "${pr_number}" "${tmpdir}"
+        if ! fetch_pr_results "${pr_number}" "${tmpdir}"; then
+            echo "PR #${pr_number}: incomplete job results, skipping"
+            rm -rf "${tmpdir}"
+            continue
+        fi
 
         local failed_jobs=()
         for f in "${tmpdir}"/*; do
