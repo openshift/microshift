@@ -11,11 +11,18 @@ PROW_VIEW="https://prow.ci.openshift.org/view/gs/test-platform-results"
 GH_REPO="openshift/microshift"
 GCS_PR_PREFIX="pr-logs/pull/openshift_microshift"
 
-# Get open PRs using GitHub CLI, optionally filtered by title substring
+# Get open PRs using GitHub CLI, optionally filtered by title substring and/or author
 fetch_open_prs() {
     local filter="${1:-}"
+    local author="${2:-}"
     local pr_data
-    pr_data=$(gh pr list --repo "${GH_REPO}" --state open --limit 100 --json number,title,url)
+    local -a gh_args=(--repo "${GH_REPO}" --state open --limit 100 --json number,title,url)
+
+    if [[ -n "${author}" ]]; then
+        gh_args+=(--author "${author}")
+    fi
+
+    pr_data=$(gh pr list "${gh_args[@]}")
 
     if [[ -n "${filter}" ]]; then
         echo "${pr_data}" | jq -c --arg f "${filter}" '[.[] | select(.title | contains($f))]'
@@ -60,13 +67,14 @@ result_to_icon() {
 
 # Usage
 usage() {
-    echo "Usage: ${0} [--mode MODE] [--filter STRING]"
+    echo "Usage: ${0} [--mode MODE] [--filter STRING] [--author USER]"
     echo "  --mode MODE:     Operation mode (default: summary)"
     echo "    summary: Show table of open PRs with test job status summary"
     echo "    detail:  Show table of open PRs with individual test job links"
     echo "    approve: Approve PRs where ALL test jobs finished successfully"
     echo "    restart: Restart failed test jobs by commenting /test for each failure"
     echo "  --filter STRING: Only include PRs whose title contains STRING"
+    echo "  --author USER:   Only include PRs authored by USER (GitHub username)"
     exit 1
 }
 
@@ -105,10 +113,11 @@ fetch_pr_results() {
 # Summary mode - show PR with pass/fail counts
 mode_summary() {
     local filter="${1:-}"
+    local author="${2:-}"
     local pr_data
 
     echo "Fetching open PRs..." >&2
-    pr_data=$(fetch_open_prs "${filter}")
+    pr_data=$(fetch_open_prs "${filter}" "${author}")
 
     local pr_count
     pr_count=$(echo "${pr_data}" | jq 'length')
@@ -159,10 +168,11 @@ mode_summary() {
 # Detail mode - show each job for each PR
 mode_detail() {
     local filter="${1:-}"
+    local author="${2:-}"
     local pr_data
 
     echo "Fetching open PRs..." >&2
-    pr_data=$(fetch_open_prs "${filter}")
+    pr_data=$(fetch_open_prs "${filter}" "${author}")
 
     local pr_count
     pr_count=$(echo "${pr_data}" | jq 'length')
@@ -211,10 +221,11 @@ mode_detail() {
 # Approve mode - add "/lgtm" and "/verified by ci" comments to PRs with all tests passing
 mode_approve() {
     local filter="${1:-}"
+    local author="${2:-}"
     local pr_data
 
     echo "Fetching open PRs..." >&2
-    pr_data=$(fetch_open_prs "${filter}")
+    pr_data=$(fetch_open_prs "${filter}" "${author}")
 
     local pr_count
     pr_count=$(echo "${pr_data}" | jq 'length')
@@ -266,10 +277,11 @@ mode_approve() {
 # Restart mode - comment /test for each failed job on PRs with failures
 mode_restart() {
     local filter="${1:-}"
+    local author="${2:-}"
     local pr_data
 
     echo "Fetching open PRs..." >&2
-    pr_data=$(fetch_open_prs "${filter}")
+    pr_data=$(fetch_open_prs "${filter}" "${author}")
 
     local pr_count
     pr_count=$(echo "${pr_data}" | jq 'length')
@@ -333,6 +345,7 @@ mode_restart() {
 main() {
     local mode="summary"
     local filter=""
+    local author=""
 
     # Parse arguments
     while [[ ${#} -gt 0 ]]; do
@@ -353,6 +366,14 @@ main() {
                 filter="${2}"
                 shift 2
                 ;;
+            --author)
+                if [[ ${#} -lt 2 ]]; then
+                    echo "Error: author requires an argument"
+                    usage
+                fi
+                author="${2}"
+                shift 2
+                ;;
             -*)
                 echo "Unknown option: ${1}"
                 usage
@@ -367,16 +388,16 @@ main() {
     # Execute mode
     case "${mode}" in
         summary)
-            mode_summary "${filter}"
+            mode_summary "${filter}" "${author}"
             ;;
         detail)
-            mode_detail "${filter}"
+            mode_detail "${filter}" "${author}"
             ;;
         approve)
-            mode_approve "${filter}"
+            mode_approve "${filter}" "${author}"
             ;;
         restart)
-            mode_restart "${filter}"
+            mode_restart "${filter}" "${author}"
             ;;
         *)
             echo "Error: Unknown mode '${mode}'"
