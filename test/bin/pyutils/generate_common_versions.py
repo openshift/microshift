@@ -234,8 +234,10 @@ def get_gitops_version(minor_version):
             gitops_version_ocp_compatibility = gitops_version_from_api_docs.get("openshift_compatibility") or ""
             gitops_version_number = gitops_version_from_api_docs.get("name")
             if f"4.{current_microshift_minor_version}" in gitops_version_ocp_compatibility:
-                logging.info(f"Latest GitOps version: {gitops_version_number} which is compatible with OCP {gitops_version_ocp_compatibility}")
-                return gitops_version_number
+                gitops_repo = f"gitops-{gitops_version_number}-for-rhel-9-{ARCH}-rpms"
+                if repo_provides_pkg(gitops_repo, "microshift-gitops"):
+                    logging.info(f"Found GitOps version: {gitops_version_number} which is compatible with OCP {gitops_version_ocp_compatibility} on {gitops_repo} repository")
+                    return gitops_version_number
     return ""
 
 
