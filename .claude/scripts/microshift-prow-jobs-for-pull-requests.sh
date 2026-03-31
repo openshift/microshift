@@ -16,7 +16,7 @@ fetch_open_prs() {
     local filter="${1:-}"
     local author="${2:-}"
     local pr_data
-    local -a gh_args=(--repo "${GH_REPO}" --state open --limit 100 --json number,title,url)
+    local -a gh_args=(--repo "${GH_REPO}" --state open --limit 100 --json "number,title,url")
 
     if [[ -n "${author}" ]]; then
         gh_args+=(--author "${author}")
