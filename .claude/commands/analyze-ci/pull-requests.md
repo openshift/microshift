@@ -23,7 +23,7 @@ This command orchestrates the analysis workflow by:
 4. Aggregating results into a summary report saved to `${WORKDIR}`
 
 ## Arguments
-- `--rebase` (optional): Only analyze rebase PRs (titles containing `NO-ISSUE: rebase-release-`)
+- `--rebase` (optional): Only analyze rebase PRs (authored by `microshift-rebase-script[bot]`)
 
 ## Work Directory
 
@@ -39,7 +39,7 @@ WORKDIR=/tmp/analyze-ci-claude-workdir.$(date +%y%m%d)
 **Goal**: Get the list of open PRs with failed Prow jobs.
 
 **Actions**:
-1. Execute `.claude/scripts/microshift-prow-jobs-for-pull-requests.sh --mode detail` to get all open PRs and their job statuses. If `--rebase` was specified, add `--filter "NO-ISSUE: rebase-release-"` to only include rebase PRs
+1. Execute `.claude/scripts/microshift-prow-jobs-for-pull-requests.sh --mode detail` to get all open PRs and their job statuses. If `--rebase` was specified, add `--author "microshift-rebase-script[bot]"` to only include rebase PRs
 2. Parse the output to identify PRs with failed jobs (lines containing `✗`)
 3. For each failed job, extract:
    - PR number and title (from the `=== PR #NNN: ... ===` header lines)
@@ -53,7 +53,7 @@ WORKDIR=/tmp/analyze-ci-claude-workdir.$(date +%y%m%d)
 bash .claude/scripts/microshift-prow-jobs-for-pull-requests.sh --mode detail 2>/dev/null
 
 # Rebase PRs only
-bash .claude/scripts/microshift-prow-jobs-for-pull-requests.sh --mode detail --filter "NO-ISSUE: rebase-release-" 2>/dev/null
+bash .claude/scripts/microshift-prow-jobs-for-pull-requests.sh --mode detail --author "microshift-rebase-script[bot]" 2>/dev/null
 ```
 
 **Expected Output Format**:
@@ -230,7 +230,7 @@ Individual job reports: ${WORKDIR}/analyze-ci-prs-job-*.txt
 ```
 
 **Behavior**:
-- Only includes PRs with `NO-ISSUE: rebase-release-` in the title
+- Only includes PRs authored by `microshift-rebase-script[bot]`
 - Useful for release manager workflow to check rebase CI status
 
 ## Performance Considerations
