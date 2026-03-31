@@ -1,82 +1,191 @@
-- api embedded-component 86893981287e242c0f90d53499b93cd3e46e5b81 to 1e7cd4b531e7ce17efdb1d541013e0c55362bfa5
-  - 6e17e9e0 2026-03-27T10:42:55+01:00 CNTRLPLANE-2777: add TypeMeta to GenericControllerConfig
-  - 99aafa57 2026-03-26T19:43:23-04:00 tools: codegen: increase sippy request timeout for feature promotion verification
-  - 429b5077 2026-03-26T09:52:14-03:00 Allow JobTier=candidate in featuregate-test-analyzer with warning
-  - 933cadf6 2026-03-26T02:34:14-07:00 CORS-4337: allow AWS Europe Sovereign Cloud partition
-  - 43a92bfd 2026-03-25T15:36:05+01:00 add API-side validation to enforce prefixPolicy is not set to Prefix when username expression is used
-  - f3693b4c 2026-03-25T10:38:34+01:00 MON-4036: Add TelemeterClientConfig to ClusterMonitoring API
-  - 458cdaf9 2026-03-24T14:06:39-04:00 added InternalReleaseImageDegraded state type for MachineConfigNodeStatus Conditions field
-  - 6a8c07c9 2026-03-12T09:57:11-04:00 operator/ingress: Add configurationManagement
-  - 3757b1d4 2026-02-27T07:34:42-05:00 vsphere vm-host zonal ga
+- ovn-kubernetes image-arm64 cca0923d6f0ea9d09e77a8085d83a32e35055af0 to ee514f9f66a328f4dd4b583709a8e411b515fa5f
+  - 979d3db2 2026-03-25T22:24:14-07:00 openshift: update module path and deps for upstream package rename
+  - e2237ef1 2026-03-25T17:33:01-07:00 services,node,cni: update OCP hack imports for module rename
+  - c24c2e38 2026-03-25T17:32:24-07:00 services: resolve merge conflict in lb_config.go
+  - ded349d0 2026-03-24T11:59:51+01:00 EVPN E2E: Use framework.CreateTestingNS for test namespace setup
+  - 4c2a2e97 2026-03-24T11:39:43+02:00 ci: enable --local-kind-registry on a kv-live-migration lane
+  - 3079e5ba 2026-03-23T11:21:04+01:00 kubevirt: detect completed migration when source pod is gone
+  - 2272b627 2026-03-23T09:46:41+02:00 kind: fix --local-kind-registry for containerd 2.x
+  - 934d71e9 2026-03-23T11:59:36+08:00 no-overlay: add managed routing mode to one CI lane
+  - 1642cae4 2026-03-23T11:59:33+08:00 no-overlay: add kind.sh and kind-helm.sh support for managed routing mode
+  - ea0ae761 2026-03-23T11:59:26+08:00 no-overlay: add managedbgp controller for managed routing mode
+  - a541b389 2026-03-23T11:59:18+08:00 no-overlay: add frr-namespace flag to ManagedBGPConfig
+  - b446d7b2 2026-03-20T22:31:14+01:00 Add NetlinkDeviceManager for declarative device lifecycle management
+  - 657e10d0 2026-03-20T22:31:14+01:00 Vendor netlink with VXLAN VNI filtering support
+  - 55f96db2 2026-03-20T18:34:36+01:00 Avoid netlink dump when checking VRF membership
+  - 5948c58b 2026-03-19T17:14:08-04:00 reject empty subnet entries in node annotation parsers
+  - 845c2cce 2026-03-19T17:14:08-04:00 Make node controller a generic controller
+  - fd829c6b 2026-03-19T17:14:08-04:00 Trigger nodeSync on node subnet change
+  - 60f4db91 2026-03-19T17:14:08-04:00 Add more handling for remote nodes with layer2
+  - 02b8fa64 2026-03-19T17:14:08-04:00 refactor node-controller again
+  - 56560c1e 2026-03-19T17:14:08-04:00 Make nodeCache methods private
+  - 3b4cf90a 2026-03-19T17:14:08-04:00 Still handle node delete for cluster manager on cache miss
+  - 9a71eb2a 2026-03-19T17:14:08-04:00 Fixed node controller registration error handling
+  - 81e0b6e0 2026-03-19T17:14:08-04:00 Fixes multi-homing unit test race
+  - 72bed3d8 2026-03-19T17:14:08-04:00 Simplify node_controller handling
+  - 94a6efeb 2026-03-19T17:14:08-04:00 Cluster manager: node level-driven + anno cache
+  - db3156b0 2026-03-19T17:14:08-04:00 More node controller updates
+  - 08cec028 2026-03-19T17:14:08-04:00 Rename controller package from topoology -> node
+  - 2d8bc9f4 2026-03-19T17:14:07-04:00 Layer 3 UDN: Wait for node logical switch
+  - eea45a20 2026-03-19T17:14:07-04:00 Various fixes
+  - 7a91af5d 2026-03-19T17:14:07-04:00 Fix unit test missing fake iptables
+  - afe4f200 2026-03-19T17:14:07-04:00 Fix locking in fake network manager
+  - 9308fbb8 2026-03-19T17:14:07-04:00 Fixes immediate retry handling for missed pods and netpol
+  - a637348d 2026-03-19T17:04:31-04:00 Fix unit test issues
+  - cde0c88f 2026-03-19T17:04:31-04:00 Refactor node controller handling
+  - 027d4ff6 2026-03-19T10:30:07-04:00 tests: Wait for subnet annotation to update
+  - 9255baaf 2026-03-19T15:49:16+08:00 Bump codegen
+  - baa2c262 2026-03-19T15:49:16+08:00 update go mod tidy in e2e
+  - 4621b77f 2026-03-19T15:49:16+08:00 go-controller rebase
+  - 88885c3a 2026-03-19T15:49:16+08:00 Fix e2e tests failure
+  - 32077814 2026-03-19T15:49:16+08:00 Updates kubernetes versions
+  - 2f6c248f 2026-03-19T15:49:15+08:00 test/conformance rebase
+  - d10c28ee 2026-03-19T15:49:15+08:00 test/e2e rebase
+  - 4b266ded 2026-03-19T15:49:15+08:00 fix CNI utils test timeout after K8s 1.35 bump
+  - 5238d48f 2026-03-19T15:49:15+08:00 disable WatchListClient feature gate for unit tests
+  - d8e177c4 2026-03-18T17:11:34-04:00 node: reconcile masquerade resources via link and address events
+  - b2dd9b16 2026-03-17T20:41:55-04:00 node: improve management port resilience in DPU host mode
+  - 1dcb2db5 2026-03-17T17:42:52-04:00 kind: Log on each preloaded message
+  - 35652f39 2026-03-17T10:36:45-07:00 sctp: Remove sctp detection logic in OVN
+  - c43ac6e4 2026-03-17T17:32:57+01:00 Update the VTEP design for the EVPN OKEP
+  - 133ab12c 2026-03-16T19:02:58-04:00 e2e: preload MetalLB LB service test images into KIND cluster
+  - 327852b5 2026-03-16T19:02:58-04:00 e2e: preload test images into KIND cluster before test execution
+  - f4fb045c 2026-03-16T19:02:57-04:00 e2e: centralize netshoot image reference in images package
+  - 40caf4c2 2026-03-16T10:42:49+08:00 node: fix serviceUpdateNotNeeded nil pointer comparison
+  - feffc00d 2026-03-14T12:06:03-04:00 Refactor annotation cache
+  - 1e5d7fbf 2026-03-14T12:06:03-04:00 Fix pod+node race
+  - b107ebcc 2026-03-14T12:06:03-04:00 Perf/Scale: Do not enable hybrid overlay
+  - 5fa34299 2026-03-14T12:06:03-04:00 Adds missing VRF module for perf tests
+  - 6c38a6dd 2026-03-14T12:06:03-04:00 Fix gateway being created with invalid COPP value
+  - 0ebb03df 2026-03-14T12:06:03-04:00 Move UDN node reconcilation into a single controller
+  - 709b82c0 2026-03-14T12:06:02-04:00 Adds benchmark tests - UDN controller impact on nodes
+  - ae89ea3c 2026-03-13T10:08:06-04:00 Fixes network controller leaking goroutines on failed start
+  - 70d2a129 2026-03-13T14:47:10+01:00 docs: add SR-IOV device plugin resource pool examples for derive-from-mgmt-port
+  - 8d6c5469 2026-03-12T19:58:30+01:00 types: centralize DefaultNetworkControllerName constant
+  - a54565fb 2026-03-12T19:58:30+01:00 virt: fix SyncVirtualMachines deleting UDN DHCP options during startup
+  - 2fc7c11a 2026-03-12T15:04:02+01:00 Fix typo in EVPN ACL: use '&&' instead of '&' for logical AND in OVN match expression
+  - cd2f08c7 2026-03-11T19:21:42+01:00 e2e: fix potential subsanable VID collision for EVPN tests
+  - 9157c924 2026-03-11T19:21:42+01:00 e2e: fix incorrect use of GetK8NodeNetworkInterface/ExecK8NodeCommand
+  - e58ca6d2 2026-03-11T19:21:42+01:00 e2e: don't randomize on init() for VRF-Lite/EVPN tests
+  - ae3b43ab 2026-03-11T19:21:42+01:00 e2e: remove legacy EVPN tests
+  - c0528f20 2026-03-11T19:21:42+01:00 e2e: fix IPv6 address dropped from interfaces when attached to VRFs
+  - ca8528eb 2026-03-11T19:21:42+01:00 e2e: test isolation across EVPN networks
+  - 61377a2e 2026-03-11T19:21:42+01:00 e2e: remove EXTENDED label from test cases
+  - 575d72a9 2026-03-11T19:21:42+01:00 e2e: adjust timeouts on VRF-Lite/EVPN isolation tests
+  - 27451658 2026-03-11T19:21:42+01:00 e2e: collapse EVPN/VRF-Lite isolation tests
+  - 63b862bc 2026-03-11T19:21:42+01:00 e2e: use random subnets for VRF-Lite tests
+  - 4d12f0e4 2026-03-11T19:21:42+01:00 e2e: use crypto/rand instead of math/rand for EVPN tests
+  - 40a26e0e 2026-03-11T19:21:42+01:00 e2e: add EVPN to our existing BGP general tests
+  - 5bb6489b 2026-03-11T19:21:42+01:00 e2e: prepare EVPN e2e infra setup to be reused
+  - 0f8ee73f 2026-03-11T19:21:42+01:00 e2e: prepare existing VRF-Lite e2e tests to also host EVPN tests
+  - 6ca36eb4 2026-03-11T11:27:19+01:00 cnc UT: add test to check consistent allocation on accepted=False
+  - 5d7fc5fd 2026-03-10T13:32:55-04:00 dpulease: fix blockOwnerDeletion and add healthy log
+  - a22e591f 2026-03-10T13:58:17+01:00 Fix mkdocs warnings
+  - f21f73f4 2026-03-10T13:58:17+01:00 Add strict testing for mkdocs builds to ensure no broken links
+  - ce20fa1a 2026-03-10T13:58:17+01:00 Cross-reference requirements file to every feature doc and template
+  - c0d2ae60 2026-03-10T13:58:17+01:00 Add requirements to the docs
+  - f90a0dd2 2026-03-10T11:27:50+01:00 cnc UT: make status check more reliable
+  - 476bf82f 2026-03-09T19:52:36+01:00 Update to fedora 43 and OVN to ovn-25.09.2-82.fc43
+  - 08034bc2 2026-03-09T19:52:36+01:00 Fix deprecation of gcr.io/kubebuilder images
+  - 7af5e8ca 2026-03-06T17:33:26+01:00 Add API reference docs for CNC
+  - 457ffd60 2026-03-06T17:33:26+01:00 CNC: Rename ClusterIPServiceNetwork to ServiceNetwork
+  - 272e9873 2026-03-06T13:47:33+01:00 fix: add short names for (c)udn
+  - c4b41d78 2026-03-05T18:58:41+01:00 Make addresssetmanager shared across controllers
+  - 0a20a514 2026-03-05T18:32:55+01:00 e2e: kubevirt: use netshoot image instead of iperf3
+  - e1ed8bb0 2026-03-05T16:20:01+01:00 Move address set manager UT to its own package.
+  - ee22e6f9 2026-03-05T16:20:01+01:00 Cleanup old pod selector address set usage
+  - 5f8f93a2 2026-03-05T16:19:58+01:00 Switch to a separate address set manager
+  - ea34ff5b 2026-03-05T10:45:20+08:00 no-overlay: Add DPU helm chart support for no-overlay and route advertisements
+  - 8314ed71 2026-03-05T10:45:20+08:00 no-overlay: Handle SNAT mode in route advertisements e2e test
+  - fbde3629 2026-03-05T10:45:20+08:00 no-overlay: Add nft rules for SNAT exemption in LGW mode
+  - 417d7e00 2026-03-05T10:45:20+08:00 no-overlay: Centralize pod SNAT operations with exemption support
+  - c10d1f61 2026-03-05T10:45:20+08:00 no-overlay: Implement address set for SNAT exemption in SGW
+  - d43573a7 2026-03-05T10:43:13+08:00 no-overlay: Move SNAT constants to types package
+  - 1ea47082 2026-03-05T10:43:13+08:00 no-overlay: add kind/kind-helm SNAT support and enable in CI
+  - 3dda969d 2026-03-05T10:43:13+08:00 no-overlay: Allow SNAT rules to exempt external IPs
+  - 8103132d 2026-03-05T10:43:13+08:00 no-overlay: Extend AddressSet API to expose UUID
+  - 2b2ffd6f 2026-03-04T15:26:00-05:00 Reduce allocation in hasAddressSet
+  - a5791fcc 2026-03-04T08:56:48-08:00 make retryFramework log message clearer with specific caller
+  - 2b13c74a 2026-03-04T15:01:06+01:00 Add fakeNM lock to cache changes in unit tests
+  - ed1c103e 2026-03-04T15:01:05+01:00 Fix services controller skip logic regression after error type merge
+  - 03a95719 2026-03-04T15:01:05+01:00 Remove really old cleanup of EFW
+  - 63a3f960 2026-03-04T15:01:05+01:00 Rename partial connectivity ACLs
+  - f3624561 2026-03-04T15:01:05+01:00 Skip CNC service connectivity E2E tests when dynamic UDN allocation is enabled
+  - 490c1c5f 2026-03-04T15:01:05+01:00 Guard LBG/ACL switch attachment with localActive for dynamic UDN allocation
+  - 070266ca 2026-03-04T15:01:05+01:00 NITFIX: De-dup test setup utils
+  - 9d2f2174 2026-03-04T15:01:05+01:00 Add controller integration unit tests for Partial connectivity
+  - cebc0ddb 2026-03-04T15:01:05+01:00 Fix serviceNeedsUpdate to handle protocol set changes
+  - 418641a5 2026-03-04T15:01:05+01:00 Add controller integration unit tests for ClusterIPServiceNetwork connectivity
+  - 82159421 2026-03-04T15:01:05+01:00 Add initialSync/Repair function to remove stale CNC setup
+  - e5090188 2026-03-04T15:01:05+01:00 Add utils to fetch dbindexes
+  - c3f288d5 2026-03-04T15:01:05+01:00 Refactor to use LoadBalancerGroups
+  - 5b0ed79c 2026-03-04T15:01:05+01:00 Add GetLoadBalancerGroup and CreateOrUpdateLoadBalancerGroup utils
+  - 5f925cc1 2026-03-04T15:01:05+01:00 Add LoadBalancerGroup mutation ops for LogicalSwitch
+  - 950e16e2 2026-03-04T15:01:05+01:00 Fix stale LB race in CNC service connectivity after UDN recreate
+  - a1d2f2a2 2026-03-04T15:01:05+01:00 E2E: Add max-time for checkConnectivity
+  - 38edb749 2026-03-04T15:01:05+01:00 Reduce time taken by CNC tests
+  - d028be9e 2026-03-04T15:01:04+01:00 Add E2E tests for service connectivity
+  - 0f3200d6 2026-03-04T15:01:04+01:00 Implement partial connectivity
+  - f5980ac4 2026-03-04T15:01:04+01:00 Implement Service Connectivity
+  - 20562274 2026-03-04T15:01:04+01:00 Add service controller plumbing
+  - e2ab6372 2026-03-04T15:01:04+01:00 Fix UDN ClusterIP loadbalancer creation
+  - 26a28b5b 2026-03-04T08:29:11-05:00 Exclude webhook pods from being subject to the webhook
+  - adb71a84 2026-03-04T10:05:31+01:00 kind: fix -ric flag kubectl connection refused errors
+  - 513fdda3 2026-03-03T17:30:31-05:00 Remove NetworkQoS dependency on namespace address set
+  - ddecadf0 2026-03-03T17:30:30-05:00 Remove EgressQoS dependency on namespace AS
+  - 9fcebab2 2026-03-03T17:05:38+01:00 [CNC] fix discoverSelectedNetworks to return unique netInfos.
+  - cea695a5 2026-03-03T17:05:38+01:00 [e2e:CNC] allocate non-overlapping subnets for interconnected (C)UDNs
+  - 8a892794 2026-03-03T17:05:33+01:00 CNC: add status report from the cluster manager.
+  - 42fd999d 2026-03-03T16:47:38+01:00 route advertisement: Init FRR factory for combined mode
+  - f1c55e5f 2026-03-03T10:36:58-05:00 Remove bits about docker ipv6 support being experimental
+  - 7237b8c9 2026-03-03T16:07:08+01:00 Use GinkgoHelper in ovntesting.OnSupportedPlatformsIt()
+  - 3f7a0811 2026-03-03T12:32:41+01:00 Enable FRR to act as the route reflector client
+  - a23ecc7c 2026-03-03T12:32:40+01:00 e2e: fix parallel-unsafe global cleanup check in API validation tests
+  - 93dfc13e 2026-03-03T12:32:39+01:00 Add a new EVPN e2e lane
+  - e6d5f4a3 2026-03-03T12:32:37+01:00 e2e: Fix IPv6 connected routes in VRF becoming inactive in FRR
+  - 713e964b 2026-03-03T12:32:36+01:00 nitfix: add container information to the log line
+  - 3850fb4c 2026-03-03T12:32:28+01:00 REVERT ME: Temporary commit till ovnkube EVPN implementation lands
+  - 400e235c 2026-03-03T12:32:26+01:00 e2e: Add EVPN connectivity test with DescribeTable
+  - 7e295154 2026-03-03T12:30:54+01:00 e2e: evpn: add createFRRConfiguration utility
+  - 543882fb 2026-03-03T12:30:52+01:00 e2e: evpn: add createVTEP utility for EVPN tests
+  - 7c3371e8 2026-03-03T12:29:34+01:00 STEP6: Add IP-VRF agnhost setup utility
+  - 59fa0e0c 2026-03-03T12:29:32+01:00 STEP5: Add MAC-VRF agnhost setup utility
+  - b939356b 2026-03-03T12:28:04+01:00 e2e: Add support for container IP request during creation
+  - 5bfcf803 2026-03-03T12:28:03+01:00 STEP4: Add EVPN BGP router config setup utilities for external FRR
+  - f06d228b 2026-03-03T12:26:51+01:00 STEP3: Add IP-VRF setup utility for external FRR
+  - 32ee58e0 2026-03-03T12:26:38+01:00 STEP2: Add MAC-VRF setup utility for external FRR
+  - 486d34a7 2026-03-03T12:26:36+01:00 STEP1: Add EVPN bridge br0 and VXLAN netdevice vxlan0 for external FRR
+  - aeade799 2026-03-03T12:24:52+01:00 STEP0: Configure global EVPN BGP on external FRR at install time
+  - f2ddf75a 2026-03-03T12:24:52+01:00 e2e: Add EVPN test infrastructure diagram
+  - d9abf307 2026-03-02T17:21:50-05:00 Change package names from ovn-org to ovn-kubernetes
+  - 8d70b031 2026-03-02T14:40:21-05:00 docs: Explain how to pull exact fedora image version from a CI run
+  - afd59fb2 2026-03-02T14:40:21-05:00 ci: Collect info about fedora base in test container images
+  - ce0a7903 2026-03-02T12:47:39-05:00 docs: Explain how to use gdb for ovn services
+  - 04f3fc54 2026-03-02T11:58:03-05:00 Bump frr image from frr-k8s demo to 10.4.2
+  - a10fb54e 2026-03-02T11:58:03-05:00 Bump frr image from frr-k8s demo to 10.4.1
+  - 1e273ada 2026-03-02T11:18:56-05:00 Belatedly update some other tests for past nftables porting
+  - e5b8550c 2026-03-02T11:18:56-05:00 Belatedly remove some iptables setup calls in the UDN unit tests
+  - d9cb9038 2026-03-02T11:18:56-05:00 Remove iptables stuff from initFakeNodePortWatcher()
+  - f6cb1605 2026-03-02T09:51:58-05:00 Bump libovsdb to fix monitor race
+  - 2f21815a 2026-03-02T14:50:26+01:00 Fix VM live migration on Layer 2 networks with EVPN
+  - 68238fbe 2026-03-02T14:50:26+01:00 Add deny ARP and NS ACL for L2 EVPN
+  - 9f3a7c3a 2026-03-02T14:50:26+01:00 EVPN is only supported in local gateway mode
+  - 324f3fb0 2026-03-02T14:50:26+01:00 Add zone controller support for L3 EVPN networks
+  - 1fc0bb76 2026-03-02T14:50:26+01:00 Add zone controller support for L2 EVPN networks
+  - f96d0479 2026-03-02T14:50:26+01:00 Test zone network controller initialization
+  - 8eeb0ec7 2026-03-02T12:21:50+08:00 no-overlay: Add validation controller for RouteAdvertisements
+  - bc9fd301 2026-02-27T11:47:06-05:00 Handle the UDN cleanup special case without using `nft destroy`
+  - d54c439c 2026-02-27T13:59:34+08:00 cudn: remove Geneve transport option, use field omission for default
+  - 30a95515 2026-02-26T17:50:31-05:00 Address CNC integration with dynamic UDN
+  - 9dce4743 2026-02-26T12:39:23-05:00 Updates Dynamic UDN OKEP with dynamic allocation
+  - 73ddbe9a 2026-02-26T15:28:39+08:00 e2e: verify CUDN pod subnet is advertised to external FRR router
+  - c4f5fce2 2026-02-25T18:54:00-05:00 e2e: restore nodes before checking readiness in egressip AfterEach
+  - 7b885e65 2026-02-25T16:35:36-05:00 e2e: log cleanup operations in kind test context
+  - 63f57e73 2026-02-24T15:21:02+01:00 Revert "Use `nft destroy` to simplify the UDN cleanup code"
+  - be75e912 2026-02-20T12:25:22-08:00 e2e: add e2e test for multiple attachments to the same localnet NAD
+  - 88b276ba 2026-02-20T12:01:35-08:00 support multiple interfaces on the same localnet network
 
-- cluster-ingress-operator embedded-component ccf658f9eb520933b5e50d5903715f71053c9adb to dde7a93953d8b82faf492b759cc48763645b7039
-  - fc6e70e 2026-03-25T22:54:57-04:00 gatewayclass: Enable Horizontal Pod Autoscaling
-  - 34fd6fa 2026-03-25T06:56:57-07:00 test: update unit tests for AWS client provider
-  - f46a00c 2026-03-25T06:56:57-07:00 dns: configure Route53 and tagging clients for AWS European Sovereign Cloud
-  - e1e5a26 2026-03-25T06:56:57-07:00 endpoint: support custom endpoint for ELB v2
-  - 9b58a24 2026-03-24T16:09:29+01:00 OCPBUGS-62237: Apply APIServer TLS security profile to canary daemonset
-  - 82dc195 2026-03-20T14:29:16+01:00 NE-2421: Support dual-stack IngressController on AWS
-
-- cluster-kube-apiserver-operator embedded-component 5092ca2c6c33001dfe65c879dd9c0abee2f8a2b4 to ece488fe8612a58b95add127413a2c6f33210445
-  - 5fadfe6 2026-03-25T00:12:36-07:00 CORS-4363: fix bindAddress/bindNetwork for dual-stack IPv6 primary clusters
-
-- cluster-kube-controller-manager-operator embedded-component 49eb7c72d0ba0efc85dbd291e90335f0734ffa1a to 7df2876085ac1d76ac11bf476c0538876110c9f0
-  - b686ecf 2026-03-11T10:43:57Z Restart operator when TLS config changes
-
-- cluster-kube-scheduler-operator embedded-component a1e9a14ae7748e55b070dce831828800fd22639a to ddbfddb8a0c77b03c1d7c994991caa031d99c330
-  - c29316c 2026-03-11T10:48:17Z Restart operator when TLS config changes
-
-- cluster-network-operator embedded-component b8d21fa3f9e0d10add2cc933b327693ff9904641 to 5ce0f713f24815bc508207b265d4a44d9c11a2d2
-  - be6b8e7 2026-03-27T16:07:05+01:00 Add DevPreview NetworkConnect FG
-  - d8c7bbf 2026-03-25T15:36:20+01:00 Update OWNERS_ALIASES to include myself + "taanyas" and "marty-power" as reviewers, clean up formatting, and remove "ricky-rav" as he left Red Hat. Signed-off-by: Matteo Dallaglio <mdallagl@redhat.com>
-  - 297328f 2026-03-25T14:44:52+05:30 Add config override for allow-icmp-network-policy
-
-- cluster-openshift-controller-manager-operator embedded-component 8e04fd3a6d1bbdb878a83fa13fde240c593504cc to e0d28ec9e1c91b0b72ff66c98f7a3b126f4480ad
-  - 1c4f329 2026-03-11T10:45:32Z Restart operator when TLS config changes
-
-- machine-config-operator embedded-component c564b220f27b907206273edaaa0ee9f037b796ff to 540dfc0e51cd7324d8860b53a50b1b19e23e1aaf
-  - 9a0ff420 2026-03-27T11:44:46+01:00 MCO-2182: MCS fallback to latest v3
-  - c9ac3b6e 2026-03-25T15:47:11-04:00 remove legacy bootimage tests
-  - 5db7a7fa 2026-03-25T15:29:00-04:00 move longrun bootimage tests to disruptive
-  - 0e36e4a6 2026-03-25T15:53:57Z Fix coderabbitai suggestions
-  - a3564a1e 2026-03-25T10:31:12-04:00 AGENT-1366: Report InternalReleaseImageController errors in IRI status
-  - 9f288d56 2026-03-24T15:52:38-04:00 test: update cluster skip helpers to use oc
-  - 915d537a 2026-03-24T18:39:58+05:30 add fixes in MCN and update the rhel-version regexp
-  - e75526f7 2026-03-24T10:57:06Z MCO-2167: Migrate alert test cases from the private repository
-  - fdf1f44b 2026-03-03T02:30:46-06:00 Add etcd size limit validation for rendered MachineConfigs
-
-- operator-framework-olm embedded-component 528f8249cda0c7987492b25c500499ad3c1e3202 to 3a864ce8343abf8877d7e20b0f5cff08d9e156f9
-  - dd3ff27b 2026-02-27T14:41:30-06:00 Migrate away from deprecated ioutil
-
-- service-ca-operator embedded-component 661be3215fe08bc35f4c9eab23a8f75c5f204203 to dda95b7cb4e6810b5f604599d99c64af6c2d56cf
-  - b4cf86c 2026-02-05T17:17:44-05:00 NO-JIRA: OWNERS: remove vrutkovs and add sanchezl
-
-- oc image-amd64 8d7f53ef218fd86c83c3cca2252623ac39fb7d44 to c268e49f1f3b68b830472e2244f0aeef2cca9d2c
-  - b9c6614b 2026-03-26T16:27:03-04:00 Address comments from review
-  - 7e63b076 2026-03-23T12:26:05-04:00 Use the informing label to not block the release
-  - e668cbd7 2026-03-18T15:48:15-04:00 Add e2e test for oc adm upgrade accept
-  - 9b7e87d5 2026-03-18T15:48:15-04:00 OTA-1548: set up accepted risks
-
-- router image-amd64 8b94c5cd90c435e6b3cf137dc35fcbddb4c048a3 to 235e224fe1acd6626f70bb4a21289d0f5173246a
-  - 79c1c84 2026-03-27T12:25:35-04:00 Revert "NE-2333: Add support for configurable SSL curves in HAProxy configuration"
-  - 4b539da 2026-03-25T19:41:26Z Use X25519MLKEM768:X25519:P-256 as default TLS groups
-  - 673f5f0 2026-03-25T15:57:01Z Add support for configurable SSL curves in HAProxy configuration
-
-- ovn-kubernetes image-amd64 051683259bf47d709be19a78c5f218223da54dee to cca0923d6f0ea9d09e77a8085d83a32e35055af0
-  - 59a367d8 2026-03-04T18:35:45Z Updating ovn-kubernetes-microshift-container image to be consistent with ART for 4.22 Reconciling with https://github.com/openshift/ocp-build-data/tree/3598daf1fa2bf91473f6b3349b8aeb1d81dc397b/images/ovn-kubernetes-microshift.yml
-  - 0e5eeedc 2026-03-04T08:21:36Z Updating ose-ovn-kubernetes-container image to be consistent with ART for 4.22 Reconciling with https://github.com/openshift/ocp-build-data/tree/56cb39ad358cdec1db7c84ea1919fe8849c2550b/images/ose-ovn-kubernetes.yml
-
-- service-ca-operator image-amd64 661be3215fe08bc35f4c9eab23a8f75c5f204203 to dda95b7cb4e6810b5f604599d99c64af6c2d56cf
-  - b4cf86c 2026-02-05T17:17:44-05:00 NO-JIRA: OWNERS: remove vrutkovs and add sanchezl
-
-- oc image-arm64 8d7f53ef218fd86c83c3cca2252623ac39fb7d44 to c268e49f1f3b68b830472e2244f0aeef2cca9d2c
-  - b9c6614b 2026-03-26T16:27:03-04:00 Address comments from review
-  - 7e63b076 2026-03-23T12:26:05-04:00 Use the informing label to not block the release
-  - e668cbd7 2026-03-18T15:48:15-04:00 Add e2e test for oc adm upgrade accept
-  - 9b7e87d5 2026-03-18T15:48:15-04:00 OTA-1548: set up accepted risks
-
-- router image-arm64 8b94c5cd90c435e6b3cf137dc35fcbddb4c048a3 to 235e224fe1acd6626f70bb4a21289d0f5173246a
-  - 79c1c84 2026-03-27T12:25:35-04:00 Revert "NE-2333: Add support for configurable SSL curves in HAProxy configuration"
-  - 4b539da 2026-03-25T19:41:26Z Use X25519MLKEM768:X25519:P-256 as default TLS groups
-  - 673f5f0 2026-03-25T15:57:01Z Add support for configurable SSL curves in HAProxy configuration
+- service-ca-operator image-arm64 dda95b7cb4e6810b5f604599d99c64af6c2d56cf to 951ea66067b4d69c868470e26a5a1a9f689be23e
+  - 8fe334e 2026-03-26T14:07:11-04:00 vendor: update
+  - e4f58c5 2026-03-26T14:07:11-04:00 bindata: replace `go-bindata` with `embed.FS`
 
