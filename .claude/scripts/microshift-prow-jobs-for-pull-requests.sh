@@ -265,8 +265,11 @@ mode_approve() {
         fi
 
         if [[ "${success}" -eq "${total}" ]]; then
+            local comment=$'/lgtm\n/verified by ci\n'
+            comment+=$'\n'"*Added by $(basename "${0}")* :robot:"$'\n'
+
             echo "PR #${pr_number}: All ${total} jobs passed, approving..."
-            gh pr comment "${pr_number}" --repo "${GH_REPO}" --body $'/lgtm\n/verified by ci'
+            gh pr comment "${pr_number}" --repo "${GH_REPO}" --body "${comment}"
             echo "PR #${pr_number}: Approved"
         else
             echo "PR #${pr_number}: ${success}/${total} jobs passed, skipping"
@@ -332,8 +335,7 @@ mode_restart() {
             [[ -z "${short_name}" ]] && continue
             comment+="/test ${short_name}"$'\n'
         done
-        # Remove trailing newline
-        comment="${comment%$'\n'}"
+        comment+=$'\n'"*Added by $(basename "${0}")* :robot:"$'\n'
 
         echo "PR #${pr_number}: Restarting ${#failed_jobs[@]} failed job(s): ${failed_jobs[*]}"
         gh pr comment "${pr_number}" --repo "${GH_REPO}" --body "${comment}"
