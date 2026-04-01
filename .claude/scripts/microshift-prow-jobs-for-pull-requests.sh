@@ -10,6 +10,7 @@ GCS_BASE="https://storage.googleapis.com/test-platform-results"
 PROW_VIEW="https://prow.ci.openshift.org/view/gs/test-platform-results"
 GH_REPO="openshift/microshift"
 GCS_PR_PREFIX="pr-logs/pull/openshift_microshift"
+SIGNATURE=$'\n'"*Added by $(basename "${0}")* :robot:"$'\n'
 
 # Get open PRs using GitHub CLI, optionally filtered by title substring and/or author
 fetch_open_prs() {
@@ -266,7 +267,7 @@ mode_approve() {
 
         if [[ "${success}" -eq "${total}" ]]; then
             local comment=$'/lgtm\n/verified by ci\n'
-            comment+=$'\n'"*Added by $(basename "${0}")* :robot:"$'\n'
+            comment+="${SIGNATURE}"
 
             echo "PR #${pr_number}: All ${total} jobs passed, approving..."
             gh pr comment "${pr_number}" --repo "${GH_REPO}" --body "${comment}"
@@ -335,7 +336,12 @@ mode_restart() {
             [[ -z "${short_name}" ]] && continue
             comment+="/test ${short_name}"$'\n'
         done
-        comment+=$'\n'"*Added by $(basename "${0}")* :robot:"$'\n'
+
+        if [[ -z "${comment}" ]]; then
+            echo "PR #${pr_number}: Could not resolve rerun commands for failed job(s), skipping"
+            continue
+        fi
+        comment+="${SIGNATURE}"
 
         echo "PR #${pr_number}: Restarting ${#failed_jobs[@]} failed job(s): ${failed_jobs[*]}"
         gh pr comment "${pr_number}" --repo "${GH_REPO}" --body "${comment}"
