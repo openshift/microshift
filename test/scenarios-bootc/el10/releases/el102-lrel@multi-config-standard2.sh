@@ -19,17 +19,14 @@ WEB_SERVER_URL="http://[${VM_BRIDGE_IP}]:${WEB_SERVER_PORT}"
 start_image="rhel102-bootc-brew-lrel-tuned"
 
 scenario_create_vms() {
-    if ! does_image_exist "${start_image}"; then
-        echo "Image '${start_image}' not found - skipping test"
-        return 0
-    fi
+    exit_if_image_not_found "${start_image}"
 
     # Temporarily override MIRROR_REGISTRY_URL for kickstart preparation
     # The kickstart template needs a hostname-based URL, not an IPv6 address
     local original_mirror_url="${MIRROR_REGISTRY_URL}"
     MIRROR_REGISTRY_URL="$(hostname):${MIRROR_REGISTRY_PORT}/microshift"
 
-    # Enable IPv6 single stack in kickstart
+    # Enable IPv6 single stack in kickstart, with tuned configuration enabled
     prepare_kickstart host1 kickstart-bootc.ks.template "${start_image}" false true
 
     # Restore original MIRROR_REGISTRY_URL for runtime use
@@ -39,19 +36,13 @@ scenario_create_vms() {
 }
 
 scenario_remove_vms() {
-    if ! does_image_exist "${start_image}"; then
-        echo "Image '${start_image}' not found - skipping test"
-        return 0
-    fi
+    exit_if_image_not_found "${start_image}"
 
     remove_vm host1
 }
 
 scenario_run_tests() {
-    if ! does_image_exist "${start_image}"; then
-        echo "Image '${start_image}' not found - skipping test"
-        return 0
-    fi
+    exit_if_image_not_found "${start_image}"
 
     # Wait for microshift-tuned to reboot the node
     local -r start_time=$(date +%s)
