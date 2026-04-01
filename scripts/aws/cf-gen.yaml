@@ -5,7 +5,7 @@ Conditions:
 Mappings:
  VolumeSize:
    MetalMachine:
-     PrimaryVolumeSize: "300"
+     PrimaryVolumeSize: "400"
      SecondaryVolumeSize: "0"
      Throughput: 750
      Iops: 6000
@@ -290,6 +290,13 @@ Resources:
           #!/bin/bash -xe
           echo "====== Authorizing public key ======" | tee -a /tmp/init_output.txt
           echo "${PublicKeyString}" >> /home/ec2-user/.ssh/authorized_keys
+          # Redirect /tmp to /var/tmp to avoid tmpfs RAM usage
+          echo "====== Redirecting /tmp to /var/tmp ======" | tee -a /tmp/init_output.txt
+          # Move tmpfs /tmp out of the way and create symlink to disk-backed /var/tmp
+          mv /tmp /tmp.tmpfs
+          ln -sf /var/tmp /tmp
+          echo "====== /tmp successfully redirected to /var/tmp ======" | tee -a /tmp/init_output.txt
+
           # Use the same defaults as OCP to avoid failing requests to apiserver, such as
           # requesting logs.
           echo "====== Updating inotify =====" | tee -a /tmp/init_output.txt
