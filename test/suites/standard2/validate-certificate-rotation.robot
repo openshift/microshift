@@ -16,6 +16,10 @@ Test Tags           restart
 
 *** Variables ***
 ${KUBE_SCHEDULER_CLIENT_CERT}       /var/lib/microshift/certs/kube-control-plane-signer/kube-scheduler/client.crt
+${ETCD_SIGNER_CA}                   /var/lib/microshift/certs/etcd-signer/ca.crt
+${ETCD_PEER_CERT}                   /var/lib/microshift/certs/etcd-signer/etcd-peer/peer.crt
+${ETCD_SERVING_CERT}                /var/lib/microshift/certs/etcd-signer/etcd-serving/peer.crt
+${ETCD_APISERVER_CLIENT_CERT}       /var/lib/microshift/certs/etcd-signer/apiserver-etcd-client/client.crt
 ${OSSL_CMD}                         openssl x509 -noout -dates -in
 ${OSSL_DATE_FORMAT}                 %b %d %Y
 ${TIMEDATECTL_DATE_FORMAT}          %Y-%m-%d %H:%M:%S
@@ -23,6 +27,32 @@ ${FUTURE_DAYS}                      150
 
 
 *** Test Cases ***
+Manual Rotation Of Etcd Signer Certs
+    [Documentation]    Verify that deleting etcd signer certificates and restarting
+    ...    MicroShift causes them to be regenerated.
+    [Tags]    etcd
+    # Capture the original cert fingerprint before deletion
+    ${original_fp}=    Get Cert Fingerprint    ${ETCD_SIGNER_CA}
+    Command Should Work    bash -c 'rm -rf /var/lib/microshift/certs/etcd-signer/*'
+    Restart MicroShift
+
+    VAR    @{cert_files}=
+    ...    ${ETCD_SIGNER_CA}
+    ...    ${ETCD_PEER_CERT}
+    ...    ${ETCD_SERVING_CERT}
+    ...    ${ETCD_APISERVER_CLIENT_CERT}
+    FOR    ${cert_file}    IN    @{cert_files}
+        Verify Remote File Exists With Sudo    ${cert_file}
+        Certificate Should Be Valid For Current Time    ${cert_file}
+    END
+
+    # Expiry comparison won't work: alignValidity() anchors all same-day
+    # certs to the same notAfter (tomorrow_midnight + validity). Use
+    # fingerprint instead — it covers key, serial, and all cert fields.
+    ${new_fp}=    Get Cert Fingerprint    ${ETCD_SIGNER_CA}
+    Should Not Be Equal As Strings    ${original_fp}    ${new_fp}
+    ...    msg=CA cert fingerprint should differ after regeneration
+
 Certificate Rotation
     [Documentation]    Performs Certificate Expiration Rotation test
     # Certificates expire at midnight of (tomorrow + validity). For short-lived certs,
@@ -53,7 +83,12 @@ Teardown
     Logout MicroShift Host
 
 Restore System Date
-    [Documentation]    Reset Microshift date to current date
+    [Documentation]    Reset MicroShift date to current date.
+    ...    Skips if chronyd is already active (date was never changed).
+    ${stdout}    ${rc}=    Execute Command
+    ...    systemctl is-active chronyd
+    ...    sudo=True    return_rc=True
+    IF    '${stdout.strip()}' == 'active'    RETURN
     ${ushift_pid}=    MicroShift Process ID
     Systemctl    start    chronyd
     Wait Until MicroShift Process ID Changes    ${ushift_pid}
@@ -79,7 +114,7 @@ Compute Date After Days
     RETURN    ${future_date}
 
 Certs Should Expire On
-    [Documentation]    verify if the ceritifate expires at given date.
+    [Documentation]    verify if the certificate expires at given date.
     [Arguments]    ${cert_file}    ${cert_expected_date}
     ${expiration_date}=    Command Should Work
     ...    ${OSSL_CMD} ${cert_file} | grep notAfter | cut -f2 -d'=' | awk '{printf ("%s %02d %d",$1,$2,$4)}'
@@ -109,6 +144,17 @@ Certificate Should Be Valid For Current Time
 
     ${cert_not_before}=    Command Should Work
     ...    ${OSSL_CMD} ${cert_file} | grep notBefore | cut -f2 -d'=' | xargs -I {} date -d "{}" +%s
+    ${cert_not_after}=    Command Should Work
+    ...    ${OSSL_CMD} ${cert_file} | grep notAfter | cut -f2 -d'=' | xargs -I {} date -d "{}" +%s
     ${current_time}=    Command Should Work    date +%s
     Should Be True    ${cert_not_before} <= ${current_time}
     ...    msg=Certificate NotBefore (${cert_not_before}) is after current time (${current_time})
+    Should Be True    ${current_time} <= ${cert_not_after}
+    ...    msg=Certificate NotAfter (${cert_not_after}) is before current time (${current_time})
+
+Get Cert Fingerprint
+    [Documentation]    Return the SHA256 fingerprint of a certificate
+    [Arguments]    ${cert_file}
+    ${fingerprint}=    Command Should Work
+    ...    openssl x509 -noout -fingerprint -sha256 -in ${cert_file}
+    RETURN    ${fingerprint}

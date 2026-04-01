@@ -160,6 +160,43 @@ gettool_gomplate() {
     _install "${url}" "${checksum}" "${filename}" "gomplate_linux-${arch}"
 }
 
+gettool_etcdctl() {
+    # Extract the etcd version from the vendored source so it stays in sync
+    # automatically when the etcd dependency is bumped.
+    local -r version_file="${ROOT_DIR}/etcd/vendor/go.etcd.io/etcd/api/v3/version/version.go"
+    local ver
+    ver=$(grep -E '^[[:space:]]+Version[[:space:]]+=' "${version_file}" | sed 's/.*"\(.*\)"/\1/')
+    if [[ -z "${ver}" ]]; then
+        echo "Error: could not extract etcd version from ${version_file}"
+        return 1
+    fi
+
+    declare -A arch_map=(
+        ["x86_64"]="amd64"
+        ["aarch64"]="arm64")
+
+    local arch="${arch_map[${ARCH}]}"
+    local filename="etcdctl"
+    local tarball="etcd-v${ver}-linux-${arch}.tar.gz"
+    local base_url="https://github.com/etcd-io/etcd/releases/download/v${ver}"
+    local dest="${DEST_DIR}/${filename}"
+
+    [[ -e "${dest}" ]] && return 0
+    echo "Installing ${filename} v${ver} to ${DEST_DIR}"
+
+    curl -sSfL --retry 5 --retry-delay 3 -o "${WORK_DIR}/${tarball}" "${base_url}/${tarball}"
+    curl -sSfL --retry 5 --retry-delay 3 -o "${WORK_DIR}/SHA256SUMS" "${base_url}/SHA256SUMS"
+
+    if ! (cd "${WORK_DIR}" && grep -F "${tarball}" SHA256SUMS | sha256sum -c); then
+        echo "  Checksum verification failed for ${tarball}"
+        return 1
+    fi
+
+    (cd "${WORK_DIR}" && tar xf "${tarball}" --transform 's,.*\/,,g' --wildcards "*/${filename}" >/dev/null)
+    chmod +x "${WORK_DIR}/${filename}"
+    mv "${WORK_DIR}/${filename}" "${dest}"
+}
+
 gettool_robotframework() {
     local venv
 
