@@ -10,11 +10,11 @@ require (
 	github.com/openshift/microshift v0.0.0-00010101000000-000000000000
 	github.com/spf13/cobra v1.10.2
 	go.etcd.io/etcd/server/v3 v3.6.5
-	k8s.io/apimachinery v1.35.2
-	k8s.io/cli-runtime v1.35.2
-	k8s.io/component-base v1.35.2
+	k8s.io/apimachinery v1.35.3
+	k8s.io/cli-runtime v1.35.3
+	k8s.io/component-base v1.35.3
 	k8s.io/klog/v2 v2.140.0
-	k8s.io/kubectl v1.35.2
+	k8s.io/kubectl v1.35.3
 	sigs.k8s.io/yaml v1.6.0
 )
 
@@ -98,11 +98,11 @@ require (
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20260226221140-a57be14db171 // indirect
 	gopkg.in/evanphx/json-patch.v4 v4.13.0 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
-	k8s.io/api v1.35.2 // indirect
-	k8s.io/apiserver v1.35.2 // indirect
-	k8s.io/client-go v1.35.2 // indirect
+	k8s.io/api v1.35.3 // indirect
+	k8s.io/apiserver v1.35.3 // indirect
+	k8s.io/client-go v1.35.3 // indirect
 	k8s.io/kube-openapi v0.0.0-20260304202019-5b3e3fdb0acf // indirect
-	k8s.io/kubelet v1.35.2 // indirect
+	k8s.io/kubelet v1.35.3 // indirect
 	k8s.io/utils v0.0.0-20260210185600-b8788abfbbc2 // indirect
 	sigs.k8s.io/kustomize/api v0.20.1 // indirect
 	sigs.k8s.io/kustomize/kyaml v0.20.1 // indirect
