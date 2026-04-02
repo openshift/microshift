@@ -32,6 +32,29 @@ import (
 	_ "k8s.io/kubernetes/test/e2e/lifecycle"
 )
 
+func init() {
+	// Register OpenShift-specific cloud providers that are not part of upstream
+	// Kubernetes. Without these registrations, k8s-tests-ext crashes with
+	// "Unknown provider" when openshift-tests passes a provider like "ibmcloud".
+	// These providers don't need any special setup for running upstream kube
+	// tests, so a NullProvider is sufficient.
+	for _, name := range []string{
+		"baremetal",
+		"ovirt",
+		"kubevirt",
+		"alibabacloud",
+		"nutanix",
+		"ibmcloud",
+		"external",
+	} {
+		func(n string) {
+			framework.RegisterProvider(n, func() (framework.ProviderInterface, error) {
+				return framework.NullProvider{}, nil
+			})
+		}(name)
+	}
+}
+
 // Initialize a good enough test context for generating e2e tests,
 // so they can be listed and filtered.
 func initializeCommonTestFramework() error {
