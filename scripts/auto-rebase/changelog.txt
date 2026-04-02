@@ -1,4 +1,100 @@
-- ovn-kubernetes image-arm64 cca0923d6f0ea9d09e77a8085d83a32e35055af0 to ee514f9f66a328f4dd4b583709a8e411b515fa5f
+- api embedded-component 1e7cd4b531e7ce17efdb1d541013e0c55362bfa5 to 80fcf457ee87d9a81075bcc4e6deac506448195f
+  - 13f1241f 2026-03-30T05:58:11-04:00 Add ConfidentialCluster to the feature gate
+  - 77316367 2026-03-27T15:41:06Z Add OCP 4.15 (K8s 1.28) envtest release
+  - 76aebe7f 2026-03-27T10:04:00-04:00 Added new feature gate VSphereMultiVCenterDay2
+  - c67875d7 2026-03-24T00:17:28-04:00 Promote AzureClusterHostedDNS to default
+  - ff9d1de3 2026-03-20T11:59:51Z Add OCP 4.16 (K8s 1.29) envtest release
+
+- cluster-ingress-operator embedded-component dde7a93953d8b82faf492b759cc48763645b7039 to dfec6c028e2d4eaf7dd161cdc0e75740894df421
+  - d1de5cb 2026-03-31T12:47:25-04:00 add a commment to why BTLS test is skipped
+  - 5f91d10 2026-03-31T12:31:40-04:00 remove BTLS test
+  - 6895ca2 2026-03-31T11:03:44-04:00 Update conformance script version
+  - 2bfa9f7 2026-03-31T11:03:44-04:00 Bump to OSSM 3.3.1 and Istio v1.28.5
+  - b1bbbb7 2026-03-30T09:09:56-04:00 Remove SetImageDefaults that overrode CSV image SHAs
+  - 43c978a 2026-03-30T09:09:53-04:00 NE-2519: Move Sail Library to official release branch
+  - 6b6d84c 2026-03-27T12:10:43-04:00 Implement configurationManagement API
+  - 5374dab 2026-03-27T12:06:37-04:00 Bump openshift/api for configurationManagement API
+  - b088953 2026-03-26T16:15:23-04:00 OCPBUGS-79667: Use feature-gate annotation for Sail Library RBAC
+  - 9fe57a5 2026-03-26T11:48:51-04:00 fix(log): Add INFO logs alongside event recorder calls
+  - 6d2c6c8 2026-03-25T12:00:58-04:00 OCPBUGS-79467: Change default log level from DEBUG to INFO
+  - 7e92761 2026-03-16T21:00:19+01:00 OCPBUGS-78541: Move TestIngressControllerCustomEndpoints to run last
+
+- cluster-kube-apiserver-operator embedded-component ece488fe8612a58b95add127413a2c6f33210445 to de2a3ebcb3ceea0ea411a6fbb9b5b52c18c27e06
+  - 697f4d8 2026-04-01T12:35:57+05:30 update bouncpod functions
+  - 22d6e51 2026-04-01T08:28:56+05:30 update feedback
+  - 31f9a8f 2026-03-31T10:48:22+05:30 Fix TestBoundTokenOperatorSecretDeletion stability and monitor failures
+  - 03dbc35 2026-03-11T10:47:18Z Restart operator when TLS config changes
+
+- cluster-network-operator embedded-component 5ce0f713f24815bc508207b265d4a44d9c11a2d2 to 594de43f4f1567e5ce55be2eff7c0cf28d1e09e7
+  - 067feb9 2026-03-20T09:40:14+01:00 Fix ManagementState being reset on operator restart
+
+- kubernetes embedded-component 2b19898a979eb1ff0cd87ec5d49106e555e70ce6 to 9193b12ab88e006723c8605bea1659bfcbe7d638
+  - 429a52821 2026-03-27T14:29:55-04:00 UPSTREAM: <carry>: Register OpenShift cloud providers in k8s-tests-ext
+  - 39a9d96ad 2026-03-20T17:46:12-04:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - 78f7230b0 2026-03-20T15:17:52+01:00 UPSTREAM: 137926: KEP-961: demote maxUnavailable feature in statefulset to off by default
+  - 6c1cd99ae 2026-03-18T18:30:07Z Release commit for Kubernetes v1.35.3
+  - b57e146ae 2026-03-09T10:14:05-04:00 cmd/kubeadm: ignore EINVAL error during unmount
+  - af6488c9d 2026-03-04T18:02:34+05:30 Use localhost image reference in PodObservedGenerationTracking test
+  - 61003ad14 2026-03-03T14:33:21-08:00 drop publishing rules from dependencies.yaml on release branch
+  - b9be60a8c 2026-03-03T16:21:08+05:30 start scheduler after creating binding/non-binding slices
+  - 659d489e8 2026-03-03T16:21:08+05:30 dra: stabilize DeviceBindingConditions BasicFlow by creating without-binding slice first
+  - 02115b6ee 2026-02-26T20:14:22Z Update CHANGELOG/CHANGELOG-1.35.md for v1.35.2
+  - 1c0c911c3 2026-02-26T10:28:59Z kubeadm: do not add learner member to etcd client endpoints
+  - d05c50653 2026-02-16T15:29:03+05:30 Fix flake TestDeviceTaintRule test by adjusting event hanlder status update logic Co-authored-by: Pohly <patrick.ohly@intel.com>
+  - 2371267d2 2026-02-10T15:18:30-08:00 add dockerized go cache to  `make clean`
+  - bd3999173 2026-02-10T10:07:55+01:00 fake client-go: un-deprecate NewSimpleClientset
+  - 0a9d14b01 2026-01-21T18:32:52+05:30 Fix flaky TestApplyCRDuringCRDFinalization test
+
+- machine-config-operator embedded-component 540dfc0e51cd7324d8860b53a50b1b19e23e1aaf to 39ca98383d9b1aedf6147f9ff89e69b5a23541be
+  - 52ce5d6e 2026-03-30T13:19:07-04:00 operator: add skew doc links
+  - 162428e6 2026-03-30T15:13:20+05:30 reuse the func
+  - 83659461 2026-03-26T11:08:10Z NO-ISSUE: In extended tests, disable Skew when disabling the bootimages update
+  - afe3c608 2026-03-26T15:26:20+05:30 refactor: extract helper functions for PinnedImageSet test (OCP-88378)
+  - 7d41f94e 2026-03-26T12:24:51+05:30 duplicate images within a single PinnedImageSet (same image listed twice in the pinnedImages array)
+  - 69f31d0f 2026-03-23T12:18:23+05:30 test: add OCP-88378 Deleting a PinnedImageSet does not affect images pinned by another PinnedImageSet
+
+- operator-framework-olm embedded-component 3a864ce8343abf8877d7e20b0f5cff08d9e156f9 to 438f0e600e4ae75c8b7854afba5be963061eb2a1
+  - 26c54c87 2026-03-31T10:42:47+02:00 UPSTREAM: <carry>: Add pedjak and fgiudici as reviewers
+  - 8abbc327 2026-03-29T00:09:49Z Bump the k8s-dependencies group with 4 updates (#482)
+  - a5ea82ce 2026-03-29T00:09:08Z Bump google.golang.org/grpc from 1.78.0 to 1.79.3 (#481)
+  - 0e595339 2026-03-29T00:08:55Z Bump sigs.k8s.io/controller-runtime in the k8s-dependencies group (#480)
+  - 22670f68 2026-03-29T00:08:41Z Bump the k8s-dependencies group with 4 updates (#479)
+  - 21327766 2026-03-29T00:08:23Z Bump codecov/codecov-action from 5 to 6 (#1941)
+  - dab356b9 2026-03-29T00:08:08Z Bump github.com/operator-framework/api from 0.41.0 to 0.42.0 (#1940)
+  - 44de9cef 2026-03-29T00:07:52Z render package-level info from channel head in semver template (#1933)
+  - 114e8933 2026-03-29T00:07:35Z Bump github.com/docker/cli (#1939)
+  - fa03ec8e 2026-03-29T00:07:19Z Bump github.com/grpc-ecosystem/grpc-health-probe from 0.4.46 to 0.4.47 (#1937)
+  - ce8abe8a 2026-03-29T00:07:03Z Bump the k8s-dependencies group with 4 updates (#1936)
+  - 1f861d7f 2026-03-29T00:06:46Z Bump google.golang.org/grpc from 1.79.2 to 1.79.3 (#1935)
+  - a494f856 2026-03-29T00:06:30Z Bump github.com/mattn/go-sqlite3 from 1.14.34 to 1.14.37 (#1934)
+  - 2c8e7a36 2026-03-29T00:06:15Z chore(lint): Upgrade golanglint from v2.7.2 to  v2.8.0 and fix lint issues" (#1898)
+  - db577836 2026-03-29T00:06:00Z Bump the golang-x-deps group with 2 updates (#1932)
+  - 1701c434 2026-03-29T00:05:45Z Bump google.golang.org/grpc from 1.79.1 to 1.79.2 (#1930)
+  - 12352445 2026-03-29T00:05:30Z Bump github.com/grpc-ecosystem/grpc-health-probe from 0.4.45 to 0.4.46 (#1929)
+  - dc43e19e 2026-03-29T00:05:14Z Bump the golang-x-deps group with 2 updates (#1928)
+  - 975835e0 2026-03-29T00:04:59Z Bump docker/setup-buildx-action from 3 to 4 (#1927)
+  - 5bed99d5 2026-03-29T00:04:44Z Bump github.com/docker/cli (#1926)
+  - 2cdb1b90 2026-03-29T00:04:29Z Bump sigs.k8s.io/controller-runtime in the k8s-dependencies group (#1925)
+  - 1239ec3c 2026-03-29T00:04:14Z Bump docker/login-action from 3 to 4 (#1924)
+  - 68780955 2026-03-29T00:03:58Z Bump docker/setup-qemu-action from 3 to 4 (#1923)
+  - 60eb57b6 2026-03-29T00:03:42Z Bump the k8s-dependencies group with 4 updates (#1922)
+  - b30a6661 2026-03-29T00:03:24Z Update o-f/api and o-f/operator-registry dependencies (#3804)
+  - 5feab6f0 2026-03-29T00:03:06Z Migrate from klog v1 to klog/v2 v2.140.0 and honor stderrthreshold (#3801)
+  - c592d5ea 2026-03-29T00:02:51Z 🌱 Bump the k8s-dependencies group with 8 updates (#3802)
+  - 083fd342 2026-03-29T00:02:30Z :seedling: Bump google.golang.org/grpc from 1.79.2 to 1.79.3 (#3799)
+
+- service-ca-operator embedded-component dda95b7cb4e6810b5f604599d99c64af6c2d56cf to 951ea66067b4d69c868470e26a5a1a9f689be23e
+  - 8fe334e 2026-03-26T14:07:11-04:00 vendor: update
+  - e4f58c5 2026-03-26T14:07:11-04:00 bindata: replace `go-bindata` with `embed.FS`
+
+- oc image-amd64 c268e49f1f3b68b830472e2244f0aeef2cca9d2c to 12f8fce897cae737720309a894dac856d221485e
+  - b7c53a30 2026-03-30T15:31:21+02:00 claude: Turn pr-review skill into code-reviewer agent
+  - d10aa258 2026-03-23T11:41:30+01:00 must-gather: Handle signals properly
+
+- router image-amd64 235e224fe1acd6626f70bb4a21289d0f5173246a to 896390778ebe15f57f87e6ca78f11c96e64c2652
+  - 8997b3d 2026-03-27T19:55:43Z Add support for configurable SSL curves in HAProxy configuration
+
+- ovn-kubernetes image-amd64 cca0923d6f0ea9d09e77a8085d83a32e35055af0 to ee514f9f66a328f4dd4b583709a8e411b515fa5f
   - 979d3db2 2026-03-25T22:24:14-07:00 openshift: update module path and deps for upstream package rename
   - e2237ef1 2026-03-25T17:33:01-07:00 services,node,cni: update OCP hack imports for module rename
   - c24c2e38 2026-03-25T17:32:24-07:00 services: resolve merge conflict in lb_config.go
@@ -185,7 +281,49 @@
   - be75e912 2026-02-20T12:25:22-08:00 e2e: add e2e test for multiple attachments to the same localnet NAD
   - 88b276ba 2026-02-20T12:01:35-08:00 support multiple interfaces on the same localnet network
 
-- service-ca-operator image-arm64 dda95b7cb4e6810b5f604599d99c64af6c2d56cf to 951ea66067b4d69c868470e26a5a1a9f689be23e
+- kubernetes image-amd64 2b19898a979eb1ff0cd87ec5d49106e555e70ce6 to 9193b12ab88e006723c8605bea1659bfcbe7d638
+  - 429a52821 2026-03-27T14:29:55-04:00 UPSTREAM: <carry>: Register OpenShift cloud providers in k8s-tests-ext
+  - 39a9d96ad 2026-03-20T17:46:12-04:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - 78f7230b0 2026-03-20T15:17:52+01:00 UPSTREAM: 137926: KEP-961: demote maxUnavailable feature in statefulset to off by default
+  - 6c1cd99ae 2026-03-18T18:30:07Z Release commit for Kubernetes v1.35.3
+  - b57e146ae 2026-03-09T10:14:05-04:00 cmd/kubeadm: ignore EINVAL error during unmount
+  - af6488c9d 2026-03-04T18:02:34+05:30 Use localhost image reference in PodObservedGenerationTracking test
+  - 61003ad14 2026-03-03T14:33:21-08:00 drop publishing rules from dependencies.yaml on release branch
+  - b9be60a8c 2026-03-03T16:21:08+05:30 start scheduler after creating binding/non-binding slices
+  - 659d489e8 2026-03-03T16:21:08+05:30 dra: stabilize DeviceBindingConditions BasicFlow by creating without-binding slice first
+  - 02115b6ee 2026-02-26T20:14:22Z Update CHANGELOG/CHANGELOG-1.35.md for v1.35.2
+  - 1c0c911c3 2026-02-26T10:28:59Z kubeadm: do not add learner member to etcd client endpoints
+  - d05c50653 2026-02-16T15:29:03+05:30 Fix flake TestDeviceTaintRule test by adjusting event hanlder status update logic Co-authored-by: Pohly <patrick.ohly@intel.com>
+  - 2371267d2 2026-02-10T15:18:30-08:00 add dockerized go cache to  `make clean`
+  - bd3999173 2026-02-10T10:07:55+01:00 fake client-go: un-deprecate NewSimpleClientset
+  - 0a9d14b01 2026-01-21T18:32:52+05:30 Fix flaky TestApplyCRDuringCRDFinalization test
+
+- service-ca-operator image-amd64 dda95b7cb4e6810b5f604599d99c64af6c2d56cf to 951ea66067b4d69c868470e26a5a1a9f689be23e
   - 8fe334e 2026-03-26T14:07:11-04:00 vendor: update
   - e4f58c5 2026-03-26T14:07:11-04:00 bindata: replace `go-bindata` with `embed.FS`
+
+- oc image-arm64 c268e49f1f3b68b830472e2244f0aeef2cca9d2c to f835dae3a861b593c4dd8b688394a61614dd6663
+  - b2332831 2026-03-31T14:21:43-04:00 NO-ISSUE: recover the context in upgrade
+  - b7c53a30 2026-03-30T15:31:21+02:00 claude: Turn pr-review skill into code-reviewer agent
+  - d10aa258 2026-03-23T11:41:30+01:00 must-gather: Handle signals properly
+
+- router image-arm64 235e224fe1acd6626f70bb4a21289d0f5173246a to 896390778ebe15f57f87e6ca78f11c96e64c2652
+  - 8997b3d 2026-03-27T19:55:43Z Add support for configurable SSL curves in HAProxy configuration
+
+- kubernetes image-arm64 2b19898a979eb1ff0cd87ec5d49106e555e70ce6 to 9193b12ab88e006723c8605bea1659bfcbe7d638
+  - 429a52821 2026-03-27T14:29:55-04:00 UPSTREAM: <carry>: Register OpenShift cloud providers in k8s-tests-ext
+  - 39a9d96ad 2026-03-20T17:46:12-04:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - 78f7230b0 2026-03-20T15:17:52+01:00 UPSTREAM: 137926: KEP-961: demote maxUnavailable feature in statefulset to off by default
+  - 6c1cd99ae 2026-03-18T18:30:07Z Release commit for Kubernetes v1.35.3
+  - b57e146ae 2026-03-09T10:14:05-04:00 cmd/kubeadm: ignore EINVAL error during unmount
+  - af6488c9d 2026-03-04T18:02:34+05:30 Use localhost image reference in PodObservedGenerationTracking test
+  - 61003ad14 2026-03-03T14:33:21-08:00 drop publishing rules from dependencies.yaml on release branch
+  - b9be60a8c 2026-03-03T16:21:08+05:30 start scheduler after creating binding/non-binding slices
+  - 659d489e8 2026-03-03T16:21:08+05:30 dra: stabilize DeviceBindingConditions BasicFlow by creating without-binding slice first
+  - 02115b6ee 2026-02-26T20:14:22Z Update CHANGELOG/CHANGELOG-1.35.md for v1.35.2
+  - 1c0c911c3 2026-02-26T10:28:59Z kubeadm: do not add learner member to etcd client endpoints
+  - d05c50653 2026-02-16T15:29:03+05:30 Fix flake TestDeviceTaintRule test by adjusting event hanlder status update logic Co-authored-by: Pohly <patrick.ohly@intel.com>
+  - 2371267d2 2026-02-10T15:18:30-08:00 add dockerized go cache to  `make clean`
+  - bd3999173 2026-02-10T10:07:55+01:00 fake client-go: un-deprecate NewSimpleClientset
+  - 0a9d14b01 2026-01-21T18:32:52+05:30 Fix flaky TestApplyCRDuringCRDFinalization test
 
