@@ -1,9 +1,7 @@
-- cluster-kube-apiserver-operator embedded-component d0cf9e755d887edf142bcb656c5b6d707a259d9d to b85497d2202b30ead006502767b96419c3a1c87e
-  - b40e802 2026-03-24T10:56:54+00:00 Always set service-account-jwks-uri to LB URL even with custom issuer
+- router image-arm64 db8d384266051ef06b67883aaa83674bc6c9f1ae to ef5cab6493660c738412ac322486707a40a58c4a
+  - 59e3902 2026-03-25T10:18:34+00:00 OCPBUGS-72591: Lower verbosity for parseIPList empty list logging
+  - 0209318 2026-03-13T04:42:46+00:00 Updating ose-haproxy-router-base-container image to be consistent with ART for 4.20 Reconciling with https://github.com/openshift/ocp-build-data/tree/a378a077bf28e578d72fa8e0f10285dc56adf0d1/images/ose-haproxy-router-base.yml
 
-- machine-config-operator embedded-component 7a70444e626c6b9cc8206bd84b0719fe6bef4fcd to 30c659cb9c2a39931bde3b48c6fc35f1c6ea1945
-  - 8c9cc645 2026-03-26T11:19:22-04:00 bootimage: skip sync until cluster is stable
-  - 3f60ff75 2026-03-25T16:57:08+00:00 chore: update AMIs
-  - a9b02a66 2026-03-23T18:43:14+00:00 server: re-order logger setting
-  - 82ab1424 2026-03-11T14:38:15-04:00 controller: always determine MCP machine counts based on node properties
+- ovn-kubernetes image-arm64 304bd93419279813366b6a04d7d6f3d1ff464cb1 to 2aec60c6a5b5238c7c75173a1518322ea595a58e
+  - 225848ac 2026-03-25T18:26:11+05:30 EgressFirewall: Use exponential backoff to refresh IP addresses for DNS names
 
