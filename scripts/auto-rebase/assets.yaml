@@ -89,7 +89,7 @@ assets:
               - file: daemonset.yaml
 
   - dir: components/service-ca/
-    src: service-ca-operator/bindata/v4.0.0/controller/
+    src: service-ca-operator/bindata/assets
     files:
       - file: clusterrole.yaml
       - file: clusterrolebinding.yaml
