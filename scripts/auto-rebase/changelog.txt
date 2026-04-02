@@ -1,3 +1,9 @@
-- machine-config-operator embedded-component 27993cf190c12bd5f2191019206b9290e286694d to 18f009eeb40748895fe8a6eba3778ad275655124
-  - c106a8a4 2026-03-27T13:51:25+00:00 chore: update AMIs
+- cluster-network-operator embedded-component b7adb6895b84c1916904e6eccd93ce578731171f to c56dbe730979a72781c87e01bb5bccffe527e6c6
+  - e97a257 2026-01-21T09:06:18+00:00 Skip _stackmanager execution for libreswan 5.3+
+
+- machine-config-operator embedded-component 18f009eeb40748895fe8a6eba3778ad275655124 to 9c50d5330ae771d7e8682cbb58480867b2a874da
+  - ebbe491b 2026-03-28T10:36:19+00:00 server: re-order logger setting
+
+- operator-framework-olm embedded-component 457b7eb2fdaeb469c117c3e87201ba88281795b4 to 93649380ab6fdccf8ec1716f89162b506c7de172
+  - 70ea3b50 2026-03-30T14:20:21+08:00 Fix nil pointer dereference in sortUnpackJobs when sorting non-failed jobs (#3793)
 
