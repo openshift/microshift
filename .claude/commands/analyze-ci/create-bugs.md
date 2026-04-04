@@ -13,7 +13,7 @@ allowed-tools: Bash, Read, Write, Glob, Grep, Agent, mcp__jira__jira_search, mcp
 ```
 
 ## Description
-Reads individual job analysis reports produced by `analyze-ci:release` or `analyze-ci:pull-requests` and creates JIRA bugs in USHIFT for CI test failures. Operates in **dry-run mode by default** - it shows what bugs would be created without actually creating them. Use `--create` to perform actual issue creation.
+Reads individual job analysis reports produced by `analyze-ci:doctor` and creates JIRA bugs in USHIFT for CI test failures. Operates in **dry-run mode by default** - it shows what bugs would be created without actually creating them. Use `--create` to perform actual issue creation.
 
 This command does NOT re-analyze CI jobs. It consumes existing job analysis files from `${WORKDIR}/`.
 
@@ -28,8 +28,8 @@ This command does NOT re-analyze CI jobs. It consumes existing job analysis file
 ## Prerequisites
 
 - Job analysis files must already exist in `${WORKDIR}/`:
-  - For releases: `analyze-ci-release-<release>-job-*.txt` (produced by `/analyze-ci:release`)
-  - For PRs: `analyze-ci-prs-job-*-pr<number>-*.txt` (produced by `/analyze-ci:pull-requests`)
+  - For releases: `analyze-ci-release-<release>-job-*.txt` (produced by `/analyze-ci:doctor`)
+  - For PRs: `analyze-ci-prs-job-*-pr<number>-*.txt` (produced by `/analyze-ci:doctor`)
 - Each job file must contain a `--- STRUCTURED SUMMARY ---` block (see below)
 - MCP Jira server must be configured and accessible
 - User must have permissions to create issues in USHIFT
@@ -319,7 +319,7 @@ For each candidate where user chose "reopen":
 ### Step 5: Write Machine-Readable Bug Mapping File
 
 **Actions**:
-After processing all bug candidates (Steps 2-4a) and regardless of mode (dry-run or create), write a machine-readable bug mapping file that `analyze-ci:create-report` can consume to display JIRA bug links in the HTML report. The file content is based on the Jira search results from Step 2 — it is not affected by whether bugs were created or reopened in Steps 4/4a.
+After processing all bug candidates (Steps 2-4a) and regardless of mode (dry-run or create), write a machine-readable bug mapping file that `analyze-ci-create-report.py` can consume to display JIRA bug links in the HTML report. The file content is based on the Jira search results from Step 2 — it is not affected by whether bugs were created or reopened in Steps 4/4a.
 
 1. Save to `${WORKDIR}/analyze-ci-bugs-<source>.json` (overwrite if exists)
 2. Use this JSON format:
@@ -345,7 +345,7 @@ After processing all bug candidates (Steps 2-4a) and regardless of mode (dry-run
 }
 ```
 
-3. **IMPORTANT**: This file must be written in BOTH dry-run and create modes. The file enables `analyze-ci:create-report` to show linked bugs per issue in the HTML report.
+3. **IMPORTANT**: This file must be written in BOTH dry-run and create modes. The file enables `analyze-ci-create-report.py` to show linked bugs per issue in the HTML report.
 4. Use empty arrays `[]` for `duplicates` and `regressions` when none are found.
 5. Save using a Bash heredoc with `jq` or `python3 -c` to ensure valid JSON, or use the Write tool.
 
@@ -463,7 +463,7 @@ Resolves the rebase PR for release 4.22, then interactively creates bugs.
 Error: No job analysis files found at ${WORKDIR}/analyze-ci-release-4.19-job-*.txt
 
 Run the analysis first:
-  /analyze-ci:release 4.19
+  /analyze-ci:doctor 4.19
 ```
 
 ### Example 6: No PR Job Files Found
@@ -474,15 +474,15 @@ Run the analysis first:
 Error: No job analysis files found at ${WORKDIR}/analyze-ci-prs-job-*-pr9999-*.txt
 
 Run the analysis first:
-  /analyze-ci:pull-requests
+  /analyze-ci:doctor <release>
 ```
 
 ## Notes
 
 - This command does NOT run CI analysis — it only consumes existing analysis files from `${WORKDIR}`
 - Supports two file naming patterns:
-  - Release jobs: `analyze-ci-release-<release>-job-*.txt` (from `/analyze-ci:release`)
-  - PR jobs: `analyze-ci-prs-job-*-pr<number>-*.txt` (from `/analyze-ci:pull-requests`)
+  - Release jobs: `analyze-ci-release-<release>-job-*.txt` (from `/analyze-ci:doctor`)
+  - PR jobs: `analyze-ci-prs-job-*-pr<number>-*.txt` (from `/analyze-ci:doctor`)
 - Dry-run is the default to prevent accidental bug creation
 - The `--create` flag triggers interactive mode where each candidate requires user confirmation
 - All failures are included without filtering — no entries are skipped based on severity, infrastructure status, or stack layer
@@ -490,12 +490,10 @@ Run the analysis first:
 - All created bugs are labeled with `microshift-ci-ai-generated` for tracking
 - Security level is set to "Red Hat Employee" on all created issues
 - The STRUCTURED SUMMARY block in job files is required — this is a contract with `/analyze-ci:prow-job`
-- In addition to the text report, a machine-readable bug mapping file (`analyze-ci-bugs-<source>.json`) is written in both dry-run and create modes — this file is consumed by `analyze-ci:create-report` to show JIRA bug links in the HTML report
+- In addition to the text report, a machine-readable bug mapping file (`analyze-ci-bugs-<source>.json`) is written in both dry-run and create modes — this file is consumed by `analyze-ci-create-report.py` to show JIRA bug links in the HTML report
 
 ## Related Skills
 
-- **analyze-ci:release**: Produces release job analysis files consumed by this command
-- **analyze-ci:pull-requests**: Produces PR job analysis files consumed by this command
-- **analyze-ci:doctor**: Multi-release orchestrator
+- **analyze-ci:doctor**: Produces job analysis files consumed by this command
 - **analyze-ci:prow-job**: Command that produces individual job reports with STRUCTURED SUMMARY
 - **jira:create-bug**: Interactive bug creation (not used here — we call MCP directly)

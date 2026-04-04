@@ -13,7 +13,7 @@ allowed-tools: Skill, Bash, Read, Write, Glob, Grep, Agent
 ```
 
 ## Description
-Accepts a comma-separated list of MicroShift release versions, runs the `analyze-ci:release` command for each release and the `analyze-ci:pull-requests --rebase` command for open rebase PRs, and produces a single HTML summary file consolidating all results. The HTML report uses tabs to separate Periodics (per-release) and Pull Requests sections.
+Accepts a comma-separated list of MicroShift release versions, runs analysis for each release and for open rebase PRs, and produces a single HTML summary file consolidating all results. Uses deterministic scripts for data collection, artifact download, aggregation, and HTML generation. LLM agents are used only for per-job root cause analysis and Jira bug correlation.
 
 ## Arguments
 - `$ARGUMENTS` (required): Comma-separated list of release versions (e.g., `4.19,4.20,4.21,4.22`)
@@ -27,98 +27,101 @@ WORKDIR=/tmp/analyze-ci-claude-workdir.$(date +%y%m%d)
 
 ## Implementation Steps
 
-### Step 1: Parse and Validate Arguments
+### Step 1: Prepare — Collect and Download All Artifacts
+
+**Goal**: Deterministically collect all failed jobs and download their artifacts before any LLM analysis.
 
 **Actions**:
-1. Run `WORKDIR=/tmp/analyze-ci-claude-workdir.$(date +%y%m%d) && mkdir -p ${WORKDIR}` using the `Bash` tool
-2. Split `$ARGUMENTS` by comma to get a list of release versions
-3. Trim whitespace from each version
-4. Validate that at least one release version is provided
-5. If no arguments provided, show usage and stop
+1. Run `WORKDIR=/tmp/analyze-ci-claude-workdir.$(date +%y%m%d)` using the `Bash` tool
+2. Run the prepare script:
+   ```bash
+   WORKDIR=${WORKDIR} bash .claude/scripts/analyze-ci-doctor.sh prepare $ARGUMENTS --rebase
+   ```
+3. The script deterministically:
+   - For each release: fetches failed periodic jobs, downloads artifacts, writes `${WORKDIR}/analyze-ci-release-<version>-jobs.json`
+   - For rebase PRs: fetches PRs with failures, downloads artifacts, writes `${WORKDIR}/analyze-ci-prs-jobs.json`
+   - Outputs a JSON summary listing all releases, job counts, and file paths
+4. Read the JSON output to know which releases have jobs to analyze and how many
 
 **Error Handling**:
-- If `$ARGUMENTS` is empty, display: "Usage: /analyze-ci:doctor <release1,release2,...>" and stop
+- If `$ARGUMENTS` is empty, show usage and stop
+- If a release has no failed jobs, its jobs JSON will be an empty array — skip analysis for that release
 
-### Step 2: Analyze Each Release (Periodics)
+### Step 2: Analyze Each Job Using /analyze-ci:prow-job
+
+**Goal**: Get detailed root cause analysis for each failed job using pre-downloaded artifacts.
 
 **Actions**:
-1. For each release version from the parsed list, launch the `analyze-ci:release` command as an **Agent** (using the `Agent` tool, NOT the `Skill` tool):
-   ```text
-   Agent: subagent_type=general_purpose, prompt="Run /analyze-ci:release <version>"
+1. For each release that has jobs (from the Step 1 JSON output), read `${WORKDIR}/analyze-ci-release-<release>-jobs.json`
+2. For rebase PRs (if any), read `${WORKDIR}/analyze-ci-prs-jobs.json`
+3. For **every** job across all releases and PRs, launch a separate **Agent** (using the `Agent` tool, NOT the `Skill` tool):
+
+   **For release jobs:**
    ```
-2. Launch all releases **in parallel** as separate agents — do NOT wait for one to finish before starting the next
-3. After each agent completes, note the summary report file path it produced (typically `${WORKDIR}/analyze-ci-release-<version>-summary.json`)
-4. Wait until all the parallel agents are complete
-5. Track which releases succeeded and which failed
+   Agent: subagent_type=general_purpose, prompt="Analyze this Prow job and save the report:
+   1. Run /analyze-ci:prow-job <ARTIFACTS_DIR>
+   2. After the analysis completes, save the FULL report output (including the --- STRUCTURED SUMMARY --- block) to:
+      ${WORKDIR}/analyze-ci-release-<RELEASE>-job-<N>-<JOB_ID>.txt
+      Use the Write tool to save the file. The file must contain the complete analysis report."
+   ```
+
+   **For PR jobs:**
+   ```
+   Agent: subagent_type=general_purpose, prompt="Analyze this Prow job and save the report:
+   1. Run /analyze-ci:prow-job <ARTIFACTS_DIR>
+   2. After the analysis completes, save the FULL report output (including the --- STRUCTURED SUMMARY --- block) to:
+      ${WORKDIR}/analyze-ci-prs-job-<N>-pr<PR>-<JOB_NAME_SUFFIX>.txt
+      Use the Write tool to save the file. The file must contain the complete analysis report."
+   ```
+
+4. Launch **ALL** agents (all releases + PRs) in parallel using `run_in_background: true`
+5. Wait until ALL agents are confirmed complete before proceeding to Step 3
 
 **Progress Reporting**:
 ```text
-Analyzing release X/Y: <version>
+Analyzing N jobs in parallel across M releases...
 ```
 
-### Step 3: Analyze Rebase Pull Requests
+### Step 3: Run Bug Correlation (Dry-Run)
+
+**Goal**: Search Jira for existing bugs matching each failure.
 
 **Actions**:
-1. Launch the `analyze-ci:pull-requests` command as an **Agent** (using the `Agent` tool, NOT the `Skill` tool) with `--rebase` argument:
-   ```text
-   Agent: subagent_type=general_purpose, prompt="Run /analyze-ci:pull-requests --rebase"
-   ```
-2. This agent can be launched in parallel with the release agents in Step 2
-3. After the agent completes, note the summary report file path (typically `${WORKDIR}/analyze-ci-prs-summary.json`)
-4. If no rebase PRs are found, note "No open rebase PRs" for the report
-
-**Progress Reporting**:
-1. Keep updating the background task list and completion status
-
-### Step 4: Run Bug Correlation (Dry-Run)
-
-**Goal**: For each release and for rebase PRs, run `analyze-ci:create-bugs` in dry-run mode to identify existing JIRA bugs that correlate with detected failures. This produces machine-readable bug mapping files that `analyze-ci:create-report` will use to show linked bugs in the HTML report.
-
-**Why**: The `analyze-ci:create-bugs` command searches Jira for existing bugs matching each failure's error signature. Running it in dry-run mode before HTML generation allows the report to display known JIRA bugs next to each problem, helping users quickly see which issues are already tracked.
-
-**Actions**:
-1. **IMPORTANT**: Wait until ALL analysis agents (releases + PRs) are confirmed complete before starting this step
-2. For each release version, launch `analyze-ci:create-bugs` in dry-run mode as an **Agent** (using the `Agent` tool, NOT the `Skill` tool):
+1. **IMPORTANT**: Wait until ALL analysis agents from Step 2 are confirmed complete
+2. For each release version, launch `analyze-ci:create-bugs` in dry-run mode as an **Agent**:
    ```text
    Agent: subagent_type=general_purpose, prompt="Run /analyze-ci:create-bugs <version>"
    ```
-3. If rebase PR analysis produced job files, also launch `analyze-ci:create-bugs` for rebase PRs. Check the PR summary file to identify rebase PR source identifiers (e.g., `rebase-release-4.22`) and launch an agent for each:
+3. If rebase PR analysis produced job files, also launch `analyze-ci:create-bugs` for rebase PRs (check the PR jobs JSON to identify rebase PR source identifiers like `rebase-release-4.22`):
    ```text
    Agent: subagent_type=general_purpose, prompt="Run /analyze-ci:create-bugs rebase-release-<version>"
    ```
-4. Launch all create-bugs agents **in parallel** — do NOT wait for one to finish before starting the next
+4. Launch all create-bugs agents **in parallel**
 5. Wait until all create-bugs agents complete
-6. Each agent produces a bug mapping file at `${WORKDIR}/analyze-ci-bugs-<source>.json` that the create-report command will consume
-
-**Progress Reporting**:
-```text
-Running bug correlation for release X.YY...
-Running bug correlation for rebase PRs...
-```
+6. Each agent produces `${WORKDIR}/analyze-ci-bugs-<source>.json`
 
 **Error Handling**:
-- If create-bugs fails for a release (e.g., no job files found), note the failure but do not block other releases or the HTML report generation
-- The HTML report will simply omit bug links for releases where no bug mapping file exists
+- If create-bugs fails for a release, note the failure but do not block other releases or HTML generation
 
-### Step 5: Generate HTML Report via Dedicated Agent
+### Step 4: Finalize — Aggregate and Generate HTML Report
 
-**Goal**: Delegate HTML generation to a sub-agent with a fresh context.
-
-**Why**: By this point the main context has accumulated agent launch/completion messages for all releases and PRs. The `analyze-ci:create-report` command runs in a fresh agent context, reads only the summary files and bug mapping files (not per-job files), and generates the HTML report.
+**Goal**: Deterministically aggregate results and generate the HTML report.
 
 **Actions**:
-1. **IMPORTANT**: Wait until ALL create-bugs agents from Step 4 are confirmed complete
-2. Launch the `analyze-ci:create-report` command as an **Agent** (using the `Agent` tool, NOT the `Skill` tool):
-   ```text
-   Agent: subagent_type=general_purpose, prompt="Run /analyze-ci:create-report <comma-separated-release-versions>"
+1. Run the finalize script:
+   ```bash
+   WORKDIR=${WORKDIR} bash .claude/scripts/analyze-ci-doctor.sh finalize $ARGUMENTS
    ```
-3. Wait for the agent to complete
+2. The script deterministically:
+   - Runs `analyze-ci-aggregate.py` for each release and for PRs → `summary.json` files
+   - Runs `analyze-ci-create-report.py` → `microshift-ci-doctor-report.html`
+3. Report the script's output to the user
 
-### Step 6: Report Completion
+### Step 5: Report Completion
 
 **Actions**:
-1. After the HTML generation agent completes, relay its summary to the user
-2. Display the path to the generated HTML file
+1. Display the path to the generated HTML file
+2. Summarize: failed job counts per release, rebase PR status, bug correlation results
 
 **Example Output**:
 ```text
@@ -153,29 +156,24 @@ HTML report generated: ${WORKDIR}/microshift-ci-doctor-report.html
 
 ## Prerequisites
 
-- `/analyze-ci:release` command must be available
-- `/analyze-ci:pull-requests` command must be available
-- `gcloud` CLI must be installed and authenticated for GCS access (used by analyze-ci:prow-job)
-- `gh` CLI must be authenticated with access to openshift/microshift (used by analyze-ci:pull-requests)
+- `gcloud` CLI must be installed and authenticated for GCS access
+- `gh` CLI must be authenticated with access to openshift/microshift
+- MCP Jira server must be configured (for bug correlation)
 - Internet access to fetch job data from Prow/GCS
-- Bash shell
+- Bash shell, Python 3
 
 ## Related Skills
 
-- **analyze-ci:release**: Per-release periodic job analysis (used internally)
-- **analyze-ci:pull-requests**: PR job analysis (used internally)
-- **analyze-ci:prow-job**: Single job analysis (used by the above)
-- **analyze-ci:create-report**: HTML report generation from analysis files (used internally in Step 5)
-- **analyze-ci:create-bugs**: Creates JIRA bugs from analysis output (run automatically in dry-run mode during Step 4 for bug correlation; can also be run separately with `--create` after this command)
+- **analyze-ci:prow-job**: Single job analysis (used by Step 2 agents)
+- **analyze-ci:create-bugs**: Bug correlation and creation (used in Step 3; can also be run with `--create` after this command)
 
 ## Notes
-- Each release analysis launches `analyze-ci:release` as an **Agent** (not a Skill) - this command does NOT duplicate that logic
-- Rebase PR analysis launches `analyze-ci:pull-requests --rebase` as an **Agent** (not a Skill)
-- All agents (releases + PR analysis) are launched in parallel for maximum efficiency
-- Bug correlation runs `analyze-ci:create-bugs` in dry-run mode for each release to produce bug mapping files — these are consumed by `analyze-ci:create-report` to show JIRA links in the HTML
-- HTML generation is delegated to `analyze-ci:create-report` running as a separate agent — it reads summary files and bug mapping files (not per-job files), keeping context usage minimal
+- **Deterministic scripts** handle: data collection, artifact download, aggregation, HTML generation
+- **LLM agents** handle: per-job root cause analysis (Step 2), Jira bug search (Step 3)
+- All agents (all releases + PRs) are launched in a single parallel wave — no per-release agents
+- The `prepare` script downloads all artifacts upfront so prow-job agents use local paths (no redundant downloads)
+- The `finalize` script runs aggregation and HTML generation in one call
+- All intermediate files use prescribed filenames in `${WORKDIR}` — no improvised names
 - The HTML report is self-contained (no external CSS/JS dependencies)
-- All intermediate files from `analyze-ci:release` and `analyze-ci:pull-requests` remain available in `${WORKDIR}`
-- The HTML file can be opened in any browser for convenient examination
 - If a release analysis fails, it is noted in the report but does not block other releases
 - If no rebase PRs are open, the Pull Requests tab shows "No open rebase pull requests found"
