@@ -137,104 +137,22 @@ ls ${WORKDIR}/analyze-ci-release-<release>-job-*.txt
 ```
 If any files are missing, note the gap in the summary report but do NOT re-run the analysis.
 
-### Step 4: Aggregate Results and Identify Patterns
+### Step 4: Aggregate Results into Summary
 
-**Goal**: Find common failure patterns across all jobs from parallel execution.
-
-**Actions**:
-1. Collect results from all parallel job analyses
-   - Read each per-job file: `${WORKDIR}/analyze-ci-release-<release>-job-<N>-<job-id>.txt`
-   - Extract the `--- STRUCTURED SUMMARY ---` block from each file for pattern detection (including the `FINISHED` field for job date tracking)
-   - Extract key findings from each analysis
-
-2. Group jobs by failure type:
-   - Build/infrastructure failures
-   - Test execution failures
-   - Configuration/setup issues
-
-3. Identify most common errors:
-   - Count occurrences of similar error messages
-   - Group jobs with identical root causes
-
-4. Categorize by severity:
-   - CRITICAL: Affects multiple jobs, blocks release
-   - HIGH: Affects several jobs
-   - MEDIUM: Isolated failures
-   - LOW: Flaky/intermittent issues
-
-### Step 5: Generate Concise Summary Report
-
-**Goal**: Present actionable summary to the user.
+**Goal**: Group per-job results by failure pattern and produce a JSON summary.
 
 **Actions**:
-1. Aggregate all job analysis results from parallel execution
-2. Identify common patterns and group by failure type
-3. Generate summary report and save to `${WORKDIR}/analyze-ci-release-<release>-summary.json`
-4. Display the summary to the user
-
-**Important**: Each job listed under "Affected Jobs" MUST include:
-- The job name followed by the finish date in `[YYYY-MM-DD]` format (from the per-job `FINISHED` field)
-- The Prow URL on the next line
-This ensures the HTML report generator can extract dates without reading per-job files.
-
-**Report Structure**:
-
-```text
-═══════════════════════════════════════════════════════════════
-MICROSHIFT 4.22 RELEASE - FAILED JOBS ANALYSIS
-═══════════════════════════════════════════════════════════════
-
-OVERVIEW
-  Total Failed Jobs: 17
-  Analysis Date: 2026-03-14
-  Report saved to: ${WORKDIR}/analyze-ci-release-4.22-summary.json
-
-FAILURE BREAKDOWN
-  Build Failures:        0 jobs
-  Test Failures:        15 jobs
-  Infrastructure:        2 jobs
-
-TOP ISSUES (by frequency)
-
-1. OCP Conformance Test Failures (8 jobs)
-   Severity: HIGH
-   Pattern: Tests timeout or fail in conformance suite
-   Affected Jobs:
-   * periodic-ci-openshift-microshift-release-4.22-periodics-e2e-aws-ovn-ocp-conformance [2026-03-14]
-     https://prow.ci.openshift.org/view/gs/test-platform-results/logs/.../1234567890
-   * periodic-ci-openshift-microshift-release-4.22-periodics-e2e-aws-ovn-ocp-conformance-serial [2026-03-14]
-     https://prow.ci.openshift.org/view/gs/test-platform-results/logs/.../1234567891
-   * ... (6 more)
-
-   Root Cause: [summarized from analyze-ci:prow-job results]
-   Next Steps: [recommended actions]
-
-2. Bootc Image Test Failures (4 jobs)
-   Severity: MEDIUM
-   Pattern: Image build or deployment issues
-   Affected Jobs:
-   * periodic-ci-openshift-microshift-release-4.22-periodics-e2e-aws-tests-bootc-nightly [2026-03-14]
-     https://prow.ci.openshift.org/view/gs/test-platform-results/logs/.../1234567892
-   * ... (3 more)
-
-   Root Cause: [summarized]
-   Next Steps: [recommended actions]
-
-3. Infrastructure/Timeout Issues (2 jobs)
-   Severity: LOW
-   Pattern: Jobs timeout or fail to allocate resources
-   Affected Jobs:
-   * periodic-ci-openshift-microshift-release-4.22-periodics-rebase-on-nightlies [2026-03-14]
-     https://prow.ci.openshift.org/view/gs/test-platform-results/logs/.../1234567893
-   * periodic-ci-openshift-microshift-release-4.22-periodics-update-versions-releases [2026-03-14]
-     https://prow.ci.openshift.org/view/gs/test-platform-results/logs/.../1234567894
-
-   Root Cause: [summarized]
-
-═══════════════════════════════════════════════════════════════
-
-Individual job reports available in:
-  ${WORKDIR}/analyze-ci-release-4.22-job-*.txt
+1. Run the aggregation script:
+   ```bash
+   python3 .claude/scripts/analyze-ci-aggregate.py --release <release> --workdir ${WORKDIR}
+   ```
+2. The script deterministically:
+   - Parses `STRUCTURED SUMMARY` blocks and prose (`Error:`, `Suggested Remediation:`) from each per-job file
+   - Groups jobs by `ERROR_SIGNATURE` similarity (token overlap >= 50%)
+   - Assigns severity: `CRITICAL` (max severity >= 4), `HIGH` (3+ jobs), `MEDIUM` (2 jobs), `LOW` (1 job)
+   - Classifies breakdown by `STACK_LAYER` → build/test/infrastructure
+   - Writes `${WORKDIR}/analyze-ci-release-<release>-summary.json`
+3. Display the script output to the user
 ```
 
 ## Examples

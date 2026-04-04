@@ -152,86 +152,20 @@ ls ${WORKDIR}/analyze-ci-prs-job-*.txt
 ```
 If any files are missing, note the gap in the summary report but do NOT re-run the analysis.
 
-### Step 4: Aggregate Results and Identify Patterns
+### Step 4: Aggregate Results into Summary
 
-**Goal**: Find common failure patterns across all PRs and jobs.
-
-**Actions**:
-1. Collect results from all parallel job analyses
-   - Read each per-job file from `${WORKDIR}`
-   - Extract the `--- STRUCTURED SUMMARY ---` block from each file for pattern detection (including the `FINISHED` field for job date tracking)
-   - Extract key findings from each analysis
-
-2. Group failures by PR:
-   - List each PR with its failed jobs and root causes
-
-3. Identify common errors across PRs:
-   - Count occurrences of similar error messages
-   - Group jobs with identical root causes (e.g., same infrastructure issue affecting multiple PRs)
-
-### Step 5: Generate Summary Report
-
-**Goal**: Present actionable summary to the user.
+**Goal**: Group per-job results by PR and failure pattern, produce a JSON summary.
 
 **Actions**:
-1. Aggregate all job analysis results from parallel execution
-2. Identify common patterns and group by PR and failure type
-3. Generate summary report and save to `${WORKDIR}/analyze-ci-prs-summary.json`
-4. Display the summary to the user
-
-**Important**: Each failed job MUST include the finish date in `[YYYY-MM-DD]` format (from the per-job `FINISHED` field) after the job name. This ensures the HTML report generator can extract dates without reading per-job files.
-
-**Report Structure**:
-
-```
-═══════════════════════════════════════════════════════════════
-MICROSHIFT OPEN PULL REQUESTS - FAILED JOBS ANALYSIS
-═══════════════════════════════════════════════════════════════
-
-OVERVIEW
-  Total Open PRs: 6
-  PRs with Failures: 2
-  Total Failed Jobs: 9
-  Analysis Date: 2026-03-15
-  Report: ${WORKDIR}/analyze-ci-prs-summary.json
-
-PER-PR BREAKDOWN
-
-PR #6313: USHIFT-6636: Change test-agent impl to align with greenboot-rs
-  https://github.com/openshift/microshift/pull/6313
-  Jobs: 8 passed, 7 failed
-
-  Failed Jobs:
-  1. pull-ci-openshift-microshift-main-e2e-aws-tests [2026-03-15]
-     Status: FAILURE
-     Root Cause: [summarized from analyze-ci:prow-job]
-     URL: https://prow.ci.openshift.org/view/gs/...
-
-  2. pull-ci-openshift-microshift-main-e2e-aws-tests-arm [2026-03-15]
-     Status: FAILURE
-     Root Cause: [summarized]
-     URL: https://prow.ci.openshift.org/view/gs/...
-
-  ... (more failed jobs)
-
-PR #6116: USHIFT-6491: Improve gitops test
-  https://github.com/openshift/microshift/pull/6116
-  Jobs: 15 passed, 2 failed
-
-  Failed Jobs:
-  1. pull-ci-openshift-microshift-main-e2e-aws-tests-bootc-periodic [2026-03-15]
-     Status: FAILURE
-     Root Cause: [summarized]
-     URL: https://prow.ci.openshift.org/view/gs/...
-
-COMMON PATTERNS (across PRs)
-  If the same failure pattern appears in multiple PRs, list it here
-  with the affected PRs and jobs.
-
-═══════════════════════════════════════════════════════════════
-
-Individual job reports: ${WORKDIR}/analyze-ci-prs-job-*.txt
-```
+1. Run the aggregation script:
+   ```bash
+   python3 .claude/scripts/analyze-ci-aggregate.py --prs --workdir ${WORKDIR}
+   ```
+2. The script deterministically:
+   - Parses `STRUCTURED SUMMARY` blocks and prose from each per-job file
+   - Groups jobs by PR number (extracted from filenames `analyze-ci-prs-job-*-pr<N>-*.txt`)
+   - Writes `${WORKDIR}/analyze-ci-prs-summary.json`
+3. Display the script output to the user
 
 ## Examples
 
