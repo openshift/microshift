@@ -269,9 +269,9 @@ def render_release_section(version, rdata, bug_candidates):
             lines.append(f"                <p><strong>Affected Jobs:</strong></p><ul>")
             for job in issue["affected_jobs"]:
                 if job.get("url"):
-                    lines.append(f'                    <li><a href="{_e(job["url"])}" target="_blank">{_e(job["name"])}</a> <span class="job-date">[{_e(job["date"])}]</span></li>')
+                    lines.append(f'                    <li><span class="job-date">[{_e(job["date"])}]</span> <a href="{_e(job["url"])}" target="_blank">{_e(job["name"])}</a></li>')
                 else:
-                    lines.append(f'                    <li>{_e(job["name"])} <span class="job-date">[{_e(job["date"])}]</span></li>')
+                    lines.append(f'                    <li><span class="job-date">[{_e(job["date"])}]</span> {_e(job["name"])}</li>')
             lines.append(f"                </ul>")
         if issue.get("next_steps"):
             lines.append(f"                <p><em>Next Steps:</em> {_e(issue['next_steps'])}</p>")
