@@ -35,6 +35,11 @@ STOP_WORDS = frozenset({
     "is", "was", "are", "were", "be", "been", "and", "or", "not", "no",
     "but", "from", "that", "this", "all", "has", "have", "had", "do",
     "does", "did", "will", "would", "could", "should", "may", "might",
+})
+
+# Additional stop words filtered only during keyword extraction for Jira search,
+# not during signature grouping (which must match aggregate.py's tokenization).
+KEYWORD_STOP_WORDS = STOP_WORDS | frozenset({
     "ci", "microshift", "failure", "failed", "error", "test", "tests",
     "job", "jobs", "step", "periodic",
 })
@@ -124,16 +129,20 @@ def group_by_signature(jobs):
 # Keyword extraction
 # ---------------------------------------------------------------------------
 
+def _tokenize_for_keywords(text):
+    """Tokenize with extra stop words filtered for Jira keyword extraction."""
+    words = re.findall(r"[a-z0-9][a-z0-9_.-]*[a-z0-9]|[a-z0-9]", text.lower())
+    return {w for w in words if w not in KEYWORD_STOP_WORDS and len(w) >= 2}
+
+
 def extract_keywords(error_signature):
     """Extract distinctive search keywords from an error signature.
 
     Returns a list of 2-4 keywords ranked by specificity.
-    Specificity heuristics:
-      - Contains hyphen (e.g., "InvalidClientTokenId", "runc-v1.4.1")
-      - Contains digits (e.g., "OCP-55394", "v1.4.1")
-      - Longer tokens are more distinctive
+    Uses KEYWORD_STOP_WORDS (broader filtering) so generic CI terms
+    like "test", "failed", "microshift" don't pollute Jira searches.
     """
-    tokens = _tokenize(error_signature)
+    tokens = _tokenize_for_keywords(error_signature)
     if not tokens:
         return []
 

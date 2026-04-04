@@ -22,6 +22,13 @@ from datetime import datetime, timezone
 # Constants
 # ---------------------------------------------------------------------------
 
+# Threshold for fuzzy matching issue titles to bug candidate signatures.
+# Uses asymmetric formula: overlap / len(sig_tokens) — measures what fraction
+# of the bug candidate's signature is covered by the issue title. This differs
+# from the symmetric min-based formula in aggregate.py/search-bugs.py because
+# issue titles are short summaries while signatures are detailed.
+MATCH_THRESHOLD = 0.50
+
 STOP_WORDS = frozenset({
     "the", "a", "an", "in", "on", "at", "to", "for", "of", "with", "by",
     "is", "was", "are", "were", "be", "been", "and", "or", "not", "no",
@@ -68,7 +75,9 @@ CSS = """\
         .timestamp { color: #6c757d; font-size: 0.9em; }
         a { color: #0366d6; }
         .tab-bar { display: flex; gap: 0; margin: 20px 0 0 0; border-bottom: 2px solid #dee2e6; }
-        .tab-btn { padding: 12px 24px; border: none; background: transparent; font-size: 1em; font-weight: 600; color: #6c757d; cursor: pointer; border-bottom: 3px solid transparent; margin-bottom: -2px; transition: color 0.2s, border-color 0.2s; }
+        .tab-btn { padding: 12px 24px; border: none; background: transparent; font-size: 1em; font-weight: 600;
+            color: #6c757d; cursor: pointer; border-bottom: 3px solid transparent;
+            margin-bottom: -2px; transition: color 0.2s, border-color 0.2s; }
         .tab-btn:hover { color: #333; }
         .tab-btn.active { color: #e94560; border-bottom-color: #e94560; }
         .tab-content { display: none; }
@@ -166,7 +175,7 @@ def match_issue_to_bugs(issue_title, bug_candidates):
         if score > best_score:
             best_score = score
             best = cand
-    return best if best_score >= 0.5 else None
+    return best if best_score >= MATCH_THRESHOLD else None
 
 
 # ---------------------------------------------------------------------------
@@ -223,12 +232,12 @@ def render_release_section(version, rdata, bug_candidates):
     if rdata is None:
         return (
             f'        <div class="release-section" id="release-{_e(version)}">\n'
-            f'            <div class="release-header">\n'
+            '            <div class="release-header">\n'
             f'                <h2>Release {_e(version)}</h2>\n'
-            f'                <span class="badge badge-nodata">no data</span>\n'
-            f'            </div>\n'
-            f"            <p>Analysis failed or produced no output.</p>\n"
-            f"        </div>"
+            '                <span class="badge badge-nodata">no data</span>\n'
+            '            </div>\n'
+            "            <p>Analysis failed or produced no output.</p>\n"
+            "        </div>"
         )
 
     total = rdata["total_failed"]
@@ -238,16 +247,16 @@ def render_release_section(version, rdata, bug_candidates):
 
     lines = []
     lines.append(f'        <div class="release-section" id="release-{_e(version)}">')
-    lines.append(f'            <div class="release-header">')
+    lines.append('            <div class="release-header">')
     lines.append(f"                <h2>Release {_e(version)}</h2>")
     label = "failure" if total == 1 else "failures"
     lines.append(f'                <span class="badge {badge}">{total} {label}</span>')
-    lines.append(f"            </div>")
-    lines.append(f'            <div class="breakdown">')
+    lines.append("            </div>")
+    lines.append('            <div class="breakdown">')
     lines.append(f'                <span class="breakdown-item"><strong>{b["build"]}</strong> Build</span>')
     lines.append(f'                <span class="breakdown-item"><strong>{b["test"]}</strong> Test</span>')
     lines.append(f'                <span class="breakdown-item"><strong>{b["infrastructure"]}</strong> Infrastructure</span>')
-    lines.append(f"            </div>")
+    lines.append("            </div>")
 
     for issue in rdata["issues"]:
         bug_match = match_issue_to_bugs(issue["title"], bug_candidates)
@@ -259,25 +268,23 @@ def render_release_section(version, rdata, bug_candidates):
             f'            <h4 class="collapsible">{issue["number"]}. {_e(issue["title"])} '
             f'<span class="job-date">({jc} {"job" if jc == 1 else "jobs"}, {sev})</span></h4>'
         )
-        lines.append(f'            <div class="collapsible-content">')
-        if issue.get("pattern"):
-            lines.append(f"                <p>{_e(issue['pattern'])}</p>")
+        lines.append('            <div class="collapsible-content">')
         if issue.get("root_cause"):
             lines.append(f'                <div class="root-cause"><strong>Root Cause:</strong> {_e(issue["root_cause"])}</div>')
         lines.append(f'                <div class="bug-links">{_render_bug_links(bug_match)}</div>')
         if issue.get("affected_jobs"):
-            lines.append(f"                <p><strong>Affected Jobs:</strong></p><ul>")
+            lines.append("                <p><strong>Affected Jobs:</strong></p><ul>")
             for job in issue["affected_jobs"]:
                 if job.get("url"):
                     lines.append(f'                    <li><span class="job-date">[{_e(job["date"])}]</span> <a href="{_e(job["url"])}" target="_blank">{_e(job["name"])}</a></li>')
                 else:
                     lines.append(f'                    <li><span class="job-date">[{_e(job["date"])}]</span> {_e(job["name"])}</li>')
-            lines.append(f"                </ul>")
+            lines.append("                </ul>")
         if issue.get("next_steps"):
             lines.append(f"                <p><em>Next Steps:</em> {_e(issue['next_steps'])}</p>")
-        lines.append(f"            </div>")
+        lines.append("            </div>")
 
-    lines.append(f"        </div>")
+    lines.append("        </div>")
     return "\n".join(lines)
 
 
@@ -300,10 +307,10 @@ def render_pr_section(pr_data, all_pr_bugs):
         label = "failure" if total_failed == 1 else "failures"
 
         lines.append(f'        <div class="release-section" id="pr-{pr["number"]}">')
-        lines.append(f'            <div class="release-header">')
+        lines.append('            <div class="release-header">')
         lines.append(f'                <h2>PR #{pr["number"]}: {_e(pr["title"])}</h2>')
         lines.append(f'                <span class="badge {badge}">{total_failed} {label}</span>')
-        lines.append(f"            </div>")
+        lines.append("            </div>")
         if pr.get("url"):
             lines.append(f'            <p><a href="{_e(pr["url"])}" target="_blank">{_e(pr["url"])}</a></p>')
         lines.append(f"            <p>Jobs: {pr['passed']} passed, {pr['failed']} failed</p>")
@@ -312,15 +319,15 @@ def render_pr_section(pr_data, all_pr_bugs):
             bug_match = match_issue_to_bugs(job.get("root_cause", "") or job.get("name", ""), all_pr_bugs)
             lines.append("")
             lines.append(f'            <h4 class="collapsible"><span class="job-date">[{_e(job["date"])}]</span> {job["number"]}. {_e(job["name"])}</h4>')
-            lines.append(f'            <div class="collapsible-content">')
+            lines.append('            <div class="collapsible-content">')
             if job.get("url"):
                 lines.append(f'                <p><strong>Job:</strong> <span class="job-date">[{_e(job["date"])}]</span> <a href="{_e(job["url"])}" target="_blank">{_e(job["name"])}</a></p>')
             if job.get("root_cause"):
                 lines.append(f'                <div class="root-cause"><strong>Root Cause:</strong> {_e(job["root_cause"])}</div>')
             lines.append(f'                <div class="bug-links">{_render_bug_links(bug_match)}</div>')
-            lines.append(f"            </div>")
+            lines.append("            </div>")
 
-        lines.append(f"        </div>")
+        lines.append("        </div>")
     return "\n".join(lines)
 
 
@@ -333,17 +340,18 @@ def generate_html(releases_data, bug_data, pr_data, all_pr_bugs, timestamp):
         count = rdata["total_failed"] if rdata else "?"
         css = "status-fail" if rdata and rdata["total_failed"] > 0 else ("status-pass" if rdata else "")
         cards.append(
-            f'        <div class="overview-card">\n'
+            '        <div class="overview-card">\n'
             f'            <div class="number {css}">{count}</div>\n'
             f'            <div class="label">Release {_e(version)}</div>\n'
-            f"        </div>"
+            "        </div>"
         )
     pr_failed = pr_data.get("total_failed", 0) if pr_data else 0
+    pr_css = "status-fail" if pr_failed > 0 else "status-pass"
     cards.append(
-        f'        <div class="overview-card">\n'
-        f'            <div class="number {"status-fail" if pr_failed > 0 else "status-pass"}">{pr_failed}</div>\n'
-        f'            <div class="label">Rebase PRs</div>\n'
-        f"        </div>"
+        '        <div class="overview-card">\n'
+        f'            <div class="number {pr_css}">{pr_failed}</div>\n'
+        '            <div class="label">Rebase PRs</div>\n'
+        "        </div>"
     )
 
     toc = []

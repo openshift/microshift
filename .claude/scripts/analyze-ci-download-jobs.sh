@@ -120,16 +120,21 @@ main() {
     local status_file
     status_file=$(mktemp)
 
-    echo "${jobs_json}" | jq -r '.[] | [.build_id, .url] | @tsv' | \
-        xargs -P "${parallel}" -I {} bash -c '
-            build_id=$(echo "{}" | cut -f1)
-            url=$(echo "{}" | cut -f2)
+    while IFS=$'\t' read -r build_id url; do
+        (
             if download_job "${build_id}" "${url}"; then
-                echo "${build_id}:ok" >> "'"${status_file}"'"
+                echo "${build_id}:ok" >> "${status_file}"
             else
-                echo "${build_id}:fail" >> "'"${status_file}"'"
+                echo "${build_id}:fail" >> "${status_file}"
             fi
-        '
+        ) &
+
+        # Limit parallelism
+        while [[ $(jobs -rp | wc -l) -ge ${parallel} ]]; do
+            wait -n 2>/dev/null || true
+        done
+    done < <(echo "${jobs_json}" | jq -r '.[] | [.build_id, .url] | @tsv')
+    wait
 
     # Count results
     local ok=0 fail=0

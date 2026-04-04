@@ -119,7 +119,7 @@ mode_summary() {
             continue
         fi
 
-        local passed=0 failed=0 pending=0 total=0
+        local passed=0 failed=0 other=0 total=0
         for f in "${tmpdir}"/*.json; do
             [[ -f "${f}" ]] || continue
             local status
@@ -128,15 +128,15 @@ mode_summary() {
             case "${status}" in
                 SUCCESS) passed=$((passed + 1)) ;;
                 FAILURE) failed=$((failed + 1)) ;;
-                *)       pending=$((pending + 1)) ;;
+                *)       other=$((other + 1)) ;;
             esac
         done
         rm -rf "${tmpdir}"
 
         jq -nc --argjson n "${pr_number}" --arg t "${pr_title}" --arg u "${pr_url}" \
             --argjson p "${passed}" --argjson f "${failed}" \
-            --argjson pe "${pending}" --argjson to "${total}" \
-            '{pr_number: $n, title: $t, url: $u, passed: $p, failed: $f, pending: $pe, total: $to}' \
+            --argjson o "${other}" --argjson to "${total}" \
+            '{pr_number: $n, title: $t, url: $u, passed: $p, failed: $f, other: $o, total: $to}' \
             >> "${output_tmp}"
     done < <(echo "${pr_data}" | jq -r '.[] | [.number, .title, .url] | @tsv')
 

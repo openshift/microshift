@@ -177,7 +177,7 @@ cmd_finalize() {
         release=$(echo "${release}" | xargs)
         echo "=== Aggregating release ${release} ===" >&2
         python3 "${SCRIPT_DIR}/analyze-ci-aggregate.py" \
-            --release "${release}" --workdir "${WORKDIR}" 2>&1 >/dev/null || \
+            --release "${release}" --workdir "${WORKDIR}" >/dev/null 2>&1 || \
             echo "  WARNING: aggregation failed for ${release}" >&2
     done
 
@@ -187,7 +187,7 @@ cmd_finalize() {
     if [[ -n "${pr_files}" ]]; then
         echo "=== Aggregating PRs ===" >&2
         python3 "${SCRIPT_DIR}/analyze-ci-aggregate.py" \
-            --prs --workdir "${WORKDIR}" 2>&1 >/dev/null || \
+            --prs --workdir "${WORKDIR}" >/dev/null 2>&1 || \
             echo "  WARNING: PR aggregation failed" >&2
     fi
 

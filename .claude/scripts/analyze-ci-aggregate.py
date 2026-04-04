@@ -179,7 +179,6 @@ def build_release_json(release, jobs, timestamp):
             "title": rep["error_signature"],
             "job_count": len(group),
             "severity": classify_severity(group),
-            "pattern": rep.get("error_text", ""),
             "root_cause": rep.get("error_text", ""),
             "next_steps": rep.get("remediation_text", ""),
             "affected_jobs": [
