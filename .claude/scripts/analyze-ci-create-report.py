@@ -195,24 +195,22 @@ def _render_bug_links(bug_match):
 
     parts = []
     if has_dups:
-        parts.append("<strong>Bugs:</strong> ")
+        parts.append("<strong>Bugs:</strong><br>")
         for d in bug_match["duplicates"]:
             parts.append(
                 f'<a class="bug-tag bug-tag-open" '
                 f'href="https://issues.redhat.com/browse/{_e(d["key"])}" '
                 f'target="_blank">{_e(d["key"])}</a> '
-                f'<span class="job-date">{_e(d["summary"])} ({_e(d["status"])})</span> '
+                f'<span class="job-date">{_e(d["summary"])} ({_e(d["status"])})</span><br>'
             )
     if has_regs:
-        if has_dups:
-            parts.append("<br>")
-        parts.append("<strong>Regressions:</strong> ")
+        parts.append("<strong>Regressions:</strong><br>")
         for r in bug_match["regressions"]:
             parts.append(
                 f'<a class="bug-tag bug-tag-regression" '
                 f'href="https://issues.redhat.com/browse/{_e(r["key"])}" '
                 f'target="_blank">{_e(r["key"])} &#x27F2;</a> '
-                f'<span class="job-date">{_e(r["summary"])} ({_e(r["status"])})</span> '
+                f'<span class="job-date">{_e(r["summary"])} ({_e(r["status"])})</span><br>'
             )
     return "".join(parts)
 
