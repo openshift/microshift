@@ -85,14 +85,15 @@ bash .claude/scripts/microshift-prow-jobs-for-pull-requests.sh --mode detail --a
 
 **Actions**:
 1. Run `WORKDIR=/tmp/analyze-ci-claude-workdir.$(date +%y%m%d) && mkdir -p ${WORKDIR}` using the `Bash` tool
-2. Filter the JSON from Step 1 to only include PRs with failed jobs, then pipe into the download script:
+2. Filter the JSON from Step 1 to only include PRs with failed jobs, then pipe into the download script and save to a prescribed file:
    ```bash
    echo '<json_from_step1>' | \
        jq '[.[] | select(.jobs | map(select(.status == "FAILURE")) | length > 0)]' | \
-       WORKDIR=${WORKDIR} bash .claude/scripts/analyze-ci-download-jobs.sh
+       WORKDIR=${WORKDIR} bash .claude/scripts/analyze-ci-download-jobs.sh \
+       > ${WORKDIR}/analyze-ci-prs-jobs.json
    ```
 3. The script auto-detects the nested PR format, flattens the jobs, downloads artifacts in parallel to `${WORKDIR}/artifacts/<build_id>/`, and outputs enriched JSON with `artifacts_dir` fields added
-4. Save the output JSON for use in Step 3
+4. The output is saved to `${WORKDIR}/analyze-ci-prs-jobs.json` — do NOT use any other filename
 
 **Error Handling**:
 - If some downloads fail, note the failures but proceed with successfully downloaded jobs
@@ -108,7 +109,8 @@ Each job MUST be analyzed by launching a **separate Agent** (using the `Agent` t
 3. The file MUST contain the full report including the `--- STRUCTURED SUMMARY ---` block
 
 **Actions**:
-1. For each failed job in the enriched JSON from Step 2, launch a separate **Agent** with this exact prompt template, using the `.artifacts_dir` field as `<ARTIFACTS_DIR>`, `.pr_number` as `<PR>`, and the last segment of `.job` as `<JOB_NAME_SUFFIX>`:
+1. Read the enriched JSON from `${WORKDIR}/analyze-ci-prs-jobs.json`
+2. For each failed job in the JSON, launch a separate **Agent** with this exact prompt template, using the `.artifacts_dir` field as `<ARTIFACTS_DIR>`, `.pr_number` as `<PR>`, and the last segment of `.job` as `<JOB_NAME_SUFFIX>`:
    ```
    Agent: subagent_type=general_purpose, prompt="Analyze this Prow job and save the report:
    1. Run /analyze-ci:prow-job <ARTIFACTS_DIR>
