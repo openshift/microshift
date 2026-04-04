@@ -16,8 +16,9 @@ allowed-tools: Skill, Bash, Read, Write, Glob, Grep, Agent
 Analyzes all failed periodic jobs for a specific MicroShift release by leveraging existing tools and agents. This command orchestrates the analysis workflow by:
 
 1. Fetching list of failed periodic jobs using `.claude/scripts/microshift-prow-jobs-for-release.sh`
-2. Analyzing each job individually using the `/analyze-ci:prow-job` command
-3. Aggregating results and presenting a concise summary with common failure patterns
+2. Downloading all job artifacts in parallel using `.claude/scripts/analyze-ci-download-jobs.sh`
+3. Analyzing each job individually using the `/analyze-ci:prow-job` command
+4. Aggregating results into a JSON summary using `.claude/scripts/analyze-ci-aggregate.py`
 
 This approach reuses existing analysis capabilities rather than duplicating logic.
 
@@ -81,9 +82,9 @@ Found 17 failed periodic jobs for release 4.22
 1. Run `WORKDIR=/tmp/analyze-ci-claude-workdir.$(date +%y%m%d) && mkdir -p ${WORKDIR}` using the `Bash` tool
 2. Pipe the filtered JSON from Step 1 into the download script and save the enriched output to a prescribed file:
    ```bash
-   bash .claude/scripts/microshift-prow-jobs-for-release.sh <release> | \
+   bash .claude/scripts/microshift-prow-jobs-for-release.sh <release> 2>/dev/null | \
        jq '[.[] | select(.type == "periodic")]' | \
-       WORKDIR=${WORKDIR} bash .claude/scripts/analyze-ci-download-jobs.sh \
+       WORKDIR=${WORKDIR} bash .claude/scripts/analyze-ci-download-jobs.sh 2>/dev/null \
        > ${WORKDIR}/analyze-ci-release-<release>-jobs.json
    ```
 3. The script downloads all artifacts in parallel to `${WORKDIR}/artifacts/<build_id>/` and outputs enriched JSON with `artifacts_dir` fields added
@@ -113,8 +114,8 @@ Each job MUST be analyzed by launching a **separate Agent** (using the `Agent` t
       Use the Write tool to save the file. The file must contain the complete analysis report."
    ```
    Replace `<ARTIFACTS_DIR>`, `<RELEASE>`, `<N>` (1-based job index), and `<JOB_ID>` with actual values from the JSON.
-2. Launch **ALL** job agents in parallel using `run_in_background: true`
-3. Wait for all agents to complete before proceeding to Step 4
+3. Launch **ALL** job agents in parallel using `run_in_background: true`
+4. Wait for all agents to complete before proceeding to Step 4
 
 **Progress Reporting**:
 ```text
@@ -155,7 +156,6 @@ If any files are missing, note the gap in the summary report but do NOT re-run t
    - Classifies breakdown by `STACK_LAYER` → build/test/infrastructure
    - Writes `${WORKDIR}/analyze-ci-release-<release>-summary.json`
 3. Display the script output to the user
-```
 
 ## Examples
 
@@ -239,7 +239,5 @@ Run periodically and compare summaries over time to identify regression patterns
 
 - This skill focuses on **periodic** jobs only (not presubmit/postsubmit)
 - Analysis is read-only - no modifications to CI data
-- Results are saved in files in ${WORKDIR} directory with a timestamp
-- Provide links to the jobs in the summary
-- Only present a concise analysis summary for each job
-- Pattern detection improves with more jobs analyzed
+- Results are saved as JSON in ${WORKDIR} directory
+- Per-job reports are saved as `.txt` files with STRUCTURED SUMMARY blocks

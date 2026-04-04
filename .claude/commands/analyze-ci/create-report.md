@@ -36,8 +36,8 @@ WORKDIR=/tmp/analyze-ci-claude-workdir.$(date +%y%m%d)
    python3 .claude/scripts/analyze-ci-create-report.py --workdir ${WORKDIR} $ARGUMENTS
    ```
 3. The script handles everything deterministically:
-   - Discovers summary files and bug mapping files in `${WORKDIR}`
-   - Parses release summaries, PR summaries, and bug candidate blocks
+   - Discovers JSON summary files and bug mapping files in `${WORKDIR}`
+   - Loads release summaries, PR summaries, and bug candidates from JSON
    - Fuzzy-matches issues to bug candidates using token overlap (>= 50% threshold)
    - Generates a self-contained HTML file with tabbed navigation, collapsible issues, and JIRA bug links
 4. Report the script's stdout output to the user (it includes file discovery, summary, and the output path)

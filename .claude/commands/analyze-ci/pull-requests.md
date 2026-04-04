@@ -13,14 +13,15 @@ allowed-tools: Skill, Bash, Read, Write, Glob, Grep, Agent
 ```
 
 ## Description
-Fetches all open MicroShift pull requests, identifies failed Prow CI jobs for each PR, analyzes each failure using the `/analyze-ci:prow-job` command, and produces a text summary report.
+Fetches all open MicroShift pull requests, identifies failed Prow CI jobs for each PR, analyzes each failure using the `/analyze-ci:prow-job` command, and produces a JSON summary.
 
 This command orchestrates the analysis workflow by:
 
 1. Fetching the list of open PRs and their failed jobs using `.claude/scripts/microshift-prow-jobs-for-pull-requests.sh --mode detail`
-2. Filtering to only PRs that have at least one failed job
-3. Analyzing each failed job individually using the `/analyze-ci:prow-job` command
-4. Aggregating results into a summary report saved to `${WORKDIR}`
+2. Downloading all job artifacts in parallel using `.claude/scripts/analyze-ci-download-jobs.sh`
+3. Filtering to only PRs that have at least one failed job
+4. Analyzing each failed job individually using the `/analyze-ci:prow-job` command
+5. Aggregating results into a JSON summary using `.claude/scripts/analyze-ci-aggregate.py`
 
 ## Arguments
 - `--rebase` (optional): Only analyze rebase PRs (authored by `microshift-rebase-script[bot]`)
@@ -89,7 +90,7 @@ bash .claude/scripts/microshift-prow-jobs-for-pull-requests.sh --mode detail --a
    ```bash
    echo '<json_from_step1>' | \
        jq '[.[] | select(.jobs | map(select(.status == "FAILURE")) | length > 0)]' | \
-       WORKDIR=${WORKDIR} bash .claude/scripts/analyze-ci-download-jobs.sh \
+       WORKDIR=${WORKDIR} bash .claude/scripts/analyze-ci-download-jobs.sh 2>/dev/null \
        > ${WORKDIR}/analyze-ci-prs-jobs.json
    ```
 3. The script auto-detects the nested PR format, flattens the jobs, downloads artifacts in parallel to `${WORKDIR}/artifacts/<build_id>/`, and outputs enriched JSON with `artifacts_dir` fields added
@@ -119,8 +120,8 @@ Each job MUST be analyzed by launching a **separate Agent** (using the `Agent` t
       Use the Write tool to save the file. The file must contain the complete analysis report."
    ```
    Replace `<ARTIFACTS_DIR>`, `<N>` (1-based job index), `<PR>` (PR number), and `<JOB_NAME_SUFFIX>` with actual values from the JSON.
-2. Launch **ALL** job agents in parallel using `run_in_background: true`
-3. Wait for all agents to complete before proceeding to Step 4
+3. Launch **ALL** job agents in parallel using `run_in_background: true`
+4. Wait for all agents to complete before proceeding to Step 4
 
 **Progress Reporting**:
 ```text
@@ -239,8 +240,6 @@ Please ensure you're in the microshift project directory.
 
 - This skill focuses on **presubmit** PR jobs (not periodic/postsubmit)
 - Analysis is read-only - no modifications to CI data or PRs
-- Results are saved in files in ${WORKDIR} directory with a timestamp
-- Provide links to the jobs in the summary
-- Only present a concise analysis summary for each job
+- Results are saved as JSON in ${WORKDIR} directory
+- Per-job reports are saved as `.txt` files with STRUCTURED SUMMARY blocks
 - PRs with no Prow jobs (e.g., drafts without triggered tests) are skipped
-- Pattern detection improves with more jobs analyzed

@@ -167,10 +167,10 @@ STACK_LAYER: {AWS Infra, External Infrastructure, build phase, deploy phase, tes
 STEP_NAME: {same as Step Name above}
 ERROR_SIGNATURE: {a concise, unique one-line description of the root cause - not the full error, just enough to identify and deduplicate this failure}
 INFRASTRUCTURE_FAILURE: {true if Stack Layer is AWS Infra or the failure is due to CI infrastructure rather than product code, false otherwise}
-JOB_URL: {the full prow job URL that was analyzed}
-JOB_NAME: {the full job name extracted from the URL}
-RELEASE: {the branch extracted from the URL, e.g. 4.22 from release-4.22, or main}
-FINISHED: {the job finish date in YYYY-MM-DD format, extracted from finished.json or build log timestamps}
+JOB_URL: {the full prow job URL — when given a URL as input, use it directly; when given a local artifacts dir, reconstruct from the build-log.txt "Link to job on registry info site" line or from the directory path structure}
+JOB_NAME: {the full job name — extract from the JOB_URL path, or from the build-log.txt "Running step" lines, or from the artifacts directory structure}
+RELEASE: {the release branch — extract from JOB_NAME (e.g. 4.22 from release-4.22), or from finished.json metadata repos field, or default to "main"}
+FINISHED: {the job finish date in YYYY-MM-DD format, extracted from finished.json timestamp field or build log timestamps}
 --- END STRUCTURED SUMMARY ---
 ```
 
