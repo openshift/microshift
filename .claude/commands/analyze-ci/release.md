@@ -39,13 +39,28 @@ WORKDIR=/tmp/analyze-ci-claude-workdir.$(date +%y%m%d)
 
 **Actions**:
 1. Validate release version argument is provided
-2. Execute `.claude/scripts/microshift-prow-jobs-for-release.sh <release>` to get all failed jobs
-3. Filter output to only include periodic jobs (containing `-periodics-`)
-4. Extract job URLs from the output
+2. Execute `.claude/scripts/microshift-prow-jobs-for-release.sh <release>` to get all failed jobs as a JSON array
+3. Filter the JSON to only include periodic jobs (where `.type == "periodic"`)
+4. Extract job URLs and build IDs from the JSON
 
 **Example Command**:
 ```bash
-bash .claude/scripts/microshift-prow-jobs-for-release.sh 4.22 | grep -E "periodics-" | awk '{print $NF}'
+bash .claude/scripts/microshift-prow-jobs-for-release.sh 4.22 | jq '[.[] | select(.type == "periodic")]'
+```
+
+**JSON output format** (array of objects):
+```json
+[
+  {
+    "job": "periodic-ci-openshift-microshift-release-4.22-periodics-e2e-aws-tests-bootc-nightly",
+    "type": "periodic",
+    "status": "failure",
+    "finished": "2026-04-01T06:38:10Z",
+    "duration": "4h37m20s",
+    "url": "https://prow.ci.openshift.org/view/gs/...",
+    "build_id": "2039161134610649088"
+  }
+]
 ```
 
 **Expected Output**:
@@ -55,7 +70,7 @@ Found 17 failed periodic jobs for release 4.22
 
 **Error Handling**:
 - If no release version provided, show usage and exit
-- If no periodic jobs found, report "No failed periodic jobs found for release X.XX" and exit successfully
+- If no periodic jobs found (empty JSON array after filtering), report "No failed periodic jobs found for release X.XX" and exit successfully
 - If microshift-prow-jobs-for-release.sh fails, report error and exit
 
 ### Step 2: Analyze Each Job Using /analyze-ci:prow-job
@@ -70,7 +85,7 @@ Each job MUST be analyzed by launching a **separate Agent** (using the `Agent` t
 
 **Actions**:
 1. Run `WORKDIR=/tmp/analyze-ci-claude-workdir.$(date +%y%m%d) && mkdir -p ${WORKDIR}` using the `Bash` tool
-2. For each job URL, launch a separate **Agent** with this exact prompt template:
+2. For each job in the JSON array, launch a separate **Agent** with this exact prompt template, using the `.url` field as `<JOB_URL>` and the `.build_id` field as `<JOB_ID>`:
    ```
    Agent: subagent_type=general_purpose, prompt="Analyze this Prow job and save the report:
    1. Run /analyze-ci:prow-job <JOB_URL>
@@ -78,7 +93,7 @@ Each job MUST be analyzed by launching a **separate Agent** (using the `Agent` t
       ${WORKDIR}/analyze-ci-release-<RELEASE>-job-<N>-<JOB_ID>.txt
       Use the Write tool to save the file. The file must contain the complete analysis report."
    ```
-   Replace `<JOB_URL>`, `<RELEASE>`, `<N>` (1-based job index), and `<JOB_ID>` with actual values.
+   Replace `<JOB_URL>`, `<RELEASE>`, `<N>` (1-based job index), and `<JOB_ID>` with actual values from the JSON.
 3. Launch **ALL** job agents in parallel using `run_in_background: true`
 4. Wait for all agents to complete before proceeding to Step 3
 

@@ -39,13 +39,11 @@ WORKDIR=/tmp/analyze-ci-claude-workdir.$(date +%y%m%d)
 **Goal**: Get the list of open PRs with failed Prow jobs.
 
 **Actions**:
-1. Execute `.claude/scripts/microshift-prow-jobs-for-pull-requests.sh --mode detail` to get all open PRs and their job statuses. If `--rebase` was specified, add `--author "microshift-rebase-script[bot]"` to only include rebase PRs
-2. Parse the output to identify PRs with failed jobs (lines containing `✗`)
-3. For each failed job, extract:
-   - PR number and title (from the `=== PR #NNN: ... ===` header lines)
-   - PR URL (line following the header)
-   - Job name (first column)
-   - Job URL (last column, the Prow URL)
+1. Execute `.claude/scripts/microshift-prow-jobs-for-pull-requests.sh --mode detail` to get all open PRs and their job statuses as a JSON array. If `--rebase` was specified, add `--author "microshift-rebase-script[bot]"` to only include rebase PRs
+2. Parse the JSON to identify PRs with failed jobs (jobs where `.status == "FAILURE"`)
+3. For each failed job, extract from the JSON:
+   - PR number (`.pr_number`), title (`.title`), and URL (`.url`)
+   - Job name (`.jobs[].job`), status (`.jobs[].status`), Prow URL (`.jobs[].url`), and build ID (`.jobs[].build_id`)
 
 **Example Commands**:
 ```bash
@@ -56,19 +54,28 @@ bash .claude/scripts/microshift-prow-jobs-for-pull-requests.sh --mode detail 2>/
 bash .claude/scripts/microshift-prow-jobs-for-pull-requests.sh --mode detail --author "microshift-rebase-script[bot]" 2>/dev/null
 ```
 
-**Expected Output Format**:
-```
-=== PR #6313: USHIFT-6636: Change test-agent impl to align with greenboot-rs ===
-    https://github.com/openshift/microshift/pull/6313
-
-    JOB                                                  STATUS  URL
-    pull-ci-openshift-microshift-main-e2e-aws-tests      ✗       https://prow.ci.openshift.org/view/gs/...
-    pull-ci-openshift-microshift-main-e2e-aws-tests-arm  ✗       https://prow.ci.openshift.org/view/gs/...
-    ...
+**JSON output format** (array of PR objects with nested jobs):
+```json
+[
+  {
+    "pr_number": 6313,
+    "title": "USHIFT-6636: Change test-agent impl to align with greenboot-rs",
+    "url": "https://github.com/openshift/microshift/pull/6313",
+    "jobs": [
+      {
+        "job": "pull-ci-openshift-microshift-main-e2e-aws-tests",
+        "status": "FAILURE",
+        "url": "https://prow.ci.openshift.org/view/gs/...",
+        "build_id": "2039755516510474240",
+        "finished": "2026-04-01T06:38:10Z"
+      }
+    ]
+  }
+]
 ```
 
 **Error Handling**:
-- If no open PRs found, report "No open pull requests found" and exit successfully
+- If no open PRs found (empty JSON array), report "No open pull requests found" and exit successfully
 - If no failed jobs across all PRs, report "All PR jobs are passing" and exit successfully
 - If `microshift-prow-jobs-for-pull-requests.sh` fails, report error and exit
 
@@ -84,7 +91,7 @@ Each job MUST be analyzed by launching a **separate Agent** (using the `Agent` t
 
 **Actions**:
 1. Run `WORKDIR=/tmp/analyze-ci-claude-workdir.$(date +%y%m%d) && mkdir -p ${WORKDIR}` using the `Bash` tool
-2. For each failed job URL, launch a separate **Agent** with this exact prompt template:
+2. For each failed job in the JSON, launch a separate **Agent** with this exact prompt template, using `.jobs[].url` as `<JOB_URL>`, `.pr_number` as `<PR>`, and the last segment of `.jobs[].job` as `<JOB_NAME_SUFFIX>`:
    ```
    Agent: subagent_type=general_purpose, prompt="Analyze this Prow job and save the report:
    1. Run /analyze-ci:prow-job <JOB_URL>
@@ -92,7 +99,7 @@ Each job MUST be analyzed by launching a **separate Agent** (using the `Agent` t
       ${WORKDIR}/analyze-ci-prs-job-<N>-pr<PR>-<JOB_NAME_SUFFIX>.txt
       Use the Write tool to save the file. The file must contain the complete analysis report."
    ```
-   Replace `<JOB_URL>`, `<N>` (1-based job index), `<PR>` (PR number), and `<JOB_NAME_SUFFIX>` (last segment of job name) with actual values.
+   Replace `<JOB_URL>`, `<N>` (1-based job index), `<PR>` (PR number), and `<JOB_NAME_SUFFIX>` with actual values from the JSON.
 3. Launch **ALL** job agents in parallel using `run_in_background: true`
 4. Wait for all agents to complete before proceeding to Step 3
 

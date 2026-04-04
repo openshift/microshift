@@ -2,8 +2,9 @@
 set -euo pipefail
 
 # Prow Jobs for Pull Requests
-# Lists open MicroShift PRs with their associated Prow test job results
-# Uses GCS bucket (test-platform-results) to query job data directly
+# Data modes (summary, detail): JSON on stdout
+# Action modes (approve, restart): text on stdout
+# Progress/errors: stderr
 
 GCS_API="https://storage.googleapis.com/storage/v1/b/test-platform-results/o"
 GCS_BASE="https://storage.googleapis.com/test-platform-results"
@@ -12,17 +13,15 @@ GH_REPO="openshift/microshift"
 GCS_PR_PREFIX="pr-logs/pull/openshift_microshift"
 SIGNATURE=$'\n'"*Added by $(basename "${0}")* :robot:"$'\n'
 
-# Get open PRs using GitHub CLI, optionally filtered by title substring and/or author
+# Get open PRs as JSON array
 fetch_open_prs() {
     local filter="${1:-}"
     local author="${2:-}"
-    local pr_data
     local -a gh_args=(--repo "${GH_REPO}" --state open --limit 100 --json "number,title,url")
 
-    if [[ -n "${author}" ]]; then
-        gh_args+=(--author "${author}")
-    fi
+    [[ -n "${author}" ]] && gh_args+=(--author "${author}")
 
+    local pr_data
     pr_data=$(gh pr list "${gh_args[@]}")
 
     if [[ -n "${filter}" ]]; then
@@ -40,63 +39,42 @@ list_pr_jobs() {
         sed "s|${GCS_PR_PREFIX}/${pr}/||; s|/$||"
 }
 
-# Get latest build result for a job
+# Get latest build result as a JSON object
 get_latest_build() {
     local pr="${1}" job="${2}"
-    local build_id result
+    local build_id finished_json
 
     build_id=$(curl -s --max-time 10 "${GCS_BASE}/${GCS_PR_PREFIX}/${pr}/${job}/latest-build.txt" 2>/dev/null) || return 1
     [[ -z "${build_id}" ]] && return 1
 
-    result=$(curl -s --max-time 10 "${GCS_BASE}/${GCS_PR_PREFIX}/${pr}/${job}/${build_id}/finished.json" 2>/dev/null | \
-        jq -r '.result // "PENDING"' 2>/dev/null) || result="PENDING"
+    finished_json=$(curl -s --max-time 10 "${GCS_BASE}/${GCS_PR_PREFIX}/${pr}/${job}/${build_id}/finished.json" 2>/dev/null) || return 1
 
-    local url="${PROW_VIEW}/${GCS_PR_PREFIX}/${pr}/${job}/${build_id}"
-    echo "${result}	${url}"
+    local url="${PROW_VIEW}/pr-logs/pull/openshift_microshift/${pr}/${job}/${build_id}"
+    echo "${finished_json}" | jq -c \
+        --arg job "${job}" --arg url "${url}" --arg build_id "${build_id}" \
+        '{
+            job: $job,
+            status: (.result // "PENDING"),
+            url: $url,
+            build_id: $build_id,
+            finished: (if (.timestamp // 0) > 0 then .timestamp | todate else null end)
+        }'
 }
 
-# Map result to icon
-result_to_icon() {
-    case "${1}" in
-        SUCCESS) echo "✓" ;;
-        FAILURE) echo "✗" ;;
-        ABORTED) echo "⊘" ;;
-        PENDING) echo "⋯" ;;
-        *)       echo "?" ;;
-    esac
-}
-
-# Usage
-usage() {
-    echo "Usage: ${0} [--mode MODE] [--filter STRING] [--author USER]"
-    echo "  --mode MODE:     Operation mode (default: summary)"
-    echo "    summary: Show table of open PRs with test job status summary"
-    echo "    detail:  Show table of open PRs with individual test job links"
-    echo "    approve: Approve PRs where ALL test jobs finished successfully"
-    echo "    restart: Restart failed test jobs by commenting /test for each failure"
-    echo "  --filter STRING: Only include PRs whose title contains STRING"
-    echo "  --author USER:   Only include PRs authored by USER (GitHub username)"
-    exit 1
-}
-
-# Fetch job results for a single PR (parallelized)
-# Returns non-zero if any job fetch fails, writing a .fetch_failed marker
+# Fetch job results for a single PR into temp dir (parallelized)
 fetch_pr_results() {
     local pr="${1}"
     local tmpdir="${2}"
     local jobs
 
     jobs=$(list_pr_jobs "${pr}") || { touch "${tmpdir}/.fetch_failed"; return 1; }
-    if [[ -z "${jobs}" ]]; then
-        return 0
-    fi
+    [[ -z "${jobs}" ]] && return 0
 
-    # Fetch latest build for each job in parallel
     while IFS= read -r job; do
         (
-            result_line=$(get_latest_build "${pr}" "${job}" 2>/dev/null) || { touch "${tmpdir}/.fetch_failed"; exit 1; }
-            if [[ -n "${result_line}" ]]; then
-                echo "${job}	${result_line}" > "${tmpdir}/${job}"
+            result=$(get_latest_build "${pr}" "${job}" 2>/dev/null) || { touch "${tmpdir}/.fetch_failed"; exit 1; }
+            if [[ -n "${result}" ]]; then
+                echo "${result}" > "${tmpdir}/${job}.json"
             else
                 touch "${tmpdir}/.fetch_failed"
             fi
@@ -104,141 +82,115 @@ fetch_pr_results() {
     done <<< "${jobs}"
     wait
 
-    # Check if any subshell signaled a failure
-    if [[ -f "${tmpdir}/.fetch_failed" ]]; then
-        return 1
-    fi
+    [[ -f "${tmpdir}/.fetch_failed" ]] && return 1
     return 0
 }
 
-# Summary mode - show PR with pass/fail counts
-mode_summary() {
-    local filter="${1:-}"
-    local author="${2:-}"
-    local pr_data
-
-    echo "Fetching open PRs..." >&2
-    pr_data=$(fetch_open_prs "${filter}" "${author}")
-
-    local pr_count
-    pr_count=$(echo "${pr_data}" | jq 'length')
-
-    if [[ "${pr_count}" -eq 0 ]]; then
-        echo "No open pull requests found."
+# Collect per-job JSON files into a single JSON array
+collect_jobs_json() {
+    local tmpdir="${1}"
+    local files=("${tmpdir}"/*.json)
+    if [[ ! -f "${files[0]}" ]]; then
+        echo "[]"
         return
     fi
-
-    echo "Fetching job results..." >&2
-
-    {
-        echo -e "PR\tTITLE\t✓\t✗\t⋯\tJOBS"
-        echo "${pr_data}" | jq -r '.[] | [.number, .title, .url] | @tsv' | while IFS=$'\t' read -r pr_number pr_title pr_url; do
-            local tmpdir
-            tmpdir=$(mktemp -d)
-
-            if ! fetch_pr_results "${pr_number}" "${tmpdir}"; then
-                echo "PR #${pr_number}: incomplete job results, skipping" >&2
-                rm -rf "${tmpdir}"
-                continue
-            fi
-
-            local success=0 failure=0 pending=0 total=0
-            for f in "${tmpdir}"/*; do
-                [[ -f "${f}" ]] || continue
-                local result
-                result=$(cut -f2 "${f}")
-                total=$((total + 1))
-                case "${result}" in
-                    SUCCESS) success=$((success + 1)) ;;
-                    FAILURE) failure=$((failure + 1)) ;;
-                    *)       pending=$((pending + 1)) ;;
-                esac
-            done
-            rm -rf "${tmpdir}"
-
-            # Truncate title to 50 chars
-            if [[ ${#pr_title} -gt 50 ]]; then
-                pr_title="${pr_title:0:47}..."
-            fi
-
-            echo -e "${pr_url}\t${pr_title}\t${success}\t${failure}\t${pending}\t${total}"
-        done
-    } | column -t -s $'\t'
+    cat "${files[@]}" | jq -s '.'
 }
 
-# Detail mode - show each job for each PR
-mode_detail() {
-    local filter="${1:-}"
-    local author="${2:-}"
-    local pr_data
+# Summary mode: JSON array of PRs with pass/fail counts
+mode_summary() {
+    local filter="${1:-}" author="${2:-}"
+    local pr_data output_tmp
 
     echo "Fetching open PRs..." >&2
     pr_data=$(fetch_open_prs "${filter}" "${author}")
+    [[ "$(echo "${pr_data}" | jq 'length')" -eq 0 ]] && { echo "[]"; return; }
 
-    local pr_count
-    pr_count=$(echo "${pr_data}" | jq 'length')
+    echo "Fetching job results..." >&2
+    output_tmp=$(mktemp)
 
-    if [[ "${pr_count}" -eq 0 ]]; then
-        echo "No open pull requests found."
-        return
-    fi
-
-    echo "${pr_data}" | jq -r '.[] | [.number, .title, .url] | @tsv' | while IFS=$'\t' read -r pr_number pr_title pr_url; do
-        echo ""
-        echo "=== PR #${pr_number}: ${pr_title} ==="
-        echo "    ${pr_url}"
-        echo ""
-
+    while IFS=$'\t' read -r pr_number pr_title pr_url; do
         local tmpdir
         tmpdir=$(mktemp -d)
 
         if ! fetch_pr_results "${pr_number}" "${tmpdir}"; then
-            echo "    PR #${pr_number}: incomplete job results, skipping"
+            echo "PR #${pr_number}: incomplete job results, skipping" >&2
             rm -rf "${tmpdir}"
             continue
         fi
 
-        local file_count
-        file_count=$(find "${tmpdir}" -maxdepth 1 -type f | wc -l)
-
-        if [[ "${file_count}" -eq 0 ]]; then
-            echo "    No Prow jobs found."
-        else
-            {
-                echo -e "JOB\tSTATUS\tURL"
-                while IFS= read -r -d '' f; do
-                    local job result url icon
-                    IFS=$'\t' read -r job result url < "${f}"
-                    icon=$(result_to_icon "${result}")
-                    echo -e "${job}\t${icon}\t${url}"
-                done < <(find "${tmpdir}" -maxdepth 1 -type f -print0 | sort -z)
-            } | column -t -s $'\t' | sed 's/^/    /'
-        fi
-
+        local passed=0 failed=0 pending=0 total=0
+        for f in "${tmpdir}"/*.json; do
+            [[ -f "${f}" ]] || continue
+            local status
+            status=$(jq -r '.status' "${f}")
+            total=$((total + 1))
+            case "${status}" in
+                SUCCESS) passed=$((passed + 1)) ;;
+                FAILURE) failed=$((failed + 1)) ;;
+                *)       pending=$((pending + 1)) ;;
+            esac
+        done
         rm -rf "${tmpdir}"
-    done
+
+        jq -nc --argjson n "${pr_number}" --arg t "${pr_title}" --arg u "${pr_url}" \
+            --argjson p "${passed}" --argjson f "${failed}" \
+            --argjson pe "${pending}" --argjson to "${total}" \
+            '{pr_number: $n, title: $t, url: $u, passed: $p, failed: $f, pending: $pe, total: $to}' \
+            >> "${output_tmp}"
+    done < <(echo "${pr_data}" | jq -r '.[] | [.number, .title, .url] | @tsv')
+
+    jq -s '.' "${output_tmp}"
+    rm -f "${output_tmp}"
 }
 
-# Approve mode - add "/lgtm" and "/verified by ci" comments to PRs with all tests passing
+# Detail mode: JSON array of PRs with full job lists
+mode_detail() {
+    local filter="${1:-}" author="${2:-}"
+    local pr_data output_tmp
+
+    echo "Fetching open PRs..." >&2
+    pr_data=$(fetch_open_prs "${filter}" "${author}")
+    [[ "$(echo "${pr_data}" | jq 'length')" -eq 0 ]] && { echo "[]"; return; }
+
+    echo "Fetching job results..." >&2
+    output_tmp=$(mktemp)
+
+    while IFS=$'\t' read -r pr_number pr_title pr_url; do
+        local tmpdir
+        tmpdir=$(mktemp -d)
+
+        if ! fetch_pr_results "${pr_number}" "${tmpdir}"; then
+            echo "PR #${pr_number}: incomplete job results, skipping" >&2
+            rm -rf "${tmpdir}"
+            continue
+        fi
+
+        local jobs_json
+        jobs_json=$(collect_jobs_json "${tmpdir}")
+        rm -rf "${tmpdir}"
+
+        jq -nc --argjson n "${pr_number}" --arg t "${pr_title}" --arg u "${pr_url}" \
+            --argjson jobs "${jobs_json}" \
+            '{pr_number: $n, title: $t, url: $u, jobs: $jobs}' >> "${output_tmp}"
+    done < <(echo "${pr_data}" | jq -r '.[] | [.number, .title, .url] | @tsv')
+
+    jq -s '.' "${output_tmp}"
+    rm -f "${output_tmp}"
+}
+
+# Approve mode: add /lgtm to PRs where all jobs pass
 mode_approve() {
-    local filter="${1:-}"
-    local author="${2:-}"
+    local filter="${1:-}" author="${2:-}"
     local pr_data
 
     echo "Fetching open PRs..." >&2
     pr_data=$(fetch_open_prs "${filter}" "${author}")
-
-    local pr_count
-    pr_count=$(echo "${pr_data}" | jq 'length')
-
-    if [[ "${pr_count}" -eq 0 ]]; then
-        echo "No open pull requests found."
-        return
-    fi
+    [[ "$(echo "${pr_data}" | jq 'length')" -eq 0 ]] && { echo "No open pull requests found."; return; }
 
     echo "Fetching job results..." >&2
 
-    echo "${pr_data}" | jq -r '.[] | [.number, .title, .url] | @tsv' | while IFS=$'\t' read -r pr_number pr_title pr_url; do
+    while IFS=$'\t' read -r pr_number pr_title pr_url; do
         local tmpdir
         tmpdir=$(mktemp -d)
 
@@ -249,14 +201,12 @@ mode_approve() {
         fi
 
         local total=0 success=0
-        for f in "${tmpdir}"/*; do
+        for f in "${tmpdir}"/*.json; do
             [[ -f "${f}" ]] || continue
-            local result
-            result=$(cut -f2 "${f}")
+            local status
+            status=$(jq -r '.status' "${f}")
             total=$((total + 1))
-            case "${result}" in
-                SUCCESS) success=$((success + 1)) ;;
-            esac
+            [[ "${status}" == "SUCCESS" ]] && success=$((success + 1))
         done
         rm -rf "${tmpdir}"
 
@@ -275,29 +225,21 @@ mode_approve() {
         else
             echo "PR #${pr_number}: ${success}/${total} jobs passed, skipping"
         fi
-    done
+    done < <(echo "${pr_data}" | jq -r '.[] | [.number, .title, .url] | @tsv')
 }
 
-# Restart mode - comment /test for each failed job on PRs with failures
+# Restart mode: comment /test for each failed job
 mode_restart() {
-    local filter="${1:-}"
-    local author="${2:-}"
+    local filter="${1:-}" author="${2:-}"
     local pr_data
 
     echo "Fetching open PRs..." >&2
     pr_data=$(fetch_open_prs "${filter}" "${author}")
-
-    local pr_count
-    pr_count=$(echo "${pr_data}" | jq 'length')
-
-    if [[ "${pr_count}" -eq 0 ]]; then
-        echo "No open pull requests found."
-        return
-    fi
+    [[ "$(echo "${pr_data}" | jq 'length')" -eq 0 ]] && { echo "No open pull requests found."; return; }
 
     echo "Fetching job results..." >&2
 
-    echo "${pr_data}" | jq -r '.[] | [.number, .title, .url] | @tsv' | while IFS=$'\t' read -r pr_number pr_title pr_url; do
+    while IFS=$'\t' read -r pr_number pr_title pr_url; do
         local tmpdir
         tmpdir=$(mktemp -d)
 
@@ -308,13 +250,12 @@ mode_restart() {
         fi
 
         local failed_jobs=()
-        for f in "${tmpdir}"/*; do
+        for f in "${tmpdir}"/*.json; do
             [[ -f "${f}" ]] || continue
-            local job result
-            IFS=$'\t' read -r job result _ < "${f}"
-            if [[ "${result}" == "FAILURE" ]]; then
-                failed_jobs+=("${job}")
-            fi
+            local job status
+            job=$(jq -r '.job' "${f}")
+            status=$(jq -r '.status' "${f}")
+            [[ "${status}" == "FAILURE" ]] && failed_jobs+=("${job}")
         done
 
         if [[ ${#failed_jobs[@]} -eq 0 ]]; then
@@ -346,71 +287,48 @@ mode_restart() {
         echo "PR #${pr_number}: Restarting ${#failed_jobs[@]} failed job(s): ${failed_jobs[*]}"
         gh pr comment "${pr_number}" --repo "${GH_REPO}" --body "${comment}"
         echo "PR #${pr_number}: Restart comment posted"
-    done
+    done < <(echo "${pr_data}" | jq -r '.[] | [.number, .title, .url] | @tsv')
 }
 
-# Main
+usage() {
+    echo "Usage: ${0} [--mode MODE] [--filter STRING] [--author USER]" >&2
+    echo "  --mode MODE:     Operation mode (default: summary)" >&2
+    echo "    summary: JSON array of PRs with pass/fail counts" >&2
+    echo "    detail:  JSON array of PRs with full job lists" >&2
+    echo "    approve: Approve PRs where ALL test jobs passed" >&2
+    echo "    restart: Restart failed test jobs by commenting /test" >&2
+    echo "  --filter STRING: Only include PRs whose title contains STRING" >&2
+    echo "  --author USER:   Only include PRs authored by USER" >&2
+    exit 1
+}
+
 main() {
     local mode="summary"
     local filter=""
     local author=""
 
-    # Parse arguments
     while [[ ${#} -gt 0 ]]; do
         case "${1}" in
             --mode)
-                if [[ ${#} -lt 2 ]]; then
-                    echo "Error: mode requires an argument"
-                    usage
-                fi
-                mode="${2}"
-                shift 2
-                ;;
+                [[ ${#} -lt 2 ]] && { echo "Error: mode requires an argument" >&2; usage; }
+                mode="${2}"; shift 2 ;;
             --filter)
-                if [[ ${#} -lt 2 ]]; then
-                    echo "Error: filter requires an argument"
-                    usage
-                fi
-                filter="${2}"
-                shift 2
-                ;;
+                [[ ${#} -lt 2 ]] && { echo "Error: filter requires an argument" >&2; usage; }
+                filter="${2}"; shift 2 ;;
             --author)
-                if [[ ${#} -lt 2 ]]; then
-                    echo "Error: author requires an argument"
-                    usage
-                fi
-                author="${2}"
-                shift 2
-                ;;
-            -*)
-                echo "Unknown option: ${1}"
-                usage
-                ;;
-            *)
-                echo "Unknown argument: ${1}"
-                usage
-                ;;
+                [[ ${#} -lt 2 ]] && { echo "Error: author requires an argument" >&2; usage; }
+                author="${2}"; shift 2 ;;
+            -*) echo "Unknown option: ${1}" >&2; usage ;;
+            *) echo "Unknown argument: ${1}" >&2; usage ;;
         esac
     done
 
-    # Execute mode
     case "${mode}" in
-        summary)
-            mode_summary "${filter}" "${author}"
-            ;;
-        detail)
-            mode_detail "${filter}" "${author}"
-            ;;
-        approve)
-            mode_approve "${filter}" "${author}"
-            ;;
-        restart)
-            mode_restart "${filter}" "${author}"
-            ;;
-        *)
-            echo "Error: Unknown mode '${mode}'"
-            usage
-            ;;
+        summary) mode_summary "${filter}" "${author}" ;;
+        detail)  mode_detail "${filter}" "${author}" ;;
+        approve) mode_approve "${filter}" "${author}" ;;
+        restart) mode_restart "${filter}" "${author}" ;;
+        *) echo "Error: Unknown mode '${mode}'" >&2; usage ;;
     esac
 }
 

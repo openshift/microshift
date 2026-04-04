@@ -1,132 +1,60 @@
 #!/bin/bash
 set -euo pipefail
 
-# Prow Jobs Analyzer
-# Analyzes status of Prow jobs for MicroShift
+# Prow Jobs Analyzer for MicroShift
+# Output: JSON array of job objects on stdout
+# Progress/errors: stderr
 
 PROW_URL="https://prow.ci.openshift.org/data.js"
-PROW_JOB="microshift"
 
-# Base query - fetch all MicroShift jobs for a release
-fetch_base_data() {
+# Fetch all MicroShift jobs for a release, return latest run per job as JSON
+fetch_latest_per_job() {
     local release="${1}"
-    curl -s --max-time 60 "${PROW_URL}" | jq -c --arg release "${release}" --arg job "${PROW_JOB}" '
-        .[] | select((.job | contains($job)) and (.job | contains($release))) |
-        {job: .job, status: .state, started: .started, finished: .finished, duration: .duration, url: .url}
+    curl -s --max-time 60 "${PROW_URL}" | jq --arg release "${release}" '
+        [.[] | select((.job | contains("microshift")) and (.job | contains($release)))] |
+        group_by(.job) |
+        map(sort_by(.started | tonumber) | reverse | first) |
+        [.[] | {
+            job: .job,
+            type: .type,
+            status: .state,
+            finished: .finished,
+            duration: .duration,
+            url: .url,
+            build_id: .build_id
+        }]
     '
 }
 
-# Map status to icon
-status_to_icon() {
-    case "${1}" in
-        success) echo "✓" ;;
-        failure) echo "✗" ;;
-        pending) echo "⋯" ;;
-        *) echo "?" ;;
-    esac
-}
-
-# Query for status mode - show latest run for each job
-query_status() {
-    {
-        echo -e "JOB\tSTATUS\tFINISHED\tDURATION\tURL"
-        jq -sr '
-            group_by(.job) |
-            map(sort_by(.started | tonumber) | reverse | first) |
-            .[] |
-            .status = (if .status == "success" then "✓"
-                      elif .status == "failure" then "✗"
-                      elif .status == "pending" then "⋯"
-                      else "?" end) |
-            [.job, .status, .finished, .duration, .url] |
-            @tsv
-        '
-    } | column -t -s $'\t'
-}
-
-# Query for failed mode - show only latest jobs with failure status
-query_failed() {
-    {
-        echo -e "JOB\tSTATUS\tFINISHED\tDURATION\tURL"
-        jq -sr '
-            group_by(.job) |
-            map(sort_by(.started | tonumber) | reverse | first) |
-            .[] |
-            select(.status == "failure") |
-            .status = "✗" |
-            [.job, .status, .finished, .duration, .url] |
-            @tsv
-        '
-    } | column -t -s $'\t'
-}
-
-# Usage
 usage() {
-    echo "Usage: ${0} [--mode MODE] <release>"
-    echo "  --mode MODE: Operation mode (default: failed)"
-    echo "    status: Show status of latest run for each job"
-    echo "    failed: Show only latest jobs with failure status"
-    echo "  release: OpenShift release version (e.g., 4.17, 4.16)"
+    echo "Usage: ${0} [--mode MODE] <release>" >&2
+    echo "  --mode MODE: Operation mode (default: failed)" >&2
+    echo "    status: Latest run status for each job" >&2
+    echo "    failed: Only jobs with failure status" >&2
+    echo "  release: OpenShift release version (e.g., 4.22, main)" >&2
     exit 1
 }
 
-# Status mode - show latest run for each job
-mode_status() {
-    local release="${1}"
-    fetch_base_data "${release}" | query_status
-}
-
-# Failed mode - show only failed jobs
-mode_failed() {
-    local release="${1}"
-    fetch_base_data "${release}" | query_failed
-}
-
-# Main
 main() {
     local mode="failed"
     local release=""
 
-    # Parse arguments
     while [[ ${#} -gt 0 ]]; do
         case "${1}" in
             --mode)
-                if [[ ${#} -lt 2 ]]; then
-                    echo "Error: mode requires an argument"
-                    usage
-                fi
-                mode="${2}"
-                shift 2
-                ;;
-            -*)
-                echo "Unknown option: ${1}"
-                usage
-                ;;
-            *)
-                release="${1}"
-                shift
-                ;;
+                [[ ${#} -lt 2 ]] && { echo "Error: mode requires an argument" >&2; usage; }
+                mode="${2}"; shift 2 ;;
+            -*) echo "Unknown option: ${1}" >&2; usage ;;
+            *) release="${1}"; shift ;;
         esac
     done
 
-    # Validate arguments
-    if [[ -z "${release}" ]]; then
-        echo "Error: release argument is required"
-        usage
-    fi
+    [[ -z "${release}" ]] && { echo "Error: release argument is required" >&2; usage; }
 
-    # Execute mode
     case "${mode}" in
-        status)
-            mode_status "${release}"
-            ;;
-        failed)
-            mode_failed "${release}"
-            ;;
-        *)
-            echo "Error: Unknown mode '${mode}'"
-            usage
-            ;;
+        status) fetch_latest_per_job "${release}" ;;
+        failed) fetch_latest_per_job "${release}" | jq '[.[] | select(.status == "failure")]' ;;
+        *) echo "Error: Unknown mode '${mode}'" >&2; usage ;;
     esac
 }
 
