@@ -73,29 +73,46 @@ Found 17 failed periodic jobs for release 4.22
 - If no periodic jobs found (empty JSON array after filtering), report "No failed periodic jobs found for release X.XX" and exit successfully
 - If microshift-prow-jobs-for-release.sh fails, report error and exit
 
-### Step 2: Analyze Each Job Using /analyze-ci:prow-job
+### Step 2: Download All Job Artifacts
 
-**Goal**: Get detailed root cause analysis for each failed job.
+**Goal**: Download artifacts for all failed jobs in parallel before analysis.
+
+**Actions**:
+1. Run `WORKDIR=/tmp/analyze-ci-claude-workdir.$(date +%y%m%d) && mkdir -p ${WORKDIR}` using the `Bash` tool
+2. Pipe the filtered JSON from Step 1 into the download script:
+   ```bash
+   bash .claude/scripts/microshift-prow-jobs-for-release.sh <release> | \
+       jq '[.[] | select(.type == "periodic")]' | \
+       WORKDIR=${WORKDIR} bash .claude/scripts/analyze-ci-download-jobs.sh
+   ```
+3. The script downloads all artifacts in parallel to `${WORKDIR}/artifacts/<build_id>/` and outputs enriched JSON with `artifacts_dir` fields added
+4. Save the output JSON for use in Step 3
+
+**Error Handling**:
+- If some downloads fail, note the failures but proceed with successfully downloaded jobs
+
+### Step 3: Analyze Each Job Using /analyze-ci:prow-job
+
+**Goal**: Get detailed root cause analysis for each failed job using pre-downloaded artifacts.
 
 **IMPORTANT - Mandatory Per-Job Agent Requirements**:
-Each job MUST be analyzed by launching a **separate Agent** (using the `Agent` tool, NOT the `Skill` tool) for each job URL. Do NOT analyze jobs inline or combine multiple jobs into a single agent. Each agent MUST:
-1. Run `/analyze-ci:prow-job <job-url>` (not by reimplementing the analysis)
+Each job MUST be analyzed by launching a **separate Agent** (using the `Agent` tool, NOT the `Skill` tool) for each job. Do NOT analyze jobs inline or combine multiple jobs into a single agent. Each agent MUST:
+1. Run `/analyze-ci:prow-job <artifacts_dir>` using the local artifacts directory (not by reimplementing the analysis)
 2. After the analysis completes, write the analysis report to an **exact file path** (see File Storage below)
 3. The file MUST contain the full report including the `--- STRUCTURED SUMMARY ---` block
 
 **Actions**:
-1. Run `WORKDIR=/tmp/analyze-ci-claude-workdir.$(date +%y%m%d) && mkdir -p ${WORKDIR}` using the `Bash` tool
-2. For each job in the JSON array, launch a separate **Agent** with this exact prompt template, using the `.url` field as `<JOB_URL>` and the `.build_id` field as `<JOB_ID>`:
+1. For each job in the enriched JSON from Step 2, launch a separate **Agent** with this exact prompt template, using the `.artifacts_dir` field as `<ARTIFACTS_DIR>` and the `.build_id` field as `<JOB_ID>`:
    ```
    Agent: subagent_type=general_purpose, prompt="Analyze this Prow job and save the report:
-   1. Run /analyze-ci:prow-job <JOB_URL>
+   1. Run /analyze-ci:prow-job <ARTIFACTS_DIR>
    2. After the analysis completes, save the FULL report output (including the --- STRUCTURED SUMMARY --- block) to:
       ${WORKDIR}/analyze-ci-release-<RELEASE>-job-<N>-<JOB_ID>.txt
       Use the Write tool to save the file. The file must contain the complete analysis report."
    ```
-   Replace `<JOB_URL>`, `<RELEASE>`, `<N>` (1-based job index), and `<JOB_ID>` with actual values from the JSON.
-3. Launch **ALL** job agents in parallel using `run_in_background: true`
-4. Wait for all agents to complete before proceeding to Step 3
+   Replace `<ARTIFACTS_DIR>`, `<RELEASE>`, `<N>` (1-based job index), and `<JOB_ID>` with actual values from the JSON.
+2. Launch **ALL** job agents in parallel using `run_in_background: true`
+3. Wait for all agents to complete before proceeding to Step 4
 
 **Progress Reporting**:
 ```text
@@ -120,7 +137,7 @@ ls ${WORKDIR}/analyze-ci-release-<release>-job-*.txt
 ```
 If any files are missing, note the gap in the summary report but do NOT re-run the analysis.
 
-### Step 3: Aggregate Results and Identify Patterns
+### Step 4: Aggregate Results and Identify Patterns
 
 **Goal**: Find common failure patterns across all jobs from parallel execution.
 
@@ -145,7 +162,7 @@ If any files are missing, note the gap in the summary report but do NOT re-run t
    - MEDIUM: Isolated failures
    - LOW: Flaky/intermittent issues
 
-### Step 4: Generate Concise Summary Report
+### Step 5: Generate Concise Summary Report
 
 **Goal**: Present actionable summary to the user.
 
