@@ -169,7 +169,7 @@ If any files are missing, note the gap in the summary report but do NOT re-run t
 **Actions**:
 1. Aggregate all job analysis results from parallel execution
 2. Identify common patterns and group by failure type
-3. Generate summary report and save to `${WORKDIR}/analyze-ci-release-<release>-summary.<timestamp>.txt`
+3. Generate summary report and save to `${WORKDIR}/analyze-ci-release-<release>-summary.json`
 4. Display the summary to the user
 
 **Important**: Each job listed under "Affected Jobs" MUST include:
@@ -187,7 +187,7 @@ MICROSHIFT 4.22 RELEASE - FAILED JOBS ANALYSIS
 OVERVIEW
   Total Failed Jobs: 17
   Analysis Date: 2026-03-14
-  Report saved to: ${WORKDIR}/analyze-ci-release-4.22-summary.<timestamp>.txt
+  Report saved to: ${WORKDIR}/analyze-ci-release-4.22-summary.json
 
 FAILURE BREAKDOWN
   Build Failures:        0 jobs

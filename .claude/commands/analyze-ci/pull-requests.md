@@ -176,7 +176,7 @@ If any files are missing, note the gap in the summary report but do NOT re-run t
 **Actions**:
 1. Aggregate all job analysis results from parallel execution
 2. Identify common patterns and group by PR and failure type
-3. Generate summary report and save to `${WORKDIR}/analyze-ci-prs-summary.<timestamp>.txt`
+3. Generate summary report and save to `${WORKDIR}/analyze-ci-prs-summary.json`
 4. Display the summary to the user
 
 **Important**: Each failed job MUST include the finish date in `[YYYY-MM-DD]` format (from the per-job `FINISHED` field) after the job name. This ensures the HTML report generator can extract dates without reading per-job files.
@@ -193,7 +193,7 @@ OVERVIEW
   PRs with Failures: 2
   Total Failed Jobs: 9
   Analysis Date: 2026-03-15
-  Report: ${WORKDIR}/analyze-ci-prs-summary.20260315-143022.txt
+  Report: ${WORKDIR}/analyze-ci-prs-summary.json
 
 PER-PR BREAKDOWN
 

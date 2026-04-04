@@ -69,7 +69,7 @@ WORKDIR=/tmp/analyze-ci-claude-workdir.$(date +%y%m%d)
 - **analyze-ci:doctor**: Orchestrator that runs analyses and then invokes this command
 - **analyze-ci:release**: Per-release periodic job analysis (produces the input files)
 - **analyze-ci:pull-requests**: PR job analysis (produces the input files)
-- **analyze-ci:create-bugs**: Creates JIRA bugs from analysis output; also produces bug mapping files (`analyze-ci-bugs-<source>.txt`) consumed by this command to show JIRA links in the HTML report
+- **analyze-ci:create-bugs**: Creates JIRA bugs from analysis output; also produces bug mapping files (`analyze-ci-bugs-<source>.json`) consumed by this command to show JIRA links in the HTML report
 
 ## Notes
 - This command is read-only — it only reads existing analysis files and generates HTML
@@ -78,4 +78,4 @@ WORKDIR=/tmp/analyze-ci-claude-workdir.$(date +%y%m%d)
 - If analysis files are missing for a release, it is noted in the report but does not block generation
 - If no PR files exist, the Pull Requests tab shows "No open rebase pull requests found"
 - This command can be re-run to regenerate the HTML without re-running the analyses
-- If bug mapping files (`analyze-ci-bugs-*.txt`) exist in `${WORKDIR}/`, JIRA bug links are shown per issue in the HTML; if not, the report still generates correctly without bug links
+- If bug mapping files (`analyze-ci-bugs-*.json`) exist in `${WORKDIR}/`, JIRA bug links are shown per issue in the HTML; if not, the report still generates correctly without bug links

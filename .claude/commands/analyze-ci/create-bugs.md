@@ -84,7 +84,7 @@ WORKDIR=/tmp/analyze-ci-claude-workdir.$(date +%y%m%d)
    - Extract the release version from the shorthand (e.g., `4.22`)
    - Glob for all PR job files: `${WORKDIR}/analyze-ci-prs-job-*.txt`
    - Read each file's STRUCTURED SUMMARY and find files where JOB_NAME contains the release version (e.g., `release-4.22` or `main`) OR where the JOB_URL contains the release branch
-   - Alternatively, check the PR summary file (`analyze-ci-prs-summary.*.txt`) to find the PR number for the given rebase release
+   - Alternatively, check the PR summary file (`analyze-ci-prs-summary.json`) to find the PR number for the given rebase release
    - Set `SOURCE_TYPE=pr`, `SOURCE_LABEL="rebase PR for <release> (PR #<number>)"`
 
 5. If no files found, report error and stop
@@ -382,32 +382,33 @@ For each candidate where user chose "reopen":
 **Actions**:
 After processing all bug candidates (Steps 5-7a) and regardless of mode (dry-run or create), write a machine-readable bug mapping file that `analyze-ci:create-report` can consume to display JIRA bug links in the HTML report. The file content is based on the Jira search results from Step 5 — it is not affected by whether bugs were created or reopened in Steps 7/7a.
 
-1. Save to `${WORKDIR}/analyze-ci-bugs-<source>.txt` (overwrite if exists)
-2. Use this structured format with one block per bug candidate:
+1. Save to `${WORKDIR}/analyze-ci-bugs-<source>.json` (overwrite if exists)
+2. Use this JSON format:
 
-```text
---- BUG MAPPING ---
-SOURCE: <source>
-DATE: YYYY-MM-DD
---- BUG CANDIDATE ---
-ERROR_SIGNATURE: <error_signature>
-SEVERITY: <N>
-STEP_NAME: <step_name>
-AFFECTED_JOBS: <count>
-JIRA_DUPLICATES: <comma-separated list of JIRA keys, or "None">
-JIRA_DUPLICATE_DETAILS: <KEY>|<summary>|<status>, <KEY>|<summary>|<status>, ...
-JIRA_REGRESSIONS: <comma-separated list of JIRA keys, or "None">
-JIRA_REGRESSION_DETAILS: <KEY>|<summary>|<status>, <KEY>|<summary>|<status>, ...
---- END BUG CANDIDATE ---
---- BUG CANDIDATE ---
-...
---- END BUG CANDIDATE ---
---- END BUG MAPPING ---
+```json
+{
+  "source": "<source>",
+  "date": "YYYY-MM-DD",
+  "candidates": [
+    {
+      "error_signature": "<error_signature>",
+      "severity": <N>,
+      "step_name": "<step_name>",
+      "affected_jobs": <count>,
+      "duplicates": [
+        {"key": "<JIRA-KEY>", "summary": "<summary>", "status": "<status>"}
+      ],
+      "regressions": [
+        {"key": "<JIRA-KEY>", "summary": "<summary>", "status": "<status>"}
+      ]
+    }
+  ]
+}
 ```
 
 3. **IMPORTANT**: This file must be written in BOTH dry-run and create modes. The file enables `analyze-ci:create-report` to show linked bugs per issue in the HTML report.
-4. The `JIRA_DUPLICATE_DETAILS` and `JIRA_REGRESSION_DETAILS` lines provide summary and status for each JIRA key, pipe-separated within each entry and comma-separated between entries. If no duplicates/regressions, use "None".
-5. Save using a Bash heredoc to avoid Write tool permission issues with `/tmp` paths.
+4. Use empty arrays `[]` for `duplicates` and `regressions` when none are found.
+5. Save using a Bash heredoc with `jq` or `python3 -c` to ensure valid JSON, or use the Write tool.
 
 ### Step 8: Generate Results Report
 
@@ -550,7 +551,7 @@ Run the analysis first:
 - All created bugs are labeled with `microshift-ci-ai-generated` for tracking
 - Security level is set to "Red Hat Employee" on all created issues
 - The STRUCTURED SUMMARY block in job files is required — this is a contract with `/analyze-ci:prow-job`
-- In addition to the text report, a machine-readable bug mapping file (`analyze-ci-bugs-<source>.txt`) is written in both dry-run and create modes — this file is consumed by `analyze-ci:create-report` to show JIRA bug links in the HTML report
+- In addition to the text report, a machine-readable bug mapping file (`analyze-ci-bugs-<source>.json`) is written in both dry-run and create modes — this file is consumed by `analyze-ci:create-report` to show JIRA bug links in the HTML report
 
 ## Related Skills
 

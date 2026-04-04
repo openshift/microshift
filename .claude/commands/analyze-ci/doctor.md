@@ -47,7 +47,7 @@ WORKDIR=/tmp/analyze-ci-claude-workdir.$(date +%y%m%d)
    Agent: subagent_type=general_purpose, prompt="Run /analyze-ci:release <version>"
    ```
 2. Launch all releases **in parallel** as separate agents — do NOT wait for one to finish before starting the next
-3. After each agent completes, note the summary report file path it produced (typically `${WORKDIR}/analyze-ci-release-<version>-summary.*.txt`)
+3. After each agent completes, note the summary report file path it produced (typically `${WORKDIR}/analyze-ci-release-<version>-summary.json`)
 4. Wait until all the parallel agents are complete
 5. Track which releases succeeded and which failed
 
@@ -64,7 +64,7 @@ Analyzing release X/Y: <version>
    Agent: subagent_type=general_purpose, prompt="Run /analyze-ci:pull-requests --rebase"
    ```
 2. This agent can be launched in parallel with the release agents in Step 2
-3. After the agent completes, note the summary report file path (typically `${WORKDIR}/analyze-ci-prs-summary.*.txt`)
+3. After the agent completes, note the summary report file path (typically `${WORKDIR}/analyze-ci-prs-summary.json`)
 4. If no rebase PRs are found, note "No open rebase PRs" for the report
 
 **Progress Reporting**:
@@ -88,7 +88,7 @@ Analyzing release X/Y: <version>
    ```
 4. Launch all create-bugs agents **in parallel** — do NOT wait for one to finish before starting the next
 5. Wait until all create-bugs agents complete
-6. Each agent produces a bug mapping file at `${WORKDIR}/analyze-ci-bugs-<source>.txt` that the create-report command will consume
+6. Each agent produces a bug mapping file at `${WORKDIR}/analyze-ci-bugs-<source>.json` that the create-report command will consume
 
 **Progress Reporting**:
 ```text
