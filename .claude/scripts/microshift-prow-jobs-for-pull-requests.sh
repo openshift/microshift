@@ -40,16 +40,25 @@ list_pr_jobs() {
 }
 
 # Get latest build result as a JSON object
+# Returns PENDING status for jobs still running (no finished.json).
 get_latest_build() {
     local pr="${1}" job="${2}"
     local build_id finished_json
 
     build_id=$(curl -s --max-time 10 "${GCS_BASE}/${GCS_PR_PREFIX}/${pr}/${job}/latest-build.txt" 2>/dev/null) || return 1
-    [[ -z "${build_id}" ]] && return 1
-
-    finished_json=$(curl -s --max-time 10 "${GCS_BASE}/${GCS_PR_PREFIX}/${pr}/${job}/${build_id}/finished.json" 2>/dev/null) || return 1
+    [[ -z "${build_id}" || "${build_id}" == *"<"* ]] && return 1
 
     local url="${PROW_VIEW}/pr-logs/pull/openshift_microshift/${pr}/${job}/${build_id}"
+
+    finished_json=$(curl -s --max-time 10 "${GCS_BASE}/${GCS_PR_PREFIX}/${pr}/${job}/${build_id}/finished.json" 2>/dev/null)
+
+    if [[ -z "${finished_json}" || "${finished_json}" == *"NoSuchKey"* || "${finished_json}" == *"<"* ]]; then
+        # Job still running — no finished.json yet
+        jq -nc --arg job "${job}" --arg url "${url}" --arg build_id "${build_id}" \
+            '{job: $job, status: "PENDING", url: $url, build_id: $build_id, finished: null}'
+        return 0
+    fi
+
     echo "${finished_json}" | jq -c \
         --arg job "${job}" --arg url "${url}" --arg build_id "${build_id}" \
         '{
@@ -62,27 +71,24 @@ get_latest_build() {
 }
 
 # Fetch job results for a single PR into temp dir (parallelized)
+# Skips individual jobs that fail to fetch (e.g. no latest-build.txt).
 fetch_pr_results() {
     local pr="${1}"
     local tmpdir="${2}"
     local jobs
 
-    jobs=$(list_pr_jobs "${pr}") || { touch "${tmpdir}/.fetch_failed"; return 1; }
+    jobs=$(list_pr_jobs "${pr}") || return 1
     [[ -z "${jobs}" ]] && return 0
 
     while IFS= read -r job; do
         (
-            result=$(get_latest_build "${pr}" "${job}" 2>/dev/null) || { touch "${tmpdir}/.fetch_failed"; exit 1; }
+            result=$(get_latest_build "${pr}" "${job}" 2>/dev/null) || exit 0
             if [[ -n "${result}" ]]; then
                 echo "${result}" > "${tmpdir}/${job}.json"
-            else
-                touch "${tmpdir}/.fetch_failed"
             fi
         ) &
     done <<< "${jobs}"
     wait
-
-    [[ -f "${tmpdir}/.fetch_failed" ]] && return 1
     return 0
 }
 

@@ -90,34 +90,54 @@ cmd_prepare() {
         echo "=== Rebase Pull Requests ===" >&2
 
         local prs_file="${WORKDIR}/analyze-ci-prs-jobs.json"
+        local prs_status_file="${WORKDIR}/analyze-ci-prs-status.json"
 
         echo "  Collecting rebase PRs..." >&2
         local pr_json
         pr_json=$(bash "${SCRIPT_DIR}/microshift-prow-jobs-for-pull-requests.sh" \
             --mode detail --author "microshift-rebase-script[bot]" 2>/dev/null)
 
-        # Filter to PRs with failed jobs
-        local failed_prs
-        failed_prs=$(echo "${pr_json}" | \
-            jq '[.[] | select(.jobs | map(select(.status == "FAILURE")) | length > 0)]')
-
         local pr_count
-        pr_count=$(echo "${failed_prs}" | jq 'length')
+        pr_count=$(echo "${pr_json}" | jq 'length')
 
         if [[ "${pr_count}" -eq 0 ]]; then
-            echo "  No rebase PRs with failures found" >&2
+            echo "  No rebase PRs found" >&2
             echo "[]" > "${prs_file}"
+            echo "[]" > "${prs_status_file}"
         else
-            local job_count
-            job_count=$(echo "${failed_prs}" | jq '[.[].jobs[] | select(.status == "FAILURE")] | length')
+            # Save job status snapshot for all PRs (used by HTML report)
+            echo "${pr_json}" | jq '[.[] | {
+                pr_number, title, url,
+                passed:  [.jobs[] | select(.status == "SUCCESS")] | length,
+                failed:  [.jobs[] | select(.status == "FAILURE")] | length,
+                pending: [.jobs[] | select(.status != "SUCCESS" and .status != "FAILURE")] | length,
+                total:   (.jobs | length)
+            }]' > "${prs_status_file}"
+            echo "  Saved status for ${pr_count} rebase PRs" >&2
 
-            echo "  Found ${pr_count} PRs with ${job_count} failed jobs, downloading artifacts..." >&2
-            echo "${failed_prs}" | \
-                bash "${SCRIPT_DIR}/analyze-ci-download-jobs.sh" 2>/dev/null \
-                > "${prs_file}"
+            # Filter to PRs with failed jobs for artifact download
+            local failed_prs
+            failed_prs=$(echo "${pr_json}" | \
+                jq '[.[] | select(.jobs | map(select(.status == "FAILURE")) | length > 0)]')
 
-            total_jobs=$((total_jobs + job_count))
-            echo "  Done: ${prs_file}" >&2
+            local failed_pr_count
+            failed_pr_count=$(echo "${failed_prs}" | jq 'length')
+
+            if [[ "${failed_pr_count}" -eq 0 ]]; then
+                echo "  No PRs with failures to investigate" >&2
+                echo "[]" > "${prs_file}"
+            else
+                local job_count
+                job_count=$(echo "${failed_prs}" | jq '[.[].jobs[] | select(.status == "FAILURE")] | length')
+
+                echo "  Downloading artifacts for ${job_count} failed jobs across ${failed_pr_count} PRs..." >&2
+                echo "${failed_prs}" | \
+                    bash "${SCRIPT_DIR}/analyze-ci-download-jobs.sh" 2>/dev/null \
+                    > "${prs_file}"
+
+                total_jobs=$((total_jobs + job_count))
+                echo "  Done: ${prs_file}" >&2
+            fi
         fi
     fi
 
