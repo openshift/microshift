@@ -39,8 +39,10 @@ STOP_WORDS = frozenset({
 CSS = """\
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 20px; background: #f5f5f5; color: #333; }
         .container { max-width: 1200px; margin: 0 auto; }
-        h1 { color: #1a1a2e; border-bottom: 3px solid #e94560; padding-bottom: 10px; }
-        .release-section { background: white; border-radius: 8px; padding: 20px; margin: 20px 0; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        h1 { color: #1a1a2e; border-bottom: 3px solid #e94560; padding-bottom: 8px; font-size: 1.4em; margin: 10px 0; }
+        h2 { font-size: 1.15em; margin: 0; }
+        h3 { font-size: 1.05em; margin: 0 0 8px 0; }
+        .release-section { background: white; border-radius: 8px; padding: 15px; margin: 15px 0; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
         .release-header { display: flex; justify-content: space-between; align-items: center; }
         .release-header h2 { color: #16213e; margin: 0; }
         .badge { padding: 4px 12px; border-radius: 12px; font-size: 0.85em; font-weight: 600; }
@@ -51,9 +53,9 @@ CSS = """\
         .root-cause { background: #fff8e1; border-left: 3px solid #ffc107; padding: 8px 12px; margin: 8px 0; font-size: 0.9em; }
         .status-pass { color: #28a745; }
         .status-fail { color: #dc3545; }
-        .overview-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 20px 0; }
-        .overview-card { background: white; border-radius: 8px; padding: 20px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .overview-card .number { font-size: 2em; font-weight: 700; }
+        .overview-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin: 15px 0; }
+        .overview-card { background: white; border-radius: 8px; padding: 12px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .overview-card .number { font-size: 1.6em; font-weight: 700; }
         .overview-card .label { color: #6c757d; font-size: 0.9em; }
         .collapsible { cursor: pointer; user-select: none; }
         .collapsible::before { content: '\\25B6  '; font-size: 0.8em; }
@@ -62,12 +64,26 @@ CSS = """\
         .job-date { font-weight: 400; color: #6c757d; font-size: 0.85em; }
         .collapsible-content { display: none; }
         .collapsible-content.show { display: block; }
+        .issues-table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+        .issues-table td { padding: 5px 6px; vertical-align: middle; }
+        .issues-table .col-num { width: 30px; text-align: right; font-weight: 700; color: #495057; padding-right: 10px; }
+        .issues-table .col-sev { width: 78px; }
+        .issues-table .col-ftype { width: 58px; }
+        .issues-table .col-title { cursor: pointer; user-select: none; }
+        .issues-table .col-title::before { content: '\\25B6  '; font-size: 0.7em; color: #6c757d; }
+        .issues-table .col-title.active::before { content: '\\25BC  '; }
+        .issues-table .col-jobs { width: 70px; text-align: center; color: #6c757d; font-size: 0.85em; white-space: nowrap; }
+        .issues-table .detail-row td { padding: 0 6px 12px 40px; }
+        .issues-table .detail-row { display: none; }
+        .issues-table .detail-row.show { display: table-row; }
+        .issues-table tr.issue-row { border-top: 1px solid #eee; }
+        .issues-table tr.issue-row:first-child { border-top: none; }
         .bug-links { margin: 8px 0; padding: 8px 12px; background: #f0f4ff; border-left: 3px solid #0366d6; font-size: 0.9em; }
         .bug-links .bug-tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.85em; font-weight: 600; margin: 2px 4px 2px 0; text-decoration: none; }
         .bug-tag-open { background: #fff3cd; color: #856404; border: 1px solid #ffc107; }
         .bug-tag-regression { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
         .no-bugs { color: #6c757d; font-style: italic; font-size: 0.85em; }
-        .toc { background: white; border-radius: 8px; padding: 20px; margin: 20px 0; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .toc { background: white; border-radius: 8px; padding: 15px; margin: 15px 0; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
         .toc ul { list-style: none; padding-left: 0; }
         .toc li { padding: 5px 0; }
         .toc a { color: #0366d6; text-decoration: none; }
@@ -84,7 +100,16 @@ CSS = """\
         .tab-content.active { display: block; }
         .breakdown { display: flex; gap: 15px; margin: 10px 0; flex-wrap: wrap; }
         .breakdown-item { font-size: 0.9em; color: #495057; }
-        .breakdown-item strong { color: #333; }"""
+        .breakdown-item strong { color: #333; }
+        .severity-badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.75em; font-weight: 700; text-transform: uppercase; }
+        .severity-high { background: #f8d7da; color: #721c24; }
+        .severity-medium { background: #fff3cd; color: #856404; }
+        .severity-low { background: #d4edda; color: #155724; }
+        .severity-critical { background: #721c24; color: #fff; }
+        .ftype-badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.75em; font-weight: 700; text-transform: uppercase; }
+        .ftype-test { background: #cce5ff; color: #004085; }
+        .ftype-build { background: #e2d5f1; color: #4a235a; }
+        .ftype-infra { background: #fde2cc; color: #7d4e24; }"""
 
 JS = """\
 function showTab(e, name) {
@@ -101,6 +126,15 @@ document.querySelectorAll('.collapsible').forEach(function(el) {
     el.addEventListener('click', function() {
         this.classList.toggle('active');
         this.nextElementSibling.classList.toggle('show');
+    });
+});
+document.querySelectorAll('.col-title').forEach(function(el) {
+    el.addEventListener('click', function() {
+        this.classList.toggle('active');
+        var row = this.closest('tr').nextElementSibling;
+        if (row && row.classList.contains('detail-row')) {
+            row.classList.toggle('show');
+        }
     });
 });"""
 
@@ -258,17 +292,25 @@ def render_release_section(version, rdata, bug_candidates):
     lines.append(f'                <span class="breakdown-item"><strong>{b["infrastructure"]}</strong> Infrastructure</span>')
     lines.append("            </div>")
 
+    lines.append('            <table class="issues-table">')
     for issue in rdata["issues"]:
         bug_match = match_issue_to_bugs(issue["title"], bug_candidates)
         jc = issue["job_count"]
         sev = issue.get("severity", "UNKNOWN").upper()
+        sev_css = f"severity-{sev.lower()}" if sev in ("HIGH", "MEDIUM", "LOW", "CRITICAL") else ""
+        ftype = issue.get("failure_type", "test")
+        ftype_label = "INFRA" if ftype == "infrastructure" else ftype.upper()
+        ftype_css = "ftype-infra" if ftype == "infrastructure" else f"ftype-{ftype}"
+        jobs_label = f'{jc} {"job" if jc == 1 else "jobs"}'
 
-        lines.append("")
-        lines.append(
-            f'            <h4 class="collapsible">{issue["number"]}. {_e(issue["title"])} '
-            f'<span class="job-date">({jc} {"job" if jc == 1 else "jobs"}, {sev})</span></h4>'
-        )
-        lines.append('            <div class="collapsible-content">')
+        lines.append(f'            <tr class="issue-row">')
+        lines.append(f'                <td class="col-num">{issue["number"]}.</td>')
+        lines.append(f'                <td class="col-sev"><span class="severity-badge {sev_css}">{sev}</span></td>')
+        lines.append(f'                <td class="col-ftype"><span class="ftype-badge {ftype_css}">{ftype_label}</span></td>')
+        lines.append(f'                <td class="col-title">{_e(issue["title"])}</td>')
+        lines.append(f'                <td class="col-jobs">{jobs_label}</td>')
+        lines.append(f'            </tr>')
+        lines.append(f'            <tr class="detail-row"><td colspan="5">')
         if issue.get("root_cause"):
             lines.append(f'                <div class="root-cause"><strong>Root Cause:</strong> {_e(issue["root_cause"])}</div>')
         lines.append(f'                <div class="bug-links">{_render_bug_links(bug_match)}</div>')
@@ -282,7 +324,8 @@ def render_release_section(version, rdata, bug_candidates):
             lines.append("                </ul>")
         if issue.get("next_steps"):
             lines.append(f"                <p><em>Next Steps:</em> {_e(issue['next_steps'])}</p>")
-        lines.append("            </div>")
+        lines.append("            </td></tr>")
+    lines.append('            </table>')
 
     lines.append("        </div>")
     return "\n".join(lines)
@@ -300,6 +343,19 @@ def render_pr_section(pr_data, all_pr_bugs):
             "        </div>"
         )
 
+    toc_lines = []
+    toc_lines.append('        <div class="toc">')
+    toc_lines.append('            <h3>Table of Contents</h3>')
+    toc_lines.append('            <ul>')
+    for pr in pr_data["prs"]:
+        b = pr.get("breakdown", {})
+        toc_lines.append(
+            f'                <li><a href="#pr-{pr["number"]}">PR# {pr["number"]}: {_e(pr["title"])}</a>'
+            f' &mdash; {pr["failed"]} failures ({b.get("build", 0)} build, {b.get("test", 0)} test, {b.get("infrastructure", 0)} infra)</li>'
+        )
+    toc_lines.append('            </ul>')
+    toc_lines.append('        </div>')
+
     lines = []
     for pr in pr_data["prs"]:
         total_failed = pr["failed"]
@@ -308,27 +364,55 @@ def render_pr_section(pr_data, all_pr_bugs):
 
         lines.append(f'        <div class="release-section" id="pr-{pr["number"]}">')
         lines.append('            <div class="release-header">')
-        lines.append(f'                <h2>PR #{pr["number"]}: {_e(pr["title"])}</h2>')
+        pr_link = f'<a href="{_e(pr["url"])}" target="_blank">PR# {pr["number"]}</a>' if pr.get("url") else f'PR# {pr["number"]}'
+        lines.append(f'                <h2>{pr_link}: {_e(pr["title"])}</h2>')
         lines.append(f'                <span class="badge {badge}">{total_failed} {label}</span>')
         lines.append("            </div>")
-        if pr.get("url"):
-            lines.append(f'            <p><a href="{_e(pr["url"])}" target="_blank">{_e(pr["url"])}</a></p>')
-        lines.append(f"            <p>Jobs: {pr['passed']} passed, {pr['failed']} failed</p>")
-
-        for job in pr.get("failed_jobs", []):
-            bug_match = match_issue_to_bugs(job.get("root_cause", "") or job.get("name", ""), all_pr_bugs)
-            lines.append("")
-            lines.append(f'            <h4 class="collapsible"><span class="job-date">[{_e(job["date"])}]</span> {job["number"]}. {_e(job["name"])}</h4>')
-            lines.append('            <div class="collapsible-content">')
-            if job.get("url"):
-                lines.append(f'                <p><strong>Job:</strong> <span class="job-date">[{_e(job["date"])}]</span> <a href="{_e(job["url"])}" target="_blank">{_e(job["name"])}</a></p>')
-            if job.get("root_cause"):
-                lines.append(f'                <div class="root-cause"><strong>Root Cause:</strong> {_e(job["root_cause"])}</div>')
-            lines.append(f'                <div class="bug-links">{_render_bug_links(bug_match)}</div>')
+        b = pr.get("breakdown", {})
+        if b:
+            lines.append('            <div class="breakdown">')
+            lines.append(f'                <span class="breakdown-item"><strong>{b.get("build", 0)}</strong> Build</span>')
+            lines.append(f'                <span class="breakdown-item"><strong>{b.get("test", 0)}</strong> Test</span>')
+            lines.append(f'                <span class="breakdown-item"><strong>{b.get("infrastructure", 0)}</strong> Infrastructure</span>')
             lines.append("            </div>")
 
+        lines.append('            <table class="issues-table">')
+        for issue in pr.get("issues", []):
+            bug_match = match_issue_to_bugs(issue.get("title", ""), all_pr_bugs)
+            jc = issue["job_count"]
+            sev = issue.get("severity", "UNKNOWN").upper()
+            sev_css = f"severity-{sev.lower()}" if sev in ("HIGH", "MEDIUM", "LOW", "CRITICAL") else ""
+            ftype = issue.get("failure_type", "test")
+            ftype_label = "INFRA" if ftype == "infrastructure" else ftype.upper()
+            ftype_css = "ftype-infra" if ftype == "infrastructure" else f"ftype-{ftype}"
+            jobs_label = f'{jc} {"job" if jc == 1 else "jobs"}'
+
+            lines.append(f'            <tr class="issue-row">')
+            lines.append(f'                <td class="col-num">{issue["number"]}.</td>')
+            lines.append(f'                <td class="col-sev"><span class="severity-badge {sev_css}">{sev}</span></td>')
+            lines.append(f'                <td class="col-ftype"><span class="ftype-badge {ftype_css}">{ftype_label}</span></td>')
+            lines.append(f'                <td class="col-title">{_e(issue["title"])}</td>')
+            lines.append(f'                <td class="col-jobs">{jobs_label}</td>')
+            lines.append(f'            </tr>')
+            lines.append(f'            <tr class="detail-row"><td colspan="5">')
+            if issue.get("root_cause"):
+                lines.append(f'                <div class="root-cause"><strong>Root Cause:</strong> {_e(issue["root_cause"])}</div>')
+            lines.append(f'                <div class="bug-links">{_render_bug_links(bug_match)}</div>')
+            if issue.get("affected_jobs"):
+                lines.append("                <p><strong>Affected Jobs:</strong></p><ul>")
+                for job in issue["affected_jobs"]:
+                    if job.get("url"):
+                        lines.append(f'                    <li><span class="job-date">[{_e(job["date"])}]</span> <a href="{_e(job["url"])}" target="_blank">{_e(job["name"])}</a></li>')
+                    else:
+                        lines.append(f'                    <li><span class="job-date">[{_e(job["date"])}]</span> {_e(job["name"])}</li>')
+                lines.append("                </ul>")
+            if issue.get("next_steps"):
+                lines.append(f"                <p><em>Next Steps:</em> {_e(issue['next_steps'])}</p>")
+            lines.append("            </td></tr>")
+        lines.append('            </table>')
+
         lines.append("        </div>")
-    return "\n".join(lines)
+    return "\n".join(toc_lines) + "\n\n" + "\n".join(lines)
 
 
 def generate_html(releases_data, bug_data, pr_data, all_pr_bugs, timestamp):

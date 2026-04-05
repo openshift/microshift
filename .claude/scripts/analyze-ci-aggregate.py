@@ -255,6 +255,22 @@ def classify_breakdown(stack_layer, step_name="", error_signature=""):
 
 def build_release_json(release, jobs, timestamp):
     """Build the release summary as a dict (ready for json.dump)."""
+    issues, breakdown = _build_issues_from_jobs(jobs)
+
+    return {
+        "release": release,
+        "total_failed": len(jobs),
+        "date": timestamp.strftime("%Y-%m-%d"),
+        "breakdown": breakdown,
+        "issues": issues,
+    }
+
+
+def _build_issues_from_jobs(jobs):
+    """Group jobs by error signature and return (issues list, breakdown dict).
+
+    Shared by both release and PR builders.
+    """
     groups = group_by_signature(jobs)
     groups.sort(key=lambda g: (max(j["severity"] for j in g), len(g)), reverse=True)
 
@@ -269,11 +285,17 @@ def build_release_json(release, jobs, timestamp):
     issues = []
     for i, group in enumerate(groups, 1):
         rep = max(group, key=lambda j: j["severity"])
+        failure_type = classify_breakdown(
+            rep["stack_layer"],
+            rep.get("step_name", ""),
+            rep.get("error_signature", ""),
+        )
         issues.append({
             "number": i,
             "title": rep["error_signature"],
             "job_count": len(group),
             "severity": classify_severity(group),
+            "failure_type": failure_type,
             "root_cause": rep.get("error_text", ""),
             "next_steps": rep.get("remediation_text", ""),
             "affected_jobs": [
@@ -282,13 +304,7 @@ def build_release_json(release, jobs, timestamp):
             ],
         })
 
-    return {
-        "release": release,
-        "total_failed": len(jobs),
-        "date": timestamp.strftime("%Y-%m-%d"),
-        "breakdown": breakdown,
-        "issues": issues,
-    }
+    return issues, breakdown
 
 
 def build_pr_json(pr_jobs, timestamp):
@@ -303,22 +319,15 @@ def build_pr_json(pr_jobs, timestamp):
         if not jobs:
             continue
         first = jobs[0]
+        issues, breakdown = _build_issues_from_jobs(jobs)
         prs.append({
             "number": pr_number,
             "title": first.get("pr_title", ""),
             "url": first.get("pr_url", ""),
             "passed": 0,
             "failed": len(jobs),
-            "failed_jobs": [
-                {
-                    "number": j_idx,
-                    "name": j["job_name"],
-                    "date": j["finished"],
-                    "root_cause": j.get("error_text", ""),
-                    "url": j["job_url"],
-                }
-                for j_idx, j in enumerate(jobs, 1)
-            ],
+            "breakdown": breakdown,
+            "issues": issues,
         })
 
     return {
