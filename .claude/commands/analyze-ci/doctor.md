@@ -35,7 +35,7 @@ WORKDIR=/tmp/analyze-ci-claude-workdir.$(date +%y%m%d)
 1. Run `WORKDIR=/tmp/analyze-ci-claude-workdir.$(date +%y%m%d)` using the `Bash` tool
 2. Run the prepare script:
    ```bash
-   WORKDIR=${WORKDIR} bash .claude/scripts/analyze-ci-doctor.sh prepare $ARGUMENTS --rebase
+   bash .claude/scripts/analyze-ci-doctor.sh prepare --workdir ${WORKDIR} $ARGUMENTS --rebase
    ```
 3. The script deterministically:
    - For each release: fetches failed periodic jobs, downloads artifacts, writes `${WORKDIR}/analyze-ci-release-<version>-jobs.json`
@@ -110,7 +110,7 @@ Analyzing N jobs in parallel across M releases...
 **Actions**:
 1. Run the finalize script:
    ```bash
-   WORKDIR=${WORKDIR} bash .claude/scripts/analyze-ci-doctor.sh finalize $ARGUMENTS
+   bash .claude/scripts/analyze-ci-doctor.sh finalize --workdir ${WORKDIR} $ARGUMENTS
    ```
 2. The script deterministically:
    - Runs `analyze-ci-aggregate.py` for each release and for PRs → `summary.json` files

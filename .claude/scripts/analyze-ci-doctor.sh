@@ -5,23 +5,23 @@ set -euo pipefail
 #
 # Two phases called by the doctor skill with LLM steps in between:
 #
-#   analyze-ci-doctor.sh prepare <releases> [--rebase]
+#   analyze-ci-doctor.sh prepare --workdir DIR <releases> [--rebase]
 #     - Collects failed jobs for each release and rebase PRs
 #     - Downloads all artifacts in parallel
 #     - Writes per-release and PR jobs JSON files
 #
-#   analyze-ci-doctor.sh finalize <releases>
+#   analyze-ci-doctor.sh finalize --workdir DIR <releases>
 #     - Runs analyze-ci-aggregate.py for each release and PRs
 #     - Runs analyze-ci-create-report.py to generate HTML
 #
 # Usage from doctor skill:
-#   1. analyze-ci-doctor.sh prepare 4.18,4.19,4.20,main --rebase
+#   1. analyze-ci-doctor.sh prepare --workdir $WORKDIR 4.18,4.19,4.20,main --rebase
 #   2. (LLM launches prow-job agents for all jobs)
 #   3. (LLM launches create-bugs agents for Jira search)
-#   4. analyze-ci-doctor.sh finalize 4.18,4.19,4.20,main
+#   4. analyze-ci-doctor.sh finalize --workdir $WORKDIR 4.18,4.19,4.20,main
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-WORKDIR="${WORKDIR:-/tmp/analyze-ci-claude-workdir.$(date +%y%m%d)}"
+WORKDIR=""
 
 # ---------------------------------------------------------------------------
 # prepare
@@ -33,15 +33,18 @@ cmd_prepare() {
 
     while [[ ${#} -gt 0 ]]; do
         case "${1}" in
+            --workdir) WORKDIR="${2}"; shift 2 ;;
             --rebase) do_rebase=true; shift ;;
             -*) echo "Unknown option: ${1}" >&2; return 1 ;;
             *) releases_arg="${1}"; shift ;;
         esac
     done
 
+    WORKDIR="${WORKDIR:-/tmp/analyze-ci-claude-workdir.$(date +%y%m%d)}"
+
     if [[ -z "${releases_arg}" ]]; then
         echo "Error: releases argument required" >&2
-        echo "Usage: $(basename "$0") prepare <release1,release2,...> [--rebase]" >&2
+        echo "Usage: $(basename "$0") prepare [--workdir DIR] <release1,release2,...> [--rebase]" >&2
         return 1
     fi
 
@@ -159,14 +162,17 @@ cmd_finalize() {
 
     while [[ ${#} -gt 0 ]]; do
         case "${1}" in
+            --workdir) WORKDIR="${2}"; shift 2 ;;
             -*) echo "Unknown option: ${1}" >&2; return 1 ;;
             *) releases_arg="${1}"; shift ;;
         esac
     done
 
+    WORKDIR="${WORKDIR:-/tmp/analyze-ci-claude-workdir.$(date +%y%m%d)}"
+
     if [[ -z "${releases_arg}" ]]; then
         echo "Error: releases argument required" >&2
-        echo "Usage: $(basename "$0") finalize <release1,release2,...>" >&2
+        echo "Usage: $(basename "$0") finalize [--workdir DIR] <release1,release2,...>" >&2
         return 1
     fi
 
@@ -202,13 +208,14 @@ cmd_finalize() {
 # ---------------------------------------------------------------------------
 
 usage() {
-    echo "Usage: $(basename "$0") <command> <releases> [options]" >&2
+    echo "Usage: $(basename "$0") <command> [--workdir DIR] <releases> [options]" >&2
     echo "" >&2
     echo "Commands:" >&2
-    echo "  prepare <releases> [--rebase]  Collect jobs and download artifacts" >&2
-    echo "  finalize <releases>            Aggregate results and generate HTML" >&2
+    echo "  prepare [--workdir DIR] <releases> [--rebase]  Collect jobs and download artifacts" >&2
+    echo "  finalize [--workdir DIR] <releases>            Aggregate results and generate HTML" >&2
     echo "" >&2
     echo "  <releases>: comma-separated release versions (e.g., 4.18,4.19,4.20,main)" >&2
+    echo "  --workdir DIR: work directory (default: /tmp/analyze-ci-claude-workdir.YYMMDD)" >&2
     exit 1
 }
 
