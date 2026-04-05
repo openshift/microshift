@@ -82,6 +82,7 @@ def parse_structured_summary(filepath):
         "stack_layer": data.get("STACK_LAYER", ""),
         "step_name": data.get("STEP_NAME", ""),
         "error_signature": data.get("ERROR_SIGNATURE", ""),
+        "raw_error": data.get("RAW_ERROR", ""),
         "infrastructure_failure": data.get("INFRASTRUCTURE_FAILURE", "false").lower() == "true",
         "job_url": data.get("JOB_URL", ""),
         "job_name": data.get("JOB_NAME", ""),
@@ -119,21 +120,32 @@ def _signature_similarity(sig_a, sig_b):
     return len(tokens_a & tokens_b) / min(len(tokens_a), len(tokens_b))
 
 
+def _grouping_text(job):
+    """Return the text used for similarity grouping.
+
+    Prefers RAW_ERROR (verbatim log text, deterministic) over
+    ERROR_SIGNATURE (LLM-paraphrased, variable across runs).
+    """
+    return job.get("raw_error") or job.get("error_signature", "")
+
+
 def _group_by_similarity(jobs):
-    """Group jobs by ERROR_SIGNATURE token similarity.
+    """Group jobs by similarity of their grouping text.
+
+    Uses RAW_ERROR when available (deterministic log text),
+    falling back to ERROR_SIGNATURE for older reports.
 
     A new job is compared against ALL existing members of each group,
     not just the first.  If any member exceeds the similarity threshold
-    the job joins that group.  This makes grouping less sensitive to
-    insertion order and to signature phrasing variation.
+    the job joins that group.
     """
     groups = []
     for job in jobs:
-        sig = job["error_signature"]
+        sig = _grouping_text(job)
         placed = False
         for group in groups:
             if any(
-                _signature_similarity(sig, member["error_signature"]) >= SIMILARITY_THRESHOLD
+                _signature_similarity(sig, _grouping_text(member)) >= SIMILARITY_THRESHOLD
                 for member in group
             ):
                 group.append(job)

@@ -166,6 +166,7 @@ SEVERITY: {1-5, same as Error Severity above}
 STACK_LAYER: {AWS Infra, External Infrastructure, build phase, deploy phase, test setup phase, Test Configuration, test, teardown - same as Stack Layer above}
 STEP_NAME: {same as Step Name above}
 ERROR_SIGNATURE: {a concise, unique one-line description of the root cause - not the full error, just enough to identify and deduplicate this failure}
+RAW_ERROR: {the primary error message copied VERBATIM from the log file - see rules below}
 INFRASTRUCTURE_FAILURE: {true if Stack Layer is AWS Infra or the failure is due to CI infrastructure rather than product code, false otherwise}
 JOB_URL: {the full prow job URL — when given a URL as input, use it directly; when given a local artifacts dir, reconstruct from the build-log.txt "Link to job on registry info site" line or from the directory path structure}
 JOB_NAME: {the full job name — extract from the JOB_URL path, or from the build-log.txt "Running step" lines, or from the artifacts directory structure}
@@ -174,8 +175,21 @@ FINISHED: {the job finish date in YYYY-MM-DD format, extracted from finished.jso
 --- END STRUCTURED SUMMARY ---
 ```
 
-The ERROR_SIGNATURE field is critical for deduplication. It should capture the essence of the failure in a way that two jobs failing for the same reason produce identical or near-identical signatures. Examples:
-- `greenboot timeout waiting for MicroShift to start after bootc upgrade`
-- `OCP conformance test NetworkPolicy timeout`
-- `AWS EC2 quota exceeded in us-east-1`
-- `rpm-ostree upgrade failed: package conflict microshift-selinux`
+### RAW_ERROR rules
+
+The `RAW_ERROR` field is used by downstream scripts for deterministic grouping. Two runs analyzing the same job MUST produce the same RAW_ERROR. Keep it simple — fewer rules mean less room for variation.
+
+1. **Copy-paste the exact error text** from the log — do NOT paraphrase, summarize, or reword
+2. **Pick only ONE error** — the primary error that caused the step to fail. If multiple errors exist, pick the first fatal one.
+3. **Only strip timestamps** — remove leading timestamps like `2026-04-01T06:21:48Z`. Keep everything else verbatim, including prefixes like `An error occurred...` or `error:`.
+4. **Never concatenate multiple errors** — pick ONE error, not a semicolon-separated list
+5. **Truncate to ~150 characters** if the raw message is very long — keep the distinctive part
+
+Examples of good RAW_ERROR values (copied verbatim from logs):
+- `An error occurred (InvalidClientTokenId) when calling the CreateStack operation: The security token included in the request is invalid.`
+- `panic: runtime error: index out of range [6] with length 6`
+- `Process did not finish before 4h0m0s timeout`
+- `error: the server doesn't have a resource type "clusterversion"`
+- `package github.com/opencontainers/runc/libcontainer/cgroups: module github.com/opencontainers/runc@latest found, but does not contain package`
+
+The ERROR_SIGNATURE field remains as a human-readable description for reports and Jira bug titles.

@@ -44,6 +44,7 @@ SEVERITY: <1-5>
 STACK_LAYER: <AWS Infra|External Infrastructure|build phase|deploy phase|test setup phase|Test Configuration|test|teardown>
 STEP_NAME: <the CI step where the error occurred>
 ERROR_SIGNATURE: <concise, unique description of the root cause error>
+RAW_ERROR: <verbatim primary error message from logs — used for deterministic grouping>
 INFRASTRUCTURE_FAILURE: <true|false>
 JOB_URL: <full prow job URL>
 JOB_NAME: <full periodic job name>
