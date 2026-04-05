@@ -5,20 +5,20 @@ set -euo pipefail
 #
 # Accepts JSON on stdin — either flat job array (from microshift-prow-jobs-for-release.sh)
 # or nested PR array (from microshift-prow-jobs-for-pull-requests.sh --mode detail).
-# Downloads artifacts into ${WORKDIR}/artifacts/${BUILD_ID}/ with parallel workers.
+# Downloads artifacts into WORKDIR/artifacts/BUILD_ID/ with parallel workers.
 # Skips already-downloaded jobs. Outputs JSON job list with local paths on stdout.
 #
 # Usage:
-#   microshift-prow-jobs-for-release.sh 4.22 | analyze-ci-download-jobs.sh
-#   microshift-prow-jobs-for-release.sh 4.22 | analyze-ci-download-jobs.sh --parallel 4
-#   microshift-prow-jobs-for-pull-requests.sh --mode detail | analyze-ci-download-jobs.sh
+#   microshift-prow-jobs-for-release.sh 4.22 | analyze-ci-download-jobs.sh --workdir DIR
+#   microshift-prow-jobs-for-release.sh 4.22 | analyze-ci-download-jobs.sh --workdir DIR --parallel 4
+#   microshift-prow-jobs-for-pull-requests.sh --mode detail | analyze-ci-download-jobs.sh --workdir DIR
 #
 # Output (stdout): JSON array of job objects with "artifacts_dir" added:
 #   [{"job":"...","url":"...","build_id":"...","artifacts_dir":"/tmp/.../artifacts/BUILD_ID"}, ...]
 #
 # Progress/errors: stderr
 
-WORKDIR="${WORKDIR:-/tmp/analyze-ci-claude-workdir.$(date +%y%m%d)}"
+WORKDIR=""
 
 # Convert a Prow view URL to a GCS path
 url_to_gcs() {
@@ -60,8 +60,9 @@ download_job() {
 }
 
 usage() {
-    echo "Usage: <jobs-json> | ${0} [--parallel N]" >&2
-    echo "  --parallel N: number of parallel downloads (default: 6)" >&2
+    echo "Usage: <jobs-json> | ${0} --workdir DIR [--parallel N]" >&2
+    echo "  --workdir DIR: work directory (required)" >&2
+    echo "  --parallel N:  number of parallel downloads (default: 6)" >&2
     echo "" >&2
     echo "Accepts JSON on stdin from:" >&2
     echo "  microshift-prow-jobs-for-release.sh (flat job array)" >&2
@@ -74,6 +75,9 @@ main() {
 
     while [[ ${#} -gt 0 ]]; do
         case "${1}" in
+            --workdir)
+                [[ ${#} -lt 2 ]] && { echo "Error: --workdir requires a directory" >&2; usage; }
+                WORKDIR="${2}"; shift 2 ;;
             --parallel)
                 [[ ${#} -lt 2 ]] && { echo "Error: --parallel requires a number" >&2; usage; }
                 parallel="${2}"; shift 2 ;;
@@ -82,6 +86,11 @@ main() {
             *) echo "Unknown argument: ${1}" >&2; usage ;;
         esac
     done
+
+    if [[ -z "${WORKDIR}" ]]; then
+        echo "Error: --workdir is required" >&2
+        usage
+    fi
 
     mkdir -p "${WORKDIR}/artifacts"
 

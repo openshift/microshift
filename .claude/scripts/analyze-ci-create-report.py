@@ -57,13 +57,7 @@ CSS = """\
         .overview-card { background: white; border-radius: 8px; padding: 12px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
         .overview-card .number { font-size: 1.6em; font-weight: 700; }
         .overview-card .label { color: #6c757d; font-size: 0.9em; }
-        .collapsible { cursor: pointer; user-select: none; }
-        .collapsible::before { content: '\\25B6  '; font-size: 0.8em; }
-        .collapsible.active::before { content: '\\25BC  '; }
-        .collapsible .job-date { font-weight: 400; color: #6c757d; font-size: 0.85em; }
         .job-date { font-weight: 400; color: #6c757d; font-size: 0.85em; }
-        .collapsible-content { display: none; }
-        .collapsible-content.show { display: block; }
         .issues-table { width: 100%; border-collapse: collapse; margin: 15px 0; }
         .issues-table td { padding: 5px 6px; vertical-align: middle; }
         .issues-table .col-num { width: 30px; text-align: right; font-weight: 700; color: #495057; padding-right: 10px; }
@@ -122,12 +116,6 @@ function showTab(e, name) {
     document.getElementById('tab-' + name).classList.add('active');
     e.target.classList.add('active');
 }
-document.querySelectorAll('.collapsible').forEach(function(el) {
-    el.addEventListener('click', function() {
-        this.classList.toggle('active');
-        this.nextElementSibling.classList.toggle('show');
-    });
-});
 document.querySelectorAll('.col-title').forEach(function(el) {
     el.addEventListener('click', function() {
         this.classList.toggle('active');
@@ -307,14 +295,14 @@ def render_release_section(version, rdata, bug_candidates):
         ftype_css = "ftype-infra" if ftype == "infrastructure" else f"ftype-{ftype}"
         jobs_label = f'{jc} {"job" if jc == 1 else "jobs"}'
 
-        lines.append(f'            <tr class="issue-row">')
+        lines.append('            <tr class="issue-row">')
         lines.append(f'                <td class="col-num">{issue["number"]}.</td>')
         lines.append(f'                <td class="col-sev"><span class="severity-badge {sev_css}">{sev}</span></td>')
         lines.append(f'                <td class="col-ftype"><span class="ftype-badge {ftype_css}">{ftype_label}</span></td>')
         lines.append(f'                <td class="col-title">{_e(issue["title"])}</td>')
         lines.append(f'                <td class="col-jobs">{jobs_label}</td>')
-        lines.append(f'            </tr>')
-        lines.append(f'            <tr class="detail-row"><td colspan="5">')
+        lines.append('            </tr>')
+        lines.append('            <tr class="detail-row"><td colspan="5">')
         if issue.get("root_cause"):
             lines.append(f'                <div class="root-cause"><strong>Root Cause:</strong> {_e(issue["root_cause"])}</div>')
         lines.append(f'                <div class="bug-links">{_render_bug_links(bug_match)}</div>')
@@ -371,10 +359,10 @@ def render_pr_section(pr_data, all_pr_bugs, pr_status):
                 "number": pr["number"],
                 "title": pr.get("title", ""),
                 "url": pr.get("url", ""),
-                "passed": pr.get("passed", 0),
+                "passed": 0,
                 "failed": pr.get("failed", 0),
                 "pending": 0,
-                "total": pr.get("passed", 0) + pr.get("failed", 0),
+                "total": pr.get("failed", 0),
                 "analysis": pr,
             })
 
@@ -434,7 +422,8 @@ def render_pr_section(pr_data, all_pr_bugs, pr_status):
             status_parts.append(f'{pr["failed"]} failed')
         if pending:
             status_parts.append(f'{pending} running')
-        lines.append(f'            <p>Jobs: {", ".join(status_parts)} ({pr["total"]} total)</p>')
+        if status_parts:
+            lines.append(f'            <p>Jobs: {", ".join(status_parts)} ({pr["total"]} total)</p>')
 
         if analysis and analysis.get("issues"):
             b = analysis.get("breakdown", {})
@@ -456,14 +445,14 @@ def render_pr_section(pr_data, all_pr_bugs, pr_status):
                 ftype_css = "ftype-infra" if ftype == "infrastructure" else f"ftype-{ftype}"
                 jobs_label = f'{jc} {"job" if jc == 1 else "jobs"}'
 
-                lines.append(f'            <tr class="issue-row">')
+                lines.append('            <tr class="issue-row">')
                 lines.append(f'                <td class="col-num">{issue["number"]}.</td>')
                 lines.append(f'                <td class="col-sev"><span class="severity-badge {sev_css}">{sev}</span></td>')
                 lines.append(f'                <td class="col-ftype"><span class="ftype-badge {ftype_css}">{ftype_label}</span></td>')
                 lines.append(f'                <td class="col-title">{_e(issue["title"])}</td>')
                 lines.append(f'                <td class="col-jobs">{jobs_label}</td>')
-                lines.append(f'            </tr>')
-                lines.append(f'            <tr class="detail-row"><td colspan="5">')
+                lines.append('            </tr>')
+                lines.append('            <tr class="detail-row"><td colspan="5">')
                 if issue.get("root_cause"):
                     lines.append(f'                <div class="root-cause"><strong>Root Cause:</strong> {_e(issue["root_cause"])}</div>')
                 lines.append(f'                <div class="bug-links">{_render_bug_links(bug_match)}</div>')
@@ -505,7 +494,6 @@ def generate_html(releases_data, bug_data, pr_data, all_pr_bugs, pr_status, time
         pr_failed = pr_data.get("total_failed", 0)
     else:
         pr_failed = 0
-    pr_total = len(pr_status) if pr_status else (len(pr_data["prs"]) if pr_data and pr_data.get("prs") else 0)
     pr_css = "status-fail" if pr_failed > 0 else "status-pass"
     cards.append(
         '        <div class="overview-card">\n'
@@ -687,10 +675,15 @@ def main():
         else:
             print(f"    Release {version}: no data")
     print("  Pull Requests:")
-    if pr_data and pr_data.get("has_content"):
+    if pr_status:
+        pr_total_failed = sum(p.get("failed", 0) for p in pr_status)
+        pr_total_pending = sum(p.get("pending", 0) for p in pr_status)
+        parts = [f"{len(pr_status)} rebase PRs", f"{pr_total_failed} failed jobs"]
+        if pr_total_pending:
+            parts.append(f"{pr_total_pending} running")
+        print(f"    {', '.join(parts)}")
+    elif pr_data and pr_data.get("has_content"):
         print(f"    {len(pr_data['prs'])} rebase PRs with {pr_data['total_failed']} total failed jobs")
-    elif pr_data:
-        print("    No open rebase PRs or no failures found")
     else:
         print("    No PR data")
     print(f"\nHTML report generated: {output_path}")

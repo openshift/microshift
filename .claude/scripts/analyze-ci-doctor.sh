@@ -62,7 +62,7 @@ cmd_prepare() {
 
         echo "  Collecting failed periodic jobs..." >&2
         local raw_json
-        raw_json=$(bash "${SCRIPT_DIR}/microshift-prow-jobs-for-release.sh" "${release}" 2>/dev/null)
+        raw_json=$(bash "${SCRIPT_DIR}/microshift-prow-jobs-for-release.sh" "${release}" 2>/dev/null) || raw_json="[]"
 
         local filtered_json
         filtered_json=$(echo "${raw_json}" | jq '[.[] | select(.type == "periodic")]')
@@ -78,7 +78,7 @@ cmd_prepare() {
 
         echo "  Found ${count} failed periodic jobs, downloading artifacts..." >&2
         echo "${filtered_json}" | \
-            bash "${SCRIPT_DIR}/analyze-ci-download-jobs.sh" 2>/dev/null \
+            bash "${SCRIPT_DIR}/analyze-ci-download-jobs.sh" --workdir "${WORKDIR}" 2>/dev/null \
             > "${jobs_file}"
 
         total_jobs=$((total_jobs + count))
@@ -95,7 +95,7 @@ cmd_prepare() {
         echo "  Collecting rebase PRs..." >&2
         local pr_json
         pr_json=$(bash "${SCRIPT_DIR}/microshift-prow-jobs-for-pull-requests.sh" \
-            --mode detail --author "microshift-rebase-script[bot]" 2>/dev/null)
+            --mode detail --author "microshift-rebase-script[bot]" 2>/dev/null) || pr_json="[]"
 
         local pr_count
         pr_count=$(echo "${pr_json}" | jq 'length')
@@ -132,7 +132,7 @@ cmd_prepare() {
 
                 echo "  Downloading artifacts for ${job_count} failed jobs across ${failed_pr_count} PRs..." >&2
                 echo "${failed_prs}" | \
-                    bash "${SCRIPT_DIR}/analyze-ci-download-jobs.sh" 2>/dev/null \
+                    bash "${SCRIPT_DIR}/analyze-ci-download-jobs.sh" --workdir "${WORKDIR}" 2>/dev/null \
                     > "${prs_file}"
 
                 total_jobs=$((total_jobs + job_count))

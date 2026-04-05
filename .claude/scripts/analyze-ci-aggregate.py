@@ -324,7 +324,6 @@ def build_pr_json(pr_jobs, timestamp):
             "number": pr_number,
             "title": first.get("pr_title", ""),
             "url": first.get("pr_url", ""),
-            "passed": 0,
             "failed": len(jobs),
             "breakdown": breakdown,
             "issues": issues,
