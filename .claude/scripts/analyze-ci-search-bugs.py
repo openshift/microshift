@@ -96,6 +96,16 @@ def parse_structured_summary(filepath):
 # Grouping
 # ---------------------------------------------------------------------------
 
+def _normalize_step_name(step_name):
+    """Extract the step ref from a fully-qualified Prow step name.
+
+    Prow step names follow ``<test-variant>-<step-ref>`` where the
+    step ref typically starts with ``openshift-microshift-``.
+    """
+    m = re.search(r"(openshift-microshift-\S+)", step_name)
+    return m.group(1) if m else step_name
+
+
 def _tokenize(text):
     words = re.findall(r"[a-z0-9][a-z0-9_.-]*[a-z0-9]|[a-z0-9]", text.lower())
     return {w for w in words if w not in STOP_WORDS and len(w) >= 2}
@@ -109,20 +119,49 @@ def _signature_similarity(sig_a, sig_b):
     return len(tokens_a & tokens_b) / min(len(tokens_a), len(tokens_b))
 
 
-def group_by_signature(jobs):
-    """Group jobs by ERROR_SIGNATURE similarity."""
+def _group_by_similarity(jobs):
+    """Group jobs by ERROR_SIGNATURE token similarity.
+
+    A new job is compared against ALL existing members of each group,
+    not just the first.  If any member exceeds the similarity threshold
+    the job joins that group.  This makes grouping less sensitive to
+    insertion order and to signature phrasing variation.
+    """
     groups = []
     for job in jobs:
         sig = job["error_signature"]
         placed = False
         for group in groups:
-            if _signature_similarity(sig, group[0]["error_signature"]) >= SIMILARITY_THRESHOLD:
+            if any(
+                _signature_similarity(sig, member["error_signature"]) >= SIMILARITY_THRESHOLD
+                for member in group
+            ):
                 group.append(job)
                 placed = True
                 break
         if not placed:
             groups.append([job])
     return groups
+
+
+def group_by_signature(jobs):
+    """Two-pass grouping: first by step_name, then by signature similarity.
+
+    Grouping by step_name first prevents jobs from different CI steps
+    from being merged together even when their error signatures share
+    enough tokens to exceed the similarity threshold.
+    """
+    # Pass 1: bucket by normalized step_name
+    by_step = {}
+    for job in jobs:
+        step = _normalize_step_name(job.get("step_name", ""))
+        by_step.setdefault(step, []).append(job)
+
+    # Pass 2: within each step bucket, group by signature similarity
+    all_groups = []
+    for step_jobs in by_step.values():
+        all_groups.extend(_group_by_similarity(step_jobs))
+    return all_groups
 
 
 # ---------------------------------------------------------------------------

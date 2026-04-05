@@ -109,6 +109,27 @@ def parse_prose_fields(filepath):
 # Grouping
 # ---------------------------------------------------------------------------
 
+def _normalize_step_name(step_name):
+    """Extract the step ref from a fully-qualified Prow step name.
+
+    Prow step names follow the pattern ``<test-variant>-<step-ref>``
+    where the step ref typically starts with ``openshift-microshift-``.
+    The LLM sometimes includes the test-variant prefix, sometimes not,
+    which would cause identical steps to land in different buckets
+    during two-pass grouping.
+
+    Examples:
+        "openshift-microshift-infra-aws-ec2"
+            → "openshift-microshift-infra-aws-ec2"
+        "e2e-aws-tests-bootc-arm-nightly-el10-openshift-microshift-infra-aws-ec2"
+            → "openshift-microshift-infra-aws-ec2"
+        "clusterbot-nightly-openshift-microshift-infra-aws-ec2"
+            → "openshift-microshift-infra-aws-ec2"
+    """
+    m = re.search(r"(openshift-microshift-\S+)", step_name)
+    return m.group(1) if m else step_name
+
+
 def _tokenize(text):
     words = re.findall(r"[a-z0-9][a-z0-9_.-]*[a-z0-9]|[a-z0-9]", text.lower())
     return {w for w in words if w not in STOP_WORDS and len(w) >= 2}
@@ -122,13 +143,25 @@ def signature_similarity(sig_a, sig_b):
     return len(tokens_a & tokens_b) / min(len(tokens_a), len(tokens_b))
 
 
-def group_by_signature(jobs):
+def _group_by_similarity(jobs):
+    """Group jobs by ERROR_SIGNATURE token similarity.
+
+    A new job is compared against ALL existing members of each group,
+    not just the first.  If any member exceeds the similarity threshold
+    the job joins that group.  This makes grouping less sensitive to
+    insertion order and to signature phrasing variation — each member
+    added to a group acts as an additional reference point for future
+    matches.
+    """
     groups = []
     for job in jobs:
         sig = job["error_signature"]
         placed = False
         for group in groups:
-            if signature_similarity(sig, group[0]["error_signature"]) >= SIMILARITY_THRESHOLD:
+            if any(
+                signature_similarity(sig, member["error_signature"]) >= SIMILARITY_THRESHOLD
+                for member in group
+            ):
                 group.append(job)
                 placed = True
                 break
@@ -137,10 +170,31 @@ def group_by_signature(jobs):
     return groups
 
 
+def group_by_signature(jobs):
+    """Two-pass grouping: first by step_name, then by signature similarity.
+
+    Grouping by step_name first prevents jobs from different CI steps
+    (e.g. conformance vs metal-tests) from being merged together even
+    when their error signatures share enough tokens to exceed the
+    similarity threshold.  This makes the issue count deterministic
+    across runs where only the signature wording varies.
+    """
+    # Pass 1: bucket by normalized step_name
+    by_step = {}
+    for job in jobs:
+        step = _normalize_step_name(job.get("step_name", ""))
+        by_step.setdefault(step, []).append(job)
+
+    # Pass 2: within each step bucket, group by signature similarity
+    all_groups = []
+    for step_jobs in by_step.values():
+        all_groups.extend(_group_by_similarity(step_jobs))
+    return all_groups
+
+
 def classify_severity(group):
-    max_sev = max(j["severity"] for j in group)
     count = len(group)
-    if max_sev >= 4:
+    if count >= 5:
         return "CRITICAL"
     if count >= 3:
         return "HIGH"
@@ -149,7 +203,30 @@ def classify_severity(group):
     return "LOW"
 
 
-def classify_breakdown(stack_layer):
+# Patterns for deterministic breakdown classification.
+# These override the LLM's STACK_LAYER, because step names and error
+# signatures are deterministic while STACK_LAYER varies across runs.
+INFRA_STEP_PATTERNS = ("infra-aws", "infra-gcp", "infra-setup")
+BUILD_STEP_PATTERNS = ("update-origin", "build-image", "iso-build")
+BUILD_SIGNATURE_PATTERNS = ("update-origin", "build-image")
+
+
+def classify_breakdown(stack_layer, step_name="", error_signature=""):
+    lower_step = step_name.lower()
+    lower_sig = error_signature.lower()
+
+    # Step-name overrides — more reliable than LLM's STACK_LAYER
+    if any(k in lower_step for k in INFRA_STEP_PATTERNS):
+        return "infrastructure"
+    if any(k in lower_step for k in BUILD_STEP_PATTERNS):
+        return "build"
+
+    # Error-signature overrides — catches build operations that run
+    # inside a test step (e.g. "make update-origin" in e2e-metal-tests)
+    if any(k in lower_sig for k in BUILD_SIGNATURE_PATTERNS):
+        return "build"
+
+    # Fall back to LLM's classification
     lower = stack_layer.lower()
     if lower in INFRA_LAYERS:
         return "infrastructure"
@@ -169,7 +246,11 @@ def build_release_json(release, jobs, timestamp):
 
     breakdown = {"build": 0, "test": 0, "infrastructure": 0}
     for job in jobs:
-        breakdown[classify_breakdown(job["stack_layer"])] += 1
+        breakdown[classify_breakdown(
+            job["stack_layer"],
+            job.get("step_name", ""),
+            job.get("error_signature", ""),
+        )] += 1
 
     issues = []
     for i, group in enumerate(groups, 1):
