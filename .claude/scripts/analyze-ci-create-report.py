@@ -407,7 +407,9 @@ def render_pr_section(pr_data, all_pr_bugs, pr_status):
         lines.append(f'        <div class="release-section" id="pr-{pr["number"]}">')
         lines.append('            <div class="release-header">')
         pr_link = f'<a href="{_e(pr["url"])}" target="_blank" title="{_e(pr["title"])}">PR# {pr["number"]}</a>' if pr.get("url") else f'<span title="{_e(pr["title"])}">PR# {pr["number"]}</span>'
-        lines.append(f'                <h2>{pr_link}</h2>')
+        pr_release_m = re.search(r"rebase-(release-\d+\.\d+|main)", pr.get("title", ""))
+        pr_release_label = f' (rebase {pr_release_m.group(1)})' if pr_release_m else f': {_e(pr["title"])}' if pr.get("title") else ''
+        lines.append(f'                <h2>{pr_link}{pr_release_label}</h2>')
         label = "failure" if total_failed == 1 else "failures"
         lines.append(f'                <span class="badge {badge}">{total_failed} {label}</span>')
 
