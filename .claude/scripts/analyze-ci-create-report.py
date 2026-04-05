@@ -391,7 +391,7 @@ def render_pr_section(pr_data, all_pr_bugs, pr_status):
         pending = pr.get("pending", 0)
         suffix = f' &mdash; {pending} running' if pending else ''
         toc_lines.append(
-            f'                <li><a href="#pr-{pr["number"]}">PR# {pr["number"]}: {_e(pr["title"])}</a>'
+            f'                <li><a href="#pr-{pr["number"]}">PR# {pr["number"]}</a>'
             f' &mdash; {pr["failed"]} failures ({b.get("build", 0)} build, {b.get("test", 0)} test, {b.get("infrastructure", 0)} infra){suffix}</li>'
         )
     toc_lines.append('            </ul>')
@@ -406,33 +406,31 @@ def render_pr_section(pr_data, all_pr_bugs, pr_status):
 
         lines.append(f'        <div class="release-section" id="pr-{pr["number"]}">')
         lines.append('            <div class="release-header">')
-        pr_link = f'<a href="{_e(pr["url"])}" target="_blank">PR# {pr["number"]}</a>' if pr.get("url") else f'PR# {pr["number"]}'
-        lines.append(f'                <h2>{pr_link}: {_e(pr["title"])}</h2>')
+        pr_link = f'<a href="{_e(pr["url"])}" target="_blank" title="{_e(pr["title"])}">PR# {pr["number"]}</a>' if pr.get("url") else f'<span title="{_e(pr["title"])}">PR# {pr["number"]}</span>'
+        lines.append(f'                <h2>{pr_link}</h2>')
         label = "failure" if total_failed == 1 else "failures"
         lines.append(f'                <span class="badge {badge}">{total_failed} {label}</span>')
 
         lines.append("            </div>")
 
-        # Job status summary
+        # Breakdown: same format as periodics (Build/Test/Infrastructure)
+        # Plus job status (passed/running) when available
         pending = pr.get("pending", 0)
-        status_parts = []
+        if analysis and analysis.get("breakdown"):
+            b = analysis["breakdown"]
+        else:
+            b = {"build": 0, "test": 0, "infrastructure": 0}
+        lines.append('            <div class="breakdown">')
+        lines.append(f'                <span class="breakdown-item"><strong>{b.get("build", 0)}</strong> Build</span>')
+        lines.append(f'                <span class="breakdown-item"><strong>{b.get("test", 0)}</strong> Test</span>')
+        lines.append(f'                <span class="breakdown-item"><strong>{b.get("infrastructure", 0)}</strong> Infrastructure</span>')
         if pr["passed"]:
-            status_parts.append(f'{pr["passed"]} passed')
-        if pr["failed"]:
-            status_parts.append(f'{pr["failed"]} failed')
+            lines.append(f'                <span class="breakdown-item"><strong>{pr["passed"]}</strong> Passed</span>')
         if pending:
-            status_parts.append(f'{pending} running')
-        if status_parts:
-            lines.append(f'            <p>Jobs: {", ".join(status_parts)} ({pr["total"]} total)</p>')
+            lines.append(f'                <span class="breakdown-item"><strong>{pending}</strong> Running</span>')
+        lines.append("            </div>")
 
         if analysis and analysis.get("issues"):
-            b = analysis.get("breakdown", {})
-            if b:
-                lines.append('            <div class="breakdown">')
-                lines.append(f'                <span class="breakdown-item"><strong>{b.get("build", 0)}</strong> Build</span>')
-                lines.append(f'                <span class="breakdown-item"><strong>{b.get("test", 0)}</strong> Test</span>')
-                lines.append(f'                <span class="breakdown-item"><strong>{b.get("infrastructure", 0)}</strong> Infrastructure</span>')
-                lines.append("            </div>")
 
             lines.append('            <table class="issues-table">')
             for issue in analysis["issues"]:
