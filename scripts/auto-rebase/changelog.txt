@@ -1,6 +1,0 @@
-- ovn-kubernetes image-amd64 0fb1abde1454b64b596657600e18f4196229fa5a to af9d912e101fe65cc197e7d0b06182c82d7368f3
-  - cab5ac8d 2026-03-09T15:26:51+01:00 Add pperiyasamy to OWNERS for release-4.17
-
-- ovn-kubernetes image-arm64 0fb1abde1454b64b596657600e18f4196229fa5a to af9d912e101fe65cc197e7d0b06182c82d7368f3
-  - cab5ac8d 2026-03-09T15:26:51+01:00 Add pperiyasamy to OWNERS for release-4.17
-
