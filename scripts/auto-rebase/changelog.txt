@@ -1,7 +1,17 @@
-- router image-arm64 db8d384266051ef06b67883aaa83674bc6c9f1ae to ef5cab6493660c738412ac322486707a40a58c4a
+- operator-framework-olm embedded-component 12a261a3702726aaaa339c5d2fceb8b6078ceec8 to 72a01f66530d38330e9442d2238ab30aa90dcb39
+  - b99f6a70 2026-03-27T06:36:43+00:00 UPSTREAM: <carry>: add jiazha to approvers
+  - c40d8a1c 2026-03-26T03:27:11+00:00 Fix nil pointer dereference in sortUnpackJobs when sorting non-failed jobs (#3793)
+
+- router image-amd64 db8d384266051ef06b67883aaa83674bc6c9f1ae to ef5cab6493660c738412ac322486707a40a58c4a
   - 59e3902 2026-03-25T10:18:34+00:00 OCPBUGS-72591: Lower verbosity for parseIPList empty list logging
   - 0209318 2026-03-13T04:42:46+00:00 Updating ose-haproxy-router-base-container image to be consistent with ART for 4.20 Reconciling with https://github.com/openshift/ocp-build-data/tree/a378a077bf28e578d72fa8e0f10285dc56adf0d1/images/ose-haproxy-router-base.yml
 
-- ovn-kubernetes image-arm64 304bd93419279813366b6a04d7d6f3d1ff464cb1 to 2aec60c6a5b5238c7c75173a1518322ea595a58e
+- ovn-kubernetes image-amd64 304bd93419279813366b6a04d7d6f3d1ff464cb1 to 2aec60c6a5b5238c7c75173a1518322ea595a58e
   - 225848ac 2026-03-25T18:26:11+05:30 EgressFirewall: Use exponential backoff to refresh IP addresses for DNS names
+
+- router image-arm64 ef5cab6493660c738412ac322486707a40a58c4a to 3c365cad8c7037e4aa64a694994ea393abc4d9a2
+  - dc4dc03 2026-03-13T05:32:10+00:00 Updating openshift-enterprise-haproxy-router-container image to be consistent with ART for 4.20 Reconciling with https://github.com/openshift/ocp-build-data/tree/a378a077bf28e578d72fa8e0f10285dc56adf0d1/images/openshift-enterprise-haproxy-router.yml
+
+- kubernetes image-arm64 4ef1baeb6786a70898f3842a06e988d9566aa444 to 51bc740cd4e090500ccdff94eda526ceddf3d2a9
+  - bd4e81273 2026-04-02T20:36:48+00:00 UPSTREAM: <carry>: Add jacobsee and jubittajohn to DOWNSTREAM_OWNERS
 
