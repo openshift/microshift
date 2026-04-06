@@ -1,18 +1,30 @@
-- api embedded-component 80fcf457ee87d9a81075bcc4e6deac506448195f to e9d6d439b48bfa2d127ee90c28e6d0f55243b620
-  - ceacb94c 2026-03-24T09:40:44+05:30 kubebuilder validation and clarified API behavior for KubeletConfig API doc and adds tests
-  - 13eaa95e 2026-03-02T18:23:59+05:30 kubebuilder validation and clarified API behavior for KubeletConfig API doc and adds tests
+- api embedded-component e9d6d439b48bfa2d127ee90c28e6d0f55243b620 to ad9eb11110b6e704efa5000c12c5fb5db1685e8a
+  - 72cac067 2026-04-01T14:05:14-04:00 Include candidate tier in default sippy queries for feature promotion
+  - 78c930f0 2026-03-31T12:59:48-04:00 Remove GCPClusterHostedDNSInstall featuregate
+  - a443b3b6 2026-03-26T11:21:00+01:00 CNTRLPLANE-2796: promote the event-ttl feature
 
-- cluster-ingress-operator embedded-component dfec6c028e2d4eaf7dd161cdc0e75740894df421 to c79099dcdc4e58f5a0d55a47b626a805a02af526
-  - eeb09ed 2026-03-30T14:26:32-04:00 NE-2501: Added network policies for the router
+- cluster-ingress-operator embedded-component c79099dcdc4e58f5a0d55a47b626a805a02af526 to 3c1da4b8b3d4a9fbaf033f4324b5a0ffe2fbf633
+  - 0da1246 2026-03-27T19:48:03-04:00 OCPBUGS-3917: Filter non-FIPS TLS 1.3 ciphers and validate effective profiles
 
-- machine-config-operator embedded-component 39ca98383d9b1aedf6147f9ff89e69b5a23541be to f325e92327ccfcda3ff09c09dc1b233a63fb312b
-  - db7b8e1e 2026-04-01T11:47:17Z MCO-2183: migrated configdrift, kubeletconfig, containerruntimeconfig and metrics e2e test cases
-  - 34cd2aa2 2026-03-13T17:30:09+01:00 OCPBUGS-78154: Add GetDefaultLeaderElectionConfig for MCC
-  - 65d648b8 2026-03-13T16:22:34+01:00 OCPBUGS-78154: Log when using HA default leader election timings
-  - 165da5a9 2026-03-13T15:56:37+01:00 OCPBUGS-78154: Add useDefaultTimings flag to GetLeaderElectionConfig
-  - f016a8e8 2026-03-13T09:58:06+01:00 Trim comment in GetLeaderElectionConfig.
-  - a7b45feb 2026-03-13T09:52:13+01:00 OCPBUGS-78154: Use HA leader election defaults for MCO on SNO.
+- cluster-kube-apiserver-operator embedded-component de2a3ebcb3ceea0ea411a6fbb9b5b52c18c27e06 to 360d3fee5c01437f857d761cff755f8b2e5004b3
+  - d22154c 2026-02-23T12:19:42-05:00 scc: fix uid{Min,Max}Range for nested-container
 
-- oc image-arm64 f835dae3a861b593c4dd8b688394a61614dd6663 to 075cd278d1e62cf49b266e157891967bda16079d
+- cluster-kube-controller-manager-operator embedded-component 7df2876085ac1d76ac11bf476c0538876110c9f0 to b646f5481a723f5613ea45cd4a49dd716f5ae16c
+  - feaa384 2026-03-17T16:01:18+01:00 bindata: Import configmap-csr-controller-ca.yaml from KAS-O
+
+- cluster-network-operator embedded-component 594de43f4f1567e5ce55be2eff7c0cf28d1e09e7 to f3e41c5bf61313ae7408f15b263140bfc184b7d6
+  - 740568c 2026-04-02T00:59:59+02:00 Add VTEP update/patch RBAC for CM
+  - f247bbe 2026-04-02T00:35:17+02:00 Update the CRDs for CUDN/VTEP APIs
+
+- machine-config-operator embedded-component f325e92327ccfcda3ff09c09dc1b233a63fb312b to c4a08067821f304642e731fdcca0c8c6a6b19484
+  - b63d34cf 2026-04-02T13:40:13-05:00 Move state logging to updateConfigAndState after SetDone
+  - 2f270e7e 2026-04-02T09:43:18-04:00 AGENT-1416: Add default NodeDisruptionPolicy for IRI
+  - b7189285 2026-03-30T13:33:55-04:00 Fix order of cleanup to further avoid race
+
+- operator-framework-olm embedded-component 438f0e600e4ae75c8b7854afba5be963061eb2a1 to 51af59545315b37207a76f55825f397f5df13910
+  - 22ef120c 2026-04-01T00:04:23Z Add fgiudici as reviewer (#3805)
+
+- oc image-amd64 12f8fce897cae737720309a894dac856d221485e to 075cd278d1e62cf49b266e157891967bda16079d
   - 075cd278 2026-04-02T11:58:36Z NO-JIRA: Add feature gate changes to changelog JSON output (#2247)
+  - b2332831 2026-03-31T14:21:43-04:00 NO-ISSUE: recover the context in upgrade
 
