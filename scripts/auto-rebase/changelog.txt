@@ -1,0 +1,3 @@
+- operator-framework-olm embedded-component 5cd473d377523ab5746804171dac03e4ae37993f to 4680ec1ee00e1af34e29ec598ac983bf74d2e523
+  - 42b9d713 2026-03-31T00:26:23+00:00 Fix nil pointer dereference in sortUnpackJobs when sorting non-failed jobs (#3793)
+
