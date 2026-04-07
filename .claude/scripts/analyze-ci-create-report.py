@@ -135,13 +135,16 @@ def discover_files(workdir, releases):
     result = {"releases": {}, "prs": {"summary": None, "status": None, "bugs": []}}
 
     for version in releases:
-        entry = {"summary": None, "bugs": None}
+        entry = {"summary": None, "bugs": None, "jobs": None}
         path = os.path.join(workdir, f"analyze-ci-release-{version}-summary.json")
         if os.path.exists(path):
             entry["summary"] = path
         path = os.path.join(workdir, f"analyze-ci-bugs-{version}.json")
         if os.path.exists(path):
             entry["bugs"] = path
+        path = os.path.join(workdir, f"analyze-ci-release-{version}-jobs.json")
+        if os.path.exists(path):
+            entry["jobs"] = path
         result["releases"][version] = entry
 
     path = os.path.join(workdir, "analyze-ci-prs-summary.json")
@@ -301,7 +304,7 @@ def render_release_section(version, rdata, bug_candidates):
             f'                <h2>Release {_e(version)}</h2>\n'
             '                <span class="badge badge-nodata">no data</span>\n'
             '            </div>\n'
-            "            <p>Analysis failed or produced no output.</p>\n"
+            "            <p>Analysis failed to produce results.</p>\n"
             "        </div>"
         )
 
@@ -686,9 +689,20 @@ def main():
     # Load everything via json.load
     releases_data = {}
     bug_data = {}
+    _EMPTY_BREAKDOWN = {"build": 0, "test": 0, "infrastructure": 0}
     for version in releases:
         entry = files["releases"][version]
-        releases_data[version] = load_json(entry["summary"])
+        rdata = load_json(entry["summary"])
+        if rdata is None:
+            # Distinguish "no failures" from "analysis failed" by checking the jobs file
+            jobs = load_json(entry["jobs"])
+            if jobs is not None and len(jobs) == 0:
+                rdata = {
+                    "total_failed": 0,
+                    "issues": [],
+                    "breakdown": _EMPTY_BREAKDOWN,
+                }
+        releases_data[version] = rdata
         bug_data[version] = load_bug_candidates(entry["bugs"])
 
     pr_data = load_json(pr_entry["summary"])
